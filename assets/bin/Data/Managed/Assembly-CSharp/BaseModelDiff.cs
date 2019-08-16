@@ -109,6 +109,8 @@ public class BaseModelDiff
 
 		public List<int> eSetNo;
 
+		public List<int> ueSetNo;
+
 		public List<int> titleId;
 
 		public List<Capacity> capacity;
@@ -142,6 +144,20 @@ public class BaseModelDiff
 		public List<EquipSetSimple> add;
 
 		public List<EquipSetSimple> update;
+	}
+
+	[Serializable]
+	public class DiffUniqueEquipSet
+	{
+		public List<EquipSetSimple> update;
+	}
+
+	[Serializable]
+	public class DiffUserClan
+	{
+		public List<UserClanData> add;
+
+		public List<UserClanData> update;
 	}
 
 	[Serializable]
@@ -181,6 +197,36 @@ public class BaseModelDiff
 	}
 
 	[Serializable]
+	public class DiffAccessory
+	{
+		public List<Accessory> add;
+
+		public List<Accessory> update;
+
+		public List<string> del;
+	}
+
+	[Serializable]
+	public class DiffAccessorySet
+	{
+		public List<AccessorySet> add;
+
+		public List<AccessorySet> update;
+
+		public List<string> del;
+	}
+
+	[Serializable]
+	public class DiffUniqueAccessorySet
+	{
+		public List<AccessorySet> add;
+
+		public List<AccessorySet> update;
+
+		public List<string> del;
+	}
+
+	[Serializable]
 	public class DiffSkillItem
 	{
 		public List<SkillItem> add;
@@ -192,6 +238,14 @@ public class BaseModelDiff
 
 	[Serializable]
 	public class DiffEquipSetSlot
+	{
+		public List<SkillItem.DiffEquipSetSlot> add;
+
+		public List<SkillItem.DiffEquipSetSlot> update;
+	}
+
+	[Serializable]
+	public class DiffUniqueEquipSetSlot
 	{
 		public List<SkillItem.DiffEquipSetSlot> add;
 
@@ -212,6 +266,8 @@ public class BaseModelDiff
 		public List<ClearStatusQuest> add;
 
 		public List<ClearStatusQuest> update;
+
+		public List<int> del;
 	}
 
 	[Serializable]
@@ -310,6 +366,13 @@ public class BaseModelDiff
 		public List<int> del;
 	}
 
+	public class DiffFieldGatherGrowth
+	{
+		public List<GatherGrowthInfo> add;
+
+		public List<GatherGrowthInfo> del;
+	}
+
 	public class DiffAchievement
 	{
 		public List<AchievementCounter> add;
@@ -376,6 +439,10 @@ public class BaseModelDiff
 
 	public List<DiffEquipSet> equipSet;
 
+	public List<DiffUniqueEquipSet> uniqueEquipSet;
+
+	public List<DiffUserClan> userClan;
+
 	public List<DiffItem> item;
 
 	public List<DiffExpiredItem> expiredItem;
@@ -386,7 +453,15 @@ public class BaseModelDiff
 
 	public List<DiffEquipSetSlot> skillItemEquipSlot;
 
+	public List<DiffUniqueEquipSetSlot> skillItemUniqueEquipSlot;
+
 	public List<DiffAbilityItem> abilityItem;
+
+	public List<DiffAccessory> accessory;
+
+	public List<DiffAccessorySet> accessorySet;
+
+	public List<DiffUniqueAccessorySet> uniqueAccessorySet;
 
 	public List<DiffQuestItem> questItem;
 
@@ -415,6 +490,8 @@ public class BaseModelDiff
 	public List<DiffNotice> notice;
 
 	public List<DiffFieldGather> fieldGather;
+
+	public List<DiffFieldGatherGrowth> fieldGrowthGather;
 
 	public List<DiffAchievement> achievement;
 

@@ -22,7 +22,6 @@ public final class ContentUtils {
     }
 
     public static String getFilename(Context context, Uri uri) {
-        Throwable th;
         Cursor cursor = null;
         String scheme = uri.getScheme();
         if (scheme.equals("file")) {
@@ -35,17 +34,17 @@ public final class ContentUtils {
                     try {
                         if (query.getCount() != 0) {
                             query.moveToFirst();
-                            scheme = query.getString(query.getColumnIndexOrThrow("_display_name"));
-                            if (scheme != null) {
+                            String string = query.getString(query.getColumnIndexOrThrow("_display_name"));
+                            if (string != null) {
                                 if (query == null) {
-                                    return scheme;
+                                    return string;
                                 }
                                 query.close();
-                                return scheme;
+                                return string;
                             }
                         }
-                    } catch (Throwable th2) {
-                        th = th2;
+                    } catch (Throwable th) {
+                        th = th;
                         cursor = query;
                         if (cursor != null) {
                             cursor.close();
@@ -56,12 +55,8 @@ public final class ContentUtils {
                 if (query != null) {
                     query.close();
                 }
-            } catch (Throwable th3) {
-                th = th3;
-                if (cursor != null) {
-                    cursor.close();
-                }
-                throw th;
+            } catch (Throwable th2) {
+                th = th2;
             }
         }
         return null;

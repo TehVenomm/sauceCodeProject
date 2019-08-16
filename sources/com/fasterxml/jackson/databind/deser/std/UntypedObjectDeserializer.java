@@ -123,7 +123,8 @@ public class UntypedObjectDeserializer extends StdDeserializer<Object> implement
             }
         }
 
-        protected Object mapArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        /* access modifiers changed from: protected */
+        public Object mapArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
             int i = 2;
             Object deserialize = deserialize(jsonParser, deserializationContext);
             if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
@@ -133,36 +134,36 @@ public class UntypedObjectDeserializer extends StdDeserializer<Object> implement
             }
             Object deserialize2 = deserialize(jsonParser, deserializationContext);
             if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
-                arrayList = new ArrayList(2);
-                arrayList.add(deserialize);
-                arrayList.add(deserialize2);
-                return arrayList;
+                ArrayList arrayList2 = new ArrayList(2);
+                arrayList2.add(deserialize);
+                arrayList2.add(deserialize2);
+                return arrayList2;
             }
             ObjectBuffer leaseObjectBuffer = deserializationContext.leaseObjectBuffer();
             Object[] resetAndStart = leaseObjectBuffer.resetAndStart();
             resetAndStart[0] = deserialize;
             resetAndStart[1] = deserialize2;
-            Object[] objArr = resetAndStart;
             int i2 = 2;
-            do {
-                int i3;
+            while (true) {
+                int i3 = i;
                 Object deserialize3 = deserialize(jsonParser, deserializationContext);
-                i++;
-                if (i2 >= objArr.length) {
-                    objArr = leaseObjectBuffer.appendCompletedChunk(objArr);
+                i2++;
+                if (i3 >= resetAndStart.length) {
+                    resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
                     i3 = 0;
-                } else {
-                    i3 = i2;
                 }
-                i2 = i3 + 1;
-                objArr[i3] = deserialize3;
-            } while (jsonParser.nextToken() != JsonToken.END_ARRAY);
-            List arrayList2 = new ArrayList(i);
-            leaseObjectBuffer.completeAndClearBuffer(objArr, i2, arrayList2);
-            return arrayList2;
+                i = i3 + 1;
+                resetAndStart[i3] = deserialize3;
+                if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
+                    ArrayList arrayList3 = new ArrayList(i2);
+                    leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i, (List<Object>) arrayList3);
+                    return arrayList3;
+                }
+            }
         }
 
-        protected Object mapObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        /* access modifiers changed from: protected */
+        public Object mapObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
             String text = jsonParser.getText();
             jsonParser.nextToken();
             Object deserialize = deserialize(jsonParser, deserializationContext);
@@ -174,41 +175,42 @@ public class UntypedObjectDeserializer extends StdDeserializer<Object> implement
             }
             jsonParser.nextToken();
             Object deserialize2 = deserialize(jsonParser, deserializationContext);
-            Object nextFieldName2 = jsonParser.nextFieldName();
+            String nextFieldName2 = jsonParser.nextFieldName();
             if (nextFieldName2 == null) {
-                nextFieldName2 = new LinkedHashMap(4);
-                nextFieldName2.put(text, deserialize);
-                nextFieldName2.put(nextFieldName, deserialize2);
-                return nextFieldName2;
+                LinkedHashMap linkedHashMap2 = new LinkedHashMap(4);
+                linkedHashMap2.put(text, deserialize);
+                linkedHashMap2.put(nextFieldName, deserialize2);
+                return linkedHashMap2;
             }
-            LinkedHashMap linkedHashMap2 = new LinkedHashMap();
-            linkedHashMap2.put(text, deserialize);
-            linkedHashMap2.put(nextFieldName, deserialize2);
+            LinkedHashMap linkedHashMap3 = new LinkedHashMap();
+            linkedHashMap3.put(text, deserialize);
+            linkedHashMap3.put(nextFieldName, deserialize2);
             do {
                 jsonParser.nextToken();
-                linkedHashMap2.put(nextFieldName2, deserialize(jsonParser, deserializationContext));
+                linkedHashMap3.put(nextFieldName2, deserialize(jsonParser, deserializationContext));
                 nextFieldName2 = jsonParser.nextFieldName();
             } while (nextFieldName2 != null);
-            return linkedHashMap2;
+            return linkedHashMap3;
         }
 
-        protected Object[] mapArrayToArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        /* access modifiers changed from: protected */
+        public Object[] mapArrayToArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+            int i;
             ObjectBuffer leaseObjectBuffer = deserializationContext.leaseObjectBuffer();
             Object[] resetAndStart = leaseObjectBuffer.resetAndStart();
-            int i = 0;
+            int i2 = 0;
             do {
-                int i2;
                 Object deserialize = deserialize(jsonParser, deserializationContext);
-                if (i >= resetAndStart.length) {
+                if (i2 >= resetAndStart.length) {
                     resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
-                    i2 = 0;
+                    i = 0;
                 } else {
-                    i2 = i;
+                    i = i2;
                 }
-                i = i2 + 1;
-                resetAndStart[i2] = deserialize;
+                i2 = i + 1;
+                resetAndStart[i] = deserialize;
             } while (jsonParser.nextToken() != JsonToken.END_ARRAY);
-            return leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i);
+            return leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i2);
         }
     }
 
@@ -249,19 +251,24 @@ public class UntypedObjectDeserializer extends StdDeserializer<Object> implement
         }
         this._stringDeserializer = _clearIfStdImpl(_findCustomDeser(deserializationContext, constructType2));
         this._numberDeserializer = _clearIfStdImpl(_findCustomDeser(deserializationContext, typeFactory.constructType((Type) Number.class)));
-        constructType = TypeFactory.unknownType();
-        this._mapDeserializer = deserializationContext.handleSecondaryContextualization(this._mapDeserializer, null, constructType);
-        this._listDeserializer = deserializationContext.handleSecondaryContextualization(this._listDeserializer, null, constructType);
-        this._stringDeserializer = deserializationContext.handleSecondaryContextualization(this._stringDeserializer, null, constructType);
-        this._numberDeserializer = deserializationContext.handleSecondaryContextualization(this._numberDeserializer, null, constructType);
+        JavaType unknownType = TypeFactory.unknownType();
+        this._mapDeserializer = deserializationContext.handleSecondaryContextualization(this._mapDeserializer, null, unknownType);
+        this._listDeserializer = deserializationContext.handleSecondaryContextualization(this._listDeserializer, null, unknownType);
+        this._stringDeserializer = deserializationContext.handleSecondaryContextualization(this._stringDeserializer, null, unknownType);
+        this._numberDeserializer = deserializationContext.handleSecondaryContextualization(this._numberDeserializer, null, unknownType);
     }
 
-    protected JsonDeserializer<Object> _findCustomDeser(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _findCustomDeser(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
         return deserializationContext.findNonContextualValueDeserializer(javaType);
     }
 
-    protected JsonDeserializer<Object> _clearIfStdImpl(JsonDeserializer<Object> jsonDeserializer) {
-        return ClassUtil.isJacksonStdImpl((Object) jsonDeserializer) ? null : jsonDeserializer;
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _clearIfStdImpl(JsonDeserializer<Object> jsonDeserializer) {
+        if (ClassUtil.isJacksonStdImpl((Object) jsonDeserializer)) {
+            return null;
+        }
+        return jsonDeserializer;
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
@@ -271,7 +278,8 @@ public class UntypedObjectDeserializer extends StdDeserializer<Object> implement
         return this;
     }
 
-    protected JsonDeserializer<?> _withResolved(JsonDeserializer<?> jsonDeserializer, JsonDeserializer<?> jsonDeserializer2, JsonDeserializer<?> jsonDeserializer3, JsonDeserializer<?> jsonDeserializer4) {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<?> _withResolved(JsonDeserializer<?> jsonDeserializer, JsonDeserializer<?> jsonDeserializer2, JsonDeserializer<?> jsonDeserializer3, JsonDeserializer<?> jsonDeserializer4) {
         return new UntypedObjectDeserializer(this, jsonDeserializer, jsonDeserializer2, jsonDeserializer3, jsonDeserializer4);
     }
 
@@ -370,7 +378,8 @@ public class UntypedObjectDeserializer extends StdDeserializer<Object> implement
         }
     }
 
-    protected Object mapArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object mapArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         int i = 2;
         if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
             return new ArrayList(2);
@@ -383,97 +392,98 @@ public class UntypedObjectDeserializer extends StdDeserializer<Object> implement
         }
         Object deserialize2 = deserialize(jsonParser, deserializationContext);
         if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
-            arrayList = new ArrayList(2);
-            arrayList.add(deserialize);
-            arrayList.add(deserialize2);
-            return arrayList;
+            ArrayList arrayList2 = new ArrayList(2);
+            arrayList2.add(deserialize);
+            arrayList2.add(deserialize2);
+            return arrayList2;
         }
         ObjectBuffer leaseObjectBuffer = deserializationContext.leaseObjectBuffer();
         Object[] resetAndStart = leaseObjectBuffer.resetAndStart();
         resetAndStart[0] = deserialize;
         resetAndStart[1] = deserialize2;
-        Object[] objArr = resetAndStart;
         int i2 = 2;
-        do {
-            int i3;
+        while (true) {
+            int i3 = i;
             Object deserialize3 = deserialize(jsonParser, deserializationContext);
-            i++;
-            if (i2 >= objArr.length) {
-                objArr = leaseObjectBuffer.appendCompletedChunk(objArr);
+            i2++;
+            if (i3 >= resetAndStart.length) {
+                resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
                 i3 = 0;
-            } else {
-                i3 = i2;
             }
-            i2 = i3 + 1;
-            objArr[i3] = deserialize3;
-        } while (jsonParser.nextToken() != JsonToken.END_ARRAY);
-        List arrayList2 = new ArrayList(i);
-        leaseObjectBuffer.completeAndClearBuffer(objArr, i2, arrayList2);
-        return arrayList2;
+            i = i3 + 1;
+            resetAndStart[i3] = deserialize3;
+            if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
+                ArrayList arrayList3 = new ArrayList(i2);
+                leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i, (List<Object>) arrayList3);
+                return arrayList3;
+            }
+        }
     }
 
-    protected Object mapObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Object nextFieldName;
+    /* access modifiers changed from: protected */
+    public Object mapObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Object obj;
         JsonToken currentToken = jsonParser.getCurrentToken();
         if (currentToken == JsonToken.START_OBJECT) {
-            nextFieldName = jsonParser.nextFieldName();
+            obj = jsonParser.nextFieldName();
         } else if (currentToken == JsonToken.FIELD_NAME) {
-            String currentName = jsonParser.getCurrentName();
+            obj = jsonParser.getCurrentName();
         } else if (currentToken != JsonToken.END_OBJECT) {
             throw deserializationContext.mappingException(handledType(), jsonParser.getCurrentToken());
         } else {
-            nextFieldName = null;
+            obj = null;
         }
-        if (nextFieldName == null) {
+        if (obj == null) {
             return new LinkedHashMap(2);
         }
         jsonParser.nextToken();
         Object deserialize = deserialize(jsonParser, deserializationContext);
-        String nextFieldName2 = jsonParser.nextFieldName();
-        if (nextFieldName2 == null) {
-            Object linkedHashMap = new LinkedHashMap(2);
-            linkedHashMap.put(nextFieldName, deserialize);
+        String nextFieldName = jsonParser.nextFieldName();
+        if (nextFieldName == null) {
+            LinkedHashMap linkedHashMap = new LinkedHashMap(2);
+            linkedHashMap.put(obj, deserialize);
             return linkedHashMap;
         }
         jsonParser.nextToken();
         Object deserialize2 = deserialize(jsonParser, deserializationContext);
-        linkedHashMap = jsonParser.nextFieldName();
-        if (linkedHashMap == null) {
-            linkedHashMap = new LinkedHashMap(4);
-            linkedHashMap.put(nextFieldName, deserialize);
-            linkedHashMap.put(nextFieldName2, deserialize2);
-            return linkedHashMap;
+        String nextFieldName2 = jsonParser.nextFieldName();
+        if (nextFieldName2 == null) {
+            LinkedHashMap linkedHashMap2 = new LinkedHashMap(4);
+            linkedHashMap2.put(obj, deserialize);
+            linkedHashMap2.put(nextFieldName, deserialize2);
+            return linkedHashMap2;
         }
-        LinkedHashMap linkedHashMap2 = new LinkedHashMap();
-        linkedHashMap2.put(nextFieldName, deserialize);
-        linkedHashMap2.put(nextFieldName2, deserialize2);
+        LinkedHashMap linkedHashMap3 = new LinkedHashMap();
+        linkedHashMap3.put(obj, deserialize);
+        linkedHashMap3.put(nextFieldName, deserialize2);
         do {
             jsonParser.nextToken();
-            linkedHashMap2.put(linkedHashMap, deserialize(jsonParser, deserializationContext));
-            linkedHashMap = jsonParser.nextFieldName();
-        } while (linkedHashMap != null);
-        return linkedHashMap2;
+            linkedHashMap3.put(nextFieldName2, deserialize(jsonParser, deserializationContext));
+            nextFieldName2 = jsonParser.nextFieldName();
+        } while (nextFieldName2 != null);
+        return linkedHashMap3;
     }
 
-    protected Object[] mapArrayToArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object[] mapArrayToArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        int i;
         if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
             return NO_OBJECTS;
         }
         ObjectBuffer leaseObjectBuffer = deserializationContext.leaseObjectBuffer();
         Object[] resetAndStart = leaseObjectBuffer.resetAndStart();
-        int i = 0;
+        int i2 = 0;
         do {
-            int i2;
             Object deserialize = deserialize(jsonParser, deserializationContext);
-            if (i >= resetAndStart.length) {
+            if (i2 >= resetAndStart.length) {
                 resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
-                i2 = 0;
+                i = 0;
             } else {
-                i2 = i;
+                i = i2;
             }
-            i = i2 + 1;
-            resetAndStart[i2] = deserialize;
+            i2 = i + 1;
+            resetAndStart[i] = deserialize;
         } while (jsonParser.nextToken() != JsonToken.END_ARRAY);
-        return leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i);
+        return leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i2);
     }
 }

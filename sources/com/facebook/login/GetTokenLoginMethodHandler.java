@@ -14,18 +14,12 @@ import com.facebook.login.LoginClient.Request;
 import com.facebook.login.LoginClient.Result;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 class GetTokenLoginMethodHandler extends LoginMethodHandler {
-    public static final Creator<GetTokenLoginMethodHandler> CREATOR = new C04383();
-    private GetTokenClient getTokenClient;
-
-    /* renamed from: com.facebook.login.GetTokenLoginMethodHandler$3 */
-    static final class C04383 implements Creator {
-        C04383() {
-        }
-
+    public static final Creator<GetTokenLoginMethodHandler> CREATOR = new Creator() {
         public GetTokenLoginMethodHandler createFromParcel(Parcel parcel) {
             return new GetTokenLoginMethodHandler(parcel);
         }
@@ -33,7 +27,8 @@ class GetTokenLoginMethodHandler extends LoginMethodHandler {
         public GetTokenLoginMethodHandler[] newArray(int i) {
             return new GetTokenLoginMethodHandler[i];
         }
-    }
+    };
+    private GetTokenClient getTokenClient;
 
     GetTokenLoginMethodHandler(Parcel parcel) {
         super(parcel);
@@ -43,7 +38,8 @@ class GetTokenLoginMethodHandler extends LoginMethodHandler {
         super(loginClient);
     }
 
-    void cancel() {
+    /* access modifiers changed from: 0000 */
+    public void cancel() {
         if (this.getTokenClient != null) {
             this.getTokenClient.cancel();
             this.getTokenClient.setCompletedListener(null);
@@ -51,7 +47,8 @@ class GetTokenLoginMethodHandler extends LoginMethodHandler {
         }
     }
 
-    void complete(final Request request, final Bundle bundle) {
+    /* access modifiers changed from: 0000 */
+    public void complete(final Request request, final Bundle bundle) {
         String string = bundle.getString(NativeProtocol.EXTRA_USER_ID);
         if (string == null || string.isEmpty()) {
             this.loginClient.notifyBackgroundProcessingStart();
@@ -78,11 +75,13 @@ class GetTokenLoginMethodHandler extends LoginMethodHandler {
         return 0;
     }
 
-    String getNameForLogging() {
+    /* access modifiers changed from: 0000 */
+    public String getNameForLogging() {
         return "get_token";
     }
 
-    void getTokenCompleted(Request request, Bundle bundle) {
+    /* access modifiers changed from: 0000 */
+    public void getTokenCompleted(Request request, Bundle bundle) {
         if (this.getTokenClient != null) {
             this.getTokenClient.setCompletedListener(null);
         }
@@ -90,9 +89,9 @@ class GetTokenLoginMethodHandler extends LoginMethodHandler {
         this.loginClient.notifyBackgroundProcessingStop();
         if (bundle != null) {
             ArrayList stringArrayList = bundle.getStringArrayList(NativeProtocol.EXTRA_PERMISSIONS);
-            Object<String> permissions = request.getPermissions();
-            if (stringArrayList == null || !(permissions == null || stringArrayList.containsAll(permissions))) {
-                Object hashSet = new HashSet();
+            Set<String> permissions = request.getPermissions();
+            if (stringArrayList == null || (permissions != null && !stringArrayList.containsAll(permissions))) {
+                HashSet hashSet = new HashSet();
                 for (String str : permissions) {
                     if (!stringArrayList.contains(str)) {
                         hashSet.add(str);
@@ -110,11 +109,13 @@ class GetTokenLoginMethodHandler extends LoginMethodHandler {
         this.loginClient.tryNextHandler();
     }
 
-    void onComplete(Request request, Bundle bundle) {
-        this.loginClient.completeAndValidate(Result.createTokenResult(this.loginClient.getPendingRequest(), LoginMethodHandler.createAccessTokenFromNativeLogin(bundle, AccessTokenSource.FACEBOOK_APPLICATION_SERVICE, request.getApplicationId())));
+    /* access modifiers changed from: 0000 */
+    public void onComplete(Request request, Bundle bundle) {
+        this.loginClient.completeAndValidate(Result.createTokenResult(this.loginClient.getPendingRequest(), createAccessTokenFromNativeLogin(bundle, AccessTokenSource.FACEBOOK_APPLICATION_SERVICE, request.getApplicationId())));
     }
 
-    boolean tryAuthorize(final Request request) {
+    /* access modifiers changed from: 0000 */
+    public boolean tryAuthorize(final Request request) {
         this.getTokenClient = new GetTokenClient(this.loginClient.getActivity(), request.getApplicationId());
         if (!this.getTokenClient.start()) {
             return false;

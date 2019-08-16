@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UIModelRenderTexture
+public class UIModelRenderTexture : MonoBehaviour
 {
 	private enum LOADER_TYPE
 	{
@@ -27,11 +27,13 @@ public class UIModelRenderTexture
 
 	public const float MAGI_SYMBOL_FOV = 13f;
 
+	public const float ACCESSORY_FOV = 45f;
+
 	public const float NORMAL_ROTATE_SPEED = 12f;
 
 	public const float MAGI_ROTATE_SPEED = 22f;
 
-	private const float crossFadeTime = 0.5f;
+	public const float ACCESSORY_ROTATE_SPEED = 22f;
 
 	private UITexture uiTexture;
 
@@ -73,6 +75,8 @@ public class UIModelRenderTexture
 
 	private int referenceFaceID = -1;
 
+	private int accessoryID = -1;
+
 	private EnemyLoader enemyLoader;
 
 	private int enemyID = -1;
@@ -99,7 +103,11 @@ public class UIModelRenderTexture
 
 	private OutGameSettingsManager.EnemyDisplayInfo.SCENE targetScene;
 
+	private bool oneshot;
+
 	private bool isRandomPlaying;
+
+	private const float crossFadeTime = 0.5f;
 
 	public EnemyAnimCtrl enemyAnimCtrl
 	{
@@ -116,7 +124,6 @@ public class UIModelRenderTexture
 
 	public static UIModelRenderTexture Get(Transform t)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIModelRenderTexture uIModelRenderTexture = t.GetComponent<UIModelRenderTexture>();
 		if (uIModelRenderTexture == null)
 		{
@@ -140,22 +147,34 @@ public class UIModelRenderTexture
 		}
 	}
 
+	public void InitPlayerOneShot(UITexture ui_tex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback)
+	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		oneshot = true;
+		InitPlayer(ui_tex, info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
+	}
+
 	public void ForceInitPlayer(UITexture ui_tex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback)
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 		if (playerLoadInfo != null && playerLoadInfo.Equals(info) && isPriorityVisualEquip == is_priority_visual_equip)
 		{
 			onload_callback?.Invoke(null);
+			return;
 		}
-		else
+		bool flag = IsLoadingPlayer();
+		bool flag2 = npcLoader != null;
+		if (flag || flag2)
 		{
-			if (playerLoader != null && playerLoader.isLoading)
+			if (flag2)
 			{
-				DeleteModel();
+				npcData = null;
 			}
-			InitPlayerInFact(ui_tex, info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
+			DeleteModel();
 		}
+		InitPlayerInFact(ui_tex, info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 	}
 
 	public void InitPlayerInFact(UITexture ui_tex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback)
@@ -175,7 +194,7 @@ public class UIModelRenderTexture
 		modelRot = rot;
 		playerAnimID = anim_id;
 		onPlayerLoadFinishedCallBack = onload_callback;
-		playerLoader.StartLoad(info, modelLayer, playerAnimID, false, false, false, false, false, false, true, true, SHADER_TYPE.UI, OnPlayerLoadFinished, true, -1);
+		playerLoader.StartLoad(info, modelLayer, playerAnimID, need_anim_event: false, need_foot_stamp: false, need_shadow: false, enable_light_probes: false, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.UI, OnPlayerLoadFinished);
 		LoadStart();
 	}
 
@@ -190,36 +209,42 @@ public class UIModelRenderTexture
 
 	public void InitNPC(UITexture ui_tex, int npc_id, Vector3 pos, Vector3 rot, float fov, Action<NPCLoader> onload_callback)
 	{
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		if (!(npcLoader != null) || !npcLoader.isLoading)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		if (npcLoader != null && npcLoader.isLoading)
 		{
-			NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(npc_id);
-			if (nPCData != null && nPCData != npcData)
+			return;
+		}
+		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(npc_id);
+		if (nPCData != null && nPCData != npcData)
+		{
+			if (playerLoader != null)
 			{
-				Init(ui_tex, (fov == -1f) ? 10f : fov, LOADER_TYPE.NPC);
-				if (uiRenderTexture != null && uiRenderTexture.nearClipPlane == -1f && ((fov >= 40f && pos.z > 13f) || (fov < 40f && pos.z > 5f)))
-				{
-					uiRenderTexture.nearClipPlane = pos.z - 5f;
-				}
-				npcData = nPCData;
-				modelPos = pos;
-				modelRot = rot;
-				cameraFOV = fov;
-				onNPCLoadFinishedCallBack = onload_callback;
-				int num = (nPCData.specialModelID <= 0) ? nPCData.npcModelID : nPCData.specialModelID;
-				HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(Singleton<HomeThemeTable>.I.CurrentHomeTheme);
-				int num2 = -1;
-				if (homeThemeData != null)
-				{
-					num2 = Singleton<HomeThemeTable>.I.GetNpcModelID(homeThemeData, nPCData.id);
-				}
-				num = ((num2 <= 0) ? num : num2);
-				npcLoader.Load(num, modelLayer, false, false, SHADER_TYPE.UI, OnNPCLoadFinished);
-				LoadStart();
+				playerLoadInfo = null;
+				DeleteModel();
 			}
+			Init(ui_tex, (fov == -1f) ? 10f : fov, LOADER_TYPE.NPC);
+			if (uiRenderTexture != null && uiRenderTexture.nearClipPlane == -1f && ((fov >= 40f && pos.z > 13f) || (fov < 40f && pos.z > 5f)))
+			{
+				uiRenderTexture.nearClipPlane = pos.z - 5f;
+			}
+			npcData = nPCData;
+			modelPos = pos;
+			modelRot = rot;
+			cameraFOV = fov;
+			onNPCLoadFinishedCallBack = onload_callback;
+			int num = (nPCData.specialModelID <= 0) ? nPCData.npcModelID : nPCData.specialModelID;
+			HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(Singleton<HomeThemeTable>.I.CurrentHomeTheme);
+			int num2 = -1;
+			if (homeThemeData != null)
+			{
+				num2 = Singleton<HomeThemeTable>.I.GetNpcModelID(homeThemeData, nPCData.id);
+			}
+			num = ((num2 <= 0) ? num : num2);
+			npcLoader.Load(num, modelLayer, need_shadow: false, enable_light_probes: false, SHADER_TYPE.UI, OnNPCLoadFinished);
+			LoadStart();
 		}
 	}
 
@@ -234,18 +259,18 @@ public class UIModelRenderTexture
 
 	public void Init(UITexture ui_tex, SortCompareData data)
 	{
-		Init(ui_tex, 45f, LOADER_TYPE.ITEM);
+		Init(ui_tex, 45f);
 		if (data is EquipItemSortData || data is SmithCreateSortData)
 		{
 			InitEquip(ui_tex, data.GetTableID(), referenceSexID, referenceFaceID, uiModelScale);
 		}
 		else if (data is ItemSortData)
 		{
-			InitItem(ui_tex, data.GetTableID(), true);
+			InitItem(ui_tex, data.GetTableID());
 		}
 		else if (data is SkillItemSortData)
 		{
-			InitSkillItem(ui_tex, data.GetTableID(), true, false, 35f);
+			InitSkillItem(ui_tex, data.GetTableID());
 		}
 	}
 
@@ -253,7 +278,7 @@ public class UIModelRenderTexture
 	{
 		referenceSexID = sex_id;
 		referenceFaceID = face_id;
-		Init(ui_tex, 45f, LOADER_TYPE.ITEM);
+		Init(ui_tex, 45f);
 		equipItemID = (int)equip_item_id;
 		uiModelScale = scale;
 		itemLoader.LoadEquip(equip_item_id, model, modelLayer, referenceSexID, referenceFaceID, OnLoadFinished);
@@ -262,7 +287,7 @@ public class UIModelRenderTexture
 
 	public void InitItem(UITexture ui_tex, uint item_id, bool rotation = true)
 	{
-		Init(ui_tex, 45f, LOADER_TYPE.ITEM);
+		Init(ui_tex, 45f);
 		itemID = (int)item_id;
 		itemLoader.LoadItem(item_id, model, modelLayer, OnLoadFinished);
 		LoadStart();
@@ -278,7 +303,7 @@ public class UIModelRenderTexture
 
 	public void InitSkillItem(UITexture ui_tex, uint skill_item_id, bool rotation = true, bool light_rotation = false, float fov = 35f)
 	{
-		Init(ui_tex, fov, LOADER_TYPE.ITEM);
+		Init(ui_tex, fov);
 		skillItemID = (int)skill_item_id;
 		itemLoader.LoadSkillItem(skill_item_id, model, modelLayer, OnLoadFinished);
 		LoadStart();
@@ -295,9 +320,7 @@ public class UIModelRenderTexture
 
 	public void InitSkillItemSymbol(UITexture ui_tex, uint skill_item_id, bool rotation = true, float fov = 13f)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		Init(ui_tex, fov, LOADER_TYPE.ITEM);
+		Init(ui_tex, fov);
 		skillSymbolItemID = (int)skill_item_id;
 		itemLoader.LoadSkillItemSymbol(skill_item_id, model, modelLayer, OnLoadFinished);
 		BlurFilter blurFilter = this.get_gameObject().GetComponent<BlurFilter>();
@@ -327,67 +350,72 @@ public class UIModelRenderTexture
 			Clear();
 			if (callback != null)
 			{
-				callback(false, null);
+				callback(arg1: false, null);
 			}
+			return;
+		}
+		Init(ui_tex, 45f, LOADER_TYPE.ENEMY);
+		enemyID = (int)enemy_id;
+		foundationName = foundation_name;
+		targetScene = target_scene;
+		isEnemyHowl = is_Howl;
+		int anim_id = enemyData.animId;
+		float scale = enemyData.modelScale;
+		if (targetScene == OutGameSettingsManager.EnemyDisplayInfo.SCENE.QUEST)
+		{
+			enemyDispplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForQuestSelect(enemyData);
 		}
 		else
 		{
-			Init(ui_tex, 45f, LOADER_TYPE.ENEMY);
-			enemyID = (int)enemy_id;
-			foundationName = foundation_name;
-			targetScene = target_scene;
-			isEnemyHowl = is_Howl;
-			int anim_id = enemyData.animId;
-			float scale = enemyData.modelScale;
-			if (targetScene == OutGameSettingsManager.EnemyDisplayInfo.SCENE.QUEST)
-			{
-				enemyDispplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForQuestSelect(enemyData);
-			}
-			else
-			{
-				enemyDispplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemyData);
-			}
-			if (enemyDispplayInfo != null)
-			{
-				if (enemyDispplayInfo.animID > 0)
-				{
-					anim_id = enemyDispplayInfo.animID;
-				}
-				scale = enemyDispplayInfo.scale;
-			}
-			enemyLoader.StartLoad(enemyData.modelId, anim_id, scale, enemyData.baseEffectName, enemyData.baseEffectNode, false, false, true, SHADER_TYPE.UI, modelLayer, foundation_name, false, false, delegate(Enemy enemy)
-			{
-				if (callback != null)
-				{
-					callback(true, enemyLoader);
-				}
-				if (enemyLoader != null && enemyLoader.animator != null)
-				{
-					if (moveType == ENEMY_MOVE_TYPE.DONT_MOVE)
-					{
-						enemyLoader.animator.set_applyRootMotion(false);
-					}
-					else if (moveType == ENEMY_MOVE_TYPE.STOP)
-					{
-						enemyLoader.animator.set_speed(0f);
-					}
-				}
-				OnEnemyLoadFinished(enemy);
-			});
-			LoadStart();
+			enemyDispplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemyData);
 		}
+		if (enemyDispplayInfo != null)
+		{
+			if (enemyDispplayInfo.animID > 0)
+			{
+				anim_id = enemyDispplayInfo.animID;
+			}
+			scale = enemyDispplayInfo.scale;
+		}
+		enemyLoader.StartLoad(enemyData.modelId, anim_id, scale, enemyData.baseEffectName, enemyData.baseEffectNode, need_shadow: false, enable_light_probes: false, need_anim_event_res_cache: true, SHADER_TYPE.UI, modelLayer, foundation_name, need_stamp_effect: false, will_stock: false, string.Empty, delegate(Enemy enemy)
+		{
+			if (callback != null)
+			{
+				callback(arg1: true, enemyLoader);
+			}
+			if (enemyLoader != null && enemyLoader.animator != null)
+			{
+				if (moveType == ENEMY_MOVE_TYPE.DONT_MOVE)
+				{
+					enemyLoader.animator.set_applyRootMotion(false);
+				}
+				else if (moveType == ENEMY_MOVE_TYPE.STOP)
+				{
+					enemyLoader.animator.set_speed(0f);
+				}
+			}
+			OnEnemyLoadFinished(enemy);
+		});
+		LoadStart();
+	}
+
+	public void InitAccessory(UITexture ui_tex, uint accessory_id, float scale, bool rotation = true, bool light_rotation = false)
+	{
+		Init(ui_tex, 45f);
+		accessoryID = (int)accessory_id;
+		uiModelScale = scale;
+		itemLoader.LoadAccessory(accessory_id, model, modelLayer, OnLoadFinished);
+		LoadStart();
+		rotateSpeed = ((!rotation) ? 0f : 22f);
+		lightRotation = light_rotation;
 	}
 
 	private void Init(UITexture ui_tex, float fov, LOADER_TYPE loader_type = LOADER_TYPE.ITEM)
 	{
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		if (model == null)
 		{
 			uiTexture = ui_tex;
-			uiRenderTexture = UIRenderTexture.Get(ui_tex, fov, false, -1);
+			uiRenderTexture = UIRenderTexture.Get(ui_tex, fov);
 			model = Utility.CreateGameObject("UIModel", uiRenderTexture.modelTransform, uiRenderTexture.renderLayer);
 			switch (loader_type)
 			{
@@ -410,30 +438,27 @@ public class UIModelRenderTexture
 
 	private void OnLoadFinished()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		if (!(model == null))
+		if (model == null)
 		{
-			if (!this.get_gameObject().get_activeInHierarchy())
-			{
-				DeleteModel();
-			}
-			else
-			{
-				if (coroutine != null)
-				{
-					this.StopCoroutine(coroutine);
-					coroutine = null;
-				}
-				if (uiModelScale != 1f)
-				{
-					model.set_localScale(new Vector3(uiModelScale, uiModelScale, uiModelScale));
-				}
-				coroutine = DoViewing();
-				this.StartCoroutine(coroutine);
-			}
+			return;
 		}
+		if (!this.get_gameObject().get_activeInHierarchy())
+		{
+			DeleteModel();
+			return;
+		}
+		if (coroutine != null)
+		{
+			this.StopCoroutine(coroutine);
+			coroutine = null;
+		}
+		if (uiModelScale != 1f)
+		{
+			model.set_localScale(new Vector3(uiModelScale, uiModelScale, uiModelScale));
+		}
+		coroutine = DoViewing();
+		this.StartCoroutine(coroutine);
 	}
 
 	private void OnPlayerLoadFinished(object o)
@@ -456,62 +481,62 @@ public class UIModelRenderTexture
 
 	private void OnEnemyLoadFinished(Enemy o)
 	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		OnLoadFinished();
-		if (!(enemyLoader == null) && !(enemyLoader.body == null))
+		if (enemyLoader == null || enemyLoader.body == null)
 		{
-			enemyLoader.body.GetComponentsInChildren<Renderer>(Temporary.rendererList);
-			int i = 0;
-			for (int count = Temporary.rendererList.Count; i < count; i++)
+			return;
+		}
+		enemyLoader.body.GetComponentsInChildren<Renderer>(Temporary.rendererList);
+		int i = 0;
+		for (int count = Temporary.rendererList.Count; i < count; i++)
+		{
+			Renderer val = Temporary.rendererList[i];
+			if (!(val is MeshRenderer) && !(val is SkinnedMeshRenderer))
 			{
-				Renderer val = Temporary.rendererList[i];
-				if (val is MeshRenderer || val is SkinnedMeshRenderer)
+				continue;
+			}
+			Material[] materials = val.get_materials();
+			int j = 0;
+			for (int num = materials.Length; j < num; j++)
+			{
+				Material val2 = materials[j];
+				if (!(val2 != null))
 				{
-					Material[] materials = val.get_materials();
-					int j = 0;
-					for (int num = materials.Length; j < num; j++)
+					continue;
+				}
+				string name = val2.get_shader().get_name();
+				if (name.Contains("cut"))
+				{
+					val2.set_shader(ResourceUtility.FindShader("Transparent/Cutout/Diffuse"));
+					continue;
+				}
+				if (name.Contains("_zako_"))
+				{
+					val2.set_shader(ResourceUtility.FindShader(name + "__s"));
+				}
+				else if (CanChangeHighQualityShader(name))
+				{
+					Shader val3 = ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_single_tex__no_cull");
+					if (val2.HasProperty("_CullMode") && val2.GetInt("_CullMode") == 0 && val3 != null)
 					{
-						Material val2 = materials[j];
-						if (val2 != null)
-						{
-							string name = val2.get_shader().get_name();
-							if (name.Contains("cut"))
-							{
-								val2.set_shader(ResourceUtility.FindShader("Transparent/Cutout/Diffuse"));
-							}
-							else
-							{
-								if (name.Contains("_zako_"))
-								{
-									val2.set_shader(ResourceUtility.FindShader(name + "__s"));
-								}
-								else if (CanChangeHighQualityShader(name))
-								{
-									Shader val3 = ResourceUtility.FindShader("mobile/Custom/enemy_single_tex__no_cull");
-									if (val2.HasProperty("_CullMode") && val2.GetInt("_CullMode") == 0 && val3 != null)
-									{
-										val2.set_shader(val3);
-									}
-									else
-									{
-										val2.set_shader(ResourceUtility.FindShader("mobile/Custom/enemy_single_tex__s"));
-									}
-								}
-								if (enemyLoader.bodyID == 2023)
-								{
-									val2.set_shader(ResourceUtility.FindShader("mobile/Custom/enemy_reflective_simple"));
-								}
-								else if (enemyLoader.bodyID == 2043)
-								{
-									val2.set_shader(ResourceUtility.FindShader("mobile/Custom/enemy_reflective_for_shadow"));
-								}
-							}
-						}
+						val2.set_shader(val3);
+					}
+					else
+					{
+						val2.set_shader(ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_single_tex__s"));
 					}
 				}
+				if (enemyLoader.bodyID == 2023)
+				{
+					val2.set_shader(ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_reflective_simple"));
+				}
+				else if (enemyLoader.bodyID == 2043)
+				{
+					val2.set_shader(ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_reflective_for_shadow"));
+				}
 			}
-			Temporary.rendererList.Clear();
 		}
+		Temporary.rendererList.Clear();
 	}
 
 	private bool CanChangeHighQualityShader(string currentShaderName)
@@ -525,7 +550,6 @@ public class UIModelRenderTexture
 
 	private void DeleteModel()
 	{
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 		if (model != null)
 		{
 			if (playerLoader != null)
@@ -533,6 +557,12 @@ public class UIModelRenderTexture
 				playerLoader.DeleteLoadedObjects();
 				Object.Destroy(playerLoader);
 				playerLoader = null;
+			}
+			if (npcLoader != null)
+			{
+				npcLoader.Clear();
+				Object.Destroy(npcLoader);
+				npcLoader = null;
 			}
 			if (enemyLoader != null)
 			{
@@ -587,19 +617,23 @@ public class UIModelRenderTexture
 			}
 			else if (itemID != -1)
 			{
-				InitItem(uiTexture, (uint)itemID, true);
+				InitItem(uiTexture, (uint)itemID);
 			}
 			else if (skillItemID != -1)
 			{
-				InitSkillItem(uiTexture, (uint)skillItemID, true, false, 35f);
+				InitSkillItem(uiTexture, (uint)skillItemID);
 			}
 			else if (skillSymbolItemID != -1)
 			{
-				InitSkillItemSymbol(uiTexture, (uint)skillSymbolItemID, true, 13f);
+				InitSkillItemSymbol(uiTexture, (uint)skillSymbolItemID);
 			}
 			else if (enemyID != -1)
 			{
-				InitEnemy(uiTexture, (uint)enemyID, foundationName, targetScene, null, ENEMY_MOVE_TYPE.DEFULT, true);
+				InitEnemy(uiTexture, (uint)enemyID, foundationName, targetScene);
+			}
+			else if (accessoryID != -1)
+			{
+				InitAccessory(uiTexture, (uint)accessoryID, uiModelScale);
 			}
 		}
 		else if (equipItemID != -1)
@@ -630,9 +664,9 @@ public class UIModelRenderTexture
 				OnLoadFinished();
 			}
 		}
-		else if (enemyID == -1)
+		else if (enemyID == -1 && accessoryID != -1 && itemLoader != null && !itemLoader.IsLoading())
 		{
-			return;
+			OnLoadFinished();
 		}
 	}
 
@@ -652,6 +686,7 @@ public class UIModelRenderTexture
 		skillSymbolItemID = -1;
 		itemID = -1;
 		enemyID = -1;
+		accessoryID = -1;
 		foundationName = null;
 		uiTexture = null;
 		referenceSexID = -1;
@@ -695,92 +730,107 @@ public class UIModelRenderTexture
 
 	private IEnumerator DoViewing()
 	{
-		if (!(model == null))
+		if (model == null)
 		{
-			model.set_localEulerAngles(Vector3.get_zero());
-			uiRenderTexture.enableTexture = true;
-			float rot_wait = 1f;
-			if (playerLoader != null)
+			Log.Error("model is null!!");
+			yield break;
+		}
+		model.set_localEulerAngles(Vector3.get_zero());
+		uiRenderTexture.enableTexture = true;
+		float rot_wait = 1f;
+		if (playerLoader != null)
+		{
+			model.set_localPosition(modelPos);
+			model.set_localEulerAngles(modelRot);
+		}
+		else if (npcLoader != null)
+		{
+			model.set_localPosition(modelPos);
+			model.set_localEulerAngles(modelRot);
+		}
+		else if (enemyLoader != null)
+		{
+			if (enemyDispplayInfo == null)
 			{
-				model.set_localPosition(modelPos);
-				model.set_localEulerAngles(modelRot);
-			}
-			else if (npcLoader != null)
-			{
-				model.set_localPosition(modelPos);
-				model.set_localEulerAngles(modelRot);
-			}
-			else if (enemyLoader != null)
-			{
-				if (enemyDispplayInfo == null)
+				Bounds val = default(Bounds);
+				int i = 0;
+				for (int num = enemyLoader.renderersBody.Length; i < num; i++)
 				{
-					Bounds bounds = default(Bounds);
-					int j = 0;
-					for (int i = enemyLoader.renderersBody.Length; j < i; j++)
+					val.Encapsulate(enemyLoader.renderersBody[i].get_bounds());
+				}
+				Vector3 extents = val.get_extents();
+				float num2 = extents.x * 0.5f / Mathf.Tan((float)Math.PI / 8f) + 1f;
+				Transform obj = model;
+				Vector3 extents2 = val.get_extents();
+				obj.set_localPosition(new Vector3(0f, extents2.y * -0.5f, num2));
+				model.set_localEulerAngles(new Vector3(0f, 180f, 0f));
+			}
+			else
+			{
+				model.set_localPosition(new Vector3(0f, -0.8f, 5f));
+				if (enemyDispplayInfo.seIdhowl > 0 && isEnemyHowl)
+				{
+					audioObject = SoundManager.PlayUISE(enemyDispplayInfo.seIdhowl);
+				}
+				enemyLoader.body.set_localPosition(enemyDispplayInfo.pos);
+				enemyLoader.body.set_localEulerAngles(new Vector3(0f, enemyDispplayInfo.angleY, 0f));
+				enemyAnimCtrl = model.get_gameObject().AddComponent<EnemyAnimCtrl>();
+				enemyAnimCtrl.Init(enemyLoader, uiRenderTexture.renderCamera);
+				Animator animator = enemyLoader.GetAnimator();
+				if (animator != null)
+				{
+					int num3 = Animator.StringToHash("Base Layer.GACHA_HOWL");
+					if (animator.HasState(0, num3))
 					{
-						bounds.Encapsulate(enemyLoader.renderersBody[j].get_bounds());
+						animator.Play(num3, 0, 0f);
+						animator.Update(0f);
 					}
-					Vector3 extents = bounds.get_extents();
-					float z = extents.x * 0.5f / Mathf.Tan(0.3926991f) + 1f;
-					Transform obj = model;
-					Vector3 extents2 = bounds.get_extents();
-					obj.set_localPosition(new Vector3(0f, extents2.y * -0.5f, z));
-					model.set_localEulerAngles(new Vector3(0f, 180f, 0f));
+				}
+			}
+		}
+		else if (itemLoader != null && accessoryID != -1)
+		{
+			model.set_localEulerAngles(new Vector3(0f, 180f, 0f));
+		}
+		Vector3 lightDir = new Vector3(1.19f, -1.59f, -1f);
+		Quaternion rotation = Quaternion.AngleAxis(1f, new Vector3(-0.07124705f, 0f, -0.9974587f));
+		MeshRenderer renderer = null;
+		if (lightRotation)
+		{
+			renderer = model.GetComponentInChildren<MeshRenderer>();
+		}
+		if (oneshot)
+		{
+			yield return (object)new WaitForEndOfFrame();
+			if (uiRenderTexture != null && uiRenderTexture.renderCamera != null)
+			{
+				uiRenderTexture.renderCamera.set_enabled(false);
+			}
+			DeleteModel();
+			yield break;
+		}
+		while (true)
+		{
+			if (itemLoader != null)
+			{
+				model.set_localPosition(new Vector3(0f, 0f, itemLoader.displayInfo.zFromCamera));
+				itemLoader.ApplyDisplayInfo();
+				if (rot_wait <= 0f)
+				{
+					model.Rotate(new Vector3(0f, rotateSpeed, 0f) * Time.get_deltaTime());
 				}
 				else
 				{
-					model.set_localPosition(new Vector3(0f, -0.8f, 5f));
-					if (enemyDispplayInfo.seIdhowl > 0 && isEnemyHowl)
-					{
-						audioObject = SoundManager.PlayUISE(enemyDispplayInfo.seIdhowl);
-					}
-					enemyLoader.body.set_localPosition(enemyDispplayInfo.pos);
-					enemyLoader.body.set_localEulerAngles(new Vector3(0f, enemyDispplayInfo.angleY, 0f));
-					enemyAnimCtrl = model.get_gameObject().AddComponent<EnemyAnimCtrl>();
-					enemyAnimCtrl.Init(enemyLoader, uiRenderTexture.renderCamera, false);
-					Animator animator = enemyLoader.GetAnimator();
-					if (animator != null)
-					{
-						int stateHash = Animator.StringToHash("Base Layer.GACHA_HOWL");
-						if (animator.HasState(0, stateHash))
-						{
-							animator.Play(stateHash, 0, 0f);
-							animator.Update(0f);
-						}
-					}
+					rot_wait -= Time.get_deltaTime();
 				}
-			}
-			Vector3 lightDir = new Vector3(1.19f, -1.59f, -1f);
-			Quaternion rotation = Quaternion.AngleAxis(1f, new Vector3(-0.07124705f, 0f, -0.9974587f));
-			MeshRenderer renderer = null;
-			if (lightRotation)
-			{
-				renderer = model.GetComponentInChildren<MeshRenderer>();
-			}
-			while (true)
-			{
-				if (itemLoader != null)
+				if (lightRotation)
 				{
-					model.set_localPosition(new Vector3(0f, 0f, itemLoader.displayInfo.zFromCamera));
-					itemLoader.ApplyDisplayInfo();
-					if (rot_wait <= 0f)
-					{
-						model.Rotate(new Vector3(0f, rotateSpeed, 0f) * Time.get_deltaTime());
-					}
-					else
-					{
-						rot_wait -= Time.get_deltaTime();
-					}
-					if (lightRotation)
-					{
-						lightDir = rotation * lightDir;
-						renderer.get_material().SetVector("_LightDir", Vector4.op_Implicit(lightDir));
-					}
+					lightDir = rotation * lightDir;
+					renderer.get_material().SetVector("_LightDir", Vector4.op_Implicit(lightDir));
 				}
-				yield return (object)null;
 			}
+			yield return null;
 		}
-		Log.Error("model is null!!");
 	}
 
 	public void SetApplyEnemyRootMotion(bool enable)
@@ -793,7 +843,6 @@ public class UIModelRenderTexture
 
 	public void PlayRandomEnemyAnimation()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (!(enemyLoader == null) && !(enemyLoader.animator == null))
 		{
 			Object.Destroy(enemyAnimCtrl);

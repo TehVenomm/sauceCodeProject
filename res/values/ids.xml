@@ -1,195 +1,276 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item type="id" name="com_facebook_fragment_container">false</item>
-    <item type="id" name="com_facebook_device_dialog_title">false</item>
-    <item type="id" name="com_facebook_device_auth_instructions">false</item>
-    <item type="id" name="confirmation_code">false</item>
-    <item type="id" name="progress_bar">false</item>
-    <item type="id" name="cancel_button">false</item>
-    <item type="id" name="com_facebook_login_activity_progress_bar">false</item>
-    <item type="id" name="com_facebook_body_frame">false</item>
-    <item type="id" name="com_facebook_tooltip_bubble_view_top_pointer">false</item>
-    <item type="id" name="com_facebook_button_xout">false</item>
-    <item type="id" name="com_facebook_tooltip_bubble_view_text_body">false</item>
-    <item type="id" name="com_facebook_tooltip_bubble_view_bottom_pointer">false</item>
-    <item type="id" name="rootProgressDialog">false</item>
-    <item type="id" name="progressDialogMessage">false</item>
-    <item type="id" name="progressDialogAnimationImage">false</item>
-    <item type="id" name="BaseLayout">false</item>
-    <item type="id" name="UnityLayout">false</item>
-    <item type="id" name="text_purchase_status">false</item>
-    <item type="id" name="linearLayout1">false</item>
-    <item type="id" name="textView1">false</item>
-    <item type="id" name="progressBar1">false</item>
-    <item type="id" name="messenger_send_button">false</item>
-    <item type="id" name="root">false</item>
-    <item type="id" name="img">false</item>
-    <item type="id" name="title">false</item>
-    <item type="id" name="message">false</item>
-    <item type="id" name="time">false</item>
-    <item type="id" name="notification_row">false</item>
-    <item type="id" name="purchased_order_id">false</item>
-    <item type="id" name="purchased_state">false</item>
-    <item type="id" name="purchased_time">false</item>
-    <item type="id" name="purchased_item_name">false</item>
-    <item type="id" name="net_gogame_zopim_header_bar">false</item>
-    <item type="id" name="backButton">false</item>
-    <item type="id" name="switchButton">false</item>
-    <item type="id" name="closeButton">false</item>
-    <item type="id" name="fragment">false</item>
-    <item type="id" name="listView">false</item>
-    <item type="id" name="net_gogame_zopim_input_section">false</item>
-    <item type="id" name="editText">false</item>
-    <item type="id" name="sendButton">false</item>
-    <item type="id" name="progressBar">false</item>
-    <item type="id" name="imageView">false</item>
-    <item type="id" name="secondMainLayout">false</item>
-    <item type="id" name="profileIcon">false</item>
-    <item type="id" name="agentTextView">false</item>
-    <item type="id" name="cellImageView">false</item>
-    <item type="id" name="agentName">false</item>
-    <item type="id" name="optionsLinearLayout">false</item>
-    <item type="id" name="textView">false</item>
-    <item type="id" name="chatOption">false</item>
-    <item type="id" name="optionBulletImageView">false</item>
-    <item type="id" name="optionLabelTextView">false</item>
-    <item type="id" name="rateGoodImageView">false</item>
-    <item type="id" name="rateBadImageView">false</item>
-    <item type="id" name="messageTextView">false</item>
-    <item type="id" name="attachmentThumbnailImageView">false</item>
-    <item type="id" name="net_gogame_gowrap_image_button_image">false</item>
-    <item type="id" name="net_gogame_gowrap_image_button_content_background">false</item>
-    <item type="id" name="net_gogame_gowrap_image_button_content">false</item>
-    <item type="id" name="net_gogame_gowrap_image_button_caption">false</item>
-    <item type="id" name="net_gogame_gowrap_image_button_mask">false</item>
-    <item type="id" name="net_gogame_gowrap_list_view">false</item>
-    <item type="id" name="net_gogame_gowrap_text_view">false</item>
-    <item type="id" name="net_gogame_gowrap_dialog_title">false</item>
-    <item type="id" name="net_gogame_gowrap_dialog_close_button">false</item>
-    <item type="id" name="net_gogame_gowrap_dialog_icon_container">false</item>
-    <item type="id" name="net_gogame_gowrap_progress_indicator">false</item>
-    <item type="id" name="net_gogame_gowrap_dialog_icon_alert">false</item>
-    <item type="id" name="net_gogame_gowrap_dialog_icon_info">false</item>
-    <item type="id" name="net_gogame_gowrap_dialog_message">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_user_name">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_user_title">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_user_level">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_user_power_rating">false</item>
-    <item type="id" name="net_gogame_gowrap_back_button">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_hunter_id">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_user_atk">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_user_def">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_user_hp">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_list">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_icon">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_name">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_rarity">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_level">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_icon">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_name">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_rarity">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_skillitem_level">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_user_name">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_user_title">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_user_level">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_points">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_hunter_id">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_forged_count">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_total_count">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_container">false</item>
-    <item type="id" name="net_gogame_gowrap_equipment_collection_list">false</item>
-    <item type="id" name="net_gogame_gowrap_pager_container">false</item>
-    <item type="id" name="net_gogame_gowrap_pager_previous_button">false</item>
-    <item type="id" name="net_gogame_gowrap_pager_text">false</item>
-    <item type="id" name="net_gogame_gowrap_pager_next_button">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_frame">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_element">false</item>
-    <item type="id" name="net_gogame_gowrap_armory_equipment_index">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_button_container">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_power_rating_all_users_button">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_power_rating_new_users_button">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_equipment_collection_all_users_button">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_search_button">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_search_container">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_search">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_search_submit_button">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_results_container">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_hunter_entry_container">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_hunter_entry">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_listview">false</item>
-    <item type="id" name="net_gogame_gowrap_main_tabbed_panel">false</item>
-    <item type="id" name="net_gogame_gowrap_main_fragment_container">false</item>
-    <item type="id" name="net_gogame_gowrap_main_sns_button">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_position">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_title">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_level">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_value">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_name">false</item>
-    <item type="id" name="net_gogame_gowrap_ranking_hunter_id">false</item>
-    <item type="id" name="net_gogame_gowrap_community_header">false</item>
-    <item type="id" name="net_gogame_gowrap_facebook_button">false</item>
-    <item type="id" name="net_gogame_gowrap_twitter_button">false</item>
-    <item type="id" name="net_gogame_gowrap_instagram_button">false</item>
-    <item type="id" name="net_gogame_gowrap_youtube_button">false</item>
-    <item type="id" name="net_gogame_gowrap_forum_button">false</item>
-    <item type="id" name="net_gogame_gowrap_wiki_button">false</item>
-    <item type="id" name="net_gogame_gowrap_faq_listview">false</item>
-    <item type="id" name="net_gogame_gowrap_faq_article_title">false</item>
-    <item type="id" name="net_gogame_gowrap_faq_section_name">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_scroll_view">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_button_more">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_button_visit_site_for_more">false</item>
-    <item type="id" name="net_gogame_gowrap_progressBar">false</item>
-    <item type="id" name="net_gogame_gowrap_progressBar2">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_field_name">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_field_email">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_group_mobile_number">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_field_mobile_number">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_field_category">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_field_body">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_field_attachment">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_field_remove_attachment">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_button_send">false</item>
-    <item type="id" name="net_gogame_gowrap_webview_non_video_layout">false</item>
-    <item type="id" name="net_gogame_gowrap_main_webview">false</item>
-    <item type="id" name="net_gogame_gowrap_webview_video_layout">false</item>
-    <item type="id" name="net_gogame_gowrap_back_support_buttons">false</item>
-    <item type="id" name="net_gogame_gowrap_support_form_button">false</item>
-    <item type="id" name="net_gogame_gowrap_support_chat_button">false</item>
-    <item type="id" name="net_gogame_gowrap_support_search_textfield">false</item>
-    <item type="id" name="net_gogame_gowrap_tip1_button">false</item>
-    <item type="id" name="net_gogame_gowrap_tip2_button">false</item>
-    <item type="id" name="net_gogame_gowrap_tip3_button">false</item>
-    <item type="id" name="net_gogame_gowrap_navbar">false</item>
-    <item type="id" name="net_gogame_gowrap_info_button">false</item>
-    <item type="id" name="net_gogame_gowrap_language_button">false</item>
-    <item type="id" name="net_gogame_gowrap_community_button">false</item>
-    <item type="id" name="net_gogame_gowrap_offers_button">false</item>
-    <item type="id" name="net_gogame_gowrap_help_button">false</item>
-    <item type="id" name="net_gogame_gowrap_contact_button">false</item>
-    <item type="id" name="net_gogame_gowrap_close_button">false</item>
-    <item type="id" name="net_gogame_gowrap_news_icon">false</item>
-    <item type="id" name="net_gogame_gowrap_news_icon_top">false</item>
-    <item type="id" name="net_gogame_gowrap_news_icon_bottom">false</item>
-    <item type="id" name="net_gogame_gowrap_news_title">false</item>
-    <item type="id" name="net_gogame_gowrap_news_status">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_media">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_photo">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_content_background">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_content">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_text">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_timestamp">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_message">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_button">false</item>
-    <item type="id" name="net_gogame_gowrap_newsfeed_item_video">false</item>
-    <item type="id" name="net_gogame_gowrap_image_button_subcaption">false</item>
-    <item type="id" name="net_gogame_gowrap_faq_button">false</item>
-    <item type="id" name="net_gogame_gowrap_news_banners">false</item>
-    <item type="id" name="net_gogame_gowrap_news_banner_period">false</item>
-    <item type="id" name="net_gogame_gowrap_news_listview">false</item>
-    <item type="id" name="net_gogame_gowrap_error_container">false</item>
-    <item type="id" name="net_gogame_gowrap_news_article_timestamp">false</item>
-    <item type="id" name="net_gogame_gowrap_news_article_container">false</item>
-    <item type="id" name="net_gogame_gowrap_more_tips_button">false</item>
+    <item type="id" name="action_bar_activity_content" />
+    <item type="id" name="action_bar_spinner" />
+    <item type="id" name="action_menu_divider" />
+    <item type="id" name="action_menu_presenter" />
+    <item type="id" name="home" />
+    <item type="id" name="line1" />
+    <item type="id" name="line3" />
+    <item type="id" name="progress_circular" />
+    <item type="id" name="progress_horizontal" />
+    <item type="id" name="split_action_bar" />
+    <item type="id" name="text" />
+    <item type="id" name="text2" />
+    <item type="id" name="title" />
+    <item type="id" name="up" />
+    <item type="id" name="action_bar_title" />
+    <item type="id" name="action_bar_subtitle" />
+    <item type="id" name="action_mode_close_button" />
+    <item type="id" name="activity_chooser_view_content" />
+    <item type="id" name="expand_activities_button" />
+    <item type="id" name="image" />
+    <item type="id" name="default_activity_button" />
+    <item type="id" name="list_item" />
+    <item type="id" name="icon" />
+    <item type="id" name="buttonPanel" />
+    <item type="id" name="spacer" />
+    <item type="id" name="parentPanel" />
+    <item type="id" name="contentPanel" />
+    <item type="id" name="scrollIndicatorUp" />
+    <item type="id" name="scrollView" />
+    <item type="id" name="textSpacerNoTitle" />
+    <item type="id" name="textSpacerNoButtons" />
+    <item type="id" name="scrollIndicatorDown" />
+    <item type="id" name="customPanel" />
+    <item type="id" name="custom" />
+    <item type="id" name="topPanel" />
+    <item type="id" name="title_template" />
+    <item type="id" name="alertTitle" />
+    <item type="id" name="titleDividerNoCustom" />
+    <item type="id" name="expanded_menu" />
+    <item type="id" name="checkbox" />
+    <item type="id" name="shortcut" />
+    <item type="id" name="radio" />
+    <item type="id" name="submenuarrow" />
+    <item type="id" name="action_bar_root" />
+    <item type="id" name="action_mode_bar_stub" />
+    <item type="id" name="action_mode_bar" />
+    <item type="id" name="decor_content_parent" />
+    <item type="id" name="action_bar_container" />
+    <item type="id" name="action_bar" />
+    <item type="id" name="action_context_bar" />
+    <item type="id" name="edit_query" />
+    <item type="id" name="search_bar" />
+    <item type="id" name="search_badge" />
+    <item type="id" name="search_button" />
+    <item type="id" name="search_edit_frame" />
+    <item type="id" name="search_mag_icon" />
+    <item type="id" name="search_plate" />
+    <item type="id" name="search_src_text" />
+    <item type="id" name="search_close_btn" />
+    <item type="id" name="submit_area" />
+    <item type="id" name="search_go_btn" />
+    <item type="id" name="search_voice_btn" />
+    <item type="id" name="select_dialog_listview" />
+    <item type="id" name="com_facebook_fragment_container" />
+    <item type="id" name="confirmation_code" />
+    <item type="id" name="progress_bar" />
+    <item type="id" name="com_facebook_device_auth_instructions" />
+    <item type="id" name="cancel_button" />
+    <item type="id" name="com_facebook_login_fragment_progress_bar" />
+    <item type="id" name="com_facebook_smart_instructions_0" />
+    <item type="id" name="com_facebook_smart_instructions_or" />
+    <item type="id" name="com_facebook_body_frame" />
+    <item type="id" name="com_facebook_tooltip_bubble_view_top_pointer" />
+    <item type="id" name="com_facebook_button_xout" />
+    <item type="id" name="com_facebook_tooltip_bubble_view_text_body" />
+    <item type="id" name="com_facebook_tooltip_bubble_view_bottom_pointer" />
+    <item type="id" name="rootProgressDialog" />
+    <item type="id" name="progressDialogMessage" />
+    <item type="id" name="progressDialogAnimationImage" />
+    <item type="id" name="BaseLayout" />
+    <item type="id" name="UnityLayout" />
+    <item type="id" name="text_purchase_status" />
+    <item type="id" name="linearLayout1" />
+    <item type="id" name="textView1" />
+    <item type="id" name="progressBar1" />
+    <item type="id" name="messenger_send_button" />
+    <item type="id" name="action_container" />
+    <item type="id" name="action_image" />
+    <item type="id" name="action_text" />
+    <item type="id" name="action0" />
+    <item type="id" name="cancel_action" />
+    <item type="id" name="status_bar_latest_event_content" />
+    <item type="id" name="media_actions" />
+    <item type="id" name="action_divider" />
+    <item type="id" name="notification_main_column_container" />
+    <item type="id" name="notification_main_column" />
+    <item type="id" name="right_side" />
+    <item type="id" name="time" />
+    <item type="id" name="chronometer" />
+    <item type="id" name="info" />
+    <item type="id" name="notification_background" />
+    <item type="id" name="right_icon" />
+    <item type="id" name="actions" />
+    <item type="id" name="icon_group" />
+    <item type="id" name="end_padder" />
+    <item type="id" name="root" />
+    <item type="id" name="img" />
+    <item type="id" name="message" />
+    <item type="id" name="notification_row" />
+    <item type="id" name="purchased_order_id" />
+    <item type="id" name="purchased_state" />
+    <item type="id" name="purchased_time" />
+    <item type="id" name="purchased_item_name" />
+    <item type="id" name="net_gogame_zopim_header_bar" />
+    <item type="id" name="backButton" />
+    <item type="id" name="switchButton" />
+    <item type="id" name="closeButton" />
+    <item type="id" name="fragment" />
+    <item type="id" name="listView" />
+    <item type="id" name="net_gogame_zopim_input_section" />
+    <item type="id" name="editText" />
+    <item type="id" name="sendButton" />
+    <item type="id" name="progressBar" />
+    <item type="id" name="imageView" />
+    <item type="id" name="secondMainLayout" />
+    <item type="id" name="profileIcon" />
+    <item type="id" name="agentTextView" />
+    <item type="id" name="cellImageView" />
+    <item type="id" name="agentName" />
+    <item type="id" name="optionsLinearLayout" />
+    <item type="id" name="textView" />
+    <item type="id" name="chatOption" />
+    <item type="id" name="optionBulletImageView" />
+    <item type="id" name="optionLabelTextView" />
+    <item type="id" name="rateGoodImageView" />
+    <item type="id" name="rateBadImageView" />
+    <item type="id" name="messageTextView" />
+    <item type="id" name="attachmentThumbnailImageView" />
+    <item type="id" name="net_gogame_gowrap_image_button_image" />
+    <item type="id" name="net_gogame_gowrap_image_button_content_background" />
+    <item type="id" name="net_gogame_gowrap_image_button_content" />
+    <item type="id" name="net_gogame_gowrap_image_button_caption" />
+    <item type="id" name="net_gogame_gowrap_image_button_mask" />
+    <item type="id" name="net_gogame_gowrap_list_view" />
+    <item type="id" name="net_gogame_gowrap_text_view" />
+    <item type="id" name="net_gogame_gowrap_dialog_title" />
+    <item type="id" name="net_gogame_gowrap_dialog_close_button" />
+    <item type="id" name="net_gogame_gowrap_dialog_icon_container" />
+    <item type="id" name="net_gogame_gowrap_progress_indicator" />
+    <item type="id" name="net_gogame_gowrap_dialog_icon_alert" />
+    <item type="id" name="net_gogame_gowrap_dialog_icon_info" />
+    <item type="id" name="net_gogame_gowrap_dialog_message" />
+    <item type="id" name="net_gogame_gowrap_armory_user_name" />
+    <item type="id" name="net_gogame_gowrap_armory_user_title" />
+    <item type="id" name="net_gogame_gowrap_armory_user_level" />
+    <item type="id" name="net_gogame_gowrap_armory_user_power_rating" />
+    <item type="id" name="net_gogame_gowrap_back_button" />
+    <item type="id" name="net_gogame_gowrap_armory_hunter_id" />
+    <item type="id" name="net_gogame_gowrap_armory_user_atk" />
+    <item type="id" name="net_gogame_gowrap_armory_user_def" />
+    <item type="id" name="net_gogame_gowrap_armory_user_hp" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_list" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_icon" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_name" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_rarity" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_level" />
+    <item type="id" name="net_gogame_gowrap_armory_skillitem_icon" />
+    <item type="id" name="net_gogame_gowrap_armory_skillitem_name" />
+    <item type="id" name="net_gogame_gowrap_armory_skillitem_rarity" />
+    <item type="id" name="net_gogame_gowrap_armory_skillitem_level" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_user_name" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_user_title" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_user_level" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_points" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_hunter_id" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_forged_count" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_total_count" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_container" />
+    <item type="id" name="net_gogame_gowrap_equipment_collection_list" />
+    <item type="id" name="net_gogame_gowrap_pager_container" />
+    <item type="id" name="net_gogame_gowrap_pager_previous_button" />
+    <item type="id" name="net_gogame_gowrap_pager_text" />
+    <item type="id" name="net_gogame_gowrap_pager_next_button" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_frame" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_element" />
+    <item type="id" name="net_gogame_gowrap_armory_equipment_index" />
+    <item type="id" name="net_gogame_gowrap_ranking_button_container" />
+    <item type="id" name="net_gogame_gowrap_ranking_power_rating_all_users_button" />
+    <item type="id" name="net_gogame_gowrap_ranking_power_rating_new_users_button" />
+    <item type="id" name="net_gogame_gowrap_ranking_equipment_collection_all_users_button" />
+    <item type="id" name="net_gogame_gowrap_ranking_search_button" />
+    <item type="id" name="net_gogame_gowrap_ranking_search_container" />
+    <item type="id" name="net_gogame_gowrap_ranking_search" />
+    <item type="id" name="net_gogame_gowrap_ranking_search_submit_button" />
+    <item type="id" name="net_gogame_gowrap_ranking_results_container" />
+    <item type="id" name="net_gogame_gowrap_ranking_hunter_entry_container" />
+    <item type="id" name="net_gogame_gowrap_ranking_hunter_entry" />
+    <item type="id" name="net_gogame_gowrap_ranking_listview" />
+    <item type="id" name="net_gogame_gowrap_main_tabbed_panel" />
+    <item type="id" name="net_gogame_gowrap_main_fragment_container" />
+    <item type="id" name="net_gogame_gowrap_main_sns_button" />
+    <item type="id" name="net_gogame_gowrap_ranking_position" />
+    <item type="id" name="net_gogame_gowrap_ranking_title" />
+    <item type="id" name="net_gogame_gowrap_ranking_level" />
+    <item type="id" name="net_gogame_gowrap_ranking_value" />
+    <item type="id" name="net_gogame_gowrap_ranking_name" />
+    <item type="id" name="net_gogame_gowrap_ranking_hunter_id" />
+    <item type="id" name="net_gogame_gowrap_community_header" />
+    <item type="id" name="net_gogame_gowrap_facebook_button" />
+    <item type="id" name="net_gogame_gowrap_twitter_button" />
+    <item type="id" name="net_gogame_gowrap_instagram_button" />
+    <item type="id" name="net_gogame_gowrap_youtube_button" />
+    <item type="id" name="net_gogame_gowrap_forum_button" />
+    <item type="id" name="net_gogame_gowrap_wiki_button" />
+    <item type="id" name="net_gogame_gowrap_faq_listview" />
+    <item type="id" name="net_gogame_gowrap_faq_article_title" />
+    <item type="id" name="net_gogame_gowrap_faq_section_name" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_scroll_view" />
+    <item type="id" name="net_gogame_gowrap_newsfeed" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_button_more" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_button_visit_site_for_more" />
+    <item type="id" name="net_gogame_gowrap_progressBar" />
+    <item type="id" name="net_gogame_gowrap_progressBar2" />
+    <item type="id" name="net_gogame_gowrap_support_form_field_name" />
+    <item type="id" name="net_gogame_gowrap_support_form_field_email" />
+    <item type="id" name="net_gogame_gowrap_support_form_group_mobile_number" />
+    <item type="id" name="net_gogame_gowrap_support_form_field_mobile_number" />
+    <item type="id" name="net_gogame_gowrap_support_form_field_category" />
+    <item type="id" name="net_gogame_gowrap_support_form_field_body" />
+    <item type="id" name="net_gogame_gowrap_support_form_field_attachment" />
+    <item type="id" name="net_gogame_gowrap_support_form_field_remove_attachment" />
+    <item type="id" name="net_gogame_gowrap_support_form_button_send" />
+    <item type="id" name="net_gogame_gowrap_webview_non_video_layout" />
+    <item type="id" name="net_gogame_gowrap_main_webview" />
+    <item type="id" name="net_gogame_gowrap_webview_video_layout" />
+    <item type="id" name="net_gogame_gowrap_back_support_buttons" />
+    <item type="id" name="net_gogame_gowrap_support_form_button" />
+    <item type="id" name="net_gogame_gowrap_support_chat_button" />
+    <item type="id" name="net_gogame_gowrap_support_search_textfield" />
+    <item type="id" name="net_gogame_gowrap_tip1_button" />
+    <item type="id" name="net_gogame_gowrap_tip2_button" />
+    <item type="id" name="net_gogame_gowrap_tip3_button" />
+    <item type="id" name="net_gogame_gowrap_navbar" />
+    <item type="id" name="net_gogame_gowrap_info_button" />
+    <item type="id" name="net_gogame_gowrap_language_button" />
+    <item type="id" name="net_gogame_gowrap_community_button" />
+    <item type="id" name="net_gogame_gowrap_offers_button" />
+    <item type="id" name="net_gogame_gowrap_help_button" />
+    <item type="id" name="net_gogame_gowrap_contact_button" />
+    <item type="id" name="net_gogame_gowrap_close_button" />
+    <item type="id" name="net_gogame_gowrap_news_icon" />
+    <item type="id" name="net_gogame_gowrap_news_icon_top" />
+    <item type="id" name="net_gogame_gowrap_news_icon_bottom" />
+    <item type="id" name="net_gogame_gowrap_news_title" />
+    <item type="id" name="net_gogame_gowrap_news_status" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_media" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_photo" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_content_background" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_content" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_text" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_timestamp" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_message" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_button" />
+    <item type="id" name="net_gogame_gowrap_newsfeed_item_video" />
+    <item type="id" name="net_gogame_gowrap_image_button_subcaption" />
+    <item type="id" name="net_gogame_gowrap_faq_button" />
+    <item type="id" name="net_gogame_gowrap_news_banners" />
+    <item type="id" name="net_gogame_gowrap_news_banner_period" />
+    <item type="id" name="net_gogame_gowrap_news_listview" />
+    <item type="id" name="net_gogame_gowrap_error_container" />
+    <item type="id" name="net_gogame_gowrap_news_article_timestamp" />
+    <item type="id" name="net_gogame_gowrap_news_article_container" />
+    <item type="id" name="net_gogame_gowrap_more_tips_button" />
 </resources>

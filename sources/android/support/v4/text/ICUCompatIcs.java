@@ -1,13 +1,13 @@
-package android.support.v4.text;
+package android.support.p000v4.text;
 
-import android.annotation.TargetApi;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-@TargetApi(14)
 @RequiresApi(14)
+/* renamed from: android.support.v4.text.ICUCompatIcs */
 class ICUCompatIcs {
     private static final String TAG = "ICUCompatIcs";
     private static Method sAddLikelySubtagsMethod;
@@ -20,7 +20,7 @@ class ICUCompatIcs {
                 sGetScriptMethod = cls.getMethod("getScript", new Class[]{String.class});
                 sAddLikelySubtagsMethod = cls.getMethod("addLikelySubtags", new Class[]{String.class});
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             sGetScriptMethod = null;
             sAddLikelySubtagsMethod = null;
             Log.w(TAG, e);
@@ -36,9 +36,9 @@ class ICUCompatIcs {
             if (sAddLikelySubtagsMethod != null) {
                 return (String) sAddLikelySubtagsMethod.invoke(null, new Object[]{locale2});
             }
-        } catch (Throwable e) {
+        } catch (IllegalAccessException e) {
             Log.w(TAG, e);
-        } catch (Throwable e2) {
+        } catch (InvocationTargetException e2) {
             Log.w(TAG, e2);
         }
         return locale2;
@@ -49,9 +49,9 @@ class ICUCompatIcs {
             if (sGetScriptMethod != null) {
                 return (String) sGetScriptMethod.invoke(null, new Object[]{str});
             }
-        } catch (Throwable e) {
+        } catch (IllegalAccessException e) {
             Log.w(TAG, e);
-        } catch (Throwable e2) {
+        } catch (InvocationTargetException e2) {
             Log.w(TAG, e2);
         }
         return null;
@@ -59,6 +59,9 @@ class ICUCompatIcs {
 
     public static String maximizeAndGetScript(Locale locale) {
         String addLikelySubtags = addLikelySubtags(locale);
-        return addLikelySubtags != null ? getScript(addLikelySubtags) : null;
+        if (addLikelySubtags != null) {
+            return getScript(addLikelySubtags);
+        }
+        return null;
     }
 }

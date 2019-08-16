@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EvolveController
@@ -9,18 +10,6 @@ public class EvolveController
 	private const uint kSphinxId = 10001u;
 
 	public const int kEvolveGaugeMaxSeId = 10000091;
-
-	private const string TYPE10000_EXEC_EFFECT = "ef_btl_wex1_spear_01_01";
-
-	private const string TYPE10000_EFFECT = "ef_btl_wex1_spear_01_02";
-
-	private const string TYPE10000_EXRUSH_EFFECT = "ef_btl_wex1_spear_01_03";
-
-	private const string TYPE10001_WING_EFFECT = "ef_btl_ast1_twinsword_01";
-
-	private const string TYPE10001_WEAPON_EFFECT = "ef_btl_ast1_twinsword_02";
-
-	private const string TYPE10001_ACTION_EFFECT = "ef_btl_ast1_twinsword_03";
 
 	private InGameSettingsManager.Evolve parameter;
 
@@ -44,6 +33,18 @@ public class EvolveController
 
 	private InGameSettingsManager.Evolve.TypeAbstract.EvolveBuff[] execBuffs;
 
+	private const string TYPE10000_EXEC_EFFECT = "ef_btl_wex1_spear_01_01";
+
+	private const string TYPE10000_EFFECT = "ef_btl_wex1_spear_01_02";
+
+	private const string TYPE10000_EXRUSH_EFFECT = "ef_btl_wex1_spear_01_03";
+
+	private const string TYPE10001_WING_EFFECT = "ef_btl_ast1_twinsword_01";
+
+	private const string TYPE10001_WEAPON_EFFECT = "ef_btl_ast1_twinsword_02";
+
+	private const string TYPE10001_ACTION_EFFECT = "ef_btl_ast1_twinsword_03";
+
 	public bool isExec
 	{
 		get;
@@ -52,11 +53,11 @@ public class EvolveController
 
 	public static void Load(LoadingQueue queue, uint evolveId)
 	{
-		queue.CacheSE(10000091, null);
+		queue.CacheSE(10000091);
 		switch (evolveId)
 		{
 		case 10000u:
-			queue.CacheSE(MonoBehaviourSingleton<InGameSettingsManager>.I.evolve.type10000.rushSeId, null);
+			queue.CacheSE(MonoBehaviourSingleton<InGameSettingsManager>.I.evolve.type10000.rushSeId);
 			queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wex1_spear_01_01");
 			queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wex1_spear_01_02");
 			queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wex1_spear_01_03");
@@ -118,7 +119,11 @@ public class EvolveController
 		}
 		if (typeAbstract.healValue > 0)
 		{
-			owner.OnGetHeal(typeAbstract.healValue, HEAL_TYPE.NONE, false, HEAL_EFFECT_TYPE.BASIS, true);
+			Character.HealData healData = new Character.HealData(typeAbstract.healValue, HEAL_TYPE.NONE, HEAL_EFFECT_TYPE.BASIS, new List<int>
+			{
+				10
+			});
+			owner.ExecHealHp(healData);
 		}
 		if (!object.ReferenceEquals(typeAbstract.healTypes, null))
 		{
@@ -153,16 +158,16 @@ public class EvolveController
 			_end10001();
 			break;
 		}
-		ReleaseEffect(ref execEffect, true);
-		ReleaseEffect(ref execEffect2, true);
-		ReleaseEffect(ref execEffect3, true);
+		ReleaseEffect(ref execEffect);
+		ReleaseEffect(ref execEffect2);
+		ReleaseEffect(ref execEffect3);
 		execEvolveId = 0u;
 		isExec = false;
 		execBuffs = null;
 		if (isSelf)
 		{
-			MonoBehaviourSingleton<UIPlayerStatus>.I.PlayChangeEvolveIcon(false);
-			MonoBehaviourSingleton<UIEnduranceStatus>.I.PlayChangeEvolveIcon(false);
+			MonoBehaviourSingleton<UIPlayerStatus>.I.PlayChangeEvolveIcon(start: false);
+			MonoBehaviourSingleton<UIEnduranceStatus>.I.PlayChangeEvolveIcon(start: false);
 			MonoBehaviourSingleton<UIPlayerStatus>.I.UpDateStatusIcon();
 		}
 	}
@@ -196,11 +201,9 @@ public class EvolveController
 
 	private void ReleaseEffect(ref Transform t, bool isPlayEndAnimation = true)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !object.ReferenceEquals(t, null))
 		{
-			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation, false);
+			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation);
 			t = null;
 		}
 	}
@@ -254,15 +257,15 @@ public class EvolveController
 		if (isSelf)
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.SetEvolveRate(0f);
-			MonoBehaviourSingleton<UIPlayerStatus>.I.EnableEvolveIcon(false);
+			MonoBehaviourSingleton<UIPlayerStatus>.I.EnableEvolveIcon(isEnable: false);
 			MonoBehaviourSingleton<UIEnduranceStatus>.I.SetEvolveRate(0f);
-			MonoBehaviourSingleton<UIEnduranceStatus>.I.EnableEvolveIcon(false);
+			MonoBehaviourSingleton<UIEnduranceStatus>.I.EnableEvolveIcon(isEnable: false);
 		}
 	}
 
 	public void ResetCurrentGauge()
 	{
-		ResetGauge(false);
+		ResetGauge(isAll: false);
 	}
 
 	public void SetGauge(float value, int index)
@@ -309,27 +312,29 @@ public class EvolveController
 
 	public void IncreaseGauge(AttackHitInfo.ATTACK_TYPE atkType, Player.ATTACK_MODE atkMode, int index)
 	{
-		if (execEvolveId == 0)
+		if (execEvolveId != 0)
 		{
-			float num = _GetIncreaseValue(atkType, atkMode);
-			if (!(num <= 0f))
+			return;
+		}
+		float num = _GetIncreaseValue(atkType, atkMode);
+		if (num <= 0f)
+		{
+			return;
+		}
+		float num2 = gauge[index];
+		gauge[index] += owner.CalcWaveMatchSpGauge(num);
+		if (gauge[index] > 1000f)
+		{
+			gauge[index] = 1000f;
+		}
+		if (isSelf && index == owner.weaponIndex && num2 != gauge[index])
+		{
+			MonoBehaviourSingleton<UIPlayerStatus>.I.SetEvolveRate(gauge[index] / 1000f);
+			MonoBehaviourSingleton<UIEnduranceStatus>.I.SetEvolveRate(gauge[index] / 1000f);
+			if (IsGaugeFull())
 			{
-				float num2 = gauge[index];
-				gauge[index] += owner.CalcWaveMatchSpGauge(num);
-				if (gauge[index] > 1000f)
-				{
-					gauge[index] = 1000f;
-				}
-				if (isSelf && index == owner.weaponIndex && num2 != gauge[index])
-				{
-					MonoBehaviourSingleton<UIPlayerStatus>.I.SetEvolveRate(gauge[index] / 1000f);
-					MonoBehaviourSingleton<UIEnduranceStatus>.I.SetEvolveRate(gauge[index] / 1000f);
-					if (IsGaugeFull())
-					{
-						MonoBehaviourSingleton<UIPlayerStatus>.I.PlayChangeEvolveIcon(true);
-						MonoBehaviourSingleton<UIEnduranceStatus>.I.PlayChangeEvolveIcon(true);
-					}
-				}
+				MonoBehaviourSingleton<UIPlayerStatus>.I.PlayChangeEvolveIcon(start: true);
+				MonoBehaviourSingleton<UIEnduranceStatus>.I.PlayChangeEvolveIcon(start: true);
 			}
 		}
 	}
@@ -384,7 +389,7 @@ public class EvolveController
 		{
 			EffectManager.GetEffect("ef_btl_wex1_spear_01_01", owner.FindNode(string.Empty));
 		});
-		ReleaseEffect(ref execEffect, true);
+		ReleaseEffect(ref execEffect);
 		execEffect = EffectManager.GetEffect("ef_btl_wex1_spear_01_02", owner.loader.wepR);
 		return parameter.type10000;
 	}
@@ -429,11 +434,11 @@ public class EvolveController
 	{
 		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		ReleaseEffect(ref execEffect, true);
+		ReleaseEffect(ref execEffect);
 		execEffect = EffectManager.GetEffect("ef_btl_ast1_twinsword_02", owner.loader.wepR);
-		ReleaseEffect(ref execEffect2, true);
+		ReleaseEffect(ref execEffect2);
 		execEffect2 = EffectManager.GetEffect("ef_btl_ast1_twinsword_02", owner.loader.wepL);
-		ReleaseEffect(ref execEffect3, true);
+		ReleaseEffect(ref execEffect3);
 		execEffect3 = EffectManager.GetEffect("ef_btl_ast1_twinsword_01", owner.FindNode("Spine01"));
 		execEffect3.set_localRotation(Quaternion.Euler(new Vector3(90f, -90f, 0f)));
 		return parameter.type10001;

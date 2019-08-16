@@ -1,6 +1,5 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
-import android.annotation.TargetApi;
 import android.graphics.Rect;
 import android.support.annotation.RequiresApi;
 import android.transition.Transition;
@@ -15,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.app.FragmentTransitionCompat21 */
 class FragmentTransitionCompat21 {
     FragmentTransitionCompat21() {
     }
@@ -28,21 +27,18 @@ class FragmentTransitionCompat21 {
     }
 
     public static void addTargets(Object obj, ArrayList<View> arrayList) {
-        int i = 0;
         Transition transition = (Transition) obj;
         if (transition != null) {
-            int transitionCount;
             if (transition instanceof TransitionSet) {
                 TransitionSet transitionSet = (TransitionSet) transition;
-                transitionCount = transitionSet.getTransitionCount();
-                while (i < transitionCount) {
+                int transitionCount = transitionSet.getTransitionCount();
+                for (int i = 0; i < transitionCount; i++) {
                     addTargets(transitionSet.getTransitionAt(i), arrayList);
-                    i++;
                 }
             } else if (!hasSimpleTarget(transition) && isNullOrEmpty(transition.getTargets())) {
                 int size = arrayList.size();
-                for (transitionCount = 0; transitionCount < size; transitionCount++) {
-                    transition.addTarget((View) arrayList.get(transitionCount));
+                for (int i2 = 0; i2 < size; i2++) {
+                    transition.addTarget((View) arrayList.get(i2));
                 }
             }
         }
@@ -92,7 +88,10 @@ class FragmentTransitionCompat21 {
     }
 
     public static Object cloneTransition(Object obj) {
-        return obj != null ? ((Transition) obj).clone() : null;
+        if (obj != null) {
+            return ((Transition) obj).clone();
+        }
+        return null;
     }
 
     private static boolean containedBeforeIndex(List<View> list, View view, int i) {
@@ -104,7 +103,8 @@ class FragmentTransitionCompat21 {
         return false;
     }
 
-    private static String findKeyForValue(Map<String, String> map, String str) {
+    /* access modifiers changed from: private */
+    public static String findKeyForValue(Map<String, String> map, String str) {
         for (Entry entry : map.entrySet()) {
             if (str.equals(entry.getValue())) {
                 return (String) entry.getKey();
@@ -136,7 +136,7 @@ class FragmentTransitionCompat21 {
     }
 
     private static boolean hasSimpleTarget(Transition transition) {
-        return (isNullOrEmpty(transition.getTargetIds()) && isNullOrEmpty(transition.getTargetNames()) && isNullOrEmpty(transition.getTargetTypes())) ? false : true;
+        return !isNullOrEmpty(transition.getTargetIds()) || !isNullOrEmpty(transition.getTargetNames()) || !isNullOrEmpty(transition.getTargetTypes());
     }
 
     private static boolean isNullOrEmpty(List list) {
@@ -180,8 +180,8 @@ class FragmentTransitionCompat21 {
         return transitionSet;
     }
 
-    public static ArrayList<String> prepareSetNameOverridesOptimized(ArrayList<View> arrayList) {
-        ArrayList<String> arrayList2 = new ArrayList();
+    public static ArrayList<String> prepareSetNameOverridesReordered(ArrayList<View> arrayList) {
+        ArrayList<String> arrayList2 = new ArrayList<>();
         int size = arrayList.size();
         for (int i = 0; i < size; i++) {
             View view = (View) arrayList.get(i);
@@ -198,25 +198,22 @@ class FragmentTransitionCompat21 {
     }
 
     public static void replaceTargets(Object obj, ArrayList<View> arrayList, ArrayList<View> arrayList2) {
-        int i = 0;
         Transition transition = (Transition) obj;
-        int transitionCount;
         if (transition instanceof TransitionSet) {
             TransitionSet transitionSet = (TransitionSet) transition;
-            transitionCount = transitionSet.getTransitionCount();
-            while (i < transitionCount) {
+            int transitionCount = transitionSet.getTransitionCount();
+            for (int i = 0; i < transitionCount; i++) {
                 replaceTargets(transitionSet.getTransitionAt(i), arrayList, arrayList2);
-                i++;
             }
         } else if (!hasSimpleTarget(transition)) {
             List targets = transition.getTargets();
             if (targets != null && targets.size() == arrayList.size() && targets.containsAll(arrayList)) {
-                transitionCount = arrayList2 == null ? 0 : arrayList2.size();
-                for (int i2 = 0; i2 < transitionCount; i2++) {
+                int size = arrayList2 == null ? 0 : arrayList2.size();
+                for (int i2 = 0; i2 < size; i2++) {
                     transition.addTarget((View) arrayList2.get(i2));
                 }
-                for (transitionCount = arrayList.size() - 1; transitionCount >= 0; transitionCount--) {
-                    transition.removeTarget((View) arrayList.get(transitionCount));
+                for (int size2 = arrayList.size() - 1; size2 >= 0; size2--) {
+                    transition.removeTarget((View) arrayList.get(size2));
                 }
             }
         }
@@ -297,7 +294,10 @@ class FragmentTransitionCompat21 {
         if (obj != null) {
             ((Transition) obj).setEpicenterCallback(new EpicenterCallback() {
                 public Rect onGetEpicenter(Transition transition) {
-                    return (rect == null || rect.isEmpty()) ? null : rect;
+                    if (rect == null || rect.isEmpty()) {
+                        return null;
+                    }
+                    return rect;
                 }
             });
         }
@@ -316,7 +316,22 @@ class FragmentTransitionCompat21 {
         }
     }
 
-    public static void setNameOverridesOptimized(View view, ArrayList<View> arrayList, ArrayList<View> arrayList2, ArrayList<String> arrayList3, Map<String, String> map) {
+    public static void setNameOverridesOrdered(View view, final ArrayList<View> arrayList, final Map<String, String> map) {
+        OneShotPreDrawListener.add(view, new Runnable() {
+            public void run() {
+                int size = arrayList.size();
+                for (int i = 0; i < size; i++) {
+                    View view = (View) arrayList.get(i);
+                    String transitionName = view.getTransitionName();
+                    if (transitionName != null) {
+                        view.setTransitionName(FragmentTransitionCompat21.findKeyForValue(map, transitionName));
+                    }
+                }
+            }
+        });
+    }
+
+    public static void setNameOverridesReordered(View view, ArrayList<View> arrayList, ArrayList<View> arrayList2, ArrayList<String> arrayList3, Map<String, String> map) {
         final int size = arrayList2.size();
         final ArrayList arrayList4 = new ArrayList();
         for (int i = 0; i < size; i++) {
@@ -326,10 +341,15 @@ class FragmentTransitionCompat21 {
             if (transitionName != null) {
                 view2.setTransitionName(null);
                 String str = (String) map.get(transitionName);
-                for (int i2 = 0; i2 < size; i2++) {
-                    if (str.equals(arrayList3.get(i2))) {
+                int i2 = 0;
+                while (true) {
+                    if (i2 >= size) {
+                        break;
+                    } else if (str.equals(arrayList3.get(i2))) {
                         ((View) arrayList2.get(i2)).setTransitionName(transitionName);
                         break;
+                    } else {
+                        i2++;
                     }
                 }
             }
@@ -339,23 +359,15 @@ class FragmentTransitionCompat21 {
         final ArrayList<View> arrayList7 = arrayList;
         OneShotPreDrawListener.add(view, new Runnable() {
             public void run() {
-                for (int i = 0; i < size; i++) {
-                    ((View) arrayList5.get(i)).setTransitionName((String) arrayList6.get(i));
-                    ((View) arrayList7.get(i)).setTransitionName((String) arrayList4.get(i));
-                }
-            }
-        });
-    }
-
-    public static void setNameOverridesUnoptimized(View view, final ArrayList<View> arrayList, final Map<String, String> map) {
-        OneShotPreDrawListener.add(view, new Runnable() {
-            public void run() {
-                int size = arrayList.size();
-                for (int i = 0; i < size; i++) {
-                    View view = (View) arrayList.get(i);
-                    String transitionName = view.getTransitionName();
-                    if (transitionName != null) {
-                        view.setTransitionName(FragmentTransitionCompat21.findKeyForValue(map, transitionName));
+                int i = 0;
+                while (true) {
+                    int i2 = i;
+                    if (i2 < size) {
+                        ((View) arrayList5.get(i2)).setTransitionName((String) arrayList6.get(i2));
+                        ((View) arrayList7.get(i2)).setTransitionName((String) arrayList4.get(i2));
+                        i = i2 + 1;
+                    } else {
+                        return;
                     }
                 }
             }

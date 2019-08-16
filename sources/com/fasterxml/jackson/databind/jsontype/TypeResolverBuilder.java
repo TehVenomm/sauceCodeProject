@@ -1,10 +1,11 @@
 package com.fasterxml.jackson.databind.jsontype;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import java.util.Collection;
 
 public interface TypeResolverBuilder<T extends TypeResolverBuilder<T>> {
@@ -16,9 +17,9 @@ public interface TypeResolverBuilder<T extends TypeResolverBuilder<T>> {
 
     Class<?> getDefaultImpl();
 
-    T inclusion(As as);
+    T inclusion(C0861As as);
 
-    T init(Id id, TypeIdResolver typeIdResolver);
+    T init(C0862Id id, TypeIdResolver typeIdResolver);
 
     T typeIdVisibility(boolean z);
 

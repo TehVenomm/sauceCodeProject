@@ -42,7 +42,7 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
     }
 
     protected AtomicReferenceSerializer(AtomicReferenceSerializer atomicReferenceSerializer, BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, NameTransformer nameTransformer, Include include) {
-        super((StdSerializer) atomicReferenceSerializer);
+        super((StdSerializer<?>) atomicReferenceSerializer);
         this._referredType = atomicReferenceSerializer._referredType;
         this._dynamicSerializers = atomicReferenceSerializer._dynamicSerializers;
         this._property = beanProperty;
@@ -57,68 +57,66 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
     }
 
     public JsonSerializer<AtomicReference<?>> unwrappingSerializer(NameTransformer nameTransformer) {
-        JsonSerializer jsonSerializer = this._valueSerializer;
+        JsonSerializer<Object> jsonSerializer = this._valueSerializer;
         if (jsonSerializer != null) {
             jsonSerializer = jsonSerializer.unwrappingSerializer(nameTransformer);
         }
         return withResolved(this._property, this._valueTypeSerializer, jsonSerializer, this._unwrapper == null ? nameTransformer : NameTransformer.chainedTransformer(nameTransformer, this._unwrapper), this._contentInclusion);
     }
 
-    protected AtomicReferenceSerializer withResolved(BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, NameTransformer nameTransformer, Include include) {
+    /* access modifiers changed from: protected */
+    public AtomicReferenceSerializer withResolved(BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, NameTransformer nameTransformer, Include include) {
         return (this._property == beanProperty && include == this._contentInclusion && this._valueTypeSerializer == typeSerializer && this._valueSerializer == jsonSerializer && this._unwrapper == nameTransformer) ? this : new AtomicReferenceSerializer(this, beanProperty, typeSerializer, jsonSerializer, nameTransformer, include);
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* JADX WARNING: Code restructure failed: missing block: B:15:0x0036, code lost:
+        if (r5 != com.fasterxml.jackson.annotation.JsonInclude.Include.USE_DEFAULTS) goto L_0x0038;
+     */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public com.fasterxml.jackson.databind.JsonSerializer<?> createContextual(com.fasterxml.jackson.databind.SerializerProvider r7, com.fasterxml.jackson.databind.BeanProperty r8) throws com.fasterxml.jackson.databind.JsonMappingException {
         /*
-        r6 = this;
-        r2 = r6._valueTypeSerializer;
-        if (r2 == 0) goto L_0x0008;
-    L_0x0004:
-        r2 = r2.forProperty(r8);
-    L_0x0008:
-        r3 = r6.findAnnotatedContentSerializer(r7, r8);
-        if (r3 != 0) goto L_0x0020;
-    L_0x000e:
-        r3 = r6._valueSerializer;
-        if (r3 != 0) goto L_0x0041;
-    L_0x0012:
-        r0 = r6._referredType;
-        r0 = r6._useStatic(r7, r8, r0);
-        if (r0 == 0) goto L_0x0020;
-    L_0x001a:
-        r0 = r6._referredType;
-        r3 = r6._findSerializer(r7, r0, r8);
-    L_0x0020:
-        r0 = r6._contentInclusion;
-        if (r8 == 0) goto L_0x0046;
-    L_0x0024:
-        r1 = r7.getConfig();
-        r4 = java.util.concurrent.atomic.AtomicReference.class;
-        r1 = r8.findPropertyInclusion(r1, r4);
-        r5 = r1.getContentInclusion();
-        if (r5 == r0) goto L_0x0046;
-    L_0x0034:
-        r1 = com.fasterxml.jackson.annotation.JsonInclude.Include.USE_DEFAULTS;
-        if (r5 == r1) goto L_0x0046;
-    L_0x0038:
-        r4 = r6._unwrapper;
-        r0 = r6;
-        r1 = r8;
-        r0 = r0.withResolved(r1, r2, r3, r4, r5);
-        return r0;
-    L_0x0041:
-        r3 = r7.handlePrimaryContextualization(r3, r8);
-        goto L_0x0020;
-    L_0x0046:
-        r5 = r0;
-        goto L_0x0038;
+            r6 = this;
+            com.fasterxml.jackson.databind.jsontype.TypeSerializer r2 = r6._valueTypeSerializer
+            if (r2 == 0) goto L_0x0008
+            com.fasterxml.jackson.databind.jsontype.TypeSerializer r2 = r2.forProperty(r8)
+        L_0x0008:
+            com.fasterxml.jackson.databind.JsonSerializer r3 = r6.findAnnotatedContentSerializer(r7, r8)
+            if (r3 != 0) goto L_0x0020
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r3 = r6._valueSerializer
+            if (r3 != 0) goto L_0x0041
+            com.fasterxml.jackson.databind.JavaType r0 = r6._referredType
+            boolean r0 = r6._useStatic(r7, r8, r0)
+            if (r0 == 0) goto L_0x0020
+            com.fasterxml.jackson.databind.JavaType r0 = r6._referredType
+            com.fasterxml.jackson.databind.JsonSerializer r3 = r6._findSerializer(r7, r0, r8)
+        L_0x0020:
+            com.fasterxml.jackson.annotation.JsonInclude$Include r0 = r6._contentInclusion
+            if (r8 == 0) goto L_0x0046
+            com.fasterxml.jackson.databind.SerializationConfig r1 = r7.getConfig()
+            java.lang.Class<java.util.concurrent.atomic.AtomicReference> r4 = java.util.concurrent.atomic.AtomicReference.class
+            com.fasterxml.jackson.annotation.JsonInclude$Value r1 = r8.findPropertyInclusion(r1, r4)
+            com.fasterxml.jackson.annotation.JsonInclude$Include r5 = r1.getContentInclusion()
+            if (r5 == r0) goto L_0x0046
+            com.fasterxml.jackson.annotation.JsonInclude$Include r1 = com.fasterxml.jackson.annotation.JsonInclude.Include.USE_DEFAULTS
+            if (r5 == r1) goto L_0x0046
+        L_0x0038:
+            com.fasterxml.jackson.databind.util.NameTransformer r4 = r6._unwrapper
+            r0 = r6
+            r1 = r8
+            com.fasterxml.jackson.databind.ser.std.AtomicReferenceSerializer r0 = r0.withResolved(r1, r2, r3, r4, r5)
+            return r0
+        L_0x0041:
+            com.fasterxml.jackson.databind.JsonSerializer r3 = r7.handlePrimaryContextualization(r3, r8)
+            goto L_0x0020
+        L_0x0046:
+            r5 = r0
+            goto L_0x0038
         */
-        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.std.AtomicReferenceSerializer.createContextual(com.fasterxml.jackson.databind.SerializerProvider, com.fasterxml.jackson.databind.BeanProperty):com.fasterxml.jackson.databind.JsonSerializer<?>");
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.std.AtomicReferenceSerializer.createContextual(com.fasterxml.jackson.databind.SerializerProvider, com.fasterxml.jackson.databind.BeanProperty):com.fasterxml.jackson.databind.JsonSerializer");
     }
 
-    protected boolean _useStatic(SerializerProvider serializerProvider, BeanProperty beanProperty, JavaType javaType) {
+    /* access modifiers changed from: protected */
+    public boolean _useStatic(SerializerProvider serializerProvider, BeanProperty beanProperty, JavaType javaType) {
         if (javaType.isJavaLangObject()) {
             return false;
         }
@@ -152,7 +150,7 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
         if (this._contentInclusion == null) {
             return false;
         }
-        JsonSerializer jsonSerializer = this._valueSerializer;
+        JsonSerializer<Object> jsonSerializer = this._valueSerializer;
         if (jsonSerializer == null) {
             try {
                 jsonSerializer = _findCachedSerializer(serializerProvider, obj.getClass());
@@ -170,7 +168,7 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
     public void serialize(AtomicReference<?> atomicReference, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         Object obj = atomicReference.get();
         if (obj != null) {
-            JsonSerializer jsonSerializer = this._valueSerializer;
+            JsonSerializer<Object> jsonSerializer = this._valueSerializer;
             if (jsonSerializer == null) {
                 jsonSerializer = _findCachedSerializer(serializerProvider, obj.getClass());
             }
@@ -187,7 +185,7 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
     public void serializeWithType(AtomicReference<?> atomicReference, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {
         Object obj = atomicReference.get();
         if (obj != null) {
-            JsonSerializer jsonSerializer = this._valueSerializer;
+            JsonSerializer<Object> jsonSerializer = this._valueSerializer;
             if (jsonSerializer == null) {
                 jsonSerializer = _findCachedSerializer(serializerProvider, obj.getClass());
             }
@@ -198,7 +196,7 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
     }
 
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType) throws JsonMappingException {
-        JsonSerializer jsonSerializer = this._valueSerializer;
+        JsonSerializer<Object> jsonSerializer = this._valueSerializer;
         if (jsonSerializer == null) {
             jsonSerializer = _findSerializer(jsonFormatVisitorWrapper.getProvider(), this._referredType, this._property);
             if (this._unwrapper != null) {
@@ -211,7 +209,7 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
     private final JsonSerializer<Object> _findCachedSerializer(SerializerProvider serializerProvider, Class<?> cls) throws JsonMappingException {
         JsonSerializer<Object> serializerFor = this._dynamicSerializers.serializerFor(cls);
         if (serializerFor == null) {
-            serializerFor = _findSerializer(serializerProvider, (Class) cls, this._property);
+            serializerFor = _findSerializer(serializerProvider, cls, this._property);
             if (this._unwrapper != null) {
                 serializerFor = serializerFor.unwrappingSerializer(this._unwrapper);
             }
@@ -221,7 +219,7 @@ public class AtomicReferenceSerializer extends StdSerializer<AtomicReference<?>>
     }
 
     private final JsonSerializer<Object> _findSerializer(SerializerProvider serializerProvider, Class<?> cls, BeanProperty beanProperty) throws JsonMappingException {
-        return serializerProvider.findTypedValueSerializer((Class) cls, true, beanProperty);
+        return serializerProvider.findTypedValueSerializer(cls, true, beanProperty);
     }
 
     private final JsonSerializer<Object> _findSerializer(SerializerProvider serializerProvider, JavaType javaType, BeanProperty beanProperty) throws JsonMappingException {

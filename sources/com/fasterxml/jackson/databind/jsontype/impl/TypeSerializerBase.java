@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
@@ -9,7 +9,7 @@ public abstract class TypeSerializerBase extends TypeSerializer {
     protected final TypeIdResolver _idResolver;
     protected final BeanProperty _property;
 
-    public abstract As getTypeInclusion();
+    public abstract C0861As getTypeInclusion();
 
     protected TypeSerializerBase(TypeIdResolver typeIdResolver, BeanProperty beanProperty) {
         this._idResolver = typeIdResolver;
@@ -24,7 +24,8 @@ public abstract class TypeSerializerBase extends TypeSerializer {
         return this._idResolver;
     }
 
-    protected String idFromValue(Object obj) {
+    /* access modifiers changed from: protected */
+    public String idFromValue(Object obj) {
         String idFromValue = this._idResolver.idFromValue(obj);
         if (idFromValue == null) {
             handleMissingId(obj);
@@ -32,7 +33,8 @@ public abstract class TypeSerializerBase extends TypeSerializer {
         return idFromValue;
     }
 
-    protected String idFromValueAndType(Object obj, Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public String idFromValueAndType(Object obj, Class<?> cls) {
         String idFromValueAndType = this._idResolver.idFromValueAndType(obj, cls);
         if (idFromValueAndType == null) {
             handleMissingId(obj);
@@ -40,6 +42,7 @@ public abstract class TypeSerializerBase extends TypeSerializer {
         return idFromValueAndType;
     }
 
-    protected void handleMissingId(Object obj) {
+    /* access modifiers changed from: protected */
+    public void handleMissingId(Object obj) {
     }
 }

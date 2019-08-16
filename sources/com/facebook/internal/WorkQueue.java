@@ -8,10 +8,12 @@ public class WorkQueue {
     public static final int DEFAULT_MAX_CONCURRENT = 8;
     private final Executor executor;
     private final int maxConcurrent;
-    private WorkNode pendingJobs;
+    /* access modifiers changed from: private */
+    public WorkNode pendingJobs;
     private int runningCount;
     private WorkNode runningJobs;
-    private final Object workLock;
+    /* access modifiers changed from: private */
+    public final Object workLock;
 
     public interface WorkItem {
         boolean cancel();
@@ -32,11 +34,12 @@ public class WorkQueue {
             this.callback = runnable;
         }
 
-        WorkNode addToList(WorkNode workNode, boolean z) {
+        /* access modifiers changed from: 0000 */
+        public WorkNode addToList(WorkNode workNode, boolean z) {
+            WorkNode workNode2;
             if (!$assertionsDisabled && this.next != null) {
                 throw new AssertionError();
             } else if ($assertionsDisabled || this.prev == null) {
-                WorkNode workNode2;
                 if (workNode == null) {
                     this.prev = this;
                     this.next = this;
@@ -44,9 +47,9 @@ public class WorkQueue {
                 } else {
                     this.next = workNode;
                     this.prev = workNode.prev;
-                    workNode2 = this.next;
+                    WorkNode workNode3 = this.next;
                     this.prev.next = this;
-                    workNode2.prev = this;
+                    workNode3.prev = this;
                     workNode2 = workNode;
                 }
                 return z ? this : workNode2;
@@ -65,11 +68,13 @@ public class WorkQueue {
             }
         }
 
-        Runnable getCallback() {
+        /* access modifiers changed from: 0000 */
+        public Runnable getCallback() {
             return this.callback;
         }
 
-        WorkNode getNext() {
+        /* access modifiers changed from: 0000 */
+        public WorkNode getNext() {
             return this.next;
         }
 
@@ -86,7 +91,8 @@ public class WorkQueue {
             }
         }
 
-        WorkNode removeFromList(WorkNode workNode) {
+        /* access modifiers changed from: 0000 */
+        public WorkNode removeFromList(WorkNode workNode) {
             if (!$assertionsDisabled && this.next == null) {
                 throw new AssertionError();
             } else if ($assertionsDisabled || this.prev != null) {
@@ -103,11 +109,13 @@ public class WorkQueue {
             }
         }
 
-        void setIsRunning(boolean z) {
+        /* access modifiers changed from: 0000 */
+        public void setIsRunning(boolean z) {
             this.isRunning = z;
         }
 
-        void verify(boolean z) {
+        /* access modifiers changed from: 0000 */
+        public void verify(boolean z) {
             if (!$assertionsDisabled && this.prev.next != this) {
                 throw new AssertionError();
             } else if (!$assertionsDisabled && this.next.prev != this) {
@@ -126,12 +134,12 @@ public class WorkQueue {
         this(i, FacebookSdk.getExecutor());
     }
 
-    public WorkQueue(int i, Executor executor) {
+    public WorkQueue(int i, Executor executor2) {
         this.workLock = new Object();
         this.runningJobs = null;
         this.runningCount = 0;
         this.maxConcurrent = i;
-        this.executor = executor;
+        this.executor = executor2;
     }
 
     private void execute(final WorkNode workNode) {
@@ -146,7 +154,8 @@ public class WorkQueue {
         });
     }
 
-    private void finishItemAndStartNew(WorkNode workNode) {
+    /* access modifiers changed from: private */
+    public void finishItemAndStartNew(WorkNode workNode) {
         WorkNode workNode2 = null;
         synchronized (this.workLock) {
             if (workNode != null) {
@@ -177,7 +186,7 @@ public class WorkQueue {
     }
 
     public WorkItem addActiveWorkItem(Runnable runnable, boolean z) {
-        WorkItem workNode = new WorkNode(runnable);
+        WorkNode workNode = new WorkNode(runnable);
         synchronized (this.workLock) {
             this.pendingJobs = workNode.addToList(this.pendingJobs, z);
         }
@@ -196,8 +205,7 @@ public class WorkQueue {
                     workNode = workNode.getNext();
                 } while (workNode != this.runningJobs);
             }
-            if ($assertionsDisabled || this.runningCount == r0) {
-            } else {
+            if (!$assertionsDisabled && this.runningCount != i) {
                 throw new AssertionError();
             }
         }

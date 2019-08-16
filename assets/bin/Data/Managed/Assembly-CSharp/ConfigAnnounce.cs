@@ -26,11 +26,9 @@ public class ConfigAnnounce : GameSection
 
 	private void Update()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
 		if (autoClose && !MonoBehaviourSingleton<GameSceneManager>.I.isWaiting)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ConfigAnnounce", this.get_gameObject(), "CLOSE", null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ConfigAnnounce", this.get_gameObject(), "CLOSE");
 			autoClose = false;
 		}
 	}
@@ -101,7 +99,7 @@ public class ConfigAnnounce : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<UserInfoManager>.I.SendPushNotificationDeviceEnable(pushEnable, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 				pushEnable = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.pushEnable;
 				autoClose = true;
 			});

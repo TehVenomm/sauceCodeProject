@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GrowMagiMaterialRotator
+public class GrowMagiMaterialRotator : MonoBehaviour
 {
 	public float speed;
 
@@ -27,7 +27,6 @@ public class GrowMagiMaterialRotator
 
 	private void Update()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.get_transform().Rotate(axis, speed * Time.get_deltaTime());
 	}

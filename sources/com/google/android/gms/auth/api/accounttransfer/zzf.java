@@ -1,14 +1,14 @@
 package com.google.android.gms.auth.api.accounttransfer;
 
 final class zzf extends zza<byte[]> {
-    private /* synthetic */ zze zzdyx;
+    private final /* synthetic */ zze zzaq;
 
     zzf(zze zze, zzb zzb) {
-        this.zzdyx = zze;
+        this.zzaq = zze;
         super(zzb);
     }
 
-    public final void zzg(byte[] bArr) {
-        this.zzdyx.setResult(bArr);
+    public final void zza(byte[] bArr) {
+        this.zzaq.setResult(bArr);
     }
 }

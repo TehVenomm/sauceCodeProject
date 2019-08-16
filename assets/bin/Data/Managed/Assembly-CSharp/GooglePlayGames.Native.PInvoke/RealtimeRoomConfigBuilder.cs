@@ -19,7 +19,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal RealtimeRoomConfigBuilder SetVariant(uint variantValue)
 		{
-			uint variant = (uint)((variantValue != 0) ? ((int)variantValue) : (-1));
+			uint variant = (variantValue != 0) ? variantValue : uint.MaxValue;
 			RealTimeRoomConfigBuilder.RealTimeRoomConfig_Builder_SetVariant(SelfPtr(), variant);
 			return this;
 		}

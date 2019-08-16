@@ -26,12 +26,11 @@ public class EnumSetDeserializer extends StdDeserializer<EnumSet<?>> implements 
         super(EnumSet.class);
         this._enumType = javaType;
         this._enumClass = javaType.getRawClass();
-        if (this._enumClass.isEnum()) {
-            this._enumDeserializer = jsonDeserializer;
-            this._unwrapSingle = null;
-            return;
+        if (!this._enumClass.isEnum()) {
+            throw new IllegalArgumentException("Type " + javaType + " not Java Enum type");
         }
-        throw new IllegalArgumentException("Type " + javaType + " not Java Enum type");
+        this._enumDeserializer = jsonDeserializer;
+        this._unwrapSingle = null;
     }
 
     protected EnumSetDeserializer(EnumSetDeserializer enumSetDeserializer, JsonDeserializer<?> jsonDeserializer, Boolean bool) {
@@ -58,36 +57,37 @@ public class EnumSetDeserializer extends StdDeserializer<EnumSet<?>> implements 
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
+        JsonDeserializer handleSecondaryContextualization;
         Boolean findFormatFeature = findFormatFeature(deserializationContext, beanProperty, EnumSet.class, Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        JsonDeserializer jsonDeserializer = this._enumDeserializer;
+        JsonDeserializer<Enum<?>> jsonDeserializer = this._enumDeserializer;
         if (jsonDeserializer == null) {
-            jsonDeserializer = deserializationContext.findContextualValueDeserializer(this._enumType, beanProperty);
+            handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(this._enumType, beanProperty);
         } else {
-            jsonDeserializer = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, this._enumType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, this._enumType);
         }
-        return withResolved(jsonDeserializer, findFormatFeature);
+        return withResolved(handleSecondaryContextualization, findFormatFeature);
     }
 
     public EnumSet<?> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (!jsonParser.isExpectedStartArrayToken()) {
             return handleNonArray(jsonParser, deserializationContext);
         }
-        EnumSet<?> constructSet = constructSet();
+        EnumSet constructSet = constructSet();
         while (true) {
-            JsonToken nextToken = jsonParser.nextToken();
-            if (nextToken == JsonToken.END_ARRAY) {
-                return constructSet;
-            }
-            if (nextToken == JsonToken.VALUE_NULL) {
-                throw deserializationContext.mappingException(this._enumClass);
-            }
             try {
+                JsonToken nextToken = jsonParser.nextToken();
+                if (nextToken == JsonToken.END_ARRAY) {
+                    return constructSet;
+                }
+                if (nextToken == JsonToken.VALUE_NULL) {
+                    throw deserializationContext.mappingException(this._enumClass);
+                }
                 Enum enumR = (Enum) this._enumDeserializer.deserialize(jsonParser, deserializationContext);
                 if (enumR != null) {
                     constructSet.add(enumR);
                 }
-            } catch (Throwable e) {
-                throw JsonMappingException.wrapWithPath(e, (Object) constructSet, constructSet.size());
+            } catch (Exception e) {
+                throw JsonMappingException.wrapWithPath((Throwable) e, (Object) constructSet, constructSet.size());
             }
         }
     }
@@ -100,12 +100,12 @@ public class EnumSetDeserializer extends StdDeserializer<EnumSet<?>> implements 
         return EnumSet.noneOf(this._enumClass);
     }
 
-    protected EnumSet<?> handleNonArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Object obj = (this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY))) ? 1 : null;
-        if (obj == null) {
+    /* access modifiers changed from: protected */
+    public EnumSet<?> handleNonArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        if (!(this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)))) {
             throw deserializationContext.mappingException(EnumSet.class);
         }
-        Object constructSet = constructSet();
+        EnumSet<?> constructSet = constructSet();
         if (jsonParser.hasToken(JsonToken.VALUE_NULL)) {
             throw deserializationContext.mappingException(this._enumClass);
         }
@@ -115,8 +115,8 @@ public class EnumSetDeserializer extends StdDeserializer<EnumSet<?>> implements 
                 constructSet.add(enumR);
             }
             return constructSet;
-        } catch (Throwable e) {
-            throw JsonMappingException.wrapWithPath(e, constructSet, constructSet.size());
+        } catch (Exception e) {
+            throw JsonMappingException.wrapWithPath((Throwable) e, (Object) constructSet, constructSet.size());
         }
     }
 }

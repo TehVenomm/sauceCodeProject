@@ -24,6 +24,18 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 
 	public bool sendAsset;
 
+	public bool termsCheck;
+
+	public string termsUpdateDay;
+
+	public bool usageLimitMode;
+
+	public bool appClose;
+
+	public string closedNotice = string.Empty;
+
+	public bool openRefundForm;
+
 	public Account account
 	{
 		get;
@@ -57,7 +69,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 		}
 		FieldRewardPool.DeleteSave();
 		PlayerPrefs.SetInt("LastNewsID", -1);
-		new DataTableCache(null).RemoveAll();
+		new DataTableCache().RemoveAll();
 		TutorialReadData.DeleteSave();
 		if (Singleton<TutorialMessageTable>.IsValid() && Singleton<TutorialMessageTable>.I.ReadData != null)
 		{
@@ -92,11 +104,10 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 		if (flag)
 		{
 			SaveData.Save();
+			return;
 		}
-		else
-		{
-			NetworkNative.setCookieToken(account.token);
-		}
+		NetworkNative.setCookieToken(account.token);
+		NetworkNative.setSidToken(account.token);
 	}
 
 	public void SaveAccount(string user_hash, string token = null)
@@ -108,6 +119,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (!string.IsNullOrEmpty(token))
 			{
 				NetworkNative.setCookieToken(account.token);
+				NetworkNative.setSidToken(account.token);
 				Native.getList();
 			}
 		}
@@ -115,6 +127,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 		{
 			account.token = MonoBehaviourSingleton<NetworkManager>.I.tokenTemp;
 			NetworkNative.setCookieToken(account.token);
+			NetworkNative.setSidToken(account.token);
 			Native.getList();
 		}
 		SaveData.SetData(SaveData.Key.Account, account);
@@ -141,16 +154,18 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				MonoBehaviourSingleton<UserInfoManager>.I.SetNewsID(ret.result.newsId);
 				MonoBehaviourSingleton<UserInfoManager>.I.userIdHash = ret.result.userIdHash;
 				sendAsset = ret.result.sendAsset;
+				termsCheck = ret.result.termsCheck;
+				termsUpdateDay = ret.result.termsUpdateDay;
 				if (ret.result.recommendUpdate)
 				{
 					RecommendUpdateCheck(delegate
 					{
-						call_back(true);
+						call_back(obj: true);
 					});
 				}
 				else if (call_back != null)
 				{
-					call_back(true);
+					call_back(obj: true);
 				}
 				break;
 			case Error.ERR_AUTH_FAILED:
@@ -160,17 +175,17 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 					{
 						RecommendUpdateCheck(delegate
 						{
-							call_back(false);
+							call_back(obj: false);
 						});
 					}
 					else if (call_back != null)
 					{
-						call_back(false);
+						call_back(obj: false);
 					}
 				}
 				else
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, StringTable.GetErrorMessage((uint)ret.Error), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u), null, null), delegate(string btn)
+					MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, StringTable.GetErrorMessage((uint)ret.Error), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u)), delegate(string btn)
 					{
 						if (btn == "YES")
 						{
@@ -184,7 +199,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 						{
 							SendCheckRegister(ntc_data, call_back);
 						}
-					}, true, (int)ret.Error);
+					}, error: true, (int)ret.Error);
 				}
 				break;
 			case Error.WRN_MAINTENANCE:
@@ -193,7 +208,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 					MonoBehaviourSingleton<GameSceneManager>.I.OpenInfoDialog(delegate
 					{
 						SendCheckRegister(ntc_data, call_back);
-					}, true);
+					}, error: true);
 				});
 				break;
 			case Error.WRN_UPDATE_FORCE:
@@ -243,9 +258,9 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo);
 				MonoBehaviourSingleton<UserInfoManager>.I.userIdHash = ret.result.userIdHash;
-				SaveAccount(ret.result.uh, null);
+				SaveAccount(ret.result.uh);
 				Dictionary<string, object> values = new Dictionary<string, object>
 				{
 					{
@@ -262,6 +277,9 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 					}
 				};
 				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Account_Register", "Account", values);
+				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen, "Tutorial");
+				Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen.ToString()));
+				MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen, "Tutorial");
 				call_back(is_success);
 			}
 			else
@@ -284,14 +302,14 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 
 	private void RecommendUpdateCheck(Action call_back)
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, StringTable.Get(STRING_CATEGORY.COMMON, 11u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u), null, null), delegate(string sel)
+		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, StringTable.Get(STRING_CATEGORY.COMMON, 11u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u)), delegate(string sel)
 		{
 			if ("YES" == sel)
 			{
 				Native.launchMyselfMarket();
 			}
 			call_back();
-		}, true, 0);
+		}, error: true);
 	}
 
 	public void SendLogInBonus(Action<bool> callback)
@@ -299,7 +317,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 		logInBonus = null;
 		logInBonusLimitedCount = 0;
 		GameSaveData.instance.showIAPAdsPop = string.Empty;
-		Protocol.Send(LoginBonusModel.URL, delegate(LoginBonusModel ret)
+		Protocol.SendAsync(LoginBonusModel.URL, delegate(LoginBonusModel ret)
 		{
 			bool obj = false;
 			if (ret.Error == Error.None)
@@ -344,7 +362,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 				Dictionary<string, object> values = new Dictionary<string, object>
 				{
 					{
@@ -379,10 +397,10 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo);
 				MonoBehaviourSingleton<UserInfoManager>.I.SetNewsID(ret.result.newsId);
 				MonoBehaviourSingleton<UserInfoManager>.I.userIdHash = ret.result.userIdHash;
-				SaveAccount(ret.result.uh, null);
+				SaveAccount(ret.result.uh);
 			}
 			call_back(is_success);
 		}, string.Empty);
@@ -435,7 +453,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success);
 		}, string.Empty);
@@ -456,10 +474,10 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo);
 				MonoBehaviourSingleton<UserInfoManager>.I.SetNewsID(ret.result.newsId);
 				MonoBehaviourSingleton<UserInfoManager>.I.userIdHash = ret.result.userIdHash;
-				SaveAccount(ret.result.uh, null);
+				SaveAccount(ret.result.uh);
 			}
 			call_back(is_success);
 		}, string.Empty);
@@ -493,9 +511,9 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo);
 				MonoBehaviourSingleton<UserInfoManager>.I.SetNewsID(ret.result.newsId);
-				SaveAccount(ret.result.uh, null);
+				SaveAccount(ret.result.uh);
 				Dictionary<string, object> values = new Dictionary<string, object>
 				{
 					{
@@ -527,7 +545,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success, ret);
 		}, string.Empty);
@@ -544,7 +562,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success);
 		}, string.Empty);
@@ -558,7 +576,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			if (ret.Error == Error.None)
 			{
 				is_success = true;
-				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result, 0);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success);
 		}, string.Empty);
@@ -595,21 +613,21 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 	private void OpenMessageDialog(Error msg_id, Action<string> callback)
 	{
 		GameSceneEvent.PushStay();
-		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.GetErrorMessage((uint)msg_id), null, null, null, null), delegate(string ret)
+		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.GetErrorMessage((uint)msg_id)), delegate(string ret)
 		{
 			GameSceneEvent.PopStay();
 			callback(ret);
-		}, true, 0);
+		}, error: true);
 	}
 
 	private void OpenYesNoDialog(Error msg_id, Action<string> callback)
 	{
 		GameSceneEvent.PushStay();
-		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, StringTable.GetErrorMessage((uint)msg_id), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 110u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 112u), null, null), delegate(string ret)
+		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, StringTable.GetErrorMessage((uint)msg_id), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 110u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 112u)), delegate(string ret)
 		{
 			GameSceneEvent.PopStay();
 			callback(ret);
-		}, true, 0);
+		}, error: true);
 	}
 
 	public void SetLoginBonusFromCache(List<LoginBonus> cacheLogInBonus)

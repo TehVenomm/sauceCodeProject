@@ -44,8 +44,6 @@ public class JSONInStream
 				Debug.LogError((object)("Error JSONInStream " + tag + " " + ex.ToString() + " " + ex2.ToString()));
 				value = null;
 				return null;
-				IL_0084:
-				return this;
 			}
 		}
 	}
@@ -55,11 +53,11 @@ public class JSONInStream
 		try
 		{
 			JSONStringFieldValue jSONStringFieldValue = (JSONStringFieldValue)node.GetField(tag);
-			if (jSONStringFieldValue != null)
+			if (jSONStringFieldValue == null)
 			{
-				value = jSONStringFieldValue.value;
 				return this;
 			}
+			value = jSONStringFieldValue.value;
 			return this;
 		}
 		catch (Exception ex)
@@ -74,8 +72,6 @@ public class JSONInStream
 			{
 				Debug.LogError((object)("Error JSONInStream " + tag + " " + ex.ToString() + " " + ex2.ToString()));
 				return null;
-				IL_008f:
-				return this;
 			}
 		}
 	}
@@ -106,8 +102,6 @@ public class JSONInStream
 				Debug.LogError((object)("Error JSONInStream " + idx + " " + ex.ToString() + " " + ex2.ToString()));
 				value = null;
 				return null;
-				IL_0089:
-				return this;
 			}
 		}
 	}

@@ -8,47 +8,47 @@ public final class SendException extends Exception {
     public static final int ERROR_TOO_MANY_MESSAGES = 4;
     public static final int ERROR_TTL_EXCEEDED = 3;
     public static final int ERROR_UNKNOWN = 0;
-    private final int mErrorCode;
+    private final int errorCode;
 
     SendException(String str) {
         int i = 2;
         super(str);
         if (str != null) {
-            String toLowerCase = str.toLowerCase(Locale.US);
-            int i2 = -1;
-            switch (toLowerCase.hashCode()) {
+            String lowerCase = str.toLowerCase(Locale.US);
+            char c = 65535;
+            switch (lowerCase.hashCode()) {
                 case -1743242157:
-                    if (toLowerCase.equals("service_not_available")) {
-                        i2 = 3;
+                    if (lowerCase.equals("service_not_available")) {
+                        c = 3;
                         break;
                     }
                     break;
                 case -1290953729:
-                    if (toLowerCase.equals("toomanymessages")) {
-                        i2 = 4;
+                    if (lowerCase.equals("toomanymessages")) {
+                        c = 4;
                         break;
                     }
                     break;
                 case -920906446:
-                    if (toLowerCase.equals("invalid_parameters")) {
-                        i2 = 0;
+                    if (lowerCase.equals("invalid_parameters")) {
+                        c = 0;
                         break;
                     }
                     break;
                 case -617027085:
-                    if (toLowerCase.equals("messagetoobig")) {
-                        i2 = 2;
+                    if (lowerCase.equals("messagetoobig")) {
+                        c = 2;
                         break;
                     }
                     break;
                 case -95047692:
-                    if (toLowerCase.equals("missing_to")) {
-                        i2 = 1;
+                    if (lowerCase.equals("missing_to")) {
+                        c = 1;
                         break;
                     }
                     break;
             }
-            switch (i2) {
+            switch (c) {
                 case 0:
                 case 1:
                     i = 1;
@@ -64,10 +64,10 @@ public final class SendException extends Exception {
             }
         }
         i = 0;
-        this.mErrorCode = i;
+        this.errorCode = i;
     }
 
     public final int getErrorCode() {
-        return this.mErrorCode;
+        return this.errorCode;
     }
 }

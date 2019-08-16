@@ -1,10 +1,11 @@
-package jp.colopl.iab;
+package p018jp.colopl.iab;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/* renamed from: jp.colopl.iab.Inventory */
 public class Inventory {
     Map<String, Purchase> mPurchaseMap = new HashMap();
     Map<String, SkuDetails> mSkuMap = new HashMap();
@@ -12,11 +13,13 @@ public class Inventory {
     Inventory() {
     }
 
-    void addPurchase(Purchase purchase) {
+    /* access modifiers changed from: 0000 */
+    public void addPurchase(Purchase purchase) {
         this.mPurchaseMap.put(purchase.getSku(), purchase);
     }
 
-    void addSkuDetails(SkuDetails skuDetails) {
+    /* access modifiers changed from: 0000 */
+    public void addSkuDetails(SkuDetails skuDetails) {
         this.mSkuMap.put(skuDetails.getSku(), skuDetails);
     }
 
@@ -26,12 +29,14 @@ public class Inventory {
         }
     }
 
-    List<String> getAllOwnedSkus() {
+    /* access modifiers changed from: 0000 */
+    public List<String> getAllOwnedSkus() {
         return new ArrayList(this.mPurchaseMap.keySet());
     }
 
-    List<String> getAllOwnedSkus(String str) {
-        List<String> arrayList = new ArrayList();
+    /* access modifiers changed from: 0000 */
+    public List<String> getAllOwnedSkus(String str) {
+        ArrayList arrayList = new ArrayList();
         for (Purchase purchase : this.mPurchaseMap.values()) {
             if (purchase.getItemType().equals(str)) {
                 arrayList.add(purchase.getSku());

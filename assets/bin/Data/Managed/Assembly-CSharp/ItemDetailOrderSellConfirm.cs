@@ -42,7 +42,7 @@ public class ItemDetailOrderSellConfirm : GameSection
 		int num = 0;
 		int num2 = 0;
 		QuestItemInfo item_info = itemData.GetItemData() as QuestItemInfo;
-		SetGrid(UI.GRD_ICON, string.Empty, 1, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_ICON, string.Empty, 1, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			uint num3 = 0u;
 			EquipItemExceedTable.EquipItemExceedData equipItemExceedData = Singleton<EquipItemExceedTable>.I.GetEquipItemExceedData(item_info.infoData.questData.tableData.rarity, item_info.infoData.questData.tableData.getType, item_info.infoData.questData.tableData.eventId);
@@ -51,9 +51,9 @@ public class ItemDetailOrderSellConfirm : GameSection
 				num3 = equipItemExceedData.exchangeItemId;
 			}
 			REWARD_TYPE rEWARD_TYPE = REWARD_TYPE.ITEM;
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(rEWARD_TYPE, num3, t, sellNum, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-			SetMaterialInfo(itemIcon.transform, rEWARD_TYPE, num3, null);
-			itemIcon.SetRewardBG(true);
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(rEWARD_TYPE, num3, t, sellNum);
+			SetMaterialInfo(itemIcon.transform, rEWARD_TYPE, num3);
+			itemIcon.SetRewardBG(is_visible: true);
 		});
 		SetLabelText((Enum)UI.LBL_GOLD, num.ToString());
 		SetLabelText((Enum)UI.LBL_EXP, num2.ToString());
@@ -73,10 +73,10 @@ public class ItemDetailOrderSellConfirm : GameSection
 			{
 				if (itemData.GetTableID() == empty_data)
 				{
-					GameSection.ChangeStayEvent("CLOSE_DETAIL", null);
+					GameSection.ChangeStayEvent("CLOSE_DETAIL");
 				}
 			});
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

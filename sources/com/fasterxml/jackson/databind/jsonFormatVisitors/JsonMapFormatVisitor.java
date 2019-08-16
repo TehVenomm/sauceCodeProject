@@ -9,6 +9,9 @@ public interface JsonMapFormatVisitor extends JsonFormatVisitorWithSerializerPro
     public static class Base implements JsonMapFormatVisitor {
         protected SerializerProvider _provider;
 
+        public Base() {
+        }
+
         public Base(SerializerProvider serializerProvider) {
             this._provider = serializerProvider;
         }

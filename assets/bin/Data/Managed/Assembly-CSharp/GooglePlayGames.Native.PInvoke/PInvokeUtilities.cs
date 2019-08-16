@@ -35,28 +35,28 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static DateTime FromMillisSinceUnixEpoch(long millisSinceEpoch)
 		{
-			return UnixEpoch.Add(TimeSpan.FromMilliseconds((double)millisSinceEpoch));
+			return UnixEpoch.Add(TimeSpan.FromMilliseconds(millisSinceEpoch));
 		}
 
 		internal static string OutParamsToString(OutStringMethod outStringMethod)
 		{
 			UIntPtr out_size = outStringMethod(null, UIntPtr.Zero);
-			if (!out_size.Equals(UIntPtr.Zero))
+			if (out_size.Equals(UIntPtr.Zero))
 			{
-				string text = null;
-				try
-				{
-					byte[] array = new byte[out_size.ToUInt32()];
-					outStringMethod(array, out_size);
-					return Encoding.UTF8.GetString(array, 0, (int)(out_size.ToUInt32() - 1));
-				}
-				catch (Exception arg)
-				{
-					Debug.LogError((object)("Exception creating string from char array: " + arg));
-					return string.Empty;
-				}
+				return null;
 			}
-			return null;
+			string text = null;
+			try
+			{
+				byte[] array = new byte[out_size.ToUInt32()];
+				outStringMethod(array, out_size);
+				return Encoding.UTF8.GetString(array, 0, (int)(out_size.ToUInt32() - 1));
+			}
+			catch (Exception arg)
+			{
+				Debug.LogError((object)("Exception creating string from char array: " + arg));
+				return string.Empty;
+			}
 		}
 
 		internal static T[] OutParamsToArray<T>(OutMethod<T> outMethod)
@@ -98,11 +98,11 @@ namespace GooglePlayGames.Native.PInvoke
 			double totalMilliseconds = span.TotalMilliseconds;
 			if (totalMilliseconds > 9.2233720368547758E+18)
 			{
-				return 9223372036854775807L;
+				return long.MaxValue;
 			}
 			if (totalMilliseconds < -9.2233720368547758E+18)
 			{
-				return -9223372036854775808L;
+				return long.MinValue;
 			}
 			return Convert.ToInt64(totalMilliseconds);
 		}

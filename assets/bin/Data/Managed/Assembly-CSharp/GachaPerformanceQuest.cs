@@ -20,9 +20,20 @@ public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBas
 
 	private bool m_isReam;
 
+	protected override void OnOpen()
+	{
+		SetActive((Enum)UI.BTN_SKIP, is_visible: true);
+		m_isReam = (AnimationDirector.I is QuestReamGachaDirector || AnimationDirector.I is QuestFeverGachaLegacyDirector);
+		SetActive((Enum)UI.BTN_SKIPALL, m_isReam);
+		if (AnimationDirector.I != null)
+		{
+			(AnimationDirector.I as QuestGachaDirectorBase).StartDirection(this);
+		}
+	}
+
 	void QuestGachaDirectorBase.ISectionCommand.OnShowRarity(RARITY_TYPE rarity)
 	{
-		SetActive((Enum)UI.BTN_SKIPALL, false);
+		SetActive((Enum)UI.BTN_SKIPALL, is_visible: false);
 		ShowRarity(rarity);
 	}
 
@@ -34,23 +45,12 @@ public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBas
 
 	void QuestGachaDirectorBase.ISectionCommand.OnEnd()
 	{
-		SetActive((Enum)UI.BTN_SKIPALL, false);
+		SetActive((Enum)UI.BTN_SKIPALL, is_visible: false);
 		End();
 	}
 
 	void QuestGachaDirectorBase.ISectionCommand.ActivateSkipButton()
 	{
 		ActivateButtonSkip();
-	}
-
-	protected override void OnOpen()
-	{
-		SetActive((Enum)UI.BTN_SKIP, true);
-		m_isReam = (AnimationDirector.I is QuestReamGachaDirector);
-		SetActive((Enum)UI.BTN_SKIPALL, m_isReam);
-		if (AnimationDirector.I != null)
-		{
-			(AnimationDirector.I as QuestGachaDirectorBase).StartDirection(this);
-		}
 	}
 }

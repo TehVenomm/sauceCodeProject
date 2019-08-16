@@ -1,8 +1,9 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
 import android.os.SystemClock;
 import android.util.Log;
 
+/* renamed from: io.fabric.sdk.android.services.common.TimingMetric */
 public class TimingMetric {
     private final boolean disabled;
     private long duration;

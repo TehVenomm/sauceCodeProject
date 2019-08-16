@@ -8,7 +8,6 @@ public class QuestEventListSelect : QuestListSelectBase
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -17,40 +16,38 @@ public class QuestEventListSelect : QuestListSelectBase
 		bool is_recv = true;
 		while (!is_recv)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.BTN_SORT, false);
+		SetActive((Enum)UI.BTN_SORT, is_visible: false);
 		if (eventLocation == null || eventLocation.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			return;
 		}
-		else
+		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetGrid(UI.GRD_QUEST, "QuestEventListSelectItem", eventLocation.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestEventListSelectItem", eventLocation.Length, true, delegate(int i, Transform t, bool is_recycle)
+			SetEvent(t, "SELECT_EVENT", i);
+			SetTexture(t, UI.TEX_EVENT_BANNER, null);
+			SetLabelText(t, UI.LBL_QUEST_NAME, string.Empty);
+			SetLabelText(t, UI.LBL_REMAIN_TIME, eventLocation[i].eventAppearRemain);
+			if (eventLocation[i].isPayingLocation)
 			{
-				SetEvent(t, "SELECT_EVENT", i);
-				SetTexture(t, UI.TEX_EVENT_BANNER, null);
-				SetLabelText(t, UI.LBL_QUEST_NAME, string.Empty);
-				SetLabelText(t, UI.LBL_REMAIN_TIME, eventLocation[i].eventAppearRemain);
-				if (eventLocation[i].isPayingLocation)
-				{
-					SetActive(t, UI.SPR_CRYSTAL, true);
-					SetActive(t, UI.SPR_FREE_PLAY, eventLocation[i].isFreePlaying);
-					SetLabelText(t, UI.LBL_PAYING_REMAIN, eventLocation[i].eventFreePayingRemain);
-				}
-				else
-				{
-					SetActive(t, UI.SPR_CRYSTAL, false);
-				}
-			});
-			base.UpdateUI();
-		}
+				SetActive(t, UI.SPR_CRYSTAL, is_visible: true);
+				SetActive(t, UI.SPR_FREE_PLAY, eventLocation[i].isFreePlaying);
+				SetLabelText(t, UI.LBL_PAYING_REMAIN, eventLocation[i].eventFreePayingRemain);
+			}
+			else
+			{
+				SetActive(t, UI.SPR_CRYSTAL, is_visible: false);
+			}
+		});
+		base.UpdateUI();
 	}
 
 	public void OnQuery_SELECT_EVENT()

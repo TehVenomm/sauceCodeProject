@@ -10,7 +10,7 @@ namespace GooglePlayGames.OurUtils
 			get
 			{
 				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Expected O, but got Unknown
+				//IL_000b: Expected O, but got Unknown
 				AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 				AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
 				AndroidJavaObject val2 = @static.Call<AndroidJavaObject>("getPackageManager", new object[0]);
@@ -25,7 +25,6 @@ namespace GooglePlayGames.OurUtils
 				catch (Exception)
 				{
 					return false;
-					IL_0053:;
 				}
 				return val3 != null;
 			}

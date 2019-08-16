@@ -12,7 +12,7 @@ import org.apache.commons.lang3.Validate;
 public class HashCodeBuilder implements Builder<Integer> {
     private static final int DEFAULT_INITIAL_VALUE = 17;
     private static final int DEFAULT_MULTIPLIER_VALUE = 37;
-    private static final ThreadLocal<Set<IDKey>> REGISTRY = new ThreadLocal();
+    private static final ThreadLocal<Set<IDKey>> REGISTRY = new ThreadLocal<>();
     private final int iConstant;
     private int iTotal;
 
@@ -29,10 +29,10 @@ public class HashCodeBuilder implements Builder<Integer> {
         if (!isRegistered(obj)) {
             try {
                 register(obj);
-                AccessibleObject[] declaredFields = cls.getDeclaredFields();
+                Field[] declaredFields = cls.getDeclaredFields();
                 AccessibleObject.setAccessible(declaredFields, true);
                 for (Field field : declaredFields) {
-                    if (!ArrayUtils.contains((Object[]) strArr, field.getName()) && field.getName().indexOf(36) == -1 && ((z || !Modifier.isTransient(field.getModifiers())) && !Modifier.isStatic(field.getModifiers()))) {
+                    if (!ArrayUtils.contains((Object[]) strArr, (Object) field.getName()) && field.getName().indexOf(36) == -1 && ((z || !Modifier.isTransient(field.getModifiers())) && !Modifier.isStatic(field.getModifiers()))) {
                         hashCodeBuilder.append(field.get(obj));
                     }
                 }
@@ -41,6 +41,7 @@ public class HashCodeBuilder implements Builder<Integer> {
                 throw new InternalError("Unexpected IllegalAccessException");
             } catch (Throwable th) {
                 unregister(obj);
+                throw th;
             }
         }
     }
@@ -72,7 +73,7 @@ public class HashCodeBuilder implements Builder<Integer> {
     }
 
     public static int reflectionHashCode(Object obj, Collection<String> collection) {
-        return reflectionHashCode(obj, ReflectionToStringBuilder.toNoNullStringArray((Collection) collection));
+        return reflectionHashCode(obj, ReflectionToStringBuilder.toNoNullStringArray(collection));
     }
 
     public static int reflectionHashCode(Object obj, String... strArr) {
@@ -93,8 +94,8 @@ public class HashCodeBuilder implements Builder<Integer> {
         if (registry != null) {
             registry.remove(new IDKey(obj));
             synchronized (HashCodeBuilder.class) {
-                registry = getRegistry();
-                if (registry != null && registry.isEmpty()) {
+                Set registry2 = getRegistry();
+                if (registry2 != null && registry2.isEmpty()) {
                     REGISTRY.remove();
                 }
             }

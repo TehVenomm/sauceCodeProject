@@ -2,32 +2,32 @@ package com.google.android.gms.drive.metadata.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzr implements Creator<zzq> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
         long j = 0;
         int i = -1;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    j = zzb.zzi(parcel, readInt);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 4:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new zzq(str, j, i);
     }
 

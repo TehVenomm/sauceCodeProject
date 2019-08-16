@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import com.appsflyer.share.Constants;
 import com.sec.android.iap.IAPConnector;
 import com.sec.android.iap.IAPConnector.Stub;
@@ -20,6 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.oms.AppstoreInAppBillingService;
 import org.onepf.oms.OpenIabHelper;
@@ -85,8 +87,9 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
     private Activity activity;
     private volatile boolean isBound;
     private String mExtraData;
+    /* access modifiers changed from: private */
     @Nullable
-    private IAPConnector mIapConnector;
+    public IAPConnector mIapConnector;
     private String mItemGroupId;
     @Nullable
     private OnIabPurchaseFinishedListener mPurchaseListener = null;
@@ -95,34 +98,29 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
     private String purchasingItemType;
     @Nullable
     private ServiceConnection serviceConnection;
+    /* access modifiers changed from: private */
     @Nullable
-    private OnIabSetupFinishedListener setupListener = null;
+    public OnIabSetupFinishedListener setupListener = null;
 
-    /* renamed from: org.onepf.oms.appstore.SamsungAppsBillingService$1 */
-    class C13221 implements ServiceConnection {
-        C13221() {
-        }
-
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            SamsungAppsBillingService.this.mIapConnector = Stub.asInterface(iBinder);
-            if (SamsungAppsBillingService.this.mIapConnector != null) {
-                SamsungAppsBillingService.this.initIap();
-            } else {
-                SamsungAppsBillingService.this.setupListener.onIabSetupFinished(new IabResult(6, "IAP service bind failed"));
-            }
-        }
-
-        public void onServiceDisconnected(ComponentName componentName) {
-        }
-    }
-
-    public SamsungAppsBillingService(Activity activity, Options options) {
-        this.activity = activity;
-        this.options = options;
+    public SamsungAppsBillingService(Activity activity2, Options options2) {
+        this.activity = activity2;
+        this.options = options2;
     }
 
     private void bindIapService() {
-        this.serviceConnection = new C13221();
+        this.serviceConnection = new ServiceConnection() {
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                SamsungAppsBillingService.this.mIapConnector = Stub.asInterface(iBinder);
+                if (SamsungAppsBillingService.this.mIapConnector != null) {
+                    SamsungAppsBillingService.this.initIap();
+                } else {
+                    SamsungAppsBillingService.this.setupListener.onIabSetupFinished(new IabResult(6, "IAP service bind failed"));
+                }
+            }
+
+            public void onServiceDisconnected(ComponentName componentName) {
+            }
+        };
         this.isBound = this.activity.getApplicationContext().bindService(new Intent("com.sec.android.iap.service.iapService"), this.serviceConnection, 1);
     }
 
@@ -136,48 +134,50 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
         return str.split(Constants.URL_PATH_DELIMITER)[1];
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* access modifiers changed from: private */
+    /* JADX WARNING: Code restructure failed: missing block: B:5:0x002c, code lost:
+        if (r4 == 0) goto L_0x002e;
+     */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    private void initIap() {
+    public void initIap() {
         /*
-        r8 = this;
-        r1 = 0;
-        r2 = 6;
-        r0 = "Init IAP service failed";
-        r3 = r8.mIapConnector;	 Catch:{ RemoteException -> 0x0039 }
-        r4 = CURRENT_MODE;	 Catch:{ RemoteException -> 0x0039 }
-        r3 = r3.init(r4);	 Catch:{ RemoteException -> 0x0039 }
-        if (r3 == 0) goto L_0x0041;
-    L_0x000e:
-        r4 = "STATUS_CODE";
-        r4 = r3.getInt(r4);	 Catch:{ RemoteException -> 0x0039 }
-        r5 = 2;
-        r5 = new java.lang.Object[r5];	 Catch:{ RemoteException -> 0x0039 }
-        r6 = 0;
-        r7 = "Init IAP connection status code: ";
-        r5[r6] = r7;	 Catch:{ RemoteException -> 0x0039 }
-        r6 = 1;
-        r7 = java.lang.Integer.valueOf(r4);	 Catch:{ RemoteException -> 0x0039 }
-        r5[r6] = r7;	 Catch:{ RemoteException -> 0x0039 }
-        org.onepf.oms.util.Logger.m1001d(r5);	 Catch:{ RemoteException -> 0x0039 }
-        r5 = "ERROR_STRING";
-        r0 = r3.getString(r5);	 Catch:{ RemoteException -> 0x0039 }
-        if (r4 != 0) goto L_0x0041;
-    L_0x002e:
-        r2 = r8.setupListener;
-        r3 = new org.onepf.oms.appstore.googleUtils.IabResult;
-        r3.<init>(r1, r0);
-        r2.onIabSetupFinished(r3);
-        return;
-    L_0x0039:
-        r1 = move-exception;
-        r3 = "Init IAP: ";
-        org.onepf.oms.util.Logger.m1003e(r3, r1);
-        r1 = r2;
-        goto L_0x002e;
-    L_0x0041:
-        r1 = r2;
-        goto L_0x002e;
+            r8 = this;
+            r1 = 0
+            r2 = 6
+            java.lang.String r0 = "Init IAP service failed"
+            com.sec.android.iap.IAPConnector r3 = r8.mIapConnector     // Catch:{ RemoteException -> 0x0039 }
+            int r4 = CURRENT_MODE     // Catch:{ RemoteException -> 0x0039 }
+            android.os.Bundle r3 = r3.init(r4)     // Catch:{ RemoteException -> 0x0039 }
+            if (r3 == 0) goto L_0x0041
+            java.lang.String r4 = "STATUS_CODE"
+            int r4 = r3.getInt(r4)     // Catch:{ RemoteException -> 0x0039 }
+            r5 = 2
+            java.lang.Object[] r5 = new java.lang.Object[r5]     // Catch:{ RemoteException -> 0x0039 }
+            r6 = 0
+            java.lang.String r7 = "Init IAP connection status code: "
+            r5[r6] = r7     // Catch:{ RemoteException -> 0x0039 }
+            r6 = 1
+            java.lang.Integer r7 = java.lang.Integer.valueOf(r4)     // Catch:{ RemoteException -> 0x0039 }
+            r5[r6] = r7     // Catch:{ RemoteException -> 0x0039 }
+            org.onepf.oms.util.Logger.m1026d(r5)     // Catch:{ RemoteException -> 0x0039 }
+            java.lang.String r5 = "ERROR_STRING"
+            java.lang.String r0 = r3.getString(r5)     // Catch:{ RemoteException -> 0x0039 }
+            if (r4 != 0) goto L_0x0041
+        L_0x002e:
+            org.onepf.oms.appstore.googleUtils.IabHelper$OnIabSetupFinishedListener r2 = r8.setupListener
+            org.onepf.oms.appstore.googleUtils.IabResult r3 = new org.onepf.oms.appstore.googleUtils.IabResult
+            r3.<init>(r1, r0)
+            r2.onIabSetupFinished(r3)
+            return
+        L_0x0039:
+            r1 = move-exception
+            java.lang.String r3 = "Init IAP: "
+            org.onepf.oms.util.Logger.m1028e(r3, r1)
+            r1 = r2
+            goto L_0x002e
+        L_0x0041:
+            r1 = r2
+            goto L_0x002e
         */
         throw new UnsupportedOperationException("Method not decompiled: org.onepf.oms.appstore.SamsungAppsBillingService.initIap():void");
     }
@@ -213,8 +213,8 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
                         }
                     }
                 }
-            } catch (Throwable e) {
-                Logger.m1003e("JSON parse error", e);
+            } catch (JSONException e) {
+                Logger.m1028e("JSON parse error", (Throwable) e);
             }
         }
         return stringArrayList.size() == 100;
@@ -233,47 +233,44 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
     }
 
     public boolean handleActivityResult(int i, int i2, @Nullable Intent intent) {
+        int i3 = 6;
         if (i == this.options.getSamsungCertificationRequestCode()) {
             if (i2 == -1) {
                 bindIapService();
+                return true;
             } else if (i2 == 0) {
                 this.setupListener.onIabSetupFinished(new IabResult(1, "Account certification canceled"));
+                return true;
             } else {
                 this.setupListener.onIabSetupFinished(new IabResult(6, "Unknown error. Result code: " + i2));
+                return true;
             }
-            return true;
         } else if (i != this.mRequestCode) {
             return false;
         } else {
-            String str;
-            int i3;
-            String str2;
-            int i4 = 6;
-            String str3 = "Unknown error";
+            String str = "Unknown error";
             Purchase purchase = new Purchase(OpenIabHelper.NAME_SAMSUNG);
             if (intent != null) {
                 Bundle extras = intent.getExtras();
                 if (extras != null) {
-                    int i5 = extras.getInt(KEY_NAME_STATUS_CODE);
-                    str3 = extras.getString(KEY_NAME_ERROR_STRING);
+                    int i4 = extras.getInt(KEY_NAME_STATUS_CODE);
+                    str = extras.getString(KEY_NAME_ERROR_STRING);
                     String string = extras.getString(KEY_NAME_ITEM_ID);
                     switch (i2) {
                         case -1:
-                            switch (i5) {
+                            switch (i4) {
                                 case -1005:
-                                    i4 = 4;
+                                    i3 = 4;
                                     break;
                                 case -1003:
-                                    i4 = 7;
+                                    i3 = 7;
                                     break;
                                 case 0:
-                                    i4 = 0;
-                                    break;
-                                default:
+                                    i3 = 0;
                                     break;
                             }
                         case 0:
-                            i4 = 1;
+                            i3 = 1;
                             break;
                     }
                     String string2 = extras.getString(KEY_NAME_RESULT_OBJECT);
@@ -283,39 +280,30 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
                         purchase.setOrderId(jSONObject.getString(JSON_KEY_PAYMENT_ID));
                         purchase.setPurchaseTime(Long.parseLong(jSONObject.getString(JSON_KEY_PURCHASE_DATE)));
                         purchase.setToken(jSONObject.getString(JSON_KEY_PURCHASE_ID));
-                    } catch (Throwable e) {
-                        Logger.m1003e("JSON parse error: ", e);
+                    } catch (JSONException e) {
+                        Logger.m1028e("JSON parse error: ", (Throwable) e);
                     }
                     purchase.setItemType(this.purchasingItemType);
                     purchase.setSku(SkuManager.getInstance().getSku(OpenIabHelper.NAME_SAMSUNG, this.mItemGroupId + '/' + string));
                     purchase.setPackageName(this.activity.getPackageName());
                     purchase.setPurchaseState(0);
                     purchase.setDeveloperPayload(this.mExtraData);
-                    str = str3;
-                    i3 = i4;
-                    str2 = str;
-                    Logger.m1001d("Samsung result code: ", Integer.valueOf(i3), ", msg: ", str2);
-                    this.mPurchaseListener.onIabPurchaseFinished(new IabResult(i3, str2), purchase);
-                    return true;
                 }
             }
-            str = str3;
-            i3 = 6;
-            str2 = str;
-            Logger.m1001d("Samsung result code: ", Integer.valueOf(i3), ", msg: ", str2);
-            this.mPurchaseListener.onIabPurchaseFinished(new IabResult(i3, str2), purchase);
+            Logger.m1026d("Samsung result code: ", Integer.valueOf(i3), ", msg: ", str);
+            this.mPurchaseListener.onIabPurchaseFinished(new IabResult(i3, str), purchase);
             return true;
         }
     }
 
-    public void launchPurchaseFlow(@NotNull Activity activity, @NotNull String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
+    public void launchPurchaseFlow(@NotNull Activity activity2, @NotNull String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
         String itemGroupId = getItemGroupId(str);
         String itemId = getItemId(str);
         Bundle bundle = new Bundle();
-        bundle.putString(KEY_NAME_THIRD_PARTY_NAME, activity.getPackageName());
+        bundle.putString(KEY_NAME_THIRD_PARTY_NAME, activity2.getPackageName());
         bundle.putString(KEY_NAME_ITEM_GROUP_ID, itemGroupId);
         bundle.putString(KEY_NAME_ITEM_ID, itemId);
-        Logger.m1001d("launchPurchase: itemGroupId = ", itemGroupId, ", itemId = ", itemId);
+        Logger.m1026d("launchPurchase: itemGroupId = ", itemGroupId, ", itemId = ", itemId);
         ComponentName componentName = new ComponentName(SamsungApps.IAP_PACKAGE_NAME, PAYMENT_ACTIVITY_NAME);
         Intent intent = new Intent("android.intent.action.MAIN");
         intent.addCategory("android.intent.category.LAUNCHER");
@@ -326,16 +314,18 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
         this.purchasingItemType = str2;
         this.mItemGroupId = itemGroupId;
         this.mExtraData = str3;
-        Logger.m1001d("Request code: ", Integer.valueOf(i));
-        activity.startActivityForResult(intent, i);
+        Logger.m1026d("Request code: ", Integer.valueOf(i));
+        activity2.startActivityForResult(intent, i);
     }
 
     public Inventory queryInventory(boolean z, @Nullable List<String> list, @Nullable List<String> list2) throws IabException {
+        Bundle bundle;
+        Bundle bundle2;
         Inventory inventory = new Inventory();
         String format = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
-        Set<String> hashSet = new HashSet();
-        Collection<String> allStoreSkus = SkuManager.getInstance().getAllStoreSkus(OpenIabHelper.NAME_SAMSUNG);
-        if (!CollectionUtils.isEmpty((Collection) allStoreSkus)) {
+        HashSet<String> hashSet = new HashSet<>();
+        List<String> allStoreSkus = SkuManager.getInstance().getAllStoreSkus(OpenIabHelper.NAME_SAMSUNG);
+        if (!CollectionUtils.isEmpty((Collection<?>) allStoreSkus)) {
             for (String itemGroupId : allStoreSkus) {
                 hashSet.add(getItemGroupId(itemGroupId));
             }
@@ -343,51 +333,49 @@ public class SamsungAppsBillingService implements AppstoreInAppBillingService {
         for (String str : hashSet) {
             int i = 1;
             int i2 = 100;
-            Bundle bundle;
             do {
-                bundle = null;
+                bundle2 = null;
                 try {
-                    Logger.m1001d("getItemsInbox, startNum = ", Integer.valueOf(i), ", endNum = ", Integer.valueOf(i2));
-                    bundle = this.mIapConnector.getItemsInbox(this.activity.getPackageName(), str, i, i2, "19700101", format);
-                } catch (Throwable e) {
-                    Logger.m1003e("Samsung getItemsInbox: ", e);
+                    Logger.m1026d("getItemsInbox, startNum = ", Integer.valueOf(i), ", endNum = ", Integer.valueOf(i2));
+                    bundle2 = this.mIapConnector.getItemsInbox(this.activity.getPackageName(), str, i, i2, "19700101", format);
+                } catch (RemoteException e) {
+                    Logger.m1028e("Samsung getItemsInbox: ", (Throwable) e);
                 }
                 i += 100;
                 i2 += 100;
-            } while (processItemsBundle(bundle, str, inventory, z, true, false, null));
+            } while (processItemsBundle(bundle2, str, inventory, z, true, false, null));
         }
         if (z) {
-            hashSet = new HashSet();
-            Set hashSet2 = new HashSet();
+            HashSet<String> hashSet2 = new HashSet<>();
+            HashSet hashSet3 = new HashSet();
             if (list != null) {
-                for (String itemGroupId2 : list) {
-                    hashSet.add(getItemGroupId(itemGroupId2));
-                    hashSet2.add(getItemId(itemGroupId2));
+                for (String str2 : list) {
+                    hashSet2.add(getItemGroupId(str2));
+                    hashSet3.add(getItemId(str2));
                 }
             }
             if (list2 != null) {
-                for (String itemGroupId22 : list2) {
-                    hashSet.add(getItemGroupId(itemGroupId22));
-                    hashSet2.add(getItemId(itemGroupId22));
+                for (String str3 : list2) {
+                    hashSet2.add(getItemGroupId(str3));
+                    hashSet3.add(getItemId(str3));
                 }
             }
-            if (!hashSet2.isEmpty()) {
-                for (String str2 : hashSet) {
-                    i2 = 1;
-                    int i3 = 100;
+            if (!hashSet3.isEmpty()) {
+                for (String str4 : hashSet2) {
+                    int i3 = 1;
+                    int i4 = 100;
                     while (true) {
-                        Bundle itemList;
                         try {
-                            itemList = this.mIapConnector.getItemList(CURRENT_MODE, this.activity.getPackageName(), str2, i2, i3, ITEM_TYPE_ALL);
-                        } catch (Throwable e2) {
-                            Logger.m1003e("Samsung getItemList: ", e2);
-                            itemList = null;
+                            bundle = this.mIapConnector.getItemList(CURRENT_MODE, this.activity.getPackageName(), str4, i3, i4, ITEM_TYPE_ALL);
+                        } catch (RemoteException e2) {
+                            Logger.m1028e("Samsung getItemList: ", (Throwable) e2);
+                            bundle = null;
                         }
-                        int i4 = i2 + 100;
                         int i5 = i3 + 100;
-                        if (processItemsBundle(itemList, str2, inventory, z, false, true, hashSet2)) {
-                            i2 = i4;
+                        int i6 = i4 + 100;
+                        if (processItemsBundle(bundle, str4, inventory, z, false, true, hashSet3)) {
                             i3 = i5;
+                            i4 = i6;
                         }
                     }
                 }

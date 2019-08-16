@@ -2,6 +2,7 @@ package com.fasterxml.jackson.databind.util;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.lang.reflect.Type;
 
 public abstract class StdConverter<IN, OUT> implements Converter<IN, OUT> {
     public abstract OUT convert(IN in);
@@ -14,8 +15,9 @@ public abstract class StdConverter<IN, OUT> implements Converter<IN, OUT> {
         return _findConverterType(typeFactory).containedType(1);
     }
 
-    protected JavaType _findConverterType(TypeFactory typeFactory) {
-        JavaType findSuperType = typeFactory.constructType(getClass()).findSuperType(Converter.class);
+    /* access modifiers changed from: protected */
+    public JavaType _findConverterType(TypeFactory typeFactory) {
+        JavaType findSuperType = typeFactory.constructType((Type) getClass()).findSuperType(Converter.class);
         if (findSuperType != null && findSuperType.containedTypeCount() >= 2) {
             return findSuperType;
         }

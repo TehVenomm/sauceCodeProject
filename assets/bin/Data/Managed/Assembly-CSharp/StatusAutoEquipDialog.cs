@@ -114,52 +114,50 @@ public class StatusAutoEquipDialog : GameSection
 		weaponItemInfoList = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
 		if (weaponItemInfoList == null || weaponItemInfoList.Length == 0)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.Get(STRING_CATEGORY.AUTO_EQUIP, 0u), null, null, null, null), delegate
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.Get(STRING_CATEGORY.AUTO_EQUIP, 0u)), delegate
 			{
-			}, false, 0);
+			});
 			GameSection.StopEvent();
+			return;
+		}
+		newEquipments = new StatusEquip.ChangeEquipData[7];
+		selectedWeaponIds = new List<ulong>(3);
+		for (int i = 0; i < newEquipments.Length; i++)
+		{
+			newEquipments[i] = new StatusEquip.ChangeEquipData(selectEquipSetData.setNo, i, null);
+			switch (i)
+			{
+			case 0:
+				SelectWeapon0();
+				break;
+			case 1:
+				SelectWeapon1();
+				break;
+			case 2:
+				SelectWeapon2();
+				break;
+			case 4:
+				SelectHelm();
+				break;
+			case 3:
+				SelectArmor();
+				break;
+			case 5:
+				SelectArm();
+				break;
+			case 6:
+				SelectLeg();
+				break;
+			}
+		}
+		GameSection.SetEventData(newEquipments);
+		if (isMismatchElem)
+		{
+			GameSection.ChangeEvent("ELMENT_WARNING");
 		}
 		else
 		{
-			newEquipments = new StatusEquip.ChangeEquipData[7];
-			selectedWeaponIds = new List<ulong>(3);
-			for (int i = 0; i < newEquipments.Length; i++)
-			{
-				newEquipments[i] = new StatusEquip.ChangeEquipData(selectEquipSetData.setNo, i, null);
-				switch (i)
-				{
-				case 0:
-					SelectWeapon0();
-					break;
-				case 1:
-					SelectWeapon1();
-					break;
-				case 2:
-					SelectWeapon2();
-					break;
-				case 4:
-					SelectHelm();
-					break;
-				case 3:
-					SelectArmor();
-					break;
-				case 5:
-					SelectArm();
-					break;
-				case 6:
-					SelectLeg();
-					break;
-				}
-			}
-			GameSection.SetEventData(newEquipments);
-			if (isMismatchElem)
-			{
-				GameSection.ChangeEvent("ELMENT_WARNING", null);
-			}
-			else
-			{
-				GameSection.ChangeEvent("COMPLETE", null);
-			}
+			GameSection.ChangeEvent("COMPLETE");
 		}
 	}
 
@@ -170,13 +168,12 @@ public class StatusAutoEquipDialog : GameSection
 
 	private void OnQuery_QuestAcceptArenaRoomAutoEquipWarningElementDialog_OK()
 	{
-		Debug.Log((object)"OnQuery_QuestAcceptArenaRoomAutoEquipWarningElementDialog_OK");
 		GameSection.SetEventData(newEquipments);
 	}
 
 	private void SelectWeapon0()
 	{
-		newEquipments[0].item = GetWeaponMaxAtk(true, ELEMENT_CONDITION.EQUAL);
+		newEquipments[0].item = GetWeaponMaxAtk(validElement: true);
 		if (elementIndex != 0 && ChangeElementToMasterDefineElement(elementIndex, ELEMENT_CONDITION.EQUAL) != (ELEMENT_TYPE)newEquipments[0].item.GetElemAtkType())
 		{
 			isMismatchElem = true;
@@ -185,40 +182,40 @@ public class StatusAutoEquipDialog : GameSection
 
 	private void SelectWeapon1()
 	{
-		newEquipments[1].item = GetWeaponMaxAtk(true, ELEMENT_CONDITION.EQUAL);
+		newEquipments[1].item = GetWeaponMaxAtk(validElement: true);
 	}
 
 	private void SelectWeapon2()
 	{
-		newEquipments[2].item = GetWeaponMaxAtk(true, ELEMENT_CONDITION.EQUAL);
+		newEquipments[2].item = GetWeaponMaxAtk(validElement: true);
 	}
 
 	private void SelectHelm()
 	{
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = InventoryManager.INVENTORY_TYPE.HELM;
 		EquipItemInfo[] equipInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
-		newEquipments[4].item = GetEquipMaxDef(equipInventoryClone, true, true, true);
+		newEquipments[4].item = GetEquipMaxDef(equipInventoryClone, validElement: true, validAbilityWeaponType: true, checkOnlyFixAbility: true);
 	}
 
 	private void SelectArmor()
 	{
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = InventoryManager.INVENTORY_TYPE.ARMOR;
 		EquipItemInfo[] equipInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
-		newEquipments[3].item = GetEquipMaxDef(equipInventoryClone, true, true, true);
+		newEquipments[3].item = GetEquipMaxDef(equipInventoryClone, validElement: true, validAbilityWeaponType: true, checkOnlyFixAbility: true);
 	}
 
 	private void SelectArm()
 	{
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = InventoryManager.INVENTORY_TYPE.ARM;
 		EquipItemInfo[] equipInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
-		newEquipments[5].item = GetEquipMaxDef(equipInventoryClone, true, true, true);
+		newEquipments[5].item = GetEquipMaxDef(equipInventoryClone, validElement: true, validAbilityWeaponType: true, checkOnlyFixAbility: true);
 	}
 
 	private void SelectLeg()
 	{
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = InventoryManager.INVENTORY_TYPE.LEG;
 		EquipItemInfo[] equipInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
-		newEquipments[6].item = GetEquipMaxDef(equipInventoryClone, true, true, true);
+		newEquipments[6].item = GetEquipMaxDef(equipInventoryClone, validElement: true, validAbilityWeaponType: true, checkOnlyFixAbility: true);
 	}
 
 	private EquipItemInfo GetWeaponMaxAtk(bool validElement, ELEMENT_CONDITION condition = ELEMENT_CONDITION.EQUAL)
@@ -287,11 +284,11 @@ public class StatusAutoEquipDialog : GameSection
 		}
 		if (equipItemInfo == null && validElement && condition == ELEMENT_CONDITION.EQUAL)
 		{
-			equipItemInfo = GetWeaponMaxAtk(true, ELEMENT_CONDITION.DISADVANTAGEOUS);
+			equipItemInfo = GetWeaponMaxAtk(validElement: true, ELEMENT_CONDITION.DISADVANTAGEOUS);
 		}
 		else if (equipItemInfo == null && validElement && condition == ELEMENT_CONDITION.DISADVANTAGEOUS)
 		{
-			equipItemInfo = GetWeaponMaxAtk(false, ELEMENT_CONDITION.EQUAL);
+			equipItemInfo = GetWeaponMaxAtk(validElement: false);
 		}
 		return equipItemInfo;
 	}
@@ -303,73 +300,74 @@ public class StatusAutoEquipDialog : GameSection
 		int num2 = -1;
 		for (int i = 0; i < items.Length; i++)
 		{
-			if (!validAbilityWeaponType || weaponIndex == 0 || HasFixAbilityWithWeaponType(items[i], weaponIndex, checkOnlyFixAbility))
+			if (validAbilityWeaponType && weaponIndex != 0 && !HasFixAbilityWithWeaponType(items[i], weaponIndex, checkOnlyFixAbility))
 			{
-				if (validElement && elementIndex != 0)
+				continue;
+			}
+			if (validElement && elementIndex != 0)
+			{
+				ELEMENT_TYPE eLEMENT_TYPE = ChangeElementToMasterDefineElement(elementIndex, ELEMENT_CONDITION.EFFECTIVE_DEF);
+				if (eLEMENT_TYPE != (ELEMENT_TYPE)items[i].GetElemDefType())
 				{
-					ELEMENT_TYPE eLEMENT_TYPE = ChangeElementToMasterDefineElement(elementIndex, ELEMENT_CONDITION.EFFECTIVE_DEF);
-					if (eLEMENT_TYPE != (ELEMENT_TYPE)items[i].GetElemDefType())
+					continue;
+				}
+			}
+			int num3 = 0;
+			int num4 = 0;
+			if (isCurrent)
+			{
+				num3 = items[i].def + items[i].elemDef;
+				num4 = items[i].hp;
+			}
+			else
+			{
+				EquipItemTable.EquipItemData tableData = items[i].tableData;
+				GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(tableData.growID, (uint)tableData.maxLv);
+				if (growEquipItemData != null)
+				{
+					EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = tableData.GetExceedParam(4u);
+					if (equipItemExceedParamAll == null)
 					{
-						continue;
+						equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
 					}
-				}
-				int num3 = 0;
-				int num4 = 0;
-				if (isCurrent)
-				{
-					num3 = items[i].def + items[i].elemDef;
-					num4 = items[i].hp;
-				}
-				else
-				{
-					EquipItemTable.EquipItemData tableData = items[i].tableData;
-					GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(tableData.growID, (uint)tableData.maxLv);
-					if (growEquipItemData != null)
+					int num5 = growEquipItemData.GetGrowParamDef(tableData.baseDef) + (int)equipItemExceedParamAll.def;
+					int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(tableData.defElement);
+					int j = 0;
+					for (int num6 = growParamElemDef.Length; j < num6; j++)
 					{
-						EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = tableData.GetExceedParam(4u);
-						if (equipItemExceedParamAll == null)
-						{
-							equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
-						}
-						int num5 = growEquipItemData.GetGrowParamDef(tableData.baseDef) + (int)equipItemExceedParamAll.def;
-						int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(tableData.defElement);
-						int j = 0;
-						for (int num6 = growParamElemDef.Length; j < num6; j++)
-						{
-							growParamElemDef[j] += equipItemExceedParamAll.defElement[j];
-						}
-						int num7 = Mathf.Max(growParamElemDef);
-						num3 = num5 + num7;
-						num4 = growEquipItemData.GetGrowParamHp(tableData.baseHp) + (int)equipItemExceedParamAll.hp;
+						growParamElemDef[j] += equipItemExceedParamAll.defElement[j];
 					}
+					int num7 = Mathf.Max(growParamElemDef);
+					num3 = num5 + num7;
+					num4 = growEquipItemData.GetGrowParamHp(tableData.baseHp) + (int)equipItemExceedParamAll.hp;
 				}
-				if (num3 > num || (num3 == num && num4 > num2))
-				{
-					equipItemInfo = items[i];
-					num = num3;
-					num2 = num4;
-				}
+			}
+			if (num3 > num || (num3 == num && num4 > num2))
+			{
+				equipItemInfo = items[i];
+				num = num3;
+				num2 = num4;
 			}
 		}
 		if (equipItemInfo == null && validElement && validAbilityWeaponType && checkOnlyFixAbility)
 		{
-			equipItemInfo = GetEquipMaxDef(items, true, true, false);
+			equipItemInfo = GetEquipMaxDef(items, validElement: true, validAbilityWeaponType: true, checkOnlyFixAbility: false);
 		}
 		else if (equipItemInfo == null && validElement && validAbilityWeaponType && !checkOnlyFixAbility)
 		{
-			equipItemInfo = GetEquipMaxDef(items, false, true, true);
+			equipItemInfo = GetEquipMaxDef(items, validElement: false, validAbilityWeaponType: true, checkOnlyFixAbility: true);
 		}
 		else if (equipItemInfo == null && !validElement && validAbilityWeaponType && checkOnlyFixAbility)
 		{
-			equipItemInfo = GetEquipMaxDef(items, false, true, false);
+			equipItemInfo = GetEquipMaxDef(items, validElement: false, validAbilityWeaponType: true, checkOnlyFixAbility: false);
 		}
 		else if (equipItemInfo == null && !validElement && validAbilityWeaponType && !checkOnlyFixAbility)
 		{
-			equipItemInfo = GetEquipMaxDef(items, true, false, false);
+			equipItemInfo = GetEquipMaxDef(items, validElement: true, validAbilityWeaponType: false, checkOnlyFixAbility: false);
 		}
 		else if (equipItemInfo == null)
 		{
-			equipItemInfo = GetEquipMaxDef(items, false, false, false);
+			equipItemInfo = GetEquipMaxDef(items, validElement: false, validAbilityWeaponType: false, checkOnlyFixAbility: false);
 		}
 		return equipItemInfo;
 	}
@@ -515,68 +513,64 @@ public class StatusAutoEquipDialog : GameSection
 		}
 		for (int i = 0; i < item.ability.Length; i++)
 		{
-			if (!checkOnlyFixAbility || item.IsFixedAbility(i))
+			if (checkOnlyFixAbility && !item.IsFixedAbility(i))
 			{
-				AbilityDataTable.AbilityData abilityData = Singleton<AbilityDataTable>.I.GetAbilityData(item.ability[i].id, item.ability[i].ap);
-				if (abilityData != null)
+				continue;
+			}
+			AbilityDataTable.AbilityData abilityData = Singleton<AbilityDataTable>.I.GetAbilityData(item.ability[i].id, item.ability[i].ap);
+			if (abilityData == null)
+			{
+				continue;
+			}
+			ENABLE_EQUIP_TYPE enableEquipType = abilityData.enableEquipType;
+			if (enableEquipType != 0)
+			{
+				if (enableEquipType == ENABLE_EQUIP_TYPE.ONE_HAND_SWORD && wepIndex == 1)
 				{
-					ENABLE_EQUIP_TYPE enableEquipType = abilityData.enableEquipType;
-					switch (enableEquipType)
+					return true;
+				}
+				if (enableEquipType == ENABLE_EQUIP_TYPE.TWO_HAND_SWORD && wepIndex == 2)
+				{
+					return true;
+				}
+				if (enableEquipType == ENABLE_EQUIP_TYPE.SPEAR && wepIndex == 3)
+				{
+					return true;
+				}
+				if (enableEquipType == ENABLE_EQUIP_TYPE.PAIR_SWORDS && wepIndex == 4)
+				{
+					return true;
+				}
+				if (enableEquipType == ENABLE_EQUIP_TYPE.ARROW && wepIndex == 5)
+				{
+					return true;
+				}
+			}
+			AbilityDataTable.AbilityData.AbilityInfo[] info = abilityData.info;
+			for (int j = 0; j < info.Length; j++)
+			{
+				if (!string.IsNullOrEmpty(info[j].target))
+				{
+					string target = info[j].target;
+					if (target == "ONE_HAND_SWORD" && wepIndex == 1)
 					{
-					case ENABLE_EQUIP_TYPE.ONE_HAND_SWORD:
-						if (wepIndex == 1)
-						{
-							return true;
-						}
-						goto default;
-					default:
-						if (enableEquipType == ENABLE_EQUIP_TYPE.TWO_HAND_SWORD && wepIndex == 2)
-						{
-							return true;
-						}
-						if (enableEquipType == ENABLE_EQUIP_TYPE.SPEAR && wepIndex == 3)
-						{
-							return true;
-						}
-						if (enableEquipType == ENABLE_EQUIP_TYPE.PAIR_SWORDS && wepIndex == 4)
-						{
-							return true;
-						}
-						if (enableEquipType == ENABLE_EQUIP_TYPE.ARROW && wepIndex == 5)
-						{
-							return true;
-						}
-						break;
-					case ENABLE_EQUIP_TYPE.ALL:
-						break;
+						return true;
 					}
-					AbilityDataTable.AbilityData.AbilityInfo[] info = abilityData.info;
-					for (int j = 0; j < info.Length; j++)
+					if (target == "TWO_HAND_SWORD" && wepIndex == 2)
 					{
-						if (!string.IsNullOrEmpty(info[j].target))
-						{
-							string target = info[j].target;
-							if (target == "ONE_HAND_SWORD" && wepIndex == 1)
-							{
-								return true;
-							}
-							if (target == "TWO_HAND_SWORD" && wepIndex == 2)
-							{
-								return true;
-							}
-							if (target == "SPEAR" && wepIndex == 3)
-							{
-								return true;
-							}
-							if (target == "PAIR_SWORDS" && wepIndex == 4)
-							{
-								return true;
-							}
-							if (target == "ARROW" && wepIndex == 5)
-							{
-								return true;
-							}
-						}
+						return true;
+					}
+					if (target == "SPEAR" && wepIndex == 3)
+					{
+						return true;
+					}
+					if (target == "PAIR_SWORDS" && wepIndex == 4)
+					{
+						return true;
+					}
+					if (target == "ARROW" && wepIndex == 5)
+					{
+						return true;
 					}
 				}
 			}

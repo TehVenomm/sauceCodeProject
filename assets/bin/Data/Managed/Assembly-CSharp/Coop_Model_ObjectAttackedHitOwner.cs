@@ -20,6 +20,8 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 
 	public int regionID = -1;
 
+	public bool isDamageRegionOnly;
+
 	public int weakState;
 
 	public int damage;
@@ -29,6 +31,10 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 	public float downAddBase;
 
 	public float downAddWeak;
+
+	public bool isForceDown;
+
+	public float concussionAdd;
 
 	public bool isArrowBleed;
 
@@ -43,6 +49,8 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 	public AtkAttribute damageDetails = new AtkAttribute();
 
 	public bool isShadowSealing;
+
+	public bool isArrowBomb;
 
 	public Coop_Model_ObjectAttackedHitOwner()
 	{
@@ -71,11 +79,14 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 			skillIndex = status.skillParam.skillIndex;
 		}
 		regionID = status.regionID;
+		isDamageRegionOnly = status.isDamageRegionOnly;
 		weakState = (int)status.weakState;
 		damage = status.damage;
 		validDamage = status.validDamage;
 		downAddBase = status.downAddBase;
 		downAddWeak = status.downAddWeak;
+		isForceDown = status.isForceDown;
+		concussionAdd = status.concussionAdd;
 		isArrowBleed = status.isArrowBleed;
 		arrowBleedDamage = status.arrowBleedDamage;
 		arrowBurstDamage = status.arrowBurstDamage;
@@ -83,6 +94,7 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 		isSpAttackHit = status.IsSpAttackHit;
 		damageDetails = status.damageDetails;
 		isShadowSealing = status.isShadowSealing;
+		isArrowBomb = status.isArrowBomb;
 	}
 
 	public void CopyAttackedHitStatus(out AttackedHitStatusOwner status)
@@ -96,7 +108,7 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 		attackedHitStatus.fromObject = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(fromObjectID);
 		if (attackedHitStatus.fromObject != null)
 		{
-			attackedHitStatus.attackInfo = (attackedHitStatus.fromObject.FindAttackInfoExternal(attackInfoName, true, attackInfoRate) as AttackHitInfo);
+			attackedHitStatus.attackInfo = (attackedHitStatus.fromObject.FindAttackInfoExternal(attackInfoName, fix_rate: true, attackInfoRate) as AttackHitInfo);
 		}
 		if (attackedHitStatus.attackInfo == null)
 		{
@@ -111,11 +123,14 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 			attackedHitStatus.skillParam = attackedHitStatus.fromObject.GetSkillParam(skillIndex);
 		}
 		attackedHitStatus.regionID = regionID;
+		attackedHitStatus.isDamageRegionOnly = isDamageRegionOnly;
 		attackedHitStatus.weakState = (Enemy.WEAK_STATE)weakState;
 		attackedHitStatus.damage = damage;
 		attackedHitStatus.validDamage = validDamage;
 		attackedHitStatus.downAddBase = downAddBase;
 		attackedHitStatus.downAddWeak = downAddWeak;
+		attackedHitStatus.isForceDown = isForceDown;
+		attackedHitStatus.concussionAdd = concussionAdd;
 		attackedHitStatus.isArrowBleed = isArrowBleed;
 		attackedHitStatus.arrowBleedDamage = arrowBleedDamage;
 		attackedHitStatus.arrowBurstDamage = arrowBurstDamage;
@@ -123,6 +138,7 @@ public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 		attackedHitStatus.isSpAttackHit = isSpAttackHit;
 		attackedHitStatus.damageDetails = damageDetails;
 		attackedHitStatus.isShadowSealing = isShadowSealing;
+		attackedHitStatus.isArrowBomb = isArrowBomb;
 		status = new AttackedHitStatusOwner(attackedHitStatus);
 	}
 }

@@ -52,11 +52,13 @@ public class MapEntryDeserializer extends ContainerDeserializerBase<Entry<Object
         this._valueTypeDeserializer = typeDeserializer;
     }
 
-    protected MapEntryDeserializer withResolved(KeyDeserializer keyDeserializer, TypeDeserializer typeDeserializer, JsonDeserializer<?> jsonDeserializer) {
-        return (this._keyDeserializer == keyDeserializer && this._valueDeserializer == jsonDeserializer && this._valueTypeDeserializer == typeDeserializer) ? this : new MapEntryDeserializer(this, keyDeserializer, (JsonDeserializer) jsonDeserializer, typeDeserializer);
+    /* access modifiers changed from: protected */
+    public MapEntryDeserializer withResolved(KeyDeserializer keyDeserializer, TypeDeserializer typeDeserializer, JsonDeserializer<?> jsonDeserializer) {
+        return (this._keyDeserializer == keyDeserializer && this._valueDeserializer == jsonDeserializer && this._valueTypeDeserializer == typeDeserializer) ? this : new MapEntryDeserializer(this, keyDeserializer, jsonDeserializer, typeDeserializer);
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
+        JsonDeserializer handleSecondaryContextualization;
         KeyDeserializer keyDeserializer = this._keyDeserializer;
         if (keyDeserializer == null) {
             keyDeserializer = deserializationContext.findKeyDeserializer(this._type.containedType(0), beanProperty);
@@ -66,15 +68,15 @@ public class MapEntryDeserializer extends ContainerDeserializerBase<Entry<Object
         JsonDeserializer findConvertingContentDeserializer = findConvertingContentDeserializer(deserializationContext, beanProperty, this._valueDeserializer);
         JavaType containedType = this._type.containedType(1);
         if (findConvertingContentDeserializer == null) {
-            findConvertingContentDeserializer = deserializationContext.findContextualValueDeserializer(containedType, beanProperty);
+            handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(containedType, beanProperty);
         } else {
-            findConvertingContentDeserializer = deserializationContext.handleSecondaryContextualization(findConvertingContentDeserializer, beanProperty, containedType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(findConvertingContentDeserializer, beanProperty, containedType);
         }
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         if (typeDeserializer != null) {
             typeDeserializer = typeDeserializer.forProperty(beanProperty);
         }
-        return withResolved(keyDeserializer, typeDeserializer, findConvertingContentDeserializer);
+        return withResolved(keyDeserializer, typeDeserializer, handleSecondaryContextualization);
     }
 
     public JavaType getContentType() {
@@ -95,7 +97,7 @@ public class MapEntryDeserializer extends ContainerDeserializerBase<Entry<Object
         }
         if (currentToken == JsonToken.FIELD_NAME) {
             KeyDeserializer keyDeserializer = this._keyDeserializer;
-            JsonDeserializer jsonDeserializer = this._valueDeserializer;
+            JsonDeserializer<Object> jsonDeserializer = this._valueDeserializer;
             TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
             String currentName = jsonParser.getCurrentName();
             Object deserializeKey = keyDeserializer.deserializeKey(currentName, deserializationContext);
@@ -108,7 +110,7 @@ public class MapEntryDeserializer extends ContainerDeserializerBase<Entry<Object
                 } else {
                     obj = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 wrapAndThrow(e, Entry.class, currentName);
             }
             JsonToken nextToken = jsonParser.nextToken();

@@ -18,68 +18,76 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends As
     private boolean isTitleProgressIndeterminateEnabled = true;
 
     public BetterAsyncTask(Context context) {
-        if (context.getApplicationContext() instanceof DroidFuApplication) {
-            this.appContext = (DroidFuApplication) context.getApplicationContext();
-            this.callerId = context.getClass().getCanonicalName();
-            this.contextIsDroidFuActivity = context instanceof BetterActivity;
-            this.appContext.setActiveContext(this.callerId, context);
-            if (this.contextIsDroidFuActivity) {
-                int windowFeatures = ((BetterActivity) context).getWindowFeatures();
-                if (2 == (windowFeatures & 2)) {
-                    this.isTitleProgressEnabled = true;
-                    return;
-                } else if (5 == (windowFeatures & 5)) {
-                    this.isTitleProgressIndeterminateEnabled = true;
-                    return;
-                } else {
-                    return;
-                }
-            }
-            return;
+        if (!(context.getApplicationContext() instanceof DroidFuApplication)) {
+            throw new IllegalArgumentException("context bound to this task must be a DroidFu context (DroidFuApplication)");
         }
-        throw new IllegalArgumentException("context bound to this task must be a DroidFu context (DroidFuApplication)");
+        this.appContext = (DroidFuApplication) context.getApplicationContext();
+        this.callerId = context.getClass().getCanonicalName();
+        this.contextIsDroidFuActivity = context instanceof BetterActivity;
+        this.appContext.setActiveContext(this.callerId, context);
+        if (this.contextIsDroidFuActivity) {
+            int windowFeatures = ((BetterActivity) context).getWindowFeatures();
+            if (2 == (windowFeatures & 2)) {
+                this.isTitleProgressEnabled = true;
+            } else if (5 == (windowFeatures & 5)) {
+                this.isTitleProgressIndeterminateEnabled = true;
+            }
+        }
     }
 
-    protected abstract void after(Context context, ReturnT returnT);
+    /* access modifiers changed from: protected */
+    public abstract void after(Context context, ReturnT returnt);
 
-    protected void before(Context context) {
+    /* access modifiers changed from: protected */
+    public void before(Context context) {
     }
 
     public void disableDialog() {
         this.dialogId = -1;
     }
 
-    protected ReturnT doCheckedInBackground(Context context, ParameterT... parameterTArr) throws Exception {
-        return this.callable != null ? this.callable.call(this) : null;
+    /* access modifiers changed from: protected */
+    public ReturnT doCheckedInBackground(Context context, ParameterT... parametertArr) throws Exception {
+        if (this.callable != null) {
+            return this.callable.call(this);
+        }
+        return null;
     }
 
-    protected final ReturnT doInBackground(ParameterT... parameterTArr) {
-        ReturnT returnT = null;
+    /* access modifiers changed from: protected */
+    public final ReturnT doInBackground(ParameterT... parametertArr) {
+        boolean z = false;
         try {
-            returnT = doCheckedInBackground(getCallingContext(), parameterTArr);
+            return doCheckedInBackground(getCallingContext(), parametertArr);
         } catch (Exception e) {
             this.error = e;
+            return z;
         }
-        return returnT;
     }
 
     public boolean failed() {
         return this.error != null;
     }
 
-    protected Context getCallingContext() {
+    /* access modifiers changed from: protected */
+    public Context getCallingContext() {
         try {
             Context activeContext = this.appContext.getActiveContext(this.callerId);
-            return (activeContext == null || !this.callerId.equals(activeContext.getClass().getCanonicalName()) || ((activeContext instanceof Activity) && ((Activity) activeContext).isFinishing())) ? null : activeContext;
+            if (activeContext == null || !this.callerId.equals(activeContext.getClass().getCanonicalName()) || ((activeContext instanceof Activity) && ((Activity) activeContext).isFinishing())) {
+                return null;
+            }
+            return activeContext;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    protected abstract void handleError(Context context, Exception exception);
+    /* access modifiers changed from: protected */
+    public abstract void handleError(Context context, Exception exc);
 
-    protected final void onPostExecute(ReturnT returnT) {
+    /* access modifiers changed from: protected */
+    public final void onPostExecute(ReturnT returnt) {
         Context callingContext = getCallingContext();
         if (callingContext == null) {
             Log.d(BetterAsyncTask.class.getSimpleName(), "skipping post-exec handler for task " + hashCode() + " (context is null)");
@@ -99,11 +107,12 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends As
         if (failed()) {
             handleError(callingContext, this.error);
         } else {
-            after(callingContext, returnT);
+            after(callingContext, returnt);
         }
     }
 
-    protected final void onPreExecute() {
+    /* access modifiers changed from: protected */
+    public final void onPreExecute() {
         Context callingContext = getCallingContext();
         if (callingContext == null) {
             Log.d(BetterAsyncTask.class.getSimpleName(), "skipping pre-exec handler for task " + hashCode() + " (context is null)");

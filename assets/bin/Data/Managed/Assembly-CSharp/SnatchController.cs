@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SnatchController
@@ -85,81 +86,85 @@ public class SnatchController
 		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		if (isCtrlActive)
+		if (!isCtrlActive)
 		{
-			animStateTimer += Time.get_deltaTime();
-			if (snatchTrans != null)
+			return;
+		}
+		animStateTimer += Time.get_deltaTime();
+		if (snatchTrans != null)
+		{
+			snatchTrans.set_rotation(owner._rotation);
+		}
+		if (handTrans != null)
+		{
+			renderer.SetPositonStart(handTrans.get_position());
+		}
+		if (snatchTrans != null)
+		{
+			renderer.SetPositionEnd(snatchTrans.get_position());
+		}
+		else if (snatchBulletTrans != null)
+		{
+			renderer.SetPositionEnd(snatchBulletTrans.get_position());
+		}
+		switch (state)
+		{
+		case STATE.NONE:
+		{
+			if (!(owner != null) || !(owner.animator != null))
 			{
-				snatchTrans.set_rotation(owner._rotation);
-			}
-			if (handTrans != null)
-			{
-				renderer.SetPositonStart(handTrans.get_position());
-			}
-			if (snatchTrans != null)
-			{
-				renderer.SetPositionEnd(snatchTrans.get_position());
-			}
-			else if (snatchBulletTrans != null)
-			{
-				renderer.SetPositionEnd(snatchBulletTrans.get_position());
-			}
-			switch (state)
-			{
-			case STATE.NONE:
-				if (owner != null && owner.animator != null)
-				{
-					AnimatorStateInfo currentAnimatorStateInfo = owner.animator.GetCurrentAnimatorStateInfo(0);
-					int shortNameHash = currentAnimatorStateInfo.get_shortNameHash();
-					if (shortNameHash == HASH_ANIMATOR_MOVE_LOOP)
-					{
-						animStateTimerForMoveLoop += Time.get_deltaTime();
-						if (animStateTimerForMoveLoop > animStateTimeLimitForMoveLoop)
-						{
-							owner.SetNextTrigger(0);
-							animStateTimerForMoveLoop = 0f;
-						}
-					}
-				}
 				break;
-			case STATE.SHOT:
-			case STATE.SHOT_RELEASE:
-				if (IsReached())
+			}
+			AnimatorStateInfo currentAnimatorStateInfo = owner.animator.GetCurrentAnimatorStateInfo(0);
+			int shortNameHash = currentAnimatorStateInfo.get_shortNameHash();
+			if (shortNameHash == HASH_ANIMATOR_MOVE_LOOP)
+			{
+				animStateTimerForMoveLoop += Time.get_deltaTime();
+				if (animStateTimerForMoveLoop > animStateTimeLimitForMoveLoop)
 				{
-					owner.OnSnatchMoveEnd(1);
-				}
-				else if (IsAnimStateTimeLimit())
-				{
-					owner.OnSnatchMoveEnd(1);
-				}
-				break;
-			case STATE.SNATCH:
-				if (target != null && target.isDead)
-				{
-					owner.SetNextTrigger(1);
-					Cancel();
-				}
-				break;
-			case STATE.MOVE:
-				owner.CheckSnatchMove();
-				break;
-			case STATE.MOVE_LOOP:
-				if (owner.IsArrivalPosition(GetSnatchPos(), 0f))
-				{
-					owner.OnSnatchMoveEnd(0);
+					owner.SetNextTrigger();
 					animStateTimerForMoveLoop = 0f;
 				}
-				else if (owner.IsCoopNone() || owner.IsOriginal())
-				{
-					animStateTimerForMoveLoop += Time.get_deltaTime();
-					if (animStateTimerForMoveLoop > animStateTimeLimitForMoveLoop)
-					{
-						owner.OnSnatchMoveEnd(0);
-						animStateTimerForMoveLoop = 0f;
-					}
-				}
-				break;
 			}
+			break;
+		}
+		case STATE.SHOT:
+		case STATE.SHOT_RELEASE:
+			if (IsReached())
+			{
+				owner.OnSnatchMoveEnd(1);
+			}
+			else if (IsAnimStateTimeLimit())
+			{
+				owner.OnSnatchMoveEnd(1);
+			}
+			break;
+		case STATE.SNATCH:
+			if (target != null && target.isDead)
+			{
+				owner.SetNextTrigger(1);
+				Cancel();
+			}
+			break;
+		case STATE.MOVE:
+			owner.CheckSnatchMove();
+			break;
+		case STATE.MOVE_LOOP:
+			if (owner.IsArrivalPosition(GetSnatchPos()))
+			{
+				owner.OnSnatchMoveEnd();
+				animStateTimerForMoveLoop = 0f;
+			}
+			else if (owner.IsCoopNone() || owner.IsOriginal())
+			{
+				animStateTimerForMoveLoop += Time.get_deltaTime();
+				if (animStateTimerForMoveLoop > animStateTimeLimitForMoveLoop)
+				{
+					owner.OnSnatchMoveEnd();
+					animStateTimerForMoveLoop = 0f;
+				}
+			}
+			break;
 		}
 	}
 
@@ -196,59 +201,60 @@ public class SnatchController
 		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
 		target = (MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(enemyId) as Enemy);
 		if (FieldManager.IsValidInGameNoBoss() && !owner.IsCoopNone() && !owner.IsOriginal())
 		{
 			target = null;
 		}
-		if (!isHit)
+		if (isHit)
 		{
-			isHit = true;
-			if (MonoBehaviourSingleton<SoundManager>.IsValid())
-			{
-				SoundManager.PlayOneShotSE(ohsInfo.Soul_SnatchHitSeId, hitPoint);
-			}
-			string effect_name = (!owner.isBoostMode) ? ohsInfo.Soul_SnatchHitEffect : ohsInfo.Soul_SnatchHitEffectOnBoostMode;
-			EffectManager.OneShot(effect_name, hitPoint, Quaternion.get_identity(), false);
-			snatchTrans = EffectManager.GetEffect(ohsInfo.Soul_SnatchHitRemainEffect, null);
-			renderer.SetPositionEnd(snatchTrans.get_position());
-			Vector3 val = Vector3.get_zero();
-			Vector3 val2 = owner._position - hitPoint;
-			float magnitude = val2.get_magnitude();
-			if (magnitude > ohsInfo.Soul_MoveStopRange)
-			{
-				Vector3 val3 = owner._position - hitPoint;
-				val = val3.get_normalized() * ohsInfo.Soul_MoveStopRange;
-			}
-			snatchTrans.set_position(hitPoint + val);
-			snatchTrans.set_rotation(owner._rotation);
+			return;
+		}
+		isHit = true;
+		if (MonoBehaviourSingleton<SoundManager>.IsValid())
+		{
+			SoundManager.PlayOneShotSE(ohsInfo.Soul_SnatchHitSeId, hitPoint);
+		}
+		string effect_name = (!owner.isBoostMode) ? ohsInfo.Soul_SnatchHitEffect : ohsInfo.Soul_SnatchHitEffectOnBoostMode;
+		EffectManager.OneShot(effect_name, hitPoint, Quaternion.get_identity());
+		snatchTrans = EffectManager.GetEffect(ohsInfo.Soul_SnatchHitRemainEffect);
+		renderer.SetPositionEnd(snatchTrans.get_position());
+		Vector3 val = Vector3.get_zero();
+		Vector3 val2 = owner._position - hitPoint;
+		float magnitude = val2.get_magnitude();
+		if (magnitude > ohsInfo.Soul_MoveStopRange)
+		{
+			Vector3 val3 = owner._position - hitPoint;
+			val = val3.get_normalized() * ohsInfo.Soul_MoveStopRange;
+		}
+		snatchTrans.set_position(hitPoint + val);
+		snatchTrans.set_rotation(owner._rotation);
+		if (target != null)
+		{
+			snatchTrans.set_parent(target._transform);
+			target.stackBuffCtrl.IncrementStackCount(StackBuffController.STACK_TYPE.SNATCH);
+		}
+		switch (state)
+		{
+		case STATE.SHOT_RELEASE:
 			if (target != null)
 			{
-				snatchTrans.set_parent(target._transform);
-				target.stackBuffCtrl.IncrementStackCount(StackBuffController.STACK_TYPE.SNATCH);
+				target.stackBuffCtrl.DecrementStackCount(StackBuffController.STACK_TYPE.SNATCH);
 			}
-			switch (state)
-			{
-			case STATE.SHOT_RELEASE:
-				if (target != null)
-				{
-					target.stackBuffCtrl.DecrementStackCount(StackBuffController.STACK_TYPE.SNATCH);
-				}
-				isShotReleased = true;
-				SetState(STATE.MOVE);
-				break;
-			default:
-				owner.SetNextTrigger(0);
-				SetState(STATE.SNATCH);
-				break;
-			case STATE.MOVE:
-				break;
-			}
-			if (owner.playerSender != null)
-			{
-				owner.playerSender.OnSnatch(enemyId, hitPoint);
-			}
+			isShotReleased = true;
+			SetState(STATE.MOVE);
+			break;
+		default:
+			owner.SetNextTrigger();
+			SetState(STATE.SNATCH);
+			break;
+		case STATE.MOVE:
+			break;
+		}
+		if (owner.playerSender != null)
+		{
+			owner.playerSender.OnSnatch(enemyId, hitPoint);
 		}
 	}
 
@@ -256,8 +262,6 @@ public class SnatchController
 	{
 		switch (state)
 		{
-		case STATE.SHOT_RELEASE:
-			break;
 		case STATE.SHOT:
 			SetState(STATE.SHOT_RELEASE);
 			break;
@@ -269,11 +273,9 @@ public class SnatchController
 
 	public void OnArrive()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		if (snatchTrans != null)
 		{
-			EffectManager.ReleaseEffect(snatchTrans.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(snatchTrans.get_gameObject());
 			snatchTrans = null;
 		}
 		if (target != null)
@@ -339,9 +341,31 @@ public class SnatchController
 		return position;
 	}
 
+	public bool GetSnatchPos(out Vector3 pos)
+	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		pos = Vector3.get_zero();
+		bool result = false;
+		if (isCtrlActive && snatchTrans != null)
+		{
+			pos = snatchTrans.get_position();
+			pos.y = 0f;
+			result = true;
+		}
+		return result;
+	}
+
 	public int GetAttackId(SelfController.FLICK_DIRECTION direction)
 	{
 		return attackIds[(int)direction];
+	}
+
+	public bool IsFlickedAttack(int attackID)
+	{
+		return Array.IndexOf(attackIds, attackID) > 0;
 	}
 
 	public bool IsSnatching()

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class CreatePickupItemTable : Singleton<CreatePickupItemTable>, IDataTable
 {
 	public class CreatePickupItemData
 	{
-		public const string NT = "pickupId,createId,locationId,preShowTime,postShowTime,openOnly";
-
 		public uint id;
 
 		public uint createTableID;
@@ -17,6 +16,8 @@ public class CreatePickupItemTable : Singleton<CreatePickupItemTable>, IDataTabl
 		public int postShowTime;
 
 		public bool openOnly;
+
+		public const string NT = "pickupId,createId,locationId,preShowTime,postShowTime,openOnly";
 
 		public static bool cb(CSVReader csv_reader, CreatePickupItemData data, ref uint key)
 		{
@@ -45,9 +46,12 @@ public class CreatePickupItemTable : Singleton<CreatePickupItemTable>, IDataTabl
 
 	private UIntKeyTable<CreatePickupItemData> pickupTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<CreatePickupItemData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		pickupTable = TableUtility.CreateUIntKeyTable<CreatePickupItemData>(csv_text, CreatePickupItemData.cb, "pickupId,createId,locationId,preShowTime,postShowTime,openOnly", null);
+		pickupTable = TableUtility.CreateUIntKeyTable<CreatePickupItemData>(csv_text, CreatePickupItemData.cb, "pickupId,createId,locationId,preShowTime,postShowTime,openOnly");
 		pickupTable.TrimExcess();
 	}
 

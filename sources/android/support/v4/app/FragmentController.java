@@ -1,10 +1,10 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.v4.util.SimpleArrayMap;
+import android.support.p000v4.util.SimpleArrayMap;
 import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,9 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
+/* renamed from: android.support.v4.app.FragmentController */
 public class FragmentController {
     private final FragmentHostCallback<?> mHost;
 
@@ -132,19 +132,11 @@ public class FragmentController {
     }
 
     public List<Fragment> getActiveFragments(List<Fragment> list) {
-        if (this.mHost.mFragmentManager.mActive == null) {
-            return null;
-        }
-        if (list == null) {
-            list = new ArrayList(getActiveFragmentsCount());
-        }
-        list.addAll(this.mHost.mFragmentManager.mActive);
-        return list;
+        return this.mHost.mFragmentManager.getActiveFragments();
     }
 
     public int getActiveFragmentsCount() {
-        List list = this.mHost.mFragmentManager.mActive;
-        return list == null ? 0 : list.size();
+        return this.mHost.mFragmentManager.getActiveFragmentCount();
     }
 
     public FragmentManager getSupportFragmentManager() {
@@ -191,7 +183,10 @@ public class FragmentController {
     @Deprecated
     public List<Fragment> retainNonConfig() {
         FragmentManagerNonConfig retainNonConfig = this.mHost.mFragmentManager.retainNonConfig();
-        return retainNonConfig != null ? retainNonConfig.getFragments() : null;
+        if (retainNonConfig != null) {
+            return retainNonConfig.getFragments();
+        }
+        return null;
     }
 
     public Parcelable saveAllState() {

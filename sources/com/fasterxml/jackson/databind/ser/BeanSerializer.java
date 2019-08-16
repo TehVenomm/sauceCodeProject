@@ -50,11 +50,13 @@ public class BeanSerializer extends BeanSerializerBase {
         return new BeanSerializer(this, this._objectIdWriter, obj);
     }
 
-    protected BeanSerializerBase withIgnorals(String[] strArr) {
+    /* access modifiers changed from: protected */
+    public BeanSerializerBase withIgnorals(String[] strArr) {
         return new BeanSerializer((BeanSerializerBase) this, strArr);
     }
 
-    protected BeanSerializerBase asArraySerializer() {
+    /* access modifiers changed from: protected */
+    public BeanSerializerBase asArraySerializer() {
         if (this._objectIdWriter == null && this._anyGetterWriter == null && this._propertyFilterId == null) {
             return new BeanAsArraySerializer(this);
         }

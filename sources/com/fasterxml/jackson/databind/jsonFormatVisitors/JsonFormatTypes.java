@@ -18,14 +18,11 @@ public enum JsonFormatTypes {
     private static final Map<String, JsonFormatTypes> _byLCName = null;
 
     static {
-        _byLCName = new HashMap();
-        JsonFormatTypes[] values = values();
-        int length = values.length;
         int i;
-        while (i < length) {
-            JsonFormatTypes jsonFormatTypes = values[i];
+        JsonFormatTypes[] values;
+        _byLCName = new HashMap();
+        for (JsonFormatTypes jsonFormatTypes : values()) {
             _byLCName.put(jsonFormatTypes.name().toLowerCase(), jsonFormatTypes);
-            i++;
         }
     }
 

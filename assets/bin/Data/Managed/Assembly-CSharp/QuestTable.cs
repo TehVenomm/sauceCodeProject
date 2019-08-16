@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class QuestTable : Singleton<QuestTable>
 {
 	public class QuestTableData : IUIntKeyBinaryTableData
 	{
-		public const string NT = "questId,questType,questStyle,rarity,level,getType,eventId,grade,difficulty,sortPriority,locationNum,questNum,name,appearQuestId,appearDeliveryId,rushId,rushIconId,mapId,stage1Name,enemy1Id,enemy1Lv,bgm1Id,time,mission1Id,mission2Id,mission3Id,cantSell,forcedefeat,storyId";
-
 		public uint questID;
 
 		public QUEST_TYPE questType;
@@ -47,13 +46,13 @@ public class QuestTable : Singleton<QuestTable>
 
 		public uint mapId;
 
-		public string[] stageName = new string[1];
+		public string[] stageName = new string[3];
 
-		public int[] enemyID = new int[1];
+		public int[] enemyID = new int[3];
 
-		public int[] enemyLv = new int[1];
+		public int[] enemyLv = new int[3];
 
-		public int[] bgmID = new int[1];
+		public int[] bgmID = new int[3];
 
 		public float limitTime;
 
@@ -65,11 +64,15 @@ public class QuestTable : Singleton<QuestTable>
 
 		public int storyId;
 
+		public int userNumLimit;
+
 		public int seriesNum;
+
+		public const string NT = "questId,questType,questStyle,rarity,level,getType,eventId,grade,difficulty,sortPriority,locationNum,questNum,name,appearQuestId,appearDeliveryId,rushId,rushIconId,mapId,stage1Name,enemy1Id,enemy1Lv,enemy2Id,enemy2Lv,enemy3Id,enemy3Lv,bgm1Id,bgm2Id,bgm3Id,time,mission1Id,mission2Id,mission3Id,cantSell,forcedefeat,storyId,userNumLimit";
 
 		public QuestTableData()
 		{
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				stageName[i] = string.Empty;
 			}
@@ -99,12 +102,12 @@ public class QuestTable : Singleton<QuestTable>
 			{
 				csv_reader.Pop(ref data.stageName[i]);
 			}
-			for (int j = 0; j < 1; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				csv_reader.Pop(ref data.enemyID[j]);
 				csv_reader.Pop(ref data.enemyLv[j]);
 			}
-			for (int k = 0; k < 1; k++)
+			for (int k = 0; k < 3; k++)
 			{
 				csv_reader.Pop(ref data.bgmID[k]);
 			}
@@ -115,6 +118,11 @@ public class QuestTable : Singleton<QuestTable>
 			csv_reader.Pop(ref data.cantSale);
 			csv_reader.Pop(ref data.forceDefeat);
 			csv_reader.Pop(ref data.storyId);
+			csv_reader.Pop(ref data.userNumLimit);
+			if (data.userNumLimit <= 0)
+			{
+				data.userNumLimit = 4;
+			}
 			if (data.sortPriority == 0)
 			{
 				data.sortPriority = (int)key;
@@ -128,7 +136,7 @@ public class QuestTable : Singleton<QuestTable>
 				data.questNumber = (data.questID % 100u).ToString();
 			}
 			data.seriesNum = 0;
-			for (int l = 0; l < 1 && data.enemyID[l] != 0; l++)
+			for (int l = 0; l < 3 && data.enemyID[l] != 0; l++)
 			{
 				data.seriesNum++;
 			}
@@ -161,6 +169,19 @@ public class QuestTable : Singleton<QuestTable>
 			return enemyID[seriesNum - 1];
 		}
 
+		public int GetEnemyIdByIndex(int index)
+		{
+			if (seriesNum <= 0)
+			{
+				return 0;
+			}
+			if (index >= seriesNum)
+			{
+				return 0;
+			}
+			return enemyID[index];
+		}
+
 		public int GetMainEnemyLv()
 		{
 			if (seriesNum <= 0)
@@ -187,41 +208,41 @@ public class QuestTable : Singleton<QuestTable>
 		public void LoadFromBinary(BinaryTableReader reader, ref uint key)
 		{
 			questID = key;
-			questType = (QUEST_TYPE)reader.ReadInt32(0);
-			questStyle = (QUEST_STYLE)reader.ReadInt32(0);
-			rarity = (RARITY_TYPE)reader.ReadInt32(0);
-			getType = (GET_TYPE)reader.ReadInt32(0);
-			eventId = reader.ReadInt32(0);
-			grade = reader.ReadInt32(0);
-			difficulty = (DIFFICULTY_TYPE)reader.ReadInt32(0);
-			sortPriority = reader.ReadInt32(0);
+			questType = (QUEST_TYPE)reader.ReadInt32();
+			questStyle = (QUEST_STYLE)reader.ReadInt32();
+			rarity = (RARITY_TYPE)reader.ReadInt32();
+			getType = (GET_TYPE)reader.ReadInt32();
+			eventId = reader.ReadInt32();
+			grade = reader.ReadInt32();
+			difficulty = (DIFFICULTY_TYPE)reader.ReadInt32();
+			sortPriority = reader.ReadInt32();
 			locationNumber = reader.ReadString(string.Empty);
 			questNumber = reader.ReadString(string.Empty);
 			questText = reader.ReadString(string.Empty);
-			appearQuestId = reader.ReadUInt32(0u);
-			appearDeliveryId = reader.ReadUInt32(0u);
-			rushId = reader.ReadUInt32(0u);
-			mapId = reader.ReadUInt32(0u);
+			appearQuestId = reader.ReadUInt32();
+			appearDeliveryId = reader.ReadUInt32();
+			rushId = reader.ReadUInt32();
+			mapId = reader.ReadUInt32();
 			for (int i = 0; i < 1; i++)
 			{
 				stageName[i] = reader.ReadString(string.Empty);
 			}
-			for (int j = 0; j < 1; j++)
+			for (int j = 0; j < 3; j++)
 			{
-				enemyID[j] = reader.ReadInt32(0);
-				enemyLv[j] = reader.ReadInt32(0);
+				enemyID[j] = reader.ReadInt32();
+				enemyLv[j] = reader.ReadInt32();
 			}
-			for (int k = 0; k < 1; k++)
+			for (int k = 0; k < 3; k++)
 			{
-				bgmID[k] = reader.ReadInt32(0);
+				bgmID[k] = reader.ReadInt32();
 			}
-			limitTime = reader.ReadSingle(0f);
-			missionID[0] = reader.ReadUInt32(0u);
-			missionID[1] = reader.ReadUInt32(0u);
-			missionID[2] = reader.ReadUInt32(0u);
-			cantSale = reader.ReadBoolean(false);
-			forceDefeat = reader.ReadBoolean(false);
-			storyId = reader.ReadInt32(0);
+			limitTime = reader.ReadSingle();
+			missionID[0] = reader.ReadUInt32();
+			missionID[1] = reader.ReadUInt32();
+			missionID[2] = reader.ReadUInt32();
+			cantSale = reader.ReadBoolean();
+			forceDefeat = reader.ReadBoolean();
+			storyId = reader.ReadInt32();
 			if (sortPriority == 0)
 			{
 				sortPriority = (int)key;
@@ -235,48 +256,10 @@ public class QuestTable : Singleton<QuestTable>
 				questNumber = (questID % 100u).ToString();
 			}
 			seriesNum = 0;
-			for (int l = 0; l < 1 && enemyID[l] != 0; l++)
+			for (int l = 0; l < 3 && enemyID[l] != 0; l++)
 			{
 				seriesNum++;
 			}
-		}
-
-		public void DumpBinary(BinaryWriter writer)
-		{
-			writer.Write((int)questType);
-			writer.Write((int)questStyle);
-			writer.Write((int)rarity);
-			writer.Write((int)getType);
-			writer.Write(eventId);
-			writer.Write(grade);
-			writer.Write((int)difficulty);
-			writer.Write(sortPriority);
-			writer.Write(locationNumber);
-			writer.Write(questNumber);
-			writer.Write(questText);
-			writer.Write(appearQuestId);
-			writer.Write(appearDeliveryId);
-			writer.Write(mapId);
-			for (int i = 0; i < 1; i++)
-			{
-				writer.Write(stageName[i]);
-			}
-			for (int j = 0; j < 1; j++)
-			{
-				writer.Write(enemyID[j]);
-				writer.Write(enemyLv[j]);
-			}
-			for (int k = 0; k < 1; k++)
-			{
-				writer.Write(bgmID[k]);
-			}
-			writer.Write(limitTime);
-			writer.Write(missionID[0]);
-			writer.Write(missionID[1]);
-			writer.Write(missionID[2]);
-			writer.Write(cantSale);
-			writer.Write(forceDefeat);
-			writer.Write(storyId);
 		}
 
 		public override bool Equals(object obj)
@@ -327,8 +310,6 @@ public class QuestTable : Singleton<QuestTable>
 
 	public class MissionTableData
 	{
-		public const string NT = "missionId,name,type,require,param0";
-
 		public uint missionID;
 
 		public string missionText;
@@ -338,6 +319,8 @@ public class QuestTable : Singleton<QuestTable>
 		public MISSION_REQUIRE missionRequire;
 
 		public int missionParam;
+
+		public const string NT = "missionId,name,type,require,param0";
 
 		public static bool cb(CSVReader csv_reader, MissionTableData data, ref uint key)
 		{
@@ -350,7 +333,9 @@ public class QuestTable : Singleton<QuestTable>
 		}
 	}
 
-	public const int SERIES_NUM_MAX = 1;
+	public const int SERIES_STAGE_NUM_MAX = 1;
+
+	public const int SERIES_NUM_MAX = 3;
 
 	public const int MISSION_NUM_MAX = 3;
 
@@ -358,9 +343,18 @@ public class QuestTable : Singleton<QuestTable>
 
 	private UIntKeyTable<MissionTableData> missionTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<QuestTableData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<QuestTableData> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<MissionTableData> _003C_003Ef__mg_0024cache2;
+
 	public static UIntKeyTable<QuestTableData> CreateQuestTableCSV(string csv_text)
 	{
-		return TableUtility.CreateUIntKeyTable<QuestTableData>(csv_text, QuestTableData.cb, "questId,questType,questStyle,rarity,level,getType,eventId,grade,difficulty,sortPriority,locationNum,questNum,name,appearQuestId,appearDeliveryId,rushId,rushIconId,mapId,stage1Name,enemy1Id,enemy1Lv,bgm1Id,time,mission1Id,mission2Id,mission3Id,cantSell,forcedefeat,storyId", null);
+		return TableUtility.CreateUIntKeyTable<QuestTableData>(csv_text, QuestTableData.cb, "questId,questType,questStyle,rarity,level,getType,eventId,grade,difficulty,sortPriority,locationNum,questNum,name,appearQuestId,appearDeliveryId,rushId,rushIconId,mapId,stage1Name,enemy1Id,enemy1Lv,enemy2Id,enemy2Lv,enemy3Id,enemy3Lv,bgm1Id,bgm2Id,bgm3Id,time,mission1Id,mission2Id,mission3Id,cantSell,forcedefeat,storyId,userNumLimit");
 	}
 
 	public void CreateQuestTable(string csv_text)
@@ -370,12 +364,12 @@ public class QuestTable : Singleton<QuestTable>
 
 	public void AddQuestTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(questTable, csv_text, QuestTableData.cb, "questId,questType,questStyle,rarity,level,getType,eventId,grade,difficulty,sortPriority,locationNum,questNum,name,appearQuestId,appearDeliveryId,rushId,rushIconId,mapId,stage1Name,enemy1Id,enemy1Lv,bgm1Id,time,mission1Id,mission2Id,mission3Id,cantSell,forcedefeat,storyId", null);
+		TableUtility.AddUIntKeyTable(questTable, csv_text, QuestTableData.cb, "questId,questType,questStyle,rarity,level,getType,eventId,grade,difficulty,sortPriority,locationNum,questNum,name,appearQuestId,appearDeliveryId,rushId,rushIconId,mapId,stage1Name,enemy1Id,enemy1Lv,enemy2Id,enemy2Lv,enemy3Id,enemy3Lv,bgm1Id,bgm2Id,bgm3Id,time,mission1Id,mission2Id,mission3Id,cantSell,forcedefeat,storyId,userNumLimit");
 	}
 
 	public void CreateMissionTable(string csv_text)
 	{
-		missionTable = TableUtility.CreateUIntKeyTable<MissionTableData>(csv_text, MissionTableData.cb, "missionId,name,type,require,param0", null);
+		missionTable = TableUtility.CreateUIntKeyTable<MissionTableData>(csv_text, MissionTableData.cb, "missionId,name,type,require,param0");
 	}
 
 	public static UIntKeyTable<QuestTableData> CreateQuestTableBinary(byte[] bytes)
@@ -415,6 +409,28 @@ public class QuestTable : Singleton<QuestTable>
 		if (questTable != null && call_back != null)
 		{
 			questTable.ForEach(delegate(QuestTableData data)
+			{
+				call_back(data);
+			});
+		}
+	}
+
+	public void AllQuestDataAsc(Action<QuestTableData> call_back)
+	{
+		if (questTable != null && call_back != null)
+		{
+			questTable.ForEachAsc(delegate(QuestTableData data)
+			{
+				call_back(data);
+			});
+		}
+	}
+
+	public void AllQuestDataDesc(Action<QuestTableData> call_back)
+	{
+		if (questTable != null && call_back != null)
+		{
+			questTable.ForEachDesc(delegate(QuestTableData data)
 			{
 				call_back(data);
 			});
@@ -503,8 +519,8 @@ public class QuestTable : Singleton<QuestTable>
 						{
 							return;
 						}
-						QUEST_TYPE? nullable = type[num];
-						if (nullable.HasValue && table.questType == type[num])
+						QUEST_TYPE? qUEST_TYPE = type[num];
+						if (qUEST_TYPE.HasValue && table.questType == type[num])
 						{
 							break;
 						}
@@ -549,15 +565,33 @@ public class QuestTable : Singleton<QuestTable>
 		List<QuestTableData> enemyTable = new List<QuestTableData>();
 		questTable.ForEach(delegate(QuestTableData table)
 		{
-			if (table.enemyID != null && Array.IndexOf(table.enemyID, (int)((_003CGetEnemyAppearQuestData_003Ec__Iterator246)/*Error near IL_0039: stateMachine*/).enemy_id) >= 0)
+			if (table.enemyID != null && Array.IndexOf(table.enemyID, (int)enemy_id) >= 0)
 			{
-				((_003CGetEnemyAppearQuestData_003Ec__Iterator246)/*Error near IL_0039: stateMachine*/)._003CenemyTable_003E__0.Add(table);
+				enemyTable.Add(table);
 			}
 		});
 		foreach (QuestTableData item in enemyTable)
 		{
 			yield return item;
 		}
+	}
+
+	public QuestTableData GetEventQuestData(int eventId)
+	{
+		return questTable.Find((QuestTableData data) => data.eventId == eventId);
+	}
+
+	public List<QuestTableData> GetEventQuestDataList(int eventId)
+	{
+		List<QuestTableData> questList = new List<QuestTableData>();
+		questTable.ForEach(delegate(QuestTableData x)
+		{
+			if (x.eventId == eventId)
+			{
+				questList.Add(x);
+			}
+		});
+		return questList;
 	}
 
 	public static List<QuestTableData> GetSameRushQuestData(uint searchId)

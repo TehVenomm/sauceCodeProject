@@ -10,6 +10,8 @@ public class QuestRetireModel : BaseModel
 		public List<FollowPartyMember> friend;
 
 		public int followNum;
+
+		public PointEventCurrentData waveMatchPoint;
 	}
 
 	public class RequestSendForm
@@ -29,6 +31,16 @@ public class QuestRetireModel : BaseModel
 		public TaskUpdateInfo actioncount = new TaskUpdateInfo();
 
 		public int enemyHp;
+
+		public int dc;
+
+		public int dbc;
+
+		public int pdbc;
+
+		public float rSec;
+
+		public int wmwave;
 	}
 
 	public static string URL = "ajax/quest/retire";

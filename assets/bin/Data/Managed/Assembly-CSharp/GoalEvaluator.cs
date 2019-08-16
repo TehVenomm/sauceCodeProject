@@ -42,7 +42,7 @@ public abstract class GoalEvaluator
 		{
 			return 1f;
 		}
-		return EvaluateValue((float)brain.owner.hp, 1f, (float)brain.owner.hpMax);
+		return EvaluateValue(brain.owner.hp, 1f, brain.owner.hpMax);
 	}
 
 	protected float EvaluateDangerWithTargetCondition(Brain brain, StageObject target)

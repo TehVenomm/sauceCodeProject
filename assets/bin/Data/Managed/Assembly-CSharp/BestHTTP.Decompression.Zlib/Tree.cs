@@ -4,8 +4,6 @@ namespace BestHTTP.Decompression.Zlib
 {
 	internal sealed class Tree
 	{
-		internal const int Buf_size = 16;
-
 		private static readonly int HEAP_SIZE = 2 * InternalConstants.L_CODES + 1;
 
 		internal static readonly int[] ExtraLengthBits = new int[29]
@@ -120,6 +118,8 @@ namespace BestHTTP.Decompression.Zlib
 			1,
 			15
 		};
+
+		internal const int Buf_size = 16;
 
 		private static readonly sbyte[] _dist_code = new sbyte[512]
 		{
@@ -1015,36 +1015,37 @@ namespace BestHTTP.Decompression.Zlib
 					}
 				}
 			}
-			if (num != 0)
+			if (num == 0)
 			{
-				do
+				return;
+			}
+			do
+			{
+				int i = maxLength - 1;
+				while (s.bl_count[i] == 0)
 				{
-					int i = maxLength - 1;
-					while (s.bl_count[i] == 0)
-					{
-						i--;
-					}
-					s.bl_count[i]--;
-					s.bl_count[i + 1] = (short)(s.bl_count[i + 1] + 2);
-					s.bl_count[maxLength]--;
-					num -= 2;
+					i--;
 				}
-				while (num > 0);
-				for (int i = maxLength; i != 0; i--)
+				s.bl_count[i]--;
+				s.bl_count[i + 1] = (short)(s.bl_count[i + 1] + 2);
+				s.bl_count[maxLength]--;
+				num -= 2;
+			}
+			while (num > 0);
+			for (int i = maxLength; i != 0; i--)
+			{
+				int num2 = s.bl_count[i];
+				while (num2 != 0)
 				{
-					int num2 = s.bl_count[i];
-					while (num2 != 0)
+					int num5 = s.heap[--j];
+					if (num5 <= max_code)
 					{
-						int num5 = s.heap[--j];
-						if (num5 <= max_code)
+						if (array[num5 * 2 + 1] != i)
 						{
-							if (array[num5 * 2 + 1] != i)
-							{
-								s.opt_len = (int)(s.opt_len + ((long)i - (long)array[num5 * 2 + 1]) * array[num5 * 2]);
-								array[num5 * 2 + 1] = (short)i;
-							}
-							num2--;
+							s.opt_len = (int)(s.opt_len + ((long)i - (long)array[num5 * 2 + 1]) * array[num5 * 2]);
+							array[num5 * 2 + 1] = (short)i;
 						}
+						num2--;
 					}
 				}
 			}

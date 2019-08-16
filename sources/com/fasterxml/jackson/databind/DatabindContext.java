@@ -76,24 +76,24 @@ public abstract class DatabindContext {
         if (obj instanceof Converter) {
             return (Converter) obj;
         }
-        if (obj instanceof Class) {
-            Class cls = (Class) obj;
-            if (cls == None.class || ClassUtil.isBogusClass(cls)) {
-                return null;
-            }
-            if (Converter.class.isAssignableFrom(cls)) {
-                MapperConfig config = getConfig();
-                HandlerInstantiator handlerInstantiator = config.getHandlerInstantiator();
-                if (handlerInstantiator != null) {
-                    converter = handlerInstantiator.converterInstance(config, annotated, cls);
-                }
-                if (converter == null) {
-                    converter = (Converter) ClassUtil.createInstance(cls, config.canOverrideAccessModifiers());
-                }
-                return converter;
-            }
+        if (!(obj instanceof Class)) {
+            throw new IllegalStateException("AnnotationIntrospector returned Converter definition of type " + obj.getClass().getName() + "; expected type Converter or Class<Converter> instead");
+        }
+        Class<None> cls = (Class) obj;
+        if (cls == None.class || ClassUtil.isBogusClass(cls)) {
+            return null;
+        }
+        if (!Converter.class.isAssignableFrom(cls)) {
             throw new IllegalStateException("AnnotationIntrospector returned Class " + cls.getName() + "; expected Class<Converter>");
         }
-        throw new IllegalStateException("AnnotationIntrospector returned Converter definition of type " + obj.getClass().getName() + "; expected type Converter or Class<Converter> instead");
+        MapperConfig config = getConfig();
+        HandlerInstantiator handlerInstantiator = config.getHandlerInstantiator();
+        if (handlerInstantiator != null) {
+            converter = handlerInstantiator.converterInstance(config, annotated, cls);
+        }
+        if (converter == null) {
+            converter = (Converter) ClassUtil.createInstance(cls, config.canOverrideAccessModifiers());
+        }
+        return converter;
     }
 }

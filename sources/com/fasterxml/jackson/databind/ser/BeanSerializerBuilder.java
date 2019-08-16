@@ -31,7 +31,8 @@ public class BeanSerializerBuilder {
         this._filterId = beanSerializerBuilder._filterId;
     }
 
-    protected void setConfig(SerializationConfig serializationConfig) {
+    /* access modifiers changed from: protected */
+    public void setConfig(SerializationConfig serializationConfig) {
         this._config = serializationConfig;
     }
 

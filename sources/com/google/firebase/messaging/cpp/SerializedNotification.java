@@ -119,116 +119,198 @@ public final class SerializedNotification extends Table {
 
     public void __init(int i, ByteBuffer byteBuffer) {
         this.bb_pos = i;
-        this.bb = byteBuffer;
+        this.f441bb = byteBuffer;
     }
 
     public String badge() {
         int __offset = __offset(12);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer badgeAsByteBuffer() {
         return __vector_as_bytebuffer(12, 1);
     }
 
+    public ByteBuffer badgeInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 12, 1);
+    }
+
     public String body() {
         int __offset = __offset(6);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer bodyAsByteBuffer() {
         return __vector_as_bytebuffer(6, 1);
     }
 
+    public ByteBuffer bodyInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 6, 1);
+    }
+
     public String bodyLocArgs(int i) {
         int __offset = __offset(22);
-        return __offset != 0 ? __string(__vector(__offset) + (i * 4)) : null;
+        if (__offset != 0) {
+            return __string(__vector(__offset) + (i * 4));
+        }
+        return null;
     }
 
     public int bodyLocArgsLength() {
         int __offset = __offset(22);
-        return __offset != 0 ? __vector_len(__offset) : 0;
+        if (__offset != 0) {
+            return __vector_len(__offset);
+        }
+        return 0;
     }
 
     public String bodyLocKey() {
         int __offset = __offset(20);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer bodyLocKeyAsByteBuffer() {
         return __vector_as_bytebuffer(20, 1);
     }
 
+    public ByteBuffer bodyLocKeyInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 20, 1);
+    }
+
     public String clickAction() {
         int __offset = __offset(18);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer clickActionAsByteBuffer() {
         return __vector_as_bytebuffer(18, 1);
     }
 
+    public ByteBuffer clickActionInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 18, 1);
+    }
+
     public String color() {
         int __offset = __offset(16);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer colorAsByteBuffer() {
         return __vector_as_bytebuffer(16, 1);
     }
 
+    public ByteBuffer colorInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 16, 1);
+    }
+
     public String icon() {
         int __offset = __offset(8);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer iconAsByteBuffer() {
         return __vector_as_bytebuffer(8, 1);
     }
 
+    public ByteBuffer iconInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 8, 1);
+    }
+
     public String sound() {
         int __offset = __offset(10);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer soundAsByteBuffer() {
         return __vector_as_bytebuffer(10, 1);
     }
 
+    public ByteBuffer soundInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 10, 1);
+    }
+
     public String tag() {
         int __offset = __offset(14);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer tagAsByteBuffer() {
         return __vector_as_bytebuffer(14, 1);
     }
 
+    public ByteBuffer tagInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 14, 1);
+    }
+
     public String title() {
         int __offset = __offset(4);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer titleAsByteBuffer() {
         return __vector_as_bytebuffer(4, 1);
     }
 
+    public ByteBuffer titleInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 4, 1);
+    }
+
     public String titleLocArgs(int i) {
         int __offset = __offset(26);
-        return __offset != 0 ? __string(__vector(__offset) + (i * 4)) : null;
+        if (__offset != 0) {
+            return __string(__vector(__offset) + (i * 4));
+        }
+        return null;
     }
 
     public int titleLocArgsLength() {
         int __offset = __offset(26);
-        return __offset != 0 ? __vector_len(__offset) : 0;
+        if (__offset != 0) {
+            return __vector_len(__offset);
+        }
+        return 0;
     }
 
     public String titleLocKey() {
         int __offset = __offset(24);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer titleLocKeyAsByteBuffer() {
         return __vector_as_bytebuffer(24, 1);
+    }
+
+    public ByteBuffer titleLocKeyInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 24, 1);
     }
 }

@@ -3,8 +3,8 @@ package com.fasterxml.jackson.databind;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonInclude.Value;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.core.Base64Variants;
@@ -23,8 +23,8 @@ import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.Versioned;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.SegmentedStringWriter;
+import com.fasterxml.jackson.core.p015io.CharacterEscapes;
+import com.fasterxml.jackson.core.p015io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.cfg.PackageVersion;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory;
 import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.deser.DeserializerFactory;
 import com.fasterxml.jackson.databind.introspect.BasicClassIntrospector;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector.MixInResolver;
@@ -122,86 +123,108 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         }
 
         public TypeDeserializer buildTypeDeserializer(DeserializationConfig deserializationConfig, JavaType javaType, Collection<NamedType> collection) {
-            return useForType(javaType) ? super.buildTypeDeserializer(deserializationConfig, javaType, collection) : null;
+            if (useForType(javaType)) {
+                return super.buildTypeDeserializer(deserializationConfig, javaType, collection);
+            }
+            return null;
         }
 
         public TypeSerializer buildTypeSerializer(SerializationConfig serializationConfig, JavaType javaType, Collection<NamedType> collection) {
-            return useForType(javaType) ? super.buildTypeSerializer(serializationConfig, javaType, collection) : null;
+            if (useForType(javaType)) {
+                return super.buildTypeSerializer(serializationConfig, javaType, collection);
+            }
+            return null;
         }
 
-        /* JADX WARNING: inconsistent code. */
+        /* JADX WARNING: Code restructure failed: missing block: B:17:0x0048, code lost:
+            if (r5.isArrayType() == false) goto L_0x004f;
+         */
+        /* JADX WARNING: Code restructure failed: missing block: B:18:0x004a, code lost:
+            r5 = r5.getContentType();
+         */
+        /* JADX WARNING: Code restructure failed: missing block: B:20:0x0053, code lost:
+            if (r5.isReferenceType() == false) goto L_0x005a;
+         */
+        /* JADX WARNING: Code restructure failed: missing block: B:21:0x0055, code lost:
+            r5 = r5.getReferencedType();
+         */
+        /* JADX WARNING: Code restructure failed: missing block: B:23:0x005e, code lost:
+            if (r5.isFinal() != false) goto L_0x006e;
+         */
+        /* JADX WARNING: Code restructure failed: missing block: B:25:0x006a, code lost:
+            if (com.fasterxml.jackson.core.TreeNode.class.isAssignableFrom(r5.getRawClass()) != false) goto L_0x006e;
+         */
+        /* JADX WARNING: Code restructure failed: missing block: B:27:0x006e, code lost:
+            r1 = false;
+         */
+        /* JADX WARNING: Code restructure failed: missing block: B:37:?, code lost:
+            return r1;
+         */
         /* Code decompiled incorrectly, please refer to instructions dump. */
         public boolean useForType(com.fasterxml.jackson.databind.JavaType r5) {
             /*
-            r4 = this;
-            r1 = 1;
-            r0 = 0;
-            r2 = com.fasterxml.jackson.databind.ObjectMapper.C05532.f369x3ef634e7;
-            r3 = r4._appliesFor;
-            r3 = r3.ordinal();
-            r2 = r2[r3];
-            switch(r2) {
-                case 1: goto L_0x0014;
-                case 2: goto L_0x001f;
-                case 3: goto L_0x0044;
-                default: goto L_0x000f;
-            };
-        L_0x000f:
-            r0 = r5.isJavaLangObject();
-        L_0x0013:
-            return r0;
-        L_0x0014:
-            r2 = r5.isArrayType();
-            if (r2 == 0) goto L_0x001f;
-        L_0x001a:
-            r5 = r5.getContentType();
-            goto L_0x0014;
-        L_0x001f:
-            r2 = r5.isReferenceType();
-            if (r2 == 0) goto L_0x002a;
-        L_0x0025:
-            r5 = r5.getReferencedType();
-            goto L_0x001f;
-        L_0x002a:
-            r2 = r5.isJavaLangObject();
-            if (r2 != 0) goto L_0x0042;
-        L_0x0030:
-            r2 = r5.isConcrete();
-            if (r2 != 0) goto L_0x0013;
-        L_0x0036:
-            r2 = com.fasterxml.jackson.core.TreeNode.class;
-            r3 = r5.getRawClass();
-            r2 = r2.isAssignableFrom(r3);
-            if (r2 != 0) goto L_0x0013;
-        L_0x0042:
-            r0 = r1;
-            goto L_0x0013;
-        L_0x0044:
-            r2 = r5.isArrayType();
-            if (r2 == 0) goto L_0x004f;
-        L_0x004a:
-            r5 = r5.getContentType();
-            goto L_0x0044;
-        L_0x004f:
-            r2 = r5.isReferenceType();
-            if (r2 == 0) goto L_0x005a;
-        L_0x0055:
-            r5 = r5.getReferencedType();
-            goto L_0x004f;
-        L_0x005a:
-            r2 = r5.isFinal();
-            if (r2 != 0) goto L_0x006e;
-        L_0x0060:
-            r2 = com.fasterxml.jackson.core.TreeNode.class;
-            r3 = r5.getRawClass();
-            r2 = r2.isAssignableFrom(r3);
-            if (r2 != 0) goto L_0x006e;
-        L_0x006c:
-            r0 = r1;
-            goto L_0x0013;
-        L_0x006e:
-            r1 = r0;
-            goto L_0x006c;
+                r4 = this;
+                r1 = 1
+                r0 = 0
+                int[] r2 = com.fasterxml.jackson.databind.ObjectMapper.C08652.f425x3ef634e7
+                com.fasterxml.jackson.databind.ObjectMapper$DefaultTyping r3 = r4._appliesFor
+                int r3 = r3.ordinal()
+                r2 = r2[r3]
+                switch(r2) {
+                    case 1: goto L_0x0014;
+                    case 2: goto L_0x001f;
+                    case 3: goto L_0x0044;
+                    default: goto L_0x000f;
+                }
+            L_0x000f:
+                boolean r0 = r5.isJavaLangObject()
+            L_0x0013:
+                return r0
+            L_0x0014:
+                boolean r2 = r5.isArrayType()
+                if (r2 == 0) goto L_0x001f
+                com.fasterxml.jackson.databind.JavaType r5 = r5.getContentType()
+                goto L_0x0014
+            L_0x001f:
+                boolean r2 = r5.isReferenceType()
+                if (r2 == 0) goto L_0x002a
+                com.fasterxml.jackson.databind.JavaType r5 = r5.getReferencedType()
+                goto L_0x001f
+            L_0x002a:
+                boolean r2 = r5.isJavaLangObject()
+                if (r2 != 0) goto L_0x0042
+                boolean r2 = r5.isConcrete()
+                if (r2 != 0) goto L_0x0013
+                java.lang.Class<com.fasterxml.jackson.core.TreeNode> r2 = com.fasterxml.jackson.core.TreeNode.class
+                java.lang.Class r3 = r5.getRawClass()
+                boolean r2 = r2.isAssignableFrom(r3)
+                if (r2 != 0) goto L_0x0013
+            L_0x0042:
+                r0 = r1
+                goto L_0x0013
+            L_0x0044:
+                boolean r2 = r5.isArrayType()
+                if (r2 == 0) goto L_0x004f
+                com.fasterxml.jackson.databind.JavaType r5 = r5.getContentType()
+                goto L_0x0044
+            L_0x004f:
+                boolean r2 = r5.isReferenceType()
+                if (r2 == 0) goto L_0x005a
+                com.fasterxml.jackson.databind.JavaType r5 = r5.getReferencedType()
+                goto L_0x004f
+            L_0x005a:
+                boolean r2 = r5.isFinal()
+                if (r2 != 0) goto L_0x006e
+                java.lang.Class<com.fasterxml.jackson.core.TreeNode> r2 = com.fasterxml.jackson.core.TreeNode.class
+                java.lang.Class r3 = r5.getRawClass()
+                boolean r2 = r2.isAssignableFrom(r3)
+                if (r2 != 0) goto L_0x006e
+            L_0x006c:
+                r0 = r1
+                goto L_0x0013
+            L_0x006e:
+                r1 = r0
+                goto L_0x006c
             */
             throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ObjectMapper.DefaultTypeResolverBuilder.useForType(com.fasterxml.jackson.databind.JavaType):boolean");
         }
@@ -223,7 +246,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     protected ObjectMapper(ObjectMapper objectMapper) {
-        this._rootDeserializers = new ConcurrentHashMap(64, 0.6f, 2);
+        this._rootDeserializers = new ConcurrentHashMap<>(64, 0.6f, 2);
         this._jsonFactory = objectMapper._jsonFactory.copy();
         this._jsonFactory.setCodec(this);
         this._subtypeResolver = objectMapper._subtypeResolver;
@@ -237,16 +260,16 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         this._serializerProvider = objectMapper._serializerProvider.copy();
         this._deserializationContext = objectMapper._deserializationContext.copy();
         this._serializerFactory = objectMapper._serializerFactory;
-        Collection collection = objectMapper._registeredModuleTypes;
-        if (collection == null) {
+        Set<Object> set = objectMapper._registeredModuleTypes;
+        if (set == null) {
             this._registeredModuleTypes = null;
         } else {
-            this._registeredModuleTypes = new LinkedHashSet(collection);
+            this._registeredModuleTypes = new LinkedHashSet(set);
         }
     }
 
     public ObjectMapper(JsonFactory jsonFactory, DefaultSerializerProvider defaultSerializerProvider, DefaultDeserializationContext defaultDeserializationContext) {
-        this._rootDeserializers = new ConcurrentHashMap(64, 0.6f, 2);
+        this._rootDeserializers = new ConcurrentHashMap<>(64, 0.6f, 2);
         if (jsonFactory == null) {
             this._jsonFactory = new MappingJsonFactory(this);
         } else {
@@ -264,7 +287,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         this._serializationConfig = new SerializationConfig(withClassIntrospector, this._subtypeResolver, simpleMixInResolver, rootNameLookup);
         this._deserializationConfig = new DeserializationConfig(withClassIntrospector, this._subtypeResolver, simpleMixInResolver, rootNameLookup);
         boolean requiresPropertyOrdering = this._jsonFactory.requiresPropertyOrdering();
-        if ((this._serializationConfig.isEnabled(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY) ^ requiresPropertyOrdering) != 0) {
+        if (this._serializationConfig.isEnabled(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY) ^ requiresPropertyOrdering) {
             configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, requiresPropertyOrdering);
         }
         if (defaultSerializerProvider == null) {
@@ -272,13 +295,14 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         }
         this._serializerProvider = defaultSerializerProvider;
         if (defaultDeserializationContext == null) {
-            defaultDeserializationContext = new DefaultDeserializationContext.Impl(BeanDeserializerFactory.instance);
+            defaultDeserializationContext = new DefaultDeserializationContext.Impl((DeserializerFactory) BeanDeserializerFactory.instance);
         }
         this._deserializationContext = defaultDeserializationContext;
         this._serializerFactory = BeanSerializerFactory.instance;
     }
 
-    protected ClassIntrospector defaultClassIntrospector() {
+    /* access modifiers changed from: protected */
+    public ClassIntrospector defaultClassIntrospector() {
         return new BasicClassIntrospector();
     }
 
@@ -287,29 +311,35 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         return new ObjectMapper(this);
     }
 
-    protected void _checkInvalidCopy(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public void _checkInvalidCopy(Class<?> cls) {
         if (getClass() != cls) {
             throw new IllegalStateException("Failed copy(): " + getClass().getName() + " (version: " + version() + ") does not override copy(); it has to");
         }
     }
 
-    protected ObjectReader _newReader(DeserializationConfig deserializationConfig) {
+    /* access modifiers changed from: protected */
+    public ObjectReader _newReader(DeserializationConfig deserializationConfig) {
         return new ObjectReader(this, deserializationConfig);
     }
 
-    protected ObjectReader _newReader(DeserializationConfig deserializationConfig, JavaType javaType, Object obj, FormatSchema formatSchema, InjectableValues injectableValues) {
+    /* access modifiers changed from: protected */
+    public ObjectReader _newReader(DeserializationConfig deserializationConfig, JavaType javaType, Object obj, FormatSchema formatSchema, InjectableValues injectableValues) {
         return new ObjectReader(this, deserializationConfig, javaType, obj, formatSchema, injectableValues);
     }
 
-    protected ObjectWriter _newWriter(SerializationConfig serializationConfig) {
+    /* access modifiers changed from: protected */
+    public ObjectWriter _newWriter(SerializationConfig serializationConfig) {
         return new ObjectWriter(this, serializationConfig);
     }
 
-    protected ObjectWriter _newWriter(SerializationConfig serializationConfig, FormatSchema formatSchema) {
+    /* access modifiers changed from: protected */
+    public ObjectWriter _newWriter(SerializationConfig serializationConfig, FormatSchema formatSchema) {
         return new ObjectWriter(this, serializationConfig, formatSchema);
     }
 
-    protected ObjectWriter _newWriter(SerializationConfig serializationConfig, JavaType javaType, PrettyPrinter prettyPrinter) {
+    /* access modifiers changed from: protected */
+    public ObjectWriter _newWriter(SerializationConfig serializationConfig, JavaType javaType, PrettyPrinter prettyPrinter) {
         return new ObjectWriter(this, serializationConfig, javaType, prettyPrinter);
     }
 
@@ -317,51 +347,48 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         return PackageVersion.VERSION;
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* JADX WARNING: Code restructure failed: missing block: B:8:0x001f, code lost:
+        if (r2._registeredModuleTypes.add(r0) == false) goto L_0x0021;
+     */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public com.fasterxml.jackson.databind.ObjectMapper registerModule(com.fasterxml.jackson.databind.Module r3) {
         /*
-        r2 = this;
-        r0 = com.fasterxml.jackson.databind.MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS;
-        r0 = r2.isEnabled(r0);
-        if (r0 == 0) goto L_0x0022;
-    L_0x0008:
-        r0 = r3.getTypeId();
-        if (r0 == 0) goto L_0x0022;
-    L_0x000e:
-        r1 = r2._registeredModuleTypes;
-        if (r1 != 0) goto L_0x0019;
-    L_0x0012:
-        r1 = new java.util.LinkedHashSet;
-        r1.<init>();
-        r2._registeredModuleTypes = r1;
-    L_0x0019:
-        r1 = r2._registeredModuleTypes;
-        r0 = r1.add(r0);
-        if (r0 != 0) goto L_0x0022;
-    L_0x0021:
-        return r2;
-    L_0x0022:
-        r0 = r3.getModuleName();
-        if (r0 != 0) goto L_0x0030;
-    L_0x0028:
-        r0 = new java.lang.IllegalArgumentException;
-        r1 = "Module without defined name";
-        r0.<init>(r1);
-        throw r0;
-    L_0x0030:
-        r0 = r3.version();
-        if (r0 != 0) goto L_0x003e;
-    L_0x0036:
-        r0 = new java.lang.IllegalArgumentException;
-        r1 = "Module without defined version";
-        r0.<init>(r1);
-        throw r0;
-    L_0x003e:
-        r0 = new com.fasterxml.jackson.databind.ObjectMapper$1;
-        r0.<init>(r2);
-        r3.setupModule(r0);
-        goto L_0x0021;
+            r2 = this;
+            com.fasterxml.jackson.databind.MapperFeature r0 = com.fasterxml.jackson.databind.MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS
+            boolean r0 = r2.isEnabled(r0)
+            if (r0 == 0) goto L_0x0022
+            java.lang.Object r0 = r3.getTypeId()
+            if (r0 == 0) goto L_0x0022
+            java.util.Set<java.lang.Object> r1 = r2._registeredModuleTypes
+            if (r1 != 0) goto L_0x0019
+            java.util.LinkedHashSet r1 = new java.util.LinkedHashSet
+            r1.<init>()
+            r2._registeredModuleTypes = r1
+        L_0x0019:
+            java.util.Set<java.lang.Object> r1 = r2._registeredModuleTypes
+            boolean r0 = r1.add(r0)
+            if (r0 != 0) goto L_0x0022
+        L_0x0021:
+            return r2
+        L_0x0022:
+            java.lang.String r0 = r3.getModuleName()
+            if (r0 != 0) goto L_0x0030
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException
+            java.lang.String r1 = "Module without defined name"
+            r0.<init>(r1)
+            throw r0
+        L_0x0030:
+            com.fasterxml.jackson.core.Version r0 = r3.version()
+            if (r0 != 0) goto L_0x003e
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException
+            java.lang.String r1 = "Module without defined version"
+            r0.<init>(r1)
+            throw r0
+        L_0x003e:
+            com.fasterxml.jackson.databind.ObjectMapper$1 r0 = new com.fasterxml.jackson.databind.ObjectMapper$1
+            r0.<init>(r2)
+            r3.setupModule(r0)
+            goto L_0x0021
         */
         throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ObjectMapper.registerModule(com.fasterxml.jackson.databind.Module):com.fasterxml.jackson.databind.ObjectMapper");
     }
@@ -385,7 +412,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public static List<Module> findModules(ClassLoader classLoader) {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         Iterator it = (classLoader == null ? ServiceLoader.load(Module.class) : ServiceLoader.load(Module.class, classLoader)).iterator();
         while (it.hasNext()) {
             arrayList.add((Module) it.next());
@@ -394,7 +421,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectMapper findAndRegisterModules() {
-        return registerModules(findModules());
+        return registerModules((Iterable<Module>) findModules());
     }
 
     public SerializationConfig getSerializationConfig() {
@@ -479,8 +506,8 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectMapper setVisibility(VisibilityChecker<?> visibilityChecker) {
-        this._deserializationConfig = this._deserializationConfig.with((VisibilityChecker) visibilityChecker);
-        this._serializationConfig = this._serializationConfig.with((VisibilityChecker) visibilityChecker);
+        this._deserializationConfig = this._deserializationConfig.with(visibilityChecker);
+        this._serializationConfig = this._serializationConfig.with(visibilityChecker);
         return this;
     }
 
@@ -543,18 +570,18 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectMapper enableDefaultTyping(DefaultTyping defaultTyping) {
-        return enableDefaultTyping(defaultTyping, As.WRAPPER_ARRAY);
+        return enableDefaultTyping(defaultTyping, C0861As.WRAPPER_ARRAY);
     }
 
-    public ObjectMapper enableDefaultTyping(DefaultTyping defaultTyping, As as) {
-        if (as != As.EXTERNAL_PROPERTY) {
-            return setDefaultTyping(new DefaultTypeResolverBuilder(defaultTyping).init(Id.CLASS, null).inclusion(as));
+    public ObjectMapper enableDefaultTyping(DefaultTyping defaultTyping, C0861As as) {
+        if (as != C0861As.EXTERNAL_PROPERTY) {
+            return setDefaultTyping(new DefaultTypeResolverBuilder(defaultTyping).init(C0862Id.CLASS, null).inclusion(as));
         }
         throw new IllegalArgumentException("Can not use includeAs of " + as);
     }
 
     public ObjectMapper enableDefaultTypingAsProperty(DefaultTyping defaultTyping, String str) {
-        return setDefaultTyping(new DefaultTypeResolverBuilder(defaultTyping).init(Id.CLASS, null).inclusion(As.PROPERTY).typeProperty(str));
+        return setDefaultTyping(new DefaultTypeResolverBuilder(defaultTyping).init(C0862Id.CLASS, null).inclusion(C0861As.PROPERTY).typeProperty(str));
     }
 
     public ObjectMapper disableDefaultTyping() {
@@ -562,13 +589,13 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectMapper setDefaultTyping(TypeResolverBuilder<?> typeResolverBuilder) {
-        this._deserializationConfig = this._deserializationConfig.with((TypeResolverBuilder) typeResolverBuilder);
-        this._serializationConfig = this._serializationConfig.with((TypeResolverBuilder) typeResolverBuilder);
+        this._deserializationConfig = this._deserializationConfig.with(typeResolverBuilder);
+        this._serializationConfig = this._serializationConfig.with(typeResolverBuilder);
         return this;
     }
 
     public void registerSubtypes(Class<?>... clsArr) {
-        getSubtypeResolver().registerSubtypes((Class[]) clsArr);
+        getSubtypeResolver().registerSubtypes(clsArr);
     }
 
     public void registerSubtypes(NamedType... namedTypeArr) {
@@ -686,20 +713,20 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectMapper configure(MapperFeature mapperFeature, boolean z) {
-        SerializationConfig with;
-        DeserializationConfig with2;
+        SerializationConfig without;
+        DeserializationConfig without2;
         if (z) {
-            with = this._serializationConfig.with(mapperFeature);
+            without = this._serializationConfig.with(mapperFeature);
         } else {
-            with = this._serializationConfig.without(mapperFeature);
+            without = this._serializationConfig.without(mapperFeature);
         }
-        this._serializationConfig = with;
+        this._serializationConfig = without;
         if (z) {
-            with2 = this._deserializationConfig.with(mapperFeature);
+            without2 = this._deserializationConfig.with(mapperFeature);
         } else {
-            with2 = this._deserializationConfig.without(mapperFeature);
+            without2 = this._deserializationConfig.without(mapperFeature);
         }
-        this._deserializationConfig = with2;
+        this._deserializationConfig = without2;
         return this;
     }
 
@@ -828,7 +855,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> T readValue(JsonParser jsonParser, TypeReference<?> typeReference) throws IOException, JsonParseException, JsonMappingException {
-        return _readValue(getDeserializationConfig(), jsonParser, this._typeFactory.constructType((TypeReference) typeReference));
+        return _readValue(getDeserializationConfig(), jsonParser, this._typeFactory.constructType(typeReference));
     }
 
     public final <T> T readValue(JsonParser jsonParser, ResolvedType resolvedType) throws IOException, JsonParseException, JsonMappingException {
@@ -844,11 +871,11 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         if (jsonParser.getCurrentToken() == null && jsonParser.nextToken() == null) {
             return null;
         }
-        JsonNode jsonNode = (JsonNode) _readValue(deserializationConfig, jsonParser, JSON_NODE_TYPE);
-        if (jsonNode == null) {
+        T t = (JsonNode) _readValue(deserializationConfig, jsonParser, JSON_NODE_TYPE);
+        if (t == null) {
             return getNodeFactory().nullNode();
         }
-        return jsonNode;
+        return t;
     }
 
     public <T> MappingIterator<T> readValues(JsonParser jsonParser, ResolvedType resolvedType) throws IOException, JsonProcessingException {
@@ -856,8 +883,8 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> MappingIterator<T> readValues(JsonParser jsonParser, JavaType javaType) throws IOException, JsonProcessingException {
-        DeserializationContext createDeserializationContext = createDeserializationContext(jsonParser, getDeserializationConfig());
-        return new MappingIterator(javaType, jsonParser, createDeserializationContext, _findRootDeserializer(createDeserializationContext, javaType), false, null);
+        DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser, getDeserializationConfig());
+        return new MappingIterator<>(javaType, jsonParser, createDeserializationContext, _findRootDeserializer(createDeserializationContext, javaType), false, null);
     }
 
     public <T> MappingIterator<T> readValues(JsonParser jsonParser, Class<T> cls) throws IOException, JsonProcessingException {
@@ -865,7 +892,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> MappingIterator<T> readValues(JsonParser jsonParser, TypeReference<?> typeReference) throws IOException, JsonProcessingException {
-        return readValues(jsonParser, this._typeFactory.constructType((TypeReference) typeReference));
+        return readValues(jsonParser, this._typeFactory.constructType(typeReference));
     }
 
     public JsonNode readTree(InputStream inputStream) throws IOException, JsonProcessingException {
@@ -903,14 +930,15 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         if (serializationConfig.isEnabled(SerializationFeature.INDENT_OUTPUT) && jsonGenerator.getPrettyPrinter() == null) {
             jsonGenerator.setPrettyPrinter(serializationConfig.constructDefaultPrettyPrinter());
         }
-        if (serializationConfig.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) && (obj instanceof Closeable)) {
-            _writeCloseableValue(jsonGenerator, obj, serializationConfig);
+        if (!serializationConfig.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) || !(obj instanceof Closeable)) {
+            _serializerProvider(serializationConfig).serializeValue(jsonGenerator, obj);
+            if (serializationConfig.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
+                jsonGenerator.flush();
+                return;
+            }
             return;
         }
-        _serializerProvider(serializationConfig).serializeValue(jsonGenerator, obj);
-        if (serializationConfig.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
-            jsonGenerator.flush();
-        }
+        _writeCloseableValue(jsonGenerator, obj, serializationConfig);
     }
 
     public void writeTree(JsonGenerator jsonGenerator, TreeNode treeNode) throws IOException, JsonProcessingException {
@@ -942,39 +970,41 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> T treeToValue(TreeNode treeNode, Class<T> cls) throws JsonProcessingException {
-        try {
-            if (cls != Object.class && cls.isAssignableFrom(treeNode.getClass())) {
-                return treeNode;
-            }
-            if (treeNode.asToken() == JsonToken.VALUE_EMBEDDED_OBJECT && (treeNode instanceof POJONode)) {
-                TreeNode pojo = ((POJONode) treeNode).getPojo();
-                if (pojo == null || cls.isInstance(pojo)) {
-                    return pojo;
+        if (cls != Object.class) {
+            try {
+                if (cls.isAssignableFrom(treeNode.getClass())) {
+                    return treeNode;
                 }
+            } catch (JsonProcessingException e) {
+                throw e;
+            } catch (IOException e2) {
+                throw new IllegalArgumentException(e2.getMessage(), e2);
             }
-            return readValue(treeAsTokens(treeNode), (Class) cls);
-        } catch (JsonProcessingException e) {
-            throw e;
-        } catch (Throwable e2) {
-            throw new IllegalArgumentException(e2.getMessage(), e2);
         }
+        if (treeNode.asToken() == JsonToken.VALUE_EMBEDDED_OBJECT && (treeNode instanceof POJONode)) {
+            Object pojo = ((POJONode) treeNode).getPojo();
+            if (pojo == null || cls.isInstance(pojo)) {
+                return pojo;
+            }
+        }
+        return readValue(treeAsTokens(treeNode), cls);
     }
 
     public <T extends JsonNode> T valueToTree(Object obj) throws IllegalArgumentException {
         if (obj == null) {
             return null;
         }
-        JsonGenerator tokenBuffer = new TokenBuffer((ObjectCodec) this, false);
+        TokenBuffer tokenBuffer = new TokenBuffer((ObjectCodec) this, false);
         if (isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)) {
             tokenBuffer = tokenBuffer.forceUseOfBigDecimal(true);
         }
         try {
-            writeValue(tokenBuffer, obj);
+            writeValue((JsonGenerator) tokenBuffer, obj);
             JsonParser asParser = tokenBuffer.asParser();
-            JsonNode jsonNode = (JsonNode) readTree(asParser);
+            T t = (JsonNode) readTree(asParser);
             asParser.close();
-            return jsonNode;
-        } catch (Throwable e) {
+            return t;
+        } catch (IOException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
@@ -1092,9 +1122,9 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public String writeValueAsString(Object obj) throws JsonProcessingException {
-        Writer segmentedStringWriter = new SegmentedStringWriter(this._jsonFactory._getBufferRecycler());
+        SegmentedStringWriter segmentedStringWriter = new SegmentedStringWriter(this._jsonFactory._getBufferRecycler());
         try {
-            _configAndWriteValue(this._jsonFactory.createGenerator(segmentedStringWriter), obj);
+            _configAndWriteValue(this._jsonFactory.createGenerator((Writer) segmentedStringWriter), obj);
             return segmentedStringWriter.getAndClear();
         } catch (JsonProcessingException e) {
             throw e;
@@ -1104,12 +1134,12 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public byte[] writeValueAsBytes(Object obj) throws JsonProcessingException {
-        OutputStream byteArrayBuilder = new ByteArrayBuilder(this._jsonFactory._getBufferRecycler());
+        ByteArrayBuilder byteArrayBuilder = new ByteArrayBuilder(this._jsonFactory._getBufferRecycler());
         try {
-            _configAndWriteValue(this._jsonFactory.createGenerator(byteArrayBuilder, JsonEncoding.UTF8), obj);
-            byte[] toByteArray = byteArrayBuilder.toByteArray();
+            _configAndWriteValue(this._jsonFactory.createGenerator((OutputStream) byteArrayBuilder, JsonEncoding.UTF8), obj);
+            byte[] byteArray = byteArrayBuilder.toByteArray();
             byteArrayBuilder.release();
-            return toByteArray;
+            return byteArray;
         } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e2) {
@@ -1134,7 +1164,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectWriter writerWithView(Class<?> cls) {
-        return _newWriter(getSerializationConfig().withView((Class) cls));
+        return _newWriter(getSerializationConfig().withView(cls));
     }
 
     public ObjectWriter writerFor(Class<?> cls) {
@@ -1142,7 +1172,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectWriter writerFor(TypeReference<?> typeReference) {
-        return _newWriter(getSerializationConfig(), typeReference == null ? null : this._typeFactory.constructType((TypeReference) typeReference), null);
+        return _newWriter(getSerializationConfig(), typeReference == null ? null : this._typeFactory.constructType(typeReference), null);
     }
 
     public ObjectWriter writerFor(JavaType javaType) {
@@ -1189,7 +1219,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
 
     @Deprecated
     public ObjectWriter writerWithType(TypeReference<?> typeReference) {
-        return _newWriter(getSerializationConfig(), typeReference == null ? null : this._typeFactory.constructType((TypeReference) typeReference), null);
+        return _newWriter(getSerializationConfig(), typeReference == null ? null : this._typeFactory.constructType(typeReference), null);
     }
 
     @Deprecated
@@ -1210,7 +1240,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectReader readerForUpdating(Object obj) {
-        return _newReader(getDeserializationConfig(), this._typeFactory.constructType(obj.getClass()), obj, null, this._injectableValues);
+        return _newReader(getDeserializationConfig(), this._typeFactory.constructType((Type) obj.getClass()), obj, null, this._injectableValues);
     }
 
     public ObjectReader readerFor(JavaType javaType) {
@@ -1222,7 +1252,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectReader readerFor(TypeReference<?> typeReference) {
-        return _newReader(getDeserializationConfig(), this._typeFactory.constructType((TypeReference) typeReference), null, null, this._injectableValues);
+        return _newReader(getDeserializationConfig(), this._typeFactory.constructType(typeReference), null, null, this._injectableValues);
     }
 
     public ObjectReader reader(JsonNodeFactory jsonNodeFactory) {
@@ -1239,7 +1269,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectReader readerWithView(Class<?> cls) {
-        return _newReader(getDeserializationConfig().withView((Class) cls));
+        return _newReader(getDeserializationConfig().withView(cls));
     }
 
     public ObjectReader reader(Base64Variant base64Variant) {
@@ -1262,7 +1292,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
 
     @Deprecated
     public ObjectReader reader(TypeReference<?> typeReference) {
-        return _newReader(getDeserializationConfig(), this._typeFactory.constructType((TypeReference) typeReference), null, null, this._injectableValues);
+        return _newReader(getDeserializationConfig(), this._typeFactory.constructType(typeReference), null, null, this._injectableValues);
     }
 
     public <T> T convertValue(Object obj, Class<T> cls) throws IllegalArgumentException {
@@ -1273,7 +1303,7 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> T convertValue(Object obj, TypeReference<?> typeReference) throws IllegalArgumentException {
-        return convertValue(obj, this._typeFactory.constructType((TypeReference) typeReference));
+        return convertValue(obj, this._typeFactory.constructType(typeReference));
     }
 
     public <T> T convertValue(Object obj, JavaType javaType) throws IllegalArgumentException {
@@ -1283,10 +1313,11 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         return _convert(obj, javaType);
     }
 
-    protected Object _convert(Object obj, JavaType javaType) throws IllegalArgumentException {
-        Class rawClass = javaType.getRawClass();
+    /* access modifiers changed from: protected */
+    public Object _convert(Object obj, JavaType javaType) throws IllegalArgumentException {
+        Class<Object> rawClass = javaType.getRawClass();
         if (rawClass == Object.class || javaType.hasGenericTypes() || !rawClass.isAssignableFrom(obj.getClass())) {
-            JsonGenerator tokenBuffer = new TokenBuffer((ObjectCodec) this, false);
+            TokenBuffer tokenBuffer = new TokenBuffer((ObjectCodec) this, false);
             if (isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)) {
                 tokenBuffer = tokenBuffer.forceUseOfBigDecimal(true);
             }
@@ -1295,18 +1326,17 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
                 JsonParser asParser = tokenBuffer.asParser();
                 DeserializationConfig deserializationConfig = getDeserializationConfig();
                 JsonToken _initForReading = _initForReading(asParser);
-                DeserializationContext createDeserializationContext;
                 if (_initForReading == JsonToken.VALUE_NULL) {
-                    createDeserializationContext = createDeserializationContext(asParser, deserializationConfig);
+                    DefaultDeserializationContext createDeserializationContext = createDeserializationContext(asParser, deserializationConfig);
                     obj = _findRootDeserializer(createDeserializationContext, javaType).getNullValue(createDeserializationContext);
                 } else if (_initForReading == JsonToken.END_ARRAY || _initForReading == JsonToken.END_OBJECT) {
                     obj = null;
                 } else {
-                    createDeserializationContext = createDeserializationContext(asParser, deserializationConfig);
-                    obj = _findRootDeserializer(createDeserializationContext, javaType).deserialize(asParser, createDeserializationContext);
+                    DefaultDeserializationContext createDeserializationContext2 = createDeserializationContext(asParser, deserializationConfig);
+                    obj = _findRootDeserializer(createDeserializationContext2, javaType).deserialize(asParser, createDeserializationContext2);
                 }
                 asParser.close();
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
         }
@@ -1329,222 +1359,224 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         _serializerProvider(getSerializationConfig()).acceptJsonFormatVisitor(javaType, jsonFormatVisitorWrapper);
     }
 
-    protected DefaultSerializerProvider _serializerProvider(SerializationConfig serializationConfig) {
+    /* access modifiers changed from: protected */
+    public DefaultSerializerProvider _serializerProvider(SerializationConfig serializationConfig) {
         return this._serializerProvider.createInstance(serializationConfig, this._serializerFactory);
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected PrettyPrinter _defaultPrettyPrinter() {
+    public PrettyPrinter _defaultPrettyPrinter() {
         return this._serializationConfig.constructDefaultPrettyPrinter();
     }
 
-    protected final void _configAndWriteValue(JsonGenerator jsonGenerator, Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _configAndWriteValue(JsonGenerator jsonGenerator, Object obj) throws IOException {
         SerializationConfig serializationConfig = getSerializationConfig();
         serializationConfig.initialize(jsonGenerator);
-        if (serializationConfig.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) && (obj instanceof Closeable)) {
-            _configAndWriteCloseable(jsonGenerator, obj, serializationConfig);
-            return;
-        }
-        Object obj2 = null;
-        try {
-            _serializerProvider(serializationConfig).serializeValue(jsonGenerator, obj);
-            obj2 = 1;
-            jsonGenerator.close();
-        } catch (Throwable th) {
-            if (obj2 == null) {
-                jsonGenerator.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
-                try {
-                    jsonGenerator.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    @Deprecated
-    protected final void _configAndWriteValue(JsonGenerator jsonGenerator, Object obj, Class<?> cls) throws IOException {
-        SerializationConfig withView = getSerializationConfig().withView((Class) cls);
-        withView.initialize(jsonGenerator);
-        if (withView.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) && (obj instanceof Closeable)) {
-            _configAndWriteCloseable(jsonGenerator, obj, withView);
-            return;
-        }
-        Object obj2 = null;
-        try {
-            _serializerProvider(withView).serializeValue(jsonGenerator, obj);
-            obj2 = 1;
-            jsonGenerator.close();
-        } catch (Throwable th) {
-            if (obj2 == null) {
-                jsonGenerator.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
-                try {
-                    jsonGenerator.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    private final void _configAndWriteCloseable(JsonGenerator jsonGenerator, Object obj, SerializationConfig serializationConfig) throws IOException {
-        Closeable closeable;
-        Throwable th;
-        JsonGenerator jsonGenerator2 = null;
-        Closeable closeable2 = (Closeable) obj;
-        try {
-            Closeable closeable3;
-            _serializerProvider(serializationConfig).serializeValue(jsonGenerator, obj);
-            JsonGenerator jsonGenerator3 = null;
+        if (!serializationConfig.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) || !(obj instanceof Closeable)) {
+            boolean z = false;
             try {
+                _serializerProvider(serializationConfig).serializeValue(jsonGenerator, obj);
+                z = true;
                 jsonGenerator.close();
-                closeable3 = null;
-            } catch (Throwable th2) {
-                Throwable th3 = th2;
-                closeable = closeable2;
-                th = th3;
-                if (jsonGenerator2 != null) {
-                    jsonGenerator2.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
+            } catch (Throwable th) {
+                if (!z) {
+                    jsonGenerator.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
                     try {
-                        jsonGenerator2.close();
+                        jsonGenerator.close();
                     } catch (IOException e) {
                     }
                 }
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (IOException e2) {
-                    }
-                }
                 throw th;
             }
-            try {
-                closeable2.close();
-                if (jsonGenerator2 != null) {
-                    jsonGenerator2.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
-                    try {
-                        jsonGenerator3.close();
-                    } catch (IOException e3) {
-                    }
-                }
-                if (jsonGenerator2 != null) {
-                    try {
-                        closeable3.close();
-                    } catch (IOException e4) {
-                    }
-                }
-            } catch (Throwable th4) {
-                th = th4;
-                Object obj2 = jsonGenerator2;
-                if (jsonGenerator2 != null) {
-                    jsonGenerator2.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
-                    jsonGenerator2.close();
-                }
-                if (closeable != null) {
-                    closeable.close();
-                }
-                throw th;
-            }
-        } catch (Throwable th22) {
-            jsonGenerator2 = jsonGenerator;
-            Closeable closeable4 = closeable2;
-            th = th22;
-            closeable = closeable4;
-            if (jsonGenerator2 != null) {
-                jsonGenerator2.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
-                jsonGenerator2.close();
-            }
-            if (closeable != null) {
-                closeable.close();
-            }
-            throw th;
+        } else {
+            _configAndWriteCloseable(jsonGenerator, obj, serializationConfig);
         }
     }
 
-    private final void _writeCloseableValue(JsonGenerator jsonGenerator, Object obj, SerializationConfig serializationConfig) throws IOException {
-        Closeable closeable;
-        Throwable th;
-        Closeable closeable2 = (Closeable) obj;
-        try {
-            _serializerProvider(serializationConfig).serializeValue(jsonGenerator, obj);
-            if (serializationConfig.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
-                jsonGenerator.flush();
-            }
-            closeable = null;
+    /* access modifiers changed from: protected */
+    @Deprecated
+    public final void _configAndWriteValue(JsonGenerator jsonGenerator, Object obj, Class<?> cls) throws IOException {
+        SerializationConfig withView = getSerializationConfig().withView(cls);
+        withView.initialize(jsonGenerator);
+        if (!withView.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) || !(obj instanceof Closeable)) {
+            boolean z = false;
             try {
-                closeable2.close();
-                if (closeable != null) {
+                _serializerProvider(withView).serializeValue(jsonGenerator, obj);
+                z = true;
+                jsonGenerator.close();
+            } catch (Throwable th) {
+                if (!z) {
+                    jsonGenerator.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
                     try {
-                        closeable.close();
+                        jsonGenerator.close();
                     } catch (IOException e) {
                     }
                 }
-            } catch (Throwable th2) {
-                th = th2;
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (IOException e2) {
-                    }
-                }
                 throw th;
             }
-        } catch (Throwable th3) {
-            Throwable th4 = th3;
-            closeable = closeable2;
-            th = th4;
-            if (closeable != null) {
-                closeable.close();
-            }
-            throw th;
+        } else {
+            _configAndWriteCloseable(jsonGenerator, obj, withView);
         }
     }
 
-    protected DefaultDeserializationContext createDeserializationContext(JsonParser jsonParser, DeserializationConfig deserializationConfig) {
+    /* JADX WARNING: Removed duplicated region for block: B:19:0x0027  */
+    /* JADX WARNING: Removed duplicated region for block: B:23:0x0031 A[SYNTHETIC, Splitter:B:23:0x0031] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private final void _configAndWriteCloseable(com.fasterxml.jackson.core.JsonGenerator r5, java.lang.Object r6, com.fasterxml.jackson.databind.SerializationConfig r7) throws java.io.IOException {
+        /*
+            r4 = this;
+            r3 = 0
+            r0 = r6
+            java.io.Closeable r0 = (java.io.Closeable) r0
+            com.fasterxml.jackson.databind.ser.DefaultSerializerProvider r1 = r4._serializerProvider(r7)     // Catch:{ all -> 0x0023 }
+            r1.serializeValue(r5, r6)     // Catch:{ all -> 0x0023 }
+            r1 = 0
+            r5.close()     // Catch:{ all -> 0x003d }
+            r2 = 0
+            r0.close()     // Catch:{ all -> 0x0041 }
+            if (r3 == 0) goto L_0x001d
+            com.fasterxml.jackson.core.JsonGenerator$Feature r0 = com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT
+            r3.disable(r0)
+            r1.close()     // Catch:{ IOException -> 0x0035 }
+        L_0x001d:
+            if (r3 == 0) goto L_0x0022
+            r2.close()     // Catch:{ IOException -> 0x0037 }
+        L_0x0022:
+            return
+        L_0x0023:
+            r1 = move-exception
+            r2 = r0
+        L_0x0025:
+            if (r5 == 0) goto L_0x002f
+            com.fasterxml.jackson.core.JsonGenerator$Feature r0 = com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT
+            r5.disable(r0)
+            r5.close()     // Catch:{ IOException -> 0x0039 }
+        L_0x002f:
+            if (r2 == 0) goto L_0x0034
+            r2.close()     // Catch:{ IOException -> 0x003b }
+        L_0x0034:
+            throw r1
+        L_0x0035:
+            r0 = move-exception
+            goto L_0x001d
+        L_0x0037:
+            r0 = move-exception
+            goto L_0x0022
+        L_0x0039:
+            r0 = move-exception
+            goto L_0x002f
+        L_0x003b:
+            r0 = move-exception
+            goto L_0x0034
+        L_0x003d:
+            r1 = move-exception
+            r2 = r0
+            r5 = r3
+            goto L_0x0025
+        L_0x0041:
+            r0 = move-exception
+            r1 = r0
+            r2 = r3
+            r5 = r3
+            goto L_0x0025
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ObjectMapper._configAndWriteCloseable(com.fasterxml.jackson.core.JsonGenerator, java.lang.Object, com.fasterxml.jackson.databind.SerializationConfig):void");
+    }
+
+    /* JADX WARNING: Removed duplicated region for block: B:14:0x0023 A[SYNTHETIC, Splitter:B:14:0x0023] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private final void _writeCloseableValue(com.fasterxml.jackson.core.JsonGenerator r4, java.lang.Object r5, com.fasterxml.jackson.databind.SerializationConfig r6) throws java.io.IOException {
+        /*
+            r3 = this;
+            r0 = r5
+            java.io.Closeable r0 = (java.io.Closeable) r0
+            com.fasterxml.jackson.databind.ser.DefaultSerializerProvider r1 = r3._serializerProvider(r6)     // Catch:{ all -> 0x001f }
+            r1.serializeValue(r4, r5)     // Catch:{ all -> 0x001f }
+            com.fasterxml.jackson.databind.SerializationFeature r1 = com.fasterxml.jackson.databind.SerializationFeature.FLUSH_AFTER_WRITE_VALUE     // Catch:{ all -> 0x001f }
+            boolean r1 = r6.isEnabled(r1)     // Catch:{ all -> 0x001f }
+            if (r1 == 0) goto L_0x0015
+            r4.flush()     // Catch:{ all -> 0x001f }
+        L_0x0015:
+            r2 = 0
+            r0.close()     // Catch:{ all -> 0x002b }
+            if (r2 == 0) goto L_0x001e
+            r2.close()     // Catch:{ IOException -> 0x0027 }
+        L_0x001e:
+            return
+        L_0x001f:
+            r1 = move-exception
+            r2 = r0
+        L_0x0021:
+            if (r2 == 0) goto L_0x0026
+            r2.close()     // Catch:{ IOException -> 0x0029 }
+        L_0x0026:
+            throw r1
+        L_0x0027:
+            r0 = move-exception
+            goto L_0x001e
+        L_0x0029:
+            r0 = move-exception
+            goto L_0x0026
+        L_0x002b:
+            r0 = move-exception
+            r1 = r0
+            goto L_0x0021
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ObjectMapper._writeCloseableValue(com.fasterxml.jackson.core.JsonGenerator, java.lang.Object, com.fasterxml.jackson.databind.SerializationConfig):void");
+    }
+
+    /* access modifiers changed from: protected */
+    public DefaultDeserializationContext createDeserializationContext(JsonParser jsonParser, DeserializationConfig deserializationConfig) {
         return this._deserializationContext.createInstance(deserializationConfig, jsonParser, this._injectableValues);
     }
 
-    protected Object _readValue(DeserializationConfig deserializationConfig, JsonParser jsonParser, JavaType javaType) throws IOException, JsonParseException, JsonMappingException {
-        Object nullValue;
+    /* access modifiers changed from: protected */
+    public Object _readValue(DeserializationConfig deserializationConfig, JsonParser jsonParser, JavaType javaType) throws IOException, JsonParseException, JsonMappingException {
+        Object obj;
         JsonToken _initForReading = _initForReading(jsonParser);
         if (_initForReading == JsonToken.VALUE_NULL) {
-            DeserializationContext createDeserializationContext = createDeserializationContext(jsonParser, deserializationConfig);
-            nullValue = _findRootDeserializer(createDeserializationContext, javaType).getNullValue(createDeserializationContext);
+            DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser, deserializationConfig);
+            obj = _findRootDeserializer(createDeserializationContext, javaType).getNullValue(createDeserializationContext);
         } else if (_initForReading == JsonToken.END_ARRAY || _initForReading == JsonToken.END_OBJECT) {
-            nullValue = null;
+            obj = null;
         } else {
-            DeserializationContext createDeserializationContext2 = createDeserializationContext(jsonParser, deserializationConfig);
+            DefaultDeserializationContext createDeserializationContext2 = createDeserializationContext(jsonParser, deserializationConfig);
             JsonDeserializer _findRootDeserializer = _findRootDeserializer(createDeserializationContext2, javaType);
             if (deserializationConfig.useRootWrapping()) {
-                nullValue = _unwrapAndDeserialize(jsonParser, createDeserializationContext2, deserializationConfig, javaType, _findRootDeserializer);
+                obj = _unwrapAndDeserialize(jsonParser, createDeserializationContext2, deserializationConfig, javaType, _findRootDeserializer);
             } else {
-                nullValue = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2);
+                obj = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2);
             }
         }
         jsonParser.clearCurrentToken();
-        return nullValue;
+        return obj;
     }
 
-    protected Object _readMapAndClose(JsonParser jsonParser, JavaType javaType) throws IOException, JsonParseException, JsonMappingException {
+    /* access modifiers changed from: protected */
+    public Object _readMapAndClose(JsonParser jsonParser, JavaType javaType) throws IOException, JsonParseException, JsonMappingException {
+        Object obj;
         try {
-            Object nullValue;
             JsonToken _initForReading = _initForReading(jsonParser);
             if (_initForReading == JsonToken.VALUE_NULL) {
-                DeserializationContext createDeserializationContext = createDeserializationContext(jsonParser, getDeserializationConfig());
-                nullValue = _findRootDeserializer(createDeserializationContext, javaType).getNullValue(createDeserializationContext);
+                DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser, getDeserializationConfig());
+                obj = _findRootDeserializer(createDeserializationContext, javaType).getNullValue(createDeserializationContext);
             } else if (_initForReading == JsonToken.END_ARRAY || _initForReading == JsonToken.END_OBJECT) {
-                nullValue = null;
+                obj = null;
             } else {
                 DeserializationConfig deserializationConfig = getDeserializationConfig();
-                DeserializationContext createDeserializationContext2 = createDeserializationContext(jsonParser, deserializationConfig);
+                DefaultDeserializationContext createDeserializationContext2 = createDeserializationContext(jsonParser, deserializationConfig);
                 JsonDeserializer _findRootDeserializer = _findRootDeserializer(createDeserializationContext2, javaType);
                 if (deserializationConfig.useRootWrapping()) {
-                    nullValue = _unwrapAndDeserialize(jsonParser, createDeserializationContext2, deserializationConfig, javaType, _findRootDeserializer);
+                    obj = _unwrapAndDeserialize(jsonParser, createDeserializationContext2, deserializationConfig, javaType, _findRootDeserializer);
                 } else {
-                    nullValue = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2);
+                    obj = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2);
                 }
                 createDeserializationContext2.checkUnresolvedObjectId();
             }
             jsonParser.clearCurrentToken();
-            return nullValue;
+            return obj;
         } finally {
             try {
                 jsonParser.close();
@@ -1553,7 +1585,8 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         }
     }
 
-    protected JsonToken _initForReading(JsonParser jsonParser) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonToken _initForReading(JsonParser jsonParser) throws IOException {
         this._deserializationConfig.initialize(jsonParser);
         JsonToken currentToken = jsonParser.getCurrentToken();
         if (currentToken == null) {
@@ -1565,7 +1598,8 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         return currentToken;
     }
 
-    protected Object _unwrapAndDeserialize(JsonParser jsonParser, DeserializationContext deserializationContext, DeserializationConfig deserializationConfig, JavaType javaType, JsonDeserializer<Object> jsonDeserializer) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _unwrapAndDeserialize(JsonParser jsonParser, DeserializationContext deserializationContext, DeserializationConfig deserializationConfig, JavaType javaType, JsonDeserializer<Object> jsonDeserializer) throws IOException {
         String simpleName = deserializationConfig.findRootName(javaType).getSimpleName();
         if (jsonParser.getCurrentToken() != JsonToken.START_OBJECT) {
             throw JsonMappingException.from(jsonParser, "Current token not START_OBJECT (needed to unwrap root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
@@ -1573,19 +1607,20 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
             throw JsonMappingException.from(jsonParser, "Current token not FIELD_NAME (to contain expected root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
         } else {
             String currentName = jsonParser.getCurrentName();
-            if (simpleName.equals(currentName)) {
-                jsonParser.nextToken();
-                Object deserialize = jsonDeserializer.deserialize(jsonParser, deserializationContext);
-                if (jsonParser.nextToken() == JsonToken.END_OBJECT) {
-                    return deserialize;
-                }
-                throw JsonMappingException.from(jsonParser, "Current token not END_OBJECT (to match wrapper object with root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
+            if (!simpleName.equals(currentName)) {
+                throw JsonMappingException.from(jsonParser, "Root name '" + currentName + "' does not match expected ('" + simpleName + "') for type " + javaType);
             }
-            throw JsonMappingException.from(jsonParser, "Root name '" + currentName + "' does not match expected ('" + simpleName + "') for type " + javaType);
+            jsonParser.nextToken();
+            Object deserialize = jsonDeserializer.deserialize(jsonParser, deserializationContext);
+            if (jsonParser.nextToken() == JsonToken.END_OBJECT) {
+                return deserialize;
+            }
+            throw JsonMappingException.from(jsonParser, "Current token not END_OBJECT (to match wrapper object with root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
         }
     }
 
-    protected JsonDeserializer<Object> _findRootDeserializer(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _findRootDeserializer(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
         JsonDeserializer<Object> jsonDeserializer = (JsonDeserializer) this._rootDeserializers.get(javaType);
         if (jsonDeserializer == null) {
             jsonDeserializer = deserializationContext.findRootValueDeserializer(javaType);
@@ -1597,7 +1632,8 @@ public class ObjectMapper extends ObjectCodec implements Versioned, Serializable
         return jsonDeserializer;
     }
 
-    protected void _verifySchemaType(FormatSchema formatSchema) {
+    /* access modifiers changed from: protected */
+    public void _verifySchemaType(FormatSchema formatSchema) {
         if (formatSchema != null && !this._jsonFactory.canUseSchema(formatSchema)) {
             throw new IllegalArgumentException("Can not use FormatSchema of type " + formatSchema.getClass().getName() + " for format " + this._jsonFactory.getFormatName());
         }

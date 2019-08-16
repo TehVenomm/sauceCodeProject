@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Brain
+public class Brain : MonoBehaviour
 {
 	public BrainParam param = new BrainParam();
 
-	public Transform _frontTransform;
+	private Transform _frontTransform;
 
-	public Transform _backTransform;
+	private Transform _backTransform;
 
 	public bool canCheckAvoidAttack;
 
@@ -169,7 +169,7 @@ public class Brain
 
 	protected virtual void Update()
 	{
-		if (!(owner == null) && !owner.isDead && isInitialized)
+		if (!(owner == null) && !owner.isDead && !owner.IsStone() && isInitialized)
 		{
 			if (opponentMemSpanTimer != null && opponentMemSpanTimer.IsReady())
 			{

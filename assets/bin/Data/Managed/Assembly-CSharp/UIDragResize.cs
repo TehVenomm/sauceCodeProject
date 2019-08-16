@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Drag-Resize Widget")]
-public class UIDragResize
+public class UIDragResize : MonoBehaviour
 {
 	public UIWidget target;
 
@@ -86,25 +86,26 @@ public class UIDragResize
 		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		if (mDragging && target != null)
+		if (!mDragging || !(target != null))
 		{
-			Ray currentRay = UICamera.currentRay;
-			float num = default(float);
-			if (mPlane.Raycast(currentRay, ref num))
+			return;
+		}
+		Ray currentRay = UICamera.currentRay;
+		float num = default(float);
+		if (mPlane.Raycast(currentRay, ref num))
+		{
+			Transform cachedTransform = target.cachedTransform;
+			cachedTransform.set_localPosition(mLocalPos);
+			target.width = mWidth;
+			target.height = mHeight;
+			Vector3 val = currentRay.GetPoint(num) - mRayPos;
+			cachedTransform.set_position(cachedTransform.get_position() + val);
+			Vector3 val2 = Quaternion.Inverse(cachedTransform.get_localRotation()) * (cachedTransform.get_localPosition() - mLocalPos);
+			cachedTransform.set_localPosition(mLocalPos);
+			NGUIMath.ResizeWidget(target, pivot, val2.x, val2.y, minWidth, minHeight, maxWidth, maxHeight);
+			if (updateAnchors)
 			{
-				Transform cachedTransform = target.cachedTransform;
-				cachedTransform.set_localPosition(mLocalPos);
-				target.width = mWidth;
-				target.height = mHeight;
-				Vector3 val = currentRay.GetPoint(num) - mRayPos;
-				cachedTransform.set_position(cachedTransform.get_position() + val);
-				Vector3 val2 = Quaternion.Inverse(cachedTransform.get_localRotation()) * (cachedTransform.get_localPosition() - mLocalPos);
-				cachedTransform.set_localPosition(mLocalPos);
-				NGUIMath.ResizeWidget(target, pivot, val2.x, val2.y, minWidth, minHeight, maxWidth, maxHeight);
-				if (updateAnchors)
-				{
-					target.BroadcastMessage("UpdateAnchors");
-				}
+				target.BroadcastMessage("UpdateAnchors");
 			}
 		}
 	}

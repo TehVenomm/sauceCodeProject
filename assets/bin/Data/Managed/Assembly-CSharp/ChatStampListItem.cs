@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class ChatStampListItem
+public class ChatStampListItem : MonoBehaviour
 {
 	[SerializeField]
 	private BoxCollider m_Colider;
@@ -11,6 +11,8 @@ public class ChatStampListItem
 	private UITexture m_Texture;
 
 	public Action onButton;
+
+	private bool isDummy;
 
 	private IEnumerator m_CoroutineLoadStamp;
 
@@ -42,14 +44,24 @@ public class ChatStampListItem
 	{
 		StampId = _stampId;
 		IsReady = false;
-		SetActiveComponents(false);
+		isDummy = false;
+		SetActiveComponents(isActive: false);
 		RequestLoadStamp();
+	}
+
+	public void SetAsDummy()
+	{
+		isDummy = true;
+		SetActiveComponents(isActive: false);
 	}
 
 	public void SetActiveComponents(bool isActive)
 	{
-		m_Colider.set_enabled(isActive);
-		m_Texture.alpha = (float)(isActive ? 1 : 0);
+		if (!isDummy || !isActive)
+		{
+			m_Colider.set_enabled(isActive);
+			m_Texture.alpha = (isActive ? 1 : 0);
+		}
 	}
 
 	public void OnButten()
@@ -62,8 +74,6 @@ public class ChatStampListItem
 
 	private void RequestLoadStamp()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		CancelLoadStamp();
 		m_CoroutineLoadStamp = CoroutineLoadStamp();
 		if (this.get_gameObject().get_activeInHierarchy())
@@ -75,16 +85,16 @@ public class ChatStampListItem
 	private IEnumerator CoroutineLoadStamp()
 	{
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_stamp = load_queue.LoadChatStamp(StampId, false);
+		LoadObject lo_stamp = load_queue.LoadChatStamp(StampId);
 		while (load_queue.IsLoading())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (lo_stamp.loadedObject != null)
 		{
-			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
-			m_Texture.mainTexture = stamp;
-			SetActiveComponents(true);
+			Texture2D mainTexture = lo_stamp.loadedObject as Texture2D;
+			m_Texture.mainTexture = mainTexture;
+			SetActiveComponents(isActive: true);
 			IsReady = true;
 		}
 		m_CoroutineLoadStamp = null;
@@ -99,7 +109,7 @@ public class ChatStampListItem
 	{
 		while (m_CoroutineLoadStamp != null && m_CoroutineLoadStamp.MoveNext())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 	}
 

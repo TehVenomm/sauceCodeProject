@@ -1,4 +1,4 @@
-package android.support.v4.os;
+package android.support.p000v4.p002os;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,20 +8,12 @@ import android.os.Parcelable.Creator;
 import android.os.RemoteException;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.os.IResultReceiver.Stub;
+import android.support.p000v4.p002os.IResultReceiver.Stub;
 
 @RestrictTo({Scope.LIBRARY_GROUP})
+/* renamed from: android.support.v4.os.ResultReceiver */
 public class ResultReceiver implements Parcelable {
-    public static final Creator<ResultReceiver> CREATOR = new C00961();
-    final Handler mHandler;
-    final boolean mLocal;
-    IResultReceiver mReceiver;
-
-    /* renamed from: android.support.v4.os.ResultReceiver$1 */
-    static final class C00961 implements Creator<ResultReceiver> {
-        C00961() {
-        }
-
+    public static final Creator<ResultReceiver> CREATOR = new Creator<ResultReceiver>() {
         public ResultReceiver createFromParcel(Parcel parcel) {
             return new ResultReceiver(parcel);
         }
@@ -29,8 +21,12 @@ public class ResultReceiver implements Parcelable {
         public ResultReceiver[] newArray(int i) {
             return new ResultReceiver[i];
         }
-    }
+    };
+    final Handler mHandler;
+    final boolean mLocal;
+    IResultReceiver mReceiver;
 
+    /* renamed from: android.support.v4.os.ResultReceiver$MyResultReceiver */
     class MyResultReceiver extends Stub {
         MyResultReceiver() {
         }
@@ -44,6 +40,7 @@ public class ResultReceiver implements Parcelable {
         }
     }
 
+    /* renamed from: android.support.v4.os.ResultReceiver$MyRunnable */
     class MyRunnable implements Runnable {
         final int mResultCode;
         final Bundle mResultData;
@@ -73,7 +70,8 @@ public class ResultReceiver implements Parcelable {
         return 0;
     }
 
-    protected void onReceiveResult(int i, Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onReceiveResult(int i, Bundle bundle) {
     }
 
     public void send(int i, Bundle bundle) {

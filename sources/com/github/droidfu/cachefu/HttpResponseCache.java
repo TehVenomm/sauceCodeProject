@@ -34,7 +34,8 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
         return CacheHelper.getFileNameFromUrl(str);
     }
 
-    protected ResponseData readValueFromDisk(File file) throws IOException {
+    /* access modifiers changed from: protected */
+    public ResponseData readValueFromDisk(File file) throws IOException {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
         long length = file.length();
         if (length > 2147483647L) {
@@ -61,7 +62,8 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
         }
     }
 
-    protected void writeValueToDisk(File file, ResponseData responseData) throws IOException {
+    /* access modifiers changed from: protected */
+    public void writeValueToDisk(File file, ResponseData responseData) throws IOException {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
         bufferedOutputStream.write(responseData.getStatusCode());
         bufferedOutputStream.write(responseData.getResponseBody());

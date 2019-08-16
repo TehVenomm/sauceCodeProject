@@ -13,9 +13,7 @@ namespace Network
 
 		public DateTime ConvToDateTime()
 		{
-			DateTime result = DateTime.Parse(date);
-			result = result.AddSeconds(1.0);
-			return result;
+			return DateTime.Parse(date).AddSeconds(1.0);
 		}
 
 		public TimeSpan CalcRemainTime()

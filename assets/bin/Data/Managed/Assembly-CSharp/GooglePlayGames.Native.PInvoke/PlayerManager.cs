@@ -6,22 +6,18 @@ using GooglePlayGames.OurUtils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class PlayerManager
 	{
-		internal class FetchListResponse : BaseReferenceHolder, IEnumerable, IEnumerable<NativePlayer>
+		internal class FetchListResponse : BaseReferenceHolder, IEnumerable<NativePlayer>, IEnumerable
 		{
 			internal FetchListResponse(IntPtr selfPointer)
 				: base(selfPointer)
 			{
-			}
-
-			IEnumerator IEnumerable.GetEnumerator()
-			{
-				return GetEnumerator();
 			}
 
 			protected override void CallDispose(HandleRef selfPointer)
@@ -37,6 +33,11 @@ namespace GooglePlayGames.Native.PInvoke
 			public IEnumerator<NativePlayer> GetEnumerator()
 			{
 				return PInvokeUtilities.ToEnumerator(Length(), (UIntPtr index) => GetElement(index));
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
 			}
 
 			internal UIntPtr Length()
@@ -137,6 +138,24 @@ namespace GooglePlayGames.Native.PInvoke
 		}
 
 		private readonly GameServices mGameServices;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchSelfResponse> _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.PlayerManager.FetchSelfCallback _003C_003Ef__mg_0024cache1;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchResponse> _003C_003Ef__mg_0024cache2;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.PlayerManager.FetchCallback _003C_003Ef__mg_0024cache3;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchListResponse> _003C_003Ef__mg_0024cache4;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.PlayerManager.FetchListCallback _003C_003Ef__mg_0024cache5;
 
 		internal PlayerManager(GameServices services)
 		{

@@ -1,11 +1,13 @@
-package io.fabric.sdk.android.services.network;
+package p017io.fabric.sdk.android.services.network;
 
 import android.text.TextUtils;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.TreeMap;
 
+/* renamed from: io.fabric.sdk.android.services.network.UrlUtils */
 public final class UrlUtils {
     public static final String UTF8 = "UTF8";
 
@@ -13,7 +15,7 @@ public final class UrlUtils {
     }
 
     public static TreeMap<String, String> getQueryParams(String str, boolean z) {
-        TreeMap<String, String> treeMap = new TreeMap();
+        TreeMap<String, String> treeMap = new TreeMap<>();
         if (str != null) {
             for (String split : str.split("&")) {
                 String[] split2 = split.split("=");
@@ -43,25 +45,25 @@ public final class UrlUtils {
         if (str == null) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         String urlEncode = urlEncode(str);
         int length = urlEncode.length();
         int i = 0;
         while (i < length) {
             char charAt = urlEncode.charAt(i);
             if (charAt == '*') {
-                stringBuilder.append("%2A");
+                sb.append("%2A");
             } else if (charAt == '+') {
-                stringBuilder.append("%20");
+                sb.append("%20");
             } else if (charAt == '%' && i + 2 < length && urlEncode.charAt(i + 1) == '7' && urlEncode.charAt(i + 2) == 'E') {
-                stringBuilder.append('~');
+                sb.append('~');
                 i += 2;
             } else {
-                stringBuilder.append(charAt);
+                sb.append(charAt);
             }
             i++;
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String urlDecode(String str) {
@@ -70,7 +72,7 @@ public final class UrlUtils {
         }
         try {
             return URLDecoder.decode(str, UTF8);
-        } catch (Throwable e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -81,7 +83,7 @@ public final class UrlUtils {
         }
         try {
             return URLEncoder.encode(str, UTF8);
-        } catch (Throwable e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

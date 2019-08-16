@@ -1,10 +1,10 @@
+using System.Runtime.CompilerServices;
+
 public class StageTable : Singleton<StageTable>, IDataTable
 {
 	public class StageData
 	{
 		public const int USE_EFFECT_NUM = 8;
-
-		public const string NT = "name,scene,ground,sky,attributeID,cameraLinkEffect,cameraLinkEffectY0,rootEffect,useEffect0,useEffect1,useEffect2,useEffect3,useEffect4,useEffect5,useEffect6,useEffect7";
 
 		public string scene;
 
@@ -21,6 +21,8 @@ public class StageTable : Singleton<StageTable>, IDataTable
 		public string rootEffect;
 
 		public string[] useEffects = new string[8];
+
+		public const string NT = "name,scene,ground,sky,attributeID,cameraLinkEffect,cameraLinkEffectY0,rootEffect,useEffect0,useEffect1,useEffect2,useEffect3,useEffect4,useEffect5,useEffect6,useEffect7";
 
 		public static bool cb(CSVReader csv, StageData data, ref string key)
 		{
@@ -39,6 +41,9 @@ public class StageTable : Singleton<StageTable>, IDataTable
 			return true;
 		}
 	}
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackStringKeyReadCSV<StageData> _003C_003Ef__mg_0024cache0;
 
 	public StringKeyTable<StageData> dataTable
 	{

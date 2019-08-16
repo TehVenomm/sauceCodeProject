@@ -3,9 +3,9 @@ using System;
 using System.IO;
 using UnityEngine;
 
-public class PacketTest
+public class PacketTest : MonoBehaviour
 {
-	private SerializationContext context = SerializationContext.Default;
+	private SerializationContext context = SerializationContext.get_Default();
 
 	public PacketTest()
 		: this()
@@ -70,7 +70,7 @@ public class PacketTest
 		{
 			LogError("Test4 Error:" + arg4);
 		}
-		for (int i = 0; i <= 261; i++)
+		for (int i = 0; i <= 263; i++)
 		{
 			Type modelType = ((PACKET_TYPE)i).GetModelType();
 			try
@@ -108,9 +108,9 @@ public class PacketTest
 		Log("before pos=" + coop_Model_ObjectAttackedHitFix.hitPos);
 		Type typeFromHandle = typeof(Coop_Model_ObjectAttackedHitFix);
 		IMessagePackSingleObjectSerializer serializer = context.GetSerializer(typeFromHandle);
-		serializer.Pack(memoryStream, coop_Model_ObjectAttackedHitFix);
+		MessagePackSerializerExtensions.Pack(serializer, (Stream)memoryStream, (object)coop_Model_ObjectAttackedHitFix);
 		memoryStream.Position = 0L;
-		Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix2 = (Coop_Model_ObjectAttackedHitFix)serializer.Unpack(memoryStream);
+		Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix2 = (Coop_Model_ObjectAttackedHitFix)MessagePackSerializerExtensions.Unpack(serializer, (Stream)memoryStream);
 		Log("after pos=" + coop_Model_ObjectAttackedHitFix2.hitPos);
 		string str = JSONSerializer.Serialize(coop_Model_ObjectAttackedHitFix, typeFromHandle);
 		Log("json stream:" + str);
@@ -122,8 +122,8 @@ public class PacketTest
 
 	private void Test4()
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		MemoryStream memoryStream = new MemoryStream();
 		Coop_Model_EnemyTargetShotEvent coop_Model_EnemyTargetShotEvent = new Coop_Model_EnemyTargetShotEvent();
 		int[] array = new int[3]
@@ -151,9 +151,9 @@ public class PacketTest
 		Log("before target:" + log);
 		Type typeFromHandle = typeof(Coop_Model_EnemyTargetShotEvent);
 		IMessagePackSingleObjectSerializer serializer = context.GetSerializer(typeFromHandle);
-		serializer.Pack(memoryStream, coop_Model_EnemyTargetShotEvent);
+		MessagePackSerializerExtensions.Pack(serializer, (Stream)memoryStream, (object)coop_Model_EnemyTargetShotEvent);
 		memoryStream.Position = 0L;
-		Coop_Model_EnemyTargetShotEvent coop_Model_EnemyTargetShotEvent2 = (Coop_Model_EnemyTargetShotEvent)serializer.Unpack(memoryStream);
+		Coop_Model_EnemyTargetShotEvent coop_Model_EnemyTargetShotEvent2 = (Coop_Model_EnemyTargetShotEvent)MessagePackSerializerExtensions.Unpack(serializer, (Stream)memoryStream);
 		log = string.Empty;
 		coop_Model_EnemyTargetShotEvent2.targets.ForEach(delegate(Enemy.RandomShotInfo.TargetInfo r)
 		{
@@ -172,10 +172,10 @@ public class PacketTest
 		object obj = Activator.CreateInstance(type);
 		Log($"MsgPack:     {obj.GetType().FullName}\nValue:    {obj.ToString()}\nHashCode: {obj.GetHashCode()}\n");
 		IMessagePackSingleObjectSerializer serializer = context.GetSerializer(type);
-		serializer.Pack(memoryStream, obj);
+		MessagePackSerializerExtensions.Pack(serializer, (Stream)memoryStream, obj);
 		Log($"MsgPacked:     {obj.GetType().FullName}\nValue:    {obj.ToString()}\nHashCode: {obj.GetHashCode()}\n");
 		memoryStream.Position = 0L;
-		object obj2 = serializer.Unpack(memoryStream);
+		object obj2 = MessagePackSerializerExtensions.Unpack(serializer, (Stream)memoryStream);
 		Log($"MsgUnpack:     {obj2.GetType().FullName}\nValue:    {obj2.ToString()}\nHashCode: {obj2.GetHashCode()}\n");
 	}
 

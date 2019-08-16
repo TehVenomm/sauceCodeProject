@@ -1,6 +1,5 @@
-package android.support.v4.media.session;
+package android.support.p000v4.media.session;
 
-import android.annotation.TargetApi;
 import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,12 +7,13 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 import java.lang.reflect.InvocationTargetException;
 
-@TargetApi(24)
 @RequiresApi(24)
+/* renamed from: android.support.v4.media.session.MediaSessionCompatApi24 */
 class MediaSessionCompatApi24 {
     private static final String TAG = "MediaSessionCompatApi24";
 
-    public interface Callback extends android.support.v4.media.session.MediaSessionCompatApi23.Callback {
+    /* renamed from: android.support.v4.media.session.MediaSessionCompatApi24$Callback */
+    public interface Callback extends android.support.p000v4.media.session.MediaSessionCompatApi23.Callback {
         void onPrepare();
 
         void onPrepareFromMediaId(String str, Bundle bundle);
@@ -23,6 +23,7 @@ class MediaSessionCompatApi24 {
         void onPrepareFromUri(Uri uri, Bundle bundle);
     }
 
+    /* renamed from: android.support.v4.media.session.MediaSessionCompatApi24$CallbackProxy */
     static class CallbackProxy<T extends Callback> extends CallbackProxy<T> {
         public CallbackProxy(T t) {
             super(t);
@@ -53,18 +54,12 @@ class MediaSessionCompatApi24 {
     }
 
     public static String getCallingPackage(Object obj) {
-        Throwable e;
         MediaSession mediaSession = (MediaSession) obj;
         try {
             return (String) mediaSession.getClass().getMethod("getCallingPackage", new Class[0]).invoke(mediaSession, new Object[0]);
-        } catch (NoSuchMethodException e2) {
-            e = e2;
-        } catch (InvocationTargetException e3) {
-            e = e3;
-        } catch (IllegalAccessException e4) {
-            e = e4;
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            Log.e(TAG, "Cannot execute MediaSession.getCallingPackage()", e);
+            return null;
         }
-        Log.e(TAG, "Cannot execute MediaSession.getCallingPackage()", e);
-        return null;
     }
 }

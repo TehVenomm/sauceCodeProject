@@ -164,15 +164,15 @@ public class AnnotationIntrospectorPair extends AnnotationIntrospector implement
     }
 
     public List<NamedType> findSubtypes(Annotated annotated) {
-        Collection findSubtypes = this._primary.findSubtypes(annotated);
-        Collection findSubtypes2 = this._secondary.findSubtypes(annotated);
+        List findSubtypes = this._primary.findSubtypes(annotated);
+        List findSubtypes2 = this._secondary.findSubtypes(annotated);
         if (findSubtypes == null || findSubtypes.isEmpty()) {
             return findSubtypes2;
         }
         if (findSubtypes2 == null || findSubtypes2.isEmpty()) {
             return findSubtypes;
         }
-        List<NamedType> arrayList = new ArrayList(findSubtypes.size() + findSubtypes2.size());
+        ArrayList arrayList = new ArrayList(findSubtypes.size() + findSubtypes2.size());
         arrayList.addAll(findSubtypes);
         arrayList.addAll(findSubtypes2);
         return arrayList;
@@ -328,8 +328,8 @@ public class AnnotationIntrospectorPair extends AnnotationIntrospector implement
         if (findPropertyAccess != null && findPropertyAccess != Access.AUTO) {
             return findPropertyAccess;
         }
-        findPropertyAccess = this._secondary.findPropertyAccess(annotated);
-        return findPropertyAccess == null ? Access.AUTO : findPropertyAccess;
+        Access findPropertyAccess2 = this._secondary.findPropertyAccess(annotated);
+        return findPropertyAccess2 == null ? Access.AUTO : findPropertyAccess2;
     }
 
     public AnnotatedMethod resolveSetterConflict(MapperConfig<?> mapperConfig, AnnotatedMethod annotatedMethod, AnnotatedMethod annotatedMethod2) {
@@ -497,7 +497,8 @@ public class AnnotationIntrospectorPair extends AnnotationIntrospector implement
         return findCreatorBinding != null ? findCreatorBinding : this._secondary.findCreatorBinding(annotated);
     }
 
-    protected boolean _isExplicitClassOrOb(Object obj, Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public boolean _isExplicitClassOrOb(Object obj, Class<?> cls) {
         if (obj == null) {
             return false;
         }

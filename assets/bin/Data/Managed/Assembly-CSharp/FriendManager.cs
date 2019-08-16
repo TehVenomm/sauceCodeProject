@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class FriendManager : MonoBehaviourSingleton<FriendManager>
 {
+	private bool _isHomeCharaCached;
+
 	public const int DRAW_FOLLOW_MAX = 10;
 
 	private FriendFollowListModel.Param recvFollowList;
@@ -11,6 +13,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 	private FriendFollowListModel.Param recvFollowerList;
 
 	private FriendMessageUserListModel.Param recvMessageUserList;
+
+	private List<FriendMessageUserListModel.MessageUserInfo> recvUserListAtLeastGetMessageOnce;
 
 	private string mutualFollowValue = string.Empty;
 
@@ -21,6 +25,8 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		get;
 		private set;
 	}
+
+	public bool IsHomeCharaCached => _isHomeCharaCached;
 
 	public FriendMessageUserListModel.MessageUserInfo talkUser
 	{
@@ -100,6 +106,15 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}
 	}
 
+	public void SetClanInviteToHomeCharaInfo(int userId, bool isInvite)
+	{
+		FriendCharaInfo friendCharaInfo = homeCharas.chara.Find((FriendCharaInfo c) => c.userId == userId);
+		if (friendCharaInfo != null)
+		{
+			friendCharaInfo.isInviteToClan = isInvite;
+		}
+	}
+
 	private void AddMessageDetailList(List<FriendMessageData> addMessageList)
 	{
 		addMessageList.ForEach(delegate(FriendMessageData message)
@@ -143,14 +158,18 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 
 	public void SendHomeCharaList(Action<bool> callback)
 	{
-		Protocol.Send(HomeCharaListModel.URL, delegate(HomeCharaListModel ret)
+		Protocol.SendAsync("ajax/home/charalist", delegate(HomeCharaListModel ret)
 		{
 			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
 			if (flag)
 			{
 				homeCharas = ret.result;
+				_isHomeCharaCached = true;
 			}
-			callback(flag);
+			if (callback != null)
+			{
+				callback(flag);
+			}
 		}, string.Empty);
 	}
 
@@ -185,10 +204,11 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}, string.Empty);
 	}
 
-	public void SendGetFollowerList(int page, Action<bool, FriendFollowListModel.Param> callback)
+	public void SendGetFollowerList(int _chunkIndex, int _sortTypeIndex, Action<bool, FriendFollowerListModel.Param> callback)
 	{
 		FriendFollowerListModel.RequestSendForm requestSendForm = new FriendFollowerListModel.RequestSendForm();
-		requestSendForm.page = page;
+		requestSendForm.page = _chunkIndex;
+		requestSendForm.sortType = _sortTypeIndex;
 		Protocol.Send(FriendFollowerListModel.URL, requestSendForm, delegate(FriendFollowerListModel ret)
 		{
 			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
@@ -197,7 +217,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvFollowerList = ret.result;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
-			callback(flag, recvFollowerList);
+			callback(flag, ret.result);
 		}, string.Empty);
 	}
 
@@ -288,6 +308,35 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}, string.Empty);
 	}
 
+	public void SendGetUserListMessagedOnce(bool isCalledByOther, Action<bool, FriendMessagedMutualFollowerListModel.Param> _callback)
+	{
+		if (!isCalledByOther)
+		{
+			SendGetUserListMessagedOnce(_callback);
+		}
+		else
+		{
+			Protocol.Try(delegate
+			{
+				SendGetUserListMessagedOnce(_callback);
+			});
+		}
+	}
+
+	public void SendGetUserListMessagedOnce(Action<bool, FriendMessagedMutualFollowerListModel.Param> callback)
+	{
+		FriendMessagedMutualFollowerListModel.RequestSendForm postData = new FriendMessagedMutualFollowerListModel.RequestSendForm();
+		Protocol.Send(FriendMessagedMutualFollowerListModel.URL, postData, delegate(FriendMessagedMutualFollowerListModel ret)
+		{
+			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+			if (flag)
+			{
+				recvUserListAtLeastGetMessageOnce = ret.result.messageFollowList;
+			}
+			callback(flag, ret.result);
+		}, string.Empty);
+	}
+
 	public void SendGetMessageUserList(int page, Action<bool, FriendMessageUserListModel.Param> callback)
 	{
 		FriendMessageUserListModel.RequestSendForm requestSendForm = new FriendMessageUserListModel.RequestSendForm();
@@ -302,6 +351,36 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			}
 			callback(flag, recvMessageUserList);
 		}, string.Empty);
+	}
+
+	public void SendGetMessageUserList(int page, bool isCalledByOther, Action<bool, FriendMessageUserListModel.Param> callback)
+	{
+		if (!isCalledByOther)
+		{
+			SendGetMessageUserList(page, callback);
+		}
+		else
+		{
+			Protocol.Try(delegate
+			{
+				SendGetMessageUserList(page, callback);
+			});
+		}
+	}
+
+	public void SendGetMessageDetailList(int user_id, int page, bool isCalledByOther, Action<bool> callback)
+	{
+		if (!isCalledByOther)
+		{
+			SendGetMessageDetailList(user_id, page, callback);
+		}
+		else
+		{
+			Protocol.Try(delegate
+			{
+				SendGetMessageDetailList(user_id, page, callback);
+			});
+		}
 	}
 
 	public void SendGetMessageDetailList(int user_id, int page, Action<bool> callback)
@@ -321,7 +400,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			{
 				messagePageMax = ret.result.pageNumMax;
 				AddMessageDetailList(ret.result.message);
-				FriendMessageUserListModel.MessageUserInfo messageUserInfo = recvMessageUserList.messageUser.Find((FriendMessageUserListModel.MessageUserInfo user) => user.userId == user_id);
+				FriendMessageUserListModel.MessageUserInfo messageUserInfo = FindMessageUser(user_id);
 				if (messageUserInfo != null)
 				{
 					talkUser = messageUserInfo;
@@ -329,6 +408,42 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			}
 			callback(flag);
 		}, string.Empty);
+	}
+
+	private FriendMessageUserListModel.MessageUserInfo FindMessageUser(int userId)
+	{
+		if (recvMessageUserList != null && recvMessageUserList.messageUser != null)
+		{
+			FriendMessageUserListModel.MessageUserInfo messageUserInfo = recvMessageUserList.messageUser.Find((FriendMessageUserListModel.MessageUserInfo user) => user.userId == userId);
+			if (messageUserInfo != null)
+			{
+				return messageUserInfo;
+			}
+		}
+		if (recvUserListAtLeastGetMessageOnce != null)
+		{
+			FriendMessageUserListModel.MessageUserInfo messageUserInfo2 = recvUserListAtLeastGetMessageOnce.Find((FriendMessageUserListModel.MessageUserInfo user) => user.userId == userId);
+			if (messageUserInfo2 != null)
+			{
+				return messageUserInfo2;
+			}
+		}
+		return null;
+	}
+
+	public void SendFriendMessage(int user_id, string message, bool isCalledByOther, Action<bool> callback)
+	{
+		if (!isCalledByOther)
+		{
+			SendFriendMessage(user_id, message, callback);
+		}
+		else
+		{
+			Protocol.Try(delegate
+			{
+				SendFriendMessage(user_id, message, callback);
+			});
+		}
 	}
 
 	public void SendFriendMessage(int user_id, string message, Action<bool> callback)
@@ -347,22 +462,35 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		}, string.Empty);
 	}
 
+	public void SendGetNoreadMessage(bool isCalledByOther, Action<bool> callback)
+	{
+		if (!isCalledByOther)
+		{
+			SendGetNoreadMessage(callback);
+		}
+		else
+		{
+			Protocol.Try(delegate
+			{
+				SendGetNoreadMessage(callback);
+			});
+		}
+	}
+
 	public void SendGetNoreadMessage(Action<bool> callback)
 	{
 		if (talkUser == null)
 		{
-			callback(false);
+			callback(obj: false);
+			return;
 		}
-		else
+		FriendGetNoReadMessageModel.RequestSendForm requestSendForm = new FriendGetNoReadMessageModel.RequestSendForm();
+		requestSendForm.userId = talkUser.userId;
+		Protocol.Send(FriendGetNoReadMessageModel.URL, requestSendForm, delegate(FriendGetNoReadMessageModel ret)
 		{
-			FriendGetNoReadMessageModel.RequestSendForm requestSendForm = new FriendGetNoReadMessageModel.RequestSendForm();
-			requestSendForm.userId = talkUser.userId;
-			Protocol.Send(FriendGetNoReadMessageModel.URL, requestSendForm, delegate(FriendGetNoReadMessageModel ret)
-			{
-				bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-				callback(obj);
-			}, string.Empty);
-		}
+			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
+			callback(obj);
+		}, string.Empty);
 	}
 
 	public void SendSearchName(string name, int page, Action<bool, FriendSearchResult> callback)

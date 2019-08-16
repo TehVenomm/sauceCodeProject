@@ -30,23 +30,22 @@ public class QuestAcceptChallengeSelect : QuestAcceptSelect
 
 	public override void Initialize()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		root = SetPrefab(base.collectUI, "QuestAcceptChallengeSelect", true);
+		root = SetPrefab(base.collectUI, "QuestAcceptChallengeSelect");
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)_Initialize();
+		yield return _Initialize();
 		bool sended = false;
 		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeEnmey(questInfo.questData.tableData.enemyID[0], delegate(bool isSuccess, QuestChallengeEnemyModel.Param result)
 		{
-			((_003CDoInitialize_003Ec__Iterator109)/*Error near IL_006a: stateMachine*/)._003C_003Ef__this.OnSendFinished(isSuccess, result);
-			((_003CDoInitialize_003Ec__Iterator109)/*Error near IL_006a: stateMachine*/)._003Csended_003E__0 = true;
+			OnSendFinished(isSuccess, result);
+			sended = true;
 		});
 		if (!sended)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		InitializeBase();
 	}
@@ -79,22 +78,22 @@ public class QuestAcceptChallengeSelect : QuestAcceptSelect
 		if (selectedQuestIndex >= enableQuestList.Count - 1)
 		{
 			SetColor((Enum)UI.OBJ_LEVEL_R, Color.get_clear());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, true);
+			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, is_visible: true);
 		}
 		else
 		{
 			SetColor((Enum)UI.OBJ_LEVEL_R, Color.get_white());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, false);
+			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, is_visible: false);
 		}
 		if (selectedQuestIndex <= 0)
 		{
 			SetColor((Enum)UI.OBJ_LEVEL_L, Color.get_clear());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, true);
+			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, is_visible: true);
 		}
 		else
 		{
 			SetColor((Enum)UI.OBJ_LEVEL_L, Color.get_white());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, false);
+			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, is_visible: false);
 		}
 	}
 
@@ -157,7 +156,7 @@ public class QuestAcceptChallengeSelect : QuestAcceptSelect
 
 	protected override void OnQuery_CREATE_ROOM()
 	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questInfo.questData.tableData.questID, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questInfo.questData.tableData.questID);
 		base.OnQuery_CREATE_ROOM();
 	}
 

@@ -2,79 +2,48 @@ package com.google.android.gms.drive;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzs extends zza {
-    public static final Creator<zzs> CREATOR = new zzt();
-    private String zzgeh;
-    private int zzgei;
-    private String zzgej;
-    private String zzgek;
-    private int zzgel;
-    private boolean zzgem;
-
-    public zzs(String str, int i, String str2, String str3, int i2, boolean z) {
-        this.zzgeh = str;
-        this.zzgei = i;
-        this.zzgej = str2;
-        this.zzgek = str3;
-        this.zzgel = i2;
-        this.zzgem = z;
+public final class zzs implements Creator<zzr> {
+    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        String str = null;
+        String str2 = null;
+        String str3 = null;
+        boolean z = false;
+        int i = 0;
+        int i2 = 0;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 2:
+                    str = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 3:
+                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                case 4:
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 5:
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 6:
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                case 7:
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
+            }
+        }
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new zzr(str, i, str2, str3, i2, z);
     }
 
-    private static boolean zzco(int i) {
-        switch (i) {
-            case 256:
-            case 257:
-            case 258:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public final boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != getClass()) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        zzs zzs = (zzs) obj;
-        return zzbf.equal(this.zzgeh, zzs.zzgeh) && this.zzgei == zzs.zzgei && this.zzgel == zzs.zzgel && this.zzgem == zzs.zzgem;
-    }
-
-    public final int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzgeh, Integer.valueOf(this.zzgei), Integer.valueOf(this.zzgel), Boolean.valueOf(this.zzgem)});
-    }
-
-    public final void writeToParcel(Parcel parcel, int i) {
-        boolean z;
-        int i2 = -1;
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, !zzco(this.zzgei) ? null : this.zzgeh, false);
-        zzd.zzc(parcel, 3, !zzco(this.zzgei) ? -1 : this.zzgei);
-        zzd.zza(parcel, 4, this.zzgej, false);
-        zzd.zza(parcel, 5, this.zzgek, false);
-        switch (this.zzgel) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                z = true;
-                break;
-            default:
-                z = false;
-                break;
-        }
-        if (z) {
-            i2 = this.zzgel;
-        }
-        zzd.zzc(parcel, 6, i2);
-        zzd.zza(parcel, 7, this.zzgem);
-        zzd.zzai(parcel, zze);
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new zzr[i];
     }
 }

@@ -35,12 +35,8 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), false);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), false);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), is_visible: false);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), is_visible: false);
 		base.UpdateUI();
 	}
 
@@ -75,7 +71,10 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 		if (localInventoryEquipData != null)
 		{
 			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, false, (Func<int, bool>)delegate(int i)
+			m_generatedIconList.Clear();
+			UpdateNewIconInfo();
+			bool initItem = false;
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, reset: false, (Func<int, bool>)delegate(int i)
 			{
 				SortCompareData sortCompareData = localInventoryEquipData[i];
 				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
@@ -85,26 +84,53 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 				return true;
 			}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
+				initItem = true;
 				uint tableID = localInventoryEquipData[i].GetTableID();
 				if (tableID == 0)
 				{
-					SetActive(t, false);
+					SetActive(t, is_visible: false);
 				}
 				else
 				{
-					SetActive(t, true);
+					SetActive(t, is_visible: true);
 					EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
 					EquipItemSortData equipItemSortData = localInventoryEquipData[i] as EquipItemSortData;
 					EquipItemInfo equip = equipItemSortData.GetItemData() as EquipItemInfo;
 					ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
-					bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
+					bool flag = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
 					SkillSlotUIData[] skillSlotData = GetSkillSlotData(equip);
-					ItemIcon itemIcon = CreateEquipAbilityIconDetail(getType: equipItemSortData.GetGetType(), icon_type: iconType, icon_id: equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), rarity: equipItemData.rarity, item_data: equipItemSortData, skill_slot_data: skillSlotData, is_show_main_status: base.IsShowMainStatus, parent: t, event_name: "TRY_ON", event_data: i, icon_status: equipItemSortData.GetIconStatus(), is_new: is_new, toggle_group: -1, is_select: false, equip_index: -1);
+					SmithAbilityChangeSelect smithAbilityChangeSelect = this;
+					ITEM_ICON_TYPE icon_type = iconType;
+					int iconID = equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
+					RARITY_TYPE? rarity = equipItemData.rarity;
+					EquipItemSortData item_data = equipItemSortData;
+					SkillSlotUIData[] skill_slot_data = skillSlotData;
+					bool isShowMainStatus = base.IsShowMainStatus;
+					string event_name = "TRY_ON";
+					ItemIconDetail.ICON_STATUS iconStatus = equipItemSortData.GetIconStatus();
+					bool is_new = flag;
+					GET_TYPE getType = equipItemSortData.GetGetType();
+					ItemIcon itemIcon = smithAbilityChangeSelect.CreateEquipAbilityIconDetail(icon_type, iconID, rarity, item_data, skill_slot_data, isShowMainStatus, t, event_name, i, iconStatus, is_new, -1, is_select: false, -1, getType);
 					itemIcon.SetItemID(equipItemSortData.GetTableID());
-					itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), true);
+					itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), is_instant: true);
 					SetLongTouch(itemIcon.transform, "DETAIL", i);
+					if (itemIcon != null && equipItemSortData != null)
+					{
+						itemIcon.SetInitData(equipItemSortData);
+					}
+					if (itemIcon != null && !m_generatedIconList.Contains(itemIcon))
+					{
+						m_generatedIconList.Add(itemIcon);
+					}
 				}
 			});
+			SetActive(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, !initItem);
+			SetLabelText(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
+		}
+		else
+		{
+			SetActive(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, is_visible: true);
+			SetLabelText(GetCtrl(UI.OBJ_ROOT), UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
 		}
 	}
 
@@ -161,20 +187,21 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 
 	protected override void OnQuery_TRY_ON()
 	{
-		if (localInventoryEquipData != null && localInventoryEquipData.Length != 0)
+		if (localInventoryEquipData == null || localInventoryEquipData.Length == 0)
 		{
-			selectInventoryIndex = (int)GameSection.GetEventData();
-			SortCompareData sortCompareData = localInventoryEquipData[selectInventoryIndex];
-			if (sortCompareData != null)
+			return;
+		}
+		selectInventoryIndex = (int)GameSection.GetEventData();
+		SortCompareData sortCompareData = localInventoryEquipData[selectInventoryIndex];
+		if (sortCompareData != null)
+		{
+			ulong uniqID = sortCompareData.GetUniqID();
+			if (uniqID != 0)
 			{
-				ulong uniqID = sortCompareData.GetUniqID();
-				if (uniqID != 0L)
-				{
-					SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-					smithGrowData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
-					GameSection.ChangeEvent("SELECT_ITEM", null);
-					OnQuery_SELECT_ITEM();
-				}
+				SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
+				smithGrowData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
+				GameSection.ChangeEvent("SELECT_ITEM");
+				OnQuery_SELECT_ITEM();
 			}
 		}
 	}
@@ -184,14 +211,12 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 		if (localInventoryEquipData == null || localInventoryEquipData.Length == 0)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
+		if (smithData == null)
 		{
-			SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-			if (smithData == null)
-			{
-				GameSection.StopEvent();
-			}
+			GameSection.StopEvent();
 		}
 	}
 
@@ -202,16 +227,14 @@ public class SmithAbilityChangeSelect : SmithEquipSelectBase
 		if (sortCompareData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		ulong uniqID = sortCompareData.GetUniqID();
+		if (uniqID != 0)
 		{
-			ulong uniqID = sortCompareData.GetUniqID();
-			if (uniqID != 0L)
-			{
-				SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-				smithGrowData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
-			}
-			base.OnQueryDetail();
+			SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
+			smithGrowData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
 		}
+		base.OnQueryDetail();
 	}
 }

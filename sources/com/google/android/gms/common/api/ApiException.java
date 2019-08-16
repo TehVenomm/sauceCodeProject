@@ -8,8 +8,8 @@ public class ApiException extends Exception {
 
     public ApiException(@NonNull Status status) {
         int statusCode = status.getStatusCode();
-        String statusMessage = status.getStatusMessage() != null ? status.getStatusMessage() : "";
-        super(new StringBuilder(String.valueOf(statusMessage).length() + 13).append(statusCode).append(": ").append(statusMessage).toString());
+        String str = status.getStatusMessage() != null ? status.getStatusMessage() : "";
+        super(new StringBuilder(String.valueOf(str).length() + 13).append(statusCode).append(": ").append(str).toString());
         this.mStatus = status;
     }
 
@@ -18,6 +18,7 @@ public class ApiException extends Exception {
     }
 
     @Nullable
+    @Deprecated
     public String getStatusMessage() {
         return this.mStatus.getStatusMessage();
     }

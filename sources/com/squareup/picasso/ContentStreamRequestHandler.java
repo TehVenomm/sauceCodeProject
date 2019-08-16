@@ -11,8 +11,8 @@ import java.io.InputStream;
 class ContentStreamRequestHandler extends RequestHandler {
     final Context context;
 
-    ContentStreamRequestHandler(Context context) {
-        this.context = context;
+    ContentStreamRequestHandler(Context context2) {
+        this.context = context2;
     }
 
     public boolean canHandleRequest(Request request) {
@@ -23,7 +23,8 @@ class ContentStreamRequestHandler extends RequestHandler {
         return new Result(getInputStream(request), LoadedFrom.DISK);
     }
 
-    InputStream getInputStream(Request request) throws FileNotFoundException {
+    /* access modifiers changed from: 0000 */
+    public InputStream getInputStream(Request request) throws FileNotFoundException {
         return this.context.getContentResolver().openInputStream(request.uri);
     }
 }

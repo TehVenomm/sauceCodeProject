@@ -12,7 +12,7 @@ public class PointShopManager
 
 	public void SendGetPointShops(Action<bool, List<PointShop>> call_back)
 	{
-		Protocol.Send(PointShopModel.URL, null, delegate(PointShopModel ret)
+		Protocol.Send("ajax/pointshop/list", null, delegate(PointShopModel ret)
 		{
 			bool arg = false;
 			if (ret.Error == Error.None)
@@ -45,10 +45,10 @@ public class PointShopManager
 	public static string GetBoughtMessage(PointShopItem item, int num)
 	{
 		string empty = string.Empty;
-		if (item.itemId != 1200000)
+		if (item.itemId == 1200000)
 		{
-			return string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 7u), item.name, num);
+			return string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 8u), item.name, num);
 		}
-		return string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 8u), item.name, num);
+		return string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 7u), item.name, num);
 	}
 }

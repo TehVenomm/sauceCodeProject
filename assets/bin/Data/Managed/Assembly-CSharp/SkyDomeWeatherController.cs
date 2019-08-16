@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SkyDomeWeatherController
+public class SkyDomeWeatherController : MonoBehaviour
 {
 	[SerializeField]
 	private Renderer[] originalRenderer;
@@ -33,38 +33,41 @@ public class SkyDomeWeatherController
 		{
 			for (int i = 0; i < originalRenderer.Length; i++)
 			{
-				if (!(originalRenderer[i] == null))
+				if (originalRenderer[i] == null)
 				{
-					Material[] sharedMaterials = originalRenderer[i].get_sharedMaterials();
-					foreach (Material val in sharedMaterials)
+					continue;
+				}
+				Material[] sharedMaterials = originalRenderer[i].get_sharedMaterials();
+				foreach (Material val in sharedMaterials)
+				{
+					if (!(val == null) && val.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
 					{
-						if (!(val == null) && val.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
-						{
-							Color color = val.GetColor(MATERIALCOLOR_PROPERTY_KEY);
-							color.a = 1f - rate;
-							val.SetColor(MATERIALCOLOR_PROPERTY_KEY, color);
-						}
+						Color color = val.GetColor(MATERIALCOLOR_PROPERTY_KEY);
+						color.a = 1f - rate;
+						val.SetColor(MATERIALCOLOR_PROPERTY_KEY, color);
 					}
 				}
 			}
 		}
-		if (afterRenderer != null)
+		if (afterRenderer == null)
 		{
-			for (int k = 0; k < afterRenderer.Length; k++)
+			return;
+		}
+		for (int k = 0; k < afterRenderer.Length; k++)
+		{
+			if (afterRenderer[k] == null)
 			{
-				if (!(afterRenderer[k] == null))
+				continue;
+			}
+			Material[] materials = afterRenderer[k].get_materials();
+			for (int l = 0; l < afterRenderer[k].get_materials().Length; l++)
+			{
+				Material val2 = afterRenderer[k].get_sharedMaterials()[l];
+				if (!(val2 == null) && val2.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
 				{
-					Material[] materials = afterRenderer[k].get_materials();
-					for (int l = 0; l < afterRenderer[k].get_materials().Length; l++)
-					{
-						Material val2 = afterRenderer[k].get_sharedMaterials()[l];
-						if (!(val2 == null) && val2.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
-						{
-							Color color2 = val2.GetColor(MATERIALCOLOR_PROPERTY_KEY);
-							color2.a = rate;
-							val2.SetColor(MATERIALCOLOR_PROPERTY_KEY, color2);
-						}
-					}
+					Color color2 = val2.GetColor(MATERIALCOLOR_PROPERTY_KEY);
+					color2.a = rate;
+					val2.SetColor(MATERIALCOLOR_PROPERTY_KEY, color2);
 				}
 			}
 		}

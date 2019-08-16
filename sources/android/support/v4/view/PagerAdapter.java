@@ -1,4 +1,4 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 
+/* renamed from: android.support.v4.view.PagerAdapter */
 public abstract class PagerAdapter {
     public static final int POSITION_NONE = -2;
     public static final int POSITION_UNCHANGED = -1;
@@ -82,7 +83,8 @@ public abstract class PagerAdapter {
         setPrimaryItem((View) viewGroup, i, obj);
     }
 
-    void setViewPagerObserver(DataSetObserver dataSetObserver) {
+    /* access modifiers changed from: 0000 */
+    public void setViewPagerObserver(DataSetObserver dataSetObserver) {
         synchronized (this) {
             this.mViewPagerObserver = dataSetObserver;
         }

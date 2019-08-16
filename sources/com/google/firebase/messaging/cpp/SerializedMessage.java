@@ -26,6 +26,10 @@ public final class SerializedMessage extends Table {
         flatBufferBuilder.addOffset(0, i, 0);
     }
 
+    public static void addLink(FlatBufferBuilder flatBufferBuilder, int i) {
+        flatBufferBuilder.addOffset(13, i, 0);
+    }
+
     public static void addMessageId(FlatBufferBuilder flatBufferBuilder, int i) {
         flatBufferBuilder.addOffset(5, i, 0);
     }
@@ -42,12 +46,20 @@ public final class SerializedMessage extends Table {
         flatBufferBuilder.addBoolean(12, z, false);
     }
 
+    public static void addOriginalPriority(FlatBufferBuilder flatBufferBuilder, int i) {
+        flatBufferBuilder.addOffset(15, i, 0);
+    }
+
     public static void addPriority(FlatBufferBuilder flatBufferBuilder, int i) {
         flatBufferBuilder.addOffset(7, i, 0);
     }
 
     public static void addRawData(FlatBufferBuilder flatBufferBuilder, int i) {
         flatBufferBuilder.addOffset(4, i, 0);
+    }
+
+    public static void addSentTime(FlatBufferBuilder flatBufferBuilder, long j) {
+        flatBufferBuilder.addLong(14, j, 0);
     }
 
     public static void addTimeToLive(FlatBufferBuilder flatBufferBuilder, int i) {
@@ -66,8 +78,11 @@ public final class SerializedMessage extends Table {
         return flatBufferBuilder.endVector();
     }
 
-    public static int createSerializedMessage(FlatBufferBuilder flatBufferBuilder, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10, int i11, int i12, boolean z) {
-        flatBufferBuilder.startObject(13);
+    public static int createSerializedMessage(FlatBufferBuilder flatBufferBuilder, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10, int i11, int i12, boolean z, int i13, long j, int i14) {
+        flatBufferBuilder.startObject(16);
+        addSentTime(flatBufferBuilder, j);
+        addOriginalPriority(flatBufferBuilder, i14);
+        addLink(flatBufferBuilder, i13);
         addNotification(flatBufferBuilder, i12);
         addErrorDescription(flatBufferBuilder, i11);
         addError(flatBufferBuilder, i10);
@@ -102,7 +117,7 @@ public final class SerializedMessage extends Table {
     }
 
     public static void startSerializedMessage(FlatBufferBuilder flatBufferBuilder) {
-        flatBufferBuilder.startObject(13);
+        flatBufferBuilder.startObject(16);
     }
 
     public SerializedMessage __assign(int i, ByteBuffer byteBuffer) {
@@ -112,16 +127,23 @@ public final class SerializedMessage extends Table {
 
     public void __init(int i, ByteBuffer byteBuffer) {
         this.bb_pos = i;
-        this.bb = byteBuffer;
+        this.f441bb = byteBuffer;
     }
 
     public String collapseKey() {
         int __offset = __offset(8);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer collapseKeyAsByteBuffer() {
         return __vector_as_bytebuffer(8, 1);
+    }
+
+    public ByteBuffer collapseKeyInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 8, 1);
     }
 
     public DataPair data(int i) {
@@ -130,17 +152,26 @@ public final class SerializedMessage extends Table {
 
     public DataPair data(DataPair dataPair, int i) {
         int __offset = __offset(10);
-        return __offset != 0 ? dataPair.__assign(__indirect(__vector(__offset) + (i * 4)), this.bb) : null;
+        if (__offset != 0) {
+            return dataPair.__assign(__indirect(__vector(__offset) + (i * 4)), this.f441bb);
+        }
+        return null;
     }
 
     public int dataLength() {
         int __offset = __offset(10);
-        return __offset != 0 ? __vector_len(__offset) : 0;
+        if (__offset != 0) {
+            return __vector_len(__offset);
+        }
+        return 0;
     }
 
     public String error() {
         int __offset = __offset(22);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer errorAsByteBuffer() {
@@ -149,38 +180,86 @@ public final class SerializedMessage extends Table {
 
     public String errorDescription() {
         int __offset = __offset(24);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer errorDescriptionAsByteBuffer() {
         return __vector_as_bytebuffer(24, 1);
     }
 
+    public ByteBuffer errorDescriptionInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 24, 1);
+    }
+
+    public ByteBuffer errorInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 22, 1);
+    }
+
     public String from() {
         int __offset = __offset(4);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer fromAsByteBuffer() {
         return __vector_as_bytebuffer(4, 1);
     }
 
+    public ByteBuffer fromInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 4, 1);
+    }
+
+    public String link() {
+        int __offset = __offset(30);
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
+    }
+
+    public ByteBuffer linkAsByteBuffer() {
+        return __vector_as_bytebuffer(30, 1);
+    }
+
+    public ByteBuffer linkInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 30, 1);
+    }
+
     public String messageId() {
         int __offset = __offset(14);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer messageIdAsByteBuffer() {
         return __vector_as_bytebuffer(14, 1);
     }
 
+    public ByteBuffer messageIdInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 14, 1);
+    }
+
     public String messageType() {
         int __offset = __offset(16);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer messageTypeAsByteBuffer() {
         return __vector_as_bytebuffer(16, 1);
+    }
+
+    public ByteBuffer messageTypeInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 16, 1);
     }
 
     public SerializedNotification notification() {
@@ -189,43 +268,95 @@ public final class SerializedMessage extends Table {
 
     public SerializedNotification notification(SerializedNotification serializedNotification) {
         int __offset = __offset(26);
-        return __offset != 0 ? serializedNotification.__assign(__indirect(__offset + this.bb_pos), this.bb) : null;
+        if (__offset != 0) {
+            return serializedNotification.__assign(__indirect(__offset + this.bb_pos), this.f441bb);
+        }
+        return null;
     }
 
     public boolean notificationOpened() {
         int __offset = __offset(28);
-        return (__offset == 0 || this.bb.get(__offset + this.bb_pos) == (byte) 0) ? false : true;
+        return (__offset == 0 || this.f441bb.get(__offset + this.bb_pos) == 0) ? false : true;
+    }
+
+    public String originalPriority() {
+        int __offset = __offset(34);
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
+    }
+
+    public ByteBuffer originalPriorityAsByteBuffer() {
+        return __vector_as_bytebuffer(34, 1);
+    }
+
+    public ByteBuffer originalPriorityInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 34, 1);
     }
 
     public String priority() {
         int __offset = __offset(18);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer priorityAsByteBuffer() {
         return __vector_as_bytebuffer(18, 1);
     }
 
+    public ByteBuffer priorityInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 18, 1);
+    }
+
     public String rawData() {
         int __offset = __offset(12);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer rawDataAsByteBuffer() {
         return __vector_as_bytebuffer(12, 1);
     }
 
-    public int timeToLive() {
-        int __offset = __offset(20);
-        return __offset != 0 ? this.bb.getInt(__offset + this.bb_pos) : 0;
+    public ByteBuffer rawDataInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 12, 1);
     }
 
-    public String to() {
+    public long sentTime() {
+        int __offset = __offset(32);
+        if (__offset != 0) {
+            return this.f441bb.getLong(__offset + this.bb_pos);
+        }
+        return 0;
+    }
+
+    public int timeToLive() {
+        int __offset = __offset(20);
+        if (__offset != 0) {
+            return this.f441bb.getInt(__offset + this.bb_pos);
+        }
+        return 0;
+    }
+
+    /* renamed from: to */
+    public String mo19580to() {
         int __offset = __offset(6);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer toAsByteBuffer() {
         return __vector_as_bytebuffer(6, 1);
+    }
+
+    public ByteBuffer toInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 6, 1);
     }
 }

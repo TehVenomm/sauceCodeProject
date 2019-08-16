@@ -1,33 +1,55 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
 import android.os.Build.VERSION;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 
+/* renamed from: android.support.v4.view.ViewGroupCompat */
 public final class ViewGroupCompat {
-    static final ViewGroupCompatImpl IMPL;
+    static final ViewGroupCompatBaseImpl IMPL;
     public static final int LAYOUT_MODE_CLIP_BOUNDS = 0;
     public static final int LAYOUT_MODE_OPTICAL_BOUNDS = 1;
 
-    interface ViewGroupCompatImpl {
-        int getLayoutMode(ViewGroup viewGroup);
+    @RequiresApi(18)
+    /* renamed from: android.support.v4.view.ViewGroupCompat$ViewGroupCompatApi18Impl */
+    static class ViewGroupCompatApi18Impl extends ViewGroupCompatBaseImpl {
+        ViewGroupCompatApi18Impl() {
+        }
 
-        int getNestedScrollAxes(ViewGroup viewGroup);
+        public int getLayoutMode(ViewGroup viewGroup) {
+            return viewGroup.getLayoutMode();
+        }
 
-        boolean isTransitionGroup(ViewGroup viewGroup);
-
-        boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent);
-
-        void setLayoutMode(ViewGroup viewGroup, int i);
-
-        void setMotionEventSplittingEnabled(ViewGroup viewGroup, boolean z);
-
-        void setTransitionGroup(ViewGroup viewGroup, boolean z);
+        public void setLayoutMode(ViewGroup viewGroup, int i) {
+            viewGroup.setLayoutMode(i);
+        }
     }
 
-    static class ViewGroupCompatStubImpl implements ViewGroupCompatImpl {
-        ViewGroupCompatStubImpl() {
+    @RequiresApi(21)
+    /* renamed from: android.support.v4.view.ViewGroupCompat$ViewGroupCompatApi21Impl */
+    static class ViewGroupCompatApi21Impl extends ViewGroupCompatApi18Impl {
+        ViewGroupCompatApi21Impl() {
+        }
+
+        public int getNestedScrollAxes(ViewGroup viewGroup) {
+            return viewGroup.getNestedScrollAxes();
+        }
+
+        public boolean isTransitionGroup(ViewGroup viewGroup) {
+            return viewGroup.isTransitionGroup();
+        }
+
+        public void setTransitionGroup(ViewGroup viewGroup, boolean z) {
+            viewGroup.setTransitionGroup(z);
+        }
+    }
+
+    /* renamed from: android.support.v4.view.ViewGroupCompat$ViewGroupCompatBaseImpl */
+    static class ViewGroupCompatBaseImpl {
+        ViewGroupCompatBaseImpl() {
         }
 
         public int getLayoutMode(ViewGroup viewGroup) {
@@ -35,87 +57,30 @@ public final class ViewGroupCompat {
         }
 
         public int getNestedScrollAxes(ViewGroup viewGroup) {
-            return viewGroup instanceof NestedScrollingParent ? ((NestedScrollingParent) viewGroup).getNestedScrollAxes() : 0;
+            if (viewGroup instanceof NestedScrollingParent) {
+                return ((NestedScrollingParent) viewGroup).getNestedScrollAxes();
+            }
+            return 0;
         }
 
         public boolean isTransitionGroup(ViewGroup viewGroup) {
             return false;
         }
 
-        public boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent) {
-            return true;
-        }
-
         public void setLayoutMode(ViewGroup viewGroup, int i) {
         }
 
-        public void setMotionEventSplittingEnabled(ViewGroup viewGroup, boolean z) {
-        }
-
         public void setTransitionGroup(ViewGroup viewGroup, boolean z) {
-        }
-    }
-
-    static class ViewGroupCompatHCImpl extends ViewGroupCompatStubImpl {
-        ViewGroupCompatHCImpl() {
-        }
-
-        public void setMotionEventSplittingEnabled(ViewGroup viewGroup, boolean z) {
-            ViewGroupCompatHC.setMotionEventSplittingEnabled(viewGroup, z);
-        }
-    }
-
-    static class ViewGroupCompatIcsImpl extends ViewGroupCompatHCImpl {
-        ViewGroupCompatIcsImpl() {
-        }
-
-        public boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent) {
-            return ViewGroupCompatIcs.onRequestSendAccessibilityEvent(viewGroup, view, accessibilityEvent);
-        }
-    }
-
-    static class ViewGroupCompatJellybeanMR2Impl extends ViewGroupCompatIcsImpl {
-        ViewGroupCompatJellybeanMR2Impl() {
-        }
-
-        public int getLayoutMode(ViewGroup viewGroup) {
-            return ViewGroupCompatJellybeanMR2.getLayoutMode(viewGroup);
-        }
-
-        public void setLayoutMode(ViewGroup viewGroup, int i) {
-            ViewGroupCompatJellybeanMR2.setLayoutMode(viewGroup, i);
-        }
-    }
-
-    static class ViewGroupCompatLollipopImpl extends ViewGroupCompatJellybeanMR2Impl {
-        ViewGroupCompatLollipopImpl() {
-        }
-
-        public int getNestedScrollAxes(ViewGroup viewGroup) {
-            return ViewGroupCompatLollipop.getNestedScrollAxes(viewGroup);
-        }
-
-        public boolean isTransitionGroup(ViewGroup viewGroup) {
-            return ViewGroupCompatLollipop.isTransitionGroup(viewGroup);
-        }
-
-        public void setTransitionGroup(ViewGroup viewGroup, boolean z) {
-            ViewGroupCompatLollipop.setTransitionGroup(viewGroup, z);
         }
     }
 
     static {
-        int i = VERSION.SDK_INT;
-        if (i >= 21) {
-            IMPL = new ViewGroupCompatLollipopImpl();
-        } else if (i >= 18) {
-            IMPL = new ViewGroupCompatJellybeanMR2Impl();
-        } else if (i >= 14) {
-            IMPL = new ViewGroupCompatIcsImpl();
-        } else if (i >= 11) {
-            IMPL = new ViewGroupCompatHCImpl();
+        if (VERSION.SDK_INT >= 21) {
+            IMPL = new ViewGroupCompatApi21Impl();
+        } else if (VERSION.SDK_INT >= 18) {
+            IMPL = new ViewGroupCompatApi18Impl();
         } else {
-            IMPL = new ViewGroupCompatStubImpl();
+            IMPL = new ViewGroupCompatBaseImpl();
         }
     }
 
@@ -126,7 +91,7 @@ public final class ViewGroupCompat {
         return IMPL.getLayoutMode(viewGroup);
     }
 
-    public static int getNestedScrollAxes(ViewGroup viewGroup) {
+    public static int getNestedScrollAxes(@NonNull ViewGroup viewGroup) {
         return IMPL.getNestedScrollAxes(viewGroup);
     }
 
@@ -134,16 +99,18 @@ public final class ViewGroupCompat {
         return IMPL.isTransitionGroup(viewGroup);
     }
 
+    @Deprecated
     public static boolean onRequestSendAccessibilityEvent(ViewGroup viewGroup, View view, AccessibilityEvent accessibilityEvent) {
-        return IMPL.onRequestSendAccessibilityEvent(viewGroup, view, accessibilityEvent);
+        return viewGroup.onRequestSendAccessibilityEvent(view, accessibilityEvent);
     }
 
     public static void setLayoutMode(ViewGroup viewGroup, int i) {
         IMPL.setLayoutMode(viewGroup, i);
     }
 
+    @Deprecated
     public static void setMotionEventSplittingEnabled(ViewGroup viewGroup, boolean z) {
-        IMPL.setMotionEventSplittingEnabled(viewGroup, z);
+        viewGroup.setMotionEventSplittingEnabled(z);
     }
 
     public static void setTransitionGroup(ViewGroup viewGroup, boolean z) {

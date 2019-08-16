@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class PointShopItemList
+public class PointShopItemList : MonoBehaviour
 {
 	public UILabel tradeNum;
 
@@ -66,7 +66,7 @@ public class PointShopItemList
 
 	protected void SetUpItemIcon(PointShopItem item)
 	{
-		ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)item.type, (uint)item.itemId, itemIconRoot, -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-		itemIcon.SetEnableCollider(false);
+		ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)item.type, (uint)item.itemId, itemIconRoot);
+		itemIcon.SetEnableCollider(is_enable: false);
 	}
 }

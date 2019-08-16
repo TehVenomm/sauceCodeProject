@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Drawing
@@ -118,7 +119,7 @@ public class Drawing
 	public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float width)
 	{
 		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Expected O, but got Unknown
+		//IL_005b: Expected O, but got Unknown
 		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
@@ -132,10 +133,10 @@ public class Drawing
 		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		pointA.x = (float)(int)pointA.x;
-		pointA.y = (float)(int)pointA.y;
-		pointB.x = (float)(int)pointB.x;
-		pointB.y = (float)(int)pointB.y;
+		pointA.x = (int)pointA.x;
+		pointA.y = (int)pointA.y;
+		pointB.x = (int)pointB.x;
+		pointB.y = (int)pointB.y;
 		if (!Object.op_Implicit(lineTex))
 		{
 			lineTex = new Texture2D(1, 1);
@@ -143,7 +144,7 @@ public class Drawing
 		Color color2 = GUI.get_color();
 		GUI.set_color(color);
 		Matrix4x4 matrix = GUI.get_matrix();
-		float num = Mathf.Atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180f / 3.14159274f;
+		float num = Mathf.Atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180f / (float)Math.PI;
 		Vector2 val = pointA - pointB;
 		float magnitude = val.get_magnitude();
 		GUIUtility.RotateAroundPivot(num, pointA);

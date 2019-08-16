@@ -9,7 +9,8 @@ final class TargetAction extends Action<Target> {
         super(picasso, target, request, i, i2, i3, drawable, str, obj, false);
     }
 
-    void complete(Bitmap bitmap, LoadedFrom loadedFrom) {
+    /* access modifiers changed from: 0000 */
+    public void complete(Bitmap bitmap, LoadedFrom loadedFrom) {
         if (bitmap == null) {
             throw new AssertionError(String.format("Attempted to complete action with no result!\n%s", new Object[]{this}));
         }
@@ -22,7 +23,8 @@ final class TargetAction extends Action<Target> {
         }
     }
 
-    void error() {
+    /* access modifiers changed from: 0000 */
+    public void error() {
         Target target = (Target) getTarget();
         if (target == null) {
             return;

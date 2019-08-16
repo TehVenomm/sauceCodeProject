@@ -11,18 +11,17 @@ public class GuildRequestChallengeCounter : QuestChallengeSelect
 		if (num < 0 || num >= challengeData.Length)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint)challengeData[num].questId, true))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint)challengeData[num].questId))
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
-		{
-			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)challengeData[num].questId, true);
-			QuestInfoData questChallengeInfoData = MonoBehaviourSingleton<QuestManager>.I.GetQuestChallengeInfoData((uint)challengeData[num].questId);
-			GameSection.SetEventData(questChallengeInfoData);
-			isScrollViewReady = false;
-		}
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)challengeData[num].questId);
+		QuestInfoData questChallengeInfoData = MonoBehaviourSingleton<QuestManager>.I.GetQuestChallengeInfoData((uint)challengeData[num].questId);
+		GameSection.SetEventData(questChallengeInfoData);
+		isScrollViewReady = false;
 	}
 
 	private void OnCloseDialog_GuildRequestChallengeRoomCondition()

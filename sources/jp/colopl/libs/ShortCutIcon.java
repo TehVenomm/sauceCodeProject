@@ -1,4 +1,4 @@
-package jp.colopl.libs;
+package p018jp.colopl.libs;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,9 +6,10 @@ import android.content.Intent.ShortcutIconResource;
 import android.net.Uri;
 import com.facebook.internal.NativeProtocol;
 import com.google.android.gms.drive.DriveFile;
-import jp.colopl.drapro.StartActivity;
 import net.gogame.gowrap.InternalConstants;
+import p018jp.colopl.drapro.StartActivity;
 
+/* renamed from: jp.colopl.libs.ShortCutIcon */
 public class ShortCutIcon {
     public static final String DEFAULT_ACTIVITY = "StartActivity";
 

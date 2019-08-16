@@ -99,22 +99,27 @@ public class StatusEquipSecond : StatusEquip
 		base.Initialize();
 	}
 
+	protected override SortCompareData[] CreateSortAry()
+	{
+		return sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortWithPayCheckData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
+	}
+
 	private void SetupTargetInventory()
 	{
 		string text;
 		if (MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType))
 		{
 			switchInventoryAry = weaponInventoryAry;
-			SetActive((Enum)UI.OBJ_WEAPON_WINDOW, true);
-			SetActive((Enum)UI.OBJ_DEFENSE_WINDOW, false);
-			SetToggle((Enum)tgl[(int)(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType - 1)], true);
+			SetActive((Enum)UI.OBJ_WEAPON_WINDOW, is_visible: true);
+			SetActive((Enum)UI.OBJ_DEFENSE_WINDOW, is_visible: false);
+			SetToggle((Enum)tgl[(int)(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType - 1)], value: true);
 			text = base.sectionData.GetText("CAPTION_WEAPON");
 		}
 		else
 		{
 			switchInventoryAry = defenseInventoryAry;
-			SetActive((Enum)UI.OBJ_WEAPON_WINDOW, false);
-			SetActive((Enum)UI.OBJ_DEFENSE_WINDOW, true);
+			SetActive((Enum)UI.OBJ_WEAPON_WINDOW, is_visible: false);
+			SetActive((Enum)UI.OBJ_DEFENSE_WINDOW, is_visible: true);
 			text = base.sectionData.GetText("CAPTION_DEFENCE");
 		}
 		InitializeCaption(text);
@@ -123,35 +128,35 @@ public class StatusEquipSecond : StatusEquip
 	private void OnQuery_TAB_1()
 	{
 		int num = 0;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle((Enum)tgl[num], value: true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_2()
 	{
 		int num = 1;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle((Enum)tgl[num], value: true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_3()
 	{
 		int num = 2;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle((Enum)tgl[num], value: true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_4()
 	{
 		int num = 3;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle((Enum)tgl[num], value: true);
 		LimitedInventory(num);
 	}
 
 	private void OnQuery_TAB_5()
 	{
 		int num = 4;
-		SetToggle((Enum)tgl[num], true);
+		SetToggle((Enum)tgl[num], value: true);
 		LimitedInventory(num);
 	}
 
@@ -173,6 +178,11 @@ public class StatusEquipSecond : StatusEquip
 		base.UpdateUI();
 	}
 
+	protected override SortBase.DIALOG_TYPE GetDialogType(bool isWeapon)
+	{
+		return (!isWeapon) ? SortBase.DIALOG_TYPE.TYPE_FILTERABLE_ARMOR : SortBase.DIALOG_TYPE.TYPE_FILTERABLE_WEAPON;
+	}
+
 	protected override void _OnOpenStatusStage()
 	{
 	}
@@ -189,11 +199,10 @@ public class StatusEquipSecond : StatusEquip
 	{
 		if (GameSaveData.instance.canPushTrackEquipTutorial)
 		{
-			GameSaveData.instance.SetPushTrackEquipTutorial(false);
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_equip, "Tutorial");
+			GameSaveData.instance.SetPushTrackEquipTutorial(canPush: false);
 		}
 		base.OnQuery_TRY_ON();
-		GameSection.ChangeEvent("SELECT_ITEM", null);
+		GameSection.ChangeEvent("SELECT_ITEM");
 		OnQuery_SELECT_ITEM();
 	}
 
@@ -202,13 +211,12 @@ public class StatusEquipSecond : StatusEquip
 		if (backEventData != null)
 		{
 			GameSection.SetEventData(backEventData);
-			Close(UITransition.TYPE.CLOSE);
+			Close();
 		}
 	}
 
 	private void InitializeCaption(string caption)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		SetLabelText(ctrl, UI.LBL_CAPTION, caption);
 		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
@@ -220,7 +228,7 @@ public class StatusEquipSecond : StatusEquip
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 }

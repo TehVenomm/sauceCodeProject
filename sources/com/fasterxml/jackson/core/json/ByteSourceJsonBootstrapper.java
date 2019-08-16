@@ -1,16 +1,14 @@
 package com.fasterxml.jackson.core.json;
 
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory.Feature;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.format.InputAccessor;
 import com.fasterxml.jackson.core.format.MatchStrength;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.io.MergedStream;
-import com.fasterxml.jackson.core.io.UTF32Reader;
+import com.fasterxml.jackson.core.p015io.IOContext;
+import com.fasterxml.jackson.core.p015io.MergedStream;
+import com.fasterxml.jackson.core.p015io.UTF32Reader;
 import com.fasterxml.jackson.core.sym.ByteQuadsCanonicalizer;
 import com.fasterxml.jackson.core.sym.CharsToNameCanonicalizer;
 import java.io.ByteArrayInputStream;
@@ -21,9 +19,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 public final class ByteSourceJsonBootstrapper {
-    static final byte UTF8_BOM_1 = (byte) -17;
-    static final byte UTF8_BOM_2 = (byte) -69;
-    static final byte UTF8_BOM_3 = (byte) -65;
+    static final byte UTF8_BOM_1 = -17;
+    static final byte UTF8_BOM_2 = -69;
+    static final byte UTF8_BOM_3 = -65;
     protected boolean _bigEndian = true;
     private final boolean _bufferRecyclable;
     protected int _bytesPerChar;
@@ -54,135 +52,133 @@ public final class ByteSourceJsonBootstrapper {
         this._bufferRecyclable = false;
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* JADX WARNING: Code restructure failed: missing block: B:11:0x0052, code lost:
+        if (checkUTF16(r2 >>> 16) != false) goto L_0x003c;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:16:0x0076, code lost:
+        if (checkUTF16(((r5._inputBuffer[r5._inputPtr] & 255) << 8) | (r5._inputBuffer[r5._inputPtr + 1] & 255)) != false) goto L_0x003c;
+     */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public com.fasterxml.jackson.core.JsonEncoding detectEncoding() throws java.io.IOException {
         /*
-        r5 = this;
-        r0 = 1;
-        r1 = 0;
-        r2 = 4;
-        r2 = r5.ensureLoaded(r2);
-        if (r2 == 0) goto L_0x0056;
-    L_0x0009:
-        r2 = r5._inputBuffer;
-        r3 = r5._inputPtr;
-        r2 = r2[r3];
-        r2 = r2 << 24;
-        r3 = r5._inputBuffer;
-        r4 = r5._inputPtr;
-        r4 = r4 + 1;
-        r3 = r3[r4];
-        r3 = r3 & 255;
-        r3 = r3 << 16;
-        r2 = r2 | r3;
-        r3 = r5._inputBuffer;
-        r4 = r5._inputPtr;
-        r4 = r4 + 2;
-        r3 = r3[r4];
-        r3 = r3 & 255;
-        r3 = r3 << 8;
-        r2 = r2 | r3;
-        r3 = r5._inputBuffer;
-        r4 = r5._inputPtr;
-        r4 = r4 + 3;
-        r3 = r3[r4];
-        r3 = r3 & 255;
-        r2 = r2 | r3;
-        r3 = r5.handleBOM(r2);
-        if (r3 == 0) goto L_0x0046;
-    L_0x003c:
-        if (r0 != 0) goto L_0x0079;
-    L_0x003e:
-        r0 = com.fasterxml.jackson.core.JsonEncoding.UTF8;
-    L_0x0040:
-        r1 = r5._context;
-        r1.setEncoding(r0);
-        return r0;
-    L_0x0046:
-        r3 = r5.checkUTF32(r2);
-        if (r3 != 0) goto L_0x003c;
-    L_0x004c:
-        r2 = r2 >>> 16;
-        r2 = r5.checkUTF16(r2);
-        if (r2 != 0) goto L_0x003c;
-    L_0x0054:
-        r0 = r1;
-        goto L_0x003c;
-    L_0x0056:
-        r2 = 2;
-        r2 = r5.ensureLoaded(r2);
-        if (r2 == 0) goto L_0x0054;
-    L_0x005d:
-        r2 = r5._inputBuffer;
-        r3 = r5._inputPtr;
-        r2 = r2[r3];
-        r2 = r2 & 255;
-        r2 = r2 << 8;
-        r3 = r5._inputBuffer;
-        r4 = r5._inputPtr;
-        r4 = r4 + 1;
-        r3 = r3[r4];
-        r3 = r3 & 255;
-        r2 = r2 | r3;
-        r2 = r5.checkUTF16(r2);
-        if (r2 == 0) goto L_0x0054;
-    L_0x0078:
-        goto L_0x003c;
-    L_0x0079:
-        r0 = r5._bytesPerChar;
-        switch(r0) {
-            case 1: goto L_0x0086;
-            case 2: goto L_0x0089;
-            case 3: goto L_0x007e;
-            case 4: goto L_0x0093;
-            default: goto L_0x007e;
-        };
-    L_0x007e:
-        r0 = new java.lang.RuntimeException;
-        r1 = "Internal error";
-        r0.<init>(r1);
-        throw r0;
-    L_0x0086:
-        r0 = com.fasterxml.jackson.core.JsonEncoding.UTF8;
-        goto L_0x0040;
-    L_0x0089:
-        r0 = r5._bigEndian;
-        if (r0 == 0) goto L_0x0090;
-    L_0x008d:
-        r0 = com.fasterxml.jackson.core.JsonEncoding.UTF16_BE;
-        goto L_0x0040;
-    L_0x0090:
-        r0 = com.fasterxml.jackson.core.JsonEncoding.UTF16_LE;
-        goto L_0x0040;
-    L_0x0093:
-        r0 = r5._bigEndian;
-        if (r0 == 0) goto L_0x009a;
-    L_0x0097:
-        r0 = com.fasterxml.jackson.core.JsonEncoding.UTF32_BE;
-        goto L_0x0040;
-    L_0x009a:
-        r0 = com.fasterxml.jackson.core.JsonEncoding.UTF32_LE;
-        goto L_0x0040;
+            r5 = this;
+            r0 = 1
+            r1 = 0
+            r2 = 4
+            boolean r2 = r5.ensureLoaded(r2)
+            if (r2 == 0) goto L_0x0056
+            byte[] r2 = r5._inputBuffer
+            int r3 = r5._inputPtr
+            byte r2 = r2[r3]
+            int r2 = r2 << 24
+            byte[] r3 = r5._inputBuffer
+            int r4 = r5._inputPtr
+            int r4 = r4 + 1
+            byte r3 = r3[r4]
+            r3 = r3 & 255(0xff, float:3.57E-43)
+            int r3 = r3 << 16
+            r2 = r2 | r3
+            byte[] r3 = r5._inputBuffer
+            int r4 = r5._inputPtr
+            int r4 = r4 + 2
+            byte r3 = r3[r4]
+            r3 = r3 & 255(0xff, float:3.57E-43)
+            int r3 = r3 << 8
+            r2 = r2 | r3
+            byte[] r3 = r5._inputBuffer
+            int r4 = r5._inputPtr
+            int r4 = r4 + 3
+            byte r3 = r3[r4]
+            r3 = r3 & 255(0xff, float:3.57E-43)
+            r2 = r2 | r3
+            boolean r3 = r5.handleBOM(r2)
+            if (r3 == 0) goto L_0x0046
+        L_0x003c:
+            if (r0 != 0) goto L_0x0079
+            com.fasterxml.jackson.core.JsonEncoding r0 = com.fasterxml.jackson.core.JsonEncoding.UTF8
+        L_0x0040:
+            com.fasterxml.jackson.core.io.IOContext r1 = r5._context
+            r1.setEncoding(r0)
+            return r0
+        L_0x0046:
+            boolean r3 = r5.checkUTF32(r2)
+            if (r3 != 0) goto L_0x003c
+            int r2 = r2 >>> 16
+            boolean r2 = r5.checkUTF16(r2)
+            if (r2 != 0) goto L_0x003c
+        L_0x0054:
+            r0 = r1
+            goto L_0x003c
+        L_0x0056:
+            r2 = 2
+            boolean r2 = r5.ensureLoaded(r2)
+            if (r2 == 0) goto L_0x0054
+            byte[] r2 = r5._inputBuffer
+            int r3 = r5._inputPtr
+            byte r2 = r2[r3]
+            r2 = r2 & 255(0xff, float:3.57E-43)
+            int r2 = r2 << 8
+            byte[] r3 = r5._inputBuffer
+            int r4 = r5._inputPtr
+            int r4 = r4 + 1
+            byte r3 = r3[r4]
+            r3 = r3 & 255(0xff, float:3.57E-43)
+            r2 = r2 | r3
+            boolean r2 = r5.checkUTF16(r2)
+            if (r2 == 0) goto L_0x0054
+            goto L_0x003c
+        L_0x0079:
+            int r0 = r5._bytesPerChar
+            switch(r0) {
+                case 1: goto L_0x0086;
+                case 2: goto L_0x0089;
+                case 3: goto L_0x007e;
+                case 4: goto L_0x0093;
+                default: goto L_0x007e;
+            }
+        L_0x007e:
+            java.lang.RuntimeException r0 = new java.lang.RuntimeException
+            java.lang.String r1 = "Internal error"
+            r0.<init>(r1)
+            throw r0
+        L_0x0086:
+            com.fasterxml.jackson.core.JsonEncoding r0 = com.fasterxml.jackson.core.JsonEncoding.UTF8
+            goto L_0x0040
+        L_0x0089:
+            boolean r0 = r5._bigEndian
+            if (r0 == 0) goto L_0x0090
+            com.fasterxml.jackson.core.JsonEncoding r0 = com.fasterxml.jackson.core.JsonEncoding.UTF16_BE
+            goto L_0x0040
+        L_0x0090:
+            com.fasterxml.jackson.core.JsonEncoding r0 = com.fasterxml.jackson.core.JsonEncoding.UTF16_LE
+            goto L_0x0040
+        L_0x0093:
+            boolean r0 = r5._bigEndian
+            if (r0 == 0) goto L_0x009a
+            com.fasterxml.jackson.core.JsonEncoding r0 = com.fasterxml.jackson.core.JsonEncoding.UTF32_BE
+            goto L_0x0040
+        L_0x009a:
+            com.fasterxml.jackson.core.JsonEncoding r0 = com.fasterxml.jackson.core.JsonEncoding.UTF32_LE
+            goto L_0x0040
         */
         throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.ByteSourceJsonBootstrapper.detectEncoding():com.fasterxml.jackson.core.JsonEncoding");
     }
 
     public Reader constructReader() throws IOException {
+        InputStream inputStream;
         JsonEncoding encoding = this._context.getEncoding();
         switch (encoding.bits()) {
             case 8:
             case 16:
-                InputStream byteArrayInputStream;
-                InputStream inputStream = this._in;
-                if (inputStream == null) {
-                    byteArrayInputStream = new ByteArrayInputStream(this._inputBuffer, this._inputPtr, this._inputEnd);
+                InputStream inputStream2 = this._in;
+                if (inputStream2 == null) {
+                    inputStream = new ByteArrayInputStream(this._inputBuffer, this._inputPtr, this._inputEnd);
                 } else if (this._inputPtr < this._inputEnd) {
-                    byteArrayInputStream = new MergedStream(this._context, inputStream, this._inputBuffer, this._inputPtr, this._inputEnd);
+                    inputStream = new MergedStream(this._context, inputStream2, this._inputBuffer, this._inputPtr, this._inputEnd);
                 } else {
-                    byteArrayInputStream = inputStream;
+                    inputStream = inputStream2;
                 }
-                return new InputStreamReader(byteArrayInputStream, encoding.getJavaName());
+                return new InputStreamReader(inputStream, encoding.getJavaName());
             case 32:
                 return new UTF32Reader(this._context, this._in, this._inputBuffer, this._inputPtr, this._inputEnd, this._context.getEncoding().isBigEndian());
             default:
@@ -191,10 +187,10 @@ public final class ByteSourceJsonBootstrapper {
     }
 
     public JsonParser constructParser(int i, ObjectCodec objectCodec, ByteQuadsCanonicalizer byteQuadsCanonicalizer, CharsToNameCanonicalizer charsToNameCanonicalizer, int i2) throws IOException {
-        if (detectEncoding() == JsonEncoding.UTF8 && Feature.CANONICALIZE_FIELD_NAMES.enabledIn(i2)) {
-            return new UTF8StreamJsonParser(this._context, i, this._in, objectCodec, byteQuadsCanonicalizer.makeChild(i2), this._inputBuffer, this._inputPtr, this._inputEnd, this._bufferRecyclable);
+        if (detectEncoding() != JsonEncoding.UTF8 || !Feature.CANONICALIZE_FIELD_NAMES.enabledIn(i2)) {
+            return new ReaderBasedJsonParser(this._context, i, constructReader(), objectCodec, charsToNameCanonicalizer.makeChild(i2));
         }
-        return new ReaderBasedJsonParser(this._context, i, constructReader(), objectCodec, charsToNameCanonicalizer.makeChild(i2));
+        return new UTF8StreamJsonParser(this._context, i, this._in, objectCodec, byteQuadsCanonicalizer.makeChild(i2), this._inputBuffer, this._inputPtr, this._inputEnd, this._bufferRecyclable);
     }
 
     public static MatchStrength hasJSONFormat(InputAccessor inputAccessor) throws IOException {
@@ -202,17 +198,17 @@ public final class ByteSourceJsonBootstrapper {
             return MatchStrength.INCONCLUSIVE;
         }
         byte nextByte = inputAccessor.nextByte();
-        if (nextByte == UTF8_BOM_1) {
+        if (nextByte == -17) {
             if (!inputAccessor.hasMoreBytes()) {
                 return MatchStrength.INCONCLUSIVE;
             }
-            if (inputAccessor.nextByte() != UTF8_BOM_2) {
+            if (inputAccessor.nextByte() != -69) {
                 return MatchStrength.NO_MATCH;
             }
             if (!inputAccessor.hasMoreBytes()) {
                 return MatchStrength.INCONCLUSIVE;
             }
-            if (inputAccessor.nextByte() != UTF8_BOM_3) {
+            if (inputAccessor.nextByte() != -65) {
                 return MatchStrength.NO_MATCH;
             }
             if (!inputAccessor.hasMoreBytes()) {
@@ -224,9 +220,8 @@ public final class ByteSourceJsonBootstrapper {
         if (skipSpace < 0) {
             return MatchStrength.INCONCLUSIVE;
         }
-        int skipSpace2;
         if (skipSpace == 123) {
-            skipSpace2 = skipSpace(inputAccessor);
+            int skipSpace2 = skipSpace(inputAccessor);
             if (skipSpace2 < 0) {
                 return MatchStrength.INCONCLUSIVE;
             }
@@ -235,11 +230,11 @@ public final class ByteSourceJsonBootstrapper {
             }
             return MatchStrength.NO_MATCH;
         } else if (skipSpace == 91) {
-            skipSpace2 = skipSpace(inputAccessor);
-            if (skipSpace2 < 0) {
+            int skipSpace3 = skipSpace(inputAccessor);
+            if (skipSpace3 < 0) {
                 return MatchStrength.INCONCLUSIVE;
             }
-            if (skipSpace2 == 93 || skipSpace2 == 91) {
+            if (skipSpace3 == 93 || skipSpace3 == 91) {
                 return MatchStrength.SOLID_MATCH;
             }
             return MatchStrength.SOLID_MATCH;
@@ -252,11 +247,11 @@ public final class ByteSourceJsonBootstrapper {
                 return matchStrength;
             }
             if (skipSpace == 45) {
-                skipSpace = skipSpace(inputAccessor);
-                if (skipSpace < 0) {
+                int skipSpace4 = skipSpace(inputAccessor);
+                if (skipSpace4 < 0) {
                     return MatchStrength.INCONCLUSIVE;
                 }
-                if (skipSpace > 57 || skipSpace < 48) {
+                if (skipSpace4 > 57 || skipSpace4 < 48) {
                     return MatchStrength.NO_MATCH;
                 }
                 return matchStrength;
@@ -288,23 +283,23 @@ public final class ByteSourceJsonBootstrapper {
     }
 
     private static int skipSpace(InputAccessor inputAccessor) throws IOException {
-        if (inputAccessor.hasMoreBytes()) {
-            return skipSpace(inputAccessor, inputAccessor.nextByte());
+        if (!inputAccessor.hasMoreBytes()) {
+            return -1;
         }
-        return -1;
+        return skipSpace(inputAccessor, inputAccessor.nextByte());
     }
 
     private static int skipSpace(InputAccessor inputAccessor, byte b) throws IOException {
         while (true) {
-            int i = b & 255;
-            if (i != 32 && i != 13 && i != 10 && i != 9) {
-                return i;
+            byte b2 = b & 255;
+            if (b2 != 32 && b2 != 13 && b2 != 10 && b2 != 9) {
+                return b2;
             }
             if (!inputAccessor.hasMoreBytes()) {
                 return -1;
             }
             b = inputAccessor.nextByte();
-            i = b & 255;
+            byte b3 = b & 255;
         }
     }
 
@@ -351,7 +346,7 @@ public final class ByteSourceJsonBootstrapper {
     private boolean checkUTF32(int i) throws IOException {
         if ((i >> 8) == 0) {
             this._bigEndian = true;
-        } else if ((ViewCompat.MEASURED_SIZE_MASK & i) == 0) {
+        } else if ((16777215 & i) == 0) {
             this._bigEndian = false;
         } else if ((-16711681 & i) == 0) {
             reportWeirdUCS4("3412");
@@ -365,7 +360,7 @@ public final class ByteSourceJsonBootstrapper {
     }
 
     private boolean checkUTF16(int i) {
-        if ((MotionEventCompat.ACTION_POINTER_INDEX_MASK & i) == 0) {
+        if ((65280 & i) == 0) {
             this._bigEndian = true;
         } else if ((i & 255) != 0) {
             return false;
@@ -380,20 +375,21 @@ public final class ByteSourceJsonBootstrapper {
         throw new CharConversionException("Unsupported UCS-4 endianness (" + str + ") detected");
     }
 
-    protected boolean ensureLoaded(int i) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean ensureLoaded(int i) throws IOException {
+        int read;
         int i2 = this._inputEnd - this._inputPtr;
         while (i2 < i) {
-            int i3;
             if (this._in == null) {
-                i3 = -1;
+                read = -1;
             } else {
-                i3 = this._in.read(this._inputBuffer, this._inputEnd, this._inputBuffer.length - this._inputEnd);
+                read = this._in.read(this._inputBuffer, this._inputEnd, this._inputBuffer.length - this._inputEnd);
             }
-            if (i3 < 1) {
+            if (read < 1) {
                 return false;
             }
-            this._inputEnd += i3;
-            i2 = i3 + i2;
+            this._inputEnd += read;
+            i2 = read + i2;
         }
         return true;
     }

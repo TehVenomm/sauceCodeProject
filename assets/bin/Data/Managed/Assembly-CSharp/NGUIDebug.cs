@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Internal/Debug")]
-public class NGUIDebug
+public class NGUIDebug : MonoBehaviour
 {
 	private static bool mRayDebug = false;
 
@@ -34,7 +34,7 @@ public class NGUIDebug
 	public static void CreateInstance()
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
+		//IL_001b: Expected O, but got Unknown
 		if (mInstance == null)
 		{
 			GameObject val = new GameObject("_NGUI Debug");

@@ -69,36 +69,37 @@ public class ItemSellConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		if (sellData != null)
+		if (sellData == null)
 		{
-			SetLabelText((Enum)UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
-			SetActive((Enum)UI.STR_INCLUDE_RARE, isRareConfirm);
-			SetActive((Enum)UI.STR_MAIN_TEXT, !isHideMainText);
-			DrawIcon();
-			SortCompareData[] array = sellData.ToArray();
-			int num = GetSellGold();
-			if (num == 0)
+			return;
+		}
+		SetLabelText((Enum)UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
+		SetActive((Enum)UI.STR_INCLUDE_RARE, isRareConfirm);
+		SetActive((Enum)UI.STR_MAIN_TEXT, !isHideMainText);
+		DrawIcon();
+		SortCompareData[] array = sellData.ToArray();
+		int num = GetSellGold();
+		if (num == 0)
+		{
+			int i = 0;
+			for (int num2 = array.Length; i < num2; i++)
 			{
-				int i = 0;
-				for (int num2 = array.Length; i < num2; i++)
-				{
-					num += array[i].GetSalePrice();
-				}
+				num += array[i].GetSalePrice();
 			}
-			SetActive((Enum)UI.OBJ_GOLD, num != 0);
-			SetLabelText((Enum)UI.LBL_TOTAL, num.ToString());
-			if (isButtonSingle)
-			{
-				SetActive((Enum)UI.BTN_CENTER, true);
-				SetActive((Enum)UI.BTN_0, false);
-				SetActive((Enum)UI.BTN_1, false);
-			}
-			else
-			{
-				SetActive((Enum)UI.BTN_CENTER, false);
-				SetActive((Enum)UI.BTN_0, true);
-				SetActive((Enum)UI.BTN_1, true);
-			}
+		}
+		SetActive((Enum)UI.OBJ_GOLD, num != 0);
+		SetLabelText((Enum)UI.LBL_TOTAL, num.ToString());
+		if (isButtonSingle)
+		{
+			SetActive((Enum)UI.BTN_CENTER, is_visible: true);
+			SetActive((Enum)UI.BTN_0, is_visible: false);
+			SetActive((Enum)UI.BTN_1, is_visible: false);
+		}
+		else
+		{
+			SetActive((Enum)UI.BTN_CENTER, is_visible: false);
+			SetActive((Enum)UI.BTN_0, is_visible: true);
+			SetActive((Enum)UI.BTN_1, is_visible: true);
 		}
 	}
 
@@ -111,39 +112,54 @@ public class ItemSellConfirm : GameSection
 	{
 		SortCompareData[] sell_data_ary = sellData.ToArray();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (i < sell_data_ary.Length)
 			{
-				int enemy_icon_id = 0;
-				int enemy_icon_id2 = 0;
-				bool is_equipping = false;
+				int num = 0;
+				int num2 = 0;
+				bool flag = false;
 				SortCompareData sortCompareData = sell_data_ary[i];
 				if (sortCompareData is ItemSortData)
 				{
 					ItemSortData itemSortData = sortCompareData as ItemSortData;
-					enemy_icon_id = itemSortData.itemData.tableData.enemyIconID;
-					enemy_icon_id2 = itemSortData.itemData.tableData.enemyIconID2;
+					num = itemSortData.itemData.tableData.enemyIconID;
+					num2 = itemSortData.itemData.tableData.enemyIconID2;
 				}
 				else if (sortCompareData is SkillItemSortData)
 				{
 					SkillItemSortData skillItemSortData = sortCompareData as SkillItemSortData;
-					is_equipping = skillItemSortData.IsEquipping();
+					flag = skillItemSortData.IsEquipping();
 				}
 				else if (sortCompareData is AbilityItemSortData)
 				{
-					enemy_icon_id = (sortCompareData as AbilityItemSortData).itemData.GetItemTableData().enemyIconID;
-					enemy_icon_id2 = (sortCompareData as AbilityItemSortData).itemData.GetItemTableData().enemyIconID2;
+					num = (sortCompareData as AbilityItemSortData).itemData.GetItemTableData().enemyIconID;
+					num2 = (sortCompareData as AbilityItemSortData).itemData.GetItemTableData().enemyIconID2;
 				}
+				ITEM_ICON_TYPE iconType = sell_data_ary[i].GetIconType();
+				int iconID = sell_data_ary[i].GetIconID();
+				RARITY_TYPE? rarity = sell_data_ary[i].GetRarity();
+				ELEMENT_TYPE iconElement = sell_data_ary[i].GetIconElement();
+				EQUIPMENT_TYPE? iconMagiEnableType = sell_data_ary[i].GetIconMagiEnableType();
+				int targetIconNum = GetTargetIconNum(sell_data_ary, i);
+				string event_name = null;
+				int event_data = 0;
+				bool is_new = false;
+				int toggle_group = -1;
+				bool is_select = false;
+				string icon_under_text = null;
+				bool is_equipping = flag;
+				int enemy_icon_id = num;
+				int enemy_icon_id2 = num2;
 				GET_TYPE getType = sell_data_ary[i].GetGetType();
-				ItemIcon itemIcon = ItemIcon.Create(sell_data_ary[i].GetIconType(), sell_data_ary[i].GetIconID(), sell_data_ary[i].GetRarity(), t, sell_data_ary[i].GetIconElement(), sell_data_ary[i].GetIconMagiEnableType(), GetTargetIconNum(sell_data_ary, i), null, 0, false, -1, false, null, is_equipping, enemy_icon_id, enemy_icon_id2, false, getType);
+				ItemIcon itemIcon = ItemIcon.Create(iconType, iconID, rarity, t, iconElement, iconMagiEnableType, targetIconNum, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType, sell_data_ary[i].GetIconElementSub());
 				itemIcon.SetRewardBG(isShowIconBG());
 				Transform ctrl = GetCtrl(UI.SCR_ICON);
 				SetMaterialInfo(itemIcon.transform, sell_data_ary[i].GetMaterialType(), sell_data_ary[i].GetTableID(), ctrl);
 			}
 			else
 			{
-				SetActive(t, false);
+				SetActive(t, is_visible: false);
 			}
 		});
 	}

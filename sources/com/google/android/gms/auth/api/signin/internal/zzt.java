@@ -1,13 +1,33 @@
 package com.google.android.gms.auth.api.signin.internal;
 
-import android.os.IInterface;
+import android.os.Parcel;
 import android.os.RemoteException;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.internal.auth-api.zzd;
+import com.google.android.gms.internal.auth-api.zze;
 
-public interface zzt extends IInterface {
-    void zza(zzr zzr, GoogleSignInOptions googleSignInOptions) throws RemoteException;
+public abstract class zzt extends zzd implements zzs {
+    public zzt() {
+        super("com.google.android.gms.auth.api.signin.internal.ISignInCallbacks");
+    }
 
-    void zzb(zzr zzr, GoogleSignInOptions googleSignInOptions) throws RemoteException;
-
-    void zzc(zzr zzr, GoogleSignInOptions googleSignInOptions) throws RemoteException;
+    /* access modifiers changed from: protected */
+    public final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+        switch (i) {
+            case 101:
+                zzc((GoogleSignInAccount) zze.zzc(parcel, GoogleSignInAccount.CREATOR), (Status) zze.zzc(parcel, Status.CREATOR));
+                break;
+            case 102:
+                zze((Status) zze.zzc(parcel, Status.CREATOR));
+                break;
+            case 103:
+                zzf((Status) zze.zzc(parcel, Status.CREATOR));
+                break;
+            default:
+                return false;
+        }
+        parcel2.writeNoException();
+        return true;
+    }
 }

@@ -19,30 +19,32 @@ public final class Range<T> implements Serializable {
         }
     }
 
-    public static <T extends Comparable<T>> Range<T> is(T t) {
+    /* renamed from: is */
+    public static <T extends Comparable<T>> Range<T> m1013is(T t) {
         return between(t, t, null);
     }
 
-    public static <T> Range<T> is(T t, Comparator<T> comparator) {
-        return between(t, t, comparator);
+    /* renamed from: is */
+    public static <T> Range<T> m1014is(T t, Comparator<T> comparator2) {
+        return between(t, t, comparator2);
     }
 
     public static <T extends Comparable<T>> Range<T> between(T t, T t2) {
         return between(t, t2, null);
     }
 
-    public static <T> Range<T> between(T t, T t2, Comparator<T> comparator) {
-        return new Range(t, t2, comparator);
+    public static <T> Range<T> between(T t, T t2, Comparator<T> comparator2) {
+        return new Range<>(t, t2, comparator2);
     }
 
-    private Range(T t, T t2, Comparator<T> comparator) {
+    private Range(T t, T t2, Comparator<T> comparator2) {
         if (t == null || t2 == null) {
             throw new IllegalArgumentException("Elements in a range must not be null: element1=" + t + ", element2=" + t2);
         }
-        if (comparator == null) {
+        if (comparator2 == null) {
             this.comparator = ComparableComparator.INSTANCE;
         } else {
-            this.comparator = comparator;
+            this.comparator = comparator2;
         }
         if (this.comparator.compare(t, t2) < 1) {
             this.minimum = t;
@@ -170,10 +172,10 @@ public final class Range<T> implements Serializable {
             return false;
         }
         Range range = (Range) obj;
-        if (this.minimum.equals(range.minimum) && this.maximum.equals(range.maximum)) {
-            return true;
+        if (!this.minimum.equals(range.minimum) || !this.maximum.equals(range.maximum)) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {
@@ -181,9 +183,9 @@ public final class Range<T> implements Serializable {
         if (this.hashCode != 0) {
             return i;
         }
-        i = ((((getClass().hashCode() + 629) * 37) + this.minimum.hashCode()) * 37) + this.maximum.hashCode();
-        this.hashCode = i;
-        return i;
+        int hashCode2 = ((((getClass().hashCode() + 629) * 37) + this.minimum.hashCode()) * 37) + this.maximum.hashCode();
+        this.hashCode = hashCode2;
+        return hashCode2;
     }
 
     public String toString() {
@@ -191,15 +193,15 @@ public final class Range<T> implements Serializable {
         if (str != null) {
             return str;
         }
-        StringBuilder stringBuilder = new StringBuilder(32);
-        stringBuilder.append('[');
-        stringBuilder.append(this.minimum);
-        stringBuilder.append("..");
-        stringBuilder.append(this.maximum);
-        stringBuilder.append(']');
-        str = stringBuilder.toString();
-        this.toString = str;
-        return str;
+        StringBuilder sb = new StringBuilder(32);
+        sb.append('[');
+        sb.append(this.minimum);
+        sb.append("..");
+        sb.append(this.maximum);
+        sb.append(']');
+        String sb2 = sb.toString();
+        this.toString = sb2;
+        return sb2;
     }
 
     public String toString(String str) {

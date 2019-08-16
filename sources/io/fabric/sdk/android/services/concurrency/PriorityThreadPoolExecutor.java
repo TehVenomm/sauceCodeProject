@@ -1,17 +1,20 @@
-package io.fabric.sdk.android.services.concurrency;
+package p017io.fabric.sdk.android.services.concurrency;
 
+import android.annotation.TargetApi;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.PriorityThreadPoolExecutor */
 public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     private static final int CORE_POOL_SIZE = (CPU_COUNT + 1);
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final long KEEP_ALIVE = 1;
     private static final int MAXIMUM_POOL_SIZE = ((CPU_COUNT * 2) + 1);
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.PriorityThreadPoolExecutor$PriorityThreadFactory */
     protected static final class PriorityThreadFactory implements ThreadFactory {
         private final int threadPriority;
 
@@ -44,7 +47,8 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
         return new PriorityThreadPoolExecutor(i, i2, 1, TimeUnit.SECONDS, new DependencyPriorityBlockingQueue(), new PriorityThreadFactory(10));
     }
 
-    protected void afterExecute(Runnable runnable, Throwable th) {
+    /* access modifiers changed from: protected */
+    public void afterExecute(Runnable runnable, Throwable th) {
         Task task = (Task) runnable;
         task.setFinished(true);
         task.setError(th);
@@ -52,6 +56,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
         super.afterExecute(runnable, th);
     }
 
+    @TargetApi(9)
     public void execute(Runnable runnable) {
         if (PriorityTask.isProperDelegate(runnable)) {
             super.execute(runnable);
@@ -64,11 +69,13 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
         return (DependencyPriorityBlockingQueue) super.getQueue();
     }
 
-    protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T t) {
+    /* access modifiers changed from: protected */
+    public <T> RunnableFuture<T> newTaskFor(Runnable runnable, T t) {
         return new PriorityFutureTask(runnable, t);
     }
 
-    protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
+    /* access modifiers changed from: protected */
+    public <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
         return new PriorityFutureTask(callable);
     }
 }

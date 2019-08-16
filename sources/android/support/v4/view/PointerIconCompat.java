@@ -1,14 +1,15 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.os.Build.VERSION;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.os.BuildCompat;
+import android.view.PointerIcon;
 
+/* renamed from: android.support.v4.view.PointerIconCompat */
 public final class PointerIconCompat {
-    static final PointerIconCompatImpl IMPL;
     public static final int TYPE_ALIAS = 1010;
     public static final int TYPE_ALL_SCROLL = 1013;
     public static final int TYPE_ARROW = 1000;
@@ -34,70 +35,20 @@ public final class PointerIconCompat {
     public static final int TYPE_ZOOM_OUT = 1019;
     private Object mPointerIcon;
 
-    interface PointerIconCompatImpl {
-        Object create(Bitmap bitmap, float f, float f2);
-
-        Object getSystemIcon(Context context, int i);
-
-        Object load(Resources resources, int i);
-    }
-
-    static class BasePointerIconCompatImpl implements PointerIconCompatImpl {
-        BasePointerIconCompatImpl() {
-        }
-
-        public Object create(Bitmap bitmap, float f, float f2) {
-            return null;
-        }
-
-        public Object getSystemIcon(Context context, int i) {
-            return null;
-        }
-
-        public Object load(Resources resources, int i) {
-            return null;
-        }
-    }
-
-    static class Api24PointerIconCompatImpl extends BasePointerIconCompatImpl {
-        Api24PointerIconCompatImpl() {
-        }
-
-        public Object create(Bitmap bitmap, float f, float f2) {
-            return PointerIconCompatApi24.create(bitmap, f, f2);
-        }
-
-        public Object getSystemIcon(Context context, int i) {
-            return PointerIconCompatApi24.getSystemIcon(context, i);
-        }
-
-        public Object load(Resources resources, int i) {
-            return PointerIconCompatApi24.load(resources, i);
-        }
-    }
-
-    static {
-        if (BuildCompat.isAtLeastN()) {
-            IMPL = new Api24PointerIconCompatImpl();
-        } else {
-            IMPL = new BasePointerIconCompatImpl();
-        }
-    }
-
     private PointerIconCompat(Object obj) {
         this.mPointerIcon = obj;
     }
 
     public static PointerIconCompat create(Bitmap bitmap, float f, float f2) {
-        return new PointerIconCompat(IMPL.create(bitmap, f, f2));
+        return VERSION.SDK_INT >= 24 ? new PointerIconCompat(PointerIcon.create(bitmap, f, f2)) : new PointerIconCompat(null);
     }
 
     public static PointerIconCompat getSystemIcon(Context context, int i) {
-        return new PointerIconCompat(IMPL.getSystemIcon(context, i));
+        return VERSION.SDK_INT >= 24 ? new PointerIconCompat(PointerIcon.getSystemIcon(context, i)) : new PointerIconCompat(null);
     }
 
     public static PointerIconCompat load(Resources resources, int i) {
-        return new PointerIconCompat(IMPL.load(resources, i));
+        return VERSION.SDK_INT >= 24 ? new PointerIconCompat(PointerIcon.load(resources, i)) : new PointerIconCompat(null);
     }
 
     @RestrictTo({Scope.LIBRARY_GROUP})

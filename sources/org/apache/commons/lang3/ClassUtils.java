@@ -3,7 +3,6 @@ package org.apache.commons.lang3;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +45,7 @@ public class ClassUtils {
                 wrapperPrimitiveMap.put(cls2, cls);
             }
         }
-        Map hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         hashMap.put("int", "I");
         hashMap.put("boolean", "Z");
         hashMap.put("float", "F");
@@ -56,7 +55,7 @@ public class ClassUtils {
         hashMap.put("double", "D");
         hashMap.put("char", "C");
         hashMap.put("void", "V");
-        Map hashMap2 = new HashMap();
+        HashMap hashMap2 = new HashMap();
         for (Entry entry : hashMap.entrySet()) {
             hashMap2.put(entry.getValue(), entry.getKey());
         }
@@ -79,11 +78,11 @@ public class ClassUtils {
         if (StringUtils.isEmpty(str)) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (str.startsWith("[")) {
             while (str.charAt(0) == '[') {
                 str = str.substring(1);
-                stringBuilder.append("[]");
+                sb.append("[]");
             }
             if (str.charAt(0) == 'L' && str.charAt(str.length() - 1) == ';') {
                 str = str.substring(1, str.length() - 1);
@@ -98,7 +97,7 @@ public class ClassUtils {
         if (indexOf != -1) {
             substring = substring.replace('$', PACKAGE_SEPARATOR_CHAR);
         }
-        return substring + stringBuilder;
+        return substring + sb;
     }
 
     public static String getSimpleName(Class<?> cls) {
@@ -154,28 +153,28 @@ public class ClassUtils {
             return "";
         } else {
             int countMatches = StringUtils.countMatches((CharSequence) str, (char) PACKAGE_SEPARATOR_CHAR);
-            Object[] objArr = new String[(countMatches + 1)];
-            int length = str.length() - 1;
+            String[] strArr = new String[(countMatches + 1)];
             int i2 = countMatches;
+            int length = str.length() - 1;
             while (i2 >= 0) {
                 int lastIndexOf = str.lastIndexOf(46, length);
                 String substring = str.substring(lastIndexOf + 1, length + 1);
-                length = i - substring.length();
+                int length2 = i - substring.length();
                 if (i2 > 0) {
-                    length--;
+                    length2--;
                 }
                 if (i2 == countMatches) {
-                    objArr[i2] = substring;
-                } else if (length > 0) {
-                    objArr[i2] = substring;
+                    strArr[i2] = substring;
+                } else if (length2 > 0) {
+                    strArr[i2] = substring;
                 } else {
-                    objArr[i2] = substring.substring(0, 1);
+                    strArr[i2] = substring.substring(0, 1);
                 }
-                i2--;
-                i = length;
                 length = lastIndexOf - 1;
+                i2--;
+                i = length2;
             }
-            return StringUtils.join(objArr, (char) PACKAGE_SEPARATOR_CHAR);
+            return StringUtils.join((Object[]) strArr, (char) PACKAGE_SEPARATOR_CHAR);
         }
     }
 
@@ -183,7 +182,7 @@ public class ClassUtils {
         if (cls == null) {
             return null;
         }
-        List<Class<?>> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (Class superclass = cls.getSuperclass(); superclass != null; superclass = superclass.getSuperclass()) {
             arrayList.add(superclass);
         }
@@ -194,12 +193,13 @@ public class ClassUtils {
         if (cls == null) {
             return null;
         }
-        Collection linkedHashSet = new LinkedHashSet();
+        LinkedHashSet linkedHashSet = new LinkedHashSet();
         getAllInterfaces(cls, linkedHashSet);
         return new ArrayList(linkedHashSet);
     }
 
     private static void getAllInterfaces(Class<?> cls, HashSet<Class<?>> hashSet) {
+        Class[] interfaces;
         while (cls != null) {
             for (Class cls2 : cls.getInterfaces()) {
                 if (hashSet.add(cls2)) {
@@ -214,7 +214,7 @@ public class ClassUtils {
         if (list == null) {
             return null;
         }
-        List<Class<?>> arrayList = new ArrayList(list.size());
+        ArrayList arrayList = new ArrayList(list.size());
         for (String cls : list) {
             try {
                 arrayList.add(Class.forName(cls));
@@ -229,7 +229,7 @@ public class ClassUtils {
         if (list == null) {
             return null;
         }
-        List<String> arrayList = new ArrayList(list.size());
+        ArrayList arrayList = new ArrayList(list.size());
         for (Class cls : list) {
             if (cls == null) {
                 arrayList.add(null);
@@ -241,7 +241,7 @@ public class ClassUtils {
     }
 
     public static boolean isAssignable(Class<?>[] clsArr, Class<?>... clsArr2) {
-        return isAssignable((Class[]) clsArr, (Class[]) clsArr2, SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_5));
+        return isAssignable(clsArr, clsArr2, SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_5));
     }
 
     public static boolean isAssignable(Class<?>[] clsArr, Class<?>[] clsArr2, boolean z) {
@@ -277,7 +277,7 @@ public class ClassUtils {
     }
 
     public static boolean isAssignable(Class<?> cls, Class<?> cls2) {
-        return isAssignable((Class) cls, (Class) cls2, SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_5));
+        return isAssignable(cls, cls2, SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_5));
     }
 
     public static boolean isAssignable(Class<?> cls, Class<?> cls2, boolean z) {
@@ -365,7 +365,7 @@ public class ClassUtils {
         if (clsArr.length == 0) {
             return clsArr;
         }
-        Class<?>[] clsArr2 = new Class[clsArr.length];
+        Class[] clsArr2 = new Class[clsArr.length];
         for (int i = 0; i < clsArr.length; i++) {
             clsArr2[i] = primitiveToWrapper(clsArr[i]);
         }
@@ -383,7 +383,7 @@ public class ClassUtils {
         if (clsArr.length == 0) {
             return clsArr;
         }
-        Class<?>[] clsArr2 = new Class[clsArr.length];
+        Class[] clsArr2 = new Class[clsArr.length];
         for (int i = 0; i < clsArr.length; i++) {
             clsArr2[i] = wrapperToPrimitive(clsArr[i]);
         }
@@ -400,13 +400,12 @@ public class ClassUtils {
                 return Class.forName("[" + ((String) abbreviationMap.get(str)), z, classLoader).getComponentType();
             }
             return Class.forName(toCanonicalName(str), z, classLoader);
-        } catch (Object e) {
+        } catch (ClassNotFoundException e) {
             int lastIndexOf = str.lastIndexOf(46);
             if (lastIndexOf != -1) {
                 try {
                     return getClass(classLoader, str.substring(0, lastIndexOf) + '$' + str.substring(lastIndexOf + 1), z);
                 } catch (ClassNotFoundException e2) {
-                    throw e;
                 }
             }
             throw e;
@@ -432,7 +431,7 @@ public class ClassUtils {
     public static Method getPublicMethod(Class<?> cls, String str, Class<?>... clsArr) throws SecurityException, NoSuchMethodException {
         Method method = cls.getMethod(str, clsArr);
         if (!Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
-            List<Class> arrayList = new ArrayList();
+            ArrayList<Class> arrayList = new ArrayList<>();
             arrayList.addAll(getAllInterfaces(cls));
             arrayList.addAll(getAllSuperclasses(cls));
             for (Class cls2 : arrayList) {
@@ -451,26 +450,29 @@ public class ClassUtils {
     }
 
     private static String toCanonicalName(String str) {
+        String str2;
         String deleteWhitespace = StringUtils.deleteWhitespace(str);
         if (deleteWhitespace == null) {
             throw new NullPointerException("className must not be null.");
         } else if (!deleteWhitespace.endsWith("[]")) {
             return deleteWhitespace;
         } else {
-            StringBuilder stringBuilder = new StringBuilder();
-            String str2 = deleteWhitespace;
-            while (str2.endsWith("[]")) {
-                deleteWhitespace = str2.substring(0, str2.length() - 2);
-                stringBuilder.append("[");
+            StringBuilder sb = new StringBuilder();
+            while (true) {
                 str2 = deleteWhitespace;
+                if (!str2.endsWith("[]")) {
+                    break;
+                }
+                deleteWhitespace = str2.substring(0, str2.length() - 2);
+                sb.append("[");
             }
-            deleteWhitespace = (String) abbreviationMap.get(str2);
-            if (deleteWhitespace != null) {
-                stringBuilder.append(deleteWhitespace);
+            String str3 = (String) abbreviationMap.get(str2);
+            if (str3 != null) {
+                sb.append(str3);
             } else {
-                stringBuilder.append("L").append(str2).append(";");
+                sb.append("L").append(str2).append(";");
             }
-            return stringBuilder.toString();
+            return sb.toString();
         }
     }
 
@@ -481,7 +483,7 @@ public class ClassUtils {
         if (objArr.length == 0) {
             return ArrayUtils.EMPTY_CLASS_ARRAY;
         }
-        Class<?>[] clsArr = new Class[objArr.length];
+        Class[] clsArr = new Class[objArr.length];
         for (int i = 0; i < objArr.length; i++) {
             clsArr[i] = objArr[i] == null ? null : objArr[i].getClass();
         }
@@ -519,34 +521,33 @@ public class ClassUtils {
     }
 
     private static String getCanonicalName(String str) {
-        int i = 0;
+        String str2;
         String deleteWhitespace = StringUtils.deleteWhitespace(str);
         if (deleteWhitespace == null) {
             return null;
         }
-        int i2 = 0;
-        String str2 = deleteWhitespace;
-        while (str2.startsWith("[")) {
-            int i3 = i2 + 1;
-            str2 = str2.substring(1);
-            i2 = i3;
+        int i = 0;
+        String str3 = deleteWhitespace;
+        while (str3.startsWith("[")) {
+            int i2 = i + 1;
+            str3 = str3.substring(1);
+            i = i2;
         }
-        if (i2 < 1) {
-            return str2;
+        if (i < 1) {
+            return str3;
         }
-        if (str2.startsWith("L")) {
-            deleteWhitespace = str2.substring(1, str2.endsWith(";") ? str2.length() - 1 : str2.length());
-        } else if (str2.length() > 0) {
-            deleteWhitespace = (String) reverseAbbreviationMap.get(str2.substring(0, 1));
+        if (str3.startsWith("L")) {
+            str2 = str3.substring(1, str3.endsWith(";") ? str3.length() - 1 : str3.length());
+        } else if (str3.length() > 0) {
+            str2 = (String) reverseAbbreviationMap.get(str3.substring(0, 1));
         } else {
-            deleteWhitespace = str2;
+            str2 = str3;
         }
-        StringBuilder stringBuilder = new StringBuilder(deleteWhitespace);
-        while (i < i2) {
-            stringBuilder.append("[]");
-            i++;
+        StringBuilder sb = new StringBuilder(str2);
+        for (int i3 = 0; i3 < i; i3++) {
+            sb.append("[]");
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static Iterable<Class<?>> hierarchy(Class<?> cls) {
@@ -554,7 +555,7 @@ public class ClassUtils {
     }
 
     public static Iterable<Class<?>> hierarchy(final Class<?> cls, Interfaces interfaces) {
-        final Iterable<Class<?>> c12701 = new Iterable<Class<?>>() {
+        final C17681 r0 = new Iterable<Class<?>>() {
             public Iterator<Class<?>> iterator() {
                 final MutableObject mutableObject = new MutableObject(cls);
                 return new Iterator<Class<?>>() {
@@ -574,10 +575,10 @@ public class ClassUtils {
                 };
             }
         };
-        return interfaces != Interfaces.INCLUDE ? c12701 : new Iterable<Class<?>>() {
+        return interfaces != Interfaces.INCLUDE ? r0 : new Iterable<Class<?>>() {
             public Iterator<Class<?>> iterator() {
-                final Set hashSet = new HashSet();
-                final Iterator it = c12701.iterator();
+                final HashSet hashSet = new HashSet();
+                final Iterator it = r0.iterator();
                 return new Iterator<Class<?>>() {
                     Iterator<Class<?>> interfaces = Collections.emptySet().iterator();
 
@@ -591,14 +592,15 @@ public class ClassUtils {
                             hashSet.add(cls);
                             return cls;
                         }
-                        cls = (Class) it.next();
-                        Set linkedHashSet = new LinkedHashSet();
-                        walkInterfaces(linkedHashSet, cls);
+                        Class<?> cls2 = (Class) it.next();
+                        LinkedHashSet linkedHashSet = new LinkedHashSet();
+                        walkInterfaces(linkedHashSet, cls2);
                         this.interfaces = linkedHashSet.iterator();
-                        return cls;
+                        return cls2;
                     }
 
                     private void walkInterfaces(Set<Class<?>> set, Class<?> cls) {
+                        Class[] interfaces2;
                         for (Class cls2 : cls.getInterfaces()) {
                             if (!hashSet.contains(cls2)) {
                                 set.add(cls2);

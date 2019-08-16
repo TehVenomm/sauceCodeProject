@@ -1,29 +1,52 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.app.NotificationCompatBase.Action.Factory;
-import android.support.v4.app.NotificationCompatBase.UnreadConversation;
-import android.support.v4.app.RemoteInputCompatBase.RemoteInput;
-import android.support.v4.os.BuildCompat;
+import android.support.compat.C0004R;
+import android.support.p000v4.app.NotificationCompatBase.Action.Factory;
+import android.support.p000v4.app.NotificationCompatBase.UnreadConversation;
+import android.support.p000v4.app.RemoteInputCompatBase.RemoteInput;
+import android.support.p000v4.text.BidiFormatter;
+import android.support.p000v4.view.ViewCompat;
+import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
+import android.text.style.TextAppearanceSpan;
 import android.widget.RemoteViews;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
+/* renamed from: android.support.v4.app.NotificationCompat */
 public class NotificationCompat {
+    public static final int BADGE_ICON_LARGE = 2;
+    public static final int BADGE_ICON_NONE = 0;
+    public static final int BADGE_ICON_SMALL = 1;
     public static final String CATEGORY_ALARM = "alarm";
     public static final String CATEGORY_CALL = "call";
     public static final String CATEGORY_EMAIL = "email";
@@ -45,6 +68,7 @@ public class NotificationCompat {
     public static final int DEFAULT_LIGHTS = 4;
     public static final int DEFAULT_SOUND = 1;
     public static final int DEFAULT_VIBRATE = 2;
+    public static final String EXTRA_AUDIO_CONTENTS_URI = "android.audioContents";
     public static final String EXTRA_BACKGROUND_IMAGE_URI = "android.backgroundImageUri";
     public static final String EXTRA_BIG_TEXT = "android.bigText";
     public static final String EXTRA_COMPACT_ACTIONS = "android.compactActions";
@@ -82,6 +106,9 @@ public class NotificationCompat {
     public static final int FLAG_ONGOING_EVENT = 2;
     public static final int FLAG_ONLY_ALERT_ONCE = 8;
     public static final int FLAG_SHOW_LIGHTS = 1;
+    public static final int GROUP_ALERT_ALL = 0;
+    public static final int GROUP_ALERT_CHILDREN = 2;
+    public static final int GROUP_ALERT_SUMMARY = 1;
     static final NotificationCompatImpl IMPL;
     public static final int PRIORITY_DEFAULT = 0;
     public static final int PRIORITY_HIGH = 1;
@@ -93,30 +120,27 @@ public class NotificationCompat {
     public static final int VISIBILITY_PUBLIC = 1;
     public static final int VISIBILITY_SECRET = -1;
 
-    public static class Action extends android.support.v4.app.NotificationCompatBase.Action {
+    /* renamed from: android.support.v4.app.NotificationCompat$Action */
+    public static class Action extends android.support.p000v4.app.NotificationCompatBase.Action {
         @RestrictTo({Scope.LIBRARY_GROUP})
-        public static final Factory FACTORY = new C00371();
-        public PendingIntent actionIntent;
-        public int icon;
-        private boolean mAllowGeneratedReplies;
-        final Bundle mExtras;
-        private final RemoteInput[] mRemoteInputs;
-        public CharSequence title;
-
-        /* renamed from: android.support.v4.app.NotificationCompat$Action$1 */
-        static final class C00371 implements Factory {
-            C00371() {
-            }
-
-            public android.support.v4.app.NotificationCompatBase.Action build(int i, CharSequence charSequence, PendingIntent pendingIntent, Bundle bundle, RemoteInput[] remoteInputArr, boolean z) {
-                return new Action(i, charSequence, pendingIntent, bundle, (RemoteInput[]) remoteInputArr, z);
+        public static final Factory FACTORY = new Factory() {
+            public android.support.p000v4.app.NotificationCompatBase.Action build(int i, CharSequence charSequence, PendingIntent pendingIntent, Bundle bundle, RemoteInput[] remoteInputArr, RemoteInput[] remoteInputArr2, boolean z) {
+                return new Action(i, charSequence, pendingIntent, bundle, (RemoteInput[]) remoteInputArr, (RemoteInput[]) remoteInputArr2, z);
             }
 
             public Action[] newArray(int i) {
                 return new Action[i];
             }
-        }
+        };
+        public PendingIntent actionIntent;
+        public int icon;
+        private boolean mAllowGeneratedReplies;
+        private final RemoteInput[] mDataOnlyRemoteInputs;
+        final Bundle mExtras;
+        private final RemoteInput[] mRemoteInputs;
+        public CharSequence title;
 
+        /* renamed from: android.support.v4.app.NotificationCompat$Action$Builder */
         public static final class Builder {
             private boolean mAllowGeneratedReplies;
             private final Bundle mExtras;
@@ -135,7 +159,7 @@ public class NotificationCompat {
                 this.mTitle = Builder.limitCharSequenceLength(charSequence);
                 this.mIntent = pendingIntent;
                 this.mExtras = bundle;
-                this.mRemoteInputs = remoteInputArr == null ? null : new ArrayList(Arrays.asList(remoteInputArr));
+                this.mRemoteInputs = remoteInputArr == null ? null : new ArrayList<>(Arrays.asList(remoteInputArr));
                 this.mAllowGeneratedReplies = z;
             }
 
@@ -152,14 +176,27 @@ public class NotificationCompat {
 
             public Builder addRemoteInput(RemoteInput remoteInput) {
                 if (this.mRemoteInputs == null) {
-                    this.mRemoteInputs = new ArrayList();
+                    this.mRemoteInputs = new ArrayList<>();
                 }
                 this.mRemoteInputs.add(remoteInput);
                 return this;
             }
 
             public Action build() {
-                return new Action(this.mIcon, this.mTitle, this.mIntent, this.mExtras, this.mRemoteInputs != null ? (RemoteInput[]) this.mRemoteInputs.toArray(new RemoteInput[this.mRemoteInputs.size()]) : null, this.mAllowGeneratedReplies);
+                ArrayList arrayList = new ArrayList();
+                ArrayList arrayList2 = new ArrayList();
+                if (this.mRemoteInputs != null) {
+                    Iterator it = this.mRemoteInputs.iterator();
+                    while (it.hasNext()) {
+                        RemoteInput remoteInput = (RemoteInput) it.next();
+                        if (remoteInput.isDataOnly()) {
+                            arrayList.add(remoteInput);
+                        } else {
+                            arrayList2.add(remoteInput);
+                        }
+                    }
+                }
+                return new Action(this.mIcon, this.mTitle, this.mIntent, this.mExtras, arrayList2.isEmpty() ? null : (RemoteInput[]) arrayList2.toArray(new RemoteInput[arrayList2.size()]), arrayList.isEmpty() ? null : (RemoteInput[]) arrayList.toArray(new RemoteInput[arrayList.size()]), this.mAllowGeneratedReplies);
             }
 
             public Builder extend(Extender extender) {
@@ -177,10 +214,12 @@ public class NotificationCompat {
             }
         }
 
+        /* renamed from: android.support.v4.app.NotificationCompat$Action$Extender */
         public interface Extender {
             Builder extend(Builder builder);
         }
 
+        /* renamed from: android.support.v4.app.NotificationCompat$Action$WearableExtender */
         public static final class WearableExtender implements Extender {
             private static final int DEFAULT_FLAGS = 1;
             private static final String EXTRA_WEARABLE_EXTENSIONS = "android.wearable.EXTENSIONS";
@@ -195,6 +234,9 @@ public class NotificationCompat {
             private CharSequence mConfirmLabel;
             private int mFlags = 1;
             private CharSequence mInProgressLabel;
+
+            public WearableExtender() {
+            }
 
             public WearableExtender(Action action) {
                 Bundle bundle = action.getExtras().getBundle(EXTRA_WEARABLE_EXTENSIONS);
@@ -297,10 +339,10 @@ public class NotificationCompat {
         }
 
         public Action(int i, CharSequence charSequence, PendingIntent pendingIntent) {
-            this(i, charSequence, pendingIntent, new Bundle(), null, true);
+            this(i, charSequence, pendingIntent, new Bundle(), null, null, true);
         }
 
-        Action(int i, CharSequence charSequence, PendingIntent pendingIntent, Bundle bundle, RemoteInput[] remoteInputArr, boolean z) {
+        Action(int i, CharSequence charSequence, PendingIntent pendingIntent, Bundle bundle, RemoteInput[] remoteInputArr, RemoteInput[] remoteInputArr2, boolean z) {
             this.icon = i;
             this.title = Builder.limitCharSequenceLength(charSequence);
             this.actionIntent = pendingIntent;
@@ -309,6 +351,7 @@ public class NotificationCompat {
             }
             this.mExtras = bundle;
             this.mRemoteInputs = remoteInputArr;
+            this.mDataOnlyRemoteInputs = remoteInputArr2;
             this.mAllowGeneratedReplies = z;
         }
 
@@ -318,6 +361,10 @@ public class NotificationCompat {
 
         public boolean getAllowGeneratedReplies() {
             return this.mAllowGeneratedReplies;
+        }
+
+        public RemoteInput[] getDataOnlyRemoteInputs() {
+            return this.mDataOnlyRemoteInputs;
         }
 
         public Bundle getExtras() {
@@ -337,41 +384,30 @@ public class NotificationCompat {
         }
     }
 
-    public static abstract class Style {
-        CharSequence mBigContentTitle;
-        Builder mBuilder;
-        CharSequence mSummaryText;
-        boolean mSummaryTextSet = false;
-
-        @RestrictTo({Scope.LIBRARY_GROUP})
-        public void addCompatExtras(Bundle bundle) {
-        }
-
-        public Notification build() {
-            return this.mBuilder != null ? this.mBuilder.build() : null;
-        }
-
-        @RestrictTo({Scope.LIBRARY_GROUP})
-        protected void restoreFromCompatExtras(Bundle bundle) {
-        }
-
-        public void setBuilder(Builder builder) {
-            if (this.mBuilder != builder) {
-                this.mBuilder = builder;
-                if (this.mBuilder != null) {
-                    this.mBuilder.setStyle(this);
-                }
-            }
-        }
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.app.NotificationCompat$BadgeIconType */
+    public @interface BadgeIconType {
     }
 
+    /* renamed from: android.support.v4.app.NotificationCompat$BigPictureStyle */
     public static class BigPictureStyle extends Style {
-        Bitmap mBigLargeIcon;
-        boolean mBigLargeIconSet;
-        Bitmap mPicture;
+        private Bitmap mBigLargeIcon;
+        private boolean mBigLargeIconSet;
+        private Bitmap mPicture;
+
+        public BigPictureStyle() {
+        }
 
         public BigPictureStyle(Builder builder) {
             setBuilder(builder);
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void apply(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT >= 16) {
+                NotificationCompatJellybean.addBigPictureStyle(notificationBuilderWithBuilderAccessor, this.mBigContentTitle, this.mSummaryTextSet, this.mSummaryText, this.mPicture, this.mBigLargeIcon, this.mBigLargeIconSet);
+            }
         }
 
         public BigPictureStyle bigLargeIcon(Bitmap bitmap) {
@@ -397,11 +433,22 @@ public class NotificationCompat {
         }
     }
 
+    /* renamed from: android.support.v4.app.NotificationCompat$BigTextStyle */
     public static class BigTextStyle extends Style {
-        CharSequence mBigText;
+        private CharSequence mBigText;
+
+        public BigTextStyle() {
+        }
 
         public BigTextStyle(Builder builder) {
             setBuilder(builder);
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void apply(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT >= 16) {
+                NotificationCompatJellybean.addBigTextStyle(notificationBuilderWithBuilderAccessor, this.mBigContentTitle, this.mSummaryTextSet, this.mSummaryText, this.mBigText);
+            }
         }
 
         public BigTextStyle bigText(CharSequence charSequence) {
@@ -421,13 +468,18 @@ public class NotificationCompat {
         }
     }
 
+    /* renamed from: android.support.v4.app.NotificationCompat$Builder */
     public static class Builder {
         private static final int MAX_CHARSEQUENCE_LENGTH = 5120;
         @RestrictTo({Scope.LIBRARY_GROUP})
-        public ArrayList<Action> mActions = new ArrayList();
+        public ArrayList<Action> mActions;
+        int mBadgeIcon;
         RemoteViews mBigContentView;
         String mCategory;
-        int mColor = 0;
+        String mChannelId;
+        int mColor;
+        boolean mColorized;
+        boolean mColorizedSet;
         @RestrictTo({Scope.LIBRARY_GROUP})
         public CharSequence mContentInfo;
         PendingIntent mContentIntent;
@@ -440,14 +492,16 @@ public class NotificationCompat {
         public Context mContext;
         Bundle mExtras;
         PendingIntent mFullScreenIntent;
+        /* access modifiers changed from: private */
+        public int mGroupAlertBehavior;
         String mGroupKey;
         boolean mGroupSummary;
         RemoteViews mHeadsUpContentView;
         @RestrictTo({Scope.LIBRARY_GROUP})
         public Bitmap mLargeIcon;
-        boolean mLocalOnly = false;
+        boolean mLocalOnly;
         @RestrictTo({Scope.LIBRARY_GROUP})
-        public Notification mNotification = new Notification();
+        public Notification mNotification;
         @RestrictTo({Scope.LIBRARY_GROUP})
         public int mNumber;
         public ArrayList<String> mPeople;
@@ -458,23 +512,39 @@ public class NotificationCompat {
         Notification mPublicVersion;
         @RestrictTo({Scope.LIBRARY_GROUP})
         public CharSequence[] mRemoteInputHistory;
-        boolean mShowWhen = true;
+        String mShortcutId;
+        boolean mShowWhen;
         String mSortKey;
         @RestrictTo({Scope.LIBRARY_GROUP})
         public Style mStyle;
         @RestrictTo({Scope.LIBRARY_GROUP})
         public CharSequence mSubText;
         RemoteViews mTickerView;
+        long mTimeout;
         @RestrictTo({Scope.LIBRARY_GROUP})
         public boolean mUseChronometer;
-        int mVisibility = 0;
+        int mVisibility;
 
+        @Deprecated
         public Builder(Context context) {
+            this(context, null);
+        }
+
+        public Builder(@NonNull Context context, @NonNull String str) {
+            this.mShowWhen = true;
+            this.mActions = new ArrayList<>();
+            this.mLocalOnly = false;
+            this.mColor = 0;
+            this.mVisibility = 0;
+            this.mBadgeIcon = 0;
+            this.mGroupAlertBehavior = 0;
+            this.mNotification = new Notification();
             this.mContext = context;
+            this.mChannelId = str;
             this.mNotification.when = System.currentTimeMillis();
             this.mNotification.audioStreamType = -1;
             this.mPriority = 0;
-            this.mPeople = new ArrayList();
+            this.mPeople = new ArrayList<>();
         }
 
         protected static CharSequence limitCharSequenceLength(CharSequence charSequence) {
@@ -483,12 +553,10 @@ public class NotificationCompat {
 
         private void setFlag(int i, boolean z) {
             if (z) {
-                Notification notification = this.mNotification;
-                notification.flags |= i;
+                this.mNotification.flags |= i;
                 return;
             }
-            notification = this.mNotification;
-            notification.flags &= i ^ -1;
+            this.mNotification.flags &= i ^ -1;
         }
 
         public Builder addAction(int i, CharSequence charSequence, PendingIntent pendingIntent) {
@@ -541,8 +609,9 @@ public class NotificationCompat {
             return this.mContentView;
         }
 
+        /* access modifiers changed from: protected */
         @RestrictTo({Scope.LIBRARY_GROUP})
-        protected BuilderExtender getExtender() {
+        public BuilderExtender getExtender() {
             return new BuilderExtender();
         }
 
@@ -570,21 +639,19 @@ public class NotificationCompat {
 
         @RestrictTo({Scope.LIBRARY_GROUP})
         public long getWhenIfShowing() {
-            return this.mShowWhen ? this.mNotification.when : 0;
-        }
-
-        @RestrictTo({Scope.LIBRARY_GROUP})
-        protected CharSequence resolveText() {
-            return this.mContentText;
-        }
-
-        @RestrictTo({Scope.LIBRARY_GROUP})
-        protected CharSequence resolveTitle() {
-            return this.mContentTitle;
+            if (this.mShowWhen) {
+                return this.mNotification.when;
+            }
+            return 0;
         }
 
         public Builder setAutoCancel(boolean z) {
             setFlag(16, z);
+            return this;
+        }
+
+        public Builder setBadgeIconType(int i) {
+            this.mBadgeIcon = i;
             return this;
         }
 
@@ -593,8 +660,19 @@ public class NotificationCompat {
             return this;
         }
 
+        public Builder setChannelId(@NonNull String str) {
+            this.mChannelId = str;
+            return this;
+        }
+
         public Builder setColor(@ColorInt int i) {
             this.mColor = i;
+            return this;
+        }
+
+        public Builder setColorized(boolean z) {
+            this.mColorized = z;
+            this.mColorizedSet = true;
             return this;
         }
 
@@ -641,8 +719,7 @@ public class NotificationCompat {
         public Builder setDefaults(int i) {
             this.mNotification.defaults = i;
             if ((i & 4) != 0) {
-                Notification notification = this.mNotification;
-                notification.flags |= 1;
+                this.mNotification.flags |= 1;
             }
             return this;
         }
@@ -668,6 +745,11 @@ public class NotificationCompat {
             return this;
         }
 
+        public Builder setGroupAlertBehavior(int i) {
+            this.mGroupAlertBehavior = i;
+            return this;
+        }
+
         public Builder setGroupSummary(boolean z) {
             this.mGroupSummary = z;
             return this;
@@ -683,13 +765,13 @@ public class NotificationCompat {
             this.mNotification.ledARGB = i;
             this.mNotification.ledOnMS = i2;
             this.mNotification.ledOffMS = i3;
-            int i5 = (this.mNotification.ledOnMS == 0 || this.mNotification.ledOffMS == 0) ? 0 : 1;
+            boolean z = (this.mNotification.ledOnMS == 0 || this.mNotification.ledOffMS == 0) ? false : true;
             Notification notification = this.mNotification;
-            int i6 = this.mNotification.flags;
-            if (i5 == 0) {
+            int i5 = this.mNotification.flags;
+            if (!z) {
                 i4 = 0;
             }
-            notification.flags = (i6 & -2) | i4;
+            notification.flags = (i5 & -2) | i4;
             return this;
         }
 
@@ -732,6 +814,11 @@ public class NotificationCompat {
 
         public Builder setRemoteInputHistory(CharSequence[] charSequenceArr) {
             this.mRemoteInputHistory = charSequenceArr;
+            return this;
+        }
+
+        public Builder setShortcutId(String str) {
+            this.mShortcutId = str;
             return this;
         }
 
@@ -794,6 +881,11 @@ public class NotificationCompat {
             return this;
         }
 
+        public Builder setTimeoutAfter(long j) {
+            this.mTimeout = j;
+            return this;
+        }
+
         public Builder setUsesChronometer(boolean z) {
             this.mUseChronometer = z;
             return this;
@@ -816,23 +908,36 @@ public class NotificationCompat {
     }
 
     @RestrictTo({Scope.LIBRARY_GROUP})
+    /* renamed from: android.support.v4.app.NotificationCompat$BuilderExtender */
     protected static class BuilderExtender {
         protected BuilderExtender() {
         }
 
         public Notification build(Builder builder, NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            RemoteViews remoteViews = builder.mStyle != null ? builder.mStyle.makeContentView(notificationBuilderWithBuilderAccessor) : null;
             Notification build = notificationBuilderWithBuilderAccessor.build();
-            if (builder.mContentView != null) {
+            if (remoteViews != null) {
+                build.contentView = remoteViews;
+            } else if (builder.mContentView != null) {
                 build.contentView = builder.mContentView;
+            }
+            if (VERSION.SDK_INT >= 16 && builder.mStyle != null) {
+                RemoteViews makeBigContentView = builder.mStyle.makeBigContentView(notificationBuilderWithBuilderAccessor);
+                if (makeBigContentView != null) {
+                    build.bigContentView = makeBigContentView;
+                }
+            }
+            if (VERSION.SDK_INT >= 21 && builder.mStyle != null) {
+                RemoteViews makeHeadsUpContentView = builder.mStyle.makeHeadsUpContentView(notificationBuilderWithBuilderAccessor);
+                if (makeHeadsUpContentView != null) {
+                    build.headsUpContentView = makeHeadsUpContentView;
+                }
             }
             return build;
         }
     }
 
-    public interface Extender {
-        Builder extend(Builder builder);
-    }
-
+    /* renamed from: android.support.v4.app.NotificationCompat$CarExtender */
     public static final class CarExtender implements Extender {
         private static final String EXTRA_CAR_EXTENDER = "android.car.EXTENSIONS";
         private static final String EXTRA_COLOR = "app_color";
@@ -843,8 +948,13 @@ public class NotificationCompat {
         private Bitmap mLargeIcon;
         private UnreadConversation mUnreadConversation;
 
-        public static class UnreadConversation extends android.support.v4.app.NotificationCompatBase.UnreadConversation {
-            static final android.support.v4.app.NotificationCompatBase.UnreadConversation.Factory FACTORY = new C00381();
+        /* renamed from: android.support.v4.app.NotificationCompat$CarExtender$UnreadConversation */
+        public static class UnreadConversation extends android.support.p000v4.app.NotificationCompatBase.UnreadConversation {
+            static final android.support.p000v4.app.NotificationCompatBase.UnreadConversation.Factory FACTORY = new android.support.p000v4.app.NotificationCompatBase.UnreadConversation.Factory() {
+                public UnreadConversation build(String[] strArr, RemoteInput remoteInput, PendingIntent pendingIntent, PendingIntent pendingIntent2, String[] strArr2, long j) {
+                    return new UnreadConversation(strArr, (RemoteInput) remoteInput, pendingIntent, pendingIntent2, strArr2, j);
+                }
+            };
             private final long mLatestTimestamp;
             private final String[] mMessages;
             private final String[] mParticipants;
@@ -852,16 +962,7 @@ public class NotificationCompat {
             private final RemoteInput mRemoteInput;
             private final PendingIntent mReplyPendingIntent;
 
-            /* renamed from: android.support.v4.app.NotificationCompat$CarExtender$UnreadConversation$1 */
-            static final class C00381 implements android.support.v4.app.NotificationCompatBase.UnreadConversation.Factory {
-                C00381() {
-                }
-
-                public UnreadConversation build(String[] strArr, RemoteInput remoteInput, PendingIntent pendingIntent, PendingIntent pendingIntent2, String[] strArr2, long j) {
-                    return new UnreadConversation(strArr, (RemoteInput) remoteInput, pendingIntent, pendingIntent2, strArr2, j);
-                }
-            }
-
+            /* renamed from: android.support.v4.app.NotificationCompat$CarExtender$UnreadConversation$Builder */
             public static class Builder {
                 private long mLatestTimestamp;
                 private final List<String> mMessages = new ArrayList();
@@ -920,7 +1021,10 @@ public class NotificationCompat {
             }
 
             public String getParticipant() {
-                return this.mParticipants.length > 0 ? this.mParticipants[0] : null;
+                if (this.mParticipants.length > 0) {
+                    return this.mParticipants[0];
+                }
+                return null;
             }
 
             public String[] getParticipants() {
@@ -938,6 +1042,9 @@ public class NotificationCompat {
             public PendingIntent getReplyPendingIntent() {
                 return this.mReplyPendingIntent;
             }
+        }
+
+        public CarExtender() {
         }
 
         public CarExtender(Notification notification) {
@@ -997,8 +1104,136 @@ public class NotificationCompat {
         }
     }
 
+    /* renamed from: android.support.v4.app.NotificationCompat$DecoratedCustomViewStyle */
+    public static class DecoratedCustomViewStyle extends Style {
+        private static final int MAX_ACTION_BUTTONS = 3;
+
+        /* JADX WARNING: Removed duplicated region for block: B:11:0x0041  */
+        /* JADX WARNING: Removed duplicated region for block: B:14:0x0050  */
+        /* Code decompiled incorrectly, please refer to instructions dump. */
+        private android.widget.RemoteViews createRemoteViews(android.widget.RemoteViews r8, boolean r9) {
+            /*
+                r7 = this;
+                r2 = 1
+                r1 = 0
+                int r0 = android.support.compat.C0004R.C0007layout.notification_template_custom_big
+                android.widget.RemoteViews r4 = r7.applyStandardTemplate(r2, r0, r1)
+                int r0 = android.support.compat.C0004R.C0006id.actions
+                r4.removeAllViews(r0)
+                if (r9 == 0) goto L_0x0053
+                android.support.v4.app.NotificationCompat$Builder r0 = r7.mBuilder
+                java.util.ArrayList<android.support.v4.app.NotificationCompat$Action> r0 = r0.mActions
+                if (r0 == 0) goto L_0x0053
+                android.support.v4.app.NotificationCompat$Builder r0 = r7.mBuilder
+                java.util.ArrayList<android.support.v4.app.NotificationCompat$Action> r0 = r0.mActions
+                int r0 = r0.size()
+                r3 = 3
+                int r5 = java.lang.Math.min(r0, r3)
+                if (r5 <= 0) goto L_0x0053
+                r3 = r1
+            L_0x0025:
+                if (r3 >= r5) goto L_0x003e
+                android.support.v4.app.NotificationCompat$Builder r0 = r7.mBuilder
+                java.util.ArrayList<android.support.v4.app.NotificationCompat$Action> r0 = r0.mActions
+                java.lang.Object r0 = r0.get(r3)
+                android.support.v4.app.NotificationCompat$Action r0 = (android.support.p000v4.app.NotificationCompat.Action) r0
+                android.widget.RemoteViews r0 = r7.generateActionButton(r0)
+                int r6 = android.support.compat.C0004R.C0006id.actions
+                r4.addView(r6, r0)
+                int r0 = r3 + 1
+                r3 = r0
+                goto L_0x0025
+            L_0x003e:
+                r0 = r2
+            L_0x003f:
+                if (r0 == 0) goto L_0x0050
+                r0 = r1
+            L_0x0042:
+                int r1 = android.support.compat.C0004R.C0006id.actions
+                r4.setViewVisibility(r1, r0)
+                int r1 = android.support.compat.C0004R.C0006id.action_divider
+                r4.setViewVisibility(r1, r0)
+                r7.buildIntoRemoteViews(r4, r8)
+                return r4
+            L_0x0050:
+                r0 = 8
+                goto L_0x0042
+            L_0x0053:
+                r0 = r1
+                goto L_0x003f
+            */
+            throw new UnsupportedOperationException("Method not decompiled: android.support.p000v4.app.NotificationCompat.DecoratedCustomViewStyle.createRemoteViews(android.widget.RemoteViews, boolean):android.widget.RemoteViews");
+        }
+
+        private RemoteViews generateActionButton(Action action) {
+            boolean z = action.actionIntent == null;
+            RemoteViews remoteViews = new RemoteViews(this.mBuilder.mContext.getPackageName(), z ? C0004R.C0007layout.notification_action_tombstone : C0004R.C0007layout.notification_action);
+            remoteViews.setImageViewBitmap(C0004R.C0006id.action_image, createColoredBitmap(action.getIcon(), this.mBuilder.mContext.getResources().getColor(C0004R.color.notification_action_color_filter)));
+            remoteViews.setTextViewText(C0004R.C0006id.action_text, action.title);
+            if (!z) {
+                remoteViews.setOnClickPendingIntent(C0004R.C0006id.action_container, action.actionIntent);
+            }
+            if (VERSION.SDK_INT >= 15) {
+                remoteViews.setContentDescription(C0004R.C0006id.action_container, action.title);
+            }
+            return remoteViews;
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void apply(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT >= 24) {
+                notificationBuilderWithBuilderAccessor.getBuilder().setStyle(new android.app.Notification.DecoratedCustomViewStyle());
+            }
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public RemoteViews makeBigContentView(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT >= 24) {
+                return null;
+            }
+            RemoteViews bigContentView = this.mBuilder.getBigContentView();
+            if (bigContentView == null) {
+                bigContentView = this.mBuilder.getContentView();
+            }
+            if (bigContentView != null) {
+                return createRemoteViews(bigContentView, true);
+            }
+            return null;
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public RemoteViews makeContentView(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT < 24 && this.mBuilder.getContentView() != null) {
+                return createRemoteViews(this.mBuilder.getContentView(), false);
+            }
+            return null;
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public RemoteViews makeHeadsUpContentView(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT >= 24) {
+                return null;
+            }
+            RemoteViews headsUpContentView = this.mBuilder.getHeadsUpContentView();
+            RemoteViews contentView = headsUpContentView != null ? headsUpContentView : this.mBuilder.getContentView();
+            if (headsUpContentView != null) {
+                return createRemoteViews(contentView, true);
+            }
+            return null;
+        }
+    }
+
+    /* renamed from: android.support.v4.app.NotificationCompat$Extender */
+    public interface Extender {
+        Builder extend(Builder builder);
+    }
+
+    /* renamed from: android.support.v4.app.NotificationCompat$InboxStyle */
     public static class InboxStyle extends Style {
-        ArrayList<CharSequence> mTexts = new ArrayList();
+        private ArrayList<CharSequence> mTexts = new ArrayList<>();
+
+        public InboxStyle() {
+        }
 
         public InboxStyle(Builder builder) {
             setBuilder(builder);
@@ -1007,6 +1242,13 @@ public class NotificationCompat {
         public InboxStyle addLine(CharSequence charSequence) {
             this.mTexts.add(Builder.limitCharSequenceLength(charSequence));
             return this;
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void apply(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT >= 16) {
+                NotificationCompatJellybean.addInboxStyle(notificationBuilderWithBuilderAccessor, this.mBigContentTitle, this.mSummaryTextSet, this.mSummaryText, this.mTexts);
+            }
         }
 
         public InboxStyle setBigContentTitle(CharSequence charSequence) {
@@ -1021,20 +1263,24 @@ public class NotificationCompat {
         }
     }
 
+    /* renamed from: android.support.v4.app.NotificationCompat$MessagingStyle */
     public static class MessagingStyle extends Style {
         public static final int MAXIMUM_RETAINED_MESSAGES = 25;
         CharSequence mConversationTitle;
         List<Message> mMessages = new ArrayList();
         CharSequence mUserDisplayName;
 
+        /* renamed from: android.support.v4.app.NotificationCompat$MessagingStyle$Message */
         public static final class Message {
             static final String KEY_DATA_MIME_TYPE = "type";
             static final String KEY_DATA_URI = "uri";
+            static final String KEY_EXTRAS_BUNDLE = "extras";
             static final String KEY_SENDER = "sender";
             static final String KEY_TEXT = "text";
             static final String KEY_TIMESTAMP = "time";
             private String mDataMimeType;
             private Uri mDataUri;
+            private Bundle mExtras = new Bundle();
             private final CharSequence mSender;
             private final CharSequence mText;
             private final long mTimestamp;
@@ -1060,10 +1306,13 @@ public class NotificationCompat {
                         return null;
                     }
                     Message message = new Message(bundle.getCharSequence(KEY_TEXT), bundle.getLong(KEY_TIMESTAMP), bundle.getCharSequence(KEY_SENDER));
-                    if (!bundle.containsKey("type") || !bundle.containsKey("uri")) {
+                    if (bundle.containsKey("type") && bundle.containsKey("uri")) {
+                        message.setData(bundle.getString("type"), (Uri) bundle.getParcelable("uri"));
+                    }
+                    if (!bundle.containsKey("extras")) {
                         return message;
                     }
-                    message.setData(bundle.getString("type"), (Uri) bundle.getParcelable("uri"));
+                    message.getExtras().putAll(bundle.getBundle("extras"));
                     return message;
                 } catch (ClassCastException e) {
                     return null;
@@ -1071,16 +1320,21 @@ public class NotificationCompat {
             }
 
             static List<Message> getMessagesFromBundleArray(Parcelable[] parcelableArr) {
-                List<Message> arrayList = new ArrayList(parcelableArr.length);
-                for (int i = 0; i < parcelableArr.length; i++) {
-                    if (parcelableArr[i] instanceof Bundle) {
-                        Message messageFromBundle = getMessageFromBundle((Bundle) parcelableArr[i]);
+                ArrayList arrayList = new ArrayList(parcelableArr.length);
+                int i = 0;
+                while (true) {
+                    int i2 = i;
+                    if (i2 >= parcelableArr.length) {
+                        return arrayList;
+                    }
+                    if (parcelableArr[i2] instanceof Bundle) {
+                        Message messageFromBundle = getMessageFromBundle(parcelableArr[i2]);
                         if (messageFromBundle != null) {
                             arrayList.add(messageFromBundle);
                         }
                     }
+                    i = i2 + 1;
                 }
-                return arrayList;
             }
 
             private Bundle toBundle() {
@@ -1098,6 +1352,9 @@ public class NotificationCompat {
                 if (this.mDataUri != null) {
                     bundle.putParcelable("uri", this.mDataUri);
                 }
+                if (this.mExtras != null) {
+                    bundle.putBundle("extras", this.mExtras);
+                }
                 return bundle;
             }
 
@@ -1107,6 +1364,10 @@ public class NotificationCompat {
 
             public Uri getDataUri() {
                 return this.mDataUri;
+            }
+
+            public Bundle getExtras() {
+                return this.mExtras;
             }
 
             public CharSequence getSender() {
@@ -1136,8 +1397,8 @@ public class NotificationCompat {
         }
 
         public static MessagingStyle extractMessagingStyleFromNotification(Notification notification) {
-            Bundle extras = NotificationCompat.IMPL.getExtras(notification);
-            if (!extras.containsKey(NotificationCompat.EXTRA_SELF_DISPLAY_NAME)) {
+            Bundle extras = NotificationCompat.getExtras(notification);
+            if (extras != null && !extras.containsKey(NotificationCompat.EXTRA_SELF_DISPLAY_NAME)) {
                 return null;
             }
             try {
@@ -1147,6 +1408,53 @@ public class NotificationCompat {
             } catch (ClassCastException e) {
                 return null;
             }
+        }
+
+        @Nullable
+        private Message findLatestIncomingMessage() {
+            for (int size = this.mMessages.size() - 1; size >= 0; size--) {
+                Message message = (Message) this.mMessages.get(size);
+                if (!TextUtils.isEmpty(message.getSender())) {
+                    return message;
+                }
+            }
+            if (!this.mMessages.isEmpty()) {
+                return (Message) this.mMessages.get(this.mMessages.size() - 1);
+            }
+            return null;
+        }
+
+        private boolean hasMessagesWithoutSender() {
+            for (int size = this.mMessages.size() - 1; size >= 0; size--) {
+                if (((Message) this.mMessages.get(size)).getSender() == null) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @NonNull
+        private TextAppearanceSpan makeFontColorSpan(int i) {
+            return new TextAppearanceSpan(null, 0, 0, ColorStateList.valueOf(i), null);
+        }
+
+        private CharSequence makeMessageLine(Message message) {
+            BidiFormatter instance = BidiFormatter.getInstance();
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+            boolean z = VERSION.SDK_INT >= 21;
+            int i = z ? ViewCompat.MEASURED_STATE_MASK : -1;
+            CharSequence sender = message.getSender();
+            if (TextUtils.isEmpty(message.getSender())) {
+                sender = this.mUserDisplayName == null ? "" : this.mUserDisplayName;
+                if (z && this.mBuilder.getColor() != 0) {
+                    i = this.mBuilder.getColor();
+                }
+            }
+            CharSequence unicodeWrap = instance.unicodeWrap(sender);
+            spannableStringBuilder.append(unicodeWrap);
+            spannableStringBuilder.setSpan(makeFontColorSpan(i), spannableStringBuilder.length() - unicodeWrap.length(), spannableStringBuilder.length(), 33);
+            spannableStringBuilder.append("  ").append(instance.unicodeWrap(message.getText() == null ? "" : message.getText()));
+            return spannableStringBuilder;
         }
 
         public void addCompatExtras(Bundle bundle) {
@@ -1178,6 +1486,48 @@ public class NotificationCompat {
             return this;
         }
 
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void apply(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            if (VERSION.SDK_INT >= 24) {
+                ArrayList arrayList = new ArrayList();
+                ArrayList arrayList2 = new ArrayList();
+                ArrayList arrayList3 = new ArrayList();
+                ArrayList arrayList4 = new ArrayList();
+                ArrayList arrayList5 = new ArrayList();
+                for (Message message : this.mMessages) {
+                    arrayList.add(message.getText());
+                    arrayList2.add(Long.valueOf(message.getTimestamp()));
+                    arrayList3.add(message.getSender());
+                    arrayList4.add(message.getDataMimeType());
+                    arrayList5.add(message.getDataUri());
+                }
+                NotificationCompatApi24.addMessagingStyle(notificationBuilderWithBuilderAccessor, this.mUserDisplayName, this.mConversationTitle, arrayList, arrayList2, arrayList3, arrayList4, arrayList5);
+                return;
+            }
+            Message findLatestIncomingMessage = findLatestIncomingMessage();
+            if (this.mConversationTitle != null) {
+                notificationBuilderWithBuilderAccessor.getBuilder().setContentTitle(this.mConversationTitle);
+            } else if (findLatestIncomingMessage != null) {
+                notificationBuilderWithBuilderAccessor.getBuilder().setContentTitle(findLatestIncomingMessage.getSender());
+            }
+            if (findLatestIncomingMessage != null) {
+                notificationBuilderWithBuilderAccessor.getBuilder().setContentText(this.mConversationTitle != null ? makeMessageLine(findLatestIncomingMessage) : findLatestIncomingMessage.getText());
+            }
+            if (VERSION.SDK_INT >= 16) {
+                SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                boolean z = this.mConversationTitle != null || hasMessagesWithoutSender();
+                for (int size = this.mMessages.size() - 1; size >= 0; size--) {
+                    Message message2 = (Message) this.mMessages.get(size);
+                    CharSequence text = z ? makeMessageLine(message2) : message2.getText();
+                    if (size != this.mMessages.size() - 1) {
+                        spannableStringBuilder.insert(0, StringUtils.f1199LF);
+                    }
+                    spannableStringBuilder.insert(0, text);
+                }
+                NotificationCompatJellybean.addBigTextStyle(notificationBuilderWithBuilderAccessor, null, false, null, spannableStringBuilder);
+            }
+        }
+
         public CharSequence getConversationTitle() {
             return this.mConversationTitle;
         }
@@ -1190,8 +1540,9 @@ public class NotificationCompat {
             return this.mUserDisplayName;
         }
 
+        /* access modifiers changed from: protected */
         @RestrictTo({Scope.LIBRARY_GROUP})
-        protected void restoreFromCompatExtras(Bundle bundle) {
+        public void restoreFromCompatExtras(Bundle bundle) {
             this.mMessages.clear();
             this.mUserDisplayName = bundle.getString(NotificationCompat.EXTRA_SELF_DISPLAY_NAME);
             this.mConversationTitle = bundle.getString(NotificationCompat.EXTRA_CONVERSATION_TITLE);
@@ -1207,109 +1558,21 @@ public class NotificationCompat {
         }
     }
 
-    interface NotificationCompatImpl {
-        Notification build(Builder builder, BuilderExtender builderExtender);
-
-        Action getAction(Notification notification, int i);
-
-        int getActionCount(Notification notification);
-
-        Action[] getActionsFromParcelableArrayList(ArrayList<Parcelable> arrayList);
-
-        Bundle getBundleForUnreadConversation(UnreadConversation unreadConversation);
-
-        String getCategory(Notification notification);
-
-        Bundle getExtras(Notification notification);
-
-        String getGroup(Notification notification);
-
-        boolean getLocalOnly(Notification notification);
-
-        ArrayList<Parcelable> getParcelableArrayListForActions(Action[] actionArr);
-
-        String getSortKey(Notification notification);
-
-        UnreadConversation getUnreadConversationFromBundle(Bundle bundle, UnreadConversation.Factory factory, RemoteInput.Factory factory2);
-
-        boolean isGroupSummary(Notification notification);
-    }
-
-    static class NotificationCompatImplBase implements NotificationCompatImpl {
-        NotificationCompatImplBase() {
+    @RequiresApi(16)
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatApi16Impl */
+    static class NotificationCompatApi16Impl extends NotificationCompatBaseImpl {
+        NotificationCompatApi16Impl() {
         }
 
         public Notification build(Builder builder, BuilderExtender builderExtender) {
-            Notification add = NotificationCompatBase.add(builder.mNotification, builder.mContext, builder.resolveTitle(), builder.resolveText(), builder.mContentIntent, builder.mFullScreenIntent);
-            if (builder.mPriority > 0) {
-                add.flags |= 128;
-            }
-            if (builder.mContentView != null) {
-                add.contentView = builder.mContentView;
-            }
-            return add;
-        }
-
-        public Action getAction(Notification notification, int i) {
-            return null;
-        }
-
-        public int getActionCount(Notification notification) {
-            return 0;
-        }
-
-        public Action[] getActionsFromParcelableArrayList(ArrayList<Parcelable> arrayList) {
-            return null;
-        }
-
-        public Bundle getBundleForUnreadConversation(UnreadConversation unreadConversation) {
-            return null;
-        }
-
-        public String getCategory(Notification notification) {
-            return null;
-        }
-
-        public Bundle getExtras(Notification notification) {
-            return null;
-        }
-
-        public String getGroup(Notification notification) {
-            return null;
-        }
-
-        public boolean getLocalOnly(Notification notification) {
-            return false;
-        }
-
-        public ArrayList<Parcelable> getParcelableArrayListForActions(Action[] actionArr) {
-            return null;
-        }
-
-        public String getSortKey(Notification notification) {
-            return null;
-        }
-
-        public UnreadConversation getUnreadConversationFromBundle(Bundle bundle, UnreadConversation.Factory factory, RemoteInput.Factory factory2) {
-            return null;
-        }
-
-        public boolean isGroupSummary(Notification notification) {
-            return false;
-        }
-    }
-
-    static class NotificationCompatImplJellybean extends NotificationCompatImplBase {
-        NotificationCompatImplJellybean() {
-        }
-
-        public Notification build(Builder builder, BuilderExtender builderExtender) {
-            NotificationBuilderWithBuilderAccessor builder2 = new android.support.v4.app.NotificationCompatJellybean.Builder(builder.mContext, builder.mNotification, builder.resolveTitle(), builder.resolveText(), builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mExtras, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView);
+            android.support.p000v4.app.NotificationCompatJellybean.Builder builder2 = new android.support.p000v4.app.NotificationCompatJellybean.Builder(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mExtras, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView);
             NotificationCompat.addActionsToBuilder(builder2, builder.mActions);
-            NotificationCompat.addStyleToBuilderJellybean(builder2, builder.mStyle);
+            if (builder.mStyle != null) {
+                builder.mStyle.apply(builder2);
+            }
             Notification build = builderExtender.build(builder, builder2);
             if (builder.mStyle != null) {
-                Bundle extras = getExtras(build);
+                Bundle extras = NotificationCompat.getExtras(build);
                 if (extras != null) {
                     builder.mStyle.addCompatExtras(extras);
                 }
@@ -1321,90 +1584,50 @@ public class NotificationCompat {
             return (Action) NotificationCompatJellybean.getAction(notification, i, Action.FACTORY, RemoteInput.FACTORY);
         }
 
-        public int getActionCount(Notification notification) {
-            return NotificationCompatJellybean.getActionCount(notification);
-        }
-
         public Action[] getActionsFromParcelableArrayList(ArrayList<Parcelable> arrayList) {
             return (Action[]) NotificationCompatJellybean.getActionsFromParcelableArrayList(arrayList, Action.FACTORY, RemoteInput.FACTORY);
-        }
-
-        public Bundle getExtras(Notification notification) {
-            return NotificationCompatJellybean.getExtras(notification);
-        }
-
-        public String getGroup(Notification notification) {
-            return NotificationCompatJellybean.getGroup(notification);
-        }
-
-        public boolean getLocalOnly(Notification notification) {
-            return NotificationCompatJellybean.getLocalOnly(notification);
         }
 
         public ArrayList<Parcelable> getParcelableArrayListForActions(Action[] actionArr) {
             return NotificationCompatJellybean.getParcelableArrayListForActions(actionArr);
         }
-
-        public String getSortKey(Notification notification) {
-            return NotificationCompatJellybean.getSortKey(notification);
-        }
-
-        public boolean isGroupSummary(Notification notification) {
-            return NotificationCompatJellybean.isGroupSummary(notification);
-        }
     }
 
-    static class NotificationCompatImplKitKat extends NotificationCompatImplJellybean {
-        NotificationCompatImplKitKat() {
+    @RequiresApi(19)
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatApi19Impl */
+    static class NotificationCompatApi19Impl extends NotificationCompatApi16Impl {
+        NotificationCompatApi19Impl() {
         }
 
         public Notification build(Builder builder, BuilderExtender builderExtender) {
-            NotificationBuilderWithBuilderAccessor builder2 = new android.support.v4.app.NotificationCompatKitKat.Builder(builder.mContext, builder.mNotification, builder.resolveTitle(), builder.resolveText(), builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mPeople, builder.mExtras, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView);
+            android.support.p000v4.app.NotificationCompatKitKat.Builder builder2 = new android.support.p000v4.app.NotificationCompatKitKat.Builder(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mPeople, builder.mExtras, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView);
             NotificationCompat.addActionsToBuilder(builder2, builder.mActions);
-            NotificationCompat.addStyleToBuilderJellybean(builder2, builder.mStyle);
+            if (builder.mStyle != null) {
+                builder.mStyle.apply(builder2);
+            }
             return builderExtender.build(builder, builder2);
         }
 
         public Action getAction(Notification notification, int i) {
             return (Action) NotificationCompatKitKat.getAction(notification, i, Action.FACTORY, RemoteInput.FACTORY);
         }
-
-        public int getActionCount(Notification notification) {
-            return NotificationCompatKitKat.getActionCount(notification);
-        }
-
-        public Bundle getExtras(Notification notification) {
-            return NotificationCompatKitKat.getExtras(notification);
-        }
-
-        public String getGroup(Notification notification) {
-            return NotificationCompatKitKat.getGroup(notification);
-        }
-
-        public boolean getLocalOnly(Notification notification) {
-            return NotificationCompatKitKat.getLocalOnly(notification);
-        }
-
-        public String getSortKey(Notification notification) {
-            return NotificationCompatKitKat.getSortKey(notification);
-        }
-
-        public boolean isGroupSummary(Notification notification) {
-            return NotificationCompatKitKat.isGroupSummary(notification);
-        }
     }
 
-    static class NotificationCompatImplApi20 extends NotificationCompatImplKitKat {
-        NotificationCompatImplApi20() {
+    @RequiresApi(20)
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatApi20Impl */
+    static class NotificationCompatApi20Impl extends NotificationCompatApi19Impl {
+        NotificationCompatApi20Impl() {
         }
 
         public Notification build(Builder builder, BuilderExtender builderExtender) {
-            NotificationBuilderWithBuilderAccessor builder2 = new android.support.v4.app.NotificationCompatApi20.Builder(builder.mContext, builder.mNotification, builder.resolveTitle(), builder.resolveText(), builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mPeople, builder.mExtras, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView);
+            android.support.p000v4.app.NotificationCompatApi20.Builder builder2 = new android.support.p000v4.app.NotificationCompatApi20.Builder(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mPeople, builder.mExtras, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView, builder.mGroupAlertBehavior);
             NotificationCompat.addActionsToBuilder(builder2, builder.mActions);
-            NotificationCompat.addStyleToBuilderJellybean(builder2, builder.mStyle);
+            if (builder.mStyle != null) {
+                builder.mStyle.apply(builder2);
+            }
             Notification build = builderExtender.build(builder, builder2);
             if (builder.mStyle != null) {
-                builder.mStyle.addCompatExtras(getExtras(build));
+                builder.mStyle.addCompatExtras(NotificationCompat.getExtras(build));
             }
             return build;
         }
@@ -1417,38 +1640,26 @@ public class NotificationCompat {
             return (Action[]) NotificationCompatApi20.getActionsFromParcelableArrayList(arrayList, Action.FACTORY, RemoteInput.FACTORY);
         }
 
-        public String getGroup(Notification notification) {
-            return NotificationCompatApi20.getGroup(notification);
-        }
-
-        public boolean getLocalOnly(Notification notification) {
-            return NotificationCompatApi20.getLocalOnly(notification);
-        }
-
         public ArrayList<Parcelable> getParcelableArrayListForActions(Action[] actionArr) {
             return NotificationCompatApi20.getParcelableArrayListForActions(actionArr);
         }
-
-        public String getSortKey(Notification notification) {
-            return NotificationCompatApi20.getSortKey(notification);
-        }
-
-        public boolean isGroupSummary(Notification notification) {
-            return NotificationCompatApi20.isGroupSummary(notification);
-        }
     }
 
-    static class NotificationCompatImplApi21 extends NotificationCompatImplApi20 {
-        NotificationCompatImplApi21() {
+    @RequiresApi(21)
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatApi21Impl */
+    static class NotificationCompatApi21Impl extends NotificationCompatApi20Impl {
+        NotificationCompatApi21Impl() {
         }
 
         public Notification build(Builder builder, BuilderExtender builderExtender) {
-            NotificationBuilderWithBuilderAccessor builder2 = new android.support.v4.app.NotificationCompatApi21.Builder(builder.mContext, builder.mNotification, builder.resolveTitle(), builder.resolveText(), builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mCategory, builder.mPeople, builder.mExtras, builder.mColor, builder.mVisibility, builder.mPublicVersion, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView, builder.mHeadsUpContentView);
+            android.support.p000v4.app.NotificationCompatApi21.Builder builder2 = new android.support.p000v4.app.NotificationCompatApi21.Builder(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mCategory, builder.mPeople, builder.mExtras, builder.mColor, builder.mVisibility, builder.mPublicVersion, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mContentView, builder.mBigContentView, builder.mHeadsUpContentView, builder.mGroupAlertBehavior);
             NotificationCompat.addActionsToBuilder(builder2, builder.mActions);
-            NotificationCompat.addStyleToBuilderJellybean(builder2, builder.mStyle);
+            if (builder.mStyle != null) {
+                builder.mStyle.apply(builder2);
+            }
             Notification build = builderExtender.build(builder, builder2);
             if (builder.mStyle != null) {
-                builder.mStyle.addCompatExtras(getExtras(build));
+                builder.mStyle.addCompatExtras(NotificationCompat.getExtras(build));
             }
             return build;
         }
@@ -1457,53 +1668,357 @@ public class NotificationCompat {
             return NotificationCompatApi21.getBundleForUnreadConversation(unreadConversation);
         }
 
-        public String getCategory(Notification notification) {
-            return NotificationCompatApi21.getCategory(notification);
-        }
-
         public UnreadConversation getUnreadConversationFromBundle(Bundle bundle, UnreadConversation.Factory factory, RemoteInput.Factory factory2) {
             return NotificationCompatApi21.getUnreadConversationFromBundle(bundle, factory, factory2);
         }
     }
 
-    static class NotificationCompatImplApi24 extends NotificationCompatImplApi21 {
-        NotificationCompatImplApi24() {
+    @RequiresApi(24)
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatApi24Impl */
+    static class NotificationCompatApi24Impl extends NotificationCompatApi21Impl {
+        NotificationCompatApi24Impl() {
         }
 
         public Notification build(Builder builder, BuilderExtender builderExtender) {
-            NotificationBuilderWithBuilderAccessor builder2 = new android.support.v4.app.NotificationCompatApi24.Builder(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mCategory, builder.mPeople, builder.mExtras, builder.mColor, builder.mVisibility, builder.mPublicVersion, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mRemoteInputHistory, builder.mContentView, builder.mBigContentView, builder.mHeadsUpContentView);
+            android.support.p000v4.app.NotificationCompatApi24.Builder builder2 = new android.support.p000v4.app.NotificationCompatApi24.Builder(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mCategory, builder.mPeople, builder.mExtras, builder.mColor, builder.mVisibility, builder.mPublicVersion, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mRemoteInputHistory, builder.mContentView, builder.mBigContentView, builder.mHeadsUpContentView, builder.mGroupAlertBehavior);
             NotificationCompat.addActionsToBuilder(builder2, builder.mActions);
-            NotificationCompat.addStyleToBuilderApi24(builder2, builder.mStyle);
+            if (builder.mStyle != null) {
+                builder.mStyle.apply(builder2);
+            }
             Notification build = builderExtender.build(builder, builder2);
             if (builder.mStyle != null) {
-                builder.mStyle.addCompatExtras(getExtras(build));
+                builder.mStyle.addCompatExtras(NotificationCompat.getExtras(build));
+            }
+            return build;
+        }
+
+        public Action getAction(Notification notification, int i) {
+            return (Action) NotificationCompatApi24.getAction(notification, i, Action.FACTORY, RemoteInput.FACTORY);
+        }
+
+        public Action[] getActionsFromParcelableArrayList(ArrayList<Parcelable> arrayList) {
+            return (Action[]) NotificationCompatApi24.getActionsFromParcelableArrayList(arrayList, Action.FACTORY, RemoteInput.FACTORY);
+        }
+
+        public ArrayList<Parcelable> getParcelableArrayListForActions(Action[] actionArr) {
+            return NotificationCompatApi24.getParcelableArrayListForActions(actionArr);
+        }
+    }
+
+    @RequiresApi(26)
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatApi26Impl */
+    static class NotificationCompatApi26Impl extends NotificationCompatApi24Impl {
+        NotificationCompatApi26Impl() {
+        }
+
+        public Notification build(Builder builder, BuilderExtender builderExtender) {
+            android.support.p000v4.app.NotificationCompatApi26.Builder builder2 = new android.support.p000v4.app.NotificationCompatApi26.Builder(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate, builder.mShowWhen, builder.mUseChronometer, builder.mPriority, builder.mSubText, builder.mLocalOnly, builder.mCategory, builder.mPeople, builder.mExtras, builder.mColor, builder.mVisibility, builder.mPublicVersion, builder.mGroupKey, builder.mGroupSummary, builder.mSortKey, builder.mRemoteInputHistory, builder.mContentView, builder.mBigContentView, builder.mHeadsUpContentView, builder.mChannelId, builder.mBadgeIcon, builder.mShortcutId, builder.mTimeout, builder.mColorized, builder.mColorizedSet, builder.mGroupAlertBehavior);
+            NotificationCompat.addActionsToBuilder(builder2, builder.mActions);
+            if (builder.mStyle != null) {
+                builder.mStyle.apply(builder2);
+            }
+            Notification build = builderExtender.build(builder, builder2);
+            if (builder.mStyle != null) {
+                builder.mStyle.addCompatExtras(NotificationCompat.getExtras(build));
             }
             return build;
         }
     }
 
-    static class NotificationCompatImplHoneycomb extends NotificationCompatImplBase {
-        NotificationCompatImplHoneycomb() {
-        }
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatBaseImpl */
+    static class NotificationCompatBaseImpl implements NotificationCompatImpl {
 
-        public Notification build(Builder builder, BuilderExtender builderExtender) {
-            Notification add = NotificationCompatHoneycomb.add(builder.mContext, builder.mNotification, builder.resolveTitle(), builder.resolveText(), builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon);
-            if (builder.mContentView != null) {
-                add.contentView = builder.mContentView;
+        /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatBaseImpl$BuilderBase */
+        public static class BuilderBase implements NotificationBuilderWithBuilderAccessor {
+            private android.app.Notification.Builder mBuilder;
+
+            BuilderBase(Context context, Notification notification, CharSequence charSequence, CharSequence charSequence2, CharSequence charSequence3, RemoteViews remoteViews, int i, PendingIntent pendingIntent, PendingIntent pendingIntent2, Bitmap bitmap, int i2, int i3, boolean z) {
+                this.mBuilder = new android.app.Notification.Builder(context).setWhen(notification.when).setSmallIcon(notification.icon, notification.iconLevel).setContent(notification.contentView).setTicker(notification.tickerText, remoteViews).setSound(notification.sound, notification.audioStreamType).setVibrate(notification.vibrate).setLights(notification.ledARGB, notification.ledOnMS, notification.ledOffMS).setOngoing((notification.flags & 2) != 0).setOnlyAlertOnce((notification.flags & 8) != 0).setAutoCancel((notification.flags & 16) != 0).setDefaults(notification.defaults).setContentTitle(charSequence).setContentText(charSequence2).setContentInfo(charSequence3).setContentIntent(pendingIntent).setDeleteIntent(notification.deleteIntent).setFullScreenIntent(pendingIntent2, (notification.flags & 128) != 0).setLargeIcon(bitmap).setNumber(i).setProgress(i2, i3, z);
             }
-            return add;
-        }
-    }
 
-    static class NotificationCompatImplIceCreamSandwich extends NotificationCompatImplBase {
-        NotificationCompatImplIceCreamSandwich() {
+            public Notification build() {
+                return this.mBuilder.getNotification();
+            }
+
+            public android.app.Notification.Builder getBuilder() {
+                return this.mBuilder;
+            }
+        }
+
+        NotificationCompatBaseImpl() {
         }
 
         public Notification build(Builder builder, BuilderExtender builderExtender) {
-            return builderExtender.build(builder, new android.support.v4.app.NotificationCompatIceCreamSandwich.Builder(builder.mContext, builder.mNotification, builder.resolveTitle(), builder.resolveText(), builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate));
+            return builderExtender.build(builder, new BuilderBase(builder.mContext, builder.mNotification, builder.mContentTitle, builder.mContentText, builder.mContentInfo, builder.mTickerView, builder.mNumber, builder.mContentIntent, builder.mFullScreenIntent, builder.mLargeIcon, builder.mProgressMax, builder.mProgress, builder.mProgressIndeterminate));
+        }
+
+        public Action getAction(Notification notification, int i) {
+            return null;
+        }
+
+        public Action[] getActionsFromParcelableArrayList(ArrayList<Parcelable> arrayList) {
+            return null;
+        }
+
+        public Bundle getBundleForUnreadConversation(UnreadConversation unreadConversation) {
+            return null;
+        }
+
+        public ArrayList<Parcelable> getParcelableArrayListForActions(Action[] actionArr) {
+            return null;
+        }
+
+        public UnreadConversation getUnreadConversationFromBundle(Bundle bundle, UnreadConversation.Factory factory, RemoteInput.Factory factory2) {
+            return null;
         }
     }
 
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationCompatImpl */
+    interface NotificationCompatImpl {
+        Notification build(Builder builder, BuilderExtender builderExtender);
+
+        Action getAction(Notification notification, int i);
+
+        Action[] getActionsFromParcelableArrayList(ArrayList<Parcelable> arrayList);
+
+        Bundle getBundleForUnreadConversation(UnreadConversation unreadConversation);
+
+        ArrayList<Parcelable> getParcelableArrayListForActions(Action[] actionArr);
+
+        UnreadConversation getUnreadConversationFromBundle(Bundle bundle, UnreadConversation.Factory factory, RemoteInput.Factory factory2);
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.app.NotificationCompat$NotificationVisibility */
+    public @interface NotificationVisibility {
+    }
+
+    /* renamed from: android.support.v4.app.NotificationCompat$Style */
+    public static abstract class Style {
+        CharSequence mBigContentTitle;
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        protected Builder mBuilder;
+        CharSequence mSummaryText;
+        boolean mSummaryTextSet = false;
+
+        private int calculateTopPadding() {
+            Resources resources = this.mBuilder.mContext.getResources();
+            int dimensionPixelSize = resources.getDimensionPixelSize(C0004R.dimen.notification_top_pad);
+            int dimensionPixelSize2 = resources.getDimensionPixelSize(C0004R.dimen.notification_top_pad_large_text);
+            float constrain = (constrain(resources.getConfiguration().fontScale, 1.0f, 1.3f) - 1.0f) / 0.29999995f;
+            return Math.round((constrain * ((float) dimensionPixelSize2)) + (((float) dimensionPixelSize) * (1.0f - constrain)));
+        }
+
+        private static float constrain(float f, float f2, float f3) {
+            return f < f2 ? f2 : f <= f3 ? f : f3;
+        }
+
+        private Bitmap createColoredBitmap(int i, int i2, int i3) {
+            Drawable drawable = this.mBuilder.mContext.getResources().getDrawable(i);
+            int i4 = i3 == 0 ? drawable.getIntrinsicWidth() : i3;
+            if (i3 == 0) {
+                i3 = drawable.getIntrinsicHeight();
+            }
+            Bitmap createBitmap = Bitmap.createBitmap(i4, i3, Config.ARGB_8888);
+            drawable.setBounds(0, 0, i4, i3);
+            if (i2 != 0) {
+                drawable.mutate().setColorFilter(new PorterDuffColorFilter(i2, Mode.SRC_IN));
+            }
+            drawable.draw(new Canvas(createBitmap));
+            return createBitmap;
+        }
+
+        private Bitmap createIconWithBackground(int i, int i2, int i3, int i4) {
+            int i5 = C0004R.C0005drawable.notification_icon_background;
+            if (i4 == 0) {
+                i4 = 0;
+            }
+            Bitmap createColoredBitmap = createColoredBitmap(i5, i4, i2);
+            Canvas canvas = new Canvas(createColoredBitmap);
+            Drawable mutate = this.mBuilder.mContext.getResources().getDrawable(i).mutate();
+            mutate.setFilterBitmap(true);
+            int i6 = (i2 - i3) / 2;
+            mutate.setBounds(i6, i6, i3 + i6, i3 + i6);
+            mutate.setColorFilter(new PorterDuffColorFilter(-1, Mode.SRC_ATOP));
+            mutate.draw(canvas);
+            return createColoredBitmap;
+        }
+
+        private void hideNormalContent(RemoteViews remoteViews) {
+            remoteViews.setViewVisibility(C0004R.C0006id.title, 8);
+            remoteViews.setViewVisibility(C0004R.C0006id.text2, 8);
+            remoteViews.setViewVisibility(C0004R.C0006id.text, 8);
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void addCompatExtras(Bundle bundle) {
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void apply(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public RemoteViews applyStandardTemplate(boolean z, int i, boolean z2) {
+            boolean z3;
+            boolean z4;
+            boolean z5;
+            boolean z6;
+            Resources resources = this.mBuilder.mContext.getResources();
+            RemoteViews remoteViews = new RemoteViews(this.mBuilder.mContext.getPackageName(), i);
+            boolean z7 = this.mBuilder.getPriority() < -1;
+            if (VERSION.SDK_INT >= 16 && VERSION.SDK_INT < 21) {
+                if (z7) {
+                    remoteViews.setInt(C0004R.C0006id.notification_background, "setBackgroundResource", C0004R.C0005drawable.notification_bg_low);
+                    remoteViews.setInt(C0004R.C0006id.icon, "setBackgroundResource", C0004R.C0005drawable.notification_template_icon_low_bg);
+                } else {
+                    remoteViews.setInt(C0004R.C0006id.notification_background, "setBackgroundResource", C0004R.C0005drawable.notification_bg);
+                    remoteViews.setInt(C0004R.C0006id.icon, "setBackgroundResource", C0004R.C0005drawable.notification_template_icon_bg);
+                }
+            }
+            if (this.mBuilder.mLargeIcon != null) {
+                if (VERSION.SDK_INT >= 16) {
+                    remoteViews.setViewVisibility(C0004R.C0006id.icon, 0);
+                    remoteViews.setImageViewBitmap(C0004R.C0006id.icon, this.mBuilder.mLargeIcon);
+                } else {
+                    remoteViews.setViewVisibility(C0004R.C0006id.icon, 8);
+                }
+                if (z && this.mBuilder.mNotification.icon != 0) {
+                    int dimensionPixelSize = resources.getDimensionPixelSize(C0004R.dimen.notification_right_icon_size);
+                    int dimensionPixelSize2 = resources.getDimensionPixelSize(C0004R.dimen.notification_small_icon_background_padding);
+                    if (VERSION.SDK_INT >= 21) {
+                        remoteViews.setImageViewBitmap(C0004R.C0006id.right_icon, createIconWithBackground(this.mBuilder.mNotification.icon, dimensionPixelSize, dimensionPixelSize - (dimensionPixelSize2 * 2), this.mBuilder.getColor()));
+                    } else {
+                        remoteViews.setImageViewBitmap(C0004R.C0006id.right_icon, createColoredBitmap(this.mBuilder.mNotification.icon, -1));
+                    }
+                    remoteViews.setViewVisibility(C0004R.C0006id.right_icon, 0);
+                }
+            } else if (z && this.mBuilder.mNotification.icon != 0) {
+                remoteViews.setViewVisibility(C0004R.C0006id.icon, 0);
+                if (VERSION.SDK_INT >= 21) {
+                    remoteViews.setImageViewBitmap(C0004R.C0006id.icon, createIconWithBackground(this.mBuilder.mNotification.icon, resources.getDimensionPixelSize(C0004R.dimen.notification_large_icon_width) - resources.getDimensionPixelSize(C0004R.dimen.notification_big_circle_margin), resources.getDimensionPixelSize(C0004R.dimen.notification_small_icon_size_as_large), this.mBuilder.getColor()));
+                } else {
+                    remoteViews.setImageViewBitmap(C0004R.C0006id.icon, createColoredBitmap(this.mBuilder.mNotification.icon, -1));
+                }
+            }
+            if (this.mBuilder.mContentTitle != null) {
+                remoteViews.setTextViewText(C0004R.C0006id.title, this.mBuilder.mContentTitle);
+            }
+            if (this.mBuilder.mContentText != null) {
+                remoteViews.setTextViewText(C0004R.C0006id.text, this.mBuilder.mContentText);
+                z3 = true;
+            } else {
+                z3 = false;
+            }
+            boolean z8 = VERSION.SDK_INT < 21 && this.mBuilder.mLargeIcon != null;
+            if (this.mBuilder.mContentInfo != null) {
+                remoteViews.setTextViewText(C0004R.C0006id.info, this.mBuilder.mContentInfo);
+                remoteViews.setViewVisibility(C0004R.C0006id.info, 0);
+                z4 = true;
+                z5 = true;
+            } else if (this.mBuilder.mNumber > 0) {
+                if (this.mBuilder.mNumber > resources.getInteger(C0004R.integer.status_bar_notification_info_maxnum)) {
+                    remoteViews.setTextViewText(C0004R.C0006id.info, resources.getString(C0004R.string.status_bar_notification_info_overflow));
+                } else {
+                    remoteViews.setTextViewText(C0004R.C0006id.info, NumberFormat.getIntegerInstance().format((long) this.mBuilder.mNumber));
+                }
+                remoteViews.setViewVisibility(C0004R.C0006id.info, 0);
+                z4 = true;
+                z5 = true;
+            } else {
+                remoteViews.setViewVisibility(C0004R.C0006id.info, 8);
+                z4 = z3;
+                z5 = z8;
+            }
+            if (this.mBuilder.mSubText == null || VERSION.SDK_INT < 16) {
+                z6 = false;
+            } else {
+                remoteViews.setTextViewText(C0004R.C0006id.text, this.mBuilder.mSubText);
+                if (this.mBuilder.mContentText != null) {
+                    remoteViews.setTextViewText(C0004R.C0006id.text2, this.mBuilder.mContentText);
+                    remoteViews.setViewVisibility(C0004R.C0006id.text2, 0);
+                    z6 = true;
+                } else {
+                    remoteViews.setViewVisibility(C0004R.C0006id.text2, 8);
+                    z6 = false;
+                }
+            }
+            if (z6 && VERSION.SDK_INT >= 16) {
+                if (z2) {
+                    remoteViews.setTextViewTextSize(C0004R.C0006id.text, 0, (float) resources.getDimensionPixelSize(C0004R.dimen.notification_subtext_size));
+                }
+                remoteViews.setViewPadding(C0004R.C0006id.line1, 0, 0, 0, 0);
+            }
+            if (this.mBuilder.getWhenIfShowing() != 0) {
+                if (!this.mBuilder.mUseChronometer || VERSION.SDK_INT < 16) {
+                    remoteViews.setViewVisibility(C0004R.C0006id.time, 0);
+                    remoteViews.setLong(C0004R.C0006id.time, "setTime", this.mBuilder.getWhenIfShowing());
+                } else {
+                    remoteViews.setViewVisibility(C0004R.C0006id.chronometer, 0);
+                    remoteViews.setLong(C0004R.C0006id.chronometer, "setBase", this.mBuilder.getWhenIfShowing() + (SystemClock.elapsedRealtime() - System.currentTimeMillis()));
+                    remoteViews.setBoolean(C0004R.C0006id.chronometer, "setStarted", true);
+                }
+                z5 = true;
+            }
+            remoteViews.setViewVisibility(C0004R.C0006id.right_side, z5 ? 0 : 8);
+            remoteViews.setViewVisibility(C0004R.C0006id.line3, z4 ? 0 : 8);
+            return remoteViews;
+        }
+
+        public Notification build() {
+            if (this.mBuilder != null) {
+                return this.mBuilder.build();
+            }
+            return null;
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void buildIntoRemoteViews(RemoteViews remoteViews, RemoteViews remoteViews2) {
+            hideNormalContent(remoteViews);
+            remoteViews.removeAllViews(C0004R.C0006id.notification_main_column);
+            remoteViews.addView(C0004R.C0006id.notification_main_column, remoteViews2.clone());
+            remoteViews.setViewVisibility(C0004R.C0006id.notification_main_column, 0);
+            if (VERSION.SDK_INT >= 21) {
+                remoteViews.setViewPadding(C0004R.C0006id.notification_main_column_container, 0, calculateTopPadding(), 0, 0);
+            }
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public Bitmap createColoredBitmap(int i, int i2) {
+            return createColoredBitmap(i, i2, 0);
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public RemoteViews makeBigContentView(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            return null;
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public RemoteViews makeContentView(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            return null;
+        }
+
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public RemoteViews makeHeadsUpContentView(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor) {
+            return null;
+        }
+
+        /* access modifiers changed from: protected */
+        @RestrictTo({Scope.LIBRARY_GROUP})
+        public void restoreFromCompatExtras(Bundle bundle) {
+        }
+
+        public void setBuilder(Builder builder) {
+            if (this.mBuilder != builder) {
+                this.mBuilder = builder;
+                if (this.mBuilder != null) {
+                    this.mBuilder.setStyle(this);
+                }
+            }
+        }
+    }
+
+    /* renamed from: android.support.v4.app.NotificationCompat$WearableExtender */
     public static final class WearableExtender implements Extender {
         private static final int DEFAULT_CONTENT_ICON_GRAVITY = 8388613;
         private static final int DEFAULT_FLAGS = 1;
@@ -1539,7 +2054,7 @@ public class NotificationCompat {
         public static final int SIZE_SMALL = 2;
         public static final int SIZE_XSMALL = 1;
         public static final int UNSET_ACTION_INDEX = -1;
-        private ArrayList<Action> mActions = new ArrayList();
+        private ArrayList<Action> mActions = new ArrayList<>();
         private Bitmap mBackground;
         private String mBridgeTag;
         private int mContentActionIndex = -1;
@@ -1550,9 +2065,12 @@ public class NotificationCompat {
         private String mDismissalId;
         private PendingIntent mDisplayIntent;
         private int mFlags = 1;
-        private int mGravity = DEFAULT_GRAVITY;
+        private int mGravity = 80;
         private int mHintScreenTimeout;
-        private ArrayList<Notification> mPages = new ArrayList();
+        private ArrayList<Notification> mPages = new ArrayList<>();
+
+        public WearableExtender() {
+        }
 
         public WearableExtender(Notification notification) {
             Bundle extras = NotificationCompat.getExtras(notification);
@@ -1574,7 +2092,7 @@ public class NotificationCompat {
                 this.mContentActionIndex = bundle.getInt(KEY_CONTENT_ACTION_INDEX, -1);
                 this.mCustomSizePreset = bundle.getInt(KEY_CUSTOM_SIZE_PRESET, 0);
                 this.mCustomContentHeight = bundle.getInt(KEY_CUSTOM_CONTENT_HEIGHT);
-                this.mGravity = bundle.getInt(KEY_GRAVITY, DEFAULT_GRAVITY);
+                this.mGravity = bundle.getInt(KEY_GRAVITY, 80);
                 this.mHintScreenTimeout = bundle.getInt(KEY_HINT_SCREEN_TIMEOUT);
                 this.mDismissalId = bundle.getString(KEY_DISMISSAL_ID);
                 this.mBridgeTag = bundle.getString(KEY_BRIDGE_TAG);
@@ -1621,10 +2139,10 @@ public class NotificationCompat {
 
         public WearableExtender clone() {
             WearableExtender wearableExtender = new WearableExtender();
-            wearableExtender.mActions = new ArrayList(this.mActions);
+            wearableExtender.mActions = new ArrayList<>(this.mActions);
             wearableExtender.mFlags = this.mFlags;
             wearableExtender.mDisplayIntent = this.mDisplayIntent;
-            wearableExtender.mPages = new ArrayList(this.mPages);
+            wearableExtender.mPages = new ArrayList<>(this.mPages);
             wearableExtender.mBackground = this.mBackground;
             wearableExtender.mContentIcon = this.mContentIcon;
             wearableExtender.mContentIconGravity = this.mContentIconGravity;
@@ -1670,7 +2188,7 @@ public class NotificationCompat {
             if (this.mCustomContentHeight != 0) {
                 bundle.putInt(KEY_CUSTOM_CONTENT_HEIGHT, this.mCustomContentHeight);
             }
-            if (this.mGravity != DEFAULT_GRAVITY) {
+            if (this.mGravity != 80) {
                 bundle.putInt(KEY_GRAVITY, this.mGravity);
             }
             if (this.mHintScreenTimeout != 0) {
@@ -1858,22 +2376,20 @@ public class NotificationCompat {
     }
 
     static {
-        if (BuildCompat.isAtLeastN()) {
-            IMPL = new NotificationCompatImplApi24();
+        if (VERSION.SDK_INT >= 26) {
+            IMPL = new NotificationCompatApi26Impl();
+        } else if (VERSION.SDK_INT >= 24) {
+            IMPL = new NotificationCompatApi24Impl();
         } else if (VERSION.SDK_INT >= 21) {
-            IMPL = new NotificationCompatImplApi21();
+            IMPL = new NotificationCompatApi21Impl();
         } else if (VERSION.SDK_INT >= 20) {
-            IMPL = new NotificationCompatImplApi20();
+            IMPL = new NotificationCompatApi20Impl();
         } else if (VERSION.SDK_INT >= 19) {
-            IMPL = new NotificationCompatImplKitKat();
+            IMPL = new NotificationCompatApi19Impl();
         } else if (VERSION.SDK_INT >= 16) {
-            IMPL = new NotificationCompatImplJellybean();
-        } else if (VERSION.SDK_INT >= 14) {
-            IMPL = new NotificationCompatImplIceCreamSandwich();
-        } else if (VERSION.SDK_INT >= 11) {
-            IMPL = new NotificationCompatImplHoneycomb();
+            IMPL = new NotificationCompatApi16Impl();
         } else {
-            IMPL = new NotificationCompatImplBase();
+            IMPL = new NotificationCompatBaseImpl();
         }
     }
 
@@ -1884,68 +2400,85 @@ public class NotificationCompat {
         }
     }
 
-    static void addStyleToBuilderApi24(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor, Style style) {
-        if (style == null) {
-            return;
-        }
-        if (style instanceof MessagingStyle) {
-            MessagingStyle messagingStyle = (MessagingStyle) style;
-            List arrayList = new ArrayList();
-            List arrayList2 = new ArrayList();
-            List arrayList3 = new ArrayList();
-            List arrayList4 = new ArrayList();
-            List arrayList5 = new ArrayList();
-            for (Message message : messagingStyle.mMessages) {
-                arrayList.add(message.getText());
-                arrayList2.add(Long.valueOf(message.getTimestamp()));
-                arrayList3.add(message.getSender());
-                arrayList4.add(message.getDataMimeType());
-                arrayList5.add(message.getDataUri());
-            }
-            NotificationCompatApi24.addMessagingStyle(notificationBuilderWithBuilderAccessor, messagingStyle.mUserDisplayName, messagingStyle.mConversationTitle, arrayList, arrayList2, arrayList3, arrayList4, arrayList5);
-            return;
-        }
-        addStyleToBuilderJellybean(notificationBuilderWithBuilderAccessor, style);
-    }
-
-    static void addStyleToBuilderJellybean(NotificationBuilderWithBuilderAccessor notificationBuilderWithBuilderAccessor, Style style) {
-        if (style == null) {
-            return;
-        }
-        if (style instanceof BigTextStyle) {
-            BigTextStyle bigTextStyle = (BigTextStyle) style;
-            NotificationCompatJellybean.addBigTextStyle(notificationBuilderWithBuilderAccessor, bigTextStyle.mBigContentTitle, bigTextStyle.mSummaryTextSet, bigTextStyle.mSummaryText, bigTextStyle.mBigText);
-        } else if (style instanceof InboxStyle) {
-            InboxStyle inboxStyle = (InboxStyle) style;
-            NotificationCompatJellybean.addInboxStyle(notificationBuilderWithBuilderAccessor, inboxStyle.mBigContentTitle, inboxStyle.mSummaryTextSet, inboxStyle.mSummaryText, inboxStyle.mTexts);
-        } else if (style instanceof BigPictureStyle) {
-            BigPictureStyle bigPictureStyle = (BigPictureStyle) style;
-            NotificationCompatJellybean.addBigPictureStyle(notificationBuilderWithBuilderAccessor, bigPictureStyle.mBigContentTitle, bigPictureStyle.mSummaryTextSet, bigPictureStyle.mSummaryText, bigPictureStyle.mPicture, bigPictureStyle.mBigLargeIcon, bigPictureStyle.mBigLargeIconSet);
-        }
-    }
-
     public static Action getAction(Notification notification, int i) {
         return IMPL.getAction(notification, i);
     }
 
     public static int getActionCount(Notification notification) {
-        return IMPL.getActionCount(notification);
+        if (VERSION.SDK_INT >= 19) {
+            if (notification.actions != null) {
+                return notification.actions.length;
+            }
+            return 0;
+        } else if (VERSION.SDK_INT >= 16) {
+            return NotificationCompatJellybean.getActionCount(notification);
+        } else {
+            return 0;
+        }
+    }
+
+    public static int getBadgeIconType(Notification notification) {
+        if (VERSION.SDK_INT >= 26) {
+            return notification.getBadgeIconType();
+        }
+        return 0;
     }
 
     public static String getCategory(Notification notification) {
-        return IMPL.getCategory(notification);
+        if (VERSION.SDK_INT >= 21) {
+            return notification.category;
+        }
+        return null;
+    }
+
+    public static String getChannelId(Notification notification) {
+        if (VERSION.SDK_INT >= 26) {
+            return notification.getChannelId();
+        }
+        return null;
     }
 
     public static Bundle getExtras(Notification notification) {
-        return IMPL.getExtras(notification);
+        if (VERSION.SDK_INT >= 19) {
+            return notification.extras;
+        }
+        if (VERSION.SDK_INT >= 16) {
+            return NotificationCompatJellybean.getExtras(notification);
+        }
+        return null;
     }
 
     public static String getGroup(Notification notification) {
-        return IMPL.getGroup(notification);
+        if (VERSION.SDK_INT >= 20) {
+            return notification.getGroup();
+        }
+        if (VERSION.SDK_INT >= 19) {
+            return notification.extras.getString(NotificationCompatExtras.EXTRA_GROUP_KEY);
+        }
+        if (VERSION.SDK_INT >= 16) {
+            return NotificationCompatJellybean.getExtras(notification).getString(NotificationCompatExtras.EXTRA_GROUP_KEY);
+        }
+        return null;
+    }
+
+    public static int getGroupAlertBehavior(Notification notification) {
+        if (VERSION.SDK_INT >= 26) {
+            return notification.getGroupAlertBehavior();
+        }
+        return 0;
     }
 
     public static boolean getLocalOnly(Notification notification) {
-        return IMPL.getLocalOnly(notification);
+        if (VERSION.SDK_INT >= 20) {
+            return (notification.flags & 256) != 0;
+        }
+        if (VERSION.SDK_INT >= 19) {
+            return notification.extras.getBoolean(NotificationCompatExtras.EXTRA_LOCAL_ONLY);
+        }
+        if (VERSION.SDK_INT >= 16) {
+            return NotificationCompatJellybean.getExtras(notification).getBoolean(NotificationCompatExtras.EXTRA_LOCAL_ONLY);
+        }
+        return false;
     }
 
     static Notification[] getNotificationArrayFromBundle(Bundle bundle, String str) {
@@ -1953,19 +2486,57 @@ public class NotificationCompat {
         if ((parcelableArray instanceof Notification[]) || parcelableArray == null) {
             return (Notification[]) parcelableArray;
         }
-        Parcelable[] parcelableArr = new Notification[parcelableArray.length];
-        for (int i = 0; i < parcelableArray.length; i++) {
-            parcelableArr[i] = (Notification) parcelableArray[i];
+        Notification[] notificationArr = new Notification[parcelableArray.length];
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 < parcelableArray.length) {
+                notificationArr[i2] = (Notification) parcelableArray[i2];
+                i = i2 + 1;
+            } else {
+                bundle.putParcelableArray(str, notificationArr);
+                return notificationArr;
+            }
         }
-        bundle.putParcelableArray(str, parcelableArr);
-        return parcelableArr;
+    }
+
+    public static String getShortcutId(Notification notification) {
+        if (VERSION.SDK_INT >= 26) {
+            return notification.getShortcutId();
+        }
+        return null;
     }
 
     public static String getSortKey(Notification notification) {
-        return IMPL.getSortKey(notification);
+        if (VERSION.SDK_INT >= 20) {
+            return notification.getSortKey();
+        }
+        if (VERSION.SDK_INT >= 19) {
+            return notification.extras.getString(NotificationCompatExtras.EXTRA_SORT_KEY);
+        }
+        if (VERSION.SDK_INT >= 16) {
+            return NotificationCompatJellybean.getExtras(notification).getString(NotificationCompatExtras.EXTRA_SORT_KEY);
+        }
+        return null;
+    }
+
+    public static long getTimeoutAfter(Notification notification) {
+        if (VERSION.SDK_INT >= 26) {
+            return notification.getTimeoutAfter();
+        }
+        return 0;
     }
 
     public static boolean isGroupSummary(Notification notification) {
-        return IMPL.isGroupSummary(notification);
+        if (VERSION.SDK_INT >= 20) {
+            return (notification.flags & 512) != 0;
+        }
+        if (VERSION.SDK_INT >= 19) {
+            return notification.extras.getBoolean(NotificationCompatExtras.EXTRA_GROUP_SUMMARY);
+        }
+        if (VERSION.SDK_INT >= 16) {
+            return NotificationCompatJellybean.getExtras(notification).getBoolean(NotificationCompatExtras.EXTRA_GROUP_SUMMARY);
+        }
+        return false;
     }
 }

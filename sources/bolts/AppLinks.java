@@ -16,7 +16,10 @@ public final class AppLinks {
 
     public static Bundle getAppLinkExtras(Intent intent) {
         Bundle appLinkData = getAppLinkData(intent);
-        return appLinkData == null ? null : appLinkData.getBundle("extras");
+        if (appLinkData == null) {
+            return null;
+        }
+        return appLinkData.getBundle("extras");
     }
 
     public static Uri getTargetUrl(Intent intent) {

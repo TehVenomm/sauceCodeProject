@@ -1,19 +1,20 @@
-package net.gogame.gowrap.ui.download;
+package net.gogame.gowrap.p019ui.download;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.ImageView;
 import net.gogame.gowrap.Constants;
+import net.gogame.gowrap.p019ui.utils.ImageUtils;
 import net.gogame.gowrap.support.DownloadManager.DownloadResult;
 import net.gogame.gowrap.support.DownloadManager.Target;
-import net.gogame.gowrap.ui.utils.ImageUtils;
 
+/* renamed from: net.gogame.gowrap.ui.download.ImageViewTarget */
 public class ImageViewTarget implements Target {
     private boolean cancelled;
     private ImageView imageView;
 
-    public ImageViewTarget(ImageView imageView) {
-        this.imageView = imageView;
+    public ImageViewTarget(ImageView imageView2) {
+        this.imageView = imageView2;
     }
 
     public boolean isCancelled() {

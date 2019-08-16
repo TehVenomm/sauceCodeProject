@@ -1,4 +1,4 @@
-package jp.colopl.config;
+package p018jp.colopl.config;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,10 +8,11 @@ import android.os.Build.VERSION;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.google.android.zippy.SharedPreferencesCompat;
-import io.fabric.sdk.android.services.common.IdManager;
-import jp.colopl.libs.ColoplAppInfo;
-import jp.colopl.util.Crypto;
+import p017io.fabric.sdk.android.services.common.IdManager;
+import p018jp.colopl.libs.ColoplAppInfo;
+import p018jp.colopl.util.Crypto;
 
+/* renamed from: jp.colopl.config.Config */
 public class Config {
     private static String PREF_KEY_PREF_LOCATON_ACCURACY = "pref_location_acc";
     private static String PREF_KEY_PREF_LOCATON_LATITUDE = "pref_location_lat";
@@ -26,23 +27,24 @@ public class Config {
     private Context context;
     private Session session;
 
-    public Config(Context context) {
-        this.context = context;
-        this.session = new Session(context);
+    public Config(Context context2) {
+        this.context = context2;
+        this.session = new Session(context2);
     }
 
-    private static SharedPreferences getDefaultSharedPreferences(Context context) {
+    private static SharedPreferences getDefaultSharedPreferences(Context context2) {
+        SharedPreferences sharedPreferences;
         synchronized (Config.class) {
             try {
                 if (mDefaultSharedPreferences == null) {
-                    mDefaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                    mDefaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context2);
                 }
-                SharedPreferences sharedPreferences = mDefaultSharedPreferences;
-                return sharedPreferences;
+                sharedPreferences = mDefaultSharedPreferences;
             } finally {
-                Object obj = Config.class;
+                Class<Config> cls = Config.class;
             }
         }
+        return sharedPreferences;
     }
 
     private float getPreviousLocationAccuracy(SharedPreferences sharedPreferences) {
@@ -51,26 +53,26 @@ public class Config {
 
     private double getPreviousLocationLatitude(SharedPreferences sharedPreferences) {
         String string = sharedPreferences.getString(PREF_KEY_PREF_LOCATON_LATITUDE, IdManager.DEFAULT_VERSION_NAME);
-        double d = 0.0d;
+        long j = 0;
         try {
-            d = Double.valueOf(string).doubleValue();
+            return Double.valueOf(string).doubleValue();
         } catch (NumberFormatException e) {
             Log.e(TAG, e.toString());
             Log.e(TAG, "getPreviousLocationLatitude: latStr = " + string);
+            return j;
         }
-        return d;
     }
 
     private double getPreviousLocationLongitude(SharedPreferences sharedPreferences) {
         String string = sharedPreferences.getString(PREF_KEY_PREF_LOCATON_LONGITUDE, IdManager.DEFAULT_VERSION_NAME);
-        double d = 0.0d;
+        long j = 0;
         try {
-            d = Double.valueOf(string).doubleValue();
+            return Double.valueOf(string).doubleValue();
         } catch (NumberFormatException e) {
             Log.e(TAG, e.toString());
             Log.e(TAG, "getPreviousLocationLongitude: lonStr = " + string);
+            return j;
         }
-        return d;
     }
 
     private String getPreviousLocationProvider(SharedPreferences sharedPreferences) {
@@ -81,21 +83,21 @@ public class Config {
         return sharedPreferences.getLong(PREF_KEY_PREF_LOCATON_TIME, 0);
     }
 
-    public static int getVersionCode(Context context) {
-        int i = 0;
+    public static int getVersionCode(Context context2) {
+        boolean z = false;
         try {
-            return context.getPackageManager().getPackageInfo(context.getPackageName(), 128).versionCode;
+            return context2.getPackageManager().getPackageInfo(context2.getPackageName(), 128).versionCode;
         } catch (NameNotFoundException e) {
-            return i;
+            return z;
         }
     }
 
-    public static String getVersionName(Context context) {
-        String str = null;
+    public static String getVersionName(Context context2) {
+        boolean z = false;
         try {
-            return context.getPackageManager().getPackageInfo(context.getPackageName(), 128).versionName;
+            return context2.getPackageManager().getPackageInfo(context2.getPackageName(), 128).versionName;
         } catch (NameNotFoundException e) {
-            return str;
+            return z;
         }
     }
 

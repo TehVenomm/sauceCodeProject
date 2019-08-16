@@ -48,7 +48,7 @@ public class Goal_MoveToAround : GoalComposite
 	public override string ToStringGoal()
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		string str = $"targetPos={(object)targetPos}, moveLen={(object)moveLen}";
+		string str = $"targetPos={targetPos}, moveLen={moveLen}";
 		return base.ToStringGoal() + str;
 	}
 }

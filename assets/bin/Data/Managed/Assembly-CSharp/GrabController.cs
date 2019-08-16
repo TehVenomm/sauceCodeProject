@@ -47,7 +47,7 @@ public class GrabController
 	{
 		for (int i = 0; i < grabbedPlayers.Count; i++)
 		{
-			if (!grabbedPlayers[i].isDead && grabbedPlayers[i].actionID == (Character.ACTION_ID)27)
+			if (!grabbedPlayers[i].isDead && grabbedPlayers[i].actionID == (Character.ACTION_ID)29)
 			{
 				grabbedPlayers[i].ActGrabbedEnd(angle, power);
 			}

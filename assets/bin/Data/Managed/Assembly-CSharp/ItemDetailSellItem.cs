@@ -30,4 +30,9 @@ public class ItemDetailSellItem : ItemDetailSellBase
 			GameSection.SetEventData(array);
 		}
 	}
+
+	private void OnQuery_SALE_TP()
+	{
+		MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostSellItemData(data.GetTableID(), data.GetUniqID(), data.GetNum());
+	}
 }

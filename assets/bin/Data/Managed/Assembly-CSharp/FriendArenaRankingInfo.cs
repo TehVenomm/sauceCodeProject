@@ -49,6 +49,7 @@ public class FriendArenaRankingInfo : FriendInfo
 		SPR_FOLLOW_ARROW,
 		SPR_FOLLOWER_ARROW,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		LBL_LEVEL_WEAPON_1,
 		LBL_LEVEL_WEAPON_2,
 		LBL_LEVEL_WEAPON_3,
@@ -69,7 +70,6 @@ public class FriendArenaRankingInfo : FriendInfo
 
 	public override void Initialize()
 	{
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = (object[])GameSection.GetEventData();
 		friendCharaInfo = (array[0] as FriendCharaInfo);
 		data = (array[0] as CharaInfo);
@@ -82,6 +82,10 @@ public class FriendArenaRankingInfo : FriendInfo
 		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
 		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
 		InitializeBase();
+	}
+
+	protected override void OnOpen()
+	{
 	}
 
 	private void OnQuery_SCORE()
@@ -98,12 +102,12 @@ public class FriendArenaRankingInfo : FriendInfo
 		base.UpdateUI();
 		if (data.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			SetActive((Enum)UI.BTN_FOLLOW, false);
-			SetActive((Enum)UI.BTN_UNFOLLOW, false);
-			SetActive((Enum)UI.OBJ_BLACKLIST_ROOT, false);
-			SetActive((Enum)UI.OBJ_BLACKLIST_ROOT, false);
-			SetActive((Enum)UI.BTN_BLACKLIST_IN, false);
-			SetActive((Enum)UI.BTN_BLACKLIST_OUT, false);
+			SetActive((Enum)UI.BTN_FOLLOW, is_visible: false);
+			SetActive((Enum)UI.BTN_UNFOLLOW, is_visible: false);
+			SetActive((Enum)UI.OBJ_BLACKLIST_ROOT, is_visible: false);
+			SetActive((Enum)UI.OBJ_BLACKLIST_ROOT, is_visible: false);
+			SetActive((Enum)UI.BTN_BLACKLIST_IN, is_visible: false);
+			SetActive((Enum)UI.BTN_BLACKLIST_OUT, is_visible: false);
 		}
 	}
 }

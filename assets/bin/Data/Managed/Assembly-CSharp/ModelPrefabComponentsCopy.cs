@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ModelPrefabComponentsCopy
+public class ModelPrefabComponentsCopy : MonoBehaviour
 {
 	public enum TOOL_MODE
 	{

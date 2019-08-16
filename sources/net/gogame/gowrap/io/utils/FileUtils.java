@@ -1,4 +1,4 @@
-package net.gogame.gowrap.io.utils;
+package net.gogame.gowrap.p021io.utils;
 
 import android.content.Context;
 import java.io.File;
@@ -10,42 +10,42 @@ import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+/* renamed from: net.gogame.gowrap.io.utils.FileUtils */
 public final class FileUtils {
     private FileUtils() {
     }
 
     public static void copy(File file, File file2) throws IOException {
-        OutputStream fileOutputStream;
-        Throwable th;
+        OutputStream outputStream;
         InputStream inputStream = null;
         try {
-            InputStream fileInputStream = new FileInputStream(file);
+            FileInputStream fileInputStream = new FileInputStream(file);
             try {
-                fileOutputStream = new FileOutputStream(file2);
+                outputStream = new FileOutputStream(file2);
                 try {
-                    IOUtils.copy(fileInputStream, fileOutputStream);
+                    IOUtils.copy(fileInputStream, outputStream);
                     try {
-                        IOUtils.closeQuietly(fileOutputStream);
-                        IOUtils.closeQuietly(fileInputStream);
-                    } catch (Throwable th2) {
-                        th = th2;
+                        IOUtils.closeQuietly(outputStream);
+                        IOUtils.closeQuietly((InputStream) fileInputStream);
+                    } catch (Throwable th) {
+                        th = th;
                         inputStream = fileInputStream;
                         IOUtils.closeQuietly(inputStream);
                         throw th;
                     }
-                } catch (Throwable th3) {
-                    th = th3;
-                    IOUtils.closeQuietly(fileOutputStream);
+                } catch (Throwable th2) {
+                    th = th2;
+                    IOUtils.closeQuietly(outputStream);
                     throw th;
                 }
-            } catch (Throwable th4) {
-                th = th4;
-                fileOutputStream = null;
-                IOUtils.closeQuietly(fileOutputStream);
+            } catch (Throwable th3) {
+                th = th3;
+                outputStream = null;
+                IOUtils.closeQuietly(outputStream);
                 throw th;
             }
-        } catch (Throwable th5) {
-            th = th5;
+        } catch (Throwable th4) {
+            th = th4;
             IOUtils.closeQuietly(inputStream);
             throw th;
         }
@@ -56,118 +56,106 @@ public final class FileUtils {
         file.delete();
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static void touch(java.io.File r2) throws java.io.IOException {
-        /*
-        r1 = 0;
-        r0 = new java.io.FileOutputStream;	 Catch:{ all -> 0x000a }
-        r0.<init>(r2);	 Catch:{ all -> 0x000a }
-        net.gogame.gowrap.io.utils.IOUtils.closeQuietly(r0);
-        return;
-    L_0x000a:
-        r0 = move-exception;
-        net.gogame.gowrap.io.utils.IOUtils.closeQuietly(r1);
-        throw r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: net.gogame.gowrap.io.utils.FileUtils.touch(java.io.File):void");
+    public static void touch(File file) throws IOException {
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+        } finally {
+            IOUtils.closeQuietly(fileOutputStream);
+        }
     }
 
     public static void copyFromAsset(Context context, String str, File file) throws IOException {
-        OutputStream fileOutputStream;
-        Throwable th;
+        OutputStream outputStream;
         try {
-            fileOutputStream = new FileOutputStream(file);
+            outputStream = new FileOutputStream(file);
             try {
-                IOUtils.assetCopy(context, str, fileOutputStream);
-                IOUtils.closeQuietly(fileOutputStream);
-            } catch (Throwable th2) {
-                th = th2;
-                IOUtils.closeQuietly(fileOutputStream);
+                IOUtils.assetCopy(context, str, outputStream);
+                IOUtils.closeQuietly(outputStream);
+            } catch (Throwable th) {
+                th = th;
+                IOUtils.closeQuietly(outputStream);
                 throw th;
             }
-        } catch (Throwable th3) {
-            th = th3;
-            fileOutputStream = null;
-            IOUtils.closeQuietly(fileOutputStream);
+        } catch (Throwable th2) {
+            th = th2;
+            outputStream = null;
+            IOUtils.closeQuietly(outputStream);
             throw th;
         }
     }
 
     public static String toString(File file, String str) throws IOException {
-        Throwable th;
-        InputStream fileInputStream;
+        InputStream inputStream;
         try {
-            fileInputStream = new FileInputStream(file);
+            inputStream = new FileInputStream(file);
             try {
-                String iOUtils = IOUtils.toString(fileInputStream, str);
-                IOUtils.closeQuietly(fileInputStream);
+                String iOUtils = IOUtils.toString(inputStream, str);
+                IOUtils.closeQuietly(inputStream);
                 return iOUtils;
-            } catch (Throwable th2) {
-                th = th2;
-                IOUtils.closeQuietly(fileInputStream);
+            } catch (Throwable th) {
+                th = th;
+                IOUtils.closeQuietly(inputStream);
                 throw th;
             }
-        } catch (Throwable th3) {
-            th = th3;
-            fileInputStream = null;
-            IOUtils.closeQuietly(fileInputStream);
+        } catch (Throwable th2) {
+            th = th2;
+            inputStream = null;
+            IOUtils.closeQuietly(inputStream);
             throw th;
         }
     }
 
     public static void gzipCopyFromAsset(Context context, String str, File file) throws IOException {
-        OutputStream fileOutputStream;
         Throwable th;
-        Throwable th2;
-        InputStream open;
+        InputStream inputStream;
+        OutputStream outputStream;
+        InputStream inputStream2 = null;
         try {
-            InputStream gZIPInputStream;
-            open = context.getAssets().open(str);
+            InputStream open = context.getAssets().open(str);
             try {
                 if (str.endsWith(".gz")) {
-                    gZIPInputStream = new GZIPInputStream(open);
+                    inputStream = new GZIPInputStream(open);
                 } else {
-                    gZIPInputStream = open;
+                    inputStream = open;
                 }
                 try {
-                    fileOutputStream = new FileOutputStream(file);
+                    outputStream = new FileOutputStream(file);
                     try {
                         if (file.getName().endsWith(".gz")) {
-                            fileOutputStream = new GZIPOutputStream(fileOutputStream);
+                            outputStream = new GZIPOutputStream(outputStream);
                         }
-                        IOUtils.copy(gZIPInputStream, fileOutputStream);
-                    } catch (Throwable th3) {
-                        th = th3;
-                        IOUtils.closeQuietly(fileOutputStream);
+                        IOUtils.copy(inputStream, outputStream);
+                    } catch (Throwable th2) {
+                        th = th2;
+                        IOUtils.closeQuietly(outputStream);
                         throw th;
                     }
-                } catch (Throwable th4) {
-                    th = th4;
-                    fileOutputStream = null;
-                    IOUtils.closeQuietly(fileOutputStream);
+                } catch (Throwable th3) {
+                    th = th3;
+                    outputStream = null;
+                    IOUtils.closeQuietly(outputStream);
                     throw th;
                 }
-            } catch (Throwable th5) {
-                th2 = th5;
-                IOUtils.closeQuietly(open);
-                throw th2;
+            } catch (Throwable th4) {
+                th = th4;
+                inputStream2 = open;
+                IOUtils.closeQuietly(inputStream2);
+                throw th;
             }
             try {
-                IOUtils.closeQuietly(fileOutputStream);
-                IOUtils.closeQuietly(gZIPInputStream);
-            } catch (Throwable th6) {
-                Throwable th7 = th6;
-                open = gZIPInputStream;
-                th2 = th7;
-                IOUtils.closeQuietly(open);
-                throw th2;
+                IOUtils.closeQuietly(outputStream);
+                IOUtils.closeQuietly(inputStream);
+            } catch (Throwable th5) {
+                th = th5;
+                inputStream2 = inputStream;
+                IOUtils.closeQuietly(inputStream2);
+                throw th;
             }
-        } catch (Throwable th8) {
-            th2 = th8;
-            open = null;
-            IOUtils.closeQuietly(open);
-            throw th2;
+        } catch (Throwable th6) {
+            th = th6;
+            IOUtils.closeQuietly(inputStream2);
+            throw th;
         }
     }
 }

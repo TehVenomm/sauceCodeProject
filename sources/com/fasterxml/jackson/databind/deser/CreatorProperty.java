@@ -38,7 +38,7 @@ public class CreatorProperty extends SettableBeanProperty {
     }
 
     protected CreatorProperty(CreatorProperty creatorProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) creatorProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) creatorProperty, jsonDeserializer);
         this._annotated = creatorProperty._annotated;
         this._creatorIndex = creatorProperty._creatorIndex;
         this._injectableValueId = creatorProperty._injectableValueId;
@@ -50,7 +50,7 @@ public class CreatorProperty extends SettableBeanProperty {
     }
 
     public CreatorProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new CreatorProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new CreatorProperty(this, jsonDeserializer);
     }
 
     public void setFallbackSetter(SettableBeanProperty settableBeanProperty) {

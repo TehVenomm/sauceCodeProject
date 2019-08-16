@@ -1,14 +1,20 @@
 package com.google.android.gms.games;
 
-import java.util.Collections;
-import java.util.List;
+import android.support.annotation.Nullable;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.internal.PendingResultUtil.ResultConverter;
+import com.google.android.gms.games.achievement.AchievementBuffer;
+import com.google.android.gms.games.achievement.Achievements.LoadAchievementsResult;
 
-final class zzb extends zzb {
+final class zzb implements ResultConverter<LoadAchievementsResult, AchievementBuffer> {
     zzb() {
-        super();
     }
 
-    public final /* synthetic */ List zzn(Object obj) {
-        return Collections.singletonList(Games.SCOPE_GAMES);
+    public final /* synthetic */ Object convert(@Nullable Result result) {
+        LoadAchievementsResult loadAchievementsResult = (LoadAchievementsResult) result;
+        if (loadAchievementsResult == null) {
+            return null;
+        }
+        return loadAchievementsResult.getAchievements();
     }
 }

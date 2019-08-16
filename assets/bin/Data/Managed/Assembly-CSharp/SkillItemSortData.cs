@@ -94,7 +94,7 @@ public class SkillItemSortData : SortCompareData
 
 	public override string GetDetail()
 	{
-		return skillData.GetExplanationText(false);
+		return skillData.GetExplanationText();
 	}
 
 	public override int GetNum()
@@ -112,6 +112,11 @@ public class SkillItemSortData : SortCompareData
 		return skillData.tableData.skillAtkType;
 	}
 
+	public override ELEMENT_TYPE GetIconElementSub()
+	{
+		return skillData.tableData.GetAttackElementByIndex(1);
+	}
+
 	public override int GetSalePrice()
 	{
 		return skillData.sellPrice;
@@ -124,7 +129,7 @@ public class SkillItemSortData : SortCompareData
 
 	public override bool IsEquipping()
 	{
-		return skillData.isAttached;
+		return skillData.isAttached || skillData.isUniqueAttached;
 	}
 
 	public override int GetLevel()

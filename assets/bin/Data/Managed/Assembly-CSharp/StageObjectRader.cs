@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StageObjectRader
+public class StageObjectRader : MonoBehaviour
 {
 	public class CatchStageObject
 	{
@@ -49,11 +49,7 @@ public class StageObjectRader
 
 	protected virtual void Awake()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		objects = new List<CatchStageObject>();
 		_transform = this.get_transform();
 		_rigidbody = this.GetComponent<Rigidbody>();
@@ -77,7 +73,6 @@ public class StageObjectRader
 
 	protected virtual void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
 	}
 
@@ -139,38 +134,32 @@ public class StageObjectRader
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(_collider == null) && _collider.get_enabled() && !(this.stageObject == null) && !(collider.get_gameObject() == this.get_gameObject()))
+		if (_collider == null || !_collider.get_enabled() || this.stageObject == null || collider.get_gameObject() == this.get_gameObject())
 		{
-			StageObject stageObject = null;
-			BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
-			if (component != null)
+			return;
+		}
+		StageObject stageObject = null;
+		BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
+		if (component != null)
+		{
+			stageObject = component.stageObject;
+		}
+		else
+		{
+			if (collider.get_isTrigger())
 			{
-				stageObject = component.stageObject;
+				return;
 			}
-			else
-			{
-				if (collider.get_isTrigger())
-				{
-					return;
-				}
-				stageObject = collider.get_gameObject().GetComponentInParent<StageObject>();
-			}
-			if (!(stageObject == null) && !(stageObject == this.stageObject))
-			{
-				Add(stageObject, collider, component);
-			}
+			stageObject = collider.get_gameObject().GetComponentInParent<StageObject>();
+		}
+		if (!(stageObject == null) && !(stageObject == this.stageObject))
+		{
+			Add(stageObject, collider, component);
 		}
 	}
 
 	private void OnTriggerExit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (!(collider.get_gameObject() == this.get_gameObject()))
 		{
 			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();

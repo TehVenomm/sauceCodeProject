@@ -1,6 +1,5 @@
 package org.apache.commons.lang3.text.translate;
 
-import com.google.android.gms.nearby.messages.Strategy;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -16,11 +15,11 @@ public class NumericEntityEscaper extends CodePointTranslator {
     }
 
     public NumericEntityEscaper() {
-        this(0, Strategy.TTL_SECONDS_INFINITE, true);
+        this(0, Integer.MAX_VALUE, true);
     }
 
     public static NumericEntityEscaper below(int i) {
-        return outsideOf(i, Strategy.TTL_SECONDS_INFINITE);
+        return outsideOf(i, Integer.MAX_VALUE);
     }
 
     public static NumericEntityEscaper above(int i) {

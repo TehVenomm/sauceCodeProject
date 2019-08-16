@@ -1,24 +1,25 @@
 package com.facebook;
 
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.annotation.Nullable;
+import android.support.p000v4.content.LocalBroadcastManager;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
 
-final class ProfileManager {
-    static final String ACTION_CURRENT_PROFILE_CHANGED = "com.facebook.sdk.ACTION_CURRENT_PROFILE_CHANGED";
-    static final String EXTRA_NEW_PROFILE = "com.facebook.sdk.EXTRA_NEW_PROFILE";
-    static final String EXTRA_OLD_PROFILE = "com.facebook.sdk.EXTRA_OLD_PROFILE";
+public final class ProfileManager {
+    public static final String ACTION_CURRENT_PROFILE_CHANGED = "com.facebook.sdk.ACTION_CURRENT_PROFILE_CHANGED";
+    public static final String EXTRA_NEW_PROFILE = "com.facebook.sdk.EXTRA_NEW_PROFILE";
+    public static final String EXTRA_OLD_PROFILE = "com.facebook.sdk.EXTRA_OLD_PROFILE";
     private static volatile ProfileManager instance;
     private Profile currentProfile;
     private final LocalBroadcastManager localBroadcastManager;
     private final ProfileCache profileCache;
 
-    ProfileManager(LocalBroadcastManager localBroadcastManager, ProfileCache profileCache) {
-        Validate.notNull(localBroadcastManager, "localBroadcastManager");
-        Validate.notNull(profileCache, "profileCache");
-        this.localBroadcastManager = localBroadcastManager;
-        this.profileCache = profileCache;
+    ProfileManager(LocalBroadcastManager localBroadcastManager2, ProfileCache profileCache2) {
+        Validate.notNull(localBroadcastManager2, "localBroadcastManager");
+        Validate.notNull(profileCache2, "profileCache");
+        this.localBroadcastManager = localBroadcastManager2;
+        this.profileCache = profileCache2;
     }
 
     static ProfileManager getInstance() {
@@ -28,9 +29,9 @@ final class ProfileManager {
                     if (instance == null) {
                         instance = new ProfileManager(LocalBroadcastManager.getInstance(FacebookSdk.getApplicationContext()), new ProfileCache());
                     }
-                } catch (Throwable th) {
+                } finally {
                     while (true) {
-                        Class cls = ProfileManager.class;
+                        Class<ProfileManager> cls = ProfileManager.class;
                     }
                 }
             }
@@ -45,7 +46,7 @@ final class ProfileManager {
         this.localBroadcastManager.sendBroadcast(intent);
     }
 
-    private void setCurrentProfile(Profile profile, boolean z) {
+    private void setCurrentProfile(@Nullable Profile profile, boolean z) {
         Profile profile2 = this.currentProfile;
         this.currentProfile = profile;
         if (z) {
@@ -60,11 +61,13 @@ final class ProfileManager {
         }
     }
 
-    Profile getCurrentProfile() {
+    /* access modifiers changed from: 0000 */
+    public Profile getCurrentProfile() {
         return this.currentProfile;
     }
 
-    boolean loadCurrentProfile() {
+    /* access modifiers changed from: 0000 */
+    public boolean loadCurrentProfile() {
         Profile load = this.profileCache.load();
         if (load == null) {
             return false;
@@ -73,7 +76,8 @@ final class ProfileManager {
         return true;
     }
 
-    void setCurrentProfile(Profile profile) {
+    /* access modifiers changed from: 0000 */
+    public void setCurrentProfile(@Nullable Profile profile) {
         setCurrentProfile(profile, true);
     }
 }

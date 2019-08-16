@@ -1,34 +1,44 @@
 package com.google.android.gms.drive.query.internal;
 
 import android.os.Parcel;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.drive.metadata.MetadataField;
 import com.google.android.gms.drive.metadata.SearchableCollectionMetadataField;
 import com.google.android.gms.drive.metadata.internal.MetadataBundle;
 import com.google.android.gms.drive.metadata.zzb;
 import java.util.Collection;
 import java.util.Collections;
 
+@Class(creator = "InFilterCreator")
+@Reserved({1000})
 public final class zzp<T> extends zza {
     public static final zzq CREATOR = new zzq();
-    private MetadataBundle zzgnh;
-    private final zzb<T> zzgnu;
+    @Field(mo13990id = 1)
+    private final MetadataBundle zzlk;
+    private final zzb<T> zzlx;
 
     public zzp(SearchableCollectionMetadataField<T> searchableCollectionMetadataField, T t) {
-        this(MetadataBundle.zzb(searchableCollectionMetadataField, Collections.singleton(t)));
+        this(MetadataBundle.zza(searchableCollectionMetadataField, Collections.singleton(t)));
     }
 
-    zzp(MetadataBundle metadataBundle) {
-        this.zzgnh = metadataBundle;
-        this.zzgnu = (zzb) zzi.zza(metadataBundle);
+    @Constructor
+    zzp(@Param(mo13993id = 1) MetadataBundle metadataBundle) {
+        this.zzlk = metadataBundle;
+        this.zzlx = (zzb) zzi.zza(metadataBundle);
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.zzgnh, i, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 1, this.zzlk, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
     public final <F> F zza(zzj<F> zzj) {
-        return zzj.zza(this.zzgnu, ((Collection) this.zzgnh.zza(this.zzgnu)).iterator().next());
+        return zzj.zza(this.zzlx, ((Collection) this.zzlk.zza((MetadataField<T>) this.zzlx)).iterator().next());
     }
 }

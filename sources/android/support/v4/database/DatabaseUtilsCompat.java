@@ -1,7 +1,8 @@
-package android.support.v4.database;
+package android.support.p000v4.database;
 
 import android.text.TextUtils;
 
+/* renamed from: android.support.v4.database.DatabaseUtilsCompat */
 public final class DatabaseUtilsCompat {
     private DatabaseUtilsCompat() {
     }
@@ -10,10 +11,10 @@ public final class DatabaseUtilsCompat {
         if (strArr == null || strArr.length == 0) {
             return strArr2;
         }
-        Object obj = new String[(strArr.length + strArr2.length)];
-        System.arraycopy(strArr, 0, obj, 0, strArr.length);
-        System.arraycopy(strArr2, 0, obj, strArr.length, strArr2.length);
-        return obj;
+        String[] strArr3 = new String[(strArr.length + strArr2.length)];
+        System.arraycopy(strArr, 0, strArr3, 0, strArr.length);
+        System.arraycopy(strArr2, 0, strArr3, strArr.length, strArr2.length);
+        return strArr3;
     }
 
     public static String concatenateWhere(String str, String str2) {

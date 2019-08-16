@@ -12,7 +12,7 @@ import java.util.HashMap;
 public final class PropertyBasedCreator {
     protected final SettableBeanProperty[] _allProperties;
     protected final int _propertyCount;
-    protected final HashMap<String, SettableBeanProperty> _propertyLookup = new HashMap();
+    protected final HashMap<String, SettableBeanProperty> _propertyLookup = new HashMap<>();
     protected final ValueInstantiator _valueInstantiator;
 
     protected PropertyBasedCreator(ValueInstantiator valueInstantiator, SettableBeanProperty[] settableBeanPropertyArr) {

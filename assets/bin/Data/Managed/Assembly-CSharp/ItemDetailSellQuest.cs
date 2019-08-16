@@ -11,7 +11,7 @@ public class ItemDetailSellQuest : ItemDetailSellBase
 			if (questItem != null)
 			{
 				base.UpdateUI();
-				SetActive((Enum)UI.OBJ_MONEY_ROOT, false);
+				SetActive((Enum)UI.OBJ_MONEY_ROOT, is_visible: false);
 			}
 		}
 	}

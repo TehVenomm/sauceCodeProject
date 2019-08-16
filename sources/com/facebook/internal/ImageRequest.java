@@ -2,16 +2,15 @@ package com.facebook.internal;
 
 import android.content.Context;
 import android.net.Uri;
+import com.facebook.FacebookSdk;
 import java.util.Locale;
 import org.onepf.oms.appstore.AmazonAppstoreBillingService;
 
 public class ImageRequest {
-    private static final String AUTHORITY = "graph.facebook.com";
     private static final String HEIGHT_PARAM = "height";
     private static final String MIGRATION_PARAM = "migration_overrides";
     private static final String MIGRATION_VALUE = "{october_2012:true}";
-    private static final String PATH = "%s/picture";
-    private static final String SCHEME = "https";
+    private static final String PATH = "%s/%s/picture";
     public static final int UNSPECIFIED_DIMENSION = 0;
     private static final String WIDTH_PARAM = "width";
     private boolean allowCachedRedirects;
@@ -21,20 +20,25 @@ public class ImageRequest {
     private Uri imageUri;
 
     public static class Builder {
-        private boolean allowCachedRedirects;
-        private Callback callback;
-        private Object callerTag;
-        private Context context;
-        private Uri imageUrl;
+        /* access modifiers changed from: private */
+        public boolean allowCachedRedirects;
+        /* access modifiers changed from: private */
+        public Callback callback;
+        /* access modifiers changed from: private */
+        public Object callerTag;
+        /* access modifiers changed from: private */
+        public Context context;
+        /* access modifiers changed from: private */
+        public Uri imageUrl;
 
-        public Builder(Context context, Uri uri) {
+        public Builder(Context context2, Uri uri) {
             Validate.notNull(uri, "imageUri");
-            this.context = context;
+            this.context = context2;
             this.imageUrl = uri;
         }
 
         public ImageRequest build() {
-            return new ImageRequest();
+            return new ImageRequest(this);
         }
 
         public Builder setAllowCachedRedirects(boolean z) {
@@ -42,8 +46,8 @@ public class ImageRequest {
             return this;
         }
 
-        public Builder setCallback(Callback callback) {
-            this.callback = callback;
+        public Builder setCallback(Callback callback2) {
+            this.callback = callback2;
             return this;
         }
 
@@ -72,7 +76,7 @@ public class ImageRequest {
         if (max == 0 && max2 == 0) {
             throw new IllegalArgumentException("Either width or height must be greater than 0");
         }
-        android.net.Uri.Builder path = new android.net.Uri.Builder().scheme(SCHEME).authority(AUTHORITY).path(String.format(Locale.US, PATH, new Object[]{str}));
+        android.net.Uri.Builder path = Uri.parse(ServerProtocol.getGraphUrlBase()).buildUpon().path(String.format(Locale.US, PATH, new Object[]{FacebookSdk.getGraphApiVersion(), str}));
         if (max2 != 0) {
             path.appendQueryParameter("height", String.valueOf(max2));
         }

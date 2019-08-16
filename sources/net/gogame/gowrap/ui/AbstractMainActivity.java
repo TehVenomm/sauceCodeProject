@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui;
+package net.gogame.gowrap.p019ui;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.regex.Pattern;
@@ -21,34 +22,26 @@ import net.gogame.gowrap.VipStatus;
 import net.gogame.gowrap.integrations.core.CoreSupport;
 import net.gogame.gowrap.integrations.core.Wrapper;
 import net.gogame.gowrap.model.configuration.Configuration.Integrations.Core.LocaleConfiguration;
+import net.gogame.gowrap.p019ui.utils.DisplayUtils;
+import net.gogame.gowrap.p019ui.v2017_1.CommunityFragment;
+import net.gogame.gowrap.p019ui.v2017_1.InternalWebViewFragment;
+import net.gogame.gowrap.p019ui.v2017_1.NewsFeedFragment;
+import net.gogame.gowrap.p019ui.v2017_1.SupportFragment;
+import net.gogame.gowrap.p019ui.v2017_1.WebViewFragment;
+import net.gogame.gowrap.p019ui.v2017_2.NewsFragment;
 import net.gogame.gowrap.support.DefaultDownloadManager;
 import net.gogame.gowrap.support.DiskLruCache;
 import net.gogame.gowrap.support.DownloadManager;
 import net.gogame.gowrap.support.LocaleManager;
 import net.gogame.gowrap.support.NetworkUtils;
 import net.gogame.gowrap.support.StringUtils;
-import net.gogame.gowrap.ui.utils.DisplayUtils;
-import net.gogame.gowrap.ui.v2017_1.CommunityFragment;
-import net.gogame.gowrap.ui.v2017_1.InternalWebViewFragment;
-import net.gogame.gowrap.ui.v2017_1.NewsFeedFragment;
-import net.gogame.gowrap.ui.v2017_1.SupportFragment;
-import net.gogame.gowrap.ui.v2017_1.WebViewFragment;
-import net.gogame.gowrap.ui.v2017_2.NewsFragment;
 
+/* renamed from: net.gogame.gowrap.ui.AbstractMainActivity */
 public abstract class AbstractMainActivity extends Activity implements UIContext {
     private static DiskLruCache diskLruCache;
     private static DownloadManager downloadManager;
     private boolean fullscreen = false;
-    private final Listener listener = new C11251();
-    protected LocaleConfiguration localeConfiguration;
-    protected LocaleManager localeManager = null;
-    private Integer preFullscreenOrientation = null;
-
-    /* renamed from: net.gogame.gowrap.ui.AbstractMainActivity$1 */
-    class C11251 implements Listener {
-        C11251() {
-        }
-
+    private final Listener listener = new Listener() {
         public void onVipStatusUpdated(VipStatus vipStatus) {
             if (AbstractMainActivity.this.isVipChatEnabled(vipStatus)) {
                 AbstractMainActivity.this.enableVipChat();
@@ -60,23 +53,31 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
         public void onOffersAvailable() {
             AbstractMainActivity.this.enableOffers();
         }
-    }
+    };
+    protected LocaleConfiguration localeConfiguration;
+    protected LocaleManager localeManager = null;
+    private Integer preFullscreenOrientation = null;
 
-    protected abstract void enableOffers();
+    /* access modifiers changed from: protected */
+    public abstract void enableOffers();
 
-    protected abstract int getFragmentContainerViewId();
+    /* access modifiers changed from: protected */
+    public abstract int getFragmentContainerViewId();
 
-    protected abstract void onEnterFullscreen();
+    /* access modifiers changed from: protected */
+    public abstract void onEnterFullscreen();
 
-    protected abstract void onExitFullscreen();
+    /* access modifiers changed from: protected */
+    public abstract void onExitFullscreen();
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         this.localeManager = new LocaleManager(this);
         this.localeManager.setLocale(Wrapper.INSTANCE.getCurrentLocale(this));
         try {
             diskLruCache = DiskLruCache.open(new File(getCacheDir(), "net/gogame/gowrap/cache"), 2, 1, 67108864);
-        } catch (Throwable e) {
+        } catch (IOException e) {
             Log.e(Constants.TAG, "Exception", e);
         }
         downloadManager = new DefaultDownloadManager(this, diskLruCache);
@@ -85,18 +86,21 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
         GoWrapImpl.INSTANCE.onMenuOpened();
     }
 
-    protected void onResume() {
+    /* access modifiers changed from: protected */
+    public void onResume() {
         super.onResume();
         DisplayUtils.lockOrientation(this);
         GoWrapImpl.INSTANCE.addListener(this.listener);
     }
 
-    protected void onPause() {
+    /* access modifiers changed from: protected */
+    public void onPause() {
         super.onPause();
         GoWrapImpl.INSTANCE.removeListener(this.listener);
     }
 
-    protected void onDestroy() {
+    /* access modifiers changed from: protected */
+    public void onDestroy() {
         super.onDestroy();
         GoWrapImpl.INSTANCE.onMenuClosed();
     }
@@ -196,14 +200,16 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
         return downloadManager;
     }
 
-    protected boolean canShowLanguageMenu() {
+    /* access modifiers changed from: protected */
+    public boolean canShowLanguageMenu() {
         if (this.localeManager == null || this.localeManager.getSupportedLocaleDescriptors() == null || this.localeManager.getSupportedLocaleDescriptors().size() <= 1) {
             return false;
         }
         return true;
     }
 
-    protected Fragment getActiveFragment() {
+    /* access modifiers changed from: protected */
+    public Fragment getActiveFragment() {
         FragmentManager fragmentManager = getFragmentManager();
         if (fragmentManager.getBackStackEntryCount() == 0) {
             return null;
@@ -211,7 +217,8 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
         return fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1).getName());
     }
 
-    protected void showInitialFragment() {
+    /* access modifiers changed from: protected */
+    public void showInitialFragment() {
         if (NetworkUtils.isNetworkAvailable(this)) {
             if (CoreSupport.INSTANCE.getAppId() != null) {
                 if (isUseNews2017_2()) {
@@ -229,15 +236,18 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
         }
     }
 
-    protected boolean isUseNews2017_2() {
+    /* access modifiers changed from: protected */
+    public boolean isUseNews2017_2() {
         return (Wrapper.INSTANCE.getConfiguration() == null || Wrapper.INSTANCE.getConfiguration().getSettings() == null || !StringUtils.isEquals(Wrapper.INSTANCE.getConfiguration().getSettings().getNewsWidgetVersion(), InternalConstants.VERSION_2017_2)) ? false : true;
     }
 
-    private boolean isVipChatEnabled(VipStatus vipStatus) {
-        return CoreSupport.INSTANCE.isForceEnableChat() || !(vipStatus == null || !vipStatus.isVip() || vipStatus.isSuspended());
+    /* access modifiers changed from: private */
+    public boolean isVipChatEnabled(VipStatus vipStatus) {
+        return CoreSupport.INSTANCE.isForceEnableChat() || (vipStatus != null && vipStatus.isVip() && !vipStatus.isSuspended());
     }
 
-    private void enableVipChat() {
+    /* access modifiers changed from: private */
+    public void enableVipChat() {
         Log.v(Constants.TAG, "VIP chat enabled");
         Fragment activeFragment = getActiveFragment();
         if (activeFragment instanceof VipListener) {
@@ -245,7 +255,8 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
         }
     }
 
-    private void disableVipChat() {
+    /* access modifiers changed from: private */
+    public void disableVipChat() {
         Log.v(Constants.TAG, "VIP chat disabled");
         Fragment activeFragment = getActiveFragment();
         if (activeFragment instanceof VipListener) {
@@ -264,7 +275,7 @@ public abstract class AbstractMainActivity extends Activity implements UIContext
             try {
                 fragmentManager.popBackStack();
                 return true;
-            } catch (Throwable e) {
+            } catch (IllegalStateException e) {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }

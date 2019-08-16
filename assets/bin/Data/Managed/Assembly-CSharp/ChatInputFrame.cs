@@ -1,12 +1,8 @@
 using System;
 using UnityEngine;
 
-public class ChatInputFrame
+public class ChatInputFrame : MonoBehaviour
 {
-	private const float INPUT_COLLIDER_MARGIN = 10f;
-
-	private const float FRAME_OFFSET = 4f;
-
 	[SerializeField]
 	private UITweener[] m_OpenTweens;
 
@@ -29,6 +25,10 @@ public class ChatInputFrame
 	private BoxCollider m_InputCollider;
 
 	private int m_BusyCount;
+
+	private const float INPUT_COLLIDER_MARGIN = 10f;
+
+	private const float FRAME_OFFSET = 4f;
 
 	private bool m_IsOpen;
 
@@ -174,7 +174,6 @@ public class ChatInputFrame
 	{
 		if (IsBusy)
 		{
-			return;
 		}
 	}
 
@@ -182,14 +181,11 @@ public class ChatInputFrame
 	{
 		if (IsBusy)
 		{
-			return;
 		}
 	}
 
 	public void UpdateAgeConfirm()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		bool active = !UserInfoManager.IsRegisterdAge();
 		bool active2 = UserInfoManager.IsRegisterdAge() && !UserInfoManager.IsEnableCommunication();
 		if (m_AgeConfirmSprite != null)

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class EvolveEquipItemTable : Singleton<EvolveEquipItemTable>, IDataTable
 {
 	public class EvolveEquipItemData
 	{
-		public const string NT = "evolveId,baseEquipItemId,nextEquipItemId,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money,equipItemID_0,equipItemNum_0,needLv_0,equipItemID_1,equipItemNum_1,needLv_1,equipItemID_2,equipItemNum_2,needLv_2,equipItemID_3,equipItemNum_3,needLv_3,equipItemID_4,equipItemNum_4,needLv_4,equipItemID_5,equipItemNum_5,needLv_5,equipItemID_6,equipItemNum_6,needLv_6,equipItemID_7,equipItemNum_7,needLv_7,equipItemID_8,equipItemNum_8,needLv_8,equipItemID_9,equipItemNum_9,needLv_9";
-
 		public uint id;
 
 		public uint equipBaseItemID;
@@ -17,6 +16,8 @@ public class EvolveEquipItemTable : Singleton<EvolveEquipItemTable>, IDataTable
 		public XorInt needMoney = 0;
 
 		public NeedEquip[] needEquip;
+
+		public const string NT = "evolveId,baseEquipItemId,nextEquipItemId,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money,equipItemID_0,equipItemNum_0,needLv_0,equipItemID_1,equipItemNum_1,needLv_1,equipItemID_2,equipItemNum_2,needLv_2,equipItemID_3,equipItemNum_3,needLv_3,equipItemID_4,equipItemNum_4,needLv_4,equipItemID_5,equipItemNum_5,needLv_5,equipItemID_6,equipItemNum_6,needLv_6,equipItemID_7,equipItemNum_7,needLv_7,equipItemID_8,equipItemNum_8,needLv_8,equipItemID_9,equipItemNum_9,needLv_9";
 
 		public static bool cb(CSVReader csv_reader, EvolveEquipItemData data, ref uint key)
 		{
@@ -58,15 +59,21 @@ public class EvolveEquipItemTable : Singleton<EvolveEquipItemTable>, IDataTable
 
 	private UIntKeyTable<EvolveEquipItemData> tableData;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EvolveEquipItemData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EvolveEquipItemData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		tableData = TableUtility.CreateUIntKeyTable<EvolveEquipItemData>(csv_text, EvolveEquipItemData.cb, "evolveId,baseEquipItemId,nextEquipItemId,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money,equipItemID_0,equipItemNum_0,needLv_0,equipItemID_1,equipItemNum_1,needLv_1,equipItemID_2,equipItemNum_2,needLv_2,equipItemID_3,equipItemNum_3,needLv_3,equipItemID_4,equipItemNum_4,needLv_4,equipItemID_5,equipItemNum_5,needLv_5,equipItemID_6,equipItemNum_6,needLv_6,equipItemID_7,equipItemNum_7,needLv_7,equipItemID_8,equipItemNum_8,needLv_8,equipItemID_9,equipItemNum_9,needLv_9", null);
+		tableData = TableUtility.CreateUIntKeyTable<EvolveEquipItemData>(csv_text, EvolveEquipItemData.cb, "evolveId,baseEquipItemId,nextEquipItemId,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money,equipItemID_0,equipItemNum_0,needLv_0,equipItemID_1,equipItemNum_1,needLv_1,equipItemID_2,equipItemNum_2,needLv_2,equipItemID_3,equipItemNum_3,needLv_3,equipItemID_4,equipItemNum_4,needLv_4,equipItemID_5,equipItemNum_5,needLv_5,equipItemID_6,equipItemNum_6,needLv_6,equipItemID_7,equipItemNum_7,needLv_7,equipItemID_8,equipItemNum_8,needLv_8,equipItemID_9,equipItemNum_9,needLv_9");
 		tableData.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(tableData, csv_text, EvolveEquipItemData.cb, "evolveId,baseEquipItemId,nextEquipItemId,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money,equipItemID_0,equipItemNum_0,needLv_0,equipItemID_1,equipItemNum_1,needLv_1,equipItemID_2,equipItemNum_2,needLv_2,equipItemID_3,equipItemNum_3,needLv_3,equipItemID_4,equipItemNum_4,needLv_4,equipItemID_5,equipItemNum_5,needLv_5,equipItemID_6,equipItemNum_6,needLv_6,equipItemID_7,equipItemNum_7,needLv_7,equipItemID_8,equipItemNum_8,needLv_8,equipItemID_9,equipItemNum_9,needLv_9", null);
+		TableUtility.AddUIntKeyTable(tableData, csv_text, EvolveEquipItemData.cb, "evolveId,baseEquipItemId,nextEquipItemId,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money,equipItemID_0,equipItemNum_0,needLv_0,equipItemID_1,equipItemNum_1,needLv_1,equipItemID_2,equipItemNum_2,needLv_2,equipItemID_3,equipItemNum_3,needLv_3,equipItemID_4,equipItemNum_4,needLv_4,equipItemID_5,equipItemNum_5,needLv_5,equipItemID_6,equipItemNum_6,needLv_6,equipItemID_7,equipItemNum_7,needLv_7,equipItemID_8,equipItemNum_8,needLv_8,equipItemID_9,equipItemNum_9,needLv_9");
 	}
 
 	public EvolveEquipItemData[] GetEvolveEquipItemData(uint base_equip_id)

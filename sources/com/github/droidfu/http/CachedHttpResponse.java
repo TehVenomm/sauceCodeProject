@@ -11,8 +11,10 @@ public class CachedHttpResponse implements BetterHttpResponse {
     private HttpResponseCache responseCache = BetterHttp.getResponseCache();
 
     public static final class ResponseData {
-        private byte[] responseBody;
-        private int statusCode;
+        /* access modifiers changed from: private */
+        public byte[] responseBody;
+        /* access modifiers changed from: private */
+        public int statusCode;
 
         public ResponseData(int i, byte[] bArr) {
             this.statusCode = i;

@@ -6,7 +6,7 @@ public interface IBulletObserver
 
 	void RegisterObservableID(int observedID);
 
-	void OnBreak(int brokenBulletID);
+	void OnBreak(int brokenBulletID, bool isSendOnlyOriginal);
 
 	void OnBulletDestroy(int brokenBulletID);
 }

@@ -25,27 +25,26 @@ public class FormattableUtils {
     }
 
     public static Formatter append(CharSequence charSequence, Formatter formatter, int i, int i2, int i3, char c, CharSequence charSequence2) {
-        int i4 = 1;
-        boolean z = charSequence2 == null || i3 < 0 || charSequence2.length() <= i3;
-        Validate.isTrue(z, "Specified ellipsis '%1$s' exceeds precision of %2$s", charSequence2, Integer.valueOf(i3));
-        StringBuilder stringBuilder = new StringBuilder(charSequence);
+        int i4;
+        boolean z = true;
+        Validate.isTrue(charSequence2 == null || i3 < 0 || charSequence2.length() <= i3, "Specified ellipsis '%1$s' exceeds precision of %2$s", charSequence2, Integer.valueOf(i3));
+        StringBuilder sb = new StringBuilder(charSequence);
         if (i3 >= 0 && i3 < charSequence.length()) {
             CharSequence charSequence3 = (CharSequence) ObjectUtils.defaultIfNull(charSequence2, "");
-            stringBuilder.replace(i3 - charSequence3.length(), charSequence.length(), charSequence3.toString());
+            sb.replace(i3 - charSequence3.length(), charSequence.length(), charSequence3.toString());
         }
         if ((i & 1) != 1) {
-            i4 = 0;
+            z = false;
         }
-        for (int length = stringBuilder.length(); length < i2; length++) {
-            int i5;
-            if (i4 != 0) {
-                i5 = length;
+        for (int length = sb.length(); length < i2; length++) {
+            if (z) {
+                i4 = length;
             } else {
-                i5 = 0;
+                i4 = 0;
             }
-            stringBuilder.insert(i5, c);
+            sb.insert(i4, c);
         }
-        formatter.format(stringBuilder.toString(), new Object[0]);
+        formatter.format(sb.toString(), new Object[0]);
         return formatter;
     }
 }

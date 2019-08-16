@@ -55,13 +55,11 @@ public class HomeTopBonusTime : UIBehaviour
 
 	public void SetUp()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		myTrans = this.get_transform();
 		tweenCtrl = myTrans.GetComponent<UITweenCtrl>();
 		isFirst = true;
 		timeSlotEvents = MonoBehaviourSingleton<StatusManager>.I.timeSlotEvents;
-		SetActive(myTrans, UI.OBJ_BONUS_TIME_VISIBLE, false);
+		SetActive(myTrans, UI.OBJ_BONUS_TIME_VISIBLE, is_visible: false);
 	}
 
 	public void UpdateBonusTime()
@@ -72,29 +70,30 @@ public class HomeTopBonusTime : UIBehaviour
 			isVisible = flag;
 			SetActive(myTrans, UI.OBJ_BONUS_TIME_VISIBLE, flag);
 		}
-		if (flag)
+		if (!flag)
 		{
-			if (timeSlotEvents.Count >= 2)
+			return;
+		}
+		if (timeSlotEvents.Count >= 2)
+		{
+			UpdateVisualIndex();
+		}
+		if (previousIndex != currentIndex)
+		{
+			previousIndex = currentIndex;
+			Transform plate = UpdatePlate();
+			UpdateName(plate);
+		}
+		if (IsUpdateDate())
+		{
+			UpdateDate();
+			if (isFirst)
 			{
-				UpdateVisualIndex();
-			}
-			if (previousIndex != currentIndex)
-			{
-				previousIndex = currentIndex;
-				Transform plate = UpdatePlate();
-				UpdateName(plate);
-			}
-			if (IsUpdateDate())
-			{
-				UpdateDate();
-				if (isFirst)
-				{
-					isActiveTap = true;
-					TweenFirst();
-					isFirst = false;
-					isClosedBonusTime = false;
-					time = 0f;
-				}
+				isActiveTap = true;
+				TweenFirst();
+				isFirst = false;
+				isClosedBonusTime = false;
+				time = 0f;
 			}
 		}
 	}
@@ -145,7 +144,7 @@ public class HomeTopBonusTime : UIBehaviour
 		if (!(tweenCtrl == null))
 		{
 			isActiveTap = false;
-			tweenCtrl.Play(true, delegate
+			tweenCtrl.Play(forward: true, delegate
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
@@ -203,14 +202,14 @@ public class HomeTopBonusTime : UIBehaviour
 		int i = 0;
 		for (int num = PlateUI.Length; i < num; i++)
 		{
-			SetActive(myTrans, PlateUI[i], false);
+			SetActive(myTrans, PlateUI[i], is_visible: false);
 		}
 		int num2 = timeSlotEvents[currentIndex].timeSlotType;
 		if (num2 >= PlateUI.Length)
 		{
 			num2 = 1;
 		}
-		SetActive(myTrans, PlateUI[num2], true);
+		SetActive(myTrans, PlateUI[num2], is_visible: true);
 		return FindCtrl(myTrans, PlateUI[num2]);
 	}
 

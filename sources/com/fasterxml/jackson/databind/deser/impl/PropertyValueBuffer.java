@@ -33,36 +33,37 @@ public class PropertyValueBuffer {
         }
     }
 
-    protected Object[] getParameters(SettableBeanProperty[] settableBeanPropertyArr) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public Object[] getParameters(SettableBeanProperty[] settableBeanPropertyArr) throws JsonMappingException {
         int i = 0;
         if (this._paramsNeeded > 0) {
-            int length;
             if (this._paramsSeenBig != null) {
-                length = this._creatorParameters.length;
+                int length = this._creatorParameters.length;
                 while (true) {
-                    i = this._paramsSeenBig.nextClearBit(i);
-                    if (i >= length) {
+                    int nextClearBit = this._paramsSeenBig.nextClearBit(i);
+                    if (nextClearBit >= length) {
                         break;
                     }
-                    this._creatorParameters[i] = _findMissing(settableBeanPropertyArr[i]);
-                    i++;
+                    this._creatorParameters[nextClearBit] = _findMissing(settableBeanPropertyArr[nextClearBit]);
+                    i = nextClearBit + 1;
                 }
             } else {
-                length = this._paramsSeen;
+                int i2 = this._paramsSeen;
                 int length2 = this._creatorParameters.length;
                 while (i < length2) {
-                    if ((length & 1) == 0) {
+                    if ((i2 & 1) == 0) {
                         this._creatorParameters[i] = _findMissing(settableBeanPropertyArr[i]);
                     }
                     i++;
-                    length >>= 1;
+                    i2 >>= 1;
                 }
             }
         }
         return this._creatorParameters;
     }
 
-    protected Object _findMissing(SettableBeanProperty settableBeanProperty) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public Object _findMissing(SettableBeanProperty settableBeanProperty) throws JsonMappingException {
         if (settableBeanProperty.getInjectableValueId() != null) {
             return this._context.findInjectableValue(settableBeanProperty.getInjectableValueId(), settableBeanProperty, null);
         }
@@ -98,7 +99,8 @@ public class PropertyValueBuffer {
         throw deserializationContext.mappingException("No _idValue when handleIdValue called, on instance of %s", obj.getClass().getName());
     }
 
-    protected PropertyValue buffered() {
+    /* access modifiers changed from: protected */
+    public PropertyValue buffered() {
         return this._buffered;
     }
 
@@ -109,22 +111,21 @@ public class PropertyValueBuffer {
     public boolean assignParameter(SettableBeanProperty settableBeanProperty, Object obj) {
         int creatorIndex = settableBeanProperty.getCreatorIndex();
         this._creatorParameters[creatorIndex] = obj;
-        int i;
         if (this._paramsSeenBig == null) {
-            i = this._paramsSeen;
-            creatorIndex = (1 << creatorIndex) | i;
-            if (i != creatorIndex) {
-                this._paramsSeen = creatorIndex;
-                creatorIndex = this._paramsNeeded - 1;
-                this._paramsNeeded = creatorIndex;
-                if (creatorIndex <= 0) {
+            int i = this._paramsSeen;
+            int i2 = (1 << creatorIndex) | i;
+            if (i != i2) {
+                this._paramsSeen = i2;
+                int i3 = this._paramsNeeded - 1;
+                this._paramsNeeded = i3;
+                if (i3 <= 0) {
                     return true;
                 }
             }
         } else if (!this._paramsSeenBig.get(creatorIndex)) {
-            i = this._paramsNeeded - 1;
-            this._paramsNeeded = i;
-            if (i <= 0) {
+            int i4 = this._paramsNeeded - 1;
+            this._paramsNeeded = i4;
+            if (i4 <= 0) {
                 return true;
             }
             this._paramsSeenBig.set(creatorIndex);

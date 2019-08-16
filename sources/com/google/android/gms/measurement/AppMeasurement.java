@@ -3,94 +3,137 @@ package com.google.android.gms.measurement;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Keep;
-import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.Size;
 import android.support.annotation.WorkerThread;
-import android.support.v4.util.ArrayMap;
-import com.facebook.AccessToken;
+import android.support.p000v4.util.ArrayMap;
 import com.google.android.gms.common.annotation.KeepForSdk;
-import com.google.android.gms.common.api.internal.zzca;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.internal.zzcap;
-import com.google.android.gms.internal.zzcco;
-import com.google.android.gms.internal.zzcdo;
-import com.google.android.gms.internal.zzcfl;
-import com.google.android.gms.internal.zzcfo;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.ShowFirstParty;
+import com.google.android.gms.common.util.VisibleForTesting;
+import com.google.android.gms.measurement.internal.zzfj;
+import com.google.android.gms.measurement.internal.zzgg;
+import com.google.android.gms.measurement.internal.zzgi;
+import com.google.android.gms.measurement.internal.zzgj;
+import com.google.android.gms.measurement.internal.zzgk;
+import com.google.android.gms.measurement.internal.zzgl;
+import com.google.android.gms.measurement.internal.zzgn;
+import com.google.android.gms.measurement.internal.zzhi;
+import com.google.android.gms.measurement.internal.zzho;
+import com.google.android.gms.measurement.internal.zzjn;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Keep
+@ShowFirstParty
 @Deprecated
 public class AppMeasurement {
+    @ShowFirstParty
     @KeepForSdk
     public static final String CRASH_ORIGIN = "crash";
+    @ShowFirstParty
     @KeepForSdk
     public static final String FCM_ORIGIN = "fcm";
-    private final zzcco zzikb;
+    @ShowFirstParty
+    @KeepForSdk
+    public static final String FIAM_ORIGIN = "fiam";
+    private static volatile AppMeasurement zzi;
+    private final zzfj zzj;
+    private final zzhi zzk;
+    private final boolean zzl;
 
-    public static class zzb {
-        public String zzikg;
-        public String zzikh;
-        public long zziki;
-
-        public zzb(zzb zzb) {
-            this.zzikg = zzb.zzikg;
-            this.zzikh = zzb.zzikh;
-            this.zziki = zzb.zziki;
-        }
-    }
-
+    @ShowFirstParty
+    @KeepForSdk
     public static class ConditionalUserProperty {
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public boolean mActive;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public String mAppId;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public long mCreationTimestamp;
         @Keep
         public String mExpiredEventName;
         @Keep
         public Bundle mExpiredEventParams;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public String mName;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public String mOrigin;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public long mTimeToLive;
         @Keep
         public String mTimedOutEventName;
         @Keep
         public Bundle mTimedOutEventParams;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public String mTriggerEventName;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public long mTriggerTimeout;
         @Keep
         public String mTriggeredEventName;
         @Keep
         public Bundle mTriggeredEventParams;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public long mTriggeredTimestamp;
         @Keep
+        @ShowFirstParty
+        @KeepForSdk
         public Object mValue;
 
+        @KeepForSdk
+        public ConditionalUserProperty() {
+        }
+
+        private ConditionalUserProperty(@NonNull Bundle bundle) {
+            Preconditions.checkNotNull(bundle);
+            this.mAppId = (String) zzgg.zza(bundle, "app_id", String.class, null);
+            this.mOrigin = (String) zzgg.zza(bundle, "origin", String.class, null);
+            this.mName = (String) zzgg.zza(bundle, "name", String.class, null);
+            this.mValue = zzgg.zza(bundle, "value", Object.class, null);
+            this.mTriggerEventName = (String) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGER_EVENT_NAME, String.class, null);
+            this.mTriggerTimeout = ((Long) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGER_TIMEOUT, Long.class, Long.valueOf(0))).longValue();
+            this.mTimedOutEventName = (String) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TIMED_OUT_EVENT_NAME, String.class, null);
+            this.mTimedOutEventParams = (Bundle) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TIMED_OUT_EVENT_PARAMS, Bundle.class, null);
+            this.mTriggeredEventName = (String) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGERED_EVENT_NAME, String.class, null);
+            this.mTriggeredEventParams = (Bundle) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGERED_EVENT_PARAMS, Bundle.class, null);
+            this.mTimeToLive = ((Long) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TIME_TO_LIVE, Long.class, Long.valueOf(0))).longValue();
+            this.mExpiredEventName = (String) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.EXPIRED_EVENT_NAME, String.class, null);
+            this.mExpiredEventParams = (Bundle) zzgg.zza(bundle, com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.EXPIRED_EVENT_PARAMS, Bundle.class, null);
+        }
+
+        @KeepForSdk
         public ConditionalUserProperty(ConditionalUserProperty conditionalUserProperty) {
-            zzbp.zzu(conditionalUserProperty);
+            Preconditions.checkNotNull(conditionalUserProperty);
             this.mAppId = conditionalUserProperty.mAppId;
             this.mOrigin = conditionalUserProperty.mOrigin;
             this.mCreationTimestamp = conditionalUserProperty.mCreationTimestamp;
             this.mName = conditionalUserProperty.mName;
             if (conditionalUserProperty.mValue != null) {
-                this.mValue = zzcfo.zzad(conditionalUserProperty.mValue);
+                this.mValue = zzho.zza(conditionalUserProperty.mValue);
                 if (this.mValue == null) {
                     this.mValue = conditionalUserProperty.mValue;
                 }
             }
-            this.mValue = conditionalUserProperty.mValue;
             this.mActive = conditionalUserProperty.mActive;
             this.mTriggerEventName = conditionalUserProperty.mTriggerEventName;
             this.mTriggerTimeout = conditionalUserProperty.mTriggerTimeout;
@@ -109,274 +152,461 @@ public class AppMeasurement {
                 this.mExpiredEventParams = new Bundle(conditionalUserProperty.mExpiredEventParams);
             }
         }
+
+        /* access modifiers changed from: private */
+        public final Bundle zzd() {
+            Bundle bundle = new Bundle();
+            if (this.mAppId != null) {
+                bundle.putString("app_id", this.mAppId);
+            }
+            if (this.mOrigin != null) {
+                bundle.putString("origin", this.mOrigin);
+            }
+            if (this.mName != null) {
+                bundle.putString("name", this.mName);
+            }
+            if (this.mValue != null) {
+                zzgg.zza(bundle, this.mValue);
+            }
+            if (this.mTriggerEventName != null) {
+                bundle.putString(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGER_EVENT_NAME, this.mTriggerEventName);
+            }
+            bundle.putLong(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGER_TIMEOUT, this.mTriggerTimeout);
+            if (this.mTimedOutEventName != null) {
+                bundle.putString(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TIMED_OUT_EVENT_NAME, this.mTimedOutEventName);
+            }
+            if (this.mTimedOutEventParams != null) {
+                bundle.putBundle(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TIMED_OUT_EVENT_PARAMS, this.mTimedOutEventParams);
+            }
+            if (this.mTriggeredEventName != null) {
+                bundle.putString(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGERED_EVENT_NAME, this.mTriggeredEventName);
+            }
+            if (this.mTriggeredEventParams != null) {
+                bundle.putBundle(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGERED_EVENT_PARAMS, this.mTriggeredEventParams);
+            }
+            bundle.putLong(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TIME_TO_LIVE, this.mTimeToLive);
+            if (this.mExpiredEventName != null) {
+                bundle.putString(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.EXPIRED_EVENT_NAME, this.mExpiredEventName);
+            }
+            if (this.mExpiredEventParams != null) {
+                bundle.putBundle(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.EXPIRED_EVENT_PARAMS, this.mExpiredEventParams);
+            }
+            bundle.putLong(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.CREATION_TIMESTAMP, this.mCreationTimestamp);
+            bundle.putBoolean(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.ACTIVE, this.mActive);
+            bundle.putLong(com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty.TRIGGERED_TIMESTAMP, this.mTriggeredTimestamp);
+            return bundle;
+        }
     }
 
+    @ShowFirstParty
     @KeepForSdk
-    public static final class Event extends com.google.firebase.analytics.FirebaseAnalytics.Event {
+    public static final class Event extends zzgj {
+        @ShowFirstParty
+        @KeepForSdk
+        public static final String AD_REWARD = "_ar";
+        @ShowFirstParty
         @KeepForSdk
         public static final String APP_EXCEPTION = "_ae";
-        public static final String[] zzikc = new String[]{"app_clear_data", "app_exception", "app_remove", "app_upgrade", "app_install", "app_update", "firebase_campaign", "error", "first_open", "first_visit", "in_app_purchase", "notification_dismiss", "notification_foreground", "notification_open", "notification_receive", "os_update", "session_start", "user_engagement", "ad_exposure", "adunit_exposure", "ad_query", "ad_activeview", "ad_impression", "ad_click", "screen_view", "firebase_extra_parameter"};
-        public static final String[] zzikd = new String[]{"_cd", APP_EXCEPTION, "_ui", "_ug", "_in", "_au", "_cmp", "_err", "_f", "_v", "_iap", "_nd", "_nf", "_no", "_nr", "_ou", "_s", "_e", "_xa", "_xu", "_aq", "_aa", "_ai", "_ac", "_vs", "_ep"};
 
         private Event() {
         }
-
-        public static String zzil(String str) {
-            return zzcfo.zza(str, zzikc, zzikd);
-        }
     }
 
+    @ShowFirstParty
     @KeepForSdk
-    public interface EventInterceptor {
+    public interface EventInterceptor extends zzgk {
         @WorkerThread
+        @ShowFirstParty
         @KeepForSdk
         void interceptEvent(String str, String str2, Bundle bundle, long j);
     }
 
+    @ShowFirstParty
     @KeepForSdk
-    public interface OnEventListener {
+    public interface OnEventListener extends zzgn {
         @WorkerThread
+        @ShowFirstParty
         @KeepForSdk
         void onEvent(String str, String str2, Bundle bundle, long j);
     }
 
+    @ShowFirstParty
     @KeepForSdk
-    public static final class Param extends com.google.firebase.analytics.FirebaseAnalytics.Param {
+    public static final class Param extends zzgi {
+        @ShowFirstParty
         @KeepForSdk
         public static final String FATAL = "fatal";
+        @ShowFirstParty
         @KeepForSdk
         public static final String TIMESTAMP = "timestamp";
-        public static final String[] zzike = new String[]{"firebase_conversion", "engagement_time_msec", "exposure_time", "ad_event_id", "ad_unit_id", "firebase_error", "firebase_error_value", "firebase_error_length", "firebase_event_origin", "firebase_screen", "firebase_screen_class", "firebase_screen_id", "firebase_previous_screen", "firebase_previous_class", "firebase_previous_id", "message_device_time", "message_id", "message_name", "message_time", "previous_app_version", "previous_os_version", "topic", "update_with_analytics", "previous_first_open_count", "system_app", "system_app_update", "previous_install_count", "firebase_event_id", "firebase_extra_params_ct", "firebase_group_name", "firebase_list_length", "firebase_index", "firebase_event_name"};
-        public static final String[] zzikf = new String[]{"_c", "_et", "_xt", "_aeid", "_ai", "_err", "_ev", "_el", "_o", "_sn", "_sc", "_si", "_pn", "_pc", "_pi", "_ndt", "_nmid", "_nmn", "_nmt", "_pv", "_po", "_nt", "_uwa", "_pfo", "_sys", "_sysu", "_pin", "_eid", "_epc", "_gn", "_ll", "_i", "_en"};
+        @ShowFirstParty
+        @KeepForSdk
+        public static final String TYPE = "type";
 
         private Param() {
         }
-
-        public static String zzil(String str) {
-            return zzcfo.zza(str, zzike, zzikf);
-        }
     }
 
+    @ShowFirstParty
     @KeepForSdk
-    public static final class UserProperty extends com.google.firebase.analytics.FirebaseAnalytics.UserProperty {
+    public static final class UserProperty extends zzgl {
+        @ShowFirstParty
         @KeepForSdk
         public static final String FIREBASE_LAST_NOTIFICATION = "_ln";
-        public static final String[] zzikj = new String[]{"firebase_last_notification", "first_open_time", "first_visit_time", "last_deep_link_referrer", AccessToken.USER_ID_KEY, "first_open_after_install"};
-        public static final String[] zzikk = new String[]{FIREBASE_LAST_NOTIFICATION, "_fot", "_fvt", "_ldl", "_id", "_fi"};
 
         private UserProperty() {
         }
-
-        public static String zzil(String str) {
-            return zzcfo.zza(str, zzikj, zzikk);
-        }
     }
 
-    public interface zza {
-        @MainThread
-        boolean zza(zzb zzb, zzb zzb2);
+    private AppMeasurement(zzfj zzfj) {
+        Preconditions.checkNotNull(zzfj);
+        this.zzj = zzfj;
+        this.zzk = null;
+        this.zzl = false;
     }
 
-    public AppMeasurement(zzcco zzcco) {
-        zzbp.zzu(zzcco);
-        this.zzikb = zzcco;
+    private AppMeasurement(zzhi zzhi) {
+        Preconditions.checkNotNull(zzhi);
+        this.zzk = zzhi;
+        this.zzj = null;
+        this.zzl = true;
     }
 
     @Keep
+    @ShowFirstParty
     @RequiresPermission(allOf = {"android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE", "android.permission.WAKE_LOCK"})
     @Deprecated
     public static AppMeasurement getInstance(Context context) {
-        return zzcco.zzdm(context).zzayx();
+        return zza(context, null, null);
     }
 
-    @Keep
-    public void beginAdUnitExposure(@Size(min = 1) @NonNull String str) {
-        this.zzikb.zzatw().beginAdUnitExposure(str);
+    public static AppMeasurement zza(Context context, Bundle bundle) {
+        if (zzi == null) {
+            synchronized (AppMeasurement.class) {
+                try {
+                    if (zzi == null) {
+                        zzhi zzb = zzb(context, bundle);
+                        if (zzb != null) {
+                            zzi = new AppMeasurement(zzb);
+                        } else {
+                            zzi = new AppMeasurement(zzfj.zza(context, null, null, bundle));
+                        }
+                    }
+                } finally {
+                    Class<AppMeasurement> cls = AppMeasurement.class;
+                }
+            }
+        }
+        return zzi;
     }
 
-    @Keep
-    protected void clearConditionalUserProperty(@Size(max = 24, min = 1) @NonNull String str, @Nullable String str2, @Nullable Bundle bundle) {
-        this.zzikb.zzaty().clearConditionalUserProperty(str, str2, bundle);
+    @VisibleForTesting
+    private static AppMeasurement zza(Context context, String str, String str2) {
+        if (zzi == null) {
+            synchronized (AppMeasurement.class) {
+                try {
+                    if (zzi == null) {
+                        zzhi zzb = zzb(context, null);
+                        if (zzb != null) {
+                            zzi = new AppMeasurement(zzb);
+                        } else {
+                            zzi = new AppMeasurement(zzfj.zza(context, null, null, null));
+                        }
+                    }
+                } finally {
+                    Class<AppMeasurement> cls = AppMeasurement.class;
+                }
+            }
+        }
+        return zzi;
     }
 
-    @Keep
-    protected void clearConditionalUserPropertyAs(@Size(min = 1) @NonNull String str, @Size(max = 24, min = 1) @NonNull String str2, @Nullable String str3, @Nullable Bundle bundle) {
-        this.zzikb.zzaty().clearConditionalUserPropertyAs(str, str2, str3, bundle);
-    }
-
-    @Keep
-    public void endAdUnitExposure(@Size(min = 1) @NonNull String str) {
-        this.zzikb.zzatw().endAdUnitExposure(str);
-    }
-
-    @Keep
-    public long generateEventId() {
-        return this.zzikb.zzaug().zzazw();
-    }
-
-    @Keep
-    @Nullable
-    public String getAppInstanceId() {
-        return this.zzikb.zzaty().zzaym();
-    }
-
-    @Keep
-    @WorkerThread
-    protected List<ConditionalUserProperty> getConditionalUserProperties(@Nullable String str, @Nullable @Size(max = 23, min = 1) String str2) {
-        return this.zzikb.zzaty().getConditionalUserProperties(str, str2);
-    }
-
-    @Keep
-    @WorkerThread
-    protected List<ConditionalUserProperty> getConditionalUserPropertiesAs(@Size(min = 1) @NonNull String str, @Nullable String str2, @Nullable @Size(max = 23, min = 1) String str3) {
-        return this.zzikb.zzaty().getConditionalUserPropertiesAs(str, str2, str3);
-    }
-
-    @Keep
-    @Nullable
-    public String getCurrentScreenClass() {
-        zzb zzazn = this.zzikb.zzauc().zzazn();
-        return zzazn != null ? zzazn.zzikh : null;
-    }
-
-    @Keep
-    @Nullable
-    public String getCurrentScreenName() {
-        zzb zzazn = this.zzikb.zzauc().zzazn();
-        return zzazn != null ? zzazn.zzikg : null;
-    }
-
-    @Keep
-    @Nullable
-    public String getGmpAppId() {
+    private static zzhi zzb(Context context, Bundle bundle) {
         try {
-            return zzca.zzaid();
-        } catch (IllegalStateException e) {
-            this.zzikb.zzauk().zzayc().zzj("getGoogleAppId failed with exception", e);
+            try {
+                return (zzhi) Class.forName("com.google.firebase.analytics.FirebaseAnalytics").getDeclaredMethod("getScionFrontendApiImplementation", new Class[]{Context.class, Bundle.class}).invoke(null, new Object[]{context, bundle});
+            } catch (Exception e) {
+                return null;
+            }
+        } catch (ClassNotFoundException e2) {
             return null;
         }
     }
 
     @Keep
-    @WorkerThread
-    protected int getMaxUserProperties(@Size(min = 1) @NonNull String str) {
-        this.zzikb.zzaty();
-        return zzcdo.getMaxUserProperties(str);
+    public void beginAdUnitExposure(@Size(min = 1) @NonNull String str) {
+        if (this.zzl) {
+            this.zzk.beginAdUnitExposure(str);
+        } else {
+            this.zzj.zzp().beginAdUnitExposure(str, this.zzj.zzx().elapsedRealtime());
+        }
     }
 
     @Keep
-    @WorkerThread
-    protected Map<String, Object> getUserProperties(@Nullable String str, @Nullable @Size(max = 24, min = 1) String str2, boolean z) {
-        return this.zzikb.zzaty().getUserProperties(str, str2, z);
+    @ShowFirstParty
+    @KeepForSdk
+    public void clearConditionalUserProperty(@Size(max = 24, min = 1) @NonNull String str, @Nullable String str2, @Nullable Bundle bundle) {
+        if (this.zzl) {
+            this.zzk.clearConditionalUserProperty(str, str2, bundle);
+        } else {
+            this.zzj.zzq().clearConditionalUserProperty(str, str2, bundle);
+        }
     }
 
+    /* access modifiers changed from: protected */
+    @Keep
+    @VisibleForTesting
+    public void clearConditionalUserPropertyAs(@Size(min = 1) @NonNull String str, @Size(max = 24, min = 1) @NonNull String str2, @Nullable String str3, @Nullable Bundle bundle) {
+        if (this.zzl) {
+            throw new IllegalStateException("Unexpected call on client side");
+        }
+        this.zzj.zzq().clearConditionalUserPropertyAs(str, str2, str3, bundle);
+    }
+
+    @Keep
+    public void endAdUnitExposure(@Size(min = 1) @NonNull String str) {
+        if (this.zzl) {
+            this.zzk.endAdUnitExposure(str);
+        } else {
+            this.zzj.zzp().endAdUnitExposure(str, this.zzj.zzx().elapsedRealtime());
+        }
+    }
+
+    @Keep
+    public long generateEventId() {
+        return this.zzl ? this.zzk.generateEventId() : this.zzj.zzz().zzjv();
+    }
+
+    @Keep
+    @Nullable
+    public String getAppInstanceId() {
+        return this.zzl ? this.zzk.zzi() : this.zzj.zzq().zzi();
+    }
+
+    @KeepForSdk
+    public Boolean getBoolean() {
+        return this.zzl ? (Boolean) this.zzk.zzb(4) : this.zzj.zzq().zzig();
+    }
+
+    @Keep
+    @ShowFirstParty
+    @WorkerThread
+    @KeepForSdk
+    public List<ConditionalUserProperty> getConditionalUserProperties(@Nullable String str, @Nullable @Size(max = 23, min = 1) String str2) {
+        List<Bundle> zzn = this.zzl ? this.zzk.getConditionalUserProperties(str, str2) : this.zzj.zzq().zzn(str, str2);
+        ArrayList arrayList = new ArrayList(zzn == null ? 0 : zzn.size());
+        for (Bundle conditionalUserProperty : zzn) {
+            arrayList.add(new ConditionalUserProperty(conditionalUserProperty));
+        }
+        return arrayList;
+    }
+
+    /* access modifiers changed from: protected */
+    @Keep
+    @WorkerThread
+    @VisibleForTesting
+    public List<ConditionalUserProperty> getConditionalUserPropertiesAs(@Size(min = 1) @NonNull String str, @Nullable String str2, @Nullable @Size(max = 23, min = 1) String str3) {
+        int i = 0;
+        if (this.zzl) {
+            throw new IllegalStateException("Unexpected call on client side");
+        }
+        ArrayList zzd = this.zzj.zzq().zzd(str, str2, str3);
+        ArrayList arrayList = new ArrayList(zzd == null ? 0 : zzd.size());
+        ArrayList arrayList2 = zzd;
+        int size = arrayList2.size();
+        while (i < size) {
+            Object obj = arrayList2.get(i);
+            i++;
+            arrayList.add(new ConditionalUserProperty((Bundle) obj));
+        }
+        return arrayList;
+    }
+
+    @Keep
+    @Nullable
+    public String getCurrentScreenClass() {
+        return this.zzl ? this.zzk.getCurrentScreenClass() : this.zzj.zzq().getCurrentScreenClass();
+    }
+
+    @Keep
+    @Nullable
+    public String getCurrentScreenName() {
+        return this.zzl ? this.zzk.getCurrentScreenName() : this.zzj.zzq().getCurrentScreenName();
+    }
+
+    @KeepForSdk
+    public Double getDouble() {
+        return this.zzl ? (Double) this.zzk.zzb(2) : this.zzj.zzq().zzik();
+    }
+
+    @Keep
+    @Nullable
+    public String getGmpAppId() {
+        return this.zzl ? this.zzk.getGmpAppId() : this.zzj.zzq().getGmpAppId();
+    }
+
+    @KeepForSdk
+    public Integer getInteger() {
+        return this.zzl ? (Integer) this.zzk.zzb(3) : this.zzj.zzq().zzij();
+    }
+
+    @KeepForSdk
+    public Long getLong() {
+        return this.zzl ? (Long) this.zzk.zzb(1) : this.zzj.zzq().zzii();
+    }
+
+    @Keep
+    @ShowFirstParty
+    @WorkerThread
+    @KeepForSdk
+    public int getMaxUserProperties(@Size(min = 1) @NonNull String str) {
+        if (this.zzl) {
+            return this.zzk.getMaxUserProperties(str);
+        }
+        this.zzj.zzq();
+        Preconditions.checkNotEmpty(str);
+        return 25;
+    }
+
+    @KeepForSdk
+    public String getString() {
+        return this.zzl ? (String) this.zzk.zzb(0) : this.zzj.zzq().zzih();
+    }
+
+    /* access modifiers changed from: protected */
+    @Keep
+    @WorkerThread
+    @VisibleForTesting
+    public Map<String, Object> getUserProperties(@Nullable String str, @Nullable @Size(max = 24, min = 1) String str2, boolean z) {
+        return this.zzl ? this.zzk.getUserProperties(str, str2, z) : this.zzj.zzq().getUserProperties(str, str2, z);
+    }
+
+    @ShowFirstParty
     @WorkerThread
     @KeepForSdk
     public Map<String, Object> getUserProperties(boolean z) {
-        List<zzcfl> zzbq = this.zzikb.zzaty().zzbq(z);
-        Map<String, Object> arrayMap = new ArrayMap(zzbq.size());
-        for (zzcfl zzcfl : zzbq) {
-            arrayMap.put(zzcfl.name, zzcfl.getValue());
+        if (this.zzl) {
+            return this.zzk.getUserProperties(null, null, z);
+        }
+        List<zzjn> zzh = this.zzj.zzq().zzh(z);
+        ArrayMap arrayMap = new ArrayMap(zzh.size());
+        for (zzjn zzjn : zzh) {
+            arrayMap.put(zzjn.name, zzjn.getValue());
         }
         return arrayMap;
     }
 
+    /* access modifiers changed from: protected */
     @Keep
     @WorkerThread
-    protected Map<String, Object> getUserPropertiesAs(@Size(min = 1) @NonNull String str, @Nullable String str2, @Nullable @Size(max = 23, min = 1) String str3, boolean z) {
-        return this.zzikb.zzaty().getUserPropertiesAs(str, str2, str3, z);
-    }
-
-    public final void logEvent(@Size(max = 40, min = 1) @NonNull String str, Bundle bundle) {
-        if (bundle == null) {
-            bundle = new Bundle();
+    @VisibleForTesting
+    public Map<String, Object> getUserPropertiesAs(@Size(min = 1) @NonNull String str, @Nullable String str2, @Nullable @Size(max = 23, min = 1) String str3, boolean z) {
+        if (!this.zzl) {
+            return this.zzj.zzq().getUserPropertiesAs(str, str2, str3, z);
         }
-        zzcap.zzawj();
-        if (!"_iap".equals(str)) {
-            int zzjv = this.zzikb.zzaug().zzjv(str);
-            if (zzjv != 0) {
-                this.zzikb.zzaug();
-                this.zzikb.zzaug().zza(zzjv, "_ev", zzcfo.zza(str, zzcap.zzavm(), true), str != null ? str.length() : 0);
-                return;
-            }
-        }
-        this.zzikb.zzaty().zza(SettingsJsonConstants.APP_KEY, str, bundle, true);
+        throw new IllegalStateException("Unexpected call on client side");
     }
 
     @Keep
+    @ShowFirstParty
     public void logEventInternal(String str, String str2, Bundle bundle) {
-        if (bundle == null) {
-            bundle = new Bundle();
+        if (this.zzl) {
+            this.zzk.logEventInternal(str, str2, bundle);
+        } else {
+            this.zzj.zzq().logEvent(str, str2, bundle);
         }
-        this.zzikb.zzaty().zzc(str, str2, bundle);
     }
 
+    @ShowFirstParty
     @KeepForSdk
     public void logEventInternalNoInterceptor(String str, String str2, Bundle bundle, long j) {
-        this.zzikb.zzaty().zza(str, str2, bundle == null ? new Bundle() : bundle, j);
+        if (this.zzl) {
+            this.zzk.logEventInternalNoInterceptor(str, str2, bundle, j);
+        } else {
+            this.zzj.zzq().logEvent(str, str2, bundle, true, false, j);
+        }
     }
 
+    @ShowFirstParty
     @KeepForSdk
     public void registerOnMeasurementEventListener(OnEventListener onEventListener) {
-        this.zzikb.zzaty().registerOnMeasurementEventListener(onEventListener);
+        if (this.zzl) {
+            this.zzk.zza((zzgn) onEventListener);
+        } else {
+            this.zzj.zzq().zza((zzgn) onEventListener);
+        }
     }
 
     @Keep
-    public void registerOnScreenChangeCallback(@NonNull zza zza) {
-        this.zzikb.zzauc().registerOnScreenChangeCallback(zza);
+    @ShowFirstParty
+    @KeepForSdk
+    public void setConditionalUserProperty(@NonNull ConditionalUserProperty conditionalUserProperty) {
+        Preconditions.checkNotNull(conditionalUserProperty);
+        if (this.zzl) {
+            this.zzk.setConditionalUserProperty(conditionalUserProperty.zzd());
+        } else {
+            this.zzj.zzq().setConditionalUserProperty(conditionalUserProperty.zzd());
+        }
     }
 
+    /* access modifiers changed from: protected */
     @Keep
-    protected void setConditionalUserProperty(@NonNull ConditionalUserProperty conditionalUserProperty) {
-        this.zzikb.zzaty().setConditionalUserProperty(conditionalUserProperty);
-    }
-
-    @Keep
-    protected void setConditionalUserPropertyAs(@NonNull ConditionalUserProperty conditionalUserProperty) {
-        this.zzikb.zzaty().setConditionalUserPropertyAs(conditionalUserProperty);
+    @VisibleForTesting
+    public void setConditionalUserPropertyAs(@NonNull ConditionalUserProperty conditionalUserProperty) {
+        Preconditions.checkNotNull(conditionalUserProperty);
+        if (this.zzl) {
+            throw new IllegalStateException("Unexpected call on client side");
+        }
+        this.zzj.zzq().zzd(conditionalUserProperty.zzd());
     }
 
     @WorkerThread
+    @ShowFirstParty
     @KeepForSdk
     public void setEventInterceptor(EventInterceptor eventInterceptor) {
-        this.zzikb.zzaty().setEventInterceptor(eventInterceptor);
+        if (this.zzl) {
+            this.zzk.zza((zzgk) eventInterceptor);
+        } else {
+            this.zzj.zzq().zza((zzgk) eventInterceptor);
+        }
     }
 
+    @KeepForSdk
     @Deprecated
     public void setMeasurementEnabled(boolean z) {
-        this.zzikb.zzaty().setMeasurementEnabled(z);
-    }
-
-    public final void setMinimumSessionDuration(long j) {
-        this.zzikb.zzaty().setMinimumSessionDuration(j);
-    }
-
-    public final void setSessionTimeoutDuration(long j) {
-        this.zzikb.zzaty().setSessionTimeoutDuration(j);
-    }
-
-    public final void setUserProperty(@Size(max = 24, min = 1) @NonNull String str, @Nullable @Size(max = 36) String str2) {
-        int zzjx = this.zzikb.zzaug().zzjx(str);
-        if (zzjx != 0) {
-            this.zzikb.zzaug();
-            this.zzikb.zzaug().zza(zzjx, "_ev", zzcfo.zza(str, zzcap.zzavn(), true), str != null ? str.length() : 0);
-            return;
+        if (this.zzl) {
+            this.zzk.setMeasurementEnabled(z);
+        } else {
+            this.zzj.zzq().setMeasurementEnabled(z);
         }
-        setUserPropertyInternal(SettingsJsonConstants.APP_KEY, str, str2);
     }
 
+    @ShowFirstParty
     @KeepForSdk
     public void setUserPropertyInternal(String str, String str2, Object obj) {
-        this.zzikb.zzaty().zzb(str, str2, obj);
+        Preconditions.checkNotEmpty(str);
+        if (this.zzl) {
+            this.zzk.setUserPropertyInternal(str, str2, obj);
+        } else {
+            this.zzj.zzq().zzb(str, str2, obj, true);
+        }
     }
 
+    @ShowFirstParty
     @KeepForSdk
     public void unregisterOnMeasurementEventListener(OnEventListener onEventListener) {
-        this.zzikb.zzaty().unregisterOnMeasurementEventListener(onEventListener);
+        if (this.zzl) {
+            this.zzk.zzb((zzgn) onEventListener);
+        } else {
+            this.zzj.zzq().zzb(onEventListener);
+        }
     }
 
-    @Keep
-    public void unregisterOnScreenChangeCallback(@NonNull zza zza) {
-        this.zzikb.zzauc().unregisterOnScreenChangeCallback(zza);
+    public final void zza(boolean z) {
+        if (this.zzl) {
+            this.zzk.setDataCollectionEnabled(z);
+        } else {
+            this.zzj.zzq().zza(z);
+        }
     }
 }

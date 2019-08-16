@@ -22,11 +22,11 @@ public abstract class StdNodeBasedDeserializer<T> extends StdDeserializer<T> imp
     }
 
     protected StdNodeBasedDeserializer(Class<T> cls) {
-        super((Class) cls);
+        super(cls);
     }
 
     protected StdNodeBasedDeserializer(StdNodeBasedDeserializer<?> stdNodeBasedDeserializer) {
-        super((StdDeserializer) stdNodeBasedDeserializer);
+        super((StdDeserializer<?>) stdNodeBasedDeserializer);
         this._treeDeserializer = stdNodeBasedDeserializer._treeDeserializer;
     }
 

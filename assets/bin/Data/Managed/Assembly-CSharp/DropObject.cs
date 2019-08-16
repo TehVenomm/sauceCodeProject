@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DropObject
+public class DropObject : MonoBehaviour
 {
 	protected int rarity;
 
@@ -52,8 +52,6 @@ public class DropObject
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.dropItem;
 	}
@@ -76,30 +74,30 @@ public class DropObject
 		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		if (animStep == 0)
+		if (animStep != 0)
 		{
+			return;
+		}
+		if (anim.IsPlaying())
+		{
+			animTime += Time.get_deltaTime();
+			_transform.set_localRotation(Quaternion.AngleAxis(animTime * parameter.rotationSpeed, Vector3.get_up()));
+			float num = animTime / parameter.popAnimTime;
+			if (num > 1f)
+			{
+				num = 1f;
+			}
+			Vector3 position = Vector3.Lerp(dropPos, targetPos, num);
+			position.y = anim.Update() + parameter.defHeight;
 			if (anim.IsPlaying())
 			{
-				animTime += Time.get_deltaTime();
-				_transform.set_localRotation(Quaternion.AngleAxis(animTime * parameter.rotationSpeed, Vector3.get_up()));
-				float num = animTime / parameter.popAnimTime;
-				if (num > 1f)
-				{
-					num = 1f;
-				}
-				Vector3 position = Vector3.Lerp(dropPos, targetPos, num);
-				position.y = anim.Update() + parameter.defHeight;
-				if (anim.IsPlaying())
-				{
-					_transform.set_position(position);
-				}
+				_transform.set_position(position);
 			}
-			else
-			{
-				this.get_gameObject().SetActive(false);
-				animStep++;
-			}
+		}
+		else
+		{
+			this.get_gameObject().SetActive(false);
+			animStep++;
 		}
 	}
 
@@ -126,7 +124,7 @@ public class DropObject
 		animStep = 0;
 		animTime = 0f;
 		isRight = true;
-		anim.Set(parameter.popAnimTime, 0f, parameter.popHeight, parameter.popAnim, 0f, null);
+		anim.Set(parameter.popAnimTime, 0f, parameter.popHeight, parameter.popAnim, 0f);
 		anim.Play();
 		anim.Update(0f);
 		pos.y = anim.Get() + parameter.defHeight;

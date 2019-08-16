@@ -9,8 +9,8 @@ public class UITexture : UIBasicSprite
 	[SerializeField]
 	private Rect mRect = new Rect(0f, 0f, 1f, 1f);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Texture mTexture;
 
 	[HideInInspector]
@@ -25,8 +25,8 @@ public class UITexture : UIBasicSprite
 	[SerializeField]
 	private Vector4 mBorder = Vector4.get_zero();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mFixedAspect;
 
 	[NonSerialized]
@@ -36,8 +36,6 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Expected O, but got Unknown
 			if (mTexture != null)
 			{
 				return mTexture;
@@ -56,14 +54,12 @@ public class UITexture : UIBasicSprite
 				{
 					mTexture = value;
 					drawCall.mainTexture = value;
+					return;
 				}
-				else
-				{
-					RemoveFromPanel();
-					mTexture = value;
-					mPMA = -1;
-					MarkAsChanged();
-				}
+				RemoveFromPanel();
+				mTexture = value;
+				mPMA = -1;
+				MarkAsChanged();
 			}
 		}
 	}
@@ -91,10 +87,6 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
 			if (mMat != null)
 			{
 				return mMat.get_shader();
@@ -113,15 +105,13 @@ public class UITexture : UIBasicSprite
 				{
 					mShader = value;
 					drawCall.shader = value;
+					return;
 				}
-				else
-				{
-					RemoveFromPanel();
-					mShader = value;
-					mPMA = -1;
-					mMat = null;
-					MarkAsChanged();
-				}
+				RemoveFromPanel();
+				mShader = value;
+				mPMA = -1;
+				mMat = null;
+				MarkAsChanged();
 			}
 		}
 	}
@@ -130,8 +120,6 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			if (mPMA == -1)
 			{
 				Material material = this.material;
@@ -278,24 +266,25 @@ public class UITexture : UIBasicSprite
 	public override void MakePixelPerfect()
 	{
 		base.MakePixelPerfect();
-		if (mType != Type.Tiled)
+		if (mType == Type.Tiled)
 		{
-			Texture mainTexture = this.mainTexture;
-			if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !base.hasBorder) && mainTexture != null)
+			return;
+		}
+		Texture mainTexture = this.mainTexture;
+		if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !base.hasBorder) && mainTexture != null)
+		{
+			int num = mainTexture.get_width();
+			int num2 = mainTexture.get_height();
+			if ((num & 1) == 1)
 			{
-				int num = mainTexture.get_width();
-				int num2 = mainTexture.get_height();
-				if ((num & 1) == 1)
-				{
-					num++;
-				}
-				if ((num2 & 1) == 1)
-				{
-					num2++;
-				}
-				base.width = num;
-				base.height = num2;
+				num++;
 			}
+			if ((num2 & 1) == 1)
+			{
+				num2++;
+			}
+			base.width = num;
+			base.height = num2;
 		}
 	}
 
@@ -304,35 +293,36 @@ public class UITexture : UIBasicSprite
 		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 		base.OnUpdate();
-		if (mFixedAspect)
+		if (!mFixedAspect)
 		{
-			Texture mainTexture = this.mainTexture;
-			if (mainTexture != null)
+			return;
+		}
+		Texture mainTexture = this.mainTexture;
+		if (mainTexture != null)
+		{
+			int num = mainTexture.get_width();
+			int num2 = mainTexture.get_height();
+			if ((num & 1) == 1)
 			{
-				int num = mainTexture.get_width();
-				int num2 = mainTexture.get_height();
-				if ((num & 1) == 1)
-				{
-					num++;
-				}
-				if ((num2 & 1) == 1)
-				{
-					num2++;
-				}
-				float num3 = (float)mWidth;
-				float num4 = (float)mHeight;
-				float num5 = num3 / num4;
-				float num6 = (float)num / (float)num2;
-				if (num6 < num5)
-				{
-					float num7 = (num3 - num4 * num6) / num3 * 0.5f;
-					base.drawRegion = new Vector4(num7, 0f, 1f - num7, 1f);
-				}
-				else
-				{
-					float num8 = (num4 - num3 / num6) / num4 * 0.5f;
-					base.drawRegion = new Vector4(0f, num8, 1f, 1f - num8);
-				}
+				num++;
+			}
+			if ((num2 & 1) == 1)
+			{
+				num2++;
+			}
+			float num3 = mWidth;
+			float num4 = mHeight;
+			float num5 = num3 / num4;
+			float num6 = (float)num / (float)num2;
+			if (num6 < num5)
+			{
+				float num7 = (num3 - num4 * num6) / num3 * 0.5f;
+				base.drawRegion = new Vector4(num7, 0f, 1f - num7, 1f);
+			}
+			else
+			{
+				float num8 = (num4 - num3 / num6) / num4 * 0.5f;
+				base.drawRegion = new Vector4(0f, num8, 1f, 1f - num8);
 			}
 		}
 	}

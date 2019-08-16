@@ -16,6 +16,7 @@ import org.json.JSONObject;
 class LoginLogger {
     static final String EVENT_EXTRAS_DEFAULT_AUDIENCE = "default_audience";
     static final String EVENT_EXTRAS_FACEBOOK_VERSION = "facebookVersion";
+    static final String EVENT_EXTRAS_FAILURE = "failure";
     static final String EVENT_EXTRAS_IS_REAUTHORIZE = "isReauthorize";
     static final String EVENT_EXTRAS_LOGIN_BEHAVIOR = "login_behavior";
     static final String EVENT_EXTRAS_MISSING_INTERNET_PERMISSION = "no_internet_permission";
@@ -26,8 +27,11 @@ class LoginLogger {
     static final String EVENT_EXTRAS_TRY_LOGIN_ACTIVITY = "try_login_activity";
     static final String EVENT_NAME_LOGIN_COMPLETE = "fb_mobile_login_complete";
     static final String EVENT_NAME_LOGIN_METHOD_COMPLETE = "fb_mobile_login_method_complete";
+    static final String EVENT_NAME_LOGIN_METHOD_NOT_TRIED = "fb_mobile_login_method_not_tried";
     static final String EVENT_NAME_LOGIN_METHOD_START = "fb_mobile_login_method_start";
     static final String EVENT_NAME_LOGIN_START = "fb_mobile_login_start";
+    static final String EVENT_NAME_LOGIN_STATUS_COMPLETE = "fb_mobile_login_status_complete";
+    static final String EVENT_NAME_LOGIN_STATUS_START = "fb_mobile_login_status_start";
     static final String EVENT_PARAM_AUTH_LOGGER_ID = "0_auth_logger_id";
     static final String EVENT_PARAM_CHALLENGE = "7_challenge";
     static final String EVENT_PARAM_ERROR_CODE = "4_error_code";
@@ -84,11 +88,17 @@ class LoginLogger {
         if (str5 != null) {
             newAuthorizationLoggingBundle.putString(EVENT_PARAM_ERROR_CODE, str5);
         }
-        if (!(map == null || map.isEmpty())) {
+        if (map != null && !map.isEmpty()) {
             newAuthorizationLoggingBundle.putString(EVENT_PARAM_EXTRAS, new JSONObject(map).toString());
         }
         newAuthorizationLoggingBundle.putString(EVENT_PARAM_METHOD, str2);
         this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_METHOD_COMPLETE, null, newAuthorizationLoggingBundle);
+    }
+
+    public void logAuthorizationMethodNotTried(String str, String str2) {
+        Bundle newAuthorizationLoggingBundle = newAuthorizationLoggingBundle(str);
+        newAuthorizationLoggingBundle.putString(EVENT_PARAM_METHOD, str2);
+        this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_METHOD_NOT_TRIED, null, newAuthorizationLoggingBundle);
     }
 
     public void logAuthorizationMethodStart(String str, String str2) {
@@ -97,13 +107,13 @@ class LoginLogger {
         this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_METHOD_START, null, newAuthorizationLoggingBundle);
     }
 
-    public void logCompleteLogin(String str, Map<String, String> map, Code code, Map<String, String> map2, Exception exception) {
+    public void logCompleteLogin(String str, Map<String, String> map, Code code, Map<String, String> map2, Exception exc) {
         Bundle newAuthorizationLoggingBundle = newAuthorizationLoggingBundle(str);
         if (code != null) {
             newAuthorizationLoggingBundle.putString(EVENT_PARAM_LOGIN_RESULT, code.getLoggingValue());
         }
-        if (!(exception == null || exception.getMessage() == null)) {
-            newAuthorizationLoggingBundle.putString(EVENT_PARAM_ERROR_MESSAGE, exception.getMessage());
+        if (!(exc == null || exc.getMessage() == null)) {
+            newAuthorizationLoggingBundle.putString(EVENT_PARAM_ERROR_MESSAGE, exc.getMessage());
         }
         JSONObject jSONObject = !map.isEmpty() ? new JSONObject(map) : null;
         if (map2 != null) {
@@ -121,6 +131,29 @@ class LoginLogger {
             newAuthorizationLoggingBundle.putString(EVENT_PARAM_EXTRAS, jSONObject.toString());
         }
         this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_COMPLETE, null, newAuthorizationLoggingBundle);
+    }
+
+    public void logLoginStatusError(String str, Exception exc) {
+        Bundle newAuthorizationLoggingBundle = newAuthorizationLoggingBundle(str);
+        newAuthorizationLoggingBundle.putString(EVENT_PARAM_LOGIN_RESULT, Code.ERROR.getLoggingValue());
+        newAuthorizationLoggingBundle.putString(EVENT_PARAM_ERROR_MESSAGE, exc.toString());
+        this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_STATUS_COMPLETE, null, newAuthorizationLoggingBundle);
+    }
+
+    public void logLoginStatusFailure(String str) {
+        Bundle newAuthorizationLoggingBundle = newAuthorizationLoggingBundle(str);
+        newAuthorizationLoggingBundle.putString(EVENT_PARAM_LOGIN_RESULT, EVENT_EXTRAS_FAILURE);
+        this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_STATUS_COMPLETE, null, newAuthorizationLoggingBundle);
+    }
+
+    public void logLoginStatusStart(String str) {
+        this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_STATUS_START, null, newAuthorizationLoggingBundle(str));
+    }
+
+    public void logLoginStatusSuccess(String str) {
+        Bundle newAuthorizationLoggingBundle = newAuthorizationLoggingBundle(str);
+        newAuthorizationLoggingBundle.putString(EVENT_PARAM_LOGIN_RESULT, Code.SUCCESS.getLoggingValue());
+        this.appEventsLogger.logSdkEvent(EVENT_NAME_LOGIN_STATUS_COMPLETE, null, newAuthorizationLoggingBundle);
     }
 
     public void logStartLogin(Request request) {

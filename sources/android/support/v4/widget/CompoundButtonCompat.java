@@ -1,4 +1,4 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff.Mode;
@@ -6,86 +6,113 @@ import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.widget.CompoundButton;
+import java.lang.reflect.Field;
 
+/* renamed from: android.support.v4.widget.CompoundButtonCompat */
 public final class CompoundButtonCompat {
-    private static final CompoundButtonCompatImpl IMPL;
+    private static final CompoundButtonCompatBaseImpl IMPL;
 
-    interface CompoundButtonCompatImpl {
-        Drawable getButtonDrawable(CompoundButton compoundButton);
-
-        ColorStateList getButtonTintList(CompoundButton compoundButton);
-
-        Mode getButtonTintMode(CompoundButton compoundButton);
-
-        void setButtonTintList(CompoundButton compoundButton, ColorStateList colorStateList);
-
-        void setButtonTintMode(CompoundButton compoundButton, Mode mode);
-    }
-
-    static class BaseCompoundButtonCompat implements CompoundButtonCompatImpl {
-        BaseCompoundButtonCompat() {
-        }
-
-        public Drawable getButtonDrawable(CompoundButton compoundButton) {
-            return CompoundButtonCompatGingerbread.getButtonDrawable(compoundButton);
+    @RequiresApi(21)
+    /* renamed from: android.support.v4.widget.CompoundButtonCompat$CompoundButtonCompatApi21Impl */
+    static class CompoundButtonCompatApi21Impl extends CompoundButtonCompatBaseImpl {
+        CompoundButtonCompatApi21Impl() {
         }
 
         public ColorStateList getButtonTintList(CompoundButton compoundButton) {
-            return CompoundButtonCompatGingerbread.getButtonTintList(compoundButton);
+            return compoundButton.getButtonTintList();
         }
 
         public Mode getButtonTintMode(CompoundButton compoundButton) {
-            return CompoundButtonCompatGingerbread.getButtonTintMode(compoundButton);
+            return compoundButton.getButtonTintMode();
         }
 
         public void setButtonTintList(CompoundButton compoundButton, ColorStateList colorStateList) {
-            CompoundButtonCompatGingerbread.setButtonTintList(compoundButton, colorStateList);
+            compoundButton.setButtonTintList(colorStateList);
         }
 
         public void setButtonTintMode(CompoundButton compoundButton, Mode mode) {
-            CompoundButtonCompatGingerbread.setButtonTintMode(compoundButton, mode);
+            compoundButton.setButtonTintMode(mode);
         }
     }
 
-    static class LollipopCompoundButtonImpl extends BaseCompoundButtonCompat {
-        LollipopCompoundButtonImpl() {
-        }
-
-        public ColorStateList getButtonTintList(CompoundButton compoundButton) {
-            return CompoundButtonCompatLollipop.getButtonTintList(compoundButton);
-        }
-
-        public Mode getButtonTintMode(CompoundButton compoundButton) {
-            return CompoundButtonCompatLollipop.getButtonTintMode(compoundButton);
-        }
-
-        public void setButtonTintList(CompoundButton compoundButton, ColorStateList colorStateList) {
-            CompoundButtonCompatLollipop.setButtonTintList(compoundButton, colorStateList);
-        }
-
-        public void setButtonTintMode(CompoundButton compoundButton, Mode mode) {
-            CompoundButtonCompatLollipop.setButtonTintMode(compoundButton, mode);
-        }
-    }
-
-    static class Api23CompoundButtonImpl extends LollipopCompoundButtonImpl {
-        Api23CompoundButtonImpl() {
+    @RequiresApi(23)
+    /* renamed from: android.support.v4.widget.CompoundButtonCompat$CompoundButtonCompatApi23Impl */
+    static class CompoundButtonCompatApi23Impl extends CompoundButtonCompatApi21Impl {
+        CompoundButtonCompatApi23Impl() {
         }
 
         public Drawable getButtonDrawable(CompoundButton compoundButton) {
-            return CompoundButtonCompatApi23.getButtonDrawable(compoundButton);
+            return compoundButton.getButtonDrawable();
+        }
+    }
+
+    /* renamed from: android.support.v4.widget.CompoundButtonCompat$CompoundButtonCompatBaseImpl */
+    static class CompoundButtonCompatBaseImpl {
+        private static final String TAG = "CompoundButtonCompat";
+        private static Field sButtonDrawableField;
+        private static boolean sButtonDrawableFieldFetched;
+
+        CompoundButtonCompatBaseImpl() {
+        }
+
+        public Drawable getButtonDrawable(CompoundButton compoundButton) {
+            if (!sButtonDrawableFieldFetched) {
+                try {
+                    sButtonDrawableField = CompoundButton.class.getDeclaredField("mButtonDrawable");
+                    sButtonDrawableField.setAccessible(true);
+                } catch (NoSuchFieldException e) {
+                    Log.i(TAG, "Failed to retrieve mButtonDrawable field", e);
+                }
+                sButtonDrawableFieldFetched = true;
+            }
+            if (sButtonDrawableField != null) {
+                try {
+                    return (Drawable) sButtonDrawableField.get(compoundButton);
+                } catch (IllegalAccessException e2) {
+                    Log.i(TAG, "Failed to get button drawable via reflection", e2);
+                    sButtonDrawableField = null;
+                }
+            }
+            return null;
+        }
+
+        public ColorStateList getButtonTintList(CompoundButton compoundButton) {
+            if (compoundButton instanceof TintableCompoundButton) {
+                return ((TintableCompoundButton) compoundButton).getSupportButtonTintList();
+            }
+            return null;
+        }
+
+        public Mode getButtonTintMode(CompoundButton compoundButton) {
+            if (compoundButton instanceof TintableCompoundButton) {
+                return ((TintableCompoundButton) compoundButton).getSupportButtonTintMode();
+            }
+            return null;
+        }
+
+        public void setButtonTintList(CompoundButton compoundButton, ColorStateList colorStateList) {
+            if (compoundButton instanceof TintableCompoundButton) {
+                ((TintableCompoundButton) compoundButton).setSupportButtonTintList(colorStateList);
+            }
+        }
+
+        public void setButtonTintMode(CompoundButton compoundButton, Mode mode) {
+            if (compoundButton instanceof TintableCompoundButton) {
+                ((TintableCompoundButton) compoundButton).setSupportButtonTintMode(mode);
+            }
         }
     }
 
     static {
-        int i = VERSION.SDK_INT;
-        if (i >= 23) {
-            IMPL = new Api23CompoundButtonImpl();
-        } else if (i >= 21) {
-            IMPL = new LollipopCompoundButtonImpl();
+        if (VERSION.SDK_INT >= 23) {
+            IMPL = new CompoundButtonCompatApi23Impl();
+        } else if (VERSION.SDK_INT >= 21) {
+            IMPL = new CompoundButtonCompatApi21Impl();
         } else {
-            IMPL = new BaseCompoundButtonCompat();
+            IMPL = new CompoundButtonCompatBaseImpl();
         }
     }
 

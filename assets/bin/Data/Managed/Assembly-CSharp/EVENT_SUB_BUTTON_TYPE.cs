@@ -1,0 +1,5 @@
+public enum EVENT_SUB_BUTTON_TYPE
+{
+	NONE,
+	FISHING_RESULT
+}

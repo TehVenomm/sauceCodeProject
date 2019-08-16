@@ -1,14 +1,26 @@
 package com.google.android.gms.auth.api.signin.internal;
 
-import android.os.IInterface;
+import android.os.Parcel;
 import android.os.RemoteException;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.api.Status;
+import com.google.android.gms.internal.auth-api.zzd;
 
-public interface zzr extends IInterface {
-    void zza(GoogleSignInAccount googleSignInAccount, Status status) throws RemoteException;
+public abstract class zzr extends zzd implements zzq {
+    public zzr() {
+        super("com.google.android.gms.auth.api.signin.internal.IRevocationService");
+    }
 
-    void zzi(Status status) throws RemoteException;
-
-    void zzj(Status status) throws RemoteException;
+    /* access modifiers changed from: protected */
+    public final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+        switch (i) {
+            case 1:
+                zzj();
+                break;
+            case 2:
+                zzk();
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
 }

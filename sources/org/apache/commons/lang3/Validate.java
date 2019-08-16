@@ -70,7 +70,7 @@ public class Validate {
     }
 
     public static <T> T[] notEmpty(T[] tArr) {
-        return notEmpty((Object[]) tArr, DEFAULT_NOT_EMPTY_ARRAY_EX_MESSAGE, new Object[0]);
+        return notEmpty(tArr, DEFAULT_NOT_EMPTY_ARRAY_EX_MESSAGE, new Object[0]);
     }
 
     public static <T extends Collection<?>> T notEmpty(T t, String str, Object... objArr) {
@@ -84,7 +84,7 @@ public class Validate {
     }
 
     public static <T extends Collection<?>> T notEmpty(T t) {
-        return notEmpty((Collection) t, DEFAULT_NOT_EMPTY_COLLECTION_EX_MESSAGE, new Object[0]);
+        return notEmpty(t, DEFAULT_NOT_EMPTY_COLLECTION_EX_MESSAGE, new Object[0]);
     }
 
     public static <T extends Map<?, ?>> T notEmpty(T t, String str, Object... objArr) {
@@ -98,7 +98,7 @@ public class Validate {
     }
 
     public static <T extends Map<?, ?>> T notEmpty(T t) {
-        return notEmpty((Map) t, DEFAULT_NOT_EMPTY_MAP_EX_MESSAGE, new Object[0]);
+        return notEmpty(t, DEFAULT_NOT_EMPTY_MAP_EX_MESSAGE, new Object[0]);
     }
 
     public static <T extends CharSequence> T notEmpty(T t, String str, Object... objArr) {
@@ -112,7 +112,7 @@ public class Validate {
     }
 
     public static <T extends CharSequence> T notEmpty(T t) {
-        return notEmpty((CharSequence) t, DEFAULT_NOT_EMPTY_CHAR_SEQUENCE_EX_MESSAGE, new Object[0]);
+        return notEmpty(t, DEFAULT_NOT_EMPTY_CHAR_SEQUENCE_EX_MESSAGE, new Object[0]);
     }
 
     public static <T extends CharSequence> T notBlank(T t, String str, Object... objArr) {
@@ -133,30 +133,49 @@ public class Validate {
         notNull(tArr);
         for (int i = 0; i < tArr.length; i++) {
             if (tArr[i] == null) {
-                throw new IllegalArgumentException(String.format(str, ArrayUtils.add(objArr, Integer.valueOf(i))));
+                throw new IllegalArgumentException(String.format(str, ArrayUtils.add((T[]) objArr, Integer.valueOf(i))));
             }
         }
         return tArr;
     }
 
     public static <T> T[] noNullElements(T[] tArr) {
-        return noNullElements((Object[]) tArr, DEFAULT_NO_NULL_ELEMENTS_ARRAY_EX_MESSAGE, new Object[0]);
+        return noNullElements(tArr, DEFAULT_NO_NULL_ELEMENTS_ARRAY_EX_MESSAGE, new Object[0]);
     }
 
-    public static <T extends Iterable<?>> T noNullElements(T t, String str, Object... objArr) {
-        notNull(t);
-        int i = 0;
-        for (Object obj : t) {
-            if (obj == null) {
-                throw new IllegalArgumentException(String.format(str, ArrayUtils.addAll(objArr, Integer.valueOf(i))));
-            }
-            i++;
-        }
-        return t;
+    /* JADX WARNING: Incorrect type for immutable var: ssa=T, code=T<java.lang.Object>, for r4v0, types: [T, T<java.lang.Object>, java.lang.Object, java.lang.Iterable] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static <T extends java.lang.Iterable<?>> T noNullElements(T<java.lang.Object> r4, java.lang.String r5, java.lang.Object... r6) {
+        /*
+            r1 = 0
+            notNull(r4)
+            java.util.Iterator r2 = r4.iterator()
+            r0 = r1
+        L_0x0009:
+            boolean r3 = r2.hasNext()
+            if (r3 == 0) goto L_0x002f
+            java.lang.Object r3 = r2.next()
+            if (r3 != 0) goto L_0x002c
+            r2 = 1
+            java.lang.Object[] r2 = new java.lang.Object[r2]
+            java.lang.Integer r0 = java.lang.Integer.valueOf(r0)
+            r2[r1] = r0
+            java.lang.Object[] r0 = org.apache.commons.lang3.ArrayUtils.addAll((T[]) r6, (T[]) r2)
+            java.lang.IllegalArgumentException r1 = new java.lang.IllegalArgumentException
+            java.lang.String r0 = java.lang.String.format(r5, r0)
+            r1.<init>(r0)
+            throw r1
+        L_0x002c:
+            int r0 = r0 + 1
+            goto L_0x0009
+        L_0x002f:
+            return r4
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.apache.commons.lang3.Validate.noNullElements(java.lang.Iterable, java.lang.String, java.lang.Object[]):java.lang.Iterable");
     }
 
     public static <T extends Iterable<?>> T noNullElements(T t) {
-        return noNullElements((Iterable) t, DEFAULT_NO_NULL_ELEMENTS_COLLECTION_EX_MESSAGE, new Object[0]);
+        return noNullElements(t, DEFAULT_NO_NULL_ELEMENTS_COLLECTION_EX_MESSAGE, new Object[0]);
     }
 
     public static <T> T[] validIndex(T[] tArr, int i, String str, Object... objArr) {
@@ -168,7 +187,7 @@ public class Validate {
     }
 
     public static <T> T[] validIndex(T[] tArr, int i) {
-        return validIndex((Object[]) tArr, i, DEFAULT_VALID_INDEX_ARRAY_EX_MESSAGE, Integer.valueOf(i));
+        return validIndex(tArr, i, DEFAULT_VALID_INDEX_ARRAY_EX_MESSAGE, Integer.valueOf(i));
     }
 
     public static <T extends Collection<?>> T validIndex(T t, int i, String str, Object... objArr) {
@@ -180,7 +199,7 @@ public class Validate {
     }
 
     public static <T extends Collection<?>> T validIndex(T t, int i) {
-        return validIndex((Collection) t, i, DEFAULT_VALID_INDEX_COLLECTION_EX_MESSAGE, Integer.valueOf(i));
+        return validIndex(t, i, DEFAULT_VALID_INDEX_COLLECTION_EX_MESSAGE, Integer.valueOf(i));
     }
 
     public static <T extends CharSequence> T validIndex(T t, int i, String str, Object... objArr) {
@@ -192,7 +211,7 @@ public class Validate {
     }
 
     public static <T extends CharSequence> T validIndex(T t, int i) {
-        return validIndex((CharSequence) t, i, DEFAULT_VALID_INDEX_CHAR_SEQUENCE_EX_MESSAGE, Integer.valueOf(i));
+        return validIndex(t, i, DEFAULT_VALID_INDEX_CHAR_SEQUENCE_EX_MESSAGE, Integer.valueOf(i));
     }
 
     public static void validState(boolean z) {

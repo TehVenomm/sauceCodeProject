@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestRaycast
+public class TestRaycast : MonoBehaviour
 {
 	private class CastHitInfo
 	{
@@ -27,7 +27,6 @@ public class TestRaycast
 
 	private void Update()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		if (!(checkObject == null) && !(endObject == null))
 		{
@@ -37,35 +36,26 @@ public class TestRaycast
 
 	private Vector3 CheckWarpPos()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Expected O, but got Unknown
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Expected O, but got Unknown
-		//IL_038f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
 		SphereCollider val = this.GetComponent<Collider>() as SphereCollider;
 		float radius = val.get_radius();
 		Vector3 lossyScale = this.get_transform().get_lossyScale();
@@ -130,23 +120,24 @@ public class TestRaycast
 		for (int count = list.Count; k < count; k++)
 		{
 			CastHitInfo castHitInfo5 = list[k];
-			if (!castHitInfo5.checkCollider && !(castHitInfo5.collider == null))
+			if (castHitInfo5.checkCollider || castHitInfo5.collider == null)
 			{
-				int num6 = k;
-				while (0 <= num6 && num6 < count)
+				continue;
+			}
+			int num6 = k;
+			while (0 <= num6 && num6 < count)
+			{
+				CastHitInfo castHitInfo6 = list[num6];
+				if (num6 != k)
 				{
-					CastHitInfo castHitInfo6 = list[num6];
-					if (num6 != k)
+					if (castHitInfo6.collider == castHitInfo5.collider)
 					{
-						if (castHitInfo6.collider == castHitInfo5.collider)
-						{
-							castHitInfo6.checkCollider = true;
-							break;
-						}
-						castHitInfo6.enable = false;
+						castHitInfo6.checkCollider = true;
+						break;
 					}
-					num6 = ((!castHitInfo5.faceToEnd) ? (num6 - 1) : (num6 + 1));
+					castHitInfo6.enable = false;
 				}
+				num6 = ((!castHitInfo5.faceToEnd) ? (num6 - 1) : (num6 + 1));
 			}
 		}
 		float num7 = magnitude;
@@ -177,31 +168,26 @@ public class TestRaycast
 
 	private Vector3 CheckWarpPos2()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0442: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0455: Unknown result type (might be due to invalid IL or missing references)
-		//IL_045a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0449: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0450: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0457: Unknown result type (might be due to invalid IL or missing references)
+		//IL_045c: Unknown result type (might be due to invalid IL or missing references)
 		SphereCollider val = this.GetComponent<Collider>() as SphereCollider;
 		float radius = val.get_radius();
 		Vector3 lossyScale = this.get_transform().get_lossyScale();
@@ -278,12 +264,10 @@ public class TestRaycast
 				if (castHitInfo6.faceToEnd)
 				{
 					list.RemoveAt(num5);
+					continue;
 				}
-				else
-				{
-					list.RemoveAt(num5 - 1);
-					castHitInfo5 = castHitInfo6;
-				}
+				list.RemoveAt(num5 - 1);
+				castHitInfo5 = castHitInfo6;
 			}
 			else
 			{
@@ -337,43 +321,31 @@ public class TestRaycast
 
 	private Vector3 CheckWarpPos3()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
 		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 		float num = 5f;
 		SphereCollider val = this.GetComponent<Collider>() as SphereCollider;

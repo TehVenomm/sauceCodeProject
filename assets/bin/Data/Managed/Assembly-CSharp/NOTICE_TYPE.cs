@@ -3,5 +3,6 @@ public enum NOTICE_TYPE
 	EVENT = 0,
 	FRIEND = 1,
 	ATTRACT = 2,
+	CLAN_NOTICE_BOARD = 3,
 	MAX = 0x20
 }

@@ -1,5 +1,6 @@
 package com.facebook;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -7,17 +8,18 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.os.AsyncTask;
-import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.p000v4.media.session.PlaybackStateCompat;
 import android.util.Base64;
 import android.util.Log;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.appevents.internal.ActivityLifecycleTracker;
 import com.facebook.internal.BoltsMeasurementEventListener;
+import com.facebook.internal.FetchedAppSettingsManager;
 import com.facebook.internal.LockOnGetVariable;
 import com.facebook.internal.NativeProtocol;
+import com.facebook.internal.ServerProtocol;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
-import com.facebook.internal.WebDialog;
-import io.fabric.sdk.android.services.common.CommonUtils;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,18 +36,30 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
 
 public final class FacebookSdk {
+    public static final String ADVERTISER_ID_COLLECTION_ENABLED_PROPERTY = "com.facebook.sdk.AdvertiserIDCollectionEnabled";
     public static final String APPLICATION_ID_PROPERTY = "com.facebook.sdk.ApplicationId";
     public static final String APPLICATION_NAME_PROPERTY = "com.facebook.sdk.ApplicationName";
     private static final String ATTRIBUTION_PREFERENCES = "com.facebook.sdk.attributionTracking";
-    static final String CALLBACK_OFFSET_CHANGED_AFTER_INIT = "The callback request code offset can't be updated once the SDK is initialized.";
+    public static final String AUTO_LOG_APP_EVENTS_ENABLED_PROPERTY = "com.facebook.sdk.AutoLogAppEventsEnabled";
+    static final String CALLBACK_OFFSET_CHANGED_AFTER_INIT = "The callback request code offset can't be updated once the SDK is initialized. Call FacebookSdk.setCallbackRequestCodeOffset inside your Application.onCreate method";
     static final String CALLBACK_OFFSET_NEGATIVE = "The callback request code offset can't be negative.";
+    public static final String CALLBACK_OFFSET_PROPERTY = "com.facebook.sdk.CallbackOffset";
     public static final String CLIENT_TOKEN_PROPERTY = "com.facebook.sdk.ClientToken";
+    public static final String CODELESS_DEBUG_LOG_ENABLED_PROPERTY = "com.facebook.sdk.CodelessDebugLogEnabled";
+    private static final int DEFAULT_CALLBACK_REQUEST_CODE_OFFSET = 64206;
     private static final int DEFAULT_CORE_POOL_SIZE = 5;
     private static final int DEFAULT_KEEP_ALIVE = 1;
     private static final int DEFAULT_MAXIMUM_POOL_SIZE = 128;
-    private static final ThreadFactory DEFAULT_THREAD_FACTORY = new C03491();
+    private static final ThreadFactory DEFAULT_THREAD_FACTORY = new ThreadFactory() {
+        private final AtomicInteger counter = new AtomicInteger(0);
+
+        public Thread newThread(Runnable runnable) {
+            return new Thread(runnable, "FacebookSdk #" + this.counter.incrementAndGet());
+        }
+    };
     private static final BlockingQueue<Runnable> DEFAULT_WORK_QUEUE = new LinkedBlockingQueue(10);
     private static final String FACEBOOK_COM = "facebook.com";
     private static final Object LOCK = new Object();
@@ -53,42 +67,25 @@ public final class FacebookSdk {
     private static final String PUBLISH_ACTIVITY_PATH = "%s/activities";
     private static final String TAG = FacebookSdk.class.getCanonicalName();
     public static final String WEB_DIALOG_THEME = "com.facebook.sdk.WebDialogTheme";
+    private static volatile Boolean advertiserIDCollectionEnabled;
     private static volatile String appClientToken;
-    private static Context applicationContext;
-    private static volatile String applicationId;
+    /* access modifiers changed from: private */
+    public static Context applicationContext;
+    /* access modifiers changed from: private */
+    public static volatile String applicationId;
     private static volatile String applicationName;
+    private static volatile Boolean autoLogAppEventsEnabled;
     private static LockOnGetVariable<File> cacheDir;
-    private static int callbackRequestCodeOffset = 64206;
-    private static volatile Executor executor;
+    private static int callbackRequestCodeOffset = DEFAULT_CALLBACK_REQUEST_CODE_OFFSET;
+    private static volatile Boolean codelessDebugLogEnabled;
+    private static Executor executor;
     private static volatile String facebookDomain = FACEBOOK_COM;
+    private static String graphApiVersion = ServerProtocol.getDefaultAPIVersion();
     private static volatile boolean isDebugEnabled = false;
     private static boolean isLegacyTokenUpgradeSupported = false;
-    private static final HashSet<LoggingBehavior> loggingBehaviors = new HashSet(Arrays.asList(new LoggingBehavior[]{LoggingBehavior.DEVELOPER_ERRORS}));
+    private static final HashSet<LoggingBehavior> loggingBehaviors = new HashSet<>(Arrays.asList(new LoggingBehavior[]{LoggingBehavior.DEVELOPER_ERRORS}));
     private static AtomicLong onProgressThreshold = new AtomicLong(PlaybackStateCompat.ACTION_PREPARE_FROM_SEARCH);
     private static Boolean sdkInitialized = Boolean.valueOf(false);
-    private static volatile int webDialogTheme;
-
-    /* renamed from: com.facebook.FacebookSdk$1 */
-    static final class C03491 implements ThreadFactory {
-        private final AtomicInteger counter = new AtomicInteger(0);
-
-        C03491() {
-        }
-
-        public Thread newThread(Runnable runnable) {
-            return new Thread(runnable, "FacebookSdk #" + this.counter.incrementAndGet());
-        }
-    }
-
-    /* renamed from: com.facebook.FacebookSdk$2 */
-    static final class C03502 implements Callable<File> {
-        C03502() {
-        }
-
-        public File call() throws Exception {
-            return FacebookSdk.applicationContext.getCacheDir();
-        }
-    }
 
     public interface InitializeCallback {
         void onInitialized();
@@ -105,6 +102,11 @@ public final class FacebookSdk {
         synchronized (loggingBehaviors) {
             loggingBehaviors.clear();
         }
+    }
+
+    public static boolean getAdvertiserIDCollectionEnabled() {
+        Validate.sdkInitialized();
+        return advertiserIDCollectionEnabled.booleanValue();
     }
 
     public static Context getApplicationContext() {
@@ -150,6 +152,11 @@ public final class FacebookSdk {
         }
     }
 
+    public static boolean getAutoLogAppEventsEnabled() {
+        Validate.sdkInitialized();
+        return autoLogAppEventsEnabled.booleanValue();
+    }
+
     public static File getCacheDir() {
         Validate.sdkInitialized();
         return (File) cacheDir.getValue();
@@ -165,6 +172,11 @@ public final class FacebookSdk {
         return appClientToken;
     }
 
+    public static boolean getCodelessDebugLogEnabled() {
+        Validate.sdkInitialized();
+        return codelessDebugLogEnabled.booleanValue();
+    }
+
     public static Executor getExecutor() {
         synchronized (LOCK) {
             if (executor == null) {
@@ -176,6 +188,11 @@ public final class FacebookSdk {
 
     public static String getFacebookDomain() {
         return facebookDomain;
+    }
+
+    public static String getGraphApiVersion() {
+        Utility.logd(TAG, String.format("getGraphApiVersion: %s", new Object[]{graphApiVersion}));
+        return graphApiVersion;
     }
 
     public static boolean getLimitEventAndDataUsage(Context context) {
@@ -200,11 +217,6 @@ public final class FacebookSdk {
         return FacebookSdkVersion.BUILD;
     }
 
-    public static int getWebDialogTheme() {
-        Validate.sdkInitialized();
-        return webDialogTheme;
-    }
-
     public static boolean isDebugEnabled() {
         return isDebugEnabled;
     }
@@ -214,14 +226,15 @@ public final class FacebookSdk {
     }
 
     public static boolean isInitialized() {
+        boolean booleanValue;
         synchronized (FacebookSdk.class) {
             try {
-                boolean booleanValue = sdkInitialized.booleanValue();
-                return booleanValue;
+                booleanValue = sdkInitialized.booleanValue();
             } finally {
-                Object obj = FacebookSdk.class;
+                Class<FacebookSdk> cls = FacebookSdk.class;
             }
         }
+        return booleanValue;
     }
 
     public static boolean isLegacyTokenUpgradeSupported() {
@@ -260,8 +273,17 @@ public final class FacebookSdk {
                     if (appClientToken == null) {
                         appClientToken = applicationInfo.metaData.getString(CLIENT_TOKEN_PROPERTY);
                     }
-                    if (webDialogTheme == 0) {
-                        setWebDialogTheme(applicationInfo.metaData.getInt(WEB_DIALOG_THEME));
+                    if (callbackRequestCodeOffset == DEFAULT_CALLBACK_REQUEST_CODE_OFFSET) {
+                        callbackRequestCodeOffset = applicationInfo.metaData.getInt(CALLBACK_OFFSET_PROPERTY, DEFAULT_CALLBACK_REQUEST_CODE_OFFSET);
+                    }
+                    if (autoLogAppEventsEnabled == null) {
+                        autoLogAppEventsEnabled = Boolean.valueOf(applicationInfo.metaData.getBoolean(AUTO_LOG_APP_EVENTS_ENABLED_PROPERTY, true));
+                    }
+                    if (codelessDebugLogEnabled == null) {
+                        codelessDebugLogEnabled = Boolean.valueOf(applicationInfo.metaData.getBoolean(CODELESS_DEBUG_LOG_ENABLED_PROPERTY, false));
+                    }
+                    if (advertiserIDCollectionEnabled == null) {
+                        advertiserIDCollectionEnabled = Boolean.valueOf(applicationInfo.metaData.getBoolean(ADVERTISER_ID_COLLECTION_ENABLED_PROPERTY, true));
                     }
                 }
             } catch (NameNotFoundException e) {
@@ -269,147 +291,89 @@ public final class FacebookSdk {
         }
     }
 
-    static com.facebook.GraphResponse publishInstallAndWaitForResponse(android.content.Context r14, java.lang.String r15) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: Exception block dominator not found, method:com.facebook.FacebookSdk.publishInstallAndWaitForResponse(android.content.Context, java.lang.String):com.facebook.GraphResponse. bs: [B:3:0x0007, B:11:0x005d]
-	at jadx.core.dex.visitors.regions.ProcessTryCatchRegions.searchTryCatchDominators(ProcessTryCatchRegions.java:86)
-	at jadx.core.dex.visitors.regions.ProcessTryCatchRegions.process(ProcessTryCatchRegions.java:45)
-	at jadx.core.dex.visitors.regions.RegionMakerVisitor.postProcessRegions(RegionMakerVisitor.java:63)
-	at jadx.core.dex.visitors.regions.RegionMakerVisitor.visit(RegionMakerVisitor.java:58)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:56)
-	at jadx.core.ProcessClass.process(ProcessClass.java:39)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:282)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:200)
-	at jadx.api.JadxDecompiler$$Lambda$8/24039137.run(Unknown Source)
-*/
+    /* JADX INFO: used method not loaded: com.facebook.internal.Utility.logd(java.lang.String, java.lang.Exception):null, types can be incorrect */
+    /* JADX WARNING: Code restructure failed: missing block: B:17:0x006f, code lost:
+        r0 = move-exception;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:19:0x0077, code lost:
+        throw new com.facebook.FacebookException("An error occurred while publishing install.", (java.lang.Throwable) r0);
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:20:?, code lost:
+        return;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:6:0x000e, code lost:
+        r0 = move-exception;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:7:0x000f, code lost:
+        com.facebook.internal.Utility.logd("Facebook-publish", r0);
+     */
+    /* JADX WARNING: Exception block dominator not found, dom blocks: [B:3:0x0006, B:10:0x0039] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    static void publishInstallAndWaitForResponse(android.content.Context r12, java.lang.String r13) {
         /*
-        r12 = 0;
-        r2 = 0;
-        if (r14 == 0) goto L_0x0007;
-    L_0x0005:
-        if (r15 != 0) goto L_0x0021;
-    L_0x0007:
-        r0 = new java.lang.IllegalArgumentException;	 Catch:{ Exception -> 0x000f }
-        r1 = "Both context and applicationId must be non-null";	 Catch:{ Exception -> 0x000f }
-        r0.<init>(r1);	 Catch:{ Exception -> 0x000f }
-        throw r0;	 Catch:{ Exception -> 0x000f }
-    L_0x000f:
-        r0 = move-exception;
-        r1 = r0;
-        r0 = "Facebook-publish";
-        com.facebook.internal.Utility.logd(r0, r1);
-        r0 = new com.facebook.GraphResponse;
-        r3 = new com.facebook.FacebookRequestError;
-        r3.<init>(r2, r1);
-        r0.<init>(r2, r2, r3);
-    L_0x0020:
-        return r0;
-    L_0x0021:
-        r0 = com.facebook.internal.AttributionIdentifiers.getAttributionIdentifiers(r14);	 Catch:{ Exception -> 0x000f }
-        r1 = "com.facebook.sdk.attributionTracking";	 Catch:{ Exception -> 0x000f }
-        r3 = 0;	 Catch:{ Exception -> 0x000f }
-        r1 = r14.getSharedPreferences(r1, r3);	 Catch:{ Exception -> 0x000f }
-        r3 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x000f }
-        r3.<init>();	 Catch:{ Exception -> 0x000f }
-        r3 = r3.append(r15);	 Catch:{ Exception -> 0x000f }
-        r4 = "ping";	 Catch:{ Exception -> 0x000f }
-        r3 = r3.append(r4);	 Catch:{ Exception -> 0x000f }
-        r3 = r3.toString();	 Catch:{ Exception -> 0x000f }
-        r4 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x000f }
-        r4.<init>();	 Catch:{ Exception -> 0x000f }
-        r4 = r4.append(r15);	 Catch:{ Exception -> 0x000f }
-        r5 = "json";	 Catch:{ Exception -> 0x000f }
-        r4 = r4.append(r5);	 Catch:{ Exception -> 0x000f }
-        r4 = r4.toString();	 Catch:{ Exception -> 0x000f }
-        r6 = 0;	 Catch:{ Exception -> 0x000f }
-        r6 = r1.getLong(r3, r6);	 Catch:{ Exception -> 0x000f }
-        r5 = 0;	 Catch:{ Exception -> 0x000f }
-        r5 = r1.getString(r4, r5);	 Catch:{ Exception -> 0x000f }
-        r8 = com.facebook.internal.AppEventsLoggerUtility.GraphAPIActivityType.MOBILE_INSTALL_EVENT;	 Catch:{ JSONException -> 0x00a6 }
-        r9 = com.facebook.appevents.AppEventsLogger.getAnonymousAppDeviceGUID(r14);	 Catch:{ JSONException -> 0x00a6 }
-        r10 = getLimitEventAndDataUsage(r14);	 Catch:{ JSONException -> 0x00a6 }
-        r0 = com.facebook.internal.AppEventsLoggerUtility.getJSONObjectForGraphAPICall(r8, r0, r9, r10, r14);	 Catch:{ JSONException -> 0x00a6 }
-        r8 = 0;
-        r9 = "%s/activities";	 Catch:{ Exception -> 0x000f }
-        r10 = 1;	 Catch:{ Exception -> 0x000f }
-        r10 = new java.lang.Object[r10];	 Catch:{ Exception -> 0x000f }
-        r11 = 0;	 Catch:{ Exception -> 0x000f }
-        r10[r11] = r15;	 Catch:{ Exception -> 0x000f }
-        r9 = java.lang.String.format(r9, r10);	 Catch:{ Exception -> 0x000f }
-        r10 = 0;	 Catch:{ Exception -> 0x000f }
-        r8 = com.facebook.GraphRequest.newPostRequest(r8, r9, r0, r10);	 Catch:{ Exception -> 0x000f }
-        r0 = (r6 > r12 ? 1 : (r6 == r12 ? 0 : -1));
-        if (r0 == 0) goto L_0x00b9;
-    L_0x0081:
-        if (r5 == 0) goto L_0x00e1;
-    L_0x0083:
-        r0 = new org.json.JSONObject;	 Catch:{ JSONException -> 0x00de }
-        r0.<init>(r5);	 Catch:{ JSONException -> 0x00de }
-        r1 = r0;
-    L_0x0089:
-        if (r1 != 0) goto L_0x00af;
-    L_0x008b:
-        r0 = new com.facebook.GraphRequestBatch;	 Catch:{ Exception -> 0x000f }
-        r1 = 1;	 Catch:{ Exception -> 0x000f }
-        r1 = new com.facebook.GraphRequest[r1];	 Catch:{ Exception -> 0x000f }
-        r3 = 0;	 Catch:{ Exception -> 0x000f }
-        r1[r3] = r8;	 Catch:{ Exception -> 0x000f }
-        r0.<init>(r1);	 Catch:{ Exception -> 0x000f }
-        r1 = "true";	 Catch:{ Exception -> 0x000f }
-        r3 = 0;	 Catch:{ Exception -> 0x000f }
-        r0 = com.facebook.GraphResponse.createResponsesFromString(r1, r3, r0);	 Catch:{ Exception -> 0x000f }
-        r1 = 0;	 Catch:{ Exception -> 0x000f }
-        r0 = r0.get(r1);	 Catch:{ Exception -> 0x000f }
-        r0 = (com.facebook.GraphResponse) r0;	 Catch:{ Exception -> 0x000f }
-        goto L_0x0020;	 Catch:{ Exception -> 0x000f }
-    L_0x00a6:
-        r0 = move-exception;	 Catch:{ Exception -> 0x000f }
-        r1 = new com.facebook.FacebookException;	 Catch:{ Exception -> 0x000f }
-        r3 = "An error occurred while publishing install.";	 Catch:{ Exception -> 0x000f }
-        r1.<init>(r3, r0);	 Catch:{ Exception -> 0x000f }
-        throw r1;	 Catch:{ Exception -> 0x000f }
-    L_0x00af:
-        r0 = new com.facebook.GraphResponse;	 Catch:{ Exception -> 0x000f }
-        r3 = 0;	 Catch:{ Exception -> 0x000f }
-        r4 = 0;	 Catch:{ Exception -> 0x000f }
-        r5 = 0;	 Catch:{ Exception -> 0x000f }
-        r0.<init>(r3, r4, r5, r1);	 Catch:{ Exception -> 0x000f }
-        goto L_0x0020;	 Catch:{ Exception -> 0x000f }
-    L_0x00b9:
-        r0 = r8.executeAndWait();	 Catch:{ Exception -> 0x000f }
-        r1 = r1.edit();	 Catch:{ Exception -> 0x000f }
-        r6 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x000f }
-        r1.putLong(r3, r6);	 Catch:{ Exception -> 0x000f }
-        r3 = r0.getJSONObject();	 Catch:{ Exception -> 0x000f }
-        if (r3 == 0) goto L_0x00d9;	 Catch:{ Exception -> 0x000f }
-    L_0x00ce:
-        r3 = r0.getJSONObject();	 Catch:{ Exception -> 0x000f }
-        r3 = r3.toString();	 Catch:{ Exception -> 0x000f }
-        r1.putString(r4, r3);	 Catch:{ Exception -> 0x000f }
-    L_0x00d9:
-        r1.apply();	 Catch:{ Exception -> 0x000f }
-        goto L_0x0020;
-    L_0x00de:
-        r0 = move-exception;
-        r1 = r2;
-        goto L_0x0089;
-    L_0x00e1:
-        r1 = r2;
-        goto L_0x0089;
+            r10 = 0
+            if (r12 == 0) goto L_0x0006
+            if (r13 != 0) goto L_0x0015
+        L_0x0006:
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException     // Catch:{ Exception -> 0x000e }
+            java.lang.String r1 = "Both context and applicationId must be non-null"
+            r0.<init>(r1)     // Catch:{ Exception -> 0x000e }
+            throw r0     // Catch:{ Exception -> 0x000e }
+        L_0x000e:
+            r0 = move-exception
+            java.lang.String r1 = "Facebook-publish"
+            com.facebook.internal.Utility.logd(r1, r0)
+        L_0x0014:
+            return
+        L_0x0015:
+            com.facebook.internal.AttributionIdentifiers r0 = com.facebook.internal.AttributionIdentifiers.getAttributionIdentifiers(r12)     // Catch:{ Exception -> 0x000e }
+            java.lang.String r1 = "com.facebook.sdk.attributionTracking"
+            r2 = 0
+            android.content.SharedPreferences r1 = r12.getSharedPreferences(r1, r2)     // Catch:{ Exception -> 0x000e }
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder     // Catch:{ Exception -> 0x000e }
+            r2.<init>()     // Catch:{ Exception -> 0x000e }
+            java.lang.StringBuilder r2 = r2.append(r13)     // Catch:{ Exception -> 0x000e }
+            java.lang.String r3 = "ping"
+            java.lang.StringBuilder r2 = r2.append(r3)     // Catch:{ Exception -> 0x000e }
+            java.lang.String r2 = r2.toString()     // Catch:{ Exception -> 0x000e }
+            r4 = 0
+            long r4 = r1.getLong(r2, r4)     // Catch:{ Exception -> 0x000e }
+            com.facebook.appevents.internal.AppEventsLoggerUtility$GraphAPIActivityType r3 = com.facebook.appevents.internal.AppEventsLoggerUtility.GraphAPIActivityType.MOBILE_INSTALL_EVENT     // Catch:{ JSONException -> 0x006f }
+            java.lang.String r6 = com.facebook.appevents.AppEventsLogger.getAnonymousAppDeviceGUID(r12)     // Catch:{ JSONException -> 0x006f }
+            boolean r7 = getLimitEventAndDataUsage(r12)     // Catch:{ JSONException -> 0x006f }
+            org.json.JSONObject r0 = com.facebook.appevents.internal.AppEventsLoggerUtility.getJSONObjectForGraphAPICall(r3, r0, r6, r7, r12)     // Catch:{ JSONException -> 0x006f }
+            r3 = 0
+            java.lang.String r6 = "%s/activities"
+            r7 = 1
+            java.lang.Object[] r7 = new java.lang.Object[r7]     // Catch:{ Exception -> 0x000e }
+            r8 = 0
+            r7[r8] = r13     // Catch:{ Exception -> 0x000e }
+            java.lang.String r6 = java.lang.String.format(r6, r7)     // Catch:{ Exception -> 0x000e }
+            r7 = 0
+            com.facebook.GraphRequest r0 = com.facebook.GraphRequest.newPostRequest(r3, r6, r0, r7)     // Catch:{ Exception -> 0x000e }
+            int r3 = (r4 > r10 ? 1 : (r4 == r10 ? 0 : -1))
+            if (r3 != 0) goto L_0x0014
+            r0.executeAndWait()     // Catch:{ Exception -> 0x000e }
+            android.content.SharedPreferences$Editor r0 = r1.edit()     // Catch:{ Exception -> 0x000e }
+            long r4 = java.lang.System.currentTimeMillis()     // Catch:{ Exception -> 0x000e }
+            r0.putLong(r2, r4)     // Catch:{ Exception -> 0x000e }
+            r0.apply()     // Catch:{ Exception -> 0x000e }
+            goto L_0x0014
+        L_0x006f:
+            r0 = move-exception
+            com.facebook.FacebookException r1 = new com.facebook.FacebookException     // Catch:{ Exception -> 0x000e }
+            java.lang.String r2 = "An error occurred while publishing install."
+            r1.<init>(r2, r0)     // Catch:{ Exception -> 0x000e }
+            throw r1     // Catch:{ Exception -> 0x000e }
         */
-        throw new UnsupportedOperationException("Method not decompiled: com.facebook.FacebookSdk.publishInstallAndWaitForResponse(android.content.Context, java.lang.String):com.facebook.GraphResponse");
+        throw new UnsupportedOperationException("Method not decompiled: com.facebook.FacebookSdk.publishInstallAndWaitForResponse(android.content.Context, java.lang.String):void");
     }
 
     public static void publishInstallAsync(Context context, final String str) {
-        final Context applicationContext = context.getApplicationContext();
+        final Context applicationContext2 = context.getApplicationContext();
         getExecutor().execute(new Runnable() {
             public void run() {
-                FacebookSdk.publishInstallAndWaitForResponse(applicationContext, str);
+                FacebookSdk.publishInstallAndWaitForResponse(applicationContext2, str);
             }
         });
     }
@@ -420,47 +384,47 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Exception block dominato
         }
     }
 
+    @Deprecated
     public static void sdkInitialize(Context context) {
         synchronized (FacebookSdk.class) {
             try {
-                sdkInitialize(context, null);
+                sdkInitialize(context, (InitializeCallback) null);
             } finally {
-                Class cls = FacebookSdk.class;
+                Class<FacebookSdk> cls = FacebookSdk.class;
             }
         }
     }
 
+    @Deprecated
     public static void sdkInitialize(Context context, int i) {
         synchronized (FacebookSdk.class) {
             try {
                 sdkInitialize(context, i, null);
             } finally {
-                Class cls = FacebookSdk.class;
+                Class<FacebookSdk> cls = FacebookSdk.class;
             }
         }
     }
 
+    @Deprecated
     public static void sdkInitialize(Context context, int i, InitializeCallback initializeCallback) {
         synchronized (FacebookSdk.class) {
             try {
-                boolean booleanValue = sdkInitialized.booleanValue();
-                if (booleanValue) {
-                    booleanValue = callbackRequestCodeOffset;
-                    if (i != booleanValue) {
-                        throw new FacebookException(CALLBACK_OFFSET_CHANGED_AFTER_INIT);
-                    }
-                }
-                if (i < 0) {
+                if (sdkInitialized.booleanValue() && i != callbackRequestCodeOffset) {
+                    throw new FacebookException(CALLBACK_OFFSET_CHANGED_AFTER_INIT);
+                } else if (i < 0) {
                     throw new FacebookException(CALLBACK_OFFSET_NEGATIVE);
+                } else {
+                    callbackRequestCodeOffset = i;
+                    sdkInitialize(context, initializeCallback);
                 }
-                callbackRequestCodeOffset = i;
-                sdkInitialize(context, initializeCallback);
             } finally {
-                Class cls = FacebookSdk.class;
+                Class<FacebookSdk> cls = FacebookSdk.class;
             }
         }
     }
 
+    @Deprecated
     public static void sdkInitialize(final Context context, final InitializeCallback initializeCallback) {
         synchronized (FacebookSdk.class) {
             try {
@@ -470,21 +434,32 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Exception block dominato
                     Validate.hasInternetPermissions(context, false);
                     applicationContext = context.getApplicationContext();
                     loadDefaultsFromMetadata(applicationContext);
+                    if (Utility.isNullOrEmpty(applicationId)) {
+                        throw new FacebookException("A valid Facebook app id must be set in the AndroidManifest.xml or set by calling FacebookSdk.setApplicationId before initializing the sdk.");
+                    }
+                    if ((applicationContext instanceof Application) && autoLogAppEventsEnabled.booleanValue()) {
+                        ActivityLifecycleTracker.startTracking((Application) applicationContext, applicationId);
+                    }
                     sdkInitialized = Boolean.valueOf(true);
-                    Utility.loadAppSettingsAsync(applicationContext, applicationId);
+                    FetchedAppSettingsManager.loadAppSettingsAsync();
                     NativeProtocol.updateAllAvailableProtocolVersionsAsync();
                     BoltsMeasurementEventListener.getInstance(applicationContext);
-                    cacheDir = new LockOnGetVariable(new C03502());
+                    cacheDir = new LockOnGetVariable<>((Callable<T>) new Callable<File>() {
+                        public File call() throws Exception {
+                            return FacebookSdk.applicationContext.getCacheDir();
+                        }
+                    });
                     getExecutor().execute(new FutureTask(new Callable<Void>() {
                         public Void call() throws Exception {
                             AccessTokenManager.getInstance().loadCurrentAccessToken();
                             ProfileManager.getInstance().loadCurrentProfile();
-                            if (AccessToken.getCurrentAccessToken() != null && Profile.getCurrentProfile() == null) {
+                            if (AccessToken.isCurrentAccessTokenActive() && Profile.getCurrentProfile() == null) {
                                 Profile.fetchProfileForCurrentAccessToken();
                             }
                             if (initializeCallback != null) {
                                 initializeCallback.onInitialized();
                             }
+                            AppEventsLogger.initializeLib(FacebookSdk.applicationContext, FacebookSdk.applicationId);
                             AppEventsLogger.newLogger(context.getApplicationContext()).flush();
                             return null;
                         }
@@ -492,10 +467,14 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Exception block dominato
                 } else if (initializeCallback != null) {
                     initializeCallback.onInitialized();
                 }
-            } catch (Throwable th) {
-                Class cls = FacebookSdk.class;
+            } finally {
+                Class<FacebookSdk> cls = FacebookSdk.class;
             }
         }
+    }
+
+    public static void setAdvertiserIDCollectionEnabled(boolean z) {
+        advertiserIDCollectionEnabled = Boolean.valueOf(z);
     }
 
     public static void setApplicationId(String str) {
@@ -506,24 +485,39 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Exception block dominato
         applicationName = str;
     }
 
+    public static void setAutoLogAppEventsEnabled(boolean z) {
+        autoLogAppEventsEnabled = Boolean.valueOf(z);
+    }
+
     public static void setCacheDir(File file) {
-        cacheDir = new LockOnGetVariable((Object) file);
+        cacheDir = new LockOnGetVariable<>(file);
     }
 
     public static void setClientToken(String str) {
         appClientToken = str;
     }
 
-    public static void setExecutor(Executor executor) {
-        Validate.notNull(executor, "executor");
+    public static void setCodelessDebugLogEnabled(boolean z) {
+        codelessDebugLogEnabled = Boolean.valueOf(z);
+    }
+
+    public static void setExecutor(Executor executor2) {
+        Validate.notNull(executor2, "executor");
         synchronized (LOCK) {
-            executor = executor;
+            executor = executor2;
         }
     }
 
     public static void setFacebookDomain(String str) {
         Log.w(TAG, "WARNING: Calling setFacebookDomain from non-DEBUG code.");
         facebookDomain = str;
+    }
+
+    public static void setGraphApiVersion(String str) {
+        Log.w(TAG, "WARNING: Calling setGraphApiVersion from non-DEBUG code.");
+        if (!Utility.isNullOrEmpty(str) && !graphApiVersion.equals(str)) {
+            graphApiVersion = str;
+        }
     }
 
     public static void setIsDebugEnabled(boolean z) {
@@ -540,13 +534,6 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Exception block dominato
 
     public static void setOnProgressThreshold(long j) {
         onProgressThreshold.set(j);
-    }
-
-    public static void setWebDialogTheme(int i) {
-        if (i == 0) {
-            i = WebDialog.DEFAULT_THEME;
-        }
-        webDialogTheme = i;
     }
 
     private static void updateGraphDebugBehavior() {

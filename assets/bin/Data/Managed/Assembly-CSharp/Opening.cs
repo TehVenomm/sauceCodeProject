@@ -126,30 +126,29 @@ public class Opening : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialzie());
 	}
 
 	private IEnumerator DoInitialzie()
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loadedCutSceneObj = loadQueue.Load(RESOURCE_CATEGORY.CUTSCENE, "Opening", false);
-		LoadObject loadedTitleObj = loadQueue.Load(RESOURCE_CATEGORY.CUTSCENE, "Title", false);
+		LoadObject loadedCutSceneObj = loadQueue.Load(RESOURCE_CATEGORY.CUTSCENE, "Opening");
+		LoadObject loadedTitleObj = loadQueue.Load(RESOURCE_CATEGORY.CUTSCENE, "Title");
 		int[] se_ids = (int[])Enum.GetValues(typeof(AUDIO));
 		int[] array = se_ids;
-		foreach (int id in array)
+		foreach (int se_id in array)
 		{
-			loadQueue.CacheSE(id, null);
+			loadQueue.CacheSE(se_id);
 		}
 		int[] voices = (int[])Enum.GetValues(typeof(VOICE));
 		int[] array2 = voices;
-		foreach (int id2 in array2)
+		foreach (int voice_id in array2)
 		{
-			loadQueue.CacheVoice(id2, null);
+			loadQueue.CacheVoice(voice_id);
 		}
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		if (MonoBehaviourSingleton<AppMain>.I.mainCamera != null)
 		{
@@ -159,48 +158,52 @@ public class Opening : GameSection
 		cutSceneObjectRoot.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I.get_transform());
 		titleObjectRoot = (ResourceUtility.Instantiate<Object>(loadedTitleObj.loadedObject) as GameObject);
 		titleObjectRoot.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I.get_transform());
-		Transform eventObj = cutSceneObjectRoot.get_transform().FindChild("CUT_op");
+		Transform eventObj = cutSceneObjectRoot.get_transform().Find("CUT_op");
 		if (eventObj != null)
 		{
 			cutOP = eventObj.get_gameObject();
 			cutSceneAnimation = cutOP.GetComponent<Animation>();
 			cutOP.SetActive(false);
+			if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyOpening)
+			{
+				cutOP.get_transform().set_localScale(SpecialDeviceManager.SpecialDeviceInfo.OpeningCutScale);
+			}
 		}
-		Transform fade = cutSceneObjectRoot.get_transform().FindChild("Main Camera/Plane");
+		Transform fade = cutSceneObjectRoot.get_transform().Find("Main Camera/Plane");
 		if (fade != null)
 		{
-			MeshRenderer renderer = fade.GetComponent<MeshRenderer>();
-			whiteFadeMaterial = renderer.get_material();
+			MeshRenderer component = fade.GetComponent<MeshRenderer>();
+			whiteFadeMaterial = component.get_material();
 		}
 		titleAnimation = titleObjectRoot.GetComponent<Animation>();
 		cutSceneAnimation.Stop();
-		MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(10000100u);
-		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_start_screen, "Tutorial");
+		MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(10000101u);
 		MonoBehaviourSingleton<UIManager>.I.loading.HideAllPermissionMsg();
 		base.Initialize();
 		PredownloadManager.openingMode = true;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<PredownloadManager>();
 		MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
-		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_TUTORIAL, true);
+		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_TUTORIAL, is_stop: true);
 		DataTableManager dataTableManager = MonoBehaviourSingleton<DataTableManager>.I;
+		bool updatedTableIndex = false;
 		Protocol.Send<CheckRegisterModel>(CheckRegisterModel.URL, delegate
 		{
-			((_003CDoInitialzie_003Ec__IteratorEC)/*Error near IL_0399: stateMachine*/)._003CupdatedTableIndex_003E__15 = true;
+			updatedTableIndex = true;
 		}, string.Empty);
-		yield return (object)new WaitUntil((Func<bool>)(() => ((_003CDoInitialzie_003Ec__IteratorEC)/*Error near IL_03b0: stateMachine*/)._003CupdatedTableIndex_003E__15));
+		yield return (object)new WaitUntil((Func<bool>)(() => updatedTableIndex));
 		isDownloading = true;
 		dataTableManager.InitializeForDownload();
 		dataTableManager.UpdateManifest(delegate
 		{
-			((_003CDoInitialzie_003Ec__IteratorEC)/*Error near IL_03ef: stateMachine*/)._003CdataTableManager_003E__14.LoadInitialTable(delegate
+			dataTableManager.LoadInitialTable(delegate
 			{
-				List<DataLoadRequest> loadings = ((_003CDoInitialzie_003Ec__IteratorEC)/*Error near IL_03ef: stateMachine*/)._003CdataTableManager_003E__14.LoadAllTable(delegate
+				List<DataLoadRequest> loadings = dataTableManager.LoadAllTable(delegate
 				{
-					PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_TUTORIAL, false);
-					((_003CDoInitialzie_003Ec__IteratorEC)/*Error near IL_03ef: stateMachine*/)._003C_003Ef__this.isDownloading = false;
-				}, true);
+					PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_TUTORIAL, is_stop: false);
+					isDownloading = false;
+				}, downloadOnly: true);
 				MonoBehaviourSingleton<UIManager>.I.loading.SetProgress(new FirstOpeningProgress(loadings));
-			}, true);
+			}, downloadOnly: true);
 		});
 		TitleTop.isFirstBoot = false;
 	}
@@ -210,14 +213,14 @@ public class Opening : GameSection
 		base.StartSection();
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook)
 		{
-			DispatchEvent("START", null);
+			DispatchEvent("START");
 		}
 	}
 
 	protected override void OnClose()
 	{
-		SoundManager.StopVoice(0u, 2);
-		SoundManager.StopSEAll(0);
+		SoundManager.StopVoice();
+		SoundManager.StopSEAll();
 		if (cutSceneObjectRoot != null)
 		{
 			Object.Destroy(cutSceneObjectRoot);
@@ -242,50 +245,53 @@ public class Opening : GameSection
 
 	private void Update()
 	{
-		if (!endCutScene)
+		if (endCutScene)
 		{
-			if (MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible)
+			return;
+		}
+		if (MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible)
+		{
+			downloadGaugeDisplayTimer -= Time.get_deltaTime();
+			if (downloadGaugeDisplayTimer <= 0f)
 			{
-				downloadGaugeDisplayTimer -= Time.get_deltaTime();
-				if (downloadGaugeDisplayTimer <= 0f)
-				{
-					downloadGaugeDisplayTimer = 0f;
-					MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
-				}
+				downloadGaugeDisplayTimer = 0f;
+				MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
 			}
-			if (isAnimationStarted)
+		}
+		if (!isAnimationStarted)
+		{
+			return;
+		}
+		GameSceneManager i = MonoBehaviourSingleton<GameSceneManager>.I;
+		if (i.isChangeing || !isRegisted)
+		{
+			return;
+		}
+		bool flag = i.GetCurrentSectionName() == "Opening";
+		if (cutSceneAnimation == null)
+		{
+			if (i.IsEventExecutionPossible() && flag)
 			{
-				GameSceneManager i = MonoBehaviourSingleton<GameSceneManager>.I;
-				if (!i.isChangeing && isRegisted)
-				{
-					bool flag = i.GetCurrentSectionName() == "Opening";
-					if (cutSceneAnimation == null)
-					{
-						if (i.IsEventExecutionPossible() && flag)
-						{
-							GoEventTutorial();
-						}
-					}
-					else if (!cutSceneAnimation.get_isPlaying())
-					{
-						if (i.IsEventExecutionPossible() && flag)
-						{
-							GoEventTutorial();
-						}
-					}
-					else if (MonoBehaviourSingleton<InputManager>.I.IsTouch() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() == this)
-					{
-						if (MonoBehaviourSingleton<PredownloadManager>.IsValid() && !MonoBehaviourSingleton<PredownloadManager>.I.isLoadingInOpening)
-						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Title", "OpeningSkipConfirm", UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-						}
-						else if (!MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible)
-						{
-							MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = true;
-							downloadGaugeDisplayTimer = 1f;
-						}
-					}
-				}
+				GoEventTutorial();
+			}
+		}
+		else if (!cutSceneAnimation.get_isPlaying())
+		{
+			if (i.IsEventExecutionPossible() && flag)
+			{
+				GoEventTutorial();
+			}
+		}
+		else if (MonoBehaviourSingleton<InputManager>.I.IsTouch() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() == this)
+		{
+			if (MonoBehaviourSingleton<PredownloadManager>.IsValid() && !MonoBehaviourSingleton<PredownloadManager>.I.isLoadingInOpening)
+			{
+				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Title", "OpeningSkipConfirm");
+			}
+			else if (!MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible)
+			{
+				MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = true;
+				downloadGaugeDisplayTimer = 1f;
 			}
 		}
 	}
@@ -297,14 +303,13 @@ public class Opening : GameSection
 		endCutScene = true;
 		Fade(Color.get_black(), 0f, 1f, 1f, delegate
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			if (MonoBehaviourSingleton<PredownloadManager>.I.isLoadingInOpening || isDownloading)
 			{
 				this.StartCoroutine("WaitForDownload");
 			}
 			else
 			{
-				DispatchEvent("ENTER_TUTORIAL", null);
+				DispatchEvent("ENTER_TUTORIAL");
 				ResourceManager.internalMode = false;
 				MonoBehaviourSingleton<UIManager>.I.ShowGGTutorialMessage();
 			}
@@ -316,15 +321,20 @@ public class Opening : GameSection
 		MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = true;
 		while (MonoBehaviourSingleton<PredownloadManager>.I.isLoadingInOpening || isDownloading)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		ResourceManager.internalMode = false;
-		DispatchEvent("ENTER_TUTORIAL", null);
+		DispatchEvent("ENTER_TUTORIAL");
 		MonoBehaviourSingleton<UIManager>.I.ShowGGTutorialMessage();
 	}
 
 	private void OnQuery_START()
 	{
+		if (MonoBehaviourSingleton<AccountManager>.I.usageLimitMode)
+		{
+			GameSection.ChangeEvent("SERVICE_LIMIT");
+			return;
+		}
 		isRegisted = MonoBehaviourSingleton<AccountManager>.I.account.IsRegist();
 		if (!isRegisted)
 		{
@@ -344,7 +354,7 @@ public class Opening : GameSection
 					MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_login, "Tutorial", values);
 				}
 				isRegisted = is_success;
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 		else
@@ -371,7 +381,7 @@ public class Opening : GameSection
 				}
 				else
 				{
-					GameSection.ResumeEvent(success, null);
+					GameSection.ResumeEvent(success);
 				}
 			});
 		}
@@ -402,24 +412,22 @@ public class Opening : GameSection
 					MonoBehaviourSingleton<NativeGameService>.I.SetOldUserLogin();
 				}
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 		});
 	}
 
 	private void StartOpening()
 	{
 		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.LBL_APP_VERSION, false);
-		SetActive((Enum)UI.BTN_START, false);
-		SetActive((Enum)UI.BTN_ADVANCED_LOGIN, false);
-		SetActive((Enum)UI.BTN_CLEARCACHE, false);
-		SetActive((Enum)UI.BTN_FB_LOGIN, false);
-		MonoBehaviourSingleton<SoundManager>.I.TransitionTo("Opening", 1f);
+		SetActive((Enum)UI.LBL_APP_VERSION, is_visible: false);
+		SetActive((Enum)UI.BTN_START, is_visible: false);
+		SetActive((Enum)UI.BTN_ADVANCED_LOGIN, is_visible: false);
+		SetActive((Enum)UI.BTN_CLEARCACHE, is_visible: false);
+		SetActive((Enum)UI.BTN_FB_LOGIN, is_visible: false);
+		MonoBehaviourSingleton<SoundManager>.I.TransitionTo("Opening");
 		titleAnimation.Play("Tap");
 		Fade(Color.get_white(), 0f, 1f, 1f, delegate
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			titleObjectRoot.SetActive(false);
 			cutOP.SetActive(true);
@@ -442,7 +450,7 @@ public class Opening : GameSection
 			yield return (object)new WaitForSeconds(seq.delay);
 			if (!hasSkipped)
 			{
-				SoundManager.PlayVoice(seq.id, 1f, 0u, null, null);
+				SoundManager.PlayVoice(seq.id);
 			}
 		}
 	}
@@ -463,7 +471,6 @@ public class Opening : GameSection
 	private void Fade(Color baseColor, float _from, float _to, float duration, Action onComplete)
 	{
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoFade(baseColor, _from, _to, duration, onComplete));
 	}
 
@@ -471,23 +478,21 @@ public class Opening : GameSection
 	{
 		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		float timer = 0f;
 		if (baseColor != Color.get_white())
 		{
-			whiteFadeMaterial.set_shader(Shader.Find("mobile/Custom/effect_alpha"));
+			whiteFadeMaterial.set_shader(Shader.Find("mobile/Custom/Effect/effect_alpha"));
 		}
 		else
 		{
-			whiteFadeMaterial.set_shader(Shader.Find("mobile/Custom/effect_add"));
+			whiteFadeMaterial.set_shader(Shader.Find("mobile/Custom/Effect/effect_add"));
 		}
 		while (timer < duration)
 		{
 			timer += Time.get_deltaTime();
 			float alpha = Mathf.Lerp(_from, _to, timer / duration);
 			whiteFadeMaterial.SetColor("_Color", new Color(baseColor.r, baseColor.g, baseColor.b, alpha));
-			yield return (object)null;
+			yield return null;
 		}
 		onComplete?.Invoke();
 	}
@@ -497,7 +502,7 @@ public class Opening : GameSection
 		SetApplicationVersionText(UI.LBL_APP_VERSION);
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid() && MonoBehaviourSingleton<GlobalSettingsManager>.I.submissionVersion)
 		{
-			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, false);
+			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, is_visible: false);
 		}
 		else
 		{
@@ -509,16 +514,10 @@ public class Opening : GameSection
 
 	public override void Exit()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		base.Exit();
-		if (!isCacheClear)
+		if (!isCacheClear && !MonoBehaviourSingleton<LoadingProcess>.IsValid())
 		{
-			if (!MonoBehaviourSingleton<LoadingProcess>.IsValid())
-			{
-				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
-			}
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameTutorialManager>();
+			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
 		}
 	}
 

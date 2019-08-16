@@ -4,7 +4,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Play Tween")]
-public class UIPlayTween
+public class UIPlayTween : MonoBehaviour
 {
 	public static UIPlayTween current;
 
@@ -28,12 +28,12 @@ public class UIPlayTween
 
 	public List<EventDelegate> onFinished = new List<EventDelegate>();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private GameObject eventReceiver;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string callWhenFinished;
 
 	private UITweener[] mTweens;
@@ -60,8 +60,6 @@ public class UIPlayTween
 
 	private void Start()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		mStarted = true;
 		if (tweenTarget == null)
 		{
@@ -71,10 +69,6 @@ public class UIPlayTween
 
 	private void OnEnable()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (mStarted)
 		{
 			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
@@ -110,7 +104,7 @@ public class UIPlayTween
 	{
 		if (trigger == Trigger.OnHover)
 		{
-			OnHover(true);
+			OnHover(isOver: true);
 		}
 	}
 
@@ -128,7 +122,7 @@ public class UIPlayTween
 		if (this.get_enabled() && mActivated)
 		{
 			mActivated = false;
-			Play(false);
+			Play(forward: false);
 		}
 	}
 
@@ -145,7 +139,7 @@ public class UIPlayTween
 	{
 		if (this.get_enabled() && trigger == Trigger.OnClick)
 		{
-			Play(true);
+			Play(forward: true);
 		}
 	}
 
@@ -153,7 +147,7 @@ public class UIPlayTween
 	{
 		if (this.get_enabled() && trigger == Trigger.OnDoubleClick)
 		{
-			Play(true);
+			Play(forward: true);
 		}
 	}
 
@@ -176,95 +170,92 @@ public class UIPlayTween
 
 	private void Update()
 	{
-		if (disableWhenFinished != 0 && mTweens != null)
+		if (disableWhenFinished == DisableCondition.DoNotDisable || mTweens == null)
 		{
-			bool flag = true;
-			bool flag2 = true;
-			int i = 0;
-			for (int num = mTweens.Length; i < num; i++)
+			return;
+		}
+		bool flag = true;
+		bool flag2 = true;
+		int i = 0;
+		for (int num = mTweens.Length; i < num; i++)
+		{
+			UITweener uITweener = mTweens[i];
+			if (uITweener.tweenGroup == tweenGroup)
 			{
-				UITweener uITweener = mTweens[i];
-				if (uITweener.tweenGroup == tweenGroup)
+				if (uITweener.get_enabled())
 				{
-					if (uITweener.get_enabled())
-					{
-						flag = false;
-						break;
-					}
-					if (uITweener.direction != (Direction)disableWhenFinished)
-					{
-						flag2 = false;
-					}
+					flag = false;
+					break;
+				}
+				if (uITweener.direction != (Direction)disableWhenFinished)
+				{
+					flag2 = false;
 				}
 			}
-			if (flag)
+		}
+		if (flag)
+		{
+			if (flag2)
 			{
-				if (flag2)
-				{
-					NGUITools.SetActive(tweenTarget, false);
-				}
-				mTweens = null;
+				NGUITools.SetActive(tweenTarget, state: false);
 			}
+			mTweens = null;
 		}
 	}
 
 	public void Play(bool forward)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		mActive = 0;
-		GameObject val = (!(tweenTarget == null)) ? ((object)tweenTarget) : ((object)this.get_gameObject());
+		GameObject val = (!(tweenTarget == null)) ? tweenTarget : this.get_gameObject();
 		if (!NGUITools.GetActive(val))
 		{
 			if (ifDisabledOnPlay != EnableCondition.EnableThenPlay)
 			{
 				return;
 			}
-			NGUITools.SetActive(val, true);
+			NGUITools.SetActive(val, state: true);
 		}
 		mTweens = ((!includeChildren) ? val.GetComponents<UITweener>() : val.GetComponentsInChildren<UITweener>());
 		if (mTweens.Length == 0)
 		{
 			if (disableWhenFinished != 0)
 			{
-				NGUITools.SetActive(tweenTarget, false);
+				NGUITools.SetActive(tweenTarget, state: false);
 			}
+			return;
 		}
-		else
+		bool flag = false;
+		if (playDirection == Direction.Reverse)
 		{
-			bool flag = false;
-			if (playDirection == Direction.Reverse)
+			forward = !forward;
+		}
+		int i = 0;
+		for (int num = mTweens.Length; i < num; i++)
+		{
+			UITweener uITweener = mTweens[i];
+			if (uITweener.tweenGroup != tweenGroup)
 			{
-				forward = !forward;
+				continue;
 			}
-			int i = 0;
-			for (int num = mTweens.Length; i < num; i++)
+			if (!flag && !NGUITools.GetActive(val))
 			{
-				UITweener uITweener = mTweens[i];
-				if (uITweener.tweenGroup == tweenGroup)
-				{
-					if (!flag && !NGUITools.GetActive(val))
-					{
-						flag = true;
-						NGUITools.SetActive(val, true);
-					}
-					mActive++;
-					if (playDirection == Direction.Toggle)
-					{
-						EventDelegate.Add(uITweener.onFinished, OnFinished, true);
-						uITweener.Toggle();
-					}
-					else
-					{
-						if (resetOnPlay || (resetIfDisabled && !uITweener.get_enabled()))
-						{
-							uITweener.Play(forward);
-							uITweener.ResetToBeginning();
-						}
-						EventDelegate.Add(uITweener.onFinished, OnFinished, true);
-						uITweener.Play(forward);
-					}
-				}
+				flag = true;
+				NGUITools.SetActive(val, state: true);
 			}
+			mActive++;
+			if (playDirection == Direction.Toggle)
+			{
+				EventDelegate.Add(uITweener.onFinished, OnFinished, oneShot: true);
+				uITweener.Toggle();
+				continue;
+			}
+			if (resetOnPlay || (resetIfDisabled && !uITweener.get_enabled()))
+			{
+				uITweener.Play(forward);
+				uITweener.ResetToBeginning();
+			}
+			EventDelegate.Add(uITweener.onFinished, OnFinished, oneShot: true);
+			uITweener.Play(forward);
 		}
 	}
 

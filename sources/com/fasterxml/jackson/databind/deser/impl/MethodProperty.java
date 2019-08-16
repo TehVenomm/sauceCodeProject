@@ -27,7 +27,7 @@ public final class MethodProperty extends SettableBeanProperty {
     }
 
     protected MethodProperty(MethodProperty methodProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) methodProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) methodProperty, jsonDeserializer);
         this._annotated = methodProperty._annotated;
         this._setter = methodProperty._setter;
     }
@@ -49,11 +49,14 @@ public final class MethodProperty extends SettableBeanProperty {
     }
 
     public MethodProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new MethodProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new MethodProperty(this, jsonDeserializer);
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {
-        return this._annotated == null ? null : this._annotated.getAnnotation(cls);
+        if (this._annotated == null) {
+            return null;
+        }
+        return this._annotated.getAnnotation(cls);
     }
 
     public AnnotatedMember getMember() {
@@ -70,11 +73,12 @@ public final class MethodProperty extends SettableBeanProperty {
     }
 
     public Object deserializeSetAndReturn(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
+        Object deserialize = deserialize(jsonParser, deserializationContext);
         try {
-            Object invoke = this._setter.invoke(obj, new Object[]{deserialize(jsonParser, deserializationContext)});
+            Object invoke = this._setter.invoke(obj, new Object[]{deserialize});
             return invoke == null ? obj : invoke;
         } catch (Exception e) {
-            _throwAsIOE(jsonParser, e, r1);
+            _throwAsIOE(jsonParser, e, deserialize);
             return null;
         }
     }
@@ -97,7 +101,8 @@ public final class MethodProperty extends SettableBeanProperty {
         }
     }
 
-    Object readResolve() {
+    /* access modifiers changed from: 0000 */
+    public Object readResolve() {
         return new MethodProperty(this, this._annotated.getAnnotated());
     }
 }

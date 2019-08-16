@@ -1,26 +1,28 @@
-package android.support.v4.text;
+package android.support.p000v4.text;
 
 import android.os.Build.VERSION;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import java.util.Locale;
 
+/* renamed from: android.support.v4.text.ICUCompat */
 public final class ICUCompat {
-    private static final ICUCompatImpl IMPL;
+    private static final ICUCompatBaseImpl IMPL;
 
-    interface ICUCompatImpl {
-        String maximizeAndGetScript(Locale locale);
-    }
-
-    static class ICUCompatImplBase implements ICUCompatImpl {
-        ICUCompatImplBase() {
+    @RequiresApi(21)
+    /* renamed from: android.support.v4.text.ICUCompat$ICUCompatApi21Impl */
+    static class ICUCompatApi21Impl extends ICUCompatBaseImpl {
+        ICUCompatApi21Impl() {
         }
 
         public String maximizeAndGetScript(Locale locale) {
-            return null;
+            return ICUCompatApi21.maximizeAndGetScript(locale);
         }
     }
 
-    static class ICUCompatImplIcs implements ICUCompatImpl {
-        ICUCompatImplIcs() {
+    /* renamed from: android.support.v4.text.ICUCompat$ICUCompatBaseImpl */
+    static class ICUCompatBaseImpl {
+        ICUCompatBaseImpl() {
         }
 
         public String maximizeAndGetScript(Locale locale) {
@@ -28,29 +30,18 @@ public final class ICUCompat {
         }
     }
 
-    static class ICUCompatImplLollipop implements ICUCompatImpl {
-        ICUCompatImplLollipop() {
-        }
-
-        public String maximizeAndGetScript(Locale locale) {
-            return ICUCompatApi23.maximizeAndGetScript(locale);
-        }
-    }
-
     static {
-        int i = VERSION.SDK_INT;
-        if (i >= 21) {
-            IMPL = new ICUCompatImplLollipop();
-        } else if (i >= 14) {
-            IMPL = new ICUCompatImplIcs();
+        if (VERSION.SDK_INT >= 21) {
+            IMPL = new ICUCompatApi21Impl();
         } else {
-            IMPL = new ICUCompatImplBase();
+            IMPL = new ICUCompatBaseImpl();
         }
     }
 
     private ICUCompat() {
     }
 
+    @Nullable
     public static String maximizeAndGetScript(Locale locale) {
         return IMPL.maximizeAndGetScript(locale);
     }

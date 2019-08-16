@@ -5,7 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.text.TextUtils;
+import com.skubit.android.billing.IBillingService.Stub;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
@@ -21,27 +25,28 @@ public class SkubitAppstore extends DefaultAppstore {
     public static final String SKUBIT_INSTALLER = "com.skubit.android";
     public static final int TIMEOUT_BILLING_SUPPORTED = 2000;
     public static final String VENDING_ACTION = "com.skubit.android.billing.IBillingService.BIND";
+    /* access modifiers changed from: private */
     @Nullable
-    private volatile Boolean billingAvailable = null;
+    public volatile Boolean billingAvailable = null;
     @Nullable
     protected final Context context;
     protected final boolean isDebugMode = false;
     @Nullable
     protected AppstoreInAppBillingService mBillingService;
 
-    public SkubitAppstore(@Nullable Context context) {
-        if (context == null) {
+    public SkubitAppstore(@Nullable Context context2) {
+        if (context2 == null) {
             throw new IllegalArgumentException("context is null");
         }
-        this.context = context;
+        this.context = context2;
     }
 
-    private boolean packageExists(@NotNull Context context, String str) {
+    private boolean packageExists(@NotNull Context context2, String str) {
         try {
-            context.getPackageManager().getPackageInfo(str, 0);
+            context2.getPackageManager().getPackageInfo(str, 0);
             return true;
         } catch (NameNotFoundException e) {
-            Logger.m1001d(str, " package was not found.");
+            Logger.m1026d(str, " package was not found.");
             return false;
         }
     }
@@ -75,7 +80,7 @@ public class SkubitAppstore extends DefaultAppstore {
     }
 
     public boolean isBillingAvailable(final String str) {
-        Logger.m1001d("isBillingAvailable() packageName: ", str);
+        Logger.m1026d("isBillingAvailable() packageName: ", str);
         if (this.billingAvailable != null) {
             return this.billingAvailable.booleanValue();
         }
@@ -88,57 +93,22 @@ public class SkubitAppstore extends DefaultAppstore {
             if (packageExists(this.context, "com.skubit.android")) {
                 Intent intent = new Intent(getAction());
                 intent.setPackage(getInstaller());
-                if (!CollectionUtils.isEmpty(this.context.getPackageManager().queryIntentServices(intent, 0))) {
+                if (!CollectionUtils.isEmpty((Collection<?>) this.context.getPackageManager().queryIntentServices(intent, 0))) {
                     final CountDownLatch countDownLatch = new CountDownLatch(1);
                     if (this.context.bindService(intent, new ServiceConnection() {
-                        /* JADX WARNING: inconsistent code. */
-                        /* Code decompiled incorrectly, please refer to instructions dump. */
-                        public void onServiceConnected(android.content.ComponentName r5, android.os.IBinder r6) {
-                            /*
-                            r4 = this;
-                            r0 = com.skubit.android.billing.IBillingService.Stub.asInterface(r6);
-                            r1 = 1;
-                            r2 = r6;	 Catch:{ RemoteException -> 0x002c }
-                            r3 = "inapp";
-                            r0 = r0.isBillingSupported(r1, r2, r3);	 Catch:{ RemoteException -> 0x002c }
-                            if (r0 != 0) goto L_0x0026;
-                        L_0x000f:
-                            r0 = org.onepf.oms.appstore.SkubitAppstore.this;	 Catch:{ RemoteException -> 0x002c }
-                            r1 = 1;
-                            r1 = java.lang.Boolean.valueOf(r1);	 Catch:{ RemoteException -> 0x002c }
-                            r0.billingAvailable = r1;	 Catch:{ RemoteException -> 0x002c }
-                        L_0x0019:
-                            r0 = r1;
-                            r0.countDown();
-                            r0 = org.onepf.oms.appstore.SkubitAppstore.this;
-                            r0 = r0.context;
-                            r0.unbindService(r4);
-                        L_0x0025:
-                            return;
-                        L_0x0026:
-                            r0 = "isBillingAvailable() Google Play billing unavaiable";
-                            org.onepf.oms.util.Logger.m1000d(r0);	 Catch:{ RemoteException -> 0x002c }
-                            goto L_0x0019;
-                        L_0x002c:
-                            r0 = move-exception;
-                            r1 = "isBillingAvailable() RemoteException while setting up in-app billing";
-                            org.onepf.oms.util.Logger.m1003e(r1, r0);	 Catch:{ all -> 0x003f }
-                            r0 = r1;
-                            r0.countDown();
-                            r0 = org.onepf.oms.appstore.SkubitAppstore.this;
-                            r0 = r0.context;
-                            r0.unbindService(r4);
-                            goto L_0x0025;
-                        L_0x003f:
-                            r0 = move-exception;
-                            r1 = r1;
-                            r1.countDown();
-                            r1 = org.onepf.oms.appstore.SkubitAppstore.this;
-                            r1 = r1.context;
-                            r1.unbindService(r4);
-                            throw r0;
-                            */
-                            throw new UnsupportedOperationException("Method not decompiled: org.onepf.oms.appstore.SkubitAppstore.1.onServiceConnected(android.content.ComponentName, android.os.IBinder):void");
+                        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                            try {
+                                if (Stub.asInterface(iBinder).isBillingSupported(1, str, "inapp") == 0) {
+                                    SkubitAppstore.this.billingAvailable = Boolean.valueOf(true);
+                                } else {
+                                    Logger.m1025d("isBillingAvailable() Google Play billing unavaiable");
+                                }
+                            } catch (RemoteException e) {
+                                Logger.m1028e("isBillingAvailable() RemoteException while setting up in-app billing", (Throwable) e);
+                            } finally {
+                                countDownLatch.countDown();
+                                SkubitAppstore.this.context.unbindService(this);
+                            }
                         }
 
                         public void onServiceDisconnected(ComponentName componentName) {
@@ -149,7 +119,7 @@ public class SkubitAppstore extends DefaultAppstore {
                         } catch (InterruptedException e) {
                         }
                     }
-                    Logger.m1002e("isBillingAvailable() billing is not supported. Initialization error.");
+                    Logger.m1027e("isBillingAvailable() billing is not supported. Initialization error.");
                 }
             }
             return this.billingAvailable.booleanValue();

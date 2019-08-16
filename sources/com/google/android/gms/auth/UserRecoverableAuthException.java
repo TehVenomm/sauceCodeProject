@@ -11,6 +11,9 @@ public class UserRecoverableAuthException extends GoogleAuthException {
     }
 
     public Intent getIntent() {
-        return this.mIntent == null ? null : new Intent(this.mIntent);
+        if (this.mIntent == null) {
+            return null;
+        }
+        return new Intent(this.mIntent);
     }
 }

@@ -10,7 +10,8 @@ public class MessagingUnityPlayerActivity extends UnityPlayerActivity {
     private static final String EXTRA_MESSAGE_ID_KEY = "google.message_id";
     private static final String EXTRA_MESSAGE_ID_KEY_SERVER = "message_id";
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         if (this.mUnityPlayer != null) {
             this.mUnityPlayer.quit();
             this.mUnityPlayer = null;
@@ -18,7 +19,8 @@ public class MessagingUnityPlayerActivity extends UnityPlayerActivity {
         super.onCreate(bundle);
     }
 
-    protected void onNewIntent(Intent intent) {
+    /* access modifiers changed from: protected */
+    public void onNewIntent(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             String string = extras.getString("google.message_id");
@@ -26,7 +28,7 @@ public class MessagingUnityPlayerActivity extends UnityPlayerActivity {
             if (string2 == null) {
                 string2 = extras.getString(EXTRA_MESSAGE_ID_KEY_SERVER);
             }
-            if (!(string == null || r0 == null)) {
+            if (!(string == null || string2 == null)) {
                 Intent intent2 = new Intent(this, MessageForwardingService.class);
                 intent2.setAction(MessageForwardingService.ACTION_REMOTE_INTENT);
                 intent2.putExtras(intent);

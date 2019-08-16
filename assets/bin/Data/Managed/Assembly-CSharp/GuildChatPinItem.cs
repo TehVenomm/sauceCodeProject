@@ -1,10 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
-public class GuildChatPinItem
+public class GuildChatPinItem : MonoBehaviour
 {
-	private const int MIN_HEIGHT = 140;
-
 	[SerializeField]
 	private UISprite m_UnPinButton;
 
@@ -25,6 +23,8 @@ public class GuildChatPinItem
 
 	[SerializeField]
 	private UITexture m_Avatar;
+
+	private const int MIN_HEIGHT = 140;
 
 	private bool canUnPinMsg;
 
@@ -48,13 +48,9 @@ public class GuildChatPinItem
 
 	public void ShowPinMsg(string userPin, string pinMsg)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
@@ -77,10 +73,7 @@ public class GuildChatPinItem
 
 	public void ShowPinStamp(string userPin, int stampId)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
@@ -101,8 +94,6 @@ public class GuildChatPinItem
 
 	private void RequestLoadStamp(int stampId)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		CancelLoadStamp();
 		m_CoroutineLoadStamp = CoroutineLoadStamp(stampId);
 		if (this.get_gameObject().get_activeInHierarchy())
@@ -114,23 +105,22 @@ public class GuildChatPinItem
 	private IEnumerator CoroutineLoadStamp(int stampId)
 	{
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId, false);
+		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId);
 		while (load_queue.IsLoading())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (lo_stamp.loadedObject != null)
 		{
-			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
+			Texture2D mainTexture = lo_stamp.loadedObject as Texture2D;
 			m_TexStamp.get_gameObject().SetActive(true);
-			m_TexStamp.mainTexture = stamp;
+			m_TexStamp.mainTexture = mainTexture;
 		}
 		m_CoroutineLoadStamp = null;
 	}
 
 	private void CancelLoadStamp()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (m_CoroutineLoadStamp != null)
 		{
 			m_CoroutineLoadStamp = null;
@@ -142,7 +132,7 @@ public class GuildChatPinItem
 	{
 		while (m_CoroutineLoadStamp != null && m_CoroutineLoadStamp.MoveNext())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 	}
 
@@ -151,7 +141,6 @@ public class GuildChatPinItem
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (checkLongPress)
 		{
 			float num = Vector2.Distance(mousePosition, Vector2.op_Implicit(Input.get_mousePosition()));
@@ -189,7 +178,6 @@ public class GuildChatPinItem
 
 	public void HideUnPinButton()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		m_UnPinButton.get_gameObject().SetActive(false);
 	}
 }

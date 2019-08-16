@@ -1,4 +1,4 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -9,8 +9,9 @@ import com.google.android.gms.nearby.messages.Strategy;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import jp.colopl.util.Util;
+import p018jp.colopl.util.Util;
 
+/* renamed from: jp.colopl.drapro.AnalyticsHelper */
 public class AnalyticsHelper {
     private static final String SETTING_KEY_INSTALL_DATE = "install";
     private static final String appid = "jp.colopl.drapro";

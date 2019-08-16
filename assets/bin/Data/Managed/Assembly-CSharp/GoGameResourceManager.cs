@@ -24,7 +24,6 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 
 	public void LoadVariantManifest()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(IELoadVariantManifest());
 	}
 
@@ -33,36 +32,38 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 		isLoadingVariantManifest = true;
 		variantManifest = null;
 		string url = string.Format("{0}{1}", MonoBehaviourSingleton<ResourceManager>.I.downloadURL, "variants_manifest.bytes");
-		Error error_code = Error.None;
-		string www_url = url;
-		WWW _www = new WWW(www_url);
-		yield return (object)_www;
-		string www_error = _www.get_error();
-		if (!string.IsNullOrEmpty(www_error))
+		Error error_code;
+		do
 		{
-			error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
-		}
-		else if (_www.get_bytes() != null)
-		{
-			variantManifest = new ObjectPacker().Unpack<Dictionary<int, string>>(_www.get_bytes());
-		}
-		else
-		{
-			error_code = Error.AssetLoadFailed;
-			Log.Error(LOG.RESOURCE, _www.get_text());
-		}
-		_www.Dispose();
-		switch (error_code)
-		{
-		default:
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.Format(STRING_CATEGORY.COMMON_DIALOG, 1001u, error_code), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u), null, null, null), delegate
+			error_code = Error.None;
+			string www_url = url;
+			WWW _www = new WWW(www_url);
+			yield return _www;
+			string www_error = _www.get_error();
+			if (!string.IsNullOrEmpty(www_error))
 			{
-				MonoBehaviourSingleton<AppMain>.I.Reset();
-			}, true, (int)error_code);
-			break;
-		case Error.None:
-			break;
+				error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+			}
+			else if (_www.get_bytes() != null)
+			{
+				variantManifest = new ObjectPacker().Unpack<Dictionary<int, string>>(_www.get_bytes());
+			}
+			else
+			{
+				error_code = Error.AssetLoadFailed;
+				Log.Error(LOG.RESOURCE, _www.get_text());
+			}
+			_www.Dispose();
+			if (error_code != 0)
+			{
+				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.Format(STRING_CATEGORY.COMMON_DIALOG, 1001u, error_code), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u)), delegate
+				{
+					MonoBehaviourSingleton<AppMain>.I.Reset();
+				}, error: true, (int)error_code);
+				break;
+			}
 		}
+		while (error_code != 0);
 		if (error_code == Error.None)
 		{
 			isLoadingVariantManifest = false;
@@ -117,7 +118,7 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 		{
 			return null;
 		}
-		return (RESOURCE_CATEGORY)(int)Enum.Parse(typeof(RESOURCE_CATEGORY), value);
+		return (RESOURCE_CATEGORY)Enum.Parse(typeof(RESOURCE_CATEGORY), value);
 	}
 
 	public string GetBundleNameWithoutVariant(string fullBundleName)

@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.view;
+package net.gogame.gowrap.p019ui.view;
 
 import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.TextView;
 
+/* renamed from: net.gogame.gowrap.ui.view.RightDrawableOnTouchListener */
 public abstract class RightDrawableOnTouchListener implements OnTouchListener {
     public static final int DEFAULT_FUZZ = 10;
     private final int fuzz;

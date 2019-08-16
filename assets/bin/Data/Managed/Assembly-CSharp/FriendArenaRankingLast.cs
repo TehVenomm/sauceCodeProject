@@ -18,9 +18,12 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 		GRD_LIST,
 		TEX_MODEL,
 		STR_NON_LIST,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		OBJ_COMMENT,
 		LBL_COMMENT,
 		LBL_LAST_LOGIN,
@@ -39,6 +42,17 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 		STR_TITLE_REFLECT,
 		OBJ_DEGREE_FRAME_ROOT,
 		SPR_ICON_FIRST_MET,
+		OBJ_SWITCH_INFO,
+		DEFAULT_STATUS_ROOT,
+		JOIN_STATUS_ROOT,
+		ONLINE_TEXT_ROOT,
+		ONLINE_TEXT,
+		DETAIL_TEXT,
+		JOIN_BUTTON_ROOT,
+		BTN_JOIN_BUTTON,
+		LBL_BUTTON_TEXT,
+		BTN_SORT,
+		LBL_SORT,
 		OBJ_STATUS,
 		LBL_TIME,
 		LBL_ARENA_NAME,
@@ -49,6 +63,7 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 		SCR_LIST,
 		BTN_OWN,
 		OBJ_OWN_ON,
+		LBL_TIME_DEFAULT,
 		LBL_END_DATE
 	}
 
@@ -124,7 +139,7 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 			GameSection.StayEvent();
 			SendGetList(nowPage, delegate(bool b)
 			{
-				GameSection.ResumeEvent(b, null);
+				GameSection.ResumeEvent(b);
 				Refresh();
 				DragToOwn();
 			});

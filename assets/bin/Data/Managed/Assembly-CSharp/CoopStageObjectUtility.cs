@@ -19,16 +19,17 @@ public static class CoopStageObjectUtility
 
 	public static void SetCoopModeForAll(StageObject.COOP_MODE_TYPE coop_mode, int client_id)
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			int i = 0;
-			for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
+			return;
+		}
+		int i = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
+		{
+			StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.objectList[i];
+			if (stageObject.coopMode != coop_mode)
 			{
-				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.objectList[i];
-				if (stageObject.coopMode != coop_mode)
-				{
-					stageObject.SetCoopMode(coop_mode, client_id);
-				}
+				stageObject.SetCoopMode(coop_mode, client_id);
 			}
 		}
 	}
@@ -41,56 +42,56 @@ public static class CoopStageObjectUtility
 		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(delegate(StageObject obj)
+			return;
+		}
+		MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(delegate(StageObject obj)
+		{
+			obj.get_gameObject().SetActive(true);
+		});
+		MonoBehaviourSingleton<StageObjectManager>.I.ClearCacheObject();
+		Vector3 val = Vector3.get_zero();
+		if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+		{
+			val = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
+		}
+		int i = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
+		{
+			StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.objectList[i];
+			if (!stageObject.IsCoopNone())
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				obj.get_gameObject().SetActive(true);
-			});
-			MonoBehaviourSingleton<StageObjectManager>.I.ClearCacheObject();
-			Vector3 val = Vector3.get_zero();
-			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
-			{
-				val = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
+				stageObject.SetCoopMode(StageObject.COOP_MODE_TYPE.NONE, 0);
 			}
-			int i = 0;
-			for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
+			stageObject.isCoopInitialized = true;
+			if (stageObject is Player)
 			{
-				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.objectList[i];
-				if (!stageObject.IsCoopNone())
+				Player player = stageObject as Player;
+				SetAI(player);
+				if (!player.isSetAppearPos)
 				{
-					stageObject.SetCoopMode(StageObject.COOP_MODE_TYPE.NONE, 0);
-				}
-				stageObject.isCoopInitialized = true;
-				if (stageObject is Player)
-				{
-					Player player = stageObject as Player;
-					SetAI(player);
-					if (!player.isSetAppearPos)
+					if (player is Self)
 					{
-						if (player is Self)
-						{
-							player.SetAppearPosOwner(val);
-						}
-						else
-						{
-							player.SetAppearPosGuest(val);
-						}
+						player.SetAppearPosOwner(val);
 					}
-					if (player.isWaitBattleStart)
+					else
 					{
-						player.ActBattleStart(false);
+						player.SetAppearPosGuest(val);
 					}
 				}
-				else if (stageObject is Enemy)
+				if (player.isWaitBattleStart)
 				{
-					Enemy enemy = stageObject as Enemy;
-					SetAI(enemy);
-					if (!enemy.isSetAppearPos)
-					{
-						enemy.SetAppearPosEnemy();
-					}
+					player.ActBattleStart();
+				}
+			}
+			else if (stageObject is Enemy)
+			{
+				Enemy enemy = stageObject as Enemy;
+				SetAI(enemy);
+				if (!enemy.isSetAppearPos)
+				{
+					enemy.SetAppearPosEnemy();
 				}
 			}
 		}
@@ -104,20 +105,18 @@ public static class CoopStageObjectUtility
 			if (!CanControll(obj))
 			{
 				Log.Error(LOG.COOP, "TransfarOwner. field block obj({0}) to original", obj);
+				return;
 			}
-			else
+			obj.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
+			Character character = obj as Character;
+			if (character != null)
 			{
-				obj.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
-				Character character = obj as Character;
-				if (character != null)
+				SetAI(character);
+				if (!character.isSetAppearPos)
 				{
-					SetAI(character);
-					if (!character.isSetAppearPos)
-					{
-						character.SetAppearPos(character._position);
-					}
-					character.characterSender.SendInitialize(0);
+					character.SetAppearPos(character._position);
 				}
+				character.characterSender.SendInitialize();
 			}
 		}
 		else
@@ -143,35 +142,35 @@ public static class CoopStageObjectUtility
 
 	public static void TransfarOwnerForClientObjects(int client_id, int owner_client_id)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			if (!FieldManager.IsValidInGameNoQuest())
+			return;
+		}
+		if (!FieldManager.IsValidInGameNoQuest())
+		{
+			int num = 0;
+			while (num < MonoBehaviourSingleton<StageObjectManager>.I.cacheList.Count)
 			{
-				int num = 0;
-				while (num < MonoBehaviourSingleton<StageObjectManager>.I.cacheList.Count)
+				Player player = MonoBehaviourSingleton<StageObjectManager>.I.cacheList[num] as Player;
+				if (player != null)
 				{
-					Player player = MonoBehaviourSingleton<StageObjectManager>.I.cacheList[num] as Player;
-					if (player != null)
-					{
-						player.get_gameObject().SetActive(true);
-						MonoBehaviourSingleton<StageObjectManager>.I.cacheList.RemoveAt(num);
-					}
-					else
-					{
-						num++;
-					}
+					player.get_gameObject().SetActive(true);
+					MonoBehaviourSingleton<StageObjectManager>.I.cacheList.RemoveAt(num);
+				}
+				else
+				{
+					num++;
 				}
 			}
-			bool flag = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == client_id;
-			int i = 0;
-			for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
+		}
+		bool flag = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == client_id;
+		int i = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
+		{
+			StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.objectList[i];
+			if ((stageObject.coopClientId == client_id || (stageObject.coopClientId == 0 && flag)) && (!FieldManager.IsValidInGame() || !(stageObject is Enemy)) && (!FieldManager.IsValidInGameNoQuest() || !(stageObject is Player)))
 			{
-				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.objectList[i];
-				if ((stageObject.coopClientId == client_id || (stageObject.coopClientId == 0 && flag)) && (!FieldManager.IsValidInGame() || !(stageObject is Enemy)) && (!FieldManager.IsValidInGameNoQuest() || !(stageObject is Player)))
-				{
-					TransfarOwner(stageObject, owner_client_id);
-				}
+				TransfarOwner(stageObject, owner_client_id);
 			}
 		}
 	}
@@ -198,7 +197,11 @@ public static class CoopStageObjectUtility
 		{
 			return false;
 		}
-		if (MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex != 0)
+		if (QuestManager.IsValidTrial())
+		{
+			return false;
+		}
+		if (QuestManager.IsValidInGameSeriesArena())
 		{
 			return false;
 		}
@@ -221,9 +224,14 @@ public static class CoopStageObjectUtility
 		{
 			client_num = 1;
 		}
-		int num = nonplayer_max - Mathf.Max(player_num, client_num);
+		int num = nonplayer_max;
+		if (QuestManager.IsValidInGame())
+		{
+			num = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestMaxTeamMemberNum();
+		}
+		int num2 = num - Mathf.Max(player_num, client_num);
 		bool result = false;
-		for (int i = 0; i < num; i++)
+		for (int i = 0; i < num2; i++)
 		{
 			int id = MonoBehaviourSingleton<CoopManager>.I.CreateUniqueNonPlayerID();
 			MonoBehaviourSingleton<StageObjectManager>.I.CreateNonPlayer(id, delegate(object o)
@@ -231,11 +239,11 @@ public static class CoopStageObjectUtility
 				NonPlayer nonPlayer = o as NonPlayer;
 				if (MonoBehaviourSingleton<CoopManager>.I.coopRoom.IsBattle())
 				{
-					nonPlayer.ActBattleStart(false);
+					nonPlayer.ActBattleStart();
 				}
 				else if (nonPlayer.controller != null)
 				{
-					nonPlayer.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_START);
+					nonPlayer.controller.SetEnableControll(enable: false, ControllerBase.DISABLE_FLAG.BATTLE_START);
 				}
 			});
 			result = true;
@@ -245,42 +253,48 @@ public static class CoopStageObjectUtility
 
 	public static void ShrinkOriginalNonPlayer(int player_max)
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			int player_num = 0;
-			MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject o)
+			return;
+		}
+		int num = player_max;
+		if (QuestManager.IsValidInGame())
+		{
+			num = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestMaxTeamMemberNum();
+		}
+		int player_num = 0;
+		MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject o)
+		{
+			if (!o.isDestroyWaitFlag)
 			{
-				if (!o.isDestroyWaitFlag)
-				{
-					player_num++;
-				}
-			});
-			MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(delegate(StageObject o)
+				player_num++;
+			}
+		});
+		MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(delegate(StageObject o)
+		{
+			if (o is Player && !o.isDestroyWaitFlag)
 			{
-				if (o is Player && !o.isDestroyWaitFlag)
-				{
-					player_num++;
-				}
-			});
-			int num = player_num - player_max;
-			if (num > 0)
+				player_num++;
+			}
+		});
+		int num2 = player_num - num;
+		if (num2 > 0)
+		{
+			List<StageObject> destroyList = new List<StageObject>();
+			Action<StageObject> action = delegate(StageObject o)
 			{
-				List<StageObject> destroyList = new List<StageObject>();
-				Action<StageObject> action = delegate(StageObject o)
+				if (o is NonPlayer && !o.isDestroyWaitFlag && (o.IsCoopNone() || o.IsOriginal()))
 				{
-					if (o is NonPlayer && !o.isDestroyWaitFlag && (o.IsCoopNone() || o.IsOriginal()))
-					{
-						destroyList.Add(o);
-					}
-				};
-				MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(action);
-				MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList.ForEach(action);
-				int num2 = Math.Min(num, destroyList.Count);
-				for (int i = 0; i < num2; i++)
-				{
-					StageObject stageObject = destroyList[i];
-					stageObject.DestroyObject();
+					destroyList.Add(o);
 				}
+			};
+			MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(action);
+			MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList.ForEach(action);
+			int num3 = Math.Min(num2, destroyList.Count);
+			for (int i = 0; i < num3; i++)
+			{
+				StageObject stageObject = destroyList[i];
+				stageObject.DestroyObject();
 			}
 		}
 	}

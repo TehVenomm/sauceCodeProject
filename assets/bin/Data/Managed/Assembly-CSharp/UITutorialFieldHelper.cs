@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UITutorialFieldHelper
+public class UITutorialFieldHelper : MonoBehaviour
 {
 	public enum MessageState
 	{
@@ -87,16 +87,13 @@ public class UITutorialFieldHelper
 
 	private void UpdateMessage()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_State)
 		{
 		case MessageState.CollectItemImg:
 		case MessageState.CollectItem:
 			if (UIInGameFieldMenu.IsValid())
 			{
-				UIInGameFieldMenu.I.SetDisableButtons(true);
+				UIInGameFieldMenu.I.SetDisableButtons(disable: true);
 				UIInGameFieldMenu.I.get_gameObject().SetActive(false);
 			}
 			break;
@@ -104,9 +101,9 @@ public class UITutorialFieldHelper
 			if (UIInGameFieldMenu.IsValid())
 			{
 				tweenEndCtrl.get_gameObject().SetActive(true);
-				UIInGameFieldMenu.I.SetDisableButtons(true);
+				UIInGameFieldMenu.I.SetDisableButtons(disable: true);
 				UIInGameFieldMenu.I.get_gameObject().SetActive(true);
-				UIInGameFieldMenu.I.SetEnableButton("BTN_REQUEST", true);
+				UIInGameFieldMenu.I.SetEnableButton("BTN_REQUEST", is_enable: true);
 			}
 			break;
 		}
@@ -116,13 +113,11 @@ public class UITutorialFieldHelper
 	{
 		tweenStratCtrl.Reset();
 		tweenEndCtrl.Reset();
-		tweenStratCtrl.Play(true, delegate
+		tweenStratCtrl.Play(forward: true, delegate
 		{
 			SetState(MessageState.CollectItemImg);
-			tweenEndCtrl.Play(true, delegate
+			tweenEndCtrl.Play(forward: true, delegate
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				tweenStratCtrl.get_gameObject().SetActive(false);
 				tweenEndCtrl.get_gameObject().SetActive(false);
 			});
@@ -130,7 +125,7 @@ public class UITutorialFieldHelper
 		skilBtn.onClick.Clear();
 		skilBtn.onClick.Add(new EventDelegate(delegate
 		{
-			tweenStratCtrl.Skip(true);
+			tweenStratCtrl.Skip();
 		}));
 	}
 

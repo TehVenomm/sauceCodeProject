@@ -34,7 +34,8 @@ public abstract class AnnotatedWithParams extends AnnotatedMember {
         annotationMap.add(annotation);
     }
 
-    protected AnnotatedParameter replaceParameterAnnotations(int i, AnnotationMap annotationMap) {
+    /* access modifiers changed from: protected */
+    public AnnotatedParameter replaceParameterAnnotations(int i, AnnotationMap annotationMap) {
         this._paramAnnotations[i] = annotationMap;
         return getParameter(i);
     }

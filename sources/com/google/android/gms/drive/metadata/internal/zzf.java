@@ -2,102 +2,102 @@ package com.google.android.gms.drive.metadata.internal;
 
 import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.drive.metadata.MetadataField;
-import com.google.android.gms.internal.zzbnr;
-import com.google.android.gms.internal.zzboc;
-import com.google.android.gms.internal.zzboe;
-import com.google.android.gms.internal.zzbom;
+import com.google.android.gms.internal.drive.zzhp;
+import com.google.android.gms.internal.drive.zzia;
+import com.google.android.gms.internal.drive.zzic;
+import com.google.android.gms.internal.drive.zzik;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class zzf {
-    private static final Map<String, MetadataField<?>> zzgkn = new HashMap();
-    private static final Map<String, zzg> zzgko = new HashMap();
+    private static final Map<String, MetadataField<?>> zzip = new HashMap();
+    private static final Map<String, zzg> zziq = new HashMap();
 
     static {
-        zzb(zzbnr.zzgkt);
-        zzb(zzbnr.zzglz);
-        zzb(zzbnr.zzglq);
-        zzb(zzbnr.zzglx);
-        zzb(zzbnr.zzgma);
-        zzb(zzbnr.zzglg);
-        zzb(zzbnr.zzglf);
-        zzb(zzbnr.zzglh);
-        zzb(zzbnr.zzgli);
-        zzb(zzbnr.zzglj);
-        zzb(zzbnr.zzgld);
-        zzb(zzbnr.zzgll);
-        zzb(zzbnr.zzglm);
-        zzb(zzbnr.zzgln);
-        zzb(zzbnr.zzglv);
-        zzb(zzbnr.zzgku);
-        zzb(zzbnr.zzgls);
-        zzb(zzbnr.zzgkw);
-        zzb(zzbnr.zzgle);
-        zzb(zzbnr.zzgkx);
-        zzb(zzbnr.zzgky);
-        zzb(zzbnr.zzgkz);
-        zzb(zzbnr.zzgla);
-        zzb(zzbnr.zzglp);
-        zzb(zzbnr.zzglk);
-        zzb(zzbnr.zzglr);
-        zzb(zzbnr.zzglt);
-        zzb(zzbnr.zzglu);
-        zzb(zzbnr.zzglw);
-        zzb(zzbnr.zzgmb);
-        zzb(zzbnr.zzgmc);
-        zzb(zzbnr.zzglc);
-        zzb(zzbnr.zzglb);
-        zzb(zzbnr.zzgly);
-        zzb(zzbnr.zzglo);
-        zzb(zzbnr.zzgkv);
-        zzb(zzbnr.zzgmd);
-        zzb(zzbnr.zzgme);
-        zzb(zzbnr.zzgmf);
-        zzb(zzbnr.zzgmg);
-        zzb(zzbnr.zzgmh);
-        zzb(zzbnr.zzgmi);
-        zzb(zzbnr.zzgmj);
-        zzb(zzboe.zzgml);
-        zzb(zzboe.zzgmn);
-        zzb(zzboe.zzgmo);
-        zzb(zzboe.zzgmp);
-        zzb(zzboe.zzgmm);
-        zzb(zzboe.zzgmq);
-        zzb(zzbom.zzgms);
-        zzb(zzbom.zzgmt);
-        zza(zzo.zzgks);
-        zza(zzboc.zzgmk);
+        zzb(zzhp.zziv);
+        zzb(zzhp.zzkb);
+        zzb(zzhp.zzjs);
+        zzb(zzhp.zzjz);
+        zzb(zzhp.zzkc);
+        zzb(zzhp.zzji);
+        zzb(zzhp.zzjh);
+        zzb(zzhp.zzjj);
+        zzb(zzhp.zzjk);
+        zzb(zzhp.zzjl);
+        zzb(zzhp.zzjf);
+        zzb(zzhp.zzjn);
+        zzb(zzhp.zzjo);
+        zzb(zzhp.zzjp);
+        zzb(zzhp.zzjx);
+        zzb(zzhp.zziw);
+        zzb(zzhp.zzju);
+        zzb(zzhp.zziy);
+        zzb(zzhp.zzjg);
+        zzb(zzhp.zziz);
+        zzb(zzhp.zzja);
+        zzb(zzhp.zzjb);
+        zzb(zzhp.zzjc);
+        zzb(zzhp.zzjr);
+        zzb(zzhp.zzjm);
+        zzb(zzhp.zzjt);
+        zzb(zzhp.zzjv);
+        zzb(zzhp.zzjw);
+        zzb(zzhp.zzjy);
+        zzb(zzhp.zzkd);
+        zzb(zzhp.zzke);
+        zzb(zzhp.zzje);
+        zzb(zzhp.zzjd);
+        zzb(zzhp.zzka);
+        zzb(zzhp.zzjq);
+        zzb(zzhp.zzix);
+        zzb(zzhp.zzkf);
+        zzb(zzhp.zzkg);
+        zzb(zzhp.zzkh);
+        zzb(zzhp.zzki);
+        zzb(zzhp.zzkj);
+        zzb(zzhp.zzkk);
+        zzb(zzhp.zzkl);
+        zzb(zzic.zzkn);
+        zzb(zzic.zzkp);
+        zzb(zzic.zzkq);
+        zzb(zzic.zzkr);
+        zzb(zzic.zzko);
+        zzb(zzic.zzks);
+        zzb(zzik.zzku);
+        zzb(zzik.zzkv);
+        zza(zzo.zziu);
+        zza(zzia.zzkm);
+    }
+
+    public static void zza(DataHolder dataHolder) {
+        for (zzg zzb : zziq.values()) {
+            zzb.zzb(dataHolder);
+        }
     }
 
     private static void zza(zzg zzg) {
-        if (zzgko.put(zzg.zzans(), zzg) != null) {
-            String zzans = zzg.zzans();
-            throw new IllegalStateException(new StringBuilder(String.valueOf(zzans).length() + 46).append("A cleaner for key ").append(zzans).append(" has already been registered").toString());
+        if (zziq.put(zzg.zzav(), zzg) != null) {
+            String zzav = zzg.zzav();
+            throw new IllegalStateException(new StringBuilder(String.valueOf(zzav).length() + 46).append("A cleaner for key ").append(zzav).append(" has already been registered").toString());
         }
     }
 
-    public static Collection<MetadataField<?>> zzanr() {
-        return Collections.unmodifiableCollection(zzgkn.values());
-    }
-
-    public static void zzb(DataHolder dataHolder) {
-        for (zzg zzc : zzgko.values()) {
-            zzc.zzc(dataHolder);
-        }
+    public static Collection<MetadataField<?>> zzau() {
+        return Collections.unmodifiableCollection(zzip.values());
     }
 
     private static void zzb(MetadataField<?> metadataField) {
-        if (zzgkn.containsKey(metadataField.getName())) {
+        if (zzip.containsKey(metadataField.getName())) {
             String valueOf = String.valueOf(metadataField.getName());
             throw new IllegalArgumentException(valueOf.length() != 0 ? "Duplicate field name registered: ".concat(valueOf) : new String("Duplicate field name registered: "));
         } else {
-            zzgkn.put(metadataField.getName(), metadataField);
+            zzip.put(metadataField.getName(), metadataField);
         }
     }
 
-    public static MetadataField<?> zzgr(String str) {
-        return (MetadataField) zzgkn.get(str);
+    public static MetadataField<?> zzd(String str) {
+        return (MetadataField) zzip.get(str);
     }
 }

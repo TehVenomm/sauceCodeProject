@@ -1,4 +1,6 @@
-public class StageObjectProxy
+using UnityEngine;
+
+public class StageObjectProxy : MonoBehaviour
 {
 	public StageObject stageObject;
 

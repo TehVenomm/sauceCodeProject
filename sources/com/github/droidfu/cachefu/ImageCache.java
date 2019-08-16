@@ -27,7 +27,8 @@ public class ImageCache extends AbstractCache<String, byte[]> {
         return CacheHelper.getFileNameFromUrl(str);
     }
 
-    protected byte[] readValueFromDisk(File file) throws IOException {
+    /* access modifiers changed from: protected */
+    public byte[] readValueFromDisk(File file) throws IOException {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
         long length = file.length();
         if (length > 2147483647L) {
@@ -40,7 +41,8 @@ public class ImageCache extends AbstractCache<String, byte[]> {
         return bArr;
     }
 
-    protected void writeValueToDisk(File file, byte[] bArr) throws IOException {
+    /* access modifiers changed from: protected */
+    public void writeValueToDisk(File file, byte[] bArr) throws IOException {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
         bufferedOutputStream.write(bArr);
         bufferedOutputStream.close();

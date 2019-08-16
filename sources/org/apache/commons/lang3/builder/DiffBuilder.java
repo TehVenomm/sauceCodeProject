@@ -22,8 +22,7 @@ public class DiffBuilder implements Builder<DiffResult> {
             this.left = obj;
             this.right = obj2;
             this.style = toStringStyle;
-            boolean z2 = z && (obj == obj2 || obj.equals(obj2));
-            this.objectsTriviallyEqual = z2;
+            this.objectsTriviallyEqual = z && (obj == obj2 || obj.equals(obj2));
         }
     }
 
@@ -35,7 +34,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || z == z2)) {
+        if (!this.objectsTriviallyEqual && z != z2) {
             this.diffs.add(new Diff<Boolean>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -55,7 +54,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(zArr, zArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(zArr, zArr2)) {
             this.diffs.add(new Diff<Boolean[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -75,7 +74,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || b == b2)) {
+        if (!this.objectsTriviallyEqual && b != b2) {
             this.diffs.add(new Diff<Byte>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -95,7 +94,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(bArr, bArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(bArr, bArr2)) {
             this.diffs.add(new Diff<Byte[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -115,7 +114,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || c == c2)) {
+        if (!this.objectsTriviallyEqual && c != c2) {
             this.diffs.add(new Diff<Character>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -135,7 +134,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(cArr, cArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(cArr, cArr2)) {
             this.diffs.add(new Diff<Character[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -155,7 +154,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Double.doubleToLongBits(d) == Double.doubleToLongBits(d2))) {
+        if (!this.objectsTriviallyEqual && Double.doubleToLongBits(d) != Double.doubleToLongBits(d2)) {
             final double d3 = d;
             final double d4 = d2;
             this.diffs.add(new Diff<Double>(str) {
@@ -177,7 +176,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(dArr, dArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(dArr, dArr2)) {
             this.diffs.add(new Diff<Double[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -197,7 +196,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Float.floatToIntBits(f) == Float.floatToIntBits(f2))) {
+        if (!this.objectsTriviallyEqual && Float.floatToIntBits(f) != Float.floatToIntBits(f2)) {
             this.diffs.add(new Diff<Float>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -217,7 +216,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(fArr, fArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(fArr, fArr2)) {
             this.diffs.add(new Diff<Float[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -237,7 +236,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || i == i2)) {
+        if (!this.objectsTriviallyEqual && i != i2) {
             this.diffs.add(new Diff<Integer>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -257,7 +256,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(iArr, iArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(iArr, iArr2)) {
             this.diffs.add(new Diff<Integer[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -277,7 +276,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || j == j2)) {
+        if (!this.objectsTriviallyEqual && j != j2) {
             final long j3 = j;
             final long j4 = j2;
             this.diffs.add(new Diff<Long>(str) {
@@ -299,7 +298,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(jArr, jArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(jArr, jArr2)) {
             this.diffs.add(new Diff<Long[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -319,7 +318,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || s == s2)) {
+        if (!this.objectsTriviallyEqual && s != s2) {
             this.diffs.add(new Diff<Short>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -339,7 +338,7 @@ public class DiffBuilder implements Builder<DiffResult> {
         if (str == null) {
             throw new IllegalArgumentException("Field name cannot be null");
         }
-        if (!(this.objectsTriviallyEqual || Arrays.equals(sArr, sArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(sArr, sArr2)) {
             this.diffs.add(new Diff<Short[]>(str) {
                 private static final long serialVersionUID = 1;
 
@@ -356,10 +355,10 @@ public class DiffBuilder implements Builder<DiffResult> {
     }
 
     public DiffBuilder append(String str, final Object obj, final Object obj2) {
+        Object obj3;
         if (this.objectsTriviallyEqual || obj == obj2) {
             return this;
         }
-        Object obj3;
         if (obj != null) {
             obj3 = obj;
         } else {
@@ -410,7 +409,7 @@ public class DiffBuilder implements Builder<DiffResult> {
     }
 
     public DiffBuilder append(String str, final Object[] objArr, final Object[] objArr2) {
-        if (!(this.objectsTriviallyEqual || Arrays.equals(objArr, objArr2))) {
+        if (!this.objectsTriviallyEqual && !Arrays.equals(objArr, objArr2)) {
             this.diffs.add(new Diff<Object[]>(str) {
                 private static final long serialVersionUID = 1;
 

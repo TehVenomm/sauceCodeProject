@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.cpr;
+package net.gogame.gowrap.p019ui.cpr;
 
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -13,6 +13,7 @@ import android.webkit.WebChromeClient.CustomViewCallback;
 import android.widget.FrameLayout;
 import android.widget.VideoView;
 
+/* renamed from: net.gogame.gowrap.ui.cpr.VideoEnabledWebChromeClient */
 public class VideoEnabledWebChromeClient extends WebChromeClient implements OnPreparedListener, OnCompletionListener, OnErrorListener {
     private View activityNonVideoView;
     private ViewGroup activityVideoView;
@@ -23,8 +24,12 @@ public class VideoEnabledWebChromeClient extends WebChromeClient implements OnPr
     private FrameLayout videoViewContainer;
     private VideoEnabledWebView webView;
 
+    /* renamed from: net.gogame.gowrap.ui.cpr.VideoEnabledWebChromeClient$ToggledFullscreenCallback */
     public interface ToggledFullscreenCallback {
         void toggledFullscreen(boolean z);
+    }
+
+    public VideoEnabledWebChromeClient() {
     }
 
     public VideoEnabledWebChromeClient(View view, ViewGroup viewGroup) {
@@ -55,8 +60,8 @@ public class VideoEnabledWebChromeClient extends WebChromeClient implements OnPr
         return this.isVideoFullscreen;
     }
 
-    public void setOnToggledFullscreen(ToggledFullscreenCallback toggledFullscreenCallback) {
-        this.toggledFullscreenCallback = toggledFullscreenCallback;
+    public void setOnToggledFullscreen(ToggledFullscreenCallback toggledFullscreenCallback2) {
+        this.toggledFullscreenCallback = toggledFullscreenCallback2;
     }
 
     public void onShowCustomView(View view, CustomViewCallback customViewCallback) {
@@ -92,7 +97,7 @@ public class VideoEnabledWebChromeClient extends WebChromeClient implements OnPr
             this.activityVideoView.setVisibility(4);
             this.activityVideoView.removeView(this.videoViewContainer);
             this.activityNonVideoView.setVisibility(0);
-            if (!(this.videoViewCallback == null || this.videoViewCallback.getClass().getName().contains(".chromium."))) {
+            if (this.videoViewCallback != null && !this.videoViewCallback.getClass().getName().contains(".chromium.")) {
                 this.videoViewCallback.onCustomViewHidden();
             }
             this.isVideoFullscreen = false;

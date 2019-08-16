@@ -38,7 +38,6 @@ import com.fasterxml.jackson.databind.ser.std.InetAddressSerializer;
 import com.fasterxml.jackson.databind.ser.std.InetSocketAddressSerializer;
 import com.fasterxml.jackson.databind.ser.std.IterableSerializer;
 import com.fasterxml.jackson.databind.ser.std.JsonValueSerializer;
-import com.fasterxml.jackson.databind.ser.std.MapSerializer;
 import com.fasterxml.jackson.databind.ser.std.NumberSerializer;
 import com.fasterxml.jackson.databind.ser.std.NumberSerializers;
 import com.fasterxml.jackson.databind.ser.std.ObjectArraySerializer;
@@ -85,13 +84,14 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
 
     public abstract JsonSerializer<Object> createSerializer(SerializerProvider serializerProvider, JavaType javaType) throws JsonMappingException;
 
-    protected abstract Iterable<Serializers> customSerializers();
+    /* access modifiers changed from: protected */
+    public abstract Iterable<Serializers> customSerializers();
 
     public abstract SerializerFactory withConfig(SerializerFactoryConfig serializerFactoryConfig);
 
     static {
-        HashMap hashMap = new HashMap();
-        HashMap hashMap2 = new HashMap();
+        HashMap<String, Class<? extends JsonSerializer<?>>> hashMap = new HashMap<>();
+        HashMap<String, JsonSerializer<?>> hashMap2 = new HashMap<>();
         hashMap2.put(String.class.getName(), new StringSerializer());
         ToStringSerializer toStringSerializer = ToStringSerializer.instance;
         hashMap2.put(StringBuffer.class.getName(), toStringSerializer);
@@ -167,7 +167,7 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
                     if (serializationConfig.canOverrideAccessModifiers()) {
                         ClassUtil.checkAndFixAccess(annotated, serializationConfig.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
                     }
-                    jsonSerializer = new JsonValueSerializer(annotated, stdKeySerializer);
+                    jsonSerializer = new JsonValueSerializer<>(annotated, stdKeySerializer);
                     introspectClassAnnotations = introspect;
                 } else {
                     jsonSerializer = StdKeySerializers.getFallbackKeySerializer(serializationConfig, javaType.getRawClass());
@@ -184,22 +184,23 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
     }
 
     public TypeSerializer createTypeSerializer(SerializationConfig serializationConfig, JavaType javaType) {
-        Collection collection;
+        Collection collectAndResolveSubtypesByClass;
         AnnotatedClass classInfo = serializationConfig.introspectClassAnnotations(javaType.getRawClass()).getClassInfo();
         TypeResolverBuilder findTypeResolver = serializationConfig.getAnnotationIntrospector().findTypeResolver(serializationConfig, classInfo, javaType);
         if (findTypeResolver == null) {
             findTypeResolver = serializationConfig.getDefaultTyper(javaType);
-            collection = null;
+            collectAndResolveSubtypesByClass = null;
         } else {
-            collection = serializationConfig.getSubtypeResolver().collectAndResolveSubtypesByClass(serializationConfig, classInfo);
+            collectAndResolveSubtypesByClass = serializationConfig.getSubtypeResolver().collectAndResolveSubtypesByClass(serializationConfig, classInfo);
         }
         if (findTypeResolver == null) {
             return null;
         }
-        return findTypeResolver.buildTypeSerializer(serializationConfig, javaType, collection);
+        return findTypeResolver.buildTypeSerializer(serializationConfig, javaType, collectAndResolveSubtypesByClass);
     }
 
-    protected final JsonSerializer<?> findSerializerByLookup(JavaType javaType, SerializationConfig serializationConfig, BeanDescription beanDescription, boolean z) {
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<?> findSerializerByLookup(JavaType javaType, SerializationConfig serializationConfig, BeanDescription beanDescription, boolean z) {
         String name = javaType.getRawClass().getName();
         JsonSerializer<?> jsonSerializer = (JsonSerializer) _concrete.get(name);
         if (jsonSerializer != null) {
@@ -211,16 +212,17 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         }
         try {
             return (JsonSerializer) cls.newInstance();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Failed to instantiate standard serializer (of type " + cls.getName() + "): " + e.getMessage(), e);
         }
     }
 
-    protected final JsonSerializer<?> findSerializerByAnnotations(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<?> findSerializerByAnnotations(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
         if (JsonSerializable.class.isAssignableFrom(javaType.getRawClass())) {
             return SerializableSerializer.instance;
         }
-        Annotated findJsonValueMethod = beanDescription.findJsonValueMethod();
+        AnnotatedMethod findJsonValueMethod = beanDescription.findJsonValueMethod();
         if (findJsonValueMethod == null) {
             return null;
         }
@@ -231,7 +233,8 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return new JsonValueSerializer(annotated, findSerializerFromAnnotation(serializerProvider, findJsonValueMethod));
     }
 
-    protected final JsonSerializer<?> findSerializerByPrimaryType(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<?> findSerializerByPrimaryType(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
         Class rawClass = javaType.getRawClass();
         JsonSerializer<?> findOptionalStdSerializer = findOptionalStdSerializer(serializerProvider, javaType, beanDescription, z);
         if (findOptionalStdSerializer != null) {
@@ -269,12 +272,9 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
             if (Charset.class.isAssignableFrom(rawClass)) {
                 return ToStringSerializer.instance;
             }
-            if (!Number.class.isAssignableFrom(rawClass)) {
-                return Enum.class.isAssignableFrom(rawClass) ? buildEnumSerializer(serializerProvider.getConfig(), javaType, beanDescription) : null;
-            } else {
-                Value findExpectedFormat = beanDescription.findExpectedFormat(null);
-                if (findExpectedFormat != null) {
-                    switch (findExpectedFormat.getShape()) {
+            if (Number.class.isAssignableFrom(rawClass)) {
+                if (beanDescription.findExpectedFormat(null) != null) {
+                    switch (beanDescription.findExpectedFormat(null).getShape()) {
                         case STRING:
                             return ToStringSerializer.instance;
                         case OBJECT:
@@ -283,26 +283,28 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
                     }
                 }
                 return NumberSerializer.instance;
+            } else if (Enum.class.isAssignableFrom(rawClass)) {
+                return buildEnumSerializer(serializerProvider.getConfig(), javaType, beanDescription);
+            } else {
+                return null;
             }
         }
     }
 
-    protected JsonSerializer<?> findOptionalStdSerializer(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> findOptionalStdSerializer(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
         return OptionalHandlerFactory.instance.findSerializer(serializerProvider.getConfig(), javaType, beanDescription);
     }
 
-    protected final JsonSerializer<?> findSerializerByAddonType(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<?> findSerializerByAddonType(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
         Class rawClass = javaType.getRawClass();
-        JavaType[] findTypeParameters;
-        JavaType unknownType;
         if (Iterator.class.isAssignableFrom(rawClass)) {
-            findTypeParameters = serializationConfig.getTypeFactory().findTypeParameters(javaType, Iterator.class);
-            unknownType = (findTypeParameters == null || findTypeParameters.length != 1) ? TypeFactory.unknownType() : findTypeParameters[0];
-            return buildIteratorSerializer(serializationConfig, javaType, beanDescription, z, unknownType);
+            JavaType[] findTypeParameters = serializationConfig.getTypeFactory().findTypeParameters(javaType, Iterator.class);
+            return buildIteratorSerializer(serializationConfig, javaType, beanDescription, z, (findTypeParameters == null || findTypeParameters.length != 1) ? TypeFactory.unknownType() : findTypeParameters[0]);
         } else if (Iterable.class.isAssignableFrom(rawClass)) {
-            findTypeParameters = serializationConfig.getTypeFactory().findTypeParameters(javaType, Iterable.class);
-            unknownType = (findTypeParameters == null || findTypeParameters.length != 1) ? TypeFactory.unknownType() : findTypeParameters[0];
-            return buildIterableSerializer(serializationConfig, javaType, beanDescription, z, unknownType);
+            JavaType[] findTypeParameters2 = serializationConfig.getTypeFactory().findTypeParameters(javaType, Iterable.class);
+            return buildIterableSerializer(serializationConfig, javaType, beanDescription, z, (findTypeParameters2 == null || findTypeParameters2.length != 1) ? TypeFactory.unknownType() : findTypeParameters2[0]);
         } else if (CharSequence.class.isAssignableFrom(rawClass)) {
             return ToStringSerializer.instance;
         } else {
@@ -310,7 +312,8 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         }
     }
 
-    protected JsonSerializer<Object> findSerializerFromAnnotation(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> findSerializerFromAnnotation(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
         Object findSerializer = serializerProvider.getAnnotationIntrospector().findSerializer(annotated);
         if (findSerializer == null) {
             return null;
@@ -318,12 +321,14 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return findConvertingSerializer(serializerProvider, annotated, serializerProvider.serializerInstance(annotated, findSerializer));
     }
 
-    protected JsonSerializer<?> findConvertingSerializer(SerializerProvider serializerProvider, Annotated annotated, JsonSerializer<?> jsonSerializer) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> findConvertingSerializer(SerializerProvider serializerProvider, Annotated annotated, JsonSerializer<?> jsonSerializer) throws JsonMappingException {
         Converter findConverter = findConverter(serializerProvider, annotated);
         return findConverter == null ? jsonSerializer : new StdDelegatingSerializer(findConverter, findConverter.getOutputType(serializerProvider.getTypeFactory()), jsonSerializer);
     }
 
-    protected Converter<Object, Object> findConverter(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public Converter<Object, Object> findConverter(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
         Object findSerializationConverter = serializerProvider.getAnnotationIntrospector().findSerializationConverter(annotated);
         if (findSerializationConverter == null) {
             return null;
@@ -331,11 +336,12 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return serializerProvider.converterInstance(annotated, findSerializationConverter);
     }
 
-    protected JsonSerializer<?> buildContainerSerializer(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> buildContainerSerializer(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
         boolean z2;
         JsonSerializer<?> jsonSerializer;
         SerializationConfig config = serializerProvider.getConfig();
-        if (!(z || !javaType.useStaticType() || (javaType.isContainerType() && javaType.getContentType().getRawClass() == Object.class))) {
+        if (!z && javaType.useStaticType() && (!javaType.isContainerType() || javaType.getContentType().getRawClass() != Object.class)) {
             z = true;
         }
         TypeSerializer createTypeSerializer = createTypeSerializer(config, javaType.getContentType());
@@ -345,53 +351,64 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
             z2 = z;
         }
         JsonSerializer _findContentSerializer = _findContentSerializer(serializerProvider, beanDescription.getClassInfo());
-        JsonSerializer<?> jsonSerializer2;
         if (javaType.isMapLikeType()) {
             MapLikeType mapLikeType = (MapLikeType) javaType;
             JsonSerializer _findKeySerializer = _findKeySerializer(serializerProvider, beanDescription.getClassInfo());
-            if (mapLikeType.isTrueMapType()) {
-                return buildMapSerializer(serializerProvider, (MapType) mapLikeType, beanDescription, z2, _findKeySerializer, createTypeSerializer, _findContentSerializer);
-            }
-            jsonSerializer2 = null;
-            MapLikeType mapLikeType2 = (MapLikeType) javaType;
-            for (Serializers findMapLikeSerializer : customSerializers()) {
-                jsonSerializer2 = findMapLikeSerializer.findMapLikeSerializer(config, mapLikeType2, beanDescription, _findKeySerializer, createTypeSerializer, _findContentSerializer);
-                if (jsonSerializer2 != null) {
-                    break;
+            if (!mapLikeType.isTrueMapType()) {
+                JsonSerializer<?> jsonSerializer2 = null;
+                MapLikeType mapLikeType2 = (MapLikeType) javaType;
+                for (Serializers findMapLikeSerializer : customSerializers()) {
+                    jsonSerializer2 = findMapLikeSerializer.findMapLikeSerializer(config, mapLikeType2, beanDescription, _findKeySerializer, createTypeSerializer, _findContentSerializer);
+                    if (jsonSerializer2 != null) {
+                        break;
+                    }
                 }
-            }
-            if (jsonSerializer2 == null) {
-                jsonSerializer2 = findSerializerByAnnotations(serializerProvider, javaType, beanDescription);
-            }
-            if (jsonSerializer2 == null || !this._factoryConfig.hasSerializerModifiers()) {
-                return jsonSerializer2;
-            }
-            jsonSerializer = jsonSerializer2;
-            for (BeanSerializerModifier modifyMapLikeSerializer : this._factoryConfig.serializerModifiers()) {
-                jsonSerializer = modifyMapLikeSerializer.modifyMapLikeSerializer(config, mapLikeType2, beanDescription, jsonSerializer);
+                if (jsonSerializer2 == null) {
+                    jsonSerializer2 = findSerializerByAnnotations(serializerProvider, javaType, beanDescription);
+                }
+                if (jsonSerializer2 != null && this._factoryConfig.hasSerializerModifiers()) {
+                    Iterator it = this._factoryConfig.serializerModifiers().iterator();
+                    while (true) {
+                        jsonSerializer = jsonSerializer2;
+                        if (!it.hasNext()) {
+                            break;
+                        }
+                        jsonSerializer2 = ((BeanSerializerModifier) it.next()).modifyMapLikeSerializer(config, mapLikeType2, beanDescription, jsonSerializer);
+                    }
+                } else {
+                    return jsonSerializer2;
+                }
+            } else {
+                return buildMapSerializer(serializerProvider, (MapType) mapLikeType, beanDescription, z2, _findKeySerializer, createTypeSerializer, _findContentSerializer);
             }
         } else if (javaType.isCollectionLikeType()) {
             CollectionLikeType collectionLikeType = (CollectionLikeType) javaType;
-            if (collectionLikeType.isTrueCollectionType()) {
-                return buildCollectionSerializer(serializerProvider, (CollectionType) collectionLikeType, beanDescription, z2, createTypeSerializer, _findContentSerializer);
-            }
-            jsonSerializer2 = null;
-            CollectionLikeType collectionLikeType2 = (CollectionLikeType) javaType;
-            for (Serializers findCollectionLikeSerializer : customSerializers()) {
-                jsonSerializer2 = findCollectionLikeSerializer.findCollectionLikeSerializer(config, collectionLikeType2, beanDescription, createTypeSerializer, _findContentSerializer);
-                if (jsonSerializer2 != null) {
-                    break;
+            if (!collectionLikeType.isTrueCollectionType()) {
+                JsonSerializer<?> jsonSerializer3 = null;
+                CollectionLikeType collectionLikeType2 = (CollectionLikeType) javaType;
+                for (Serializers findCollectionLikeSerializer : customSerializers()) {
+                    jsonSerializer3 = findCollectionLikeSerializer.findCollectionLikeSerializer(config, collectionLikeType2, beanDescription, createTypeSerializer, _findContentSerializer);
+                    if (jsonSerializer3 != null) {
+                        break;
+                    }
                 }
-            }
-            if (jsonSerializer2 == null) {
-                jsonSerializer2 = findSerializerByAnnotations(serializerProvider, javaType, beanDescription);
-            }
-            if (jsonSerializer2 == null || !this._factoryConfig.hasSerializerModifiers()) {
-                return jsonSerializer2;
-            }
-            jsonSerializer = jsonSerializer2;
-            for (BeanSerializerModifier modifyMapLikeSerializer2 : this._factoryConfig.serializerModifiers()) {
-                jsonSerializer = modifyMapLikeSerializer2.modifyCollectionLikeSerializer(config, collectionLikeType2, beanDescription, jsonSerializer);
+                if (jsonSerializer3 == null) {
+                    jsonSerializer3 = findSerializerByAnnotations(serializerProvider, javaType, beanDescription);
+                }
+                if (jsonSerializer3 != null && this._factoryConfig.hasSerializerModifiers()) {
+                    Iterator it2 = this._factoryConfig.serializerModifiers().iterator();
+                    while (true) {
+                        jsonSerializer = jsonSerializer3;
+                        if (!it2.hasNext()) {
+                            break;
+                        }
+                        jsonSerializer3 = ((BeanSerializerModifier) it2.next()).modifyCollectionLikeSerializer(config, collectionLikeType2, beanDescription, jsonSerializer);
+                    }
+                } else {
+                    return jsonSerializer3;
+                }
+            } else {
+                return buildCollectionSerializer(serializerProvider, (CollectionType) collectionLikeType, beanDescription, z2, createTypeSerializer, _findContentSerializer);
             }
         } else if (!javaType.isArrayType()) {
             return null;
@@ -401,11 +418,12 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return jsonSerializer;
     }
 
-    protected JsonSerializer<?> buildCollectionSerializer(SerializerProvider serializerProvider, CollectionType collectionType, BeanDescription beanDescription, boolean z, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer) throws JsonMappingException {
-        JsonSerializer<?> jsonSerializer2;
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> buildCollectionSerializer(SerializerProvider serializerProvider, CollectionType collectionType, BeanDescription beanDescription, boolean z, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer) throws JsonMappingException {
+        JsonSerializer jsonSerializer2;
         JavaType javaType = null;
         SerializationConfig config = serializerProvider.getConfig();
-        JsonSerializer<?> jsonSerializer3 = null;
+        JsonSerializer jsonSerializer3 = null;
         for (Serializers findCollectionSerializer : customSerializers()) {
             jsonSerializer3 = findCollectionSerializer.findCollectionSerializer(config, collectionType, beanDescription, typeSerializer, jsonSerializer);
             if (jsonSerializer3 != null) {
@@ -427,7 +445,7 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
                     }
                     jsonSerializer3 = buildEnumSetSerializer(javaType);
                 } else {
-                    Class rawClass2 = collectionType.getContentType().getRawClass();
+                    Class<String> rawClass2 = collectionType.getContentType().getRawClass();
                     if (isIndexedList(rawClass)) {
                         if (rawClass2 != String.class) {
                             jsonSerializer3 = buildIndexedListSerializer(collectionType.getContentType(), z, typeSerializer, jsonSerializer);
@@ -444,9 +462,13 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
             }
         }
         if (this._factoryConfig.hasSerializerModifiers()) {
-            jsonSerializer2 = jsonSerializer3;
-            for (BeanSerializerModifier modifyCollectionSerializer : this._factoryConfig.serializerModifiers()) {
-                jsonSerializer2 = modifyCollectionSerializer.modifyCollectionSerializer(config, collectionType, beanDescription, jsonSerializer2);
+            Iterator it = this._factoryConfig.serializerModifiers().iterator();
+            while (true) {
+                jsonSerializer2 = jsonSerializer3;
+                if (!it.hasNext()) {
+                    break;
+                }
+                jsonSerializer3 = ((BeanSerializerModifier) it.next()).modifyCollectionSerializer(config, collectionType, beanDescription, jsonSerializer2);
             }
         } else {
             jsonSerializer2 = jsonSerializer3;
@@ -454,7 +476,8 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return jsonSerializer2;
     }
 
-    protected boolean isIndexedList(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public boolean isIndexedList(Class<?> cls) {
         return RandomAccess.class.isAssignableFrom(cls);
     }
 
@@ -470,36 +493,108 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return new EnumSetSerializer(javaType);
     }
 
-    protected JsonSerializer<?> buildMapSerializer(SerializerProvider serializerProvider, MapType mapType, BeanDescription beanDescription, boolean z, JsonSerializer<Object> jsonSerializer, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer2) throws JsonMappingException {
-        SerializationConfig config = serializerProvider.getConfig();
-        JsonSerializer<?> jsonSerializer3 = null;
-        for (Serializers findMapSerializer : customSerializers()) {
-            jsonSerializer3 = findMapSerializer.findMapSerializer(config, mapType, beanDescription, jsonSerializer, typeSerializer, jsonSerializer2);
-            if (jsonSerializer3 != null) {
-                break;
-            }
-        }
-        if (jsonSerializer3 == null) {
-            jsonSerializer3 = findSerializerByAnnotations(serializerProvider, mapType, beanDescription);
-            if (jsonSerializer3 == null) {
-                jsonSerializer3 = MapSerializer.construct(config.getAnnotationIntrospector().findPropertiesToIgnore(beanDescription.getClassInfo(), true), mapType, z, typeSerializer, jsonSerializer, jsonSerializer2, findFilterId(config, beanDescription));
-                Object findSuppressableContentValue = findSuppressableContentValue(config, mapType.getContentType(), beanDescription);
-                if (findSuppressableContentValue != null) {
-                    jsonSerializer3 = jsonSerializer3.withContentInclusion(findSuppressableContentValue);
-                }
-            }
-        }
-        if (!this._factoryConfig.hasSerializerModifiers()) {
-            return jsonSerializer3;
-        }
-        JsonSerializer<?> jsonSerializer4 = jsonSerializer3;
-        for (BeanSerializerModifier modifyMapSerializer : this._factoryConfig.serializerModifiers()) {
-            jsonSerializer4 = modifyMapSerializer.modifyMapSerializer(config, mapType, beanDescription, jsonSerializer4);
-        }
-        return jsonSerializer4;
+    /* JADX WARNING: type inference failed for: r0v0 */
+    /* JADX WARNING: type inference failed for: r0v1 */
+    /* JADX WARNING: type inference failed for: r0v2 */
+    /* JADX WARNING: type inference failed for: r0v3 */
+    /* JADX WARNING: type inference failed for: r2v4, types: [com.fasterxml.jackson.databind.JsonSerializer<?>] */
+    /* JADX WARNING: type inference failed for: r0v4 */
+    /* JADX WARNING: type inference failed for: r2v7, types: [com.fasterxml.jackson.databind.JsonSerializer, com.fasterxml.jackson.databind.JsonSerializer<?>] */
+    /* JADX WARNING: type inference failed for: r0v8, types: [com.fasterxml.jackson.databind.JsonSerializer] */
+    /* JADX WARNING: type inference failed for: r0v9, types: [com.fasterxml.jackson.databind.JsonSerializer] */
+    /* JADX WARNING: type inference failed for: r0v11, types: [com.fasterxml.jackson.databind.ser.std.MapSerializer] */
+    /* JADX WARNING: type inference failed for: r0v12, types: [com.fasterxml.jackson.databind.ser.std.MapSerializer] */
+    /* JADX WARNING: type inference failed for: r0v15, types: [com.fasterxml.jackson.databind.JsonSerializer] */
+    /* JADX WARNING: type inference failed for: r0v16 */
+    /* JADX WARNING: type inference failed for: r0v17 */
+    /* JADX WARNING: type inference failed for: r0v18 */
+    /* JADX WARNING: type inference failed for: r0v19 */
+    /* JADX WARNING: type inference failed for: r0v20 */
+    /* access modifiers changed from: protected */
+    /* JADX WARNING: Multi-variable type inference failed. Error: jadx.core.utils.exceptions.JadxRuntimeException: No candidate types for var: r0v1
+      assigns: []
+      uses: []
+      mth insns count: 52
+    	at jadx.core.dex.visitors.typeinference.TypeSearch.fillTypeCandidates(TypeSearch.java:237)
+    	at java.base/java.util.ArrayList.forEach(ArrayList.java:1540)
+    	at jadx.core.dex.visitors.typeinference.TypeSearch.run(TypeSearch.java:53)
+    	at jadx.core.dex.visitors.typeinference.TypeInferenceVisitor.runMultiVariableSearch(TypeInferenceVisitor.java:99)
+    	at jadx.core.dex.visitors.typeinference.TypeInferenceVisitor.visit(TypeInferenceVisitor.java:92)
+    	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:27)
+    	at jadx.core.dex.visitors.DepthTraversal.lambda$visit$1(DepthTraversal.java:14)
+    	at java.base/java.util.ArrayList.forEach(ArrayList.java:1540)
+    	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+    	at jadx.core.ProcessClass.process(ProcessClass.java:30)
+    	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:311)
+    	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+    	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:217)
+     */
+    /* JADX WARNING: Unknown variable types count: 7 */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JsonSerializer<?> buildMapSerializer(com.fasterxml.jackson.databind.SerializerProvider r10, com.fasterxml.jackson.databind.type.MapType r11, com.fasterxml.jackson.databind.BeanDescription r12, boolean r13, com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r14, com.fasterxml.jackson.databind.jsontype.TypeSerializer r15, com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r16) throws com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r9 = this;
+            com.fasterxml.jackson.databind.SerializationConfig r1 = r10.getConfig()
+            r0 = 0
+            java.lang.Iterable r2 = r9.customSerializers()
+            java.util.Iterator r7 = r2.iterator()
+        L_0x000d:
+            boolean r2 = r7.hasNext()
+            if (r2 == 0) goto L_0x0025
+            java.lang.Object r0 = r7.next()
+            com.fasterxml.jackson.databind.ser.Serializers r0 = (com.fasterxml.jackson.databind.ser.Serializers) r0
+            r2 = r11
+            r3 = r12
+            r4 = r14
+            r5 = r15
+            r6 = r16
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r0.findMapSerializer(r1, r2, r3, r4, r5, r6)
+            if (r0 == 0) goto L_0x000d
+        L_0x0025:
+            if (r0 != 0) goto L_0x0056
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r9.findSerializerByAnnotations(r10, r11, r12)
+            if (r0 != 0) goto L_0x0056
+            java.lang.Object r8 = r9.findFilterId(r1, r12)
+            com.fasterxml.jackson.databind.AnnotationIntrospector r0 = r1.getAnnotationIntrospector()
+            com.fasterxml.jackson.databind.introspect.AnnotatedClass r2 = r12.getClassInfo()
+            r3 = 1
+            java.lang.String[] r2 = r0.findPropertiesToIgnore(r2, r3)
+            r3 = r11
+            r4 = r13
+            r5 = r15
+            r6 = r14
+            r7 = r16
+            com.fasterxml.jackson.databind.ser.std.MapSerializer r0 = com.fasterxml.jackson.databind.ser.std.MapSerializer.construct(r2, r3, r4, r5, r6, r7, r8)
+            com.fasterxml.jackson.databind.JavaType r2 = r11.getContentType()
+            java.lang.Object r2 = r9.findSuppressableContentValue(r1, r2, r12)
+            if (r2 == 0) goto L_0x0056
+            com.fasterxml.jackson.databind.ser.std.MapSerializer r0 = r0.withContentInclusion(r2)
+        L_0x0056:
+            com.fasterxml.jackson.databind.cfg.SerializerFactoryConfig r2 = r9._factoryConfig
+            boolean r2 = r2.hasSerializerModifiers()
+            if (r2 == 0) goto L_0x007b
+            com.fasterxml.jackson.databind.cfg.SerializerFactoryConfig r2 = r9._factoryConfig
+            java.lang.Iterable r2 = r2.serializerModifiers()
+            java.util.Iterator r3 = r2.iterator()
+            r2 = r0
+        L_0x0069:
+            boolean r0 = r3.hasNext()
+            if (r0 == 0) goto L_0x007c
+            java.lang.Object r0 = r3.next()
+            com.fasterxml.jackson.databind.ser.BeanSerializerModifier r0 = (com.fasterxml.jackson.databind.ser.BeanSerializerModifier) r0
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r0.modifyMapSerializer(r1, r11, r12, r2)
+            r2 = r0
+            goto L_0x0069
+        L_0x007b:
+            r2 = r0
+        L_0x007c:
+            return r2
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildMapSerializer(com.fasterxml.jackson.databind.SerializerProvider, com.fasterxml.jackson.databind.type.MapType, com.fasterxml.jackson.databind.BeanDescription, boolean, com.fasterxml.jackson.databind.JsonSerializer, com.fasterxml.jackson.databind.jsontype.TypeSerializer, com.fasterxml.jackson.databind.JsonSerializer):com.fasterxml.jackson.databind.JsonSerializer");
     }
 
-    protected Object findSuppressableContentValue(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public Object findSuppressableContentValue(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
         JsonInclude.Value findPropertyInclusion = beanDescription.findPropertyInclusion(serializationConfig.getDefaultPropertyInclusion());
         if (findPropertyInclusion == null) {
             return null;
@@ -513,9 +608,10 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         }
     }
 
-    protected JsonSerializer<?> buildArraySerializer(SerializerProvider serializerProvider, ArrayType arrayType, BeanDescription beanDescription, boolean z, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> buildArraySerializer(SerializerProvider serializerProvider, ArrayType arrayType, BeanDescription beanDescription, boolean z, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer) throws JsonMappingException {
         SerializationConfig config = serializerProvider.getConfig();
-        JsonSerializer<?> jsonSerializer2 = null;
+        JsonSerializer jsonSerializer2 = null;
         for (Serializers findArraySerializer : customSerializers()) {
             jsonSerializer2 = findArraySerializer.findArraySerializer(config, arrayType, beanDescription, typeSerializer, jsonSerializer);
             if (jsonSerializer2 != null) {
@@ -523,7 +619,7 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
             }
         }
         if (jsonSerializer2 == null) {
-            Class rawClass = arrayType.getRawClass();
+            Class<String[]> rawClass = arrayType.getRawClass();
             if (jsonSerializer == null || ClassUtil.isJacksonStdImpl((Object) jsonSerializer)) {
                 if (String[].class == rawClass) {
                     jsonSerializer2 = StringArraySerializer.instance;
@@ -538,57 +634,69 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         if (!this._factoryConfig.hasSerializerModifiers()) {
             return jsonSerializer2;
         }
-        JsonSerializer<?> jsonSerializer3 = jsonSerializer2;
-        for (BeanSerializerModifier modifyArraySerializer : this._factoryConfig.serializerModifiers()) {
-            jsonSerializer3 = modifyArraySerializer.modifyArraySerializer(config, arrayType, beanDescription, jsonSerializer3);
+        Iterator it = this._factoryConfig.serializerModifiers().iterator();
+        while (true) {
+            JsonSerializer jsonSerializer3 = jsonSerializer2;
+            if (!it.hasNext()) {
+                return jsonSerializer3;
+            }
+            jsonSerializer2 = ((BeanSerializerModifier) it.next()).modifyArraySerializer(config, arrayType, beanDescription, jsonSerializer3);
         }
-        return jsonSerializer3;
     }
 
-    protected JsonSerializer<?> buildIteratorSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z, JavaType javaType2) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> buildIteratorSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z, JavaType javaType2) throws JsonMappingException {
         return new IteratorSerializer(javaType2, z, createTypeSerializer(serializationConfig, javaType2));
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JsonSerializer<?> buildIteratorSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
+    public JsonSerializer<?> buildIteratorSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
         JavaType[] findTypeParameters = serializationConfig.getTypeFactory().findTypeParameters(javaType, Iterator.class);
-        JavaType unknownType = (findTypeParameters == null || findTypeParameters.length != 1) ? TypeFactory.unknownType() : findTypeParameters[0];
-        return buildIteratorSerializer(serializationConfig, javaType, beanDescription, z, unknownType);
+        return buildIteratorSerializer(serializationConfig, javaType, beanDescription, z, (findTypeParameters == null || findTypeParameters.length != 1) ? TypeFactory.unknownType() : findTypeParameters[0]);
     }
 
-    protected JsonSerializer<?> buildIterableSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z, JavaType javaType2) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> buildIterableSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z, JavaType javaType2) throws JsonMappingException {
         return new IterableSerializer(javaType2, z, createTypeSerializer(serializationConfig, javaType2));
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JsonSerializer<?> buildIterableSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
+    public JsonSerializer<?> buildIterableSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
         JavaType[] findTypeParameters = serializationConfig.getTypeFactory().findTypeParameters(javaType, Iterable.class);
-        JavaType unknownType = (findTypeParameters == null || findTypeParameters.length != 1) ? TypeFactory.unknownType() : findTypeParameters[0];
-        return buildIterableSerializer(serializationConfig, javaType, beanDescription, z, unknownType);
+        return buildIterableSerializer(serializationConfig, javaType, beanDescription, z, (findTypeParameters == null || findTypeParameters.length != 1) ? TypeFactory.unknownType() : findTypeParameters[0]);
     }
 
-    protected JsonSerializer<?> buildMapEntrySerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z, JavaType javaType2, JavaType javaType3) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> buildMapEntrySerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription, boolean z, JavaType javaType2, JavaType javaType3) throws JsonMappingException {
         return new MapEntrySerializer(javaType3, javaType2, javaType3, z, createTypeSerializer(serializationConfig, javaType3), null);
     }
 
-    protected JsonSerializer<?> buildEnumSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> buildEnumSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
         Value findExpectedFormat = beanDescription.findExpectedFormat(null);
         if (findExpectedFormat == null || findExpectedFormat.getShape() != Shape.OBJECT) {
             JsonSerializer<?> construct = EnumSerializer.construct(javaType.getRawClass(), serializationConfig, beanDescription, findExpectedFormat);
             if (!this._factoryConfig.hasSerializerModifiers()) {
                 return construct;
             }
-            JsonSerializer<?> jsonSerializer = construct;
-            for (BeanSerializerModifier modifyEnumSerializer : this._factoryConfig.serializerModifiers()) {
-                jsonSerializer = modifyEnumSerializer.modifyEnumSerializer(serializationConfig, javaType, beanDescription, jsonSerializer);
+            Iterator it = this._factoryConfig.serializerModifiers().iterator();
+            while (true) {
+                JsonSerializer<?> jsonSerializer = construct;
+                if (!it.hasNext()) {
+                    return jsonSerializer;
+                }
+                construct = ((BeanSerializerModifier) it.next()).modifyEnumSerializer(serializationConfig, javaType, beanDescription, jsonSerializer);
             }
-            return jsonSerializer;
+        } else {
+            ((BasicBeanDescription) beanDescription).removeProperty("declaringClass");
+            return null;
         }
-        ((BasicBeanDescription) beanDescription).removeProperty("declaringClass");
-        return null;
     }
 
-    protected JsonSerializer<Object> _findKeySerializer(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _findKeySerializer(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
         Object findKeySerializer = serializerProvider.getAnnotationIntrospector().findKeySerializer(annotated);
         if (findKeySerializer != null) {
             return serializerProvider.serializerInstance(annotated, findKeySerializer);
@@ -596,7 +704,8 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return null;
     }
 
-    protected JsonSerializer<Object> _findContentSerializer(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _findContentSerializer(SerializerProvider serializerProvider, Annotated annotated) throws JsonMappingException {
         Object findContentSerializer = serializerProvider.getAnnotationIntrospector().findContentSerializer(annotated);
         if (findContentSerializer != null) {
             return serializerProvider.serializerInstance(annotated, findContentSerializer);
@@ -604,11 +713,13 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return null;
     }
 
-    protected Object findFilterId(SerializationConfig serializationConfig, BeanDescription beanDescription) {
+    /* access modifiers changed from: protected */
+    public Object findFilterId(SerializationConfig serializationConfig, BeanDescription beanDescription) {
         return serializationConfig.getAnnotationIntrospector().findFilterId(beanDescription.getClassInfo());
     }
 
-    protected boolean usesStaticTyping(SerializationConfig serializationConfig, BeanDescription beanDescription, TypeSerializer typeSerializer) {
+    /* access modifiers changed from: protected */
+    public boolean usesStaticTyping(SerializationConfig serializationConfig, BeanDescription beanDescription, TypeSerializer typeSerializer) {
         if (typeSerializer != null) {
             return false;
         }
@@ -622,17 +733,18 @@ public abstract class BasicSerializerFactory extends SerializerFactory implement
         return false;
     }
 
-    protected Class<?> _verifyAsClass(Object obj, String str, Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public Class<?> _verifyAsClass(Object obj, String str, Class<?> cls) {
         if (obj == null) {
             return null;
         }
-        if (obj instanceof Class) {
-            Class<?> cls2 = (Class) obj;
-            if (cls2 == cls || ClassUtil.isBogusClass(cls2)) {
-                return null;
-            }
-            return cls2;
+        if (!(obj instanceof Class)) {
+            throw new IllegalStateException("AnnotationIntrospector." + str + "() returned value of type " + obj.getClass().getName() + ": expected type JsonSerializer or Class<JsonSerializer> instead");
         }
-        throw new IllegalStateException("AnnotationIntrospector." + str + "() returned value of type " + obj.getClass().getName() + ": expected type JsonSerializer or Class<JsonSerializer> instead");
+        Class<?> cls2 = (Class) obj;
+        if (cls2 == cls || ClassUtil.isBogusClass(cls2)) {
+            return null;
+        }
+        return cls2;
     }
 }

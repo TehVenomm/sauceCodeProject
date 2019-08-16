@@ -1,13 +1,16 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
+/* renamed from: android.support.v4.util.Pools */
 public final class Pools {
 
+    /* renamed from: android.support.v4.util.Pools$Pool */
     public interface Pool<T> {
         T acquire();
 
         boolean release(T t);
     }
 
+    /* renamed from: android.support.v4.util.Pools$SimplePool */
     public static class SimplePool<T> implements Pool<T> {
         private final Object[] mPool;
         private int mPoolSize;
@@ -52,6 +55,7 @@ public final class Pools {
         }
     }
 
+    /* renamed from: android.support.v4.util.Pools$SynchronizedPool */
     public static class SynchronizedPool<T> extends SimplePool<T> {
         private final Object mLock = new Object();
 

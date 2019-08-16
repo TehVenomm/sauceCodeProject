@@ -75,8 +75,11 @@ public enum JavaVersion {
     }
 
     private static float maxVersion() {
-        float toFloatVersion = toFloatVersion(System.getProperty("java.version", "2.0"));
-        return toFloatVersion > 0.0f ? toFloatVersion : 2.0f;
+        float floatVersion = toFloatVersion(System.getProperty("java.version", "2.0"));
+        if (floatVersion > 0.0f) {
+            return floatVersion;
+        }
+        return 2.0f;
     }
 
     private static float toFloatVersion(String str) {

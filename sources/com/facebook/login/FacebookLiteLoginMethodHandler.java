@@ -7,13 +7,7 @@ import com.facebook.internal.NativeProtocol;
 import com.facebook.login.LoginClient.Request;
 
 class FacebookLiteLoginMethodHandler extends NativeAppLoginMethodHandler {
-    public static final Creator<FacebookLiteLoginMethodHandler> CREATOR = new C04351();
-
-    /* renamed from: com.facebook.login.FacebookLiteLoginMethodHandler$1 */
-    static final class C04351 implements Creator {
-        C04351() {
-        }
-
+    public static final Creator<FacebookLiteLoginMethodHandler> CREATOR = new Creator<FacebookLiteLoginMethodHandler>() {
         public FacebookLiteLoginMethodHandler createFromParcel(Parcel parcel) {
             return new FacebookLiteLoginMethodHandler(parcel);
         }
@@ -21,7 +15,7 @@ class FacebookLiteLoginMethodHandler extends NativeAppLoginMethodHandler {
         public FacebookLiteLoginMethodHandler[] newArray(int i) {
             return new FacebookLiteLoginMethodHandler[i];
         }
-    }
+    };
 
     FacebookLiteLoginMethodHandler(Parcel parcel) {
         super(parcel);
@@ -35,13 +29,15 @@ class FacebookLiteLoginMethodHandler extends NativeAppLoginMethodHandler {
         return 0;
     }
 
-    String getNameForLogging() {
+    /* access modifiers changed from: 0000 */
+    public String getNameForLogging() {
         return "fb_lite_login";
     }
 
-    boolean tryAuthorize(Request request) {
+    /* access modifiers changed from: 0000 */
+    public boolean tryAuthorize(Request request) {
         String e2e = LoginClient.getE2E();
-        Intent createFacebookLiteIntent = NativeProtocol.createFacebookLiteIntent(this.loginClient.getActivity(), request.getApplicationId(), request.getPermissions(), e2e, request.isRerequest(), request.hasPublishPermission(), request.getDefaultAudience(), getClientState(request.getAuthId()));
+        Intent createFacebookLiteIntent = NativeProtocol.createFacebookLiteIntent(this.loginClient.getActivity(), request.getApplicationId(), request.getPermissions(), e2e, request.isRerequest(), request.hasPublishPermission(), request.getDefaultAudience(), getClientState(request.getAuthId()), request.getAuthType());
         addLoggingExtra("e2e", e2e);
         return tryIntent(createFacebookLiteIntent, LoginClient.getLoginRequestCode());
     }

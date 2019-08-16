@@ -29,7 +29,10 @@ public enum JsonToken {
 
     private JsonToken(String str, int i) {
         boolean z;
-        boolean z2 = true;
+        boolean z2;
+        boolean z3;
+        boolean z4;
+        boolean z5 = true;
         if (str == null) {
             this._serialized = null;
             this._serializedChars = null;
@@ -51,30 +54,31 @@ public enum JsonToken {
         }
         this._isBoolean = z;
         if (i == 7 || i == 8) {
-            z = true;
+            z2 = true;
         } else {
-            z = false;
-        }
-        this._isNumber = z;
-        if (i == 1 || i == 3) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this._isStructStart = z;
-        if (i == 2 || i == 4) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this._isStructEnd = z;
-        if (this._isStructStart || this._isStructEnd || i == 5 || i == -1) {
             z2 = false;
         }
-        this._isScalar = z2;
+        this._isNumber = z2;
+        if (i == 1 || i == 3) {
+            z3 = true;
+        } else {
+            z3 = false;
+        }
+        this._isStructStart = z3;
+        if (i == 2 || i == 4) {
+            z4 = true;
+        } else {
+            z4 = false;
+        }
+        this._isStructEnd = z4;
+        if (this._isStructStart || this._isStructEnd || i == 5 || i == -1) {
+            z5 = false;
+        }
+        this._isScalar = z5;
     }
 
-    public final int id() {
+    /* renamed from: id */
+    public final int mo9113id() {
         return this._id;
     }
 

@@ -14,8 +14,6 @@ public class BulletControllerPairSwordsSoul : BulletControllerBase, IObservable
 
 	public override void OnHit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		if (collider.get_gameObject().get_layer() == 11 || collider.get_gameObject().get_layer() == 10)
 		{
 			NotifyObservers();

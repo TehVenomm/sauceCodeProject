@@ -2,28 +2,29 @@ package com.google.android.gms.nearby.connection;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
+import java.util.ArrayList;
 
-public final class zzd implements Creator<DiscoveryOptions> {
+public final class zzd implements Creator<AppMetadata> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
-        Strategy strategy = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        ArrayList arrayList = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    strategy = (Strategy) zzb.zza(parcel, readInt, Strategy.CREATOR);
+                    arrayList = SafeParcelReader.createTypedList(parcel, readHeader, AppIdentifier.CREATOR);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
-        return new DiscoveryOptions(strategy);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new AppMetadata(arrayList);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {
-        return new DiscoveryOptions[i];
+        return new AppMetadata[i];
     }
 }

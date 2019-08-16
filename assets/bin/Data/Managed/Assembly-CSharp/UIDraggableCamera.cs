@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Draggable Camera")]
 [RequireComponent(typeof(Camera))]
-public class UIDraggableCamera
+[AddComponentMenu("NGUI/Interaction/Draggable Camera")]
+public class UIDraggableCamera : MonoBehaviour
 {
 	public Transform rootForBounds;
 
@@ -58,12 +58,6 @@ public class UIDraggableCamera
 
 	private void Start()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Expected O, but got Unknown
 		mCam = this.GetComponent<Camera>();
 		mTrans = this.get_transform();
 		mRoot = NGUITools.FindInParents<UIRoot>(this.get_gameObject());
@@ -79,28 +73,28 @@ public class UIDraggableCamera
 		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
@@ -143,11 +137,9 @@ public class UIDraggableCamera
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Expected O, but got Unknown
 		if (mTrans != null && rootForBounds != null)
 		{
 			Vector3 val = CalculateConstrainOffset();
@@ -180,24 +172,25 @@ public class UIDraggableCamera
 		{
 			mDragStarted = false;
 		}
-		if (rootForBounds != null)
+		if (!(rootForBounds != null))
 		{
-			mPressed = isPressed;
-			if (isPressed)
+			return;
+		}
+		mPressed = isPressed;
+		if (isPressed)
+		{
+			mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
+			mMomentum = Vector2.get_zero();
+			mScroll = 0f;
+			SpringPosition component = this.GetComponent<SpringPosition>();
+			if (component != null)
 			{
-				mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
-				mMomentum = Vector2.get_zero();
-				mScroll = 0f;
-				SpringPosition component = this.GetComponent<SpringPosition>();
-				if (component != null)
-				{
-					component.set_enabled(false);
-				}
+				component.set_enabled(false);
 			}
-			else if (dragEffect == UIDragObject.DragEffect.MomentumAndSpring)
-			{
-				ConstrainToBounds(false);
-			}
+		}
+		else if (dragEffect == UIDragObject.DragEffect.MomentumAndSpring)
+		{
+			ConstrainToBounds(immediate: false);
 		}
 	}
 
@@ -227,30 +220,26 @@ public class UIDraggableCamera
 		if (smoothDragStart && !mDragStarted)
 		{
 			mDragStarted = true;
+			return;
 		}
-		else
+		UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
+		if (mRoot != null)
 		{
-			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
-			if (mRoot != null)
-			{
-				delta *= mRoot.pixelSizeAdjustment;
-			}
-			Vector2 val = Vector2.Scale(delta, -scale);
-			Transform obj = mTrans;
-			obj.set_localPosition(obj.get_localPosition() + Vector2.op_Implicit(val));
-			mMomentum = Vector2.Lerp(mMomentum, mMomentum + val * (0.01f * momentumAmount), 0.67f);
-			if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true))
-			{
-				mMomentum = Vector2.get_zero();
-				mScroll = 0f;
-			}
+			delta *= mRoot.pixelSizeAdjustment;
+		}
+		Vector2 val = Vector2.Scale(delta, -scale);
+		Transform obj = mTrans;
+		obj.set_localPosition(obj.get_localPosition() + Vector2.op_Implicit(val));
+		mMomentum = Vector2.Lerp(mMomentum, mMomentum + val * (0.01f * momentumAmount), 0.67f);
+		if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(immediate: true))
+		{
+			mMomentum = Vector2.get_zero();
+			mScroll = 0f;
 		}
 	}
 
 	public void Scroll(float delta)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
 		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
 		{
 			if (Mathf.Sign(mScroll) != Mathf.Sign(delta))

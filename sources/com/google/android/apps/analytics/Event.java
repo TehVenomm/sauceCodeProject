@@ -59,11 +59,13 @@ class Event {
         this(-1, str, -1, -1, -1, -1, -1, str2, str3, str4, i, i2, i3);
     }
 
-    int getAdHitId() {
+    /* access modifiers changed from: 0000 */
+    public int getAdHitId() {
         return this.adHitId;
     }
 
-    boolean getAnonymizeIp() {
+    /* access modifiers changed from: 0000 */
+    public boolean getAnonymizeIp() {
         return this.anonymizeIp;
     }
 
@@ -75,19 +77,23 @@ class Event {
         return this.item;
     }
 
-    int getRandomVal() {
+    /* access modifiers changed from: 0000 */
+    public int getRandomVal() {
         return this.randomVal;
     }
 
-    int getTimestampCurrent() {
+    /* access modifiers changed from: 0000 */
+    public int getTimestampCurrent() {
         return this.timestampCurrent;
     }
 
-    int getTimestampFirst() {
+    /* access modifiers changed from: 0000 */
+    public int getTimestampFirst() {
         return this.timestampFirst;
     }
 
-    int getTimestampPrevious() {
+    /* access modifiers changed from: 0000 */
+    public int getTimestampPrevious() {
         return this.timestampPrevious;
     }
 
@@ -95,15 +101,18 @@ class Event {
         return this.transaction;
     }
 
-    boolean getUseServerTime() {
+    /* access modifiers changed from: 0000 */
+    public boolean getUseServerTime() {
         return this.useServerTime;
     }
 
-    int getUserId() {
+    /* access modifiers changed from: 0000 */
+    public int getUserId() {
         return this.userId;
     }
 
-    int getVisits() {
+    /* access modifiers changed from: 0000 */
+    public int getVisits() {
         return this.visits;
     }
 
@@ -111,59 +120,66 @@ class Event {
         return this.timestampFirst != -1;
     }
 
-    void setAdHitId(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setAdHitId(int i) {
         this.adHitId = i;
     }
 
-    void setAnonymizeIp(boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void setAnonymizeIp(boolean z) {
         this.anonymizeIp = z;
     }
 
-    public void setCustomVariableBuffer(CustomVariableBuffer customVariableBuffer) {
-        this.customVariableBuffer = customVariableBuffer;
+    public void setCustomVariableBuffer(CustomVariableBuffer customVariableBuffer2) {
+        this.customVariableBuffer = customVariableBuffer2;
     }
 
-    public void setItem(Item item) {
-        if (this.category.equals(ITEM_CATEGORY)) {
-            this.item = item;
-            return;
+    public void setItem(Item item2) {
+        if (!this.category.equals(ITEM_CATEGORY)) {
+            throw new IllegalStateException("Attempted to add an item to an event of type " + this.category);
         }
-        throw new IllegalStateException("Attempted to add an item to an event of type " + this.category);
+        this.item = item2;
     }
 
-    void setRandomVal(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setRandomVal(int i) {
         this.randomVal = i;
     }
 
-    void setTimestampCurrent(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setTimestampCurrent(int i) {
         this.timestampCurrent = i;
     }
 
-    void setTimestampFirst(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setTimestampFirst(int i) {
         this.timestampFirst = i;
     }
 
-    void setTimestampPrevious(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setTimestampPrevious(int i) {
         this.timestampPrevious = i;
     }
 
-    public void setTransaction(Transaction transaction) {
-        if (this.category.equals(TRANSACTION_CATEGORY)) {
-            this.transaction = transaction;
-            return;
+    public void setTransaction(Transaction transaction2) {
+        if (!this.category.equals(TRANSACTION_CATEGORY)) {
+            throw new IllegalStateException("Attempted to add a transction to an event of type " + this.category);
         }
-        throw new IllegalStateException("Attempted to add a transction to an event of type " + this.category);
+        this.transaction = transaction2;
     }
 
-    void setUseServerTime(boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void setUseServerTime(boolean z) {
         this.useServerTime = z;
     }
 
-    void setUserId(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setUserId(int i) {
         this.userId = i;
     }
 
-    void setVisits(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setVisits(int i) {
         this.visits = i;
     }
 

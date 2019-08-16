@@ -157,7 +157,8 @@ public class SimpleModule extends Module implements Serializable {
         return this;
     }
 
-    protected SimpleModule setNamingStrategy(PropertyNamingStrategy propertyNamingStrategy) {
+    /* access modifiers changed from: protected */
+    public SimpleModule setNamingStrategy(PropertyNamingStrategy propertyNamingStrategy) {
         this._namingStrategy = propertyNamingStrategy;
         return this;
     }
@@ -220,9 +221,9 @@ public class SimpleModule extends Module implements Serializable {
 
     public SimpleModule registerSubtypes(Class<?>... clsArr) {
         if (this._subtypes == null) {
-            this._subtypes = new LinkedHashSet(Math.max(16, clsArr.length));
+            this._subtypes = new LinkedHashSet<>(Math.max(16, clsArr.length));
         }
-        for (Class namedType : clsArr) {
+        for (Class<?> namedType : clsArr) {
             this._subtypes.add(new NamedType(namedType));
         }
         return this;
@@ -230,9 +231,9 @@ public class SimpleModule extends Module implements Serializable {
 
     public SimpleModule registerSubtypes(NamedType... namedTypeArr) {
         if (this._subtypes == null) {
-            this._subtypes = new LinkedHashSet(Math.max(16, namedTypeArr.length));
+            this._subtypes = new LinkedHashSet<>(Math.max(16, namedTypeArr.length));
         }
-        for (Object add : namedTypeArr) {
+        for (NamedType add : namedTypeArr) {
             this._subtypes.add(add);
         }
         return this;
@@ -240,7 +241,7 @@ public class SimpleModule extends Module implements Serializable {
 
     public SimpleModule setMixInAnnotation(Class<?> cls, Class<?> cls2) {
         if (this._mixins == null) {
-            this._mixins = new HashMap();
+            this._mixins = new HashMap<>();
         }
         this._mixins.put(cls, cls2);
         return this;

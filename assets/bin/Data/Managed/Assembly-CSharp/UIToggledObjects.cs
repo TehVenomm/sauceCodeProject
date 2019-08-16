@@ -2,14 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Toggled Objects")]
-public class UIToggledObjects
+public class UIToggledObjects : MonoBehaviour
 {
 	public List<GameObject> activate;
 
 	public List<GameObject> deactivate;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private GameObject target;
 
 	[HideInInspector]

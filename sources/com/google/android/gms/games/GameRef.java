@@ -3,10 +3,10 @@ package com.google.android.gms.games;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 
-public final class GameRef extends zzc implements Game {
+public final class GameRef extends DataBufferRef implements Game {
     public GameRef(DataHolder dataHolder, int i) {
         super(dataHolder, i);
     }
@@ -40,7 +40,7 @@ public final class GameRef extends zzc implements Game {
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zza("game_description", charArrayBuffer);
+        copyToBuffer("game_description", charArrayBuffer);
     }
 
     public final String getDeveloperName() {
@@ -48,7 +48,7 @@ public final class GameRef extends zzc implements Game {
     }
 
     public final void getDeveloperName(CharArrayBuffer charArrayBuffer) {
-        zza("developer_name", charArrayBuffer);
+        copyToBuffer("developer_name", charArrayBuffer);
     }
 
     public final String getDisplayName() {
@@ -56,11 +56,11 @@ public final class GameRef extends zzc implements Game {
     }
 
     public final void getDisplayName(CharArrayBuffer charArrayBuffer) {
-        zza("display_name", charArrayBuffer);
+        copyToBuffer("display_name", charArrayBuffer);
     }
 
     public final Uri getFeaturedImageUri() {
-        return zzfu("featured_image_uri");
+        return parseUri("featured_image_uri");
     }
 
     public final String getFeaturedImageUrl() {
@@ -68,7 +68,7 @@ public final class GameRef extends zzc implements Game {
     }
 
     public final Uri getHiResImageUri() {
-        return zzfu("game_hi_res_image_uri");
+        return parseUri("game_hi_res_image_uri");
     }
 
     public final String getHiResImageUrl() {
@@ -76,7 +76,7 @@ public final class GameRef extends zzc implements Game {
     }
 
     public final Uri getIconImageUri() {
-        return zzfu("game_icon_image_uri");
+        return parseUri("game_icon_image_uri");
     }
 
     public final String getIconImageUrl() {
@@ -104,7 +104,7 @@ public final class GameRef extends zzc implements Game {
     }
 
     public final int hashCode() {
-        return GameEntity.zza(this);
+        return GameEntity.zza((Game) this);
     }
 
     public final boolean isMuted() {
@@ -127,19 +127,19 @@ public final class GameRef extends zzc implements Game {
         ((GameEntity) ((Game) freeze())).writeToParcel(parcel, i);
     }
 
-    public final boolean zzapg() {
+    public final boolean zzb() {
         return getBoolean("play_enabled_game");
     }
 
-    public final boolean zzaph() {
+    public final boolean zzc() {
         return getBoolean("identity_sharing_confirmed");
     }
 
-    public final boolean zzapi() {
+    public final boolean zzd() {
         return getInteger("installed") > 0;
     }
 
-    public final String zzapj() {
+    public final String zze() {
         return getString("package_name");
     }
 }

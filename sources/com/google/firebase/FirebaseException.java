@@ -1,7 +1,7 @@
 package com.google.firebase;
 
 import android.support.annotation.NonNull;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 
 public class FirebaseException extends Exception {
     @Deprecated
@@ -9,10 +9,10 @@ public class FirebaseException extends Exception {
     }
 
     public FirebaseException(@NonNull String str) {
-        super(zzbp.zzh(str, "Detail message must not be empty"));
+        super(Preconditions.checkNotEmpty(str, "Detail message must not be empty"));
     }
 
     public FirebaseException(@NonNull String str, Throwable th) {
-        super(zzbp.zzh(str, "Detail message must not be empty"), th);
+        super(Preconditions.checkNotEmpty(str, "Detail message must not be empty"), th);
     }
 }

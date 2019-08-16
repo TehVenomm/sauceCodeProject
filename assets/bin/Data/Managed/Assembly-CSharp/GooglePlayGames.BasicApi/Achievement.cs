@@ -130,7 +130,7 @@ namespace GooglePlayGames.BasicApi
 		{
 			get
 			{
-				return UnixEpoch.AddMilliseconds((double)mLastModifiedTime);
+				return UnixEpoch.AddMilliseconds(mLastModifiedTime);
 			}
 			set
 			{

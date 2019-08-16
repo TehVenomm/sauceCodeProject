@@ -159,7 +159,10 @@ public class SystemUtils {
     }
 
     public static boolean isJavaAwtHeadless() {
-        return JAVA_AWT_HEADLESS != null ? JAVA_AWT_HEADLESS.equals(Boolean.TRUE.toString()) : false;
+        if (JAVA_AWT_HEADLESS != null) {
+            return JAVA_AWT_HEADLESS.equals(Boolean.TRUE.toString());
+        }
+        return false;
     }
 
     public static boolean isJavaVersionAtLeast(JavaVersion javaVersion) {

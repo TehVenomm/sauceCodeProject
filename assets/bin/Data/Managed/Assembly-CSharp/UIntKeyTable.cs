@@ -43,6 +43,52 @@ public class UIntKeyTable<T> : UIntKeyTableBase
 		}
 	}
 
+	public void ForEachAsc(Action<T> _action)
+	{
+		if (_action == null || lists == null || lists.Length < 1)
+		{
+			return;
+		}
+		List<Item> list = new List<Item>();
+		int i = 0;
+		for (int num = lists.Length; i < num; i++)
+		{
+			if (lists[i] != null)
+			{
+				list.AddRange(lists[i]);
+			}
+		}
+		list.Sort((Item a, Item b) => (a.key < b.key) ? (-1) : ((a.key != b.key) ? 1 : 0));
+		int j = 0;
+		for (int count = list.Count; j < count; j++)
+		{
+			_action((T)list[j].value);
+		}
+	}
+
+	public void ForEachDesc(Action<T> _action)
+	{
+		if (_action == null || lists == null || lists.Length < 1)
+		{
+			return;
+		}
+		List<Item> list = new List<Item>();
+		int i = 0;
+		for (int num = lists.Length; i < num; i++)
+		{
+			if (lists[i] != null)
+			{
+				list.AddRange(lists[i]);
+			}
+		}
+		list.Sort((Item a, Item b) => (a.key < b.key) ? 1 : ((a.key != b.key) ? (-1) : 0));
+		int j = 0;
+		for (int count = list.Count; j < count; j++)
+		{
+			_action((T)list[j].value);
+		}
+	}
+
 	public void ForEachKey(Action<uint> action)
 	{
 		if (lists != null)

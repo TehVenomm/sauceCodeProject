@@ -12,6 +12,8 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 		LEVEL_UP,
 		SHIELD_ON,
 		SHIELD_OFF,
+		DRAGON_ARMOR,
+		GIMMICK_EVOLVE,
 		MAX
 	}
 
@@ -35,15 +37,16 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 	protected UILabel announceEffect;
 
 	[SerializeField]
-	protected LabelSettings[] labelSettings = new LabelSettings[7];
+	protected LabelSettings[] labelSettings = new LabelSettings[9];
 
 	public void Announce(ANNOUNCE_TYPE type, Player player)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(true);
 		if (AnnounceStart(player))
 		{
 			announceName.text = labelSettings[(int)type].text;
@@ -59,11 +62,12 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 
 	public void StartSkill(string skill_name, Player player)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().SetActive(true);
 		if (AnnounceStart(player))
 		{
 			announceName.text = skill_name;
@@ -75,5 +79,15 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 			announceEffect.fontStyle = style;
 			playerName.fontStyle = style;
 		}
+	}
+
+	protected override void OnStart()
+	{
+		this.get_gameObject().SetActive(false);
+	}
+
+	protected override void OnAfterAnimation()
+	{
+		this.get_gameObject().SetActive(false);
 	}
 }

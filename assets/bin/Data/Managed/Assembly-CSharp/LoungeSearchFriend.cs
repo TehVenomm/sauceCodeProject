@@ -20,9 +20,12 @@ public class LoungeSearchFriend : FollowListBase
 		GRD_LIST,
 		TEX_MODEL,
 		STR_NON_LIST,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		OBJ_COMMENT,
 		LBL_COMMENT,
 		LBL_LAST_LOGIN,
@@ -100,21 +103,21 @@ public class LoungeSearchFriend : FollowListBase
 	{
 		if (loungeFollowers == null || loungeFollowers.Count == 0)
 		{
-			SetActive((Enum)UI.LBL_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, false);
+			SetActive((Enum)UI.LBL_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_LIST, is_visible: false);
+			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, is_enabled: false);
+			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, is_enabled: false);
 			SetLabelText((Enum)UI.LBL_NOW, "0");
 			SetLabelText((Enum)UI.LBL_MAX, "0");
 		}
 		else
 		{
 			SetLabelText((Enum)UI.LBL_NOW, (nowPage + 1).ToString());
-			SetActive((Enum)UI.LBL_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
+			SetActive((Enum)UI.LBL_NON_LIST, is_visible: false);
+			SetActive((Enum)UI.GRD_LIST, is_visible: true);
 			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, nowPage > 0);
 			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
-			SetDynamicList((Enum)UI.GRD_LIST, "LoungeSearchFriendItem", loungeFollowers.Count, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetDynamicList((Enum)UI.GRD_LIST, "LoungeSearchFriendItem", loungeFollowers.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
 				LoungeSearchFollowerRoomModel.LoungeFollowerModel data = loungeFollowers[i];
 				SetupListItem(data, i, t);
@@ -141,15 +144,16 @@ public class LoungeSearchFriend : FollowListBase
 				charaInfo = data.slotInfos[i].userInfo;
 			}
 		}
-		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(charaInfo, false, true, false, true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), true, null);
+		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(charaInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		SetLabelText(t, UI.LBL_NAME, charaInfo.name);
 		SetLabelText(t, UI.LBL_LEVEL, charaInfo.level.ToString());
 		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(charaInfo.selectedDegrees, false, delegate
+		component.Initialize(charaInfo.selectedDegrees, isButton: false, delegate
 		{
 			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().Reposition();
 		});
 		SetActive(t, UI.SPR_ICON_FIRST_MET, CheckFirstMet(charaInfo.userId));
+		SetFollowStatus(t, charaInfo.userId, following: true, follower: true, charaInfo.userClanData.cId);
 	}
 
 	private bool CheckFirstMet(int userId)
@@ -171,7 +175,7 @@ public class LoungeSearchFriend : FollowListBase
 		string text = StringTable.Get(STRING_CATEGORY.LOUNGE_LABEL, (uint)data.label);
 		SetLabelText(t, UI.LBL_LABEL, text);
 		int num = data.num + 1;
-		int num2 = data.slotInfos.Count((LoungeModel.SlotInfo slotInfo) => slotInfo != null && slotInfo.userInfo != null && slotInfo.userInfo.userId != data.ownerUserId);
+		int num2 = data.slotInfos.Count((PartyModel.SlotInfo slotInfo) => slotInfo != null && slotInfo.userInfo != null && slotInfo.userInfo.userId != data.ownerUserId);
 		for (int i = 0; i < 7; i++)
 		{
 			bool is_visible = i < num - 1;
@@ -187,7 +191,7 @@ public class LoungeSearchFriend : FollowListBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEntry(loungeFollowerModel.id, delegate(bool isSuccess)
 		{
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess);
 		});
 	}
 }

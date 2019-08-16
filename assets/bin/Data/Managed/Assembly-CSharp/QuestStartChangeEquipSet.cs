@@ -21,7 +21,7 @@ public class QuestStartChangeEquipSet : QuestChangeEquipSet
 
 	protected override void OnQuery_DECISION()
 	{
-		GameSection.ChangeEvent("[BACK]", null);
+		GameSection.ChangeEvent("[BACK]");
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquipSet(selfCharaEquipSetNo, delegate(bool is_success)
 		{
@@ -29,7 +29,7 @@ public class QuestStartChangeEquipSet : QuestChangeEquipSet
 			{
 				selectSection.SuccessChangeEquipSet();
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

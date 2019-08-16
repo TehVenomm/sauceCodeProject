@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class YamashitaTest
+public class YamashitaTest : MonoBehaviour
 {
 	[Serializable]
 	public class SaveTest

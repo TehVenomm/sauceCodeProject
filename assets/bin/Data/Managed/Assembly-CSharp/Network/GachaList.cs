@@ -80,9 +80,9 @@ namespace Network
 
 			public int num;
 
-			public int yen;
+			public float yen;
 
-			public int yenIncludeTax;
+			public float yenIncludeTax;
 
 			public string buttonImg;
 
@@ -90,7 +90,21 @@ namespace Network
 
 			public int remainCount = -1;
 
-			public string endDate;
+			public string seriesStartDate = string.Empty;
+
+			public string endDate = string.Empty;
+
+			public int seriesId = -1;
+
+			public string description = string.Empty;
+
+			public string detailButtonImg = string.Empty;
+
+			public string link = string.Empty;
+
+			public string campaignDetailImg;
+
+			public string caption = string.Empty;
 
 			public bool IsEnd
 			{
@@ -108,6 +122,11 @@ namespace Network
 				}
 			}
 
+			public bool IsDirectPurchase()
+			{
+				return productId != string.Empty;
+			}
+
 			public bool IsOncePurchase()
 			{
 				return subGroup == 0;
@@ -116,6 +135,20 @@ namespace Network
 			public void SetCrystalNum(int num)
 			{
 				crystalNum = num;
+			}
+
+			public string GetTitleImageName()
+			{
+				return detailButtonImg;
+			}
+
+			public DateTime GetStartDateTime()
+			{
+				if (seriesStartDate == string.Empty)
+				{
+					return new DateTime(0L);
+				}
+				return DateTime.Parse(seriesStartDate);
 			}
 		}
 

@@ -22,6 +22,14 @@ public class Coop_Model_PlayerInitialize : Coop_Model_ObjectSyncPositionBase
 
 	public int cannonId;
 
+	public int bulletIndex;
+
+	public int fishingState;
+
+	public int gatherGimmickId;
+
+	public int carryingGimmickId;
+
 	public Coop_Model_PlayerInitialize()
 	{
 		base.packetType = PACKET_TYPE.PLAYER_INITIALIZE;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class PointShopGetPointTable : Singleton<PointShopGetPointTable>, IDataTable
 {
@@ -34,9 +35,12 @@ public class PointShopGetPointTable : Singleton<PointShopGetPointTable>, IDataTa
 
 	public UIntKeyTable<Data> table;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		table = TableUtility.CreateUIntKeyTable<Data>(csv_text, Data.InsertRow, "id,pointShopId,type,typeId,basePoint,rate", null);
+		table = TableUtility.CreateUIntKeyTable<Data>(csv_text, Data.InsertRow, "id,pointShopId,type,typeId,basePoint,rate");
 		table.TrimExcess();
 	}
 

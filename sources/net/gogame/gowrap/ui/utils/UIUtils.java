@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.utils;
+package net.gogame.gowrap.p019ui.utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
+/* renamed from: net.gogame.gowrap.ui.utils.UIUtils */
 public final class UIUtils {
     private UIUtils() {
     }
@@ -29,7 +30,8 @@ public final class UIUtils {
         });
     }
 
-    private static void setupRightDrawable(EditText editText, int i, int i2, CharSequence charSequence) {
+    /* access modifiers changed from: private */
+    public static void setupRightDrawable(EditText editText, int i, int i2, CharSequence charSequence) {
         if (charSequence == null || charSequence.length() <= 0) {
             editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, i, 0);
         } else {

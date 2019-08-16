@@ -33,7 +33,7 @@ public class BetterHttp {
     public static final int DEFAULT_SOCKET_TIMEOUT = 30000;
     static final String LOG_TAG = "BetterHttp";
     private static Context appContext;
-    private static HashMap<String, String> defaultHeaders = new HashMap();
+    private static HashMap<String, String> defaultHeaders = new HashMap<>();
     private static AbstractHttpClient httpClient;
     private static int maxConnections = 4;
     private static HttpResponseCache responseCache;
@@ -57,7 +57,7 @@ public class BetterHttp {
     }
 
     public static BetterHttpRequest get(String str, boolean z) {
-        return (z && responseCache != null && responseCache.containsKey(str)) ? new CachedHttpRequest(str) : new HttpGet(httpClient, str, defaultHeaders);
+        return (!z || responseCache == null || !responseCache.containsKey(str)) ? new HttpGet(httpClient, str, defaultHeaders) : new CachedHttpRequest(str);
     }
 
     public static HashMap<String, String> getDefaultHeaders() {
@@ -121,7 +121,7 @@ public class BetterHttp {
     }
 
     public static void setupHttpClient() {
-        HttpParams basicHttpParams = new BasicHttpParams();
+        BasicHttpParams basicHttpParams = new BasicHttpParams();
         ConnManagerParams.setTimeout(basicHttpParams, (long) socketTimeout);
         ConnManagerParams.setMaxConnectionsPerRoute(basicHttpParams, new ConnPerRouteBean(maxConnections));
         ConnManagerParams.setMaxTotalConnections(basicHttpParams, 4);
@@ -156,13 +156,12 @@ public class BetterHttp {
                     }
                     if (host == null || port <= -1) {
                         params.setParameter("http.route.default-proxy", null);
-                        return;
                     } else {
                         params.setParameter("http.route.default-proxy", new HttpHost(host, port));
-                        return;
                     }
+                } else {
+                    params.setParameter("http.route.default-proxy", null);
                 }
-                params.setParameter("http.route.default-proxy", null);
             }
         }
     }

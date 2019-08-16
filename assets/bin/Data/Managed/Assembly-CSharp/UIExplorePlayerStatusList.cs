@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIExplorePlayerStatusList
+public class UIExplorePlayerStatusList : MonoBehaviour
 {
 	[SerializeField]
 	private UIExplorePlayerStatus[] statuses = new UIExplorePlayerStatus[3];
@@ -40,7 +40,6 @@ public class UIExplorePlayerStatusList
 
 	private void OnChangeExploreMemberList()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < statuses.Length; i++)
 		{
 			statuses[i].get_gameObject().SetActive(false);
@@ -53,18 +52,16 @@ public class UIExplorePlayerStatusList
 			if (explorePlayerStatus.isSelf)
 			{
 				flag = true;
+				continue;
 			}
-			else
+			int num = explorePlayerStatus.coopClient.slotIndex;
+			if (num >= 0)
 			{
-				int num = explorePlayerStatus.coopClient.slotIndex;
-				if (num >= 0)
+				if (flag)
 				{
-					if (flag)
-					{
-						num--;
-					}
-					statuses[num].Initialize(explorePlayerStatus);
+					num--;
 				}
+				statuses[num].Initialize(explorePlayerStatus);
 			}
 		}
 	}

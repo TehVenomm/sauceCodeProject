@@ -1,11 +1,84 @@
 package com.google.android.gms.common;
 
-final class zzk extends zzi {
-    zzk(byte[] bArr) {
-        super(bArr);
+import android.os.IBinder;
+import android.os.Parcel;
+import android.os.Parcelable.Creator;
+import android.os.RemoteException;
+import android.util.Log;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.zzj;
+import com.google.android.gms.dynamic.IObjectWrapper;
+import com.google.android.gms.dynamic.ObjectWrapper;
+import javax.annotation.Nullable;
+
+@Class(creator = "GoogleCertificatesQueryCreator")
+public final class zzk extends AbstractSafeParcelable {
+    public static final Creator<zzk> CREATOR = new zzl();
+    @Field(getter = "getAllowTestKeys", mo13990id = 3)
+    private final boolean zzaa;
+    @Field(defaultValue = "false", getter = "getForbidTestKeys", mo13990id = 4)
+    private final boolean zzab;
+    @Field(getter = "getCallingPackage", mo13990id = 1)
+    private final String zzy;
+    @Field(getter = "getCallingCertificateBinder", mo13990id = 2, type = "android.os.IBinder")
+    @Nullable
+    private final zze zzz;
+
+    @Constructor
+    zzk(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) @Nullable IBinder iBinder, @Param(mo13993id = 3) boolean z, @Param(mo13993id = 4) boolean z2) {
+        this.zzy = str;
+        this.zzz = zza(iBinder);
+        this.zzaa = z;
+        this.zzab = z2;
     }
 
-    protected final byte[] zzafa() {
-        return zzg.zzfq("0\u0004C0\u0003+ \u0003\u0002\u0001\u0002\u0002\t\u0000ÂàFdJ00\r\u0006\t*H÷\r\u0001\u0001\u0004\u0005\u00000t1\u000b0\t\u0006\u0003U\u0004\u0006\u0013\u0002US1\u00130\u0011\u0006\u0003U\u0004\b\u0013\nCalifornia1\u00160\u0014\u0006\u0003U\u0004\u0007\u0013\rMountain View1\u00140\u0012\u0006\u0003U\u0004\n\u0013\u000bGoogle Inc.1\u00100\u000e\u0006\u0003U\u0004\u000b\u0013\u0007Android1\u00100\u000e\u0006\u0003U\u0004\u0003\u0013\u0007Android0\u001e\u0017\r080821231334Z\u0017\r360107231334Z0t1\u000b0\t\u0006\u0003U\u0004\u0006\u0013\u0002US1\u00130\u0011\u0006\u0003U\u0004\b\u0013\nCalifornia1\u00160\u0014\u0006\u0003U\u0004\u0007\u0013\rMountain View1\u00140\u0012\u0006\u0003U\u0004\n\u0013\u000bGoogle Inc.1\u00100\u000e\u0006\u0003U\u0004\u000b\u0013\u0007Android1\u00100\u000e\u0006\u0003U\u0004\u0003\u0013\u0007Android0\u0001 0\r\u0006\t*H÷\r\u0001\u0001\u0001\u0005\u0000\u0003\u0001\r\u00000\u0001\b\u0002\u0001\u0001\u0000«V.\u0000Ø;¢\b®\no\u0012N)Ú\u0011ò«VÐXâÌ©\u0013\u0003é·TÓrö@§\u001b\u001dË\u0013\tgbNFV§wj\u0019=²å¿·$©\u001ew\u0018\u000ejG¤;3Ù`w\u00181EÌß{.XftÉáV[\u001fLjYU¿òQ¦=«ùÅ\\'\"\"Rèuäø\u0015Jd_qhÀ±¿Æ\u0012ê¿xWi»4ªyÜ~.¢vL®\u0007ØÁqT×î_d¥\u001aD¦\u0002ÂI\u0005AWÜ\u0002Í_\\\u000eUûï\u0019ûã'ð±Q\u0016Å o\u0019ÑõÄÛÂÖ¹?hÌ)yÇ\u000e\u0018«k;ÕÛU*\u000e;LßXûíÁº5à\u0003Á´±\rÒD¨î$ÿý38r«R!^Ú°ü\r\u000b\u0014[j¡y\u0002\u0001\u0003£Ù0Ö0\u001d\u0006\u0003U\u001d\u000e\u0004\u0016\u0004\u0014Ç}Â!\u0017V%Óßkãä×¥0¦\u0006\u0003U\u001d#\u00040\u0014Ç}Â!\u0017V%Óßkãä×¥¡x¤v0t1\u000b0\t\u0006\u0003U\u0004\u0006\u0013\u0002US1\u00130\u0011\u0006\u0003U\u0004\b\u0013\nCalifornia1\u00160\u0014\u0006\u0003U\u0004\u0007\u0013\rMountain View1\u00140\u0012\u0006\u0003U\u0004\n\u0013\u000bGoogle Inc.1\u00100\u000e\u0006\u0003U\u0004\u000b\u0013\u0007Android1\u00100\u000e\u0006\u0003U\u0004\u0003\u0013\u0007Android\t\u0000ÂàFdJ00\f\u0006\u0003U\u001d\u0013\u0004\u00050\u0003\u0001\u0001ÿ0\r\u0006\t*H÷\r\u0001\u0001\u0004\u0005\u0000\u0003\u0001\u0001\u0000mÒRÎï0,6\nªÎÏòÌ©\u0004»]z\u0016aø®F²B\u0004ÐÿJhÇí\u001aS\u001eÄYZb<æ\u0007c±g)zzãW\u0012Ä\u0007ò\bðË\u0010)\u0012M{\u0010b\u0019ÀÊ>³ù­_¸qï&âñmDÈÙ l²ð\u0005»?âËD~s\u0010v­E³?`\tê\u0019Áaæ&Aª'\u001dýR(ÅÅ]ÛE'XÖaöÌ\fÌ·5.BLÄ6\\R52÷2Q7Y<JãAôÛAíÚ\r\u000b\u0010q§Ä@ðþ \u001c¶'ÊgCiÐ½/Ù\u0011ÿ\u0006Í¿,ú\u0010Ü\u000f:ãWbHÇïÆLqD\u0017B÷\u0005ÉÞW:õ[9\r×ý¹A1]_u0\u0011&ÿb\u0014\u0010Ài0");
+    zzk(String str, @Nullable zze zze, boolean z, boolean z2) {
+        this.zzy = str;
+        this.zzz = zze;
+        this.zzaa = z;
+        this.zzab = z2;
+    }
+
+    @Nullable
+    private static zze zza(@Nullable IBinder iBinder) {
+        zzf zzf;
+        if (iBinder == null) {
+            return null;
+        }
+        try {
+            IObjectWrapper zzb = zzj.zzb(iBinder).zzb();
+            byte[] bArr = zzb == null ? null : (byte[]) ObjectWrapper.unwrap(zzb);
+            if (bArr != null) {
+                zzf = new zzf(bArr);
+            } else {
+                Log.e("GoogleCertificatesQuery", "Could not unwrap certificate");
+                zzf = null;
+            }
+            return zzf;
+        } catch (RemoteException e) {
+            Log.e("GoogleCertificatesQuery", "Could not unwrap certificate", e);
+            return null;
+        }
+    }
+
+    public final void writeToParcel(Parcel parcel, int i) {
+        IBinder asBinder;
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, this.zzy, false);
+        if (this.zzz == null) {
+            Log.w("GoogleCertificatesQuery", "certificate binder is null");
+            asBinder = null;
+        } else {
+            asBinder = this.zzz.asBinder();
+        }
+        SafeParcelWriter.writeIBinder(parcel, 2, asBinder, false);
+        SafeParcelWriter.writeBoolean(parcel, 3, this.zzaa);
+        SafeParcelWriter.writeBoolean(parcel, 4, this.zzab);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

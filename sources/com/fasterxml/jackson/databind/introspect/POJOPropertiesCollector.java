@@ -143,7 +143,8 @@ public class POJOPropertiesCollector {
         return this._annotationIntrospector.findPOJOBuilder(this._classDef);
     }
 
-    protected Map<String, POJOPropertyBuilder> getPropertyMap() {
+    /* access modifiers changed from: protected */
+    public Map<String, POJOPropertyBuilder> getPropertyMap() {
         if (!this._collected) {
             collectAll();
         }
@@ -155,8 +156,9 @@ public class POJOPropertiesCollector {
         return this;
     }
 
-    protected void collectAll() {
-        Object linkedHashMap = new LinkedHashMap();
+    /* access modifiers changed from: protected */
+    public void collectAll() {
+        LinkedHashMap<String, POJOPropertyBuilder> linkedHashMap = new LinkedHashMap<>();
         _addFields(linkedHashMap);
         _addMethods(linkedHashMap);
         _addCreators(linkedHashMap);
@@ -171,8 +173,8 @@ public class POJOPropertiesCollector {
         if (_findNamingStrategy != null) {
             _renameUsing(linkedHashMap, _findNamingStrategy);
         }
-        for (POJOPropertyBuilder mergeAnnotations2 : linkedHashMap.values()) {
-            mergeAnnotations2.trimByVisibility();
+        for (POJOPropertyBuilder trimByVisibility : linkedHashMap.values()) {
+            trimByVisibility.trimByVisibility();
         }
         if (this._config.isEnabled(MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME)) {
             _renameWithWrappers(linkedHashMap);
@@ -182,40 +184,41 @@ public class POJOPropertiesCollector {
         this._collected = true;
     }
 
-    protected void _addFields(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _addFields(Map<String, POJOPropertyBuilder> map) {
+        String str;
+        PropertyName findNameForDeserialization;
+        boolean z;
+        boolean z2;
+        boolean z3;
+        boolean z4;
         AnnotationIntrospector annotationIntrospector = this._annotationIntrospector;
-        Object obj = (this._forSerialization || this._config.isEnabled(MapperFeature.ALLOW_FINAL_FIELDS_AS_MUTATORS)) ? null : 1;
+        boolean z5 = !this._forSerialization && !this._config.isEnabled(MapperFeature.ALLOW_FINAL_FIELDS_AS_MUTATORS);
         boolean isEnabled = this._config.isEnabled(MapperFeature.PROPAGATE_TRANSIENT_MARKER);
         for (AnnotatedField annotatedField : this._classDef.fields()) {
-            String name;
-            PropertyName propertyName;
-            boolean z;
-            boolean z2;
-            boolean z3;
-            boolean z4;
             String findImplicitPropertyName = annotationIntrospector == null ? null : annotationIntrospector.findImplicitPropertyName(annotatedField);
             if (findImplicitPropertyName == null) {
-                name = annotatedField.getName();
+                str = annotatedField.getName();
             } else {
-                name = findImplicitPropertyName;
+                str = findImplicitPropertyName;
             }
             if (annotationIntrospector == null) {
-                propertyName = null;
+                findNameForDeserialization = null;
             } else if (this._forSerialization) {
-                propertyName = annotationIntrospector.findNameForSerialization(annotatedField);
+                findNameForDeserialization = annotationIntrospector.findNameForSerialization(annotatedField);
             } else {
-                propertyName = annotationIntrospector.findNameForDeserialization(annotatedField);
+                findNameForDeserialization = annotationIntrospector.findNameForDeserialization(annotatedField);
             }
-            if (propertyName != null) {
+            if (findNameForDeserialization != null) {
                 z = true;
             } else {
                 z = false;
             }
-            if (z && propertyName.isEmpty()) {
-                propertyName = _propNameFromSimple(name);
+            if (z && findNameForDeserialization.isEmpty()) {
+                findNameForDeserialization = _propNameFromSimple(str);
                 z = false;
             }
-            if (propertyName != null) {
+            if (findNameForDeserialization != null) {
                 z2 = true;
             } else {
                 z2 = false;
@@ -237,44 +240,44 @@ public class POJOPropertiesCollector {
                 z4 = z3;
                 z2 = false;
             }
-            if (obj == null || propertyName != null || z4 || !Modifier.isFinal(annotatedField.getModifiers())) {
-                _property((Map) map, name).addField(annotatedField, propertyName, z, z2, z4);
+            if (!z5 || findNameForDeserialization != null || z4 || !Modifier.isFinal(annotatedField.getModifiers())) {
+                _property(map, str).addField(annotatedField, findNameForDeserialization, z, z2, z4);
             }
         }
     }
 
-    protected void _addCreators(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _addCreators(Map<String, POJOPropertyBuilder> map) {
         if (this._annotationIntrospector != null) {
-            int parameterCount;
-            int i;
             for (AnnotatedConstructor annotatedConstructor : this._classDef.getConstructors()) {
                 if (this._creatorProperties == null) {
-                    this._creatorProperties = new LinkedList();
+                    this._creatorProperties = new LinkedList<>();
                 }
-                parameterCount = annotatedConstructor.getParameterCount();
-                for (i = 0; i < parameterCount; i++) {
+                int parameterCount = annotatedConstructor.getParameterCount();
+                for (int i = 0; i < parameterCount; i++) {
                     _addCreatorParam(map, annotatedConstructor.getParameter(i));
                 }
             }
             for (AnnotatedMethod annotatedMethod : this._classDef.getStaticMethods()) {
                 if (this._creatorProperties == null) {
-                    this._creatorProperties = new LinkedList();
+                    this._creatorProperties = new LinkedList<>();
                 }
-                parameterCount = annotatedMethod.getParameterCount();
-                for (i = 0; i < parameterCount; i++) {
-                    _addCreatorParam(map, annotatedMethod.getParameter(i));
+                int parameterCount2 = annotatedMethod.getParameterCount();
+                for (int i2 = 0; i2 < parameterCount2; i2++) {
+                    _addCreatorParam(map, annotatedMethod.getParameter(i2));
                 }
             }
         }
     }
 
-    protected void _addCreatorParam(Map<String, POJOPropertyBuilder> map, AnnotatedParameter annotatedParameter) {
+    /* access modifiers changed from: protected */
+    public void _addCreatorParam(Map<String, POJOPropertyBuilder> map, AnnotatedParameter annotatedParameter) {
         String findImplicitPropertyName = this._annotationIntrospector.findImplicitPropertyName(annotatedParameter);
         if (findImplicitPropertyName == null) {
             findImplicitPropertyName = "";
         }
         PropertyName findNameForDeserialization = this._annotationIntrospector.findNameForDeserialization(annotatedParameter);
-        boolean z = (findNameForDeserialization == null || findNameForDeserialization.isEmpty()) ? false : true;
+        boolean z = findNameForDeserialization != null && !findNameForDeserialization.isEmpty();
         if (!z) {
             if (!findImplicitPropertyName.isEmpty() && this._annotationIntrospector.hasCreatorAnnotation(annotatedParameter.getOwner())) {
                 findNameForDeserialization = PropertyName.construct(findImplicitPropertyName);
@@ -282,12 +285,13 @@ public class POJOPropertiesCollector {
                 return;
             }
         }
-        POJOPropertyBuilder _property = (z && findImplicitPropertyName.isEmpty()) ? _property((Map) map, findNameForDeserialization) : _property((Map) map, findImplicitPropertyName);
+        POJOPropertyBuilder _property = (!z || !findImplicitPropertyName.isEmpty()) ? _property(map, findImplicitPropertyName) : _property(map, findNameForDeserialization);
         _property.addCtor(annotatedParameter, findNameForDeserialization, z, true, false);
         this._creatorProperties.add(_property);
     }
 
-    protected void _addMethods(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _addMethods(Map<String, POJOPropertyBuilder> map) {
         AnnotationIntrospector annotationIntrospector = this._annotationIntrospector;
         for (AnnotatedMethod annotatedMethod : this._classDef.memberMethods()) {
             int parameterCount = annotatedMethod.getParameterCount();
@@ -297,30 +301,31 @@ public class POJOPropertiesCollector {
                 _addSetterMethod(map, annotatedMethod, annotationIntrospector);
             } else if (parameterCount == 2 && annotationIntrospector != null && annotationIntrospector.hasAnySetterAnnotation(annotatedMethod)) {
                 if (this._anySetters == null) {
-                    this._anySetters = new LinkedList();
+                    this._anySetters = new LinkedList<>();
                 }
                 this._anySetters.add(annotatedMethod);
             }
         }
     }
 
-    protected void _addGetterMethod(Map<String, POJOPropertyBuilder> map, AnnotatedMethod annotatedMethod, AnnotationIntrospector annotationIntrospector) {
-        boolean z = true;
+    /* access modifiers changed from: protected */
+    public void _addGetterMethod(Map<String, POJOPropertyBuilder> map, AnnotatedMethod annotatedMethod, AnnotationIntrospector annotationIntrospector) {
+        boolean z;
+        boolean z2;
+        boolean z3 = true;
         String str = null;
-        boolean z2 = false;
+        boolean z4 = false;
         if (annotatedMethod.hasReturnType()) {
-            boolean z3;
-            boolean z4;
             if (annotationIntrospector != null) {
                 if (annotationIntrospector.hasAnyGetterAnnotation(annotatedMethod)) {
                     if (this._anyGetters == null) {
-                        this._anyGetters = new LinkedList();
+                        this._anyGetters = new LinkedList<>();
                     }
                     this._anyGetters.add(annotatedMethod);
                     return;
                 } else if (annotationIntrospector.hasAsValueAnnotation(annotatedMethod)) {
                     if (this._jsonValueGetters == null) {
-                        this._jsonValueGetters = new LinkedList();
+                        this._jsonValueGetters = new LinkedList<>();
                     }
                     this._jsonValueGetters.add(annotatedMethod);
                     return;
@@ -328,11 +333,30 @@ public class POJOPropertiesCollector {
             }
             PropertyName findNameForSerialization = annotationIntrospector == null ? null : annotationIntrospector.findNameForSerialization(annotatedMethod);
             if (findNameForSerialization != null) {
-                z3 = true;
+                z = true;
             } else {
-                z3 = false;
+                z = false;
             }
-            if (z3) {
+            if (!z) {
+                if (annotationIntrospector != null) {
+                    str = annotationIntrospector.findImplicitPropertyName(annotatedMethod);
+                }
+                if (str == null) {
+                    str = BeanUtil.okNameForRegularGetter(annotatedMethod, annotatedMethod.getName(), this._stdBeanNaming);
+                }
+                if (str == null) {
+                    str = BeanUtil.okNameForIsGetter(annotatedMethod, annotatedMethod.getName(), this._stdBeanNaming);
+                    if (str != null) {
+                        z3 = this._visibilityChecker.isIsGetterVisible(annotatedMethod);
+                        z2 = z;
+                    } else {
+                        return;
+                    }
+                } else {
+                    z3 = this._visibilityChecker.isGetterVisible(annotatedMethod);
+                    z2 = z;
+                }
+            } else {
                 if (annotationIntrospector != null) {
                     str = annotationIntrospector.findImplicitPropertyName(annotatedMethod);
                 }
@@ -344,36 +368,19 @@ public class POJOPropertiesCollector {
                 }
                 if (findNameForSerialization.isEmpty()) {
                     findNameForSerialization = _propNameFromSimple(str);
-                    z3 = false;
+                    z = false;
                 }
-                z4 = z3;
-            } else {
-                if (annotationIntrospector != null) {
-                    str = annotationIntrospector.findImplicitPropertyName(annotatedMethod);
-                }
-                if (str == null) {
-                    str = BeanUtil.okNameForRegularGetter(annotatedMethod, annotatedMethod.getName(), this._stdBeanNaming);
-                }
-                if (str == null) {
-                    str = BeanUtil.okNameForIsGetter(annotatedMethod, annotatedMethod.getName(), this._stdBeanNaming);
-                    if (str != null) {
-                        z = this._visibilityChecker.isIsGetterVisible(annotatedMethod);
-                        z4 = z3;
-                    } else {
-                        return;
-                    }
-                }
-                z = this._visibilityChecker.isGetterVisible(annotatedMethod);
-                z4 = z3;
+                z2 = z;
             }
             if (annotationIntrospector != null) {
-                z2 = annotationIntrospector.hasIgnoreMarker(annotatedMethod);
+                z4 = annotationIntrospector.hasIgnoreMarker(annotatedMethod);
             }
-            _property((Map) map, str).addGetter(annotatedMethod, findNameForSerialization, z4, z, z2);
+            _property(map, str).addGetter(annotatedMethod, findNameForSerialization, z2, z3, z4);
         }
     }
 
-    protected void _addSetterMethod(Map<String, POJOPropertyBuilder> map, AnnotatedMethod annotatedMethod, AnnotationIntrospector annotationIntrospector) {
+    /* access modifiers changed from: protected */
+    public void _addSetterMethod(Map<String, POJOPropertyBuilder> map, AnnotatedMethod annotatedMethod, AnnotationIntrospector annotationIntrospector) {
         boolean z;
         boolean z2;
         boolean z3 = true;
@@ -385,7 +392,20 @@ public class POJOPropertiesCollector {
         } else {
             z = false;
         }
-        if (z) {
+        if (!z) {
+            if (annotationIntrospector != null) {
+                str = annotationIntrospector.findImplicitPropertyName(annotatedMethod);
+            }
+            if (str == null) {
+                str = BeanUtil.okNameForMutator(annotatedMethod, this._mutatorPrefix, this._stdBeanNaming);
+            }
+            if (str != null) {
+                z3 = this._visibilityChecker.isSetterVisible(annotatedMethod);
+                z2 = z;
+            } else {
+                return;
+            }
+        } else {
             if (annotationIntrospector != null) {
                 str = annotationIntrospector.findImplicitPropertyName(annotatedMethod);
             }
@@ -400,27 +420,15 @@ public class POJOPropertiesCollector {
                 z = false;
             }
             z2 = z;
-        } else {
-            if (annotationIntrospector != null) {
-                str = annotationIntrospector.findImplicitPropertyName(annotatedMethod);
-            }
-            if (str == null) {
-                str = BeanUtil.okNameForMutator(annotatedMethod, this._mutatorPrefix, this._stdBeanNaming);
-            }
-            if (str != null) {
-                z3 = this._visibilityChecker.isSetterVisible(annotatedMethod);
-                z2 = z;
-            } else {
-                return;
-            }
         }
         if (annotationIntrospector != null) {
             z4 = annotationIntrospector.hasIgnoreMarker(annotatedMethod);
         }
-        _property((Map) map, str).addSetter(annotatedMethod, findNameForDeserialization, z2, z3, z4);
+        _property(map, str).addSetter(annotatedMethod, findNameForDeserialization, z2, z3, z4);
     }
 
-    protected void _addInjectables(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _addInjectables(Map<String, POJOPropertyBuilder> map) {
         AnnotationIntrospector annotationIntrospector = this._annotationIntrospector;
         if (annotationIntrospector != null) {
             for (AnnotatedField annotatedField : this._classDef.fields()) {
@@ -434,10 +442,11 @@ public class POJOPropertiesCollector {
         }
     }
 
-    protected void _doAddInjectable(Object obj, AnnotatedMember annotatedMember) {
+    /* access modifiers changed from: protected */
+    public void _doAddInjectable(Object obj, AnnotatedMember annotatedMember) {
         if (obj != null) {
             if (this._injectables == null) {
-                this._injectables = new LinkedHashMap();
+                this._injectables = new LinkedHashMap<>();
             }
             if (((AnnotatedMember) this._injectables.put(obj, annotatedMember)) != null) {
                 throw new IllegalArgumentException("Duplicate injectable value with id '" + String.valueOf(obj) + "' (of type " + obj.getClass().getName() + ")");
@@ -449,27 +458,29 @@ public class POJOPropertiesCollector {
         return PropertyName.construct(str, null);
     }
 
-    protected void _removeUnwantedProperties(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _removeUnwantedProperties(Map<String, POJOPropertyBuilder> map) {
         Iterator it = map.values().iterator();
         while (it.hasNext()) {
             POJOPropertyBuilder pOJOPropertyBuilder = (POJOPropertyBuilder) it.next();
             if (!pOJOPropertyBuilder.anyVisible()) {
                 it.remove();
             } else if (pOJOPropertyBuilder.anyIgnorals()) {
-                if (pOJOPropertyBuilder.isExplicitlyIncluded()) {
-                    pOJOPropertyBuilder.removeIgnored();
-                    if (!(this._forSerialization || pOJOPropertyBuilder.couldDeserialize())) {
-                        _collectIgnorals(pOJOPropertyBuilder.getName());
-                    }
-                } else {
+                if (!pOJOPropertyBuilder.isExplicitlyIncluded()) {
                     it.remove();
                     _collectIgnorals(pOJOPropertyBuilder.getName());
+                } else {
+                    pOJOPropertyBuilder.removeIgnored();
+                    if (!this._forSerialization && !pOJOPropertyBuilder.couldDeserialize()) {
+                        _collectIgnorals(pOJOPropertyBuilder.getName());
+                    }
                 }
             }
         }
     }
 
-    protected void _removeUnwantedAccessor(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _removeUnwantedAccessor(Map<String, POJOPropertyBuilder> map) {
         boolean isEnabled = this._config.isEnabled(MapperFeature.INFER_PROPERTY_MUTATORS);
         for (POJOPropertyBuilder removeNonVisible : map.values()) {
             removeNonVisible.removeNonVisible(isEnabled);
@@ -479,18 +490,19 @@ public class POJOPropertiesCollector {
     private void _collectIgnorals(String str) {
         if (!this._forSerialization) {
             if (this._ignoredPropertyNames == null) {
-                this._ignoredPropertyNames = new HashSet();
+                this._ignoredPropertyNames = new HashSet<>();
             }
             this._ignoredPropertyNames.add(str);
         }
     }
 
-    protected void _renameProperties(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _renameProperties(Map<String, POJOPropertyBuilder> map) {
         Iterator it = map.entrySet().iterator();
         LinkedList linkedList = null;
         while (it.hasNext()) {
             POJOPropertyBuilder pOJOPropertyBuilder = (POJOPropertyBuilder) ((Entry) it.next()).getValue();
-            Collection findExplicitNames = pOJOPropertyBuilder.findExplicitNames();
+            Set findExplicitNames = pOJOPropertyBuilder.findExplicitNames();
             if (!findExplicitNames.isEmpty()) {
                 it.remove();
                 if (linkedList == null) {
@@ -508,23 +520,23 @@ public class POJOPropertiesCollector {
             while (it2.hasNext()) {
                 POJOPropertyBuilder pOJOPropertyBuilder2 = (POJOPropertyBuilder) it2.next();
                 String name = pOJOPropertyBuilder2.getName();
-                pOJOPropertyBuilder = (POJOPropertyBuilder) map.get(name);
-                if (pOJOPropertyBuilder == null) {
+                POJOPropertyBuilder pOJOPropertyBuilder3 = (POJOPropertyBuilder) map.get(name);
+                if (pOJOPropertyBuilder3 == null) {
                     map.put(name, pOJOPropertyBuilder2);
                 } else {
-                    pOJOPropertyBuilder.addAll(pOJOPropertyBuilder2);
+                    pOJOPropertyBuilder3.addAll(pOJOPropertyBuilder2);
                 }
                 _updateCreatorProperty(pOJOPropertyBuilder2, this._creatorProperties);
             }
         }
     }
 
-    protected void _renameUsing(Map<String, POJOPropertyBuilder> map, PropertyNamingStrategy propertyNamingStrategy) {
+    /* access modifiers changed from: protected */
+    public void _renameUsing(Map<String, POJOPropertyBuilder> map, PropertyNamingStrategy propertyNamingStrategy) {
+        String simpleName;
         POJOPropertyBuilder[] pOJOPropertyBuilderArr = (POJOPropertyBuilder[]) map.values().toArray(new POJOPropertyBuilder[map.size()]);
         map.clear();
         for (POJOPropertyBuilder pOJOPropertyBuilder : pOJOPropertyBuilderArr) {
-            POJOPropertyBuilder pOJOPropertyBuilder2;
-            Object obj;
             PropertyName fullName = pOJOPropertyBuilder.getFullName();
             String str = null;
             if (!pOJOPropertyBuilder.isExplicitlyNamed() || this._config.isEnabled(MapperFeature.ALLOW_EXPLICIT_PROPERTY_RENAMING)) {
@@ -545,32 +557,31 @@ public class POJOPropertiesCollector {
                 }
             }
             if (str == null || fullName.hasSimpleName(str)) {
-                str = fullName.getSimpleName();
-                pOJOPropertyBuilder2 = pOJOPropertyBuilder;
-                String str2 = str;
+                simpleName = fullName.getSimpleName();
             } else {
-                pOJOPropertyBuilder2 = pOJOPropertyBuilder.withSimpleName(str);
-                obj = str;
+                pOJOPropertyBuilder = pOJOPropertyBuilder.withSimpleName(str);
+                simpleName = str;
             }
-            POJOPropertyBuilder pOJOPropertyBuilder3 = (POJOPropertyBuilder) map.get(obj);
-            if (pOJOPropertyBuilder3 == null) {
-                map.put(obj, pOJOPropertyBuilder2);
+            POJOPropertyBuilder pOJOPropertyBuilder2 = (POJOPropertyBuilder) map.get(simpleName);
+            if (pOJOPropertyBuilder2 == null) {
+                map.put(simpleName, pOJOPropertyBuilder);
             } else {
-                pOJOPropertyBuilder3.addAll(pOJOPropertyBuilder2);
+                pOJOPropertyBuilder2.addAll(pOJOPropertyBuilder);
             }
-            _updateCreatorProperty(pOJOPropertyBuilder2, this._creatorProperties);
+            _updateCreatorProperty(pOJOPropertyBuilder, this._creatorProperties);
         }
     }
 
-    protected void _renameWithWrappers(Map<String, POJOPropertyBuilder> map) {
+    /* access modifiers changed from: protected */
+    public void _renameWithWrappers(Map<String, POJOPropertyBuilder> map) {
         Iterator it = map.entrySet().iterator();
         LinkedList linkedList = null;
         while (it.hasNext()) {
             POJOPropertyBuilder pOJOPropertyBuilder = (POJOPropertyBuilder) ((Entry) it.next()).getValue();
-            Annotated primaryMember = pOJOPropertyBuilder.getPrimaryMember();
+            AnnotatedMember primaryMember = pOJOPropertyBuilder.getPrimaryMember();
             if (primaryMember != null) {
                 PropertyName findWrapperName = this._annotationIntrospector.findWrapperName(primaryMember);
-                if (!(findWrapperName == null || !findWrapperName.hasSimpleName() || findWrapperName.equals(pOJOPropertyBuilder.getFullName()))) {
+                if (findWrapperName != null && findWrapperName.hasSimpleName() && !findWrapperName.equals(pOJOPropertyBuilder.getFullName())) {
                     if (linkedList == null) {
                         linkedList = new LinkedList();
                     }
@@ -580,103 +591,107 @@ public class POJOPropertiesCollector {
             }
         }
         if (linkedList != null) {
-            it = linkedList.iterator();
-            while (it.hasNext()) {
-                pOJOPropertyBuilder = (POJOPropertyBuilder) it.next();
-                String name = pOJOPropertyBuilder.getName();
-                POJOPropertyBuilder pOJOPropertyBuilder2 = (POJOPropertyBuilder) map.get(name);
-                if (pOJOPropertyBuilder2 == null) {
-                    map.put(name, pOJOPropertyBuilder);
+            Iterator it2 = linkedList.iterator();
+            while (it2.hasNext()) {
+                POJOPropertyBuilder pOJOPropertyBuilder2 = (POJOPropertyBuilder) it2.next();
+                String name = pOJOPropertyBuilder2.getName();
+                POJOPropertyBuilder pOJOPropertyBuilder3 = (POJOPropertyBuilder) map.get(name);
+                if (pOJOPropertyBuilder3 == null) {
+                    map.put(name, pOJOPropertyBuilder2);
                 } else {
-                    pOJOPropertyBuilder2.addAll(pOJOPropertyBuilder);
+                    pOJOPropertyBuilder3.addAll(pOJOPropertyBuilder2);
                 }
             }
         }
     }
 
-    protected void _sortProperties(Map<String, POJOPropertyBuilder> map) {
-        boolean shouldSortPropertiesAlphabetically;
+    /* access modifiers changed from: protected */
+    public void _sortProperties(Map<String, POJOPropertyBuilder> map) {
+        boolean booleanValue;
+        Map linkedHashMap;
+        Collection<POJOPropertyBuilder> collection;
         AnnotationIntrospector annotationIntrospector = this._annotationIntrospector;
         Boolean findSerializationSortAlphabetically = annotationIntrospector == null ? null : annotationIntrospector.findSerializationSortAlphabetically(this._classDef);
         if (findSerializationSortAlphabetically == null) {
-            shouldSortPropertiesAlphabetically = this._config.shouldSortPropertiesAlphabetically();
+            booleanValue = this._config.shouldSortPropertiesAlphabetically();
         } else {
-            shouldSortPropertiesAlphabetically = findSerializationSortAlphabetically.booleanValue();
+            booleanValue = findSerializationSortAlphabetically.booleanValue();
         }
         String[] findSerializationPropertyOrder = annotationIntrospector == null ? null : annotationIntrospector.findSerializationPropertyOrder(this._classDef);
-        if (shouldSortPropertiesAlphabetically || this._creatorProperties != null || findSerializationPropertyOrder != null) {
-            Map treeMap;
-            Iterator it;
-            POJOPropertyBuilder pOJOPropertyBuilder;
+        if (booleanValue || this._creatorProperties != null || findSerializationPropertyOrder != null) {
             int size = map.size();
-            if (shouldSortPropertiesAlphabetically) {
-                treeMap = new TreeMap();
+            if (booleanValue) {
+                linkedHashMap = new TreeMap();
             } else {
-                Object linkedHashMap = new LinkedHashMap(size + size);
+                linkedHashMap = new LinkedHashMap(size + size);
             }
-            for (POJOPropertyBuilder pOJOPropertyBuilder2 : map.values()) {
-                treeMap.put(pOJOPropertyBuilder2.getName(), pOJOPropertyBuilder2);
+            for (POJOPropertyBuilder pOJOPropertyBuilder : map.values()) {
+                linkedHashMap.put(pOJOPropertyBuilder.getName(), pOJOPropertyBuilder);
             }
-            Map linkedHashMap2 = new LinkedHashMap(size + size);
+            LinkedHashMap linkedHashMap2 = new LinkedHashMap(size + size);
             if (findSerializationPropertyOrder != null) {
                 for (String str : findSerializationPropertyOrder) {
-                    Object name;
-                    Object obj = (POJOPropertyBuilder) treeMap.get(str);
-                    if (obj == null) {
-                        for (POJOPropertyBuilder pOJOPropertyBuilder3 : map.values()) {
+                    POJOPropertyBuilder pOJOPropertyBuilder2 = (POJOPropertyBuilder) linkedHashMap.get(str);
+                    if (pOJOPropertyBuilder2 == null) {
+                        Iterator it = map.values().iterator();
+                        while (true) {
+                            if (!it.hasNext()) {
+                                break;
+                            }
+                            POJOPropertyBuilder pOJOPropertyBuilder3 = (POJOPropertyBuilder) it.next();
                             if (str.equals(pOJOPropertyBuilder3.getInternalName())) {
-                                POJOPropertyBuilder pOJOPropertyBuilder4 = pOJOPropertyBuilder3;
-                                name = pOJOPropertyBuilder3.getName();
-                                obj = pOJOPropertyBuilder4;
+                                str = pOJOPropertyBuilder3.getName();
+                                pOJOPropertyBuilder2 = pOJOPropertyBuilder3;
                                 break;
                             }
                         }
                     }
-                    String str2 = str;
-                    if (obj != null) {
-                        linkedHashMap2.put(name, obj);
+                    if (pOJOPropertyBuilder2 != null) {
+                        linkedHashMap2.put(str, pOJOPropertyBuilder2);
                     }
                 }
             }
             if (this._creatorProperties != null) {
-                Collection values;
-                if (shouldSortPropertiesAlphabetically) {
-                    TreeMap treeMap2 = new TreeMap();
-                    it = this._creatorProperties.iterator();
-                    while (it.hasNext()) {
-                        pOJOPropertyBuilder2 = (POJOPropertyBuilder) it.next();
-                        treeMap2.put(pOJOPropertyBuilder2.getName(), pOJOPropertyBuilder2);
+                if (booleanValue) {
+                    TreeMap treeMap = new TreeMap();
+                    Iterator it2 = this._creatorProperties.iterator();
+                    while (it2.hasNext()) {
+                        POJOPropertyBuilder pOJOPropertyBuilder4 = (POJOPropertyBuilder) it2.next();
+                        treeMap.put(pOJOPropertyBuilder4.getName(), pOJOPropertyBuilder4);
                     }
-                    values = treeMap2.values();
+                    collection = treeMap.values();
                 } else {
-                    values = this._creatorProperties;
+                    collection = this._creatorProperties;
                 }
-                for (POJOPropertyBuilder pOJOPropertyBuilder22 : r0) {
-                    linkedHashMap2.put(pOJOPropertyBuilder22.getName(), pOJOPropertyBuilder22);
+                for (POJOPropertyBuilder pOJOPropertyBuilder5 : collection) {
+                    linkedHashMap2.put(pOJOPropertyBuilder5.getName(), pOJOPropertyBuilder5);
                 }
             }
-            linkedHashMap2.putAll(treeMap);
+            linkedHashMap2.putAll(linkedHashMap);
             map.clear();
             map.putAll(linkedHashMap2);
         }
     }
 
-    protected void reportProblem(String str) {
+    /* access modifiers changed from: protected */
+    public void reportProblem(String str) {
         throw new IllegalArgumentException("Problem with definition of " + this._classDef + ": " + str);
     }
 
-    protected POJOPropertyBuilder _property(Map<String, POJOPropertyBuilder> map, PropertyName propertyName) {
-        return _property((Map) map, propertyName.getSimpleName());
+    /* access modifiers changed from: protected */
+    public POJOPropertyBuilder _property(Map<String, POJOPropertyBuilder> map, PropertyName propertyName) {
+        return _property(map, propertyName.getSimpleName());
     }
 
-    protected POJOPropertyBuilder _property(Map<String, POJOPropertyBuilder> map, String str) {
+    /* access modifiers changed from: protected */
+    public POJOPropertyBuilder _property(Map<String, POJOPropertyBuilder> map, String str) {
         POJOPropertyBuilder pOJOPropertyBuilder = (POJOPropertyBuilder) map.get(str);
         if (pOJOPropertyBuilder != null) {
             return pOJOPropertyBuilder;
         }
-        pOJOPropertyBuilder = new POJOPropertyBuilder(this._config, this._annotationIntrospector, this._forSerialization, PropertyName.construct(str));
-        map.put(str, pOJOPropertyBuilder);
-        return pOJOPropertyBuilder;
+        POJOPropertyBuilder pOJOPropertyBuilder2 = new POJOPropertyBuilder(this._config, this._annotationIntrospector, this._forSerialization, PropertyName.construct(str));
+        map.put(str, pOJOPropertyBuilder2);
+        return pOJOPropertyBuilder2;
     }
 
     private PropertyNamingStrategy _findNamingStrategy() {
@@ -687,27 +702,28 @@ public class POJOPropertiesCollector {
         if (findNamingStrategy instanceof PropertyNamingStrategy) {
             return (PropertyNamingStrategy) findNamingStrategy;
         }
-        if (findNamingStrategy instanceof Class) {
-            Class cls = (Class) findNamingStrategy;
-            if (cls == PropertyNamingStrategy.class) {
-                return null;
-            }
-            if (PropertyNamingStrategy.class.isAssignableFrom(cls)) {
-                HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
-                if (handlerInstantiator != null) {
-                    PropertyNamingStrategy namingStrategyInstance = handlerInstantiator.namingStrategyInstance(this._config, this._classDef, cls);
-                    if (namingStrategyInstance != null) {
-                        return namingStrategyInstance;
-                    }
-                }
-                return (PropertyNamingStrategy) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
-            }
+        if (!(findNamingStrategy instanceof Class)) {
+            throw new IllegalStateException("AnnotationIntrospector returned PropertyNamingStrategy definition of type " + findNamingStrategy.getClass().getName() + "; expected type PropertyNamingStrategy or Class<PropertyNamingStrategy> instead");
+        }
+        Class<PropertyNamingStrategy> cls = (Class) findNamingStrategy;
+        if (cls == PropertyNamingStrategy.class) {
+            return null;
+        }
+        if (!PropertyNamingStrategy.class.isAssignableFrom(cls)) {
             throw new IllegalStateException("AnnotationIntrospector returned Class " + cls.getName() + "; expected Class<PropertyNamingStrategy>");
         }
-        throw new IllegalStateException("AnnotationIntrospector returned PropertyNamingStrategy definition of type " + findNamingStrategy.getClass().getName() + "; expected type PropertyNamingStrategy or Class<PropertyNamingStrategy> instead");
+        HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
+        if (handlerInstantiator != null) {
+            PropertyNamingStrategy namingStrategyInstance = handlerInstantiator.namingStrategyInstance(this._config, this._classDef, cls);
+            if (namingStrategyInstance != null) {
+                return namingStrategyInstance;
+            }
+        }
+        return (PropertyNamingStrategy) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
     }
 
-    protected void _updateCreatorProperty(POJOPropertyBuilder pOJOPropertyBuilder, List<POJOPropertyBuilder> list) {
+    /* access modifiers changed from: protected */
+    public void _updateCreatorProperty(POJOPropertyBuilder pOJOPropertyBuilder, List<POJOPropertyBuilder> list) {
         if (list != null) {
             int size = list.size();
             for (int i = 0; i < size; i++) {

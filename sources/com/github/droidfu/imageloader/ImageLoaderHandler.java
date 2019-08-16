@@ -12,13 +12,13 @@ public class ImageLoaderHandler extends Handler {
     private String imageUrl;
     private ImageView imageView;
 
-    public ImageLoaderHandler(ImageView imageView, String str) {
-        this.imageView = imageView;
+    public ImageLoaderHandler(ImageView imageView2, String str) {
+        this.imageView = imageView2;
         this.imageUrl = str;
     }
 
-    public ImageLoaderHandler(ImageView imageView, String str, Drawable drawable) {
-        this(imageView, str);
+    public ImageLoaderHandler(ImageView imageView2, String str, Drawable drawable) {
+        this(imageView2, str);
         this.errorDrawable = drawable;
     }
 
@@ -30,7 +30,8 @@ public class ImageLoaderHandler extends Handler {
         return this.imageView;
     }
 
-    protected boolean handleImageLoaded(Bitmap bitmap, Message message) {
+    /* access modifiers changed from: protected */
+    public boolean handleImageLoaded(Bitmap bitmap, Message message) {
         if (!this.imageUrl.equals((String) this.imageView.getTag())) {
             return false;
         }
@@ -43,7 +44,8 @@ public class ImageLoaderHandler extends Handler {
         return true;
     }
 
-    protected final void handleImageLoadedMessage(Message message) {
+    /* access modifiers changed from: protected */
+    public final void handleImageLoadedMessage(Message message) {
         handleImageLoaded((Bitmap) message.getData().getParcelable(ImageLoader.BITMAP_EXTRA), message);
     }
 
@@ -57,7 +59,7 @@ public class ImageLoaderHandler extends Handler {
         this.imageUrl = str;
     }
 
-    public void setImageView(ImageView imageView) {
-        this.imageView = imageView;
+    public void setImageView(ImageView imageView2) {
+        this.imageView = imageView2;
     }
 }

@@ -24,13 +24,13 @@ public class GuildStageManager : MonoBehaviourSingleton<GuildStageManager>
 	{
 		while (!MonoBehaviourSingleton<StageManager>.IsValid() || MonoBehaviourSingleton<StageManager>.I.isLoading)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
 		HomePeople = this.get_gameObject().AddComponent<HomePeople>();
 		while (!HomeCamera.isInitialized || !HomePeople.isInitialized)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		IsInitialized = true;
 	}

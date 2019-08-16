@@ -94,10 +94,10 @@ public class InGameQuestAcceptDeliveryDetail : InGameDeliveryDetailBase
 
 	public void OnQuery_TO_GACHA_QUEST_COUNTER()
 	{
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+		string goingHomeEvent = GameSection.GetGoingHomeEvent();
 		EventData[] autoEvents = new EventData[2]
 		{
-			new EventData(name, null),
+			new EventData(goingHomeEvent, null),
 			new EventData("GACHA_QUEST_COUNTER", null)
 		};
 		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);

@@ -1,4 +1,5 @@
 using MsgPack.Serialization;
+using System;
 using System.Collections.Generic;
 
 namespace MsgPack
@@ -12,26 +13,26 @@ namespace MsgPack
 
 		protected override void PackToCore(Packer packer, List<T> objectTree)
 		{
-			MessagePackSerializer<T> serializer = base.OwnerContext.GetSerializer<T>();
+			MessagePackSerializer<T> serializer = base.get_OwnerContext().GetSerializer<T>();
 			T[] array = objectTree.ToArray();
 			packer.PackArrayHeader(array.Length);
 			T[] array2 = array;
-			foreach (T objectTree2 in array2)
+			foreach (T val in array2)
 			{
-				serializer.PackTo(packer, objectTree2);
+				serializer.PackTo(packer, val);
 			}
 		}
 
 		protected override List<T> UnpackFromCore(Unpacker unpacker)
 		{
-			MessagePackSerializer<T> serializer = base.OwnerContext.GetSerializer<T>();
-			if (!unpacker.IsArrayHeader)
+			MessagePackSerializer<T> serializer = base.get_OwnerContext().GetSerializer<T>();
+			if (!unpacker.get_IsArrayHeader())
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
 			int itemsCount = UnpackHelpers.GetItemsCount(unpacker);
 			List<T> list = new List<T>();
-			if (!unpacker.IsArrayHeader)
+			if (!unpacker.get_IsArrayHeader())
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
@@ -41,16 +42,21 @@ namespace MsgPack
 				{
 					throw SerializationExceptions.NewMissingItem(i);
 				}
-				T item = default(T);
-				if (!unpacker.IsArrayHeader && !unpacker.IsMapHeader)
+				T item;
+				if (!unpacker.get_IsArrayHeader() && !unpacker.get_IsMapHeader())
 				{
 					item = serializer.UnpackFrom(unpacker);
 				}
 				else
 				{
-					using (Unpacker unpacker2 = unpacker.ReadSubtree())
+					Unpacker val = unpacker.ReadSubtree();
+					try
 					{
-						item = serializer.UnpackFrom(unpacker2);
+						item = serializer.UnpackFrom(val);
+					}
+					finally
+					{
+						((IDisposable)val)?.Dispose();
 					}
 				}
 				list.Add(item);

@@ -5,11 +5,33 @@ public class UIInGameSelfAnnounceManager : MonoBehaviourSingleton<UIInGameSelfAn
 	[SerializeField]
 	protected UIInGameSelfAnnounce regionBreak;
 
+	[SerializeField]
+	protected UIInGameSelfAnnounce regionDragonArmor;
+
+	[SerializeField]
+	protected UIInGameSelfAnnounce supplyInformation;
+
 	public void PlayRegionBreak()
 	{
 		if (!(regionBreak == null))
 		{
-			regionBreak.Play(null);
+			regionBreak.Play();
+		}
+	}
+
+	public void PlayDragonArmorBreak()
+	{
+		if (!(regionDragonArmor == null))
+		{
+			regionDragonArmor.Play();
+		}
+	}
+
+	public void PlaySupplyInformation()
+	{
+		if (!(supplyInformation == null))
+		{
+			supplyInformation.Play();
 		}
 	}
 }

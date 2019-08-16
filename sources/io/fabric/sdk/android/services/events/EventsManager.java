@@ -1,5 +1,6 @@
-package io.fabric.sdk.android.services.events;
+package p017io.fabric.sdk.android.services.events;
 
+/* renamed from: io.fabric.sdk.android.services.events.EventsManager */
 public interface EventsManager<T> {
     void deleteAllEvents();
 

@@ -2,47 +2,62 @@ package com.google.android.gms.games.quest;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.games.internal.zzc;
-import java.util.Arrays;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.games.internal.zzd;
 
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "MilestoneEntityCreator")
+@Reserved({1000})
 @Deprecated
-public final class MilestoneEntity extends zzc implements Milestone {
+public final class MilestoneEntity extends zzd implements Milestone {
     public static final Creator<MilestoneEntity> CREATOR = new zza();
-    private final int mState;
-    private final String zzhdw;
-    private final String zzhft;
-    private final long zzhno;
-    private final long zzhnp;
-    private final byte[] zzhnq;
+    @Field(getter = "getState", mo13990id = 5)
+    private final int state;
+    @Field(getter = "getEventId", mo13990id = 6)
+    private final String zzgl;
+    @Field(getter = "getMilestoneId", mo13990id = 1)
+    private final String zzqw;
+    @Field(getter = "getCurrentProgress", mo13990id = 2)
+    private final long zzqx;
+    @Field(getter = "getTargetProgress", mo13990id = 3)
+    private final long zzqy;
+    @Field(getter = "getCompletionRewardData", mo13990id = 4)
+    private final byte[] zzqz;
 
     public MilestoneEntity(Milestone milestone) {
-        this.zzhft = milestone.getMilestoneId();
-        this.zzhno = milestone.getCurrentProgress();
-        this.zzhnp = milestone.getTargetProgress();
-        this.mState = milestone.getState();
-        this.zzhdw = milestone.getEventId();
-        Object completionRewardData = milestone.getCompletionRewardData();
+        this.zzqw = milestone.getMilestoneId();
+        this.zzqx = milestone.getCurrentProgress();
+        this.zzqy = milestone.getTargetProgress();
+        this.state = milestone.getState();
+        this.zzgl = milestone.getEventId();
+        byte[] completionRewardData = milestone.getCompletionRewardData();
         if (completionRewardData == null) {
-            this.zzhnq = null;
+            this.zzqz = null;
             return;
         }
-        this.zzhnq = new byte[completionRewardData.length];
-        System.arraycopy(completionRewardData, 0, this.zzhnq, 0, completionRewardData.length);
+        this.zzqz = new byte[completionRewardData.length];
+        System.arraycopy(completionRewardData, 0, this.zzqz, 0, completionRewardData.length);
     }
 
-    MilestoneEntity(String str, long j, long j2, byte[] bArr, int i, String str2) {
-        this.zzhft = str;
-        this.zzhno = j;
-        this.zzhnp = j2;
-        this.zzhnq = bArr;
-        this.mState = i;
-        this.zzhdw = str2;
+    @Constructor
+    MilestoneEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) long j, @Param(mo13993id = 3) long j2, @Param(mo13993id = 4) byte[] bArr, @Param(mo13993id = 5) int i, @Param(mo13993id = 6) String str2) {
+        this.zzqw = str;
+        this.zzqx = j;
+        this.zzqy = j2;
+        this.zzqz = bArr;
+        this.state = i;
+        this.zzgl = str2;
     }
 
     static int zza(Milestone milestone) {
-        return Arrays.hashCode(new Object[]{milestone.getMilestoneId(), Long.valueOf(milestone.getCurrentProgress()), Long.valueOf(milestone.getTargetProgress()), Integer.valueOf(milestone.getState()), milestone.getEventId()});
+        return Objects.hashCode(milestone.getMilestoneId(), Long.valueOf(milestone.getCurrentProgress()), Long.valueOf(milestone.getTargetProgress()), Integer.valueOf(milestone.getState()), milestone.getEventId());
     }
 
     static boolean zza(Milestone milestone, Object obj) {
@@ -53,43 +68,46 @@ public final class MilestoneEntity extends zzc implements Milestone {
             return true;
         }
         Milestone milestone2 = (Milestone) obj;
-        return zzbf.equal(milestone2.getMilestoneId(), milestone.getMilestoneId()) && zzbf.equal(Long.valueOf(milestone2.getCurrentProgress()), Long.valueOf(milestone.getCurrentProgress())) && zzbf.equal(Long.valueOf(milestone2.getTargetProgress()), Long.valueOf(milestone.getTargetProgress())) && zzbf.equal(Integer.valueOf(milestone2.getState()), Integer.valueOf(milestone.getState())) && zzbf.equal(milestone2.getEventId(), milestone.getEventId());
+        return Objects.equal(milestone2.getMilestoneId(), milestone.getMilestoneId()) && Objects.equal(Long.valueOf(milestone2.getCurrentProgress()), Long.valueOf(milestone.getCurrentProgress())) && Objects.equal(Long.valueOf(milestone2.getTargetProgress()), Long.valueOf(milestone.getTargetProgress())) && Objects.equal(Integer.valueOf(milestone2.getState()), Integer.valueOf(milestone.getState())) && Objects.equal(milestone2.getEventId(), milestone.getEventId());
     }
 
     static String zzb(Milestone milestone) {
-        return zzbf.zzt(milestone).zzg("MilestoneId", milestone.getMilestoneId()).zzg("CurrentProgress", Long.valueOf(milestone.getCurrentProgress())).zzg("TargetProgress", Long.valueOf(milestone.getTargetProgress())).zzg("State", Integer.valueOf(milestone.getState())).zzg("CompletionRewardData", milestone.getCompletionRewardData()).zzg("EventId", milestone.getEventId()).toString();
+        return Objects.toStringHelper(milestone).add("MilestoneId", milestone.getMilestoneId()).add("CurrentProgress", Long.valueOf(milestone.getCurrentProgress())).add("TargetProgress", Long.valueOf(milestone.getTargetProgress())).add("State", Integer.valueOf(milestone.getState())).add("CompletionRewardData", milestone.getCompletionRewardData()).add("EventId", milestone.getEventId()).toString();
     }
 
     public final boolean equals(Object obj) {
         return zza(this, obj);
     }
 
-    public final Milestone freeze() {
-        return this;
+    public final /* bridge */ /* synthetic */ Object freeze() {
+        if (this != null) {
+            return this;
+        }
+        throw null;
     }
 
     public final byte[] getCompletionRewardData() {
-        return this.zzhnq;
+        return this.zzqz;
     }
 
     public final long getCurrentProgress() {
-        return this.zzhno;
+        return this.zzqx;
     }
 
     public final String getEventId() {
-        return this.zzhdw;
+        return this.zzgl;
     }
 
     public final String getMilestoneId() {
-        return this.zzhft;
+        return this.zzqw;
     }
 
     public final int getState() {
-        return this.mState;
+        return this.state;
     }
 
     public final long getTargetProgress() {
-        return this.zzhnp;
+        return this.zzqy;
     }
 
     public final int hashCode() {
@@ -105,13 +123,13 @@ public final class MilestoneEntity extends zzc implements Milestone {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getMilestoneId(), false);
-        zzd.zza(parcel, 2, getCurrentProgress());
-        zzd.zza(parcel, 3, getTargetProgress());
-        zzd.zza(parcel, 4, getCompletionRewardData(), false);
-        zzd.zzc(parcel, 5, getState());
-        zzd.zza(parcel, 6, getEventId(), false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, getMilestoneId(), false);
+        SafeParcelWriter.writeLong(parcel, 2, getCurrentProgress());
+        SafeParcelWriter.writeLong(parcel, 3, getTargetProgress());
+        SafeParcelWriter.writeByteArray(parcel, 4, getCompletionRewardData(), false);
+        SafeParcelWriter.writeInt(parcel, 5, getState());
+        SafeParcelWriter.writeString(parcel, 6, getEventId(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

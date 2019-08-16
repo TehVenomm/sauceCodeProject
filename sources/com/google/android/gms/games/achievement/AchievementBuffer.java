@@ -9,6 +9,6 @@ public final class AchievementBuffer extends AbstractDataBuffer<Achievement> {
     }
 
     public final Achievement get(int i) {
-        return new AchievementRef(this.zzfkz, i);
+        return new AchievementRef(this.mDataHolder, i);
     }
 }

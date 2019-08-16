@@ -1,4 +1,4 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,8 +7,17 @@ import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import android.util.Log;
 
+/* renamed from: android.support.v4.app.FragmentState */
 final class FragmentState implements Parcelable {
-    public static final Creator<FragmentState> CREATOR = new C00221();
+    public static final Creator<FragmentState> CREATOR = new Creator<FragmentState>() {
+        public FragmentState createFromParcel(Parcel parcel) {
+            return new FragmentState(parcel);
+        }
+
+        public FragmentState[] newArray(int i) {
+            return new FragmentState[i];
+        }
+    };
     final Bundle mArguments;
     final String mClassName;
     final int mContainerId;
@@ -21,20 +30,6 @@ final class FragmentState implements Parcelable {
     final boolean mRetainInstance;
     Bundle mSavedFragmentState;
     final String mTag;
-
-    /* renamed from: android.support.v4.app.FragmentState$1 */
-    static final class C00221 implements Creator<FragmentState> {
-        C00221() {
-        }
-
-        public FragmentState createFromParcel(Parcel parcel) {
-            return new FragmentState(parcel);
-        }
-
-        public FragmentState[] newArray(int i) {
-            return new FragmentState[i];
-        }
-    }
 
     public FragmentState(Parcel parcel) {
         boolean z = true;
@@ -71,13 +66,17 @@ final class FragmentState implements Parcelable {
         return 0;
     }
 
-    public Fragment instantiate(FragmentHostCallback fragmentHostCallback, Fragment fragment, FragmentManagerNonConfig fragmentManagerNonConfig) {
+    public Fragment instantiate(FragmentHostCallback fragmentHostCallback, FragmentContainer fragmentContainer, Fragment fragment, FragmentManagerNonConfig fragmentManagerNonConfig) {
         if (this.mInstance == null) {
             Context context = fragmentHostCallback.getContext();
             if (this.mArguments != null) {
                 this.mArguments.setClassLoader(context.getClassLoader());
             }
-            this.mInstance = Fragment.instantiate(context, this.mClassName, this.mArguments);
+            if (fragmentContainer != null) {
+                this.mInstance = fragmentContainer.instantiate(context, this.mClassName, this.mArguments);
+            } else {
+                this.mInstance = Fragment.instantiate(context, this.mClassName, this.mArguments);
+            }
             if (this.mSavedFragmentState != null) {
                 this.mSavedFragmentState.setClassLoader(context.getClassLoader());
                 this.mInstance.mSavedFragmentState = this.mSavedFragmentState;

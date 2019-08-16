@@ -4,58 +4,82 @@ public class MissionCheckEqpip : MissionCheckBase
 
 	protected override void Initialize(MISSION_REQUIRE require, int param)
 	{
-		EquipItemInfo equipmentWeaponInfo = MonoBehaviourSingleton<StatusManager>.I.GetEquipmentWeaponInfo(0, -1);
-		EQUIPMENT_TYPE type = equipmentWeaponInfo.tableData.type;
-		for (int i = 0; i < 3; i++)
+		EquipItemInfo equipItemInfo = null;
+		if (QuestManager.IsValidInGameSeriesArena())
 		{
-			EquipItemInfo equipmentWeaponInfo2 = MonoBehaviourSingleton<StatusManager>.I.GetEquipmentWeaponInfo(i, -1);
-			if (equipmentWeaponInfo2 != null)
+			for (int i = 1; i <= MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestSeriesNum(); i++)
 			{
-				switch (require)
+				EquipSetInfo orderUniqueEquipSet = MonoBehaviourSingleton<StatusManager>.I.GetOrderUniqueEquipSet(i);
+				if (orderUniqueEquipSet == null)
 				{
-				case MISSION_REQUIRE.ONLY_PAIR_SWORDS:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.PAIR_SWORDS)
+					continue;
+				}
+				for (int j = 0; j < 3; j++)
+				{
+					EquipItemInfo equipItemInfo2 = orderUniqueEquipSet.item[j];
+					if (equipItemInfo2 != null)
+					{
+						if (equipItemInfo == null)
+						{
+							equipItemInfo = equipItemInfo2;
+						}
+						if (Check(require, equipItemInfo2, equipItemInfo))
+						{
+							return;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int k = 0; k < 3; k++)
+			{
+				EquipItemInfo equipmentWeaponInfo = MonoBehaviourSingleton<StatusManager>.I.GetEquipmentWeaponInfo(k);
+				if (equipmentWeaponInfo != null)
+				{
+					if (equipItemInfo == null)
+					{
+						equipItemInfo = equipmentWeaponInfo;
+					}
+					if (Check(require, equipmentWeaponInfo, equipItemInfo))
 					{
 						return;
 					}
-					break;
-				case MISSION_REQUIRE.ONLY_ONE_HAND_SWORD:
-					if (equipmentWeaponInfo2.tableData.type != 0)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.ONLY_TWO_HAND_SWORD:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.TWO_HAND_SWORD)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.ONLY_SPEAR:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.SPEAR)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.ONLY_ARROW:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.ARROW)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.MULTI_EQUIP:
-					if (equipmentWeaponInfo2.tableData.type != type)
-					{
-						isClear = true;
-						return;
-					}
-					break;
 				}
 			}
 		}
 		if (require != MISSION_REQUIRE.MULTI_EQUIP)
 		{
 			isClear = true;
+		}
+	}
+
+	private bool Check(MISSION_REQUIRE require, EquipItemInfo checkWeapon, EquipItemInfo baseWeapon)
+	{
+		switch (require)
+		{
+		case MISSION_REQUIRE.ONLY_PAIR_SWORDS:
+			return checkWeapon.tableData.type != EQUIPMENT_TYPE.PAIR_SWORDS;
+		case MISSION_REQUIRE.ONLY_ONE_HAND_SWORD:
+			return checkWeapon.tableData.type != EQUIPMENT_TYPE.ONE_HAND_SWORD;
+		case MISSION_REQUIRE.ONLY_TWO_HAND_SWORD:
+			return checkWeapon.tableData.type != EQUIPMENT_TYPE.TWO_HAND_SWORD;
+		case MISSION_REQUIRE.ONLY_SPEAR:
+			return checkWeapon.tableData.type != EQUIPMENT_TYPE.SPEAR;
+		case MISSION_REQUIRE.ONLY_ARROW:
+			return checkWeapon.tableData.type != EQUIPMENT_TYPE.ARROW;
+		case MISSION_REQUIRE.MULTI_EQUIP:
+		{
+			bool flag = checkWeapon.tableData.type != baseWeapon.tableData.type;
+			if (flag)
+			{
+				isClear = true;
+			}
+			return flag;
+		}
+		default:
+			return false;
 		}
 	}
 

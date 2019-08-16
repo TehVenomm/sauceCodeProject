@@ -10,23 +10,26 @@ import com.google.gson.reflect.TypeToken;
 public final class JsonAdapterAnnotationTypeAdapterFactory implements TypeAdapterFactory {
     private final ConstructorConstructor constructorConstructor;
 
-    public JsonAdapterAnnotationTypeAdapterFactory(ConstructorConstructor constructorConstructor) {
-        this.constructorConstructor = constructorConstructor;
+    public JsonAdapterAnnotationTypeAdapterFactory(ConstructorConstructor constructorConstructor2) {
+        this.constructorConstructor = constructorConstructor2;
     }
 
-    static TypeAdapter<?> getTypeAdapter(ConstructorConstructor constructorConstructor, Gson gson, TypeToken<?> typeToken, JsonAdapter jsonAdapter) {
+    static TypeAdapter<?> getTypeAdapter(ConstructorConstructor constructorConstructor2, Gson gson, TypeToken<?> typeToken, JsonAdapter jsonAdapter) {
         Class value = jsonAdapter.value();
         if (TypeAdapter.class.isAssignableFrom(value)) {
-            return (TypeAdapter) constructorConstructor.get(TypeToken.get(value)).construct();
+            return (TypeAdapter) constructorConstructor2.get(TypeToken.get(value)).construct();
         }
         if (TypeAdapterFactory.class.isAssignableFrom(value)) {
-            return ((TypeAdapterFactory) constructorConstructor.get(TypeToken.get(value)).construct()).create(gson, typeToken);
+            return ((TypeAdapterFactory) constructorConstructor2.get(TypeToken.get(value)).construct()).create(gson, typeToken);
         }
         throw new IllegalArgumentException("@JsonAdapter value must be TypeAdapter or TypeAdapterFactory reference.");
     }
 
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
         JsonAdapter jsonAdapter = (JsonAdapter) typeToken.getRawType().getAnnotation(JsonAdapter.class);
-        return jsonAdapter == null ? null : getTypeAdapter(this.constructorConstructor, gson, typeToken, jsonAdapter);
+        if (jsonAdapter == null) {
+            return null;
+        }
+        return getTypeAdapter(this.constructorConstructor, gson, typeToken, jsonAdapter);
     }
 }

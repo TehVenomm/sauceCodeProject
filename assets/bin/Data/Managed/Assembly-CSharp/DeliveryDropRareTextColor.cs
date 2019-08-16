@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DeliveryDropRareTextColor
+public class DeliveryDropRareTextColor : MonoBehaviour
 {
 	public Color NormalColor;
 
@@ -15,9 +15,9 @@ public class DeliveryDropRareTextColor
 
 	public Color GetRarityColor(DELIVERY_DROP_DIFFICULTY type)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		switch (type)
 		{
 		default:

@@ -1,32 +1,31 @@
 package com.google.android.gms.common.api.internal;
 
-import android.os.RemoteException;
-import android.support.annotation.NonNull;
-import com.google.android.gms.common.api.Api.zzb;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.TaskCompletionSource;
+final class zzd implements Runnable {
+    private final /* synthetic */ LifecycleCallback zzbi;
+    private final /* synthetic */ String zzbj;
+    private final /* synthetic */ zzc zzbl;
 
-public final class zzd extends zzb {
-    private zzcr<zzb, ?> zzfhx;
-    private zzdm<zzb, ?> zzfhy;
-
-    public zzd(zzcs zzcs, TaskCompletionSource<Void> taskCompletionSource) {
-        super(3, taskCompletionSource);
-        this.zzfhx = zzcs.zzfhx;
-        this.zzfhy = zzcs.zzfhy;
+    zzd(zzc zzc, LifecycleCallback lifecycleCallback, String str) {
+        this.zzbl = zzc;
+        this.zzbi = lifecycleCallback;
+        this.zzbj = str;
     }
 
-    public final /* bridge */ /* synthetic */ void zza(@NonNull zzah zzah, boolean z) {
-    }
-
-    public final void zzb(zzbr<?> zzbr) throws RemoteException {
-        this.zzfhx.zzb(zzbr.zzagm(), this.zzdzd);
-        if (this.zzfhx.zzaik() != null) {
-            zzbr.zzahv().put(this.zzfhx.zzaik(), new zzcs(this.zzfhx, this.zzfhy));
+    public final void run() {
+        if (this.zzbl.zzbg > 0) {
+            this.zzbi.onCreate(this.zzbl.zzbh != null ? this.zzbl.zzbh.getBundle(this.zzbj) : null);
         }
-    }
-
-    public final /* bridge */ /* synthetic */ void zzq(@NonNull Status status) {
-        super.zzq(status);
+        if (this.zzbl.zzbg >= 2) {
+            this.zzbi.onStart();
+        }
+        if (this.zzbl.zzbg >= 3) {
+            this.zzbi.onResume();
+        }
+        if (this.zzbl.zzbg >= 4) {
+            this.zzbi.onStop();
+        }
+        if (this.zzbl.zzbg >= 5) {
+            this.zzbi.onDestroy();
+        }
     }
 }

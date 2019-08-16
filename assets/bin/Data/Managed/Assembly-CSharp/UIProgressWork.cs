@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIProgressWork
+public class UIProgressWork : MonoBehaviour
 {
 	private int min;
 

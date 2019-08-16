@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BuffSlideEffectController
+public class BuffSlideEffectController : MonoBehaviour
 {
 	public const float END_STATE_PLAY_HEIGHT = 0.8f;
 
@@ -32,9 +32,9 @@ public class BuffSlideEffectController
 	{
 		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_animator == null) && !(m_targetPlayer == null))
 		{
 			AnimatorStateInfo currentAnimatorStateInfo = m_animator.GetCurrentAnimatorStateInfo(0);

@@ -4,12 +4,20 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import com.amazon.device.iap.internal.model.ProductBuilder;
-import com.amazon.device.iap.internal.util.C0243d;
+import com.amazon.device.iap.internal.util.C0408d;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class Product implements Parcelable {
-    public static final Creator<Product> CREATOR = new C02451();
+    public static final Creator<Product> CREATOR = new Creator<Product>() {
+        public Product createFromParcel(Parcel parcel) {
+            return new Product(parcel);
+        }
+
+        public Product[] newArray(int i) {
+            return new Product[i];
+        }
+    };
     private static final String DESCRIPTION = "description";
     private static final String PRICE = "price";
     private static final String PRODUCT_TYPE = "productType";
@@ -23,20 +31,6 @@ public final class Product implements Parcelable {
     private final String smallIconUrl;
     private final String title;
 
-    /* renamed from: com.amazon.device.iap.model.Product$1 */
-    static final class C02451 implements Creator<Product> {
-        C02451() {
-        }
-
-        public Product createFromParcel(Parcel parcel) {
-            return new Product(parcel);
-        }
-
-        public Product[] newArray(int i) {
-            return new Product[i];
-        }
-    }
-
     private Product(Parcel parcel) {
         this.sku = parcel.readString();
         this.productType = ProductType.valueOf(parcel.readString());
@@ -47,13 +41,13 @@ public final class Product implements Parcelable {
     }
 
     public Product(ProductBuilder productBuilder) {
-        C0243d.m169a(productBuilder.getSku(), SKU);
-        C0243d.m169a(productBuilder.getProductType(), PRODUCT_TYPE);
-        C0243d.m169a(productBuilder.getDescription(), "description");
-        C0243d.m169a(productBuilder.getTitle(), "title");
-        C0243d.m169a(productBuilder.getSmallIconUrl(), SMALL_ICON_URL);
+        C0408d.m164a((Object) productBuilder.getSku(), SKU);
+        C0408d.m164a((Object) productBuilder.getProductType(), PRODUCT_TYPE);
+        C0408d.m164a((Object) productBuilder.getDescription(), "description");
+        C0408d.m164a((Object) productBuilder.getTitle(), "title");
+        C0408d.m164a((Object) productBuilder.getSmallIconUrl(), SMALL_ICON_URL);
         if (ProductType.SUBSCRIPTION != productBuilder.getProductType()) {
-            C0243d.m169a(productBuilder.getPrice(), "price");
+            C0408d.m164a((Object) productBuilder.getPrice(), "price");
         }
         this.sku = productBuilder.getSku();
         this.productType = productBuilder.getProductType();
@@ -103,12 +97,12 @@ public final class Product implements Parcelable {
     }
 
     public String toString() {
-        String str = null;
+        boolean z = false;
         try {
-            str = toJSON().toString(4);
+            return toJSON().toString(4);
         } catch (JSONException e) {
+            return z;
         }
-        return str;
     }
 
     public void writeToParcel(Parcel parcel, int i) {

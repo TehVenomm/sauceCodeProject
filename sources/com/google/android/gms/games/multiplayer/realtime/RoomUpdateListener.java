@@ -1,5 +1,6 @@
 package com.google.android.gms.games.multiplayer.realtime;
 
+@Deprecated
 public interface RoomUpdateListener {
     void onJoinedRoom(int i, Room room);
 

@@ -1,4 +1,4 @@
-package io.fabric.sdk.android;
+package p017io.fabric.sdk.android;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import java.io.File;
 
+/* renamed from: io.fabric.sdk.android.FabricContext */
 class FabricContext extends ContextWrapper {
     private final String componentName;
     private final String componentPath;

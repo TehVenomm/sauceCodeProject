@@ -62,11 +62,17 @@ public class BeanDeserializerBuilder {
     }
 
     private static HashMap<String, SettableBeanProperty> _copy(HashMap<String, SettableBeanProperty> hashMap) {
-        return hashMap == null ? null : new HashMap(hashMap);
+        if (hashMap == null) {
+            return null;
+        }
+        return new HashMap<>(hashMap);
     }
 
     private static <T> List<T> _copy(List<T> list) {
-        return list == null ? null : new ArrayList(list);
+        if (list == null) {
+            return null;
+        }
+        return new ArrayList(list);
     }
 
     public void addOrReplaceProperty(SettableBeanProperty settableBeanProperty, boolean z) {
@@ -82,7 +88,7 @@ public class BeanDeserializerBuilder {
 
     public void addBackReferenceProperty(String str, SettableBeanProperty settableBeanProperty) {
         if (this._backRefProperties == null) {
-            this._backRefProperties = new HashMap(4);
+            this._backRefProperties = new HashMap<>(4);
         }
         this._backRefProperties.put(str, settableBeanProperty);
         if (this._properties != null) {
@@ -99,7 +105,7 @@ public class BeanDeserializerBuilder {
 
     public void addIgnorable(String str) {
         if (this._ignorableProps == null) {
-            this._ignorableProps = new HashSet();
+            this._ignorableProps = new HashSet<>();
         }
         this._ignorableProps.add(str);
     }
@@ -175,13 +181,18 @@ public class BeanDeserializerBuilder {
 
     public JsonDeserializer<?> build() {
         boolean z = true;
-        Collection<SettableBeanProperty> values = this._properties.values();
+        Collection values = this._properties.values();
         BeanPropertyMap construct = BeanPropertyMap.construct(values, this._caseInsensitivePropertyComparison);
         construct.assignIndexes();
         boolean z2 = !this._defaultViewInclusion;
         if (!z2) {
-            for (SettableBeanProperty hasViews : values) {
-                if (hasViews.hasViews()) {
+            Iterator it = values.iterator();
+            while (true) {
+                if (it.hasNext()) {
+                    if (((SettableBeanProperty) it.next()).hasViews()) {
+                        break;
+                    }
+                } else {
                     break;
                 }
             }
@@ -202,19 +213,24 @@ public class BeanDeserializerBuilder {
         if (this._buildMethod != null) {
             Class rawReturnType = this._buildMethod.getRawReturnType();
             Class rawClass = javaType.getRawClass();
-            if (!(rawReturnType == rawClass || rawReturnType.isAssignableFrom(rawClass) || rawClass.isAssignableFrom(rawReturnType))) {
+            if (rawReturnType != rawClass && !rawReturnType.isAssignableFrom(rawClass) && !rawClass.isAssignableFrom(rawReturnType)) {
                 throw new IllegalArgumentException("Build method '" + this._buildMethod.getFullName() + " has bad return type (" + rawReturnType.getName() + "), not compatible with POJO type (" + javaType.getRawClass().getName() + ")");
             }
         } else if (!str.isEmpty()) {
             throw new IllegalArgumentException("Builder class " + this._beanDesc.getBeanClass().getName() + " does not have build method (name: '" + str + "')");
         }
-        Collection<SettableBeanProperty> values = this._properties.values();
+        Collection values = this._properties.values();
         BeanPropertyMap construct = BeanPropertyMap.construct(values, this._caseInsensitivePropertyComparison);
         construct.assignIndexes();
         boolean z2 = !this._defaultViewInclusion;
         if (!z2) {
-            for (SettableBeanProperty hasViews : values) {
-                if (hasViews.hasViews()) {
+            Iterator it = values.iterator();
+            while (true) {
+                if (it.hasNext()) {
+                    if (((SettableBeanProperty) it.next()).hasViews()) {
+                        break;
+                    }
+                } else {
                     break;
                 }
             }

@@ -3,7 +3,7 @@ package com.google.android.gms.common;
 import android.accounts.Account;
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 import java.util.ArrayList;
 
 public final class AccountPicker {
@@ -12,7 +12,7 @@ public final class AccountPicker {
 
     public static Intent newChooseAccountIntent(Account account, ArrayList<Account> arrayList, String[] strArr, boolean z, String str, String str2, String[] strArr2, Bundle bundle) {
         Intent intent = new Intent();
-        zzbp.zzb(true, (Object) "We only support hostedDomain filter for account chip styled account picker");
+        Preconditions.checkArgument(true, "We only support hostedDomain filter for account chip styled account picker");
         intent.setAction("com.google.android.gms.common.account.CHOOSE_ACCOUNT");
         intent.setPackage("com.google.android.gms");
         intent.putExtra("allowableAccounts", arrayList);

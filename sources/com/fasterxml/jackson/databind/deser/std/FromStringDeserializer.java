@@ -43,8 +43,9 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
             this._kind = i;
         }
 
-        protected Object _deserialize(String str, DeserializationContext deserializationContext) throws IOException {
-            int indexOf;
+        /* access modifiers changed from: protected */
+        public Object _deserialize(String str, DeserializationContext deserializationContext) throws IOException {
+            int i;
             switch (this._kind) {
                 case 1:
                     return new File(str);
@@ -55,7 +56,7 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
                 case 4:
                     try {
                         return deserializationContext.findClass(str);
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         throw deserializationContext.instantiationException(this._valueClass, ClassUtil.getRootCause(e));
                     }
                 case 5:
@@ -65,7 +66,7 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
                 case 7:
                     return Pattern.compile(str);
                 case 8:
-                    indexOf = str.indexOf(95);
+                    int indexOf = str.indexOf(95);
                     if (indexOf < 0) {
                         return new Locale(str);
                     }
@@ -88,43 +89,45 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
                         if (lastIndexOf == -1) {
                             throw new InvalidFormatException(deserializationContext.getParser(), "Bracketed IPv6 address must contain closing bracket", (Object) str, InetSocketAddress.class);
                         }
-                        indexOf = str.indexOf(58, lastIndexOf);
-                        if (indexOf > -1) {
-                            indexOf = Integer.parseInt(str.substring(indexOf + 1));
+                        int indexOf3 = str.indexOf(58, lastIndexOf);
+                        if (indexOf3 > -1) {
+                            i = Integer.parseInt(str.substring(indexOf3 + 1));
                         } else {
-                            indexOf = 0;
+                            i = 0;
                         }
-                        return new InetSocketAddress(str.substring(0, lastIndexOf + 1), indexOf);
+                        return new InetSocketAddress(str.substring(0, lastIndexOf + 1), i);
                     }
-                    int indexOf3 = str.indexOf(58);
-                    if (indexOf3 < 0 || str.indexOf(58, indexOf3 + 1) >= 0) {
+                    int indexOf4 = str.indexOf(58);
+                    if (indexOf4 < 0 || str.indexOf(58, indexOf4 + 1) >= 0) {
                         return new InetSocketAddress(str, 0);
                     }
-                    return new InetSocketAddress(str.substring(0, indexOf3), Integer.parseInt(str.substring(indexOf3 + 1)));
+                    return new InetSocketAddress(str.substring(0, indexOf4), Integer.parseInt(str.substring(indexOf4 + 1)));
                 default:
                     throw new IllegalArgumentException();
             }
         }
 
-        protected Object _deserializeFromEmptyString() throws IOException {
+        /* access modifiers changed from: protected */
+        public Object _deserializeFromEmptyString() throws IOException {
             if (this._kind == 3) {
                 return URI.create("");
             }
             if (this._kind == 8) {
                 return Locale.ROOT;
             }
-            return super._deserializeFromEmptyString();
+            return FromStringDeserializer.super._deserializeFromEmptyString();
         }
     }
 
-    protected abstract T _deserialize(String str, DeserializationContext deserializationContext) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract T _deserialize(String str, DeserializationContext deserializationContext) throws IOException;
 
     public static Class<?>[] types() {
         return new Class[]{File.class, URL.class, URI.class, Class.class, JavaType.class, Currency.class, Pattern.class, Locale.class, Charset.class, TimeZone.class, InetAddress.class, InetSocketAddress.class};
     }
 
     protected FromStringDeserializer(Class<?> cls) {
-        super((Class) cls);
+        super(cls);
     }
 
     public static Std findDeserializer(Class<?> cls) {
@@ -160,8 +163,49 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
     }
 
     public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Throwable th = null;
-        if (jsonParser.getCurrentToken() == JsonToken.START_ARRAY && deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
+        IllegalArgumentException e = null;
+        if (jsonParser.getCurrentToken() != JsonToken.START_ARRAY || !deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
+            String valueAsString = jsonParser.getValueAsString();
+            if (valueAsString != null) {
+                if (valueAsString.length() != 0) {
+                    String trim = valueAsString.trim();
+                    if (trim.length() != 0) {
+                        try {
+                            Object _deserialize = _deserialize(trim, deserializationContext);
+                            if (_deserialize != null) {
+                                return _deserialize;
+                            }
+                        } catch (IllegalArgumentException e2) {
+                            e = e2;
+                        }
+                        String str = "not a valid textual representation";
+                        if (e != null) {
+                            String message = e.getMessage();
+                            if (message != null) {
+                                str = str + ", problem: " + message;
+                            }
+                        }
+                        JsonMappingException weirdStringException = deserializationContext.weirdStringException(trim, this._valueClass, str);
+                        if (e != null) {
+                            weirdStringException.initCause(e);
+                        }
+                        throw weirdStringException;
+                    }
+                }
+                return _deserializeFromEmptyString();
+            } else if (jsonParser.getCurrentToken() == JsonToken.VALUE_EMBEDDED_OBJECT) {
+                Object embeddedObject = jsonParser.getEmbeddedObject();
+                if (embeddedObject == null) {
+                    return null;
+                }
+                if (this._valueClass.isAssignableFrom(embeddedObject.getClass())) {
+                    return embeddedObject;
+                }
+                return _deserializeEmbedded(embeddedObject, deserializationContext);
+            } else {
+                throw deserializationContext.mappingException(this._valueClass);
+            }
+        } else {
             jsonParser.nextToken();
             T deserialize = deserialize(jsonParser, deserializationContext);
             if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
@@ -169,54 +213,15 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
             }
             throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "Attempted to unwrap single value array for single '" + this._valueClass.getName() + "' value but there was more than a single value in the array");
         }
-        String valueAsString = jsonParser.getValueAsString();
-        T _deserialize;
-        if (valueAsString != null) {
-            if (valueAsString.length() != 0) {
-                String trim = valueAsString.trim();
-                if (trim.length() != 0) {
-                    try {
-                        _deserialize = _deserialize(trim, deserializationContext);
-                        if (_deserialize != null) {
-                            return _deserialize;
-                        }
-                    } catch (IllegalArgumentException e) {
-                        th = e;
-                    }
-                    valueAsString = "not a valid textual representation";
-                    if (th != null) {
-                        String message = th.getMessage();
-                        if (message != null) {
-                            valueAsString = valueAsString + ", problem: " + message;
-                        }
-                    }
-                    JsonMappingException weirdStringException = deserializationContext.weirdStringException(trim, this._valueClass, valueAsString);
-                    if (th != null) {
-                        weirdStringException.initCause(th);
-                    }
-                    throw weirdStringException;
-                }
-            }
-            return _deserializeFromEmptyString();
-        } else if (jsonParser.getCurrentToken() == JsonToken.VALUE_EMBEDDED_OBJECT) {
-            _deserialize = jsonParser.getEmbeddedObject();
-            if (_deserialize == null) {
-                return null;
-            }
-            if (this._valueClass.isAssignableFrom(_deserialize.getClass())) {
-                return _deserialize;
-            }
-            return _deserializeEmbedded(_deserialize, deserializationContext);
-        } else {
-            throw deserializationContext.mappingException(this._valueClass);
-        }
     }
 
-    protected T _deserializeEmbedded(Object obj, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public T _deserializeEmbedded(Object obj, DeserializationContext deserializationContext) throws IOException {
         throw deserializationContext.mappingException("Don't know how to convert embedded Object of type %s into %s", obj.getClass().getName(), this._valueClass.getName());
     }
 
-    protected T _deserializeFromEmptyString() throws IOException {
+    /* access modifiers changed from: protected */
+    public T _deserializeFromEmptyString() throws IOException {
         return null;
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TargetPointWeightCtl
+public class TargetPointWeightCtl : MonoBehaviour
 {
 	public TargetPoint targetPoint;
 
@@ -146,45 +146,46 @@ public class TargetPointWeightCtl
 		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		if (!(targetPoint == null) && !(animator == null))
+		if (targetPoint == null || animator == null)
 		{
-			float layerWeight = animator.GetLayerWeight(layerIndex);
-			if (currentWeight != layerWeight)
+			return;
+		}
+		float layerWeight = animator.GetLayerWeight(layerIndex);
+		if (currentWeight != layerWeight)
+		{
+			currentWeight = layerWeight;
+			if (isOffsetChange)
 			{
-				currentWeight = layerWeight;
-				if (isOffsetChange)
-				{
-					Vector3 offset = diffOffset * currentWeight + startOffset;
-					targetPoint.offset = offset;
-				}
-				if (isMarkerZShiftChange)
-				{
-					float markerZShift = diffMarkerZShift * currentWeight + startMarkerZShift;
-					targetPoint.markerZShift = markerZShift;
-				}
-				if (isBleedOffsetPosChange)
-				{
-					Vector3 bleedOffsetPos = diffBleedOffsetPos * currentWeight + startBleedOffsetPos;
-					targetPoint.bleedOffsetPos = bleedOffsetPos;
-				}
-				if (isBleedOffsetRotChange)
-				{
-					Vector3 bleedOffsetRot = diffBleedOffsetRot * currentWeight + startBleedOffsetRot;
-					targetPoint.bleedOffsetRot = bleedOffsetRot;
-				}
-				if (isAimMarkerPointRateChange)
-				{
-					float aimMarkerPointRate = diffAimMarkerPointRate * currentWeight + startAimMarkerPointRate;
-					targetPoint.aimMarkerPointRate = aimMarkerPointRate;
-				}
-				if (isWeightChange)
-				{
-					float weight = diffWeight * currentWeight + startWeight;
-					targetPoint.weight = weight;
-				}
-				targetPoint.scaledCalc();
-				calc();
+				Vector3 offset = diffOffset * currentWeight + startOffset;
+				targetPoint.offset = offset;
 			}
+			if (isMarkerZShiftChange)
+			{
+				float markerZShift = diffMarkerZShift * currentWeight + startMarkerZShift;
+				targetPoint.markerZShift = markerZShift;
+			}
+			if (isBleedOffsetPosChange)
+			{
+				Vector3 bleedOffsetPos = diffBleedOffsetPos * currentWeight + startBleedOffsetPos;
+				targetPoint.bleedOffsetPos = bleedOffsetPos;
+			}
+			if (isBleedOffsetRotChange)
+			{
+				Vector3 bleedOffsetRot = diffBleedOffsetRot * currentWeight + startBleedOffsetRot;
+				targetPoint.bleedOffsetRot = bleedOffsetRot;
+			}
+			if (isAimMarkerPointRateChange)
+			{
+				float aimMarkerPointRate = diffAimMarkerPointRate * currentWeight + startAimMarkerPointRate;
+				targetPoint.aimMarkerPointRate = aimMarkerPointRate;
+			}
+			if (isWeightChange)
+			{
+				float weight = diffWeight * currentWeight + startWeight;
+				targetPoint.weight = weight;
+			}
+			targetPoint.scaledCalc();
+			calc();
 		}
 	}
 

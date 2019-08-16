@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -13,7 +13,7 @@ public abstract class TypeSerializer {
 
     public abstract TypeIdResolver getTypeIdResolver();
 
-    public abstract As getTypeInclusion();
+    public abstract C0861As getTypeInclusion();
 
     public abstract void writeCustomTypePrefixForArray(Object obj, JsonGenerator jsonGenerator, String str) throws IOException;
 

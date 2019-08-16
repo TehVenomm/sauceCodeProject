@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[RequireComponent(typeof(UIWidget))]
 [AddComponentMenu("ProjectUI/UIVirtualScreen")]
-public class UIVirtualScreen
+[RequireComponent(typeof(UIWidget))]
+public class UIVirtualScreen : MonoBehaviour
 {
 	public const float BASE_SCREEN_HEIGHT = 854f;
 
@@ -11,6 +11,16 @@ public class UIVirtualScreen
 	public static float screenHeight = 854f;
 
 	public static float screenWidth = 480f;
+
+	public static float screenHeightFull = 854f;
+
+	public static float screenWidthFull = 480f;
+
+	public bool IsOverSafeArea;
+
+	public float ScreenWidthFull => screenWidthFull;
+
+	public float ScreenHeightFull => screenHeightFull;
 
 	public UIVirtualScreen()
 		: this()
@@ -24,8 +34,8 @@ public class UIVirtualScreen
 
 	public static void InitUIRoot(UIRoot root)
 	{
-		float num = (float)Screen.get_width();
-		float num2 = (float)Screen.get_height();
+		float num = Screen.get_width();
+		float num2 = Screen.get_height();
 		if (num > num2)
 		{
 			screenWidth = 854f;
@@ -36,6 +46,9 @@ public class UIVirtualScreen
 			screenHeight = 854f;
 			screenWidth = num / num2 * 854f;
 		}
+		screenHeightFull = screenHeight;
+		screenWidthFull = screenWidth;
+		RefleshScreenSizeForSpecialDevice();
 		root.scalingStyle = UIRoot.Scaling.Constrained;
 		root.manualHeight = (int)screenHeight;
 		root.manualWidth = (int)screenWidth;
@@ -45,24 +58,66 @@ public class UIVirtualScreen
 
 	public void InitWidget()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		float num = screenWidth;
+		float num2 = screenHeight;
+		RefleshScreenSizeForSpecialDevice();
+		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea && IsOverSafeArea)
+		{
+			num = screenWidthFull;
+			num2 = screenHeightFull;
+		}
 		UIWidget uIWidget = this.get_gameObject().GetComponent<UIWidget>();
 		if (uIWidget == null)
 		{
 			uIWidget = this.get_gameObject().AddComponent<UIWidget>();
 		}
-		if ((float)uIWidget.width != screenWidth || (float)uIWidget.height != screenHeight)
+		if ((float)uIWidget.width != num || (float)uIWidget.height != num2)
 		{
 			Vector3 localPosition = uIWidget.get_transform().get_localPosition();
-			uIWidget.SetRect(screenWidth * -0.5f, screenHeight * -0.5f, screenWidth, screenHeight);
+			uIWidget.SetRect(num * -0.5f, num2 * -0.5f, num, num2);
 			uIWidget.get_transform().set_localPosition(localPosition);
 			uIWidget.SetDirty();
+		}
+	}
+
+	public static void RefleshScreenSizeForSpecialDevice()
+	{
+		if (!SpecialDeviceManager.HasSpecialDeviceInfo || !SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+		{
+			return;
+		}
+		DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+		EdgeInsets safeArea = specialDeviceInfo.SafeArea;
+		if (Screen.get_width() > Screen.get_height())
+		{
+			screenWidth = 854f;
+			screenWidthFull = 854f / (safeArea.SafeWidth / (float)Screen.get_width());
+			screenHeight = safeArea.SafeHeight / safeArea.SafeWidth * 854f;
+			screenHeightFull = 854f * ((float)Screen.get_height() / (float)Screen.get_width());
+			if (specialDeviceInfo.NeedModifyVirtualScreenRatio)
+			{
+				screenWidth *= specialDeviceInfo.RatioVirtualScreenLandscape;
+				screenWidthFull *= specialDeviceInfo.RatioVirtualScreenLandscape;
+				screenHeight *= specialDeviceInfo.RatioVirtualScreenLandscape;
+				screenHeightFull *= specialDeviceInfo.RatioVirtualScreenLandscape;
+			}
+		}
+		else
+		{
+			screenHeight = 480f * (safeArea.SafeHeightMax / safeArea.SafeWidthMax);
+			screenHeightFull = 480f * ((float)Screen.get_height() / (float)Screen.get_width());
+			screenWidth = 480f;
+			screenWidthFull = 480f;
+			if (specialDeviceInfo.NeedModifyVirtualScreenRatio)
+			{
+				screenWidth *= specialDeviceInfo.RatioVirtualScreenPortrait;
+				screenWidthFull *= specialDeviceInfo.RatioVirtualScreenPortrait;
+				screenHeight *= specialDeviceInfo.RatioVirtualScreenPortrait;
+				screenHeightFull *= specialDeviceInfo.RatioVirtualScreenPortrait;
+			}
 		}
 	}
 }

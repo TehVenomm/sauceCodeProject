@@ -7,11 +7,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Releasable;
 import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.util.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Deprecated
+@VisibleForTesting
 public interface Requests {
     public static final String EXTRA_REQUESTS = "requests";
     public static final int MAX_REQUEST_RECIPIENTS = 8;

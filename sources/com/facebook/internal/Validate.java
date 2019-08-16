@@ -10,8 +10,6 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Looper;
 import android.util.Log;
-import com.facebook.CustomTabActivity;
-import com.facebook.FacebookActivity;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.FacebookSdkNotInitializedException;
@@ -22,7 +20,7 @@ public final class Validate {
     private static final String CONTENT_PROVIDER_BASE = "com.facebook.app.FacebookContentProvider";
     private static final String CONTENT_PROVIDER_NOT_FOUND_REASON = "A ContentProvider for this app was not set up in the AndroidManifest.xml, please add %s as a provider to your AndroidManifest.xml file. See https://developers.facebook.com/docs/sharing/android for more info.";
     private static final String CUSTOM_TAB_REDIRECT_ACTIVITY_NOT_FOUND_REASON = "FacebookActivity is declared incorrectly in the AndroidManifest.xml, please add com.facebook.FacebookActivity to your AndroidManifest.xml file. See https://developers.facebook.com/docs/android/getting-started for more info.";
-    private static final String FACEBOOK_ACTIVITY_NOT_FOUND_REASON = "FacebookActivity is not declared in the AndroidManifest.xml, please add com.facebook.FacebookActivity to your AndroidManifest.xml file. See https://developers.facebook.com/docs/android/getting-started for more info.";
+    private static final String FACEBOOK_ACTIVITY_NOT_FOUND_REASON = "FacebookActivity is not declared in the AndroidManifest.xml. If you are using the facebook-common module or dependent modules please add com.facebook.FacebookActivity to your AndroidManifest.xml file. See https://developers.facebook.com/docs/android/getting-started for more info.";
     private static final String NO_INTERNET_PERMISSION_REASON = "No internet permissions granted for the app, please add <uses-permission android:name=\"android.permission.INTERNET\" /> to your AndroidManifest.xml.";
     private static final String TAG = Validate.class.getName();
 
@@ -31,12 +29,13 @@ public final class Validate {
     }
 
     public static void checkCustomTabRedirectActivity(Context context, boolean z) {
-        if (!hasCustomTabRedirectActivity(context)) {
-            if (z) {
-                throw new IllegalStateException(CUSTOM_TAB_REDIRECT_ACTIVITY_NOT_FOUND_REASON);
-            }
-            Log.w(TAG, CUSTOM_TAB_REDIRECT_ACTIVITY_NOT_FOUND_REASON);
+        if (hasCustomTabRedirectActivity(context)) {
+            return;
         }
+        if (z) {
+            throw new IllegalStateException(CUSTOM_TAB_REDIRECT_ACTIVITY_NOT_FOUND_REASON);
+        }
+        Log.w(TAG, CUSTOM_TAB_REDIRECT_ACTIVITY_NOT_FOUND_REASON);
     }
 
     public static void containsNoNullOrEmpty(Collection<String> collection, String str) {
@@ -67,6 +66,14 @@ public final class Validate {
         throw new IllegalStateException("No App ID found, please set the App ID.");
     }
 
+    public static boolean hasBluetoothPermission(Context context) {
+        return hasPermission(context, "android.permission.BLUETOOTH") && hasPermission(context, "android.permission.BLUETOOTH_ADMIN");
+    }
+
+    public static boolean hasChangeWifiStatePermission(Context context) {
+        return hasPermission(context, "android.permission.CHANGE_WIFI_STATE");
+    }
+
     public static String hasClientToken() {
         String clientToken = FacebookSdk.getClientToken();
         if (clientToken != null) {
@@ -80,8 +87,9 @@ public final class Validate {
         String hasAppID = hasAppID();
         PackageManager packageManager = context.getPackageManager();
         if (packageManager != null) {
-            if (packageManager.resolveContentProvider(CONTENT_PROVIDER_BASE + hasAppID, 0) == null) {
-                throw new IllegalStateException(String.format(CONTENT_PROVIDER_NOT_FOUND_REASON, new Object[]{hasAppID}));
+            String str = CONTENT_PROVIDER_BASE + hasAppID;
+            if (packageManager.resolveContentProvider(str, 0) == null) {
+                throw new IllegalStateException(String.format(CONTENT_PROVIDER_NOT_FOUND_REASON, new Object[]{str}));
             }
         }
     }
@@ -90,7 +98,7 @@ public final class Validate {
         boolean z;
         notNull(context, "context");
         PackageManager packageManager = context.getPackageManager();
-        List list = null;
+        List<ResolveInfo> list = null;
         if (packageManager != null) {
             Intent intent = new Intent();
             intent.setAction("android.intent.action.VIEW");
@@ -99,10 +107,11 @@ public final class Validate {
             intent.setData(Uri.parse("fb" + FacebookSdk.getApplicationId() + "://authorize"));
             list = packageManager.queryIntentActivities(intent, 64);
         }
-        if (r0 != null) {
+        if (list != null) {
             z = false;
-            for (ResolveInfo resolveInfo : r0) {
-                if (!resolveInfo.activityInfo.name.equals(CustomTabActivity.class.getName())) {
+            for (ResolveInfo resolveInfo : list) {
+                ActivityInfo activityInfo = resolveInfo.activityInfo;
+                if (!activityInfo.name.equals("com.facebook.CustomTabActivity") || !activityInfo.packageName.equals(context.getPackageName())) {
                     return false;
                 }
                 z = true;
@@ -123,7 +132,7 @@ public final class Validate {
         ActivityInfo activityInfo = null;
         if (packageManager != null) {
             try {
-                activityInfo = packageManager.getActivityInfo(new ComponentName(context, FacebookActivity.class), 1);
+                activityInfo = packageManager.getActivityInfo(new ComponentName(context, "com.facebook.FacebookActivity"), 1);
             } catch (NameNotFoundException e) {
             }
         }
@@ -149,6 +158,18 @@ public final class Validate {
             throw new IllegalStateException(NO_INTERNET_PERMISSION_REASON);
         }
         Log.w(TAG, NO_INTERNET_PERMISSION_REASON);
+    }
+
+    public static boolean hasLocationPermission(Context context) {
+        return hasPermission(context, "android.permission.ACCESS_COARSE_LOCATION") || hasPermission(context, "android.permission.ACCESS_FINE_LOCATION");
+    }
+
+    public static boolean hasPermission(Context context, String str) {
+        return context.checkCallingOrSelfPermission(str) == 0;
+    }
+
+    public static boolean hasWiFiPermission(Context context) {
+        return hasPermission(context, "android.permission.ACCESS_WIFI_STATE");
     }
 
     public static <T> void notEmpty(Collection<T> collection, String str) {

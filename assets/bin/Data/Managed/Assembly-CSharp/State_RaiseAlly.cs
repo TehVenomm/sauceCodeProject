@@ -10,7 +10,7 @@ public class State_RaiseAlly : State
 
 	public override void Process(StateMachine fsm, Brain brain)
 	{
-		if (!brain.targetCtrl.CanReviveOfTargetAlly())
+		if (!brain.targetCtrl.CanRescueOfTargetAlly())
 		{
 			fsm.ChangeState(STATE_TYPE.KILL_TARGET);
 		}

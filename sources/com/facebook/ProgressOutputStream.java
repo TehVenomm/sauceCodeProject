@@ -9,12 +9,15 @@ import java.io.OutputStream;
 import java.util.Map;
 
 class ProgressOutputStream extends FilterOutputStream implements RequestOutputStream {
-    private long batchProgress;
+    /* access modifiers changed from: private */
+    public long batchProgress;
     private RequestProgress currentRequestProgress;
     private long lastReportedProgress;
-    private long maxProgress;
+    /* access modifiers changed from: private */
+    public long maxProgress;
     private final Map<GraphRequest, RequestProgress> progressMap;
-    private final GraphRequestBatch requests;
+    /* access modifiers changed from: private */
+    public final GraphRequestBatch requests;
     private final long threshold = FacebookSdk.getOnProgressThreshold();
 
     ProgressOutputStream(OutputStream outputStream, GraphRequestBatch graphRequestBatch, Map<GraphRequest, RequestProgress> map, long j) {
@@ -63,11 +66,13 @@ class ProgressOutputStream extends FilterOutputStream implements RequestOutputSt
         reportBatchProgress();
     }
 
-    long getBatchProgress() {
+    /* access modifiers changed from: 0000 */
+    public long getBatchProgress() {
         return this.batchProgress;
     }
 
-    long getMaxProgress() {
+    /* access modifiers changed from: 0000 */
+    public long getMaxProgress() {
         return this.maxProgress;
     }
 

@@ -18,12 +18,12 @@ public class GuildRequestContinue : GameSection
 	private void OnQuery_YES()
 	{
 		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
-		if (GameSection.CheckCrystal(selectedItem.crystalNum, 0, true))
+		if (GameSection.CheckCrystal(selectedItem.crystalNum))
 		{
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestExtend(delegate(bool questCompleteData)
 			{
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 				GameSection.SetEventData(questCompleteData);
 			});
 		}
@@ -34,7 +34,7 @@ public class GuildRequestContinue : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestRetire(delegate(bool questCompleteData)
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 			GameSection.SetEventData(questCompleteData);
 		});
 	}

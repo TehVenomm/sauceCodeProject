@@ -49,7 +49,8 @@ public class UnknownSerializer extends StdSerializer<Object> {
         jsonFormatVisitorWrapper.expectAnyFormat(javaType);
     }
 
-    protected void failForEmpty(JsonGenerator jsonGenerator, Object obj) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void failForEmpty(JsonGenerator jsonGenerator, Object obj) throws JsonMappingException {
         throw JsonMappingException.from(jsonGenerator, "No serializer found for class " + obj.getClass().getName() + " and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS) )");
     }
 }

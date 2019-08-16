@@ -25,8 +25,7 @@ final class TreeTypeAdapter<T> extends TypeAdapter<T> {
         private SingleTypeFactory(Object obj, TypeToken<?> typeToken, boolean z, Class<?> cls) {
             this.serializer = obj instanceof JsonSerializer ? (JsonSerializer) obj : null;
             this.deserializer = obj instanceof JsonDeserializer ? (JsonDeserializer) obj : null;
-            boolean z2 = (this.serializer == null && this.deserializer == null) ? false : true;
-            C$Gson$Preconditions.checkArgument(z2);
+            C$Gson$Preconditions.checkArgument((this.serializer == null && this.deserializer == null) ? false : true);
             this.exactType = typeToken;
             this.matchRawType = z;
             this.hierarchyType = cls;
@@ -34,15 +33,18 @@ final class TreeTypeAdapter<T> extends TypeAdapter<T> {
 
         public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
             boolean isAssignableFrom = this.exactType != null ? this.exactType.equals(typeToken) || (this.matchRawType && this.exactType.getType() == typeToken.getRawType()) : this.hierarchyType.isAssignableFrom(typeToken.getRawType());
-            return isAssignableFrom ? new TreeTypeAdapter(this.serializer, this.deserializer, gson, typeToken, this) : null;
+            if (isAssignableFrom) {
+                return new TreeTypeAdapter(this.serializer, this.deserializer, gson, typeToken, this);
+            }
+            return null;
         }
     }
 
-    private TreeTypeAdapter(JsonSerializer<T> jsonSerializer, JsonDeserializer<T> jsonDeserializer, Gson gson, TypeToken<T> typeToken, TypeAdapterFactory typeAdapterFactory) {
+    private TreeTypeAdapter(JsonSerializer<T> jsonSerializer, JsonDeserializer<T> jsonDeserializer, Gson gson2, TypeToken<T> typeToken2, TypeAdapterFactory typeAdapterFactory) {
         this.serializer = jsonSerializer;
         this.deserializer = jsonDeserializer;
-        this.gson = gson;
-        this.typeToken = typeToken;
+        this.gson = gson2;
+        this.typeToken = typeToken2;
         this.skipPast = typeAdapterFactory;
     }
 
@@ -51,17 +53,17 @@ final class TreeTypeAdapter<T> extends TypeAdapter<T> {
         if (typeAdapter != null) {
             return typeAdapter;
         }
-        typeAdapter = this.gson.getDelegateAdapter(this.skipPast, this.typeToken);
-        this.delegate = typeAdapter;
-        return typeAdapter;
+        TypeAdapter<T> delegateAdapter = this.gson.getDelegateAdapter(this.skipPast, this.typeToken);
+        this.delegate = delegateAdapter;
+        return delegateAdapter;
     }
 
-    public static TypeAdapterFactory newFactory(TypeToken<?> typeToken, Object obj) {
-        return new SingleTypeFactory(obj, typeToken, false, null);
+    public static TypeAdapterFactory newFactory(TypeToken<?> typeToken2, Object obj) {
+        return new SingleTypeFactory(obj, typeToken2, false, null);
     }
 
-    public static TypeAdapterFactory newFactoryWithMatchRawType(TypeToken<?> typeToken, Object obj) {
-        return new SingleTypeFactory(obj, typeToken, typeToken.getType() == typeToken.getRawType(), null);
+    public static TypeAdapterFactory newFactoryWithMatchRawType(TypeToken<?> typeToken2, Object obj) {
+        return new SingleTypeFactory(obj, typeToken2, typeToken2.getType() == typeToken2.getRawType(), null);
     }
 
     public static TypeAdapterFactory newTypeHierarchyFactory(Class<?> cls, Object obj) {
@@ -73,7 +75,10 @@ final class TreeTypeAdapter<T> extends TypeAdapter<T> {
             return delegate().read(jsonReader);
         }
         JsonElement parse = Streams.parse(jsonReader);
-        return parse.isJsonNull() ? null : this.deserializer.deserialize(parse, this.typeToken.getType(), this.gson.deserializationContext);
+        if (parse.isJsonNull()) {
+            return null;
+        }
+        return this.deserializer.deserialize(parse, this.typeToken.getType(), this.gson.deserializationContext);
     }
 
     public void write(JsonWriter jsonWriter, T t) throws IOException {

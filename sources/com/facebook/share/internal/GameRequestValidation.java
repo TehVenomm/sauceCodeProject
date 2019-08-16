@@ -8,9 +8,7 @@ public class GameRequestValidation {
     public static void validate(GameRequestContent gameRequestContent) {
         int i = 0;
         Validate.notNull(gameRequestContent.getMessage(), "message");
-        int i2 = gameRequestContent.getObjectId() != null ? 1 : 0;
-        int i3 = (gameRequestContent.getActionType() == ActionType.ASKFOR || gameRequestContent.getActionType() == ActionType.SEND) ? 1 : 0;
-        if ((i2 ^ i3) != 0) {
+        if ((gameRequestContent.getObjectId() != null) ^ (gameRequestContent.getActionType() == ActionType.ASKFOR || gameRequestContent.getActionType() == ActionType.SEND)) {
             throw new IllegalArgumentException("Object id should be provided if and only if action type is send or askfor");
         }
         if (gameRequestContent.getRecipients() != null) {

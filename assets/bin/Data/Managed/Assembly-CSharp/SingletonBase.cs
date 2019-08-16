@@ -15,21 +15,22 @@ public abstract class SingletonBase
 
 	public static void RemoveAllInstance()
 	{
-		if (instanceList != null)
+		if (instanceList == null)
 		{
-			while (instanceList.Count > 0)
-			{
-				if (instanceList[0] is SingletonBase)
-				{
-					(instanceList[0] as SingletonBase).Remove();
-				}
-				else
-				{
-					instanceList.RemoveAt(0);
-				}
-			}
-			instanceList = null;
+			return;
 		}
+		while (instanceList.Count > 0)
+		{
+			if (instanceList[0] is SingletonBase)
+			{
+				(instanceList[0] as SingletonBase).Remove();
+			}
+			else
+			{
+				instanceList.RemoveAt(0);
+			}
+		}
+		instanceList = null;
 	}
 
 	public virtual void Remove()

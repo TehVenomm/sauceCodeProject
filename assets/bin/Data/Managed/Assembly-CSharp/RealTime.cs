@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RealTime
+public class RealTime : MonoBehaviour
 {
 	public static float time => Time.get_unscaledTime();
 

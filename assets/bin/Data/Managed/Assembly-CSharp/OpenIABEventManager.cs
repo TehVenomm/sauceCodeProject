@@ -2,7 +2,7 @@ using OnePF;
 using System;
 using UnityEngine;
 
-public class OpenIABEventManager
+public class OpenIABEventManager : MonoBehaviour
 {
 	public static event Action billingSupportedEvent;
 
@@ -33,8 +33,7 @@ public class OpenIABEventManager
 
 	private void Awake()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().set_name(GetType().ToString());
+		this.get_gameObject().set_name(base.GetType().ToString());
 		Object.DontDestroyOnLoad(this);
 	}
 

@@ -11,14 +11,19 @@ public class PreChatForm implements Serializable {
     private final Field phoneNumber;
 
     public static class Builder {
-        private Field department = Field.NOT_REQUIRED;
-        private Field email = Field.NOT_REQUIRED;
-        private Field message = Field.NOT_REQUIRED;
-        private Field name = Field.NOT_REQUIRED;
-        private Field phoneNumber = Field.NOT_REQUIRED;
+        /* access modifiers changed from: private */
+        public Field department = Field.NOT_REQUIRED;
+        /* access modifiers changed from: private */
+        public Field email = Field.NOT_REQUIRED;
+        /* access modifiers changed from: private */
+        public Field message = Field.NOT_REQUIRED;
+        /* access modifiers changed from: private */
+        public Field name = Field.NOT_REQUIRED;
+        /* access modifiers changed from: private */
+        public Field phoneNumber = Field.NOT_REQUIRED;
 
         public PreChatForm build() {
-            return new PreChatForm();
+            return new PreChatForm(this);
         }
 
         public Builder department(Field field) {

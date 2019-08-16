@@ -1,19 +1,20 @@
-package net.gogame.gowrap.ui.v2017_1;
+package net.gogame.gowrap.p019ui.v2017_1;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.ui.InternalWebViewContext;
-import net.gogame.gowrap.ui.utils.ExternalAppLauncher;
+import net.gogame.gowrap.p019ui.InternalWebViewContext;
+import net.gogame.gowrap.p019ui.utils.ExternalAppLauncher;
 
+/* renamed from: net.gogame.gowrap.ui.v2017_1.InternalWebViewFragment */
 public class InternalWebViewFragment extends AbstractWebViewFragment implements InternalWebViewContext {
     public static final String BASE_URL_ARGUMENT = "baseUrl";
     public static final String START_HTML_ARGUMENT = "startHtml";
 
     public InternalWebViewFragment() {
-        super(C1110R.layout.net_gogame_gowrap_fragment_webview_internal);
+        super(C1423R.C1425layout.net_gogame_gowrap_fragment_webview_internal);
     }
 
     public static InternalWebViewFragment newFragmentWithHtml(String str, String str2) {
@@ -37,16 +38,18 @@ public class InternalWebViewFragment extends AbstractWebViewFragment implements 
         return true;
     }
 
-    protected void init(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void init(Bundle bundle) {
         loadHtml(bundle.getString(START_HTML_ARGUMENT), bundle.getString(BASE_URL_ARGUMENT));
     }
 
-    protected boolean doHandleUri(Uri uri) {
+    /* access modifiers changed from: protected */
+    public boolean doHandleUri(Uri uri) {
         try {
             if (ExternalAppLauncher.openUrlInExternalBrowser(getActivity(), uri.toString())) {
                 return true;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             Log.e(Constants.TAG, "Exception", e);
         }
         if (getUIContext() == null) {
@@ -56,7 +59,8 @@ public class InternalWebViewFragment extends AbstractWebViewFragment implements 
         return true;
     }
 
-    protected BackgroundMode getBackgroundMode(Uri uri) {
+    /* access modifiers changed from: protected */
+    public BackgroundMode getBackgroundMode(Uri uri) {
         return BackgroundMode.TRANSPARENT;
     }
 

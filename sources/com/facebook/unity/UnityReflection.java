@@ -15,10 +15,10 @@ public class UnityReflection {
             if (activity != null) {
                 return activity;
             }
-            Log.d(FB.TAG, "Current unity activity is null");
+            Log.d(C0849FB.TAG, "Current unity activity is null");
             return activity;
         } catch (Exception e) {
-            Log.d(FB.TAG, e.toString());
+            Log.d(C0849FB.TAG, e.toString());
             return null;
         }
     }

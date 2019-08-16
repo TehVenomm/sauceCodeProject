@@ -11,7 +11,7 @@ public class AFScreenManager {
     public static final String SCREEN_KEY = "dim";
 
     public static Map<String, String> getScreenMetrics(@NonNull Context context) {
-        Map<String, String> hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         try {
             DisplayMetrics displayMetrics = new DisplayMetrics();
             ((WindowManager) context.getSystemService("window")).getDefaultDisplay().getMetrics(displayMetrics);

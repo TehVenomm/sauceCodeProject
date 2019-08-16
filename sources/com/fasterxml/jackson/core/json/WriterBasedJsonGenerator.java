@@ -3,13 +3,11 @@ package com.fasterxml.jackson.core.json;
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
-import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.CharTypes;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.io.NumberOutput;
+import com.fasterxml.jackson.core.p015io.CharTypes;
+import com.fasterxml.jackson.core.p015io.IOContext;
+import com.fasterxml.jackson.core.p015io.NumberOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -65,7 +63,8 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         _writeFieldName(serializableString, z);
     }
 
-    protected void _writeFieldName(String str, boolean z) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _writeFieldName(String str, boolean z) throws IOException {
         if (this._cfgPrettyPrinter != null) {
             _writePPFieldName(str, z);
             return;
@@ -83,62 +82,62 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
             _writeString(str);
             return;
         }
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        cArr2[i2] = '\"';
         _writeString(str);
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr3 = this._outputBuffer;
+        int i3 = this._outputTail;
+        this._outputTail = i3 + 1;
+        cArr3[i3] = '\"';
     }
 
-    protected void _writeFieldName(SerializableString serializableString, boolean z) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _writeFieldName(SerializableString serializableString, boolean z) throws IOException {
         if (this._cfgPrettyPrinter != null) {
             _writePPFieldName(serializableString, z);
             return;
         }
-        char[] cArr;
         if (this._outputTail + 1 >= this._outputEnd) {
             _flushBuffer();
         }
         if (z) {
-            cArr = this._outputBuffer;
+            char[] cArr = this._outputBuffer;
             int i = this._outputTail;
             this._outputTail = i + 1;
             cArr[i] = ',';
         }
-        cArr = serializableString.asQuotedChars();
+        char[] asQuotedChars = serializableString.asQuotedChars();
         if (this._cfgUnqNames) {
-            writeRaw(cArr, 0, cArr.length);
+            writeRaw(asQuotedChars, 0, asQuotedChars.length);
             return;
         }
         char[] cArr2 = this._outputBuffer;
         int i2 = this._outputTail;
         this._outputTail = i2 + 1;
         cArr2[i2] = '\"';
-        i = cArr.length;
-        if ((this._outputTail + i) + 1 >= this._outputEnd) {
-            writeRaw(cArr, 0, i);
+        int length = asQuotedChars.length;
+        if (this._outputTail + length + 1 >= this._outputEnd) {
+            writeRaw(asQuotedChars, 0, length);
             if (this._outputTail >= this._outputEnd) {
                 _flushBuffer();
             }
-            cArr = this._outputBuffer;
-            i = this._outputTail;
-            this._outputTail = i + 1;
-            cArr[i] = '\"';
+            char[] cArr3 = this._outputBuffer;
+            int i3 = this._outputTail;
+            this._outputTail = i3 + 1;
+            cArr3[i3] = '\"';
             return;
         }
-        System.arraycopy(cArr, 0, this._outputBuffer, this._outputTail, i);
-        this._outputTail += i;
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        System.arraycopy(asQuotedChars, 0, this._outputBuffer, this._outputTail, length);
+        this._outputTail += length;
+        char[] cArr4 = this._outputBuffer;
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        cArr4[i4] = '\"';
     }
 
     public void writeStartArray() throws IOException, JsonGenerationException {
@@ -209,7 +208,8 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         this._writeContext = this._writeContext.clearAndGetParent();
     }
 
-    protected void _writePPFieldName(String str, boolean z) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _writePPFieldName(String str, boolean z) throws IOException {
         if (z) {
             this._cfgPrettyPrinter.writeObjectEntrySeparator(this);
         } else {
@@ -230,13 +230,14 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        cArr2[i2] = '\"';
     }
 
-    protected void _writePPFieldName(SerializableString serializableString, boolean z) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _writePPFieldName(SerializableString serializableString, boolean z) throws IOException {
         if (z) {
             this._cfgPrettyPrinter.writeObjectEntrySeparator(this);
         } else {
@@ -258,10 +259,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        asQuotedChars = this._outputBuffer;
+        char[] cArr2 = this._outputBuffer;
         int i2 = this._outputTail;
         this._outputTail = i2 + 1;
-        asQuotedChars[i2] = '\"';
+        cArr2[i2] = '\"';
     }
 
     public void writeString(String str) throws IOException {
@@ -281,10 +282,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        cArr2[i2] = '\"';
     }
 
     public void writeString(char[] cArr, int i, int i2) throws IOException {
@@ -300,10 +301,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr2 = this._outputBuffer;
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        cArr2[i3] = '\"';
+        char[] cArr3 = this._outputBuffer;
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        cArr3[i4] = '\"';
     }
 
     public void writeString(SerializableString serializableString) throws IOException {
@@ -315,25 +316,25 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         int i = this._outputTail;
         this._outputTail = i + 1;
         cArr[i] = '\"';
-        Object asQuotedChars = serializableString.asQuotedChars();
-        i = asQuotedChars.length;
-        if (i < 32) {
-            if (i > this._outputEnd - this._outputTail) {
+        char[] asQuotedChars = serializableString.asQuotedChars();
+        int length = asQuotedChars.length;
+        if (length < 32) {
+            if (length > this._outputEnd - this._outputTail) {
                 _flushBuffer();
             }
-            System.arraycopy(asQuotedChars, 0, this._outputBuffer, this._outputTail, i);
-            this._outputTail += i;
+            System.arraycopy(asQuotedChars, 0, this._outputBuffer, this._outputTail, length);
+            this._outputTail += length;
         } else {
             _flushBuffer();
-            this._writer.write(asQuotedChars, 0, i);
+            this._writer.write(asQuotedChars, 0, length);
         }
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        cArr2[i2] = '\"';
     }
 
     public void writeRawUTF8String(byte[] bArr, int i, int i2) throws IOException {
@@ -433,10 +434,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr = this._outputBuffer;
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        cArr[i3] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        cArr2[i4] = '\"';
     }
 
     public int writeBinary(Base64Variant base64Variant, InputStream inputStream, int i) throws IOException, JsonGenerationException {
@@ -454,6 +455,7 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
                 i = _writeBinary(base64Variant, inputStream, allocBase64Buffer);
             } catch (Throwable th) {
                 this._ioContext.releaseBase64Buffer(allocBase64Buffer);
+                throw th;
             }
         } else {
             int _writeBinary = _writeBinary(base64Variant, inputStream, allocBase64Buffer, i);
@@ -465,10 +467,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr = this._outputBuffer;
-        i2 = this._outputTail;
-        this._outputTail = i2 + 1;
-        cArr[i2] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i3 = this._outputTail;
+        this._outputTail = i3 + 1;
+        cArr2[i3] = '\"';
         return i;
     }
 
@@ -493,10 +495,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         this._outputTail = i + 1;
         cArr[i] = '\"';
         this._outputTail = NumberOutput.outputInt((int) s, this._outputBuffer, this._outputTail);
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        cArr2[i2] = '\"';
     }
 
     public void writeNumber(int i) throws IOException {
@@ -520,10 +522,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         this._outputTail = i2 + 1;
         cArr[i2] = '\"';
         this._outputTail = NumberOutput.outputInt(i, this._outputBuffer, this._outputTail);
-        cArr = this._outputBuffer;
-        i2 = this._outputTail;
-        this._outputTail = i2 + 1;
-        cArr[i2] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i3 = this._outputTail;
+        this._outputTail = i3 + 1;
+        cArr2[i3] = '\"';
     }
 
     public void writeNumber(long j) throws IOException {
@@ -547,10 +549,10 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         this._outputTail = i + 1;
         cArr[i] = '\"';
         this._outputTail = NumberOutput.outputLong(j, this._outputBuffer, this._outputTail);
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        cArr2[i2] = '\"';
     }
 
     public void writeNumber(BigInteger bigInteger) throws IOException {
@@ -616,36 +618,37 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        cArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        cArr[i] = '\"';
+        char[] cArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        cArr2[i2] = '\"';
     }
 
     public void writeBoolean(boolean z) throws IOException {
+        int i;
         _verifyValueWrite("write a boolean value");
         if (this._outputTail + 5 >= this._outputEnd) {
             _flushBuffer();
         }
-        int i = this._outputTail;
+        int i2 = this._outputTail;
         char[] cArr = this._outputBuffer;
         if (z) {
-            cArr[i] = 't';
-            i++;
-            cArr[i] = 'r';
-            i++;
-            cArr[i] = 'u';
-            i++;
+            cArr[i2] = 't';
+            int i3 = i2 + 1;
+            cArr[i3] = 'r';
+            int i4 = i3 + 1;
+            cArr[i4] = 'u';
+            i = i4 + 1;
             cArr[i] = 'e';
         } else {
-            cArr[i] = 'f';
-            i++;
-            cArr[i] = 'a';
-            i++;
-            cArr[i] = 'l';
-            i++;
-            cArr[i] = 's';
-            i++;
+            cArr[i2] = 'f';
+            int i5 = i2 + 1;
+            cArr[i5] = 'a';
+            int i6 = i5 + 1;
+            cArr[i6] = 'l';
+            int i7 = i6 + 1;
+            cArr[i7] = 's';
+            i = i7 + 1;
             cArr[i] = 'e';
         }
         this._outputTail = i + 1;
@@ -656,12 +659,13 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         _writeNull();
     }
 
-    protected void _verifyValueWrite(String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _verifyValueWrite(String str) throws IOException {
+        char c;
         if (this._cfgPrettyPrinter != null) {
             _verifyPrettyValueWrite(str);
             return;
         }
-        char c;
         int writeValue = this._writeContext.writeValue();
         if (writeValue == 5) {
             _reportError("Can not " + str + ", expecting field name");
@@ -689,7 +693,8 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         this._outputTail++;
     }
 
-    protected void _verifyPrettyValueWrite(String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _verifyPrettyValueWrite(String str) throws IOException {
         int writeValue = this._writeContext.writeValue();
         if (writeValue == 5) {
             _reportError("Can not " + str + ", expecting field name");
@@ -731,7 +736,7 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         super.close();
         if (this._outputBuffer != null && isEnabled(Feature.AUTO_CLOSE_JSON_CONTENT)) {
             while (true) {
-                JsonStreamContext outputContext = getOutputContext();
+                JsonWriteContext outputContext = getOutputContext();
                 if (!outputContext.inArray()) {
                     if (!outputContext.inObject()) {
                         break;
@@ -755,7 +760,8 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         _releaseBuffers();
     }
 
-    protected void _releaseBuffers() {
+    /* access modifiers changed from: protected */
+    public void _releaseBuffers() {
         char[] cArr = this._outputBuffer;
         if (cArr != null) {
             this._outputBuffer = null;
@@ -782,34 +788,66 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         }
     }
 
-    private void _writeString2(int i) throws IOException {
-        int i2 = this._outputTail + i;
-        int[] iArr = this._outputEscapes;
-        char length = iArr.length;
-        while (this._outputTail < i2) {
-            char c;
-            int i3;
-            while (true) {
-                c = this._outputBuffer[this._outputTail];
-                if (c < length && iArr[c] != 0) {
-                    break;
-                }
-                i3 = this._outputTail + 1;
-                this._outputTail = i3;
-                if (i3 >= i2) {
-                    return;
-                }
-            }
-            i3 = this._outputTail - this._outputHead;
-            if (i3 > 0) {
-                this._writer.write(this._outputBuffer, this._outputHead, i3);
-            }
-            char[] cArr = this._outputBuffer;
-            int i4 = this._outputTail;
-            this._outputTail = i4 + 1;
-            c = cArr[i4];
-            _prependOrWriteCharacterEscape(c, iArr[c]);
-        }
+    /* JADX WARNING: Code restructure failed: missing block: B:10:0x0026, code lost:
+        r3 = r7._outputBuffer;
+        r4 = r7._outputTail;
+        r7._outputTail = r4 + 1;
+        r3 = r3[r4];
+        _prependOrWriteCharacterEscape(r3, r1[r3]);
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:7:0x0016, code lost:
+        r3 = r7._outputTail - r7._outputHead;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:8:0x001b, code lost:
+        if (r3 <= 0) goto L_0x0026;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:9:0x001d, code lost:
+        r7._writer.write(r7._outputBuffer, r7._outputHead, r3);
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void _writeString2(int r8) throws java.io.IOException {
+        /*
+            r7 = this;
+            int r0 = r7._outputTail
+            int r0 = r0 + r8
+            int[] r1 = r7._outputEscapes
+            int r2 = r1.length
+        L_0x0006:
+            int r3 = r7._outputTail
+            if (r3 >= r0) goto L_0x003e
+        L_0x000a:
+            char[] r3 = r7._outputBuffer
+            int r4 = r7._outputTail
+            char r3 = r3[r4]
+            if (r3 >= r2) goto L_0x0036
+            r3 = r1[r3]
+            if (r3 == 0) goto L_0x0036
+            int r3 = r7._outputTail
+            int r4 = r7._outputHead
+            int r3 = r3 - r4
+            if (r3 <= 0) goto L_0x0026
+            java.io.Writer r4 = r7._writer
+            char[] r5 = r7._outputBuffer
+            int r6 = r7._outputHead
+            r4.write(r5, r6, r3)
+        L_0x0026:
+            char[] r3 = r7._outputBuffer
+            int r4 = r7._outputTail
+            int r5 = r4 + 1
+            r7._outputTail = r5
+            char r3 = r3[r4]
+            r4 = r1[r3]
+            r7._prependOrWriteCharacterEscape(r3, r4)
+            goto L_0x0006
+        L_0x0036:
+            int r3 = r7._outputTail
+            int r3 = r3 + 1
+            r7._outputTail = r3
+            if (r3 < r0) goto L_0x000a
+        L_0x003e:
+            return
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.WriterBasedJsonGenerator._writeString2(int):void");
     }
 
     private void _writeLongString(String str) throws IOException {
@@ -834,29 +872,29 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
     }
 
     private void _writeSegment(int i) throws IOException {
+        char c;
         int[] iArr = this._outputEscapes;
-        char length = iArr.length;
+        int length = iArr.length;
         int i2 = 0;
         int i3 = 0;
-        while (i2 < i) {
-            char c;
+        while (i3 < i) {
             do {
-                c = this._outputBuffer[i2];
+                c = this._outputBuffer[i3];
                 if (c < length && iArr[c] != 0) {
                     break;
                 }
-                i2++;
-            } while (i2 < i);
-            int i4 = i2 - i3;
+                i3++;
+            } while (i3 < i);
+            int i4 = i3 - i2;
             if (i4 > 0) {
-                this._writer.write(this._outputBuffer, i3, i4);
-                if (i2 >= i) {
+                this._writer.write(this._outputBuffer, i2, i4);
+                if (i3 >= i) {
                     return;
                 }
             }
-            i4 = i2 + 1;
-            i3 = _prependOrWriteCharacterEscape(this._outputBuffer, i4, i, c, iArr[c]);
-            i2 = i4;
+            int i5 = i3 + 1;
+            i2 = _prependOrWriteCharacterEscape(this._outputBuffer, i5, i, c, iArr[c]);
+            i3 = i5;
         }
     }
 
@@ -868,7 +906,7 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         } else {
             int i3 = i2 + i;
             int[] iArr = this._outputEscapes;
-            char length = iArr.length;
+            int length = iArr.length;
             int i4 = i;
             while (i4 < i3) {
                 int i5 = i4;
@@ -903,320 +941,389 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         }
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* JADX WARNING: Removed duplicated region for block: B:15:0x0043 A[SYNTHETIC] */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     private void _writeStringASCII(int r10, int r11) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
         /*
-        r9 = this;
-        r0 = r9._outputTail;
-        r1 = r0 + r10;
-        r2 = r9._outputEscapes;
-        r0 = r2.length;
-        r3 = r11 + 1;
-        r3 = java.lang.Math.min(r0, r3);
-    L_0x000d:
-        r0 = r9._outputTail;
-        if (r0 >= r1) goto L_0x0043;
-    L_0x0011:
-        r0 = r9._outputBuffer;
-        r4 = r9._outputTail;
-        r4 = r0[r4];
-        if (r4 >= r3) goto L_0x0037;
-    L_0x0019:
-        r0 = r2[r4];
-        if (r0 == 0) goto L_0x003b;
-    L_0x001d:
-        r5 = r9._outputTail;
-        r6 = r9._outputHead;
-        r5 = r5 - r6;
-        if (r5 <= 0) goto L_0x002d;
-    L_0x0024:
-        r6 = r9._writer;
-        r7 = r9._outputBuffer;
-        r8 = r9._outputHead;
-        r6.write(r7, r8, r5);
-    L_0x002d:
-        r5 = r9._outputTail;
-        r5 = r5 + 1;
-        r9._outputTail = r5;
-        r9._prependOrWriteCharacterEscape(r4, r0);
-        goto L_0x000d;
-    L_0x0037:
-        if (r4 <= r11) goto L_0x003b;
-    L_0x0039:
-        r0 = -1;
-        goto L_0x001d;
-    L_0x003b:
-        r0 = r9._outputTail;
-        r0 = r0 + 1;
-        r9._outputTail = r0;
-        if (r0 < r1) goto L_0x0011;
-    L_0x0043:
-        return;
+            r9 = this;
+            int r0 = r9._outputTail
+            int r1 = r0 + r10
+            int[] r2 = r9._outputEscapes
+            int r0 = r2.length
+            int r3 = r11 + 1
+            int r3 = java.lang.Math.min(r0, r3)
+        L_0x000d:
+            int r0 = r9._outputTail
+            if (r0 >= r1) goto L_0x0043
+        L_0x0011:
+            char[] r0 = r9._outputBuffer
+            int r4 = r9._outputTail
+            char r4 = r0[r4]
+            if (r4 >= r3) goto L_0x0037
+            r0 = r2[r4]
+            if (r0 == 0) goto L_0x003b
+        L_0x001d:
+            int r5 = r9._outputTail
+            int r6 = r9._outputHead
+            int r5 = r5 - r6
+            if (r5 <= 0) goto L_0x002d
+            java.io.Writer r6 = r9._writer
+            char[] r7 = r9._outputBuffer
+            int r8 = r9._outputHead
+            r6.write(r7, r8, r5)
+        L_0x002d:
+            int r5 = r9._outputTail
+            int r5 = r5 + 1
+            r9._outputTail = r5
+            r9._prependOrWriteCharacterEscape(r4, r0)
+            goto L_0x000d
+        L_0x0037:
+            if (r4 <= r11) goto L_0x003b
+            r0 = -1
+            goto L_0x001d
+        L_0x003b:
+            int r0 = r9._outputTail
+            int r0 = r0 + 1
+            r9._outputTail = r0
+            if (r0 < r1) goto L_0x0011
+        L_0x0043:
+            return
         */
         throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.WriterBasedJsonGenerator._writeStringASCII(int, int):void");
     }
 
-    private void _writeSegmentASCII(int i, int i2) throws IOException, JsonGenerationException {
-        int i3 = 0;
-        int[] iArr = this._outputEscapes;
-        char min = Math.min(iArr.length, i2 + 1);
-        int i4 = 0;
-        int i5 = 0;
-        while (i5 < i) {
-            char c;
-            int i6;
-            do {
-                c = this._outputBuffer[i5];
-                if (c < min) {
-                    i6 = iArr[c];
-                    if (i6 != 0) {
-                        break;
-                    }
-                    i3 = i6;
-                    i5++;
-                } else {
-                    if (c > i2) {
-                        i6 = -1;
-                        break;
-                    }
-                    i5++;
-                }
-            } while (i5 < i);
-            i6 = i3;
-            i3 = i5 - i4;
-            if (i3 > 0) {
-                this._writer.write(this._outputBuffer, i4, i3);
-                if (i5 >= i) {
-                    return;
-                }
-            }
-            i4 = i5 + 1;
-            i5 = i4;
-            i4 = _prependOrWriteCharacterEscape(this._outputBuffer, i4, i, c, i6);
-            i3 = i6;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:23:0x0030 A[SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void _writeSegmentASCII(int r10, int r11) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
+        /*
+            r9 = this;
+            r2 = 0
+            int[] r6 = r9._outputEscapes
+            int r0 = r6.length
+            int r1 = r11 + 1
+            int r7 = java.lang.Math.min(r0, r1)
+            r3 = r2
+            r0 = r2
+            r1 = r2
+        L_0x000d:
+            if (r1 >= r10) goto L_0x0026
+        L_0x000f:
+            char[] r2 = r9._outputBuffer
+            char r4 = r2[r1]
+            if (r4 >= r7) goto L_0x0027
+            r5 = r6[r4]
+            if (r5 == 0) goto L_0x002b
+        L_0x0019:
+            int r0 = r1 - r3
+            if (r0 <= 0) goto L_0x0032
+            java.io.Writer r2 = r9._writer
+            char[] r8 = r9._outputBuffer
+            r2.write(r8, r3, r0)
+            if (r1 < r10) goto L_0x0032
+        L_0x0026:
+            return
+        L_0x0027:
+            if (r4 <= r11) goto L_0x002c
+            r5 = -1
+            goto L_0x0019
+        L_0x002b:
+            r0 = r5
+        L_0x002c:
+            int r1 = r1 + 1
+            if (r1 < r10) goto L_0x000f
+            r5 = r0
+            goto L_0x0019
+        L_0x0032:
+            int r2 = r1 + 1
+            char[] r1 = r9._outputBuffer
+            r0 = r9
+            r3 = r10
+            int r3 = r0._prependOrWriteCharacterEscape(r1, r2, r3, r4, r5)
+            r0 = r5
+            r1 = r2
+            goto L_0x000d
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.WriterBasedJsonGenerator._writeSegmentASCII(int, int):void");
     }
 
-    private void _writeStringASCII(char[] cArr, int i, int i2, int i3) throws IOException, JsonGenerationException {
-        int i4 = i2 + i;
-        int[] iArr = this._outputEscapes;
-        char min = Math.min(iArr.length, i3 + 1);
-        int i5 = 0;
-        int i6 = i;
-        while (i6 < i4) {
-            int i7 = i6;
-            do {
-                char c = cArr[i7];
-                if (c < min) {
-                    i5 = iArr[c];
-                    if (i5 != 0) {
-                        break;
-                    }
-                    i7++;
-                } else {
-                    if (c > i3) {
-                        i5 = -1;
-                        break;
-                    }
-                    i7++;
-                }
-            } while (i7 < i4);
-            int i8 = i7 - i6;
-            if (i8 < 32) {
-                if (this._outputTail + i8 > this._outputEnd) {
-                    _flushBuffer();
-                }
-                if (i8 > 0) {
-                    System.arraycopy(cArr, i6, this._outputBuffer, this._outputTail, i8);
-                    this._outputTail += i8;
-                }
-            } else {
-                _flushBuffer();
-                this._writer.write(cArr, i6, i8);
-            }
-            if (i7 < i4) {
-                i6 = i7 + 1;
-                _appendCharacterEscape(c, i5);
-            } else {
-                return;
-            }
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:25:0x0018 A[EDGE_INSN: B:25:0x0018->B:7:0x0018 ?: BREAK  , SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void _writeStringASCII(char[] r11, int r12, int r13, int r14) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
+        /*
+            r10 = this;
+            int r3 = r13 + r12
+            int[] r4 = r10._outputEscapes
+            int r0 = r4.length
+            int r1 = r14 + 1
+            int r5 = java.lang.Math.min(r0, r1)
+            r0 = 0
+            r2 = r12
+        L_0x000d:
+            if (r2 >= r3) goto L_0x0038
+            r1 = r2
+        L_0x0010:
+            char r6 = r11[r1]
+            if (r6 >= r5) goto L_0x0039
+            r0 = r4[r6]
+            if (r0 == 0) goto L_0x003d
+        L_0x0018:
+            int r7 = r1 - r2
+            r8 = 32
+            if (r7 >= r8) goto L_0x0042
+            int r8 = r10._outputTail
+            int r8 = r8 + r7
+            int r9 = r10._outputEnd
+            if (r8 <= r9) goto L_0x0028
+            r10._flushBuffer()
+        L_0x0028:
+            if (r7 <= 0) goto L_0x0036
+            char[] r8 = r10._outputBuffer
+            int r9 = r10._outputTail
+            java.lang.System.arraycopy(r11, r2, r8, r9, r7)
+            int r2 = r10._outputTail
+            int r2 = r2 + r7
+            r10._outputTail = r2
+        L_0x0036:
+            if (r1 < r3) goto L_0x004b
+        L_0x0038:
+            return
+        L_0x0039:
+            if (r6 <= r14) goto L_0x003d
+            r0 = -1
+            goto L_0x0018
+        L_0x003d:
+            int r1 = r1 + 1
+            if (r1 < r3) goto L_0x0010
+            goto L_0x0018
+        L_0x0042:
+            r10._flushBuffer()
+            java.io.Writer r8 = r10._writer
+            r8.write(r11, r2, r7)
+            goto L_0x0036
+        L_0x004b:
+            int r2 = r1 + 1
+            r10._appendCharacterEscape(r6, r0)
+            goto L_0x000d
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.WriterBasedJsonGenerator._writeStringASCII(char[], int, int, int):void");
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* JADX WARNING: Removed duplicated region for block: B:22:0x005a A[SYNTHETIC] */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     private void _writeStringCustom(int r12) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
         /*
-        r11 = this;
-        r0 = r11._outputTail;
-        r2 = r0 + r12;
-        r3 = r11._outputEscapes;
-        r0 = r11._maximumNonEscapedChar;
-        r1 = 1;
-        if (r0 >= r1) goto L_0x0041;
-    L_0x000b:
-        r0 = 65535; // 0xffff float:9.1834E-41 double:3.23786E-319;
-    L_0x000e:
-        r1 = r3.length;
-        r4 = r0 + 1;
-        r4 = java.lang.Math.min(r1, r4);
-        r5 = r11._characterEscapes;
-    L_0x0017:
-        r1 = r11._outputTail;
-        if (r1 >= r2) goto L_0x005a;
-    L_0x001b:
-        r1 = r11._outputBuffer;
-        r6 = r11._outputTail;
-        r6 = r1[r6];
-        if (r6 >= r4) goto L_0x0044;
-    L_0x0023:
-        r1 = r3[r6];
-        if (r1 == 0) goto L_0x0052;
-    L_0x0027:
-        r7 = r11._outputTail;
-        r8 = r11._outputHead;
-        r7 = r7 - r8;
-        if (r7 <= 0) goto L_0x0037;
-    L_0x002e:
-        r8 = r11._writer;
-        r9 = r11._outputBuffer;
-        r10 = r11._outputHead;
-        r8.write(r9, r10, r7);
-    L_0x0037:
-        r7 = r11._outputTail;
-        r7 = r7 + 1;
-        r11._outputTail = r7;
-        r11._prependOrWriteCharacterEscape(r6, r1);
-        goto L_0x0017;
-    L_0x0041:
-        r0 = r11._maximumNonEscapedChar;
-        goto L_0x000e;
-    L_0x0044:
-        if (r6 <= r0) goto L_0x0048;
-    L_0x0046:
-        r1 = -1;
-        goto L_0x0027;
-    L_0x0048:
-        r1 = r5.getEscapeSequence(r6);
-        r11._currentEscape = r1;
-        if (r1 == 0) goto L_0x0052;
-    L_0x0050:
-        r1 = -2;
-        goto L_0x0027;
-    L_0x0052:
-        r1 = r11._outputTail;
-        r1 = r1 + 1;
-        r11._outputTail = r1;
-        if (r1 < r2) goto L_0x001b;
-    L_0x005a:
-        return;
+            r11 = this;
+            int r0 = r11._outputTail
+            int r2 = r0 + r12
+            int[] r3 = r11._outputEscapes
+            int r0 = r11._maximumNonEscapedChar
+            r1 = 1
+            if (r0 >= r1) goto L_0x0041
+            r0 = 65535(0xffff, float:9.1834E-41)
+        L_0x000e:
+            int r1 = r3.length
+            int r4 = r0 + 1
+            int r4 = java.lang.Math.min(r1, r4)
+            com.fasterxml.jackson.core.io.CharacterEscapes r5 = r11._characterEscapes
+        L_0x0017:
+            int r1 = r11._outputTail
+            if (r1 >= r2) goto L_0x005a
+        L_0x001b:
+            char[] r1 = r11._outputBuffer
+            int r6 = r11._outputTail
+            char r6 = r1[r6]
+            if (r6 >= r4) goto L_0x0044
+            r1 = r3[r6]
+            if (r1 == 0) goto L_0x0052
+        L_0x0027:
+            int r7 = r11._outputTail
+            int r8 = r11._outputHead
+            int r7 = r7 - r8
+            if (r7 <= 0) goto L_0x0037
+            java.io.Writer r8 = r11._writer
+            char[] r9 = r11._outputBuffer
+            int r10 = r11._outputHead
+            r8.write(r9, r10, r7)
+        L_0x0037:
+            int r7 = r11._outputTail
+            int r7 = r7 + 1
+            r11._outputTail = r7
+            r11._prependOrWriteCharacterEscape(r6, r1)
+            goto L_0x0017
+        L_0x0041:
+            int r0 = r11._maximumNonEscapedChar
+            goto L_0x000e
+        L_0x0044:
+            if (r6 <= r0) goto L_0x0048
+            r1 = -1
+            goto L_0x0027
+        L_0x0048:
+            com.fasterxml.jackson.core.SerializableString r1 = r5.getEscapeSequence(r6)
+            r11._currentEscape = r1
+            if (r1 == 0) goto L_0x0052
+            r1 = -2
+            goto L_0x0027
+        L_0x0052:
+            int r1 = r11._outputTail
+            int r1 = r1 + 1
+            r11._outputTail = r1
+            if (r1 < r2) goto L_0x001b
+        L_0x005a:
+            return
         */
         throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.WriterBasedJsonGenerator._writeStringCustom(int):void");
     }
 
-    private void _writeSegmentCustom(int i) throws IOException, JsonGenerationException {
-        int i2 = 0;
-        int[] iArr = this._outputEscapes;
-        char c = this._maximumNonEscapedChar < 1 ? '￿' : this._maximumNonEscapedChar;
-        char min = Math.min(iArr.length, c + 1);
-        CharacterEscapes characterEscapes = this._characterEscapes;
-        int i3 = 0;
-        int i4 = 0;
-        while (i2 < i) {
-            char c2;
-            int i5;
-            do {
-                c2 = this._outputBuffer[i2];
-                if (c2 < min) {
-                    i5 = iArr[c2];
-                    if (i5 != 0) {
-                        break;
-                    }
-                    i4 = i5;
-                    i2++;
-                } else if (c2 > c) {
-                    i5 = -1;
-                    break;
-                } else {
-                    SerializableString escapeSequence = characterEscapes.getEscapeSequence(c2);
-                    this._currentEscape = escapeSequence;
-                    if (escapeSequence != null) {
-                        i5 = -2;
-                        break;
-                    }
-                    i2++;
-                }
-            } while (i2 < i);
-            i5 = i4;
-            i4 = i2 - i3;
-            if (i4 > 0) {
-                this._writer.write(this._outputBuffer, i3, i4);
-                if (i2 >= i) {
-                    return;
-                }
-            }
-            i3 = i2 + 1;
-            i2 = i3;
-            i3 = _prependOrWriteCharacterEscape(this._outputBuffer, i3, i, c2, i5);
-            i4 = i5;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:31:0x0049 A[SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void _writeSegmentCustom(int r12) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
+        /*
+            r11 = this;
+            r2 = 0
+            int[] r7 = r11._outputEscapes
+            int r0 = r11._maximumNonEscapedChar
+            r1 = 1
+            if (r0 >= r1) goto L_0x0032
+            r0 = 65535(0xffff, float:9.1834E-41)
+            r6 = r0
+        L_0x000c:
+            int r0 = r7.length
+            int r1 = r6 + 1
+            int r8 = java.lang.Math.min(r0, r1)
+            com.fasterxml.jackson.core.io.CharacterEscapes r9 = r11._characterEscapes
+            r3 = r2
+            r0 = r2
+            r1 = r2
+        L_0x0018:
+            if (r1 >= r12) goto L_0x0031
+        L_0x001a:
+            char[] r2 = r11._outputBuffer
+            char r4 = r2[r1]
+            if (r4 >= r8) goto L_0x0036
+            r5 = r7[r4]
+            if (r5 == 0) goto L_0x0044
+        L_0x0024:
+            int r0 = r1 - r3
+            if (r0 <= 0) goto L_0x004b
+            java.io.Writer r2 = r11._writer
+            char[] r10 = r11._outputBuffer
+            r2.write(r10, r3, r0)
+            if (r1 < r12) goto L_0x004b
+        L_0x0031:
+            return
+        L_0x0032:
+            int r0 = r11._maximumNonEscapedChar
+            r6 = r0
+            goto L_0x000c
+        L_0x0036:
+            if (r4 <= r6) goto L_0x003a
+            r5 = -1
+            goto L_0x0024
+        L_0x003a:
+            com.fasterxml.jackson.core.SerializableString r2 = r9.getEscapeSequence(r4)
+            r11._currentEscape = r2
+            if (r2 == 0) goto L_0x0045
+            r5 = -2
+            goto L_0x0024
+        L_0x0044:
+            r0 = r5
+        L_0x0045:
+            int r1 = r1 + 1
+            if (r1 < r12) goto L_0x001a
+            r5 = r0
+            goto L_0x0024
+        L_0x004b:
+            int r2 = r1 + 1
+            char[] r1 = r11._outputBuffer
+            r0 = r11
+            r3 = r12
+            int r3 = r0._prependOrWriteCharacterEscape(r1, r2, r3, r4, r5)
+            r0 = r5
+            r1 = r2
+            goto L_0x0018
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.WriterBasedJsonGenerator._writeSegmentCustom(int):void");
     }
 
-    private void _writeStringCustom(char[] cArr, int i, int i2) throws IOException, JsonGenerationException {
-        int i3 = i2 + i;
-        int[] iArr = this._outputEscapes;
-        char c = this._maximumNonEscapedChar < 1 ? '￿' : this._maximumNonEscapedChar;
-        char min = Math.min(iArr.length, c + 1);
-        CharacterEscapes characterEscapes = this._characterEscapes;
-        int i4 = 0;
-        int i5 = i;
-        while (i5 < i3) {
-            int i6 = i5;
-            do {
-                char c2 = cArr[i6];
-                if (c2 < min) {
-                    i4 = iArr[c2];
-                    if (i4 != 0) {
-                        break;
-                    }
-                    i6++;
-                } else if (c2 > c) {
-                    i4 = -1;
-                    break;
-                } else {
-                    SerializableString escapeSequence = characterEscapes.getEscapeSequence(c2);
-                    this._currentEscape = escapeSequence;
-                    if (escapeSequence != null) {
-                        i4 = -2;
-                        break;
-                    }
-                    i6++;
-                }
-            } while (i6 < i3);
-            int i7 = i6 - i5;
-            if (i7 < 32) {
-                if (this._outputTail + i7 > this._outputEnd) {
-                    _flushBuffer();
-                }
-                if (i7 > 0) {
-                    System.arraycopy(cArr, i5, this._outputBuffer, this._outputTail, i7);
-                    this._outputTail += i7;
-                }
-            } else {
-                _flushBuffer();
-                this._writer.write(cArr, i5, i7);
-            }
-            if (i6 < i3) {
-                i5 = i6 + 1;
-                _appendCharacterEscape(c2, i4);
-            } else {
-                return;
-            }
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:32:0x0022 A[EDGE_INSN: B:32:0x0022->B:10:0x0022 ?: BREAK  , SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void _writeStringCustom(char[] r13, int r14, int r15) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
+        /*
+            r12 = this;
+            int r4 = r15 + r14
+            int[] r5 = r12._outputEscapes
+            int r0 = r12._maximumNonEscapedChar
+            r1 = 1
+            if (r0 >= r1) goto L_0x0043
+            r0 = 65535(0xffff, float:9.1834E-41)
+        L_0x000c:
+            int r1 = r5.length
+            int r2 = r0 + 1
+            int r6 = java.lang.Math.min(r1, r2)
+            com.fasterxml.jackson.core.io.CharacterEscapes r7 = r12._characterEscapes
+            r1 = 0
+            r3 = r14
+        L_0x0017:
+            if (r3 >= r4) goto L_0x0042
+            r2 = r3
+        L_0x001a:
+            char r8 = r13[r2]
+            if (r8 >= r6) goto L_0x0046
+            r1 = r5[r8]
+            if (r1 == 0) goto L_0x0054
+        L_0x0022:
+            int r9 = r2 - r3
+            r10 = 32
+            if (r9 >= r10) goto L_0x0059
+            int r10 = r12._outputTail
+            int r10 = r10 + r9
+            int r11 = r12._outputEnd
+            if (r10 <= r11) goto L_0x0032
+            r12._flushBuffer()
+        L_0x0032:
+            if (r9 <= 0) goto L_0x0040
+            char[] r10 = r12._outputBuffer
+            int r11 = r12._outputTail
+            java.lang.System.arraycopy(r13, r3, r10, r11, r9)
+            int r3 = r12._outputTail
+            int r3 = r3 + r9
+            r12._outputTail = r3
+        L_0x0040:
+            if (r2 < r4) goto L_0x0062
+        L_0x0042:
+            return
+        L_0x0043:
+            int r0 = r12._maximumNonEscapedChar
+            goto L_0x000c
+        L_0x0046:
+            if (r8 <= r0) goto L_0x004a
+            r1 = -1
+            goto L_0x0022
+        L_0x004a:
+            com.fasterxml.jackson.core.SerializableString r9 = r7.getEscapeSequence(r8)
+            r12._currentEscape = r9
+            if (r9 == 0) goto L_0x0054
+            r1 = -2
+            goto L_0x0022
+        L_0x0054:
+            int r2 = r2 + 1
+            if (r2 < r4) goto L_0x001a
+            goto L_0x0022
+        L_0x0059:
+            r12._flushBuffer()
+            java.io.Writer r10 = r12._writer
+            r10.write(r13, r3, r9)
+            goto L_0x0040
+        L_0x0062:
+            int r3 = r2 + 1
+            r12._appendCharacterEscape(r8, r1)
+            goto L_0x0017
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.WriterBasedJsonGenerator._writeStringCustom(char[], int, int):void");
     }
 
-    protected void _writeBinary(Base64Variant base64Variant, byte[] bArr, int i, int i2) throws IOException, JsonGenerationException {
+    /* access modifiers changed from: protected */
+    public void _writeBinary(Base64Variant base64Variant, byte[] bArr, int i, int i2) throws IOException, JsonGenerationException {
         int i3 = i2 - 3;
         int i4 = this._outputEnd - 6;
         int maxLineLength = base64Variant.getMaxLineLength() >> 2;
@@ -1228,177 +1335,179 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
             int i6 = bArr[i] << 8;
             int i7 = i5 + 1;
             i = i7 + 1;
-            this._outputTail = base64Variant.encodeBase64Chunk((((bArr[i5] & 255) | i6) << 8) | (bArr[i7] & 255), this._outputBuffer, this._outputTail);
+            this._outputTail = base64Variant.encodeBase64Chunk((int) (((bArr[i5] & 255) | i6) << 8) | (bArr[i7] & 255), this._outputBuffer, this._outputTail);
             maxLineLength--;
             if (maxLineLength <= 0) {
                 char[] cArr = this._outputBuffer;
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                cArr[i5] = '\\';
-                cArr = this._outputBuffer;
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                cArr[i5] = 'n';
+                int i8 = this._outputTail;
+                this._outputTail = i8 + 1;
+                cArr[i8] = '\\';
+                char[] cArr2 = this._outputBuffer;
+                int i9 = this._outputTail;
+                this._outputTail = i9 + 1;
+                cArr2[i9] = 'n';
                 maxLineLength = base64Variant.getMaxLineLength() >> 2;
             }
         }
-        i3 = i2 - i;
-        if (i3 > 0) {
+        int i10 = i2 - i;
+        if (i10 > 0) {
             if (this._outputTail > i4) {
                 _flushBuffer();
             }
-            i4 = i + 1;
-            maxLineLength = bArr[i] << 16;
-            if (i3 == 2) {
-                i5 = i4 + 1;
-                maxLineLength |= (bArr[i4] & 255) << 8;
+            int i11 = i + 1;
+            int i12 = bArr[i] << 16;
+            if (i10 == 2) {
+                int i13 = i11 + 1;
+                i12 |= (bArr[i11] & 255) << 8;
             }
-            this._outputTail = base64Variant.encodeBase64Partial(maxLineLength, i3, this._outputBuffer, this._outputTail);
+            this._outputTail = base64Variant.encodeBase64Partial(i12, i10, this._outputBuffer, this._outputTail);
         }
     }
 
-    protected int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr, int i) throws IOException, JsonGenerationException {
-        int i2 = 0;
-        int i3 = 0;
-        int i4 = -3;
-        int i5 = this._outputEnd - 6;
-        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
-        int i6 = i;
-        while (i6 > 2) {
-            if (i2 > i4) {
-                i3 = _readMore(inputStream, bArr, i2, i3, i6);
-                i2 = 0;
-                if (i3 < 3) {
-                    break;
-                }
-                i4 = i3 - 3;
-            }
-            if (this._outputTail > i5) {
-                _flushBuffer();
-            }
-            int i7 = i2 + 1;
-            int i8 = bArr[i2] << 8;
-            int i9 = i7 + 1;
-            i2 = i9 + 1;
-            i6 -= 3;
-            this._outputTail = base64Variant.encodeBase64Chunk((((bArr[i7] & 255) | i8) << 8) | (bArr[i9] & 255), this._outputBuffer, this._outputTail);
-            i7 = maxLineLength - 1;
-            if (i7 <= 0) {
-                char[] cArr = this._outputBuffer;
-                i8 = this._outputTail;
-                this._outputTail = i8 + 1;
-                cArr[i8] = '\\';
-                cArr = this._outputBuffer;
-                i8 = this._outputTail;
-                this._outputTail = i8 + 1;
-                cArr[i8] = 'n';
-                i7 = base64Variant.getMaxLineLength() >> 2;
-            }
-            maxLineLength = i7;
-        }
-        if (i6 <= 0) {
-            return i6;
-        }
-        i4 = _readMore(inputStream, bArr, i2, i3, i6);
-        if (i4 <= 0) {
-            return i6;
-        }
-        if (this._outputTail > i5) {
-            _flushBuffer();
-        }
-        i7 = bArr[0] << 16;
-        if (1 < i4) {
-            i7 |= (bArr[1] & 255) << 8;
-            i4 = 2;
-        } else {
-            i4 = 1;
-        }
-        this._outputTail = base64Variant.encodeBase64Partial(i7, i4, this._outputBuffer, this._outputTail);
-        return i6 - i4;
-    }
-
-    protected int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr) throws IOException, JsonGenerationException {
-        int i = -3;
-        int i2 = this._outputEnd - 6;
-        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
+    /* access modifiers changed from: protected */
+    public int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr, int i) throws IOException, JsonGenerationException {
+        int i2;
         int i3 = 0;
         int i4 = 0;
-        int i5 = 0;
-        while (true) {
-            if (i5 > i) {
-                i4 = _readMore(inputStream, bArr, i5, i4, bArr.length);
+        int i5 = -3;
+        int i6 = this._outputEnd - 6;
+        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
+        int i7 = i;
+        while (i7 > 2) {
+            if (i3 > i5) {
+                i4 = _readMore(inputStream, bArr, i3, i4, i7);
+                i3 = 0;
                 if (i4 < 3) {
                     break;
                 }
-                i = i4 - 3;
-                i5 = 0;
+                i5 = i4 - 3;
             }
-            if (this._outputTail > i2) {
+            if (this._outputTail > i6) {
                 _flushBuffer();
             }
-            int i6 = i5 + 1;
-            int i7 = bArr[i5] << 8;
-            int i8 = i6 + 1;
-            i5 = i8 + 1;
-            i3 += 3;
-            this._outputTail = base64Variant.encodeBase64Chunk((((bArr[i6] & 255) | i7) << 8) | (bArr[i8] & 255), this._outputBuffer, this._outputTail);
-            i6 = maxLineLength - 1;
-            if (i6 <= 0) {
+            int i8 = i3 + 1;
+            int i9 = bArr[i3] << 8;
+            int i10 = i8 + 1;
+            i3 = i10 + 1;
+            i7 -= 3;
+            this._outputTail = base64Variant.encodeBase64Chunk((int) (((bArr[i8] & 255) | i9) << 8) | (bArr[i10] & 255), this._outputBuffer, this._outputTail);
+            int i11 = maxLineLength - 1;
+            if (i11 <= 0) {
                 char[] cArr = this._outputBuffer;
-                i7 = this._outputTail;
-                this._outputTail = i7 + 1;
-                cArr[i7] = '\\';
-                cArr = this._outputBuffer;
-                i7 = this._outputTail;
-                this._outputTail = i7 + 1;
-                cArr[i7] = 'n';
-                i6 = base64Variant.getMaxLineLength() >> 2;
+                int i12 = this._outputTail;
+                this._outputTail = i12 + 1;
+                cArr[i12] = '\\';
+                char[] cArr2 = this._outputBuffer;
+                int i13 = this._outputTail;
+                this._outputTail = i13 + 1;
+                cArr2[i13] = 'n';
+                i11 = base64Variant.getMaxLineLength() >> 2;
             }
-            maxLineLength = i6;
+            maxLineLength = i11;
         }
-        if (0 >= i4) {
-            return i3;
+        if (i7 <= 0) {
+            return i7;
         }
-        if (this._outputTail > i2) {
+        int _readMore = _readMore(inputStream, bArr, i3, i4, i7);
+        if (_readMore <= 0) {
+            return i7;
+        }
+        if (this._outputTail > i6) {
             _flushBuffer();
         }
-        i = bArr[0] << 16;
-        if (1 < i4) {
-            i6 = ((bArr[1] & 255) << 8) | i;
+        int i14 = bArr[0] << 16;
+        if (1 < _readMore) {
+            i14 |= (bArr[1] & 255) << 8;
+            i2 = 2;
+        } else {
+            i2 = 1;
+        }
+        this._outputTail = base64Variant.encodeBase64Partial(i14, i2, this._outputBuffer, this._outputTail);
+        return i7 - i2;
+    }
+
+    /* access modifiers changed from: protected */
+    public int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr) throws IOException, JsonGenerationException {
+        int i;
+        int i2 = -3;
+        int i3 = this._outputEnd - 6;
+        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
+        int i4 = 0;
+        int i5 = 0;
+        int i6 = 0;
+        while (true) {
+            if (i6 > i2) {
+                i5 = _readMore(inputStream, bArr, i6, i5, bArr.length);
+                if (i5 < 3) {
+                    break;
+                }
+                i2 = i5 - 3;
+                i6 = 0;
+            }
+            if (this._outputTail > i3) {
+                _flushBuffer();
+            }
+            int i7 = i6 + 1;
+            int i8 = bArr[i6] << 8;
+            int i9 = i7 + 1;
+            i6 = i9 + 1;
+            i4 += 3;
+            this._outputTail = base64Variant.encodeBase64Chunk((int) (((bArr[i7] & 255) | i8) << 8) | (bArr[i9] & 255), this._outputBuffer, this._outputTail);
+            int i10 = maxLineLength - 1;
+            if (i10 <= 0) {
+                char[] cArr = this._outputBuffer;
+                int i11 = this._outputTail;
+                this._outputTail = i11 + 1;
+                cArr[i11] = '\\';
+                char[] cArr2 = this._outputBuffer;
+                int i12 = this._outputTail;
+                this._outputTail = i12 + 1;
+                cArr2[i12] = 'n';
+                i10 = base64Variant.getMaxLineLength() >> 2;
+            }
+            maxLineLength = i10;
+        }
+        if (0 >= i5) {
+            return i4;
+        }
+        if (this._outputTail > i3) {
+            _flushBuffer();
+        }
+        int i13 = bArr[0] << 16;
+        if (1 < i5) {
+            i13 |= (bArr[1] & 255) << 8;
             i = 2;
         } else {
-            i6 = i;
             i = 1;
         }
-        i7 = i3 + i;
-        this._outputTail = base64Variant.encodeBase64Partial(i6, i, this._outputBuffer, this._outputTail);
-        return i7;
+        int i14 = i4 + i;
+        this._outputTail = base64Variant.encodeBase64Partial(i13, i, this._outputBuffer, this._outputTail);
+        return i14;
     }
 
     private int _readMore(InputStream inputStream, byte[] bArr, int i, int i2, int i3) throws IOException {
-        int i4;
-        int i5 = 0;
+        int i4 = 0;
         while (i < i2) {
-            i4 = i5 + 1;
+            int i5 = i4 + 1;
             int i6 = i + 1;
-            bArr[i5] = bArr[i];
-            i5 = i4;
+            bArr[i4] = bArr[i];
+            i4 = i5;
             i = i6;
         }
-        i4 = Math.min(i3, bArr.length);
+        int min = Math.min(i3, bArr.length);
         do {
-            i6 = i4 - i5;
-            if (i6 != 0) {
-                i6 = inputStream.read(bArr, i5, i6);
-                if (i6 < 0) {
+            int i7 = min - i4;
+            if (i7 != 0) {
+                int read = inputStream.read(bArr, i4, i7);
+                if (read < 0) {
                     break;
                 }
-                i5 += i6;
+                i4 += read;
             } else {
                 break;
             }
-        } while (i5 < 3);
-        return i5;
+        } while (i4 < 3);
+        return i4;
     }
 
     private final void _writeNull() throws IOException {
@@ -1408,29 +1517,28 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         int i = this._outputTail;
         char[] cArr = this._outputBuffer;
         cArr[i] = 'n';
-        i++;
-        cArr[i] = 'u';
-        i++;
-        cArr[i] = 'l';
-        i++;
-        cArr[i] = 'l';
-        this._outputTail = i + 1;
+        int i2 = i + 1;
+        cArr[i2] = 'u';
+        int i3 = i2 + 1;
+        cArr[i3] = 'l';
+        int i4 = i3 + 1;
+        cArr[i4] = 'l';
+        this._outputTail = i4 + 1;
     }
 
     private void _prependOrWriteCharacterEscape(char c, int i) throws IOException, JsonGenerationException {
+        String value;
         int i2;
-        int i3;
-        char[] cArr;
         if (i >= 0) {
             if (this._outputTail >= 2) {
-                i2 = this._outputTail - 2;
-                this._outputHead = i2;
-                i3 = i2 + 1;
-                this._outputBuffer[i2] = '\\';
-                this._outputBuffer[i3] = (char) i;
+                int i3 = this._outputTail - 2;
+                this._outputHead = i3;
+                int i4 = i3 + 1;
+                this._outputBuffer[i3] = '\\';
+                this._outputBuffer[i4] = (char) i;
                 return;
             }
-            cArr = this._entityBuffer;
+            char[] cArr = this._entityBuffer;
             if (cArr == null) {
                 cArr = _allocateEntityBuffer();
             }
@@ -1438,72 +1546,72 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
             cArr[1] = (char) i;
             this._writer.write(cArr, 0, 2);
         } else if (i == -2) {
-            String value;
             if (this._currentEscape == null) {
                 value = this._characterEscapes.getEscapeSequence(c).getValue();
             } else {
                 value = this._currentEscape.getValue();
                 this._currentEscape = null;
             }
-            r1 = value.length();
-            if (this._outputTail >= r1) {
-                i3 = this._outputTail - r1;
-                this._outputHead = i3;
-                value.getChars(0, r1, this._outputBuffer, i3);
+            int length = value.length();
+            if (this._outputTail >= length) {
+                int i5 = this._outputTail - length;
+                this._outputHead = i5;
+                value.getChars(0, length, this._outputBuffer, i5);
                 return;
             }
             this._outputHead = this._outputTail;
             this._writer.write(value);
         } else if (this._outputTail >= 6) {
             char[] cArr2 = this._outputBuffer;
-            i2 = this._outputTail - 6;
-            this._outputHead = i2;
-            cArr2[i2] = '\\';
-            i2++;
-            cArr2[i2] = 'u';
-            if (c > 'ÿ') {
-                i3 = (c >> 8) & 255;
-                i2++;
-                cArr2[i2] = HEX_CHARS[i3 >> 4];
-                i2++;
-                cArr2[i2] = HEX_CHARS[i3 & 15];
+            int i6 = this._outputTail - 6;
+            this._outputHead = i6;
+            cArr2[i6] = '\\';
+            int i7 = i6 + 1;
+            cArr2[i7] = 'u';
+            if (c > 255) {
+                int i8 = (c >> 8) & 255;
+                int i9 = i7 + 1;
+                cArr2[i9] = HEX_CHARS[i8 >> 4];
+                i2 = i9 + 1;
+                cArr2[i2] = HEX_CHARS[i8 & 15];
                 c = (char) (c & 255);
             } else {
-                i2++;
-                cArr2[i2] = '0';
-                i2++;
+                int i10 = i7 + 1;
+                cArr2[i10] = '0';
+                i2 = i10 + 1;
                 cArr2[i2] = '0';
             }
-            i2++;
-            cArr2[i2] = HEX_CHARS[c >> 4];
-            cArr2[i2 + 1] = HEX_CHARS[c & 15];
+            int i11 = i2 + 1;
+            cArr2[i11] = HEX_CHARS[c >> 4];
+            cArr2[i11 + 1] = HEX_CHARS[c & 15];
         } else {
-            cArr = this._entityBuffer;
-            if (cArr == null) {
-                cArr = _allocateEntityBuffer();
+            char[] cArr3 = this._entityBuffer;
+            if (cArr3 == null) {
+                cArr3 = _allocateEntityBuffer();
             }
             this._outputHead = this._outputTail;
-            if (c > 'ÿ') {
-                r1 = (c >> 8) & 255;
-                i3 = c & 255;
-                cArr[10] = HEX_CHARS[r1 >> 4];
-                cArr[11] = HEX_CHARS[r1 & 15];
-                cArr[12] = HEX_CHARS[i3 >> 4];
-                cArr[13] = HEX_CHARS[i3 & 15];
-                this._writer.write(cArr, 8, 6);
+            if (c > 255) {
+                int i12 = (c >> 8) & 255;
+                char c2 = c & 255;
+                cArr3[10] = HEX_CHARS[i12 >> 4];
+                cArr3[11] = HEX_CHARS[i12 & 15];
+                cArr3[12] = HEX_CHARS[c2 >> 4];
+                cArr3[13] = HEX_CHARS[c2 & 15];
+                this._writer.write(cArr3, 8, 6);
                 return;
             }
-            cArr[6] = HEX_CHARS[c >> 4];
-            cArr[7] = HEX_CHARS[c & 15];
-            this._writer.write(cArr, 2, 6);
+            cArr3[6] = HEX_CHARS[c >> 4];
+            cArr3[7] = HEX_CHARS[c & 15];
+            this._writer.write(cArr3, 2, 6);
         }
     }
 
     private int _prependOrWriteCharacterEscape(char[] cArr, int i, int i2, char c, int i3) throws IOException, JsonGenerationException {
-        char[] cArr2;
+        String value;
+        int i4;
         if (i3 >= 0) {
             if (i <= 1 || i >= i2) {
-                cArr2 = this._entityBuffer;
+                char[] cArr2 = this._entityBuffer;
                 if (cArr2 == null) {
                     cArr2 = _allocateEntityBuffer();
                 }
@@ -1511,132 +1619,131 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
                 this._writer.write(cArr2, 0, 2);
                 return i;
             }
-            i -= 2;
-            cArr[i] = '\\';
-            cArr[i + 1] = (char) i3;
-            return i;
+            int i5 = i - 2;
+            cArr[i5] = '\\';
+            cArr[i5 + 1] = (char) i3;
+            return i5;
         } else if (i3 == -2) {
-            String value;
             if (this._currentEscape == null) {
                 value = this._characterEscapes.getEscapeSequence(c).getValue();
             } else {
                 value = this._currentEscape.getValue();
                 this._currentEscape = null;
             }
-            r1 = value.length();
-            if (i < r1 || i >= i2) {
+            int length = value.length();
+            if (i < length || i >= i2) {
                 this._writer.write(value);
                 return i;
             }
-            i -= r1;
-            value.getChars(0, r1, cArr, i);
-            return i;
+            int i6 = i - length;
+            value.getChars(0, length, cArr, i6);
+            return i6;
         } else if (i <= 5 || i >= i2) {
-            cArr2 = this._entityBuffer;
-            if (cArr2 == null) {
-                cArr2 = _allocateEntityBuffer();
+            char[] cArr3 = this._entityBuffer;
+            if (cArr3 == null) {
+                cArr3 = _allocateEntityBuffer();
             }
             this._outputHead = this._outputTail;
-            if (c > 'ÿ') {
-                r1 = (c >> 8) & 255;
-                r2 = c & 255;
-                cArr2[10] = HEX_CHARS[r1 >> 4];
-                cArr2[11] = HEX_CHARS[r1 & 15];
-                cArr2[12] = HEX_CHARS[r2 >> 4];
-                cArr2[13] = HEX_CHARS[r2 & 15];
-                this._writer.write(cArr2, 8, 6);
+            if (c > 255) {
+                int i7 = (c >> 8) & 255;
+                char c2 = c & 255;
+                cArr3[10] = HEX_CHARS[i7 >> 4];
+                cArr3[11] = HEX_CHARS[i7 & 15];
+                cArr3[12] = HEX_CHARS[c2 >> 4];
+                cArr3[13] = HEX_CHARS[c2 & 15];
+                this._writer.write(cArr3, 8, 6);
                 return i;
             }
-            cArr2[6] = HEX_CHARS[c >> 4];
-            cArr2[7] = HEX_CHARS[c & 15];
-            this._writer.write(cArr2, 2, 6);
+            cArr3[6] = HEX_CHARS[c >> 4];
+            cArr3[7] = HEX_CHARS[c & 15];
+            this._writer.write(cArr3, 2, 6);
             return i;
         } else {
-            int i4 = i - 6;
-            r1 = i4 + 1;
-            cArr[i4] = '\\';
-            i4 = r1 + 1;
-            cArr[r1] = 'u';
-            if (c > 'ÿ') {
-                r1 = (c >> 8) & 255;
-                r2 = i4 + 1;
-                cArr[i4] = HEX_CHARS[r1 >> 4];
-                i4 = r2 + 1;
-                cArr[r2] = HEX_CHARS[r1 & 15];
+            int i8 = i - 6;
+            int i9 = i8 + 1;
+            cArr[i8] = '\\';
+            int i10 = i9 + 1;
+            cArr[i9] = 'u';
+            if (c > 255) {
+                int i11 = (c >> 8) & 255;
+                int i12 = i10 + 1;
+                cArr[i10] = HEX_CHARS[i11 >> 4];
+                i4 = i12 + 1;
+                cArr[i12] = HEX_CHARS[i11 & 15];
                 c = (char) (c & 255);
             } else {
-                r1 = i4 + 1;
-                cArr[i4] = '0';
-                i4 = r1 + 1;
-                cArr[r1] = '0';
+                int i13 = i10 + 1;
+                cArr[i10] = '0';
+                i4 = i13 + 1;
+                cArr[i13] = '0';
             }
-            r1 = i4 + 1;
+            int i14 = i4 + 1;
             cArr[i4] = HEX_CHARS[c >> 4];
-            cArr[r1] = HEX_CHARS[c & 15];
-            return r1 - 5;
+            cArr[i14] = HEX_CHARS[c & 15];
+            return i14 - 5;
         }
     }
 
     private void _appendCharacterEscape(char c, int i) throws IOException, JsonGenerationException {
+        String value;
         int i2;
         if (i >= 0) {
             if (this._outputTail + 2 > this._outputEnd) {
                 _flushBuffer();
             }
             char[] cArr = this._outputBuffer;
-            i2 = this._outputTail;
-            this._outputTail = i2 + 1;
-            cArr[i2] = '\\';
-            cArr = this._outputBuffer;
-            i2 = this._outputTail;
-            this._outputTail = i2 + 1;
-            cArr[i2] = (char) i;
+            int i3 = this._outputTail;
+            this._outputTail = i3 + 1;
+            cArr[i3] = '\\';
+            char[] cArr2 = this._outputBuffer;
+            int i4 = this._outputTail;
+            this._outputTail = i4 + 1;
+            cArr2[i4] = (char) i;
         } else if (i != -2) {
             if (this._outputTail + 5 >= this._outputEnd) {
                 _flushBuffer();
             }
-            int i3 = this._outputTail;
-            char[] cArr2 = this._outputBuffer;
-            int i4 = i3 + 1;
-            cArr2[i3] = '\\';
-            i3 = i4 + 1;
-            cArr2[i4] = 'u';
-            if (c > 'ÿ') {
-                i4 = (c >> 8) & 255;
-                int i5 = i3 + 1;
-                cArr2[i3] = HEX_CHARS[i4 >> 4];
-                i3 = i5 + 1;
-                cArr2[i5] = HEX_CHARS[i4 & 15];
+            int i5 = this._outputTail;
+            char[] cArr3 = this._outputBuffer;
+            int i6 = i5 + 1;
+            cArr3[i5] = '\\';
+            int i7 = i6 + 1;
+            cArr3[i6] = 'u';
+            if (c > 255) {
+                int i8 = (c >> 8) & 255;
+                int i9 = i7 + 1;
+                cArr3[i7] = HEX_CHARS[i8 >> 4];
+                i2 = i9 + 1;
+                cArr3[i9] = HEX_CHARS[i8 & 15];
                 c = (char) (c & 255);
             } else {
-                i4 = i3 + 1;
-                cArr2[i3] = '0';
-                i3 = i4 + 1;
-                cArr2[i4] = '0';
+                int i10 = i7 + 1;
+                cArr3[i7] = '0';
+                i2 = i10 + 1;
+                cArr3[i10] = '0';
             }
-            i4 = i3 + 1;
-            cArr2[i3] = HEX_CHARS[c >> 4];
-            i3 = i4 + 1;
-            cArr2[i4] = HEX_CHARS[c & 15];
-            this._outputTail = i3;
+            int i11 = i2 + 1;
+            cArr3[i2] = HEX_CHARS[c >> 4];
+            int i12 = i11 + 1;
+            cArr3[i11] = HEX_CHARS[c & 15];
+            this._outputTail = i12;
         } else {
-            String value;
             if (this._currentEscape == null) {
                 value = this._characterEscapes.getEscapeSequence(c).getValue();
             } else {
                 value = this._currentEscape.getValue();
                 this._currentEscape = null;
             }
-            i2 = value.length();
-            if (this._outputTail + i2 > this._outputEnd) {
+            int length = value.length();
+            if (this._outputTail + length > this._outputEnd) {
                 _flushBuffer();
-                if (i2 > this._outputEnd) {
+                if (length > this._outputEnd) {
                     this._writer.write(value);
                     return;
                 }
             }
-            value.getChars(0, i2, this._outputBuffer, this._outputTail);
-            this._outputTail += i2;
+            value.getChars(0, length, this._outputBuffer, this._outputTail);
+            this._outputTail += length;
         }
     }
 
@@ -1653,7 +1760,8 @@ public final class WriterBasedJsonGenerator extends JsonGeneratorImpl {
         return cArr;
     }
 
-    protected void _flushBuffer() throws IOException {
+    /* access modifiers changed from: protected */
+    public void _flushBuffer() throws IOException {
         int i = this._outputTail - this._outputHead;
         if (i > 0) {
             int i2 = this._outputHead;

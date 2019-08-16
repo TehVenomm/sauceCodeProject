@@ -1,25 +1,28 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.media.TransportMediator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+/* renamed from: android.support.v4.widget.FocusStrategy */
 class FocusStrategy {
 
+    /* renamed from: android.support.v4.widget.FocusStrategy$BoundsAdapter */
     public interface BoundsAdapter<T> {
         void obtainBounds(T t, Rect rect);
     }
 
+    /* renamed from: android.support.v4.widget.FocusStrategy$CollectionAdapter */
     public interface CollectionAdapter<T, V> {
         V get(T t, int i);
 
         int size(T t);
     }
 
+    /* renamed from: android.support.v4.widget.FocusStrategy$SequentialComparator */
     private static class SequentialComparator<T> implements Comparator<T> {
         private final BoundsAdapter<T> mAdapter;
         private final boolean mIsLayoutRtl;
@@ -36,7 +39,31 @@ class FocusStrategy {
             Rect rect2 = this.mTemp2;
             this.mAdapter.obtainBounds(t, rect);
             this.mAdapter.obtainBounds(t2, rect2);
-            return rect.top < rect2.top ? -1 : rect.top > rect2.top ? 1 : rect.left < rect2.left ? this.mIsLayoutRtl ? 1 : -1 : rect.left > rect2.left ? !this.mIsLayoutRtl ? 1 : -1 : rect.bottom >= rect2.bottom ? rect.bottom > rect2.bottom ? 1 : rect.right < rect2.right ? this.mIsLayoutRtl ? 1 : -1 : rect.right > rect2.right ? !this.mIsLayoutRtl ? 1 : -1 : 0 : -1;
+            if (rect.top < rect2.top) {
+                return -1;
+            }
+            if (rect.top > rect2.top) {
+                return 1;
+            }
+            if (rect.left < rect2.left) {
+                return this.mIsLayoutRtl ? 1 : -1;
+            }
+            if (rect.left > rect2.left) {
+                return !this.mIsLayoutRtl ? 1 : -1;
+            }
+            if (rect.bottom < rect2.bottom) {
+                return -1;
+            }
+            if (rect.bottom > rect2.bottom) {
+                return 1;
+            }
+            if (rect.right < rect2.right) {
+                return this.mIsLayoutRtl ? 1 : -1;
+            }
+            if (rect.right > rect2.right) {
+                return !this.mIsLayoutRtl ? 1 : -1;
+            }
+            return 0;
         }
     }
 
@@ -44,7 +71,11 @@ class FocusStrategy {
     }
 
     private static boolean beamBeats(int i, @NonNull Rect rect, @NonNull Rect rect2, @NonNull Rect rect3) {
-        return (beamsOverlap(i, rect, rect3) || !beamsOverlap(i, rect, rect2)) ? false : !isToDirectionOf(i, rect, rect3) || i == 17 || i == 66 || majorAxisDistance(i, rect, rect2) < majorAxisDistanceToFarEdge(i, rect, rect3);
+        boolean beamsOverlap = beamsOverlap(i, rect, rect2);
+        if (beamsOverlap(i, rect, rect3) || !beamsOverlap) {
+            return false;
+        }
+        return !isToDirectionOf(i, rect, rect3) || i == 17 || i == 66 || majorAxisDistance(i, rect, rect2) < majorAxisDistanceToFarEdge(i, rect, rect3);
     }
 
     private static boolean beamsOverlap(int i, @NonNull Rect rect, @NonNull Rect rect2) {
@@ -53,7 +84,7 @@ class FocusStrategy {
             case 66:
                 return rect2.bottom >= rect.top && rect2.top <= rect.bottom;
             case 33:
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 return rect2.right >= rect.left && rect2.left <= rect.right;
             default:
                 throw new IllegalArgumentException("direction must be one of {FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, FOCUS_RIGHT}.");
@@ -72,7 +103,7 @@ class FocusStrategy {
             case 66:
                 rect2.offset(-(rect.width() + 1), 0);
                 break;
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 rect2.offset(0, -(rect.height() + 1));
                 break;
             default:
@@ -119,21 +150,36 @@ class FocusStrategy {
     private static <T> T getNextFocusable(T t, ArrayList<T> arrayList, boolean z) {
         int size = arrayList.size();
         int lastIndexOf = (t == null ? -1 : arrayList.lastIndexOf(t)) + 1;
-        return lastIndexOf < size ? arrayList.get(lastIndexOf) : (!z || size <= 0) ? null : arrayList.get(0);
+        if (lastIndexOf < size) {
+            return arrayList.get(lastIndexOf);
+        }
+        if (!z || size <= 0) {
+            return null;
+        }
+        return arrayList.get(0);
     }
 
     private static <T> T getPreviousFocusable(T t, ArrayList<T> arrayList, boolean z) {
         int size = arrayList.size();
         int indexOf = (t == null ? size : arrayList.indexOf(t)) - 1;
-        return indexOf >= 0 ? arrayList.get(indexOf) : (!z || size <= 0) ? null : arrayList.get(size - 1);
+        if (indexOf >= 0) {
+            return arrayList.get(indexOf);
+        }
+        if (!z || size <= 0) {
+            return null;
+        }
+        return arrayList.get(size - 1);
     }
 
     private static int getWeightedDistanceFor(int i, int i2) {
-        return ((i * 13) * i) + (i2 * i2);
+        return (i * 13 * i) + (i2 * i2);
     }
 
     private static boolean isBetterCandidate(int i, @NonNull Rect rect, @NonNull Rect rect2, @NonNull Rect rect3) {
-        return !isCandidate(rect, rect2, i) ? false : !isCandidate(rect, rect3, i) || beamBeats(i, rect, rect2, rect3) || (!beamBeats(i, rect, rect3, rect2) && getWeightedDistanceFor(majorAxisDistance(i, rect, rect2), minorAxisDistance(i, rect, rect2)) < getWeightedDistanceFor(majorAxisDistance(i, rect, rect3), minorAxisDistance(i, rect, rect3)));
+        if (!isCandidate(rect, rect2, i)) {
+            return false;
+        }
+        return !isCandidate(rect, rect3, i) || beamBeats(i, rect, rect2, rect3) || (!beamBeats(i, rect, rect3, rect2) && getWeightedDistanceFor(majorAxisDistance(i, rect, rect2), minorAxisDistance(i, rect, rect2)) < getWeightedDistanceFor(majorAxisDistance(i, rect, rect3), minorAxisDistance(i, rect, rect3)));
     }
 
     private static boolean isCandidate(@NonNull Rect rect, @NonNull Rect rect2, int i) {
@@ -144,7 +190,7 @@ class FocusStrategy {
                 return (rect.bottom > rect2.bottom || rect.top >= rect2.bottom) && rect.top > rect2.top;
             case 66:
                 return (rect.left < rect2.left || rect.right <= rect2.left) && rect.right < rect2.right;
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 return (rect.top < rect2.top || rect.bottom <= rect2.top) && rect.bottom < rect2.bottom;
             default:
                 throw new IllegalArgumentException("direction must be one of {FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, FOCUS_RIGHT}.");
@@ -168,7 +214,7 @@ class FocusStrategy {
                     return false;
                 }
                 break;
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 if (rect.bottom > rect2.top) {
                     return false;
                 }
@@ -191,7 +237,7 @@ class FocusStrategy {
                 return rect.top - rect2.bottom;
             case 66:
                 return rect2.left - rect.right;
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 return rect2.top - rect.bottom;
             default:
                 throw new IllegalArgumentException("direction must be one of {FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, FOCUS_RIGHT}.");
@@ -210,7 +256,7 @@ class FocusStrategy {
                 return rect.top - rect2.top;
             case 66:
                 return rect2.right - rect.right;
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 return rect2.bottom - rect.bottom;
             default:
                 throw new IllegalArgumentException("direction must be one of {FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, FOCUS_RIGHT}.");
@@ -223,7 +269,7 @@ class FocusStrategy {
             case 66:
                 return Math.abs((rect.top + (rect.height() / 2)) - (rect2.top + (rect2.height() / 2)));
             case 33:
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 return Math.abs((rect.left + (rect.width() / 2)) - (rect2.left + (rect2.width() / 2)));
             default:
                 throw new IllegalArgumentException("direction must be one of {FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, FOCUS_RIGHT}.");

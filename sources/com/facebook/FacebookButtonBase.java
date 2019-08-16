@@ -7,47 +7,35 @@ import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.support.p000v4.app.Fragment;
+import android.support.p000v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.common.C0618R;
 import com.facebook.internal.FragmentWrapper;
 
 public abstract class FacebookButtonBase extends Button {
     private String analyticsButtonCreatedEventName;
     private String analyticsButtonTappedEventName;
-    private OnClickListener externalOnClickListener;
-    private OnClickListener internalOnClickListener;
+    /* access modifiers changed from: private */
+    public OnClickListener externalOnClickListener;
+    /* access modifiers changed from: private */
+    public OnClickListener internalOnClickListener;
     private boolean overrideCompoundPadding;
     private int overrideCompoundPaddingLeft;
     private int overrideCompoundPaddingRight;
     private FragmentWrapper parentFragment;
 
-    /* renamed from: com.facebook.FacebookButtonBase$1 */
-    class C03471 implements OnClickListener {
-        C03471() {
-        }
-
-        public void onClick(View view) {
-            FacebookButtonBase.this.logButtonTapped(FacebookButtonBase.this.getContext());
-            if (FacebookButtonBase.this.internalOnClickListener != null) {
-                FacebookButtonBase.this.internalOnClickListener.onClick(view);
-            } else if (FacebookButtonBase.this.externalOnClickListener != null) {
-                FacebookButtonBase.this.externalOnClickListener.onClick(view);
-            }
-        }
-    }
-
     protected FacebookButtonBase(Context context, AttributeSet attributeSet, int i, int i2, String str, String str2) {
         super(context, attributeSet, 0);
-        int defaultStyleResource = i2 == 0 ? getDefaultStyleResource() : i2;
-        if (defaultStyleResource == 0) {
-            defaultStyleResource = C0365R.style.com_facebook_button;
+        int i3 = i2 == 0 ? getDefaultStyleResource() : i2;
+        if (i3 == 0) {
+            i3 = C0618R.style.com_facebook_button;
         }
-        configureButton(context, attributeSet, i, defaultStyleResource);
+        configureButton(context, attributeSet, i, i3);
         this.analyticsButtonCreatedEventName = str;
         this.analyticsButtonTappedEventName = str2;
         setClickable(true);
@@ -58,7 +46,8 @@ public abstract class FacebookButtonBase extends Button {
         AppEventsLogger.newLogger(context).logSdkEvent(this.analyticsButtonCreatedEventName, null, null);
     }
 
-    private void logButtonTapped(Context context) {
+    /* access modifiers changed from: private */
+    public void logButtonTapped(Context context) {
         AppEventsLogger.newLogger(context).logSdkEvent(this.analyticsButtonTappedEventName, null, null);
     }
 
@@ -74,10 +63,9 @@ public abstract class FacebookButtonBase extends Button {
                         setBackgroundColor(obtainStyledAttributes.getColor(0, 0));
                     }
                 } else {
-                    setBackgroundColor(ContextCompat.getColor(context, C0365R.color.com_facebook_blue));
+                    setBackgroundColor(ContextCompat.getColor(context, C0618R.color.com_facebook_blue));
                 }
-                obtainStyledAttributes.recycle();
-            } catch (Throwable th) {
+            } finally {
                 obtainStyledAttributes.recycle();
             }
         }
@@ -103,40 +91,56 @@ public abstract class FacebookButtonBase extends Button {
         }
     }
 
+    /* JADX INFO: finally extract failed */
     private void parseTextAttributes(Context context, AttributeSet attributeSet, int i, int i2) {
         TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, new int[]{16842904}, i, i2);
         try {
             setTextColor(obtainStyledAttributes.getColorStateList(0));
-            obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, new int[]{16842927}, i, i2);
-            try {
-                setGravity(obtainStyledAttributes.getInt(0, 17));
-                obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, new int[]{16842901, 16842903, 16843087}, i, i2);
-                try {
-                    setTextSize(0, (float) obtainStyledAttributes.getDimensionPixelSize(0, 0));
-                    setTypeface(Typeface.defaultFromStyle(obtainStyledAttributes.getInt(1, 1)));
-                    setText(obtainStyledAttributes.getString(2));
-                } finally {
-                    obtainStyledAttributes.recycle();
-                }
-            } finally {
-                obtainStyledAttributes.recycle();
-            }
-        } finally {
             obtainStyledAttributes.recycle();
+            TypedArray obtainStyledAttributes2 = context.getTheme().obtainStyledAttributes(attributeSet, new int[]{16842927}, i, i2);
+            try {
+                setGravity(obtainStyledAttributes2.getInt(0, 17));
+                obtainStyledAttributes2.recycle();
+                TypedArray obtainStyledAttributes3 = context.getTheme().obtainStyledAttributes(attributeSet, new int[]{16842901, 16842903, 16843087}, i, i2);
+                try {
+                    setTextSize(0, (float) obtainStyledAttributes3.getDimensionPixelSize(0, 0));
+                    setTypeface(Typeface.defaultFromStyle(obtainStyledAttributes3.getInt(1, 1)));
+                    setText(obtainStyledAttributes3.getString(2));
+                } finally {
+                    obtainStyledAttributes3.recycle();
+                }
+            } catch (Throwable th) {
+                obtainStyledAttributes2.recycle();
+                throw th;
+            }
+        } catch (Throwable th2) {
+            obtainStyledAttributes.recycle();
+            throw th2;
         }
     }
 
     private void setupOnClickListener() {
-        super.setOnClickListener(new C03471());
+        super.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                FacebookButtonBase.this.logButtonTapped(FacebookButtonBase.this.getContext());
+                if (FacebookButtonBase.this.internalOnClickListener != null) {
+                    FacebookButtonBase.this.internalOnClickListener.onClick(view);
+                } else if (FacebookButtonBase.this.externalOnClickListener != null) {
+                    FacebookButtonBase.this.externalOnClickListener.onClick(view);
+                }
+            }
+        });
     }
 
-    protected void callExternalOnClickListener(View view) {
+    /* access modifiers changed from: protected */
+    public void callExternalOnClickListener(View view) {
         if (this.externalOnClickListener != null) {
             this.externalOnClickListener.onClick(view);
         }
     }
 
-    protected void configureButton(Context context, AttributeSet attributeSet, int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void configureButton(Context context, AttributeSet attributeSet, int i, int i2) {
         parseBackgroundAttributes(context, attributeSet, i, i2);
         parseCompoundDrawableAttributes(context, attributeSet, i, i2);
         parseContentAttributes(context, attributeSet, i, i2);
@@ -144,7 +148,8 @@ public abstract class FacebookButtonBase extends Button {
         setupOnClickListener();
     }
 
-    protected Activity getActivity() {
+    /* access modifiers changed from: protected */
+    public Activity getActivity() {
         Context context = getContext();
         while (!(context instanceof Activity) && (context instanceof ContextWrapper)) {
             context = ((ContextWrapper) context).getBaseContext();
@@ -163,36 +168,47 @@ public abstract class FacebookButtonBase extends Button {
         return this.overrideCompoundPadding ? this.overrideCompoundPaddingRight : super.getCompoundPaddingRight();
     }
 
-    protected abstract int getDefaultRequestCode();
+    /* access modifiers changed from: protected */
+    public abstract int getDefaultRequestCode();
 
-    protected int getDefaultStyleResource() {
+    /* access modifiers changed from: protected */
+    public int getDefaultStyleResource() {
         return 0;
     }
 
     public Fragment getFragment() {
-        return this.parentFragment != null ? this.parentFragment.getSupportFragment() : null;
+        if (this.parentFragment != null) {
+            return this.parentFragment.getSupportFragment();
+        }
+        return null;
     }
 
     public android.app.Fragment getNativeFragment() {
-        return this.parentFragment != null ? this.parentFragment.getNativeFragment() : null;
+        if (this.parentFragment != null) {
+            return this.parentFragment.getNativeFragment();
+        }
+        return null;
     }
 
     public int getRequestCode() {
         return getDefaultRequestCode();
     }
 
-    protected int measureTextWidth(String str) {
+    /* access modifiers changed from: protected */
+    public int measureTextWidth(String str) {
         return (int) Math.ceil((double) getPaint().measureText(str));
     }
 
-    protected void onAttachedToWindow() {
+    /* access modifiers changed from: protected */
+    public void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (!isInEditMode()) {
             logButtonCreated(getContext());
         }
     }
 
-    protected void onDraw(Canvas canvas) {
+    /* access modifiers changed from: protected */
+    public void onDraw(Canvas canvas) {
         if ((getGravity() & 1) != 0) {
             int compoundPaddingLeft = getCompoundPaddingLeft();
             int compoundPaddingRight = getCompoundPaddingRight();
@@ -213,7 +229,8 @@ public abstract class FacebookButtonBase extends Button {
         this.parentFragment = new FragmentWrapper(fragment);
     }
 
-    protected void setInternalOnClickListener(OnClickListener onClickListener) {
+    /* access modifiers changed from: protected */
+    public void setInternalOnClickListener(OnClickListener onClickListener) {
         this.internalOnClickListener = onClickListener;
     }
 

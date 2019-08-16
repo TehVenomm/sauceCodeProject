@@ -3,7 +3,6 @@ package com.facebook.share.model;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
 import com.facebook.share.model.ShareMedia.Type;
@@ -11,17 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class SharePhoto extends ShareMedia {
-    public static final Creator<SharePhoto> CREATOR = new C05171();
-    private final Bitmap bitmap;
-    private final String caption;
-    private final Uri imageUrl;
-    private final boolean userGenerated;
-
-    /* renamed from: com.facebook.share.model.SharePhoto$1 */
-    static final class C05171 implements Creator<SharePhoto> {
-        C05171() {
-        }
-
+    public static final Creator<SharePhoto> CREATOR = new Creator<SharePhoto>() {
         public SharePhoto createFromParcel(Parcel parcel) {
             return new SharePhoto(parcel);
         }
@@ -29,17 +18,25 @@ public final class SharePhoto extends ShareMedia {
         public SharePhoto[] newArray(int i) {
             return new SharePhoto[i];
         }
-    }
+    };
+    private final Bitmap bitmap;
+    private final String caption;
+    private final Uri imageUrl;
+    private final boolean userGenerated;
 
     public static final class Builder extends com.facebook.share.model.ShareMedia.Builder<SharePhoto, Builder> {
-        private Bitmap bitmap;
-        private String caption;
-        private Uri imageUrl;
-        private boolean userGenerated;
+        /* access modifiers changed from: private */
+        public Bitmap bitmap;
+        /* access modifiers changed from: private */
+        public String caption;
+        /* access modifiers changed from: private */
+        public Uri imageUrl;
+        /* access modifiers changed from: private */
+        public boolean userGenerated;
 
         static List<SharePhoto> readPhotoListFrom(Parcel parcel) {
-            List<ShareMedia> readListFrom = com.facebook.share.model.ShareMedia.Builder.readListFrom(parcel);
-            List<SharePhoto> arrayList = new ArrayList();
+            List<ShareMedia> readListFrom = readListFrom(parcel);
+            ArrayList arrayList = new ArrayList();
             for (ShareMedia shareMedia : readListFrom) {
                 if (shareMedia instanceof SharePhoto) {
                     arrayList.add((SharePhoto) shareMedia);
@@ -49,35 +46,45 @@ public final class SharePhoto extends ShareMedia {
         }
 
         static void writePhotoListTo(Parcel parcel, int i, List<SharePhoto> list) {
-            Parcelable[] parcelableArr = new ShareMedia[list.size()];
-            for (int i2 = 0; i2 < list.size(); i2++) {
-                parcelableArr[i2] = (ShareMedia) list.get(i2);
+            ShareMedia[] shareMediaArr = new ShareMedia[list.size()];
+            int i2 = 0;
+            while (true) {
+                int i3 = i2;
+                if (i3 < list.size()) {
+                    shareMediaArr[i3] = (ShareMedia) list.get(i3);
+                    i2 = i3 + 1;
+                } else {
+                    parcel.writeParcelableArray(shareMediaArr, i);
+                    return;
+                }
             }
-            parcel.writeParcelableArray(parcelableArr, i);
         }
 
         public SharePhoto build() {
-            return new SharePhoto();
+            return new SharePhoto(this);
         }
 
-        Bitmap getBitmap() {
+        /* access modifiers changed from: 0000 */
+        public Bitmap getBitmap() {
             return this.bitmap;
         }
 
-        Uri getImageUrl() {
+        /* access modifiers changed from: 0000 */
+        public Uri getImageUrl() {
             return this.imageUrl;
         }
 
-        Builder readFrom(Parcel parcel) {
+        /* access modifiers changed from: 0000 */
+        public Builder readFrom(Parcel parcel) {
             return readFrom((SharePhoto) parcel.readParcelable(SharePhoto.class.getClassLoader()));
         }
 
         public Builder readFrom(SharePhoto sharePhoto) {
-            return sharePhoto == null ? this : ((Builder) super.readFrom((ShareMedia) sharePhoto)).setBitmap(sharePhoto.getBitmap()).setImageUrl(sharePhoto.getImageUrl()).setUserGenerated(sharePhoto.getUserGenerated()).setCaption(sharePhoto.getCaption());
+            return sharePhoto == null ? this : ((Builder) super.readFrom(sharePhoto)).setBitmap(sharePhoto.getBitmap()).setImageUrl(sharePhoto.getImageUrl()).setUserGenerated(sharePhoto.getUserGenerated()).setCaption(sharePhoto.getCaption());
         }
 
-        public Builder setBitmap(@Nullable Bitmap bitmap) {
-            this.bitmap = bitmap;
+        public Builder setBitmap(@Nullable Bitmap bitmap2) {
+            this.bitmap = bitmap2;
             return this;
         }
 
@@ -101,7 +108,7 @@ public final class SharePhoto extends ShareMedia {
         super(parcel);
         this.bitmap = (Bitmap) parcel.readParcelable(Bitmap.class.getClassLoader());
         this.imageUrl = (Uri) parcel.readParcelable(Uri.class.getClassLoader());
-        this.userGenerated = parcel.readByte() != (byte) 0;
+        this.userGenerated = parcel.readByte() != 0;
         this.caption = parcel.readString();
     }
 

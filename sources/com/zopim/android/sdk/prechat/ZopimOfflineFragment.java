@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.p000v4.app.Fragment;
+import android.support.p000v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ZopimChat;
 import com.zopim.android.sdk.chatlog.ConnectionFragment;
@@ -32,85 +32,76 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
     private static final String LOG_TAG = ZopimOfflineFragment.class.getSimpleName();
     public static final String STATE_MENU_ITEM_ENABLED = "MENU_ITEM_ENABLED";
     private static final String STATE_PROGRESS_VISIBITLITY = "PROGRESS_VISIBILITY";
-    private Chat mChat;
-    private ChatListener mChatListener;
+    /* access modifiers changed from: private */
+    public Chat mChat;
+    /* access modifiers changed from: private */
+    public ChatListener mChatListener;
     private EditText mEmailEdit;
-    FormsObserver mFormsObserver = new C0893o(this);
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    FormsObserver mFormsObserver = new C1262o(this);
+    /* access modifiers changed from: private */
+    public Handler mHandler = new Handler(Looper.getMainLooper());
     private Menu mMenu;
     private EditText mMessageEdit;
     private EditText mNameEdit;
-    private View mProgressBar;
-    private AlertDialog mSendTimeoutDialog;
-    Runnable mShowSendTimeoutDialog = new C0890l(this);
+    /* access modifiers changed from: private */
+    public View mProgressBar;
+    /* access modifiers changed from: private */
+    public AlertDialog mSendTimeoutDialog;
+    Runnable mShowSendTimeoutDialog = new C1259l(this);
     private boolean mStateMenuItemEnabled = true;
     private VisitorInfo mVisitorInfo;
 
-    private void close() {
+    /* access modifiers changed from: private */
+    public void close() {
         FragmentTransaction beginTransaction = getFragmentManager().beginTransaction();
         beginTransaction.remove(this);
         beginTransaction.commit();
     }
 
-    private void sendOfflineMessage() {
-        String trim;
-        int i;
-        int i2;
-        String str;
-        String str2;
-        int i3;
+    /* access modifiers changed from: private */
+    public void sendOfflineMessage() {
+        String name;
+        boolean z;
+        String email;
+        String str = null;
         if (this.mNameEdit.getVisibility() == 0) {
-            trim = this.mNameEdit.getText().toString().trim();
-            if (trim.isEmpty()) {
-                this.mNameEdit.setError(getResources().getString(C0785R.string.offline_name_error_message));
-                this.mNameEdit.setHint(C0785R.string.offline_name_error_hint);
-                i = 0;
+            name = this.mNameEdit.getText().toString().trim();
+            if (name.isEmpty()) {
+                this.mNameEdit.setError(getResources().getString(C1122R.string.offline_name_error_message));
+                this.mNameEdit.setHint(C1122R.string.offline_name_error_hint);
+                z = false;
             } else {
-                i = 1;
+                z = true;
             }
         } else {
-            trim = this.mVisitorInfo.getName();
-            i = 1;
+            name = this.mVisitorInfo.getName();
+            z = true;
         }
         if (this.mEmailEdit.getVisibility() == 0) {
-            CharSequence trim2 = this.mEmailEdit.getText().toString().trim();
-            if (Patterns.EMAIL_ADDRESS.matcher(trim2).matches()) {
-                CharSequence charSequence = trim2;
-                i2 = i;
-                CharSequence charSequence2 = charSequence;
-            } else {
-                this.mEmailEdit.setError(getResources().getString(C0785R.string.offline_email_error_message));
-                this.mEmailEdit.setHint(C0785R.string.offline_email_error_hint);
-                str = trim2;
-                i2 = 0;
+            email = this.mEmailEdit.getText().toString().trim();
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                this.mEmailEdit.setError(getResources().getString(C1122R.string.offline_email_error_message));
+                this.mEmailEdit.setHint(C1122R.string.offline_email_error_hint);
+                z = false;
             }
         } else {
-            i2 = i;
-            str = this.mVisitorInfo.getEmail();
+            email = this.mVisitorInfo.getEmail();
         }
         if (this.mMessageEdit.getVisibility() == 0) {
-            String trim3 = this.mMessageEdit.getText().toString().trim();
-            if (trim3.isEmpty()) {
-                this.mMessageEdit.setError(getResources().getString(C0785R.string.offline_message_error_message));
-                this.mMessageEdit.setHint(C0785R.string.offline_message_error_hint);
-                str2 = trim3;
-                i3 = 0;
-            } else {
-                String str3 = trim3;
-                i3 = i2;
-                str2 = str3;
+            str = this.mMessageEdit.getText().toString().trim();
+            if (str.isEmpty()) {
+                this.mMessageEdit.setError(getResources().getString(C1122R.string.offline_message_error_message));
+                this.mMessageEdit.setHint(C1122R.string.offline_message_error_hint);
+                z = false;
             }
-        } else {
-            i3 = i2;
-            str2 = null;
         }
-        if (i3 == 0) {
-            Toast.makeText(getActivity(), C0785R.string.offline_validation_error_message, 1).show();
-        } else if (this.mChat.sendOfflineMessage(trim, str, str2)) {
+        if (!z) {
+            Toast.makeText(getActivity(), C1122R.string.offline_validation_error_message, 1).show();
+        } else if (!this.mChat.sendOfflineMessage(name, email, str)) {
+            this.mHandler.post(this.mShowSendTimeoutDialog);
+        } else {
             this.mProgressBar.setVisibility(0);
             this.mHandler.postDelayed(this.mShowSendTimeoutDialog, ZopimChat.getInitializationTimeout().longValue());
-        } else {
-            this.mHandler.post(this.mShowSendTimeoutDialog);
         }
     }
 
@@ -143,7 +134,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
 
     public void onConnected() {
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.start_chat);
+            MenuItem findItem = this.mMenu.findItem(C1122R.C1125id.start_chat);
             if (findItem != null && findItem.isEnabled()) {
                 findItem.setEnabled(false);
             }
@@ -160,29 +151,29 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
         }
         this.mVisitorInfo = visitorInfo;
         if (bundle == null) {
-            Fragment connectionToastFragment = new ConnectionToastFragment();
-            Fragment connectionFragment = new ConnectionFragment();
+            ConnectionToastFragment connectionToastFragment = new ConnectionToastFragment();
+            ConnectionFragment connectionFragment = new ConnectionFragment();
             FragmentTransaction beginTransaction = getChildFragmentManager().beginTransaction();
-            beginTransaction.add(C0785R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
-            beginTransaction.add(connectionFragment, ConnectionFragment.class.getName());
+            beginTransaction.add(C1122R.C1125id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
+            beginTransaction.add((Fragment) connectionFragment, ConnectionFragment.class.getName());
             beginTransaction.commit();
         }
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
-        menuInflater.inflate(C0785R.menu.chat_offline_message_menu, menu);
-        menu.findItem(C0785R.id.send).setEnabled(this.mStateMenuItemEnabled);
+        menuInflater.inflate(C1122R.menu.chat_offline_message_menu, menu);
+        menu.findItem(C1122R.C1125id.send).setEnabled(this.mStateMenuItemEnabled);
         this.mMenu = menu;
     }
 
     public View onCreateView(LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup, @Nullable Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_offline_message_fragment, viewGroup, false);
+        return layoutInflater.inflate(C1122R.C1126layout.zopim_offline_message_fragment, viewGroup, false);
     }
 
     public void onDisconnected() {
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.start_chat);
+            MenuItem findItem = this.mMenu.findItem(C1122R.C1125id.start_chat);
             if (findItem != null && !findItem.isEnabled()) {
                 findItem.setEnabled(true);
             }
@@ -197,7 +188,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
                 this.mChatListener.onChatEnded();
             }
             return super.onOptionsItemSelected(menuItem);
-        } else if (C0785R.id.send != menuItem.getItemId()) {
+        } else if (C1122R.C1125id.send != menuItem.getItemId()) {
             return super.onOptionsItemSelected(menuItem);
         } else {
             sendOfflineMessage();
@@ -207,7 +198,7 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
 
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        bundle.putBoolean(STATE_MENU_ITEM_ENABLED, this.mMenu.findItem(C0785R.id.send).isEnabled());
+        bundle.putBoolean(STATE_MENU_ITEM_ENABLED, this.mMenu.findItem(C1122R.C1125id.send).isEnabled());
         bundle.putInt(STATE_PROGRESS_VISIBITLITY, this.mProgressBar.getVisibility());
     }
 
@@ -224,14 +215,14 @@ public class ZopimOfflineFragment extends Fragment implements ConnectionListener
 
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
-        this.mNameEdit = (EditText) view.findViewById(C0785R.id.name);
-        this.mEmailEdit = (EditText) view.findViewById(C0785R.id.email);
-        this.mMessageEdit = (EditText) view.findViewById(C0785R.id.message);
-        this.mProgressBar = view.findViewById(C0785R.id.progress);
-        this.mNameEdit.setHint(String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{this.mNameEdit.getHint()}));
-        this.mEmailEdit.setHint(String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{this.mEmailEdit.getHint()}));
-        this.mMessageEdit.setHint(String.format(getResources().getString(C0785R.string.required_field_template), new Object[]{this.mMessageEdit.getHint()}));
-        if (!(this.mVisitorInfo.getName() == null || this.mVisitorInfo.getName().isEmpty())) {
+        this.mNameEdit = (EditText) view.findViewById(C1122R.C1125id.name);
+        this.mEmailEdit = (EditText) view.findViewById(C1122R.C1125id.email);
+        this.mMessageEdit = (EditText) view.findViewById(C1122R.C1125id.message);
+        this.mProgressBar = view.findViewById(C1122R.C1125id.progress);
+        this.mNameEdit.setHint(String.format(getResources().getString(C1122R.string.required_field_template), new Object[]{this.mNameEdit.getHint()}));
+        this.mEmailEdit.setHint(String.format(getResources().getString(C1122R.string.required_field_template), new Object[]{this.mEmailEdit.getHint()}));
+        this.mMessageEdit.setHint(String.format(getResources().getString(C1122R.string.required_field_template), new Object[]{this.mMessageEdit.getHint()}));
+        if (this.mVisitorInfo.getName() != null && !this.mVisitorInfo.getName().isEmpty()) {
             this.mNameEdit.setVisibility(8);
         }
         if (this.mVisitorInfo.getEmail() != null && !this.mVisitorInfo.getEmail().isEmpty()) {

@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class CoopClientPacketSender
+public class CoopClientPacketSender : MonoBehaviour
 {
 	private CoopClient coopClient
 	{
@@ -15,7 +16,6 @@ public class CoopClientPacketSender
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		coopClient = this.get_gameObject().GetComponent<CoopClient>();
 	}
 
@@ -38,7 +38,7 @@ public class CoopClientPacketSender
 		model.id = 1003;
 		model.status = (int)coopClient.status;
 		model.joinType = (int)coopClient.joinType;
-		Send(model, true, to_client_id, null, delegate
+		Send(model, promise: true, to_client_id, null, delegate
 		{
 			if (model.status != (int)coopClient.status)
 			{
@@ -52,7 +52,7 @@ public class CoopClientPacketSender
 	{
 		Coop_Model_ClientBecameHost coop_Model_ClientBecameHost = new Coop_Model_ClientBecameHost();
 		coop_Model_ClientBecameHost.id = 1003;
-		Send(coop_Model_ClientBecameHost, true, to_client_id, null, null);
+		Send(coop_Model_ClientBecameHost, promise: true, to_client_id);
 	}
 
 	public void SendClientLoadingProgress()
@@ -60,7 +60,7 @@ public class CoopClientPacketSender
 		Coop_Model_ClientLoadingProgress coop_Model_ClientLoadingProgress = new Coop_Model_ClientLoadingProgress();
 		coop_Model_ClientLoadingProgress.id = 1003;
 		coop_Model_ClientLoadingProgress.per = coopClient.loadingPer;
-		Send(coop_Model_ClientLoadingProgress, false, 0, null, null);
+		Send(coop_Model_ClientLoadingProgress, promise: false);
 	}
 
 	public void SendClientChangeEquip()
@@ -68,14 +68,14 @@ public class CoopClientPacketSender
 		Coop_Model_ClientChangeEquip coop_Model_ClientChangeEquip = new Coop_Model_ClientChangeEquip();
 		coop_Model_ClientChangeEquip.id = 1003;
 		coop_Model_ClientChangeEquip.userInfo = coopClient.userInfo;
-		Send(coop_Model_ClientChangeEquip, true, 0, null, null);
+		Send(coop_Model_ClientChangeEquip);
 	}
 
 	public void SendClientBattleRetire()
 	{
 		Coop_Model_ClientBattleRetire coop_Model_ClientBattleRetire = new Coop_Model_ClientBattleRetire();
 		coop_Model_ClientBattleRetire.id = 1003;
-		Send(coop_Model_ClientBattleRetire, true, 0, null, null);
+		Send(coop_Model_ClientBattleRetire);
 	}
 
 	public void SendClientSeriesProgress(int endPhase)
@@ -83,6 +83,6 @@ public class CoopClientPacketSender
 		Coop_Model_ClientSeriesProgress coop_Model_ClientSeriesProgress = new Coop_Model_ClientSeriesProgress();
 		coop_Model_ClientSeriesProgress.id = 1003;
 		coop_Model_ClientSeriesProgress.ep = endPhase;
-		Send(coop_Model_ClientSeriesProgress, true, 0, null, null);
+		Send(coop_Model_ClientSeriesProgress);
 	}
 }

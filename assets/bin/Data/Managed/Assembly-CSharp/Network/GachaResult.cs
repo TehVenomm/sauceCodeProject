@@ -13,6 +13,8 @@ namespace Network
 			public int itemId;
 
 			public int param_0;
+
+			public int lotGroupNo;
 		}
 
 		public class OncePurchaseItemToShop
@@ -24,8 +26,6 @@ namespace Network
 
 		public int remainCount = -1;
 
-		public string buttonImg;
-
 		public int counter;
 
 		public bool oncePurchasedState;
@@ -33,5 +33,9 @@ namespace Network
 		public GachaGuaranteeCampaignInfo gachaGuaranteeCampaignInfo;
 
 		public OncePurchaseItemToShop oncePurchaseItemToShop;
+
+		public string buttonImg = string.Empty;
+
+		public string detailButtonImg = string.Empty;
 	}
 }

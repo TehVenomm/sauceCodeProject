@@ -1,7 +1,8 @@
-package io.fabric.sdk.android;
+package p017io.fabric.sdk.android;
 
 import android.util.Log;
 
+/* renamed from: io.fabric.sdk.android.DefaultLogger */
 public class DefaultLogger implements Logger {
     private int logLevel;
 
@@ -14,24 +15,24 @@ public class DefaultLogger implements Logger {
     }
 
     /* renamed from: d */
-    public void mo4289d(String str, String str2) {
-        mo4290d(str, str2, null);
+    public void mo20969d(String str, String str2) {
+        mo20970d(str, str2, null);
     }
 
     /* renamed from: d */
-    public void mo4290d(String str, String str2, Throwable th) {
+    public void mo20970d(String str, String str2, Throwable th) {
         if (isLoggable(str, 3)) {
             Log.d(str, str2, th);
         }
     }
 
     /* renamed from: e */
-    public void mo4291e(String str, String str2) {
-        mo4292e(str, str2, null);
+    public void mo20971e(String str, String str2) {
+        mo20972e(str, str2, null);
     }
 
     /* renamed from: e */
-    public void mo4292e(String str, String str2, Throwable th) {
+    public void mo20972e(String str, String str2, Throwable th) {
         if (isLoggable(str, 6)) {
             Log.e(str, str2, th);
         }
@@ -42,19 +43,19 @@ public class DefaultLogger implements Logger {
     }
 
     /* renamed from: i */
-    public void mo4294i(String str, String str2) {
-        mo4295i(str, str2, null);
+    public void mo20974i(String str, String str2) {
+        mo20975i(str, str2, null);
     }
 
     /* renamed from: i */
-    public void mo4295i(String str, String str2, Throwable th) {
+    public void mo20975i(String str, String str2, Throwable th) {
         if (isLoggable(str, 4)) {
             Log.i(str, str2, th);
         }
     }
 
     public boolean isLoggable(String str, int i) {
-        return this.logLevel <= i;
+        return this.logLevel <= i || Log.isLoggable(str, i);
     }
 
     public void log(int i, String str, String str2) {
@@ -72,24 +73,24 @@ public class DefaultLogger implements Logger {
     }
 
     /* renamed from: v */
-    public void mo4300v(String str, String str2) {
-        mo4301v(str, str2, null);
+    public void mo20980v(String str, String str2) {
+        mo20981v(str, str2, null);
     }
 
     /* renamed from: v */
-    public void mo4301v(String str, String str2, Throwable th) {
+    public void mo20981v(String str, String str2, Throwable th) {
         if (isLoggable(str, 2)) {
             Log.v(str, str2, th);
         }
     }
 
     /* renamed from: w */
-    public void mo4302w(String str, String str2) {
-        mo4303w(str, str2, null);
+    public void mo20982w(String str, String str2) {
+        mo20983w(str, str2, null);
     }
 
     /* renamed from: w */
-    public void mo4303w(String str, String str2, Throwable th) {
+    public void mo20983w(String str, String str2, Throwable th) {
         if (isLoggable(str, 5)) {
             Log.w(str, str2, th);
         }

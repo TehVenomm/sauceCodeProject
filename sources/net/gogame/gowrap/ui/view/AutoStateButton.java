@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.view;
+package net.gogame.gowrap.p019ui.view;
 
 import android.content.Context;
 import android.graphics.ColorFilter;
@@ -8,8 +8,10 @@ import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.widget.Button;
 
+/* renamed from: net.gogame.gowrap.ui.view.AutoStateButton */
 public class AutoStateButton extends Button {
 
+    /* renamed from: net.gogame.gowrap.ui.view.AutoStateButton$BackgroundDrawable */
     private class BackgroundDrawable extends LayerDrawable {
         private int disabledAlpha = 100;
         private int fullAlpha = 255;
@@ -19,20 +21,21 @@ public class AutoStateButton extends Button {
             super(new Drawable[]{drawable});
         }
 
-        protected boolean onStateChange(int[] iArr) {
-            Object obj = null;
-            Object obj2 = null;
+        /* access modifiers changed from: protected */
+        public boolean onStateChange(int[] iArr) {
+            boolean z = false;
+            boolean z2 = false;
             for (int i : iArr) {
                 if (i == 16842910) {
-                    obj2 = 1;
+                    z2 = true;
                 } else if (i == 16842919) {
-                    int i2 = 1;
+                    z = true;
                 }
             }
             mutate();
-            if (obj2 != null && r0 != null) {
+            if (z2 && z) {
                 setColorFilter(this.pressedFilter);
-            } else if (obj2 == null) {
+            } else if (!z2) {
                 setColorFilter(null);
                 setAlpha(this.disabledAlpha);
             } else {

@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.armory;
+package net.gogame.gowrap.p019ui.dpro.model.armory;
 
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -7,6 +7,7 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.armory.EquipmentSet */
 public class EquipmentSet extends BaseJsonObject {
     private static final String KEY_ARM = "arm";
     private static final String KEY_ARMOR = "armor";
@@ -25,7 +26,9 @@ public class EquipmentSet extends BaseJsonObject {
     private Long atk;
     private Long def;
     private Equipment helm;
-    private Long hp;
+
+    /* renamed from: hp */
+    private Long f1417hp;
     private Equipment leg;
     private String name;
     private UserStats user;
@@ -33,11 +36,15 @@ public class EquipmentSet extends BaseJsonObject {
     private Equipment weapon1;
     private Equipment weapon2;
 
+    public EquipmentSet() {
+    }
+
     public EquipmentSet(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, "name")) {
             this.name = JSONUtils.optString(jsonReader);
             return true;
@@ -48,7 +55,7 @@ public class EquipmentSet extends BaseJsonObject {
             this.def = JSONUtils.optLong(jsonReader);
             return true;
         } else if (StringUtils.isEquals(str, KEY_HP)) {
-            this.hp = JSONUtils.optLong(jsonReader);
+            this.f1417hp = JSONUtils.optLong(jsonReader);
             return true;
         } else if (StringUtils.isEquals(str, KEY_USER)) {
             if (jsonReader.peek() == JsonToken.NULL) {
@@ -136,11 +143,11 @@ public class EquipmentSet extends BaseJsonObject {
     }
 
     public Long getHp() {
-        return this.hp;
+        return this.f1417hp;
     }
 
     public void setHp(Long l) {
-        this.hp = l;
+        this.f1417hp = l;
     }
 
     public UserStats getUser() {

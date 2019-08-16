@@ -8,10 +8,10 @@ public class ImageResponse {
     private boolean isCachedRedirect;
     private ImageRequest request;
 
-    ImageResponse(ImageRequest imageRequest, Exception exception, boolean z, Bitmap bitmap) {
+    ImageResponse(ImageRequest imageRequest, Exception exc, boolean z, Bitmap bitmap2) {
         this.request = imageRequest;
-        this.error = exception;
-        this.bitmap = bitmap;
+        this.error = exc;
+        this.bitmap = bitmap2;
         this.isCachedRedirect = z;
     }
 

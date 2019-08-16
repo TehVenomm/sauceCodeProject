@@ -11,36 +11,36 @@ import net.gogame.gopay.vip.tape2.ObjectQueue.Converter;
 import org.json.JSONObject;
 
 public class CustomTaskQueue extends TapeTaskQueue<BaseEvent> {
+
     /* renamed from: a */
-    private final ConnectivityManager f1266a;
+    private final ConnectivityManager f1332a;
 
     public static class CustomConverter implements Converter<BaseEvent> {
         public BaseEvent from(byte[] bArr) throws IOException {
-            BaseEvent baseEvent = null;
             try {
                 JSONObject jSONObject = new JSONObject(new String(bArr, "UTF-8"));
                 String optString = jSONObject.optString("@eventType", null);
-                if (optString != null) {
-                    Object obj = -1;
-                    switch (optString.hashCode()) {
-                        case -548821511:
-                            if (optString.equals(PurchaseEvent.EVENT_TYPE)) {
-                                obj = null;
-                                break;
-                            }
-                            break;
-                    }
-                    switch (obj) {
-                        case null:
-                            baseEvent = new PurchaseEvent();
-                            baseEvent.unmarshal(jSONObject);
-                            break;
-                        default:
-                            break;
-                    }
+                if (optString == null) {
+                    return null;
                 }
-                return baseEvent;
-            } catch (Throwable e) {
+                char c = 65535;
+                switch (optString.hashCode()) {
+                    case -548821511:
+                        if (optString.equals(PurchaseEvent.EVENT_TYPE)) {
+                            c = 0;
+                            break;
+                        }
+                        break;
+                }
+                switch (c) {
+                    case 0:
+                        PurchaseEvent purchaseEvent = new PurchaseEvent();
+                        purchaseEvent.unmarshal(jSONObject);
+                        return purchaseEvent;
+                    default:
+                        return null;
+                }
+            } catch (Exception e) {
                 throw new IOException(e);
             }
         }
@@ -48,7 +48,7 @@ public class CustomTaskQueue extends TapeTaskQueue<BaseEvent> {
         public void toStream(BaseEvent baseEvent, OutputStream outputStream) throws IOException {
             try {
                 outputStream.write(baseEvent.marshal().toString().getBytes("UTF-8"));
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 throw new IOException(e);
             }
         }
@@ -56,14 +56,15 @@ public class CustomTaskQueue extends TapeTaskQueue<BaseEvent> {
 
     public CustomTaskQueue(Context context, File file, Listener listener) throws IOException {
         super(file, new CustomConverter(), listener);
-        this.f1266a = (ConnectivityManager) context.getSystemService("connectivity");
+        this.f1332a = (ConnectivityManager) context.getSystemService("connectivity");
     }
 
-    protected boolean shouldProcess() {
-        if (this.f1266a == null) {
+    /* access modifiers changed from: protected */
+    public boolean shouldProcess() {
+        if (this.f1332a == null) {
             return false;
         }
-        NetworkInfo activeNetworkInfo = this.f1266a.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = this.f1332a.getActiveNetworkInfo();
         if (activeNetworkInfo == null || !activeNetworkInfo.isConnectedOrConnecting()) {
             return false;
         }

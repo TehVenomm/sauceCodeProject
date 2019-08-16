@@ -18,8 +18,6 @@ public class TweenScale : UITweener
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
 			if (mTrans == null)
 			{
 				mTrans = this.get_transform();
@@ -64,22 +62,21 @@ public class TweenScale : UITweener
 		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Expected O, but got Unknown
 		value = from * (1f - factor) + to * factor;
-		if (updateTable)
+		if (!updateTable)
 		{
+			return;
+		}
+		if (mTable == null)
+		{
+			mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
 			if (mTable == null)
 			{
-				mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
-				if (mTable == null)
-				{
-					updateTable = false;
-					return;
-				}
+				updateTable = false;
+				return;
 			}
-			mTable.repositionNow = true;
 		}
+		mTable.repositionNow = true;
 	}
 
 	public static TweenScale Begin(GameObject go, float duration, Vector3 scale)
@@ -88,12 +85,12 @@ public class TweenScale : UITweener
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		TweenScale tweenScale = UITweener.Begin<TweenScale>(go, duration, true);
+		TweenScale tweenScale = UITweener.Begin<TweenScale>(go, duration);
 		tweenScale.from = tweenScale.value;
 		tweenScale.to = scale;
 		if (duration <= 0f)
 		{
-			tweenScale.Sample(1f, true);
+			tweenScale.Sample(1f, isFinished: true);
 			tweenScale.set_enabled(false);
 		}
 		return tweenScale;

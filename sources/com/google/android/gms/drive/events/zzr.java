@@ -2,22 +2,26 @@ package com.google.android.gms.drive.events;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import android.text.TextUtils;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.internal.zzbhe;
-import java.util.Arrays;
-import java.util.List;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.internal.drive.zzh;
 
-public final class zzr extends zza implements DriveEvent {
+@Class(creator = "TransferProgressEventCreator")
+@Reserved({1})
+public final class zzr extends AbstractSafeParcelable implements DriveEvent {
     public static final Creator<zzr> CREATOR = new zzs();
-    private String zzdxg;
-    private List<zzbhe> zzgfq;
+    @Field(mo13990id = 2)
+    private final zzh zzcq;
 
-    public zzr(String str, List<zzbhe> list) {
-        this.zzdxg = str;
-        this.zzgfq = list;
+    @Constructor
+    public zzr(@Param(mo13993id = 2) zzh zzh) {
+        this.zzcq = zzh;
     }
 
     public final boolean equals(Object obj) {
@@ -27,26 +31,24 @@ public final class zzr extends zza implements DriveEvent {
         if (obj == this) {
             return true;
         }
-        zzr zzr = (zzr) obj;
-        return zzbf.equal(this.zzdxg, zzr.zzdxg) && zzbf.equal(this.zzgfq, zzr.zzgfq);
+        return Objects.equal(this.zzcq, ((zzr) obj).zzcq);
     }
 
     public final int getType() {
-        return 7;
+        return 8;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzdxg, this.zzgfq});
-    }
-
-    public final String toString() {
-        return String.format("TransferStateEvent[%s]", new Object[]{TextUtils.join("','", this.zzgfq)});
+        return Objects.hashCode(this.zzcq);
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzdxg, false);
-        zzd.zzc(parcel, 3, this.zzgfq, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.zzcq, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    public final zzh zzab() {
+        return this.zzcq;
     }
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("ProjectUI/UIPlaySoundCustom")]
-public class UIPlaySoundCustom
+public class UIPlaySoundCustom : MonoBehaviour
 {
 	public enum Trigger
 	{
@@ -15,8 +15,6 @@ public class UIPlaySoundCustom
 		OnDisable
 	}
 
-	private const float pitch = 1f;
-
 	public SoundID.UISE SEType = SoundID.UISE.INVALID;
 
 	public int SEID;
@@ -29,6 +27,8 @@ public class UIPlaySoundCustom
 
 	[Range(0f, 1f)]
 	public float volume = 1f;
+
+	private const float pitch = 1f;
 
 	public UIPlaySoundCustom()
 		: this()
@@ -46,37 +46,31 @@ public class UIPlaySoundCustom
 
 	private void FindSource()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Expected O, but got Unknown
 		SEName = ResourceName.GetSE(SEID);
-		if (!(ResourceLink != null))
+		if (ResourceLink != null)
 		{
-			Transform val = this.get_gameObject().get_transform().get_parent();
-			ResourceLink component;
-			while (true)
-			{
-				if (!(val != null) || val.get_name() == "UI Root")
-				{
-					return;
-				}
-				component = val.GetComponent<ResourceLink>();
-				if (component != null)
-				{
-					AudioClip val2 = component.Get<AudioClip>(SEName);
-					if (val2 != null)
-					{
-						break;
-					}
-				}
-				val = val.get_transform().get_parent();
-			}
-			ResourceLink = component;
+			return;
 		}
+		Transform parent = this.get_gameObject().get_transform().get_parent();
+		ResourceLink component;
+		while (true)
+		{
+			if (!(parent != null) || parent.get_name() == "UI Root")
+			{
+				return;
+			}
+			component = parent.GetComponent<ResourceLink>();
+			if (component != null)
+			{
+				AudioClip val = component.Get<AudioClip>(SEName);
+				if (val != null)
+				{
+					break;
+				}
+			}
+			parent = parent.get_transform().get_parent();
+		}
+		ResourceLink = component;
 	}
 
 	public void Start()
@@ -112,7 +106,7 @@ public class UIPlaySoundCustom
 	{
 		if (SEType != SoundID.UISE.INVALID && MonoBehaviourSingleton<SoundManager>.IsValid() && MonoBehaviourSingleton<GlobalSettingsManager>.IsValid())
 		{
-			SoundManager.PlaySystemSE(SEType, 1f);
+			SoundManager.PlaySystemSE(SEType);
 		}
 	}
 
@@ -120,7 +114,7 @@ public class UIPlaySoundCustom
 	{
 		if (!(clip == null))
 		{
-			SoundManager.PlayUISE(clip, volume, false, null, id);
+			SoundManager.PlayUISE(clip, volume, loop: false, null, id);
 		}
 	}
 }

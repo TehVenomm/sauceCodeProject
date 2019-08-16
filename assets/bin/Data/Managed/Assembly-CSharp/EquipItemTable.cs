@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
@@ -45,33 +46,34 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 	{
 		public class Obtained
 		{
-			private const int CATEGORY_MAX = 64;
-
-			private const int ALPHABET_MAX = 26;
-
 			public string category = string.Empty;
 
 			public int flag = -1;
 
+			private const int CATEGORY_MAX = 64;
+
+			private const int ALPHABET_MAX = 26;
+
 			public Obtained(string obtained)
 			{
-				if (obtained.Length != 0)
+				if (obtained.Length == 0)
 				{
-					string text = null;
-					int i = 0;
-					for (int length = obtained.Length; i < length; i++)
+					return;
+				}
+				string text = null;
+				int i = 0;
+				for (int length = obtained.Length; i < length; i++)
+				{
+					if (char.IsNumber(obtained[i]))
 					{
-						if (char.IsNumber(obtained[i]))
-						{
-							category = obtained.Substring(0, i).ToUpper();
-							text = obtained.Substring(i);
-							break;
-						}
+						category = obtained.Substring(0, i).ToUpper();
+						text = obtained.Substring(i);
+						break;
 					}
-					if (text != null)
-					{
-						int.TryParse(text, out flag);
-					}
+				}
+				if (text != null)
+				{
+					int.TryParse(text, out flag);
 				}
 			}
 
@@ -110,8 +112,6 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 				return num;
 			}
 		}
-
-		public const string NT = "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId";
 
 		public uint id;
 
@@ -195,7 +195,11 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public uint evolveId;
 
+		public EXTRA_ATTACK_TYPE exAttackType;
+
 		private bool? isEvolve;
+
+		public const string NT = "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType";
 
 		public int baseElemAtk
 		{
@@ -304,8 +308,8 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public bool IsEvolve()
 		{
-			bool? nullable = isEvolve;
-			if (!nullable.HasValue)
+			bool? flag = isEvolve;
+			if (!flag.HasValue)
 			{
 				isEvolve = (GetEvolveTable() != null);
 			}
@@ -358,6 +362,41 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 				return equipItemData;
 			}
 			return null;
+		}
+
+		public bool IsRevertable()
+		{
+			ItemTable.ItemData rootLithograph = GetRootLithograph();
+			return rootLithograph != null && getType == GET_TYPE.PAY;
+		}
+
+		public ItemTable.ItemData GetRootLithograph()
+		{
+			NeedMaterial[] rootMaterials = GetRootMaterials();
+			if (rootMaterials == null)
+			{
+				return null;
+			}
+			ItemTable i = Singleton<ItemTable>.I;
+			int num = rootMaterials.Length;
+			for (int j = 0; j < num; j++)
+			{
+				NeedMaterial needMaterial = rootMaterials[j];
+				uint itemID = needMaterial.itemID;
+				ItemTable.ItemData itemData = i.GetItemData(itemID);
+				if (itemData.type == ITEM_TYPE.LITHOGRAPH)
+				{
+					return itemData;
+				}
+			}
+			return null;
+		}
+
+		public NeedMaterial[] GetRootMaterials()
+		{
+			EquipItemData rootEquipTable = GetRootEquipTable();
+			uint equipId = rootEquipTable.id;
+			return Singleton<CreateEquipItemTable>.I.GetCreateItemDataByEquipItem(equipId)?.needMaterial;
 		}
 
 		public EquipItemData GetShadowEvolveEquipTable()
@@ -419,26 +458,28 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 			for (int num2 = maxSlot; j < num2; j++)
 			{
 				SkillItemTable.SkillSlotData skillSlotData = GetSkillSlot(0)[j];
-				if (skillSlotData != null && skillSlotData.skill_id != 0)
+				if (skillSlotData == null || skillSlotData.skill_id == 0)
 				{
-					SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(skillSlotData.skill_id);
-					if (skillItemData != null)
+					continue;
+				}
+				SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(skillSlotData.skill_id);
+				if (skillItemData == null)
+				{
+					continue;
+				}
+				GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, 1, 0);
+				if (growSkillItemData != null)
+				{
+					atk[0] += growSkillItemData.GetGrowParamAtk(skillItemData.baseAtk);
+					def[0] += growSkillItemData.GetGrowParamDef(skillItemData.baseDef);
+					hp += growSkillItemData.GetGrowParamHp(skillItemData.baseHp);
+					int[] growParamElemAtk = growSkillItemData.GetGrowParamElemAtk(skillItemData.atkElement);
+					int[] growParamElemDef = growSkillItemData.GetGrowParamElemDef(skillItemData.defElement);
+					int k = 1;
+					for (int num3 = 7; k < num3; k++)
 					{
-						GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, 1);
-						if (growSkillItemData != null)
-						{
-							atk[0] += growSkillItemData.GetGrowParamAtk(skillItemData.baseAtk);
-							def[0] += growSkillItemData.GetGrowParamDef(skillItemData.baseDef);
-							hp += growSkillItemData.GetGrowParamHp(skillItemData.baseHp);
-							int[] growParamElemAtk = growSkillItemData.GetGrowParamElemAtk(skillItemData.atkElement);
-							int[] growParamElemDef = growSkillItemData.GetGrowParamElemDef(skillItemData.defElement);
-							int k = 1;
-							for (int num3 = 7; k < num3; k++)
-							{
-								atk[k] += growParamElemAtk[k - 1];
-								def[k] += growParamElemDef[k - 1];
-							}
-						}
+						atk[k] += growParamElemAtk[k - 1];
+						def[k] += growParamElemDef[k - 1];
 					}
 				}
 			}
@@ -503,12 +544,12 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 					return (ELEMENT_TYPE)((!flag) ? exceedParam.GetElemDefType(defElement) : exceedParam.GetElemAtkType(atkElement));
 				}
 			}
-			return (ELEMENT_TYPE)((!flag) ? GetElemDefType(null) : GetElemAtkType(null));
+			return (ELEMENT_TYPE)((!flag) ? GetElemDefType() : GetElemAtkType());
 		}
 
 		public ELEMENT_TYPE GetTargetElementPriorityToTable()
 		{
-			return (ELEMENT_TYPE)((!IsWeapon()) ? GetElemDefTypePriorityToTable(null) : GetElemAtkTypePriorityToTable(null));
+			return (ELEMENT_TYPE)((!IsWeapon()) ? GetElemDefTypePriorityToTable() : GetElemAtkTypePriorityToTable());
 		}
 
 		public void GetMaxAtk(out int _atk, out int _elem_atk, out ELEMENT_TYPE _element)
@@ -653,19 +694,20 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 				uint value3 = 0u;
 				csv_reader.Pop(ref value2);
 				csv_reader.Pop(ref value3);
-				if (!string.IsNullOrEmpty(value2))
+				if (string.IsNullOrEmpty(value2))
 				{
-					SkillItemTable.SkillSlotData skillSlotData = new SkillItemTable.SkillSlotData();
-					skillSlotData.slotType = (SKILL_SLOT_TYPE)(int)Enum.Parse(typeof(SKILL_SLOT_TYPE), value2);
-					if (skillSlotData.slotType != 0)
+					continue;
+				}
+				SkillItemTable.SkillSlotData skillSlotData = new SkillItemTable.SkillSlotData();
+				skillSlotData.slotType = (SKILL_SLOT_TYPE)Enum.Parse(typeof(SKILL_SLOT_TYPE), value2);
+				if (skillSlotData.slotType != 0)
+				{
+					skillSlotData.skill_id = value3;
+					list.Add(skillSlotData);
+					num3++;
+					if (value3 != 0)
 					{
-						skillSlotData.skill_id = value3;
-						list.Add(skillSlotData);
-						num3++;
-						if (value3 != 0)
-						{
-							num2++;
-						}
+						num2++;
 					}
 				}
 			}
@@ -716,6 +758,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 			csv_reader.PopEnum(ref data.spAttackType, SP_ATTACK_TYPE.NONE);
 			csv_reader.Pop(ref data.spAttackRate);
 			csv_reader.Pop(ref data.evolveId);
+			csv_reader.PopEnum(ref data.exAttackType, EXTRA_ATTACK_TYPE.NONE);
 			return true;
 		}
 	}
@@ -736,20 +779,29 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 	private List<EquipItemData> equipList;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EquipItemData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EquipItemData> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EquipItemData> _003C_003Ef__mg_0024cache2;
+
 	public void CreateTable(string csv_table)
 	{
-		equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemData>(csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId", null);
+		equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemData>(csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType");
 	}
 
 	public void CreateTable(string csv_table, TableUtility.Progress progress)
 	{
-		equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemData>(csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId", progress);
+		equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemData>(csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType", progress);
 		equipItemTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_table)
 	{
-		TableUtility.AddUIntKeyTable(equipItemTable, csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId", null);
+		TableUtility.AddUIntKeyTable(equipItemTable, csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType");
 	}
 
 	public bool IsWeapon(EQUIPMENT_TYPE type)

@@ -87,25 +87,24 @@ public class GuildDonateMaterialSelectDialog : GameSection
 
 	public override void Initialize()
 	{
-		inventory = new ItemStorageTop.MaterialInventory(true, false, false, null);
+		inventory = new ItemStorageTop.MaterialInventory(include_material: true, include_lithograph: false, include_lapis: false);
 		itemList.Clear();
 		Array.ForEach(materialList, delegate(int id)
 		{
-			GuildDonateMaterialSelectDialog guildDonateMaterialSelectDialog = this;
 			ItemInfo itemInfo = new ItemInfo();
 			itemInfo.tableID = (uint)id;
 			itemInfo.tableData = Singleton<ItemTable>.I.GetItemData(itemInfo.tableID);
-			itemInfo.num = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == id, 1, false);
+			itemInfo.num = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == id, 1);
 			itemList.Add(itemInfo);
 		});
 		SetLabelText((Enum)UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 34u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
-		SetSupportEncoding(UI.LBL_NUMBER_REQUEST, true);
+		SetSupportEncoding(UI.LBL_NUMBER_REQUEST, isEnable: true);
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		SetDynamicList((Enum)UI.GRD_INVENTORY, "GuildDonateMaterialItem", itemList.Count, false, (Func<int, bool>)((int i) => true), (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycre)
+		SetDynamicList((Enum)UI.GRD_INVENTORY, "GuildDonateMaterialItem", itemList.Count, reset: false, (Func<int, bool>)((int i) => true), (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycre)
 		{
 			GuildDonateMaterialSelectDialog guildDonateMaterialSelectDialog = this;
 			SetSprite(t, UI.SPR_RARITY_TEXT_ICON, ItemIcon.ITEM_ICON_ITEM_RARITY_ICON_SPRITE[(int)itemList[i].tableData.rarity]);
@@ -128,7 +127,7 @@ public class GuildDonateMaterialSelectDialog : GameSection
 	private void OnQuery_CHOSE_MATERIAL()
 	{
 		chooseIndex = (int)GameSection.GetEventData();
-		GameSection.ChangeEvent("OPEN_SEND_DIALOG", null);
+		GameSection.ChangeEvent("OPEN_SEND_DIALOG");
 	}
 
 	private void OnQuery_ARMORY()
@@ -142,7 +141,6 @@ public class GuildDonateMaterialSelectDialog : GameSection
 
 	private void OnCloseDialog_GuildDonateSendDialog()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		string s = GameSection.GetEventData() as string;
 		try
 		{
@@ -165,10 +163,10 @@ public class GuildDonateMaterialSelectDialog : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator47)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				backSection = true;
 			}
 		});
 	}

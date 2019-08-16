@@ -6,8 +6,12 @@ public class MutableTriple<L, M, R> extends Triple<L, M, R> {
     public M middle;
     public R right;
 
-    public static <L, M, R> MutableTriple<L, M, R> of(L l, M m, R r) {
-        return new MutableTriple(l, m, r);
+    /* renamed from: of */
+    public static <L, M, R> MutableTriple<L, M, R> m1018of(L l, M m, R r) {
+        return new MutableTriple<>(l, m, r);
+    }
+
+    public MutableTriple() {
     }
 
     public MutableTriple(L l, M m, R r) {

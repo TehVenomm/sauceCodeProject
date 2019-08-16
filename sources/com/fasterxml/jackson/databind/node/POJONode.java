@@ -89,12 +89,12 @@ public class POJONode extends ValueNode {
         return _pojoEquals((POJONode) obj);
     }
 
-    protected boolean _pojoEquals(POJONode pOJONode) {
+    /* access modifiers changed from: protected */
+    public boolean _pojoEquals(POJONode pOJONode) {
         if (this._value == null) {
             return pOJONode._value == null;
-        } else {
-            return this._value.equals(pOJONode._value);
         }
+        return this._value.equals(pOJONode._value);
     }
 
     public int hashCode() {

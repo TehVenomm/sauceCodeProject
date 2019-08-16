@@ -1,6 +1,6 @@
 package android.support.multidex;
 
-import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.p000v4.media.session.PlaybackStateCompat;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -26,8 +26,7 @@ final class ZipUtil {
     static long getZipCrc(File file) throws IOException {
         RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
         try {
-            long computeCrcOfCentralDir = computeCrcOfCentralDir(randomAccessFile, findCentralDirectory(randomAccessFile));
-            return computeCrcOfCentralDir;
+            return computeCrcOfCentralDir(randomAccessFile, findCentralDirectory(randomAccessFile));
         } finally {
             randomAccessFile.close();
         }
@@ -44,9 +43,9 @@ final class ZipUtil {
             j = j2;
         }
         int reverseBytes = Integer.reverseBytes(ENDSIG);
-        j2 = length;
+        long j3 = length;
         do {
-            randomAccessFile.seek(j2);
+            randomAccessFile.seek(j3);
             if (randomAccessFile.readInt() == reverseBytes) {
                 randomAccessFile.skipBytes(2);
                 randomAccessFile.skipBytes(2);
@@ -57,8 +56,8 @@ final class ZipUtil {
                 centralDirectory.offset = ((long) Integer.reverseBytes(randomAccessFile.readInt())) & 4294967295L;
                 return centralDirectory;
             }
-            j2--;
-        } while (j2 >= j);
+            j3--;
+        } while (j3 >= j);
         throw new ZipException("End Of Central Directory signature not found");
     }
 

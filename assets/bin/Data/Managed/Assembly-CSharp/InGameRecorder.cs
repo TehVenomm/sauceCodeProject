@@ -1,4 +1,6 @@
 using Network;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,7 +52,17 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 	public class EnemyRecord : CharacterRecord
 	{
 		public int hp;
+
+		public int recoveredHp;
 	}
+
+	public InGameProgress.PROGRESS_END_TYPE progressEndType;
+
+	public string rushRemainTimeToString = string.Empty;
+
+	public float arenaElapsedTime;
+
+	public string arenaRemainTimeToString = string.Empty;
 
 	public List<PlayerRecord> players
 	{
@@ -210,7 +222,7 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 
 	public void ApplySyncOwnerData(int id)
 	{
-		PlayerRecord player = GetPlayer(id, null);
+		PlayerRecord player = GetPlayer(id);
 		if (!player.isSyncOwner)
 		{
 			player.isSyncOwner = true;
@@ -229,9 +241,33 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		enemyRecord.hp = hp;
 	}
 
+	public void SetEnemyRecoveredHP(int id, int recoveredHp)
+	{
+		EnemyRecord enemyRecord = enemies.Find((EnemyRecord o) => o.id == id);
+		if (enemyRecord == null)
+		{
+			enemyRecord = new EnemyRecord();
+			enemyRecord.id = id;
+			enemies.Add(enemyRecord);
+		}
+		enemyRecord.recoveredHp = recoveredHp;
+	}
+
+	public void RecordEnemyRecoveredHP(int id, int recoveredHp)
+	{
+		EnemyRecord enemyRecord = enemies.Find((EnemyRecord o) => o.id == id);
+		if (enemyRecord == null)
+		{
+			enemyRecord = new EnemyRecord();
+			enemyRecord.id = id;
+			enemies.Add(enemyRecord);
+		}
+		enemyRecord.recoveredHp += recoveredHp;
+	}
+
 	public void RecordGivenDamage(int player_id, int damage)
 	{
-		PlayerRecord player = MonoBehaviourSingleton<InGameRecorder>.I.GetPlayer(player_id, null);
+		PlayerRecord player = MonoBehaviourSingleton<InGameRecorder>.I.GetPlayer(player_id);
 		if (player != null)
 		{
 			player.givenTotalDamage += damage;
@@ -248,13 +284,29 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		return total;
 	}
 
+	public int GetTotalEnemyHpContainsHealed()
+	{
+		int total = 0;
+		enemies.ForEach(delegate(EnemyRecord o)
+		{
+			total += o.hp;
+			total += o.recoveredHp;
+		});
+		return total;
+	}
+
+	public int GetEnemyRecoveredHpById(int id)
+	{
+		return enemies.Find((EnemyRecord o) => o.id == id)?.recoveredHp ?? 0;
+	}
+
 	public void OnInGameEnd(bool is_victory)
 	{
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		isVictory = is_victory;
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
@@ -301,15 +353,19 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 				pickupPlayer = playerRecord;
 			}
 		}
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			progressEndType = MonoBehaviourSingleton<InGameProgress>.I.progressEndType;
+			rushRemainTimeToString = MonoBehaviourSingleton<InGameProgress>.I.GetRushRemainTimeToString();
+			arenaRemainTimeToString = MonoBehaviourSingleton<InGameProgress>.I.GetArenaRemainTimeToString();
+			arenaElapsedTime = MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedTime();
+		}
 	}
 
 	public PlayerLoader[] CreatePlayerModels()
 	{
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
 		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Expected O, but got Unknown
 		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 		DeletePlayerModels();
@@ -330,9 +386,9 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		for (int count = list.Count; i < count; i++)
 		{
 			PlayerRecord playerRecord = list[i];
-			Transform val = Utility.CreateGameObject("Player:" + i, MonoBehaviourSingleton<StageManager>.I._transform, -1);
+			Transform val = Utility.CreateGameObject("Player:" + i, MonoBehaviourSingleton<StageManager>.I._transform);
 			array[i] = val.get_gameObject().AddComponent<PlayerLoader>();
-			array[i].StartLoad(playerRecord.playerLoadInfo, -1, anim_id, false, false, true, true, false, false, false, false, ShaderGlobal.GetCharacterShaderType(), null, true, -1);
+			array[i].StartLoad(playerRecord.playerLoadInfo, -1, anim_id, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: false, need_dev_frame_instantiate: false, ShaderGlobal.GetCharacterShaderType(), null);
 			int num = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss.Length;
 			if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && pickupPlayer == null && i < num)
 			{
@@ -342,82 +398,131 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		}
 		if (pickupPlayer != null)
 		{
-			Transform val2 = array[0].get_transform();
-			val2.set_position(pickupPlayerPos);
-			val2.set_eulerAngles(new Vector3(0f, pickupPlayerRot, 0f));
+			Transform transform = array[0].get_transform();
+			transform.set_position(pickupPlayerPos);
+			transform.set_eulerAngles(new Vector3(0f, pickupPlayerRot, 0f));
 		}
 		playerModels = array;
 		return playerModels;
 	}
 
-	public void DeletePlayerModels()
+	public void CreatePlayerModelsAsync(Action<PlayerLoader[]> callback)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (playerModels != null)
-		{
-			int i = 0;
-			for (int num = playerModels.Length; i < num; i++)
-			{
-				if (playerModels[i] != null)
-				{
-					Object.DestroyImmediate(playerModels[i].get_gameObject());
-					playerModels[i] = null;
-				}
-			}
-			playerModels = null;
-		}
+		this.StartCoroutine(DoCreatePlayerModelsAsync(callback));
 	}
 
-	public void SetRecordsForExplore(List<ExplorePlayerStatus> playerStatuses, PartyModel.Party party, int bossHp, bool isInGame)
+	private IEnumerator DoCreatePlayerModelsAsync(Action<PlayerLoader[]> callback)
+	{
+		DeletePlayerModels();
+		yield return null;
+		int anim_type = (!isVictory) ? 91 : (-1);
+		List<PlayerRecord> player_records = players.FindAll((PlayerRecord x) => x.isShowModel);
+		if (!isVictory)
+		{
+			pickupPlayer = GetSelfPlayerRecord();
+		}
+		if (pickupPlayer != null)
+		{
+			player_records = new List<PlayerRecord>
+			{
+				pickupPlayer
+			};
+			pickupPlayer.playerLoadInfo.SetEquipWeapon(0, null);
+		}
+		PlayerLoader[] player_loaders = new PlayerLoader[player_records.Count];
+		int j = 0;
+		for (int i = player_records.Count; j < i; j++)
+		{
+			PlayerRecord player_record = player_records[j];
+			Transform player_t = Utility.CreateGameObject("Player:" + j, MonoBehaviourSingleton<StageManager>.I._transform);
+			player_loaders[j] = player_t.get_gameObject().AddComponent<PlayerLoader>();
+			player_loaders[j].StartLoad(player_record.playerLoadInfo, -1, anim_type, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: false, need_dev_frame_instantiate: false, ShaderGlobal.GetCharacterShaderType(), null);
+			while (player_loaders[j].isLoading)
+			{
+				yield return null;
+			}
+			int poss_max = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss.Length;
+			if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && pickupPlayer == null && j < poss_max)
+			{
+				player_t.set_position(MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss[j]);
+				player_t.set_eulerAngles(new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerRots[j], 0f));
+			}
+			yield return null;
+		}
+		if (pickupPlayer != null)
+		{
+			Transform transform = player_loaders[0].get_transform();
+			transform.set_position(pickupPlayerPos);
+			transform.set_eulerAngles(new Vector3(0f, pickupPlayerRot, 0f));
+		}
+		yield return null;
+		playerModels = player_loaders;
+		callback?.Invoke(playerModels);
+	}
+
+	public void DeletePlayerModels()
+	{
+		if (playerModels == null)
+		{
+			return;
+		}
+		int i = 0;
+		for (int num = playerModels.Length; i < num; i++)
+		{
+			if (playerModels[i] != null)
+			{
+				Object.DestroyImmediate(playerModels[i].get_gameObject());
+				playerModels[i] = null;
+			}
+		}
+		playerModels = null;
+	}
+
+	public void SetRecordsForExplore(List<ExplorePlayerStatus> playerStatuses, PartyModel.Party party, ExploreBossStatus bossStatus, bool isInGame)
 	{
 		List<PlayerRecord> list = new List<PlayerRecord>();
-		using (List<ExplorePlayerStatus>.Enumerator enumerator = playerStatuses.GetEnumerator())
+		foreach (ExplorePlayerStatus p in playerStatuses)
 		{
-			ExplorePlayerStatus p;
-			while (enumerator.MoveNext())
+			if (p.isSelf)
 			{
-				p = enumerator.Current;
-				if (p.isSelf)
+				PlayerRecord selfPlayerRecord = GetSelfPlayerRecord();
+				if (selfPlayerRecord != null)
 				{
-					PlayerRecord selfPlayerRecord = GetSelfPlayerRecord();
-					if (selfPlayerRecord != null)
+					PlayerRecord playerRecord = p.CreateInGameRecord(selfPlayerRecord.charaInfo);
+					if (isInGame && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 					{
-						PlayerRecord playerRecord = p.CreateInGameRecord(selfPlayerRecord.charaInfo);
-						if (isInGame && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
-						{
-							playerRecord.id = MonoBehaviourSingleton<StageObjectManager>.I.self.id;
-						}
-						list.Add(playerRecord);
+						playerRecord.id = MonoBehaviourSingleton<StageObjectManager>.I.self.id;
+					}
+					list.Add(playerRecord);
+				}
+			}
+			else
+			{
+				CharaInfo charaInfo = null;
+				if (party != null)
+				{
+					PartyModel.SlotInfo slotInfo = party.slotInfos.Find((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == p.userId);
+					if (slotInfo != null)
+					{
+						charaInfo = slotInfo.userInfo;
+					}
+				}
+				PlayerRecord playerRecord2 = p.CreateInGameRecord(charaInfo);
+				if (playerRecord2 != null && playerRecord2.charaInfo != null)
+				{
+					list.Add(playerRecord2);
+				}
+				PlayerRecord playerRecord3 = players.Find((PlayerRecord x) => x != null && x.charaInfo != null && x.charaInfo.userId == p.userId);
+				if (playerRecord3 != null)
+				{
+					if (isInGame)
+					{
+						playerRecord2.id = playerRecord3.id;
 					}
 				}
 				else
 				{
-					CharaInfo charaInfo = null;
-					if (party != null)
-					{
-						PartyModel.SlotInfo slotInfo = party.slotInfos.Find((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == p.userId);
-						if (slotInfo != null)
-						{
-							charaInfo = slotInfo.userInfo;
-						}
-					}
-					PlayerRecord playerRecord2 = p.CreateInGameRecord(charaInfo);
-					if (playerRecord2 != null && playerRecord2.charaInfo != null)
-					{
-						list.Add(playerRecord2);
-					}
-					PlayerRecord playerRecord3 = players.Find((PlayerRecord x) => x != null && x.charaInfo != null && x.charaInfo.userId == p.userId);
-					if (playerRecord3 != null)
-					{
-						if (isInGame)
-						{
-							playerRecord2.id = playerRecord3.id;
-						}
-					}
-					else
-					{
-						playerRecord2.isShowModel = false;
-					}
+					playerRecord2.isShowModel = false;
 				}
 			}
 		}
@@ -434,13 +539,15 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		});
 		enemies.Clear();
 		EnemyRecord enemyRecord = new EnemyRecord();
-		if (bossHp <= 0)
+		if (bossStatus == null || (int)bossStatus.hpMax <= 0)
 		{
 			enemyRecord.hp = 10000000;
 		}
 		else
 		{
-			enemyRecord.hp = bossHp;
+			enemyRecord.id = bossStatus.coopEnemyId;
+			enemyRecord.hp = bossStatus.hpMax;
+			enemyRecord.recoveredHp = bossStatus.recoveredHP;
 		}
 		enemies.Add(enemyRecord);
 		if (!isVictory && MonoBehaviourSingleton<CoopManager>.IsValid() && !isInGame)

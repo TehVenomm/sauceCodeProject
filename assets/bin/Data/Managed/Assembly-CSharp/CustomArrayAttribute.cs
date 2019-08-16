@@ -1,4 +1,6 @@
-public class CustomArrayAttribute
+using UnityEngine;
+
+public class CustomArrayAttribute : PropertyAttribute
 {
 	public string propertyPath;
 

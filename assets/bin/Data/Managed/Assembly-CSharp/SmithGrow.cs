@@ -1,5 +1,6 @@
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,6 +38,10 @@ public class SmithGrow : EquipMaterialBase
 			MonoBehaviourSingleton<UIManager>.I.common.AttachCaption(this, base.sectionData.backButtonIndex, caption);
 		}
 		aimLv = GetEquipData().level + 1;
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			this.StartCoroutine(UPGRADE_TOTURIAL_EVENT());
+		}
 	}
 
 	protected override void OnOpen()
@@ -62,25 +67,25 @@ public class SmithGrow : EquipMaterialBase
 
 	public override void UpdateUI()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateUI();
 		int num = Mathf.Min(aimLv, GetEquipData().tableData.maxLv);
 		SetLabelText((Enum)UI.LBL_AIM_LV, num.ToString());
-		SetActive((Enum)UI.STR_ONLY_EXCEED, false);
+		SetActive((Enum)UI.STR_ONLY_EXCEED, is_visible: false);
 		Color color = Color.get_red();
 		if (num == GetEquipData().level)
 		{
-			SetActive((Enum)UI.STR_ONLY_EXCEED, true);
+			SetActive((Enum)UI.STR_ONLY_EXCEED, is_visible: true);
 			color = Color.get_gray();
 		}
 		else if (IsHavingMaterialAndMoney() && num > GetEquipData().level)
@@ -130,79 +135,80 @@ public class SmithGrow : EquipMaterialBase
 		EquipItemInfo equipData = GetEquipData();
 		EquipItemTable.EquipItemData tableData = equipData.tableData;
 		GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(tableData.growID, (uint)num);
-		if (equipData != null && tableData != null)
+		if (equipData == null || tableData == null)
 		{
-			SetLabelText(detailBase, UI.LBL_NAME, tableData.name);
-			SetLabelText(detailBase, UI.LBL_LV_MAX, tableData.maxLv.ToString());
-			SetLabelCompareParam(detailBase, UI.LBL_LV_NOW, num, equipData.level, -1);
-			SetEquipmentTypeIcon(detailBase, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipData.tableData);
-			if (growEquipItemData != null)
+			return;
+		}
+		SetLabelText(detailBase, UI.LBL_NAME, tableData.name);
+		SetLabelText(detailBase, UI.LBL_LV_MAX, tableData.maxLv.ToString());
+		SetLabelCompareParam(detailBase, UI.LBL_LV_NOW, num, equipData.level);
+		SetEquipmentTypeIcon(detailBase, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipData.tableData);
+		if (growEquipItemData != null)
+		{
+			EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = equipData.tableData.GetExceedParam((uint)equipData.exceed);
+			if (equipItemExceedParamAll == null)
 			{
-				EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = equipData.tableData.GetExceedParam((uint)equipData.exceed);
-				if (equipItemExceedParamAll == null)
-				{
-					equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
-				}
-				int num2 = growEquipItemData.GetGrowParamAtk(equipData.tableData.baseAtk) + (int)equipItemExceedParamAll.atk;
-				int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(equipData.tableData.atkElement);
-				int i = 0;
-				for (int num3 = growParamElemAtk.Length; i < num3; i++)
-				{
-					growParamElemAtk[i] += equipItemExceedParamAll.atkElement[i];
-				}
-				int num4 = Mathf.Max(growParamElemAtk);
-				SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
-				SetLabelText(detailBase, UI.LBL_ATK, equipData.atk.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ATK, num2 > equipData.atk);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_ATK, num2 - equipData.atk, false);
-				SetLabelText(detailBase, UI.LBL_ELEM, equipData.elemAtk.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ELEM, num4 > equipData.elemAtk);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM, num4 - equipData.elemAtk, false);
-				int num5 = growEquipItemData.GetGrowParamDef(equipData.tableData.baseDef) + (int)equipItemExceedParamAll.def;
-				int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(equipData.tableData.defElement);
-				int j = 0;
-				for (int num6 = growParamElemDef.Length; j < num6; j++)
-				{
-					growParamElemDef[j] += equipItemExceedParamAll.defElement[j];
-				}
-				int num7 = Mathf.Max(growParamElemDef);
-				SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
-				SetLabelText(detailBase, UI.LBL_DEF, equipData.def.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_DEF, num5 > equipData.def);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_DEF, num5 - equipData.def, false);
-				int num8 = equipData.elemDef;
-				if (equipData.tableData.isFormer)
-				{
-					num8 = Mathf.FloorToInt((float)num8 * 0.1f);
-				}
-				SetLabelText(detailBase, UI.LBL_ELEM_DEF, num8.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 > num8);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 - num8, false);
-				int num9 = growEquipItemData.GetGrowParamHp(equipData.tableData.baseHp) + (int)equipItemExceedParamAll.hp;
-				SetLabelText(detailBase, UI.LBL_HP, equipData.hp.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_HP, num9 > equipData.hp);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_HP, num9 - equipData.hp, false);
+				equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
 			}
-			else
+			int num2 = growEquipItemData.GetGrowParamAtk(equipData.tableData.baseAtk) + (int)equipItemExceedParamAll.atk;
+			int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(equipData.tableData.atkElement);
+			int i = 0;
+			for (int num3 = growParamElemAtk.Length; i < num3; i++)
 			{
-				int atk = equipData.atk;
-				int elemAtk = equipData.elemAtk;
-				SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
-				SetLabelText(detailBase, UI.LBL_ATK, atk.ToString());
-				SetLabelText(detailBase, UI.LBL_ELEM, elemAtk.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ATK, false);
-				SetActive(detailBase, UI.LBL_AFTER_ELEM, false);
-				int def = equipData.def;
-				int elemDef = equipData.elemDef;
-				SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
-				SetLabelText(detailBase, UI.LBL_DEF, def.ToString());
-				SetLabelText(detailBase, UI.LBL_ELEM_DEF, elemDef.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_DEF, false);
-				SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, false);
-				int hp = equipData.hp;
-				SetLabelText(detailBase, UI.LBL_HP, hp.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_HP, false);
+				growParamElemAtk[i] += equipItemExceedParamAll.atkElement[i];
 			}
+			int num4 = Mathf.Max(growParamElemAtk);
+			SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
+			SetLabelText(detailBase, UI.LBL_ATK, equipData.atk.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ATK, num2 > equipData.atk);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_ATK, num2 - equipData.atk, expression_include: false);
+			SetLabelText(detailBase, UI.LBL_ELEM, equipData.elemAtk.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ELEM, num4 > equipData.elemAtk);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM, num4 - equipData.elemAtk, expression_include: false);
+			int num5 = growEquipItemData.GetGrowParamDef(equipData.tableData.baseDef) + (int)equipItemExceedParamAll.def;
+			int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(equipData.tableData.defElement);
+			int j = 0;
+			for (int num6 = growParamElemDef.Length; j < num6; j++)
+			{
+				growParamElemDef[j] += equipItemExceedParamAll.defElement[j];
+			}
+			int num7 = Mathf.Max(growParamElemDef);
+			SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
+			SetLabelText(detailBase, UI.LBL_DEF, equipData.def.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_DEF, num5 > equipData.def);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_DEF, num5 - equipData.def, expression_include: false);
+			int num8 = equipData.elemDef;
+			if (equipData.tableData.isFormer)
+			{
+				num8 = Mathf.FloorToInt((float)num8 * 0.1f);
+			}
+			SetLabelText(detailBase, UI.LBL_ELEM_DEF, num8.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 > num8);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 - num8, expression_include: false);
+			int num9 = growEquipItemData.GetGrowParamHp(equipData.tableData.baseHp) + (int)equipItemExceedParamAll.hp;
+			SetLabelText(detailBase, UI.LBL_HP, equipData.hp.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_HP, num9 > equipData.hp);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_HP, num9 - equipData.hp, expression_include: false);
+		}
+		else
+		{
+			int atk = equipData.atk;
+			int elemAtk = equipData.elemAtk;
+			SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
+			SetLabelText(detailBase, UI.LBL_ATK, atk.ToString());
+			SetLabelText(detailBase, UI.LBL_ELEM, elemAtk.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ATK, is_visible: false);
+			SetActive(detailBase, UI.LBL_AFTER_ELEM, is_visible: false);
+			int def = equipData.def;
+			int elemDef = equipData.elemDef;
+			SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
+			SetLabelText(detailBase, UI.LBL_DEF, def.ToString());
+			SetLabelText(detailBase, UI.LBL_ELEM_DEF, elemDef.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_DEF, is_visible: false);
+			SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, is_visible: false);
+			int hp = equipData.hp;
+			SetLabelText(detailBase, UI.LBL_HP, hp.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_HP, is_visible: false);
 		}
 	}
 
@@ -234,24 +240,79 @@ public class SmithGrow : EquipMaterialBase
 
 	private void OnQuery_AIM_R()
 	{
-		EquipItemInfo equipData = GetEquipData();
-		if (aimLv != equipData.tableData.maxLv)
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
 		{
-			aimLv++;
-			SetDirty(UI.GRD_NEED_MATERIAL);
-			RefreshUI();
-			if (!IsHavingMaterialAndMoney())
+			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL2) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN))
 			{
-				if (terminateAimLv < 0)
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL2, delegate
 				{
-					terminateAimLv = aimLv;
-				}
-				if (terminateAimLv == aimLv && !terminating)
-				{
-					terminating = true;
-					TerminateRepeatButton((Enum)UI.BTN_AIM_R);
-				}
+				});
 			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL3) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL2))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL3, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL4) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL3))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL4, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL5) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL4))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL5, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL6) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL5))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL6, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL7) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL6))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL7, delegate
+				{
+				});
+			}
+			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL8) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL7))
+			{
+				TutorialMessageTable.SendTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_LEVEL8, delegate
+				{
+				});
+			}
+		}
+		EquipItemInfo equipData = GetEquipData();
+		if (aimLv == equipData.tableData.maxLv)
+		{
+			return;
+		}
+		aimLv++;
+		SetDirty(UI.GRD_NEED_MATERIAL);
+		RefreshUI();
+		if (!IsHavingMaterialAndMoney())
+		{
+			if (terminateAimLv < 0)
+			{
+				terminateAimLv = aimLv;
+			}
+			if (terminateAimLv == aimLv && !terminating)
+			{
+				terminating = true;
+				TerminateRepeatButton((Enum)UI.BTN_AIM_R);
+			}
+		}
+	}
+
+	private IEnumerator UPGRADE_TOTURIAL_EVENT()
+	{
+		while (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
+		{
+			DispatchEvent("UPGRADE_TOTURIAL");
+			yield return null;
 		}
 	}
 
@@ -274,46 +335,42 @@ public class SmithGrow : EquipMaterialBase
 		if (smithData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		EquipItemInfo selectEquipData = smithData.selectEquipData;
+		if (selectEquipData == null)
 		{
-			EquipItemInfo selectEquipData = smithData.selectEquipData;
-			if (selectEquipData == null)
+			GameSection.StopEvent();
+			return;
+		}
+		SmithManager.ResultData result_data = new SmithManager.ResultData();
+		result_data.beforeRarity = (int)selectEquipData.tableData.rarity;
+		result_data.beforeLevel = selectEquipData.level;
+		result_data.beforeMaxLevel = selectEquipData.tableData.maxLv;
+		result_data.beforeExceedCnt = selectEquipData.exceed;
+		result_data.beforeAtk = selectEquipData.atk;
+		result_data.beforeDef = selectEquipData.def;
+		result_data.beforeHp = selectEquipData.hp;
+		result_data.beforeElemAtk = selectEquipData.elemAtk;
+		result_data.beforeElemDef = selectEquipData.elemDef;
+		GameSection.SetEventData(result_data);
+		isNotifySelfUpdate = true;
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, delegate(Error err, EquipItemInfo grow_item)
+		{
+			if (err == Error.None)
 			{
-				GameSection.StopEvent();
+				aimLv = grow_item.level + 1;
+				result_data.itemData = grow_item;
+				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+				GameSection.ResumeEvent(is_resume: true);
 			}
 			else
 			{
-				SmithManager.ResultData result_data = new SmithManager.ResultData();
-				result_data.beforeRarity = (int)selectEquipData.tableData.rarity;
-				result_data.beforeLevel = selectEquipData.level;
-				result_data.beforeMaxLevel = selectEquipData.tableData.maxLv;
-				result_data.beforeExceedCnt = selectEquipData.exceed;
-				result_data.beforeAtk = selectEquipData.atk;
-				result_data.beforeDef = selectEquipData.def;
-				result_data.beforeHp = selectEquipData.hp;
-				result_data.beforeElemAtk = selectEquipData.elemAtk;
-				result_data.beforeElemDef = selectEquipData.elemDef;
-				GameSection.SetEventData(result_data);
-				isNotifySelfUpdate = true;
-				GameSection.StayEvent();
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, delegate(Error err, EquipItemInfo grow_item)
-				{
-					if (err == Error.None)
-					{
-						aimLv = grow_item.level + 1;
-						result_data.itemData = grow_item;
-						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-						GameSection.ResumeEvent(true, null);
-					}
-					else
-					{
-						isNotifySelfUpdate = false;
-						GameSection.ResumeEvent(false, null);
-					}
-				});
+				isNotifySelfUpdate = false;
+				GameSection.ResumeEvent(is_resume: false);
 			}
-		}
+		});
 	}
 
 	private void NewNeedDB()
@@ -396,7 +453,7 @@ public class SmithGrow : EquipMaterialBase
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("SmithGrowItemSelect"))
 		{
 			GameSection.StopEvent();
-			OnQuery_MAIN_MENU_STATUS();
+			TO_UNIQUE_OR_MAIN_STATUS();
 		}
 	}
 }

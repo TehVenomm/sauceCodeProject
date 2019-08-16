@@ -1,42 +1,38 @@
 package com.google.android.gms.common.internal;
 
-import android.content.ComponentName;
-import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
-import android.os.IInterface;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.RemoteException;
+import com.google.android.gms.internal.common.zza;
+import com.google.android.gms.internal.common.zzc;
 
-public final class zzl implements ServiceConnection {
-    private /* synthetic */ zzd zzftf;
-    private final int zzfti;
-
-    public zzl(zzd zzd, int i) {
-        this.zzftf = zzd;
-        this.zzfti = i;
+public final class zzl extends zza implements IGmsCallbacks {
+    zzl(IBinder iBinder) {
+        super(iBinder, "com.google.android.gms.common.internal.IGmsCallbacks");
     }
 
-    public final void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        if (iBinder == null) {
-            this.zzftf.zzcc(16);
-            return;
-        }
-        synchronized (this.zzftf.zzfsp) {
-            zzax zzax;
-            zzd zzd = this.zzftf;
-            if (iBinder == null) {
-                zzax = null;
-            } else {
-                IInterface queryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.common.internal.IGmsServiceBroker");
-                zzax = (queryLocalInterface == null || !(queryLocalInterface instanceof zzax)) ? new zzay(iBinder) : (zzax) queryLocalInterface;
-            }
-            zzd.zzfsq = zzax;
-        }
-        this.zzftf.zza(0, null, this.zzfti);
+    public final void onPostInitComplete(int i, IBinder iBinder, Bundle bundle) throws RemoteException {
+        Parcel zza = zza();
+        zza.writeInt(i);
+        zza.writeStrongBinder(iBinder);
+        zzc.zza(zza, (Parcelable) bundle);
+        zzb(1, zza);
     }
 
-    public final void onServiceDisconnected(ComponentName componentName) {
-        synchronized (this.zzftf.zzfsp) {
-            this.zzftf.zzfsq = null;
-        }
-        this.zzftf.mHandler.sendMessage(this.zzftf.mHandler.obtainMessage(6, this.zzfti, 1));
+    public final void zza(int i, Bundle bundle) throws RemoteException {
+        Parcel zza = zza();
+        zza.writeInt(i);
+        zzc.zza(zza, (Parcelable) bundle);
+        zzb(2, zza);
+    }
+
+    public final void zza(int i, IBinder iBinder, zzb zzb) throws RemoteException {
+        Parcel zza = zza();
+        zza.writeInt(i);
+        zza.writeStrongBinder(iBinder);
+        zzc.zza(zza, (Parcelable) zzb);
+        zzb(3, zza);
     }
 }

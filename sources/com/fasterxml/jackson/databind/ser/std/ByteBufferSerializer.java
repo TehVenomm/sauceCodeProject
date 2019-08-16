@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class ByteBufferSerializer extends StdScalarSerializer<ByteBuffer> {
@@ -21,7 +20,7 @@ public class ByteBufferSerializer extends StdScalarSerializer<ByteBuffer> {
         if (asReadOnlyBuffer.position() > 0) {
             asReadOnlyBuffer.rewind();
         }
-        InputStream byteBufferBackedInputStream = new ByteBufferBackedInputStream(asReadOnlyBuffer);
+        ByteBufferBackedInputStream byteBufferBackedInputStream = new ByteBufferBackedInputStream(asReadOnlyBuffer);
         jsonGenerator.writeBinary(byteBufferBackedInputStream, asReadOnlyBuffer.remaining());
         byteBufferBackedInputStream.close();
     }

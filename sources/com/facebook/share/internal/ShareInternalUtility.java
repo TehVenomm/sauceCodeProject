@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 import com.facebook.AccessToken;
@@ -32,12 +31,15 @@ import com.facebook.internal.Utility;
 import com.facebook.internal.Utility.Mapper;
 import com.facebook.share.Sharer.Result;
 import com.facebook.share.internal.OpenGraphJSONUtility.PhotoJSONProcessor;
+import com.facebook.share.model.CameraEffectTextures;
+import com.facebook.share.model.ShareCameraEffectContent;
 import com.facebook.share.model.ShareMedia;
 import com.facebook.share.model.ShareMediaContent;
 import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.model.ShareStoryContent;
 import com.facebook.share.model.ShareVideo;
 import com.facebook.share.model.ShareVideoContent;
 import com.facebook.share.widget.LikeView.ObjectType;
@@ -45,9 +47,9 @@ import com.google.android.gms.drive.DriveFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,77 +60,89 @@ public final class ShareInternalUtility {
     private static final String MY_STAGING_RESOURCES = "me/staging_resources";
     private static final String STAGING_PARAM = "file";
 
-    /* renamed from: com.facebook.share.internal.ShareInternalUtility$5 */
-    static final class C04985 implements Mapper<Attachment, String> {
-        C04985() {
-        }
-
-        public String apply(Attachment attachment) {
-            return attachment.getAttachmentUrl();
-        }
-    }
-
-    /* renamed from: com.facebook.share.internal.ShareInternalUtility$8 */
-    static final class C05018 implements PhotoJSONProcessor {
-        C05018() {
-        }
-
-        public JSONObject toJSONObject(SharePhoto sharePhoto) {
-            Uri imageUrl = sharePhoto.getImageUrl();
-            JSONObject jSONObject = new JSONObject();
-            try {
-                jSONObject.put("url", imageUrl.toString());
-                return jSONObject;
-            } catch (Throwable e) {
-                throw new FacebookException("Unable to attach images", e);
-            }
-        }
-    }
-
     private static AppCall getAppCallFromActivityResult(int i, int i2, Intent intent) {
         UUID callIdFromIntent = NativeProtocol.getCallIdFromIntent(intent);
-        return callIdFromIntent == null ? null : AppCall.finishPendingCall(callIdFromIntent, i);
+        if (callIdFromIntent == null) {
+            return null;
+        }
+        return AppCall.finishPendingCall(callIdFromIntent, i);
     }
 
-    private static Attachment getAttachment(UUID uuid, ShareMedia shareMedia) {
+    private static Attachment getAttachment(UUID uuid, Uri uri, Bitmap bitmap) {
+        if (bitmap != null) {
+            return NativeAppCallAttachmentStore.createAttachment(uuid, bitmap);
+        }
+        if (uri != null) {
+            return NativeAppCallAttachmentStore.createAttachment(uuid, uri);
+        }
+        return null;
+    }
+
+    /* access modifiers changed from: private */
+    public static Attachment getAttachment(UUID uuid, ShareMedia shareMedia) {
         Bitmap bitmap;
-        Uri imageUrl;
+        Uri uri;
         if (shareMedia instanceof SharePhoto) {
             SharePhoto sharePhoto = (SharePhoto) shareMedia;
             bitmap = sharePhoto.getBitmap();
-            imageUrl = sharePhoto.getImageUrl();
+            uri = sharePhoto.getImageUrl();
         } else if (shareMedia instanceof ShareVideo) {
-            imageUrl = ((ShareVideo) shareMedia).getLocalUrl();
+            uri = ((ShareVideo) shareMedia).getLocalUrl();
             bitmap = null;
         } else {
             bitmap = null;
-            imageUrl = null;
+            uri = null;
         }
-        return bitmap != null ? NativeAppCallAttachmentStore.createAttachment(uuid, bitmap) : imageUrl != null ? NativeAppCallAttachmentStore.createAttachment(uuid, imageUrl) : null;
+        return getAttachment(uuid, uri, bitmap);
+    }
+
+    @Nullable
+    public static Bundle getBackgroundAssetMediaInfo(ShareStoryContent shareStoryContent, final UUID uuid) {
+        if (shareStoryContent == null || shareStoryContent.getBackgroundAsset() == null) {
+            return null;
+        }
+        ArrayList arrayList = new ArrayList();
+        arrayList.add(shareStoryContent.getBackgroundAsset());
+        final ArrayList arrayList2 = new ArrayList();
+        List map = Utility.map(arrayList, new Mapper<ShareMedia, Bundle>() {
+            public Bundle apply(ShareMedia shareMedia) {
+                Attachment access$000 = ShareInternalUtility.getAttachment(uuid, shareMedia);
+                arrayList2.add(access$000);
+                Bundle bundle = new Bundle();
+                bundle.putString("type", shareMedia.getMediaType().name());
+                bundle.putString(ShareConstants.MEDIA_URI, access$000.getAttachmentUrl());
+                String uriExtension = ShareInternalUtility.getUriExtension(access$000.getOriginalUri());
+                if (uriExtension != null) {
+                    Utility.putNonEmptyString(bundle, ShareConstants.MEDIA_EXTENSION, uriExtension);
+                }
+                return bundle;
+            }
+        });
+        NativeAppCallAttachmentStore.addAttachments(arrayList2);
+        return (Bundle) map.get(0);
     }
 
     public static Pair<String, String> getFieldNameAndNamespaceFromFullName(String str) {
-        Object substring;
-        Object obj = null;
+        String str2 = null;
         int indexOf = str.indexOf(58);
         if (indexOf != -1 && str.length() > indexOf + 1) {
-            obj = str.substring(0, indexOf);
-            substring = str.substring(indexOf + 1);
+            str2 = str.substring(0, indexOf);
+            str = str.substring(indexOf + 1);
         }
-        return new Pair(obj, substring);
+        return new Pair<>(str2, str);
     }
 
     public static List<Bundle> getMediaInfos(ShareMediaContent shareMediaContent, final UUID uuid) {
         if (shareMediaContent != null) {
             List media = shareMediaContent.getMedia();
             if (media != null) {
-                final Collection arrayList = new ArrayList();
+                final ArrayList arrayList = new ArrayList();
                 List<Bundle> map = Utility.map(media, new Mapper<ShareMedia, Bundle>() {
                     public Bundle apply(ShareMedia shareMedia) {
                         Attachment access$000 = ShareInternalUtility.getAttachment(uuid, shareMedia);
                         arrayList.add(access$000);
                         Bundle bundle = new Bundle();
-                        bundle.putString(ShareConstants.MEDIA_TYPE, shareMedia.getMediaType().name());
+                        bundle.putString("type", shareMedia.getMediaType().name());
                         bundle.putString(ShareConstants.MEDIA_URI, access$000.getAttachmentUrl());
                         return bundle;
                     }
@@ -142,7 +156,16 @@ public final class ShareInternalUtility {
 
     @Nullable
     public static ObjectType getMostSpecificObjectType(ObjectType objectType, ObjectType objectType2) {
-        return objectType == objectType2 ? objectType : objectType == ObjectType.UNKNOWN ? objectType2 : objectType2 != ObjectType.UNKNOWN ? null : objectType;
+        if (objectType == objectType2) {
+            return objectType;
+        }
+        if (objectType == ObjectType.UNKNOWN) {
+            return objectType2;
+        }
+        if (objectType2 != ObjectType.UNKNOWN) {
+            return null;
+        }
+        return objectType;
     }
 
     public static String getNativeDialogCompletionGesture(Bundle bundle) {
@@ -153,12 +176,16 @@ public final class ShareInternalUtility {
         if (sharePhotoContent != null) {
             List photos = sharePhotoContent.getPhotos();
             if (photos != null) {
-                Collection map = Utility.map(photos, new Mapper<SharePhoto, Attachment>() {
+                List map = Utility.map(photos, new Mapper<SharePhoto, Attachment>() {
                     public Attachment apply(SharePhoto sharePhoto) {
                         return ShareInternalUtility.getAttachment(uuid, sharePhoto);
                     }
                 });
-                List<String> map2 = Utility.map(map, new C04985());
+                List<String> map2 = Utility.map(map, new Mapper<Attachment, String>() {
+                    public String apply(Attachment attachment) {
+                        return attachment.getAttachmentUrl();
+                    }
+                });
                 NativeAppCallAttachmentStore.addAttachments(map);
                 return map2;
             }
@@ -195,12 +222,70 @@ public final class ShareInternalUtility {
         };
     }
 
+    @Nullable
+    public static Bundle getStickerUrl(ShareStoryContent shareStoryContent, final UUID uuid) {
+        if (shareStoryContent == null || shareStoryContent.getStickerAsset() == null) {
+            return null;
+        }
+        ArrayList arrayList = new ArrayList();
+        arrayList.add(shareStoryContent.getStickerAsset());
+        List map = Utility.map(arrayList, new Mapper<SharePhoto, Attachment>() {
+            public Attachment apply(SharePhoto sharePhoto) {
+                return ShareInternalUtility.getAttachment(uuid, sharePhoto);
+            }
+        });
+        List map2 = Utility.map(map, new Mapper<Attachment, Bundle>() {
+            public Bundle apply(Attachment attachment) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ShareConstants.MEDIA_URI, attachment.getAttachmentUrl());
+                String uriExtension = ShareInternalUtility.getUriExtension(attachment.getOriginalUri());
+                if (uriExtension != null) {
+                    Utility.putNonEmptyString(bundle, ShareConstants.MEDIA_EXTENSION, uriExtension);
+                }
+                return bundle;
+            }
+        });
+        NativeAppCallAttachmentStore.addAttachments(map);
+        return (Bundle) map2.get(0);
+    }
+
+    public static Bundle getTextureUrlBundle(ShareCameraEffectContent shareCameraEffectContent, UUID uuid) {
+        if (shareCameraEffectContent != null) {
+            CameraEffectTextures textures = shareCameraEffectContent.getTextures();
+            if (textures != null) {
+                Bundle bundle = new Bundle();
+                ArrayList arrayList = new ArrayList();
+                for (String str : textures.keySet()) {
+                    Attachment attachment = getAttachment(uuid, textures.getTextureUri(str), textures.getTextureBitmap(str));
+                    arrayList.add(attachment);
+                    bundle.putString(str, attachment.getAttachmentUrl());
+                }
+                NativeAppCallAttachmentStore.addAttachments(arrayList);
+                return bundle;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String getUriExtension(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
+        String uri2 = uri.toString();
+        int lastIndexOf = uri2.lastIndexOf(46);
+        if (lastIndexOf != -1) {
+            return uri2.substring(lastIndexOf);
+        }
+        return null;
+    }
+
     public static String getVideoUrl(ShareVideoContent shareVideoContent, UUID uuid) {
         if (shareVideoContent == null || shareVideoContent.getVideo() == null) {
             return null;
         }
         Attachment createAttachment = NativeAppCallAttachmentStore.createAttachment(uuid, shareVideoContent.getVideo().getLocalUrl());
-        Collection arrayList = new ArrayList(1);
+        ArrayList arrayList = new ArrayList(1);
         arrayList.add(createAttachment);
         NativeAppCallAttachmentStore.addAttachments(arrayList);
         return createAttachment.getAttachmentUrl();
@@ -229,14 +314,14 @@ public final class ShareInternalUtility {
     }
 
     public static void invokeCallbackWithError(FacebookCallback<Result> facebookCallback, String str) {
-        invokeOnErrorCallback((FacebookCallback) facebookCallback, str);
+        invokeOnErrorCallback(facebookCallback, str);
     }
 
-    public static void invokeCallbackWithException(FacebookCallback<Result> facebookCallback, Exception exception) {
-        if (exception instanceof FacebookException) {
-            invokeOnErrorCallback((FacebookCallback) facebookCallback, (FacebookException) exception);
+    public static void invokeCallbackWithException(FacebookCallback<Result> facebookCallback, Exception exc) {
+        if (exc instanceof FacebookException) {
+            invokeOnErrorCallback(facebookCallback, (FacebookException) exc);
         } else {
-            invokeCallbackWithError(facebookCallback, "Error preparing share content: " + exception.getLocalizedMessage());
+            invokeCallbackWithError(facebookCallback, "Error preparing share content: " + exc.getLocalizedMessage());
         }
     }
 
@@ -308,32 +393,31 @@ public final class ShareInternalUtility {
         if (Utility.isFileUri(uri)) {
             return newUploadStagingResourceWithImageRequest(accessToken, new File(uri.getPath()), callback);
         }
-        if (Utility.isContentUri(uri)) {
-            Parcelable parcelableResourceWithMimeType = new ParcelableResourceWithMimeType((Parcelable) uri, "image/png");
-            Bundle bundle = new Bundle(1);
-            bundle.putParcelable(STAGING_PARAM, parcelableResourceWithMimeType);
-            return new GraphRequest(accessToken, MY_STAGING_RESOURCES, bundle, HttpMethod.POST, callback);
+        if (!Utility.isContentUri(uri)) {
+            throw new FacebookException("The image Uri must be either a file:// or content:// Uri");
         }
-        throw new FacebookException("The image Uri must be either a file:// or content:// Uri");
+        ParcelableResourceWithMimeType parcelableResourceWithMimeType = new ParcelableResourceWithMimeType(uri, "image/png");
+        Bundle bundle = new Bundle(1);
+        bundle.putParcelable(STAGING_PARAM, parcelableResourceWithMimeType);
+        return new GraphRequest(accessToken, MY_STAGING_RESOURCES, bundle, HttpMethod.POST, callback);
     }
 
     public static GraphRequest newUploadStagingResourceWithImageRequest(AccessToken accessToken, File file, Callback callback) throws FileNotFoundException {
-        Parcelable parcelableResourceWithMimeType = new ParcelableResourceWithMimeType(ParcelFileDescriptor.open(file, DriveFile.MODE_READ_ONLY), "image/png");
+        ParcelableResourceWithMimeType parcelableResourceWithMimeType = new ParcelableResourceWithMimeType(ParcelFileDescriptor.open(file, DriveFile.MODE_READ_ONLY), "image/png");
         Bundle bundle = new Bundle(1);
         bundle.putParcelable(STAGING_PARAM, parcelableResourceWithMimeType);
         return new GraphRequest(accessToken, MY_STAGING_RESOURCES, bundle, HttpMethod.POST, callback);
     }
 
     public static void registerSharerCallback(final int i, CallbackManager callbackManager, final FacebookCallback<Result> facebookCallback) {
-        if (callbackManager instanceof CallbackManagerImpl) {
-            ((CallbackManagerImpl) callbackManager).registerCallback(i, new CallbackManagerImpl.Callback() {
-                public boolean onActivityResult(int i, Intent intent) {
-                    return ShareInternalUtility.handleActivityResult(i, i, intent, ShareInternalUtility.getShareResultProcessor(facebookCallback));
-                }
-            });
-            return;
+        if (!(callbackManager instanceof CallbackManagerImpl)) {
+            throw new FacebookException("Unexpected CallbackManager, please use the provided Factory.");
         }
-        throw new FacebookException("Unexpected CallbackManager, please use the provided Factory.");
+        ((CallbackManagerImpl) callbackManager).registerCallback(i, new CallbackManagerImpl.Callback() {
+            public boolean onActivityResult(int i, Intent intent) {
+                return ShareInternalUtility.handleActivityResult(i, i, intent, ShareInternalUtility.getShareResultProcessor(facebookCallback));
+            }
+        });
     }
 
     public static void registerStaticShareCallback(final int i) {
@@ -346,16 +430,21 @@ public final class ShareInternalUtility {
 
     public static JSONArray removeNamespacesFromOGJsonArray(JSONArray jSONArray, boolean z) throws JSONException {
         JSONArray jSONArray2 = new JSONArray();
-        for (int i = 0; i < jSONArray.length(); i++) {
-            Object obj = jSONArray.get(i);
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 >= jSONArray.length()) {
+                return jSONArray2;
+            }
+            Object obj = jSONArray.get(i2);
             if (obj instanceof JSONArray) {
                 obj = removeNamespacesFromOGJsonArray((JSONArray) obj, z);
             } else if (obj instanceof JSONObject) {
                 obj = removeNamespacesFromOGJsonObject((JSONObject) obj, z);
             }
             jSONArray2.put(obj);
+            i = i2 + 1;
         }
-        return jSONArray2;
     }
 
     public static JSONObject removeNamespacesFromOGJsonObject(JSONObject jSONObject, boolean z) {
@@ -367,31 +456,24 @@ public final class ShareInternalUtility {
             JSONObject jSONObject3 = new JSONObject();
             JSONArray names = jSONObject.names();
             for (int i = 0; i < names.length(); i++) {
-                Object removeNamespacesFromOGJsonObject;
                 String string = names.getString(i);
                 Object obj = jSONObject.get(string);
-                if (obj instanceof JSONObject) {
-                    removeNamespacesFromOGJsonObject = removeNamespacesFromOGJsonObject((JSONObject) obj, true);
-                } else if (obj instanceof JSONArray) {
-                    JSONArray removeNamespacesFromOGJsonArray = removeNamespacesFromOGJsonArray((JSONArray) obj, true);
-                } else {
-                    removeNamespacesFromOGJsonObject = obj;
-                }
+                Object obj2 = obj instanceof JSONObject ? removeNamespacesFromOGJsonObject((JSONObject) obj, true) : obj instanceof JSONArray ? removeNamespacesFromOGJsonArray((JSONArray) obj, true) : obj;
                 Pair fieldNameAndNamespaceFromFullName = getFieldNameAndNamespaceFromFullName(string);
                 String str = (String) fieldNameAndNamespaceFromFullName.first;
                 String str2 = (String) fieldNameAndNamespaceFromFullName.second;
                 if (z) {
                     if (str != null && str.equals("fbsdk")) {
-                        jSONObject2.put(string, removeNamespacesFromOGJsonObject);
+                        jSONObject2.put(string, obj2);
                     } else if (str == null || str.equals("og")) {
-                        jSONObject2.put(str2, removeNamespacesFromOGJsonObject);
+                        jSONObject2.put(str2, obj2);
                     } else {
-                        jSONObject3.put(str2, removeNamespacesFromOGJsonObject);
+                        jSONObject3.put(str2, obj2);
                     }
                 } else if (str == null || !str.equals("fb")) {
-                    jSONObject2.put(str2, removeNamespacesFromOGJsonObject);
+                    jSONObject2.put(str2, obj2);
                 } else {
-                    jSONObject2.put(string, removeNamespacesFromOGJsonObject);
+                    jSONObject2.put(string, obj2);
                 }
             }
             if (jSONObject3.length() <= 0) {
@@ -406,8 +488,8 @@ public final class ShareInternalUtility {
 
     public static JSONObject toJSONObjectForCall(final UUID uuid, ShareOpenGraphContent shareOpenGraphContent) throws JSONException {
         ShareOpenGraphAction action = shareOpenGraphContent.getAction();
-        final Collection arrayList = new ArrayList();
-        JSONObject toJSONObject = OpenGraphJSONUtility.toJSONObject(action, new PhotoJSONProcessor() {
+        final ArrayList arrayList = new ArrayList();
+        JSONObject jSONObject = OpenGraphJSONUtility.toJSONObject(action, (PhotoJSONProcessor) new PhotoJSONProcessor() {
             public JSONObject toJSONObject(SharePhoto sharePhoto) {
                 Attachment access$000 = ShareInternalUtility.getAttachment(uuid, sharePhoto);
                 if (access$000 == null) {
@@ -422,31 +504,41 @@ public final class ShareInternalUtility {
                     }
                     jSONObject.put(NativeProtocol.IMAGE_USER_GENERATED_KEY, true);
                     return jSONObject;
-                } catch (Throwable e) {
-                    throw new FacebookException("Unable to attach images", e);
+                } catch (JSONException e) {
+                    throw new FacebookException("Unable to attach images", (Throwable) e);
                 }
             }
         });
         NativeAppCallAttachmentStore.addAttachments(arrayList);
-        if (shareOpenGraphContent.getPlaceId() != null && Utility.isNullOrEmpty(toJSONObject.optString("place"))) {
-            toJSONObject.put("place", shareOpenGraphContent.getPlaceId());
+        if (shareOpenGraphContent.getPlaceId() != null && Utility.isNullOrEmpty(jSONObject.optString("place"))) {
+            jSONObject.put("place", shareOpenGraphContent.getPlaceId());
         }
         if (shareOpenGraphContent.getPeopleIds() != null) {
-            JSONArray optJSONArray = toJSONObject.optJSONArray("tags");
-            if (optJSONArray == null) {
-                arrayList = new HashSet();
-            } else {
-                Object jsonArrayToSet = Utility.jsonArrayToSet(optJSONArray);
-            }
+            JSONArray optJSONArray = jSONObject.optJSONArray("tags");
+            Set jsonArrayToSet = optJSONArray == null ? new HashSet() : Utility.jsonArrayToSet(optJSONArray);
             for (String add : shareOpenGraphContent.getPeopleIds()) {
-                arrayList.add(add);
+                jsonArrayToSet.add(add);
             }
-            toJSONObject.put("tags", new ArrayList(arrayList));
+            jSONObject.put("tags", new JSONArray(jsonArrayToSet));
         }
-        return toJSONObject;
+        return jSONObject;
     }
 
     public static JSONObject toJSONObjectForWeb(ShareOpenGraphContent shareOpenGraphContent) throws JSONException {
-        return OpenGraphJSONUtility.toJSONObject(shareOpenGraphContent.getAction(), new C05018());
+        return OpenGraphJSONUtility.toJSONObject(shareOpenGraphContent.getAction(), (PhotoJSONProcessor) new PhotoJSONProcessor() {
+            public JSONObject toJSONObject(SharePhoto sharePhoto) {
+                Uri imageUrl = sharePhoto.getImageUrl();
+                if (!Utility.isWebUri(imageUrl)) {
+                    throw new FacebookException("Only web images may be used in OG objects shared via the web dialog");
+                }
+                JSONObject jSONObject = new JSONObject();
+                try {
+                    jSONObject.put("url", imageUrl.toString());
+                    return jSONObject;
+                } catch (JSONException e) {
+                    throw new FacebookException("Unable to attach images", (Throwable) e);
+                }
+            }
+        });
     }
 }

@@ -55,12 +55,12 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
         return BetterActivityHelper.newMessageDialog(this, getString(i), getString(i2), 17301543);
     }
 
-    public AlertDialog newErrorHandlerDialog(int i, Exception exception) {
-        return BetterActivityHelper.newErrorHandlerDialog(this, getString(i), exception);
+    public AlertDialog newErrorHandlerDialog(int i, Exception exc) {
+        return BetterActivityHelper.newErrorHandlerDialog(this, getString(i), exc);
     }
 
-    public AlertDialog newErrorHandlerDialog(Exception exception) {
-        return newErrorHandlerDialog(getResources().getIdentifier(BetterActivityHelper.ERROR_DIALOG_TITLE_RESOURCE, "string", getPackageName()), exception);
+    public AlertDialog newErrorHandlerDialog(Exception exc) {
+        return newErrorHandlerDialog(getResources().getIdentifier(BetterActivityHelper.ERROR_DIALOG_TITLE_RESOURCE, "string", getPackageName()), exc);
     }
 
     public AlertDialog newInfoDialog(int i, int i2) {
@@ -75,7 +75,8 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
         return BetterActivityHelper.newYesNoDialog(this, getString(i), getString(i2), 17301659, onClickListener);
     }
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         this.wasCreated = true;
         this.currentIntent = getIntent();
@@ -85,11 +86,13 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
         }
     }
 
-    protected Dialog onCreateDialog(int i) {
+    /* access modifiers changed from: protected */
+    public Dialog onCreateDialog(int i) {
         return BetterActivityHelper.createProgressDialog(this, this.progressDialogTitleId, this.progressDialogMsgId);
     }
 
-    protected void onDestroy() {
+    /* access modifiers changed from: protected */
+    public void onDestroy() {
         super.onDestroy();
     }
 
@@ -98,18 +101,21 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
         return super.onKeyDown(i, keyEvent);
     }
 
-    protected void onNewIntent(Intent intent) {
+    /* access modifiers changed from: protected */
+    public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         this.currentIntent = intent;
     }
 
-    protected void onPause() {
+    /* access modifiers changed from: protected */
+    public void onPause() {
         super.onPause();
         this.wasInterrupted = false;
         this.wasCreated = false;
     }
 
-    protected void onRestoreInstanceState(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onRestoreInstanceState(Bundle bundle) {
         super.onRestoreInstanceState(bundle);
         this.wasInterrupted = true;
     }

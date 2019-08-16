@@ -2,54 +2,54 @@ package com.google.android.gms.ads.identifier;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
-import com.google.android.gms.common.zzo;
+import android.util.Log;
+import com.google.android.gms.common.GooglePlayServicesUtilLight;
 
-public class zzb {
-    private static zzb zzamj;
-    private final Context zzaie;
+public final class zzb {
+    private SharedPreferences zzs;
 
-    private zzb(Context context) {
-        this.zzaie = context;
-    }
-
-    private final void zza(Info info, boolean z) {
-        if (Math.random() <= ((double) new zzd(this.zzaie).getFloat("gads:ad_id_use_shared_preference:ping_ratio", 0.0f))) {
-            new Thread(new zzc(info, z)).start();
+    public zzb(Context context) {
+        try {
+            Context remoteContext = GooglePlayServicesUtilLight.getRemoteContext(context);
+            this.zzs = remoteContext == null ? null : remoteContext.getSharedPreferences("google_ads_flags", 0);
+        } catch (Throwable th) {
+            Log.w("GmscoreFlag", "Error while getting SharedPreferences ", th);
+            this.zzs = null;
         }
     }
 
-    public static zzb zze(Context context) {
-        zzb zzb;
-        synchronized (zzb.class) {
-            try {
-                if (zzamj == null) {
-                    zzamj = new zzb(context);
-                }
-                zzb = zzamj;
-            } catch (Throwable th) {
-                Class cls = zzb.class;
+    public final boolean getBoolean(String str, boolean z) {
+        try {
+            if (this.zzs == null) {
+                return false;
             }
+            return this.zzs.getBoolean(str, false);
+        } catch (Throwable th) {
+            Log.w("GmscoreFlag", "Error while reading from SharedPreferences ", th);
+            return false;
         }
-        return zzb;
     }
 
-    public final Info getInfo() {
-        Info info = null;
-        Context remoteContext = zzo.getRemoteContext(this.zzaie);
-        if (remoteContext == null) {
-            zza(null, false);
-        } else {
-            SharedPreferences sharedPreferences = remoteContext.getSharedPreferences("adid_settings", 0);
-            if (sharedPreferences == null) {
-                zza(null, false);
-            } else {
-                if (sharedPreferences.contains("adid_key") && sharedPreferences.contains("enable_limit_ad_tracking")) {
-                    info = new Info(sharedPreferences.getString("adid_key", ""), sharedPreferences.getBoolean("enable_limit_ad_tracking", false));
-                }
-                zza(info, true);
+    /* access modifiers changed from: 0000 */
+    public final float getFloat(String str, float f) {
+        try {
+            if (this.zzs == null) {
+                return 0.0f;
             }
+            return this.zzs.getFloat(str, 0.0f);
+        } catch (Throwable th) {
+            Log.w("GmscoreFlag", "Error while reading from SharedPreferences ", th);
+            return 0.0f;
         }
-        return info;
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final String getString(String str, String str2) {
+        try {
+            return this.zzs == null ? str2 : this.zzs.getString(str, str2);
+        } catch (Throwable th) {
+            Log.w("GmscoreFlag", "Error while reading from SharedPreferences ", th);
+            return str2;
+        }
     }
 }

@@ -14,7 +14,8 @@ import java.lang.annotation.Target;
 @JacksonAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsonDeserialize {
-    Class<?> as() default Void.class;
+    /* renamed from: as */
+    Class<?> mo10580as() default Void.class;
 
     Class<?> builder() default Void.class;
 

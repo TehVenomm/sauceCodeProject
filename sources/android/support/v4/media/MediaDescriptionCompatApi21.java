@@ -1,6 +1,5 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.media.MediaDescription;
 import android.net.Uri;
@@ -8,10 +7,11 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.support.annotation.RequiresApi;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.media.MediaDescriptionCompatApi21 */
 class MediaDescriptionCompatApi21 {
 
+    /* renamed from: android.support.v4.media.MediaDescriptionCompatApi21$Builder */
     static class Builder {
         Builder() {
         }

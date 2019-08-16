@@ -1,14 +1,15 @@
 package com.crashlytics.android.answers;
 
 import android.content.Context;
-import io.fabric.sdk.android.services.common.CurrentTimeProvider;
-import io.fabric.sdk.android.services.events.EventsFilesManager;
-import io.fabric.sdk.android.services.events.EventsStorage;
-import io.fabric.sdk.android.services.settings.AnalyticsSettingsData;
 import java.io.IOException;
 import java.util.UUID;
+import p017io.fabric.sdk.android.services.common.CurrentTimeProvider;
+import p017io.fabric.sdk.android.services.events.EventsFilesManager;
+import p017io.fabric.sdk.android.services.events.EventsStorage;
+import p017io.fabric.sdk.android.services.settings.AnalyticsSettingsData;
 
 class SessionAnalyticsFilesManager extends EventsFilesManager<SessionEvent> {
+    private static final String SESSION_ANALYTICS_TO_SEND_FILE_EXTENSION = ".tap";
     private static final String SESSION_ANALYTICS_TO_SEND_FILE_PREFIX = "sa";
     private AnalyticsSettingsData analyticsSettingsData;
 
@@ -16,19 +17,23 @@ class SessionAnalyticsFilesManager extends EventsFilesManager<SessionEvent> {
         super(context, sessionEventTransform, currentTimeProvider, eventsStorage, 100);
     }
 
-    protected String generateUniqueRollOverFileName() {
-        return SESSION_ANALYTICS_TO_SEND_FILE_PREFIX + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + UUID.randomUUID().toString() + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + this.currentTimeProvider.getCurrentTimeMillis() + ".tap";
+    /* access modifiers changed from: protected */
+    public String generateUniqueRollOverFileName() {
+        return SESSION_ANALYTICS_TO_SEND_FILE_PREFIX + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + UUID.randomUUID().toString() + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + this.currentTimeProvider.getCurrentTimeMillis() + SESSION_ANALYTICS_TO_SEND_FILE_EXTENSION;
     }
 
-    protected int getMaxByteSizePerFile() {
+    /* access modifiers changed from: protected */
+    public int getMaxByteSizePerFile() {
         return this.analyticsSettingsData == null ? super.getMaxByteSizePerFile() : this.analyticsSettingsData.maxByteSizePerFile;
     }
 
-    protected int getMaxFilesToKeep() {
+    /* access modifiers changed from: protected */
+    public int getMaxFilesToKeep() {
         return this.analyticsSettingsData == null ? super.getMaxFilesToKeep() : this.analyticsSettingsData.maxPendingSendFileCount;
     }
 
-    void setAnalyticsSettingsData(AnalyticsSettingsData analyticsSettingsData) {
-        this.analyticsSettingsData = analyticsSettingsData;
+    /* access modifiers changed from: 0000 */
+    public void setAnalyticsSettingsData(AnalyticsSettingsData analyticsSettingsData2) {
+        this.analyticsSettingsData = analyticsSettingsData2;
     }
 }

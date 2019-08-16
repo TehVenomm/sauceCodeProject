@@ -4,25 +4,32 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.annotation.KeepForSdk;
 import com.google.android.gms.common.annotation.KeepName;
 
 @KeepName
+@KeepForSdk
 public final class BinderWrapper implements Parcelable {
-    public static final Creator<BinderWrapper> CREATOR = new zzp();
-    private IBinder zzftk;
+    public static final Creator<BinderWrapper> CREATOR = new zza();
+    private IBinder zzcz;
 
     public BinderWrapper() {
-        this.zzftk = null;
+        this.zzcz = null;
     }
 
+    @KeepForSdk
     public BinderWrapper(IBinder iBinder) {
-        this.zzftk = null;
-        this.zzftk = iBinder;
+        this.zzcz = null;
+        this.zzcz = iBinder;
     }
 
     private BinderWrapper(Parcel parcel) {
-        this.zzftk = null;
-        this.zzftk = parcel.readStrongBinder();
+        this.zzcz = null;
+        this.zzcz = parcel.readStrongBinder();
+    }
+
+    /* synthetic */ BinderWrapper(Parcel parcel, zza zza) {
+        this(parcel);
     }
 
     public final int describeContents() {
@@ -30,6 +37,6 @@ public final class BinderWrapper implements Parcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        parcel.writeStrongBinder(this.zzftk);
+        parcel.writeStrongBinder(this.zzcz);
     }
 }

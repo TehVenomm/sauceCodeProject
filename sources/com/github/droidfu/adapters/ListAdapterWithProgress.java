@@ -17,7 +17,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     private View progressView;
 
     public ListAdapterWithProgress(Activity activity, AbsListView absListView, int i) {
-        this.data = new ArrayList();
+        this.data = new ArrayList<>();
         this.listView = absListView;
         this.progressView = activity.getLayoutInflater().inflate(i, absListView, false);
     }
@@ -55,7 +55,8 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    protected abstract View doGetView(int i, View view, ViewGroup viewGroup);
+    /* access modifiers changed from: protected */
+    public abstract View doGetView(int i, View view, ViewGroup viewGroup);
 
     public int getCount() {
         int i = 0;
@@ -70,11 +71,17 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     }
 
     public T getItem(int i) {
-        return this.data == null ? null : this.data.get(i);
+        if (this.data == null) {
+            return null;
+        }
+        return this.data.get(i);
     }
 
     public int getItemCount() {
-        return this.data != null ? this.data.size() : 0;
+        if (this.data != null) {
+            return this.data.size();
+        }
+        return 0;
     }
 
     public long getItemId(int i) {
@@ -102,7 +109,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     }
 
     public boolean hasItems() {
-        return (this.data == null || this.data.isEmpty()) ? false : true;
+        return this.data != null && !this.data.isEmpty();
     }
 
     public boolean isEmpty() {

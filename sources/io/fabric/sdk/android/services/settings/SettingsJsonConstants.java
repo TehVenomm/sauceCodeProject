@@ -1,8 +1,15 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
+/* renamed from: io.fabric.sdk.android.services.settings.SettingsJsonConstants */
 public class SettingsJsonConstants {
     public static final int ANALYTICS_FLUSH_INTERVAL_SECS_DEFAULT = 600;
     public static final String ANALYTICS_FLUSH_INTERVAL_SECS_KEY = "flush_interval_secs";
+    public static final boolean ANALYTICS_FLUSH_ON_BACKGROUND_DEFAULT = true;
+    public static final String ANALYTICS_FLUSH_ON_BACKGROUND_KEY = "flush_on_background";
+    public static final boolean ANALYTICS_FORWARD_TO_GOOGLE_ANALYTICS_DEFAULT = false;
+    public static final String ANALYTICS_FORWARD_TO_GOOGLE_ANALYTICS_KEY = "forward_to_google_analytics";
+    public static final boolean ANALYTICS_INCLUDE_PURCHASE_EVENTS_IN_FORWARDED_EVENTS_DEFAULT = false;
+    public static final String ANALYTICS_INCLUDE_PURCHASE_EVENTS_IN_FORWARDED_EVENTS_KEY = "include_purchase_events_in_forwarded_events";
     public static final String ANALYTICS_KEY = "analytics";
     public static final int ANALYTICS_MAX_BYTE_SIZE_PER_FILE_DEFAULT = 8000;
     public static final String ANALYTICS_MAX_BYTE_SIZE_PER_FILE_KEY = "max_byte_size_per_file";
@@ -14,11 +21,14 @@ public class SettingsJsonConstants {
     public static final String ANALYTICS_SAMPLING_RATE_KEY = "sampling_rate";
     public static final boolean ANALYTICS_TRACK_CUSTOM_EVENTS_DEFAULT = true;
     public static final String ANALYTICS_TRACK_CUSTOM_EVENTS_KEY = "track_custom_events";
+    public static final boolean ANALYTICS_TRACK_PREDEFINED_EVENTS_DEFAULT = true;
+    public static final String ANALYTICS_TRACK_PREDEFINED_EVENTS_KEY = "track_predefined_events";
     public static final String ANALYTICS_URL_DEFAULT = "https://e.crashlytics.com/spi/v2/events";
     public static final String ANALYTICS_URL_KEY = "url";
     public static final String APP_ICON_KEY = "icon";
     public static final String APP_IDENTIFIER_KEY = "identifier";
     public static final String APP_KEY = "app";
+    public static final String APP_NDK_REPORTS_URL_KEY = "ndk_reports_url";
     public static final String APP_REPORTS_URL_KEY = "reports_url";
     public static final String APP_STATUS_KEY = "status";
     public static final boolean APP_UPDATE_REQUIRED_DEFAULT = false;
@@ -37,6 +47,8 @@ public class SettingsJsonConstants {
     public static final String FEATURES_COLLECT_LOGGED_EXCEPTIONS_KEY = "collect_logged_exceptions";
     public static final boolean FEATURES_COLLECT_REPORTS_DEFAULT = true;
     public static final String FEATURES_COLLECT_REPORTS_KEY = "collect_reports";
+    public static final boolean FEATURES_FIREBASE_CRASHLYTICS_ENABLED_DEFAULT = false;
+    public static final String FEATURES_FIREBASE_CRASHLYTICS_ENABLED_KEY = "firebase_crashlytics_enabled";
     public static final String FEATURES_KEY = "features";
     public static final boolean FEATURES_PROMPT_ENABLED_DEFAULT = false;
     public static final String FEATURES_PROMPT_ENABLED_KEY = "prompt_enabled";
@@ -67,6 +79,8 @@ public class SettingsJsonConstants {
     public static final String SETTINGS_LOG_BUFFER_SIZE_KEY = "log_buffer_size";
     public static final int SETTINGS_MAX_CHAINED_EXCEPTION_DEPTH_DEFAULT = 8;
     public static final String SETTINGS_MAX_CHAINED_EXCEPTION_DEPTH_KEY = "max_chained_exception_depth";
+    public static final int SETTINGS_MAX_COMPLETE_SESSIONS_COUNT_DEFAULT = 4;
+    public static final String SETTINGS_MAX_COMPLETE_SESSIONS_COUNT_KEY = "max_complete_sessions_count";
     public static final int SETTINGS_MAX_CUSTOM_EXCEPTION_EVENTS_DEFAULT = 64;
     public static final String SETTINGS_MAX_CUSTOM_EXCEPTION_EVENTS_KEY = "max_custom_exception_events";
     public static final int SETTINGS_MAX_CUSTOM_KEY_VALUE_PAIRS_DEFAULT = 64;

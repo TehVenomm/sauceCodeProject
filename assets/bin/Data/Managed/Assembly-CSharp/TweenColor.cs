@@ -96,29 +96,27 @@ public class TweenColor : UITweener
 
 	private void Cache()
 	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Expected O, but got Unknown
 		mCached = true;
 		mWidget = this.GetComponent<UIWidget>();
-		if (!(mWidget != null))
+		if (mWidget != null)
 		{
-			mSr = this.GetComponent<SpriteRenderer>();
-			if (!(mSr != null))
-			{
-				Renderer component = this.GetComponent<Renderer>();
-				if (component != null)
-				{
-					mMat = component.get_material();
-				}
-				else
-				{
-					mLight = this.GetComponent<Light>();
-					if (mLight == null)
-					{
-						mWidget = this.GetComponentInChildren<UIWidget>();
-					}
-				}
-			}
+			return;
+		}
+		mSr = this.GetComponent<SpriteRenderer>();
+		if (mSr != null)
+		{
+			return;
+		}
+		Renderer component = this.GetComponent<Renderer>();
+		if (component != null)
+		{
+			mMat = component.get_material();
+			return;
+		}
+		mLight = this.GetComponent<Light>();
+		if (mLight == null)
+		{
+			mWidget = this.GetComponentInChildren<UIWidget>();
 		}
 	}
 
@@ -136,12 +134,12 @@ public class TweenColor : UITweener
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		TweenColor tweenColor = UITweener.Begin<TweenColor>(go, duration, true);
+		TweenColor tweenColor = UITweener.Begin<TweenColor>(go, duration);
 		tweenColor.from = tweenColor.value;
 		tweenColor.to = color;
 		if (duration <= 0f)
 		{
-			tweenColor.Sample(1f, true);
+			tweenColor.Sample(1f, isFinished: true);
 			tweenColor.set_enabled(false);
 		}
 		return tweenColor;

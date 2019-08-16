@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Internal/Draw Call")]
 [ExecuteInEditMode]
-public class UIDrawCall
+[AddComponentMenu("NGUI/Internal/Draw Call")]
+public class UIDrawCall : MonoBehaviour
 {
 	public enum Clipping
 	{
@@ -16,8 +16,6 @@ public class UIDrawCall
 
 	public delegate void OnRenderCallback(Material mat);
 
-	private const int maxIndexBufferCache = 10;
-
 	private static BetterList<UIDrawCall> mActiveList = new BetterList<UIDrawCall>();
 
 	private static BetterList<UIDrawCall> mInactiveList = new BetterList<UIDrawCall>();
@@ -28,11 +26,11 @@ public class UIDrawCall
 
 	[NonSerialized]
 	[HideInInspector]
-	public int depthStart = 2147483647;
+	public int depthStart = int.MaxValue;
 
 	[NonSerialized]
 	[HideInInspector]
-	public int depthEnd = -2147483648;
+	public int depthEnd = int.MinValue;
 
 	[NonSerialized]
 	[HideInInspector]
@@ -106,6 +104,8 @@ public class UIDrawCall
 
 	public OnRenderCallback onRender;
 
+	private const int maxIndexBufferCache = 10;
+
 	private static List<int[]> mCache = new List<int[]>(10);
 
 	private static int[] ClipRange = null;
@@ -165,8 +165,6 @@ public class UIDrawCall
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
 			if (mTrans == null)
 			{
 				mTrans = this.get_transform();
@@ -241,12 +239,10 @@ public class UIDrawCall
 
 	private void CreateMaterial()
 	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
 		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Expected O, but got Unknown
-		//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0340: Expected O, but got Unknown
+		//IL_0257: Expected O, but got Unknown
+		//IL_0333: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033d: Expected O, but got Unknown
 		mTextureClip = false;
 		mLegacyShader = false;
 		mClipCount = panel.clipCount;
@@ -341,7 +337,6 @@ public class UIDrawCall
 
 	private void UpdateMaterials()
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		if (mRebuildMat || mDynamicMat == null || mClipCount != panel.clipCount || mTextureClip != (panel.clipping == Clipping.TextureMask))
 		{
 			RebuildMaterial();
@@ -358,16 +353,8 @@ public class UIDrawCall
 
 	public void UpdateGeometry(int widgetCount)
 	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Expected O, but got Unknown
-		//IL_0415: Unknown result type (might be due to invalid IL or missing references)
-		//IL_042b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0467: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0489: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dc: Expected O, but got Unknown
 		this.widgetCount = widgetCount;
 		int size = verts.size;
 		if (size > 0 && size == uvs.size && size == cols.size && size % 4 == 0)
@@ -550,81 +537,82 @@ public class UIDrawCall
 		{
 			onRender(mDynamicMat ?? mMaterial);
 		}
-		if (!(mDynamicMat == null) && mClipCount != 0)
+		if (mDynamicMat == null || mClipCount == 0)
 		{
-			if (mTextureClip)
+			return;
+		}
+		if (mTextureClip)
+		{
+			Vector4 drawCallClipRange = panel.drawCallClipRange;
+			Vector2 clipSoftness = panel.clipSoftness;
+			Vector2 val = default(Vector2);
+			val._002Ector(1000f, 1000f);
+			if (clipSoftness.x > 0f)
 			{
-				Vector4 drawCallClipRange = panel.drawCallClipRange;
-				Vector2 clipSoftness = panel.clipSoftness;
-				Vector2 val = default(Vector2);
-				val._002Ector(1000f, 1000f);
-				if (clipSoftness.x > 0f)
-				{
-					val.x = drawCallClipRange.z / clipSoftness.x;
-				}
-				if (clipSoftness.y > 0f)
-				{
-					val.y = drawCallClipRange.w / clipSoftness.y;
-				}
-				mDynamicMat.SetVector(ClipRange[0], new Vector4((0f - drawCallClipRange.x) / drawCallClipRange.z, (0f - drawCallClipRange.y) / drawCallClipRange.w, 1f / drawCallClipRange.z, 1f / drawCallClipRange.w));
-				mDynamicMat.SetTexture("_ClipTex", clipTexture);
+				val.x = drawCallClipRange.z / clipSoftness.x;
 			}
-			else if (!mLegacyShader)
+			if (clipSoftness.y > 0f)
 			{
-				UIPanel parentPanel = panel;
-				int num = 0;
-				while (parentPanel != null)
+				val.y = drawCallClipRange.w / clipSoftness.y;
+			}
+			mDynamicMat.SetVector(ClipRange[0], new Vector4((0f - drawCallClipRange.x) / drawCallClipRange.z, (0f - drawCallClipRange.y) / drawCallClipRange.w, 1f / drawCallClipRange.z, 1f / drawCallClipRange.w));
+			mDynamicMat.SetTexture("_ClipTex", clipTexture);
+		}
+		else if (!mLegacyShader)
+		{
+			UIPanel parentPanel = panel;
+			int num = 0;
+			while (parentPanel != null)
+			{
+				if (parentPanel.hasClipping)
 				{
-					if (parentPanel.hasClipping)
+					float angle = 0f;
+					Vector4 drawCallClipRange2 = parentPanel.drawCallClipRange;
+					if (parentPanel != panel)
 					{
-						float angle = 0f;
-						Vector4 drawCallClipRange2 = parentPanel.drawCallClipRange;
-						if (parentPanel != panel)
+						Vector3 val2 = parentPanel.cachedTransform.InverseTransformPoint(panel.cachedTransform.get_position());
+						drawCallClipRange2.x -= val2.x;
+						drawCallClipRange2.y -= val2.y;
+						Quaternion rotation = panel.cachedTransform.get_rotation();
+						Vector3 eulerAngles = rotation.get_eulerAngles();
+						Quaternion rotation2 = parentPanel.cachedTransform.get_rotation();
+						Vector3 eulerAngles2 = rotation2.get_eulerAngles();
+						Vector3 val3 = eulerAngles2 - eulerAngles;
+						val3.x = NGUIMath.WrapAngle(val3.x);
+						val3.y = NGUIMath.WrapAngle(val3.y);
+						val3.z = NGUIMath.WrapAngle(val3.z);
+						if (Mathf.Abs(val3.x) > 0.001f || Mathf.Abs(val3.y) > 0.001f)
 						{
-							Vector3 val2 = parentPanel.cachedTransform.InverseTransformPoint(panel.cachedTransform.get_position());
-							drawCallClipRange2.x -= val2.x;
-							drawCallClipRange2.y -= val2.y;
-							Quaternion rotation = panel.cachedTransform.get_rotation();
-							Vector3 eulerAngles = rotation.get_eulerAngles();
-							Quaternion rotation2 = parentPanel.cachedTransform.get_rotation();
-							Vector3 eulerAngles2 = rotation2.get_eulerAngles();
-							Vector3 val3 = eulerAngles2 - eulerAngles;
-							val3.x = NGUIMath.WrapAngle(val3.x);
-							val3.y = NGUIMath.WrapAngle(val3.y);
-							val3.z = NGUIMath.WrapAngle(val3.z);
-							if (Mathf.Abs(val3.x) > 0.001f || Mathf.Abs(val3.y) > 0.001f)
-							{
-								Debug.LogWarning((object)"Panel can only be clipped properly if X and Y rotation is left at 0", panel);
-							}
-							angle = val3.z;
+							Debug.LogWarning((object)"Panel can only be clipped properly if X and Y rotation is left at 0", panel);
 						}
-						SetClipping(num++, drawCallClipRange2, parentPanel.clipSoftness, angle);
+						angle = val3.z;
 					}
-					parentPanel = parentPanel.parentPanel;
+					SetClipping(num++, drawCallClipRange2, parentPanel.clipSoftness, angle);
 				}
+				parentPanel = parentPanel.parentPanel;
 			}
-			else
+		}
+		else
+		{
+			Vector2 clipSoftness2 = panel.clipSoftness;
+			Vector4 drawCallClipRange3 = panel.drawCallClipRange;
+			Vector2 mainTextureOffset = default(Vector2);
+			mainTextureOffset._002Ector((0f - drawCallClipRange3.x) / drawCallClipRange3.z, (0f - drawCallClipRange3.y) / drawCallClipRange3.w);
+			Vector2 mainTextureScale = default(Vector2);
+			mainTextureScale._002Ector(1f / drawCallClipRange3.z, 1f / drawCallClipRange3.w);
+			Vector2 val4 = default(Vector2);
+			val4._002Ector(1000f, 1000f);
+			if (clipSoftness2.x > 0f)
 			{
-				Vector2 clipSoftness2 = panel.clipSoftness;
-				Vector4 drawCallClipRange3 = panel.drawCallClipRange;
-				Vector2 mainTextureOffset = default(Vector2);
-				mainTextureOffset._002Ector((0f - drawCallClipRange3.x) / drawCallClipRange3.z, (0f - drawCallClipRange3.y) / drawCallClipRange3.w);
-				Vector2 mainTextureScale = default(Vector2);
-				mainTextureScale._002Ector(1f / drawCallClipRange3.z, 1f / drawCallClipRange3.w);
-				Vector2 val4 = default(Vector2);
-				val4._002Ector(1000f, 1000f);
-				if (clipSoftness2.x > 0f)
-				{
-					val4.x = drawCallClipRange3.z / clipSoftness2.x;
-				}
-				if (clipSoftness2.y > 0f)
-				{
-					val4.y = drawCallClipRange3.w / clipSoftness2.y;
-				}
-				mDynamicMat.set_mainTextureOffset(mainTextureOffset);
-				mDynamicMat.set_mainTextureScale(mainTextureScale);
-				mDynamicMat.SetVector("_ClipSharpness", Vector4.op_Implicit(val4));
+				val4.x = drawCallClipRange3.z / clipSoftness2.x;
 			}
+			if (clipSoftness2.y > 0f)
+			{
+				val4.y = drawCallClipRange3.w / clipSoftness2.y;
+			}
+			mDynamicMat.set_mainTextureOffset(mainTextureOffset);
+			mDynamicMat.set_mainTextureScale(mainTextureScale);
+			mDynamicMat.SetVector("_ClipSharpness", Vector4.op_Implicit(val4));
 		}
 	}
 
@@ -632,7 +620,7 @@ public class UIDrawCall
 	{
 		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		angle *= -0.0174532924f;
+		angle *= -(float)Math.PI / 180f;
 		Vector2 val = default(Vector2);
 		val._002Ector(1000f, 1000f);
 		if (soft.x > 0f)
@@ -681,8 +669,8 @@ public class UIDrawCall
 
 	private void OnDisable()
 	{
-		depthStart = 2147483647;
-		depthEnd = -2147483648;
+		depthStart = int.MaxValue;
+		depthEnd = int.MinValue;
 		panel = null;
 		manager = null;
 		mMaterial = null;
@@ -709,7 +697,6 @@ public class UIDrawCall
 
 	private static UIDrawCall Create(string name, UIPanel pan, Material mat, Texture tex, Shader shader)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		UIDrawCall uIDrawCall = Create(name);
 		uIDrawCall.get_gameObject().set_layer(pan.cachedGameObject.get_layer());
 		uIDrawCall.baseMaterial = mat;
@@ -723,10 +710,8 @@ public class UIDrawCall
 
 	private static UIDrawCall Create(string name)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
+		//IL_0048: Expected O, but got Unknown
 		if (mInactiveList.size > 0)
 		{
 			UIDrawCall uIDrawCall = mInactiveList.Pop();
@@ -735,7 +720,7 @@ public class UIDrawCall
 			{
 				uIDrawCall.set_name(name);
 			}
-			NGUITools.SetActive(uIDrawCall.get_gameObject(), true);
+			NGUITools.SetActive(uIDrawCall.get_gameObject(), state: true);
 			return uIDrawCall;
 		}
 		GameObject val = new GameObject(name);
@@ -747,10 +732,6 @@ public class UIDrawCall
 
 	public static void ClearAll()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Expected O, but got Unknown
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Expected O, but got Unknown
 		bool isPlaying = Application.get_isPlaying();
 		int num = mActiveList.size;
 		while (num > 0)
@@ -760,7 +741,7 @@ public class UIDrawCall
 			{
 				if (isPlaying)
 				{
-					NGUITools.SetActive(uIDrawCall.get_gameObject(), false);
+					NGUITools.SetActive(uIDrawCall.get_gameObject(), state: false);
 				}
 				else
 				{
@@ -779,8 +760,6 @@ public class UIDrawCall
 
 	public static void ReleaseInactive()
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Expected O, but got Unknown
 		int num = mInactiveList.size;
 		while (num > 0)
 		{
@@ -808,26 +787,23 @@ public class UIDrawCall
 
 	public static void Destroy(UIDrawCall dc)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Expected O, but got Unknown
-		if (Object.op_Implicit(dc))
+		if (!Object.op_Implicit(dc))
 		{
-			dc.onRender = null;
-			if (Application.get_isPlaying())
+			return;
+		}
+		dc.onRender = null;
+		if (Application.get_isPlaying())
+		{
+			if (mActiveList.Remove(dc))
 			{
-				if (mActiveList.Remove(dc))
-				{
-					NGUITools.SetActive(dc.get_gameObject(), false);
-					mInactiveList.Add(dc);
-				}
+				NGUITools.SetActive(dc.get_gameObject(), state: false);
+				mInactiveList.Add(dc);
 			}
-			else
-			{
-				mActiveList.Remove(dc);
-				NGUITools.DestroyImmediate(dc.get_gameObject());
-			}
+		}
+		else
+		{
+			mActiveList.Remove(dc);
+			NGUITools.DestroyImmediate(dc.get_gameObject());
 		}
 	}
 }

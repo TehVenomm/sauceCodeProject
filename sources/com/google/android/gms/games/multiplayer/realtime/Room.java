@@ -3,6 +3,7 @@ package com.google.android.gms.games.multiplayer.realtime;
 import android.database.CharArrayBuffer;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.data.Freezable;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.Participatable;
@@ -15,6 +16,7 @@ public interface Room extends Parcelable, Freezable<Room>, Participatable {
     public static final int ROOM_STATUS_INVITING = 0;
     public static final int ROOM_VARIANT_DEFAULT = -1;
 
+    @Nullable
     Bundle getAutoMatchCriteria();
 
     int getAutoMatchWaitEstimateSeconds();

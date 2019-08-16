@@ -11,8 +11,9 @@ public class SkubitTestIabHelper extends SkubitIabHelper {
         super(context, str, appstore);
     }
 
+    /* access modifiers changed from: protected */
     @NotNull
-    protected Intent getServiceIntent() {
+    public Intent getServiceIntent() {
         Intent intent = new Intent(SkubitTestAppstore.VENDING_ACTION);
         intent.setPackage("net.skubit.android");
         return intent;

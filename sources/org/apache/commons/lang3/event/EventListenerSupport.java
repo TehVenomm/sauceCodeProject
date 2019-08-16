@@ -16,7 +16,8 @@ import org.apache.commons.lang3.Validate;
 
 public class EventListenerSupport<L> implements Serializable {
     private static final long serialVersionUID = 3593265990380473632L;
-    private List<L> listeners;
+    /* access modifiers changed from: private */
+    public List<L> listeners;
     private transient L[] prototypeArray;
     private transient L proxy;
 
@@ -33,7 +34,7 @@ public class EventListenerSupport<L> implements Serializable {
     }
 
     public static <T> EventListenerSupport<T> create(Class<T> cls) {
-        return new EventListenerSupport(cls);
+        return new EventListenerSupport<>(cls);
     }
 
     public EventListenerSupport(Class<L> cls) {
@@ -61,7 +62,8 @@ public class EventListenerSupport<L> implements Serializable {
         this.listeners.add(l);
     }
 
-    int getListenerCount() {
+    /* access modifiers changed from: 0000 */
+    public int getListenerCount() {
         return this.listeners.size();
     }
 
@@ -103,7 +105,8 @@ public class EventListenerSupport<L> implements Serializable {
         this.proxy = cls.cast(Proxy.newProxyInstance(classLoader, new Class[]{cls}, createInvocationHandler()));
     }
 
-    protected InvocationHandler createInvocationHandler() {
+    /* access modifiers changed from: protected */
+    public InvocationHandler createInvocationHandler() {
         return new ProxyInvocationHandler();
     }
 }

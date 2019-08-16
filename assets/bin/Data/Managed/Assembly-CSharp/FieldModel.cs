@@ -9,6 +9,14 @@ public class FieldModel : BaseModel
 		public Field field;
 
 		public List<int> gather;
+
+		public List<GatherGrowthInfo> growth;
+
+		public string raidBossHp;
+
+		public string noticeText = string.Empty;
+
+		public int mapFlag;
 	}
 
 	public class Field
@@ -26,6 +34,8 @@ public class FieldModel : BaseModel
 		public int expiredAt;
 
 		public string createdAt;
+
+		public int enableStandby;
 
 		public bool TryGetCreatedAt(out DateTime createdAt)
 		{
@@ -53,6 +63,8 @@ public class FieldModel : BaseModel
 		public int dId;
 
 		public int prevId;
+
+		public int toUserId;
 	}
 
 	public class RequestQuest

@@ -4,13 +4,12 @@ public class StoryScene : GameSection
 {
 	public override void Initialize()
 	{
-		Utility.CreateGameObjectAndComponent("StoryDirector", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+		Utility.CreateGameObjectAndComponent("StoryDirector", MonoBehaviourSingleton<AppMain>.I._transform);
 		base.Initialize();
 	}
 
 	protected override void OnDestroy()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		base.OnDestroy();
 		if (MonoBehaviourSingleton<StoryDirector>.IsValid())
 		{

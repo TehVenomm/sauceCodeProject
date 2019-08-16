@@ -19,9 +19,12 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 		GRD_LIST,
 		TEX_MODEL,
 		STR_NON_LIST,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		OBJ_COMMENT,
 		LBL_COMMENT,
 		LBL_LAST_LOGIN,
@@ -40,6 +43,17 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 		STR_TITLE_REFLECT,
 		OBJ_DEGREE_FRAME_ROOT,
 		SPR_ICON_FIRST_MET,
+		OBJ_SWITCH_INFO,
+		DEFAULT_STATUS_ROOT,
+		JOIN_STATUS_ROOT,
+		ONLINE_TEXT_ROOT,
+		ONLINE_TEXT,
+		DETAIL_TEXT,
+		JOIN_BUTTON_ROOT,
+		BTN_JOIN_BUTTON,
+		LBL_BUTTON_TEXT,
+		BTN_SORT,
+		LBL_SORT,
 		OBJ_STATUS,
 		LBL_TIME,
 		LBL_ARENA_NAME,
@@ -50,6 +64,7 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 		SCR_LIST,
 		BTN_OWN,
 		OBJ_OWN_ON,
+		LBL_TIME_DEFAULT,
 		LBL_ITEM_ARENA_NAME
 	}
 
@@ -66,15 +81,15 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_OWN, false);
-		SetActive((Enum)UI.OBJ_OWN_ON, false);
+		SetActive((Enum)UI.BTN_OWN, is_visible: false);
+		SetActive((Enum)UI.OBJ_OWN_ON, is_visible: false);
 	}
 
 	protected override void SetRankiItem(int i, Transform t)
 	{
 		base.SetRankiItem(i, t);
-		SetActive(t, UI.OBJ_STATUS, true);
-		SetActive(t, UI.OBJ_COMMENT, true);
+		SetActive(t, UI.OBJ_STATUS, is_visible: true);
+		SetActive(t, UI.OBJ_COMMENT, is_visible: true);
 	}
 
 	protected override void SetRank(Transform t, int rank)
@@ -82,9 +97,9 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 		int num = FriendArenaRankingBase.RankSprite.Length;
 		for (int i = 0; i < num; i++)
 		{
-			SetActive(t, FriendArenaRankingBase.RankSprite[i], false);
+			SetActive(t, FriendArenaRankingBase.RankSprite[i], is_visible: false);
 		}
-		SetActive(t, UI.LBL_RANK, false);
+		SetActive(t, UI.LBL_RANK, is_visible: false);
 	}
 
 	protected override void UpdateDynamicList()
@@ -99,7 +114,7 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 				item_num = info.Length;
 			}
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
 			SetListItem(i, t, is_recycle, info[i]);
 		});

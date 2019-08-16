@@ -11,7 +11,7 @@ public class GuildDialog : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(array[0], delegate(bool is_success, Error ret_code)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 	}
@@ -22,7 +22,7 @@ public class GuildDialog : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEntry(id, delegate(bool isSuccess)
 		{
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess);
 		});
 	}
 
@@ -35,7 +35,7 @@ public class GuildDialog : GameSection
 	{
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal < 15)
 		{
-			GameSection.ChangeEvent("DONT_HAVE_GEM", null);
+			GameSection.ChangeEvent("DONT_HAVE_GEM");
 		}
 	}
 

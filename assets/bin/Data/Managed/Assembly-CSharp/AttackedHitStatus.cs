@@ -34,6 +34,8 @@ public class AttackedHitStatus
 
 	public int regionID = -1;
 
+	public bool isDamageRegionOnly;
+
 	public Enemy.WEAK_STATE weakState;
 
 	public int damage;
@@ -44,6 +46,10 @@ public class AttackedHitStatus
 
 	public float downAddWeak;
 
+	public bool isForceDown;
+
+	public float concussionAdd;
+
 	public bool isArrowBleed;
 
 	public int arrowBleedDamage;
@@ -51,6 +57,8 @@ public class AttackedHitStatus
 	public int arrowBurstDamage;
 
 	public bool isShadowSealing;
+
+	public bool isArrowBomb;
 
 	public Vector3 hostPos = Vector3.get_zero();
 
@@ -70,6 +78,8 @@ public class AttackedHitStatus
 
 	public float downTotal;
 
+	public float concussionTotal;
+
 	public BadStatus badStatusTotal = new BadStatus();
 
 	public float damageHpRate;
@@ -87,6 +97,8 @@ public class AttackedHitStatus
 	public int shieldDamage;
 
 	public EnemyAegisController.SyncParam aegisParam = new EnemyAegisController.SyncParam();
+
+	public int deadReviveCount;
 
 	public Player.ATTACK_MODE attackMode;
 

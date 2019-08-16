@@ -162,7 +162,7 @@ namespace GooglePlayGames.Native
 			}
 			else
 			{
-				OpenWithManualConflictResolution(filename, source, false, delegate(IConflictResolver resolver, ISavedGameMetadata original, byte[] originalData, ISavedGameMetadata unmerged, byte[] unmergedData)
+				OpenWithManualConflictResolution(filename, source, prefetchDataOnConflict: false, delegate(IConflictResolver resolver, ISavedGameMetadata original, byte[] originalData, ISavedGameMetadata unmerged, byte[] unmergedData)
 				{
 					switch (resolutionStrategy)
 					{

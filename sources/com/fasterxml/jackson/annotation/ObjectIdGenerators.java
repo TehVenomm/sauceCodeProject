@@ -40,7 +40,8 @@ public class ObjectIdGenerators {
             this._nextValue = i;
         }
 
-        protected int initialValue() {
+        /* access modifiers changed from: protected */
+        public int initialValue() {
             return 1;
         }
 

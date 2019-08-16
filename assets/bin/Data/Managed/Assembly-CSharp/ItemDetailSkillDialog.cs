@@ -4,4 +4,9 @@ public class ItemDetailSkillDialog : ItemDetailSkill
 	{
 		base.Initialize();
 	}
+
+	public override void UpdateUI()
+	{
+		base.UpdateUI();
+	}
 }

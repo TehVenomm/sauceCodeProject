@@ -17,7 +17,10 @@ public class SimpleObjectIdResolver implements ObjectIdResolver {
     }
 
     public Object resolveId(IdKey idKey) {
-        return this._items == null ? null : this._items.get(idKey);
+        if (this._items == null) {
+            return null;
+        }
+        return this._items.get(idKey);
     }
 
     public boolean canUseFor(ObjectIdResolver objectIdResolver) {

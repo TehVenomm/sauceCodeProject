@@ -59,11 +59,11 @@ public interface Game extends Parcelable, Freezable<Game> {
 
     boolean isTurnBasedMultiplayerEnabled();
 
-    boolean zzapg();
+    boolean zzb();
 
-    boolean zzaph();
+    boolean zzc();
 
-    boolean zzapi();
+    boolean zzd();
 
-    String zzapj();
+    String zze();
 }

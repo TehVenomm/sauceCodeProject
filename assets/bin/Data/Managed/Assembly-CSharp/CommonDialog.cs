@@ -65,10 +65,6 @@ public class CommonDialog : GameSection
 
 	private const float THREE_BUTTON_WIDTH = 90f;
 
-	protected const int CMNBTNO_TEXTCOLOR_BOTTOM = -2644481;
-
-	protected const int CMNBTNO_TEXTCOLOR_EFFECT = 957678335;
-
 	protected static readonly string[] BTN_SPRITE_NAME = new string[4]
 	{
 		"CmnBtn",
@@ -76,6 +72,10 @@ public class CommonDialog : GameSection
 		"CmnBtnR",
 		"CmnBtnO_n"
 	};
+
+	protected const int CMNBTNO_TEXTCOLOR_BOTTOM = -2644481;
+
+	protected const int CMNBTNO_TEXTCOLOR_EFFECT = 957678335;
 
 	private string backKeyEvent;
 
@@ -93,7 +93,7 @@ public class CommonDialog : GameSection
 		SetTransferUI(GetTransferUIName(), typeof(UI));
 		InitDialog(GameSceneEvent.current.userData);
 		base.Initialize();
-		PlayTween((Enum)UI.OBJ_FRAME, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween((Enum)UI.OBJ_FRAME, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 	}
 
 	protected string[] GetTexts(object[] args, STRING_CATEGORY message_categoly = STRING_CATEGORY.COMMON_DIALOG)
@@ -157,8 +157,8 @@ public class CommonDialog : GameSection
 		Desc desc = data_object as Desc;
 		if (desc == null)
 		{
-			string[] texts = GetTexts(data_object as object[], STRING_CATEGORY.COMMON_DIALOG);
-			desc = new Desc(TYPE.YES_NO_CANCEL, (texts.Length <= 0) ? "message" : texts[0], (texts.Length <= 1) ? "YES" : texts[1], (texts.Length <= 2) ? "NO" : texts[2], (texts.Length <= 3) ? "CANCEL" : texts[3], null);
+			string[] texts = GetTexts(data_object as object[]);
+			desc = new Desc(TYPE.YES_NO_CANCEL, (texts.Length <= 0) ? "message" : texts[0], (texts.Length <= 1) ? "YES" : texts[1], (texts.Length <= 2) ? "NO" : texts[2], (texts.Length <= 3) ? "CANCEL" : texts[3]);
 		}
 		string text = desc.text;
 		if (text.StartsWith("[BB]"))
@@ -179,7 +179,7 @@ public class CommonDialog : GameSection
 		}
 		int num2 = 20 + num - 96;
 		int height = GetHeight(UI.BG);
-		float num3 = (float)num2;
+		float num3 = num2;
 		Vector3 localScale = ctrl.get_localScale();
 		int height2 = height + (int)(num3 / localScale.y);
 		SetHeight((Enum)UI.BG, height2);
@@ -195,14 +195,14 @@ public class CommonDialog : GameSection
 			{
 				desc.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u);
 			}
-			SetActive((Enum)UI.SPR_BTN_0, false);
+			SetActive((Enum)UI.SPR_BTN_0, is_visible: false);
 			SetLabelText((Enum)UI.LBL_BTN_1, desc.btnText[0]);
 			SetLabelText((Enum)UI.LBL_BTN_1_R, desc.btnText[0]);
 			SetEventName((Enum)UI.SPR_BTN_1, "OK");
 			SetFullScreenButton((Enum)UI.SPR_BTN_1);
-			SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[1], true);
-			SetActive((Enum)UI.OBJ_SPACE, false);
-			SetActive((Enum)UI.SPR_BTN_2, false);
+			SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[1], with_press: true);
+			SetActive((Enum)UI.OBJ_SPACE, is_visible: false);
+			SetActive((Enum)UI.SPR_BTN_2, is_visible: false);
 			backKeyEvent = "OK";
 			break;
 		case TYPE.YES_NO:
@@ -217,13 +217,13 @@ public class CommonDialog : GameSection
 			SetLabelText((Enum)UI.LBL_BTN_0, desc.btnText[1]);
 			SetLabelText((Enum)UI.LBL_BTN_0_R, desc.btnText[1]);
 			SetEventName((Enum)UI.SPR_BTN_0, "NO");
-			SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[2], true);
-			SetActive((Enum)UI.SPR_BTN_1, false);
-			SetActive((Enum)UI.OBJ_SPACE, true);
+			SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[2], with_press: true);
+			SetActive((Enum)UI.SPR_BTN_1, is_visible: false);
+			SetActive((Enum)UI.OBJ_SPACE, is_visible: true);
 			SetLabelText((Enum)UI.LBL_BTN_2, desc.btnText[0]);
 			SetLabelText((Enum)UI.LBL_BTN_2_R, desc.btnText[0]);
 			SetEventName((Enum)UI.SPR_BTN_2, "YES");
-			SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], true);
+			SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], with_press: true);
 			backKeyEvent = "NO";
 			break;
 		case TYPE.YES_NO_CANCEL:
@@ -241,8 +241,8 @@ public class CommonDialog : GameSection
 			SetLabelText((Enum)UI.LBL_BTN_0, desc.btnText[1]);
 			SetLabelText((Enum)UI.LBL_BTN_0_R, desc.btnText[1]);
 			SetEventName((Enum)UI.SPR_BTN_0, "NO");
-			SetActive((Enum)UI.SPR_BTN_1, false);
-			SetActive((Enum)UI.OBJ_SPACE, true);
+			SetActive((Enum)UI.SPR_BTN_1, is_visible: false);
+			SetActive((Enum)UI.OBJ_SPACE, is_visible: true);
 			SetLabelText((Enum)UI.LBL_BTN_2, desc.btnText[0]);
 			SetLabelText((Enum)UI.LBL_BTN_2_R, desc.btnText[0]);
 			SetEventName((Enum)UI.SPR_BTN_2, "YES");
@@ -250,7 +250,7 @@ public class CommonDialog : GameSection
 			break;
 		}
 		base.GetComponent<UITable>((Enum)UI.TBL_BTN).Reposition();
-		SoundManager.PlaySystemSE(openingSound, 1f);
+		SoundManager.PlaySystemSE(openingSound);
 	}
 
 	protected virtual void SetupThreeButton(Desc data)
@@ -274,20 +274,20 @@ public class CommonDialog : GameSection
 		SetLabelText((Enum)UI.LBL_BTN_0, data.btnText[0]);
 		SetLabelText((Enum)UI.LBL_BTN_0_R, data.btnText[0]);
 		SetEventName((Enum)UI.SPR_BTN_0, "YES");
-		SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[3], true);
+		SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[3], with_press: true);
 		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_0).gradientBottom = NGUIMath.IntToColor(-2644481);
 		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_0).effectColor = NGUIMath.IntToColor(957678335);
 		SetLabelText((Enum)UI.LBL_BTN_1, data.btnText[1]);
 		SetLabelText((Enum)UI.LBL_BTN_1_R, data.btnText[1]);
 		SetEventName((Enum)UI.SPR_BTN_1, "NO");
-		SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[3], true);
+		SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[3], with_press: true);
 		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_1).gradientBottom = NGUIMath.IntToColor(-2644481);
 		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_1).effectColor = NGUIMath.IntToColor(957678335);
-		SetActive((Enum)UI.OBJ_SPACE, false);
+		SetActive((Enum)UI.OBJ_SPACE, is_visible: false);
 		SetLabelText((Enum)UI.LBL_BTN_2, data.btnText[2]);
 		SetLabelText((Enum)UI.LBL_BTN_2_R, data.btnText[2]);
 		SetEventName((Enum)UI.SPR_BTN_2, "CANCEL");
-		SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], true);
+		SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], with_press: true);
 		backKeyEvent = "CANCEL";
 	}
 }

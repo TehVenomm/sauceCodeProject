@@ -16,7 +16,7 @@ import org.w3c.dom.Node;
 
 public class OptionalHandlerFactory implements Serializable {
     private static final Class<?> CLASS_DOM_DOCUMENT;
-    private static final Class<?> CLASS_DOM_NODE;
+    private static final Class<?> CLASS_DOM_NODE = Node.class;
     private static final Class<?> CLASS_JAVA7_PATH;
     private static final String DESERIALIZERS_FOR_JAVAX_XML = "com.fasterxml.jackson.databind.ext.CoreXMLDeserializers";
     private static final String DESERIALIZER_FOR_DOM_DOCUMENT = "com.fasterxml.jackson.databind.ext.DOMDeserializer$DocumentDeserializer";
@@ -29,38 +29,15 @@ public class OptionalHandlerFactory implements Serializable {
     private static final long serialVersionUID = 1;
 
     static {
-        Class cls;
-        Class cls2;
-        Class cls3 = null;
-        try {
-            cls = Node.class;
-            try {
-                cls2 = Document.class;
-            } catch (Exception e) {
-                System.err.println("WARNING: could not load DOM Node and/or Document classes");
-                cls2 = cls3;
-                CLASS_DOM_NODE = cls;
-                CLASS_DOM_DOCUMENT = cls2;
-                cls3 = Class.forName("java.nio.file.Path");
-                CLASS_JAVA7_PATH = cls3;
-            }
-        } catch (Exception e2) {
-            cls = cls3;
-            System.err.println("WARNING: could not load DOM Node and/or Document classes");
-            cls2 = cls3;
-            CLASS_DOM_NODE = cls;
-            CLASS_DOM_DOCUMENT = cls2;
-            cls3 = Class.forName("java.nio.file.Path");
-            CLASS_JAVA7_PATH = cls3;
-        }
-        CLASS_DOM_NODE = cls;
+        Class<?> cls = null;
+        Class<Document> cls2 = Document.class;
         CLASS_DOM_DOCUMENT = cls2;
         try {
-            cls3 = Class.forName("java.nio.file.Path");
-        } catch (Exception e3) {
+            cls = Class.forName("java.nio.file.Path");
+        } catch (Exception e) {
             System.err.println("WARNING: could not load Java7 Path class");
         }
-        CLASS_JAVA7_PATH = cls3;
+        CLASS_JAVA7_PATH = cls;
     }
 
     protected OptionalHandlerFactory() {
@@ -108,15 +85,13 @@ public class OptionalHandlerFactory implements Serializable {
     private Object instantiate(String str) {
         try {
             return Class.forName(str).newInstance();
-        } catch (LinkageError e) {
-            return null;
-        } catch (Exception e2) {
+        } catch (Exception | LinkageError e) {
             return null;
         }
     }
 
     private boolean hasSuperClassStartingWith(Class<?> cls, String str) {
-        Class superclass = cls.getSuperclass();
+        Class<Object> superclass = cls.getSuperclass();
         while (superclass != null && superclass != Object.class) {
             if (superclass.getName().startsWith(str)) {
                 return true;

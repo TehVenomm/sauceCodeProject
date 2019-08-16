@@ -7,7 +7,7 @@ import java.util.Set;
 
 class PersistedEvents implements Serializable {
     private static final long serialVersionUID = 20160629001L;
-    private HashMap<AccessTokenAppIdPair, List<AppEvent>> events = new HashMap();
+    private HashMap<AccessTokenAppIdPair, List<AppEvent>> events = new HashMap<>();
 
     static class SerializationProxyV1 implements Serializable {
         private static final long serialVersionUID = 20160629001L;
@@ -22,6 +22,9 @@ class PersistedEvents implements Serializable {
         }
     }
 
+    public PersistedEvents() {
+    }
+
     public PersistedEvents(HashMap<AccessTokenAppIdPair, List<AppEvent>> hashMap) {
         this.events.putAll(hashMap);
     }
@@ -31,10 +34,10 @@ class PersistedEvents implements Serializable {
     }
 
     public void addEvents(AccessTokenAppIdPair accessTokenAppIdPair, List<AppEvent> list) {
-        if (this.events.containsKey(accessTokenAppIdPair)) {
-            ((List) this.events.get(accessTokenAppIdPair)).addAll(list);
-        } else {
+        if (!this.events.containsKey(accessTokenAppIdPair)) {
             this.events.put(accessTokenAppIdPair, list);
+        } else {
+            ((List) this.events.get(accessTokenAppIdPair)).addAll(list);
         }
     }
 

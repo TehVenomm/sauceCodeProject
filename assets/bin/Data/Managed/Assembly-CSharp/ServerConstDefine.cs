@@ -2,7 +2,7 @@ public class ServerConstDefine
 {
 	public static readonly string CDV_KEY = "cdv";
 
-	public int cdv = 1508206700;
+	public int cdv = 1540274801;
 
 	public int LIST_NUM_PER_PAGE = 10;
 
@@ -12,7 +12,7 @@ public class ServerConstDefine
 
 	public int EQUIP_SET_MAX = 6;
 
-	public int EQUIP_SET_EXT_MAX = 20;
+	public int EQUIP_SET_EXT_MAX = 30;
 
 	public int EQUIP_SET_INIT = 6;
 
@@ -28,15 +28,17 @@ public class ServerConstDefine
 
 	public int ALIVE_CHECK_SEC = 270;
 
+	public int USER_LEVEL_MAX = 300;
+
 	public int INVENTORY_EXTEND_USE_CRYSTAL = 5;
 
 	public int INVENTORY_EXTEND_EQUIP_ITEM = 10;
 
 	public int INVENTORY_EXTEND_SKILL_ITEM = 10;
 
-	public int INVENTORY_EXTEND_EQUIP_ITEM_MAX = 700;
+	public int INVENTORY_EXTEND_EQUIP_ITEM_MAX = 1000;
 
-	public int INVENTORY_EXTEND_SKILL_ITEM_MAX = 700;
+	public int INVENTORY_EXTEND_SKILL_ITEM_MAX = 1000;
 
 	public int QUEST_LOCK_SEC = 15;
 
@@ -45,6 +47,8 @@ public class ServerConstDefine
 	public int QUEST_ITEM_LEVEL_MAX = 150;
 
 	public int PARTY_SEARCH_QUEST_LEVEL_MAX = 300;
+
+	public int PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX = -1;
 
 	public float SKILL_EXCEED_NEED_RATE_PLUS_1 = 0.5f;
 
@@ -76,7 +80,21 @@ public class ServerConstDefine
 
 	public int SKILL_EXCEED_POINT_RARITY_SS = 9000;
 
+	public int SKILL_EXCEED_POINT_RARITY_SSS = 45000;
+
 	public float SKILL_EXCEED_MAX_LEVEL_RATE = 1f;
+
+	public float SKILL_EXCEED_SAME_RATE_C = 10f;
+
+	public float SKILL_EXCEED_SAME_RATE_B = 10f;
+
+	public float SKILL_EXCEED_SAME_RATE_A = 10f;
+
+	public float SKILL_EXCEED_SAME_RATE_S = 10f;
+
+	public float SKILL_EXCEED_SAME_RATE_SS = 10f;
+
+	public float SKILL_EXCEED_SAME_RATE_SSS = 10f;
 
 	public int ABILITY_CHANGE_COST_RARITY_D = 3000;
 
@@ -104,6 +122,8 @@ public class ServerConstDefine
 
 	public int GUILD_REQUEST_NEED_POINT_SS = 2400;
 
+	public int GUILD_REQUEST_NEED_POINT_SSS = 4800;
+
 	public int GUILD_REQUEST_NEED_POINT_S = 1200;
 
 	public int GUILD_REQUEST_NEED_POINT_A = 400;
@@ -115,4 +135,18 @@ public class ServerConstDefine
 	public int GUILD_REQUEST_SLOT_EXTEND_MIN = 1440;
 
 	public int GUILD_REQUEST_EARLY_RECEIVE_MIN = 60;
+
+	public int SMITH_RESTORE_USE_CRYSTAL = 5;
+
+	public int MAX_ATTACH_ACCESSORY_NUM = 1;
+
+	public int CLAN_MIN_USER_LV = 15;
+
+	public int CLAN_CREATE_COST = 15;
+
+	public int CLAN_MAX_MEMBER_NUM = 32;
+
+	public int CLAN_BASE_MAX_DISP_MEMBER_NUM = 15;
+
+	public int CLAN_NOTICE_BOARD_SEND_INTERVAL_SECONDS = 60;
 }

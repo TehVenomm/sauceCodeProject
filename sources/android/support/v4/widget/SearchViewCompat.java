@@ -1,24 +1,32 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build.VERSION;
 import android.view.View;
+import android.widget.SearchView;
+import com.google.firebase.analytics.FirebaseAnalytics.Event;
 
+@Deprecated
+/* renamed from: android.support.v4.widget.SearchViewCompat */
 public final class SearchViewCompat {
-    private static final SearchViewCompatImpl IMPL;
 
+    @Deprecated
+    /* renamed from: android.support.v4.widget.SearchViewCompat$OnCloseListener */
     public interface OnCloseListener {
         boolean onClose();
     }
 
     @Deprecated
+    /* renamed from: android.support.v4.widget.SearchViewCompat$OnCloseListenerCompat */
     public static abstract class OnCloseListenerCompat implements OnCloseListener {
         public boolean onClose() {
             return false;
         }
     }
 
+    @Deprecated
+    /* renamed from: android.support.v4.widget.SearchViewCompat$OnQueryTextListener */
     public interface OnQueryTextListener {
         boolean onQueryTextChange(String str);
 
@@ -26,6 +34,7 @@ public final class SearchViewCompat {
     }
 
     @Deprecated
+    /* renamed from: android.support.v4.widget.SearchViewCompat$OnQueryTextListenerCompat */
     public static abstract class OnQueryTextListenerCompat implements OnQueryTextListener {
         public boolean onQueryTextChange(String str) {
             return false;
@@ -36,301 +45,129 @@ public final class SearchViewCompat {
         }
     }
 
-    interface SearchViewCompatImpl {
-        CharSequence getQuery(View view);
-
-        boolean isIconified(View view);
-
-        boolean isQueryRefinementEnabled(View view);
-
-        boolean isSubmitButtonEnabled(View view);
-
-        Object newOnCloseListener(OnCloseListener onCloseListener);
-
-        Object newOnQueryTextListener(OnQueryTextListener onQueryTextListener);
-
-        View newSearchView(Context context);
-
-        void setIconified(View view, boolean z);
-
-        void setImeOptions(View view, int i);
-
-        void setInputType(View view, int i);
-
-        void setMaxWidth(View view, int i);
-
-        void setOnCloseListener(View view, OnCloseListener onCloseListener);
-
-        void setOnQueryTextListener(View view, OnQueryTextListener onQueryTextListener);
-
-        void setQuery(View view, CharSequence charSequence, boolean z);
-
-        void setQueryHint(View view, CharSequence charSequence);
-
-        void setQueryRefinementEnabled(View view, boolean z);
-
-        void setSearchableInfo(View view, ComponentName componentName);
-
-        void setSubmitButtonEnabled(View view, boolean z);
-    }
-
-    static class SearchViewCompatStubImpl implements SearchViewCompatImpl {
-        SearchViewCompatStubImpl() {
-        }
-
-        public CharSequence getQuery(View view) {
-            return null;
-        }
-
-        public boolean isIconified(View view) {
-            return true;
-        }
-
-        public boolean isQueryRefinementEnabled(View view) {
-            return false;
-        }
-
-        public boolean isSubmitButtonEnabled(View view) {
-            return false;
-        }
-
-        public Object newOnCloseListener(OnCloseListener onCloseListener) {
-            return null;
-        }
-
-        public Object newOnQueryTextListener(OnQueryTextListener onQueryTextListener) {
-            return null;
-        }
-
-        public View newSearchView(Context context) {
-            return null;
-        }
-
-        public void setIconified(View view, boolean z) {
-        }
-
-        public void setImeOptions(View view, int i) {
-        }
-
-        public void setInputType(View view, int i) {
-        }
-
-        public void setMaxWidth(View view, int i) {
-        }
-
-        public void setOnCloseListener(View view, OnCloseListener onCloseListener) {
-        }
-
-        public void setOnQueryTextListener(View view, OnQueryTextListener onQueryTextListener) {
-        }
-
-        public void setQuery(View view, CharSequence charSequence, boolean z) {
-        }
-
-        public void setQueryHint(View view, CharSequence charSequence) {
-        }
-
-        public void setQueryRefinementEnabled(View view, boolean z) {
-        }
-
-        public void setSearchableInfo(View view, ComponentName componentName) {
-        }
-
-        public void setSubmitButtonEnabled(View view, boolean z) {
-        }
-    }
-
-    static class SearchViewCompatHoneycombImpl extends SearchViewCompatStubImpl {
-        SearchViewCompatHoneycombImpl() {
-        }
-
-        protected void checkIfLegalArg(View view) {
-            SearchViewCompatHoneycomb.checkIfLegalArg(view);
-        }
-
-        public CharSequence getQuery(View view) {
-            checkIfLegalArg(view);
-            return SearchViewCompatHoneycomb.getQuery(view);
-        }
-
-        public boolean isIconified(View view) {
-            checkIfLegalArg(view);
-            return SearchViewCompatHoneycomb.isIconified(view);
-        }
-
-        public boolean isQueryRefinementEnabled(View view) {
-            checkIfLegalArg(view);
-            return SearchViewCompatHoneycomb.isQueryRefinementEnabled(view);
-        }
-
-        public boolean isSubmitButtonEnabled(View view) {
-            checkIfLegalArg(view);
-            return SearchViewCompatHoneycomb.isSubmitButtonEnabled(view);
-        }
-
-        public Object newOnCloseListener(final OnCloseListener onCloseListener) {
-            return SearchViewCompatHoneycomb.newOnCloseListener(new OnCloseListenerCompatBridge() {
-                public boolean onClose() {
-                    return onCloseListener.onClose();
-                }
-            });
-        }
-
-        public Object newOnQueryTextListener(final OnQueryTextListener onQueryTextListener) {
-            return SearchViewCompatHoneycomb.newOnQueryTextListener(new OnQueryTextListenerCompatBridge() {
-                public boolean onQueryTextChange(String str) {
-                    return onQueryTextListener.onQueryTextChange(str);
-                }
-
-                public boolean onQueryTextSubmit(String str) {
-                    return onQueryTextListener.onQueryTextSubmit(str);
-                }
-            });
-        }
-
-        public View newSearchView(Context context) {
-            return SearchViewCompatHoneycomb.newSearchView(context);
-        }
-
-        public void setIconified(View view, boolean z) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setIconified(view, z);
-        }
-
-        public void setMaxWidth(View view, int i) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setMaxWidth(view, i);
-        }
-
-        public void setOnCloseListener(View view, OnCloseListener onCloseListener) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setOnCloseListener(view, newOnCloseListener(onCloseListener));
-        }
-
-        public void setOnQueryTextListener(View view, OnQueryTextListener onQueryTextListener) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setOnQueryTextListener(view, newOnQueryTextListener(onQueryTextListener));
-        }
-
-        public void setQuery(View view, CharSequence charSequence, boolean z) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setQuery(view, charSequence, z);
-        }
-
-        public void setQueryHint(View view, CharSequence charSequence) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setQueryHint(view, charSequence);
-        }
-
-        public void setQueryRefinementEnabled(View view, boolean z) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setQueryRefinementEnabled(view, z);
-        }
-
-        public void setSearchableInfo(View view, ComponentName componentName) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setSearchableInfo(view, componentName);
-        }
-
-        public void setSubmitButtonEnabled(View view, boolean z) {
-            checkIfLegalArg(view);
-            SearchViewCompatHoneycomb.setSubmitButtonEnabled(view, z);
-        }
-    }
-
-    static class SearchViewCompatIcsImpl extends SearchViewCompatHoneycombImpl {
-        SearchViewCompatIcsImpl() {
-        }
-
-        public View newSearchView(Context context) {
-            return SearchViewCompatIcs.newSearchView(context);
-        }
-
-        public void setImeOptions(View view, int i) {
-            checkIfLegalArg(view);
-            SearchViewCompatIcs.setImeOptions(view, i);
-        }
-
-        public void setInputType(View view, int i) {
-            checkIfLegalArg(view);
-            SearchViewCompatIcs.setInputType(view, i);
-        }
-    }
-
-    static {
-        if (VERSION.SDK_INT >= 14) {
-            IMPL = new SearchViewCompatIcsImpl();
-        } else if (VERSION.SDK_INT >= 11) {
-            IMPL = new SearchViewCompatHoneycombImpl();
-        } else {
-            IMPL = new SearchViewCompatStubImpl();
-        }
-    }
-
     private SearchViewCompat(Context context) {
     }
 
+    private static void checkIfLegalArg(View view) {
+        if (view == null) {
+            throw new IllegalArgumentException("searchView must be non-null");
+        } else if (!(view instanceof SearchView)) {
+            throw new IllegalArgumentException("searchView must be an instance of android.widget.SearchView");
+        }
+    }
+
+    @Deprecated
     public static CharSequence getQuery(View view) {
-        return IMPL.getQuery(view);
+        checkIfLegalArg(view);
+        return ((SearchView) view).getQuery();
     }
 
+    @Deprecated
     public static boolean isIconified(View view) {
-        return IMPL.isIconified(view);
+        checkIfLegalArg(view);
+        return ((SearchView) view).isIconified();
     }
 
+    @Deprecated
     public static boolean isQueryRefinementEnabled(View view) {
-        return IMPL.isQueryRefinementEnabled(view);
+        checkIfLegalArg(view);
+        return ((SearchView) view).isQueryRefinementEnabled();
     }
 
+    @Deprecated
     public static boolean isSubmitButtonEnabled(View view) {
-        return IMPL.isSubmitButtonEnabled(view);
+        checkIfLegalArg(view);
+        return ((SearchView) view).isSubmitButtonEnabled();
     }
 
+    private static android.widget.SearchView.OnCloseListener newOnCloseListener(final OnCloseListener onCloseListener) {
+        return new android.widget.SearchView.OnCloseListener() {
+            public boolean onClose() {
+                return onCloseListener.onClose();
+            }
+        };
+    }
+
+    private static android.widget.SearchView.OnQueryTextListener newOnQueryTextListener(final OnQueryTextListener onQueryTextListener) {
+        return new android.widget.SearchView.OnQueryTextListener() {
+            public boolean onQueryTextChange(String str) {
+                return onQueryTextListener.onQueryTextChange(str);
+            }
+
+            public boolean onQueryTextSubmit(String str) {
+                return onQueryTextListener.onQueryTextSubmit(str);
+            }
+        };
+    }
+
+    @Deprecated
     public static View newSearchView(Context context) {
-        return IMPL.newSearchView(context);
+        return new SearchView(context);
     }
 
+    @Deprecated
     public static void setIconified(View view, boolean z) {
-        IMPL.setIconified(view, z);
+        checkIfLegalArg(view);
+        ((SearchView) view).setIconified(z);
     }
 
+    @Deprecated
     public static void setImeOptions(View view, int i) {
-        IMPL.setImeOptions(view, i);
+        checkIfLegalArg(view);
+        ((SearchView) view).setImeOptions(i);
     }
 
+    @Deprecated
     public static void setInputType(View view, int i) {
-        IMPL.setInputType(view, i);
+        checkIfLegalArg(view);
+        ((SearchView) view).setInputType(i);
     }
 
+    @Deprecated
     public static void setMaxWidth(View view, int i) {
-        IMPL.setMaxWidth(view, i);
+        checkIfLegalArg(view);
+        ((SearchView) view).setMaxWidth(i);
     }
 
+    @Deprecated
     public static void setOnCloseListener(View view, OnCloseListener onCloseListener) {
-        IMPL.setOnCloseListener(view, onCloseListener);
+        checkIfLegalArg(view);
+        ((SearchView) view).setOnCloseListener(newOnCloseListener(onCloseListener));
     }
 
+    @Deprecated
     public static void setOnQueryTextListener(View view, OnQueryTextListener onQueryTextListener) {
-        IMPL.setOnQueryTextListener(view, onQueryTextListener);
+        checkIfLegalArg(view);
+        ((SearchView) view).setOnQueryTextListener(newOnQueryTextListener(onQueryTextListener));
     }
 
+    @Deprecated
     public static void setQuery(View view, CharSequence charSequence, boolean z) {
-        IMPL.setQuery(view, charSequence, z);
+        checkIfLegalArg(view);
+        ((SearchView) view).setQuery(charSequence, z);
     }
 
+    @Deprecated
     public static void setQueryHint(View view, CharSequence charSequence) {
-        IMPL.setQueryHint(view, charSequence);
+        checkIfLegalArg(view);
+        ((SearchView) view).setQueryHint(charSequence);
     }
 
+    @Deprecated
     public static void setQueryRefinementEnabled(View view, boolean z) {
-        IMPL.setQueryRefinementEnabled(view, z);
+        checkIfLegalArg(view);
+        ((SearchView) view).setQueryRefinementEnabled(z);
     }
 
+    @Deprecated
     public static void setSearchableInfo(View view, ComponentName componentName) {
-        IMPL.setSearchableInfo(view, componentName);
+        checkIfLegalArg(view);
+        ((SearchView) view).setSearchableInfo(((SearchManager) view.getContext().getSystemService(Event.SEARCH)).getSearchableInfo(componentName));
     }
 
+    @Deprecated
     public static void setSubmitButtonEnabled(View view, boolean z) {
-        IMPL.setSubmitButtonEnabled(view, z);
+        checkIfLegalArg(view);
+        ((SearchView) view).setSubmitButtonEnabled(z);
     }
 }

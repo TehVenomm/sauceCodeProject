@@ -19,8 +19,6 @@ public class TweenTransform : UITweener
 
 	protected override void OnUpdate(float factor, bool isFinished)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
 		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
@@ -88,12 +86,12 @@ public class TweenTransform : UITweener
 
 	public static TweenTransform Begin(GameObject go, float duration, Transform from, Transform to)
 	{
-		TweenTransform tweenTransform = UITweener.Begin<TweenTransform>(go, duration, true);
+		TweenTransform tweenTransform = UITweener.Begin<TweenTransform>(go, duration);
 		tweenTransform.from = from;
 		tweenTransform.to = to;
 		if (duration <= 0f)
 		{
-			tweenTransform.Sample(1f, true);
+			tweenTransform.Sample(1f, isFinished: true);
 			tweenTransform.set_enabled(false);
 		}
 		return tweenTransform;

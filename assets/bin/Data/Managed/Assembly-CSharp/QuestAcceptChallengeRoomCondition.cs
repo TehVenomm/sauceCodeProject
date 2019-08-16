@@ -24,12 +24,17 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 		BTN_SOIL,
 		BTN_LIGHT,
 		BTN_DARK,
+		BTN_NO_ELEMENT,
 		POP_TARGET_MIN_LEVEL,
 		POP_TARGET_MAX_LEVEL,
 		LBL_TARGET_MIN_LEVEL,
 		LBL_TARGET_MAX_LEVEL,
 		OBJ_SEARCH,
 		OBJ_MY_SEARCH,
+		OBJ_FRAME,
+		PRIORITY_ROOT,
+		TGL_BTN_FRIEND,
+		TGL_BTN_CLAN,
 		POP_TARGET_LEVEL,
 		LBL_TARGET_LEVEL
 	}
@@ -156,7 +161,7 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 	{
 		if (levelPopup == null)
 		{
-			levelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LEVEL), false);
+			levelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LEVEL), check_panel: false);
 		}
 		if (!(levelPopup == null))
 		{
@@ -166,7 +171,7 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 				array[i] = (i <= maxLevelIndex);
 			}
 			int enemyLevelIndex = challengeRequest.enemyLevelIndex;
-			UIScrollablePopupList.CreatePopup(levelPopup, GetCtrl(UI.POP_TARGET_LEVEL), 5, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, enemyLevelNames.ToArray(), array, enemyLevelIndex, delegate(int index)
+			UIScrollablePopupList.CreatePopup(levelPopup, GetCtrl(UI.POP_TARGET_LEVEL), 5, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, enemyLevelNames.ToArray(), array, enemyLevelIndex, delegate(int index)
 			{
 				challengeRequest.enemyLevelIndex = index;
 				challengeRequest.enemyLevel = enemyLevelList[index];
@@ -180,18 +185,17 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 		FixBit();
 		if (challengeRequest.rarityBit == 0)
 		{
-			GameSection.ChangeEvent("NOT_RARITY", null);
+			GameSection.ChangeEvent("NOT_RARITY");
+			return;
 		}
-		else if (challengeRequest.elementBit == 0)
+		if (challengeRequest.elementBit == 0)
 		{
-			GameSection.ChangeEvent("NOT_ELEMENT", null);
+			GameSection.ChangeEvent("NOT_ELEMENT");
+			return;
 		}
-		else
-		{
-			challengeRequest.order = 1;
-			GameSection.SetEventData(challengeRequest);
-			base.OnQuery_SEARCH();
-		}
+		challengeRequest.order = 1;
+		GameSection.SetEventData(challengeRequest);
+		base.OnQuery_SEARCH();
 	}
 
 	protected override void SendSearch()
@@ -203,8 +207,8 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 			{
 				OnNotFoundQuest();
 			}
-			GameSection.ResumeEvent(true, null);
-		}, true);
+			GameSection.ResumeEvent(is_resume: true);
+		}, isSave: true);
 	}
 
 	protected override void OnQuery_SPECIES_SEARCH_REQUEST()

@@ -1,5 +1,6 @@
 package com.google.android.gms.drive;
 
+@Deprecated
 public interface FileUploadPreferences {
     public static final int BATTERY_USAGE_CHARGING_ONLY = 257;
     public static final int BATTERY_USAGE_UNRESTRICTED = 256;

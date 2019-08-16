@@ -131,13 +131,13 @@ public class ItemSortData : SortCompareData
 	public override uint GetMainorSortWeight()
 	{
 		uint num = 0u;
-		if (itemData.tableData.type != ITEM_TYPE.ABILITY_ITEM)
+		if (itemData.tableData.type == ITEM_TYPE.ABILITY_ITEM)
 		{
-			return GetTableID();
+			uint num2 = ElementTypeToMinorSortValue(GetIconElement());
+			num += num2 << 6;
+			uint rarity = (uint)GetRarity();
+			return num + (rarity << 0);
 		}
-		uint num2 = ElementTypeToMinorSortValue(GetIconElement());
-		num += num2 << 6;
-		uint rarity = (uint)GetRarity();
-		return num + rarity;
+		return GetTableID();
 	}
 }

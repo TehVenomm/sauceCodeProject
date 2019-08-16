@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackColliderObject : IAttackCollider
+public class AttackColliderObject : MonoBehaviour, IAttackCollider
 {
 	private StageObject m_attacker;
 
@@ -30,9 +30,6 @@ public class AttackColliderObject : IAttackCollider
 
 	public void Initialize(StageObject attacker, Transform parent, AttackInfo atkInfo, Vector3 pos, Vector3 rot, float radius, float height, int attackLayer)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
@@ -42,11 +39,11 @@ public class AttackColliderObject : IAttackCollider
 		this.get_gameObject().set_layer(attackLayer);
 		m_attacker = attacker;
 		m_attackInfo = atkInfo;
-		Transform val = this.get_transform();
-		val.set_parent(parent);
-		val.set_localEulerAngles(rot);
-		val.set_localPosition(val.get_localRotation() * pos);
-		val.set_localScale(Vector3.get_one());
+		Transform transform = this.get_transform();
+		transform.set_parent(parent);
+		transform.set_localEulerAngles(rot);
+		transform.set_localPosition(transform.get_localRotation() * pos);
+		transform.set_localScale(Vector3.get_one());
 		m_capsule.set_direction(2);
 		m_capsule.set_radius(radius);
 		m_capsule.set_height(height);
@@ -56,16 +53,41 @@ public class AttackColliderObject : IAttackCollider
 		m_timeCount = 0f;
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
-			m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_attackInfo, attacker, m_capsule, this, Player.ATTACK_MODE.NONE, null);
+			m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_attackInfo, attacker, m_capsule, this);
+			m_attackHitChecker = attacker.ReferenceAttackHitChecker();
+		}
+	}
+
+	public void Initialize(StageObject attacker, Transform parent, AttackInfo atkInfo, Vector3 pos, Vector3 rot, float radius, float height, int direction, Vector3 center, int attackLayer)
+	{
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		this.get_gameObject().set_layer(attackLayer);
+		m_attacker = attacker;
+		m_attackInfo = atkInfo;
+		Transform transform = this.get_transform();
+		transform.set_parent(parent);
+		transform.set_localEulerAngles(rot);
+		transform.set_localPosition(pos);
+		transform.set_localScale(Vector3.get_one());
+		m_capsule.set_direction(direction);
+		m_capsule.set_radius(radius);
+		m_capsule.set_height(height);
+		m_capsule.set_enabled(true);
+		m_capsule.set_center(center);
+		m_capsule.set_isTrigger(true);
+		m_timeCount = 0f;
+		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
+		{
+			m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_attackInfo, attacker, m_capsule, this);
 			m_attackHitChecker = attacker.ReferenceAttackHitChecker();
 		}
 	}
 
 	public void InitializeForExAtkCollider(StageObject attacker, Transform parent, AttackInfo atkInfo, Vector3 pos, Vector3 rot, float radius, float height, int attackLayer)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
@@ -73,11 +95,11 @@ public class AttackColliderObject : IAttackCollider
 		this.get_gameObject().set_layer(attackLayer);
 		m_attacker = attacker;
 		m_attackInfo = atkInfo;
-		Transform val = this.get_transform();
-		val.set_parent(parent);
-		val.set_localEulerAngles(rot);
-		val.set_localPosition(pos);
-		val.set_localScale(Vector3.get_one());
+		Transform transform = this.get_transform();
+		transform.set_parent(parent);
+		transform.set_localEulerAngles(rot);
+		transform.set_localPosition(pos);
+		transform.set_localScale(Vector3.get_one());
 		m_capsule.set_direction(2);
 		m_capsule.set_radius(radius);
 		m_capsule.set_height(height);
@@ -87,18 +109,24 @@ public class AttackColliderObject : IAttackCollider
 		m_timeCount = 0f;
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
-			m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_attackInfo, attacker, m_capsule, this, Player.ATTACK_MODE.NONE, null);
+			m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_attackInfo, attacker, m_capsule, this);
 			m_attackHitChecker = attacker.ReferenceAttackHitChecker();
+		}
+		if (m_colliderProcessor != null && m_attackInfo != null)
+		{
+			AttackHitInfo attackHitInfo = m_attackInfo as AttackHitInfo;
+			if (attackHitInfo != null && attackHitInfo.isValidTriggerStay)
+			{
+				m_colliderProcessor.ValidTriggerStay();
+				m_colliderProcessor.ValidMultiHitInterval();
+			}
 		}
 	}
 
 	public virtual void Destroy()
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 		if (m_rigidBody != null)
 		{
 			m_rigidBody.Sleep();
@@ -108,7 +136,7 @@ public class AttackColliderObject : IAttackCollider
 			BulletData bulletData = m_attackInfo.bulletData;
 			if (bulletData != null && !string.IsNullOrEmpty(bulletData.data.landHiteffectName))
 			{
-				Transform effect = EffectManager.GetEffect(bulletData.data.landHiteffectName, null);
+				Transform effect = EffectManager.GetEffect(bulletData.data.landHiteffectName);
 				if (effect != null)
 				{
 					effect.set_position(this.get_transform().get_position());
@@ -121,10 +149,12 @@ public class AttackColliderObject : IAttackCollider
 
 	protected void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		m_capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
-		m_rigidBody = this.get_gameObject().AddComponent<Rigidbody>();
+		m_rigidBody = this.get_gameObject().GetComponent<Rigidbody>();
+		if (m_rigidBody == null)
+		{
+			m_rigidBody = this.get_gameObject().AddComponent<Rigidbody>();
+		}
 		m_rigidBody.set_useGravity(false);
 	}
 

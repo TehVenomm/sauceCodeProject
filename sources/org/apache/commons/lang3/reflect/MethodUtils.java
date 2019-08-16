@@ -1,11 +1,9 @@
 package org.apache.commons.lang3.reflect;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -29,7 +27,7 @@ public class MethodUtils {
     }
 
     public static Object invokeMethod(Object obj, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Class[] nullToEmpty = ArrayUtils.nullToEmpty((Class[]) clsArr);
+        Class[] nullToEmpty = ArrayUtils.nullToEmpty(clsArr);
         Object[] nullToEmpty2 = ArrayUtils.nullToEmpty(objArr);
         Method matchingAccessibleMethod = getMatchingAccessibleMethod(obj.getClass(), str, nullToEmpty);
         if (matchingAccessibleMethod != null) {
@@ -49,7 +47,7 @@ public class MethodUtils {
 
     public static Object invokeExactMethod(Object obj, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Method accessibleMethod = getAccessibleMethod(obj.getClass(), str, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Method accessibleMethod = getAccessibleMethod(obj.getClass(), str, ArrayUtils.nullToEmpty(clsArr));
         if (accessibleMethod != null) {
             return accessibleMethod.invoke(obj, nullToEmpty);
         }
@@ -58,7 +56,7 @@ public class MethodUtils {
 
     public static Object invokeExactStaticMethod(Class<?> cls, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Method accessibleMethod = getAccessibleMethod(cls, str, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Method accessibleMethod = getAccessibleMethod(cls, str, ArrayUtils.nullToEmpty(clsArr));
         if (accessibleMethod != null) {
             return accessibleMethod.invoke(null, nullToEmpty);
         }
@@ -72,7 +70,7 @@ public class MethodUtils {
 
     public static Object invokeStaticMethod(Class<?> cls, String str, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Method matchingAccessibleMethod = getMatchingAccessibleMethod(cls, str, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Method matchingAccessibleMethod = getMatchingAccessibleMethod(cls, str, ArrayUtils.nullToEmpty(clsArr));
         if (matchingAccessibleMethod != null) {
             return matchingAccessibleMethod.invoke(null, nullToEmpty);
         }
@@ -115,9 +113,9 @@ public class MethodUtils {
         while (superclass != null) {
             if (Modifier.isPublic(superclass.getModifiers())) {
                 try {
-                    method = superclass.getMethod(str, clsArr);
-                    break;
+                    return superclass.getMethod(str, clsArr);
                 } catch (NoSuchMethodException e) {
+                    return method;
                 }
             } else {
                 superclass = superclass.getSuperclass();
@@ -147,18 +145,18 @@ public class MethodUtils {
     }
 
     public static Method getMatchingAccessibleMethod(Class<?> cls, String str, Class<?>... clsArr) {
+        Method[] methods;
         try {
-            AccessibleObject method = cls.getMethod(str, clsArr);
+            Method method = cls.getMethod(str, clsArr);
             MemberUtils.setAccessibleWorkaround(method);
             return method;
         } catch (NoSuchMethodException e) {
             Method method2 = null;
             for (Method method3 : cls.getMethods()) {
-                Method method32;
-                if (method32.getName().equals(str) && ClassUtils.isAssignable((Class[]) clsArr, method32.getParameterTypes(), true)) {
-                    method32 = getAccessibleMethod(method32);
-                    if (method32 != null && (method2 == null || MemberUtils.compareParameterTypes(method32.getParameterTypes(), method2.getParameterTypes(), clsArr) < 0)) {
-                        method2 = method32;
+                if (method3.getName().equals(str) && ClassUtils.isAssignable(clsArr, (Class<?>[]) method3.getParameterTypes(), true)) {
+                    Method accessibleMethod = getAccessibleMethod(method3);
+                    if (accessibleMethod != null && (method2 == null || MemberUtils.compareParameterTypes(accessibleMethod.getParameterTypes(), method2.getParameterTypes(), clsArr) < 0)) {
+                        method2 = accessibleMethod;
                     }
                 }
             }
@@ -172,24 +170,30 @@ public class MethodUtils {
 
     public static Set<Method> getOverrideHierarchy(Method method, Interfaces interfaces) {
         Validate.notNull(method);
-        Set<Method> linkedHashSet = new LinkedHashSet();
+        LinkedHashSet linkedHashSet = new LinkedHashSet();
         linkedHashSet.add(method);
         Class[] parameterTypes = method.getParameterTypes();
-        Type declaringClass = method.getDeclaringClass();
+        Class declaringClass = method.getDeclaringClass();
         Iterator it = ClassUtils.hierarchy(declaringClass, interfaces).iterator();
         it.next();
         while (it.hasNext()) {
             Method matchingAccessibleMethod = getMatchingAccessibleMethod((Class) it.next(), method.getName(), parameterTypes);
             if (matchingAccessibleMethod != null) {
-                if (Arrays.equals(matchingAccessibleMethod.getParameterTypes(), parameterTypes)) {
-                    linkedHashSet.add(matchingAccessibleMethod);
-                } else {
+                if (!Arrays.equals(matchingAccessibleMethod.getParameterTypes(), parameterTypes)) {
                     Map typeArguments = TypeUtils.getTypeArguments(declaringClass, matchingAccessibleMethod.getDeclaringClass());
-                    for (int i = 0; i < parameterTypes.length; i++) {
-                        if (!TypeUtils.equals(TypeUtils.unrollVariables(typeArguments, method.getGenericParameterTypes()[i]), TypeUtils.unrollVariables(typeArguments, matchingAccessibleMethod.getGenericParameterTypes()[i]))) {
+                    int i = 0;
+                    while (true) {
+                        if (i < parameterTypes.length) {
+                            if (!TypeUtils.equals(TypeUtils.unrollVariables(typeArguments, method.getGenericParameterTypes()[i]), TypeUtils.unrollVariables(typeArguments, matchingAccessibleMethod.getGenericParameterTypes()[i]))) {
+                                break;
+                            }
+                            i++;
+                        } else {
+                            linkedHashSet.add(matchingAccessibleMethod);
                             break;
                         }
                     }
+                } else {
                     linkedHashSet.add(matchingAccessibleMethod);
                 }
             }
@@ -205,7 +209,6 @@ public class MethodUtils {
     public static List<Method> getMethodsListWithAnnotation(Class<?> cls, Class<? extends Annotation> cls2) {
         boolean z;
         boolean z2 = true;
-        int i = 0;
         if (cls != null) {
             z = true;
         } else {
@@ -217,14 +220,11 @@ public class MethodUtils {
         }
         Validate.isTrue(z2, "The annotation class must not be null", new Object[0]);
         Method[] methods = cls.getMethods();
-        List<Method> arrayList = new ArrayList();
-        int length = methods.length;
-        while (i < length) {
-            Method method = methods[i];
+        ArrayList arrayList = new ArrayList();
+        for (Method method : methods) {
             if (method.getAnnotation(cls2) != null) {
                 arrayList.add(method);
             }
-            i++;
         }
         return arrayList;
     }

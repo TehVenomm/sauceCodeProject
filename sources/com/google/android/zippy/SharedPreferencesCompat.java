@@ -12,8 +12,7 @@ public class SharedPreferencesCompat {
             try {
                 sApplyMethod.invoke(editor, new Object[0]);
                 return;
-            } catch (InvocationTargetException e) {
-            } catch (IllegalAccessException e2) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
             }
         }
         editor.commit();

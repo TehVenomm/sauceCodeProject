@@ -42,7 +42,7 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
     }
 
     public BeanDeserializer(BeanDeserializerBase beanDeserializerBase, HashSet<String> hashSet) {
-        super(beanDeserializerBase, (HashSet) hashSet);
+        super(beanDeserializerBase, hashSet);
     }
 
     public JsonDeserializer<Object> unwrappingDeserializer(NameTransformer nameTransformer) {
@@ -54,10 +54,11 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
     }
 
     public BeanDeserializer withIgnorableProperties(HashSet<String> hashSet) {
-        return new BeanDeserializer((BeanDeserializerBase) this, (HashSet) hashSet);
+        return new BeanDeserializer((BeanDeserializerBase) this, hashSet);
     }
 
-    protected BeanDeserializerBase asArrayDeserializer() {
+    /* access modifiers changed from: protected */
+    public BeanDeserializerBase asArrayDeserializer() {
         return new BeanAsArrayDeserializer(this, this._beanProperties.getPropertiesInInsertionOrder());
     }
 
@@ -75,7 +76,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         return deserializeFromObject(jsonParser, deserializationContext);
     }
 
-    protected final Object _deserializeOther(JsonParser jsonParser, DeserializationContext deserializationContext, JsonToken jsonToken) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Object _deserializeOther(JsonParser jsonParser, DeserializationContext deserializationContext, JsonToken jsonToken) throws IOException {
         switch (jsonToken) {
             case VALUE_STRING:
                 return deserializeFromString(jsonParser, deserializationContext);
@@ -106,12 +108,13 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         }
     }
 
-    protected Object _missingToken(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _missingToken(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         throw deserializationContext.endOfInputException(handledType());
     }
 
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
-        String nextFieldName;
+        String currentName;
         jsonParser.setCurrentValue(obj);
         if (this._injectables != null) {
             injectValues(deserializationContext, obj);
@@ -123,14 +126,14 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
             return deserializeWithExternalTypeId(jsonParser, deserializationContext, obj);
         }
         if (jsonParser.isExpectedStartObjectToken()) {
-            nextFieldName = jsonParser.nextFieldName();
-            if (nextFieldName == null) {
+            currentName = jsonParser.nextFieldName();
+            if (currentName == null) {
                 return obj;
             }
         } else if (!jsonParser.hasTokenId(5)) {
             return obj;
         } else {
-            nextFieldName = jsonParser.getCurrentName();
+            currentName = jsonParser.getCurrentName();
         }
         if (this._needViewProcesing) {
             Class activeView = deserializationContext.getActiveView();
@@ -140,18 +143,18 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         }
         do {
             jsonParser.nextToken();
-            SettableBeanProperty find = this._beanProperties.find(nextFieldName);
+            SettableBeanProperty find = this._beanProperties.find(currentName);
             if (find != null) {
                 try {
                     find.deserializeAndSet(jsonParser, deserializationContext, obj);
-                } catch (Throwable e) {
-                    wrapAndThrow(e, obj, nextFieldName, deserializationContext);
+                } catch (Exception e) {
+                    wrapAndThrow((Throwable) e, obj, currentName, deserializationContext);
                 }
             } else {
-                handleUnknownVanilla(jsonParser, deserializationContext, obj, nextFieldName);
+                handleUnknownVanilla(jsonParser, deserializationContext, obj, currentName);
             }
-            nextFieldName = jsonParser.nextFieldName();
-        } while (nextFieldName != null);
+            currentName = jsonParser.nextFieldName();
+        } while (currentName != null);
         return obj;
     }
 
@@ -166,8 +169,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                 if (find != null) {
                     try {
                         find.deserializeAndSet(jsonParser, deserializationContext, createUsingDefault);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, createUsingDefault, currentName, deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, createUsingDefault, currentName, deserializationContext);
                     }
                 } else {
                     handleUnknownVanilla(jsonParser, deserializationContext, createUsingDefault, currentName);
@@ -182,12 +185,11 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         if (this._objectIdReader != null && this._objectIdReader.maySerializeAsObject() && jsonParser.hasTokenId(5) && this._objectIdReader.isValidReferencePropertyName(jsonParser.getCurrentName(), jsonParser)) {
             return deserializeFromObjectId(jsonParser, deserializationContext);
         }
-        Object objectId;
         if (!this._nonStandardCreation) {
             Object createUsingDefault = this._valueInstantiator.createUsingDefault(deserializationContext);
             jsonParser.setCurrentValue(createUsingDefault);
             if (jsonParser.canReadObjectId()) {
-                objectId = jsonParser.getObjectId();
+                Object objectId = jsonParser.getObjectId();
                 if (objectId != null) {
                     _handleTypedObjectId(jsonParser, deserializationContext, createUsingDefault, objectId);
                 }
@@ -209,8 +211,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                     if (find != null) {
                         try {
                             find.deserializeAndSet(jsonParser, deserializationContext, createUsingDefault);
-                        } catch (Throwable e) {
-                            wrapAndThrow(e, createUsingDefault, currentName, deserializationContext);
+                        } catch (Exception e) {
+                            wrapAndThrow((Throwable) e, createUsingDefault, currentName, deserializationContext);
                         }
                     } else {
                         handleUnknownVanilla(jsonParser, deserializationContext, createUsingDefault, currentName);
@@ -225,17 +227,20 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
             if (this._externalTypeIdHandler != null) {
                 return deserializeWithExternalTypeId(jsonParser, deserializationContext);
             }
-            objectId = deserializeFromObjectUsingNonDefault(jsonParser, deserializationContext);
+            Object deserializeFromObjectUsingNonDefault = deserializeFromObjectUsingNonDefault(jsonParser, deserializationContext);
             if (this._injectables == null) {
-                return objectId;
+                return deserializeFromObjectUsingNonDefault;
             }
-            injectValues(deserializationContext, objectId);
-            return objectId;
+            injectValues(deserializationContext, deserializeFromObjectUsingNonDefault);
+            return deserializeFromObjectUsingNonDefault;
         }
     }
 
-    protected Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Object build;
+    /* access modifiers changed from: protected */
+    public Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Object obj;
+        Object obj2;
+        Object obj3;
         PropertyBasedCreator propertyBasedCreator = this._propertyBasedCreator;
         PropertyValueBuffer startBuilding = propertyBasedCreator.startBuilding(jsonParser, deserializationContext, this._objectIdReader);
         JsonToken currentToken = jsonParser.getCurrentToken();
@@ -248,37 +253,36 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                 if (startBuilding.assignParameter(findCreatorProperty, _deserializeWithErrorWrapping(jsonParser, deserializationContext, findCreatorProperty))) {
                     jsonParser.nextToken();
                     try {
-                        build = propertyBasedCreator.build(deserializationContext, startBuilding);
-                    } catch (Throwable e) {
+                        obj2 = propertyBasedCreator.build(deserializationContext, startBuilding);
+                    } catch (Exception e) {
                         wrapInstantiationProblem(e, deserializationContext);
-                        build = null;
+                        obj2 = null;
                     }
-                    if (build == null) {
+                    if (obj2 == null) {
                         throw deserializationContext.instantiationException(this._beanType.getRawClass(), "JSON Creator returned null");
                     }
-                    jsonParser.setCurrentValue(build);
-                    if (build.getClass() != this._beanType.getRawClass()) {
-                        return handlePolymorphic(jsonParser, deserializationContext, build, tokenBuffer);
+                    jsonParser.setCurrentValue(obj2);
+                    if (obj2.getClass() != this._beanType.getRawClass()) {
+                        return handlePolymorphic(jsonParser, deserializationContext, obj2, tokenBuffer);
                     }
-                    Object handleUnknownProperties;
                     if (tokenBuffer != null) {
-                        handleUnknownProperties = handleUnknownProperties(deserializationContext, build, tokenBuffer);
+                        obj3 = handleUnknownProperties(deserializationContext, obj2, tokenBuffer);
                     } else {
-                        handleUnknownProperties = build;
+                        obj3 = obj2;
                     }
-                    return deserialize(jsonParser, deserializationContext, handleUnknownProperties);
+                    return deserialize(jsonParser, deserializationContext, obj3);
                 }
             } else if (!startBuilding.readIdProperty(currentName)) {
-                findCreatorProperty = this._beanProperties.find(currentName);
-                if (findCreatorProperty != null) {
-                    startBuilding.bufferProperty(findCreatorProperty, _deserializeWithErrorWrapping(jsonParser, deserializationContext, findCreatorProperty));
+                SettableBeanProperty find = this._beanProperties.find(currentName);
+                if (find != null) {
+                    startBuilding.bufferProperty(find, _deserializeWithErrorWrapping(jsonParser, deserializationContext, find));
                 } else if (this._ignorableProps != null && this._ignorableProps.contains(currentName)) {
                     handleIgnoredProperty(jsonParser, deserializationContext, handledType(), currentName);
                 } else if (this._anySetter != null) {
                     try {
                         startBuilding.bufferAnyProperty(this._anySetter, currentName, this._anySetter.deserialize(jsonParser, deserializationContext));
-                    } catch (Throwable e2) {
-                        wrapAndThrow(e2, (Object) this._beanType.getRawClass(), currentName, deserializationContext);
+                    } catch (Exception e2) {
+                        wrapAndThrow((Throwable) e2, (Object) this._beanType.getRawClass(), currentName, deserializationContext);
                     }
                 } else {
                     if (tokenBuffer == null) {
@@ -291,43 +295,46 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
             currentToken = jsonParser.nextToken();
         }
         try {
-            build = propertyBasedCreator.build(deserializationContext, startBuilding);
-        } catch (Throwable e22) {
-            wrapInstantiationProblem(e22, deserializationContext);
-            build = null;
+            obj = propertyBasedCreator.build(deserializationContext, startBuilding);
+        } catch (Exception e3) {
+            wrapInstantiationProblem(e3, deserializationContext);
+            obj = null;
         }
         if (tokenBuffer == null) {
-            return build;
+            return obj;
         }
-        if (build.getClass() != this._beanType.getRawClass()) {
-            return handlePolymorphic(null, deserializationContext, build, tokenBuffer);
+        if (obj.getClass() != this._beanType.getRawClass()) {
+            return handlePolymorphic(null, deserializationContext, obj, tokenBuffer);
         }
-        return handleUnknownProperties(deserializationContext, build, tokenBuffer);
+        return handleUnknownProperties(deserializationContext, obj, tokenBuffer);
     }
 
-    protected final Object _deserializeWithErrorWrapping(JsonParser jsonParser, DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Object _deserializeWithErrorWrapping(JsonParser jsonParser, DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) throws IOException {
         try {
             return settableBeanProperty.deserialize(jsonParser, deserializationContext);
-        } catch (Throwable e) {
-            wrapAndThrow(e, (Object) this._beanType.getRawClass(), settableBeanProperty.getName(), deserializationContext);
+        } catch (Exception e) {
+            wrapAndThrow((Throwable) e, (Object) this._beanType.getRawClass(), settableBeanProperty.getName(), deserializationContext);
             return null;
         }
     }
 
-    protected Object deserializeFromNull(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeFromNull(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (jsonParser.requiresCustomCodec()) {
             TokenBuffer tokenBuffer = new TokenBuffer(jsonParser, deserializationContext);
             tokenBuffer.writeEndObject();
             JsonParser asParser = tokenBuffer.asParser(jsonParser);
             asParser.nextToken();
-            Object vanillaDeserialize = this._vanillaProcessing ? vanillaDeserialize(asParser, deserializationContext, JsonToken.END_OBJECT) : deserializeFromObject(asParser, deserializationContext);
+            Object deserializeFromObject = this._vanillaProcessing ? vanillaDeserialize(asParser, deserializationContext, JsonToken.END_OBJECT) : deserializeFromObject(asParser, deserializationContext);
             asParser.close();
-            return vanillaDeserialize;
+            return deserializeFromObject;
         }
         throw deserializationContext.mappingException(handledType());
     }
 
-    protected final Object deserializeWithView(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, Class<?> cls) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Object deserializeWithView(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, Class<?> cls) throws IOException {
         if (jsonParser.hasTokenId(5)) {
             String currentName = jsonParser.getCurrentName();
             do {
@@ -335,14 +342,14 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                 SettableBeanProperty find = this._beanProperties.find(currentName);
                 if (find == null) {
                     handleUnknownVanilla(jsonParser, deserializationContext, obj, currentName);
-                } else if (find.visibleInView(cls)) {
+                } else if (!find.visibleInView(cls)) {
+                    jsonParser.skipChildren();
+                } else {
                     try {
                         find.deserializeAndSet(jsonParser, deserializationContext, obj);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, obj, currentName, deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, obj, currentName, deserializationContext);
                     }
-                } else {
-                    jsonParser.skipChildren();
                 }
                 currentName = jsonParser.nextFieldName();
             } while (currentName != null);
@@ -350,7 +357,9 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         return obj;
     }
 
-    protected Object deserializeWithUnwrapped(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeWithUnwrapped(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Class cls;
         String str = null;
         if (this._delegateDeserializer != null) {
             return this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
@@ -358,7 +367,6 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         if (this._propertyBasedCreator != null) {
             return deserializeUsingPropertyBasedWithUnwrapped(jsonParser, deserializationContext);
         }
-        Class activeView;
         TokenBuffer tokenBuffer = new TokenBuffer(jsonParser, deserializationContext);
         tokenBuffer.writeStartObject();
         Object createUsingDefault = this._valueInstantiator.createUsingDefault(deserializationContext);
@@ -367,9 +375,9 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
             injectValues(deserializationContext, createUsingDefault);
         }
         if (this._needViewProcesing) {
-            activeView = deserializationContext.getActiveView();
+            cls = deserializationContext.getActiveView();
         } else {
-            activeView = null;
+            cls = null;
         }
         if (jsonParser.hasTokenId(5)) {
             str = jsonParser.getCurrentName();
@@ -379,11 +387,11 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
             jsonParser.nextToken();
             SettableBeanProperty find = this._beanProperties.find(str2);
             if (find != null) {
-                if (activeView == null || find.visibleInView(activeView)) {
+                if (cls == null || find.visibleInView(cls)) {
                     try {
                         find.deserializeAndSet(jsonParser, deserializationContext, createUsingDefault);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, createUsingDefault, str2, deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, createUsingDefault, str2, deserializationContext);
                     }
                 } else {
                     jsonParser.skipChildren();
@@ -394,8 +402,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                 if (this._anySetter != null) {
                     try {
                         this._anySetter.deserializeAndSet(jsonParser, deserializationContext, createUsingDefault, str2);
-                    } catch (Throwable e2) {
-                        wrapAndThrow(e2, createUsingDefault, str2, deserializationContext);
+                    } catch (Exception e2) {
+                        wrapAndThrow((Throwable) e2, createUsingDefault, str2, deserializationContext);
                     }
                 }
             } else {
@@ -408,7 +416,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         return createUsingDefault;
     }
 
-    protected Object deserializeWithUnwrapped(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeWithUnwrapped(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
         JsonToken currentToken = jsonParser.getCurrentToken();
         if (currentToken == JsonToken.START_OBJECT) {
             currentToken = jsonParser.nextToken();
@@ -424,8 +433,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                 if (activeView == null || find.visibleInView(activeView)) {
                     try {
                         find.deserializeAndSet(jsonParser, deserializationContext, obj);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, obj, currentName, deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, obj, currentName, deserializationContext);
                     }
                 } else {
                     jsonParser.skipChildren();
@@ -446,7 +455,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         return obj;
     }
 
-    protected Object deserializeUsingPropertyBasedWithUnwrapped(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeUsingPropertyBasedWithUnwrapped(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         PropertyBasedCreator propertyBasedCreator = this._propertyBasedCreator;
         PropertyValueBuffer startBuilding = propertyBasedCreator.startBuilding(jsonParser, deserializationContext, this._objectIdReader);
         TokenBuffer tokenBuffer = new TokenBuffer(jsonParser, deserializationContext);
@@ -458,14 +468,14 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
             SettableBeanProperty findCreatorProperty = propertyBasedCreator.findCreatorProperty(currentName);
             if (findCreatorProperty != null) {
                 if (startBuilding.assignParameter(findCreatorProperty, _deserializeWithErrorWrapping(jsonParser, deserializationContext, findCreatorProperty))) {
-                    currentToken = jsonParser.nextToken();
+                    JsonToken nextToken = jsonParser.nextToken();
                     try {
                         Object build = propertyBasedCreator.build(deserializationContext, startBuilding);
                         jsonParser.setCurrentValue(build);
-                        while (currentToken == JsonToken.FIELD_NAME) {
+                        while (nextToken == JsonToken.FIELD_NAME) {
                             jsonParser.nextToken();
                             tokenBuffer.copyCurrentStructure(jsonParser);
-                            currentToken = jsonParser.nextToken();
+                            nextToken = jsonParser.nextToken();
                         }
                         tokenBuffer.writeEndObject();
                         if (build.getClass() == this._beanType.getRawClass()) {
@@ -473,24 +483,24 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                         }
                         tokenBuffer.close();
                         throw deserializationContext.mappingException("Can not create polymorphic instances with unwrapped values");
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         wrapInstantiationProblem(e, deserializationContext);
                     }
                 } else {
                     continue;
                 }
             } else if (!startBuilding.readIdProperty(currentName)) {
-                findCreatorProperty = this._beanProperties.find(currentName);
-                if (findCreatorProperty != null) {
-                    startBuilding.bufferProperty(findCreatorProperty, _deserializeWithErrorWrapping(jsonParser, deserializationContext, findCreatorProperty));
+                SettableBeanProperty find = this._beanProperties.find(currentName);
+                if (find != null) {
+                    startBuilding.bufferProperty(find, _deserializeWithErrorWrapping(jsonParser, deserializationContext, find));
                 } else if (this._ignorableProps == null || !this._ignorableProps.contains(currentName)) {
                     tokenBuffer.writeFieldName(currentName);
                     tokenBuffer.copyCurrentStructure(jsonParser);
                     if (this._anySetter != null) {
                         try {
                             startBuilding.bufferAnyProperty(this._anySetter, currentName, this._anySetter.deserialize(jsonParser, deserializationContext));
-                        } catch (Throwable e2) {
-                            wrapAndThrow(e2, (Object) this._beanType.getRawClass(), currentName, deserializationContext);
+                        } catch (Exception e2) {
+                            wrapAndThrow((Throwable) e2, (Object) this._beanType.getRawClass(), currentName, deserializationContext);
                         }
                     }
                 } else {
@@ -501,13 +511,14 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         }
         try {
             return this._unwrappedPropertyHandler.processUnwrapped(jsonParser, deserializationContext, propertyBasedCreator.build(deserializationContext, startBuilding), tokenBuffer);
-        } catch (Throwable e22) {
-            wrapInstantiationProblem(e22, deserializationContext);
+        } catch (Exception e3) {
+            wrapInstantiationProblem(e3, deserializationContext);
             return null;
         }
     }
 
-    protected Object deserializeWithExternalTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeWithExternalTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (this._propertyBasedCreator != null) {
             return deserializeUsingPropertyBasedWithExternalTypeId(jsonParser, deserializationContext);
         }
@@ -517,23 +528,24 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         return deserializeWithExternalTypeId(jsonParser, deserializationContext, this._valueInstantiator.createUsingDefault(deserializationContext));
     }
 
-    protected Object deserializeWithExternalTypeId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
-        Class activeView = this._needViewProcesing ? deserializationContext.getActiveView() : null;
+    /* access modifiers changed from: protected */
+    public Object deserializeWithExternalTypeId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
+        Class cls = this._needViewProcesing ? deserializationContext.getActiveView() : null;
         ExternalTypeHandler start = this._externalTypeIdHandler.start();
         JsonToken currentToken = jsonParser.getCurrentToken();
         while (currentToken == JsonToken.FIELD_NAME) {
             String currentName = jsonParser.getCurrentName();
-            currentToken = jsonParser.nextToken();
+            JsonToken nextToken = jsonParser.nextToken();
             SettableBeanProperty find = this._beanProperties.find(currentName);
             if (find != null) {
-                if (currentToken.isScalarValue()) {
+                if (nextToken.isScalarValue()) {
                     start.handleTypePropertyValue(jsonParser, deserializationContext, currentName, obj);
                 }
-                if (activeView == null || find.visibleInView(activeView)) {
+                if (cls == null || find.visibleInView(cls)) {
                     try {
                         find.deserializeAndSet(jsonParser, deserializationContext, obj);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, obj, currentName, deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, obj, currentName, deserializationContext);
                     }
                 } else {
                     jsonParser.skipChildren();
@@ -544,8 +556,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
                 if (this._anySetter != null) {
                     try {
                         this._anySetter.deserializeAndSet(jsonParser, deserializationContext, obj, currentName);
-                    } catch (Throwable e2) {
-                        wrapAndThrow(e2, obj, currentName, deserializationContext);
+                    } catch (Exception e2) {
+                        wrapAndThrow((Throwable) e2, obj, currentName, deserializationContext);
                     }
                 } else {
                     handleUnknownProperty(jsonParser, deserializationContext, obj, currentName);
@@ -556,7 +568,8 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         return start.complete(jsonParser, deserializationContext, obj);
     }
 
-    protected Object deserializeUsingPropertyBasedWithExternalTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeUsingPropertyBasedWithExternalTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         Object obj = null;
         ExternalTypeHandler start = this._externalTypeIdHandler.start();
         PropertyBasedCreator propertyBasedCreator = this._propertyBasedCreator;
@@ -570,26 +583,26 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
             SettableBeanProperty findCreatorProperty = propertyBasedCreator.findCreatorProperty(currentName);
             if (findCreatorProperty != null) {
                 if (!start.handlePropertyValue(jsonParser, deserializationContext, currentName, obj) && startBuilding.assignParameter(findCreatorProperty, _deserializeWithErrorWrapping(jsonParser, deserializationContext, findCreatorProperty))) {
-                    currentToken = jsonParser.nextToken();
+                    JsonToken nextToken = jsonParser.nextToken();
                     try {
-                        obj = propertyBasedCreator.build(deserializationContext, startBuilding);
-                        while (currentToken == JsonToken.FIELD_NAME) {
+                        Object build = propertyBasedCreator.build(deserializationContext, startBuilding);
+                        while (nextToken == JsonToken.FIELD_NAME) {
                             jsonParser.nextToken();
                             tokenBuffer.copyCurrentStructure(jsonParser);
-                            currentToken = jsonParser.nextToken();
+                            nextToken = jsonParser.nextToken();
                         }
-                        if (obj.getClass() == this._beanType.getRawClass()) {
-                            return start.complete(jsonParser, deserializationContext, obj);
+                        if (build.getClass() == this._beanType.getRawClass()) {
+                            return start.complete(jsonParser, deserializationContext, build);
                         }
                         throw deserializationContext.mappingException("Can not create polymorphic instances with unwrapped values");
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, (Object) this._beanType.getRawClass(), currentName, deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, (Object) this._beanType.getRawClass(), currentName, deserializationContext);
                     }
                 }
             } else if (!startBuilding.readIdProperty(currentName)) {
-                findCreatorProperty = this._beanProperties.find(currentName);
-                if (findCreatorProperty != null) {
-                    startBuilding.bufferProperty(findCreatorProperty, findCreatorProperty.deserialize(jsonParser, deserializationContext));
+                SettableBeanProperty find = this._beanProperties.find(currentName);
+                if (find != null) {
+                    startBuilding.bufferProperty(find, find.deserialize(jsonParser, deserializationContext));
                 } else if (!start.handlePropertyValue(jsonParser, deserializationContext, currentName, obj)) {
                     if (this._ignorableProps != null && this._ignorableProps.contains(currentName)) {
                         handleIgnoredProperty(jsonParser, deserializationContext, handledType(), currentName);
@@ -602,7 +615,7 @@ public class BeanDeserializer extends BeanDeserializerBase implements Serializab
         }
         try {
             return start.complete(jsonParser, deserializationContext, startBuilding, propertyBasedCreator);
-        } catch (Throwable e2) {
+        } catch (Exception e2) {
             wrapInstantiationProblem(e2, deserializationContext);
             return obj;
         }

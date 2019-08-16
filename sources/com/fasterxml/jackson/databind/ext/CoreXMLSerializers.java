@@ -57,15 +57,19 @@ public class CoreXMLSerializers extends Base {
         }
 
         public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-            JsonSerializer handlePrimaryContextualization = serializerProvider.handlePrimaryContextualization(this._delegate, beanProperty);
+            JsonSerializer<Object> handlePrimaryContextualization = serializerProvider.handlePrimaryContextualization(this._delegate, beanProperty);
             if (handlePrimaryContextualization != this._delegate) {
                 return new XMLGregorianCalendarSerializer(handlePrimaryContextualization);
             }
             return this;
         }
 
-        protected Calendar _convert(XMLGregorianCalendar xMLGregorianCalendar) {
-            return xMLGregorianCalendar == null ? null : xMLGregorianCalendar.toGregorianCalendar();
+        /* access modifiers changed from: protected */
+        public Calendar _convert(XMLGregorianCalendar xMLGregorianCalendar) {
+            if (xMLGregorianCalendar == null) {
+                return null;
+            }
+            return xMLGregorianCalendar.toGregorianCalendar();
         }
     }
 

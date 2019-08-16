@@ -18,16 +18,15 @@ public class Goal_Avoid : Goal
 		if (!(brain.owner is Player))
 		{
 			SetStatus(STATUS.COMPLETED);
+			return;
 		}
-		else if (!brain.moveCtrl.CanPlaceAvoid(place))
+		if (!brain.moveCtrl.CanPlaceAvoid(place))
 		{
 			SetStatus(STATUS.COMPLETED);
+			return;
 		}
-		else
-		{
-			brain.moveCtrl.AvoidOn();
-			brain.moveCtrl.SetAvoid(place);
-		}
+		brain.moveCtrl.AvoidOn();
+		brain.moveCtrl.SetAvoid(place);
 	}
 
 	protected override STATUS Process(Brain brain)
@@ -57,7 +56,7 @@ public class Goal_Avoid : Goal
 		case BRAIN_EVENT.END_ACTION:
 		{
 			int num = (int)param;
-			if (num == 12)
+			if (num == 13)
 			{
 				SetStatus(STATUS.COMPLETED);
 			}

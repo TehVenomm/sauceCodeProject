@@ -13,7 +13,8 @@ public abstract class Triple<L, M, R> implements Comparable<Triple<L, M, R>>, Se
 
     public abstract R getRight();
 
-    public static <L, M, R> Triple<L, M, R> of(L l, M m, R r) {
+    /* renamed from: of */
+    public static <L, M, R> Triple<L, M, R> m1020of(L l, M m, R r) {
         return new ImmutableTriple(l, m, r);
     }
 
@@ -29,10 +30,10 @@ public abstract class Triple<L, M, R> implements Comparable<Triple<L, M, R>>, Se
             return false;
         }
         Triple triple = (Triple) obj;
-        if (ObjectUtils.equals(getLeft(), triple.getLeft()) && ObjectUtils.equals(getMiddle(), triple.getMiddle()) && ObjectUtils.equals(getRight(), triple.getRight())) {
-            return true;
+        if (!ObjectUtils.equals(getLeft(), triple.getLeft()) || !ObjectUtils.equals(getMiddle(), triple.getMiddle()) || !ObjectUtils.equals(getRight(), triple.getRight())) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {

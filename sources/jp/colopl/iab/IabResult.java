@@ -1,5 +1,6 @@
-package jp.colopl.iab;
+package p018jp.colopl.iab;
 
+/* renamed from: jp.colopl.iab.IabResult */
 public class IabResult {
     String mMessage;
     int mResponse;

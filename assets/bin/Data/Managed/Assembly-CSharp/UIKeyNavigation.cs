@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Key Navigation")]
-public class UIKeyNavigation
+public class UIKeyNavigation : MonoBehaviour
 {
 	public enum Constraint
 	{
@@ -50,7 +50,6 @@ public class UIKeyNavigation
 	{
 		get
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			if (this.get_enabled() && this.get_gameObject().get_activeInHierarchy())
 			{
 				Collider component = this.GetComponent<Collider>();
@@ -81,8 +80,6 @@ public class UIKeyNavigation
 
 	private void Start()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		mStarted = true;
 		if (startsSelected && isColliderEnabled)
 		{
@@ -149,7 +146,7 @@ public class UIKeyNavigation
 		{
 			return null;
 		}
-		return Get(Vector3.get_up(), 2f, 1f);
+		return Get(Vector3.get_up(), 2f);
 	}
 
 	public GameObject GetDown()
@@ -163,22 +160,16 @@ public class UIKeyNavigation
 		{
 			return null;
 		}
-		return Get(Vector3.get_down(), 2f, 1f);
+		return Get(Vector3.get_down(), 2f);
 	}
 
 	public GameObject Get(Vector3 myDir, float x = 1f, float y = 1f)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
 		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Expected O, but got Unknown
 		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
@@ -188,35 +179,35 @@ public class UIKeyNavigation
 		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Expected O, but got Unknown
-		Transform val = this.get_transform();
-		myDir = val.TransformDirection(myDir);
+		Transform transform = this.get_transform();
+		myDir = transform.TransformDirection(myDir);
 		Vector3 center = GetCenter(this.get_gameObject());
-		float num = 3.40282347E+38f;
+		float num = float.MaxValue;
 		GameObject result = null;
 		for (int i = 0; i < list.size; i++)
 		{
 			UIKeyNavigation uIKeyNavigation = list[i];
-			if (!(uIKeyNavigation == this) && uIKeyNavigation.constraint != Constraint.Explicit && uIKeyNavigation.isColliderEnabled)
+			if (uIKeyNavigation == this || uIKeyNavigation.constraint == Constraint.Explicit || !uIKeyNavigation.isColliderEnabled)
 			{
-				UIWidget component = uIKeyNavigation.GetComponent<UIWidget>();
-				if (!(component != null) || component.alpha != 0f)
+				continue;
+			}
+			UIWidget component = uIKeyNavigation.GetComponent<UIWidget>();
+			if (component != null && component.alpha == 0f)
+			{
+				continue;
+			}
+			Vector3 val = GetCenter(uIKeyNavigation.get_gameObject()) - center;
+			float num2 = Vector3.Dot(myDir, val.get_normalized());
+			if (!(num2 < 0.707f))
+			{
+				val = transform.InverseTransformDirection(val);
+				val.x *= x;
+				val.y *= y;
+				float sqrMagnitude = val.get_sqrMagnitude();
+				if (!(sqrMagnitude > num))
 				{
-					Vector3 val2 = GetCenter(uIKeyNavigation.get_gameObject()) - center;
-					float num2 = Vector3.Dot(myDir, val2.get_normalized());
-					if (!(num2 < 0.707f))
-					{
-						val2 = val.InverseTransformDirection(val2);
-						val2.x *= x;
-						val2.y *= y;
-						float sqrMagnitude = val2.get_sqrMagnitude();
-						if (!(sqrMagnitude > num))
-						{
-							result = uIKeyNavigation.get_gameObject();
-							num = sqrMagnitude;
-						}
-					}
+					result = uIKeyNavigation.get_gameObject();
+					num = sqrMagnitude;
 				}
 			}
 		}
@@ -225,7 +216,6 @@ public class UIKeyNavigation
 
 	protected static Vector3 GetCenter(GameObject go)
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
@@ -241,7 +231,6 @@ public class UIKeyNavigation
 		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		UIWidget component = go.GetComponent<UIWidget>();
 		UICamera uICamera = UICamera.FindCameraForLayer(go.get_layer());
@@ -268,10 +257,8 @@ public class UIKeyNavigation
 	public virtual void OnNavigate(KeyCode key)
 	{
 		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected I4, but got Unknown
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Expected I4, but got Unknown
 		if (!UIPopupList.isOpen)
 		{
 			GameObject val = null;
@@ -301,48 +288,49 @@ public class UIKeyNavigation
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0003: Invalid comparison between Unknown and I4
-		if ((int)key == 9)
+		if ((int)key != 9)
 		{
-			GameObject val = onTab;
-			if (val == null)
+			return;
+		}
+		GameObject val = onTab;
+		if (val == null)
+		{
+			if (UICamera.GetKey(304) || UICamera.GetKey(303))
 			{
-				if (UICamera.GetKey(304) || UICamera.GetKey(303))
+				val = GetLeft();
+				if (val == null)
 				{
-					val = GetLeft();
-					if (val == null)
-					{
-						val = GetUp();
-					}
-					if (val == null)
-					{
-						val = GetDown();
-					}
-					if (val == null)
-					{
-						val = GetRight();
-					}
+					val = GetUp();
 				}
-				else
+				if (val == null)
+				{
+					val = GetDown();
+				}
+				if (val == null)
 				{
 					val = GetRight();
-					if (val == null)
-					{
-						val = GetDown();
-					}
-					if (val == null)
-					{
-						val = GetUp();
-					}
-					if (val == null)
-					{
-						val = GetLeft();
-					}
 				}
 			}
-			if (val != null)
+			else
 			{
-				UICamera.selectedObject = val;
+				val = GetRight();
+				if (val == null)
+				{
+					val = GetDown();
+				}
+				if (val == null)
+				{
+					val = GetUp();
+				}
+				if (val == null)
+				{
+					val = GetLeft();
+				}
 			}
+		}
+		if (val != null)
+		{
+			UICamera.selectedObject = val;
 		}
 	}
 

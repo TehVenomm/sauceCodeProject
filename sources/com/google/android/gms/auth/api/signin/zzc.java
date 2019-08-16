@@ -1,13 +1,16 @@
 package com.google.android.gms.auth.api.signin;
 
-import com.google.android.gms.common.api.Scope;
-import java.util.Comparator;
+final /* synthetic */ class zzc {
+    static final /* synthetic */ int[] zzat = new int[zzd.m404xd6228de2().length];
 
-final class zzc implements Comparator<Scope> {
-    zzc() {
-    }
-
-    public final /* synthetic */ int compare(Object obj, Object obj2) {
-        return ((Scope) obj).zzafs().compareTo(((Scope) obj2).zzafs());
+    static {
+        try {
+            zzat[zzd.zzaw - 1] = 1;
+        } catch (NoSuchFieldError e) {
+        }
+        try {
+            zzat[zzd.zzax - 1] = 2;
+        } catch (NoSuchFieldError e2) {
+        }
     }
 }

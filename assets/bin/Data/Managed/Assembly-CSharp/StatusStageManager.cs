@@ -51,12 +51,22 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 
 	private StatusSmithCharacter m_stSmithCharacter;
 
+	private StatusSmithCharacter m_stUniqueSmithCharacter;
+
 	public bool isBusy => cameraPosAnim.IsPlaying() || cameraRotAnim.IsPlaying();
+
+	public PlayerLoader GetPlayerLoader()
+	{
+		return playerLoader;
+	}
+
+	public int GetPlayerLayer()
+	{
+		return renderTexture.renderLayer;
+	}
 
 	protected override void Awake()
 	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Expected O, but got Unknown
 		base.Awake();
 		targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		targetCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
@@ -65,13 +75,20 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 		uiTexture.shader = ResourceUtility.FindShader("Unlit/ui_render_tex");
 		uiTexture.SetAnchor(MonoBehaviourSingleton<UIManager>.I.system.get_gameObject(), 0, 0, 0, 0);
 		uiTexture.UpdateAnchors();
-		m_stSmithCharacter = (StatusSmithCharacter)Utility.CreateGameObjectAndComponent("StatusSmithCharacter", base._transform, -1);
+		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+		{
+			UIWidget component = uiTexture.get_gameObject().GetComponent<UIWidget>();
+			component.width = 480;
+			component.height = 854;
+		}
+		m_stSmithCharacter = (StatusSmithCharacter)Utility.CreateGameObjectAndComponent("StatusSmithCharacter", base._transform);
+		m_stSmithCharacter.isUnique = false;
+		m_stUniqueSmithCharacter = (StatusSmithCharacter)Utility.CreateGameObjectAndComponent("StatusSmithCharacter", base._transform);
+		m_stUniqueSmithCharacter.isUnique = true;
 	}
 
 	protected override void _OnDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (uiTexture != null)
 		{
 			Object.Destroy(uiTexture.get_gameObject());
@@ -95,12 +112,11 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
 		{
 			string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-			if (!(currentSectionName != "StatusTop") || !(currentSectionName != "StatusAvatar"))
+			if (!(currentSectionName != "StatusTop") || !(currentSectionName != "StatusAvatar") || !(currentSectionName != "StatusAccessory") || !(currentSectionName != "UniqueStatusTop"))
 			{
 				playerLoader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
 			}
@@ -109,7 +125,6 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 
 	public void SetUITextureActive(bool active)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		uiTexture.get_gameObject().SetActive(active);
 	}
 
@@ -121,16 +136,14 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 		}
 	}
 
-	public void LoadPlayer(PlayerLoadInfo load_info)
+	public void LoadPlayer(PlayerLoadInfo load_info, int anim_id = 0)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
 		if (playerShadow == null)
 		{
-			playerShadow = PlayerLoader.CreateShadow(MonoBehaviourSingleton<StageManager>.I.stageObject, false, -1, false);
+			playerShadow = PlayerLoader.CreateShadow(MonoBehaviourSingleton<StageManager>.I.stageObject, fixedY0: false);
 			playerShadow.get_transform().set_position(parameter.playerPos + new Vector3(0f, 0.005f, 0f));
 		}
 		ShaderGlobal.lightProbe = false;
@@ -140,7 +153,7 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 			{
 				Object.DestroyImmediate(renderTexture);
 			}
-			renderTexture = UIRenderTexture.Get(uiTexture, -1f, true, -1);
+			renderTexture = UIRenderTexture.Get(uiTexture, -1f, link_main_camera: true);
 			renderTexture.Disable();
 			renderTexture.nearClipPlane = parameter.renderTextureNearClip;
 			int num = -1;
@@ -148,17 +161,28 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 			{
 				num = ((!MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.isChangeHairShader) ? (-1) : MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hairColorId);
 			}
+			int num2 = anim_id;
+			if (num2 == 0)
+			{
+				num2 = PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
+			}
 			playerLoader = renderTexture.modelTransform.get_gameObject().AddComponent<PlayerLoader>();
 			PlayerLoader obj = playerLoader;
-			int use_hair_overlay = num;
-			obj.StartLoad(load_info, renderTexture.renderLayer, PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), false, false, false, false, false, true, true, true, SHADER_TYPE.NORMAL, delegate
+			int renderLayer = renderTexture.renderLayer;
+			int anim_id2 = num2;
+			bool need_anim_event = false;
+			bool need_foot_stamp = false;
+			bool need_shadow = false;
+			bool enable_light_probes = false;
+			bool need_action_voice = false;
+			bool need_high_reso_tex = true;
+			bool need_res_ref_count = true;
+			bool need_dev_frame_instantiate = true;
+			SHADER_TYPE shader_type = SHADER_TYPE.NORMAL;
+			PlayerLoader.OnCompleteLoad callback = delegate
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
@@ -167,11 +191,13 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 				if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 				{
 					UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
-					float num2 = (userStatus.sex != 0) ? parameter.playerScaleFemale : parameter.playerScaleMale;
-					playerLoader.get_transform().set_localScale(playerLoader.get_transform().get_localScale().Mul(new Vector3(num2, num2, num2)));
+					float num3 = (userStatus.sex != 0) ? parameter.playerScaleFemale : parameter.playerScaleMale;
+					playerLoader.get_transform().set_localScale(playerLoader.get_transform().get_localScale().Mul(new Vector3(num3, num3, num3)));
 				}
-				renderTexture.Enable(0.25f);
-			}, true, use_hair_overlay);
+				renderTexture.Enable();
+			};
+			int use_hair_overlay = num;
+			obj.StartLoad(load_info, renderLayer, anim_id2, need_anim_event, need_foot_stamp, need_shadow, enable_light_probes, need_action_voice, need_high_reso_tex, need_res_ref_count, need_dev_frame_instantiate, shader_type, callback, enable_eye_blick: true, use_hair_overlay);
 		}
 	}
 
@@ -203,7 +229,7 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 		PlayerLoadInfo playerLoadInfo = playerLoader.loadInfo.Clone();
 		if (equip_info != null)
 		{
-			playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData, true, true, true);
+			playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData);
 		}
 		else if (viewMode == VIEW_MODE.AVATAR)
 		{
@@ -215,14 +241,13 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 			}
 			else
 			{
-				playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData, true, true, true);
+				playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData);
 			}
 		}
 		else if (equipSetData != null)
 		{
 			playerLoadInfo.RemoveEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equipSetData.index);
 		}
-		LoadPlayer(playerLoadInfo);
 		if (equipInfo != equip_info)
 		{
 			equipInfo = equip_info;
@@ -235,7 +260,7 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 		if (!section_data.type.IsDialog())
 		{
 			VIEW_TYPE vIEW_TYPE = viewType;
-			vIEW_TYPE = ((scene_name == "StatusScene" && section_name != "StatusToSmith" && section_name != "ItemStorageSell" && !section_name.Contains("Exchange")) ? VIEW_TYPE.STATUS : VIEW_TYPE.SMITH);
+			vIEW_TYPE = (((scene_name == "StatusScene" || scene_name == "UniqueStatusScene") && section_name != "StatusToSmith" && section_name != "ItemStorageSell" && !section_name.Contains("Exchange") && section_name != "UniqueStatusToSmith") ? VIEW_TYPE.STATUS : VIEW_TYPE.SMITH);
 			if (viewType != vIEW_TYPE)
 			{
 				MoveCamera(viewType, vIEW_TYPE, viewMode, viewMode);
@@ -252,71 +277,70 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
 		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
 		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0209: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0359: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0362: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0368: Unknown result type (might be due to invalid IL or missing references)
 		Quaternion val = Quaternion.Euler(0f, parameter.playerRot, 0f);
 		Vector3 val2;
 		Quaternion end_value;
@@ -372,22 +396,21 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 			num = 0f;
 		}
 		cameraTurningMode = (num > 0f && type_from == type_to && type_from == VIEW_TYPE.STATUS && mode_from != mode_to);
-		cameraPosAnim.Set(num, targetCameraTransform.get_position(), val2, null, default(Vector3), null);
+		cameraPosAnim.Set(num, targetCameraTransform.get_position(), val2);
 		cameraPosAnim.Play();
-		cameraRotAnim.Set(num, targetCameraTransform.get_rotation(), end_value, null, default(Quaternion), null);
+		cameraRotAnim.Set(num, targetCameraTransform.get_rotation(), end_value);
 		cameraRotAnim.Play();
-		cameraFovAnim.Set(num, targetCamera.get_fieldOfView(), end_value2, null, 0f, null);
+		cameraFovAnim.Set(num, targetCamera.get_fieldOfView(), end_value2, null, 0f);
 		cameraFovAnim.Play();
 		if (playerLoader != null && !playerLoader.isLoading)
 		{
-			playerRotAnim.Set(num * 1.25f, playerLoader.get_transform().get_rotation(), val, null, default(Quaternion), null);
+			playerRotAnim.Set(num * 1.25f, playerLoader.get_transform().get_rotation(), val);
 			playerRotAnim.Play();
 		}
 	}
 
 	private void LateUpdate()
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
@@ -417,12 +440,43 @@ public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 		}
 	}
 
-	public void SetSmithCharacterActivateFlag(bool isActivate)
+	public void SetSmithCharacterActivate(bool active)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (m_stSmithCharacter != null)
 		{
-			m_stSmithCharacter.get_gameObject().SetActive(isActivate);
+			m_stSmithCharacter.SetActive(active);
+		}
+	}
+
+	public void SetUniqueSmithCharacterActivate(bool active)
+	{
+		if (m_stUniqueSmithCharacter != null)
+		{
+			m_stUniqueSmithCharacter.SetActive(active);
+		}
+	}
+
+	public void SetEnableSmithCharacterActivate(bool active)
+	{
+		if (StatusManager.IsUnique())
+		{
+			SetUniqueSmithCharacterActivate(active);
+		}
+		else
+		{
+			SetSmithCharacterActivate(active);
+		}
+	}
+
+	public void SetDisableSmithCharacterActivate(bool active)
+	{
+		if (!StatusManager.IsUnique())
+		{
+			SetUniqueSmithCharacterActivate(active);
+		}
+		else
+		{
+			SetSmithCharacterActivate(active);
 		}
 	}
 }

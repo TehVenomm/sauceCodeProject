@@ -1,17 +1,22 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
 import android.net.Uri;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/* renamed from: jp.colopl.util.MailTo */
 public class MailTo {
     private static final String BODY = "body";
-    private static final String CC = "cc";
+
+    /* renamed from: CC */
+    private static final String f1203CC = "cc";
     public static final String MAILTO_SCHEME = "mailto:";
     private static final String SUBJECT = "subject";
-    private static final String TO = "to";
-    private HashMap<String, String> mHeaders = new HashMap();
+
+    /* renamed from: TO */
+    private static final String f1204TO = "to";
+    private HashMap<String, String> mHeaders = new HashMap<>();
 
     private MailTo() {
     }
@@ -23,19 +28,21 @@ public class MailTo {
     public static MailTo parse(String str) throws RuntimeException {
         if (str == null) {
             throw new NullPointerException();
-        } else if (isMailTo(str)) {
+        } else if (!isMailTo(str)) {
+            throw new RuntimeException("Not a mailto scheme");
+        } else {
             Uri parse = Uri.parse(str.substring(MAILTO_SCHEME.length()));
             MailTo mailTo = new MailTo();
             String encodedQuery = parse.getEncodedQuery();
             if (encodedQuery != null) {
-                for (String encodedQuery2 : encodedQuery2.split("&")) {
-                    String[] split = encodedQuery2.split("=");
-                    if (split.length != 0) {
-                        mailTo.mHeaders.put(Uri.decode(split[0]).toLowerCase(), split.length > 1 ? Uri.decode(split[1]) : null);
+                for (String split : encodedQuery.split("&")) {
+                    String[] split2 = split.split("=");
+                    if (split2.length != 0) {
+                        mailTo.mHeaders.put(Uri.decode(split2[0]).toLowerCase(), split2.length > 1 ? Uri.decode(split2[1]) : null);
                     }
                 }
             }
-            Object path = parse.getPath();
+            String path = parse.getPath();
             if (path != null) {
                 String to = mailTo.getTo();
                 if (to != null) {
@@ -44,8 +51,6 @@ public class MailTo {
                 mailTo.mHeaders.put("to", path);
             }
             return mailTo;
-        } else {
-            throw new RuntimeException("Not a mailto scheme");
         }
     }
 
@@ -54,7 +59,7 @@ public class MailTo {
     }
 
     public String getCc() {
-        return (String) this.mHeaders.get(CC);
+        return (String) this.mHeaders.get(f1203CC);
     }
 
     public Map<String, String> getHeaders() {
@@ -70,14 +75,14 @@ public class MailTo {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(MAILTO_SCHEME);
-        stringBuilder.append('?');
+        StringBuilder sb = new StringBuilder(MAILTO_SCHEME);
+        sb.append('?');
         for (Entry entry : this.mHeaders.entrySet()) {
-            stringBuilder.append(Uri.encode((String) entry.getKey()));
-            stringBuilder.append('=');
-            stringBuilder.append(Uri.encode((String) entry.getValue()));
-            stringBuilder.append('&');
+            sb.append(Uri.encode((String) entry.getKey()));
+            sb.append('=');
+            sb.append(Uri.encode((String) entry.getValue()));
+            sb.append('&');
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 }

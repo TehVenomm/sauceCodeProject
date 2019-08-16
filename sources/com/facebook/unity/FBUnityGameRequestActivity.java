@@ -18,8 +18,8 @@ import java.util.Locale;
 public class FBUnityGameRequestActivity extends BaseActivity {
     public static final String GAME_REQUEST_PARAMS = "game_request_params";
 
-    protected void onCreate(Bundle bundle) {
-        String string;
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Bundle bundleExtra = getIntent().getBundleExtra(GAME_REQUEST_PARAMS);
         final UnityMessage unityMessage = new UnityMessage("OnAppRequestsComplete");
@@ -31,7 +31,7 @@ public class FBUnityGameRequestActivity extends BaseActivity {
             builder.setMessage(bundleExtra.getString("message"));
         }
         if (bundleExtra.containsKey(ShareConstants.WEB_DIALOG_PARAM_ACTION_TYPE)) {
-            string = bundleExtra.getString(ShareConstants.WEB_DIALOG_PARAM_ACTION_TYPE);
+            String string = bundleExtra.getString(ShareConstants.WEB_DIALOG_PARAM_ACTION_TYPE);
             try {
                 builder.setActionType(ActionType.valueOf(string));
             } catch (IllegalArgumentException e) {
@@ -47,11 +47,11 @@ public class FBUnityGameRequestActivity extends BaseActivity {
             builder.setRecipients(Arrays.asList(bundleExtra.getString("to").split(",")));
         }
         if (bundleExtra.containsKey(ShareConstants.WEB_DIALOG_PARAM_FILTERS)) {
-            string = bundleExtra.getString(ShareConstants.WEB_DIALOG_PARAM_FILTERS).toUpperCase(Locale.ROOT);
+            String upperCase = bundleExtra.getString(ShareConstants.WEB_DIALOG_PARAM_FILTERS).toUpperCase(Locale.ROOT);
             try {
-                builder.setFilters(Filters.valueOf(string));
+                builder.setFilters(Filters.valueOf(upperCase));
             } catch (IllegalArgumentException e2) {
-                unityMessage.sendError("Unsupported filter type: " + string);
+                unityMessage.sendError("Unsupported filter type: " + upperCase);
                 finish();
                 return;
             }

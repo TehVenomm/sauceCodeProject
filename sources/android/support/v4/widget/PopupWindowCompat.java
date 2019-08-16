@@ -1,34 +1,101 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.os.Build.VERSION;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
+import android.support.annotation.RequiresApi;
+import android.support.p000v4.view.GravityCompat;
+import android.support.p000v4.view.ViewCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.PopupWindow;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+/* renamed from: android.support.v4.widget.PopupWindowCompat */
 public final class PopupWindowCompat {
-    static final PopupWindowImpl IMPL;
+    static final PopupWindowCompatBaseImpl IMPL;
 
-    interface PopupWindowImpl {
-        boolean getOverlapAnchor(PopupWindow popupWindow);
+    @RequiresApi(19)
+    /* renamed from: android.support.v4.widget.PopupWindowCompat$PopupWindowCompatApi19Impl */
+    static class PopupWindowCompatApi19Impl extends PopupWindowCompatBaseImpl {
+        PopupWindowCompatApi19Impl() {
+        }
 
-        int getWindowLayoutType(PopupWindow popupWindow);
-
-        void setOverlapAnchor(PopupWindow popupWindow, boolean z);
-
-        void setWindowLayoutType(PopupWindow popupWindow, int i);
-
-        void showAsDropDown(PopupWindow popupWindow, View view, int i, int i2, int i3);
+        public void showAsDropDown(PopupWindow popupWindow, View view, int i, int i2, int i3) {
+            popupWindow.showAsDropDown(view, i, i2, i3);
+        }
     }
 
-    static class BasePopupWindowImpl implements PopupWindowImpl {
+    @RequiresApi(21)
+    /* renamed from: android.support.v4.widget.PopupWindowCompat$PopupWindowCompatApi21Impl */
+    static class PopupWindowCompatApi21Impl extends PopupWindowCompatApi19Impl {
+        private static final String TAG = "PopupWindowCompatApi21";
+        private static Field sOverlapAnchorField;
+
+        static {
+            try {
+                sOverlapAnchorField = PopupWindow.class.getDeclaredField("mOverlapAnchor");
+                sOverlapAnchorField.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                Log.i(TAG, "Could not fetch mOverlapAnchor field from PopupWindow", e);
+            }
+        }
+
+        PopupWindowCompatApi21Impl() {
+        }
+
+        public boolean getOverlapAnchor(PopupWindow popupWindow) {
+            if (sOverlapAnchorField != null) {
+                try {
+                    return ((Boolean) sOverlapAnchorField.get(popupWindow)).booleanValue();
+                } catch (IllegalAccessException e) {
+                    Log.i(TAG, "Could not get overlap anchor field in PopupWindow", e);
+                }
+            }
+            return false;
+        }
+
+        public void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
+            if (sOverlapAnchorField != null) {
+                try {
+                    sOverlapAnchorField.set(popupWindow, Boolean.valueOf(z));
+                } catch (IllegalAccessException e) {
+                    Log.i(TAG, "Could not set overlap anchor field in PopupWindow", e);
+                }
+            }
+        }
+    }
+
+    @RequiresApi(23)
+    /* renamed from: android.support.v4.widget.PopupWindowCompat$PopupWindowCompatApi23Impl */
+    static class PopupWindowCompatApi23Impl extends PopupWindowCompatApi21Impl {
+        PopupWindowCompatApi23Impl() {
+        }
+
+        public boolean getOverlapAnchor(PopupWindow popupWindow) {
+            return popupWindow.getOverlapAnchor();
+        }
+
+        public int getWindowLayoutType(PopupWindow popupWindow) {
+            return popupWindow.getWindowLayoutType();
+        }
+
+        public void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
+            popupWindow.setOverlapAnchor(z);
+        }
+
+        public void setWindowLayoutType(PopupWindow popupWindow, int i) {
+            popupWindow.setWindowLayoutType(i);
+        }
+    }
+
+    /* renamed from: android.support.v4.widget.PopupWindowCompat$PopupWindowCompatBaseImpl */
+    static class PopupWindowCompatBaseImpl {
         private static Method sGetWindowLayoutTypeMethod;
         private static boolean sGetWindowLayoutTypeMethodAttempted;
         private static Method sSetWindowLayoutTypeMethod;
         private static boolean sSetWindowLayoutTypeMethodAttempted;
 
-        BasePopupWindowImpl() {
+        PopupWindowCompatBaseImpl() {
         }
 
         public boolean getOverlapAnchor(PopupWindow popupWindow) {
@@ -81,59 +148,15 @@ public final class PopupWindowCompat {
         }
     }
 
-    static class KitKatPopupWindowImpl extends BasePopupWindowImpl {
-        KitKatPopupWindowImpl() {
-        }
-
-        public void showAsDropDown(PopupWindow popupWindow, View view, int i, int i2, int i3) {
-            PopupWindowCompatKitKat.showAsDropDown(popupWindow, view, i, i2, i3);
-        }
-    }
-
-    static class Api21PopupWindowImpl extends KitKatPopupWindowImpl {
-        Api21PopupWindowImpl() {
-        }
-
-        public boolean getOverlapAnchor(PopupWindow popupWindow) {
-            return PopupWindowCompatApi21.getOverlapAnchor(popupWindow);
-        }
-
-        public void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
-            PopupWindowCompatApi21.setOverlapAnchor(popupWindow, z);
-        }
-    }
-
-    static class Api23PopupWindowImpl extends Api21PopupWindowImpl {
-        Api23PopupWindowImpl() {
-        }
-
-        public boolean getOverlapAnchor(PopupWindow popupWindow) {
-            return PopupWindowCompatApi23.getOverlapAnchor(popupWindow);
-        }
-
-        public int getWindowLayoutType(PopupWindow popupWindow) {
-            return PopupWindowCompatApi23.getWindowLayoutType(popupWindow);
-        }
-
-        public void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
-            PopupWindowCompatApi23.setOverlapAnchor(popupWindow, z);
-        }
-
-        public void setWindowLayoutType(PopupWindow popupWindow, int i) {
-            PopupWindowCompatApi23.setWindowLayoutType(popupWindow, i);
-        }
-    }
-
     static {
-        int i = VERSION.SDK_INT;
-        if (i >= 23) {
-            IMPL = new Api23PopupWindowImpl();
-        } else if (i >= 21) {
-            IMPL = new Api21PopupWindowImpl();
-        } else if (i >= 19) {
-            IMPL = new KitKatPopupWindowImpl();
+        if (VERSION.SDK_INT >= 23) {
+            IMPL = new PopupWindowCompatApi23Impl();
+        } else if (VERSION.SDK_INT >= 21) {
+            IMPL = new PopupWindowCompatApi21Impl();
+        } else if (VERSION.SDK_INT >= 19) {
+            IMPL = new PopupWindowCompatApi19Impl();
         } else {
-            IMPL = new BasePopupWindowImpl();
+            IMPL = new PopupWindowCompatBaseImpl();
         }
     }
 

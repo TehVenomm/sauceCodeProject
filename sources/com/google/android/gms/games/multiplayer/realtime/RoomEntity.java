@@ -4,40 +4,62 @@ import android.database.CharArrayBuffer;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.DowngradeableSafeParcel;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.util.zzg;
+import android.support.annotation.Nullable;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.DataUtils;
+import com.google.android.gms.common.util.RetainForClient;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.internal.GamesDowngradeableSafeParcel;
+import com.google.android.gms.games.internal.zzc;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.ParticipantEntity;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
+@RetainForClient
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "RoomEntityCreator")
+@Reserved({1000})
 public final class RoomEntity extends GamesDowngradeableSafeParcel implements Room {
     public static final Creator<RoomEntity> CREATOR = new zza();
-    private final long mCreationTimestamp;
-    private final String zzdmz;
-    private final String zzhew;
-    private final ArrayList<ParticipantEntity> zzhmc;
-    private final int zzhmd;
-    private final Bundle zzhmu;
-    private final String zzhmw;
-    private final int zzhmx;
-    private final int zzhmy;
+    @Field(getter = "getDescription", mo13990id = 5)
+    private final String description;
+    @Field(getter = "getCreationTimestamp", mo13990id = 3)
+    private final long zzoz;
+    @Field(getter = "getParticipants", mo13990id = 8)
+    private final ArrayList<ParticipantEntity> zzpc;
+    @Field(getter = "getVariant", mo13990id = 6)
+    private final int zzpd;
+    @Nullable
+    @Field(getter = "getAutoMatchCriteria", mo13990id = 7)
+    private final Bundle zzpz;
+    @Field(getter = "getRoomId", mo13990id = 1)
+    private final String zzqc;
+    @Field(getter = "getCreatorId", mo13990id = 2)
+    private final String zzqd;
+    @Field(getter = "getStatus", mo13990id = 4)
+    private final int zzqe;
+    @Field(getter = "getAutoMatchWaitEstimateSeconds", mo13990id = 9)
+    private final int zzqf;
 
     static final class zza extends zze {
         zza() {
         }
 
         public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-            return zzm(parcel);
+            return createFromParcel(parcel);
         }
 
-        public final RoomEntity zzm(Parcel parcel) {
-            if (GamesDowngradeableSafeParcel.zze(DowngradeableSafeParcel.zzakc()) || DowngradeableSafeParcel.zzga(RoomEntity.class.getCanonicalName())) {
-                return super.zzm(parcel);
+        public final RoomEntity zzg(Parcel parcel) {
+            if (RoomEntity.zzb(RoomEntity.getUnparcelClientVersion()) || RoomEntity.canUnparcelSafely(RoomEntity.class.getCanonicalName())) {
+                return super.createFromParcel(parcel);
             }
             String readString = parcel.readString();
             String readString2 = parcel.readString();
@@ -56,36 +78,36 @@ public final class RoomEntity extends GamesDowngradeableSafeParcel implements Ro
     }
 
     public RoomEntity(Room room) {
-        this.zzhew = room.getRoomId();
-        this.zzhmw = room.getCreatorId();
-        this.mCreationTimestamp = room.getCreationTimestamp();
-        this.zzhmx = room.getStatus();
-        this.zzdmz = room.getDescription();
-        this.zzhmd = room.getVariant();
-        this.zzhmu = room.getAutoMatchCriteria();
-        ArrayList participants = room.getParticipants();
-        int size = participants.size();
-        this.zzhmc = new ArrayList(size);
-        for (int i = 0; i < size; i++) {
-            this.zzhmc.add((ParticipantEntity) ((Participant) participants.get(i)).freeze());
-        }
-        this.zzhmy = room.getAutoMatchWaitEstimateSeconds();
+        this(room, ParticipantEntity.zza((List<Participant>) room.getParticipants()));
     }
 
-    RoomEntity(String str, String str2, long j, int i, String str3, int i2, Bundle bundle, ArrayList<ParticipantEntity> arrayList, int i3) {
-        this.zzhew = str;
-        this.zzhmw = str2;
-        this.mCreationTimestamp = j;
-        this.zzhmx = i;
-        this.zzdmz = str3;
-        this.zzhmd = i2;
-        this.zzhmu = bundle;
-        this.zzhmc = arrayList;
-        this.zzhmy = i3;
+    private RoomEntity(Room room, ArrayList<ParticipantEntity> arrayList) {
+        this.zzqc = room.getRoomId();
+        this.zzqd = room.getCreatorId();
+        this.zzoz = room.getCreationTimestamp();
+        this.zzqe = room.getStatus();
+        this.description = room.getDescription();
+        this.zzpd = room.getVariant();
+        this.zzpz = room.getAutoMatchCriteria();
+        this.zzpc = arrayList;
+        this.zzqf = room.getAutoMatchWaitEstimateSeconds();
+    }
+
+    @Constructor
+    RoomEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) String str2, @Param(mo13993id = 3) long j, @Param(mo13993id = 4) int i, @Param(mo13993id = 5) String str3, @Param(mo13993id = 6) int i2, @Nullable @Param(mo13993id = 7) Bundle bundle, @Param(mo13993id = 8) ArrayList<ParticipantEntity> arrayList, @Param(mo13993id = 9) int i3) {
+        this.zzqc = str;
+        this.zzqd = str2;
+        this.zzoz = j;
+        this.zzqe = i;
+        this.description = str3;
+        this.zzpd = i2;
+        this.zzpz = bundle;
+        this.zzpc = arrayList;
+        this.zzqf = i3;
     }
 
     static int zza(Room room) {
-        return Arrays.hashCode(new Object[]{room.getRoomId(), room.getCreatorId(), Long.valueOf(room.getCreationTimestamp()), Integer.valueOf(room.getStatus()), room.getDescription(), Integer.valueOf(room.getVariant()), room.getAutoMatchCriteria(), room.getParticipants(), Integer.valueOf(room.getAutoMatchWaitEstimateSeconds())});
+        return Objects.hashCode(room.getRoomId(), room.getCreatorId(), Long.valueOf(room.getCreationTimestamp()), Integer.valueOf(room.getStatus()), room.getDescription(), Integer.valueOf(room.getVariant()), Integer.valueOf(zzc.zza(room.getAutoMatchCriteria())), room.getParticipants(), Integer.valueOf(room.getAutoMatchWaitEstimateSeconds()));
     }
 
     static int zza(Room room, String str) {
@@ -98,7 +120,7 @@ public final class RoomEntity extends GamesDowngradeableSafeParcel implements Ro
             }
         }
         String roomId = room.getRoomId();
-        throw new IllegalStateException(new StringBuilder((String.valueOf(str).length() + 28) + String.valueOf(roomId).length()).append("Participant ").append(str).append(" is not in room ").append(roomId).toString());
+        throw new IllegalStateException(new StringBuilder(String.valueOf(str).length() + 28 + String.valueOf(roomId).length()).append("Participant ").append(str).append(" is not in room ").append(roomId).toString());
     }
 
     static boolean zza(Room room, Object obj) {
@@ -109,11 +131,11 @@ public final class RoomEntity extends GamesDowngradeableSafeParcel implements Ro
             return true;
         }
         Room room2 = (Room) obj;
-        return zzbf.equal(room2.getRoomId(), room.getRoomId()) && zzbf.equal(room2.getCreatorId(), room.getCreatorId()) && zzbf.equal(Long.valueOf(room2.getCreationTimestamp()), Long.valueOf(room.getCreationTimestamp())) && zzbf.equal(Integer.valueOf(room2.getStatus()), Integer.valueOf(room.getStatus())) && zzbf.equal(room2.getDescription(), room.getDescription()) && zzbf.equal(Integer.valueOf(room2.getVariant()), Integer.valueOf(room.getVariant())) && zzbf.equal(room2.getAutoMatchCriteria(), room.getAutoMatchCriteria()) && zzbf.equal(room2.getParticipants(), room.getParticipants()) && zzbf.equal(Integer.valueOf(room2.getAutoMatchWaitEstimateSeconds()), Integer.valueOf(room.getAutoMatchWaitEstimateSeconds()));
+        return Objects.equal(room2.getRoomId(), room.getRoomId()) && Objects.equal(room2.getCreatorId(), room.getCreatorId()) && Objects.equal(Long.valueOf(room2.getCreationTimestamp()), Long.valueOf(room.getCreationTimestamp())) && Objects.equal(Integer.valueOf(room2.getStatus()), Integer.valueOf(room.getStatus())) && Objects.equal(room2.getDescription(), room.getDescription()) && Objects.equal(Integer.valueOf(room2.getVariant()), Integer.valueOf(room.getVariant())) && zzc.zza(room2.getAutoMatchCriteria(), room.getAutoMatchCriteria()) && Objects.equal(room2.getParticipants(), room.getParticipants()) && Objects.equal(Integer.valueOf(room2.getAutoMatchWaitEstimateSeconds()), Integer.valueOf(room.getAutoMatchWaitEstimateSeconds()));
     }
 
     static String zzb(Room room) {
-        return zzbf.zzt(room).zzg("RoomId", room.getRoomId()).zzg("CreatorId", room.getCreatorId()).zzg("CreationTimestamp", Long.valueOf(room.getCreationTimestamp())).zzg("RoomStatus", Integer.valueOf(room.getStatus())).zzg("Description", room.getDescription()).zzg("Variant", Integer.valueOf(room.getVariant())).zzg("AutoMatchCriteria", room.getAutoMatchCriteria()).zzg("Participants", room.getParticipants()).zzg("AutoMatchWaitEstimateSeconds", Integer.valueOf(room.getAutoMatchWaitEstimateSeconds())).toString();
+        return Objects.toStringHelper(room).add("RoomId", room.getRoomId()).add("CreatorId", room.getCreatorId()).add("CreationTimestamp", Long.valueOf(room.getCreationTimestamp())).add("RoomStatus", Integer.valueOf(room.getStatus())).add("Description", room.getDescription()).add("Variant", Integer.valueOf(room.getVariant())).add("AutoMatchCriteria", room.getAutoMatchCriteria()).add("Participants", room.getParticipants()).add("AutoMatchWaitEstimateSeconds", Integer.valueOf(room.getAutoMatchWaitEstimateSeconds())).toString();
     }
 
     static String zzb(Room room, String str) {
@@ -139,13 +161,13 @@ public final class RoomEntity extends GamesDowngradeableSafeParcel implements Ro
             }
         }
         String roomId = room.getRoomId();
-        throw new IllegalStateException(new StringBuilder((String.valueOf(str).length() + 29) + String.valueOf(roomId).length()).append("Participant ").append(str).append(" is not in match ").append(roomId).toString());
+        throw new IllegalStateException(new StringBuilder(String.valueOf(str).length() + 29 + String.valueOf(roomId).length()).append("Participant ").append(str).append(" is not in match ").append(roomId).toString());
     }
 
     static ArrayList<String> zzc(Room room) {
         ArrayList participants = room.getParticipants();
         int size = participants.size();
-        ArrayList<String> arrayList = new ArrayList(size);
+        ArrayList<String> arrayList = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             arrayList.add(((Participant) participants.get(i)).getParticipantId());
         }
@@ -160,28 +182,29 @@ public final class RoomEntity extends GamesDowngradeableSafeParcel implements Ro
         return this;
     }
 
+    @Nullable
     public final Bundle getAutoMatchCriteria() {
-        return this.zzhmu;
+        return this.zzpz;
     }
 
     public final int getAutoMatchWaitEstimateSeconds() {
-        return this.zzhmy;
+        return this.zzqf;
     }
 
     public final long getCreationTimestamp() {
-        return this.mCreationTimestamp;
+        return this.zzoz;
     }
 
     public final String getCreatorId() {
-        return this.zzhmw;
+        return this.zzqd;
     }
 
     public final String getDescription() {
-        return this.zzdmz;
+        return this.description;
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzdmz, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.description, charArrayBuffer);
     }
 
     public final Participant getParticipant(String str) {
@@ -201,27 +224,35 @@ public final class RoomEntity extends GamesDowngradeableSafeParcel implements Ro
     }
 
     public final ArrayList<Participant> getParticipants() {
-        return new ArrayList(this.zzhmc);
+        return new ArrayList<>(this.zzpc);
     }
 
     public final String getRoomId() {
-        return this.zzhew;
+        return this.zzqc;
     }
 
     public final int getStatus() {
-        return this.zzhmx;
+        return this.zzqe;
     }
 
     public final int getVariant() {
-        return this.zzhmd;
+        return this.zzpd;
     }
 
     public final int hashCode() {
-        return zza(this);
+        return zza((Room) this);
     }
 
     public final boolean isDataValid() {
         return true;
+    }
+
+    public final void setShouldDowngrade(boolean z) {
+        super.setShouldDowngrade(z);
+        int size = this.zzpc.size();
+        for (int i = 0; i < size; i++) {
+            ((ParticipantEntity) this.zzpc.get(i)).setShouldDowngrade(z);
+        }
     }
 
     public final String toString() {
@@ -229,16 +260,31 @@ public final class RoomEntity extends GamesDowngradeableSafeParcel implements Ro
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getRoomId(), false);
-        zzd.zza(parcel, 2, getCreatorId(), false);
-        zzd.zza(parcel, 3, getCreationTimestamp());
-        zzd.zzc(parcel, 4, getStatus());
-        zzd.zza(parcel, 5, getDescription(), false);
-        zzd.zzc(parcel, 6, getVariant());
-        zzd.zza(parcel, 7, getAutoMatchCriteria(), false);
-        zzd.zzc(parcel, 8, getParticipants(), false);
-        zzd.zzc(parcel, 9, getAutoMatchWaitEstimateSeconds());
-        zzd.zzai(parcel, zze);
+        if (!shouldDowngrade()) {
+            int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+            SafeParcelWriter.writeString(parcel, 1, getRoomId(), false);
+            SafeParcelWriter.writeString(parcel, 2, getCreatorId(), false);
+            SafeParcelWriter.writeLong(parcel, 3, getCreationTimestamp());
+            SafeParcelWriter.writeInt(parcel, 4, getStatus());
+            SafeParcelWriter.writeString(parcel, 5, getDescription(), false);
+            SafeParcelWriter.writeInt(parcel, 6, getVariant());
+            SafeParcelWriter.writeBundle(parcel, 7, getAutoMatchCriteria(), false);
+            SafeParcelWriter.writeTypedList(parcel, 8, getParticipants(), false);
+            SafeParcelWriter.writeInt(parcel, 9, getAutoMatchWaitEstimateSeconds());
+            SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+            return;
+        }
+        parcel.writeString(this.zzqc);
+        parcel.writeString(this.zzqd);
+        parcel.writeLong(this.zzoz);
+        parcel.writeInt(this.zzqe);
+        parcel.writeString(this.description);
+        parcel.writeInt(this.zzpd);
+        parcel.writeBundle(this.zzpz);
+        int size = this.zzpc.size();
+        parcel.writeInt(size);
+        for (int i2 = 0; i2 < size; i2++) {
+            ((ParticipantEntity) this.zzpc.get(i2)).writeToParcel(parcel, i);
+        }
     }
 }

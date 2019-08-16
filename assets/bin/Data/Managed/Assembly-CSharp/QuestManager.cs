@@ -29,12 +29,6 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		MAX_NUM
 	}
 
-	private const string DIFFICULTY_SPRITE_NAME_EASY = "Quest_classicon_beginner";
-
-	private const string DIFFICULTY_SPRITE_NAME_NORMAL = "Quest_classicon_middle";
-
-	private const string DIFFICULTY_SPRITE_NAME_HARD = "Quest_classicon_high";
-
 	public bool needRequestOrderQuestList = true;
 
 	private QuestStartData startData;
@@ -53,11 +47,19 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 
 	private int m_currentArenaId;
 
+	private int m_currentSeriesArenaId;
+
 	private bool firstSetGetClearStatus = true;
 
 	public QuestCollection questCollection = new QuestCollection();
 
 	public static string SPR_NAME_MISSION_CLEAR = "Quest_crownicon_clear";
+
+	private const string DIFFICULTY_SPRITE_NAME_EASY = "Quest_classicon_beginner";
+
+	private const string DIFFICULTY_SPRITE_NAME_NORMAL = "Quest_classicon_middle";
+
+	private const string DIFFICULTY_SPRITE_NAME_HARD = "Quest_classicon_high";
 
 	public List<ClearStatusQuest> clearStatusQuest
 	{
@@ -101,6 +103,18 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		private set;
 	}
 
+	public int carnivalEventId
+	{
+		get;
+		private set;
+	}
+
+	public List<int> futureEventIdList
+	{
+		get;
+		private set;
+	}
+
 	public List<Network.EventData> bingoEventList
 	{
 		get;
@@ -108,6 +122,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	}
 
 	public QuestCompleteData compData
+	{
+		get;
+		private set;
+	}
+
+	public QuestRetireModel.Param retireData
 	{
 		get;
 		private set;
@@ -131,15 +151,25 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		private set;
 	}
 
+	public bool isTrial
+	{
+		get;
+		private set;
+	}
+
 	public bool IsHowToGetAutoEvent => howToGetTargetQuestID != 0;
 
 	public int currentArenaId => m_currentArenaId;
+
+	public int currentSeriesArenaId => m_currentSeriesArenaId;
 
 	public uint currentQuestID => current.questId;
 
 	public uint currentQuestSeriesIndex => current.seriesIndex;
 
 	public bool currentQuestIsFreeJoin => current.isFreeJoin;
+
+	public QuestTable.QuestTableData currentQuestData => current.questData;
 
 	public bool initialized
 	{
@@ -186,9 +216,34 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle();
 	}
 
-	public static bool IsValidInGameWaveMatch()
+	public static bool IsValidInGameWaveMatch(bool isOnlyEvent = false)
 	{
-		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsWaveMatch();
+		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsWaveMatch(isOnlyEvent);
+	}
+
+	public static bool IsValidInGameSeries()
+	{
+		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries();
+	}
+
+	public static bool IsValidInGameSeriesArena()
+	{
+		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena();
+	}
+
+	public static bool IsValidInGameTrial()
+	{
+		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.isTrial;
+	}
+
+	public static bool IsValidTrial()
+	{
+		return MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.isTrial;
+	}
+
+	public static bool IsValidInGameWaveStrategy()
+	{
+		return IsValidInGame() && (MonoBehaviourSingleton<QuestManager>.I.IsMatchQuestType(QUEST_TYPE.WAVE_STRATEGY) || MonoBehaviourSingleton<QuestManager>.I.IsMatchQuestType(QUEST_TYPE.EVENT_WAVE_STRATEGY));
 	}
 
 	public void SetEventList(List<Network.EventData> _eventList)
@@ -198,10 +253,16 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		for (int count = eventList.Count; i < count; i++)
 		{
 			eventList[i].OnRecv();
+			eventList[i].SetupEnum();
 		}
 	}
 
-	private Network.EventData _GetEventData(int eventId)
+	public void SetCarnivalEventId(int carnivalEventId)
+	{
+		this.carnivalEventId = carnivalEventId;
+	}
+
+	public Network.EventData _GetEventData(int eventId)
 	{
 		int i = 0;
 		for (int count = eventList.Count; i < count; i++)
@@ -235,6 +296,16 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return eventData.GetRest() > 0;
 	}
 
+	public void SetFutureEventList(List<int> _idList)
+	{
+		futureEventIdList = _idList;
+	}
+
+	public bool IsFutureEvent(int eventId)
+	{
+		return futureEventIdList.Contains(eventId);
+	}
+
 	public void SetBingoEventList(List<Network.EventData> _bingoEventList)
 	{
 		bingoEventList = _bingoEventList;
@@ -242,6 +313,10 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		for (int count = bingoEventList.Count; i < count; i++)
 		{
 			bingoEventList[i].OnRecv();
+		}
+		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
+		{
+			MonoBehaviourSingleton<SceneSettingsManager>.I.SwitchBingoObjectsActivation(IsBingoPlayableEventExist());
 		}
 	}
 
@@ -273,6 +348,16 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return eventData.GetRest() > 0;
 	}
 
+	public void StartTrial()
+	{
+		isTrial = true;
+	}
+
+	public void ClearTrial()
+	{
+		isTrial = false;
+	}
+
 	public void StartHowToGetAutoEvent(uint id)
 	{
 		howToGetTargetQuestID = id;
@@ -281,6 +366,15 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	public void EndHowToGetAutoEvent()
 	{
 		howToGetTargetQuestID = 0u;
+	}
+
+	public bool IsMatchQuestType(QUEST_TYPE questType)
+	{
+		if (current.questData == null)
+		{
+			return false;
+		}
+		return current.questData.questType == questType;
 	}
 
 	public bool IsDefenseBattle()
@@ -292,13 +386,30 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return current.questData.questType == QUEST_TYPE.DEFENSE || current.questData.questStyle == QUEST_STYLE.DEFENSE;
 	}
 
-	public bool IsWaveMatch()
+	public bool IsWaveMatch(bool isOnlyEvent = false)
 	{
 		if (current.questData == null)
 		{
 			return false;
 		}
-		return current.questData.questType == QUEST_TYPE.WAVE;
+		if (isOnlyEvent)
+		{
+			return current.questData.questType == QUEST_TYPE.EVENT_WAVE || current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+		}
+		return current.questData.questType == QUEST_TYPE.WAVE || current.questData.questType == QUEST_TYPE.EVENT_WAVE || current.questData.questType == QUEST_TYPE.WAVE_STRATEGY || current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+	}
+
+	public bool IsWaveStrategyMatch(bool isOnlyEvent = false)
+	{
+		if (current.questData == null)
+		{
+			return false;
+		}
+		if (isOnlyEvent)
+		{
+			return current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+		}
+		return current.questData.questType == QUEST_TYPE.WAVE_STRATEGY || current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
 	}
 
 	public bool IsExplore()
@@ -518,7 +629,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (explore != null)
 		{
-			explore.UpdatePortalPoint(portalId, point, false);
+			explore.UpdatePortalPoint(portalId, point);
 		}
 	}
 
@@ -526,88 +637,88 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (explore != null)
 		{
-			explore.UpdatePortalPoint(portalId, point, true);
+			explore.UpdatePortalPoint(portalId, point, force: true);
 		}
 	}
 
 	private void UpdatePortalPointForExplore(int portalId, int point, int x, int z)
 	{
 		ExplorePortalPoint portal = explore.GetPortalData(portalId);
-		if (portal != null)
+		if (portal == null)
 		{
-			int prevPoint = portal.point;
-			if (point > prevPoint)
+			return;
+		}
+		int prevPoint = portal.point;
+		if (point <= prevPoint)
+		{
+			return;
+		}
+		uint portalPoint = portal.portalData.portalPoint;
+		if (point > portalPoint)
+		{
+			point = (int)portalPoint;
+		}
+		FieldMapPortalInfo portalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalInfo((uint)portalId);
+		if (portalInfo == null)
+		{
+			FieldMapTable.PortalTableData portalData = Singleton<FieldMapTable>.I.GetPortalData((uint)portalId);
+			portalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalInfo(portalData.linkPortalId);
+			if (portalInfo != null)
 			{
-				uint portalPoint = portal.portalData.portalPoint;
-				if (point > portalPoint)
+				x = Mathf.RoundToInt(portalInfo.portalData.srcX);
+				z = Mathf.RoundToInt(portalInfo.portalData.srcZ);
+			}
+		}
+		if (portalInfo != null)
+		{
+			prevPoint = portalInfo.GetNowPortalPoint();
+		}
+		if (point >= portalPoint)
+		{
+			FieldPortal fieldPortal = MonoBehaviourSingleton<WorldMapManager>.I.GetFieldPortal(portalId);
+			if (fieldPortal == null || fieldPortal.point < portalPoint)
+			{
+				SetExplorePortalPoint(portalId, point);
+				MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestOpenPortal(portalId, delegate(bool succeeded, Error error)
 				{
-					point = (int)portalPoint;
-				}
-				FieldMapPortalInfo portalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalInfo((uint)portalId);
-				if (portalInfo == null)
-				{
-					FieldMapTable.PortalTableData portalData = Singleton<FieldMapTable>.I.GetPortalData((uint)portalId);
-					portalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalInfo(portalData.linkPortalId);
-					if (portalInfo != null)
+					if (succeeded)
 					{
-						x = Mathf.RoundToInt(portalInfo.portalData.srcX);
-						z = Mathf.RoundToInt(portalInfo.portalData.srcZ);
-					}
-				}
-				if (portalInfo != null)
-				{
-					prevPoint = portalInfo.GetNowPortalPoint();
-				}
-				if (point >= portalPoint)
-				{
-					FieldPortal fieldPortal = MonoBehaviourSingleton<WorldMapManager>.I.GetFieldPortal(portalId);
-					if (fieldPortal == null || fieldPortal.point < portalPoint)
-					{
-						SetExplorePortalPoint(portalId, point);
-						MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestOpenPortal(portalId, delegate(bool succeeded, Error error)
+						if (!PlayPortalPointEffect(portalInfo, point - prevPoint, x, z) && ShouldShowPortalOpenNotification())
 						{
-							if (succeeded)
+							string text3 = string.Empty;
+							FieldMapTable.FieldMapTableData fieldMapData2 = Singleton<FieldMapTable>.I.GetFieldMapData(portal.portalData.dstMapID);
+							if (fieldMapData2 != null)
 							{
-								if (!PlayPortalPointEffect(portalInfo, point - prevPoint, x, z) && ShouldShowPortalOpenNotification())
-								{
-									string text3 = string.Empty;
-									FieldMapTable.FieldMapTableData fieldMapData2 = Singleton<FieldMapTable>.I.GetFieldMapData(portal.portalData.dstMapID);
-									if (fieldMapData2 != null)
-									{
-										text3 = fieldMapData2.mapName;
-									}
-									string text4 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text3);
-									UIInGamePopupDialog.PushOpen(text4, false, 1.8f);
-								}
+								text3 = fieldMapData2.mapName;
 							}
-							else
-							{
-								RollbackExplorePortalPoint(portalId, prevPoint);
-							}
-						});
+							string text4 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text3);
+							UIInGamePopupDialog.PushOpen(text4, is_important: false);
+						}
 					}
 					else
 					{
-						SetExplorePortalPoint(portalId, point);
-						if (!PlayPortalPointEffect(portalInfo, point - prevPoint, x, z) && ShouldShowPortalOpenNotification())
-						{
-							string text = string.Empty;
-							FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portal.portalData.dstMapID);
-							if (fieldMapData != null)
-							{
-								text = fieldMapData.mapName;
-							}
-							string text2 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text);
-							UIInGamePopupDialog.PushOpen(text2, false, 1.4f);
-						}
+						RollbackExplorePortalPoint(portalId, prevPoint);
 					}
-				}
-				else
-				{
-					SetExplorePortalPoint(portalId, point);
-					PlayPortalPointEffect(portalInfo, point - prevPoint, x, z);
-				}
+				});
+				return;
 			}
+			SetExplorePortalPoint(portalId, point);
+			if (!PlayPortalPointEffect(portalInfo, point - prevPoint, x, z) && ShouldShowPortalOpenNotification())
+			{
+				string text = string.Empty;
+				FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portal.portalData.dstMapID);
+				if (fieldMapData != null)
+				{
+					text = fieldMapData.mapName;
+				}
+				string text2 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text);
+				UIInGamePopupDialog.PushOpen(text2, is_important: false, 1.4f);
+			}
+		}
+		else
+		{
+			SetExplorePortalPoint(portalId, point);
+			PlayPortalPointEffect(portalInfo, point - prevPoint, x, z);
 		}
 	}
 
@@ -624,7 +735,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		}
 		if (MonoBehaviourSingleton<FieldManager>.I.AddPortalPointToPortalInfo(portalInfo, getPoint))
 		{
-			MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop(null);
+			MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop();
 		}
 		if (getPoint <= 0)
 		{
@@ -995,6 +1106,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		startData = null;
 		compData = null;
+		retireData = null;
 		startTime = 0f;
 		missionNewClearFlag = null;
 		resultUserCollection.Clear();
@@ -1002,6 +1114,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		exploreInfo = null;
 		arenaCompData = null;
 		remainEndurance = 0f;
+		isTrial = false;
 	}
 
 	public void SaveLastNewClearQuest(int status)
@@ -1021,6 +1134,24 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			GameSaveData.instance.lastQusetID = quest_id;
 			GameSaveData.Save();
 		}
+	}
+
+	public bool IsCurrentQuestTypeSeries()
+	{
+		if (current.questData == null)
+		{
+			return false;
+		}
+		return current.questData.questType == QUEST_TYPE.SERIES;
+	}
+
+	public bool IsCurrentQuestTypeSeriesArena()
+	{
+		if (current.questData == null)
+		{
+			return false;
+		}
+		return current.questData.questType == QUEST_TYPE.SERIES_ARENA;
 	}
 
 	public void SetCurrentQuestID(uint quest_id, bool is_free_join = true)
@@ -1053,6 +1184,11 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	public void SetCurrentArenaId(int arenaId)
 	{
 		m_currentArenaId = arenaId;
+	}
+
+	public void SetCurrentSeriesArenaId(int seriesArenaId)
+	{
+		m_currentSeriesArenaId = seriesArenaId;
 	}
 
 	public int GetCurrentQuestId()
@@ -1118,6 +1254,19 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return current.questData.enemyID[current.seriesIndex];
 	}
 
+	public int GetCurrentQuestEnemyID(int index)
+	{
+		if (current.questData == null)
+		{
+			return 0;
+		}
+		if (index >= current.questData.enemyID.Length)
+		{
+			return 0;
+		}
+		return current.questData.enemyID[index];
+	}
+
 	public int GetCurrentQuestEnemyLv()
 	{
 		if (current.questData == null)
@@ -1134,6 +1283,19 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			}
 		}
 		return num;
+	}
+
+	public int GetCurrentQuestEnemyLv(int index)
+	{
+		if (current.questData == null)
+		{
+			return 0;
+		}
+		if (index >= current.questData.enemyLv.Length)
+		{
+			return 0;
+		}
+		return current.questData.enemyLv[index];
 	}
 
 	public int GetCurrentQuestBGMID()
@@ -1163,6 +1325,41 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return current.questData.seriesNum;
 	}
 
+	public bool IsLastEnemyCurrentQuestSeries()
+	{
+		if (current.questData == null)
+		{
+			return false;
+		}
+		if (!IsCurrentQuestTypeSeries() && !IsCurrentQuestTypeSeriesArena())
+		{
+			return false;
+		}
+		return current.seriesIndex >= current.questData.seriesNum - 1;
+	}
+
+	public bool IsOverCurrentQuestSeries()
+	{
+		if (current.questData == null)
+		{
+			return false;
+		}
+		if (GetCurrentQuestSeriesNum() <= 1)
+		{
+			return false;
+		}
+		return current.seriesIndex >= current.questData.seriesNum;
+	}
+
+	public int GetCurrentQuestMaxTeamMemberNum()
+	{
+		if (current.questData == null)
+		{
+			return 4;
+		}
+		return current.questData.userNumLimit;
+	}
+
 	public QuestStartData.EnemyReward GetCurrentQuestEnemyReward()
 	{
 		if (startData == null)
@@ -1186,8 +1383,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	public bool IsClearQuest(uint questId)
 	{
 		CLEAR_STATUS clearStatusQuest = GetClearStatusQuest(questId);
-		CLEAR_STATUS cLEAR_STATUS = clearStatusQuest;
-		if (cLEAR_STATUS == CLEAR_STATUS.CLEAR || cLEAR_STATUS == CLEAR_STATUS.ALL_CLEAR)
+		if (clearStatusQuest == CLEAR_STATUS.CLEAR || clearStatusQuest == CLEAR_STATUS.ALL_CLEAR)
 		{
 			return true;
 		}
@@ -1230,6 +1426,15 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA1) && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialQuestId == (int)questId)
 		{
 			return !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_END);
+		}
+		return false;
+	}
+
+	public bool IsTutorialOrderShadowQuest()
+	{
+		if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
+		{
+			return !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_END);
 		}
 		return false;
 	}
@@ -1447,30 +1652,25 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				{
 					orderQuestList = ret.result.order;
 				}
-				if (send.req_eq <= 0)
+				if (send.req_eq > 0)
 				{
-					goto IL_0075;
 				}
-				goto IL_0075;
+				if (send.req_e > 0)
+				{
+					SetEventList(ret.result.events);
+					SetCarnivalEventId(ret.result.carnivalEventId);
+					SetFutureEventList(ret.result.futureEventIds);
+				}
+				if (send.req_d > 0 && MonoBehaviourSingleton<DeliveryManager>.IsValid())
+				{
+					MonoBehaviourSingleton<DeliveryManager>.I.UpdateDeliveryReaminTime(ret.result.dailyRemainTime, ret.result.weeklyRemainTime);
+				}
+				if (send.req_bingo > 0)
+				{
+					SetBingoEventList(ret.result.bingoEvents);
+				}
 			}
-			goto IL_0108;
-			IL_0108:
 			call_back(obj);
-			return;
-			IL_0075:
-			if (send.req_e > 0)
-			{
-				SetEventList(ret.result.events);
-			}
-			if (send.req_d > 0 && MonoBehaviourSingleton<DeliveryManager>.IsValid())
-			{
-				MonoBehaviourSingleton<DeliveryManager>.I.UpdateDeliveryReaminTime(ret.result.dailyRemainTime, ret.result.weeklyRemainTime);
-			}
-			if (send.req_bingo > 0)
-			{
-				SetBingoEventList(ret.result.bingoEvents);
-			}
-			goto IL_0108;
 		}, string.Empty);
 	}
 
@@ -1523,20 +1723,41 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return bingoEventList;
 	}
 
+	public List<Network.EventData> GetValidBingoDataListInSection()
+	{
+		if (!MonoBehaviourSingleton<GameSceneManager>.IsValid())
+		{
+			return new List<Network.EventData>();
+		}
+		EVENT_DISPLAY_LOCATION_TYPE excludeLocationType;
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
+		{
+			excludeLocationType = EVENT_DISPLAY_LOCATION_TYPE.HOME;
+		}
+		else
+		{
+			excludeLocationType = EVENT_DISPLAY_LOCATION_TYPE.FIELD;
+		}
+		return (from e in bingoEventList
+		where e.displayLocationType != (int)excludeLocationType
+		select e).ToList();
+	}
+
 	public bool IsBingoPlayableEventExist()
 	{
-		if (bingoEventList == null)
+		List<Network.EventData> validBingoDataListInSection = GetValidBingoDataListInSection();
+		if (validBingoDataListInSection == null)
 		{
 			return false;
 		}
-		if (bingoEventList.Count <= 0)
+		if (validBingoDataListInSection.Count <= 0)
 		{
 			return false;
 		}
 		int i = 0;
-		for (int count = bingoEventList.Count; i < count; i++)
+		for (int count = validBingoDataListInSection.Count; i < count; i++)
 		{
-			if (bingoEventList[i].GetRest() >= 1)
+			if (validBingoDataListInSection[i].GetRest() >= 1)
 			{
 				return true;
 			}
@@ -1616,7 +1837,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		float num = 0f;
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
-			num = (float)MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_LOCK_SEC;
+			num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_LOCK_SEC;
 		}
 		float num2 = Time.get_time() - startTime;
 		if (num2 < num)
@@ -1633,15 +1854,16 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			compData = recv_comp;
 		}
 		missionNewClearFlag = now_clear_mission_list;
-		if (old_mission_clear_state != null)
+		if (old_mission_clear_state == null)
 		{
-			int i = 0;
-			for (int count = old_mission_clear_state.Count; i < count; i++)
+			return;
+		}
+		int i = 0;
+		for (int count = old_mission_clear_state.Count; i < count; i++)
+		{
+			if (old_mission_clear_state[i] >= 3)
 			{
-				if (old_mission_clear_state[i] >= 3)
-				{
-					missionNewClearFlag[i] = 0;
-				}
+				missionNewClearFlag[i] = 0;
 			}
 		}
 	}
@@ -1651,7 +1873,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		compData = new QuestCompleteData();
 		compData.reward = guildRequestCompleteData.reward;
 		compData.pointEvent = guildRequestCompleteData.pointEvent;
-		SetCurrentQuestID(beforeQuestId, false);
+		SetCurrentQuestID(beforeQuestId, is_free_join: false);
 	}
 
 	public void SetCompleteDataFromGuildRequestMultiComplete(GuildRequestCompleteModel.Param guildRequestCompleteData)
@@ -1693,128 +1915,179 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		return mission_clear_status;
 	}
 
+	public bool CheckMissionAllClear(uint questID)
+	{
+		ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questID);
+		return clearStatusQuestData != null && !clearStatusQuestData.missionStatus.Any((int missionStatus) => missionStatus < 3);
+	}
+
+	public bool CheckEventMissionAllClear(int eventID)
+	{
+		List<QuestTable.QuestTableData> eventQuestDataList = Singleton<QuestTable>.I.GetEventQuestDataList(eventID);
+		for (int i = 0; i < eventQuestDataList.Count; i++)
+		{
+			if (!CheckMissionAllClear(eventQuestDataList[i].questID))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void SendQuestCompleteTrial(List<int> mClear, Action<bool, Error> call_back)
+	{
+		if (startData == null)
+		{
+			call_back(arg1: false, Error.Unknown);
+			return;
+		}
+		QuestCompleteTrialModel.RequestSendForm requestSendForm = new QuestCompleteTrialModel.RequestSendForm();
+		requestSendForm.qt = startData.qt;
+		requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
+		if (mClear != null)
+		{
+			requestSendForm.mClear = mClear;
+		}
+		Protocol.Send(QuestCompleteTrialModel.URL, requestSendForm, delegate(QuestCompleteTrialModel ret)
+		{
+			bool arg = false;
+			if (ret.Error == Error.None)
+			{
+				arg = true;
+			}
+			call_back(arg, ret.Error);
+		}, string.Empty);
+	}
+
 	public void SendQuestComplete(List<List<int>> breakIds, List<int> mClear, List<int> memIds, float hpRate, List<QuestCompleteModel.BattleUserLog> logs, Action<bool, Error> call_back)
 	{
 		if (startData == null)
 		{
-			call_back(false, Error.Unknown);
+			call_back(arg1: false, Error.Unknown);
+			return;
 		}
-		else
+		QuestCompleteModel.RequestSendForm requestSendForm = new QuestCompleteModel.RequestSendForm();
+		requestSendForm.qt = startData.qt;
+		if (breakIds != null)
 		{
-			QuestCompleteModel.RequestSendForm requestSendForm = new QuestCompleteModel.RequestSendForm();
-			requestSendForm.qt = startData.qt;
-			if (breakIds != null)
+			if (breakIds.Count > 0 && breakIds[0] != null)
 			{
-				if (breakIds.Count > 0 && breakIds[0] != null)
-				{
-					requestSendForm.breakIds0 = breakIds[0];
-				}
-				if (breakIds.Count > 1 && breakIds[1] != null)
-				{
-					requestSendForm.breakIds1 = breakIds[1];
-				}
-				if (breakIds.Count > 2 && breakIds[2] != null)
-				{
-					requestSendForm.breakIds2 = breakIds[2];
-				}
-				if (breakIds.Count > 3 && breakIds[3] != null)
-				{
-					requestSendForm.breakIds3 = breakIds[3];
-				}
-				if (breakIds.Count > 4 && breakIds[4] != null)
-				{
-					requestSendForm.breakIds4 = breakIds[4];
-				}
+				requestSendForm.breakIds0 = breakIds[0];
 			}
-			if (memIds != null)
+			if (breakIds.Count > 1 && breakIds[1] != null)
 			{
-				requestSendForm.memids = memIds;
+				requestSendForm.breakIds1 = breakIds[1];
 			}
-			if (mClear != null)
+			if (breakIds.Count > 2 && breakIds[2] != null)
 			{
-				requestSendForm.mClear = mClear;
+				requestSendForm.breakIds2 = breakIds[2];
 			}
-			requestSendForm.hpRate = hpRate;
-			if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+			if (breakIds.Count > 3 && breakIds[3] != null)
 			{
-				SetGivenDamageList(requestSendForm.givenDamageList);
+				requestSendForm.breakIds3 = breakIds[3];
 			}
-			if (logs != null)
+			if (breakIds.Count > 4 && breakIds[4] != null)
 			{
-				requestSendForm.fieldId = MonoBehaviourSingleton<FieldManager>.I.GetFieldId();
-				requestSendForm.logs = logs;
-				requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
+				requestSendForm.breakIds4 = breakIds[4];
 			}
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
-			{
-				requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
-				MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
-			}
-			if (MonoBehaviourSingleton<InGameManager>.IsValid())
-			{
-				requestSendForm.deliveryBattleInfo = MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.GetInfo();
-				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.ClearInfo();
-			}
-			List<int> mission_clear_status = GetMissionClearStatus();
-			if (MonoBehaviourSingleton<StatusManager>.I.GetBoostStatus(USE_ITEM_EFFECT_TYPE.EVENT_POINT_UP) == null)
-			{
-				if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
-				{
-					MonoBehaviourSingleton<UIPlayerStatus>.I.SetHGPBoostUpdatePermitFlag(false);
-				}
-				if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
-				{
-					MonoBehaviourSingleton<UIEnduranceStatus>.I.SetHGPBoostUpdatePermitFlag(false);
-				}
-			}
-			if (MonoBehaviourSingleton<InGameManager>.IsValid())
-			{
-				requestSendForm.remainSec = MonoBehaviourSingleton<InGameProgress>.I.remaindTime;
-				requestSendForm.elapseSec = MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime();
-			}
-			Protocol.Send(QuestCompleteModel.URL, requestSendForm, delegate(QuestCompleteModel ret)
-			{
-				bool arg = false;
-				if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
-				{
-					MonoBehaviourSingleton<UIPlayerStatus>.I.SetHGPBoostUpdatePermitFlag(true);
-				}
-				if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
-				{
-					MonoBehaviourSingleton<UIEnduranceStatus>.I.SetHGPBoostUpdatePermitFlag(true);
-				}
-				switch (ret.Error)
-				{
-				case Error.None:
-					arg = true;
-					SetReciveCompleteData(ret.result, mClear, mission_clear_status);
-					resultUserCollection.SetPartyFollowInfo(ret.result.friend);
-					if (MonoBehaviourSingleton<PartyManager>.IsValid())
-					{
-						MonoBehaviourSingleton<PartyManager>.I.SetFollowPartyMember(ret.result.friend);
-					}
-					if (MonoBehaviourSingleton<FriendManager>.IsValid())
-					{
-						MonoBehaviourSingleton<FriendManager>.I.SetFollowNum(ret.result.followNum);
-					}
-					if (ret.result.repeatParty != null)
-					{
-						MonoBehaviourSingleton<PartyManager>.I.repeatPartyStatus = ret.result.repeatParty.repeatPartyStatus;
-						if (ret.result.repeatParty.repeatPartyStatus > 0)
-						{
-							MonoBehaviourSingleton<PartyManager>.I.UpdatePartyRepeat(ret.result.repeatParty.party, null, ret.result.repeatParty.partyServer, ret.result.repeatParty.inviteFriendInfo, null);
-						}
-						else if (ret.result.repeatParty.repeatPartyStatus < 0)
-						{
-							MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest = false;
-						}
-					}
-					MonoBehaviourSingleton<GoWrapManager>.I.trackQuestEnd(currentQuestID, true);
-					break;
-				}
-				call_back(arg, ret.Error);
-			}, string.Empty);
 		}
+		if (memIds != null)
+		{
+			requestSendForm.memids = memIds;
+		}
+		if (mClear != null)
+		{
+			requestSendForm.mClear = mClear;
+		}
+		requestSendForm.hpRate = hpRate;
+		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+		{
+			SetGivenDamageList(requestSendForm.givenDamageList);
+		}
+		if (logs != null)
+		{
+			requestSendForm.fieldId = MonoBehaviourSingleton<FieldManager>.I.GetFieldId();
+			requestSendForm.logs = logs;
+			requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
+		}
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		{
+			requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
+			MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
+		}
+		if (MonoBehaviourSingleton<InGameManager>.IsValid())
+		{
+			requestSendForm.deliveryBattleInfo = MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.GetInfo();
+			MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.ClearInfo();
+		}
+		List<int> mission_clear_status = GetMissionClearStatus();
+		if (MonoBehaviourSingleton<StatusManager>.I.GetBoostStatus(USE_ITEM_EFFECT_TYPE.EVENT_POINT_UP) == null)
+		{
+			if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+			{
+				MonoBehaviourSingleton<UIPlayerStatus>.I.SetHGPBoostUpdatePermitFlag(permit: false);
+			}
+			if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
+			{
+				MonoBehaviourSingleton<UIEnduranceStatus>.I.SetHGPBoostUpdatePermitFlag(permit: false);
+			}
+		}
+		if (MonoBehaviourSingleton<InGameManager>.IsValid())
+		{
+			requestSendForm.remainSec = MonoBehaviourSingleton<InGameProgress>.I.remaindTime;
+			requestSendForm.elapseSec = MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime();
+		}
+		if (IsWaveMatch(isOnlyEvent: true))
+		{
+			requestSendForm.dc = MonoBehaviourSingleton<InGameProgress>.I.defeatCount;
+			requestSendForm.dbc = MonoBehaviourSingleton<InGameProgress>.I.defeatBossCount;
+			requestSendForm.pdbc = MonoBehaviourSingleton<InGameProgress>.I.partyDefeatBossCount;
+			requestSendForm.rHp = MonoBehaviourSingleton<StageObjectManager>.I.GetWaveMatchTargetHpRate();
+			requestSendForm.rSec = MonoBehaviourSingleton<InGameProgress>.I.remaindTime;
+			requestSendForm.wmwave = MonoBehaviourSingleton<InGameProgress>.I.waveMatchWave;
+		}
+		Protocol.Send(QuestCompleteModel.URL, requestSendForm, delegate(QuestCompleteModel ret)
+		{
+			bool arg = false;
+			if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+			{
+				MonoBehaviourSingleton<UIPlayerStatus>.I.SetHGPBoostUpdatePermitFlag(permit: true);
+			}
+			if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
+			{
+				MonoBehaviourSingleton<UIEnduranceStatus>.I.SetHGPBoostUpdatePermitFlag(permit: true);
+			}
+			switch (ret.Error)
+			{
+			case Error.None:
+				arg = true;
+				SetReciveCompleteData(ret.result, mClear, mission_clear_status);
+				resultUserCollection.SetPartyFollowInfo(ret.result.friend);
+				if (MonoBehaviourSingleton<PartyManager>.IsValid())
+				{
+					MonoBehaviourSingleton<PartyManager>.I.SetFollowPartyMember(ret.result.friend);
+				}
+				if (MonoBehaviourSingleton<FriendManager>.IsValid())
+				{
+					MonoBehaviourSingleton<FriendManager>.I.SetFollowNum(ret.result.followNum);
+				}
+				if (ret.result.repeatParty != null)
+				{
+					MonoBehaviourSingleton<PartyManager>.I.repeatPartyStatus = ret.result.repeatParty.repeatPartyStatus;
+					if (ret.result.repeatParty.repeatPartyStatus > 0)
+					{
+						MonoBehaviourSingleton<PartyManager>.I.UpdatePartyRepeat(ret.result.repeatParty.party, null, ret.result.repeatParty.partyServer, ret.result.repeatParty.inviteFriendInfo);
+					}
+					else if (ret.result.repeatParty.repeatPartyStatus < 0)
+					{
+						MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest = false;
+					}
+				}
+				MonoBehaviourSingleton<GoWrapManager>.I.trackQuestEnd(currentQuestID, isSuccess: true);
+				break;
+			}
+			call_back(arg, ret.Error);
+		}, string.Empty);
 	}
 
 	public void SendQuestRetire(bool is_timeout, List<int> memIDs, string roomId, List<QuestCompleteModel.BattleUserLog> logs, Action<bool> call_back)
@@ -1838,8 +2111,19 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		}
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 		{
-			requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
+			if (!IsValidTrial())
+			{
+				requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
+			}
 			MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
+		}
+		if (IsWaveMatch(isOnlyEvent: true))
+		{
+			requestSendForm.dc = MonoBehaviourSingleton<InGameProgress>.I.defeatCount;
+			requestSendForm.dbc = MonoBehaviourSingleton<InGameProgress>.I.defeatBossCount;
+			requestSendForm.pdbc = MonoBehaviourSingleton<InGameProgress>.I.partyDefeatBossCount;
+			requestSendForm.rSec = MonoBehaviourSingleton<InGameProgress>.I.remaindTime;
+			requestSendForm.wmwave = MonoBehaviourSingleton<InGameProgress>.I.waveMatchWave;
 		}
 		Protocol.Send(QuestRetireModel.URL, requestSendForm, delegate(QuestRetireModel ret)
 		{
@@ -1847,6 +2131,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			if (ret.Error == Error.None)
 			{
 				obj = true;
+				retireData = ret.result;
 				resultUserCollection.SetPartyFollowInfo(ret.result.friend);
 				if (MonoBehaviourSingleton<PartyManager>.IsValid())
 				{
@@ -1856,7 +2141,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				{
 					MonoBehaviourSingleton<FriendManager>.I.SetFollowNum(ret.result.followNum);
 				}
-				MonoBehaviourSingleton<GoWrapManager>.I.trackQuestEnd(currentQuestID, false);
+				MonoBehaviourSingleton<GoWrapManager>.I.trackQuestEnd(currentQuestID, isSuccess: false);
 			}
 			call_back(obj);
 		}, string.Empty);
@@ -1896,64 +2181,62 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (startData == null)
 		{
-			call_back(false, Error.Unknown);
+			call_back(arg1: false, Error.Unknown);
+			return;
 		}
-		else
+		QuestRushProgressModel.RequestSendForm requestSendForm = new QuestRushProgressModel.RequestSendForm();
+		requestSendForm.wave = wave;
+		requestSendForm.remainSec = remainSec;
+		requestSendForm.qt = startData.qt;
+		if (breakIds != null)
 		{
-			QuestRushProgressModel.RequestSendForm requestSendForm = new QuestRushProgressModel.RequestSendForm();
-			requestSendForm.wave = wave;
-			requestSendForm.remainSec = remainSec;
-			requestSendForm.qt = startData.qt;
-			if (breakIds != null)
-			{
-				requestSendForm.breakIds = breakIds;
-			}
-			if (memIds != null)
-			{
-				requestSendForm.memids = memIds;
-			}
-			if (mClear != null)
-			{
-				requestSendForm.mClear = mClear;
-			}
-			requestSendForm.hpRate = hpRate;
-			if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-			{
-				SetGivenDamageList(requestSendForm.givenDamageList);
-			}
-			if (logs != null)
-			{
-				requestSendForm.fieldId = MonoBehaviourSingleton<FieldManager>.I.GetFieldId();
-				requestSendForm.logs = logs;
-				requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
-			}
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
-			{
-				requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
-				MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
-			}
-			if (MonoBehaviourSingleton<InGameManager>.IsValid())
-			{
-				requestSendForm.deliveryBattleInfo = MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.GetInfo();
-				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.ClearInfo();
-			}
-			List<int> mission_clear_status = GetMissionClearStatus();
-			Protocol.Send(QuestRushProgressModel.URL, requestSendForm, delegate(QuestRushProgressModel ret)
-			{
-				bool arg = false;
-				switch (ret.Error)
-				{
-				case Error.None:
-					arg = true;
-					MonoBehaviourSingleton<InGameManager>.I.AddWaveResult(ret.result.reward, ret.result.pointEvent, ret.result.pointShop);
-					MonoBehaviourSingleton<InGameProgress>.I.SetRushRemainTime(ret.result.remainSec);
-					MonoBehaviourSingleton<InGameProgress>.I.SetRushTimeBonus(ret.result.plusSec);
-					SetReciveCompleteData(null, mClear, mission_clear_status);
-					break;
-				}
-				call_back(arg, ret.Error);
-			}, string.Empty);
+			requestSendForm.breakIds = breakIds;
 		}
+		if (memIds != null)
+		{
+			requestSendForm.memids = memIds;
+		}
+		if (mClear != null)
+		{
+			requestSendForm.mClear = mClear;
+		}
+		requestSendForm.hpRate = hpRate;
+		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+		{
+			SetGivenDamageList(requestSendForm.givenDamageList);
+		}
+		if (logs != null)
+		{
+			requestSendForm.fieldId = MonoBehaviourSingleton<FieldManager>.I.GetFieldId();
+			requestSendForm.logs = logs;
+			requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
+		}
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		{
+			requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
+			MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
+		}
+		if (MonoBehaviourSingleton<InGameManager>.IsValid())
+		{
+			requestSendForm.deliveryBattleInfo = MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.GetInfo();
+			MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.ClearInfo();
+		}
+		List<int> mission_clear_status = GetMissionClearStatus();
+		Protocol.Send(QuestRushProgressModel.URL, requestSendForm, delegate(QuestRushProgressModel ret)
+		{
+			bool arg = false;
+			switch (ret.Error)
+			{
+			case Error.None:
+				arg = true;
+				MonoBehaviourSingleton<InGameManager>.I.AddWaveResult(ret.result.reward, ret.result.pointEvent, ret.result.pointShop);
+				MonoBehaviourSingleton<InGameProgress>.I.SetRushRemainTime(ret.result.remainSec);
+				MonoBehaviourSingleton<InGameProgress>.I.SetRushTimeBonus(ret.result.plusSec);
+				SetReciveCompleteData(null, mClear, mission_clear_status);
+				break;
+			}
+			call_back(arg, ret.Error);
+		}, string.Empty);
 	}
 
 	public void SendArenaQuestStart(ArenaStartModel.RequestSendForm requestData, Action<bool> callBack)
@@ -1977,77 +2260,72 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	{
 		if (startData == null)
 		{
-			callback(false, Error.Unknown);
+			callback(arg1: false, Error.Unknown);
+			return;
 		}
-		else
+		requestData.qt = startData.qt;
+		Protocol.Send(ArenaProgressModel.URL, requestData, delegate(ArenaProgressModel ret)
 		{
-			requestData.qt = startData.qt;
-			Protocol.Send(ArenaProgressModel.URL, requestData, delegate(ArenaProgressModel ret)
+			bool arg = false;
+			if (ret.Error == Error.None)
 			{
-				bool arg = false;
-				if (ret.Error == Error.None)
-				{
-					arg = true;
-					MonoBehaviourSingleton<InGameManager>.I.AddArenaWaveResult(ret.result.reward, ret.result.pointShop);
-					MonoBehaviourSingleton<InGameProgress>.I.SetArenaRemainTime(ret.result.remainMilliSec);
-					MonoBehaviourSingleton<InGameProgress>.I.SetArenaTimeBonus(ret.result.plusSec);
-				}
-				callback(arg, ret.Error);
-			}, string.Empty);
-		}
+				arg = true;
+				MonoBehaviourSingleton<InGameManager>.I.AddArenaWaveResult(ret.result.reward, ret.result.pointShop);
+				MonoBehaviourSingleton<InGameProgress>.I.SetArenaRemainTime(ret.result.remainMilliSec);
+				MonoBehaviourSingleton<InGameProgress>.I.SetArenaTimeBonus(ret.result.plusSec);
+			}
+			callback(arg, ret.Error);
+		}, string.Empty);
 	}
 
 	public void SendArenaComplete(Action<bool, Error> callBack)
 	{
 		if (startData == null)
 		{
-			callBack(false, Error.Unknown);
+			callBack(arg1: false, Error.Unknown);
+			return;
 		}
-		else if (!MonoBehaviourSingleton<CoopManager>.IsValid())
+		if (!MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
-			callBack(false, Error.Unknown);
+			callBack(arg1: false, Error.Unknown);
+			return;
 		}
-		else
+		CoopManager i = MonoBehaviourSingleton<CoopManager>.I;
+		ArenaCompleteModel.RequestSendForm requestSendForm = new ArenaCompleteModel.RequestSendForm();
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
-			CoopManager i = MonoBehaviourSingleton<CoopManager>.I;
-			ArenaCompleteModel.RequestSendForm requestSendForm = new ArenaCompleteModel.RequestSendForm();
-			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+			requestSendForm.remainMilliSec = MonoBehaviourSingleton<InGameProgress>.I.GetArenaRemainMilliSec();
+			requestSendForm.totalElapseMilliSec = MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedMilliSec();
+		}
+		Protocol.Send(ArenaCompleteModel.URL, requestSendForm, delegate(ArenaCompleteModel ret)
+		{
+			bool arg = false;
+			if (ret.Error == Error.None)
 			{
-				requestSendForm.remainMilliSec = MonoBehaviourSingleton<InGameProgress>.I.GetArenaRemainMilliSec();
-				requestSendForm.totalElapseMilliSec = MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedMilliSec();
+				arg = true;
+				arenaCompData = ret.result;
 			}
-			Protocol.Send(ArenaCompleteModel.URL, requestSendForm, delegate(ArenaCompleteModel ret)
-			{
-				bool arg = false;
-				if (ret.Error == Error.None)
-				{
-					arg = true;
-					arenaCompData = ret.result;
-				}
-				callBack(arg, ret.Error);
-			}, string.Empty);
-		}
+			callBack(arg, ret.Error);
+		}, string.Empty);
 	}
 
 	public void SendArenaRetire(ArenaRetireModel.RequestSendForm requestData, Action<bool> callBack)
 	{
 		if (startData == null)
 		{
-			callBack(false);
+			callBack(obj: false);
+			return;
 		}
-		else
+		requestData.qt = startData.qt;
+		Protocol.Send(ArenaRetireModel.URL, requestData, delegate(ArenaRetireModel ret)
 		{
-			requestData.qt = startData.qt;
-			Protocol.Send(ArenaRetireModel.URL, requestData, delegate(ArenaRetireModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-				}
-				callBack(obj);
-			}, string.Empty);
-		}
+				obj = true;
+			}
+			callBack(obj);
+		}, string.Empty);
 	}
 
 	public void SendGetArenaUserRecord(int userId, int eventId, Action<bool, ArenaUserRecordModel.Param> callBack)
@@ -2087,16 +2365,24 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			});
 			flag = true;
 		}
+		if (Utility.IsExist(diff.del))
+		{
+			diff.del.ForEach(delegate(int qusetId)
+			{
+				clearStatusQuest.RemoveAll((ClearStatusQuest list_data) => list_data.questId == qusetId);
+			});
+			flag = true;
+		}
 		if (Utility.IsExist(diff.update))
 		{
 			diff.update.ForEach(delegate(ClearStatusQuest data)
 			{
-				QuestManager questManager = this;
 				ClearStatusQuest clearStatusQuest = this.clearStatusQuest.Find((ClearStatusQuest list_data) => list_data.questId == data.questId);
 				clearStatusQuest.questId = data.questId;
 				clearStatusQuest.questStatus = data.questStatus;
 				clearStatusQuest.missionStatus = data.missionStatus;
 				clearStatusQuest.story = data.story;
+				clearStatusQuest.clearTime = data.clearTime;
 			});
 			flag = true;
 		}
@@ -2126,7 +2412,6 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			diff.update.ForEach(delegate(ClearStatusQuestEnemySpecies data)
 			{
-				QuestManager questManager = this;
 				ClearStatusQuestEnemySpecies clearStatusQuestEnemySpecies = this.clearStatusQuestEnemySpecies.Find((ClearStatusQuestEnemySpecies list_data) => list_data.enemySpecies == data.enemySpecies);
 				clearStatusQuestEnemySpecies.enemySpecies = data.enemySpecies;
 				clearStatusQuestEnemySpecies.questStatus = data.questStatus;

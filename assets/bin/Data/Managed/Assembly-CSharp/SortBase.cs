@@ -16,7 +16,10 @@ public abstract class SortBase : GameSection
 		SMITH_CREATE_PICKUP_WEAPON,
 		SMITH_CREATE_PICKUP_ARMOR,
 		QUEST,
-		ABILITY_ITEM
+		ABILITY_ITEM,
+		ACCESSORY,
+		TYPE_FILTERABLE_WEAPON,
+		TYPE_FILTERABLE_ARMOR
 	}
 
 	[Flags]
@@ -232,7 +235,7 @@ public abstract class SortBase : GameSection
 
 	protected void OnQuery_REQUIREMENT()
 	{
-		SORT_REQUIREMENT requirement = (SORT_REQUIREMENT)(int)GameSection.GetEventData();
+		SORT_REQUIREMENT requirement = (SORT_REQUIREMENT)GameSection.GetEventData();
 		sortOrder.requirement = requirement;
 	}
 

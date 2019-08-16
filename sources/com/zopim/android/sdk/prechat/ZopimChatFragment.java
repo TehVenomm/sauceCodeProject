@@ -7,15 +7,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.p000v4.app.Fragment;
+import android.support.p000v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ChatConfig;
 import com.zopim.android.sdk.api.ChatSession;
@@ -37,17 +37,23 @@ public class ZopimChatFragment extends Fragment {
     private static final String STATE_NO_AGENTS_VISIBITLITY = "NO_AGENTS_VISIBILITY";
     private static final String STATE_NO_CONNECTION_ERROR_VISIBITLITY = "NO_CONNECTION_ERROR_VISIBILITY";
     private static final String STATE_PROGRESS_VISIBITLITY = "PROGRESS_VISIBILITY";
-    private Chat mChat;
-    BroadcastReceiver mChatInitializationTimeout = new C0889k(this);
-    private boolean mChatInitialized = false;
+    /* access modifiers changed from: private */
+    public Chat mChat;
+    BroadcastReceiver mChatInitializationTimeout = new C1258k(this);
+    /* access modifiers changed from: private */
+    public boolean mChatInitialized = false;
     private ChatListener mChatListener;
-    ConnectionObserver mConnectionObserver = new C0887i(this);
-    private View mCouldNotConnectErrorView;
+    ConnectionObserver mConnectionObserver = new C1256i(this);
+    /* access modifiers changed from: private */
+    public View mCouldNotConnectErrorView;
     private Handler mHandler = new Handler(Looper.getMainLooper());
-    private View mNoAgentsView;
-    private View mNoConnectionErrorView;
-    BroadcastReceiver mOfflineMessageReceiver = new C0888j(this);
-    private View mProgressBar;
+    /* access modifiers changed from: private */
+    public View mNoAgentsView;
+    /* access modifiers changed from: private */
+    public View mNoConnectionErrorView;
+    BroadcastReceiver mOfflineMessageReceiver = new C1257j(this);
+    /* access modifiers changed from: private */
+    public View mProgressBar;
 
     private void close() {
         FragmentTransaction beginTransaction = getFragmentManager().beginTransaction();
@@ -63,18 +69,20 @@ public class ZopimChatFragment extends Fragment {
         return zopimChatFragment;
     }
 
-    private void onChatInitializationFailed() {
-        this.mHandler.post(new C0883e(this));
+    /* access modifiers changed from: private */
+    public void onChatInitializationFailed() {
+        this.mHandler.post(new C1252e(this));
     }
 
-    private void onChatInitialized() {
-        Logger.m564v(LOG_TAG, "Chat initialization completed");
+    /* access modifiers changed from: private */
+    public void onChatInitialized() {
+        Logger.m577v(LOG_TAG, "Chat initialization completed");
         if (this.mChatListener != null) {
             this.mChatListener.onChatInitialized();
         }
         Account account = ZopimChat.getDataSource().getAccount();
         if (account == null || Status.OFFLINE != account.getStatus()) {
-            this.mHandler.post(new C0882d(this));
+            this.mHandler.post(new C1251d(this));
         } else {
             showNoAgents();
         }
@@ -100,8 +108,9 @@ public class ZopimChatFragment extends Fragment {
         }
     }
 
-    private void showCouldNotConnectError() {
-        this.mHandler.post(new C0886h(this));
+    /* access modifiers changed from: private */
+    public void showCouldNotConnectError() {
+        this.mHandler.post(new C1255h(this));
     }
 
     private boolean showField(Field field, String str) {
@@ -109,14 +118,16 @@ public class ZopimChatFragment extends Fragment {
     }
 
     private void showNoAgents() {
-        this.mHandler.post(new C0885g(this));
+        this.mHandler.post(new C1254g(this));
     }
 
-    private void showNoConnectionError() {
-        this.mHandler.post(new C0884f(this));
+    /* access modifiers changed from: private */
+    public void showNoConnectionError() {
+        this.mHandler.post(new C1253f(this));
     }
 
-    private boolean showPreChat() {
+    /* access modifiers changed from: private */
+    public boolean showPreChat() {
         ChatConfig config = this.mChat.getConfig();
         PreChatForm preChatForm = config.getPreChatForm();
         if (config.getDepartment() == null || !config.getDepartment().isEmpty()) {
@@ -131,17 +142,8 @@ public class ZopimChatFragment extends Fragment {
         if (visitorInfo.getName() == null || !visitorInfo.getName().isEmpty()) {
         }
         if (visitorInfo.getPhoneNumber() == null || !visitorInfo.getPhoneNumber().isEmpty()) {
-            z = z || showField(preChatForm.getEmail(), visitorInfo.getEmail());
-            z = z || showField(preChatForm.getName(), visitorInfo.getName());
-            return z || showField(preChatForm.getPhoneNumber(), visitorInfo.getPhoneNumber());
-        } else {
-            if (!z) {
-            }
-            if (!z) {
-            }
-            if (!z) {
-            }
         }
+        return ((z || showField(preChatForm.getEmail(), visitorInfo.getEmail())) || showField(preChatForm.getName(), visitorInfo.getName())) || showField(preChatForm.getPhoneNumber(), visitorInfo.getPhoneNumber());
     }
 
     public void onActivityCreated(@Nullable Bundle bundle) {
@@ -164,7 +166,7 @@ public class ZopimChatFragment extends Fragment {
         } else {
             this.mChatInitialized = bundle.getBoolean(STATE_CHAT_INITIALIZED, false);
             this.mChat = ZopimChat.resume(getActivity());
-            Logger.m564v(LOG_TAG, "Restoring states. chat initialized: " + this.mChatInitialized);
+            Logger.m577v(LOG_TAG, "Restoring states. chat initialized: " + this.mChatInitialized);
         }
         if (this.mChatListener != null) {
             this.mChatListener.onChatLoaded(this.mChat);
@@ -181,7 +183,7 @@ public class ZopimChatFragment extends Fragment {
     }
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_chat_fragment, viewGroup, false);
+        return layoutInflater.inflate(C1122R.C1126layout.zopim_chat_fragment, viewGroup, false);
     }
 
     public void onDetach() {
@@ -207,7 +209,7 @@ public class ZopimChatFragment extends Fragment {
         bundle.putInt(STATE_COULD_NOT_CONNECT_ERROR_VISIBITLITY, this.mCouldNotConnectErrorView.getVisibility());
         bundle.putInt(STATE_NO_AGENTS_VISIBITLITY, this.mNoAgentsView.getVisibility());
         bundle.putInt(STATE_PROGRESS_VISIBITLITY, this.mProgressBar.getVisibility());
-        Logger.m564v(LOG_TAG, "Saving states. chat initialized: " + this.mChatInitialized + ", no conn visibility: " + this.mNoConnectionErrorView.getVisibility() + ", progress visibility: " + this.mProgressBar.getVisibility());
+        Logger.m577v(LOG_TAG, "Saving states. chat initialized: " + this.mChatInitialized + ", no conn visibility: " + this.mNoConnectionErrorView.getVisibility() + ", progress visibility: " + this.mProgressBar.getVisibility());
     }
 
     public void onStart() {
@@ -216,9 +218,9 @@ public class ZopimChatFragment extends Fragment {
         IntentFilter intentFilter = new IntentFilter(Contract.ACTION_CREATE_REQUEST);
         intentFilter.setPriority(-1000);
         getActivity().registerReceiver(this.mOfflineMessageReceiver, intentFilter);
-        intentFilter = new IntentFilter(ChatSession.ACTION_CHAT_INITIALIZATION_TIMEOUT);
-        intentFilter.setPriority(-1000);
-        getActivity().registerReceiver(this.mChatInitializationTimeout, intentFilter);
+        IntentFilter intentFilter2 = new IntentFilter(ChatSession.ACTION_CHAT_INITIALIZATION_TIMEOUT);
+        intentFilter2.setPriority(-1000);
+        getActivity().registerReceiver(this.mChatInitializationTimeout, intentFilter2);
     }
 
     public void onStop() {
@@ -232,11 +234,11 @@ public class ZopimChatFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
         setHasOptionsMenu(true);
-        this.mProgressBar = view.findViewById(C0785R.id.progress_container);
-        this.mNoConnectionErrorView = view.findViewById(C0785R.id.no_connection_error);
-        this.mNoAgentsView = view.findViewById(C0785R.id.no_agents);
-        this.mCouldNotConnectErrorView = view.findViewById(C0785R.id.could_not_connect_error);
-        ((Button) this.mNoAgentsView.findViewById(C0785R.id.no_agents_button)).setOnClickListener(new C0880b(this));
+        this.mProgressBar = view.findViewById(C1122R.C1125id.progress_container);
+        this.mNoConnectionErrorView = view.findViewById(C1122R.C1125id.no_connection_error);
+        this.mNoAgentsView = view.findViewById(C1122R.C1125id.no_agents);
+        this.mCouldNotConnectErrorView = view.findViewById(C1122R.C1125id.could_not_connect_error);
+        ((Button) this.mNoAgentsView.findViewById(C1122R.C1125id.no_agents_button)).setOnClickListener(new C1249b(this));
     }
 
     public void onViewStateRestored(@Nullable Bundle bundle) {

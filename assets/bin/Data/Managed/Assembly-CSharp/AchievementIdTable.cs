@@ -19,14 +19,14 @@ public class AchievementIdTable : Singleton<AchievementIdTable>, IDataTable
 		}
 	}
 
-	private const string NT = "taskId,goalNum,androidKey";
-
 	private UIntKeyTable<AchievementIdData> achievementIdDataTable;
+
+	private const string NT = "taskId,goalNum,androidKey";
 
 	public void CreateTable(string csv_text)
 	{
 		achievementIdDataTable = new UIntKeyTable<AchievementIdData>();
-		CSVReader cSVReader = new CSVReader(csv_text, "taskId,goalNum,androidKey", true);
+		CSVReader cSVReader = new CSVReader(csv_text, "taskId,goalNum,androidKey", decrypt: true);
 		uint num = 1u;
 		while (cSVReader.NextLine())
 		{

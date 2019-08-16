@@ -9,29 +9,27 @@ public class Goal_RaiseAlly : GoalComposite
 	{
 		SetStatus(STATUS.ACTIVE);
 		RemoveAllSubGoals(brain);
-		if (!brain.targetCtrl.CanReviveOfTargetAlly())
+		if (!brain.targetCtrl.CanRescueOfTargetAlly())
 		{
 			SetStatus(STATUS.COMPLETED);
+			return;
+		}
+		float num = 2f;
+		if (brain.owner is Player)
+		{
+			num = (brain.owner as Player).playerParameter.revivalRange;
+		}
+		num *= 0.7f;
+		brain.moveCtrl.ChangeStopRange(num);
+		Character target = brain.targetCtrl.GetAllyTarget() as Character;
+		float lengthWithBetweenObject = AIUtility.GetLengthWithBetweenObject(brain.owner, target);
+		if (lengthWithBetweenObject < num)
+		{
+			AddSubGoal<Goal_Prayer>().SetPrayer(target, num);
 		}
 		else
 		{
-			float num = 2f;
-			if (brain.owner is Player)
-			{
-				num = (brain.owner as Player).playerParameter.revivalRange;
-			}
-			num *= 0.7f;
-			brain.moveCtrl.ChangeStopRange(num);
-			Character target = brain.targetCtrl.GetAllyTarget() as Character;
-			float lengthWithBetweenObject = AIUtility.GetLengthWithBetweenObject(brain.owner, target);
-			if (lengthWithBetweenObject < num)
-			{
-				AddSubGoal<Goal_Prayer>().SetPrayer(target, num);
-			}
-			else
-			{
-				AddSubGoal<Goal_GoToAlly>();
-			}
+			AddSubGoal<Goal_GoToAlly>();
 		}
 	}
 
@@ -39,7 +37,7 @@ public class Goal_RaiseAlly : GoalComposite
 	{
 		STATUS sTATUS = UpdateSubGoals(brain);
 		SetStatus(sTATUS);
-		if (sTATUS == STATUS.COMPLETED && brain.targetCtrl.CanReviveOfTargetAlly())
+		if (sTATUS == STATUS.COMPLETED && brain.targetCtrl.CanRescueOfTargetAlly())
 		{
 			SetStatus(STATUS.INACTIVE);
 		}
@@ -55,9 +53,8 @@ public class Goal_RaiseAlly : GoalComposite
 	public override void HandleEvent(Brain brain, BRAIN_EVENT ev, object param = null)
 	{
 		base.HandleEvent(brain, ev, param);
-		if (ev == BRAIN_EVENT.BULLET_CATCH && !IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && brain.dangerRader != null && !brain.dangerRader.AskWillBulletHit(0.2f))
+		if (ev == BRAIN_EVENT.BULLET_CATCH && !IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && brain.dangerRader != null && !brain.dangerRader.AskWillBulletHit())
 		{
-			return;
 		}
 	}
 }

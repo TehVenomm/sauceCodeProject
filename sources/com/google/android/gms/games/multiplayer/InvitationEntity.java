@@ -2,38 +2,57 @@ package com.google.android.gms.games.multiplayer;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.DowngradeableSafeParcel;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
+import android.support.annotation.NonNull;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.RetainForClient;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameEntity;
 import com.google.android.gms.games.internal.GamesDowngradeableSafeParcel;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
+@RetainForClient
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "InvitationEntityCreator")
+@Reserved({1000})
 public final class InvitationEntity extends GamesDowngradeableSafeParcel implements Invitation {
     public static final Creator<InvitationEntity> CREATOR = new zza();
-    private final long mCreationTimestamp;
-    private final String zzdww;
-    private final GameEntity zzhiw;
-    private final int zzhma;
-    private final ParticipantEntity zzhmb;
-    private final ArrayList<ParticipantEntity> zzhmc;
-    private final int zzhmd;
-    private final int zzhme;
+    @Field(getter = "getGame", mo13990id = 1)
+    private final GameEntity zzlp;
+    @Field(getter = "getInvitationId", mo13990id = 2)
+    private final String zzoy;
+    @Field(getter = "getCreationTimestamp", mo13990id = 3)
+    private final long zzoz;
+    @Field(getter = "getInvitationType", mo13990id = 4)
+    private final int zzpa;
+    @Field(getter = "getInviter", mo13990id = 5)
+    private final ParticipantEntity zzpb;
+    @Field(getter = "getParticipants", mo13990id = 6)
+    private final ArrayList<ParticipantEntity> zzpc;
+    @Field(getter = "getVariant", mo13990id = 7)
+    private final int zzpd;
+    @Field(getter = "getAvailableAutoMatchSlots", mo13990id = 8)
+    private final int zzpe;
 
     static final class zza extends zza {
         zza() {
         }
 
         public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-            return zzk(parcel);
+            return createFromParcel(parcel);
         }
 
-        public final InvitationEntity zzk(Parcel parcel) {
-            if (GamesDowngradeableSafeParcel.zze(DowngradeableSafeParcel.zzakc()) || DowngradeableSafeParcel.zzga(InvitationEntity.class.getCanonicalName())) {
-                return super.zzk(parcel);
+        public final InvitationEntity zze(Parcel parcel) {
+            if (InvitationEntity.zzb(InvitationEntity.getUnparcelClientVersion()) || InvitationEntity.canUnparcelSafely(InvitationEntity.class.getCanonicalName())) {
+                return super.createFromParcel(parcel);
             }
             GameEntity gameEntity = (GameEntity) GameEntity.CREATOR.createFromParcel(parcel);
             String readString = parcel.readString();
@@ -49,42 +68,53 @@ public final class InvitationEntity extends GamesDowngradeableSafeParcel impleme
         }
     }
 
-    InvitationEntity(GameEntity gameEntity, String str, long j, int i, ParticipantEntity participantEntity, ArrayList<ParticipantEntity> arrayList, int i2, int i3) {
-        this.zzhiw = gameEntity;
-        this.zzdww = str;
-        this.mCreationTimestamp = j;
-        this.zzhma = i;
-        this.zzhmb = participantEntity;
-        this.zzhmc = arrayList;
-        this.zzhmd = i2;
-        this.zzhme = i3;
+    @Constructor
+    InvitationEntity(@Param(mo13993id = 1) GameEntity gameEntity, @Param(mo13993id = 2) String str, @Param(mo13993id = 3) long j, @Param(mo13993id = 4) int i, @Param(mo13993id = 5) ParticipantEntity participantEntity, @Param(mo13993id = 6) ArrayList<ParticipantEntity> arrayList, @Param(mo13993id = 7) int i2, @Param(mo13993id = 8) int i3) {
+        this.zzlp = gameEntity;
+        this.zzoy = str;
+        this.zzoz = j;
+        this.zzpa = i;
+        this.zzpb = participantEntity;
+        this.zzpc = arrayList;
+        this.zzpd = i2;
+        this.zzpe = i3;
     }
 
-    InvitationEntity(Invitation invitation) {
-        this.zzhiw = new GameEntity(invitation.getGame());
-        this.zzdww = invitation.getInvitationId();
-        this.mCreationTimestamp = invitation.getCreationTimestamp();
-        this.zzhma = invitation.getInvitationType();
-        this.zzhmd = invitation.getVariant();
-        this.zzhme = invitation.getAvailableAutoMatchSlots();
+    InvitationEntity(@NonNull Invitation invitation) {
+        this(invitation, ParticipantEntity.zza((List<Participant>) invitation.getParticipants()));
+    }
+
+    private InvitationEntity(@NonNull Invitation invitation, @NonNull ArrayList<ParticipantEntity> arrayList) {
+        ParticipantEntity participantEntity;
+        this.zzlp = new GameEntity(invitation.getGame());
+        this.zzoy = invitation.getInvitationId();
+        this.zzoz = invitation.getCreationTimestamp();
+        this.zzpa = invitation.getInvitationType();
+        this.zzpd = invitation.getVariant();
+        this.zzpe = invitation.getAvailableAutoMatchSlots();
         String participantId = invitation.getInviter().getParticipantId();
-        Object obj = null;
-        ArrayList participants = invitation.getParticipants();
-        int size = participants.size();
-        this.zzhmc = new ArrayList(size);
-        for (int i = 0; i < size; i++) {
-            Participant participant = (Participant) participants.get(i);
-            if (participant.getParticipantId().equals(participantId)) {
-                obj = participant;
+        this.zzpc = arrayList;
+        ArrayList arrayList2 = arrayList;
+        int size = arrayList2.size();
+        int i = 0;
+        while (true) {
+            if (i >= size) {
+                participantEntity = null;
+                break;
             }
-            this.zzhmc.add((ParticipantEntity) participant.freeze());
+            Object obj = arrayList2.get(i);
+            i++;
+            participantEntity = (ParticipantEntity) obj;
+            if (participantEntity.getParticipantId().equals(participantId)) {
+                break;
+            }
         }
-        zzbp.zzb(obj, (Object) "Must have a valid inviter!");
-        this.zzhmb = (ParticipantEntity) obj.freeze();
+        Preconditions.checkNotNull(participantEntity, "Must have a valid inviter!");
+        this.zzpb = participantEntity;
     }
 
     static int zza(Invitation invitation) {
-        return Arrays.hashCode(new Object[]{invitation.getGame(), invitation.getInvitationId(), Long.valueOf(invitation.getCreationTimestamp()), Integer.valueOf(invitation.getInvitationType()), invitation.getInviter(), invitation.getParticipants(), Integer.valueOf(invitation.getVariant()), Integer.valueOf(invitation.getAvailableAutoMatchSlots())});
+        return Objects.hashCode(invitation.getGame(), invitation.getInvitationId(), Long.valueOf(invitation.getCreationTimestamp()), Integer.valueOf(invitation.getInvitationType()), invitation.getInviter(), invitation.getParticipants(), Integer.valueOf(invitation.getVariant()), Integer.valueOf(invitation.getAvailableAutoMatchSlots()));
     }
 
     static boolean zza(Invitation invitation, Object obj) {
@@ -95,11 +125,11 @@ public final class InvitationEntity extends GamesDowngradeableSafeParcel impleme
             return true;
         }
         Invitation invitation2 = (Invitation) obj;
-        return zzbf.equal(invitation2.getGame(), invitation.getGame()) && zzbf.equal(invitation2.getInvitationId(), invitation.getInvitationId()) && zzbf.equal(Long.valueOf(invitation2.getCreationTimestamp()), Long.valueOf(invitation.getCreationTimestamp())) && zzbf.equal(Integer.valueOf(invitation2.getInvitationType()), Integer.valueOf(invitation.getInvitationType())) && zzbf.equal(invitation2.getInviter(), invitation.getInviter()) && zzbf.equal(invitation2.getParticipants(), invitation.getParticipants()) && zzbf.equal(Integer.valueOf(invitation2.getVariant()), Integer.valueOf(invitation.getVariant())) && zzbf.equal(Integer.valueOf(invitation2.getAvailableAutoMatchSlots()), Integer.valueOf(invitation.getAvailableAutoMatchSlots()));
+        return Objects.equal(invitation2.getGame(), invitation.getGame()) && Objects.equal(invitation2.getInvitationId(), invitation.getInvitationId()) && Objects.equal(Long.valueOf(invitation2.getCreationTimestamp()), Long.valueOf(invitation.getCreationTimestamp())) && Objects.equal(Integer.valueOf(invitation2.getInvitationType()), Integer.valueOf(invitation.getInvitationType())) && Objects.equal(invitation2.getInviter(), invitation.getInviter()) && Objects.equal(invitation2.getParticipants(), invitation.getParticipants()) && Objects.equal(Integer.valueOf(invitation2.getVariant()), Integer.valueOf(invitation.getVariant())) && Objects.equal(Integer.valueOf(invitation2.getAvailableAutoMatchSlots()), Integer.valueOf(invitation.getAvailableAutoMatchSlots()));
     }
 
     static String zzb(Invitation invitation) {
-        return zzbf.zzt(invitation).zzg("Game", invitation.getGame()).zzg("InvitationId", invitation.getInvitationId()).zzg("CreationTimestamp", Long.valueOf(invitation.getCreationTimestamp())).zzg("InvitationType", Integer.valueOf(invitation.getInvitationType())).zzg("Inviter", invitation.getInviter()).zzg("Participants", invitation.getParticipants()).zzg("Variant", Integer.valueOf(invitation.getVariant())).zzg("AvailableAutoMatchSlots", Integer.valueOf(invitation.getAvailableAutoMatchSlots())).toString();
+        return Objects.toStringHelper(invitation).add("Game", invitation.getGame()).add("InvitationId", invitation.getInvitationId()).add("CreationTimestamp", Long.valueOf(invitation.getCreationTimestamp())).add("InvitationType", Integer.valueOf(invitation.getInvitationType())).add("Inviter", invitation.getInviter()).add("Participants", invitation.getParticipants()).add("Variant", Integer.valueOf(invitation.getVariant())).add("AvailableAutoMatchSlots", Integer.valueOf(invitation.getAvailableAutoMatchSlots())).toString();
     }
 
     public final boolean equals(Object obj) {
@@ -111,43 +141,53 @@ public final class InvitationEntity extends GamesDowngradeableSafeParcel impleme
     }
 
     public final int getAvailableAutoMatchSlots() {
-        return this.zzhme;
+        return this.zzpe;
     }
 
     public final long getCreationTimestamp() {
-        return this.mCreationTimestamp;
+        return this.zzoz;
     }
 
     public final Game getGame() {
-        return this.zzhiw;
+        return this.zzlp;
     }
 
     public final String getInvitationId() {
-        return this.zzdww;
+        return this.zzoy;
     }
 
     public final int getInvitationType() {
-        return this.zzhma;
+        return this.zzpa;
     }
 
     public final Participant getInviter() {
-        return this.zzhmb;
+        return this.zzpb;
     }
 
     public final ArrayList<Participant> getParticipants() {
-        return new ArrayList(this.zzhmc);
+        return new ArrayList<>(this.zzpc);
     }
 
     public final int getVariant() {
-        return this.zzhmd;
+        return this.zzpd;
     }
 
     public final int hashCode() {
-        return zza(this);
+        return zza((Invitation) this);
     }
 
     public final boolean isDataValid() {
         return true;
+    }
+
+    public final void setShouldDowngrade(boolean z) {
+        super.setShouldDowngrade(z);
+        this.zzlp.setShouldDowngrade(z);
+        this.zzpb.setShouldDowngrade(z);
+        int size = this.zzpc.size();
+        for (int i = 0; i < size; i++) {
+            ((ParticipantEntity) this.zzpc.get(i)).setShouldDowngrade(z);
+        }
     }
 
     public final String toString() {
@@ -155,15 +195,28 @@ public final class InvitationEntity extends GamesDowngradeableSafeParcel impleme
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getGame(), i, false);
-        zzd.zza(parcel, 2, getInvitationId(), false);
-        zzd.zza(parcel, 3, getCreationTimestamp());
-        zzd.zzc(parcel, 4, getInvitationType());
-        zzd.zza(parcel, 5, getInviter(), i, false);
-        zzd.zzc(parcel, 6, getParticipants(), false);
-        zzd.zzc(parcel, 7, getVariant());
-        zzd.zzc(parcel, 8, getAvailableAutoMatchSlots());
-        zzd.zzai(parcel, zze);
+        if (!shouldDowngrade()) {
+            int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+            SafeParcelWriter.writeParcelable(parcel, 1, getGame(), i, false);
+            SafeParcelWriter.writeString(parcel, 2, getInvitationId(), false);
+            SafeParcelWriter.writeLong(parcel, 3, getCreationTimestamp());
+            SafeParcelWriter.writeInt(parcel, 4, getInvitationType());
+            SafeParcelWriter.writeParcelable(parcel, 5, getInviter(), i, false);
+            SafeParcelWriter.writeTypedList(parcel, 6, getParticipants(), false);
+            SafeParcelWriter.writeInt(parcel, 7, getVariant());
+            SafeParcelWriter.writeInt(parcel, 8, getAvailableAutoMatchSlots());
+            SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+            return;
+        }
+        this.zzlp.writeToParcel(parcel, i);
+        parcel.writeString(this.zzoy);
+        parcel.writeLong(this.zzoz);
+        parcel.writeInt(this.zzpa);
+        this.zzpb.writeToParcel(parcel, i);
+        int size = this.zzpc.size();
+        parcel.writeInt(size);
+        for (int i2 = 0; i2 < size; i2++) {
+            ((ParticipantEntity) this.zzpc.get(i2)).writeToParcel(parcel, i);
+        }
     }
 }

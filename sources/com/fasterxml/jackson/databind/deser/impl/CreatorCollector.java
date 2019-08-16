@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import net.gogame.gowrap.InternalConstants;
 
 public class CreatorCollector {
     protected static final int C_ARRAY_DELEGATE = 8;
@@ -35,7 +34,7 @@ public class CreatorCollector {
     protected static final int C_LONG = 3;
     protected static final int C_PROPS = 7;
     protected static final int C_STRING = 1;
-    protected static final String[] TYPE_DESCS = new String[]{InternalConstants.DEFAULT_LOCALE, "String", "int", "long", "double", "boolean", "delegate", "property-based"};
+    protected static final String[] TYPE_DESCS = {"default", "String", "int", "long", "double", "boolean", "delegate", "property-based"};
     protected SettableBeanProperty[] _arrayDelegateArgs;
     protected final BeanDescription _beanDesc;
     protected final boolean _canFixAccess;
@@ -104,7 +103,7 @@ public class CreatorCollector {
         JavaType _computeDelegateType2 = _computeDelegateType(this._creators[8], this._arrayDelegateArgs);
         JavaType type = this._beanDesc.getType();
         if (!this._hasNonDefaultCreator) {
-            Class rawClass = type.getRawClass();
+            Class<HashMap> rawClass = type.getRawClass();
             if (rawClass == Collection.class || rawClass == List.class || rawClass == ArrayList.class) {
                 return new Vanilla(1);
             }
@@ -115,7 +114,7 @@ public class CreatorCollector {
                 return new Vanilla(3);
             }
         }
-        ValueInstantiator stdValueInstantiator = new StdValueInstantiator(deserializationConfig, type);
+        StdValueInstantiator stdValueInstantiator = new StdValueInstantiator(deserializationConfig, type);
         stdValueInstantiator.configureFromObjectSettings(this._creators[0], this._creators[6], _computeDelegateType, this._delegateArgs, this._creators[7], this._propertyBasedArgs);
         stdValueInstantiator.configureFromArraySettings(this._creators[8], _computeDelegateType2, this._arrayDelegateArgs);
         stdValueInstantiator.configureFromStringCreator(this._creators[1]);
@@ -166,8 +165,7 @@ public class CreatorCollector {
         if (settableBeanPropertyArr.length > 1) {
             HashMap hashMap = new HashMap();
             int length = settableBeanPropertyArr.length;
-            int i = 0;
-            while (i < length) {
+            for (int i = 0; i < length; i++) {
                 String name = settableBeanPropertyArr[i].getName();
                 if (name.length() != 0 || settableBeanPropertyArr[i].getInjectableValueId() == null) {
                     Integer num = (Integer) hashMap.put(name, Integer.valueOf(i));
@@ -175,7 +173,6 @@ public class CreatorCollector {
                         throw new IllegalArgumentException("Duplicate creator property \"" + name + "\" (index " + num + " vs " + i + ")");
                     }
                 }
-                i++;
             }
         }
         this._propertyBasedArgs = settableBeanPropertyArr;
@@ -235,18 +232,21 @@ public class CreatorCollector {
     }
 
     private JavaType _computeDelegateType(AnnotatedWithParams annotatedWithParams, SettableBeanProperty[] settableBeanPropertyArr) {
+        int i;
         if (!this._hasNonDefaultCreator || annotatedWithParams == null) {
             return null;
         }
-        int i;
         if (settableBeanPropertyArr != null) {
             int length = settableBeanPropertyArr.length;
             i = 0;
-            while (i < length) {
-                if (settableBeanPropertyArr[i] == null) {
+            while (true) {
+                if (i >= length) {
                     break;
+                } else if (settableBeanPropertyArr[i] == null) {
+                    break;
+                } else {
+                    i++;
                 }
-                i++;
             }
         }
         i = 0;
@@ -260,7 +260,8 @@ public class CreatorCollector {
         return t;
     }
 
-    protected void verifyNonDup(AnnotatedWithParams annotatedWithParams, int i, boolean z) {
+    /* access modifiers changed from: protected */
+    public void verifyNonDup(AnnotatedWithParams annotatedWithParams, int i, boolean z) {
         boolean z2 = true;
         int i2 = 1 << i;
         this._hasNonDefaultCreator = true;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BestHTTP
 {
-	internal sealed class HTTPUpdateDelegator
+	internal sealed class HTTPUpdateDelegator : MonoBehaviour
 	{
 		private static HTTPUpdateDelegator instance;
 
@@ -14,10 +14,8 @@ namespace BestHTTP
 
 		public static void CheckInstance()
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Expected O, but got Unknown
+			//IL_0042: Expected O, but got Unknown
 			if (!Object.op_Implicit(instance))
 			{
 				instance = (Object.FindObjectOfType(typeof(HTTPUpdateDelegator)) as HTTPUpdateDelegator);

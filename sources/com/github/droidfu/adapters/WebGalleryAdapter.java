@@ -4,9 +4,9 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.Gallery;
 import com.github.droidfu.widgets.WebImageView;
 import java.util.List;
@@ -19,36 +19,37 @@ public class WebGalleryAdapter extends BaseAdapter {
     private Drawable progressDrawable;
 
     private static final class ViewHolder {
-        private WebImageView webImageView;
+        /* access modifiers changed from: private */
+        public WebImageView webImageView;
 
         private ViewHolder() {
         }
     }
 
-    public WebGalleryAdapter(Context context) {
-        initialize(context, null, null, null);
+    public WebGalleryAdapter(Context context2) {
+        initialize(context2, null, null, null);
     }
 
-    public WebGalleryAdapter(Context context, List<String> list) {
-        initialize(context, list, null, null);
+    public WebGalleryAdapter(Context context2, List<String> list) {
+        initialize(context2, list, null, null);
     }
 
-    public WebGalleryAdapter(Context context, List<String> list, int i) {
-        initialize(context, list, context.getResources().getDrawable(i), null);
+    public WebGalleryAdapter(Context context2, List<String> list, int i) {
+        initialize(context2, list, context2.getResources().getDrawable(i), null);
     }
 
-    public WebGalleryAdapter(Context context, List<String> list, int i, int i2) {
+    public WebGalleryAdapter(Context context2, List<String> list, int i, int i2) {
         Drawable drawable = null;
-        Drawable drawable2 = i == -1 ? null : context.getResources().getDrawable(i);
+        Drawable drawable2 = i == -1 ? null : context2.getResources().getDrawable(i);
         if (i2 != -1) {
-            drawable = context.getResources().getDrawable(i2);
+            drawable = context2.getResources().getDrawable(i2);
         }
-        initialize(context, list, drawable2, drawable);
+        initialize(context2, list, drawable2, drawable);
     }
 
-    private void initialize(Context context, List<String> list, Drawable drawable, Drawable drawable2) {
+    private void initialize(Context context2, List<String> list, Drawable drawable, Drawable drawable2) {
         this.imageUrls = list;
-        this.context = context;
+        this.context = context2;
         this.progressDrawable = drawable;
         this.errorDrawable = drawable2;
     }
@@ -74,30 +75,33 @@ public class WebGalleryAdapter extends BaseAdapter {
     }
 
     public View getView(int i, View view, ViewGroup viewGroup) {
-        WebImageView webImageView;
+        WebImageView access$100;
         String str = (String) getItem(i);
-        if (view == null) {
-            webImageView = new WebImageView(this.context, null, this.progressDrawable, this.errorDrawable, false);
-            LayoutParams layoutParams = new FrameLayout.LayoutParams(-2, -2);
+        if (view == 0) {
+            access$100 = new WebImageView(this.context, null, this.progressDrawable, this.errorDrawable, false);
+            LayoutParams layoutParams = new LayoutParams(-2, -2);
             layoutParams.gravity = 17;
-            webImageView.setLayoutParams(layoutParams);
-            view = new FrameLayout(this.context);
-            view.setLayoutParams(new Gallery.LayoutParams(-1, -1));
-            view.addView(webImageView, 0);
+            access$100.setLayoutParams(layoutParams);
+            r11 = new FrameLayout(this.context);
+            r11.setLayoutParams(new Gallery.LayoutParams(-1, -1));
+            r11.addView(access$100, 0);
             ViewHolder viewHolder = new ViewHolder();
-            viewHolder.webImageView = webImageView;
-            view.setTag(viewHolder);
+            viewHolder.webImageView = access$100;
+            r11.setTag(viewHolder);
+            r11 = r11;
         } else {
-            webImageView = ((ViewHolder) view.getTag()).webImageView;
+            access$100 = ((ViewHolder) view.getTag()).webImageView;
+            r11 = view;
         }
-        webImageView.reset();
-        webImageView.setImageUrl(str);
-        webImageView.loadImage();
-        onGetView(i, view, viewGroup);
-        return view;
+        access$100.reset();
+        access$100.setImageUrl(str);
+        access$100.loadImage();
+        onGetView(i, r11, viewGroup);
+        return r11;
     }
 
-    protected void onGetView(int i, View view, ViewGroup viewGroup) {
+    /* access modifiers changed from: protected */
+    public void onGetView(int i, View view, ViewGroup viewGroup) {
     }
 
     public void setImageUrls(List<String> list) {

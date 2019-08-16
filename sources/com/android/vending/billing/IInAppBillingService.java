@@ -43,8 +43,7 @@ public interface IInAppBillingService extends IInterface {
                     obtain.writeString(str2);
                     this.mRemote.transact(5, obtain, obtain2, 0);
                     obtain2.readException();
-                    int readInt = obtain2.readInt();
-                    return readInt;
+                    return obtain2.readInt();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -63,11 +62,8 @@ public interface IInAppBillingService extends IInterface {
                     obtain.writeString(str4);
                     this.mRemote.transact(3, obtain, obtain2, 0);
                     obtain2.readException();
-                    Bundle bundle = obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return bundle;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -91,11 +87,8 @@ public interface IInAppBillingService extends IInterface {
                     }
                     this.mRemote.transact(8, obtain, obtain2, 0);
                     obtain2.readException();
-                    Bundle bundle2 = obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return bundle2;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -114,11 +107,8 @@ public interface IInAppBillingService extends IInterface {
                     obtain.writeString(str4);
                     this.mRemote.transact(7, obtain, obtain2, 0);
                     obtain2.readException();
-                    Bundle bundle = obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return bundle;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -145,11 +135,8 @@ public interface IInAppBillingService extends IInterface {
                     }
                     this.mRemote.transact(9, obtain, obtain2, 0);
                     obtain2.readException();
-                    Bundle bundle2 = obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return bundle2;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -166,11 +153,8 @@ public interface IInAppBillingService extends IInterface {
                     obtain.writeString(str3);
                     this.mRemote.transact(4, obtain, obtain2, 0);
                     obtain2.readException();
-                    Bundle bundle = obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return bundle;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -192,11 +176,8 @@ public interface IInAppBillingService extends IInterface {
                     }
                     this.mRemote.transact(2, obtain, obtain2, 0);
                     obtain2.readException();
-                    Bundle bundle2 = obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return bundle2;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -212,8 +193,7 @@ public interface IInAppBillingService extends IInterface {
                     obtain.writeString(str2);
                     this.mRemote.transact(1, obtain, obtain2, 0);
                     obtain2.readException();
-                    int readInt = obtain2.readInt();
-                    return readInt;
+                    return obtain2.readInt();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -230,8 +210,7 @@ public interface IInAppBillingService extends IInterface {
                     obtain.writeString(str2);
                     this.mRemote.transact(6, obtain, obtain2, 0);
                     obtain2.readException();
-                    int readInt = obtain2.readInt();
-                    return readInt;
+                    return obtain2.readInt();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -257,11 +236,10 @@ public interface IInAppBillingService extends IInterface {
 
         public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
             Bundle bundle = null;
-            int isBillingSupported;
             switch (i) {
                 case 1:
                     parcel.enforceInterface(DESCRIPTOR);
-                    isBillingSupported = isBillingSupported(parcel.readInt(), parcel.readString(), parcel.readString());
+                    int isBillingSupported = isBillingSupported(parcel.readInt(), parcel.readString(), parcel.readString());
                     parcel2.writeNoException();
                     parcel2.writeInt(isBillingSupported);
                     return true;
@@ -273,78 +251,78 @@ public interface IInAppBillingService extends IInterface {
                     if (parcel.readInt() != 0) {
                         bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     }
-                    bundle = getSkuDetails(readInt, readString, readString2, bundle);
+                    Bundle skuDetails = getSkuDetails(readInt, readString, readString2, bundle);
                     parcel2.writeNoException();
-                    if (bundle != null) {
+                    if (skuDetails != null) {
                         parcel2.writeInt(1);
-                        bundle.writeToParcel(parcel2, 1);
+                        skuDetails.writeToParcel(parcel2, 1);
                     } else {
                         parcel2.writeInt(0);
                     }
                     return true;
                 case 3:
                     parcel.enforceInterface(DESCRIPTOR);
-                    bundle = getBuyIntent(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString());
+                    Bundle buyIntent = getBuyIntent(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString());
                     parcel2.writeNoException();
-                    if (bundle != null) {
+                    if (buyIntent != null) {
                         parcel2.writeInt(1);
-                        bundle.writeToParcel(parcel2, 1);
+                        buyIntent.writeToParcel(parcel2, 1);
                     } else {
                         parcel2.writeInt(0);
                     }
                     return true;
                 case 4:
                     parcel.enforceInterface(DESCRIPTOR);
-                    bundle = getPurchases(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString());
+                    Bundle purchases = getPurchases(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString());
                     parcel2.writeNoException();
-                    if (bundle != null) {
+                    if (purchases != null) {
                         parcel2.writeInt(1);
-                        bundle.writeToParcel(parcel2, 1);
+                        purchases.writeToParcel(parcel2, 1);
                     } else {
                         parcel2.writeInt(0);
                     }
                     return true;
                 case 5:
                     parcel.enforceInterface(DESCRIPTOR);
-                    isBillingSupported = consumePurchase(parcel.readInt(), parcel.readString(), parcel.readString());
+                    int consumePurchase = consumePurchase(parcel.readInt(), parcel.readString(), parcel.readString());
                     parcel2.writeNoException();
-                    parcel2.writeInt(isBillingSupported);
+                    parcel2.writeInt(consumePurchase);
                     return true;
                 case 6:
                     parcel.enforceInterface(DESCRIPTOR);
-                    isBillingSupported = isPromoEligible(parcel.readInt(), parcel.readString(), parcel.readString());
+                    int isPromoEligible = isPromoEligible(parcel.readInt(), parcel.readString(), parcel.readString());
                     parcel2.writeNoException();
-                    parcel2.writeInt(isBillingSupported);
+                    parcel2.writeInt(isPromoEligible);
                     return true;
                 case 7:
                     parcel.enforceInterface(DESCRIPTOR);
-                    bundle = getBuyIntentToReplaceSkus(parcel.readInt(), parcel.readString(), parcel.createStringArrayList(), parcel.readString(), parcel.readString(), parcel.readString());
+                    Bundle buyIntentToReplaceSkus = getBuyIntentToReplaceSkus(parcel.readInt(), parcel.readString(), parcel.createStringArrayList(), parcel.readString(), parcel.readString(), parcel.readString());
                     parcel2.writeNoException();
-                    if (bundle != null) {
+                    if (buyIntentToReplaceSkus != null) {
                         parcel2.writeInt(1);
-                        bundle.writeToParcel(parcel2, 1);
+                        buyIntentToReplaceSkus.writeToParcel(parcel2, 1);
                     } else {
                         parcel2.writeInt(0);
                     }
                     return true;
                 case 8:
                     parcel.enforceInterface(DESCRIPTOR);
-                    bundle = getBuyIntentExtraParams(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
+                    Bundle buyIntentExtraParams = getBuyIntentExtraParams(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
                     parcel2.writeNoException();
-                    if (bundle != null) {
+                    if (buyIntentExtraParams != null) {
                         parcel2.writeInt(1);
-                        bundle.writeToParcel(parcel2, 1);
+                        buyIntentExtraParams.writeToParcel(parcel2, 1);
                     } else {
                         parcel2.writeInt(0);
                     }
                     return true;
                 case 9:
                     parcel.enforceInterface(DESCRIPTOR);
-                    bundle = getPurchaseHistory(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
+                    Bundle purchaseHistory = getPurchaseHistory(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
                     parcel2.writeNoException();
-                    if (bundle != null) {
+                    if (purchaseHistory != null) {
                         parcel2.writeInt(1);
-                        bundle.writeToParcel(parcel2, 1);
+                        purchaseHistory.writeToParcel(parcel2, 1);
                     } else {
                         parcel2.writeInt(0);
                     }

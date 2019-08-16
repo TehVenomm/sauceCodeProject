@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -38,7 +37,7 @@ public class EasySSLSocketFactory implements SocketFactory, LayeredSocketFactory
     public Socket connectSocket(Socket socket, String str, int i, InetAddress inetAddress, int i2, HttpParams httpParams) throws IOException, UnknownHostException, ConnectTimeoutException {
         int connectionTimeout = HttpConnectionParams.getConnectionTimeout(httpParams);
         int soTimeout = HttpConnectionParams.getSoTimeout(httpParams);
-        SocketAddress inetSocketAddress = new InetSocketAddress(str, i);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(str, i);
         SSLSocket sSLSocket = (SSLSocket) (socket != null ? socket : createSocket());
         if (inetAddress != null || i2 > 0) {
             if (i2 < 0) {

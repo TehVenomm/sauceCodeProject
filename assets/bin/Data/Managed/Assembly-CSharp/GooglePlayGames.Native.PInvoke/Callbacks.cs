@@ -9,13 +9,13 @@ namespace GooglePlayGames.Native.PInvoke
 {
 	internal static class Callbacks
 	{
+		internal delegate void ShowUICallbackInternal(CommonErrorStatus.UIStatus status, IntPtr data);
+
 		internal enum Type
 		{
 			Permanent,
 			Temporary
 		}
-
-		internal delegate void ShowUICallbackInternal(CommonErrorStatus.UIStatus status, IntPtr data);
 
 		internal static readonly Action<CommonErrorStatus.UIStatus> NoopUICallback = delegate(CommonErrorStatus.UIStatus status)
 		{
@@ -64,43 +64,37 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static T IntPtrToTempCallback<T>(IntPtr handle) where T : class
 		{
-			return IntPtrToCallback<T>(handle, true);
+			return IntPtrToCallback<T>(handle, unpinHandle: true);
 		}
 
 		private static T IntPtrToCallback<T>(IntPtr handle, bool unpinHandle) where T : class
 		{
-			if (!PInvokeUtilities.IsNull(handle))
+			if (PInvokeUtilities.IsNull(handle))
 			{
-				GCHandle gCHandle = GCHandle.FromIntPtr(handle);
-				try
+				return (T)null;
+			}
+			GCHandle gCHandle = GCHandle.FromIntPtr(handle);
+			try
+			{
+				return (T)gCHandle.Target;
+			}
+			catch (InvalidCastException ex)
+			{
+				Logger.e("GC Handle pointed to unexpected type: " + gCHandle.Target.ToString() + ". Expected " + typeof(T));
+				throw ex;
+			}
+			finally
+			{
+				if (unpinHandle)
 				{
-					return (T)gCHandle.Target;
-					IL_002b:
-					T result;
-					return result;
-				}
-				catch (InvalidCastException ex)
-				{
-					Logger.e("GC Handle pointed to unexpected type: " + gCHandle.Target.ToString() + ". Expected " + typeof(T));
-					throw ex;
-					IL_006f:
-					T result;
-					return result;
-				}
-				finally
-				{
-					if (unpinHandle)
-					{
-						gCHandle.Free();
-					}
+					gCHandle.Free();
 				}
 			}
-			return (T)null;
 		}
 
 		internal static T IntPtrToPermanentCallback<T>(IntPtr handle) where T : class
 		{
-			return IntPtrToCallback<T>(handle, false);
+			return IntPtrToCallback<T>(handle, unpinHandle: false);
 		}
 
 		[MonoPInvokeCallback(typeof(ShowUICallbackInternal))]
@@ -147,7 +141,6 @@ namespace GooglePlayGames.Native.PInvoke
 			{
 				Logger.e("Error encountered converting " + callbackName + ". Smothering to avoid passing exception into Native: " + ex);
 				return;
-				IL_005f:;
 			}
 			Logger.d("Internal Callback converted to action");
 			if (action != null)
@@ -198,7 +191,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static byte[] IntPtrAndSizeToByteArray(IntPtr data, UIntPtr dataLength)
 		{
-			if (dataLength.ToUInt64() == 0L)
+			if (dataLength.ToUInt64() == 0)
 			{
 				return null;
 			}

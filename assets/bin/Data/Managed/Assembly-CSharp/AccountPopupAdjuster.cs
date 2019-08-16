@@ -17,15 +17,15 @@ public class AccountPopupAdjuster : GameSection
 		string text = new string(array);
 		int num = lbl.CalculateOffsetToFit(text);
 		string empty = string.Empty;
-		if (num <= 0)
+		if (num > 0)
 		{
-			return pop_text;
+			empty = text.Substring(num - 1);
+			empty = "…" + empty;
+			char[] array2 = empty.ToCharArray();
+			Array.Reverse(array2);
+			return new string(array2);
 		}
-		empty = text.Substring(num - 1);
-		empty = "…" + empty;
-		char[] array2 = empty.ToCharArray();
-		Array.Reverse(array2);
-		return new string(array2);
+		return pop_text;
 	}
 
 	public string GetAdjustBeforeText(int index)

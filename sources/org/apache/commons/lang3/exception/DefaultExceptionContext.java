@@ -31,7 +31,7 @@ public class DefaultExceptionContext implements ExceptionContext, Serializable {
     }
 
     public List<Object> getContextValues(String str) {
-        List<Object> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (Pair pair : this.contextValues) {
             if (StringUtils.equals(str, (CharSequence) pair.getKey())) {
                 arrayList.add(pair.getValue());
@@ -50,7 +50,7 @@ public class DefaultExceptionContext implements ExceptionContext, Serializable {
     }
 
     public Set<String> getContextLabels() {
-        Set<String> hashSet = new HashSet();
+        HashSet hashSet = new HashSet();
         for (Pair key : this.contextValues) {
             hashSet.add(key.getKey());
         }
@@ -62,40 +62,40 @@ public class DefaultExceptionContext implements ExceptionContext, Serializable {
     }
 
     public String getFormattedExceptionMessage(String str) {
-        StringBuilder stringBuilder = new StringBuilder(256);
+        String str2;
+        StringBuilder sb = new StringBuilder(256);
         if (str != null) {
-            stringBuilder.append(str);
+            sb.append(str);
         }
         if (this.contextValues.size() > 0) {
-            if (stringBuilder.length() > 0) {
-                stringBuilder.append('\n');
+            if (sb.length() > 0) {
+                sb.append(10);
             }
-            stringBuilder.append("Exception Context:\n");
+            sb.append("Exception Context:\n");
             int i = 0;
             for (Pair pair : this.contextValues) {
-                stringBuilder.append("\t[");
+                sb.append("\t[");
                 int i2 = i + 1;
-                stringBuilder.append(i2);
-                stringBuilder.append(':');
-                stringBuilder.append((String) pair.getKey());
-                stringBuilder.append("=");
+                sb.append(i2);
+                sb.append(':');
+                sb.append((String) pair.getKey());
+                sb.append("=");
                 Object value = pair.getValue();
                 if (value == null) {
-                    stringBuilder.append("null");
+                    sb.append("null");
                 } else {
-                    String obj;
                     try {
-                        obj = value.toString();
-                    } catch (Throwable e) {
-                        obj = "Exception thrown on toString(): " + ExceptionUtils.getStackTrace(e);
+                        str2 = value.toString();
+                    } catch (Exception e) {
+                        str2 = "Exception thrown on toString(): " + ExceptionUtils.getStackTrace(e);
                     }
-                    stringBuilder.append(obj);
+                    sb.append(str2);
                 }
-                stringBuilder.append("]\n");
+                sb.append("]\n");
                 i = i2;
             }
-            stringBuilder.append("---------------------------------");
+            sb.append("---------------------------------");
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 }

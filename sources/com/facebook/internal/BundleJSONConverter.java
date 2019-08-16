@@ -19,132 +19,95 @@ public class BundleJSONConverter {
         void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException;
     }
 
-    /* renamed from: com.facebook.internal.BundleJSONConverter$1 */
-    static final class C03931 implements Setter {
-        C03931() {
-        }
-
-        public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
-            bundle.putBoolean(str, ((Boolean) obj).booleanValue());
-        }
-
-        public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
-            jSONObject.put(str, obj);
-        }
-    }
-
-    /* renamed from: com.facebook.internal.BundleJSONConverter$2 */
-    static final class C03942 implements Setter {
-        C03942() {
-        }
-
-        public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
-            bundle.putInt(str, ((Integer) obj).intValue());
-        }
-
-        public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
-            jSONObject.put(str, obj);
-        }
-    }
-
-    /* renamed from: com.facebook.internal.BundleJSONConverter$3 */
-    static final class C03953 implements Setter {
-        C03953() {
-        }
-
-        public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
-            bundle.putLong(str, ((Long) obj).longValue());
-        }
-
-        public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
-            jSONObject.put(str, obj);
-        }
-    }
-
-    /* renamed from: com.facebook.internal.BundleJSONConverter$4 */
-    static final class C03964 implements Setter {
-        C03964() {
-        }
-
-        public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
-            bundle.putDouble(str, ((Double) obj).doubleValue());
-        }
-
-        public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
-            jSONObject.put(str, obj);
-        }
-    }
-
-    /* renamed from: com.facebook.internal.BundleJSONConverter$5 */
-    static final class C03975 implements Setter {
-        C03975() {
-        }
-
-        public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
-            bundle.putString(str, (String) obj);
-        }
-
-        public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
-            jSONObject.put(str, obj);
-        }
-    }
-
-    /* renamed from: com.facebook.internal.BundleJSONConverter$6 */
-    static final class C03986 implements Setter {
-        C03986() {
-        }
-
-        public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
-            throw new IllegalArgumentException("Unexpected type from JSON");
-        }
-
-        public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
-            JSONArray jSONArray = new JSONArray();
-            for (Object put : (String[]) obj) {
-                jSONArray.put(put);
+    static {
+        SETTERS.put(Boolean.class, new Setter() {
+            public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
+                bundle.putBoolean(str, ((Boolean) obj).booleanValue());
             }
-            jSONObject.put(str, jSONArray);
-        }
-    }
 
-    /* renamed from: com.facebook.internal.BundleJSONConverter$7 */
-    static final class C03997 implements Setter {
-        C03997() {
-        }
-
-        public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
-            JSONArray jSONArray = (JSONArray) obj;
-            ArrayList arrayList = new ArrayList();
-            if (jSONArray.length() == 0) {
-                bundle.putStringArrayList(str, arrayList);
-                return;
+            public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
+                jSONObject.put(str, obj);
             }
-            int i = 0;
-            while (i < jSONArray.length()) {
-                Object obj2 = jSONArray.get(i);
-                if (obj2 instanceof String) {
-                    arrayList.add((String) obj2);
-                    i++;
-                } else {
-                    throw new IllegalArgumentException("Unexpected type in an array: " + obj2.getClass());
+        });
+        SETTERS.put(Integer.class, new Setter() {
+            public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
+                bundle.putInt(str, ((Integer) obj).intValue());
+            }
+
+            public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
+                jSONObject.put(str, obj);
+            }
+        });
+        SETTERS.put(Long.class, new Setter() {
+            public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
+                bundle.putLong(str, ((Long) obj).longValue());
+            }
+
+            public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
+                jSONObject.put(str, obj);
+            }
+        });
+        SETTERS.put(Double.class, new Setter() {
+            public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
+                bundle.putDouble(str, ((Double) obj).doubleValue());
+            }
+
+            public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
+                jSONObject.put(str, obj);
+            }
+        });
+        SETTERS.put(String.class, new Setter() {
+            public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
+                bundle.putString(str, (String) obj);
+            }
+
+            public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
+                jSONObject.put(str, obj);
+            }
+        });
+        SETTERS.put(String[].class, new Setter() {
+            public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
+                throw new IllegalArgumentException("Unexpected type from JSON");
+            }
+
+            public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
+                JSONArray jSONArray = new JSONArray();
+                for (String put : (String[]) obj) {
+                    jSONArray.put(put);
+                }
+                jSONObject.put(str, jSONArray);
+            }
+        });
+        SETTERS.put(JSONArray.class, new Setter() {
+            public void setOnBundle(Bundle bundle, String str, Object obj) throws JSONException {
+                JSONArray jSONArray = (JSONArray) obj;
+                ArrayList arrayList = new ArrayList();
+                if (jSONArray.length() == 0) {
+                    bundle.putStringArrayList(str, arrayList);
+                    return;
+                }
+                int i = 0;
+                while (true) {
+                    int i2 = i;
+                    if (i2 < jSONArray.length()) {
+                        Object obj2 = jSONArray.get(i2);
+                        if (obj2 instanceof String) {
+                            arrayList.add((String) obj2);
+                            i = i2 + 1;
+                        } else {
+                            throw new IllegalArgumentException("Unexpected type in an array: " + obj2.getClass());
+                        }
+                    } else {
+                        bundle.putStringArrayList(str, arrayList);
+                        return;
+                    }
                 }
             }
-            bundle.putStringArrayList(str, arrayList);
-        }
 
-        public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
-            throw new IllegalArgumentException("JSONArray's are not supported in bundles.");
-        }
-    }
-
-    static {
-        SETTERS.put(Boolean.class, new C03931());
-        SETTERS.put(Integer.class, new C03942());
-        SETTERS.put(Long.class, new C03953());
-        SETTERS.put(Double.class, new C03964());
-        SETTERS.put(String.class, new C03975());
-        SETTERS.put(String[].class, new C03986());
-        SETTERS.put(JSONArray.class, new C03997());
+            public void setOnJSON(JSONObject jSONObject, String str, Object obj) throws JSONException {
+                throw new IllegalArgumentException("JSONArray's are not supported in bundles.");
+            }
+        });
     }
 
     public static Bundle convertToBundle(JSONObject jSONObject) throws JSONException {

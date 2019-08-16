@@ -14,12 +14,12 @@ public interface Downloader {
         final InputStream stream;
 
         @Deprecated
-        public Response(Bitmap bitmap, boolean z) {
-            if (bitmap == null) {
+        public Response(Bitmap bitmap2, boolean z) {
+            if (bitmap2 == null) {
                 throw new IllegalArgumentException("Bitmap may not be null.");
             }
             this.stream = null;
-            this.bitmap = bitmap;
+            this.bitmap = bitmap2;
             this.cached = z;
             this.contentLength = -1;
         }
@@ -30,8 +30,8 @@ public interface Downloader {
         }
 
         @Deprecated
-        public Response(Bitmap bitmap, boolean z, long j) {
-            this(bitmap, z);
+        public Response(Bitmap bitmap2, boolean z, long j) {
+            this(bitmap2, z);
         }
 
         public Response(InputStream inputStream, boolean z, long j) {

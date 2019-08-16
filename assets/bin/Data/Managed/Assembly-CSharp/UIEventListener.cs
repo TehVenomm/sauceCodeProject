@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Internal/Event Listener")]
-public class UIEventListener
+public class UIEventListener : MonoBehaviour
 {
 	public delegate void VoidDelegate(GameObject go);
 
@@ -68,8 +68,6 @@ public class UIEventListener
 
 	private void OnSubmit()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onSubmit != null)
 		{
 			onSubmit(this.get_gameObject());
@@ -78,8 +76,6 @@ public class UIEventListener
 
 	private void OnClick()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onClick != null)
 		{
 			onClick(this.get_gameObject());
@@ -88,8 +84,6 @@ public class UIEventListener
 
 	private void OnDoubleClick()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onDoubleClick != null)
 		{
 			onDoubleClick(this.get_gameObject());
@@ -98,8 +92,6 @@ public class UIEventListener
 
 	private void OnHover(bool isOver)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onHover != null)
 		{
 			onHover(this.get_gameObject(), isOver);
@@ -108,8 +100,6 @@ public class UIEventListener
 
 	private void OnPress(bool isPressed)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onPress != null)
 		{
 			onPress(this.get_gameObject(), isPressed);
@@ -118,8 +108,6 @@ public class UIEventListener
 
 	private void OnSelect(bool selected)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onSelect != null)
 		{
 			onSelect(this.get_gameObject(), selected);
@@ -128,8 +116,6 @@ public class UIEventListener
 
 	private void OnScroll(float delta)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onScroll != null)
 		{
 			onScroll(this.get_gameObject(), delta);
@@ -138,8 +124,6 @@ public class UIEventListener
 
 	private void OnDragStart()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
 		if (onDragStart != null)
 		{
 			onDragStart(this.get_gameObject());
@@ -148,9 +132,7 @@ public class UIEventListener
 
 	private void OnDrag(Vector2 delta)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
 		if (onDrag != null)
 		{
 			onDrag(this.get_gameObject(), delta);
@@ -159,8 +141,6 @@ public class UIEventListener
 
 	private void OnDragOver()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onDragOver != null)
 		{
 			onDragOver(this.get_gameObject());
@@ -169,8 +149,6 @@ public class UIEventListener
 
 	private void OnDragOut()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (isColliderEnabled && onDragOut != null)
 		{
 			onDragOut(this.get_gameObject());
@@ -179,8 +157,6 @@ public class UIEventListener
 
 	private void OnDragEnd()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
 		if (onDragEnd != null)
 		{
 			onDragEnd(this.get_gameObject());
@@ -189,8 +165,6 @@ public class UIEventListener
 
 	private void OnDrop(GameObject go)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onDrop != null)
 		{
 			onDrop(this.get_gameObject(), go);
@@ -199,9 +173,7 @@ public class UIEventListener
 
 	private void OnKey(KeyCode key)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onKey != null)
 		{
 			onKey(this.get_gameObject(), key);
@@ -210,8 +182,6 @@ public class UIEventListener
 
 	private void OnTooltip(bool show)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (isColliderEnabled && onTooltip != null)
 		{
 			onTooltip(this.get_gameObject(), show);

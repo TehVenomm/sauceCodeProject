@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapScriptWall
+public class MapScriptWall : MonoBehaviour
 {
 	[Tooltip("壁半径")]
 	public float wallRadius = 40f;
@@ -23,18 +23,19 @@ public class MapScriptWall
 		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			Vector3 zero = Vector3.get_zero();
-			List<StageObject> characterList = MonoBehaviourSingleton<StageObjectManager>.I.characterList;
-			List<StageObject>.Enumerator enumerator = characterList.GetEnumerator();
-			while (enumerator.MoveNext())
+			return;
+		}
+		Vector3 zero = Vector3.get_zero();
+		List<StageObject> characterList = MonoBehaviourSingleton<StageObjectManager>.I.characterList;
+		List<StageObject>.Enumerator enumerator = characterList.GetEnumerator();
+		while (enumerator.MoveNext())
+		{
+			Vector3 val = enumerator.Current._transform.get_position() - zero;
+			if (val.get_magnitude() > wallRadius)
 			{
-				Vector3 val = enumerator.Current._transform.get_position() - zero;
-				if (val.get_magnitude() > wallRadius)
-				{
-					enumerator.Current._transform.set_position(zero + val.get_normalized() * wallRadius);
-				}
+				enumerator.Current._transform.set_position(zero + val.get_normalized() * wallRadius);
 			}
 		}
 	}

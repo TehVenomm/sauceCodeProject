@@ -2,16 +2,25 @@ package com.google.android.gms.common.data;
 
 import android.content.ContentValues;
 import android.database.CharArrayBuffer;
+import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.CursorWindow;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.util.Log;
+import com.google.android.gms.common.annotation.KeepForSdk;
 import com.google.android.gms.common.annotation.KeepName;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.common.internal.zzc;
+import com.google.android.gms.common.internal.Asserts;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
+import com.google.android.gms.common.sqlite.CursorWrapper;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,196 +29,256 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @KeepName
-public final class DataHolder extends com.google.android.gms.common.internal.safeparcel.zza implements Closeable {
-    public static final Creator<DataHolder> CREATOR = new zzf();
-    private static final zza zzfqm = new zze(new String[0], null);
+@KeepForSdk
+@Class(creator = "DataHolderCreator", validate = true)
+public final class DataHolder extends AbstractSafeParcelable implements Closeable {
+    @KeepForSdk
+    public static final Creator<DataHolder> CREATOR = new zac();
+    private static final Builder zalx = new zab(new String[0], null);
     private boolean mClosed;
-    private int zzdxt;
-    private final int zzezx;
-    private final String[] zzfqf;
-    private Bundle zzfqg;
-    private final CursorWindow[] zzfqh;
-    private final Bundle zzfqi;
-    private int[] zzfqj;
-    int zzfqk;
-    private boolean zzfql;
+    @VersionField(mo13996id = 1000)
+    private final int zale;
+    @Field(getter = "getColumns", mo13990id = 1)
+    private final String[] zalp;
+    private Bundle zalq;
+    @Field(getter = "getWindows", mo13990id = 2)
+    private final CursorWindow[] zalr;
+    @Field(getter = "getStatusCode", mo13990id = 3)
+    private final int zals;
+    @Field(getter = "getMetadata", mo13990id = 4)
+    private final Bundle zalt;
+    private int[] zalu;
+    private int zalv;
+    private boolean zalw;
 
-    public static class zza {
-        private final String[] zzfqf;
-        private final ArrayList<HashMap<String, Object>> zzfqn;
-        private final String zzfqo;
-        private final HashMap<Object, Integer> zzfqp;
-        private boolean zzfqq;
-        private String zzfqr;
+    @KeepForSdk
+    public static class Builder {
+        /* access modifiers changed from: private */
+        public final String[] zalp;
+        /* access modifiers changed from: private */
+        public final ArrayList<HashMap<String, Object>> zaly;
+        private final String zalz;
+        private final HashMap<Object, Integer> zama;
+        private boolean zamb;
+        private String zamc;
 
-        private zza(String[] strArr, String str) {
-            this.zzfqf = (String[]) zzbp.zzu(strArr);
-            this.zzfqn = new ArrayList();
-            this.zzfqo = str;
-            this.zzfqp = new HashMap();
-            this.zzfqq = false;
-            this.zzfqr = null;
+        private Builder(String[] strArr, String str) {
+            this.zalp = (String[]) Preconditions.checkNotNull(strArr);
+            this.zaly = new ArrayList<>();
+            this.zalz = str;
+            this.zama = new HashMap<>();
+            this.zamb = false;
+            this.zamc = null;
         }
 
-        public zza zza(ContentValues contentValues) {
-            zzc.zzr(contentValues);
+        /* synthetic */ Builder(String[] strArr, String str, zab zab) {
+            this(strArr, null);
+        }
+
+        @KeepForSdk
+        public DataHolder build(int i) {
+            return new DataHolder(this, i, (Bundle) null, (zab) null);
+        }
+
+        @KeepForSdk
+        public DataHolder build(int i, Bundle bundle) {
+            return new DataHolder(this, i, bundle, -1, (zab) null);
+        }
+
+        @KeepForSdk
+        public Builder withRow(ContentValues contentValues) {
+            Asserts.checkNotNull(contentValues);
             HashMap hashMap = new HashMap(contentValues.size());
             for (Entry entry : contentValues.valueSet()) {
                 hashMap.put((String) entry.getKey(), entry.getValue());
             }
-            return zza(hashMap);
+            return zaa(hashMap);
         }
 
-        public zza zza(HashMap<String, Object> hashMap) {
-            int i;
-            zzc.zzr(hashMap);
-            if (this.zzfqo == null) {
-                i = -1;
+        public Builder zaa(HashMap<String, Object> hashMap) {
+            int intValue;
+            Asserts.checkNotNull(hashMap);
+            if (this.zalz == null) {
+                intValue = -1;
             } else {
-                Object obj = hashMap.get(this.zzfqo);
+                Object obj = hashMap.get(this.zalz);
                 if (obj == null) {
-                    i = -1;
+                    intValue = -1;
                 } else {
-                    Integer num = (Integer) this.zzfqp.get(obj);
+                    Integer num = (Integer) this.zama.get(obj);
                     if (num == null) {
-                        this.zzfqp.put(obj, Integer.valueOf(this.zzfqn.size()));
-                        i = -1;
+                        this.zama.put(obj, Integer.valueOf(this.zaly.size()));
+                        intValue = -1;
                     } else {
-                        i = num.intValue();
+                        intValue = num.intValue();
                     }
                 }
             }
-            if (i == -1) {
-                this.zzfqn.add(hashMap);
+            if (intValue == -1) {
+                this.zaly.add(hashMap);
             } else {
-                this.zzfqn.remove(i);
-                this.zzfqn.add(i, hashMap);
+                this.zaly.remove(intValue);
+                this.zaly.add(intValue, hashMap);
             }
-            this.zzfqq = false;
+            this.zamb = false;
             return this;
-        }
-
-        public final DataHolder zzby(int i) {
-            return new DataHolder(this);
         }
     }
 
-    public static final class zzb extends RuntimeException {
-        public zzb(String str) {
+    public static final class zaa extends RuntimeException {
+        public zaa(String str) {
             super(str);
         }
     }
 
-    DataHolder(int i, String[] strArr, CursorWindow[] cursorWindowArr, int i2, Bundle bundle) {
+    @Constructor
+    DataHolder(@Param(mo13993id = 1000) int i, @Param(mo13993id = 1) String[] strArr, @Param(mo13993id = 2) CursorWindow[] cursorWindowArr, @Param(mo13993id = 3) int i2, @Param(mo13993id = 4) Bundle bundle) {
         this.mClosed = false;
-        this.zzfql = true;
-        this.zzdxt = i;
-        this.zzfqf = strArr;
-        this.zzfqh = cursorWindowArr;
-        this.zzezx = i2;
-        this.zzfqi = bundle;
+        this.zalw = true;
+        this.zale = i;
+        this.zalp = strArr;
+        this.zalr = cursorWindowArr;
+        this.zals = i2;
+        this.zalt = bundle;
     }
 
-    private DataHolder(zza zza, int i, Bundle bundle) {
-        this(zza.zzfqf, zza(zza, -1), i, null);
+    @KeepForSdk
+    public DataHolder(Cursor cursor, int i, Bundle bundle) {
+        this(new CursorWrapper(cursor), i, bundle);
     }
 
-    private DataHolder(String[] strArr, CursorWindow[] cursorWindowArr, int i, Bundle bundle) {
+    private DataHolder(Builder builder, int i, Bundle bundle) {
+        this(builder.zalp, zaa(builder, -1), i, (Bundle) null);
+    }
+
+    private DataHolder(Builder builder, int i, Bundle bundle, int i2) {
+        this(builder.zalp, zaa(builder, -1), i, bundle);
+    }
+
+    /* synthetic */ DataHolder(Builder builder, int i, Bundle bundle, int i2, zab zab) {
+        this(builder, i, bundle, -1);
+    }
+
+    /* synthetic */ DataHolder(Builder builder, int i, Bundle bundle, zab zab) {
+        this(builder, i, (Bundle) null);
+    }
+
+    private DataHolder(CursorWrapper cursorWrapper, int i, Bundle bundle) {
+        this(cursorWrapper.getColumnNames(), zaa(cursorWrapper), i, bundle);
+    }
+
+    @KeepForSdk
+    public DataHolder(String[] strArr, CursorWindow[] cursorWindowArr, int i, Bundle bundle) {
         this.mClosed = false;
-        this.zzfql = true;
-        this.zzdxt = 1;
-        this.zzfqf = (String[]) zzbp.zzu(strArr);
-        this.zzfqh = (CursorWindow[]) zzbp.zzu(cursorWindowArr);
-        this.zzezx = i;
-        this.zzfqi = bundle;
-        zzaiv();
+        this.zalw = true;
+        this.zale = 1;
+        this.zalp = (String[]) Preconditions.checkNotNull(strArr);
+        this.zalr = (CursorWindow[]) Preconditions.checkNotNull(cursorWindowArr);
+        this.zals = i;
+        this.zalt = bundle;
+        zaca();
     }
 
-    public static zza zza(String[] strArr) {
-        return new zza(strArr);
+    @KeepForSdk
+    public static Builder builder(String[] strArr) {
+        return new Builder(strArr, null, null);
     }
 
-    private static CursorWindow[] zza(zza zza, int i) {
+    @KeepForSdk
+    public static DataHolder empty(int i) {
+        return new DataHolder(zalx, i, (Bundle) null);
+    }
+
+    private final void zaa(String str, int i) {
+        if (this.zalq == null || !this.zalq.containsKey(str)) {
+            String valueOf = String.valueOf(str);
+            throw new IllegalArgumentException(valueOf.length() != 0 ? "No such column: ".concat(valueOf) : new String("No such column: "));
+        } else if (isClosed()) {
+            throw new IllegalArgumentException("Buffer is closed.");
+        } else if (i < 0 || i >= this.zalv) {
+            throw new CursorIndexOutOfBoundsException(i, this.zalv);
+        }
+    }
+
+    private static CursorWindow[] zaa(Builder builder, int i) {
+        CursorWindow cursorWindow;
         int i2;
-        int i3 = 0;
-        if (zza.zzfqf.length == 0) {
+        boolean z;
+        if (builder.zalp.length == 0) {
             return new CursorWindow[0];
         }
-        List zzb = zza.zzfqn;
-        int size = zzb.size();
-        CursorWindow cursorWindow = new CursorWindow(false);
+        List zab = (i < 0 || i >= builder.zaly.size()) ? builder.zaly : builder.zaly.subList(0, i);
+        int size = zab.size();
+        CursorWindow cursorWindow2 = new CursorWindow(false);
         ArrayList arrayList = new ArrayList();
-        arrayList.add(cursorWindow);
-        cursorWindow.setNumColumns(zza.zzfqf.length);
-        int i4 = 0;
-        int i5 = 0;
-        while (i5 < size) {
+        arrayList.add(cursorWindow2);
+        cursorWindow2.setNumColumns(builder.zalp.length);
+        boolean z2 = false;
+        int i3 = 0;
+        while (i3 < size) {
             try {
-                CursorWindow cursorWindow2;
-                int i6;
-                if (!cursorWindow.allocRow()) {
-                    Log.d("DataHolder", "Allocating additional cursor window for large data set (row " + i5 + ")");
-                    cursorWindow = new CursorWindow(false);
-                    cursorWindow.setStartPosition(i5);
-                    cursorWindow.setNumColumns(zza.zzfqf.length);
-                    arrayList.add(cursorWindow);
-                    if (!cursorWindow.allocRow()) {
+                if (!cursorWindow2.allocRow()) {
+                    Log.d("DataHolder", "Allocating additional cursor window for large data set (row " + i3 + ")");
+                    cursorWindow2 = new CursorWindow(false);
+                    cursorWindow2.setStartPosition(i3);
+                    cursorWindow2.setNumColumns(builder.zalp.length);
+                    arrayList.add(cursorWindow2);
+                    if (!cursorWindow2.allocRow()) {
                         Log.e("DataHolder", "Unable to allocate row to hold data.");
-                        arrayList.remove(cursorWindow);
+                        arrayList.remove(cursorWindow2);
                         return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
                     }
                 }
-                Map map = (Map) zzb.get(i5);
-                boolean z = true;
-                for (int i7 = 0; i7 < zza.zzfqf.length && z; i7++) {
-                    String str = zza.zzfqf[i7];
+                Map map = (Map) zab.get(i3);
+                boolean z3 = true;
+                for (int i4 = 0; i4 < builder.zalp.length && z3; i4++) {
+                    String str = builder.zalp[i4];
                     Object obj = map.get(str);
                     if (obj == null) {
-                        z = cursorWindow.putNull(i5, i7);
+                        z3 = cursorWindow2.putNull(i3, i4);
                     } else if (obj instanceof String) {
-                        z = cursorWindow.putString((String) obj, i5, i7);
+                        z3 = cursorWindow2.putString((String) obj, i3, i4);
                     } else if (obj instanceof Long) {
-                        z = cursorWindow.putLong(((Long) obj).longValue(), i5, i7);
+                        z3 = cursorWindow2.putLong(((Long) obj).longValue(), i3, i4);
                     } else if (obj instanceof Integer) {
-                        z = cursorWindow.putLong((long) ((Integer) obj).intValue(), i5, i7);
+                        z3 = cursorWindow2.putLong((long) ((Integer) obj).intValue(), i3, i4);
                     } else if (obj instanceof Boolean) {
-                        z = cursorWindow.putLong(((Boolean) obj).booleanValue() ? 1 : 0, i5, i7);
+                        z3 = cursorWindow2.putLong(((Boolean) obj).booleanValue() ? 1 : 0, i3, i4);
                     } else if (obj instanceof byte[]) {
-                        z = cursorWindow.putBlob((byte[]) obj, i5, i7);
+                        z3 = cursorWindow2.putBlob((byte[]) obj, i3, i4);
                     } else if (obj instanceof Double) {
-                        z = cursorWindow.putDouble(((Double) obj).doubleValue(), i5, i7);
+                        z3 = cursorWindow2.putDouble(((Double) obj).doubleValue(), i3, i4);
                     } else if (obj instanceof Float) {
-                        z = cursorWindow.putDouble((double) ((Float) obj).floatValue(), i5, i7);
+                        z3 = cursorWindow2.putDouble((double) ((Float) obj).floatValue(), i3, i4);
                     } else {
                         String valueOf = String.valueOf(obj);
-                        throw new IllegalArgumentException(new StringBuilder((String.valueOf(str).length() + 32) + String.valueOf(valueOf).length()).append("Unsupported object for column ").append(str).append(": ").append(valueOf).toString());
+                        throw new IllegalArgumentException(new StringBuilder(String.valueOf(str).length() + 32 + String.valueOf(valueOf).length()).append("Unsupported object for column ").append(str).append(": ").append(valueOf).toString());
                     }
                 }
-                if (z) {
-                    cursorWindow2 = cursorWindow;
-                    i6 = i5;
-                    i2 = 0;
-                } else if (i4 != 0) {
-                    throw new zzb("Could not add the value to a new CursorWindow. The size of value may be larger than what a CursorWindow can handle.");
+                if (z3) {
+                    cursorWindow = cursorWindow2;
+                    i2 = i3;
+                    z = false;
+                } else if (z2) {
+                    throw new zaa("Could not add the value to a new CursorWindow. The size of value may be larger than what a CursorWindow can handle.");
                 } else {
-                    Log.d("DataHolder", "Couldn't populate window data for row " + i5 + " - allocating new window.");
-                    cursorWindow.freeLastRow();
-                    cursorWindow2 = new CursorWindow(false);
-                    cursorWindow2.setStartPosition(i5);
-                    cursorWindow2.setNumColumns(zza.zzfqf.length);
-                    arrayList.add(cursorWindow2);
-                    i6 = i5 - 1;
-                    i2 = 1;
+                    Log.d("DataHolder", "Couldn't populate window data for row " + i3 + " - allocating new window.");
+                    cursorWindow2.freeLastRow();
+                    cursorWindow = new CursorWindow(false);
+                    cursorWindow.setStartPosition(i3);
+                    cursorWindow.setNumColumns(builder.zalp.length);
+                    arrayList.add(cursorWindow);
+                    i2 = i3 - 1;
+                    z = true;
                 }
-                i5 = i6 + 1;
-                i4 = i2;
-                cursorWindow = cursorWindow2;
+                i3 = i2 + 1;
+                cursorWindow2 = cursorWindow;
+                z2 = z;
             } catch (RuntimeException e) {
                 RuntimeException runtimeException = e;
-                i2 = arrayList.size();
-                while (i3 < i2) {
-                    ((CursorWindow) arrayList.get(i3)).close();
-                    i3++;
+                int size2 = arrayList.size();
+                for (int i5 = 0; i5 < size2; i5++) {
+                    ((CursorWindow) arrayList.get(i5)).close();
                 }
                 throw runtimeException;
             }
@@ -217,53 +286,144 @@ public final class DataHolder extends com.google.android.gms.common.internal.saf
         return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
     }
 
-    public static DataHolder zzbx(int i) {
-        return new DataHolder(zzfqm, i, null);
-    }
-
-    private final void zzh(String str, int i) {
-        if (this.zzfqg == null || !this.zzfqg.containsKey(str)) {
-            String valueOf = String.valueOf(str);
-            throw new IllegalArgumentException(valueOf.length() != 0 ? "No such column: ".concat(valueOf) : new String("No such column: "));
-        } else if (isClosed()) {
-            throw new IllegalArgumentException("Buffer is closed.");
-        } else if (i < 0 || i >= this.zzfqk) {
-            throw new CursorIndexOutOfBoundsException(i, this.zzfqk);
+    /* JADX INFO: finally extract failed */
+    private static CursorWindow[] zaa(CursorWrapper cursorWrapper) {
+        int i;
+        ArrayList arrayList = new ArrayList();
+        try {
+            int count = cursorWrapper.getCount();
+            CursorWindow window = cursorWrapper.getWindow();
+            if (window == null || window.getStartPosition() != 0) {
+                i = 0;
+            } else {
+                window.acquireReference();
+                cursorWrapper.setWindow(null);
+                arrayList.add(window);
+                i = window.getNumRows();
+            }
+            while (i < count && cursorWrapper.moveToPosition(i)) {
+                CursorWindow window2 = cursorWrapper.getWindow();
+                if (window2 != null) {
+                    window2.acquireReference();
+                    cursorWrapper.setWindow(null);
+                } else {
+                    window2 = new CursorWindow(false);
+                    window2.setStartPosition(i);
+                    cursorWrapper.fillWindow(i, window2);
+                }
+                if (window2.getNumRows() == 0) {
+                    break;
+                }
+                arrayList.add(window2);
+                i = window2.getNumRows() + window2.getStartPosition();
+            }
+            cursorWrapper.close();
+            return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
+        } catch (Throwable th) {
+            cursorWrapper.close();
+            throw th;
         }
     }
 
+    @KeepForSdk
     public final void close() {
         synchronized (this) {
             if (!this.mClosed) {
                 this.mClosed = true;
-                for (CursorWindow close : this.zzfqh) {
+                for (CursorWindow close : this.zalr) {
                     close.close();
                 }
             }
         }
     }
 
-    protected final void finalize() throws Throwable {
+    /* access modifiers changed from: protected */
+    public final void finalize() throws Throwable {
         try {
-            if (this.zzfql && this.zzfqh.length > 0 && !isClosed()) {
+            if (this.zalw && this.zalr.length > 0 && !isClosed()) {
                 close();
                 String obj = toString();
                 Log.e("DataBuffer", new StringBuilder(String.valueOf(obj).length() + 178).append("Internal data leak within a DataBuffer object detected!  Be sure to explicitly call release() on all DataBuffer extending objects when you are done with them. (internal object: ").append(obj).append(")").toString());
             }
-            super.finalize();
-        } catch (Throwable th) {
+        } finally {
             super.finalize();
         }
     }
 
+    @KeepForSdk
+    public final boolean getBoolean(String str, int i, int i2) {
+        zaa(str, i);
+        return Long.valueOf(this.zalr[i2].getLong(i, this.zalq.getInt(str))).longValue() == 1;
+    }
+
+    @KeepForSdk
+    public final byte[] getByteArray(String str, int i, int i2) {
+        zaa(str, i);
+        return this.zalr[i2].getBlob(i, this.zalq.getInt(str));
+    }
+
+    @KeepForSdk
     public final int getCount() {
-        return this.zzfqk;
+        return this.zalv;
     }
 
+    @KeepForSdk
+    public final int getInteger(String str, int i, int i2) {
+        zaa(str, i);
+        return this.zalr[i2].getInt(i, this.zalq.getInt(str));
+    }
+
+    @KeepForSdk
+    public final long getLong(String str, int i, int i2) {
+        zaa(str, i);
+        return this.zalr[i2].getLong(i, this.zalq.getInt(str));
+    }
+
+    @KeepForSdk
+    public final Bundle getMetadata() {
+        return this.zalt;
+    }
+
+    @KeepForSdk
     public final int getStatusCode() {
-        return this.zzezx;
+        return this.zals;
     }
 
+    @KeepForSdk
+    public final String getString(String str, int i, int i2) {
+        zaa(str, i);
+        return this.zalr[i2].getString(i, this.zalq.getInt(str));
+    }
+
+    @KeepForSdk
+    public final int getWindowIndex(int i) {
+        int i2 = 0;
+        Preconditions.checkState(i >= 0 && i < this.zalv);
+        while (true) {
+            if (i2 >= this.zalu.length) {
+                break;
+            } else if (i < this.zalu[i2]) {
+                i2--;
+                break;
+            } else {
+                i2++;
+            }
+        }
+        return i2 == this.zalu.length ? i2 - 1 : i2;
+    }
+
+    @KeepForSdk
+    public final boolean hasColumn(String str) {
+        return this.zalq.containsKey(str);
+    }
+
+    @KeepForSdk
+    public final boolean hasNull(String str, int i, int i2) {
+        zaa(str, i);
+        return this.zalr[i2].isNull(i, this.zalq.getInt(str));
+    }
+
+    @KeepForSdk
     public final boolean isClosed() {
         boolean z;
         synchronized (this) {
@@ -273,92 +433,47 @@ public final class DataHolder extends com.google.android.gms.common.internal.saf
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.zzfqf, false);
-        zzd.zza(parcel, 2, this.zzfqh, i, false);
-        zzd.zzc(parcel, 3, this.zzezx);
-        zzd.zza(parcel, 4, this.zzfqi, false);
-        zzd.zzc(parcel, 1000, this.zzdxt);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeStringArray(parcel, 1, this.zalp, false);
+        SafeParcelWriter.writeTypedArray(parcel, 2, this.zalr, i, false);
+        SafeParcelWriter.writeInt(parcel, 3, getStatusCode());
+        SafeParcelWriter.writeBundle(parcel, 4, getMetadata(), false);
+        SafeParcelWriter.writeInt(parcel, 1000, this.zale);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
         if ((i & 1) != 0) {
             close();
         }
     }
 
-    public final void zza(String str, int i, int i2, CharArrayBuffer charArrayBuffer) {
-        zzh(str, i);
-        this.zzfqh[i2].copyStringToBuffer(i, this.zzfqg.getInt(str), charArrayBuffer);
+    public final float zaa(String str, int i, int i2) {
+        zaa(str, i);
+        return this.zalr[i2].getFloat(i, this.zalq.getInt(str));
     }
 
-    public final Bundle zzafh() {
-        return this.zzfqi;
+    public final void zaa(String str, int i, int i2, CharArrayBuffer charArrayBuffer) {
+        zaa(str, i);
+        this.zalr[i2].copyStringToBuffer(i, this.zalq.getInt(str), charArrayBuffer);
     }
 
-    public final void zzaiv() {
-        int i;
+    public final double zab(String str, int i, int i2) {
+        zaa(str, i);
+        return this.zalr[i2].getDouble(i, this.zalq.getInt(str));
+    }
+
+    public final void zaca() {
+        this.zalq = new Bundle();
+        for (int i = 0; i < this.zalp.length; i++) {
+            this.zalq.putInt(this.zalp[i], i);
+        }
+        this.zalu = new int[this.zalr.length];
         int i2 = 0;
-        this.zzfqg = new Bundle();
-        for (i = 0; i < this.zzfqf.length; i++) {
-            this.zzfqg.putInt(this.zzfqf[i], i);
+        int i3 = 0;
+        while (i3 < this.zalr.length) {
+            this.zalu[i3] = i2;
+            int startPosition = this.zalr[i3].getStartPosition();
+            i3++;
+            i2 = (this.zalr[i3].getNumRows() - (i2 - startPosition)) + i2;
         }
-        this.zzfqj = new int[this.zzfqh.length];
-        for (i = 0; i < this.zzfqh.length; i++) {
-            this.zzfqj[i] = i2;
-            i2 += this.zzfqh[i].getNumRows() - (i2 - this.zzfqh[i].getStartPosition());
-        }
-        this.zzfqk = i2;
-    }
-
-    public final long zzb(String str, int i, int i2) {
-        zzh(str, i);
-        return this.zzfqh[i2].getLong(i, this.zzfqg.getInt(str));
-    }
-
-    public final int zzbw(int i) {
-        int i2 = 0;
-        boolean z = i >= 0 && i < this.zzfqk;
-        zzbp.zzbg(z);
-        while (i2 < this.zzfqj.length) {
-            if (i < this.zzfqj[i2]) {
-                i2--;
-                break;
-            }
-            i2++;
-        }
-        return i2 == this.zzfqj.length ? i2 - 1 : i2;
-    }
-
-    public final int zzc(String str, int i, int i2) {
-        zzh(str, i);
-        return this.zzfqh[i2].getInt(i, this.zzfqg.getInt(str));
-    }
-
-    public final String zzd(String str, int i, int i2) {
-        zzh(str, i);
-        return this.zzfqh[i2].getString(i, this.zzfqg.getInt(str));
-    }
-
-    public final boolean zze(String str, int i, int i2) {
-        zzh(str, i);
-        return Long.valueOf(this.zzfqh[i2].getLong(i, this.zzfqg.getInt(str))).longValue() == 1;
-    }
-
-    public final float zzf(String str, int i, int i2) {
-        zzh(str, i);
-        return this.zzfqh[i2].getFloat(i, this.zzfqg.getInt(str));
-    }
-
-    public final boolean zzft(String str) {
-        return this.zzfqg.containsKey(str);
-    }
-
-    public final byte[] zzg(String str, int i, int i2) {
-        zzh(str, i);
-        return this.zzfqh[i2].getBlob(i, this.zzfqg.getInt(str));
-    }
-
-    public final boolean zzh(String str, int i, int i2) {
-        zzh(str, i);
-        return this.zzfqh[i2].isNull(i, this.zzfqg.getInt(str));
+        this.zalv = i2;
     }
 }

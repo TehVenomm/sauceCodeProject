@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Wrap Content")]
-public class UIWrapContent
+public class UIWrapContent : MonoBehaviour
 {
 	public delegate void OnInitializeItem(GameObject go, int wrapIndex, int realIndex);
 
@@ -28,6 +30,15 @@ public class UIWrapContent
 
 	private List<Transform> mChildren = new List<Transform>();
 
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache2;
+
 	public UIWrapContent()
 		: this()
 	{
@@ -52,8 +63,6 @@ public class UIWrapContent
 	[ContextMenu("Sort Based on Scroll Movement")]
 	public void SortBasedOnScrollMovement()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Expected O, but got Unknown
 		if (CacheScrollView())
 		{
 			mChildren.Clear();
@@ -76,8 +85,6 @@ public class UIWrapContent
 	[ContextMenu("Sort Alphabetically")]
 	public void SortAlphabetically()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Expected O, but got Unknown
 		if (CacheScrollView())
 		{
 			mChildren.Clear();
@@ -92,10 +99,6 @@ public class UIWrapContent
 
 	protected bool CacheScrollView()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
 		mTrans = this.get_transform();
 		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
 		mScroll = mPanel.GetComponent<UIScrollView>();
@@ -156,10 +159,6 @@ public class UIWrapContent
 		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0267: Unknown result type (might be due to invalid IL or missing references)
 		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0280: Expected O, but got Unknown
-		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a4: Expected O, but got Unknown
 		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0314: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0332: Unknown result type (might be due to invalid IL or missing references)
@@ -172,10 +171,6 @@ public class UIWrapContent
 		//IL_047b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_048a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_048f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a3: Expected O, but got Unknown
-		//IL_04af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c7: Expected O, but got Unknown
 		float num = (float)(itemSize * mChildren.Count) * 0.5f;
 		Vector3[] worldCorners = mPanel.worldCorners;
 		for (int i = 0; i < 4; i++)
@@ -242,7 +237,7 @@ public class UIWrapContent
 					num5 = num8 + (x - localPosition4.x);
 					if (!UICamera.IsPressed(val3.get_gameObject()))
 					{
-						NGUITools.SetActive(val3.get_gameObject(), num5 > num3 && num5 < num4, false);
+						NGUITools.SetActive(val3.get_gameObject(), num5 > num3 && num5 < num4, compatibilityMode: false);
 					}
 				}
 			}
@@ -302,7 +297,7 @@ public class UIWrapContent
 					num11 = num14 + (y - localPosition8.y);
 					if (!UICamera.IsPressed(val4.get_gameObject()))
 					{
-						NGUITools.SetActive(val4.get_gameObject(), num11 > num9 && num11 < num10, false);
+						NGUITools.SetActive(val4.get_gameObject(), num11 > num9 && num11 < num10, compatibilityMode: false);
 					}
 				}
 			}
@@ -328,8 +323,6 @@ public class UIWrapContent
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Expected O, but got Unknown
 		if (onInitializeItem != null)
 		{
 			int num;

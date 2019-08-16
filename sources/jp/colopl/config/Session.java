@@ -1,4 +1,4 @@
-package jp.colopl.config;
+package p018jp.colopl.config;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
@@ -7,12 +7,13 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import com.google.android.zippy.SharedPreferencesCompat;
 
+/* renamed from: jp.colopl.config.Session */
 public class Session {
     public static String PREFERENCE_NAME = "jp.colopl.session";
     private Context context;
 
-    Session(Context context) {
-        this.context = context;
+    Session(Context context2) {
+        this.context = context2;
     }
 
     public String getName() {

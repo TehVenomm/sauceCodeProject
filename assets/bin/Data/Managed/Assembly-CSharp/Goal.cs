@@ -61,12 +61,10 @@ public abstract class Goal : Poolable
 		if (Singleton<GoalPool>.IsValid())
 		{
 			Singleton<GoalPool>.I.Free(goal);
+			return;
 		}
-		else
-		{
-			goal.OnFinal();
-			goal = null;
-		}
+		goal.OnFinal();
+		goal = null;
 	}
 
 	protected abstract GOAL_TYPE GetGoalType();

@@ -20,8 +20,7 @@ public abstract class BackgroundInitializer<T> implements ConcurrentInitializer<
 
         public T call() throws Exception {
             try {
-                T initialize = BackgroundInitializer.this.initialize();
-                return initialize;
+                return BackgroundInitializer.this.initialize();
             } finally {
                 if (this.execFinally != null) {
                     this.execFinally.shutdown();
@@ -30,7 +29,8 @@ public abstract class BackgroundInitializer<T> implements ConcurrentInitializer<
         }
     }
 
-    protected abstract T initialize() throws Exception;
+    /* access modifiers changed from: protected */
+    public abstract T initialize() throws Exception;
 
     protected BackgroundInitializer() {
         this(null);
@@ -57,19 +57,19 @@ public abstract class BackgroundInitializer<T> implements ConcurrentInitializer<
 
     public synchronized boolean start() {
         boolean z;
-        if (isStarted()) {
-            z = false;
-        } else {
-            ExecutorService createExecutor;
+        ExecutorService executorService;
+        if (!isStarted()) {
             this.executor = getExternalExecutor();
             if (this.executor == null) {
-                createExecutor = createExecutor();
-                this.executor = createExecutor;
+                executorService = createExecutor();
+                this.executor = executorService;
             } else {
-                createExecutor = null;
+                executorService = null;
             }
-            this.future = this.executor.submit(createTask(createExecutor));
+            this.future = this.executor.submit(createTask(executorService));
             z = true;
+        } else {
+            z = false;
         }
         return z;
     }
@@ -80,7 +80,7 @@ public abstract class BackgroundInitializer<T> implements ConcurrentInitializer<
         } catch (ExecutionException e) {
             ConcurrentUtils.handleCause(e);
             return null;
-        } catch (Throwable e2) {
+        } catch (InterruptedException e2) {
             Thread.currentThread().interrupt();
             throw new ConcurrentException(e2);
         }
@@ -93,11 +93,13 @@ public abstract class BackgroundInitializer<T> implements ConcurrentInitializer<
         return this.future;
     }
 
-    protected final synchronized ExecutorService getActiveExecutor() {
+    /* access modifiers changed from: protected */
+    public final synchronized ExecutorService getActiveExecutor() {
         return this.executor;
     }
 
-    protected int getTaskCount() {
+    /* access modifiers changed from: protected */
+    public int getTaskCount() {
         return 1;
     }
 

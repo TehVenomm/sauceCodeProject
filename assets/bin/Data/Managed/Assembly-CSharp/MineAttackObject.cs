@@ -35,28 +35,25 @@ public class MineAttackObject : AttackColliderObject
 
 	protected override void OnTriggerEnter(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		hitLayer = collider.get_gameObject().get_layer();
-		if (((1 << hitLayer) & ignoreLayerMask) <= 0)
+		if (((1 << hitLayer) & ignoreLayerMask) > 0)
 		{
-			if (hitLayer == 8)
+			return;
+		}
+		if (hitLayer == 8)
+		{
+			hitPlayer = collider.get_gameObject().GetComponent<Player>();
+			if (collider.get_gameObject().GetComponent<DangerRader>() != null)
 			{
-				hitPlayer = collider.get_gameObject().GetComponent<Player>();
-				if (collider.get_gameObject().GetComponent<DangerRader>() != null)
-				{
-					return;
-				}
+				return;
 			}
-			HealAttackObject component = collider.get_gameObject().GetComponent<HealAttackObject>();
-			if (!(component != null))
-			{
-				isHit = true;
-				DeactivateOwnCollider();
-				base.OnTriggerEnter(collider);
-			}
+		}
+		HealAttackObject component = collider.get_gameObject().GetComponent<HealAttackObject>();
+		if (!(component != null))
+		{
+			isHit = true;
+			DeactivateOwnCollider();
+			base.OnTriggerEnter(collider);
 		}
 	}
 }

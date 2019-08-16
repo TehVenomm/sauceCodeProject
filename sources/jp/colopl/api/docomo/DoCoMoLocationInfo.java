@@ -1,7 +1,8 @@
-package jp.colopl.api.docomo;
+package p018jp.colopl.api.docomo;
 
 import java.util.ArrayList;
 
+/* renamed from: jp.colopl.api.docomo.DoCoMoLocationInfo */
 public class DoCoMoLocationInfo {
     private ArrayList<Feature> featureList;
     private ResultInfo resultInfo;
@@ -10,12 +11,12 @@ public class DoCoMoLocationInfo {
         this(new ResultInfo(), new ArrayList());
     }
 
-    public DoCoMoLocationInfo(ResultInfo resultInfo) {
-        this(resultInfo, new ArrayList());
+    public DoCoMoLocationInfo(ResultInfo resultInfo2) {
+        this(resultInfo2, new ArrayList());
     }
 
-    public DoCoMoLocationInfo(ResultInfo resultInfo, ArrayList<Feature> arrayList) {
-        this.resultInfo = resultInfo;
+    public DoCoMoLocationInfo(ResultInfo resultInfo2, ArrayList<Feature> arrayList) {
+        this.resultInfo = resultInfo2;
         this.featureList = arrayList;
     }
 
@@ -24,7 +25,10 @@ public class DoCoMoLocationInfo {
     }
 
     public Feature getFeature(int i) {
-        return (this.featureList == null || i > this.featureList.size() - 1) ? null : (Feature) this.featureList.get(i);
+        if (this.featureList == null || i > this.featureList.size() - 1) {
+            return null;
+        }
+        return (Feature) this.featureList.get(i);
     }
 
     public ArrayList<Feature> getFeatureList() {
@@ -35,8 +39,8 @@ public class DoCoMoLocationInfo {
         return this.resultInfo;
     }
 
-    public void setResultInfo(ResultInfo resultInfo) {
-        this.resultInfo = resultInfo;
+    public void setResultInfo(ResultInfo resultInfo2) {
+        this.resultInfo = resultInfo2;
     }
 
     public String toString() {

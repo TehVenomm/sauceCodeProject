@@ -22,11 +22,14 @@ public class ItemStorageTop : SkillInfoBase
 		BTN_SORT,
 		SPR_INVALID_SORT,
 		LBL_INVALID_SORT,
+		BTN_CHANGE,
+		SPR_INVALID_CHANGE,
 		TGL_TAB0,
 		TGL_TAB1,
 		TGL_TAB2,
 		TGL_TAB3,
 		TGL_TAB4,
+		TGL_TAB5,
 		OBJ_BTN_SELL_MODE,
 		OBJ_SELL_MODE_ROOT,
 		LBL_MAX_SELECT_NUM,
@@ -54,6 +57,7 @@ public class ItemStorageTop : SkillInfoBase
 		EQUIP,
 		SKILL,
 		LAPIS,
+		ACCESSORY,
 		MAX
 	}
 
@@ -106,7 +110,7 @@ public class ItemStorageTop : SkillInfoBase
 							return;
 						}
 					}
-					if (item_data.tableData.type != ITEM_TYPE.TICKET && item_data.tableData.type != ITEM_TYPE.ABILITY_ITEM && item_data.tableData.type != ITEM_TYPE.EVENT_POINT)
+					if (item_data.tableData.type != ITEM_TYPE.TICKET && item_data.tableData.type != ITEM_TYPE.ABILITY_ITEM && item_data.tableData.type != ITEM_TYPE.EVENT_POINT && item_data.tableData.type != ITEM_TYPE.FORTUNE_TICKET)
 					{
 						item_inventory.Add(item_data);
 					}
@@ -114,22 +118,17 @@ public class ItemStorageTop : SkillInfoBase
 			});
 			if (include_lapis)
 			{
-				using (List<ItemTable.ItemData>.Enumerator enumerator = Singleton<ItemTable>.I.GetItemTypeItemData(ITEM_TYPE.LAPIS).GetEnumerator())
+				foreach (ItemTable.ItemData lapisData in Singleton<ItemTable>.I.GetItemTypeItemData(ITEM_TYPE.LAPIS))
 				{
-					ItemTable.ItemData lapisData;
-					while (enumerator.MoveNext())
+					if (item_inventory.Find((ItemInfo x) => x.tableData.id == lapisData.id) == null && (lapisData.endDate == default(DateTime) || lapisData.endDate > TimeManager.GetNow()))
 					{
-						lapisData = enumerator.Current;
-						if (item_inventory.Find((ItemInfo x) => x.tableData.id == lapisData.id) == null && (lapisData.endDate == default(DateTime) || lapisData.endDate > TimeManager.GetNow()))
+						Item recv_data = new Item
 						{
-							Item recv_data = new Item
-							{
-								num = 0,
-								itemId = lapisData.id,
-								uniqId = "0"
-							};
-							item_inventory.Add(new ItemInfo(recv_data));
-						}
+							num = 0,
+							itemId = (int)lapisData.id,
+							uniqId = "0"
+						};
+						item_inventory.Add(new ItemInfo(recv_data));
 					}
 				}
 			}
@@ -171,16 +170,12 @@ public class ItemStorageTop : SkillInfoBase
 				MonoBehaviourSingleton<InventoryManager>.I.AddShowFragsAbilityItem(sortCompareData.GetUniqID());
 			}
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(sortCompareData.GetTableID());
-			if (itemStorageTop.showInventoryMode != SHOW_INVENTORY_MODE.SMALL)
+			ItemIcon itemIcon = ItemIconDetail.CreateMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), itemData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, is_select: false, is_new);
+			if (sortCompareData is AbilityItemSortData)
 			{
-				ItemIcon itemIcon = ItemIconDetail.CreateMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), itemData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, false, is_new);
-				if (sortCompareData is AbilityItemSortData)
-				{
-					(itemIcon as ItemIconDetail).setupperMaterial.SetDescription(sortCompareData.GetDetail());
-				}
-				return itemIcon;
+				(itemIcon as ItemIconDetail).setupperMaterial.SetDescription(sortCompareData.GetDetail());
 			}
-			return ItemIconDetailSmall.CreateSmallMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, false, is_new, itemData.enemyIconID, itemData.enemyIconID2, ItemIconDetail.ICON_STATUS.NONE);
+			return itemIcon;
 		}
 	}
 
@@ -219,11 +214,7 @@ public class ItemStorageTop : SkillInfoBase
 			ItemStorageTop itemStorageTop = data[3] as ItemStorageTop;
 			bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(ITEM_ICON_TYPE.ITEM, sortCompareData.GetUniqID());
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(sortCompareData.GetTableID());
-			if (itemStorageTop.showInventoryMode != SHOW_INVENTORY_MODE.SMALL)
-			{
-				return ItemIconDetail.CreateMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), itemData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, false, is_new);
-			}
-			return ItemIconDetailSmall.CreateSmallMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, false, is_new, 0, 0, ItemIconDetail.ICON_STATUS.NONE);
+			return ItemIconDetail.CreateMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), itemData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, is_select: false, is_new);
 		}
 	}
 
@@ -283,11 +274,7 @@ public class ItemStorageTop : SkillInfoBase
 			{
 				num++;
 			}
-			if (itemStorageTop.showInventoryMode != SHOW_INVENTORY_MODE.SMALL)
-			{
-				return ItemIconDetail.CreateEquipDetailSelectNumberIcon(item_data, skillSlotData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, "SELECT", event_data, ItemIconDetail.ICON_STATUS.NONE, is_new, toggle_group, num, (!item_data.IsEquipping()) ? (-1) : 0, GET_TYPE.PAY);
-			}
-			return ItemIconDetailSmall.CreateSmallEquipSelectDetailIcon(item_data, parent, "SELECT", event_data, ItemIconDetail.ICON_STATUS.NONE, is_new, toggle_group, num, (!item_data.IsEquipping()) ? (-1) : 0);
+			return ItemIconDetail.CreateEquipDetailSelectNumberIcon(item_data, skillSlotData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, "SELECT", event_data, ItemIconDetail.ICON_STATUS.NONE, is_new, toggle_group, num, (!item_data.IsEquipping()) ? (-1) : 0);
 		}
 	}
 
@@ -348,11 +335,7 @@ public class ItemStorageTop : SkillInfoBase
 				num++;
 			}
 			ItemIconDetail.ICON_STATUS icon_status = item_data.IsExceeded() ? ItemIconDetail.ICON_STATUS.VALID_EXCEED : ItemIconDetail.ICON_STATUS.NONE;
-			if (itemStorageTop.showInventoryMode != SHOW_INVENTORY_MODE.SMALL)
-			{
-				return ItemIconDetail.CreateSkillDetailSelectNumberIcon(item_data.GetIconType(), item_data.GetIconID(), item_data.GetRarity(), item_data, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, "SELECT", event_data, is_new, toggle_group, num, item_data.IsEquipping(), icon_status);
-			}
-			return ItemIconDetailSmall.CreateSmallSkillSelectDetailIcon(item_data.GetIconType(), item_data.GetIconID(), item_data.GetRarity(), item_data, parent, "SELECT", event_data, is_new, toggle_group, num, item_data.IsEquipping(), icon_status);
+			return ItemIconDetail.CreateSkillDetailSelectNumberIcon(item_data.GetIconType(), item_data.GetIconID(), item_data.GetRarity(), item_data, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, "SELECT", event_data, is_new, toggle_group, num, item_data.IsEquipping(), icon_status);
 		}
 	}
 
@@ -384,15 +367,9 @@ public class ItemStorageTop : SkillInfoBase
 			int event_data = (int)data[2];
 			ItemStorageTop itemStorageTop = data[3] as ItemStorageTop;
 			bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(questSortData.GetIconType(), questSortData.GetUniqID());
-			if (itemStorageTop.showInventoryMode != SHOW_INVENTORY_MODE.SMALL)
-			{
-				ItemIcon itemIcon = ItemIconDetail.CreateQuestItemIcon(questSortData.GetIconType(), questSortData.GetIconID(), questSortData.GetRarity(), questSortData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, questSortData.GetNum(), questSortData.GetName(), "SELECT", event_data, -1, false, is_new);
-				itemIcon.SetEnemyIconScale(questSortData.GetIconType(), 0.9f);
-				return itemIcon;
-			}
-			ItemIcon itemIcon2 = ItemIconDetailSmall.CreateSmallQuestItemIcon(questSortData.GetIconType(), questSortData.GetIconID(), questSortData.GetRarity(), parent, questSortData.GetEnemyElement(), questSortData.GetNum(), questSortData.GetName(), "SELECT", event_data, -1, false, is_new);
-			itemIcon2.SetEnemyIconScale(questSortData.GetIconType(), 0.9f);
-			return itemIcon2;
+			ItemIcon itemIcon = ItemIconDetail.CreateQuestItemIcon(questSortData.GetIconType(), questSortData.GetIconID(), questSortData.GetRarity(), questSortData, itemStorageTop.showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS, parent, questSortData.GetNum(), questSortData.GetName(), "SELECT", event_data, -1, is_select: false, is_new);
+			itemIcon.SetEnemyIconScale(questSortData.GetIconType(), 0.9f);
+			return itemIcon;
 		}
 	}
 
@@ -417,14 +394,34 @@ public class ItemStorageTop : SkillInfoBase
 			AbilityItemSortData abilityItemSortData = objects[0] as AbilityItemSortData;
 			Transform parent = objects[1] as Transform;
 			int event_data = (int)objects[2];
-			SHOW_INVENTORY_MODE sHOW_INVENTORY_MODE = (SHOW_INVENTORY_MODE)(int)objects[3];
+			SHOW_INVENTORY_MODE sHOW_INVENTORY_MODE = (SHOW_INVENTORY_MODE)objects[3];
 			bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(ITEM_ICON_TYPE.ABILITY_ITEM, abilityItemSortData.GetUniqID());
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(abilityItemSortData.GetTableID());
-			if (sHOW_INVENTORY_MODE != SHOW_INVENTORY_MODE.SMALL)
-			{
-				return ItemIconDetail.CreateMaterialIcon(abilityItemSortData.GetIconType(), abilityItemSortData.GetIconID(), abilityItemSortData.GetRarity(), itemData, true, parent, abilityItemSortData.GetNum(), abilityItemSortData.GetName(), "SELECT_ITEM", event_data, -1, false, is_new);
-			}
-			return ItemIconDetailSmall.CreateSmallMaterialIcon(abilityItemSortData.GetIconType(), abilityItemSortData.GetIconID(), abilityItemSortData.GetRarity(), parent, abilityItemSortData.GetNum(), abilityItemSortData.GetName(), "SELECT_ITEM", event_data, -1, false, is_new, 0, 0, ItemIconDetail.ICON_STATUS.NONE);
+			return ItemIconDetail.CreateMaterialIcon(abilityItemSortData.GetIconType(), abilityItemSortData.GetIconID(), abilityItemSortData.GetRarity(), itemData, is_show_main_status: true, parent, abilityItemSortData.GetNum(), abilityItemSortData.GetName(), "SELECT_ITEM", event_data, -1, is_select: false, is_new);
+		}
+	}
+
+	public class AccessoryInventory : InventoryBase
+	{
+		public AccessoryInventory()
+		{
+			sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.ACCESSORY, SortSettings.SETTINGS_TYPE.STORAGE_ACCESSORY);
+			AccessoryInfo[] target_ary = MonoBehaviourSingleton<InventoryManager>.I.accessoryInventory.GetAll().ToArray();
+			datas = sortSettings.CreateSortAry<AccessoryInfo, AccessorySortData>(target_ary);
+		}
+
+		protected override bool DoSort()
+		{
+			return sortSettings.Sort(datas as AccessorySortData[]);
+		}
+
+		public override ItemIcon CreateIcon(object[] objects)
+		{
+			AccessorySortData accessorySortData = objects[0] as AccessorySortData;
+			Transform parent = objects[1] as Transform;
+			int eventData = (int)objects[2];
+			bool isNew = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(ITEM_ICON_TYPE.ACCESSORY, accessorySortData.GetUniqID());
+			return ItemIconDetail.CreateAccessoryIcon(accessorySortData.itemData.tableData, parent, "SELECT", eventData, isNew, _isEquipping: false);
 		}
 	}
 
@@ -432,21 +429,22 @@ public class ItemStorageTop : SkillInfoBase
 	{
 		MAIN_STATUS,
 		SUB_STATUS,
-		SMALL
+		MAX
 	}
 
 	private const float DEFAULT_LAST_SCROLL_POS_Y = -9999.9f;
 
-	private readonly UI[] uiTab = new UI[5]
+	private readonly UI[] uiTab = new UI[6]
 	{
 		UI.TGL_TAB0,
 		UI.TGL_TAB1,
 		UI.TGL_TAB2,
 		UI.TGL_TAB3,
-		UI.TGL_TAB4
+		UI.TGL_TAB4,
+		UI.TGL_TAB5
 	};
 
-	protected InventoryBase[] inventories = new InventoryBase[5];
+	protected InventoryBase[] inventories = new InventoryBase[6];
 
 	protected TAB_MODE tab;
 
@@ -524,7 +522,7 @@ public class ItemStorageTop : SkillInfoBase
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
 	{
-		return base.GetUpdateUINotifyFlags() | NOTIFY_FLAG.UPDATE_ITEM_INVENTORY | NOTIFY_FLAG.UPDATE_EQUIP_INVENTORY | NOTIFY_FLAG.UPDATE_SKILL_INVENTORY | NOTIFY_FLAG.UPDATE_QUEST_ITEM_INVENTORY | NOTIFY_FLAG.UPDATE_SKILL_CHANGE | NOTIFY_FLAG.UPDATE_EQUIP_FAVORITE | NOTIFY_FLAG.UPDATE_SKILL_FAVORITE | NOTIFY_FLAG.REMOVE_NEW_ICON | NOTIFY_FLAG.UPDATE_INVENTORY_CAPACITY | NOTIFY_FLAG.UPDATE_ABILITY_ITEM_INVENTORY;
+		return base.GetUpdateUINotifyFlags() | NOTIFY_FLAG.UPDATE_ITEM_INVENTORY | NOTIFY_FLAG.UPDATE_EQUIP_INVENTORY | NOTIFY_FLAG.UPDATE_SKILL_INVENTORY | NOTIFY_FLAG.UPDATE_QUEST_ITEM_INVENTORY | NOTIFY_FLAG.UPDATE_SKILL_CHANGE | NOTIFY_FLAG.UPDATE_EQUIP_FAVORITE | NOTIFY_FLAG.UPDATE_SKILL_FAVORITE | NOTIFY_FLAG.REMOVE_NEW_ICON | NOTIFY_FLAG.UPDATE_INVENTORY_CAPACITY | NOTIFY_FLAG.UPDATE_ABILITY_ITEM_INVENTORY | NOTIFY_FLAG.UPDATE_EQUIP_GROW;
 	}
 
 	public override void OnNotify(NOTIFY_FLAG flags)
@@ -558,6 +556,11 @@ public class ItemStorageTop : SkillInfoBase
 			inventories[0] = null;
 			SetDirty(SelectListTarget(tab, showInventoryMode));
 		}
+		if ((flags & NOTIFY_FLAG.UPDATE_EQUIP_GROW) != (NOTIFY_FLAG)0L)
+		{
+			inventories[5] = null;
+			SetDirty(SelectListTarget(tab, showInventoryMode));
+		}
 		base.OnNotify(flags);
 	}
 
@@ -580,14 +583,14 @@ public class ItemStorageTop : SkillInfoBase
 			}
 		}
 		UIToggle.current = null;
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, showInventoryMode != SHOW_INVENTORY_MODE.SMALL);
+		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, value: true);
 		InventoryBase inventory = inventories[(int)tab];
 		if (inventory == null)
 		{
 			switch (tab)
 			{
 			case TAB_MODE.MATERIAL:
-				inventories[(int)tab] = new MaterialInventory(includeMaterialItem, includeLithograph, false, ItemGetType);
+				inventories[(int)tab] = new MaterialInventory(includeMaterialItem, includeLithograph, include_lapis: false, ItemGetType);
 				break;
 			case TAB_MODE.USE_ITEM:
 				inventories[(int)tab] = new UseItemInventory();
@@ -596,10 +599,10 @@ public class ItemStorageTop : SkillInfoBase
 				inventories[(int)tab] = new EquipItemInventory(ItemGetType);
 				break;
 			case TAB_MODE.SKILL:
-				inventories[(int)tab] = new SkillItemInventory(SortSettings.SETTINGS_TYPE.STORAGE_SKILL, SKILL_SLOT_TYPE.NONE, false);
+				inventories[(int)tab] = new SkillItemInventory();
 				break;
 			case TAB_MODE.LAPIS:
-				inventories[(int)tab] = new MaterialInventory(false, false, true, null);
+				inventories[(int)tab] = new MaterialInventory(include_material: false, include_lithograph: false, include_lapis: true);
 				break;
 			}
 			inventory = inventories[(int)tab];
@@ -610,7 +613,7 @@ public class ItemStorageTop : SkillInfoBase
 				sellItemData.ForEach(delegate(SortCompareData sort_data)
 				{
 					int l = 0;
-					for (int num4 = inventories[(int)tab].datas.Length; l < num4; l++)
+					for (int num3 = inventories[(int)tab].datas.Length; l < num3; l++)
 					{
 						if (sort_data.GetUniqID() == inventories[(int)tab].datas[l].GetUniqID())
 						{
@@ -638,15 +641,20 @@ public class ItemStorageTop : SkillInfoBase
 				}
 			}
 		}
-		SetActive((Enum)UI.BTN_SORT, true);
+		SetActive((Enum)UI.BTN_SORT, is_visible: true);
 		SetLabelText((Enum)UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
 		SetToggle((Enum)UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
 		bool flag = tab != TAB_MODE.USE_ITEM && tab != TAB_MODE.LAPIS;
-		SetActive((Enum)UI.BTN_SORT, flag);
-		SetActive((Enum)UI.SPR_INVALID_SORT, !flag);
+		SetActive((Enum)UI.BTN_SORT, tab != TAB_MODE.ACCESSORY && flag);
+		SetActive((Enum)UI.SPR_INVALID_SORT, tab != TAB_MODE.ACCESSORY && !flag);
 		SetLabelText((Enum)UI.LBL_INVALID_SORT, inventory.sortSettings.GetSortLabel());
+		m_generatedIconList.Clear();
+		UpdateNewIconInfo();
+		bool flag2 = tab != TAB_MODE.SKILL && tab != TAB_MODE.ACCESSORY;
+		SetActive((Enum)UI.BTN_CHANGE, flag2);
+		SetActive((Enum)UI.SPR_INVALID_CHANGE, !flag2);
 		int sortedItemCount = 0;
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, (Func<int, bool>)delegate(int i)
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
 		{
 			SortCompareData sortCompareData3 = inventory.datas[i];
 			if (sortCompareData3 == null || !sortCompareData3.IsPriority(inventory.sortSettings.orderTypeAsc))
@@ -669,59 +677,79 @@ public class ItemStorageTop : SkillInfoBase
 			{
 				itemIcon.toggleSelectFrame.onChange.Clear();
 				itemIcon.toggleSelectFrame.onChange.Add(new EventDelegate(this, "IconToggleChange"));
-				SetLongTouch(itemIcon.transform, "DETAIL", i);
+				InitListItemEvent(itemIcon, i, sortCompareData2);
 				itemIcon.SetGrayout(IsRequiredIconGrayOut(sortCompareData2));
+				itemIcon.SetInitData(sortCompareData2);
+				if (!m_generatedIconList.Contains(itemIcon))
+				{
+					m_generatedIconList.Add(itemIcon);
+				}
 			}
 		});
+		InitSellObjectMode();
+		m_maxScrollableValue = CalcMaxScrollableValue(sortedItemCount);
+		UpdateScrollSettings();
+		UpdateAnchors();
+	}
+
+	protected virtual void InitListItemEvent(ItemIcon icon, int i, SortCompareData item)
+	{
+		SetLongTouch(icon.transform, "DETAIL", i);
+	}
+
+	protected virtual void InitSellObjectMode()
+	{
 		if (tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL)
 		{
 			if (isSellMode)
 			{
 				UpdateSellGoldAndExp();
-				SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, true);
-				SetActive((Enum)UI.OBJ_BTN_SELL_MODE, false);
+				SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, is_visible: true);
+				SetActive((Enum)UI.OBJ_BTN_SELL_MODE, is_visible: false);
 			}
 			else
 			{
 				SetActive((Enum)UI.OBJ_BTN_SELL_MODE, MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
-				SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, false);
+				SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, is_visible: false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_BTN_SELL_MODE, false);
-			SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, false);
+			SetActive((Enum)UI.OBJ_BTN_SELL_MODE, is_visible: false);
+			SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, is_visible: false);
 		}
-		int num3 = 0;
+		int num = 0;
 		int now_num = 0;
 		switch (tab)
 		{
 		case TAB_MODE.EQUIP:
-			num3 = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxEquipItem;
+			num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxEquipItem;
 			MonoBehaviourSingleton<InventoryManager>.I.ForAllEquipItemInventory(delegate(EquipItemInfo _equip)
 			{
-				if (_equip != null && _equip.uniqueID != 0L && _equip.tableID != 0)
+				if (_equip != null && _equip.uniqueID != 0 && _equip.tableID != 0)
 				{
 					now_num++;
 				}
 			});
 			break;
 		case TAB_MODE.SKILL:
-			num3 = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxSkillItem;
+			num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxSkillItem;
 			MonoBehaviourSingleton<InventoryManager>.I.ForAllSkillItemInventory(delegate(SkillItemInfo _skill)
 			{
-				if (_skill != null && _skill.uniqueID != 0L && _skill.tableID != 0)
+				if (_skill != null && _skill.uniqueID != 0 && _skill.tableID != 0)
 				{
 					now_num++;
 				}
 			});
 			break;
 		}
-		SetLabelText((Enum)UI.LBL_MAX_HAVE_NUM, num3.ToString());
+		SetLabelText((Enum)UI.LBL_MAX_HAVE_NUM, num.ToString());
 		SetLabelText((Enum)UI.LBL_NOW_HAVE_NUM, now_num.ToString());
-		m_maxScrollableValue = CalcMaxScrollableValue(sortedItemCount);
-		UpdateScrollSettings();
-		UpdateAnchors();
+	}
+
+	private void Update()
+	{
+		ObserveItemList();
 	}
 
 	protected virtual bool IsRequiredIconGrayOut(SortCompareData _data)
@@ -785,22 +813,20 @@ public class ItemStorageTop : SkillInfoBase
 		if (isSellMode && sellItemData.Count > 0 && tab != t)
 		{
 			tmpTab = t;
-			GameSection.ChangeEvent("SELL_CHANGE_TAB", null);
+			GameSection.ChangeEvent("SELL_CHANGE_TAB");
+			return;
 		}
-		else
+		tmpTab = TAB_MODE.MAX;
+		if (tab != t)
 		{
-			tmpTab = TAB_MODE.MAX;
-			if (tab != t)
-			{
-				sellItemData.Clear();
-				isSellMode = false;
-				SetNextTab(t);
-				m_lastScrollPosition = Vector3.get_up() * -9999.9f;
-				m_isEnableUpdateScrollTopPos = true;
-				inventoryUI = SelectListTarget(tab, showInventoryMode);
-				SetDirty(inventoryUI);
-				RefreshUI();
-			}
+			sellItemData.Clear();
+			isSellMode = false;
+			SetNextTab(t);
+			m_lastScrollPosition = Vector3.get_up() * -9999.9f;
+			m_isEnableUpdateScrollTopPos = true;
+			inventoryUI = SelectListTarget(tab, showInventoryMode);
+			SetDirty(inventoryUI);
+			RefreshUI();
 		}
 	}
 
@@ -845,7 +871,11 @@ public class ItemStorageTop : SkillInfoBase
 	{
 		if (tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL)
 		{
-			GameSection.ChangeEvent("EQUIP_SORT", null);
+			GameSection.ChangeEvent("EQUIP_SORT");
+		}
+		else if (tab == TAB_MODE.ACCESSORY)
+		{
+			GameSection.ChangeEvent("ACCESSORY_SORT");
 		}
 		GameSection.SetEventData(inventories[(int)tab].sortSettings.Clone());
 	}
@@ -914,6 +944,14 @@ public class ItemStorageTop : SkillInfoBase
 		{
 			GameSection.ChangeEvent("SELECT", inventories[(int)tab].datas[num]);
 		}
+		else if (tab == TAB_MODE.ACCESSORY)
+		{
+			GameSection.ChangeEvent("ACCESSORY_SELECT", new object[2]
+			{
+				ItemDetailEquip.CURRENT_SECTION.ITEM_STORAGE,
+				inventories[(int)tab].datas[num]
+			});
+		}
 		else
 		{
 			GameSection.ChangeEvent("SELECT", inventories[(int)tab].datas[num]);
@@ -941,39 +979,43 @@ public class ItemStorageTop : SkillInfoBase
 			if (sellItemData.Count >= MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX && sortCompareData == null)
 			{
 				toggleIndex = num;
-				GameSection.ChangeEvent("MULTI_SELL_MAX", null);
+				GameSection.ChangeEvent("MULTI_SELL_MAX");
+				return;
 			}
-			else if (!select_data.CanSale())
+			if (!select_data.CanSale())
 			{
 				if (select_data.IsFavorite())
 				{
-					GameSection.ChangeEvent("NOT_SELL_FAVORITE", null);
+					GameSection.ChangeEvent("NOT_SELL_FAVORITE");
+				}
+				else if (select_data.IsHomeEquipping())
+				{
+					GameSection.ChangeEvent("NOT_SELL_EQUIPPING");
 				}
 				else
 				{
-					GameSection.ChangeEvent("NOT_SELL_EQUIPPING", null);
+					GameSection.ChangeEvent("NOT_SELL_UNIQUE_EQUIPPING");
 				}
 				toggleIndex = num;
+				return;
 			}
-			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && select_data.GetTableID() == 10000000)
+			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && select_data.GetTableID() == 10000000)
 			{
-				GameSection.ChangeEvent("NOT_SELL_DEFAULT_WEAPON", null);
+				GameSection.ChangeEvent("NOT_SELL_DEFAULT_WEAPON");
+				return;
+			}
+			ResetSelectSellIcon();
+			if (sortCompareData != null)
+			{
+				sellItemData.Remove(sortCompareData);
 			}
 			else
 			{
-				ResetSelectSellIcon();
-				if (sortCompareData != null)
-				{
-					sellItemData.Remove(sortCompareData);
-				}
-				else
-				{
-					sellItemData.Add(select_data);
-				}
-				GameSection.StopEvent();
-				UpdateSellGoldAndExp();
-				UpdateSelectSellIcon();
+				sellItemData.Add(select_data);
 			}
+			GameSection.StopEvent();
+			UpdateSellGoldAndExp();
+			UpdateSelectSellIcon();
 		}
 		else
 		{
@@ -983,12 +1025,12 @@ public class ItemStorageTop : SkillInfoBase
 
 	private void ResetSelectSellIcon()
 	{
-		_UpdateSelectSellIcon(true);
+		_UpdateSelectSellIcon(reset: true);
 	}
 
 	private void UpdateSelectSellIcon()
 	{
-		_UpdateSelectSellIcon(false);
+		_UpdateSelectSellIcon(reset: false);
 	}
 
 	private void _UpdateSelectSellIcon(bool reset)
@@ -999,8 +1041,6 @@ public class ItemStorageTop : SkillInfoBase
 			int select_index = (!reset) ? 1 : (-1);
 			sellItemData.ForEach(delegate(SortCompareData material)
 			{
-				//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0098: Expected O, but got Unknown
 				int num = -1;
 				if (inventories[(int)tab] != null)
 				{
@@ -1016,35 +1056,17 @@ public class ItemStorageTop : SkillInfoBase
 				}
 				if (num != -1)
 				{
-					Transform val = ui.GetChild(num);
-					if (showInventoryMode != SHOW_INVENTORY_MODE.SMALL)
+					Transform child = ui.GetChild(num);
+					ItemIconDetail componentInChildren = child.GetComponentInChildren<ItemIconDetail>();
+					if (componentInChildren != null)
 					{
-						ItemIconDetail componentInChildren = val.GetComponentInChildren<ItemIconDetail>();
-						if (componentInChildren != null)
+						if (tab == TAB_MODE.EQUIP)
 						{
-							if (tab == TAB_MODE.EQUIP)
-							{
-								componentInChildren.setupperEquip.SetupSelectNumberSprite(select_index);
-							}
-							else if (tab == TAB_MODE.SKILL)
-							{
-								componentInChildren.setupperSkill.SetupSelectNumberSprite(select_index);
-							}
+							componentInChildren.setupperEquip.SetupSelectNumberSprite(select_index);
 						}
-					}
-					else
-					{
-						ItemIconDetailSmall componentInChildren2 = val.GetComponentInChildren<ItemIconDetailSmall>();
-						if (Object.op_Implicit(componentInChildren2))
+						else if (tab == TAB_MODE.SKILL)
 						{
-							if (tab == TAB_MODE.EQUIP)
-							{
-								componentInChildren2.SetupSelectNumberSprite(select_index);
-							}
-							else if (tab == TAB_MODE.SKILL)
-							{
-								componentInChildren2.SetupSelectNumberSprite(select_index);
-							}
+							componentInChildren.setupperSkill.SetupSelectNumberSprite(select_index);
 						}
 					}
 					if (!reset)
@@ -1073,18 +1095,16 @@ public class ItemStorageTop : SkillInfoBase
 	{
 		if (sellItemData.Count == 0)
 		{
-			GameSection.ChangeEvent("SELL_NOT_SELECT", null);
+			GameSection.ChangeEvent("SELL_NOT_SELECT");
+			return;
 		}
-		else
+		SaveCurrentScrollPosition();
+		GameSection.SetEventData(new object[3]
 		{
-			SaveCurrentScrollPosition();
-			GameSection.SetEventData(new object[3]
-			{
-				tab,
-				sellItemData,
-				confirmTo
-			});
-		}
+			tab,
+			sellItemData,
+			confirmTo
+		});
 	}
 
 	private void OnCloseDialog_ItemStorageSellConfirm()
@@ -1123,73 +1143,41 @@ public class ItemStorageTop : SkillInfoBase
 		TAB_MODE tAB_MODE = tab;
 		if (tAB_MODE == TAB_MODE.SKILL)
 		{
-			return (showInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS) ? SHOW_INVENTORY_MODE.SMALL : SHOW_INVENTORY_MODE.MAIN_STATUS;
+			return SHOW_INVENTORY_MODE.MAIN_STATUS;
 		}
-		return (showInventoryMode != SHOW_INVENTORY_MODE.SMALL) ? (showInventoryMode + 1) : SHOW_INVENTORY_MODE.MAIN_STATUS;
+		return (showInventoryMode + 1 != SHOW_INVENTORY_MODE.MAX) ? (showInventoryMode + 1) : SHOW_INVENTORY_MODE.MAIN_STATUS;
 	}
 
 	private void OnQuery_CHANGE_INVENTORY()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		SHOW_INVENTORY_MODE nextContentMode = GetNextContentMode();
-		if (IsSwitchIconListViewStyle(showInventoryMode, nextContentMode))
-		{
-			m_isEnableUpdateScrollTopPos = true;
-			m_lastScrollPosition = Vector3.get_up() * -9999.9f;
-		}
-		showInventoryMode = nextContentMode;
+		SHOW_INVENTORY_MODE sHOW_INVENTORY_MODE = showInventoryMode = GetNextContentMode();
 		TAB_MODE tAB_MODE = tab;
 		if (tAB_MODE == TAB_MODE.EQUIP || tAB_MODE == TAB_MODE.SKILL)
 		{
 			SetDirty(UI.GRD_INVENTORY_EQUIP);
 			SetDirty(UI.GRD_INVENTORY_EQUIP_SMALL);
-			if (showInventoryMode == SHOW_INVENTORY_MODE.SMALL)
-			{
-				inventoryUI = UI.GRD_INVENTORY_EQUIP_SMALL;
-			}
-			else
-			{
-				inventoryUI = UI.GRD_INVENTORY_EQUIP;
-			}
+			inventoryUI = UI.GRD_INVENTORY_EQUIP;
 		}
 		else
 		{
 			SetDirty(UI.GRD_INVENTORY);
 			SetDirty(UI.GRD_INVENTORY_SMALL);
-			if (showInventoryMode == SHOW_INVENTORY_MODE.SMALL)
-			{
-				inventoryUI = UI.GRD_INVENTORY_SMALL;
-			}
-			else
-			{
-				inventoryUI = UI.GRD_INVENTORY;
-			}
+			inventoryUI = UI.GRD_INVENTORY;
 		}
 		inventories[(int)tab] = null;
 		RefreshUI();
 	}
 
-	private bool IsSwitchIconListViewStyle(SHOW_INVENTORY_MODE _current, SHOW_INVENTORY_MODE _next)
-	{
-		if (_current == SHOW_INVENTORY_MODE.SMALL)
-		{
-			return _next != SHOW_INVENTORY_MODE.SMALL;
-		}
-		return _next == SHOW_INVENTORY_MODE.SMALL;
-	}
-
 	private UI SelectListTarget(TAB_MODE tab, SHOW_INVENTORY_MODE show_detail_icon)
 	{
-		SetActive((Enum)UI.SCR_INVENTORY, false);
-		SetActive((Enum)UI.SCR_INVENTORY_EQUIP, false);
-		SetActive((Enum)UI.GRD_INVENTORY, false);
-		SetActive((Enum)UI.GRD_INVENTORY_SMALL, false);
-		SetActive((Enum)UI.GRD_INVENTORY_EQUIP, false);
-		SetActive((Enum)UI.GRD_INVENTORY_EQUIP_SMALL, false);
-		SetActive((Enum)UI.SPR_SCR_BAR, false);
-		SetActive((Enum)UI.SPR_EQUIP_SCR_BAR, false);
+		SetActive((Enum)UI.SCR_INVENTORY, is_visible: false);
+		SetActive((Enum)UI.SCR_INVENTORY_EQUIP, is_visible: false);
+		SetActive((Enum)UI.GRD_INVENTORY, is_visible: false);
+		SetActive((Enum)UI.GRD_INVENTORY_SMALL, is_visible: false);
+		SetActive((Enum)UI.GRD_INVENTORY_EQUIP, is_visible: false);
+		SetActive((Enum)UI.GRD_INVENTORY_EQUIP_SMALL, is_visible: false);
+		SetActive((Enum)UI.SPR_SCR_BAR, is_visible: false);
+		SetActive((Enum)UI.SPR_EQUIP_SCR_BAR, is_visible: false);
 		bool flag = false;
 		if (MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene() && (tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL))
 		{
@@ -1197,30 +1185,19 @@ public class ItemStorageTop : SkillInfoBase
 		}
 		if (flag)
 		{
-			SetActive((Enum)UI.SCR_INVENTORY_EQUIP, true);
-			SetActive((Enum)UI.SPR_EQUIP_SCR_BAR, true);
-			if (show_detail_icon != SHOW_INVENTORY_MODE.SMALL)
-			{
-				SetActive((Enum)UI.GRD_INVENTORY_EQUIP, true);
-				return UI.GRD_INVENTORY_EQUIP;
-			}
-			SetActive((Enum)UI.GRD_INVENTORY_EQUIP_SMALL, true);
-			return UI.GRD_INVENTORY_EQUIP_SMALL;
+			SetActive((Enum)UI.SCR_INVENTORY_EQUIP, is_visible: true);
+			SetActive((Enum)UI.SPR_EQUIP_SCR_BAR, is_visible: true);
+			SetActive((Enum)UI.GRD_INVENTORY_EQUIP, is_visible: true);
+			return UI.GRD_INVENTORY_EQUIP;
 		}
-		SetActive((Enum)UI.SCR_INVENTORY, true);
-		SetActive((Enum)UI.SPR_SCR_BAR, true);
-		if (show_detail_icon != SHOW_INVENTORY_MODE.SMALL)
-		{
-			SetActive((Enum)UI.GRD_INVENTORY, true);
-			return UI.GRD_INVENTORY;
-		}
-		SetActive((Enum)UI.GRD_INVENTORY_SMALL, true);
-		return UI.GRD_INVENTORY_SMALL;
+		SetActive((Enum)UI.SCR_INVENTORY, is_visible: true);
+		SetActive((Enum)UI.SPR_SCR_BAR, is_visible: true);
+		SetActive((Enum)UI.GRD_INVENTORY, is_visible: true);
+		return UI.GRD_INVENTORY;
 	}
 
-	private void InitializeCaption()
+	protected virtual void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
@@ -1233,13 +1210,12 @@ public class ItemStorageTop : SkillInfoBase
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 
 	protected float CalcMaxScrollableValue(int allItemCount)
 	{
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 		if (allItemCount < 1)
@@ -1287,37 +1263,38 @@ public class ItemStorageTop : SkillInfoBase
 		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 		Transform scrollViewController = GetScrollViewController(tab);
-		if (!(scrollViewController == null))
+		if (scrollViewController == null)
 		{
-			UpdateCurrentScrollTopPos(scrollViewController.get_localPosition());
-			float y = m_lastScrollPosition.y;
-			Vector3 currentScrollTopPos = CurrentScrollTopPos;
-			if (y > currentScrollTopPos.y)
+			return;
+		}
+		UpdateCurrentScrollTopPos(scrollViewController.get_localPosition());
+		float y = m_lastScrollPosition.y;
+		Vector3 currentScrollTopPos = CurrentScrollTopPos;
+		if (y > currentScrollTopPos.y)
+		{
+			float maxScrollableValue = m_maxScrollableValue;
+			Vector3 currentScrollTopPos2 = CurrentScrollTopPos;
+			float num = maxScrollableValue + currentScrollTopPos2.y;
+			Vector3 localPosition = scrollViewController.get_localPosition();
+			float y2 = localPosition.y;
+			UI scrollViewUI = GetScrollViewUI(tab);
+			float num2 = m_lastScrollPosition.y - y2;
+			if (num2 > m_maxScrollableValue)
 			{
-				float maxScrollableValue = m_maxScrollableValue;
-				Vector3 currentScrollTopPos2 = CurrentScrollTopPos;
-				float num = maxScrollableValue + currentScrollTopPos2.y;
-				Vector3 localPosition = scrollViewController.get_localPosition();
-				float y2 = localPosition.y;
-				UI scrollViewUI = GetScrollViewUI(tab);
-				float num2 = m_lastScrollPosition.y - y2;
-				if (num2 > m_maxScrollableValue)
-				{
-					num2 = m_maxScrollableValue;
-				}
-				if (y2 >= num || y2 + num2 >= num)
-				{
-					num2 = num - y2;
-				}
-				MoveRelativeScrollView((Enum)scrollViewUI, Vector3.get_up() * num2);
+				num2 = m_maxScrollableValue;
 			}
+			if (y2 >= num || y2 + num2 >= num)
+			{
+				num2 = num - y2;
+			}
+			MoveRelativeScrollView((Enum)scrollViewUI, Vector3.get_up() * num2);
 		}
 	}
 
@@ -1328,6 +1305,7 @@ public class ItemStorageTop : SkillInfoBase
 		{
 		case TAB_MODE.MATERIAL:
 		case TAB_MODE.LAPIS:
+		case TAB_MODE.ACCESSORY:
 			result = GetCtrl(UI.SCR_INVENTORY);
 			break;
 		case TAB_MODE.EQUIP:
@@ -1345,6 +1323,7 @@ public class ItemStorageTop : SkillInfoBase
 		{
 		case TAB_MODE.MATERIAL:
 		case TAB_MODE.LAPIS:
+		case TAB_MODE.ACCESSORY:
 			result = UI.SCR_INVENTORY;
 			break;
 		case TAB_MODE.EQUIP:

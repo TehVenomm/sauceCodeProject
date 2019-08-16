@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.ClassUtils;
 
 public abstract class TypeBase extends JavaType implements JsonSerializable {
     private static final TypeBindings NO_BINDINGS = TypeBindings.emptyBindings();
@@ -21,9 +20,9 @@ public abstract class TypeBase extends JavaType implements JsonSerializable {
     protected final JavaType _superClass;
     protected final JavaType[] _superInterfaces;
 
-    public abstract StringBuilder getErasedSignature(StringBuilder stringBuilder);
+    public abstract StringBuilder getErasedSignature(StringBuilder sb);
 
-    public abstract StringBuilder getGenericSignature(StringBuilder stringBuilder);
+    public abstract StringBuilder getGenericSignature(StringBuilder sb);
 
     protected TypeBase(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr, int i, Object obj, Object obj2, boolean z) {
         super(cls, i, obj, obj2, z);
@@ -50,7 +49,8 @@ public abstract class TypeBase extends JavaType implements JsonSerializable {
         return str;
     }
 
-    protected String buildCanonicalName() {
+    /* access modifiers changed from: protected */
+    public String buildCanonicalName() {
         return this._class.getName();
     }
 
@@ -103,16 +103,19 @@ public abstract class TypeBase extends JavaType implements JsonSerializable {
         }
         if (cls.isInterface() && this._superInterfaces != null) {
             for (JavaType findSuperType : this._superInterfaces) {
-                JavaType findSuperType2 = findSuperType2.findSuperType(cls);
+                JavaType findSuperType2 = findSuperType.findSuperType(cls);
                 if (findSuperType2 != null) {
                     return findSuperType2;
                 }
             }
         }
-        if (this._superClass == null || this._superClass.findSuperType(cls) == null) {
-            return null;
+        if (this._superClass != null) {
+            JavaType findSuperType3 = this._superClass.findSuperType(cls);
+            if (findSuperType3 != null) {
+                return findSuperType3;
+            }
         }
-        return this._superClass.findSuperType(cls);
+        return null;
     }
 
     public JavaType[] findTypeParameters(Class<?> cls) {
@@ -133,43 +136,43 @@ public abstract class TypeBase extends JavaType implements JsonSerializable {
         jsonGenerator.writeString(toCanonical());
     }
 
-    protected static StringBuilder _classSignature(Class<?> cls, StringBuilder stringBuilder, boolean z) {
+    protected static StringBuilder _classSignature(Class<?> cls, StringBuilder sb, boolean z) {
         if (!cls.isPrimitive()) {
-            stringBuilder.append('L');
+            sb.append('L');
             String name = cls.getName();
             int length = name.length();
             for (int i = 0; i < length; i++) {
                 char charAt = name.charAt(i);
-                if (charAt == ClassUtils.PACKAGE_SEPARATOR_CHAR) {
+                if (charAt == '.') {
                     charAt = '/';
                 }
-                stringBuilder.append(charAt);
+                sb.append(charAt);
             }
             if (z) {
-                stringBuilder.append(';');
+                sb.append(';');
             }
         } else if (cls == Boolean.TYPE) {
-            stringBuilder.append('Z');
+            sb.append('Z');
         } else if (cls == Byte.TYPE) {
-            stringBuilder.append('B');
+            sb.append('B');
         } else if (cls == Short.TYPE) {
-            stringBuilder.append('S');
+            sb.append('S');
         } else if (cls == Character.TYPE) {
-            stringBuilder.append('C');
+            sb.append('C');
         } else if (cls == Integer.TYPE) {
-            stringBuilder.append('I');
+            sb.append('I');
         } else if (cls == Long.TYPE) {
-            stringBuilder.append('J');
+            sb.append('J');
         } else if (cls == Float.TYPE) {
-            stringBuilder.append('F');
+            sb.append('F');
         } else if (cls == Double.TYPE) {
-            stringBuilder.append('D');
+            sb.append('D');
         } else if (cls == Void.TYPE) {
-            stringBuilder.append('V');
+            sb.append('V');
         } else {
             throw new IllegalStateException("Unrecognized primitive type: " + cls.getName());
         }
-        return stringBuilder;
+        return sb;
     }
 
     protected static JavaType _bogusSuperClass(Class<?> cls) {

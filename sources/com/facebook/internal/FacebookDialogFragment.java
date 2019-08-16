@@ -1,13 +1,12 @@
 package com.facebook.internal;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.p000v4.app.DialogFragment;
+import android.support.p000v4.app.FragmentActivity;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.internal.WebDialog.Builder;
@@ -17,33 +16,15 @@ public class FacebookDialogFragment extends DialogFragment {
     public static final String TAG = "FacebookDialogFragment";
     private Dialog dialog;
 
-    /* renamed from: com.facebook.internal.FacebookDialogFragment$1 */
-    class C04021 implements OnCompleteListener {
-        C04021() {
-        }
-
-        public void onComplete(Bundle bundle, FacebookException facebookException) {
-            FacebookDialogFragment.this.onCompleteWebDialog(bundle, facebookException);
-        }
-    }
-
-    /* renamed from: com.facebook.internal.FacebookDialogFragment$2 */
-    class C04032 implements OnCompleteListener {
-        C04032() {
-        }
-
-        public void onComplete(Bundle bundle, FacebookException facebookException) {
-            FacebookDialogFragment.this.onCompleteWebFallbackDialog(bundle);
-        }
-    }
-
-    private void onCompleteWebDialog(Bundle bundle, FacebookException facebookException) {
+    /* access modifiers changed from: private */
+    public void onCompleteWebDialog(Bundle bundle, FacebookException facebookException) {
         FragmentActivity activity = getActivity();
         activity.setResult(facebookException == null ? -1 : 0, NativeProtocol.createProtocolResultIntent(activity.getIntent(), bundle, facebookException));
         activity.finish();
     }
 
-    private void onCompleteWebFallbackDialog(Bundle bundle) {
+    /* access modifiers changed from: private */
+    public void onCompleteWebFallbackDialog(Bundle bundle) {
         FragmentActivity activity = getActivity();
         Intent intent = new Intent();
         if (bundle == null) {
@@ -56,38 +37,45 @@ public class FacebookDialogFragment extends DialogFragment {
 
     public void onConfigurationChanged(Configuration configuration) {
         super.onConfigurationChanged(configuration);
-        if (this.dialog instanceof WebDialog) {
+        if ((this.dialog instanceof WebDialog) && isResumed()) {
             ((WebDialog) this.dialog).resize();
         }
     }
 
     public void onCreate(Bundle bundle) {
+        WebDialog newInstance;
         super.onCreate(bundle);
         if (this.dialog == null) {
-            Dialog facebookWebFallbackDialog;
-            Context activity = getActivity();
+            FragmentActivity activity = getActivity();
             Bundle methodArgumentsFromIntent = NativeProtocol.getMethodArgumentsFromIntent(activity.getIntent());
-            String string;
-            if (methodArgumentsFromIntent.getBoolean(NativeProtocol.WEB_DIALOG_IS_FALLBACK, false)) {
-                string = methodArgumentsFromIntent.getString("url");
-                if (Utility.isNullOrEmpty(string)) {
-                    Utility.logd(TAG, "Cannot start a fallback WebDialog with an empty/missing 'url'");
-                    activity.finish();
-                    return;
-                }
-                facebookWebFallbackDialog = new FacebookWebFallbackDialog(activity, string, String.format("fb%s://bridge/", new Object[]{FacebookSdk.getApplicationId()}));
-                facebookWebFallbackDialog.setOnCompleteListener(new C04032());
-            } else {
-                string = methodArgumentsFromIntent.getString(NativeProtocol.WEB_DIALOG_ACTION);
-                methodArgumentsFromIntent = methodArgumentsFromIntent.getBundle(NativeProtocol.WEB_DIALOG_PARAMS);
+            if (!methodArgumentsFromIntent.getBoolean(NativeProtocol.WEB_DIALOG_IS_FALLBACK, false)) {
+                String string = methodArgumentsFromIntent.getString(NativeProtocol.WEB_DIALOG_ACTION);
+                Bundle bundle2 = methodArgumentsFromIntent.getBundle(NativeProtocol.WEB_DIALOG_PARAMS);
                 if (Utility.isNullOrEmpty(string)) {
                     Utility.logd(TAG, "Cannot start a WebDialog with an empty/missing 'actionName'");
                     activity.finish();
                     return;
                 }
-                facebookWebFallbackDialog = new Builder(activity, string, methodArgumentsFromIntent).setOnCompleteListener(new C04021()).build();
+                newInstance = new Builder(activity, string, bundle2).setOnCompleteListener(new OnCompleteListener() {
+                    public void onComplete(Bundle bundle, FacebookException facebookException) {
+                        FacebookDialogFragment.this.onCompleteWebDialog(bundle, facebookException);
+                    }
+                }).build();
+            } else {
+                String string2 = methodArgumentsFromIntent.getString("url");
+                if (Utility.isNullOrEmpty(string2)) {
+                    Utility.logd(TAG, "Cannot start a fallback WebDialog with an empty/missing 'url'");
+                    activity.finish();
+                    return;
+                }
+                newInstance = FacebookWebFallbackDialog.newInstance(activity, string2, String.format("fb%s://bridge/", new Object[]{FacebookSdk.getApplicationId()}));
+                newInstance.setOnCompleteListener(new OnCompleteListener() {
+                    public void onComplete(Bundle bundle, FacebookException facebookException) {
+                        FacebookDialogFragment.this.onCompleteWebFallbackDialog(bundle);
+                    }
+                });
             }
-            this.dialog = facebookWebFallbackDialog;
+            this.dialog = newInstance;
         }
     }
 
@@ -107,7 +95,14 @@ public class FacebookDialogFragment extends DialogFragment {
         super.onDestroyView();
     }
 
-    public void setDialog(Dialog dialog) {
-        this.dialog = dialog;
+    public void onResume() {
+        super.onResume();
+        if (this.dialog instanceof WebDialog) {
+            ((WebDialog) this.dialog).resize();
+        }
+    }
+
+    public void setDialog(Dialog dialog2) {
+        this.dialog = dialog2;
     }
 }

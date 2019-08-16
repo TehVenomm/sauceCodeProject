@@ -2,24 +2,33 @@ package com.google.android.gms.drive.query.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 
-public final class zzx extends zza {
+@Class(creator = "OperatorCreator")
+@Reserved({1000})
+public final class zzx extends AbstractSafeParcelable {
     public static final Creator<zzx> CREATOR = new zzy();
-    public static final zzx zzgnx = new zzx("=");
-    public static final zzx zzgny = new zzx("<");
-    public static final zzx zzgnz = new zzx("<=");
-    public static final zzx zzgoa = new zzx(">");
-    public static final zzx zzgob = new zzx(">=");
-    public static final zzx zzgoc = new zzx("and");
-    public static final zzx zzgod = new zzx("or");
-    private static zzx zzgoe = new zzx("not");
-    public static final zzx zzgof = new zzx("contains");
-    private String mTag;
+    public static final zzx zzma = new zzx("=");
+    public static final zzx zzmb = new zzx("<");
+    public static final zzx zzmc = new zzx("<=");
+    public static final zzx zzmd = new zzx(">");
+    public static final zzx zzme = new zzx(">=");
+    public static final zzx zzmf = new zzx("and");
+    public static final zzx zzmg = new zzx("or");
+    private static final zzx zzmh = new zzx("not");
+    public static final zzx zzmi = new zzx("contains");
+    @Field(mo13990id = 1)
+    private final String tag;
 
-    zzx(String str) {
-        this.mTag = str;
+    @Constructor
+    zzx(@Param(mo13993id = 1) String str) {
+        this.tag = str;
     }
 
     public final boolean equals(Object obj) {
@@ -28,11 +37,11 @@ public final class zzx extends zza {
                 return false;
             }
             zzx zzx = (zzx) obj;
-            if (this.mTag == null) {
-                if (zzx.mTag != null) {
+            if (this.tag == null) {
+                if (zzx.tag != null) {
                     return false;
                 }
-            } else if (!this.mTag.equals(zzx.mTag)) {
+            } else if (!this.tag.equals(zzx.tag)) {
                 return false;
             }
         }
@@ -40,16 +49,16 @@ public final class zzx extends zza {
     }
 
     public final String getTag() {
-        return this.mTag;
+        return this.tag;
     }
 
     public final int hashCode() {
-        return (this.mTag == null ? 0 : this.mTag.hashCode()) + 31;
+        return (this.tag == null ? 0 : this.tag.hashCode()) + 31;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.mTag, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, this.tag, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

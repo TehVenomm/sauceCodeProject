@@ -24,7 +24,8 @@ public class TokenFilterContext extends JsonStreamContext {
         this._needToHandleName = false;
     }
 
-    protected TokenFilterContext reset(int i, TokenFilter tokenFilter, boolean z) {
+    /* access modifiers changed from: protected */
+    public TokenFilterContext reset(int i, TokenFilter tokenFilter, boolean z) {
         this._type = i;
         this._filter = tokenFilter;
         this._index = -1;
@@ -43,9 +44,9 @@ public class TokenFilterContext extends JsonStreamContext {
         if (tokenFilterContext != null) {
             return tokenFilterContext.reset(1, tokenFilter, z);
         }
-        tokenFilterContext = new TokenFilterContext(1, this, tokenFilter, z);
-        this._child = tokenFilterContext;
-        return tokenFilterContext;
+        TokenFilterContext tokenFilterContext2 = new TokenFilterContext(1, this, tokenFilter, z);
+        this._child = tokenFilterContext2;
+        return tokenFilterContext2;
     }
 
     public TokenFilterContext createChildObjectContext(TokenFilter tokenFilter, boolean z) {
@@ -53,9 +54,9 @@ public class TokenFilterContext extends JsonStreamContext {
         if (tokenFilterContext != null) {
             return tokenFilterContext.reset(2, tokenFilter, z);
         }
-        tokenFilterContext = new TokenFilterContext(2, this, tokenFilter, z);
-        this._child = tokenFilterContext;
-        return tokenFilterContext;
+        TokenFilterContext tokenFilterContext2 = new TokenFilterContext(2, this, tokenFilter, z);
+        this._child = tokenFilterContext2;
+        return tokenFilterContext2;
     }
 
     public TokenFilter setFieldName(String str) throws JsonProcessingException {
@@ -205,43 +206,44 @@ public class TokenFilterContext extends JsonStreamContext {
         if (this._parent == tokenFilterContext) {
             return this;
         }
-        this = this._parent;
-        while (this != null) {
-            TokenFilterContext tokenFilterContext2 = this._parent;
-            if (tokenFilterContext2 == tokenFilterContext) {
-                return this;
+        TokenFilterContext tokenFilterContext2 = this._parent;
+        while (tokenFilterContext2 != null) {
+            TokenFilterContext tokenFilterContext3 = tokenFilterContext2._parent;
+            if (tokenFilterContext3 == tokenFilterContext) {
+                return tokenFilterContext2;
             }
-            this = tokenFilterContext2;
+            tokenFilterContext2 = tokenFilterContext3;
         }
         return null;
     }
 
-    protected void appendDesc(StringBuilder stringBuilder) {
+    /* access modifiers changed from: protected */
+    public void appendDesc(StringBuilder sb) {
         if (this._parent != null) {
-            this._parent.appendDesc(stringBuilder);
+            this._parent.appendDesc(sb);
         }
         if (this._type == 2) {
-            stringBuilder.append('{');
+            sb.append('{');
             if (this._currentName != null) {
-                stringBuilder.append('\"');
-                stringBuilder.append(this._currentName);
-                stringBuilder.append('\"');
+                sb.append('\"');
+                sb.append(this._currentName);
+                sb.append('\"');
             } else {
-                stringBuilder.append('?');
+                sb.append('?');
             }
-            stringBuilder.append('}');
+            sb.append('}');
         } else if (this._type == 1) {
-            stringBuilder.append('[');
-            stringBuilder.append(getCurrentIndex());
-            stringBuilder.append(']');
+            sb.append('[');
+            sb.append(getCurrentIndex());
+            sb.append(']');
         } else {
-            stringBuilder.append(Constants.URL_PATH_DELIMITER);
+            sb.append(Constants.URL_PATH_DELIMITER);
         }
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(64);
-        appendDesc(stringBuilder);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(64);
+        appendDesc(sb);
+        return sb.toString();
     }
 }

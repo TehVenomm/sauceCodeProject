@@ -45,12 +45,12 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 		SetActive((Enum)UI.IPT_ADDRESS, !isGoogleAccount);
 		SetActive((Enum)UI.POP_ADDRESS, isGoogleAccount);
 		SetActive((Enum)UI.OBJ_SECRET_QUESTION, !isGoogleAccount);
-		SetInput((Enum)UI.IPT_ADDRESS, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_CONFIRM_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
+		SetInput(UI.IPT_ADDRESS, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_PASSWORD, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_CONFIRM_PASSWORD, string.Empty, 255, InputCallBack);
 		if (!isGoogleAccount)
 		{
-			SetInput((Enum)UI.IPT_SECRET_ANSER, string.Empty, 45, (EventDelegate.Callback)InputCallBack);
+			SetInput(UI.IPT_SECRET_ANSER, string.Empty, 45, InputCallBack);
 		}
 		if (isGoogleAccount)
 		{
@@ -100,7 +100,7 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 
 	private void InputCallBack()
 	{
-		bool flag = CheckRegistData(false);
+		bool flag = CheckRegistData();
 		SetActive((Enum)UI.BTN_OK, flag);
 		SetActive((Enum)UI.BTN_INVALID, !flag);
 	}
@@ -124,18 +124,18 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 		{
 			if (is_send_event)
 			{
-				GameSection.ChangeEvent("ADDRESS_INCLUDE_NOT_ALPHANUMERIC", null);
+				GameSection.ChangeEvent("ADDRESS_INCLUDE_NOT_ALPHANUMERIC");
 			}
 			return false;
 		}
 		if (empty.Length < 6)
 		{
-			CheckChangeEvent(is_send_event, "ADDRESS_TOO_SHORT", null);
+			CheckChangeEvent(is_send_event, "ADDRESS_TOO_SHORT");
 			return false;
 		}
 		if (empty.Length > 255)
 		{
-			CheckChangeEvent(is_send_event, "ADDRESS_TOO_LONG", null);
+			CheckChangeEvent(is_send_event, "ADDRESS_TOO_LONG");
 			return false;
 		}
 		if (string.IsNullOrEmpty(inputText))
@@ -148,28 +148,22 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 		}
 		if (inputText.Length < 8)
 		{
-			CheckChangeEvent(is_send_event, "PASSWORD_TOO_SHORT", null);
+			CheckChangeEvent(is_send_event, "PASSWORD_TOO_SHORT");
 			return false;
 		}
 		if (inputText != inputText2)
 		{
-			CheckChangeEvent(is_send_event, "CONFIRM_PASSWORD_NOT_MATCH", null);
+			CheckChangeEvent(is_send_event, "CONFIRM_PASSWORD_NOT_MATCH");
 			return false;
 		}
 		if (inputText.Length > 255)
 		{
-			CheckChangeEvent(is_send_event, "PASSWORD_TOO_LONG", null);
+			CheckChangeEvent(is_send_event, "PASSWORD_TOO_LONG");
 			return false;
 		}
 		if (!isGoogleAccount)
 		{
 			if (!isSelectedSecretQuest)
-			{
-				CheckChangeEvent(is_send_event, "NON_SELECT_SECRET_QUESTION", null);
-				return false;
-			}
-			empty2 = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text;
-			if (string.IsNullOrEmpty(empty2))
 			{
 				CheckChangeEvent(is_send_event, "EMPTY", new object[1]
 				{
@@ -177,9 +171,18 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 				});
 				return false;
 			}
+			empty2 = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text;
+			if (string.IsNullOrEmpty(empty2))
+			{
+				CheckChangeEvent(is_send_event, "EMPTY", new object[1]
+				{
+					base.sectionData.GetText("STR_SECRET_ANSER_TEXT")
+				});
+				return false;
+			}
 			if (empty2.Length > 45)
 			{
-				CheckChangeEvent(is_send_event, "SECRET_QUESTION_TOO_LONG", null);
+				CheckChangeEvent(is_send_event, "SECRET_QUESTION_TOO_LONG");
 				return false;
 			}
 		}
@@ -196,42 +199,41 @@ public class AccountRegistrationBase : AccountPopupAdjuster
 
 	private void OnQuery_OK()
 	{
-		if (CheckRegistData(true))
+		if (!CheckRegistData(is_send_event: true))
 		{
-			string mail_address = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text;
-			string inputText = GetInputText(UI.IPT_PASSWORD);
-			string inputText2 = GetInputText(UI.IPT_CONFIRM_PASSWORD);
-			string secretQuestionAnswer = (!isGoogleAccount) ? base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text : string.Empty;
-			GameSection.StayEvent();
-			if (isGoogleAccount)
+			return;
+		}
+		string mail_address = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text;
+		string inputText = GetInputText(UI.IPT_PASSWORD);
+		string inputText2 = GetInputText(UI.IPT_CONFIRM_PASSWORD);
+		string secretQuestionAnswer = (!isGoogleAccount) ? base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text : string.Empty;
+		GameSection.StayEvent();
+		if (isGoogleAccount)
+		{
+			NetworkNative.GoogleAccount select_account = null;
+			if (googleAccountList == null || googleAccountList.googleAccounts.Count == 0)
 			{
-				NetworkNative.GoogleAccount select_account = null;
-				if (googleAccountList == null || googleAccountList.googleAccounts.Count == 0)
-				{
-					GameSection.ResumeEvent(false, null);
-				}
-				else
-				{
-					googleAccountList.googleAccounts.ForEach(delegate(NetworkNative.GoogleAccount data)
-					{
-						if (select_account == null && data.name == mail_address)
-						{
-							select_account = data;
-						}
-					});
-					MonoBehaviourSingleton<AccountManager>.I.SendRegistCreateGoogleAccount(select_account.name, select_account.key, inputText, inputText2, delegate(bool is_success)
-					{
-						GameSection.ResumeEvent(is_success, null);
-					});
-				}
+				GameSection.ResumeEvent(is_resume: false);
+				return;
 			}
-			else
+			googleAccountList.googleAccounts.ForEach(delegate(NetworkNative.GoogleAccount data)
 			{
-				MonoBehaviourSingleton<AccountManager>.I.SendRegistCreateRobAccount(mail_address, inputText, inputText2, secretQuestionIndex + 1, secretQuestionAnswer, delegate(bool is_success)
+				if (select_account == null && data.name == mail_address)
 				{
-					GameSection.ResumeEvent(is_success, null);
-				});
-			}
+					select_account = data;
+				}
+			});
+			MonoBehaviourSingleton<AccountManager>.I.SendRegistCreateGoogleAccount(select_account.name, select_account.key, inputText, inputText2, delegate(bool is_success)
+			{
+				GameSection.ResumeEvent(is_success);
+			});
+		}
+		else
+		{
+			MonoBehaviourSingleton<AccountManager>.I.SendRegistCreateRobAccount(mail_address, inputText, inputText2, secretQuestionIndex + 1, secretQuestionAnswer, delegate(bool is_success)
+			{
+				GameSection.ResumeEvent(is_success);
+			});
 		}
 	}
 }

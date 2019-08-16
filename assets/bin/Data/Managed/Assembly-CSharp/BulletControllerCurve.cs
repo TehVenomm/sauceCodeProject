@@ -12,31 +12,23 @@ public class BulletControllerCurve : BulletControllerBase
 
 	public override void Update()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
-		if (baseRotation == Quaternion.get_identity())
-		{
-			baseRotation = base._transform.get_rotation();
-		}
 		curve.Update(Time.get_deltaTime() * curveTime.Update());
 		Quaternion val = Quaternion.AngleAxis(curve.Get(), curveAxis);
 		base._transform.set_rotation(baseRotation * val);
@@ -50,15 +42,18 @@ public class BulletControllerCurve : BulletControllerBase
 	{
 		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
+		baseRotation = base._transform.get_rotation();
 		curve = new FloatInterpolator();
 		curve.loopType = Interpolator.LOOP.REPETE;
-		curve.Set(bullet.dataCurve.loopTime, 0f, bullet.dataCurve.curveAngle, bullet.dataCurve.curveAnim, 0f, null);
+		curve.Set(bullet.dataCurve.loopTime, 0f, bullet.dataCurve.curveAngle, bullet.dataCurve.curveAnim, 0f);
 		curve.Play();
 		curveTime = new FloatInterpolator();
-		curveTime.Set(bullet.data.appearTime, 1f, 0f, bullet.dataCurve.timeAnim, 0f, null);
+		curveTime.Set(bullet.data.appearTime, 1f, 0f, bullet.dataCurve.timeAnim, 0f);
 		curveTime.Play();
 		curveAxis = bullet.dataCurve.curveAxis;
 	}

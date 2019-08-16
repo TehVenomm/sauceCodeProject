@@ -1,6 +1,9 @@
 package com.crashlytics.android.answers;
 
-public class KeepAllEventFilter implements EventFilter {
+class KeepAllEventFilter implements EventFilter {
+    KeepAllEventFilter() {
+    }
+
     public boolean skipEvent(SessionEvent sessionEvent) {
         return false;
     }

@@ -43,6 +43,9 @@ public class MissionCheckBase
 		case MISSION_TYPE.ONCE_DAMAGE:
 			missionCheckBase = new MissionCheckOneDamage();
 			break;
+		case MISSION_TYPE.USE_WEAPON:
+			missionCheckBase = new MissionCheckUseWeapon();
+			break;
 		default:
 			missionCheckBase = new MissionCheckBase();
 			break;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using UnityEngine;
 
-public class CoopRoomPacketSender
+public class CoopRoomPacketSender : MonoBehaviour
 {
 	private CoopRoom coopRoom
 	{
@@ -15,7 +16,6 @@ public class CoopRoomPacketSender
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		coopRoom = this.get_gameObject().GetComponent<CoopRoom>();
 	}
 
@@ -28,7 +28,7 @@ public class CoopRoomPacketSender
 		Coop_Model_RoomSyncAllPortalPoint coop_Model_RoomSyncAllPortalPoint = new Coop_Model_RoomSyncAllPortalPoint();
 		coop_Model_RoomSyncAllPortalPoint.id = 1001;
 		coop_Model_RoomSyncAllPortalPoint.SetFromExplorePortalList(portals);
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncAllPortalPoint, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncAllPortalPoint);
 	}
 
 	public void SendUpdatePortalPoint(int portalId, int point, int x, int z)
@@ -39,7 +39,7 @@ public class CoopRoomPacketSender
 		coop_Model_RoomUpdatePortalPoint.pt = point;
 		coop_Model_RoomUpdatePortalPoint.x = x;
 		coop_Model_RoomUpdatePortalPoint.z = z;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomUpdatePortalPoint, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomUpdatePortalPoint);
 	}
 
 	public void SendSyncExploreBoss(ExploreStatus explore, int toClientId = -1)
@@ -49,14 +49,20 @@ public class CoopRoomPacketSender
 		coop_Model_RoomSyncExploreBoss.mId = explore.GetCurrentBossMapId();
 		if (explore.bossStatus != null)
 		{
+			coop_Model_RoomSyncExploreBoss.ceId = explore.bossStatus.coopEnemyId;
 			coop_Model_RoomSyncExploreBoss.hp = explore.bossStatus.hp;
 			coop_Model_RoomSyncExploreBoss.hpm = explore.bossStatus.hpMax;
 			coop_Model_RoomSyncExploreBoss.bhp = explore.bossStatus.barrierHp;
 			coop_Model_RoomSyncExploreBoss.shp = explore.bossStatus.shieldHp;
 			coop_Model_RoomSyncExploreBoss.SetRegions(explore.bossStatus.regionWorks);
+			coop_Model_RoomSyncExploreBoss.concussionTotal = explore.bossStatus.concussionTotal;
+			coop_Model_RoomSyncExploreBoss.concussionMax = explore.bossStatus.concussionMax;
+			coop_Model_RoomSyncExploreBoss.concussionExtend = explore.bossStatus.concussionExtend;
 			coop_Model_RoomSyncExploreBoss.angid = explore.bossStatus.nowAngryId;
 			coop_Model_RoomSyncExploreBoss.eangids = explore.bossStatus.execAngryIds;
 			coop_Model_RoomSyncExploreBoss.isMM = explore.bossStatus.isMadMode;
+			coop_Model_RoomSyncExploreBoss.deadReviveCount = explore.bossStatus.deadReviveCount;
+			coop_Model_RoomSyncExploreBoss.recoveredHP = explore.bossStatus.deadReviveCount;
 		}
 		else
 		{
@@ -64,11 +70,11 @@ public class CoopRoomPacketSender
 		}
 		if (toClientId > 0)
 		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncExploreBoss, true, null, null);
+			MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncExploreBoss);
 		}
 		else
 		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncExploreBoss, true, null, null);
+			MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncExploreBoss);
 		}
 	}
 
@@ -79,11 +85,11 @@ public class CoopRoomPacketSender
 		coop_Model_RoomSyncExploreBossMap.mId = mapId;
 		if (toClientId > 0)
 		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncExploreBossMap, true, null, null);
+			MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncExploreBossMap);
 		}
 		else
 		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncExploreBossMap, true, null, null);
+			MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncExploreBossMap);
 		}
 	}
 
@@ -92,7 +98,7 @@ public class CoopRoomPacketSender
 		Coop_Model_RoomExploreBossDamage coop_Model_RoomExploreBossDamage = new Coop_Model_RoomExploreBossDamage();
 		coop_Model_RoomExploreBossDamage.id = 1001;
 		coop_Model_RoomExploreBossDamage.dmg = totalDamage;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreBossDamage, false, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreBossDamage, promise: false);
 	}
 
 	public void SendExploreBossDead(Enemy boss, List<ExplorePlayerStatus> statuses)
@@ -100,6 +106,9 @@ public class CoopRoomPacketSender
 		Coop_Model_RoomExploreBossDead coop_Model_RoomExploreBossDead = new Coop_Model_RoomExploreBossDead();
 		coop_Model_RoomExploreBossDead.id = 1001;
 		coop_Model_RoomExploreBossDead.downCount = boss.downCount;
+		coop_Model_RoomExploreBossDead.concussionTotal = boss.concussionTotal;
+		coop_Model_RoomExploreBossDead.concussionMax = boss.concussionMax;
+		coop_Model_RoomExploreBossDead.concussionExtend = boss.concussionExtend;
 		coop_Model_RoomExploreBossDead.breakIds = boss.GetBreakRegionIDList();
 		if (statuses != null)
 		{
@@ -109,21 +118,21 @@ public class CoopRoomPacketSender
 				coop_Model_RoomExploreBossDead.AddTotalDamageFromExplorePlayerStatus(statuses[i]);
 			}
 		}
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreBossDead, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreBossDead);
 	}
 
 	public void SendExploreAlive()
 	{
 		Coop_Model_RoomExploreAlive coop_Model_RoomExploreAlive = new Coop_Model_RoomExploreAlive();
 		coop_Model_RoomExploreAlive.id = 1001;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreAlive, false, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreAlive, promise: false);
 	}
 
 	public void SendExploreAliveRequest()
 	{
 		Coop_Model_RoomExploreAliveRequest coop_Model_RoomExploreAliveRequest = new Coop_Model_RoomExploreAliveRequest();
 		coop_Model_RoomExploreAliveRequest.id = 1001;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreAliveRequest, false, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomExploreAliveRequest, promise: false);
 	}
 
 	public void SendNotifyEncounterBoss(int mapId, int portalId)
@@ -132,7 +141,7 @@ public class CoopRoomPacketSender
 		coop_Model_RoomNotifyEncounterBoss.id = 1001;
 		coop_Model_RoomNotifyEncounterBoss.mid = mapId;
 		coop_Model_RoomNotifyEncounterBoss.pid = portalId;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomNotifyEncounterBoss, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomNotifyEncounterBoss);
 	}
 
 	public void SendNotifyTraceBoss(int mapId, int lastCount)
@@ -141,39 +150,40 @@ public class CoopRoomPacketSender
 		coop_Model_RoomNotifyTraceBoss.id = 1001;
 		coop_Model_RoomNotifyTraceBoss.mid = mapId;
 		coop_Model_RoomNotifyTraceBoss.lc = lastCount;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomNotifyTraceBoss, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomNotifyTraceBoss);
 	}
 
 	public void SendSyncPlayerStatus(Self self, int toClientId = -1)
 	{
 		CoopClient coopClient = coopRoom.clients.Find((CoopClient x) => x.stageId != MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId);
-		if (!(coopClient == null))
+		if (coopClient == null)
 		{
-			Coop_Model_RoomSyncPlayerStatus coop_Model_RoomSyncPlayerStatus = new Coop_Model_RoomSyncPlayerStatus();
-			coop_Model_RoomSyncPlayerStatus.id = 1001;
-			coop_Model_RoomSyncPlayerStatus.hp = self.hp;
-			coop_Model_RoomSyncPlayerStatus.buff = self.buffParam.CreateSyncParamIfNeeded();
-			coop_Model_RoomSyncPlayerStatus.wid = self.weaponData.eId;
-			if (QuestManager.IsValidInGameExplore())
+			return;
+		}
+		Coop_Model_RoomSyncPlayerStatus coop_Model_RoomSyncPlayerStatus = new Coop_Model_RoomSyncPlayerStatus();
+		coop_Model_RoomSyncPlayerStatus.id = 1001;
+		coop_Model_RoomSyncPlayerStatus.hp = self.hp;
+		coop_Model_RoomSyncPlayerStatus.buff = self.buffParam.CreateSyncParamIfNeeded();
+		coop_Model_RoomSyncPlayerStatus.wid = self.weaponData.eId;
+		if (QuestManager.IsValidInGameExplore())
+		{
+			ExplorePlayerStatus myExplorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
+			if (myExplorePlayerStatus != null)
 			{
-				ExplorePlayerStatus myExplorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
-				if (myExplorePlayerStatus != null)
-				{
-					coop_Model_RoomSyncPlayerStatus.SetExtraStatus(self, myExplorePlayerStatus.extraStatus);
-				}
-				else
-				{
-					coop_Model_RoomSyncPlayerStatus.SetExtraStatus(self, null);
-				}
-			}
-			if (toClientId > 0)
-			{
-				MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncPlayerStatus, false, null, null);
+				coop_Model_RoomSyncPlayerStatus.SetExtraStatus(self, myExplorePlayerStatus.extraStatus);
 			}
 			else
 			{
-				MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncPlayerStatus, false, null, null);
+				coop_Model_RoomSyncPlayerStatus.SetExtraStatus(self, null);
 			}
+		}
+		if (toClientId > 0)
+		{
+			MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RoomSyncPlayerStatus, promise: false);
+		}
+		else
+		{
+			MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncPlayerStatus, promise: false);
 		}
 	}
 
@@ -187,7 +197,7 @@ public class CoopRoomPacketSender
 		{
 			coop_Model_RoomChatStamp.userId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		}
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomChatStamp, false, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomChatStamp, promise: false);
 	}
 
 	public void SendMoveField(int portalId)
@@ -195,7 +205,7 @@ public class CoopRoomPacketSender
 		Coop_Model_RoomMoveField coop_Model_RoomMoveField = new Coop_Model_RoomMoveField();
 		coop_Model_RoomMoveField.id = 1001;
 		coop_Model_RoomMoveField.pid = portalId;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomMoveField, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomMoveField);
 	}
 
 	public void SendRushRequest()
@@ -203,7 +213,7 @@ public class CoopRoomPacketSender
 		Coop_Model_RushRequest coop_Model_RushRequest = new Coop_Model_RushRequest();
 		coop_Model_RushRequest.id = 1001;
 		coop_Model_RushRequest.requestRushIndex = MonoBehaviourSingleton<InGameManager>.I.GetRushIndex();
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RushRequest, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RushRequest);
 	}
 
 	public void SendRushRequested(int toClientId, int requestRushIndex)
@@ -212,7 +222,7 @@ public class CoopRoomPacketSender
 		coop_Model_RushRequested.id = 1001;
 		coop_Model_RushRequested.currentWaveIndex = MonoBehaviourSingleton<InGameManager>.I.GetRushIndex();
 		coop_Model_RushRequested.syncData = MonoBehaviourSingleton<InGameManager>.I.GetRushSyncData(requestRushIndex);
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RushRequested, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(toClientId, coop_Model_RushRequested);
 	}
 
 	public void SendSyncDefenseBattle(float endurance)
@@ -220,6 +230,6 @@ public class CoopRoomPacketSender
 		Coop_Model_RoomSyncDefenseBattle coop_Model_RoomSyncDefenseBattle = new Coop_Model_RoomSyncDefenseBattle();
 		coop_Model_RoomSyncDefenseBattle.id = 1001;
 		coop_Model_RoomSyncDefenseBattle.endurance = endurance;
-		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncDefenseBattle, true, null, null);
+		MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(coop_Model_RoomSyncDefenseBattle);
 	}
 }

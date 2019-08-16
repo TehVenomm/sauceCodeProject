@@ -2,28 +2,32 @@ package com.google.android.gms.games.snapshot;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.drive.zzc;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzb implements Creator<zza> {
+public final class zzb implements Creator<SnapshotEntity> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = com.google.android.gms.common.internal.safeparcel.zzb.zzd(parcel);
-        zzc zzc = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        SnapshotContentsEntity snapshotContentsEntity = null;
+        SnapshotMetadata snapshotMetadata = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    zzc = (zzc) com.google.android.gms.common.internal.safeparcel.zzb.zza(parcel, readInt, zzc.CREATOR);
+                    snapshotMetadata = (SnapshotMetadataEntity) SafeParcelReader.createParcelable(parcel, readHeader, SnapshotMetadataEntity.CREATOR);
+                    break;
+                case 3:
+                    snapshotContentsEntity = (SnapshotContentsEntity) SafeParcelReader.createParcelable(parcel, readHeader, SnapshotContentsEntity.CREATOR);
                     break;
                 default:
-                    com.google.android.gms.common.internal.safeparcel.zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        com.google.android.gms.common.internal.safeparcel.zzb.zzaf(parcel, zzd);
-        return new zza(zzc);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new SnapshotEntity(snapshotMetadata, snapshotContentsEntity);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {
-        return new zza[i];
+        return new SnapshotEntity[i];
     }
 }

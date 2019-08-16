@@ -5,6 +5,7 @@ using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.Native.PInvoke;
 using GooglePlayGames.OurUtils;
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace GooglePlayGames.Native
@@ -14,6 +15,9 @@ namespace GooglePlayGames.Native
 		private static volatile NearbyConnectionsManager sManager;
 
 		private static Action<INearbyConnectionClient> sCreationCallback;
+
+		[CompilerGenerated]
+		private static Action<NearbyConnectionsStatus.InitializationStatus> _003C_003Ef__mg_0024cache0;
 
 		internal static NearbyConnectionsManager GetManager()
 		{

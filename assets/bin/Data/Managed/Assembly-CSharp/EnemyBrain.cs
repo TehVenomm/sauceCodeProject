@@ -13,6 +13,15 @@ public class EnemyBrain : Brain
 		enemy = (base.owner as Enemy);
 	}
 
+	protected override void Update()
+	{
+		base.Update();
+		if (QuestManager.IsValidInGameWaveStrategy() && (enemy.actionTarget == null || enemy.actionTarget is Player))
+		{
+			SetNearWaveMatchTarget();
+		}
+	}
+
 	protected override void OnInitialize()
 	{
 		base.OnInitialize();
@@ -47,6 +56,11 @@ public class EnemyBrain : Brain
 		if (QuestManager.IsValidInGameWaveMatch())
 		{
 			SetNearWaveMatchTarget();
+		}
+		if (QuestManager.IsValidInGameWaveStrategy())
+		{
+			base.opponentMem.SetHateParam(null);
+			SetNearDecoyTarget();
 		}
 		actionCtrl = new EnemyActionController(this);
 		actionCtrl.LoadTable();
@@ -97,47 +111,75 @@ public class EnemyBrain : Brain
 
 	private void SetNearWaveMatchTarget()
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		if (base.fsm != null && base.targetCtrl != null)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		if (base.fsm == null || base.targetCtrl == null)
 		{
-			StageObject stageObject = null;
-			float num = 3.40282347E+38f;
-			for (int i = 0; i < MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.Count; i++)
+			return;
+		}
+		StageObject stageObject = null;
+		float num = float.MaxValue;
+		for (int i = 0; i < MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.Count; i++)
+		{
+			FieldWaveTargetObject fieldWaveTargetObject = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i] as FieldWaveTargetObject;
+			if (!(fieldWaveTargetObject == null) && !fieldWaveTargetObject.isDead)
 			{
-				StageObject stageObject2 = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i];
-				if (!(stageObject2 == null))
+				Vector3 val = fieldWaveTargetObject._position - enemy._position;
+				float sqrMagnitude = val.get_sqrMagnitude();
+				if (sqrMagnitude < num)
 				{
-					Vector3 val = stageObject2._position - enemy._position;
-					float sqrMagnitude = val.get_sqrMagnitude();
-					if (sqrMagnitude < num)
-					{
-						num = sqrMagnitude;
-						stageObject = stageObject2;
-					}
+					num = sqrMagnitude;
+					stageObject = fieldWaveTargetObject;
 				}
 			}
-			if (!(stageObject == null))
+		}
+		if (!(stageObject == null))
+		{
+			base.fsm.ChangeState(STATE_TYPE.SELECT);
+			base.targetCtrl.SetCurrentTarget(stageObject);
+			HandleEvent(BRAIN_EVENT.WAVE_TARGET, stageObject);
+		}
+	}
+
+	public void SetNearDecoyTarget()
+	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		if (base.targetCtrl != null)
+		{
+			StageObject nearestDecoyObject = AIUtility.GetNearestDecoyObject(base.owner._position);
+			if (!(nearestDecoyObject == null))
 			{
 				base.fsm.ChangeState(STATE_TYPE.SELECT);
-				base.targetCtrl.SetCurrentTarget(stageObject);
-				HandleEvent(BRAIN_EVENT.WAVE_TARGET, stageObject);
+				base.targetCtrl.SetCurrentTarget(nearestDecoyObject);
+			}
+		}
+	}
+
+	public void MissDecoyTarget(StageObject decoyObj)
+	{
+		if (base.targetCtrl != null && !(decoyObj == null))
+		{
+			DecoyBulletObject decoyBulletObject = base.targetCtrl.GetCurrentTarget() as DecoyBulletObject;
+			if (!(decoyBulletObject == null) && !decoyBulletObject.IsActive())
+			{
+				base.fsm.ChangeState(STATE_TYPE.SELECT);
+				base.targetCtrl.MissCurrentTarget();
 			}
 		}
 	}
 
 	public override void HandleEvent(BRAIN_EVENT ev, object param = null)
 	{
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 		switch (ev)
 		{
 		case BRAIN_EVENT.END_ACTION:
@@ -159,7 +201,7 @@ public class EnemyBrain : Brain
 		case BRAIN_EVENT.ATTACKED_HIT:
 		{
 			AttackedHitStatusOwner attackedHitStatusOwner2 = (AttackedHitStatusOwner)param;
-			if (base.opponentMem != null)
+			if (base.opponentMem != null && base.opponentMem.haveHateControl)
 			{
 				OpponentMemory opponentMem2 = base.opponentMem;
 				Vector3 val2 = attackedHitStatusOwner2.fromPos - attackedHitStatusOwner2.hitPos;
@@ -176,7 +218,7 @@ public class EnemyBrain : Brain
 		case BRAIN_EVENT.ATTACKED_WEAK_POINT:
 		{
 			AttackedHitStatusOwner attackedHitStatusOwner = (AttackedHitStatusOwner)param;
-			if (base.opponentMem != null)
+			if (base.opponentMem != null && base.opponentMem.haveHateControl)
 			{
 				int attackedWeakPointHate = base.opponentMem.hateParam.attackedWeakPointHate;
 				OpponentMemory opponentMem = base.opponentMem;

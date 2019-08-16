@@ -5,17 +5,19 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 public class ByteBufferBackedOutputStream extends OutputStream {
-    protected final ByteBuffer _b;
+
+    /* renamed from: _b */
+    protected final ByteBuffer f431_b;
 
     public ByteBufferBackedOutputStream(ByteBuffer byteBuffer) {
-        this._b = byteBuffer;
+        this.f431_b = byteBuffer;
     }
 
     public void write(int i) throws IOException {
-        this._b.put((byte) i);
+        this.f431_b.put((byte) i);
     }
 
     public void write(byte[] bArr, int i, int i2) throws IOException {
-        this._b.put(bArr, i, i2);
+        this.f431_b.put(bArr, i, i2);
     }
 }

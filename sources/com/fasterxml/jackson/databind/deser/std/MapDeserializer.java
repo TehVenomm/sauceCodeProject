@@ -20,12 +20,11 @@ import com.fasterxml.jackson.databind.deser.ValueInstantiator;
 import com.fasterxml.jackson.databind.deser.impl.PropertyBasedCreator;
 import com.fasterxml.jackson.databind.deser.impl.PropertyValueBuffer;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId.Referring;
-import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -81,25 +80,29 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
         }
 
         public Referring handleUnresolvedReference(UnresolvedForwardReference unresolvedForwardReference, Object obj) {
-            Referring mapReferring = new MapReferring(this, unresolvedForwardReference, this._valueType, obj);
+            MapReferring mapReferring = new MapReferring(this, unresolvedForwardReference, this._valueType, obj);
             this._accumulator.add(mapReferring);
             return mapReferring;
         }
 
         public void resolveForwardReference(Object obj, Object obj2) throws IOException {
             Iterator it = this._accumulator.iterator();
-            Map map = this._result;
-            while (it.hasNext()) {
-                MapReferring mapReferring = (MapReferring) it.next();
-                if (mapReferring.hasId(obj)) {
-                    it.remove();
-                    map.put(mapReferring.key, obj2);
-                    map.putAll(mapReferring.next);
-                    return;
+            Map<Object, Object> map = this._result;
+            while (true) {
+                Map<Object, Object> map2 = map;
+                if (it.hasNext()) {
+                    MapReferring mapReferring = (MapReferring) it.next();
+                    if (mapReferring.hasId(obj)) {
+                        it.remove();
+                        map2.put(mapReferring.key, obj2);
+                        map2.putAll(mapReferring.next);
+                        return;
+                    }
+                    map = mapReferring.next;
+                } else {
+                    throw new IllegalArgumentException("Trying to resolve a forward reference with id [" + obj + "] that wasn't previously seen as unresolved.");
                 }
-                map = mapReferring.next;
             }
-            throw new IllegalArgumentException("Trying to resolve a forward reference with id [" + obj + "] that wasn't previously seen as unresolved.");
         }
     }
 
@@ -144,11 +147,13 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
         this._standardStringKey = _isStdKeyDeser(this._mapType, keyDeserializer);
     }
 
-    protected MapDeserializer withResolved(KeyDeserializer keyDeserializer, TypeDeserializer typeDeserializer, JsonDeserializer<?> jsonDeserializer, HashSet<String> hashSet) {
-        return (this._keyDeserializer == keyDeserializer && this._valueDeserializer == jsonDeserializer && this._valueTypeDeserializer == typeDeserializer && this._ignorableProperties == hashSet) ? this : new MapDeserializer(this, keyDeserializer, (JsonDeserializer) jsonDeserializer, typeDeserializer, (HashSet) hashSet);
+    /* access modifiers changed from: protected */
+    public MapDeserializer withResolved(KeyDeserializer keyDeserializer, TypeDeserializer typeDeserializer, JsonDeserializer<?> jsonDeserializer, HashSet<String> hashSet) {
+        return (this._keyDeserializer == keyDeserializer && this._valueDeserializer == jsonDeserializer && this._valueTypeDeserializer == typeDeserializer && this._ignorableProperties == hashSet) ? this : new MapDeserializer(this, keyDeserializer, jsonDeserializer, typeDeserializer, hashSet);
     }
 
-    protected final boolean _isStdKeyDeser(JavaType javaType, KeyDeserializer keyDeserializer) {
+    /* access modifiers changed from: protected */
+    public final boolean _isStdKeyDeser(JavaType javaType, KeyDeserializer keyDeserializer) {
         if (keyDeserializer == null) {
             return true;
         }
@@ -156,7 +161,7 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
         if (keyType == null) {
             return true;
         }
-        Class rawClass = keyType.getRawClass();
+        Class<Object> rawClass = keyType.getRawClass();
         if ((rawClass == String.class || rawClass == Object.class) && isDefaultKeyDeserializer(keyDeserializer)) {
             return true;
         }
@@ -164,8 +169,7 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
     }
 
     public void setIgnorableProperties(String[] strArr) {
-        HashSet arrayToSet = (strArr == null || strArr.length == 0) ? null : ArrayBuilders.arrayToSet(strArr);
-        this._ignorableProperties = arrayToSet;
+        this._ignorableProperties = (strArr == null || strArr.length == 0) ? null : ArrayBuilders.arrayToSet(strArr);
     }
 
     public void resolve(DeserializationContext deserializationContext) throws JsonMappingException {
@@ -183,44 +187,45 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
-        HashSet hashSet;
+        JsonDeserializer handleSecondaryContextualization;
+        HashSet<String> hashSet;
         KeyDeserializer keyDeserializer = this._keyDeserializer;
         if (keyDeserializer == null) {
             keyDeserializer = deserializationContext.findKeyDeserializer(this._mapType.getKeyType(), beanProperty);
         } else if (keyDeserializer instanceof ContextualKeyDeserializer) {
             keyDeserializer = ((ContextualKeyDeserializer) keyDeserializer).createContextual(deserializationContext, beanProperty);
         }
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
+        JsonDeserializer<Object> jsonDeserializer = this._valueDeserializer;
         if (beanProperty != null) {
             jsonDeserializer = findConvertingContentDeserializer(deserializationContext, beanProperty, jsonDeserializer);
         }
         JavaType contentType = this._mapType.getContentType();
         if (jsonDeserializer == null) {
-            jsonDeserializer = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
+            handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
         } else {
-            jsonDeserializer = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, contentType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, contentType);
         }
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         if (typeDeserializer != null) {
             typeDeserializer = typeDeserializer.forProperty(beanProperty);
         }
-        Collection collection = this._ignorableProperties;
+        HashSet<String> hashSet2 = this._ignorableProperties;
         AnnotationIntrospector annotationIntrospector = deserializationContext.getAnnotationIntrospector();
         if (!(annotationIntrospector == null || beanProperty == null)) {
-            Annotated member = beanProperty.getMember();
+            AnnotatedMember member = beanProperty.getMember();
             if (member != null) {
                 String[] findPropertiesToIgnore = annotationIntrospector.findPropertiesToIgnore(member, false);
                 if (findPropertiesToIgnore != null) {
-                    hashSet = collection == null ? new HashSet() : new HashSet(collection);
-                    for (Object add : findPropertiesToIgnore) {
+                    hashSet = hashSet2 == null ? new HashSet<>() : new HashSet<>(hashSet2);
+                    for (String add : findPropertiesToIgnore) {
                         hashSet.add(add);
                     }
-                    return withResolved(keyDeserializer, typeDeserializer, jsonDeserializer, hashSet);
+                    return withResolved(keyDeserializer, typeDeserializer, handleSecondaryContextualization, hashSet);
                 }
             }
         }
-        hashSet = collection;
-        return withResolved(keyDeserializer, typeDeserializer, jsonDeserializer, hashSet);
+        hashSet = hashSet2;
+        return withResolved(keyDeserializer, typeDeserializer, handleSecondaryContextualization, hashSet);
     }
 
     public JavaType getContentType() {
@@ -242,23 +247,23 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
         if (this._delegateDeserializer != null) {
             return (Map) this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
         }
-        if (this._hasDefaultCreator) {
-            JsonToken currentToken = jsonParser.getCurrentToken();
-            if (currentToken == JsonToken.START_OBJECT || currentToken == JsonToken.FIELD_NAME || currentToken == JsonToken.END_OBJECT) {
-                Map<Object, Object> map = (Map) this._valueInstantiator.createUsingDefault(deserializationContext);
-                if (this._standardStringKey) {
-                    _readAndBindStringMap(jsonParser, deserializationContext, map);
-                    return map;
-                }
-                _readAndBind(jsonParser, deserializationContext, map);
-                return map;
-            } else if (currentToken == JsonToken.VALUE_STRING) {
-                return (Map) this._valueInstantiator.createFromString(deserializationContext, jsonParser.getText());
-            } else {
-                return (Map) _deserializeFromEmpty(jsonParser, deserializationContext);
-            }
+        if (!this._hasDefaultCreator) {
+            throw deserializationContext.instantiationException(getMapClass(), "No default constructor found");
         }
-        throw deserializationContext.instantiationException(getMapClass(), "No default constructor found");
+        JsonToken currentToken = jsonParser.getCurrentToken();
+        if (currentToken == JsonToken.START_OBJECT || currentToken == JsonToken.FIELD_NAME || currentToken == JsonToken.END_OBJECT) {
+            Map<Object, Object> map = (Map) this._valueInstantiator.createUsingDefault(deserializationContext);
+            if (this._standardStringKey) {
+                _readAndBindStringMap(jsonParser, deserializationContext, map);
+                return map;
+            }
+            _readAndBind(jsonParser, deserializationContext, map);
+            return map;
+        } else if (currentToken == JsonToken.VALUE_STRING) {
+            return (Map) this._valueInstantiator.createFromString(deserializationContext, jsonParser.getText());
+        } else {
+            return (Map) _deserializeFromEmpty(jsonParser, deserializationContext);
+        }
     }
 
     public Map<Object, Object> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Map<Object, Object> map) throws IOException {
@@ -287,136 +292,136 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
         return this._mapType;
     }
 
-    protected final void _readAndBind(JsonParser jsonParser, DeserializationContext deserializationContext, Map<Object, Object> map) throws IOException {
-        String nextFieldName;
-        JsonToken currentToken;
+    /* access modifiers changed from: protected */
+    public final void _readAndBind(JsonParser jsonParser, DeserializationContext deserializationContext, Map<Object, Object> map) throws IOException {
+        String str;
+        Object deserializeWithType;
         KeyDeserializer keyDeserializer = this._keyDeserializer;
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
+        JsonDeserializer<Object> jsonDeserializer = this._valueDeserializer;
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         MapReferringAccumulator mapReferringAccumulator = null;
-        Object obj = jsonDeserializer.getObjectIdReader() != null ? 1 : null;
-        if (obj != null) {
+        boolean z = jsonDeserializer.getObjectIdReader() != null;
+        if (z) {
             mapReferringAccumulator = new MapReferringAccumulator(this._mapType.getContentType().getRawClass(), map);
         }
         if (jsonParser.isExpectedStartObjectToken()) {
-            nextFieldName = jsonParser.nextFieldName();
+            str = jsonParser.nextFieldName();
         } else {
-            currentToken = jsonParser.getCurrentToken();
+            JsonToken currentToken = jsonParser.getCurrentToken();
             if (currentToken != JsonToken.END_OBJECT) {
                 if (currentToken != JsonToken.FIELD_NAME) {
                     throw deserializationContext.mappingException(this._mapType.getRawClass(), jsonParser.getCurrentToken());
                 }
-                nextFieldName = jsonParser.getCurrentName();
+                str = jsonParser.getCurrentName();
             } else {
                 return;
             }
         }
-        while (nextFieldName != null) {
-            Object deserializeKey = keyDeserializer.deserializeKey(nextFieldName, deserializationContext);
-            currentToken = jsonParser.nextToken();
-            if (this._ignorableProperties == null || !this._ignorableProperties.contains(nextFieldName)) {
+        while (str != null) {
+            Object deserializeKey = keyDeserializer.deserializeKey(str, deserializationContext);
+            JsonToken nextToken = jsonParser.nextToken();
+            if (this._ignorableProperties == null || !this._ignorableProperties.contains(str)) {
                 try {
-                    Object nullValue;
-                    if (currentToken == JsonToken.VALUE_NULL) {
-                        nullValue = jsonDeserializer.getNullValue(deserializationContext);
+                    if (nextToken == JsonToken.VALUE_NULL) {
+                        deserializeWithType = jsonDeserializer.getNullValue(deserializationContext);
                     } else if (typeDeserializer == null) {
-                        nullValue = jsonDeserializer.deserialize(jsonParser, deserializationContext);
+                        deserializeWithType = jsonDeserializer.deserialize(jsonParser, deserializationContext);
                     } else {
-                        nullValue = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
+                        deserializeWithType = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
                     }
-                    if (obj != null) {
-                        mapReferringAccumulator.put(deserializeKey, nullValue);
+                    if (z) {
+                        mapReferringAccumulator.put(deserializeKey, deserializeWithType);
                     } else {
-                        map.put(deserializeKey, nullValue);
+                        map.put(deserializeKey, deserializeWithType);
                     }
                 } catch (UnresolvedForwardReference e) {
                     handleUnresolvedReference(jsonParser, mapReferringAccumulator, deserializeKey, e);
-                } catch (Throwable e2) {
-                    wrapAndThrow(e2, map, nextFieldName);
+                } catch (Exception e2) {
+                    wrapAndThrow(e2, map, str);
                 }
             } else {
                 jsonParser.skipChildren();
             }
-            nextFieldName = jsonParser.nextFieldName();
+            str = jsonParser.nextFieldName();
         }
     }
 
-    protected final void _readAndBindStringMap(JsonParser jsonParser, DeserializationContext deserializationContext, Map<Object, Object> map) throws IOException {
-        String nextFieldName;
-        JsonToken currentToken;
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
+    /* access modifiers changed from: protected */
+    public final void _readAndBindStringMap(JsonParser jsonParser, DeserializationContext deserializationContext, Map<Object, Object> map) throws IOException {
+        String str;
+        Object deserializeWithType;
+        JsonDeserializer<Object> jsonDeserializer = this._valueDeserializer;
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         MapReferringAccumulator mapReferringAccumulator = null;
-        Object obj = jsonDeserializer.getObjectIdReader() != null ? 1 : null;
-        if (obj != null) {
+        boolean z = jsonDeserializer.getObjectIdReader() != null;
+        if (z) {
             mapReferringAccumulator = new MapReferringAccumulator(this._mapType.getContentType().getRawClass(), map);
         }
         if (jsonParser.isExpectedStartObjectToken()) {
-            nextFieldName = jsonParser.nextFieldName();
+            str = jsonParser.nextFieldName();
         } else {
-            currentToken = jsonParser.getCurrentToken();
+            JsonToken currentToken = jsonParser.getCurrentToken();
             if (currentToken != JsonToken.END_OBJECT) {
                 if (currentToken != JsonToken.FIELD_NAME) {
                     throw deserializationContext.mappingException(this._mapType.getRawClass(), jsonParser.getCurrentToken());
                 }
-                nextFieldName = jsonParser.getCurrentName();
+                str = jsonParser.getCurrentName();
             } else {
                 return;
             }
         }
-        while (nextFieldName != null) {
-            currentToken = jsonParser.nextToken();
-            if (this._ignorableProperties == null || !this._ignorableProperties.contains(nextFieldName)) {
+        while (str != null) {
+            JsonToken nextToken = jsonParser.nextToken();
+            if (this._ignorableProperties == null || !this._ignorableProperties.contains(str)) {
                 try {
-                    Object nullValue;
-                    if (currentToken == JsonToken.VALUE_NULL) {
-                        nullValue = jsonDeserializer.getNullValue(deserializationContext);
+                    if (nextToken == JsonToken.VALUE_NULL) {
+                        deserializeWithType = jsonDeserializer.getNullValue(deserializationContext);
                     } else if (typeDeserializer == null) {
-                        nullValue = jsonDeserializer.deserialize(jsonParser, deserializationContext);
+                        deserializeWithType = jsonDeserializer.deserialize(jsonParser, deserializationContext);
                     } else {
-                        nullValue = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
+                        deserializeWithType = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
                     }
-                    if (obj != null) {
-                        mapReferringAccumulator.put(nextFieldName, nullValue);
+                    if (z) {
+                        mapReferringAccumulator.put(str, deserializeWithType);
                     } else {
-                        map.put(nextFieldName, nullValue);
+                        map.put(str, deserializeWithType);
                     }
                 } catch (UnresolvedForwardReference e) {
-                    handleUnresolvedReference(jsonParser, mapReferringAccumulator, nextFieldName, e);
-                } catch (Throwable e2) {
-                    wrapAndThrow(e2, map, nextFieldName);
+                    handleUnresolvedReference(jsonParser, mapReferringAccumulator, str, e);
+                } catch (Exception e2) {
+                    wrapAndThrow(e2, map, str);
                 }
             } else {
                 jsonParser.skipChildren();
             }
-            nextFieldName = jsonParser.nextFieldName();
+            str = jsonParser.nextFieldName();
         }
     }
 
     public Map<Object, Object> _deserializeUsingCreator(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Object deserializeWithType;
         PropertyBasedCreator propertyBasedCreator = this._propertyBasedCreator;
         PropertyValueBuffer startBuilding = propertyBasedCreator.startBuilding(jsonParser, deserializationContext, null);
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
+        JsonDeserializer<Object> jsonDeserializer = this._valueDeserializer;
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
-        String nextFieldName = jsonParser.isExpectedStartObjectToken() ? jsonParser.nextFieldName() : jsonParser.hasToken(JsonToken.FIELD_NAME) ? jsonParser.getCurrentName() : null;
-        while (nextFieldName != null) {
+        String str = jsonParser.isExpectedStartObjectToken() ? jsonParser.nextFieldName() : jsonParser.hasToken(JsonToken.FIELD_NAME) ? jsonParser.getCurrentName() : null;
+        while (str != null) {
             JsonToken nextToken = jsonParser.nextToken();
-            if (this._ignorableProperties == null || !this._ignorableProperties.contains(nextFieldName)) {
-                SettableBeanProperty findCreatorProperty = propertyBasedCreator.findCreatorProperty(nextFieldName);
+            if (this._ignorableProperties == null || !this._ignorableProperties.contains(str)) {
+                SettableBeanProperty findCreatorProperty = propertyBasedCreator.findCreatorProperty(str);
                 if (findCreatorProperty == null) {
-                    Object deserializeKey = this._keyDeserializer.deserializeKey(nextFieldName, deserializationContext);
+                    Object deserializeKey = this._keyDeserializer.deserializeKey(str, deserializationContext);
                     try {
-                        Object nullValue;
                         if (nextToken == JsonToken.VALUE_NULL) {
-                            nullValue = jsonDeserializer.getNullValue(deserializationContext);
+                            deserializeWithType = jsonDeserializer.getNullValue(deserializationContext);
                         } else if (typeDeserializer == null) {
-                            nullValue = jsonDeserializer.deserialize(jsonParser, deserializationContext);
+                            deserializeWithType = jsonDeserializer.deserialize(jsonParser, deserializationContext);
                         } else {
-                            nullValue = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
+                            deserializeWithType = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
                         }
-                        startBuilding.bufferMapProperty(deserializeKey, nullValue);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, this._mapType.getRawClass(), nextFieldName);
+                        startBuilding.bufferMapProperty(deserializeKey, deserializeWithType);
+                    } catch (Exception e) {
+                        wrapAndThrow(e, this._mapType.getRawClass(), str);
                         return null;
                     }
                 } else if (startBuilding.assignParameter(findCreatorProperty, findCreatorProperty.deserialize(jsonParser, deserializationContext))) {
@@ -425,26 +430,27 @@ public class MapDeserializer extends ContainerDeserializerBase<Map<Object, Objec
                         Map<Object, Object> map = (Map) propertyBasedCreator.build(deserializationContext, startBuilding);
                         _readAndBind(jsonParser, deserializationContext, map);
                         return map;
-                    } catch (Throwable e2) {
-                        wrapAndThrow(e2, this._mapType.getRawClass(), nextFieldName);
+                    } catch (Exception e2) {
+                        wrapAndThrow(e2, this._mapType.getRawClass(), str);
                         return null;
                     }
                 }
             } else {
                 jsonParser.skipChildren();
             }
-            nextFieldName = jsonParser.nextFieldName();
+            str = jsonParser.nextFieldName();
         }
         try {
             return (Map) propertyBasedCreator.build(deserializationContext, startBuilding);
-        } catch (Throwable e22) {
-            wrapAndThrow(e22, this._mapType.getRawClass(), nextFieldName);
+        } catch (Exception e3) {
+            wrapAndThrow(e3, this._mapType.getRawClass(), str);
             return null;
         }
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected void wrapAndThrow(Throwable th, Object obj) throws IOException {
+    public void wrapAndThrow(Throwable th, Object obj) throws IOException {
         wrapAndThrow(th, obj, null);
     }
 

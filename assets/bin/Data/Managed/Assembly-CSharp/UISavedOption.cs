@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Saved Option")]
-public class UISavedOption
+public class UISavedOption : MonoBehaviour
 {
 	public string keyName;
 
@@ -35,27 +35,27 @@ public class UISavedOption
 			{
 				mList.value = @string;
 			}
+			return;
 		}
-		else if (mCheck != null)
+		if (mCheck != null)
 		{
 			EventDelegate.Add(mCheck.onChange, SaveState);
 			mCheck.value = (PlayerPrefs.GetInt(key, mCheck.startsActive ? 1 : 0) != 0);
+			return;
 		}
-		else if (mSlider != null)
+		if (mSlider != null)
 		{
 			EventDelegate.Add(mSlider.onChange, SaveProgress);
 			mSlider.value = PlayerPrefs.GetFloat(key, mSlider.value);
+			return;
 		}
-		else
+		string string2 = PlayerPrefs.GetString(key);
+		UIToggle[] componentsInChildren = this.GetComponentsInChildren<UIToggle>(true);
+		int i = 0;
+		for (int num = componentsInChildren.Length; i < num; i++)
 		{
-			string string2 = PlayerPrefs.GetString(key);
-			UIToggle[] componentsInChildren = this.GetComponentsInChildren<UIToggle>(true);
-			int i = 0;
-			for (int num = componentsInChildren.Length; i < num; i++)
-			{
-				UIToggle uIToggle = componentsInChildren[i];
-				uIToggle.value = (uIToggle.get_name() == string2);
-			}
+			UIToggle uIToggle = componentsInChildren[i];
+			uIToggle.value = (uIToggle.get_name() == string2);
 		}
 	}
 
@@ -64,36 +64,37 @@ public class UISavedOption
 		if (mCheck != null)
 		{
 			EventDelegate.Remove(mCheck.onChange, SaveState);
+			return;
 		}
-		else if (mList != null)
+		if (mList != null)
 		{
 			EventDelegate.Remove(mList.onChange, SaveSelection);
+			return;
 		}
-		else if (mSlider != null)
+		if (mSlider != null)
 		{
 			EventDelegate.Remove(mSlider.onChange, SaveProgress);
+			return;
 		}
-		else
+		UIToggle[] componentsInChildren = this.GetComponentsInChildren<UIToggle>(true);
+		int num = 0;
+		int num2 = componentsInChildren.Length;
+		UIToggle uIToggle;
+		while (true)
 		{
-			UIToggle[] componentsInChildren = this.GetComponentsInChildren<UIToggle>(true);
-			int num = 0;
-			int num2 = componentsInChildren.Length;
-			UIToggle uIToggle;
-			while (true)
+			if (num < num2)
 			{
-				if (num >= num2)
-				{
-					return;
-				}
 				uIToggle = componentsInChildren[num];
 				if (uIToggle.value)
 				{
 					break;
 				}
 				num++;
+				continue;
 			}
-			PlayerPrefs.SetString(key, uIToggle.get_name());
+			return;
 		}
+		PlayerPrefs.SetString(key, uIToggle.get_name());
 	}
 
 	public void SaveSelection()

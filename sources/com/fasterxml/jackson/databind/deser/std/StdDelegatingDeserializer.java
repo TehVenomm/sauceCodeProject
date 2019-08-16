@@ -33,15 +33,16 @@ public class StdDelegatingDeserializer<T> extends StdDeserializer<T> implements 
     }
 
     protected StdDelegatingDeserializer(StdDelegatingDeserializer<T> stdDelegatingDeserializer) {
-        super((StdDeserializer) stdDelegatingDeserializer);
+        super((StdDeserializer<?>) stdDelegatingDeserializer);
         this._converter = stdDelegatingDeserializer._converter;
         this._delegateType = stdDelegatingDeserializer._delegateType;
         this._delegateDeserializer = stdDelegatingDeserializer._delegateDeserializer;
     }
 
-    protected StdDelegatingDeserializer<T> withDelegate(Converter<Object, T> converter, JavaType javaType, JsonDeserializer<?> jsonDeserializer) {
+    /* access modifiers changed from: protected */
+    public StdDelegatingDeserializer<T> withDelegate(Converter<Object, T> converter, JavaType javaType, JsonDeserializer<?> jsonDeserializer) {
         if (getClass() == StdDelegatingDeserializer.class) {
-            return new StdDelegatingDeserializer(converter, javaType, jsonDeserializer);
+            return new StdDelegatingDeserializer<>(converter, javaType, jsonDeserializer);
         }
         throw new IllegalStateException("Sub-class " + getClass().getName() + " must override 'withDelegate'");
     }
@@ -54,7 +55,7 @@ public class StdDelegatingDeserializer<T> extends StdDeserializer<T> implements 
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
         if (this._delegateDeserializer != null) {
-            JsonDeserializer handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(this._delegateDeserializer, beanProperty, this._delegateType);
+            JsonDeserializer<Object> handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(this._delegateDeserializer, beanProperty, this._delegateType);
             if (handleSecondaryContextualization != this._delegateDeserializer) {
                 return withDelegate(this._converter, this._delegateType, handleSecondaryContextualization);
             }
@@ -95,11 +96,13 @@ public class StdDelegatingDeserializer<T> extends StdDeserializer<T> implements 
         return _handleIncompatibleUpdateValue(jsonParser, deserializationContext, obj);
     }
 
-    protected Object _handleIncompatibleUpdateValue(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _handleIncompatibleUpdateValue(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
         throw new UnsupportedOperationException(String.format("Can not update object of type %s (using deserializer for type %s)" + obj.getClass().getName(), new Object[]{this._delegateType}));
     }
 
-    protected T convertValue(Object obj) {
+    /* access modifiers changed from: protected */
+    public T convertValue(Object obj) {
         return this._converter.convert(obj);
     }
 }

@@ -1,8 +1,9 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.util.JsonParserSequence;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -29,8 +30,8 @@ public class AsArrayTypeDeserializer extends TypeDeserializerBase implements Ser
         return beanProperty == this._property ? this : new AsArrayTypeDeserializer(this, beanProperty);
     }
 
-    public As getTypeInclusion() {
-        return As.WRAPPER_ARRAY;
+    public C0861As getTypeInclusion() {
+        return C0861As.WRAPPER_ARRAY;
     }
 
     public Object deserializeTypedFromArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
@@ -49,10 +50,10 @@ public class AsArrayTypeDeserializer extends TypeDeserializerBase implements Ser
         return _deserialize(jsonParser, deserializationContext);
     }
 
-    protected Object _deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Object typeId;
+    /* access modifiers changed from: protected */
+    public Object _deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (jsonParser.canReadTypeId()) {
-            typeId = jsonParser.getTypeId();
+            Object typeId = jsonParser.getTypeId();
             if (typeId != null) {
                 return _deserializeWithNativeTypeId(jsonParser, deserializationContext, typeId);
             }
@@ -61,39 +62,40 @@ public class AsArrayTypeDeserializer extends TypeDeserializerBase implements Ser
         String _locateTypeId = _locateTypeId(jsonParser, deserializationContext);
         JsonDeserializer _findDeserializer = _findDeserializer(deserializationContext, _locateTypeId);
         if (this._typeIdVisible && !_usesExternalId() && jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
-            TokenBuffer tokenBuffer = new TokenBuffer(null, false);
+            TokenBuffer tokenBuffer = new TokenBuffer((ObjectCodec) null, false);
             tokenBuffer.writeStartObject();
             tokenBuffer.writeFieldName(this._typePropertyName);
             tokenBuffer.writeString(_locateTypeId);
             jsonParser = JsonParserSequence.createFlattened(tokenBuffer.asParser(jsonParser), jsonParser);
             jsonParser.nextToken();
         }
-        typeId = _findDeserializer.deserialize(jsonParser, deserializationContext);
+        Object deserialize = _findDeserializer.deserialize(jsonParser, deserializationContext);
         if (!isExpectedStartArrayToken || jsonParser.nextToken() == JsonToken.END_ARRAY) {
-            return typeId;
+            return deserialize;
         }
         throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "expected closing END_ARRAY after type information and deserialized value");
     }
 
-    protected String _locateTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        if (jsonParser.isExpectedStartArrayToken()) {
-            if (jsonParser.nextToken() == JsonToken.VALUE_STRING) {
-                String text = jsonParser.getText();
-                jsonParser.nextToken();
-                return text;
-            } else if (this._defaultImpl != null) {
+    /* access modifiers changed from: protected */
+    public String _locateTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        if (!jsonParser.isExpectedStartArrayToken()) {
+            if (this._defaultImpl != null) {
                 return this._idResolver.idFromBaseType();
-            } else {
-                throw deserializationContext.wrongTokenException(jsonParser, JsonToken.VALUE_STRING, "need JSON String that contains type id (for subtype of " + baseTypeName() + ")");
             }
+            throw deserializationContext.wrongTokenException(jsonParser, JsonToken.START_ARRAY, "need JSON Array to contain As.WRAPPER_ARRAY type information for class " + baseTypeName());
+        } else if (jsonParser.nextToken() == JsonToken.VALUE_STRING) {
+            String text = jsonParser.getText();
+            jsonParser.nextToken();
+            return text;
         } else if (this._defaultImpl != null) {
             return this._idResolver.idFromBaseType();
         } else {
-            throw deserializationContext.wrongTokenException(jsonParser, JsonToken.START_ARRAY, "need JSON Array to contain As.WRAPPER_ARRAY type information for class " + baseTypeName());
+            throw deserializationContext.wrongTokenException(jsonParser, JsonToken.VALUE_STRING, "need JSON String that contains type id (for subtype of " + baseTypeName() + ")");
         }
     }
 
-    protected boolean _usesExternalId() {
+    /* access modifiers changed from: protected */
+    public boolean _usesExternalId() {
         return false;
     }
 }

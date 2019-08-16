@@ -29,11 +29,11 @@ public abstract class QuestSearchRoomConditionBase : GameSection
 
 	protected void OnNotFoundMatchingParty()
 	{
-		GameSection.ChangeStayEvent("NOT_FOUND_MATCHING_PARTY", null);
+		GameSection.ChangeStayEvent("NOT_FOUND_MATCHING_PARTY");
 	}
 
 	protected void OnNotFoundQuest()
 	{
-		GameSection.ChangeStayEvent("NOT_FOUND_QUEST", null);
+		GameSection.ChangeStayEvent("NOT_FOUND_QUEST");
 	}
 }

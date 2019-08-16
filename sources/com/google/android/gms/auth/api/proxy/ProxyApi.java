@@ -15,5 +15,14 @@ public interface ProxyApi {
     }
 
     @KeepForSdk
+    public interface SpatulaHeaderResult extends Result {
+        @KeepForSdk
+        String getSpatulaHeader();
+    }
+
+    @KeepForSdk
+    PendingResult<SpatulaHeaderResult> getSpatulaHeader(GoogleApiClient googleApiClient);
+
+    @KeepForSdk
     PendingResult<ProxyResult> performProxyRequest(GoogleApiClient googleApiClient, ProxyRequest proxyRequest);
 }

@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/NGUI Scroll Bar")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/NGUI Scroll Bar")]
 public class UIScrollBar : UISlider
 {
 	private enum Direction
@@ -20,8 +20,8 @@ public class UIScrollBar : UISlider
 	[SerializeField]
 	private float mScroll;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Direction mDir = Direction.Upgraded;
 
 	[Obsolete("Use 'value' instead")]
@@ -46,20 +46,21 @@ public class UIScrollBar : UISlider
 		set
 		{
 			float num = Mathf.Clamp01(value);
-			if (mSize != num)
+			if (mSize == num)
 			{
-				mSize = num;
-				mIsDirty = true;
-				if (NGUITools.GetActive(this))
+				return;
+			}
+			mSize = num;
+			mIsDirty = true;
+			if (NGUITools.GetActive(this))
+			{
+				if (UIProgressBar.current == null && onChange != null)
 				{
-					if (UIProgressBar.current == null && onChange != null)
-					{
-						UIProgressBar.current = this;
-						EventDelegate.Execute(onChange);
-						UIProgressBar.current = null;
-					}
-					ForceUpdate();
+					UIProgressBar.current = this;
+					EventDelegate.Execute(onChange);
+					UIProgressBar.current = null;
 				}
+				ForceUpdate();
 			}
 		}
 	}
@@ -83,10 +84,6 @@ public class UIScrollBar : UISlider
 
 	protected override void OnStart()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Expected O, but got Unknown
 		base.OnStart();
 		if (mFG != null && mFG.get_gameObject() != this.get_gameObject() && (mFG.GetComponent<Collider>() != null || mFG.GetComponent<Collider2D>() != null))
 		{

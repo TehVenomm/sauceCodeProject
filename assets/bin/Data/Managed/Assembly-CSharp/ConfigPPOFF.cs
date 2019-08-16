@@ -15,7 +15,7 @@ public class ConfigPPOFF : PPInputBase
 					(int)ret
 				});
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 }

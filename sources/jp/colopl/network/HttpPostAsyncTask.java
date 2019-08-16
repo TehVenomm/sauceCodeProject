@@ -1,12 +1,13 @@
-package jp.colopl.network;
+package p018jp.colopl.network;
 
 import android.content.Context;
 import com.github.droidfu.concurrent.BetterAsyncTask;
 import java.util.List;
-import jp.colopl.config.Config;
-import jp.colopl.util.HTTP;
 import org.apache.http.NameValuePair;
+import p018jp.colopl.config.Config;
+import p018jp.colopl.util.HTTP;
 
+/* renamed from: jp.colopl.network.HttpPostAsyncTask */
 public class HttpPostAsyncTask extends BetterAsyncTask<Void, Void, String> {
     private List<String> cookies;
     private HttpRequestListener listener;
@@ -28,13 +29,15 @@ public class HttpPostAsyncTask extends BetterAsyncTask<Void, Void, String> {
         this.cookies = list2;
     }
 
-    protected void after(Context context, String str) {
+    /* access modifiers changed from: protected */
+    public void after(Context context, String str) {
         if (this.listener != null) {
             this.listener.onReceiveResponse(this, str);
         }
     }
 
-    protected String doCheckedInBackground(Context context, Void... voidArr) throws Exception {
+    /* access modifiers changed from: protected */
+    public String doCheckedInBackground(Context context, Void... voidArr) throws Exception {
         super.doCheckedInBackground(context, voidArr);
         String post = HTTP.post(this.url, this.postData, this.cookies);
         if (post != null) {
@@ -47,9 +50,10 @@ public class HttpPostAsyncTask extends BetterAsyncTask<Void, Void, String> {
         return this.tag;
     }
 
-    protected void handleError(Context context, Exception exception) {
+    /* access modifiers changed from: protected */
+    public void handleError(Context context, Exception exc) {
         if (this.listener != null) {
-            this.listener.onReceiveError(this, exception);
+            this.listener.onReceiveError(this, exc);
         }
     }
 

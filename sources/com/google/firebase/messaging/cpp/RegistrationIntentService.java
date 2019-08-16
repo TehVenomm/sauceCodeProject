@@ -1,6 +1,7 @@
 package com.google.firebase.messaging.cpp;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.flatbuffers.FlatBufferBuilder;
@@ -16,32 +17,39 @@ public class RegistrationIntentService extends IntentService {
         super(TAG);
     }
 
-    private byte[] generateTokenByteBuffer(String str) {
-        CharSequence charSequence;
+    private static byte[] generateTokenByteBuffer(String str) {
         FlatBufferBuilder flatBufferBuilder = new FlatBufferBuilder(0);
         if (str == null) {
-            charSequence = "";
+            str = "";
         }
-        int createString = flatBufferBuilder.createString(charSequence);
+        int createString = flatBufferBuilder.createString((CharSequence) str);
         SerializedTokenReceived.startSerializedTokenReceived(flatBufferBuilder);
         SerializedTokenReceived.addToken(flatBufferBuilder, createString);
-        createString = SerializedTokenReceived.endSerializedTokenReceived(flatBufferBuilder);
+        int endSerializedTokenReceived = SerializedTokenReceived.endSerializedTokenReceived(flatBufferBuilder);
         SerializedEvent.startSerializedEvent(flatBufferBuilder);
-        SerializedEvent.addEventType(flatBufferBuilder, (byte) 2);
-        SerializedEvent.addEvent(flatBufferBuilder, createString);
+        SerializedEvent.addEventType(flatBufferBuilder, 2);
+        SerializedEvent.addEvent(flatBufferBuilder, endSerializedTokenReceived);
         flatBufferBuilder.finish(SerializedEvent.endSerializedEvent(flatBufferBuilder));
         return flatBufferBuilder.sizedByteArray();
     }
 
-    private void writeTokenToInternalStorage(String str) {
+    public static void refreshToken(Context context) {
+        String token = FirebaseInstanceId.getInstance().getToken();
+        DebugLogging.log(TAG, String.format("onHandleIntent token=%s", new Object[]{token}));
+        if (token != null) {
+            writeTokenToInternalStorage(context, token);
+        }
+    }
+
+    private static void writeTokenToInternalStorage(Context context, String str) {
         FileLock fileLock = null;
         byte[] generateTokenByteBuffer = generateTokenByteBuffer(str);
         ByteBuffer allocate = ByteBuffer.allocate(4);
         allocate.order(ByteOrder.LITTLE_ENDIAN);
         allocate.putInt(generateTokenByteBuffer.length);
         try {
-            fileLock = openFileOutput("FIREBASE_CLOUD_MESSAGING_LOCKFILE", 0).getChannel().lock();
-            FileOutputStream openFileOutput = openFileOutput("FIREBASE_CLOUD_MESSAGING_LOCAL_STORAGE", 32768);
+            fileLock = context.openFileOutput("FIREBASE_CLOUD_MESSAGING_LOCKFILE", 0).getChannel().lock();
+            FileOutputStream openFileOutput = context.openFileOutput("FIREBASE_CLOUD_MESSAGING_LOCAL_STORAGE", 32768);
             openFileOutput.write(allocate.array());
             openFileOutput.write(generateTokenByteBuffer);
             openFileOutput.close();
@@ -57,26 +65,23 @@ public class RegistrationIntentService extends IntentService {
             if (fileLock != null) {
                 try {
                     fileLock.release();
-                } catch (Exception e22) {
-                    e22.printStackTrace();
+                } catch (Exception e3) {
+                    e3.printStackTrace();
                 }
             }
-        } catch (Throwable th) {
+        } finally {
             if (fileLock != null) {
                 try {
                     fileLock.release();
-                } catch (Exception e3) {
-                    e3.printStackTrace();
+                } catch (Exception e4) {
+                    e4.printStackTrace();
                 }
             }
         }
     }
 
-    protected void onHandleIntent(Intent intent) {
-        DebugLogging.log(TAG, String.format("onHandleIntent token=%s", new Object[]{FirebaseInstanceId.getInstance().getToken()}));
-        String token = FirebaseInstanceId.getInstance().getToken();
-        if (token != null) {
-            writeTokenToInternalStorage(token);
-        }
+    /* access modifiers changed from: protected */
+    public void onHandleIntent(Intent intent) {
+        refreshToken(this);
     }
 }

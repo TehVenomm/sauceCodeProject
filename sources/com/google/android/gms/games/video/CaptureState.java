@@ -1,51 +1,54 @@
 package com.google.android.gms.games.video;
 
 import android.os.Bundle;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
 
 public final class CaptureState {
-    private final boolean zzark;
-    private final boolean zzeqa;
-    private final boolean zzhpj;
-    private final int zzhpk;
-    private final int zzhpl;
+    private final boolean zzst;
+    private final int zzsu;
+    private final int zzsv;
+    private final boolean zzsw;
+    private final boolean zzsx;
 
     private CaptureState(boolean z, int i, int i2, boolean z2, boolean z3) {
-        zzbp.zzbh(VideoConfiguration.isValidCaptureMode(i, true));
-        zzbp.zzbh(VideoConfiguration.isValidQualityLevel(i2, true));
-        this.zzhpj = z;
-        this.zzhpk = i;
-        this.zzhpl = i2;
-        this.zzeqa = z2;
-        this.zzark = z3;
+        Preconditions.checkArgument(VideoConfiguration.isValidCaptureMode(i, true));
+        Preconditions.checkArgument(VideoConfiguration.isValidQualityLevel(i2, true));
+        this.zzst = z;
+        this.zzsu = i;
+        this.zzsv = i2;
+        this.zzsw = z2;
+        this.zzsx = z3;
     }
 
-    public static CaptureState zzo(Bundle bundle) {
-        return (bundle == null || bundle.get("IsCapturing") == null) ? null : new CaptureState(bundle.getBoolean("IsCapturing", false), bundle.getInt("CaptureMode", -1), bundle.getInt("CaptureQuality", -1), bundle.getBoolean("IsOverlayVisible", false), bundle.getBoolean("IsPaused", false));
+    public static CaptureState zzb(Bundle bundle) {
+        if (bundle == null || bundle.get("IsCapturing") == null) {
+            return null;
+        }
+        return new CaptureState(bundle.getBoolean("IsCapturing", false), bundle.getInt("CaptureMode", -1), bundle.getInt("CaptureQuality", -1), bundle.getBoolean("IsOverlayVisible", false), bundle.getBoolean("IsPaused", false));
     }
 
     public final int getCaptureMode() {
-        return this.zzhpk;
+        return this.zzsu;
     }
 
     public final int getCaptureQuality() {
-        return this.zzhpl;
+        return this.zzsv;
     }
 
     public final boolean isCapturing() {
-        return this.zzhpj;
+        return this.zzst;
     }
 
     public final boolean isOverlayVisible() {
-        return this.zzeqa;
+        return this.zzsw;
     }
 
     public final boolean isPaused() {
-        return this.zzark;
+        return this.zzsx;
     }
 
     public final String toString() {
-        return zzbf.zzt(this).zzg("IsCapturing", Boolean.valueOf(this.zzhpj)).zzg("CaptureMode", Integer.valueOf(this.zzhpk)).zzg("CaptureQuality", Integer.valueOf(this.zzhpl)).zzg("IsOverlayVisible", Boolean.valueOf(this.zzeqa)).zzg("IsPaused", Boolean.valueOf(this.zzark)).toString();
+        return Objects.toStringHelper(this).add("IsCapturing", Boolean.valueOf(this.zzst)).add("CaptureMode", Integer.valueOf(this.zzsu)).add("CaptureQuality", Integer.valueOf(this.zzsv)).add("IsOverlayVisible", Boolean.valueOf(this.zzsw)).add("IsPaused", Boolean.valueOf(this.zzsx)).toString();
     }
 }

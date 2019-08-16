@@ -1,7 +1,7 @@
 package com.amazon.device.iap.internal.util;
 
-import com.amazon.device.iap.internal.p001b.C0197e;
-import com.amazon.device.iap.internal.p001b.p009h.C0228a;
+import com.amazon.device.iap.internal.p005b.C0378e;
+import com.amazon.device.iap.internal.p005b.p013h.C0392a;
 import com.amazon.device.iap.model.RequestId;
 import org.json.JSONObject;
 
@@ -15,7 +15,7 @@ public class MetricsHelper {
     private static final String TAG = MetricsHelper.class.getSimpleName();
 
     protected static void submitMetric(String str, String str2, JSONObject jSONObject) {
-        new C0228a(new C0197e(RequestId.fromString(str)), str2, jSONObject.toString()).a_();
+        new C0392a(new C0378e(RequestId.fromString(str)), str2, jSONObject.toString()).mo6224a_();
     }
 
     public static void submitReceiptVerificationFailureMetrics(String str, String str2, String str3) {
@@ -25,7 +25,7 @@ public class MetricsHelper {
             jSONObject.put(SIGNATURE, str3);
             submitMetric(str, RECEIPT_VERIFICATION_FAILED_METRIC, jSONObject);
         } catch (Exception e) {
-            C0244e.m175b(TAG, "error calling submitMetric: " + e);
+            C0409e.m170b(TAG, "error calling submitMetric: " + e);
         }
     }
 }

@@ -1,12 +1,13 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.services.persistence.PreferenceStore;
-import io.fabric.sdk.android.services.persistence.PreferenceStoreImpl;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.services.persistence.PreferenceStore;
+import p017io.fabric.sdk.android.services.persistence.PreferenceStoreImpl;
 
+/* renamed from: io.fabric.sdk.android.services.common.AdvertisingInfoProvider */
 class AdvertisingInfoProvider {
     private static final String ADVERTISING_INFO_PREFERENCES = "TwitterAdvertisingInfoPreferences";
     private static final String PREFKEY_ADVERTISING_ID = "advertising_id";
@@ -14,28 +15,29 @@ class AdvertisingInfoProvider {
     private final Context context;
     private final PreferenceStore preferenceStore;
 
-    public AdvertisingInfoProvider(Context context) {
-        this.context = context.getApplicationContext();
-        this.preferenceStore = new PreferenceStoreImpl(context, ADVERTISING_INFO_PREFERENCES);
+    public AdvertisingInfoProvider(Context context2) {
+        this.context = context2.getApplicationContext();
+        this.preferenceStore = new PreferenceStoreImpl(context2, ADVERTISING_INFO_PREFERENCES);
     }
 
-    private AdvertisingInfo getAdvertisingInfoFromStrategies() {
+    /* access modifiers changed from: private */
+    public AdvertisingInfo getAdvertisingInfoFromStrategies() {
         AdvertisingInfo advertisingInfo = getReflectionStrategy().getAdvertisingInfo();
-        if (isInfoValid(advertisingInfo)) {
-            Fabric.getLogger().mo4289d("Fabric", "Using AdvertisingInfo from Reflection Provider");
-        } else {
+        if (!isInfoValid(advertisingInfo)) {
             advertisingInfo = getServiceStrategy().getAdvertisingInfo();
-            if (isInfoValid(advertisingInfo)) {
-                Fabric.getLogger().mo4289d("Fabric", "Using AdvertisingInfo from Service Provider");
+            if (!isInfoValid(advertisingInfo)) {
+                Fabric.getLogger().mo20969d(Fabric.TAG, "AdvertisingInfo not present");
             } else {
-                Fabric.getLogger().mo4289d("Fabric", "AdvertisingInfo not present");
+                Fabric.getLogger().mo20969d(Fabric.TAG, "Using AdvertisingInfo from Service Provider");
             }
+        } else {
+            Fabric.getLogger().mo20969d(Fabric.TAG, "Using AdvertisingInfo from Reflection Provider");
         }
         return advertisingInfo;
     }
 
     private boolean isInfoValid(AdvertisingInfo advertisingInfo) {
-        return (advertisingInfo == null || TextUtils.isEmpty(advertisingInfo.advertisingId)) ? false : true;
+        return advertisingInfo != null && !TextUtils.isEmpty(advertisingInfo.advertisingId);
     }
 
     private void refreshInfoIfNeededAsync(final AdvertisingInfo advertisingInfo) {
@@ -43,15 +45,16 @@ class AdvertisingInfoProvider {
             public void onRun() {
                 AdvertisingInfo access$000 = AdvertisingInfoProvider.this.getAdvertisingInfoFromStrategies();
                 if (!advertisingInfo.equals(access$000)) {
-                    Fabric.getLogger().mo4289d("Fabric", "Asychronously getting Advertising Info and storing it to preferences");
+                    Fabric.getLogger().mo20969d(Fabric.TAG, "Asychronously getting Advertising Info and storing it to preferences");
                     AdvertisingInfoProvider.this.storeInfoToPreferences(access$000);
                 }
             }
         }).start();
     }
 
+    /* access modifiers changed from: private */
     @SuppressLint({"CommitPrefEdits"})
-    private void storeInfoToPreferences(AdvertisingInfo advertisingInfo) {
+    public void storeInfoToPreferences(AdvertisingInfo advertisingInfo) {
         if (isInfoValid(advertisingInfo)) {
             this.preferenceStore.save(this.preferenceStore.edit().putString("advertising_id", advertisingInfo.advertisingId).putBoolean(PREFKEY_LIMIT_AD_TRACKING, advertisingInfo.limitAdTrackingEnabled));
         } else {
@@ -62,16 +65,17 @@ class AdvertisingInfoProvider {
     public AdvertisingInfo getAdvertisingInfo() {
         AdvertisingInfo infoFromPreferences = getInfoFromPreferences();
         if (isInfoValid(infoFromPreferences)) {
-            Fabric.getLogger().mo4289d("Fabric", "Using AdvertisingInfo from Preference Store");
+            Fabric.getLogger().mo20969d(Fabric.TAG, "Using AdvertisingInfo from Preference Store");
             refreshInfoIfNeededAsync(infoFromPreferences);
             return infoFromPreferences;
         }
-        infoFromPreferences = getAdvertisingInfoFromStrategies();
-        storeInfoToPreferences(infoFromPreferences);
-        return infoFromPreferences;
+        AdvertisingInfo advertisingInfoFromStrategies = getAdvertisingInfoFromStrategies();
+        storeInfoToPreferences(advertisingInfoFromStrategies);
+        return advertisingInfoFromStrategies;
     }
 
-    protected AdvertisingInfo getInfoFromPreferences() {
+    /* access modifiers changed from: protected */
+    public AdvertisingInfo getInfoFromPreferences() {
         return new AdvertisingInfo(this.preferenceStore.get().getString("advertising_id", ""), this.preferenceStore.get().getBoolean(PREFKEY_LIMIT_AD_TRACKING, false));
     }
 

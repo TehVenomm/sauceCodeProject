@@ -22,7 +22,9 @@ import com.facebook.internal.CollectionMapper.ValueMapper;
 import com.facebook.internal.Mutable;
 import com.facebook.internal.NativeProtocol;
 import com.facebook.internal.Utility;
+import com.facebook.places.model.PlaceFields;
 import com.facebook.share.Sharer.Result;
+import com.facebook.share.internal.MessengerShareContentUtility;
 import com.facebook.share.internal.ShareConstants;
 import com.facebook.share.internal.ShareContentValidation;
 import com.facebook.share.internal.ShareInternalUtility;
@@ -41,6 +43,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.json.JSONArray;
@@ -57,42 +60,28 @@ public final class ShareApi {
     private String message;
     private final ShareContent shareContent;
 
-    /* renamed from: com.facebook.share.ShareApi$7 */
-    class C04687 implements ValueMapper {
-        C04687() {
-        }
-
-        public void mapValue(Object obj, OnMapValueCompleteListener onMapValueCompleteListener) {
-            if (obj instanceof ArrayList) {
-                ShareApi.this.stageArrayList((ArrayList) obj, onMapValueCompleteListener);
-            } else if (obj instanceof ShareOpenGraphObject) {
-                ShareApi.this.stageOpenGraphObject((ShareOpenGraphObject) obj, onMapValueCompleteListener);
-            } else if (obj instanceof SharePhoto) {
-                ShareApi.this.stagePhoto((SharePhoto) obj, onMapValueCompleteListener);
-            } else {
-                onMapValueCompleteListener.onComplete(obj);
-            }
-        }
+    public ShareApi(ShareContent shareContent2) {
+        this.shareContent = shareContent2;
     }
 
-    public ShareApi(ShareContent shareContent) {
-        this.shareContent = shareContent;
-    }
-
-    private void addCommonParameters(Bundle bundle, ShareContent shareContent) {
-        Collection peopleIds = shareContent.getPeopleIds();
-        if (!Utility.isNullOrEmpty(peopleIds)) {
+    private void addCommonParameters(Bundle bundle, ShareContent shareContent2) {
+        List peopleIds = shareContent2.getPeopleIds();
+        if (!Utility.isNullOrEmpty((Collection<T>) peopleIds)) {
             bundle.putString("tags", TextUtils.join(", ", peopleIds));
         }
-        if (!Utility.isNullOrEmpty(shareContent.getPlaceId())) {
-            bundle.putString("place", shareContent.getPlaceId());
+        if (!Utility.isNullOrEmpty(shareContent2.getPlaceId())) {
+            bundle.putString("place", shareContent2.getPlaceId());
         }
-        if (!Utility.isNullOrEmpty(shareContent.getRef())) {
-            bundle.putString("ref", shareContent.getRef());
+        if (!Utility.isNullOrEmpty(shareContent2.getPageId())) {
+            bundle.putString(PlaceFields.PAGE, shareContent2.getPageId());
+        }
+        if (!Utility.isNullOrEmpty(shareContent2.getRef())) {
+            bundle.putString("ref", shareContent2.getRef());
         }
     }
 
-    private String getGraphPath(String str) {
+    /* access modifiers changed from: private */
+    public String getGraphPath(String str) {
         try {
             return String.format(Locale.ROOT, GRAPH_PATH_FORMAT, new Object[]{URLEncoder.encode(getGraphNode(), "UTF-8"), str});
         } catch (UnsupportedEncodingException e) {
@@ -102,12 +91,12 @@ public final class ShareApi {
 
     private Bundle getSharePhotoCommonParameters(SharePhoto sharePhoto, SharePhotoContent sharePhotoContent) throws JSONException {
         Bundle parameters = sharePhoto.getParameters();
-        if (!(parameters.containsKey("place") || Utility.isNullOrEmpty(sharePhotoContent.getPlaceId()))) {
+        if (!parameters.containsKey("place") && !Utility.isNullOrEmpty(sharePhotoContent.getPlaceId())) {
             parameters.putString("place", sharePhotoContent.getPlaceId());
         }
-        if (!(parameters.containsKey("tags") || Utility.isNullOrEmpty(sharePhotoContent.getPeopleIds()))) {
-            Collection<String> peopleIds = sharePhotoContent.getPeopleIds();
-            if (!Utility.isNullOrEmpty((Collection) peopleIds)) {
+        if (!parameters.containsKey("tags") && !Utility.isNullOrEmpty((Collection<T>) sharePhotoContent.getPeopleIds())) {
+            List<String> peopleIds = sharePhotoContent.getPeopleIds();
+            if (!Utility.isNullOrEmpty((Collection<T>) peopleIds)) {
                 JSONArray jSONArray = new JSONArray();
                 for (String str : peopleIds) {
                     JSONObject jSONObject = new JSONObject();
@@ -117,14 +106,15 @@ public final class ShareApi {
                 parameters.putString("tags", jSONArray.toString());
             }
         }
-        if (!(parameters.containsKey("ref") || Utility.isNullOrEmpty(sharePhotoContent.getRef()))) {
+        if (!parameters.containsKey("ref") && !Utility.isNullOrEmpty(sharePhotoContent.getRef())) {
             parameters.putString("ref", sharePhotoContent.getRef());
         }
         return parameters;
     }
 
-    private static void handleImagesOnAction(Bundle bundle) {
-        String string = bundle.getString("image");
+    /* access modifiers changed from: private */
+    public static void handleImagesOnAction(Bundle bundle) {
+        String string = bundle.getString(MessengerShareContentUtility.MEDIA_IMAGE);
         if (string != null) {
             try {
                 JSONArray jSONArray = new JSONArray(string);
@@ -136,11 +126,11 @@ public final class ShareApi {
                         bundle.putString(String.format(Locale.ROOT, "image[%d][url]", new Object[]{Integer.valueOf(i)}), jSONArray.getString(i));
                     }
                 }
-                bundle.remove("image");
+                bundle.remove(MessengerShareContentUtility.MEDIA_IMAGE);
             } catch (JSONException e) {
                 try {
                     putImageInBundleWithArrayFormat(bundle, 0, new JSONObject(string));
-                    bundle.remove("image");
+                    bundle.remove(MessengerShareContentUtility.MEDIA_IMAGE);
                 } catch (JSONException e2) {
                 }
             }
@@ -150,17 +140,17 @@ public final class ShareApi {
     private static void putImageInBundleWithArrayFormat(Bundle bundle, int i, JSONObject jSONObject) throws JSONException {
         Iterator keys = jSONObject.keys();
         while (keys.hasNext()) {
-            Object[] objArr = new Object[]{Integer.valueOf(i), (String) keys.next()};
-            bundle.putString(String.format(Locale.ROOT, "image[%d][%s]", objArr), jSONObject.get((String) keys.next()).toString());
+            String str = (String) keys.next();
+            bundle.putString(String.format(Locale.ROOT, "image[%d][%s]", new Object[]{Integer.valueOf(i), str}), jSONObject.get(str).toString());
         }
     }
 
-    public static void share(ShareContent shareContent, FacebookCallback<Result> facebookCallback) {
-        new ShareApi(shareContent).share(facebookCallback);
+    public static void share(ShareContent shareContent2, FacebookCallback<Result> facebookCallback) {
+        new ShareApi(shareContent2).share(facebookCallback);
     }
 
     private void shareLinkContent(ShareLinkContent shareLinkContent, final FacebookCallback<Result> facebookCallback) {
-        Callback c04644 = new Callback() {
+        C07524 r5 = new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
                 JSONObject jSONObject = graphResponse.getJSONObject();
                 ShareInternalUtility.invokeCallbackWithResults(facebookCallback, jSONObject == null ? null : jSONObject.optString("id"), graphResponse);
@@ -174,11 +164,11 @@ public final class ShareApi {
         bundle.putString("name", shareLinkContent.getContentTitle());
         bundle.putString("description", shareLinkContent.getContentDescription());
         bundle.putString("ref", shareLinkContent.getRef());
-        new GraphRequest(AccessToken.getCurrentAccessToken(), getGraphPath("feed"), bundle, HttpMethod.POST, c04644).executeAsync();
+        new GraphRequest(AccessToken.getCurrentAccessToken(), getGraphPath("feed"), bundle, HttpMethod.POST, r5).executeAsync();
     }
 
     private void shareOpenGraphContent(ShareOpenGraphContent shareOpenGraphContent, final FacebookCallback<Result> facebookCallback) {
-        final Callback c04611 = new Callback() {
+        final C07461 r4 = new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
                 JSONObject jSONObject = graphResponse.getJSONObject();
                 ShareInternalUtility.invokeCallbackWithResults(facebookCallback, jSONObject == null ? null : jSONObject.optString("id"), graphResponse);
@@ -195,8 +185,8 @@ public final class ShareApi {
             public void onComplete() {
                 try {
                     ShareApi.handleImagesOnAction(bundle);
-                    new GraphRequest(AccessToken.getCurrentAccessToken(), ShareApi.this.getGraphPath(URLEncoder.encode(action.getActionType(), "UTF-8")), bundle, HttpMethod.POST, c04611).executeAsync();
-                } catch (Exception e) {
+                    new GraphRequest(AccessToken.getCurrentAccessToken(), ShareApi.this.getGraphPath(URLEncoder.encode(action.getActionType(), "UTF-8")), bundle, HttpMethod.POST, r4).executeAsync();
+                } catch (UnsupportedEncodingException e) {
                     ShareInternalUtility.invokeCallbackWithException(facebookCallback2, e);
                 }
             }
@@ -214,7 +204,7 @@ public final class ShareApi {
         final ArrayList arrayList2 = new ArrayList();
         final ArrayList arrayList3 = new ArrayList();
         final FacebookCallback<Result> facebookCallback2 = facebookCallback;
-        C04633 c04633 = new Callback() {
+        C07513 r0 = new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
                 JSONObject jSONObject = graphResponse.getJSONObject();
                 if (jSONObject != null) {
@@ -245,11 +235,11 @@ public final class ShareApi {
                         caption = getMessage();
                     }
                     if (bitmap != null) {
-                        arrayList.add(GraphRequest.newUploadPhotoRequest(currentAccessToken, getGraphPath(PHOTOS_EDGE), bitmap, caption, sharePhotoCommonParameters, (Callback) c04633));
+                        arrayList.add(GraphRequest.newUploadPhotoRequest(currentAccessToken, getGraphPath("photos"), bitmap, caption, sharePhotoCommonParameters, (Callback) r0));
                     } else if (imageUrl != null) {
-                        arrayList.add(GraphRequest.newUploadPhotoRequest(currentAccessToken, getGraphPath(PHOTOS_EDGE), imageUrl, caption, sharePhotoCommonParameters, (Callback) c04633));
+                        arrayList.add(GraphRequest.newUploadPhotoRequest(currentAccessToken, getGraphPath("photos"), imageUrl, caption, sharePhotoCommonParameters, (Callback) r0));
                     }
-                } catch (Exception e) {
+                } catch (JSONException e) {
                     ShareInternalUtility.invokeCallbackWithException(facebookCallback, e);
                     return;
                 }
@@ -259,7 +249,7 @@ public final class ShareApi {
             while (it.hasNext()) {
                 ((GraphRequest) it.next()).executeAsync();
             }
-        } catch (Exception e2) {
+        } catch (FileNotFoundException e2) {
             ShareInternalUtility.invokeCallbackWithException(facebookCallback, e2);
         }
     }
@@ -267,12 +257,13 @@ public final class ShareApi {
     private void shareVideoContent(ShareVideoContent shareVideoContent, FacebookCallback<Result> facebookCallback) {
         try {
             VideoUploader.uploadAsync(shareVideoContent, getGraphNode(), facebookCallback);
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             ShareInternalUtility.invokeCallbackWithException(facebookCallback, e);
         }
     }
 
-    private void stageArrayList(final ArrayList arrayList, final OnMapValueCompleteListener onMapValueCompleteListener) {
+    /* access modifiers changed from: private */
+    public void stageArrayList(final ArrayList arrayList, final OnMapValueCompleteListener onMapValueCompleteListener) {
         final JSONArray jSONArray = new JSONArray();
         stageCollectionValues(new CollectionMapper.Collection<Integer>() {
             public Object get(Integer num) {
@@ -322,7 +313,19 @@ public final class ShareApi {
     }
 
     private <T> void stageCollectionValues(CollectionMapper.Collection<T> collection, OnMapperCompleteListener onMapperCompleteListener) {
-        CollectionMapper.iterate(collection, new C04687(), onMapperCompleteListener);
+        CollectionMapper.iterate(collection, new ValueMapper() {
+            public void mapValue(Object obj, OnMapValueCompleteListener onMapValueCompleteListener) {
+                if (obj instanceof ArrayList) {
+                    ShareApi.this.stageArrayList((ArrayList) obj, onMapValueCompleteListener);
+                } else if (obj instanceof ShareOpenGraphObject) {
+                    ShareApi.this.stageOpenGraphObject((ShareOpenGraphObject) obj, onMapValueCompleteListener);
+                } else if (obj instanceof SharePhoto) {
+                    ShareApi.this.stagePhoto((SharePhoto) obj, onMapValueCompleteListener);
+                } else {
+                    onMapValueCompleteListener.onComplete(obj);
+                }
+            }
+        }, onMapperCompleteListener);
     }
 
     private void stageOpenGraphAction(final Bundle bundle, OnMapperCompleteListener onMapperCompleteListener) {
@@ -343,8 +346,9 @@ public final class ShareApi {
         }, onMapperCompleteListener);
     }
 
-    private void stageOpenGraphObject(final ShareOpenGraphObject shareOpenGraphObject, final OnMapValueCompleteListener onMapValueCompleteListener) {
-        String string = shareOpenGraphObject.getString(ShareConstants.MEDIA_TYPE);
+    /* access modifiers changed from: private */
+    public void stageOpenGraphObject(final ShareOpenGraphObject shareOpenGraphObject, final OnMapValueCompleteListener onMapValueCompleteListener) {
+        final String string = shareOpenGraphObject.getString("type");
         if (string == null) {
             string = shareOpenGraphObject.getString("og:type");
         }
@@ -353,7 +357,7 @@ public final class ShareApi {
             return;
         }
         final JSONObject jSONObject = new JSONObject();
-        CollectionMapper.Collection c04709 = new CollectionMapper.Collection<String>() {
+        C07589 r6 = new CollectionMapper.Collection<String>() {
             public Object get(String str) {
                 return shareOpenGraphObject.get(str);
             }
@@ -374,12 +378,11 @@ public final class ShareApi {
                 }
             }
         };
-        final Callback anonymousClass10 = new Callback() {
+        final C074710 r4 = new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
                 FacebookRequestError error = graphResponse.getError();
-                String errorMessage;
                 if (error != null) {
-                    errorMessage = error.getErrorMessage();
+                    String errorMessage = error.getErrorMessage();
                     if (errorMessage == null) {
                         errorMessage = "Error staging Open Graph object.";
                     }
@@ -391,28 +394,28 @@ public final class ShareApi {
                     onMapValueCompleteListener.onError(new FacebookGraphResponseException(graphResponse, "Error staging Open Graph object."));
                     return;
                 }
-                errorMessage = jSONObject.optString("id");
-                if (errorMessage == null) {
+                String optString = jSONObject.optString("id");
+                if (optString == null) {
                     onMapValueCompleteListener.onError(new FacebookGraphResponseException(graphResponse, "Error staging Open Graph object."));
                 } else {
-                    onMapValueCompleteListener.onComplete(errorMessage);
+                    onMapValueCompleteListener.onComplete(optString);
                 }
             }
         };
         final OnMapValueCompleteListener onMapValueCompleteListener2 = onMapValueCompleteListener;
-        stageCollectionValues(c04709, new OnMapperCompleteListener() {
+        stageCollectionValues(r6, new OnMapperCompleteListener() {
             public void onComplete() {
                 String jSONObject = jSONObject.toString();
                 Bundle bundle = new Bundle();
                 bundle.putString("object", jSONObject);
                 try {
-                    new GraphRequest(AccessToken.getCurrentAccessToken(), ShareApi.this.getGraphPath("objects/" + URLEncoder.encode(string, "UTF-8")), bundle, HttpMethod.POST, anonymousClass10).executeAsync();
+                    new GraphRequest(AccessToken.getCurrentAccessToken(), ShareApi.this.getGraphPath("objects/" + URLEncoder.encode(string, "UTF-8")), bundle, HttpMethod.POST, r4).executeAsync();
                 } catch (UnsupportedEncodingException e) {
-                    jSONObject = e.getLocalizedMessage();
-                    if (jSONObject == null) {
-                        jSONObject = "Error staging Open Graph object.";
+                    String localizedMessage = e.getLocalizedMessage();
+                    if (localizedMessage == null) {
+                        localizedMessage = "Error staging Open Graph object.";
                     }
-                    onMapValueCompleteListener2.onError(new FacebookException(jSONObject));
+                    onMapValueCompleteListener2.onError(new FacebookException(localizedMessage));
                 }
             }
 
@@ -422,19 +425,19 @@ public final class ShareApi {
         });
     }
 
-    private void stagePhoto(final SharePhoto sharePhoto, final OnMapValueCompleteListener onMapValueCompleteListener) {
+    /* access modifiers changed from: private */
+    public void stagePhoto(final SharePhoto sharePhoto, final OnMapValueCompleteListener onMapValueCompleteListener) {
         Bitmap bitmap = sharePhoto.getBitmap();
         Uri imageUrl = sharePhoto.getImageUrl();
         if (bitmap == null && imageUrl == null) {
             onMapValueCompleteListener.onError(new FacebookException("Photos must have an imageURL or bitmap."));
             return;
         }
-        Callback anonymousClass12 = new Callback() {
+        C074912 r2 = new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
                 FacebookRequestError error = graphResponse.getError();
-                String errorMessage;
                 if (error != null) {
-                    errorMessage = error.getErrorMessage();
+                    String errorMessage = error.getErrorMessage();
                     if (errorMessage == null) {
                         errorMessage = "Error staging photo.";
                     }
@@ -446,31 +449,31 @@ public final class ShareApi {
                     onMapValueCompleteListener.onError(new FacebookException("Error staging photo."));
                     return;
                 }
-                errorMessage = jSONObject.optString(ShareConstants.MEDIA_URI);
-                if (errorMessage == null) {
+                String optString = jSONObject.optString(ShareConstants.MEDIA_URI);
+                if (optString == null) {
                     onMapValueCompleteListener.onError(new FacebookException("Error staging photo."));
                     return;
                 }
                 JSONObject jSONObject2 = new JSONObject();
                 try {
-                    jSONObject2.put("url", errorMessage);
+                    jSONObject2.put("url", optString);
                     jSONObject2.put(NativeProtocol.IMAGE_USER_GENERATED_KEY, sharePhoto.getUserGenerated());
                     onMapValueCompleteListener.onComplete(jSONObject2);
                 } catch (JSONException e) {
-                    errorMessage = e.getLocalizedMessage();
-                    if (errorMessage == null) {
-                        errorMessage = "Error staging photo.";
+                    String localizedMessage = e.getLocalizedMessage();
+                    if (localizedMessage == null) {
+                        localizedMessage = "Error staging photo.";
                     }
-                    onMapValueCompleteListener.onError(new FacebookException(errorMessage));
+                    onMapValueCompleteListener.onError(new FacebookException(localizedMessage));
                 }
             }
         };
         if (bitmap != null) {
-            ShareInternalUtility.newUploadStagingResourceWithImageRequest(AccessToken.getCurrentAccessToken(), bitmap, anonymousClass12).executeAsync();
+            ShareInternalUtility.newUploadStagingResourceWithImageRequest(AccessToken.getCurrentAccessToken(), bitmap, (Callback) r2).executeAsync();
             return;
         }
         try {
-            ShareInternalUtility.newUploadStagingResourceWithImageRequest(AccessToken.getCurrentAccessToken(), imageUrl, anonymousClass12).executeAsync();
+            ShareInternalUtility.newUploadStagingResourceWithImageRequest(AccessToken.getCurrentAccessToken(), imageUrl, (Callback) r2).executeAsync();
         } catch (FileNotFoundException e) {
             String localizedMessage = e.getLocalizedMessage();
             if (localizedMessage == null) {
@@ -485,7 +488,7 @@ public final class ShareApi {
             return false;
         }
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
-        if (currentAccessToken == null) {
+        if (!AccessToken.isCurrentAccessTokenActive()) {
             return false;
         }
         Set permissions = currentAccessToken.getPermissions();
@@ -516,30 +519,24 @@ public final class ShareApi {
     }
 
     public void share(FacebookCallback<Result> facebookCallback) {
-        if (canShare()) {
-            ShareContent shareContent = getShareContent();
-            try {
-                ShareContentValidation.validateForApiShare(shareContent);
-                if (shareContent instanceof ShareLinkContent) {
-                    shareLinkContent((ShareLinkContent) shareContent, facebookCallback);
-                    return;
-                } else if (shareContent instanceof SharePhotoContent) {
-                    sharePhotoContent((SharePhotoContent) shareContent, facebookCallback);
-                    return;
-                } else if (shareContent instanceof ShareVideoContent) {
-                    shareVideoContent((ShareVideoContent) shareContent, facebookCallback);
-                    return;
-                } else if (shareContent instanceof ShareOpenGraphContent) {
-                    shareOpenGraphContent((ShareOpenGraphContent) shareContent, facebookCallback);
-                    return;
-                } else {
-                    return;
-                }
-            } catch (Exception e) {
-                ShareInternalUtility.invokeCallbackWithException(facebookCallback, e);
-                return;
-            }
+        if (!canShare()) {
+            ShareInternalUtility.invokeCallbackWithError(facebookCallback, "Insufficient permissions for sharing content via Api.");
+            return;
         }
-        ShareInternalUtility.invokeCallbackWithError(facebookCallback, "Insufficient permissions for sharing content via Api.");
+        ShareContent shareContent2 = getShareContent();
+        try {
+            ShareContentValidation.validateForApiShare(shareContent2);
+            if (shareContent2 instanceof ShareLinkContent) {
+                shareLinkContent((ShareLinkContent) shareContent2, facebookCallback);
+            } else if (shareContent2 instanceof SharePhotoContent) {
+                sharePhotoContent((SharePhotoContent) shareContent2, facebookCallback);
+            } else if (shareContent2 instanceof ShareVideoContent) {
+                shareVideoContent((ShareVideoContent) shareContent2, facebookCallback);
+            } else if (shareContent2 instanceof ShareOpenGraphContent) {
+                shareOpenGraphContent((ShareOpenGraphContent) shareContent2, facebookCallback);
+            }
+        } catch (FacebookException e) {
+            ShareInternalUtility.invokeCallbackWithException(facebookCallback, e);
+        }
     }
 }

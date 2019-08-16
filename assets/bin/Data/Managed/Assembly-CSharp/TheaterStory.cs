@@ -32,7 +32,6 @@ public class TheaterStory : GameSection
 
 	public override void Initialize()
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		m_canViewStoryList = (array[0] as List<TheaterModeTable.TheaterModeData>);
 		m_chapterName = (array[1] as string);
@@ -58,28 +57,16 @@ public class TheaterStory : GameSection
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)null;
+		yield return null;
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Expected O, but got Unknown
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Expected O, but got Unknown
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Expected O, but got Unknown
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Expected O, but got Unknown
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+		string goingHomeEvent = GameSection.GetGoingHomeEvent();
 		EventData[] events = new EventData[4]
 		{
-			new EventData(name, null),
+			new EventData(goingHomeEvent, null),
 			new EventData("MAIN_MENU_MENU", null),
 			new EventData("THEATERMODE", null),
 			new EventData("STORY", new object[2]
@@ -90,13 +77,13 @@ public class TheaterStory : GameSection
 		};
 		if (m_canViewStoryList.Count > 0)
 		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, false);
+			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, is_visible: false);
 		}
 		else
 		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, true);
+			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, is_visible: true);
 		}
-		SetActive(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, true);
+		SetActive(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, is_visible: true);
 		SetLabelText(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, m_chapterName);
 		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
 		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
@@ -114,9 +101,9 @@ public class TheaterStory : GameSection
 			}
 			dispList = list;
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList((Enum)UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, reset: true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
-			SetActive(t, UI.LBL_STORY_TITLE, true);
+			SetActive(t, UI.LBL_STORY_TITLE, is_visible: true);
 			SetLabelText(t, UI.LBL_STORY_TITLE, dispList[i].title);
 			SetEvent(t, "PLAY_STORY", new object[4]
 			{
@@ -158,14 +145,14 @@ public class TheaterStory : GameSection
 		List<TheaterModeTable.TheaterModeData> canViewStoryList = m_canViewStoryList;
 		if (canViewStoryList.Count <= 10)
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
 			m_pageMax = 1;
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, true);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, false);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: true);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: false);
 			m_pageMax = canViewStoryList.Count / 10 + 1;
 		}
 		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());

@@ -1,7 +1,8 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import com.facebook.internal.ServerProtocol;
 
+/* renamed from: jp.colopl.drapro.BuildConfig */
 public final class BuildConfig {
     public static final String APPLICATION_ID = "jp.colopl.drapro";
     public static final String BUILD_TYPE = "debug";

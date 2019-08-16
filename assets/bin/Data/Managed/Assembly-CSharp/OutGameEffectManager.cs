@@ -39,13 +39,13 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 	{
 		LoadingQueue load_queue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
-		touchEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_tap_01", false);
-		moveEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_downenergy_01", false);
-		silhouetteEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_01", false);
+		touchEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_tap_01");
+		moveEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_downenergy_01");
+		silhouetteEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_01");
 		ResourceManager.enableCache = true;
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
@@ -57,7 +57,7 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 	private unsafe void OnDestroy()
 	{
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
 			InputManager.OnTouchOnAlways = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnTouchOnAlways, new InputManager.OnTouchDelegate(OnTouchOn));
@@ -87,8 +87,6 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 	public void PopTouchEffect(Vector3 pos)
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Expected O, but got Unknown
 		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		lastTouchEffectPos = pos;
 		if (touchEffectPrefab != null && !(touchEffectPrefab.loadedObject == null) && effectCount < 5)
@@ -101,10 +99,7 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	public void ShowAutoEventEffect()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		if (!(autoEventEffect != null))
 		{
 			autoEventEffect = ResourceUtility.Realizes(moveEffectPrefab.loadedObject, MonoBehaviourSingleton<UIManager>.I.uiCamera.get_transform(), 5);
@@ -116,18 +111,15 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	public void HideAutoEventEffect()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		if (!(autoEventEffect == null))
 		{
-			EffectManager.ReleaseEffect(autoEventEffect.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(autoEventEffect.get_gameObject());
 			autoEventEffect = null;
 		}
 	}
 
 	public Coroutine MoveAutoEventEffect(Vector3 to)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
@@ -160,7 +152,6 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	public void ShowSilhoutteffect(Transform t, int layer)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		if (!(silhouetteEffect != null))
 		{
@@ -171,11 +162,9 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	public void HideSilhoutteEffect()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		if (!(silhouetteEffect == null))
 		{
-			EffectManager.ReleaseEffect(silhouetteEffect.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(silhouetteEffect.get_gameObject());
 			silhouetteEffect = null;
 		}
 	}
@@ -190,11 +179,9 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	public void ReleaseSceneButtonEffect()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		if (!(sceneButtonEffect == null))
 		{
-			EffectManager.ReleaseEffect(sceneButtonEffect.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(sceneButtonEffect.get_gameObject());
 			sceneButtonEffect = null;
 			sceneNow = MAIN_SCENE.MAX;
 		}

@@ -51,7 +51,8 @@ public final class Excluder implements TypeAdapterFactory, Cloneable {
         return isValidSince(since) && isValidUntil(until);
     }
 
-    protected Excluder clone() {
+    /* access modifiers changed from: protected */
+    public Excluder clone() {
         try {
             return (Excluder) super.clone();
         } catch (CloneNotSupportedException e) {
@@ -76,9 +77,9 @@ public final class Excluder implements TypeAdapterFactory, Cloneable {
                 if (typeAdapter != null) {
                     return typeAdapter;
                 }
-                typeAdapter = gson2.getDelegateAdapter(Excluder.this, typeToken2);
-                this.delegate = typeAdapter;
-                return typeAdapter;
+                TypeAdapter<T> delegateAdapter = gson2.getDelegateAdapter(Excluder.this, typeToken2);
+                this.delegate = delegateAdapter;
+                return delegateAdapter;
             }
 
             public T read(JsonReader jsonReader) throws IOException {
@@ -135,7 +136,7 @@ public final class Excluder implements TypeAdapterFactory, Cloneable {
         }
         if (this.requireExpose) {
             Expose expose = (Expose) field.getAnnotation(Expose.class);
-            if (expose == null || (z ? !expose.serialize() : !expose.deserialize())) {
+            if (expose == null || (!z ? !expose.deserialize() : !expose.serialize())) {
                 return true;
             }
         }
@@ -177,13 +178,10 @@ public final class Excluder implements TypeAdapterFactory, Cloneable {
     }
 
     public Excluder withModifiers(int... iArr) {
-        int i = 0;
         Excluder clone = clone();
         clone.modifiers = 0;
-        int length = iArr.length;
-        while (i < length) {
-            clone.modifiers = iArr[i] | clone.modifiers;
-            i++;
+        for (int i : iArr) {
+            clone.modifiers = i | clone.modifiers;
         }
         return clone;
     }

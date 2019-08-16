@@ -1,8 +1,8 @@
 public class MetaAI
 {
-	private const int kPlayerNum = 4;
+	private const int kPlayerNum = 8;
 
-	private Player[] deadPlayer = new Player[4];
+	private Player[] needRescuePlayer = new Player[8];
 
 	public void Update()
 	{
@@ -11,55 +11,73 @@ public class MetaAI
 
 	private void WatchingPlayer()
 	{
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			deadPlayer[i] = null;
+			needRescuePlayer[i] = null;
 		}
 		int num = 0;
-		int num2 = 3;
+		int num2 = 7;
 		bool flag = false;
 		int j = 0;
 		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; j < count; j++)
 		{
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[j] as Player;
-			if (!object.ReferenceEquals(player, null) && player.isDead && !player.isPrayer && player.rescueTime > 0f)
+			if (object.ReferenceEquals(player, null))
+			{
+				continue;
+			}
+			bool flag2 = false;
+			if (!player.IsPrayed())
+			{
+				if (player.isDead && !player.isWaitingResurrectionHoming && player.rescueTime > 0f)
+				{
+					flag2 = true;
+				}
+				if (player.IsStone() && player.stoneRescueTime > 0f)
+				{
+					flag2 = true;
+				}
+			}
+			if (flag2)
 			{
 				if (player.isNpc)
 				{
-					deadPlayer[num2--] = player;
+					needRescuePlayer[num2--] = player;
 				}
 				else
 				{
-					deadPlayer[num++] = player;
+					needRescuePlayer[num++] = player;
 				}
 				flag = true;
 			}
 		}
-		if (flag)
+		if (!flag)
 		{
-			for (int k = 0; k < 4; k++)
+			return;
+		}
+		for (int k = 0; k < 8; k++)
+		{
+			if (!object.ReferenceEquals(needRescuePlayer[k], null))
 			{
-				if (!object.ReferenceEquals(deadPlayer[k], null))
-				{
-					OnRaisePlayer(deadPlayer[k]);
-				}
+				OnRescuePlayer(needRescuePlayer[k]);
 			}
 		}
 	}
 
-	private void OnRaisePlayer(Player dead_player)
+	private void OnRescuePlayer(Player dead_player)
 	{
 		NonPlayer nearestAliveNpc = AIUtility.GetNearestAliveNpc(dead_player);
-		if (!(nearestAliveNpc == null) && !(nearestAliveNpc.controller == null))
+		if (nearestAliveNpc == null || nearestAliveNpc.controller == null)
 		{
-			Brain brain = nearestAliveNpc.controller.brain;
-			if (!(brain == null) && brain.think != null)
+			return;
+		}
+		Brain brain = nearestAliveNpc.controller.brain;
+		if (!(brain == null) && brain.think != null)
+		{
+			brain.targetCtrl.SetAllyTarget(dead_player);
+			if (brain.fsm != null)
 			{
-				brain.targetCtrl.SetAllyTarget(dead_player);
-				if (brain.fsm != null)
-				{
-					brain.fsm.ChangeState(STATE_TYPE.RAISE_ALLY);
-				}
+				brain.fsm.ChangeState(STATE_TYPE.RAISE_ALLY);
 			}
 		}
 	}

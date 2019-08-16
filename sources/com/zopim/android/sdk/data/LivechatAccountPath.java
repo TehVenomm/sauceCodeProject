@@ -1,7 +1,10 @@
 package com.zopim.android.sdk.data;
 
 import android.util.Log;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zopim.android.sdk.model.Account;
+import java.io.IOException;
 
 public class LivechatAccountPath extends Path<Account> {
     private static final LivechatAccountPath INSTANCE = new LivechatAccountPath();
@@ -19,7 +22,8 @@ public class LivechatAccountPath extends Path<Account> {
         return livechatAccountPath;
     }
 
-    void clear() {
+    /* access modifiers changed from: 0000 */
+    public void clear() {
         this.mData = null;
     }
 
@@ -27,19 +31,20 @@ public class LivechatAccountPath extends Path<Account> {
         return (Account) this.mData;
     }
 
-    void update(String str) {
+    /* access modifiers changed from: 0000 */
+    public void update(String str) {
         if (isClearRequired(str)) {
             clear();
         } else if (!str.isEmpty()) {
             synchronized (this.mLock) {
                 if (this.mData == null) {
-                    this.mData = this.PARSER.parse(str, new C0864b(this));
+                    this.mData = this.PARSER.parse(str, (TypeReference<T>) new C1233b<T>(this));
                 } else {
                     try {
                         this.mData = (Account) this.PARSER.getMapper().readerForUpdating(this.mData).readValue(str);
-                    } catch (Throwable e) {
+                    } catch (JsonProcessingException e) {
                         Log.w(TAG, "Failed to process json. Account could not be updated.", e);
-                    } catch (Throwable e2) {
+                    } catch (IOException e2) {
                         Log.w(TAG, "IO error. Account could not be updated.", e2);
                     }
                 }

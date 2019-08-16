@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UICenterOnChildCtrl
+public class UICenterOnChildCtrl : MonoBehaviour
 {
 	public UICenterOnChild.OnCenterCallback onCenter;
 
@@ -55,16 +55,13 @@ public class UICenterOnChildCtrl
 		}
 		if (reserveTarget != null)
 		{
-			Centering(reserveTarget, true);
+			Centering(reserveTarget, is_instant: true);
 			reserveTarget = null;
 		}
 	}
 
 	private void OnCenter(GameObject go)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		if (go.get_transform() != lastTarget)
 		{
 			lastTarget = go.get_transform();
@@ -89,15 +86,13 @@ public class UICenterOnChildCtrl
 		if (centerOnChild == null)
 		{
 			reserveTarget = target;
+			return;
 		}
-		else
+		if (is_instant)
 		{
-			if (is_instant)
-			{
-				centerOnChild.springStrength = 99999f;
-				lastTarget = null;
-			}
-			centerOnChild.CenterOn(target);
+			centerOnChild.springStrength = 99999f;
+			lastTarget = null;
 		}
+		centerOnChild.CenterOn(target);
 	}
 }

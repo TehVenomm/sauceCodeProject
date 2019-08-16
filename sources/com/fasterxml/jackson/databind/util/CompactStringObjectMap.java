@@ -66,11 +66,11 @@ public final class CompactStringObjectMap implements Serializable {
     public Object find(String str) {
         int hashCode = str.hashCode() & this._hashMask;
         int i = hashCode << 1;
-        String str2 = this._hashArea[i];
-        if (str2 == str || str.equals(str2)) {
+        Object obj = this._hashArea[i];
+        if (obj == str || str.equals(obj)) {
             return this._hashArea[i + 1];
         }
-        return _find2(str, hashCode, str2);
+        return _find2(str, hashCode, obj);
     }
 
     private final Object _find2(String str, int i, Object obj) {
@@ -86,21 +86,21 @@ public final class CompactStringObjectMap implements Serializable {
         if (obj2 == null) {
             return null;
         }
-        i2 = (i2 + (i2 >> 1)) << 1;
-        i3 = this._spillCount + i2;
-        while (i2 < i3) {
-            String str2 = this._hashArea[i2];
-            if (str2 == str || str.equals(str2)) {
-                return this._hashArea[i2 + 1];
+        int i4 = (i2 + (i2 >> 1)) << 1;
+        int i5 = this._spillCount + i4;
+        while (i4 < i5) {
+            Object obj3 = this._hashArea[i4];
+            if (obj3 == str || str.equals(obj3)) {
+                return this._hashArea[i4 + 1];
             }
-            i2 += 2;
+            i4 += 2;
         }
         return null;
     }
 
     public List<String> keys() {
         int length = this._hashArea.length;
-        List<String> arrayList = new ArrayList(length >> 2);
+        ArrayList arrayList = new ArrayList(length >> 2);
         for (int i = 0; i < length; i += 2) {
             Object obj = this._hashArea[i];
             if (obj != null) {

@@ -1,5 +1,15 @@
 public static class SpAttackTypeExtension
 {
+	private const int ITEM_ICON_BG_ID_DEFAULT = 90000100;
+
+	private const int ITEM_ICON_BG_ID_HEAT = 90000107;
+
+	private const int ITEM_ICON_BG_ID_SOUL = 90000108;
+
+	private const int ITEM_ICON_BG_ID_BURST = 90000109;
+
+	private const int ITEM_ICON_BG_ID_ORACLE = 90000110;
+
 	public static string GetName(this SP_ATTACK_TYPE type)
 	{
 		return StringTable.Get(STRING_CATEGORY.SP_ATTACK_TYPE, (uint)type);
@@ -15,6 +25,10 @@ public static class SpAttackTypeExtension
 			return "SpAttackType_Frame_heat";
 		case SP_ATTACK_TYPE.SOUL:
 			return "SpAttackType_Frame_soul";
+		case SP_ATTACK_TYPE.BURST:
+			return "SpAttackType_Frame_burst";
+		case SP_ATTACK_TYPE.ORACLE:
+			return "SpAttackType_Frame_oracle";
 		}
 	}
 
@@ -28,6 +42,10 @@ public static class SpAttackTypeExtension
 			return "SpAttackType_smallFrame_heat";
 		case SP_ATTACK_TYPE.SOUL:
 			return "SpAttackType_smallFrame_soul";
+		case SP_ATTACK_TYPE.BURST:
+			return "SpAttackType_smallFrame_burst";
+		case SP_ATTACK_TYPE.ORACLE:
+			return "SpAttackType_smallFrame_oracle";
 		}
 	}
 
@@ -41,6 +59,10 @@ public static class SpAttackTypeExtension
 			return "EquipRemodelingTxt_04";
 		case SP_ATTACK_TYPE.SOUL:
 			return "EquipRemodelingTxt_05";
+		case SP_ATTACK_TYPE.BURST:
+			return "EquipRemodelingTxt_06";
+		case SP_ATTACK_TYPE.ORACLE:
+			return "EquipRemodelingTxt_07";
 		}
 	}
 
@@ -54,6 +76,10 @@ public static class SpAttackTypeExtension
 			return 90000107;
 		case SP_ATTACK_TYPE.SOUL:
 			return 90000108;
+		case SP_ATTACK_TYPE.BURST:
+			return 90000109;
+		case SP_ATTACK_TYPE.ORACLE:
+			return 90000110;
 		}
 	}
 }

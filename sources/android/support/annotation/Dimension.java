@@ -10,9 +10,15 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.CLASS)
 public @interface Dimension {
-    public static final int DP = 0;
-    public static final int PX = 1;
-    public static final int SP = 2;
+
+    /* renamed from: DP */
+    public static final int f0DP = 0;
+
+    /* renamed from: PX */
+    public static final int f1PX = 1;
+
+    /* renamed from: SP */
+    public static final int f2SP = 2;
 
     int unit() default 1;
 }

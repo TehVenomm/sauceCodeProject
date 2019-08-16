@@ -4,11 +4,11 @@ import com.google.android.gms.games.GamesStatusCodes;
 
 public class BufferRecycler {
     public static final int BYTE_BASE64_CODEC_BUFFER = 3;
-    private static final int[] BYTE_BUFFER_LENGTHS = new int[]{8000, 8000, 2000, 2000};
+    private static final int[] BYTE_BUFFER_LENGTHS = {8000, 8000, 2000, 2000};
     public static final int BYTE_READ_IO_BUFFER = 0;
     public static final int BYTE_WRITE_CONCAT_BUFFER = 2;
     public static final int BYTE_WRITE_ENCODING_BUFFER = 1;
-    private static final int[] CHAR_BUFFER_LENGTHS = new int[]{GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND, GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND, 200, 200};
+    private static final int[] CHAR_BUFFER_LENGTHS = {GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND, GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND, 200, 200};
     public static final int CHAR_CONCAT_BUFFER = 1;
     public static final int CHAR_NAME_COPY_BUFFER = 3;
     public static final int CHAR_TEXT_BUFFER = 2;
@@ -67,19 +67,23 @@ public class BufferRecycler {
         this._charBuffers[i] = cArr;
     }
 
-    protected int byteBufferLength(int i) {
+    /* access modifiers changed from: protected */
+    public int byteBufferLength(int i) {
         return BYTE_BUFFER_LENGTHS[i];
     }
 
-    protected int charBufferLength(int i) {
+    /* access modifiers changed from: protected */
+    public int charBufferLength(int i) {
         return CHAR_BUFFER_LENGTHS[i];
     }
 
-    protected byte[] balloc(int i) {
+    /* access modifiers changed from: protected */
+    public byte[] balloc(int i) {
         return new byte[i];
     }
 
-    protected char[] calloc(int i) {
+    /* access modifiers changed from: protected */
+    public char[] calloc(int i) {
         return new char[i];
     }
 }

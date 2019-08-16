@@ -12,6 +12,8 @@ public class ChatOfflineConnection : IChatConnection
 
 	public event ChatRoom.OnReceiveNotification onReceiveNotification;
 
+	public event ChatRoom.OnAfterSendUserMessage onAfterSendUserMessage;
+
 	public event ChatRoom.OnDisconnect onDisconnect;
 
 	public void Connect()

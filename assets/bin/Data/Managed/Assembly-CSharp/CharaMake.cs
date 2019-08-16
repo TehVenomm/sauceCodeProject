@@ -51,9 +51,13 @@ public class CharaMake : GameSection
 		BTN_LIST_PREV,
 		BTN_LIST_NEXT,
 		LBL_LISTITEM,
+		BTN_VISIBLE_EQUIP,
+		BTN_INVISIBLE_EQUIP,
+		TGL_VISIBLE_EQUIP_BUTTON,
 		OBJ_INPUT_NAME_GG,
 		IPT_NAME_GG,
-		SelectGender
+		SelectGender,
+		BTN_BACK
 	}
 
 	private enum PAGE
@@ -99,8 +103,6 @@ public class CharaMake : GameSection
 	public const int STRING_TABLE_PRESET_PLAYER_NAME_ID_TOP = 40000;
 
 	public const int STRING_TABLE_SEX_OFFSET_ID = 1000;
-
-	private const int MAX_SHOW_COLOR_ITEM_COUNT = 12;
 
 	private Vector3 mainCameraPos;
 
@@ -151,6 +153,10 @@ public class CharaMake : GameSection
 	private string defaultUserName = string.Empty;
 
 	private bool isTermsEnable;
+
+	private const int MAX_SHOW_COLOR_ITEM_COUNT = 12;
+
+	private bool isShowMyEquip;
 
 	private EDIT_TYPE editType;
 
@@ -249,7 +255,6 @@ public class CharaMake : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -258,7 +263,7 @@ public class CharaMake : GameSection
 		editType = EDIT_TYPE.All;
 		if (event_data != null && event_data.Length > 2)
 		{
-			editType = (EDIT_TYPE)(int)event_data[2];
+			editType = (EDIT_TYPE)event_data[2];
 		}
 	}
 
@@ -268,30 +273,43 @@ public class CharaMake : GameSection
 		{
 			while (MonoBehaviourSingleton<PredownloadManager>.I.isLoading)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			Object.Destroy(MonoBehaviourSingleton<PredownloadManager>.I);
 		}
-		int m = 0;
-		for (int l = lists.Length; m < l; m++)
+		int i = 0;
+		for (int num = lists.Length; i < num; i++)
 		{
-			lists[m] = new ListInfo();
+			lists[i] = new ListInfo();
+		}
+		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedCharaMakeModelAnchor)
+		{
+			UIWidget component = base.GetComponent<UIWidget>((Enum)UI.TEX_MODEL);
+			if (component != null)
+			{
+				DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+				component.leftAnchor.absolute = specialDeviceInfo.CharaMakeTexModelAnchor.left;
+				component.rightAnchor.absolute = specialDeviceInfo.CharaMakeTexModelAnchor.right;
+				component.bottomAnchor.absolute = specialDeviceInfo.CharaMakeTexModelAnchor.bottom;
+				component.topAnchor.absolute = specialDeviceInfo.CharaMakeTexModelAnchor.top;
+				component.UpdateAnchors();
+			}
 		}
 		object[] event_data = GameSection.GetEventData() as object[];
 		if (event_data != null)
 		{
 			nonFirstCharaMake = true;
 			isTermsEnable = true;
-			UserInfo _user_info = event_data[0] as UserInfo;
-			UserStatus _user_status = event_data[1] as UserStatus;
+			UserInfo userInfo = event_data[0] as UserInfo;
+			UserStatus userStatus = event_data[1] as UserStatus;
 			GetEditType(event_data);
-			sexID = _user_status.sex;
-			lists[0].index = FaceTypeToIndex(_user_status.faceId);
-			skinColorID = _user_status.skinId;
-			lists[1].index = HeadToIndex(_user_status.hairId);
-			hairColorID = _user_status.hairColorId;
-			voiceTypeID = _user_status.voiceId;
-			defaultUserName = _user_info.name;
+			sexID = userStatus.sex;
+			lists[0].index = FaceTypeToIndex(userStatus.faceId);
+			skinColorID = userStatus.skinId;
+			lists[1].index = HeadToIndex(userStatus.hairId);
+			hairColorID = userStatus.hairColorId;
+			voiceTypeID = userStatus.voiceId;
+			defaultUserName = userInfo.name;
 		}
 		GetCameraPosRot(out mainCameraPos, out zoomCameraPos, out Vector3 _, nonFirstCharaMake);
 		if (!nonFirstCharaMake)
@@ -307,7 +325,7 @@ public class CharaMake : GameSection
 		initPlayerRot = playerRot;
 		if (MonoBehaviourSingleton<StageManager>.I.stageObject != null && shadow == null)
 		{
-			shadow = PlayerLoader.CreateShadow(MonoBehaviourSingleton<StageManager>.I.stageObject, false, -1, false);
+			shadow = PlayerLoader.CreateShadow(MonoBehaviourSingleton<StageManager>.I.stageObject, fixedY0: false);
 			if (shadow != null)
 			{
 				shadow.set_position(playerPos + new Vector3(0f, 0.005f, 0f));
@@ -317,45 +335,45 @@ public class CharaMake : GameSection
 		ResourceManager.enableCache = false;
 		int voice_type_count = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVoiceTypeCount;
 		voices = new LoadObject[2][];
-		for (int k = 0; k < 2; k++)
+		for (int j = 0; j < 2; j++)
 		{
-			voices[k] = new LoadObject[voice_type_count];
-			for (int j = 0; j < voice_type_count; j++)
+			voices[j] = new LoadObject[voice_type_count];
+			for (int k = 0; k < voice_type_count; k++)
 			{
-				int VOICE_NUM = VOICE_ID_CANDIDATE.Length;
-				string[] names = new string[VOICE_NUM];
-				for (int i = 0; i < VOICE_NUM; i++)
+				int num2 = VOICE_ID_CANDIDATE.Length;
+				string[] array = new string[num2];
+				for (int l = 0; l < num2; l++)
 				{
-					names[i] = ResourceName.GetActionVoiceName(k, j, VOICE_ID_CANDIDATE[i]);
+					array[l] = ResourceName.GetActionVoiceName(j, k, VOICE_ID_CANDIDATE[l]);
 				}
-				voices[k][j] = load_queue.Load(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageName(k, j), names, false);
+				voices[j][k] = load_queue.Load(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageName(j, k), array);
 			}
 		}
 		ResourceManager.enableCache = true;
-		LoadObject lo_color_list_item = load_queue.Load(RESOURCE_CATEGORY.UI, "CharaMakeColorListItem", false);
-		yield return (object)load_queue.Wait();
+		LoadObject lo_color_list_item = load_queue.Load(RESOURCE_CATEGORY.UI, "CharaMakeColorListItem");
+		yield return load_queue.Wait();
 		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
 		colorListItem = (lo_color_list_item.loadedObject as GameObject);
-		SetGrid(item_num: hasVisuals.hasSkinColorIndexes.Length, create_item_func: CreateColorItem, grid_ctrl_enum: UI.GRD_SKIN_COLOR_LIST, item_prefab_name: null, reset: true, item_init_func: InitSkinColorItem);
+		SetGrid(item_num: hasVisuals.hasSkinColorIndexes.Length, grid_ctrl_enum: UI.GRD_SKIN_COLOR_LIST, item_prefab_name: null, reset: true, create_item_func: CreateColorItem, item_init_func: InitSkinColorItem);
 		SelectSkinColor(skinColorID);
 		skinColorScroll = GetCtrl(UI.SCR_SKIN_COLOR_LIST).GetComponent<UIScrollView>();
 		if (IsNeedScrollSkinColor())
 		{
-			UIGrid grid2 = GetCtrl(UI.GRD_SKIN_COLOR_LIST).GetComponent<UIGrid>();
-			grid2.pivot = UIWidget.Pivot.Left;
+			UIGrid component2 = GetCtrl(UI.GRD_SKIN_COLOR_LIST).GetComponent<UIGrid>();
+			component2.pivot = UIWidget.Pivot.Left;
 		}
-		SetGrid(item_num: hasVisuals.hasHairColorIndexes.Length, create_item_func: CreateColorItem, grid_ctrl_enum: UI.GRD_HAIR_COLOR_LIST, item_prefab_name: null, reset: true, item_init_func: InitHairColorItem);
+		SetGrid(item_num: hasVisuals.hasHairColorIndexes.Length, grid_ctrl_enum: UI.GRD_HAIR_COLOR_LIST, item_prefab_name: null, reset: true, create_item_func: CreateColorItem, item_init_func: InitHairColorItem);
 		SelectHairColor(hairColorID);
 		hairColorScroll = GetCtrl(UI.SCR_HAIR_COLOR_LIST).GetComponent<UIScrollView>();
 		if (IsNeedScrollHairColor())
 		{
-			UIGrid grid = GetCtrl(UI.GRD_HAIR_COLOR_LIST).GetComponent<UIGrid>();
-			grid.pivot = UIWidget.Pivot.Left;
+			UIGrid component3 = GetCtrl(UI.GRD_HAIR_COLOR_LIST).GetComponent<UIGrid>();
+			component3.pivot = UIWidget.Pivot.Left;
 		}
 		LoadModel();
 		while ((playerLoader != null && playerLoader.isLoading) || load_queue.IsLoading())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		cameraAnim.endValue = mainCameraPos;
 		MovePage(0);
@@ -364,50 +382,46 @@ public class CharaMake : GameSection
 			bool hasSentTutorialStep = false;
 			MonoBehaviourSingleton<UserInfoManager>.I.SendTutorialStep(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator146)/*Error near IL_0728: stateMachine*/)._003ChasSentTutorialStep_003E__19 = true;
+				hasSentTutorialStep = true;
 			});
 			while (!hasSentTutorialStep)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		ResetLayout();
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1)
 		{
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_charactercreate_start, "Tutorial");
 		}
 		base.Initialize();
 	}
 
 	private void ResetLayout()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 		if (editType == EDIT_TYPE.Name)
 		{
-			SetActive((Enum)UI.OBJ_INPUT_NAME_GG, false);
+			SetActive((Enum)UI.OBJ_INPUT_NAME_GG, is_visible: false);
 			GetCtrl(UI.OBJ_PAGE_BUTTONS).get_gameObject().SetActive(false);
 			GetCtrl(UI.SPR_PAGE_CURSOR).get_gameObject().SetActive(false);
 			GetCtrl(UI.CharaLine).get_gameObject().SetActive(false);
@@ -415,7 +429,7 @@ public class CharaMake : GameSection
 		}
 		else if (editType == EDIT_TYPE.Appearance)
 		{
-			SetActive((Enum)UI.OBJ_INPUT_NAME_GG, false);
+			SetActive((Enum)UI.OBJ_INPUT_NAME_GG, is_visible: false);
 			Transform ctrl = GetCtrl(UI.SelectGender);
 			Vector3 localPosition = ctrl.get_localPosition();
 			float x = localPosition.x;
@@ -444,11 +458,11 @@ public class CharaMake : GameSection
 			localPosition12._002Ector(x3, num3, localPosition11.z);
 			ctrl3.set_localPosition(localPosition12);
 		}
+		GetCtrl(UI.BTN_BACK).get_gameObject().SetActive(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep > 2);
 	}
 
 	protected override void OnDestroy()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		base.OnDestroy();
 		if (shadow != null)
 		{
@@ -459,8 +473,6 @@ public class CharaMake : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Expected O, but got Unknown
 		if (nonFirstCharaMake)
 		{
 			SetSprite((Enum)UI.SPR_FRAME, "CharacterEdit");
@@ -469,13 +481,13 @@ public class CharaMake : GameSection
 		int i = 0;
 		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
 		{
-			Transform val = ctrl.GetChild(i);
-			SetEvent(val, "MOVE_PAGE", i);
-			SetActive(val, UI.SPR_ON, i == (int)page);
-			SetActive(val, UI.SPR_OFF, i != (int)page);
+			Transform child = ctrl.GetChild(i);
+			SetEvent(child, "MOVE_PAGE", i);
+			SetActive(child, UI.SPR_ON, i == (int)page);
+			SetActive(child, UI.SPR_OFF, i != (int)page);
 		}
-		SetCellWidth(UI.GRD_PAGES, MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth, true);
-		SetCenter((Enum)UI.GRD_PAGES, (int)page, false);
+		SetCellWidth(UI.GRD_PAGES, MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth, reposition: true);
+		SetCenter((Enum)UI.GRD_PAGES, (int)page, is_instant: false);
 		UpdateLists();
 		SetToggleGroup(UI.OBJ_GENDERS_ON, UI.OBJ_GENDERS_OFF, sexID, "SEX");
 		SetToggleGroup(UI.OBJ_SKIN_COLORS_ON, UI.OBJ_SKIN_COLORS_OFF, skinColorID, "SKIN_COLOR");
@@ -484,15 +496,15 @@ public class CharaMake : GameSection
 		UpdateVoiceNames();
 		if (editType == EDIT_TYPE.Name)
 		{
-			SetInput((Enum)UI.IPT_NAME, base.sectionData.GetText("DEFAULT_NAME_TEXT"), 12, (EventDelegate.Callback)OnChangeName);
+			SetInput(UI.IPT_NAME, base.sectionData.GetText("DEFAULT_NAME_TEXT"), 14, OnChangeName);
 			inputName = base.GetComponent<UINameInput>((Enum)UI.IPT_NAME);
 		}
 		else
 		{
-			SetInput((Enum)UI.IPT_NAME_GG, base.sectionData.GetText("DEFAULT_NAME_TEXT"), 12, (EventDelegate.Callback)OnChangeName);
+			SetInput(UI.IPT_NAME_GG, base.sectionData.GetText("DEFAULT_NAME_TEXT"), 14, OnChangeName);
 			inputName = base.GetComponent<UINameInput>((Enum)UI.IPT_NAME_GG);
 		}
-		inputName.CreateCaret(true);
+		inputName.CreateCaret(is_enable: true);
 		bool value = false;
 		if (!string.IsNullOrEmpty(defaultUserName))
 		{
@@ -501,17 +513,8 @@ public class CharaMake : GameSection
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 			{
 				DateTime now = TimeManager.GetNow();
-				if (DateTime.TryParse(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.editNameAt.date, out DateTime result) && result.CompareTo(now) > 0)
+				if (!DateTime.TryParse(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.editNameAt.date, out DateTime _))
 				{
-					value = true;
-					inputName.SetInActiveNameColor();
-					inputName.set_enabled(false);
-					BoxCollider component = inputName.GetComponent<BoxCollider>();
-					if (component != null)
-					{
-						component.set_enabled(false);
-					}
-					SetLabelText((Enum)UI.LBL_LIMIT_TIME_TEXT, string.Format(base.sectionData.GetText("LIMIT_INPUT_TEXT"), MonoBehaviourSingleton<UserInfoManager>.I.userInfo.editNameAt.date));
 				}
 			}
 			defaultUserName = string.Empty;
@@ -523,6 +526,19 @@ public class CharaMake : GameSection
 		}
 		SetToggle((Enum)UI.TGL_INPUT_LIMITER, value);
 		SetLabelText((Enum)UI.STR_CHANGEABLE_STATUS2, base.sectionData.GetText("STR_CHANGEABLE_STATUS"));
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep < 2)
+		{
+			SetActive((Enum)UI.TGL_VISIBLE_EQUIP_BUTTON, is_visible: false);
+		}
+		else
+		{
+			SetActive((Enum)UI.TGL_VISIBLE_EQUIP_BUTTON, is_visible: true);
+			SetToggleButton((Enum)UI.TGL_VISIBLE_EQUIP_BUTTON, isShowMyEquip, (Action<bool>)delegate(bool is_active)
+			{
+				isShowMyEquip = is_active;
+				LoadModel();
+			});
+		}
 		SetActive((Enum)UI.TERMS_OF_SERVICE, !nonFirstCharaMake);
 		SetActive((Enum)UI.SPR_CHECK, isTermsEnable);
 		SetActive((Enum)UI.SPR_CHECK_OFF, !isTermsEnable);
@@ -532,7 +548,6 @@ public class CharaMake : GameSection
 	private void LateUpdate()
 	{
 		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		if (cameraAnim.IsPlaying())
 		{
@@ -548,11 +563,7 @@ public class CharaMake : GameSection
 	{
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Expected O, but got Unknown
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
 		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
@@ -560,33 +571,28 @@ public class CharaMake : GameSection
 		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl2 = GetCtrl(ctrl);
-		if (!(ctrl2 == null))
+		if (ctrl2 == null)
 		{
-			int i = 0;
-			for (int childCount = ctrl2.get_childCount(); i < childCount; i++)
+			return;
+		}
+		int i = 0;
+		for (int childCount = ctrl2.get_childCount(); i < childCount; i++)
+		{
+			Color val = colors[i];
+			Transform child = ctrl2.GetChild(i);
+			SetColor(ctrl2.GetChild(i), val);
+			UIButton component = base.GetComponent<UIButton>(child);
+			if (component != null)
 			{
-				Color val = colors[i];
-				Transform t = ctrl2.GetChild(i);
-				SetColor(ctrl2.GetChild(i), val);
-				UIButton component = base.GetComponent<UIButton>(t);
-				if (component != null)
-				{
-					component.hover = val;
-					component.pressed = val;
-					component.disabledColor = val;
-				}
+				component.hover = val;
+				component.pressed = val;
+				component.disabledColor = val;
 			}
 		}
 	}
 
 	private void SetList(LIST list, UI ui, int item_num, Action<int, Transform> cb)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Expected O, but got Unknown
 		ListInfo listInfo = lists[(int)list];
 		Transform ctrl = GetCtrl(ui);
 		if (ctrl != null)
@@ -601,12 +607,12 @@ public class CharaMake : GameSection
 		Transform val2 = SetPrefab((Enum)ui, "CharaMakeList");
 		SetEvent(val2, UI.BTN_LIST_PREV, "LIST_PREV", (int)ui);
 		SetEvent(val2, UI.BTN_LIST_NEXT, "LIST_NEXT", (int)ui);
-		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, false, delegate(int i, Transform c, bool b)
+		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, reset: false, delegate(int i, Transform c, bool b)
 		{
 			cb(i, c);
 		});
 		SetCenterOnChildFunc(val2, UI.GRD_LIST, OnCenterListItem);
-		SetCenter(val2, UI.GRD_LIST, listInfo.index, false);
+		SetCenter(val2, UI.GRD_LIST, listInfo.index);
 		listInfo.tansform = val2.get_parent();
 		listInfo.max = item_num;
 	}
@@ -632,10 +638,6 @@ public class CharaMake : GameSection
 
 	private void UpdateVoiceNames()
 	{
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Expected O, but got Unknown
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Expected O, but got Unknown
 		Transform ctrl = GetCtrl(UI.OBJ_VOICES_ON);
 		Transform ctrl2 = GetCtrl(UI.OBJ_VOICES_OFF);
 		if (!(ctrl == null) && !(ctrl2 == null))
@@ -644,43 +646,37 @@ public class CharaMake : GameSection
 			for (int childCount = ctrl.get_childCount(); i < childCount; i++)
 			{
 				string text = StringTable.Get(STRING_CATEGORY.CHARA_MAKE, (uint)(30000 + 1000 * sexID + i));
-				Transform root = ctrl.GetChild(i);
-				SetLabelText(root, UI.LBL_VOICE_NAME, text);
-				Transform root2 = ctrl2.GetChild(i);
-				SetLabelText(root2, UI.LBL_VOICE_NAME, text);
+				Transform child = ctrl.GetChild(i);
+				SetLabelText(child, UI.LBL_VOICE_NAME, text);
+				Transform child2 = ctrl2.GetChild(i);
+				SetLabelText(child2, UI.LBL_VOICE_NAME, text);
 			}
 		}
 	}
 
 	private void SetToggleGroup(UI ui_on, UI ui_off, int value, string event_name = null)
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Expected O, but got Unknown
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(ui_on);
 		Transform ctrl2 = GetCtrl(ui_off);
-		if (!(ctrl == null) && !(ctrl2 == null))
+		if (ctrl == null || ctrl2 == null)
 		{
-			int i = 0;
-			for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+			return;
+		}
+		int i = 0;
+		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+		{
+			ctrl.GetChild(i).get_gameObject().SetActive(i == value);
+			Transform child = ctrl2.GetChild(i);
+			if (event_name != null)
 			{
-				ctrl.GetChild(i).get_gameObject().SetActive(i == value);
-				Transform val = ctrl2.GetChild(i);
-				if (event_name != null)
-				{
-					SetEvent(val, event_name, i);
-				}
-				val.get_gameObject().SetActive(i != value);
+				SetEvent(child, event_name, i);
 			}
+			child.get_gameObject().SetActive(i != value);
 		}
 	}
 
 	private void LoadModel()
 	{
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
 		DeleteRenderTexture((Enum)UI.TEX_MODEL);
 		int sex = sexID;
 		int face_type_id = IndexToFaceType(lists[0].index);
@@ -690,40 +686,67 @@ public class CharaMake : GameSection
 		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
 		playerLoadInfo.SetFace(sex, face_type_id, skin_color_id);
 		playerLoadInfo.SetHair(sex, hair_style_id, num);
-		playerLoadInfo.SetEquipBody(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerBodyEquipItemID);
-		playerLoadInfo.SetEquipHead(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerHeadEquipItemID);
-		playerLoadInfo.SetEquipArm(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerArmEquipItemID);
-		playerLoadInfo.SetEquipLeg(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerLegEquipItemID);
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep < 2)
+		{
+			SetDefultEquip(playerLoadInfo, sex);
+		}
+		else if (isShowMyEquip)
+		{
+			UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
+			EquipSetInfo equipSet = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(userStatus.eSetNo);
+			playerLoadInfo.SetUpCharaMakeLoadInfo(equipSet, uint.Parse(userStatus.armorUniqId), uint.Parse(userStatus.helmUniqId), uint.Parse(userStatus.armUniqId), uint.Parse(userStatus.legUniqId), sex, userStatus.showHelm == 1);
+		}
+		else
+		{
+			SetDefultEquip(playerLoadInfo, sex);
+		}
 		int num2 = -1;
 		if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
 		{
 			num2 = ((!MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.isChangeHairShader) ? (-1) : num);
 		}
-		InitRenderTexture(UI.TEX_MODEL, 0f, true);
+		InitRenderTexture(UI.TEX_MODEL, 0f, link_main_camera: true);
 		playerLoader = GetRenderTextureModelTransform(UI.TEX_MODEL).get_gameObject().AddComponent<PlayerLoader>();
 		PlayerLoader obj = playerLoader;
-		int use_hair_overlay = num2;
-		obj.StartLoad(playerLoadInfo, playerLoader.get_gameObject().get_layer(), 98, false, false, false, !nonFirstCharaMake, false, false, false, true, SHADER_TYPE.NORMAL, delegate
+		PlayerLoadInfo player_load_info = playerLoadInfo;
+		int layer = playerLoader.get_gameObject().get_layer();
+		int anim_id = 98;
+		bool need_anim_event = false;
+		bool need_foot_stamp = false;
+		bool need_shadow = false;
+		bool enable_light_probes = !nonFirstCharaMake;
+		bool need_action_voice = false;
+		bool need_high_reso_tex = false;
+		bool need_res_ref_count = false;
+		bool need_dev_frame_instantiate = true;
+		SHADER_TYPE shader_type = SHADER_TYPE.NORMAL;
+		PlayerLoader.OnCompleteLoad callback = delegate
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			if (!(playerLoader.animator == null))
 			{
 				playerLoader.get_transform().set_position(playerPos);
 				playerLoader.get_transform().set_eulerAngles(new Vector3(0f, playerRot, 0f));
-				PlayerAnimCtrl.Get(playerLoader.animator, (sex != 0) ? PLCA.IDLE_01_F : PLCA.IDLE_01, null, null, null);
+				PlayerAnimCtrl.Get(playerLoader.animator, (sex != 0) ? PLCA.IDLE_01_F : PLCA.IDLE_01);
 				EnableRenderTexture(UI.TEX_MODEL);
 			}
-		}, true, use_hair_overlay);
+		};
+		int use_hair_overlay = num2;
+		obj.StartLoad(player_load_info, layer, anim_id, need_anim_event, need_foot_stamp, need_shadow, enable_light_probes, need_action_voice, need_high_reso_tex, need_res_ref_count, need_dev_frame_instantiate, shader_type, callback, enable_eye_blick: true, use_hair_overlay);
+	}
+
+	private void SetDefultEquip(PlayerLoadInfo load_info, int sex)
+	{
+		load_info.SetEquipBody(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerBodyEquipItemID);
+		load_info.SetEquipHead(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerHeadEquipItemID);
+		load_info.SetEquipArm(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerArmEquipItemID);
+		load_info.SetEquipLeg(sex, (uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerLegEquipItemID);
 	}
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && page != PAGE.CONFIRM)
@@ -736,12 +759,6 @@ public class CharaMake : GameSection
 
 	private void OnCenterListItem(GameObject go)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		int n = int.Parse(go.get_name());
 		Transform t = go.get_transform().get_parent().get_parent()
 			.get_parent()
@@ -781,28 +798,26 @@ public class CharaMake : GameSection
 			}
 			SetColor((Enum)UI.LBL_CONFIRM_NAME, Color.get_red());
 			SetLabelText((Enum)UI.LBL_CONFIRM_NAME, base.sectionData.GetText("NO_NAME"));
-			SetActive((Enum)UI.BTN_YES, false);
-			SetActive((Enum)UI.BTN_YES_OFF, true);
+			SetActive((Enum)UI.BTN_YES, is_visible: false);
+			SetActive((Enum)UI.BTN_YES_OFF, is_visible: true);
+			return;
+		}
+		if (inputName != null)
+		{
+			inputName.ActiveName();
+			inputName.SetName(inputNameGG);
+		}
+		SetColor((Enum)UI.LBL_CONFIRM_NAME, Color.get_white());
+		SetLabelText((Enum)UI.LBL_CONFIRM_NAME, inputNameGG);
+		if (isTermsEnable)
+		{
+			SetActive((Enum)UI.BTN_YES, is_visible: true);
+			SetActive((Enum)UI.BTN_YES_OFF, is_visible: false);
 		}
 		else
 		{
-			if (inputName != null)
-			{
-				inputName.ActiveName();
-				inputName.SetName(inputNameGG);
-			}
-			SetColor((Enum)UI.LBL_CONFIRM_NAME, Color.get_white());
-			SetLabelText((Enum)UI.LBL_CONFIRM_NAME, inputNameGG);
-			if (isTermsEnable)
-			{
-				SetActive((Enum)UI.BTN_YES, true);
-				SetActive((Enum)UI.BTN_YES_OFF, false);
-			}
-			else
-			{
-				SetActive((Enum)UI.BTN_YES, false);
-				SetActive((Enum)UI.BTN_YES_OFF, true);
-			}
+			SetActive((Enum)UI.BTN_YES, is_visible: false);
+			SetActive((Enum)UI.BTN_YES_OFF, is_visible: true);
 		}
 	}
 
@@ -831,7 +846,7 @@ public class CharaMake : GameSection
 		}
 		if (listInfo.index != num)
 		{
-			SetCenter(listInfo.tansform, UI.GRD_LIST, num, false);
+			SetCenter(listInfo.tansform, UI.GRD_LIST, num);
 		}
 	}
 
@@ -840,15 +855,29 @@ public class CharaMake : GameSection
 		string inputNameGG = GetInputNameGG();
 		if (inputNameGG.Length == 0)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your character name.", null, null, null, null), delegate
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your character name."), delegate
 			{
-			}, false, 0);
+			});
 		}
 		else if (!isTermsEnable)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please accept the term", null, null, null, null), delegate
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please accept the term"), delegate
 			{
-			}, false, 0);
+			});
+		}
+		else if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name.Equals(GetInputNameGG()))
+		{
+			OnQuery_OK();
+		}
+		else if (MonoBehaviourSingleton<UserInfoManager>.I.crystalChangeName > 0)
+		{
+			if (GameSection.CheckCrystal(MonoBehaviourSingleton<UserInfoManager>.I.crystalChangeName))
+			{
+				GameSection.ChangeEvent("SPEND_CRYSTAL_CONFIRM", new object[1]
+				{
+					MonoBehaviourSingleton<UserInfoManager>.I.crystalChangeName
+				});
+			}
 		}
 		else
 		{
@@ -902,7 +931,7 @@ public class CharaMake : GameSection
 			{
 				BackBeforeSceneOrStatus();
 			}
-			else if (GameSection.CheckCrystal(MonoBehaviourSingleton<UserInfoManager>.I.crystalChangeName, 0, true))
+			else if (GameSection.CheckCrystal(MonoBehaviourSingleton<UserInfoManager>.I.crystalChangeName))
 			{
 				GameSection.ChangeEvent("SPEND_CRYSTAL_CONFIRM", new object[1]
 				{
@@ -921,16 +950,15 @@ public class CharaMake : GameSection
 		GameSection.StayEvent();
 		SendEditFigure(delegate(bool is_success)
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
 			if (is_success)
 			{
-				RequestEvent("BACK_TO_HOME", null);
+				RequestEvent("BACK_TO_HOME");
 				GameSection.BackSection();
 			}
 			else
 			{
-				this.StartCoroutine_Auto(IECloseDialog());
+				this.StartCoroutine(IECloseDialog());
 			}
 		});
 	}
@@ -955,20 +983,17 @@ public class CharaMake : GameSection
 		if (num == 5 || page == PAGE.SEX)
 		{
 			CheckUniqueName(num);
+			return;
 		}
-		else
+		if (editType == EDIT_TYPE.Appearance && num == 4)
 		{
-			if (editType == EDIT_TYPE.Appearance && num == 4)
-			{
-				num += add;
-			}
-			MovePage(num);
+			num += add;
 		}
+		MovePage(num);
 	}
 
 	private void MovePage(int n)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		if (page != (PAGE)n)
 		{
 			this.StartCoroutine(WaitForTrack(n));
@@ -977,128 +1002,110 @@ public class CharaMake : GameSection
 
 	private IEnumerator WaitForTrack(int n)
 	{
-		yield return (object)null;
+		yield return null;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1)
 		{
 			switch (page)
 			{
-			case PAGE.FACE:
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_charactercreate_face, "Tutorial");
-				break;
-			case PAGE.HAIR:
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_charactercreate_hair, "Tutorial");
-				break;
-			case PAGE.VOICE:
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_charactercreate_voice, "Tutorial");
-				break;
-			case PAGE.NAME:
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_charactercreate_name, "Tutorial");
-				break;
 			}
 		}
-		yield return (object)null;
-		yield return (object)null;
+		yield return null;
+		yield return null;
 		MovePageOld(n);
 	}
 
 	private void MovePageOld(int n)
 	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Expected O, but got Unknown
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Expected O, but got Unknown
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-		if (page != (PAGE)n)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+		if (page == (PAGE)n)
 		{
-			PAGE pAGE = page;
-			page = (PAGE)n;
-			SetCenter((Enum)UI.GRD_PAGES, n, false);
-			Vector3 val;
-			switch (page)
+			return;
+		}
+		PAGE pAGE = page;
+		page = (PAGE)n;
+		SetCenter((Enum)UI.GRD_PAGES, n, is_instant: false);
+		Vector3 val;
+		switch (page)
+		{
+		default:
+			val = mainCameraPos;
+			break;
+		case PAGE.FACE:
+		case PAGE.HAIR:
+		case PAGE.VOICE:
+			val = zoomCameraPos;
+			break;
+		}
+		if (cameraAnim.endValue != val)
+		{
+			cameraAnim.Set(0.5f, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position(), val);
+			cameraAnim.Play();
+		}
+		Transform child = GetCtrl(UI.OBJ_PAGE_BUTTONS).GetChild(n);
+		GetCtrl(UI.SPR_PAGE_CURSOR).set_position(child.get_position());
+		if (pAGE != PAGE.MAX)
+		{
+			Transform child2 = GetCtrl(UI.OBJ_PAGE_BUTTONS).GetChild((int)pAGE);
+			SetActive(child2, UI.SPR_ON, is_visible: false);
+			SetActive(child2, UI.SPR_OFF, is_visible: true);
+		}
+		SetActive(child, UI.SPR_ON, is_visible: true);
+		SetActive(child, UI.SPR_OFF, is_visible: false);
+		switch (page)
+		{
+		case PAGE.FACE:
+			skinColorScroll.set_enabled(IsNeedScrollSkinColor());
+			hairColorScroll.set_enabled(false);
+			break;
+		case PAGE.HAIR:
+			skinColorScroll.set_enabled(false);
+			hairColorScroll.set_enabled(IsNeedScrollHairColor());
+			break;
+		}
+		switch (page)
+		{
+		case PAGE.SEX:
+		case PAGE.NAME:
+			break;
+		default:
+			if (page == PAGE.VOICE)
 			{
-			default:
-				val = mainCameraPos;
-				break;
-			case PAGE.FACE:
-			case PAGE.HAIR:
-			case PAGE.VOICE:
-				val = zoomCameraPos;
-				break;
+				this.StartCoroutine(DoVoiceChangePlayVoice());
 			}
-			if (cameraAnim.endValue != val)
+			break;
+		case PAGE.CONFIRM:
+		{
+			string inputNameGG = GetInputNameGG();
+			if (inputNameGG.Length == 0)
 			{
-				cameraAnim.Set(0.5f, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position(), val, null, default(Vector3), null);
-				cameraAnim.Play();
-			}
-			Transform val2 = GetCtrl(UI.OBJ_PAGE_BUTTONS).GetChild(n);
-			GetCtrl(UI.SPR_PAGE_CURSOR).set_position(val2.get_position());
-			if (pAGE != PAGE.MAX)
-			{
-				Transform root = GetCtrl(UI.OBJ_PAGE_BUTTONS).GetChild((int)pAGE);
-				SetActive(root, UI.SPR_ON, false);
-				SetActive(root, UI.SPR_OFF, true);
-			}
-			SetActive(val2, UI.SPR_ON, true);
-			SetActive(val2, UI.SPR_OFF, false);
-			switch (page)
-			{
-			case PAGE.FACE:
-				skinColorScroll.set_enabled(IsNeedScrollSkinColor());
-				hairColorScroll.set_enabled(false);
-				break;
-			case PAGE.HAIR:
-				skinColorScroll.set_enabled(false);
-				hairColorScroll.set_enabled(IsNeedScrollHairColor());
-				break;
-			}
-			switch (page)
-			{
-			case PAGE.SEX:
-				break;
-			case PAGE.NAME:
-				break;
-			default:
-				if (page == PAGE.VOICE)
+				int num = Random.Range(0, MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.presetPlayerNameCount);
+				inputNameGG = StringTable.Get(STRING_CATEGORY.CHARA_MAKE, (uint)(40000 + 1000 * sexID + num));
+				if (inputName != null)
 				{
-					this.StartCoroutine(DoVoiceChangePlayVoice());
+					inputName.SetName(inputNameGG);
+					OnChangeName();
 				}
-				break;
-			case PAGE.CONFIRM:
-			{
-				string inputNameGG = GetInputNameGG();
-				if (inputNameGG.Length == 0)
-				{
-					int num = Random.Range(0, MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.presetPlayerNameCount);
-					inputNameGG = StringTable.Get(STRING_CATEGORY.CHARA_MAKE, (uint)(40000 + 1000 * sexID + num));
-					if (inputName != null)
-					{
-						inputName.SetName(inputNameGG);
-						OnChangeName();
-					}
-				}
-				playerRotAnim.Set(0.5f, playerLoader.get_transform().get_rotation(), Quaternion.AngleAxis(initPlayerRot, Vector3.get_up()), null, default(Quaternion), null);
-				playerRot = initPlayerRot;
-				playerRotAnim.Play();
-				break;
 			}
-			}
+			playerRotAnim.Set(0.5f, playerLoader.get_transform().get_rotation(), Quaternion.AngleAxis(initPlayerRot, Vector3.get_up()));
+			playerRot = initPlayerRot;
+			playerRotAnim.Play();
+			break;
+		}
 		}
 	}
 
@@ -1112,7 +1119,7 @@ public class CharaMake : GameSection
 	{
 		if (voiceAudioObject != null)
 		{
-			voiceAudioObject.Stop(0);
+			voiceAudioObject.Stop();
 			voiceAudioObject = null;
 		}
 		int num = sexID;
@@ -1128,7 +1135,7 @@ public class CharaMake : GameSection
 			AudioClip val = loadObject.loadedObjects[id].obj as AudioClip;
 			if (val != null)
 			{
-				voiceAudioObject = SoundManager.PlayUISE(val, 1f, false, null, 0);
+				voiceAudioObject = SoundManager.PlayUISE(val, 1f, loop: false, null);
 			}
 		}
 	}
@@ -1153,7 +1160,7 @@ public class CharaMake : GameSection
 	{
 		sexID = (int)GameSection.GetEventData();
 		ChangeSex();
-		SetToggleGroup(UI.OBJ_GENDERS_ON, UI.OBJ_GENDERS_OFF, sexID, null);
+		SetToggleGroup(UI.OBJ_GENDERS_ON, UI.OBJ_GENDERS_OFF, sexID);
 		LoadModel();
 		UpdateLists();
 		UpdateVoiceNames();
@@ -1176,7 +1183,7 @@ public class CharaMake : GameSection
 	private void OnQuery_VOICE()
 	{
 		voiceTypeID = (int)GameSection.GetEventData();
-		SetToggleGroup(UI.OBJ_VOICES_ON, UI.OBJ_VOICES_OFF, voiceTypeID, null);
+		SetToggleGroup(UI.OBJ_VOICES_ON, UI.OBJ_VOICES_OFF, voiceTypeID);
 		PlayDefaultVoice();
 	}
 
@@ -1194,17 +1201,16 @@ public class CharaMake : GameSection
 		GameSection.StayEvent();
 		SendEditFigure(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 2)
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_charactercreate_end, "Tutorial");
 			}
 			if (!nonFirstCharaMake)
 			{
 				int id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 				Native.TrackUserRegEventAppsFlyer(id.ToString());
 			}
-			DispatchEvent("MAIN_MENU_HOME", null);
+			DispatchEvent("MAIN_MENU_HOME");
 		});
 	}
 
@@ -1213,25 +1219,23 @@ public class CharaMake : GameSection
 		string inputNameGG = GetInputNameGG();
 		if (inputNameGG.Length == 0)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your character name.", null, null, null, null), delegate
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your character name."), delegate
 			{
-			}, false, 0);
+			});
+			return;
 		}
-		else
+		GameSection.StayEvent();
+		OptionCheckUniqueNameModel.RequestSendForm requestSendForm = new OptionCheckUniqueNameModel.RequestSendForm();
+		requestSendForm.name = inputNameGG;
+		Protocol.Send(OptionCheckUniqueNameModel.URL, requestSendForm, delegate(OptionEditFigureModel ret)
 		{
-			GameSection.StayEvent();
-			OptionCheckUniqueNameModel.RequestSendForm requestSendForm = new OptionCheckUniqueNameModel.RequestSendForm();
-			requestSendForm.name = inputNameGG;
-			Protocol.Send(OptionCheckUniqueNameModel.URL, requestSendForm, delegate(OptionEditFigureModel ret)
+			bool flag = ret.Error == Error.None;
+			GameSection.ResumeEvent(flag);
+			if (flag)
 			{
-				bool flag = ret.Error == Error.None;
-				GameSection.ResumeEvent(flag, null);
-				if (flag)
-				{
-					MovePage(nextPage);
-				}
-			}, string.Empty);
-		}
+				MovePage(nextPage);
+			}
+		}, string.Empty);
 	}
 
 	public void SendEditFigure(Action<bool> call_back)
@@ -1257,7 +1261,7 @@ public class CharaMake : GameSection
 				MovePage(4);
 				break;
 			case Error.ERR_CRYSTAL_NOT_ENOUGH:
-				GameSection.ChangeStayEvent("NOT_ENOUGTH", null);
+				GameSection.ChangeStayEvent("NOT_ENOUGTH");
 				obj = true;
 				break;
 			}
@@ -1269,7 +1273,6 @@ public class CharaMake : GameSection
 	{
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1)
 		{
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_charactercreate_agreement, "Tutorial");
 		}
 		isTermsEnable = !isTermsEnable;
 		SetActive((Enum)UI.SPR_CHECK, isTermsEnable);
@@ -1279,7 +1282,6 @@ public class CharaMake : GameSection
 
 	private void ResetAnim(Enum ctrl_enum)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(ctrl_enum);
 		if (null != ctrl)
 		{
@@ -1297,9 +1299,20 @@ public class CharaMake : GameSection
 		{
 			List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
 			GameSectionHistory.HistoryData historyData = historyList[0];
+			for (int i = 0; i < historyList.Count; i++)
+			{
+				Debug.LogWarning((object)historyList[i].sceneName);
+			}
 			if (historyData.sceneName == "Smith")
 			{
-				GameSection.ChangeEvent("TO_STATUS", null);
+				if (StatusManager.IsUnique())
+				{
+					GameSection.ChangeEvent("TO_UNIQUE_STATUS");
+				}
+				else
+				{
+					GameSection.ChangeEvent("TO_STATUS");
+				}
 			}
 			else
 			{
@@ -1307,12 +1320,12 @@ public class CharaMake : GameSection
 				historyList.Clear();
 				historyList.Add(historyData);
 				historyList.Add(item);
-				GameSection.ChangeEvent("[BACK]", null);
+				GameSection.ChangeEvent("[BACK]");
 			}
 		}
 		else
 		{
-			GameSection.ChangeEvent("TO_STATUS", null);
+			GameSection.ChangeEvent("TO_STATUS");
 		}
 	}
 

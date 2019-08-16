@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneTable>, IDataTable
 {
 	public class FieldMapEnemyPopTimeZoneData
 	{
-		public const string NT = "id,startTime,endTime,enemyId,mapId";
-
 		public uint id;
 
 		public string startTime;
@@ -17,6 +16,12 @@ public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneT
 
 		public int mapId;
 
+		public uint existStrId;
+
+		public uint goneStrId;
+
+		public const string NT = "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId";
+
 		public static bool cb(CSVReader csv_reader, FieldMapEnemyPopTimeZoneData data, ref uint key)
 		{
 			data.id = key;
@@ -24,6 +29,8 @@ public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneT
 			csv_reader.Pop(ref data.endTime);
 			csv_reader.Pop(ref data.enemyId);
 			csv_reader.Pop(ref data.mapId);
+			csv_reader.Pop(ref data.existStrId);
+			csv_reader.Pop(ref data.goneStrId);
 			return true;
 		}
 
@@ -40,20 +47,29 @@ public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneT
 
 	private UIntKeyTable<FieldMapEnemyPopTimeZoneData> timeZoneDataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneData> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneData> _003C_003Ef__mg_0024cache2;
+
 	public void CreateTable(string csv_text)
 	{
-		timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneData>(csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId", null);
+		timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneData>(csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId");
 	}
 
 	public void CreateTable(string csv_text, TableUtility.Progress progress)
 	{
-		timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneData>(csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId", progress);
+		timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneData>(csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId", progress);
 		timeZoneDataTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(timeZoneDataTable, csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId", null);
+		TableUtility.AddUIntKeyTable(timeZoneDataTable, csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId");
 	}
 
 	public List<FieldMapEnemyPopTimeZoneData> GetEnemyTimeZoneDataList(int mapId)
@@ -102,19 +118,20 @@ public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneT
 		for (int count = enemyTimeZoneDataList.Count; i < count; i++)
 		{
 			FieldMapEnemyPopTimeZoneData fieldMapEnemyPopTimeZoneData = enemyTimeZoneDataList[i];
-			if (fieldMapEnemyPopTimeZoneData.TryGetStartTime(out DateTime result2) && fieldMapEnemyPopTimeZoneData.TryGetEndTime(out DateTime result3))
+			if (!fieldMapEnemyPopTimeZoneData.TryGetStartTime(out DateTime result2) || !fieldMapEnemyPopTimeZoneData.TryGetEndTime(out DateTime result3))
 			{
-				result2 = TimeManager.CombineDateAndTime(createdAt, result2);
-				result3 = TimeManager.CombineDateAndTime(createdAt, result3);
-				if (createdAt >= result2 && now <= result3)
+				continue;
+			}
+			result2 = TimeManager.CombineDateAndTime(createdAt, result2);
+			result3 = TimeManager.CombineDateAndTime(createdAt, result3);
+			if (createdAt >= result2 && now <= result3)
+			{
+				FieldMapTable.EnemyPopTableData enemyPopTableData = FindEnemyPopData(rareOrBossEnemyList, mapId, fieldMapEnemyPopTimeZoneData.enemyId);
+				if (enemyPopTableData != null && (result3 > minValue || IsPreferredType(resultType, enemyPopTableData)))
 				{
-					FieldMapTable.EnemyPopTableData enemyPopTableData = FindEnemyPopData(rareOrBossEnemyList, mapId, fieldMapEnemyPopTimeZoneData.enemyId);
-					if (enemyPopTableData != null && (result3 > minValue || IsPreferredType(resultType, enemyPopTableData)))
-					{
-						result = true;
-						resultType = enemyPopTableData.enemyPopType;
-						resultTimeZone = fieldMapEnemyPopTimeZoneData;
-					}
+					result = true;
+					resultType = enemyPopTableData.enemyPopType;
+					resultTimeZone = fieldMapEnemyPopTimeZoneData;
 				}
 			}
 		}

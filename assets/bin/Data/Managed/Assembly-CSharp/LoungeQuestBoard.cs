@@ -58,49 +58,65 @@ public class LoungeQuestBoard : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		SetLabelText((Enum)UI.LBL_TITLE, base.sectionData.GetText("TITLE"));
 		SetLabelText((Enum)UI.LBL_TITLE_SHADOW, base.sectionData.GetText("TITLE"));
 		SetLabelText((Enum)UI.STR_NON_LIST, base.sectionData.GetText("NON_QUEST"));
-		SetActive((Enum)UI.SCR_QUEST, true);
+		SetActive((Enum)UI.SCR_QUEST, is_visible: true);
 		this.StartCoroutine(DoInitialize());
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.SPR_CONDITION_DIFFICULTY, false);
-		SetActive((Enum)UI.STR_NO_CONDITION, true);
+		SetActive((Enum)UI.SPR_CONDITION_DIFFICULTY, is_visible: false);
+		SetActive((Enum)UI.STR_NO_CONDITION, is_visible: true);
 		SetNpcInfo();
 		if (parties.Count <= 0)
 		{
-			SetActive((Enum)UI.GRD_QUEST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.GRD_QUEST, true);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", parties.Count, false, delegate(int i, Transform t, bool is_recycle)
+			SetActive((Enum)UI.GRD_QUEST, is_visible: true);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", parties.Count, reset: false, delegate(int i, Transform t, bool is_recycle)
 			{
 				QuestTable.QuestTableData questTableData = null;
 				questTableData = ((parties[i].quest.explore == null) ? Singleton<QuestTable>.I.GetQuestData((uint)parties[i].quest.questId) : Singleton<QuestTable>.I.GetQuestData((uint)parties[i].quest.explore.mainQuestId));
 				if (questTableData == null)
 				{
-					SetActive(t, false);
+					SetActive(t, is_visible: false);
 				}
 				else
 				{
 					SetEvent(t, "SELECT_ROOM", i);
 					SetQuestData(questTableData, t);
 					SetPartyData(parties[i], t, questTableData.questType);
+					SetStatusIconInfo(parties[i], t);
+					SetMemberIcon(t, questTableData);
 				}
 			});
 		}
 	}
 
+	protected void SetStatusIconInfo(PartyModel.Party _partyParam, Transform _targetObject)
+	{
+		if (!(_targetObject == null) && _partyParam != null)
+		{
+			QuestUserStatusIconController componentInChildren = _targetObject.GetComponentInChildren<QuestUserStatusIconController>();
+			if (componentInChildren != null)
+			{
+				componentInChildren.Initialize(new QuestUserStatusIconController.InitParam
+				{
+					StatusBit = (uint)_partyParam.iconBit
+				});
+			}
+		}
+	}
+
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)this.StartCoroutine(Reload(null));
+		yield return this.StartCoroutine(Reload());
 	}
 
 	private IEnumerator Reload(Action<bool> cb = null)
@@ -110,17 +126,17 @@ public class LoungeQuestBoard : GameSection
 		{
 			if (isSuccess)
 			{
-				((_003CReload_003Ec__IteratorCF)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this.parties = parties;
-				((_003CReload_003Ec__IteratorCF)/*Error near IL_002d: stateMachine*/)._003CisRecv_003E__0 = true;
+				this.parties = parties;
+				isRecv = true;
 			}
-			if (((_003CReload_003Ec__IteratorCF)/*Error near IL_002d: stateMachine*/).cb != null)
+			if (cb != null)
 			{
-				((_003CReload_003Ec__IteratorCF)/*Error near IL_002d: stateMachine*/).cb(isSuccess);
+				cb(isSuccess);
 			}
 		});
 		while (!isRecv)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		SetDirty(UI.GRD_QUEST);
 		RefreshUI();
@@ -167,12 +183,6 @@ public class LoungeQuestBoard : GameSection
 
 	private void SetQuestData(QuestTable.QuestTableData questData, Transform t)
 	{
-		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0319: Unknown result type (might be due to invalid IL or missing references)
 		UI[] array = new UI[10]
 		{
 			UI.OBJ_DIFFICULT_STAR_1,
@@ -192,16 +202,16 @@ public class LoungeQuestBoard : GameSection
 		{
 			SetActive(t, array[i], i < num);
 		}
-		ResetTween(t, UI.TWN_DIFFICULT_STAR, 0);
-		PlayTween(t, UI.TWN_DIFFICULT_STAR, true, null, false, 0);
+		ResetTween(t, UI.TWN_DIFFICULT_STAR);
+		PlayTween(t, UI.TWN_DIFFICULT_STAR, forward: true, null, is_input_block: false);
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 		if (enemyData != null)
 		{
-			SetActive(t, UI.OBJ_ENEMY, true);
+			SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 			int iconId = enemyData.iconId;
 			RARITY_TYPE? rarity = (questData.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(questData.rarity);
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-			itemIcon.SetEnableCollider(false);
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+			itemIcon.SetEnableCollider(is_enable: false);
 			SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 			SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -209,9 +219,9 @@ public class LoungeQuestBoard : GameSection
 		}
 		else
 		{
-			SetActive(t, UI.OBJ_ENEMY, false);
+			SetActive(t, UI.OBJ_ENEMY, is_visible: false);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
-			SetActive(t, UI.STR_NON_WEAK_ELEMENT, true);
+			SetActive(t, UI.STR_NON_WEAK_ELEMENT, is_visible: true);
 		}
 		Transform val = FindCtrl(t, UI.SPR_ICON_DOUBLE);
 		Transform val2 = FindCtrl(t, UI.SPR_ICON_DEFENSE_BATTLE);
@@ -268,52 +278,63 @@ public class LoungeQuestBoard : GameSection
 	private void OnQuery_SELECT_ROOM()
 	{
 		int index = (int)GameSection.GetEventData();
-		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint)MonoBehaviourSingleton<LoungeMatchingManager>.I.parties[index].quest.questId, true))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint)MonoBehaviourSingleton<LoungeMatchingManager>.I.parties[index].quest.questId))
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		GameSection.SetEventData(new object[1]
 		{
-			GameSection.SetEventData(new object[1]
-			{
-				false
-			});
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<LoungeMatchingManager>.I.parties[index].id, true, delegate(bool is_success)
-			{
-				GameSection.ResumeEvent(is_success, null);
-			});
-		}
+			false
+		});
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<LoungeMatchingManager>.I.parties[index].id, isLoungeBoard: true, delegate(bool is_success)
+		{
+			GameSection.ResumeEvent(is_success);
+		});
 	}
 
 	private void OnQuery_RELOAD()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.StayEvent();
 		this.StartCoroutine(Reload(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b);
 		}));
 	}
 
 	private void OnQuery_SECTION_BACK()
 	{
-		MonoBehaviourSingleton<LoungeManager>.I.SetLoungeQuestBalloon(true);
+		MonoBehaviourSingleton<LoungeManager>.I.SetLoungeQuestBalloon(request: true);
 	}
 
 	private void OnQuery_MEMBER()
 	{
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData == null)
 		{
-			GameSection.ChangeEvent("ERROR", null);
+			GameSection.ChangeEvent("ERROR");
 		}
-		else
+	}
+
+	protected void SetMemberIcon(Transform t, QuestTable.QuestTableData table)
+	{
+		if (table != null)
 		{
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool isSuccess)
+			SetActive(t, UI.TGL_MEMBER_3, is_visible: true);
+			SetActive(t, UI.TGL_MEMBER_2, is_visible: true);
+			SetActive(t, UI.TGL_MEMBER_1, is_visible: true);
+			if (table.userNumLimit < 4)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
-			}, false);
+				SetActive(t, UI.TGL_MEMBER_3, is_visible: false);
+			}
+			if (table.userNumLimit < 3)
+			{
+				SetActive(t, UI.TGL_MEMBER_2, is_visible: false);
+			}
+			if (table.userNumLimit < 2)
+			{
+				SetActive(t, UI.TGL_MEMBER_1, is_visible: false);
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,88 +28,157 @@ public class QuestRushSelectList : QuestEventSelectList
 		OBJ_FRAME,
 		SPR_BG_FRAME,
 		LBL_STORY_TITLE,
-		SPR_FRAME
+		SPR_FRAME,
+		SPR_TYPE_DIFFICULTY,
+		LBL_POINT_TITLE,
+		LBL_CURRENT_POINT,
+		OBJ_NEXT_REWARD_ROOT,
+		LBL_NEXT_REWARD_NAME,
+		LBL_NEXT_POINT,
+		GRD_NEXT_ICON,
+		OBJ_NEXT_REWARD_ICON_POS1,
+		OBJ_NEXT_REWARD_ICON_POS2,
+		OBJ_CURRENT_STATUS,
+		SPR_NORMAL_INFO,
+		SPR_CARNIVAL_INFO
 	}
 
 	private const string RUSH_FRAME_SPRITE = "RequestPlate_Rush";
 
+	private QuestRushPointModel.Param currentData;
+
 	protected override bool showMap => false;
+
+	protected override IEnumerator DoInitialize()
+	{
+		bool isCarnival = MonoBehaviourSingleton<DeliveryManager>.I.IsCarnivalEvent(eventData.eventId);
+		if (!isCarnival)
+		{
+			yield return this.StartCoroutine(GetCurrentStatus());
+		}
+		SetActive((Enum)UI.OBJ_CURRENT_STATUS, !isCarnival);
+		SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, !isCarnival);
+		SetActive((Enum)UI.SPR_NORMAL_INFO, !isCarnival);
+		SetActive((Enum)UI.SPR_CARNIVAL_INFO, isCarnival);
+		yield return this.StartCoroutine(base.DoInitialize());
+	}
 
 	protected override void UpdateTable()
 	{
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Expected O, but got Unknown
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (currentData != null)
 		{
-			num++;
+			SetLabelText((Enum)UI.LBL_CURRENT_POINT, StringTable.Format(STRING_CATEGORY.RUSH, 0u, currentData.point));
 		}
-		int num2 = deliveryInfo.Length + clearedDeliveries.Count;
-		num2++;
-		if (showStory)
+		SetLabelText((Enum)UI.LBL_POINT_TITLE, StringTable.Get(STRING_CATEGORY.RUSH, 1u));
+		if (currentData != null && currentData.reward != null && currentData.reward.reward.Count > 0)
 		{
-			num2 += num + stories.Count;
-		}
-		if (deliveryInfo == null || num2 == 0)
-		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, false);
+			SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, is_visible: true);
+			SetLabelText((Enum)UI.LBL_NEXT_POINT, StringTable.Format(STRING_CATEGORY.RUSH, 0u, currentData.reward.point));
+			int num = Mathf.Min(2, currentData.reward.reward.Count);
+			string text = string.Empty;
+			for (int j = 0; j < num; j++)
+			{
+				QuestRushPointModel.Param.Reward reward = currentData.reward.reward[j];
+				Transform ctrl;
+				if (j == 0)
+				{
+					ctrl = GetCtrl(UI.OBJ_NEXT_REWARD_ICON_POS1);
+					text = Utility.GetRewardName((REWARD_TYPE)reward.type, (uint)reward.itemId);
+				}
+				else
+				{
+					ctrl = GetCtrl(UI.OBJ_NEXT_REWARD_ICON_POS2);
+					text = text + "\n" + Utility.GetRewardName((REWARD_TYPE)reward.type, (uint)reward.itemId);
+				}
+				ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, ctrl, reward.num);
+			}
+			if (currentData.reward.reward.Count == 1)
+			{
+				SetActive((Enum)UI.OBJ_NEXT_REWARD_ICON_POS2, is_visible: false);
+			}
+			SetLabelText((Enum)UI.LBL_NEXT_REWARD_NAME, text);
+			GetCtrl(UI.GRD_NEXT_ICON).GetComponent<UIGrid>().Reposition();
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, true);
-			int questStartIndex = 0;
-			questStartIndex++;
-			int completedStartIndex = deliveryInfo.Length + questStartIndex;
-			int borderIndex = completedStartIndex + clearedDeliveries.Count;
-			int storyStartIndex = borderIndex;
-			if (stories.Count > 0)
+			SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, is_visible: false);
+		}
+		int num2 = 0;
+		int count = stories.Count;
+		if (count > 0)
+		{
+			num2++;
+		}
+		int num3 = deliveryInfo.Length + clearedDeliveries.Count;
+		num3++;
+		if (showStory)
+		{
+			num3 += num2 + stories.Count;
+		}
+		if (deliveryInfo == null || num3 == 0)
+		{
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: false);
+			return;
+		}
+		SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
+		SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
+		SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: true);
+		int questStartIndex = 0;
+		questStartIndex++;
+		int completedStartIndex = deliveryInfo.Length + questStartIndex;
+		int borderIndex = completedStartIndex + clearedDeliveries.Count;
+		int storyStartIndex = borderIndex;
+		if (stories.Count > 0)
+		{
+			storyStartIndex++;
+		}
+		Transform ctrl2 = GetCtrl(UI.TBL_DELIVERY_QUEST);
+		if (Object.op_Implicit(ctrl2))
+		{
+			int k = 0;
+			for (int childCount = ctrl2.get_childCount(); k < childCount; k++)
 			{
-				storyStartIndex++;
+				Transform child = ctrl2.GetChild(0);
+				child.set_parent(null);
+				Object.Destroy(child.get_gameObject());
 			}
-			Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-			if (Object.op_Implicit(ctrl))
+		}
+		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, reset: false, delegate(int i, Transform parent)
+		{
+			Transform result = null;
+			if (i >= storyStartIndex)
 			{
-				int j = 0;
-				for (int childCount = ctrl.get_childCount(); j < childCount; j++)
+				if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
 				{
-					Transform val = ctrl.GetChild(0);
-					val.set_parent(null);
-					Object.Destroy(val.get_gameObject());
+					return Realizes("QuestEventStoryItem", parent);
 				}
+				return null;
 			}
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, delegate(int i, Transform parent)
+			if (i >= borderIndex)
 			{
-				Transform result = null;
+				result = Realizes("QuestEventBorderItem", parent);
+			}
+			else if (i >= questStartIndex)
+			{
+				result = Realizes("QuestRequestItemRush", parent);
+			}
+			else if (i == 0)
+			{
+				result = Realizes("QuestRushRequestItemToSearch", parent);
+			}
+			return result;
+		}, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (!(t == null))
+			{
+				SetActive(t, is_visible: true);
 				if (i >= storyStartIndex)
 				{
-					result = Realizes("QuestEventStoryItem", parent, true);
-				}
-				else if (i >= borderIndex)
-				{
-					result = Realizes("QuestEventBorderItem", parent, true);
-				}
-				else if (i >= questStartIndex)
-				{
-					result = Realizes("QuestRequestItemRush", parent, true);
-				}
-				else if (i == 0)
-				{
-					result = Realizes("QuestRushRequestItemToSearch", parent, true);
-				}
-				return result;
-			}, delegate(int i, Transform t, bool is_recycle)
-			{
-				SetActive(t, true);
-				if (i >= storyStartIndex)
-				{
-					int index = i - storyStartIndex;
-					InitStory(index, t);
+					int storyIndex = i - storyStartIndex;
+					InitStory(storyIndex, t);
 				}
 				else if (i < borderIndex)
 				{
@@ -130,11 +200,11 @@ public class QuestRushSelectList : QuestEventSelectList
 				{
 					SetSprite(t, UI.SPR_FRAME, "RequestPlate_Rush");
 				}
-			});
-			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-			component.set_enabled(true);
-			RepositionTable();
-		}
+			}
+		});
+		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
+		component.set_enabled(true);
+		RepositionTable();
 	}
 
 	protected override void UpdateGrid()
@@ -142,16 +212,16 @@ public class QuestRushSelectList : QuestEventSelectList
 		int num = deliveryInfo.Length + clearedDeliveries.Count;
 		if (deliveryInfo == null || num == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, true);
-			SetDynamicList((Enum)UI.GRD_DELIVERY_QUEST, "QuestRequestItemRush", num, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: true);
+			SetDynamicList((Enum)UI.GRD_DELIVERY_QUEST, "QuestRequestItemRush", num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 				DeliveryTable.DeliveryData deliveryData = null;
 				bool flag = i >= deliveryInfo.Length;
 				if (!flag)
@@ -166,6 +236,7 @@ public class QuestRushSelectList : QuestEventSelectList
 				}
 				SetupDeliveryListItem(t, deliveryData);
 				SetActive(t, UI.OBJ_REQUEST_COMPLETED, flag);
+				SetDifficultySprite(t, deliveryData);
 				SetSprite(t, UI.SPR_FRAME, "RequestPlate_Rush");
 			});
 		}
@@ -173,6 +244,12 @@ public class QuestRushSelectList : QuestEventSelectList
 
 	protected override void InitStory(int index, Transform t)
 	{
+		bool flag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+		if (HasChapterStory() && flag)
+		{
+			base.InitStory(index, t);
+			return;
+		}
 		SetEvent(t, "SELECT_RUSH_STORY", index);
 		SetLabelText(t, UI.LBL_STORY_TITLE, stories[index].title);
 	}
@@ -182,16 +259,18 @@ public class QuestRushSelectList : QuestEventSelectList
 		SetEvent(t, "SELECT_RUSH", index);
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryInfo[index].dId);
 		SetupDeliveryListItem(t, deliveryTableData);
+		SetDifficultySprite(t, deliveryTableData);
 	}
 
 	protected override void InitCompletedDelivery(int completedIndex, Transform t)
 	{
 		int num = clearedDeliveries.Count - 1 - completedIndex;
-		DeliveryTable.DeliveryData info = clearedDeliveries[num];
+		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[num];
 		SetEvent(t, "SELECT_COMPLETED_RUSH", num);
-		SetupDeliveryListItem(t, info);
-		SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
-		SetCompletedHaveCount(t, info);
+		SetupDeliveryListItem(t, deliveryData);
+		SetActive(t, UI.OBJ_REQUEST_COMPLETED, is_visible: true);
+		SetDifficultySprite(t, deliveryData);
+		SetCompletedHaveCount(t, deliveryData);
 	}
 
 	private void OnQuery_SELECT_RUSH()
@@ -238,7 +317,7 @@ public class QuestRushSelectList : QuestEventSelectList
 				{
 					changeToDeliveryClearEvent = false;
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 		else
@@ -302,10 +381,10 @@ public class QuestRushSelectList : QuestEventSelectList
 	{
 		int index = (int)GameSection.GetEventData();
 		Story story = stories[index];
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+		string goingHomeEvent = GameSection.GetGoingHomeEvent();
 		EventData[] array = new EventData[3]
 		{
-			new EventData(name, null),
+			new EventData(goingHomeEvent, null),
 			new EventData("EXPLORE", null),
 			new EventData("SELECT_EXPLORE", eventData)
 		};
@@ -316,5 +395,39 @@ public class QuestRushSelectList : QuestEventSelectList
 			string.Empty,
 			array
 		});
+	}
+
+	private void SetDifficultySprite(Transform t, DeliveryTable.DeliveryData dd)
+	{
+		SetActive(t, UI.SPR_TYPE_DIFFICULTY, dd.difficulty >= DIFFICULTY_MODE.HARD);
+	}
+
+	private IEnumerator GetCurrentStatus()
+	{
+		bool isRequest = true;
+		Protocol.Send<QuestRushPointModel.RequestSendForm, QuestRushPointModel>(postData: new QuestRushPointModel.RequestSendForm
+		{
+			eid = eventData.eventId
+		}, url: QuestRushPointModel.URL, callBack: (Action<QuestRushPointModel>)delegate(QuestRushPointModel result)
+		{
+			isRequest = false;
+			currentData = result.result;
+		}, getParam: string.Empty);
+		while (isRequest)
+		{
+			yield return null;
+		}
+	}
+
+	protected override void OnQuery_INFO()
+	{
+		string arg = base.eventData.linkName + "_REWARD";
+		string eventData = string.Format(WebViewManager.NewsWithLinkParamFormat, arg);
+		GameSection.SetEventData(eventData);
+	}
+
+	private void OnQuery_HOW_TO()
+	{
+		GameSection.SetEventData(WebViewManager.Rush);
 	}
 }

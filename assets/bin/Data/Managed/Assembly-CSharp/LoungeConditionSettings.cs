@@ -171,7 +171,6 @@ public class LoungeConditionSettings : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
 		SetActive((Enum)UI.OBJ_CHANGE, MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge());
 		SetActive((Enum)UI.OBJ_CREATE, !MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge());
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
@@ -220,7 +219,7 @@ public class LoungeConditionSettings : GameSection
 		{
 			createRequest.SetLoungeName(base.sectionData.GetText("DEFAULT_LOUNGE_NAME"));
 		}
-		SetInput((Enum)UI.IPT_NAME, createRequest.loungeName, 16, (EventDelegate.Callback)OnChangeLoungeName);
+		SetInput(UI.IPT_NAME, createRequest.loungeName, 16, OnChangeLoungeName);
 		this.StartCoroutine(LoadStampList());
 	}
 
@@ -231,12 +230,12 @@ public class LoungeConditionSettings : GameSection
 
 	private IEnumerator LoadStampList()
 	{
-		SetActive((Enum)UI.SPR_STAMP_LIST, false);
+		SetActive((Enum)UI.SPR_STAMP_LIST, is_visible: false);
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem", false);
+		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		stampListPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
 		InitStamp();
@@ -252,7 +251,7 @@ public class LoungeConditionSettings : GameSection
 			ResetStampIdList();
 		}
 		int count = stampIdListCanUse.Count;
-		SetGrid(create_item_func: CreateStampItem, grid_ctrl_enum: UI.GRD_STAMP_LIST, item_prefab_name: null, item_num: count, reset: true, item_init_func: InitStampItem);
+		SetGrid(UI.GRD_STAMP_LIST, null, count, reset: true, CreateStampItem, InitStampItem);
 	}
 
 	private Transform CreateStampItem(int index, Transform parent)
@@ -266,23 +265,24 @@ public class LoungeConditionSettings : GameSection
 
 	private void InitStampItem(int index, Transform iTransform, bool isRecycle)
 	{
-		if (stampIdListCanUse != null)
+		if (stampIdListCanUse == null)
 		{
-			int num = stampIdListCanUse[index];
-			ChatStampListItem item = iTransform.GetComponent<ChatStampListItem>();
-			item.Init(num);
-			if (!isRecycle)
+			return;
+		}
+		int num = stampIdListCanUse[index];
+		ChatStampListItem item = iTransform.GetComponent<ChatStampListItem>();
+		item.Init(num);
+		if (!isRecycle)
+		{
+			if (num == createRequest.stampId)
 			{
-				if (num == createRequest.stampId)
-				{
-					SetStampTextre(item.StampId);
-				}
-				ChatStampListItem chatStampListItem = item;
-				chatStampListItem.onButton = (Action)Delegate.Combine(chatStampListItem.onButton, (Action)delegate
-				{
-					SelectStamp(item.StampId);
-				});
+				SetStampTextre(item.StampId);
 			}
+			ChatStampListItem chatStampListItem = item;
+			chatStampListItem.onButton = (Action)Delegate.Combine(chatStampListItem.onButton, (Action)delegate
+			{
+				SelectStamp(item.StampId);
+			});
 		}
 	}
 
@@ -295,7 +295,7 @@ public class LoungeConditionSettings : GameSection
 
 	private void SelectStamp(int id)
 	{
-		SetActive((Enum)UI.SPR_STAMP_LIST, false);
+		SetActive((Enum)UI.SPR_STAMP_LIST, is_visible: false);
 		SetStampTextre(id);
 		createRequest.SetStampId(id);
 	}
@@ -419,7 +419,7 @@ public class LoungeConditionSettings : GameSection
 
 	private void OnQuery_STAMP()
 	{
-		SetActive((Enum)UI.SPR_STAMP_LIST, true);
+		SetActive((Enum)UI.SPR_STAMP_LIST, is_visible: true);
 	}
 
 	private void OnQuery_TARGET_MIN_LEVEL()
@@ -431,7 +431,7 @@ public class LoungeConditionSettings : GameSection
 	{
 		if (minLevelPopup == null)
 		{
-			minLevelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MIN_LEVEL), false);
+			minLevelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MIN_LEVEL), check_panel: false);
 		}
 		if (!(minLevelPopup == null))
 		{
@@ -441,7 +441,7 @@ public class LoungeConditionSettings : GameSection
 				array[i] = (i <= maxLevelIndex);
 			}
 			int select_index = minLevelIndex;
-			UIScrollablePopupList.CreatePopup(minLevelPopup, GetCtrl(UI.POP_TARGET_MIN_LEVEL), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, levelNames.ToArray(), array, select_index, delegate(int index)
+			UIScrollablePopupList.CreatePopup(minLevelPopup, GetCtrl(UI.POP_TARGET_MIN_LEVEL), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, levelNames.ToArray(), array, select_index, delegate(int index)
 			{
 				minLevelIndex = index;
 				createRequest.SetMinLevel(levelList[index]);
@@ -459,7 +459,7 @@ public class LoungeConditionSettings : GameSection
 	{
 		if (maxLevelPopup == null)
 		{
-			maxLevelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MAX_LEVEL), false);
+			maxLevelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MAX_LEVEL), check_panel: false);
 		}
 		if (!(maxLevelPopup == null))
 		{
@@ -469,7 +469,7 @@ public class LoungeConditionSettings : GameSection
 				array[i] = (i >= minLevelIndex);
 			}
 			int select_index = maxLevelIndex;
-			UIScrollablePopupList.CreatePopup(maxLevelPopup, GetCtrl(UI.POP_TARGET_MAX_LEVEL), 8, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, levelNames.ToArray(), array, select_index, delegate(int index)
+			UIScrollablePopupList.CreatePopup(maxLevelPopup, GetCtrl(UI.POP_TARGET_MAX_LEVEL), 8, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, levelNames.ToArray(), array, select_index, delegate(int index)
 			{
 				maxLevelIndex = index;
 				createRequest.SetMaxLevel(levelList[index]);
@@ -482,37 +482,38 @@ public class LoungeConditionSettings : GameSection
 	{
 		if (capacityPopup == null)
 		{
-			capacityPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_CAPACITY), false);
+			capacityPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_CAPACITY), check_panel: false);
 		}
-		if (!(capacityPopup == null))
+		if (capacityPopup == null)
 		{
-			bool[] array = new bool[capacityNames.Count];
-			for (int i = 0; i < array.Length; i++)
-			{
-				if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
-				{
-					array[i] = (i >= createRequest.capacity - 2);
-				}
-				else
-				{
-					array[i] = true;
-				}
-			}
-			int select_index = capacityIndex;
-			UIScrollablePopupList.CreatePopup(capacityPopup, GetCtrl(UI.POP_TARGET_CAPACITY), 6, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, capacityNames.ToArray(), array, select_index, delegate(int index)
-			{
-				capacityIndex = index;
-				createRequest.SetCapacity(capacityList[index]);
-				RefreshUI();
-			});
+			return;
 		}
+		bool[] array = new bool[capacityNames.Count];
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
+			{
+				array[i] = (i >= createRequest.capacity - 2);
+			}
+			else
+			{
+				array[i] = true;
+			}
+		}
+		int select_index = capacityIndex;
+		UIScrollablePopupList.CreatePopup(capacityPopup, GetCtrl(UI.POP_TARGET_CAPACITY), 6, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, capacityNames.ToArray(), array, select_index, delegate(int index)
+		{
+			capacityIndex = index;
+			createRequest.SetCapacity(capacityList[index]);
+			RefreshUI();
+		});
 	}
 
 	private void OnQuery_TARGET_LABEL()
 	{
 		if (labelPopup == null)
 		{
-			labelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LABEL), false);
+			labelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LABEL), check_panel: false);
 		}
 		if (!(labelPopup == null))
 		{
@@ -522,7 +523,7 @@ public class LoungeConditionSettings : GameSection
 				array[i] = true;
 			}
 			int select_index = labelIndex;
-			UIScrollablePopupList.CreatePopup(labelPopup, GetCtrl(UI.POP_TARGET_LABEL), 5, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, labels, array, select_index, delegate(int index)
+			UIScrollablePopupList.CreatePopup(labelPopup, GetCtrl(UI.POP_TARGET_LABEL), 5, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, labels, array, select_index, delegate(int index)
 			{
 				labelIndex = index;
 				SetParamLabel((LOUNGE_LABEL)index);
@@ -540,7 +541,7 @@ public class LoungeConditionSettings : GameSection
 	{
 		if (lockPopup == null)
 		{
-			lockPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LOCK), false);
+			lockPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LOCK), check_panel: false);
 		}
 		if (!(lockPopup == null))
 		{
@@ -550,7 +551,7 @@ public class LoungeConditionSettings : GameSection
 				array[i] = true;
 			}
 			int select_index = lockIndex;
-			UIScrollablePopupList.CreatePopup(lockPopup, GetCtrl(UI.POP_TARGET_LOCK), 2, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, lockNames.ToArray(), array, select_index, delegate(int index)
+			UIScrollablePopupList.CreatePopup(lockPopup, GetCtrl(UI.POP_TARGET_LOCK), 2, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, lockNames.ToArray(), array, select_index, delegate(int index)
 			{
 				lockIndex = index;
 				createRequest.SetLockSetting(lockIndex == 1);
@@ -567,9 +568,9 @@ public class LoungeConditionSettings : GameSection
 		{
 			if (!is_success && err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
 			{
-				GameSection.ChangeStayEvent("NOT_FOUND_QUEST", null);
+				GameSection.ChangeStayEvent("NOT_FOUND_QUEST");
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 
@@ -586,7 +587,7 @@ public class LoungeConditionSettings : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEdit(requestEdit, delegate
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 }

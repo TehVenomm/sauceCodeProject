@@ -32,7 +32,7 @@ public class Inventory {
 
     @NotNull
     public List<String> getAllOwnedSkus(String str) {
-        List<String> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (Purchase purchase : this.mPurchaseMap.values()) {
             if (purchase.getItemType().equals(str)) {
                 arrayList.add(purchase.getSku());

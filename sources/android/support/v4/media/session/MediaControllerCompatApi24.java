@@ -1,15 +1,15 @@
-package android.support.v4.media.session;
+package android.support.p000v4.media.session;
 
-import android.annotation.TargetApi;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 
-@TargetApi(24)
 @RequiresApi(24)
+/* renamed from: android.support.v4.media.session.MediaControllerCompatApi24 */
 class MediaControllerCompatApi24 {
 
-    public static class TransportControls extends android.support.v4.media.session.MediaControllerCompatApi23.TransportControls {
+    /* renamed from: android.support.v4.media.session.MediaControllerCompatApi24$TransportControls */
+    public static class TransportControls extends android.support.p000v4.media.session.MediaControllerCompatApi23.TransportControls {
         public static void prepare(Object obj) {
             ((android.media.session.MediaController.TransportControls) obj).prepare();
         }

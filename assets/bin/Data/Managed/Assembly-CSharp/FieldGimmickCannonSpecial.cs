@@ -31,8 +31,6 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
 		base.Initialize(pointData);
 		m_launchTrans = modelTrans.Find(NAME_NODE_SHOT_EFFECT);
 		m_delayChangeCamera = MonoBehaviourSingleton<InGameSettingsManager>.I.cannonParam.delayChangeCameraForSpecial;
@@ -62,49 +60,50 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 	public override void Shot()
 	{
 		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Expected O, but got Unknown
+		//IL_006b: Expected O, but got Unknown
 		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		if (IsReadyForShot() && (!(m_owner is Self) || m_owner.IsCannonFullCharged()))
+		if (!IsReadyForShot() || (m_owner is Self && !m_owner.IsCannonFullCharged()))
 		{
-			AttackInfo attackHitInfo = GetAttackHitInfo();
-			if (attackHitInfo != null)
+			return;
+		}
+		AttackInfo attackHitInfo = GetAttackHitInfo();
+		if (attackHitInfo != null)
+		{
+			AttackCannonBeam.InitParamCannonBeam initParamCannonBeam = new AttackCannonBeam.InitParamCannonBeam();
+			initParamCannonBeam.attacker = m_owner;
+			initParamCannonBeam.atkInfo = attackHitInfo;
+			initParamCannonBeam.launchTrans = m_launchTrans;
+			GameObject val = new GameObject("AttackCannonBeam");
+			AttackCannonBeam attackCannonBeam = val.AddComponent<AttackCannonBeam>();
+			attackCannonBeam.Initialize(initParamCannonBeam);
+			if (attackHitInfo.bulletData != null && attackHitInfo.bulletData.data != null)
 			{
-				AttackCannonBeam.InitParamCannonBeam initParamCannonBeam = new AttackCannonBeam.InitParamCannonBeam();
-				initParamCannonBeam.attacker = m_owner;
-				initParamCannonBeam.atkInfo = attackHitInfo;
-				initParamCannonBeam.launchTrans = m_launchTrans;
-				GameObject val = new GameObject("AttackCannonBeam");
-				AttackCannonBeam attackCannonBeam = val.AddComponent<AttackCannonBeam>();
-				attackCannonBeam.Initialize(initParamCannonBeam);
-				if (attackHitInfo.bulletData != null && attackHitInfo.bulletData.data != null)
-				{
-					m_durationChangeCamera = attackHitInfo.bulletData.data.appearTime;
-				}
-				if (m_seIdShot > 0)
-				{
-					SoundManager.PlayOneShotSE(m_seIdShot, m_launchTrans.get_position());
-				}
-				this.StartCoroutine(DelayCameraChange());
-				StartCoolTime();
-				SetState(STATE.COOLTIME);
+				m_durationChangeCamera = attackHitInfo.bulletData.data.appearTime;
 			}
+			if (m_seIdShot > 0)
+			{
+				SoundManager.PlayOneShotSE(m_seIdShot, m_launchTrans.get_position());
+			}
+			this.StartCoroutine(DelayCameraChange());
+			StartCoolTime();
+			SetState(STATE.COOLTIME);
 		}
 	}
 
 	private IEnumerator DelayCameraChange()
 	{
-		if (m_owner is Self)
+		if (!(m_owner is Self))
 		{
-			yield return (object)new WaitForSeconds(m_delayChangeCamera);
-			if (!(m_owner == null) && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+			yield break;
+		}
+		yield return (object)new WaitForSeconds(m_delayChangeCamera);
+		if (!(m_owner == null) && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.CANNON_BEAM);
+			yield return (object)new WaitForSeconds(m_durationChangeCamera);
+			if (!(m_owner == null))
 			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.CANNON_BEAM);
-				yield return (object)new WaitForSeconds(m_durationChangeCamera);
-				if (!(m_owner == null))
-				{
-					MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.CANNON_BEAM_CHARGE);
-				}
+				MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.CANNON_BEAM_CHARGE);
 			}
 		}
 	}
@@ -166,11 +165,9 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 
 	public void ReleaseCharge()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && m_effectChargeTrans != null)
 		{
-			EffectManager.ReleaseEffect(m_effectChargeTrans.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(m_effectChargeTrans.get_gameObject());
 		}
 		if (m_owner != null)
 		{

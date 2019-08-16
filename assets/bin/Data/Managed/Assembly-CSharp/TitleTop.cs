@@ -1,3 +1,4 @@
+using Network;
 using rhyme;
 using System;
 using System.Collections;
@@ -36,7 +37,6 @@ public class TitleTop : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -47,47 +47,69 @@ public class TitleTop : GameSection
 			bool wait = true;
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator14A)/*Error near IL_004b: stateMachine*/)._003Cwait_003E__0 = false;
-			}, false);
+				wait = false;
+			});
 			while (wait)
 			{
-				yield return (object)null;
+				yield return null;
 			}
-			SetActiveUI(false);
+			wait = true;
+			MonoBehaviourSingleton<ClanMatchingManager>.I.RequestUserDetail(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, delegate(UserClanData userClanData)
+			{
+				MonoBehaviourSingleton<UserInfoManager>.I.SetUserClan(userClanData);
+				wait = false;
+			});
+			while (wait)
+			{
+				yield return null;
+			}
+			wait = true;
+			MonoBehaviourSingleton<ClanMatchingManager>.I.SendInfo(delegate
+			{
+				wait = false;
+			});
+			while (wait)
+			{
+				yield return null;
+			}
+			SetActiveUI(enable: false);
 			base.Initialize();
+			yield break;
+		}
+		LoadingQueue load_queue = new LoadingQueue(this);
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_title_01");
+		LoadObject lo_director = load_queue.Load(RESOURCE_CATEGORY.CUTSCENE, "InGameTutorialDirector");
+		LoadObject lo_tap = load_queue.Load(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_title_04");
+		while (load_queue.IsLoading())
+		{
+			yield return null;
+		}
+		Transform director_t = ResourceUtility.Realizes(lo_director.loadedObject);
+		if (director_t != null)
+		{
+			director = director_t.GetComponent<TutorialBossDirector>();
+			if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyTitleTop)
+			{
+				DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+				director.logo.camera.set_orthographicSize(specialDeviceInfo.TitleTopCameraSize);
+				director.logo.bg.get_transform().set_localScale(specialDeviceInfo.TitleTopBGScale);
+			}
+			director.StartLogoAnimation(tutorial_flag: false, null, delegate
+			{
+				SetActiveUI(enable: true);
+			});
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(false);
 		}
 		else
 		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_title_01");
-			LoadObject lo_director = load_queue.Load(RESOURCE_CATEGORY.CUTSCENE, "InGameTutorialDirector", false);
-			LoadObject lo_tap = load_queue.Load(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_title_04", false);
-			while (load_queue.IsLoading())
-			{
-				yield return (object)null;
-			}
-			Transform director_t = ResourceUtility.Realizes(lo_director.loadedObject, -1);
-			if (director_t != null)
-			{
-				director = director_t.GetComponent<TutorialBossDirector>();
-				director.StartLogoAnimation(false, null, delegate
-				{
-					((_003CDoInitialize_003Ec__Iterator14A)/*Error near IL_0163: stateMachine*/)._003C_003Ef__this.SetActiveUI(true);
-				});
-				MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(false);
-			}
-			else
-			{
-				SetActiveUI(true);
-			}
-			tapPrefab = (lo_tap.loadedObject as GameObject);
-			base.Initialize();
+			SetActiveUI(enable: true);
 		}
+		tapPrefab = (lo_tap.loadedObject as GameObject);
+		base.Initialize();
 	}
 
 	private void SetActiveUI(bool enable)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		GetCtrl(UI.Container).get_gameObject().SetActive(enable);
 	}
 
@@ -97,7 +119,7 @@ public class TitleTop : GameSection
 		SetVisibleWidgetEffect(UI.TEX_BG, "ef_ui_title_01");
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.I.submissionVersion)
 		{
-			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, false);
+			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, is_visible: false);
 		}
 		else
 		{
@@ -107,7 +129,6 @@ public class TitleTop : GameSection
 
 	public override void Exit()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		base.Exit();
 		if (director != null)
 		{
@@ -116,45 +137,65 @@ public class TitleTop : GameSection
 		}
 	}
 
+	private bool IsAgreement()
+	{
+		if (!MonoBehaviourSingleton<AccountManager>.I.account.IsRegist())
+		{
+			return false;
+		}
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep < 9)
+		{
+			return false;
+		}
+		return MonoBehaviourSingleton<AccountManager>.I.termsCheck;
+	}
+
 	private void OnQuery_PUSH_START()
 	{
 		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		if (!(null != tapEffect))
+		if (null != tapEffect)
 		{
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool is_success)
-			{
-				GameSection.ResumeEvent(is_success, null);
-			}, false);
-			tapEffect = ResourceUtility.Realizes(tapPrefab, -1);
-			if (null != tapEffect)
-			{
-				rymFX component = tapEffect.GetComponent<rymFX>();
-				if (null != component && null != director)
-				{
-					component.Cameras = (Camera[])new Camera[1]
-					{
-						director.logoCamera
-					};
-				}
-				tapEffect.set_localPosition(new Vector3(0f, 1000f, 0.1f));
-				tapEffect.set_localScale(new Vector3(11f, 11f, 1f));
-				tapEffect.get_gameObject().SetActive(true);
-			}
-			SetActive((Enum)UI.BTN_CLEARCACHE, false);
-			this.StartCoroutine(DelayStart());
+			return;
 		}
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool is_success)
+		{
+			MonoBehaviourSingleton<ClanMatchingManager>.I.RequestUserDetail(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, delegate(UserClanData userClanData)
+			{
+				MonoBehaviourSingleton<UserInfoManager>.I.SetUserClan(userClanData);
+				MonoBehaviourSingleton<ClanMatchingManager>.I.SendInfo(delegate(bool is_success_clan)
+				{
+					GameSection.ResumeEvent(is_success && is_success_clan);
+				});
+			});
+			GameSection.ResumeEvent(is_success);
+		});
+		tapEffect = ResourceUtility.Realizes(tapPrefab);
+		if (null != tapEffect)
+		{
+			rymFX component = tapEffect.GetComponent<rymFX>();
+			if (null != component && null != director)
+			{
+				component.Cameras = (Camera[])new Camera[1]
+				{
+					director.logoCamera
+				};
+			}
+			tapEffect.set_localPosition(new Vector3(0f, 1000f, 0.1f));
+			tapEffect.set_localScale(new Vector3(11f, 11f, 1f));
+			tapEffect.get_gameObject().SetActive(true);
+		}
+		SetActive((Enum)UI.BTN_CLEARCACHE, is_visible: false);
+		this.StartCoroutine(DelayStart());
 	}
 
 	private IEnumerator DelayStart()
 	{
 		yield return (object)new WaitForSeconds(0.5f);
-		SetActive((Enum)UI.BTN_START, false);
+		SetActive((Enum)UI.BTN_START, is_visible: false);
 		yield return (object)new WaitForSeconds(1.5f);
-		DispatchEvent("START", null);
+		DispatchEvent("START");
 	}
 
 	private void OnQuery_START()
@@ -166,25 +207,26 @@ public class TitleTop : GameSection
 			{
 				if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name == "/colopl_rob")
 				{
-					GameSection.ChangeStayEvent("OPENING", null);
+					GameSection.ChangeStayEvent("OPENING");
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep > 0 && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep <= 2)
 		{
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1)
+			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1 || MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 2)
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Title", "CharaMake", UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
 			}
-			else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 2)
+			DispatchEvent("MAIN_MENU_HOME");
+		}
+		if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.END))
+		{
+			Protocol.Force(delegate
 			{
-				DispatchEvent("MAIN_MENU_HOME", null);
-			}
-			else
-			{
-				DispatchEvent("TUTORIAL_" + MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep.ToString(), null);
-			}
+				MonoBehaviourSingleton<UserInfoManager>.I.SendTutorialStep(delegate
+				{
+				});
+			});
 		}
 	}
 
@@ -202,16 +244,16 @@ public class TitleTop : GameSection
 	{
 		if (isFirstBoot && CheckTitleSkip())
 		{
-			DispatchEvent("START", null);
+			DispatchEvent("START");
 		}
 		else if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			SoundManager.RequestBGM(1, true);
+			SoundManager.RequestBGM(1);
 		}
 		isFirstBoot = false;
 	}
 
-	private bool CheckTitleSkip()
+	public static bool CheckTitleSkip()
 	{
 		if (MonoBehaviourSingleton<AccountManager>.I.account.IsRegist() && 1 <= MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep)
 		{

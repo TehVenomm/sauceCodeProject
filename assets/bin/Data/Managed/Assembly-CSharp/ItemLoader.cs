@@ -83,8 +83,6 @@ public class ItemLoader : ModelLoaderBase
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		Clear();
 	}
@@ -114,62 +112,61 @@ public class ItemLoader : ModelLoaderBase
 		if (equipItemID == equip_item_id && sexID == sex_id && faceID == face_id)
 		{
 			_callback?.Invoke();
+			return;
+		}
+		EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equip_item_id);
+		if (equipItemData != null)
+		{
+			switch (equipItemData.type)
+			{
+			case EQUIPMENT_TYPE.ARMOR:
+			case EQUIPMENT_TYPE.VISUAL_ARMOR:
+				Init(DoLoadFullBody(equipItemData), parent, layer, sex_id, face_id, _callback);
+				break;
+			case EQUIPMENT_TYPE.HELM:
+			case EQUIPMENT_TYPE.VISUAL_HELM:
+				Init(DoLoadHelm(equipItemData), parent, layer, sex_id, face_id, _callback);
+				break;
+			case EQUIPMENT_TYPE.ARM:
+			case EQUIPMENT_TYPE.VISUAL_ARM:
+				Init(DoLoadFullBody(equipItemData), parent, layer, sex_id, face_id, _callback);
+				break;
+			case EQUIPMENT_TYPE.LEG:
+			case EQUIPMENT_TYPE.VISUAL_LEG:
+				Init(DoLoadFullBody(equipItemData), parent, layer, sex_id, face_id, _callback);
+				break;
+			default:
+				Init(DoLoadWeapon(equipItemData), parent, layer, sex_id, face_id, _callback);
+				break;
+			}
+			equipItemID = equip_item_id;
 		}
 		else
 		{
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equip_item_id);
-			if (equipItemData != null)
-			{
-				switch (equipItemData.type)
-				{
-				case EQUIPMENT_TYPE.ARMOR:
-				case EQUIPMENT_TYPE.VISUAL_ARMOR:
-					Init(DoLoadFullBody(equipItemData), parent, layer, sex_id, face_id, _callback);
-					break;
-				case EQUIPMENT_TYPE.HELM:
-				case EQUIPMENT_TYPE.VISUAL_HELM:
-					Init(DoLoadHelm(equipItemData), parent, layer, sex_id, face_id, _callback);
-					break;
-				case EQUIPMENT_TYPE.ARM:
-				case EQUIPMENT_TYPE.VISUAL_ARM:
-					Init(DoLoadFullBody(equipItemData), parent, layer, sex_id, face_id, _callback);
-					break;
-				case EQUIPMENT_TYPE.LEG:
-				case EQUIPMENT_TYPE.VISUAL_LEG:
-					Init(DoLoadFullBody(equipItemData), parent, layer, sex_id, face_id, _callback);
-					break;
-				default:
-					Init(DoLoadWeapon(equipItemData), parent, layer, sex_id, face_id, _callback);
-					break;
-				}
-				equipItemID = equip_item_id;
-			}
-			else
-			{
-				Clear();
-			}
+			Clear();
 		}
 	}
 
 	public void LoadItem(uint item_id, Transform parent, int layer, Action _callback = null)
 	{
-		if (itemID != item_id)
+		if (itemID == item_id)
 		{
-			if (1000000 > item_id)
-			{
-				if (item_id != 1 && item_id != 2)
-				{
-					item_id = 2u;
-				}
-				Init(DoLoadItem(item_id), parent, layer, -1, -1, _callback);
-			}
-			else
-			{
-				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(item_id);
-				Init(DoLoadItem(itemData), parent, layer, -1, -1, _callback);
-			}
-			itemID = item_id;
+			return;
 		}
+		if (1000000 > item_id)
+		{
+			if (item_id != 1 && item_id != 2)
+			{
+				item_id = 2u;
+			}
+			Init(DoLoadItem(item_id), parent, layer, -1, -1, _callback);
+		}
+		else
+		{
+			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(item_id);
+			Init(DoLoadItem(itemData), parent, layer, -1, -1, _callback);
+		}
+		itemID = item_id;
 	}
 
 	public void LoadSkillItem(uint skill_item_id, Transform parent, int layer, Action _callback = null)
@@ -191,32 +188,39 @@ public class ItemLoader : ModelLoaderBase
 
 	public void LoadSkillItemSymbol(uint skill_item_id, Transform parent, int layer, Action _callback = null)
 	{
-		if (itemID != skill_item_id)
+		if (itemID == skill_item_id)
 		{
-			SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(skill_item_id);
-			if (skillItemData != null)
-			{
-				if (skillItemData.iconID <= 0)
-				{
-					Clear();
-				}
-				else
-				{
-					Init(DoLoadSkillItemSymbol(skillItemData), parent, layer, -1, -1, _callback);
-					itemID = skill_item_id;
-				}
-			}
-			else
+			return;
+		}
+		SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(skill_item_id);
+		if (skillItemData != null)
+		{
+			if (skillItemData.iconID <= 0)
 			{
 				Clear();
+				return;
 			}
+			Init(DoLoadSkillItemSymbol(skillItemData), parent, layer, -1, -1, _callback);
+			itemID = skill_item_id;
+		}
+		else
+		{
+			Clear();
+		}
+	}
+
+	public void LoadAccessory(uint accessory_id, Transform parent, int layer, Action _callback = null)
+	{
+		if (itemID != accessory_id)
+		{
+			AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData(accessory_id);
+			Init(DoLoadAccessory(accessory_id), parent, layer, -1, -1, _callback);
+			itemID = accessory_id;
 		}
 	}
 
 	private void Init(IEnumerator _coroutine, Transform parent, int layer, int sex_id, int face_id, Action _callback)
 	{
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		Clear();
 		if (sex_id == -1)
 		{
@@ -244,8 +248,6 @@ public class ItemLoader : ModelLoaderBase
 
 	public void Clear()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		for (int num = _transform.get_childCount() - 1; num >= 0; num--)
 		{
 			Object.Destroy(_transform.GetChild(num).get_gameObject());
@@ -282,12 +284,13 @@ public class ItemLoader : ModelLoaderBase
 		byte highTex = 0;
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid())
 		{
-			EquipModelHQTable hqTable = MonoBehaviourSingleton<GlobalSettingsManager>.I.equipModelHQTable;
-			highTex = hqTable.GetWeaponFlag(modelID);
+			EquipModelHQTable equipModelHQTable = MonoBehaviourSingleton<GlobalSettingsManager>.I.equipModelHQTable;
+			highTex = equipModelHQTable.GetWeaponFlag(modelID);
 		}
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_WEAPON, name);
+		Debug.Log((object)("Weapon name:" + name));
 		LoadObject lo_high_reso_tex = PlayerLoader.LoadHighResoTexs(loadingQueue, name, highTex);
-		yield return (object)loadingQueue.Wait();
+		yield return loadingQueue.Wait();
 		Transform weapon = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
 		weapon.set_localPosition(Vector3.get_zero());
 		weapon.set_localRotation(Quaternion.get_identity());
@@ -295,29 +298,31 @@ public class ItemLoader : ModelLoaderBase
 		PlayerLoader.SetEquipColor3(renderers, NGUIMath.IntToColor(data.modelColor0), NGUIMath.IntToColor(data.modelColor1), NGUIMath.IntToColor(data.modelColor2));
 		Material materialR = null;
 		Material materialL = null;
-		int j = 0;
-		for (int i = renderers.Length; j < i; j++)
+		int i = 0;
+		for (int num = renderers.Length; i < num; i++)
 		{
-			Renderer r = renderers[j];
-			if (r.get_name().EndsWith("_L"))
+			Renderer val = renderers[i];
+			if (val.get_name().EndsWith("_L"))
 			{
-				materialL = r.get_material();
-				nodeSub = r.get_transform();
+				materialL = val.get_material();
+				nodeSub = val.get_transform();
 			}
 			else
 			{
-				materialR = r.get_material();
-				nodeMain = r.get_transform();
+				materialR = val.get_material();
+				nodeMain = val.get_transform();
 			}
 		}
-		yield return (object)this.StartCoroutine(InitRoopEffect(loadingQueue, weapon, SHADER_TYPE.NORMAL));
+		yield return this.StartCoroutine(InitRoopEffect(loadingQueue, weapon));
 		PlayerLoader.ApplyWeaponHighResoTexs(lo_high_reso_tex, highTex, materialR, materialL);
 		displayInfo = new GlobalSettingsManager.UIModelRenderingParam.DisplayInfo(MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.WeaponDisplayInfos[(int)data.type]);
 		if (data.id == 50020201 || data.id == 50020200)
 		{
 			displayInfo.mainPos = new Vector3(0f, 0f, -0.21f);
-			displayInfo.mainRot.x += 180f;
-			displayInfo.subRot.x += 180f;
+			ref Vector3 mainRot = ref displayInfo.mainRot;
+			mainRot.x += 180f;
+			ref Vector3 subRot = ref displayInfo.subRot;
+			subRot.x += 180f;
 		}
 		if (data.id == 60020200 || data.id == 60020201 || data.id == 60020202)
 		{
@@ -348,7 +353,7 @@ public class ItemLoader : ModelLoaderBase
 		LoadObject lo_body = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_BDY, ResourceName.GetPlayerBody(body_id));
 		LoadObject lo_arm = (!model_data.needArm || arm_id <= -1) ? null : loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_ARM, ResourceName.GetPlayerArm(arm_id));
 		LoadObject lo_leg = (!model_data.needLeg || leg_id <= -1) ? null : loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_LEG, ResourceName.GetPlayerLeg(leg_id));
-		yield return (object)loadingQueue.Wait();
+		yield return loadingQueue.Wait();
 		Transform body = lo_body.Realizes(_transform, _transform.get_gameObject().get_layer());
 		body.set_localPosition(Vector3.get_zero());
 		body.set_localRotation(Quaternion.get_identity());
@@ -359,27 +364,27 @@ public class ItemLoader : ModelLoaderBase
 		}
 		else
 		{
-			yield return (object)this.StartCoroutine(InitRoopEffect(loadingQueue, body, SHADER_TYPE.NORMAL));
+			yield return this.StartCoroutine(InitRoopEffect(loadingQueue, body));
 		}
 		nodeMain = body;
 		SkinnedMeshRenderer body_skin = body.GetComponentInChildren<SkinnedMeshRenderer>();
 		Transform head_node = Utility.Find(body, "Head");
-		Transform L_Upperarm = Utility.Find(body, "L_Upperarm");
-		Transform R_Upperarm = Utility.Find(body, "R_Upperarm");
-		if (L_Upperarm != null && R_Upperarm != null)
+		Transform val = Utility.Find(body, "L_Upperarm");
+		Transform val2 = Utility.Find(body, "R_Upperarm");
+		if (val != null && val2 != null)
 		{
-			Vector3 angle = L_Upperarm.get_localEulerAngles();
-			angle.y = -40f;
-			L_Upperarm.set_localEulerAngles(angle);
-			angle = R_Upperarm.get_localEulerAngles();
-			angle.y = -40f;
-			R_Upperarm.set_localEulerAngles(angle);
+			Vector3 localEulerAngles = val.get_localEulerAngles();
+			localEulerAngles.y = -40f;
+			val.set_localEulerAngles(localEulerAngles);
+			localEulerAngles = val2.get_localEulerAngles();
+			localEulerAngles.y = -40f;
+			val2.set_localEulerAngles(localEulerAngles);
 		}
 		if (lo_face != null)
 		{
-			Transform face = lo_face.Realizes(head_node, _transform.get_gameObject().get_layer());
-			PlayerLoader.SetSkinColor(face, skin_color);
-			_SetMannequinMaterial(face);
+			Transform t = lo_face.Realizes(head_node, _transform.get_gameObject().get_layer());
+			PlayerLoader.SetSkinColor(t, skin_color);
+			_SetMannequinMaterial(t);
 		}
 		if (lo_hair != null)
 		{
@@ -443,17 +448,17 @@ public class ItemLoader : ModelLoaderBase
 		{
 			lo_face = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_FACE, ResourceName.GetPlayerFace(faceModelID));
 		}
-		yield return (object)loadingQueue.Wait();
+		yield return loadingQueue.Wait();
 		Transform head = lo_head.Realizes(_transform, _transform.get_gameObject().get_layer());
 		head.set_localPosition(Vector3.get_zero());
 		head.set_localRotation(Quaternion.get_identity());
 		PlayerLoader.SetEquipColor(head, NGUIMath.IntToColor(data.modelColor0));
 		nodeMain = head;
-		yield return (object)this.StartCoroutine(InitRoopEffect(loadingQueue, head, SHADER_TYPE.NORMAL));
+		yield return this.StartCoroutine(InitRoopEffect(loadingQueue, head));
 		if (lo_face != null)
 		{
-			Transform face = lo_face.Realizes(head, _transform.get_gameObject().get_layer());
-			_SetMannequinMaterial(face);
+			Transform t = lo_face.Realizes(head, _transform.get_gameObject().get_layer());
+			_SetMannequinMaterial(t);
 		}
 		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.helmDisplayInfo;
 		OnLoadFinished();
@@ -467,7 +472,7 @@ public class ItemLoader : ModelLoaderBase
 	private IEnumerator DoLoadItem(uint itemID)
 	{
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetItemModel((int)itemID));
-		yield return (object)loadingQueue.Wait();
+		yield return loadingQueue.Wait();
 		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
 		item.set_localPosition(Vector3.get_zero());
 		item.set_localRotation(Quaternion.get_identity());
@@ -479,7 +484,7 @@ public class ItemLoader : ModelLoaderBase
 	private IEnumerator DoLoadSkillItem(SkillItemTable.SkillItemData data)
 	{
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemModel(data.modelID));
-		yield return (object)loadingQueue.Wait();
+		yield return loadingQueue.Wait();
 		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
 		item.set_localPosition(Vector3.get_zero());
 		item.set_localRotation(Quaternion.get_identity());
@@ -492,11 +497,24 @@ public class ItemLoader : ModelLoaderBase
 	private IEnumerator DoLoadSkillItemSymbol(SkillItemTable.SkillItemData data)
 	{
 		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemSymbolModel(data.iconID));
-		yield return (object)loadingQueue.Wait();
+		yield return loadingQueue.Wait();
 		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
 		item.set_localPosition(Vector3.get_zero());
 		item.set_localRotation(Quaternion.get_identity());
 		nodeMain = item;
+		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.itemDisplayInfo;
+		OnLoadFinished();
+	}
+
+	private IEnumerator DoLoadAccessory(uint accessoryID)
+	{
+		LoadObject lo = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_ACCESSORY, ResourceName.GetPlayerAccessory(accessoryID));
+		yield return loadingQueue.Wait();
+		Transform item = lo.Realizes(_transform, _transform.get_gameObject().get_layer());
+		item.set_localPosition(Vector3.get_zero());
+		item.set_localRotation(Quaternion.get_identity());
+		nodeMain = item;
+		yield return this.StartCoroutine(InitRoopEffect(loadingQueue, item));
 		displayInfo = MonoBehaviourSingleton<GlobalSettingsManager>.I.uiModelRendering.itemDisplayInfo;
 		OnLoadFinished();
 	}
@@ -543,37 +561,39 @@ public class ItemLoader : ModelLoaderBase
 		EffectPlayProcessor processor = equipItemRoot.get_gameObject().GetComponentInChildren<EffectPlayProcessor>();
 		if (processor != null && processor.effectSettings != null)
 		{
-			int j = 0;
-			for (int len = processor.effectSettings.Length; j < len; j++)
+			int i = 0;
+			for (int num = processor.effectSettings.Length; i < num; i++)
 			{
-				if (!string.IsNullOrEmpty(processor.effectSettings[j].effectName))
+				if (!string.IsNullOrEmpty(processor.effectSettings[i].effectName))
 				{
-					queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, processor.effectSettings[j].effectName);
+					queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, processor.effectSettings[i].effectName);
 				}
 			}
 		}
-		yield return (object)queue.Wait();
-		if (processor != null)
+		yield return queue.Wait();
+		if (!(processor != null))
 		{
-			List<Transform> trans = processor.PlayEffect("InitRoop", null);
-			if (trans != null)
+			yield break;
+		}
+		List<Transform> list = processor.PlayEffect("InitRoop");
+		if (list == null)
+		{
+			yield break;
+		}
+		for (int j = 0; j < list.Count; j++)
+		{
+			Utility.SetLayerWithChildren(list[j], equipItemRoot.get_gameObject().get_layer());
+			if (shaderType != 0)
 			{
-				for (int i = 0; i < trans.Count; i++)
+				Renderer[] componentsInChildren = list[j].GetComponentsInChildren<Renderer>();
+				switch (shaderType)
 				{
-					Utility.SetLayerWithChildren(trans[i], equipItemRoot.get_gameObject().get_layer());
-					if (shaderType != 0)
-					{
-						Renderer[] rs = trans[i].GetComponentsInChildren<Renderer>();
-						switch (shaderType)
-						{
-						case SHADER_TYPE.LIGHTWEIGHT:
-							ShaderGlobal.ChangeWantLightweightShader(rs);
-							break;
-						case SHADER_TYPE.UI:
-							ShaderGlobal.ChangeWantUIShader(rs);
-							break;
-						}
-					}
+				case SHADER_TYPE.LIGHTWEIGHT:
+					ShaderGlobal.ChangeWantLightweightShader(componentsInChildren);
+					break;
+				case SHADER_TYPE.UI:
+					ShaderGlobal.ChangeWantUIShader(componentsInChildren);
+					break;
 				}
 			}
 		}

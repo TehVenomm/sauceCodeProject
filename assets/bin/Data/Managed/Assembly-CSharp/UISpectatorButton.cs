@@ -18,7 +18,6 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	private void Start()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (currentTarget == null)
 		{
 			this.get_gameObject().SetActive(false);
@@ -32,7 +31,6 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public void BeginSpect()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		Player value = GetPlayers().First.Value;
 		SetTarget(value);
 		this.get_gameObject().SetActive(true);
@@ -45,12 +43,10 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 		if (linkedListNode == null)
 		{
 			BeginSpect();
+			return;
 		}
-		else
-		{
-			Player target = (linkedListNode.Previous != null) ? linkedListNode.Previous.Value : players.Last.Value;
-			SetTarget(target);
-		}
+		Player target = (linkedListNode.Previous != null) ? linkedListNode.Previous.Value : players.Last.Value;
+		SetTarget(target);
 	}
 
 	public void OnNext()
@@ -60,12 +56,10 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 		if (linkedListNode == null)
 		{
 			BeginSpect();
+			return;
 		}
-		else
-		{
-			Player target = (linkedListNode.Next != null) ? linkedListNode.Next.Value : players.First.Value;
-			SetTarget(target);
-		}
+		Player target = (linkedListNode.Next != null) ? linkedListNode.Next.Value : players.First.Value;
+		SetTarget(target);
 	}
 
 	private void SetTarget(Player target)
@@ -77,7 +71,6 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public void EndSpect()
 	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient != null && Object.op_Implicit(MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer()))
 		{
 			MonoBehaviourSingleton<InGameCameraManager>.I.target = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer()._transform;
@@ -133,7 +126,6 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public bool IsEnable()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		return this.get_gameObject().get_activeSelf();
 	}
 }

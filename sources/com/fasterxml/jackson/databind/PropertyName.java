@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.databind;
 
 import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.core.p015io.SerializedString;
 import com.fasterxml.jackson.core.util.InternCache;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import java.io.Serializable;
@@ -28,14 +28,15 @@ public class PropertyName implements Serializable {
         this._namespace = str2;
     }
 
-    protected Object readResolve() {
+    /* access modifiers changed from: protected */
+    public Object readResolve() {
         if (this._simpleName == null || "".equals(this._simpleName)) {
             return USE_DEFAULT;
         }
-        if (this._simpleName.equals("") && this._namespace == null) {
-            return NO_NAME;
+        if (!this._simpleName.equals("") || this._namespace != null) {
+            return this;
         }
-        return this;
+        return NO_NAME;
     }
 
     public static PropertyName construct(String str) {
@@ -109,9 +110,8 @@ public class PropertyName implements Serializable {
     public boolean hasSimpleName(String str) {
         if (str == null) {
             return this._simpleName == null;
-        } else {
-            return str.equals(this._simpleName);
         }
+        return str.equals(this._simpleName);
     }
 
     public boolean hasNamespace() {

@@ -28,6 +28,8 @@ namespace Network
 
 		public string name;
 
+		public int remain = -1;
+
 		public List<DarkMarketReward> rewards;
 	}
 }

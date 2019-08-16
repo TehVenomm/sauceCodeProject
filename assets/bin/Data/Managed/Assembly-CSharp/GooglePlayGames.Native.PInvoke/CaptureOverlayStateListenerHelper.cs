@@ -2,12 +2,16 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class CaptureOverlayStateListenerHelper : BaseReferenceHolder
 	{
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.CaptureOverlayStateListenerHelper.OnCaptureOverlayStateChangedCallback _003C_003Ef__mg_0024cache0;
+
 		internal CaptureOverlayStateListenerHelper(IntPtr selfPointer)
 			: base(selfPointer)
 		{

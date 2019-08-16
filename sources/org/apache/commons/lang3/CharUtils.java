@@ -2,12 +2,16 @@ package org.apache.commons.lang3;
 
 public class CharUtils {
     private static final String[] CHAR_STRING_ARRAY = new String[128];
-    public static final char CR = '\r';
-    private static final char[] HEX_DIGITS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    public static final char LF = '\n';
+
+    /* renamed from: CR */
+    public static final char f1421CR = '\r';
+    private static final char[] HEX_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    /* renamed from: LF */
+    public static final char f1422LF = '\n';
 
     static {
-        for (char c = '\u0000'; c < CHAR_STRING_ARRAY.length; c = (char) (c + 1)) {
+        for (char c = 0; c < CHAR_STRING_ARRAY.length; c = (char) (c + 1)) {
             CHAR_STRING_ARRAY[c] = String.valueOf(c);
         }
     }
@@ -48,13 +52,13 @@ public class CharUtils {
 
     public static int toIntValue(char c) {
         if (isAsciiNumeric(c)) {
-            return c - 48;
+            return c - '0';
         }
         throw new IllegalArgumentException("The character " + c + " is not in the range '0' - '9'");
     }
 
     public static int toIntValue(char c, int i) {
-        return !isAsciiNumeric(c) ? i : c - 48;
+        return !isAsciiNumeric(c) ? i : c - '0';
     }
 
     public static int toIntValue(Character ch) {
@@ -69,7 +73,7 @@ public class CharUtils {
     }
 
     public static String toString(char c) {
-        if (c < '') {
+        if (c < 128) {
             return CHAR_STRING_ARRAY[c];
         }
         return new String(new char[]{c});
@@ -83,13 +87,13 @@ public class CharUtils {
     }
 
     public static String unicodeEscaped(char c) {
-        StringBuilder stringBuilder = new StringBuilder(6);
-        stringBuilder.append("\\u");
-        stringBuilder.append(HEX_DIGITS[(c >> 12) & 15]);
-        stringBuilder.append(HEX_DIGITS[(c >> 8) & 15]);
-        stringBuilder.append(HEX_DIGITS[(c >> 4) & 15]);
-        stringBuilder.append(HEX_DIGITS[c & 15]);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(6);
+        sb.append("\\u");
+        sb.append(HEX_DIGITS[(c >> 12) & 15]);
+        sb.append(HEX_DIGITS[(c >> 8) & 15]);
+        sb.append(HEX_DIGITS[(c >> 4) & 15]);
+        sb.append(HEX_DIGITS[c & 15]);
+        return sb.toString();
     }
 
     public static String unicodeEscaped(Character ch) {
@@ -100,15 +104,15 @@ public class CharUtils {
     }
 
     public static boolean isAscii(char c) {
-        return c < '';
+        return c < 128;
     }
 
     public static boolean isAsciiPrintable(char c) {
-        return c >= ' ' && c < '';
+        return c >= ' ' && c < 127;
     }
 
     public static boolean isAsciiControl(char c) {
-        return c < ' ' || c == '';
+        return c < ' ' || c == 127;
     }
 
     public static boolean isAsciiAlpha(char c) {

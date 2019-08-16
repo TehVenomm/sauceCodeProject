@@ -2,40 +2,41 @@ package com.google.android.gms.games.leaderboard;
 
 import android.database.CharArrayBuffer;
 import android.net.Uri;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.util.zzg;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.util.DataUtils;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameEntity;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+@UsedByReflection("GamesClientImpl.java")
 public final class LeaderboardEntity implements Leaderboard {
-    private final String zzeby;
-    private final Uri zzhbd;
-    private final String zzhbo;
-    private final String zzhku;
-    private final int zzhkv;
-    private final ArrayList<zzb> zzhkw;
-    private final Game zzhkx;
+    private final String zzac;
+    private final String zzn;
+    private final String zznt;
+    private final int zznu;
+    private final ArrayList<LeaderboardVariantEntity> zznv;
+    private final Game zznw;
+    private final Uri zzr;
 
     public LeaderboardEntity(Leaderboard leaderboard) {
-        this.zzhku = leaderboard.getLeaderboardId();
-        this.zzeby = leaderboard.getDisplayName();
-        this.zzhbd = leaderboard.getIconImageUri();
-        this.zzhbo = leaderboard.getIconImageUrl();
-        this.zzhkv = leaderboard.getScoreOrder();
+        this.zznt = leaderboard.getLeaderboardId();
+        this.zzn = leaderboard.getDisplayName();
+        this.zzr = leaderboard.getIconImageUri();
+        this.zzac = leaderboard.getIconImageUrl();
+        this.zznu = leaderboard.getScoreOrder();
         Game game = leaderboard.getGame();
-        this.zzhkx = game == null ? null : new GameEntity(game);
+        this.zznw = game == null ? null : new GameEntity(game);
         ArrayList variants = leaderboard.getVariants();
         int size = variants.size();
-        this.zzhkw = new ArrayList(size);
+        this.zznv = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            this.zzhkw.add((zzb) ((LeaderboardVariant) variants.get(i)).freeze());
+            this.zznv.add((LeaderboardVariantEntity) ((LeaderboardVariant) variants.get(i)).freeze());
         }
     }
 
     static int zza(Leaderboard leaderboard) {
-        return Arrays.hashCode(new Object[]{leaderboard.getLeaderboardId(), leaderboard.getDisplayName(), leaderboard.getIconImageUri(), Integer.valueOf(leaderboard.getScoreOrder()), leaderboard.getVariants()});
+        return Objects.hashCode(leaderboard.getLeaderboardId(), leaderboard.getDisplayName(), leaderboard.getIconImageUri(), Integer.valueOf(leaderboard.getScoreOrder()), leaderboard.getVariants());
     }
 
     static boolean zza(Leaderboard leaderboard, Object obj) {
@@ -46,11 +47,11 @@ public final class LeaderboardEntity implements Leaderboard {
             return true;
         }
         Leaderboard leaderboard2 = (Leaderboard) obj;
-        return zzbf.equal(leaderboard2.getLeaderboardId(), leaderboard.getLeaderboardId()) && zzbf.equal(leaderboard2.getDisplayName(), leaderboard.getDisplayName()) && zzbf.equal(leaderboard2.getIconImageUri(), leaderboard.getIconImageUri()) && zzbf.equal(Integer.valueOf(leaderboard2.getScoreOrder()), Integer.valueOf(leaderboard.getScoreOrder())) && zzbf.equal(leaderboard2.getVariants(), leaderboard.getVariants());
+        return Objects.equal(leaderboard2.getLeaderboardId(), leaderboard.getLeaderboardId()) && Objects.equal(leaderboard2.getDisplayName(), leaderboard.getDisplayName()) && Objects.equal(leaderboard2.getIconImageUri(), leaderboard.getIconImageUri()) && Objects.equal(Integer.valueOf(leaderboard2.getScoreOrder()), Integer.valueOf(leaderboard.getScoreOrder())) && Objects.equal(leaderboard2.getVariants(), leaderboard.getVariants());
     }
 
     static String zzb(Leaderboard leaderboard) {
-        return zzbf.zzt(leaderboard).zzg("LeaderboardId", leaderboard.getLeaderboardId()).zzg("DisplayName", leaderboard.getDisplayName()).zzg("IconImageUri", leaderboard.getIconImageUri()).zzg("IconImageUrl", leaderboard.getIconImageUrl()).zzg("ScoreOrder", Integer.valueOf(leaderboard.getScoreOrder())).zzg("Variants", leaderboard.getVariants()).toString();
+        return Objects.toStringHelper(leaderboard).add("LeaderboardId", leaderboard.getLeaderboardId()).add("DisplayName", leaderboard.getDisplayName()).add("IconImageUri", leaderboard.getIconImageUri()).add("IconImageUrl", leaderboard.getIconImageUrl()).add("ScoreOrder", Integer.valueOf(leaderboard.getScoreOrder())).add("Variants", leaderboard.getVariants()).toString();
     }
 
     public final boolean equals(Object obj) {
@@ -65,35 +66,35 @@ public final class LeaderboardEntity implements Leaderboard {
     }
 
     public final String getDisplayName() {
-        return this.zzeby;
+        return this.zzn;
     }
 
     public final void getDisplayName(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzeby, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.zzn, charArrayBuffer);
     }
 
     public final Game getGame() {
-        return this.zzhkx;
+        return this.zznw;
     }
 
     public final Uri getIconImageUri() {
-        return this.zzhbd;
+        return this.zzr;
     }
 
     public final String getIconImageUrl() {
-        return this.zzhbo;
+        return this.zzac;
     }
 
     public final String getLeaderboardId() {
-        return this.zzhku;
+        return this.zznt;
     }
 
     public final int getScoreOrder() {
-        return this.zzhkv;
+        return this.zznu;
     }
 
     public final ArrayList<LeaderboardVariant> getVariants() {
-        return new ArrayList(this.zzhkw);
+        return new ArrayList<>(this.zznv);
     }
 
     public final int hashCode() {

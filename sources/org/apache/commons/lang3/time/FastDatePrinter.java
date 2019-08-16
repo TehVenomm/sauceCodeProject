@@ -1,6 +1,5 @@
 package org.apache.commons.lang3.time;
 
-import android.support.v4.view.MotionEventCompat;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -15,7 +14,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import jp.colopl.util.ImageUtil;
 import net.gogame.gowrap.InternalConstants;
 
 public class FastDatePrinter implements DatePrinter, Serializable {
@@ -30,12 +28,6 @@ public class FastDatePrinter implements DatePrinter, Serializable {
     private final String mPattern;
     private transient Rule[] mRules;
     private final TimeZone mTimeZone;
-
-    private interface Rule {
-        void appendTo(StringBuffer stringBuffer, Calendar calendar);
-
-        int estimateLength();
-    }
 
     private static class CharacterLiteral implements Rule {
         private final char mValue;
@@ -86,20 +78,20 @@ public class FastDatePrinter implements DatePrinter, Serializable {
                 stringBuffer.append("Z");
                 return;
             }
-            i += calendar.get(16);
-            if (i < 0) {
+            int i2 = i + calendar.get(16);
+            if (i2 < 0) {
                 stringBuffer.append('-');
-                i = -i;
+                i2 = -i2;
             } else {
                 stringBuffer.append('+');
             }
-            int i2 = i / 3600000;
-            FastDatePrinter.appendDigits(stringBuffer, i2);
+            int i3 = i2 / 3600000;
+            FastDatePrinter.appendDigits(stringBuffer, i3);
             if (this.length >= 5) {
                 if (this.length == 6) {
                     stringBuffer.append(':');
                 }
-                FastDatePrinter.appendDigits(stringBuffer, (i / InternalConstants.FAB_BLINKING_TIME_INTERVAL) - (i2 * 60));
+                FastDatePrinter.appendDigits(stringBuffer, (i2 / InternalConstants.FAB_BLINKING_TIME_INTERVAL) - (i3 * 60));
             }
         }
     }
@@ -129,17 +121,22 @@ public class FastDatePrinter implements DatePrinter, Serializable {
         }
 
         public final void appendTo(StringBuffer stringBuffer, int i) {
-            int i2;
-            for (i2 = 0; i2 < this.mSize; i2++) {
+            for (int i2 = 0; i2 < this.mSize; i2++) {
                 stringBuffer.append('0');
             }
-            i2 = stringBuffer.length();
+            int length = stringBuffer.length();
             while (i > 0) {
-                i2--;
-                stringBuffer.setCharAt(i2, (char) ((i % 10) + 48));
+                length--;
+                stringBuffer.setCharAt(length, (char) ((i % 10) + 48));
                 i /= 10;
             }
         }
+    }
+
+    private interface Rule {
+        void appendTo(StringBuffer stringBuffer, Calendar calendar);
+
+        int estimateLength();
     }
 
     private static class StringLiteral implements Rule {
@@ -171,16 +168,15 @@ public class FastDatePrinter implements DatePrinter, Serializable {
             int i = 0;
             int length = this.mValues.length;
             while (true) {
-                int i2 = length - 1;
-                if (i2 < 0) {
+                length--;
+                if (length < 0) {
                     return i;
                 }
-                length = this.mValues[i2].length();
-                if (length <= i) {
-                    length = i;
+                int length2 = this.mValues[length].length();
+                if (length2 <= i) {
+                    length2 = i;
                 }
-                i = length;
-                length = i2;
+                i = length2;
             }
         }
 
@@ -216,10 +212,10 @@ public class FastDatePrinter implements DatePrinter, Serializable {
                 return false;
             }
             TimeZoneDisplayKey timeZoneDisplayKey = (TimeZoneDisplayKey) obj;
-            if (this.mTimeZone.equals(timeZoneDisplayKey.mTimeZone) && this.mStyle == timeZoneDisplayKey.mStyle && this.mLocale.equals(timeZoneDisplayKey.mLocale)) {
-                return true;
+            if (!this.mTimeZone.equals(timeZoneDisplayKey.mTimeZone) || this.mStyle != timeZoneDisplayKey.mStyle || !this.mLocale.equals(timeZoneDisplayKey.mLocale)) {
+                return false;
             }
-            return false;
+            return true;
         }
     }
 
@@ -267,23 +263,23 @@ public class FastDatePrinter implements DatePrinter, Serializable {
         }
 
         public void appendTo(StringBuffer stringBuffer, Calendar calendar) {
-            if (this.mISO8601 && calendar.getTimeZone().getID().equals("UTC")) {
-                stringBuffer.append("Z");
+            if (!this.mISO8601 || !calendar.getTimeZone().getID().equals("UTC")) {
+                int i = calendar.get(15) + calendar.get(16);
+                if (i < 0) {
+                    stringBuffer.append('-');
+                    i = -i;
+                } else {
+                    stringBuffer.append('+');
+                }
+                int i2 = i / 3600000;
+                FastDatePrinter.appendDigits(stringBuffer, i2);
+                if (this.mColon) {
+                    stringBuffer.append(':');
+                }
+                FastDatePrinter.appendDigits(stringBuffer, (i / InternalConstants.FAB_BLINKING_TIME_INTERVAL) - (i2 * 60));
                 return;
             }
-            int i = calendar.get(15) + calendar.get(16);
-            if (i < 0) {
-                stringBuffer.append('-');
-                i = -i;
-            } else {
-                stringBuffer.append('+');
-            }
-            int i2 = i / 3600000;
-            FastDatePrinter.appendDigits(stringBuffer, i2);
-            if (this.mColon) {
-                stringBuffer.append(':');
-            }
-            FastDatePrinter.appendDigits(stringBuffer, (i / InternalConstants.FAB_BLINKING_TIME_INTERVAL) - (i2 * 60));
+            stringBuffer.append("Z");
         }
     }
 
@@ -469,9 +465,12 @@ public class FastDatePrinter implements DatePrinter, Serializable {
         }
     }
 
-    protected List<Rule> parsePattern() {
+    /* access modifiers changed from: protected */
+    public List<Rule> parsePattern() {
+        Object stringLiteral;
+        String[] strArr;
         DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(this.mLocale);
-        List<Rule> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         String[] eras = dateFormatSymbols.getEras();
         String[] months = dateFormatSymbols.getMonths();
         String[] shortMonths = dateFormatSymbols.getShortMonths();
@@ -485,117 +484,123 @@ public class FastDatePrinter implements DatePrinter, Serializable {
             iArr[0] = i;
             String parseToken = parseToken(this.mPattern, iArr);
             int i2 = iArr[0];
-            i = parseToken.length();
-            if (i == 0) {
+            int length2 = parseToken.length();
+            if (length2 == 0) {
                 return arrayList;
             }
-            Object stringLiteral;
             switch (parseToken.charAt(0)) {
-                case MotionEventCompat.AXIS_GENERIC_8 /*39*/:
-                    parseToken = parseToken.substring(1);
-                    if (parseToken.length() != 1) {
-                        stringLiteral = new StringLiteral(parseToken);
+                case '\'':
+                    String substring = parseToken.substring(1);
+                    if (substring.length() != 1) {
+                        stringLiteral = new StringLiteral(substring);
+                        break;
+                    } else {
+                        stringLiteral = new CharacterLiteral(substring.charAt(0));
                         break;
                     }
-                    stringLiteral = new CharacterLiteral(parseToken.charAt(0));
-                    break;
                 case 'D':
-                    stringLiteral = selectNumberRule(6, i);
+                    stringLiteral = selectNumberRule(6, length2);
                     break;
                 case 'E':
-                    String[] strArr;
-                    if (i < 4) {
+                    if (length2 < 4) {
                         strArr = shortWeekdays;
                     } else {
                         strArr = weekdays;
                     }
-                    TextField textField = new TextField(7, strArr);
+                    stringLiteral = new TextField(7, strArr);
                     break;
                 case 'F':
-                    stringLiteral = selectNumberRule(8, i);
+                    stringLiteral = selectNumberRule(8, length2);
                     break;
                 case 'G':
                     stringLiteral = new TextField(0, eras);
                     break;
                 case 'H':
-                    stringLiteral = selectNumberRule(11, i);
+                    stringLiteral = selectNumberRule(11, length2);
                     break;
                 case 'K':
-                    stringLiteral = selectNumberRule(10, i);
+                    stringLiteral = selectNumberRule(10, length2);
                     break;
                 case 'M':
-                    if (i < 4) {
-                        if (i != 3) {
-                            if (i != 2) {
+                    if (length2 < 4) {
+                        if (length2 != 3) {
+                            if (length2 != 2) {
                                 stringLiteral = UnpaddedMonthField.INSTANCE;
                                 break;
+                            } else {
+                                stringLiteral = TwoDigitMonthField.INSTANCE;
+                                break;
                             }
-                            stringLiteral = TwoDigitMonthField.INSTANCE;
+                        } else {
+                            stringLiteral = new TextField(2, shortMonths);
                             break;
                         }
-                        stringLiteral = new TextField(2, shortMonths);
+                    } else {
+                        stringLiteral = new TextField(2, months);
                         break;
                     }
-                    stringLiteral = new TextField(2, months);
-                    break;
                 case 'S':
-                    stringLiteral = selectNumberRule(14, i);
+                    stringLiteral = selectNumberRule(14, length2);
                     break;
                 case 'W':
-                    stringLiteral = selectNumberRule(4, i);
+                    stringLiteral = selectNumberRule(4, length2);
                     break;
                 case 'X':
-                    stringLiteral = Iso8601_Rule.getRule(i);
+                    stringLiteral = Iso8601_Rule.getRule(length2);
                     break;
-                case ImageUtil.OUTPUT_QUALITY /*90*/:
-                    if (i != 1) {
-                        if (i != 2) {
+                case 'Z':
+                    if (length2 != 1) {
+                        if (length2 != 2) {
                             stringLiteral = TimeZoneNumberRule.INSTANCE_COLON;
                             break;
+                        } else {
+                            stringLiteral = TimeZoneNumberRule.INSTANCE_ISO_8601;
+                            break;
                         }
-                        stringLiteral = TimeZoneNumberRule.INSTANCE_ISO_8601;
+                    } else {
+                        stringLiteral = TimeZoneNumberRule.INSTANCE_NO_COLON;
                         break;
                     }
-                    stringLiteral = TimeZoneNumberRule.INSTANCE_NO_COLON;
-                    break;
                 case 'a':
                     stringLiteral = new TextField(9, amPmStrings);
                     break;
                 case 'd':
-                    stringLiteral = selectNumberRule(5, i);
+                    stringLiteral = selectNumberRule(5, length2);
                     break;
                 case 'h':
-                    TwelveHourField twelveHourField = new TwelveHourField(selectNumberRule(10, i));
+                    stringLiteral = new TwelveHourField(selectNumberRule(10, length2));
                     break;
                 case 'k':
-                    TwentyFourHourField twentyFourHourField = new TwentyFourHourField(selectNumberRule(11, i));
+                    stringLiteral = new TwentyFourHourField(selectNumberRule(11, length2));
                     break;
                 case 'm':
-                    stringLiteral = selectNumberRule(12, i);
+                    stringLiteral = selectNumberRule(12, length2);
                     break;
                 case 's':
-                    stringLiteral = selectNumberRule(13, i);
+                    stringLiteral = selectNumberRule(13, length2);
                     break;
                 case 'w':
-                    stringLiteral = selectNumberRule(3, i);
+                    stringLiteral = selectNumberRule(3, length2);
                     break;
                 case 'y':
-                    if (i != 2) {
-                        if (i < 4) {
-                            i = 4;
+                    if (length2 != 2) {
+                        if (length2 < 4) {
+                            length2 = 4;
                         }
-                        stringLiteral = selectNumberRule(1, i);
+                        stringLiteral = selectNumberRule(1, length2);
+                        break;
+                    } else {
+                        stringLiteral = TwoDigitYearField.INSTANCE;
                         break;
                     }
-                    stringLiteral = TwoDigitYearField.INSTANCE;
-                    break;
                 case 'z':
-                    if (i < 4) {
+                    if (length2 < 4) {
                         stringLiteral = new TimeZoneNameRule(this.mTimeZone, this.mLocale, 0);
                         break;
+                    } else {
+                        stringLiteral = new TimeZoneNameRule(this.mTimeZone, this.mLocale, 1);
+                        break;
                     }
-                    stringLiteral = new TimeZoneNameRule(this.mTimeZone, this.mLocale, 1);
-                    break;
                 default:
                     throw new IllegalArgumentException("Illegal pattern component: " + parseToken);
             }
@@ -605,42 +610,88 @@ public class FastDatePrinter implements DatePrinter, Serializable {
         return arrayList;
     }
 
-    protected String parseToken(String str, int[] iArr) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int i = iArr[0];
-        int length = str.length();
-        char charAt = str.charAt(i);
-        if ((charAt < 'A' || charAt > 'Z') && (charAt < 'a' || charAt > 'z')) {
-            stringBuilder.append('\'');
-            int i2 = 0;
-            while (i < length) {
-                char charAt2 = str.charAt(i);
-                if (charAt2 != '\'') {
-                    if (i2 == 0 && ((charAt2 >= 'A' && charAt2 <= 'Z') || (charAt2 >= 'a' && charAt2 <= 'z'))) {
-                        i--;
-                        break;
-                    }
-                    stringBuilder.append(charAt2);
-                } else if (i + 1 >= length || str.charAt(i + 1) != '\'') {
-                    i2 = i2 == 0 ? 1 : 0;
-                } else {
-                    i++;
-                    stringBuilder.append(charAt2);
-                }
-                i++;
-            }
-        } else {
-            stringBuilder.append(charAt);
-            while (i + 1 < length && str.charAt(i + 1) == charAt) {
-                stringBuilder.append(charAt);
-                i++;
-            }
-        }
-        iArr[0] = i;
-        return stringBuilder.toString();
+    /* access modifiers changed from: protected */
+    /* JADX WARNING: Code restructure failed: missing block: B:31:0x0069, code lost:
+        r2 = r2 - 1;
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public java.lang.String parseToken(java.lang.String r12, int[] r13) {
+        /*
+            r11 = this;
+            r10 = 97
+            r9 = 90
+            r8 = 65
+            r7 = 39
+            r1 = 0
+            java.lang.StringBuilder r3 = new java.lang.StringBuilder
+            r3.<init>()
+            r2 = r13[r1]
+            int r4 = r12.length()
+            char r0 = r12.charAt(r2)
+            if (r0 < r8) goto L_0x001c
+            if (r0 <= r9) goto L_0x0022
+        L_0x001c:
+            if (r0 < r10) goto L_0x0037
+            r5 = 122(0x7a, float:1.71E-43)
+            if (r0 > r5) goto L_0x0037
+        L_0x0022:
+            r3.append(r0)
+        L_0x0025:
+            int r5 = r2 + 1
+            if (r5 >= r4) goto L_0x006b
+            int r5 = r2 + 1
+            char r5 = r12.charAt(r5)
+            if (r5 != r0) goto L_0x006b
+            r3.append(r0)
+            int r2 = r2 + 1
+            goto L_0x0025
+        L_0x0037:
+            r3.append(r7)
+            r0 = r1
+        L_0x003b:
+            if (r2 >= r4) goto L_0x006b
+            char r5 = r12.charAt(r2)
+            if (r5 != r7) goto L_0x005d
+            int r6 = r2 + 1
+            if (r6 >= r4) goto L_0x0057
+            int r6 = r2 + 1
+            char r6 = r12.charAt(r6)
+            if (r6 != r7) goto L_0x0057
+            int r2 = r2 + 1
+            r3.append(r5)
+        L_0x0054:
+            int r2 = r2 + 1
+            goto L_0x003b
+        L_0x0057:
+            if (r0 != 0) goto L_0x005b
+            r0 = 1
+            goto L_0x0054
+        L_0x005b:
+            r0 = r1
+            goto L_0x0054
+        L_0x005d:
+            if (r0 != 0) goto L_0x0072
+            if (r5 < r8) goto L_0x0063
+            if (r5 <= r9) goto L_0x0069
+        L_0x0063:
+            if (r5 < r10) goto L_0x0072
+            r6 = 122(0x7a, float:1.71E-43)
+            if (r5 > r6) goto L_0x0072
+        L_0x0069:
+            int r2 = r2 + -1
+        L_0x006b:
+            r13[r1] = r2
+            java.lang.String r0 = r3.toString()
+            return r0
+        L_0x0072:
+            r3.append(r5)
+            goto L_0x0054
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.apache.commons.lang3.time.FastDatePrinter.parseToken(java.lang.String, int[]):java.lang.String");
     }
 
-    protected NumberRule selectNumberRule(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public NumberRule selectNumberRule(int i, int i2) {
         switch (i2) {
             case 1:
                 return new UnpaddedNumberField(i);
@@ -665,7 +716,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
     }
 
     public String format(long j) {
-        Calendar newCalendar = newCalendar();
+        GregorianCalendar newCalendar = newCalendar();
         newCalendar.setTimeInMillis(j);
         return applyRulesToString(newCalendar);
     }
@@ -679,7 +730,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
     }
 
     public String format(Date date) {
-        Calendar newCalendar = newCalendar();
+        GregorianCalendar newCalendar = newCalendar();
         newCalendar.setTime(date);
         return applyRulesToString(newCalendar);
     }
@@ -693,7 +744,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
     }
 
     public StringBuffer format(Date date, StringBuffer stringBuffer) {
-        Calendar newCalendar = newCalendar();
+        GregorianCalendar newCalendar = newCalendar();
         newCalendar.setTime(date);
         return applyRules(newCalendar, stringBuffer);
     }
@@ -702,7 +753,8 @@ public class FastDatePrinter implements DatePrinter, Serializable {
         return applyRules(calendar, stringBuffer);
     }
 
-    protected StringBuffer applyRules(Calendar calendar, StringBuffer stringBuffer) {
+    /* access modifiers changed from: protected */
+    public StringBuffer applyRules(Calendar calendar, StringBuffer stringBuffer) {
         for (Rule appendTo : this.mRules) {
             appendTo.appendTo(stringBuffer, calendar);
         }
@@ -730,10 +782,10 @@ public class FastDatePrinter implements DatePrinter, Serializable {
             return false;
         }
         FastDatePrinter fastDatePrinter = (FastDatePrinter) obj;
-        if (this.mPattern.equals(fastDatePrinter.mPattern) && this.mTimeZone.equals(fastDatePrinter.mTimeZone) && this.mLocale.equals(fastDatePrinter.mLocale)) {
-            return true;
+        if (!this.mPattern.equals(fastDatePrinter.mPattern) || !this.mTimeZone.equals(fastDatePrinter.mTimeZone) || !this.mLocale.equals(fastDatePrinter.mLocale)) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {
@@ -749,7 +801,8 @@ public class FastDatePrinter implements DatePrinter, Serializable {
         init();
     }
 
-    private static void appendDigits(StringBuffer stringBuffer, int i) {
+    /* access modifiers changed from: private */
+    public static void appendDigits(StringBuffer stringBuffer, int i) {
         stringBuffer.append((char) ((i / 10) + 48));
         stringBuffer.append((char) ((i % 10) + 48));
     }
@@ -761,7 +814,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
             return str;
         }
         String displayName = timeZone.getDisplayName(z, i, locale);
-        str = (String) cTimeZoneDisplayCache.putIfAbsent(timeZoneDisplayKey, displayName);
-        return str != null ? str : displayName;
+        String str2 = (String) cTimeZoneDisplayCache.putIfAbsent(timeZoneDisplayKey, displayName);
+        return str2 != null ? str2 : displayName;
     }
 }

@@ -1,11 +1,10 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class GrowEnemyTable : Singleton<GrowEnemyTable>, IDataTable
 {
 	public class GrowEnemyData
 	{
-		public const string NT = "growId,lv,hp,atk";
-
 		public uint growId;
 
 		public XorInt level = 1;
@@ -13,6 +12,8 @@ public class GrowEnemyTable : Singleton<GrowEnemyTable>, IDataTable
 		public XorInt hp = 100;
 
 		public XorInt atk = 100;
+
+		public const string NT = "growId,lv,hp,atk";
 
 		public float hpRate => (float)(int)hp * 0.01f;
 
@@ -36,15 +37,21 @@ public class GrowEnemyTable : Singleton<GrowEnemyTable>, IDataTable
 
 	private GrowEnemyData _defaultData = new GrowEnemyData();
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEnemyData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEnemyData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		growTableData = TableUtility.CreateDoubleUIntKeyTable<GrowEnemyData>(csv_text, GrowEnemyData.cb, "growId,lv,hp,atk", null, null, null, null);
+		growTableData = TableUtility.CreateDoubleUIntKeyTable<GrowEnemyData>(csv_text, GrowEnemyData.cb, "growId,lv,hp,atk", null);
 		growTableData.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(growTableData, csv_text, GrowEnemyData.cb, "growId,lv,hp,atk", null, null, null);
+		TableUtility.AddDoubleUIntKeyTable(growTableData, csv_text, GrowEnemyData.cb, "growId,lv,hp,atk", null);
 	}
 
 	public GrowEnemyData GetGrowEnemyData(uint growId, int level)

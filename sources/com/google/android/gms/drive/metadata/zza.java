@@ -2,7 +2,7 @@ package com.google.android.gms.drive.metadata;
 
 import android.os.Bundle;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.drive.metadata.internal.MetadataBundle;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,64 +10,80 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class zza<T> implements MetadataField<T> {
-    private final String zzgke;
-    private final Set<String> zzgkf;
-    private final Set<String> zzgkg;
-    private final int zzgkh;
+    private final String fieldName;
+    private final Set<String> zzig;
+    private final Set<String> zzih;
+    private final int zzii;
 
     protected zza(String str, int i) {
-        this.zzgke = (String) zzbp.zzb((Object) str, (Object) "fieldName");
-        this.zzgkf = Collections.singleton(str);
-        this.zzgkg = Collections.emptySet();
-        this.zzgkh = i;
+        this.fieldName = (String) Preconditions.checkNotNull(str, "fieldName");
+        this.zzig = Collections.singleton(str);
+        this.zzih = Collections.emptySet();
+        this.zzii = i;
     }
 
     protected zza(String str, Collection<String> collection, Collection<String> collection2, int i) {
-        this.zzgke = (String) zzbp.zzb((Object) str, (Object) "fieldName");
-        this.zzgkf = Collections.unmodifiableSet(new HashSet(collection));
-        this.zzgkg = Collections.unmodifiableSet(new HashSet(collection2));
-        this.zzgkh = i;
+        this.fieldName = (String) Preconditions.checkNotNull(str, "fieldName");
+        this.zzig = Collections.unmodifiableSet(new HashSet(collection));
+        this.zzih = Collections.unmodifiableSet(new HashSet(collection2));
+        this.zzii = i;
     }
 
     public final String getName() {
-        return this.zzgke;
+        return this.fieldName;
     }
 
     public String toString() {
-        return this.zzgke;
+        return this.fieldName;
+    }
+
+    public final T zza(Bundle bundle) {
+        Preconditions.checkNotNull(bundle, "bundle");
+        if (bundle.get(this.fieldName) != null) {
+            return zzb(bundle);
+        }
+        return null;
     }
 
     public final T zza(DataHolder dataHolder, int i, int i2) {
-        return zzb(dataHolder, i, i2) ? zzc(dataHolder, i, i2) : null;
+        if (zzb(dataHolder, i, i2)) {
+            return zzc(dataHolder, i, i2);
+        }
+        return null;
     }
 
-    protected abstract void zza(Bundle bundle, T t);
+    /* access modifiers changed from: protected */
+    public abstract void zza(Bundle bundle, T t);
 
     public final void zza(DataHolder dataHolder, MetadataBundle metadataBundle, int i, int i2) {
-        zzbp.zzb((Object) dataHolder, (Object) "dataHolder");
-        zzbp.zzb((Object) metadataBundle, (Object) "bundle");
+        Preconditions.checkNotNull(dataHolder, "dataHolder");
+        Preconditions.checkNotNull(metadataBundle, "bundle");
         if (zzb(dataHolder, i, i2)) {
-            metadataBundle.zzc(this, zzc(dataHolder, i, i2));
+            metadataBundle.zzb(this, zzc(dataHolder, i, i2));
         }
     }
 
     public final void zza(T t, Bundle bundle) {
-        zzbp.zzb((Object) bundle, (Object) "bundle");
+        Preconditions.checkNotNull(bundle, "bundle");
         if (t == null) {
-            bundle.putString(this.zzgke, null);
+            bundle.putString(this.fieldName, null);
         } else {
-            zza(bundle, (Object) t);
+            zza(bundle, t);
         }
     }
 
-    public final Collection<String> zzano() {
-        return this.zzgkf;
+    public final Collection<String> zzar() {
+        return this.zzig;
     }
 
-    protected boolean zzb(DataHolder dataHolder, int i, int i2) {
-        for (String str : this.zzgkf) {
-            if (dataHolder.zzft(str)) {
-                if (dataHolder.zzh(str, i, i2)) {
+    /* access modifiers changed from: protected */
+    public abstract T zzb(Bundle bundle);
+
+    /* access modifiers changed from: protected */
+    public boolean zzb(DataHolder dataHolder, int i, int i2) {
+        for (String str : this.zzig) {
+            if (dataHolder.hasColumn(str)) {
+                if (dataHolder.hasNull(str, i, i2)) {
                 }
             }
             return false;
@@ -75,12 +91,6 @@ public abstract class zza<T> implements MetadataField<T> {
         return true;
     }
 
-    protected abstract T zzc(DataHolder dataHolder, int i, int i2);
-
-    public final T zzl(Bundle bundle) {
-        zzbp.zzb((Object) bundle, (Object) "bundle");
-        return bundle.get(this.zzgke) != null ? zzm(bundle) : null;
-    }
-
-    protected abstract T zzm(Bundle bundle);
+    /* access modifiers changed from: protected */
+    public abstract T zzc(DataHolder dataHolder, int i, int i2);
 }

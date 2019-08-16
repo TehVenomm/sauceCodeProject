@@ -14,13 +14,15 @@ public class ChatCoopConnection : IChatConnection
 
 	public event ChatRoom.OnReceiveStamp onReceiveStamp;
 
+	public event ChatRoom.OnReceiveNotification onReceiveNotification;
+
+	public event ChatRoom.OnAfterSendUserMessage onAfterSendUserMessage;
+
+	public event ChatRoom.OnDisconnect onDisconnect;
+
 	public event ChatRoom.OnReceiveText onReceivePrivateText;
 
 	public event ChatRoom.OnReceiveStamp onReceivePrivateStamp;
-
-	public event ChatRoom.OnReceiveNotification onReceiveNotification;
-
-	public event ChatRoom.OnDisconnect onDisconnect;
 
 	public void Connect()
 	{
@@ -44,7 +46,6 @@ public class ChatCoopConnection : IChatConnection
 
 	public void SendText(string message)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatMessage(MonoBehaviourSingleton<CoopManager>.I.GetSelfID(), message);
@@ -65,12 +66,11 @@ public class ChatCoopConnection : IChatConnection
 				}
 			}
 		}
-		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message);
+		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message, string.Empty);
 	}
 
 	public void SendStamp(int stampId)
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			if (QuestManager.IsValidInGameExplore())
@@ -105,7 +105,7 @@ public class ChatCoopConnection : IChatConnection
 				}
 			}
 		}
-		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId);
+		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId, string.Empty);
 	}
 
 	public void SendPrivateText(string target_id, string message)
@@ -116,27 +116,27 @@ public class ChatCoopConnection : IChatConnection
 	{
 	}
 
-	public void OnReceiveMessage(int userId, string userName, string message)
+	public void OnReceiveMessage(int userId, string userName, string message, string chatItemId = "")
 	{
 		if (isEstablished && this.onReceiveText != null)
 		{
-			this.onReceiveText(userId, userName, message);
+			this.onReceiveText(userId, userName, message, chatItemId);
 		}
 	}
 
-	public void OnReceiveStamp(int userId, string userName, int stampId)
+	public void OnReceiveStamp(int userId, string userName, int stampId, string chatItemId = "")
 	{
 		if (isEstablished && this.onReceiveStamp != null)
 		{
-			this.onReceiveStamp(userId, userName, stampId);
+			this.onReceiveStamp(userId, userName, stampId, chatItemId);
 		}
 	}
 
-	public void OnReceiveNotification(string message)
+	public void OnReceiveNotification(string message, string chatItemId = "")
 	{
 		if (isEstablished && this.onReceiveNotification != null)
 		{
-			this.onReceiveNotification(message);
+			this.onReceiveNotification(message, chatItemId);
 		}
 	}
 }

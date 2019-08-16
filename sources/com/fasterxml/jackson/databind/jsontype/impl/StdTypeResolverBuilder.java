@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializationConfig;
@@ -16,16 +16,16 @@ import java.util.Collection;
 public class StdTypeResolverBuilder implements TypeResolverBuilder<StdTypeResolverBuilder> {
     protected TypeIdResolver _customIdResolver;
     protected Class<?> _defaultImpl;
-    protected Id _idType;
-    protected As _includeAs;
+    protected C0862Id _idType;
+    protected C0861As _includeAs;
     protected boolean _typeIdVisible = false;
     protected String _typeProperty;
 
     public static StdTypeResolverBuilder noTypeInfoBuilder() {
-        return new StdTypeResolverBuilder().init(Id.NONE, null);
+        return new StdTypeResolverBuilder().init(C0862Id.NONE, (TypeIdResolver) null);
     }
 
-    public StdTypeResolverBuilder init(Id id, TypeIdResolver typeIdResolver) {
+    public StdTypeResolverBuilder init(C0862Id id, TypeIdResolver typeIdResolver) {
         if (id == null) {
             throw new IllegalArgumentException("idType can not be null");
         }
@@ -36,7 +36,7 @@ public class StdTypeResolverBuilder implements TypeResolverBuilder<StdTypeResolv
     }
 
     public TypeSerializer buildTypeSerializer(SerializationConfig serializationConfig, JavaType javaType, Collection<NamedType> collection) {
-        if (this._idType == Id.NONE) {
+        if (this._idType == C0862Id.NONE) {
             return null;
         }
         TypeIdResolver idResolver = idResolver(serializationConfig, javaType, collection, true, false);
@@ -57,7 +57,7 @@ public class StdTypeResolverBuilder implements TypeResolverBuilder<StdTypeResolv
     }
 
     public TypeDeserializer buildTypeDeserializer(DeserializationConfig deserializationConfig, JavaType javaType, Collection<NamedType> collection) {
-        if (this._idType == Id.NONE) {
+        if (this._idType == C0862Id.NONE) {
             return null;
         }
         TypeIdResolver idResolver = idResolver(deserializationConfig, javaType, collection, false, true);
@@ -76,7 +76,7 @@ public class StdTypeResolverBuilder implements TypeResolverBuilder<StdTypeResolv
         }
     }
 
-    public StdTypeResolverBuilder inclusion(As as) {
+    public StdTypeResolverBuilder inclusion(C0861As as) {
         if (as == null) {
             throw new IllegalArgumentException("includeAs can not be null");
         }
@@ -114,7 +114,8 @@ public class StdTypeResolverBuilder implements TypeResolverBuilder<StdTypeResolv
         return this._typeIdVisible;
     }
 
-    protected TypeIdResolver idResolver(MapperConfig<?> mapperConfig, JavaType javaType, Collection<NamedType> collection, boolean z, boolean z2) {
+    /* access modifiers changed from: protected */
+    public TypeIdResolver idResolver(MapperConfig<?> mapperConfig, JavaType javaType, Collection<NamedType> collection, boolean z, boolean z2) {
         if (this._customIdResolver != null) {
             return this._customIdResolver;
         }

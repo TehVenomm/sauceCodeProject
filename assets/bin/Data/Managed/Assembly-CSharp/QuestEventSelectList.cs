@@ -31,7 +31,10 @@ public class QuestEventSelectList : QuestSpecialSelect
 		OBJ_ACTIVE_ROOT,
 		OBJ_INACTIVE_ROOT,
 		LBL_MAX,
-		LBL_NOW
+		LBL_NOW,
+		BTN_INGAME_INFO,
+		BTN_FISHING_RECORD,
+		SPR_CLEARD_BLACK
 	}
 
 	protected class Story
@@ -95,11 +98,11 @@ public class QuestEventSelectList : QuestSpecialSelect
 	public override void Initialize()
 	{
 		eventData = (GameSection.GetEventData() as Network.EventData);
-		SkipTween((Enum)UI.SPR_DELIVERY_BTN_SELECTED, true, 0);
-		SetActive((Enum)UI.OBJ_DELIVERY_ROOT, true);
+		SkipTween((Enum)UI.SPR_DELIVERY_BTN_SELECTED, forward: true, 0);
+		SetActive((Enum)UI.OBJ_DELIVERY_ROOT, is_visible: true);
 		int width = GetWidth(UI.WGT_LOCATION_NAME_LIMIT);
-		title = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME).GetComponent<UILabel>(), width, false);
-		titleEffect = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME_EFFECT).GetComponent<UILabel>(), width, true);
+		title = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME).GetComponent<UILabel>(), width, fixAnchorForEffect: false);
+		titleEffect = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME_EFFECT).GetComponent<UILabel>(), width, fixAnchorForEffect: true);
 		base.Initialize();
 	}
 
@@ -107,28 +110,28 @@ public class QuestEventSelectList : QuestSpecialSelect
 	{
 		string resourceName = ResourceName.GetEventBG(eventData.bannerId);
 		Hash128 hash = default(Hash128);
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
+		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 		{
-			hash = MonoBehaviourSingleton<ResourceManager>.I.manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
+			hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
 		}
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest == null || hash.get_isValid())
+		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || hash.get_isValid())
 		{
 			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.EVENT_BG, resourceName, false);
+			LoadObject lo_bg = load_queue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, resourceName);
 			LoadObject lo_item = null;
 			if (ShouldShowEventMapButton())
 			{
-				lo_item = load_queue.Load(RESOURCE_CATEGORY.QUEST_ITEM, "QEM_10000000", false);
+				lo_item = load_queue.Load(RESOURCE_CATEGORY.QUEST_ITEM, "QEM_10000000");
 			}
 			if (load_queue.IsLoading())
 			{
-				yield return (object)load_queue.Wait();
+				yield return load_queue.Wait();
 			}
 			SetTexture(texture: lo_bg.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
 			if (lo_item != null && null != lo_item.loadedObject)
 			{
-				GameObject mapItemObj = lo_item.loadedObject as GameObject;
-				mapItem = mapItemObj.get_transform();
+				GameObject val = lo_item.loadedObject as GameObject;
+				mapItem = val.get_transform();
 			}
 		}
 		GetDeliveryList();
@@ -142,7 +145,6 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	protected override void OnOpen()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(InitScroll());
 		base.OnOpen();
 	}
@@ -156,7 +158,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		UIScrollView scroll = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
 		while (base.state != STATE.OPEN)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		scroll.set_enabled(scroll.shouldMoveVertically);
 		RepositionTable();
@@ -206,6 +208,36 @@ public class QuestEventSelectList : QuestSpecialSelect
 		}
 	}
 
+	protected bool HasChapterStory()
+	{
+		return GetChapterId() > 0;
+	}
+
+	protected int GetChapterId()
+	{
+		if (!MonoBehaviourSingleton<TheaterModeTable>.IsValid())
+		{
+			return -1;
+		}
+		if (stories == null || stories.Count < 1)
+		{
+			return -1;
+		}
+		int chapterId = -1;
+		MonoBehaviourSingleton<TheaterModeTable>.I.AllTheaterData(delegate(TheaterModeTable.TheaterModeData data)
+		{
+			int i = 0;
+			for (int count = stories.Count; i < count; i++)
+			{
+				if (data.script_id == stories[i].id)
+				{
+					chapterId = data.chapter_id;
+				}
+			}
+		});
+		return chapterId;
+	}
+
 	public override void UpdateUI()
 	{
 		SetLabelText((Enum)UI.LBL_LOCATION_NAME, eventData.name);
@@ -217,6 +249,10 @@ public class QuestEventSelectList : QuestSpecialSelect
 		if (eventData.prologueStoryId > 0)
 		{
 			stories.Add(new Story(eventData.prologueStoryId, eventData.prologueTitle));
+		}
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
+		{
+			SetActive((Enum)UI.BTN_FISHING_RECORD, eventData.subButtonType == 1);
 		}
 		clearedDeliveries = CreateClearedDliveryList();
 		UpdateList();
@@ -232,22 +268,24 @@ public class QuestEventSelectList : QuestSpecialSelect
 		for (int count = clearStatusDelivery.Count; i < count; i++)
 		{
 			ClearStatusDelivery d = clearStatusDelivery[i];
-			if (d.deliveryStatus == 3)
+			if (d.deliveryStatus != 3)
 			{
-				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)d.deliveryId);
-				if (deliveryTableData.eventID == eventData.eventId && !Array.Exists(deliveryInfo, (Delivery x) => x.dId == d.deliveryId))
+				continue;
+			}
+			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)d.deliveryId);
+			if (deliveryTableData.eventID != eventData.eventId || Array.Exists(deliveryInfo, (Delivery x) => x.dId == d.deliveryId))
+			{
+				continue;
+			}
+			list.Add(deliveryTableData);
+			if (deliveryTableData.clearEventID != 0)
+			{
+				string value = deliveryTableData.clearEventTitle;
+				if (string.IsNullOrEmpty(value))
 				{
-					list.Add(deliveryTableData);
-					if (deliveryTableData.clearEventID != 0)
-					{
-						string value = deliveryTableData.clearEventTitle;
-						if (string.IsNullOrEmpty(value))
-						{
-							value = deliveryTableData.name;
-						}
-						stories.Add(new Story((int)deliveryTableData.clearEventID, value));
-					}
+					value = deliveryTableData.name;
 				}
+				stories.Add(new Story((int)deliveryTableData.clearEventID, value));
 			}
 		}
 		return list;
@@ -267,9 +305,6 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	protected virtual void UpdateTable()
 	{
-		//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026f: Expected O, but got Unknown
-		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		int count = stories.Count;
 		if (count > 0)
@@ -281,7 +316,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		{
 			for (int j = 0; j < deliveryInfo.Length; j++)
 			{
-				ShowDeliveryData item = new ShowDeliveryData(j, false, deliveryInfo[j]);
+				ShowDeliveryData item = new ShowDeliveryData(j, isComp: false, deliveryInfo[j]);
 				list.Add(item);
 			}
 		}
@@ -289,7 +324,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		{
 			for (int k = 0; k < clearedDeliveries.Count; k++)
 			{
-				ShowDeliveryData item2 = new ShowDeliveryData(k, true, clearedDeliveries[k]);
+				ShowDeliveryData item2 = new ShowDeliveryData(k, isComp: true, clearedDeliveries[k]);
 				list.Add(item2);
 			}
 		}
@@ -307,90 +342,99 @@ public class QuestEventSelectList : QuestSpecialSelect
 		}
 		if (num2 == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, false);
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: false);
+			return;
 		}
-		else
+		SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
+		SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
+		SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: true);
+		bool flag2 = false;
+		if (ShouldShowEventMapButton())
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, true);
-			bool flag2 = false;
-			if (ShouldShowEventMapButton())
+			flag2 = true;
+			num2++;
+		}
+		int questStartIndex = 0;
+		if (flag2)
+		{
+			questStartIndex++;
+		}
+		int borderIndex = questStartIndex + showList.Length;
+		int storyStartIndex = borderIndex;
+		if (stories.Count > 0)
+		{
+			storyStartIndex++;
+		}
+		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
+		if (Object.op_Implicit(ctrl))
+		{
+			int l = 0;
+			for (int childCount = ctrl.get_childCount(); l < childCount; l++)
 			{
-				flag2 = true;
-				num2++;
+				Transform child = ctrl.GetChild(0);
+				child.set_parent(null);
+				Object.Destroy(child.get_gameObject());
 			}
-			int questStartIndex = 0;
-			if (flag2)
+		}
+		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
+		{
+			Transform val = null;
+			if (i >= storyStartIndex)
 			{
-				questStartIndex++;
-			}
-			int borderIndex = questStartIndex + showList.Length;
-			int storyStartIndex = borderIndex;
-			if (stories.Count > 0)
-			{
-				storyStartIndex++;
-			}
-			Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-			if (Object.op_Implicit(ctrl))
-			{
-				int l = 0;
-				for (int childCount = ctrl.get_childCount(); l < childCount; l++)
+				if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
 				{
-					Transform val = ctrl.GetChild(0);
-					val.set_parent(null);
-					Object.Destroy(val.get_gameObject());
+					return Realizes("QuestEventStoryItem", parent);
 				}
+				return null;
 			}
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
+			if (i >= borderIndex)
 			{
-				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0096: Expected O, but got Unknown
-				Transform val2 = null;
-				if (i < storyStartIndex)
-				{
-					if (i < borderIndex)
-					{
-						if (i < questStartIndex)
-						{
-							if (!(null != mapItem))
-							{
-								return Realizes("QuestEventBorderItem", parent, true);
-							}
-							return ResourceUtility.Realizes(mapItem.get_gameObject(), parent, -1);
-						}
-						return Realizes("QuestRequestItem", parent, true);
-					}
-					return Realizes("QuestEventBorderItem", parent, true);
-				}
-				return Realizes("QuestEventStoryItem", parent, true);
-			}, delegate(int i, Transform t, bool is_recycle)
+				return Realizes("QuestEventBorderItem", parent);
+			}
+			if (i >= questStartIndex)
 			{
-				SetActive(t, true);
+				return Realizes("QuestRequestItem", parent);
+			}
+			if (null != mapItem)
+			{
+				return ResourceUtility.Realizes(mapItem.get_gameObject(), parent);
+			}
+			return Realizes("QuestEventBorderItem", parent);
+		}, delegate(int i, Transform t, bool is_recycle)
+		{
+			if (!(t == null))
+			{
+				SetActive(t, is_visible: true);
 				if (i >= storyStartIndex)
 				{
 					int storyIndex = i - storyStartIndex;
 					InitStory(storyIndex, t);
 				}
-				else if (i < borderIndex)
+				else if (i < borderIndex || i >= storyStartIndex)
 				{
-					if (i >= questStartIndex)
+					if (i >= questStartIndex && i < borderIndex)
 					{
 						int num3 = i - questStartIndex;
 						InitDelivery(showList[num3], t);
+						ChangeDeliveryFrameSprite(t);
 					}
-					else
+					else if (i < questStartIndex)
 					{
 						InitMap(t);
 					}
 				}
-			});
-			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-			component.set_enabled(true);
-			RepositionTable();
-		}
+			}
+		});
+		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
+		component.set_enabled(true);
+		RepositionTable();
+	}
+
+	protected virtual void ChangeDeliveryFrameSprite(Transform parent)
+	{
 	}
 
 	protected virtual void UpdateGrid()
@@ -400,7 +444,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		{
 			for (int j = 0; j < deliveryInfo.Length; j++)
 			{
-				ShowDeliveryData item = new ShowDeliveryData(j, false, deliveryInfo[j]);
+				ShowDeliveryData item = new ShowDeliveryData(j, isComp: false, deliveryInfo[j]);
 				list.Add(item);
 			}
 		}
@@ -408,7 +452,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		{
 			for (int k = 0; k < clearedDeliveries.Count; k++)
 			{
-				ShowDeliveryData item2 = new ShowDeliveryData(k, true, clearedDeliveries[k]);
+				ShowDeliveryData item2 = new ShowDeliveryData(k, isComp: true, clearedDeliveries[k]);
 				list.Add(item2);
 			}
 		}
@@ -421,17 +465,21 @@ public class QuestEventSelectList : QuestSpecialSelect
 		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
 		if (list.Count == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, true);
+			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
+			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: true);
 			SetDynamicList((Enum)UI.GRD_DELIVERY_QUEST, "QuestRequestItem", showList.Length, isResetUI, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
-				SetActive(t, true);
-				if (!showList[i].isCompleted)
+				SetActive(t, is_visible: true);
+				if (showList[i].data.subType == DELIVERY_SUB_TYPE.ASSIGNED_EQUIPMENT)
+				{
+					SetEvent(t, "COMPLETED_ASSIGNED_EQUIPMENT", showList[i].index);
+				}
+				else if (!showList[i].isCompleted)
 				{
 					SetEvent(t, "SELECT_DELIVERY", showList[i].index);
 				}
@@ -442,7 +490,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 				SetupDeliveryListItem(t, showList[i].data);
 				if (showList[i].isCompleted)
 				{
-					SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
+					SetActive(t, UI.OBJ_REQUEST_COMPLETED, is_visible: true);
 				}
 			});
 		}
@@ -465,19 +513,63 @@ public class QuestEventSelectList : QuestSpecialSelect
 			{
 				SetEvent(t, "SELECT_COMPLETED_DELIVERY_HAPPEN", showData.index);
 			}
+			else if (showData.data.subType == DELIVERY_SUB_TYPE.ASSIGNED_EQUIPMENT)
+			{
+				SetEvent(t, "COMPLETED_ASSIGNED_EQUIPMENT", showData.index);
+			}
 			else
 			{
 				SetEvent(t, "SELECT_COMPLETED_DELIVERY", showData.index);
 			}
+			UpdateCompletedDeliveryUI(t);
 			SetupDeliveryListItem(t, showData.data);
-			SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
+			SetActive(t, UI.OBJ_REQUEST_COMPLETED, is_visible: true);
 			SetCompletedHaveCount(t, showData.data);
 		}
 		else
 		{
-			SetEvent(t, "SELECT_DELIVERY", showData.index);
+			if (showData.data != null && showData.data.subType == DELIVERY_SUB_TYPE.READ_STORY)
+			{
+				SetEvent(t, "READ_STORY", showData.index);
+			}
+			else if (showData.data != null && showData.data.subType == DELIVERY_SUB_TYPE.ASSIGNED_EQUIPMENT)
+			{
+				SetEvent(t, "ASSIGNED_EQUIPMENT", showData.index);
+			}
+			else
+			{
+				SetEvent(t, "SELECT_DELIVERY", showData.index);
+			}
 			SetupDeliveryListItem(t, showData.data);
 		}
+	}
+
+	protected virtual void UpdateCompletedDeliveryUI(Transform parent)
+	{
+	}
+
+	private void OnQuery_ASSIGNED_EQUIPMENT()
+	{
+		int num = (int)GameSection.GetEventData();
+		int dId = deliveryInfo[num].dId;
+		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)dId);
+		bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(dId);
+		if (flag)
+		{
+			GameSection.StayEvent();
+			SendDeliveryComplete(num, dId, flag, is_happen_quest: false);
+		}
+		else
+		{
+			GameSection.SetEventData(deliveryTableData);
+		}
+	}
+
+	private void OnQuery_COMPLETED_ASSIGNED_EQUIPMENT()
+	{
+		int index = (int)GameSection.GetEventData();
+		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[index];
+		GameSection.SetEventData(deliveryData);
 	}
 
 	protected virtual void InitNormalDelivery(int index, Transform t)
@@ -508,14 +600,24 @@ public class QuestEventSelectList : QuestSpecialSelect
 			SetEvent(t, "SELECT_COMPLETED_DELIVERY", completedIndex);
 		}
 		SetupDeliveryListItem(t, deliveryData);
-		SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
+		SetActive(t, UI.OBJ_REQUEST_COMPLETED, is_visible: true);
 		SetCompletedHaveCount(t, deliveryData);
 	}
 
 	protected virtual void InitStory(int storyIndex, Transform t)
 	{
-		SetEvent(t, "SELECT_STORY", storyIndex);
-		SetLabelText(t, UI.LBL_STORY_TITLE, stories[storyIndex].title);
+		bool flag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+		if (HasChapterStory() && flag)
+		{
+			int event_data = (eventData != null) ? eventData.eventId : 0;
+			SetEvent(t, "JUMP_TO_STORY_PAGE", event_data);
+			SetLabelText(t, UI.LBL_STORY_TITLE, "View All Stories");
+		}
+		else
+		{
+			SetEvent(t, "SELECT_STORY", storyIndex);
+			SetLabelText(t, UI.LBL_STORY_TITLE, stories[storyIndex].title);
+		}
 	}
 
 	protected virtual void InitMap(Transform t)
@@ -524,7 +626,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		SetLabelText(t, UI.LBL_STORY_TITLE, "マップ");
 	}
 
-	private void OnQuery_INFO()
+	protected virtual void OnQuery_INFO()
 	{
 		string text = string.Format(WebViewManager.NewsWithLinkParamFormat, eventData.linkName);
 		GameSection.SetEventData(text);
@@ -554,16 +656,46 @@ public class QuestEventSelectList : QuestSpecialSelect
 		});
 	}
 
+	protected virtual void OnQuery_JUMP_TO_STORY_PAGE()
+	{
+		EventData[] array = new EventData[2]
+		{
+			new EventData("SELECT_EVENT", null),
+			new EventData("SELECT_CHAPTER_FROM_OUTER", null)
+		};
+		GameSection.SetEventData(new object[2]
+		{
+			GetChapterId(),
+			array
+		});
+	}
+
 	protected virtual void OnQuery_SELECT_STORY()
 	{
 		int index = (int)GameSection.GetEventData();
 		Story story = stories[index];
-		EventData[] array = new EventData[3]
+		string goingHomeEvent = GameSection.GetGoingHomeEvent();
+		EventData[] array;
+		if (eventData == null || !MonoBehaviourSingleton<DeliveryManager>.IsValid() || MonoBehaviourSingleton<DeliveryManager>.I.eventListData.IsNullOrEmpty() || MonoBehaviourSingleton<DeliveryManager>.I.GetEventListData(eventData.eventId) == null)
 		{
-			new EventData("MAIN_MENU_HOME", null),
-			new EventData("TO_EVENT", null),
-			new EventData("SELECT", eventData)
-		};
+			array = new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null),
+				new EventData("SELECT", eventData)
+			};
+		}
+		else
+		{
+			EventListData eventListData = MonoBehaviourSingleton<DeliveryManager>.I.GetEventListData(eventData.eventId);
+			array = new EventData[4]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null),
+				(eventListData.placeEnum != EVENT_DISPLAY_PLACE.PRESENT) ? new EventData("TAB_EVENT", null) : new EventData("TAB_PRESENT", null),
+				new EventData("SELECT", eventData)
+			};
+		}
 		GameSection.SetEventData(new object[4]
 		{
 			story.id,
@@ -597,5 +729,10 @@ public class QuestEventSelectList : QuestSpecialSelect
 		isResetUI = true;
 		nowPage = ((nowPage >= pageMax) ? 1 : (nowPage + 1));
 		RefreshUI();
+	}
+
+	private void OnQuery_FISHING_RECORD()
+	{
+		GameSection.SetEventData(eventData.eventId);
 	}
 }

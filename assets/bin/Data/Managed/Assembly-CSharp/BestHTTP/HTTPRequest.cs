@@ -249,15 +249,15 @@ namespace BestHTTP
 			Callback = callback;
 			StreamFragmentSize = 4096;
 			DisableRetry = (methodType == HTTPMethods.Post);
-			MaxRedirects = 2147483647;
+			MaxRedirects = int.MaxValue;
 			RedirectCount = 0;
 		}
 
 		public void AddField(string fieldName, string value)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Expected O, but got Unknown
-			if ((object)FieldsImpl == null)
+			//IL_0016: Expected O, but got Unknown
+			if (FieldsImpl == null)
 			{
 				FieldsImpl = new WWWForm();
 			}
@@ -267,8 +267,8 @@ namespace BestHTTP
 		public void AddBinaryData(string fieldName, byte[] contents)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Expected O, but got Unknown
-			if ((object)FieldsImpl == null)
+			//IL_0016: Expected O, but got Unknown
+			if (FieldsImpl == null)
 			{
 				FieldsImpl = new WWWForm();
 			}
@@ -359,7 +359,7 @@ namespace BestHTTP
 			int num = (entityBody != null) ? entityBody.Length : 0;
 			if (RawData == null)
 			{
-				byte[] array = ((object)FieldsImpl == null) ? null : FieldsImpl.get_data();
+				byte[] array = (FieldsImpl == null) ? null : FieldsImpl.get_data();
 				if (array != null && array.Length > 0 && !HasHeader("Content-Type"))
 				{
 					AddHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -412,16 +412,13 @@ namespace BestHTTP
 				{
 					SendHeaders(stream);
 					return memoryStream.ToArray().AsciiToString();
-					IL_0025:
-					string result;
-					return result;
 				}
 			}
 		}
 
 		internal byte[] GetEntityBody()
 		{
-			return (RawData != null) ? RawData : (((object)FieldsImpl == null) ? null : FieldsImpl.get_data());
+			return (RawData != null) ? RawData : ((FieldsImpl == null) ? null : FieldsImpl.get_data());
 		}
 
 		internal bool SendOutTo(Stream stream)
@@ -434,7 +431,7 @@ namespace BestHTTP
 				binaryWriter.Write(EOL);
 				SendHeaders(binaryWriter);
 				binaryWriter.Write(EOL);
-				byte[] array = (RawData != null) ? RawData : (((object)FieldsImpl == null) ? null : FieldsImpl.get_data());
+				byte[] array = (RawData != null) ? RawData : ((FieldsImpl == null) ? null : FieldsImpl.get_data());
 				if (array != null && array.Length > 0)
 				{
 					binaryWriter.Write(array, 0, array.Length);

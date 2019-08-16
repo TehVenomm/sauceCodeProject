@@ -15,11 +15,11 @@ namespace BestHTTP.Extensions
 			if (str != null)
 			{
 				int pos = 0;
-				string key = str.Read(ref pos, (char ch) => !char.IsWhiteSpace(ch) && !char.IsControl(ch), true).TrimAndLower();
+				string key = str.Read(ref pos, (char ch) => !char.IsWhiteSpace(ch) && !char.IsControl(ch)).TrimAndLower();
 				list.Add(new KeyValuePair(key));
 				while (pos < str.Length)
 				{
-					string key2 = str.Read(ref pos, '=', true).TrimAndLower();
+					string key2 = str.Read(ref pos, '=').TrimAndLower();
 					KeyValuePair keyValuePair = new KeyValuePair(key2);
 					str.SkipWhiteSpace(ref pos);
 					keyValuePair.Value = str.ReadQuotedText(ref pos);

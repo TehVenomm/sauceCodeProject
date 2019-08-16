@@ -1,8 +1,9 @@
-package net.gogame.gowrap.ui;
+package net.gogame.gowrap.p019ui;
 
 import android.app.Fragment;
 import net.gogame.gowrap.support.DownloadManager;
 
+/* renamed from: net.gogame.gowrap.ui.UIContext */
 public interface UIContext {
     void clearFragments();
 

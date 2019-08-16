@@ -2,12 +2,22 @@ package com.google.android.gms.common.api;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.google.android.gms.common.annotation.KeepForSdk;
+import com.google.android.gms.common.api.Result;
 import java.util.concurrent.TimeUnit;
 
+@KeepForSdk
 public abstract class PendingResult<R extends Result> {
 
-    public interface zza {
-        void zzp(Status status);
+    @KeepForSdk
+    public interface StatusListener {
+        @KeepForSdk
+        void onComplete(Status status);
+    }
+
+    @KeepForSdk
+    public void addStatusListener(@NonNull StatusListener statusListener) {
+        throw new UnsupportedOperationException();
     }
 
     @NonNull
@@ -29,12 +39,8 @@ public abstract class PendingResult<R extends Result> {
         throw new UnsupportedOperationException();
     }
 
-    public void zza(@NonNull zza zza) {
-        throw new UnsupportedOperationException();
-    }
-
     @Nullable
-    public Integer zzafr() {
+    public Integer zam() {
         throw new UnsupportedOperationException();
     }
 }

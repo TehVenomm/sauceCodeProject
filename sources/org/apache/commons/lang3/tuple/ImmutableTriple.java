@@ -6,8 +6,9 @@ public final class ImmutableTriple<L, M, R> extends Triple<L, M, R> {
     public final M middle;
     public final R right;
 
-    public static <L, M, R> ImmutableTriple<L, M, R> of(L l, M m, R r) {
-        return new ImmutableTriple(l, m, r);
+    /* renamed from: of */
+    public static <L, M, R> ImmutableTriple<L, M, R> m1016of(L l, M m, R r) {
+        return new ImmutableTriple<>(l, m, r);
     }
 
     public ImmutableTriple(L l, M m, R r) {

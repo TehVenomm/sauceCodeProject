@@ -41,16 +41,15 @@ public class UnityMessage {
     public void send() {
         if ($assertionsDisabled || this.methodName != null) {
             String unityParams = new UnityParams(this.params).toString();
-            Log.v(FB.TAG, "sending to Unity " + this.methodName + "(" + unityParams + ")");
+            Log.v(C0849FB.TAG, "sending to Unity " + this.methodName + "(" + unityParams + ")");
             try {
                 UnityReflection.SendMessage("UnityFacebookSDKPlugin", this.methodName, unityParams);
-                return;
             } catch (UnsatisfiedLinkError e) {
-                Log.v(FB.TAG, "message not send, Unity not initialized");
-                return;
+                Log.v(C0849FB.TAG, "message not send, Unity not initialized");
             }
+        } else {
+            throw new AssertionError("no method specified");
         }
-        throw new AssertionError("no method specified");
     }
 
     public void sendError(String str) {

@@ -89,7 +89,10 @@ public class ConcurrentUtils {
     }
 
     public static <T> T initialize(ConcurrentInitializer<T> concurrentInitializer) throws ConcurrentException {
-        return concurrentInitializer != null ? concurrentInitializer.get() : null;
+        if (concurrentInitializer != null) {
+            return concurrentInitializer.get();
+        }
+        return null;
     }
 
     public static <T> T initializeUnchecked(ConcurrentInitializer<T> concurrentInitializer) {
@@ -104,7 +107,7 @@ public class ConcurrentUtils {
         if (concurrentMap == null) {
             return null;
         }
-        V putIfAbsent = concurrentMap.putIfAbsent(k, v);
+        Object putIfAbsent = concurrentMap.putIfAbsent(k, v);
         return putIfAbsent != null ? putIfAbsent : v;
     }
 

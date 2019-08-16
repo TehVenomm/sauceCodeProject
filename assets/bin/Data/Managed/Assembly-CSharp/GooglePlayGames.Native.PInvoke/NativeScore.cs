@@ -46,7 +46,7 @@ namespace GooglePlayGames.Native.PInvoke
 			{
 				num = 0uL;
 			}
-			DateTime date = dateTime.AddMilliseconds((double)num);
+			DateTime date = dateTime.AddMilliseconds(num);
 			return new PlayGamesScore(date, leaderboardId, GetRank(), selfPlayerId, GetValue(), GetMetadata());
 		}
 

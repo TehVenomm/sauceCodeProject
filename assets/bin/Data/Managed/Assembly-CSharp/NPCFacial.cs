@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class NPCFacial
+public class NPCFacial : MonoBehaviour
 {
 	public enum TYPE
 	{
@@ -128,57 +128,58 @@ public class NPCFacial
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animNode == null) && enableAnim)
+		if (animNode == null || !enableAnim)
 		{
-			Vector3 localPosition = animNode.get_localPosition();
-			TYPE tYPE = (TYPE)(localPosition.y * 100f + 0.001f);
-			TYPE tYPE2 = (TYPE)(localPosition.z * 100f + 0.001f);
-			if (lastAnimEyeType != tYPE && Mathf.Abs(lastAnimValue.y - localPosition.y) < 0.0001f)
-			{
-				lastAnimEyeType = tYPE;
-				if (animChangeEyeCallback != null)
-				{
-					animChangeEyeCallback(tYPE);
-				}
-				else
-				{
-					eyeType = tYPE;
-				}
-			}
-			if (lastAnimMouthType != tYPE2 && Mathf.Abs(lastAnimValue.z - localPosition.z) < 0.0001f)
-			{
-				lastAnimMouthType = tYPE2;
-				if (animChangeMouthCallback != null)
-				{
-					animChangeMouthCallback(tYPE2);
-				}
-				else
-				{
-					mouthType = tYPE2;
-				}
-			}
-			lastAnimValue = localPosition;
+			return;
 		}
+		Vector3 localPosition = animNode.get_localPosition();
+		TYPE tYPE = (TYPE)(localPosition.y * 100f + 0.001f);
+		TYPE tYPE2 = (TYPE)(localPosition.z * 100f + 0.001f);
+		if (lastAnimEyeType != tYPE && Mathf.Abs(lastAnimValue.y - localPosition.y) < 0.0001f)
+		{
+			lastAnimEyeType = tYPE;
+			if (animChangeEyeCallback != null)
+			{
+				animChangeEyeCallback(tYPE);
+			}
+			else
+			{
+				eyeType = tYPE;
+			}
+		}
+		if (lastAnimMouthType != tYPE2 && Mathf.Abs(lastAnimValue.z - localPosition.z) < 0.0001f)
+		{
+			lastAnimMouthType = tYPE2;
+			if (animChangeMouthCallback != null)
+			{
+				animChangeMouthCallback(tYPE2);
+			}
+			else
+			{
+				mouthType = tYPE2;
+			}
+		}
+		lastAnimValue = localPosition;
 	}
 
 	private void UpdateEyeBlink()
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		if (!(faceRenderer == null) && enableEyeBlick && eyeType == TYPE.NORMAL)
+		if (faceRenderer == null || !enableEyeBlick || eyeType != 0)
 		{
-			eyeBlinkTime -= Time.get_deltaTime();
-			if (eyeBlinkTime <= 0f)
+			return;
+		}
+		eyeBlinkTime -= Time.get_deltaTime();
+		if (eyeBlinkTime <= 0f)
+		{
+			if (eyeMaterial.get_mainTexture() != eyeTextures[1])
 			{
-				if (eyeMaterial.get_mainTexture() != eyeTextures[1])
-				{
-					SetTexture(eyeMaterial, eyeTextures, TYPE.CLOSE);
-					eyeBlinkTime = Random.Range(0.1f, 0.3f);
-				}
-				else
-				{
-					SetTexture(eyeMaterial, eyeTextures, _eyeType);
-					ResetEyeBlinkTime();
-				}
+				SetTexture(eyeMaterial, eyeTextures, TYPE.CLOSE);
+				eyeBlinkTime = Random.Range(0.1f, 0.3f);
+			}
+			else
+			{
+				SetTexture(eyeMaterial, eyeTextures, _eyeType);
+				ResetEyeBlinkTime();
 			}
 		}
 	}

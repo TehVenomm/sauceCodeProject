@@ -33,7 +33,6 @@ public class FriendArenaRankingInfoScore : GameSection
 
 	public override void Initialize()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = (object[])GameSection.GetEventData();
 		eventData = (array[0] as Network.EventData);
 		userId = (int)array[1];
@@ -45,12 +44,12 @@ public class FriendArenaRankingInfoScore : GameSection
 		bool isFinishGetRecord = false;
 		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(userId, eventData.eventId, delegate(bool b, ArenaUserRecordModel.Param result)
 		{
-			((_003CDoInitialize_003Ec__Iterator3B)/*Error near IL_0048: stateMachine*/)._003CisFinishGetRecord_003E__0 = true;
-			((_003CDoInitialize_003Ec__Iterator3B)/*Error near IL_0048: stateMachine*/)._003C_003Ef__this.record = result;
+			isFinishGetRecord = true;
+			record = result;
 		});
 		while (!isFinishGetRecord)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.Initialize();
 	}

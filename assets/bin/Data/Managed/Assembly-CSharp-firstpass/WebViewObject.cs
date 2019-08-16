@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class WebViewObject
+public class WebViewObject : MonoBehaviour
 {
 	private string lastURL;
 
@@ -21,7 +21,7 @@ public class WebViewObject
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
+		//IL_002b: Expected O, but got Unknown
 		offset = new Vector2(0f, 0f);
 		webView = new AndroidJavaObject("net.gree.unitywebview.WebViewPlugin", new object[0]);
 		webView.Call("Init", new object[1]
@@ -104,9 +104,8 @@ public class WebViewObject
 
 	public void Refresh()
 	{
-		if (lastURL == null)
+		if (lastURL != null)
 		{
-			return;
 		}
 	}
 

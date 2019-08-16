@@ -28,10 +28,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class DeserializerCache implements Serializable {
     private static final long serialVersionUID = 1;
-    protected final ConcurrentHashMap<JavaType, JsonDeserializer<Object>> _cachedDeserializers = new ConcurrentHashMap(64, 0.75f, 4);
-    protected final HashMap<JavaType, JsonDeserializer<Object>> _incompleteDeserializers = new HashMap(8);
+    protected final ConcurrentHashMap<JavaType, JsonDeserializer<Object>> _cachedDeserializers = new ConcurrentHashMap<>(64, 0.75f, 4);
+    protected final HashMap<JavaType, JsonDeserializer<Object>> _incompleteDeserializers = new HashMap<>(8);
 
-    Object writeReplace() {
+    /* access modifiers changed from: 0000 */
+    public Object writeReplace() {
         this._incompleteDeserializers.clear();
         return this;
     }
@@ -49,11 +50,11 @@ public final class DeserializerCache implements Serializable {
         if (_findCachedDeserializer != null) {
             return _findCachedDeserializer;
         }
-        _findCachedDeserializer = _createAndCacheValueDeserializer(deserializationContext, deserializerFactory, javaType);
-        if (_findCachedDeserializer == null) {
+        JsonDeserializer<Object> _createAndCacheValueDeserializer = _createAndCacheValueDeserializer(deserializationContext, deserializerFactory, javaType);
+        if (_createAndCacheValueDeserializer == null) {
             return _handleUnknownValueDeserializer(deserializationContext, javaType);
         }
-        return _findCachedDeserializer;
+        return _createAndCacheValueDeserializer;
     }
 
     public KeyDeserializer findKeyDeserializer(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType) throws JsonMappingException {
@@ -76,7 +77,8 @@ public final class DeserializerCache implements Serializable {
         return _findCachedDeserializer != null;
     }
 
-    protected JsonDeserializer<Object> _findCachedDeserializer(JavaType javaType) {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _findCachedDeserializer(JavaType javaType) {
         if (javaType == null) {
             throw new IllegalArgumentException("Null JavaType passed");
         } else if (_hasCustomValueHandler(javaType)) {
@@ -86,71 +88,73 @@ public final class DeserializerCache implements Serializable {
         }
     }
 
-    protected JsonDeserializer<Object> _createAndCacheValueDeserializer(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _createAndCacheValueDeserializer(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType) throws JsonMappingException {
         JsonDeserializer<Object> _findCachedDeserializer;
         synchronized (this._incompleteDeserializers) {
             _findCachedDeserializer = _findCachedDeserializer(javaType);
-            if (_findCachedDeserializer != null) {
-            } else {
-                r2 = this._incompleteDeserializers.size();
-                if (r2 > 0) {
+            if (_findCachedDeserializer == null) {
+                int size = this._incompleteDeserializers.size();
+                if (size > 0) {
                     _findCachedDeserializer = (JsonDeserializer) this._incompleteDeserializers.get(javaType);
                     if (_findCachedDeserializer != null) {
                     }
                 }
                 try {
                     _findCachedDeserializer = _createAndCache2(deserializationContext, deserializerFactory, javaType);
-                    if (r2 == 0) {
+                    if (size == 0) {
                         if (this._incompleteDeserializers.size() > 0) {
                             this._incompleteDeserializers.clear();
                         }
                     }
                 } catch (Throwable th) {
-                    int size;
                     if (size == 0 && this._incompleteDeserializers.size() > 0) {
                         this._incompleteDeserializers.clear();
                     }
+                    throw th;
                 }
             }
         }
         return _findCachedDeserializer;
     }
 
-    protected JsonDeserializer<Object> _createAndCache2(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _createAndCache2(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType) throws JsonMappingException {
+        boolean z;
         try {
             JsonDeserializer<Object> _createDeserializer = _createDeserializer(deserializationContext, deserializerFactory, javaType);
             if (_createDeserializer == null) {
                 return null;
             }
-            Object obj;
-            boolean z = _createDeserializer instanceof ResolvableDeserializer;
+            boolean z2 = _createDeserializer instanceof ResolvableDeserializer;
             if (_hasCustomValueHandler(javaType) || !_createDeserializer.isCachable()) {
-                obj = null;
+                z = false;
             } else {
-                obj = 1;
+                z = true;
             }
-            if (z) {
+            if (z2) {
                 this._incompleteDeserializers.put(javaType, _createDeserializer);
                 ((ResolvableDeserializer) _createDeserializer).resolve(deserializationContext);
                 this._incompleteDeserializers.remove(javaType);
             }
-            if (obj == null) {
+            if (!z) {
                 return _createDeserializer;
             }
             this._cachedDeserializers.put(javaType, _createDeserializer);
             return _createDeserializer;
-        } catch (Throwable e) {
-            throw JsonMappingException.from(deserializationContext, e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw JsonMappingException.from(deserializationContext, e.getMessage(), (Throwable) e);
         }
     }
 
-    protected JsonDeserializer<Object> _createDeserializer(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _createDeserializer(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType) throws JsonMappingException {
         DeserializationConfig config = deserializationContext.getConfig();
         if (javaType.isAbstract() || javaType.isMapLikeType() || javaType.isCollectionLikeType()) {
             javaType = deserializerFactory.mapAbstractType(config, javaType);
         }
         BeanDescription introspect = config.introspect(javaType);
-        JsonDeserializer<Object> findDeserializerFromAnnotation = findDeserializerFromAnnotation(deserializationContext, introspect.getClassInfo());
+        JsonDeserializer findDeserializerFromAnnotation = findDeserializerFromAnnotation(deserializationContext, introspect.getClassInfo());
         if (findDeserializerFromAnnotation != null) {
             return findDeserializerFromAnnotation;
         }
@@ -174,7 +178,8 @@ public final class DeserializerCache implements Serializable {
         return new StdDelegatingDeserializer(findDeserializationConverter, inputType, _createDeserializer2(deserializationContext, deserializerFactory, inputType, introspect));
     }
 
-    protected JsonDeserializer<?> _createDeserializer2(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<?> _createDeserializer2(DeserializationContext deserializationContext, DeserializerFactory deserializerFactory, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
         DeserializationConfig config = deserializationContext.getConfig();
         if (javaType.isEnumType()) {
             return deserializerFactory.createEnumDeserializer(deserializationContext, javaType, beanDescription);
@@ -209,7 +214,8 @@ public final class DeserializerCache implements Serializable {
         return deserializerFactory.createBeanDeserializer(deserializationContext, javaType, beanDescription);
     }
 
-    protected JsonDeserializer<Object> findDeserializerFromAnnotation(DeserializationContext deserializationContext, Annotated annotated) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> findDeserializerFromAnnotation(DeserializationContext deserializationContext, Annotated annotated) throws JsonMappingException {
         Object findDeserializer = deserializationContext.getAnnotationIntrospector().findDeserializer(annotated);
         if (findDeserializer == null) {
             return null;
@@ -217,12 +223,14 @@ public final class DeserializerCache implements Serializable {
         return findConvertingDeserializer(deserializationContext, annotated, deserializationContext.deserializerInstance(annotated, findDeserializer));
     }
 
-    protected JsonDeserializer<Object> findConvertingDeserializer(DeserializationContext deserializationContext, Annotated annotated, JsonDeserializer<Object> jsonDeserializer) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> findConvertingDeserializer(DeserializationContext deserializationContext, Annotated annotated, JsonDeserializer<Object> jsonDeserializer) throws JsonMappingException {
         Converter findConverter = findConverter(deserializationContext, annotated);
         return findConverter == null ? jsonDeserializer : new StdDelegatingDeserializer(findConverter, findConverter.getInputType(deserializationContext.getTypeFactory()), jsonDeserializer);
     }
 
-    protected Converter<Object, Object> findConverter(DeserializationContext deserializationContext, Annotated annotated) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public Converter<Object, Object> findConverter(DeserializationContext deserializationContext, Annotated annotated) throws JsonMappingException {
         Object findDeserializationConverter = deserializationContext.getAnnotationIntrospector().findDeserializationConverter(annotated);
         if (findDeserializationConverter == null) {
             return null;
@@ -231,16 +239,15 @@ public final class DeserializerCache implements Serializable {
     }
 
     private JavaType modifyTypeByAnnotation(DeserializationContext deserializationContext, Annotated annotated, JavaType javaType) throws JsonMappingException {
+        JsonDeserializer jsonDeserializer;
         AnnotationIntrospector annotationIntrospector = deserializationContext.getAnnotationIntrospector();
         if (annotationIntrospector == null) {
             return javaType;
         }
-        JavaType keyType;
-        Object findKeyDeserializer;
         if (javaType.isMapLikeType()) {
-            keyType = javaType.getKeyType();
+            JavaType keyType = javaType.getKeyType();
             if (keyType != null && keyType.getValueHandler() == null) {
-                findKeyDeserializer = annotationIntrospector.findKeyDeserializer(annotated);
+                Object findKeyDeserializer = annotationIntrospector.findKeyDeserializer(annotated);
                 if (findKeyDeserializer != null) {
                     KeyDeserializer keyDeserializerInstance = deserializationContext.keyDeserializerInstance(annotated, findKeyDeserializer);
                     if (keyDeserializerInstance != null) {
@@ -250,19 +257,19 @@ public final class DeserializerCache implements Serializable {
                 }
             }
         }
-        keyType = javaType.getContentType();
-        if (keyType != null && keyType.getValueHandler() == null) {
-            findKeyDeserializer = annotationIntrospector.findContentDeserializer(annotated);
-            if (findKeyDeserializer != null) {
-                if (findKeyDeserializer instanceof JsonDeserializer) {
-                    JsonDeserializer jsonDeserializer = (JsonDeserializer) findKeyDeserializer;
-                    findKeyDeserializer = null;
+        JavaType contentType = javaType.getContentType();
+        if (contentType != null && contentType.getValueHandler() == null) {
+            Object findContentDeserializer = annotationIntrospector.findContentDeserializer(annotated);
+            if (findContentDeserializer != null) {
+                if (findContentDeserializer instanceof JsonDeserializer) {
+                    JsonDeserializer jsonDeserializer2 = (JsonDeserializer) findContentDeserializer;
+                    jsonDeserializer = null;
                 } else {
-                    Class _verifyAsClass = _verifyAsClass(findKeyDeserializer, "findContentDeserializer", None.class);
-                    findKeyDeserializer = _verifyAsClass != null ? deserializationContext.deserializerInstance(annotated, _verifyAsClass) : null;
+                    Class _verifyAsClass = _verifyAsClass(findContentDeserializer, "findContentDeserializer", None.class);
+                    jsonDeserializer = _verifyAsClass != null ? deserializationContext.deserializerInstance(annotated, _verifyAsClass) : null;
                 }
-                if (findKeyDeserializer != null) {
-                    javaType = javaType.withContentValueHandler(findKeyDeserializer);
+                if (jsonDeserializer != null) {
+                    javaType = javaType.withContentValueHandler(jsonDeserializer);
                 }
             }
         }
@@ -287,24 +294,26 @@ public final class DeserializerCache implements Serializable {
         if (obj == null) {
             return null;
         }
-        if (obj instanceof Class) {
-            Class<?> cls2 = (Class) obj;
-            if (cls2 == cls || ClassUtil.isBogusClass(cls2)) {
-                return null;
-            }
-            return cls2;
+        if (!(obj instanceof Class)) {
+            throw new IllegalStateException("AnnotationIntrospector." + str + "() returned value of type " + obj.getClass().getName() + ": expected type JsonSerializer or Class<JsonSerializer> instead");
         }
-        throw new IllegalStateException("AnnotationIntrospector." + str + "() returned value of type " + obj.getClass().getName() + ": expected type JsonSerializer or Class<JsonSerializer> instead");
+        Class<?> cls2 = (Class) obj;
+        if (cls2 == cls || ClassUtil.isBogusClass(cls2)) {
+            return null;
+        }
+        return cls2;
     }
 
-    protected JsonDeserializer<Object> _handleUnknownValueDeserializer(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
-        if (ClassUtil.isConcrete(javaType.getRawClass())) {
-            throw JsonMappingException.from(deserializationContext, "Can not find a Value deserializer for type " + javaType);
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _handleUnknownValueDeserializer(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
+        if (!ClassUtil.isConcrete(javaType.getRawClass())) {
+            throw JsonMappingException.from(deserializationContext, "Can not find a Value deserializer for abstract type " + javaType);
         }
-        throw JsonMappingException.from(deserializationContext, "Can not find a Value deserializer for abstract type " + javaType);
+        throw JsonMappingException.from(deserializationContext, "Can not find a Value deserializer for type " + javaType);
     }
 
-    protected KeyDeserializer _handleUnknownKeyDeserializer(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public KeyDeserializer _handleUnknownKeyDeserializer(DeserializationContext deserializationContext, JavaType javaType) throws JsonMappingException {
         throw JsonMappingException.from(deserializationContext, "Can not find a (Map) Key deserializer for type " + javaType);
     }
 }

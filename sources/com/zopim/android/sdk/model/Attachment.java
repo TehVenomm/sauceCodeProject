@@ -5,6 +5,7 @@ import android.util.Log;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -46,7 +47,7 @@ public class Attachment {
         }
         try {
             return new URL(this.thumbnail);
-        } catch (Throwable e) {
+        } catch (MalformedURLException e) {
             Log.w(LOG_TAG, "Can not retrieve url. ", e);
             return null;
         }
@@ -64,7 +65,7 @@ public class Attachment {
         }
         try {
             return new URL(this.url);
-        } catch (Throwable e) {
+        } catch (MalformedURLException e) {
             Log.w(LOG_TAG, "Can not retrieve url. ", e);
             return null;
         }

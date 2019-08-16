@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.p000v4.content.LocalBroadcastManager;
 import com.facebook.appevents.AppEventsLogger;
 
 public class BoltsMeasurementEventListener extends BroadcastReceiver {
@@ -37,7 +37,8 @@ public class BoltsMeasurementEventListener extends BroadcastReceiver {
         LocalBroadcastManager.getInstance(this.applicationContext).registerReceiver(this, new IntentFilter("com.parse.bolts.measurement_event"));
     }
 
-    protected void finalize() throws Throwable {
+    /* access modifiers changed from: protected */
+    public void finalize() throws Throwable {
         try {
             close();
         } finally {

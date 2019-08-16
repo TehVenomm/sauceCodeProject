@@ -2,46 +2,46 @@ package com.google.android.gms.nearby.messages;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
-import com.google.android.gms.internal.zzclm;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
+import com.google.android.gms.internal.nearby.zzgs;
 
 public final class zza implements Creator<Message> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        byte[] bArr = null;
-        int zzd = zzb.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
         long j = 0;
+        byte[] bArr = null;
         String str = null;
         String str2 = null;
-        zzclm[] zzclmArr = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        zzgs[] zzgsArr = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    bArr = zzb.zzt(parcel, readInt);
+                    bArr = SafeParcelReader.createByteArray(parcel, readHeader);
                     break;
                 case 2:
-                    str2 = zzb.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    zzclmArr = (zzclm[]) zzb.zzb(parcel, readInt, zzclm.CREATOR);
+                    zzgsArr = (zzgs[]) SafeParcelReader.createTypedArray(parcel, readHeader, zzgs.CREATOR);
                     break;
                 case 5:
-                    j = zzb.zzi(parcel, readInt);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 1000:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
-        return new Message(i, bArr, str, str2, zzclmArr, j);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new Message(i, bArr, str, str2, zzgsArr, j);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

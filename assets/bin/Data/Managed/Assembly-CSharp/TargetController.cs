@@ -32,7 +32,7 @@ public class TargetController
 		return AIUtility.IsAlive(GetAllyTarget());
 	}
 
-	public bool CanReviveOfTargetAlly()
+	public bool CanRescueOfTargetAlly()
 	{
 		StageObject stageObject = GetAllyTarget();
 		if (stageObject == null)
@@ -42,11 +42,12 @@ public class TargetController
 		if (stageObject is Player)
 		{
 			Player player = stageObject as Player;
-			return player.isDead && player.rescueTime > 0f;
+			return (player.isDead && player.rescueTime > 0f) || (player.IsStone() && player.stoneRescueTime > 0f);
 		}
 		if (stageObject is Character)
 		{
-			return (stageObject as Character).isDead;
+			Character character = stageObject as Character;
+			return character.isDead || character.IsStone();
 		}
 		return false;
 	}
@@ -86,13 +87,13 @@ public class TargetController
 
 	public void MissCurrentTarget()
 	{
-		brain.owner.SetActionTarget(null, false);
+		brain.owner.SetActionTarget(null, send: false);
 	}
 
 	public void SetCurrentTarget(StageObject target_obj)
 	{
 		StageObject currentTarget = GetCurrentTarget();
-		brain.owner.SetActionTarget(target_obj, true);
+		brain.owner.SetActionTarget(target_obj);
 		brain.opponentMem.OnTargetOpponent(target_obj, currentTarget);
 	}
 
@@ -121,14 +122,14 @@ public class TargetController
 	public StageObject GetTargetObjectOfNearest()
 	{
 		StageObject obj = null;
-		double len = 1.7976931348623157E+308;
+		double len = double.MaxValue;
 		List<OpponentMemory.OpponentRecord> listOfSensedOpponent = brain.opponentMem.GetListOfSensedOpponent();
 		listOfSensedOpponent.ForEach(delegate(OpponentMemory.OpponentRecord t)
 		{
 			if ((double)t.record.distance < len)
 			{
 				obj = t.obj;
-				len = (double)t.record.distance;
+				len = t.record.distance;
 			}
 		});
 		return obj;

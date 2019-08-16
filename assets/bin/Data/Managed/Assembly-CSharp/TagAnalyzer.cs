@@ -20,15 +20,12 @@ internal class TagAnalyzer
 
 	protected virtual bool IsValidTag(string tag, int line, int column)
 	{
-		switch (tag)
+		if (tag == null || (!(tag == "M") && !(tag == "F")))
 		{
-		default:
 			Log.Warning(LOG.OUTGAME, "Invalid tag : " + tag + " :: line " + (line + 1) + " : column " + column);
 			return false;
-		case "M":
-		case "F":
-			return true;
 		}
+		return true;
 	}
 
 	public bool IsFindTag()
@@ -70,26 +67,27 @@ internal class TagAnalyzer
 					if (c2 == '<')
 					{
 						int num4 = num;
-						if (num4 < length && text[num4++] == '/')
+						if (num4 >= length || text[num4++] != '/')
 						{
-							char c3 = '\0';
-							while (c3 != '>' && num4 < length)
+							continue;
+						}
+						char c3 = '\0';
+						while (c3 != '>' && num4 < length)
+						{
+							c3 = text[num4++];
+							if (c3 != '>')
 							{
-								c3 = text[num4++];
-								if (c3 != '>')
-								{
-									stringBuilder3.Append(c3);
-								}
+								stringBuilder3.Append(c3);
 							}
-							if (stringBuilder3.ToString() == findTag)
-							{
-								flag = true;
-								num = num4;
-							}
-							else
-							{
-								Log.Error(LOG.OUTGAME, "not match END_TAG : start = " + findTag + " : end = " + stringBuilder3.ToString() + " :: line " + (line + 1) + " : column " + column);
-							}
+						}
+						if (stringBuilder3.ToString() == findTag)
+						{
+							flag = true;
+							num = num4;
+						}
+						else
+						{
+							Log.Error(LOG.OUTGAME, "not match END_TAG : start = " + findTag + " : end = " + stringBuilder3.ToString() + " :: line " + (line + 1) + " : column " + column);
 						}
 					}
 					else

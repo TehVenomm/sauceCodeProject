@@ -26,6 +26,23 @@ namespace Network
 			}
 		}
 
+		public class UniqueEquipSetSlot
+		{
+			public string euid;
+
+			public int slotNo;
+
+			public UniqueEquipSetSlot()
+			{
+			}
+
+			public UniqueEquipSetSlot(string eId, int slNo)
+			{
+				euid = eId;
+				slotNo = slNo;
+			}
+		}
+
 		public class DiffEquipSetSlot : EquipSetSlot
 		{
 			public string uniqId;
@@ -64,6 +81,8 @@ namespace Network
 		public int price;
 
 		public List<EquipSetSlot> equipSlots = new List<EquipSetSlot>();
+
+		public UniqueEquipSetSlot uniqueEquipSlots = new UniqueEquipSetSlot();
 
 		public int RelativeExp => exp - expPrev;
 

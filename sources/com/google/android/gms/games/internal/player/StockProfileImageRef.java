@@ -2,9 +2,10 @@ package com.google.android.gms.games.internal.player;
 
 import android.net.Uri;
 import android.os.Parcel;
-import com.google.android.gms.common.data.zzc;
+import com.facebook.share.internal.MessengerShareContentUtility;
+import com.google.android.gms.common.data.DataBufferRef;
 
-public class StockProfileImageRef extends zzc implements StockProfileImage {
+public class StockProfileImageRef extends DataBufferRef implements StockProfileImage {
     public int describeContents() {
         throw new NoSuchMethodError();
     }
@@ -14,14 +15,14 @@ public class StockProfileImageRef extends zzc implements StockProfileImage {
     }
 
     public String getImageUrl() {
-        return getString("image_url");
+        return getString(MessengerShareContentUtility.IMAGE_URL);
     }
 
     public void writeToParcel(Parcel parcel, int i) {
         throw new NoSuchMethodError();
     }
 
-    public final Uri zzaro() {
+    public final Uri zzae() {
         throw new NoSuchMethodError();
     }
 }

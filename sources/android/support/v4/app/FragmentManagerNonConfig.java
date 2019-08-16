@@ -1,7 +1,8 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import java.util.List;
 
+/* renamed from: android.support.v4.app.FragmentManagerNonConfig */
 public class FragmentManagerNonConfig {
     private final List<FragmentManagerNonConfig> mChildNonConfigs;
     private final List<Fragment> mFragments;
@@ -11,11 +12,13 @@ public class FragmentManagerNonConfig {
         this.mChildNonConfigs = list2;
     }
 
-    List<FragmentManagerNonConfig> getChildNonConfigs() {
+    /* access modifiers changed from: 0000 */
+    public List<FragmentManagerNonConfig> getChildNonConfigs() {
         return this.mChildNonConfigs;
     }
 
-    List<Fragment> getFragments() {
+    /* access modifiers changed from: 0000 */
+    public List<Fragment> getFragments() {
         return this.mFragments;
     }
 }

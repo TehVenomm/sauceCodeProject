@@ -37,14 +37,16 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         return new BeanAsArrayBuilderDeserializer(this._delegate.withIgnorableProperties(hashSet), this._orderedProperties, this._buildMethod);
     }
 
-    protected BeanAsArrayBuilderDeserializer asArrayDeserializer() {
+    /* access modifiers changed from: protected */
+    public BeanAsArrayBuilderDeserializer asArrayDeserializer() {
         return this;
     }
 
-    protected final Object finishBuild(DeserializationContext deserializationContext, Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Object finishBuild(DeserializationContext deserializationContext, Object obj) throws IOException {
         try {
             return this._buildMethod.getMember().invoke(obj, new Object[0]);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             wrapInstantiationProblem(e, deserializationContext);
             return null;
         }
@@ -60,31 +62,30 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         Object createUsingDefault = this._valueInstantiator.createUsingDefault(deserializationContext);
         SettableBeanProperty[] settableBeanPropertyArr = this._orderedProperties;
         int length = settableBeanPropertyArr.length;
-        Object obj = createUsingDefault;
         int i = 0;
         while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
             if (i != length) {
                 SettableBeanProperty settableBeanProperty = settableBeanPropertyArr[i];
                 if (settableBeanProperty != null) {
                     try {
-                        obj = settableBeanProperty.deserializeSetAndReturn(jsonParser, deserializationContext, obj);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, obj, settableBeanProperty.getName(), deserializationContext);
+                        createUsingDefault = settableBeanProperty.deserializeSetAndReturn(jsonParser, deserializationContext, createUsingDefault);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, createUsingDefault, settableBeanProperty.getName(), deserializationContext);
                     }
                 } else {
                     jsonParser.skipChildren();
                 }
                 i++;
-            } else if (this._ignoreAllUnknown) {
+            } else if (!this._ignoreAllUnknown) {
+                throw deserializationContext.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)", Integer.valueOf(length));
+            } else {
                 while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
                     jsonParser.skipChildren();
                 }
-                return finishBuild(deserializationContext, obj);
-            } else {
-                throw deserializationContext.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)", Integer.valueOf(length));
+                return finishBuild(deserializationContext, createUsingDefault);
             }
         }
-        return finishBuild(deserializationContext, obj);
+        return finishBuild(deserializationContext, createUsingDefault);
     }
 
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
@@ -100,20 +101,20 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
                 if (settableBeanProperty != null) {
                     try {
                         obj = settableBeanProperty.deserializeSetAndReturn(jsonParser, deserializationContext, obj);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, obj, settableBeanProperty.getName(), deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, obj, settableBeanProperty.getName(), deserializationContext);
                     }
                 } else {
                     jsonParser.skipChildren();
                 }
                 i++;
-            } else if (this._ignoreAllUnknown) {
+            } else if (!this._ignoreAllUnknown) {
+                throw deserializationContext.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)", Integer.valueOf(length));
+            } else {
                 while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
                     jsonParser.skipChildren();
                 }
                 return finishBuild(deserializationContext, obj);
-            } else {
-                throw deserializationContext.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)", Integer.valueOf(length));
             }
         }
         return finishBuild(deserializationContext, obj);
@@ -123,7 +124,8 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         return _deserializeFromNonArray(jsonParser, deserializationContext);
     }
 
-    protected Object _deserializeNonVanilla(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeNonVanilla(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (this._nonStandardCreation) {
             return _deserializeWithCreator(jsonParser, deserializationContext);
         }
@@ -131,7 +133,7 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         if (this._injectables != null) {
             injectValues(deserializationContext, createUsingDefault);
         }
-        Class activeView = this._needViewProcesing ? deserializationContext.getActiveView() : null;
+        Class cls = this._needViewProcesing ? deserializationContext.getActiveView() : null;
         SettableBeanProperty[] settableBeanPropertyArr = this._orderedProperties;
         int length = settableBeanPropertyArr.length;
         int i = 0;
@@ -139,28 +141,29 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
             if (i != length) {
                 SettableBeanProperty settableBeanProperty = settableBeanPropertyArr[i];
                 i++;
-                if (settableBeanProperty == null || !(activeView == null || settableBeanProperty.visibleInView(activeView))) {
+                if (settableBeanProperty == null || (cls != null && !settableBeanProperty.visibleInView(cls))) {
                     jsonParser.skipChildren();
                 } else {
                     try {
                         settableBeanProperty.deserializeSetAndReturn(jsonParser, deserializationContext, createUsingDefault);
-                    } catch (Throwable e) {
-                        wrapAndThrow(e, createUsingDefault, settableBeanProperty.getName(), deserializationContext);
+                    } catch (Exception e) {
+                        wrapAndThrow((Throwable) e, createUsingDefault, settableBeanProperty.getName(), deserializationContext);
                     }
                 }
-            } else if (this._ignoreAllUnknown) {
+            } else if (!this._ignoreAllUnknown) {
+                throw deserializationContext.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)", Integer.valueOf(length));
+            } else {
                 while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
                     jsonParser.skipChildren();
                 }
                 return createUsingDefault;
-            } else {
-                throw deserializationContext.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)", Integer.valueOf(length));
             }
         }
         return createUsingDefault;
     }
 
-    protected Object _deserializeWithCreator(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeWithCreator(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (this._delegateDeserializer != null) {
             return this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
         }
@@ -173,7 +176,9 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         throw JsonMappingException.from(jsonParser, "No suitable constructor found for type " + this._beanType + ": can not instantiate from JSON object (need to add/enable type information?)");
     }
 
-    protected final Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        SettableBeanProperty settableBeanProperty;
         PropertyBasedCreator propertyBasedCreator = this._propertyBasedCreator;
         PropertyValueBuffer startBuilding = propertyBasedCreator.startBuilding(jsonParser, deserializationContext, this._objectIdReader);
         SettableBeanProperty[] settableBeanPropertyArr = this._orderedProperties;
@@ -181,7 +186,6 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         Object obj = null;
         int i = 0;
         while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-            SettableBeanProperty settableBeanProperty;
             if (i < length) {
                 settableBeanProperty = settableBeanPropertyArr[i];
             } else {
@@ -192,8 +196,8 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
             } else if (obj != null) {
                 try {
                     obj = settableBeanProperty.deserializeSetAndReturn(jsonParser, deserializationContext, obj);
-                } catch (Throwable e) {
-                    wrapAndThrow(e, obj, settableBeanProperty.getName(), deserializationContext);
+                } catch (Exception e) {
+                    wrapAndThrow((Throwable) e, obj, settableBeanProperty.getName(), deserializationContext);
                 }
             } else {
                 String name = settableBeanProperty.getName();
@@ -205,8 +209,8 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
                             if (obj.getClass() != this._beanType.getRawClass()) {
                                 throw deserializationContext.mappingException("Can not support implicit polymorphic deserialization for POJOs-as-Arrays style: nominal type %s, actual type %s", this._beanType.getRawClass().getName(), obj.getClass().getName());
                             }
-                        } catch (Throwable e2) {
-                            wrapAndThrow(e2, (Object) this._beanType.getRawClass(), name, deserializationContext);
+                        } catch (Exception e2) {
+                            wrapAndThrow((Throwable) e2, (Object) this._beanType.getRawClass(), name, deserializationContext);
                         }
                     } else {
                         continue;
@@ -220,7 +224,7 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         if (obj == null) {
             try {
                 obj = propertyBasedCreator.build(deserializationContext, startBuilding);
-            } catch (Throwable e3) {
+            } catch (Exception e3) {
                 wrapInstantiationProblem(e3, deserializationContext);
                 return null;
             }
@@ -228,7 +232,8 @@ public class BeanAsArrayBuilderDeserializer extends BeanDeserializerBase {
         return obj;
     }
 
-    protected Object _deserializeFromNonArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeFromNonArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         throw deserializationContext.mappingException("Can not deserialize a POJO (of type %s) from non-Array representation (token: %s): type/property designed to be serialized as JSON Array", this._beanType.getRawClass().getName(), jsonParser.getCurrentToken());
     }
 }

@@ -8,7 +8,6 @@ public class InGameQuestEventList : QuestEventList
 	{
 		isInGame = true;
 		base.Initialize();
-		SetActive((Enum)UI.OBJ_NPC, false);
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
@@ -36,6 +35,11 @@ public class InGameQuestEventList : QuestEventList
 		UpdateCheck();
 	}
 
+	protected override bool IsCarnival()
+	{
+		return false;
+	}
+
 	private void Reposition(bool isPortrait)
 	{
 		UIScreenRotationHandler[] components = GetCtrl(UI.OBJ_FRAME).GetComponents<UIScreenRotationHandler>();
@@ -59,8 +63,6 @@ public class InGameQuestEventList : QuestEventList
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (base.transferUI != null)
 		{
 			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();

@@ -4,52 +4,86 @@ import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.DowngradeableSafeParcel;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.util.zzg;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.DataUtils;
+import com.google.android.gms.common.util.RetainForClient;
 import com.google.android.gms.games.internal.GamesDowngradeableSafeParcel;
-import java.util.Arrays;
 
+@RetainForClient
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "GameEntityCreator")
+@Reserved({1000})
 public final class GameEntity extends GamesDowngradeableSafeParcel implements Game {
     public static final Creator<GameEntity> CREATOR = new zza();
-    private final boolean zzckg;
-    private final String zzdmz;
-    private final String zzeby;
-    private final String zzehw;
-    private final String zzhba;
-    private final String zzhbb;
-    private final String zzhbc;
-    private final Uri zzhbd;
-    private final Uri zzhbe;
-    private final Uri zzhbf;
-    private final boolean zzhbg;
-    private final boolean zzhbh;
-    private final String zzhbi;
-    private final int zzhbj;
-    private final int zzhbk;
-    private final int zzhbl;
-    private final boolean zzhbm;
-    private final boolean zzhbn;
-    private final String zzhbo;
-    private final String zzhbp;
-    private final String zzhbq;
-    private final boolean zzhbr;
-    private final boolean zzhbs;
-    private final String zzhbt;
-    private final boolean zzhbu;
+    @Field(getter = "getDescription", mo13990id = 5)
+    private final String description;
+    @Field(getter = "isRealTimeMultiplayerEnabled", mo13990id = 16)
+    private final boolean zzaa;
+    @Field(getter = "isTurnBasedMultiplayerEnabled", mo13990id = 17)
+    private final boolean zzab;
+    @Field(getter = "getIconImageUrl", mo13990id = 18)
+    private final String zzac;
+    @Field(getter = "getHiResImageUrl", mo13990id = 19)
+    private final String zzad;
+    @Field(getter = "getFeaturedImageUrl", mo13990id = 20)
+    private final String zzae;
+    @Field(getter = "isMuted", mo13990id = 21)
+    private final boolean zzaf;
+    @Field(getter = "isIdentitySharingConfirmed", mo13990id = 22)
+    private final boolean zzag;
+    @Field(getter = "areSnapshotsEnabled", mo13990id = 23)
+    private final boolean zzah;
+    @Field(getter = "getThemeColor", mo13990id = 24)
+    private final String zzai;
+    @Field(getter = "hasGamepadSupport", mo13990id = 25)
+    private final boolean zzaj;
+    @Field(getter = "getApplicationId", mo13990id = 1)
+    private final String zzm;
+    @Field(getter = "getDisplayName", mo13990id = 2)
+    private final String zzn;
+    @Field(getter = "getPrimaryCategory", mo13990id = 3)
+    private final String zzo;
+    @Field(getter = "getSecondaryCategory", mo13990id = 4)
+    private final String zzp;
+    @Field(getter = "getDeveloperName", mo13990id = 6)
+    private final String zzq;
+    @Field(getter = "getIconImageUri", mo13990id = 7)
+    private final Uri zzr;
+    @Field(getter = "getHiResImageUri", mo13990id = 8)
+    private final Uri zzs;
+    @Field(getter = "getFeaturedImageUri", mo13990id = 9)
+    private final Uri zzt;
+    @Field(getter = "isPlayEnabledGame", mo13990id = 10)
+    private final boolean zzu;
+    @Field(getter = "isInstanceInstalled", mo13990id = 11)
+    private final boolean zzv;
+    @Field(getter = "getInstancePackageName", mo13990id = 12)
+    private final String zzw;
+    @Field(getter = "getGameplayAclStatus", mo13990id = 13)
+    private final int zzx;
+    @Field(getter = "getAchievementTotalCount", mo13990id = 14)
+    private final int zzy;
+    @Field(getter = "getLeaderboardCount", mo13990id = 15)
+    private final int zzz;
 
-    static final class zza extends zza {
+    static final class zza extends zzh {
         zza() {
         }
 
         public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-            return zzi(parcel);
+            return createFromParcel(parcel);
         }
 
-        public final GameEntity zzi(Parcel parcel) {
-            if (GamesDowngradeableSafeParcel.zze(DowngradeableSafeParcel.zzakc()) || DowngradeableSafeParcel.zzga(GameEntity.class.getCanonicalName())) {
-                return super.zzi(parcel);
+        public final GameEntity zzb(Parcel parcel) {
+            if (GameEntity.zzb(GameEntity.getUnparcelClientVersion()) || GameEntity.canUnparcelSafely(GameEntity.class.getCanonicalName())) {
+                return super.createFromParcel(parcel);
             }
             String readString = parcel.readString();
             String readString2 = parcel.readString();
@@ -59,71 +93,72 @@ public final class GameEntity extends GamesDowngradeableSafeParcel implements Ga
             String readString6 = parcel.readString();
             String readString7 = parcel.readString();
             Uri parse = readString7 == null ? null : Uri.parse(readString7);
-            readString7 = parcel.readString();
-            Uri parse2 = readString7 == null ? null : Uri.parse(readString7);
-            readString7 = parcel.readString();
-            return new GameEntity(readString, readString2, readString3, readString4, readString5, readString6, parse, parse2, readString7 == null ? null : Uri.parse(readString7), parcel.readInt() > 0, parcel.readInt() > 0, parcel.readString(), parcel.readInt(), parcel.readInt(), parcel.readInt(), false, false, null, null, null, false, false, false, null, false);
+            String readString8 = parcel.readString();
+            Uri parse2 = readString8 == null ? null : Uri.parse(readString8);
+            String readString9 = parcel.readString();
+            return new GameEntity(readString, readString2, readString3, readString4, readString5, readString6, parse, parse2, readString9 == null ? null : Uri.parse(readString9), parcel.readInt() > 0, parcel.readInt() > 0, parcel.readString(), parcel.readInt(), parcel.readInt(), parcel.readInt(), false, false, null, null, null, false, false, false, null, false);
         }
     }
 
     public GameEntity(Game game) {
-        this.zzehw = game.getApplicationId();
-        this.zzhba = game.getPrimaryCategory();
-        this.zzhbb = game.getSecondaryCategory();
-        this.zzdmz = game.getDescription();
-        this.zzhbc = game.getDeveloperName();
-        this.zzeby = game.getDisplayName();
-        this.zzhbd = game.getIconImageUri();
-        this.zzhbo = game.getIconImageUrl();
-        this.zzhbe = game.getHiResImageUri();
-        this.zzhbp = game.getHiResImageUrl();
-        this.zzhbf = game.getFeaturedImageUri();
-        this.zzhbq = game.getFeaturedImageUrl();
-        this.zzhbg = game.zzapg();
-        this.zzhbh = game.zzapi();
-        this.zzhbi = game.zzapj();
-        this.zzhbj = 1;
-        this.zzhbk = game.getAchievementTotalCount();
-        this.zzhbl = game.getLeaderboardCount();
-        this.zzhbm = game.isRealTimeMultiplayerEnabled();
-        this.zzhbn = game.isTurnBasedMultiplayerEnabled();
-        this.zzckg = game.isMuted();
-        this.zzhbr = game.zzaph();
-        this.zzhbs = game.areSnapshotsEnabled();
-        this.zzhbt = game.getThemeColor();
-        this.zzhbu = game.hasGamepadSupport();
+        this.zzm = game.getApplicationId();
+        this.zzo = game.getPrimaryCategory();
+        this.zzp = game.getSecondaryCategory();
+        this.description = game.getDescription();
+        this.zzq = game.getDeveloperName();
+        this.zzn = game.getDisplayName();
+        this.zzr = game.getIconImageUri();
+        this.zzac = game.getIconImageUrl();
+        this.zzs = game.getHiResImageUri();
+        this.zzad = game.getHiResImageUrl();
+        this.zzt = game.getFeaturedImageUri();
+        this.zzae = game.getFeaturedImageUrl();
+        this.zzu = game.zzb();
+        this.zzv = game.zzd();
+        this.zzw = game.zze();
+        this.zzx = 1;
+        this.zzy = game.getAchievementTotalCount();
+        this.zzz = game.getLeaderboardCount();
+        this.zzaa = game.isRealTimeMultiplayerEnabled();
+        this.zzab = game.isTurnBasedMultiplayerEnabled();
+        this.zzaf = game.isMuted();
+        this.zzag = game.zzc();
+        this.zzah = game.areSnapshotsEnabled();
+        this.zzai = game.getThemeColor();
+        this.zzaj = game.hasGamepadSupport();
     }
 
-    GameEntity(String str, String str2, String str3, String str4, String str5, String str6, Uri uri, Uri uri2, Uri uri3, boolean z, boolean z2, String str7, int i, int i2, int i3, boolean z3, boolean z4, String str8, String str9, String str10, boolean z5, boolean z6, boolean z7, String str11, boolean z8) {
-        this.zzehw = str;
-        this.zzeby = str2;
-        this.zzhba = str3;
-        this.zzhbb = str4;
-        this.zzdmz = str5;
-        this.zzhbc = str6;
-        this.zzhbd = uri;
-        this.zzhbo = str8;
-        this.zzhbe = uri2;
-        this.zzhbp = str9;
-        this.zzhbf = uri3;
-        this.zzhbq = str10;
-        this.zzhbg = z;
-        this.zzhbh = z2;
-        this.zzhbi = str7;
-        this.zzhbj = i;
-        this.zzhbk = i2;
-        this.zzhbl = i3;
-        this.zzhbm = z3;
-        this.zzhbn = z4;
-        this.zzckg = z5;
-        this.zzhbr = z6;
-        this.zzhbs = z7;
-        this.zzhbt = str11;
-        this.zzhbu = z8;
+    @Constructor
+    GameEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) String str2, @Param(mo13993id = 3) String str3, @Param(mo13993id = 4) String str4, @Param(mo13993id = 5) String str5, @Param(mo13993id = 6) String str6, @Param(mo13993id = 7) Uri uri, @Param(mo13993id = 8) Uri uri2, @Param(mo13993id = 9) Uri uri3, @Param(mo13993id = 10) boolean z, @Param(mo13993id = 11) boolean z2, @Param(mo13993id = 12) String str7, @Param(mo13993id = 13) int i, @Param(mo13993id = 14) int i2, @Param(mo13993id = 15) int i3, @Param(mo13993id = 16) boolean z3, @Param(mo13993id = 17) boolean z4, @Param(mo13993id = 18) String str8, @Param(mo13993id = 19) String str9, @Param(mo13993id = 20) String str10, @Param(mo13993id = 21) boolean z5, @Param(mo13993id = 22) boolean z6, @Param(mo13993id = 23) boolean z7, @Param(mo13993id = 24) String str11, @Param(mo13993id = 25) boolean z8) {
+        this.zzm = str;
+        this.zzn = str2;
+        this.zzo = str3;
+        this.zzp = str4;
+        this.description = str5;
+        this.zzq = str6;
+        this.zzr = uri;
+        this.zzac = str8;
+        this.zzs = uri2;
+        this.zzad = str9;
+        this.zzt = uri3;
+        this.zzae = str10;
+        this.zzu = z;
+        this.zzv = z2;
+        this.zzw = str7;
+        this.zzx = i;
+        this.zzy = i2;
+        this.zzz = i3;
+        this.zzaa = z3;
+        this.zzab = z4;
+        this.zzaf = z5;
+        this.zzag = z6;
+        this.zzah = z7;
+        this.zzai = str11;
+        this.zzaj = z8;
     }
 
     static int zza(Game game) {
-        return Arrays.hashCode(new Object[]{game.getApplicationId(), game.getDisplayName(), game.getPrimaryCategory(), game.getSecondaryCategory(), game.getDescription(), game.getDeveloperName(), game.getIconImageUri(), game.getHiResImageUri(), game.getFeaturedImageUri(), Boolean.valueOf(game.zzapg()), Boolean.valueOf(game.zzapi()), game.zzapj(), Integer.valueOf(game.getAchievementTotalCount()), Integer.valueOf(game.getLeaderboardCount()), Boolean.valueOf(game.isRealTimeMultiplayerEnabled()), Boolean.valueOf(game.isTurnBasedMultiplayerEnabled()), Boolean.valueOf(game.isMuted()), Boolean.valueOf(game.zzaph()), Boolean.valueOf(game.areSnapshotsEnabled()), game.getThemeColor(), Boolean.valueOf(game.hasGamepadSupport())});
+        return Objects.hashCode(game.getApplicationId(), game.getDisplayName(), game.getPrimaryCategory(), game.getSecondaryCategory(), game.getDescription(), game.getDeveloperName(), game.getIconImageUri(), game.getHiResImageUri(), game.getFeaturedImageUri(), Boolean.valueOf(game.zzb()), Boolean.valueOf(game.zzd()), game.zze(), Integer.valueOf(game.getAchievementTotalCount()), Integer.valueOf(game.getLeaderboardCount()), Boolean.valueOf(game.isRealTimeMultiplayerEnabled()), Boolean.valueOf(game.isTurnBasedMultiplayerEnabled()), Boolean.valueOf(game.isMuted()), Boolean.valueOf(game.zzc()), Boolean.valueOf(game.areSnapshotsEnabled()), game.getThemeColor(), Boolean.valueOf(game.hasGamepadSupport()));
     }
 
     static boolean zza(Game game, Object obj) {
@@ -134,20 +169,15 @@ public final class GameEntity extends GamesDowngradeableSafeParcel implements Ga
             return true;
         }
         Game game2 = (Game) obj;
-        if (!zzbf.equal(game2.getApplicationId(), game.getApplicationId()) || !zzbf.equal(game2.getDisplayName(), game.getDisplayName()) || !zzbf.equal(game2.getPrimaryCategory(), game.getPrimaryCategory()) || !zzbf.equal(game2.getSecondaryCategory(), game.getSecondaryCategory()) || !zzbf.equal(game2.getDescription(), game.getDescription()) || !zzbf.equal(game2.getDeveloperName(), game.getDeveloperName()) || !zzbf.equal(game2.getIconImageUri(), game.getIconImageUri()) || !zzbf.equal(game2.getHiResImageUri(), game.getHiResImageUri()) || !zzbf.equal(game2.getFeaturedImageUri(), game.getFeaturedImageUri()) || !zzbf.equal(Boolean.valueOf(game2.zzapg()), Boolean.valueOf(game.zzapg())) || !zzbf.equal(Boolean.valueOf(game2.zzapi()), Boolean.valueOf(game.zzapi())) || !zzbf.equal(game2.zzapj(), game.zzapj()) || !zzbf.equal(Integer.valueOf(game2.getAchievementTotalCount()), Integer.valueOf(game.getAchievementTotalCount())) || !zzbf.equal(Integer.valueOf(game2.getLeaderboardCount()), Integer.valueOf(game.getLeaderboardCount())) || !zzbf.equal(Boolean.valueOf(game2.isRealTimeMultiplayerEnabled()), Boolean.valueOf(game.isRealTimeMultiplayerEnabled()))) {
-            return false;
-        }
-        boolean isTurnBasedMultiplayerEnabled = game2.isTurnBasedMultiplayerEnabled();
-        boolean z = game.isTurnBasedMultiplayerEnabled() && zzbf.equal(Boolean.valueOf(game2.isMuted()), Boolean.valueOf(game.isMuted())) && zzbf.equal(Boolean.valueOf(game2.zzaph()), Boolean.valueOf(game.zzaph()));
-        return zzbf.equal(Boolean.valueOf(isTurnBasedMultiplayerEnabled), Boolean.valueOf(z)) && zzbf.equal(Boolean.valueOf(game2.areSnapshotsEnabled()), Boolean.valueOf(game.areSnapshotsEnabled())) && zzbf.equal(game2.getThemeColor(), game.getThemeColor()) && zzbf.equal(Boolean.valueOf(game2.hasGamepadSupport()), Boolean.valueOf(game.hasGamepadSupport()));
+        return Objects.equal(game2.getApplicationId(), game.getApplicationId()) && Objects.equal(game2.getDisplayName(), game.getDisplayName()) && Objects.equal(game2.getPrimaryCategory(), game.getPrimaryCategory()) && Objects.equal(game2.getSecondaryCategory(), game.getSecondaryCategory()) && Objects.equal(game2.getDescription(), game.getDescription()) && Objects.equal(game2.getDeveloperName(), game.getDeveloperName()) && Objects.equal(game2.getIconImageUri(), game.getIconImageUri()) && Objects.equal(game2.getHiResImageUri(), game.getHiResImageUri()) && Objects.equal(game2.getFeaturedImageUri(), game.getFeaturedImageUri()) && Objects.equal(Boolean.valueOf(game2.zzb()), Boolean.valueOf(game.zzb())) && Objects.equal(Boolean.valueOf(game2.zzd()), Boolean.valueOf(game.zzd())) && Objects.equal(game2.zze(), game.zze()) && Objects.equal(Integer.valueOf(game2.getAchievementTotalCount()), Integer.valueOf(game.getAchievementTotalCount())) && Objects.equal(Integer.valueOf(game2.getLeaderboardCount()), Integer.valueOf(game.getLeaderboardCount())) && Objects.equal(Boolean.valueOf(game2.isRealTimeMultiplayerEnabled()), Boolean.valueOf(game.isRealTimeMultiplayerEnabled())) && Objects.equal(Boolean.valueOf(game2.isTurnBasedMultiplayerEnabled()), Boolean.valueOf(game.isTurnBasedMultiplayerEnabled())) && Objects.equal(Boolean.valueOf(game2.isMuted()), Boolean.valueOf(game.isMuted())) && Objects.equal(Boolean.valueOf(game2.zzc()), Boolean.valueOf(game.zzc())) && Objects.equal(Boolean.valueOf(game2.areSnapshotsEnabled()), Boolean.valueOf(game.areSnapshotsEnabled())) && Objects.equal(game2.getThemeColor(), game.getThemeColor()) && Objects.equal(Boolean.valueOf(game2.hasGamepadSupport()), Boolean.valueOf(game.hasGamepadSupport()));
     }
 
     static String zzb(Game game) {
-        return zzbf.zzt(game).zzg("ApplicationId", game.getApplicationId()).zzg("DisplayName", game.getDisplayName()).zzg("PrimaryCategory", game.getPrimaryCategory()).zzg("SecondaryCategory", game.getSecondaryCategory()).zzg("Description", game.getDescription()).zzg("DeveloperName", game.getDeveloperName()).zzg("IconImageUri", game.getIconImageUri()).zzg("IconImageUrl", game.getIconImageUrl()).zzg("HiResImageUri", game.getHiResImageUri()).zzg("HiResImageUrl", game.getHiResImageUrl()).zzg("FeaturedImageUri", game.getFeaturedImageUri()).zzg("FeaturedImageUrl", game.getFeaturedImageUrl()).zzg("PlayEnabledGame", Boolean.valueOf(game.zzapg())).zzg("InstanceInstalled", Boolean.valueOf(game.zzapi())).zzg("InstancePackageName", game.zzapj()).zzg("AchievementTotalCount", Integer.valueOf(game.getAchievementTotalCount())).zzg("LeaderboardCount", Integer.valueOf(game.getLeaderboardCount())).zzg("RealTimeMultiplayerEnabled", Boolean.valueOf(game.isRealTimeMultiplayerEnabled())).zzg("TurnBasedMultiplayerEnabled", Boolean.valueOf(game.isTurnBasedMultiplayerEnabled())).zzg("AreSnapshotsEnabled", Boolean.valueOf(game.areSnapshotsEnabled())).zzg("ThemeColor", game.getThemeColor()).zzg("HasGamepadSupport", Boolean.valueOf(game.hasGamepadSupport())).toString();
+        return Objects.toStringHelper(game).add("ApplicationId", game.getApplicationId()).add("DisplayName", game.getDisplayName()).add("PrimaryCategory", game.getPrimaryCategory()).add("SecondaryCategory", game.getSecondaryCategory()).add("Description", game.getDescription()).add("DeveloperName", game.getDeveloperName()).add("IconImageUri", game.getIconImageUri()).add("IconImageUrl", game.getIconImageUrl()).add("HiResImageUri", game.getHiResImageUri()).add("HiResImageUrl", game.getHiResImageUrl()).add("FeaturedImageUri", game.getFeaturedImageUri()).add("FeaturedImageUrl", game.getFeaturedImageUrl()).add("PlayEnabledGame", Boolean.valueOf(game.zzb())).add("InstanceInstalled", Boolean.valueOf(game.zzd())).add("InstancePackageName", game.zze()).add("AchievementTotalCount", Integer.valueOf(game.getAchievementTotalCount())).add("LeaderboardCount", Integer.valueOf(game.getLeaderboardCount())).add("RealTimeMultiplayerEnabled", Boolean.valueOf(game.isRealTimeMultiplayerEnabled())).add("TurnBasedMultiplayerEnabled", Boolean.valueOf(game.isTurnBasedMultiplayerEnabled())).add("AreSnapshotsEnabled", Boolean.valueOf(game.areSnapshotsEnabled())).add("ThemeColor", game.getThemeColor()).add("HasGamepadSupport", Boolean.valueOf(game.hasGamepadSupport())).toString();
     }
 
     public final boolean areSnapshotsEnabled() {
-        return this.zzhbs;
+        return this.zzah;
     }
 
     public final boolean equals(Object obj) {
@@ -159,83 +189,83 @@ public final class GameEntity extends GamesDowngradeableSafeParcel implements Ga
     }
 
     public final int getAchievementTotalCount() {
-        return this.zzhbk;
+        return this.zzy;
     }
 
     public final String getApplicationId() {
-        return this.zzehw;
+        return this.zzm;
     }
 
     public final String getDescription() {
-        return this.zzdmz;
+        return this.description;
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzdmz, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.description, charArrayBuffer);
     }
 
     public final String getDeveloperName() {
-        return this.zzhbc;
+        return this.zzq;
     }
 
     public final void getDeveloperName(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzhbc, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.zzq, charArrayBuffer);
     }
 
     public final String getDisplayName() {
-        return this.zzeby;
+        return this.zzn;
     }
 
     public final void getDisplayName(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzeby, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.zzn, charArrayBuffer);
     }
 
     public final Uri getFeaturedImageUri() {
-        return this.zzhbf;
+        return this.zzt;
     }
 
     public final String getFeaturedImageUrl() {
-        return this.zzhbq;
+        return this.zzae;
     }
 
     public final Uri getHiResImageUri() {
-        return this.zzhbe;
+        return this.zzs;
     }
 
     public final String getHiResImageUrl() {
-        return this.zzhbp;
+        return this.zzad;
     }
 
     public final Uri getIconImageUri() {
-        return this.zzhbd;
+        return this.zzr;
     }
 
     public final String getIconImageUrl() {
-        return this.zzhbo;
+        return this.zzac;
     }
 
     public final int getLeaderboardCount() {
-        return this.zzhbl;
+        return this.zzz;
     }
 
     public final String getPrimaryCategory() {
-        return this.zzhba;
+        return this.zzo;
     }
 
     public final String getSecondaryCategory() {
-        return this.zzhbb;
+        return this.zzp;
     }
 
     public final String getThemeColor() {
-        return this.zzhbt;
+        return this.zzai;
     }
 
     public final boolean hasGamepadSupport() {
-        return this.zzhbu;
+        return this.zzaj;
     }
 
     public final int hashCode() {
-        return zza(this);
+        return zza((Game) this);
     }
 
     public final boolean isDataValid() {
@@ -243,15 +273,15 @@ public final class GameEntity extends GamesDowngradeableSafeParcel implements Ga
     }
 
     public final boolean isMuted() {
-        return this.zzckg;
+        return this.zzaf;
     }
 
     public final boolean isRealTimeMultiplayerEnabled() {
-        return this.zzhbm;
+        return this.zzaa;
     }
 
     public final boolean isTurnBasedMultiplayerEnabled() {
-        return this.zzhbn;
+        return this.zzab;
     }
 
     public final String toString() {
@@ -259,48 +289,74 @@ public final class GameEntity extends GamesDowngradeableSafeParcel implements Ga
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getApplicationId(), false);
-        zzd.zza(parcel, 2, getDisplayName(), false);
-        zzd.zza(parcel, 3, getPrimaryCategory(), false);
-        zzd.zza(parcel, 4, getSecondaryCategory(), false);
-        zzd.zza(parcel, 5, getDescription(), false);
-        zzd.zza(parcel, 6, getDeveloperName(), false);
-        zzd.zza(parcel, 7, getIconImageUri(), i, false);
-        zzd.zza(parcel, 8, getHiResImageUri(), i, false);
-        zzd.zza(parcel, 9, getFeaturedImageUri(), i, false);
-        zzd.zza(parcel, 10, this.zzhbg);
-        zzd.zza(parcel, 11, this.zzhbh);
-        zzd.zza(parcel, 12, this.zzhbi, false);
-        zzd.zzc(parcel, 13, this.zzhbj);
-        zzd.zzc(parcel, 14, getAchievementTotalCount());
-        zzd.zzc(parcel, 15, getLeaderboardCount());
-        zzd.zza(parcel, 16, isRealTimeMultiplayerEnabled());
-        zzd.zza(parcel, 17, isTurnBasedMultiplayerEnabled());
-        zzd.zza(parcel, 18, getIconImageUrl(), false);
-        zzd.zza(parcel, 19, getHiResImageUrl(), false);
-        zzd.zza(parcel, 20, getFeaturedImageUrl(), false);
-        zzd.zza(parcel, 21, this.zzckg);
-        zzd.zza(parcel, 22, this.zzhbr);
-        zzd.zza(parcel, 23, areSnapshotsEnabled());
-        zzd.zza(parcel, 24, getThemeColor(), false);
-        zzd.zza(parcel, 25, hasGamepadSupport());
-        zzd.zzai(parcel, zze);
+        String str = null;
+        int i2 = 1;
+        if (!shouldDowngrade()) {
+            int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+            SafeParcelWriter.writeString(parcel, 1, getApplicationId(), false);
+            SafeParcelWriter.writeString(parcel, 2, getDisplayName(), false);
+            SafeParcelWriter.writeString(parcel, 3, getPrimaryCategory(), false);
+            SafeParcelWriter.writeString(parcel, 4, getSecondaryCategory(), false);
+            SafeParcelWriter.writeString(parcel, 5, getDescription(), false);
+            SafeParcelWriter.writeString(parcel, 6, getDeveloperName(), false);
+            SafeParcelWriter.writeParcelable(parcel, 7, getIconImageUri(), i, false);
+            SafeParcelWriter.writeParcelable(parcel, 8, getHiResImageUri(), i, false);
+            SafeParcelWriter.writeParcelable(parcel, 9, getFeaturedImageUri(), i, false);
+            SafeParcelWriter.writeBoolean(parcel, 10, this.zzu);
+            SafeParcelWriter.writeBoolean(parcel, 11, this.zzv);
+            SafeParcelWriter.writeString(parcel, 12, this.zzw, false);
+            SafeParcelWriter.writeInt(parcel, 13, this.zzx);
+            SafeParcelWriter.writeInt(parcel, 14, getAchievementTotalCount());
+            SafeParcelWriter.writeInt(parcel, 15, getLeaderboardCount());
+            SafeParcelWriter.writeBoolean(parcel, 16, isRealTimeMultiplayerEnabled());
+            SafeParcelWriter.writeBoolean(parcel, 17, isTurnBasedMultiplayerEnabled());
+            SafeParcelWriter.writeString(parcel, 18, getIconImageUrl(), false);
+            SafeParcelWriter.writeString(parcel, 19, getHiResImageUrl(), false);
+            SafeParcelWriter.writeString(parcel, 20, getFeaturedImageUrl(), false);
+            SafeParcelWriter.writeBoolean(parcel, 21, this.zzaf);
+            SafeParcelWriter.writeBoolean(parcel, 22, this.zzag);
+            SafeParcelWriter.writeBoolean(parcel, 23, areSnapshotsEnabled());
+            SafeParcelWriter.writeString(parcel, 24, getThemeColor(), false);
+            SafeParcelWriter.writeBoolean(parcel, 25, hasGamepadSupport());
+            SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+            return;
+        }
+        parcel.writeString(this.zzm);
+        parcel.writeString(this.zzn);
+        parcel.writeString(this.zzo);
+        parcel.writeString(this.zzp);
+        parcel.writeString(this.description);
+        parcel.writeString(this.zzq);
+        parcel.writeString(this.zzr == null ? null : this.zzr.toString());
+        parcel.writeString(this.zzs == null ? null : this.zzs.toString());
+        if (this.zzt != null) {
+            str = this.zzt.toString();
+        }
+        parcel.writeString(str);
+        parcel.writeInt(this.zzu ? 1 : 0);
+        if (!this.zzv) {
+            i2 = 0;
+        }
+        parcel.writeInt(i2);
+        parcel.writeString(this.zzw);
+        parcel.writeInt(this.zzx);
+        parcel.writeInt(this.zzy);
+        parcel.writeInt(this.zzz);
     }
 
-    public final boolean zzapg() {
-        return this.zzhbg;
+    public final boolean zzb() {
+        return this.zzu;
     }
 
-    public final boolean zzaph() {
-        return this.zzhbr;
+    public final boolean zzc() {
+        return this.zzag;
     }
 
-    public final boolean zzapi() {
-        return this.zzhbh;
+    public final boolean zzd() {
+        return this.zzv;
     }
 
-    public final String zzapj() {
-        return this.zzhbi;
+    public final String zze() {
+        return this.zzw;
     }
 }

@@ -29,7 +29,8 @@ public class ThrowableDeserializer extends BeanDeserializer {
     }
 
     public Object deserializeFromObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        int i = 0;
+        Object createUsingDefault;
+        int i;
         if (this._propertyBasedCreator != null) {
             return _deserializeUsingPropertyBased(jsonParser, deserializationContext);
         }
@@ -46,9 +47,6 @@ public class ThrowableDeserializer extends BeanDeserializer {
             Object[] objArr = null;
             Object obj = null;
             while (jsonParser.getCurrentToken() != JsonToken.END_OBJECT) {
-                int i3;
-                Object obj2;
-                Object[] objArr2;
                 String currentName = jsonParser.getCurrentName();
                 SettableBeanProperty find = this._beanProperties.find(currentName);
                 jsonParser.nextToken();
@@ -56,67 +54,53 @@ public class ThrowableDeserializer extends BeanDeserializer {
                     if ("message".equals(currentName) && canCreateFromString) {
                         obj = this._valueInstantiator.createFromString(deserializationContext, jsonParser.getText());
                         if (objArr != null) {
-                            for (int i4 = 0; i4 < i2; i4 += 2) {
-                                ((SettableBeanProperty) objArr[i4]).set(obj, objArr[i4 + 1]);
+                            for (int i3 = 0; i3 < i2; i3 += 2) {
+                                ((SettableBeanProperty) objArr[i3]).set(obj, objArr[i3 + 1]);
                             }
-                            i3 = i2;
-                            obj2 = obj;
-                            objArr2 = null;
+                            i = i2;
+                            objArr = null;
                         }
                     } else if (this._ignorableProps != null && this._ignorableProps.contains(currentName)) {
                         jsonParser.skipChildren();
-                        i3 = i2;
-                        objArr2 = objArr;
-                        obj2 = obj;
+                        i = i2;
                     } else if (this._anySetter != null) {
                         this._anySetter.deserializeAndSet(jsonParser, deserializationContext, obj, currentName);
-                        i3 = i2;
-                        objArr2 = objArr;
-                        obj2 = obj;
+                        i = i2;
                     } else {
                         handleUnknownProperty(jsonParser, deserializationContext, obj, currentName);
                     }
-                    i3 = i2;
-                    objArr2 = objArr;
-                    obj2 = obj;
+                    i = i2;
                 } else if (obj != null) {
                     find.deserializeAndSet(jsonParser, deserializationContext, obj);
-                    i3 = i2;
-                    objArr2 = objArr;
-                    obj2 = obj;
+                    i = i2;
                 } else {
                     if (objArr == null) {
-                        i3 = this._beanProperties.size();
-                        objArr = new Object[(i3 + i3)];
+                        int size = this._beanProperties.size();
+                        objArr = new Object[(size + size)];
                     }
-                    int i5 = i2 + 1;
+                    int i4 = i2 + 1;
                     objArr[i2] = find;
-                    i3 = i5 + 1;
-                    objArr[i5] = find.deserialize(jsonParser, deserializationContext);
-                    objArr2 = objArr;
-                    obj2 = obj;
+                    i = i4 + 1;
+                    objArr[i4] = find.deserialize(jsonParser, deserializationContext);
                 }
                 jsonParser.nextToken();
-                obj = obj2;
-                objArr = objArr2;
-                i2 = i3;
+                i2 = i;
             }
             if (obj != null) {
                 return obj;
             }
             if (canCreateFromString) {
-                obj = this._valueInstantiator.createFromString(deserializationContext, null);
+                createUsingDefault = this._valueInstantiator.createFromString(deserializationContext, null);
             } else {
-                obj = this._valueInstantiator.createUsingDefault(deserializationContext);
+                createUsingDefault = this._valueInstantiator.createUsingDefault(deserializationContext);
             }
             if (objArr == null) {
-                return obj;
+                return createUsingDefault;
             }
-            while (i < i2) {
-                ((SettableBeanProperty) objArr[i]).set(obj, objArr[i + 1]);
-                i += 2;
+            for (int i5 = 0; i5 < i2; i5 += 2) {
+                ((SettableBeanProperty) objArr[i5]).set(createUsingDefault, objArr[i5 + 1]);
             }
-            return obj;
+            return createUsingDefault;
         }
         throw JsonMappingException.from(jsonParser, "Can not deserialize Throwable of type " + this._beanType + " without having a default contructor, a single-String-arg constructor; or explicit @JsonCreator");
     }

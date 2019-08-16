@@ -9,6 +9,6 @@ public final class PlayerBuffer extends AbstractDataBuffer<Player> {
     }
 
     public final Player get(int i) {
-        return new PlayerRef(this.zzfkz, i);
+        return new PlayerRef(this.mDataHolder, i);
     }
 }

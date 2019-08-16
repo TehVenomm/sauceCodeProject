@@ -14,7 +14,9 @@ public final class Request {
     public final boolean centerInside;
     public final Config config;
     public final boolean hasRotationPivot;
-    int id;
+
+    /* renamed from: id */
+    int f444id;
     int networkPolicy;
     public final boolean onlyScaleDown;
     public final Priority priority;
@@ -46,18 +48,18 @@ public final class Request {
         private List<Transformation> transformations;
         private Uri uri;
 
-        public Builder(Uri uri) {
-            setUri(uri);
+        public Builder(Uri uri2) {
+            setUri(uri2);
         }
 
         public Builder(int i) {
             setResourceId(i);
         }
 
-        Builder(Uri uri, int i, Config config) {
-            this.uri = uri;
+        Builder(Uri uri2, int i, Config config2) {
+            this.uri = uri2;
             this.resourceId = i;
-            this.config = config;
+            this.config = config2;
         }
 
         private Builder(Request request) {
@@ -80,23 +82,26 @@ public final class Request {
             this.priority = request.priority;
         }
 
-        boolean hasImage() {
+        /* access modifiers changed from: 0000 */
+        public boolean hasImage() {
             return (this.uri == null && this.resourceId == 0) ? false : true;
         }
 
-        boolean hasSize() {
+        /* access modifiers changed from: 0000 */
+        public boolean hasSize() {
             return (this.targetWidth == 0 && this.targetHeight == 0) ? false : true;
         }
 
-        boolean hasPriority() {
+        /* access modifiers changed from: 0000 */
+        public boolean hasPriority() {
             return this.priority != null;
         }
 
-        public Builder setUri(Uri uri) {
-            if (uri == null) {
+        public Builder setUri(Uri uri2) {
+            if (uri2 == null) {
                 throw new IllegalArgumentException("Image URI may not be null.");
             }
-            this.uri = uri;
+            this.uri = uri2;
             this.resourceId = 0;
             return this;
         }
@@ -197,18 +202,18 @@ public final class Request {
             return this;
         }
 
-        public Builder config(Config config) {
-            this.config = config;
+        public Builder config(Config config2) {
+            this.config = config2;
             return this;
         }
 
-        public Builder priority(Priority priority) {
-            if (priority == null) {
+        public Builder priority(Priority priority2) {
+            if (priority2 == null) {
                 throw new IllegalArgumentException("Priority invalid.");
             } else if (this.priority != null) {
                 throw new IllegalStateException("Priority already set.");
             } else {
-                this.priority = priority;
+                this.priority = priority2;
                 return this;
             }
         }
@@ -254,8 +259,8 @@ public final class Request {
         }
     }
 
-    private Request(Uri uri, int i, String str, List<Transformation> list, int i2, int i3, boolean z, boolean z2, boolean z3, float f, float f2, float f3, boolean z4, Config config, Priority priority) {
-        this.uri = uri;
+    private Request(Uri uri2, int i, String str, List<Transformation> list, int i2, int i3, boolean z, boolean z2, boolean z3, float f, float f2, float f3, boolean z4, Config config2, Priority priority2) {
+        this.uri = uri2;
         this.resourceId = i;
         this.stableKey = str;
         if (list == null) {
@@ -272,49 +277,50 @@ public final class Request {
         this.rotationPivotX = f2;
         this.rotationPivotY = f3;
         this.hasRotationPivot = z4;
-        this.config = config;
-        this.priority = priority;
+        this.config = config2;
+        this.priority = priority2;
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("Request{");
+        StringBuilder sb = new StringBuilder("Request{");
         if (this.resourceId > 0) {
-            stringBuilder.append(this.resourceId);
+            sb.append(this.resourceId);
         } else {
-            stringBuilder.append(this.uri);
+            sb.append(this.uri);
         }
-        if (!(this.transformations == null || this.transformations.isEmpty())) {
+        if (this.transformations != null && !this.transformations.isEmpty()) {
             for (Transformation key : this.transformations) {
-                stringBuilder.append(' ').append(key.key());
+                sb.append(' ').append(key.key());
             }
         }
         if (this.stableKey != null) {
-            stringBuilder.append(" stableKey(").append(this.stableKey).append(')');
+            sb.append(" stableKey(").append(this.stableKey).append(')');
         }
         if (this.targetWidth > 0) {
-            stringBuilder.append(" resize(").append(this.targetWidth).append(',').append(this.targetHeight).append(')');
+            sb.append(" resize(").append(this.targetWidth).append(',').append(this.targetHeight).append(')');
         }
         if (this.centerCrop) {
-            stringBuilder.append(" centerCrop");
+            sb.append(" centerCrop");
         }
         if (this.centerInside) {
-            stringBuilder.append(" centerInside");
+            sb.append(" centerInside");
         }
         if (this.rotationDegrees != 0.0f) {
-            stringBuilder.append(" rotation(").append(this.rotationDegrees);
+            sb.append(" rotation(").append(this.rotationDegrees);
             if (this.hasRotationPivot) {
-                stringBuilder.append(" @ ").append(this.rotationPivotX).append(',').append(this.rotationPivotY);
+                sb.append(" @ ").append(this.rotationPivotX).append(',').append(this.rotationPivotY);
             }
-            stringBuilder.append(')');
+            sb.append(')');
         }
         if (this.config != null) {
-            stringBuilder.append(' ').append(this.config);
+            sb.append(' ').append(this.config);
         }
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        sb.append('}');
+        return sb.toString();
     }
 
-    String logId() {
+    /* access modifiers changed from: 0000 */
+    public String logId() {
         long nanoTime = System.nanoTime() - this.started;
         if (nanoTime > TOO_LONG_LOG) {
             return plainId() + '+' + TimeUnit.NANOSECONDS.toSeconds(nanoTime) + 's';
@@ -322,11 +328,13 @@ public final class Request {
         return plainId() + '+' + TimeUnit.NANOSECONDS.toMillis(nanoTime) + "ms";
     }
 
-    String plainId() {
-        return "[R" + this.id + ']';
+    /* access modifiers changed from: 0000 */
+    public String plainId() {
+        return "[R" + this.f444id + ']';
     }
 
-    String getName() {
+    /* access modifiers changed from: 0000 */
+    public String getName() {
         if (this.uri != null) {
             return String.valueOf(this.uri.getPath());
         }
@@ -337,15 +345,18 @@ public final class Request {
         return (this.targetWidth == 0 && this.targetHeight == 0) ? false : true;
     }
 
-    boolean needsTransformation() {
+    /* access modifiers changed from: 0000 */
+    public boolean needsTransformation() {
         return needsMatrixTransform() || hasCustomTransformations();
     }
 
-    boolean needsMatrixTransform() {
+    /* access modifiers changed from: 0000 */
+    public boolean needsMatrixTransform() {
         return hasSize() || this.rotationDegrees != 0.0f;
     }
 
-    boolean hasCustomTransformations() {
+    /* access modifiers changed from: 0000 */
+    public boolean hasCustomTransformations() {
         return this.transformations != null;
     }
 

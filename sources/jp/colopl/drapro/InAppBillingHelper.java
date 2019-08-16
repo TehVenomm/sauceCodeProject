@@ -1,4 +1,4 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.os.Handler;
 import android.util.Log;
@@ -7,30 +7,32 @@ import com.unity3d.player.UnityPlayer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import jp.colopl.iab.IabException;
-import jp.colopl.iab.IabHelper;
-import jp.colopl.iab.IabHelper.OnConsumeMultiFinishedListener;
-import jp.colopl.iab.IabHelper.QueryInventoryFinishedListener;
-import jp.colopl.iab.IabResult;
-import jp.colopl.iab.Inventory;
-import jp.colopl.iab.Purchase;
-import jp.colopl.iab.SkuDetails;
-import jp.colopl.network.HttpPostAsyncTask;
-import jp.colopl.network.HttpRequestListener;
-import jp.colopl.util.Util;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.oms.appstore.AmazonAppstoreBillingService;
+import p018jp.colopl.iab.IabException;
+import p018jp.colopl.iab.IabHelper;
+import p018jp.colopl.iab.IabHelper.OnConsumeMultiFinishedListener;
+import p018jp.colopl.iab.IabHelper.QueryInventoryFinishedListener;
+import p018jp.colopl.iab.IabResult;
+import p018jp.colopl.iab.Inventory;
+import p018jp.colopl.iab.Purchase;
+import p018jp.colopl.iab.SkuDetails;
+import p018jp.colopl.network.HttpPostAsyncTask;
+import p018jp.colopl.network.HttpRequestListener;
+import p018jp.colopl.util.Util;
 
+/* renamed from: jp.colopl.drapro.InAppBillingHelper */
 public class InAppBillingHelper {
     private static final String TAG = "InAppBillingHelper";
     public static StartActivity activity;
-    static ArrayList<Purchase> consumeList = new ArrayList();
+    static ArrayList<Purchase> consumeList = new ArrayList<>();
     private static Handler handler;
     public static IabHelper mHelper;
-    private static ArrayList<Purchase> mPromotionPurchaseInfo = new ArrayList();
+    /* access modifiers changed from: private */
+    public static ArrayList<Purchase> mPromotionPurchaseInfo = new ArrayList<>();
     public static String paymentReturnUrl;
     private static String productId;
     public static String productName;
@@ -38,71 +40,31 @@ public class InAppBillingHelper {
     public static String userId;
     public static String userIdHash;
 
-    /* renamed from: jp.colopl.drapro.InAppBillingHelper$1 */
-    static final class C09681 implements QueryInventoryFinishedListener {
-        C09681() {
-        }
-
-        public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
-            if (!iabResult.isFailure()) {
-                JSONArray jSONArray = new JSONArray();
-                for (String skuDetails : AppConsts.itemCodeId) {
-                    SkuDetails skuDetails2 = inventory.getSkuDetails(skuDetails);
-                    JSONObject jSONObject = new JSONObject();
-                    if (skuDetails2 != null) {
-                        try {
-                            jSONObject.put("sku", skuDetails2.getSku());
-                            jSONObject.put(Param.PRICE, skuDetails2.getPrice());
-                            jSONObject.put("title", skuDetails2.getTitle());
-                            jSONObject.put("description", skuDetails2.getDescription());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    jSONArray.put(jSONObject);
-                }
-                JSONObject jSONObject2 = new JSONObject();
-                try {
-                    jSONObject2.put("ItemList", jSONArray);
-                } catch (JSONException e2) {
-                    e2.printStackTrace();
-                }
-                UnityPlayer.UnitySendMessage("ShopReceiver", "ReceiveItemPriceData", jSONObject2.toString());
-            }
-        }
-    }
-
-    /* renamed from: jp.colopl.drapro.InAppBillingHelper$5 */
-    static final class C09735 implements OnConsumeMultiFinishedListener {
-        C09735() {
-        }
-
-        public void onConsumeMultiFinished(List<Purchase> list, List<IabResult> list2) {
-            boolean z = false;
-            int i = 0;
-            while (i < list.size()) {
-                boolean z2;
-                if (((IabResult) list2.get(i)).isSuccess()) {
-                    InAppBillingHelper.mPromotionPurchaseInfo.remove(list.get(i));
-                    z2 = true;
-                } else {
-                    z2 = z;
-                }
-                i++;
-                z = z2;
-            }
-            InAppBillingHelper.consumeList.clear();
-            InAppBillingHelper.FinishCheckPromotion(z);
-        }
-    }
-
     static void ConsumePromotionItems() {
         Log.d(TAG, "ConsumePromotionItems requestCount:" + requestCount + " consumeList:" + consumeList.size());
         if (requestCount != 0) {
             return;
         }
         if (consumeList.size() > 0) {
-            mHelper.consumeAsync(consumeList, new C09735());
+            mHelper.consumeAsync((List<Purchase>) consumeList, (OnConsumeMultiFinishedListener) new OnConsumeMultiFinishedListener() {
+                public void onConsumeMultiFinished(List<Purchase> list, List<IabResult> list2) {
+                    boolean z;
+                    boolean z2 = false;
+                    int i = 0;
+                    while (i < list.size()) {
+                        if (((IabResult) list2.get(i)).isSuccess()) {
+                            InAppBillingHelper.mPromotionPurchaseInfo.remove(list.get(i));
+                            z = true;
+                        } else {
+                            z = z2;
+                        }
+                        i++;
+                        z2 = z;
+                    }
+                    InAppBillingHelper.consumeList.clear();
+                    InAppBillingHelper.FinishCheckPromotion(z2);
+                }
+            });
         } else {
             FinishCheckPromotion(false);
         }
@@ -118,6 +80,7 @@ public class InAppBillingHelper {
         final String[] split = str.split("----");
         mHelper.queryInventoryAsync(true, new QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
+                boolean z;
                 if (iabResult.isFailure()) {
                     InAppBillingHelper.FinishCheckPromotion(false);
                     return;
@@ -130,21 +93,27 @@ public class InAppBillingHelper {
                     Log.e(InAppBillingHelper.TAG, "Host is null!!!");
                     InAppBillingHelper.FinishCheckPromotion(false);
                 } else {
-                    boolean z = false;
+                    boolean z2 = false;
                     for (final Purchase purchase : allPurchases) {
-                        boolean z2;
-                        for (Object equals : split) {
-                            if (purchase.getSku().equals(equals)) {
-                                z2 = true;
+                        String[] strArr = split;
+                        int length = strArr.length;
+                        int i = 0;
+                        while (true) {
+                            if (i >= length) {
+                                z = false;
                                 break;
                             }
+                            if (purchase.getSku().equals(strArr[i])) {
+                                z = true;
+                                break;
+                            }
+                            i++;
                         }
-                        z2 = false;
-                        if (z2) {
+                        if (z) {
                             Log.d(InAppBillingHelper.TAG, "checkAndGivePromotionitems Purchase:" + purchase.getSku());
                             InAppBillingHelper.requestCount++;
                             String str = NetworkHelper.getHost() + "/ajax/payments/inappbilling/promotion";
-                            List arrayList = new ArrayList();
+                            ArrayList arrayList = new ArrayList();
                             arrayList.add(new BasicNameValuePair("mainToken", InAppBillingHelper.activity.getConfig().getSession().getSid()));
                             arrayList.add(new BasicNameValuePair("signedData", purchase.getOriginalJson()));
                             arrayList.add(new BasicNameValuePair("signature", purchase.getSignature()));
@@ -152,9 +121,9 @@ public class InAppBillingHelper {
                             arrayList.add(new BasicNameValuePair("apv", String.valueOf(InAppBillingHelper.activity.getConfig().getVersionCode())));
                             HttpPostAsyncTask httpPostAsyncTask = new HttpPostAsyncTask(InAppBillingHelper.activity, str, arrayList);
                             httpPostAsyncTask.setListener(new HttpRequestListener() {
-                                public void onReceiveError(HttpPostAsyncTask httpPostAsyncTask, Exception exception) {
+                                public void onReceiveError(HttpPostAsyncTask httpPostAsyncTask, Exception exc) {
                                     InAppBillingHelper.requestCount--;
-                                    Log.e(InAppBillingHelper.TAG, "[PromoCode] Http request error : " + exception.getMessage());
+                                    Log.e(InAppBillingHelper.TAG, "[PromoCode] Http request error : " + exc.getMessage());
                                     InAppBillingHelper.ConsumePromotionItems();
                                 }
 
@@ -174,10 +143,10 @@ public class InAppBillingHelper {
                                 }
                             });
                             httpPostAsyncTask.execute(new Void[0]);
-                            z = true;
+                            z2 = true;
                         }
                     }
-                    if (!z) {
+                    if (!z2) {
                         InAppBillingHelper.FinishCheckPromotion(false);
                     }
                 }
@@ -187,7 +156,9 @@ public class InAppBillingHelper {
 
     public static void getProductDatas(String str) throws IabException {
         final List asList = Arrays.asList(str.split("----"));
-        if (mHelper.IsSetupDone()) {
+        if (!mHelper.IsSetupDone()) {
+            UnityPlayer.UnitySendMessage("ShopReceiver", "getProductDatas", "");
+        } else {
             mHelper.queryInventoryAsync(true, asList, new QueryInventoryFinishedListener() {
                 public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
                     if (iabResult.isFailure()) {
@@ -196,13 +167,19 @@ public class InAppBillingHelper {
                         return;
                     }
                     JSONArray jSONArray = new JSONArray();
-                    for (int i = 0; i < asList.size(); i++) {
-                        SkuDetails skuDetails = inventory.getSkuDetails((String) asList.get(i));
+                    int i = 0;
+                    while (true) {
+                        int i2 = i;
+                        if (i2 >= asList.size()) {
+                            break;
+                        }
+                        SkuDetails skuDetails = inventory.getSkuDetails((String) asList.get(i2));
                         JSONObject jSONObject = new JSONObject();
                         if (skuDetails != null) {
                             try {
                                 jSONObject.put(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID, skuDetails.getSku());
                                 jSONObject.put(Param.PRICE, skuDetails.getPrice());
+                                jSONObject.put("priceMicros", skuDetails.getPriceMicros());
                                 jSONObject.put("name", skuDetails.getTitle());
                                 jSONObject.put("desc", skuDetails.getDescription());
                             } catch (JSONException e) {
@@ -210,6 +187,7 @@ public class InAppBillingHelper {
                             }
                         }
                         jSONArray.put(jSONObject);
+                        i = i2 + 1;
                     }
                     JSONObject jSONObject2 = new JSONObject();
                     try {
@@ -220,8 +198,6 @@ public class InAppBillingHelper {
                     UnityPlayer.UnitySendMessage("ShopReceiver", "getProductDatas", jSONObject2.toString());
                 }
             });
-        } else {
-            UnityPlayer.UnitySendMessage("ShopReceiver", "getProductDatas", "");
         }
     }
 
@@ -231,7 +207,35 @@ public class InAppBillingHelper {
     }
 
     public static void getSkuDetails() throws IabException {
-        mHelper.queryInventoryAsync(true, Arrays.asList(AppConsts.itemCodeId), new C09681());
+        mHelper.queryInventoryAsync(true, Arrays.asList(AppConsts.itemCodeId), new QueryInventoryFinishedListener() {
+            public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
+                if (!iabResult.isFailure()) {
+                    JSONArray jSONArray = new JSONArray();
+                    for (String skuDetails : AppConsts.itemCodeId) {
+                        SkuDetails skuDetails2 = inventory.getSkuDetails(skuDetails);
+                        JSONObject jSONObject = new JSONObject();
+                        if (skuDetails2 != null) {
+                            try {
+                                jSONObject.put("sku", skuDetails2.getSku());
+                                jSONObject.put(Param.PRICE, skuDetails2.getPrice());
+                                jSONObject.put("title", skuDetails2.getTitle());
+                                jSONObject.put("description", skuDetails2.getDescription());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        jSONArray.put(jSONObject);
+                    }
+                    JSONObject jSONObject2 = new JSONObject();
+                    try {
+                        jSONObject2.put("ItemList", jSONArray);
+                    } catch (JSONException e2) {
+                        e2.printStackTrace();
+                    }
+                    UnityPlayer.UnitySendMessage("ShopReceiver", "ReceiveItemPriceData", jSONObject2.toString());
+                }
+            }
+        });
     }
 
     public static void init(IabHelper iabHelper, StartActivity startActivity) {
@@ -241,16 +245,16 @@ public class InAppBillingHelper {
     }
 
     public static void requestMarket(String str, String str2, String str3) {
-        if (mHelper.IsSetupDone()) {
-            productName = AppConsts.getProductNameById(str, activity);
-            setProductId(str);
-            userId = str2;
-            userIdHash = str3;
-            Util.dLog(TAG, "productName:" + productName + ", productId: " + str);
-            activity.inappbillingStart(productId);
+        if (!mHelper.IsSetupDone()) {
+            UnityPlayer.UnitySendMessage("ShopReceiver", "buyItem", String.valueOf(3));
             return;
         }
-        UnityPlayer.UnitySendMessage("ShopReceiver", "buyItem", String.valueOf(3));
+        productName = AppConsts.getProductNameById(str, activity);
+        setProductId(str);
+        userId = str2;
+        userIdHash = str3;
+        Util.dLog(TAG, "productName:" + productName + ", productId: " + str);
+        activity.inappbillingStart(productId);
     }
 
     public static void restorePurchasedItem(boolean z) {
@@ -298,7 +302,7 @@ public class InAppBillingHelper {
 
     public static void trackPurtraceData(final String str, final String str2, final String str3) throws IabException {
         Util.dLog(TAG, "call Track");
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         arrayList.add(str);
         mHelper.queryInventoryAsync(true, arrayList, new QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {

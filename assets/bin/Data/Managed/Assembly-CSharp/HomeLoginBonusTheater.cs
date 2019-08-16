@@ -141,7 +141,6 @@ public class HomeLoginBonusTheater : GameSection
 
 		public override void Init(FSMInfo info)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
@@ -152,7 +151,7 @@ public class HomeLoginBonusTheater : GameSection
 			npc00AnimCtrl_ = npc00_.get_gameObject().GetComponentInChildren<PlayerAnimCtrl>();
 			tempAction_ = npc00AnimCtrl_.onEnd;
 			npc00AnimCtrl_.onEnd = null;
-			npc00AnimCtrl_.Play(PLCA.BOW, false);
+			npc00AnimCtrl_.Play(PLCA.BOW);
 			previousNPC00Position_ = info.previousNPC00Position;
 			previousNPC00Rotation_ = info.previousNPC00Rotation;
 			PlayRandomVoice(voiceGreetings);
@@ -183,7 +182,7 @@ public class HomeLoginBonusTheater : GameSection
 		{
 			if (IsWaitComplete())
 			{
-				npc00AnimCtrl_.Play(PLCA.HAPPY, false);
+				npc00AnimCtrl_.Play(PLCA.HAPPY);
 				StartTimer(3.5f);
 				act_ = Phase03;
 			}
@@ -237,7 +236,6 @@ public class HomeLoginBonusTheater : GameSection
 
 		public override void Init(FSMInfo info)
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			base.Init(info);
 			act_ = Phase00;
 			facial_ = info.npc00.get_gameObject().GetComponentInChildren<NPCFacial>();
@@ -282,7 +280,6 @@ public class HomeLoginBonusTheater : GameSection
 
 		public override void Init(FSMInfo info)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			base.Init(info);
 			act_ = Phase00;
 			npc06_ = info.npc06;
@@ -300,7 +297,7 @@ public class HomeLoginBonusTheater : GameSection
 			if (info_.goNextNpc06)
 			{
 				info_.goNextNpc06 = false;
-				npc06AnimCtrl_.Play(PLCA.LOGIN_FIRE, false);
+				npc06AnimCtrl_.Play(PLCA.LOGIN_FIRE);
 				act_ = Phase01;
 				info_.goNextFireball = true;
 			}
@@ -315,7 +312,7 @@ public class HomeLoginBonusTheater : GameSection
 				npc06AnimCtrl_.defaultAnim = tempDefaultAnim_;
 				npc06AnimCtrl_.onEnd = tempAction_;
 				npc06AnimCtrl_.moveAnim = PLCA.LOGIN_FLY;
-				npc06AnimCtrl_.Play(PLCA.LOGIN_FLY, false);
+				npc06AnimCtrl_.Play(PLCA.LOGIN_FLY);
 				npc06_.PopState();
 				npc06_.PushLeave();
 				ToExit();
@@ -378,7 +375,6 @@ public class HomeLoginBonusTheater : GameSection
 
 		private bool Phase01()
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
@@ -417,9 +413,6 @@ public class HomeLoginBonusTheater : GameSection
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			position_ += dir_ * velocity_;
 			fireball_.set_position(position_);
 			Vector3 val = endPos_ - position_;
@@ -447,7 +440,6 @@ public class HomeLoginBonusTheater : GameSection
 
 		private bool Phase03()
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			if (IsWaitComplete())
 			{
 				rymFX component = fireEffect2_.get_gameObject().GetComponent<rymFX>();
@@ -519,7 +511,6 @@ public class HomeLoginBonusTheater : GameSection
 
 		private bool Phase00()
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
@@ -581,7 +572,6 @@ public class HomeLoginBonusTheater : GameSection
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
@@ -613,7 +603,6 @@ public class HomeLoginBonusTheater : GameSection
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
@@ -660,8 +649,6 @@ public class HomeLoginBonusTheater : GameSection
 
 		private bool Phase05()
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (info_.goNextBoard)
 			{
 				itemModel_.get_gameObject().SetActive(false);
@@ -699,8 +686,8 @@ public class HomeLoginBonusTheater : GameSection
 				OutGameSettingsManager.LoginBonusScene loginBonusScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene;
 				Vector3 cameraPos = loginBonusScene.cameraPos;
 				Vector3 cameraRot = loginBonusScene.cameraRot;
-				info_.interpolator.Translate(0.7f, cameraPos, null, default(Vector3), null);
-				info_.interpolator.Rotate(0.7f, cameraRot, null, default(Vector3), null, true);
+				info_.interpolator.Translate(0.7f, cameraPos);
+				info_.interpolator.Rotate(0.7f, cameraRot);
 			}
 			return true;
 		}
@@ -781,341 +768,308 @@ public class HomeLoginBonusTheater : GameSection
 
 	public void PreInitialize()
 	{
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Expected O, but got Unknown
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Expected O, but got Unknown
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021d: Unknown result type (might be due to invalid IL or missing references)
 		HomeCamera homeCamera = null;
 		HomeNPCCharacter homeNPCCharacter = null;
 		HomeNPCCharacter homeNPCCharacter2 = null;
 		HomeSelfCharacter homeSelfCharacter = null;
 		List<HomeCharacterBase> list = new List<HomeCharacterBase>();
-		if (MonoBehaviourSingleton<HomeManager>.IsValid())
+		IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+		if (currentIHomeManager != null)
 		{
-			homeCamera = MonoBehaviourSingleton<HomeManager>.I.HomeCamera;
-			homeNPCCharacter = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(0);
-			homeNPCCharacter2 = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(6);
-			homeSelfCharacter = MonoBehaviourSingleton<HomeManager>.I.HomePeople.selfChara;
-			list = MonoBehaviourSingleton<HomeManager>.I.HomePeople.charas;
-		}
-		else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-		{
-			homeCamera = MonoBehaviourSingleton<LoungeManager>.I.HomeCamera;
-			homeNPCCharacter = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(0);
-			homeNPCCharacter2 = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(6);
-			homeSelfCharacter = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara;
-			list = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.charas;
-		}
-		homeCamera.LateUpdate();
-		homeCamera.targetCamera.set_fieldOfView(19f);
-		HomeSelfCharacter.CTRL = false;
-		OutGameSettingsManager.LoginBonusScene loginBonusScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene;
-		Vector3 npc00CameraPos = loginBonusScene.npc00CameraPos;
-		Quaternion localRotation = Quaternion.Euler(loginBonusScene.npc00CameraRot);
-		previousCameraPosition = homeCamera.targetCamera.get_transform().get_position();
-		previousCameraRotation = homeCamera.targetCamera.get_transform().get_rotation();
-		homeCamera.targetCamera.get_transform().set_localPosition(npc00CameraPos);
-		homeCamera.targetCamera.get_transform().set_localRotation(localRotation);
-		if (null != homeNPCCharacter)
-		{
-			Transform val = homeNPCCharacter.get_transform();
-			previousNPC00Position = val.get_position();
-			previousNPC00Rotation = val.get_rotation();
-			Vector3 npc00Pos = loginBonusScene.npc00Pos;
-			Quaternion rotation = Quaternion.Euler(loginBonusScene.npc00Rot);
-			val.set_position(npc00Pos);
-			val.set_rotation(rotation);
-			homeNPCCharacter.PushOutControll();
-		}
-		if (null != homeNPCCharacter2)
-		{
-			Transform val2 = homeNPCCharacter2.get_transform();
-			Vector3 npc06Pos = loginBonusScene.npc06Pos;
-			Quaternion rotation2 = Quaternion.Euler(loginBonusScene.npc06Rot);
-			val2.set_position(npc06Pos);
-			val2.set_rotation(rotation2);
-			homeNPCCharacter2.PushOutControll();
-			PlayerAnimCtrl componentInChildren = homeNPCCharacter2.get_gameObject().GetComponentInChildren<PlayerAnimCtrl>();
-			componentInChildren.Play(PLCA.LOGIN_IDLE, false);
-			homeNPCCharacter2.HideShadow();
-		}
-		if (null != homeSelfCharacter)
-		{
-			homeSelfCharacter.get_gameObject().SetActive(false);
-		}
-		list.ForEach(delegate(HomeCharacterBase o)
-		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			if (o is HomePlayerCharacter || o is LoungePlayer)
+			homeCamera = currentIHomeManager.HomeCamera;
+			homeNPCCharacter = currentIHomeManager.IHomePeople.GetHomeNPCCharacter(0);
+			homeNPCCharacter2 = currentIHomeManager.IHomePeople.GetHomeNPCCharacter(6);
+			homeSelfCharacter = currentIHomeManager.IHomePeople.selfChara;
+			list = currentIHomeManager.IHomePeople.charas;
+			HomeSelfCharacter.CTRL = false;
+			OutGameSettingsManager.LoginBonusScene loginBonusScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene;
+			Vector3 npc00CameraPos = loginBonusScene.npc00CameraPos;
+			Quaternion localRotation = Quaternion.Euler(loginBonusScene.npc00CameraRot);
+			previousCameraPosition = homeCamera.targetCamera.get_transform().get_position();
+			previousCameraRotation = homeCamera.targetCamera.get_transform().get_rotation();
+			homeCamera.targetCamera.get_transform().set_localPosition(npc00CameraPos);
+			homeCamera.targetCamera.get_transform().set_localRotation(localRotation);
+			homeCamera.targetCamera.set_fieldOfView(MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene.cameraFov);
+			if (null != homeNPCCharacter)
 			{
-				o.get_gameObject().SetActive(false);
-				Transform namePlate = o.GetNamePlate();
-				if (null != namePlate)
-				{
-					o.GetNamePlate().get_gameObject().SetActive(false);
-				}
+				Transform transform = homeNPCCharacter.get_transform();
+				previousNPC00Position = transform.get_position();
+				previousNPC00Rotation = transform.get_rotation();
+				Vector3 npc00Pos = loginBonusScene.npc00Pos;
+				Quaternion rotation = Quaternion.Euler(loginBonusScene.npc00Rot);
+				transform.set_position(npc00Pos);
+				transform.set_rotation(rotation);
+				homeNPCCharacter.PushOutControll();
 			}
-		});
+			if (null != homeNPCCharacter2)
+			{
+				Transform transform2 = homeNPCCharacter2.get_transform();
+				Vector3 npc06Pos = loginBonusScene.npc06Pos;
+				Quaternion rotation2 = Quaternion.Euler(loginBonusScene.npc06Rot);
+				transform2.set_position(npc06Pos);
+				transform2.set_rotation(rotation2);
+				homeNPCCharacter2.PushOutControll();
+				PlayerAnimCtrl componentInChildren = homeNPCCharacter2.get_gameObject().GetComponentInChildren<PlayerAnimCtrl>();
+				componentInChildren.Play(PLCA.LOGIN_IDLE);
+				homeNPCCharacter2.HideShadow();
+			}
+			if (null != homeSelfCharacter)
+			{
+				homeSelfCharacter.get_gameObject().SetActive(false);
+			}
+			list.ForEach(delegate(HomeCharacterBase o)
+			{
+				if (o is HomePlayerCharacter || o is LoungePlayer)
+				{
+					o.get_gameObject().SetActive(false);
+					Transform namePlate = o.GetNamePlate();
+					if (null != namePlate)
+					{
+						o.GetNamePlate().get_gameObject().SetActive(false);
+					}
+				}
+			});
+		}
 	}
 
 	public override void Initialize()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		PreInitialize();
 		this.StartCoroutine("DoInitialize");
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		HomeCamera homeCamera = null;
-		HomeNPCCharacter npc0 = null;
-		HomeNPCCharacter npc = null;
-		if (MonoBehaviourSingleton<HomeManager>.IsValid())
-		{
-			homeCamera = MonoBehaviourSingleton<HomeManager>.I.HomeCamera;
-			npc0 = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(0);
-			npc = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(6);
-		}
-		else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-		{
-			homeCamera = MonoBehaviourSingleton<LoungeManager>.I.HomeCamera;
-			npc0 = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(0);
-			npc = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetHomeNPCCharacter(6);
-		}
-		homeCamera.targetCamera.set_fieldOfView(19f);
+		IHomeManager iHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+		HomeCamera homeCamera = iHomeManager.HomeCamera;
+		HomeNPCCharacter npc7 = iHomeManager.IHomePeople.GetHomeNPCCharacter(0);
+		HomeNPCCharacter npc6 = iHomeManager.IHomePeople.GetHomeNPCCharacter(6);
 		MonoBehaviourSingleton<AccountManager>.I.DisplayLogInBonusSection();
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject boardLO = loadQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, "LIB_00000001", false);
-		LoadObject lightLO = loadQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, "LIB_00000002", false);
-		LoadObject fireballLO = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_dragon_breath_01", false);
-		LoadObject fireEffect1LO = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_damage_slash_fire_01", false);
-		LoadObject fireEffect2LO = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_damage_fire_01", false);
+		LoadObject boardLO = loadQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, "LIB_00000001");
+		LoadObject lightLO = loadQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, "LIB_00000002");
+		LoadObject fireballLO = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_dragon_breath_01");
+		LoadObject fireEffect1LO = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_damage_slash_fire_01");
+		LoadObject fireEffect2LO = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_damage_fire_01");
 		int[] voiceList = (int[])Enum.GetValues(typeof(VOICE));
 		int[] array = voiceList;
-		foreach (int v in array)
+		foreach (int voice_id in array)
 		{
-			loadQueue.CacheVoice(v, null);
+			loadQueue.CacheVoice(voice_id);
 		}
 		int[] audioList = (int[])Enum.GetValues(typeof(AUDIO));
 		int[] array2 = audioList;
-		foreach (int a in array2)
+		foreach (int se_id in array2)
 		{
-			loadQueue.CacheSE(a, null);
+			loadQueue.CacheSE(se_id);
 		}
 		LoginBonus bonus = MonoBehaviourSingleton<AccountManager>.I.logInBonus.Find((LoginBonus obj) => obj.type == 0);
-		if (bonus != null)
+		if (bonus == null)
 		{
-			List<LoginBonus.NextReward> nextRewards = bonus.next;
-			if (nextRewards != null)
+			yield break;
+		}
+		List<LoginBonus.NextReward> nextRewards = bonus.next;
+		if (nextRewards == null)
+		{
+			yield break;
+		}
+		LoadObject[] itemIconLOs = new LoadObject[9];
+		LoadObject[] itemBGIconLOs = new LoadObject[9];
+		string iconName = string.Empty;
+		string iconBGName = string.Empty;
+		GetIconName(bonus.reward[0], out iconName, out iconBGName);
+		itemIconLOs[bonus.nowCount - 1] = loadQueue.LoadItemIcon(iconName);
+		if (string.Empty != iconBGName)
+		{
+			itemBGIconLOs[bonus.nowCount - 1] = loadQueue.LoadItemIcon(iconBGName);
+		}
+		nextRewards.ForEach(delegate(LoginBonus.NextReward o)
+		{
+			if (0 < o.reward.Count && 0 < o.count && 9 >= o.count)
 			{
-				LoadObject[] itemIconLOs = new LoadObject[9];
-				LoadObject[] itemBGIconLOs = new LoadObject[9];
-				string iconName = string.Empty;
-				string iconBGName = string.Empty;
-				GetIconName(bonus.reward[0], out iconName, out iconBGName);
-				itemIconLOs[bonus.nowCount - 1] = loadQueue.LoadItemIcon(iconName);
+				GetIconName(o.reward[0], out iconName, out iconBGName);
+				itemIconLOs[o.count - 1] = loadQueue.LoadItemIcon(iconName);
 				if (string.Empty != iconBGName)
 				{
-					itemBGIconLOs[bonus.nowCount - 1] = loadQueue.LoadItemIcon(iconBGName);
+					itemBGIconLOs[o.count - 1] = loadQueue.LoadItemIcon(iconBGName);
 				}
-				nextRewards.ForEach(delegate(LoginBonus.NextReward o)
+			}
+		});
+		itemLoader_ = Utility.CreateGameObject("ItemLoader", MonoBehaviourSingleton<AppMain>.I._transform);
+		ItemLoader loader = itemLoader_.get_gameObject().AddComponent<ItemLoader>();
+		uint itemID = GetItemModelID((REWARD_TYPE)bonus.reward[0].type, bonus.reward[0].itemId);
+		loader.LoadItem(itemID, itemModel_, 0);
+		while (loader.isLoading)
+		{
+			yield return null;
+		}
+		itemModel_ = Utility.CreateGameObject("ItemModel", MonoBehaviourSingleton<AppMain>.I._transform);
+		loader.nodeMain.SetParent(itemModel_);
+		itemModel_.get_gameObject().SetActive(false);
+		float itemModelScale = 0.16f;
+		itemModel_.set_localScale(new Vector3(itemModelScale, itemModelScale, itemModelScale));
+		homeCamera_ = homeCamera.targetCamera;
+		interpolator_ = homeCamera_.get_gameObject().GetComponent<TransformInterpolator>();
+		if (null == interpolator_)
+		{
+			interpolator_ = homeCamera_.get_gameObject().AddComponent<TransformInterpolator>();
+		}
+		homeCamera_.set_fieldOfView(MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene.cameraFov);
+		homeFieldOfView_ = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.outGameFieldOfView;
+		if (loadQueue.IsLoading())
+		{
+			yield return loadQueue.Wait();
+		}
+		board_ = ResourceUtility.Realizes(parent: Utility.Find(npc6._transform, "Move"), obj: boardLO.loadedObject);
+		light_ = ResourceUtility.Realizes(lightLO.loadedObject, npc6._transform);
+		light_.get_gameObject().SetActive(false);
+		fireball_ = ResourceUtility.Realizes(fireballLO.loadedObject, npc6._transform);
+		fireball_.set_localScale(new Vector3(0.3f, 0.3f, 0.3f));
+		fireball_.get_gameObject().SetActive(false);
+		fireEffect1_ = ResourceUtility.Realizes(fireEffect1LO.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform);
+		fireEffect1_.set_localScale(new Vector3(0.18f, 0.18f, 0.18f));
+		fireEffect1_.get_gameObject().SetActive(false);
+		fireEffect2_ = ResourceUtility.Realizes(fireEffect2LO.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform);
+		fireEffect2_.set_localScale(new Vector3(0.25f, 0.25f, 0.25f));
+		fireEffect2_.get_gameObject().SetActive(false);
+		Material[] panelMaterials = (Material[])new Material[9];
+		Transform[] panelTransforms = (Transform[])new Transform[9];
+		Material[] panel2Materials = (Material[])new Material[9];
+		Transform[] panel2Transforms = (Transform[])new Transform[9];
+		Renderer[] papers = (Renderer[])new Renderer[9];
+		Transform Day_set = board_.Find("Day_set");
+		if (null != Day_set)
+		{
+			for (int k = 0; k <= 8; k++)
+			{
+				string text = "Day" + (k + 1).ToString();
+				Transform val = Day_set.Find(text + "/" + text + "_panel");
+				if (null == val)
 				{
-					if (0 < o.reward.Count && 0 < o.count && 9 >= o.count)
+					continue;
+				}
+				Renderer component = val.GetComponent<Renderer>();
+				if (null != component)
+				{
+					panelMaterials[k] = component.get_material();
+				}
+				panelTransforms[k] = val;
+				Transform val2 = Day_set.Find(text + "/" + text + "_panel2");
+				if (!(null == val))
+				{
+					Renderer component2 = val2.GetComponent<Renderer>();
+					if (null != component)
 					{
-						GetIconName(o.reward[0], out ((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CiconName_003E__21, out ((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CiconBGName_003E__22);
-						((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CitemIconLOs_003E__19[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CiconName_003E__21);
-						if (string.Empty != ((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CiconBGName_003E__22)
-						{
-							((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CitemBGIconLOs_003E__20[o.count - 1] = ((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CloadQueue_003E__3.LoadItemIcon(((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_037f: stateMachine*/)._003CiconBGName_003E__22);
-						}
+						panel2Materials[k] = component2.get_material();
 					}
-				});
-				itemLoader_ = Utility.CreateGameObject("ItemLoader", MonoBehaviourSingleton<AppMain>.I._transform, -1);
-				ItemLoader loader = itemLoader_.get_gameObject().AddComponent<ItemLoader>();
-				uint itemID = GetItemModelID((REWARD_TYPE)bonus.reward[0].type, bonus.reward[0].itemId);
-				loader.LoadItem(itemID, itemModel_, 0, null);
-				while (loader.isLoading)
-				{
-					yield return (object)null;
-				}
-				itemModel_ = Utility.CreateGameObject("ItemModel", MonoBehaviourSingleton<AppMain>.I._transform, -1);
-				loader.nodeMain.SetParent(itemModel_);
-				itemModel_.get_gameObject().SetActive(false);
-				float itemModelScale = 0.16f;
-				itemModel_.set_localScale(new Vector3(itemModelScale, itemModelScale, itemModelScale));
-				homeCamera_ = homeCamera.targetCamera;
-				interpolator_ = homeCamera_.get_gameObject().GetComponent<TransformInterpolator>();
-				if (null == interpolator_)
-				{
-					interpolator_ = homeCamera_.get_gameObject().AddComponent<TransformInterpolator>();
-				}
-				homeCamera_.set_fieldOfView(MonoBehaviourSingleton<OutGameSettingsManager>.I.loginBonusScene.cameraFov);
-				homeFieldOfView_ = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.outGameFieldOfView;
-				if (loadQueue.IsLoading())
-				{
-					yield return (object)loadQueue.Wait();
-				}
-				board_ = ResourceUtility.Realizes(parent: Utility.Find(npc._transform, "Move"), obj: boardLO.loadedObject, layer: -1);
-				light_ = ResourceUtility.Realizes(lightLO.loadedObject, npc._transform, -1);
-				light_.get_gameObject().SetActive(false);
-				fireball_ = ResourceUtility.Realizes(fireballLO.loadedObject, npc._transform, -1);
-				fireball_.set_localScale(new Vector3(0.3f, 0.3f, 0.3f));
-				fireball_.get_gameObject().SetActive(false);
-				fireEffect1_ = ResourceUtility.Realizes(fireEffect1LO.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1);
-				fireEffect1_.set_localScale(new Vector3(0.18f, 0.18f, 0.18f));
-				fireEffect1_.get_gameObject().SetActive(false);
-				fireEffect2_ = ResourceUtility.Realizes(fireEffect2LO.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1);
-				fireEffect2_.set_localScale(new Vector3(0.25f, 0.25f, 0.25f));
-				fireEffect2_.get_gameObject().SetActive(false);
-				Material[] panelMaterials = (Material[])new Material[9];
-				Transform[] panelTransforms = (Transform[])new Transform[9];
-				Material[] panel2Materials = (Material[])new Material[9];
-				Transform[] panel2Transforms = (Transform[])new Transform[9];
-				Renderer[] papers = (Renderer[])new Renderer[9];
-				Transform Day_set = board_.Find("Day_set");
-				if (null != Day_set)
-				{
-					for (int k = 0; k <= 8; k++)
+					panel2Transforms[k] = val2;
+					Transform val3 = Day_set.Find(text + "/" + text + "_paper");
+					if (!(null == val3))
 					{
-						string nameHead = "Day" + (k + 1).ToString();
-						Transform panel3 = Day_set.Find(nameHead + "/" + nameHead + "_panel");
-						if (!(null == panel3))
-						{
-							Renderer renderer3 = panel3.GetComponent<Renderer>();
-							if (null != renderer3)
-							{
-								panelMaterials[k] = renderer3.get_material();
-							}
-							panelTransforms[k] = panel3;
-							Transform panel2 = Day_set.Find(nameHead + "/" + nameHead + "_panel2");
-							if (!(null == panel3))
-							{
-								Renderer renderer2 = panel2.GetComponent<Renderer>();
-								if (null != renderer3)
-								{
-									panel2Materials[k] = renderer2.get_material();
-								}
-								panel2Transforms[k] = panel2;
-								Transform paper = Day_set.Find(nameHead + "/" + nameHead + "_paper");
-								if (!(null == paper))
-								{
-									papers[k] = paper.get_gameObject().GetComponent<Renderer>();
-								}
-							}
-						}
+						papers[k] = val3.get_gameObject().GetComponent<Renderer>();
 					}
 				}
-				Texture[] itemIcons = (Texture[])new Texture[9];
-				for (int j = 0; j < itemIconLOs.Length; j++)
-				{
-					if (itemIconLOs[j] != null)
-					{
-						itemIcons[j] = (itemIconLOs[j].loadedObject as Texture);
-					}
-				}
-				Texture[] itemBGIcons = (Texture[])new Texture[9];
-				for (int i = 0; i < itemBGIconLOs.Length; i++)
-				{
-					if (itemBGIconLOs[i] != null)
-					{
-						itemBGIcons[i] = (itemBGIconLOs[i].loadedObject as Texture);
-					}
-				}
-				int panelIndex;
-				for (panelIndex = 0; panelIndex < bonus.nowCount - 1; panelIndex++)
-				{
-					panelTransforms[panelIndex].get_gameObject().SetActive(false);
-					panel2Transforms[panelIndex].get_gameObject().SetActive(false);
-					papers[panelIndex].get_material().SetFloat("_Offset", 1f);
-				}
-				for (; panelIndex < 9; panelIndex++)
-				{
-					if (null != itemBGIcons[panelIndex])
-					{
-						panelMaterials[panelIndex].set_mainTexture(itemBGIcons[panelIndex]);
-						panel2Materials[panelIndex].set_mainTexture(itemIcons[panelIndex]);
-					}
-					else
-					{
-						panelMaterials[panelIndex].set_mainTexture(itemIcons[panelIndex]);
-					}
-				}
-				fsmInfo_.npc00 = npc0;
-				fsmInfo_.npc06 = npc;
-				fsmInfo_.light = light_;
-				fsmInfo_.fireball = fireball_;
-				fsmInfo_.fireEffect1 = fireEffect1_;
-				fsmInfo_.fireEffect2 = fireEffect2_;
-				fsmInfo_.itemModel = itemModel_;
-				fsmInfo_.fireballEndPos = panelTransforms[bonus.nowCount - 1].get_position();
-				fsmInfo_.fireballEndPos.z -= 0.08f;
-				fsmInfo_.dayIndex = bonus.nowCount - 1;
-				fsmInfo_.todayPanel = panelMaterials[bonus.nowCount - 1];
-				fsmInfo_.todayPanel2 = panel2Materials[bonus.nowCount - 1];
-				fsmInfo_.todayPaper = papers[bonus.nowCount - 1].get_material();
-				fsmInfo_.interpolator = interpolator_;
-				fsmInfo_.moveCurve = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.loginBonusMoveCureve;
-				fsmInfo_.scaleCurve = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.loginBonusScaleCureve;
-				fsmInfo_.previousNPC00Position = previousNPC00Position;
-				fsmInfo_.previousNPC00Rotation = previousNPC00Rotation;
-				fsmList_.Add(new FSMNpc00());
-				fsmList_.Add(new FSMNpc00Facial());
-				fsmList_.Add(new FSMNpc06());
-				fsmList_.Add(new FSMBoard());
-				fsmList_.Add(new FSMFireball());
-				fsmList_.Add(new FSMCamera());
-				fsmList_.ForEach(delegate(FSM o)
-				{
-					o.Init(((_003CDoInitialize_003Ec__Iterator83)/*Error near IL_0e08: stateMachine*/)._003C_003Ef__this.fsmInfo_);
-				});
-				mainAction_ = Phase00;
-				base.Initialize();
 			}
 		}
+		Texture[] itemIcons = (Texture[])new Texture[9];
+		for (int l = 0; l < itemIconLOs.Length; l++)
+		{
+			if (itemIconLOs[l] != null)
+			{
+				itemIcons[l] = (itemIconLOs[l].loadedObject as Texture);
+			}
+		}
+		Texture[] itemBGIcons = (Texture[])new Texture[9];
+		for (int m = 0; m < itemBGIconLOs.Length; m++)
+		{
+			if (itemBGIconLOs[m] != null)
+			{
+				itemBGIcons[m] = (itemBGIconLOs[m].loadedObject as Texture);
+			}
+		}
+		int panelIndex;
+		for (panelIndex = 0; panelIndex < bonus.nowCount - 1; panelIndex++)
+		{
+			panelTransforms[panelIndex].get_gameObject().SetActive(false);
+			panel2Transforms[panelIndex].get_gameObject().SetActive(false);
+			papers[panelIndex].get_material().SetFloat("_Offset", 1f);
+		}
+		for (; panelIndex < 9; panelIndex++)
+		{
+			if (null != itemBGIcons[panelIndex])
+			{
+				panelMaterials[panelIndex].set_mainTexture(itemBGIcons[panelIndex]);
+				panel2Materials[panelIndex].set_mainTexture(itemIcons[panelIndex]);
+			}
+			else
+			{
+				panelMaterials[panelIndex].set_mainTexture(itemIcons[panelIndex]);
+			}
+		}
+		fsmInfo_.npc00 = npc7;
+		fsmInfo_.npc06 = npc6;
+		fsmInfo_.light = light_;
+		fsmInfo_.fireball = fireball_;
+		fsmInfo_.fireEffect1 = fireEffect1_;
+		fsmInfo_.fireEffect2 = fireEffect2_;
+		fsmInfo_.itemModel = itemModel_;
+		fsmInfo_.fireballEndPos = panelTransforms[bonus.nowCount - 1].get_position();
+		ref Vector3 fireballEndPos = ref fsmInfo_.fireballEndPos;
+		fireballEndPos.z -= 0.08f;
+		fsmInfo_.dayIndex = bonus.nowCount - 1;
+		fsmInfo_.todayPanel = panelMaterials[bonus.nowCount - 1];
+		fsmInfo_.todayPanel2 = panel2Materials[bonus.nowCount - 1];
+		fsmInfo_.todayPaper = papers[bonus.nowCount - 1].get_material();
+		fsmInfo_.interpolator = interpolator_;
+		fsmInfo_.moveCurve = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.loginBonusMoveCureve;
+		fsmInfo_.scaleCurve = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.loginBonusScaleCureve;
+		fsmInfo_.previousNPC00Position = previousNPC00Position;
+		fsmInfo_.previousNPC00Rotation = previousNPC00Rotation;
+		fsmList_.Add(new FSMNpc00());
+		fsmList_.Add(new FSMNpc00Facial());
+		fsmList_.Add(new FSMNpc06());
+		fsmList_.Add(new FSMBoard());
+		fsmList_.Add(new FSMFireball());
+		fsmList_.Add(new FSMCamera());
+		fsmList_.ForEach(delegate(FSM o)
+		{
+			o.Init(fsmInfo_);
+		});
+		mainAction_ = Phase00;
+		base.Initialize();
 	}
 
 	protected override void OnDestroy()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 		base.OnDestroy();
 		if (null != light_)
 		{
@@ -1166,7 +1120,7 @@ public class HomeLoginBonusTheater : GameSection
 		if (fsmInfo_.goNextMain)
 		{
 			fsmInfo_.goNextMain = false;
-			DispatchEvent("NOTICE", null);
+			DispatchEvent("NOTICE");
 			mainAction_ = Phase01;
 			StartTimer(0.5f);
 		}
@@ -1189,14 +1143,13 @@ public class HomeLoginBonusTheater : GameSection
 		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		if (fsmInfo_.goNextMain)
 		{
 			fsmInfo_.goNextMain = false;
 			if (null != interpolator_)
 			{
-				interpolator_.Translate(1.3f, previousCameraPosition, null, default(Vector3), null);
-				interpolator_.Rotate(1.3f, previousCameraRotation.get_eulerAngles(), null, default(Vector3), null, true);
+				interpolator_.Translate(1.3f, previousCameraPosition);
+				interpolator_.Rotate(1.3f, previousCameraRotation.get_eulerAngles());
 			}
 			if (null != light_)
 			{
@@ -1211,7 +1164,6 @@ public class HomeLoginBonusTheater : GameSection
 
 	private void Phase03()
 	{
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		float fieldOfView = homeCamera_.get_fieldOfView();
 		fieldOfView += fovSpeed_;
 		if (fieldOfView >= homeFieldOfView_)
@@ -1222,14 +1174,8 @@ public class HomeLoginBonusTheater : GameSection
 		if (isWaitComplete())
 		{
 			HomeSelfCharacter homeSelfCharacter = null;
-			if (MonoBehaviourSingleton<HomeManager>.IsValid())
-			{
-				homeSelfCharacter = MonoBehaviourSingleton<HomeManager>.I.HomePeople.selfChara;
-			}
-			else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-			{
-				homeSelfCharacter = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara;
-			}
+			IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+			homeSelfCharacter = currentIHomeManager.IHomePeople.selfChara;
 			if (null != homeSelfCharacter)
 			{
 				homeSelfCharacter.get_gameObject().SetActive(true);
@@ -1256,18 +1202,10 @@ public class HomeLoginBonusTheater : GameSection
 			GameSection.BackSection();
 			HomeSelfCharacter.CTRL = true;
 			List<HomeCharacterBase> list = new List<HomeCharacterBase>();
-			if (MonoBehaviourSingleton<HomeManager>.IsValid())
-			{
-				list = MonoBehaviourSingleton<HomeManager>.I.HomePeople.charas;
-			}
-			else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-			{
-				list = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.charas;
-			}
+			IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+			list = currentIHomeManager.IHomePeople.charas;
 			list.ForEach(delegate(HomeCharacterBase o)
 			{
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 				if (o is HomePlayerCharacter || o is LoungePlayer)
 				{
 					o.get_gameObject().SetActive(true);
@@ -1344,15 +1282,23 @@ public class HomeLoginBonusTheater : GameSection
 		ITEM_ICON_TYPE icon_type = ITEM_ICON_TYPE.NONE;
 		RARITY_TYPE? rarity = null;
 		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-		ItemIcon.GetIconShowData((REWARD_TYPE)reward.type, (uint)reward.itemId, out int icon_id, out icon_type, out rarity, out element, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _, 0);
-		iconName = ResourceName.GetItemIcon(icon_id);
+		ELEMENT_TYPE element2 = ELEMENT_TYPE.MAX;
+		ItemIcon.GetIconShowData((REWARD_TYPE)reward.type, (uint)reward.itemId, out int icon_id, out icon_type, out rarity, out element, out element2, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _);
+		if (icon_type == ITEM_ICON_TYPE.ACCESSORY)
+		{
+			iconName = ResourceName.GetAccessoryIcon(icon_id);
+		}
+		else
+		{
+			iconName = ResourceName.GetItemIcon(icon_id);
+		}
 		int iconBGID = GetIconBGID(icon_type, icon_id);
 		iconBGName = ResourceName.GetItemIcon(iconBGID);
 	}
 
 	public static void PlayAudio(AUDIO audio)
 	{
-		SoundManager.PlayOneShotSE((int)audio, null, null);
+		SoundManager.PlayOneShotSE((int)audio);
 	}
 
 	public static void PlayRandomVoice(VOICE[] voiceList)
@@ -1362,7 +1308,7 @@ public class HomeLoginBonusTheater : GameSection
 		{
 			int num2 = Utility.Random(num);
 			int voice_id = (int)voiceList[num2];
-			SoundManager.PlayVoice(voice_id, 1f, 0u, null, null);
+			SoundManager.PlayVoice(voice_id);
 		}
 	}
 }

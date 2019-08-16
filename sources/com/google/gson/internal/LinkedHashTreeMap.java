@@ -15,7 +15,11 @@ import java.util.Set;
 
 public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements Serializable {
     static final /* synthetic */ boolean $assertionsDisabled = (!LinkedHashTreeMap.class.desiredAssertionStatus());
-    private static final Comparator<Comparable> NATURAL_ORDER = new C06811();
+    private static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
+        public int compare(Comparable comparable, Comparable comparable2) {
+            return comparable.compareTo(comparable2);
+        }
+    };
     Comparator<? super K> comparator;
     private EntrySet entrySet;
     final Node<K, V> header;
@@ -24,16 +28,6 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     int size;
     Node<K, V>[] table;
     int threshold;
-
-    /* renamed from: com.google.gson.internal.LinkedHashTreeMap$1 */
-    static final class C06811 implements Comparator<Comparable> {
-        C06811() {
-        }
-
-        public int compare(Comparable comparable, Comparable comparable2) {
-            return comparable.compareTo(comparable2);
-        }
-    }
 
     static final class AvlBuilder<K, V> {
         private int leavesSkipped;
@@ -44,7 +38,8 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         AvlBuilder() {
         }
 
-        void add(Node<K, V> node) {
+        /* access modifiers changed from: 0000 */
+        public void add(Node<K, V> node) {
             node.right = null;
             node.parent = null;
             node.left = null;
@@ -63,12 +58,10 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
                 this.leavesSkipped++;
             }
             for (int i = 4; (this.size & (i - 1)) == i - 1; i *= 2) {
-                Node node2;
-                Node node3;
                 if (this.leavesSkipped == 0) {
-                    node2 = this.stack;
-                    node3 = node2.parent;
-                    Node node4 = node3.parent;
+                    Node<K, V> node2 = this.stack;
+                    Node<K, V> node3 = node2.parent;
+                    Node<K, V> node4 = node3.parent;
                     node3.parent = node4.parent;
                     this.stack = node3;
                     node3.left = node4;
@@ -77,12 +70,12 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
                     node4.parent = node3;
                     node2.parent = node3;
                 } else if (this.leavesSkipped == 1) {
-                    node2 = this.stack;
-                    node3 = node2.parent;
-                    this.stack = node3;
-                    node3.right = node2;
-                    node3.height = node2.height + 1;
-                    node2.parent = node3;
+                    Node<K, V> node5 = this.stack;
+                    Node<K, V> node6 = node5.parent;
+                    this.stack = node6;
+                    node6.right = node5;
+                    node6.height = node5.height + 1;
+                    node5.parent = node6;
                     this.leavesSkipped = 0;
                 } else if (this.leavesSkipped == 2) {
                     this.leavesSkipped = 0;
@@ -90,14 +83,16 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
             }
         }
 
-        void reset(int i) {
+        /* access modifiers changed from: 0000 */
+        public void reset(int i) {
             this.leavesToSkip = ((Integer.highestOneBit(i) * 2) - 1) - i;
             this.size = 0;
             this.leavesSkipped = 0;
             this.stack = null;
         }
 
-        Node<K, V> root() {
+        /* access modifiers changed from: 0000 */
+        public Node<K, V> root() {
             Node<K, V> node = this.stack;
             if (node.parent == null) {
                 return node;
@@ -117,24 +112,21 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
             if (node == null) {
                 return null;
             }
-            Node node2 = node.parent;
+            Node<K, V> node2 = node.parent;
             node.parent = null;
-            Node node3 = node2;
-            node2 = node.right;
-            Node node4 = node3;
-            while (node2 != null) {
-                node2.parent = node4;
-                node3 = node2;
-                node2 = node2.left;
-                node4 = node3;
+            Node<K, V> node3 = node2;
+            for (Node<K, V> node4 = node.right; node4 != null; node4 = node4.left) {
+                node4.parent = node3;
+                node3 = node4;
             }
-            this.stackTop = node4;
+            this.stackTop = node3;
             return node;
         }
 
-        void reset(Node<K, V> node) {
-            Node node2 = null;
-            for (Node node3 = node; node3 != null; node3 = node3.left) {
+        /* access modifiers changed from: 0000 */
+        public void reset(Node<K, V> node) {
+            Node<K, V> node2 = null;
+            for (Node<K, V> node3 = node; node3 != null; node3 = node3.left) {
                 node3.parent = node2;
                 node2 = node3;
             }
@@ -142,57 +134,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         }
     }
 
-    private abstract class LinkedTreeMapIterator<T> implements Iterator<T> {
-        int expectedModCount;
-        Node<K, V> lastReturned;
-        Node<K, V> next;
-
-        private LinkedTreeMapIterator() {
-            this.next = LinkedHashTreeMap.this.header.next;
-            this.lastReturned = null;
-            this.expectedModCount = LinkedHashTreeMap.this.modCount;
-        }
-
-        public final boolean hasNext() {
-            return this.next != LinkedHashTreeMap.this.header;
-        }
-
-        final Node<K, V> nextNode() {
-            Node<K, V> node = this.next;
-            if (node == LinkedHashTreeMap.this.header) {
-                throw new NoSuchElementException();
-            } else if (LinkedHashTreeMap.this.modCount != this.expectedModCount) {
-                throw new ConcurrentModificationException();
-            } else {
-                this.next = node.next;
-                this.lastReturned = node;
-                return node;
-            }
-        }
-
-        public final void remove() {
-            if (this.lastReturned == null) {
-                throw new IllegalStateException();
-            }
-            LinkedHashTreeMap.this.removeInternal(this.lastReturned, true);
-            this.lastReturned = null;
-            this.expectedModCount = LinkedHashTreeMap.this.modCount;
-        }
-    }
-
     final class EntrySet extends AbstractSet<Entry<K, V>> {
-
-        /* renamed from: com.google.gson.internal.LinkedHashTreeMap$EntrySet$1 */
-        class C06821 extends LinkedTreeMapIterator<Entry<K, V>> {
-            C06821() {
-                super();
-            }
-
-            public Entry<K, V> next() {
-                return nextNode();
-            }
-        }
-
         EntrySet() {
         }
 
@@ -205,7 +147,15 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         }
 
         public Iterator<Entry<K, V>> iterator() {
-            return new C06821();
+            return new LinkedTreeMapIterator<Entry<K, V>>() {
+                {
+                    LinkedHashTreeMap linkedHashTreeMap = LinkedHashTreeMap.this;
+                }
+
+                public Entry<K, V> next() {
+                    return nextNode();
+                }
+            };
         }
 
         public boolean remove(Object obj) {
@@ -225,18 +175,6 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     }
 
     final class KeySet extends AbstractSet<K> {
-
-        /* renamed from: com.google.gson.internal.LinkedHashTreeMap$KeySet$1 */
-        class C06831 extends LinkedTreeMapIterator<K> {
-            C06831() {
-                super();
-            }
-
-            public K next() {
-                return nextNode().key;
-            }
-        }
-
         KeySet() {
         }
 
@@ -249,7 +187,15 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         }
 
         public Iterator<K> iterator() {
-            return new C06831();
+            return new LinkedTreeMapIterator<K>() {
+                {
+                    LinkedHashTreeMap linkedHashTreeMap = LinkedHashTreeMap.this;
+                }
+
+                public K next() {
+                    return nextNode().key;
+                }
+            };
         }
 
         public boolean remove(Object obj) {
@@ -258,6 +204,45 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
 
         public int size() {
             return LinkedHashTreeMap.this.size;
+        }
+    }
+
+    private abstract class LinkedTreeMapIterator<T> implements Iterator<T> {
+        int expectedModCount;
+        Node<K, V> lastReturned;
+        Node<K, V> next;
+
+        private LinkedTreeMapIterator() {
+            this.next = LinkedHashTreeMap.this.header.next;
+            this.lastReturned = null;
+            this.expectedModCount = LinkedHashTreeMap.this.modCount;
+        }
+
+        public final boolean hasNext() {
+            return this.next != LinkedHashTreeMap.this.header;
+        }
+
+        /* access modifiers changed from: 0000 */
+        public final Node<K, V> nextNode() {
+            Node<K, V> node = this.next;
+            if (node == LinkedHashTreeMap.this.header) {
+                throw new NoSuchElementException();
+            } else if (LinkedHashTreeMap.this.modCount != this.expectedModCount) {
+                throw new ConcurrentModificationException();
+            } else {
+                this.next = node.next;
+                this.lastReturned = node;
+                return node;
+            }
+        }
+
+        public final void remove() {
+            if (this.lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            LinkedHashTreeMap.this.removeInternal(this.lastReturned, true);
+            this.lastReturned = null;
+            this.expectedModCount = LinkedHashTreeMap.this.modCount;
         }
     }
 
@@ -313,11 +298,10 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         }
 
         public Node<K, V> first() {
-            Node<K, V> node;
-            for (Node<K, V> node2 = this.left; node2 != null; node2 = node2.left) {
-                node = node2;
+            for (Node<K, V> node = this.left; node != null; node = node.left) {
+                this = node;
             }
-            return node;
+            return this;
         }
 
         public K getKey() {
@@ -338,11 +322,10 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         }
 
         public Node<K, V> last() {
-            Node<K, V> node;
-            for (Node<K, V> node2 = this.right; node2 != null; node2 = node2.right) {
-                node = node2;
+            for (Node<K, V> node = this.right; node != null; node = node.right) {
+                this = node;
             }
-            return node;
+            return this;
         }
 
         public V setValue(V v) {
@@ -360,17 +343,38 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         this(NATURAL_ORDER);
     }
 
-    public LinkedHashTreeMap(Comparator<? super K> comparator) {
-        Comparator comparator2;
-        this.size = 0;
-        this.modCount = 0;
-        if (comparator == null) {
-            comparator2 = NATURAL_ORDER;
-        }
-        this.comparator = comparator2;
-        this.header = new Node();
-        this.table = new Node[16];
-        this.threshold = (this.table.length / 2) + (this.table.length / 4);
+    /* JADX WARNING: Incorrect type for immutable var: ssa=java.util.Comparator<? super K>, code=java.util.Comparator, for r3v0, types: [java.util.Comparator<? super K>, java.util.Comparator] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public LinkedHashTreeMap(java.util.Comparator r3) {
+        /*
+            r2 = this;
+            r0 = 0
+            r2.<init>()
+            r2.size = r0
+            r2.modCount = r0
+            if (r3 == 0) goto L_0x0027
+        L_0x000a:
+            r2.comparator = r3
+            com.google.gson.internal.LinkedHashTreeMap$Node r0 = new com.google.gson.internal.LinkedHashTreeMap$Node
+            r0.<init>()
+            r2.header = r0
+            r0 = 16
+            com.google.gson.internal.LinkedHashTreeMap$Node[] r0 = new com.google.gson.internal.LinkedHashTreeMap.Node[r0]
+            r2.table = r0
+            com.google.gson.internal.LinkedHashTreeMap$Node<K, V>[] r0 = r2.table
+            int r0 = r0.length
+            int r0 = r0 / 2
+            com.google.gson.internal.LinkedHashTreeMap$Node<K, V>[] r1 = r2.table
+            int r1 = r1.length
+            int r1 = r1 / 4
+            int r0 = r0 + r1
+            r2.threshold = r0
+            return
+        L_0x0027:
+            java.util.Comparator<java.lang.Comparable> r3 = NATURAL_ORDER
+            goto L_0x000a
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.gson.internal.LinkedHashTreeMap.<init>(java.util.Comparator):void");
     }
 
     private void doubleCapacity() {
@@ -385,7 +389,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         AvlBuilder avlBuilder = new AvlBuilder();
         AvlBuilder avlBuilder2 = new AvlBuilder();
         for (int i = 0; i < length; i++) {
-            Node node = nodeArr[i];
+            Node<K, V> node = nodeArr[i];
             if (node != null) {
                 avlIterator.reset(node);
                 int i2 = 0;
@@ -404,13 +408,13 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
                 avlBuilder2.reset(i3);
                 avlIterator.reset(node);
                 while (true) {
-                    node = avlIterator.next();
-                    if (node == null) {
+                    Node next2 = avlIterator.next();
+                    if (next2 == null) {
                         break;
-                    } else if ((node.hash & length) == 0) {
-                        avlBuilder.add(node);
+                    } else if ((next2.hash & length) == 0) {
+                        avlBuilder.add(next2);
                     } else {
-                        avlBuilder2.add(node);
+                        avlBuilder2.add(next2);
                     }
                 }
                 nodeArr2[i] = i2 > 0 ? avlBuilder.root() : null;
@@ -425,23 +429,21 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     }
 
     private void rebalance(Node<K, V> node, boolean z) {
-        Node node2;
-        while (node2 != null) {
-            Node node3 = node2.left;
-            Node node4 = node2.right;
-            int i = node3 != null ? node3.height : 0;
-            int i2 = node4 != null ? node4.height : 0;
+        while (node != null) {
+            Node<K, V> node2 = node.left;
+            Node<K, V> node3 = node.right;
+            int i = node2 != null ? node2.height : 0;
+            int i2 = node3 != null ? node3.height : 0;
             int i3 = i - i2;
-            Node node5;
             if (i3 == -2) {
-                node3 = node4.left;
-                node5 = node4.right;
-                i2 = (node3 != null ? node3.height : 0) - (node5 != null ? node5.height : 0);
-                if (i2 == -1 || (i2 == 0 && !z)) {
-                    rotateLeft(node2);
-                } else if ($assertionsDisabled || i2 == 1) {
-                    rotateRight(node4);
-                    rotateLeft(node2);
+                Node<K, V> node4 = node3.left;
+                Node<K, V> node5 = node3.right;
+                int i4 = (node4 != null ? node4.height : 0) - (node5 != null ? node5.height : 0);
+                if (i4 == -1 || (i4 == 0 && !z)) {
+                    rotateLeft(node);
+                } else if ($assertionsDisabled || i4 == 1) {
+                    rotateRight(node3);
+                    rotateLeft(node);
                 } else {
                     throw new AssertionError();
                 }
@@ -449,14 +451,14 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
                     return;
                 }
             } else if (i3 == 2) {
-                node4 = node3.left;
-                node5 = node3.right;
-                i2 = (node4 != null ? node4.height : 0) - (node5 != null ? node5.height : 0);
-                if (i2 == 1 || (i2 == 0 && !z)) {
-                    rotateRight(node2);
-                } else if ($assertionsDisabled || i2 == -1) {
-                    rotateLeft(node3);
-                    rotateRight(node2);
+                Node<K, V> node6 = node2.left;
+                Node<K, V> node7 = node2.right;
+                int i5 = (node6 != null ? node6.height : 0) - (node7 != null ? node7.height : 0);
+                if (i5 == 1 || (i5 == 0 && !z)) {
+                    rotateRight(node);
+                } else if ($assertionsDisabled || i5 == -1) {
+                    rotateLeft(node2);
+                    rotateRight(node);
                 } else {
                     throw new AssertionError();
                 }
@@ -464,24 +466,24 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
                     return;
                 }
             } else if (i3 == 0) {
-                node2.height = i + 1;
+                node.height = i + 1;
                 if (z) {
                     return;
                 }
             } else if ($assertionsDisabled || i3 == -1 || i3 == 1) {
-                node2.height = Math.max(i, i2) + 1;
+                node.height = Math.max(i, i2) + 1;
                 if (!z) {
                     return;
                 }
             } else {
                 throw new AssertionError();
             }
-            node2 = node2.parent;
+            node = node.parent;
         }
     }
 
     private void replaceInParent(Node<K, V> node, Node<K, V> node2) {
-        Node node3 = node.parent;
+        Node<K, V> node3 = node.parent;
         node.parent = null;
         if (node2 != null) {
             node2.parent = node3;
@@ -499,10 +501,10 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
 
     private void rotateLeft(Node<K, V> node) {
         int i = 0;
-        Node node2 = node.left;
-        Node node3 = node.right;
-        Node node4 = node3.left;
-        Node node5 = node3.right;
+        Node<K, V> node2 = node.left;
+        Node<K, V> node3 = node.right;
+        Node<K, V> node4 = node3.left;
+        Node<K, V> node5 = node3.right;
         node.right = node4;
         if (node4 != null) {
             node4.parent = node;
@@ -520,10 +522,10 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
 
     private void rotateRight(Node<K, V> node) {
         int i = 0;
-        Node node2 = node.left;
-        Node node3 = node.right;
-        Node node4 = node2.left;
-        Node node5 = node2.right;
+        Node<K, V> node2 = node.left;
+        Node<K, V> node3 = node.right;
+        Node<K, V> node4 = node2.left;
+        Node<K, V> node5 = node2.right;
         node.left = node5;
         if (node5 != null) {
             node5.parent = node;
@@ -552,10 +554,10 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         Arrays.fill(this.table, null);
         this.size = 0;
         this.modCount++;
-        Node node = this.header;
-        Node node2 = node.next;
+        Node<K, V> node = this.header;
+        Node<K, V> node2 = node.next;
         while (node2 != node) {
-            Node node3 = node2.next;
+            Node<K, V> node3 = node2.next;
             node2.prev = null;
             node2.next = null;
             node2 = node3;
@@ -569,106 +571,106 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     }
 
     public Set<Entry<K, V>> entrySet() {
-        Set set = this.entrySet;
-        if (set != null) {
-            return set;
+        EntrySet entrySet2 = this.entrySet;
+        if (entrySet2 != null) {
+            return entrySet2;
         }
-        set = new EntrySet();
-        this.entrySet = set;
-        return set;
+        EntrySet entrySet3 = new EntrySet<>();
+        this.entrySet = entrySet3;
+        return entrySet3;
     }
 
-    Node<K, V> find(K k, boolean z) {
-        Node<K, V> node;
-        int compareTo;
+    /* access modifiers changed from: 0000 */
+    public Node<K, V> find(K k, boolean z) {
         int i;
-        Comparator comparator = this.comparator;
-        Node[] nodeArr = this.table;
+        Node<K, V> node;
+        Comparator<? super K> comparator2 = this.comparator;
+        Node<K, V>[] nodeArr = this.table;
         int secondaryHash = secondaryHash(k.hashCode());
         int length = secondaryHash & (nodeArr.length - 1);
-        Node node2 = nodeArr[length];
+        Node<K, V> node2 = nodeArr[length];
         if (node2 != null) {
-            Comparable comparable;
-            if (comparator == NATURAL_ORDER) {
-                comparable = (Comparable) k;
-                node = node2;
-            } else {
-                comparable = null;
-                node = node2;
-            }
+            Comparable comparable = comparator2 == NATURAL_ORDER ? (Comparable) k : null;
             while (true) {
-                compareTo = comparable != null ? comparable.compareTo(node.key) : comparator.compare(k, node.key);
-                if (compareTo == 0) {
-                    return node;
+                int compare = comparable != null ? comparable.compareTo(node2.key) : comparator2.compare(k, node2.key);
+                if (compare == 0) {
+                    return node2;
                 }
-                Node<K, V> node3 = compareTo < 0 ? node.left : node.right;
+                Node<K, V> node3 = compare < 0 ? node2.left : node2.right;
                 if (node3 == null) {
+                    i = compare;
                     break;
                 }
-                node = node3;
+                node2 = node3;
             }
-            i = compareTo;
-            node2 = node;
         } else {
             i = 0;
         }
         if (!z) {
             return null;
         }
-        Node node4 = this.header;
+        Node<K, V> node4 = this.header;
         if (node2 != null) {
-            node = new Node(node2, k, secondaryHash, node4, node4.prev);
+            node = new Node<>(node2, k, secondaryHash, node4, node4.prev);
             if (i < 0) {
                 node2.left = node;
             } else {
                 node2.right = node;
             }
             rebalance(node2, true);
-        } else if (comparator != NATURAL_ORDER || (k instanceof Comparable)) {
-            node = new Node(node2, k, secondaryHash, node4, node4.prev);
+        } else if (comparator2 != NATURAL_ORDER || (k instanceof Comparable)) {
+            node = new Node<>(node2, k, secondaryHash, node4, node4.prev);
             nodeArr[length] = node;
         } else {
             throw new ClassCastException(k.getClass().getName() + " is not Comparable");
         }
-        compareTo = this.size;
-        this.size = compareTo + 1;
-        if (compareTo > this.threshold) {
+        int i2 = this.size;
+        this.size = i2 + 1;
+        if (i2 > this.threshold) {
             doubleCapacity();
         }
         this.modCount++;
         return node;
     }
 
-    Node<K, V> findByEntry(Entry<?, ?> entry) {
+    /* access modifiers changed from: 0000 */
+    public Node<K, V> findByEntry(Entry<?, ?> entry) {
         Node<K, V> findByObject = findByObject(entry.getKey());
-        Object obj = (findByObject == null || !equal(findByObject.value, entry.getValue())) ? null : 1;
-        return obj != null ? findByObject : null;
+        if (findByObject != null && equal(findByObject.value, entry.getValue())) {
+            return findByObject;
+        }
+        return null;
     }
 
-    Node<K, V> findByObject(Object obj) {
+    /* access modifiers changed from: 0000 */
+    public Node<K, V> findByObject(Object obj) {
         Node<K, V> node = null;
-        if (obj != null) {
-            try {
-                node = find(obj, false);
-            } catch (ClassCastException e) {
-            }
+        if (obj == null) {
+            return node;
         }
-        return node;
+        try {
+            return find(obj, false);
+        } catch (ClassCastException e) {
+            return node;
+        }
     }
 
     public V get(Object obj) {
         Node findByObject = findByObject(obj);
-        return findByObject != null ? findByObject.value : null;
+        if (findByObject != null) {
+            return findByObject.value;
+        }
+        return null;
     }
 
     public Set<K> keySet() {
-        Set set = this.keySet;
-        if (set != null) {
-            return set;
+        KeySet keySet2 = this.keySet;
+        if (keySet2 != null) {
+            return keySet2;
         }
-        set = new KeySet();
-        this.keySet = set;
-        return set;
+        KeySet keySet3 = new KeySet<>();
+        this.keySet = keySet3;
+        return keySet3;
     }
 
     public V put(K k, V v) {
@@ -683,20 +685,25 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
 
     public V remove(Object obj) {
         Node removeInternalByKey = removeInternalByKey(obj);
-        return removeInternalByKey != null ? removeInternalByKey.value : null;
+        if (removeInternalByKey != null) {
+            return removeInternalByKey.value;
+        }
+        return null;
     }
 
-    void removeInternal(Node<K, V> node, boolean z) {
-        int i = 0;
+    /* access modifiers changed from: 0000 */
+    public void removeInternal(Node<K, V> node, boolean z) {
+        int i;
+        int i2 = 0;
         if (z) {
             node.prev.next = node.next;
             node.next.prev = node.prev;
             node.prev = null;
             node.next = null;
         }
-        Node node2 = node.left;
-        Node node3 = node.right;
-        Node node4 = node.parent;
+        Node<K, V> node2 = node.left;
+        Node<K, V> node3 = node.right;
+        Node<K, V> node4 = node.parent;
         if (node2 == null || node3 == null) {
             if (node2 != null) {
                 replaceInParent(node, node2);
@@ -712,30 +719,30 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
             this.modCount++;
             return;
         }
-        int i2;
-        node2 = node2.height > node3.height ? node2.last() : node3.first();
-        removeInternal(node2, false);
-        node4 = node.left;
-        if (node4 != null) {
-            i2 = node4.height;
-            node2.left = node4;
-            node4.parent = node2;
+        Node<K, V> first = node2.height > node3.height ? node2.last() : node3.first();
+        removeInternal(first, false);
+        Node<K, V> node5 = node.left;
+        if (node5 != null) {
+            i = node5.height;
+            first.left = node5;
+            node5.parent = first;
             node.left = null;
         } else {
-            i2 = 0;
+            i = 0;
         }
-        node4 = node.right;
-        if (node4 != null) {
-            i = node4.height;
-            node2.right = node4;
-            node4.parent = node2;
+        Node<K, V> node6 = node.right;
+        if (node6 != null) {
+            i2 = node6.height;
+            first.right = node6;
+            node6.parent = first;
             node.right = null;
         }
-        node2.height = Math.max(i2, i) + 1;
-        replaceInParent(node, node2);
+        first.height = Math.max(i, i2) + 1;
+        replaceInParent(node, first);
     }
 
-    Node<K, V> removeInternalByKey(Object obj) {
+    /* access modifiers changed from: 0000 */
+    public Node<K, V> removeInternalByKey(Object obj) {
         Node<K, V> findByObject = findByObject(obj);
         if (findByObject != null) {
             removeInternal(findByObject, true);

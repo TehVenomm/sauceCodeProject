@@ -2,6 +2,7 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -42,6 +43,12 @@ namespace GooglePlayGames.Native.PInvoke
 		}
 
 		private readonly GameServices mServices;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchForPlayerResponse> _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.StatsManager.FetchForPlayerCallback _003C_003Ef__mg_0024cache1;
 
 		internal StatsManager(GameServices services)
 		{

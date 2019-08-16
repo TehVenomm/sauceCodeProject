@@ -21,9 +21,9 @@ public class ShareInviteHelper {
         String string = AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.ONELINK_ID);
         String string2 = AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.ONELINK_DOMAIN);
         LinkGenerator addParameter = new LinkGenerator(str).setBaseURL(string, string2, context.getPackageName()).setReferrerUID(appsFlyerUID).setReferrerCustomerId(AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.APP_USER_ID)).addParameter(Constants.URL_SITE_ID, context.getPackageName());
-        appsFlyerUID = AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.ONELINK_SCHEME);
-        if (appsFlyerUID != null && appsFlyerUID.length() > 3) {
-            addParameter.setBaseDeeplink(appsFlyerUID);
+        String string3 = AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.ONELINK_SCHEME);
+        if (string3 != null && string3.length() > 3) {
+            addParameter.setBaseDeeplink(string3);
         }
         return addParameter;
     }
@@ -33,7 +33,7 @@ public class ShareInviteHelper {
             AFLogger.afInfoLog("CustomerUserId not set, generate User Invite Link is disabled", true);
             return;
         }
-        Runnable createOneLinkHttpTask = new CreateOneLinkHttpTask(str, map, AppsFlyerLib.getInstance(), context, AppsFlyerLib.getInstance().isTrackingStopped());
+        CreateOneLinkHttpTask createOneLinkHttpTask = new CreateOneLinkHttpTask(str, map, AppsFlyerLib.getInstance(), context, AppsFlyerLib.getInstance().isTrackingStopped());
         createOneLinkHttpTask.setConnProvider(new HttpsUrlConnectionProvider());
         createOneLinkHttpTask.setListener(responseListener);
         AFExecutor.getInstance().getThreadPoolExecutor().execute(createOneLinkHttpTask);
@@ -55,7 +55,7 @@ public class ShareInviteHelper {
             } else if (Constants.USER_SHARE_LINK_TYPE.equals(mediaSource)) {
                 mediaSource = AFInAppEventType.SHARE;
             }
-            Map hashMap = new HashMap();
+            HashMap hashMap = new HashMap();
             if (generateInviteUrl.getParameters() != null) {
                 hashMap.putAll(generateInviteUrl.getParameters());
             }

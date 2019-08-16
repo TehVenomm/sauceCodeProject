@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class TheaterModeChapterTable : MonoBehaviourSingleton<TheaterModeChapterTable>, IDataTable
 {
 	[Serializable]
 	public class TheaterModeChapterData
 	{
-		public const string NT = "chapter_id,chapter_name,order,is_main,banner_id";
-
 		public uint chapter_id;
 
 		public string chapter_name;
@@ -17,6 +16,8 @@ public class TheaterModeChapterTable : MonoBehaviourSingleton<TheaterModeChapter
 		public int is_main;
 
 		public int banner_id;
+
+		public const string NT = "chapter_id,chapter_name,order,is_main,banner_id";
 
 		public static bool CB(CSVReader csv, TheaterModeChapterData data, ref uint key1)
 		{
@@ -38,6 +39,9 @@ public class TheaterModeChapterTable : MonoBehaviourSingleton<TheaterModeChapter
 
 	private UIntKeyTable<TheaterModeChapterData> dataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<TheaterModeChapterData> _003C_003Ef__mg_0024cache0;
+
 	public bool isLoading
 	{
 		get;
@@ -56,12 +60,12 @@ public class TheaterModeChapterTable : MonoBehaviourSingleton<TheaterModeChapter
 		MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable("TheaterModeChapterTable", this, delegate
 		{
 			isLoading = false;
-		}, false);
+		});
 	}
 
 	public void CreateTable(string csv)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<TheaterModeChapterData>(csv, TheaterModeChapterData.CB, "chapter_id,chapter_name,order,is_main,banner_id", null);
+		dataTable = TableUtility.CreateUIntKeyTable<TheaterModeChapterData>(csv, TheaterModeChapterData.CB, "chapter_id,chapter_name,order,is_main,banner_id");
 		dataTable.TrimExcess();
 	}
 

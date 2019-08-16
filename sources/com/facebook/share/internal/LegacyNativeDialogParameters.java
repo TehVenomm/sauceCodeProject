@@ -73,8 +73,8 @@ public class LegacyNativeDialogParameters {
         Utility.putNonEmptyString(bundle, ShareConstants.LEGACY_PLACE_TAG, shareContent.getPlaceId());
         Utility.putNonEmptyString(bundle, ShareConstants.LEGACY_REF, shareContent.getRef());
         bundle.putBoolean(ShareConstants.LEGACY_DATA_FAILURES_FATAL, z);
-        Collection peopleIds = shareContent.getPeopleIds();
-        if (!Utility.isNullOrEmpty(peopleIds)) {
+        List peopleIds = shareContent.getPeopleIds();
+        if (!Utility.isNullOrEmpty((Collection<T>) peopleIds)) {
             bundle.putStringArrayList(ShareConstants.LEGACY_FRIEND_TAGS, new ArrayList(peopleIds));
         }
         return bundle;

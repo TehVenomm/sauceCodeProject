@@ -13,8 +13,6 @@ public class MoveController
 		ROTATE = 0x8
 	}
 
-	private const float AVOID_RANGE = 2f;
-
 	private Brain brain;
 
 	public MOVE_TYPE moveType;
@@ -24,6 +22,8 @@ public class MoveController
 	private float stopTime;
 
 	private RaycastHit _seekHit = default(RaycastHit);
+
+	private const float AVOID_RANGE = 2f;
 
 	public bool isStopTimeOver => stopTime < Time.get_time();
 

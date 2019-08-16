@@ -32,9 +32,6 @@ namespace BestHTTP.WebSocket.Frames
 				bytes = Encoding.UTF8.GetBytes(message);
 				memoryStream.Write(bytes, 0, bytes.Length);
 				return memoryStream.ToArray();
-				IL_005e:
-				byte[] result;
-				return result;
 			}
 		}
 	}

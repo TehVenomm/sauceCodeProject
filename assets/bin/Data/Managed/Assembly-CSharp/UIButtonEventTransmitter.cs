@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIButtonEventTransmitter
+public class UIButtonEventTransmitter : MonoBehaviour
 {
 	public GameObject transmit_target;
 

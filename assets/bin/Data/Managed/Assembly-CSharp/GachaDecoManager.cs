@@ -19,11 +19,11 @@ public class GachaDecoManager : MonoBehaviourSingleton<GachaDecoManager>
 
 	private IEnumerator Start()
 	{
-		double interval_time = (double)MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.gachaDecoIntervalTime;
+		double interval_time = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.gachaDecoIntervalTime;
 		GachaDeco info = null;
 		while (true)
 		{
-			yield return (object)null;
+			yield return null;
 			if (list != MonoBehaviourSingleton<UserInfoManager>.I.gachaDecoList)
 			{
 				list = MonoBehaviourSingleton<UserInfoManager>.I.gachaDecoList;
@@ -36,40 +36,36 @@ public class GachaDecoManager : MonoBehaviourSingleton<GachaDecoManager>
 					UpdateGachaDeco(null);
 					info = null;
 				}
+				continue;
+			}
+			if (list.Count <= index)
+			{
+				index = 0;
+			}
+			info = list[index];
+			double remain_time = (double)info.remainTime - new TimeSpan(TimeManager.GetNow().Ticks - MonoBehaviourSingleton<UserInfoManager>.I.gachaDecoDateBase).TotalSeconds;
+			double wait_time = interval_time;
+			if (wait_time > remain_time)
+			{
+				wait_time = remain_time;
+			}
+			if (wait_time > 1.0)
+			{
+				UpdateGachaDeco(info);
+				float timer = (float)wait_time;
+				while (timer > 0f && IsVisible())
+				{
+					timer -= Time.get_deltaTime();
+					yield return null;
+				}
+			}
+			if (wait_time != interval_time)
+			{
+				list.Remove(info);
 			}
 			else
 			{
-				if (list.Count <= index)
-				{
-					index = 0;
-				}
-				info = list[index];
-				double num = (double)info.remainTime;
-				TimeSpan timeSpan = new TimeSpan(TimeManager.GetNow().Ticks - MonoBehaviourSingleton<UserInfoManager>.I.gachaDecoDateBase);
-				double remain_time = num - timeSpan.TotalSeconds;
-				double wait_time = interval_time;
-				if (wait_time > remain_time)
-				{
-					wait_time = remain_time;
-				}
-				if (wait_time > 1.0)
-				{
-					UpdateGachaDeco(info);
-					float timer = (float)wait_time;
-					while (timer > 0f && IsVisible())
-					{
-						timer -= Time.get_deltaTime();
-						yield return (object)null;
-					}
-				}
-				if (wait_time != interval_time)
-				{
-					list.Remove(info);
-				}
-				else
-				{
-					index++;
-				}
+				index++;
 			}
 		}
 	}
@@ -99,9 +95,9 @@ public class GachaDecoManager : MonoBehaviourSingleton<GachaDecoManager>
 		for (int count = hierarchyList.Count; i < count; i++)
 		{
 			GameSectionHierarchy.HierarchyData hierarchyData = hierarchyList[i];
-			if (hierarchyData != null && hierarchyData.data != (GameSceneTables.SectionData)null)
+			if (hierarchyData != null && hierarchyData.data != null)
 			{
-				if (hierarchyData.data.sectionName == "HomeTop" || hierarchyData.data.sectionName == "LoungeTop")
+				if (hierarchyData.data.sectionName == "HomeTop" || hierarchyData.data.sectionName == "LoungeTop" || hierarchyData.data.sectionName == "ClanTop")
 				{
 					flag = true;
 				}

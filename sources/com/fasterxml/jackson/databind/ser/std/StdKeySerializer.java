@@ -17,28 +17,28 @@ public class StdKeySerializer extends StdSerializer<Object> {
     }
 
     public void serialize(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        String str;
-        Class cls = obj.getClass();
+        String obj2;
+        String name;
+        Class<Class> cls = obj.getClass();
         if (cls == String.class) {
-            str = (String) obj;
+            obj2 = (String) obj;
         } else if (cls.isEnum()) {
-            String str2;
             Enum enumR = (Enum) obj;
             if (serializerProvider.isEnabled(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)) {
-                str2 = enumR.toString();
+                name = enumR.toString();
             } else {
-                str2 = enumR.name();
+                name = enumR.name();
             }
-            str = str2;
+            obj2 = name;
         } else if (obj instanceof Date) {
             serializerProvider.defaultSerializeDateKey((Date) obj, jsonGenerator);
             return;
         } else if (cls == Class.class) {
-            str = ((Class) obj).getName();
+            obj2 = ((Class) obj).getName();
         } else {
-            str = obj.toString();
+            obj2 = obj.toString();
         }
-        jsonGenerator.writeFieldName(str);
+        jsonGenerator.writeFieldName(obj2);
     }
 
     public JsonNode getSchema(SerializerProvider serializerProvider, Type type) throws JsonMappingException {

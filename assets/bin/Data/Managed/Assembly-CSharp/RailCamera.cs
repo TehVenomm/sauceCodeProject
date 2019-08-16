@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class RailCamera
+public class RailCamera : MonoBehaviour
 {
 	public float moveCoef = -0.3f;
 
@@ -40,7 +40,6 @@ public class RailCamera
 
 	private void Awake()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		targetCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
 		railAnim = targetCameraTransform.get_gameObject().AddComponent<RailAnimation>();
@@ -115,18 +114,18 @@ public class RailCamera
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		Vector2 vector = info.position - info.move;
 		Vector2 position = info.position;
 		vector.y = 0f;

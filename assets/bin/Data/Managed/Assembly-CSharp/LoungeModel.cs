@@ -48,7 +48,7 @@ public class LoungeModel : BaseModel
 
 		public string loungeNumber;
 
-		public List<SlotInfo> slotInfos;
+		public List<PartyModel.SlotInfo> slotInfos;
 
 		public int num;
 
@@ -65,15 +65,8 @@ public class LoungeModel : BaseModel
 		public string name;
 	}
 
-	public class SlotInfo
+	public class SlotInfo : PartyModel.SlotInfo
 	{
-		public int status;
-
-		public int questId;
-
-		public int fieldId;
-
-		public CharaInfo userInfo;
 	}
 
 	public class LoungeServer

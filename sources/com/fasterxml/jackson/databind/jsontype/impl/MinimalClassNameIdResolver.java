@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
@@ -22,8 +22,8 @@ public class MinimalClassNameIdResolver extends ClassNameIdResolver {
         this._basePackageName = name.substring(0, lastIndexOf);
     }
 
-    public Id getMechanism() {
-        return Id.MINIMAL_CLASS;
+    public C0862Id getMechanism() {
+        return C0862Id.MINIMAL_CLASS;
     }
 
     public String idFromValue(Object obj) {
@@ -34,15 +34,16 @@ public class MinimalClassNameIdResolver extends ClassNameIdResolver {
         return name;
     }
 
-    protected JavaType _typeFromId(String str, TypeFactory typeFactory) {
+    /* access modifiers changed from: protected */
+    public JavaType _typeFromId(String str, TypeFactory typeFactory) {
         if (str.startsWith(AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER)) {
-            StringBuilder stringBuilder = new StringBuilder(str.length() + this._basePackageName.length());
+            StringBuilder sb = new StringBuilder(str.length() + this._basePackageName.length());
             if (this._basePackageName.length() == 0) {
-                stringBuilder.append(str.substring(1));
+                sb.append(str.substring(1));
             } else {
-                stringBuilder.append(this._basePackageName).append(str);
+                sb.append(this._basePackageName).append(str);
             }
-            str = stringBuilder.toString();
+            str = sb.toString();
         }
         return super._typeFromId(str, typeFactory);
     }

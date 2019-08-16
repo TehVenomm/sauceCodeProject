@@ -100,10 +100,10 @@ public final class BaseSettings implements Serializable {
     }
 
     public BaseSettings withDateFormat(DateFormat dateFormat) {
+        DateFormat dateFormat2;
         if (this._dateFormat == dateFormat) {
             return this;
         }
-        DateFormat dateFormat2;
         if (dateFormat == null || !hasExplicitTimeZone()) {
             dateFormat2 = dateFormat;
         } else {

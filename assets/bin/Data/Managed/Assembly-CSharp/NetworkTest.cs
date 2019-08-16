@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NetworkTest
+public class NetworkTest : MonoBehaviour
 {
 	private NetworkRegistTest netRegister;
 
@@ -15,9 +15,6 @@ public class NetworkTest
 
 	private void Awake()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().AddComponent<NetworkManager>();
 		this.get_gameObject().AddComponent<AccountManager>();
 		netRegister = this.get_gameObject().AddComponent<NetworkRegistTest>();

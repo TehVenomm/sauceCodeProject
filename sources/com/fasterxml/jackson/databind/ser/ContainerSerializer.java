@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public abstract class ContainerSerializer<T> extends StdSerializer<T> {
-    protected abstract ContainerSerializer<?> _withValueTypeSerializer(TypeSerializer typeSerializer);
+    /* access modifiers changed from: protected */
+    public abstract ContainerSerializer<?> _withValueTypeSerializer(TypeSerializer typeSerializer);
 
     public abstract JsonSerializer<?> getContentSerializer();
 
@@ -17,7 +18,7 @@ public abstract class ContainerSerializer<T> extends StdSerializer<T> {
     public abstract boolean hasSingleElement(T t);
 
     protected ContainerSerializer(Class<T> cls) {
-        super((Class) cls);
+        super(cls);
     }
 
     protected ContainerSerializer(JavaType javaType) {
@@ -41,8 +42,9 @@ public abstract class ContainerSerializer<T> extends StdSerializer<T> {
         return isEmpty(null, t);
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected boolean hasContentTypeAnnotation(SerializerProvider serializerProvider, BeanProperty beanProperty) {
+    public boolean hasContentTypeAnnotation(SerializerProvider serializerProvider, BeanProperty beanProperty) {
         return false;
     }
 }

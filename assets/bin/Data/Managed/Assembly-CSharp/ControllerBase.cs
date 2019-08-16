@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public abstract class ControllerBase
+public abstract class ControllerBase : MonoBehaviour
 {
 	[Flags]
 	public enum DISABLE_FLAG
@@ -10,7 +11,8 @@ public abstract class ControllerBase
 		INPUT_DISABLE = 0x2,
 		BATTLE_START = 0x4,
 		BATTLE_END = 0x8,
-		HAPPEN_QUEST = 0x8
+		HAPPEN_QUEST = 0x8,
+		CHANGE_UNIQUE_EQUIPMENT = 0x10
 	}
 
 	protected Character character;
@@ -61,8 +63,6 @@ public abstract class ControllerBase
 
 	protected virtual T AttachBrain<T>() where T : Brain
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		brain = this.get_gameObject().GetComponent<T>();
 		if (brain == null)
 		{
@@ -97,7 +97,7 @@ public abstract class ControllerBase
 	{
 		if (!enable && character.actionID == Character.ACTION_ID.MOVE)
 		{
-			character.ActIdle(false, -1f);
+			character.ActIdle();
 		}
 	}
 
@@ -109,7 +109,7 @@ public abstract class ControllerBase
 		}
 		if (IsEnableControll())
 		{
-			OnChangeEnableControll(true);
+			OnChangeEnableControll(enable: true);
 		}
 	}
 
@@ -121,7 +121,7 @@ public abstract class ControllerBase
 		}
 		if (IsEnableControll())
 		{
-			OnChangeEnableControll(false);
+			OnChangeEnableControll(enable: false);
 		}
 	}
 

@@ -17,7 +17,7 @@ public static class Curves
 	public static AnimationCurve CreateSinCurve()
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
+		//IL_0006: Expected O, but got Unknown
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		AnimationCurve val = new AnimationCurve();
@@ -31,7 +31,7 @@ public static class Curves
 	public static AnimationCurve CreateSinHalfCurve()
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
+		//IL_0006: Expected O, but got Unknown
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		AnimationCurve val = new AnimationCurve();
@@ -45,7 +45,7 @@ public static class Curves
 	public static AnimationCurve CreateEaseInCurve()
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
+		//IL_0006: Expected O, but got Unknown
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		AnimationCurve val = new AnimationCurve();
@@ -57,7 +57,7 @@ public static class Curves
 	public static AnimationCurve CreateArcHalfCurve()
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
+		//IL_0006: Expected O, but got Unknown
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005b: Unknown result type (might be due to invalid IL or missing references)

@@ -1,7 +1,8 @@
-package io.fabric.sdk.android.services.cache;
+package p017io.fabric.sdk.android.services.cache;
 
 import android.content.Context;
 
+/* renamed from: io.fabric.sdk.android.services.cache.MemoryValueCache */
 public class MemoryValueCache<T> extends AbstractValueCache<T> {
     private T value;
 
@@ -13,15 +14,18 @@ public class MemoryValueCache<T> extends AbstractValueCache<T> {
         super(valueCache);
     }
 
-    protected void cacheValue(Context context, T t) {
+    /* access modifiers changed from: protected */
+    public void cacheValue(Context context, T t) {
         this.value = t;
     }
 
-    protected void doInvalidate(Context context) {
+    /* access modifiers changed from: protected */
+    public void doInvalidate(Context context) {
         this.value = null;
     }
 
-    protected T getCached(Context context) {
+    /* access modifiers changed from: protected */
+    public T getCached(Context context) {
         return this.value;
     }
 }

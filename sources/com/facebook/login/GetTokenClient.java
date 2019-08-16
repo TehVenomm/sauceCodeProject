@@ -10,6 +10,7 @@ final class GetTokenClient extends PlatformServiceClient {
         super(context, 65536, NativeProtocol.MESSAGE_GET_ACCESS_TOKEN_REPLY, NativeProtocol.PROTOCOL_VERSION_20121101, str);
     }
 
-    protected void populateRequestBundle(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void populateRequestBundle(Bundle bundle) {
     }
 }

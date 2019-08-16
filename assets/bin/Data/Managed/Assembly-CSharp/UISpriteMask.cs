@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UISpriteMask
+public class UISpriteMask : MonoBehaviour
 {
 	private class MaterialEntry
 	{
@@ -50,37 +50,21 @@ public class UISpriteMask
 	private void SetupMaskSprite()
 	{
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0233: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
 		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_029f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
-		Shader shader = ResourceUtility.FindShader("mobile/Custom/ui_alpha_mask");
+		Shader shader = ResourceUtility.FindShader("mobile/Custom/UI/ui_alpha_mask");
 		Material material = GetMaterial(sprite.material, shader);
 		UISpriteData atlasSprite = sprite.GetAtlasSprite();
 		Rect rect = default(Rect);
@@ -101,7 +85,7 @@ public class UISpriteMask
 			UISprite uISprite = maskingObject as UISprite;
 			if (Object.op_Implicit(uISprite))
 			{
-				Shader shader2 = ResourceUtility.FindShader("mobile/Custom/ui_add_depth_greater");
+				Shader shader2 = ResourceUtility.FindShader("mobile/Custom/UI/ui_add_depth_greater");
 				Material material2 = GetMaterial(uISprite.material, shader2);
 				UISpriteData atlasSprite2 = uISprite.GetAtlasSprite();
 				Rect rect2 = default(Rect);
@@ -130,46 +114,46 @@ public class UISpriteMask
 
 	private void OnDestroy()
 	{
-		if (valid)
+		if (!valid)
 		{
-			if (!AppMain.isApplicationQuit)
+			return;
+		}
+		if (!AppMain.isApplicationQuit)
+		{
+			if (Object.op_Implicit(maskSprite))
 			{
-				if (Object.op_Implicit(maskSprite))
+				if (Object.op_Implicit(sprite))
 				{
-					if (Object.op_Implicit(sprite))
-					{
-						ReleaseMaterial(sprite.material);
-					}
-					else
-					{
-						Material val = FindOriginalMaterial(maskSprite.material);
-						if (Object.op_Implicit(val))
-						{
-							ReleaseMaterial(val);
-						}
-					}
+					ReleaseMaterial(sprite.material);
 				}
-				if (Object.op_Implicit(maskedSprite))
+				else
 				{
-					UISprite uISprite = maskingObject as UISprite;
-					if (Object.op_Implicit(uISprite))
+					Material val = FindOriginalMaterial(maskSprite.material);
+					if (Object.op_Implicit(val))
 					{
-						ReleaseMaterial(uISprite.material);
-					}
-					else
-					{
-						Material val2 = FindOriginalMaterial(maskedSprite.material);
-						if (Object.op_Implicit(val2))
-						{
-							ReleaseMaterial(val2);
-						}
+						ReleaseMaterial(val);
 					}
 				}
 			}
-			else
+			if (!Object.op_Implicit(maskedSprite))
 			{
-				maskMaterials.Clear();
+				return;
 			}
+			UISprite uISprite = maskingObject as UISprite;
+			if (Object.op_Implicit(uISprite))
+			{
+				ReleaseMaterial(uISprite.material);
+				return;
+			}
+			Material val2 = FindOriginalMaterial(maskedSprite.material);
+			if (Object.op_Implicit(val2))
+			{
+				ReleaseMaterial(val2);
+			}
+		}
+		else
+		{
+			maskMaterials.Clear();
 		}
 	}
 
@@ -188,9 +172,8 @@ public class UISpriteMask
 	private Material GetMaterial(Material orig, Shader shader)
 	{
 		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
+		//IL_0019: Expected O, but got Unknown
+		//IL_002b: Expected O, but got Unknown
 		if (!maskMaterials.TryGetValue(orig, out MaterialEntry value))
 		{
 			Material val = new Material(shader);

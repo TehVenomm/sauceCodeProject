@@ -2,12 +2,18 @@ package com.google.android.gms.drive.metadata.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import com.google.android.gms.drive.metadata.CustomPropertyKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,58 +21,68 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public final class AppVisibleCustomProperties extends com.google.android.gms.common.internal.safeparcel.zza implements ReflectedParcelable, Iterable<zzc> {
+@Class(creator = "AppVisibleCustomPropertiesCreator")
+@Reserved({1})
+public final class AppVisibleCustomProperties extends AbstractSafeParcelable implements ReflectedParcelable, Iterable<zzc> {
     public static final Creator<AppVisibleCustomProperties> CREATOR = new zza();
-    public static final AppVisibleCustomProperties zzgkj = new zza().zzanq();
-    private List<zzc> zzgkk;
+    public static final AppVisibleCustomProperties zzil = new zza().zzat();
+    @Field(mo13990id = 2)
+    private final List<zzc> zzim;
 
     public static final class zza {
-        private final Map<CustomPropertyKey, zzc> zzgkl = new HashMap();
+        private final Map<CustomPropertyKey, zzc> zzin = new HashMap();
 
         public final zza zza(CustomPropertyKey customPropertyKey, String str) {
-            zzbp.zzb((Object) customPropertyKey, (Object) "key");
-            this.zzgkl.put(customPropertyKey, new zzc(customPropertyKey, str));
+            Preconditions.checkNotNull(customPropertyKey, "key");
+            this.zzin.put(customPropertyKey, new zzc(customPropertyKey, str));
             return this;
         }
 
         public final zza zza(zzc zzc) {
-            zzbp.zzb((Object) zzc, (Object) "property");
-            this.zzgkl.put(zzc.zzgkm, zzc);
+            Preconditions.checkNotNull(zzc, "property");
+            this.zzin.put(zzc.zzio, zzc);
             return this;
         }
 
-        public final AppVisibleCustomProperties zzanq() {
-            return new AppVisibleCustomProperties(this.zzgkl.values());
+        public final AppVisibleCustomProperties zzat() {
+            return new AppVisibleCustomProperties(this.zzin.values());
         }
     }
 
-    AppVisibleCustomProperties(Collection<zzc> collection) {
-        zzbp.zzu(collection);
-        this.zzgkk = new ArrayList(collection);
+    @Constructor
+    AppVisibleCustomProperties(@Param(mo13993id = 2) Collection<zzc> collection) {
+        Preconditions.checkNotNull(collection);
+        this.zzim = new ArrayList(collection);
     }
 
     public final boolean equals(Object obj) {
-        return this == obj ? true : (obj == null || obj.getClass() != getClass()) ? false : zzanp().equals(((AppVisibleCustomProperties) obj).zzanp());
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != getClass()) {
+            return false;
+        }
+        return zzas().equals(((AppVisibleCustomProperties) obj).zzas());
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzgkk});
+        return Objects.hashCode(this.zzim);
     }
 
     public final Iterator<zzc> iterator() {
-        return this.zzgkk.iterator();
+        return this.zzim.iterator();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 2, this.zzgkk, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeTypedList(parcel, 2, this.zzim, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final Map<CustomPropertyKey, String> zzanp() {
-        Map hashMap = new HashMap(this.zzgkk.size());
-        for (zzc zzc : this.zzgkk) {
-            hashMap.put(zzc.zzgkm, zzc.mValue);
+    public final Map<CustomPropertyKey, String> zzas() {
+        HashMap hashMap = new HashMap(this.zzim.size());
+        for (zzc zzc : this.zzim) {
+            hashMap.put(zzc.zzio, zzc.value);
         }
         return Collections.unmodifiableMap(hashMap);
     }

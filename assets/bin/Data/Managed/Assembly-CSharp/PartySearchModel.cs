@@ -22,6 +22,10 @@ public class PartySearchModel : BaseModel
 		public int enemySpecies;
 
 		public int questTypeBit;
+
+		public int isFs;
+
+		public int isCs;
 	}
 
 	public static string URL = "ajax/party/search";

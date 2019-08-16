@@ -1,22 +1,9 @@
 using Network;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Self : Player
 {
-	private const int lineDivide = 30;
-
-	public const string EFFECT_NAME_INK_SPLASH = "ef_btl_pl_blind_01";
-
-	public const string EFFECT_NAME_INK_FLICK = "ef_btl_pl_blind_02";
-
-	public const string EFFECT_NAME_FLICK_WARNING = "ef_btl_target_flick";
-
-	private const float CANNON_DRAG_RATE_Y = 15f;
-
-	private const float CANNON_ANGLE_LIMT_UP = 30f;
-
-	private const float CANNON_ANGLE_LIMIT_DOWN = 10f;
-
 	protected Vector3 arrowAimLineVec = Vector3.get_forward();
 
 	protected Vector2 arrowAimInputVec = Vector2.get_zero();
@@ -26,6 +13,12 @@ public class Self : Player
 	protected GameObject arrowAimLesserCursorEffect;
 
 	protected float arrowAimLesserCursorStartTime = -1f;
+
+	private static readonly int lineSize = 3;
+
+	private static readonly Vector3 lineOffset = new Vector3(0.5f, 0f, 0f);
+
+	private const int lineDivide = 30;
 
 	public TaskChecker taskChecker = new TaskChecker();
 
@@ -43,6 +36,12 @@ public class Self : Player
 
 	private float reduceTimeByFlick_;
 
+	public const string EFFECT_NAME_INK_SPLASH = "ef_btl_pl_blind_01";
+
+	public const string EFFECT_NAME_INK_FLICK = "ef_btl_pl_blind_02";
+
+	public const string EFFECT_NAME_FLICK_WARNING = "ef_btl_target_flick";
+
 	private static readonly Vector3 INKSPLASH_LANDSCAPE_OFFSET = new Vector3(0f, -0.15f, 0f);
 
 	private EffectCtrl inkSplashCtrl_;
@@ -50,6 +49,12 @@ public class Self : Player
 	private int inkSplashState_;
 
 	private GameObject effectFlickWarning_;
+
+	public const string EFFECT_NAME_BLIND = "ef_btl_pl_darkness_02";
+
+	private Transform _blindEffect;
+
+	private float _blindTimer;
 
 	public Vector3 cannonAimForward = Vector3.get_zero();
 
@@ -63,6 +68,12 @@ public class Self : Player
 
 	private bool isBaseInputVec;
 
+	private const float CANNON_DRAG_RATE_Y = 15f;
+
+	private const float CANNON_ANGLE_LIMT_UP = 30f;
+
+	private const float CANNON_ANGLE_LIMIT_DOWN = 10f;
+
 	public float overSpeedLimit = 2f;
 
 	public float dragRateX = 2f;
@@ -70,6 +81,12 @@ public class Self : Player
 	private Transform effectTapTrans;
 
 	private bool isFirstRideCannon = true;
+
+	private CapsuleCollider _capsuleCollider;
+
+	private Vector3 colliderCenter = Vector3.get_zero();
+
+	private bool lastAerialFlag;
 
 	public Vector3 arrowAimForward
 	{
@@ -101,7 +118,7 @@ public class Self : Player
 		protected set;
 	}
 
-	public LineRenderer bulletLineRenderer
+	public List<LineRenderer> bulletLineRenderers
 	{
 		get;
 		protected set;
@@ -135,11 +152,13 @@ public class Self : Player
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		arrowAimForward = Vector3.get_zero();
 		arrowAimLesserCursorPos = Vector3.get_zero();
-		bulletLineRenderer = null;
+		bulletLineRenderers = null;
 		base.objectType = OBJECT_TYPE.SELF;
 	}
 
@@ -152,6 +171,20 @@ public class Self : Player
 	{
 		base.Load(load_info, callback);
 		ResetShadowSealingUI();
+		ResetConcussionUI();
+	}
+
+	protected override void LoadUniqueEquipment(StageObjectManager.CreatePlayerInfo info, PlayerLoader.OnCompleteLoad callback)
+	{
+		base.LoadUniqueEquipment(info, callback);
+		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+		{
+			MonoBehaviourSingleton<UIPlayerStatus>.I.ChangeUniqueEquipment();
+		}
+		if (MonoBehaviourSingleton<InGameManager>.IsValid() && !weaponEquipItemDataList.IsNullOrEmpty())
+		{
+			MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.ResetItemDamageByWeapon(weaponEquipItemDataList);
+		}
 	}
 
 	public override void OnLoadComplete()
@@ -161,10 +194,19 @@ public class Self : Player
 		{
 			stepCtrl.stampDistance = 1000f;
 		}
-		if (base.isDead && MonoBehaviourSingleton<InGameManager>.I.IsRush() && !MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && base.rescueTime <= 0f)
+		if (base.isDead && (MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true)) && !MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && base.rescueTime <= 0f)
 		{
 			BeginSpect();
 		}
+		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+		{
+			UIPlayerStatus.OnLoadComplete();
+		}
+		if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
+		{
+			MonoBehaviourSingleton<UIEnduranceStatus>.I.UpdateBurstUIInfo();
+		}
+		_capsuleCollider = (base._collider as CapsuleCollider);
 	}
 
 	private void OnScreenRotate(bool is_portrait)
@@ -177,11 +219,11 @@ public class Self : Player
 
 	protected override void OnDisable()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (bulletLineRenderer != null)
+		for (int i = 0; i < bulletLineRenderers.Count; i++)
 		{
-			Object.Destroy(bulletLineRenderer.get_gameObject());
+			Object.Destroy(bulletLineRenderers[i].get_gameObject());
 		}
+		bulletLineRenderers.Clear();
 		base.OnDisable();
 	}
 
@@ -191,6 +233,7 @@ public class Self : Player
 		{
 			InkSplashEnd();
 		}
+		DestroyBlindEffect();
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= OnScreenRotate;
@@ -202,27 +245,36 @@ public class Self : Player
 	public void OnCached()
 	{
 		InkSplashEnd();
+		DestroyBlindEffect();
 	}
 
 	protected override void Initialize()
 	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
-		if (bulletLineRenderer == null)
+		if (bulletLineRenderers == null)
 		{
-			Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.bulletLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-			if (val == null)
+			bulletLineRenderers = new List<LineRenderer>();
+		}
+		if (bulletLineRenderers.Count == 0)
+		{
+			for (int i = 0; i < lineSize; i++)
 			{
-				return;
-			}
-			bulletLineRenderer = val.GetComponent<LineRenderer>();
-			if (bulletLineRenderer != null)
-			{
-				bulletLineRenderer.set_enabled(false);
-				bulletLineRenderer.SetColors(Color.get_yellow(), Color.get_yellow());
-				bulletLineRenderer.get_material().set_renderQueue(3001);
+				Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.bulletLine, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+				if (val == null)
+				{
+					break;
+				}
+				LineRenderer component = val.GetComponent<LineRenderer>();
+				if (component == null)
+				{
+					break;
+				}
+				component.set_enabled(false);
+				component.SetColors(Color.get_yellow(), Color.get_yellow());
+				component.get_material().set_renderQueue(3001);
+				bulletLineRenderers.Add(component);
 			}
 		}
 		soulEnergyCtrl = new SoulEnergyController();
@@ -251,7 +303,6 @@ public class Self : Player
 
 	protected override void Update()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
 		if (MonoBehaviourSingleton<UIContinueButton>.IsValid() && !MonoBehaviourSingleton<UIContinueButton>.I.get_gameObject().get_activeSelf() && MonoBehaviourSingleton<UIContinueButton>.I.CheckVisible() && MonoBehaviourSingleton<StageObjectManager>.I.self == this)
 		{
@@ -268,11 +319,15 @@ public class Self : Player
 					bool continueButton = MonoBehaviourSingleton<InGameManager>.I.CanRushPayContinue();
 					MonoBehaviourSingleton<UIContinueButton>.I.SetContinueButton(continueButton);
 				}
+				else if (QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true))
+				{
+					MonoBehaviourSingleton<UIContinueButton>.I.SetContinueButton(enable: false);
+				}
 			}
 		}
 		if (IsNeedActivateUIButtonsForRush() && MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
-			MonoBehaviourSingleton<InGameProgress>.I.SetDisableUIOpen(false);
+			MonoBehaviourSingleton<InGameProgress>.I.SetDisableUIOpen(disable: false);
 		}
 		if (base.isArrowAimBossMode)
 		{
@@ -286,7 +341,7 @@ public class Self : Player
 				SendExploreSyncPlayerStatus();
 			}
 		}
-		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && MonoBehaviourSingleton<UISpectatorButton>.I.IsEnable())
+		if ((MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true)) && MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && MonoBehaviourSingleton<UISpectatorButton>.I.IsEnable())
 		{
 			if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid() && !MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle())
 			{
@@ -303,15 +358,29 @@ public class Self : Player
 		{
 			UpdateInkSplash();
 		}
+		UpdateBlind();
+	}
+
+	protected override void FixedUpdate()
+	{
+		base.FixedUpdate();
+		UpdateAerialCollider();
 	}
 
 	protected override void UpdateAction()
 	{
 		base.UpdateAction();
 		ACTION_ID actionID = base.actionID;
-		if (actionID == (ACTION_ID)22 && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo() && !IsAutoReviving())
+		if (actionID != ACTION_ID.ATTACK && actionID == (ACTION_ID)24)
 		{
-			OnEndContinueTimeEnd();
+			if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo() && !IsAutoReviving())
+			{
+				OnEndContinueTimeEnd();
+			}
+			if (QuestManager.IsValidInGameTrial() && !IsAutoReviving())
+			{
+				OnEndContinueTimeEnd();
+			}
 		}
 	}
 
@@ -334,7 +403,7 @@ public class Self : Player
 		{
 			return false;
 		}
-		if (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.IsRush())
+		if (!MonoBehaviourSingleton<InGameManager>.IsValid() || (!MonoBehaviourSingleton<InGameManager>.I.IsRush() && !QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true)))
 		{
 			return false;
 		}
@@ -346,14 +415,14 @@ public class Self : Player
 		{
 			return false;
 		}
-		if (base.actionID != (ACTION_ID)22)
+		if (base.actionID != (ACTION_ID)24)
 		{
 			return false;
 		}
 		return true;
 	}
 
-	public override void ActAttack(int id, bool send_packet = true, bool sync_immediately = false)
+	public override void ActAttack(int id, bool send_packet = true, bool sync_immediately = false, string _motionLayerName = "", string _motionStateName = "")
 	{
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
@@ -382,10 +451,18 @@ public class Self : Player
 				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnSoulPairSwords();
 			}
 		}
-		base.ActAttack(id, send_packet, sync_immediately);
+		if (CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.BURST) && id == base.playerParameter.spearActionInfo.burstSpearInfo.hitComboAttackId)
+		{
+			taskChecker.OnBurstSpear();
+			if (MonoBehaviourSingleton<InGameManager>.IsValid())
+			{
+				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnBurstSpear();
+			}
+		}
+		base.ActAttack(id, send_packet, sync_immediately, _motionLayerName, _motionStateName);
 		if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
-			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(true, 0f);
+			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: true);
 		}
 	}
 
@@ -397,7 +474,7 @@ public class Self : Player
 		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(true, 0f);
+		MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: true);
 		if (base.isArrowAimBossMode)
 		{
 			Vector3 lerpRotation = Quaternion.LookRotation(arrowAimForward) * arrowAimLineVec;
@@ -409,7 +486,7 @@ public class Self : Player
 
 	public override void SetChargeExpandRelease(float chargeRate)
 	{
-		MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(true, 0f);
+		MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: true);
 		base.SetChargeExpandRelease(chargeRate);
 	}
 
@@ -420,8 +497,8 @@ public class Self : Player
 		base.SetInputAxis(input_vec);
 		if (startInputRotate != base.startInputRotate)
 		{
-			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, 0f);
-			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetDisable(true);
+			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: false);
+			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetDisable(disable: true);
 		}
 	}
 
@@ -433,7 +510,7 @@ public class Self : Player
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameProgress>.I.CloseDialog();
-			MonoBehaviourSingleton<InGameProgress>.I.SetDisableUIOpen(true);
+			MonoBehaviourSingleton<InGameProgress>.I.SetDisableUIOpen(disable: true);
 		}
 	}
 
@@ -442,7 +519,7 @@ public class Self : Player
 		base.ActDeadStandup(standup_hp, cType);
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && cType == eContinueType.AUTO_REVIVE)
 		{
-			MonoBehaviourSingleton<InGameProgress>.I.SetDisableUIOpen(false);
+			MonoBehaviourSingleton<InGameProgress>.I.SetDisableUIOpen(disable: false);
 		}
 	}
 
@@ -457,27 +534,33 @@ public class Self : Player
 
 	public override void OnEndContinueTimeEnd()
 	{
+		if (MonoBehaviourSingleton<CoopManager>.I.coopStage.IsPresentQuest())
+		{
+			return;
+		}
 		base.OnEndContinueTimeEnd();
-		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && !MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop)
+		if ((MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true)) && !MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop)
 		{
 			BeginSpect();
+			return;
 		}
-		else
+		if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
 		{
-			if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
+			MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
+		}
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && QuestManager.IsValidInGameTrial())
+		{
+			MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
+		}
+		else if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsForceDefeatQuest())
+			{
+				MonoBehaviourSingleton<InGameProgress>.I.BattleForceDefeatsEvent();
+			}
+			else if (!MonoBehaviourSingleton<InGameProgress>.I.isWaitContinueProtocol)
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
-			}
-			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-			{
-				if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsForceDefeatQuest())
-				{
-					MonoBehaviourSingleton<InGameProgress>.I.BattleForceDefeatsEvent();
-				}
-				else if (!MonoBehaviourSingleton<InGameProgress>.I.isWaitContinueProtocol)
-				{
-					MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
-				}
 			}
 		}
 	}
@@ -493,7 +576,7 @@ public class Self : Player
 		return flag;
 	}
 
-	public override bool ActSkillAction(int skill_index)
+	public override bool ActSkillAction(int skill_index, bool isGuestUsingSecondGrade = false)
 	{
 		bool flag = base.ActSkillAction(skill_index);
 		SkillInfo.SkillParam actSkillParam = base.skillInfo.actSkillParam;
@@ -501,12 +584,13 @@ public class Self : Player
 		{
 			return false;
 		}
+		MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.AddMySkillCount((int)actSkillParam.tableData.id);
 		if (flag)
 		{
 			SKILL_SLOT_TYPE type = actSkillParam.tableData.type;
-			if (type == SKILL_SLOT_TYPE.ATTACK)
+			if (type == SKILL_SLOT_TYPE.ATTACK && (!actSkillParam.tableData.isTeleportation || !base.isArrowAimLesserMode))
 			{
-				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(true, 0f);
+				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: true);
 			}
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
@@ -517,27 +601,19 @@ public class Self : Player
 		return flag;
 	}
 
-	public override void OnGetHeal(int heal_hp, HEAL_TYPE heal_type, bool packet = false, HEAL_EFFECT_TYPE effectType = HEAL_EFFECT_TYPE.BASIS, bool isApplyAbility = true)
+	public override int ExecHealHp(HealData healData, bool isPacket = false)
 	{
-		base.OnGetHeal(heal_hp, heal_type, packet, effectType, isApplyAbility);
-		if (!base.isDead && MonoBehaviourSingleton<UIDamageManager>.IsValid())
+		int num = base.ExecHealHp(healData, isPacket);
+		if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
 		{
-			float num = (float)heal_hp;
-			if (isApplyAbility)
-			{
-				num = (float)heal_hp * buffParam.GetHealUp();
-				if (num <= 0f)
-				{
-					num = 1f;
-				}
-			}
-			MonoBehaviourSingleton<UIDamageManager>.I.CreatePlayerRecoverHp(this, (int)num, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
+			MonoBehaviourSingleton<UIDamageManager>.I.CreatePlayerRecoverHp(this, num, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
 		}
+		return num;
 	}
 
-	public override void ApplyChangeWeapon(CharaInfo.EquipItem item, int weapon_index)
+	public override void ApplyChangeWeapon(CharaInfo.EquipItem item, int weapon_index, StageObjectManager.CreatePlayerInfo createPlayerInfo = null)
 	{
-		base.ApplyChangeWeapon(item, weapon_index);
+		base.ApplyChangeWeapon(item, weapon_index, createPlayerInfo);
 		if (QuestManager.IsValidInGameExplore())
 		{
 			SendExploreSyncPlayerStatus();
@@ -553,30 +629,30 @@ public class Self : Player
 		bool isArrowAimLesserMode = base.isArrowAimLesserMode;
 		ACTION_ID actionID = base.actionID;
 		base.EndAction();
-		ACTION_ID aCTION_ID = actionID;
-		if (aCTION_ID == ACTION_ID.PARALYZE && MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+		if (actionID == ACTION_ID.PARALYZE && MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.UpDateStatusIcon();
 		}
-		if (bulletLineRenderer != null)
+		for (int i = 0; i < bulletLineRenderers.Count; i++)
 		{
-			bulletLineRenderer.set_enabled(false);
+			bulletLineRenderers[i].set_enabled(false);
 		}
 		if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
-			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetDisable(false);
+			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetDisable(disable: false);
 			if (isArrowAimLesserMode)
 			{
-				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, base.playerParameter.specialActionInfo.arrowAimLesserUnlockTime);
+				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: false, base.playerParameter.specialActionInfo.arrowAimLesserUnlockTime);
 			}
 			else if (MonoBehaviourSingleton<TargetMarkerManager>.I.parameter != null)
 			{
-				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, MonoBehaviourSingleton<TargetMarkerManager>.I.parameter.defaultUnlockTime);
+				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: false, MonoBehaviourSingleton<TargetMarkerManager>.I.parameter.defaultUnlockTime);
 			}
 			else
 			{
-				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, 0f);
+				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: false);
 			}
+			base.enableCancelToCarryPut = false;
 		}
 	}
 
@@ -585,6 +661,11 @@ public class Self : Player
 		if (!base.OnBuffStart(buffData))
 		{
 			return false;
+		}
+		BuffParam.BUFFTYPE type = buffData.type;
+		if (type == BuffParam.BUFFTYPE.BLIND)
+		{
+			CreateBlindEffect(buffData.time);
 		}
 		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 		{
@@ -611,6 +692,8 @@ public class Self : Player
 		case BuffParam.BUFFTYPE.POISON:
 		case BuffParam.BUFFTYPE.BURNING:
 		case BuffParam.BUFFTYPE.DEADLY_POISON:
+		case BuffParam.BUFFTYPE.BLEEDING:
+		case BuffParam.BUFFTYPE.ACID:
 			if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
 			{
 				MonoBehaviourSingleton<UIDamageManager>.I.CreatePlayerDamage(this, value, UIPlayerDamageNum.DAMAGE_COLOR.DAMAGE);
@@ -625,9 +708,14 @@ public class Self : Player
 		{
 			return false;
 		}
-		if (type == BuffParam.BUFFTYPE.INK_SPLASH)
+		switch (type)
 		{
+		case BuffParam.BUFFTYPE.INK_SPLASH:
 			InkSplashEnd();
+			break;
+		case BuffParam.BUFFTYPE.BLIND:
+			DestroyBlindEffect();
+			break;
 		}
 		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 		{
@@ -649,9 +737,30 @@ public class Self : Player
 	public override void OnAttackedHitOwner(AttackedHitStatusOwner status)
 	{
 		base.OnAttackedHitOwner(status);
-		if (status.attackInfo.toPlayer.isBuffCancellation && MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+		if (status.attackInfo.toPlayer.isBuffCancellation && !IsInBarrier() && MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
 		{
 			MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(string.Empty, STRING_CATEGORY.ENEMY_REACTION, 3u);
+		}
+	}
+
+	public override void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
+	{
+		base.OnHitAttack(info, hit_param);
+		if (hit_param.toObject is Enemy)
+		{
+			Enemy enemy = hit_param.toObject as Enemy;
+			if (enemy.isSummonAttack || (enemy.regionInfos.Length > hit_param.regionID && !enemy.regionInfos[hit_param.regionID].isAtkColliderHit))
+			{
+				return;
+			}
+		}
+		if (info.attackType == AttackHitInfo.ATTACK_TYPE.OHS_ORACLE_SP)
+		{
+			taskChecker.OnOracleOneHandSword();
+			if (MonoBehaviourSingleton<InGameManager>.IsValid())
+			{
+				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnOracleOneHandSword();
+			}
 		}
 	}
 
@@ -665,25 +774,40 @@ public class Self : Player
 		}
 	}
 
+	protected override bool IsDamageValid(AttackedHitStatusDirection status)
+	{
+		if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.GIMMICK_GENERATED)
+		{
+			return true;
+		}
+		return base.IsDamageValid(status);
+	}
+
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN))
+		if (TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN))
 		{
-			base.OnAttackedHitFix(status);
-			if (status.attackInfo.shakeCameraPercent != 0f && status.fromType == OBJECT_TYPE.ENEMY && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+			return;
+		}
+		base.OnAttackedHitFix(status);
+		if (status.attackInfo.shakeCameraPercent != 0f && status.fromType == OBJECT_TYPE.ENEMY && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(status.hitPos, status.attackInfo.shakeCameraPercent, status.attackInfo.shakeCycleTime);
+		}
+		if (status.damage + status.shieldDamage <= 0 && (status.damage + status.shieldDamage != 0 || !base.shouldShowInvincibleDamage))
+		{
+			return;
+		}
+		if (uiPlayerStatusGizmo != null)
+		{
+			uiPlayerStatusGizmo.OnDamageSelf();
+			if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
 			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(status.hitPos, status.attackInfo.shakeCameraPercent, status.attackInfo.shakeCycleTime);
-			}
-			if (status.damage + status.shieldDamage > 0 && uiPlayerStatusGizmo != null)
-			{
-				uiPlayerStatusGizmo.OnDamageSelf();
-				if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
-				{
-					MonoBehaviourSingleton<UIDamageManager>.I.CreatePlayerDamage(this, status.origin);
-				}
+				MonoBehaviourSingleton<UIDamageManager>.I.CreatePlayerDamage(this, status.origin);
 			}
 		}
+		base.shouldShowInvincibleDamage = false;
 	}
 
 	public override Vector3 GetCameraTargetPos()
@@ -724,14 +848,66 @@ public class Self : Player
 		case AnimEventFormat.ID.CHARGE_INPUT_START:
 			if (!MonoBehaviourSingleton<TargetMarkerManager>.I.parameter.enableNormalMarker)
 			{
-				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarker.defaultUnlockTime);
+				MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: false, MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarker.defaultUnlockTime);
 			}
 			break;
 		case AnimEventFormat.ID.TARGET_LOCK_ON:
-			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(true, 0f);
+			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: true);
 			return;
 		case AnimEventFormat.ID.TARGET_LOCK_OFF:
-			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, 0f);
+			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: false);
+			return;
+		case AnimEventFormat.ID.TWO_HAND_SWORD_BURST_FULL_BURST:
+			if (thsCtrl == null)
+			{
+				break;
+			}
+			if (thsCtrl.DoFullBurst())
+			{
+				taskChecker.OnBurstTwoHandSword();
+				if (MonoBehaviourSingleton<InGameManager>.IsValid())
+				{
+					MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnBurstTwoHandSword();
+				}
+				if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+				{
+					MonoBehaviourSingleton<UIPlayerStatus>.I.DoFullBurstAction();
+				}
+				if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
+				{
+					MonoBehaviourSingleton<UIEnduranceStatus>.I.DoFullBurstAction();
+				}
+			}
+			return;
+		case AnimEventFormat.ID.TWO_HAND_SWORD_BURST_SINGLE_SHOT:
+			if (thsCtrl == null)
+			{
+				break;
+			}
+			if (thsCtrl.DoShootAction())
+			{
+				if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+				{
+					MonoBehaviourSingleton<UIPlayerStatus>.I.DoShootAction();
+				}
+				if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
+				{
+					MonoBehaviourSingleton<UIEnduranceStatus>.I.DoShootAction();
+				}
+			}
+			return;
+		case AnimEventFormat.ID.TWO_HAND_SWORD_BURST_RELOAD_NOW:
+			if (thsCtrl == null || !thsCtrl.IsReloadingNow)
+			{
+				break;
+			}
+			if (thsCtrl.DoReloadAction() && MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+			{
+				MonoBehaviourSingleton<UIPlayerStatus>.I.DoReloadAction();
+			}
+			return;
+		case AnimEventFormat.ID.CAMERA_RESET_POSITION:
+			MonoBehaviourSingleton<InGameCameraManager>.I.AdjustCameraPosition();
 			return;
 		}
 		base.OnAnimEvent(data);
@@ -739,16 +915,20 @@ public class Self : Player
 
 	protected override void EventCameraTargetOffsetOn(AnimEventData.EventData data)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && !FieldManager.IsValidInGameNoBoss())
 		{
 			float[] floatArgs = data.floatArgs;
 			InGameCameraManager.TargetOffset targetOffset = new InGameCameraManager.TargetOffset();
 			targetOffset.pos = new Vector3(floatArgs[0], floatArgs[1], floatArgs[2]);
 			targetOffset.rot = new Vector3(floatArgs[3], floatArgs[4], floatArgs[5]);
+			if (floatArgs.Length > 6)
+			{
+				targetOffset.smoothMaxSpeed = floatArgs[6];
+			}
 			MonoBehaviourSingleton<InGameCameraManager>.I.SetAnimEventTargetOffsetByPlayer(targetOffset);
 		}
 	}
@@ -761,23 +941,94 @@ public class Self : Player
 		}
 	}
 
+	public override void EventCameraTargetRotateOn(AnimEventData.EventData data)
+	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && !StageObjectManager.IsBossAssimilated)
+		{
+			InGameCameraManager.TargetPosition targetPosition = new InGameCameraManager.TargetPosition();
+			if (data.intArgs[0] > 0)
+			{
+				targetPosition.pos = MonoBehaviourSingleton<StageObjectManager>.I.boss._position + new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			}
+			else
+			{
+				targetPosition.pos = _position + new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			}
+			if (data.floatArgs.Length > 3)
+			{
+				targetPosition.smoothMaxSpeed = data.floatArgs[3];
+			}
+			MonoBehaviourSingleton<InGameCameraManager>.I.SetAnimEventTargetPositionByPlayer(targetPosition);
+		}
+	}
+
+	public override void EventCameraTargetRotateOff()
+	{
+		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetPositionByPlayer();
+		}
+	}
+
 	protected override void EventCameraStopOn(AnimEventData.EventData data)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && data.floatArgs.Length >= 6)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && !FieldManager.IsValidInGameNoBoss() && data.floatArgs.Length >= 6)
 		{
 			InGameCameraManager i = MonoBehaviourSingleton<InGameCameraManager>.I;
-			i.SetStopPos(i.movePosition + new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]));
-			InGameCameraManager inGameCameraManager = i;
+			Vector3 stopPos = i.movePosition + new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 			Quaternion moveRotation = i.moveRotation;
-			inGameCameraManager.SetStopRotEular(moveRotation.get_eulerAngles() + new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+			Vector3 stopRotEular = moveRotation.get_eulerAngles() + new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+			if (data.floatArgs.Length >= 7)
+			{
+				i.SetStopMaxSpeed(data.floatArgs[6]);
+			}
+			if (data.floatArgs.Length >= 8)
+			{
+				i.SetStopMaxRotSpeed(data.floatArgs[7]);
+			}
+			if (data.intArgs.Length >= 1 && data.intArgs[0] != 0)
+			{
+				stopPos = _position + Quaternion.LookRotation(_forward) * new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+				Quaternion val = Quaternion.LookRotation(_forward) * Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+				stopRotEular = val.get_eulerAngles();
+			}
+			i.SetStopPos(stopPos);
+			i.SetStopRotEular(stopRotEular);
 			i.SetCameraMode(InGameCameraManager.CAMERA_MODE.STOP);
 		}
 	}
@@ -790,16 +1041,90 @@ public class Self : Player
 		}
 	}
 
-	public override void ShotArrow(Vector3 shot_pos, Quaternion shot_rot, AttackInfo attack_info, bool isSitShot, bool isAimEnd)
+	protected override void EventCameraCutOn(AnimEventData.EventData data)
+	{
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid() || FieldManager.IsValidInGameNoBoss() || data.floatArgs.Length < 6)
+		{
+			return;
+		}
+		Vector3 val = _position + Quaternion.LookRotation(_forward) * new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+		Vector3 val2 = _position + Quaternion.LookRotation(_forward) * new Vector3(0f - data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+		Quaternion cutRot = Quaternion.LookRotation(_forward) * Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+		Quaternion cutRot2 = Quaternion.LookRotation(_forward) * Quaternion.Euler(new Vector3(data.floatArgs[3], 0f - data.floatArgs[4], data.floatArgs[5]));
+		RaycastHit hit = default(RaycastHit);
+		RaycastHit hit2 = default(RaycastHit);
+		bool flag = AIUtility.RaycastObstacle(this, val, out hit);
+		bool flag2 = AIUtility.RaycastObstacle(this, val2, out hit2);
+		if (!flag || !flag2)
+		{
+			InGameCameraManager i = MonoBehaviourSingleton<InGameCameraManager>.I;
+			if (!flag)
+			{
+				i.SetCutPos(val);
+				i.SetCutRot(cutRot);
+			}
+			else if (!flag2)
+			{
+				i.SetCutPos(val2);
+				i.SetCutRot(cutRot2);
+			}
+			i.SetCameraMode(InGameCameraManager.CAMERA_MODE.CUT);
+		}
+	}
+
+	protected override void EventCameraCutOff()
+	{
+		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameCameraManager>.I.ClearCameraMode(InGameCameraManager.CAMERA_MODE.CUT);
+		}
+	}
+
+	public override void ShotArrow(Vector3 shot_pos, Quaternion shot_rot, AttackInfo attack_info, bool isSitShot, bool isAimEnd, bool isSend = false)
 	{
 		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		if (attack_info != null)
 		{
-			base.ShotArrow(shot_pos, shot_rot, attack_info, isSitShot, isAimEnd);
-			if (base.isArrowAimBossMode)
+			base.ShotArrow(shot_pos, shot_rot, attack_info, isSitShot, isAimEnd, isSend);
+			bool flag = isSitShot && base.spAttackType == SP_ATTACK_TYPE.BURST;
+			if (base.isArrowAimBossMode && !flag)
 			{
-				SetArrowAimBossVisible(false);
+				SetArrowAimBossVisible(enable: false);
 			}
 		}
 	}
@@ -809,7 +1134,7 @@ public class Self : Player
 		base.ShotSoulArrow();
 		if (base.isArrowAimBossMode)
 		{
-			SetArrowAimBossVisible(false);
+			SetArrowAimBossVisible(enable: false);
 		}
 		MonoBehaviourSingleton<TargetMarkerManager>.I.ResetMultiLock();
 	}
@@ -835,19 +1160,24 @@ public class Self : Player
 	public override void SetArrowAimBossMode(bool enable)
 	{
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 		if (enable)
 		{
 			if (base.actionTarget != null)
 			{
-				LookAt(base.actionTarget._position);
+				LookAt(base.actionTarget._position, isBlindEnable: true);
+			}
+			else if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+			{
+				LookAt(MonoBehaviourSingleton<StageObjectManager>.I.boss.get_transform().get_position());
 			}
 			base.isActSpecialAction = true;
 		}
@@ -886,14 +1216,20 @@ public class Self : Player
 	protected override void SetArrowAimBossVisible(bool enable)
 	{
 		base.SetArrowAimBossVisible(enable);
-		if (bulletLineRenderer != null)
+		if (bulletLineRenderers.Count < lineSize)
 		{
-			bulletLineRenderer.set_enabled(enable);
-			if (enable)
-			{
-				SetBulletLineColor(false);
-				UpdateBulletLine();
-			}
+			return;
+		}
+		if (enable)
+		{
+			bulletLineRenderers[0].set_enabled(true);
+			SetBulletLineColor(isMax: false);
+			UpdateBulletLine();
+			return;
+		}
+		for (int i = 0; i < lineSize; i++)
+		{
+			bulletLineRenderers[i].set_enabled(false);
 		}
 	}
 
@@ -1030,7 +1366,7 @@ public class Self : Player
 		{
 			arrowAimLesserCursorStartTime = Time.get_time();
 			arrowAimLesserCursorPos = Vector3.get_zero();
-			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(false, 0f);
+			MonoBehaviourSingleton<TargetMarkerManager>.I.SetTargetLock(isLock: false);
 		}
 		else
 		{
@@ -1042,46 +1378,43 @@ public class Self : Player
 
 	protected override void SetArrowAimLesserVisible(bool enable)
 	{
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Expected O, but got Unknown
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 		base.SetArrowAimLesserVisible(enable);
 		if (enable)
 		{
-			if (arrowAimLesserCursorEffect == null)
+			if (!(arrowAimLesserCursorEffect == null))
 			{
-				Transform val = (!CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT)) ? EffectManager.GetEffect(base.playerParameter.specialActionInfo.arrowAimLesserCursorEffectName, base._transform) : EffectManager.GetEffect("ef_btl_target_e_01", base._transform);
-				if (!(val == null))
+				return;
+			}
+			Transform val = CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT) ? EffectManager.GetEffect("ef_btl_target_e_01", base._transform) : ((!base.isArrowRainShot) ? EffectManager.GetEffect(base.playerParameter.specialActionInfo.arrowAimLesserCursorEffectName, base._transform) : EffectManager.GetEffect(base.playerParameter.arrowActionInfo.arrowRainShotAimLesserCursorEffectName, base._transform));
+			if (!(val == null))
+			{
+				float num = 2f;
+				val.set_localScale(Vector3.get_one() * num);
+				arrowAimLesserCursorEffect = val.get_gameObject();
+				val.set_position(_position + arrowAimLesserCursorPos);
+				Rigidbody val2 = val.get_gameObject().AddComponent<Rigidbody>();
+				val2.set_mass(1f);
+				val2.set_angularDrag(100f);
+				val2.set_isKinematic(false);
+				val2.set_constraints(116);
+				val2.set_collisionDetectionMode(1);
+				CapsuleCollider val3 = base._collider as CapsuleCollider;
+				if (val3 != null)
 				{
-					float num = 2f;
-					val.set_localScale(Vector3.get_one() * num);
-					arrowAimLesserCursorEffect = val.get_gameObject();
-					val.set_position(_position + arrowAimLesserCursorPos);
-					Rigidbody val2 = val.get_gameObject().AddComponent<Rigidbody>();
-					val2.set_mass(1f);
-					val2.set_angularDrag(100f);
-					val2.set_isKinematic(false);
-					val2.set_constraints(116);
-					val2.set_collisionDetectionMode(1);
-					CapsuleCollider val3 = base._collider as CapsuleCollider;
-					if (val3 != null)
-					{
-						CapsuleCollider val4 = val.get_gameObject().AddComponent<CapsuleCollider>();
-						val4.set_direction(val3.get_direction());
-						val4.set_height(val3.get_height() / num);
-						val4.set_radius(val3.get_radius() / num);
-						val4.set_center(val3.get_center() / num);
-					}
-					Utility.SetLayerWithChildren(val, 29);
+					CapsuleCollider val4 = val.get_gameObject().AddComponent<CapsuleCollider>();
+					val4.set_direction(val3.get_direction());
+					val4.set_height(val3.get_height() / num);
+					val4.set_radius(val3.get_radius() / num);
+					val4.set_center(val3.get_center() / num);
 				}
+				Utility.SetLayerWithChildren(val, 29);
 			}
 		}
 		else if (arrowAimLesserCursorEffect != null)
@@ -1094,78 +1427,77 @@ public class Self : Player
 	public override void UpdateArrowAimLesserMode(Vector2 input_vec)
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0209: Unknown result type (might be due to invalid IL or missing references)
 		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0318: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0314: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0330: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0334: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0339: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0369: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0377: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0384: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0359: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0388: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0398: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateArrowAimLesserMode(input_vec);
 		InGameSettingsManager.SelfController.ArrowAimLesserSettings arrowAimLesserSettings;
-		if (CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT))
+		if (!CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT))
 		{
-			arrowAimLesserSettings = MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.spearAimLesserSettings;
-			UpdateSpearJumpEffect();
+			arrowAimLesserSettings = ((!base.isArrowRainShot) ? MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.arrowAimLesserSettings : MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.arrowRainShotAimLesserSettings);
 		}
 		else
 		{
-			arrowAimLesserSettings = MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.arrowAimLesserSettings;
+			arrowAimLesserSettings = MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.spearAimLesserSettings;
+			UpdateSpearJumpEffect();
 		}
 		Rigidbody val = null;
 		if (arrowAimLesserCursorEffect != null)
@@ -1239,122 +1571,157 @@ public class Self : Player
 				arrowAimLesserCursorEffect.get_transform().set_localScale(Vector3.get_one() * num7);
 			}
 		}
-		if (val != null)
+		if (!(val != null))
 		{
-			Vector3 arrowAimLesserCursorPos4 = this.arrowAimLesserCursorPos;
-			Vector3 normalized = arrowAimLesserCursorPos4.get_normalized();
-			float num8 = Vector3.Dot(normalized, val2) * Time.get_deltaTime();
-			if (num8 > 0f)
-			{
-				Vector3 arrowAimLesserCursorPos5 = this.arrowAimLesserCursorPos;
-				float magnitude2 = arrowAimLesserCursorPos5.get_magnitude();
-				float num9 = magnitude2 + num8;
-				if (num9 > arrowAimLesserSettings.cursorMaxDistance)
-				{
-					float num10 = num9 - arrowAimLesserSettings.cursorMaxDistance;
-					val2 -= normalized * num10 / Time.get_deltaTime();
-				}
-			}
-			val.set_velocity(val2);
+			return;
 		}
+		Vector3 arrowAimLesserCursorPos4 = this.arrowAimLesserCursorPos;
+		Vector3 normalized = arrowAimLesserCursorPos4.get_normalized();
+		float num8 = Vector3.Dot(normalized, val2) * Time.get_deltaTime();
+		if (num8 > 0f)
+		{
+			Vector3 arrowAimLesserCursorPos5 = this.arrowAimLesserCursorPos;
+			float magnitude2 = arrowAimLesserCursorPos5.get_magnitude();
+			float num9 = magnitude2 + num8;
+			if (num9 > arrowAimLesserSettings.cursorMaxDistance)
+			{
+				float num10 = num9 - arrowAimLesserSettings.cursorMaxDistance;
+				val2 -= normalized * num10 / Time.get_deltaTime();
+			}
+		}
+		val.set_velocity(val2);
 	}
 
 	protected void UpdateBulletLine()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-		if (!(bulletLineRenderer == null) && bulletLineRenderer.get_enabled())
+		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0323: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033e: Unknown result type (might be due to invalid IL or missing references)
+		if (bulletLineRenderers.Count < lineSize || !bulletLineRenderers[0].get_enabled())
 		{
-			Vector3 bulletAppearPos = GetBulletAppearPos();
-			Vector3 bulletShotVec = GetBulletShotVec(bulletAppearPos);
-			if (base.spAttackType == SP_ATTACK_TYPE.SOUL)
+			return;
+		}
+		Vector3 bulletAppearPos = GetBulletAppearPos();
+		Vector3 bulletShotVec = GetBulletShotVec(bulletAppearPos);
+		if (base.spAttackType == SP_ATTACK_TYPE.SOUL)
+		{
+			bulletLineRenderers[0].SetVertexCount(2);
+			bulletLineRenderers[0].SetPosition(0, bulletAppearPos);
+			Vector3 val = bulletAppearPos + bulletShotVec * 30f;
+			bulletLineRenderers[0].SetPosition(1, val);
+			CheckMultiLock(bulletAppearPos, bulletShotVec);
+			return;
+		}
+		AttackInfo attackInfo = FindAttackInfo(base.playerParameter.arrowActionInfo.attackInfoNames[(int)base.spAttackType], fix_rate: false);
+		if (attackInfo == null)
+		{
+			return;
+		}
+		float chargingRate = GetChargingRate();
+		if (!string.IsNullOrEmpty(attackInfo.rateInfoName) && chargingRate != 0f)
+		{
+			AttackInfo rate_info = FindAttackInfo(attackInfo.rateInfoName, fix_rate: false);
+			attackInfo = attackInfo.GetRateAttackInfo(rate_info, chargingRate);
+		}
+		BulletData bulletData = attackInfo.bulletData;
+		if (bulletData == null)
+		{
+			return;
+		}
+		bool flag = bulletData.dataFall == null;
+		if (chargingRate >= 1f && (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.HEAT) || CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.BURST)))
+		{
+			flag = true;
+		}
+		bool enabled = flag && base.isBoostMode && base.spAttackType == SP_ATTACK_TYPE.BURST;
+		bulletLineRenderers[1].set_enabled(enabled);
+		bulletLineRenderers[2].set_enabled(enabled);
+		for (int i = 0; i < lineSize; i++)
+		{
+			if (!bulletLineRenderers[i].get_enabled())
 			{
-				bulletLineRenderer.SetVertexCount(2);
-				bulletLineRenderer.SetPosition(0, bulletAppearPos);
-				Vector3 val = bulletAppearPos + bulletShotVec * 30f;
-				bulletLineRenderer.SetPosition(1, val);
-				CheckMultiLock(bulletAppearPos, bulletShotVec);
+				continue;
 			}
-			else
+			Vector3 val2 = bulletAppearPos;
+			switch (i)
 			{
-				AttackInfo attackInfo = FindAttackInfo(base.playerParameter.arrowActionInfo.attackInfoNames[(int)base.spAttackType], false, false);
-				if (attackInfo != null)
+			case 1:
+				val2 = bulletAppearPos + lineOffset;
+				break;
+			case 2:
+				val2 = bulletAppearPos - lineOffset;
+				break;
+			}
+			if (flag)
+			{
+				bulletLineRenderers[i].SetVertexCount(2);
+				bulletLineRenderers[i].SetPosition(0, val2);
+				Vector3 val3 = val2 + bulletShotVec * 30f;
+				bulletLineRenderers[i].SetPosition(1, val3);
+				continue;
+			}
+			Vector3 val4 = Physics.get_gravity() * bulletData.dataFall.gravityRate;
+			float gravityStartTime = bulletData.dataFall.gravityStartTime;
+			float speed = bulletData.data.speed;
+			bulletLineRenderers[i].SetVertexCount(30);
+			bulletLineRenderers[i].SetPosition(0, val2);
+			float num = bulletData.data.appearTime / 30f;
+			float num2 = 0f;
+			for (int j = 1; j < 30; j++)
+			{
+				num2 = ((!(num2 <= gravityStartTime)) ? (num2 + num) : (num2 + num * 0.1f));
+				Vector3 val5 = bulletAppearPos + bulletShotVec * speed * num2;
+				if (num2 >= gravityStartTime)
 				{
-					float chargingRate = GetChargingRate();
-					if (!string.IsNullOrEmpty(attackInfo.rateInfoName) && chargingRate != 0f)
-					{
-						AttackInfo rate_info = FindAttackInfo(attackInfo.rateInfoName, false, false);
-						attackInfo = attackInfo.GetRateAttackInfo(rate_info, chargingRate);
-					}
-					BulletData bulletData = attackInfo.bulletData;
-					if (!(bulletData == null))
-					{
-						if (bulletData.dataFall == null || (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.HEAT) && base.attackID == 1 && chargingRate >= 1f))
-						{
-							bulletLineRenderer.SetVertexCount(2);
-							bulletLineRenderer.SetPosition(0, bulletAppearPos);
-							Vector3 val2 = bulletAppearPos + bulletShotVec * 30f;
-							bulletLineRenderer.SetPosition(1, val2);
-						}
-						else if (bulletData.dataFall != null)
-						{
-							Vector3 val3 = Physics.get_gravity() * bulletData.dataFall.gravityRate;
-							float gravityStartTime = bulletData.dataFall.gravityStartTime;
-							float speed = bulletData.data.speed;
-							bulletLineRenderer.SetVertexCount(30);
-							bulletLineRenderer.SetPosition(0, bulletAppearPos);
-							float num = bulletData.data.appearTime / 30f;
-							float num2 = 0f;
-							for (int i = 1; i < 30; i++)
-							{
-								num2 = ((!(num2 <= gravityStartTime)) ? (num2 + num) : (num2 + num * 0.1f));
-								Vector3 val4 = bulletAppearPos + bulletShotVec * speed * num2;
-								if (num2 >= gravityStartTime)
-								{
-									val4 += val3 * (num2 - gravityStartTime) * (num2 - gravityStartTime) / 2f;
-								}
-								bulletLineRenderer.SetPosition(i, val4);
-							}
-						}
-					}
+					val5 += val4 * (num2 - gravityStartTime) * (num2 - gravityStartTime) / 2f;
 				}
+				bulletLineRenderers[i].SetPosition(j, val5);
 			}
 		}
 	}
@@ -1412,14 +1779,15 @@ public class Self : Player
 		return base.ActSpecialAction(start_effect, isSuccess);
 	}
 
-	public override void OnPrayerEnd(int prayer_id)
+	public override void OnPrayerEnd(PrayInfo prayInfo)
 	{
-		Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayer_id) as Player;
-		if (player != null && !player.isDead)
+		Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(prayInfo.targetId) as Player;
+		PRAY_REASON reason = prayInfo.reason;
+		if (reason == PRAY_REASON.DEAD && player != null && !player.isDead)
 		{
 			taskChecker.OnRevival();
 		}
-		base.OnPrayerEnd(prayer_id);
+		base.OnPrayerEnd(prayInfo);
 	}
 
 	public override void ActGrabbedStart(int enemyId, GrabInfo grabInfo)
@@ -1430,12 +1798,13 @@ public class Self : Player
 		StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(enemyId);
 		if (!(stageObject == null))
 		{
-			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, true);
+			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, disable: true);
 			InGameCameraManager.GrabInfo grabInfo2 = MonoBehaviourSingleton<InGameCameraManager>.I.grabInfo;
 			grabInfo2.enabled = true;
 			grabInfo2.enemyRoot = stageObject._transform;
 			grabInfo2.dir = grabInfo.toCameraDir.get_normalized();
 			grabInfo2.distance = grabInfo.cameraDistance;
+			grabInfo2.smoothMaxSpeed = grabInfo.smoothMaxSpeed;
 			MonoBehaviourSingleton<InGameCameraManager>.I.target = stageObject.FindNode(grabInfo.cameraLookAt);
 			MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.GRABBED);
 		}
@@ -1444,7 +1813,7 @@ public class Self : Player
 	public override void ActGrabbedEnd(float angle, float power)
 	{
 		base.ActGrabbedEnd(angle, power);
-		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, false);
+		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, disable: false);
 		MonoBehaviourSingleton<InGameCameraManager>.I.grabInfo.enabled = false;
 		MonoBehaviourSingleton<InGameCameraManager>.I.target = base._transform;
 		MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.DEFAULT);
@@ -1454,18 +1823,14 @@ public class Self : Player
 	{
 		statusSyncTime = STATUS_SYNC_INTERVAL;
 		syncHp = base.hp;
-		MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendSyncPlayerStatus(this, -1);
+		MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendSyncPlayerStatus(this);
 	}
 
 	public void CreateInkSplashEffect(Vector3 flickIconPos)
 	{
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Expected O, but got Unknown
 		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Expected O, but got Unknown
 		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
@@ -1483,23 +1848,24 @@ public class Self : Player
 			}
 		}
 		effect = EffectManager.GetEffect("ef_btl_target_flick", MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform);
-		if (null != effect)
+		if (!(null != effect))
 		{
-			effect.set_localPosition(flickIconPos);
-			effect.set_localScale(new Vector3(0.2f, 0.2f, 0.2f));
-			effectFlickWarning_ = effect.get_gameObject();
-			Renderer[] componentsInChildren2 = effectFlickWarning_.GetComponentsInChildren<Renderer>();
-			for (int j = 0; j < componentsInChildren2.Length; j++)
+			return;
+		}
+		effect.set_localPosition(flickIconPos);
+		effect.set_localScale(new Vector3(0.2f, 0.2f, 0.2f));
+		effectFlickWarning_ = effect.get_gameObject();
+		Renderer[] componentsInChildren2 = effectFlickWarning_.GetComponentsInChildren<Renderer>();
+		for (int j = 0; j < componentsInChildren2.Length; j++)
+		{
+			if (num >= componentsInChildren2[j].get_sortingOrder())
 			{
-				if (num >= componentsInChildren2[j].get_sortingOrder())
-				{
-					componentsInChildren2[j].set_sortingOrder(num + 1);
-				}
+				componentsInChildren2[j].set_sortingOrder(num + 1);
 			}
-			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
-			{
-				effect.set_localPosition(effect.get_localPosition() + INKSPLASH_LANDSCAPE_OFFSET);
-			}
+		}
+		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+		{
+			effect.set_localPosition(effect.get_localPosition() + INKSPLASH_LANDSCAPE_OFFSET);
 		}
 	}
 
@@ -1522,12 +1888,12 @@ public class Self : Player
 		{
 			if (null != inkSplashEffect_)
 			{
-				EffectManager.ReleaseEffect(inkSplashEffect_, true, false);
+				EffectManager.ReleaseEffect(inkSplashEffect_);
 				inkSplashEffect_ = null;
 			}
 			if (null != effectFlickWarning_)
 			{
-				EffectManager.ReleaseEffect(effectFlickWarning_, true, false);
+				EffectManager.ReleaseEffect(effectFlickWarning_);
 				effectFlickWarning_ = null;
 			}
 		}
@@ -1536,31 +1902,32 @@ public class Self : Player
 	public void UpdateInkSplash()
 	{
 		inkSplashTimer_ -= Time.get_deltaTime();
-		if (!(null == inkSplashCtrl_))
+		if (null == inkSplashCtrl_)
 		{
-			if (inkSplashState_ == 0)
+			return;
+		}
+		if (inkSplashState_ == 0)
+		{
+			float num = 2f * inkSplashTimerMax_ / 3f;
+			if (num > inkSplashTimer_)
 			{
-				float num = 2f * inkSplashTimerMax_ / 3f;
-				if (num > inkSplashTimer_)
-				{
-					inkSplashCtrl_.animator.Play("ACT1");
-					inkSplashState_++;
-				}
-			}
-			else if (inkSplashState_ == 1)
-			{
-				float num2 = inkSplashTimerMax_ / 3f;
-				if (num2 > inkSplashTimer_)
-				{
-					inkSplashCtrl_.animator.Play("ACT2");
-					inkSplashState_++;
-				}
-			}
-			else if (inkSplashState_ == 2 && 0f > inkSplashTimer_)
-			{
-				InkSplashEnd();
+				inkSplashCtrl_.animator.Play("ACT1");
 				inkSplashState_++;
 			}
+		}
+		else if (inkSplashState_ == 1)
+		{
+			float num2 = inkSplashTimerMax_ / 3f;
+			if (num2 > inkSplashTimer_)
+			{
+				inkSplashCtrl_.animator.Play("ACT2");
+				inkSplashState_++;
+			}
+		}
+		else if (inkSplashState_ == 2 && 0f > inkSplashTimer_)
+		{
+			InkSplashEnd();
+			inkSplashState_++;
 		}
 	}
 
@@ -1583,22 +1950,61 @@ public class Self : Player
 
 	private void RotateInkSplash(bool is_portrait)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
 		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = effectFlickWarning_.get_transform();
+		Transform transform = effectFlickWarning_.get_transform();
 		if (is_portrait)
 		{
-			val.set_localPosition(val.get_localPosition() - INKSPLASH_LANDSCAPE_OFFSET);
+			transform.set_localPosition(transform.get_localPosition() - INKSPLASH_LANDSCAPE_OFFSET);
 		}
 		else
 		{
-			val.set_localPosition(val.get_localPosition() + INKSPLASH_LANDSCAPE_OFFSET);
+			transform.set_localPosition(transform.get_localPosition() + INKSPLASH_LANDSCAPE_OFFSET);
+		}
+	}
+
+	private void CreateBlindEffect(float sec)
+	{
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		_blindTimer = sec;
+		if (_blindEffect != null)
+		{
+			return;
+		}
+		_blindEffect = EffectManager.GetEffect("ef_btl_pl_darkness_02", MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform);
+		if (!(_blindEffect == null))
+		{
+			_blindEffect.set_localPosition(new Vector3(0f, 0f, 1f));
+			Renderer[] componentsInChildren = _blindEffect.GetComponentsInChildren<Renderer>();
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				componentsInChildren[i].set_sortingOrder(10);
+			}
+		}
+	}
+
+	public void DestroyBlindEffect()
+	{
+		if (_blindEffect != null)
+		{
+			EffectManager.ReleaseEffect(_blindEffect.get_gameObject());
+			_blindEffect = null;
+		}
+	}
+
+	public void UpdateBlind()
+	{
+		if (!(_blindEffect == null))
+		{
+			_blindTimer -= Time.get_deltaTime();
+			if (_blindTimer <= 0f)
+			{
+				DestroyBlindEffect();
+			}
 		}
 	}
 
@@ -1635,7 +2041,7 @@ public class Self : Player
 
 	public bool IsActionFromAvoid()
 	{
-		if (base.actionID == ACTION_ID.MAX || base.actionID == (ACTION_ID)34)
+		if (base.actionID == ACTION_ID.MAX || base.actionID == (ACTION_ID)36 || base.actionID == (ACTION_ID)46 || base.actionID == (ACTION_ID)49)
 		{
 			if (base.attackMode == ATTACK_MODE.TWO_HAND_SWORD && !base.playerParameter.twoHandSwordActionInfo.avoidAttackEnable)
 			{
@@ -1648,8 +2054,6 @@ public class Self : Player
 
 	public override void CancelCannonMode()
 	{
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Expected O, but got Unknown
 		if (IsOnCannonMode())
 		{
 			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
@@ -1662,38 +2066,49 @@ public class Self : Player
 			}
 			if (effectTapTrans != null)
 			{
-				EffectManager.ReleaseEffect(effectTapTrans.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(effectTapTrans.get_gameObject());
 				effectTapTrans = null;
 			}
 			SetCannonState(CANNON_STATE.NONE);
 			base.targetFieldGimmickCannon = null;
+			base._rigidbody.set_isKinematic(false);
 		}
 	}
 
 	public override void SetCannonAimMode()
 	{
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() || MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 		{
-			LookAt(MonoBehaviourSingleton<StageObjectManager>.I.boss._position);
+			LookAt(MonoBehaviourSingleton<StageObjectManager>.I.boss._position, isBlindEnable: true);
 		}
 		if (base.targetFieldGimmickCannon != null)
 		{
-			cannonAimForward = _forward;
+			FieldGimmickCannonField fieldGimmickCannonField = base.targetFieldGimmickCannon as FieldGimmickCannonField;
+			if (fieldGimmickCannonField != null)
+			{
+				cannonAimForward = fieldGimmickCannonField.GetBaseTransformForward();
+			}
+			else
+			{
+				cannonAimForward = _forward;
+			}
 			Transform cannonTransform = base.targetFieldGimmickCannon.GetCannonTransform();
 			if (cannonTransform != null)
 			{
@@ -1709,7 +2124,7 @@ public class Self : Player
 			baseInputVec = Vector2.get_zero();
 			isBaseInputVec = false;
 			dragRateX = MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.cannonDragRateX;
-			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && base.targetFieldGimmickCannon.IsAimCamera())
 			{
 				MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.CANNON_AIM);
 			}
@@ -1845,69 +2260,159 @@ public class Self : Player
 	{
 		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.HEAT))
 		{
-			MonoBehaviourSingleton<UIEnemyStatus>.I.ShowShadowSealing(true);
+			MonoBehaviourSingleton<UIEnemyStatus>.I.ShowShadowSealing(isVisible: true);
 		}
 		else
 		{
-			MonoBehaviourSingleton<UIEnemyStatus>.I.ShowShadowSealing(false);
+			MonoBehaviourSingleton<UIEnemyStatus>.I.ShowShadowSealing(isVisible: false);
+		}
+	}
+
+	public void ResetConcussionUI()
+	{
+		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && IsOracleTwoHandSword())
+		{
+			MonoBehaviourSingleton<UIEnemyStatus>.I.ShowConcussion(isVisible: true);
+		}
+		else
+		{
+			MonoBehaviourSingleton<UIEnemyStatus>.I.ShowConcussion(isVisible: false);
 		}
 	}
 
 	public override void CheckBuffShadowSealing()
 	{
-		if (!isChangingWeapon)
+		if (isChangingWeapon)
 		{
-			if (!CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.HEAT))
-			{
-				_EndBuffShadowSealing();
-			}
-			else
-			{
-				Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-				if (object.ReferenceEquals(boss, null))
-				{
-					_EndBuffShadowSealing();
-				}
-				else if (!boss.IsDebuffShadowSealing())
-				{
-					_EndBuffShadowSealing();
-				}
-				else
-				{
-					_StartBuffShadowSealing();
-				}
-			}
+			return;
+		}
+		if (!CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.HEAT))
+		{
+			_EndBuffShadowSealing();
+			return;
+		}
+		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+		if (object.ReferenceEquals(boss, null))
+		{
+			_EndBuffShadowSealing();
+		}
+		else if (!boss.IsDebuffShadowSealing())
+		{
+			_EndBuffShadowSealing();
+		}
+		else
+		{
+			_StartBuffShadowSealing();
 		}
 	}
 
 	public bool CheckAvoidAttack()
 	{
-		if (IsActionFromAvoid() && base.enableSpAttackContinue)
+		if (!IsActionFromAvoid() || !base.enableSpAttackContinue)
 		{
-			switch (base.attackMode)
+			return false;
+		}
+		switch (base.attackMode)
+		{
+		case ATTACK_MODE.ONE_HAND_SWORD:
+			switch (base.spAttackType)
 			{
-			case ATTACK_MODE.TWO_HAND_SWORD:
-				if (base.spAttackType == SP_ATTACK_TYPE.NONE || base.spAttackType == SP_ATTACK_TYPE.HEAT)
-				{
-					ActAttack(20, true, false);
-					return true;
-				}
-				return false;
-			case ATTACK_MODE.SPEAR:
-				ActAttack(20, true, false);
+			case SP_ATTACK_TYPE.BURST:
+			{
+				int avoidAttackID = base.playerParameter.ohsActionInfo.burstOHSInfo.AvoidAttackID;
+				string motionLayerName5 = GetMotionLayerName(base.attackMode, base.spAttackType, avoidAttackID);
+				int id = avoidAttackID;
+				string motionLayerName2 = motionLayerName5;
+				ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
 				return true;
-			case ATTACK_MODE.PAIR_SWORDS:
-				if (base.spAttackType == SP_ATTACK_TYPE.NONE || base.spAttackType == SP_ATTACK_TYPE.HEAT)
-				{
-					ActAttack(20, true, false);
-					return true;
-				}
-				return false;
+			}
+			case SP_ATTACK_TYPE.ORACLE:
+			{
+				int avoidAttackId2 = base.playerParameter.ohsActionInfo.oracleOHSInfo.avoidAttackId;
+				string motionLayerName4 = GetMotionLayerName(base.attackMode, base.spAttackType, avoidAttackId2);
+				int id = avoidAttackId2;
+				string motionLayerName2 = motionLayerName4;
+				ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+				return true;
+			}
 			default:
 				return false;
 			}
+		case ATTACK_MODE.TWO_HAND_SWORD:
+			if (base.spAttackType == SP_ATTACK_TYPE.NONE || base.spAttackType == SP_ATTACK_TYPE.HEAT)
+			{
+				ActAttack(20, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+				return true;
+			}
+			if (base.spAttackType == SP_ATTACK_TYPE.BURST)
+			{
+				int burstAvoidAttackID = base.playerParameter.twoHandSwordActionInfo.burstTHSInfo.BurstAvoidAttackID;
+				string motionLayerName6 = GetMotionLayerName(base.attackMode, base.spAttackType, burstAvoidAttackID);
+				int id = burstAvoidAttackID;
+				string motionLayerName2 = motionLayerName6;
+				ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+				return true;
+			}
+			if (base.spAttackType == SP_ATTACK_TYPE.ORACLE)
+			{
+				int num2 = 64;
+				string motionLayerName7 = GetMotionLayerName(base.attackMode, base.spAttackType, num2);
+				int id = num2;
+				string motionLayerName2 = motionLayerName7;
+				ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+				return true;
+			}
+			return false;
+		case ATTACK_MODE.SPEAR:
+			switch (base.spAttackType)
+			{
+			case SP_ATTACK_TYPE.NONE:
+			case SP_ATTACK_TYPE.HEAT:
+				ActAttack(20, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+				return true;
+			case SP_ATTACK_TYPE.SOUL:
+				ActAttack(base.playerParameter.spearActionInfo.Soul_AvoidAttackId, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+				return true;
+			case SP_ATTACK_TYPE.ORACLE:
+			{
+				int avoidAttackId = base.playerParameter.spearActionInfo.oracle.avoidAttackId;
+				string motionLayerName3 = GetMotionLayerName(base.attackMode, base.spAttackType, avoidAttackId);
+				int id = avoidAttackId;
+				string motionLayerName2 = motionLayerName3;
+				ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+				return true;
+			}
+			default:
+				return false;
+			}
+		case ATTACK_MODE.PAIR_SWORDS:
+			if (base.spAttackType == SP_ATTACK_TYPE.NONE || base.spAttackType == SP_ATTACK_TYPE.HEAT)
+			{
+				ActAttack(20, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+				return true;
+			}
+			if (base.spAttackType == SP_ATTACK_TYPE.BURST)
+			{
+				ActAttack(21, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+				return true;
+			}
+			if (base.spAttackType == SP_ATTACK_TYPE.ORACLE)
+			{
+				int num = 45;
+				if (base.actionID == (ACTION_ID)49)
+				{
+					num = 43;
+				}
+				string motionLayerName = GetMotionLayerName(base.attackMode, base.spAttackType, num);
+				int id = num;
+				string motionLayerName2 = motionLayerName;
+				ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+				return true;
+			}
+			return false;
+		default:
+			return false;
 		}
-		return false;
 	}
 
 	public bool CheckAttackNext()
@@ -1919,27 +2424,38 @@ public class Self : Player
 		ATTACK_MODE attackMode = base.attackMode;
 		if (attackMode == ATTACK_MODE.PAIR_SWORDS && base.spAttackType == SP_ATTACK_TYPE.SOUL)
 		{
-			ActAttack(base.playerParameter.pairSwordsActionInfo.Soul_AttackNextId, true, false);
+			ActAttack(base.playerParameter.pairSwordsActionInfo.Soul_AttackNextId, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
 			return true;
 		}
 		return false;
 	}
 
+	public bool CheckWeaponActionForSpAction()
+	{
+		if (!base.enableWeaponAction)
+		{
+			return false;
+		}
+		EventWeaponActionStart();
+		return true;
+	}
+
 	private void UpdateSpearJumpEffect()
 	{
-		if (jumpState <= eJumpState.Charge)
+		if (jumpState > eJumpState.Charge)
 		{
-			float chargingRate = GetChargingRate();
-			if (chargingRate >= 1f)
+			return;
+		}
+		float chargingRate = GetChargingRate();
+		if (chargingRate >= 1f)
+		{
+			EffectCtrl component = arrowAimLesserCursorEffect.GetComponent<EffectCtrl>();
+			if (!object.ReferenceEquals(component, null))
 			{
-				EffectCtrl component = arrowAimLesserCursorEffect.GetComponent<EffectCtrl>();
-				if (!object.ReferenceEquals(component, null))
-				{
-					int num = CheckGaugeLevel();
-					component.Play("LEVEL" + num);
-				}
-				jumpState = eJumpState.Charged;
+				int num = CheckGaugeLevel();
+				component.Play("LEVEL" + num);
 			}
+			jumpState = eJumpState.Charged;
 		}
 	}
 
@@ -1956,7 +2472,7 @@ public class Self : Player
 		OnJumpRize(arrowAimLesserCursorPos, useGaugeLevel);
 		if (!base.isArrowAimKeep && base.isArrowAimLesserMode)
 		{
-			SetArrowAimLesserMode(false);
+			SetArrowAimLesserMode(enable: false);
 		}
 		base.isArrowAimable = false;
 		base.isArrowAimKeep = false;
@@ -1985,12 +2501,36 @@ public class Self : Player
 					MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnSoulTwoHandSword();
 				}
 			}
+			if (CheckAttackModeAndSpType(ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.SOUL))
+			{
+				taskChecker.OnSoulSpear();
+				if (MonoBehaviourSingleton<InGameManager>.IsValid())
+				{
+					MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnSoulSpear();
+				}
+			}
+			if (CheckAttackModeAndSpType(ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.BURST))
+			{
+				taskChecker.OnBurstPairSwords();
+				if (MonoBehaviourSingleton<InGameManager>.IsValid())
+				{
+					MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnBurstPairSwords();
+				}
+			}
 			if (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
 			{
 				taskChecker.OnSoulArrow();
 				if (MonoBehaviourSingleton<InGameManager>.IsValid())
 				{
 					MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnSoulArrow();
+				}
+			}
+			if (CheckAttackModeAndSpType(ATTACK_MODE.ARROW, SP_ATTACK_TYPE.BURST))
+			{
+				taskChecker.OnBurstArrow();
+				if (MonoBehaviourSingleton<InGameManager>.IsValid())
+				{
+					MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnBurstArrow();
 				}
 			}
 		}
@@ -2016,7 +2556,7 @@ public class Self : Player
 		{
 			return false;
 		}
-		if (!IsChangeableAction((ACTION_ID)35) && !EnableActionUseEvolve())
+		if (!IsChangeableAction((ACTION_ID)37) && !EnableActionUseEvolve())
 		{
 			return false;
 		}
@@ -2026,7 +2566,7 @@ public class Self : Player
 
 	private bool EnableActionUseEvolve()
 	{
-		if (base.actionID == (ACTION_ID)28)
+		if (base.actionID == (ACTION_ID)30)
 		{
 			return true;
 		}
@@ -2039,6 +2579,14 @@ public class Self : Player
 		{
 			snatchCtrl.Cancel();
 			SetNextTrigger(1);
+		}
+	}
+
+	public override void OnAvoidHit(StageObject fromObject, AttackHitInfo attackHitInfo)
+	{
+		if (fromObject is Enemy && CheckAttackModeAndSpType(ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.ORACLE) && base.actionID == (ACTION_ID)49)
+		{
+			pairSwordsCtrl.JustAvoid();
 		}
 	}
 
@@ -2057,72 +2605,80 @@ public class Self : Player
 		return base.GetTargetPos(out pos);
 	}
 
-	public bool isMultiLockMax()
+	public bool IsChangeableAction(ACTION_ID action_id, int _motionId)
 	{
-		int multiLockMax = GetMultiLockMax();
-		int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
-		return multiLockNum >= multiLockMax;
+		if (_motionId <= 0)
+		{
+			return IsChangeableAction(action_id);
+		}
+		if (action_id == ACTION_ID.ATTACK && IsBurstTwoHandSword() && _motionId == base.playerParameter.twoHandSwordActionInfo.burstTHSInfo.FirstReloadActionAttackID)
+		{
+			return thsCtrl != null && thsCtrl.IsChangebleReloadAction();
+		}
+		return IsChangeableAction(action_id);
 	}
 
-	private int GetMultiLockMax()
+	public bool isMultiLockMax()
 	{
-		return (!base.isBoostMode) ? base.playerParameter.arrowActionInfo.soulLockMax : base.playerParameter.arrowActionInfo.soulBoostLockMax;
+		int soulArrowLockNum = GetSoulArrowLockNum();
+		int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
+		return multiLockNum >= soulArrowLockNum;
 	}
 
 	private void CheckMultiLock(Vector3 start, Vector3 dir)
 	{
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
+		if (!MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
-			int multiLockMax = GetMultiLockMax();
-			int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
-			RaycastHit val = default(RaycastHit);
-			if (multiLockNum < multiLockMax && Physics.Raycast(start, dir, ref val, base.playerParameter.arrowActionInfo.soulRaycastDistance, 16))
+			return;
+		}
+		int soulArrowLockNum = GetSoulArrowLockNum();
+		int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
+		RaycastHit val = default(RaycastHit);
+		if (multiLockNum >= soulArrowLockNum || !Physics.Raycast(start, dir, ref val, base.playerParameter.arrowActionInfo.soulRaycastDistance, 16))
+		{
+			return;
+		}
+		MultiLockMarker component = val.get_transform().GetComponent<MultiLockMarker>();
+		if (!(component == null) && component.Lock(multiLockNum, base.isBoostMode))
+		{
+			multiLockNum++;
+			SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockSeId, this, FindNode(string.Empty));
+			int targetMarkerNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetTargetMarkerNum();
+			if (multiLockNum >= soulArrowLockNum || multiLockNum >= targetMarkerNum)
 			{
-				MultiLockMarker component = val.get_transform().GetComponent<MultiLockMarker>();
-				if (!(component == null) && component.Lock(multiLockNum, base.isBoostMode))
-				{
-					multiLockNum++;
-					SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockSeId, this, FindNode(string.Empty));
-					int targetMarkerNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetTargetMarkerNum();
-					if (multiLockNum >= multiLockMax || multiLockNum >= targetMarkerNum)
-					{
-						MonoBehaviourSingleton<TargetMarkerManager>.I.HideMultiLock();
-						EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity(), false);
-						SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockMaxSeId, this, FindNode(string.Empty));
-						SetBulletLineColor(true);
-					}
-				}
+				MonoBehaviourSingleton<TargetMarkerManager>.I.HideMultiLock();
+				EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity());
+				SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockMaxSeId, this, FindNode(string.Empty));
+				SetBulletLineColor(isMax: true);
 			}
 		}
 	}
 
 	public void CheckMultiLock(MultiLockMarker m)
 	{
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m == null) && MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
+		if (m == null || !MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
 		{
-			int multiLockMax = GetMultiLockMax();
-			int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
-			if (multiLockNum < multiLockMax && m.Lock(multiLockNum, base.isBoostMode))
+			return;
+		}
+		int soulArrowLockNum = GetSoulArrowLockNum();
+		int multiLockNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetMultiLockNum();
+		if (multiLockNum < soulArrowLockNum && m.Lock(multiLockNum, base.isBoostMode))
+		{
+			multiLockNum++;
+			SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockSeId, this, FindNode(string.Empty));
+			int targetMarkerNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetTargetMarkerNum();
+			if (multiLockNum >= soulArrowLockNum || multiLockNum >= targetMarkerNum)
 			{
-				multiLockNum++;
-				SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockSeId, this, FindNode(string.Empty));
-				int targetMarkerNum = MonoBehaviourSingleton<TargetMarkerManager>.I.GetTargetMarkerNum();
-				if (multiLockNum >= multiLockMax || multiLockNum >= targetMarkerNum)
-				{
-					MonoBehaviourSingleton<TargetMarkerManager>.I.HideMultiLock();
-					EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity(), false);
-					SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockMaxSeId, this, FindNode(string.Empty));
-					SetBulletLineColor(true);
-				}
+				MonoBehaviourSingleton<TargetMarkerManager>.I.HideMultiLock();
+				EffectManager.OneShot("ef_btl_wsk_charge_end_01", FindNode("R_Wep").get_transform().get_position(), Quaternion.get_identity());
+				SoundManager.PlayOneShotSE(base.playerParameter.arrowActionInfo.soulLockMaxSeId, this, FindNode(string.Empty));
+				SetBulletLineColor(isMax: true);
 			}
 		}
 	}
@@ -2134,10 +2690,50 @@ public class Self : Player
 		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		Color val = (!isMax) ? ((base.spAttackType != SP_ATTACK_TYPE.SOUL) ? base.playerParameter.arrowActionInfo.bulletLineColor : base.playerParameter.arrowActionInfo.bulletLineColorSoul) : base.playerParameter.arrowActionInfo.bulletLineColorSoulFull;
-		bulletLineRenderer.SetColors(val, val);
+		for (int i = 0; i < bulletLineRenderers.Count; i++)
+		{
+			bulletLineRenderers[i].SetColors(val, val);
+		}
+	}
+
+	public void CheckWaveMatchAutoRevive()
+	{
+		if (MonoBehaviourSingleton<UISpectatorButton>.IsValid() && MonoBehaviourSingleton<UISpectatorButton>.I.IsEnable() && !MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop)
+		{
+			ActDeadStandup(base.hpMax, eContinueType.REACH_NEXT_WAVE);
+			if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+			{
+				MonoBehaviourSingleton<UIPlayerStatus>.I.DoEnable();
+			}
+			MonoBehaviourSingleton<UISpectatorButton>.I.EndSpect();
+			MonoBehaviourSingleton<UISkillButtonGroup>.I.DoEnable();
+			MonoBehaviourSingleton<InGameCameraManager>.I.AdjustCameraPosition();
+		}
+	}
+
+	private void UpdateAerialCollider()
+	{
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		if (pairSwordsCtrl.IsUpdateAerialCollider() && (base.isAerial || lastAerialFlag))
+		{
+			if (base.isAerial)
+			{
+				ref Vector3 reference = ref colliderCenter;
+				Vector3 localPosition = base.loader.socketRoot.get_localPosition();
+				reference.y = localPosition.y;
+			}
+			else
+			{
+				colliderCenter.y = _capsuleCollider.get_height() * 0.5f;
+			}
+			_capsuleCollider.set_center(colliderCenter);
+			lastAerialFlag = base.isAerial;
+		}
 	}
 
 	public void SetSpearCursorPos(Vector3 vec)
@@ -2146,10 +2742,67 @@ public class Self : Player
 		arrowAimLesserCursorPos = vec;
 	}
 
+	public override void RainShotChargeRelease()
+	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		base.RainShotChargeRelease();
+		Vector3 pos = base._transform.get_position() + arrowAimLesserCursorPos;
+		Quaternion rotation = base._transform.get_rotation();
+		Vector3 eulerAngles = rotation.get_eulerAngles();
+		float y = eulerAngles.y;
+		OnRainShotChargeRelease(pos, y);
+		if (!base.isArrowAimKeep && base.isArrowAimLesserMode)
+		{
+			SetArrowAimLesserMode(enable: false);
+		}
+		base.isArrowAimable = false;
+		base.isArrowAimKeep = false;
+		base.isArrowAimEnd = false;
+		MonoBehaviourSingleton<InGameCameraManager>.I.AdjustCameraPosition();
+	}
+
+	public bool IsAbleArrowRainShot()
+	{
+		if (!CheckAttackMode(ATTACK_MODE.ARROW))
+		{
+			return false;
+		}
+		if (base.spAttackType != SP_ATTACK_TYPE.BURST)
+		{
+			return false;
+		}
+		if (!base.enableSpAttackContinue)
+		{
+			return false;
+		}
+		if (!IsActionFromAvoid() && !base.isArrowRainShot)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public Vector3 GetArrowAimLesserCursorEffect()
+	{
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		if (arrowAimLesserCursorEffect != null)
+		{
+			return arrowAimLesserCursorEffect.get_transform().get_position();
+		}
+		return Vector3.get_zero();
+	}
+
 	public void SwitchAutoBattle(bool isTurnOn)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		if (isTurnOn && !isAutoMode)
 		{
 			Object.DestroyImmediate(base.controller);

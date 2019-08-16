@@ -1,10 +1,11 @@
-package android.support.v4.provider;
+package android.support.p000v4.provider;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import java.io.File;
 
+/* renamed from: android.support.v4.provider.DocumentFile */
 public abstract class DocumentFile {
     static final String TAG = "DocumentFile";
     private final DocumentFile mParent;
@@ -18,15 +19,24 @@ public abstract class DocumentFile {
     }
 
     public static DocumentFile fromSingleUri(Context context, Uri uri) {
-        return VERSION.SDK_INT >= 19 ? new SingleDocumentFile(null, context, uri) : null;
+        if (VERSION.SDK_INT >= 19) {
+            return new SingleDocumentFile(null, context, uri);
+        }
+        return null;
     }
 
     public static DocumentFile fromTreeUri(Context context, Uri uri) {
-        return VERSION.SDK_INT >= 21 ? new TreeDocumentFile(null, context, DocumentsContractApi21.prepareTreeUri(uri)) : null;
+        if (VERSION.SDK_INT >= 21) {
+            return new TreeDocumentFile(null, context, DocumentsContractApi21.prepareTreeUri(uri));
+        }
+        return null;
     }
 
     public static boolean isDocumentUri(Context context, Uri uri) {
-        return VERSION.SDK_INT >= 19 ? DocumentsContractApi19.isDocumentUri(context, uri) : false;
+        if (VERSION.SDK_INT >= 19) {
+            return DocumentsContractApi19.isDocumentUri(context, uri);
+        }
+        return false;
     }
 
     public abstract boolean canRead();
@@ -42,6 +52,7 @@ public abstract class DocumentFile {
     public abstract boolean exists();
 
     public DocumentFile findFile(String str) {
+        DocumentFile[] listFiles;
         for (DocumentFile documentFile : listFiles()) {
             if (str.equals(documentFile.getName())) {
                 return documentFile;

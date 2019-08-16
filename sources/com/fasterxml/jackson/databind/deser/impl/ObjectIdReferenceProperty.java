@@ -28,11 +28,10 @@ public class ObjectIdReferenceProperty extends SettableBeanProperty {
         }
 
         public void handleResolvedForwardReference(Object obj, Object obj2) throws IOException {
-            if (hasId(obj)) {
-                this._parent.set(this._pojo, obj2);
-                return;
+            if (!hasId(obj)) {
+                throw new IllegalArgumentException("Trying to resolve a forward reference with id [" + obj + "] that wasn't previously seen as unresolved.");
             }
-            throw new IllegalArgumentException("Trying to resolve a forward reference with id [" + obj + "] that wasn't previously seen as unresolved.");
+            this._parent.set(this._pojo, obj2);
         }
     }
 
@@ -43,7 +42,7 @@ public class ObjectIdReferenceProperty extends SettableBeanProperty {
     }
 
     public ObjectIdReferenceProperty(ObjectIdReferenceProperty objectIdReferenceProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) objectIdReferenceProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) objectIdReferenceProperty, jsonDeserializer);
         this._forward = objectIdReferenceProperty._forward;
         this._objectIdInfo = objectIdReferenceProperty._objectIdInfo;
     }
@@ -55,7 +54,7 @@ public class ObjectIdReferenceProperty extends SettableBeanProperty {
     }
 
     public SettableBeanProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new ObjectIdReferenceProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new ObjectIdReferenceProperty(this, jsonDeserializer);
     }
 
     public SettableBeanProperty withName(PropertyName propertyName) {
@@ -81,10 +80,9 @@ public class ObjectIdReferenceProperty extends SettableBeanProperty {
     public Object deserializeSetAndReturn(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
         try {
             return setAndReturn(obj, deserialize(jsonParser, deserializationContext));
-        } catch (Throwable e) {
-            Object obj2 = (this._objectIdInfo == null && this._valueDeserializer.getObjectIdReader() == null) ? null : 1;
-            if (obj2 == null) {
-                throw JsonMappingException.from(jsonParser, "Unresolved forward reference but no identity info.", e);
+        } catch (UnresolvedForwardReference e) {
+            if (!((this._objectIdInfo == null && this._valueDeserializer.getObjectIdReader() == null) ? false : true)) {
+                throw JsonMappingException.from(jsonParser, "Unresolved forward reference but no identity info.", (Throwable) e);
             }
             e.getRoid().appendReferring(new PropertyReferring(this, e, this._type.getRawClass(), obj));
             return null;

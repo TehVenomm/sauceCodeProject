@@ -132,8 +132,6 @@ public class GuildMessage : GameSection
 
 	private class ChatItemListData
 	{
-		private const float DEFAULT_OFFSET = -26f;
-
 		public GameObject rootObject;
 
 		public List<GuildChatItem> itemList;
@@ -143,6 +141,8 @@ public class GuildMessage : GameSection
 		public int oldestItemIndex;
 
 		public float slideOffset;
+
+		private const float DEFAULT_OFFSET = -26f;
 
 		public ChatItemListData(GameObject root)
 		{
@@ -160,7 +160,6 @@ public class GuildMessage : GameSection
 
 		public void Reset()
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			int i = 0;
 			for (int count = itemList.Count; i < count; i++)
 			{
@@ -172,11 +171,8 @@ public class GuildMessage : GameSection
 
 		public void MoveAll(float y)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Expected O, but got Unknown
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
@@ -184,10 +180,10 @@ public class GuildMessage : GameSection
 			int i = 0;
 			for (int count = itemList.Count; i < count; i++)
 			{
-				Transform val = itemList[i].get_transform();
-				Vector3 localPosition2 = val.get_localPosition();
+				Transform transform = itemList[i].get_transform();
+				Vector3 localPosition2 = transform.get_localPosition();
 				localPosition.y = localPosition2.y + y;
-				val.set_localPosition(localPosition);
+				transform.set_localPosition(localPosition);
 			}
 		}
 	}
@@ -283,21 +279,9 @@ public class GuildMessage : GameSection
 		UPDATE
 	}
 
-	public const string EVENT_AGE_CONFIRM = "CHAT_AGE_CONFIRM";
-
-	private const int CHAT_ITEM_OFFSET = 22;
-
-	private const int FORCE_SCROLL_LIMIT = 32;
-
-	private const float SOFTNESS_HEIGHT = 10f;
-
-	private const float SPRING_STRENGTH = 20f;
-
-	private const float CHAT_WIDTH = 410f;
-
-	private const int ITEM_COUNT_MAX = 30;
-
 	private static readonly string STAMP_SYMBOL_BEGIN = "[STMP]";
+
+	public const string EVENT_AGE_CONFIRM = "CHAT_AGE_CONFIRM";
 
 	private TouchScreenKeyboard m_Keyboard;
 
@@ -334,6 +318,18 @@ public class GuildMessage : GameSection
 	private UIRect m_RootRect;
 
 	private UIInput m_Input;
+
+	private const int CHAT_ITEM_OFFSET = 22;
+
+	private const int FORCE_SCROLL_LIMIT = 32;
+
+	private const float SOFTNESS_HEIGHT = 10f;
+
+	private const float SPRING_STRENGTH = 20f;
+
+	private const float CHAT_WIDTH = 410f;
+
+	private const int ITEM_COUNT_MAX = 30;
 
 	private List<int> m_StampIdListCanPost;
 
@@ -474,16 +470,6 @@ public class GuildMessage : GameSection
 
 	public override void Initialize()
 	{
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveText += OnReceiveClanText;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveStamp += OnReceiveClanStamp;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceivePrivateText += OnReceiveClanPrivateText;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceivePrivateStamp += OnReceiveClanPrivateStamp;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveNotification += OnReceiveClanNotification;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveUpdateStatus += OnReceiveUpdateStatus;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onJoin += OnJoinClanChat;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onDisconnect += OnDisconnectClanChat;
-		MonoBehaviourSingleton<ChatManager>.I.clanChat.onLeave += OnLeaveClanChat;
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -491,39 +477,39 @@ public class GuildMessage : GameSection
 	{
 		_chatType = ((MonoBehaviourSingleton<GuildManager>.I.talkUser != null) ? CHAT_TYPE.MEMBER : CHAT_TYPE.CLAN);
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_quest_chatitem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatItem", false);
-		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem", false);
-		LoadObject lo_quest_chatpinitem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatPinItem", false);
-		LoadObject lo_chatAdvisaryItem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatAdvisoryItem", false);
-		LoadObject lo_quest_donatepinitem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildDonatePinItem", false);
+		LoadObject lo_quest_chatitem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatItem");
+		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
+		LoadObject lo_quest_chatpinitem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatPinItem");
+		LoadObject lo_chatAdvisaryItem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatAdvisoryItem");
+		LoadObject lo_quest_donatepinitem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildDonatePinItem");
 		bool finish_chat_log = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendClanChatLog(delegate(bool success, GuildChatModel ret)
 		{
-			((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003Cfinish_chat_log_003E__6 = true;
-			((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.AddClanChatLog(ret.result.array);
+			finish_chat_log = true;
+			AddClanChatLog(ret.result.array);
 			if (ret.result.pin != null)
 			{
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage = new ClanChatLogMessageData();
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage.fromUserId = ret.result.pin.fromUserId;
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage.id = ret.result.pin.id;
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage.type = ret.result.pin.type;
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage.message = ret.result.pin.message;
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage.uuid = ret.result.pin.uuid;
-				if (((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage.type == 1)
+				pinMessage = new ClanChatLogMessageData();
+				pinMessage.fromUserId = ret.result.pin.fromUserId;
+				pinMessage.id = ret.result.pin.id;
+				pinMessage.type = ret.result.pin.type;
+				pinMessage.message = ret.result.pin.message;
+				pinMessage.uuid = ret.result.pin.uuid;
+				if (pinMessage.type == 1)
 				{
-					((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.pinMessage.stampId = int.Parse(ret.result.pin.message);
+					pinMessage.stampId = int.Parse(ret.result.pin.message);
 				}
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this.senerInfo = ret.result.pin.charInfo;
+				senerInfo = ret.result.pin.charInfo;
 			}
 			if (ret.result.advisory != null)
 			{
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_00e4: stateMachine*/)._003C_003Ef__this._advisaryData = ret.result.advisory;
+				_advisaryData = ret.result.advisory;
 			}
 		});
 		bool finish_donate_list = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_0101: stateMachine*/)._003Cfinish_donate_list_003E__7 = true;
+			finish_donate_list = true;
 		});
 		bool finish_log_member = true;
 		if (_chatType == CHAT_TYPE.MEMBER && MonoBehaviourSingleton<GuildManager>.I.talkUser != null)
@@ -531,17 +517,17 @@ public class GuildMessage : GameSection
 			finish_log_member = false;
 			MonoBehaviourSingleton<GuildManager>.I.SendPrivateClanChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, delegate(bool success, GuildPrivateChatModel ret)
 			{
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_0154: stateMachine*/)._003C_003Ef__this.AddMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, ret.result.array);
-				((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_0154: stateMachine*/)._003Cfinish_log_member_003E__8 = true;
+				AddMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, ret.result.array);
+				finish_log_member = true;
 			});
 		}
 		while (!finish_chat_log || !finish_donate_list || !finish_log_member)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		m_DataList[0] = new ChatItemListData(GetCtrl(UI.OBJ_CLAN_ITEM_LIST_ROOT).get_gameObject());
 		m_DataList[1] = new ChatItemListData(GetCtrl(UI.OBJ_MEMBER_ITEM_LIST_ROOT).get_gameObject());
@@ -558,21 +544,21 @@ public class GuildMessage : GameSection
 		m_DonatePinItemPrefab = (lo_quest_donatepinitem.loadedObject as GameObject);
 		DummyDragScroll.width = 410;
 		InitStampList();
-		SetActive((Enum)UI.OBJ_STAMP_UP, false);
-		SetActive((Enum)UI.OBJ_STAMP_DOWN, true);
+		SetActive((Enum)UI.OBJ_STAMP_UP, is_visible: false);
+		SetActive((Enum)UI.OBJ_STAMP_DOWN, is_visible: true);
 		object event_data = GameSection.GetEventData();
 		if (event_data != null && event_data is VIEW_TYPE)
 		{
-			_viewType = (VIEW_TYPE)(int)event_data;
+			_viewType = (VIEW_TYPE)event_data;
 		}
 		bool waitToGetMember = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendMemberList(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator4F)/*Error near IL_03c6: stateMachine*/)._003CwaitToGetMember_003E__11 = false;
+			waitToGetMember = false;
 		});
 		while (waitToGetMember)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		UIPanel chatPanel = ScrollView.get_gameObject().GetComponent<UIPanel>();
 		baseClipRegion = chatPanel.baseClipRegion;
@@ -593,7 +579,6 @@ public class GuildMessage : GameSection
 
 	public override void InitializeReopen()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (_viewType == VIEW_TYPE.CHAT)
 		{
 			this.StartCoroutine(DoInitializeReopen());
@@ -613,14 +598,14 @@ public class GuildMessage : GameSection
 			finish_log_member = false;
 			MonoBehaviourSingleton<GuildManager>.I.SendPrivateClanChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, delegate(bool success, GuildPrivateChatModel ret)
 			{
-				((_003CDoInitializeReopen_003Ec__Iterator50)/*Error near IL_0084: stateMachine*/)._003C_003Ef__this.ResetMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId);
-				((_003CDoInitializeReopen_003Ec__Iterator50)/*Error near IL_0084: stateMachine*/)._003C_003Ef__this.AddMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, ret.result.array);
-				((_003CDoInitializeReopen_003Ec__Iterator50)/*Error near IL_0084: stateMachine*/)._003Cfinish_log_member_003E__0 = true;
+				ResetMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId);
+				AddMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, ret.result.array);
+				finish_log_member = true;
 			});
 		}
 		while (!finish_log_member)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.InitializeReopen();
 	}
@@ -630,15 +615,6 @@ public class GuildMessage : GameSection
 		base.OnDestroy();
 		if (MonoBehaviourSingleton<ChatManager>.IsValid())
 		{
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveText -= OnReceiveClanText;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveStamp -= OnReceiveClanStamp;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceivePrivateText -= OnReceiveClanPrivateText;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceivePrivateStamp -= OnReceiveClanPrivateStamp;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveNotification -= OnReceiveClanNotification;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveUpdateStatus -= OnReceiveUpdateStatus;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onJoin -= OnJoinClanChat;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onDisconnect -= OnDisconnectClanChat;
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onLeave -= OnLeaveClanChat;
 		}
 	}
 
@@ -670,7 +646,7 @@ public class GuildMessage : GameSection
 			float w2 = finalClipRegion.w;
 			Vector2 clipOffset = ScrollView.panel.clipOffset;
 			float num3 = num2 - (w2 + clipOffset.y);
-			object dragScrollCollider = (object)DragScrollCollider;
+			BoxCollider dragScrollCollider = DragScrollCollider;
 			Vector4 val3 = ScrollView.panel.baseClipRegion;
 			dragScrollCollider.set_center(Vector2.op_Implicit(new Vector2(val3.x, 0f - num3)));
 		}
@@ -686,7 +662,7 @@ public class GuildMessage : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_NO_DONATE, false);
+			SetActive((Enum)UI.LBL_NO_DONATE, is_visible: false);
 			if (!GameSceneEvent.IsStay())
 			{
 				GameSceneEvent.Stay();
@@ -694,7 +670,7 @@ public class GuildMessage : GameSection
 			MonoBehaviourSingleton<GuildManager>.I.SendDonateList(delegate
 			{
 				UpdateDonate();
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			});
 		}
 		UpdateClanBadge();
@@ -712,7 +688,7 @@ public class GuildMessage : GameSection
 			MonoBehaviourSingleton<GuildManager>.I.SendDonateList(delegate
 			{
 				UpdateDonate();
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			});
 		}
 	}
@@ -727,8 +703,8 @@ public class GuildMessage : GameSection
 		}
 		else
 		{
-			SetActive(FindCtrl(base._transform, UI.BTN_MEMBER), UI.SPR_BADGE, false);
-			SetActive(FindCtrl(base._transform, UI.BTN_GUILD_SETTING), UI.SPR_BADGE, false);
+			SetActive(FindCtrl(base._transform, UI.BTN_MEMBER), UI.SPR_BADGE, is_visible: false);
+			SetActive(FindCtrl(base._transform, UI.BTN_GUILD_SETTING), UI.SPR_BADGE, is_visible: false);
 		}
 	}
 
@@ -737,7 +713,7 @@ public class GuildMessage : GameSection
 		ClanUpdateStatus();
 		if (IsValidDispatchEventInUpdate() && !GameSaveData.instance.isShowChatOfferBanner && MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId)
 		{
-			DispatchEvent("BANNER_CLANCHATOFFER", null);
+			DispatchEvent("BANNER_CLANCHATOFFER");
 			GameSaveData.instance.isShowChatOfferBanner = true;
 		}
 	}
@@ -769,31 +745,19 @@ public class GuildMessage : GameSection
 
 	private void UpdateChat()
 	{
-		bool hasConnect = MonoBehaviourSingleton<ChatManager>.I.clanChat.HasConnect;
-		SetActive((Enum)UI.OBJ_POST_BLOCK, !hasConnect);
-		SetActive((Enum)UI.BTN_CHAT, !hasConnect);
-		SetActive((Enum)UI.OBJ_CHAT_INPUT, hasConnect);
+		bool flag = false;
+		SetActive((Enum)UI.OBJ_POST_BLOCK, !flag);
+		SetActive((Enum)UI.BTN_CHAT, !flag);
+		SetActive((Enum)UI.OBJ_CHAT_INPUT, flag);
 		SetLabelText((Enum)UI.LBL_CONNECTION_STATUS, base.sectionData.GetText("TEXT_DISCONNECT"));
 		SetButtonEvent((Enum)UI.BTN_CHAT, new EventDelegate(delegate
 		{
-			SetActive((Enum)UI.OBJ_STAMP_UP, true);
-			SetActive((Enum)UI.OBJ_STAMP_DOWN, false);
+			SetActive((Enum)UI.OBJ_STAMP_UP, is_visible: true);
+			SetActive((Enum)UI.OBJ_STAMP_DOWN, is_visible: false);
 		}));
 		SetButtonEvent((Enum)UI.BTN_RECONNECT, new EventDelegate(delegate
 		{
 			SetLabelText((Enum)UI.LBL_CONNECTION_STATUS, base.sectionData.GetText("TEXT_CONNECTING"));
-			if (!MonoBehaviourSingleton<ChatManager>.I.clanChat.IsConnecting)
-			{
-				MonoBehaviourSingleton<ChatManager>.I.CreateClanChat(MonoBehaviourSingleton<GuildManager>.I.guildInfos.chat, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, delegate(bool success)
-				{
-					if (success)
-					{
-						SetActive((Enum)UI.OBJ_POST_BLOCK, false);
-						SetActive((Enum)UI.BTN_CHAT, false);
-						SetActive((Enum)UI.OBJ_CHAT_INPUT, true);
-					}
-				});
-			}
 		}));
 		SetButtonEvent((Enum)UI.BTN_TAB_GUILD, new EventDelegate(delegate
 		{
@@ -806,13 +770,13 @@ public class GuildMessage : GameSection
 		}));
 		SetButtonEvent((Enum)UI.BTN_STAMP_UP, new EventDelegate(delegate
 		{
-			SetActive((Enum)UI.OBJ_STAMP_UP, true);
-			SetActive((Enum)UI.OBJ_STAMP_DOWN, false);
+			SetActive((Enum)UI.OBJ_STAMP_UP, is_visible: true);
+			SetActive((Enum)UI.OBJ_STAMP_DOWN, is_visible: false);
 		}));
 		SetButtonEvent((Enum)UI.BTN_STAMP_DOWN, new EventDelegate(delegate
 		{
-			SetActive((Enum)UI.OBJ_STAMP_UP, false);
-			SetActive((Enum)UI.OBJ_STAMP_DOWN, true);
+			SetActive((Enum)UI.OBJ_STAMP_UP, is_visible: false);
+			SetActive((Enum)UI.OBJ_STAMP_DOWN, is_visible: true);
 		}));
 		SetInputSubmitEvent((Enum)UI.IPT_POST, new EventDelegate(delegate
 		{
@@ -835,15 +799,16 @@ public class GuildMessage : GameSection
 			{
 				MonoBehaviourSingleton<GuildManager>.I.UpdateTalkUser();
 			}
-			if (MonoBehaviourSingleton<GuildManager>.I.talkUser != null)
+			if (MonoBehaviourSingleton<GuildManager>.I.talkUser == null)
 			{
-				List<ChatPostRequest> memberChatLog = GetMemberChatLog(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<GuildManager>.I.talkUser.userId);
-				if (memberChatLog != null)
+				return;
+			}
+			List<ChatPostRequest> memberChatLog = GetMemberChatLog(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<GuildManager>.I.talkUser.userId);
+			if (memberChatLog != null)
+			{
+				for (int i = 0; i < memberChatLog.Count; i++)
 				{
-					for (int i = 0; i < memberChatLog.Count; i++)
-					{
-						Post(memberChatLog[i]);
-					}
+					Post(memberChatLog[i]);
 				}
 			}
 		}
@@ -865,7 +830,7 @@ public class GuildMessage : GameSection
 	private void UpdateTabChat()
 	{
 		m_ChatTabListData.Clear();
-		SetGrid(UI.GRD_TAB_CHAT, "GuildMessageTabListItem", MonoBehaviourSingleton<GuildManager>.I.talkUsers.Count, true, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_TAB_CHAT, "GuildMessageTabListItem", MonoBehaviourSingleton<GuildManager>.I.talkUsers.Count, reset: true, delegate(int i, Transform t, bool b)
 		{
 			FriendCharaInfo friendCharaInfo = MonoBehaviourSingleton<GuildManager>.I.talkUsers[i];
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id != friendCharaInfo.userId)
@@ -1008,7 +973,7 @@ public class GuildMessage : GameSection
 			MonoBehaviourSingleton<GuildManager>.I.RemoveTalkUser(friendCharaInfo);
 		}
 		_chatType = ((MonoBehaviourSingleton<GuildManager>.I.talkUser != null) ? CHAT_TYPE.MEMBER : CHAT_TYPE.CLAN);
-		GameSection.ResumeEvent(false, null);
+		GameSection.ResumeEvent(is_resume: false);
 		RefreshUI();
 	}
 
@@ -1019,27 +984,25 @@ public class GuildMessage : GameSection
 		FriendCharaInfo friendCharaInfo = MonoBehaviourSingleton<GuildManager>.I.talkUsers[index];
 		if (MonoBehaviourSingleton<GuildManager>.I.talkUser != null && friendCharaInfo.userId == MonoBehaviourSingleton<GuildManager>.I.talkUser.userId)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
+			return;
+		}
+		MonoBehaviourSingleton<GuildManager>.I.SetTalkUser(friendCharaInfo);
+		_chatType = CHAT_TYPE.MEMBER;
+		List<ChatPostRequest> memberChatLog = GetMemberChatLog(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<GuildManager>.I.talkUser.userId);
+		if (memberChatLog != null && memberChatLog.Count > 0)
+		{
+			GameSection.ResumeEvent(is_resume: false);
+			RefreshUI();
 		}
 		else
 		{
-			MonoBehaviourSingleton<GuildManager>.I.SetTalkUser(friendCharaInfo);
-			_chatType = CHAT_TYPE.MEMBER;
-			List<ChatPostRequest> memberChatLog = GetMemberChatLog(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<GuildManager>.I.talkUser.userId);
-			if (memberChatLog != null && memberChatLog.Count > 0)
+			MonoBehaviourSingleton<GuildManager>.I.SendPrivateClanChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, delegate(bool success, GuildPrivateChatModel ret)
 			{
-				GameSection.ResumeEvent(false, null);
+				AddMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, ret.result.array);
+				GameSection.ResumeEvent(is_resume: false);
 				RefreshUI();
-			}
-			else
-			{
-				MonoBehaviourSingleton<GuildManager>.I.SendPrivateClanChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, delegate(bool success, GuildPrivateChatModel ret)
-				{
-					AddMemberChatLog(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId, ret.result.array);
-					GameSection.ResumeEvent(false, null);
-					RefreshUI();
-				});
-			}
+			});
 		}
 	}
 
@@ -1084,7 +1047,7 @@ public class GuildMessage : GameSection
 				{
 					if (chatTabListDatum.info.userId == clanChatMsgData.fromUserId)
 					{
-						SetBadge(chatTabListDatum.tran, -1, 1, 5, 5, false);
+						SetBadge(chatTabListDatum.tran, -1, 1);
 						break;
 					}
 				}
@@ -1107,7 +1070,7 @@ public class GuildMessage : GameSection
 				{
 					if (chatTabListDatum.info.userId == clanChatMsgData.fromUserId)
 					{
-						SetBadge(chatTabListDatum.tran, -1, 1, 5, 5, false);
+						SetBadge(chatTabListDatum.tran, -1, 1);
 						break;
 					}
 				}
@@ -1130,41 +1093,39 @@ public class GuildMessage : GameSection
 		if (errorType != 0)
 		{
 			OnError(StringTable.Get(STRING_CATEGORY.CHAT_ERROR, 2u));
+			return;
 		}
-		else
+		int result = -9999;
+		int.TryParse(userId, out result);
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == result)
 		{
-			int result = -9999;
-			int.TryParse(userId, out result);
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == result)
-			{
-				SetActive((Enum)UI.OBJ_POST_BLOCK, false);
-				SetActive((Enum)UI.BTN_CHAT, false);
-				SetActive((Enum)UI.OBJ_CHAT_INPUT, true);
-			}
+			SetActive((Enum)UI.OBJ_POST_BLOCK, is_visible: false);
+			SetActive((Enum)UI.BTN_CHAT, is_visible: false);
+			SetActive((Enum)UI.OBJ_CHAT_INPUT, is_visible: true);
 		}
 	}
 
 	private void OnDisconnectClanChat()
 	{
 		SetLabelText((Enum)UI.LBL_CONNECTION_STATUS, base.sectionData.GetText("TEXT_DISCONNECT"));
-		SetActive((Enum)UI.OBJ_POST_BLOCK, true);
-		SetActive((Enum)UI.BTN_CHAT, true);
-		SetActive((Enum)UI.OBJ_CHAT_INPUT, false);
+		SetActive((Enum)UI.OBJ_POST_BLOCK, is_visible: true);
+		SetActive((Enum)UI.BTN_CHAT, is_visible: true);
+		SetActive((Enum)UI.OBJ_CHAT_INPUT, is_visible: false);
 	}
 
 	private void OnLeaveClanChat(CHAT_ERROR_TYPE errorType, string userId)
 	{
 		SetLabelText((Enum)UI.LBL_CONNECTION_STATUS, base.sectionData.GetText("TEXT_DISCONNECT"));
-		SetActive((Enum)UI.OBJ_POST_BLOCK, true);
-		SetActive((Enum)UI.BTN_CHAT, true);
-		SetActive((Enum)UI.OBJ_CHAT_INPUT, false);
+		SetActive((Enum)UI.OBJ_POST_BLOCK, is_visible: true);
+		SetActive((Enum)UI.BTN_CHAT, is_visible: true);
+		SetActive((Enum)UI.OBJ_CHAT_INPUT, is_visible: false);
 	}
 
 	private void OnError(string message)
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, message, StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u), null, null, null), delegate
+		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, message, StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u)), delegate
 		{
-		}, true, 0);
+		}, error: true);
 	}
 
 	private void InitStampList()
@@ -1179,8 +1140,8 @@ public class GuildMessage : GameSection
 	public void UpdateStampList()
 	{
 		int count = m_StampIdListCanPost.Count;
-		SetGrid(create_item_func: CreateStampItem, grid_ctrl_enum: UI.GRD_STAMP_LIST, item_prefab_name: null, item_num: count, reset: true, item_init_func: InitStampItem);
-		base.SetEnabled<UIScrollView>((Enum)UI.SCR_STAMP_LIST, true);
+		SetGrid(UI.GRD_STAMP_LIST, null, count, reset: true, CreateStampItem, InitStampItem);
+		SetEnabled<UIScrollView>((Enum)UI.SCR_STAMP_LIST, is_enabled: true);
 	}
 
 	public void ResetStampIdList()
@@ -1275,30 +1236,14 @@ public class GuildMessage : GameSection
 
 	public void SendMessageAsMine(string message)
 	{
-		if (_chatType == CHAT_TYPE.MEMBER && MonoBehaviourSingleton<GuildManager>.I.talkUser != null)
-		{
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.SendPrivateMessage(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId.ToString(), message);
-		}
-		else
-		{
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.SendMessage(message);
-		}
 	}
 
 	public void SendStampAsMine(int stampId)
 	{
 		if (CanIPostTheStamp(stampId))
 		{
-			SetActive((Enum)UI.OBJ_STAMP_UP, false);
-			SetActive((Enum)UI.OBJ_STAMP_DOWN, true);
-			if (_chatType == CHAT_TYPE.MEMBER && MonoBehaviourSingleton<GuildManager>.I.talkUser != null)
-			{
-				MonoBehaviourSingleton<ChatManager>.I.clanChat.SendPrivateStamp(MonoBehaviourSingleton<GuildManager>.I.talkUser.userId.ToString(), stampId);
-			}
-			else
-			{
-				MonoBehaviourSingleton<ChatManager>.I.clanChat.SendStamp(stampId);
-			}
+			SetActive((Enum)UI.OBJ_STAMP_UP, is_visible: false);
+			SetActive((Enum)UI.OBJ_STAMP_DOWN, is_visible: true);
 		}
 	}
 
@@ -1325,28 +1270,29 @@ public class GuildMessage : GameSection
 		{
 			chatItem.Init(uuid, chatId, userId, userName, text);
 		});
-		SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
 	}
 
 	private void PostStamp(int userId, string userName, int stampId, ChatItemListData data)
 	{
-		if (IsValidStampId(stampId))
+		if (!IsValidStampId(stampId))
 		{
-			StampTable.Data data2 = Singleton<StampTable>.I.GetData((uint)stampId);
-			if (data2 != null)
+			return;
+		}
+		StampTable.Data data2 = Singleton<StampTable>.I.GetData((uint)stampId);
+		if (data2 != null)
+		{
+			AddNextChatItem(data, delegate(GuildChatItem chatItem)
 			{
-				AddNextChatItem(data, delegate(GuildChatItem chatItem)
-				{
-					chatItem.Init(string.Empty, 0, userId, userName, stampId);
-				});
-				if (data2.hasSE)
-				{
-					SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
-				}
-				else
-				{
-					SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
-				}
+				chatItem.Init(string.Empty, 0, userId, userName, stampId);
+			});
+			if (data2.hasSE)
+			{
+				SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
+			}
+			else
+			{
+				SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
 			}
 		}
 	}
@@ -1357,14 +1303,11 @@ public class GuildMessage : GameSection
 		{
 			chatItem.Init(text);
 		});
-		SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
 	}
 
 	private void AddNextChatItem(ChatItemListData data, Action<GuildChatItem> initializer)
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Expected O, but got Unknown
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
 		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
 		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
@@ -1376,68 +1319,67 @@ public class GuildMessage : GameSection
 		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_ChatItemPrefab == null))
+		if (m_ChatItemPrefab == null)
 		{
-			if (data.itemList.Count > 0)
+			return;
+		}
+		if (data.itemList.Count > 0)
+		{
+			data.currentTotalHeight += 22f;
+		}
+		GuildChatItem guildChatItem = null;
+		if (data.itemList.Count < 30)
+		{
+			guildChatItem = ResourceUtility.Realizes(m_ChatItemPrefab, data.rootObject.get_transform(), 5).GetComponent<GuildChatItem>();
+		}
+		else
+		{
+			guildChatItem = data.itemList[data.oldestItemIndex];
+			data.oldestItemIndex++;
+			if (data.oldestItemIndex == 30)
 			{
-				data.currentTotalHeight += 22f;
+				data.oldestItemIndex = 0;
 			}
-			GuildChatItem guildChatItem = null;
-			if (data.itemList.Count < 30)
+			data.currentTotalHeight -= guildChatItem.height + 22f;
+			ScrollView.panel.widgetsAreStatic = false;
+			data.MoveAll(guildChatItem.height + 22f);
+			AppMain i = MonoBehaviourSingleton<AppMain>.I;
+			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
 			{
-				guildChatItem = ResourceUtility.Realizes(m_ChatItemPrefab, data.rootObject.get_transform(), 5).GetComponent<GuildChatItem>();
-			}
-			else
-			{
-				guildChatItem = data.itemList[data.oldestItemIndex];
-				data.oldestItemIndex++;
-				if (data.oldestItemIndex == 30)
-				{
-					data.oldestItemIndex = 0;
-				}
-				data.currentTotalHeight -= guildChatItem.height + 22f;
-				ScrollView.panel.widgetsAreStatic = false;
-				data.MoveAll(guildChatItem.height + 22f);
-				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					ScrollView.panel.widgetsAreStatic = true;
-				});
-			}
-			float currentTotalHeight = data.currentTotalHeight;
-			guildChatItem.get_transform().set_localPosition(new Vector3(-15f, 0f - currentTotalHeight, 0f));
-			initializer(guildChatItem);
-			data.currentTotalHeight += guildChatItem.height;
-			UpdateDummyDragScroll();
-			float currentTotalHeight2 = data.currentTotalHeight;
-			Vector4 val = ScrollView.panel.baseClipRegion;
-			float num = currentTotalHeight2 + val.y;
-			Vector4 val2 = ScrollView.panel.baseClipRegion;
-			float num2 = num - val2.w * 0.5f;
-			Vector3 localPosition = ScrollViewTrans.get_localPosition();
-			float y = localPosition.y;
-			Vector2 clipOffset = ScrollView.panel.clipOffset;
-			float num3 = num2 + (y + clipOffset.y);
-			Vector2 clipSoftness = ScrollView.panel.clipSoftness;
-			float num4 = num3 + clipSoftness.y;
-			if (data.itemList.Count >= 30)
-			{
-				ForceScroll(num4 - guildChatItem.height - 22f, false);
-			}
-			ForceScroll(num4, true);
-			if (data.itemList.Count < 30)
-			{
-				data.itemList.Add(guildChatItem);
-			}
+				ScrollView.panel.widgetsAreStatic = true;
+			});
+		}
+		float currentTotalHeight = data.currentTotalHeight;
+		guildChatItem.get_transform().set_localPosition(new Vector3(-15f, 0f - currentTotalHeight, 0f));
+		initializer(guildChatItem);
+		data.currentTotalHeight += guildChatItem.height;
+		UpdateDummyDragScroll();
+		float currentTotalHeight2 = data.currentTotalHeight;
+		Vector4 val = ScrollView.panel.baseClipRegion;
+		float num = currentTotalHeight2 + val.y;
+		Vector4 val2 = ScrollView.panel.baseClipRegion;
+		float num2 = num - val2.w * 0.5f;
+		Vector3 localPosition = ScrollViewTrans.get_localPosition();
+		float y = localPosition.y;
+		Vector2 clipOffset = ScrollView.panel.clipOffset;
+		float num3 = num2 + (y + clipOffset.y);
+		Vector2 clipSoftness = ScrollView.panel.clipSoftness;
+		float num4 = num3 + clipSoftness.y;
+		if (data.itemList.Count >= 30)
+		{
+			ForceScroll(num4 - guildChatItem.height - 22f, useSpring: false);
+		}
+		ForceScroll(num4, useSpring: true);
+		if (data.itemList.Count < 30)
+		{
+			data.itemList.Add(guildChatItem);
 		}
 	}
 
 	private void ForceScroll(float newHeight, bool useSpring)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
@@ -1449,16 +1391,14 @@ public class GuildMessage : GameSection
 		if (useSpring)
 		{
 			SpringPanel.Begin(ScrollView.get_gameObject(), Vector3.get_up() * newHeight, 20f);
+			return;
 		}
-		else
-		{
-			Vector2 clipOffset = ScrollView.panel.clipOffset;
-			Vector3 localPosition = ScrollViewTrans.get_localPosition();
-			float num = localPosition.y + clipOffset.y;
-			ScrollViewTrans.set_localPosition(Vector3.get_up() * newHeight);
-			clipOffset.y = 0f - newHeight + num;
-			ScrollView.panel.clipOffset = clipOffset;
-		}
+		Vector2 clipOffset = ScrollView.panel.clipOffset;
+		Vector3 localPosition = ScrollViewTrans.get_localPosition();
+		float num = localPosition.y + clipOffset.y;
+		ScrollViewTrans.set_localPosition(Vector3.get_up() * newHeight);
+		clipOffset.y = 0f - newHeight + num;
+		ScrollView.panel.clipOffset = clipOffset;
 	}
 
 	private void UpdateDummyDragScroll()
@@ -1481,10 +1421,10 @@ public class GuildMessage : GameSection
 		{
 			DummyDragScroll.height = (int)(CurrentTotalHeight - 20f);
 		}
-		object dragScrollTrans = (object)DragScrollTrans;
+		Transform dragScrollTrans = DragScrollTrans;
 		Vector2 clipOffset = ScrollView.panel.clipOffset;
 		dragScrollTrans.set_localPosition(new Vector3(clipOffset.x, 0f - CurrentTotalHeight, 0f));
-		object dragScrollCollider = (object)DragScrollCollider;
+		BoxCollider dragScrollCollider = DragScrollCollider;
 		Vector4 finalClipRegion = ScrollView.panel.finalClipRegion;
 		float z = finalClipRegion.z;
 		Vector4 finalClipRegion2 = ScrollView.panel.finalClipRegion;
@@ -1504,7 +1444,6 @@ public class GuildMessage : GameSection
 
 	private void UpdateDonate()
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		pinDonate = MonoBehaviourSingleton<GuildManager>.I.pinDonate;
 		if (pinDonate != null)
 		{
@@ -1516,7 +1455,7 @@ public class GuildMessage : GameSection
 			RefreshUI();
 		}));
 		List<DonateInfo> donate_list = MonoBehaviourSingleton<GuildManager>.I.donateList;
-		SetGrid(UI.GRD_DONATE, "GuildMessageDonateListItem", donate_list.Count, true, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_DONATE, "GuildMessageDonateListItem", donate_list.Count, reset: true, delegate(int i, Transform t, bool b)
 		{
 			DonateInfo info = donate_list[i];
 			t.GetComponent<GuildMessageDonateListItem>().SetDonateInfo(info);
@@ -1531,20 +1470,27 @@ public class GuildMessage : GameSection
 			SetLabelText(val, UI.LBL_CHAT_MESSAGE, info.msg);
 			SetLabelText(val, UI.LBL_USER_NAME, info.nickName);
 			SetLabelText(val, UI.LBL_MATERIAL_NAME, info.materialName);
-			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
 			SetLabelText(val, UI.LBL_QUATITY, itemNum);
 			SetLabelText(val, UI.LBL_DONATE_NUM, info.itemNum);
 			SetLabelText(val, UI.LBL_DONATE_MAX, info.quantity);
 			if (info.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				SetButtonEvent(val, UI.BTN_ASK, new EventDelegate(delegate
+				if (!flag)
 				{
-					DispatchEvent("ASK", info);
-				}));
+					SetButtonEvent(val, UI.BTN_ASK, new EventDelegate(delegate
+					{
+						DispatchEvent("ASK", info);
+					}));
+				}
+				else
+				{
+					SetButtonEnabled(val, UI.BTN_ASK, is_enabled: false);
+				}
 			}
 			else
 			{
-				int itemNum2 = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+				int itemNum2 = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
 				if (!flag && itemNum2 > 0 && info.itemNum < info.quantity)
 				{
 					SetButtonEvent(val, UI.BTN_GIFT, new EventDelegate(delegate
@@ -1554,7 +1500,7 @@ public class GuildMessage : GameSection
 				}
 				else
 				{
-					SetButtonEnabled(val, UI.BTN_GIFT, false);
+					SetButtonEnabled(val, UI.BTN_GIFT, is_enabled: false);
 				}
 			}
 			ItemInfo item = ItemInfo.CreateItemInfo(new Item
@@ -1615,7 +1561,7 @@ public class GuildMessage : GameSection
 		case ITEM_ICON_TYPE.QUEST_ITEM:
 		{
 			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0L)
+			if (uniqID != 0)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
@@ -1650,7 +1596,7 @@ public class GuildMessage : GameSection
 		}
 		else
 		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", event_data, is_new, -1, false, null, false, enemy_icon_id, 0, false, GET_TYPE.PAY);
+			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
 		}
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), parent_scroll);
 	}
@@ -1676,36 +1622,35 @@ public class GuildMessage : GameSection
 
 	private void OnReceiveUpdateStatus(ClanUpdateStatusData clanUpdateStatusData)
 	{
-		if (clanUpdateStatusData.type != 1)
+		if (clanUpdateStatusData.type == 1)
 		{
-			if (clanUpdateStatusData.type == 2)
+			return;
+		}
+		if (clanUpdateStatusData.type == 2)
+		{
+			if (clanUpdateStatusData.status == 2)
 			{
-				if (clanUpdateStatusData.status == 2)
-				{
-					need_update_donate_later = true;
-				}
-				else
-				{
-					need_update_donate = true;
-				}
+				need_update_donate_later = true;
 			}
-			else if (clanUpdateStatusData.type == 3)
+			else
 			{
-				if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id != MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId)
-				{
-					need_update_pin = true;
-				}
+				need_update_donate = true;
 			}
-			else if (clanUpdateStatusData.type != 4)
+		}
+		else if (clanUpdateStatusData.type == 3)
+		{
+			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id != MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId)
 			{
-				return;
+				need_update_pin = true;
 			}
+		}
+		else if (clanUpdateStatusData.type != 4)
+		{
 		}
 	}
 
 	private void ClanUpdateStatus()
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		if (base.isInitialized)
 		{
 			if (need_update_pin)
@@ -1742,7 +1687,6 @@ public class GuildMessage : GameSection
 		}
 		MonoBehaviourSingleton<GuildManager>.I.GetAllPinData(delegate(bool success, GuildGetPinModel ret)
 		{
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
 			if (success)
 			{
 				if (!string.IsNullOrEmpty(ret.result.message))
@@ -1774,7 +1718,7 @@ public class GuildMessage : GameSection
 			}
 			if (stayEvent)
 			{
-				GameSceneEvent.Resume(null);
+				GameSceneEvent.Resume();
 			}
 		});
 	}
@@ -1786,13 +1730,8 @@ public class GuildMessage : GameSection
 
 	private void UpdateChatPin()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		if (chatPinItem == null)
 		{
 			if (_chatType == CHAT_TYPE.CLAN && pinMessage != null)
@@ -1827,15 +1766,12 @@ public class GuildMessage : GameSection
 			{
 				RemovePinMsg();
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 		});
 	}
 
 	private void RemovePinMsg()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		if (!(chatPinItem == null))
 		{
 			ClearRenderModel(chatPinItem.get_transform(), UI.TEX_MODEL);
@@ -1879,14 +1815,13 @@ public class GuildMessage : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendClanChatPin(pinMessage.fromUserId, pinMessage.id, pinMessage.uuid, pinMessage.type, pinMessage.message, delegate(bool success, GuildChatPinModel ret)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			if (success)
 			{
 				HidePinButton();
 				senerInfo = ret.result.charInfo;
 				this.StartCoroutine(AddChatPinMsg());
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 		});
 	}
 
@@ -1899,7 +1834,7 @@ public class GuildMessage : GameSection
 				chatPinItem = ResourceUtility.Realizes(m_ChatPinItemPrefab, RootRect.get_transform(), 5).GetComponent<GuildChatPinItem>();
 				chatPinItem.get_transform().set_localPosition(new Vector3(0f, 370f, 0f));
 			}
-			yield return (object)null;
+			yield return null;
 			if (pinMessage.type == 0)
 			{
 				chatPinItem.ShowPinMsg(senerInfo.name, pinMessage.message);
@@ -1910,8 +1845,8 @@ public class GuildMessage : GameSection
 			}
 			CalculateBaseClipScrollView();
 			ClearRenderModel(chatPinItem.get_transform(), UI.TEX_MODEL);
-			yield return (object)null;
-			SetRenderPlayerModel(chatPinItem.get_transform(), UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(senerInfo, false, true, false, true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), true, null);
+			yield return null;
+			SetRenderPlayerModel(chatPinItem.get_transform(), UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(senerInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		}
 	}
 
@@ -1943,7 +1878,7 @@ public class GuildMessage : GameSection
 	{
 		if (!(m_DonatePinItemPrefab == null))
 		{
-			bool isFirstPin = donatePinItem == null;
+			bool flag = donatePinItem == null;
 			if (donatePinItem == null)
 			{
 				donatePinItem = ResourceUtility.Realizes(m_DonatePinItemPrefab, GetCtrl(UI.WGT_DONATE_ROOT).get_transform(), 5).GetComponent<GuildDonatePinItem>();
@@ -1951,26 +1886,24 @@ public class GuildMessage : GameSection
 			}
 			UpdateDonatePinUI(info);
 			donatePinItem.ShowPin(info);
-			UIPanel donatePanel = GetCtrl(UI.SCR_DONATE).GetComponent<UIScrollView>().get_gameObject().GetComponent<UIPanel>();
-			int h = donatePinItem.GetBaseHeight + 30;
-			if (isFirstPin)
+			UIPanel component = GetCtrl(UI.SCR_DONATE).GetComponent<UIScrollView>().get_gameObject().GetComponent<UIPanel>();
+			int num = donatePinItem.GetBaseHeight + 30;
+			if (flag)
 			{
-				baseDonateClipRegion = donatePanel.baseClipRegion;
+				baseDonateClipRegion = component.baseClipRegion;
 			}
-			donatePanel.baseClipRegion = new Vector4(baseDonateClipRegion.x, baseDonateClipRegion.y - (float)h / 2f, baseDonateClipRegion.z, baseDonateClipRegion.w - (float)h);
+			component.baseClipRegion = new Vector4(baseDonateClipRegion.x, baseDonateClipRegion.y - (float)num / 2f, baseDonateClipRegion.z, baseDonateClipRegion.w - (float)num);
 		}
 		yield break;
 	}
 
 	private void UpdateDonatePinUI(DonateInfo info)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		Transform root = donatePinItem.get_transform();
-		SetActive(root, UI.OBJ_TARGET, info.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-		SetActive(root, UI.OBJ_OWNER, info.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-		Transform val = (info.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id) ? FindCtrl(root, UI.OBJ_OWNER) : FindCtrl(root, UI.OBJ_TARGET);
-		SetLabelText(root, UI.LBL_CHAT_MESSAGE, info.msg);
+		Transform transform = donatePinItem.get_transform();
+		SetActive(transform, UI.OBJ_TARGET, info.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
+		SetActive(transform, UI.OBJ_OWNER, info.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
+		Transform val = (info.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id) ? FindCtrl(transform, UI.OBJ_OWNER) : FindCtrl(transform, UI.OBJ_TARGET);
+		SetLabelText(transform, UI.LBL_CHAT_MESSAGE, info.msg);
 		bool flag = info.itemNum >= info.quantity;
 		SetActive(val, UI.OBJ_FULL, flag);
 		SetActive(val, UI.OBJ_NORMAL, !flag);
@@ -1978,7 +1911,7 @@ public class GuildMessage : GameSection
 		SetLabelText(val, UI.LBL_CHAT_MESSAGE, info.msg);
 		SetLabelText(val, UI.LBL_USER_NAME, info.nickName);
 		SetLabelText(val, UI.LBL_MATERIAL_NAME, info.materialName);
-		int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+		int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
 		SetLabelText(val, UI.LBL_QUATITY, itemNum);
 		SetLabelText(val, UI.LBL_DONATE_NUM, info.itemNum);
 		SetLabelText(val, UI.LBL_DONATE_MAX, info.quantity);
@@ -1991,7 +1924,7 @@ public class GuildMessage : GameSection
 		}
 		else
 		{
-			int itemNum2 = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+			int itemNum2 = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
 			if (!flag && itemNum2 > 0 && info.itemNum < info.quantity)
 			{
 				SetButtonEvent(val, UI.BTN_GIFT, new EventDelegate(delegate
@@ -2001,7 +1934,7 @@ public class GuildMessage : GameSection
 			}
 			else
 			{
-				SetButtonEnabled(val, UI.BTN_GIFT, false);
+				SetButtonEnabled(val, UI.BTN_GIFT, is_enabled: false);
 			}
 		}
 		Item item = new Item();
@@ -2041,9 +1974,7 @@ public class GuildMessage : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendClanChatUnPin(delegate(bool success, GuildChatUnPinModel ret)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			if (success)
 			{
 				UIPanel component = GetCtrl(UI.SCR_DONATE).GetComponent<UIScrollView>().get_gameObject().GetComponent<UIPanel>();
@@ -2051,7 +1982,7 @@ public class GuildMessage : GameSection
 				Object.DestroyImmediate(donatePinItem.get_gameObject());
 				donatePinItem = null;
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 		});
 	}
 
@@ -2071,20 +2002,18 @@ public class GuildMessage : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<GuildManager>.I.SendClanChatPin(0, info.id, string.Empty, 2, string.Empty, delegate(bool success, GuildChatPinModel ret)
 			{
-				//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 				if (success)
 				{
 					MonoBehaviourSingleton<GuildManager>.I.pinDonate = info;
 					this.StartCoroutine(AddDonatePin(info));
 				}
-				GameSection.ResumeEvent(success, null);
+				GameSection.ResumeEvent(success);
 			});
 		}
 	}
 
 	private void UpdateAdvisoryItem()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		if (chatAdvisoryItem == null && _chatType == CHAT_TYPE.CLAN && _advisaryData != null)
 		{
 			this.StartCoroutine(AddAdvisary());
@@ -2100,16 +2029,15 @@ public class GuildMessage : GameSection
 				chatAdvisoryItem = ResourceUtility.Realizes(m_ChatAdvisaryItemPrefab, GetCtrl(UI.WGT_CHAT_TOP), 5).GetComponent<GuildChatAdvisoryItem>();
 				chatAdvisoryItem.get_transform().set_localPosition(new Vector3(0f, 370f, 0f));
 			}
-			yield return (object)null;
+			yield return null;
 			chatAdvisoryItem.Init(_advisaryData.title, _advisaryData.content);
 			SetButtonEvent(chatAdvisoryItem.close, new EventDelegate(delegate
 			{
-				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 				GuildChatAdvisoryItem.SetReadNew();
-				if (((_003CAddAdvisary_003Ec__Iterator54)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem != null)
+				if (chatAdvisoryItem != null)
 				{
-					Object.DestroyImmediate(((_003CAddAdvisary_003Ec__Iterator54)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem.get_gameObject());
-					((_003CAddAdvisary_003Ec__Iterator54)/*Error near IL_0120: stateMachine*/)._003C_003Ef__this.chatAdvisoryItem = null;
+					Object.DestroyImmediate(chatAdvisoryItem.get_gameObject());
+					chatAdvisoryItem = null;
 				}
 			}));
 		}
@@ -2117,7 +2045,6 @@ public class GuildMessage : GameSection
 
 	private void CalculateBaseClipScrollView()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 		Vector4 val = default(Vector4);
 		val._002Ector(baseClipRegion.x, baseClipRegion.y, baseClipRegion.z, baseClipRegion.w);

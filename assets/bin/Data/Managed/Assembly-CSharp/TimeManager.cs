@@ -14,16 +14,42 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 
 	private float elapsedTime;
 
+	private float _timeScale;
+
 	public STOP_FLAG stopFlags
 	{
 		get;
 		private set;
 	}
 
+	public static float timeScale
+	{
+		get
+		{
+			if (MonoBehaviourSingleton<TimeManager>.IsValid())
+			{
+				return MonoBehaviourSingleton<TimeManager>.I._timeScale;
+			}
+			return Time.get_timeScale();
+		}
+		set
+		{
+			if (MonoBehaviourSingleton<TimeManager>.IsValid())
+			{
+				MonoBehaviourSingleton<TimeManager>.I._timeScale = value;
+				if (!MonoBehaviourSingleton<TimeManager>.I.IsStop())
+				{
+					Time.set_timeScale(value);
+				}
+			}
+		}
+	}
+
 	protected override void Awake()
 	{
 		base.Awake();
 		Time.set_timeScale(1f);
+		_timeScale = Time.get_timeScale();
 	}
 
 	public void SetStop(STOP_FLAG flag, bool is_stop)
@@ -36,7 +62,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 		{
 			stopFlags &= ~flag;
 		}
-		Time.set_timeScale((!IsStop()) ? 1f : 0f);
+		Time.set_timeScale((!IsStop()) ? _timeScale : 0f);
 	}
 
 	public bool IsStop()
@@ -50,7 +76,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 		{
 			return DateTime.Now;
 		}
-		return MonoBehaviourSingleton<TimeManager>.I.currentTime.Value.AddSeconds((double)MonoBehaviourSingleton<TimeManager>.I.elapsedTime);
+		return MonoBehaviourSingleton<TimeManager>.I.currentTime.Value.AddSeconds(MonoBehaviourSingleton<TimeManager>.I.elapsedTime);
 	}
 
 	public static void SetServerTime(string time)

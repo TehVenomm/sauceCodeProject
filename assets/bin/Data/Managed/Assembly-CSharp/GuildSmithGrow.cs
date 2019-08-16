@@ -67,25 +67,25 @@ public class GuildSmithGrow : EquipMaterialBase
 
 	public override void UpdateUI()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateUI();
 		int num = Mathf.Min(aimLv, GetEquipData().tableData.maxLv);
 		SetLabelText((Enum)UI.LBL_AIM_LV, num.ToString());
-		SetActive((Enum)UI.STR_ONLY_EXCEED, false);
+		SetActive((Enum)UI.STR_ONLY_EXCEED, is_visible: false);
 		Color color = Color.get_red();
 		if (num == GetEquipData().level)
 		{
-			SetActive((Enum)UI.STR_ONLY_EXCEED, true);
+			SetActive((Enum)UI.STR_ONLY_EXCEED, is_visible: true);
 			color = Color.get_gray();
 		}
 		else if (IsHavingMaterialAndMoney() && num > GetEquipData().level)
@@ -103,11 +103,11 @@ public class GuildSmithGrow : EquipMaterialBase
 		SetActive((Enum)UI.BTN_AIM_R_INACTIVE, !flag2);
 		SetRepeatButton((Enum)UI.BTN_AIM_L, "AIM_L", (object)null);
 		SetRepeatButton((Enum)UI.BTN_AIM_R, "AIM_R", (object)null);
-		SetActive((Enum)UI.BTN_EXCEED, false);
-		SetActive((Enum)UI.BTN_DECISION, false);
-		SetActive((Enum)UI.BTN_INACTIVE, false);
-		SetActive((Enum)UI.LBL_GOLD, false);
-		SetActive((Enum)UI.LinePartsR01, false);
+		SetActive((Enum)UI.BTN_EXCEED, is_visible: false);
+		SetActive((Enum)UI.BTN_DECISION, is_visible: false);
+		SetActive((Enum)UI.BTN_INACTIVE, is_visible: false);
+		SetActive((Enum)UI.LBL_GOLD, is_visible: false);
+		SetActive((Enum)UI.LinePartsR01, is_visible: false);
 	}
 
 	protected override void InitNeedMaterialData()
@@ -140,79 +140,80 @@ public class GuildSmithGrow : EquipMaterialBase
 		EquipItemInfo equipData = GetEquipData();
 		EquipItemTable.EquipItemData tableData = equipData.tableData;
 		GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(tableData.growID, (uint)num);
-		if (equipData != null && tableData != null)
+		if (equipData == null || tableData == null)
 		{
-			SetLabelText(detailBase, UI.LBL_NAME, tableData.name);
-			SetLabelText(detailBase, UI.LBL_LV_MAX, tableData.maxLv.ToString());
-			SetLabelCompareParam(detailBase, UI.LBL_LV_NOW, num, equipData.level, -1);
-			SetEquipmentTypeIcon(detailBase, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipData.tableData);
-			if (growEquipItemData != null)
+			return;
+		}
+		SetLabelText(detailBase, UI.LBL_NAME, tableData.name);
+		SetLabelText(detailBase, UI.LBL_LV_MAX, tableData.maxLv.ToString());
+		SetLabelCompareParam(detailBase, UI.LBL_LV_NOW, num, equipData.level);
+		SetEquipmentTypeIcon(detailBase, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipData.tableData);
+		if (growEquipItemData != null)
+		{
+			EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = equipData.tableData.GetExceedParam((uint)equipData.exceed);
+			if (equipItemExceedParamAll == null)
 			{
-				EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = equipData.tableData.GetExceedParam((uint)equipData.exceed);
-				if (equipItemExceedParamAll == null)
-				{
-					equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
-				}
-				int num2 = growEquipItemData.GetGrowParamAtk(equipData.tableData.baseAtk) + (int)equipItemExceedParamAll.atk;
-				int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(equipData.tableData.atkElement);
-				int i = 0;
-				for (int num3 = growParamElemAtk.Length; i < num3; i++)
-				{
-					growParamElemAtk[i] += equipItemExceedParamAll.atkElement[i];
-				}
-				int num4 = Mathf.Max(growParamElemAtk);
-				SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
-				SetLabelText(detailBase, UI.LBL_ATK, equipData.atk.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ATK, num2 > equipData.atk);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_ATK, num2 - equipData.atk, false);
-				SetLabelText(detailBase, UI.LBL_ELEM, equipData.elemAtk.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ELEM, num4 > equipData.elemAtk);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM, num4 - equipData.elemAtk, false);
-				int num5 = growEquipItemData.GetGrowParamDef(equipData.tableData.baseDef) + (int)equipItemExceedParamAll.def;
-				int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(equipData.tableData.defElement);
-				int j = 0;
-				for (int num6 = growParamElemDef.Length; j < num6; j++)
-				{
-					growParamElemDef[j] += equipItemExceedParamAll.defElement[j];
-				}
-				int num7 = Mathf.Max(growParamElemDef);
-				SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
-				SetLabelText(detailBase, UI.LBL_DEF, equipData.def.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_DEF, num5 > equipData.def);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_DEF, num5 - equipData.def, false);
-				int num8 = equipData.elemDef;
-				if (equipData.tableData.isFormer)
-				{
-					num8 = Mathf.FloorToInt((float)num8 * 0.1f);
-				}
-				SetLabelText(detailBase, UI.LBL_ELEM_DEF, num8.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 > num8);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 - num8, false);
-				int num9 = growEquipItemData.GetGrowParamHp(equipData.tableData.baseHp) + (int)equipItemExceedParamAll.hp;
-				SetLabelText(detailBase, UI.LBL_HP, equipData.hp.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_HP, num9 > equipData.hp);
-				SetStatusBuffText(detailBase, UI.LBL_AFTER_HP, num9 - equipData.hp, false);
+				equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
 			}
-			else
+			int num2 = growEquipItemData.GetGrowParamAtk(equipData.tableData.baseAtk) + (int)equipItemExceedParamAll.atk;
+			int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(equipData.tableData.atkElement);
+			int i = 0;
+			for (int num3 = growParamElemAtk.Length; i < num3; i++)
 			{
-				int atk = equipData.atk;
-				int elemAtk = equipData.elemAtk;
-				SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
-				SetLabelText(detailBase, UI.LBL_ATK, atk.ToString());
-				SetLabelText(detailBase, UI.LBL_ELEM, elemAtk.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_ATK, false);
-				SetActive(detailBase, UI.LBL_AFTER_ELEM, false);
-				int def = equipData.def;
-				int elemDef = equipData.elemDef;
-				SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
-				SetLabelText(detailBase, UI.LBL_DEF, def.ToString());
-				SetLabelText(detailBase, UI.LBL_ELEM_DEF, elemDef.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_DEF, false);
-				SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, false);
-				int hp = equipData.hp;
-				SetLabelText(detailBase, UI.LBL_HP, hp.ToString());
-				SetActive(detailBase, UI.LBL_AFTER_HP, false);
+				growParamElemAtk[i] += equipItemExceedParamAll.atkElement[i];
 			}
+			int num4 = Mathf.Max(growParamElemAtk);
+			SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
+			SetLabelText(detailBase, UI.LBL_ATK, equipData.atk.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ATK, num2 > equipData.atk);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_ATK, num2 - equipData.atk, expression_include: false);
+			SetLabelText(detailBase, UI.LBL_ELEM, equipData.elemAtk.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ELEM, num4 > equipData.elemAtk);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM, num4 - equipData.elemAtk, expression_include: false);
+			int num5 = growEquipItemData.GetGrowParamDef(equipData.tableData.baseDef) + (int)equipItemExceedParamAll.def;
+			int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(equipData.tableData.defElement);
+			int j = 0;
+			for (int num6 = growParamElemDef.Length; j < num6; j++)
+			{
+				growParamElemDef[j] += equipItemExceedParamAll.defElement[j];
+			}
+			int num7 = Mathf.Max(growParamElemDef);
+			SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
+			SetLabelText(detailBase, UI.LBL_DEF, equipData.def.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_DEF, num5 > equipData.def);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_DEF, num5 - equipData.def, expression_include: false);
+			int num8 = equipData.elemDef;
+			if (equipData.tableData.isFormer)
+			{
+				num8 = Mathf.FloorToInt((float)num8 * 0.1f);
+			}
+			SetLabelText(detailBase, UI.LBL_ELEM_DEF, num8.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 > num8);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_ELEM_DEF, num7 - num8, expression_include: false);
+			int num9 = growEquipItemData.GetGrowParamHp(equipData.tableData.baseHp) + (int)equipItemExceedParamAll.hp;
+			SetLabelText(detailBase, UI.LBL_HP, equipData.hp.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_HP, num9 > equipData.hp);
+			SetStatusBuffText(detailBase, UI.LBL_AFTER_HP, num9 - equipData.hp, expression_include: false);
+		}
+		else
+		{
+			int atk = equipData.atk;
+			int elemAtk = equipData.elemAtk;
+			SetElementSprite(detailBase, UI.SPR_ELEM, equipData.GetElemAtkType());
+			SetLabelText(detailBase, UI.LBL_ATK, atk.ToString());
+			SetLabelText(detailBase, UI.LBL_ELEM, elemAtk.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_ATK, is_visible: false);
+			SetActive(detailBase, UI.LBL_AFTER_ELEM, is_visible: false);
+			int def = equipData.def;
+			int elemDef = equipData.elemDef;
+			SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, equipData.GetElemDefType());
+			SetLabelText(detailBase, UI.LBL_DEF, def.ToString());
+			SetLabelText(detailBase, UI.LBL_ELEM_DEF, elemDef.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_DEF, is_visible: false);
+			SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, is_visible: false);
+			int hp = equipData.hp;
+			SetLabelText(detailBase, UI.LBL_HP, hp.ToString());
+			SetActive(detailBase, UI.LBL_AFTER_HP, is_visible: false);
 		}
 	}
 
@@ -245,22 +246,23 @@ public class GuildSmithGrow : EquipMaterialBase
 	private void OnQuery_AIM_R()
 	{
 		EquipItemInfo equipData = GetEquipData();
-		if (aimLv != equipData.tableData.maxLv)
+		if (aimLv == equipData.tableData.maxLv)
 		{
-			aimLv++;
-			SetDirty(UI.GRD_NEED_MATERIAL);
-			RefreshUI();
-			if (!IsHavingMaterialAndMoney())
+			return;
+		}
+		aimLv++;
+		SetDirty(UI.GRD_NEED_MATERIAL);
+		RefreshUI();
+		if (!IsHavingMaterialAndMoney())
+		{
+			if (terminateAimLv < 0)
 			{
-				if (terminateAimLv < 0)
-				{
-					terminateAimLv = aimLv;
-				}
-				if (terminateAimLv == aimLv && !terminating)
-				{
-					terminating = true;
-					TerminateRepeatButton((Enum)UI.BTN_AIM_R);
-				}
+				terminateAimLv = aimLv;
+			}
+			if (terminateAimLv == aimLv && !terminating)
+			{
+				terminating = true;
+				TerminateRepeatButton((Enum)UI.BTN_AIM_R);
 			}
 		}
 	}
@@ -284,46 +286,42 @@ public class GuildSmithGrow : EquipMaterialBase
 		if (smithData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		EquipItemInfo selectEquipData = smithData.selectEquipData;
+		if (selectEquipData == null)
 		{
-			EquipItemInfo selectEquipData = smithData.selectEquipData;
-			if (selectEquipData == null)
+			GameSection.StopEvent();
+			return;
+		}
+		SmithManager.ResultData result_data = new SmithManager.ResultData();
+		result_data.beforeRarity = (int)selectEquipData.tableData.rarity;
+		result_data.beforeLevel = selectEquipData.level;
+		result_data.beforeMaxLevel = selectEquipData.tableData.maxLv;
+		result_data.beforeExceedCnt = selectEquipData.exceed;
+		result_data.beforeAtk = selectEquipData.atk;
+		result_data.beforeDef = selectEquipData.def;
+		result_data.beforeHp = selectEquipData.hp;
+		result_data.beforeElemAtk = selectEquipData.elemAtk;
+		result_data.beforeElemDef = selectEquipData.elemDef;
+		GameSection.SetEventData(result_data);
+		isNotifySelfUpdate = true;
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, delegate(Error err, EquipItemInfo grow_item)
+		{
+			if (err == Error.None)
 			{
-				GameSection.StopEvent();
+				aimLv = grow_item.level + 1;
+				result_data.itemData = grow_item;
+				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+				GameSection.ResumeEvent(is_resume: true);
 			}
 			else
 			{
-				SmithManager.ResultData result_data = new SmithManager.ResultData();
-				result_data.beforeRarity = (int)selectEquipData.tableData.rarity;
-				result_data.beforeLevel = selectEquipData.level;
-				result_data.beforeMaxLevel = selectEquipData.tableData.maxLv;
-				result_data.beforeExceedCnt = selectEquipData.exceed;
-				result_data.beforeAtk = selectEquipData.atk;
-				result_data.beforeDef = selectEquipData.def;
-				result_data.beforeHp = selectEquipData.hp;
-				result_data.beforeElemAtk = selectEquipData.elemAtk;
-				result_data.beforeElemDef = selectEquipData.elemDef;
-				GameSection.SetEventData(result_data);
-				isNotifySelfUpdate = true;
-				GameSection.StayEvent();
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowEquipItem(selectEquipData.uniqueID, aimLv, delegate(Error err, EquipItemInfo grow_item)
-				{
-					if (err == Error.None)
-					{
-						aimLv = grow_item.level + 1;
-						result_data.itemData = grow_item;
-						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-						GameSection.ResumeEvent(true, null);
-					}
-					else
-					{
-						isNotifySelfUpdate = false;
-						GameSection.ResumeEvent(false, null);
-					}
-				});
+				isNotifySelfUpdate = false;
+				GameSection.ResumeEvent(is_resume: false);
 			}
-		}
+		});
 	}
 
 	private void NewNeedDB()
@@ -417,7 +415,6 @@ public class GuildSmithGrow : EquipMaterialBase
 
 	private void OnCloseDialog_GuildDonateSendDialog()
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 		string s = GameSection.GetEventData() as string;
 		int itemID = (int)needMaterial[chooseIndex].itemID;
 		string name = Singleton<ItemTable>.I.GetItemData(needMaterial[chooseIndex].itemID).name;
@@ -442,10 +439,10 @@ public class GuildSmithGrow : EquipMaterialBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator58)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				backSection = true;
 			}
 		});
 	}
@@ -457,11 +454,11 @@ public class GuildSmithGrow : EquipMaterialBase
 			backSection = false;
 			if (LoungeMatchingManager.IsValidInLounge())
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", "GuildDonateMaterialSelectDialog", UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", "GuildDonateMaterialSelectDialog");
 			}
 			else
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home", "GuildDonateMaterialSelectDialog", UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home", "GuildDonateMaterialSelectDialog");
 			}
 		}
 	}

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:orientation="vertical" android:tag="rating" android:paddingLeft="65dp" android:paddingBottom="5dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-    <TextView android:textSize="14dp" android:textStyle="bold" android:textColor="#000" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/net_gogame_chat_rate_message"/>
-    <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
-        <ImageView android:id="@+id/rateGoodImageView" android:layout_width="35dp" android:layout_height="35dp" android:src="@drawable/net_gogame_chat_rate_good_selected" android:contentDescription="@string/net_gogame_chat_rate_good_description"/>
-        <ImageView android:id="@+id/rateBadImageView" android:layout_width="35dp" android:layout_height="35dp" android:layout_marginLeft="15dp" android:src="@drawable/net_gogame_chat_rate_bad_selected" android:contentDescription="@string/net_gogame_chat_rate_bad_description"/>
-    </LinearLayout>
-</LinearLayout>

@@ -29,7 +29,8 @@ public @interface JsonSerialize {
         DEFAULT_TYPING
     }
 
-    Class<?> as() default Void.class;
+    /* renamed from: as */
+    Class<?> mo10592as() default Void.class;
 
     Class<?> contentAs() default Void.class;
 

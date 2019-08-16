@@ -1,8 +1,12 @@
-package net.gogame.gowrap.ui.dpro.model;
+package net.gogame.gowrap.p019ui.dpro.model;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.PageRequest */
 public class PageRequest {
     private int pageNumber;
     private int pageSize;
+
+    public PageRequest() {
+    }
 
     public PageRequest(int i, int i2) {
         this.pageNumber = i;

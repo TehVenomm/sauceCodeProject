@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class ModelLoaderBase
+public abstract class ModelLoaderBase : MonoBehaviour
 {
 	protected ModelLoaderBase()
 		: this()

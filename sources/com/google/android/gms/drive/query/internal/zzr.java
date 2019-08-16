@@ -2,56 +2,66 @@ package com.google.android.gms.drive.query.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import com.google.android.gms.drive.query.Filter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Class(creator = "LogicalFilterCreator")
+@Reserved({1000})
 public final class zzr extends zza {
     public static final Creator<zzr> CREATOR = new zzs();
-    private List<Filter> zzgna;
-    private zzx zzgng;
-    private List<FilterHolder> zzgnv;
+    private List<Filter> zzlc;
+    @Field(mo13990id = 1)
+    private final zzx zzlj;
+    @Field(mo13990id = 2)
+    private final List<FilterHolder> zzly;
 
     public zzr(zzx zzx, Filter filter, Filter... filterArr) {
-        this.zzgng = zzx;
-        this.zzgnv = new ArrayList(filterArr.length + 1);
-        this.zzgnv.add(new FilterHolder(filter));
-        this.zzgna = new ArrayList(filterArr.length + 1);
-        this.zzgna.add(filter);
+        this.zzlj = zzx;
+        this.zzly = new ArrayList(filterArr.length + 1);
+        this.zzly.add(new FilterHolder(filter));
+        this.zzlc = new ArrayList(filterArr.length + 1);
+        this.zzlc.add(filter);
         for (Filter filter2 : filterArr) {
-            this.zzgnv.add(new FilterHolder(filter2));
-            this.zzgna.add(filter2);
+            this.zzly.add(new FilterHolder(filter2));
+            this.zzlc.add(filter2);
         }
     }
 
     public zzr(zzx zzx, Iterable<Filter> iterable) {
-        this.zzgng = zzx;
-        this.zzgna = new ArrayList();
-        this.zzgnv = new ArrayList();
+        this.zzlj = zzx;
+        this.zzlc = new ArrayList();
+        this.zzly = new ArrayList();
         for (Filter filter : iterable) {
-            this.zzgna.add(filter);
-            this.zzgnv.add(new FilterHolder(filter));
+            this.zzlc.add(filter);
+            this.zzly.add(new FilterHolder(filter));
         }
     }
 
-    zzr(zzx zzx, List<FilterHolder> list) {
-        this.zzgng = zzx;
-        this.zzgnv = list;
+    @Constructor
+    zzr(@Param(mo13993id = 1) zzx zzx, @Param(mo13993id = 2) List<FilterHolder> list) {
+        this.zzlj = zzx;
+        this.zzly = list;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.zzgng, i, false);
-        zzd.zzc(parcel, 2, this.zzgnv, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 1, this.zzlj, i, false);
+        SafeParcelWriter.writeTypedList(parcel, 2, this.zzly, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
     public final <T> T zza(zzj<T> zzj) {
-        List arrayList = new ArrayList();
-        for (FilterHolder filter : this.zzgnv) {
+        ArrayList arrayList = new ArrayList();
+        for (FilterHolder filter : this.zzly) {
             arrayList.add(filter.getFilter().zza(zzj));
         }
-        return zzj.zza(this.zzgng, arrayList);
+        return zzj.zza(this.zzlj, (List<F>) arrayList);
     }
 }

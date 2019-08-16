@@ -65,6 +65,14 @@ public class GuildInformationStep2 : GameSection
 		levelNames.Add("150");
 		levelNames.Add("250");
 		levelIndex = 0;
+		for (int i = 0; i < levelNames.Count; i++)
+		{
+			if (int.Parse(levelNames[i]) == mCreateRequest.GuildMinLevel)
+			{
+				levelIndex = i;
+				break;
+			}
+		}
 		spriteMapNames = new List<string>();
 		spriteMapNames.Add("temp_map1");
 		spriteMapNames.Add("temp_map2");
@@ -76,12 +84,12 @@ public class GuildInformationStep2 : GameSection
 		bool flag = MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanId != -1;
 		SetActive((Enum)UI.BTN_NEXT, !flag);
 		SetActive((Enum)UI.BTN_NEXT_UPDATE, flag);
-		SetActive((Enum)UI.SPR_TYPE_INFO, false);
+		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: false);
 		SetTouchAndRelease((Enum)UI.BTN_INFO, "TYPE_INFO_SHOW", "TYPE_INFO_HIDE", (object)null);
-		SetActive((Enum)UI.SPR_TYPE_INFO, false);
-		SetSupportEncoding(UI.STR_TYPE_INFOR, true);
-		mCreateRequest.SetGuildType(GuildManager.GUILD_TYPE.PUBLIC);
-		mCreateRequest.SetGuildMinLevel(int.Parse(levelNames[0]));
+		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: false);
+		SetSupportEncoding(UI.STR_TYPE_INFOR, isEnable: true);
+		mCreateRequest.SetGuildType(mCreateRequest.GuildType);
+		mCreateRequest.SetGuildMinLevel(int.Parse(levelNames[levelIndex]));
 	}
 
 	public override void UpdateUI()
@@ -124,7 +132,7 @@ public class GuildInformationStep2 : GameSection
 	{
 		if (lockPopup == null)
 		{
-			lockPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LOCK), false);
+			lockPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_LOCK), check_panel: false);
 		}
 		if (!(lockPopup == null))
 		{
@@ -134,7 +142,7 @@ public class GuildInformationStep2 : GameSection
 				array[i] = true;
 			}
 			int select_index = lockIndex;
-			UIScrollablePopupList.CreatePopup(lockPopup, GetCtrl(UI.POP_TARGET_LOCK), 3, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, lockNames.ToArray(), array, select_index, delegate(int index)
+			UIScrollablePopupList.CreatePopup(lockPopup, GetCtrl(UI.POP_TARGET_LOCK), 3, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, lockNames.ToArray(), array, select_index, delegate(int index)
 			{
 				lockIndex = index;
 				mCreateRequest.SetGuildType((GuildManager.GUILD_TYPE)lockIndex);
@@ -147,7 +155,7 @@ public class GuildInformationStep2 : GameSection
 	{
 		if (levelPopup == null)
 		{
-			levelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MIN_LEVEL), false);
+			levelPopup = Realizes("ScrollablePopupList", GetCtrl(UI.POP_TARGET_MIN_LEVEL), check_panel: false);
 		}
 		if (!(levelPopup == null))
 		{
@@ -157,7 +165,7 @@ public class GuildInformationStep2 : GameSection
 				array[i] = true;
 			}
 			int select_index = levelIndex;
-			UIScrollablePopupList.CreatePopup(levelPopup, GetCtrl(UI.POP_TARGET_MIN_LEVEL), levelNames.Count, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, levelNames.ToArray(), array, select_index, delegate(int index)
+			UIScrollablePopupList.CreatePopup(levelPopup, GetCtrl(UI.POP_TARGET_MIN_LEVEL), levelNames.Count, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, levelNames.ToArray(), array, select_index, delegate(int index)
 			{
 				levelIndex = index;
 				mCreateRequest.SetGuildMinLevel(int.Parse(levelNames[levelIndex]));
@@ -175,12 +183,12 @@ public class GuildInformationStep2 : GameSection
 			{
 				MonoBehaviourSingleton<GuildManager>.I.GetClanStat(delegate
 				{
-					GameSection.ResumeEvent(true, null);
+					GameSection.ResumeEvent(is_resume: true);
 				});
 			}
 			else
 			{
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 		});
 	}
@@ -190,17 +198,17 @@ public class GuildInformationStep2 : GameSection
 		MonoBehaviourSingleton<GuildManager>.I.ClearCreateGuildRequestParam();
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanId != -1)
 		{
-			GameSection.ChangeEvent("CLOSE_UPDATE", null);
+			GameSection.ChangeEvent("CLOSE_UPDATE");
 		}
 	}
 
 	private void OnQuery_TYPE_INFO_SHOW()
 	{
-		SetActive((Enum)UI.SPR_TYPE_INFO, true);
+		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: true);
 	}
 
 	private void OnQuery_TYPE_INFO_HIDE()
 	{
-		SetActive((Enum)UI.SPR_TYPE_INFO, false);
+		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: false);
 	}
 }

@@ -34,8 +34,8 @@ public class SmithShadowEvolveDialog : GameSection
 			int haveingItemNum = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum(itemData.id);
 			int num = createData.needMaterial[0].num;
 			bool flag = haveingItemNum >= num;
-			ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, GetCtrl(UI.OBJ_ICON_ROOT), haveingItemNum, num, "MATERIAL", 0, false);
-			SetMaterialInfo(itemIcon._transform, REWARD_TYPE.ITEM, itemData.id, null);
+			ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, GetCtrl(UI.OBJ_ICON_ROOT), haveingItemNum, num, "MATERIAL");
+			SetMaterialInfo(itemIcon._transform, REWARD_TYPE.ITEM, itemData.id);
 			SetActive((Enum)UI.BTN_OK, flag);
 			SetActive((Enum)UI.BTN_INACTIVE, !flag);
 			base.UpdateUI();
@@ -79,11 +79,11 @@ public class SmithShadowEvolveDialog : GameSection
 				smithData.selectEquipData = info;
 				MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
 				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 			else
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 		});
 	}

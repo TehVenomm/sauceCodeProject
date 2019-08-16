@@ -2,32 +2,33 @@ package com.google.android.gms.drive;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 
-public final class zzh implements Creator<zzg> {
-    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        long j = 0;
-        int zzd = zzb.zzd(parcel);
-        long j2 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 2:
-                    j2 = zzb.zzi(parcel, readInt);
-                    break;
-                case 3:
-                    j = zzb.zzi(parcel, readInt);
-                    break;
-                default:
-                    zzb.zzb(parcel, readInt);
-                    break;
-            }
-        }
-        zzb.zzaf(parcel, zzd);
-        return new zzg(j2, j);
+@Class(creator = "DriveFileRangeCreator")
+@Reserved({1})
+public final class zzh extends AbstractSafeParcelable {
+    public static final Creator<zzh> CREATOR = new zzi();
+    @Field(mo13990id = 3)
+    private final long zzaa;
+    @Field(mo13990id = 2)
+    private final long zzz;
+
+    @Constructor
+    public zzh(@Param(mo13993id = 2) long j, @Param(mo13993id = 3) long j2) {
+        this.zzz = j;
+        this.zzaa = j2;
     }
 
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzg[i];
+    public final void writeToParcel(Parcel parcel, int i) {
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeLong(parcel, 2, this.zzz);
+        SafeParcelWriter.writeLong(parcel, 3, this.zzaa);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

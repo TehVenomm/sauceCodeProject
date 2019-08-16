@@ -53,8 +53,6 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
 			if (mTrans == null)
 			{
 				mTrans = this.get_transform();
@@ -67,7 +65,6 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (mCam == null)
 			{
 				mCam = NGUITools.FindCameraForLayer(this.get_gameObject().get_layer());
@@ -137,19 +134,20 @@ public class UIProgressBar : UIWidgetContainer
 		set
 		{
 			float num = Mathf.Clamp01(value);
-			if (mValue != num)
+			if (mValue == num)
 			{
-				float value2 = this.value;
-				mValue = num;
-				if (value2 != this.value)
+				return;
+			}
+			float value2 = this.value;
+			mValue = num;
+			if (value2 != this.value)
+			{
+				ForceUpdate();
+				if (NGUITools.GetActive(this) && EventDelegate.IsValid(onChange))
 				{
-					ForceUpdate();
-					if (NGUITools.GetActive(this) && EventDelegate.IsValid(onChange))
-					{
-						current = this;
-						EventDelegate.Execute(onChange);
-						current = null;
-					}
+					current = this;
+					EventDelegate.Execute(onChange);
+					current = null;
 				}
 			}
 		}
@@ -195,20 +193,21 @@ public class UIProgressBar : UIWidgetContainer
 					mBG.GetComponent<Collider2D>().set_enabled(mBG.alpha > 0.001f);
 				}
 			}
-			if (thumb != null)
+			if (!(thumb != null))
 			{
-				UIWidget component = thumb.GetComponent<UIWidget>();
-				if (component != null)
+				return;
+			}
+			UIWidget component = thumb.GetComponent<UIWidget>();
+			if (component != null)
+			{
+				component.alpha = value;
+				if (component.GetComponent<Collider>() != null)
 				{
-					component.alpha = value;
-					if (component.GetComponent<Collider>() != null)
-					{
-						component.GetComponent<Collider>().set_enabled(component.alpha > 0.001f);
-					}
-					else if (component.GetComponent<Collider2D>() != null)
-					{
-						component.GetComponent<Collider2D>().set_enabled(component.alpha > 0.001f);
-					}
+					component.GetComponent<Collider>().set_enabled(component.alpha > 0.001f);
+				}
+				else if (component.GetComponent<Collider2D>() != null)
+				{
+					component.GetComponent<Collider2D>().set_enabled(component.alpha > 0.001f);
 				}
 			}
 		}
@@ -417,14 +416,22 @@ public class UIProgressBar : UIWidgetContainer
 		{
 			Vector3[] array = (!(mFG != null)) ? mBG.localCorners : mFG.localCorners;
 			Vector4 val = (!(mFG != null)) ? mBG.border : mFG.border;
-			array[0].x += val.x;
-			array[1].x += val.x;
-			array[2].x -= val.z;
-			array[3].x -= val.z;
-			array[0].y += val.y;
-			array[1].y -= val.w;
-			array[2].y -= val.w;
-			array[3].y += val.y;
+			ref Vector3 reference = ref array[0];
+			reference.x += val.x;
+			ref Vector3 reference2 = ref array[1];
+			reference2.x += val.x;
+			ref Vector3 reference3 = ref array[2];
+			reference3.x -= val.z;
+			ref Vector3 reference4 = ref array[3];
+			reference4.x -= val.z;
+			ref Vector3 reference5 = ref array[0];
+			reference5.y += val.y;
+			ref Vector3 reference6 = ref array[1];
+			reference6.y -= val.w;
+			ref Vector3 reference7 = ref array[2];
+			reference7.y -= val.w;
+			ref Vector3 reference8 = ref array[3];
+			reference8.y += val.y;
 			Transform val2 = (!(mFG != null)) ? mBG.cachedTransform : mFG.cachedTransform;
 			for (int i = 0; i < 4; i++)
 			{
@@ -451,8 +458,6 @@ public class UIProgressBar : UIWidgetContainer
 
 	protected void SetThumbPosition(Vector3 worldPos)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
@@ -462,10 +467,10 @@ public class UIProgressBar : UIWidgetContainer
 		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = thumb.get_parent();
-		if (val != null)
+		Transform parent = thumb.get_parent();
+		if (parent != null)
 		{
-			worldPos = val.InverseTransformPoint(worldPos);
+			worldPos = parent.InverseTransformPoint(worldPos);
 			worldPos.x = Mathf.Round(worldPos.x);
 			worldPos.y = Mathf.Round(worldPos.y);
 			worldPos.z = 0f;

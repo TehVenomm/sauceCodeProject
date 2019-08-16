@@ -4,107 +4,140 @@ import android.database.CharArrayBuffer;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.util.zzg;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.DataUtils;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameEntity;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.internal.zzc;
+import com.google.android.gms.games.internal.zzd;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.ParticipantEntity;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
-public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "TurnBasedMatchEntityCreator")
+@Reserved({1000})
+public final class TurnBasedMatchEntity extends zzd implements TurnBasedMatch {
     public static final Creator<TurnBasedMatchEntity> CREATOR = new zzc();
-    private final long mCreationTimestamp;
-    private final int mVersion;
-    private final String zzdmz;
-    private final long zzhdu;
-    private final String zzhfi;
-    private final GameEntity zzhiw;
-    private final ArrayList<ParticipantEntity> zzhmc;
-    private final int zzhmd;
-    private final Bundle zzhmu;
-    private final String zzhmw;
-    private final String zzhne;
-    private final String zzhnf;
-    private final int zzhng;
-    private final byte[] zzhnh;
-    private final String zzhni;
-    private final byte[] zzhnj;
-    private final int zzhnk;
-    private final int zzhnl;
-    private final boolean zzhnm;
-    private final String zzhnn;
+    @Field(getter = "getData", mo13990id = 12)
+    private final byte[] data;
+    @Field(getter = "getDescription", mo13990id = 20)
+    private final String description;
+    @Field(getter = "getVersion", mo13990id = 11)
+    private final int version;
+    @Field(getter = "getLastUpdatedTimestamp", mo13990id = 6)
+    private final long zzfm;
+    @Field(getter = "getGame", mo13990id = 1)
+    private final GameEntity zzlp;
+    @Field(getter = "getCreationTimestamp", mo13990id = 4)
+    private final long zzoz;
+    @Field(getter = "getParticipants", mo13990id = 13)
+    private final ArrayList<ParticipantEntity> zzpc;
+    @Field(getter = "getVariant", mo13990id = 10)
+    private final int zzpd;
+    @Nullable
+    @Field(getter = "getAutoMatchCriteria", mo13990id = 17)
+    private final Bundle zzpz;
+    @Field(getter = "getCreatorId", mo13990id = 3)
+    private final String zzqd;
+    @Field(getter = "getMatchId", mo13990id = 2)
+    private final String zzqm;
+    @Field(getter = "getLastUpdaterId", mo13990id = 5)
+    private final String zzqn;
+    @Field(getter = "getPendingParticipantId", mo13990id = 7)
+    private final String zzqo;
+    @Field(getter = "getStatus", mo13990id = 8)
+    private final int zzqp;
+    @Field(getter = "getRematchId", mo13990id = 14)
+    private final String zzqq;
+    @Field(getter = "getPreviousMatchData", mo13990id = 15)
+    private final byte[] zzqr;
+    @Field(getter = "getMatchNumber", mo13990id = 16)
+    private final int zzqs;
+    @Field(getter = "getTurnStatus", mo13990id = 18)
+    private final int zzqt;
+    @Field(getter = "isLocallyModified", mo13990id = 19)
+    private final boolean zzqu;
+    @Field(getter = "getDescriptionParticipantId", mo13990id = 21)
+    private final String zzqv;
 
-    TurnBasedMatchEntity(GameEntity gameEntity, String str, String str2, long j, String str3, long j2, String str4, int i, int i2, int i3, byte[] bArr, ArrayList<ParticipantEntity> arrayList, String str5, byte[] bArr2, int i4, Bundle bundle, int i5, boolean z, String str6, String str7) {
-        this.zzhiw = gameEntity;
-        this.zzhfi = str;
-        this.zzhmw = str2;
-        this.mCreationTimestamp = j;
-        this.zzhne = str3;
-        this.zzhdu = j2;
-        this.zzhnf = str4;
-        this.zzhng = i;
-        this.zzhnl = i5;
-        this.zzhmd = i2;
-        this.mVersion = i3;
-        this.zzhnh = bArr;
-        this.zzhmc = arrayList;
-        this.zzhni = str5;
-        this.zzhnj = bArr2;
-        this.zzhnk = i4;
-        this.zzhmu = bundle;
-        this.zzhnm = z;
-        this.zzdmz = str6;
-        this.zzhnn = str7;
+    @Constructor
+    TurnBasedMatchEntity(@Param(mo13993id = 1) GameEntity gameEntity, @Param(mo13993id = 2) String str, @Param(mo13993id = 3) String str2, @Param(mo13993id = 4) long j, @Param(mo13993id = 5) String str3, @Param(mo13993id = 6) long j2, @Param(mo13993id = 7) String str4, @Param(mo13993id = 8) int i, @Param(mo13993id = 10) int i2, @Param(mo13993id = 11) int i3, @Param(mo13993id = 12) byte[] bArr, @Param(mo13993id = 13) ArrayList<ParticipantEntity> arrayList, @Param(mo13993id = 14) String str5, @Param(mo13993id = 15) byte[] bArr2, @Param(mo13993id = 16) int i4, @Nullable @Param(mo13993id = 17) Bundle bundle, @Param(mo13993id = 18) int i5, @Param(mo13993id = 19) boolean z, @Param(mo13993id = 20) String str6, @Param(mo13993id = 21) String str7) {
+        this.zzlp = gameEntity;
+        this.zzqm = str;
+        this.zzqd = str2;
+        this.zzoz = j;
+        this.zzqn = str3;
+        this.zzfm = j2;
+        this.zzqo = str4;
+        this.zzqp = i;
+        this.zzqt = i5;
+        this.zzpd = i2;
+        this.version = i3;
+        this.data = bArr;
+        this.zzpc = arrayList;
+        this.zzqq = str5;
+        this.zzqr = bArr2;
+        this.zzqs = i4;
+        this.zzpz = bundle;
+        this.zzqu = z;
+        this.description = str6;
+        this.zzqv = str7;
     }
 
-    public TurnBasedMatchEntity(TurnBasedMatch turnBasedMatch) {
-        this.zzhiw = new GameEntity(turnBasedMatch.getGame());
-        this.zzhfi = turnBasedMatch.getMatchId();
-        this.zzhmw = turnBasedMatch.getCreatorId();
-        this.mCreationTimestamp = turnBasedMatch.getCreationTimestamp();
-        this.zzhne = turnBasedMatch.getLastUpdaterId();
-        this.zzhdu = turnBasedMatch.getLastUpdatedTimestamp();
-        this.zzhnf = turnBasedMatch.getPendingParticipantId();
-        this.zzhng = turnBasedMatch.getStatus();
-        this.zzhnl = turnBasedMatch.getTurnStatus();
-        this.zzhmd = turnBasedMatch.getVariant();
-        this.mVersion = turnBasedMatch.getVersion();
-        this.zzhni = turnBasedMatch.getRematchId();
-        this.zzhnk = turnBasedMatch.getMatchNumber();
-        this.zzhmu = turnBasedMatch.getAutoMatchCriteria();
-        this.zzhnm = turnBasedMatch.isLocallyModified();
-        this.zzdmz = turnBasedMatch.getDescription();
-        this.zzhnn = turnBasedMatch.getDescriptionParticipantId();
-        Object data = turnBasedMatch.getData();
-        if (data == null) {
-            this.zzhnh = null;
+    public TurnBasedMatchEntity(@NonNull TurnBasedMatch turnBasedMatch) {
+        this(turnBasedMatch, ParticipantEntity.zza((List<Participant>) turnBasedMatch.getParticipants()));
+    }
+
+    private TurnBasedMatchEntity(@NonNull TurnBasedMatch turnBasedMatch, @NonNull ArrayList<ParticipantEntity> arrayList) {
+        this.zzlp = new GameEntity(turnBasedMatch.getGame());
+        this.zzqm = turnBasedMatch.getMatchId();
+        this.zzqd = turnBasedMatch.getCreatorId();
+        this.zzoz = turnBasedMatch.getCreationTimestamp();
+        this.zzqn = turnBasedMatch.getLastUpdaterId();
+        this.zzfm = turnBasedMatch.getLastUpdatedTimestamp();
+        this.zzqo = turnBasedMatch.getPendingParticipantId();
+        this.zzqp = turnBasedMatch.getStatus();
+        this.zzqt = turnBasedMatch.getTurnStatus();
+        this.zzpd = turnBasedMatch.getVariant();
+        this.version = turnBasedMatch.getVersion();
+        this.zzqq = turnBasedMatch.getRematchId();
+        this.zzqs = turnBasedMatch.getMatchNumber();
+        this.zzpz = turnBasedMatch.getAutoMatchCriteria();
+        this.zzqu = turnBasedMatch.isLocallyModified();
+        this.description = turnBasedMatch.getDescription();
+        this.zzqv = turnBasedMatch.getDescriptionParticipantId();
+        byte[] data2 = turnBasedMatch.getData();
+        if (data2 == null) {
+            this.data = null;
         } else {
-            this.zzhnh = new byte[data.length];
-            System.arraycopy(data, 0, this.zzhnh, 0, data.length);
+            this.data = new byte[data2.length];
+            System.arraycopy(data2, 0, this.data, 0, data2.length);
         }
-        data = turnBasedMatch.getPreviousMatchData();
-        if (data == null) {
-            this.zzhnj = null;
+        byte[] previousMatchData = turnBasedMatch.getPreviousMatchData();
+        if (previousMatchData == null) {
+            this.zzqr = null;
         } else {
-            this.zzhnj = new byte[data.length];
-            System.arraycopy(data, 0, this.zzhnj, 0, data.length);
+            this.zzqr = new byte[previousMatchData.length];
+            System.arraycopy(previousMatchData, 0, this.zzqr, 0, previousMatchData.length);
         }
-        ArrayList participants = turnBasedMatch.getParticipants();
-        int size = participants.size();
-        this.zzhmc = new ArrayList(size);
-        for (int i = 0; i < size; i++) {
-            this.zzhmc.add((ParticipantEntity) ((Participant) participants.get(i)).freeze());
-        }
+        this.zzpc = arrayList;
     }
 
     static int zza(TurnBasedMatch turnBasedMatch) {
-        return Arrays.hashCode(new Object[]{turnBasedMatch.getGame(), turnBasedMatch.getMatchId(), turnBasedMatch.getCreatorId(), Long.valueOf(turnBasedMatch.getCreationTimestamp()), turnBasedMatch.getLastUpdaterId(), Long.valueOf(turnBasedMatch.getLastUpdatedTimestamp()), turnBasedMatch.getPendingParticipantId(), Integer.valueOf(turnBasedMatch.getStatus()), Integer.valueOf(turnBasedMatch.getTurnStatus()), turnBasedMatch.getDescription(), Integer.valueOf(turnBasedMatch.getVariant()), Integer.valueOf(turnBasedMatch.getVersion()), turnBasedMatch.getParticipants(), turnBasedMatch.getRematchId(), Integer.valueOf(turnBasedMatch.getMatchNumber()), turnBasedMatch.getAutoMatchCriteria(), Integer.valueOf(turnBasedMatch.getAvailableAutoMatchSlots()), Boolean.valueOf(turnBasedMatch.isLocallyModified())});
+        return Objects.hashCode(turnBasedMatch.getGame(), turnBasedMatch.getMatchId(), turnBasedMatch.getCreatorId(), Long.valueOf(turnBasedMatch.getCreationTimestamp()), turnBasedMatch.getLastUpdaterId(), Long.valueOf(turnBasedMatch.getLastUpdatedTimestamp()), turnBasedMatch.getPendingParticipantId(), Integer.valueOf(turnBasedMatch.getStatus()), Integer.valueOf(turnBasedMatch.getTurnStatus()), turnBasedMatch.getDescription(), Integer.valueOf(turnBasedMatch.getVariant()), Integer.valueOf(turnBasedMatch.getVersion()), turnBasedMatch.getParticipants(), turnBasedMatch.getRematchId(), Integer.valueOf(turnBasedMatch.getMatchNumber()), Integer.valueOf(zzc.zza(turnBasedMatch.getAutoMatchCriteria())), Integer.valueOf(turnBasedMatch.getAvailableAutoMatchSlots()), Boolean.valueOf(turnBasedMatch.isLocallyModified()));
     }
 
     static int zza(TurnBasedMatch turnBasedMatch, String str) {
@@ -117,7 +150,7 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
             }
         }
         String matchId = turnBasedMatch.getMatchId();
-        throw new IllegalStateException(new StringBuilder((String.valueOf(str).length() + 29) + String.valueOf(matchId).length()).append("Participant ").append(str).append(" is not in match ").append(matchId).toString());
+        throw new IllegalStateException(new StringBuilder(String.valueOf(str).length() + 29 + String.valueOf(matchId).length()).append("Participant ").append(str).append(" is not in match ").append(matchId).toString());
     }
 
     static boolean zza(TurnBasedMatch turnBasedMatch, Object obj) {
@@ -128,11 +161,11 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
             return true;
         }
         TurnBasedMatch turnBasedMatch2 = (TurnBasedMatch) obj;
-        return zzbf.equal(turnBasedMatch2.getGame(), turnBasedMatch.getGame()) && zzbf.equal(turnBasedMatch2.getMatchId(), turnBasedMatch.getMatchId()) && zzbf.equal(turnBasedMatch2.getCreatorId(), turnBasedMatch.getCreatorId()) && zzbf.equal(Long.valueOf(turnBasedMatch2.getCreationTimestamp()), Long.valueOf(turnBasedMatch.getCreationTimestamp())) && zzbf.equal(turnBasedMatch2.getLastUpdaterId(), turnBasedMatch.getLastUpdaterId()) && zzbf.equal(Long.valueOf(turnBasedMatch2.getLastUpdatedTimestamp()), Long.valueOf(turnBasedMatch.getLastUpdatedTimestamp())) && zzbf.equal(turnBasedMatch2.getPendingParticipantId(), turnBasedMatch.getPendingParticipantId()) && zzbf.equal(Integer.valueOf(turnBasedMatch2.getStatus()), Integer.valueOf(turnBasedMatch.getStatus())) && zzbf.equal(Integer.valueOf(turnBasedMatch2.getTurnStatus()), Integer.valueOf(turnBasedMatch.getTurnStatus())) && zzbf.equal(turnBasedMatch2.getDescription(), turnBasedMatch.getDescription()) && zzbf.equal(Integer.valueOf(turnBasedMatch2.getVariant()), Integer.valueOf(turnBasedMatch.getVariant())) && zzbf.equal(Integer.valueOf(turnBasedMatch2.getVersion()), Integer.valueOf(turnBasedMatch.getVersion())) && zzbf.equal(turnBasedMatch2.getParticipants(), turnBasedMatch.getParticipants()) && zzbf.equal(turnBasedMatch2.getRematchId(), turnBasedMatch.getRematchId()) && zzbf.equal(Integer.valueOf(turnBasedMatch2.getMatchNumber()), Integer.valueOf(turnBasedMatch.getMatchNumber())) && zzbf.equal(turnBasedMatch2.getAutoMatchCriteria(), turnBasedMatch.getAutoMatchCriteria()) && zzbf.equal(Integer.valueOf(turnBasedMatch2.getAvailableAutoMatchSlots()), Integer.valueOf(turnBasedMatch.getAvailableAutoMatchSlots())) && zzbf.equal(Boolean.valueOf(turnBasedMatch2.isLocallyModified()), Boolean.valueOf(turnBasedMatch.isLocallyModified()));
+        return Objects.equal(turnBasedMatch2.getGame(), turnBasedMatch.getGame()) && Objects.equal(turnBasedMatch2.getMatchId(), turnBasedMatch.getMatchId()) && Objects.equal(turnBasedMatch2.getCreatorId(), turnBasedMatch.getCreatorId()) && Objects.equal(Long.valueOf(turnBasedMatch2.getCreationTimestamp()), Long.valueOf(turnBasedMatch.getCreationTimestamp())) && Objects.equal(turnBasedMatch2.getLastUpdaterId(), turnBasedMatch.getLastUpdaterId()) && Objects.equal(Long.valueOf(turnBasedMatch2.getLastUpdatedTimestamp()), Long.valueOf(turnBasedMatch.getLastUpdatedTimestamp())) && Objects.equal(turnBasedMatch2.getPendingParticipantId(), turnBasedMatch.getPendingParticipantId()) && Objects.equal(Integer.valueOf(turnBasedMatch2.getStatus()), Integer.valueOf(turnBasedMatch.getStatus())) && Objects.equal(Integer.valueOf(turnBasedMatch2.getTurnStatus()), Integer.valueOf(turnBasedMatch.getTurnStatus())) && Objects.equal(turnBasedMatch2.getDescription(), turnBasedMatch.getDescription()) && Objects.equal(Integer.valueOf(turnBasedMatch2.getVariant()), Integer.valueOf(turnBasedMatch.getVariant())) && Objects.equal(Integer.valueOf(turnBasedMatch2.getVersion()), Integer.valueOf(turnBasedMatch.getVersion())) && Objects.equal(turnBasedMatch2.getParticipants(), turnBasedMatch.getParticipants()) && Objects.equal(turnBasedMatch2.getRematchId(), turnBasedMatch.getRematchId()) && Objects.equal(Integer.valueOf(turnBasedMatch2.getMatchNumber()), Integer.valueOf(turnBasedMatch.getMatchNumber())) && zzc.zza(turnBasedMatch2.getAutoMatchCriteria(), turnBasedMatch.getAutoMatchCriteria()) && Objects.equal(Integer.valueOf(turnBasedMatch2.getAvailableAutoMatchSlots()), Integer.valueOf(turnBasedMatch.getAvailableAutoMatchSlots())) && Objects.equal(Boolean.valueOf(turnBasedMatch2.isLocallyModified()), Boolean.valueOf(turnBasedMatch.isLocallyModified()));
     }
 
     static String zzb(TurnBasedMatch turnBasedMatch) {
-        return zzbf.zzt(turnBasedMatch).zzg("Game", turnBasedMatch.getGame()).zzg("MatchId", turnBasedMatch.getMatchId()).zzg("CreatorId", turnBasedMatch.getCreatorId()).zzg("CreationTimestamp", Long.valueOf(turnBasedMatch.getCreationTimestamp())).zzg("LastUpdaterId", turnBasedMatch.getLastUpdaterId()).zzg("LastUpdatedTimestamp", Long.valueOf(turnBasedMatch.getLastUpdatedTimestamp())).zzg("PendingParticipantId", turnBasedMatch.getPendingParticipantId()).zzg("MatchStatus", Integer.valueOf(turnBasedMatch.getStatus())).zzg("TurnStatus", Integer.valueOf(turnBasedMatch.getTurnStatus())).zzg("Description", turnBasedMatch.getDescription()).zzg("Variant", Integer.valueOf(turnBasedMatch.getVariant())).zzg("Data", turnBasedMatch.getData()).zzg("Version", Integer.valueOf(turnBasedMatch.getVersion())).zzg("Participants", turnBasedMatch.getParticipants()).zzg("RematchId", turnBasedMatch.getRematchId()).zzg("PreviousData", turnBasedMatch.getPreviousMatchData()).zzg("MatchNumber", Integer.valueOf(turnBasedMatch.getMatchNumber())).zzg("AutoMatchCriteria", turnBasedMatch.getAutoMatchCriteria()).zzg("AvailableAutoMatchSlots", Integer.valueOf(turnBasedMatch.getAvailableAutoMatchSlots())).zzg("LocallyModified", Boolean.valueOf(turnBasedMatch.isLocallyModified())).zzg("DescriptionParticipantId", turnBasedMatch.getDescriptionParticipantId()).toString();
+        return Objects.toStringHelper(turnBasedMatch).add("Game", turnBasedMatch.getGame()).add("MatchId", turnBasedMatch.getMatchId()).add("CreatorId", turnBasedMatch.getCreatorId()).add("CreationTimestamp", Long.valueOf(turnBasedMatch.getCreationTimestamp())).add("LastUpdaterId", turnBasedMatch.getLastUpdaterId()).add("LastUpdatedTimestamp", Long.valueOf(turnBasedMatch.getLastUpdatedTimestamp())).add("PendingParticipantId", turnBasedMatch.getPendingParticipantId()).add("MatchStatus", Integer.valueOf(turnBasedMatch.getStatus())).add("TurnStatus", Integer.valueOf(turnBasedMatch.getTurnStatus())).add("Description", turnBasedMatch.getDescription()).add("Variant", Integer.valueOf(turnBasedMatch.getVariant())).add("Data", turnBasedMatch.getData()).add("Version", Integer.valueOf(turnBasedMatch.getVersion())).add("Participants", turnBasedMatch.getParticipants()).add("RematchId", turnBasedMatch.getRematchId()).add("PreviousData", turnBasedMatch.getPreviousMatchData()).add("MatchNumber", Integer.valueOf(turnBasedMatch.getMatchNumber())).add("AutoMatchCriteria", turnBasedMatch.getAutoMatchCriteria()).add("AvailableAutoMatchSlots", Integer.valueOf(turnBasedMatch.getAvailableAutoMatchSlots())).add("LocallyModified", Boolean.valueOf(turnBasedMatch.isLocallyModified())).add("DescriptionParticipantId", turnBasedMatch.getDescriptionParticipantId()).toString();
     }
 
     static String zzb(TurnBasedMatch turnBasedMatch, String str) {
@@ -158,13 +191,13 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
             }
         }
         String matchId = turnBasedMatch.getMatchId();
-        throw new IllegalStateException(new StringBuilder((String.valueOf(str).length() + 29) + String.valueOf(matchId).length()).append("Participant ").append(str).append(" is not in match ").append(matchId).toString());
+        throw new IllegalStateException(new StringBuilder(String.valueOf(str).length() + 29 + String.valueOf(matchId).length()).append("Participant ").append(str).append(" is not in match ").append(matchId).toString());
     }
 
     static ArrayList<String> zzc(TurnBasedMatch turnBasedMatch) {
         ArrayList participants = turnBasedMatch.getParticipants();
         int size = participants.size();
-        ArrayList<String> arrayList = new ArrayList(size);
+        ArrayList<String> arrayList = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             arrayList.add(((Participant) participants.get(i)).getParticipantId());
         }
@@ -172,7 +205,7 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
     }
 
     public final boolean canRematch() {
-        return this.zzhng == 2 && this.zzhni == null;
+        return this.zzqp == 2 && this.zzqq == null;
     }
 
     public final boolean equals(Object obj) {
@@ -183,61 +216,68 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
         return this;
     }
 
+    @Nullable
     public final Bundle getAutoMatchCriteria() {
-        return this.zzhmu;
+        return this.zzpz;
     }
 
     public final int getAvailableAutoMatchSlots() {
-        return this.zzhmu == null ? 0 : this.zzhmu.getInt(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS);
+        if (this.zzpz == null) {
+            return 0;
+        }
+        return this.zzpz.getInt(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS);
     }
 
     public final long getCreationTimestamp() {
-        return this.mCreationTimestamp;
+        return this.zzoz;
     }
 
     public final String getCreatorId() {
-        return this.zzhmw;
+        return this.zzqd;
     }
 
     public final byte[] getData() {
-        return this.zzhnh;
+        return this.data;
     }
 
     public final String getDescription() {
-        return this.zzdmz;
+        return this.description;
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzdmz, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.description, charArrayBuffer);
     }
 
     public final Participant getDescriptionParticipant() {
         String descriptionParticipantId = getDescriptionParticipantId();
-        return descriptionParticipantId == null ? null : getParticipant(descriptionParticipantId);
+        if (descriptionParticipantId == null) {
+            return null;
+        }
+        return getParticipant(descriptionParticipantId);
     }
 
     public final String getDescriptionParticipantId() {
-        return this.zzhnn;
+        return this.zzqv;
     }
 
     public final Game getGame() {
-        return this.zzhiw;
+        return this.zzlp;
     }
 
     public final long getLastUpdatedTimestamp() {
-        return this.zzhdu;
+        return this.zzfm;
     }
 
     public final String getLastUpdaterId() {
-        return this.zzhne;
+        return this.zzqn;
     }
 
     public final String getMatchId() {
-        return this.zzhfi;
+        return this.zzqm;
     }
 
     public final int getMatchNumber() {
-        return this.zzhnk;
+        return this.zzqs;
     }
 
     public final Participant getParticipant(String str) {
@@ -257,35 +297,35 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
     }
 
     public final ArrayList<Participant> getParticipants() {
-        return new ArrayList(this.zzhmc);
+        return new ArrayList<>(this.zzpc);
     }
 
     public final String getPendingParticipantId() {
-        return this.zzhnf;
+        return this.zzqo;
     }
 
     public final byte[] getPreviousMatchData() {
-        return this.zzhnj;
+        return this.zzqr;
     }
 
     public final String getRematchId() {
-        return this.zzhni;
+        return this.zzqq;
     }
 
     public final int getStatus() {
-        return this.zzhng;
+        return this.zzqp;
     }
 
     public final int getTurnStatus() {
-        return this.zzhnl;
+        return this.zzqt;
     }
 
     public final int getVariant() {
-        return this.zzhmd;
+        return this.zzpd;
     }
 
     public final int getVersion() {
-        return this.mVersion;
+        return this.version;
     }
 
     public final int hashCode() {
@@ -297,7 +337,7 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
     }
 
     public final boolean isLocallyModified() {
-        return this.zzhnm;
+        return this.zzqu;
     }
 
     public final String toString() {
@@ -305,27 +345,27 @@ public final class TurnBasedMatchEntity extends zzc implements TurnBasedMatch {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getGame(), i, false);
-        zzd.zza(parcel, 2, getMatchId(), false);
-        zzd.zza(parcel, 3, getCreatorId(), false);
-        zzd.zza(parcel, 4, getCreationTimestamp());
-        zzd.zza(parcel, 5, getLastUpdaterId(), false);
-        zzd.zza(parcel, 6, getLastUpdatedTimestamp());
-        zzd.zza(parcel, 7, getPendingParticipantId(), false);
-        zzd.zzc(parcel, 8, getStatus());
-        zzd.zzc(parcel, 10, getVariant());
-        zzd.zzc(parcel, 11, getVersion());
-        zzd.zza(parcel, 12, getData(), false);
-        zzd.zzc(parcel, 13, getParticipants(), false);
-        zzd.zza(parcel, 14, getRematchId(), false);
-        zzd.zza(parcel, 15, getPreviousMatchData(), false);
-        zzd.zzc(parcel, 16, getMatchNumber());
-        zzd.zza(parcel, 17, getAutoMatchCriteria(), false);
-        zzd.zzc(parcel, 18, getTurnStatus());
-        zzd.zza(parcel, 19, isLocallyModified());
-        zzd.zza(parcel, 20, getDescription(), false);
-        zzd.zza(parcel, 21, getDescriptionParticipantId(), false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 1, getGame(), i, false);
+        SafeParcelWriter.writeString(parcel, 2, getMatchId(), false);
+        SafeParcelWriter.writeString(parcel, 3, getCreatorId(), false);
+        SafeParcelWriter.writeLong(parcel, 4, getCreationTimestamp());
+        SafeParcelWriter.writeString(parcel, 5, getLastUpdaterId(), false);
+        SafeParcelWriter.writeLong(parcel, 6, getLastUpdatedTimestamp());
+        SafeParcelWriter.writeString(parcel, 7, getPendingParticipantId(), false);
+        SafeParcelWriter.writeInt(parcel, 8, getStatus());
+        SafeParcelWriter.writeInt(parcel, 10, getVariant());
+        SafeParcelWriter.writeInt(parcel, 11, getVersion());
+        SafeParcelWriter.writeByteArray(parcel, 12, getData(), false);
+        SafeParcelWriter.writeTypedList(parcel, 13, getParticipants(), false);
+        SafeParcelWriter.writeString(parcel, 14, getRematchId(), false);
+        SafeParcelWriter.writeByteArray(parcel, 15, getPreviousMatchData(), false);
+        SafeParcelWriter.writeInt(parcel, 16, getMatchNumber());
+        SafeParcelWriter.writeBundle(parcel, 17, getAutoMatchCriteria(), false);
+        SafeParcelWriter.writeInt(parcel, 18, getTurnStatus());
+        SafeParcelWriter.writeBoolean(parcel, 19, isLocallyModified());
+        SafeParcelWriter.writeString(parcel, 20, getDescription(), false);
+        SafeParcelWriter.writeString(parcel, 21, getDescriptionParticipantId(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

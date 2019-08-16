@@ -1,5 +1,5 @@
 package com.crashlytics.android.answers;
 
-public interface EventFilter {
+interface EventFilter {
     boolean skipEvent(SessionEvent sessionEvent);
 }

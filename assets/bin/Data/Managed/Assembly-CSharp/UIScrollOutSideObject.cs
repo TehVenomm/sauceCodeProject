@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIScrollOutSideObject
+public class UIScrollOutSideObject : MonoBehaviour
 {
 	private Transform target;
 
@@ -19,7 +19,6 @@ public class UIScrollOutSideObject
 
 	public void SetActive(bool is_active)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		enaleUpdate = is_active;
 		this.get_gameObject().SetActive(is_active);
 	}
@@ -38,14 +37,11 @@ public class UIScrollOutSideObject
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 	}
 
 	private void LateUpdate()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (enaleUpdate && _transform != null && target != null)
 		{

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 {
@@ -12,8 +13,6 @@ public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 
 			public int flag;
 		}
-
-		public const string NT = "enemyID,actionID,actionName,anim0,anim1,anim2,anim3,anim4,weight0,weight1,weight2,weight3,weight4,weight5,weight6,weight7,weight8,act0,act1,act2,act3,act4,act5,act6,act7,act8,act9,angryId,validAngryId,lotteryWaitInterval,counter,useLvLimit,modeId,startWaitInterval";
 
 		public uint actionID;
 
@@ -45,17 +44,19 @@ public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 
 		public float lotteryWaitInterval;
 
-		public float lotteryWaitTime = -3.40282347E+38f;
+		public float lotteryWaitTime = float.MinValue;
 
 		public float startWaitInterval;
 
-		public float startWaitTime = -3.40282347E+38f;
+		public float startWaitTime = float.MinValue;
 
 		public bool isCounterAttack;
 
 		public int useLvLimit;
 
 		public RegionFlag[] regionFlags = new RegionFlag[3];
+
+		public const string NT = "enemyID,actionID,actionName,anim0,anim1,anim2,anim3,anim4,weight0,weight1,weight2,weight3,weight4,weight5,weight6,weight7,weight8,act0,act1,act2,act3,act4,act5,act6,act7,act8,act9,angryId,validAngryId,lotteryWaitInterval,counter,useLvLimit,modeId,startWaitInterval";
 
 		public bool isMove => (float)atkRange > 0f;
 
@@ -174,6 +175,12 @@ public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 
 	private UIntKeyTable<List<EnemyActionData>> dataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyActionData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyActionData> _003C_003Ef__mg_0024cache1;
+
 	public static ActionTypeInfo GetActionTypeInfo(string name)
 	{
 		ActionTypeInfo actionTypeInfo = new ActionTypeInfo();
@@ -201,6 +208,17 @@ public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 			Log.Error(LOG.ERROR, "Anim名（{0}）は動作しません。Tableで設定しているAnim名を確認・変更してください。", name);
 		}
 		return actionTypeInfo;
+	}
+
+	public static ActionTypeInfo[] GetActionTypeInfos(params string[] names)
+	{
+		ActionTypeInfo[] array = new ActionTypeInfo[names.Length];
+		int i = 0;
+		for (int num = array.Length; i < num; i++)
+		{
+			array[i] = GetActionTypeInfo(names[i]);
+		}
+		return array;
 	}
 
 	public void CreateTable(string csv)

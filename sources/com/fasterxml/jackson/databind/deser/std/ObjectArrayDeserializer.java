@@ -56,20 +56,21 @@ public class ObjectArrayDeserializer extends ContainerDeserializerBase<Object[]>
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
-        JsonDeserializer jsonDeserializer = this._elementDeserializer;
+        JsonDeserializer handleSecondaryContextualization;
+        JsonDeserializer<Object> jsonDeserializer = this._elementDeserializer;
         Boolean findFormatFeature = findFormatFeature(deserializationContext, beanProperty, this._arrayType.getRawClass(), Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        jsonDeserializer = findConvertingContentDeserializer(deserializationContext, beanProperty, jsonDeserializer);
+        JsonDeserializer findConvertingContentDeserializer = findConvertingContentDeserializer(deserializationContext, beanProperty, jsonDeserializer);
         JavaType contentType = this._arrayType.getContentType();
-        if (jsonDeserializer == null) {
-            jsonDeserializer = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
+        if (findConvertingContentDeserializer == null) {
+            handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
         } else {
-            jsonDeserializer = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, contentType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(findConvertingContentDeserializer, beanProperty, contentType);
         }
         TypeDeserializer typeDeserializer = this._elementTypeDeserializer;
         if (typeDeserializer != null) {
             typeDeserializer = typeDeserializer.forProperty(beanProperty);
         }
-        return withResolved(typeDeserializer, jsonDeserializer, findFormatFeature);
+        return withResolved(typeDeserializer, handleSecondaryContextualization, findFormatFeature);
     }
 
     public boolean isCachable() {
@@ -85,45 +86,45 @@ public class ObjectArrayDeserializer extends ContainerDeserializerBase<Object[]>
     }
 
     public Object[] deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Object[] completeAndClearBuffer;
+        Object deserializeWithType;
+        int i;
         if (!jsonParser.isExpectedStartArrayToken()) {
             return handleNonArray(jsonParser, deserializationContext);
         }
-        Object[] completeAndClearBuffer;
         ObjectBuffer leaseObjectBuffer = deserializationContext.leaseObjectBuffer();
         Object[] resetAndStart = leaseObjectBuffer.resetAndStart();
         TypeDeserializer typeDeserializer = this._elementTypeDeserializer;
-        int i = 0;
+        int i2 = 0;
         while (true) {
-            JsonToken nextToken = jsonParser.nextToken();
-            if (nextToken == JsonToken.END_ARRAY) {
-                break;
-            }
-            Object nullValue;
-            int i2;
-            if (nextToken == JsonToken.VALUE_NULL) {
-                nullValue = this._elementDeserializer.getNullValue(deserializationContext);
-            } else if (typeDeserializer == null) {
-                try {
-                    nullValue = this._elementDeserializer.deserialize(jsonParser, deserializationContext);
-                } catch (Throwable e) {
-                    throw JsonMappingException.wrapWithPath(e, (Object) resetAndStart, i + leaseObjectBuffer.bufferedSize());
+            try {
+                JsonToken nextToken = jsonParser.nextToken();
+                if (nextToken == JsonToken.END_ARRAY) {
+                    break;
                 }
-            } else {
-                nullValue = this._elementDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
+                if (nextToken == JsonToken.VALUE_NULL) {
+                    deserializeWithType = this._elementDeserializer.getNullValue(deserializationContext);
+                } else if (typeDeserializer == null) {
+                    deserializeWithType = this._elementDeserializer.deserialize(jsonParser, deserializationContext);
+                } else {
+                    deserializeWithType = this._elementDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
+                }
+                if (i2 >= resetAndStart.length) {
+                    resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
+                    i = 0;
+                } else {
+                    i = i2;
+                }
+                i2 = i + 1;
+                resetAndStart[i] = deserializeWithType;
+            } catch (Exception e) {
+                throw JsonMappingException.wrapWithPath((Throwable) e, (Object) resetAndStart, i2 + leaseObjectBuffer.bufferedSize());
             }
-            if (i >= resetAndStart.length) {
-                resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
-                i2 = 0;
-            } else {
-                i2 = i;
-            }
-            i = i2 + 1;
-            resetAndStart[i2] = nullValue;
         }
         if (this._untyped) {
-            completeAndClearBuffer = leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i);
+            completeAndClearBuffer = leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i2);
         } else {
-            completeAndClearBuffer = leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i, this._elementClass);
+            completeAndClearBuffer = leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i2, this._elementClass);
         }
         deserializationContext.returnObjectBuffer(leaseObjectBuffer);
         return completeAndClearBuffer;
@@ -133,7 +134,8 @@ public class ObjectArrayDeserializer extends ContainerDeserializerBase<Object[]>
         return (Object[]) typeDeserializer.deserializeTypedFromArray(jsonParser, deserializationContext);
     }
 
-    protected Byte[] deserializeFromBase64(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Byte[] deserializeFromBase64(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         byte[] binaryValue = jsonParser.getBinaryValue(deserializationContext.getBase64Variant());
         Byte[] bArr = new Byte[binaryValue.length];
         int length = binaryValue.length;
@@ -143,27 +145,27 @@ public class ObjectArrayDeserializer extends ContainerDeserializerBase<Object[]>
         return bArr;
     }
 
-    protected Object[] handleNonArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object[] handleNonArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Object deserializeWithType;
+        Object[] objArr;
         if (jsonParser.hasToken(JsonToken.VALUE_STRING) && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT) && jsonParser.getText().length() == 0) {
             return null;
         }
-        int i = (this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY))) ? 1 : 0;
-        if (i != 0) {
-            Object nullValue;
-            Object[] objArr;
+        if (this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY))) {
             if (jsonParser.getCurrentToken() == JsonToken.VALUE_NULL) {
-                nullValue = this._elementDeserializer.getNullValue(deserializationContext);
+                deserializeWithType = this._elementDeserializer.getNullValue(deserializationContext);
             } else if (this._elementTypeDeserializer == null) {
-                nullValue = this._elementDeserializer.deserialize(jsonParser, deserializationContext);
+                deserializeWithType = this._elementDeserializer.deserialize(jsonParser, deserializationContext);
             } else {
-                nullValue = this._elementDeserializer.deserializeWithType(jsonParser, deserializationContext, this._elementTypeDeserializer);
+                deserializeWithType = this._elementDeserializer.deserializeWithType(jsonParser, deserializationContext, this._elementTypeDeserializer);
             }
             if (this._untyped) {
                 objArr = new Object[1];
             } else {
                 objArr = (Object[]) Array.newInstance(this._elementClass, 1);
             }
-            objArr[0] = nullValue;
+            objArr[0] = deserializeWithType;
             return objArr;
         } else if (jsonParser.getCurrentToken() == JsonToken.VALUE_STRING && this._elementClass == Byte.class) {
             return deserializeFromBase64(jsonParser, deserializationContext);

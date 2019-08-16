@@ -10,11 +10,10 @@ public final class JsonArray extends JsonElement implements Iterable<JsonElement
     private final List<JsonElement> elements = new ArrayList();
 
     public void add(JsonElement jsonElement) {
-        Object obj;
         if (jsonElement == null) {
-            obj = JsonNull.INSTANCE;
+            jsonElement = JsonNull.INSTANCE;
         }
-        this.elements.add(obj);
+        this.elements.add(jsonElement);
     }
 
     public void add(Boolean bool) {
@@ -41,7 +40,8 @@ public final class JsonArray extends JsonElement implements Iterable<JsonElement
         return this.elements.contains(jsonElement);
     }
 
-    JsonArray deepCopy() {
+    /* access modifiers changed from: 0000 */
+    public JsonArray deepCopy() {
         JsonArray jsonArray = new JsonArray();
         for (JsonElement deepCopy : this.elements) {
             jsonArray.add(deepCopy.deepCopy());

@@ -41,13 +41,12 @@ public class RadialBlurFilter : FilterBase
 	private void Awake()
 	{
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		_blurMaterial = new Material(ResourceUtility.FindShader("mobile/Custom/ImageEffect/RadialBlurFilter"));
 	}
 
 	public override void StartFilter()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		postEffector = this.get_gameObject().AddComponent<PostEffector>();
 		postEffector.SetFilter(this);
 	}

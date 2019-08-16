@@ -1,6 +1,5 @@
 package org.apache.commons.lang3.text;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,7 @@ public class StrSubstitutor {
     private StrLookup<?> variableResolver;
 
     public static <V> String replace(Object obj, Map<String, V> map) {
-        return new StrSubstitutor((Map) map).replace(obj);
+        return new StrSubstitutor(map).replace(obj);
     }
 
     public static <V> String replace(Object obj, Map<String, V> map, String str, String str2) {
@@ -32,13 +31,13 @@ public class StrSubstitutor {
         if (properties == null) {
             return obj.toString();
         }
-        Map hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         Enumeration propertyNames = properties.propertyNames();
         while (propertyNames.hasMoreElements()) {
             String str = (String) propertyNames.nextElement();
             hashMap.put(str, properties.getProperty(str));
         }
-        return replace(obj, hashMap);
+        return replace(obj, (Map<String, V>) hashMap);
     }
 
     public static String replaceSystemProperties(Object obj) {
@@ -46,7 +45,7 @@ public class StrSubstitutor {
     }
 
     public StrSubstitutor() {
-        this((StrLookup) null, DEFAULT_PREFIX, DEFAULT_SUFFIX, '$');
+        this(null, DEFAULT_PREFIX, DEFAULT_SUFFIX, '$');
     }
 
     public <V> StrSubstitutor(Map<String, V> map) {
@@ -66,7 +65,7 @@ public class StrSubstitutor {
     }
 
     public StrSubstitutor(StrLookup<?> strLookup) {
-        this((StrLookup) strLookup, DEFAULT_PREFIX, DEFAULT_SUFFIX, '$');
+        this(strLookup, DEFAULT_PREFIX, DEFAULT_SUFFIX, '$');
     }
 
     public StrSubstitutor(StrLookup<?> strLookup, String str, String str2, char c) {
@@ -86,7 +85,7 @@ public class StrSubstitutor {
     }
 
     public StrSubstitutor(StrLookup<?> strLookup, StrMatcher strMatcher, StrMatcher strMatcher2, char c) {
-        this((StrLookup) strLookup, strMatcher, strMatcher2, c, DEFAULT_VALUE_DELIMITER);
+        this(strLookup, strMatcher, strMatcher2, c, DEFAULT_VALUE_DELIMITER);
     }
 
     public StrSubstitutor(StrLookup<?> strLookup, StrMatcher strMatcher, StrMatcher strMatcher2, char c, StrMatcher strMatcher3) {
@@ -110,10 +109,10 @@ public class StrSubstitutor {
             return null;
         }
         StrBuilder append = new StrBuilder(i2).append(str, i, i2);
-        if (substitute(append, 0, i2)) {
-            return append.toString();
+        if (!substitute(append, 0, i2)) {
+            return str.substring(i, i + i2);
         }
-        return str.substring(i, i + i2);
+        return append.toString();
     }
 
     public String replace(char[] cArr) {
@@ -214,22 +213,22 @@ public class StrSubstitutor {
         return true;
     }
 
-    public boolean replaceIn(StringBuilder stringBuilder) {
-        if (stringBuilder == null) {
+    public boolean replaceIn(StringBuilder sb) {
+        if (sb == null) {
             return false;
         }
-        return replaceIn(stringBuilder, 0, stringBuilder.length());
+        return replaceIn(sb, 0, sb.length());
     }
 
-    public boolean replaceIn(StringBuilder stringBuilder, int i, int i2) {
-        if (stringBuilder == null) {
+    public boolean replaceIn(StringBuilder sb, int i, int i2) {
+        if (sb == null) {
             return false;
         }
-        StrBuilder append = new StrBuilder(i2).append(stringBuilder, i, i2);
+        StrBuilder append = new StrBuilder(i2).append(sb, i, i2);
         if (!substitute(append, 0, i2)) {
             return false;
         }
-        stringBuilder.replace(i, i + i2, append.toString());
+        sb.replace(i, i + i2, append.toString());
         return true;
     }
 
@@ -247,113 +246,192 @@ public class StrSubstitutor {
         return substitute(strBuilder, i, i2);
     }
 
-    protected boolean substitute(StrBuilder strBuilder, int i, int i2) {
+    /* access modifiers changed from: protected */
+    public boolean substitute(StrBuilder strBuilder, int i, int i2) {
         return substitute(strBuilder, i, i2, null) > 0;
     }
 
-    private int substitute(StrBuilder strBuilder, int i, int i2, List<String> list) {
-        StrMatcher variablePrefixMatcher = getVariablePrefixMatcher();
-        StrMatcher variableSuffixMatcher = getVariableSuffixMatcher();
-        char escapeChar = getEscapeChar();
-        StrMatcher valueDelimiterMatcher = getValueDelimiterMatcher();
-        boolean isEnableSubstitutionInVariables = isEnableSubstitutionInVariables();
-        Object obj = list == null ? 1 : null;
-        Object obj2 = null;
-        int i3 = 0;
-        char[] cArr = strBuilder.buffer;
-        int i4 = i + i2;
-        int i5 = i;
-        List list2 = list;
-        while (i5 < i4) {
-            int i6;
-            int isMatch = variablePrefixMatcher.isMatch(cArr, i5, i, i4);
-            if (isMatch == 0) {
-                i6 = i5 + 1;
-            } else if (i5 <= i || cArr[i5 - 1] != escapeChar) {
-                i6 = i5 + isMatch;
-                int i7 = 0;
-                while (i6 < i4) {
-                    if (isEnableSubstitutionInVariables) {
-                        int isMatch2 = variablePrefixMatcher.isMatch(cArr, i6, i, i4);
-                        if (isMatch2 != 0) {
-                            i7++;
-                            i6 += isMatch2;
-                        }
-                    }
-                    int isMatch3 = variableSuffixMatcher.isMatch(cArr, i6, i, i4);
-                    if (isMatch3 == 0) {
-                        i6++;
-                    } else if (i7 == 0) {
-                        String str;
-                        String str2;
-                        String str3 = new String(cArr, i5 + isMatch, (i6 - i5) - isMatch);
-                        if (isEnableSubstitutionInVariables) {
-                            StrBuilder strBuilder2 = new StrBuilder(str3);
-                            substitute(strBuilder2, 0, strBuilder2.length());
-                            str3 = strBuilder2.toString();
-                        }
-                        i6 += isMatch3;
-                        if (valueDelimiterMatcher != null) {
-                            char[] toCharArray = str3.toCharArray();
-                            for (i7 = 0; i7 < toCharArray.length; i7++) {
-                                if (!isEnableSubstitutionInVariables) {
-                                    if (variablePrefixMatcher.isMatch(toCharArray, i7, i7, toCharArray.length) != 0) {
-                                        str = null;
-                                        str2 = str3;
-                                        break;
-                                    }
-                                }
-                                int isMatch4 = valueDelimiterMatcher.isMatch(toCharArray, i7);
-                                if (isMatch4 != 0) {
-                                    str2 = str3.substring(0, i7);
-                                    str = str3.substring(i7 + isMatch4);
-                                    break;
-                                }
-                            }
-                        }
-                        str = null;
-                        str2 = str3;
-                        if (list2 == null) {
-                            list2 = new ArrayList();
-                            list2.add(new String(cArr, i, i2));
-                        }
-                        checkCyclicSubstitution(str2, list2);
-                        list2.add(str2);
-                        str2 = resolveVariable(str2, strBuilder, i5, i6);
-                        if (str2 != null) {
-                            str = str2;
-                        }
-                        if (str != null) {
-                            int length = str.length();
-                            strBuilder.replace(i5, i6, str);
-                            obj2 = 1;
-                            length = (length + substitute(strBuilder, i5, length, list2)) - (i6 - i5);
-                            i6 += length;
-                            i4 += length;
-                            i3 += length;
-                            cArr = strBuilder.buffer;
-                        }
-                        list2.remove(list2.size() - 1);
-                    } else {
-                        i7--;
-                        i6 += isMatch3;
-                    }
-                }
-            } else {
-                strBuilder.deleteCharAt(i5 - 1);
-                cArr = strBuilder.buffer;
-                i3--;
-                obj2 = 1;
-                i4--;
-                i6 = i5;
-            }
-            i5 = i6;
-        }
-        if (obj != null) {
-            return obj2 != null ? 1 : 0;
-        } else {
-            return i3;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:38:0x00b6  */
+    /* JADX WARNING: Removed duplicated region for block: B:42:0x00db  */
+    /* JADX WARNING: Removed duplicated region for block: B:55:0x0130  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private int substitute(org.apache.commons.lang3.text.StrBuilder r21, int r22, int r23, java.util.List<java.lang.String> r24) {
+        /*
+            r20 = this;
+            org.apache.commons.lang3.text.StrMatcher r13 = r20.getVariablePrefixMatcher()
+            org.apache.commons.lang3.text.StrMatcher r14 = r20.getVariableSuffixMatcher()
+            char r15 = r20.getEscapeChar()
+            org.apache.commons.lang3.text.StrMatcher r16 = r20.getValueDelimiterMatcher()
+            boolean r17 = r20.isEnableSubstitutionInVariables()
+            if (r24 != 0) goto L_0x0031
+            r2 = 1
+        L_0x0017:
+            r8 = 0
+            r7 = 0
+            r0 = r21
+            char[] r6 = r0.buffer
+            int r5 = r22 + r23
+            r9 = r22
+            r3 = r24
+        L_0x0023:
+            if (r9 >= r5) goto L_0x0124
+            r0 = r22
+            int r11 = r13.isMatch(r6, r9, r0, r5)
+            if (r11 != 0) goto L_0x0033
+            int r4 = r9 + 1
+        L_0x002f:
+            r9 = r4
+            goto L_0x0023
+        L_0x0031:
+            r2 = 0
+            goto L_0x0017
+        L_0x0033:
+            r0 = r22
+            if (r9 <= r0) goto L_0x004f
+            int r4 = r9 + -1
+            char r4 = r6[r4]
+            if (r4 != r15) goto L_0x004f
+            int r4 = r9 + -1
+            r0 = r21
+            r0.deleteCharAt(r4)
+            r0 = r21
+            char[] r6 = r0.buffer
+            int r7 = r7 + -1
+            r8 = 1
+            int r5 = r5 + -1
+            r4 = r9
+            goto L_0x002f
+        L_0x004f:
+            int r4 = r9 + r11
+            r10 = 0
+        L_0x0052:
+            if (r4 >= r5) goto L_0x002f
+            if (r17 == 0) goto L_0x0062
+            r0 = r22
+            int r12 = r13.isMatch(r6, r4, r0, r5)
+            if (r12 == 0) goto L_0x0062
+            int r10 = r10 + 1
+            int r4 = r4 + r12
+            goto L_0x0052
+        L_0x0062:
+            r0 = r22
+            int r18 = r14.isMatch(r6, r4, r0, r5)
+            if (r18 != 0) goto L_0x006d
+            int r4 = r4 + 1
+            goto L_0x0052
+        L_0x006d:
+            if (r10 != 0) goto L_0x011e
+            java.lang.String r12 = new java.lang.String
+            int r10 = r9 + r11
+            int r19 = r4 - r9
+            int r11 = r19 - r11
+            r12.<init>(r6, r10, r11)
+            if (r17 == 0) goto L_0x008f
+            org.apache.commons.lang3.text.StrBuilder r10 = new org.apache.commons.lang3.text.StrBuilder
+            r10.<init>(r12)
+            r11 = 0
+            int r12 = r10.length()
+            r0 = r20
+            r0.substitute(r10, r11, r12)
+            java.lang.String r12 = r10.toString()
+        L_0x008f:
+            int r4 = r4 + r18
+            r11 = 0
+            if (r16 == 0) goto L_0x012e
+            char[] r18 = r12.toCharArray()
+            r10 = 0
+        L_0x0099:
+            r0 = r18
+            int r0 = r0.length
+            r19 = r0
+            r0 = r19
+            if (r10 >= r0) goto L_0x012e
+            if (r17 != 0) goto L_0x0103
+            r0 = r18
+            int r0 = r0.length
+            r19 = r0
+            r0 = r18
+            r1 = r19
+            int r19 = r13.isMatch(r0, r10, r10, r1)
+            if (r19 == 0) goto L_0x0103
+            r10 = r11
+        L_0x00b4:
+            if (r3 != 0) goto L_0x00c7
+            java.util.ArrayList r3 = new java.util.ArrayList
+            r3.<init>()
+            java.lang.String r11 = new java.lang.String
+            r0 = r22
+            r1 = r23
+            r11.<init>(r6, r0, r1)
+            r3.add(r11)
+        L_0x00c7:
+            r0 = r20
+            r0.checkCyclicSubstitution(r12, r3)
+            r3.add(r12)
+            r0 = r20
+            r1 = r21
+            java.lang.String r11 = r0.resolveVariable(r12, r1, r9, r4)
+            if (r11 != 0) goto L_0x0130
+        L_0x00d9:
+            if (r10 == 0) goto L_0x00f8
+            int r6 = r10.length()
+            r0 = r21
+            r0.replace(r9, r4, r10)
+            r8 = 1
+            r0 = r20
+            r1 = r21
+            int r10 = r0.substitute(r1, r9, r6, r3)
+            int r6 = r6 + r10
+            int r9 = r4 - r9
+            int r6 = r6 - r9
+            int r4 = r4 + r6
+            int r5 = r5 + r6
+            int r7 = r7 + r6
+            r0 = r21
+            char[] r6 = r0.buffer
+        L_0x00f8:
+            int r9 = r3.size()
+            int r9 = r9 + -1
+            r3.remove(r9)
+            goto L_0x002f
+        L_0x0103:
+            r0 = r16
+            r1 = r18
+            int r19 = r0.isMatch(r1, r10)
+            if (r19 == 0) goto L_0x011a
+            r11 = 0
+            java.lang.String r11 = r12.substring(r11, r10)
+            int r10 = r10 + r19
+            java.lang.String r10 = r12.substring(r10)
+            r12 = r11
+            goto L_0x00b4
+        L_0x011a:
+            int r10 = r10 + 1
+            goto L_0x0099
+        L_0x011e:
+            int r10 = r10 + -1
+            int r4 = r4 + r18
+            goto L_0x0052
+        L_0x0124:
+            if (r2 == 0) goto L_0x012c
+            if (r8 == 0) goto L_0x012a
+            r2 = 1
+        L_0x0129:
+            return r2
+        L_0x012a:
+            r2 = 0
+            goto L_0x0129
+        L_0x012c:
+            r2 = r7
+            goto L_0x0129
+        L_0x012e:
+            r10 = r11
+            goto L_0x00b4
+        L_0x0130:
+            r10 = r11
+            goto L_0x00d9
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.apache.commons.lang3.text.StrSubstitutor.substitute(org.apache.commons.lang3.text.StrBuilder, int, int, java.util.List):int");
     }
 
     private void checkCyclicSubstitution(String str, List<String> list) {
@@ -362,17 +440,18 @@ public class StrSubstitutor {
             strBuilder.append("Infinite loop in property interpolation of ");
             strBuilder.append((String) list.remove(0));
             strBuilder.append(": ");
-            strBuilder.appendWithSeparators((Iterable) list, "->");
+            strBuilder.appendWithSeparators((Iterable<?>) list, "->");
             throw new IllegalStateException(strBuilder.toString());
         }
     }
 
-    protected String resolveVariable(String str, StrBuilder strBuilder, int i, int i2) {
-        StrLookup variableResolver = getVariableResolver();
-        if (variableResolver == null) {
+    /* access modifiers changed from: protected */
+    public String resolveVariable(String str, StrBuilder strBuilder, int i, int i2) {
+        StrLookup variableResolver2 = getVariableResolver();
+        if (variableResolver2 == null) {
             return null;
         }
-        return variableResolver.lookup(str);
+        return variableResolver2.lookup(str);
     }
 
     public char getEscapeChar() {

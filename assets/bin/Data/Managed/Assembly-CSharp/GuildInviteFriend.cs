@@ -1,5 +1,6 @@
 using Network;
 using System;
+using UnityEngine;
 
 public class GuildInviteFriend : QuestAcceptRoomInviteFriend
 {
@@ -52,10 +53,10 @@ public class GuildInviteFriend : QuestAcceptRoomInviteFriend
 		{
 			if (is_success)
 			{
-				nowPage = 1;
-				pageNumMax = 1;
+				nowPage = page;
+				pageNumMax = ((recv_data != null && recv_data.Length > 0) ? Mathf.CeilToInt((float)recv_data.Length / 10f) : 0);
 				inviteUsers = recv_data;
-				Sort();
+				Sort(GetCurrentUserList());
 			}
 			if (callback != null)
 			{
@@ -74,7 +75,7 @@ public class GuildInviteFriend : QuestAcceptRoomInviteFriend
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendInvite(selectedUserIdList.ToArray(), delegate(bool is_success, int[] invited_users)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

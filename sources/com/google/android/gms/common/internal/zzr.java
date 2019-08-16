@@ -1,43 +1,29 @@
 package com.google.android.gms.common.internal;
 
-import android.accounts.Account;
-import android.support.v4.util.ArraySet;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.internal.zzcpn;
-import java.util.Collection;
+import android.os.Parcel;
+import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 
-public final class zzr {
-    private Account zzdva;
-    private String zzdxd;
-    private int zzfgx = 0;
-    private String zzfgz;
-    private zzcpn zzftn = zzcpn.zzjnd;
-    private ArraySet<Scope> zzftp;
+@Class(creator = "ValidateAccountRequestCreator")
+@Deprecated
+public final class zzr extends AbstractSafeParcelable {
+    public static final Creator<zzr> CREATOR = new zzs();
+    @VersionField(mo13996id = 1)
+    private final int zzg;
 
-    public final zzq zzajz() {
-        return new zzq(this.zzdva, this.zzftp, null, 0, null, this.zzdxd, this.zzfgz, this.zzftn);
+    @Constructor
+    zzr(@Param(mo13993id = 1) int i) {
+        this.zzg = i;
     }
 
-    public final zzr zze(Account account) {
-        this.zzdva = account;
-        return this;
-    }
-
-    public final zzr zze(Collection<Scope> collection) {
-        if (this.zzftp == null) {
-            this.zzftp = new ArraySet();
-        }
-        this.zzftp.addAll((Collection) collection);
-        return this;
-    }
-
-    public final zzr zzfy(String str) {
-        this.zzdxd = str;
-        return this;
-    }
-
-    public final zzr zzfz(String str) {
-        this.zzfgz = str;
-        return this;
+    public final void writeToParcel(Parcel parcel, int i) {
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zzg);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

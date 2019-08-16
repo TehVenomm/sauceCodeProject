@@ -1,20 +1,12 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 
+/* renamed from: android.support.v4.app.FragmentManagerState */
 final class FragmentManagerState implements Parcelable {
-    public static final Creator<FragmentManagerState> CREATOR = new C00211();
-    FragmentState[] mActive;
-    int[] mAdded;
-    BackStackState[] mBackStack;
-
-    /* renamed from: android.support.v4.app.FragmentManagerState$1 */
-    static final class C00211 implements Creator<FragmentManagerState> {
-        C00211() {
-        }
-
+    public static final Creator<FragmentManagerState> CREATOR = new Creator<FragmentManagerState>() {
         public FragmentManagerState createFromParcel(Parcel parcel) {
             return new FragmentManagerState(parcel);
         }
@@ -22,12 +14,22 @@ final class FragmentManagerState implements Parcelable {
         public FragmentManagerState[] newArray(int i) {
             return new FragmentManagerState[i];
         }
+    };
+    FragmentState[] mActive;
+    int[] mAdded;
+    BackStackState[] mBackStack;
+    int mNextFragmentIndex;
+    int mPrimaryNavActiveIndex = -1;
+
+    public FragmentManagerState() {
     }
 
     public FragmentManagerState(Parcel parcel) {
         this.mActive = (FragmentState[]) parcel.createTypedArray(FragmentState.CREATOR);
         this.mAdded = parcel.createIntArray();
         this.mBackStack = (BackStackState[]) parcel.createTypedArray(BackStackState.CREATOR);
+        this.mPrimaryNavActiveIndex = parcel.readInt();
+        this.mNextFragmentIndex = parcel.readInt();
     }
 
     public int describeContents() {
@@ -38,5 +40,7 @@ final class FragmentManagerState implements Parcelable {
         parcel.writeTypedArray(this.mActive, i);
         parcel.writeIntArray(this.mAdded);
         parcel.writeTypedArray(this.mBackStack, i);
+        parcel.writeInt(this.mPrimaryNavActiveIndex);
+        parcel.writeInt(this.mNextFragmentIndex);
     }
 }

@@ -1,5 +1,6 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
+/* renamed from: android.support.v4.view.WindowCompat */
 public final class WindowCompat {
     public static final int FEATURE_ACTION_BAR = 8;
     public static final int FEATURE_ACTION_BAR_OVERLAY = 9;

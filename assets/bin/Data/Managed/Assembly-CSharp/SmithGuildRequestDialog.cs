@@ -48,8 +48,8 @@ public class SmithGuildRequestDialog : GameSection
 		{
 			OnTouchPost();
 		}));
-		SetActive((Enum)UI.OBJ_TARGET, true);
-		SetActive((Enum)UI.OBJ_OWNER, false);
+		SetActive((Enum)UI.OBJ_TARGET, is_visible: true);
+		SetActive((Enum)UI.OBJ_OWNER, is_visible: false);
 		SetInputValue((Enum)UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
 		SetInputLabel((Enum)UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
 		SetLabelText((Enum)UI.LBL_USER_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
@@ -57,7 +57,7 @@ public class SmithGuildRequestDialog : GameSection
 		SetLabelText(UI.LBL_QUATITY, data.GetNum());
 		SetLabelText(UI.LBL_DONATE_NUM, data.GetNum());
 		SetLabelText(UI.LBL_DONATE_MAX, needNum);
-		SetButtonEnabled((Enum)UI.BTN_GIFT, false);
+		SetButtonEnabled((Enum)UI.BTN_GIFT, is_enabled: false);
 		SetSliderValue((Enum)UI.SLD_PROGRESS, (float)data.GetNum() / (float)needNum);
 		Transform ctrl = GetCtrl(UI.OBJ_MATERIAL_ICON);
 		Item item = new Item();
@@ -84,7 +84,7 @@ public class SmithGuildRequestDialog : GameSection
 			{
 				RequestEvent("CHAT", GuildMessage.VIEW_TYPE.DONATE);
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 		});
 	}
 
@@ -116,7 +116,7 @@ public class SmithGuildRequestDialog : GameSection
 		case ITEM_ICON_TYPE.QUEST_ITEM:
 		{
 			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0L)
+			if (uniqID != 0)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
@@ -151,7 +151,7 @@ public class SmithGuildRequestDialog : GameSection
 		}
 		else
 		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, false, null, false, enemy_icon_id, 0, false, GET_TYPE.PAY);
+			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
 		}
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), parent_scroll);
 	}

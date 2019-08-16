@@ -17,9 +17,12 @@ public class InGamePlayerList : GameSection
 		LBL_ATK,
 		LBL_DEF,
 		LBL_COMMENT,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		BTN_FOLLOW,
 		BTN_BLACK_LIST,
 		PORTRAIT_FRAME,
@@ -52,17 +55,17 @@ public class InGamePlayerList : GameSection
 
 	private void OnScreenRotate(bool is_portrait)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 		UIPanel panel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
 		Vector4 baseClipRegion = panel.baseClipRegion;
 		if (is_portrait)
@@ -72,7 +75,7 @@ public class InGamePlayerList : GameSection
 			GetCtrl(UI.FRAME).set_localPosition(localPosition);
 			SetHeight((Enum)UI.FRAME, height);
 			GetCtrl(UI.SCR_LIST).set_parent(GetCtrl(UI.PORTRAIT_LIST));
-			baseClipRegion.w = (float)GetHeight(UI.PORTRAIT_LIST);
+			baseClipRegion.w = GetHeight(UI.PORTRAIT_LIST);
 		}
 		else
 		{
@@ -81,7 +84,7 @@ public class InGamePlayerList : GameSection
 			GetCtrl(UI.FRAME).set_localPosition(localPosition2);
 			SetHeight((Enum)UI.FRAME, height2);
 			GetCtrl(UI.SCR_LIST).set_parent(GetCtrl(UI.LANDSCAPE_LIST));
-			baseClipRegion.w = (float)GetHeight(UI.LANDSCAPE_LIST);
+			baseClipRegion.w = GetHeight(UI.LANDSCAPE_LIST);
 		}
 		panel.baseClipRegion = baseClipRegion;
 		panel.clipOffset = Vector2.get_zero();
@@ -101,12 +104,12 @@ public class InGamePlayerList : GameSection
 		int count = infoList.Count;
 		if (count <= 0)
 		{
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_LIST, is_visible: false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
 		}
 		else
 		{
-			SetGrid(UI.GRD_LIST, "InGamePlayerListItem", count, false, delegate(int i, Transform t, bool b)
+			SetGrid(UI.GRD_LIST, "InGamePlayerListItem", count, reset: false, delegate(int i, Transform t, bool b)
 			{
 				MonoBehaviourSingleton<StatusManager>.I.CalcUserStatusParam(infoList[i], out int _atk, out int _def, out int _hp);
 				SetLabelText(t, UI.LBL_NAME, infoList[i].name);
@@ -134,11 +137,31 @@ public class InGamePlayerList : GameSection
 					SetEvent(t, UI.BTN_BLACK_LIST, "BLACK_LIST_IN", i);
 				}
 				SetButtonEnabled(t, UI.BTN_BLACK_LIST, !flag);
-				SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
-				SetActive(t, UI.SPR_FOLLOW, infoList[i].following);
-				SetActive(t, UI.SPR_FOLLOWER, infoList[i].follower);
+				string clanId = (infoList[i].userClanData == null) ? "0" : infoList[i].userClanData.cId;
+				SetFollowStatus(t, infoList[i].userId, infoList[i].following, infoList[i].follower, clanId);
 			});
-			SetActive((Enum)UI.STR_NON_LIST, false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		}
+	}
+
+	protected void SetFollowStatus(Transform t, int user_id, bool following, bool follower, string clanId)
+	{
+		bool flag = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(user_id);
+		bool is_visible = false;
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userClan != null && MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
+		{
+			is_visible = (clanId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
+		}
+		bool flag2 = !flag && (following || follower);
+		SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
+		SetActive(t, UI.OBJ_FOLLOW, flag2);
+		SetActive(t, UI.SPR_FOLLOW, flag2 && following);
+		SetActive(t, UI.SPR_FOLLOWER, flag2 && follower);
+		SetActive(t, UI.SPR_SAME_CLAN_ICON, is_visible);
+		UIGrid component = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_FOLLOW_ARROW);
+		if (component != null)
+		{
+			component.Reposition();
 		}
 	}
 
@@ -183,9 +206,9 @@ public class InGamePlayerList : GameSection
 			}
 			if (MonoBehaviourSingleton<CoopApp>.IsValid())
 			{
-				CoopApp.UpdateField(null);
+				CoopApp.UpdateField();
 			}
-			GameSection.ResumeEvent(flag, null);
+			GameSection.ResumeEvent(flag);
 			RefreshUI();
 		});
 	}
@@ -204,7 +227,7 @@ public class InGamePlayerList : GameSection
 			{
 				infoList[index].following = !infoList[index].following;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 			RefreshUI();
 		});
 	}
@@ -223,7 +246,7 @@ public class InGamePlayerList : GameSection
 			{
 				infoList[index].following = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 			RefreshUI();
 		});
 	}
@@ -238,7 +261,7 @@ public class InGamePlayerList : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(infoList[index].userId, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 			RefreshUI();
 		});
 	}

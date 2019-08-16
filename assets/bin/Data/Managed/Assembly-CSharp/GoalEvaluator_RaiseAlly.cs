@@ -11,7 +11,7 @@ public class GoalEvaluator_RaiseAlly : GoalEvaluator
 		{
 			return 0f;
 		}
-		if (!brain.targetCtrl.CanReviveOfTargetAlly())
+		if (!brain.targetCtrl.CanRescueOfTargetAlly())
 		{
 			return 0f;
 		}

@@ -4,18 +4,18 @@ import com.google.android.gms.common.data.AbstractDataBuffer;
 import com.google.android.gms.common.data.DataHolder;
 
 public final class LeaderboardScoreBuffer extends AbstractDataBuffer<LeaderboardScore> {
-    private final zza zzhkz;
+    private final zza zzny;
 
     public LeaderboardScoreBuffer(DataHolder dataHolder) {
         super(dataHolder);
-        this.zzhkz = new zza(dataHolder.zzafh());
+        this.zzny = new zza(dataHolder.getMetadata());
     }
 
     public final LeaderboardScore get(int i) {
-        return new LeaderboardScoreRef(this.zzfkz, i);
+        return new LeaderboardScoreRef(this.mDataHolder, i);
     }
 
-    public final zza zzarq() {
-        return this.zzhkz;
+    public final zza zzdi() {
+        return this.zzny;
     }
 }

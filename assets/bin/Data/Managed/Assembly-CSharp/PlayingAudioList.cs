@@ -9,9 +9,9 @@ public class PlayingAudioList
 
 	public const int LOWEST_PRIORITY = 255;
 
-	private const int LIST_DEFAULT_SIZE = 32;
-
 	private List<AudioObject> m_AudioLists;
+
+	private const int LIST_DEFAULT_SIZE = 32;
 
 	public int ClipId
 	{
@@ -54,7 +54,7 @@ public class PlayingAudioList
 		ClipId = -1;
 		Priority = 255u;
 		IntervalTime = 0.002f;
-		LimitNum = 2147483647;
+		LimitNum = int.MaxValue;
 		PlayingCount = 0;
 		CullingType = AudioControlGroup.CullingTypes.NONE;
 	}
@@ -88,50 +88,53 @@ public class PlayingAudioList
 
 	private void DoCullingAudio(int needCullingNum)
 	{
-		if (needCullingNum >= 1 && m_AudioLists != null)
+		if (needCullingNum < 1 || m_AudioLists == null)
 		{
-			int num = 0;
-			while (num < m_AudioLists.Count && needCullingNum >= 1)
+			return;
+		}
+		int num = 0;
+		while (num < m_AudioLists.Count && needCullingNum >= 1)
+		{
+			if (m_AudioLists[num] != null)
 			{
-				if (m_AudioLists[num] != null)
-				{
-					m_AudioLists[num].Stop(0);
-				}
-				needCullingNum--;
+				m_AudioLists[num].Stop();
 			}
+			needCullingNum--;
 		}
 	}
 
 	public void StopAll(int fadeout_framecount = 0)
 	{
-		if (m_AudioLists != null)
+		if (m_AudioLists == null)
 		{
-			int num = 0;
-			while (num < m_AudioLists.Count)
+			return;
+		}
+		int num = 0;
+		while (num < m_AudioLists.Count)
+		{
+			if (m_AudioLists[num] != null)
 			{
-				if (m_AudioLists[num] != null)
-				{
-					m_AudioLists[num].Stop(fadeout_framecount);
-				}
+				m_AudioLists[num].Stop(fadeout_framecount);
 			}
 		}
 	}
 
 	public void OpanPlaySlot(int slotCount, bool force = false)
 	{
-		if (force || CullingType == AudioControlGroup.CullingTypes.OVERWRITE)
+		if (!force && CullingType != AudioControlGroup.CullingTypes.OVERWRITE)
 		{
-			int num = 0;
-			if (LimitNum > 1)
-			{
-				num = PlayingCount + slotCount - LimitNum;
-				if (num < 0)
-				{
-					num = 0;
-				}
-			}
-			DoCullingAudio(num);
+			return;
 		}
+		int num = 0;
+		if (LimitNum > 1)
+		{
+			num = PlayingCount + slotCount - LimitNum;
+			if (num < 0)
+			{
+				num = 0;
+			}
+		}
+		DoCullingAudio(num);
 	}
 
 	public bool CanPlay()

@@ -22,31 +22,25 @@ public abstract class PlatformServiceClient implements ServiceConnection {
     private boolean running;
     private Messenger sender;
 
-    /* renamed from: com.facebook.internal.PlatformServiceClient$1 */
-    class C04181 extends Handler {
-        C04181() {
-        }
-
-        public void handleMessage(Message message) {
-            PlatformServiceClient.this.handleMessage(message);
-        }
-    }
-
     public interface CompletedListener {
         void completed(Bundle bundle);
     }
 
-    public PlatformServiceClient(Context context, int i, int i2, int i3, String str) {
-        Context applicationContext = context.getApplicationContext();
+    public PlatformServiceClient(Context context2, int i, int i2, int i3, String str) {
+        Context applicationContext = context2.getApplicationContext();
         if (applicationContext != null) {
-            context = applicationContext;
+            context2 = applicationContext;
         }
-        this.context = context;
+        this.context = context2;
         this.requestMessage = i;
         this.replyMessage = i2;
         this.applicationId = str;
         this.protocolVersion = i3;
-        this.handler = new C04181();
+        this.handler = new Handler() {
+            public void handleMessage(Message message) {
+                PlatformServiceClient.this.handleMessage(message);
+            }
+        };
     }
 
     private void callback(Bundle bundle) {
@@ -78,11 +72,13 @@ public abstract class PlatformServiceClient implements ServiceConnection {
         this.running = false;
     }
 
-    protected Context getContext() {
+    /* access modifiers changed from: protected */
+    public Context getContext() {
         return this.context;
     }
 
-    protected void handleMessage(Message message) {
+    /* access modifiers changed from: protected */
+    public void handleMessage(Message message) {
         if (message.what == this.replyMessage) {
             Bundle data = message.getData();
             if (data.getString(NativeProtocol.STATUS_ERROR_TYPE) != null) {
@@ -90,7 +86,10 @@ public abstract class PlatformServiceClient implements ServiceConnection {
             } else {
                 callback(data);
             }
-            this.context.unbindService(this);
+            try {
+                this.context.unbindService(this);
+            } catch (IllegalArgumentException e) {
+            }
         }
     }
 
@@ -108,7 +107,8 @@ public abstract class PlatformServiceClient implements ServiceConnection {
         callback(null);
     }
 
-    protected abstract void populateRequestBundle(Bundle bundle);
+    /* access modifiers changed from: protected */
+    public abstract void populateRequestBundle(Bundle bundle);
 
     public void setCompletedListener(CompletedListener completedListener) {
         this.listener = completedListener;

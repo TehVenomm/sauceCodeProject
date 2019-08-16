@@ -9,11 +9,11 @@ public class PlayingSoundList
 
 	private const int MAX_PRIORITY_NUM = 256;
 
-	private const float DEFAULT_INTERVAL = 0.002f;
-
 	private Dictionary<int, List<AudioObject>> playingObjects = new Dictionary<int, List<AudioObject>>();
 
 	private List<AudioObject>[] priorityList = new List<AudioObject>[256];
+
+	private const float DEFAULT_INTERVAL = 0.002f;
 
 	public int playingSENum
 	{

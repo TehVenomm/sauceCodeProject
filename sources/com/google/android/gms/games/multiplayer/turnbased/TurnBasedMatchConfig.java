@@ -1,34 +1,34 @@
 package com.google.android.gms.games.multiplayer.turnbased;
 
 import android.os.Bundle;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import java.util.ArrayList;
 
 public abstract class TurnBasedMatchConfig {
 
     public static final class Builder {
-        int zzhmd;
-        ArrayList<String> zzhmt;
-        Bundle zzhmu;
-        int zzhnd;
+        int zzpd;
+        ArrayList<String> zzpy;
+        Bundle zzpz;
+        int zzql;
 
         private Builder() {
-            this.zzhmd = -1;
-            this.zzhmt = new ArrayList();
-            this.zzhmu = null;
-            this.zzhnd = 2;
+            this.zzpd = -1;
+            this.zzpy = new ArrayList<>();
+            this.zzpz = null;
+            this.zzql = 2;
         }
 
         public final Builder addInvitedPlayer(String str) {
-            zzbp.zzu(str);
-            this.zzhmt.add(str);
+            Preconditions.checkNotNull(str);
+            this.zzpy.add(str);
             return this;
         }
 
         public final Builder addInvitedPlayers(ArrayList<String> arrayList) {
-            zzbp.zzu(arrayList);
-            this.zzhmt.addAll(arrayList);
+            Preconditions.checkNotNull(arrayList);
+            this.zzpy.addAll(arrayList);
             return this;
         }
 
@@ -37,14 +37,13 @@ public abstract class TurnBasedMatchConfig {
         }
 
         public final Builder setAutoMatchCriteria(Bundle bundle) {
-            this.zzhmu = bundle;
+            this.zzpz = bundle;
             return this;
         }
 
         public final Builder setVariant(int i) {
-            boolean z = i == -1 || i > 0;
-            zzbp.zzb(z, (Object) "Variant must be a positive integer or TurnBasedMatch.MATCH_VARIANT_ANY");
-            this.zzhmd = i;
+            Preconditions.checkArgument(i == -1 || i > 0, "Variant must be a positive integer or TurnBasedMatch.MATCH_VARIANT_ANY");
+            this.zzpd = i;
             return this;
         }
     }
@@ -70,5 +69,5 @@ public abstract class TurnBasedMatchConfig {
 
     public abstract int getVariant();
 
-    public abstract int zzarv();
+    public abstract int zzdp();
 }

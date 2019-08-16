@@ -1,13 +1,21 @@
 using System.Collections;
 using UnityEngine;
 
-public class StatusSmithCharacter
+public class StatusSmithCharacter : MonoBehaviour
 {
 	private const int SMITH_NPC_ID = 4;
+
+	private const int UNIQUE_SMITH_NPC_ID = 36;
+
+	public bool isUnique;
 
 	protected Animator animator;
 
 	protected PlayerAnimCtrl animCtrl;
+
+	protected bool isComplete;
+
+	protected bool isActive;
 
 	public Transform _transform
 	{
@@ -28,18 +36,18 @@ public class StatusSmithCharacter
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 	}
 
 	private IEnumerator Start()
 	{
+		isComplete = false;
 		loader = LoadModel();
 		while (loader.IsLoading())
 		{
-			yield return (object)null;
+			yield return null;
 		}
+		this.get_gameObject().SetActive(isActive);
 		animator = loader.GetAnimator();
 		if (!(animator == null))
 		{
@@ -49,19 +57,34 @@ public class StatusSmithCharacter
 			_transform.set_position(param.smithNPCPos);
 			_transform.set_eulerAngles(param.smithNPCRot);
 			_transform.set_localScale(Vector3.get_one() * param.smithSize);
+			isComplete = true;
 		}
 	}
 
 	protected ModelLoaderBase LoadModel()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		return Singleton<NPCTable>.I.GetNPCData(4).LoadModel(this.get_gameObject(), true, true, null, false);
+		if (isUnique)
+		{
+			return Singleton<NPCTable>.I.GetNPCData(36).LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, null, useSpecialModel: false);
+		}
+		return Singleton<NPCTable>.I.GetNPCData(4).LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, null, useSpecialModel: false);
 	}
 
 	protected void InitAnim()
 	{
 		PLCA default_anim = PLCA.IDLE_02;
-		animCtrl = PlayerAnimCtrl.Get(animator, default_anim, null, null, null);
+		animCtrl = PlayerAnimCtrl.Get(animator, default_anim);
+	}
+
+	public void SetActive(bool active)
+	{
+		if (!isComplete)
+		{
+			isActive = active;
+		}
+		else
+		{
+			this.get_gameObject().SetActive(active);
+		}
 	}
 }

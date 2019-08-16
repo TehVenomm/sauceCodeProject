@@ -48,11 +48,11 @@ public interface InputAccessor {
             if (length < 1) {
                 return false;
             }
-            length = this._in.read(this._buffer, this._ptr, length);
-            if (length <= 0) {
+            int read = this._in.read(this._buffer, this._ptr, length);
+            if (read <= 0) {
                 return false;
             }
-            this._bufferedEnd += length;
+            this._bufferedEnd += read;
             return true;
         }
 

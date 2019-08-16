@@ -1,68 +1,65 @@
 package com.google.android.gms.auth.api;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import com.google.android.gms.auth.api.credentials.CredentialsApi;
-import com.google.android.gms.auth.api.credentials.PasswordSpecification;
 import com.google.android.gms.auth.api.proxy.ProxyApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.internal.zzc;
-import com.google.android.gms.auth.api.signin.internal.zzd;
+import com.google.android.gms.auth.api.signin.internal.zzf;
+import com.google.android.gms.auth.api.signin.internal.zzg;
 import com.google.android.gms.common.annotation.KeepForSdk;
 import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.Api.ApiOptions.NoOptions;
+import com.google.android.gms.common.api.Api.AbstractClientBuilder;
 import com.google.android.gms.common.api.Api.ApiOptions.Optional;
-import com.google.android.gms.common.api.Api.zza;
-import com.google.android.gms.common.api.Api.zzf;
-import com.google.android.gms.internal.zzari;
-import com.google.android.gms.internal.zzarj;
-import com.google.android.gms.internal.zzark;
-import com.google.android.gms.internal.zzasg;
-import com.google.android.gms.internal.zzaso;
-import com.google.android.gms.internal.zzatn;
+import com.google.android.gms.common.api.Api.ClientKey;
+import com.google.android.gms.internal.auth-api.zzi;
+import com.google.android.gms.internal.auth-api.zzr;
 
 public final class Auth {
-    public static final Api<AuthCredentialsOptions> CREDENTIALS_API = new Api("Auth.CREDENTIALS_API", zzdyg, zzdyd);
-    public static final CredentialsApi CredentialsApi = new zzasg();
-    public static final Api<GoogleSignInOptions> GOOGLE_SIGN_IN_API = new Api("Auth.GOOGLE_SIGN_IN_API", zzdyi, zzdyf);
-    public static final GoogleSignInApi GoogleSignInApi = new zzc();
+    public static final Api<AuthCredentialsOptions> CREDENTIALS_API = new Api<>("Auth.CREDENTIALS_API", zzi, zzg);
+    public static final CredentialsApi CredentialsApi = new zzi();
+    public static final Api<GoogleSignInOptions> GOOGLE_SIGN_IN_API = new Api<>("Auth.GOOGLE_SIGN_IN_API", zzj, zzh);
+    public static final GoogleSignInApi GoogleSignInApi = new zzf();
     @KeepForSdk
-    public static final Api<zzf> PROXY_API = zzd.API;
+    @Deprecated
+    public static final Api<AuthProxyOptions> PROXY_API = AuthProxy.API;
     @KeepForSdk
-    public static final ProxyApi ProxyApi = new zzatn();
-    public static final zzf<zzaso> zzdyd = new zzf();
-    private static zzf<zzark> zzdye = new zzf();
-    public static final zzf<zzd> zzdyf = new zzf();
-    private static final zza<zzaso, AuthCredentialsOptions> zzdyg = new zza();
-    private static final zza<zzark, NoOptions> zzdyh = new zzb();
-    private static final zza<zzd, GoogleSignInOptions> zzdyi = new zzc();
-    private static Api<NoOptions> zzdyj = new Api("Auth.ACCOUNT_STATUS_API", zzdyh, zzdye);
-    private static zzari zzdyk = new zzarj();
+    @Deprecated
+    public static final ProxyApi ProxyApi = AuthProxy.ProxyApi;
+    public static final ClientKey<zzr> zzg = new ClientKey<>();
+    public static final ClientKey<zzg> zzh = new ClientKey<>();
+    private static final AbstractClientBuilder<zzr, AuthCredentialsOptions> zzi = new zzc();
+    private static final AbstractClientBuilder<zzg, GoogleSignInOptions> zzj = new zzd();
 
-    public static final class AuthCredentialsOptions implements Optional {
-        private static AuthCredentialsOptions zzdyl = new AuthCredentialsOptions(new Builder());
-        private final String zzdym = null;
-        private final PasswordSpecification zzdyn;
+    @Deprecated
+    public static class AuthCredentialsOptions implements Optional {
+        private static final AuthCredentialsOptions zzk = new Builder().zzc();
+        private final String zzl = null;
+        private final boolean zzm;
 
+        @Deprecated
         public static class Builder {
-            @NonNull
-            private PasswordSpecification zzdyn = PasswordSpecification.zzeay;
+            protected Boolean zzn = Boolean.valueOf(false);
+
+            public Builder forceEnableSaveDialog() {
+                this.zzn = Boolean.valueOf(true);
+                return this;
+            }
+
+            public AuthCredentialsOptions zzc() {
+                return new AuthCredentialsOptions(this);
+            }
         }
 
-        private AuthCredentialsOptions(Builder builder) {
-            this.zzdyn = builder.zzdyn;
+        public AuthCredentialsOptions(Builder builder) {
+            this.zzm = builder.zzn.booleanValue();
         }
 
-        public final Bundle zzzs() {
+        public final Bundle toBundle() {
             Bundle bundle = new Bundle();
             bundle.putString("consumer_package", null);
-            bundle.putParcelable("password_specification", this.zzdyn);
+            bundle.putBoolean("force_save_dialog", this.zzm);
             return bundle;
-        }
-
-        public final PasswordSpecification zzzv() {
-            return this.zzdyn;
         }
     }
 

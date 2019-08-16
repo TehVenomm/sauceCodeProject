@@ -9,8 +9,11 @@ public class QuestInvitationButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, true, (EventDelegate.Callback)null, false, 0);
-		MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.OnInvitationBtnOpen(true);
+		PlayTween((Enum)UI.OBJ_TWEEN, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		if (MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.isOpen)
+		{
+			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.OnInvitationBtnOpen(isOpen: true);
+		}
 		base.OnOpen();
 	}
 
@@ -18,7 +21,7 @@ public class QuestInvitationButton : UIBehaviour
 	{
 		if (MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.isOpen)
 		{
-			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.OnInvitationBtnOpen(false);
+			MonoBehaviourSingleton<UIManager>.I.blackMarkeButton.OnInvitationBtnOpen(isOpen: false);
 		}
 		base.OnClose();
 	}

@@ -1,16 +1,25 @@
-package android.support.v4.content.res;
+package android.support.p000v4.content.res;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.AnyRes;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.StyleableRes;
+import android.util.AttributeSet;
 import android.util.TypedValue;
+import org.xmlpull.v1.XmlPullParser;
 
 @RestrictTo({Scope.LIBRARY_GROUP})
+/* renamed from: android.support.v4.content.res.TypedArrayUtils */
 public class TypedArrayUtils {
+    private static final String NAMESPACE = "http://schemas.android.com/apk/res/android";
+
     public static int getAttr(Context context, int i, int i2) {
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(i, typedValue, true);
@@ -28,6 +37,35 @@ public class TypedArrayUtils {
 
     public static int getInt(TypedArray typedArray, @StyleableRes int i, @StyleableRes int i2, int i3) {
         return typedArray.getInt(i, typedArray.getInt(i2, i3));
+    }
+
+    public static boolean getNamedBoolean(@NonNull TypedArray typedArray, @NonNull XmlPullParser xmlPullParser, String str, @StyleableRes int i, boolean z) {
+        return !hasAttribute(xmlPullParser, str) ? z : typedArray.getBoolean(i, z);
+    }
+
+    @ColorInt
+    public static int getNamedColor(@NonNull TypedArray typedArray, @NonNull XmlPullParser xmlPullParser, String str, @StyleableRes int i, @ColorInt int i2) {
+        return !hasAttribute(xmlPullParser, str) ? i2 : typedArray.getColor(i, i2);
+    }
+
+    public static float getNamedFloat(@NonNull TypedArray typedArray, @NonNull XmlPullParser xmlPullParser, @NonNull String str, @StyleableRes int i, float f) {
+        return !hasAttribute(xmlPullParser, str) ? f : typedArray.getFloat(i, f);
+    }
+
+    public static int getNamedInt(@NonNull TypedArray typedArray, @NonNull XmlPullParser xmlPullParser, String str, @StyleableRes int i, int i2) {
+        return !hasAttribute(xmlPullParser, str) ? i2 : typedArray.getInt(i, i2);
+    }
+
+    @AnyRes
+    public static int getNamedResourceId(@NonNull TypedArray typedArray, @NonNull XmlPullParser xmlPullParser, String str, @StyleableRes int i, @AnyRes int i2) {
+        return !hasAttribute(xmlPullParser, str) ? i2 : typedArray.getResourceId(i, i2);
+    }
+
+    public static String getNamedString(@NonNull TypedArray typedArray, @NonNull XmlPullParser xmlPullParser, String str, @StyleableRes int i) {
+        if (!hasAttribute(xmlPullParser, str)) {
+            return null;
+        }
+        return typedArray.getString(i);
     }
 
     @AnyRes
@@ -48,5 +86,20 @@ public class TypedArrayUtils {
     public static CharSequence[] getTextArray(TypedArray typedArray, @StyleableRes int i, @StyleableRes int i2) {
         CharSequence[] textArray = typedArray.getTextArray(i);
         return textArray == null ? typedArray.getTextArray(i2) : textArray;
+    }
+
+    public static boolean hasAttribute(@NonNull XmlPullParser xmlPullParser, @NonNull String str) {
+        return xmlPullParser.getAttributeValue(NAMESPACE, str) != null;
+    }
+
+    public static TypedArray obtainAttributes(Resources resources, Theme theme, AttributeSet attributeSet, int[] iArr) {
+        return theme == null ? resources.obtainAttributes(attributeSet, iArr) : theme.obtainStyledAttributes(attributeSet, iArr, 0, 0);
+    }
+
+    public static TypedValue peekNamedValue(TypedArray typedArray, XmlPullParser xmlPullParser, String str, int i) {
+        if (!hasAttribute(xmlPullParser, str)) {
+            return null;
+        }
+        return typedArray.peekValue(i);
     }
 }

@@ -1,4 +1,4 @@
-package jp.colopl.libs;
+package p018jp.colopl.libs;
 
 import android.location.Location;
 import android.telephony.CellLocation;
@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 
+/* renamed from: jp.colopl.libs.CdmaCellLocationRef */
 public class CdmaCellLocationRef {
     private static final String CDMA_CELL_LOCATION_CLASS_NAME = "android.telephony.cdma.CdmaCellLocation";
     private static final int INVALID_LAT_LON = Integer.MAX_VALUE;
@@ -22,10 +23,10 @@ public class CdmaCellLocationRef {
 
     public CdmaCellLocationRef(CellLocation cellLocation) {
         if (isCdmaCellLocationInstance(cellLocation)) {
-            Class cdmaCellLocationClass = getCdmaCellLocationClass();
+            Class cdmaCellLocationClass2 = getCdmaCellLocationClass();
             try {
-                this.getBaseStationLatitude = cdmaCellLocationClass.getMethod("getBaseStationLatitude", (Class[]) null);
-                this.getBaseStationLongitude = cdmaCellLocationClass.getMethod("getBaseStationLongitude", (Class[]) null);
+                this.getBaseStationLatitude = cdmaCellLocationClass2.getMethod("getBaseStationLatitude", null);
+                this.getBaseStationLongitude = cdmaCellLocationClass2.getMethod("getBaseStationLongitude", null);
                 this.location = cellLocation;
                 this.isValid = true;
             } catch (NoSuchMethodException e) {
@@ -38,7 +39,10 @@ public class CdmaCellLocationRef {
             return null;
         }
         CdmaCellLocationRef cdmaCellLocationRef = new CdmaCellLocationRef(cellLocation);
-        return cdmaCellLocationRef.isValid ? cdmaCellLocationRef : null;
+        if (cdmaCellLocationRef.isValid) {
+            return cdmaCellLocationRef;
+        }
+        return null;
     }
 
     private static Class<?> getCdmaCellLocationClass() {
@@ -52,13 +56,13 @@ public class CdmaCellLocationRef {
     }
 
     private static boolean isCdmaCellLocationInstance(CellLocation cellLocation) {
-        Class cdmaCellLocationClass = getCdmaCellLocationClass();
-        return cdmaCellLocationClass != null && cdmaCellLocationClass.isInstance(cellLocation);
+        Class cdmaCellLocationClass2 = getCdmaCellLocationClass();
+        return cdmaCellLocationClass2 != null && cdmaCellLocationClass2.isInstance(cellLocation);
     }
 
     public int getBaseStationLatitude() {
         try {
-            return ((Integer) this.getBaseStationLatitude.invoke(this.location, (Object[]) null)).intValue();
+            return ((Integer) this.getBaseStationLatitude.invoke(this.location, null)).intValue();
         } catch (NullPointerException e) {
             return Integer.MAX_VALUE;
         } catch (IllegalAccessException e2) {
@@ -72,7 +76,7 @@ public class CdmaCellLocationRef {
 
     public int getBaseStationLongitude() {
         try {
-            return ((Integer) this.getBaseStationLongitude.invoke(this.location, (Object[]) null)).intValue();
+            return ((Integer) this.getBaseStationLongitude.invoke(this.location, null)).intValue();
         } catch (NullPointerException e) {
             return Integer.MAX_VALUE;
         } catch (IllegalAccessException e2) {
@@ -97,11 +101,11 @@ public class CdmaCellLocationRef {
             return null;
         }
         long time = new Date().getTime();
-        Location location = new Location(PSEUDO_NAME_AS_LOCATION_PROVIDER);
-        location.setLatitude(d);
-        location.setLongitude(d2);
-        location.setTime(time);
-        location.setAccuracy(PSEUDO_ACCURACY);
-        return location;
+        Location location2 = new Location(PSEUDO_NAME_AS_LOCATION_PROVIDER);
+        location2.setLatitude(d);
+        location2.setLongitude(d2);
+        location2.setTime(time);
+        location2.setAccuracy(PSEUDO_ACCURACY);
+        return location2;
     }
 }

@@ -9,6 +9,9 @@ public interface JsonFormatVisitorWrapper extends JsonFormatVisitorWithSerialize
     public static class Base implements JsonFormatVisitorWrapper {
         protected SerializerProvider _provider;
 
+        public Base() {
+        }
+
         public Base(SerializerProvider serializerProvider) {
             this._provider = serializerProvider;
         }

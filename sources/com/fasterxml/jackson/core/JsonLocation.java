@@ -3,7 +3,9 @@ package com.fasterxml.jackson.core;
 import java.io.Serializable;
 
 public class JsonLocation implements Serializable {
-    public static final JsonLocation NA = new JsonLocation("N/A", -1, -1, -1, -1);
+
+    /* renamed from: NA */
+    public static final JsonLocation f405NA = new JsonLocation("N/A", -1, -1, -1, -1);
     private static final long serialVersionUID = 1;
     final int _columnNr;
     final int _lineNr;
@@ -44,19 +46,19 @@ public class JsonLocation implements Serializable {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(80);
-        stringBuilder.append("[Source: ");
+        StringBuilder sb = new StringBuilder(80);
+        sb.append("[Source: ");
         if (this._sourceRef == null) {
-            stringBuilder.append("UNKNOWN");
+            sb.append("UNKNOWN");
         } else {
-            stringBuilder.append(this._sourceRef.toString());
+            sb.append(this._sourceRef.toString());
         }
-        stringBuilder.append("; line: ");
-        stringBuilder.append(this._lineNr);
-        stringBuilder.append(", column: ");
-        stringBuilder.append(this._columnNr);
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append("; line: ");
+        sb.append(this._lineNr);
+        sb.append(", column: ");
+        sb.append(this._columnNr);
+        sb.append(']');
+        return sb.toString();
     }
 
     public int hashCode() {

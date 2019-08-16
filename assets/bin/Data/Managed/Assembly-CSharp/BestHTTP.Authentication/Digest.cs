@@ -113,11 +113,11 @@ namespace BestHTTP.Authentication
 							ProtectedUris = new List<string>();
 						}
 						int pos = 0;
-						string item = value.Value.Read(ref pos, ' ', true);
+						string item = value.Value.Read(ref pos, ' ');
 						do
 						{
 							ProtectedUris.Add(item);
-							item = value.Value.Read(ref pos, ' ', true);
+							item = value.Value.Read(ref pos, ' ');
 						}
 						while (pos < value.Value.Length);
 					}
@@ -153,7 +153,7 @@ namespace BestHTTP.Authentication
 				{
 					NonceCount++;
 					string empty = string.Empty;
-					string text = new Random(request.GetHashCode()).Next(-2147483648, 2147483647).ToString("X8");
+					string text = new Random(request.GetHashCode()).Next(int.MinValue, int.MaxValue).ToString("X8");
 					string text2 = NonceCount.ToString("X8");
 					switch (Algorithm.TrimAndLower())
 					{

@@ -15,14 +15,14 @@ final class TypeAdapterRuntimeTypeWrapper<T> extends TypeAdapter<T> {
     private final TypeAdapter<T> delegate;
     private final Type type;
 
-    TypeAdapterRuntimeTypeWrapper(Gson gson, TypeAdapter<T> typeAdapter, Type type) {
+    TypeAdapterRuntimeTypeWrapper(Gson gson, TypeAdapter<T> typeAdapter, Type type2) {
         this.context = gson;
         this.delegate = typeAdapter;
-        this.type = type;
+        this.type = type2;
     }
 
-    private Type getRuntimeTypeIfMoreSpecific(Type type, Object obj) {
-        return obj != null ? (type == Object.class || (type instanceof TypeVariable) || (type instanceof Class)) ? obj.getClass() : type : type;
+    private Type getRuntimeTypeIfMoreSpecific(Type type2, Object obj) {
+        return obj != null ? (type2 == Object.class || (type2 instanceof TypeVariable) || (type2 instanceof Class)) ? obj.getClass() : type2 : type2;
     }
 
     public T read(JsonReader jsonReader) throws IOException {
@@ -30,7 +30,7 @@ final class TypeAdapterRuntimeTypeWrapper<T> extends TypeAdapter<T> {
     }
 
     public void write(JsonWriter jsonWriter, T t) throws IOException {
-        TypeAdapter typeAdapter = this.delegate;
+        TypeAdapter<T> typeAdapter = this.delegate;
         Type runtimeTypeIfMoreSpecific = getRuntimeTypeIfMoreSpecific(this.type, t);
         if (runtimeTypeIfMoreSpecific != this.type) {
             typeAdapter = this.context.getAdapter(TypeToken.get(runtimeTypeIfMoreSpecific));

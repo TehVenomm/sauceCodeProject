@@ -46,7 +46,6 @@ public class UIAutoBattleButton : UIBehaviour
 
 	private void SetupAutoButton(double timeLeft)
 	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		self = (MonoBehaviourSingleton<UIPlayerStatus>.I.targetPlayer as Self);
 		if (timeLeft < 0.0)
 		{
@@ -104,36 +103,36 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			updateTimer = false;
 		}
-		if (updateTimer)
+		if (!updateTimer)
 		{
-			automodeStatus.SubTime((double)Time.get_deltaTime());
-			lblAutoTime.text = automodeStatus.GetRemainTime();
-			if (!automodeStatus.IsRemain())
+			return;
+		}
+		automodeStatus.SubTime(Time.get_deltaTime());
+		lblAutoTime.text = automodeStatus.GetRemainTime();
+		if (!automodeStatus.IsRemain())
+		{
+			PauseAutoMode();
+		}
+		if (isAbleCountCycle)
+		{
+			stampCircle -= Time.get_deltaTime();
+			if (stampCircle < 0.0)
 			{
-				PauseAutoMode();
-			}
-			if (isAbleCountCycle)
-			{
-				stampCircle -= (double)Time.get_deltaTime();
-				if (stampCircle < 0.0)
+				isAbleCountCycle = false;
+				AutoPlayTimestamp(delegate(bool b)
 				{
-					isAbleCountCycle = false;
-					AutoPlayTimestamp(delegate(bool b)
+					if (b)
 					{
-						if (b)
-						{
-							resetStampCircle();
-							isAbleCountCycle = true;
-						}
-					});
-				}
+						resetStampCircle();
+						isAbleCountCycle = true;
+					}
+				});
 			}
 		}
 	}
 
 	private void UpdateButton()
 	{
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		if (cachedAutoFlg)
 		{
 			sprAutoOn.SetActive(false);
@@ -164,30 +163,30 @@ public class UIAutoBattleButton : UIBehaviour
 	{
 		if (IsAuto())
 		{
-			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
+			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 			StopAutoMode();
 		}
 		else if (automodeStatus.IsRemain())
 		{
-			SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
+			SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
 			StartAutoMode();
 		}
 		else
 		{
-			SoundManager.PlaySystemSE(SoundID.UISE.INVALID, 1f);
+			SoundManager.PlaySystemSE(SoundID.UISE.INVALID);
 		}
 	}
 
 	private void ForcePauseAutoMode()
 	{
-		self.SwitchAutoBattle(false);
+		self.SwitchAutoBattle(isTurnOn: false);
 		cachedAutoFlg = false;
 		UpdateButton();
 	}
 
 	private void ForceResumeAutoMode()
 	{
-		self.SwitchAutoBattle(true);
+		self.SwitchAutoBattle(isTurnOn: true);
 		cachedAutoFlg = true;
 		updateTimer = true;
 		UpdateButton();
@@ -195,7 +194,7 @@ public class UIAutoBattleButton : UIBehaviour
 
 	private void PauseAutoMode()
 	{
-		self.SwitchAutoBattle(false);
+		self.SwitchAutoBattle(isTurnOn: false);
 		cachedAutoFlg = false;
 		AutoPlayStopConn(delegate(bool is_success)
 		{
@@ -208,7 +207,7 @@ public class UIAutoBattleButton : UIBehaviour
 
 	private void StopAutoMode()
 	{
-		self.SwitchAutoBattle(false);
+		self.SwitchAutoBattle(isTurnOn: false);
 		GameSaveData.instance.isAutoMode = false;
 		cachedAutoFlg = false;
 		AutoPlayStopConn(delegate(bool is_success)
@@ -227,7 +226,7 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			if (is_success)
 			{
-				self.SwitchAutoBattle(true);
+				self.SwitchAutoBattle(isTurnOn: true);
 				GameSaveData.instance.isAutoMode = true;
 				cachedAutoFlg = true;
 				updateTimer = true;
@@ -306,16 +305,16 @@ public class UIAutoBattleButton : UIBehaviour
 				flag = true;
 				if (ret.result.timeLeft == 0.0)
 				{
-					self.SwitchAutoBattle(false);
+					self.SwitchAutoBattle(isTurnOn: false);
 					GameSaveData.instance.isAutoMode = false;
 					cachedAutoFlg = false;
-					Initialize(0.0, false);
+					Initialize(0.0, timerState: false);
 				}
 				else if (needUpdateUI)
 				{
 					needUpdateUI = false;
 					ForceResumeAutoMode();
-					Initialize(ret.result.timeLeft, true);
+					Initialize(ret.result.timeLeft, timerState: true);
 				}
 			}
 			if (!flag)
@@ -332,7 +331,7 @@ public class UIAutoBattleButton : UIBehaviour
 		if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) || QuestManager.IsValidInGame())
 		{
 			SetupAutoButton(0.0);
-			call_back(true);
+			call_back(obj: true);
 		}
 		else
 		{
@@ -351,32 +350,32 @@ public class UIAutoBattleButton : UIBehaviour
 
 	public void OnUseItem(double timeleft)
 	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		Initialize(timeleft, GameSaveData.instance.isAutoMode);
-		if (automodeStatus.IsRemain())
+		if (!automodeStatus.IsRemain())
 		{
-			if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) && !QuestManager.IsValidInGame())
+			return;
+		}
+		if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) && !QuestManager.IsValidInGame())
+		{
+			canUseAutoMode = true;
+		}
+		if (canUseAutoMode)
+		{
+			if (GameSaveData.instance.isAutoMode)
 			{
-				canUseAutoMode = true;
-			}
-			if (canUseAutoMode)
-			{
-				if (GameSaveData.instance.isAutoMode)
+				if (!cachedAutoFlg)
 				{
-					if (!cachedAutoFlg)
-					{
-						StartAutoMode();
-					}
-				}
-				else
-				{
-					UpdateButton();
+					StartAutoMode();
 				}
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				UpdateButton();
 			}
+		}
+		else
+		{
+			this.get_gameObject().SetActive(false);
 		}
 	}
 
@@ -415,14 +414,20 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			if (cachedAutoFlg)
 			{
-				self.SwitchAutoBattle(false);
+				if (self != null)
+				{
+					self.SwitchAutoBattle(isTurnOn: false);
+				}
 				cachedAutoFlg = false;
 				AutoPlayForceStop();
 			}
 		}
 		else if (cachedAutoFlg)
 		{
-			self.SwitchAutoBattle(false);
+			if (self != null)
+			{
+				self.SwitchAutoBattle(isTurnOn: false);
+			}
 			GameSaveData.instance.isAutoMode = false;
 			cachedAutoFlg = false;
 			AutoPlayForceStop();
@@ -434,7 +439,10 @@ public class UIAutoBattleButton : UIBehaviour
 	{
 		if (cachedAutoFlg)
 		{
-			self.SwitchAutoBattle(false);
+			if (self != null)
+			{
+				self.SwitchAutoBattle(isTurnOn: false);
+			}
 			GameSaveData.instance.isAutoMode = false;
 			cachedAutoFlg = false;
 			AutoPlayForceStop();

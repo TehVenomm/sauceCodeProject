@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.concurrency.internal;
+package p017io.fabric.sdk.android.services.concurrency.internal;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -7,9 +7,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.internal.AbstractFuture */
 public abstract class AbstractFuture<V> implements Future<V> {
-    private final Sync<V> sync = new Sync();
+    private final Sync<V> sync = new Sync<>();
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.internal.AbstractFuture$Sync */
     static final class Sync<V> extends AbstractQueuedSynchronizer {
         static final int CANCELLED = 4;
         static final int COMPLETED = 2;
@@ -54,48 +56,58 @@ public abstract class AbstractFuture<V> implements Future<V> {
             }
         }
 
-        boolean cancel(boolean z) {
+        /* access modifiers changed from: 0000 */
+        public boolean cancel(boolean z) {
             return complete(null, null, z ? 8 : 4);
         }
 
-        V get() throws CancellationException, ExecutionException, InterruptedException {
+        /* access modifiers changed from: 0000 */
+        public V get() throws CancellationException, ExecutionException, InterruptedException {
             acquireSharedInterruptibly(-1);
             return getValue();
         }
 
-        V get(long j) throws TimeoutException, CancellationException, ExecutionException, InterruptedException {
+        /* access modifiers changed from: 0000 */
+        public V get(long j) throws TimeoutException, CancellationException, ExecutionException, InterruptedException {
             if (tryAcquireSharedNanos(-1, j)) {
                 return getValue();
             }
             throw new TimeoutException("Timeout waiting for task.");
         }
 
-        boolean isCancelled() {
+        /* access modifiers changed from: 0000 */
+        public boolean isCancelled() {
             return (getState() & 12) != 0;
         }
 
-        boolean isDone() {
+        /* access modifiers changed from: 0000 */
+        public boolean isDone() {
             return (getState() & 14) != 0;
         }
 
-        boolean set(V v) {
+        /* access modifiers changed from: 0000 */
+        public boolean set(V v) {
             return complete(v, null, 2);
         }
 
-        boolean setException(Throwable th) {
+        /* access modifiers changed from: 0000 */
+        public boolean setException(Throwable th) {
             return complete(null, th, 2);
         }
 
-        protected int tryAcquireShared(int i) {
+        /* access modifiers changed from: protected */
+        public int tryAcquireShared(int i) {
             return isDone() ? 1 : -1;
         }
 
-        protected boolean tryReleaseShared(int i) {
+        /* access modifiers changed from: protected */
+        public boolean tryReleaseShared(int i) {
             setState(i);
             return true;
         }
 
-        boolean wasInterrupted() {
+        /* access modifiers changed from: 0000 */
+        public boolean wasInterrupted() {
             return getState() == 8;
         }
     }
@@ -127,7 +139,8 @@ public abstract class AbstractFuture<V> implements Future<V> {
         return this.sync.get(timeUnit.toNanos(j));
     }
 
-    protected void interruptTask() {
+    /* access modifiers changed from: protected */
+    public void interruptTask() {
     }
 
     public boolean isCancelled() {
@@ -138,18 +151,21 @@ public abstract class AbstractFuture<V> implements Future<V> {
         return this.sync.isDone();
     }
 
-    protected boolean set(V v) {
+    /* access modifiers changed from: protected */
+    public boolean set(V v) {
         return this.sync.set(v);
     }
 
-    protected boolean setException(Throwable th) {
+    /* access modifiers changed from: protected */
+    public boolean setException(Throwable th) {
         if (th != null) {
             return this.sync.setException(th);
         }
         throw new NullPointerException();
     }
 
-    protected final boolean wasInterrupted() {
+    /* access modifiers changed from: protected */
+    public final boolean wasInterrupted() {
         return this.sync.wasInterrupted();
     }
 }

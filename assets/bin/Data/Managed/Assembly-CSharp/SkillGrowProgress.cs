@@ -1,4 +1,6 @@
-public class SkillGrowProgress
+using UnityEngine;
+
+public class SkillGrowProgress : MonoBehaviour
 {
 	public UIProgressBar progressBar;
 
@@ -15,8 +17,6 @@ public class SkillGrowProgress
 
 	public void SetGrowMode()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		gaugeGrow.get_gameObject().SetActive(true);
 		gaugeExceed.get_gameObject().SetActive(false);
 		progressBar.foregroundWidget = gaugeGrow;
@@ -24,8 +24,6 @@ public class SkillGrowProgress
 
 	public void SetExceedMode()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		gaugeGrow.get_gameObject().SetActive(false);
 		gaugeExceed.get_gameObject().SetActive(true);
 		progressBar.foregroundWidget = gaugeExceed;

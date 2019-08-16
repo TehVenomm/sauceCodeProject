@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class StoryCharacter
+public class StoryCharacter : MonoBehaviour
 {
 	public enum EaseDir
 	{
@@ -80,19 +80,14 @@ public class StoryCharacter
 	{
 	}
 
-	public static StoryCharacter Initialize(int id, UITexture ui_tex, string _name, string _dir, string idle_anim)
+	public static StoryCharacter Initialize(int id, UITexture ui_tex, string _name, string _dir, string idle_anim, int layer = -1)
 	{
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Expected O, but got Unknown
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Expected O, but got Unknown
 		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(_name);
 		if (nPCData == null)
 		{
 			return null;
 		}
-		UIRenderTexture uIRenderTexture = UIRenderTexture.Get(ui_tex, -1f, true, -1);
+		UIRenderTexture uIRenderTexture = UIRenderTexture.Get(ui_tex, -1f, link_main_camera: true, layer);
 		uIRenderTexture.Disable();
 		uIRenderTexture.nearClipPlane = 1f;
 		uIRenderTexture.farClipPlane = 100f;
@@ -104,7 +99,7 @@ public class StoryCharacter
 		storyCharacter.uiTex = ui_tex;
 		storyCharacter.charaName = _name;
 		storyCharacter.aliasName = string.Empty;
-		storyCharacter.SetStandPosition(_dir, false);
+		storyCharacter.SetStandPosition(_dir);
 		if (string.IsNullOrEmpty(idle_anim))
 		{
 			storyCharacter.idleAnim = PlayerAnimCtrl.StringToEnum(nPCData.anim);
@@ -114,7 +109,7 @@ public class StoryCharacter
 			storyCharacter.idleAnim = PlayerAnimCtrl.StringToEnum(idle_anim);
 		}
 		storyCharacter.isLoading = true;
-		ModelLoaderBase modelLoaderBase = nPCData.LoadModel(val.get_gameObject(), false, false, storyCharacter.OnModelLoadComplete, false);
+		ModelLoaderBase modelLoaderBase = nPCData.LoadModel(val.get_gameObject(), need_shadow: false, enable_light_probe: false, storyCharacter.OnModelLoadComplete, useSpecialModel: false);
 		storyCharacter.npcLoader = (modelLoaderBase as NPCLoader);
 		storyCharacter.CollectTween(ui_tex.get_transform());
 		return storyCharacter;
@@ -150,7 +145,8 @@ public class StoryCharacter
 		}
 		if (_dir == "UR" || _dir == "UC" || _dir == "UL")
 		{
-			basePos.y += MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandUpOffset;
+			ref Vector3 reference = ref basePos;
+			reference.y += MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandUpOffset;
 		}
 		animPos.Set(basePos);
 		if (doesSetImmidiate)
@@ -158,6 +154,20 @@ public class StoryCharacter
 			model.set_localPosition(basePos);
 		}
 		animRot.Set(Quaternion.Euler(baseRot));
+	}
+
+	public void SetPosition(float x, float y, float time)
+	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		basePos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+		Vector3 end_value = default(Vector3);
+		end_value._002Ector(x, y, basePos.z);
+		animPos.Set(time, end_value);
+		animPos.Play();
 	}
 
 	public void SetModelScale(Vector3 scale)
@@ -191,7 +201,7 @@ public class StoryCharacter
 	{
 		if (animator != null)
 		{
-			playerAnimCtrl = PlayerAnimCtrl.Get(animator, idleAnim, null, null, null);
+			playerAnimCtrl = PlayerAnimCtrl.Get(animator, idleAnim);
 		}
 		isLoading = false;
 	}
@@ -212,7 +222,7 @@ public class StoryCharacter
 
 	public void Show()
 	{
-		renderTex.Enable(0.25f);
+		renderTex.Enable();
 	}
 
 	public void Hide()
@@ -267,7 +277,7 @@ public class StoryCharacter
 			leftStandPos.x = 0f;
 			begin_value = leftStandPos;
 		}
-		animPos.Set(charaFadeTime, begin_value, leftStandPos, null, default(Vector3), null);
+		animPos.Set(charaFadeTime, begin_value, leftStandPos);
 		animPos.Play();
 	}
 
@@ -277,28 +287,30 @@ public class StoryCharacter
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 		float charaFadeTime = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime;
 		renderTex.FadeOutDisable(charaFadeTime);
 		float charaFadeMoveX = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeMoveX;
 		Vector3 val = Vector3.get_zero();
 		Vector3 end_value = val;
+		bool flag = false;
 		if (dir == StoryDirector.POS.LEFT)
 		{
 			val = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
 			end_value = val;
 			end_value.x -= charaFadeMoveX;
+			flag = true;
 		}
 		else if (dir == StoryDirector.POS.RIGHT)
 		{
@@ -306,35 +318,39 @@ public class StoryCharacter
 			val.x = 0f - val.x;
 			end_value = val;
 			end_value.x += charaFadeMoveX;
+			flag = true;
 		}
-		animPos.Set(charaFadeTime, val, end_value, null, default(Vector3), null);
-		animPos.Play();
+		if (flag)
+		{
+			animPos.Set(charaFadeTime, val, end_value);
+			animPos.Play();
+		}
 	}
 
-	public void RotateFront()
+	public void RotateFront(float time = 0.5f)
 	{
-		RotateAngle(0f);
+		RotateAngle(0f, time);
 	}
 
-	public void RotateDefault()
+	public void RotateDefault(float time = 0.5f)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		animRot.Set(0.5f, model.get_localRotation(), Quaternion.Euler(baseRot), null, default(Quaternion), null);
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		animRot.Set(time, model.get_localRotation(), Quaternion.Euler(baseRot));
 		animRot.Play();
 	}
 
-	public void RotateAngle(float angle)
+	public void RotateAngle(float angle, float time = 0.5f)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		animRot.Set(0.5f, model.get_localRotation(), Quaternion.Euler(new Vector3(0f, 180f + angle, 0f)), null, default(Quaternion), null);
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		animRot.Set(time, model.get_localRotation(), Quaternion.Euler(new Vector3(0f, 180f + angle, 0f)));
 		animRot.Play();
 	}
 
@@ -344,8 +360,8 @@ public class StoryCharacter
 		{
 			try
 			{
-				PLCA anim = (PLCA)(int)Enum.Parse(typeof(PLCA), pose_name);
-				playerAnimCtrl.Play(anim, false);
+				PLCA anim = (PLCA)Enum.Parse(typeof(PLCA), pose_name);
+				playerAnimCtrl.Play(anim);
 			}
 			catch
 			{
@@ -356,43 +372,44 @@ public class StoryCharacter
 
 	public void RequestFace(string eye_type, string mouth_type)
 	{
-		if (!(npcLoader == null) && !(npcLoader.facial == null))
+		if (npcLoader == null || npcLoader.facial == null)
 		{
-			NPCFacial facial = npcLoader.facial;
-			NPCFacial.TYPE eyeType = facial.eyeType;
-			NPCFacial.TYPE mouthType = facial.mouthType;
-			if (!string.IsNullOrEmpty(eye_type))
+			return;
+		}
+		NPCFacial facial = npcLoader.facial;
+		NPCFacial.TYPE eyeType = facial.eyeType;
+		NPCFacial.TYPE mouthType = facial.mouthType;
+		if (!string.IsNullOrEmpty(eye_type))
+		{
+			try
 			{
-				try
-				{
-					NPCFacial.TYPE tYPE2 = facial.eyeType = (NPCFacial.TYPE)(int)Enum.Parse(typeof(NPCFacial.TYPE), eye_type);
-				}
-				catch
-				{
-					Log.Error(LOG.GAMESCENE, "不正な表情(目)：" + eye_type);
-				}
+				NPCFacial.TYPE tYPE2 = facial.eyeType = (NPCFacial.TYPE)Enum.Parse(typeof(NPCFacial.TYPE), eye_type);
 			}
-			if (!string.IsNullOrEmpty(mouth_type))
+			catch
 			{
-				try
-				{
-					NPCFacial.TYPE tYPE4 = facial.mouthType = (NPCFacial.TYPE)(int)Enum.Parse(typeof(NPCFacial.TYPE), mouth_type);
-				}
-				catch
-				{
-					Log.Error(LOG.GAMESCENE, "不正な表情(口)：" + mouth_type);
-				}
+				Log.Error(LOG.GAMESCENE, "不正な表情(目)：" + eye_type);
 			}
-			if (eyeType != facial.eyeType || mouthType != facial.mouthType)
+		}
+		if (!string.IsNullOrEmpty(mouth_type))
+		{
+			try
 			{
-				if (facial.eyeType != 0 || facial.mouthType != 0)
-				{
-					facial.enableAnim = false;
-				}
-				else
-				{
-					facial.enableAnim = true;
-				}
+				NPCFacial.TYPE tYPE4 = facial.mouthType = (NPCFacial.TYPE)Enum.Parse(typeof(NPCFacial.TYPE), mouth_type);
+			}
+			catch
+			{
+				Log.Error(LOG.GAMESCENE, "不正な表情(口)：" + mouth_type);
+			}
+		}
+		if (eyeType != facial.eyeType || mouthType != facial.mouthType)
+		{
+			if (facial.eyeType != 0 || facial.mouthType != 0)
+			{
+				facial.enableAnim = false;
+			}
+			else
+			{
+				facial.enableAnim = true;
 			}
 		}
 	}

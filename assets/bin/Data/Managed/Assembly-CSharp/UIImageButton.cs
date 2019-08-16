@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Image Button")]
-public class UIImageButton
+public class UIImageButton : MonoBehaviour
 {
 	public UISprite target;
 
@@ -19,13 +19,11 @@ public class UIImageButton
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			Collider component = this.get_gameObject().GetComponent<Collider>();
 			return Object.op_Implicit(component) && component.get_enabled();
 		}
 		set
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			Collider component = this.get_gameObject().GetComponent<Collider>();
 			if (Object.op_Implicit(component) && component.get_enabled() != value)
 			{
@@ -74,8 +72,6 @@ public class UIImageButton
 
 	private void UpdateImage()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (target != null)
 		{
 			if (isEnabled)

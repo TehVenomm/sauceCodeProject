@@ -10,8 +10,8 @@ public final class Primitives {
     private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE_TYPE;
 
     static {
-        Map hashMap = new HashMap(16);
-        Map hashMap2 = new HashMap(16);
+        HashMap hashMap = new HashMap(16);
+        HashMap hashMap2 = new HashMap(16);
         add(hashMap, hashMap2, Boolean.TYPE, Boolean.class);
         add(hashMap, hashMap2, Byte.TYPE, Byte.class);
         add(hashMap, hashMap2, Character.TYPE, Character.class);

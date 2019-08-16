@@ -90,7 +90,7 @@ namespace GooglePlayGames.Native.PInvoke
 			{
 				num = 0uL;
 			}
-			achievement.LastModifiedTime = dateTime.AddMilliseconds((double)num);
+			achievement.LastModifiedTime = dateTime.AddMilliseconds(num);
 			achievement.Points = getXP();
 			achievement.RevealedImageUrl = getRevealedImageUrl();
 			achievement.UnlockedImageUrl = getUnlockedImageUrl();

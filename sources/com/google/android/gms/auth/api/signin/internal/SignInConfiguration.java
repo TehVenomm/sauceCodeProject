@@ -3,55 +3,61 @@ package com.google.android.gms.auth.api.signin.internal;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 
-public final class SignInConfiguration extends zza implements ReflectedParcelable {
-    public static final Creator<SignInConfiguration> CREATOR = new zzw();
-    private final String zzedd;
-    private GoogleSignInOptions zzede;
+@Class(creator = "SignInConfigurationCreator")
+@Reserved({1})
+public final class SignInConfiguration extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<SignInConfiguration> CREATOR = new zzx();
+    @Field(getter = "getConsumerPkgName", mo13990id = 2)
+    private final String zzbr;
+    @Field(getter = "getGoogleConfig", mo13990id = 5)
+    private GoogleSignInOptions zzbs;
 
-    public SignInConfiguration(String str, GoogleSignInOptions googleSignInOptions) {
-        this.zzedd = zzbp.zzgf(str);
-        this.zzede = googleSignInOptions;
+    @Constructor
+    public SignInConfiguration(@Param(mo13993id = 2) String str, @Param(mo13993id = 5) GoogleSignInOptions googleSignInOptions) {
+        this.zzbr = Preconditions.checkNotEmpty(str);
+        this.zzbs = googleSignInOptions;
     }
 
     public final boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof SignInConfiguration)) {
             return false;
         }
-        try {
-            SignInConfiguration signInConfiguration = (SignInConfiguration) obj;
-            if (!this.zzedd.equals(signInConfiguration.zzedd)) {
-                return false;
-            }
-            if (this.zzede == null) {
-                if (signInConfiguration.zzede != null) {
-                    return false;
-                }
-            } else if (!this.zzede.equals(signInConfiguration.zzede)) {
-                return false;
-            }
-            return true;
-        } catch (ClassCastException e) {
+        SignInConfiguration signInConfiguration = (SignInConfiguration) obj;
+        if (!this.zzbr.equals(signInConfiguration.zzbr)) {
             return false;
         }
+        if (this.zzbs == null) {
+            if (signInConfiguration.zzbs != null) {
+                return false;
+            }
+        } else if (!this.zzbs.equals(signInConfiguration.zzbs)) {
+            return false;
+        }
+        return true;
     }
 
     public final int hashCode() {
-        return new zzo().zzo(this.zzedd).zzo(this.zzede).zzaan();
+        return new HashAccumulator().addObject(this.zzbr).addObject(this.zzbs).hash();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzedd, false);
-        zzd.zza(parcel, 5, this.zzede, i, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.zzbr, false);
+        SafeParcelWriter.writeParcelable(parcel, 5, this.zzbs, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final GoogleSignInOptions zzaap() {
-        return this.zzede;
+    public final GoogleSignInOptions zzm() {
+        return this.zzbs;
     }
 }

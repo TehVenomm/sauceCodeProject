@@ -51,7 +51,9 @@ public abstract class BattleCheckerBase
 
 	private readonly string ONE_HAND_SWORD_HEAT_COUNTER = "PLC00_attack_98";
 
-	private readonly string ONE_HAND_SWORD_REVENGE_BURST = "PLC00_attack_96";
+	private readonly string ONE_HAND_SWORD_REVENGE_BURST = "PLC00_attack_92";
+
+	private readonly string ONE_HAND_SWORD_BURST_COUNTER = "PLC00_attack_93";
 
 	public bool isEnableAttackCount
 	{
@@ -66,82 +68,92 @@ public abstract class BattleCheckerBase
 		{
 			OnArrowChargeAttack(damage);
 		}
-		else if (isEnableAttackCount)
+		else
 		{
+			if (!isEnableAttackCount)
+			{
+				return;
+			}
 			if (attackName == TWO_HAND_SWORD_CHARGE_ATTACK_HEAT)
 			{
 				OnHeatTwoHandSword(damage);
+				return;
 			}
-			else if (attackName == ONE_HAND_SWORD_HEAT_COUNTER)
+			if (attackName == ONE_HAND_SWORD_HEAT_COUNTER)
 			{
 				OnCounter(damage);
+				return;
 			}
-			else if (attackName == ONE_HAND_SWORD_REVENGE_BURST)
+			if (attackName == ONE_HAND_SWORD_REVENGE_BURST)
 			{
 				OnRevengeBurst(damage);
+				return;
 			}
-			else
+			if (attackName == ONE_HAND_SWORD_BURST_COUNTER)
 			{
-				if (specialActionId == -1)
+				OnBurstOneHandSword(damage);
+				return;
+			}
+			if (specialActionId == -1)
+			{
+				if (!MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 				{
-					if (!MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+					return;
+				}
+				InGameSettingsManager.Player player = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
+				specialActionId = player.specialActionInfo.spAttackID;
+				int rushLoopAttackID = player.spearActionInfo.rushLoopAttackID;
+				for (int i = 0; i < specialAttackNames.Length; i++)
+				{
+					if (specialAttackNames[i] == specialAttackNames[2])
 					{
-						return;
+						specialAttackNames[i] += rushLoopAttackID.ToString();
 					}
-					InGameSettingsManager.Player player = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
-					specialActionId = player.specialActionInfo.spAttackID;
-					int rushLoopAttackID = player.spearActionInfo.rushLoopAttackID;
-					for (int i = 0; i < specialAttackNames.Length; i++)
+					else
 					{
-						if (specialAttackNames[i] == specialAttackNames[2])
-						{
-							specialAttackNames[i] += rushLoopAttackID.ToString();
-						}
-						else
-						{
-							specialAttackNames[i] += specialActionId.ToString();
-						}
+						specialAttackNames[i] += specialActionId.ToString();
 					}
 				}
-				int num = 0;
-				while (true)
+			}
+			int num = 0;
+			while (true)
+			{
+				if (num < specialAttackNames.Length)
 				{
-					if (num >= specialAttackNames.Length)
-					{
-						return;
-					}
 					if (attackName.Contains(specialAttackNames[num]))
 					{
 						break;
 					}
 					num++;
+					continue;
 				}
-				switch (num)
+				return;
+			}
+			switch (num)
+			{
+			case 0:
+				OnCounter(damage);
+				break;
+			case 1:
+				if (flag)
 				{
-				case 0:
-					OnCounter(damage);
-					break;
-				case 1:
-					if (flag)
-					{
-						OnTwoHandSwordChargeAttack(damage);
-					}
-					if (judgementParam.chargeExpandRate > 0f)
-					{
-						OnTwoHandSwordExChargeAttack(damage);
-					}
-					break;
-				case 2:
-					OnSpearSpecialAttack(damage);
-					if (judgementParam.exRushChargeRate > 0f)
-					{
-						OnSpearExChargeAttack(damage);
-					}
-					break;
-				case 3:
-					OnPairSwordsCombo(damage);
-					break;
+					OnTwoHandSwordChargeAttack(damage);
 				}
+				if (judgementParam.chargeExpandRate > 0f)
+				{
+					OnTwoHandSwordExChargeAttack(damage);
+				}
+				break;
+			case 2:
+				OnSpearSpecialAttack(damage);
+				if (judgementParam.exRushChargeRate > 0f)
+				{
+					OnSpearExChargeAttack(damage);
+				}
+				break;
+			case 3:
+				OnPairSwordsCombo(damage);
+				break;
 			}
 		}
 	}
@@ -163,6 +175,8 @@ public abstract class BattleCheckerBase
 	protected abstract void OnHeatTwoHandSword(int damage);
 
 	protected abstract void OnRevengeBurst(int damage);
+
+	protected abstract void OnBurstOneHandSword(int damage);
 
 	public void OnWeakAttack(Enemy.WEAK_STATE weakState, int damage = 0)
 	{

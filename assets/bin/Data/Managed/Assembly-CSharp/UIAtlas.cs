@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Atlas")]
-public class UIAtlas
+public class UIAtlas : MonoBehaviour
 {
 	[Serializable]
 	private class Sprite
@@ -33,24 +33,24 @@ public class UIAtlas
 		TexCoords
 	}
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material material;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<UISpriteData> mSprites = new List<UISpriteData>();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mPixelSize = 1f;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIAtlas mReplacement;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Coordinates mCoordinates;
 
 	[HideInInspector]
@@ -65,26 +65,25 @@ public class UIAtlas
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? ((object)material) : ((object)mReplacement.spriteMaterial);
+			return (!(mReplacement != null)) ? material : mReplacement.spriteMaterial;
 		}
 		set
 		{
 			if (mReplacement != null)
 			{
 				mReplacement.spriteMaterial = value;
+				return;
 			}
-			else if (material == null)
+			if (material == null)
 			{
 				mPMA = 0;
 				material = value;
+				return;
 			}
-			else
-			{
-				MarkAsChanged();
-				mPMA = -1;
-				material = value;
-				MarkAsChanged();
-			}
+			MarkAsChanged();
+			mPMA = -1;
+			material = value;
+			MarkAsChanged();
 		}
 	}
 
@@ -92,8 +91,6 @@ public class UIAtlas
 	{
 		get
 		{
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			if (mReplacement != null)
 			{
 				return mReplacement.premultipliedAlpha;
@@ -147,15 +144,13 @@ public class UIAtlas
 			if (mReplacement != null)
 			{
 				mReplacement.pixelSize = value;
+				return;
 			}
-			else
+			float num = Mathf.Clamp(value, 0.25f, 4f);
+			if (mPixelSize != num)
 			{
-				float num = Mathf.Clamp(value, 0.25f, 4f);
-				if (mPixelSize != num)
-				{
-					mPixelSize = num;
-					MarkAsChanged();
-				}
+				mPixelSize = num;
+				MarkAsChanged();
 			}
 		}
 	}
@@ -334,21 +329,22 @@ public class UIAtlas
 		for (int count2 = mSprites.Count; k < count2; k++)
 		{
 			UISpriteData uISpriteData2 = mSprites[k];
-			if (uISpriteData2 != null && !string.IsNullOrEmpty(uISpriteData2.name))
+			if (uISpriteData2 == null || string.IsNullOrEmpty(uISpriteData2.name))
 			{
-				string text = uISpriteData2.name.ToLower();
-				int num = 0;
-				for (int l = 0; l < array.Length; l++)
+				continue;
+			}
+			string text = uISpriteData2.name.ToLower();
+			int num = 0;
+			for (int l = 0; l < array.Length; l++)
+			{
+				if (text.Contains(array[l]))
 				{
-					if (text.Contains(array[l]))
-					{
-						num++;
-					}
+					num++;
 				}
-				if (num == array.Length)
-				{
-					betterList.Add(uISpriteData2.name);
-				}
+			}
+			if (num == array.Length)
+			{
+				betterList.Add(uISpriteData2.name);
 			}
 		}
 		return betterList;
@@ -422,8 +418,6 @@ public class UIAtlas
 
 	private bool Upgrade()
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Expected O, but got Unknown
 		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
@@ -438,9 +432,9 @@ public class UIAtlas
 		}
 		if (mSprites.Count == 0 && sprites.Count > 0 && Object.op_Implicit(material))
 		{
-			Texture val = material.get_mainTexture();
-			int width = (!(val != null)) ? 512 : val.get_width();
-			int height = (!(val != null)) ? 512 : val.get_height();
+			Texture mainTexture = material.get_mainTexture();
+			int width = (!(mainTexture != null)) ? 512 : mainTexture.get_width();
+			int height = (!(mainTexture != null)) ? 512 : mainTexture.get_height();
 			for (int i = 0; i < sprites.Count; i++)
 			{
 				Sprite sprite = sprites[i];
@@ -448,8 +442,8 @@ public class UIAtlas
 				Rect inner = sprite.inner;
 				if (mCoordinates == Coordinates.TexCoords)
 				{
-					NGUIMath.ConvertToPixels(outer, width, height, true);
-					NGUIMath.ConvertToPixels(inner, width, height, true);
+					NGUIMath.ConvertToPixels(outer, width, height, round: true);
+					NGUIMath.ConvertToPixels(inner, width, height, round: true);
 				}
 				UISpriteData uISpriteData = new UISpriteData();
 				uISpriteData.name = sprite.name;

@@ -3,36 +3,36 @@ package com.google.android.gms.nearby.messages.internal;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzi implements Creator<zzh> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        ClientAppContext clientAppContext = null;
-        int zzd = zzb.zzd(parcel);
-        IBinder iBinder = null;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
+        ClientAppContext clientAppContext = null;
         String str = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        IBinder iBinder = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    iBinder = zzb.zzr(parcel, readInt);
+                    iBinder = SafeParcelReader.readIBinder(parcel, readHeader);
                     break;
                 case 3:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    clientAppContext = (ClientAppContext) zzb.zza(parcel, readInt, ClientAppContext.CREATOR);
+                    clientAppContext = (ClientAppContext) SafeParcelReader.createParcelable(parcel, readHeader, ClientAppContext.CREATOR);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new zzh(i, iBinder, str, clientAppContext);
     }
 

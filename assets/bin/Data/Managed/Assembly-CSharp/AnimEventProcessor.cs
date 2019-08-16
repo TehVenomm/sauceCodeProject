@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -58,91 +57,98 @@ public class AnimEventProcessor
 		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Expected O, but got Unknown
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Expected O, but got Unknown
 		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animator == null))
+		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+		if (animator == null)
 		{
-			bool flag = animator.IsInTransition(0);
-			AnimatorStateInfo info = (!flag) ? animator.GetCurrentAnimatorStateInfo(0) : animator.GetNextAnimatorStateInfo(0);
-			if ((curHash != info.get_fullPathHash() && !waitChange) || (curHash == info.get_fullPathHash() && waitChange))
+			return;
+		}
+		bool flag = animator.IsInTransition(0);
+		AnimatorStateInfo info = (!flag) ? animator.GetCurrentAnimatorStateInfo(0) : animator.GetNextAnimatorStateInfo(0);
+		if ((curHash != info.get_fullPathHash() && !waitChange) || (curHash == info.get_fullPathHash() && waitChange))
+		{
+			if (waitChange)
 			{
-				if (waitChange)
-				{
-					waitChange = false;
-				}
-				else
-				{
-					if (curDatas != null && lastSpeed > 0f)
-					{
-						float num = Time.get_deltaTime() * lastSpeed + lastNormalizedTime;
-						Forward(num - beginTime + curMargin);
-					}
-					OnChangeAnim(info.get_fullPathHash(), false);
-				}
-				if (curDatas == null)
-				{
-					return;
-				}
-				if (!flag)
-				{
-					changeDelay = true;
-					changeTransition = false;
-					return;
-				}
-				AnimatorClipInfo[] nextAnimatorClipInfo = animator.GetNextAnimatorClipInfo(0);
-				if (nextAnimatorClipInfo.Length == 0)
-				{
-					changeDelay = true;
-					changeTransition = true;
-					return;
-				}
-				ChangeAnimClip(ref info, nextAnimatorClipInfo[0].get_clip());
+				waitChange = false;
 			}
-			else if (changeDelay)
+			else
 			{
-				AnimatorClipInfo[] array = (!changeTransition) ? animator.GetCurrentAnimatorClipInfo(0) : animator.GetNextAnimatorClipInfo(0);
-				if (array.Length <= 0)
+				if (curDatas != null && lastSpeed > 0f)
 				{
-					return;
+					float num = Time.get_deltaTime() * lastSpeed + lastNormalizedTime;
+					Forward(num - beginTime + curMargin);
 				}
-				ChangeAnimClip(ref info, array[0].get_clip());
+				OnChangeAnim(info.get_fullPathHash());
 			}
-			if (!waitChange && curDatas != null && (!flag || !((ValueType)animator.GetCurrentAnimatorStateInfo(0)).Equals((object)animator.GetNextAnimatorStateInfo(0))))
+			if (curDatas == null)
 			{
-				float num2 = info.get_normalizedTime() * curTimeScale;
-				if (animator.get_speed() >= 0f)
-				{
-					if (num2 >= lastTime && info.get_loop())
-					{
-						Forward(curLength);
-						beginTime = lastTime;
-						lastTime += curLength;
-						curTime = 0f;
-						curIndex = 0;
-					}
-					else if (lastNormalizedTime > num2)
-					{
-						ExecuteLastEvent(false);
-						beginTime = 0f;
-						lastTime = curLength;
-						curTime = 0f;
-						curIndex = 0;
-					}
-					lastNormalizedTime = num2;
-					lastSpeed = animator.get_speed();
-					Forward(num2 - beginTime + curMargin);
-				}
+				return;
 			}
+			if (!flag)
+			{
+				changeDelay = true;
+				changeTransition = false;
+				return;
+			}
+			AnimatorClipInfo[] nextAnimatorClipInfo = animator.GetNextAnimatorClipInfo(0);
+			if (nextAnimatorClipInfo.Length == 0)
+			{
+				changeDelay = true;
+				changeTransition = true;
+				return;
+			}
+			ChangeAnimClip(ref info, nextAnimatorClipInfo[0].get_clip());
+		}
+		else if (changeDelay)
+		{
+			AnimatorClipInfo[] array = (!changeTransition) ? animator.GetCurrentAnimatorClipInfo(0) : animator.GetNextAnimatorClipInfo(0);
+			if (array.Length <= 0)
+			{
+				return;
+			}
+			ChangeAnimClip(ref info, array[0].get_clip());
+		}
+		if (waitChange || curDatas == null)
+		{
+			return;
+		}
+		if (flag)
+		{
+			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+			if (((object)currentAnimatorStateInfo).Equals((object)animator.GetNextAnimatorStateInfo(0)))
+			{
+				return;
+			}
+		}
+		float num2 = info.get_normalizedTime() * curTimeScale;
+		if (animator.get_speed() >= 0f)
+		{
+			if (num2 >= lastTime && info.get_loop())
+			{
+				Forward(curLength);
+				beginTime = lastTime;
+				lastTime += curLength;
+				curTime = 0f;
+				curIndex = 0;
+			}
+			else if (lastNormalizedTime > num2)
+			{
+				ExecuteLastEvent(delete_data: false);
+				beginTime = 0f;
+				lastTime = curLength;
+				curTime = 0f;
+				curIndex = 0;
+			}
+			lastNormalizedTime = num2;
+			lastSpeed = animator.get_speed();
+			Forward(num2 - beginTime + curMargin);
 		}
 	}
 
 	private void OnChangeAnim(int motion_hash, bool cross_fade = false)
 	{
-		ExecuteLastEvent(true);
+		ExecuteLastEvent();
 		curHash = motion_hash;
 		curDatas = animEventData.GetEventDatas(curHash);
 		curTime = 0f;
@@ -173,74 +179,76 @@ public class AnimEventProcessor
 
 	private void Forward(float time)
 	{
-		if (curDatas != null && !ignoreEventFlag && curTime <= time)
+		if (curDatas == null || ignoreEventFlag || !(curTime <= time))
 		{
-			while (curIndex < curDatas.Length && !(time < curDatas[curIndex].time))
-			{
-				if (curDatas[curIndex].time == -3.40282347E+38f)
-				{
-					curIndex++;
-				}
-				else
-				{
-					StartInterruptionCheck();
-					listener.OnAnimEvent(curDatas[curIndex]);
-					if (EndInterruptionCheck())
-					{
-						return;
-					}
-					curIndex++;
-				}
-			}
-			curTime = time;
+			return;
 		}
+		while (curIndex < curDatas.Length && !(time < curDatas[curIndex].time))
+		{
+			if (curDatas[curIndex].time == float.MinValue)
+			{
+				curIndex++;
+				continue;
+			}
+			StartInterruptionCheck();
+			listener.OnAnimEvent(curDatas[curIndex]);
+			if (EndInterruptionCheck())
+			{
+				return;
+			}
+			curIndex++;
+		}
+		curTime = time;
 	}
 
 	private void ExecuteFirstEvent()
 	{
-		if (curDatas != null && !ignoreEventFlag)
+		if (curDatas == null || ignoreEventFlag)
 		{
-			int num = curDatas.Length;
-			while (curIndex < num && curDatas[curIndex].time == -3.40282347E+38f)
+			return;
+		}
+		int num = curDatas.Length;
+		while (curIndex < num && curDatas[curIndex].time == float.MinValue)
+		{
+			StartInterruptionCheck();
+			listener.OnAnimEvent(curDatas[curIndex]);
+			if (EndInterruptionCheck())
 			{
-				StartInterruptionCheck();
-				listener.OnAnimEvent(curDatas[curIndex]);
-				if (EndInterruptionCheck())
-				{
-					break;
-				}
-				curIndex++;
+				break;
 			}
+			curIndex++;
 		}
 	}
 
 	public void ExecuteLastEvent(bool delete_data = true)
 	{
-		if (curDatas != null && !ignoreEventFlag)
+		if (curDatas == null || ignoreEventFlag)
 		{
-			SetInterruptionCheck();
-			AnimEventData.EventData[] array = curDatas;
-			if (delete_data)
+			return;
+		}
+		SetInterruptionCheck();
+		AnimEventData.EventData[] array = curDatas;
+		if (delete_data)
+		{
+			curDatas = null;
+		}
+		int num = array.Length;
+		if (num <= 0 || array[num - 1].time != 3.402823E+38f)
+		{
+			return;
+		}
+		int i = num - 1;
+		while (i > 0 && array[i - 1].time == 3.402823E+38f)
+		{
+			i--;
+		}
+		for (; i < num; i++)
+		{
+			StartInterruptionCheck();
+			listener.OnAnimEvent(array[i]);
+			if (EndInterruptionCheck())
 			{
-				curDatas = null;
-			}
-			int num = array.Length;
-			if (num > 0 && array[num - 1].time == 3.402823E+38f)
-			{
-				int i = num - 1;
-				while (i > 0 && array[i - 1].time == 3.402823E+38f)
-				{
-					i--;
-				}
-				for (; i < num; i++)
-				{
-					StartInterruptionCheck();
-					listener.OnAnimEvent(array[i]);
-					if (EndInterruptionCheck())
-					{
-						break;
-					}
-				}
+				break;
 			}
 		}
 	}
@@ -264,7 +272,7 @@ public class AnimEventProcessor
 	{
 		SetInterruptionCheck();
 		animator.CrossFadeInFixedTime(motion_hash, transition_time, -1, 0f);
-		OnChangeAnim(motion_hash, true);
+		OnChangeAnim(motion_hash, cross_fade: true);
 		waitChange = true;
 	}
 
@@ -272,7 +280,7 @@ public class AnimEventProcessor
 	{
 		if (!(anim_ctrl == null) && !(anim_event == null))
 		{
-			ExecuteLastEvent(true);
+			ExecuteLastEvent();
 			curHash = 0;
 			curDatas = null;
 			curTime = 0f;
@@ -295,7 +303,7 @@ public class AnimEventProcessor
 
 	private void StartInterruptionCheck()
 	{
-		interruptionCheckFlags.Add(false);
+		interruptionCheckFlags.Add(item: false);
 	}
 
 	private bool EndInterruptionCheck()

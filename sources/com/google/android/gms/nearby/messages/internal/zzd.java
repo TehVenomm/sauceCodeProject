@@ -2,44 +2,44 @@ package com.google.android.gms.nearby.messages.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzd implements Creator<ClientAppContext> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        boolean z = false;
-        int zzd = zzb.zzd(parcel);
         String str2 = null;
         String str3 = null;
+        boolean z = false;
         int i = 0;
         int i2 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = zzb.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    z = zzb.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 5:
-                    i2 = zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 6:
-                    str3 = zzb.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new ClientAppContext(i, str, str2, z, i2, str3);
     }
 

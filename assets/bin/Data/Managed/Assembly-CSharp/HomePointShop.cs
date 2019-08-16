@@ -57,7 +57,6 @@ public class HomePointShop : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -67,26 +66,26 @@ public class HomePointShop : GameSection
 		currentPage = 1;
 		bool hasList = false;
 		LoadingQueue loadingQueue = new LoadingQueue(this);
-		loadingQueue.Load(RESOURCE_CATEGORY.UI, "PointShopListItem", false);
+		loadingQueue.Load(RESOURCE_CATEGORY.UI, "PointShopListItem");
 		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendGetPointShops(delegate(bool isSuccess, List<PointShop> resultList)
 		{
 			if (isSuccess)
 			{
-				((_003CDoInitialize_003Ec__Iterator91)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.pointShop = resultList;
-				foreach (PointShop item in ((_003CDoInitialize_003Ec__Iterator91)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.pointShop)
+				pointShop = resultList;
+				foreach (PointShop item in pointShop)
 				{
-					((_003CDoInitialize_003Ec__Iterator91)/*Error near IL_0073: stateMachine*/)._003CloadingQueue_003E__1.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(item.pointShopId), false);
+					loadingQueue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(item.pointShopId));
 				}
-				((_003CDoInitialize_003Ec__Iterator91)/*Error near IL_0073: stateMachine*/)._003ChasList_003E__0 = true;
+				hasList = true;
 			}
 		});
 		while (!hasList)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (loadingQueue.IsLoading())
 		{
-			yield return (object)loadingQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		base.Initialize();
 	}
@@ -120,24 +119,24 @@ public class HomePointShop : GameSection
 
 	private void UpdateTab()
 	{
-		switch (currentType)
+		VIEW_TYPE vIEW_TYPE = currentType;
+		if (vIEW_TYPE == VIEW_TYPE.NORMAL || vIEW_TYPE != VIEW_TYPE.EVENT_LIST)
 		{
-		default:
 			ViewNormalTab();
-			break;
-		case VIEW_TYPE.EVENT_LIST:
+		}
+		else
+		{
 			ViewEventTab();
-			break;
 		}
 	}
 
 	private void ViewNormalTab()
 	{
-		SetActive((Enum)UI.OBJ_NORMAL, true);
-		SetActive((Enum)UI.OBJ_TAB_ROOT, true);
-		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, true);
-		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, false);
-		SetActive((Enum)UI.OBJ_EVENT_LIST, false);
+		SetActive((Enum)UI.OBJ_NORMAL, is_visible: true);
+		SetActive((Enum)UI.OBJ_TAB_ROOT, is_visible: true);
+		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, is_visible: true);
+		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, is_visible: false);
+		SetActive((Enum)UI.OBJ_EVENT_LIST, is_visible: false);
 		PointShop shop = pointShop.First((PointShop x) => !x.isEvent);
 		currentPointShopItem = GetBuyableItemList();
 		if (filter != null)
@@ -155,23 +154,24 @@ public class HomePointShop : GameSection
 		SetLabelText((Enum)UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
 		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
 		int item_num = Mathf.Min(GameDefine.POINT_SHOP_LIST_COUNT, currentPointShopItem.Count - (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT);
-		SetGrid(UI.GRD_NORMAL, "PointShopListItem", item_num, true, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_NORMAL, "PointShopListItem", item_num, reset: true, delegate(int i, Transform t, bool b)
 		{
 			int index = i + (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT;
+			PointShopItem pointShopItem = currentPointShopItem[index];
 			object event_data = new object[3]
 			{
-				currentPointShopItem[index],
+				pointShopItem,
 				shop,
 				new Action<PointShopItem, int>(OnBuy)
 			};
 			SetEvent(t, "CONFIRM_BUY", event_data);
 			PointShopItemList component2 = t.GetComponent<PointShopItemList>();
-			component2.SetUp(currentPointShopItem[index], (uint)shop.pointShopId, currentPointShopItem[index].needPoint <= shop.userPoint);
+			component2.SetUp(pointShopItem, (uint)shop.pointShopId, pointShopItem.needPoint <= shop.userPoint);
 			int num = -1;
-			REWARD_TYPE type = (REWARD_TYPE)currentPointShopItem[index].type;
+			REWARD_TYPE type = (REWARD_TYPE)pointShopItem.type;
 			if (type == REWARD_TYPE.ITEM)
 			{
-				num = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum((uint)currentPointShopItem[index].itemId);
+				num = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum((uint)pointShopItem.itemId);
 			}
 			SetLabelText(t, UI.LBL_HAVE, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 6u), num.ToString()));
 			SetActive(t, UI.LBL_HAVE, num >= 0);
@@ -183,15 +183,15 @@ public class HomePointShop : GameSection
 
 	private void ViewEventTab()
 	{
-		SetActive((Enum)UI.OBJ_NORMAL, false);
-		SetActive((Enum)UI.OBJ_TAB_ROOT, true);
-		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, false);
-		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, true);
-		SetActive((Enum)UI.OBJ_EVENT_LIST, true);
+		SetActive((Enum)UI.OBJ_NORMAL, is_visible: false);
+		SetActive((Enum)UI.OBJ_TAB_ROOT, is_visible: true);
+		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, is_visible: false);
+		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, is_visible: true);
+		SetActive((Enum)UI.OBJ_EVENT_LIST, is_visible: true);
 		List<PointShop> current = (from x in pointShop
 		where x.isEvent
 		select x).ToList();
-		SetGrid(UI.GRD_EVENT_LIST, "PointShopEventList", current.Count, true, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_EVENT_LIST, "PointShopEventList", current.Count, reset: true, delegate(int i, Transform t, bool b)
 		{
 			PointShop pointShop = current[i];
 			UITexture component = FindCtrl(t, UI.TEX_EVENT_LIST_BANNER).GetComponent<UITexture>();
@@ -220,7 +220,7 @@ public class HomePointShop : GameSection
 		PointShop pointShop = array[1] as PointShop;
 		if (pointShop.userPoint < pointShopItem.needPoint)
 		{
-			GameSection.ChangeEvent("SHORTAGE_POINT", null);
+			GameSection.ChangeEvent("SHORTAGE_POINT");
 		}
 	}
 
@@ -253,7 +253,7 @@ public class HomePointShop : GameSection
 			{
 				UpdateTab();
 			}
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess);
 		});
 	}
 

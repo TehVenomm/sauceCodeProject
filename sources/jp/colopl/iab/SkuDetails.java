@@ -1,11 +1,11 @@
-package jp.colopl.iab;
+package p018jp.colopl.iab;
 
-import com.facebook.share.internal.ShareConstants;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.oms.appstore.AmazonAppstoreBillingService;
 
+/* renamed from: jp.colopl.iab.SkuDetails */
 public class SkuDetails {
     String mCurrency;
     String mDescription;
@@ -26,7 +26,7 @@ public class SkuDetails {
         this.mJson = str2;
         JSONObject jSONObject = new JSONObject(this.mJson);
         this.mSku = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID);
-        this.mType = jSONObject.optString(ShareConstants.MEDIA_TYPE);
+        this.mType = jSONObject.optString("type");
         this.mPrice = jSONObject.optString(Param.PRICE);
         this.mPriceMicros = jSONObject.optDouble("price_amount_micros", 0.0d);
         this.mCurrency = jSONObject.optString("price_currency_code");

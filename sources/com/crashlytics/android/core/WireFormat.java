@@ -56,8 +56,8 @@ final class WireFormat {
         private final JavaType javaType;
         private final int wireType;
 
-        private FieldType(JavaType javaType, int i) {
-            this.javaType = javaType;
+        private FieldType(JavaType javaType2, int i) {
+            this.javaType = javaType2;
             this.wireType = i;
         }
 
@@ -91,7 +91,8 @@ final class WireFormat {
             this.defaultDefault = obj;
         }
 
-        Object getDefaultDefault() {
+        /* access modifiers changed from: 0000 */
+        public Object getDefaultDefault() {
             return this.defaultDefault;
         }
     }

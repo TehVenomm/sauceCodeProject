@@ -2,7 +2,7 @@ using Network;
 using System;
 using System.Collections;
 
-public class HomeManager : MonoBehaviourSingleton<HomeManager>
+public class HomeManager : MonoBehaviourSingleton<HomeManager>, IHomeManager
 {
 	public bool IsJumpToGacha
 	{
@@ -22,7 +22,7 @@ public class HomeManager : MonoBehaviourSingleton<HomeManager>
 		private set;
 	}
 
-	public HomePeople HomePeople
+	public IHomePeople IHomePeople
 	{
 		get;
 		private set;
@@ -64,22 +64,27 @@ public class HomeManager : MonoBehaviourSingleton<HomeManager>
 		}, string.Empty);
 	}
 
+	public OutGameSettingsManager.HomeScene GetSceneSetting()
+	{
+		return MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene;
+	}
+
 	private IEnumerator Start()
 	{
 		while (!MonoBehaviourSingleton<StageManager>.IsValid() || MonoBehaviourSingleton<StageManager>.I.isLoading)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
-		HomePeople = this.get_gameObject().AddComponent<HomePeople>();
+		IHomePeople = this.get_gameObject().AddComponent<HomePeople>();
 		HomeFeatureBanner = this.get_gameObject().AddComponent<HomeFeatureBanner>();
 		while (!HomeCamera.isInitialized)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		while (HomePeople.isInitialized)
+		while (IHomePeople.isInitialized)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		IsInitialized = true;
 	}

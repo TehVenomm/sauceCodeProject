@@ -12,7 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
-import com.zopim.android.sdk.C0785R;
+import com.squareup.picasso.Transformation;
+import com.zopim.android.sdk.C1122R;
 import com.zopim.android.sdk.api.Logger;
 import com.zopim.android.sdk.attachment.FileExtension;
 import com.zopim.android.sdk.attachment.SharedFileProvider;
@@ -21,36 +22,55 @@ import com.zopim.android.sdk.util.CropSquareTransform;
 import java.util.Locale;
 
 final class AgentMessageHolder extends ViewHolder {
+    /* access modifiers changed from: private */
+
     /* renamed from: c */
-    private static final String f703c = AgentMessageHolder.class.getSimpleName();
+    public static final String f747c = AgentMessageHolder.class.getSimpleName();
+
     /* renamed from: a */
-    public LinearLayout f704a;
+    public LinearLayout f748a;
+
     /* renamed from: b */
-    OnClickListener f705b = new C0837d(this);
+    OnClickListener f749b = new C1206d(this);
+
     /* renamed from: d */
-    private ImageView f706d;
+    private ImageView f750d;
+
     /* renamed from: e */
-    private TextView f707e;
+    private TextView f751e;
+
     /* renamed from: f */
-    private TextView f708f;
+    private TextView f752f;
+
     /* renamed from: g */
-    private View f709g;
+    private View f753g;
+
     /* renamed from: h */
-    private TextView f710h;
+    private TextView f754h;
+
     /* renamed from: i */
-    private TextView f711i;
+    private TextView f755i;
+
     /* renamed from: j */
-    private ImageView f712j;
+    private ImageView f756j;
+
     /* renamed from: k */
-    private View f713k;
+    private View f757k;
+
     /* renamed from: l */
-    private ImageView f714l;
+    private ImageView f758l;
+    /* access modifiers changed from: private */
+
     /* renamed from: m */
-    private ProgressBar f715m;
+    public ProgressBar f759m;
+    /* access modifiers changed from: private */
+
     /* renamed from: n */
-    private OptionClickListener f716n;
+    public OptionClickListener f760n;
+    /* access modifiers changed from: private */
+
     /* renamed from: o */
-    private Intent f717o = new Intent("android.intent.action.VIEW");
+    public Intent f761o = new Intent("android.intent.action.VIEW");
 
     public interface OptionClickListener {
         void onClick(String str);
@@ -58,89 +78,89 @@ final class AgentMessageHolder extends ViewHolder {
 
     public AgentMessageHolder(View view, OptionClickListener optionClickListener) {
         super(view);
-        this.f706d = (ImageView) view.findViewById(C0785R.id.avatar_icon);
-        this.f708f = (TextView) view.findViewById(C0785R.id.message_text);
-        this.f707e = (TextView) view.findViewById(C0785R.id.agent_name);
-        this.f704a = (LinearLayout) view.findViewById(C0785R.id.options_container);
-        this.f709g = view.findViewById(C0785R.id.attachment_document);
-        this.f710h = (TextView) view.findViewById(C0785R.id.attachment_name);
-        this.f711i = (TextView) view.findViewById(C0785R.id.attachment_size);
-        this.f712j = (ImageView) view.findViewById(C0785R.id.attachment_icon);
-        this.f713k = view.findViewById(C0785R.id.attachment_image_container);
-        this.f714l = (ImageView) view.findViewById(C0785R.id.attachment_thumbnail);
-        this.f715m = (ProgressBar) view.findViewById(C0785R.id.attachment_progress);
-        this.f717o.setFlags(1073741825);
-        this.f713k.setOnClickListener(this.f705b);
-        this.f709g.setOnClickListener(this.f705b);
-        this.f716n = optionClickListener;
+        this.f750d = (ImageView) view.findViewById(C1122R.C1125id.avatar_icon);
+        this.f752f = (TextView) view.findViewById(C1122R.C1125id.message_text);
+        this.f751e = (TextView) view.findViewById(C1122R.C1125id.agent_name);
+        this.f748a = (LinearLayout) view.findViewById(C1122R.C1125id.options_container);
+        this.f753g = view.findViewById(C1122R.C1125id.attachment_document);
+        this.f754h = (TextView) view.findViewById(C1122R.C1125id.attachment_name);
+        this.f755i = (TextView) view.findViewById(C1122R.C1125id.attachment_size);
+        this.f756j = (ImageView) view.findViewById(C1122R.C1125id.attachment_icon);
+        this.f757k = view.findViewById(C1122R.C1125id.attachment_image_container);
+        this.f758l = (ImageView) view.findViewById(C1122R.C1125id.attachment_thumbnail);
+        this.f759m = (ProgressBar) view.findViewById(C1122R.C1125id.attachment_progress);
+        this.f761o.setFlags(1073741825);
+        this.f757k.setOnClickListener(this.f749b);
+        this.f753g.setOnClickListener(this.f749b);
+        this.f760n = optionClickListener;
     }
 
     /* renamed from: a */
-    private String m649a(long j, boolean z) {
+    private String m662a(long j, boolean z) {
         int i = z ? 1000 : 1024;
         if (j < ((long) i)) {
             return j + " B";
         }
-        String str = (z ? "kMGTPE" : "KMGTPE").charAt(((int) (Math.log((double) j) / Math.log((double) i))) - 1) + (z ? "" : "i");
-        return String.format(Locale.US, "%.1f %sB", new Object[]{Double.valueOf(((double) j) / Math.pow((double) i, (double) ((int) (Math.log((double) j) / Math.log((double) i))))), str});
+        int log = (int) (Math.log((double) j) / Math.log((double) i));
+        return String.format(Locale.US, "%.1f %sB", new Object[]{Double.valueOf(((double) j) / Math.pow((double) i, (double) log)), (z ? "kMGTPE" : "KMGTPE").charAt(log - 1) + (z ? "" : "i")});
     }
 
     /* renamed from: b */
-    private void m651b(C0833a c0833a) {
-        if (c0833a != null && c0833a.f749a != null) {
-            String fileExtensionFromUrl = MimeTypeMap.getFileExtensionFromUrl(c0833a.f749a.toExternalForm());
-            Uri parse = Uri.parse(c0833a.f749a.toExternalForm());
-            Uri providerUri = SharedFileProvider.getProviderUri(this.itemView.getContext(), c0833a.f752d);
-            switch (C0838e.f805a[FileExtension.valueOfExtension(fileExtensionFromUrl).ordinal()]) {
+    private void m664b(C1177a aVar) {
+        if (aVar != null && aVar.f787a != null) {
+            String fileExtensionFromUrl = MimeTypeMap.getFileExtensionFromUrl(aVar.f787a.toExternalForm());
+            Uri parse = Uri.parse(aVar.f787a.toExternalForm());
+            Uri providerUri = SharedFileProvider.getProviderUri(this.itemView.getContext(), aVar.f790d);
+            switch (C1207e.f849a[FileExtension.valueOfExtension(fileExtensionFromUrl).ordinal()]) {
                 case 1:
                     if (providerUri != null) {
-                        this.f717o.setDataAndType(providerUri, "application/pdf");
+                        this.f761o.setDataAndType(providerUri, "application/pdf");
                     } else {
-                        this.f717o.setData(parse);
+                        this.f761o.setData(parse);
                     }
-                    this.f712j.setImageResource(C0785R.drawable.ic_chat_attachment_pdf);
-                    this.f710h.setText(c0833a.f751c);
-                    if (c0833a.f750b != null) {
-                        this.f711i.setVisibility(0);
-                        this.f711i.setText(m649a(c0833a.f750b.longValue(), true));
+                    this.f756j.setImageResource(C1122R.C1124drawable.ic_chat_attachment_pdf);
+                    this.f754h.setText(aVar.f789c);
+                    if (aVar.f788b != null) {
+                        this.f755i.setVisibility(0);
+                        this.f755i.setText(m662a(aVar.f788b.longValue(), true));
                     } else {
-                        this.f711i.setVisibility(8);
+                        this.f755i.setVisibility(8);
                     }
-                    this.f709g.setVisibility(0);
-                    this.f708f.setVisibility(8);
-                    this.f713k.setVisibility(8);
+                    this.f753g.setVisibility(0);
+                    this.f752f.setVisibility(8);
+                    this.f757k.setVisibility(8);
                     return;
                 case 2:
                     if (providerUri != null) {
-                        this.f717o.setDataAndType(providerUri, "text/plain");
+                        this.f761o.setDataAndType(providerUri, "text/plain");
                     } else {
-                        this.f717o.setData(parse);
+                        this.f761o.setData(parse);
                     }
-                    this.f712j.setImageResource(C0785R.drawable.ic_chat_attachment_txt);
-                    this.f710h.setText(c0833a.f751c);
+                    this.f756j.setImageResource(C1122R.C1124drawable.ic_chat_attachment_txt);
+                    this.f754h.setText(aVar.f789c);
                     if (providerUri != null) {
-                        this.f711i.setVisibility(0);
-                        this.f711i.setText(m649a(c0833a.f750b.longValue(), true));
+                        this.f755i.setVisibility(0);
+                        this.f755i.setText(m662a(aVar.f788b.longValue(), true));
                     } else {
-                        this.f711i.setVisibility(8);
+                        this.f755i.setVisibility(8);
                     }
-                    this.f709g.setVisibility(0);
-                    this.f708f.setVisibility(8);
-                    this.f713k.setVisibility(8);
+                    this.f753g.setVisibility(0);
+                    this.f752f.setVisibility(8);
+                    this.f757k.setVisibility(8);
                     return;
                 case 3:
                 case 4:
                 case 5:
                     if (providerUri != null) {
-                        this.f717o.setDataAndType(providerUri, "image/*");
+                        this.f761o.setDataAndType(providerUri, "image/*");
                     } else {
-                        this.f717o.setDataAndType(parse, "image/*");
+                        this.f761o.setDataAndType(parse, "image/*");
                     }
-                    this.f715m.setVisibility(0);
-                    Picasso.with(this.itemView.getContext()).load(parse).placeholder(C0785R.drawable.bg_picasso_placeholder).error(C0785R.drawable.ic_chat_default_avatar).transform(new CropSquareTransform()).into(this.f714l, new C0835b(this));
-                    this.f709g.setVisibility(8);
-                    this.f708f.setVisibility(8);
-                    this.f713k.setVisibility(0);
+                    this.f759m.setVisibility(0);
+                    Picasso.with(this.itemView.getContext()).load(parse).placeholder(C1122R.C1124drawable.bg_picasso_placeholder).error(C1122R.C1124drawable.ic_chat_default_avatar).transform((Transformation) new CropSquareTransform()).into(this.f758l, new C1204b(this));
+                    this.f753g.setVisibility(8);
+                    this.f752f.setVisibility(8);
+                    this.f757k.setVisibility(0);
                     return;
                 default:
                     return;
@@ -149,72 +169,70 @@ final class AgentMessageHolder extends ViewHolder {
     }
 
     /* renamed from: c */
-    private void m653c(C0833a c0833a) {
-        int i = 0;
-        if (c0833a.f754f.length != this.f704a.getChildCount()) {
-            Logger.m566w(f703c, c0833a.f754f.length + " item options,  " + this.f704a.getChildCount() + " views.");
-            Log.w(f703c, "Unexpected agent options length. Ignoring to avoid array index out bounds exception.");
+    private void m666c(C1177a aVar) {
+        if (aVar.f792f.length != this.f748a.getChildCount()) {
+            Logger.m579w(f747c, aVar.f792f.length + " item options,  " + this.f748a.getChildCount() + " views.");
+            Log.w(f747c, "Unexpected agent options length. Ignoring to avoid array index out bounds exception.");
         }
-        switch (c0833a.f754f.length) {
+        switch (aVar.f792f.length) {
             case 0:
                 return;
             case 1:
-                TextView textView = (TextView) this.f704a.getChildAt(0);
-                textView.setText(c0833a.f754f[0]);
-                textView.setBackgroundResource(C0785R.drawable.bg_chat_bubble_visitor);
-                textView.setTextAppearance(this.itemView.getContext(), C0785R.style.chat_bubble_visitor);
+                TextView textView = (TextView) this.f748a.getChildAt(0);
+                textView.setText(aVar.f792f[0]);
+                textView.setBackgroundResource(C1122R.C1124drawable.bg_chat_bubble_visitor);
+                textView.setTextAppearance(this.itemView.getContext(), C1122R.style.chat_bubble_visitor);
                 textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 return;
         }
-        while (i < c0833a.f754f.length) {
-            textView = (TextView) this.f704a.getChildAt(i);
-            textView.setText(c0833a.f754f[i]);
-            textView.setClickable(true);
-            textView.setOnClickListener(new C0836c(this));
-            i++;
+        for (int i = 0; i < aVar.f792f.length; i++) {
+            TextView textView2 = (TextView) this.f748a.getChildAt(i);
+            textView2.setText(aVar.f792f[i]);
+            textView2.setClickable(true);
+            textView2.setOnClickListener(new C1205c(this));
         }
     }
 
     /* renamed from: a */
-    public void m654a(C0833a c0833a) {
-        if (c0833a == null) {
-            Log.e(f703c, "Item must not be null");
+    public void mo20705a(C1177a aVar) {
+        if (aVar == null) {
+            Log.e(f747c, "Item must not be null");
             return;
         }
-        this.f707e.setText(c0833a.j);
-        if (c0833a.f753e == null || c0833a.f753e.isEmpty()) {
-            Picasso.with(this.itemView.getContext()).load(C0785R.drawable.ic_chat_default_avatar).transform(new CircleTransform()).into(this.f706d);
+        this.f751e.setText(aVar.f796j);
+        if (aVar.f791e == null || aVar.f791e.isEmpty()) {
+            Picasso.with(this.itemView.getContext()).load(C1122R.C1124drawable.ic_chat_default_avatar).transform((Transformation) new CircleTransform()).into(this.f750d);
         } else {
-            Picasso.with(this.itemView.getContext()).load(c0833a.f753e).error(C0785R.drawable.ic_chat_default_avatar).placeholder(C0785R.drawable.ic_chat_default_avatar).transform(new CircleTransform()).into(this.f706d);
+            Picasso.with(this.itemView.getContext()).load(aVar.f791e).error(C1122R.C1124drawable.ic_chat_default_avatar).placeholder(C1122R.C1124drawable.ic_chat_default_avatar).transform((Transformation) new CircleTransform()).into(this.f750d);
         }
-        if ((c0833a.f749a != null ? 1 : 0) != 0) {
-            m651b(c0833a);
+        if (aVar.f787a != null) {
+            m664b(aVar);
             return;
         }
-        this.f708f.setText(c0833a.i);
-        this.f713k.setVisibility(8);
-        this.f709g.setVisibility(8);
-        this.f708f.setVisibility(0);
-        if (c0833a.f754f.length > 0) {
-            m653c(c0833a);
+        this.f752f.setText(aVar.f795i);
+        this.f757k.setVisibility(8);
+        this.f753g.setVisibility(8);
+        this.f752f.setVisibility(0);
+        if (aVar.f792f.length > 0) {
+            m666c(aVar);
         }
     }
 
     /* renamed from: a */
-    public void m655a(boolean z) {
+    public void mo20706a(boolean z) {
         if (z) {
-            this.f706d.setVisibility(0);
+            this.f750d.setVisibility(0);
         } else {
-            this.f706d.setVisibility(4);
+            this.f750d.setVisibility(4);
         }
     }
 
     /* renamed from: b */
-    public void m656b(boolean z) {
+    public void mo20707b(boolean z) {
         if (z) {
-            this.f707e.setVisibility(0);
+            this.f751e.setVisibility(0);
         } else {
-            this.f707e.setVisibility(8);
+            this.f751e.setVisibility(8);
         }
     }
 }

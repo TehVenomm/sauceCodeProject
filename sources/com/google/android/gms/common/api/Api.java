@@ -7,13 +7,18 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.Feature;
+import com.google.android.gms.common.annotation.KeepForSdk;
+import com.google.android.gms.common.api.Api.ApiOptions;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.internal.zzam;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.common.internal.zzj;
-import com.google.android.gms.common.internal.zzq;
-import com.google.android.gms.nearby.messages.Strategy;
+import com.google.android.gms.common.internal.BaseGmsClient.ConnectionProgressReportCallbacks;
+import com.google.android.gms.common.internal.BaseGmsClient.SignOutCallbacks;
+import com.google.android.gms.common.internal.ClientSettings;
+import com.google.android.gms.common.internal.IAccountAccessor;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.util.VisibleForTesting;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -22,31 +27,42 @@ import java.util.Set;
 
 public final class Api<O extends ApiOptions> {
     private final String mName;
-    private final zza<?, O> zzffz;
-    private final zzh<?, O> zzfga = null;
-    private final zzf<?> zzfgb;
-    private final zzi<?> zzfgc;
+    private final AbstractClientBuilder<?, O> zaau;
+    private final zaa<?, O> zaav = null;
+    private final ClientKey<?> zaaw;
+    private final zab<?> zaax;
 
-    public interface zzb {
+    @KeepForSdk
+    @VisibleForTesting
+    public static abstract class AbstractClientBuilder<T extends Client, O> extends BaseClientBuilder<T, O> {
+        @KeepForSdk
+        public abstract T buildClient(Context context, Looper looper, ClientSettings clientSettings, O o, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener);
     }
 
-    public static class zzd<T extends zzb, O> {
-        public int getPriority() {
-            return Strategy.TTL_SECONDS_INFINITE;
-        }
-
-        public List<Scope> zzn(O o) {
-            return Collections.emptyList();
-        }
+    @KeepForSdk
+    public interface AnyClient {
     }
 
-    public static abstract class zza<T extends zze, O> extends zzd<T, O> {
-        public abstract T zza(Context context, Looper looper, zzq zzq, O o, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener);
+    @KeepForSdk
+    public static class AnyClientKey<C extends AnyClient> {
     }
 
     public interface ApiOptions {
 
+        public interface HasAccountOptions extends HasOptions, NotRequiredOptions {
+            Account getAccount();
+        }
+
+        public interface HasGoogleSignInAccountOptions extends HasOptions {
+            GoogleSignInAccount getGoogleSignInAccount();
+        }
+
         public interface HasOptions extends ApiOptions {
+        }
+
+        public static final class NoOptions implements NotRequiredOptions {
+            private NoOptions() {
+            }
         }
 
         public interface NotRequiredOptions extends ApiOptions {
@@ -54,83 +70,135 @@ public final class Api<O extends ApiOptions> {
 
         public interface Optional extends HasOptions, NotRequiredOptions {
         }
+    }
 
-        public interface HasAccountOptions extends HasOptions, NotRequiredOptions {
-            Account getAccount();
+    @KeepForSdk
+    @VisibleForTesting
+    public static class BaseClientBuilder<T extends AnyClient, O> {
+        @KeepForSdk
+        public static final int API_PRIORITY_GAMES = 1;
+        @KeepForSdk
+        public static final int API_PRIORITY_OTHER = Integer.MAX_VALUE;
+        @KeepForSdk
+        public static final int API_PRIORITY_PLUS = 2;
+
+        @KeepForSdk
+        public List<Scope> getImpliedScopes(O o) {
+            return Collections.emptyList();
         }
 
-        public static final class NoOptions implements NotRequiredOptions {
-            private NoOptions() {
-            }
+        @KeepForSdk
+        public int getPriority() {
+            return Integer.MAX_VALUE;
         }
     }
 
-    public interface zze extends zzb {
+    @KeepForSdk
+    public interface Client extends AnyClient {
+        @KeepForSdk
+        void connect(ConnectionProgressReportCallbacks connectionProgressReportCallbacks);
+
+        @KeepForSdk
         void disconnect();
 
+        @KeepForSdk
         void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr);
 
-        boolean isConnected();
+        @KeepForSdk
+        Feature[] getAvailableFeatures();
 
-        boolean isConnecting();
+        @KeepForSdk
+        String getEndpointPackageName();
 
-        void zza(zzam zzam, Set<Scope> set);
+        @KeepForSdk
+        int getMinApkVersion();
 
-        void zza(zzj zzj);
+        @KeepForSdk
+        void getRemoteService(IAccountAccessor iAccountAccessor, Set<Scope> set);
 
-        boolean zzaaa();
-
-        boolean zzaak();
-
-        Intent zzaal();
-
-        boolean zzafe();
+        @KeepForSdk
+        Feature[] getRequiredFeatures();
 
         @Nullable
-        IBinder zzaff();
+        @KeepForSdk
+        IBinder getServiceBrokerBinder();
+
+        @KeepForSdk
+        Intent getSignInIntent();
+
+        @KeepForSdk
+        boolean isConnected();
+
+        @KeepForSdk
+        boolean isConnecting();
+
+        @KeepForSdk
+        void onUserSignOut(SignOutCallbacks signOutCallbacks);
+
+        @KeepForSdk
+        boolean providesSignIn();
+
+        @KeepForSdk
+        boolean requiresAccount();
+
+        @KeepForSdk
+        boolean requiresGooglePlayServices();
+
+        @KeepForSdk
+        boolean requiresSignIn();
     }
 
-    public static class zzc<C extends zzb> {
+    @KeepForSdk
+    @VisibleForTesting
+    public static final class ClientKey<C extends Client> extends AnyClientKey<C> {
     }
 
-    public static final class zzf<C extends zze> extends zzc<C> {
+    public interface SimpleClient<T extends IInterface> extends AnyClient {
+        T createServiceInterface(IBinder iBinder);
+
+        Context getContext();
+
+        String getServiceDescriptor();
+
+        String getStartServiceAction();
+
+        void setState(int i, T t);
     }
 
-    public interface zzg<T extends IInterface> extends zzb {
+    @VisibleForTesting
+    public static class zaa<T extends SimpleClient, O> extends BaseClientBuilder<T, O> {
     }
 
-    public static class zzh<T extends zzg, O> extends zzd<T, O> {
+    @VisibleForTesting
+    public static final class zab<C extends SimpleClient> extends AnyClientKey<C> {
     }
 
-    public static final class zzi<C extends zzg> extends zzc<C> {
-    }
-
-    public <C extends zze> Api(String str, zza<C, O> zza, zzf<C> zzf) {
-        zzbp.zzb((Object) zza, (Object) "Cannot construct an Api with a null ClientBuilder");
-        zzbp.zzb((Object) zzf, (Object) "Cannot construct an Api with a null ClientKey");
+    public <C extends Client> Api(String str, AbstractClientBuilder<C, O> abstractClientBuilder, ClientKey<C> clientKey) {
+        Preconditions.checkNotNull(abstractClientBuilder, "Cannot construct an Api with a null ClientBuilder");
+        Preconditions.checkNotNull(clientKey, "Cannot construct an Api with a null ClientKey");
         this.mName = str;
-        this.zzffz = zza;
-        this.zzfgb = zzf;
-        this.zzfgc = null;
+        this.zaau = abstractClientBuilder;
+        this.zaaw = clientKey;
+        this.zaax = null;
+    }
+
+    public final AnyClientKey<?> getClientKey() {
+        if (this.zaaw != null) {
+            return this.zaaw;
+        }
+        throw new IllegalStateException("This API was constructed with null client keys. This should not be possible.");
     }
 
     public final String getName() {
         return this.mName;
     }
 
-    public final zzd<?, O> zzafb() {
-        return this.zzffz;
+    public final BaseClientBuilder<?, O> zah() {
+        return this.zaau;
     }
 
-    public final zza<?, O> zzafc() {
-        zzbp.zza(this.zzffz != null, (Object) "This API was constructed with a SimpleClientBuilder. Use getSimpleClientBuilder");
-        return this.zzffz;
-    }
-
-    public final zzc<?> zzafd() {
-        if (this.zzfgb != null) {
-            return this.zzfgb;
-        }
-        throw new IllegalStateException("This API was constructed with null client keys. This should not be possible.");
+    public final AbstractClientBuilder<?, O> zai() {
+        Preconditions.checkState(this.zaau != null, "This API was constructed with a SimpleClientBuilder. Use getSimpleClientBuilder");
+        return this.zaau;
     }
 }

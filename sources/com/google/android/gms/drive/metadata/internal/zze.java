@@ -10,15 +10,18 @@ public class zze extends zzd<Date> {
         super(str, i);
     }
 
-    protected final /* synthetic */ void zza(Bundle bundle, Object obj) {
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ void zza(Bundle bundle, Object obj) {
         bundle.putLong(getName(), ((Date) obj).getTime());
     }
 
-    protected final /* synthetic */ Object zzc(DataHolder dataHolder, int i, int i2) {
-        return new Date(dataHolder.zzb(getName(), i, i2));
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ Object zzb(Bundle bundle) {
+        return new Date(bundle.getLong(getName()));
     }
 
-    protected final /* synthetic */ Object zzm(Bundle bundle) {
-        return new Date(bundle.getLong(getName()));
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ Object zzc(DataHolder dataHolder, int i, int i2) {
+        return new Date(dataHolder.getLong(getName(), i, i2));
     }
 }

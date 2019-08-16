@@ -92,7 +92,7 @@ namespace BestHTTP.WebSocket
 			{
 				lock (SendLock)
 				{
-					Send(new WebSocketBinaryFrame(data, 0uL, num, false));
+					Send(new WebSocketBinaryFrame(data, 0uL, num, isFinal: false));
 					ulong num3;
 					for (ulong num2 = num; num2 < (ulong)data.Length; num2 += num3)
 					{
@@ -166,16 +166,24 @@ namespace BestHTTP.WebSocket
 					{
 						Close(1002, "Protocol Error: masked frame received from server!");
 					}
-					else if (webSocketFrameReader.IsFinal)
+					else if (!webSocketFrameReader.IsFinal)
+					{
+						if (OnIncompleteFrame == null)
+						{
+							IncompleteFrames.Add(webSocketFrameReader);
+						}
+						else
+						{
+							lock (FrameLock)
+							{
+								CompletedFrames.Add(webSocketFrameReader);
+							}
+						}
+					}
+					else
 					{
 						switch (webSocketFrameReader.Type)
 						{
-						case (WebSocketFrameTypes)3:
-						case (WebSocketFrameTypes)4:
-						case (WebSocketFrameTypes)5:
-						case (WebSocketFrameTypes)6:
-						case (WebSocketFrameTypes)7:
-							break;
 						case WebSocketFrameTypes.Continuation:
 							if (OnIncompleteFrame != null)
 							{
@@ -221,17 +229,6 @@ namespace BestHTTP.WebSocket
 							}
 							closed = closeSent;
 							break;
-						}
-					}
-					else if (OnIncompleteFrame == null)
-					{
-						IncompleteFrames.Add(webSocketFrameReader);
-					}
-					else
-					{
-						lock (FrameLock)
-						{
-							CompletedFrames.Add(webSocketFrameReader);
 						}
 					}
 				}

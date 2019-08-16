@@ -4,58 +4,105 @@ import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.DowngradeableSafeParcel;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzc;
-import com.google.android.gms.common.util.zzg;
+import android.support.annotation.Nullable;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Asserts;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.DataUtils;
+import com.google.android.gms.common.util.RetainForClient;
 import com.google.android.gms.games.internal.GamesDowngradeableSafeParcel;
-import com.google.android.gms.games.internal.player.zzb;
-import java.util.Arrays;
+import com.google.android.gms.games.internal.player.MostRecentGameInfoEntity;
 
+@RetainForClient
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "PlayerEntityCreator")
+@Reserved({1000})
 public final class PlayerEntity extends GamesDowngradeableSafeParcel implements Player {
     public static final Creator<PlayerEntity> CREATOR = new zza();
-    private final String mName;
-    private final boolean zzdhy;
-    private String zzeby;
-    private final String zzehi;
-    private String zzezq;
-    private final Uri zzhbd;
-    private final Uri zzhbe;
-    private final String zzhbo;
-    private final String zzhbp;
-    private final long zzhcn;
-    private final int zzhco;
-    private final long zzhcp;
-    private final zzb zzhcq;
-    private final PlayerLevelInfo zzhcr;
-    private final boolean zzhcs;
-    private final boolean zzhct;
-    private final String zzhcu;
-    private final Uri zzhcv;
-    private final String zzhcw;
-    private final Uri zzhcx;
-    private final String zzhcy;
-    private final int zzhcz;
-    private final long zzhda;
+    @Field(getter = "getName", mo13990id = 21)
+    private final String name;
+    @Nullable
+    @Field(getter = "getIconImageUrl", mo13990id = 8)
+    private final String zzac;
+    @Nullable
+    @Field(getter = "getHiResImageUrl", mo13990id = 9)
+    private final String zzad;
+    @Field(getter = "getPlayerId", mo13990id = 1)
+    private String zzbz;
+    @Field(getter = "getRetrievedTimestamp", mo13990id = 5)
+    private final long zzca;
+    @Field(getter = "isInCircles", mo13990id = 6)
+    private final int zzcb;
+    @Field(getter = "getLastPlayedWithTimestamp", mo13990id = 7)
+    private final long zzcc;
+    @Nullable
+    @Field(getter = "getTitle", mo13990id = 14)
+    private final String zzcd;
+    @Nullable
+    @Field(getter = "getMostRecentGameInfo", mo13990id = 15)
+    private final MostRecentGameInfoEntity zzce;
+    @Nullable
+    @Field(getter = "getLevelInfo", mo13990id = 16)
+    private final PlayerLevelInfo zzcf;
+    @Field(getter = "isProfileVisible", mo13990id = 18)
+    private final boolean zzcg;
+    @Field(getter = "hasDebugAccess", mo13990id = 19)
+    private final boolean zzch;
+    @Nullable
+    @Field(getter = "getGamerTag", mo13990id = 20)
+    private final String zzci;
+    @Nullable
+    @Field(getter = "getBannerImageLandscapeUri", mo13990id = 22)
+    private final Uri zzcj;
+    @Nullable
+    @Field(getter = "getBannerImageLandscapeUrl", mo13990id = 23)
+    private final String zzck;
+    @Nullable
+    @Field(getter = "getBannerImagePortraitUri", mo13990id = 24)
+    private final Uri zzcl;
+    @Nullable
+    @Field(getter = "getBannerImagePortraitUrl", mo13990id = 25)
+    private final String zzcm;
+    @Field(getter = "getGamerFriendStatus", mo13990id = 26)
+    private final int zzcn;
+    @Field(getter = "getGamerFriendUpdateTimestamp", mo13990id = 27)
+    private final long zzco;
+    @Field(getter = "isMuted", mo13990id = 28)
+    private final boolean zzcp;
+    @Field(defaultValue = "-1", getter = "getTotalUnlockedAchievement", mo13990id = 29)
+    private final long zzcq;
+    @Field(getter = "getDisplayName", mo13990id = 2)
+    private String zzn;
+    @Nullable
+    @Field(getter = "getIconImageUri", mo13990id = 3)
+    private final Uri zzr;
+    @Nullable
+    @Field(getter = "getHiResImageUri", mo13990id = 4)
+    private final Uri zzs;
 
-    static final class zza extends zzg {
+    static final class zza extends zzap {
         zza() {
         }
 
         public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-            return zzj(parcel);
+            return createFromParcel(parcel);
         }
 
-        public final PlayerEntity zzj(Parcel parcel) {
-            if (GamesDowngradeableSafeParcel.zze(DowngradeableSafeParcel.zzakc()) || DowngradeableSafeParcel.zzga(PlayerEntity.class.getCanonicalName())) {
-                return super.zzj(parcel);
+        public final PlayerEntity zzc(Parcel parcel) {
+            if (PlayerEntity.zzb(PlayerEntity.getUnparcelClientVersion()) || PlayerEntity.canUnparcelSafely(PlayerEntity.class.getCanonicalName())) {
+                return super.createFromParcel(parcel);
             }
             String readString = parcel.readString();
             String readString2 = parcel.readString();
             String readString3 = parcel.readString();
             String readString4 = parcel.readString();
-            return new PlayerEntity(readString, readString2, readString3 == null ? null : Uri.parse(readString3), readString4 == null ? null : Uri.parse(readString4), parcel.readLong(), -1, -1, null, null, null, null, null, true, false, parcel.readString(), parcel.readString(), null, null, null, null, -1, -1, false);
+            return new PlayerEntity(readString, readString2, readString3 == null ? null : Uri.parse(readString3), readString4 == null ? null : Uri.parse(readString4), parcel.readLong(), -1, -1, null, null, null, null, null, true, false, parcel.readString(), parcel.readString(), null, null, null, null, -1, -1, false, -1);
         }
     }
 
@@ -64,63 +111,66 @@ public final class PlayerEntity extends GamesDowngradeableSafeParcel implements 
     }
 
     private PlayerEntity(Player player, boolean z) {
-        this.zzezq = player.getPlayerId();
-        this.zzeby = player.getDisplayName();
-        this.zzhbd = player.getIconImageUri();
-        this.zzhbo = player.getIconImageUrl();
-        this.zzhbe = player.getHiResImageUri();
-        this.zzhbp = player.getHiResImageUrl();
-        this.zzhcn = player.getRetrievedTimestamp();
-        this.zzhco = player.zzapo();
-        this.zzhcp = player.getLastPlayedWithTimestamp();
-        this.zzehi = player.getTitle();
-        this.zzhcs = player.zzapp();
-        com.google.android.gms.games.internal.player.zza zzapq = player.zzapq();
-        this.zzhcq = zzapq == null ? null : new zzb(zzapq);
-        this.zzhcr = player.getLevelInfo();
-        this.zzhct = player.zzapn();
-        this.zzhcu = player.zzapm();
-        this.mName = player.getName();
-        this.zzhcv = player.getBannerImageLandscapeUri();
-        this.zzhcw = player.getBannerImageLandscapeUrl();
-        this.zzhcx = player.getBannerImagePortraitUri();
-        this.zzhcy = player.getBannerImagePortraitUrl();
-        this.zzhcz = player.zzapr();
-        this.zzhda = player.zzaps();
-        this.zzdhy = player.isMuted();
-        zzc.zzr(this.zzezq);
-        zzc.zzr(this.zzeby);
-        zzc.zzbg(this.zzhcn > 0);
+        this.zzbz = player.getPlayerId();
+        this.zzn = player.getDisplayName();
+        this.zzr = player.getIconImageUri();
+        this.zzac = player.getIconImageUrl();
+        this.zzs = player.getHiResImageUri();
+        this.zzad = player.getHiResImageUrl();
+        this.zzca = player.getRetrievedTimestamp();
+        this.zzcb = player.zzj();
+        this.zzcc = player.getLastPlayedWithTimestamp();
+        this.zzcd = player.getTitle();
+        this.zzcg = player.zzk();
+        com.google.android.gms.games.internal.player.zza zzl = player.zzl();
+        this.zzce = zzl == null ? null : new MostRecentGameInfoEntity(zzl);
+        this.zzcf = player.getLevelInfo();
+        this.zzch = player.zzi();
+        this.zzci = player.zzh();
+        this.name = player.getName();
+        this.zzcj = player.getBannerImageLandscapeUri();
+        this.zzck = player.getBannerImageLandscapeUrl();
+        this.zzcl = player.getBannerImagePortraitUri();
+        this.zzcm = player.getBannerImagePortraitUrl();
+        this.zzcn = player.zzm();
+        this.zzco = player.zzn();
+        this.zzcp = player.isMuted();
+        this.zzcq = player.zzo();
+        Asserts.checkNotNull(this.zzbz);
+        Asserts.checkNotNull(this.zzn);
+        Asserts.checkState(this.zzca > 0);
     }
 
-    PlayerEntity(String str, String str2, Uri uri, Uri uri2, long j, int i, long j2, String str3, String str4, String str5, zzb zzb, PlayerLevelInfo playerLevelInfo, boolean z, boolean z2, String str6, String str7, Uri uri3, String str8, Uri uri4, String str9, int i2, long j3, boolean z3) {
-        this.zzezq = str;
-        this.zzeby = str2;
-        this.zzhbd = uri;
-        this.zzhbo = str3;
-        this.zzhbe = uri2;
-        this.zzhbp = str4;
-        this.zzhcn = j;
-        this.zzhco = i;
-        this.zzhcp = j2;
-        this.zzehi = str5;
-        this.zzhcs = z;
-        this.zzhcq = zzb;
-        this.zzhcr = playerLevelInfo;
-        this.zzhct = z2;
-        this.zzhcu = str6;
-        this.mName = str7;
-        this.zzhcv = uri3;
-        this.zzhcw = str8;
-        this.zzhcx = uri4;
-        this.zzhcy = str9;
-        this.zzhcz = i2;
-        this.zzhda = j3;
-        this.zzdhy = z3;
+    @Constructor
+    PlayerEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) String str2, @Nullable @Param(mo13993id = 3) Uri uri, @Nullable @Param(mo13993id = 4) Uri uri2, @Param(mo13993id = 5) long j, @Param(mo13993id = 6) int i, @Param(mo13993id = 7) long j2, @Nullable @Param(mo13993id = 8) String str3, @Nullable @Param(mo13993id = 9) String str4, @Nullable @Param(mo13993id = 14) String str5, @Nullable @Param(mo13993id = 15) MostRecentGameInfoEntity mostRecentGameInfoEntity, @Nullable @Param(mo13993id = 16) PlayerLevelInfo playerLevelInfo, @Param(mo13993id = 18) boolean z, @Param(mo13993id = 19) boolean z2, @Nullable @Param(mo13993id = 20) String str6, @Param(mo13993id = 21) String str7, @Nullable @Param(mo13993id = 22) Uri uri3, @Nullable @Param(mo13993id = 23) String str8, @Nullable @Param(mo13993id = 24) Uri uri4, @Nullable @Param(mo13993id = 25) String str9, @Param(mo13993id = 26) int i2, @Param(mo13993id = 27) long j3, @Param(mo13993id = 28) boolean z3, @Param(mo13993id = 29) long j4) {
+        this.zzbz = str;
+        this.zzn = str2;
+        this.zzr = uri;
+        this.zzac = str3;
+        this.zzs = uri2;
+        this.zzad = str4;
+        this.zzca = j;
+        this.zzcb = i;
+        this.zzcc = j2;
+        this.zzcd = str5;
+        this.zzcg = z;
+        this.zzce = mostRecentGameInfoEntity;
+        this.zzcf = playerLevelInfo;
+        this.zzch = z2;
+        this.zzci = str6;
+        this.name = str7;
+        this.zzcj = uri3;
+        this.zzck = str8;
+        this.zzcl = uri4;
+        this.zzcm = str9;
+        this.zzcn = i2;
+        this.zzco = j3;
+        this.zzcp = z3;
+        this.zzcq = j4;
     }
 
     static int zza(Player player) {
-        return Arrays.hashCode(new Object[]{player.getPlayerId(), player.getDisplayName(), Boolean.valueOf(player.zzapn()), player.getIconImageUri(), player.getHiResImageUri(), Long.valueOf(player.getRetrievedTimestamp()), player.getTitle(), player.getLevelInfo(), player.zzapm(), player.getName(), player.getBannerImageLandscapeUri(), player.getBannerImagePortraitUri(), Integer.valueOf(player.zzapr()), Long.valueOf(player.zzaps()), Boolean.valueOf(player.isMuted())});
+        return Objects.hashCode(player.getPlayerId(), player.getDisplayName(), Boolean.valueOf(player.zzi()), player.getIconImageUri(), player.getHiResImageUri(), Long.valueOf(player.getRetrievedTimestamp()), player.getTitle(), player.getLevelInfo(), player.zzh(), player.getName(), player.getBannerImageLandscapeUri(), player.getBannerImagePortraitUri(), Integer.valueOf(player.zzm()), Long.valueOf(player.zzn()), Boolean.valueOf(player.isMuted()), Long.valueOf(player.zzo()));
     }
 
     static boolean zza(Player player, Object obj) {
@@ -131,11 +181,11 @@ public final class PlayerEntity extends GamesDowngradeableSafeParcel implements 
             return true;
         }
         Player player2 = (Player) obj;
-        return zzbf.equal(player2.getPlayerId(), player.getPlayerId()) && zzbf.equal(player2.getDisplayName(), player.getDisplayName()) && zzbf.equal(Boolean.valueOf(player2.zzapn()), Boolean.valueOf(player.zzapn())) && zzbf.equal(player2.getIconImageUri(), player.getIconImageUri()) && zzbf.equal(player2.getHiResImageUri(), player.getHiResImageUri()) && zzbf.equal(Long.valueOf(player2.getRetrievedTimestamp()), Long.valueOf(player.getRetrievedTimestamp())) && zzbf.equal(player2.getTitle(), player.getTitle()) && zzbf.equal(player2.getLevelInfo(), player.getLevelInfo()) && zzbf.equal(player2.zzapm(), player.zzapm()) && zzbf.equal(player2.getName(), player.getName()) && zzbf.equal(player2.getBannerImageLandscapeUri(), player.getBannerImageLandscapeUri()) && zzbf.equal(player2.getBannerImagePortraitUri(), player.getBannerImagePortraitUri()) && zzbf.equal(Integer.valueOf(player2.zzapr()), Integer.valueOf(player.zzapr())) && zzbf.equal(Long.valueOf(player2.zzaps()), Long.valueOf(player.zzaps())) && zzbf.equal(Boolean.valueOf(player2.isMuted()), Boolean.valueOf(player.isMuted()));
+        return Objects.equal(player2.getPlayerId(), player.getPlayerId()) && Objects.equal(player2.getDisplayName(), player.getDisplayName()) && Objects.equal(Boolean.valueOf(player2.zzi()), Boolean.valueOf(player.zzi())) && Objects.equal(player2.getIconImageUri(), player.getIconImageUri()) && Objects.equal(player2.getHiResImageUri(), player.getHiResImageUri()) && Objects.equal(Long.valueOf(player2.getRetrievedTimestamp()), Long.valueOf(player.getRetrievedTimestamp())) && Objects.equal(player2.getTitle(), player.getTitle()) && Objects.equal(player2.getLevelInfo(), player.getLevelInfo()) && Objects.equal(player2.zzh(), player.zzh()) && Objects.equal(player2.getName(), player.getName()) && Objects.equal(player2.getBannerImageLandscapeUri(), player.getBannerImageLandscapeUri()) && Objects.equal(player2.getBannerImagePortraitUri(), player.getBannerImagePortraitUri()) && Objects.equal(Integer.valueOf(player2.zzm()), Integer.valueOf(player.zzm())) && Objects.equal(Long.valueOf(player2.zzn()), Long.valueOf(player.zzn())) && Objects.equal(Boolean.valueOf(player2.isMuted()), Boolean.valueOf(player.isMuted())) && Objects.equal(Long.valueOf(player2.zzo()), Long.valueOf(player.zzo()));
     }
 
     static String zzb(Player player) {
-        return zzbf.zzt(player).zzg("PlayerId", player.getPlayerId()).zzg("DisplayName", player.getDisplayName()).zzg("HasDebugAccess", Boolean.valueOf(player.zzapn())).zzg("IconImageUri", player.getIconImageUri()).zzg("IconImageUrl", player.getIconImageUrl()).zzg("HiResImageUri", player.getHiResImageUri()).zzg("HiResImageUrl", player.getHiResImageUrl()).zzg("RetrievedTimestamp", Long.valueOf(player.getRetrievedTimestamp())).zzg("Title", player.getTitle()).zzg("LevelInfo", player.getLevelInfo()).zzg("GamerTag", player.zzapm()).zzg("Name", player.getName()).zzg("BannerImageLandscapeUri", player.getBannerImageLandscapeUri()).zzg("BannerImageLandscapeUrl", player.getBannerImageLandscapeUrl()).zzg("BannerImagePortraitUri", player.getBannerImagePortraitUri()).zzg("BannerImagePortraitUrl", player.getBannerImagePortraitUrl()).zzg("GamerFriendStatus", Integer.valueOf(player.zzapr())).zzg("GamerFriendUpdateTimestamp", Long.valueOf(player.zzaps())).zzg("IsMuted", Boolean.valueOf(player.isMuted())).toString();
+        return Objects.toStringHelper(player).add("PlayerId", player.getPlayerId()).add("DisplayName", player.getDisplayName()).add("HasDebugAccess", Boolean.valueOf(player.zzi())).add("IconImageUri", player.getIconImageUri()).add("IconImageUrl", player.getIconImageUrl()).add("HiResImageUri", player.getHiResImageUri()).add("HiResImageUrl", player.getHiResImageUrl()).add("RetrievedTimestamp", Long.valueOf(player.getRetrievedTimestamp())).add("Title", player.getTitle()).add("LevelInfo", player.getLevelInfo()).add("GamerTag", player.zzh()).add("Name", player.getName()).add("BannerImageLandscapeUri", player.getBannerImageLandscapeUri()).add("BannerImageLandscapeUrl", player.getBannerImageLandscapeUrl()).add("BannerImagePortraitUri", player.getBannerImagePortraitUri()).add("BannerImagePortraitUrl", player.getBannerImagePortraitUrl()).add("GamerFriendStatus", Integer.valueOf(player.zzm())).add("GamerFriendUpdateTimestamp", Long.valueOf(player.zzn())).add("IsMuted", Boolean.valueOf(player.isMuted())).add("totalUnlockedAchievement", Long.valueOf(player.zzo())).toString();
     }
 
     public final boolean equals(Object obj) {
@@ -146,72 +196,82 @@ public final class PlayerEntity extends GamesDowngradeableSafeParcel implements 
         return this;
     }
 
+    @Nullable
     public final Uri getBannerImageLandscapeUri() {
-        return this.zzhcv;
+        return this.zzcj;
     }
 
+    @Nullable
     public final String getBannerImageLandscapeUrl() {
-        return this.zzhcw;
+        return this.zzck;
     }
 
+    @Nullable
     public final Uri getBannerImagePortraitUri() {
-        return this.zzhcx;
+        return this.zzcl;
     }
 
+    @Nullable
     public final String getBannerImagePortraitUrl() {
-        return this.zzhcy;
+        return this.zzcm;
     }
 
     public final String getDisplayName() {
-        return this.zzeby;
+        return this.zzn;
     }
 
     public final void getDisplayName(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzeby, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.zzn, charArrayBuffer);
     }
 
+    @Nullable
     public final Uri getHiResImageUri() {
-        return this.zzhbe;
+        return this.zzs;
     }
 
+    @Nullable
     public final String getHiResImageUrl() {
-        return this.zzhbp;
+        return this.zzad;
     }
 
+    @Nullable
     public final Uri getIconImageUri() {
-        return this.zzhbd;
+        return this.zzr;
     }
 
+    @Nullable
     public final String getIconImageUrl() {
-        return this.zzhbo;
+        return this.zzac;
     }
 
     public final long getLastPlayedWithTimestamp() {
-        return this.zzhcp;
+        return this.zzcc;
     }
 
+    @Nullable
     public final PlayerLevelInfo getLevelInfo() {
-        return this.zzhcr;
+        return this.zzcf;
     }
 
     public final String getName() {
-        return this.mName;
+        return this.name;
     }
 
     public final String getPlayerId() {
-        return this.zzezq;
+        return this.zzbz;
     }
 
     public final long getRetrievedTimestamp() {
-        return this.zzhcn;
+        return this.zzca;
     }
 
+    @Nullable
     public final String getTitle() {
-        return this.zzehi;
+        return this.zzcd;
     }
 
     public final void getTitle(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzehi, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.zzcd, charArrayBuffer);
     }
 
     public final boolean hasHiResImage() {
@@ -223,7 +283,7 @@ public final class PlayerEntity extends GamesDowngradeableSafeParcel implements 
     }
 
     public final int hashCode() {
-        return zza(this);
+        return zza((Player) this);
     }
 
     public final boolean isDataValid() {
@@ -231,7 +291,7 @@ public final class PlayerEntity extends GamesDowngradeableSafeParcel implements 
     }
 
     public final boolean isMuted() {
-        return this.zzdhy;
+        return this.zzcp;
     }
 
     public final String toString() {
@@ -239,58 +299,77 @@ public final class PlayerEntity extends GamesDowngradeableSafeParcel implements 
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getPlayerId(), false);
-        zzd.zza(parcel, 2, getDisplayName(), false);
-        zzd.zza(parcel, 3, getIconImageUri(), i, false);
-        zzd.zza(parcel, 4, getHiResImageUri(), i, false);
-        zzd.zza(parcel, 5, getRetrievedTimestamp());
-        zzd.zzc(parcel, 6, this.zzhco);
-        zzd.zza(parcel, 7, getLastPlayedWithTimestamp());
-        zzd.zza(parcel, 8, getIconImageUrl(), false);
-        zzd.zza(parcel, 9, getHiResImageUrl(), false);
-        zzd.zza(parcel, 14, getTitle(), false);
-        zzd.zza(parcel, 15, this.zzhcq, i, false);
-        zzd.zza(parcel, 16, getLevelInfo(), i, false);
-        zzd.zza(parcel, 18, this.zzhcs);
-        zzd.zza(parcel, 19, this.zzhct);
-        zzd.zza(parcel, 20, this.zzhcu, false);
-        zzd.zza(parcel, 21, this.mName, false);
-        zzd.zza(parcel, 22, getBannerImageLandscapeUri(), i, false);
-        zzd.zza(parcel, 23, getBannerImageLandscapeUrl(), false);
-        zzd.zza(parcel, 24, getBannerImagePortraitUri(), i, false);
-        zzd.zza(parcel, 25, getBannerImagePortraitUrl(), false);
-        zzd.zzc(parcel, 26, this.zzhcz);
-        zzd.zza(parcel, 27, this.zzhda);
-        zzd.zza(parcel, 28, this.zzdhy);
-        zzd.zzai(parcel, zze);
+        String str = null;
+        if (!shouldDowngrade()) {
+            int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+            SafeParcelWriter.writeString(parcel, 1, getPlayerId(), false);
+            SafeParcelWriter.writeString(parcel, 2, getDisplayName(), false);
+            SafeParcelWriter.writeParcelable(parcel, 3, getIconImageUri(), i, false);
+            SafeParcelWriter.writeParcelable(parcel, 4, getHiResImageUri(), i, false);
+            SafeParcelWriter.writeLong(parcel, 5, getRetrievedTimestamp());
+            SafeParcelWriter.writeInt(parcel, 6, this.zzcb);
+            SafeParcelWriter.writeLong(parcel, 7, getLastPlayedWithTimestamp());
+            SafeParcelWriter.writeString(parcel, 8, getIconImageUrl(), false);
+            SafeParcelWriter.writeString(parcel, 9, getHiResImageUrl(), false);
+            SafeParcelWriter.writeString(parcel, 14, getTitle(), false);
+            SafeParcelWriter.writeParcelable(parcel, 15, this.zzce, i, false);
+            SafeParcelWriter.writeParcelable(parcel, 16, getLevelInfo(), i, false);
+            SafeParcelWriter.writeBoolean(parcel, 18, this.zzcg);
+            SafeParcelWriter.writeBoolean(parcel, 19, this.zzch);
+            SafeParcelWriter.writeString(parcel, 20, this.zzci, false);
+            SafeParcelWriter.writeString(parcel, 21, this.name, false);
+            SafeParcelWriter.writeParcelable(parcel, 22, getBannerImageLandscapeUri(), i, false);
+            SafeParcelWriter.writeString(parcel, 23, getBannerImageLandscapeUrl(), false);
+            SafeParcelWriter.writeParcelable(parcel, 24, getBannerImagePortraitUri(), i, false);
+            SafeParcelWriter.writeString(parcel, 25, getBannerImagePortraitUrl(), false);
+            SafeParcelWriter.writeInt(parcel, 26, this.zzcn);
+            SafeParcelWriter.writeLong(parcel, 27, this.zzco);
+            SafeParcelWriter.writeBoolean(parcel, 28, this.zzcp);
+            SafeParcelWriter.writeLong(parcel, 29, this.zzcq);
+            SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+            return;
+        }
+        parcel.writeString(this.zzbz);
+        parcel.writeString(this.zzn);
+        parcel.writeString(this.zzr == null ? null : this.zzr.toString());
+        if (this.zzs != null) {
+            str = this.zzs.toString();
+        }
+        parcel.writeString(str);
+        parcel.writeLong(this.zzca);
     }
 
-    public final String zzapm() {
-        return this.zzhcu;
+    @Nullable
+    public final String zzh() {
+        return this.zzci;
     }
 
-    public final boolean zzapn() {
-        return this.zzhct;
+    public final boolean zzi() {
+        return this.zzch;
     }
 
-    public final int zzapo() {
-        return this.zzhco;
+    public final int zzj() {
+        return this.zzcb;
     }
 
-    public final boolean zzapp() {
-        return this.zzhcs;
+    public final boolean zzk() {
+        return this.zzcg;
     }
 
-    public final com.google.android.gms.games.internal.player.zza zzapq() {
-        return this.zzhcq;
+    @Nullable
+    public final com.google.android.gms.games.internal.player.zza zzl() {
+        return this.zzce;
     }
 
-    public final int zzapr() {
-        return this.zzhcz;
+    public final int zzm() {
+        return this.zzcn;
     }
 
-    public final long zzaps() {
-        return this.zzhda;
+    public final long zzn() {
+        return this.zzco;
+    }
+
+    public final long zzo() {
+        return this.zzcq;
     }
 }

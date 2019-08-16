@@ -1,10 +1,11 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import net.gogame.gowrap.ui.customtabs.ICustomTabsService.Stub;
+import net.gogame.gowrap.p019ui.customtabs.ICustomTabsService.Stub;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsServiceConnection */
 public abstract class CustomTabsServiceConnection implements ServiceConnection {
     public abstract void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient);
 

@@ -30,7 +30,7 @@ public class DataCache
 
 	public void RemoveAll()
 	{
-		Directory.Delete(cachePath, true);
+		Directory.Delete(cachePath, recursive: true);
 		Directory.CreateDirectory(cachePath);
 	}
 
@@ -69,9 +69,6 @@ public class DataCache
 		using (MD5 md5Hash = MD5.Create())
 		{
 			return Path.Combine(cachePath, req.filename + "." + GetMd5Hash(md5Hash, data));
-			IL_002e:
-			string result;
-			return result;
 		}
 	}
 

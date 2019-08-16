@@ -1,0 +1,16 @@
+package net.gogame.gopay.sdk.support;
+
+import android.graphics.Bitmap;
+import android.util.LruCache;
+
+/* renamed from: net.gogame.gopay.sdk.support.n */
+final class C1649n extends LruCache {
+    C1649n(int i) {
+        super(i);
+    }
+
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ int sizeOf(Object obj, Object obj2) {
+        return ((Bitmap) obj2).getByteCount() / 1024;
+    }
+}

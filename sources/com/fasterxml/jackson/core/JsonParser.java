@@ -33,6 +33,7 @@ public abstract class JsonParser implements Closeable, Versioned {
         private final int _mask;
 
         public static int collectDefaults() {
+            Feature[] values;
             int i = 0;
             for (Feature feature : values()) {
                 if (feature.enabledByDefault()) {
@@ -154,7 +155,10 @@ public abstract class JsonParser implements Closeable, Versioned {
 
     public Object getCurrentValue() {
         JsonStreamContext parsingContext = getParsingContext();
-        return parsingContext == null ? null : parsingContext.getCurrentValue();
+        if (parsingContext == null) {
+            return null;
+        }
+        return parsingContext.getCurrentValue();
     }
 
     public void setCurrentValue(Object obj) {
@@ -238,11 +242,17 @@ public abstract class JsonParser implements Closeable, Versioned {
     }
 
     public String nextFieldName() throws IOException, JsonParseException {
-        return nextToken() == JsonToken.FIELD_NAME ? getCurrentName() : null;
+        if (nextToken() == JsonToken.FIELD_NAME) {
+            return getCurrentName();
+        }
+        return null;
     }
 
     public String nextTextValue() throws IOException, JsonParseException {
-        return nextToken() == JsonToken.VALUE_STRING ? getText() : null;
+        if (nextToken() == JsonToken.VALUE_STRING) {
+            return getText();
+        }
+        return null;
     }
 
     public int nextIntValue(int i) throws IOException, JsonParseException {
@@ -365,26 +375,27 @@ public abstract class JsonParser implements Closeable, Versioned {
     }
 
     public <T> T readValueAs(Class<T> cls) throws IOException {
-        return _codec().readValue(this, (Class) cls);
+        return _codec().readValue(this, cls);
     }
 
     public <T> T readValueAs(TypeReference<?> typeReference) throws IOException {
-        return _codec().readValue(this, (TypeReference) typeReference);
+        return _codec().readValue(this, typeReference);
     }
 
     public <T> Iterator<T> readValuesAs(Class<T> cls) throws IOException {
-        return _codec().readValues(this, (Class) cls);
+        return _codec().readValues(this, cls);
     }
 
     public <T> Iterator<T> readValuesAs(TypeReference<?> typeReference) throws IOException {
-        return _codec().readValues(this, (TypeReference) typeReference);
+        return _codec().readValues(this, typeReference);
     }
 
     public <T extends TreeNode> T readValueAsTree() throws IOException {
         return _codec().readTree(this);
     }
 
-    protected ObjectCodec _codec() {
+    /* access modifiers changed from: protected */
+    public ObjectCodec _codec() {
         ObjectCodec codec = getCodec();
         if (codec != null) {
             return codec;
@@ -392,11 +403,13 @@ public abstract class JsonParser implements Closeable, Versioned {
         throw new IllegalStateException("No ObjectCodec defined for parser, needed for deserialization");
     }
 
-    protected JsonParseException _constructError(String str) {
+    /* access modifiers changed from: protected */
+    public JsonParseException _constructError(String str) {
         return new JsonParseException(this, str);
     }
 
-    protected void _reportUnsupportedOperation() {
+    /* access modifiers changed from: protected */
+    public void _reportUnsupportedOperation() {
         throw new UnsupportedOperationException("Operation not supported by parser of type " + getClass().getName());
     }
 }

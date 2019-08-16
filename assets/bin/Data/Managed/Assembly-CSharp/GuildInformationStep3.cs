@@ -45,13 +45,13 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 		}
 		if (array == null || array.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_LIST, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+			SetActive((Enum)UI.GRD_LIST, is_visible: true);
 			UpdateDynamicList();
 		}
 	}
@@ -68,7 +68,7 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 				item_num = info.Length;
 			}
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
 			SetListItem(i, t, is_recycle, info[i]);
 		});
@@ -94,11 +94,11 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 		SetEvent(t, "SELECT_FRIEND", event_data);
 		if (isGM)
 		{
-			SetRenderNPCModel(t, UI.TEX_MODEL, 0, new Vector3(0f, -1.49f, 1.87f), new Vector3(0f, 154f, 0f), 10f, null);
+			SetRenderNPCModel(t, UI.TEX_MODEL, 0, new Vector3(0f, -1.49f, 1.87f), new Vector3(0f, 154f, 0f), 10f);
 		}
 		else
 		{
-			SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, false, true, false, true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), true, null);
+			SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		}
 		SetLabelText(t, UI.LBL_NAME, data.name);
 		SetLabelText(t, UI.LBL_LEVEL, data.level.ToString());
@@ -106,29 +106,29 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 		SetLabelText(t, UI.LBL_LAST_LOGIN, base.sectionData.GetText("LAST_LOGIN"));
 		SetLabelText(t, UI.LBL_LAST_LOGIN_TIME, data.lastLogin);
 		EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(i + 4);
-		otherEquipSetCalculator.SetEquipSet(data.equipSet, false);
+		otherEquipSetCalculator.SetEquipSet(data.equipSet);
 		SimpleStatus finalStatus = otherEquipSetCalculator.GetFinalStatus(0, data.hp, data.atk, data.def);
 		SetLabelText(t, UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
 		SetLabelText(t, UI.LBL_DEF, finalStatus.defences[0].ToString());
 		SetLabelText(t, UI.LBL_HP, finalStatus.hp.ToString());
 		if ((int)data.level < 15)
 		{
-			SetActive(t, UI.OBJ_DISABLE_USER_MASK, true);
-			SetActive(t, UI.SPR_SELECTED, false);
-			SetActive(t, UI.STR_LIMIT_LVL, true);
+			SetActive(t, UI.OBJ_DISABLE_USER_MASK, is_visible: true);
+			SetActive(t, UI.SPR_SELECTED, is_visible: false);
+			SetActive(t, UI.STR_LIMIT_LVL, is_visible: true);
 			SetEvent(t, "_", null);
 		}
 		else if (mInviteFriendIDs.Contains(data.userId))
 		{
-			SetActive(t, UI.OBJ_DISABLE_USER_MASK, true);
-			SetActive(t, UI.SPR_SELECTED, true);
-			SetActive(t, UI.STR_LIMIT_LVL, false);
+			SetActive(t, UI.OBJ_DISABLE_USER_MASK, is_visible: true);
+			SetActive(t, UI.SPR_SELECTED, is_visible: true);
+			SetActive(t, UI.STR_LIMIT_LVL, is_visible: false);
 		}
 		else
 		{
-			SetActive(t, UI.OBJ_DISABLE_USER_MASK, false);
-			SetActive(t, UI.SPR_SELECTED, false);
-			SetActive(t, UI.STR_LIMIT_LVL, false);
+			SetActive(t, UI.OBJ_DISABLE_USER_MASK, is_visible: false);
+			SetActive(t, UI.SPR_SELECTED, is_visible: false);
+			SetActive(t, UI.STR_LIMIT_LVL, is_visible: false);
 		}
 	}
 
@@ -191,9 +191,9 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 				mInviteFriendIDs.Add(item);
 			}
 			Transform root = array[1] as Transform;
-			SetActive(root, UI.OBJ_DISABLE_USER_MASK, true);
-			SetActive(root, UI.SPR_SELECTED, true);
-			SetActive(root, UI.STR_LIMIT_LVL, false);
+			SetActive(root, UI.OBJ_DISABLE_USER_MASK, is_visible: true);
+			SetActive(root, UI.SPR_SELECTED, is_visible: true);
+			SetActive(root, UI.STR_LIMIT_LVL, is_visible: false);
 		}
 	}
 
@@ -256,9 +256,7 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 			GuildInformationStep3 guildInformationStep = this;
 			DoWaitProtocolBusyFinish(delegate
 			{
-				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0058: Expected O, but got Unknown
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 				if (is_success)
 				{
 					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GuildInformationStep3", guildInformationStep.get_gameObject(), "STORY", new object[3]
@@ -266,7 +264,7 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 						80000001,
 						0,
 						0
-					}, null, true);
+					});
 				}
 			});
 		});

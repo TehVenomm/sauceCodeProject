@@ -27,14 +27,16 @@ public class GameRequestDialog extends FacebookDialogBase<GameRequestContent, Re
 
     public static final class Result {
         String requestId;
-        List<String> to;
+
+        /* renamed from: to */
+        List<String> f402to;
 
         private Result(Bundle bundle) {
             this.requestId = bundle.getString(ShareConstants.WEB_DIALOG_RESULT_PARAM_REQUEST_ID);
-            this.to = new ArrayList();
+            this.f402to = new ArrayList();
             while (true) {
-                if (bundle.containsKey(String.format(ShareConstants.WEB_DIALOG_RESULT_PARAM_TO_ARRAY_MEMBER, new Object[]{Integer.valueOf(this.to.size())}))) {
-                    this.to.add(bundle.getString(String.format(ShareConstants.WEB_DIALOG_RESULT_PARAM_TO_ARRAY_MEMBER, new Object[]{Integer.valueOf(this.to.size())})));
+                if (bundle.containsKey(String.format(ShareConstants.WEB_DIALOG_RESULT_PARAM_TO_ARRAY_MEMBER, new Object[]{Integer.valueOf(this.f402to.size())}))) {
+                    this.f402to.add(bundle.getString(String.format(ShareConstants.WEB_DIALOG_RESULT_PARAM_TO_ARRAY_MEMBER, new Object[]{Integer.valueOf(this.f402to.size())})));
                 } else {
                     return;
                 }
@@ -46,7 +48,7 @@ public class GameRequestDialog extends FacebookDialogBase<GameRequestContent, Re
         }
 
         public List<String> getRequestRecipients() {
-            return this.to;
+            return this.f402to;
         }
     }
 
@@ -75,7 +77,7 @@ public class GameRequestDialog extends FacebookDialogBase<GameRequestContent, Re
         this(new FragmentWrapper(fragment));
     }
 
-    public GameRequestDialog(android.support.v4.app.Fragment fragment) {
+    public GameRequestDialog(android.support.p000v4.app.Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
@@ -95,7 +97,7 @@ public class GameRequestDialog extends FacebookDialogBase<GameRequestContent, Re
         show(new FragmentWrapper(fragment), gameRequestContent);
     }
 
-    public static void show(android.support.v4.app.Fragment fragment, GameRequestContent gameRequestContent) {
+    public static void show(android.support.p000v4.app.Fragment fragment, GameRequestContent gameRequestContent) {
         show(new FragmentWrapper(fragment), gameRequestContent);
     }
 
@@ -103,18 +105,21 @@ public class GameRequestDialog extends FacebookDialogBase<GameRequestContent, Re
         new GameRequestDialog(fragmentWrapper).show(gameRequestContent);
     }
 
-    protected AppCall createBaseAppCall() {
+    /* access modifiers changed from: protected */
+    public AppCall createBaseAppCall() {
         return new AppCall(getRequestCode());
     }
 
-    protected List<ModeHandler> getOrderedModeHandlers() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<ModeHandler> getOrderedModeHandlers() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(new WebHandler());
         return arrayList;
     }
 
-    protected void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
-        final ResultProcessor c05271 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
+    /* access modifiers changed from: protected */
+    public void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
+        final C08351 r0 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
             public void onSuccess(AppCall appCall, Bundle bundle) {
                 if (bundle != null) {
                     facebookCallback.onSuccess(new Result(bundle));
@@ -125,7 +130,7 @@ public class GameRequestDialog extends FacebookDialogBase<GameRequestContent, Re
         };
         callbackManagerImpl.registerCallback(getRequestCode(), new Callback() {
             public boolean onActivityResult(int i, Intent intent) {
-                return ShareInternalUtility.handleActivityResult(GameRequestDialog.this.getRequestCode(), i, intent, c05271);
+                return ShareInternalUtility.handleActivityResult(GameRequestDialog.this.getRequestCode(), i, intent, r0);
             }
         });
     }

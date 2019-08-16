@@ -33,11 +33,11 @@ public class GuildDonateSendDialog : GameSection
 		_info = (GameSection.GetEventData() as DonateInfo);
 		if (_info != null)
 		{
-			SetActive(base._transform, UI.SPR_SELECT_FRAME, true);
-			SetActive(base._transform, UI.SPR_REACH_LIMIT, false);
-			SetActive(base._transform, UI.LBL_NUMBER_REQUEST, false);
+			SetActive(base._transform, UI.SPR_SELECT_FRAME, is_visible: true);
+			SetActive(base._transform, UI.SPR_REACH_LIMIT, is_visible: false);
+			SetActive(base._transform, UI.LBL_NUMBER_REQUEST, is_visible: false);
 			canUpdateUI = true;
-			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == _info.itemId, 1, false);
+			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == _info.itemId, 1);
 			int num = _info.quantity - _info.itemNum;
 			m_maxNum = ((itemNum < num) ? itemNum : num);
 			m_nowSelect = m_maxNum;
@@ -47,17 +47,17 @@ public class GuildDonateSendDialog : GameSection
 			m_maxNum = MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap - MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap;
 			m_nowSelect = 1;
 			canUpdateUI = true;
-			SetActive(base._transform, UI.SPR_SELECT_FRAME, true);
-			SetActive(base._transform, UI.SPR_REACH_LIMIT, false);
-			SetActive(base._transform, UI.LBL_NUMBER_REQUEST, true);
-			SetSupportEncoding(UI.LBL_NUMBER_REQUEST, true);
+			SetActive(base._transform, UI.SPR_SELECT_FRAME, is_visible: true);
+			SetActive(base._transform, UI.SPR_REACH_LIMIT, is_visible: false);
+			SetActive(base._transform, UI.LBL_NUMBER_REQUEST, is_visible: true);
+			SetSupportEncoding(UI.LBL_NUMBER_REQUEST, isEnable: true);
 			SetLabelText((Enum)UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 32u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
 		}
 		else
 		{
-			SetActive(base._transform, UI.SPR_SELECT_FRAME, false);
-			SetActive(base._transform, UI.SPR_REACH_LIMIT, true);
-			SetSupportEncoding(UI.LBL_REQUEST_LIMIT, true);
+			SetActive(base._transform, UI.SPR_SELECT_FRAME, is_visible: false);
+			SetActive(base._transform, UI.SPR_REACH_LIMIT, is_visible: true);
+			SetSupportEncoding(UI.LBL_REQUEST_LIMIT, isEnable: true);
 			SetLabelText((Enum)UI.LBL_REQUEST_LIMIT, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 33u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
 			canUpdateUI = false;
 		}
@@ -127,7 +127,7 @@ public class GuildDonateSendDialog : GameSection
 					}
 					MonoBehaviourSingleton<GuildManager>.I.SendDonateList(delegate(bool donate_success)
 					{
-						GameSection.ResumeEvent(donate_success, null);
+						GameSection.ResumeEvent(donate_success);
 						GameSection.BackSection();
 					});
 				});

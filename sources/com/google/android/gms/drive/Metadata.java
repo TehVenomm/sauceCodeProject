@@ -1,12 +1,13 @@
 package com.google.android.gms.drive;
 
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.data.Freezable;
 import com.google.android.gms.drive.metadata.CustomPropertyKey;
 import com.google.android.gms.drive.metadata.MetadataField;
 import com.google.android.gms.drive.metadata.internal.AppVisibleCustomProperties;
-import com.google.android.gms.internal.zzbnr;
-import com.google.android.gms.internal.zzboe;
-import com.google.android.gms.internal.zzbom;
+import com.google.android.gms.internal.drive.zzhp;
+import com.google.android.gms.internal.drive.zzic;
+import com.google.android.gms.internal.drive.zzik;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -16,91 +17,103 @@ public abstract class Metadata implements Freezable<Metadata> {
     public static final int CONTENT_NOT_AVAILABLE_LOCALLY = 0;
 
     public String getAlternateLink() {
-        return (String) zza(zzbnr.zzgku);
+        return (String) zza(zzhp.zziw);
     }
 
     public int getContentAvailability() {
-        Integer num = (Integer) zza(zzbom.zzgms);
-        return num == null ? 0 : num.intValue();
+        Integer num = (Integer) zza(zzik.zzku);
+        if (num == null) {
+            return 0;
+        }
+        return num.intValue();
     }
 
     public Date getCreatedDate() {
-        return (Date) zza(zzboe.zzgml);
+        return (Date) zza(zzic.zzkn);
     }
 
     public Map<CustomPropertyKey, String> getCustomProperties() {
-        AppVisibleCustomProperties appVisibleCustomProperties = (AppVisibleCustomProperties) zza(zzbnr.zzgkv);
-        return appVisibleCustomProperties == null ? Collections.emptyMap() : appVisibleCustomProperties.zzanp();
+        AppVisibleCustomProperties appVisibleCustomProperties = (AppVisibleCustomProperties) zza(zzhp.zzix);
+        return appVisibleCustomProperties == null ? Collections.emptyMap() : appVisibleCustomProperties.zzas();
     }
 
     public String getDescription() {
-        return (String) zza(zzbnr.zzgkw);
+        return (String) zza(zzhp.zziy);
     }
 
     public DriveId getDriveId() {
-        return (DriveId) zza(zzbnr.zzgkt);
+        return (DriveId) zza(zzhp.zziv);
     }
 
     public String getEmbedLink() {
-        return (String) zza(zzbnr.zzgkx);
+        return (String) zza(zzhp.zziz);
     }
 
     public String getFileExtension() {
-        return (String) zza(zzbnr.zzgky);
+        return (String) zza(zzhp.zzja);
     }
 
     public long getFileSize() {
-        return ((Long) zza(zzbnr.zzgkz)).longValue();
+        return ((Long) zza(zzhp.zzjb)).longValue();
     }
 
+    @Nullable
     public Date getLastViewedByMeDate() {
-        return (Date) zza(zzboe.zzgmm);
+        return (Date) zza(zzic.zzko);
     }
 
     public String getMimeType() {
-        return (String) zza(zzbnr.zzglq);
+        return (String) zza(zzhp.zzjs);
     }
 
+    @Nullable
     public Date getModifiedByMeDate() {
-        return (Date) zza(zzboe.zzgmo);
+        return (Date) zza(zzic.zzkq);
     }
 
     public Date getModifiedDate() {
-        return (Date) zza(zzboe.zzgmn);
+        return (Date) zza(zzic.zzkp);
     }
 
     public String getOriginalFilename() {
-        return (String) zza(zzbnr.zzglr);
+        return (String) zza(zzhp.zzjt);
     }
 
     public long getQuotaBytesUsed() {
-        return ((Long) zza(zzbnr.zzglw)).longValue();
+        return ((Long) zza(zzhp.zzjy)).longValue();
     }
 
+    @Nullable
     public Date getSharedWithMeDate() {
-        return (Date) zza(zzboe.zzgmp);
+        return (Date) zza(zzic.zzkr);
     }
 
     public String getTitle() {
-        return (String) zza(zzbnr.zzglz);
+        return (String) zza(zzhp.zzkb);
     }
 
     public String getWebContentLink() {
-        return (String) zza(zzbnr.zzgmb);
+        return (String) zza(zzhp.zzkd);
     }
 
     public String getWebViewLink() {
-        return (String) zza(zzbnr.zzgmc);
+        return (String) zza(zzhp.zzke);
     }
 
     public boolean isEditable() {
-        Boolean bool = (Boolean) zza(zzbnr.zzglf);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjh);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isExplicitlyTrashed() {
-        Boolean bool = (Boolean) zza(zzbnr.zzglg);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzji);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isFolder() {
@@ -108,48 +121,75 @@ public abstract class Metadata implements Freezable<Metadata> {
     }
 
     public boolean isInAppFolder() {
-        Boolean bool = (Boolean) zza(zzbnr.zzgld);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjf);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isPinnable() {
-        Boolean bool = (Boolean) zza(zzbom.zzgmt);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzik.zzkv);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isPinned() {
-        Boolean bool = (Boolean) zza(zzbnr.zzgli);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjk);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isRestricted() {
-        Boolean bool = (Boolean) zza(zzbnr.zzglk);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjm);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isShared() {
-        Boolean bool = (Boolean) zza(zzbnr.zzgll);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjn);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isStarred() {
-        Boolean bool = (Boolean) zza(zzbnr.zzglx);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjz);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isTrashable() {
-        Boolean bool = (Boolean) zza(zzbnr.zzglo);
-        return bool == null ? true : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjq);
+        if (bool == null) {
+            return true;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isTrashed() {
-        Boolean bool = (Boolean) zza(zzbnr.zzgma);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzkc);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public boolean isViewed() {
-        Boolean bool = (Boolean) zza(zzbnr.zzglp);
-        return bool == null ? false : bool.booleanValue();
+        Boolean bool = (Boolean) zza(zzhp.zzjr);
+        if (bool == null) {
+            return false;
+        }
+        return bool.booleanValue();
     }
 
     public abstract <T> T zza(MetadataField<T> metadataField);

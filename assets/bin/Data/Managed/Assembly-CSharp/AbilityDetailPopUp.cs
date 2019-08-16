@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class AbilityDetailPopUp
+public class AbilityDetailPopUp : MonoBehaviour
 {
 	[SerializeField]
 	private UILabel nameLabel;
@@ -36,7 +36,6 @@ public class AbilityDetailPopUp
 
 	public void Hide()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(false);
 	}
 
@@ -48,11 +47,8 @@ public class AbilityDetailPopUp
 
 	public void ShowAbilityDetail(Transform targetTrans)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		myTransform.get_gameObject().SetActive(true);
 		myTransform.get_transform().set_position(targetTrans.TransformPoint(DETAIL_OFFSET));
 		this.StartCoroutine(Follow(targetTrans));
@@ -65,7 +61,7 @@ public class AbilityDetailPopUp
 			Vector3 pos = target.TransformPoint(DETAIL_OFFSET);
 			pos.x = 0f;
 			myTransform.set_position(pos);
-			yield return (object)null;
+			yield return null;
 		}
 	}
 }

@@ -1,12 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataTable
 {
 	[Serializable]
 	public class TheaterModeData
 	{
-		public const string NT = "story_id,title,chapter_id,order,script_id";
+		public enum STATE_ID
+		{
+			BLACK_LIST,
+			MAIN_STORY,
+			EVENT_STORY
+		}
 
 		public uint story_id;
 
@@ -18,6 +25,10 @@ public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataT
 
 		public int script_id;
 
+		public int state_id;
+
+		public const string NT = "story_id,title,chapter_id,order,script_id,state_id";
+
 		public static bool CB(CSVReader csv, TheaterModeData data, ref uint key1)
 		{
 			data.story_id = key1;
@@ -25,18 +36,27 @@ public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataT
 			csv.Pop(ref data.chapter_id);
 			csv.Pop(ref data.order);
 			csv.Pop(ref data.script_id);
+			csv.Pop(ref data.state_id);
 			return true;
 		}
 
 		public override string ToString()
 		{
-			string empty = string.Empty;
-			string text = empty;
-			return text + story_id + "," + title + "," + chapter_id + "," + order + "," + script_id;
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.AppendFormat("{0}", story_id);
+			stringBuilder.AppendFormat(",{0}", title);
+			stringBuilder.AppendFormat(",{0}", chapter_id);
+			stringBuilder.AppendFormat(",{0}", order);
+			stringBuilder.AppendFormat(",{0}", script_id);
+			stringBuilder.AppendFormat(",{0}", state_id);
+			return stringBuilder.ToString();
 		}
 	}
 
 	private UIntKeyTable<TheaterModeData> dataTable;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<TheaterModeData> _003C_003Ef__mg_0024cache0;
 
 	public bool isLoading
 	{
@@ -56,12 +76,12 @@ public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataT
 		MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable("TheaterModeTable", this, delegate
 		{
 			isLoading = false;
-		}, false);
+		});
 	}
 
 	public void CreateTable(string csv)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<TheaterModeData>(csv, TheaterModeData.CB, "story_id,title,chapter_id,order,script_id", null);
+		dataTable = TableUtility.CreateUIntKeyTable<TheaterModeData>(csv, TheaterModeData.CB, "story_id,title,chapter_id,order,script_id,state_id");
 		dataTable.TrimExcess();
 	}
 
@@ -70,6 +90,28 @@ public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataT
 		if (dataTable != null && call_back != null)
 		{
 			dataTable.ForEach(delegate(TheaterModeData data)
+			{
+				call_back(data);
+			});
+		}
+	}
+
+	public void AllTheaterDataAsc(Action<TheaterModeData> call_back)
+	{
+		if (dataTable != null && call_back != null)
+		{
+			dataTable.ForEach(delegate(TheaterModeData data)
+			{
+				call_back(data);
+			});
+		}
+	}
+
+	public void AllTheaterDataDesc(Action<TheaterModeData> call_back)
+	{
+		if (dataTable != null && call_back != null)
+		{
+			dataTable.ForEachDesc(delegate(TheaterModeData data)
 			{
 				call_back(data);
 			});

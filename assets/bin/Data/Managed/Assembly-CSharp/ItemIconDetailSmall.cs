@@ -24,24 +24,24 @@ public class ItemIconDetailSmall : ItemIcon
 
 	public static ItemIcon CreateSmallRemoveButton(Transform parent = null, string event_name = null, int event_data = 0, int toggle_group = -1, bool is_select = false, string name = null)
 	{
-		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, ITEM_ICON_TYPE.NONE, ItemIcon.GetRemoveButtonIconID(), null, parent, ELEMENT_TYPE.MAX, null, -1, event_name, event_data, false, toggle_group, is_select, name, false, 0, 0, false, QUEST_ICON_SIZE_TYPE.DEFAULT, GET_TYPE.PAY);
-		itemIconDetailSmall.EquipTypeIconInit(null);
+		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, ITEM_ICON_TYPE.NONE, ItemIcon.GetRemoveButtonIconID(), null, parent, ELEMENT_TYPE.MAX, null, -1, event_name, event_data, is_new: false, toggle_group, is_select, name);
+		itemIconDetailSmall.EquipTypeIconInit();
 		itemIconDetailSmall.SetEquipIndexSprite(-1);
-		itemIconDetailSmall.SetIconStatusSprite(ItemIconDetail.ICON_STATUS.NONE);
-		itemIconDetailSmall.SetupSelectNumberSprite(-1);
-		itemIconDetailSmall.SetFavoriteIcon(false);
+		itemIconDetailSmall.SetIconStatusSprite();
+		itemIconDetailSmall.SetupSelectNumberSprite();
+		itemIconDetailSmall.SetFavoriteIcon(is_favorite: false);
 		return itemIconDetailSmall;
 	}
 
 	public static ItemIcon CreateSmallMaterialIcon(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent = null, int num = -1, string name = null, string event_name = null, int event_data = 0, int toggle_group = -1, bool is_select = false, bool is_new = false, int enemy_icon_id = 0, int enemy_icon_id2 = 0, ItemIconDetail.ICON_STATUS icon_status = ItemIconDetail.ICON_STATUS.NONE)
 	{
 		string icon_under_text = "×" + num.ToString();
-		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, ELEMENT_TYPE.MAX, null, -1, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, false, enemy_icon_id, enemy_icon_id2, false, QUEST_ICON_SIZE_TYPE.DEFAULT, GET_TYPE.PAY);
-		itemIconDetailSmall.EquipTypeIconInit(null);
+		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, ELEMENT_TYPE.MAX, null, -1, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping: false, enemy_icon_id, enemy_icon_id2);
+		itemIconDetailSmall.EquipTypeIconInit();
 		itemIconDetailSmall.SetEquipIndexSprite(-1);
 		itemIconDetailSmall.SetIconStatusSprite(icon_status);
-		itemIconDetailSmall.SetupSelectNumberSprite(-1);
-		itemIconDetailSmall.SetFavoriteIcon(false);
+		itemIconDetailSmall.SetupSelectNumberSprite();
+		itemIconDetailSmall.SetFavoriteIcon(is_favorite: false);
 		return itemIconDetailSmall;
 	}
 
@@ -65,7 +65,7 @@ public class ItemIconDetailSmall : ItemIcon
 		bool is_equipping = equip_index == 0;
 		string icon_under_text = (!item_data.equipData.tableData.IsWeapon()) ? item_data.equipData.def.ToString() : item_data.equipData.atk.ToString();
 		EquipItemInfo equipItemInfo = item_data.GetItemData() as EquipItemInfo;
-		ItemIconDetailSmall itemIconDetailSmall = CreateEquipItemIconDetailSmall(equipItemInfo, sex, parent, null, -1, event_name, event_data, is_new, toggle_group, select_number > -1, icon_under_text, is_equipping, false);
+		ItemIconDetailSmall itemIconDetailSmall = CreateEquipItemIconDetailSmall(equipItemInfo, sex, parent, null, -1, event_name, event_data, is_new, toggle_group, select_number > -1, icon_under_text, is_equipping);
 		itemIconDetailSmall.EquipTypeIconInit(equipItemInfo.tableData);
 		itemIconDetailSmall.SetEquipIndexSprite(equip_index - 1);
 		itemIconDetailSmall.SetIconStatusSprite(icon_status);
@@ -83,13 +83,21 @@ public class ItemIconDetailSmall : ItemIcon
 	public static ItemIcon CreateSmithCreateEquipDetailIcon(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, SmithCreateSortData item_data, Transform parent = null, string event_name = null, int event_data = 0, ItemIconDetail.ICON_STATUS icon_status = ItemIconDetail.ICON_STATUS.NONE, bool is_new = false, int toggle_group = -1, bool is_select = false, bool is_equipping = false, GET_TYPE getType = GET_TYPE.PAY)
 	{
 		SmithCreateItemInfo smithCreateItemInfo = item_data.GetItemData() as SmithCreateItemInfo;
-		string icon_under_text = (!smithCreateItemInfo.equipTableData.IsWeapon()) ? smithCreateItemInfo.equipTableData.baseDef.ToString() : smithCreateItemInfo.equipTableData.baseAtk.ToString();
-		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, smithCreateItemInfo.equipTableData.GetTargetElementPriorityToTable(), null, -1, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, 0, 0, false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		string text = (!smithCreateItemInfo.equipTableData.IsWeapon()) ? smithCreateItemInfo.equipTableData.baseDef.ToString() : smithCreateItemInfo.equipTableData.baseAtk.ToString();
+		GameObject itemIconDetailSmallPrefab = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab;
+		ELEMENT_TYPE targetElementPriorityToTable = smithCreateItemInfo.equipTableData.GetTargetElementPriorityToTable();
+		EQUIPMENT_TYPE? magi_enable_icon_type = null;
+		int num = -1;
+		bool is_new2 = is_new;
+		bool is_select2 = is_select;
+		string icon_under_text = text;
+		bool is_equipping2 = is_equipping;
+		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, targetElementPriorityToTable, magi_enable_icon_type, num, event_name, event_data, is_new2, toggle_group, is_select2, icon_under_text, is_equipping2, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 		itemIconDetailSmall.EquipTypeIconInit(smithCreateItemInfo.equipTableData);
 		itemIconDetailSmall.SetEquipIndexSprite(-1);
 		itemIconDetailSmall.SetIconStatusSprite(icon_status);
-		itemIconDetailSmall.SetupSelectNumberSprite(-1);
-		itemIconDetailSmall.SetFavoriteIcon(false);
+		itemIconDetailSmall.SetupSelectNumberSprite();
+		itemIconDetailSmall.SetFavoriteIcon(is_favorite: false);
 		return itemIconDetailSmall;
 	}
 
@@ -121,8 +129,8 @@ public class ItemIconDetailSmall : ItemIcon
 		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		string format = (!item_data.skillData.IsExceeded()) ? "Lv. {0}/{1}" : ("Lv. {0}/" + UIUtility.GetColorText("{1}", ExceedSkillItemTable.color));
 		string icon_under_text = string.Format(format, item_data.GetLevel(), item_data.skillData.GetMaxLevel());
-		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, item_data.GetIconElement(), item_data.skillData.tableData.GetEnableEquipType(), -1, event_name, event_data, is_new, toggle_group, select_number > -1, icon_under_text, is_equipping, 0, 0, false, QUEST_ICON_SIZE_TYPE.DEFAULT, GET_TYPE.PAY);
-		itemIconDetailSmall.EquipTypeIconInit(null);
+		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, item_data.GetIconElement(), item_data.skillData.tableData.GetEnableEquipType(), -1, event_name, event_data, is_new, toggle_group, select_number > -1, icon_under_text, is_equipping);
+		itemIconDetailSmall.EquipTypeIconInit();
 		itemIconDetailSmall.SetEquipIndexSprite(-1);
 		itemIconDetailSmall.SetIconStatusSprite(icon_status);
 		itemIconDetailSmall.SetupSelectNumberSprite(select_number);
@@ -133,12 +141,12 @@ public class ItemIconDetailSmall : ItemIcon
 	public static ItemIcon CreateSmallQuestItemIcon(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent = null, ELEMENT_TYPE element_type = ELEMENT_TYPE.MAX, int num = -1, string name = null, string event_name = null, int event_data = 0, int toggle_group = -1, bool is_select = false, bool is_new = false)
 	{
 		string icon_under_text = "×" + num.ToString();
-		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, element_type, null, -1, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, false, 0, 0, false, QUEST_ICON_SIZE_TYPE.DEFAULT, GET_TYPE.PAY);
-		itemIconDetailSmall.EquipTypeIconInit(null);
+		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, icon_type, icon_id, rarity, parent, element_type, null, -1, event_name, event_data, is_new, toggle_group, is_select, icon_under_text);
+		itemIconDetailSmall.EquipTypeIconInit();
 		itemIconDetailSmall.SetEquipIndexSprite(-1);
-		itemIconDetailSmall.SetIconStatusSprite(ItemIconDetail.ICON_STATUS.NONE);
-		itemIconDetailSmall.SetupSelectNumberSprite(-1);
-		itemIconDetailSmall.SetFavoriteIcon(false);
+		itemIconDetailSmall.SetIconStatusSprite();
+		itemIconDetailSmall.SetupSelectNumberSprite();
+		itemIconDetailSmall.SetFavoriteIcon(is_favorite: false);
 		return itemIconDetailSmall;
 	}
 
@@ -146,13 +154,26 @@ public class ItemIconDetailSmall : ItemIcon
 	{
 		EquipItemTable.EquipItemData tableData = sortData.equipData.tableData;
 		EquipItemInfo equipItemInfo = sortData.GetItemData() as EquipItemInfo;
-		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab, iconType, tableData.GetIconID(), tableData.rarity, parent, equipItemInfo.GetTargetElementPriorityToTable(), null, -1, string.Empty, 0, isNew, -1, false, "No." + no.ToString("D4"), false, 0, 0, false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		GameObject itemIconDetailSmallPrefab = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailSmallPrefab;
+		int iconID = tableData.GetIconID();
+		RARITY_TYPE? rarity = tableData.rarity;
+		ELEMENT_TYPE targetElementPriorityToTable = equipItemInfo.GetTargetElementPriorityToTable();
+		EQUIPMENT_TYPE? magi_enable_icon_type = null;
+		int num = -1;
+		string empty = string.Empty;
+		int event_data = 0;
+		bool is_new = isNew;
+		int toggle_group = -1;
+		bool is_select = false;
+		string icon_under_text = "No." + no.ToString("D4");
+		bool is_equipping = false;
+		ItemIconDetailSmall itemIconDetailSmall = ItemIcon.CreateIcon<ItemIconDetailSmall>(itemIconDetailSmallPrefab, iconType, iconID, rarity, parent, targetElementPriorityToTable, magi_enable_icon_type, num, empty, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 		itemIconDetailSmall.EquipTypeIconInit(tableData);
 		itemIconDetailSmall.SetEquipIndexSprite(-1);
-		itemIconDetailSmall.EquipTypeIconInit(null);
-		itemIconDetailSmall.SetIconStatusSprite(ItemIconDetail.ICON_STATUS.NONE);
-		itemIconDetailSmall.SetupSelectNumberSprite(-1);
-		itemIconDetailSmall.SetFavoriteIcon(false);
+		itemIconDetailSmall.EquipTypeIconInit();
+		itemIconDetailSmall.SetIconStatusSprite();
+		itemIconDetailSmall.SetupSelectNumberSprite();
+		itemIconDetailSmall.SetFavoriteIcon(is_favorite: false);
 		return itemIconDetailSmall;
 	}
 
@@ -161,21 +182,15 @@ public class ItemIconDetailSmall : ItemIcon
 		if (equip_table == null)
 		{
 			spriteValueType.set_enabled(false);
+			return;
 		}
-		else
-		{
-			spriteValueType.set_enabled(true);
-			spriteValueType.spriteName = ((!equip_table.IsWeapon()) ? ItemIcon.SPR_TYPE_DEF : ItemIcon.SPR_TYPE_ATK);
-		}
+		spriteValueType.set_enabled(true);
+		spriteValueType.spriteName = ((!equip_table.IsWeapon()) ? ItemIcon.SPR_TYPE_DEF : ItemIcon.SPR_TYPE_ATK);
 	}
 
 	private void SetIconStatusSprite(ItemIconDetail.ICON_STATUS icon_status = ItemIconDetail.ICON_STATUS.NONE)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		SetRegistedIcon(false);
+		SetRegistedIcon(is_visible: false);
 		spriteValidEvolve.get_gameObject().SetActive(icon_status == ItemIconDetail.ICON_STATUS.VALID_EVOLVE);
 		spGrowMax.set_enabled(icon_status == ItemIconDetail.ICON_STATUS.GROW_MAX);
 		spriteGrayOut.set_enabled(icon_status == ItemIconDetail.ICON_STATUS.GRAYOUT || icon_status == ItemIconDetail.ICON_STATUS.NOT_ENOUGH_MATERIAL);

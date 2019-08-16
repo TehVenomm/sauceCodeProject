@@ -39,31 +39,28 @@ namespace MsgPack.Compiler
 			{
 			case 0:
 				il.Emit(OpCodes.Ldarg_0);
-				break;
+				return;
 			case 1:
 				il.Emit(OpCodes.Ldarg_1);
-				break;
+				return;
 			case 2:
 				il.Emit(OpCodes.Ldarg_2);
-				break;
+				return;
 			case 3:
 				il.Emit(OpCodes.Ldarg_3);
-				break;
-			default:
-				if (v.Index <= 255)
-				{
-					il.Emit(OpCodes.Ldarg_S, (byte)v.Index);
-				}
-				else
-				{
-					if (v.Index > 32767)
-					{
-						throw new FormatException();
-					}
-					il.Emit(OpCodes.Ldarg, v.Index);
-				}
-				break;
+				return;
 			}
+			if (v.Index <= 255)
+			{
+				il.Emit(OpCodes.Ldarg_S, (byte)v.Index);
+				return;
+			}
+			if (v.Index <= 32767)
+			{
+				il.Emit(OpCodes.Ldarg, v.Index);
+				return;
+			}
+			throw new FormatException();
 		}
 
 		public static void EmitLdloc(this ILGenerator il, Variable v)
@@ -76,31 +73,28 @@ namespace MsgPack.Compiler
 			{
 			case 0:
 				il.Emit(OpCodes.Ldloc_0);
-				break;
+				return;
 			case 1:
 				il.Emit(OpCodes.Ldloc_1);
-				break;
+				return;
 			case 2:
 				il.Emit(OpCodes.Ldloc_2);
-				break;
+				return;
 			case 3:
 				il.Emit(OpCodes.Ldloc_3);
-				break;
-			default:
-				if (v.Index <= 255)
-				{
-					il.Emit(OpCodes.Ldloc_S, (byte)v.Index);
-				}
-				else
-				{
-					if (v.Index > 32767)
-					{
-						throw new FormatException();
-					}
-					il.Emit(OpCodes.Ldloc, v.Index);
-				}
-				break;
+				return;
 			}
+			if (v.Index <= 255)
+			{
+				il.Emit(OpCodes.Ldloc_S, (byte)v.Index);
+				return;
+			}
+			if (v.Index <= 32767)
+			{
+				il.Emit(OpCodes.Ldloc, v.Index);
+				return;
+			}
+			throw new FormatException();
 		}
 
 		public static void EmitSt(this ILGenerator il, Variable v)
@@ -127,15 +121,14 @@ namespace MsgPack.Compiler
 			if (v.Index <= 255)
 			{
 				il.Emit(OpCodes.Starg_S, (byte)v.Index);
+				return;
 			}
-			else
+			if (v.Index <= 32767)
 			{
-				if (v.Index > 32767)
-				{
-					throw new FormatException();
-				}
 				il.Emit(OpCodes.Starg, v.Index);
+				return;
 			}
+			throw new FormatException();
 		}
 
 		public static void EmitStloc(this ILGenerator il, Variable v)
@@ -148,31 +141,28 @@ namespace MsgPack.Compiler
 			{
 			case 0:
 				il.Emit(OpCodes.Stloc_0);
-				break;
+				return;
 			case 1:
 				il.Emit(OpCodes.Stloc_1);
-				break;
+				return;
 			case 2:
 				il.Emit(OpCodes.Stloc_2);
-				break;
+				return;
 			case 3:
 				il.Emit(OpCodes.Stloc_3);
-				break;
-			default:
-				if (v.Index <= 255)
-				{
-					il.Emit(OpCodes.Stloc_S, (byte)v.Index);
-				}
-				else
-				{
-					if (v.Index > 32767)
-					{
-						throw new FormatException();
-					}
-					il.Emit(OpCodes.Stloc, v.Index);
-				}
-				break;
+				return;
 			}
+			if (v.Index <= 255)
+			{
+				il.Emit(OpCodes.Stloc_S, (byte)v.Index);
+				return;
+			}
+			if (v.Index <= 32767)
+			{
+				il.Emit(OpCodes.Stloc, v.Index);
+				return;
+			}
+			throw new FormatException();
 		}
 
 		public static void EmitLdc(this ILGenerator il, int v)
@@ -181,44 +171,42 @@ namespace MsgPack.Compiler
 			{
 			case 0:
 				il.Emit(OpCodes.Ldc_I4_0);
-				break;
+				return;
 			case 1:
 				il.Emit(OpCodes.Ldc_I4_1);
-				break;
+				return;
 			case 2:
 				il.Emit(OpCodes.Ldc_I4_2);
-				break;
+				return;
 			case 3:
 				il.Emit(OpCodes.Ldc_I4_3);
-				break;
+				return;
 			case 4:
 				il.Emit(OpCodes.Ldc_I4_4);
-				break;
+				return;
 			case 5:
 				il.Emit(OpCodes.Ldc_I4_5);
-				break;
+				return;
 			case 6:
 				il.Emit(OpCodes.Ldc_I4_6);
-				break;
+				return;
 			case 7:
 				il.Emit(OpCodes.Ldc_I4_7);
-				break;
+				return;
 			case 8:
 				il.Emit(OpCodes.Ldc_I4_8);
-				break;
+				return;
 			case -1:
 				il.Emit(OpCodes.Ldc_I4_M1);
-				break;
-			default:
-				if (v <= 127 && v >= -128)
-				{
-					il.Emit(OpCodes.Ldc_I4_S, (sbyte)v);
-				}
-				else
-				{
-					il.Emit(OpCodes.Ldc_I4, v);
-				}
-				break;
+				return;
+			}
+			if (v <= 127 && v >= -128)
+			{
+				il.Emit(OpCodes.Ldc_I4_S, (sbyte)v);
+			}
+			else
+			{
+				il.Emit(OpCodes.Ldc_I4, v);
 			}
 		}
 
@@ -242,15 +230,14 @@ namespace MsgPack.Compiler
 			if (m.MemberType == MemberTypes.Field)
 			{
 				il.Emit(OpCodes.Ldfld, (FieldInfo)m);
+				return;
 			}
-			else
+			if (m.MemberType == MemberTypes.Property)
 			{
-				if (m.MemberType != MemberTypes.Property)
-				{
-					throw new ArgumentException();
-				}
-				il.Emit(OpCodes.Callvirt, ((PropertyInfo)m).GetGetMethod(true));
+				il.Emit(OpCodes.Callvirt, ((PropertyInfo)m).GetGetMethod(nonPublic: true));
+				return;
 			}
+			throw new ArgumentException();
 		}
 
 		public static void EmitStMember(this ILGenerator il, MemberInfo m)
@@ -258,15 +245,14 @@ namespace MsgPack.Compiler
 			if (m.MemberType == MemberTypes.Field)
 			{
 				il.Emit(OpCodes.Stfld, (FieldInfo)m);
+				return;
 			}
-			else
+			if (m.MemberType == MemberTypes.Property)
 			{
-				if (m.MemberType != MemberTypes.Property)
-				{
-					throw new ArgumentException();
-				}
-				il.Emit(OpCodes.Callvirt, ((PropertyInfo)m).GetSetMethod(true));
+				il.Emit(OpCodes.Callvirt, ((PropertyInfo)m).GetSetMethod(nonPublic: true));
+				return;
 			}
+			throw new ArgumentException();
 		}
 	}
 }

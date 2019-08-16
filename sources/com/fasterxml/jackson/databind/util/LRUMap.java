@@ -13,7 +13,7 @@ public class LRUMap<K, V> implements Serializable {
     protected final transient int _maxEntries;
 
     public LRUMap(int i, int i2) {
-        this._map = new ConcurrentHashMap(i, 0.8f, 4);
+        this._map = new ConcurrentHashMap<>(i, 0.8f, 4);
         this._maxEntries = i2;
     }
 
@@ -59,7 +59,8 @@ public class LRUMap<K, V> implements Serializable {
         objectOutputStream.writeInt(this._jdkSerializeMaxEntries);
     }
 
-    protected Object readResolve() {
+    /* access modifiers changed from: protected */
+    public Object readResolve() {
         return new LRUMap(this._jdkSerializeMaxEntries, this._jdkSerializeMaxEntries);
     }
 }

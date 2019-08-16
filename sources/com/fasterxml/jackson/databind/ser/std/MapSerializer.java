@@ -2,7 +2,6 @@ package com.fasterxml.jackson.databind.ser.std;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -11,15 +10,12 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
-import com.fasterxml.jackson.databind.introspect.Annotated;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonMapFormatVisitor;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.ContainerSerializer;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
-import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap;
 import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap.SerializerAndMapResult;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -65,7 +61,8 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
         this._suppressableValue = null;
     }
 
-    protected void _ensureOverride() {
+    /* access modifiers changed from: protected */
+    public void _ensureOverride() {
         if (getClass() != MapSerializer.class) {
             throw new IllegalStateException("Missing override in class " + getClass().getName());
         }
@@ -130,7 +127,7 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
             return this;
         }
         _ensureOverride();
-        return new MapSerializer(this, typeSerializer, null);
+        return new MapSerializer(this, typeSerializer, (Object) null);
     }
 
     public MapSerializer withResolved(BeanProperty beanProperty, JsonSerializer<?> jsonSerializer, JsonSerializer<?> jsonSerializer2, HashSet<String> hashSet, boolean z) {
@@ -159,157 +156,184 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
     }
 
     public static MapSerializer construct(String[] strArr, JavaType javaType, boolean z, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer, JsonSerializer<Object> jsonSerializer2, Object obj) {
-        JavaType javaType2;
-        JavaType javaType3;
+        JavaType keyType;
+        JavaType contentType;
         boolean z2;
         boolean z3 = false;
         HashSet arrayToSet = (strArr == null || strArr.length == 0) ? null : ArrayBuilders.arrayToSet(strArr);
         if (javaType == null) {
-            javaType2 = UNSPECIFIED_TYPE;
-            javaType3 = javaType2;
+            JavaType javaType2 = UNSPECIFIED_TYPE;
+            contentType = javaType2;
+            keyType = javaType2;
         } else {
-            javaType3 = javaType.getKeyType();
-            javaType2 = javaType.getContentType();
+            keyType = javaType.getKeyType();
+            contentType = javaType.getContentType();
         }
         if (!z) {
-            if (javaType2 != null && javaType2.isFinal()) {
+            if (contentType != null && contentType.isFinal()) {
                 z3 = true;
             }
             z2 = z3;
-        } else if (javaType2.getRawClass() == Object.class) {
+        } else if (contentType.getRawClass() == Object.class) {
             z2 = false;
         } else {
             z2 = z;
         }
-        MapSerializer mapSerializer = new MapSerializer(arrayToSet, javaType3, javaType2, z2, typeSerializer, jsonSerializer, jsonSerializer2);
+        MapSerializer mapSerializer = new MapSerializer(arrayToSet, keyType, contentType, z2, typeSerializer, jsonSerializer, jsonSerializer2);
         if (obj != null) {
             return mapSerializer.withFilterId(obj);
         }
         return mapSerializer;
     }
 
-    public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer jsonSerializer;
-        Object obj;
-        JsonSerializer findConvertingContentSerializer;
-        HashSet hashSet;
-        boolean z;
-        JsonSerializer<?> withResolved;
-        Annotated member;
-        Object findFilterId;
-        JsonSerializer jsonSerializer2 = null;
-        AnnotationIntrospector annotationIntrospector = serializerProvider.getAnnotationIntrospector();
-        Annotated member2 = beanProperty == null ? null : beanProperty.getMember();
-        Object obj2 = this._suppressableValue;
-        if (member2 == null || annotationIntrospector == null) {
-            jsonSerializer = null;
-        } else {
-            Object findKeySerializer = annotationIntrospector.findKeySerializer(member2);
-            if (findKeySerializer != null) {
-                jsonSerializer = serializerProvider.serializerInstance(member2, findKeySerializer);
-            } else {
-                jsonSerializer = null;
-            }
-            Object findContentSerializer = annotationIntrospector.findContentSerializer(member2);
-            if (findContentSerializer != null) {
-                jsonSerializer2 = serializerProvider.serializerInstance(member2, findContentSerializer);
-            }
-        }
-        if (beanProperty != null) {
-            Include contentInclusion = beanProperty.findPropertyInclusion(serializerProvider.getConfig(), Map.class).getContentInclusion();
-            if (!(contentInclusion == null || contentInclusion == Include.USE_DEFAULTS)) {
-                obj = contentInclusion;
-                if (jsonSerializer2 == null) {
-                    jsonSerializer2 = this._valueSerializer;
-                }
-                findConvertingContentSerializer = findConvertingContentSerializer(serializerProvider, beanProperty, jsonSerializer2);
-                if (findConvertingContentSerializer != null) {
-                    if (this._valueTypeIsStatic && !this._valueType.isJavaLangObject()) {
-                    }
-                }
-                if (jsonSerializer != null) {
-                    jsonSerializer2 = this._keySerializer;
-                } else {
-                    jsonSerializer2 = jsonSerializer;
-                }
-                if (jsonSerializer2 != null) {
-                    jsonSerializer = serializerProvider.findKeySerializer(this._keyType, beanProperty);
-                } else {
-                    jsonSerializer = serializerProvider.handleSecondaryContextualization(jsonSerializer2, beanProperty);
-                }
-                hashSet = this._ignoredEntries;
-                if (annotationIntrospector != null || member2 == null) {
-                    z = false;
-                } else {
-                    HashSet hashSet2;
-                    String[] findPropertiesToIgnore = annotationIntrospector.findPropertiesToIgnore(member2, true);
-                    if (findPropertiesToIgnore != null) {
-                        hashSet2 = hashSet == null ? new HashSet() : new HashSet(hashSet);
-                        for (Object add : findPropertiesToIgnore) {
-                            hashSet2.add(add);
-                        }
-                    } else {
-                        hashSet2 = hashSet;
-                    }
-                    Boolean findSerializationSortAlphabetically = annotationIntrospector.findSerializationSortAlphabetically(member2);
-                    boolean z2 = findSerializationSortAlphabetically != null && findSerializationSortAlphabetically.booleanValue();
-                    z = z2;
-                    hashSet = hashSet2;
-                }
-                withResolved = withResolved(beanProperty, jsonSerializer, findConvertingContentSerializer, hashSet, z);
-                if (obj != this._suppressableValue) {
-                    withResolved = withResolved.withContentInclusion(obj);
-                }
-                if (beanProperty != null) {
-                    return withResolved;
-                }
-                member = beanProperty.getMember();
-                if (member != null) {
-                    return withResolved;
-                }
-                findFilterId = annotationIntrospector.findFilterId(member);
-                if (findFilterId == null) {
-                    return withResolved.withFilterId(findFilterId);
-                }
-                return withResolved;
-            }
-        }
-        obj = obj2;
-        if (jsonSerializer2 == null) {
-            jsonSerializer2 = this._valueSerializer;
-        }
-        findConvertingContentSerializer = findConvertingContentSerializer(serializerProvider, beanProperty, jsonSerializer2);
-        findConvertingContentSerializer = findConvertingContentSerializer != null ? serializerProvider.handleSecondaryContextualization(findConvertingContentSerializer, beanProperty) : serializerProvider.findValueSerializer(this._valueType, beanProperty);
-        if (jsonSerializer != null) {
-            jsonSerializer2 = jsonSerializer;
-        } else {
-            jsonSerializer2 = this._keySerializer;
-        }
-        if (jsonSerializer2 != null) {
-            jsonSerializer = serializerProvider.handleSecondaryContextualization(jsonSerializer2, beanProperty);
-        } else {
-            jsonSerializer = serializerProvider.findKeySerializer(this._keyType, beanProperty);
-        }
-        hashSet = this._ignoredEntries;
-        if (annotationIntrospector != null) {
-        }
-        z = false;
-        withResolved = withResolved(beanProperty, jsonSerializer, findConvertingContentSerializer, hashSet, z);
-        if (obj != this._suppressableValue) {
-            withResolved = withResolved.withContentInclusion(obj);
-        }
-        if (beanProperty != null) {
-            return withResolved;
-        }
-        member = beanProperty.getMember();
-        if (member != null) {
-            return withResolved;
-        }
-        findFilterId = annotationIntrospector.findFilterId(member);
-        if (findFilterId == null) {
-            return withResolved;
-        }
-        return withResolved.withFilterId(findFilterId);
+    /* JADX WARNING: Removed duplicated region for block: B:19:0x003e  */
+    /* JADX WARNING: Removed duplicated region for block: B:22:0x0046  */
+    /* JADX WARNING: Removed duplicated region for block: B:28:0x005a  */
+    /* JADX WARNING: Removed duplicated region for block: B:30:0x005e  */
+    /* JADX WARNING: Removed duplicated region for block: B:42:0x0088  */
+    /* JADX WARNING: Removed duplicated region for block: B:43:0x008d  */
+    /* JADX WARNING: Removed duplicated region for block: B:54:0x00b2  */
+    /* JADX WARNING: Removed duplicated region for block: B:56:0x00b8  */
+    /* JADX WARNING: Removed duplicated region for block: B:63:0x00cd  */
+    /* JADX WARNING: Removed duplicated region for block: B:64:0x00cf  */
+    /* JADX WARNING: Removed duplicated region for block: B:71:? A[RETURN, SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JsonSerializer<?> createContextual(com.fasterxml.jackson.databind.SerializerProvider r13, com.fasterxml.jackson.databind.BeanProperty r14) throws com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r12 = this;
+            r5 = 1
+            r1 = 0
+            r6 = 0
+            com.fasterxml.jackson.databind.AnnotationIntrospector r8 = r13.getAnnotationIntrospector()
+            if (r14 != 0) goto L_0x0083
+            r0 = r1
+        L_0x000a:
+            java.lang.Object r4 = r12._suppressableValue
+            if (r0 == 0) goto L_0x00db
+            if (r8 == 0) goto L_0x00db
+            java.lang.Object r2 = r8.findKeySerializer(r0)
+            if (r2 == 0) goto L_0x00d8
+            com.fasterxml.jackson.databind.JsonSerializer r2 = r13.serializerInstance(r0, r2)
+        L_0x001a:
+            java.lang.Object r3 = r8.findContentSerializer(r0)
+            if (r3 == 0) goto L_0x00d5
+            com.fasterxml.jackson.databind.JsonSerializer r1 = r13.serializerInstance(r0, r3)
+            r3 = r1
+        L_0x0025:
+            if (r14 == 0) goto L_0x00d2
+            com.fasterxml.jackson.databind.SerializationConfig r1 = r13.getConfig()
+            java.lang.Class<java.util.Map> r7 = java.util.Map.class
+            com.fasterxml.jackson.annotation.JsonInclude$Value r1 = r14.findPropertyInclusion(r1, r7)
+            com.fasterxml.jackson.annotation.JsonInclude$Include r1 = r1.getContentInclusion()
+            if (r1 == 0) goto L_0x00d2
+            com.fasterxml.jackson.annotation.JsonInclude$Include r7 = com.fasterxml.jackson.annotation.JsonInclude.Include.USE_DEFAULTS
+            if (r1 == r7) goto L_0x00d2
+            r7 = r1
+        L_0x003c:
+            if (r3 != 0) goto L_0x00cf
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r1 = r12._valueSerializer
+        L_0x0040:
+            com.fasterxml.jackson.databind.JsonSerializer r3 = r12.findConvertingContentSerializer(r13, r14, r1)
+            if (r3 != 0) goto L_0x0088
+            boolean r1 = r12._valueTypeIsStatic
+            if (r1 == 0) goto L_0x0058
+            com.fasterxml.jackson.databind.JavaType r1 = r12._valueType
+            boolean r1 = r1.isJavaLangObject()
+            if (r1 != 0) goto L_0x0058
+            com.fasterxml.jackson.databind.JavaType r1 = r12._valueType
+            com.fasterxml.jackson.databind.JsonSerializer r3 = r13.findValueSerializer(r1, r14)
+        L_0x0058:
+            if (r2 != 0) goto L_0x00cd
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r1 = r12._keySerializer
+        L_0x005c:
+            if (r1 != 0) goto L_0x008d
+            com.fasterxml.jackson.databind.JavaType r1 = r12._keyType
+            com.fasterxml.jackson.databind.JsonSerializer r2 = r13.findKeySerializer(r1, r14)
+        L_0x0064:
+            java.util.HashSet<java.lang.String> r4 = r12._ignoredEntries
+            if (r8 == 0) goto L_0x00cb
+            if (r0 == 0) goto L_0x00cb
+            java.lang.String[] r9 = r8.findPropertiesToIgnore(r0, r5)
+            if (r9 == 0) goto L_0x0098
+            if (r4 != 0) goto L_0x0092
+            java.util.HashSet r1 = new java.util.HashSet
+            r1.<init>()
+        L_0x0077:
+            int r10 = r9.length
+            r4 = r6
+        L_0x0079:
+            if (r4 >= r10) goto L_0x0099
+            r11 = r9[r4]
+            r1.add(r11)
+            int r4 = r4 + 1
+            goto L_0x0079
+        L_0x0083:
+            com.fasterxml.jackson.databind.introspect.AnnotatedMember r0 = r14.getMember()
+            goto L_0x000a
+        L_0x0088:
+            com.fasterxml.jackson.databind.JsonSerializer r3 = r13.handleSecondaryContextualization(r3, r14)
+            goto L_0x0058
+        L_0x008d:
+            com.fasterxml.jackson.databind.JsonSerializer r2 = r13.handleSecondaryContextualization(r1, r14)
+            goto L_0x0064
+        L_0x0092:
+            java.util.HashSet r1 = new java.util.HashSet
+            r1.<init>(r4)
+            goto L_0x0077
+        L_0x0098:
+            r1 = r4
+        L_0x0099:
+            java.lang.Boolean r0 = r8.findSerializationSortAlphabetically(r0)
+            if (r0 == 0) goto L_0x00c9
+            boolean r0 = r0.booleanValue()
+            if (r0 == 0) goto L_0x00c9
+            r0 = r5
+        L_0x00a6:
+            r5 = r0
+            r4 = r1
+        L_0x00a8:
+            r0 = r12
+            r1 = r14
+            com.fasterxml.jackson.databind.ser.std.MapSerializer r0 = r0.withResolved(r1, r2, r3, r4, r5)
+            java.lang.Object r1 = r12._suppressableValue
+            if (r7 == r1) goto L_0x00b6
+            com.fasterxml.jackson.databind.ser.std.MapSerializer r0 = r0.withContentInclusion(r7)
+        L_0x00b6:
+            if (r14 == 0) goto L_0x00c8
+            com.fasterxml.jackson.databind.introspect.AnnotatedMember r1 = r14.getMember()
+            if (r1 == 0) goto L_0x00c8
+            java.lang.Object r1 = r8.findFilterId(r1)
+            if (r1 == 0) goto L_0x00c8
+            com.fasterxml.jackson.databind.ser.std.MapSerializer r0 = r0.withFilterId(r1)
+        L_0x00c8:
+            return r0
+        L_0x00c9:
+            r0 = r6
+            goto L_0x00a6
+        L_0x00cb:
+            r5 = r6
+            goto L_0x00a8
+        L_0x00cd:
+            r1 = r2
+            goto L_0x005c
+        L_0x00cf:
+            r1 = r3
+            goto L_0x0040
+        L_0x00d2:
+            r7 = r4
+            goto L_0x003c
+        L_0x00d5:
+            r3 = r1
+            goto L_0x0025
+        L_0x00d8:
+            r2 = r1
+            goto L_0x001a
+        L_0x00db:
+            r2 = r1
+            r3 = r1
+            goto L_0x0025
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.std.MapSerializer.createContextual(com.fasterxml.jackson.databind.SerializerProvider, com.fasterxml.jackson.databind.BeanProperty):com.fasterxml.jackson.databind.JsonSerializer");
     }
 
     public JavaType getContentType() {
@@ -324,11 +348,11 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
         if (map == null || map.isEmpty()) {
             return true;
         }
-        Include include = this._suppressableValue;
-        if (include == null || include == Include.ALWAYS) {
+        Object obj = this._suppressableValue;
+        if (obj == null || obj == Include.ALWAYS) {
             return false;
         }
-        JsonSerializer jsonSerializer = this._valueSerializer;
+        JsonSerializer<Object> jsonSerializer = this._valueSerializer;
         if (jsonSerializer != null) {
             for (Object next : map.values()) {
                 if (next != null && !jsonSerializer.isEmpty(serializerProvider, next)) {
@@ -367,10 +391,10 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
     }
 
     public void serialize(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        Map<?, ?> map2;
         jsonGenerator.writeStartObject();
         jsonGenerator.setCurrentValue(map);
         if (!map.isEmpty()) {
-            Map _orderEntries;
             Object obj = this._suppressableValue;
             if (obj == Include.ALWAYS) {
                 obj = null;
@@ -378,31 +402,28 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
                 obj = Include.NON_NULL;
             }
             if (this._sortKeys || serializerProvider.isEnabled(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)) {
-                _orderEntries = _orderEntries(map);
+                map2 = _orderEntries(map);
             } else {
-                Map<?, ?> map2 = map;
+                map2 = map;
             }
             if (this._filterId != null) {
-                serializeFilteredFields(_orderEntries, jsonGenerator, serializerProvider, findPropertyFilter(serializerProvider, this._filterId, _orderEntries), obj);
+                serializeFilteredFields(map2, jsonGenerator, serializerProvider, findPropertyFilter(serializerProvider, this._filterId, map2), obj);
             } else if (obj != null) {
-                serializeOptionalFields(_orderEntries, jsonGenerator, serializerProvider, obj);
+                serializeOptionalFields(map2, jsonGenerator, serializerProvider, obj);
             } else if (this._valueSerializer != null) {
-                serializeFieldsUsing(_orderEntries, jsonGenerator, serializerProvider, this._valueSerializer);
+                serializeFieldsUsing(map2, jsonGenerator, serializerProvider, this._valueSerializer);
             } else {
-                serializeFields(_orderEntries, jsonGenerator, serializerProvider);
+                serializeFields(map2, jsonGenerator, serializerProvider);
             }
         }
         jsonGenerator.writeEndObject();
     }
 
     public void serializeWithType(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {
-        Object _orderEntries;
+        Map<?, ?> map2;
         typeSerializer.writeTypePrefixForObject(map, jsonGenerator);
         jsonGenerator.setCurrentValue(map);
-        Map<?, ?> map2;
-        if (map.isEmpty()) {
-            map2 = map;
-        } else {
+        if (!map.isEmpty()) {
             Object obj = this._suppressableValue;
             if (obj == Include.ALWAYS) {
                 obj = null;
@@ -410,32 +431,36 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
                 obj = Include.NON_NULL;
             }
             if (this._sortKeys || serializerProvider.isEnabled(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)) {
-                _orderEntries = _orderEntries(map);
+                map2 = _orderEntries(map);
             } else {
                 map2 = map;
             }
             if (this._filterId != null) {
-                serializeFilteredFields(_orderEntries, jsonGenerator, serializerProvider, findPropertyFilter(serializerProvider, this._filterId, _orderEntries), obj);
+                serializeFilteredFields(map2, jsonGenerator, serializerProvider, findPropertyFilter(serializerProvider, this._filterId, map2), obj);
             } else if (obj != null) {
-                serializeOptionalFields(_orderEntries, jsonGenerator, serializerProvider, obj);
+                serializeOptionalFields(map2, jsonGenerator, serializerProvider, obj);
             } else if (this._valueSerializer != null) {
-                serializeFieldsUsing(_orderEntries, jsonGenerator, serializerProvider, this._valueSerializer);
+                serializeFieldsUsing(map2, jsonGenerator, serializerProvider, this._valueSerializer);
             } else {
-                serializeFields(_orderEntries, jsonGenerator, serializerProvider);
+                serializeFields(map2, jsonGenerator, serializerProvider);
             }
+        } else {
+            map2 = map;
         }
-        typeSerializer.writeTypeSuffixForObject(_orderEntries, jsonGenerator);
+        typeSerializer.writeTypeSuffixForObject(map2, jsonGenerator);
     }
 
     public void serializeFields(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        PropertySerializerMap propertySerializerMap;
+        JsonSerializer<Object> _findAndAddDynamic;
         if (this._valueTypeSerializer != null) {
             serializeTypedFields(map, jsonGenerator, serializerProvider, null);
             return;
         }
-        JsonSerializer jsonSerializer = this._keySerializer;
-        HashSet hashSet = this._ignoredEntries;
-        PropertySerializerMap propertySerializerMap = this._dynamicValueSerializers;
-        PropertySerializerMap propertySerializerMap2 = propertySerializerMap;
+        JsonSerializer<Object> jsonSerializer = this._keySerializer;
+        HashSet<String> hashSet = this._ignoredEntries;
+        PropertySerializerMap propertySerializerMap2 = this._dynamicValueSerializers;
+        PropertySerializerMap propertySerializerMap3 = propertySerializerMap2;
         for (Entry entry : map.entrySet()) {
             Object value = entry.getValue();
             Object key = entry.getKey();
@@ -447,97 +472,90 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
             if (value == null) {
                 serializerProvider.defaultSerializeNull(jsonGenerator);
             } else {
-                JsonSerializer jsonSerializer2;
-                JsonSerializer jsonSerializer3;
-                JsonSerializer jsonSerializer4 = this._valueSerializer;
-                if (jsonSerializer4 == null) {
+                JsonSerializer<Object> jsonSerializer2 = this._valueSerializer;
+                if (jsonSerializer2 == null) {
                     Class cls = value.getClass();
-                    jsonSerializer4 = propertySerializerMap2.serializerFor(cls);
-                    if (jsonSerializer4 == null) {
+                    jsonSerializer2 = propertySerializerMap3.serializerFor(cls);
+                    if (jsonSerializer2 == null) {
                         if (this._valueType.hasGenericTypes()) {
-                            jsonSerializer4 = _findAndAddDynamic(propertySerializerMap2, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
+                            _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
                         } else {
-                            jsonSerializer4 = _findAndAddDynamic(propertySerializerMap2, cls, serializerProvider);
+                            _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, cls, serializerProvider);
                         }
-                        jsonSerializer2 = jsonSerializer4;
                         propertySerializerMap = this._dynamicValueSerializers;
-                        jsonSerializer3 = jsonSerializer2;
-                        jsonSerializer3.serialize(value, jsonGenerator, serializerProvider);
-                        propertySerializerMap2 = propertySerializerMap;
+                        jsonSerializer2 = _findAndAddDynamic;
+                        jsonSerializer2.serialize(value, jsonGenerator, serializerProvider);
+                        propertySerializerMap3 = propertySerializerMap;
                     }
                 }
-                jsonSerializer2 = jsonSerializer4;
-                propertySerializerMap = propertySerializerMap2;
-                jsonSerializer3 = jsonSerializer2;
+                propertySerializerMap = propertySerializerMap3;
                 try {
-                    jsonSerializer3.serialize(value, jsonGenerator, serializerProvider);
-                } catch (Throwable e) {
-                    wrapAndThrow(serializerProvider, e, (Object) map, "" + key);
+                    jsonSerializer2.serialize(value, jsonGenerator, serializerProvider);
+                } catch (Exception e) {
+                    wrapAndThrow(serializerProvider, (Throwable) e, (Object) map, "" + key);
                 }
-                propertySerializerMap2 = propertySerializerMap;
+                propertySerializerMap3 = propertySerializerMap;
             }
         }
     }
 
     public void serializeOptionalFields(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, Object obj) throws IOException {
+        JsonSerializer<Object> jsonSerializer;
+        JsonSerializer<Object> jsonSerializer2;
+        PropertySerializerMap propertySerializerMap;
+        JsonSerializer<Object> _findAndAddDynamic;
         if (this._valueTypeSerializer != null) {
             serializeTypedFields(map, jsonGenerator, serializerProvider, obj);
             return;
         }
-        HashSet hashSet = this._ignoredEntries;
-        PropertySerializerMap propertySerializerMap = this._dynamicValueSerializers;
-        PropertySerializerMap propertySerializerMap2 = propertySerializerMap;
+        HashSet<String> hashSet = this._ignoredEntries;
+        PropertySerializerMap propertySerializerMap2 = this._dynamicValueSerializers;
+        PropertySerializerMap propertySerializerMap3 = propertySerializerMap2;
         for (Entry entry : map.entrySet()) {
-            JsonSerializer findNullKeySerializer;
-            JsonSerializer jsonSerializer;
             Object key = entry.getKey();
             if (key == null) {
-                findNullKeySerializer = serializerProvider.findNullKeySerializer(this._keyType, this._property);
+                jsonSerializer = serializerProvider.findNullKeySerializer(this._keyType, this._property);
             } else if (hashSet == null || !hashSet.contains(key)) {
-                findNullKeySerializer = this._keySerializer;
+                jsonSerializer = this._keySerializer;
             }
             Object value = entry.getValue();
             if (value != null) {
-                JsonSerializer jsonSerializer2;
-                JsonSerializer jsonSerializer3 = this._valueSerializer;
-                if (jsonSerializer3 == null) {
+                jsonSerializer2 = this._valueSerializer;
+                if (jsonSerializer2 == null) {
                     Class cls = value.getClass();
-                    jsonSerializer3 = propertySerializerMap2.serializerFor(cls);
-                    if (jsonSerializer3 == null) {
+                    jsonSerializer2 = propertySerializerMap3.serializerFor(cls);
+                    if (jsonSerializer2 == null) {
                         if (this._valueType.hasGenericTypes()) {
-                            jsonSerializer3 = _findAndAddDynamic(propertySerializerMap2, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
+                            _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
                         } else {
-                            jsonSerializer3 = _findAndAddDynamic(propertySerializerMap2, cls, serializerProvider);
+                            _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, cls, serializerProvider);
                         }
-                        jsonSerializer2 = jsonSerializer3;
                         propertySerializerMap = this._dynamicValueSerializers;
-                        jsonSerializer = jsonSerializer2;
-                        if (obj == Include.NON_EMPTY && r1.isEmpty(serializerProvider, value)) {
-                            propertySerializerMap2 = propertySerializerMap;
+                        jsonSerializer2 = _findAndAddDynamic;
+                        if (obj == Include.NON_EMPTY && jsonSerializer2.isEmpty(serializerProvider, value)) {
+                            propertySerializerMap3 = propertySerializerMap;
                         }
                     }
                 }
-                jsonSerializer2 = jsonSerializer3;
-                propertySerializerMap = propertySerializerMap2;
-                jsonSerializer = jsonSerializer2;
-                propertySerializerMap2 = propertySerializerMap;
+                propertySerializerMap = propertySerializerMap3;
+                propertySerializerMap3 = propertySerializerMap;
             } else if (obj == null) {
-                propertySerializerMap = propertySerializerMap2;
-                jsonSerializer = serializerProvider.getDefaultNullValueSerializer();
+                jsonSerializer2 = serializerProvider.getDefaultNullValueSerializer();
+                propertySerializerMap = propertySerializerMap3;
             }
             try {
-                findNullKeySerializer.serialize(key, jsonGenerator, serializerProvider);
-                jsonSerializer.serialize(value, jsonGenerator, serializerProvider);
-            } catch (Throwable e) {
-                wrapAndThrow(serializerProvider, e, (Object) map, "" + key);
+                jsonSerializer.serialize(key, jsonGenerator, serializerProvider);
+                jsonSerializer2.serialize(value, jsonGenerator, serializerProvider);
+            } catch (Exception e) {
+                wrapAndThrow(serializerProvider, (Throwable) e, (Object) map, "" + key);
             }
-            propertySerializerMap2 = propertySerializerMap;
+            propertySerializerMap3 = propertySerializerMap;
         }
     }
 
     public void serializeFieldsUsing(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, JsonSerializer<Object> jsonSerializer) throws IOException {
-        JsonSerializer jsonSerializer2 = this._keySerializer;
-        HashSet hashSet = this._ignoredEntries;
+        JsonSerializer<Object> jsonSerializer2 = this._keySerializer;
+        HashSet<String> hashSet = this._ignoredEntries;
         TypeSerializer typeSerializer = this._valueTypeSerializer;
         for (Entry entry : map.entrySet()) {
             Object key = entry.getKey();
@@ -553,8 +571,8 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
                 } else if (typeSerializer == null) {
                     try {
                         jsonSerializer.serialize(value, jsonGenerator, serializerProvider);
-                    } catch (Throwable e) {
-                        wrapAndThrow(serializerProvider, e, (Object) map, "" + key);
+                    } catch (Exception e) {
+                        wrapAndThrow(serializerProvider, (Throwable) e, (Object) map, "" + key);
                     }
                 } else {
                     jsonSerializer.serializeWithType(value, jsonGenerator, serializerProvider, typeSerializer);
@@ -564,56 +582,54 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
     }
 
     public void serializeFilteredFields(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, PropertyFilter propertyFilter, Object obj) throws IOException {
-        HashSet hashSet = this._ignoredEntries;
-        PropertySerializerMap propertySerializerMap = this._dynamicValueSerializers;
-        PropertyWriter mapProperty = new MapProperty(this._valueTypeSerializer, this._property);
-        PropertySerializerMap propertySerializerMap2 = propertySerializerMap;
+        JsonSerializer<Object> jsonSerializer;
+        JsonSerializer<Object> jsonSerializer2;
+        PropertySerializerMap propertySerializerMap;
+        JsonSerializer<Object> _findAndAddDynamic;
+        HashSet<String> hashSet = this._ignoredEntries;
+        PropertySerializerMap propertySerializerMap2 = this._dynamicValueSerializers;
+        MapProperty mapProperty = new MapProperty(this._valueTypeSerializer, this._property);
+        PropertySerializerMap propertySerializerMap3 = propertySerializerMap2;
         for (Entry entry : map.entrySet()) {
             Object key = entry.getKey();
             if (hashSet == null || !hashSet.contains(key)) {
-                JsonSerializer findNullKeySerializer;
-                JsonSerializer jsonSerializer;
                 if (key == null) {
-                    findNullKeySerializer = serializerProvider.findNullKeySerializer(this._keyType, this._property);
+                    jsonSerializer = serializerProvider.findNullKeySerializer(this._keyType, this._property);
                 } else {
-                    findNullKeySerializer = this._keySerializer;
+                    jsonSerializer = this._keySerializer;
                 }
                 Object value = entry.getValue();
                 if (value != null) {
-                    JsonSerializer jsonSerializer2;
-                    JsonSerializer jsonSerializer3 = this._valueSerializer;
-                    if (jsonSerializer3 == null) {
+                    jsonSerializer2 = this._valueSerializer;
+                    if (jsonSerializer2 == null) {
                         Class cls = value.getClass();
-                        jsonSerializer3 = propertySerializerMap2.serializerFor(cls);
-                        if (jsonSerializer3 == null) {
+                        jsonSerializer2 = propertySerializerMap3.serializerFor(cls);
+                        if (jsonSerializer2 == null) {
                             if (this._valueType.hasGenericTypes()) {
-                                jsonSerializer3 = _findAndAddDynamic(propertySerializerMap2, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
+                                _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
                             } else {
-                                jsonSerializer3 = _findAndAddDynamic(propertySerializerMap2, cls, serializerProvider);
+                                _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, cls, serializerProvider);
                             }
-                            jsonSerializer2 = jsonSerializer3;
                             propertySerializerMap = this._dynamicValueSerializers;
-                            jsonSerializer = jsonSerializer2;
-                            if (obj == Include.NON_EMPTY && r1.isEmpty(serializerProvider, value)) {
-                                propertySerializerMap2 = propertySerializerMap;
+                            jsonSerializer2 = _findAndAddDynamic;
+                            if (obj == Include.NON_EMPTY && jsonSerializer2.isEmpty(serializerProvider, value)) {
+                                propertySerializerMap3 = propertySerializerMap;
                             }
                         }
                     }
-                    jsonSerializer2 = jsonSerializer3;
-                    propertySerializerMap = propertySerializerMap2;
-                    jsonSerializer = jsonSerializer2;
-                    propertySerializerMap2 = propertySerializerMap;
+                    propertySerializerMap = propertySerializerMap3;
+                    propertySerializerMap3 = propertySerializerMap;
                 } else if (obj == null) {
-                    propertySerializerMap = propertySerializerMap2;
-                    jsonSerializer = serializerProvider.getDefaultNullValueSerializer();
+                    jsonSerializer2 = serializerProvider.getDefaultNullValueSerializer();
+                    propertySerializerMap = propertySerializerMap3;
                 }
-                mapProperty.reset(key, findNullKeySerializer, jsonSerializer);
+                mapProperty.reset(key, jsonSerializer, jsonSerializer2);
                 try {
                     propertyFilter.serializeAsField(value, jsonGenerator, serializerProvider, mapProperty);
-                } catch (Throwable e) {
-                    wrapAndThrow(serializerProvider, e, (Object) map, "" + key);
+                } catch (Exception e) {
+                    wrapAndThrow(serializerProvider, (Throwable) e, (Object) map, "" + key);
                 }
-                propertySerializerMap2 = propertySerializerMap;
+                propertySerializerMap3 = propertySerializerMap;
             }
         }
     }
@@ -624,57 +640,56 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
     }
 
     public void serializeTypedFields(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, Object obj) throws IOException {
-        HashSet hashSet = this._ignoredEntries;
-        PropertySerializerMap propertySerializerMap = this._dynamicValueSerializers;
-        PropertySerializerMap propertySerializerMap2 = propertySerializerMap;
+        JsonSerializer<Object> jsonSerializer;
+        JsonSerializer serializerFor;
+        PropertySerializerMap propertySerializerMap;
+        JsonSerializer _findAndAddDynamic;
+        HashSet<String> hashSet = this._ignoredEntries;
+        PropertySerializerMap propertySerializerMap2 = this._dynamicValueSerializers;
+        PropertySerializerMap propertySerializerMap3 = propertySerializerMap2;
         for (Entry entry : map.entrySet()) {
-            JsonSerializer findNullKeySerializer;
-            JsonSerializer jsonSerializer;
             Object key = entry.getKey();
             if (key == null) {
-                findNullKeySerializer = serializerProvider.findNullKeySerializer(this._keyType, this._property);
+                jsonSerializer = serializerProvider.findNullKeySerializer(this._keyType, this._property);
             } else if (hashSet == null || !hashSet.contains(key)) {
-                findNullKeySerializer = this._keySerializer;
+                jsonSerializer = this._keySerializer;
             }
             Object value = entry.getValue();
             if (value != null) {
-                JsonSerializer jsonSerializer2 = this._valueSerializer;
+                JsonSerializer<Object> jsonSerializer2 = this._valueSerializer;
                 Class cls = value.getClass();
-                jsonSerializer2 = propertySerializerMap2.serializerFor(cls);
-                JsonSerializer jsonSerializer3;
-                if (jsonSerializer2 == null) {
+                serializerFor = propertySerializerMap3.serializerFor(cls);
+                if (serializerFor == null) {
                     if (this._valueType.hasGenericTypes()) {
-                        jsonSerializer2 = _findAndAddDynamic(propertySerializerMap2, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
+                        _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, serializerProvider.constructSpecializedType(this._valueType, cls), serializerProvider);
                     } else {
-                        jsonSerializer2 = _findAndAddDynamic(propertySerializerMap2, cls, serializerProvider);
+                        _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap3, cls, serializerProvider);
                     }
-                    jsonSerializer3 = jsonSerializer2;
                     propertySerializerMap = this._dynamicValueSerializers;
-                    jsonSerializer = jsonSerializer3;
+                    serializerFor = _findAndAddDynamic;
                 } else {
-                    jsonSerializer3 = jsonSerializer2;
-                    propertySerializerMap = propertySerializerMap2;
-                    jsonSerializer = jsonSerializer3;
+                    propertySerializerMap = propertySerializerMap3;
                 }
-                if (obj == Include.NON_EMPTY && r1.isEmpty(serializerProvider, value)) {
-                    propertySerializerMap2 = propertySerializerMap;
+                if (obj == Include.NON_EMPTY && serializerFor.isEmpty(serializerProvider, value)) {
+                    propertySerializerMap3 = propertySerializerMap;
                 }
             } else if (obj == null) {
-                propertySerializerMap = propertySerializerMap2;
-                jsonSerializer = serializerProvider.getDefaultNullValueSerializer();
+                serializerFor = serializerProvider.getDefaultNullValueSerializer();
+                propertySerializerMap = propertySerializerMap3;
             }
-            findNullKeySerializer.serialize(key, jsonGenerator, serializerProvider);
+            jsonSerializer.serialize(key, jsonGenerator, serializerProvider);
             try {
-                jsonSerializer.serializeWithType(value, jsonGenerator, serializerProvider, this._valueTypeSerializer);
-            } catch (Throwable e) {
-                wrapAndThrow(serializerProvider, e, (Object) map, "" + key);
+                serializerFor.serializeWithType(value, jsonGenerator, serializerProvider, this._valueTypeSerializer);
+            } catch (Exception e) {
+                wrapAndThrow(serializerProvider, (Throwable) e, (Object) map, "" + key);
             }
-            propertySerializerMap2 = propertySerializerMap;
+            propertySerializerMap3 = propertySerializerMap;
         }
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected void serializeTypedFields(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serializeTypedFields(Map<?, ?> map, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         serializeTypedFields(map, jsonGenerator, serializerProvider, serializerProvider.isEnabled(SerializationFeature.WRITE_NULL_MAP_VALUES) ? null : Include.NON_NULL);
     }
 
@@ -686,23 +701,25 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
         JsonMapFormatVisitor expectMapFormat = jsonFormatVisitorWrapper == null ? null : jsonFormatVisitorWrapper.expectMapFormat(javaType);
         if (expectMapFormat != null) {
             expectMapFormat.keyFormat(this._keySerializer, this._keyType);
-            JsonFormatVisitable jsonFormatVisitable = this._valueSerializer;
-            if (jsonFormatVisitable == null) {
-                jsonFormatVisitable = _findAndAddDynamic(this._dynamicValueSerializers, this._valueType, jsonFormatVisitorWrapper.getProvider());
+            JsonSerializer<Object> jsonSerializer = this._valueSerializer;
+            if (jsonSerializer == null) {
+                jsonSerializer = _findAndAddDynamic(this._dynamicValueSerializers, this._valueType, jsonFormatVisitorWrapper.getProvider());
             }
-            expectMapFormat.valueFormat(jsonFormatVisitable, this._valueType);
+            expectMapFormat.valueFormat(jsonSerializer, this._valueType);
         }
     }
 
-    protected final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
-        SerializerAndMapResult findAndAddSecondarySerializer = propertySerializerMap.findAndAddSecondarySerializer((Class) cls, serializerProvider, this._property);
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
+        SerializerAndMapResult findAndAddSecondarySerializer = propertySerializerMap.findAndAddSecondarySerializer(cls, serializerProvider, this._property);
         if (propertySerializerMap != findAndAddSecondarySerializer.map) {
             this._dynamicValueSerializers = findAndAddSecondarySerializer.map;
         }
         return findAndAddSecondarySerializer.serializer;
     }
 
-    protected final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, JavaType javaType, SerializerProvider serializerProvider) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, JavaType javaType, SerializerProvider serializerProvider) throws JsonMappingException {
         SerializerAndMapResult findAndAddSecondarySerializer = propertySerializerMap.findAndAddSecondarySerializer(javaType, serializerProvider, this._property);
         if (propertySerializerMap != findAndAddSecondarySerializer.map) {
             this._dynamicValueSerializers = findAndAddSecondarySerializer.map;
@@ -710,7 +727,8 @@ public class MapSerializer extends ContainerSerializer<Map<?, ?>> implements Con
         return findAndAddSecondarySerializer.serializer;
     }
 
-    protected Map<?, ?> _orderEntries(Map<?, ?> map) {
+    /* access modifiers changed from: protected */
+    public Map<?, ?> _orderEntries(Map<?, ?> map) {
         return map instanceof SortedMap ? map : new TreeMap(map);
     }
 }

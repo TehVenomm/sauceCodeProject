@@ -1,7 +1,7 @@
 package com.amazon.device.iap.model;
 
 import com.amazon.device.iap.internal.model.PurchaseUpdatesResponseBuilder;
-import com.amazon.device.iap.internal.util.C0243d;
+import com.amazon.device.iap.internal.util.C0408d;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,16 +29,16 @@ public final class PurchaseUpdatesResponse {
     }
 
     public PurchaseUpdatesResponse(PurchaseUpdatesResponseBuilder purchaseUpdatesResponseBuilder) {
-        C0243d.m169a(purchaseUpdatesResponseBuilder.getRequestId(), "requestId");
-        C0243d.m169a(purchaseUpdatesResponseBuilder.getRequestStatus(), "requestStatus");
+        C0408d.m164a((Object) purchaseUpdatesResponseBuilder.getRequestId(), "requestId");
+        C0408d.m164a((Object) purchaseUpdatesResponseBuilder.getRequestStatus(), "requestStatus");
         if (RequestStatus.SUCCESSFUL == purchaseUpdatesResponseBuilder.getRequestStatus()) {
-            C0243d.m169a(purchaseUpdatesResponseBuilder.getUserData(), "userData");
-            C0243d.m169a(purchaseUpdatesResponseBuilder.getReceipts(), "receipts");
+            C0408d.m164a((Object) purchaseUpdatesResponseBuilder.getUserData(), "userData");
+            C0408d.m164a((Object) purchaseUpdatesResponseBuilder.getReceipts(), "receipts");
         }
         this.requestId = purchaseUpdatesResponseBuilder.getRequestId();
         this.requestStatus = purchaseUpdatesResponseBuilder.getRequestStatus();
         this.userData = purchaseUpdatesResponseBuilder.getUserData();
-        this.receipts = purchaseUpdatesResponseBuilder.getReceipts() == null ? new ArrayList() : purchaseUpdatesResponseBuilder.getReceipts();
+        this.receipts = purchaseUpdatesResponseBuilder.getReceipts() == null ? new ArrayList<>() : purchaseUpdatesResponseBuilder.getReceipts();
         this.hasMore = purchaseUpdatesResponseBuilder.hasMore();
     }
 
@@ -69,8 +69,8 @@ public final class PurchaseUpdatesResponse {
         jSONObject.put(USER_DATA, this.userData != null ? this.userData.toJSON() : "");
         JSONArray jSONArray = new JSONArray();
         if (this.receipts != null) {
-            for (Receipt toJSON : this.receipts) {
-                jSONArray.put(toJSON.toJSON());
+            for (Receipt json : this.receipts) {
+                jSONArray.put(json.toJSON());
             }
         }
         jSONObject.put(RECEIPTS, jSONArray);
@@ -79,11 +79,6 @@ public final class PurchaseUpdatesResponse {
     }
 
     public String toString() {
-        String obj = super.toString();
-        RequestId requestId = this.requestId;
-        RequestStatus requestStatus = this.requestStatus;
-        UserData userData = this.userData;
-        String arrays = this.receipts != null ? Arrays.toString(this.receipts.toArray()) : "null";
-        return String.format(TO_STRING_FORMAT, new Object[]{obj, requestId, requestStatus, userData, arrays, Boolean.valueOf(this.hasMore)});
+        return String.format(TO_STRING_FORMAT, new Object[]{super.toString(), this.requestId, this.requestStatus, this.userData, this.receipts != null ? Arrays.toString(this.receipts.toArray()) : "null", Boolean.valueOf(this.hasMore)});
     }
 }

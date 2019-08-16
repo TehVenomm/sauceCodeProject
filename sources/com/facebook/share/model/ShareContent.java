@@ -3,6 +3,8 @@ package com.facebook.share.model;
 import android.net.Uri;
 import android.os.Parcel;
 import android.support.annotation.Nullable;
+import com.facebook.share.model.ShareContent;
+import com.facebook.share.model.ShareContent.Builder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,23 +12,36 @@ import java.util.List;
 public abstract class ShareContent<P extends ShareContent, E extends Builder> implements ShareModel {
     private final Uri contentUrl;
     private final ShareHashtag hashtag;
+    private final String pageId;
     private final List<String> peopleIds;
     private final String placeId;
     private final String ref;
 
     public static abstract class Builder<P extends ShareContent, E extends Builder> implements ShareModelBuilder<P, E> {
-        private Uri contentUrl;
-        private ShareHashtag hashtag;
-        private List<String> peopleIds;
-        private String placeId;
-        private String ref;
+        /* access modifiers changed from: private */
+        public Uri contentUrl;
+        /* access modifiers changed from: private */
+        public ShareHashtag hashtag;
+        /* access modifiers changed from: private */
+        public String pageId;
+        /* access modifiers changed from: private */
+        public List<String> peopleIds;
+        /* access modifiers changed from: private */
+        public String placeId;
+        /* access modifiers changed from: private */
+        public String ref;
 
         public E readFrom(P p) {
-            return p == null ? this : setContentUrl(p.getContentUrl()).setPeopleIds(p.getPeopleIds()).setPlaceId(p.getPlaceId()).setRef(p.getRef());
+            return p == null ? this : setContentUrl(p.getContentUrl()).setPeopleIds(p.getPeopleIds()).setPlaceId(p.getPlaceId()).setPageId(p.getPageId()).setRef(p.getRef());
         }
 
         public E setContentUrl(@Nullable Uri uri) {
             this.contentUrl = uri;
+            return this;
+        }
+
+        public E setPageId(@Nullable String str) {
+            this.pageId = str;
             return this;
         }
 
@@ -55,6 +70,7 @@ public abstract class ShareContent<P extends ShareContent, E extends Builder> im
         this.contentUrl = (Uri) parcel.readParcelable(Uri.class.getClassLoader());
         this.peopleIds = readUnmodifiableStringList(parcel);
         this.placeId = parcel.readString();
+        this.pageId = parcel.readString();
         this.ref = parcel.readString();
         this.hashtag = new com.facebook.share.model.ShareHashtag.Builder().readFrom(parcel).build();
     }
@@ -63,14 +79,18 @@ public abstract class ShareContent<P extends ShareContent, E extends Builder> im
         this.contentUrl = builder.contentUrl;
         this.peopleIds = builder.peopleIds;
         this.placeId = builder.placeId;
+        this.pageId = builder.pageId;
         this.ref = builder.ref;
         this.hashtag = builder.hashtag;
     }
 
     private List<String> readUnmodifiableStringList(Parcel parcel) {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         parcel.readStringList(arrayList);
-        return arrayList.size() == 0 ? null : Collections.unmodifiableList(arrayList);
+        if (arrayList.size() == 0) {
+            return null;
+        }
+        return Collections.unmodifiableList(arrayList);
     }
 
     public int describeContents() {
@@ -80,6 +100,11 @@ public abstract class ShareContent<P extends ShareContent, E extends Builder> im
     @Nullable
     public Uri getContentUrl() {
         return this.contentUrl;
+    }
+
+    @Nullable
+    public String getPageId() {
+        return this.pageId;
     }
 
     @Nullable
@@ -106,6 +131,7 @@ public abstract class ShareContent<P extends ShareContent, E extends Builder> im
         parcel.writeParcelable(this.contentUrl, 0);
         parcel.writeStringList(this.peopleIds);
         parcel.writeString(this.placeId);
+        parcel.writeString(this.pageId);
         parcel.writeString(this.ref);
         parcel.writeParcelable(this.hashtag, 0);
     }

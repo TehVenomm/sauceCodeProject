@@ -33,7 +33,6 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 
 	protected override void Awake()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		isActivate = false;
 		svSocket = new CoopLocalServerSocket();
@@ -53,7 +52,6 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 	{
 		if (!Log.enabled)
 		{
-			return;
 		}
 	}
 
@@ -188,5 +186,10 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 				nowEnemyId = sid;
 			}
 		}
+	}
+
+	public void EnemyPopForSeriesArena(int index)
+	{
+		svSocket.SendEnemyPopForSeriesArena(index);
 	}
 }

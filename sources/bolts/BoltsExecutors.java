@@ -1,6 +1,5 @@
 package bolts;
 
-import io.fabric.sdk.android.services.common.AbstractSpiCall;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +17,7 @@ final class BoltsExecutors {
         private ThreadLocal<Integer> executionDepth;
 
         private ImmediateExecutor() {
-            this.executionDepth = new ThreadLocal();
+            this.executionDepth = new ThreadLocal<>();
         }
 
         private int decrementDepth() {
@@ -51,6 +50,7 @@ final class BoltsExecutors {
                     runnable.run();
                 } catch (Throwable th) {
                     decrementDepth();
+                    throw th;
                 }
             } else {
                 BoltsExecutors.background().execute(runnable);
@@ -75,7 +75,10 @@ final class BoltsExecutors {
 
     private static boolean isAndroidRuntime() {
         String property = System.getProperty("java.runtime.name");
-        return property == null ? false : property.toLowerCase(Locale.US).contains(AbstractSpiCall.ANDROID_CLIENT_TYPE);
+        if (property == null) {
+            return false;
+        }
+        return property.toLowerCase(Locale.US).contains("android");
     }
 
     static ScheduledExecutorService scheduled() {

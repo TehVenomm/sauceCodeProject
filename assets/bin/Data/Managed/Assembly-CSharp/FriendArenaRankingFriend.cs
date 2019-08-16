@@ -18,9 +18,12 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 		GRD_LIST,
 		TEX_MODEL,
 		STR_NON_LIST,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		OBJ_COMMENT,
 		LBL_COMMENT,
 		LBL_LAST_LOGIN,
@@ -39,6 +42,17 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 		STR_TITLE_REFLECT,
 		OBJ_DEGREE_FRAME_ROOT,
 		SPR_ICON_FIRST_MET,
+		OBJ_SWITCH_INFO,
+		DEFAULT_STATUS_ROOT,
+		JOIN_STATUS_ROOT,
+		ONLINE_TEXT_ROOT,
+		ONLINE_TEXT,
+		DETAIL_TEXT,
+		JOIN_BUTTON_ROOT,
+		BTN_JOIN_BUTTON,
+		LBL_BUTTON_TEXT,
+		BTN_SORT,
+		LBL_SORT,
 		OBJ_STATUS,
 		LBL_TIME,
 		LBL_ARENA_NAME,
@@ -49,6 +63,7 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 		SCR_LIST,
 		BTN_OWN,
 		OBJ_OWN_OFF,
+		LBL_TIME_DEFAULT,
 		BTN_TAB_A,
 		BTN_TAB_B,
 		BTN_TAB_C,
@@ -63,8 +78,8 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 		base.UpdateOwnButton();
 		if (eventData != null && (recvList == null || recvList.Count <= 4))
 		{
-			SetActive((Enum)UI.BTN_OWN, false);
-			SetActive((Enum)UI.OBJ_OWN_OFF, false);
+			SetActive((Enum)UI.BTN_OWN, is_visible: false);
+			SetActive((Enum)UI.OBJ_OWN_OFF, is_visible: false);
 		}
 	}
 

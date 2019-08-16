@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectPlayProcessor
+public class EffectPlayProcessor : MonoBehaviour
 {
 	[Serializable]
 	public class EffectSetting
@@ -118,8 +118,6 @@ public class EffectPlayProcessor
 
 	public Transform PlayEffect(EffectSetting setting, Transform owner_node = null)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
 		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008c: Unknown result type (might be due to invalid IL or missing references)

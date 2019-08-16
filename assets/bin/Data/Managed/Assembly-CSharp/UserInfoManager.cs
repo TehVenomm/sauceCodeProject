@@ -19,11 +19,21 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	public bool showBlackMarketBanner;
 
+	public bool showFortuneWheel;
+
+	public bool showTradingPost;
+
+	public bool repeatPartyEnable;
+
+	public bool isWheelOfFortuneOn;
+
 	private List<string> m_alertMessages;
+
+	public int clanInviteNum;
 
 	public PointShopManager PointShopManager = new PointShopManager();
 
-	private static readonly TUTORIAL_MENU_BIT[] needTutorialBits = new TUTORIAL_MENU_BIT[12]
+	private static readonly TUTORIAL_MENU_BIT[] needTutorialBits = new TUTORIAL_MENU_BIT[28]
 	{
 		TUTORIAL_MENU_BIT.GACHA1,
 		TUTORIAL_MENU_BIT.GACHA2,
@@ -36,7 +46,23 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		TUTORIAL_MENU_BIT.CLAIM_REWARD,
 		TUTORIAL_MENU_BIT.FORGE_ITEM,
 		TUTORIAL_MENU_BIT.AFTER_GACHA2,
-		TUTORIAL_MENU_BIT.WORLD_MAP
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_START,
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN,
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_RESULT,
+		TUTORIAL_MENU_BIT.SHADOW_QUEST_END,
+		TUTORIAL_MENU_BIT.UPGRADE_ITEM,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL2,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL3,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL4,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL5,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL6,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL7,
+		TUTORIAL_MENU_BIT.UPGRADE_LEVEL8,
+		TUTORIAL_MENU_BIT.AFTER_UPGRADE_ITEM,
+		TUTORIAL_MENU_BIT.WORLD_MAP,
+		TUTORIAL_MENU_BIT.AFTER_QUEST,
+		TUTORIAL_MENU_BIT.AFTER_MAINSTATUS,
+		TUTORIAL_MENU_BIT.DONE_CHANGE_WEAPON
 	};
 
 	public UserInfo userInfo
@@ -129,6 +155,12 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		set;
 	}
 
+	public UserClanData userClan
+	{
+		get;
+		private set;
+	}
+
 	public ClanAdvisaryData advisory
 	{
 		get;
@@ -165,6 +197,18 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		private set;
 	}
 
+	public DISPLAY_TYPE clanDisplayType
+	{
+		get;
+		private set;
+	}
+
+	public int clanRequestNum
+	{
+		get;
+		private set;
+	}
+
 	public bool isAcquiredUserInfo
 	{
 		get;
@@ -177,11 +221,23 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		private set;
 	}
 
+	public bool isTheaterRenewal
+	{
+		get;
+		private set;
+	}
+
 	public string alertMessage => (m_alertMessages.Count <= 0) ? null : m_alertMessages[0];
 
 	public bool ExistsPartyInvite => partyInviteHome | partyInviteChat | partyInviteResume | rallyInviteChat;
 
 	public bool ExistsRallyInvite => rallyInviteChat;
+
+	public List<Network.HomeBanner> homeBannerList
+	{
+		get;
+		private set;
+	}
 
 	private int equipItemNum => MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetCount();
 
@@ -193,11 +249,45 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		userStatus = new UserStatus();
 		favoriteStampIds = new List<int>();
 		m_alertMessages = new List<string>();
+		userClan = new UserClanData();
 	}
 
 	public static bool IsValidUser()
 	{
 		return MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.userInfo != null;
+	}
+
+	public int SetClanRequestNum(int num)
+	{
+		if (clanRequestNum != num)
+		{
+			clanRequestNum = num;
+			MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_EVOLVE);
+		}
+		return clanRequestNum;
+	}
+
+	public int DecreaseClanRequestNum()
+	{
+		clanRequestNum--;
+		MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_EVOLVE);
+		return clanRequestNum;
+	}
+
+	public void SetClanScoutNum(int scoutNum)
+	{
+		clanInviteNum = scoutNum;
+		MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_FAVORITE);
+	}
+
+	public void LeaveClan()
+	{
+		userClan.Clear();
+	}
+
+	public bool IsRegisteredClan()
+	{
+		return userClan.IsRegistered();
 	}
 
 	public void ClearPartyInvite()
@@ -287,6 +377,19 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	public bool IsEndTutorialBit()
 	{
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady)
+		{
+			return (userStatus.TutorialBit & 0x200000000) != 0;
+		}
+		return false;
+	}
+
+	public bool IsEndTutorial()
+	{
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady)
+		{
+			return MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST);
+		}
 		return false;
 	}
 
@@ -344,7 +447,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 			float num = Time.get_time() - MonoBehaviourSingleton<NetworkManager>.I.lastRequestTime;
 			if (num >= (float)userInfo.constDefine.ALIVE_CHECK_SEC)
 			{
-				SendAlive(null);
+				SendAlive();
 			}
 		}
 	}
@@ -374,6 +477,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		DirtyUserStatus();
 	}
 
+	public void SetUserClan(UserClanData user_clan)
+	{
+		userClan = user_clan;
+	}
+
 	public void SetFavoriteStamp(List<int> setFavorites)
 	{
 		if (setFavorites.Count > 10)
@@ -386,7 +494,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	private void SaveFavoriteStamp()
 	{
-		PlayerPrefs.SetString("FAVORITE_STAMP_KEY", favoriteStampIds.ToJoinString(",", null));
+		PlayerPrefs.SetString("FAVORITE_STAMP_KEY", favoriteStampIds.ToJoinString());
 		PlayerPrefs.Save();
 	}
 
@@ -396,25 +504,24 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		if (string.IsNullOrEmpty(@string))
 		{
 			favoriteStampIds = GameDefine.FAVORITE_STAMP_DEFAULT;
+			return;
 		}
-		else
+		favoriteStampIds = GameDefine.FAVORITE_STAMP_DEFAULT;
+		string[] array = @string.Split(',');
+		for (int i = 0; i < array.Length; i++)
 		{
-			favoriteStampIds = GameDefine.FAVORITE_STAMP_DEFAULT;
-			string[] array = @string.Split(',');
-			for (int i = 0; i < array.Length; i++)
+			if (int.TryParse(array[i], out int result))
 			{
-				if (int.TryParse(array[i], out int result))
-				{
-					favoriteStampIds[i] = result;
-				}
+				favoriteStampIds[i] = result;
 			}
 		}
 	}
 
-	public void SetUserInfoAndUserStatus(UserInfo user_info, UserStatus user_status, List<int> unlock_stamps, List<int> selected_Degrees, List<int> unlocked_Degrees)
+	public void SetUserInfoAndUserStatus(UserInfo user_info, UserStatus user_status, UserClanData user_clan, List<int> unlock_stamps, List<int> selected_Degrees, List<int> unlocked_Degrees)
 	{
 		SetUserInfo(user_info);
 		SetUserStatus(user_status);
+		SetUserClan(user_clan);
 		unlockStampIds = unlock_stamps;
 		selectedDegreeIds = selected_Degrees;
 		unlockedDegreeIds = unlocked_Degrees;
@@ -528,7 +635,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 
 	public bool IsEquipVisualItem(ulong uniq_id)
 	{
-		if (uniq_id == 0L)
+		if (uniq_id == 0)
 		{
 			return false;
 		}
@@ -570,11 +677,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		return (num + 9) / 10 * 10;
 	}
 
-	public void SendHomeInfo(Action<bool, bool, int> call_back)
+	public void SendHomeInfo(Action<bool, bool, int> callBack)
 	{
 		HomeInfoModel.SendForm sendForm = new HomeInfoModel.SendForm();
-		sendForm.appStr = AppMain.appStr;
-		Protocol.Send(HomeInfoModel.URL, sendForm, delegate(HomeInfoModel ret)
+		sendForm.appStr = NetworkNative.getAppStr();
+		Protocol.SendAsync("ajax/home/info", sendForm, delegate(HomeInfoModel ret)
 		{
 			bool arg = false;
 			bool arg2 = false;
@@ -586,14 +693,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				arg2 = ret.result.loginBonus;
 				oncePurchaseGachaProductId = ret.result.productId;
 				needShowOneTimesOfferSS = ret.result.isOneTimesOfferActive;
-				if (MonoBehaviourSingleton<UserInfoManager>.I.showJoinClanInGame)
+				if (MonoBehaviourSingleton<TradingPostManager>.IsValid())
 				{
-					partyInviteHome = PartyManager.IsValidNotEmptyList();
+					MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostInfo(ret.result);
 				}
-				else
-				{
-					partyInviteHome = ret.result.party;
-				}
+				partyInviteHome = ((!showJoinClanInGame) ? ret.result.party : PartyManager.IsValidNotEmptyList());
 				if (!partyInviteHome)
 				{
 					ClearPartyInvite();
@@ -601,14 +705,17 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				m_alertMessages.AddRange(ret.result.alertMessages);
 				SetEventBannerList(ret.result.banner);
 				SetGachaDecoList(ret.result.gachaDeco);
-				MonoBehaviourSingleton<UserInfoManager>.I.SetNewsID(ret.result.newsId);
-				MonoBehaviourSingleton<UserInfoManager>.I.SetNextDonationTime(ret.result.nextDonationTime);
-				MonoBehaviourSingleton<GuildManager>.I.SetAskUpdate(long.Parse(ret.result.askUpdate));
+				SetNewsID(ret.result.newsId);
+				SetNextDonationTime(ret.result.nextDonationTime);
 				advisory = ret.result.advisory;
 				isShowAppReviewAppeal = (ret.result.isDisplayReview >= 1);
 				isArenaOpen = ret.result.isArenaOpen;
 				isJoinedArenaRanking = ret.result.isJoinedArenaRanking;
 				isGuildRequestOpen = ret.result.isGuildRequestOpen;
+				isTheaterRenewal = ret.result.isTheaterRenewal;
+				SetClanScoutNum(ret.result.clanInviteNum);
+				clanDisplayType = (DISPLAY_TYPE)ret.result.clanDisplayType;
+				SetClanRequestNum(ret.result.clanRequestNum);
 				if (MonoBehaviourSingleton<ChatManager>.IsValid())
 				{
 					MonoBehaviourSingleton<ChatManager>.I.OnNotifyUpdateChannnelInfo(ret.result.chat);
@@ -616,20 +723,14 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				if (MonoBehaviourSingleton<QuestManager>.IsValid())
 				{
 					MonoBehaviourSingleton<QuestManager>.I.SetEventList(ret.result.events);
+					MonoBehaviourSingleton<QuestManager>.I.SetFutureEventList(ret.result.futureEventIds);
 					MonoBehaviourSingleton<QuestManager>.I.SetBingoEventList(ret.result.bingoEvents);
 				}
 				if (MonoBehaviourSingleton<FriendManager>.IsValid())
 				{
 					MonoBehaviourSingleton<FriendManager>.I.SetNoReadMessageNum(ret.result.message);
 				}
-				if (MonoBehaviourSingleton<HomeManager>.IsValid())
-				{
-					MonoBehaviourSingleton<HomeManager>.I.SetPointShop(ret.result.isPointShopOpen, ret.result.pointShopBanner);
-				}
-				if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-				{
-					MonoBehaviourSingleton<LoungeManager>.I.SetPointShop(ret.result.isPointShopOpen, ret.result.pointShopBanner);
-				}
+				GameSceneGlobalSettings.GetCurrentIHomeManager()?.SetPointShop(ret.result.isPointShopOpen, ret.result.pointShopBanner);
 				if (MonoBehaviourSingleton<LoungeMatchingManager>.IsValid())
 				{
 					MonoBehaviourSingleton<LoungeMatchingManager>.I.SetOpenLounge(ret.result.isLoungeOpen);
@@ -671,8 +772,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				{
 					GameSaveData.instance.resetMarketTime = string.Empty;
 				}
+				isWheelOfFortuneOn = ret.result.isWheelOfFortuneOn;
+				GameSaveData.instance.canShowWheelFortune = isWheelOfFortuneOn;
+				SetHomeBannerList(ret.result.homeBanner);
 			}
-			call_back(arg, arg2, arg3);
+			callBack(arg, arg2, arg3);
 		}, string.Empty);
 	}
 
@@ -837,18 +941,16 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 	{
 		if (userStatus.tutorialStep >= 9)
 		{
-			call_back(true);
+			call_back(obj: true);
+			return;
 		}
-		else
+		UserStatusTutorialModel.RequestSendForm requestSendForm = new UserStatusTutorialModel.RequestSendForm();
+		requestSendForm.bit = 0;
+		Protocol.Send(UserStatusTutorialModel.URL, requestSendForm, delegate(UserStatusTutorialModel ret)
 		{
-			UserStatusTutorialModel.RequestSendForm requestSendForm = new UserStatusTutorialModel.RequestSendForm();
-			requestSendForm.bit = 0;
-			Protocol.Send(UserStatusTutorialModel.URL, requestSendForm, delegate(UserStatusTutorialModel ret)
-			{
-				bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-				call_back(obj);
-			}, string.Empty);
-		}
+			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendTutorialBit(TUTORIAL_MENU_BIT bit, Action<bool> call_back = null)
@@ -857,14 +959,14 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		{
 			if (call_back != null)
 			{
-				call_back(false);
+				call_back(obj: false);
 			}
 		}
 		else if (CheckTutorialBit(bit))
 		{
 			if (call_back != null)
 			{
-				call_back(true);
+				call_back(obj: true);
 			}
 		}
 		else
@@ -979,6 +1081,21 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		}, string.Empty, string.Empty);
 	}
 
+	public void SendGatherItemRecord(int userId, int eventId, Action<bool, GatherItemUserRecordModel> call_back = null)
+	{
+		GatherItemUserRecordModel.RequestSendForm requestSendForm = new GatherItemUserRecordModel.RequestSendForm();
+		requestSendForm.userId = userId;
+		requestSendForm.eventId = eventId;
+		Protocol.Send(GatherItemUserRecordModel.URL, requestSendForm, delegate(GatherItemUserRecordModel ret)
+		{
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			if (call_back != null)
+			{
+				call_back(arg, ret);
+			}
+		}, string.Empty);
+	}
+
 	public void OnDiff(BaseModelDiff.DiffUser diff)
 	{
 		bool flag = false;
@@ -1047,6 +1164,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 				Dictionary<string, object> dictionary = new Dictionary<string, object>();
 				dictionary.Add("value", grow.level);
 				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("reach_level", "Gameplay", dictionary);
+				if ((int)userStatus.level < 50 && grow.level >= 50)
+				{
+					Debug.Log((object)("track event lv user lv:" + userStatus.level + "grow lv:" + grow.level));
+					MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("reach_level_50", "Gameplay", dictionary);
+				}
 			}
 			userStatus.level = grow.level;
 			userStatus.exp = grow.exp;
@@ -1064,7 +1186,7 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 			flag = true;
 			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene" && MonoBehaviourSingleton<SmithManager>.IsValid())
 			{
-				MonoBehaviourSingleton<SmithManager>.I.CreateBadgeData(true);
+				MonoBehaviourSingleton<SmithManager>.I.CreateBadgeData(is_force: true);
 			}
 		}
 		if (Utility.IsExist(diff.crystal))
@@ -1080,6 +1202,11 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		if (Utility.IsExist(diff.eSetNo))
 		{
 			userStatus.eSetNo = diff.eSetNo[0];
+			flag = true;
+		}
+		if (Utility.IsExist(diff.ueSetNo))
+		{
+			userStatus.ueSetNo = diff.ueSetNo[0];
 			flag = true;
 		}
 		if (Utility.IsExist(diff.titleId))
@@ -1098,17 +1225,15 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		{
 			userStatus.tutorialStep = diff.tutorialStep[0];
 			flag = true;
-			if (userStatus.tutorialStep == 4)
+			if (userStatus.tutorialStep != 4)
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_mission_end, "Tutorial");
-			}
-			else if (userStatus.tutorialStep == 7)
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
-			}
-			else if (userStatus.tutorialStep == 8)
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_equip, "Tutorial");
+				if (userStatus.tutorialStep == 7)
+				{
+					MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
+				}
+				else if (userStatus.tutorialStep != 8)
+				{
+				}
 			}
 		}
 		if (Utility.IsExist(diff.tutorialBit))
@@ -1120,35 +1245,29 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 			}
 			userStatus.tutorialBit = diff.tutorialBit[0];
 			flag = true;
-			if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA1, oldTutorialBit))
+			if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA_QUEST_START, oldTutorialBit))
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_monster_gacha, "Tutorial");
+				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_9_behemoth_fight_begin_1, "Tutorial");
+				Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_9_behemoth_fight_begin_1.ToString()));
+				MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_9_behemoth_fight_begin_1, "Tutorial");
 			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA_QUEST_BATTLE_RESULT, oldTutorialBit))
+			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SHADOW_QUEST_START, oldTutorialBit))
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_monster_gacha_fight, "Tutorial");
+				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_13_behemoth_fight_begin_2, "Tutorial");
+				Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_13_behemoth_fight_begin_2.ToString()));
+				MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_13_behemoth_fight_begin_2, "Tutorial");
 			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA2, oldTutorialBit))
+			else if (!CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA1, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA_QUEST_BATTLE_RESULT, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.GACHA2, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SKILL_EQUIP, oldTutorialBit) && !CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.CLAIM_REWARD, oldTutorialBit))
 			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_magi_gacha, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.SKILL_EQUIP, oldTutorialBit))
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_magi_equip, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.CLAIM_REWARD, oldTutorialBit))
-			{
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_crystal_claimed, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.FORGE_ITEM, oldTutorialBit))
-			{
-				GameSaveData.instance.SetPushTrackEquipTutorial(true);
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
-			}
-			else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.AFTER_GACHA2, oldTutorialBit))
-			{
-				MonoBehaviourSingleton<NativeGameService>.I.SignInFirstTime();
-				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_equip_end, "Tutorial");
+				if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.FORGE_ITEM, oldTutorialBit))
+				{
+					GameSaveData.instance.SetPushTrackEquipTutorial(canPush: true);
+					MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_weapon_crafting, "Tutorial");
+				}
+				else if (CheckTutorialBitUnlock(TUTORIAL_MENU_BIT.AFTER_GACHA2, oldTutorialBit))
+				{
+					MonoBehaviourSingleton<NativeGameService>.I.SignInFirstTime();
+				}
 			}
 			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
 			{
@@ -1201,11 +1320,18 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		}
 	}
 
+	public void OnDiff(BaseModelDiff.DiffUserClan diff)
+	{
+		if (Utility.IsExist(diff.update))
+		{
+			userClan = diff.update[0];
+		}
+	}
+
 	public void OnDiff(BaseModelDiff.DiffNotice diff)
 	{
 		if (Utility.IsExist(diff.login) && !FieldManager.IsValidInGame())
 		{
-			return;
 		}
 	}
 
@@ -1214,6 +1340,26 @@ public class UserInfoManager : MonoBehaviourSingleton<UserInfoManager>
 		if (Utility.IsExist(diff.update) && userInfo != null)
 		{
 			userInfo.constDefine = diff.update[0];
+		}
+	}
+
+	public void SetHomeBannerList(List<Network.HomeBanner> list)
+	{
+		if (list == null)
+		{
+			ResetHomeBannerList();
+		}
+		else
+		{
+			homeBannerList = list;
+		}
+	}
+
+	public void ResetHomeBannerList()
+	{
+		if (homeBannerList != null)
+		{
+			homeBannerList.Clear();
 		}
 	}
 }

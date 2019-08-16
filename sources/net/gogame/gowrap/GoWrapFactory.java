@@ -9,14 +9,14 @@ public class GoWrapFactory {
             if (instance == null) {
                 try {
                     instance = (GoWrap) Class.forName("net.gogame.gowrap.GoWrapImpl").getField("INSTANCE").get(null);
-                } catch (Throwable e) {
+                } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
-                } catch (Throwable e2) {
+                } catch (NoSuchFieldException e2) {
                     throw new RuntimeException(e2);
-                } catch (Throwable e22) {
-                    throw new RuntimeException(e22);
-                } catch (Throwable e222) {
-                    throw new RuntimeException(e222);
+                } catch (SecurityException e3) {
+                    throw new RuntimeException(e3);
+                } catch (IllegalAccessException e4) {
+                    throw new RuntimeException(e4);
                 }
             }
             goWrap = instance;

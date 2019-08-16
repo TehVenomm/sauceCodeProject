@@ -1,10 +1,9 @@
 package net.gogame.gowrap.support;
 
-import com.google.android.gms.nearby.messages.Strategy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import net.gogame.gowrap.io.utils.IOUtils;
+import net.gogame.gowrap.p021io.utils.IOUtils;
 
 public final class HttpUtils {
     private HttpUtils() {
@@ -28,6 +27,6 @@ public final class HttpUtils {
     }
 
     public static boolean isSuccessful(int i) {
-        return i >= 200 && i < Strategy.TTL_SECONDS_DEFAULT;
+        return i >= 200 && i < 300;
     }
 }

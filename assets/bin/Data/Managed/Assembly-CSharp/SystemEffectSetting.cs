@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class SystemEffectSetting
+public class SystemEffectSetting : ScriptableObject
 {
 	[Serializable]
 	public class Data

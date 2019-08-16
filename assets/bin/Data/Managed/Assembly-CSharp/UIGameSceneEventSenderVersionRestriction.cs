@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(UIGameSceneEventSender))]
-public class UIGameSceneEventSenderVersionRestriction
+public class UIGameSceneEventSenderVersionRestriction : MonoBehaviour
 {
 	public uint major;
 

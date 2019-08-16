@@ -3,6 +3,9 @@ package net.gogame.chat;
 public class AgentTypingEntry extends ChatEntry {
     private boolean typing;
 
+    public AgentTypingEntry() {
+    }
+
     public AgentTypingEntry(boolean z) {
         this.typing = z;
     }

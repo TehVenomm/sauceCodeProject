@@ -1,4 +1,4 @@
-package android.support.v4.os;
+package android.support.p000v4.p002os;
 
 import android.os.Binder;
 import android.os.Bundle;
@@ -7,12 +7,15 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+/* renamed from: android.support.v4.os.IResultReceiver */
 public interface IResultReceiver extends IInterface {
 
+    /* renamed from: android.support.v4.os.IResultReceiver$Stub */
     public static abstract class Stub extends Binder implements IResultReceiver {
         private static final String DESCRIPTOR = "android.support.v4.os.IResultReceiver";
         static final int TRANSACTION_send = 1;
 
+        /* renamed from: android.support.v4.os.IResultReceiver$Stub$Proxy */
         private static class Proxy implements IResultReceiver {
             private IBinder mRemote;
 

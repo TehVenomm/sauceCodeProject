@@ -8,6 +8,9 @@ import java.util.HashMap;
 public final class AnnotationMap implements Annotations {
     protected HashMap<Class<?>, Annotation> _annotations;
 
+    public AnnotationMap() {
+    }
+
     private AnnotationMap(HashMap<Class<?>, Annotation> hashMap) {
         this._annotations = hashMap;
     }
@@ -30,7 +33,7 @@ public final class AnnotationMap implements Annotations {
         if (this._annotations == null) {
             return false;
         }
-        for (Object containsKey : clsArr) {
+        for (Class<? extends Annotation> containsKey : clsArr) {
             if (this._annotations.containsKey(containsKey)) {
                 return true;
             }
@@ -63,7 +66,10 @@ public final class AnnotationMap implements Annotations {
     }
 
     public int size() {
-        return this._annotations == null ? 0 : this._annotations.size();
+        if (this._annotations == null) {
+            return 0;
+        }
+        return this._annotations.size();
     }
 
     public boolean addIfNotPresent(Annotation annotation) {
@@ -85,9 +91,10 @@ public final class AnnotationMap implements Annotations {
         return this._annotations.toString();
     }
 
-    protected final boolean _add(Annotation annotation) {
+    /* access modifiers changed from: protected */
+    public final boolean _add(Annotation annotation) {
         if (this._annotations == null) {
-            this._annotations = new HashMap();
+            this._annotations = new HashMap<>();
         }
         Annotation annotation2 = (Annotation) this._annotations.put(annotation.annotationType(), annotation);
         return annotation2 == null || !annotation2.equals(annotation);

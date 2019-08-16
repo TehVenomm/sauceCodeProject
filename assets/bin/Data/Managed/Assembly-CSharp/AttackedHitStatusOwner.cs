@@ -30,6 +30,8 @@ public class AttackedHitStatusOwner
 
 	public int regionID => origin.regionID;
 
+	public bool isDamageRegionOnly => origin.isDamageRegionOnly;
+
 	public Enemy.WEAK_STATE weakState => origin.weakState;
 
 	public bool IsSpAttackHit => origin.isSpAttackHit;
@@ -82,6 +84,30 @@ public class AttackedHitStatusOwner
 		}
 	}
 
+	public bool isForceDown
+	{
+		get
+		{
+			return origin.isForceDown;
+		}
+		set
+		{
+			origin.isForceDown = value;
+		}
+	}
+
+	public float concussionAdd
+	{
+		get
+		{
+			return origin.concussionAdd;
+		}
+		set
+		{
+			origin.concussionAdd = value;
+		}
+	}
+
 	public bool isArrowBleed
 	{
 		get
@@ -107,6 +133,18 @@ public class AttackedHitStatusOwner
 		set
 		{
 			origin.isShadowSealing = value;
+		}
+	}
+
+	public bool isArrowBomb
+	{
+		get
+		{
+			return origin.isArrowBomb;
+		}
+		set
+		{
+			origin.isArrowBomb = value;
 		}
 	}
 
@@ -224,6 +262,18 @@ public class AttackedHitStatusOwner
 		}
 	}
 
+	public float concussionTotal
+	{
+		get
+		{
+			return origin.concussionTotal;
+		}
+		set
+		{
+			origin.concussionTotal = value;
+		}
+	}
+
 	public BadStatus badStatusTotal
 	{
 		get
@@ -317,6 +367,18 @@ public class AttackedHitStatusOwner
 		set
 		{
 			origin.aegisParam = value;
+		}
+	}
+
+	public int deadReviveCount
+	{
+		get
+		{
+			return origin.deadReviveCount;
+		}
+		set
+		{
+			origin.deadReviveCount = value;
 		}
 	}
 

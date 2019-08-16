@@ -35,26 +35,29 @@ public class DeviceShareDialog extends FacebookDialogBase<ShareContent, Result> 
         super(new FragmentWrapper(fragment), DEFAULT_REQUEST_CODE);
     }
 
-    public DeviceShareDialog(android.support.v4.app.Fragment fragment) {
+    public DeviceShareDialog(android.support.p000v4.app.Fragment fragment) {
         super(new FragmentWrapper(fragment), DEFAULT_REQUEST_CODE);
     }
 
-    protected boolean canShowImpl(ShareContent shareContent, Object obj) {
+    /* access modifiers changed from: protected */
+    public boolean canShowImpl(ShareContent shareContent, Object obj) {
         return (shareContent instanceof ShareLinkContent) || (shareContent instanceof ShareOpenGraphContent);
     }
 
-    protected AppCall createBaseAppCall() {
+    /* access modifiers changed from: protected */
+    public AppCall createBaseAppCall() {
         return null;
     }
 
-    protected List<ModeHandler> getOrderedModeHandlers() {
+    /* access modifiers changed from: protected */
+    public List<ModeHandler> getOrderedModeHandlers() {
         return null;
     }
 
-    protected void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
+    /* access modifiers changed from: protected */
+    public void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
         callbackManagerImpl.registerCallback(getRequestCode(), new Callback() {
             public boolean onActivityResult(int i, Intent intent) {
-                intent.getExtras();
                 if (intent.hasExtra("error")) {
                     facebookCallback.onError(((FacebookRequestError) intent.getParcelableExtra("error")).getException());
                 } else {
@@ -65,7 +68,8 @@ public class DeviceShareDialog extends FacebookDialogBase<ShareContent, Result> 
         });
     }
 
-    protected void showImpl(ShareContent shareContent, Object obj) {
+    /* access modifiers changed from: protected */
+    public void showImpl(ShareContent shareContent, Object obj) {
         if (shareContent == null) {
             throw new FacebookException("Must provide non-null content to share");
         } else if ((shareContent instanceof ShareLinkContent) || (shareContent instanceof ShareOpenGraphContent)) {

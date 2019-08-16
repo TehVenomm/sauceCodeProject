@@ -1,11 +1,10 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class DegreeTable : Singleton<DegreeTable>, IDataTable
 {
 	public class DegreeData
 	{
-		public const string NT = "id,name,type,requirementType,requirementText,lockNameId,lockTextId";
-
 		public uint id;
 
 		public string name;
@@ -19,6 +18,8 @@ public class DegreeTable : Singleton<DegreeTable>, IDataTable
 		public uint lockNameId;
 
 		public uint lockTextId;
+
+		public const string NT = "id,name,type,requirementType,requirementText,lockNameId,lockTextId";
 
 		public static bool cb(CSVReader csv_reader, DegreeData data, ref uint key)
 		{
@@ -80,15 +81,21 @@ public class DegreeTable : Singleton<DegreeTable>, IDataTable
 
 	private UIntKeyTable<DegreeData> dataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<DegreeData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<DegreeData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<DegreeData>(csv_text, DegreeData.cb, "id,name,type,requirementType,requirementText,lockNameId,lockTextId", null);
+		dataTable = TableUtility.CreateUIntKeyTable<DegreeData>(csv_text, DegreeData.cb, "id,name,type,requirementType,requirementText,lockNameId,lockTextId");
 		dataTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, csv_text, DegreeData.cb, "id,name,type,requirementType,requirementText,lockNameId,lockTextId", null);
+		TableUtility.AddUIntKeyTable(dataTable, csv_text, DegreeData.cb, "id,name,type,requirementType,requirementText,lockNameId,lockTextId");
 	}
 
 	public DegreeData GetData(uint id)

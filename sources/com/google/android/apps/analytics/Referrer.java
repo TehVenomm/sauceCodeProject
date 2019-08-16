@@ -13,19 +13,23 @@ class Referrer {
         this.index = i2;
     }
 
-    int getIndex() {
+    /* access modifiers changed from: 0000 */
+    public int getIndex() {
         return this.index;
     }
 
-    String getReferrerString() {
+    /* access modifiers changed from: 0000 */
+    public String getReferrerString() {
         return this.referrer;
     }
 
-    long getTimeStamp() {
+    /* access modifiers changed from: 0000 */
+    public long getTimeStamp() {
         return this.timeStamp;
     }
 
-    int getVisit() {
+    /* access modifiers changed from: 0000 */
+    public int getVisit() {
         return this.visit;
     }
 }

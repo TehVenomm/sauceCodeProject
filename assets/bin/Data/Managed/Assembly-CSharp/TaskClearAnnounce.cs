@@ -18,20 +18,18 @@ public class TaskClearAnnounce : UIBehaviour
 
 	private void StoreAudioClip()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		string sE = ResourceName.GetSE(40000158);
-		if (!string.IsNullOrEmpty(sE))
+		if (string.IsNullOrEmpty(sE))
 		{
-			Transform val = this.get_transform().GetChild(0);
-			if (!(val == null))
+			return;
+		}
+		Transform child = this.get_transform().GetChild(0);
+		if (!(child == null))
+		{
+			ResourceLink component = child.GetComponent<ResourceLink>();
+			if (!(component == null))
 			{
-				ResourceLink component = val.GetComponent<ResourceLink>();
-				if (!(component == null))
-				{
-					m_AudioClip = component.Get<AudioClip>(sE);
-				}
+				m_AudioClip = component.Get<AudioClip>(sE);
 			}
 		}
 	}
@@ -40,7 +38,7 @@ public class TaskClearAnnounce : UIBehaviour
 	{
 		if (m_AudioClip != null)
 		{
-			SoundManager.PlayOneshotJingle(m_AudioClip, 40000158, null, null);
+			SoundManager.PlayOneshotJingle(m_AudioClip, 40000158);
 		}
 	}
 
@@ -65,25 +63,23 @@ public class TaskClearAnnounce : UIBehaviour
 			{
 				onComplete();
 			}
+			return;
 		}
-		else
+		component.leftAnchor.Set(1f, 150f);
+		component.rightAnchor.Set(1f, 300f);
+		component.bottomAnchor.Set(1f, -130f);
+		component.topAnchor.Set(1f, -105f);
+		component.UpdateAnchors();
+		SetLabelText((Enum)UI.LBL_ANNOUNCE, announce);
+		SetLabelText((Enum)UI.LBL_REWARD, reward);
+		component2.Reset();
+		component2.Play(forward: true, delegate
 		{
-			component.leftAnchor.Set(1f, 150f);
-			component.rightAnchor.Set(1f, 300f);
-			component.bottomAnchor.Set(1f, -130f);
-			component.topAnchor.Set(1f, -105f);
-			component.UpdateAnchors();
-			SetLabelText((Enum)UI.LBL_ANNOUNCE, announce);
-			SetLabelText((Enum)UI.LBL_REWARD, reward);
-			component2.Reset();
-			component2.Play(true, delegate
+			if (onComplete != null)
 			{
-				if (onComplete != null)
-				{
-					onComplete();
-				}
-			});
-			PlayAudio();
-		}
+				onComplete();
+			}
+		});
+		PlayAudio();
 	}
 }

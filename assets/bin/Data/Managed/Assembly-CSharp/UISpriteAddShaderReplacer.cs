@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UISpriteAddShaderReplacer
+public class UISpriteAddShaderReplacer : MonoBehaviour
 {
 	private UISprite sprite;
 

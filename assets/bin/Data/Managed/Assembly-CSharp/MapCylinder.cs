@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MapCylinder
+public class MapCylinder : MonoBehaviour
 {
 	[Tooltip("半径")]
 	public float radius = 40f;
@@ -30,8 +30,6 @@ public class MapCylinder
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		meshRenderer = this.GetComponent<MeshRenderer>();
 		if (meshRenderer != null)
@@ -46,21 +44,22 @@ public class MapCylinder
 		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		if (!(meshRenderer == null) && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (meshRenderer == null || !MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!(self == null))
+			return;
+		}
+		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+		if (!(self == null))
+		{
+			Vector3 val = self._transform.get_position() - _transform.get_position();
+			float magnitude = val.get_magnitude();
+			if (magnitude <= radius - hideLength)
 			{
-				Vector3 val = self._transform.get_position() - _transform.get_position();
-				float magnitude = val.get_magnitude();
-				if (magnitude <= radius - hideLength)
-				{
-					meshRenderer.set_enabled(false);
-				}
-				else if (magnitude >= radius - showLength)
-				{
-					meshRenderer.set_enabled(true);
-				}
+				meshRenderer.set_enabled(false);
+			}
+			else if (magnitude >= radius - showLength)
+			{
+				meshRenderer.set_enabled(true);
 			}
 		}
 	}

@@ -80,10 +80,10 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
     }
 
     public static AnnotatedClass constructWithoutSuperTypes(Class<?> cls, MapperConfig<?> mapperConfig) {
+        AnnotationIntrospector annotationIntrospector;
         if (mapperConfig == null) {
             return new AnnotatedClass(null, cls, TypeBindings.emptyBindings(), Collections.emptyList(), null, null, null, null);
         }
-        AnnotationIntrospector annotationIntrospector;
         if (mapperConfig.isAnnotationProcessingEnabled()) {
             annotationIntrospector = mapperConfig.getAnnotationIntrospector();
         } else {
@@ -93,10 +93,10 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
     }
 
     public static AnnotatedClass constructWithoutSuperTypes(Class<?> cls, MapperConfig<?> mapperConfig, MixInResolver mixInResolver) {
+        AnnotationIntrospector annotationIntrospector;
         if (mapperConfig == null) {
             return new AnnotatedClass(null, cls, TypeBindings.emptyBindings(), Collections.emptyList(), null, null, null, null);
         }
-        AnnotationIntrospector annotationIntrospector;
         if (mapperConfig.isAnnotationProcessingEnabled()) {
             annotationIntrospector = mapperConfig.getAnnotationIntrospector();
         } else {
@@ -141,7 +141,8 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         return _classAnnotations().annotations();
     }
 
-    protected AnnotationMap getAllAnnotations() {
+    /* access modifiers changed from: protected */
+    public AnnotationMap getAllAnnotations() {
         return _classAnnotations();
     }
 
@@ -244,18 +245,16 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
     }
 
     private void resolveCreators() {
-        int i;
-        int size;
-        int i2 = 0;
+        Method[] _findClassMethods;
         Ctor[] constructors = ClassUtil.getConstructors(this._class);
-        List list = null;
+        List<AnnotatedConstructor> list = null;
         for (Ctor ctor : constructors) {
             if (_isIncludableConstructor(ctor.getConstructor())) {
                 if (ctor.getParamCount() == 0) {
                     this._defaultConstructor = _constructDefaultConstructor(ctor, this);
                 } else {
                     if (list == null) {
-                        list = new ArrayList(Math.max(10, constructors.length));
+                        list = new ArrayList<>(Math.max(10, constructors.length));
                     }
                     list.add(_constructNonDefaultConstructor(ctor, this));
                 }
@@ -266,7 +265,7 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         } else {
             this._constructors = list;
         }
-        if (!(this._primaryMixIn == null || (this._defaultConstructor == null && this._constructors.isEmpty()))) {
+        if (this._primaryMixIn != null && (this._defaultConstructor != null || !this._constructors.isEmpty())) {
             _addConstructorMixIns(this._primaryMixIn);
         }
         if (this._annotationIntrospector != null) {
@@ -274,9 +273,9 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
                 this._defaultConstructor = null;
             }
             if (this._constructors != null) {
-                size = this._constructors.size();
+                int size = this._constructors.size();
                 while (true) {
-                    i = size - 1;
+                    int i = size - 1;
                     if (i < 0) {
                         break;
                     } else if (this._annotationIntrospector.hasIgnoreMarker((AnnotatedMember) this._constructors.get(i))) {
@@ -288,37 +287,33 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
                 }
             }
         }
-        Method[] _findClassMethods = _findClassMethods(this._class);
-        int length = _findClassMethods.length;
-        list = null;
-        while (i2 < length) {
-            Method method = _findClassMethods[i2];
+        List<AnnotatedMethod> list2 = null;
+        for (Method method : _findClassMethods(this._class)) {
             if (Modifier.isStatic(method.getModifiers())) {
-                if (list == null) {
-                    list = new ArrayList(8);
+                if (list2 == null) {
+                    list2 = new ArrayList<>(8);
                 }
-                list.add(_constructCreatorMethod(method, this));
+                list2.add(_constructCreatorMethod(method, this));
             }
-            i2++;
         }
-        if (list == null) {
+        if (list2 == null) {
             this._creatorMethods = Collections.emptyList();
         } else {
-            this._creatorMethods = list;
+            this._creatorMethods = list2;
             if (this._primaryMixIn != null) {
                 _addFactoryMixIns(this._primaryMixIn);
             }
             if (this._annotationIntrospector != null) {
-                size = this._creatorMethods.size();
+                int size2 = this._creatorMethods.size();
                 while (true) {
-                    i2 = size - 1;
+                    int i2 = size2 - 1;
                     if (i2 < 0) {
                         break;
                     } else if (this._annotationIntrospector.hasIgnoreMarker((AnnotatedMember) this._creatorMethods.get(i2))) {
                         this._creatorMethods.remove(i2);
-                        size = i2;
+                        size2 = i2;
                     } else {
-                        size = i2;
+                        size2 = i2;
                     }
                 }
             }
@@ -331,12 +326,13 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         AnnotatedMethodMap annotatedMethodMap = new AnnotatedMethodMap();
         _addMemberMethods(this._class, this, this._memberMethods, this._primaryMixIn, annotatedMethodMap);
         for (JavaType javaType : this._superTypes) {
-            _addMemberMethods(javaType.getRawClass(), new Basic(this._typeFactory, javaType.getBindings()), this._memberMethods, this._mixInResolver == null ? null : this._mixInResolver.findMixInClassFor(javaType.getRawClass()), annotatedMethodMap);
+            Class findMixInClassFor = this._mixInResolver == null ? null : this._mixInResolver.findMixInClassFor(javaType.getRawClass());
+            _addMemberMethods(javaType.getRawClass(), new Basic(this._typeFactory, javaType.getBindings()), this._memberMethods, findMixInClassFor, annotatedMethodMap);
         }
         if (this._mixInResolver != null) {
-            Class findMixInClassFor = this._mixInResolver.findMixInClassFor(Object.class);
-            if (findMixInClassFor != null) {
-                _addMethodMixIns(this._class, this._memberMethods, findMixInClassFor, annotatedMethodMap);
+            Class findMixInClassFor2 = this._mixInResolver.findMixInClassFor(Object.class);
+            if (findMixInClassFor2 != null) {
+                _addMethodMixIns(this._class, this._memberMethods, findMixInClassFor2, annotatedMethodMap);
             }
         }
         if (this._annotationIntrospector != null && !annotatedMethodMap.isEmpty()) {
@@ -366,20 +362,23 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         this._fields.addAll(_findFields.values());
     }
 
-    protected void _addClassMixIns(AnnotationMap annotationMap, JavaType javaType) {
+    /* access modifiers changed from: protected */
+    public void _addClassMixIns(AnnotationMap annotationMap, JavaType javaType) {
         if (this._mixInResolver != null) {
             Class rawClass = javaType.getRawClass();
             _addClassMixIns(annotationMap, rawClass, this._mixInResolver.findMixInClassFor(rawClass));
         }
     }
 
-    protected void _addClassMixIns(AnnotationMap annotationMap, Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public void _addClassMixIns(AnnotationMap annotationMap, Class<?> cls) {
         if (this._mixInResolver != null) {
             _addClassMixIns(annotationMap, cls, this._mixInResolver.findMixInClassFor(cls));
         }
     }
 
-    protected void _addClassMixIns(AnnotationMap annotationMap, Class<?> cls, Class<?> cls2) {
+    /* access modifiers changed from: protected */
+    public void _addClassMixIns(AnnotationMap annotationMap, Class<?> cls, Class<?> cls2) {
         if (cls2 != null) {
             _addAnnotationsIfNotPresent(annotationMap, ClassUtil.findClassAnnotations(cls2));
             for (Class findClassAnnotations : ClassUtil.findSuperClasses(cls2, cls, false)) {
@@ -388,64 +387,81 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         }
     }
 
-    protected void _addConstructorMixIns(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public void _addConstructorMixIns(Class<?> cls) {
+        Object[] objArr;
         int size = this._constructors == null ? 0 : this._constructors.size();
-        MemberKey[] memberKeyArr = null;
+        Object[] objArr2 = null;
         for (Ctor constructor : ClassUtil.getConstructors(cls)) {
             Constructor constructor2 = constructor.getConstructor();
             if (constructor2.getParameterTypes().length != 0) {
-                MemberKey[] memberKeyArr2;
-                if (memberKeyArr == null) {
-                    memberKeyArr2 = new MemberKey[size];
+                if (objArr2 == null) {
+                    objArr = new MemberKey[size];
                     for (int i = 0; i < size; i++) {
-                        memberKeyArr2[i] = new MemberKey(((AnnotatedConstructor) this._constructors.get(i)).getAnnotated());
+                        objArr[i] = new MemberKey(((AnnotatedConstructor) this._constructors.get(i)).getAnnotated());
                     }
                 } else {
-                    memberKeyArr2 = memberKeyArr;
+                    objArr = objArr2;
                 }
                 MemberKey memberKey = new MemberKey(constructor2);
-                for (int i2 = 0; i2 < size; i2++) {
-                    if (memberKey.equals(memberKeyArr2[i2])) {
-                        _addMixOvers(constructor2, (AnnotatedConstructor) this._constructors.get(i2), true);
-                        memberKeyArr = memberKeyArr2;
+                int i2 = 0;
+                while (true) {
+                    if (i2 < size) {
+                        if (memberKey.equals(objArr[i2])) {
+                            _addMixOvers(constructor2, (AnnotatedConstructor) this._constructors.get(i2), true);
+                            objArr2 = objArr;
+                            break;
+                        }
+                        i2++;
+                    } else {
+                        objArr2 = objArr;
                         break;
                     }
                 }
-                memberKeyArr = memberKeyArr2;
             } else if (this._defaultConstructor != null) {
                 _addMixOvers(constructor2, this._defaultConstructor, false);
             }
         }
     }
 
-    protected void _addFactoryMixIns(Class<?> cls) {
-        MemberKey[] memberKeyArr = null;
+    /* access modifiers changed from: protected */
+    public void _addFactoryMixIns(Class<?> cls) {
+        Method[] declaredMethods;
+        Object[] objArr;
+        Object[] objArr2 = null;
         int size = this._creatorMethods.size();
         for (Method method : ClassUtil.getDeclaredMethods(cls)) {
             if (Modifier.isStatic(method.getModifiers()) && method.getParameterTypes().length != 0) {
-                MemberKey[] memberKeyArr2;
-                if (memberKeyArr == null) {
-                    memberKeyArr2 = new MemberKey[size];
+                if (objArr2 == null) {
+                    objArr = new MemberKey[size];
                     for (int i = 0; i < size; i++) {
-                        memberKeyArr2[i] = new MemberKey(((AnnotatedMethod) this._creatorMethods.get(i)).getAnnotated());
+                        objArr[i] = new MemberKey(((AnnotatedMethod) this._creatorMethods.get(i)).getAnnotated());
                     }
                 } else {
-                    memberKeyArr2 = memberKeyArr;
+                    objArr = objArr2;
                 }
                 MemberKey memberKey = new MemberKey(method);
-                for (int i2 = 0; i2 < size; i2++) {
-                    if (memberKey.equals(memberKeyArr2[i2])) {
-                        _addMixOvers(method, (AnnotatedMethod) this._creatorMethods.get(i2), true);
-                        memberKeyArr = memberKeyArr2;
+                int i2 = 0;
+                while (true) {
+                    if (i2 < size) {
+                        if (memberKey.equals(objArr[i2])) {
+                            _addMixOvers(method, (AnnotatedMethod) this._creatorMethods.get(i2), true);
+                            objArr2 = objArr;
+                            break;
+                        }
+                        i2++;
+                    } else {
+                        objArr2 = objArr;
                         break;
                     }
                 }
-                memberKeyArr = memberKeyArr2;
             }
         }
     }
 
-    protected void _addMemberMethods(Class<?> cls, TypeResolutionContext typeResolutionContext, AnnotatedMethodMap annotatedMethodMap, Class<?> cls2, AnnotatedMethodMap annotatedMethodMap2) {
+    /* access modifiers changed from: protected */
+    public void _addMemberMethods(Class<?> cls, TypeResolutionContext typeResolutionContext, AnnotatedMethodMap annotatedMethodMap, Class<?> cls2, AnnotatedMethodMap annotatedMethodMap2) {
+        Method[] _findClassMethods;
         if (cls2 != null) {
             _addMethodMixIns(cls, annotatedMethodMap, cls2, annotatedMethodMap2);
         }
@@ -454,11 +470,11 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
                 if (_isIncludableMemberMethod(method)) {
                     AnnotatedMethod find = annotatedMethodMap.find(method);
                     if (find == null) {
-                        find = _constructMethod(method, typeResolutionContext);
-                        annotatedMethodMap.add(find);
+                        AnnotatedMethod _constructMethod = _constructMethod(method, typeResolutionContext);
+                        annotatedMethodMap.add(_constructMethod);
                         AnnotatedMethod remove = annotatedMethodMap2.remove(method);
                         if (remove != null) {
-                            _addMixOvers(remove.getAnnotated(), find, false);
+                            _addMixOvers(remove.getAnnotated(), _constructMethod, false);
                         }
                     } else {
                         _addMixUnders(method, find);
@@ -471,17 +487,19 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         }
     }
 
-    protected void _addMethodMixIns(Class<?> cls, AnnotatedMethodMap annotatedMethodMap, Class<?> cls2, AnnotatedMethodMap annotatedMethodMap2) {
-        for (Class declaredMethods : ClassUtil.findRawSuperTypes(cls2, cls, true)) {
-            for (Method method : ClassUtil.getDeclaredMethods(declaredMethods)) {
+    /* access modifiers changed from: protected */
+    public void _addMethodMixIns(Class<?> cls, AnnotatedMethodMap annotatedMethodMap, Class<?> cls2, AnnotatedMethodMap annotatedMethodMap2) {
+        Method[] declaredMethods;
+        for (Class declaredMethods2 : ClassUtil.findRawSuperTypes(cls2, cls, true)) {
+            for (Method method : ClassUtil.getDeclaredMethods(declaredMethods2)) {
                 if (_isIncludableMemberMethod(method)) {
                     AnnotatedMethod find = annotatedMethodMap.find(method);
                     if (find != null) {
                         _addMixUnders(method, find);
                     } else {
-                        find = annotatedMethodMap2.find(method);
-                        if (find != null) {
-                            _addMixUnders(method, find);
+                        AnnotatedMethod find2 = annotatedMethodMap2.find(method);
+                        if (find2 != null) {
+                            _addMixUnders(method, find2);
                         } else {
                             annotatedMethodMap2.add(_constructMethod(method, this));
                         }
@@ -491,36 +509,39 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         }
     }
 
-    protected Map<String, AnnotatedField> _findFields(JavaType javaType, TypeResolutionContext typeResolutionContext, Map<String, AnnotatedField> map) {
+    /* access modifiers changed from: protected */
+    public Map<String, AnnotatedField> _findFields(JavaType javaType, TypeResolutionContext typeResolutionContext, Map<String, AnnotatedField> map) {
+        Field[] declaredFields;
         JavaType superClass = javaType.getSuperClass();
         if (superClass == null) {
             return map;
         }
         Class rawClass = javaType.getRawClass();
         Map<String, AnnotatedField> _findFields = _findFields(superClass, new Basic(this._typeFactory, superClass.getBindings()), map);
-        Map<String, AnnotatedField> map2 = _findFields;
         for (Field field : ClassUtil.getDeclaredFields(rawClass)) {
             if (_isIncludableField(field)) {
-                if (map2 == null) {
-                    map2 = new LinkedHashMap();
+                if (_findFields == null) {
+                    _findFields = new LinkedHashMap<>();
                 }
-                map2.put(field.getName(), _constructField(field, typeResolutionContext));
+                _findFields.put(field.getName(), _constructField(field, typeResolutionContext));
             }
         }
         if (this._mixInResolver == null) {
-            return map2;
+            return _findFields;
         }
         Class findMixInClassFor = this._mixInResolver.findMixInClassFor(rawClass);
         if (findMixInClassFor == null) {
-            return map2;
+            return _findFields;
         }
-        _addFieldMixIns(findMixInClassFor, rawClass, map2);
-        return map2;
+        _addFieldMixIns(findMixInClassFor, rawClass, _findFields);
+        return _findFields;
     }
 
-    protected void _addFieldMixIns(Class<?> cls, Class<?> cls2, Map<String, AnnotatedField> map) {
-        for (Class declaredFields : ClassUtil.findSuperClasses(cls, cls2, true)) {
-            for (Field field : ClassUtil.getDeclaredFields(declaredFields)) {
+    /* access modifiers changed from: protected */
+    public void _addFieldMixIns(Class<?> cls, Class<?> cls2, Map<String, AnnotatedField> map) {
+        Field[] declaredFields;
+        for (Class declaredFields2 : ClassUtil.findSuperClasses(cls, cls2, true)) {
+            for (Field field : ClassUtil.getDeclaredFields(declaredFields2)) {
                 if (_isIncludableField(field)) {
                     AnnotatedField annotatedField = (AnnotatedField) map.get(field.getName());
                     if (annotatedField != null) {
@@ -531,21 +552,26 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         }
     }
 
-    protected AnnotatedMethod _constructMethod(Method method, TypeResolutionContext typeResolutionContext) {
+    /* access modifiers changed from: protected */
+    public AnnotatedMethod _constructMethod(Method method, TypeResolutionContext typeResolutionContext) {
         if (this._annotationIntrospector == null) {
             return new AnnotatedMethod(typeResolutionContext, method, _emptyAnnotationMap(), null);
         }
         return new AnnotatedMethod(typeResolutionContext, method, _collectRelevantAnnotations(method.getDeclaredAnnotations()), null);
     }
 
-    protected AnnotatedConstructor _constructDefaultConstructor(Ctor ctor, TypeResolutionContext typeResolutionContext) {
+    /* access modifiers changed from: protected */
+    public AnnotatedConstructor _constructDefaultConstructor(Ctor ctor, TypeResolutionContext typeResolutionContext) {
         if (this._annotationIntrospector == null) {
             return new AnnotatedConstructor(typeResolutionContext, ctor.getConstructor(), _emptyAnnotationMap(), NO_ANNOTATION_MAPS);
         }
         return new AnnotatedConstructor(typeResolutionContext, ctor.getConstructor(), _collectRelevantAnnotations(ctor.getDeclaredAnnotations()), NO_ANNOTATION_MAPS);
     }
 
-    protected AnnotatedConstructor _constructNonDefaultConstructor(Ctor ctor, TypeResolutionContext typeResolutionContext) {
+    /* access modifiers changed from: protected */
+    public AnnotatedConstructor _constructNonDefaultConstructor(Ctor ctor, TypeResolutionContext typeResolutionContext) {
+        AnnotationMap[] annotationMapArr;
+        Annotation[][] annotationArr;
         int paramCount = ctor.getParamCount();
         if (this._annotationIntrospector == null) {
             return new AnnotatedConstructor(typeResolutionContext, ctor.getConstructor(), _emptyAnnotationMap(), _emptyAnnotationMaps(paramCount));
@@ -553,36 +579,32 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         if (paramCount == 0) {
             return new AnnotatedConstructor(typeResolutionContext, ctor.getConstructor(), _collectRelevantAnnotations(ctor.getDeclaredAnnotations()), NO_ANNOTATION_MAPS);
         }
-        AnnotationMap[] annotationMapArr;
         Annotation[][] parameterAnnotations = ctor.getParameterAnnotations();
         if (paramCount != parameterAnnotations.length) {
-            Object obj;
             annotationMapArr = null;
             Class declaringClass = ctor.getDeclaringClass();
-            Object obj2;
-            Object obj3;
             if (declaringClass.isEnum() && paramCount == parameterAnnotations.length + 2) {
-                obj2 = new Annotation[(parameterAnnotations.length + 2)][];
-                System.arraycopy(parameterAnnotations, 0, obj2, 2, parameterAnnotations.length);
-                obj3 = obj2;
-                annotationMapArr = _collectRelevantAnnotations((Annotation[][]) obj2);
-                obj = obj3;
-            } else if (declaringClass.isMemberClass() && paramCount == parameterAnnotations.length + 1) {
-                obj2 = new Annotation[(parameterAnnotations.length + 1)][];
-                System.arraycopy(parameterAnnotations, 0, obj2, 1, parameterAnnotations.length);
-                obj3 = obj2;
-                annotationMapArr = _collectRelevantAnnotations((Annotation[][]) obj2);
-                obj = obj3;
+                annotationArr = new Annotation[(parameterAnnotations.length + 2)][];
+                System.arraycopy(parameterAnnotations, 0, annotationArr, 2, parameterAnnotations.length);
+                annotationMapArr = _collectRelevantAnnotations(annotationArr);
+            } else if (!declaringClass.isMemberClass() || paramCount != parameterAnnotations.length + 1) {
+                annotationArr = parameterAnnotations;
+            } else {
+                annotationArr = new Annotation[(parameterAnnotations.length + 1)][];
+                System.arraycopy(parameterAnnotations, 0, annotationArr, 1, parameterAnnotations.length);
+                annotationMapArr = _collectRelevantAnnotations(annotationArr);
             }
             if (annotationMapArr == null) {
-                throw new IllegalStateException("Internal error: constructor for " + ctor.getDeclaringClass().getName() + " has mismatch: " + paramCount + " parameters; " + obj.length + " sets of annotations");
+                throw new IllegalStateException("Internal error: constructor for " + ctor.getDeclaringClass().getName() + " has mismatch: " + paramCount + " parameters; " + annotationArr.length + " sets of annotations");
             }
+        } else {
+            annotationMapArr = _collectRelevantAnnotations(parameterAnnotations);
         }
-        annotationMapArr = _collectRelevantAnnotations(parameterAnnotations);
         return new AnnotatedConstructor(typeResolutionContext, ctor.getConstructor(), _collectRelevantAnnotations(ctor.getDeclaredAnnotations()), annotationMapArr);
     }
 
-    protected AnnotatedMethod _constructCreatorMethod(Method method, TypeResolutionContext typeResolutionContext) {
+    /* access modifiers changed from: protected */
+    public AnnotatedMethod _constructCreatorMethod(Method method, TypeResolutionContext typeResolutionContext) {
         int length = method.getParameterTypes().length;
         if (this._annotationIntrospector == null) {
             return new AnnotatedMethod(typeResolutionContext, method, _emptyAnnotationMap(), _emptyAnnotationMaps(length));
@@ -593,7 +615,8 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         return new AnnotatedMethod(typeResolutionContext, method, _collectRelevantAnnotations(method.getDeclaredAnnotations()), _collectRelevantAnnotations(method.getParameterAnnotations()));
     }
 
-    protected AnnotatedField _constructField(Field field, TypeResolutionContext typeResolutionContext) {
+    /* access modifiers changed from: protected */
+    public AnnotatedField _constructField(Field field, TypeResolutionContext typeResolutionContext) {
         if (this._annotationIntrospector == null) {
             return new AnnotatedField(typeResolutionContext, field, _emptyAnnotationMap());
         }
@@ -615,25 +638,27 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         return annotationMapArr;
     }
 
-    protected boolean _isIncludableMemberMethod(Method method) {
-        if (Modifier.isStatic(method.getModifiers()) || method.isSynthetic() || method.isBridge() || method.getParameterTypes().length > 2) {
-            return false;
+    /* access modifiers changed from: protected */
+    public boolean _isIncludableMemberMethod(Method method) {
+        if (!Modifier.isStatic(method.getModifiers()) && !method.isSynthetic() && !method.isBridge() && method.getParameterTypes().length <= 2) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean _isIncludableField(Field field) {
-        if (field.isSynthetic() || Modifier.isStatic(field.getModifiers())) {
-            return false;
+        if (!field.isSynthetic() && !Modifier.isStatic(field.getModifiers())) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean _isIncludableConstructor(Constructor<?> constructor) {
         return !constructor.isSynthetic();
     }
 
-    protected AnnotationMap[] _collectRelevantAnnotations(Annotation[][] annotationArr) {
+    /* access modifiers changed from: protected */
+    public AnnotationMap[] _collectRelevantAnnotations(Annotation[][] annotationArr) {
         int length = annotationArr.length;
         AnnotationMap[] annotationMapArr = new AnnotationMap[length];
         for (int i = 0; i < length; i++) {
@@ -642,7 +667,8 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         return annotationMapArr;
     }
 
-    protected AnnotationMap _collectRelevantAnnotations(Annotation[] annotationArr) {
+    /* access modifiers changed from: protected */
+    public AnnotationMap _collectRelevantAnnotations(Annotation[] annotationArr) {
         return _addAnnotationsIfNotPresent(new AnnotationMap(), annotationArr);
     }
 
@@ -662,13 +688,14 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
     }
 
     private List<Annotation> _addFromBundle(Annotation annotation, List<Annotation> list) {
+        Annotation[] findClassAnnotations;
         List<Annotation> list2 = list;
-        for (Object obj : ClassUtil.findClassAnnotations(annotation.annotationType())) {
-            if (!((obj instanceof Target) || (obj instanceof Retention))) {
+        for (Annotation annotation2 : ClassUtil.findClassAnnotations(annotation.annotationType())) {
+            if (!(annotation2 instanceof Target) && !(annotation2 instanceof Retention)) {
                 if (list2 == null) {
-                    list2 = new ArrayList();
+                    list2 = new ArrayList<>();
                 }
-                list2.add(obj);
+                list2.add(annotation2);
             }
         }
         return list2;
@@ -702,7 +729,8 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         }
     }
 
-    protected void _addMixOvers(Constructor<?> constructor, AnnotatedConstructor annotatedConstructor, boolean z) {
+    /* access modifiers changed from: protected */
+    public void _addMixOvers(Constructor<?> constructor, AnnotatedConstructor annotatedConstructor, boolean z) {
         _addOrOverrideAnnotations(annotatedConstructor, constructor.getDeclaredAnnotations());
         if (z) {
             Annotation[][] parameterAnnotations = constructor.getParameterAnnotations();
@@ -715,7 +743,8 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         }
     }
 
-    protected void _addMixOvers(Method method, AnnotatedMethod annotatedMethod, boolean z) {
+    /* access modifiers changed from: protected */
+    public void _addMixOvers(Method method, AnnotatedMethod annotatedMethod, boolean z) {
         _addOrOverrideAnnotations(annotatedMethod, method.getDeclaredAnnotations());
         if (z) {
             Annotation[][] parameterAnnotations = method.getParameterAnnotations();
@@ -728,7 +757,8 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         }
     }
 
-    protected void _addMixUnders(Method method, AnnotatedMethod annotatedMethod) {
+    /* access modifiers changed from: protected */
+    public void _addMixUnders(Method method, AnnotatedMethod annotatedMethod) {
         _addAnnotationsIfNotPresent((AnnotatedMember) annotatedMethod, method.getDeclaredAnnotations());
     }
 
@@ -736,10 +766,11 @@ public final class AnnotatedClass extends Annotated implements TypeResolutionCon
         return this._annotationIntrospector != null && this._annotationIntrospector.isAnnotationBundle(annotation);
     }
 
-    protected Method[] _findClassMethods(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public Method[] _findClassMethods(Class<?> cls) {
         try {
             return ClassUtil.getDeclaredMethods(cls);
-        } catch (Object e) {
+        } catch (NoClassDefFoundError e) {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             if (contextClassLoader == null) {
                 throw e;

@@ -42,6 +42,10 @@ public class ProtocolManager : MonoBehaviourSingleton<ProtocolManager>
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.UpdateSelectedDegrees(diff.selectedDegree[0]);
 		}
+		if (Utility.IsExist(diff.userClan))
+		{
+			MonoBehaviourSingleton<UserInfoManager>.I.OnDiff(diff.userClan[0]);
+		}
 		if (Utility.IsExist(diff.status))
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.OnDiff(diff.status[0]);
@@ -51,6 +55,18 @@ public class ProtocolManager : MonoBehaviourSingleton<ProtocolManager>
 		if (Utility.IsExist(diff.equipSet))
 		{
 			MonoBehaviourSingleton<StatusManager>.I.OnDiff(diff.equipSet[0]);
+		}
+		if (Utility.IsExist(diff.uniqueEquipSet))
+		{
+			MonoBehaviourSingleton<StatusManager>.I.OnDiff(diff.uniqueEquipSet[0]);
+		}
+		if (Utility.IsExist(diff.accessorySet))
+		{
+			MonoBehaviourSingleton<StatusManager>.I.OnDiff(diff.accessorySet[0]);
+		}
+		if (Utility.IsExist(diff.uniqueAccessorySet))
+		{
+			MonoBehaviourSingleton<StatusManager>.I.OnDiff(diff.uniqueAccessorySet[0]);
 		}
 		if (Utility.IsExist(diff.item))
 		{
@@ -72,9 +88,17 @@ public class ProtocolManager : MonoBehaviourSingleton<ProtocolManager>
 		{
 			MonoBehaviourSingleton<InventoryManager>.I.OnDiff(diff.abilityItem[0]);
 		}
+		if (Utility.IsExist(diff.accessory))
+		{
+			MonoBehaviourSingleton<InventoryManager>.I.OnDiff(diff.accessory[0]);
+		}
 		if (Utility.IsExist(diff.skillItemEquipSlot))
 		{
 			MonoBehaviourSingleton<InventoryManager>.I.OnDiff(diff.skillItemEquipSlot[0]);
+		}
+		if (Utility.IsExist(diff.skillItemUniqueEquipSlot))
+		{
+			MonoBehaviourSingleton<InventoryManager>.I.OnDiff(diff.skillItemUniqueEquipSlot[0]);
 		}
 		if (Utility.IsExist(diff.questItem))
 		{
@@ -132,6 +156,10 @@ public class ProtocolManager : MonoBehaviourSingleton<ProtocolManager>
 		if (Utility.IsExist(diff.fieldGather))
 		{
 			MonoBehaviourSingleton<FieldManager>.I.OnDiff(diff.fieldGather[0]);
+		}
+		if (Utility.IsExist(diff.fieldGrowthGather))
+		{
+			MonoBehaviourSingleton<FieldManager>.I.OnDiff(diff.fieldGrowthGather[0]);
 		}
 		if (Utility.IsExist(diff.achievement))
 		{

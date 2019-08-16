@@ -1,37 +1,31 @@
 package com.google.android.gms.common.api.internal;
 
-import android.os.DeadObjectException;
-import android.os.RemoteException;
-import android.support.annotation.NonNull;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.TaskCompletionSource;
+final class zzb implements Runnable {
+    private final /* synthetic */ LifecycleCallback zzbi;
+    private final /* synthetic */ String zzbj;
+    private final /* synthetic */ zza zzbk;
 
-abstract class zzb extends zza {
-    protected final TaskCompletionSource<Void> zzdzd;
-
-    public zzb(int i, TaskCompletionSource<Void> taskCompletionSource) {
-        super(i);
-        this.zzdzd = taskCompletionSource;
+    zzb(zza zza, LifecycleCallback lifecycleCallback, String str) {
+        this.zzbk = zza;
+        this.zzbi = lifecycleCallback;
+        this.zzbj = str;
     }
 
-    public void zza(@NonNull zzah zzah, boolean z) {
-    }
-
-    public final void zza(zzbr<?> zzbr) throws DeadObjectException {
-        try {
-            zzb(zzbr);
-        } catch (RemoteException e) {
-            zzq(zza.zza(e));
-            throw e;
-        } catch (RemoteException e2) {
-            zzq(zza.zza(e2));
+    public final void run() {
+        if (this.zzbk.zzbg > 0) {
+            this.zzbi.onCreate(this.zzbk.zzbh != null ? this.zzbk.zzbh.getBundle(this.zzbj) : null);
         }
-    }
-
-    protected abstract void zzb(zzbr<?> zzbr) throws RemoteException;
-
-    public void zzq(@NonNull Status status) {
-        this.zzdzd.trySetException(new ApiException(status));
+        if (this.zzbk.zzbg >= 2) {
+            this.zzbi.onStart();
+        }
+        if (this.zzbk.zzbg >= 3) {
+            this.zzbi.onResume();
+        }
+        if (this.zzbk.zzbg >= 4) {
+            this.zzbi.onStop();
+        }
+        if (this.zzbk.zzbg >= 5) {
+            this.zzbi.onDestroy();
+        }
     }
 }

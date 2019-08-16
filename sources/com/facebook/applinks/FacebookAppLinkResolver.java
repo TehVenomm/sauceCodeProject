@@ -32,9 +32,11 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
     private static final String APP_LINK_TARGET_SHOULD_FALLBACK_KEY = "should_fallback";
     private static final String APP_LINK_TARGET_URL_KEY = "url";
     private static final String APP_LINK_WEB_TARGET_KEY = "web";
-    private final HashMap<Uri, AppLink> cachedAppLinks = new HashMap();
+    /* access modifiers changed from: private */
+    public final HashMap<Uri, AppLink> cachedAppLinks = new HashMap<>();
 
-    private static Target getAndroidTargetFromJson(JSONObject jSONObject) {
+    /* access modifiers changed from: private */
+    public static Target getAndroidTargetFromJson(JSONObject jSONObject) {
         Uri uri = null;
         String tryGetStringFromJson = tryGetStringFromJson(jSONObject, APP_LINK_TARGET_PACKAGE_KEY, null);
         if (tryGetStringFromJson == null) {
@@ -49,7 +51,8 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
         return new Target(tryGetStringFromJson, tryGetStringFromJson2, uri, tryGetStringFromJson3);
     }
 
-    private static Uri getWebFallbackUriFromJson(Uri uri, JSONObject jSONObject) {
+    /* access modifiers changed from: private */
+    public static Uri getWebFallbackUriFromJson(Uri uri, JSONObject jSONObject) {
         Uri uri2 = null;
         try {
             JSONObject jSONObject2 = jSONObject.getJSONObject("web");
@@ -68,22 +71,22 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
 
     private static boolean tryGetBooleanFromJson(JSONObject jSONObject, String str, boolean z) {
         try {
-            z = jSONObject.getBoolean(str);
+            return jSONObject.getBoolean(str);
         } catch (JSONException e) {
+            return z;
         }
-        return z;
     }
 
     private static String tryGetStringFromJson(JSONObject jSONObject, String str, String str2) {
         try {
-            str2 = jSONObject.getString(str);
+            return jSONObject.getString(str);
         } catch (JSONException e) {
+            return str2;
         }
-        return str2;
     }
 
     public Task<AppLink> getAppLinkFromUrlInBackground(final Uri uri) {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         arrayList.add(uri);
         return getAppLinkFromUrlsInBackground(arrayList).onSuccess(new Continuation<Map<Uri, AppLink>, AppLink>() {
             public AppLink then(Task<Map<Uri, AppLink>> task) throws Exception {
@@ -93,20 +96,21 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
     }
 
     public Task<Map<Uri, AppLink>> getAppLinkFromUrlsInBackground(List<Uri> list) {
-        final Map hashMap = new HashMap();
+        AppLink appLink;
+        final HashMap hashMap = new HashMap();
         final HashSet hashSet = new HashSet();
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (Uri uri : list) {
             synchronized (this.cachedAppLinks) {
-                AppLink appLink = (AppLink) this.cachedAppLinks.get(uri);
+                appLink = (AppLink) this.cachedAppLinks.get(uri);
             }
             if (appLink != null) {
                 hashMap.put(uri, appLink);
             } else {
                 if (!hashSet.isEmpty()) {
-                    stringBuilder.append(',');
+                    sb.append(',');
                 }
-                stringBuilder.append(uri.toString());
+                sb.append(uri.toString());
                 hashSet.add(uri);
             }
         }
@@ -115,8 +119,8 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
         }
         final TaskCompletionSource create = Task.create();
         Bundle bundle = new Bundle();
-        bundle.putString("ids", stringBuilder.toString());
-        bundle.putString(GraphRequest.FIELDS_PARAM, String.format("%s.fields(%s,%s)", new Object[]{APP_LINK_KEY, "android", "web"}));
+        bundle.putString("ids", sb.toString());
+        bundle.putString(GraphRequest.FIELDS_PARAM, String.format("%s.fields(%s,%s)", new Object[]{"app_links", "android", "web"}));
         new GraphRequest(AccessToken.getCurrentAccessToken(), "", bundle, null, new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
                 FacebookRequestError error = graphResponse.getError();
@@ -134,10 +138,10 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
                     Uri uri = (Uri) it.next();
                     if (jSONObject.has(uri.toString())) {
                         try {
-                            JSONObject jSONObject2 = jSONObject.getJSONObject(uri.toString()).getJSONObject(FacebookAppLinkResolver.APP_LINK_KEY);
+                            JSONObject jSONObject2 = jSONObject.getJSONObject(uri.toString()).getJSONObject("app_links");
                             JSONArray jSONArray = jSONObject2.getJSONArray("android");
                             int length = jSONArray.length();
-                            List arrayList = new ArrayList(length);
+                            ArrayList arrayList = new ArrayList(length);
                             for (int i = 0; i < length; i++) {
                                 Target access$000 = FacebookAppLinkResolver.getAndroidTargetFromJson(jSONArray.getJSONObject(i));
                                 if (access$000 != null) {

@@ -30,19 +30,19 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		}
 	}
 
+	public List<WWWInfo> wwwInfos = new List<WWWInfo>();
+
+	public string tokenTemp;
+
 	private const string TOKEN_KEY = "robpt";
 
 	private const string EMPTY_RECORD_RESULT = "\"result\":[]";
 
 	private const string EMPTY_RECORD_JSON = "{\"error\":0,\"result\":[]}";
 
-	public List<WWWInfo> wwwInfos = new List<WWWInfo>();
-
-	public string tokenTemp;
-
 	private bool isPreload;
 
-	public static string APP_HOST => "http://appprd.dragonproject.gogame.net/";
+	public static string APP_HOST => "http://appprd-163.dragonproject.gogame.net/";
 
 	public static string IMG_HOST => "http://cdnprd.dragonproject.gogame.net/resources/";
 
@@ -73,42 +73,39 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 
 	public void Request<T>(string path, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(RequestCoroutine(path, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestCoroutine<T>(string path, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		yield return (object)this.StartCoroutine(this.RequestFormCoroutine<T>(path, null, call_back, get_param, token));
+		yield return this.StartCoroutine(RequestFormCoroutine(path, null, call_back, get_param, token));
 	}
 
 	public void Request<T1, T2>(string path, T1 postData, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(RequestCoroutine(path, postData, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestCoroutine<T1, T2>(string path, T1 postData, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
 	{
 		WWWForm form = new WWWForm();
-		string data = JSONSerializer.Serialize<T1>(postData);
+		string data = JSONSerializer.Serialize(postData);
 		AccountManager.Account account = MonoBehaviourSingleton<AccountManager>.I.account;
 		string key = (!string.IsNullOrEmpty(account.userHash)) ? account.userHash : "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
 		string encrypt_data = Cipher.EncryptRJ128(key, "yCNBH$$rCNGvC+#f", data);
 		string data_to_send = string.IsNullOrEmpty(encrypt_data) ? string.Empty : encrypt_data;
 		form.AddField("data", data_to_send);
-		yield return (object)this.StartCoroutine(this.RequestFormCoroutine<T2>(path, form, call_back, get_param, token));
+		yield return this.StartCoroutine(RequestFormCoroutine(path, form, call_back, get_param, token));
 	}
 
 	public void RequestForm<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(RequestFormCoroutine(path, form, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestFormCoroutine<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		yield return (object)this.StartCoroutine(this.Request_Impl<T>(path, form, call_back, (Action)delegate
+		yield return this.StartCoroutine(Request_Impl(path, form, call_back, delegate
 		{
 		}, get_param, token));
 	}
@@ -158,12 +155,13 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 			dictionary[ServerConstDefine.CDV_KEY] = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.cdv.ToString();
 		}
 		dictionary["User-Agent"] = NetworkNative.getDefaultUserAgent();
+		dictionary["dm"] = SystemInfo.get_deviceModel();
 		return dictionary;
 	}
 
 	private IEnumerator Request_Impl<T>(string path, WWWForm form, Action<T> call_back, Action call_fatal, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		SetPreload(false);
+		SetPreload(enable: false);
 		if (form == null)
 		{
 			form = new WWWForm();
@@ -175,7 +173,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		}
 		string url = GetUrl(path, get_param);
 		CrashlyticsReporter.SetAPIRequest(url);
-		CrashlyticsReporter.SetAPIRequestStatus(true);
+		CrashlyticsReporter.SetAPIRequestStatus(requesting: true);
 		byte[] data = form.get_data();
 		Dictionary<string, string> headers = GetHeader(form);
 		string msg = GenerateErrorMsg(Error.Unknown);
@@ -184,7 +182,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		WWW www = new WWW(url, data, headers);
 		try
 		{
-			WWWInfo wwwinfo = new WWWInfo(www, false, false);
+			WWWInfo wwwinfo = new WWWInfo(www, _isAssetData: false, _isCached: false);
 			wwwInfos.Add(wwwinfo);
 			DateTime timeBegin = DateTime.Now;
 			while (true)
@@ -198,21 +196,21 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 				if (!string.IsNullOrEmpty(www.get_error()))
 				{
 					string txt = www.get_error();
-					int httpError = 0;
-					msg = ((!int.TryParse(txt.Substring(0, 3), out httpError)) ? GenerateErrorMsg(Error.DetectHttpError) : GenerateErrorMsg((Error)(200000 + httpError)));
+					int result = 0;
+					msg = ((!int.TryParse(txt.Substring(0, 3), out result)) ? GenerateErrorMsg(Error.DetectHttpError) : GenerateErrorMsg((Error)(200000 + result)));
 					break;
 				}
 				if (www.get_isDone())
 				{
 					www.get_text();
-					string signature = null;
+					string text = null;
 					foreach (KeyValuePair<string, string> responseHeader in www.get_responseHeaders())
 					{
-						string headerName = responseHeader.Key.ToLower();
-						if (string.IsNullOrEmpty(tokenTemp) && headerName == "set-cookie")
+						string a = responseHeader.Key.ToLower();
+						if (string.IsNullOrEmpty(tokenTemp) && a == "set-cookie")
 						{
-							List<string> values = new List<string>((IEnumerable<string>)responseHeader.Value.Split(';'));
-							foreach (string item in values)
+							List<string> list = new List<string>(responseHeader.Value.Split(';'));
+							foreach (string item in list)
 							{
 								if (item.Contains("robpt"))
 								{
@@ -220,33 +218,30 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 								}
 							}
 						}
-						else if (headerName == "x-compress-encrypt")
+						else if (a == "x-compress-encrypt")
 						{
 							if (!(responseHeader.Value.Trim() == "cipher"))
 							{
-								continue;
 							}
 						}
-						else if (headerName == "x-signature")
+						else if (a == "x-signature")
 						{
-							signature = responseHeader.Value.Trim();
+							text = responseHeader.Value.Trim();
 						}
 					}
-					bool isDecryptSuccess2 = true;
-					byte[] gzippedResponse = null;
+					bool flag = true;
+					byte[] array = null;
 					try
 					{
-						string key = (!string.IsNullOrEmpty(account.userHash)) ? account.userHash : "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
-						gzippedResponse = Cipher.DecryptRJ128Byte(key, "yCNBH$$rCNGvC+#f", www.get_text());
+						string prm_key = (!string.IsNullOrEmpty(account.userHash)) ? account.userHash : "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
+						array = Cipher.DecryptRJ128Byte(prm_key, "yCNBH$$rCNGvC+#f", www.get_text());
 					}
-					catch (Exception exc4)
+					catch (Exception ex)
 					{
-						Debug.LogException(exc4);
-						Debug.LogError((object)("Decrypt fail: " + www.get_url() + " data " + www.get_text()));
-						Debug.LogError((object)("Key Decrypt : " + ((!string.IsNullOrEmpty(account.userHash)) ? account.userHash : "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,")));
-						isDecryptSuccess2 = false;
+						Debug.LogException(ex);
+						flag = false;
 					}
-					if (!isDecryptSuccess2)
+					if (!flag)
 					{
 						if (string.IsNullOrEmpty(account.userHash))
 						{
@@ -254,69 +249,67 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 							Log.Error(LOG.NETWORK, "Decrypt failed!!!");
 							break;
 						}
-						isDecryptSuccess2 = true;
+						flag = true;
 						try
 						{
-							gzippedResponse = Cipher.DecryptRJ128Byte("ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,", "yCNBH$$rCNGvC+#f", www.get_text());
+							array = Cipher.DecryptRJ128Byte("ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,", "yCNBH$$rCNGvC+#f", www.get_text());
 						}
-						catch (Exception exc3)
+						catch (Exception exc)
 						{
-							Log.Exception(exc3);
-							isDecryptSuccess2 = false;
+							Log.Exception(exc);
+							flag = false;
 						}
-						if (!isDecryptSuccess2)
+						if (!flag)
 						{
 							msg = GenerateErrorMsg(Error.DecryptFailed);
 							Log.Error(LOG.NETWORK, "Decrypt failed");
 							break;
 						}
 					}
-					if (gzippedResponse == null)
+					if (array == null)
 					{
 						msg = GenerateErrorMsg(Error.DecryptResponceIsNull);
 						Log.Error(LOG.NETWORK, "Decrypt responce is null");
 					}
 					else
 					{
-						bool isUncompressSuccess = true;
+						bool flag2 = true;
 						try
 						{
-							msg = GzUncompress(gzippedResponse);
+							msg = GzUncompress(array);
 						}
-						catch (Exception ex)
+						catch (Exception exc2)
 						{
-							Exception exc2 = ex;
 							Log.Exception(exc2);
-							isUncompressSuccess = false;
+							flag2 = false;
 						}
-						if (!isUncompressSuccess)
+						if (!flag2)
 						{
 							msg = GenerateErrorMsg(Error.UncompressFailed);
 						}
-						else if (signature == null)
+						else if (text == null)
 						{
 							msg = GenerateErrorMsg(Error.SignatureIsNull);
 							Log.Error(LOG.NETWORK, "Signature is null");
 						}
 						else
 						{
-							bool isVerifySignatureSuccess = true;
-							bool isValidSignature = true;
+							bool flag3 = true;
+							bool flag4 = true;
 							try
 							{
-								isValidSignature = Cipher.verify(msg, signature);
+								flag4 = Cipher.verify(msg, text);
 							}
-							catch (Exception ex2)
+							catch (Exception exc3)
 							{
-								Exception exc = ex2;
-								Log.Exception(exc);
-								isVerifySignatureSuccess = false;
+								Log.Exception(exc3);
+								flag3 = false;
 							}
-							if (!isVerifySignatureSuccess)
+							if (!flag3)
 							{
 								msg = GenerateErrorMsg(Error.VerifySignatureFailed);
 							}
-							else if (!isValidSignature)
+							else if (!flag4)
 							{
 								msg = GenerateErrorMsg(Error.InvalidSignature);
 							}
@@ -341,37 +334,38 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		}
 		finally
 		{
-			((IDisposable)www)?.Dispose();
+			base._003C_003E__Finally0();
 		}
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
 		try
 		{
 			if (call_back != null)
 			{
-				new T();
+				T obj = new T();
 				try
 				{
-					JSONSerializer.Deserialize<T>(msg);
+					obj = JSONSerializer.Deserialize<T>(msg);
 				}
-				catch (Exception ex3)
+				catch (Exception ex2)
 				{
-					Exception exp2 = ex3;
-					string decode_failed_msg = GenerateErrorMsg(Error.DecodeFailed);
-					JSONSerializer.Deserialize<T>(decode_failed_msg);
-					Debug.LogException(exp2);
+					string message = GenerateErrorMsg(Error.DecodeFailed);
+					obj = JSONSerializer.Deserialize<T>(message);
+					Debug.LogException(ex2);
 				}
 				finally
 				{
-					((_003CRequest_Impl_003Ec__Iterator1E7<T>)/*Error near IL_08b6: stateMachine*/)._003C_003E__Finally0();
+					if (obj.Error != 0)
+					{
+					}
+					obj.Apply();
+					CrashlyticsReporter.SetAPIRequestStatus(requesting: false);
+					call_back(obj);
 				}
 			}
 		}
-		catch (Exception exp)
+		catch (Exception ex3)
 		{
-			Debug.LogException(exp);
-			CrashlyticsReporter.SetAPIRequestStatus(false);
+			Debug.LogException(ex3);
+			CrashlyticsReporter.SetAPIRequestStatus(requesting: false);
 			call_fatal();
 		}
 	}

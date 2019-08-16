@@ -4,25 +4,22 @@ import org.apache.commons.lang3.Validate;
 
 public class IEEE754rUtils {
     public static double min(double... dArr) {
-        int i = 1;
         if (dArr == null) {
             throw new IllegalArgumentException("The Array must not be null");
         }
         Validate.isTrue(dArr.length != 0, "Array cannot be empty.", new Object[0]);
         double d = dArr[0];
-        while (i < dArr.length) {
+        for (int i = 1; i < dArr.length; i++) {
             d = min(dArr[i], d);
-            i++;
         }
         return d;
     }
 
     public static float min(float... fArr) {
-        int i = 1;
+        boolean z;
         if (fArr == null) {
             throw new IllegalArgumentException("The Array must not be null");
         }
-        boolean z;
         if (fArr.length != 0) {
             z = true;
         } else {
@@ -30,9 +27,8 @@ public class IEEE754rUtils {
         }
         Validate.isTrue(z, "Array cannot be empty.", new Object[0]);
         float f = fArr[0];
-        while (i < fArr.length) {
+        for (int i = 1; i < fArr.length; i++) {
             f = min(fArr[i], f);
-            i++;
         }
         return f;
     }
@@ -66,11 +62,10 @@ public class IEEE754rUtils {
     }
 
     public static double max(double... dArr) {
-        int i = 1;
+        boolean z;
         if (dArr == null) {
             throw new IllegalArgumentException("The Array must not be null");
         }
-        boolean z;
         if (dArr.length != 0) {
             z = true;
         } else {
@@ -78,19 +73,17 @@ public class IEEE754rUtils {
         }
         Validate.isTrue(z, "Array cannot be empty.", new Object[0]);
         double d = dArr[0];
-        while (i < dArr.length) {
+        for (int i = 1; i < dArr.length; i++) {
             d = max(dArr[i], d);
-            i++;
         }
         return d;
     }
 
     public static float max(float... fArr) {
-        int i = 1;
+        boolean z;
         if (fArr == null) {
             throw new IllegalArgumentException("The Array must not be null");
         }
-        boolean z;
         if (fArr.length != 0) {
             z = true;
         } else {
@@ -98,9 +91,8 @@ public class IEEE754rUtils {
         }
         Validate.isTrue(z, "Array cannot be empty.", new Object[0]);
         float f = fArr[0];
-        while (i < fArr.length) {
+        for (int i = 1; i < fArr.length; i++) {
             f = max(fArr[i], f);
-            i++;
         }
         return f;
     }

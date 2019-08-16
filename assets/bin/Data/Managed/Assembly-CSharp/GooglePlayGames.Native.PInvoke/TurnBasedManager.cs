@@ -3,12 +3,15 @@ using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class TurnBasedManager
 	{
+		internal delegate void TurnBasedMatchCallback(TurnBasedMatchResponse response);
+
 		internal class MatchInboxUIResponse : BaseReferenceHolder
 		{
 			internal MatchInboxUIResponse(IntPtr selfPointer)
@@ -153,9 +156,58 @@ namespace GooglePlayGames.Native.PInvoke
 			}
 		}
 
-		internal delegate void TurnBasedMatchCallback(TurnBasedMatchResponse response);
-
 		private readonly GameServices mGameServices;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchCallback _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchCallback _003C_003Ef__mg_0024cache1;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, PlayerSelectUIResponse> _003C_003Ef__mg_0024cache2;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.PlayerSelectUICallback _003C_003Ef__mg_0024cache3;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, TurnBasedMatchesResponse> _003C_003Ef__mg_0024cache4;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchesCallback _003C_003Ef__mg_0024cache5;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchCallback _003C_003Ef__mg_0024cache6;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchCallback _003C_003Ef__mg_0024cache7;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, MatchInboxUIResponse> _003C_003Ef__mg_0024cache8;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.MatchInboxUICallback _003C_003Ef__mg_0024cache9;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.MultiplayerStatusCallback _003C_003Ef__mg_0024cacheA;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchCallback _003C_003Ef__mg_0024cacheB;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchCallback _003C_003Ef__mg_0024cacheC;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.MultiplayerStatusCallback _003C_003Ef__mg_0024cacheD;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.MultiplayerStatusCallback _003C_003Ef__mg_0024cacheE;
+
+		[CompilerGenerated]
+		private static TurnBasedMultiplayerManager.TurnBasedMatchCallback _003C_003Ef__mg_0024cacheF;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, TurnBasedMatchResponse> _003C_003Ef__mg_0024cache10;
 
 		internal TurnBasedManager(GameServices services)
 		{

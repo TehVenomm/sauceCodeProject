@@ -1,6 +1,5 @@
 package org.apache.commons.lang3;
 
-import com.google.android.gms.nearby.messages.Strategy;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
@@ -8,15 +7,18 @@ import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class StringUtils {
-    public static final String CR = "\r";
+
+    /* renamed from: CR */
+    public static final String f1198CR = "\r";
     public static final String EMPTY = "";
     public static final int INDEX_NOT_FOUND = -1;
-    public static final String LF = "\n";
+
+    /* renamed from: LF */
+    public static final String f1199LF = "\n";
     private static final int PAD_LIMIT = 8192;
     public static final String SPACE = " ";
 
@@ -80,12 +82,18 @@ public class StringUtils {
     }
 
     public static String trim(String str) {
-        return str == null ? null : str.trim();
+        if (str == null) {
+            return null;
+        }
+        return str.trim();
     }
 
     public static String trimToNull(String str) {
         String trim = trim(str);
-        return isEmpty(trim) ? null : trim;
+        if (isEmpty(trim)) {
+            return null;
+        }
+        return trim;
     }
 
     public static String trimToEmpty(String str) {
@@ -101,10 +109,10 @@ public class StringUtils {
             return null;
         }
         String strip = strip(str, null);
-        if (strip.isEmpty()) {
-            return null;
+        if (!strip.isEmpty()) {
+            return strip;
         }
-        return strip;
+        return null;
     }
 
     public static String stripToEmpty(String str) {
@@ -248,6 +256,7 @@ public class StringUtils {
     }
 
     private static int ordinalIndexOf(CharSequence charSequence, CharSequence charSequence2, int i, boolean z) {
+        int indexOf;
         int i2 = -1;
         if (charSequence == null || charSequence2 == null || i <= 0) {
             return -1;
@@ -258,21 +267,19 @@ public class StringUtils {
             }
             int i3 = 0;
             while (true) {
-                int lastIndexOf;
                 if (z) {
-                    lastIndexOf = CharSequenceUtils.lastIndexOf(charSequence, charSequence2, i2 - charSequence2.length());
+                    indexOf = CharSequenceUtils.lastIndexOf(charSequence, charSequence2, i2 - charSequence2.length());
                 } else {
-                    lastIndexOf = CharSequenceUtils.indexOf(charSequence, charSequence2, charSequence2.length() + i2);
+                    indexOf = CharSequenceUtils.indexOf(charSequence, charSequence2, charSequence2.length() + i2);
                 }
-                if (lastIndexOf < 0) {
-                    return lastIndexOf;
+                if (indexOf < 0) {
+                    return indexOf;
                 }
-                i2 = i3 + 1;
-                if (i2 >= i) {
-                    return lastIndexOf;
+                i3++;
+                if (i3 >= i) {
+                    return indexOf;
                 }
-                i3 = i2;
-                i2 = lastIndexOf;
+                i2 = indexOf;
             }
         } else if (z) {
             return charSequence.length();
@@ -347,26 +354,26 @@ public class StringUtils {
     }
 
     public static int lastIndexOfIgnoreCase(CharSequence charSequence, CharSequence charSequence2, int i) {
+        int i2;
         if (charSequence == null || charSequence2 == null) {
             return -1;
         }
-        int length;
         if (i > charSequence.length() - charSequence2.length()) {
-            length = charSequence.length() - charSequence2.length();
+            i2 = charSequence.length() - charSequence2.length();
         } else {
-            length = i;
+            i2 = i;
         }
-        if (length < 0) {
+        if (i2 < 0) {
             return -1;
         }
         if (charSequence2.length() == 0) {
-            return length;
+            return i2;
         }
-        while (length >= 0) {
-            if (CharSequenceUtils.regionMatches(charSequence, true, length, charSequence2, 0, charSequence2.length())) {
-                return length;
+        while (i2 >= 0) {
+            if (CharSequenceUtils.regionMatches(charSequence, true, i2, charSequence2, 0, charSequence2.length())) {
+                return i2;
             }
-            length--;
+            i2--;
         }
         return -1;
     }
@@ -423,12 +430,10 @@ public class StringUtils {
         int i3 = 0;
         while (i3 < length) {
             char charAt = charSequence.charAt(i3);
-            int i4 = 0;
-            while (i4 < length2) {
+            for (int i4 = 0; i4 < length2; i4++) {
                 if (cArr[i4] == charAt && (i3 >= i || i4 >= i2 || !Character.isHighSurrogate(charAt) || cArr[i4 + 1] == charSequence.charAt(i3 + 1))) {
                     return i3;
                 }
-                i4++;
             }
             i3++;
         }
@@ -450,11 +455,9 @@ public class StringUtils {
         int length2 = cArr.length;
         int i = length - 1;
         int i2 = length2 - 1;
-        int i3 = 0;
-        while (i3 < length) {
+        for (int i3 = 0; i3 < length; i3++) {
             char charAt = charSequence.charAt(i3);
-            int i4 = 0;
-            while (i4 < length2) {
+            for (int i4 = 0; i4 < length2; i4++) {
                 if (cArr[i4] == charAt) {
                     if (!Character.isHighSurrogate(charAt) || i4 == i2) {
                         return true;
@@ -463,9 +466,7 @@ public class StringUtils {
                         return true;
                     }
                 }
-                i4++;
             }
-            i3++;
         }
         return false;
     }
@@ -514,24 +515,24 @@ public class StringUtils {
     }
 
     public static int indexOfAnyBut(CharSequence charSequence, CharSequence charSequence2) {
+        boolean z;
         if (isEmpty(charSequence) || isEmpty(charSequence2)) {
             return -1;
         }
         int length = charSequence.length();
         for (int i = 0; i < length; i++) {
-            int i2;
-            int charAt = charSequence.charAt(i);
-            if (CharSequenceUtils.indexOf(charSequence2, charAt, 0) >= 0) {
-                i2 = 1;
+            char charAt = charSequence.charAt(i);
+            if (CharSequenceUtils.indexOf(charSequence2, (int) charAt, 0) >= 0) {
+                z = true;
             } else {
-                i2 = 0;
+                z = false;
             }
             if (i + 1 < length && Character.isHighSurrogate(charAt)) {
-                charAt = charSequence.charAt(i + 1);
-                if (i2 != 0 && CharSequenceUtils.indexOf(charSequence2, charAt, 0) < 0) {
+                char charAt2 = charSequence.charAt(i + 1);
+                if (z && CharSequenceUtils.indexOf(charSequence2, (int) charAt2, 0) < 0) {
                     return i;
                 }
-            } else if (i2 == 0) {
+            } else if (!z) {
                 return i;
             }
         }
@@ -569,11 +570,9 @@ public class StringUtils {
         int i = length - 1;
         int length2 = cArr.length;
         int i2 = length2 - 1;
-        int i3 = 0;
-        while (i3 < length) {
+        for (int i3 = 0; i3 < length; i3++) {
             char charAt = charSequence.charAt(i3);
-            int i4 = 0;
-            while (i4 < length2) {
+            for (int i4 = 0; i4 < length2; i4++) {
                 if (cArr[i4] == charAt) {
                     if (!Character.isHighSurrogate(charAt) || i4 == i2) {
                         return false;
@@ -582,9 +581,7 @@ public class StringUtils {
                         return false;
                     }
                 }
-                i4++;
             }
-            i3++;
         }
         return true;
     }
@@ -600,7 +597,7 @@ public class StringUtils {
         if (charSequence == null || charSequenceArr == null) {
             return -1;
         }
-        int i = Strategy.TTL_SECONDS_INFINITE;
+        int i = Integer.MAX_VALUE;
         for (CharSequence charSequence2 : charSequenceArr) {
             if (charSequence2 != null) {
                 int indexOf = CharSequenceUtils.indexOf(charSequence, charSequence2, 0);
@@ -609,7 +606,10 @@ public class StringUtils {
                 }
             }
         }
-        return i == Strategy.TTL_SECONDS_INFINITE ? -1 : i;
+        if (i == Integer.MAX_VALUE) {
+            return -1;
+        }
+        return i;
     }
 
     public static int lastIndexOfAny(CharSequence charSequence, CharSequence... charSequenceArr) {
@@ -628,51 +628,51 @@ public class StringUtils {
     }
 
     public static String substring(String str, int i) {
+        int i2;
         if (str == null) {
             return null;
         }
-        int length;
         if (i < 0) {
-            length = str.length() + i;
+            i2 = str.length() + i;
         } else {
-            length = i;
+            i2 = i;
         }
-        if (length < 0) {
-            length = 0;
+        if (i2 < 0) {
+            i2 = 0;
         }
-        if (length > str.length()) {
+        if (i2 > str.length()) {
             return "";
         }
-        return str.substring(length);
+        return str.substring(i2);
     }
 
     public static String substring(String str, int i, int i2) {
-        int i3 = 0;
+        int i3;
+        int i4 = 0;
         if (str == null) {
             return null;
         }
-        int length;
         if (i2 < 0) {
-            length = str.length() + i2;
+            i3 = str.length() + i2;
         } else {
-            length = i2;
+            i3 = i2;
         }
         if (i < 0) {
             i += str.length();
         }
-        if (length > str.length()) {
-            length = str.length();
+        if (i3 > str.length()) {
+            i3 = str.length();
         }
-        if (i > length) {
+        if (i > i3) {
             return "";
         }
         if (i < 0) {
             i = 0;
         }
-        if (length >= 0) {
-            i3 = length;
+        if (i3 >= 0) {
+            i4 = i3;
         }
-        return str.substring(i, i3);
+        return str.substring(i, i4);
     }
 
     public static String left(String str, int i) {
@@ -787,26 +787,26 @@ public class StringUtils {
         }
         int length2 = str3.length();
         int length3 = str2.length();
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         int i = 0;
         while (i < length - length2) {
-            i = str.indexOf(str2, i);
-            if (i >= 0) {
-                i += length3;
-                int indexOf = str.indexOf(str3, i);
-                if (indexOf < 0) {
+            int indexOf = str.indexOf(str2, i);
+            if (indexOf >= 0) {
+                int i2 = indexOf + length3;
+                int indexOf2 = str.indexOf(str3, i2);
+                if (indexOf2 < 0) {
                     break;
                 }
-                arrayList.add(str.substring(i, indexOf));
-                i = indexOf + length2;
+                arrayList.add(str.substring(i2, indexOf2));
+                i = indexOf2 + length2;
             } else {
                 break;
             }
         }
-        if (arrayList.isEmpty()) {
-            return null;
+        if (!arrayList.isEmpty()) {
+            return (String[]) arrayList.toArray(new String[arrayList.size()]);
         }
-        return (String[]) arrayList.toArray(new String[arrayList.size()]);
+        return null;
     }
 
     public static String[] split(String str) {
@@ -842,7 +842,6 @@ public class StringUtils {
     }
 
     private static String[] splitByWholeSeparatorWorker(String str, String str2, int i, boolean z) {
-        int i2 = 0;
         if (str == null) {
             return null;
         }
@@ -855,35 +854,34 @@ public class StringUtils {
         }
         int length2 = str2.length();
         ArrayList arrayList = new ArrayList();
+        int i2 = 0;
         int i3 = 0;
         int i4 = 0;
-        while (i3 < length) {
-            i3 = str.indexOf(str2, i4);
-            if (i3 <= -1) {
-                arrayList.add(str.substring(i4));
-                i3 = length;
-            } else if (i3 > i4) {
-                int i5 = i2 + 1;
-                if (i5 == i) {
-                    arrayList.add(str.substring(i4));
-                    i3 = length;
-                    i2 = i5;
+        while (i2 < length) {
+            i2 = str.indexOf(str2, i3);
+            if (i2 <= -1) {
+                arrayList.add(str.substring(i3));
+                i2 = length;
+            } else if (i2 > i3) {
+                i4++;
+                if (i4 == i) {
+                    arrayList.add(str.substring(i3));
+                    i2 = length;
                 } else {
-                    arrayList.add(str.substring(i4, i3));
-                    i4 = i3 + length2;
-                    i2 = i5;
+                    arrayList.add(str.substring(i3, i2));
+                    i3 = i2 + length2;
                 }
             } else {
                 if (z) {
-                    i2++;
-                    if (i2 == i) {
-                        arrayList.add(str.substring(i4));
-                        i3 = length;
+                    i4++;
+                    if (i4 == i) {
+                        arrayList.add(str.substring(i3));
+                        i2 = length;
                     } else {
                         arrayList.add("");
                     }
                 }
-                i4 = i3 + length2;
+                i3 = i2 + length2;
             }
         }
         return (String[]) arrayList.toArray(new String[arrayList.size()]);
@@ -905,27 +903,28 @@ public class StringUtils {
         if (length == 0) {
             return ArrayUtils.EMPTY_STRING_ARRAY;
         }
-        List arrayList = new ArrayList();
-        Object obj = null;
-        Object obj2 = null;
+        ArrayList arrayList = new ArrayList();
+        boolean z2 = false;
+        boolean z3 = false;
         int i = 0;
         int i2 = 0;
         while (i2 < length) {
             if (str.charAt(i2) == c) {
-                if (obj2 != null || z) {
+                if (z3 || z) {
                     arrayList.add(str.substring(i, i2));
-                    obj = 1;
-                    obj2 = null;
+                    z2 = true;
+                    z3 = false;
                 }
-                i = i2 + 1;
-                i2 = i;
+                int i3 = i2 + 1;
+                i = i3;
+                i2 = i3;
             } else {
-                obj2 = 1;
+                z2 = false;
+                z3 = true;
                 i2++;
-                obj = null;
             }
         }
-        if (obj2 != null || (z && r0 != null)) {
+        if (z3 || (z && z2)) {
             arrayList.add(str.substring(i, i2));
         }
         return (String[]) arrayList.toArray(new String[arrayList.size()]);
@@ -940,6 +939,13 @@ public class StringUtils {
     }
 
     private static String[] splitWorker(String str, String str2, int i, boolean z) {
+        int i2;
+        boolean z2;
+        int i3;
+        boolean z3;
+        int i4;
+        boolean z4;
+        boolean z5;
         if (str == null) {
             return null;
         }
@@ -947,135 +953,101 @@ public class StringUtils {
         if (length == 0) {
             return ArrayUtils.EMPTY_STRING_ARRAY;
         }
-        int i2;
-        int i3;
-        int i4;
-        List arrayList = new ArrayList();
-        int i5;
-        int i6;
-        int i7;
-        int i8;
+        ArrayList arrayList = new ArrayList();
         if (str2 == null) {
-            i5 = 0;
+            z3 = false;
+            z2 = false;
             i2 = 0;
-            i6 = 0;
             i3 = 0;
-            i7 = 1;
+            int i5 = 1;
             while (i3 < length) {
                 if (Character.isWhitespace(str.charAt(i3))) {
-                    if (i2 != 0 || z) {
-                        i2 = i7 + 1;
-                        if (i7 == i) {
-                            i3 = 0;
-                            i5 = length;
+                    if (z2 || z) {
+                        int i6 = i5 + 1;
+                        if (i5 == i) {
+                            z3 = false;
+                            i3 = length;
                         } else {
-                            i5 = i3;
-                            i3 = 1;
+                            z3 = true;
                         }
-                        arrayList.add(str.substring(i6, i5));
-                        i7 = i2;
-                        i2 = i5;
-                        i5 = 0;
-                    } else {
-                        i8 = i5;
-                        i5 = i2;
-                        i2 = i3;
-                        i3 = i8;
+                        arrayList.add(str.substring(i2, i3));
+                        z2 = false;
+                        i5 = i6;
                     }
-                    i6 = i2 + 1;
-                    i2 = i5;
-                    i5 = i3;
-                    i3 = i6;
+                    int i7 = i3 + 1;
+                    i2 = i7;
+                    i3 = i7;
                 } else {
                     i3++;
-                    i5 = 0;
-                    i2 = 1;
+                    z3 = false;
+                    z2 = true;
                 }
             }
-            i4 = i3;
-            i3 = i6;
+            i4 = i2;
         } else if (str2.length() == 1) {
             char charAt = str2.charAt(0);
-            i5 = 0;
-            i2 = 0;
-            i6 = 0;
-            i3 = 0;
-            i7 = 1;
+            z3 = false;
+            z2 = false;
+            int i8 = 0;
+            int i9 = 0;
+            int i10 = 1;
             while (i3 < length) {
                 if (str.charAt(i3) == charAt) {
-                    if (i2 != 0 || z) {
-                        i2 = i7 + 1;
-                        if (i7 == i) {
-                            i3 = 0;
-                            i5 = length;
+                    if (z2 || z) {
+                        int i11 = i10 + 1;
+                        if (i10 == i) {
+                            z5 = false;
+                            i3 = length;
                         } else {
-                            i5 = i3;
-                            i3 = 1;
+                            z5 = true;
                         }
-                        arrayList.add(str.substring(i6, i5));
-                        i7 = i2;
-                        i2 = i5;
-                        i5 = 0;
-                    } else {
-                        i8 = i5;
-                        i5 = i2;
-                        i2 = i3;
-                        i3 = i8;
+                        arrayList.add(str.substring(i8, i3));
+                        z2 = false;
+                        i10 = i11;
                     }
-                    i6 = i2 + 1;
-                    i2 = i5;
-                    i5 = i3;
-                    i3 = i6;
+                    int i12 = i3 + 1;
+                    i8 = i12;
+                    i9 = i12;
                 } else {
-                    i3++;
-                    i5 = 0;
-                    i2 = 1;
+                    i9 = i3 + 1;
+                    z3 = false;
+                    z2 = true;
                 }
             }
-            i4 = i3;
-            i3 = i6;
+            i4 = i8;
         } else {
-            i5 = 0;
+            z3 = false;
+            z2 = false;
             i2 = 0;
-            i6 = 0;
-            i3 = 0;
-            i7 = 1;
+            int i13 = 0;
+            int i14 = 1;
             while (i3 < length) {
                 if (str2.indexOf(str.charAt(i3)) >= 0) {
-                    if (i2 != 0 || z) {
-                        i2 = i7 + 1;
-                        if (i7 == i) {
-                            i3 = 0;
-                            i5 = length;
+                    if (z2 || z) {
+                        int i15 = i14 + 1;
+                        if (i14 == i) {
+                            z4 = false;
+                            i3 = length;
                         } else {
-                            i5 = i3;
-                            i3 = 1;
+                            z4 = true;
                         }
-                        arrayList.add(str.substring(i6, i5));
-                        i7 = i2;
-                        i2 = i5;
-                        i5 = 0;
-                    } else {
-                        i8 = i5;
-                        i5 = i2;
-                        i2 = i3;
-                        i3 = i8;
+                        arrayList.add(str.substring(i2, i3));
+                        z2 = false;
+                        i14 = i15;
                     }
-                    i6 = i2 + 1;
-                    i2 = i5;
-                    i5 = i3;
-                    i3 = i6;
+                    int i16 = i3 + 1;
+                    i2 = i16;
+                    i13 = i16;
                 } else {
-                    i3++;
-                    i5 = 0;
-                    i2 = 1;
+                    i13 = i3 + 1;
+                    z3 = false;
+                    z2 = true;
                 }
             }
-            i4 = i3;
-            i3 = i6;
+            i4 = i2;
         }
-        if (i2 != 0 || (z && r3 != 0)) {
-            arrayList.add(str.substring(i3, i4));
+        if (z2 || (z && z3)) {
+            arrayList.add(str.substring(i4, i3));
         }
         return (String[]) arrayList.toArray(new String[arrayList.size()]);
     }
@@ -1095,32 +1067,32 @@ public class StringUtils {
         if (str.isEmpty()) {
             return ArrayUtils.EMPTY_STRING_ARRAY;
         }
-        char[] toCharArray = str.toCharArray();
-        List arrayList = new ArrayList();
+        char[] charArray = str.toCharArray();
+        ArrayList arrayList = new ArrayList();
         int i = 0;
-        int type = Character.getType(toCharArray[0]);
-        for (int i2 = 1; i2 < toCharArray.length; i2++) {
-            int type2 = Character.getType(toCharArray[i2]);
+        int type = Character.getType(charArray[0]);
+        for (int i2 = 1; i2 < charArray.length; i2++) {
+            int type2 = Character.getType(charArray[i2]);
             if (type2 != type) {
                 if (z && type2 == 2 && type == 1) {
-                    type = i2 - 1;
-                    if (type != i) {
-                        arrayList.add(new String(toCharArray, i, type - i));
-                        i = type;
+                    int i3 = i2 - 1;
+                    if (i3 != i) {
+                        arrayList.add(new String(charArray, i, i3 - i));
+                        i = i3;
                     }
                 } else {
-                    arrayList.add(new String(toCharArray, i, i2 - i));
+                    arrayList.add(new String(charArray, i, i2 - i));
                     i = i2;
                 }
                 type = type2;
             }
         }
-        arrayList.add(new String(toCharArray, i, toCharArray.length - i));
+        arrayList.add(new String(charArray, i, charArray.length - i));
         return (String[]) arrayList.toArray(new String[arrayList.size()]);
     }
 
     public static <T> String join(T... tArr) {
-        return join((Object[]) tArr, null);
+        return join((Object[]) tArr, (String) null);
     }
 
     public static String join(Object[] objArr, char c) {
@@ -1187,16 +1159,16 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            if (objArr[i3] != null) {
-                stringBuilder.append(objArr[i3]);
+            if (objArr[i4] != null) {
+                sb.append(objArr[i4]);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(long[] jArr, char c, int i, int i2) {
@@ -1207,14 +1179,14 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            stringBuilder.append(jArr[i3]);
+            sb.append(jArr[i4]);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(int[] iArr, char c, int i, int i2) {
@@ -1225,14 +1197,14 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            stringBuilder.append(iArr[i3]);
+            sb.append(iArr[i4]);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(byte[] bArr, char c, int i, int i2) {
@@ -1243,14 +1215,14 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            stringBuilder.append(bArr[i3]);
+            sb.append(bArr[i4]);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(short[] sArr, char c, int i, int i2) {
@@ -1261,14 +1233,14 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            stringBuilder.append(sArr[i3]);
+            sb.append(sArr[i4]);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(char[] cArr, char c, int i, int i2) {
@@ -1279,14 +1251,14 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            stringBuilder.append(cArr[i3]);
+            sb.append(cArr[i4]);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(double[] dArr, char c, int i, int i2) {
@@ -1297,14 +1269,14 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            stringBuilder.append(dArr[i3]);
+            sb.append(dArr[i4]);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(float[] fArr, char c, int i, int i2) {
@@ -1315,14 +1287,14 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(c);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(c);
             }
-            stringBuilder.append(fArr[i3]);
+            sb.append(fArr[i4]);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(Object[] objArr, String str) {
@@ -1343,16 +1315,16 @@ public class StringUtils {
         if (i3 <= 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder(i3 * 16);
-        for (i3 = i; i3 < i2; i3++) {
-            if (i3 > i) {
-                stringBuilder.append(str);
+        StringBuilder sb = new StringBuilder(i3 * 16);
+        for (int i4 = i; i4 < i2; i4++) {
+            if (i4 > i) {
+                sb.append(str);
             }
-            if (objArr[i3] != null) {
-                stringBuilder.append(objArr[i3]);
+            if (objArr[i4] != null) {
+                sb.append(objArr[i4]);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(Iterator<?> it, char c) {
@@ -1366,18 +1338,18 @@ public class StringUtils {
         if (!it.hasNext()) {
             return ObjectUtils.toString(next);
         }
-        StringBuilder stringBuilder = new StringBuilder(256);
+        StringBuilder sb = new StringBuilder(256);
         if (next != null) {
-            stringBuilder.append(next);
+            sb.append(next);
         }
         while (it.hasNext()) {
-            stringBuilder.append(c);
-            next = it.next();
-            if (next != null) {
-                stringBuilder.append(next);
+            sb.append(c);
+            Object next2 = it.next();
+            if (next2 != null) {
+                sb.append(next2);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(Iterator<?> it, String str) {
@@ -1391,20 +1363,20 @@ public class StringUtils {
         if (!it.hasNext()) {
             return ObjectUtils.toString(next);
         }
-        StringBuilder stringBuilder = new StringBuilder(256);
+        StringBuilder sb = new StringBuilder(256);
         if (next != null) {
-            stringBuilder.append(next);
+            sb.append(next);
         }
         while (it.hasNext()) {
             if (str != null) {
-                stringBuilder.append(str);
+                sb.append(str);
             }
-            next = it.next();
-            if (next != null) {
-                stringBuilder.append(next);
+            Object next2 = it.next();
+            if (next2 != null) {
+                sb.append(next2);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String join(Iterable<?> iterable, char c) {
@@ -1422,25 +1394,25 @@ public class StringUtils {
     }
 
     public static String deleteWhitespace(String str) {
+        int i;
         if (isEmpty(str)) {
             return str;
         }
         int length = str.length();
         char[] cArr = new char[length];
-        int i = 0;
         int i2 = 0;
-        while (i < length) {
-            int i3;
-            if (Character.isWhitespace(str.charAt(i))) {
-                i3 = i2;
+        int i3 = 0;
+        while (i2 < length) {
+            if (!Character.isWhitespace(str.charAt(i2))) {
+                i = i3 + 1;
+                cArr[i3] = str.charAt(i2);
             } else {
-                i3 = i2 + 1;
-                cArr[i2] = str.charAt(i);
+                i = i3;
             }
-            i++;
-            i2 = i3;
+            i2++;
+            i3 = i;
         }
-        return i2 != length ? new String(cArr, 0, i2) : str;
+        return i3 != length ? new String(cArr, 0, i3) : str;
     }
 
     public static String removeStart(String str, String str2) {
@@ -1479,16 +1451,16 @@ public class StringUtils {
         if (isEmpty(str) || str.indexOf(c) == -1) {
             return str;
         }
-        char[] toCharArray = str.toCharArray();
+        char[] charArray = str.toCharArray();
         int i = 0;
-        for (int i2 = 0; i2 < toCharArray.length; i2++) {
-            if (toCharArray[i2] != c) {
+        for (int i2 = 0; i2 < charArray.length; i2++) {
+            if (charArray[i2] != c) {
                 int i3 = i + 1;
-                toCharArray[i] = toCharArray[i2];
+                charArray[i] = charArray[i2];
                 i = i3;
             }
         }
-        return new String(toCharArray, 0, i);
+        return new String(charArray, 0, i);
     }
 
     public static String replaceOnce(String str, String str2, String str3) {
@@ -1526,19 +1498,19 @@ public class StringUtils {
         } else if (i <= 64) {
             i2 = i;
         }
-        StringBuilder stringBuilder = new StringBuilder((i2 * length2) + str.length());
-        i2 = 0;
+        StringBuilder sb = new StringBuilder((i2 * length2) + str.length());
+        int i3 = 0;
         while (indexOf != -1) {
-            stringBuilder.append(str.substring(i2, indexOf)).append(str3);
-            i2 = indexOf + length;
+            sb.append(str.substring(i3, indexOf)).append(str3);
+            i3 = indexOf + length;
             i--;
             if (i == 0) {
                 break;
             }
-            indexOf = str.indexOf(str2, i2);
+            indexOf = str.indexOf(str2, i3);
         }
-        stringBuilder.append(str.substring(i2));
-        return stringBuilder.toString();
+        sb.append(str.substring(i3));
+        return sb.toString();
     }
 
     public static String replaceEach(String str, String[] strArr, String[] strArr2) {
@@ -1561,73 +1533,62 @@ public class StringUtils {
         if (length != length2) {
             throw new IllegalArgumentException("Search and Replace array lengths don't match: " + length + " vs " + length2);
         }
-        int indexOf;
         boolean[] zArr = new boolean[length];
-        int i2 = 0;
-        length2 = -1;
+        int i2 = -1;
         int i3 = -1;
-        while (i2 < length) {
-            if (!(zArr[i2] || strArr[i2] == null || strArr[i2].isEmpty() || strArr2[i2] == null)) {
-                indexOf = str.indexOf(strArr[i2]);
+        for (int i4 = 0; i4 < length; i4++) {
+            if (!zArr[i4] && strArr[i4] != null && !strArr[i4].isEmpty() && strArr2[i4] != null) {
+                int indexOf = str.indexOf(strArr[i4]);
                 if (indexOf == -1) {
-                    zArr[i2] = true;
+                    zArr[i4] = true;
                 } else if (i3 == -1 || indexOf < i3) {
-                    length2 = i2;
+                    i2 = i4;
                     i3 = indexOf;
                 }
             }
-            i2++;
         }
         if (i3 == -1) {
             return str;
         }
-        i2 = 0;
-        indexOf = 0;
-        while (i2 < strArr.length) {
-            int length3;
-            if (!(strArr[i2] == null || strArr2[i2] == null)) {
-                length3 = strArr2[i2].length() - strArr[i2].length();
+        int i5 = 0;
+        for (int i6 = 0; i6 < strArr.length; i6++) {
+            if (!(strArr[i6] == null || strArr2[i6] == null)) {
+                int length3 = strArr2[i6].length() - strArr[i6].length();
                 if (length3 > 0) {
-                    indexOf += length3 * 3;
+                    i5 += length3 * 3;
                 }
             }
-            i2++;
         }
-        StringBuilder stringBuilder = new StringBuilder(Math.min(indexOf, str.length() / 5) + str.length());
-        i2 = length2;
-        length2 = 0;
+        StringBuilder sb = new StringBuilder(Math.min(i5, str.length() / 5) + str.length());
+        int i7 = 0;
         while (i3 != -1) {
-            while (length2 < i3) {
-                stringBuilder.append(str.charAt(length2));
-                length2++;
+            while (i7 < i3) {
+                sb.append(str.charAt(i7));
+                i7++;
             }
-            stringBuilder.append(strArr2[i2]);
-            length3 = i3 + strArr[i2].length();
-            i2 = 0;
-            length2 = -1;
+            sb.append(strArr2[i2]);
+            int length4 = i3 + strArr[i2].length();
+            i2 = -1;
             i3 = -1;
-            while (i2 < length) {
-                if (!(zArr[i2] || strArr[i2] == null || strArr[i2].isEmpty() || strArr2[i2] == null)) {
-                    indexOf = str.indexOf(strArr[i2], length3);
-                    if (indexOf == -1) {
-                        zArr[i2] = true;
-                    } else if (i3 == -1 || indexOf < i3) {
-                        length2 = i2;
-                        i3 = indexOf;
+            for (int i8 = 0; i8 < length; i8++) {
+                if (!zArr[i8] && strArr[i8] != null && !strArr[i8].isEmpty() && strArr2[i8] != null) {
+                    int indexOf2 = str.indexOf(strArr[i8], length4);
+                    if (indexOf2 == -1) {
+                        zArr[i8] = true;
+                    } else if (i3 == -1 || indexOf2 < i3) {
+                        i2 = i8;
+                        i3 = indexOf2;
                     }
                 }
-                i2++;
             }
-            i2 = length2;
-            length2 = length3;
+            i7 = length4;
         }
-        i2 = str.length();
-        while (length2 < i2) {
-            stringBuilder.append(str.charAt(length2));
-            length2++;
+        int length5 = str.length();
+        for (int i9 = i7; i9 < length5; i9++) {
+            sb.append(str.charAt(i9));
         }
-        str = stringBuilder.toString();
-        return z ? replaceEach(str, strArr, strArr2, z, i - 1) : str;
+        String sb2 = sb.toString();
+        return z ? replaceEach(sb2, strArr, strArr2, z, i - 1) : sb2;
     }
 
     public static String replaceChars(String str, char c, char c2) {
@@ -1638,7 +1599,6 @@ public class StringUtils {
     }
 
     public static String replaceChars(String str, String str2, String str3) {
-        Object obj = null;
         if (isEmpty(str) || isEmpty(str2)) {
             return str;
         }
@@ -1647,31 +1607,34 @@ public class StringUtils {
         }
         int length = str3.length();
         int length2 = str.length();
-        StringBuilder stringBuilder = new StringBuilder(length2);
+        StringBuilder sb = new StringBuilder(length2);
+        boolean z = false;
         for (int i = 0; i < length2; i++) {
             char charAt = str.charAt(i);
             int indexOf = str2.indexOf(charAt);
             if (indexOf >= 0) {
-                obj = 1;
+                z = true;
                 if (indexOf < length) {
-                    stringBuilder.append(str3.charAt(indexOf));
+                    sb.append(str3.charAt(indexOf));
                 }
             } else {
-                stringBuilder.append(charAt);
+                sb.append(charAt);
             }
         }
-        if (obj != null) {
-            return stringBuilder.toString();
+        if (z) {
+            return sb.toString();
         }
         return str;
     }
 
     public static String overlay(String str, String str2, int i, int i2) {
+        int i3;
+        int i4;
+        int i5;
+        int i6;
         if (str == null) {
             return null;
         }
-        int i3;
-        int i4;
         if (str2 == null) {
             str2 = "";
         }
@@ -1692,12 +1655,14 @@ public class StringUtils {
         if (i4 > length) {
             i4 = length;
         }
-        if (i3 <= i4) {
-            int i5 = i4;
-            i4 = i3;
-            i3 = i5;
+        if (i3 > i4) {
+            i5 = i3;
+            i6 = i4;
+        } else {
+            i5 = i4;
+            i6 = i3;
         }
-        return new StringBuilder((((length + i4) - i3) + str2.length()) + 1).append(str.substring(0, i4)).append(str2).append(str.substring(i3)).toString();
+        return new StringBuilder(((length + i6) - i5) + str2.length() + 1).append(str.substring(0, i6)).append(str2).append(str.substring(i5)).toString();
     }
 
     public static String chomp(String str) {
@@ -1706,18 +1671,18 @@ public class StringUtils {
         }
         if (str.length() == 1) {
             char charAt = str.charAt(0);
-            if (charAt == CharUtils.CR || charAt == '\n') {
+            if (charAt == 13 || charAt == 10) {
                 return "";
             }
             return str;
         }
         int length = str.length() - 1;
         char charAt2 = str.charAt(length);
-        if (charAt2 == '\n') {
-            if (str.charAt(length - 1) == CharUtils.CR) {
+        if (charAt2 == 10) {
+            if (str.charAt(length - 1) == 13) {
                 length--;
             }
-        } else if (charAt2 != CharUtils.CR) {
+        } else if (charAt2 != 13) {
             length++;
         }
         return str.substring(0, length);
@@ -1738,14 +1703,13 @@ public class StringUtils {
         }
         int i = length - 1;
         String substring = str.substring(0, i);
-        if (str.charAt(i) == '\n' && substring.charAt(i - 1) == CharUtils.CR) {
+        if (str.charAt(i) == 10 && substring.charAt(i - 1) == 13) {
             return substring.substring(0, i - 1);
         }
         return substring;
     }
 
     public static String repeat(String str, int i) {
-        int i2 = 0;
         if (str == null) {
             return null;
         }
@@ -1759,26 +1723,25 @@ public class StringUtils {
         if (length == 1 && i <= 8192) {
             return repeat(str.charAt(0), i);
         }
-        int i3 = length * i;
+        int i2 = length * i;
         switch (length) {
             case 1:
                 return repeat(str.charAt(0), i);
             case 2:
                 char charAt = str.charAt(0);
                 char charAt2 = str.charAt(1);
-                char[] cArr = new char[i3];
-                for (i2 = (i * 2) - 2; i2 >= 0; i2 = (i2 - 1) - 1) {
-                    cArr[i2] = charAt;
-                    cArr[i2 + 1] = charAt2;
+                char[] cArr = new char[i2];
+                for (int i3 = (i * 2) - 2; i3 >= 0; i3 = (i3 - 1) - 1) {
+                    cArr[i3] = charAt;
+                    cArr[i3 + 1] = charAt2;
                 }
                 return new String(cArr);
             default:
-                StringBuilder stringBuilder = new StringBuilder(i3);
-                while (i2 < i) {
-                    stringBuilder.append(str);
-                    i2++;
+                StringBuilder sb = new StringBuilder(i2);
+                for (int i4 = 0; i4 < i; i4++) {
+                    sb.append(str);
                 }
-                return stringBuilder.toString();
+                return sb.toString();
         }
     }
 
@@ -1816,7 +1779,6 @@ public class StringUtils {
     }
 
     public static String rightPad(String str, int i, String str2) {
-        int i2 = 0;
         if (str == null) {
             return null;
         }
@@ -1838,10 +1800,9 @@ public class StringUtils {
             return str.concat(str2.substring(0, length2));
         }
         char[] cArr = new char[length2];
-        char[] toCharArray = str2.toCharArray();
-        while (i2 < length2) {
-            cArr[i2] = toCharArray[i2 % length];
-            i2++;
+        char[] charArray = str2.toCharArray();
+        for (int i2 = 0; i2 < length2; i2++) {
+            cArr[i2] = charArray[i2 % length];
         }
         return str.concat(new String(cArr));
     }
@@ -1865,7 +1826,6 @@ public class StringUtils {
     }
 
     public static String leftPad(String str, int i, String str2) {
-        int i2 = 0;
         if (str == null) {
             return null;
         }
@@ -1887,16 +1847,18 @@ public class StringUtils {
             return str2.substring(0, length2).concat(str);
         }
         char[] cArr = new char[length2];
-        char[] toCharArray = str2.toCharArray();
-        while (i2 < length2) {
-            cArr[i2] = toCharArray[i2 % length];
-            i2++;
+        char[] charArray = str2.toCharArray();
+        for (int i2 = 0; i2 < length2; i2++) {
+            cArr[i2] = charArray[i2 % length];
         }
         return new String(cArr).concat(str);
     }
 
     public static int length(CharSequence charSequence) {
-        return charSequence == null ? 0 : charSequence.length();
+        if (charSequence == null) {
+            return 0;
+        }
+        return charSequence.length();
     }
 
     public static String center(String str, int i) {
@@ -1986,18 +1948,18 @@ public class StringUtils {
         if (isEmpty(str)) {
             return str;
         }
-        char[] toCharArray = str.toCharArray();
-        for (int i = 0; i < toCharArray.length; i++) {
-            char c = toCharArray[i];
+        char[] charArray = str.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            char c = charArray[i];
             if (Character.isUpperCase(c)) {
-                toCharArray[i] = Character.toLowerCase(c);
+                charArray[i] = Character.toLowerCase(c);
             } else if (Character.isTitleCase(c)) {
-                toCharArray[i] = Character.toLowerCase(c);
+                charArray[i] = Character.toLowerCase(c);
             } else if (Character.isLowerCase(c)) {
-                toCharArray[i] = Character.toUpperCase(c);
+                charArray[i] = Character.toUpperCase(c);
             }
         }
-        return new String(toCharArray);
+        return new String(charArray);
     }
 
     public static int countMatches(CharSequence charSequence, CharSequence charSequence2) {
@@ -2007,12 +1969,13 @@ public class StringUtils {
         }
         int i2 = 0;
         while (true) {
-            i = CharSequenceUtils.indexOf(charSequence, charSequence2, i);
-            if (i == -1) {
-                return i2;
+            int i3 = i;
+            int indexOf = CharSequenceUtils.indexOf(charSequence, charSequence2, i2);
+            if (indexOf == -1) {
+                return i3;
             }
-            i2++;
-            i += charSequence2.length();
+            i = i3 + 1;
+            i2 = indexOf + charSequence2.length();
         }
     }
 
@@ -2022,13 +1985,18 @@ public class StringUtils {
             return 0;
         }
         int i2 = 0;
-        while (i < charSequence.length()) {
-            if (c == charSequence.charAt(i)) {
-                i2++;
+        while (true) {
+            int i3 = i;
+            if (i2 >= charSequence.length()) {
+                return i3;
             }
-            i++;
+            if (c == charSequence.charAt(i2)) {
+                i = i3 + 1;
+            } else {
+                i = i3;
+            }
+            i2++;
         }
-        return i2;
     }
 
     public static boolean isAlpha(CharSequence charSequence) {
@@ -2049,12 +2017,10 @@ public class StringUtils {
             return false;
         }
         int length = charSequence.length();
-        int i = 0;
-        while (i < length) {
+        for (int i = 0; i < length; i++) {
             if (!Character.isLetter(charSequence.charAt(i)) && charSequence.charAt(i) != ' ') {
                 return false;
             }
-            i++;
         }
         return true;
     }
@@ -2077,12 +2043,10 @@ public class StringUtils {
             return false;
         }
         int length = charSequence.length();
-        int i = 0;
-        while (i < length) {
+        for (int i = 0; i < length; i++) {
             if (!Character.isLetterOrDigit(charSequence.charAt(i)) && charSequence.charAt(i) != ' ') {
                 return false;
             }
-            i++;
         }
         return true;
     }
@@ -2118,12 +2082,10 @@ public class StringUtils {
             return false;
         }
         int length = charSequence.length();
-        int i = 0;
-        while (i < length) {
+        for (int i = 0; i < length; i++) {
             if (!Character.isDigit(charSequence.charAt(i)) && charSequence.charAt(i) != ' ') {
                 return false;
             }
-            i++;
         }
         return true;
     }
@@ -2194,9 +2156,9 @@ public class StringUtils {
         if (str == null) {
             return null;
         }
-        Object[] split = split(str, c);
-        ArrayUtils.reverse(split);
-        return join(split, c);
+        String[] split = split(str, c);
+        ArrayUtils.reverse((Object[]) split);
+        return join((Object[]) split, c);
     }
 
     public static String abbreviate(String str, int i) {
@@ -2238,12 +2200,12 @@ public class StringUtils {
         }
         int length = i - str2.length();
         int i2 = (length / 2) + (length % 2);
-        length = str.length() - (length / 2);
-        StringBuilder stringBuilder = new StringBuilder(i);
-        stringBuilder.append(str.substring(0, i2));
-        stringBuilder.append(str2);
-        stringBuilder.append(str.substring(length));
-        return stringBuilder.toString();
+        int length2 = str.length() - (length / 2);
+        StringBuilder sb = new StringBuilder(i);
+        sb.append(str.substring(0, i2));
+        sb.append(str2);
+        sb.append(str.substring(length2));
+        return sb.toString();
     }
 
     public static String difference(String str, String str2) {
@@ -2278,58 +2240,60 @@ public class StringUtils {
     }
 
     public static int indexOfDifference(CharSequence... charSequenceArr) {
+        int i;
         if (charSequenceArr == null || charSequenceArr.length <= 1) {
             return -1;
         }
         int length = charSequenceArr.length;
-        int i = Strategy.TTL_SECONDS_INFINITE;
-        int i2 = 0;
+        int i2 = Integer.MAX_VALUE;
         int i3 = 0;
-        int i4 = 1;
-        int i5 = 0;
-        while (i2 < length) {
-            if (charSequenceArr[i2] == null) {
-                i5 = i4;
-                i = 1;
-                i4 = 0;
+        boolean z = true;
+        boolean z2 = false;
+        for (int i4 = 0; i4 < length; i4++) {
+            if (charSequenceArr[i4] == null) {
+                i2 = 0;
+                z2 = true;
             } else {
-                i4 = Math.min(charSequenceArr[i2].length(), i);
-                i3 = Math.max(charSequenceArr[i2].length(), i3);
-                i = i5;
-                i5 = 0;
+                i2 = Math.min(charSequenceArr[i4].length(), i2);
+                i3 = Math.max(charSequenceArr[i4].length(), i3);
+                z = false;
             }
-            i2++;
-            int i6 = i4;
-            i4 = i5;
-            i5 = i;
-            i = i6;
         }
-        if (i4 != 0 || (i3 == 0 && i5 == 0)) {
+        if (z || (i3 == 0 && !z2)) {
             return -1;
         }
-        if (i == 0) {
+        if (i2 == 0) {
             return 0;
         }
-        int i7;
-        i4 = -1;
-        for (i5 = 0; i5 < i; i5++) {
-            char charAt = charSequenceArr[0].charAt(i5);
-            for (i2 = 1; i2 < length; i2++) {
-                if (charSequenceArr[i2].charAt(i5) != charAt) {
-                    i4 = i5;
-                    break;
-                }
-            }
-            if (i4 != -1) {
-                i7 = i4;
+        int i5 = 0;
+        int i6 = -1;
+        while (true) {
+            if (i5 >= i2) {
+                i = i6;
                 break;
             }
+            char charAt = charSequenceArr[0].charAt(i5);
+            int i7 = 1;
+            while (true) {
+                if (i7 >= length) {
+                    break;
+                } else if (charSequenceArr[i7].charAt(i5) != charAt) {
+                    i6 = i5;
+                    break;
+                } else {
+                    i7++;
+                }
+            }
+            if (i6 != -1) {
+                i = i6;
+                break;
+            }
+            i5++;
         }
-        i7 = i4;
-        if (i7 != -1 || i == i3) {
-            return i7;
+        if (i != -1 || i2 == i3) {
+            return i;
         }
-        return i;
+        return i2;
     }
 
     public static String getCommonPrefix(String... strArr) {
@@ -2350,6 +2314,9 @@ public class StringUtils {
     }
 
     public static int getLevenshteinDistance(CharSequence charSequence, CharSequence charSequence2) {
+        int i;
+        CharSequence charSequence3;
+        CharSequence charSequence4;
         if (charSequence == null || charSequence2 == null) {
             throw new IllegalArgumentException("Strings must not be null");
         }
@@ -2361,45 +2328,42 @@ public class StringUtils {
         if (length2 == 0) {
             return length;
         }
-        int i;
         if (length > length2) {
-            length = charSequence.length();
+            i = charSequence.length();
+            length = length2;
+            charSequence3 = charSequence;
+            charSequence4 = charSequence2;
         } else {
-            int i2 = length2;
-            length2 = length;
-            length = i2;
-            CharSequence charSequence3 = charSequence2;
-            charSequence2 = charSequence;
-            charSequence = charSequence3;
+            i = length2;
+            charSequence3 = charSequence2;
+            charSequence4 = charSequence;
         }
-        int[] iArr = new int[(length2 + 1)];
-        int[] iArr2 = new int[(length2 + 1)];
-        for (i = 0; i <= length2; i++) {
-            iArr[i] = i;
+        int[] iArr = new int[(length + 1)];
+        int[] iArr2 = new int[(length + 1)];
+        for (int i2 = 0; i2 <= length; i2++) {
+            iArr[i2] = i2;
         }
         int i3 = 1;
         int[] iArr3 = iArr2;
-        while (i3 <= length) {
-            char charAt = charSequence.charAt(i3 - 1);
+        while (i3 <= i) {
+            char charAt = charSequence3.charAt(i3 - 1);
             iArr3[0] = i3;
-            for (i = 1; i <= length2; i++) {
-                int i4;
-                if (charSequence2.charAt(i - 1) == charAt) {
-                    i4 = 0;
-                } else {
-                    i4 = 1;
-                }
-                iArr3[i] = Math.min(Math.min(iArr3[i - 1] + 1, iArr[i] + 1), i4 + iArr[i - 1]);
+            for (int i4 = 1; i4 <= length; i4++) {
+                iArr3[i4] = Math.min(Math.min(iArr3[i4 - 1] + 1, iArr[i4] + 1), (charSequence4.charAt(i4 + -1) == charAt ? 0 : 1) + iArr[i4 - 1]);
             }
             i3++;
             int[] iArr4 = iArr;
             iArr = iArr3;
             iArr3 = iArr4;
         }
-        return iArr[length2];
+        return iArr[length];
     }
 
     public static int getLevenshteinDistance(CharSequence charSequence, CharSequence charSequence2, int i) {
+        int i2;
+        int i3;
+        CharSequence charSequence3;
+        CharSequence charSequence4;
         if (charSequence == null || charSequence2 == null) {
             throw new IllegalArgumentException("Strings must not be null");
         } else if (i < 0) {
@@ -2412,55 +2376,59 @@ public class StringUtils {
                     return length2;
                 }
                 return -1;
-            } else if (length2 == 0) {
-                return length <= i ? length : -1;
-            } else {
-                int i2;
+            } else if (length2 != 0) {
                 if (length > length2) {
-                    length = length2;
-                    length2 = charSequence.length();
+                    i2 = charSequence.length();
+                    i3 = length2;
+                    charSequence3 = charSequence;
+                    charSequence4 = charSequence2;
                 } else {
-                    CharSequence charSequence3 = charSequence2;
-                    charSequence2 = charSequence;
-                    charSequence = charSequence3;
+                    i2 = length2;
+                    i3 = length;
+                    charSequence3 = charSequence2;
+                    charSequence4 = charSequence;
                 }
-                int[] iArr = new int[(length + 1)];
-                int[] iArr2 = new int[(length + 1)];
-                int min = Math.min(length, i) + 1;
-                for (i2 = 0; i2 < min; i2++) {
-                    iArr[i2] = i2;
+                int[] iArr = new int[(i3 + 1)];
+                int[] iArr2 = new int[(i3 + 1)];
+                int min = Math.min(i3, i) + 1;
+                for (int i4 = 0; i4 < min; i4++) {
+                    iArr[i4] = i4;
                 }
-                Arrays.fill(iArr, min, iArr.length, Strategy.TTL_SECONDS_INFINITE);
-                Arrays.fill(iArr2, Strategy.TTL_SECONDS_INFINITE);
-                min = 1;
+                Arrays.fill(iArr, min, iArr.length, Integer.MAX_VALUE);
+                Arrays.fill(iArr2, Integer.MAX_VALUE);
+                int i5 = 1;
                 int[] iArr3 = iArr2;
-                while (min <= length2) {
-                    char charAt = charSequence.charAt(min - 1);
-                    iArr3[0] = min;
-                    i2 = Math.max(1, min - i);
-                    int min2 = min > Strategy.TTL_SECONDS_INFINITE - i ? length : Math.min(length, min + i);
-                    if (i2 > min2) {
+                while (i5 <= i2) {
+                    char charAt = charSequence3.charAt(i5 - 1);
+                    iArr3[0] = i5;
+                    int max = Math.max(1, i5 - i);
+                    int min2 = i5 > Integer.MAX_VALUE - i ? i3 : Math.min(i3, i5 + i);
+                    if (max > min2) {
                         return -1;
                     }
-                    if (i2 > 1) {
-                        iArr3[i2 - 1] = Strategy.TTL_SECONDS_INFINITE;
+                    if (max > 1) {
+                        iArr3[max - 1] = Integer.MAX_VALUE;
                     }
-                    while (i2 <= min2) {
-                        if (charSequence2.charAt(i2 - 1) == charAt) {
-                            iArr3[i2] = iArr[i2 - 1];
+                    while (max <= min2) {
+                        if (charSequence4.charAt(max - 1) == charAt) {
+                            iArr3[max] = iArr[max - 1];
                         } else {
-                            iArr3[i2] = Math.min(Math.min(iArr3[i2 - 1], iArr[i2]), iArr[i2 - 1]) + 1;
+                            iArr3[max] = Math.min(Math.min(iArr3[max - 1], iArr[max]), iArr[max - 1]) + 1;
                         }
-                        i2++;
+                        max++;
                     }
-                    min++;
+                    i5++;
                     int[] iArr4 = iArr;
                     iArr = iArr3;
                     iArr3 = iArr4;
                 }
-                if (iArr[length] <= i) {
-                    return iArr[length];
+                if (iArr[i3] <= i) {
+                    return iArr[i3];
                 }
+                return -1;
+            } else if (length <= i) {
+                return length;
+            } else {
                 return -1;
             }
         }
@@ -2475,25 +2443,25 @@ public class StringUtils {
     }
 
     private static double score(CharSequence charSequence, CharSequence charSequence2) {
-        Object toLowerCase;
-        Object toLowerCase2;
+        String lowerCase;
+        String lowerCase2;
         if (charSequence.length() > charSequence2.length()) {
-            toLowerCase = charSequence.toString().toLowerCase();
-            toLowerCase2 = charSequence2.toString().toLowerCase();
+            lowerCase = charSequence.toString().toLowerCase();
+            lowerCase2 = charSequence2.toString().toLowerCase();
         } else {
-            toLowerCase = charSequence2.toString().toLowerCase();
-            toLowerCase2 = charSequence.toString().toLowerCase();
+            lowerCase = charSequence2.toString().toLowerCase();
+            lowerCase2 = charSequence.toString().toLowerCase();
         }
-        int length = (toLowerCase2.length() / 2) + 1;
-        String setOfMatchingCharacterWithin = getSetOfMatchingCharacterWithin(toLowerCase2, toLowerCase, length);
-        Object setOfMatchingCharacterWithin2 = getSetOfMatchingCharacterWithin(toLowerCase, toLowerCase2, length);
+        int length = (lowerCase2.length() / 2) + 1;
+        String setOfMatchingCharacterWithin = getSetOfMatchingCharacterWithin(lowerCase2, lowerCase, length);
+        String setOfMatchingCharacterWithin2 = getSetOfMatchingCharacterWithin(lowerCase, lowerCase2, length);
         if (setOfMatchingCharacterWithin.length() == 0 || setOfMatchingCharacterWithin2.length() == 0) {
             return 0.0d;
         }
         if (setOfMatchingCharacterWithin.length() != setOfMatchingCharacterWithin2.length()) {
             return 0.0d;
         }
-        return (((((double) setOfMatchingCharacterWithin2.length()) / ((double) toLowerCase.length())) + (((double) setOfMatchingCharacterWithin.length()) / ((double) toLowerCase2.length()))) + (((double) (setOfMatchingCharacterWithin.length() - transpositions(setOfMatchingCharacterWithin, setOfMatchingCharacterWithin2))) / ((double) setOfMatchingCharacterWithin.length()))) / 3.0d;
+        return (((((double) setOfMatchingCharacterWithin2.length()) / ((double) lowerCase.length())) + (((double) setOfMatchingCharacterWithin.length()) / ((double) lowerCase2.length()))) + (((double) (setOfMatchingCharacterWithin.length() - transpositions(setOfMatchingCharacterWithin, setOfMatchingCharacterWithin2))) / ((double) setOfMatchingCharacterWithin.length()))) / 3.0d;
     }
 
     public static int getFuzzyDistance(CharSequence charSequence, CharSequence charSequence2, Locale locale) {
@@ -2502,39 +2470,24 @@ public class StringUtils {
         } else if (locale == null) {
             throw new IllegalArgumentException("Locale must not be null");
         } else {
-            String toLowerCase = charSequence.toString().toLowerCase(locale);
-            String toLowerCase2 = charSequence2.toString().toLowerCase(locale);
+            String lowerCase = charSequence.toString().toLowerCase(locale);
+            String lowerCase2 = charSequence2.toString().toLowerCase(locale);
             int i = Integer.MIN_VALUE;
             int i2 = 0;
             int i3 = 0;
-            for (int i4 = 0; i4 < toLowerCase2.length(); i4++) {
-                char charAt = toLowerCase2.charAt(i4);
-                Object obj = null;
-                while (i2 < toLowerCase.length() && obj == null) {
-                    int i5;
-                    Object obj2;
-                    Object obj3;
-                    if (charAt == toLowerCase.charAt(i2)) {
+            for (int i4 = 0; i4 < lowerCase2.length(); i4++) {
+                char charAt = lowerCase2.charAt(i4);
+                boolean z = false;
+                while (i2 < lowerCase.length() && !z) {
+                    if (charAt == lowerCase.charAt(i2)) {
                         i3++;
                         if (i + 1 == i2) {
-                            i = i3 + 2;
-                        } else {
-                            i = i3;
+                            i3 += 2;
                         }
-                        i3 = i2;
-                        i5 = i;
-                        obj2 = 1;
-                    } else {
-                        obj3 = obj;
-                        i5 = i3;
-                        i3 = i;
-                        obj2 = obj3;
+                        z = true;
+                        i = i2;
                     }
                     i2++;
-                    obj3 = obj2;
-                    i = i3;
-                    i3 = i5;
-                    obj = obj3;
                 }
             }
             return i3;
@@ -2542,36 +2495,41 @@ public class StringUtils {
     }
 
     private static String getSetOfMatchingCharacterWithin(CharSequence charSequence, CharSequence charSequence2, int i) {
-        StringBuilder stringBuilder = new StringBuilder();
-        StringBuilder stringBuilder2 = new StringBuilder(charSequence2);
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder(charSequence2);
         int i2 = 0;
         while (i2 < charSequence.length()) {
             char charAt = charSequence.charAt(i2);
             int max = Math.max(0, i2 - i);
-            int i3 = 0;
-            while (i3 == 0 && max < Math.min(i2 + i, charSequence2.length())) {
-                if (stringBuilder2.charAt(max) == charAt) {
-                    i3 = 1;
-                    stringBuilder.append(charAt);
-                    stringBuilder2.setCharAt(max, '*');
+            boolean z = false;
+            while (!z && max < Math.min(i2 + i, charSequence2.length())) {
+                if (sb2.charAt(max) == charAt) {
+                    z = true;
+                    sb.append(charAt);
+                    sb2.setCharAt(max, '*');
                 }
                 max++;
             }
             i2++;
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private static int transpositions(CharSequence charSequence, CharSequence charSequence2) {
         int i = 0;
         int i2 = 0;
-        while (i < charSequence.length()) {
-            if (charSequence.charAt(i) != charSequence2.charAt(i)) {
-                i2++;
+        while (true) {
+            int i3 = i;
+            if (i2 >= charSequence.length()) {
+                return i3 / 2;
             }
-            i++;
+            if (charSequence.charAt(i2) != charSequence2.charAt(i2)) {
+                i = i3 + 1;
+            } else {
+                i = i3;
+            }
+            i2++;
         }
-        return i2 / 2;
     }
 
     private static int commonPrefixLength(CharSequence charSequence, CharSequence charSequence2) {
@@ -2637,44 +2595,40 @@ public class StringUtils {
     }
 
     public static String normalizeSpace(String str) {
+        int i;
         if (isEmpty(str)) {
             return str;
         }
         int length = str.length();
         char[] cArr = new char[length];
-        int i = 0;
-        int i2 = 1;
+        int i2 = 0;
+        boolean z = true;
         int i3 = 0;
         int i4 = 0;
-        while (i < length) {
-            int i5;
-            char charAt = str.charAt(i);
-            if (Character.isWhitespace(charAt)) {
-                if (i3 == 0 && i2 == 0) {
-                    i5 = i4 + 1;
-                    cArr[i4] = " ".charAt(0);
-                } else {
-                    i5 = i4;
-                }
-                i4 = i3 + 1;
-                int i6 = i2;
-                i2 = i5;
-                i5 = i6;
-            } else {
-                i2 = i4 + 1;
-                if (charAt == ' ') {
+        while (i2 < length) {
+            char charAt = str.charAt(i2);
+            if (!Character.isWhitespace(charAt)) {
+                int i5 = i4 + 1;
+                if (charAt == 160) {
                     charAt = ' ';
                 }
                 cArr[i4] = charAt;
-                i5 = 0;
-                i4 = 0;
+                z = false;
+                i3 = 0;
+                i = i5;
+            } else {
+                if (i3 != 0 || z) {
+                    i = i4;
+                } else {
+                    i = i4 + 1;
+                    cArr[i4] = " ".charAt(0);
+                }
+                i3++;
             }
-            i++;
-            i3 = i4;
-            i4 = i2;
-            i2 = i5;
+            i2++;
+            i4 = i;
         }
-        if (i2 != 0) {
+        if (z) {
             return "";
         }
         return new String(cArr, 0, i4 - (i3 > 0 ? 1 : 0));
@@ -2749,7 +2703,7 @@ public class StringUtils {
     }
 
     public static String wrap(String str, char c) {
-        return (isEmpty(str) || c == '\u0000') ? str : c + str + c;
+        return (isEmpty(str) || c == 0) ? str : c + str + c;
     }
 
     public static String wrap(String str, String str2) {

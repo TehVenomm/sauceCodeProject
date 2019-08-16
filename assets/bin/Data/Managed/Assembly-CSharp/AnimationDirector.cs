@@ -2,7 +2,7 @@ using rhyme;
 using System;
 using UnityEngine;
 
-public class AnimationDirector
+public class AnimationDirector : MonoBehaviour
 {
 	public const string TAG = "Direction";
 
@@ -47,10 +47,6 @@ public class AnimationDirector
 
 	public void __FUNCTION__InstantiatePrefab(string game_object_name)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Expected O, but got Unknown
 		GameObject val = GameObject.Find(game_object_name);
 		if (!(val == null))
 		{
@@ -64,8 +60,6 @@ public class AnimationDirector
 
 	public void __FUNCTION__PlayAudio(string game_object_name)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
 		GameObject val = GameObject.Find(game_object_name);
 		if (!(val == null))
 		{
@@ -93,8 +87,7 @@ public class AnimationDirector
 
 	protected Transform CreateEffect(GameObject effect_prefab, Transform parent)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(effect_prefab, parent, -1);
+		Transform val = ResourceUtility.Realizes(effect_prefab, parent);
 		if (val == null)
 		{
 			return null;
@@ -111,12 +104,22 @@ public class AnimationDirector
 		return val;
 	}
 
+	protected virtual void OnEnable()
+	{
+		I = this;
+	}
+
+	protected virtual void OnDisable()
+	{
+		if (I == this)
+		{
+			I = null;
+		}
+	}
+
 	protected virtual void Awake()
 	{
-		if (I == null)
-		{
-			I = this;
-		}
+		I = this;
 		_animator = this.GetComponent<Animator>();
 		if (MonoBehaviourSingleton<AppMain>.IsValid() && useCamera != null)
 		{
@@ -133,7 +136,7 @@ public class AnimationDirector
 		if (!AppMain.isApplicationQuit)
 		{
 			isDestroy = true;
-			SetLinkCamera(false);
+			SetLinkCamera(is_link: false);
 			if (I == this)
 			{
 				I = null;
@@ -150,26 +153,33 @@ public class AnimationDirector
 		_animator.Update(0f);
 	}
 
+	public void SetAnimatorInteger(string name, int value)
+	{
+		_animator.SetInteger(name, value);
+	}
+
 	protected virtual void Update()
 	{
 		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		if (!(_animator == null))
+		if (_animator == null)
 		{
-			_animator.set_speed((!skip) ? 1f : 10000f);
-			if (playingStateHash != 0)
+			return;
+		}
+		_animator.set_speed((!skip) ? 1f : 10000f);
+		if (playingStateHash == 0)
+		{
+			return;
+		}
+		AnimatorStateInfo currentAnimatorStateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+		if (currentAnimatorStateInfo.get_fullPathHash() == playingStateHash && currentAnimatorStateInfo.get_normalizedTime() >= 1f)
+		{
+			playingStateHash = 0;
+			if (endCallback != null)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == playingStateHash && currentAnimatorStateInfo.get_normalizedTime() >= 1f)
-				{
-					playingStateHash = 0;
-					if (endCallback != null)
-					{
-						Action action = endCallback;
-						endCallback = null;
-						action();
-					}
-				}
+				Action action = endCallback;
+				endCallback = null;
+				action();
 			}
 		}
 	}
@@ -184,11 +194,6 @@ public class AnimationDirector
 
 	public void SetLinkCamera(bool is_link)
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Expected O, but got Unknown
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Expected O, but got Unknown
 		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
@@ -201,50 +206,48 @@ public class AnimationDirector
 		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		if (!(useCamera == null) && linkCamera != is_link)
+		if (useCamera == null || linkCamera == is_link)
 		{
-			linkCamera = is_link;
-			if (is_link)
+			return;
+		}
+		linkCamera = is_link;
+		if (is_link)
+		{
+			if (saveCameraParams == null)
 			{
-				if (saveCameraParams == null)
-				{
-					saveCameraParamsObject = Utility.CreateGameObject("saveCameraParams", this.get_transform(), -1);
-					saveCameraParams = saveCameraParamsObject.get_gameObject().AddComponent<Camera>();
-				}
-				Transform val = this.get_transform();
-				Vector3 position = val.get_position();
-				Quaternion rotation = val.get_rotation();
-				saveCameraParams.CopyFrom(MonoBehaviourSingleton<AppMain>.I.mainCamera);
-				saveCameraPos = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position();
-				saveCameraRot = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation();
-				val.set_position(position);
-				val.set_rotation(rotation);
-				saveCameraParams.set_enabled(false);
-				if (fader != null)
-				{
-					fader.SetActive(true);
-				}
+				saveCameraParamsObject = Utility.CreateGameObject("saveCameraParams", this.get_transform());
+				saveCameraParams = saveCameraParamsObject.get_gameObject().AddComponent<Camera>();
 			}
-			else
+			Transform transform = this.get_transform();
+			Vector3 position = transform.get_position();
+			Quaternion rotation = transform.get_rotation();
+			saveCameraParams.CopyFrom(MonoBehaviourSingleton<AppMain>.I.mainCamera);
+			saveCameraPos = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position();
+			saveCameraRot = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation();
+			transform.set_position(position);
+			transform.set_rotation(rotation);
+			saveCameraParams.set_enabled(false);
+			if (fader != null)
 			{
-				if (saveCameraParams != null)
-				{
-					MonoBehaviourSingleton<AppMain>.I.mainCamera.CopyFrom(saveCameraParams);
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(saveCameraPos);
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(saveCameraRot);
-					if (!isDestroy)
-					{
-						Object.DestroyImmediate(saveCameraParamsObject.get_gameObject());
-					}
-					saveCameraParamsObject = null;
-					saveCameraParams = null;
-				}
-				if (fader != null)
-				{
-					fader.SetActive(false);
-				}
+				fader.SetActive(true);
 			}
+			return;
+		}
+		if (saveCameraParams != null)
+		{
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.CopyFrom(saveCameraParams);
+			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(saveCameraPos);
+			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(saveCameraRot);
+			if (!isDestroy)
+			{
+				Object.DestroyImmediate(saveCameraParamsObject.get_gameObject());
+			}
+			saveCameraParamsObject = null;
+			saveCameraParams = null;
+		}
+		if (fader != null)
+		{
+			fader.SetActive(false);
 		}
 	}
 
@@ -264,6 +267,6 @@ public class AnimationDirector
 
 	public virtual void Reset()
 	{
-		SetLinkCamera(false);
+		SetLinkCamera(is_link: false);
 	}
 }

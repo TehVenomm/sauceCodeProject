@@ -21,8 +21,8 @@ public class QuestResultUserCollection
 		{
 			get
 			{
-				bool? nullable = is_follow_enable;
-				return nullable.HasValue && is_follow_enable == true;
+				bool? flag = is_follow_enable;
+				return flag.HasValue && is_follow_enable == true;
 			}
 		}
 
@@ -119,7 +119,7 @@ public class QuestResultUserCollection
 		{
 			follow.success.ForEach(delegate(int id)
 			{
-				GetUserInfo(id)?.SetFollowEnable(false);
+				GetUserInfo(id)?.SetFollowEnable(is_enable: false);
 			});
 		}
 	}
@@ -128,7 +128,7 @@ public class QuestResultUserCollection
 	{
 		if (list != null && list.Count > 0 && unfollow.success != 0)
 		{
-			GetUserInfo(user_id)?.SetFollowEnable(true);
+			GetUserInfo(user_id)?.SetFollowEnable(is_enable: true);
 		}
 	}
 
@@ -136,7 +136,7 @@ public class QuestResultUserCollection
 	{
 		if (list != null && list.Count > 0)
 		{
-			GetUserInfo(user_id)?.SetFollowEnable(true);
+			GetUserInfo(user_id)?.SetFollowEnable(is_enable: true);
 		}
 	}
 

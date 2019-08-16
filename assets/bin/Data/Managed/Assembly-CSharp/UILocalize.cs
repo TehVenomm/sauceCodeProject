@@ -1,9 +1,9 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Localize")]
 [RequireComponent(typeof(UIWidget))]
-public class UILocalize
+[AddComponentMenu("NGUI/UI/Localize")]
+public class UILocalize : MonoBehaviour
 {
 	public string key;
 
@@ -13,38 +13,34 @@ public class UILocalize
 	{
 		set
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Expected O, but got Unknown
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			if (!string.IsNullOrEmpty(value))
+			if (string.IsNullOrEmpty(value))
 			{
-				UIWidget component = this.GetComponent<UIWidget>();
-				UILabel uILabel = component as UILabel;
-				UISprite uISprite = component as UISprite;
-				if (uILabel != null)
+				return;
+			}
+			UIWidget component = this.GetComponent<UIWidget>();
+			UILabel uILabel = component as UILabel;
+			UISprite uISprite = component as UISprite;
+			if (uILabel != null)
+			{
+				UIInput uIInput = NGUITools.FindInParents<UIInput>(uILabel.get_gameObject());
+				if (uIInput != null && uIInput.label == uILabel)
 				{
-					UIInput uIInput = NGUITools.FindInParents<UIInput>(uILabel.get_gameObject());
-					if (uIInput != null && uIInput.label == uILabel)
-					{
-						uIInput.defaultText = value;
-					}
-					else
-					{
-						uILabel.SetTextOnly(value);
-					}
+					uIInput.defaultText = value;
 				}
-				else if (uISprite != null)
+				else
 				{
-					UIButton uIButton = NGUITools.FindInParents<UIButton>(uISprite.get_gameObject());
-					if (uIButton != null && uIButton.tweenTarget == uISprite.get_gameObject())
-					{
-						uIButton.normalSprite = value;
-					}
-					uISprite.spriteName = value;
-					uISprite.MakePixelPerfect();
+					uILabel.SetTextOnly(value);
 				}
+			}
+			else if (uISprite != null)
+			{
+				UIButton uIButton = NGUITools.FindInParents<UIButton>(uISprite.get_gameObject());
+				if (uIButton != null && uIButton.tweenTarget == uISprite.get_gameObject())
+				{
+					uIButton.normalSprite = value;
+				}
+				uISprite.spriteName = value;
+				uISprite.MakePixelPerfect();
 			}
 		}
 	}
@@ -70,20 +66,21 @@ public class UILocalize
 
 	private void OnLocalize()
 	{
-		if (Localization.dictionary.ContainsKey(key))
+		if (!Localization.dictionary.ContainsKey(key))
 		{
-			if (string.IsNullOrEmpty(key))
+			return;
+		}
+		if (string.IsNullOrEmpty(key))
+		{
+			UILabel component = this.GetComponent<UILabel>();
+			if (component != null)
 			{
-				UILabel component = this.GetComponent<UILabel>();
-				if (component != null)
-				{
-					key = component.text;
-				}
+				key = component.text;
 			}
-			if (!string.IsNullOrEmpty(key))
-			{
-				value = Localization.Get(key);
-			}
+		}
+		if (!string.IsNullOrEmpty(key))
+		{
+			value = Localization.Get(key);
 		}
 	}
 }

@@ -27,9 +27,9 @@ public class UnwrappedPropertyHandler {
     }
 
     public UnwrappedPropertyHandler renameAll(NameTransformer nameTransformer) {
-        List arrayList = new ArrayList(this._properties.size());
+        ArrayList arrayList = new ArrayList(this._properties.size());
         for (SettableBeanProperty settableBeanProperty : this._properties) {
-            Object withSimpleName = settableBeanProperty.withSimpleName(nameTransformer.transform(settableBeanProperty.getName()));
+            SettableBeanProperty withSimpleName = settableBeanProperty.withSimpleName(nameTransformer.transform(settableBeanProperty.getName()));
             JsonDeserializer valueDeserializer = withSimpleName.getValueDeserializer();
             if (valueDeserializer != null) {
                 JsonDeserializer unwrappingDeserializer = valueDeserializer.unwrappingDeserializer(nameTransformer);

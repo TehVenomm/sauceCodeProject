@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MaterialInfoButton
+public class MaterialInfoButton : MonoBehaviour
 {
 	private Transform parentButton;
 
@@ -21,9 +21,6 @@ public class MaterialInfoButton
 
 	public static void Set(Transform icon, Transform material_info, REWARD_TYPE reward_type, uint id, string section_name, Transform parentScroll)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
 		UIButton componentInChildren = icon.GetComponentInChildren<UIButton>();
 		if (!(componentInChildren == null))
 		{
@@ -45,7 +42,7 @@ public class MaterialInfoButton
 	{
 		if (!isOver && touched)
 		{
-			Send(false);
+			Send(is_touch: false);
 		}
 	}
 
@@ -58,7 +55,7 @@ public class MaterialInfoButton
 	{
 		if (!AppMain.isApplicationQuit && touched)
 		{
-			Send(false);
+			Send(is_touch: false);
 		}
 	}
 

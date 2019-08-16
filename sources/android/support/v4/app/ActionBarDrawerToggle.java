@@ -1,9 +1,10 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
-import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -11,21 +12,27 @@ import android.graphics.drawable.Drawable.Callback;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Build.VERSION;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.DrawerLayout.DrawerListener;
+import android.support.p000v4.content.ContextCompat;
+import android.support.p000v4.view.GravityCompat;
+import android.support.p000v4.view.ViewCompat;
+import android.support.p000v4.widget.DrawerLayout;
+import android.support.p000v4.widget.DrawerLayout.DrawerListener;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import java.lang.reflect.Method;
 
 @Deprecated
+/* renamed from: android.support.v4.app.ActionBarDrawerToggle */
 public class ActionBarDrawerToggle implements DrawerListener {
     private static final int ID_HOME = 16908332;
-    private static final ActionBarDrawerToggleImpl IMPL;
+    private static final String TAG = "ActionBarDrawerToggle";
+    private static final int[] THEME_ATTRS = {16843531};
     private static final float TOGGLE_DRAWABLE_OFFSET = 0.33333334f;
     final Activity mActivity;
     private final Delegate mActivityImpl;
@@ -37,72 +44,11 @@ public class ActionBarDrawerToggle implements DrawerListener {
     private boolean mHasCustomUpIndicator;
     private Drawable mHomeAsUpIndicator;
     private final int mOpenDrawerContentDescRes;
-    private Object mSetIndicatorInfo;
+    private SetIndicatorInfo mSetIndicatorInfo;
     private SlideDrawable mSlider;
 
-    private interface ActionBarDrawerToggleImpl {
-        Drawable getThemeUpIndicator(Activity activity);
-
-        Object setActionBarDescription(Object obj, Activity activity, int i);
-
-        Object setActionBarUpIndicator(Object obj, Activity activity, Drawable drawable, int i);
-    }
-
-    private static class ActionBarDrawerToggleImplBase implements ActionBarDrawerToggleImpl {
-        ActionBarDrawerToggleImplBase() {
-        }
-
-        public Drawable getThemeUpIndicator(Activity activity) {
-            return null;
-        }
-
-        public Object setActionBarDescription(Object obj, Activity activity, int i) {
-            return obj;
-        }
-
-        public Object setActionBarUpIndicator(Object obj, Activity activity, Drawable drawable, int i) {
-            return obj;
-        }
-    }
-
-    @RequiresApi(11)
-    @TargetApi(11)
-    private static class ActionBarDrawerToggleImplHC implements ActionBarDrawerToggleImpl {
-        ActionBarDrawerToggleImplHC() {
-        }
-
-        public Drawable getThemeUpIndicator(Activity activity) {
-            return ActionBarDrawerToggleHoneycomb.getThemeUpIndicator(activity);
-        }
-
-        public Object setActionBarDescription(Object obj, Activity activity, int i) {
-            return ActionBarDrawerToggleHoneycomb.setActionBarDescription(obj, activity, i);
-        }
-
-        public Object setActionBarUpIndicator(Object obj, Activity activity, Drawable drawable, int i) {
-            return ActionBarDrawerToggleHoneycomb.setActionBarUpIndicator(obj, activity, drawable, i);
-        }
-    }
-
-    @RequiresApi(18)
-    @TargetApi(18)
-    private static class ActionBarDrawerToggleImplJellybeanMR2 implements ActionBarDrawerToggleImpl {
-        ActionBarDrawerToggleImplJellybeanMR2() {
-        }
-
-        public Drawable getThemeUpIndicator(Activity activity) {
-            return ActionBarDrawerToggleJellybeanMR2.getThemeUpIndicator(activity);
-        }
-
-        public Object setActionBarDescription(Object obj, Activity activity, int i) {
-            return ActionBarDrawerToggleJellybeanMR2.setActionBarDescription(obj, activity, i);
-        }
-
-        public Object setActionBarUpIndicator(Object obj, Activity activity, Drawable drawable, int i) {
-            return ActionBarDrawerToggleJellybeanMR2.setActionBarUpIndicator(obj, activity, drawable, i);
-        }
-    }
-
+    @Deprecated
+    /* renamed from: android.support.v4.app.ActionBarDrawerToggle$Delegate */
     public interface Delegate {
         @Nullable
         Drawable getThemeUpIndicator();
@@ -112,11 +58,43 @@ public class ActionBarDrawerToggle implements DrawerListener {
         void setActionBarUpIndicator(Drawable drawable, @StringRes int i);
     }
 
+    @Deprecated
+    /* renamed from: android.support.v4.app.ActionBarDrawerToggle$DelegateProvider */
     public interface DelegateProvider {
         @Nullable
         Delegate getDrawerToggleDelegate();
     }
 
+    /* renamed from: android.support.v4.app.ActionBarDrawerToggle$SetIndicatorInfo */
+    private static class SetIndicatorInfo {
+        Method mSetHomeActionContentDescription;
+        Method mSetHomeAsUpIndicator;
+        ImageView mUpIndicatorView;
+
+        SetIndicatorInfo(Activity activity) {
+            try {
+                this.mSetHomeAsUpIndicator = ActionBar.class.getDeclaredMethod("setHomeAsUpIndicator", new Class[]{Drawable.class});
+                this.mSetHomeActionContentDescription = ActionBar.class.getDeclaredMethod("setHomeActionContentDescription", new Class[]{Integer.TYPE});
+            } catch (NoSuchMethodException e) {
+                View findViewById = activity.findViewById(ActionBarDrawerToggle.ID_HOME);
+                if (findViewById != null) {
+                    ViewGroup viewGroup = (ViewGroup) findViewById.getParent();
+                    if (viewGroup.getChildCount() == 2) {
+                        View childAt = viewGroup.getChildAt(0);
+                        View childAt2 = viewGroup.getChildAt(1);
+                        if (childAt.getId() != ActionBarDrawerToggle.ID_HOME) {
+                            childAt2 = childAt;
+                        }
+                        if (childAt2 instanceof ImageView) {
+                            this.mUpIndicatorView = (ImageView) childAt2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* renamed from: android.support.v4.app.ActionBarDrawerToggle$SlideDrawable */
     private class SlideDrawable extends InsetDrawable implements Callback {
         private final boolean mHasMirroring;
         private float mOffset;
@@ -135,17 +113,17 @@ public class ActionBarDrawerToggle implements DrawerListener {
             this.mTmpRect = new Rect();
         }
 
-        public void draw(Canvas canvas) {
+        public void draw(@NonNull Canvas canvas) {
             int i = 1;
             copyBounds(this.mTmpRect);
             canvas.save();
-            int i2 = ViewCompat.getLayoutDirection(this.this$0.mActivity.getWindow().getDecorView()) == 1 ? 1 : 0;
-            if (i2 != 0) {
+            boolean z = ViewCompat.getLayoutDirection(this.this$0.mActivity.getWindow().getDecorView()) == 1;
+            if (z) {
                 i = -1;
             }
             int width = this.mTmpRect.width();
-            canvas.translate(((float) i) * (((-this.mOffset) * ((float) width)) * this.mPosition), 0.0f);
-            if (!(i2 == 0 || this.mHasMirroring)) {
+            canvas.translate(((float) i) * (-this.mOffset) * ((float) width) * this.mPosition, 0.0f);
+            if (z && !this.mHasMirroring) {
                 canvas.translate((float) width, 0.0f);
                 canvas.scale(-1.0f, 1.0f);
             }
@@ -165,17 +143,6 @@ public class ActionBarDrawerToggle implements DrawerListener {
         public void setPosition(float f) {
             this.mPosition = f;
             invalidateSelf();
-        }
-    }
-
-    static {
-        int i = VERSION.SDK_INT;
-        if (i >= 18) {
-            IMPL = new ActionBarDrawerToggleImplJellybeanMR2();
-        } else if (i >= 11) {
-            IMPL = new ActionBarDrawerToggleImplHC();
-        } else {
-            IMPL = new ActionBarDrawerToggleImplBase();
         }
     }
 
@@ -205,8 +172,74 @@ public class ActionBarDrawerToggle implements DrawerListener {
         return context.getApplicationInfo().targetSdkVersion >= 21 && VERSION.SDK_INT >= 21;
     }
 
-    Drawable getThemeUpIndicator() {
-        return this.mActivityImpl != null ? this.mActivityImpl.getThemeUpIndicator() : IMPL.getThemeUpIndicator(this.mActivity);
+    private Drawable getThemeUpIndicator() {
+        if (this.mActivityImpl != null) {
+            return this.mActivityImpl.getThemeUpIndicator();
+        }
+        if (VERSION.SDK_INT >= 18) {
+            ActionBar actionBar = this.mActivity.getActionBar();
+            TypedArray obtainStyledAttributes = (actionBar != null ? actionBar.getThemedContext() : this.mActivity).obtainStyledAttributes(null, THEME_ATTRS, 16843470, 0);
+            Drawable drawable = obtainStyledAttributes.getDrawable(0);
+            obtainStyledAttributes.recycle();
+            return drawable;
+        }
+        TypedArray obtainStyledAttributes2 = this.mActivity.obtainStyledAttributes(THEME_ATTRS);
+        Drawable drawable2 = obtainStyledAttributes2.getDrawable(0);
+        obtainStyledAttributes2.recycle();
+        return drawable2;
+    }
+
+    private void setActionBarDescription(int i) {
+        if (this.mActivityImpl != null) {
+            this.mActivityImpl.setActionBarDescription(i);
+        } else if (VERSION.SDK_INT >= 18) {
+            ActionBar actionBar = this.mActivity.getActionBar();
+            if (actionBar != null) {
+                actionBar.setHomeActionContentDescription(i);
+            }
+        } else {
+            if (this.mSetIndicatorInfo == null) {
+                this.mSetIndicatorInfo = new SetIndicatorInfo(this.mActivity);
+            }
+            if (this.mSetIndicatorInfo.mSetHomeAsUpIndicator != null) {
+                try {
+                    ActionBar actionBar2 = this.mActivity.getActionBar();
+                    this.mSetIndicatorInfo.mSetHomeActionContentDescription.invoke(actionBar2, new Object[]{Integer.valueOf(i)});
+                    actionBar2.setSubtitle(actionBar2.getSubtitle());
+                } catch (Exception e) {
+                    Log.w(TAG, "Couldn't set content description via JB-MR2 API", e);
+                }
+            }
+        }
+    }
+
+    private void setActionBarUpIndicator(Drawable drawable, int i) {
+        if (this.mActivityImpl != null) {
+            this.mActivityImpl.setActionBarUpIndicator(drawable, i);
+        } else if (VERSION.SDK_INT >= 18) {
+            ActionBar actionBar = this.mActivity.getActionBar();
+            if (actionBar != null) {
+                actionBar.setHomeAsUpIndicator(drawable);
+                actionBar.setHomeActionContentDescription(i);
+            }
+        } else {
+            if (this.mSetIndicatorInfo == null) {
+                this.mSetIndicatorInfo = new SetIndicatorInfo(this.mActivity);
+            }
+            if (this.mSetIndicatorInfo.mSetHomeAsUpIndicator != null) {
+                try {
+                    ActionBar actionBar2 = this.mActivity.getActionBar();
+                    this.mSetIndicatorInfo.mSetHomeAsUpIndicator.invoke(actionBar2, new Object[]{drawable});
+                    this.mSetIndicatorInfo.mSetHomeActionContentDescription.invoke(actionBar2, new Object[]{Integer.valueOf(i)});
+                } catch (Exception e) {
+                    Log.w(TAG, "Couldn't set home-as-up indicator via JB-MR2 API", e);
+                }
+            } else if (this.mSetIndicatorInfo.mUpIndicatorView != null) {
+                this.mSetIndicatorInfo.mUpIndicatorView.setImageDrawable(drawable);
+            } else {
+                Log.w(TAG, "Couldn't set home-as-up indicator");
+            }
+        }
     }
 
     public boolean isDrawerIndicatorEnabled() {
@@ -253,22 +286,6 @@ public class ActionBarDrawerToggle implements DrawerListener {
             this.mDrawerLayout.openDrawer((int) GravityCompat.START);
         }
         return true;
-    }
-
-    void setActionBarDescription(int i) {
-        if (this.mActivityImpl != null) {
-            this.mActivityImpl.setActionBarDescription(i);
-        } else {
-            this.mSetIndicatorInfo = IMPL.setActionBarDescription(this.mSetIndicatorInfo, this.mActivity, i);
-        }
-    }
-
-    void setActionBarUpIndicator(Drawable drawable, int i) {
-        if (this.mActivityImpl != null) {
-            this.mActivityImpl.setActionBarUpIndicator(drawable, i);
-        } else {
-            this.mSetIndicatorInfo = IMPL.setActionBarUpIndicator(this.mSetIndicatorInfo, this.mActivity, drawable, i);
-        }
     }
 
     public void setDrawerIndicatorEnabled(boolean z) {

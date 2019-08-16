@@ -18,6 +18,10 @@ public class CheckRegisterModel : BaseModel
 
 		public bool sendAsset;
 
+		public bool termsCheck;
+
+		public string termsUpdateDay = string.Empty;
+
 		public bool recommendUpdate;
 	}
 

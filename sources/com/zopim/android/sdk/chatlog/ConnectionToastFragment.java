@@ -7,14 +7,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.p000v4.app.Fragment;
+import android.support.p000v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import com.zopim.android.sdk.anim.AnimatorPack;
 import com.zopim.android.sdk.anim.AnimatorPack.Direction;
 import com.zopim.android.sdk.api.ZopimChat;
@@ -24,14 +24,15 @@ import com.zopim.android.sdk.model.Connection;
 public class ConnectionToastFragment extends Fragment {
     private static final String LOG_TAG = ConnectionToastFragment.class.getSimpleName();
     private static final String STATE_SHOW_TOAST = "SHOW_TOAST";
-    ConnectionObserver mConnectionObserver = new C0858x(this);
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    ConnectionObserver mConnectionObserver = new C1227x(this);
+    /* access modifiers changed from: private */
+    public Handler mHandler = new Handler(Looper.getMainLooper());
     private TextView mMessageView;
-    private C0832a mToastListener;
+    private C1176a mToastListener;
     private View mToastView;
 
     /* renamed from: com.zopim.android.sdk.chatlog.ConnectionToastFragment$a */
-    interface C0832a {
+    interface C1176a {
         void onHideToast();
 
         void onShowToast();
@@ -69,22 +70,23 @@ public class ConnectionToastFragment extends Fragment {
         }
     }
 
-    private void updateToastView(Connection connection) {
+    /* access modifiers changed from: private */
+    public void updateToastView(Connection connection) {
         if (connection == null) {
             Log.w(LOG_TAG, "Connection must not be null. Can not update visibility.");
             return;
         }
-        switch (C0860z.f842a[connection.getStatus().ordinal()]) {
+        switch (C1229z.f886a[connection.getStatus().ordinal()]) {
             case 1:
-                this.mMessageView.setText(getResources().getString(C0785R.string.no_connectivity_toast_message));
+                this.mMessageView.setText(getResources().getString(C1122R.string.no_connectivity_toast_message));
                 showToast();
                 return;
             case 2:
-                this.mMessageView.setText(getResources().getString(C0785R.string.reconnecting_toast_message));
+                this.mMessageView.setText(getResources().getString(C1122R.string.reconnecting_toast_message));
                 showToast();
                 return;
             case 3:
-                this.mMessageView.setText(getResources().getString(C0785R.string.no_connectivity_toast_message));
+                this.mMessageView.setText(getResources().getString(C1122R.string.no_connectivity_toast_message));
                 showToast();
                 return;
             case 4:
@@ -97,11 +99,11 @@ public class ConnectionToastFragment extends Fragment {
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof C0832a) {
-            this.mToastListener = (C0832a) activity;
+        if (activity instanceof C1176a) {
+            this.mToastListener = (C1176a) activity;
         }
-        if (getParentFragment() instanceof C0832a) {
-            this.mToastListener = (C0832a) getParentFragment();
+        if (getParentFragment() instanceof C1176a) {
+            this.mToastListener = (C1176a) getParentFragment();
         }
     }
 
@@ -109,13 +111,13 @@ public class ConnectionToastFragment extends Fragment {
         super.onCreate(bundle);
         if (bundle == null) {
             FragmentTransaction beginTransaction = getChildFragmentManager().beginTransaction();
-            beginTransaction.add(new ConnectionFragment(), ConnectionFragment.class.getName());
+            beginTransaction.add((Fragment) new ConnectionFragment(), ConnectionFragment.class.getName());
             beginTransaction.commit();
         }
     }
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, @Nullable Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_toast_fragment, viewGroup, false);
+        return layoutInflater.inflate(C1122R.C1126layout.zopim_toast_fragment, viewGroup, false);
     }
 
     public void onDestroy() {
@@ -145,8 +147,8 @@ public class ConnectionToastFragment extends Fragment {
 
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
-        this.mToastView = view.findViewById(C0785R.id.network_no_connectivity);
-        this.mMessageView = (TextView) view.findViewById(C0785R.id.message_text);
+        this.mToastView = view.findViewById(C1122R.C1125id.network_no_connectivity);
+        this.mMessageView = (TextView) view.findViewById(C1122R.C1125id.message_text);
     }
 
     public void onViewStateRestored(@Nullable Bundle bundle) {

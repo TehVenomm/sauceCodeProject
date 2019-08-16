@@ -19,9 +19,12 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 		GRD_LIST,
 		TEX_MODEL,
 		STR_NON_LIST,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		OBJ_COMMENT,
 		LBL_COMMENT,
 		LBL_LAST_LOGIN,
@@ -46,19 +49,11 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 		OBJ_ROOMCONDITION,
 		OBJ_NOT_PROGRESSED,
 		LBL_SORT,
-		SPR_ICON_FIRST_MET,
-		OBJ_CANT_LOUNGE,
-		OBJ_IN_LOUNGE
+		LBL_SELECT_ALL,
+		BTN_CHECK_PAGE_ALL_ITEM
 	}
 
-	protected enum SORT_TYPE
-	{
-		NAME,
-		LEVEL,
-		LOGIN
-	}
-
-	private SORT_TYPE currentSortType;
+	protected const int LIST_ITEM_COUNT_PER_PAGE = 10;
 
 	protected PartyInviteCharaInfo[] inviteUsers;
 
@@ -66,6 +61,11 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 
 	public override void Initialize()
 	{
+		int mutualFollowerInviteListSortType = GameSaveData.instance.MutualFollowerInviteListSortType;
+		if (0 <= mutualFollowerInviteListSortType && mutualFollowerInviteListSortType < 5)
+		{
+			m_currentSortType = (USER_SORT_TYPE)mutualFollowerInviteListSortType;
+		}
 		base.Initialize();
 	}
 
@@ -73,93 +73,83 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 	{
 		UpdateListUI();
 		SetToggle((Enum)UI.TGL_OK, selectedUserIdList.Count > 0);
+		SetLabelText((Enum)UI.LBL_SELECT_ALL, (!IsContainsAllUserInPage()) ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 41u) : StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 40u));
+		SetActive((Enum)UI.BTN_CHECK_PAGE_ALL_ITEM, inviteUsers != null && inviteUsers.Length != 0);
 	}
 
-	public void UpdateListUI()
+	protected void UpdateListUI()
 	{
 		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
 		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		SetText((Enum)UI.LBL_SORT, "STR_SORT_" + currentSortType.ToString());
+		SetLabelText((Enum)UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
 		if (inviteUsers == null || inviteUsers.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, false);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_LIST, is_visible: false);
+			SetLabelText((Enum)UI.LBL_NOW, string.Format("{0}/{1}", "0", "0"));
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax > 1);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			return;
 		}
-		else
+		SetLabelText((Enum)UI.LBL_NOW, $"{nowPage + 1}/{pageNumMax}");
+		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax > 1);
+		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive((Enum)UI.GRD_LIST, is_visible: true);
+		int currentPageItemLength = GetCurrentPageItemLength();
+		PartyInviteCharaInfo[] currentList = new PartyInviteCharaInfo[currentPageItemLength];
+		for (int j = 0; j < currentPageItemLength; j++)
 		{
-			SetLabelText((Enum)UI.LBL_NOW, (nowPage + 1).ToString());
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, nowPage > 0);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
-			SetDynamicList((Enum)UI.GRD_LIST, "QuestInviteeSelectListItem", inviteUsers.Length, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
-			{
-				PartyInviteCharaInfo partyInviteCharaInfo = inviteUsers[i];
-				SetupListItem(partyInviteCharaInfo, i, t, is_recycle);
-				SetFollowStatus(t, partyInviteCharaInfo.userId, partyInviteCharaInfo.following, partyInviteCharaInfo.follower);
-				if (LoungeMatchingManager.IsValidInLounge())
-				{
-					SetActive(t, UI.SPR_ICON_FIRST_MET, MonoBehaviourSingleton<LoungeMatchingManager>.I.CheckFirstMet(partyInviteCharaInfo.userId));
-				}
-			});
+			currentList[j] = inviteUsers[nowPage * 10 + j];
 		}
+		SetDynamicList((Enum)UI.GRD_LIST, "QuestInviteeSelectListItem", currentPageItemLength, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		{
+			PartyInviteCharaInfo partyInviteCharaInfo = currentList[i];
+			SetupListItem(partyInviteCharaInfo, i, t, is_recycle);
+			string clanId = (partyInviteCharaInfo.userClanData == null) ? "0" : partyInviteCharaInfo.userClanData.cId;
+			SetFollowStatus(t, partyInviteCharaInfo.userId, partyInviteCharaInfo.following, partyInviteCharaInfo.follower, clanId);
+		});
 	}
 
-	protected void Sort()
+	protected int GetCurrentPageItemLength()
+	{
+		return (nowPage + 1 >= pageNumMax) ? Mathf.Clamp(inviteUsers.Length - nowPage * 10, 0, 10) : 10;
+	}
+
+	protected void SortArray()
 	{
 		if (inviteUsers != null && inviteUsers.Length != 0)
 		{
-			switch (currentSortType)
+			switch (m_currentSortType)
 			{
-			case SORT_TYPE.NAME:
-				Array.Sort(inviteUsers, (PartyInviteCharaInfo a, PartyInviteCharaInfo b) => string.Compare(a.name, b.name));
+			case USER_SORT_TYPE.NAME:
+				Array.Sort(inviteUsers, base.UserCompareByName<PartyInviteCharaInfo>);
 				break;
-			case SORT_TYPE.LEVEL:
-				Array.Sort(inviteUsers, (PartyInviteCharaInfo a, PartyInviteCharaInfo b) => (int)b.level - (int)a.level);
+			case USER_SORT_TYPE.LEVEL:
+				Array.Sort(inviteUsers, base.UserCompareByLevel<PartyInviteCharaInfo>);
 				break;
-			case SORT_TYPE.LOGIN:
-				Array.Sort(inviteUsers, (PartyInviteCharaInfo a, PartyInviteCharaInfo b) => b.lastLoginTm - a.lastLoginTm);
+			case USER_SORT_TYPE.LOGIN:
+				Array.Sort(inviteUsers, base.UserCompareByLoginTime<PartyInviteCharaInfo>);
+				break;
+			case USER_SORT_TYPE.PLAY_COUNT:
+				Array.Sort(inviteUsers, base.UserCompareByPlayCount<PartyInviteCharaInfo>);
+				break;
+			case USER_SORT_TYPE.REGISTER:
+				Array.Sort(inviteUsers, base.UserCompareByResistered<PartyInviteCharaInfo>);
 				break;
 			}
 		}
 	}
 
-	private void SetupListItem(PartyInviteCharaInfo info, int i, Transform t, bool is_recycle)
+	protected virtual void SetupListItem(PartyInviteCharaInfo info, int i, Transform t, bool is_recycle)
 	{
-		SetCharaInfo(info, i, t, is_recycle, false);
+		SetCharaInfo(info, i, t, is_recycle, isGM: false);
 		SetActive(t, UI.OBJ_DISABLE_USER_MASK, !info.canEntry || info.invite || selectedUserIdList.Contains(info.userId));
 		SetActive(t, UI.OBJ_INVITED, info.invite);
 		SetButtonEnabled(t, !info.invite && info.canEntry);
 		SetActive(t, UI.OBJ_SELECTED, selectedUserIdList.Contains(info.userId));
 		SetActive(t, UI.OBJ_NOT_PROGRESSED, !info.canEntry);
-		SetActive(t, UI.OBJ_ROOMCONDITION, false);
-		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "LoungeInviteFriend")
-		{
-			bool flag = (int)info.level < 15;
-			SetActive(t, UI.OBJ_CANT_LOUNGE, flag);
-			bool flag2 = false;
-			LoungeModel.Lounge loungeData = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData;
-			for (int j = 0; j < loungeData.slotInfos.Count; j++)
-			{
-				if (loungeData.slotInfos[j].userInfo != null && loungeData.slotInfos[j].userInfo.userId == info.userId)
-				{
-					flag2 = true;
-					break;
-				}
-			}
-			SetActive(t, UI.OBJ_IN_LOUNGE, flag2);
-			if (flag || flag2)
-			{
-				SetActive(t, UI.OBJ_INVITED, false);
-				SetActive(t, UI.OBJ_NOT_PROGRESSED, false);
-				SetActive(t, UI.OBJ_ROOMCONDITION, false);
-			}
-			SetButtonEnabled(t, !info.invite && info.canEntry && !flag2 && !flag);
-		}
+		SetActive(t, UI.OBJ_ROOMCONDITION, is_visible: false);
 	}
 
 	protected override void SendGetList(int page, Action<bool> callback)
@@ -168,10 +158,10 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 		{
 			if (is_success)
 			{
-				nowPage = 1;
-				pageNumMax = 1;
+				nowPage = 0;
+				pageNumMax = ((recv_data == null) ? 1 : Mathf.CeilToInt((float)recv_data.Length / 10f));
 				inviteUsers = recv_data;
-				Sort();
+				SortArray();
 			}
 			if (callback != null)
 			{
@@ -183,7 +173,12 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 	public override void OnQuery_FOLLOW_INFO()
 	{
 		int num = (int)GameSection.GetEventData();
-		PartyInviteCharaInfo partyInviteCharaInfo = inviteUsers[num];
+		int num2 = num + nowPage * 10;
+		if (num2 < 0 || num2 >= inviteUsers.Length)
+		{
+			return;
+		}
+		PartyInviteCharaInfo partyInviteCharaInfo = inviteUsers[num2];
 		if (partyInviteCharaInfo.canEntry)
 		{
 			if (selectedUserIdList.Contains(partyInviteCharaInfo.userId))
@@ -198,14 +193,11 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 		}
 	}
 
-	private void OnQuery_SORT()
+	protected override void OnQuery_SORT()
 	{
-		currentSortType++;
-		if ((int)currentSortType >= Enum.GetValues(typeof(SORT_TYPE)).Length)
-		{
-			currentSortType = SORT_TYPE.NAME;
-		}
-		Sort();
+		UpdateSortType();
+		GameSaveData.instance.SetMutualFollowerInviteListSortType((int)m_currentSortType);
+		SortArray();
 		RefreshUI();
 	}
 
@@ -214,7 +206,82 @@ public class QuestAcceptRoomInviteFriend : FollowListBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<PartyManager>.I.SendInvite(selectedUserIdList.ToArray(), delegate(bool is_success, int[] invited_users)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
+	}
+
+	protected new void OnQuery_PAGE_PREV()
+	{
+		nowPage = (nowPage - 1 + pageNumMax) % pageNumMax;
+		RefreshUI();
+	}
+
+	protected new void OnQuery_PAGE_NEXT()
+	{
+		nowPage = (nowPage + 1) % pageNumMax;
+		RefreshUI();
+	}
+
+	protected bool IsContainsAllUserInPage()
+	{
+		int currentPageItemLength = GetCurrentPageItemLength();
+		int num = nowPage * 10;
+		bool flag = false;
+		for (int i = 0; i < currentPageItemLength; i++)
+		{
+			PartyInviteCharaInfo partyInviteCharaInfo = inviteUsers[num + i];
+			if (IsEnableInvite(partyInviteCharaInfo) && !selectedUserIdList.Contains(partyInviteCharaInfo.userId))
+			{
+				flag = true;
+				break;
+			}
+		}
+		return !flag;
+	}
+
+	protected virtual bool IsEnableInvite(PartyInviteCharaInfo _info)
+	{
+		if (_info == null)
+		{
+			return false;
+		}
+		if (!_info.canEntry)
+		{
+			return false;
+		}
+		if (_info.invite)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	protected void OnQuery_CHECK_PAGE_ITEM()
+	{
+		int currentPageItemLength = GetCurrentPageItemLength();
+		int num = nowPage * 10;
+		if (!IsContainsAllUserInPage())
+		{
+			for (int i = 0; i < currentPageItemLength; i++)
+			{
+				PartyInviteCharaInfo partyInviteCharaInfo = inviteUsers[num + i];
+				if (IsEnableInvite(partyInviteCharaInfo) && !selectedUserIdList.Contains(partyInviteCharaInfo.userId))
+				{
+					selectedUserIdList.Add(partyInviteCharaInfo.userId);
+				}
+			}
+		}
+		else
+		{
+			for (int j = 0; j < currentPageItemLength; j++)
+			{
+				PartyInviteCharaInfo partyInviteCharaInfo2 = inviteUsers[num + j];
+				if (IsEnableInvite(partyInviteCharaInfo2) && selectedUserIdList.Contains(partyInviteCharaInfo2.userId))
+				{
+					selectedUserIdList.Remove(partyInviteCharaInfo2.userId);
+				}
+			}
+		}
+		RefreshUI();
 	}
 }

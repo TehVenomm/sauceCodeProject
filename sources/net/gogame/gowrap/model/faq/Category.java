@@ -16,6 +16,9 @@ public class Category {
     private String name;
     private List<Section> sections;
 
+    public Category() {
+    }
+
     public Category(String str, String str2, List<Section> list) {
         this.name = str;
         this.description = str2;

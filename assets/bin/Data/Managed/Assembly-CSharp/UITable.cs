@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Table")]
 public class UITable : UIWidgetContainer
 {
+	public delegate void OnReposition();
+
 	public enum Direction
 	{
 		Down,
@@ -19,8 +22,6 @@ public class UITable : UIWidgetContainer
 		Vertical,
 		Custom
 	}
-
-	public delegate void OnReposition();
 
 	public int columns;
 
@@ -48,6 +49,18 @@ public class UITable : UIWidgetContainer
 
 	protected bool mReposition;
 
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache3;
+
 	public bool repositionNow
 	{
 		set
@@ -62,20 +75,14 @@ public class UITable : UIWidgetContainer
 
 	public List<Transform> GetChildList()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Expected O, but got Unknown
-		Transform val = this.get_transform();
+		Transform transform = this.get_transform();
 		List<Transform> list = new List<Transform>();
-		for (int i = 0; i < val.get_childCount(); i++)
+		for (int i = 0; i < transform.get_childCount(); i++)
 		{
-			Transform val2 = val.GetChild(i);
-			if (!hideInactive || (Object.op_Implicit(val2) && NGUITools.GetActive(val2.get_gameObject())))
+			Transform child = transform.GetChild(i);
+			if (!hideInactive || (Object.op_Implicit(child) && NGUITools.GetActive(child.get_gameObject())))
 			{
-				list.Add(val2);
+				list.Add(child);
 			}
 		}
 		if (sorting != 0)
@@ -118,8 +125,6 @@ public class UITable : UIWidgetContainer
 
 	protected virtual void Init()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
 		mInitDone = true;
 		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
 	}
@@ -153,78 +158,72 @@ public class UITable : UIWidgetContainer
 		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
 		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0205: Unknown result type (might be due to invalid IL or missing references)
 		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
 		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0254: Unknown result type (might be due to invalid IL or missing references)
 		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
 		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0289: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0282: Unknown result type (might be due to invalid IL or missing references)
 		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
 		//IL_029f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0314: Unknown result type (might be due to invalid IL or missing references)
 		//IL_031f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0324: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0330: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0335: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0341: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0346: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0390: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0376: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0395: Unknown result type (might be due to invalid IL or missing references)
 		//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0409: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_040e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0411: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0416: Expected O, but got Unknown
-		//IL_0416: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0413: Unknown result type (might be due to invalid IL or missing references)
 		//IL_041b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0424: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0420: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0429: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0442: Unknown result type (might be due to invalid IL or missing references)
+		//IL_042e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046a: Expected O, but got Unknown
-		//IL_0478: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047d: Expected O, but got Unknown
-		//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
 		float num = 0f;
 		float num2 = 0f;
 		int num3 = (columns <= 0) ? 1 : (children.Count / columns + 1);
@@ -324,31 +323,34 @@ public class UITable : UIWidgetContainer
 				num2 = num20 + (size2.y + padding.y * 2f);
 			}
 		}
-		if (pivot != 0)
+		if (pivot == UIWidget.Pivot.TopLeft)
 		{
-			pivotOffset = NGUIMath.GetPivotOffset(pivot);
-			Bounds val7 = NGUIMath.CalculateRelativeWidgetBounds(this.get_transform());
-			Vector3 size3 = val7.get_size();
-			float num21 = Mathf.Lerp(0f, size3.x, pivotOffset.x);
-			Vector3 size4 = val7.get_size();
-			float num22 = Mathf.Lerp(0f - size4.y, 0f, pivotOffset.y);
-			Transform val8 = this.get_transform();
-			for (int k = 0; k < val8.get_childCount(); k++)
+			return;
+		}
+		pivotOffset = NGUIMath.GetPivotOffset(pivot);
+		Bounds val7 = NGUIMath.CalculateRelativeWidgetBounds(this.get_transform());
+		Vector3 size3 = val7.get_size();
+		float num21 = Mathf.Lerp(0f, size3.x, pivotOffset.x);
+		Vector3 size4 = val7.get_size();
+		float num22 = Mathf.Lerp(0f - size4.y, 0f, pivotOffset.y);
+		Transform transform = this.get_transform();
+		for (int k = 0; k < transform.get_childCount(); k++)
+		{
+			Transform child = transform.GetChild(k);
+			SpringPosition component = child.GetComponent<SpringPosition>();
+			if (component != null)
 			{
-				Transform val9 = val8.GetChild(k);
-				SpringPosition component = val9.GetComponent<SpringPosition>();
-				if (component != null)
-				{
-					component.target.x -= num21;
-					component.target.y -= num22;
-				}
-				else
-				{
-					Vector3 localPosition2 = val9.get_localPosition();
-					localPosition2.x -= num21;
-					localPosition2.y -= num22;
-					val9.set_localPosition(localPosition2);
-				}
+				ref Vector3 target = ref component.target;
+				target.x -= num21;
+				ref Vector3 target2 = ref component.target;
+				target2.y -= num22;
+			}
+			else
+			{
+				Vector3 localPosition2 = child.get_localPosition();
+				localPosition2.x -= num21;
+				localPosition2.y -= num22;
+				child.set_localPosition(localPosition2);
 			}
 		}
 	}
@@ -356,14 +358,12 @@ public class UITable : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public virtual void Reposition()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
 		if (Application.get_isPlaying() && !mInitDone && NGUITools.GetActive(this))
 		{
 			Init();
 		}
 		mReposition = false;
-		Transform target = this.get_transform();
+		Transform transform = this.get_transform();
 		List<Transform> childList = GetChildList();
 		if (childList.Count > 0)
 		{
@@ -371,11 +371,11 @@ public class UITable : UIWidgetContainer
 		}
 		if (keepWithinPanel && mPanel != null)
 		{
-			mPanel.ConstrainTargetToBounds(target, true);
+			mPanel.ConstrainTargetToBounds(transform, immediate: true);
 			UIScrollView component = mPanel.GetComponent<UIScrollView>();
 			if (component != null)
 			{
-				component.UpdateScrollbars(true);
+				component.UpdateScrollbars(recalculateBounds: true);
 			}
 		}
 		if (onReposition != null)

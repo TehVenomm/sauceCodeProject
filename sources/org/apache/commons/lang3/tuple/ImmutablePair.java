@@ -5,8 +5,9 @@ public final class ImmutablePair<L, R> extends Pair<L, R> {
     public final L left;
     public final R right;
 
-    public static <L, R> ImmutablePair<L, R> of(L l, R r) {
-        return new ImmutablePair(l, r);
+    /* renamed from: of */
+    public static <L, R> ImmutablePair<L, R> m1015of(L l, R r) {
+        return new ImmutablePair<>(l, r);
     }
 
     public ImmutablePair(L l, R r) {

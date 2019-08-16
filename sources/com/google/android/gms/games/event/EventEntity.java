@@ -4,52 +4,70 @@ import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.util.zzg;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.DataUtils;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayerEntity;
-import com.google.android.gms.games.internal.zzc;
-import java.util.Arrays;
+import com.google.android.gms.games.internal.zzd;
 
-public final class EventEntity extends zzc implements Event {
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "EventEntityCreator")
+@Reserved({1000})
+public final class EventEntity extends zzd implements Event {
     public static final Creator<EventEntity> CREATOR = new zza();
-    private final String mName;
-    private final boolean zzavq;
-    private final long zzdmy;
-    private final String zzdmz;
-    private final Uri zzhbd;
-    private final String zzhbo;
-    private final PlayerEntity zzhdr;
-    private final String zzhdw;
-    private final String zzhdx;
+    @Field(getter = "getDescription", mo13990id = 3)
+    private final String description;
+    @Field(getter = "getName", mo13990id = 2)
+    private final String name;
+    @Field(getter = "getValue", mo13990id = 7)
+    private final long value;
+    @Field(getter = "getIconImageUrl", mo13990id = 5)
+    private final String zzac;
+    @Field(getter = "getPlayer", mo13990id = 6)
+    private final PlayerEntity zzfj;
+    @Field(getter = "getEventId", mo13990id = 1)
+    private final String zzgl;
+    @Field(getter = "getFormattedValue", mo13990id = 8)
+    private final String zzgm;
+    @Field(getter = "isVisible", mo13990id = 9)
+    private final boolean zzgn;
+    @Field(getter = "getIconImageUri", mo13990id = 4)
+    private final Uri zzr;
 
     public EventEntity(Event event) {
-        this.zzhdw = event.getEventId();
-        this.mName = event.getName();
-        this.zzdmz = event.getDescription();
-        this.zzhbd = event.getIconImageUri();
-        this.zzhbo = event.getIconImageUrl();
-        this.zzhdr = (PlayerEntity) event.getPlayer().freeze();
-        this.zzdmy = event.getValue();
-        this.zzhdx = event.getFormattedValue();
-        this.zzavq = event.isVisible();
+        this.zzgl = event.getEventId();
+        this.name = event.getName();
+        this.description = event.getDescription();
+        this.zzr = event.getIconImageUri();
+        this.zzac = event.getIconImageUrl();
+        this.zzfj = (PlayerEntity) event.getPlayer().freeze();
+        this.value = event.getValue();
+        this.zzgm = event.getFormattedValue();
+        this.zzgn = event.isVisible();
     }
 
-    EventEntity(String str, String str2, String str3, Uri uri, String str4, Player player, long j, String str5, boolean z) {
-        this.zzhdw = str;
-        this.mName = str2;
-        this.zzdmz = str3;
-        this.zzhbd = uri;
-        this.zzhbo = str4;
-        this.zzhdr = new PlayerEntity(player);
-        this.zzdmy = j;
-        this.zzhdx = str5;
-        this.zzavq = z;
+    @Constructor
+    EventEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) String str2, @Param(mo13993id = 3) String str3, @Param(mo13993id = 4) Uri uri, @Param(mo13993id = 5) String str4, @Param(mo13993id = 6) Player player, @Param(mo13993id = 7) long j, @Param(mo13993id = 8) String str5, @Param(mo13993id = 9) boolean z) {
+        this.zzgl = str;
+        this.name = str2;
+        this.description = str3;
+        this.zzr = uri;
+        this.zzac = str4;
+        this.zzfj = new PlayerEntity(player);
+        this.value = j;
+        this.zzgm = str5;
+        this.zzgn = z;
     }
 
     static int zza(Event event) {
-        return Arrays.hashCode(new Object[]{event.getEventId(), event.getName(), event.getDescription(), event.getIconImageUri(), event.getIconImageUrl(), event.getPlayer(), Long.valueOf(event.getValue()), event.getFormattedValue(), Boolean.valueOf(event.isVisible())});
+        return Objects.hashCode(event.getEventId(), event.getName(), event.getDescription(), event.getIconImageUri(), event.getIconImageUrl(), event.getPlayer(), Long.valueOf(event.getValue()), event.getFormattedValue(), Boolean.valueOf(event.isVisible()));
     }
 
     static boolean zza(Event event, Object obj) {
@@ -60,11 +78,11 @@ public final class EventEntity extends zzc implements Event {
             return true;
         }
         Event event2 = (Event) obj;
-        return zzbf.equal(event2.getEventId(), event.getEventId()) && zzbf.equal(event2.getName(), event.getName()) && zzbf.equal(event2.getDescription(), event.getDescription()) && zzbf.equal(event2.getIconImageUri(), event.getIconImageUri()) && zzbf.equal(event2.getIconImageUrl(), event.getIconImageUrl()) && zzbf.equal(event2.getPlayer(), event.getPlayer()) && zzbf.equal(Long.valueOf(event2.getValue()), Long.valueOf(event.getValue())) && zzbf.equal(event2.getFormattedValue(), event.getFormattedValue()) && zzbf.equal(Boolean.valueOf(event2.isVisible()), Boolean.valueOf(event.isVisible()));
+        return Objects.equal(event2.getEventId(), event.getEventId()) && Objects.equal(event2.getName(), event.getName()) && Objects.equal(event2.getDescription(), event.getDescription()) && Objects.equal(event2.getIconImageUri(), event.getIconImageUri()) && Objects.equal(event2.getIconImageUrl(), event.getIconImageUrl()) && Objects.equal(event2.getPlayer(), event.getPlayer()) && Objects.equal(Long.valueOf(event2.getValue()), Long.valueOf(event.getValue())) && Objects.equal(event2.getFormattedValue(), event.getFormattedValue()) && Objects.equal(Boolean.valueOf(event2.isVisible()), Boolean.valueOf(event.isVisible()));
     }
 
     static String zzb(Event event) {
-        return zzbf.zzt(event).zzg("Id", event.getEventId()).zzg("Name", event.getName()).zzg("Description", event.getDescription()).zzg("IconImageUri", event.getIconImageUri()).zzg("IconImageUrl", event.getIconImageUrl()).zzg("Player", event.getPlayer()).zzg("Value", Long.valueOf(event.getValue())).zzg("FormattedValue", event.getFormattedValue()).zzg("isVisible", Boolean.valueOf(event.isVisible())).toString();
+        return Objects.toStringHelper(event).add("Id", event.getEventId()).add("Name", event.getName()).add("Description", event.getDescription()).add("IconImageUri", event.getIconImageUri()).add("IconImageUrl", event.getIconImageUrl()).add("Player", event.getPlayer()).add("Value", Long.valueOf(event.getValue())).add("FormattedValue", event.getFormattedValue()).add("isVisible", Boolean.valueOf(event.isVisible())).toString();
     }
 
     public final boolean equals(Object obj) {
@@ -76,47 +94,47 @@ public final class EventEntity extends zzc implements Event {
     }
 
     public final String getDescription() {
-        return this.zzdmz;
+        return this.description;
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzdmz, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.description, charArrayBuffer);
     }
 
     public final String getEventId() {
-        return this.zzhdw;
+        return this.zzgl;
     }
 
     public final String getFormattedValue() {
-        return this.zzhdx;
+        return this.zzgm;
     }
 
     public final void getFormattedValue(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzhdx, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.zzgm, charArrayBuffer);
     }
 
     public final Uri getIconImageUri() {
-        return this.zzhbd;
+        return this.zzr;
     }
 
     public final String getIconImageUrl() {
-        return this.zzhbo;
+        return this.zzac;
     }
 
     public final String getName() {
-        return this.mName;
+        return this.name;
     }
 
     public final void getName(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.mName, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.name, charArrayBuffer);
     }
 
     public final Player getPlayer() {
-        return this.zzhdr;
+        return this.zzfj;
     }
 
     public final long getValue() {
-        return this.zzdmy;
+        return this.value;
     }
 
     public final int hashCode() {
@@ -128,7 +146,7 @@ public final class EventEntity extends zzc implements Event {
     }
 
     public final boolean isVisible() {
-        return this.zzavq;
+        return this.zzgn;
     }
 
     public final String toString() {
@@ -136,16 +154,16 @@ public final class EventEntity extends zzc implements Event {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getEventId(), false);
-        zzd.zza(parcel, 2, getName(), false);
-        zzd.zza(parcel, 3, getDescription(), false);
-        zzd.zza(parcel, 4, getIconImageUri(), i, false);
-        zzd.zza(parcel, 5, getIconImageUrl(), false);
-        zzd.zza(parcel, 6, getPlayer(), i, false);
-        zzd.zza(parcel, 7, getValue());
-        zzd.zza(parcel, 8, getFormattedValue(), false);
-        zzd.zza(parcel, 9, isVisible());
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, getEventId(), false);
+        SafeParcelWriter.writeString(parcel, 2, getName(), false);
+        SafeParcelWriter.writeString(parcel, 3, getDescription(), false);
+        SafeParcelWriter.writeParcelable(parcel, 4, getIconImageUri(), i, false);
+        SafeParcelWriter.writeString(parcel, 5, getIconImageUrl(), false);
+        SafeParcelWriter.writeParcelable(parcel, 6, getPlayer(), i, false);
+        SafeParcelWriter.writeLong(parcel, 7, getValue());
+        SafeParcelWriter.writeString(parcel, 8, getFormattedValue(), false);
+        SafeParcelWriter.writeBoolean(parcel, 9, isVisible());
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

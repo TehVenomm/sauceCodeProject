@@ -1,10 +1,11 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
-import io.fabric.sdk.android.services.common.CommonUtils;
+import com.google.firebase.messaging.cpp.SerializedEventUnion;
 import java.security.MessageDigest;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+/* renamed from: jp.colopl.util.Crypto */
 public class Crypto {
     private static final String algorithm = "AES";
 
@@ -26,7 +27,7 @@ public class Crypto {
     }
 
     public static String encryptMD5(String str) throws Exception {
-        MessageDigest instance = MessageDigest.getInstance(CommonUtils.MD5_INSTANCE);
+        MessageDigest instance = MessageDigest.getInstance("MD5");
         instance.update(str.getBytes());
         return getHexString(instance.digest());
     }
@@ -45,7 +46,7 @@ public class Crypto {
     private static String getHexString(byte[] bArr) throws Exception {
         String str = "";
         for (byte b : bArr) {
-            str = str + Integer.toString((b & 255) + 256, 16).substring(1);
+            str = str + Integer.toString((b & 255) + SerializedEventUnion.NONE, 16).substring(1);
         }
         return str;
     }

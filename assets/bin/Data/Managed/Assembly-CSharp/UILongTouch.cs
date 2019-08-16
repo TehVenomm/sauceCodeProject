@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UILongTouch
+public class UILongTouch : MonoBehaviour
 {
 	private const float TOUCH_TIME = 0.75f;
 
@@ -39,8 +39,6 @@ public class UILongTouch
 
 	protected virtual void OnPress(bool isPressed)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
 		if (TutorialMessage.IsActiveButton(this.get_gameObject()))
 		{
 			if (isPressed)
@@ -61,16 +59,17 @@ public class UILongTouch
 
 	private void Update()
 	{
-		if (!(time <= 0f))
+		if (time <= 0f)
 		{
-			time -= Time.get_deltaTime();
-			if (time <= 0f)
+			return;
+		}
+		time -= Time.get_deltaTime();
+		if (time <= 0f)
+		{
+			UIScrollView componentInParent = this.GetComponentInParent<UIScrollView>();
+			if ((componentInParent == null || (componentInParent != null && !componentInParent.isDragging)) && TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !MonoBehaviourSingleton<GameSceneManager>.I.isCallingOnQuery)
 			{
-				UIScrollView componentInParent = this.GetComponentInParent<UIScrollView>();
-				if ((componentInParent == null || (componentInParent != null && !componentInParent.isDragging)) && TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !MonoBehaviourSingleton<GameSceneManager>.I.isCallingOnQuery)
-				{
-					_SendEvent();
-				}
+				_SendEvent();
 			}
 		}
 	}
@@ -82,8 +81,6 @@ public class UILongTouch
 
 	protected virtual void _SendEvent()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		UIGameSceneEventSender.SendEvent("UILongTouch", this.get_gameObject(), eventName, eventData, null);
+		UIGameSceneEventSender.SendEvent("UILongTouch", this.get_gameObject(), eventName, eventData);
 	}
 }

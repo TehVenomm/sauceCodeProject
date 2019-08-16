@@ -1,11 +1,12 @@
 package com.zopim.android.sdk.util;
 
 import android.graphics.Bitmap;
+import com.facebook.share.internal.MessengerShareContentUtility;
 import com.squareup.picasso.Transformation;
 
 public class CropSquareTransform implements Transformation {
     public String key() {
-        return "square";
+        return MessengerShareContentUtility.IMAGE_RATIO_SQUARE;
     }
 
     public Bitmap transform(Bitmap bitmap) {

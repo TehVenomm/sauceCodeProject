@@ -17,15 +17,16 @@ public class CoopClientCollector
 		int num2 = clientList.Length;
 		while (true)
 		{
-			if (num >= num2)
+			if (num < num2)
 			{
-				return;
+				if (clientList[num] == null)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			if (clientList[num] == null)
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		clientList[num] = client;
 	}
@@ -36,15 +37,16 @@ public class CoopClientCollector
 		int num2 = clientList.Length;
 		while (true)
 		{
-			if (num >= num2)
+			if (num < num2)
 			{
-				return;
+				if (clientList[num] == client)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			if (clientList[num] == client)
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		clientList[num] = null;
 	}

@@ -15,7 +15,7 @@ public class SimpleKeyDeserializers implements KeyDeserializers, Serializable {
 
     public SimpleKeyDeserializers addDeserializer(Class<?> cls, KeyDeserializer keyDeserializer) {
         if (this._classMappings == null) {
-            this._classMappings = new HashMap();
+            this._classMappings = new HashMap<>();
         }
         this._classMappings.put(new ClassKey(cls), keyDeserializer);
         return this;

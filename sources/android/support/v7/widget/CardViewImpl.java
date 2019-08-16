@@ -1,8 +1,13 @@
-package android.support.v7.widget;
+package android.support.p003v7.widget;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.support.annotation.Nullable;
 
+/* renamed from: android.support.v7.widget.CardViewImpl */
 interface CardViewImpl {
+    ColorStateList getBackgroundColor(CardViewDelegate cardViewDelegate);
+
     float getElevation(CardViewDelegate cardViewDelegate);
 
     float getMaxElevation(CardViewDelegate cardViewDelegate);
@@ -15,13 +20,13 @@ interface CardViewImpl {
 
     void initStatic();
 
-    void initialize(CardViewDelegate cardViewDelegate, Context context, int i, float f, float f2, float f3);
+    void initialize(CardViewDelegate cardViewDelegate, Context context, ColorStateList colorStateList, float f, float f2, float f3);
 
     void onCompatPaddingChanged(CardViewDelegate cardViewDelegate);
 
     void onPreventCornerOverlapChanged(CardViewDelegate cardViewDelegate);
 
-    void setBackgroundColor(CardViewDelegate cardViewDelegate, int i);
+    void setBackgroundColor(CardViewDelegate cardViewDelegate, @Nullable ColorStateList colorStateList);
 
     void setElevation(CardViewDelegate cardViewDelegate, float f);
 

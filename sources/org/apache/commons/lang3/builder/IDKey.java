@@ -1,16 +1,18 @@
 package org.apache.commons.lang3.builder;
 
 final class IDKey {
-    private final int id;
+
+    /* renamed from: id */
+    private final int f1423id;
     private final Object value;
 
     public IDKey(Object obj) {
-        this.id = System.identityHashCode(obj);
+        this.f1423id = System.identityHashCode(obj);
         this.value = obj;
     }
 
     public int hashCode() {
-        return this.id;
+        return this.f1423id;
     }
 
     public boolean equals(Object obj) {
@@ -18,7 +20,7 @@ final class IDKey {
             return false;
         }
         IDKey iDKey = (IDKey) obj;
-        if (this.id == iDKey.id && this.value == iDKey.value) {
+        if (this.f1423id == iDKey.f1423id && this.value == iDKey.value) {
             return true;
         }
         return false;

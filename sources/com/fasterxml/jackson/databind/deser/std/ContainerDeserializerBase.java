@@ -24,7 +24,8 @@ public abstract class ContainerDeserializerBase<T> extends StdDeserializer<T> {
         throw new IllegalArgumentException("Can not handle managed/back reference '" + str + "': type: container deserializer of type " + getClass().getName() + " returned null for 'getContentDeserializer()'");
     }
 
-    protected void wrapAndThrow(Throwable th, Object obj, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public void wrapAndThrow(Throwable th, Object obj, String str) throws IOException {
         Throwable th2 = th;
         while ((th2 instanceof InvocationTargetException) && th2.getCause() != null) {
             th2 = th2.getCause();

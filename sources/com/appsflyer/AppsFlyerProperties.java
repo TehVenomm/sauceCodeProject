@@ -8,6 +8,7 @@ import android.os.Build.VERSION;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AppsFlyerProperties {
@@ -38,18 +39,24 @@ public class AppsFlyerProperties {
     public static final String USER_EMAIL = "userEmail";
     public static final String USER_EMAILS = "userEmails";
     public static final String USE_HTTP_FALLBACK = "useHttpFallback";
+
     /* renamed from: ˏ */
-    private static AppsFlyerProperties f191 = new AppsFlyerProperties();
+    private static AppsFlyerProperties f208 = new AppsFlyerProperties();
+
     /* renamed from: ʽ */
-    private boolean f192 = false;
+    private boolean f209 = false;
+
     /* renamed from: ˊ */
-    private String f193;
+    private String f210;
+
     /* renamed from: ˋ */
-    private Map<String, Object> f194 = new HashMap();
+    private Map<String, Object> f211 = new HashMap();
+
     /* renamed from: ˎ */
-    private boolean f195;
+    private boolean f212;
+
     /* renamed from: ॱ */
-    private boolean f196;
+    private boolean f213;
 
     public enum EmailsCryptType {
         NONE(0),
@@ -57,59 +64,60 @@ public class AppsFlyerProperties {
         MD5(2),
         SHA256(3);
         
+
         /* renamed from: ˎ */
-        private final int f190;
+        private final int f215;
 
         private EmailsCryptType(int i) {
-            this.f190 = i;
+            this.f215 = i;
         }
 
         public final int getValue() {
-            return this.f190;
+            return this.f215;
         }
     }
 
     public void remove(String str) {
-        this.f194.remove(str);
+        this.f211.remove(str);
     }
 
     private AppsFlyerProperties() {
     }
 
     public static AppsFlyerProperties getInstance() {
-        return f191;
+        return f208;
     }
 
     public void set(String str, String str2) {
-        this.f194.put(str, str2);
+        this.f211.put(str, str2);
     }
 
     public void set(String str, String[] strArr) {
-        this.f194.put(str, strArr);
+        this.f211.put(str, strArr);
     }
 
     public void set(String str, int i) {
-        this.f194.put(str, Integer.toString(i));
+        this.f211.put(str, Integer.toString(i));
     }
 
     public void set(String str, long j) {
-        this.f194.put(str, Long.toString(j));
+        this.f211.put(str, Long.toString(j));
     }
 
     public void set(String str, boolean z) {
-        this.f194.put(str, Boolean.toString(z));
+        this.f211.put(str, Boolean.toString(z));
     }
 
     public void setCustomData(String str) {
-        this.f194.put(ADDITIONAL_CUSTOM_DATA, str);
+        this.f211.put(ADDITIONAL_CUSTOM_DATA, str);
     }
 
     public void setUserEmails(String str) {
-        this.f194.put(USER_EMAILS, str);
+        this.f211.put(USER_EMAILS, str);
     }
 
     public String getString(String str) {
-        return (String) this.f194.get(str);
+        return (String) this.f211.get(str);
     }
 
     public boolean getBoolean(String str, boolean z) {
@@ -128,37 +136,43 @@ public class AppsFlyerProperties {
     }
 
     public Object getObject(String str) {
-        return this.f194.get(str);
+        return this.f211.get(str);
     }
 
-    protected boolean isOnReceiveCalled() {
-        return this.f196;
+    /* access modifiers changed from: protected */
+    public boolean isOnReceiveCalled() {
+        return this.f213;
     }
 
-    protected void setOnReceiveCalled() {
-        this.f196 = true;
+    /* access modifiers changed from: protected */
+    public void setOnReceiveCalled() {
+        this.f213 = true;
     }
 
-    protected boolean isFirstLaunchCalled() {
-        return this.f195;
+    /* access modifiers changed from: protected */
+    public boolean isFirstLaunchCalled() {
+        return this.f212;
     }
 
-    protected void setFirstLaunchCalled(boolean z) {
-        this.f195 = z;
+    /* access modifiers changed from: protected */
+    public void setFirstLaunchCalled(boolean z) {
+        this.f212 = z;
     }
 
-    protected void setFirstLaunchCalled() {
-        this.f195 = true;
+    /* access modifiers changed from: protected */
+    public void setFirstLaunchCalled() {
+        this.f212 = true;
     }
 
-    protected void setReferrer(String str) {
+    /* access modifiers changed from: protected */
+    public void setReferrer(String str) {
         set("AF_REFERRER", str);
-        this.f193 = str;
+        this.f210 = str;
     }
 
     public String getReferrer(Context context) {
-        if (this.f193 != null) {
-            return this.f193;
+        if (this.f210 != null) {
+            return this.f210;
         }
         if (getString("AF_REFERRER") != null) {
             return getString("AF_REFERRER");
@@ -183,7 +197,7 @@ public class AppsFlyerProperties {
 
     @SuppressLint({"CommitPrefEdits"})
     public void saveProperties(SharedPreferences sharedPreferences) {
-        String jSONObject = new JSONObject(this.f194).toString();
+        String jSONObject = new JSONObject(this.f211).toString();
         Editor edit = sharedPreferences.edit();
         edit.putString("savedProperties", jSONObject);
         if (VERSION.SDK_INT >= 9) {
@@ -194,7 +208,7 @@ public class AppsFlyerProperties {
     }
 
     public void loadProperties(Context context) {
-        if (!this.f192) {
+        if (!this.f209) {
             String string = context.getSharedPreferences("appsflyer-data", 0).getString("savedProperties", null);
             if (string != null) {
                 AFLogger.afDebugLog("Loading properties..");
@@ -202,16 +216,16 @@ public class AppsFlyerProperties {
                     JSONObject jSONObject = new JSONObject(string);
                     Iterator keys = jSONObject.keys();
                     while (keys.hasNext()) {
-                        string = (String) keys.next();
-                        if (this.f194.get(string) == null) {
-                            this.f194.put(string, jSONObject.getString(string));
+                        String str = (String) keys.next();
+                        if (this.f211.get(str) == null) {
+                            this.f211.put(str, jSONObject.getString(str));
                         }
                     }
-                    this.f192 = true;
-                } catch (Throwable e) {
+                    this.f209 = true;
+                } catch (JSONException e) {
                     AFLogger.afErrorLog("Failed loading properties", e);
                 }
-                AFLogger.afDebugLog(new StringBuilder("Done loading properties: ").append(this.f192).toString());
+                AFLogger.afDebugLog(new StringBuilder("Done loading properties: ").append(this.f209).toString());
             }
         }
     }

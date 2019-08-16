@@ -2,37 +2,54 @@ package com.google.android.gms.drive;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 
-public class UserMetadata extends zza implements ReflectedParcelable {
-    public static final Creator<UserMetadata> CREATOR = new zzu();
-    private String zzeby;
-    private String zzgen;
-    private String zzgeo;
-    private boolean zzgep;
-    private String zzgeq;
+@Class(creator = "UserMetadataCreator")
+@Reserved({1})
+public class UserMetadata extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<UserMetadata> CREATOR = new zzt();
+    @Field(mo13990id = 2)
+    private final String zzbm;
+    @Nullable
+    @Field(mo13990id = 3)
+    private final String zzbn;
+    @Nullable
+    @Field(mo13990id = 4)
+    private final String zzbo;
+    @Field(mo13990id = 5)
+    private final boolean zzbp;
+    @Nullable
+    @Field(mo13990id = 6)
+    private final String zzbq;
 
-    public UserMetadata(String str, String str2, String str3, boolean z, String str4) {
-        this.zzgen = str;
-        this.zzeby = str2;
-        this.zzgeo = str3;
-        this.zzgep = z;
-        this.zzgeq = str4;
+    @Constructor
+    public UserMetadata(@Param(mo13993id = 2) String str, @Nullable @Param(mo13993id = 3) String str2, @Nullable @Param(mo13993id = 4) String str3, @Param(mo13993id = 5) boolean z, @Nullable @Param(mo13993id = 6) String str4) {
+        this.zzbm = str;
+        this.zzbn = str2;
+        this.zzbo = str3;
+        this.zzbp = z;
+        this.zzbq = str4;
     }
 
     public String toString() {
-        return String.format("Permission ID: '%s', Display Name: '%s', Picture URL: '%s', Authenticated User: %b, Email: '%s'", new Object[]{this.zzgen, this.zzeby, this.zzgeo, Boolean.valueOf(this.zzgep), this.zzgeq});
+        return String.format("Permission ID: '%s', Display Name: '%s', Picture URL: '%s', Authenticated User: %b, Email: '%s'", new Object[]{this.zzbm, this.zzbn, this.zzbo, Boolean.valueOf(this.zzbp), this.zzbq});
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzgen, false);
-        zzd.zza(parcel, 3, this.zzeby, false);
-        zzd.zza(parcel, 4, this.zzgeo, false);
-        zzd.zza(parcel, 5, this.zzgep);
-        zzd.zza(parcel, 6, this.zzgeq, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.zzbm, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzbn, false);
+        SafeParcelWriter.writeString(parcel, 4, this.zzbo, false);
+        SafeParcelWriter.writeBoolean(parcel, 5, this.zzbp);
+        SafeParcelWriter.writeString(parcel, 6, this.zzbq, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

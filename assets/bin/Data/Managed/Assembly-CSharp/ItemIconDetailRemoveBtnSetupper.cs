@@ -4,7 +4,7 @@ public class ItemIconDetailRemoveBtnSetupper : ItemIconDetailSetuperBase
 	{
 		string name = data[0] as string;
 		SetName(name);
-		SetVisibleBG(true);
-		base.Set(null);
+		SetVisibleBG(is_visible: true);
+		base.Set();
 	}
 }

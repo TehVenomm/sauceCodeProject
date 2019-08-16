@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AttackCannonball
+public class AttackCannonball : MonoBehaviour
 {
 	public class InitParamCannonball
 	{
@@ -60,8 +60,6 @@ public class AttackCannonball
 
 	public void Initialize(InitParamCannonball initParam)
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Expected O, but got Unknown
 		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
@@ -74,72 +72,68 @@ public class AttackCannonball
 		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Expected O, but got Unknown
+		//IL_0154: Expected O, but got Unknown
 		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Expected O, but got Unknown
 		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0205: Expected O, but got Unknown
 		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
 		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023f: Expected O, but got Unknown
-		if (initParam.atkInfo != null)
+		if (initParam.atkInfo == null)
 		{
-			m_atkInfo = initParam.atkInfo;
-			AttackHitInfo attackHitInfo = m_atkInfo as AttackHitInfo;
-			if (attackHitInfo != null)
+			return;
+		}
+		m_atkInfo = initParam.atkInfo;
+		AttackHitInfo attackHitInfo = m_atkInfo as AttackHitInfo;
+		if (attackHitInfo != null)
+		{
+			attackHitInfo.enableIdentityCheck = false;
+		}
+		BulletData bulletData = m_atkInfo.bulletData;
+		if (bulletData == null)
+		{
+			return;
+		}
+		BulletData.BulletBase data = bulletData.data;
+		if (data != null)
+		{
+			BulletData.BulletCannonball dataCannonball = bulletData.dataCannonball;
+			if (dataCannonball != null)
 			{
-				attackHitInfo.enableIdentityCheck = false;
-			}
-			BulletData bulletData = m_atkInfo.bulletData;
-			if (!(bulletData == null))
-			{
-				BulletData.BulletBase data = bulletData.data;
-				if (data != null)
-				{
-					BulletData.BulletCannonball dataCannonball = bulletData.dataCannonball;
-					if (dataCannonball != null)
-					{
-						m_attacker = initParam.attacker;
-						m_cachedTransform = this.get_transform();
-						m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-						Transform launchTrans = initParam.launchTrans;
-						m_cachedTransform.set_position(launchTrans.get_position() + launchTrans.get_rotation() * initParam.offsetPos);
-						m_cachedTransform.set_rotation(launchTrans.get_rotation() * initParam.offsetRot);
-						m_cachedTransform.set_localScale(data.timeStartScale);
-						existTime = data.appearTime;
-						hasExistTime = (data.appearTime > 0f);
-						float radius = data.radius;
-						float height = 0f;
-						Vector3 hitOffset = data.hitOffset;
-						int ignoreLayerMask = 20736;
-						GameObject val = new GameObject("CannonballAttackObject");
-						CannonballAttackObject cannonballAttackObject = val.AddComponent<CannonballAttackObject>();
-						cannonballAttackObject.Initialize(m_attacker, m_cachedTransform, m_atkInfo, hitOffset, Vector3.get_zero(), radius, height, 14);
-						cannonballAttackObject.SetIgnoreLayerMask(ignoreLayerMask);
-						cannonballAttackObject.SetOwner(this);
-						m_cannonballAttackObj = cannonballAttackObject;
-						gravityStartTime = dataCannonball.gravityStartTime;
-						gravityRate = dataCannonball.gravityRate;
-						cannonballRigidbody = val.GetComponent<Rigidbody>();
-						cannonballTransform = val.get_transform();
-						float speed = data.speed;
-						cannonballRigidbody.set_velocity(initParam.shotRotation * Vector3.get_forward() * speed);
-						Transform effect = EffectManager.GetEffect(data.effectName, cannonballAttackObject.get_transform());
-						effect.set_localPosition(data.dispOffset);
-						effect.set_localRotation(Quaternion.Euler(data.dispRotation));
-						effect.set_localScale(Vector3.get_one());
-						m_effectObj = effect.get_gameObject();
-					}
-				}
+				m_attacker = initParam.attacker;
+				m_cachedTransform = this.get_transform();
+				m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
+				Transform launchTrans = initParam.launchTrans;
+				m_cachedTransform.set_position(launchTrans.get_position() + launchTrans.get_rotation() * initParam.offsetPos);
+				m_cachedTransform.set_rotation(launchTrans.get_rotation() * initParam.offsetRot);
+				m_cachedTransform.set_localScale(data.timeStartScale);
+				existTime = data.appearTime;
+				hasExistTime = (data.appearTime > 0f);
+				float radius = data.radius;
+				float height = 0f;
+				Vector3 hitOffset = data.hitOffset;
+				int ignoreLayerMask = 20736;
+				GameObject val = new GameObject("CannonballAttackObject");
+				CannonballAttackObject cannonballAttackObject = val.AddComponent<CannonballAttackObject>();
+				cannonballAttackObject.Initialize(m_attacker, m_cachedTransform, m_atkInfo, hitOffset, Vector3.get_zero(), radius, height, 14);
+				cannonballAttackObject.SetIgnoreLayerMask(ignoreLayerMask);
+				cannonballAttackObject.SetOwner(this);
+				m_cannonballAttackObj = cannonballAttackObject;
+				gravityStartTime = dataCannonball.gravityStartTime;
+				gravityRate = dataCannonball.gravityRate;
+				cannonballRigidbody = val.GetComponent<Rigidbody>();
+				cannonballTransform = val.get_transform();
+				float speed = data.speed;
+				cannonballRigidbody.set_velocity(initParam.shotRotation * Vector3.get_forward() * speed);
+				Transform effect = EffectManager.GetEffect(data.effectName, cannonballAttackObject.get_transform());
+				effect.set_localPosition(data.dispOffset);
+				effect.set_localRotation(Quaternion.Euler(data.dispRotation));
+				effect.set_localScale(Vector3.get_one());
+				m_effectObj = effect.get_gameObject();
 			}
 		}
 	}
@@ -163,10 +157,8 @@ public class AttackCannonball
 
 	private void Update()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (hasExistTime)
 		{
 			existTimer += Time.get_deltaTime();
@@ -186,14 +178,13 @@ public class AttackCannonball
 	{
 		if (!(m_effectObj == null))
 		{
-			EffectManager.ReleaseEffect(m_effectObj, true, false);
+			EffectManager.ReleaseEffect(m_effectObj);
 			m_effectObj = null;
 		}
 	}
 
 	public void OnHit()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		Object.Destroy(this.get_gameObject());
 	}
 }

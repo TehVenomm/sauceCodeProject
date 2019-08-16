@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.armory;
+package net.gogame.gowrap.p019ui.dpro.model.armory;
 
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -6,15 +6,20 @@ import java.io.IOException;
 import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.armory.SkillItem */
 public class SkillItem extends BaseJsonObject {
     private static final String KEY_BASE = "base";
     private UserStats base;
+
+    public SkillItem() {
+    }
 
     public SkillItem(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (!StringUtils.isEquals(str, KEY_BASE)) {
             return false;
         }

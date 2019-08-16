@@ -18,6 +18,7 @@ import com.facebook.internal.FragmentWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class LikeDialog extends FacebookDialogBase<LikeContent, Result> {
     private static final int DEFAULT_REQUEST_CODE = RequestCodeOffset.Like.toRequestCode();
     private static final String TAG = "LikeDialog";
@@ -28,7 +29,7 @@ public class LikeDialog extends FacebookDialogBase<LikeContent, Result> {
         }
 
         public boolean canShow(LikeContent likeContent, boolean z) {
-            return likeContent != null && LikeDialog.canShowNativeDialog();
+            return false;
         }
 
         public AppCall createAppCall(final LikeContent likeContent) {
@@ -47,11 +48,12 @@ public class LikeDialog extends FacebookDialogBase<LikeContent, Result> {
         }
     }
 
+    @Deprecated
     public static final class Result {
         private final Bundle bundle;
 
-        public Result(Bundle bundle) {
-            this.bundle = bundle;
+        public Result(Bundle bundle2) {
+            this.bundle = bundle2;
         }
 
         public Bundle getData() {
@@ -65,7 +67,7 @@ public class LikeDialog extends FacebookDialogBase<LikeContent, Result> {
         }
 
         public boolean canShow(LikeContent likeContent, boolean z) {
-            return likeContent != null && LikeDialog.canShowWebFallback();
+            return false;
         }
 
         public AppCall createAppCall(LikeContent likeContent) {
@@ -75,62 +77,77 @@ public class LikeDialog extends FacebookDialogBase<LikeContent, Result> {
         }
     }
 
+    @Deprecated
     public LikeDialog(Activity activity) {
         super(activity, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public LikeDialog(Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
-    public LikeDialog(android.support.v4.app.Fragment fragment) {
+    @Deprecated
+    public LikeDialog(android.support.p000v4.app.Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
+    @Deprecated
     public LikeDialog(FragmentWrapper fragmentWrapper) {
         super(fragmentWrapper, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public static boolean canShowNativeDialog() {
-        return DialogPresenter.canPresentNativeDialogWithFeature(getFeature());
+        return false;
     }
 
+    @Deprecated
     public static boolean canShowWebFallback() {
-        return DialogPresenter.canPresentWebFallbackDialogWithFeature(getFeature());
+        return false;
     }
 
-    private static Bundle createParameters(LikeContent likeContent) {
+    /* access modifiers changed from: private */
+    public static Bundle createParameters(LikeContent likeContent) {
         Bundle bundle = new Bundle();
         bundle.putString("object_id", likeContent.getObjectId());
         bundle.putString("object_type", likeContent.getObjectType());
         return bundle;
     }
 
-    private static DialogFeature getFeature() {
+    /* access modifiers changed from: private */
+    public static DialogFeature getFeature() {
         return LikeDialogFeature.LIKE_DIALOG;
     }
 
-    protected AppCall createBaseAppCall() {
+    /* access modifiers changed from: protected */
+    public AppCall createBaseAppCall() {
         return new AppCall(getRequestCode());
     }
 
-    protected List<ModeHandler> getOrderedModeHandlers() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<ModeHandler> getOrderedModeHandlers() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(new NativeHandler());
         arrayList.add(new WebFallbackHandler());
         return arrayList;
     }
 
-    protected void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
-        final ResultProcessor c04891 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
+    /* access modifiers changed from: protected */
+    public void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
+        final C07831 r0 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
             public void onSuccess(AppCall appCall, Bundle bundle) {
                 facebookCallback.onSuccess(new Result(bundle));
             }
         };
         callbackManagerImpl.registerCallback(getRequestCode(), new Callback() {
             public boolean onActivityResult(int i, Intent intent) {
-                return ShareInternalUtility.handleActivityResult(LikeDialog.this.getRequestCode(), i, intent, c04891);
+                return ShareInternalUtility.handleActivityResult(LikeDialog.this.getRequestCode(), i, intent, r0);
             }
         });
+    }
+
+    @Deprecated
+    public void show(LikeContent likeContent) {
     }
 }

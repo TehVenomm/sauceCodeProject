@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.layout;
+package net.gogame.gowrap.p019ui.layout;
 
 import android.content.Context;
 import android.os.Build.VERSION;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.widget.FrameLayout;
 
+/* renamed from: net.gogame.gowrap.ui.layout.LandscapeFrameLayout */
 public class LandscapeFrameLayout extends FrameLayout {
     private boolean rotate = false;
 
@@ -14,7 +15,8 @@ public class LandscapeFrameLayout extends FrameLayout {
         super(context, attributeSet);
     }
 
-    protected void onMeasure(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void onMeasure(int i, int i2) {
         if (VERSION.SDK_INT < 21 || MeasureSpec.getMode(i) != 1073741824 || MeasureSpec.getMode(i2) != 1073741824 || MeasureSpec.getSize(i) >= MeasureSpec.getSize(i2)) {
             super.onMeasure(i, i2);
             setMeasuredDimension(MeasureSpec.getSize(i), MeasureSpec.getSize(i2));
@@ -26,7 +28,8 @@ public class LandscapeFrameLayout extends FrameLayout {
         this.rotate = true;
     }
 
-    protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
+    /* access modifiers changed from: protected */
+    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
         if (this.rotate) {
             int childCount = getChildCount();
             for (int i5 = 0; i5 < childCount; i5++) {

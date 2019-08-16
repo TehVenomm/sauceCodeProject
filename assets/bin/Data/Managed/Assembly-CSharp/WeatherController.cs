@@ -86,15 +86,16 @@ public class WeatherController
 			originalSettings.lightProbePeak = MonoBehaviourSingleton<SceneSettingsManager>.I.lightProbePeak;
 			originalSettings.npcAmbientColor = MonoBehaviourSingleton<SceneSettingsManager>.I.npcAmbientColor;
 		}
-		if (Application.get_isPlaying())
+		if (!Application.get_isPlaying())
 		{
-			Update(0f);
-			if (enableObjects != null)
+			return;
+		}
+		Update(0f);
+		if (enableObjects != null)
+		{
+			for (int i = 0; i < enableObjects.Length; i++)
 			{
-				for (int i = 0; i < enableObjects.Length; i++)
-				{
-					enableObjects[i].SetActive(false);
-				}
+				enableObjects[i].SetActive(false);
 			}
 		}
 	}
@@ -131,15 +132,16 @@ public class WeatherController
 		{
 			for (int i = 0; i < blendLightMapRenderer.Length; i++)
 			{
-				if (!(blendLightMapRenderer[i] == null))
+				if (blendLightMapRenderer[i] == null)
 				{
-					Material[] sharedMaterials = blendLightMapRenderer[i].get_sharedMaterials();
-					foreach (Material val in sharedMaterials)
+					continue;
+				}
+				Material[] sharedMaterials = blendLightMapRenderer[i].get_sharedMaterials();
+				foreach (Material val in sharedMaterials)
+				{
+					if (!(val == null) && val.HasProperty(LIGHTMAPBLEND_PARAMTER_KEY))
 					{
-						if (!(val == null) && val.HasProperty(LIGHTMAPBLEND_PARAMTER_KEY))
-						{
-							val.SetFloat(LIGHTMAPBLEND_PARAMTER_KEY, rate);
-						}
+						val.SetFloat(LIGHTMAPBLEND_PARAMTER_KEY, rate);
 					}
 				}
 			}
@@ -152,8 +154,6 @@ public class WeatherController
 
 	public void OnStartWeatherChange()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
@@ -176,8 +176,6 @@ public class WeatherController
 
 	public void OnFinishedWeatherChange()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
@@ -200,8 +198,6 @@ public class WeatherController
 
 	public void OnStartReturnToOriginal()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)

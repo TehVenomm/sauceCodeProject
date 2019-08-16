@@ -71,10 +71,12 @@ public class ChatPacket
 			return Chat_Model_BroadcastClanStatus_Response.Parse(str);
 		case CHAT_PACKET_TYPE.RALLY_INVITE:
 			return Chat_Model_RallyInvite.Parse(str);
-		case CHAT_PACKET_TYPE.DARK_MARKET_RESET:
-			return Chat_Model_ResetDarkMarket.Parse(str);
 		case CHAT_PACKET_TYPE.DARK_MARKET_UPDATE:
 			return Chat_Model_UpdateDarkMarket.Parse(str);
+		case CHAT_PACKET_TYPE.DARK_MARKET_RESET:
+			return Chat_Model_ResetDarkMarket.Parse(str);
+		case CHAT_PACKET_TYPE.JACKPOT_WIN_UPDATE:
+			return Chat_Model_JackpotWin.Parse(str);
 		default:
 			return new Chat_Model_Base();
 		}

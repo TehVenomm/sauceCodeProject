@@ -1,33 +1,19 @@
 package com.google.android.gms.common;
 
-import android.os.Parcel;
-import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import java.util.concurrent.Callable;
 
-public final class zzd implements Creator<zzc> {
-    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
-        String str = null;
-        int i = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 1:
-                    str = zzb.zzq(parcel, readInt);
-                    break;
-                case 2:
-                    i = zzb.zzg(parcel, readInt);
-                    break;
-                default:
-                    zzb.zzb(parcel, readInt);
-                    break;
-            }
-        }
-        zzb.zzaf(parcel, zzd);
-        return new zzc(str, i);
+final /* synthetic */ class zzd implements Callable {
+    private final boolean zzq;
+    private final String zzr;
+    private final zze zzs;
+
+    zzd(boolean z, String str, zze zze) {
+        this.zzq = z;
+        this.zzr = str;
+        this.zzs = zze;
     }
 
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzc[i];
+    public final Object call() {
+        return zzc.zza(this.zzq, this.zzr, this.zzs);
     }
 }

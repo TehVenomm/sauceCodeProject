@@ -122,7 +122,8 @@ public class JsonNodeFactory implements Serializable, JsonNodeCreator {
         return new POJONode(rawValue);
     }
 
-    protected boolean _inIntRange(long j) {
+    /* access modifiers changed from: protected */
+    public boolean _inIntRange(long j) {
         return ((long) ((int) j)) == j;
     }
 }

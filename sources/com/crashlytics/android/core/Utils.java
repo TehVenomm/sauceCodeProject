@@ -6,26 +6,33 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 final class Utils {
+    private static final FilenameFilter ALL_FILES_FILTER = new FilenameFilter() {
+        public boolean accept(File file, String str) {
+            return true;
+        }
+    };
+
     private Utils() {
     }
 
-    public static void capFileCount(File file, FilenameFilter filenameFilter, int i, Comparator<File> comparator) {
+    static int capFileCount(File file, int i, Comparator<File> comparator) {
+        return capFileCount(file, ALL_FILES_FILTER, i, comparator);
+    }
+
+    static int capFileCount(File file, FilenameFilter filenameFilter, int i, Comparator<File> comparator) {
         File[] listFiles = file.listFiles(filenameFilter);
-        if (listFiles != null && listFiles.length > i) {
-            Arrays.sort(listFiles, comparator);
-            int length = listFiles.length;
-            int length2 = listFiles.length;
-            int i2 = 0;
-            while (i2 < length2) {
-                File file2 = listFiles[i2];
-                if (length > i) {
-                    file2.delete();
-                    length--;
-                    i2++;
-                } else {
-                    return;
-                }
-            }
+        if (listFiles == null) {
+            return 0;
         }
+        int length = listFiles.length;
+        Arrays.sort(listFiles, comparator);
+        for (File file2 : listFiles) {
+            if (length <= i) {
+                break;
+            }
+            file2.delete();
+            length--;
+        }
+        return length;
     }
 }

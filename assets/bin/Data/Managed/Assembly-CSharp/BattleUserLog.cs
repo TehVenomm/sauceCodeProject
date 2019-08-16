@@ -57,97 +57,98 @@ public class BattleUserLog
 
 	public void Add(Character to_chara, int from_objid, int skill_id, string attack_info_name, int damage)
 	{
-		if (list != null && !string.IsNullOrEmpty(attack_info_name))
+		if (list == null || string.IsNullOrEmpty(attack_info_name))
 		{
-			int num = 0;
-			string empty = string.Empty;
-			int baseId = 0;
-			bool flag = false;
-			if (to_chara is Enemy)
+			return;
+		}
+		int num = 0;
+		string empty = string.Empty;
+		int baseId = 0;
+		bool flag = false;
+		if (to_chara is Enemy)
+		{
+			Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(from_objid) as Player;
+			if (player == null)
 			{
-				Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(from_objid) as Player;
-				if (player == null)
-				{
-					return;
-				}
-				flag = (player.controller is NpcController);
-				empty = player.charaName;
-				if (player is NonPlayer)
-				{
-					num = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
-					baseId = (player as NonPlayer).npcId;
-				}
-				else
-				{
-					CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(from_objid);
-					if (coopClient != null)
-					{
-						num = coopClient.userId;
-					}
-					else if (player.record != null)
-					{
-						num = player.record.charaInfo.userId;
-					}
-				}
+				return;
+			}
+			flag = (player.controller is NpcController);
+			empty = player.charaName;
+			if (player is NonPlayer)
+			{
+				num = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
+				baseId = (player as NonPlayer).npcId;
 			}
 			else
 			{
-				if (!(to_chara is Player))
+				CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(from_objid);
+				if (coopClient != null)
 				{
-					return;
+					num = coopClient.userId;
 				}
-				Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(from_objid) as Enemy;
-				if (enemy == null)
+				else if (player.record != null)
 				{
-					return;
-				}
-				num = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
-				empty = enemy.charaName;
-				baseId = enemy.enemyID;
-			}
-			QuestCompleteModel.BattleUserLog battleUserLog = null;
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				if (list[i].userId == num && list[i].isNpc == flag && list[i].objId == from_objid && list[i].leaveCnt == MonoBehaviourSingleton<CoopManager>.I.coopRoom.roomLeaveCnt)
-				{
-					battleUserLog = list[i];
-					break;
+					num = player.record.charaInfo.userId;
 				}
 			}
-			if (battleUserLog == null)
-			{
-				battleUserLog = new QuestCompleteModel.BattleUserLog();
-				battleUserLog.userId = num;
-				battleUserLog.name = empty;
-				battleUserLog.baseId = baseId;
-				battleUserLog.objId = from_objid;
-				battleUserLog.isNpc = flag;
-				battleUserLog.hostUserId = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
-				battleUserLog.leaveCnt = MonoBehaviourSingleton<CoopManager>.I.coopRoom.roomLeaveCnt;
-				battleUserLog.startRemaindTime = ((!MonoBehaviourSingleton<InGameProgress>.IsValid()) ? 0f : MonoBehaviourSingleton<InGameProgress>.I.remaindTime);
-				list.Add(battleUserLog);
-			}
-			QuestCompleteModel.BattleUserLog.AtkInfo atkInfo = null;
-			int j = 0;
-			for (int count2 = battleUserLog.atkInfos.Count; j < count2; j++)
-			{
-				if (battleUserLog.atkInfos[j].name == attack_info_name && battleUserLog.atkInfos[j].skillId == skill_id)
-				{
-					atkInfo = battleUserLog.atkInfos[j];
-					break;
-				}
-			}
-			if (atkInfo == null)
-			{
-				atkInfo = new QuestCompleteModel.BattleUserLog.AtkInfo();
-				atkInfo.name = attack_info_name;
-				atkInfo.skillId = skill_id;
-				battleUserLog.atkInfos.Add(atkInfo);
-			}
-			atkInfo.damage += damage;
-			atkInfo.count++;
 		}
+		else
+		{
+			if (!(to_chara is Player))
+			{
+				return;
+			}
+			Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(from_objid) as Enemy;
+			if (enemy == null)
+			{
+				return;
+			}
+			num = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
+			empty = enemy.charaName;
+			baseId = enemy.enemyID;
+		}
+		QuestCompleteModel.BattleUserLog battleUserLog = null;
+		int i = 0;
+		for (int count = list.Count; i < count; i++)
+		{
+			if (list[i].userId == num && list[i].isNpc == flag && list[i].objId == from_objid && list[i].leaveCnt == MonoBehaviourSingleton<CoopManager>.I.coopRoom.roomLeaveCnt)
+			{
+				battleUserLog = list[i];
+				break;
+			}
+		}
+		if (battleUserLog == null)
+		{
+			battleUserLog = new QuestCompleteModel.BattleUserLog();
+			battleUserLog.userId = num;
+			battleUserLog.name = empty;
+			battleUserLog.baseId = baseId;
+			battleUserLog.objId = from_objid;
+			battleUserLog.isNpc = flag;
+			battleUserLog.hostUserId = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
+			battleUserLog.leaveCnt = MonoBehaviourSingleton<CoopManager>.I.coopRoom.roomLeaveCnt;
+			battleUserLog.startRemaindTime = ((!MonoBehaviourSingleton<InGameProgress>.IsValid()) ? 0f : MonoBehaviourSingleton<InGameProgress>.I.remaindTime);
+			list.Add(battleUserLog);
+		}
+		QuestCompleteModel.BattleUserLog.AtkInfo atkInfo = null;
+		int j = 0;
+		for (int count2 = battleUserLog.atkInfos.Count; j < count2; j++)
+		{
+			if (battleUserLog.atkInfos[j].name == attack_info_name && battleUserLog.atkInfos[j].skillId == skill_id)
+			{
+				atkInfo = battleUserLog.atkInfos[j];
+				break;
+			}
+		}
+		if (atkInfo == null)
+		{
+			atkInfo = new QuestCompleteModel.BattleUserLog.AtkInfo();
+			atkInfo.name = attack_info_name;
+			atkInfo.skillId = skill_id;
+			battleUserLog.atkInfos.Add(atkInfo);
+		}
+		atkInfo.damage += damage;
+		atkInfo.count++;
 	}
 
 	public void LogDump()

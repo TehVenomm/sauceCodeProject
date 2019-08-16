@@ -1,25 +1,30 @@
 package com.google.android.gms.measurement;
 
+import android.content.BroadcastReceiver.PendingResult;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.MainThread;
-import android.support.v4.content.WakefulBroadcastReceiver;
-import com.google.android.gms.internal.zzccf;
-import com.google.android.gms.internal.zzcch;
+import android.support.p000v4.content.WakefulBroadcastReceiver;
+import com.google.android.gms.measurement.internal.zzez;
+import com.google.android.gms.measurement.internal.zzfa;
 
-public final class AppMeasurementReceiver extends WakefulBroadcastReceiver implements zzcch {
-    private zzccf zzikl;
+public final class AppMeasurementReceiver extends WakefulBroadcastReceiver implements zzfa {
+    private zzez zzn;
+
+    public final PendingResult doGoAsync() {
+        return goAsync();
+    }
 
     @MainThread
     public final void doStartService(Context context, Intent intent) {
-        WakefulBroadcastReceiver.startWakefulService(context, intent);
+        startWakefulService(context, intent);
     }
 
     @MainThread
     public final void onReceive(Context context, Intent intent) {
-        if (this.zzikl == null) {
-            this.zzikl = new zzccf(this);
+        if (this.zzn == null) {
+            this.zzn = new zzez(this);
         }
-        this.zzikl.onReceive(context, intent);
+        this.zzn.onReceive(context, intent);
     }
 }

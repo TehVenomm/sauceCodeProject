@@ -11,6 +11,12 @@ public class Coop_Model_RoomExploreBossDead : Coop_Model_Base
 
 	public int downCount;
 
+	public float concussionTotal;
+
+	public float concussionMax;
+
+	public float concussionExtend;
+
 	public List<int> breakIds;
 
 	public List<TotalDamage> dmgs = new List<TotalDamage>();

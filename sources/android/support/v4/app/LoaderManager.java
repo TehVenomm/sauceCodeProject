@@ -1,12 +1,14 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import android.support.p000v4.content.Loader;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
+/* renamed from: android.support.v4.app.LoaderManager */
 public abstract class LoaderManager {
 
+    /* renamed from: android.support.v4.app.LoaderManager$LoaderCallbacks */
     public interface LoaderCallbacks<D> {
         Loader<D> onCreateLoader(int i, Bundle bundle);
 

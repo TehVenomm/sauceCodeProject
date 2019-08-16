@@ -106,22 +106,16 @@ public class QuestSortBase : SortBase
 
 	public override void UpdateUI()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Expected O, but got Unknown
 		int i = 0;
 		for (int num = enemyButton.Length; i < num; i++)
 		{
-			SetActive(GetCtrl(enemyButton[i]).get_parent(), false);
+			SetActive(GetCtrl(enemyButton[i]).get_parent(), is_visible: false);
 		}
 		QuestCollection questCollection = MonoBehaviourSingleton<QuestManager>.I.questCollection;
 		questCollection.GetEnemyTypeList(QUEST_TYPE.ORDER)?.ForEach(delegate(ENEMY_TYPE _enemy)
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Expected O, but got Unknown
 			int num7 = (int)(_enemy - 1);
-			SetActive(GetCtrl(enemyButton[num7]).get_parent(), true);
+			SetActive(GetCtrl(enemyButton[num7]).get_parent(), is_visible: true);
 		});
 		base.GetComponent<UIGrid>((Enum)UI.GRD_ENEMY).Reposition();
 		UpdateAnchors();
@@ -145,7 +139,7 @@ public class QuestSortBase : SortBase
 			}
 			else
 			{
-				SetActive((Enum)requirementButton[k], false);
+				SetActive((Enum)requirementButton[k], is_visible: false);
 			}
 		}
 		int l = 0;
@@ -163,8 +157,6 @@ public class QuestSortBase : SortBase
 
 	private void OnQuery_ENEMY()
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Expected O, but got Unknown
 		int num = (int)GameSection.GetEventData();
 		int num2 = (int)enemyValue[num];
 		bool value;

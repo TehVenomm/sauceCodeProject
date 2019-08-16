@@ -124,28 +124,8 @@ public class ItemSortBase : SortBase
 
 	public override void UpdateUI()
 	{
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Expected O, but got Unknown
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Expected O, but got Unknown
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Expected O, but got Unknown
 		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024f: Expected O, but got Unknown
-		//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c4: Expected O, but got Unknown
-		//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0339: Expected O, but got Unknown
-		//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0357: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036a: Expected O, but got Unknown
 		//IL_0370: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0375: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0380: Unknown result type (might be due to invalid IL or missing references)
@@ -153,10 +133,6 @@ public class ItemSortBase : SortBase
 		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
 		//IL_039b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_03ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d2: Expected O, but got Unknown
 		//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
@@ -164,27 +140,15 @@ public class ItemSortBase : SortBase
 		//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0403: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0413: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c6: Expected O, but got Unknown
-		//IL_0534: Unknown result type (might be due to invalid IL or missing references)
-		//IL_053b: Expected O, but got Unknown
-		//IL_0554: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0559: Unknown result type (might be due to invalid IL or missing references)
 		//IL_058c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_059b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05aa: Expected O, but got Unknown
 		//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_065a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0661: Expected O, but got Unknown
-		//IL_0827: Unknown result type (might be due to invalid IL or missing references)
+		//IL_083b: Unknown result type (might be due to invalid IL or missing references)
 		if (sortOrder.dialogType == DIALOG_TYPE.MATERIAL)
 		{
-			SetActive((Enum)UI.MATERIAL_ROOT, true);
-			SetActive((Enum)UI.RARITY_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, false);
-			SetActive((Enum)UI.ELEMENT_ROOT, true);
+			SetActive((Enum)UI.MATERIAL_ROOT, is_visible: true);
+			SetActive((Enum)UI.RARITY_ROOT, is_visible: false);
+			SetActive((Enum)UI.EQUIP_FILTER_ROOT, is_visible: false);
+			SetActive((Enum)UI.ELEMENT_ROOT, is_visible: true);
 			int i = 0;
 			for (int num = materialButton.Length; i < num; i++)
 			{
@@ -202,15 +166,15 @@ public class ItemSortBase : SortBase
 			UIWidget component = GameObject.Find("ItemSortFrame").get_gameObject().GetComponent<UIWidget>();
 			component.height = 633;
 			GetCtrl(UI.ELEMENT_ROOT).set_localPosition(new Vector3(0f, -153f, 0f));
-			Transform val = GameObject.Find("sort").get_gameObject().get_transform();
-			val.set_localPosition(new Vector3(0f, -322f, 0f));
+			Transform transform = GameObject.Find("sort").get_gameObject().get_transform();
+			transform.set_localPosition(new Vector3(0f, -322f, 0f));
 		}
 		else if (sortOrder.dialogType == DIALOG_TYPE.SMITH_CREATE_WEAPON || sortOrder.dialogType == DIALOG_TYPE.SMITH_CREATE_ARMOR)
 		{
-			SetActive((Enum)UI.MATERIAL_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, true);
-			SetActive((Enum)UI.RARITY_ROOT, true);
-			SetActive((Enum)UI.ELEMENT_ROOT, true);
+			SetActive((Enum)UI.MATERIAL_ROOT, is_visible: false);
+			SetActive((Enum)UI.EQUIP_FILTER_ROOT, is_visible: true);
+			SetActive((Enum)UI.RARITY_ROOT, is_visible: true);
+			SetActive((Enum)UI.ELEMENT_ROOT, is_visible: true);
 			int k = 0;
 			for (int num3 = rarityButton.Length; k < num3; k++)
 			{
@@ -233,32 +197,32 @@ public class ItemSortBase : SortBase
 				SetToggle(GetCtrl(elementButton[m]).get_parent(), value5);
 			}
 			UIWidget component2 = GameObject.Find("ItemSortFrame").get_gameObject().GetComponent<UIWidget>();
-			Transform val2 = component2.get_transform();
-			Vector3 localPosition = val2.get_localPosition();
+			Transform transform2 = component2.get_transform();
+			Vector3 localPosition = transform2.get_localPosition();
 			float x = localPosition.x;
-			Vector3 localPosition2 = val2.get_localPosition();
+			Vector3 localPosition2 = transform2.get_localPosition();
 			float num6 = localPosition2.y + 40f;
-			Vector3 localPosition3 = val2.get_localPosition();
+			Vector3 localPosition3 = transform2.get_localPosition();
 			Vector3 localPosition4 = default(Vector3);
 			localPosition4._002Ector(x, num6, localPosition3.z);
-			val2.set_localPosition(localPosition4);
-			component2.height = 700;
-			Transform val3 = GameObject.Find("sort").get_gameObject().get_transform();
-			Vector3 localPosition5 = val3.get_localPosition();
+			transform2.set_localPosition(localPosition4);
+			component2.height = 750;
+			Transform transform3 = GameObject.Find("sort").get_gameObject().get_transform();
+			Vector3 localPosition5 = transform3.get_localPosition();
 			float x2 = localPosition5.x;
-			Vector3 localPosition6 = val3.get_localPosition();
-			float num7 = localPosition6.y - 185f;
-			Vector3 localPosition7 = val3.get_localPosition();
+			Vector3 localPosition6 = transform3.get_localPosition();
+			float num7 = localPosition6.y - 240f;
+			Vector3 localPosition7 = transform3.get_localPosition();
 			Vector3 localPosition8 = default(Vector3);
 			localPosition8._002Ector(x2, num7, localPosition7.z);
-			val3.set_localPosition(localPosition8);
+			transform3.set_localPosition(localPosition8);
 		}
 		else if (sortOrder.dialogType == DIALOG_TYPE.ABILITY_ITEM)
 		{
-			SetActive((Enum)UI.MATERIAL_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, false);
-			SetActive((Enum)UI.RARITY_ROOT, true);
-			SetActive((Enum)UI.ELEMENT_ROOT, true);
+			SetActive((Enum)UI.MATERIAL_ROOT, is_visible: false);
+			SetActive((Enum)UI.EQUIP_FILTER_ROOT, is_visible: false);
+			SetActive((Enum)UI.RARITY_ROOT, is_visible: true);
+			SetActive((Enum)UI.ELEMENT_ROOT, is_visible: true);
 			int n = 0;
 			for (int num8 = rarityButton.Length; n < num8; n++)
 			{
@@ -276,15 +240,15 @@ public class ItemSortBase : SortBase
 			UIWidget component3 = GameObject.Find("ItemSortFrame").get_gameObject().GetComponent<UIWidget>();
 			component3.height = 583;
 			GetCtrl(UI.ELEMENT_ROOT).set_localPosition(new Vector3(0f, -98f, 0f));
-			Transform val4 = GameObject.Find("sort").get_gameObject().get_transform();
-			val4.set_localPosition(new Vector3(0f, -264f, 0f));
+			Transform transform4 = GameObject.Find("sort").get_gameObject().get_transform();
+			transform4.set_localPosition(new Vector3(0f, -264f, 0f));
 		}
 		else
 		{
-			SetActive((Enum)UI.MATERIAL_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, false);
-			SetActive((Enum)UI.RARITY_ROOT, true);
-			SetActive((Enum)UI.ELEMENT_ROOT, false);
+			SetActive((Enum)UI.MATERIAL_ROOT, is_visible: false);
+			SetActive((Enum)UI.EQUIP_FILTER_ROOT, is_visible: false);
+			SetActive((Enum)UI.RARITY_ROOT, is_visible: true);
+			SetActive((Enum)UI.ELEMENT_ROOT, is_visible: false);
 			int num11 = 0;
 			for (int num12 = rarityButton.Length; num11 < num12; num11++)
 			{
@@ -316,31 +280,31 @@ public class ItemSortBase : SortBase
 			num13 = 8521;
 			break;
 		}
-		UI? nullable = null;
+		UI? uI = null;
 		int num14 = 0;
 		for (int num15 = requirementButton.Length; num14 < num15; num14++)
 		{
-			UI? nullable2 = requirementButton[num14];
-			if (nullable2.HasValue)
+			UI? uI2 = requirementButton[num14];
+			if (uI2.HasValue)
 			{
 				int num16 = 1 << num14;
 				if ((num16 & num13) != 0)
 				{
 					bool value9 = sortOrder.requirement == (SORT_REQUIREMENT)num16;
-					SetEvent((Enum)requirementButton[num14], "REQUIREMENT", num16);
-					SetToggle((Enum)requirementButton[num14], value9);
-					nullable = requirementButton[num14];
+					SetEvent((Enum)(object)requirementButton[num14], "REQUIREMENT", num16);
+					SetToggle((Enum)(object)requirementButton[num14], value9);
+					uI = requirementButton[num14];
 				}
 				else
 				{
-					SetActive((Enum)requirementButton[num14], false);
+					SetActive((Enum)(object)requirementButton[num14], is_visible: false);
 				}
 			}
 		}
-		if (nullable.HasValue)
+		if (uI.HasValue)
 		{
 			base.GetComponent<UIGrid>((Enum)UI.GRD_REQUIREMENT).Reposition();
-			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).set_position(GetCtrl(nullable).get_position());
+			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).set_position(GetCtrl((Enum)(object)uI).get_position());
 		}
 		int num17 = 0;
 		for (int num18 = ascButton.Length; num17 < num18; num17++)
@@ -357,32 +321,24 @@ public class ItemSortBase : SortBase
 
 	private void OnQuery_RARITY()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		OnQueryEvent_Rarity(out int _index, out bool _is_enable);
 		SetToggle(GetCtrl(rarityButton[_index]).get_parent(), _is_enable);
 	}
 
 	private void OnQuery_MATERIAL()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		OnQueryEvent_Type(out int _index, out bool _is_enable);
 		SetToggle(GetCtrl(materialButton[_index]).get_parent(), _is_enable);
 	}
 
 	private void OnQuery_EQUIPFILTER()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		OnQueryEvent_EquipFilter(out int _index, out bool _is_enable);
 		SetToggle(GetCtrl(equipFilterButton[_index]).get_parent(), _is_enable);
 	}
 
 	private void OnQuery_ELEMENT()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		OnQueryEvent_Element(out int _index, out bool _is_enable);
 		SetToggle(GetCtrl(elementButton[_index]).get_parent(), _is_enable);
 	}

@@ -1,9 +1,20 @@
 package com.google.android.gms.common.stats;
 
+import com.google.android.gms.common.annotation.KeepForSdk;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
 
-public abstract class StatsEvent extends zza implements ReflectedParcelable {
+@KeepForSdk
+public abstract class StatsEvent extends AbstractSafeParcelable implements ReflectedParcelable {
+
+    @KeepForSdk
+    public interface Types {
+        @KeepForSdk
+        public static final int EVENT_TYPE_ACQUIRE_WAKE_LOCK = 7;
+        @KeepForSdk
+        public static final int EVENT_TYPE_RELEASE_WAKE_LOCK = 8;
+    }
+
     public abstract int getEventType();
 
     public abstract long getTimeMillis();
@@ -11,12 +22,12 @@ public abstract class StatsEvent extends zza implements ReflectedParcelable {
     public String toString() {
         long timeMillis = getTimeMillis();
         int eventType = getEventType();
-        long zzakz = zzakz();
-        String zzala = zzala();
-        return new StringBuilder(((String.valueOf("\t").length() + 51) + String.valueOf("\t").length()) + String.valueOf(zzala).length()).append(timeMillis).append("\t").append(eventType).append("\t").append(zzakz).append(zzala).toString();
+        long zzu = zzu();
+        String zzv = zzv();
+        return new StringBuilder(String.valueOf(zzv).length() + 53).append(timeMillis).append("\t").append(eventType).append("\t").append(zzu).append(zzv).toString();
     }
 
-    public abstract long zzakz();
+    public abstract long zzu();
 
-    public abstract String zzala();
+    public abstract String zzv();
 }

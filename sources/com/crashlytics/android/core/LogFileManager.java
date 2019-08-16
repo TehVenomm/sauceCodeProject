@@ -1,19 +1,24 @@
 package com.crashlytics.android.core;
 
 import android.content.Context;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.services.common.CommonUtils;
 import java.io.File;
+import java.util.Set;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
 
 class LogFileManager {
-    private static final String DIRECTORY_NAME = "log-files";
+    private static final String COLLECT_CUSTOM_LOGS = "com.crashlytics.CollectCustomLogs";
     private static final String LOGFILE_EXT = ".temp";
     private static final String LOGFILE_PREFIX = "crashlytics-userlog-";
     static final int MAX_LOG_SIZE = 65536;
     private static final NoopLogStore NOOP_LOG_STORE = new NoopLogStore();
     private final Context context;
-    private FileLogStore currentLog = NOOP_LOG_STORE;
-    private final File logFileDir;
+    private FileLogStore currentLog;
+    private final DirectoryProvider directoryProvider;
+
+    public interface DirectoryProvider {
+        File getLogFileDir();
+    }
 
     private static final class NoopLogStore implements FileLogStore {
         private NoopLogStore() {
@@ -29,53 +34,81 @@ class LogFileManager {
             return null;
         }
 
+        public byte[] getLogAsBytes() {
+            return null;
+        }
+
         public void writeToLog(long j, String str) {
         }
     }
 
-    public LogFileManager(Context context, File file) {
-        this.context = context;
-        this.logFileDir = new File(file, DIRECTORY_NAME);
+    LogFileManager(Context context2, DirectoryProvider directoryProvider2) {
+        this(context2, directoryProvider2, null);
     }
 
-    private void ensureTargetDirectoryExists() {
-        if (!this.logFileDir.exists()) {
-            this.logFileDir.mkdirs();
-        }
+    LogFileManager(Context context2, DirectoryProvider directoryProvider2, String str) {
+        this.context = context2;
+        this.directoryProvider = directoryProvider2;
+        this.currentLog = NOOP_LOG_STORE;
+        setCurrentSession(str);
+    }
+
+    private String getSessionIdForFile(File file) {
+        String name = file.getName();
+        int lastIndexOf = name.lastIndexOf(LOGFILE_EXT);
+        return lastIndexOf == -1 ? name : name.substring(LOGFILE_PREFIX.length(), lastIndexOf);
     }
 
     private File getWorkingFileForSession(String str) {
-        ensureTargetDirectoryExists();
-        return new File(this.logFileDir, LOGFILE_PREFIX + str + LOGFILE_EXT);
+        return new File(this.directoryProvider.getLogFileDir(), LOGFILE_PREFIX + str + LOGFILE_EXT);
     }
 
-    private boolean isLoggingEnabled() {
-        return CommonUtils.getBooleanResourceValue(this.context, "com.crashlytics.CollectCustomLogs", true);
-    }
-
+    /* access modifiers changed from: 0000 */
     public void clearLog() {
         this.currentLog.deleteLogFile();
     }
 
+    /* access modifiers changed from: 0000 */
+    public void discardOldLogFiles(Set<String> set) {
+        File[] listFiles = this.directoryProvider.getLogFileDir().listFiles();
+        if (listFiles != null) {
+            for (File file : listFiles) {
+                if (!set.contains(getSessionIdForFile(file))) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    /* access modifiers changed from: 0000 */
     public ByteString getByteStringForLog() {
         return this.currentLog.getLogAsByteString();
     }
 
-    public void onSessionChange(String str) {
-        clearLog();
-        if (isLoggingEnabled()) {
-            setLogFile(getWorkingFileForSession(str), 65536);
-            return;
-        }
-        Fabric.getLogger().mo4289d("Fabric", "Preferences requested no custom logs. Aborting log file creation.");
-        this.currentLog = NOOP_LOG_STORE;
+    /* access modifiers changed from: 0000 */
+    public byte[] getBytesForLog() {
+        return this.currentLog.getLogAsBytes();
     }
 
-    void setLogFile(File file, int i) {
+    /* access modifiers changed from: 0000 */
+    public final void setCurrentSession(String str) {
         this.currentLog.closeLogFile();
+        this.currentLog = NOOP_LOG_STORE;
+        if (str != null) {
+            if (!CommonUtils.getBooleanResourceValue(this.context, COLLECT_CUSTOM_LOGS, true)) {
+                Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Preferences requested no custom logs. Aborting log file creation.");
+            } else {
+                setLogFile(getWorkingFileForSession(str), 65536);
+            }
+        }
+    }
+
+    /* access modifiers changed from: 0000 */
+    public void setLogFile(File file, int i) {
         this.currentLog = new QueueFileLogStore(file, i);
     }
 
+    /* access modifiers changed from: 0000 */
     public void writeToLog(long j, String str) {
         this.currentLog.writeToLog(j, str);
     }

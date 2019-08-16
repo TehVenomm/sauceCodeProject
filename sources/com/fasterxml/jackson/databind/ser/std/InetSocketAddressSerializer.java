@@ -16,12 +16,12 @@ public class InetSocketAddressSerializer extends StdScalarSerializer<InetSocketA
 
     public void serialize(InetSocketAddress inetSocketAddress, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         InetAddress address = inetSocketAddress.getAddress();
-        String hostName = address == null ? inetSocketAddress.getHostName() : address.toString().trim();
-        int indexOf = hostName.indexOf(47);
+        String trim = address == null ? inetSocketAddress.getHostName() : address.toString().trim();
+        int indexOf = trim.indexOf(47);
         if (indexOf >= 0) {
-            hostName = indexOf == 0 ? address instanceof Inet6Address ? "[" + hostName.substring(1) + "]" : hostName.substring(1) : hostName.substring(0, indexOf);
+            trim = indexOf == 0 ? address instanceof Inet6Address ? "[" + trim.substring(1) + "]" : trim.substring(1) : trim.substring(0, indexOf);
         }
-        jsonGenerator.writeString(hostName + ":" + inetSocketAddress.getPort());
+        jsonGenerator.writeString(trim + ":" + inetSocketAddress.getPort());
     }
 
     public void serializeWithType(InetSocketAddress inetSocketAddress, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException, JsonGenerationException {

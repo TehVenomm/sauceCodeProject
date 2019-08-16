@@ -1,4 +1,4 @@
-package android.support.v4.content;
+package android.support.p000v4.content;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -9,30 +9,32 @@ import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.util.SparseArray;
 
+@Deprecated
+/* renamed from: android.support.v4.content.WakefulBroadcastReceiver */
 public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
     private static final String EXTRA_WAKE_LOCK_ID = "android.support.content.wakelockid";
-    private static final SparseArray<WakeLock> mActiveWakeLocks = new SparseArray();
     private static int mNextId = 1;
+    private static final SparseArray<WakeLock> sActiveWakeLocks = new SparseArray<>();
 
     public static boolean completeWakefulIntent(Intent intent) {
         int intExtra = intent.getIntExtra(EXTRA_WAKE_LOCK_ID, 0);
         if (intExtra == 0) {
             return false;
         }
-        synchronized (mActiveWakeLocks) {
-            WakeLock wakeLock = (WakeLock) mActiveWakeLocks.get(intExtra);
+        synchronized (sActiveWakeLocks) {
+            WakeLock wakeLock = (WakeLock) sActiveWakeLocks.get(intExtra);
             if (wakeLock != null) {
                 wakeLock.release();
-                mActiveWakeLocks.remove(intExtra);
+                sActiveWakeLocks.remove(intExtra);
                 return true;
             }
-            Log.w("WakefulBroadcastReceiver", "No active wake lock id #" + intExtra);
+            Log.w("WakefulBroadcastReceiv.", "No active wake lock id #" + intExtra);
             return true;
         }
     }
 
     public static ComponentName startWakefulService(Context context, Intent intent) {
-        synchronized (mActiveWakeLocks) {
+        synchronized (sActiveWakeLocks) {
             int i = mNextId;
             mNextId++;
             if (mNextId <= 0) {
@@ -46,7 +48,7 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
             WakeLock newWakeLock = ((PowerManager) context.getSystemService("power")).newWakeLock(1, "wake:" + startService.flattenToShortString());
             newWakeLock.setReferenceCounted(false);
             newWakeLock.acquire(60000);
-            mActiveWakeLocks.put(i, newWakeLock);
+            sActiveWakeLocks.put(i, newWakeLock);
             return startService;
         }
     }

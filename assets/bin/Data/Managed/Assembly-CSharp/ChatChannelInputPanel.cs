@@ -64,7 +64,7 @@ public class ChatChannelInputPanel
 	{
 		button.onClick.Add(new EventDelegate(delegate
 		{
-			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
+			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 			OnClose();
 		}));
 	}
@@ -98,7 +98,7 @@ public class ChatChannelInputPanel
 
 	private void OnNumber(int num)
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
 		if (currentPosition >= 0)
 		{
 			number[currentPosition] = num;
@@ -110,7 +110,7 @@ public class ChatChannelInputPanel
 
 	private void OnOK()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.OK, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.OK);
 		int num = 0;
 		for (int i = 0; i < number.Length; i++)
 		{
@@ -127,7 +127,7 @@ public class ChatChannelInputPanel
 
 	private void OnClear()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 		ClearNumbers();
 		UpdateOKButton();
 		UpdateNumberLabels();

@@ -24,14 +24,12 @@ namespace MsgPack
 			if (x < 128)
 			{
 				_strm.WriteByte(x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 204;
-				tmp[1] = x;
-				_strm.Write(tmp, 0, 2);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 204;
+			tmp[1] = x;
+			_strm.Write(tmp, 0, 2);
 		}
 
 		public void Write(ushort x)
@@ -39,15 +37,13 @@ namespace MsgPack
 			if (x < 256)
 			{
 				Write((byte)x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 205;
-				tmp[1] = (byte)(x >> 8);
-				tmp[2] = (byte)x;
-				_strm.Write(tmp, 0, 3);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 205;
+			tmp[1] = (byte)(x >> 8);
+			tmp[2] = (byte)x;
+			_strm.Write(tmp, 0, 3);
 		}
 
 		public void Write(char x)
@@ -60,17 +56,15 @@ namespace MsgPack
 			if (x < 65536)
 			{
 				Write((ushort)x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 206;
-				tmp[1] = (byte)(x >> 24);
-				tmp[2] = (byte)(x >> 16);
-				tmp[3] = (byte)(x >> 8);
-				tmp[4] = (byte)x;
-				_strm.Write(tmp, 0, 5);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 206;
+			tmp[1] = (byte)(x >> 24);
+			tmp[2] = (byte)(x >> 16);
+			tmp[3] = (byte)(x >> 8);
+			tmp[4] = (byte)x;
+			_strm.Write(tmp, 0, 5);
 		}
 
 		public void Write(ulong x)
@@ -78,21 +72,19 @@ namespace MsgPack
 			if (x < 4294967296L)
 			{
 				Write((uint)x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 207;
-				tmp[1] = (byte)(x >> 56);
-				tmp[2] = (byte)(x >> 48);
-				tmp[3] = (byte)(x >> 40);
-				tmp[4] = (byte)(x >> 32);
-				tmp[5] = (byte)(x >> 24);
-				tmp[6] = (byte)(x >> 16);
-				tmp[7] = (byte)(x >> 8);
-				tmp[8] = (byte)x;
-				_strm.Write(tmp, 0, 9);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 207;
+			tmp[1] = (byte)(x >> 56);
+			tmp[2] = (byte)(x >> 48);
+			tmp[3] = (byte)(x >> 40);
+			tmp[4] = (byte)(x >> 32);
+			tmp[5] = (byte)(x >> 24);
+			tmp[6] = (byte)(x >> 16);
+			tmp[7] = (byte)(x >> 8);
+			tmp[8] = (byte)x;
+			_strm.Write(tmp, 0, 9);
 		}
 
 		public void Write(sbyte x)
@@ -100,18 +92,17 @@ namespace MsgPack
 			if (x >= -32 && x <= -1)
 			{
 				_strm.WriteByte((byte)(0xE0 | (byte)x));
+				return;
 			}
-			else if (x >= 0 && x <= 127)
+			if (x >= 0 && x <= sbyte.MaxValue)
 			{
 				_strm.WriteByte((byte)x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 208;
-				tmp[1] = (byte)x;
-				_strm.Write(tmp, 0, 2);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 208;
+			tmp[1] = (byte)x;
+			_strm.Write(tmp, 0, 2);
 		}
 
 		public void Write(short x)
@@ -119,15 +110,13 @@ namespace MsgPack
 			if (x >= -128 && x <= 127)
 			{
 				Write((sbyte)x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 209;
-				tmp[1] = (byte)(x >> 8);
-				tmp[2] = (byte)x;
-				_strm.Write(tmp, 0, 3);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 209;
+			tmp[1] = (byte)(x >> 8);
+			tmp[2] = (byte)x;
+			_strm.Write(tmp, 0, 3);
 		}
 
 		public void Write(int x)
@@ -135,39 +124,35 @@ namespace MsgPack
 			if (x >= -32768 && x <= 32767)
 			{
 				Write((short)x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 210;
-				tmp[1] = (byte)(x >> 24);
-				tmp[2] = (byte)(x >> 16);
-				tmp[3] = (byte)(x >> 8);
-				tmp[4] = (byte)x;
-				_strm.Write(tmp, 0, 5);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 210;
+			tmp[1] = (byte)(x >> 24);
+			tmp[2] = (byte)(x >> 16);
+			tmp[3] = (byte)(x >> 8);
+			tmp[4] = (byte)x;
+			_strm.Write(tmp, 0, 5);
 		}
 
 		public void Write(long x)
 		{
-			if (x >= -2147483648 && x <= 2147483647)
+			if (x >= int.MinValue && x <= int.MaxValue)
 			{
 				Write((int)x);
+				return;
 			}
-			else
-			{
-				byte[] tmp = _tmp;
-				tmp[0] = 211;
-				tmp[1] = (byte)(x >> 56);
-				tmp[2] = (byte)(x >> 48);
-				tmp[3] = (byte)(x >> 40);
-				tmp[4] = (byte)(x >> 32);
-				tmp[5] = (byte)(x >> 24);
-				tmp[6] = (byte)(x >> 16);
-				tmp[7] = (byte)(x >> 8);
-				tmp[8] = (byte)x;
-				_strm.Write(tmp, 0, 9);
-			}
+			byte[] tmp = _tmp;
+			tmp[0] = 211;
+			tmp[1] = (byte)(x >> 56);
+			tmp[2] = (byte)(x >> 48);
+			tmp[3] = (byte)(x >> 40);
+			tmp[4] = (byte)(x >> 32);
+			tmp[5] = (byte)(x >> 24);
+			tmp[6] = (byte)(x >> 16);
+			tmp[7] = (byte)(x >> 8);
+			tmp[8] = (byte)x;
+			_strm.Write(tmp, 0, 9);
 		}
 
 		public void WriteNil()
@@ -258,34 +243,32 @@ namespace MsgPack
 			if (N < fix_length)
 			{
 				_strm.WriteByte((byte)(fix_prefix | N));
+				return;
+			}
+			byte[] tmp = _tmp;
+			int count;
+			if (N < 65536)
+			{
+				tmp[0] = len16bit_prefix;
+				tmp[1] = (byte)(N >> 8);
+				tmp[2] = (byte)N;
+				count = 3;
 			}
 			else
 			{
-				byte[] tmp = _tmp;
-				int count;
-				if (N < 65536)
-				{
-					tmp[0] = len16bit_prefix;
-					tmp[1] = (byte)(N >> 8);
-					tmp[2] = (byte)N;
-					count = 3;
-				}
-				else
-				{
-					tmp[0] = len32bit_prefix;
-					tmp[1] = (byte)(N >> 24);
-					tmp[2] = (byte)(N >> 16);
-					tmp[3] = (byte)(N >> 8);
-					tmp[4] = (byte)N;
-					count = 5;
-				}
-				_strm.Write(tmp, 0, count);
+				tmp[0] = len32bit_prefix;
+				tmp[1] = (byte)(N >> 24);
+				tmp[2] = (byte)(N >> 16);
+				tmp[3] = (byte)(N >> 8);
+				tmp[4] = (byte)N;
+				count = 5;
 			}
+			_strm.Write(tmp, 0, count);
 		}
 
 		public void Write(string x)
 		{
-			Write(x, false);
+			Write(x, highProbAscii: false);
 		}
 
 		public void Write(string x, bool highProbAscii)
@@ -295,7 +278,7 @@ namespace MsgPack
 
 		public void Write(string x, byte[] buf)
 		{
-			Write(x, buf, false);
+			Write(x, buf, highProbAscii: false);
 		}
 
 		public void Write(string x, byte[] buf, bool highProbAscii)
@@ -322,13 +305,13 @@ namespace MsgPack
 					return;
 				}
 			}
-			WriteRawHeader(encoder.GetByteCount(chars, 0, x.Length, true));
+			WriteRawHeader(encoder.GetByteCount(chars, 0, x.Length, flush: true));
 			int num2 = x.Length;
 			bool completed = true;
 			int num3 = 0;
 			while (num2 > 0 || !completed)
 			{
-				encoder.Convert(chars, num3, num2, buf, 0, buf.Length, false, out int charsUsed, out int bytesUsed, out completed);
+				encoder.Convert(chars, num3, num2, buf, 0, buf.Length, flush: false, out int charsUsed, out int bytesUsed, out completed);
 				_strm.Write(buf, 0, bytesUsed);
 				num2 -= charsUsed;
 				num3 += charsUsed;

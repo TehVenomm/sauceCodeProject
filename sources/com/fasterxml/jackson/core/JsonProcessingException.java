@@ -42,7 +42,8 @@ public class JsonProcessingException extends IOException {
         return null;
     }
 
-    protected String getMessageSuffix() {
+    /* access modifiers changed from: protected */
+    public String getMessageSuffix() {
         return null;
     }
 
@@ -56,17 +57,17 @@ public class JsonProcessingException extends IOException {
         if (location == null && messageSuffix == null) {
             return message;
         }
-        StringBuilder stringBuilder = new StringBuilder(100);
-        stringBuilder.append(message);
+        StringBuilder sb = new StringBuilder(100);
+        sb.append(message);
         if (messageSuffix != null) {
-            stringBuilder.append(messageSuffix);
+            sb.append(messageSuffix);
         }
         if (location != null) {
-            stringBuilder.append('\n');
-            stringBuilder.append(" at ");
-            stringBuilder.append(location.toString());
+            sb.append(10);
+            sb.append(" at ");
+            sb.append(location.toString());
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public String toString() {

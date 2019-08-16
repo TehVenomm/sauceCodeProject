@@ -4,25 +4,19 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import android.support.p000v4.app.FragmentActivity;
 import com.facebook.AccessTokenSource;
 import com.facebook.FacebookException;
 import com.facebook.internal.FacebookDialogFragment;
 import com.facebook.internal.ServerProtocol;
+import com.facebook.internal.Utility;
 import com.facebook.internal.WebDialog;
 import com.facebook.internal.WebDialog.Builder;
 import com.facebook.internal.WebDialog.OnCompleteListener;
 import com.facebook.login.LoginClient.Request;
 
 class WebViewLoginMethodHandler extends WebLoginMethodHandler {
-    public static final Creator<WebViewLoginMethodHandler> CREATOR = new C04492();
-    private String e2e;
-    private WebDialog loginDialog;
-
-    /* renamed from: com.facebook.login.WebViewLoginMethodHandler$2 */
-    static final class C04492 implements Creator {
-        C04492() {
-        }
-
+    public static final Creator<WebViewLoginMethodHandler> CREATOR = new Creator<WebViewLoginMethodHandler>() {
         public WebViewLoginMethodHandler createFromParcel(Parcel parcel) {
             return new WebViewLoginMethodHandler(parcel);
         }
@@ -30,13 +24,15 @@ class WebViewLoginMethodHandler extends WebLoginMethodHandler {
         public WebViewLoginMethodHandler[] newArray(int i) {
             return new WebViewLoginMethodHandler[i];
         }
-    }
+    };
+    private String e2e;
+    private WebDialog loginDialog;
 
     static class AuthDialogBuilder extends Builder {
         private static final String OAUTH_DIALOG = "oauth";
-        static final String REDIRECT_URI = "fbconnect://success";
+        private String authType;
         private String e2e;
-        private boolean isRerequest;
+        private String redirect_uri = ServerProtocol.DIALOG_REDIRECT_URI;
 
         public AuthDialogBuilder(Context context, String str, Bundle bundle) {
             super(context, str, OAUTH_DIALOG, bundle);
@@ -44,13 +40,18 @@ class WebViewLoginMethodHandler extends WebLoginMethodHandler {
 
         public WebDialog build() {
             Bundle parameters = getParameters();
-            parameters.putString(ServerProtocol.DIALOG_PARAM_REDIRECT_URI, "fbconnect://success");
+            parameters.putString(ServerProtocol.DIALOG_PARAM_REDIRECT_URI, this.redirect_uri);
             parameters.putString("client_id", getApplicationId());
             parameters.putString("e2e", this.e2e);
             parameters.putString(ServerProtocol.DIALOG_PARAM_RESPONSE_TYPE, ServerProtocol.DIALOG_RESPONSE_TYPE_TOKEN_AND_SIGNED_REQUEST);
             parameters.putString(ServerProtocol.DIALOG_PARAM_RETURN_SCOPES, ServerProtocol.DIALOG_RETURN_SCOPES_TRUE);
-            parameters.putString(ServerProtocol.DIALOG_PARAM_AUTH_TYPE, ServerProtocol.DIALOG_REREQUEST_AUTH_TYPE);
-            return new WebDialog(getContext(), OAUTH_DIALOG, parameters, getTheme(), getListener());
+            parameters.putString(ServerProtocol.DIALOG_PARAM_AUTH_TYPE, this.authType);
+            return WebDialog.newInstance(getContext(), OAUTH_DIALOG, parameters, getTheme(), getListener());
+        }
+
+        public AuthDialogBuilder setAuthType(String str) {
+            this.authType = str;
+            return this;
         }
 
         public AuthDialogBuilder setE2E(String str) {
@@ -58,8 +59,12 @@ class WebViewLoginMethodHandler extends WebLoginMethodHandler {
             return this;
         }
 
+        public AuthDialogBuilder setIsChromeOS(boolean z) {
+            this.redirect_uri = z ? ServerProtocol.DIALOG_REDIRECT_CHROME_OS_URI : ServerProtocol.DIALOG_REDIRECT_URI;
+            return this;
+        }
+
         public AuthDialogBuilder setIsRerequest(boolean z) {
-            this.isRerequest = z;
             return this;
         }
     }
@@ -73,7 +78,8 @@ class WebViewLoginMethodHandler extends WebLoginMethodHandler {
         super(loginClient);
     }
 
-    void cancel() {
+    /* access modifiers changed from: 0000 */
+    public void cancel() {
         if (this.loginDialog != null) {
             this.loginDialog.cancel();
             this.loginDialog = null;
@@ -84,33 +90,38 @@ class WebViewLoginMethodHandler extends WebLoginMethodHandler {
         return 0;
     }
 
-    String getNameForLogging() {
+    /* access modifiers changed from: 0000 */
+    public String getNameForLogging() {
         return "web_view";
     }
 
-    AccessTokenSource getTokenSource() {
+    /* access modifiers changed from: 0000 */
+    public AccessTokenSource getTokenSource() {
         return AccessTokenSource.WEB_VIEW;
     }
 
-    boolean needsInternetPermission() {
+    /* access modifiers changed from: 0000 */
+    public boolean needsInternetPermission() {
         return true;
     }
 
-    void onWebDialogComplete(Request request, Bundle bundle, FacebookException facebookException) {
+    /* access modifiers changed from: 0000 */
+    public void onWebDialogComplete(Request request, Bundle bundle, FacebookException facebookException) {
         super.onComplete(request, bundle, facebookException);
     }
 
-    boolean tryAuthorize(final Request request) {
+    /* access modifiers changed from: 0000 */
+    public boolean tryAuthorize(final Request request) {
         Bundle parameters = getParameters(request);
-        OnCompleteListener c04481 = new OnCompleteListener() {
+        C06961 r1 = new OnCompleteListener() {
             public void onComplete(Bundle bundle, FacebookException facebookException) {
                 WebViewLoginMethodHandler.this.onWebDialogComplete(request, bundle, facebookException);
             }
         };
         this.e2e = LoginClient.getE2E();
         addLoggingExtra("e2e", this.e2e);
-        Context activity = this.loginClient.getActivity();
-        this.loginDialog = new AuthDialogBuilder(activity, request.getApplicationId(), parameters).setE2E(this.e2e).setIsRerequest(request.isRerequest()).setOnCompleteListener(c04481).build();
+        FragmentActivity activity = this.loginClient.getActivity();
+        this.loginDialog = new AuthDialogBuilder(activity, request.getApplicationId(), parameters).setE2E(this.e2e).setIsChromeOS(Utility.isChromeOS(activity)).setAuthType(request.getAuthType()).setOnCompleteListener(r1).build();
         FacebookDialogFragment facebookDialogFragment = new FacebookDialogFragment();
         facebookDialogFragment.setRetainInstance(true);
         facebookDialogFragment.setDialog(this.loginDialog);

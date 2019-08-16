@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SceneParameter
+public class SceneParameter : MonoBehaviour
 {
 	public Texture2D[] lightmapsFar;
 
@@ -24,7 +24,7 @@ public class SceneParameter
 	public void Apply()
 	{
 		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Expected O, but got Unknown
+		//IL_006c: Expected O, but got Unknown
 		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 		if (lightProbes != null)
 		{
@@ -35,21 +35,22 @@ public class SceneParameter
 		{
 			ShaderGlobal.lightProbe = false;
 		}
-		if (lightmapsFar != null && lightmapsFar.Length > 0)
+		if (lightmapsFar == null || lightmapsFar.Length <= 0)
 		{
-			LightmapData[] array = (LightmapData[])new LightmapData[lightmapsFar.Length];
-			int i = 0;
-			for (int num = lightmapsFar.Length; i < num; i++)
-			{
-				array[i] = new LightmapData();
-				array[i].set_lightmapFar(lightmapsFar[i]);
-				if (i < lightmapsNear.Length)
-				{
-					array[i].set_lightmapNear(lightmapsNear[i]);
-				}
-			}
-			LightmapSettings.set_lightmapsMode(lightmapMode);
-			LightmapSettings.set_lightmaps(array);
+			return;
 		}
+		LightmapData[] array = (LightmapData[])new LightmapData[lightmapsFar.Length];
+		int i = 0;
+		for (int num = lightmapsFar.Length; i < num; i++)
+		{
+			array[i] = new LightmapData();
+			array[i].set_lightmapColor(lightmapsFar[i]);
+			if (i < lightmapsNear.Length)
+			{
+				array[i].set_lightmapDir(lightmapsNear[i]);
+			}
+		}
+		LightmapSettings.set_lightmapsMode(lightmapMode);
+		LightmapSettings.set_lightmaps(array);
 	}
 }

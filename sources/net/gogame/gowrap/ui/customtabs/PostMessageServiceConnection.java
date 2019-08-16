@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,8 +7,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub;
+import net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.PostMessageServiceConnection */
 public abstract class PostMessageServiceConnection implements ServiceConnection {
     private final Object mLock = new Object();
     private IPostMessageService mService;

@@ -1,6 +1,5 @@
 package net.gogame.gowrap.support;
 
-import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.UUID;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
 
 public class MultipartUtility {
     private static final String LINE_FEED = "\r\n";
@@ -76,9 +76,11 @@ public class MultipartUtility {
         if (responseCode == 200) {
             String multipartUtility = toString(this.httpConn.getInputStream());
             this.httpConn.disconnect();
-            return (multipartUtility.length() == 0 || multipartUtility.equals("")) ? null : multipartUtility;
-        } else {
-            throw new IOException("Server returned non-OK status: " + responseCode);
+            if (multipartUtility.length() == 0 || multipartUtility.equals("")) {
+                return null;
+            }
+            return multipartUtility;
         }
+        throw new IOException("Server returned non-OK status: " + responseCode);
     }
 }

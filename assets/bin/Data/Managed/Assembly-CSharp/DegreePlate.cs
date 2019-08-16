@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DegreePlate
+public class DegreePlate : MonoBehaviour
 {
 	private const int DEGREE_PART = 4;
 
@@ -26,8 +26,6 @@ public class DegreePlate
 
 	public static void Create(MonoBehaviour call_mono, List<int> degreeIds, bool isButton, Action<DegreePlate> onFinish)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
 		ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(RESOURCE_CATEGORY.UI, "DegreePlate");
 		if (cachedResourceObject != null)
 		{
@@ -36,20 +34,17 @@ public class DegreePlate
 		}
 		else
 		{
-			MonoBehaviourSingleton<ResourceManager>.I.Load(ResourceLoad.GetResourceLoad(call_mono, true), RESOURCE_CATEGORY.UI, "DegreePlate", delegate(ResourceManager.LoadRequest x, ResourceObject[] y)
+			MonoBehaviourSingleton<ResourceManager>.I.Load(ResourceLoad.GetResourceLoad(call_mono, destroy_notify: true), RESOURCE_CATEGORY.UI, "DegreePlate", delegate(ResourceManager.LoadRequest x, ResourceObject[] y)
 			{
-				//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001d: Expected O, but got Unknown
 				y[0].refCount++;
 				DegreePlate component2 = (Object.Instantiate(y[0].obj) as GameObject).GetComponent<DegreePlate>();
 				component2.Initialize(degreeIds, isButton, onFinish);
-			}, null, false, null);
+			}, null);
 		}
 	}
 
 	public void Initialize(List<int> degreeIds, bool isButton, Action<DegreePlate> onFinish)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize(degreeIds, isButton, onFinish));
 	}
 
@@ -58,47 +53,41 @@ public class DegreePlate
 		if (degreeIds == null || degreeIds.Count != 4)
 		{
 			onFinish?.Invoke(null);
+			yield break;
+		}
+		DegreeTable.DegreeData frameData = Singleton<DegreeTable>.I.GetData((uint)degreeIds[0]);
+		if (frameData == null || (frameData.type != DEGREE_TYPE.FRAME && frameData.type != DEGREE_TYPE.SPECIAL_FRAME))
+		{
+			onFinish?.Invoke(null);
+			yield break;
+		}
+		string degreeText;
+		if (frameData.type == DEGREE_TYPE.SPECIAL_FRAME)
+		{
+			degreeText = string.Empty;
 		}
 		else
 		{
-			DegreeTable.DegreeData frameData = Singleton<DegreeTable>.I.GetData((uint)degreeIds[0]);
-			if (frameData == null || (frameData.type != DEGREE_TYPE.FRAME && frameData.type != DEGREE_TYPE.SPECIAL_FRAME))
-			{
-				onFinish?.Invoke(null);
-			}
-			else
-			{
-				string degreeText;
-				if (frameData.type == DEGREE_TYPE.SPECIAL_FRAME)
-				{
-					degreeText = string.Empty;
-				}
-				else
-				{
-					DegreeTable.DegreeData prefixData = Singleton<DegreeTable>.I.GetData((uint)degreeIds[1]);
-					DegreeTable.DegreeData conData = Singleton<DegreeTable>.I.GetData((uint)degreeIds[2]);
-					DegreeTable.DegreeData suffixData = Singleton<DegreeTable>.I.GetData((uint)degreeIds[3]);
-					degreeText = prefixData.name + conData.name + suffixData.name;
-				}
-				mText.text = degreeText;
-				mText.get_gameObject().SetActive(false);
-				yield return (object)this.StartCoroutine(_SetFrame(ResourceName.GetDegreeFrameName(degreeIds[0])));
-				mText.get_gameObject().SetActive(true);
-				SetEnableButtonCollider(isButton);
-				onFinish?.Invoke(this);
-			}
+			DegreeTable.DegreeData data = Singleton<DegreeTable>.I.GetData((uint)degreeIds[1]);
+			DegreeTable.DegreeData data2 = Singleton<DegreeTable>.I.GetData((uint)degreeIds[2]);
+			DegreeTable.DegreeData data3 = Singleton<DegreeTable>.I.GetData((uint)degreeIds[3]);
+			degreeText = data.name + " " + data2.name + " " + data3.name;
 		}
+		mText.text = degreeText;
+		mText.get_gameObject().SetActive(false);
+		yield return this.StartCoroutine(_SetFrame(ResourceName.GetDegreeFrameName(degreeIds[0])));
+		mText.get_gameObject().SetActive(true);
+		SetEnableButtonCollider(isButton);
+		onFinish?.Invoke(this);
 	}
 
 	public void SetFrame(int degreeId)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(_SetFrame(ResourceName.GetDegreeFrameName(degreeId)));
 	}
 
 	public void SetUnknownFrame()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(_SetFrame("DF_UNKNOWN"));
 	}
 
@@ -107,11 +96,11 @@ public class DegreePlate
 		if (!(mFrameName == frameName))
 		{
 			LoadingQueue load = new LoadingQueue(this);
-			LoadObject frameTexture = load.Load(RESOURCE_CATEGORY.DEGREE_FRAME, frameName, false);
+			LoadObject frameTexture = load.Load(isEventAsset: true, RESOURCE_CATEGORY.DEGREE_FRAME, frameName);
 			mFrame.set_enabled(false);
 			if (load.IsLoading())
 			{
-				yield return (object)load.Wait();
+				yield return load.Wait();
 			}
 			mFrame.mainTexture = (frameTexture.loadedObject as Texture);
 			mFrameName = frameName;
@@ -121,7 +110,6 @@ public class DegreePlate
 
 	public void SetEnableButtonCollider(bool enable)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_transform().GetComponent<Collider>().set_enabled(enable);
 	}
 }

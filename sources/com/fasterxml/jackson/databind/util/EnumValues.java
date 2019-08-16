@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class EnumValues implements Serializable {
     private static final long serialVersionUID = 1;
@@ -33,7 +32,7 @@ public final class EnumValues implements Serializable {
     }
 
     public static EnumValues constructFromName(MapperConfig<?> mapperConfig, Class<Enum<?>> cls) {
-        Class findEnumType = ClassUtil.findEnumType((Class) cls);
+        Class findEnumType = ClassUtil.findEnumType(cls);
         Enum[] enumArr = (Enum[]) findEnumType.getEnumConstants();
         if (enumArr == null) {
             throw new IllegalArgumentException("Can not determine enum constants for Class " + cls.getName());
@@ -53,7 +52,7 @@ public final class EnumValues implements Serializable {
     }
 
     public static EnumValues constructFromToString(MapperConfig<?> mapperConfig, Class<Enum<?>> cls) {
-        Enum[] enumArr = (Enum[]) ClassUtil.findEnumType((Class) cls).getEnumConstants();
+        Enum[] enumArr = (Enum[]) ClassUtil.findEnumType(cls).getEnumConstants();
         if (enumArr != null) {
             SerializableString[] serializableStringArr = new SerializableString[enumArr.length];
             for (Enum enumR : enumArr) {
@@ -77,15 +76,16 @@ public final class EnumValues implements Serializable {
     }
 
     public EnumMap<?, SerializableString> internalMap() {
+        Enum<?>[] enumArr;
         EnumMap<?, SerializableString> enumMap = this._asMap;
         if (enumMap != null) {
             return enumMap;
         }
-        Map linkedHashMap = new LinkedHashMap();
-        for (Enum enumR : this._values) {
+        LinkedHashMap linkedHashMap = new LinkedHashMap();
+        for (Enum<?> enumR : this._values) {
             linkedHashMap.put(enumR, this._textual[enumR.ordinal()]);
         }
-        return new EnumMap(linkedHashMap);
+        return new EnumMap<>(linkedHashMap);
     }
 
     public Class<Enum<?>> getEnumClass() {

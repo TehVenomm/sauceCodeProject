@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TutorialUIObjectFollower
+public class TutorialUIObjectFollower : MonoBehaviour
 {
 	private Transform _transform;
 
@@ -27,8 +27,6 @@ public class TutorialUIObjectFollower
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		sprite = this.GetComponent<UISprite>();
 	}
@@ -54,30 +52,27 @@ public class TutorialUIObjectFollower
 		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 		UIPanel component = scroll.GetComponent<UIPanel>();
 		Vector4 finalClipRegion = component.finalClipRegion;
 		float x = finalClipRegion.x;
@@ -89,7 +84,7 @@ public class TutorialUIObjectFollower
 		float num2 = y - finalClipRegion4.w * 0.5f;
 		Vector2 val = new Vector2(num, num2);
 		Vector3 lossyScale = scroll.get_transform().get_lossyScale();
-		Vector2 val2 = val * lossyScale.x + Utility.ToVector2XY(scroll.get_transform().get_position());
+		Vector2 val2 = val * lossyScale.x + scroll.get_transform().get_position().ToVector2XY();
 		Vector4 finalClipRegion5 = component.finalClipRegion;
 		float z = finalClipRegion5.z;
 		Vector4 finalClipRegion6 = component.finalClipRegion;
@@ -100,7 +95,6 @@ public class TutorialUIObjectFollower
 
 	private void LateUpdate()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
@@ -111,32 +105,31 @@ public class TutorialUIObjectFollower
 		if (!Object.op_Implicit(target))
 		{
 			TutorialMessage.RemoveCursor(_transform);
+			return;
 		}
-		else if (!target.get_gameObject().get_activeInHierarchy())
+		if (!target.get_gameObject().get_activeInHierarchy())
 		{
 			sprite.set_enabled(false);
+			return;
 		}
-		else
+		if (!sprite.get_enabled())
 		{
+			sprite.set_enabled(true);
+		}
+		if (isInScrollView)
+		{
+			Vector3 val = target.get_position() + offset;
+			if (val.y > scrollViewSize.get_yMax() || val.y < scrollViewSize.get_yMin())
+			{
+				sprite.set_enabled(false);
+				CalcScrollRect(scroll);
+				return;
+			}
 			if (!sprite.get_enabled())
 			{
 				sprite.set_enabled(true);
 			}
-			if (isInScrollView)
-			{
-				Vector3 val = target.get_position() + offset;
-				if (val.y > scrollViewSize.get_yMax() || val.y < scrollViewSize.get_yMin())
-				{
-					sprite.set_enabled(false);
-					CalcScrollRect(scroll);
-					return;
-				}
-				if (!sprite.get_enabled())
-				{
-					sprite.set_enabled(true);
-				}
-			}
-			_transform.set_position(target.get_position() + offset);
 		}
+		_transform.set_position(target.get_position() + offset);
 	}
 }

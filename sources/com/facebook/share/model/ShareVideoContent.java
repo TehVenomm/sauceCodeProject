@@ -5,17 +5,7 @@ import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
 
 public final class ShareVideoContent extends ShareContent<ShareVideoContent, Builder> implements ShareModel {
-    public static final Creator<ShareVideoContent> CREATOR = new C05201();
-    private final String contentDescription;
-    private final String contentTitle;
-    private final SharePhoto previewPhoto;
-    private final ShareVideo video;
-
-    /* renamed from: com.facebook.share.model.ShareVideoContent$1 */
-    static final class C05201 implements Creator<ShareVideoContent> {
-        C05201() {
-        }
-
+    public static final Creator<ShareVideoContent> CREATOR = new Creator<ShareVideoContent>() {
         public ShareVideoContent createFromParcel(Parcel parcel) {
             return new ShareVideoContent(parcel);
         }
@@ -23,20 +13,28 @@ public final class ShareVideoContent extends ShareContent<ShareVideoContent, Bui
         public ShareVideoContent[] newArray(int i) {
             return new ShareVideoContent[i];
         }
-    }
+    };
+    private final String contentDescription;
+    private final String contentTitle;
+    private final SharePhoto previewPhoto;
+    private final ShareVideo video;
 
     public static final class Builder extends com.facebook.share.model.ShareContent.Builder<ShareVideoContent, Builder> {
-        private String contentDescription;
-        private String contentTitle;
-        private SharePhoto previewPhoto;
-        private ShareVideo video;
+        /* access modifiers changed from: private */
+        public String contentDescription;
+        /* access modifiers changed from: private */
+        public String contentTitle;
+        /* access modifiers changed from: private */
+        public SharePhoto previewPhoto;
+        /* access modifiers changed from: private */
+        public ShareVideo video;
 
         public ShareVideoContent build() {
-            return new ShareVideoContent();
+            return new ShareVideoContent(this);
         }
 
         public Builder readFrom(ShareVideoContent shareVideoContent) {
-            return shareVideoContent == null ? this : ((Builder) super.readFrom((ShareContent) shareVideoContent)).setContentDescription(shareVideoContent.getContentDescription()).setContentTitle(shareVideoContent.getContentTitle()).setPreviewPhoto(shareVideoContent.getPreviewPhoto()).setVideo(shareVideoContent.getVideo());
+            return shareVideoContent == null ? this : ((Builder) super.readFrom(shareVideoContent)).setContentDescription(shareVideoContent.getContentDescription()).setContentTitle(shareVideoContent.getContentTitle()).setPreviewPhoto(shareVideoContent.getPreviewPhoto()).setVideo(shareVideoContent.getVideo());
         }
 
         public Builder setContentDescription(@Nullable String str) {

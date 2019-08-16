@@ -9,6 +9,6 @@ public final class EventBuffer extends AbstractDataBuffer<Event> {
     }
 
     public final Event get(int i) {
-        return new EventRef(this.zzfkz, i);
+        return new EventRef(this.mDataHolder, i);
     }
 }

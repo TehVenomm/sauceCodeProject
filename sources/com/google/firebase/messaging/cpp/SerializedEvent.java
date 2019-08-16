@@ -29,6 +29,10 @@ public final class SerializedEvent extends Table {
         flatBufferBuilder.finish(i);
     }
 
+    public static void finishSizePrefixedSerializedEventBuffer(FlatBufferBuilder flatBufferBuilder, int i) {
+        flatBufferBuilder.finishSizePrefixed(i);
+    }
+
     public static SerializedEvent getRootAsSerializedEvent(ByteBuffer byteBuffer) {
         return getRootAsSerializedEvent(byteBuffer, new SerializedEvent());
     }
@@ -49,16 +53,22 @@ public final class SerializedEvent extends Table {
 
     public void __init(int i, ByteBuffer byteBuffer) {
         this.bb_pos = i;
-        this.bb = byteBuffer;
+        this.f441bb = byteBuffer;
     }
 
     public Table event(Table table) {
         int __offset = __offset(6);
-        return __offset != 0 ? __union(table, __offset) : null;
+        if (__offset != 0) {
+            return __union(table, __offset);
+        }
+        return null;
     }
 
     public byte eventType() {
         int __offset = __offset(4);
-        return __offset != 0 ? this.bb.get(__offset + this.bb_pos) : (byte) 0;
+        if (__offset != 0) {
+            return this.f441bb.get(__offset + this.bb_pos);
+        }
+        return 0;
     }
 }

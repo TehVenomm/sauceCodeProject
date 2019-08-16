@@ -44,15 +44,17 @@ public @interface JsonFormat {
         public static Features construct(Feature[] featureArr, Feature[] featureArr2) {
             int i = 0;
             int i2 = 0;
-            for (Feature ordinal : featureArr) {
-                i2 |= 1 << ordinal.ordinal();
+            while (i < featureArr.length) {
+                i++;
+                i2 = (1 << featureArr[i].ordinal()) | i2;
             }
             int i3 = 0;
-            while (i < featureArr2.length) {
-                i3 |= 1 << featureArr2[i].ordinal();
-                i++;
+            int i4 = 0;
+            while (i3 < featureArr2.length) {
+                i3++;
+                i4 = (1 << featureArr2[i3].ordinal()) | i4;
             }
-            return new Features(i2, i3);
+            return new Features(i2, i4);
         }
 
         public Features withOverrides(Features features) {
@@ -68,12 +70,8 @@ public @interface JsonFormat {
                 return features;
             }
             int i3 = (this._enabled & (i ^ -1)) | i2;
-            i |= (i2 ^ -1) & this._disabled;
-            if (i3 == this._enabled && i == this._disabled) {
-                return this;
-            }
-            this(i3, i);
-            return this;
+            int i4 = i | ((i2 ^ -1) & this._disabled);
+            return (i3 == this._enabled && i4 == this._disabled) ? this : new Features(i3, i4);
         }
 
         public Features with(Feature... featureArr) {
@@ -164,9 +162,7 @@ public @interface JsonFormat {
         }
 
         public Value(String str, Shape shape, String str2, String str3, Features features) {
-            Locale locale = (str2 == null || str2.length() == 0 || "##default".equals(str2)) ? null : new Locale(str2);
-            String str4 = (str3 == null || str3.length() == 0 || "##default".equals(str3)) ? null : str3;
-            this(str, shape, locale, str4, null, features);
+            this(str, shape, (str2 == null || str2.length() == 0 || "##default".equals(str2)) ? null : new Locale(str2), (str3 == null || str3.length() == 0 || "##default".equals(str3)) ? null : str3, null, features);
         }
 
         public Value(String str, Shape shape, Locale locale, TimeZone timeZone, Features features) {
@@ -226,14 +222,14 @@ public @interface JsonFormat {
         }
 
         public final Value withOverrides(Value value) {
+            Features withOverrides;
+            TimeZone timeZone;
             if (value == null || value == EMPTY) {
                 return this;
             }
             if (this == EMPTY) {
                 return value;
             }
-            Features features;
-            TimeZone timeZone;
             String str = value._pattern;
             if (str == null || str.isEmpty()) {
                 str = this._pattern;
@@ -246,11 +242,11 @@ public @interface JsonFormat {
             if (locale == null) {
                 locale = this._locale;
             }
-            Features features2 = this._features;
-            if (features2 == null) {
-                features = value._features;
+            Features features = this._features;
+            if (features == null) {
+                withOverrides = value._features;
             } else {
-                features = features2.withOverrides(value._features);
+                withOverrides = features.withOverrides(value._features);
             }
             String str2 = value._timezoneStr;
             if (str2 == null || str2.isEmpty()) {
@@ -259,7 +255,7 @@ public @interface JsonFormat {
             } else {
                 timeZone = value._timezone;
             }
-            return new Value(str, shape, locale, str2, timeZone, features);
+            return new Value(str, shape, locale, str2, timeZone, withOverrides);
         }
 
         public static Value forPattern(String str) {
@@ -327,9 +323,9 @@ public @interface JsonFormat {
             if (this._timezoneStr == null) {
                 return null;
             }
-            timeZone = TimeZone.getTimeZone(this._timezoneStr);
-            this._timezone = timeZone;
-            return timeZone;
+            TimeZone timeZone2 = TimeZone.getTimeZone(this._timezoneStr);
+            this._timezone = timeZone2;
+            return timeZone2;
         }
 
         public boolean hasShape() {
@@ -345,7 +341,7 @@ public @interface JsonFormat {
         }
 
         public boolean hasTimeZone() {
-            return (this._timezone == null && (this._timezoneStr == null || this._timezoneStr.isEmpty())) ? false : true;
+            return this._timezone != null || (this._timezoneStr != null && !this._timezoneStr.isEmpty());
         }
 
         public Boolean getFeature(Feature feature) {
@@ -361,11 +357,11 @@ public @interface JsonFormat {
             if (this._pattern != null) {
                 hashCode ^= this._pattern.hashCode();
             }
-            hashCode += this._shape.hashCode();
+            int hashCode2 = hashCode + this._shape.hashCode();
             if (this._locale != null) {
-                hashCode ^= this._locale.hashCode();
+                hashCode2 ^= this._locale.hashCode();
             }
-            return hashCode + this._features.hashCode();
+            return hashCode2 + this._features.hashCode();
         }
 
         public boolean equals(Object obj) {
@@ -380,7 +376,7 @@ public @interface JsonFormat {
             if (this._shape != value._shape || !this._features.equals(value._features)) {
                 return false;
             }
-            if (!(_equal(this._timezoneStr, value._timezoneStr) && _equal(this._pattern, value._pattern) && _equal(this._timezone, value._timezone) && _equal(this._locale, value._locale))) {
+            if (!_equal(this._timezoneStr, value._timezoneStr) || !_equal(this._pattern, value._pattern) || !_equal(this._timezone, value._timezone) || !_equal(this._locale, value._locale)) {
                 z = false;
             }
             return z;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIBlurWindow
+public class UIBlurWindow : MonoBehaviour
 {
 	private Material mat;
 
@@ -11,8 +11,6 @@ public class UIBlurWindow
 
 	private void Start()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
 		if (mat == null)
 		{
 			Renderer component = this.GetComponent<Renderer>();

@@ -6,6 +6,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 
+@Deprecated
 public interface Messages {
     @Deprecated
     PendingResult<Status> getPermissionStatus(GoogleApiClient googleApiClient);

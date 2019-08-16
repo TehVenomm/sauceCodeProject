@@ -19,7 +19,7 @@ public class HealAttackZoneObject : HealAttackObject
 			}
 			else
 			{
-				collInfo.Add(name, true);
+				collInfo.Add(name, value: true);
 			}
 		}
 
@@ -31,7 +31,7 @@ public class HealAttackZoneObject : HealAttackObject
 			}
 			else
 			{
-				collInfo.Add(name, true);
+				collInfo.Add(name, value: true);
 			}
 			if (lastTime != Time.get_time())
 			{
@@ -79,12 +79,12 @@ public class HealAttackZoneObject : HealAttackObject
 
 	public void Setup(Player owner, Transform trans, BulletData bullet, SkillInfo.SkillParam skill)
 	{
-		Initialize(owner, trans, (float)skill.supportValue[0], bullet.data.radius);
+		Initialize(owner, trans, skill.supportValue[0], bullet.data.radius);
 		intervalTime = bullet.dataZone.intervalTime;
 		AttackHitInfo attackHitInfo = m_attackInfo as AttackHitInfo;
 		if (attackHitInfo != null)
 		{
-			attackHitInfo.atkRate /= (float)Mathf.FloorToInt(skill.supportTime[0] / intervalTime);
+			attackHitInfo.atkRate /= Mathf.FloorToInt(skill.supportTime[0] / intervalTime);
 		}
 		targetCollection.Clear();
 	}
@@ -102,13 +102,11 @@ public class HealAttackZoneObject : HealAttackObject
 			if (targetCollection.ContainsKey(enemy.id))
 			{
 				targetCollection[enemy.id].Enter(collider.get_name());
+				return;
 			}
-			else
-			{
-				TargetInfo targetInfo = new TargetInfo();
-				targetInfo.Enter(collider.get_name());
-				targetCollection.Add(enemy.id, targetInfo);
-			}
+			TargetInfo targetInfo = new TargetInfo();
+			targetInfo.Enter(collider.get_name());
+			targetCollection.Add(enemy.id, targetInfo);
 		}
 	}
 
@@ -142,7 +140,6 @@ public class HealAttackZoneObject : HealAttackObject
 
 	private Enemy _GetValidEnemy(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		Enemy componentInParent = collider.get_gameObject().GetComponentInParent<Enemy>();
 		if (object.ReferenceEquals(componentInParent, null))
 		{

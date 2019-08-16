@@ -18,7 +18,7 @@ public class CollectionSerializer extends AsArraySerializerBase<Collection<?>> {
     private static final long serialVersionUID = 1;
 
     public CollectionSerializer(JavaType javaType, boolean z, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer) {
-        super(Collection.class, javaType, z, typeSerializer, (JsonSerializer) jsonSerializer);
+        super(Collection.class, javaType, z, typeSerializer, jsonSerializer);
     }
 
     @Deprecated
@@ -27,7 +27,7 @@ public class CollectionSerializer extends AsArraySerializerBase<Collection<?>> {
     }
 
     public CollectionSerializer(CollectionSerializer collectionSerializer, BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool) {
-        super((AsArraySerializerBase) collectionSerializer, beanProperty, typeSerializer, (JsonSerializer) jsonSerializer, bool);
+        super((AsArraySerializerBase<?>) collectionSerializer, beanProperty, typeSerializer, jsonSerializer, bool);
     }
 
     public ContainerSerializer<?> _withValueTypeSerializer(TypeSerializer typeSerializer) {
@@ -35,7 +35,7 @@ public class CollectionSerializer extends AsArraySerializerBase<Collection<?>> {
     }
 
     public CollectionSerializer withResolved(BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool) {
-        return new CollectionSerializer(this, beanProperty, typeSerializer, (JsonSerializer) jsonSerializer, bool);
+        return new CollectionSerializer(this, beanProperty, typeSerializer, jsonSerializer, bool);
     }
 
     public boolean isEmpty(SerializerProvider serializerProvider, Collection<?> collection) {
@@ -48,21 +48,21 @@ public class CollectionSerializer extends AsArraySerializerBase<Collection<?>> {
             return false;
         }
         it.next();
-        if (it.hasNext()) {
-            return false;
+        if (!it.hasNext()) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     public final void serialize(Collection<?> collection, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         int size = collection.size();
-        if (size == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
-            serializeContents((Collection) collection, jsonGenerator, serializerProvider);
+        if (size != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+            jsonGenerator.writeStartArray(size);
+            serializeContents(collection, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray(size);
-        serializeContents((Collection) collection, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
+        serializeContents(collection, jsonGenerator, serializerProvider);
     }
 
     public void serializeContents(Collection<?> collection, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -76,35 +76,32 @@ public class CollectionSerializer extends AsArraySerializerBase<Collection<?>> {
             TypeSerializer typeSerializer = this._valueTypeSerializer;
             int i = 0;
             do {
-                Object next = it.next();
-                if (next == null) {
-                    serializerProvider.defaultSerializeNull(jsonGenerator);
-                } else {
-                    Class cls = next.getClass();
-                    JsonSerializer serializerFor = propertySerializerMap.serializerFor(cls);
-                    if (serializerFor == null) {
-                        JsonSerializer _findAndAddDynamic;
-                        if (this._elementType.hasGenericTypes()) {
-                            _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap, serializerProvider.constructSpecializedType(this._elementType, cls), serializerProvider);
-                        } else {
-                            try {
-                                _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap, cls, serializerProvider);
-                            } catch (Throwable e) {
-                                wrapAndThrow(serializerProvider, e, (Object) collection, i);
-                                return;
-                            }
-                        }
-                        JsonSerializer jsonSerializer = _findAndAddDynamic;
-                        propertySerializerMap = this._dynamicSerializers;
-                        serializerFor = jsonSerializer;
-                    }
-                    if (typeSerializer == null) {
-                        serializerFor.serialize(next, jsonGenerator, serializerProvider);
+                try {
+                    Object next = it.next();
+                    if (next == null) {
+                        serializerProvider.defaultSerializeNull(jsonGenerator);
                     } else {
-                        serializerFor.serializeWithType(next, jsonGenerator, serializerProvider, typeSerializer);
+                        Class cls = next.getClass();
+                        JsonSerializer serializerFor = propertySerializerMap.serializerFor(cls);
+                        if (serializerFor == null) {
+                            if (this._elementType.hasGenericTypes()) {
+                                serializerFor = _findAndAddDynamic(propertySerializerMap, serializerProvider.constructSpecializedType(this._elementType, cls), serializerProvider);
+                            } else {
+                                serializerFor = _findAndAddDynamic(propertySerializerMap, cls, serializerProvider);
+                            }
+                            propertySerializerMap = this._dynamicSerializers;
+                        }
+                        if (typeSerializer == null) {
+                            serializerFor.serialize(next, jsonGenerator, serializerProvider);
+                        } else {
+                            serializerFor.serializeWithType(next, jsonGenerator, serializerProvider, typeSerializer);
+                        }
                     }
+                    i++;
+                } catch (Exception e) {
+                    wrapAndThrow(serializerProvider, (Throwable) e, (Object) collection, i);
+                    return;
                 }
-                i++;
             } while (it.hasNext());
         }
     }
@@ -119,8 +116,8 @@ public class CollectionSerializer extends AsArraySerializerBase<Collection<?>> {
                 if (next == null) {
                     try {
                         serializerProvider.defaultSerializeNull(jsonGenerator);
-                    } catch (Throwable e) {
-                        wrapAndThrow(serializerProvider, e, (Object) collection, i);
+                    } catch (Exception e) {
+                        wrapAndThrow(serializerProvider, (Throwable) e, (Object) collection, i);
                     }
                 } else if (typeSerializer == null) {
                     jsonSerializer.serialize(next, jsonGenerator, serializerProvider);

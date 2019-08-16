@@ -1,4 +1,4 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/* renamed from: android.support.v4.widget.SimpleCursorAdapter */
 public class SimpleCursorAdapter extends ResourceCursorAdapter {
     private CursorToStringConverter mCursorToStringConverter;
     @RestrictTo({Scope.LIBRARY_GROUP})
@@ -19,10 +20,12 @@ public class SimpleCursorAdapter extends ResourceCursorAdapter {
     protected int[] mTo;
     private ViewBinder mViewBinder;
 
+    /* renamed from: android.support.v4.widget.SimpleCursorAdapter$CursorToStringConverter */
     public interface CursorToStringConverter {
         CharSequence convertToString(Cursor cursor);
     }
 
+    /* renamed from: android.support.v4.widget.SimpleCursorAdapter$ViewBinder */
     public interface ViewBinder {
         boolean setViewValue(View view, Cursor cursor, int i);
     }
@@ -64,9 +67,7 @@ public class SimpleCursorAdapter extends ResourceCursorAdapter {
         for (int i = 0; i < length; i++) {
             View findViewById = view.findViewById(iArr2[i]);
             if (findViewById != null) {
-                if (viewBinder != null ? viewBinder.setViewValue(findViewById, cursor, iArr[i]) : false) {
-                    continue;
-                } else {
+                if (!(viewBinder != null ? viewBinder.setViewValue(findViewById, cursor, iArr[i]) : false)) {
                     String string = cursor.getString(iArr[i]);
                     if (string == null) {
                         string = "";
@@ -78,6 +79,8 @@ public class SimpleCursorAdapter extends ResourceCursorAdapter {
                     } else {
                         throw new IllegalStateException(findViewById.getClass().getName() + " is not a " + " view that can be bounds by this SimpleCursorAdapter");
                     }
+                } else {
+                    continue;
                 }
             }
         }

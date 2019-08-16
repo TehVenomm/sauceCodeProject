@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.armory;
+package net.gogame.gowrap.p019ui.dpro.model.armory;
 
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -9,17 +9,22 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.armory.Armory */
 public class Armory extends BaseJsonObject {
     private static final String KEY_CURRENT_EQUIP_SET_NO = "currentEquipSetNo";
     private static final String KEY_EQUIPMENT_SETS = "equipmentSets";
     private Integer currentEquipSetNo;
     private List<EquipmentSet> equipmentSets;
 
+    public Armory() {
+    }
+
     public Armory(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_CURRENT_EQUIP_SET_NO)) {
             this.currentEquipSetNo = JSONUtils.optInt(jsonReader);
             return true;

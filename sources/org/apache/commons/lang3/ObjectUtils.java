@@ -1,6 +1,5 @@
 package org.apache.commons.lang3;
 
-import android.support.v4.media.TransportMediator;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -60,18 +59,18 @@ public class ObjectUtils {
 
     @Deprecated
     public static int hashCode(Object obj) {
-        return obj == null ? 0 : obj.hashCode();
+        if (obj == null) {
+            return 0;
+        }
+        return obj.hashCode();
     }
 
     @Deprecated
     public static int hashCodeMulti(Object... objArr) {
         int i = 1;
         if (objArr != null) {
-            int i2 = 0;
-            while (i2 < objArr.length) {
-                int hashCode = hashCode(objArr[i2]) + (i * 31);
-                i2++;
-                i = hashCode;
+            for (Object hashCode : objArr) {
+                i = (i * 31) + hashCode(hashCode);
             }
         }
         return i;
@@ -81,9 +80,9 @@ public class ObjectUtils {
         if (obj == null) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        identityToString(stringBuilder, obj);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        identityToString(sb, obj);
+        return sb.toString();
     }
 
     public static void identityToString(Appendable appendable, Object obj) throws IOException {
@@ -107,11 +106,11 @@ public class ObjectUtils {
         stringBuffer.append(obj.getClass().getName()).append('@').append(Integer.toHexString(System.identityHashCode(obj)));
     }
 
-    public static void identityToString(StringBuilder stringBuilder, Object obj) {
+    public static void identityToString(StringBuilder sb, Object obj) {
         if (obj == null) {
             throw new NullPointerException("Cannot get the toString of a null identity");
         }
-        stringBuilder.append(obj.getClass().getName()).append('@').append(Integer.toHexString(System.identityHashCode(obj)));
+        sb.append(obj.getClass().getName()).append('@').append(Integer.toHexString(System.identityHashCode(obj)));
     }
 
     @Deprecated
@@ -168,10 +167,10 @@ public class ObjectUtils {
             return 0;
         }
         if (t == null) {
-            if (z) {
-                return 1;
+            if (!z) {
+                return -1;
             }
-            return -1;
+            return 1;
         } else if (t2 != null) {
             return t.compareTo(t2);
         } else {
@@ -183,16 +182,16 @@ public class ObjectUtils {
     }
 
     public static <T extends Comparable<? super T>> T median(T... tArr) {
-        Validate.notEmpty((Object[]) tArr);
-        Validate.noNullElements((Object[]) tArr);
+        Validate.notEmpty(tArr);
+        Validate.noNullElements(tArr);
         TreeSet treeSet = new TreeSet();
         Collections.addAll(treeSet, tArr);
         return (Comparable) treeSet.toArray()[(treeSet.size() - 1) / 2];
     }
 
     public static <T> T median(Comparator<T> comparator, T... tArr) {
-        Validate.notEmpty((Object[]) tArr, "null/empty items", new Object[0]);
-        Validate.noNullElements((Object[]) tArr);
+        Validate.notEmpty(tArr, "null/empty items", new Object[0]);
+        Validate.noNullElements(tArr);
         Validate.notNull(comparator, "null comparator", new Object[0]);
         TreeSet treeSet = new TreeSet(comparator);
         Collections.addAll(treeSet, tArr);
@@ -200,40 +199,36 @@ public class ObjectUtils {
     }
 
     public static <T> T mode(T... tArr) {
-        int i = 0;
-        if (!ArrayUtils.isNotEmpty((Object[]) tArr)) {
+        int i;
+        int i2 = 0;
+        if (!ArrayUtils.isNotEmpty(tArr)) {
             return null;
         }
-        int intValue;
         HashMap hashMap = new HashMap(tArr.length);
-        for (Object obj : tArr) {
-            MutableInt mutableInt = (MutableInt) hashMap.get(obj);
+        for (T t : tArr) {
+            MutableInt mutableInt = (MutableInt) hashMap.get(t);
             if (mutableInt == null) {
-                hashMap.put(obj, new MutableInt(1));
+                hashMap.put(t, new MutableInt(1));
             } else {
                 mutableInt.increment();
             }
         }
-        T t = null;
+        T t2 = null;
         for (Entry entry : hashMap.entrySet()) {
-            int i2;
-            T t2;
-            intValue = ((MutableInt) entry.getValue()).intValue();
-            if (intValue == i) {
-                i2 = i;
+            int intValue = ((MutableInt) entry.getValue()).intValue();
+            if (intValue == i2) {
+                i = i2;
                 t2 = null;
-            } else if (intValue > i) {
-                int i3 = intValue;
-                t2 = entry.getKey();
-                i2 = i3;
+            } else if (intValue > i2) {
+                T key = entry.getKey();
+                i = intValue;
+                t2 = key;
             } else {
-                i2 = i;
-                t2 = t;
+                i = i2;
             }
-            i = i2;
-            t = t2;
+            i2 = i;
         }
-        return t;
+        return t2;
     }
 
     public static <T> T clone(T t) {
@@ -258,9 +253,9 @@ public class ObjectUtils {
         } else {
             try {
                 return t.getClass().getMethod("clone", new Class[0]).invoke(t, new Object[0]);
-            } catch (Throwable e) {
+            } catch (NoSuchMethodException e) {
                 throw new CloneFailedException("Cloneable type " + t.getClass().getName() + " has no clone method", e);
-            } catch (Throwable e2) {
+            } catch (IllegalAccessException e2) {
                 throw new CloneFailedException("Cannot clone Cloneable type " + t.getClass().getName(), e2);
             } catch (InvocationTargetException e3) {
                 throw new CloneFailedException("Exception cloning Cloneable type " + t.getClass().getName(), e3.getCause());
@@ -269,7 +264,7 @@ public class ObjectUtils {
     }
 
     public static <T> T cloneIfPossible(T t) {
-        T clone = clone(t);
+        Object clone = clone(t);
         return clone == null ? t : clone;
     }
 
@@ -282,7 +277,7 @@ public class ObjectUtils {
     }
 
     public static byte CONST_BYTE(int i) throws IllegalArgumentException {
-        if (i >= -128 && i <= TransportMediator.KEYCODE_MEDIA_PAUSE) {
+        if (i >= -128 && i <= 127) {
             return (byte) i;
         }
         throw new IllegalArgumentException("Supplied value must be a valid byte literal between -128 and 127: [" + i + "]");

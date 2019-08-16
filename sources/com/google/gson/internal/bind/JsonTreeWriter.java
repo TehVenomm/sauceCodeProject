@@ -13,16 +13,7 @@ import java.util.List;
 
 public final class JsonTreeWriter extends JsonWriter {
     private static final JsonPrimitive SENTINEL_CLOSED = new JsonPrimitive("closed");
-    private static final Writer UNWRITABLE_WRITER = new C06951();
-    private String pendingName;
-    private JsonElement product = JsonNull.INSTANCE;
-    private final List<JsonElement> stack = new ArrayList();
-
-    /* renamed from: com.google.gson.internal.bind.JsonTreeWriter$1 */
-    static final class C06951 extends Writer {
-        C06951() {
-        }
-
+    private static final Writer UNWRITABLE_WRITER = new Writer() {
         public void close() throws IOException {
             throw new AssertionError();
         }
@@ -34,7 +25,10 @@ public final class JsonTreeWriter extends JsonWriter {
         public void write(char[] cArr, int i, int i2) {
             throw new AssertionError();
         }
-    }
+    };
+    private String pendingName;
+    private JsonElement product = JsonNull.INSTANCE;
+    private final List<JsonElement> stack = new ArrayList();
 
     public JsonTreeWriter() {
         super(UNWRITABLE_WRITER);
@@ -63,25 +57,24 @@ public final class JsonTreeWriter extends JsonWriter {
     }
 
     public JsonWriter beginArray() throws IOException {
-        JsonElement jsonArray = new JsonArray();
+        JsonArray jsonArray = new JsonArray();
         put(jsonArray);
         this.stack.add(jsonArray);
         return this;
     }
 
     public JsonWriter beginObject() throws IOException {
-        JsonElement jsonObject = new JsonObject();
+        JsonObject jsonObject = new JsonObject();
         put(jsonObject);
         this.stack.add(jsonObject);
         return this;
     }
 
     public void close() throws IOException {
-        if (this.stack.isEmpty()) {
-            this.stack.add(SENTINEL_CLOSED);
-            return;
+        if (!this.stack.isEmpty()) {
+            throw new IOException("Incomplete document");
         }
-        throw new IOException("Incomplete document");
+        this.stack.add(SENTINEL_CLOSED);
     }
 
     public JsonWriter endArray() throws IOException {
@@ -133,15 +126,15 @@ public final class JsonTreeWriter extends JsonWriter {
     }
 
     public JsonWriter value(double d) throws IOException {
-        if (isLenient() || !(Double.isNaN(d) || Double.isInfinite(d))) {
-            put(new JsonPrimitive(Double.valueOf(d)));
+        if (isLenient() || (!Double.isNaN(d) && !Double.isInfinite(d))) {
+            put(new JsonPrimitive((Number) Double.valueOf(d)));
             return this;
         }
         throw new IllegalArgumentException("JSON forbids NaN and infinities: " + d);
     }
 
     public JsonWriter value(long j) throws IOException {
-        put(new JsonPrimitive(Long.valueOf(j)));
+        put(new JsonPrimitive((Number) Long.valueOf(j)));
         return this;
     }
 

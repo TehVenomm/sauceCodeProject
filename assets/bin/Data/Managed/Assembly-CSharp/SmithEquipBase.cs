@@ -15,7 +15,8 @@ public abstract class SmithEquipBase : SkillInfoBase
 		GROW,
 		EVOLVE,
 		SKILL_GROW,
-		ABILITY_CHANGE
+		ABILITY_CHANGE,
+		REVERT_LITHOGRAPH
 	}
 
 	protected SkillItemInfo[] equipAttachSkill;

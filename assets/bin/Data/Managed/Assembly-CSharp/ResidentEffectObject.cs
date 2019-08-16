@@ -1,4 +1,6 @@
-public class ResidentEffectObject
+using UnityEngine;
+
+public class ResidentEffectObject : MonoBehaviour
 {
 	public int GroupID;
 

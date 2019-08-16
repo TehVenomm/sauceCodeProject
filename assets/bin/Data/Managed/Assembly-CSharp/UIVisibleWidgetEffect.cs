@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIVisibleWidgetEffect
+public class UIVisibleWidgetEffect : MonoBehaviour
 {
 	private UIPanel panel;
 
@@ -21,36 +21,34 @@ public class UIVisibleWidgetEffect
 
 	public static void Set(UIPanel panel, UIWidget widget, string effect_name, string current_section_name)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		if (!(widget == null))
+		if (widget == null)
 		{
-			UIVisibleWidgetEffect uIVisibleWidgetEffect = widget.GetComponent<UIVisibleWidgetEffect>();
-			if (effect_name == null)
-			{
-				if (uIVisibleWidgetEffect != null)
-				{
-					Object.Destroy(uIVisibleWidgetEffect);
-				}
-			}
-			else
-			{
-				if (uIVisibleWidgetEffect == null)
-				{
-					uIVisibleWidgetEffect = widget.get_gameObject().AddComponent<UIVisibleWidgetEffect>();
-				}
-				uIVisibleWidgetEffect.panel = panel;
-				uIVisibleWidgetEffect.widget = widget;
-				if (string.IsNullOrEmpty(uIVisibleWidgetEffect.sectionName))
-				{
-					uIVisibleWidgetEffect.sectionName = (current_section_name ?? MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName());
-				}
-				if (uIVisibleWidgetEffect.effectName != effect_name)
-				{
-					uIVisibleWidgetEffect.DeleteEffect();
-				}
-				uIVisibleWidgetEffect.effectName = effect_name;
-			}
+			return;
 		}
+		UIVisibleWidgetEffect uIVisibleWidgetEffect = widget.GetComponent<UIVisibleWidgetEffect>();
+		if (effect_name == null)
+		{
+			if (uIVisibleWidgetEffect != null)
+			{
+				Object.Destroy(uIVisibleWidgetEffect);
+			}
+			return;
+		}
+		if (uIVisibleWidgetEffect == null)
+		{
+			uIVisibleWidgetEffect = widget.get_gameObject().AddComponent<UIVisibleWidgetEffect>();
+		}
+		uIVisibleWidgetEffect.panel = panel;
+		uIVisibleWidgetEffect.widget = widget;
+		if (string.IsNullOrEmpty(uIVisibleWidgetEffect.sectionName))
+		{
+			uIVisibleWidgetEffect.sectionName = (current_section_name ?? MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName());
+		}
+		if (uIVisibleWidgetEffect.effectName != effect_name)
+		{
+			uIVisibleWidgetEffect.DeleteEffect();
+		}
+		uIVisibleWidgetEffect.effectName = effect_name;
 	}
 
 	public static void OneShot(UIPanel panel, UIWidget widget, string effect_name, string current_section_name)
@@ -97,7 +95,6 @@ public class UIVisibleWidgetEffect
 
 	private void _SetRendererQueue()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (effect != null && setRendererQueue != -1)
 		{
 			Renderer[] componentsInChildren = effect.GetComponentsInChildren<Renderer>(true);

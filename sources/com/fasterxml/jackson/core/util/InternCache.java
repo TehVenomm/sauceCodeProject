@@ -23,8 +23,8 @@ public final class InternCache extends ConcurrentHashMap<String, String> {
                 }
             }
         }
-        str2 = str.intern();
-        put(str2, str2);
-        return str2;
+        String intern = str.intern();
+        put(intern, intern);
+        return intern;
     }
 }

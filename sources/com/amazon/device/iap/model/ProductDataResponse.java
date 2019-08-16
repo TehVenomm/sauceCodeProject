@@ -1,7 +1,7 @@
 package com.amazon.device.iap.model;
 
 import com.amazon.device.iap.internal.model.ProductDataResponseBuilder;
-import com.amazon.device.iap.internal.util.C0243d;
+import com.amazon.device.iap.internal.util.C0408d;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,13 +26,13 @@ public class ProductDataResponse {
     }
 
     public ProductDataResponse(ProductDataResponseBuilder productDataResponseBuilder) {
-        C0243d.m169a(productDataResponseBuilder.getRequestId(), REQUEST_ID);
-        C0243d.m169a(productDataResponseBuilder.getRequestStatus(), REQUEST_STATUS);
+        C0408d.m164a((Object) productDataResponseBuilder.getRequestId(), REQUEST_ID);
+        C0408d.m164a((Object) productDataResponseBuilder.getRequestStatus(), REQUEST_STATUS);
         if (productDataResponseBuilder.getUnavailableSkus() == null) {
             productDataResponseBuilder.setUnavailableSkus(new HashSet());
         }
         if (RequestStatus.SUCCESSFUL == productDataResponseBuilder.getRequestStatus()) {
-            C0243d.m169a(productDataResponseBuilder.getProductData(), PRODUCT_DATA);
+            C0408d.m164a((Object) productDataResponseBuilder.getProductData(), PRODUCT_DATA);
         }
         this.requestId = productDataResponseBuilder.getRequestId();
         this.requestStatus = productDataResponseBuilder.getRequestStatus();
@@ -72,11 +72,6 @@ public class ProductDataResponse {
     }
 
     public String toString() {
-        String obj = super.toString();
-        RequestId requestId = this.requestId;
-        String obj2 = this.unavailableSkus != null ? this.unavailableSkus.toString() : "null";
-        String requestStatus = this.requestStatus != null ? this.requestStatus.toString() : "null";
-        String obj3 = this.productData != null ? this.productData.toString() : "null";
-        return String.format(TO_STRING_FORMAT, new Object[]{obj, requestId, obj2, requestStatus, obj3});
+        return String.format(TO_STRING_FORMAT, new Object[]{super.toString(), this.requestId, this.unavailableSkus != null ? this.unavailableSkus.toString() : "null", this.requestStatus != null ? this.requestStatus.toString() : "null", this.productData != null ? this.productData.toString() : "null"});
     }
 }

@@ -59,7 +59,13 @@ public class EquipChangeSortBase : EquipSortBase
 		BTN_ASC,
 		BTN_DESC,
 		OBJ_HEIGHT_ANCHOR,
-		GRD_REQUIREMENT
+		GRD_REQUIREMENT,
+		BTN_EQUIP_PAY,
+		BTN_EQUIP_NO_PAY,
+		OBJ_TYPE,
+		OBJ_SORT_ROOT,
+		SPR_SORT_UNDER_LINE,
+		Frame
 	}
 
 	public override void Initialize()

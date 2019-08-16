@@ -1,7 +1,8 @@
-package io.fabric.sdk.android.services.persistence;
+package p017io.fabric.sdk.android.services.persistence;
 
 import android.annotation.SuppressLint;
 
+/* renamed from: io.fabric.sdk.android.services.persistence.PreferenceStoreStrategy */
 public class PreferenceStoreStrategy<T> implements PersistenceStrategy<T> {
     private final String key;
     private final SerializationStrategy<T> serializer;
@@ -13,6 +14,7 @@ public class PreferenceStoreStrategy<T> implements PersistenceStrategy<T> {
         this.key = str;
     }
 
+    @SuppressLint({"CommitPrefEdits"})
     public void clear() {
         this.store.edit().remove(this.key).commit();
     }

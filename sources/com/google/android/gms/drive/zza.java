@@ -3,66 +3,78 @@ package com.google.android.gms.drive;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.util.Base64;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.internal.zzbno;
-import com.google.android.gms.internal.zzego;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.internal.drive.zzhm;
+import com.google.android.gms.internal.drive.zzix;
 
-public final class zza extends com.google.android.gms.common.internal.safeparcel.zza {
+@Class(creator = "ChangeSequenceNumberCreator")
+@Reserved({1})
+public class zza extends AbstractSafeParcelable {
     public static final Creator<zza> CREATOR = new zzb();
-    private long zzgcr;
-    private long zzgcs;
-    private long zzgct;
-    private volatile String zzgcu = null;
+    @Field(mo13990id = 2)
+    private final long zze;
+    @Field(mo13990id = 3)
+    private final long zzf;
+    @Field(mo13990id = 4)
+    private final long zzg;
+    private volatile String zzh = null;
 
-    public zza(long j, long j2, long j3) {
+    @Constructor
+    public zza(@Param(mo13993id = 2) long j, @Param(mo13993id = 3) long j2, @Param(mo13993id = 4) long j3) {
         boolean z = true;
-        zzbp.zzbh(j != -1);
-        zzbp.zzbh(j2 != -1);
+        Preconditions.checkArgument(j != -1);
+        Preconditions.checkArgument(j2 != -1);
         if (j3 == -1) {
             z = false;
         }
-        zzbp.zzbh(z);
-        this.zzgcr = j;
-        this.zzgcs = j2;
-        this.zzgct = j3;
+        Preconditions.checkArgument(z);
+        this.zze = j;
+        this.zzf = j2;
+        this.zzg = j3;
     }
 
-    public final boolean equals(Object obj) {
-        if (!(obj instanceof zza)) {
+    public boolean equals(Object obj) {
+        if (obj == null || obj.getClass() != zza.class) {
             return false;
         }
         zza zza = (zza) obj;
-        return zza.zzgcs == this.zzgcs && zza.zzgct == this.zzgct && zza.zzgcr == this.zzgcr;
+        return zza.zzf == this.zzf && zza.zzg == this.zzg && zza.zze == this.zze;
     }
 
-    public final int hashCode() {
-        String valueOf = String.valueOf(this.zzgcr);
-        String valueOf2 = String.valueOf(this.zzgcs);
-        String valueOf3 = String.valueOf(this.zzgct);
-        return new StringBuilder((String.valueOf(valueOf).length() + String.valueOf(valueOf2).length()) + String.valueOf(valueOf3).length()).append(valueOf).append(valueOf2).append(valueOf3).toString().hashCode();
+    public int hashCode() {
+        String valueOf = String.valueOf(this.zze);
+        String valueOf2 = String.valueOf(this.zzf);
+        String valueOf3 = String.valueOf(this.zzg);
+        return new StringBuilder(String.valueOf(valueOf).length() + String.valueOf(valueOf2).length() + String.valueOf(valueOf3).length()).append(valueOf).append(valueOf2).append(valueOf3).toString().hashCode();
     }
 
-    public final String toString() {
-        if (this.zzgcu == null) {
-            zzego zzbno = new zzbno();
-            zzbno.versionCode = 1;
-            zzbno.sequenceNumber = this.zzgcr;
-            zzbno.zzgjz = this.zzgcs;
-            zzbno.zzgka = this.zzgct;
-            String encodeToString = Base64.encodeToString(zzego.zzc(zzbno), 10);
+    public String toString() {
+        if (this.zzh == null) {
+            zzhm zzhm = new zzhm();
+            zzhm.versionCode = 1;
+            zzhm.zze = this.zze;
+            zzhm.zzf = this.zzf;
+            zzhm.zzg = this.zzg;
+            String encodeToString = Base64.encodeToString(zzix.zza((zzix) zzhm), 10);
             String valueOf = String.valueOf("ChangeSequenceNumber:");
-            encodeToString = String.valueOf(encodeToString);
-            this.zzgcu = encodeToString.length() != 0 ? valueOf.concat(encodeToString) : new String(valueOf);
+            String valueOf2 = String.valueOf(encodeToString);
+            this.zzh = valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf);
         }
-        return this.zzgcu;
+        return this.zzh;
     }
 
-    public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzgcr);
-        zzd.zza(parcel, 3, this.zzgcs);
-        zzd.zza(parcel, 4, this.zzgct);
-        zzd.zzai(parcel, zze);
+    public void writeToParcel(Parcel parcel, int i) {
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeLong(parcel, 2, this.zze);
+        SafeParcelWriter.writeLong(parcel, 3, this.zzf);
+        SafeParcelWriter.writeLong(parcel, 4, this.zzg);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

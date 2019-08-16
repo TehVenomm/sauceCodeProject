@@ -3,7 +3,7 @@ package com.fasterxml.jackson.core.util;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.core.p015io.SerializedString;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -15,6 +15,18 @@ public class DefaultPrettyPrinter implements PrettyPrinter, Instantiatable<Defau
     protected Indenter _objectIndenter;
     protected final SerializableString _rootSeparator;
     protected boolean _spacesInObjectEntries;
+
+    public static class FixedSpaceIndenter extends NopIndenter {
+        public static final FixedSpaceIndenter instance = new FixedSpaceIndenter();
+
+        public void writeIndentation(JsonGenerator jsonGenerator, int i) throws IOException {
+            jsonGenerator.writeRaw(' ');
+        }
+
+        public boolean isInline() {
+            return true;
+        }
+    }
 
     public interface Indenter {
         boolean isInline();
@@ -33,24 +45,12 @@ public class DefaultPrettyPrinter implements PrettyPrinter, Instantiatable<Defau
         }
     }
 
-    public static class FixedSpaceIndenter extends NopIndenter {
-        public static final FixedSpaceIndenter instance = new FixedSpaceIndenter();
-
-        public void writeIndentation(JsonGenerator jsonGenerator, int i) throws IOException {
-            jsonGenerator.writeRaw(' ');
-        }
-
-        public boolean isInline() {
-            return true;
-        }
-    }
-
     public DefaultPrettyPrinter() {
-        this(DEFAULT_ROOT_VALUE_SEPARATOR);
+        this((SerializableString) DEFAULT_ROOT_VALUE_SEPARATOR);
     }
 
     public DefaultPrettyPrinter(String str) {
-        this(str == null ? null : new SerializedString(str));
+        this((SerializableString) str == null ? null : new SerializedString(str));
     }
 
     public DefaultPrettyPrinter(SerializableString serializableString) {
@@ -78,13 +78,12 @@ public class DefaultPrettyPrinter implements PrettyPrinter, Instantiatable<Defau
     public DefaultPrettyPrinter withRootSeparator(SerializableString serializableString) {
         if (this._rootSeparator != serializableString) {
             return (serializableString == null || !serializableString.equals(this._rootSeparator)) ? new DefaultPrettyPrinter(this, serializableString) : this;
-        } else {
-            return this;
         }
+        return this;
     }
 
     public DefaultPrettyPrinter withRootSeparator(String str) {
-        return withRootSeparator(str == null ? null : new SerializedString(str));
+        return withRootSeparator((SerializableString) str == null ? null : new SerializedString(str));
     }
 
     public void indentArraysWith(Indenter indenter) {
@@ -138,7 +137,8 @@ public class DefaultPrettyPrinter implements PrettyPrinter, Instantiatable<Defau
         return _withSpaces(false);
     }
 
-    protected DefaultPrettyPrinter _withSpaces(boolean z) {
+    /* access modifiers changed from: protected */
+    public DefaultPrettyPrinter _withSpaces(boolean z) {
         if (this._spacesInObjectEntries == z) {
             return this;
         }

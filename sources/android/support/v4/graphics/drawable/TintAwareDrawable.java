@@ -1,4 +1,4 @@
-package android.support.v4.graphics.drawable;
+package android.support.p000v4.graphics.drawable;
 
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff.Mode;
@@ -7,6 +7,7 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 
 @RestrictTo({Scope.LIBRARY_GROUP})
+/* renamed from: android.support.v4.graphics.drawable.TintAwareDrawable */
 public interface TintAwareDrawable {
     void setTint(@ColorInt int i);
 

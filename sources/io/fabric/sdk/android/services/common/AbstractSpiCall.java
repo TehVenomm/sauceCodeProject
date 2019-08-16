@@ -1,13 +1,14 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
-import io.fabric.sdk.android.Kit;
-import io.fabric.sdk.android.services.network.HttpMethod;
-import io.fabric.sdk.android.services.network.HttpRequest;
-import io.fabric.sdk.android.services.network.HttpRequestFactory;
 import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Pattern;
+import p017io.fabric.sdk.android.Kit;
+import p017io.fabric.sdk.android.services.network.HttpMethod;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
+import p017io.fabric.sdk.android.services.network.HttpRequestFactory;
 
+/* renamed from: io.fabric.sdk.android.services.common.AbstractSpiCall */
 public abstract class AbstractSpiCall {
     public static final String ACCEPT_JSON_VALUE = "application/json";
     public static final String ANDROID_CLIENT_TYPE = "android";
@@ -18,9 +19,7 @@ public abstract class AbstractSpiCall {
     public static final String HEADER_API_KEY = "X-CRASHLYTICS-API-KEY";
     public static final String HEADER_CLIENT_TYPE = "X-CRASHLYTICS-API-CLIENT-TYPE";
     public static final String HEADER_CLIENT_VERSION = "X-CRASHLYTICS-API-CLIENT-VERSION";
-    public static final String HEADER_D = "X-CRASHLYTICS-D";
     public static final String HEADER_DEVELOPER_TOKEN = "X-CRASHLYTICS-DEVELOPER-TOKEN";
-    public static final String HEADER_DEVICE_STATE = "X-CRASHLYTICS-DEVICE-STATE";
     public static final String HEADER_REQUEST_ID = "X-REQUEST-ID";
     public static final String HEADER_USER_AGENT = "User-Agent";
     private static final Pattern PROTOCOL_AND_HOST_PATTERN = Pattern.compile("http(s?)://[^\\/]+", 2);
@@ -30,13 +29,13 @@ public abstract class AbstractSpiCall {
     private final HttpRequestFactory requestFactory;
     private final String url;
 
-    public AbstractSpiCall(Kit kit, String str, String str2, HttpRequestFactory httpRequestFactory, HttpMethod httpMethod) {
+    public AbstractSpiCall(Kit kit2, String str, String str2, HttpRequestFactory httpRequestFactory, HttpMethod httpMethod) {
         if (str2 == null) {
             throw new IllegalArgumentException("url must not be null.");
         } else if (httpRequestFactory == null) {
             throw new IllegalArgumentException("requestFactory must not be null.");
         } else {
-            this.kit = kit;
+            this.kit = kit2;
             this.protocolAndHostOverride = str;
             this.url = overrideProtocolAndHost(str2);
             this.requestFactory = httpRequestFactory;
@@ -48,15 +47,18 @@ public abstract class AbstractSpiCall {
         return !CommonUtils.isNullOrEmpty(this.protocolAndHostOverride) ? PROTOCOL_AND_HOST_PATTERN.matcher(str).replaceFirst(this.protocolAndHostOverride) : str;
     }
 
-    protected HttpRequest getHttpRequest() {
+    /* access modifiers changed from: protected */
+    public HttpRequest getHttpRequest() {
         return getHttpRequest(Collections.emptyMap());
     }
 
-    protected HttpRequest getHttpRequest(Map<String, String> map) {
+    /* access modifiers changed from: protected */
+    public HttpRequest getHttpRequest(Map<String, String> map) {
         return this.requestFactory.buildHttpRequest(this.method, getUrl(), map).useCaches(false).connectTimeout(10000).header("User-Agent", CRASHLYTICS_USER_AGENT + this.kit.getVersion()).header(HEADER_DEVELOPER_TOKEN, "470fa2b4ae81cd56ecbcda9735803434cec591fa");
     }
 
-    protected String getUrl() {
+    /* access modifiers changed from: protected */
+    public String getUrl() {
         return this.url;
     }
 }

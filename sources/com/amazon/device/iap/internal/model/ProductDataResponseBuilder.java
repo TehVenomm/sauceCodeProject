@@ -38,13 +38,13 @@ public class ProductDataResponseBuilder {
         return this;
     }
 
-    public ProductDataResponseBuilder setRequestId(RequestId requestId) {
-        this.requestId = requestId;
+    public ProductDataResponseBuilder setRequestId(RequestId requestId2) {
+        this.requestId = requestId2;
         return this;
     }
 
-    public ProductDataResponseBuilder setRequestStatus(RequestStatus requestStatus) {
-        this.requestStatus = requestStatus;
+    public ProductDataResponseBuilder setRequestStatus(RequestStatus requestStatus2) {
+        this.requestStatus = requestStatus2;
         return this;
     }
 

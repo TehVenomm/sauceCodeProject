@@ -1,28 +1,30 @@
 package com.google.android.gms.dynamite;
 
 import android.content.Context;
-import com.google.android.gms.dynamite.DynamiteModule.zzc;
-import com.google.android.gms.dynamite.DynamiteModule.zzd;
+import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zza;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zzb;
 
-final class zzg implements zzd {
+final class zzg implements VersionPolicy {
     zzg() {
     }
 
-    public final zzj zza(Context context, String str, zzi zzi) throws zzc {
-        zzj zzj = new zzj();
-        zzj.zzgpp = zzi.zzae(context, str);
-        if (zzj.zzgpp != 0) {
-            zzj.zzgpq = zzi.zzb(context, str, false);
+    public final zzb zza(Context context, String str, zza zza) throws LoadingException {
+        zzb zzb = new zzb();
+        zzb.zzir = zza.getLocalVersion(context, str);
+        if (zzb.zzir != 0) {
+            zzb.zzis = zza.zza(context, str, false);
         } else {
-            zzj.zzgpq = zzi.zzb(context, str, true);
+            zzb.zzis = zza.zza(context, str, true);
         }
-        if (zzj.zzgpp == 0 && zzj.zzgpq == 0) {
-            zzj.zzgpr = 0;
-        } else if (zzj.zzgpq >= zzj.zzgpp) {
-            zzj.zzgpr = 1;
+        if (zzb.zzir == 0 && zzb.zzis == 0) {
+            zzb.zzit = 0;
+        } else if (zzb.zzis >= zzb.zzir) {
+            zzb.zzit = 1;
         } else {
-            zzj.zzgpr = -1;
+            zzb.zzit = -1;
         }
-        return zzj;
+        return zzb;
     }
 }

@@ -63,7 +63,7 @@ public abstract class GoalComposite : Goal
 	protected T AddSubGoal<T>() where T : Goal, new()
 	{
 		T val = Goal.Alloc<T>();
-		subGoals.Push((Goal)val);
+		subGoals.Push(val);
 		return val;
 	}
 
@@ -81,7 +81,7 @@ public abstract class GoalComposite : Goal
 
 	public override string ToString()
 	{
-		return ToStringSubgoals(1, true);
+		return ToStringSubgoals(1, first: true);
 	}
 
 	public string ToStringSubgoals(int layer, bool first)

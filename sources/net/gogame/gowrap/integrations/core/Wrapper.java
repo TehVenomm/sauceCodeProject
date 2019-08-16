@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,28 +13,30 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.InternalConstants;
 import net.gogame.gowrap.integrations.core.ServerStatus.LocalizedStatus;
 import net.gogame.gowrap.integrations.core.ServerStatus.Status;
 import net.gogame.gowrap.integrations.core.ServerStatus.StatusFaqEntry;
-import net.gogame.gowrap.io.utils.FileUtils;
 import net.gogame.gowrap.model.configuration.Configuration;
 import net.gogame.gowrap.model.configuration.Configuration.Integrations.Core.LocaleConfiguration;
+import net.gogame.gowrap.p019ui.fab.FabManager;
+import net.gogame.gowrap.p021io.utils.FileUtils;
 import net.gogame.gowrap.support.DownloadUtils;
 import net.gogame.gowrap.support.DownloadUtils.Callback;
 import net.gogame.gowrap.support.DownloadUtils.FileTarget;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.PreferenceUtils;
-import net.gogame.gowrap.ui.fab.FabManager;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Wrapper {
     public static final Wrapper INSTANCE = new Wrapper();
     private Configuration configuration;
-    private ServerStatus serverStatus = null;
+    /* access modifiers changed from: private */
+    public ServerStatus serverStatus = null;
 
     public Configuration getConfiguration() {
         return this.configuration;
@@ -57,7 +60,7 @@ public class Wrapper {
         }
         LocaleConfiguration localeConfiguration = (LocaleConfiguration) this.configuration.getIntegrations().getCore().getLocales().get(str);
         if (localeConfiguration == null) {
-            return (LocaleConfiguration) this.configuration.getIntegrations().getCore().getLocales().get(InternalConstants.DEFAULT_LOCALE);
+            return (LocaleConfiguration) this.configuration.getIntegrations().getCore().getLocales().get("default");
         }
         return localeConfiguration;
     }
@@ -92,7 +95,7 @@ public class Wrapper {
     public String getCurrentLocale(Context context) {
         String preference = PreferenceUtils.getPreference(context, InternalConstants.LANGUAGE);
         if (preference == null) {
-            return InternalConstants.DEFAULT_LOCALE;
+            return "default";
         }
         return preference;
     }
@@ -115,7 +118,7 @@ public class Wrapper {
                 Log.d(Constants.TAG, "Initialized config.json.gz");
             } catch (FileNotFoundException e) {
                 Log.w(Constants.TAG, "Could not copy pre-packaged config file (not found): net/gogame/gowrap/config.json");
-            } catch (Throwable e2) {
+            } catch (IOException e2) {
                 Log.e(Constants.TAG, "Could not copy pre-packaged config file", e2);
             }
         } else {
@@ -137,7 +140,7 @@ public class Wrapper {
                             Wrapper.this.serverStatus = Wrapper.this.parseServerStatus(JSONUtils.read(file3));
                             file3.delete();
                             FabManager.update((Activity) context);
-                        } catch (Throwable e) {
+                        } catch (Exception e) {
                             Log.e(Constants.TAG, "Exception", e);
                         }
                     }
@@ -150,22 +153,23 @@ public class Wrapper {
         }
     }
 
-    private ServerStatus parseServerStatus(JSONObject jSONObject) {
-        ServerStatus serverStatus = new ServerStatus();
+    /* access modifiers changed from: private */
+    public ServerStatus parseServerStatus(JSONObject jSONObject) {
+        ServerStatus serverStatus2 = new ServerStatus();
         String optString = jSONObject.optString("status", null);
         if (optString != null) {
-            serverStatus.setStatus(Status.valueOf(optString));
+            serverStatus2.setStatus(Status.valueOf(optString));
         }
-        serverStatus.setLocales(new HashMap());
+        serverStatus2.setLocales(new HashMap());
         JSONObject optJSONObject = jSONObject.optJSONObject("locales");
         if (optJSONObject != null) {
             Iterator keys = optJSONObject.keys();
             while (keys.hasNext()) {
-                optString = (String) keys.next();
-                JSONObject optJSONObject2 = optJSONObject.optJSONObject(optString);
+                String str = (String) keys.next();
+                JSONObject optJSONObject2 = optJSONObject.optJSONObject(str);
                 if (optJSONObject2 != null) {
                     LocalizedStatus localizedStatus = new LocalizedStatus();
-                    serverStatus.getLocales().put(optString, localizedStatus);
+                    serverStatus2.getLocales().put(str, localizedStatus);
                     localizedStatus.setTitle(optJSONObject2.optString("title", null));
                     localizedStatus.setMessage(optJSONObject2.optString("message", null));
                     localizedStatus.setUrl(optJSONObject2.optString("url", null));
@@ -185,16 +189,16 @@ public class Wrapper {
                 }
             }
         }
-        return serverStatus;
+        return serverStatus2;
     }
 
     public void readConfiguration(Context context) {
         try {
             this.configuration = new Configuration(readJson(context, InternalConstants.CONFIG_FILENAME));
             if (this.configuration != null && this.configuration.getIntegrations() != null && this.configuration.getIntegrations().getCore() != null && this.configuration.getIntegrations().getCore().getSupportedLocales() != null) {
-                List asList = Arrays.asList(context.getResources().getStringArray(C1110R.array.language_values));
-                List arrayList = new ArrayList();
-                arrayList.add(InternalConstants.DEFAULT_LOCALE);
+                List asList = Arrays.asList(context.getResources().getStringArray(C1423R.array.language_values));
+                ArrayList arrayList = new ArrayList();
+                arrayList.add("default");
                 for (String str : this.configuration.getIntegrations().getCore().getSupportedLocales()) {
                     if (asList.contains(str) && !arrayList.contains(str)) {
                         arrayList.add(str);
@@ -202,7 +206,7 @@ public class Wrapper {
                 }
                 this.configuration.getIntegrations().getCore().setSupportedLocales(arrayList);
             }
-        } catch (Throwable e) {
+        } catch (JSONException e) {
             Log.e(Constants.TAG, "Exception", e);
         }
     }
@@ -215,24 +219,22 @@ public class Wrapper {
                 return JSONUtils.read(file);
             } catch (FileNotFoundException e) {
                 Log.w(Constants.TAG, "File not found in internal storage:" + e.getMessage());
-            } catch (Throwable e2) {
+            } catch (IOException e2) {
                 Log.e(Constants.TAG, "I/O exception", e2);
-            } catch (Throwable e22) {
-                Log.e(Constants.TAG, "JSON exception", e22);
+            } catch (JSONException e3) {
+                Log.e(Constants.TAG, "JSON exception", e3);
             }
         }
         try {
             Log.d(Constants.TAG, String.format("Reading %s from assets", new Object[]{str}));
             return JSONUtils.assetRead(context, "net/gogame/gowrap/" + str);
-        } catch (FileNotFoundException e3) {
-            Log.w(Constants.TAG, "File not found in assets:" + e3.getMessage());
-            return null;
-        } catch (Throwable e222) {
-            Log.e(Constants.TAG, "I/O exception", e222);
-            return null;
-        } catch (Throwable e2222) {
-            Log.e(Constants.TAG, "JSON exception", e2222);
-            return null;
+        } catch (FileNotFoundException e4) {
+            Log.w(Constants.TAG, "File not found in assets:" + e4.getMessage());
+        } catch (IOException e5) {
+            Log.e(Constants.TAG, "I/O exception", e5);
+        } catch (JSONException e6) {
+            Log.e(Constants.TAG, "JSON exception", e6);
         }
+        return null;
     }
 }

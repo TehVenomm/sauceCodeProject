@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
@@ -22,8 +22,8 @@ public class AsExternalTypeSerializer extends TypeSerializerBase {
         return this._typePropertyName;
     }
 
-    public As getTypeInclusion() {
-        return As.EXTERNAL_PROPERTY;
+    public C0861As getTypeInclusion() {
+        return C0861As.EXTERNAL_PROPERTY;
     }
 
     public void writeTypePrefixForObject(Object obj, JsonGenerator jsonGenerator) throws IOException {
@@ -86,31 +86,37 @@ public class AsExternalTypeSerializer extends TypeSerializerBase {
         _writeArraySuffix(obj, jsonGenerator, str);
     }
 
-    protected final void _writeScalarPrefix(Object obj, JsonGenerator jsonGenerator) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _writeScalarPrefix(Object obj, JsonGenerator jsonGenerator) throws IOException {
     }
 
-    protected final void _writeObjectPrefix(Object obj, JsonGenerator jsonGenerator) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _writeObjectPrefix(Object obj, JsonGenerator jsonGenerator) throws IOException {
         jsonGenerator.writeStartObject();
     }
 
-    protected final void _writeArrayPrefix(Object obj, JsonGenerator jsonGenerator) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _writeArrayPrefix(Object obj, JsonGenerator jsonGenerator) throws IOException {
         jsonGenerator.writeStartArray();
     }
 
-    protected final void _writeScalarSuffix(Object obj, JsonGenerator jsonGenerator, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _writeScalarSuffix(Object obj, JsonGenerator jsonGenerator, String str) throws IOException {
         if (str != null) {
             jsonGenerator.writeStringField(this._typePropertyName, str);
         }
     }
 
-    protected final void _writeObjectSuffix(Object obj, JsonGenerator jsonGenerator, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _writeObjectSuffix(Object obj, JsonGenerator jsonGenerator, String str) throws IOException {
         jsonGenerator.writeEndObject();
         if (str != null) {
             jsonGenerator.writeStringField(this._typePropertyName, str);
         }
     }
 
-    protected final void _writeArraySuffix(Object obj, JsonGenerator jsonGenerator, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _writeArraySuffix(Object obj, JsonGenerator jsonGenerator, String str) throws IOException {
         jsonGenerator.writeEndArray();
         if (str != null) {
             jsonGenerator.writeStringField(this._typePropertyName, str);

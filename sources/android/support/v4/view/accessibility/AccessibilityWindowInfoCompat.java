@@ -1,10 +1,11 @@
-package android.support.v4.view.accessibility;
+package android.support.p000v4.view.accessibility;
 
 import android.graphics.Rect;
 import android.os.Build.VERSION;
+import android.view.accessibility.AccessibilityWindowInfo;
 
+/* renamed from: android.support.v4.view.accessibility.AccessibilityWindowInfoCompat */
 public class AccessibilityWindowInfoCompat {
-    private static final AccessibilityWindowInfoImpl IMPL;
     public static final int TYPE_ACCESSIBILITY_OVERLAY = 4;
     public static final int TYPE_APPLICATION = 1;
     public static final int TYPE_INPUT_METHOD = 2;
@@ -13,201 +14,22 @@ public class AccessibilityWindowInfoCompat {
     private static final int UNDEFINED = -1;
     private Object mInfo;
 
-    private interface AccessibilityWindowInfoImpl {
-        Object getAnchor(Object obj);
-
-        void getBoundsInScreen(Object obj, Rect rect);
-
-        Object getChild(Object obj, int i);
-
-        int getChildCount(Object obj);
-
-        int getId(Object obj);
-
-        int getLayer(Object obj);
-
-        Object getParent(Object obj);
-
-        Object getRoot(Object obj);
-
-        CharSequence getTitle(Object obj);
-
-        int getType(Object obj);
-
-        boolean isAccessibilityFocused(Object obj);
-
-        boolean isActive(Object obj);
-
-        boolean isFocused(Object obj);
-
-        Object obtain();
-
-        Object obtain(Object obj);
-
-        void recycle(Object obj);
-    }
-
-    private static class AccessibilityWindowInfoStubImpl implements AccessibilityWindowInfoImpl {
-        AccessibilityWindowInfoStubImpl() {
-        }
-
-        public Object getAnchor(Object obj) {
-            return null;
-        }
-
-        public void getBoundsInScreen(Object obj, Rect rect) {
-        }
-
-        public Object getChild(Object obj, int i) {
-            return null;
-        }
-
-        public int getChildCount(Object obj) {
-            return 0;
-        }
-
-        public int getId(Object obj) {
-            return -1;
-        }
-
-        public int getLayer(Object obj) {
-            return -1;
-        }
-
-        public Object getParent(Object obj) {
-            return null;
-        }
-
-        public Object getRoot(Object obj) {
-            return null;
-        }
-
-        public CharSequence getTitle(Object obj) {
-            return null;
-        }
-
-        public int getType(Object obj) {
-            return -1;
-        }
-
-        public boolean isAccessibilityFocused(Object obj) {
-            return true;
-        }
-
-        public boolean isActive(Object obj) {
-            return true;
-        }
-
-        public boolean isFocused(Object obj) {
-            return true;
-        }
-
-        public Object obtain() {
-            return null;
-        }
-
-        public Object obtain(Object obj) {
-            return null;
-        }
-
-        public void recycle(Object obj) {
-        }
-    }
-
-    private static class AccessibilityWindowInfoApi21Impl extends AccessibilityWindowInfoStubImpl {
-        AccessibilityWindowInfoApi21Impl() {
-        }
-
-        public void getBoundsInScreen(Object obj, Rect rect) {
-            AccessibilityWindowInfoCompatApi21.getBoundsInScreen(obj, rect);
-        }
-
-        public Object getChild(Object obj, int i) {
-            return AccessibilityWindowInfoCompatApi21.getChild(obj, i);
-        }
-
-        public int getChildCount(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.getChildCount(obj);
-        }
-
-        public int getId(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.getId(obj);
-        }
-
-        public int getLayer(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.getLayer(obj);
-        }
-
-        public Object getParent(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.getParent(obj);
-        }
-
-        public Object getRoot(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.getRoot(obj);
-        }
-
-        public int getType(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.getType(obj);
-        }
-
-        public boolean isAccessibilityFocused(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.isAccessibilityFocused(obj);
-        }
-
-        public boolean isActive(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.isActive(obj);
-        }
-
-        public boolean isFocused(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.isFocused(obj);
-        }
-
-        public Object obtain() {
-            return AccessibilityWindowInfoCompatApi21.obtain();
-        }
-
-        public Object obtain(Object obj) {
-            return AccessibilityWindowInfoCompatApi21.obtain(obj);
-        }
-
-        public void recycle(Object obj) {
-            AccessibilityWindowInfoCompatApi21.recycle(obj);
-        }
-    }
-
-    private static class AccessibilityWindowInfoApi24Impl extends AccessibilityWindowInfoApi21Impl {
-        AccessibilityWindowInfoApi24Impl() {
-        }
-
-        public Object getAnchor(Object obj) {
-            return AccessibilityWindowInfoCompatApi24.getAnchor(obj);
-        }
-
-        public CharSequence getTitle(Object obj) {
-            return AccessibilityWindowInfoCompatApi24.getTitle(obj);
-        }
-    }
-
-    static {
-        if (VERSION.SDK_INT >= 24) {
-            IMPL = new AccessibilityWindowInfoApi24Impl();
-        } else if (VERSION.SDK_INT >= 21) {
-            IMPL = new AccessibilityWindowInfoApi21Impl();
-        } else {
-            IMPL = new AccessibilityWindowInfoStubImpl();
-        }
-    }
-
     private AccessibilityWindowInfoCompat(Object obj) {
         this.mInfo = obj;
     }
 
     public static AccessibilityWindowInfoCompat obtain() {
-        return wrapNonNullInstance(IMPL.obtain());
+        if (VERSION.SDK_INT >= 21) {
+            return wrapNonNullInstance(AccessibilityWindowInfo.obtain());
+        }
+        return null;
     }
 
     public static AccessibilityWindowInfoCompat obtain(AccessibilityWindowInfoCompat accessibilityWindowInfoCompat) {
-        return accessibilityWindowInfoCompat == null ? null : wrapNonNullInstance(IMPL.obtain(accessibilityWindowInfoCompat.mInfo));
+        if (VERSION.SDK_INT < 21 || accessibilityWindowInfoCompat == null) {
+            return null;
+        }
+        return wrapNonNullInstance(AccessibilityWindowInfo.obtain((AccessibilityWindowInfo) accessibilityWindowInfoCompat.mInfo));
     }
 
     private static String typeToString(int i) {
@@ -226,7 +48,10 @@ public class AccessibilityWindowInfoCompat {
     }
 
     static AccessibilityWindowInfoCompat wrapNonNullInstance(Object obj) {
-        return obj != null ? new AccessibilityWindowInfoCompat(obj) : null;
+        if (obj != null) {
+            return new AccessibilityWindowInfoCompat(obj);
+        }
+        return null;
     }
 
     public boolean equals(Object obj) {
@@ -247,84 +72,127 @@ public class AccessibilityWindowInfoCompat {
     }
 
     public AccessibilityNodeInfoCompat getAnchor() {
-        return AccessibilityNodeInfoCompat.wrapNonNullInstance(IMPL.getAnchor(this.mInfo));
+        if (VERSION.SDK_INT >= 24) {
+            return AccessibilityNodeInfoCompat.wrapNonNullInstance(((AccessibilityWindowInfo) this.mInfo).getAnchor());
+        }
+        return null;
     }
 
     public void getBoundsInScreen(Rect rect) {
-        IMPL.getBoundsInScreen(this.mInfo, rect);
+        if (VERSION.SDK_INT >= 21) {
+            ((AccessibilityWindowInfo) this.mInfo).getBoundsInScreen(rect);
+        }
     }
 
     public AccessibilityWindowInfoCompat getChild(int i) {
-        return wrapNonNullInstance(IMPL.getChild(this.mInfo, i));
+        if (VERSION.SDK_INT >= 21) {
+            return wrapNonNullInstance(((AccessibilityWindowInfo) this.mInfo).getChild(i));
+        }
+        return null;
     }
 
     public int getChildCount() {
-        return IMPL.getChildCount(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            return ((AccessibilityWindowInfo) this.mInfo).getChildCount();
+        }
+        return 0;
     }
 
     public int getId() {
-        return IMPL.getId(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            return ((AccessibilityWindowInfo) this.mInfo).getId();
+        }
+        return -1;
     }
 
     public int getLayer() {
-        return IMPL.getLayer(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            return ((AccessibilityWindowInfo) this.mInfo).getLayer();
+        }
+        return -1;
     }
 
     public AccessibilityWindowInfoCompat getParent() {
-        return wrapNonNullInstance(IMPL.getParent(this.mInfo));
+        if (VERSION.SDK_INT >= 21) {
+            return wrapNonNullInstance(((AccessibilityWindowInfo) this.mInfo).getParent());
+        }
+        return null;
     }
 
     public AccessibilityNodeInfoCompat getRoot() {
-        return AccessibilityNodeInfoCompat.wrapNonNullInstance(IMPL.getRoot(this.mInfo));
+        if (VERSION.SDK_INT >= 21) {
+            return AccessibilityNodeInfoCompat.wrapNonNullInstance(((AccessibilityWindowInfo) this.mInfo).getRoot());
+        }
+        return null;
     }
 
     public CharSequence getTitle() {
-        return IMPL.getTitle(this.mInfo);
+        if (VERSION.SDK_INT >= 24) {
+            return ((AccessibilityWindowInfo) this.mInfo).getTitle();
+        }
+        return null;
     }
 
     public int getType() {
-        return IMPL.getType(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            return ((AccessibilityWindowInfo) this.mInfo).getType();
+        }
+        return -1;
     }
 
     public int hashCode() {
-        return this.mInfo == null ? 0 : this.mInfo.hashCode();
+        if (this.mInfo == null) {
+            return 0;
+        }
+        return this.mInfo.hashCode();
     }
 
     public boolean isAccessibilityFocused() {
-        return IMPL.isAccessibilityFocused(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            return ((AccessibilityWindowInfo) this.mInfo).isAccessibilityFocused();
+        }
+        return true;
     }
 
     public boolean isActive() {
-        return IMPL.isActive(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            return ((AccessibilityWindowInfo) this.mInfo).isActive();
+        }
+        return true;
     }
 
     public boolean isFocused() {
-        return IMPL.isFocused(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            return ((AccessibilityWindowInfo) this.mInfo).isFocused();
+        }
+        return true;
     }
 
     public void recycle() {
-        IMPL.recycle(this.mInfo);
+        if (VERSION.SDK_INT >= 21) {
+            ((AccessibilityWindowInfo) this.mInfo).recycle();
+        }
     }
 
     public String toString() {
         boolean z = true;
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         Rect rect = new Rect();
         getBoundsInScreen(rect);
-        stringBuilder.append("AccessibilityWindowInfo[");
-        stringBuilder.append("id=").append(getId());
-        stringBuilder.append(", type=").append(typeToString(getType()));
-        stringBuilder.append(", layer=").append(getLayer());
-        stringBuilder.append(", bounds=").append(rect);
-        stringBuilder.append(", focused=").append(isFocused());
-        stringBuilder.append(", active=").append(isActive());
-        stringBuilder.append(", hasParent=").append(getParent() != null);
-        StringBuilder append = stringBuilder.append(", hasChildren=");
+        sb.append("AccessibilityWindowInfo[");
+        sb.append("id=").append(getId());
+        sb.append(", type=").append(typeToString(getType()));
+        sb.append(", layer=").append(getLayer());
+        sb.append(", bounds=").append(rect);
+        sb.append(", focused=").append(isFocused());
+        sb.append(", active=").append(isActive());
+        sb.append(", hasParent=").append(getParent() != null);
+        StringBuilder append = sb.append(", hasChildren=");
         if (getChildCount() <= 0) {
             z = false;
         }
         append.append(z);
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append(']');
+        return sb.toString();
     }
 }

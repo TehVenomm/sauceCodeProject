@@ -1,5 +1,6 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
+/* renamed from: io.fabric.sdk.android.services.common.AdvertisingInfo */
 class AdvertisingInfo {
     public final String advertisingId;
     public final boolean limitAdTrackingEnabled;
@@ -31,10 +32,10 @@ class AdvertisingInfo {
 
     public int hashCode() {
         int i = 0;
-        int hashCode = this.advertisingId != null ? this.advertisingId.hashCode() : 0;
+        int i2 = this.advertisingId != null ? this.advertisingId.hashCode() : 0;
         if (this.limitAdTrackingEnabled) {
             i = 1;
         }
-        return (hashCode * 31) + i;
+        return (i2 * 31) + i;
     }
 }

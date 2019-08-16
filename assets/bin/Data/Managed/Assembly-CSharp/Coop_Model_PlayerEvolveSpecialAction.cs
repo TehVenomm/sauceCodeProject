@@ -12,7 +12,7 @@ public class Coop_Model_PlayerEvolveSpecialAction : Coop_Model_ObjectSyncPositio
 		{
 			return true;
 		}
-		if (!player.IsChangeableAction((Character.ACTION_ID)36))
+		if (!player.IsChangeableAction((Character.ACTION_ID)38))
 		{
 			return false;
 		}

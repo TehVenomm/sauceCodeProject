@@ -13,11 +13,6 @@ namespace GooglePlayGames.Native.PInvoke
 		{
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		internal CommonErrorStatus.UIStatus Status()
 		{
 			return TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_PlayerSelectUIResponse_GetStatus(SelfPtr());
@@ -31,6 +26,11 @@ namespace GooglePlayGames.Native.PInvoke
 		public IEnumerator<string> GetEnumerator()
 		{
 			return PInvokeUtilities.ToEnumerator(TurnBasedMultiplayerManager.TurnBasedMultiplayerManager_PlayerSelectUIResponse_GetPlayerIds_Length(SelfPtr()), PlayerIdAtIndex);
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		internal uint MinimumAutomatchingPlayers()

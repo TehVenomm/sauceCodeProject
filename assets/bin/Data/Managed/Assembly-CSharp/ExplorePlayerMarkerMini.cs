@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ExplorePlayerMarkerMini
+public class ExplorePlayerMarkerMini : MonoBehaviour
 {
 	[Serializable]
 	public class Size
@@ -36,11 +36,9 @@ public class ExplorePlayerMarkerMini
 	public void SetIndex(int idx)
 	{
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
 		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
 		if (!(null == sprite_) && 0 <= idx && 4 > idx)
 		{

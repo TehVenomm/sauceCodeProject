@@ -85,20 +85,20 @@ public class TokenBuffer extends JsonGenerator {
         }
 
         public JsonToken peekNextToken() throws IOException {
+            int i;
             if (this._closed) {
                 return null;
             }
-            Segment next;
             Segment segment = this._segment;
-            int i = this._segmentPtr + 1;
-            if (i >= 16) {
-                next = segment == null ? null : segment.next();
+            int i2 = this._segmentPtr + 1;
+            if (i2 >= 16) {
                 i = 0;
+                segment = segment == null ? null : segment.next();
             } else {
-                next = segment;
+                i = i2;
             }
-            if (next != null) {
-                return next.type(i);
+            if (segment != null) {
+                return segment.type(i);
             }
             return null;
         }
@@ -170,7 +170,7 @@ public class TokenBuffer extends JsonGenerator {
         }
 
         public JsonLocation getCurrentLocation() {
-            return this._location == null ? JsonLocation.NA : this._location;
+            return this._location == null ? JsonLocation.f405NA : this._location;
         }
 
         public String getCurrentName() {
@@ -187,15 +187,14 @@ public class TokenBuffer extends JsonGenerator {
             }
             try {
                 jsonReadContext.setCurrentName(str);
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
         public String getText() {
-            Object _currentObject;
             if (this._currToken == JsonToken.VALUE_STRING || this._currToken == JsonToken.FIELD_NAME) {
-                _currentObject = _currentObject();
+                Object _currentObject = _currentObject();
                 if (_currentObject instanceof String) {
                     return (String) _currentObject;
                 }
@@ -206,9 +205,9 @@ public class TokenBuffer extends JsonGenerator {
                 switch (this._currToken) {
                     case VALUE_NUMBER_INT:
                     case VALUE_NUMBER_FLOAT:
-                        _currentObject = _currentObject();
-                        if (_currentObject != null) {
-                            return _currentObject.toString();
+                        Object _currentObject2 = _currentObject();
+                        if (_currentObject2 != null) {
+                            return _currentObject2.toString();
                         }
                         return null;
                     default:
@@ -219,12 +218,18 @@ public class TokenBuffer extends JsonGenerator {
 
         public char[] getTextCharacters() {
             String text = getText();
-            return text == null ? null : text.toCharArray();
+            if (text == null) {
+                return null;
+            }
+            return text.toCharArray();
         }
 
         public int getTextLength() {
             String text = getText();
-            return text == null ? 0 : text.length();
+            if (text == null) {
+                return 0;
+            }
+            return text.length();
         }
 
         public int getTextOffset() {
@@ -383,17 +388,20 @@ public class TokenBuffer extends JsonGenerator {
             return this._segment.findObjectId(this._segmentPtr);
         }
 
-        protected final Object _currentObject() {
+        /* access modifiers changed from: protected */
+        public final Object _currentObject() {
             return this._segment.get(this._segmentPtr);
         }
 
-        protected final void _checkIsNumber() throws JsonParseException {
+        /* access modifiers changed from: protected */
+        public final void _checkIsNumber() throws JsonParseException {
             if (this._currToken == null || !this._currToken.isNumeric()) {
                 throw _constructError("Current token (" + this._currToken + ") not numeric, can not use numeric value accessors");
             }
         }
 
-        protected void _handleEOF() throws JsonParseException {
+        /* access modifiers changed from: protected */
+        public void _handleEOF() throws JsonParseException {
             _throwInternal();
         }
     }
@@ -407,7 +415,7 @@ public class TokenBuffer extends JsonGenerator {
         protected final Object[] _tokens = new Object[16];
 
         static {
-            Object values = JsonToken.values();
+            JsonToken[] values = JsonToken.values();
             System.arraycopy(values, 1, TOKEN_TYPES_BY_INDEX, 1, Math.min(15, values.length - 1));
         }
 
@@ -556,7 +564,7 @@ public class TokenBuffer extends JsonGenerator {
 
         private final void assignNativeIds(int i, Object obj, Object obj2) {
             if (this._nativeIds == null) {
-                this._nativeIds = new TreeMap();
+                this._nativeIds = new TreeMap<>();
             }
             if (obj != null) {
                 this._nativeIds.put(Integer.valueOf(_objectIdIndex(i)), obj);
@@ -567,11 +575,17 @@ public class TokenBuffer extends JsonGenerator {
         }
 
         public Object findObjectId(int i) {
-            return this._nativeIds == null ? null : this._nativeIds.get(Integer.valueOf(_objectIdIndex(i)));
+            if (this._nativeIds == null) {
+                return null;
+            }
+            return this._nativeIds.get(Integer.valueOf(_objectIdIndex(i)));
         }
 
         public Object findTypeId(int i) {
-            return this._nativeIds == null ? null : this._nativeIds.get(Integer.valueOf(_typeIdIndex(i)));
+            if (this._nativeIds == null) {
+                return null;
+            }
+            return this._nativeIds.get(Integer.valueOf(_typeIdIndex(i)));
         }
 
         private final int _typeIdIndex(int i) {
@@ -579,7 +593,7 @@ public class TokenBuffer extends JsonGenerator {
         }
 
         private final int _objectIdIndex(int i) {
-            return (i + i) + 1;
+            return i + i + 1;
         }
     }
 
@@ -603,7 +617,7 @@ public class TokenBuffer extends JsonGenerator {
     }
 
     public TokenBuffer(JsonParser jsonParser) {
-        this(jsonParser, null);
+        this(jsonParser, (DeserializationContext) null);
     }
 
     public TokenBuffer(JsonParser jsonParser, DeserializationContext deserializationContext) {
@@ -643,7 +657,7 @@ public class TokenBuffer extends JsonGenerator {
     }
 
     public JsonParser asParser(JsonParser jsonParser) {
-        JsonParser parser = new Parser(this._first, jsonParser.getCodec(), this._hasNativeTypeIds, this._hasNativeObjectIds);
+        Parser parser = new Parser(this._first, jsonParser.getCodec(), this._hasNativeTypeIds, this._hasNativeObjectIds);
         parser.setLocation(jsonParser.getTokenLocation());
         return parser;
     }
@@ -671,41 +685,36 @@ public class TokenBuffer extends JsonGenerator {
     }
 
     public void serialize(JsonGenerator jsonGenerator) throws IOException {
+        boolean z;
         Segment segment = this._first;
-        boolean z = this._mayHaveNativeIds;
-        boolean z2 = z && segment.hasIds();
         int i = -1;
-        Segment segment2 = segment;
+        boolean z2 = this._mayHaveNativeIds;
+        boolean z3 = z2 && segment.hasIds();
         while (true) {
-            int i2;
             i++;
             if (i >= 16) {
-                Segment next = segment2.next();
-                if (next != null) {
-                    z2 = z && next.hasIds();
-                    i2 = 0;
-                    segment = next;
-                    boolean z3 = z2;
+                segment = segment.next();
+                if (segment != null) {
+                    z = z2 && segment.hasIds();
+                    i = 0;
                 } else {
                     return;
                 }
+            } else {
+                z = z3;
             }
-            segment = segment2;
-            i2 = i;
-            z3 = z2;
-            JsonToken type = segment.type(i2);
+            JsonToken type = segment.type(i);
             if (type != null) {
-                if (z3) {
-                    Object findObjectId = segment.findObjectId(i2);
+                if (z) {
+                    Object findObjectId = segment.findObjectId(i);
                     if (findObjectId != null) {
                         jsonGenerator.writeObjectId(findObjectId);
                     }
-                    findObjectId = segment.findTypeId(i2);
-                    if (findObjectId != null) {
-                        jsonGenerator.writeTypeId(findObjectId);
+                    Object findTypeId = segment.findTypeId(i);
+                    if (findTypeId != null) {
+                        jsonGenerator.writeTypeId(findTypeId);
                     }
                 }
-                Object obj;
                 switch (type) {
                     case START_OBJECT:
                         jsonGenerator.writeStartObject();
@@ -720,7 +729,7 @@ public class TokenBuffer extends JsonGenerator {
                         jsonGenerator.writeEndArray();
                         break;
                     case FIELD_NAME:
-                        obj = segment.get(i2);
+                        Object obj = segment.get(i);
                         if (!(obj instanceof SerializableString)) {
                             jsonGenerator.writeFieldName((String) obj);
                             break;
@@ -729,54 +738,57 @@ public class TokenBuffer extends JsonGenerator {
                             break;
                         }
                     case VALUE_STRING:
-                        obj = segment.get(i2);
-                        if (!(obj instanceof SerializableString)) {
-                            jsonGenerator.writeString((String) obj);
+                        Object obj2 = segment.get(i);
+                        if (!(obj2 instanceof SerializableString)) {
+                            jsonGenerator.writeString((String) obj2);
                             break;
                         } else {
-                            jsonGenerator.writeString((SerializableString) obj);
+                            jsonGenerator.writeString((SerializableString) obj2);
                             break;
                         }
                     case VALUE_NUMBER_INT:
-                        obj = segment.get(i2);
-                        if (!(obj instanceof Integer)) {
-                            if (!(obj instanceof BigInteger)) {
-                                if (!(obj instanceof Long)) {
-                                    if (!(obj instanceof Short)) {
-                                        jsonGenerator.writeNumber(((Number) obj).intValue());
+                        Object obj3 = segment.get(i);
+                        if (!(obj3 instanceof Integer)) {
+                            if (!(obj3 instanceof BigInteger)) {
+                                if (!(obj3 instanceof Long)) {
+                                    if (!(obj3 instanceof Short)) {
+                                        jsonGenerator.writeNumber(((Number) obj3).intValue());
                                         break;
                                     } else {
-                                        jsonGenerator.writeNumber(((Short) obj).shortValue());
+                                        jsonGenerator.writeNumber(((Short) obj3).shortValue());
                                         break;
                                     }
+                                } else {
+                                    jsonGenerator.writeNumber(((Long) obj3).longValue());
+                                    break;
                                 }
-                                jsonGenerator.writeNumber(((Long) obj).longValue());
+                            } else {
+                                jsonGenerator.writeNumber((BigInteger) obj3);
                                 break;
                             }
-                            jsonGenerator.writeNumber((BigInteger) obj);
+                        } else {
+                            jsonGenerator.writeNumber(((Integer) obj3).intValue());
                             break;
                         }
-                        jsonGenerator.writeNumber(((Integer) obj).intValue());
-                        break;
                     case VALUE_NUMBER_FLOAT:
-                        obj = segment.get(i2);
-                        if (obj instanceof Double) {
-                            jsonGenerator.writeNumber(((Double) obj).doubleValue());
+                        Object obj4 = segment.get(i);
+                        if (obj4 instanceof Double) {
+                            jsonGenerator.writeNumber(((Double) obj4).doubleValue());
                             break;
-                        } else if (obj instanceof BigDecimal) {
-                            jsonGenerator.writeNumber((BigDecimal) obj);
+                        } else if (obj4 instanceof BigDecimal) {
+                            jsonGenerator.writeNumber((BigDecimal) obj4);
                             break;
-                        } else if (obj instanceof Float) {
-                            jsonGenerator.writeNumber(((Float) obj).floatValue());
+                        } else if (obj4 instanceof Float) {
+                            jsonGenerator.writeNumber(((Float) obj4).floatValue());
                             break;
-                        } else if (obj == null) {
+                        } else if (obj4 == null) {
                             jsonGenerator.writeNull();
                             break;
-                        } else if (obj instanceof String) {
-                            jsonGenerator.writeNumber((String) obj);
+                        } else if (obj4 instanceof String) {
+                            jsonGenerator.writeNumber((String) obj4);
                             break;
                         } else {
-                            throw new JsonGenerationException(String.format("Unrecognized value type for VALUE_NUMBER_FLOAT: %s, can not serialize", new Object[]{obj.getClass().getName()}), jsonGenerator);
+                            throw new JsonGenerationException(String.format("Unrecognized value type for VALUE_NUMBER_FLOAT: %s, can not serialize", new Object[]{obj4.getClass().getName()}), jsonGenerator);
                         }
                     case VALUE_TRUE:
                         jsonGenerator.writeBoolean(true);
@@ -788,20 +800,18 @@ public class TokenBuffer extends JsonGenerator {
                         jsonGenerator.writeNull();
                         break;
                     case VALUE_EMBEDDED_OBJECT:
-                        obj = segment.get(i2);
-                        if (!(obj instanceof RawValue)) {
-                            jsonGenerator.writeObject(obj);
+                        Object obj5 = segment.get(i);
+                        if (!(obj5 instanceof RawValue)) {
+                            jsonGenerator.writeObject(obj5);
                             break;
                         } else {
-                            ((RawValue) obj).serialize(jsonGenerator);
+                            ((RawValue) obj5).serialize(jsonGenerator);
                             break;
                         }
                     default:
                         throw new RuntimeException("Internal error: should never end up through this code path");
                 }
-                z2 = z3;
-                i = i2;
-                segment2 = segment;
+                z3 = z;
             } else {
                 return;
             }
@@ -809,10 +819,10 @@ public class TokenBuffer extends JsonGenerator {
     }
 
     public TokenBuffer deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        if (jsonParser.getCurrentTokenId() != JsonToken.FIELD_NAME.id()) {
+        JsonToken nextToken;
+        if (jsonParser.getCurrentTokenId() != JsonToken.FIELD_NAME.mo9113id()) {
             copyCurrentStructure(jsonParser);
         } else {
-            JsonToken nextToken;
             writeStartObject();
             do {
                 copyCurrentStructure(jsonParser);
@@ -828,50 +838,50 @@ public class TokenBuffer extends JsonGenerator {
 
     public String toString() {
         int i = 0;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[TokenBuffer: ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("[TokenBuffer: ");
         JsonParser asParser = asParser();
-        int i2 = (this._hasNativeTypeIds || this._hasNativeObjectIds) ? 1 : 0;
+        boolean z = this._hasNativeTypeIds || this._hasNativeObjectIds;
         while (true) {
-            JsonToken nextToken = asParser.nextToken();
-            if (nextToken == null) {
-                break;
-            }
-            if (i2 != 0) {
-                try {
-                    _appendNativeIds(stringBuilder);
-                } catch (Throwable e) {
-                    throw new IllegalStateException(e);
+            try {
+                JsonToken nextToken = asParser.nextToken();
+                if (nextToken == null) {
+                    break;
                 }
-            }
-            if (i < 100) {
-                if (i > 0) {
-                    stringBuilder.append(", ");
+                if (z) {
+                    _appendNativeIds(sb);
                 }
-                stringBuilder.append(nextToken.toString());
-                if (nextToken == JsonToken.FIELD_NAME) {
-                    stringBuilder.append('(');
-                    stringBuilder.append(asParser.getCurrentName());
-                    stringBuilder.append(')');
+                if (i < 100) {
+                    if (i > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(nextToken.toString());
+                    if (nextToken == JsonToken.FIELD_NAME) {
+                        sb.append('(');
+                        sb.append(asParser.getCurrentName());
+                        sb.append(')');
+                    }
                 }
+                i++;
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
             }
-            i++;
         }
         if (i >= 100) {
-            stringBuilder.append(" ... (truncated ").append(i - 100).append(" entries)");
+            sb.append(" ... (truncated ").append(i - 100).append(" entries)");
         }
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append(']');
+        return sb.toString();
     }
 
-    private final void _appendNativeIds(StringBuilder stringBuilder) {
+    private final void _appendNativeIds(StringBuilder sb) {
         Object findObjectId = this._last.findObjectId(this._appendAt - 1);
         if (findObjectId != null) {
-            stringBuilder.append("[objectId=").append(String.valueOf(findObjectId)).append(']');
+            sb.append("[objectId=").append(String.valueOf(findObjectId)).append(']');
         }
-        findObjectId = this._last.findTypeId(this._appendAt - 1);
-        if (findObjectId != null) {
-            stringBuilder.append("[typeId=").append(String.valueOf(findObjectId)).append(']');
+        Object findTypeId = this._last.findTypeId(this._appendAt - 1);
+        if (findTypeId != null) {
+            sb.append("[typeId=").append(String.valueOf(findTypeId)).append(']');
         }
     }
 
@@ -1106,9 +1116,9 @@ public class TokenBuffer extends JsonGenerator {
     }
 
     public void writeBinary(Base64Variant base64Variant, byte[] bArr, int i, int i2) throws IOException {
-        Object obj = new byte[i2];
-        System.arraycopy(bArr, i, obj, 0, i2);
-        writeObject(obj);
+        byte[] bArr2 = new byte[i2];
+        System.arraycopy(bArr, i, bArr2, 0, i2);
+        writeObject(bArr2);
     }
 
     public int writeBinary(Base64Variant base64Variant, InputStream inputStream, int i) {
@@ -1245,14 +1255,15 @@ public class TokenBuffer extends JsonGenerator {
         if (typeId != null) {
             this._hasNativeId = true;
         }
-        typeId = jsonParser.getObjectId();
-        this._objectId = typeId;
-        if (typeId != null) {
+        Object objectId = jsonParser.getObjectId();
+        this._objectId = objectId;
+        if (objectId != null) {
             this._hasNativeId = true;
         }
     }
 
-    protected final void _append(JsonToken jsonToken) {
+    /* access modifiers changed from: protected */
+    public final void _append(JsonToken jsonToken) {
         Segment append = this._hasNativeId ? this._last.append(this._appendAt, jsonToken, this._objectId, this._typeId) : this._last.append(this._appendAt, jsonToken);
         if (append == null) {
             this._appendAt++;
@@ -1262,7 +1273,8 @@ public class TokenBuffer extends JsonGenerator {
         this._appendAt = 1;
     }
 
-    protected final void _append(JsonToken jsonToken, Object obj) {
+    /* access modifiers changed from: protected */
+    public final void _append(JsonToken jsonToken, Object obj) {
         Segment append;
         if (this._hasNativeId) {
             append = this._last.append(this._appendAt, jsonToken, obj, this._objectId, this._typeId);
@@ -1277,7 +1289,8 @@ public class TokenBuffer extends JsonGenerator {
         this._appendAt = 1;
     }
 
-    protected final void _appendValue(JsonToken jsonToken) {
+    /* access modifiers changed from: protected */
+    public final void _appendValue(JsonToken jsonToken) {
         this._writeContext.writeValue();
         Segment append = this._hasNativeId ? this._last.append(this._appendAt, jsonToken, this._objectId, this._typeId) : this._last.append(this._appendAt, jsonToken);
         if (append == null) {
@@ -1288,7 +1301,8 @@ public class TokenBuffer extends JsonGenerator {
         this._appendAt = 1;
     }
 
-    protected final void _appendValue(JsonToken jsonToken, Object obj) {
+    /* access modifiers changed from: protected */
+    public final void _appendValue(JsonToken jsonToken, Object obj) {
         Segment append;
         this._writeContext.writeValue();
         if (this._hasNativeId) {
@@ -1304,7 +1318,8 @@ public class TokenBuffer extends JsonGenerator {
         this._appendAt = 1;
     }
 
-    protected final void _appendRaw(int i, Object obj) {
+    /* access modifiers changed from: protected */
+    public final void _appendRaw(int i, Object obj) {
         Segment appendRaw;
         if (this._hasNativeId) {
             appendRaw = this._last.appendRaw(this._appendAt, i, obj, this._objectId, this._typeId);
@@ -1319,7 +1334,8 @@ public class TokenBuffer extends JsonGenerator {
         this._appendAt = 1;
     }
 
-    protected void _reportUnsupportedOperation() {
+    /* access modifiers changed from: protected */
+    public void _reportUnsupportedOperation() {
         throw new UnsupportedOperationException("Called operation not supported for TokenBuffer");
     }
 }

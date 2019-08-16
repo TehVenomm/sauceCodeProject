@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIPlayerDamageNum
+public class UIPlayerDamageNum : MonoBehaviour
 {
 	[Serializable]
 	public class LabelColor
@@ -42,6 +42,8 @@ public class UIPlayerDamageNum
 
 	[Tooltip("属性カラ\u30fc")]
 	public List<LabelColor> elementColor;
+
+	public LabelColor defaultColor;
 
 	protected Character chara;
 
@@ -87,17 +89,18 @@ public class UIPlayerDamageNum
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
 		chara = _chara;
 		higthOffset = damadeNum.height;
-		if (!SetPosFromWorld(chara._position + offset, true))
+		if (!SetPosFromWorld(chara._position + offset, bUpdatePosY: true))
 		{
 			return false;
 		}
@@ -106,7 +109,12 @@ public class UIPlayerDamageNum
 		switch (color)
 		{
 		case DAMAGE_COLOR.DAMAGE:
-			if (elementColor.Count >= 0 && elementColor.Count > (int)element)
+			if (damage == 0)
+			{
+				damadeNum.color = defaultColor.main;
+				damadeNum.effectColor = defaultColor.effect;
+			}
+			else if (elementColor.Count >= 0 && elementColor.Count > (int)element)
 			{
 				damadeNum.color = elementColor[(int)element].main;
 				damadeNum.effectColor = elementColor[(int)element].effect;
@@ -163,21 +171,21 @@ public class UIPlayerDamageNum
 		{
 			while (animPos.get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		if (animAlpha != null)
 		{
 			while (animAlpha.get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		if (animScale != null)
 		{
 			while (animScale.get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		OnFinishAnimation();
@@ -188,7 +196,7 @@ public class UIPlayerDamageNum
 		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		if (isPlaying && enable && !(chara == null) && !SetPosFromWorld(chara._transform.get_position() + offset, false))
+		if (isPlaying && enable && !(chara == null) && !SetPosFromWorld(chara._transform.get_position() + offset, bUpdatePosY: false))
 		{
 			OnFinishAnimation();
 		}
@@ -196,7 +204,6 @@ public class UIPlayerDamageNum
 
 	private void OnFinishAnimation()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		enable = false;
 		damadeNum.alpha = 0f;
 		chara = null;
@@ -216,12 +223,8 @@ public class UIPlayerDamageNum
 		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
@@ -246,9 +249,7 @@ public class UIPlayerDamageNum
 
 	public void Play()
 	{
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		isPlaying = true;
 		if (animPos != null)
 		{

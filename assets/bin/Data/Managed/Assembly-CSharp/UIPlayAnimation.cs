@@ -2,9 +2,9 @@ using AnimationOrTween;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Play Animation")]
 [ExecuteInEditMode]
-public class UIPlayAnimation
+[AddComponentMenu("NGUI/Interaction/Play Animation")]
+public class UIPlayAnimation : MonoBehaviour
 {
 	public static UIPlayAnimation current;
 
@@ -32,8 +32,8 @@ public class UIPlayAnimation
 	[SerializeField]
 	private GameObject eventReceiver;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string callWhenFinished;
 
 	private bool mStarted;
@@ -76,26 +76,20 @@ public class UIPlayAnimation
 			{
 				animator.set_enabled(false);
 			}
+			return;
 		}
-		else
+		if (target == null)
 		{
-			if (target == null)
-			{
-				target = this.GetComponentInChildren<Animation>();
-			}
-			if (target != null && target.get_enabled())
-			{
-				target.set_enabled(false);
-			}
+			target = this.GetComponentInChildren<Animation>();
+		}
+		if (target != null && target.get_enabled())
+		{
+			target.set_enabled(false);
 		}
 	}
 
 	private void OnEnable()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (mStarted)
 		{
 			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
@@ -147,7 +141,7 @@ public class UIPlayAnimation
 	{
 		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && this.get_enabled() && trigger == Trigger.OnClick)
 		{
-			Play(true, false);
+			Play(forward: true, onlyIfDifferent: false);
 		}
 	}
 
@@ -155,7 +149,7 @@ public class UIPlayAnimation
 	{
 		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && this.get_enabled() && trigger == Trigger.OnDoubleClick)
 		{
-			Play(true, false);
+			Play(forward: true, onlyIfDifferent: false);
 		}
 	}
 
@@ -177,85 +171,82 @@ public class UIPlayAnimation
 
 	private void OnDragOver()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		if (this.get_enabled() && dualState)
 		{
 			if (UICamera.currentTouch.dragged == this.get_gameObject())
 			{
-				Play(true, true);
+				Play(forward: true, onlyIfDifferent: true);
 			}
 			else if (dragHighlight && trigger == Trigger.OnPress)
 			{
-				Play(true, true);
+				Play(forward: true, onlyIfDifferent: true);
 			}
 		}
 	}
 
 	private void OnDragOut()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		if (this.get_enabled() && dualState && UICamera.hoveredObject != this.get_gameObject())
 		{
-			Play(false, true);
+			Play(forward: false, onlyIfDifferent: true);
 		}
 	}
 
 	private void OnDrop(GameObject go)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		if (this.get_enabled() && trigger == Trigger.OnPress && UICamera.currentTouch.dragged != this.get_gameObject())
 		{
-			Play(false, true);
+			Play(forward: false, onlyIfDifferent: true);
 		}
 	}
 
 	public void Play(bool forward)
 	{
-		Play(forward, true);
+		Play(forward, onlyIfDifferent: true);
 	}
 
 	public void Play(bool forward, bool onlyIfDifferent)
 	{
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(target) || Object.op_Implicit(animator))
+		if (!Object.op_Implicit(target) && !Object.op_Implicit(animator))
 		{
-			if (onlyIfDifferent)
+			return;
+		}
+		if (onlyIfDifferent)
+		{
+			if (mActivated == forward)
 			{
-				if (mActivated == forward)
-				{
-					return;
-				}
-				mActivated = forward;
+				return;
 			}
-			if (clearSelection && UICamera.selectedObject == this.get_gameObject())
+			mActivated = forward;
+		}
+		if (clearSelection && UICamera.selectedObject == this.get_gameObject())
+		{
+			UICamera.selectedObject = null;
+		}
+		int num = 0 - playDirection;
+		Direction direction = (Direction)((!forward) ? num : ((int)playDirection));
+		ActiveAnimation activeAnimation = (!Object.op_Implicit(target)) ? ActiveAnimation.Play(animator, clipName, direction, ifDisabledOnPlay, disableWhenFinished) : ActiveAnimation.Play(target, clipName, direction, ifDisabledOnPlay, disableWhenFinished);
+		if (activeAnimation != null)
+		{
+			if (resetOnPlay)
 			{
-				UICamera.selectedObject = null;
+				activeAnimation.Reset();
 			}
-			int num = 0 - playDirection;
-			Direction direction = (Direction)((!forward) ? num : ((int)playDirection));
-			ActiveAnimation activeAnimation = (!Object.op_Implicit(target)) ? ActiveAnimation.Play(animator, clipName, direction, ifDisabledOnPlay, disableWhenFinished) : ActiveAnimation.Play(target, clipName, direction, ifDisabledOnPlay, disableWhenFinished);
-			if (activeAnimation != null)
+			for (int i = 0; i < onFinished.Count; i++)
 			{
-				if (resetOnPlay)
-				{
-					activeAnimation.Reset();
-				}
-				for (int i = 0; i < onFinished.Count; i++)
-				{
-					EventDelegate.Add(activeAnimation.onFinished, OnFinished, true);
-				}
+				EventDelegate.Add(activeAnimation.onFinished, OnFinished, oneShot: true);
 			}
 		}
 	}
 
 	public void PlayForward()
 	{
-		Play(true);
+		Play(forward: true);
 	}
 
 	public void PlayReverse()
 	{
-		Play(false);
+		Play(forward: false);
 	}
 
 	private void OnFinished()

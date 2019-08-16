@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIBreakableSphere
+public class UIBreakableSphere : MonoBehaviour
 {
 	[SerializeField]
 	private float _breakRate;
@@ -29,9 +29,8 @@ public class UIBreakableSphere
 	{
 		get
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Expected O, but got Unknown
+			//IL_0029: Expected O, but got Unknown
 			if (_mat == null)
 			{
 				MeshRenderer component = this.GetComponent<MeshRenderer>();
@@ -56,7 +55,7 @@ public class UIBreakableSphere
 	private void Awake()
 	{
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
+		//IL_0025: Expected O, but got Unknown
 		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009f: Unknown result type (might be due to invalid IL or missing references)

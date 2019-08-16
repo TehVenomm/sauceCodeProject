@@ -4,81 +4,106 @@ import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.util.zzg;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.DataUtils;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameEntity;
-import com.google.android.gms.games.internal.zzc;
+import com.google.android.gms.games.internal.zzd;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "QuestEntityCreator")
+@Reserved({1000})
 @Deprecated
-public final class QuestEntity extends zzc implements Quest {
+public final class QuestEntity extends zzd implements Quest {
     public static final Creator<QuestEntity> CREATOR = new zzc();
-    private final String mName;
-    private final int mState;
-    private final String zzdmz;
-    private final int zzeda;
-    private final long zzhdu;
-    private final GameEntity zzhiw;
-    private final String zzhnr;
-    private final long zzhns;
-    private final Uri zzhnt;
-    private final String zzhnu;
-    private final long zzhnv;
-    private final Uri zzhnw;
-    private final String zzhnx;
-    private final long zzhny;
-    private final long zzhnz;
-    private final ArrayList<MilestoneEntity> zzhoa;
+    @Field(getter = "getDescription", mo13990id = 6)
+    private final String description;
+    @Field(getter = "getName", mo13990id = 12)
+    private final String name;
+    @Field(getter = "getState", mo13990id = 15)
+    private final int state;
+    @Field(getter = "getType", mo13990id = 16)
+    private final int type;
+    @Field(getter = "getLastUpdatedTimestamp", mo13990id = 8)
+    private final long zzfm;
+    @Field(getter = "getGame", mo13990id = 1)
+    private final GameEntity zzlp;
+    @Field(getter = "getQuestId", mo13990id = 2)
+    private final String zzra;
+    @Field(getter = "getAcceptedTimestamp", mo13990id = 3)
+    private final long zzrb;
+    @Field(getter = "getBannerImageUri", mo13990id = 4)
+    private final Uri zzrc;
+    @Field(getter = "getBannerImageUrl", mo13990id = 5)
+    private final String zzrd;
+    @Field(getter = "getEndTimestamp", mo13990id = 7)
+    private final long zzre;
+    @Field(getter = "getIconImageUri", mo13990id = 9)
+    private final Uri zzrf;
+    @Field(getter = "getIconImageUrl", mo13990id = 10)
+    private final String zzrg;
+    @Field(getter = "getNotifyTimestamp", mo13990id = 13)
+    private final long zzrh;
+    @Field(getter = "getStartTimestamp", mo13990id = 14)
+    private final long zzri;
+    @Field(getter = "getMilestones", mo13990id = 17)
+    private final ArrayList<MilestoneEntity> zzrj;
 
-    QuestEntity(GameEntity gameEntity, String str, long j, Uri uri, String str2, String str3, long j2, long j3, Uri uri2, String str4, String str5, long j4, long j5, int i, int i2, ArrayList<MilestoneEntity> arrayList) {
-        this.zzhiw = gameEntity;
-        this.zzhnr = str;
-        this.zzhns = j;
-        this.zzhnt = uri;
-        this.zzhnu = str2;
-        this.zzdmz = str3;
-        this.zzhnv = j2;
-        this.zzhdu = j3;
-        this.zzhnw = uri2;
-        this.zzhnx = str4;
-        this.mName = str5;
-        this.zzhny = j4;
-        this.zzhnz = j5;
-        this.mState = i;
-        this.zzeda = i2;
-        this.zzhoa = arrayList;
+    @Constructor
+    QuestEntity(@Param(mo13993id = 1) GameEntity gameEntity, @Param(mo13993id = 2) String str, @Param(mo13993id = 3) long j, @Param(mo13993id = 4) Uri uri, @Param(mo13993id = 5) String str2, @Param(mo13993id = 6) String str3, @Param(mo13993id = 7) long j2, @Param(mo13993id = 8) long j3, @Param(mo13993id = 9) Uri uri2, @Param(mo13993id = 10) String str4, @Param(mo13993id = 12) String str5, @Param(mo13993id = 13) long j4, @Param(mo13993id = 14) long j5, @Param(mo13993id = 15) int i, @Param(mo13993id = 16) int i2, @Param(mo13993id = 17) ArrayList<MilestoneEntity> arrayList) {
+        this.zzlp = gameEntity;
+        this.zzra = str;
+        this.zzrb = j;
+        this.zzrc = uri;
+        this.zzrd = str2;
+        this.description = str3;
+        this.zzre = j2;
+        this.zzfm = j3;
+        this.zzrf = uri2;
+        this.zzrg = str4;
+        this.name = str5;
+        this.zzrh = j4;
+        this.zzri = j5;
+        this.state = i;
+        this.type = i2;
+        this.zzrj = arrayList;
     }
 
     public QuestEntity(Quest quest) {
-        this.zzhiw = new GameEntity(quest.getGame());
-        this.zzhnr = quest.getQuestId();
-        this.zzhns = quest.getAcceptedTimestamp();
-        this.zzdmz = quest.getDescription();
-        this.zzhnt = quest.getBannerImageUri();
-        this.zzhnu = quest.getBannerImageUrl();
-        this.zzhnv = quest.getEndTimestamp();
-        this.zzhnw = quest.getIconImageUri();
-        this.zzhnx = quest.getIconImageUrl();
-        this.zzhdu = quest.getLastUpdatedTimestamp();
-        this.mName = quest.getName();
-        this.zzhny = quest.zzarx();
-        this.zzhnz = quest.getStartTimestamp();
-        this.mState = quest.getState();
-        this.zzeda = quest.getType();
-        List zzarw = quest.zzarw();
-        int size = zzarw.size();
-        this.zzhoa = new ArrayList(size);
+        this.zzlp = new GameEntity(quest.getGame());
+        this.zzra = quest.getQuestId();
+        this.zzrb = quest.getAcceptedTimestamp();
+        this.description = quest.getDescription();
+        this.zzrc = quest.getBannerImageUri();
+        this.zzrd = quest.getBannerImageUrl();
+        this.zzre = quest.getEndTimestamp();
+        this.zzrf = quest.getIconImageUri();
+        this.zzrg = quest.getIconImageUrl();
+        this.zzfm = quest.getLastUpdatedTimestamp();
+        this.name = quest.getName();
+        this.zzrh = quest.zzdr();
+        this.zzri = quest.getStartTimestamp();
+        this.state = quest.getState();
+        this.type = quest.getType();
+        List zzdq = quest.zzdq();
+        int size = zzdq.size();
+        this.zzrj = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            this.zzhoa.add((MilestoneEntity) ((Milestone) zzarw.get(i)).freeze());
+            this.zzrj.add((MilestoneEntity) ((Milestone) zzdq.get(i)).freeze());
         }
     }
 
     static int zza(Quest quest) {
-        return Arrays.hashCode(new Object[]{quest.getGame(), quest.getQuestId(), Long.valueOf(quest.getAcceptedTimestamp()), quest.getBannerImageUri(), quest.getDescription(), Long.valueOf(quest.getEndTimestamp()), quest.getIconImageUri(), Long.valueOf(quest.getLastUpdatedTimestamp()), quest.zzarw(), quest.getName(), Long.valueOf(quest.zzarx()), Long.valueOf(quest.getStartTimestamp()), Integer.valueOf(quest.getState())});
+        return Objects.hashCode(quest.getGame(), quest.getQuestId(), Long.valueOf(quest.getAcceptedTimestamp()), quest.getBannerImageUri(), quest.getDescription(), Long.valueOf(quest.getEndTimestamp()), quest.getIconImageUri(), Long.valueOf(quest.getLastUpdatedTimestamp()), quest.zzdq(), quest.getName(), Long.valueOf(quest.zzdr()), Long.valueOf(quest.getStartTimestamp()), Integer.valueOf(quest.getState()));
     }
 
     static boolean zza(Quest quest, Object obj) {
@@ -89,87 +114,90 @@ public final class QuestEntity extends zzc implements Quest {
             return true;
         }
         Quest quest2 = (Quest) obj;
-        return zzbf.equal(quest2.getGame(), quest.getGame()) && zzbf.equal(quest2.getQuestId(), quest.getQuestId()) && zzbf.equal(Long.valueOf(quest2.getAcceptedTimestamp()), Long.valueOf(quest.getAcceptedTimestamp())) && zzbf.equal(quest2.getBannerImageUri(), quest.getBannerImageUri()) && zzbf.equal(quest2.getDescription(), quest.getDescription()) && zzbf.equal(Long.valueOf(quest2.getEndTimestamp()), Long.valueOf(quest.getEndTimestamp())) && zzbf.equal(quest2.getIconImageUri(), quest.getIconImageUri()) && zzbf.equal(Long.valueOf(quest2.getLastUpdatedTimestamp()), Long.valueOf(quest.getLastUpdatedTimestamp())) && zzbf.equal(quest2.zzarw(), quest.zzarw()) && zzbf.equal(quest2.getName(), quest.getName()) && zzbf.equal(Long.valueOf(quest2.zzarx()), Long.valueOf(quest.zzarx())) && zzbf.equal(Long.valueOf(quest2.getStartTimestamp()), Long.valueOf(quest.getStartTimestamp())) && zzbf.equal(Integer.valueOf(quest2.getState()), Integer.valueOf(quest.getState()));
+        return Objects.equal(quest2.getGame(), quest.getGame()) && Objects.equal(quest2.getQuestId(), quest.getQuestId()) && Objects.equal(Long.valueOf(quest2.getAcceptedTimestamp()), Long.valueOf(quest.getAcceptedTimestamp())) && Objects.equal(quest2.getBannerImageUri(), quest.getBannerImageUri()) && Objects.equal(quest2.getDescription(), quest.getDescription()) && Objects.equal(Long.valueOf(quest2.getEndTimestamp()), Long.valueOf(quest.getEndTimestamp())) && Objects.equal(quest2.getIconImageUri(), quest.getIconImageUri()) && Objects.equal(Long.valueOf(quest2.getLastUpdatedTimestamp()), Long.valueOf(quest.getLastUpdatedTimestamp())) && Objects.equal(quest2.zzdq(), quest.zzdq()) && Objects.equal(quest2.getName(), quest.getName()) && Objects.equal(Long.valueOf(quest2.zzdr()), Long.valueOf(quest.zzdr())) && Objects.equal(Long.valueOf(quest2.getStartTimestamp()), Long.valueOf(quest.getStartTimestamp())) && Objects.equal(Integer.valueOf(quest2.getState()), Integer.valueOf(quest.getState()));
     }
 
     static String zzb(Quest quest) {
-        return zzbf.zzt(quest).zzg("Game", quest.getGame()).zzg("QuestId", quest.getQuestId()).zzg("AcceptedTimestamp", Long.valueOf(quest.getAcceptedTimestamp())).zzg("BannerImageUri", quest.getBannerImageUri()).zzg("BannerImageUrl", quest.getBannerImageUrl()).zzg("Description", quest.getDescription()).zzg("EndTimestamp", Long.valueOf(quest.getEndTimestamp())).zzg("IconImageUri", quest.getIconImageUri()).zzg("IconImageUrl", quest.getIconImageUrl()).zzg("LastUpdatedTimestamp", Long.valueOf(quest.getLastUpdatedTimestamp())).zzg("Milestones", quest.zzarw()).zzg("Name", quest.getName()).zzg("NotifyTimestamp", Long.valueOf(quest.zzarx())).zzg("StartTimestamp", Long.valueOf(quest.getStartTimestamp())).zzg("State", Integer.valueOf(quest.getState())).toString();
+        return Objects.toStringHelper(quest).add("Game", quest.getGame()).add("QuestId", quest.getQuestId()).add("AcceptedTimestamp", Long.valueOf(quest.getAcceptedTimestamp())).add("BannerImageUri", quest.getBannerImageUri()).add("BannerImageUrl", quest.getBannerImageUrl()).add("Description", quest.getDescription()).add("EndTimestamp", Long.valueOf(quest.getEndTimestamp())).add("IconImageUri", quest.getIconImageUri()).add("IconImageUrl", quest.getIconImageUrl()).add("LastUpdatedTimestamp", Long.valueOf(quest.getLastUpdatedTimestamp())).add("Milestones", quest.zzdq()).add("Name", quest.getName()).add("NotifyTimestamp", Long.valueOf(quest.zzdr())).add("StartTimestamp", Long.valueOf(quest.getStartTimestamp())).add("State", Integer.valueOf(quest.getState())).toString();
     }
 
     public final boolean equals(Object obj) {
         return zza(this, obj);
     }
 
-    public final Quest freeze() {
-        return this;
+    public final /* bridge */ /* synthetic */ Object freeze() {
+        if (this != null) {
+            return this;
+        }
+        throw null;
     }
 
     public final long getAcceptedTimestamp() {
-        return this.zzhns;
+        return this.zzrb;
     }
 
     public final Uri getBannerImageUri() {
-        return this.zzhnt;
+        return this.zzrc;
     }
 
     public final String getBannerImageUrl() {
-        return this.zzhnu;
+        return this.zzrd;
     }
 
     public final Milestone getCurrentMilestone() {
-        return (Milestone) zzarw().get(0);
+        return (Milestone) zzdq().get(0);
     }
 
     public final String getDescription() {
-        return this.zzdmz;
+        return this.description;
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzdmz, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.description, charArrayBuffer);
     }
 
     public final long getEndTimestamp() {
-        return this.zzhnv;
+        return this.zzre;
     }
 
     public final Game getGame() {
-        return this.zzhiw;
+        return this.zzlp;
     }
 
     public final Uri getIconImageUri() {
-        return this.zzhnw;
+        return this.zzrf;
     }
 
     public final String getIconImageUrl() {
-        return this.zzhnx;
+        return this.zzrg;
     }
 
     public final long getLastUpdatedTimestamp() {
-        return this.zzhdu;
+        return this.zzfm;
     }
 
     public final String getName() {
-        return this.mName;
+        return this.name;
     }
 
     public final void getName(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.mName, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.name, charArrayBuffer);
     }
 
     public final String getQuestId() {
-        return this.zzhnr;
+        return this.zzra;
     }
 
     public final long getStartTimestamp() {
-        return this.zzhnz;
+        return this.zzri;
     }
 
     public final int getState() {
-        return this.mState;
+        return this.state;
     }
 
     public final int getType() {
-        return this.zzeda;
+        return this.type;
     }
 
     public final int hashCode() {
@@ -181,7 +209,7 @@ public final class QuestEntity extends zzc implements Quest {
     }
 
     public final boolean isEndingSoon() {
-        return this.zzhny <= System.currentTimeMillis() + 1800000;
+        return this.zzrh <= System.currentTimeMillis() + 1800000;
     }
 
     public final String toString() {
@@ -189,31 +217,31 @@ public final class QuestEntity extends zzc implements Quest {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getGame(), i, false);
-        zzd.zza(parcel, 2, getQuestId(), false);
-        zzd.zza(parcel, 3, getAcceptedTimestamp());
-        zzd.zza(parcel, 4, getBannerImageUri(), i, false);
-        zzd.zza(parcel, 5, getBannerImageUrl(), false);
-        zzd.zza(parcel, 6, getDescription(), false);
-        zzd.zza(parcel, 7, getEndTimestamp());
-        zzd.zza(parcel, 8, getLastUpdatedTimestamp());
-        zzd.zza(parcel, 9, getIconImageUri(), i, false);
-        zzd.zza(parcel, 10, getIconImageUrl(), false);
-        zzd.zza(parcel, 12, getName(), false);
-        zzd.zza(parcel, 13, this.zzhny);
-        zzd.zza(parcel, 14, getStartTimestamp());
-        zzd.zzc(parcel, 15, getState());
-        zzd.zzc(parcel, 16, this.zzeda);
-        zzd.zzc(parcel, 17, zzarw(), false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 1, getGame(), i, false);
+        SafeParcelWriter.writeString(parcel, 2, getQuestId(), false);
+        SafeParcelWriter.writeLong(parcel, 3, getAcceptedTimestamp());
+        SafeParcelWriter.writeParcelable(parcel, 4, getBannerImageUri(), i, false);
+        SafeParcelWriter.writeString(parcel, 5, getBannerImageUrl(), false);
+        SafeParcelWriter.writeString(parcel, 6, getDescription(), false);
+        SafeParcelWriter.writeLong(parcel, 7, getEndTimestamp());
+        SafeParcelWriter.writeLong(parcel, 8, getLastUpdatedTimestamp());
+        SafeParcelWriter.writeParcelable(parcel, 9, getIconImageUri(), i, false);
+        SafeParcelWriter.writeString(parcel, 10, getIconImageUrl(), false);
+        SafeParcelWriter.writeString(parcel, 12, getName(), false);
+        SafeParcelWriter.writeLong(parcel, 13, this.zzrh);
+        SafeParcelWriter.writeLong(parcel, 14, getStartTimestamp());
+        SafeParcelWriter.writeInt(parcel, 15, getState());
+        SafeParcelWriter.writeInt(parcel, 16, this.type);
+        SafeParcelWriter.writeTypedList(parcel, 17, zzdq(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final List<Milestone> zzarw() {
-        return new ArrayList(this.zzhoa);
+    public final List<Milestone> zzdq() {
+        return new ArrayList(this.zzrj);
     }
 
-    public final long zzarx() {
-        return this.zzhny;
+    public final long zzdr() {
+        return this.zzrh;
     }
 }

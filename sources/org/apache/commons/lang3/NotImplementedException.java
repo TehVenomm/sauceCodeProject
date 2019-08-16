@@ -9,7 +9,7 @@ public class NotImplementedException extends UnsupportedOperationException {
     }
 
     public NotImplementedException(Throwable th) {
-        this(th, null);
+        this(th, (String) null);
     }
 
     public NotImplementedException(String str, Throwable th) {

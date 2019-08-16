@@ -1,7 +1,7 @@
 package net.gogame.chat;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.p000v4.app.Fragment;
+import android.support.p000v4.app.FragmentActivity;
 
 public abstract class BaseActivity extends FragmentActivity {
     public void addFragment(Fragment fragment, int i, String str) {

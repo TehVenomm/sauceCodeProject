@@ -15,7 +15,7 @@ public class CommonDialogMaintenance : CommonDialog
 		{
 			try
 			{
-				double unixTimeStamp = (double)long.Parse(desc.data.ToString());
+				double unixTimeStamp = long.Parse(desc.data.ToString());
 				DateTime dateTime = UnixTimeStampToDateTime(unixTimeStamp);
 				SetLabelText((Enum)UI.MESSAGE, string.Format(desc.text, GetFormartedText(dateTime.Day) + "/" + GetFormartedText(dateTime.Month) + ", " + GetFormartedText(dateTime.Hour) + ":" + GetFormartedText(dateTime.Minute)));
 			}
@@ -28,9 +28,7 @@ public class CommonDialogMaintenance : CommonDialog
 
 	public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
 	{
-		DateTime result = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-		result = result.AddSeconds(unixTimeStamp);
-		return result;
+		return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(unixTimeStamp);
 	}
 
 	private string GetFormartedText(int num)

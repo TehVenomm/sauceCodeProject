@@ -29,11 +29,11 @@ public class EnumResolver implements Serializable {
         HashMap hashMap = new HashMap();
         int length = enumArr.length;
         for (int i = 0; i < length; i++) {
-            Object obj = findEnumValues[i];
-            if (obj == null) {
-                obj = enumArr[i].name();
+            String str = findEnumValues[i];
+            if (str == null) {
+                str = enumArr[i].name();
             }
-            hashMap.put(obj, enumArr[i]);
+            hashMap.put(str, enumArr[i]);
         }
         return new EnumResolver(cls, enumArr, hashMap);
     }
@@ -61,14 +61,14 @@ public class EnumResolver implements Serializable {
             if (length < 0) {
                 return new EnumResolver(cls, enumArr, hashMap);
             }
-            Object obj = enumArr[length];
+            Enum enumR = enumArr[length];
             try {
-                Object invoke = method.invoke(obj, new Object[0]);
+                Object invoke = method.invoke(enumR, new Object[0]);
                 if (invoke != null) {
-                    hashMap.put(invoke.toString(), obj);
+                    hashMap.put(invoke.toString(), enumR);
                 }
             } catch (Exception e) {
-                throw new IllegalArgumentException("Failed to access @JsonValue of Enum value " + obj + ": " + e.getMessage());
+                throw new IllegalArgumentException("Failed to access @JsonValue of Enum value " + enumR + ": " + e.getMessage());
             }
         }
     }
@@ -105,8 +105,8 @@ public class EnumResolver implements Serializable {
     }
 
     public List<Enum<?>> getEnums() {
-        List arrayList = new ArrayList(this._enums.length);
-        for (Object add : this._enums) {
+        ArrayList arrayList = new ArrayList(this._enums.length);
+        for (Enum<?> add : this._enums) {
             arrayList.add(add);
         }
         return arrayList;

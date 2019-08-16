@@ -8,19 +8,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.SparseArray;
 import bolts.AppLink.Target;
-import com.facebook.GraphResponse;
 import com.facebook.appevents.AppEventsConstants;
 import com.facebook.applinks.AppLinkData;
 import com.facebook.internal.AnalyticsEvents;
-import com.facebook.share.internal.ShareConstants;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p017io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 
 public class AppLinkNavigation {
     private static final String KEY_NAME_REFERER_APP_LINK = "referer_app_link";
@@ -56,8 +54,8 @@ public class AppLinkNavigation {
         }
     }
 
-    public AppLinkNavigation(AppLink appLink, Bundle bundle, Bundle bundle2) {
-        if (appLink == null) {
+    public AppLinkNavigation(AppLink appLink2, Bundle bundle, Bundle bundle2) {
+        if (appLink2 == null) {
             throw new IllegalArgumentException("appLink must not be null.");
         }
         if (bundle == null) {
@@ -66,7 +64,7 @@ public class AppLinkNavigation {
         if (bundle2 == null) {
             bundle2 = new Bundle();
         }
-        this.appLink = appLink;
+        this.appLink = appLink2;
         this.extras = bundle;
         this.appLinkData = bundle2;
     }
@@ -81,9 +79,9 @@ public class AppLinkNavigation {
             }
             ApplicationInfo applicationInfo = context.getApplicationInfo();
             if (applicationInfo != null) {
-                packageName = context.getString(applicationInfo.labelRes);
-                if (packageName != null) {
-                    bundle2.putString("app_name", packageName);
+                String string = context.getString(applicationInfo.labelRes);
+                if (string != null) {
+                    bundle2.putString("app_name", string);
                 }
             }
         }
@@ -116,21 +114,20 @@ public class AppLinkNavigation {
         if (obj instanceof CharSequence) {
             return obj.toString();
         }
-        JSONArray jSONArray;
         if (obj instanceof List) {
-            jSONArray = new JSONArray();
+            JSONArray jSONArray = new JSONArray();
             for (Object jSONValue : (List) obj) {
                 jSONArray.put(getJSONValue(jSONValue));
             }
             return jSONArray;
         } else if (obj instanceof SparseArray) {
-            jSONArray = new JSONArray();
+            JSONArray jSONArray2 = new JSONArray();
             SparseArray sparseArray = (SparseArray) obj;
             while (i < sparseArray.size()) {
-                jSONArray.put(sparseArray.keyAt(i), getJSONValue(sparseArray.valueAt(i)));
+                jSONArray2.put(sparseArray.keyAt(i), getJSONValue(sparseArray.valueAt(i)));
                 i++;
             }
-            return jSONArray;
+            return jSONArray2;
         } else if (obj instanceof Character) {
             return obj.toString();
         } else {
@@ -139,92 +136,90 @@ public class AppLinkNavigation {
             }
             if (obj instanceof Number) {
                 return ((obj instanceof Double) || (obj instanceof Float)) ? Double.valueOf(((Number) obj).doubleValue()) : Long.valueOf(((Number) obj).longValue());
-            } else {
-                int length;
-                if (obj instanceof boolean[]) {
-                    jSONArray = new JSONArray();
-                    boolean[] zArr = (boolean[]) obj;
-                    length = zArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(Boolean.valueOf(zArr[i])));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (obj instanceof char[]) {
-                    jSONArray = new JSONArray();
-                    char[] cArr = (char[]) obj;
-                    length = cArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(Character.valueOf(cArr[i])));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (obj instanceof CharSequence[]) {
-                    jSONArray = new JSONArray();
-                    CharSequence[] charSequenceArr = (CharSequence[]) obj;
-                    length = charSequenceArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(charSequenceArr[i]));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (obj instanceof double[]) {
-                    jSONArray = new JSONArray();
-                    double[] dArr = (double[]) obj;
-                    length = dArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(Double.valueOf(dArr[i])));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (obj instanceof float[]) {
-                    jSONArray = new JSONArray();
-                    float[] fArr = (float[]) obj;
-                    length = fArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(Float.valueOf(fArr[i])));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (obj instanceof int[]) {
-                    jSONArray = new JSONArray();
-                    int[] iArr = (int[]) obj;
-                    length = iArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(Integer.valueOf(iArr[i])));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (obj instanceof long[]) {
-                    jSONArray = new JSONArray();
-                    long[] jArr = (long[]) obj;
-                    length = jArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(Long.valueOf(jArr[i])));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (obj instanceof short[]) {
-                    jSONArray = new JSONArray();
-                    short[] sArr = (short[]) obj;
-                    length = sArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(Short.valueOf(sArr[i])));
-                        i++;
-                    }
-                    return jSONArray;
-                } else if (!(obj instanceof String[])) {
-                    return null;
-                } else {
-                    jSONArray = new JSONArray();
-                    String[] strArr = (String[]) obj;
-                    length = strArr.length;
-                    while (i < length) {
-                        jSONArray.put(getJSONValue(strArr[i]));
-                        i++;
-                    }
-                    return jSONArray;
+            }
+            if (obj instanceof boolean[]) {
+                JSONArray jSONArray3 = new JSONArray();
+                boolean[] zArr = (boolean[]) obj;
+                int length = zArr.length;
+                while (i < length) {
+                    jSONArray3.put(getJSONValue(Boolean.valueOf(zArr[i])));
+                    i++;
                 }
+                return jSONArray3;
+            } else if (obj instanceof char[]) {
+                JSONArray jSONArray4 = new JSONArray();
+                char[] cArr = (char[]) obj;
+                int length2 = cArr.length;
+                while (i < length2) {
+                    jSONArray4.put(getJSONValue(Character.valueOf(cArr[i])));
+                    i++;
+                }
+                return jSONArray4;
+            } else if (obj instanceof CharSequence[]) {
+                JSONArray jSONArray5 = new JSONArray();
+                CharSequence[] charSequenceArr = (CharSequence[]) obj;
+                int length3 = charSequenceArr.length;
+                while (i < length3) {
+                    jSONArray5.put(getJSONValue(charSequenceArr[i]));
+                    i++;
+                }
+                return jSONArray5;
+            } else if (obj instanceof double[]) {
+                JSONArray jSONArray6 = new JSONArray();
+                double[] dArr = (double[]) obj;
+                int length4 = dArr.length;
+                while (i < length4) {
+                    jSONArray6.put(getJSONValue(Double.valueOf(dArr[i])));
+                    i++;
+                }
+                return jSONArray6;
+            } else if (obj instanceof float[]) {
+                JSONArray jSONArray7 = new JSONArray();
+                float[] fArr = (float[]) obj;
+                int length5 = fArr.length;
+                while (i < length5) {
+                    jSONArray7.put(getJSONValue(Float.valueOf(fArr[i])));
+                    i++;
+                }
+                return jSONArray7;
+            } else if (obj instanceof int[]) {
+                JSONArray jSONArray8 = new JSONArray();
+                int[] iArr = (int[]) obj;
+                int length6 = iArr.length;
+                while (i < length6) {
+                    jSONArray8.put(getJSONValue(Integer.valueOf(iArr[i])));
+                    i++;
+                }
+                return jSONArray8;
+            } else if (obj instanceof long[]) {
+                JSONArray jSONArray9 = new JSONArray();
+                long[] jArr = (long[]) obj;
+                int length7 = jArr.length;
+                while (i < length7) {
+                    jSONArray9.put(getJSONValue(Long.valueOf(jArr[i])));
+                    i++;
+                }
+                return jSONArray9;
+            } else if (obj instanceof short[]) {
+                JSONArray jSONArray10 = new JSONArray();
+                short[] sArr = (short[]) obj;
+                int length8 = sArr.length;
+                while (i < length8) {
+                    jSONArray10.put(getJSONValue(Short.valueOf(sArr[i])));
+                    i++;
+                }
+                return jSONArray10;
+            } else if (!(obj instanceof String[])) {
+                return null;
+            } else {
+                JSONArray jSONArray11 = new JSONArray();
+                String[] strArr = (String[]) obj;
+                int length9 = strArr.length;
+                while (i < length9) {
+                    jSONArray11.put(getJSONValue(strArr[i]));
+                    i++;
+                }
+                return jSONArray11;
             }
         }
     }
@@ -233,8 +228,8 @@ public class AppLinkNavigation {
         return getDefaultResolver() != null ? getDefaultResolver() : new WebViewAppLinkResolver(context);
     }
 
-    public static NavigationResult navigate(Context context, AppLink appLink) {
-        return new AppLinkNavigation(appLink, null, null).navigate(context);
+    public static NavigationResult navigate(Context context, AppLink appLink2) {
+        return new AppLinkNavigation(appLink2, null, null).navigate(context);
     }
 
     public static Task<NavigationResult> navigateInBackground(Context context, Uri uri) {
@@ -242,7 +237,7 @@ public class AppLinkNavigation {
     }
 
     public static Task<NavigationResult> navigateInBackground(final Context context, Uri uri, AppLinkResolver appLinkResolver) {
-        return appLinkResolver.getAppLinkFromUrlInBackground(uri).onSuccess(new Continuation<AppLink, NavigationResult>() {
+        return appLinkResolver.getAppLinkFromUrlInBackground(uri).onSuccess((Continuation<TResult, TContinuationResult>) new Continuation<AppLink, NavigationResult>() {
             public NavigationResult then(Task<AppLink> task) throws Exception {
                 return AppLinkNavigation.navigate(context, (AppLink) task.getResult());
             }
@@ -266,12 +261,12 @@ public class AppLinkNavigation {
     }
 
     private void sendAppLinkNavigateEventBroadcast(Context context, Intent intent, NavigationResult navigationResult, JSONException jSONException) {
-        Map hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         if (jSONException != null) {
             hashMap.put("error", jSONException.getLocalizedMessage());
         }
-        hashMap.put(GraphResponse.SUCCESS_KEY, navigationResult.isSucceeded() ? AppEventsConstants.EVENT_PARAM_VALUE_YES : AppEventsConstants.EVENT_PARAM_VALUE_NO);
-        hashMap.put(ShareConstants.MEDIA_TYPE, navigationResult.getCode());
+        hashMap.put("success", navigationResult.isSucceeded() ? AppEventsConstants.EVENT_PARAM_VALUE_YES : AppEventsConstants.EVENT_PARAM_VALUE_NO);
+        hashMap.put("type", navigationResult.getCode());
         MeasurementEvent.sendBroadcastEvent(context, MeasurementEvent.APP_LINK_NAVIGATE_OUT_EVENT_NAME, intent, hashMap);
     }
 
@@ -294,48 +289,52 @@ public class AppLinkNavigation {
     public NavigationResult navigate(Context context) {
         Intent intent;
         Intent intent2;
-        NavigationResult navigationResult;
         PackageManager packageManager = context.getPackageManager();
         Bundle buildAppLinkDataForNavigation = buildAppLinkDataForNavigation(context);
-        for (Target target : getAppLink().getTargets()) {
-            intent = new Intent("android.intent.action.VIEW");
+        Iterator it = getAppLink().getTargets().iterator();
+        while (true) {
+            if (!it.hasNext()) {
+                intent = null;
+                break;
+            }
+            Target target = (Target) it.next();
+            Intent intent3 = new Intent("android.intent.action.VIEW");
             if (target.getUrl() != null) {
-                intent.setData(target.getUrl());
+                intent3.setData(target.getUrl());
             } else {
-                intent.setData(this.appLink.getSourceUrl());
+                intent3.setData(this.appLink.getSourceUrl());
             }
-            intent.setPackage(target.getPackageName());
+            intent3.setPackage(target.getPackageName());
             if (target.getClassName() != null) {
-                intent.setClassName(target.getPackageName(), target.getClassName());
+                intent3.setClassName(target.getPackageName(), target.getClassName());
             }
-            intent.putExtra("al_applink_data", buildAppLinkDataForNavigation);
-            if (packageManager.resolveActivity(intent, 65536) != null) {
-                intent2 = intent;
+            intent3.putExtra("al_applink_data", buildAppLinkDataForNavigation);
+            if (packageManager.resolveActivity(intent3, 65536) != null) {
+                intent = intent3;
                 break;
             }
         }
-        intent2 = null;
-        NavigationResult navigationResult2 = NavigationResult.FAILED;
-        if (intent2 != null) {
-            intent = intent2;
+        NavigationResult navigationResult = NavigationResult.FAILED;
+        if (intent != null) {
             navigationResult = NavigationResult.APP;
+            intent2 = intent;
         } else {
             Uri webUrl = getAppLink().getWebUrl();
             if (webUrl != null) {
                 try {
-                    intent = new Intent("android.intent.action.VIEW", webUrl.buildUpon().appendQueryParameter("al_applink_data", getJSONForBundle(buildAppLinkDataForNavigation).toString()).build());
+                    intent2 = new Intent("android.intent.action.VIEW", webUrl.buildUpon().appendQueryParameter("al_applink_data", getJSONForBundle(buildAppLinkDataForNavigation).toString()).build());
                     navigationResult = NavigationResult.WEB;
-                } catch (Throwable e) {
-                    sendAppLinkNavigateEventBroadcast(context, intent2, NavigationResult.FAILED, e);
+                } catch (JSONException e) {
+                    sendAppLinkNavigateEventBroadcast(context, intent, NavigationResult.FAILED, e);
                     throw new RuntimeException(e);
                 }
+            } else {
+                intent2 = null;
             }
-            navigationResult = navigationResult2;
-            intent = null;
         }
-        sendAppLinkNavigateEventBroadcast(context, intent, navigationResult, null);
-        if (intent != null) {
-            context.startActivity(intent);
+        sendAppLinkNavigateEventBroadcast(context, intent2, navigationResult, null);
+        if (intent2 != null) {
+            context.startActivity(intent2);
         }
         return navigationResult;
     }

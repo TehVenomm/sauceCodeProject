@@ -1,19 +1,22 @@
-package io.fabric.sdk.android.services.concurrency;
+package p017io.fabric.sdk.android.services.concurrency;
 
-import io.fabric.sdk.android.services.concurrency.AsyncTask.Status;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import p017io.fabric.sdk.android.services.concurrency.AsyncTask.Status;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.PriorityAsyncTask */
 public abstract class PriorityAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> implements Dependency<Task>, PriorityProvider, Task, DelegateProvider {
     private final PriorityTask priorityTask = new PriorityTask();
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.PriorityAsyncTask$ProxyExecutor */
     private static class ProxyExecutor<Result> implements Executor {
         private final Executor executor;
-        private final PriorityAsyncTask task;
+        /* access modifiers changed from: private */
+        public final PriorityAsyncTask task;
 
-        public ProxyExecutor(Executor executor, PriorityAsyncTask priorityAsyncTask) {
-            this.executor = executor;
+        public ProxyExecutor(Executor executor2, PriorityAsyncTask priorityAsyncTask) {
+            this.executor = executor2;
             this.task = priorityAsyncTask;
         }
 

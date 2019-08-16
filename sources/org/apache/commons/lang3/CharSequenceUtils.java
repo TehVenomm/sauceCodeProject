@@ -4,7 +4,10 @@ public class CharSequenceUtils {
     private static final int NOT_FOUND = -1;
 
     public static CharSequence subSequence(CharSequence charSequence, int i) {
-        return charSequence == null ? null : charSequence.subSequence(i, charSequence.length());
+        if (charSequence == null) {
+            return null;
+        }
+        return charSequence.subSequence(i, charSequence.length());
     }
 
     static int indexOf(CharSequence charSequence, int i, int i2) {
@@ -38,9 +41,9 @@ public class CharSequenceUtils {
         if (i2 >= length) {
             i2 = length - 1;
         }
-        for (length = i2; length >= 0; length--) {
-            if (charSequence.charAt(length) == i) {
-                return length;
+        for (int i3 = i2; i3 >= 0; i3--) {
+            if (charSequence.charAt(i3) == i) {
+                return i3;
             }
         }
         return -1;
@@ -63,32 +66,33 @@ public class CharSequenceUtils {
     }
 
     static boolean regionMatches(CharSequence charSequence, boolean z, int i, CharSequence charSequence2, int i2, int i3) {
-        if ((charSequence instanceof String) && (charSequence2 instanceof String)) {
-            return ((String) charSequence).regionMatches(z, i, (String) charSequence2, i2, i3);
-        }
-        while (true) {
-            int i4 = i3 - 1;
-            if (i3 <= 0) {
-                return true;
-            }
-            int i5 = i + 1;
-            char charAt = charSequence.charAt(i);
-            int i6 = i2 + 1;
-            char charAt2 = charSequence2.charAt(i2);
-            if (charAt == charAt2) {
-                i3 = i4;
-                i2 = i6;
-                i = i5;
-            } else if (!z) {
-                return false;
-            } else {
-                if (Character.toUpperCase(charAt) != Character.toUpperCase(charAt2) && Character.toLowerCase(charAt) != Character.toLowerCase(charAt2)) {
-                    return false;
+        if (!(charSequence instanceof String) || !(charSequence2 instanceof String)) {
+            while (true) {
+                int i4 = i3 - 1;
+                if (i3 <= 0) {
+                    return true;
                 }
-                i3 = i4;
-                i2 = i6;
-                i = i5;
+                int i5 = i + 1;
+                char charAt = charSequence.charAt(i);
+                int i6 = i2 + 1;
+                char charAt2 = charSequence2.charAt(i2);
+                if (charAt == charAt2) {
+                    i3 = i4;
+                    i2 = i6;
+                    i = i5;
+                } else if (!z) {
+                    return false;
+                } else {
+                    if (Character.toUpperCase(charAt) != Character.toUpperCase(charAt2) && Character.toLowerCase(charAt) != Character.toLowerCase(charAt2)) {
+                        return false;
+                    }
+                    i3 = i4;
+                    i2 = i6;
+                    i = i5;
+                }
             }
+        } else {
+            return ((String) charSequence).regionMatches(z, i, (String) charSequence2, i2, i3);
         }
     }
 }

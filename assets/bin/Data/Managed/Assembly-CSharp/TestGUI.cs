@@ -100,7 +100,7 @@ public class TestGUI
 	public static void Begin(PLACE flag = PLACE.DEFAULT)
 	{
 		isBegin = true;
-		BeginArea(AREA_TYPE.DEFAULT, 1f);
+		BeginArea(AREA_TYPE.DEFAULT);
 		_Begin(flag);
 	}
 
@@ -113,9 +113,6 @@ public class TestGUI
 
 	public static void BeginDialog(AREA_TYPE area_type, int vertical_item, int holizon_reduction_num = 0)
 	{
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Expected O, but got Unknown
 		isBegin = true;
 		float holizon_reduction_rate = 1f - 0.1f * (float)holizon_reduction_num;
 		BeginArea(area_type, holizon_reduction_rate);
@@ -132,11 +129,6 @@ public class TestGUI
 
 	public static void BeginModalDialog(AREA_TYPE area_type, int vertical_item, int holizon_reduction_num = 0)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Expected O, but got Unknown
 		GUILayout.BeginVertical(GUIStyle.op_Implicit("Box"), (GUILayoutOption[])new GUILayoutOption[2]
 		{
 			GUILayout.Width((float)Screen.get_width()),
@@ -158,7 +150,6 @@ public class TestGUI
 
 	public static void BeginSplitHolizon(int split_num, string style = null)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		if (split_num < 1)
 		{
 			split_num = 1;
@@ -203,10 +194,6 @@ public class TestGUI
 
 	private static void _Button(string text, string event_name, PLACE flag, float width, float height, Action call_back, object user_data)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
 		float uIWidth = GetUIWidth(width);
 		float num = (height != 0f) ? height : BUTTON_HEIGHT;
 		GUILayoutOption[] array = (GUILayoutOption[])new GUILayoutOption[2]
@@ -220,7 +207,7 @@ public class TestGUI
 			call_back?.Invoke();
 			if (event_name.Length > 0)
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("TestGUI.Button", sender, event_name, user_data, null, true);
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("TestGUI.Button", sender, event_name, user_data);
 			}
 		}
 		if (!isBegin)
@@ -232,17 +219,10 @@ public class TestGUI
 
 	private static void _Label(string text, PLACE flag, float width, float height, TextAnchor alignment)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
+		//IL_002e: Expected O, but got Unknown
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Expected O, but got Unknown
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Expected O, but got Unknown
 		float uIWidth = GetUIWidth(width);
 		float num = (height != 0f) ? height : BUTTON_HEIGHT;
 		GUIStyle val = new GUIStyle(GUI.get_skin().get_label());
@@ -264,17 +244,10 @@ public class TestGUI
 
 	private static void _TextField(ref string text, PLACE flag, float width, float height, TextAnchor alignment)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
+		//IL_002e: Expected O, but got Unknown
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Expected O, but got Unknown
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Expected O, but got Unknown
 		float uIWidth = GetUIWidth(width);
 		float num = (height != 0f) ? height : BUTTON_HEIGHT;
 		GUIStyle val = new GUIStyle(GUI.get_skin().get_textField());
@@ -298,7 +271,7 @@ public class TestGUI
 	{
 		if (!isAreaSettings)
 		{
-			BeginArea(AREA_TYPE.DEFAULT, 1f);
+			BeginArea(AREA_TYPE.DEFAULT);
 		}
 		switch (flag)
 		{
@@ -407,8 +380,8 @@ public class TestGUI
 		default:
 			num = 0f;
 			num2 = 0f;
-			num3 = (float)Screen.get_width();
-			num4 = (float)Screen.get_height();
+			num3 = Screen.get_width();
+			num4 = Screen.get_height();
 			break;
 		case AREA_TYPE.CENTER:
 			num = (float)Screen.get_width() * 0.1f;
@@ -432,7 +405,7 @@ public class TestGUI
 			num = (float)Screen.get_width() * 0.1f;
 			num2 = 0f;
 			num3 = (float)Screen.get_width() * 0.9f;
-			num4 = (float)Screen.get_height();
+			num4 = Screen.get_height();
 			break;
 		case AREA_TYPE.TOP:
 			num = (float)Screen.get_width() * 0.1f;
@@ -443,8 +416,8 @@ public class TestGUI
 		case AREA_TYPE.BOTTOM:
 			num = (float)Screen.get_width() * 0.1f;
 			num2 = (float)Screen.get_height() * 0.6f;
-			num3 = (float)Screen.get_width();
-			num4 = (float)Screen.get_height();
+			num3 = Screen.get_width();
+			num4 = Screen.get_height();
 			break;
 		case AREA_TYPE.LEFT:
 			num = 0f;
@@ -455,7 +428,7 @@ public class TestGUI
 		case AREA_TYPE.RIGHT:
 			num = (float)Screen.get_width() * 0.5f;
 			num2 = (float)Screen.get_height() * 0.1f;
-			num3 = (float)Screen.get_width();
+			num3 = Screen.get_width();
 			num4 = (float)Screen.get_height() * 0.9f;
 			break;
 		}
@@ -473,13 +446,13 @@ public class TestGUI
 
 	private static float GetUIWidth(float width)
 	{
-		if (splitNum.Count <= 0)
+		if (splitNum.Count > 0)
 		{
-			return (width != 0f) ? width : areaWidth;
+			int num = splitNum[splitNum.Count - 1];
+			int num2 = (num <= 2) ? (num - 1) : (num - 2);
+			float num3 = (num2 > 0) ? (num2 * 5 / num) : 0;
+			return areaWidth / (float)num - num3;
 		}
-		int num = splitNum[splitNum.Count - 1];
-		int num2 = (num <= 2) ? (num - 1) : (num - 2);
-		float num3 = (float)((num2 > 0) ? (num2 * 5 / num) : 0);
-		return areaWidth / (float)num - num3;
+		return (width != 0f) ? width : areaWidth;
 	}
 }

@@ -1,5 +1,6 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
+/* renamed from: android.support.v4.view.ScrollingView */
 public interface ScrollingView {
     int computeHorizontalScrollExtent();
 

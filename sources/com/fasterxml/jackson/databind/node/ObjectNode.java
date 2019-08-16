@@ -33,7 +33,8 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
         this._children = map;
     }
 
-    protected JsonNode _at(JsonPointer jsonPointer) {
+    /* access modifiers changed from: protected */
+    public JsonNode _at(JsonPointer jsonPointer) {
         return get(jsonPointer.getMatchingProperty());
     }
 
@@ -121,8 +122,8 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
             return false;
         }
         ObjectNode objectNode = (ObjectNode) jsonNode;
-        Map map = this._children;
-        Map map2 = objectNode._children;
+        Map<String, JsonNode> map = this._children;
+        Map<String, JsonNode> map2 = objectNode._children;
         if (map2.size() != map.size()) {
             return false;
         }
@@ -151,35 +152,33 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
     }
 
     public List<JsonNode> findValues(String str, List<JsonNode> list) {
-        List<JsonNode> arrayList;
-        List list2 = list;
+        List<JsonNode> list2 = list;
         for (Entry entry : this._children.entrySet()) {
             if (str.equals(entry.getKey())) {
-                if (arrayList == null) {
-                    arrayList = new ArrayList();
+                if (list2 == null) {
+                    list2 = new ArrayList<>();
                 }
                 list2.add(entry.getValue());
             } else {
-                list2 = ((JsonNode) entry.getValue()).findValues(str, arrayList);
+                list2 = ((JsonNode) entry.getValue()).findValues(str, list2);
             }
         }
-        return arrayList;
+        return list2;
     }
 
     public List<String> findValuesAsText(String str, List<String> list) {
-        List<String> arrayList;
-        List list2 = list;
+        List<String> list2 = list;
         for (Entry entry : this._children.entrySet()) {
             if (str.equals(entry.getKey())) {
-                if (arrayList == null) {
-                    arrayList = new ArrayList();
+                if (list2 == null) {
+                    list2 = new ArrayList<>();
                 }
                 list2.add(((JsonNode) entry.getValue()).asText());
             } else {
-                list2 = ((JsonNode) entry.getValue()).findValuesAsText(str, arrayList);
+                list2 = ((JsonNode) entry.getValue()).findValuesAsText(str, list2);
             }
         }
-        return arrayList;
+        return list2;
     }
 
     public ObjectNode findParent(String str) {
@@ -196,20 +195,20 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
     }
 
     public List<JsonNode> findParents(String str, List<JsonNode> list) {
+        List<JsonNode> findParents;
         List<JsonNode> list2 = list;
         for (Entry entry : this._children.entrySet()) {
-            List<JsonNode> arrayList;
             if (str.equals(entry.getKey())) {
                 if (list2 == null) {
-                    arrayList = new ArrayList();
+                    findParents = new ArrayList<>();
                 } else {
-                    arrayList = list2;
+                    findParents = list2;
                 }
-                arrayList.add(this);
+                findParents.add(this);
             } else {
-                arrayList = ((JsonNode) entry.getValue()).findParents(str, list2);
+                findParents = ((JsonNode) entry.getValue()).findParents(str, list2);
             }
-            list2 = arrayList;
+            list2 = findParents;
         }
         return list2;
     }
@@ -297,7 +296,7 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
 
     @Deprecated
     public JsonNode putAll(Map<String, ? extends JsonNode> map) {
-        return setAll((Map) map);
+        return setAll(map);
     }
 
     @Deprecated
@@ -311,17 +310,17 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
     }
 
     public ObjectNode retain(String... strArr) {
-        return retain(Arrays.asList(strArr));
+        return retain((Collection<String>) Arrays.asList(strArr));
     }
 
     public ArrayNode putArray(String str) {
-        JsonNode arrayNode = arrayNode();
+        ArrayNode arrayNode = arrayNode();
         _put(str, arrayNode);
         return arrayNode;
     }
 
     public ObjectNode putObject(String str) {
-        JsonNode objectNode = objectNode();
+        ObjectNode objectNode = objectNode();
         _put(str, objectNode);
         return objectNode;
     }
@@ -409,7 +408,8 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
         return _childrenEqual((ObjectNode) obj);
     }
 
-    protected boolean _childrenEqual(ObjectNode objectNode) {
+    /* access modifiers changed from: protected */
+    public boolean _childrenEqual(ObjectNode objectNode) {
         return this._children.equals(objectNode._children);
     }
 
@@ -418,24 +418,25 @@ public class ObjectNode extends ContainerNode<ObjectNode> {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder((size() << 4) + 32);
-        stringBuilder.append("{");
+        StringBuilder sb = new StringBuilder((size() << 4) + 32);
+        sb.append("{");
         int i = 0;
         for (Entry entry : this._children.entrySet()) {
             if (i > 0) {
-                stringBuilder.append(",");
+                sb.append(",");
             }
             int i2 = i + 1;
-            TextNode.appendQuoted(stringBuilder, (String) entry.getKey());
-            stringBuilder.append(':');
-            stringBuilder.append(((JsonNode) entry.getValue()).toString());
+            TextNode.appendQuoted(sb, (String) entry.getKey());
+            sb.append(':');
+            sb.append(((JsonNode) entry.getValue()).toString());
             i = i2;
         }
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        sb.append("}");
+        return sb.toString();
     }
 
-    protected ObjectNode _put(String str, JsonNode jsonNode) {
+    /* access modifiers changed from: protected */
+    public ObjectNode _put(String str, JsonNode jsonNode) {
         this._children.put(str, jsonNode);
         return this;
     }

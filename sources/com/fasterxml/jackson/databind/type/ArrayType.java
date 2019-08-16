@@ -52,8 +52,9 @@ public final class ArrayType extends TypeBase {
         return this._asStatic ? this : new ArrayType(this._componentType.withStaticTyping(), this._bindings, this._emptyArray, this._valueHandler, this._typeHandler, true);
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         return _reportUnsupported();
     }
 
@@ -97,14 +98,14 @@ public final class ArrayType extends TypeBase {
         return this._componentType.getTypeHandler();
     }
 
-    public StringBuilder getGenericSignature(StringBuilder stringBuilder) {
-        stringBuilder.append('[');
-        return this._componentType.getGenericSignature(stringBuilder);
+    public StringBuilder getGenericSignature(StringBuilder sb) {
+        sb.append('[');
+        return this._componentType.getGenericSignature(sb);
     }
 
-    public StringBuilder getErasedSignature(StringBuilder stringBuilder) {
-        stringBuilder.append('[');
-        return this._componentType.getErasedSignature(stringBuilder);
+    public StringBuilder getErasedSignature(StringBuilder sb) {
+        sb.append('[');
+        return this._componentType.getErasedSignature(sb);
     }
 
     public String toString() {

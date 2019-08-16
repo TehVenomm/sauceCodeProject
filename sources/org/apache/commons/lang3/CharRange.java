@@ -6,10 +6,13 @@ import java.util.NoSuchElementException;
 
 final class CharRange implements Iterable<Character>, Serializable {
     private static final long serialVersionUID = 8270183163158333422L;
-    private final char end;
+    /* access modifiers changed from: private */
+    public final char end;
     private transient String iToString;
-    private final boolean negated;
-    private final char start;
+    /* access modifiers changed from: private */
+    public final boolean negated;
+    /* access modifiers changed from: private */
+    public final char start;
 
     private static class CharacterIterator implements Iterator<Character> {
         private char current;
@@ -21,9 +24,9 @@ final class CharRange implements Iterable<Character>, Serializable {
             this.hasNext = true;
             if (!this.range.negated) {
                 this.current = this.range.start;
-            } else if (this.range.start != '\u0000') {
-                this.current = '\u0000';
-            } else if (this.range.end == '￿') {
+            } else if (this.range.start != 0) {
+                this.current = 0;
+            } else if (this.range.end == 65535) {
                 this.hasNext = false;
             } else {
                 this.current = (char) (this.range.end + 1);
@@ -32,11 +35,11 @@ final class CharRange implements Iterable<Character>, Serializable {
 
         private void prepareNext() {
             if (this.range.negated) {
-                if (this.current == '￿') {
+                if (this.current == 65535) {
                     this.hasNext = false;
                 } else if (this.current + 1 != this.range.start) {
                     this.current = (char) (this.current + 1);
-                } else if (this.range.end == '￿') {
+                } else if (this.range.end == 65535) {
                     this.hasNext = false;
                 } else {
                     this.current = (char) (this.range.end + 1);
@@ -53,12 +56,12 @@ final class CharRange implements Iterable<Character>, Serializable {
         }
 
         public Character next() {
-            if (this.hasNext) {
-                char c = this.current;
-                prepareNext();
-                return Character.valueOf(c);
+            if (!this.hasNext) {
+                throw new NoSuchElementException();
             }
-            throw new NoSuchElementException();
+            char c = this.current;
+            prepareNext();
+            return Character.valueOf(c);
         }
 
         public void remove() {
@@ -67,17 +70,22 @@ final class CharRange implements Iterable<Character>, Serializable {
     }
 
     private CharRange(char c, char c2, boolean z) {
-        if (c <= c2) {
-            char c3 = c2;
-            c2 = c;
-            c = c3;
+        char c3;
+        char c4;
+        if (c > c2) {
+            c3 = c;
+            c4 = c2;
+        } else {
+            c3 = c2;
+            c4 = c;
         }
-        this.start = c2;
-        this.end = c;
+        this.start = c4;
+        this.end = c3;
         this.negated = z;
     }
 
-    public static CharRange is(char c) {
+    /* renamed from: is */
+    public static CharRange m1012is(char c) {
         return new CharRange(c, c, false);
     }
 
@@ -106,8 +114,7 @@ final class CharRange implements Iterable<Character>, Serializable {
     }
 
     public boolean contains(char c) {
-        boolean z = c >= this.start && c <= this.end;
-        return z != this.negated;
+        return (c >= this.start && c <= this.end) != this.negated;
     }
 
     public boolean contains(CharRange charRange) {
@@ -126,7 +133,7 @@ final class CharRange implements Iterable<Character>, Serializable {
                 return true;
             }
         } else if (charRange.negated) {
-            if (this.start == '\u0000' && this.end == '￿') {
+            if (this.start == 0 && this.end == 65535) {
                 return true;
             }
             return false;
@@ -152,21 +159,21 @@ final class CharRange implements Iterable<Character>, Serializable {
     }
 
     public int hashCode() {
-        return (this.negated ? 1 : 0) + ((this.end * 7) + (this.start + 83));
+        return (this.negated ? 1 : 0) + (this.end * 7) + this.start + 'S';
     }
 
     public String toString() {
         if (this.iToString == null) {
-            StringBuilder stringBuilder = new StringBuilder(4);
+            StringBuilder sb = new StringBuilder(4);
             if (isNegated()) {
-                stringBuilder.append('^');
+                sb.append('^');
             }
-            stringBuilder.append(this.start);
+            sb.append(this.start);
             if (this.start != this.end) {
-                stringBuilder.append('-');
-                stringBuilder.append(this.end);
+                sb.append('-');
+                sb.append(this.end);
             }
-            this.iToString = stringBuilder.toString();
+            this.iToString = sb.toString();
         }
         return this.iToString;
     }

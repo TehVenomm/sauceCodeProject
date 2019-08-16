@@ -89,7 +89,7 @@ namespace GooglePlayGames.Native
 			{
 				mManager = Misc.CheckNotNull(manager);
 				mListener = new OnGameThreadForwardingListener(listener);
-				EnterState(new BeforeRoomCreateStartedState(this), false);
+				EnterState(new BeforeRoomCreateStartedState(this), fireStateEnteredEvent: false);
 				mStillPreRoomCreation = true;
 			}
 
@@ -125,7 +125,7 @@ namespace GooglePlayGames.Native
 
 			internal void EnterState(State handler)
 			{
-				EnterState(handler, true);
+				EnterState(handler, fireStateEnteredEvent: true);
 			}
 
 			internal void EnterState(State handler, bool fireStateEnteredEvent)
@@ -503,7 +503,7 @@ namespace GooglePlayGames.Native
 				{
 					foreach (string key in mNativeParticipants.Keys)
 					{
-						SendToSpecificRecipient(key, subsetBytes, 0, subsetBytes.Length, true);
+						SendToSpecificRecipient(key, subsetBytes, 0, subsetBytes.Length, isReliable: true);
 					}
 				}
 				else
@@ -530,7 +530,7 @@ namespace GooglePlayGames.Native
 			internal override void LeaveRoom()
 			{
 				Logger.d("Session was torn down before room was created.");
-				mContainingSession.OnGameThreadListener().RoomConnected(false);
+				mContainingSession.OnGameThreadListener().RoomConnected(success: false);
 				mContainingSession.EnterState(new ShutdownState(mContainingSession));
 			}
 		}
@@ -549,7 +549,7 @@ namespace GooglePlayGames.Native
 				if (!response.RequestSucceeded())
 				{
 					mContainingSession.EnterState(new ShutdownState(mContainingSession));
-					mContainingSession.OnGameThreadListener().RoomConnected(false);
+					mContainingSession.OnGameThreadListener().RoomConnected(success: false);
 				}
 				else
 				{
@@ -617,33 +617,29 @@ namespace GooglePlayGames.Native
 				if (mConnectedParticipants.Equals(hashSet))
 				{
 					Logger.w("Received connected set callback with unchanged connected set!");
+					return;
+				}
+				IEnumerable<string> source = mConnectedParticipants.Except(hashSet);
+				if (room.Status() == Types.RealTimeRoomStatus.DELETED)
+				{
+					Logger.e("Participants disconnected during room setup, failing. Participants were: " + string.Join(",", source.ToArray()));
+					mSession.OnGameThreadListener().RoomConnected(success: false);
+					mSession.EnterState(new ShutdownState(mSession));
+					return;
+				}
+				IEnumerable<string> source2 = hashSet.Except(mConnectedParticipants);
+				Logger.d("New participants connected: " + string.Join(",", source2.ToArray()));
+				if (room.Status() == Types.RealTimeRoomStatus.ACTIVE)
+				{
+					Logger.d("Fully connected! Transitioning to active state.");
+					mSession.EnterState(new ActiveState(room, mSession));
+					mSession.OnGameThreadListener().RoomConnected(success: true);
 				}
 				else
 				{
-					IEnumerable<string> source = mConnectedParticipants.Except(hashSet);
-					if (room.Status() == Types.RealTimeRoomStatus.DELETED)
-					{
-						Logger.e("Participants disconnected during room setup, failing. Participants were: " + string.Join(",", source.ToArray()));
-						mSession.OnGameThreadListener().RoomConnected(false);
-						mSession.EnterState(new ShutdownState(mSession));
-					}
-					else
-					{
-						IEnumerable<string> source2 = hashSet.Except(mConnectedParticipants);
-						Logger.d("New participants connected: " + string.Join(",", source2.ToArray()));
-						if (room.Status() == Types.RealTimeRoomStatus.ACTIVE)
-						{
-							Logger.d("Fully connected! Transitioning to active state.");
-							mSession.EnterState(new ActiveState(room, mSession));
-							mSession.OnGameThreadListener().RoomConnected(true);
-						}
-						else
-						{
-							mPercentComplete += mPercentPerParticipant * (float)source2.Count();
-							mConnectedParticipants = hashSet;
-							mSession.OnGameThreadListener().RoomSetupProgress(mPercentComplete);
-						}
-					}
+					mPercentComplete += mPercentPerParticipant * (float)source2.Count();
+					mConnectedParticipants = hashSet;
+					mSession.OnGameThreadListener().RoomSetupProgress(mPercentComplete);
 				}
 			}
 
@@ -663,7 +659,7 @@ namespace GooglePlayGames.Native
 			{
 				mSession.EnterState(new LeavingRoom(mSession, mRoom, delegate
 				{
-					mSession.OnGameThreadListener().RoomConnected(false);
+					mSession.OnGameThreadListener().RoomConnected(success: false);
 				}));
 			}
 
@@ -869,13 +865,13 @@ namespace GooglePlayGames.Native
 				if (!response.RequestSucceeded())
 				{
 					mSession.EnterState(new ShutdownState(mSession));
-					mSession.OnGameThreadListener().RoomConnected(false);
+					mSession.OnGameThreadListener().RoomConnected(success: false);
 				}
 				else
 				{
 					mSession.EnterState(new LeavingRoom(mSession, response.Room(), delegate
 					{
-						mSession.OnGameThreadListener().RoomConnected(false);
+						mSession.OnGameThreadListener().RoomConnected(success: false);
 					}));
 				}
 			}
@@ -900,7 +896,7 @@ namespace GooglePlayGames.Native
 		private RoomSession GetTerminatedSession()
 		{
 			RoomSession roomSession = new RoomSession(mRealtimeManager, new NoopListener());
-			roomSession.EnterState(new ShutdownState(roomSession), false);
+			roomSession.EnterState(new ShutdownState(roomSession), fireStateEnteredEvent: false);
 			return roomSession;
 		}
 
@@ -996,7 +992,7 @@ namespace GooglePlayGames.Native
 					mCurrentSession.ShowingUI = true;
 					RealtimeRoomConfig config;
 					GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper;
-					mRealtimeManager.ShowPlayerSelectUI(minOpponents, maxOppponents, true, delegate(PlayerSelectUIResponse response)
+					mRealtimeManager.ShowPlayerSelectUI(minOpponents, maxOppponents, allowAutomatching: true, delegate(PlayerSelectUIResponse response)
 					{
 						mCurrentSession.ShowingUI = false;
 						if (response.Status() != CommonErrorStatus.UIStatus.VALID)
@@ -1153,36 +1149,30 @@ namespace GooglePlayGames.Native
 						}
 						else
 						{
-							using (IEnumerator<GooglePlayGames.Native.PInvoke.MultiplayerInvitation> enumerator = response.Invitations().GetEnumerator())
+							foreach (GooglePlayGames.Native.PInvoke.MultiplayerInvitation invitation in response.Invitations())
 							{
-								GooglePlayGames.Native.PInvoke.MultiplayerInvitation invitation;
-								while (enumerator.MoveNext())
+								using (invitation)
 								{
-									invitation = enumerator.Current;
-									using (invitation)
+									if (invitation.Id().Equals(invitationId))
 									{
-										if (invitation.Id().Equals(invitationId))
+										mCurrentSession.MinPlayersToStart = invitation.AutomatchingSlots() + invitation.ParticipantCount();
+										Logger.d("Setting MinPlayersToStart with invitation to : " + mCurrentSession.MinPlayersToStart);
+										helper = HelperForSession(newRoom);
+										try
 										{
-											mCurrentSession.MinPlayersToStart = invitation.AutomatchingSlots() + invitation.ParticipantCount();
-											Logger.d("Setting MinPlayersToStart with invitation to : " + mCurrentSession.MinPlayersToStart);
-											helper = HelperForSession(newRoom);
-											try
+											newRoom.StartRoomCreation(mNativeClient.GetUserId(), delegate
 											{
-												newRoom.StartRoomCreation(mNativeClient.GetUserId(), delegate
-												{
-													mRealtimeManager.AcceptInvitation(invitation, helper, newRoom.HandleRoomResponse);
-												});
-												return;
-												IL_011e:;
-											}
-											finally
+												mRealtimeManager.AcceptInvitation(invitation, helper, newRoom.HandleRoomResponse);
+											});
+										}
+										finally
+										{
+											if (helper != null)
 											{
-												if (helper != null)
-												{
-													((IDisposable)helper).Dispose();
-												}
+												((IDisposable)helper).Dispose();
 											}
 										}
+										return;
 									}
 								}
 							}

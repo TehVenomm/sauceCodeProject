@@ -1,106 +1,64 @@
 package com.google.android.gms.common;
 
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import com.google.android.gms.common.internal.zzaj;
-import com.google.android.gms.common.util.zzi;
-import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.internal.zzbdp;
+import android.os.RemoteException;
+import android.util.Log;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.zzi;
+import com.google.android.gms.common.internal.zzj;
+import com.google.android.gms.dynamic.IObjectWrapper;
+import com.google.android.gms.dynamic.ObjectWrapper;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import org.apache.commons.lang3.CharEncoding;
 
-public class zze {
-    public static final String GOOGLE_PLAY_SERVICES_PACKAGE = "com.google.android.gms";
-    public static final int GOOGLE_PLAY_SERVICES_VERSION_CODE = zzo.GOOGLE_PLAY_SERVICES_VERSION_CODE;
-    private static final zze zzffe = new zze();
+abstract class zze extends zzj {
+    private int zzt;
 
-    zze() {
+    protected zze(byte[] bArr) {
+        Preconditions.checkArgument(bArr.length == 25);
+        this.zzt = Arrays.hashCode(bArr);
     }
 
-    @Nullable
-    public static Intent zza(Context context, int i, @Nullable String str) {
-        switch (i) {
-            case 1:
-            case 2:
-                return (context == null || !zzi.zzck(context)) ? zzaj.zzw("com.google.android.gms", zzx(context, str)) : zzaj.zzakj();
-            case 3:
-                return zzaj.zzgd("com.google.android.gms");
-            default:
-                return null;
+    protected static byte[] zza(String str) {
+        try {
+            return str.getBytes(CharEncoding.ISO_8859_1);
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError(e);
         }
     }
 
-    public static zze zzaew() {
-        return zzffe;
-    }
-
-    public static void zzbv(Context context) throws GooglePlayServicesRepairableException, GooglePlayServicesNotAvailableException {
-        zzo.zzbk(context);
-    }
-
-    public static void zzbw(Context context) {
-        zzo.zzbw(context);
-    }
-
-    public static int zzbx(Context context) {
-        return zzo.zzbx(context);
-    }
-
-    public static boolean zze(Context context, int i) {
-        return zzo.zze(context, i);
-    }
-
-    private static String zzx(@Nullable Context context, @Nullable String str) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("gcore_");
-        stringBuilder.append(GOOGLE_PLAY_SERVICES_VERSION_CODE);
-        stringBuilder.append("-");
-        if (!TextUtils.isEmpty(str)) {
-            stringBuilder.append(str);
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof zzi)) {
+            return false;
         }
-        stringBuilder.append("-");
-        if (context != null) {
-            stringBuilder.append(context.getPackageName());
-        }
-        stringBuilder.append("-");
-        if (context != null) {
-            try {
-                stringBuilder.append(zzbdp.zzcs(context).getPackageInfo(context.getPackageName(), 0).versionCode);
-            } catch (NameNotFoundException e) {
+        try {
+            zzi zzi = (zzi) obj;
+            if (zzi.zzc() != hashCode()) {
+                return false;
             }
+            IObjectWrapper zzb = zzi.zzb();
+            if (zzb == null) {
+                return false;
+            }
+            return Arrays.equals(getBytes(), (byte[]) ObjectWrapper.unwrap(zzb));
+        } catch (RemoteException e) {
+            Log.e("GoogleCertificates", "Failed to get Google certificates from remote", e);
+            return false;
         }
-        return stringBuilder.toString();
     }
 
-    @Nullable
-    public PendingIntent getErrorResolutionPendingIntent(Context context, int i, int i2) {
-        return zza(context, i, i2, null);
+    /* access modifiers changed from: 0000 */
+    public abstract byte[] getBytes();
+
+    public int hashCode() {
+        return this.zzt;
     }
 
-    public String getErrorString(int i) {
-        return zzo.getErrorString(i);
+    public final IObjectWrapper zzb() {
+        return ObjectWrapper.wrap(getBytes());
     }
 
-    public int isGooglePlayServicesAvailable(Context context) {
-        int isGooglePlayServicesAvailable = zzo.isGooglePlayServicesAvailable(context);
-        return zzo.zze(context, isGooglePlayServicesAvailable) ? 18 : isGooglePlayServicesAvailable;
-    }
-
-    public boolean isUserResolvableError(int i) {
-        return zzo.isUserRecoverableError(i);
-    }
-
-    @Nullable
-    public final PendingIntent zza(Context context, int i, int i2, @Nullable String str) {
-        Intent zza = zza(context, i, str);
-        return zza == null ? null : PendingIntent.getActivity(context, i2, zza, DriveFile.MODE_READ_ONLY);
-    }
-
-    @Nullable
-    @Deprecated
-    public final Intent zzbn(int i) {
-        return zza(null, i, null);
+    public final int zzc() {
+        return hashCode();
     }
 }

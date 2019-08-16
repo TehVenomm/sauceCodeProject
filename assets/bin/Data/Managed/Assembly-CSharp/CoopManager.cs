@@ -18,6 +18,8 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	public const int ID_PLAYER_END = 109999;
 
+	public const int ID_PLAYER_SV_START = 110000;
+
 	public const int ID_NONPLAYER_START = 150000;
 
 	public const int ID_NONPLAYER_END = 199999;
@@ -26,9 +28,17 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	public const int ID_GIMMICK_END = 299999;
 
+	public const int ID_ENEMY_SERVANT_START = 490000;
+
+	public const int ID_ENEMY_SERVANT_END = 499999;
+
 	public const int ID_ENEMY_START = 500000;
 
 	public const int ID_ENEMY_END = 999999;
+
+	public const int ID_BULLET_START = 1000000;
+
+	public const int ID_BULLET_END = 1999999;
 
 	public const int ID_ENEMY_STAGE_COUNT = 100000;
 
@@ -70,14 +80,10 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Expected O, but got Unknown
 		base.Awake();
 		coopRoom = this.get_gameObject().AddComponent<CoopRoom>();
 		coopStage = this.get_gameObject().AddComponent<CoopStage>();
-		coopMyClient = (CoopMyClient)Utility.CreateGameObjectAndComponent("CoopMyClient", this.get_transform(), -1);
+		coopMyClient = (CoopMyClient)Utility.CreateGameObjectAndComponent("CoopMyClient", this.get_transform());
 	}
 
 	private void Start()
@@ -92,7 +98,6 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 	{
 		if (!Log.enabled)
 		{
-			return;
 		}
 	}
 
@@ -103,7 +108,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 		coopStage.Deactivate();
 		MonoBehaviourSingleton<CoopNetworkManager>.I.Clear();
 		MonoBehaviourSingleton<CoopNetworkManager>.I.EraseAllPackets();
-		MonoBehaviourSingleton<KtbWebSocket>.I.Close(1000, "Bye!");
+		MonoBehaviourSingleton<KtbWebSocket>.I.Close(1000);
 		MonoBehaviourSingleton<CoopOfflineManager>.I.Clear();
 	}
 
@@ -168,6 +173,24 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 	public int GetPlayerID(CoopClient client)
 	{
 		return 100000 + client.slotIndex;
+	}
+
+	public int GetPartyOwnerPlayerID()
+	{
+		if (coopRoom == null || coopRoom.clients == null)
+		{
+			return -1;
+		}
+		if (InGameManager.IsValidRush())
+		{
+			return -1;
+		}
+		CoopClient coopClient = coopRoom.clients.FindPartyOwner();
+		if (coopClient == null)
+		{
+			return -1;
+		}
+		return coopClient.playerId;
 	}
 
 	public int CreateUniqueNonPlayerID()

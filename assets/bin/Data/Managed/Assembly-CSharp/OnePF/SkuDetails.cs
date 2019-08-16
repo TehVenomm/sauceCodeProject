@@ -79,8 +79,7 @@ namespace OnePF
 				if (string.IsNullOrEmpty(PriceValue))
 				{
 					float num = jSON.ToFloat("price_amount_micros");
-					num /= 1000000f;
-					PriceValue = num.ToString();
+					PriceValue = (num / 1000000f).ToString();
 				}
 				if (string.IsNullOrEmpty(CurrencyCode))
 				{

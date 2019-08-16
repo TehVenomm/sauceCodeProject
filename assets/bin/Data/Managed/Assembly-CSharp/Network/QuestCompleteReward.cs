@@ -59,6 +59,26 @@ namespace Network
 			public int crystal;
 		}
 
+		public class GatherItem : BaseReward
+		{
+			public int gatherItemId;
+
+			public int score;
+
+			public PopSignatureInfo psig;
+
+			public int status;
+
+			public int maxCrownType;
+		}
+
+		public class AccessoryItem : BaseReward
+		{
+			public int accessoryId;
+
+			public int num;
+		}
+
 		public int exp;
 
 		public int money;
@@ -75,6 +95,10 @@ namespace Network
 
 		public List<EventPrice> eventPrice = new List<EventPrice>();
 
+		public List<GatherItem> gatherItem = new List<GatherItem>();
+
+		public List<AccessoryItem> accessoryItem = new List<AccessoryItem>();
+
 		public void Add(QuestCompleteReward reward)
 		{
 			exp += reward.exp;
@@ -85,6 +109,7 @@ namespace Network
 			skillItem.AddRange(reward.skillItem);
 			questItem.AddRange(reward.questItem);
 			eventPrice.AddRange(reward.eventPrice);
+			accessoryItem.AddRange(reward.accessoryItem);
 		}
 	}
 }

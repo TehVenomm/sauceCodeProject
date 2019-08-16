@@ -3,89 +3,114 @@ package com.google.android.gms.common.stats;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.text.TextUtils;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 import java.util.List;
 
+@Class(creator = "WakeLockEventCreator")
 public final class WakeLockEvent extends StatsEvent {
-    public static final Creator<WakeLockEvent> CREATOR = new zzd();
-    private final long mTimeout;
-    private int zzdxt;
-    private final long zzfxr;
-    private int zzfxs;
-    private final String zzfxt;
-    private final String zzfxu;
-    private final String zzfxv;
-    private final int zzfxw;
-    private final List<String> zzfxx;
-    private final String zzfxy;
-    private final long zzfxz;
-    private int zzfya;
-    private final String zzfyb;
-    private final float zzfyc;
-    private long zzfyd;
+    public static final Creator<WakeLockEvent> CREATOR = new zza();
+    private long durationMillis;
+    @VersionField(mo13996id = 1)
+    private final int versionCode;
+    @Field(getter = "getTimeMillis", mo13990id = 2)
+    private final long zzfo;
+    @Field(getter = "getEventType", mo13990id = 11)
+    private int zzfp;
+    @Field(getter = "getWakeLockName", mo13990id = 4)
+    private final String zzfq;
+    @Field(getter = "getSecondaryWakeLockName", mo13990id = 10)
+    private final String zzfr;
+    @Field(getter = "getCodePackage", mo13990id = 17)
+    private final String zzfs;
+    @Field(getter = "getWakeLockType", mo13990id = 5)
+    private final int zzft;
+    @Field(getter = "getCallingPackages", mo13990id = 6)
+    private final List<String> zzfu;
+    @Field(getter = "getEventKey", mo13990id = 12)
+    private final String zzfv;
+    @Field(getter = "getElapsedRealtime", mo13990id = 8)
+    private final long zzfw;
+    @Field(getter = "getDeviceState", mo13990id = 14)
+    private int zzfx;
+    @Field(getter = "getHostPackage", mo13990id = 13)
+    private final String zzfy;
+    @Field(getter = "getBeginPowerPercentage", mo13990id = 15)
+    private final float zzfz;
+    @Field(getter = "getTimeout", mo13990id = 16)
+    private final long zzga;
+    @Field(getter = "getAcquiredWithTimeout", mo13990id = 18)
+    private final boolean zzgb;
 
-    WakeLockEvent(int i, long j, int i2, String str, int i3, List<String> list, String str2, long j2, int i4, String str3, String str4, float f, long j3, String str5) {
-        this.zzdxt = i;
-        this.zzfxr = j;
-        this.zzfxs = i2;
-        this.zzfxt = str;
-        this.zzfxu = str3;
-        this.zzfxv = str5;
-        this.zzfxw = i3;
-        this.zzfyd = -1;
-        this.zzfxx = list;
-        this.zzfxy = str2;
-        this.zzfxz = j2;
-        this.zzfya = i4;
-        this.zzfyb = str4;
-        this.zzfyc = f;
-        this.mTimeout = j3;
+    @Constructor
+    WakeLockEvent(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) long j, @Param(mo13993id = 11) int i2, @Param(mo13993id = 4) String str, @Param(mo13993id = 5) int i3, @Param(mo13993id = 6) List<String> list, @Param(mo13993id = 12) String str2, @Param(mo13993id = 8) long j2, @Param(mo13993id = 14) int i4, @Param(mo13993id = 10) String str3, @Param(mo13993id = 13) String str4, @Param(mo13993id = 15) float f, @Param(mo13993id = 16) long j3, @Param(mo13993id = 17) String str5, @Param(mo13993id = 18) boolean z) {
+        this.versionCode = i;
+        this.zzfo = j;
+        this.zzfp = i2;
+        this.zzfq = str;
+        this.zzfr = str3;
+        this.zzfs = str5;
+        this.zzft = i3;
+        this.durationMillis = -1;
+        this.zzfu = list;
+        this.zzfv = str2;
+        this.zzfw = j2;
+        this.zzfx = i4;
+        this.zzfy = str4;
+        this.zzfz = f;
+        this.zzga = j3;
+        this.zzgb = z;
     }
 
-    public WakeLockEvent(long j, int i, String str, int i2, List<String> list, String str2, long j2, int i3, String str3, String str4, float f, long j3, String str5) {
-        this(2, j, i, str, i2, list, str2, j2, i3, str3, str4, f, j3, str5);
+    public WakeLockEvent(long j, int i, String str, int i2, List<String> list, String str2, long j2, int i3, String str3, String str4, float f, long j3, String str5, boolean z) {
+        this(2, j, i, str, i2, list, str2, j2, i3, str3, str4, f, j3, str5, z);
     }
 
     public final int getEventType() {
-        return this.zzfxs;
+        return this.zzfp;
     }
 
     public final long getTimeMillis() {
-        return this.zzfxr;
+        return this.zzfo;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.zzdxt);
-        zzd.zza(parcel, 2, getTimeMillis());
-        zzd.zza(parcel, 4, this.zzfxt, false);
-        zzd.zzc(parcel, 5, this.zzfxw);
-        zzd.zzb(parcel, 6, this.zzfxx, false);
-        zzd.zza(parcel, 8, this.zzfxz);
-        zzd.zza(parcel, 10, this.zzfxu, false);
-        zzd.zzc(parcel, 11, getEventType());
-        zzd.zza(parcel, 12, this.zzfxy, false);
-        zzd.zza(parcel, 13, this.zzfyb, false);
-        zzd.zzc(parcel, 14, this.zzfya);
-        zzd.zza(parcel, 15, this.zzfyc);
-        zzd.zza(parcel, 16, this.mTimeout);
-        zzd.zza(parcel, 17, this.zzfxv, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.versionCode);
+        SafeParcelWriter.writeLong(parcel, 2, getTimeMillis());
+        SafeParcelWriter.writeString(parcel, 4, this.zzfq, false);
+        SafeParcelWriter.writeInt(parcel, 5, this.zzft);
+        SafeParcelWriter.writeStringList(parcel, 6, this.zzfu, false);
+        SafeParcelWriter.writeLong(parcel, 8, this.zzfw);
+        SafeParcelWriter.writeString(parcel, 10, this.zzfr, false);
+        SafeParcelWriter.writeInt(parcel, 11, getEventType());
+        SafeParcelWriter.writeString(parcel, 12, this.zzfv, false);
+        SafeParcelWriter.writeString(parcel, 13, this.zzfy, false);
+        SafeParcelWriter.writeInt(parcel, 14, this.zzfx);
+        SafeParcelWriter.writeFloat(parcel, 15, this.zzfz);
+        SafeParcelWriter.writeLong(parcel, 16, this.zzga);
+        SafeParcelWriter.writeString(parcel, 17, this.zzfs, false);
+        SafeParcelWriter.writeBoolean(parcel, 18, this.zzgb);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final long zzakz() {
-        return this.zzfyd;
+    public final long zzu() {
+        return this.durationMillis;
     }
 
-    public final String zzala() {
-        String str = this.zzfxt;
-        int i = this.zzfxw;
-        String join = this.zzfxx == null ? "" : TextUtils.join(",", this.zzfxx);
-        int i2 = this.zzfya;
-        String str2 = this.zzfxu == null ? "" : this.zzfxu;
-        String str3 = this.zzfyb == null ? "" : this.zzfyb;
-        float f = this.zzfyc;
-        String str4 = this.zzfxv == null ? "" : this.zzfxv;
-        return new StringBuilder(((((((((((((String.valueOf("\t").length() + 37) + String.valueOf(str).length()) + String.valueOf("\t").length()) + String.valueOf("\t").length()) + String.valueOf(join).length()) + String.valueOf("\t").length()) + String.valueOf("\t").length()) + String.valueOf(str2).length()) + String.valueOf("\t").length()) + String.valueOf(str3).length()) + String.valueOf("\t").length()) + String.valueOf("\t").length()) + String.valueOf(str4).length()).append("\t").append(str).append("\t").append(i).append("\t").append(join).append("\t").append(i2).append("\t").append(str2).append("\t").append(str3).append("\t").append(f).append("\t").append(str4).toString();
+    public final String zzv() {
+        String str = this.zzfq;
+        int i = this.zzft;
+        String join = this.zzfu == null ? "" : TextUtils.join(",", this.zzfu);
+        int i2 = this.zzfx;
+        String str2 = this.zzfr == null ? "" : this.zzfr;
+        String str3 = this.zzfy == null ? "" : this.zzfy;
+        float f = this.zzfz;
+        String str4 = this.zzfs == null ? "" : this.zzfs;
+        return new StringBuilder(String.valueOf(str).length() + 51 + String.valueOf(join).length() + String.valueOf(str2).length() + String.valueOf(str3).length() + String.valueOf(str4).length()).append("\t").append(str).append("\t").append(i).append("\t").append(join).append("\t").append(i2).append("\t").append(str2).append("\t").append(str3).append("\t").append(f).append("\t").append(str4).append("\t").append(this.zzgb).toString();
     }
 }

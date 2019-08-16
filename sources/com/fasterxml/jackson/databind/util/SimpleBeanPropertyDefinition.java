@@ -24,8 +24,7 @@ public class SimpleBeanPropertyDefinition extends BeanPropertyDefinition {
     protected final String _name;
 
     protected SimpleBeanPropertyDefinition(AnnotatedMember annotatedMember, PropertyName propertyName, AnnotationIntrospector annotationIntrospector, PropertyMetadata propertyMetadata, Include include) {
-        Value construct = (include == null || include == Include.USE_DEFAULTS) ? EMPTY_INCLUDE : Value.construct(include, null);
-        this(annotatedMember, propertyName, annotationIntrospector, propertyMetadata, construct);
+        this(annotatedMember, propertyName, annotationIntrospector, propertyMetadata, (include == null || include == Include.USE_DEFAULTS) ? EMPTY_INCLUDE : Value.construct(include, null));
     }
 
     protected SimpleBeanPropertyDefinition(AnnotatedMember annotatedMember, PropertyName propertyName, AnnotationIntrospector annotationIntrospector, PropertyMetadata propertyMetadata, Value value) {
@@ -42,20 +41,20 @@ public class SimpleBeanPropertyDefinition extends BeanPropertyDefinition {
 
     @Deprecated
     protected SimpleBeanPropertyDefinition(AnnotatedMember annotatedMember, String str, AnnotationIntrospector annotationIntrospector) {
-        this(annotatedMember, new PropertyName(str), annotationIntrospector, null, EMPTY_INCLUDE);
+        this(annotatedMember, new PropertyName(str), annotationIntrospector, (PropertyMetadata) null, EMPTY_INCLUDE);
     }
 
     public static SimpleBeanPropertyDefinition construct(MapperConfig<?> mapperConfig, AnnotatedMember annotatedMember) {
-        return new SimpleBeanPropertyDefinition(annotatedMember, PropertyName.construct(annotatedMember.getName()), mapperConfig == null ? null : mapperConfig.getAnnotationIntrospector(), null, EMPTY_INCLUDE);
+        return new SimpleBeanPropertyDefinition(annotatedMember, PropertyName.construct(annotatedMember.getName()), mapperConfig == null ? null : mapperConfig.getAnnotationIntrospector(), (PropertyMetadata) null, EMPTY_INCLUDE);
     }
 
     @Deprecated
     public static SimpleBeanPropertyDefinition construct(MapperConfig<?> mapperConfig, AnnotatedMember annotatedMember, String str) {
-        return new SimpleBeanPropertyDefinition(annotatedMember, PropertyName.construct(str), mapperConfig == null ? null : mapperConfig.getAnnotationIntrospector(), null, EMPTY_INCLUDE);
+        return new SimpleBeanPropertyDefinition(annotatedMember, PropertyName.construct(str), mapperConfig == null ? null : mapperConfig.getAnnotationIntrospector(), (PropertyMetadata) null, EMPTY_INCLUDE);
     }
 
     public static SimpleBeanPropertyDefinition construct(MapperConfig<?> mapperConfig, AnnotatedMember annotatedMember, PropertyName propertyName) {
-        return construct((MapperConfig) mapperConfig, annotatedMember, propertyName, null, EMPTY_INCLUDE);
+        return construct(mapperConfig, annotatedMember, propertyName, (PropertyMetadata) null, EMPTY_INCLUDE);
     }
 
     public static SimpleBeanPropertyDefinition construct(MapperConfig<?> mapperConfig, AnnotatedMember annotatedMember, PropertyName propertyName, PropertyMetadata propertyMetadata, Include include) {
@@ -110,7 +109,10 @@ public class SimpleBeanPropertyDefinition extends BeanPropertyDefinition {
     }
 
     public PropertyName getWrapperName() {
-        return (this._introspector != null || this._member == null) ? this._introspector.findWrapperName(this._member) : null;
+        if (this._introspector != null || this._member == null) {
+            return this._introspector.findWrapperName(this._member);
+        }
+        return null;
     }
 
     public boolean isExplicitlyIncluded() {
@@ -146,25 +148,31 @@ public class SimpleBeanPropertyDefinition extends BeanPropertyDefinition {
     }
 
     public AnnotatedMethod getGetter() {
-        if ((this._member instanceof AnnotatedMethod) && ((AnnotatedMethod) this._member).getParameterCount() == 0) {
-            return (AnnotatedMethod) this._member;
+        if (!(this._member instanceof AnnotatedMethod) || ((AnnotatedMethod) this._member).getParameterCount() != 0) {
+            return null;
         }
-        return null;
+        return (AnnotatedMethod) this._member;
     }
 
     public AnnotatedMethod getSetter() {
-        if ((this._member instanceof AnnotatedMethod) && ((AnnotatedMethod) this._member).getParameterCount() == 1) {
-            return (AnnotatedMethod) this._member;
+        if (!(this._member instanceof AnnotatedMethod) || ((AnnotatedMethod) this._member).getParameterCount() != 1) {
+            return null;
+        }
+        return (AnnotatedMethod) this._member;
+    }
+
+    public AnnotatedField getField() {
+        if (this._member instanceof AnnotatedField) {
+            return (AnnotatedField) this._member;
         }
         return null;
     }
 
-    public AnnotatedField getField() {
-        return this._member instanceof AnnotatedField ? (AnnotatedField) this._member : null;
-    }
-
     public AnnotatedParameter getConstructorParameter() {
-        return this._member instanceof AnnotatedParameter ? (AnnotatedParameter) this._member : null;
+        if (this._member instanceof AnnotatedParameter) {
+            return (AnnotatedParameter) this._member;
+        }
+        return null;
     }
 
     public Iterator<AnnotatedParameter> getConstructorParameters() {
@@ -176,7 +184,7 @@ public class SimpleBeanPropertyDefinition extends BeanPropertyDefinition {
     }
 
     public AnnotatedMember getAccessor() {
-        AnnotatedMember getter = getGetter();
+        AnnotatedMethod getter = getGetter();
         if (getter == null) {
             return getField();
         }
@@ -184,19 +192,19 @@ public class SimpleBeanPropertyDefinition extends BeanPropertyDefinition {
     }
 
     public AnnotatedMember getMutator() {
-        AnnotatedMember constructorParameter = getConstructorParameter();
+        AnnotatedParameter constructorParameter = getConstructorParameter();
         if (constructorParameter != null) {
             return constructorParameter;
         }
-        constructorParameter = getSetter();
-        if (constructorParameter == null) {
+        AnnotatedMethod setter = getSetter();
+        if (setter == null) {
             return getField();
         }
-        return constructorParameter;
+        return setter;
     }
 
     public AnnotatedMember getNonConstructorMutator() {
-        AnnotatedMember setter = getSetter();
+        AnnotatedMethod setter = getSetter();
         if (setter == null) {
             return getField();
         }

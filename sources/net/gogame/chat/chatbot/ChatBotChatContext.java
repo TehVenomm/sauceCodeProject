@@ -7,9 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.facebook.AccessToken;
-import com.google.android.gms.measurement.AppMeasurement.Param;
-import io.fabric.sdk.android.services.events.EventsFilesManager;
-import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,18 +27,25 @@ import net.gogame.chat.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import p017io.fabric.sdk.android.services.events.EventsFilesManager;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
 
 public class ChatBotChatContext extends AbstractChatContext {
     private static final boolean DEBUG = false;
-    private static final String DEFAULT_AGENT_AVATAR_URI = null;
+    /* access modifiers changed from: private */
+    public static final String DEFAULT_AGENT_AVATAR_URI = null;
     private static final String DEFAULT_AGENT_DISPLAY_NAME = "Sarah";
     private static final String DEFAULT_AGENT_ID = "default";
     private static final String SERVICE_URL = "https://gw-chat.gogame.net/webchat/receive/";
-    private final Activity activity;
+    /* access modifiers changed from: private */
+    public final Activity activity;
     private final AgentTypingEntry agentTypingEntry = new AgentTypingEntry(false);
-    private final ChatBotConfig chatBotConfig;
-    private final List<ChatLog> chatLogs = new ArrayList();
-    private final String guid;
+    /* access modifiers changed from: private */
+    public final ChatBotConfig chatBotConfig;
+    /* access modifiers changed from: private */
+    public final List<ChatLog> chatLogs = new ArrayList();
+    /* access modifiers changed from: private */
+    public final String guid;
     private final ChatAdapterViewFactory viewFactory;
 
     public static class ChatLog {
@@ -70,8 +74,8 @@ public class ChatBotChatContext extends AbstractChatContext {
             return this.type;
         }
 
-        public void setType(Type type) {
-            this.type = type;
+        public void setType(Type type2) {
+            this.type = type2;
         }
 
         public String getAgentId() {
@@ -111,7 +115,8 @@ public class ChatBotChatContext extends AbstractChatContext {
         private SendMessageTask() {
         }
 
-        protected Void doInBackground(String... strArr) {
+        /* access modifiers changed from: protected */
+        public Void doInBackground(String... strArr) {
             for (String send : strArr) {
                 send(send);
             }
@@ -119,14 +124,14 @@ public class ChatBotChatContext extends AbstractChatContext {
         }
 
         private void send(String str) {
+            BufferedInputStream bufferedInputStream;
             try {
                 HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(ChatBotChatContext.SERVICE_URL + ChatBotChatContext.this.chatBotConfig.getAppId()).openConnection();
                 try {
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.setChunkedStreamingMode(0);
                     httpURLConnection.setRequestProperty(HttpRequest.HEADER_CONTENT_TYPE, "application/json");
-                    OutputStream bufferedOutputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
-                    InputStream bufferedInputStream;
+                    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
                     try {
                         JSONObject jSONObject = new JSONObject();
                         jSONObject.put(AccessToken.USER_ID_KEY, ChatBotChatContext.this.guid);
@@ -137,15 +142,15 @@ public class ChatBotChatContext extends AbstractChatContext {
                         bufferedOutputStream.flush();
                         bufferedOutputStream.close();
                         bufferedInputStream = new BufferedInputStream(httpURLConnection.getInputStream());
-                        OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         IOUtils.copy(bufferedInputStream, byteArrayOutputStream);
-                        jSONObject = new JSONObject(new String(byteArrayOutputStream.toByteArray(), "UTF-8"));
-                        final long optLong = jSONObject.optLong(Param.TIMESTAMP, System.currentTimeMillis());
-                        final String optString = jSONObject.optString("agentId", "default");
-                        final String optString2 = jSONObject.optString("agentDisplayName", ChatBotChatContext.DEFAULT_AGENT_DISPLAY_NAME);
-                        final String optString3 = jSONObject.optString("agentAvatarUri", ChatBotChatContext.DEFAULT_AGENT_AVATAR_URI);
-                        JSONArray optJSONArray = jSONObject.optJSONArray("response");
-                        final List arrayList = new ArrayList();
+                        JSONObject jSONObject2 = new JSONObject(new String(byteArrayOutputStream.toByteArray(), "UTF-8"));
+                        final long optLong = jSONObject2.optLong("timestamp", System.currentTimeMillis());
+                        final String optString = jSONObject2.optString("agentId", "default");
+                        final String optString2 = jSONObject2.optString("agentDisplayName", ChatBotChatContext.DEFAULT_AGENT_DISPLAY_NAME);
+                        final String optString3 = jSONObject2.optString("agentAvatarUri", ChatBotChatContext.DEFAULT_AGENT_AVATAR_URI);
+                        JSONArray optJSONArray = jSONObject2.optJSONArray("response");
+                        final ArrayList arrayList = new ArrayList();
                         if (optJSONArray != null) {
                             for (int i = 0; i < optJSONArray.length(); i++) {
                                 String optString4 = optJSONArray.optString(i, null);
@@ -171,15 +176,16 @@ public class ChatBotChatContext extends AbstractChatContext {
                                 }
                             });
                         }
-                        IOUtils.closeQuietly(bufferedInputStream);
-                        IOUtils.closeQuietly(bufferedOutputStream);
+                        IOUtils.closeQuietly((InputStream) bufferedInputStream);
+                        IOUtils.closeQuietly((OutputStream) bufferedOutputStream);
                     } catch (Throwable th) {
-                        IOUtils.closeQuietly(bufferedOutputStream);
+                        IOUtils.closeQuietly((OutputStream) bufferedOutputStream);
+                        throw th;
                     }
                 } finally {
                     httpURLConnection.disconnect();
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Exception", e);
                 ChatLog chatLog = new ChatLog();
                 chatLog.setType(Type.CHAT_MSG_SYSTEM);
@@ -190,21 +196,21 @@ public class ChatBotChatContext extends AbstractChatContext {
         }
     }
 
-    public ChatBotChatContext(Activity activity, ChatBotConfig chatBotConfig, ChatAdapterViewFactory chatAdapterViewFactory) {
-        String guid;
-        this.activity = activity;
-        this.chatBotConfig = chatBotConfig;
+    public ChatBotChatContext(Activity activity2, ChatBotConfig chatBotConfig2, ChatAdapterViewFactory chatAdapterViewFactory) {
+        String str;
+        this.activity = activity2;
+        this.chatBotConfig = chatBotConfig2;
         this.viewFactory = chatAdapterViewFactory;
-        if (chatBotConfig.getGuid() != null) {
-            guid = chatBotConfig.getGuid();
+        if (chatBotConfig2.getGuid() != null) {
+            str = chatBotConfig2.getGuid();
         } else {
-            guid = UUID.randomUUID().toString() + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + System.currentTimeMillis();
+            str = UUID.randomUUID().toString() + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + System.currentTimeMillis();
         }
-        this.guid = guid;
+        this.guid = str;
     }
 
     public void start() {
-        new SendMessageTask().execute(new String[]{(String) null});
+        new SendMessageTask().execute(new String[]{null});
     }
 
     public void stop() {
@@ -270,7 +276,8 @@ public class ChatBotChatContext extends AbstractChatContext {
         }
     }
 
-    private void addChatLog(final ChatLog chatLog) {
+    /* access modifiers changed from: private */
+    public void addChatLog(final ChatLog chatLog) {
         this.activity.runOnUiThread(new Runnable() {
             public void run() {
                 ChatBotChatContext.this.chatLogs.add(chatLog);

@@ -1,35 +1,43 @@
-package android.support.v4.hardware.fingerprint;
+package android.support.p000v4.hardware.fingerprint;
 
 import android.content.Context;
 import android.os.Build.VERSION;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.AuthenticationResultInternal;
-import android.support.v4.os.CancellationSignal;
+import android.support.annotation.RequiresApi;
+import android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.AuthenticationResultInternal;
+import android.support.p000v4.p002os.CancellationSignal;
 import java.security.Signature;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 
+/* renamed from: android.support.v4.hardware.fingerprint.FingerprintManagerCompat */
 public final class FingerprintManagerCompat {
     static final FingerprintManagerCompatImpl IMPL;
     private Context mContext;
 
-    private interface FingerprintManagerCompatImpl {
-        void authenticate(Context context, CryptoObject cryptoObject, int i, CancellationSignal cancellationSignal, AuthenticationCallback authenticationCallback, Handler handler);
-
-        boolean hasEnrolledFingerprints(Context context);
-
-        boolean isHardwareDetected(Context context);
-    }
-
+    @RequiresApi(23)
+    /* renamed from: android.support.v4.hardware.fingerprint.FingerprintManagerCompat$Api23FingerprintManagerCompatImpl */
     private static class Api23FingerprintManagerCompatImpl implements FingerprintManagerCompatImpl {
-        static CryptoObject unwrapCryptoObject(android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject cryptoObject) {
-            return cryptoObject == null ? null : cryptoObject.getCipher() != null ? new CryptoObject(cryptoObject.getCipher()) : cryptoObject.getSignature() != null ? new CryptoObject(cryptoObject.getSignature()) : cryptoObject.getMac() != null ? new CryptoObject(cryptoObject.getMac()) : null;
+        static CryptoObject unwrapCryptoObject(android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject cryptoObject) {
+            if (cryptoObject == null) {
+                return null;
+            }
+            if (cryptoObject.getCipher() != null) {
+                return new CryptoObject(cryptoObject.getCipher());
+            }
+            if (cryptoObject.getSignature() != null) {
+                return new CryptoObject(cryptoObject.getSignature());
+            }
+            if (cryptoObject.getMac() != null) {
+                return new CryptoObject(cryptoObject.getMac());
+            }
+            return null;
         }
 
-        private static android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.AuthenticationCallback wrapCallback(final AuthenticationCallback authenticationCallback) {
-            return new android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.AuthenticationCallback() {
+        private static android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.AuthenticationCallback wrapCallback(final AuthenticationCallback authenticationCallback) {
+            return new android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.AuthenticationCallback() {
                 public void onAuthenticationError(int i, CharSequence charSequence) {
                     authenticationCallback.onAuthenticationError(i, charSequence);
                 }
@@ -48,8 +56,20 @@ public final class FingerprintManagerCompat {
             };
         }
 
-        private static android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject wrapCryptoObject(CryptoObject cryptoObject) {
-            return cryptoObject == null ? null : cryptoObject.getCipher() != null ? new android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject(cryptoObject.getCipher()) : cryptoObject.getSignature() != null ? new android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject(cryptoObject.getSignature()) : cryptoObject.getMac() != null ? new android.support.v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject(cryptoObject.getMac()) : null;
+        private static android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject wrapCryptoObject(CryptoObject cryptoObject) {
+            if (cryptoObject == null) {
+                return null;
+            }
+            if (cryptoObject.getCipher() != null) {
+                return new android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject(cryptoObject.getCipher());
+            }
+            if (cryptoObject.getSignature() != null) {
+                return new android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject(cryptoObject.getSignature());
+            }
+            if (cryptoObject.getMac() != null) {
+                return new android.support.p000v4.hardware.fingerprint.FingerprintManagerCompatApi23.CryptoObject(cryptoObject.getMac());
+            }
+            return null;
         }
 
         public void authenticate(Context context, CryptoObject cryptoObject, int i, CancellationSignal cancellationSignal, AuthenticationCallback authenticationCallback, Handler handler) {
@@ -65,6 +85,7 @@ public final class FingerprintManagerCompat {
         }
     }
 
+    /* renamed from: android.support.v4.hardware.fingerprint.FingerprintManagerCompat$AuthenticationCallback */
     public static abstract class AuthenticationCallback {
         public void onAuthenticationError(int i, CharSequence charSequence) {
         }
@@ -79,6 +100,7 @@ public final class FingerprintManagerCompat {
         }
     }
 
+    /* renamed from: android.support.v4.hardware.fingerprint.FingerprintManagerCompat$AuthenticationResult */
     public static final class AuthenticationResult {
         private CryptoObject mCryptoObject;
 
@@ -91,6 +113,7 @@ public final class FingerprintManagerCompat {
         }
     }
 
+    /* renamed from: android.support.v4.hardware.fingerprint.FingerprintManagerCompat$CryptoObject */
     public static class CryptoObject {
         private final Cipher mCipher;
         private final Mac mMac;
@@ -127,6 +150,16 @@ public final class FingerprintManagerCompat {
         }
     }
 
+    /* renamed from: android.support.v4.hardware.fingerprint.FingerprintManagerCompat$FingerprintManagerCompatImpl */
+    private interface FingerprintManagerCompatImpl {
+        void authenticate(Context context, CryptoObject cryptoObject, int i, CancellationSignal cancellationSignal, AuthenticationCallback authenticationCallback, Handler handler);
+
+        boolean hasEnrolledFingerprints(Context context);
+
+        boolean isHardwareDetected(Context context);
+    }
+
+    /* renamed from: android.support.v4.hardware.fingerprint.FingerprintManagerCompat$LegacyFingerprintManagerCompatImpl */
     private static class LegacyFingerprintManagerCompatImpl implements FingerprintManagerCompatImpl {
         public void authenticate(Context context, CryptoObject cryptoObject, int i, CancellationSignal cancellationSignal, AuthenticationCallback authenticationCallback, Handler handler) {
         }

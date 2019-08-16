@@ -29,7 +29,7 @@ public class ProfilePlayData : GameSection
 	{
 		base.UpdateUI();
 		PlayDataTable.PlayData[] nameList = Singleton<PlayDataTable>.I.GetSortedPlayData(MonoBehaviourSingleton<AchievementManager>.I.GetAchievementCounterList().ToArray());
-		SetGrid(UI.GRD_LIST, "ProfilePlaydataListItem", nameList.Length, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_LIST, "ProfilePlaydataListItem", nameList.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			PlayDataTable.PlayData playData = nameList[i];
 			SetLabelText(t, UI.LBL_NAME, playData.name);

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NodeObject
+public class NodeObject : MonoBehaviour
 {
 	protected float timeCount;
 
@@ -40,9 +40,6 @@ public class NodeObject
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		_transform = this.get_transform();
 		_rigidbody = this.GetComponent<Rigidbody>();
 		_collider = GetCollider();
@@ -58,7 +55,6 @@ public class NodeObject
 
 	protected Collider GetCollider()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		Collider component = this.GetComponent<Collider>();
 		if (component == null)
 		{
@@ -83,7 +79,6 @@ public class NodeObject
 
 	protected virtual void Start()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		if (triggerColliderIsRequired())
 		{
 			stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
@@ -100,9 +95,6 @@ public class NodeObject
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		if (!(_collider == null) && _collider.get_enabled() && !collider.get_isTrigger() && !(stageObject == null) && !(collider.get_gameObject() == this.get_gameObject()))
 		{
 			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();

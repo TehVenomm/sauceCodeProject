@@ -43,6 +43,7 @@ public final class Fraction extends Number implements Comparable<Fraction> {
     }
 
     public static Fraction getFraction(int i, int i2, int i3) {
+        long j;
         if (i3 == 0) {
             throw new ArithmeticException("The denominator must not be zero");
         } else if (i3 < 0) {
@@ -50,7 +51,6 @@ public final class Fraction extends Number implements Comparable<Fraction> {
         } else if (i2 < 0) {
             throw new ArithmeticException("The numerator must not be negative");
         } else {
-            long j;
             if (i < 0) {
                 j = (((long) i) * ((long) i3)) - ((long) i2);
             } else {
@@ -64,13 +64,13 @@ public final class Fraction extends Number implements Comparable<Fraction> {
     }
 
     public static Fraction getReducedFraction(int i, int i2) {
+        int i3;
+        int i4;
         if (i2 == 0) {
             throw new ArithmeticException("The denominator must not be zero");
         } else if (i == 0) {
             return ZERO;
         } else {
-            int i3;
-            int i4;
             if (i2 == Integer.MIN_VALUE && (i & 1) == 0) {
                 i3 = i2 / 2;
                 i4 = i / 2;
@@ -98,37 +98,35 @@ public final class Fraction extends Number implements Comparable<Fraction> {
         }
         int i2 = (int) abs;
         double d2 = abs - ((double) i2);
-        int i3 = (int) d2;
-        abs = Double.MAX_VALUE;
-        int i4 = 1;
+        int i3 = 0;
+        int i4 = (int) d2;
+        double d3 = Double.MAX_VALUE;
         int i5 = 1;
+        double d4 = d2 - ((double) i4);
+        double d5 = 1.0d;
         int i6 = 0;
-        int i7 = 0;
+        int i7 = 1;
         int i8 = 1;
-        int i9 = i3;
-        double d3 = 1.0d;
-        double d4 = d2 - ((double) i3);
         while (true) {
-            int i10 = (int) (d3 / d4);
-            double d5 = d3 - (((double) i10) * d4);
-            i6 += i9 * i8;
-            i9 = (i9 * i7) + i5;
-            d3 = Math.abs(d2 - (((double) i6) / ((double) i9)));
-            i4++;
-            if (abs > d3 && i9 <= 10000 && i9 > 0 && i4 < 25) {
-                abs = d3;
-                i5 = i7;
-                d3 = d4;
-                i7 = i9;
-                i9 = i10;
-                d4 = d5;
-                int i11 = i6;
-                i6 = i8;
-                i8 = i11;
+            int i9 = (int) (d5 / d4);
+            double d6 = d5 - (((double) i9) * d4);
+            int i10 = (i4 * i7) + i3;
+            int i11 = (i4 * i6) + i8;
+            double abs2 = Math.abs(d2 - (((double) i10) / ((double) i11)));
+            i5++;
+            if (d3 > abs2 && i11 <= 10000 && i11 > 0 && i5 < 25) {
+                d3 = abs2;
+                d5 = d4;
+                i4 = i9;
+                i8 = i6;
+                i3 = i7;
+                i7 = i10;
+                d4 = d6;
+                i6 = i11;
             }
         }
-        if (i4 != 25) {
-            return getReducedFraction(i * ((i2 * i7) + i8), i7);
+        if (i5 != 25) {
+            return getReducedFraction(i * ((i2 * i6) + i7), i6);
         }
         throw new ArithmeticException("Unable to convert double to fraction");
     }
@@ -149,11 +147,11 @@ public final class Fraction extends Number implements Comparable<Fraction> {
                 }
                 throw new NumberFormatException("The fraction could not be parsed as the format X Y/Z");
             }
-            indexOf = str.indexOf(47);
-            if (indexOf < 0) {
+            int indexOf3 = str.indexOf(47);
+            if (indexOf3 < 0) {
                 return getFraction(Integer.parseInt(str), 1);
             }
-            return getFraction(Integer.parseInt(str.substring(0, indexOf)), Integer.parseInt(str.substring(indexOf + 1)));
+            return getFraction(Integer.parseInt(str.substring(0, indexOf3)), Integer.parseInt(str.substring(indexOf3 + 1)));
         }
     }
 
@@ -244,6 +242,8 @@ public final class Fraction extends Number implements Comparable<Fraction> {
     }
 
     private static int greatestCommonDivisor(int i, int i2) {
+        int i3;
+        int i4;
         if (i == 0 || i2 == 0) {
             if (i != Integer.MIN_VALUE && i2 != Integer.MIN_VALUE) {
                 return Math.abs(i) + Math.abs(i2);
@@ -252,7 +252,6 @@ public final class Fraction extends Number implements Comparable<Fraction> {
         } else if (Math.abs(i) == 1 || Math.abs(i2) == 1) {
             return 1;
         } else {
-            int i3;
             if (i > 0) {
                 i3 = -i;
             } else {
@@ -261,35 +260,32 @@ public final class Fraction extends Number implements Comparable<Fraction> {
             if (i2 > 0) {
                 i2 = -i2;
             }
-            int i4 = 0;
-            int i5 = i2;
-            while ((i3 & 1) == 0 && (i5 & 1) == 0 && i4 < 31) {
+            int i5 = 0;
+            int i6 = i2;
+            while ((i3 & 1) == 0 && (i6 & 1) == 0 && i5 < 31) {
                 i3 /= 2;
-                i5 /= 2;
-                i4++;
+                i6 /= 2;
+                i5++;
             }
-            if (i4 == 31) {
+            if (i5 == 31) {
                 throw new ArithmeticException("overflow: gcd is 2^31");
             }
-            int i6 = i5;
-            i5 = (i3 & 1) == 1 ? i5 : -(i3 / 2);
+            int i7 = (i3 & 1) == 1 ? i6 : -(i3 / 2);
             while (true) {
-                if ((i5 & 1) == 0) {
-                    i5 /= 2;
+                if ((i7 & 1) == 0) {
+                    i7 /= 2;
                 } else {
-                    if (i5 > 0) {
-                        i5 = -i5;
+                    if (i7 > 0) {
+                        i4 = i6;
+                        i3 = -i7;
                     } else {
-                        i6 = i5;
-                        i5 = i3;
+                        i4 = i7;
                     }
-                    i3 = (i6 - i5) / 2;
-                    if (i3 == 0) {
-                        return (-i5) * (1 << i4);
+                    i7 = (i4 - i3) / 2;
+                    if (i7 == 0) {
+                        return (-i3) * (1 << i5);
                     }
-                    int i7 = i3;
-                    i3 = i5;
-                    i5 = i7;
+                    i6 = i4;
                 }
             }
         }
@@ -349,17 +345,17 @@ public final class Fraction extends Number implements Comparable<Fraction> {
             int greatestCommonDivisor = greatestCommonDivisor(this.denominator, fraction.denominator);
             if (greatestCommonDivisor == 1) {
                 int mulAndCheck = mulAndCheck(this.numerator, fraction.denominator);
-                greatestCommonDivisor = mulAndCheck(fraction.numerator, this.denominator);
-                return new Fraction(z ? addAndCheck(mulAndCheck, greatestCommonDivisor) : subAndCheck(mulAndCheck, greatestCommonDivisor), mulPosAndCheck(this.denominator, fraction.denominator));
+                int mulAndCheck2 = mulAndCheck(fraction.numerator, this.denominator);
+                return new Fraction(z ? addAndCheck(mulAndCheck, mulAndCheck2) : subAndCheck(mulAndCheck, mulAndCheck2), mulPosAndCheck(this.denominator, fraction.denominator));
             }
             BigInteger multiply = BigInteger.valueOf((long) this.numerator).multiply(BigInteger.valueOf((long) (fraction.denominator / greatestCommonDivisor)));
             BigInteger multiply2 = BigInteger.valueOf((long) fraction.numerator).multiply(BigInteger.valueOf((long) (this.denominator / greatestCommonDivisor)));
-            multiply = z ? multiply.add(multiply2) : multiply.subtract(multiply2);
-            int intValue = multiply.mod(BigInteger.valueOf((long) greatestCommonDivisor)).intValue();
-            intValue = intValue == 0 ? greatestCommonDivisor : greatestCommonDivisor(intValue, greatestCommonDivisor);
-            BigInteger divide = multiply.divide(BigInteger.valueOf((long) intValue));
+            BigInteger subtract = z ? multiply.add(multiply2) : multiply.subtract(multiply2);
+            int intValue = subtract.mod(BigInteger.valueOf((long) greatestCommonDivisor)).intValue();
+            int greatestCommonDivisor2 = intValue == 0 ? greatestCommonDivisor : greatestCommonDivisor(intValue, greatestCommonDivisor);
+            BigInteger divide = subtract.divide(BigInteger.valueOf((long) greatestCommonDivisor2));
             if (divide.bitLength() <= 31) {
-                return new Fraction(divide.intValue(), mulPosAndCheck(this.denominator / greatestCommonDivisor, fraction.denominator / intValue));
+                return new Fraction(divide.intValue(), mulPosAndCheck(this.denominator / greatestCommonDivisor, fraction.denominator / greatestCommonDivisor2));
             }
             throw new ArithmeticException("overflow: numerator too large after multiply");
         }

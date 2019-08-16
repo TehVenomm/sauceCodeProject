@@ -1,12 +1,13 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.content.IntentCompat;
-import android.support.v4.content.SharedPreferencesCompat.EditorCompat;
+import android.support.p000v4.content.IntentCompat;
+import android.support.p000v4.content.SharedPreferencesCompat.EditorCompat;
 
+/* renamed from: android.support.v4.app.AppLaunchChecker */
 public class AppLaunchChecker {
     private static final String KEY_STARTED_FROM_LAUNCHER = "startedFromLauncher";
     private static final String SHARED_PREFS_NAME = "android.support.AppLaunchChecker";

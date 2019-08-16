@@ -8,7 +8,6 @@ import com.facebook.FacebookContentProvider;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,7 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 public final class NativeAppCallAttachmentStore {
@@ -28,18 +26,24 @@ public final class NativeAppCallAttachmentStore {
     private static File attachmentsDirectory;
 
     public static final class Attachment {
-        private final String attachmentName;
+        /* access modifiers changed from: private */
+        public final String attachmentName;
         private final String attachmentUrl;
-        private Bitmap bitmap;
-        private final UUID callId;
-        private boolean isContentUri;
-        private Uri originalUri;
-        private boolean shouldCreateFile;
+        /* access modifiers changed from: private */
+        public Bitmap bitmap;
+        /* access modifiers changed from: private */
+        public final UUID callId;
+        /* access modifiers changed from: private */
+        public boolean isContentUri;
+        /* access modifiers changed from: private */
+        public Uri originalUri;
+        /* access modifiers changed from: private */
+        public boolean shouldCreateFile;
 
-        private Attachment(UUID uuid, Bitmap bitmap, Uri uri) {
+        private Attachment(UUID uuid, Bitmap bitmap2, Uri uri) {
             boolean z = true;
             this.callId = uuid;
-            this.bitmap = bitmap;
+            this.bitmap = bitmap2;
             this.originalUri = uri;
             if (uri != null) {
                 String scheme = uri.getScheme();
@@ -54,7 +58,7 @@ public final class NativeAppCallAttachmentStore {
                 } else if (!Utility.isWebUri(uri)) {
                     throw new FacebookException("Unsupported scheme for media Uri : " + scheme);
                 }
-            } else if (bitmap != null) {
+            } else if (bitmap2 != null) {
                 this.shouldCreateFile = true;
             } else {
                 throw new FacebookException("Cannot share media without a bitmap or Uri set");
@@ -65,6 +69,10 @@ public final class NativeAppCallAttachmentStore {
 
         public String getAttachmentUrl() {
             return this.attachmentUrl;
+        }
+
+        public Uri getOriginalUri() {
+            return this.originalUri;
         }
     }
 
@@ -77,7 +85,7 @@ public final class NativeAppCallAttachmentStore {
                 cleanupAllAttachments();
             }
             ensureAttachmentsDirectoryExists();
-            List<File> arrayList = new ArrayList();
+            ArrayList<File> arrayList = new ArrayList<>();
             try {
                 for (Attachment attachment : collection) {
                     if (attachment.shouldCreateFile) {
@@ -90,16 +98,16 @@ public final class NativeAppCallAttachmentStore {
                         }
                     }
                 }
-            } catch (Throwable e) {
-                Throwable th = e;
-                Log.e(TAG, "Got unexpected exception:" + th);
+            } catch (IOException e) {
+                IOException iOException = e;
+                Log.e(TAG, "Got unexpected exception:" + iOException);
                 for (File delete : arrayList) {
                     try {
                         delete.delete();
                     } catch (Exception e2) {
                     }
                 }
-                throw new FacebookException(th);
+                throw new FacebookException((Throwable) iOException);
             }
         }
     }
@@ -128,9 +136,9 @@ public final class NativeAppCallAttachmentStore {
     }
 
     static File ensureAttachmentsDirectoryExists() {
-        File attachmentsDirectory = getAttachmentsDirectory();
-        attachmentsDirectory.mkdirs();
-        return attachmentsDirectory;
+        File attachmentsDirectory2 = getAttachmentsDirectory();
+        attachmentsDirectory2.mkdirs();
+        return attachmentsDirectory2;
     }
 
     static File getAttachmentFile(UUID uuid, String str, boolean z) throws IOException {
@@ -146,19 +154,18 @@ public final class NativeAppCallAttachmentStore {
     }
 
     static File getAttachmentsDirectory() {
+        File file;
         synchronized (NativeAppCallAttachmentStore.class) {
-            Class cacheDir;
             try {
                 if (attachmentsDirectory == null) {
-                    cacheDir = FacebookSdk.getApplicationContext().getCacheDir();
-                    attachmentsDirectory = new File(cacheDir, ATTACHMENTS_DIR_NAME);
+                    attachmentsDirectory = new File(FacebookSdk.getApplicationContext().getCacheDir(), ATTACHMENTS_DIR_NAME);
                 }
-                File file = attachmentsDirectory;
-                return file;
+                file = attachmentsDirectory;
             } finally {
-                cacheDir = NativeAppCallAttachmentStore.class;
+                Class<NativeAppCallAttachmentStore> cls = NativeAppCallAttachmentStore.class;
             }
         }
+        return file;
     }
 
     static File getAttachmentsDirectoryForCall(UUID uuid, boolean z) {
@@ -185,7 +192,7 @@ public final class NativeAppCallAttachmentStore {
     }
 
     private static void processAttachmentBitmap(Bitmap bitmap, File file) throws IOException {
-        Closeable fileOutputStream = new FileOutputStream(file);
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
         try {
             bitmap.compress(CompressFormat.JPEG, 100, fileOutputStream);
         } finally {
@@ -195,15 +202,16 @@ public final class NativeAppCallAttachmentStore {
 
     private static void processAttachmentFile(Uri uri, boolean z, File file) throws IOException {
         InputStream openInputStream;
-        Closeable fileOutputStream = new FileOutputStream(file);
-        if (z) {
-            openInputStream = FacebookSdk.getApplicationContext().getContentResolver().openInputStream(uri);
-        } else {
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        if (!z) {
             try {
                 openInputStream = new FileInputStream(uri.getPath());
             } catch (Throwable th) {
                 Utility.closeQuietly(fileOutputStream);
+                throw th;
             }
+        } else {
+            openInputStream = FacebookSdk.getApplicationContext().getContentResolver().openInputStream(uri);
         }
         Utility.copyAndCloseInputStream(openInputStream, fileOutputStream);
         Utility.closeQuietly(fileOutputStream);

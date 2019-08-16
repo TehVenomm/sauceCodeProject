@@ -3,7 +3,6 @@ package net.gogame.gowrap.integrations.firebase;
 import android.app.Activity;
 import android.os.Bundle;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import io.fabric.sdk.android.services.events.EventsFilesManager;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
@@ -13,10 +12,10 @@ import net.gogame.gowrap.integrations.CanTrackPurchase;
 import net.gogame.gowrap.integrations.Config;
 import net.gogame.gowrap.integrations.IntegrationSupport.IntegrationContext;
 import net.gogame.gowrap.support.ClassUtils;
+import p017io.fabric.sdk.android.services.events.EventsFilesManager;
 
 public class FirebaseSupport extends AbstractIntegrationSupport implements CanSetGuid, CanTrackEvent, CanTrackPurchase {
     public static final String CONFIG_EVENT_NAME_DELIMITER = "eventNameDelimiter";
-    public static final FirebaseSupport INSTANCE = new FirebaseSupport();
     private String eventNameDelimiter = EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR;
     private IntegrationContext integrationContext;
 
@@ -35,8 +34,9 @@ public class FirebaseSupport extends AbstractIntegrationSupport implements CanSe
         return ClassUtils.hasClass("com.google.firebase.analytics.FirebaseAnalytics");
     }
 
-    protected void doInit(Activity activity, Config config, IntegrationContext integrationContext) {
-        this.integrationContext = integrationContext;
+    /* access modifiers changed from: protected */
+    public void doInit(Activity activity, Config config, IntegrationContext integrationContext2) {
+        this.integrationContext = integrationContext2;
         this.eventNameDelimiter = config.getString("eventNameDelimiter", EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR);
     }
 

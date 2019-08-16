@@ -1,9 +1,11 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
 import android.os.Process;
 
+/* renamed from: io.fabric.sdk.android.services.common.BackgroundPriorityRunnable */
 public abstract class BackgroundPriorityRunnable implements Runnable {
-    protected abstract void onRun();
+    /* access modifiers changed from: protected */
+    public abstract void onRun();
 
     public final void run() {
         Process.setThreadPriority(10);

@@ -1,61 +1,88 @@
 package com.google.android.gms.drive;
 
 import android.content.IntentSender;
+import android.os.RemoteException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.drive.query.Filter;
 import com.google.android.gms.drive.query.internal.FilterHolder;
 import com.google.android.gms.drive.query.internal.zzk;
-import com.google.android.gms.internal.zzbiw;
-import com.google.android.gms.internal.zzblb;
-import com.google.android.gms.internal.zzbmt;
+import com.google.android.gms.internal.drive.zzaw;
+import com.google.android.gms.internal.drive.zzeo;
+import com.google.android.gms.internal.drive.zzgg;
 
+@Deprecated
 public class OpenFileActivityBuilder {
     public static final String EXTRA_RESPONSE_DRIVE_ID = "response_drive_id";
-    private String zzehi;
-    private String[] zzgee;
-    private Filter zzgef;
-    private DriveId zzgeg;
+    private String zzay;
+    private String[] zzaz;
+    private Filter zzba;
+    private DriveId zzbb;
 
     public IntentSender build(GoogleApiClient googleApiClient) {
-        zzbp.zza(googleApiClient.isConnected(), (Object) "Client must be connected");
-        if (this.zzgee == null) {
-            this.zzgee = new String[0];
+        Preconditions.checkState(googleApiClient.isConnected(), "Client must be connected");
+        zzf();
+        try {
+            return ((zzeo) ((zzaw) googleApiClient.getClient(Drive.CLIENT_KEY)).getService()).zza(new zzgg(this.zzay, this.zzaz, this.zzbb, this.zzba == null ? null : new FilterHolder(this.zzba)));
+        } catch (RemoteException e) {
+            throw new RuntimeException("Unable to connect Drive Play Service", e);
         }
-        if (this.zzgee.length <= 0 || this.zzgef == null) {
-            try {
-                return ((zzblb) ((zzbiw) googleApiClient.zza(Drive.zzdwq)).zzajj()).zza(new zzbmt(this.zzehi, this.zzgee, this.zzgeg, this.zzgef == null ? null : new FilterHolder(this.zzgef)));
-            } catch (Throwable e) {
-                throw new RuntimeException("Unable to connect Drive Play Service", e);
-            }
-        }
-        throw new IllegalStateException("Cannot use a selection filter and set mimetypes simultaneously");
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final String getTitle() {
+        return this.zzay;
     }
 
     public OpenFileActivityBuilder setActivityStartFolder(DriveId driveId) {
-        this.zzgeg = (DriveId) zzbp.zzu(driveId);
+        this.zzbb = (DriveId) Preconditions.checkNotNull(driveId);
         return this;
     }
 
     public OpenFileActivityBuilder setActivityTitle(String str) {
-        this.zzehi = (String) zzbp.zzu(str);
+        this.zzay = (String) Preconditions.checkNotNull(str);
         return this;
     }
 
     public OpenFileActivityBuilder setMimeType(String[] strArr) {
-        zzbp.zzb(strArr != null, (Object) "mimeTypes may not be null");
-        this.zzgee = strArr;
+        Preconditions.checkArgument(strArr != null, "mimeTypes may not be null");
+        this.zzaz = strArr;
         return this;
     }
 
     public OpenFileActivityBuilder setSelectionFilter(Filter filter) {
         boolean z = true;
-        zzbp.zzb(filter != null, (Object) "filter may not be null");
+        Preconditions.checkArgument(filter != null, "filter may not be null");
         if (zzk.zza(filter)) {
             z = false;
         }
-        zzbp.zzb(z, (Object) "FullTextSearchFilter cannot be used as a selection filter");
-        this.zzgef = filter;
+        Preconditions.checkArgument(z, "FullTextSearchFilter cannot be used as a selection filter");
+        this.zzba = filter;
         return this;
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final void zzf() {
+        if (this.zzaz == null) {
+            this.zzaz = new String[0];
+        }
+        if (this.zzaz.length > 0 && this.zzba != null) {
+            throw new IllegalStateException("Cannot use a selection filter and set mimetypes simultaneously");
+        }
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final String[] zzr() {
+        return this.zzaz;
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final Filter zzs() {
+        return this.zzba;
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final DriveId zzt() {
+        return this.zzbb;
     }
 }

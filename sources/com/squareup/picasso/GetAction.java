@@ -8,7 +8,8 @@ class GetAction extends Action<Void> {
         super(picasso, null, request, i, i2, 0, null, str, obj, false);
     }
 
-    void complete(Bitmap bitmap, LoadedFrom loadedFrom) {
+    /* access modifiers changed from: 0000 */
+    public void complete(Bitmap bitmap, LoadedFrom loadedFrom) {
     }
 
     public void error() {

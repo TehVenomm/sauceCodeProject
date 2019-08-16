@@ -6,22 +6,27 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Releasable;
 import com.google.android.gms.common.api.Result;
 
+@Deprecated
 public interface Leaderboards {
 
+    @Deprecated
     public interface LeaderboardMetadataResult extends Releasable, Result {
         LeaderboardBuffer getLeaderboards();
     }
 
+    @Deprecated
     public interface LoadPlayerScoreResult extends Result {
         LeaderboardScore getScore();
     }
 
+    @Deprecated
     public interface LoadScoresResult extends Releasable, Result {
         Leaderboard getLeaderboard();
 
         LeaderboardScoreBuffer getScores();
     }
 
+    @Deprecated
     public interface SubmitScoreResult extends Releasable, Result {
         ScoreSubmissionData getScoreData();
     }

@@ -43,9 +43,13 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		BTN_BACK,
 		TGL_CHANGE_INVENTORY,
 		TGL_ICON_ASC,
+		BTN_CHANGE_INVENTORY,
 		OBJ_EMPTY_SKILL_ROOT,
 		TEX_EMPTY_SKILL,
-		LBL_EMPTY_SKILL_TYPE
+		SPR_EMPTY_SKILL,
+		LBL_EMPTY_SKILL_TYPE,
+		OBJ_CAPTION_3,
+		LBL_CAPTION
 	}
 
 	protected SkillItemInfo equipSkillItem;
@@ -64,10 +68,9 @@ public abstract class SkillSelectBase : ItemDetailSkill
 
 	protected UI inventoryUI;
 
-	protected UI[] switchInventoryAry = new UI[2]
+	protected UI[] switchInventoryAry = new UI[1]
 	{
-		UI.GRD_INVENTORY,
-		UI.GRD_INVENTORY_SMALL
+		UI.GRD_INVENTORY
 	};
 
 	protected bool IsShowMainStatus => inventoryUIIndex == 0;
@@ -82,7 +85,7 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		}
 		GameSection.SetEventData(new object[2]
 		{
-			(ItemDetailEquip.CURRENT_SECTION)(int)array[0],
+			(ItemDetailEquip.CURRENT_SECTION)array[0],
 			null
 		});
 		base.Initialize();
@@ -99,9 +102,10 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		SetFontStyle((Enum)UI.STR_TITLE_DESCRIPTION, 2);
 		SetFontStyle((Enum)UI.STR_TITLE_STATUS, 2);
 		SetFontStyle((Enum)UI.STR_TITLE_SELL, 2);
-		SetActive((Enum)UI.BTN_DECISION, true);
-		SetActive((Enum)UI.BTN_SKILL_DECISION, false);
+		SetActive((Enum)UI.BTN_DECISION, is_visible: true);
+		SetActive((Enum)UI.BTN_SKILL_DECISION, is_visible: false);
 		SetLabelText((Enum)UI.STR_DECISION_R, base.sectionData.GetText("STR_DECISION"));
+		SetActive((Enum)UI.BTN_CHANGE_INVENTORY, is_visible: false);
 		if (inventory == null || updateInventory)
 		{
 			selectIndex = GetInventoryFirstIndex();
@@ -155,13 +159,13 @@ public abstract class SkillSelectBase : ItemDetailSkill
 
 	protected void _SetupDetailBase()
 	{
-		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, false);
+		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, is_visible: false);
 		base.SetupDetailBase();
 	}
 
 	protected void _SetupSkillInfoRoot()
 	{
-		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, true);
+		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, is_visible: true);
 		detailBase = GetCtrl(UI.OBJ_SKILL_INFO_ROOT);
 	}
 
@@ -172,13 +176,15 @@ public abstract class SkillSelectBase : ItemDetailSkill
 
 	protected virtual ItemStorageTop.SkillItemInventory CreateInventory()
 	{
-		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.SKILL_ITEM, SKILL_SLOT_TYPE.NONE, false);
+		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.SKILL_ITEM);
 	}
 
 	protected virtual void UpdateInventoryUI()
 	{
 		SetupEnableInventoryUI();
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, false, (Func<int, bool>)delegate(int i)
+		m_generatedIconList.Clear();
+		UpdateNewIconInfo();
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
 		{
 			SortCompareData sortCompareData2 = inventory.datas[i];
 			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
@@ -193,10 +199,18 @@ public abstract class SkillSelectBase : ItemDetailSkill
 			{
 				ITEM_ICON_TYPE iconType = sortCompareData.GetIconType();
 				bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, sortCompareData.GetUniqID());
-				ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, IsShowMainStatus, t, "SELECT", i, is_new, 100, selectIndex == i, sortCompareData.IsEquipping(), sortCompareData.IsExceeded(), false);
+				ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, IsShowMainStatus, t, "SELECT", i, is_new, 100, selectIndex == i, sortCompareData.IsEquipping(), sortCompareData.IsExceeded());
 				itemIcon.SetItemID(sortCompareData.GetTableID());
-				itemIcon.SetButtonColor(inventory.datas[i].IsPriority(inventory.sortSettings.orderTypeAsc), true);
+				itemIcon.SetButtonColor(inventory.datas[i].IsPriority(inventory.sortSettings.orderTypeAsc), is_instant: true);
 				SetLongTouch(itemIcon.transform, "DETAIL", i);
+				if (itemIcon != null && sortCompareData != null)
+				{
+					itemIcon.SetInitData(sortCompareData);
+				}
+				if (!m_generatedIconList.Contains(itemIcon))
+				{
+					m_generatedIconList.Add(itemIcon);
+				}
 			}
 		});
 	}
@@ -216,22 +230,23 @@ public abstract class SkillSelectBase : ItemDetailSkill
 	protected virtual void OnCloseSort()
 	{
 		SortSettings sortSettings = (SortSettings)GameSection.GetEventData();
-		if (sortSettings != null)
+		if (sortSettings == null)
 		{
-			SortCompareData sortCompareData = null;
-			if (selectIndex >= 0)
+			return;
+		}
+		SortCompareData sortCompareData = null;
+		if (selectIndex >= 0)
+		{
+			sortCompareData = inventory.datas[selectIndex];
+		}
+		if (inventory.Sort(sortSettings))
+		{
+			if (sortCompareData != null)
 			{
-				sortCompareData = inventory.datas[selectIndex];
+				selectIndex = GetSelectItemIndex(sortCompareData.GetItemData() as SkillItemInfo);
 			}
-			if (inventory.Sort(sortSettings))
-			{
-				if (sortCompareData != null)
-				{
-					selectIndex = GetSelectItemIndex(sortCompareData.GetItemData() as SkillItemInfo);
-				}
-				SetDirty(UI.GRD_INVENTORY);
-				RefreshUI();
-			}
+			SetDirty(UI.GRD_INVENTORY);
+			RefreshUI();
 		}
 	}
 
@@ -296,9 +311,9 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		int i = 0;
 		for (int num = switchInventoryAry.Length; i < num; i++)
 		{
-			SetActive((Enum)switchInventoryAry[i], false);
+			SetActive((Enum)switchInventoryAry[i], is_visible: false);
 		}
-		SetActive((Enum)switchInventoryAry[inventoryUIIndex], true);
+		SetActive((Enum)switchInventoryAry[inventoryUIIndex], is_visible: true);
 		inventoryUI = switchInventoryAry[inventoryUIIndex];
 		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, inventoryUI == UI.GRD_INVENTORY);
 	}

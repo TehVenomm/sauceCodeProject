@@ -22,14 +22,14 @@ public class ShopGachaReward : GameSection
 	{
 		QuestItem.SellItem[] data_ary = sellItem.ToArray();
 		int item_num = data_ary.Length;
-		SetGrid(UI.GRD_ICON, null, item_num, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_ICON, null, item_num, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			uint itemId = (uint)data_ary[i].itemId;
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)data_ary[i].type, itemId, t, data_ary[i].num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)data_ary[i].type, itemId, t, data_ary[i].num);
 			if (itemIcon != null)
 			{
-				itemIcon.SetRewardBG(true);
-				SetMaterialInfo(itemIcon.transform, (REWARD_TYPE)data_ary[i].type, itemId, null);
+				itemIcon.SetRewardBG(is_visible: true);
+				SetMaterialInfo(itemIcon.transform, (REWARD_TYPE)data_ary[i].type, itemId);
 			}
 		});
 	}

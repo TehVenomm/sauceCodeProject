@@ -4,7 +4,7 @@ using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	public class PlayGamesLocalUser : PlayGamesUserProfile
+	public class PlayGamesLocalUser : PlayGamesUserProfile, ILocalUser, IUserProfile
 	{
 		internal PlayGamesPlatform mPlatform;
 

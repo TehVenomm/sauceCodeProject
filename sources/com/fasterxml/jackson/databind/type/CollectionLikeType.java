@@ -24,14 +24,14 @@ public class CollectionLikeType extends TypeBase {
 
     @Deprecated
     public static CollectionLikeType construct(Class<?> cls, JavaType javaType) {
-        TypeBindings emptyBindings;
+        TypeBindings typeBindings;
         TypeVariable[] typeParameters = cls.getTypeParameters();
         if (typeParameters == null || typeParameters.length != 1) {
-            emptyBindings = TypeBindings.emptyBindings();
+            typeBindings = TypeBindings.emptyBindings();
         } else {
-            emptyBindings = TypeBindings.create((Class) cls, javaType);
+            typeBindings = TypeBindings.create(cls, javaType);
         }
-        return new CollectionLikeType(cls, emptyBindings, TypeBase._bogusSuperClass(cls), null, javaType, null, null, false);
+        return new CollectionLikeType(cls, typeBindings, _bogusSuperClass(cls), null, javaType, null, null, false);
     }
 
     public static CollectionLikeType upgradeFrom(JavaType javaType, JavaType javaType2) {
@@ -41,8 +41,9 @@ public class CollectionLikeType extends TypeBase {
         throw new IllegalArgumentException("Can not upgrade from an instance of " + javaType.getClass());
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         return new CollectionLikeType(cls, this._bindings, this._superClass, this._superInterfaces, this._elementType, this._valueHandler, this._typeHandler, this._asStatic);
     }
 
@@ -97,27 +98,28 @@ public class CollectionLikeType extends TypeBase {
         return this._elementType.getTypeHandler();
     }
 
-    public StringBuilder getErasedSignature(StringBuilder stringBuilder) {
-        return TypeBase._classSignature(this._class, stringBuilder, true);
+    public StringBuilder getErasedSignature(StringBuilder sb) {
+        return _classSignature(this._class, sb, true);
     }
 
-    public StringBuilder getGenericSignature(StringBuilder stringBuilder) {
-        TypeBase._classSignature(this._class, stringBuilder, false);
-        stringBuilder.append('<');
-        this._elementType.getGenericSignature(stringBuilder);
-        stringBuilder.append(">;");
-        return stringBuilder;
+    public StringBuilder getGenericSignature(StringBuilder sb) {
+        _classSignature(this._class, sb, false);
+        sb.append('<');
+        this._elementType.getGenericSignature(sb);
+        sb.append(">;");
+        return sb;
     }
 
-    protected String buildCanonicalName() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this._class.getName());
+    /* access modifiers changed from: protected */
+    public String buildCanonicalName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this._class.getName());
         if (this._elementType != null) {
-            stringBuilder.append('<');
-            stringBuilder.append(this._elementType.toCanonical());
-            stringBuilder.append('>');
+            sb.append('<');
+            sb.append(this._elementType.toCanonical());
+            sb.append('>');
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public boolean isTrueCollectionType() {
@@ -135,10 +137,10 @@ public class CollectionLikeType extends TypeBase {
             return false;
         }
         CollectionLikeType collectionLikeType = (CollectionLikeType) obj;
-        if (this._class == collectionLikeType._class && this._elementType.equals(collectionLikeType._elementType)) {
-            return true;
+        if (this._class != collectionLikeType._class || !this._elementType.equals(collectionLikeType._elementType)) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public String toString() {

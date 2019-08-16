@@ -12,11 +12,11 @@ import java.lang.reflect.Type;
 
 public abstract class StdScalarSerializer<T> extends StdSerializer<T> {
     protected StdScalarSerializer(Class<T> cls) {
-        super((Class) cls);
+        super(cls);
     }
 
     protected StdScalarSerializer(Class<?> cls, boolean z) {
-        super((Class) cls);
+        super(cls);
     }
 
     public void serializeWithType(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {

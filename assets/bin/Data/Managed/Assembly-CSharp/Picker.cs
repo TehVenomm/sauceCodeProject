@@ -35,7 +35,7 @@ public class Picker : GameSection
 
 	public override void UpdateUI()
 	{
-		SetGrid(UI.GRD_PICKER, "PickerItem", desc.text.Length, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_PICKER, "PickerItem", desc.text.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetLabelText(t, UI.LBL_PICKER, desc.text[i]);
 		});
@@ -45,7 +45,7 @@ public class Picker : GameSection
 			component.set_enabled(desc.enableLoop);
 		}
 		SetCenterOnChildFunc((Enum)UI.GRD_PICKER, (UICenterOnChild.OnCenterCallback)OnCenter);
-		SetCenter((Enum)UI.GRD_PICKER, selectIndex, false);
+		SetCenter((Enum)UI.GRD_PICKER, selectIndex, is_instant: false);
 	}
 
 	public void OnCenter(GameObject go)

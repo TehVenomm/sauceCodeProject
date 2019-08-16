@@ -40,12 +40,12 @@ public class ConfigTop : GameSection
 
 	private void OnQuery_STOPPER_ON()
 	{
-		SendStopper(true);
+		SendStopper(enable: true);
 	}
 
 	private void OnQuery_STOPPER_OFF()
 	{
-		SendStopper(false);
+		SendStopper(enable: false);
 	}
 
 	private void SendStopper(bool enable)
@@ -53,7 +53,7 @@ public class ConfigTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendStopper(enable, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 

@@ -6,20 +6,18 @@ public class CharSetUtils {
             return str;
         }
         CharSet instance = CharSet.getInstance(strArr);
-        StringBuilder stringBuilder = new StringBuilder(str.length());
-        char[] toCharArray = str.toCharArray();
-        int length = toCharArray.length;
-        int i = 0;
+        StringBuilder sb = new StringBuilder(str.length());
+        char[] charArray = str.toCharArray();
+        int length = charArray.length;
         char c = ' ';
-        while (i < length) {
-            char c2 = toCharArray[i];
+        for (int i = 0; i < length; i++) {
+            char c2 = charArray[i];
             if (c2 != c || i == 0 || !instance.contains(c2)) {
-                stringBuilder.append(c2);
+                sb.append(c2);
                 c = c2;
             }
-            i++;
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static boolean containsAny(String str, String... strArr) {
@@ -36,13 +34,14 @@ public class CharSetUtils {
     }
 
     public static int count(String str, String... strArr) {
+        if (StringUtils.isEmpty(str) || deepEmpty(strArr)) {
+            return 0;
+        }
+        CharSet instance = CharSet.getInstance(strArr);
         int i = 0;
-        if (!(StringUtils.isEmpty(str) || deepEmpty(strArr))) {
-            CharSet instance = CharSet.getInstance(strArr);
-            for (char contains : str.toCharArray()) {
-                if (instance.contains(contains)) {
-                    i++;
-                }
+        for (char contains : str.toCharArray()) {
+            if (instance.contains(contains)) {
+                i++;
             }
         }
         return i;
@@ -64,20 +63,20 @@ public class CharSetUtils {
 
     private static String modify(String str, String[] strArr, boolean z) {
         CharSet instance = CharSet.getInstance(strArr);
-        StringBuilder stringBuilder = new StringBuilder(str.length());
-        char[] toCharArray = str.toCharArray();
-        int length = toCharArray.length;
+        StringBuilder sb = new StringBuilder(str.length());
+        char[] charArray = str.toCharArray();
+        int length = charArray.length;
         for (int i = 0; i < length; i++) {
-            if (instance.contains(toCharArray[i]) == z) {
-                stringBuilder.append(toCharArray[i]);
+            if (instance.contains(charArray[i]) == z) {
+                sb.append(charArray[i]);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private static boolean deepEmpty(String[] strArr) {
         if (strArr != null) {
-            for (CharSequence isNotEmpty : strArr) {
+            for (String isNotEmpty : strArr) {
                 if (StringUtils.isNotEmpty(isNotEmpty)) {
                     return false;
                 }

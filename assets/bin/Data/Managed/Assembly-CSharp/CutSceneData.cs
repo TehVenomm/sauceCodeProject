@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CutSceneData
+public class CutSceneData : ScriptableObject
 {
 	public enum ATTACHMENT_TYPE
 	{
@@ -91,10 +91,6 @@ public class CutSceneData
 		public string nodeName;
 	}
 
-	public const int NOT_REQUEST_BGM = 0;
-
-	public const int NOT_REQUEST_STORY = 0;
-
 	public PlayerData[] playerData;
 
 	public EnemyData enemyData;
@@ -107,9 +103,13 @@ public class CutSceneData
 
 	public List<EffectKeyData> effectKeyData = new List<EffectKeyData>();
 
+	public const int NOT_REQUEST_BGM = 0;
+
 	public int bgm;
 
 	public string mixerName;
+
+	public const int NOT_REQUEST_STORY = 0;
 
 	public int storyId;
 

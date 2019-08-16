@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class EquipModelHQTable
+public class EquipModelHQTable : ScriptableObject
 {
 	[Serializable]
 	public class Data

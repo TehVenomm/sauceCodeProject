@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VorgonPreEventController
+public class VorgonPreEventController : MonoBehaviour
 {
-	private const int ENERGY_BALL_INDEX = 14;
-
 	public static readonly int[] NPC_ID_LIST = new int[3]
 	{
 		991,
@@ -19,6 +17,8 @@ public class VorgonPreEventController
 		10240000,
 		10000000
 	};
+
+	private const int ENERGY_BALL_INDEX = 14;
 
 	private Enemy enemy;
 
@@ -45,7 +45,7 @@ public class VorgonPreEventController
 			{
 				enemy = MonoBehaviourSingleton<StageObjectManager>.I.boss;
 			}
-			yield return (object)null;
+			yield return null;
 		}
 		if (MonoBehaviourSingleton<QuestManager>.IsValid())
 		{
@@ -53,12 +53,12 @@ public class VorgonPreEventController
 		}
 		while (!MonoBehaviourSingleton<InGameProgress>.I.isBattleStart)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (questType == QuestManager.VorgonQuetType.BATTLE_WITH_VORGON)
 		{
-			EnemyBrain brain = enemy.GetComponentInChildren<EnemyBrain>();
-			brain.actionCtrl.actions[14].isForceDisable = true;
+			EnemyBrain componentInChildren = enemy.GetComponentInChildren<EnemyBrain>();
+			componentInChildren.actionCtrl.actions[14].isForceDisable = true;
 		}
 	}
 
@@ -66,15 +66,13 @@ public class VorgonPreEventController
 	{
 		if ((float)enemy.hp / (float)enemy.hpMax <= 0.33f)
 		{
-			MonoBehaviourSingleton<InGameProgress>.I.BattleComplete(false);
+			MonoBehaviourSingleton<InGameProgress>.I.BattleComplete();
 			finish = true;
 		}
 	}
 
 	private void UpdateVorgonBattle()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (!npcStartedTalking)
 		{
 			npcStartedTalking = true;
@@ -155,24 +153,25 @@ public class VorgonPreEventController
 		}
 		yield return (object)new WaitForSeconds(5f);
 		hound_A.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_13"));
-		yield return (object)null;
+		yield return null;
 	}
 
 	private void UpdateNPC()
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			List<StageObject> nonplayerList = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList;
-			for (int i = 0; i < nonplayerList.Count; i++)
+			return;
+		}
+		List<StageObject> nonplayerList = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList;
+		for (int i = 0; i < nonplayerList.Count; i++)
+		{
+			Player player = nonplayerList[i] as Player;
+			if (!(player == null))
 			{
-				Player player = nonplayerList[i] as Player;
-				if (!(player == null))
+				int num = (int)((float)player.hpMax * 0.8f);
+				if (player.hp < num)
 				{
-					int num = (int)((float)player.hpMax * 0.8f);
-					if (player.hp < num)
-					{
-						player.hp = num;
-					}
+					player.hp = num;
 				}
 			}
 		}

@@ -34,8 +34,6 @@ namespace gogame
 
 		private const string NaN = "\"NaN\"";
 
-		private const float maxFrameTime = 0.008f;
-
 		public static readonly char[] WHITESPACE = new char[6]
 		{
 			' ',
@@ -61,6 +59,8 @@ namespace gogame
 		public long i;
 
 		public bool b;
+
+		private const float maxFrameTime = 0.008f;
 
 		private static readonly Stopwatch printWatch = new Stopwatch();
 
@@ -161,7 +161,7 @@ namespace gogame
 			type = Type.NUMBER;
 			this.i = i;
 			useInt = true;
-			n = (float)i;
+			n = i;
 		}
 
 		public JSONObject(long l)
@@ -169,7 +169,7 @@ namespace gogame
 			type = Type.NUMBER;
 			i = l;
 			useInt = true;
-			n = (float)l;
+			n = l;
 		}
 
 		public JSONObject(Dictionary<string, string> dic)
@@ -214,11 +214,6 @@ namespace gogame
 		public JSONObject(string str, int maxDepth = -2, bool storeExcessLevels = false, bool strict = false)
 		{
 			Parse(str, maxDepth, storeExcessLevels, strict);
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
 		}
 
 		public static JSONObject StringObject(string val)
@@ -280,7 +275,7 @@ namespace gogame
 		{
 			JSONObject jSONObject = Create();
 			jSONObject.type = Type.NUMBER;
-			jSONObject.n = (float)val;
+			jSONObject.n = val;
 			jSONObject.useInt = true;
 			jSONObject.i = val;
 			return jSONObject;
@@ -290,7 +285,7 @@ namespace gogame
 		{
 			JSONObject jSONObject = Create();
 			jSONObject.type = Type.NUMBER;
-			jSONObject.n = (float)val;
+			jSONObject.n = val;
 			jSONObject.useInt = true;
 			jSONObject.i = val;
 			return jSONObject;
@@ -352,146 +347,151 @@ namespace gogame
 				}
 				else if (str.Length > 0)
 				{
-					if (string.Compare(str, "true", true) == 0)
+					if (string.Compare(str, "true", ignoreCase: true) == 0)
 					{
 						type = Type.BOOL;
 						b = true;
+						return;
 					}
-					else if (string.Compare(str, "false", true) == 0)
+					if (string.Compare(str, "false", ignoreCase: true) == 0)
 					{
 						type = Type.BOOL;
 						b = false;
+						return;
 					}
-					else if (string.Compare(str, "null", true) == 0)
+					if (string.Compare(str, "null", ignoreCase: true) == 0)
 					{
 						type = Type.NULL;
+						return;
 					}
-					else if (str == "\"INFINITY\"")
+					if (str == "\"INFINITY\"")
 					{
 						type = Type.NUMBER;
 						n = float.PositiveInfinity;
+						return;
 					}
-					else if (str == "\"NEGINFINITY\"")
+					if (str == "\"NEGINFINITY\"")
 					{
 						type = Type.NUMBER;
 						n = float.NegativeInfinity;
+						return;
 					}
-					else if (str == "\"NaN\"")
+					if (str == "\"NaN\"")
 					{
 						type = Type.NUMBER;
 						n = float.NaN;
+						return;
 					}
-					else if (str[0] == '"')
+					if (str[0] == '"')
 					{
 						type = Type.STRING;
 						this.str = str.Substring(1, str.Length - 2);
+						return;
 					}
-					else
+					int num = 1;
+					int num2 = 0;
+					switch (str[num2])
 					{
-						int num = 1;
-						int num2 = 0;
-						switch (str[num2])
+					case '{':
+						type = Type.OBJECT;
+						keys = new List<string>();
+						list = new List<JSONObject>();
+						break;
+					case '[':
+						type = Type.ARRAY;
+						list = new List<JSONObject>();
+						break;
+					default:
+						try
 						{
-						case '{':
-							type = Type.OBJECT;
-							keys = new List<string>();
-							list = new List<JSONObject>();
-							break;
-						case '[':
-							type = Type.ARRAY;
-							list = new List<JSONObject>();
-							break;
-						default:
-							try
+							n = Convert.ToSingle(str);
+							if (!str.Contains("."))
 							{
-								n = Convert.ToSingle(str);
-								if (!str.Contains("."))
-								{
-									i = Convert.ToInt64(str);
-									useInt = true;
-								}
-								type = Type.NUMBER;
+								i = Convert.ToInt64(str);
+								useInt = true;
 							}
-							catch (FormatException)
-							{
-								type = Type.NULL;
-								Debug.LogWarning((object)("improper JSON formatting:" + str));
-							}
-							return;
+							type = Type.NUMBER;
 						}
-						string item = string.Empty;
-						bool flag = false;
-						bool flag2 = false;
-						int num3 = 0;
-						while (++num2 < str.Length)
+						catch (FormatException)
 						{
-							if (Array.IndexOf(WHITESPACE, str[num2]) <= -1)
+							type = Type.NULL;
+							Debug.LogWarning((object)("improper JSON formatting:" + str));
+						}
+						return;
+					}
+					string item = string.Empty;
+					bool flag = false;
+					bool flag2 = false;
+					int num3 = 0;
+					while (++num2 < str.Length)
+					{
+						if (Array.IndexOf(WHITESPACE, str[num2]) > -1)
+						{
+							continue;
+						}
+						if (str[num2] == '\\')
+						{
+							num2++;
+							continue;
+						}
+						if (str[num2] == '"')
+						{
+							if (flag)
 							{
-								if (str[num2] == '\\')
+								if (!flag2 && num3 == 0 && type == Type.OBJECT)
 								{
-									num2++;
+									item = str.Substring(num + 1, num2 - num - 1);
 								}
-								else
+								flag = false;
+							}
+							else
+							{
+								if (num3 == 0 && type == Type.OBJECT)
 								{
-									if (str[num2] == '"')
-									{
-										if (flag)
-										{
-											if (!flag2 && num3 == 0 && type == Type.OBJECT)
-											{
-												item = str.Substring(num + 1, num2 - num - 1);
-											}
-											flag = false;
-										}
-										else
-										{
-											if (num3 == 0 && type == Type.OBJECT)
-											{
-												num = num2;
-											}
-											flag = true;
-										}
-									}
-									if (!flag)
-									{
-										if (type == Type.OBJECT && num3 == 0 && str[num2] == ':')
-										{
-											num = num2 + 1;
-											flag2 = true;
-										}
-										if (str[num2] == '[' || str[num2] == '{')
-										{
-											num3++;
-										}
-										else if (str[num2] == ']' || str[num2] == '}')
-										{
-											num3--;
-										}
-										if ((str[num2] == ',' && num3 == 0) || num3 < 0)
-										{
-											flag2 = false;
-											string text = str.Substring(num, num2 - num).Trim(WHITESPACE);
-											if (text.Length > 0)
-											{
-												if (type == Type.OBJECT)
-												{
-													keys.Add(item);
-												}
-												if (maxDepth != -1)
-												{
-													list.Add(Create(text, (maxDepth >= -1) ? (maxDepth - 1) : (-2), storeExcessLevels, false));
-												}
-												else if (storeExcessLevels)
-												{
-													list.Add(CreateBakedObject(text));
-												}
-											}
-											num = num2 + 1;
-										}
-									}
+									num = num2;
 								}
+								flag = true;
 							}
 						}
+						if (flag)
+						{
+							continue;
+						}
+						if (type == Type.OBJECT && num3 == 0 && str[num2] == ':')
+						{
+							num = num2 + 1;
+							flag2 = true;
+						}
+						if (str[num2] == '[' || str[num2] == '{')
+						{
+							num3++;
+						}
+						else if (str[num2] == ']' || str[num2] == '}')
+						{
+							num3--;
+						}
+						if ((str[num2] != ',' || num3 != 0) && num3 >= 0)
+						{
+							continue;
+						}
+						flag2 = false;
+						string text = str.Substring(num, num2 - num).Trim(WHITESPACE);
+						if (text.Length > 0)
+						{
+							if (type == Type.OBJECT)
+							{
+								keys.Add(item);
+							}
+							if (maxDepth != -1)
+							{
+								list.Add(Create(text, (maxDepth >= -1) ? (maxDepth - 1) : (-2), storeExcessLevels));
+							}
+							else if (storeExcessLevels)
+							{
+								list.Add(CreateBakedObject(text));
+							}
+						}
+						num = num2 + 1;
 					}
 				}
 				else
@@ -532,18 +532,19 @@ namespace gogame
 
 		public void Add(JSONObject obj)
 		{
-			if ((bool)obj)
+			if (!(bool)obj)
 			{
-				if (type != Type.ARRAY)
-				{
-					type = Type.ARRAY;
-					if (list == null)
-					{
-						list = new List<JSONObject>();
-					}
-				}
-				list.Add(obj);
+				return;
 			}
+			if (type != Type.ARRAY)
+			{
+				type = Type.ARRAY;
+				if (list == null)
+				{
+					list = new List<JSONObject>();
+				}
+			}
+			list.Add(obj);
 		}
 
 		public void AddField(string name, bool val)
@@ -578,30 +579,31 @@ namespace gogame
 
 		public void AddField(string name, JSONObject obj)
 		{
-			if ((bool)obj)
+			if (!(bool)obj)
 			{
-				if (type != Type.OBJECT)
-				{
-					if (keys == null)
-					{
-						keys = new List<string>();
-					}
-					if (type == Type.ARRAY)
-					{
-						for (int i = 0; i < list.Count; i++)
-						{
-							keys.Add(i + string.Empty);
-						}
-					}
-					else if (list == null)
-					{
-						list = new List<JSONObject>();
-					}
-					type = Type.OBJECT;
-				}
-				keys.Add(name);
-				list.Add(obj);
+				return;
 			}
+			if (type != Type.OBJECT)
+			{
+				if (keys == null)
+				{
+					keys = new List<string>();
+				}
+				if (type == Type.ARRAY)
+				{
+					for (int i = 0; i < list.Count; i++)
+					{
+						keys.Add(i + string.Empty);
+					}
+				}
+				else if (list == null)
+				{
+					list = new List<JSONObject>();
+				}
+				type = Type.OBJECT;
+			}
+			keys.Add(name);
+			list.Add(obj);
 		}
 
 		public void SetField(string name, string val)
@@ -646,7 +648,7 @@ namespace gogame
 		public bool GetField(out bool field, string name, bool fallback)
 		{
 			field = fallback;
-			return GetField(ref field, name, null);
+			return GetField(ref field, name);
 		}
 
 		public bool GetField(ref bool field, string name, FieldNotFound fail = null)
@@ -667,7 +669,7 @@ namespace gogame
 		public bool GetField(out float field, string name, float fallback)
 		{
 			field = fallback;
-			return GetField(ref field, name, null);
+			return GetField(ref field, name);
 		}
 
 		public bool GetField(ref float field, string name, FieldNotFound fail = null)
@@ -688,7 +690,7 @@ namespace gogame
 		public bool GetField(out int field, string name, int fallback)
 		{
 			field = fallback;
-			return GetField(ref field, name, null);
+			return GetField(ref field, name);
 		}
 
 		public bool GetField(ref int field, string name, FieldNotFound fail = null)
@@ -709,7 +711,7 @@ namespace gogame
 		public bool GetField(out long field, string name, long fallback)
 		{
 			field = fallback;
-			return GetField(ref field, name, null);
+			return GetField(ref field, name);
 		}
 
 		public bool GetField(ref long field, string name, FieldNotFound fail = null)
@@ -730,7 +732,7 @@ namespace gogame
 		public bool GetField(out uint field, string name, uint fallback)
 		{
 			field = fallback;
-			return GetField(ref field, name, null);
+			return GetField(ref field, name);
 		}
 
 		public bool GetField(ref uint field, string name, FieldNotFound fail = null)
@@ -751,7 +753,7 @@ namespace gogame
 		public bool GetField(out string field, string name, string fallback)
 		{
 			field = fallback;
-			return GetField(ref field, name, null);
+			return GetField(ref field, name);
 		}
 
 		public bool GetField(ref string field, string name, FieldNotFound fail = null)
@@ -848,7 +850,7 @@ namespace gogame
 
 		public JSONObject Copy()
 		{
-			return Create(Print(false), -2, false, false);
+			return Create(Print());
 		}
 
 		public void Merge(JSONObject obj)
@@ -888,26 +890,28 @@ namespace gogame
 					}
 				}
 			}
-			else if (left.type == Type.ARRAY && right.type == Type.ARRAY)
+			else
 			{
+				if (left.type != Type.ARRAY || right.type != Type.ARRAY)
+				{
+					return;
+				}
 				if (right.Count > left.Count)
 				{
 					Debug.LogError((object)"Cannot merge arrays when right object has more elements");
+					return;
 				}
-				else
+				for (int j = 0; j < right.list.Count; j++)
 				{
-					for (int j = 0; j < right.list.Count; j++)
+					if (left[j].type == right[j].type)
 					{
-						if (left[j].type == right[j].type)
+						if (left[j].isContainer)
 						{
-							if (left[j].isContainer)
-							{
-								MergeRecur(left[j], right[j]);
-							}
-							else
-							{
-								left[j] = right[j];
-							}
+							MergeRecur(left[j], right[j]);
+						}
+						else
+						{
+							left[j] = right[j];
 						}
 					}
 				}
@@ -918,7 +922,7 @@ namespace gogame
 		{
 			if (type != Type.BAKED)
 			{
-				str = Print(false);
+				str = Print();
 				type = Type.BAKED;
 			}
 		}
@@ -927,15 +931,15 @@ namespace gogame
 		{
 			if (type != Type.BAKED)
 			{
-				foreach (string item in PrintAsync(false))
+				foreach (string s in PrintAsync())
 				{
-					if (item == null)
+					if (s == null)
 					{
-						yield return (object)item;
+						yield return s;
 					}
 					else
 					{
-						str = item;
+						str = s;
 					}
 				}
 				type = Type.BAKED;
@@ -954,10 +958,23 @@ namespace gogame
 			StringBuilder builder = new StringBuilder();
 			printWatch.Reset();
 			printWatch.Start();
-			foreach (IEnumerable item in StringifyAsync(0, builder, pretty))
+			IEnumerator enumerator = StringifyAsync(0, builder, pretty).GetEnumerator();
+			try
 			{
-				IEnumerable enumerable = item;
-				yield return (string)null;
+				while (enumerator.MoveNext())
+				{
+					IEnumerable enumerable = (IEnumerable)enumerator.Current;
+					yield return null;
+				}
+			}
+			finally
+			{
+				IDisposable disposable;
+				IDisposable disposable2 = disposable = (enumerator as IDisposable);
+				if (disposable != null)
+				{
+					disposable2.Dispose();
+				}
 			}
 			yield return builder.ToString();
 		}
@@ -969,316 +986,364 @@ namespace gogame
 			if (num > 100)
 			{
 				Debug.Log((object)"reached max depth!");
+				yield break;
 			}
-			else
+			if (printWatch.Elapsed.TotalSeconds > 0.00800000037997961)
 			{
-				if (printWatch.Elapsed.TotalSeconds > 0.00800000037997961)
+				printWatch.Reset();
+				yield return null;
+				printWatch.Start();
+			}
+			switch (type)
+			{
+			case Type.BAKED:
+				builder.Append(str);
+				break;
+			case Type.STRING:
+				builder.AppendFormat("\"{0}\"", str);
+				break;
+			case Type.NUMBER:
+				if (useInt)
 				{
-					printWatch.Reset();
-					yield return (object)null;
-					printWatch.Start();
+					builder.Append(this.i.ToString());
 				}
-				switch (type)
+				else if (float.IsInfinity(this.n))
 				{
-				case Type.BAKED:
-					builder.Append(str);
-					break;
-				case Type.STRING:
-					builder.AppendFormat("\"{0}\"", str);
-					break;
-				case Type.NUMBER:
-					if (useInt)
+					builder.Append("\"INFINITY\"");
+				}
+				else if (float.IsNegativeInfinity(this.n))
+				{
+					builder.Append("\"NEGINFINITY\"");
+				}
+				else if (float.IsNaN(this.n))
+				{
+					builder.Append("\"NaN\"");
+				}
+				else
+				{
+					builder.Append(this.n.ToString());
+				}
+				break;
+			case Type.OBJECT:
+				builder.Append("{");
+				if (list.Count > 0)
+				{
+					if (pretty)
 					{
-						builder.Append(this.i.ToString());
+						builder.Append("\n");
 					}
-					else if (float.IsInfinity(this.n))
+					for (int i = 0; i < list.Count; i++)
 					{
-						builder.Append("\"INFINITY\"");
-					}
-					else if (float.IsNegativeInfinity(this.n))
-					{
-						builder.Append("\"NEGINFINITY\"");
-					}
-					else if (float.IsNaN(this.n))
-					{
-						builder.Append("\"NaN\"");
-					}
-					else
-					{
-						builder.Append(this.n.ToString());
-					}
-					break;
-				case Type.OBJECT:
-					builder.Append("{");
-					if (list.Count > 0)
-					{
+						string key = keys[i];
+						JSONObject obj = list[i];
+						if (!(bool)obj)
+						{
+							continue;
+						}
+						if (pretty)
+						{
+							for (int k = 0; k < depth; k++)
+							{
+								builder.Append("\t");
+							}
+						}
+						builder.AppendFormat("\"{0}\":", key);
+						IEnumerator enumerator = obj.StringifyAsync(depth, builder, pretty).GetEnumerator();
+						try
+						{
+							while (enumerator.MoveNext())
+							{
+								yield return (IEnumerable)enumerator.Current;
+							}
+						}
+						finally
+						{
+							IDisposable disposable;
+							IDisposable disposable2 = disposable = (enumerator as IDisposable);
+							if (disposable != null)
+							{
+								disposable2.Dispose();
+							}
+						}
+						builder.Append(",");
 						if (pretty)
 						{
 							builder.Append("\n");
 						}
-						for (int m = 0; m < list.Count; m++)
+					}
+					if (pretty)
+					{
+						builder.Length -= 2;
+					}
+					else
+					{
+						builder.Length--;
+					}
+				}
+				if (pretty && list.Count > 0)
+				{
+					builder.Append("\n");
+					for (int l = 0; l < depth - 1; l++)
+					{
+						builder.Append("\t");
+					}
+				}
+				builder.Append("}");
+				break;
+			case Type.ARRAY:
+				builder.Append("[");
+				if (list.Count > 0)
+				{
+					if (pretty)
+					{
+						builder.Append("\n");
+					}
+					for (int j = 0; j < list.Count; j++)
+					{
+						if (!(bool)list[j])
 						{
-							string key = keys[m];
-							JSONObject obj = list[m];
-							if ((bool)obj)
-							{
-								if (pretty)
-								{
-									for (int k = 0; k < depth; k++)
-									{
-										builder.Append("\t");
-									}
-								}
-								builder.AppendFormat("\"{0}\":", key);
-								foreach (IEnumerable item in obj.StringifyAsync(depth, builder, pretty))
-								{
-									yield return (object)item;
-								}
-								builder.Append(",");
-								if (pretty)
-								{
-									builder.Append("\n");
-								}
-							}
+							continue;
 						}
 						if (pretty)
 						{
-							builder.Length -= 2;
+							for (int m = 0; m < depth; m++)
+							{
+								builder.Append("\t");
+							}
 						}
-						else
+						IEnumerator enumerator2 = list[j].StringifyAsync(depth, builder, pretty).GetEnumerator();
+						try
 						{
-							builder.Length--;
+							while (enumerator2.MoveNext())
+							{
+								yield return (IEnumerable)enumerator2.Current;
+							}
 						}
-					}
-					if (pretty && list.Count > 0)
-					{
-						builder.Append("\n");
-						for (int i = 0; i < depth - 1; i++)
+						finally
 						{
-							builder.Append("\t");
+							IDisposable disposable;
+							IDisposable disposable3 = disposable = (enumerator2 as IDisposable);
+							if (disposable != null)
+							{
+								disposable3.Dispose();
+							}
 						}
-					}
-					builder.Append("}");
-					break;
-				case Type.ARRAY:
-					builder.Append("[");
-					if (list.Count > 0)
-					{
+						builder.Append(",");
 						if (pretty)
 						{
 							builder.Append("\n");
 						}
-						for (int j = 0; j < list.Count; j++)
-						{
-							if ((bool)list[j])
-							{
-								if (pretty)
-								{
-									for (int l = 0; l < depth; l++)
-									{
-										builder.Append("\t");
-									}
-								}
-								foreach (IEnumerable item2 in list[j].StringifyAsync(depth, builder, pretty))
-								{
-									yield return (object)item2;
-								}
-								builder.Append(",");
-								if (pretty)
-								{
-									builder.Append("\n");
-								}
-							}
-						}
-						if (pretty)
-						{
-							builder.Length -= 2;
-						}
-						else
-						{
-							builder.Length--;
-						}
 					}
-					if (pretty && list.Count > 0)
+					if (pretty)
 					{
-						builder.Append("\n");
-						for (int n = 0; n < depth - 1; n++)
-						{
-							builder.Append("\t");
-						}
-					}
-					builder.Append("]");
-					break;
-				case Type.BOOL:
-					if (b)
-					{
-						builder.Append("true");
+						builder.Length -= 2;
 					}
 					else
 					{
-						builder.Append("false");
+						builder.Length--;
 					}
-					break;
-				case Type.NULL:
-					builder.Append("null");
-					break;
 				}
+				if (pretty && list.Count > 0)
+				{
+					builder.Append("\n");
+					for (int n = 0; n < depth - 1; n++)
+					{
+						builder.Append("\t");
+					}
+				}
+				builder.Append("]");
+				break;
+			case Type.BOOL:
+				if (b)
+				{
+					builder.Append("true");
+				}
+				else
+				{
+					builder.Append("false");
+				}
+				break;
+			case Type.NULL:
+				builder.Append("null");
+				break;
 			}
 		}
 
 		private void Stringify(int depth, StringBuilder builder, bool pretty = false)
 		{
-			if (depth++ <= 100)
-			{
-				switch (type)
-				{
-				case Type.BAKED:
-					builder.Append(str);
-					break;
-				case Type.STRING:
-					builder.AppendFormat("\"{0}\"", str);
-					break;
-				case Type.NUMBER:
-					if (useInt)
-					{
-						builder.Append(this.i.ToString());
-					}
-					else if (float.IsInfinity(this.n))
-					{
-						builder.Append("\"INFINITY\"");
-					}
-					else if (float.IsNegativeInfinity(this.n))
-					{
-						builder.Append("\"NEGINFINITY\"");
-					}
-					else if (float.IsNaN(this.n))
-					{
-						builder.Append("\"NaN\"");
-					}
-					else
-					{
-						builder.Append(this.n.ToString());
-					}
-					break;
-				case Type.OBJECT:
-					builder.Append("{");
-					if (list.Count > 0)
-					{
-						if (pretty)
-						{
-							builder.Append("\n");
-						}
-						for (int i = 0; i < list.Count; i++)
-						{
-							string arg = keys[i];
-							JSONObject jSONObject = list[i];
-							if ((bool)jSONObject)
-							{
-								if (pretty)
-								{
-									for (int j = 0; j < depth; j++)
-									{
-										builder.Append("\t");
-									}
-								}
-								builder.AppendFormat("\"{0}\":", arg);
-								jSONObject.Stringify(depth, builder, pretty);
-								builder.Append(",");
-								if (pretty)
-								{
-									builder.Append("\n");
-								}
-							}
-						}
-						if (pretty)
-						{
-							builder.Length -= 2;
-						}
-						else
-						{
-							builder.Length--;
-						}
-					}
-					if (pretty && list.Count > 0)
-					{
-						builder.Append("\n");
-						for (int k = 0; k < depth - 1; k++)
-						{
-							builder.Append("\t");
-						}
-					}
-					builder.Append("}");
-					break;
-				case Type.ARRAY:
-					builder.Append("[");
-					if (list.Count > 0)
-					{
-						if (pretty)
-						{
-							builder.Append("\n");
-						}
-						for (int l = 0; l < list.Count; l++)
-						{
-							if ((bool)list[l])
-							{
-								if (pretty)
-								{
-									for (int m = 0; m < depth; m++)
-									{
-										builder.Append("\t");
-									}
-								}
-								list[l].Stringify(depth, builder, pretty);
-								builder.Append(",");
-								if (pretty)
-								{
-									builder.Append("\n");
-								}
-							}
-						}
-						if (pretty)
-						{
-							builder.Length -= 2;
-						}
-						else
-						{
-							builder.Length--;
-						}
-					}
-					if (pretty && list.Count > 0)
-					{
-						builder.Append("\n");
-						for (int n = 0; n < depth - 1; n++)
-						{
-							builder.Append("\t");
-						}
-					}
-					builder.Append("]");
-					break;
-				case Type.BOOL:
-					if (b)
-					{
-						builder.Append("true");
-					}
-					else
-					{
-						builder.Append("false");
-					}
-					break;
-				case Type.NULL:
-					builder.Append("null");
-					break;
-				}
-			}
-			else
+			if (depth++ > 100)
 			{
 				Debug.Log((object)"reached max depth!");
+				return;
 			}
+			switch (type)
+			{
+			case Type.BAKED:
+				builder.Append(str);
+				break;
+			case Type.STRING:
+				builder.AppendFormat("\"{0}\"", str);
+				break;
+			case Type.NUMBER:
+				if (useInt)
+				{
+					builder.Append(this.i.ToString());
+				}
+				else if (float.IsInfinity(this.n))
+				{
+					builder.Append("\"INFINITY\"");
+				}
+				else if (float.IsNegativeInfinity(this.n))
+				{
+					builder.Append("\"NEGINFINITY\"");
+				}
+				else if (float.IsNaN(this.n))
+				{
+					builder.Append("\"NaN\"");
+				}
+				else
+				{
+					builder.Append(this.n.ToString());
+				}
+				break;
+			case Type.OBJECT:
+				builder.Append("{");
+				if (list.Count > 0)
+				{
+					if (pretty)
+					{
+						builder.Append("\n");
+					}
+					for (int i = 0; i < list.Count; i++)
+					{
+						string arg = keys[i];
+						JSONObject jSONObject = list[i];
+						if (!(bool)jSONObject)
+						{
+							continue;
+						}
+						if (pretty)
+						{
+							for (int j = 0; j < depth; j++)
+							{
+								builder.Append("\t");
+							}
+						}
+						builder.AppendFormat("\"{0}\":", arg);
+						jSONObject.Stringify(depth, builder, pretty);
+						builder.Append(",");
+						if (pretty)
+						{
+							builder.Append("\n");
+						}
+					}
+					if (pretty)
+					{
+						builder.Length -= 2;
+					}
+					else
+					{
+						builder.Length--;
+					}
+				}
+				if (pretty && list.Count > 0)
+				{
+					builder.Append("\n");
+					for (int k = 0; k < depth - 1; k++)
+					{
+						builder.Append("\t");
+					}
+				}
+				builder.Append("}");
+				break;
+			case Type.ARRAY:
+				builder.Append("[");
+				if (list.Count > 0)
+				{
+					if (pretty)
+					{
+						builder.Append("\n");
+					}
+					for (int l = 0; l < list.Count; l++)
+					{
+						if (!(bool)list[l])
+						{
+							continue;
+						}
+						if (pretty)
+						{
+							for (int m = 0; m < depth; m++)
+							{
+								builder.Append("\t");
+							}
+						}
+						list[l].Stringify(depth, builder, pretty);
+						builder.Append(",");
+						if (pretty)
+						{
+							builder.Append("\n");
+						}
+					}
+					if (pretty)
+					{
+						builder.Length -= 2;
+					}
+					else
+					{
+						builder.Length--;
+					}
+				}
+				if (pretty && list.Count > 0)
+				{
+					builder.Append("\n");
+					for (int n = 0; n < depth - 1; n++)
+					{
+						builder.Append("\t");
+					}
+				}
+				builder.Append("]");
+				break;
+			case Type.BOOL:
+				if (b)
+				{
+					builder.Append("true");
+				}
+				else
+				{
+					builder.Append("false");
+				}
+				break;
+			case Type.NULL:
+				builder.Append("null");
+				break;
+			}
+		}
+
+		public static implicit operator WWWForm(JSONObject obj)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Expected O, but got Unknown
+			WWWForm val = new WWWForm();
+			for (int i = 0; i < obj.list.Count; i++)
+			{
+				string text = i + string.Empty;
+				if (obj.type == Type.OBJECT)
+				{
+					text = obj.keys[i];
+				}
+				string text2 = obj.list[i].ToString();
+				if (obj.list[i].type == Type.STRING)
+				{
+					text2 = text2.Replace("\"", string.Empty);
+				}
+				val.AddField(text, text2);
+			}
+			return val;
 		}
 
 		public override string ToString()
 		{
-			return Print(false);
+			return Print();
 		}
 
 		public string ToString(bool pretty)
@@ -1316,36 +1381,19 @@ namespace gogame
 			return null;
 		}
 
-		public JSONObjectEnumer GetEnumerator()
-		{
-			return new JSONObjectEnumer(this);
-		}
-
-		public static implicit operator WWWForm(JSONObject obj)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Expected O, but got Unknown
-			WWWForm val = new WWWForm();
-			for (int i = 0; i < obj.list.Count; i++)
-			{
-				string text = i + string.Empty;
-				if (obj.type == Type.OBJECT)
-				{
-					text = obj.keys[i];
-				}
-				string text2 = obj.list[i].ToString();
-				if (obj.list[i].type == Type.STRING)
-				{
-					text2 = text2.Replace("\"", string.Empty);
-				}
-				val.AddField(text, text2);
-			}
-			return val;
-		}
-
 		public static implicit operator bool(JSONObject o)
 		{
 			return o != null;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		public JSONObjectEnumer GetEnumerator()
+		{
+			return new JSONObjectEnumer(this);
 		}
 	}
 }

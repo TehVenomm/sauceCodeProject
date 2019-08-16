@@ -7,6 +7,7 @@ import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.Status;
 import java.util.List;
 
+@Deprecated
 public interface Connections {
     @Deprecated
     public static final long DURATION_INDEFINITE = 0;
@@ -15,10 +16,6 @@ public interface Connections {
     public static final int MAX_RELIABLE_MESSAGE_LEN = 4096;
     @Deprecated
     public static final int MAX_UNRELIABLE_MESSAGE_LEN = 1168;
-
-    public interface StartAdvertisingResult extends Result {
-        String getLocalEndpointName();
-    }
 
     @Deprecated
     public static class ConnectionRequestListener {
@@ -48,10 +45,16 @@ public interface Connections {
         void onMessageReceived(String str, byte[] bArr, boolean z);
     }
 
+    public interface StartAdvertisingResult extends Result {
+        String getLocalEndpointName();
+    }
+
     PendingResult<Status> acceptConnection(GoogleApiClient googleApiClient, String str, PayloadCallback payloadCallback);
 
     @Deprecated
     PendingResult<Status> acceptConnectionRequest(GoogleApiClient googleApiClient, String str, byte[] bArr, MessageListener messageListener);
+
+    PendingResult<Status> cancelPayload(GoogleApiClient googleApiClient, long j);
 
     void disconnectFromEndpoint(GoogleApiClient googleApiClient, String str);
 

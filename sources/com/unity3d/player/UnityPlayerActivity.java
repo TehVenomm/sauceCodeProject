@@ -1,6 +1,7 @@
 package com.unity3d.player;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -18,7 +19,8 @@ public class UnityPlayerActivity extends Activity {
         this.mUnityPlayer.configurationChanged(configuration);
     }
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         requestWindowFeature(1);
         super.onCreate(bundle);
         getWindow().setFormat(2);
@@ -27,7 +29,8 @@ public class UnityPlayerActivity extends Activity {
         this.mUnityPlayer.requestFocus();
     }
 
-    protected void onDestroy() {
+    /* access modifiers changed from: protected */
+    public void onDestroy() {
         this.mUnityPlayer.quit();
         super.onDestroy();
     }
@@ -44,18 +47,37 @@ public class UnityPlayerActivity extends Activity {
         return this.mUnityPlayer.injectEvent(keyEvent);
     }
 
-    protected void onPause() {
+    public void onLowMemory() {
+        super.onLowMemory();
+        this.mUnityPlayer.lowMemory();
+    }
+
+    /* access modifiers changed from: protected */
+    public void onNewIntent(Intent intent) {
+        setIntent(intent);
+    }
+
+    /* access modifiers changed from: protected */
+    public void onPause() {
         super.onPause();
         this.mUnityPlayer.pause();
     }
 
-    protected void onResume() {
+    /* access modifiers changed from: protected */
+    public void onResume() {
         super.onResume();
         this.mUnityPlayer.resume();
     }
 
     public boolean onTouchEvent(MotionEvent motionEvent) {
         return this.mUnityPlayer.injectEvent(motionEvent);
+    }
+
+    public void onTrimMemory(int i) {
+        super.onTrimMemory(i);
+        if (i == 15) {
+            this.mUnityPlayer.lowMemory();
+        }
     }
 
     public void onWindowFocusChanged(boolean z) {

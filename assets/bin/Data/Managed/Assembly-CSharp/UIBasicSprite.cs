@@ -40,21 +40,21 @@ public abstract class UIBasicSprite : UIWidget
 	[SerializeField]
 	protected Type mType;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected FillDirection mFillDirection = FillDirection.Radial360;
 
+	[Range(0f, 1f)]
 	[HideInInspector]
 	[SerializeField]
-	[Range(0f, 1f)]
 	protected float mFillAmount = 1f;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected bool mInvert;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected Flip mFlip;
 
 	[NonSerialized]
@@ -348,72 +348,70 @@ public abstract class UIBasicSprite : UIWidget
 		if (val.x == 0f && val.y == 0f && val.z == 0f && val.w == 0f)
 		{
 			SimpleFill(verts, uvs, cols);
+			return;
+		}
+		Color32 drawingColor = this.drawingColor;
+		Vector4 drawingDimensions = this.drawingDimensions;
+		mTempPos[0].x = drawingDimensions.x;
+		mTempPos[0].y = drawingDimensions.y;
+		mTempPos[3].x = drawingDimensions.z;
+		mTempPos[3].y = drawingDimensions.w;
+		if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
+		{
+			mTempPos[1].x = mTempPos[0].x + val.z;
+			mTempPos[2].x = mTempPos[3].x - val.x;
+			mTempUVs[3].x = mOuterUV.get_xMin();
+			mTempUVs[2].x = mInnerUV.get_xMin();
+			mTempUVs[1].x = mInnerUV.get_xMax();
+			mTempUVs[0].x = mOuterUV.get_xMax();
 		}
 		else
 		{
-			Color32 drawingColor = this.drawingColor;
-			Vector4 drawingDimensions = this.drawingDimensions;
-			mTempPos[0].x = drawingDimensions.x;
-			mTempPos[0].y = drawingDimensions.y;
-			mTempPos[3].x = drawingDimensions.z;
-			mTempPos[3].y = drawingDimensions.w;
-			if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
+			mTempPos[1].x = mTempPos[0].x + val.x;
+			mTempPos[2].x = mTempPos[3].x - val.z;
+			mTempUVs[0].x = mOuterUV.get_xMin();
+			mTempUVs[1].x = mInnerUV.get_xMin();
+			mTempUVs[2].x = mInnerUV.get_xMax();
+			mTempUVs[3].x = mOuterUV.get_xMax();
+		}
+		if (mFlip == Flip.Vertically || mFlip == Flip.Both)
+		{
+			mTempPos[1].y = mTempPos[0].y + val.w;
+			mTempPos[2].y = mTempPos[3].y - val.y;
+			mTempUVs[3].y = mOuterUV.get_yMin();
+			mTempUVs[2].y = mInnerUV.get_yMin();
+			mTempUVs[1].y = mInnerUV.get_yMax();
+			mTempUVs[0].y = mOuterUV.get_yMax();
+		}
+		else
+		{
+			mTempPos[1].y = mTempPos[0].y + val.y;
+			mTempPos[2].y = mTempPos[3].y - val.w;
+			mTempUVs[0].y = mOuterUV.get_yMin();
+			mTempUVs[1].y = mInnerUV.get_yMin();
+			mTempUVs[2].y = mInnerUV.get_yMax();
+			mTempUVs[3].y = mOuterUV.get_yMax();
+		}
+		for (int i = 0; i < 3; i++)
+		{
+			int num = i + 1;
+			for (int j = 0; j < 3; j++)
 			{
-				mTempPos[1].x = mTempPos[0].x + val.z;
-				mTempPos[2].x = mTempPos[3].x - val.x;
-				mTempUVs[3].x = mOuterUV.get_xMin();
-				mTempUVs[2].x = mInnerUV.get_xMin();
-				mTempUVs[1].x = mInnerUV.get_xMax();
-				mTempUVs[0].x = mOuterUV.get_xMax();
-			}
-			else
-			{
-				mTempPos[1].x = mTempPos[0].x + val.x;
-				mTempPos[2].x = mTempPos[3].x - val.z;
-				mTempUVs[0].x = mOuterUV.get_xMin();
-				mTempUVs[1].x = mInnerUV.get_xMin();
-				mTempUVs[2].x = mInnerUV.get_xMax();
-				mTempUVs[3].x = mOuterUV.get_xMax();
-			}
-			if (mFlip == Flip.Vertically || mFlip == Flip.Both)
-			{
-				mTempPos[1].y = mTempPos[0].y + val.w;
-				mTempPos[2].y = mTempPos[3].y - val.y;
-				mTempUVs[3].y = mOuterUV.get_yMin();
-				mTempUVs[2].y = mInnerUV.get_yMin();
-				mTempUVs[1].y = mInnerUV.get_yMax();
-				mTempUVs[0].y = mOuterUV.get_yMax();
-			}
-			else
-			{
-				mTempPos[1].y = mTempPos[0].y + val.y;
-				mTempPos[2].y = mTempPos[3].y - val.w;
-				mTempUVs[0].y = mOuterUV.get_yMin();
-				mTempUVs[1].y = mInnerUV.get_yMin();
-				mTempUVs[2].y = mInnerUV.get_yMax();
-				mTempUVs[3].y = mOuterUV.get_yMax();
-			}
-			for (int i = 0; i < 3; i++)
-			{
-				int num = i + 1;
-				for (int j = 0; j < 3; j++)
+				if (centerType != 0 || i != 1 || j != 1)
 				{
-					if (centerType != 0 || i != 1 || j != 1)
-					{
-						int num2 = j + 1;
-						verts.Add(new Vector3(mTempPos[i].x, mTempPos[j].y));
-						verts.Add(new Vector3(mTempPos[i].x, mTempPos[num2].y));
-						verts.Add(new Vector3(mTempPos[num].x, mTempPos[num2].y));
-						verts.Add(new Vector3(mTempPos[num].x, mTempPos[j].y));
-						uvs.Add(new Vector2(mTempUVs[i].x, mTempUVs[j].y));
-						uvs.Add(new Vector2(mTempUVs[i].x, mTempUVs[num2].y));
-						uvs.Add(new Vector2(mTempUVs[num].x, mTempUVs[num2].y));
-						uvs.Add(new Vector2(mTempUVs[num].x, mTempUVs[j].y));
-						cols.Add(drawingColor);
-						cols.Add(drawingColor);
-						cols.Add(drawingColor);
-						cols.Add(drawingColor);
-					}
+					int num2 = j + 1;
+					verts.Add(new Vector3(mTempPos[i].x, mTempPos[j].y));
+					verts.Add(new Vector3(mTempPos[i].x, mTempPos[num2].y));
+					verts.Add(new Vector3(mTempPos[num].x, mTempPos[num2].y));
+					verts.Add(new Vector3(mTempPos[num].x, mTempPos[j].y));
+					uvs.Add(new Vector2(mTempUVs[i].x, mTempUVs[j].y));
+					uvs.Add(new Vector2(mTempUVs[i].x, mTempUVs[num2].y));
+					uvs.Add(new Vector2(mTempUVs[num].x, mTempUVs[num2].y));
+					uvs.Add(new Vector2(mTempUVs[num].x, mTempUVs[j].y));
+					cols.Add(drawingColor);
+					cols.Add(drawingColor);
+					cols.Add(drawingColor);
+					cols.Add(drawingColor);
 				}
 			}
 		}
@@ -441,73 +439,75 @@ public abstract class UIBasicSprite : UIWidget
 		//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
 		Texture mainTexture = this.mainTexture;
-		if (!(mainTexture == null))
+		if (mainTexture == null)
 		{
-			Vector2 val = default(Vector2);
-			val._002Ector(mInnerUV.get_width() * (float)mainTexture.get_width(), mInnerUV.get_height() * (float)mainTexture.get_height());
-			val *= pixelSize;
-			if (!(mainTexture == null) && !(val.x < 2f) && !(val.y < 2f))
+			return;
+		}
+		Vector2 val = default(Vector2);
+		val._002Ector(mInnerUV.get_width() * (float)mainTexture.get_width(), mInnerUV.get_height() * (float)mainTexture.get_height());
+		val *= pixelSize;
+		if (mainTexture == null || val.x < 2f || val.y < 2f)
+		{
+			return;
+		}
+		Color32 drawingColor = this.drawingColor;
+		Vector4 drawingDimensions = this.drawingDimensions;
+		Vector4 val2 = default(Vector4);
+		if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
+		{
+			val2.x = mInnerUV.get_xMax();
+			val2.z = mInnerUV.get_xMin();
+		}
+		else
+		{
+			val2.x = mInnerUV.get_xMin();
+			val2.z = mInnerUV.get_xMax();
+		}
+		if (mFlip == Flip.Vertically || mFlip == Flip.Both)
+		{
+			val2.y = mInnerUV.get_yMax();
+			val2.w = mInnerUV.get_yMin();
+		}
+		else
+		{
+			val2.y = mInnerUV.get_yMin();
+			val2.w = mInnerUV.get_yMax();
+		}
+		float x = drawingDimensions.x;
+		float num = drawingDimensions.y;
+		float x2 = val2.x;
+		float y = val2.y;
+		for (; num < drawingDimensions.w; num += val.y)
+		{
+			x = drawingDimensions.x;
+			float num2 = num + val.y;
+			float num3 = val2.w;
+			if (num2 > drawingDimensions.w)
 			{
-				Color32 drawingColor = this.drawingColor;
-				Vector4 drawingDimensions = this.drawingDimensions;
-				Vector4 val2 = default(Vector4);
-				if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
+				num3 = Mathf.Lerp(val2.y, val2.w, (drawingDimensions.w - num) / val.y);
+				num2 = drawingDimensions.w;
+			}
+			for (; x < drawingDimensions.z; x += val.x)
+			{
+				float num4 = x + val.x;
+				float num5 = val2.z;
+				if (num4 > drawingDimensions.z)
 				{
-					val2.x = mInnerUV.get_xMax();
-					val2.z = mInnerUV.get_xMin();
+					num5 = Mathf.Lerp(val2.x, val2.z, (drawingDimensions.z - x) / val.x);
+					num4 = drawingDimensions.z;
 				}
-				else
-				{
-					val2.x = mInnerUV.get_xMin();
-					val2.z = mInnerUV.get_xMax();
-				}
-				if (mFlip == Flip.Vertically || mFlip == Flip.Both)
-				{
-					val2.y = mInnerUV.get_yMax();
-					val2.w = mInnerUV.get_yMin();
-				}
-				else
-				{
-					val2.y = mInnerUV.get_yMin();
-					val2.w = mInnerUV.get_yMax();
-				}
-				float x = drawingDimensions.x;
-				float num = drawingDimensions.y;
-				float x2 = val2.x;
-				float y = val2.y;
-				for (; num < drawingDimensions.w; num += val.y)
-				{
-					x = drawingDimensions.x;
-					float num2 = num + val.y;
-					float num3 = val2.w;
-					if (num2 > drawingDimensions.w)
-					{
-						num3 = Mathf.Lerp(val2.y, val2.w, (drawingDimensions.w - num) / val.y);
-						num2 = drawingDimensions.w;
-					}
-					for (; x < drawingDimensions.z; x += val.x)
-					{
-						float num4 = x + val.x;
-						float num5 = val2.z;
-						if (num4 > drawingDimensions.z)
-						{
-							num5 = Mathf.Lerp(val2.x, val2.z, (drawingDimensions.z - x) / val.x);
-							num4 = drawingDimensions.z;
-						}
-						verts.Add(new Vector3(x, num));
-						verts.Add(new Vector3(x, num2));
-						verts.Add(new Vector3(num4, num2));
-						verts.Add(new Vector3(num4, num));
-						uvs.Add(new Vector2(x2, y));
-						uvs.Add(new Vector2(x2, num3));
-						uvs.Add(new Vector2(num5, num3));
-						uvs.Add(new Vector2(num5, y));
-						cols.Add(drawingColor);
-						cols.Add(drawingColor);
-						cols.Add(drawingColor);
-						cols.Add(drawingColor);
-					}
-				}
+				verts.Add(new Vector3(x, num));
+				verts.Add(new Vector3(x, num2));
+				verts.Add(new Vector3(num4, num2));
+				verts.Add(new Vector3(num4, num));
+				uvs.Add(new Vector2(x2, y));
+				uvs.Add(new Vector2(x2, num3));
+				uvs.Add(new Vector2(num5, num3));
+				uvs.Add(new Vector2(num5, y));
+				cols.Add(drawingColor);
+				cols.Add(drawingColor);
+				cols.Add(drawingColor);
+				cols.Add(drawingColor);
 			}
 		}
 	}
@@ -552,176 +552,177 @@ public abstract class UIBasicSprite : UIWidget
 		//IL_09d4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_09eb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_09f6: Unknown result type (might be due to invalid IL or missing references)
-		if (!(mFillAmount < 0.001f))
+		if (mFillAmount < 0.001f)
 		{
-			Vector4 drawingDimensions = this.drawingDimensions;
-			Vector4 drawingUVs = this.drawingUVs;
-			Color32 drawingColor = this.drawingColor;
-			if (mFillDirection == FillDirection.Horizontal || mFillDirection == FillDirection.Vertical)
+			return;
+		}
+		Vector4 drawingDimensions = this.drawingDimensions;
+		Vector4 drawingUVs = this.drawingUVs;
+		Color32 drawingColor = this.drawingColor;
+		if (mFillDirection == FillDirection.Horizontal || mFillDirection == FillDirection.Vertical)
+		{
+			if (mFillDirection == FillDirection.Horizontal)
 			{
-				if (mFillDirection == FillDirection.Horizontal)
+				float num = (drawingUVs.z - drawingUVs.x) * mFillAmount;
+				if (mInvert)
 				{
-					float num = (drawingUVs.z - drawingUVs.x) * mFillAmount;
-					if (mInvert)
-					{
-						drawingDimensions.x = drawingDimensions.z - (drawingDimensions.z - drawingDimensions.x) * mFillAmount;
-						drawingUVs.x = drawingUVs.z - num;
-					}
-					else
-					{
-						drawingDimensions.z = drawingDimensions.x + (drawingDimensions.z - drawingDimensions.x) * mFillAmount;
-						drawingUVs.z = drawingUVs.x + num;
-					}
+					drawingDimensions.x = drawingDimensions.z - (drawingDimensions.z - drawingDimensions.x) * mFillAmount;
+					drawingUVs.x = drawingUVs.z - num;
 				}
-				else if (mFillDirection == FillDirection.Vertical)
+				else
 				{
-					float num2 = (drawingUVs.w - drawingUVs.y) * mFillAmount;
-					if (mInvert)
-					{
-						drawingDimensions.y = drawingDimensions.w - (drawingDimensions.w - drawingDimensions.y) * mFillAmount;
-						drawingUVs.y = drawingUVs.w - num2;
-					}
-					else
-					{
-						drawingDimensions.w = drawingDimensions.y + (drawingDimensions.w - drawingDimensions.y) * mFillAmount;
-						drawingUVs.w = drawingUVs.y + num2;
-					}
+					drawingDimensions.z = drawingDimensions.x + (drawingDimensions.z - drawingDimensions.x) * mFillAmount;
+					drawingUVs.z = drawingUVs.x + num;
 				}
 			}
-			mTempPos[0] = new Vector2(drawingDimensions.x, drawingDimensions.y);
-			mTempPos[1] = new Vector2(drawingDimensions.x, drawingDimensions.w);
-			mTempPos[2] = new Vector2(drawingDimensions.z, drawingDimensions.w);
-			mTempPos[3] = new Vector2(drawingDimensions.z, drawingDimensions.y);
-			mTempUVs[0] = new Vector2(drawingUVs.x, drawingUVs.y);
-			mTempUVs[1] = new Vector2(drawingUVs.x, drawingUVs.w);
-			mTempUVs[2] = new Vector2(drawingUVs.z, drawingUVs.w);
-			mTempUVs[3] = new Vector2(drawingUVs.z, drawingUVs.y);
-			if (mFillAmount < 1f)
+			else if (mFillDirection == FillDirection.Vertical)
 			{
-				if (mFillDirection == FillDirection.Radial90)
+				float num2 = (drawingUVs.w - drawingUVs.y) * mFillAmount;
+				if (mInvert)
 				{
-					if (RadialCut(mTempPos, mTempUVs, mFillAmount, mInvert, 0))
+					drawingDimensions.y = drawingDimensions.w - (drawingDimensions.w - drawingDimensions.y) * mFillAmount;
+					drawingUVs.y = drawingUVs.w - num2;
+				}
+				else
+				{
+					drawingDimensions.w = drawingDimensions.y + (drawingDimensions.w - drawingDimensions.y) * mFillAmount;
+					drawingUVs.w = drawingUVs.y + num2;
+				}
+			}
+		}
+		mTempPos[0] = new Vector2(drawingDimensions.x, drawingDimensions.y);
+		mTempPos[1] = new Vector2(drawingDimensions.x, drawingDimensions.w);
+		mTempPos[2] = new Vector2(drawingDimensions.z, drawingDimensions.w);
+		mTempPos[3] = new Vector2(drawingDimensions.z, drawingDimensions.y);
+		mTempUVs[0] = new Vector2(drawingUVs.x, drawingUVs.y);
+		mTempUVs[1] = new Vector2(drawingUVs.x, drawingUVs.w);
+		mTempUVs[2] = new Vector2(drawingUVs.z, drawingUVs.w);
+		mTempUVs[3] = new Vector2(drawingUVs.z, drawingUVs.y);
+		if (mFillAmount < 1f)
+		{
+			if (mFillDirection == FillDirection.Radial90)
+			{
+				if (RadialCut(mTempPos, mTempUVs, mFillAmount, mInvert, 0))
+				{
+					for (int i = 0; i < 4; i++)
 					{
-						for (int i = 0; i < 4; i++)
+						verts.Add(Vector2.op_Implicit(mTempPos[i]));
+						uvs.Add(mTempUVs[i]);
+						cols.Add(drawingColor);
+					}
+				}
+				return;
+			}
+			if (mFillDirection == FillDirection.Radial180)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					float num3 = 0f;
+					float num4 = 1f;
+					float num5;
+					float num6;
+					if (j == 0)
+					{
+						num5 = 0f;
+						num6 = 0.5f;
+					}
+					else
+					{
+						num5 = 0.5f;
+						num6 = 1f;
+					}
+					mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num5);
+					mTempPos[1].x = mTempPos[0].x;
+					mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num6);
+					mTempPos[3].x = mTempPos[2].x;
+					mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num3);
+					mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num4);
+					mTempPos[2].y = mTempPos[1].y;
+					mTempPos[3].y = mTempPos[0].y;
+					mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num5);
+					mTempUVs[1].x = mTempUVs[0].x;
+					mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num6);
+					mTempUVs[3].x = mTempUVs[2].x;
+					mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num3);
+					mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num4);
+					mTempUVs[2].y = mTempUVs[1].y;
+					mTempUVs[3].y = mTempUVs[0].y;
+					float num7 = mInvert ? (mFillAmount * 2f - (float)(1 - j)) : (fillAmount * 2f - (float)j);
+					if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(num7), !mInvert, NGUIMath.RepeatIndex(j + 3, 4)))
+					{
+						for (int k = 0; k < 4; k++)
 						{
-							verts.Add(Vector2.op_Implicit(mTempPos[i]));
-							uvs.Add(mTempUVs[i]);
+							verts.Add(Vector2.op_Implicit(mTempPos[k]));
+							uvs.Add(mTempUVs[k]);
 							cols.Add(drawingColor);
 						}
 					}
-					return;
 				}
-				if (mFillDirection == FillDirection.Radial180)
-				{
-					for (int j = 0; j < 2; j++)
-					{
-						float num3 = 0f;
-						float num4 = 1f;
-						float num5;
-						float num6;
-						if (j == 0)
-						{
-							num5 = 0f;
-							num6 = 0.5f;
-						}
-						else
-						{
-							num5 = 0.5f;
-							num6 = 1f;
-						}
-						mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num5);
-						mTempPos[1].x = mTempPos[0].x;
-						mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num6);
-						mTempPos[3].x = mTempPos[2].x;
-						mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num3);
-						mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num4);
-						mTempPos[2].y = mTempPos[1].y;
-						mTempPos[3].y = mTempPos[0].y;
-						mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num5);
-						mTempUVs[1].x = mTempUVs[0].x;
-						mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num6);
-						mTempUVs[3].x = mTempUVs[2].x;
-						mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num3);
-						mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num4);
-						mTempUVs[2].y = mTempUVs[1].y;
-						mTempUVs[3].y = mTempUVs[0].y;
-						float num7 = mInvert ? (mFillAmount * 2f - (float)(1 - j)) : (fillAmount * 2f - (float)j);
-						if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(num7), !mInvert, NGUIMath.RepeatIndex(j + 3, 4)))
-						{
-							for (int k = 0; k < 4; k++)
-							{
-								verts.Add(Vector2.op_Implicit(mTempPos[k]));
-								uvs.Add(mTempUVs[k]);
-								cols.Add(drawingColor);
-							}
-						}
-					}
-					return;
-				}
-				if (mFillDirection == FillDirection.Radial360)
-				{
-					for (int l = 0; l < 4; l++)
-					{
-						float num8;
-						float num9;
-						if (l < 2)
-						{
-							num8 = 0f;
-							num9 = 0.5f;
-						}
-						else
-						{
-							num8 = 0.5f;
-							num9 = 1f;
-						}
-						float num10;
-						float num11;
-						if (l == 0 || l == 3)
-						{
-							num10 = 0f;
-							num11 = 0.5f;
-						}
-						else
-						{
-							num10 = 0.5f;
-							num11 = 1f;
-						}
-						mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num8);
-						mTempPos[1].x = mTempPos[0].x;
-						mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num9);
-						mTempPos[3].x = mTempPos[2].x;
-						mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num10);
-						mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num11);
-						mTempPos[2].y = mTempPos[1].y;
-						mTempPos[3].y = mTempPos[0].y;
-						mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num8);
-						mTempUVs[1].x = mTempUVs[0].x;
-						mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num9);
-						mTempUVs[3].x = mTempUVs[2].x;
-						mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num10);
-						mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num11);
-						mTempUVs[2].y = mTempUVs[1].y;
-						mTempUVs[3].y = mTempUVs[0].y;
-						float num12 = (!mInvert) ? (mFillAmount * 4f - (float)(3 - NGUIMath.RepeatIndex(l + 2, 4))) : (mFillAmount * 4f - (float)NGUIMath.RepeatIndex(l + 2, 4));
-						if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(num12), mInvert, NGUIMath.RepeatIndex(l + 2, 4)))
-						{
-							for (int m = 0; m < 4; m++)
-							{
-								verts.Add(Vector2.op_Implicit(mTempPos[m]));
-								uvs.Add(mTempUVs[m]);
-								cols.Add(drawingColor);
-							}
-						}
-					}
-					return;
-				}
+				return;
 			}
-			for (int n = 0; n < 4; n++)
+			if (mFillDirection == FillDirection.Radial360)
 			{
-				verts.Add(Vector2.op_Implicit(mTempPos[n]));
-				uvs.Add(mTempUVs[n]);
-				cols.Add(drawingColor);
+				for (int l = 0; l < 4; l++)
+				{
+					float num8;
+					float num9;
+					if (l < 2)
+					{
+						num8 = 0f;
+						num9 = 0.5f;
+					}
+					else
+					{
+						num8 = 0.5f;
+						num9 = 1f;
+					}
+					float num10;
+					float num11;
+					if (l == 0 || l == 3)
+					{
+						num10 = 0f;
+						num11 = 0.5f;
+					}
+					else
+					{
+						num10 = 0.5f;
+						num11 = 1f;
+					}
+					mTempPos[0].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num8);
+					mTempPos[1].x = mTempPos[0].x;
+					mTempPos[2].x = Mathf.Lerp(drawingDimensions.x, drawingDimensions.z, num9);
+					mTempPos[3].x = mTempPos[2].x;
+					mTempPos[0].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num10);
+					mTempPos[1].y = Mathf.Lerp(drawingDimensions.y, drawingDimensions.w, num11);
+					mTempPos[2].y = mTempPos[1].y;
+					mTempPos[3].y = mTempPos[0].y;
+					mTempUVs[0].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num8);
+					mTempUVs[1].x = mTempUVs[0].x;
+					mTempUVs[2].x = Mathf.Lerp(drawingUVs.x, drawingUVs.z, num9);
+					mTempUVs[3].x = mTempUVs[2].x;
+					mTempUVs[0].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num10);
+					mTempUVs[1].y = Mathf.Lerp(drawingUVs.y, drawingUVs.w, num11);
+					mTempUVs[2].y = mTempUVs[1].y;
+					mTempUVs[3].y = mTempUVs[0].y;
+					float num12 = (!mInvert) ? (mFillAmount * 4f - (float)(3 - NGUIMath.RepeatIndex(l + 2, 4))) : (mFillAmount * 4f - (float)NGUIMath.RepeatIndex(l + 2, 4));
+					if (RadialCut(mTempPos, mTempUVs, Mathf.Clamp01(num12), mInvert, NGUIMath.RepeatIndex(l + 2, 4)))
+					{
+						for (int m = 0; m < 4; m++)
+						{
+							verts.Add(Vector2.op_Implicit(mTempPos[m]));
+							uvs.Add(mTempUVs[m]);
+							cols.Add(drawingColor);
+						}
+					}
+				}
+				return;
 			}
+		}
+		for (int n = 0; n < 4; n++)
+		{
+			verts.Add(Vector2.op_Implicit(mTempPos[n]));
+			uvs.Add(mTempUVs[n]);
+			cols.Add(drawingColor);
 		}
 	}
 
@@ -752,194 +753,176 @@ public abstract class UIBasicSprite : UIWidget
 		//IL_0b9d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0b9e: Unknown result type (might be due to invalid IL or missing references)
 		Texture mainTexture = this.mainTexture;
-		if (!(mainTexture == null))
+		if (mainTexture == null)
 		{
-			Vector4 val = border * pixelSize;
-			if (val.x == 0f && val.y == 0f && val.z == 0f && val.w == 0f)
+			return;
+		}
+		Vector4 val = border * pixelSize;
+		if (val.x == 0f && val.y == 0f && val.z == 0f && val.w == 0f)
+		{
+			SimpleFill(verts, uvs, cols);
+			return;
+		}
+		Color32 drawingColor = this.drawingColor;
+		Vector4 drawingDimensions = this.drawingDimensions;
+		Vector2 val2 = default(Vector2);
+		val2._002Ector(mInnerUV.get_width() * (float)mainTexture.get_width(), mInnerUV.get_height() * (float)mainTexture.get_height());
+		val2 *= pixelSize;
+		if (val2.x < 1f)
+		{
+			val2.x = 1f;
+		}
+		if (val2.y < 1f)
+		{
+			val2.y = 1f;
+		}
+		mTempPos[0].x = drawingDimensions.x;
+		mTempPos[0].y = drawingDimensions.y;
+		mTempPos[3].x = drawingDimensions.z;
+		mTempPos[3].y = drawingDimensions.w;
+		if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
+		{
+			mTempPos[1].x = mTempPos[0].x + val.z;
+			mTempPos[2].x = mTempPos[3].x - val.x;
+			mTempUVs[3].x = mOuterUV.get_xMin();
+			mTempUVs[2].x = mInnerUV.get_xMin();
+			mTempUVs[1].x = mInnerUV.get_xMax();
+			mTempUVs[0].x = mOuterUV.get_xMax();
+		}
+		else
+		{
+			mTempPos[1].x = mTempPos[0].x + val.x;
+			mTempPos[2].x = mTempPos[3].x - val.z;
+			mTempUVs[0].x = mOuterUV.get_xMin();
+			mTempUVs[1].x = mInnerUV.get_xMin();
+			mTempUVs[2].x = mInnerUV.get_xMax();
+			mTempUVs[3].x = mOuterUV.get_xMax();
+		}
+		if (mFlip == Flip.Vertically || mFlip == Flip.Both)
+		{
+			mTempPos[1].y = mTempPos[0].y + val.w;
+			mTempPos[2].y = mTempPos[3].y - val.y;
+			mTempUVs[3].y = mOuterUV.get_yMin();
+			mTempUVs[2].y = mInnerUV.get_yMin();
+			mTempUVs[1].y = mInnerUV.get_yMax();
+			mTempUVs[0].y = mOuterUV.get_yMax();
+		}
+		else
+		{
+			mTempPos[1].y = mTempPos[0].y + val.y;
+			mTempPos[2].y = mTempPos[3].y - val.w;
+			mTempUVs[0].y = mOuterUV.get_yMin();
+			mTempUVs[1].y = mInnerUV.get_yMin();
+			mTempUVs[2].y = mInnerUV.get_yMax();
+			mTempUVs[3].y = mOuterUV.get_yMax();
+		}
+		for (int i = 0; i < 3; i++)
+		{
+			int num = i + 1;
+			for (int j = 0; j < 3; j++)
 			{
-				SimpleFill(verts, uvs, cols);
-			}
-			else
-			{
-				Color32 drawingColor = this.drawingColor;
-				Vector4 drawingDimensions = this.drawingDimensions;
-				Vector2 val2 = default(Vector2);
-				val2._002Ector(mInnerUV.get_width() * (float)mainTexture.get_width(), mInnerUV.get_height() * (float)mainTexture.get_height());
-				val2 *= pixelSize;
-				if (val2.x < 1f)
+				if (centerType == AdvancedType.Invisible && i == 1 && j == 1)
 				{
-					val2.x = 1f;
+					continue;
 				}
-				if (val2.y < 1f)
+				int num2 = j + 1;
+				if (i == 1 && j == 1)
 				{
-					val2.y = 1f;
-				}
-				mTempPos[0].x = drawingDimensions.x;
-				mTempPos[0].y = drawingDimensions.y;
-				mTempPos[3].x = drawingDimensions.z;
-				mTempPos[3].y = drawingDimensions.w;
-				if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
-				{
-					mTempPos[1].x = mTempPos[0].x + val.z;
-					mTempPos[2].x = mTempPos[3].x - val.x;
-					mTempUVs[3].x = mOuterUV.get_xMin();
-					mTempUVs[2].x = mInnerUV.get_xMin();
-					mTempUVs[1].x = mInnerUV.get_xMax();
-					mTempUVs[0].x = mOuterUV.get_xMax();
-				}
-				else
-				{
-					mTempPos[1].x = mTempPos[0].x + val.x;
-					mTempPos[2].x = mTempPos[3].x - val.z;
-					mTempUVs[0].x = mOuterUV.get_xMin();
-					mTempUVs[1].x = mInnerUV.get_xMin();
-					mTempUVs[2].x = mInnerUV.get_xMax();
-					mTempUVs[3].x = mOuterUV.get_xMax();
-				}
-				if (mFlip == Flip.Vertically || mFlip == Flip.Both)
-				{
-					mTempPos[1].y = mTempPos[0].y + val.w;
-					mTempPos[2].y = mTempPos[3].y - val.y;
-					mTempUVs[3].y = mOuterUV.get_yMin();
-					mTempUVs[2].y = mInnerUV.get_yMin();
-					mTempUVs[1].y = mInnerUV.get_yMax();
-					mTempUVs[0].y = mOuterUV.get_yMax();
-				}
-				else
-				{
-					mTempPos[1].y = mTempPos[0].y + val.y;
-					mTempPos[2].y = mTempPos[3].y - val.w;
-					mTempUVs[0].y = mOuterUV.get_yMin();
-					mTempUVs[1].y = mInnerUV.get_yMin();
-					mTempUVs[2].y = mInnerUV.get_yMax();
-					mTempUVs[3].y = mOuterUV.get_yMax();
-				}
-				for (int i = 0; i < 3; i++)
-				{
-					int num = i + 1;
-					for (int j = 0; j < 3; j++)
+					if (centerType == AdvancedType.Tiled)
 					{
-						if (centerType != 0 || i != 1 || j != 1)
+						float x = mTempPos[i].x;
+						float x2 = mTempPos[num].x;
+						float y = mTempPos[j].y;
+						float y2 = mTempPos[num2].y;
+						float x3 = mTempUVs[i].x;
+						float y3 = mTempUVs[j].y;
+						for (float num3 = y; num3 < y2; num3 += val2.y)
 						{
-							int num2 = j + 1;
-							if (i == 1 && j == 1)
+							float num4 = x;
+							float num5 = mTempUVs[num2].y;
+							float num6 = num3 + val2.y;
+							if (num6 > y2)
 							{
-								if (centerType == AdvancedType.Tiled)
-								{
-									float x = mTempPos[i].x;
-									float x2 = mTempPos[num].x;
-									float y = mTempPos[j].y;
-									float y2 = mTempPos[num2].y;
-									float x3 = mTempUVs[i].x;
-									float y3 = mTempUVs[j].y;
-									for (float num3 = y; num3 < y2; num3 += val2.y)
-									{
-										float num4 = x;
-										float num5 = mTempUVs[num2].y;
-										float num6 = num3 + val2.y;
-										if (num6 > y2)
-										{
-											num5 = Mathf.Lerp(y3, num5, (y2 - num3) / val2.y);
-											num6 = y2;
-										}
-										for (; num4 < x2; num4 += val2.x)
-										{
-											float num7 = num4 + val2.x;
-											float num8 = mTempUVs[num].x;
-											if (num7 > x2)
-											{
-												num8 = Mathf.Lerp(x3, num8, (x2 - num4) / val2.x);
-												num7 = x2;
-											}
-											Fill(verts, uvs, cols, num4, num7, num3, num6, x3, num8, y3, num5, Color32.op_Implicit(drawingColor));
-										}
-									}
-								}
-								else if (centerType == AdvancedType.Sliced)
-								{
-									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
-								}
+								num5 = Mathf.Lerp(y3, num5, (y2 - num3) / val2.y);
+								num6 = y2;
 							}
-							else if (i == 1)
+							for (; num4 < x2; num4 += val2.x)
 							{
-								if ((j == 0 && bottomType == AdvancedType.Tiled) || (j == 2 && topType == AdvancedType.Tiled))
+								float num7 = num4 + val2.x;
+								float num8 = mTempUVs[num].x;
+								if (num7 > x2)
 								{
-									float x4 = mTempPos[i].x;
-									float x5 = mTempPos[num].x;
-									float y4 = mTempPos[j].y;
-									float y5 = mTempPos[num2].y;
-									float x6 = mTempUVs[i].x;
-									float y6 = mTempUVs[j].y;
-									float y7 = mTempUVs[num2].y;
-									for (float num9 = x4; num9 < x5; num9 += val2.x)
-									{
-										float num10 = num9 + val2.x;
-										float num11 = mTempUVs[num].x;
-										if (num10 > x5)
-										{
-											num11 = Mathf.Lerp(x6, num11, (x5 - num9) / val2.x);
-											num10 = x5;
-										}
-										Fill(verts, uvs, cols, num9, num10, y4, y5, x6, num11, y6, y7, Color32.op_Implicit(drawingColor));
-									}
+									num8 = Mathf.Lerp(x3, num8, (x2 - num4) / val2.x);
+									num7 = x2;
 								}
-								else if ((j == 0 && bottomType != 0) || (j == 2 && topType != 0))
-								{
-									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
-								}
-							}
-							else
-							{
-								switch (j)
-								{
-								case 1:
-									if ((i == 0 && leftType == AdvancedType.Tiled) || (i == 2 && rightType == AdvancedType.Tiled))
-									{
-										float x7 = mTempPos[i].x;
-										float x8 = mTempPos[num].x;
-										float y8 = mTempPos[j].y;
-										float y9 = mTempPos[num2].y;
-										float x9 = mTempUVs[i].x;
-										float x10 = mTempUVs[num].x;
-										float y10 = mTempUVs[j].y;
-										for (float num12 = y8; num12 < y9; num12 += val2.y)
-										{
-											float num13 = mTempUVs[num2].y;
-											float num14 = num12 + val2.y;
-											if (num14 > y9)
-											{
-												num13 = Mathf.Lerp(y10, num13, (y9 - num12) / val2.y);
-												num14 = y9;
-											}
-											Fill(verts, uvs, cols, x7, x8, num12, num14, x9, x10, y10, num13, Color32.op_Implicit(drawingColor));
-										}
-									}
-									else if ((i == 0 && leftType != 0) || (i == 2 && rightType != 0))
-									{
-										Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
-									}
-									break;
-								case 0:
-									if (bottomType == AdvancedType.Invisible)
-									{
-										goto default;
-									}
-									goto IL_0b12;
-								default:
-									{
-										if ((j != 2 || topType == AdvancedType.Invisible) && (i != 0 || leftType == AdvancedType.Invisible) && (i != 2 || rightType == AdvancedType.Invisible))
-										{
-											break;
-										}
-										goto IL_0b12;
-									}
-									IL_0b12:
-									Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
-									break;
-								}
+								Fill(verts, uvs, cols, num4, num7, num3, num6, x3, num8, y3, num5, Color32.op_Implicit(drawingColor));
 							}
 						}
 					}
+					else if (centerType == AdvancedType.Sliced)
+					{
+						Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
+					}
+				}
+				else if (i == 1)
+				{
+					if ((j == 0 && bottomType == AdvancedType.Tiled) || (j == 2 && topType == AdvancedType.Tiled))
+					{
+						float x4 = mTempPos[i].x;
+						float x5 = mTempPos[num].x;
+						float y4 = mTempPos[j].y;
+						float y5 = mTempPos[num2].y;
+						float x6 = mTempUVs[i].x;
+						float y6 = mTempUVs[j].y;
+						float y7 = mTempUVs[num2].y;
+						for (float num9 = x4; num9 < x5; num9 += val2.x)
+						{
+							float num10 = num9 + val2.x;
+							float num11 = mTempUVs[num].x;
+							if (num10 > x5)
+							{
+								num11 = Mathf.Lerp(x6, num11, (x5 - num9) / val2.x);
+								num10 = x5;
+							}
+							Fill(verts, uvs, cols, num9, num10, y4, y5, x6, num11, y6, y7, Color32.op_Implicit(drawingColor));
+						}
+					}
+					else if ((j == 0 && bottomType != 0) || (j == 2 && topType != 0))
+					{
+						Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
+					}
+				}
+				else if (j == 1)
+				{
+					if ((i == 0 && leftType == AdvancedType.Tiled) || (i == 2 && rightType == AdvancedType.Tiled))
+					{
+						float x7 = mTempPos[i].x;
+						float x8 = mTempPos[num].x;
+						float y8 = mTempPos[j].y;
+						float y9 = mTempPos[num2].y;
+						float x9 = mTempUVs[i].x;
+						float x10 = mTempUVs[num].x;
+						float y10 = mTempUVs[j].y;
+						for (float num12 = y8; num12 < y9; num12 += val2.y)
+						{
+							float num13 = mTempUVs[num2].y;
+							float num14 = num12 + val2.y;
+							if (num14 > y9)
+							{
+								num13 = Mathf.Lerp(y10, num13, (y9 - num12) / val2.y);
+								num14 = y9;
+							}
+							Fill(verts, uvs, cols, x7, x8, num12, num14, x9, x10, y10, num13, Color32.op_Implicit(drawingColor));
+						}
+					}
+					else if ((i == 0 && leftType != 0) || (i == 2 && rightType != 0))
+					{
+						Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
+					}
+				}
+				else if ((j == 0 && bottomType != 0) || (j == 2 && topType != 0) || (i == 0 && leftType != 0) || (i == 2 && rightType != 0))
+				{
+					Fill(verts, uvs, cols, mTempPos[i].x, mTempPos[num].x, mTempPos[j].y, mTempPos[num2].y, mTempUVs[i].x, mTempUVs[num].x, mTempUVs[j].y, mTempUVs[num2].y, Color32.op_Implicit(drawingColor));
 				}
 			}
 		}
@@ -964,7 +947,7 @@ public abstract class UIBasicSprite : UIWidget
 		{
 			num = 1f - num;
 		}
-		num *= 1.57079637f;
+		num *= (float)Math.PI / 2f;
 		float cos = Mathf.Cos(num);
 		float sin = Mathf.Sin(num);
 		RadialCut(xy, cos, sin, invert, corner);
@@ -1012,42 +995,40 @@ public abstract class UIBasicSprite : UIWidget
 			{
 				xy[num].y = Mathf.Lerp(xy[corner].y, xy[num2].y, sin);
 			}
+			return;
+		}
+		if (cos > sin)
+		{
+			sin /= cos;
+			cos = 1f;
+			if (!invert)
+			{
+				xy[num].y = Mathf.Lerp(xy[corner].y, xy[num2].y, sin);
+				xy[num2].y = xy[num].y;
+			}
+		}
+		else if (sin > cos)
+		{
+			cos /= sin;
+			sin = 1f;
+			if (invert)
+			{
+				xy[num2].x = Mathf.Lerp(xy[corner].x, xy[num2].x, cos);
+				xy[num3].x = xy[num2].x;
+			}
 		}
 		else
 		{
-			if (cos > sin)
-			{
-				sin /= cos;
-				cos = 1f;
-				if (!invert)
-				{
-					xy[num].y = Mathf.Lerp(xy[corner].y, xy[num2].y, sin);
-					xy[num2].y = xy[num].y;
-				}
-			}
-			else if (sin > cos)
-			{
-				cos /= sin;
-				sin = 1f;
-				if (invert)
-				{
-					xy[num2].x = Mathf.Lerp(xy[corner].x, xy[num2].x, cos);
-					xy[num3].x = xy[num2].x;
-				}
-			}
-			else
-			{
-				cos = 1f;
-				sin = 1f;
-			}
-			if (invert)
-			{
-				xy[num3].y = Mathf.Lerp(xy[corner].y, xy[num2].y, sin);
-			}
-			else
-			{
-				xy[num].x = Mathf.Lerp(xy[corner].x, xy[num2].x, cos);
-			}
+			cos = 1f;
+			sin = 1f;
+		}
+		if (invert)
+		{
+			xy[num3].y = Mathf.Lerp(xy[corner].y, xy[num2].y, sin);
+		}
+		else
+		{
+			xy[num].x = Mathf.Lerp(xy[corner].x, xy[num2].x, cos);
 		}
 	}
 

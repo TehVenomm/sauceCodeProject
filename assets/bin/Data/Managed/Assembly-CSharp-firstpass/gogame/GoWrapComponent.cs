@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace gogame
 {
-	public class GoWrapComponent : IGoWrap
+	public class GoWrapComponent : MonoBehaviour, IGoWrap
 	{
 		public GoWrapComponent()
 			: this()
@@ -13,7 +13,7 @@ namespace gogame
 		public void handleAdsCompletedWithReward(string message)
 		{
 			Debug.Log((object)"handleAdsCompletedWithReward called.");
-			JSONObject jSONObject = new JSONObject(message, -2, false, false);
+			JSONObject jSONObject = new JSONObject(message);
 			jSONObject.GetField(out string field, "rewardId", "DEFAULT");
 			jSONObject.GetField(out int field2, "rewardQuantity", -1);
 			GoWrap.INSTANCE.getDelegate().didCompleteRewardedAd(field, field2);

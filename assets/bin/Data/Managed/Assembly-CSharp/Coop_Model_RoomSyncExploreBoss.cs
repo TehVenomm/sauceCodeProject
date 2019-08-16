@@ -40,6 +40,8 @@ public class Coop_Model_RoomSyncExploreBoss : Coop_Model_Base
 		}
 	}
 
+	public int ceId;
+
 	public int mId;
 
 	public int hp;
@@ -50,6 +52,12 @@ public class Coop_Model_RoomSyncExploreBoss : Coop_Model_Base
 
 	public int downCount;
 
+	public float concussionTotal;
+
+	public float concussionMax;
+
+	public float concussionExtend;
+
 	public Region[] rs;
 
 	public int shp;
@@ -59,6 +67,10 @@ public class Coop_Model_RoomSyncExploreBoss : Coop_Model_Base
 	public uint[] eangids;
 
 	public bool isMM;
+
+	public int deadReviveCount;
+
+	public int recoveredHP;
 
 	public Coop_Model_RoomSyncExploreBoss()
 	{

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class CallbackManagerImpl implements CallbackManager {
+    private static final String INAPP_PURCHASE_DATA = "INAPP_PURCHASE_DATA";
+    private static final String TAG = CallbackManagerImpl.class.getSimpleName();
     private static Map<Integer, Callback> staticCallbacks = new HashMap();
     private Map<Integer, Callback> callbacks = new HashMap();
 
@@ -37,14 +39,15 @@ public final class CallbackManagerImpl implements CallbackManager {
     }
 
     private static Callback getStaticCallback(Integer num) {
+        Callback callback;
         synchronized (CallbackManagerImpl.class) {
             try {
-                Callback callback = (Callback) staticCallbacks.get(num);
-                return callback;
+                callback = (Callback) staticCallbacks.get(num);
             } finally {
-                Object obj = CallbackManagerImpl.class;
+                Class<CallbackManagerImpl> cls = CallbackManagerImpl.class;
             }
         }
+        return callback;
     }
 
     public static void registerStaticCallback(int i, Callback callback) {
@@ -54,15 +57,18 @@ public final class CallbackManagerImpl implements CallbackManager {
                 if (!staticCallbacks.containsKey(Integer.valueOf(i))) {
                     staticCallbacks.put(Integer.valueOf(i), callback);
                 }
-            } catch (Throwable th) {
-                Class cls = CallbackManagerImpl.class;
+            } finally {
+                Class<CallbackManagerImpl> cls = CallbackManagerImpl.class;
             }
         }
     }
 
     private static boolean runStaticCallback(int i, int i2, Intent intent) {
         Callback staticCallback = getStaticCallback(Integer.valueOf(i));
-        return staticCallback != null ? staticCallback.onActivityResult(i2, intent) : false;
+        if (staticCallback != null) {
+            return staticCallback.onActivityResult(i2, intent);
+        }
+        return false;
     }
 
     public boolean onActivityResult(int i, int i2, Intent intent) {
@@ -73,5 +79,9 @@ public final class CallbackManagerImpl implements CallbackManager {
     public void registerCallback(int i, Callback callback) {
         Validate.notNull(callback, "callback");
         this.callbacks.put(Integer.valueOf(i), callback);
+    }
+
+    public void unregisterCallback(int i) {
+        this.callbacks.remove(Integer.valueOf(i));
     }
 }

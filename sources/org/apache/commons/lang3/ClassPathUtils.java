@@ -13,11 +13,11 @@ public class ClassPathUtils {
     public static String toFullyQualifiedName(Package packageR, String str) {
         Validate.notNull(packageR, "Parameter '%s' must not be null!", "context");
         Validate.notNull(str, "Parameter '%s' must not be null!", "resourceName");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(packageR.getName());
-        stringBuilder.append(AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
-        stringBuilder.append(str);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(packageR.getName());
+        sb.append(AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
+        sb.append(str);
+        return sb.toString();
     }
 
     public static String toFullyQualifiedPath(Class<?> cls, String str) {
@@ -29,10 +29,10 @@ public class ClassPathUtils {
     public static String toFullyQualifiedPath(Package packageR, String str) {
         Validate.notNull(packageR, "Parameter '%s' must not be null!", "context");
         Validate.notNull(str, "Parameter '%s' must not be null!", "resourceName");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(packageR.getName().replace(ClassUtils.PACKAGE_SEPARATOR_CHAR, '/'));
-        stringBuilder.append(Constants.URL_PATH_DELIMITER);
-        stringBuilder.append(str);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(packageR.getName().replace(ClassUtils.PACKAGE_SEPARATOR_CHAR, '/'));
+        sb.append(Constants.URL_PATH_DELIMITER);
+        sb.append(str);
+        return sb.toString();
     }
 }

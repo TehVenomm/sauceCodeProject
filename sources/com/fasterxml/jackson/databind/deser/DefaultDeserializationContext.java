@@ -34,7 +34,7 @@ public abstract class DefaultDeserializationContext extends DeserializationConte
         private static final long serialVersionUID = 1;
 
         public Impl(DeserializerFactory deserializerFactory) {
-            super(deserializerFactory, null);
+            super(deserializerFactory, (DeserializerCache) null);
         }
 
         protected Impl(Impl impl, DeserializationConfig deserializationConfig, JsonParser jsonParser, InjectableValues injectableValues) {
@@ -51,7 +51,7 @@ public abstract class DefaultDeserializationContext extends DeserializationConte
 
         public DefaultDeserializationContext copy() {
             if (getClass() != Impl.class) {
-                return super.copy();
+                return DefaultDeserializationContext.super.copy();
             }
             return new Impl(this);
         }
@@ -90,41 +90,47 @@ public abstract class DefaultDeserializationContext extends DeserializationConte
     }
 
     public ReadableObjectId findObjectId(Object obj, ObjectIdGenerator<?> objectIdGenerator, ObjectIdResolver objectIdResolver) {
+        ObjectIdResolver objectIdResolver2;
         if (obj == null) {
             return null;
         }
-        ObjectIdResolver objectIdResolver2;
         IdKey key = objectIdGenerator.key(obj);
         if (this._objectIds == null) {
-            this._objectIds = new LinkedHashMap();
+            this._objectIds = new LinkedHashMap<>();
         } else {
             ReadableObjectId readableObjectId = (ReadableObjectId) this._objectIds.get(key);
             if (readableObjectId != null) {
                 return readableObjectId;
             }
         }
-        if (this._objectIdResolvers == null) {
-            this._objectIdResolvers = new ArrayList(8);
-            objectIdResolver2 = null;
-        } else {
-            for (ObjectIdResolver objectIdResolver22 : this._objectIdResolvers) {
-                if (objectIdResolver22.canUseFor(objectIdResolver)) {
+        if (this._objectIdResolvers != null) {
+            Iterator it = this._objectIdResolvers.iterator();
+            while (true) {
+                if (!it.hasNext()) {
+                    objectIdResolver2 = null;
+                    break;
+                }
+                objectIdResolver2 = (ObjectIdResolver) it.next();
+                if (objectIdResolver2.canUseFor(objectIdResolver)) {
                     break;
                 }
             }
-            objectIdResolver22 = null;
+        } else {
+            this._objectIdResolvers = new ArrayList(8);
+            objectIdResolver2 = null;
         }
-        if (objectIdResolver22 == null) {
-            objectIdResolver22 = objectIdResolver.newForDeserialization(this);
-            this._objectIdResolvers.add(objectIdResolver22);
+        if (objectIdResolver2 == null) {
+            objectIdResolver2 = objectIdResolver.newForDeserialization(this);
+            this._objectIdResolvers.add(objectIdResolver2);
         }
         ReadableObjectId createReadableObjectId = createReadableObjectId(key);
-        createReadableObjectId.setResolver(objectIdResolver22);
+        createReadableObjectId.setResolver(objectIdResolver2);
         this._objectIds.put(key, createReadableObjectId);
         return createReadableObjectId;
     }
 
-    protected ReadableObjectId createReadableObjectId(IdKey idKey) {
+    /* access modifiers changed from: protected */
+    public ReadableObjectId createReadableObjectId(IdKey idKey) {
         return new ReadableObjectId(idKey);
     }
 
@@ -156,7 +162,8 @@ public abstract class DefaultDeserializationContext extends DeserializationConte
         }
     }
 
-    protected boolean tryToResolveUnresolvedObjectId(ReadableObjectId readableObjectId) {
+    /* access modifiers changed from: protected */
+    public boolean tryToResolveUnresolvedObjectId(ReadableObjectId readableObjectId) {
         return readableObjectId.tryToResolveUnresolved(this);
     }
 
@@ -165,23 +172,22 @@ public abstract class DefaultDeserializationContext extends DeserializationConte
         if (obj != null) {
             if (obj instanceof JsonDeserializer) {
                 jsonDeserializer = (JsonDeserializer) obj;
-            } else if (obj instanceof Class) {
-                Class cls = (Class) obj;
-                if (!(cls == None.class || ClassUtil.isBogusClass(cls))) {
-                    if (JsonDeserializer.class.isAssignableFrom(cls)) {
-                        HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
-                        if (handlerInstantiator != null) {
-                            jsonDeserializer = handlerInstantiator.deserializerInstance(this._config, annotated, cls);
-                        }
-                        if (jsonDeserializer == null) {
-                            jsonDeserializer = (JsonDeserializer) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
-                        }
-                    } else {
+            } else if (!(obj instanceof Class)) {
+                throw new IllegalStateException("AnnotationIntrospector returned deserializer definition of type " + obj.getClass().getName() + "; expected type JsonDeserializer or Class<JsonDeserializer> instead");
+            } else {
+                Class<None> cls = (Class) obj;
+                if (cls != None.class && !ClassUtil.isBogusClass(cls)) {
+                    if (!JsonDeserializer.class.isAssignableFrom(cls)) {
                         throw new IllegalStateException("AnnotationIntrospector returned Class " + cls.getName() + "; expected Class<JsonDeserializer>");
                     }
+                    HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
+                    if (handlerInstantiator != null) {
+                        jsonDeserializer = handlerInstantiator.deserializerInstance(this._config, annotated, cls);
+                    }
+                    if (jsonDeserializer == null) {
+                        jsonDeserializer = (JsonDeserializer) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
+                    }
                 }
-            } else {
-                throw new IllegalStateException("AnnotationIntrospector returned deserializer definition of type " + obj.getClass().getName() + "; expected type JsonDeserializer or Class<JsonDeserializer> instead");
             }
             if (jsonDeserializer instanceof ResolvableDeserializer) {
                 ((ResolvableDeserializer) jsonDeserializer).resolve(this);
@@ -195,23 +201,22 @@ public abstract class DefaultDeserializationContext extends DeserializationConte
         if (obj != null) {
             if (obj instanceof KeyDeserializer) {
                 keyDeserializer = (KeyDeserializer) obj;
-            } else if (obj instanceof Class) {
-                Class cls = (Class) obj;
-                if (!(cls == KeyDeserializer.None.class || ClassUtil.isBogusClass(cls))) {
-                    if (KeyDeserializer.class.isAssignableFrom(cls)) {
-                        HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
-                        if (handlerInstantiator != null) {
-                            keyDeserializer = handlerInstantiator.keyDeserializerInstance(this._config, annotated, cls);
-                        }
-                        if (keyDeserializer == null) {
-                            keyDeserializer = (KeyDeserializer) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
-                        }
-                    } else {
+            } else if (!(obj instanceof Class)) {
+                throw new IllegalStateException("AnnotationIntrospector returned key deserializer definition of type " + obj.getClass().getName() + "; expected type KeyDeserializer or Class<KeyDeserializer> instead");
+            } else {
+                Class<KeyDeserializer.None> cls = (Class) obj;
+                if (cls != KeyDeserializer.None.class && !ClassUtil.isBogusClass(cls)) {
+                    if (!KeyDeserializer.class.isAssignableFrom(cls)) {
                         throw new IllegalStateException("AnnotationIntrospector returned Class " + cls.getName() + "; expected Class<KeyDeserializer>");
                     }
+                    HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
+                    if (handlerInstantiator != null) {
+                        keyDeserializer = handlerInstantiator.keyDeserializerInstance(this._config, annotated, cls);
+                    }
+                    if (keyDeserializer == null) {
+                        keyDeserializer = (KeyDeserializer) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
+                    }
                 }
-            } else {
-                throw new IllegalStateException("AnnotationIntrospector returned key deserializer definition of type " + obj.getClass().getName() + "; expected type KeyDeserializer or Class<KeyDeserializer> instead");
             }
             if (keyDeserializer instanceof ResolvableDeserializer) {
                 ((ResolvableDeserializer) keyDeserializer).resolve(this);

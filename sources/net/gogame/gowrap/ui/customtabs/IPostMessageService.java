@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.os.Binder;
 import android.os.Bundle;
@@ -7,13 +7,16 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.IPostMessageService */
 public interface IPostMessageService extends IInterface {
 
+    /* renamed from: net.gogame.gowrap.ui.customtabs.IPostMessageService$Stub */
     public static abstract class Stub extends Binder implements IPostMessageService {
         private static final String DESCRIPTOR = "net.gogame.gowrap.ui.customtabs.IPostMessageService";
         static final int TRANSACTION_onMessageChannelReady = 2;
         static final int TRANSACTION_onPostMessage = 3;
 
+        /* renamed from: net.gogame.gowrap.ui.customtabs.IPostMessageService$Stub$Proxy */
         private static class Proxy implements IPostMessageService {
             private IBinder mRemote;
 
@@ -92,11 +95,11 @@ public interface IPostMessageService extends IInterface {
 
         public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
             Bundle bundle = null;
-            ICustomTabsCallback asInterface;
+            String str = DESCRIPTOR;
             switch (i) {
                 case 2:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    asInterface = net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
+                    parcel.enforceInterface(str);
+                    ICustomTabsCallback asInterface = net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
                     if (parcel.readInt() != 0) {
                         bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     }
@@ -104,17 +107,17 @@ public interface IPostMessageService extends IInterface {
                     parcel2.writeNoException();
                     return true;
                 case 3:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    asInterface = net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
+                    parcel.enforceInterface(str);
+                    ICustomTabsCallback asInterface2 = net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
                     String readString = parcel.readString();
                     if (parcel.readInt() != 0) {
                         bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     }
-                    onPostMessage(asInterface, readString, bundle);
+                    onPostMessage(asInterface2, readString, bundle);
                     parcel2.writeNoException();
                     return true;
                 case 1598968902:
-                    parcel2.writeString(DESCRIPTOR);
+                    parcel2.writeString(str);
                     return true;
                 default:
                     return super.onTransact(i, parcel, parcel2, i2);

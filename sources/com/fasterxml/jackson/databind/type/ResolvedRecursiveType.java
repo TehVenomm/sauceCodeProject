@@ -21,12 +21,12 @@ public class ResolvedRecursiveType extends TypeBase {
         return this._referencedType;
     }
 
-    public StringBuilder getGenericSignature(StringBuilder stringBuilder) {
-        return this._referencedType.getGenericSignature(stringBuilder);
+    public StringBuilder getGenericSignature(StringBuilder sb) {
+        return this._referencedType.getGenericSignature(sb);
     }
 
-    public StringBuilder getErasedSignature(StringBuilder stringBuilder) {
-        return this._referencedType.getErasedSignature(stringBuilder);
+    public StringBuilder getErasedSignature(StringBuilder sb) {
+        return this._referencedType.getErasedSignature(sb);
     }
 
     public JavaType withContentType(JavaType javaType) {
@@ -53,8 +53,9 @@ public class ResolvedRecursiveType extends TypeBase {
         return this;
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         return this;
     }
 

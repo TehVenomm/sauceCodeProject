@@ -39,14 +39,11 @@ namespace GooglePlayGames.Android
 		public static AndroidJavaObject GetActivity()
 		{
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Expected O, but got Unknown
+			//IL_000b: Expected O, but got Unknown
 			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 			try
 			{
 				return val.GetStatic<AndroidJavaObject>("currentActivity");
-				IL_001c:
-				AndroidJavaObject result;
-				return result;
 			}
 			finally
 			{
@@ -105,7 +102,7 @@ namespace GooglePlayGames.Android
 			PlayGamesHelperObject.RunOnGameThread(delegate
 			{
 				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0014: Expected O, but got Unknown
+				//IL_0015: Expected O, but got Unknown
 				Debug.Log((object)"Calling Signout in token client");
 				AndroidJavaClass val = new AndroidJavaClass("com.google.games.bridge.TokenFragment");
 				val.CallStatic("signOut", new object[0]);
@@ -127,8 +124,8 @@ namespace GooglePlayGames.Android
 
 		internal void DoFetchToken(Action callback)
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Expected O, but got Unknown
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Expected O, but got Unknown
 			object[] array = new object[9];
 			jvalue[] array2 = AndroidJNIHelper.CreateJNIArgArray(array);
 			try
@@ -183,7 +180,7 @@ namespace GooglePlayGames.Android
 		internal static void FetchToken(bool fetchAuthCode, bool fetchEmail, bool fetchIdToken, string webClientId, bool forceRefresh, Action<int, string, string, string> callback)
 		{
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
+			//IL_0019: Expected O, but got Unknown
 			object[] array = new object[7];
 			jvalue[] array2 = AndroidJNIHelper.CreateJNIArgArray(array);
 			try

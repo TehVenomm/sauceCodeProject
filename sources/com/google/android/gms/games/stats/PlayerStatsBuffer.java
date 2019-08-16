@@ -9,6 +9,6 @@ public final class PlayerStatsBuffer extends AbstractDataBuffer<PlayerStats> {
     }
 
     public final /* synthetic */ Object get(int i) {
-        return new zzc(this.zzfkz, i);
+        return new zzb(this.mDataHolder, i);
     }
 }

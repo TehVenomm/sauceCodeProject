@@ -79,7 +79,7 @@ public class LoungeMemberesStatus
 		where x.userInfo != null && !memberes.Any((LoungeMemberStatus m) => m.userId == x.userInfo.userId)
 		select x.userInfo.userId).ToList();
 		list2 = (from m in memberes
-		where !lounge.slotInfos.Any((LoungeModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == m.userId)
+		where !lounge.slotInfos.Any((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == m.userId)
 		select m into x
 		select x.userId).ToList();
 		for (int i = 0; i < list.Count; i++)
@@ -89,6 +89,33 @@ public class LoungeMemberesStatus
 		for (int j = 0; j < list2.Count; j++)
 		{
 			Remove(list2[j]);
+		}
+	}
+
+	public void SyncPartyMember(PartyModel.Party party)
+	{
+		List<int> list = new List<int>();
+		List<int> list2 = new List<int>();
+		list = (from x in party.slotInfos
+		where x.userInfo != null && !memberes.Any((LoungeMemberStatus m) => m.userId == x.userInfo.userId)
+		select x.userInfo.userId).ToList();
+		list2 = (from m in memberes
+		where !party.slotInfos.Any((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == m.userId)
+		select m into x
+		select x.userId).ToList();
+		if (!list.IsNullOrEmpty())
+		{
+			for (int i = 0; i < list.Count; i++)
+			{
+				memberes.Add(new LoungeMemberStatus(list[i]));
+			}
+		}
+		if (!list2.IsNullOrEmpty())
+		{
+			for (int j = 0; j < list2.Count; j++)
+			{
+				Remove(list2[j]);
+			}
 		}
 	}
 }

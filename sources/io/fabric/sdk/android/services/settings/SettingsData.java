@@ -1,5 +1,6 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
+/* renamed from: io.fabric.sdk.android.services.settings.SettingsData */
 public class SettingsData {
     public final AnalyticsSettingsData analyticsSettingsData;
     public final AppSettingsData appData;
@@ -11,7 +12,7 @@ public class SettingsData {
     public final SessionSettingsData sessionData;
     public final int settingsVersion;
 
-    public SettingsData(long j, AppSettingsData appSettingsData, SessionSettingsData sessionSettingsData, PromptSettingsData promptSettingsData, FeaturesSettingsData featuresSettingsData, AnalyticsSettingsData analyticsSettingsData, BetaSettingsData betaSettingsData, int i, int i2) {
+    public SettingsData(long j, AppSettingsData appSettingsData, SessionSettingsData sessionSettingsData, PromptSettingsData promptSettingsData, FeaturesSettingsData featuresSettingsData, AnalyticsSettingsData analyticsSettingsData2, BetaSettingsData betaSettingsData2, int i, int i2) {
         this.expiresAtMillis = j;
         this.appData = appSettingsData;
         this.sessionData = sessionSettingsData;
@@ -19,8 +20,8 @@ public class SettingsData {
         this.featuresData = featuresSettingsData;
         this.settingsVersion = i;
         this.cacheDuration = i2;
-        this.analyticsSettingsData = analyticsSettingsData;
-        this.betaSettingsData = betaSettingsData;
+        this.analyticsSettingsData = analyticsSettingsData2;
+        this.betaSettingsData = betaSettingsData2;
     }
 
     public boolean isExpired(long j) {

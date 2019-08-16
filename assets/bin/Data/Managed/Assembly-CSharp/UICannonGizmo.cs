@@ -11,12 +11,12 @@ public class UICannonGizmo : UIStatusGizmoBase
 	[SerializeField]
 	protected Vector3 offset;
 
-	[Tooltip("スクリ\u30fcン横オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン横オフセット")]
 	protected float screenSideOffset = 22f;
 
-	[Tooltip("スクリ\u30fcン下オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン下オフセット")]
 	protected float screenBottomOffset = 112f;
 
 	private FieldGimmickCannonObject _owner;
@@ -39,10 +39,6 @@ public class UICannonGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			_owner = value;
 			if (_owner != null)
 			{
@@ -59,9 +55,6 @@ public class UICannonGizmo : UIStatusGizmoBase
 
 	protected override void OnEnable()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
 		base.OnEnable();
 		if (arrowSprite != null)
 		{
@@ -77,7 +70,6 @@ public class UICannonGizmo : UIStatusGizmoBase
 
 	protected override void UpdateParam()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
@@ -105,87 +97,85 @@ public class UICannonGizmo : UIStatusGizmoBase
 		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
 		if (owner == null || !owner.get_gameObject().get_activeSelf())
 		{
-			SetSpriteEnable(false);
+			SetSpriteEnable(enable: false);
 			isPlayAnimation = false;
+			return;
 		}
-		else
+		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+		if (boss != null)
 		{
-			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			if (boss != null)
+			if (!boss.IsValidShield())
 			{
-				if (!boss.IsValidShield())
+				SetSpriteEnable(enable: false);
+				isPlayAnimation = false;
+				return;
+			}
+			if (myPlayer != null)
+			{
+				if (myPlayer.IsOnCannonMode())
 				{
-					SetSpriteEnable(false);
+					SetSpriteEnable(enable: false);
 					isPlayAnimation = false;
 					return;
 				}
-				if (myPlayer != null)
+				SetSpriteEnable(enable: true);
+			}
+			if (!isPlayAnimation)
+			{
+				isPlayAnimation = true;
+				UITweenCtrl component = this.GetComponent<UITweenCtrl>();
+				component.Reset();
+				component.Play();
+			}
+		}
+		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, targetTransform.get_position() + offset);
+		screenZ = screenUIPosition.z;
+		screenUIPosition.z = 0f;
+		float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
+		Vector3 val = screenUIPosition;
+		bool flag = false;
+		float num2 = Screen.get_width();
+		if (screenUIPosition.x < screenSideOffset * num)
+		{
+			screenUIPosition.x = screenSideOffset * num;
+			flag = true;
+		}
+		else if (screenUIPosition.x > num2 - screenSideOffset * num)
+		{
+			screenUIPosition.x = num2 - screenSideOffset * num;
+			flag = true;
+		}
+		if (screenUIPosition.y < screenBottomOffset * num)
+		{
+			screenUIPosition.y = screenBottomOffset * num;
+			flag = true;
+		}
+		if (flag)
+		{
+			SetSpriteEnable(enable: true);
+			Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+			Vector3 val3 = transform.get_position() - val2;
+			if (val3.get_sqrMagnitude() >= 2E-05f)
+			{
+				transform.set_position(val2);
+			}
+			if (arrowTransform != null)
+			{
+				Vector3 val4 = val - screenUIPosition;
+				if (val4 != Vector3.get_zero())
 				{
-					if (myPlayer.IsOnCannonMode())
-					{
-						SetSpriteEnable(false);
-						isPlayAnimation = false;
-						return;
-					}
-					SetSpriteEnable(true);
+					float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
+					arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
 				}
-				if (!isPlayAnimation)
+				else
 				{
-					isPlayAnimation = true;
-					UITweenCtrl component = this.GetComponent<UITweenCtrl>();
-					component.Reset();
-					component.Play(true, null);
-				}
-			}
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, targetTransform.get_position() + offset);
-			screenZ = screenUIPosition.z;
-			screenUIPosition.z = 0f;
-			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
-			bool flag = false;
-			float num2 = (float)Screen.get_width();
-			if (screenUIPosition.x < screenSideOffset * num)
-			{
-				screenUIPosition.x = screenSideOffset * num;
-				flag = true;
-			}
-			else if (screenUIPosition.x > num2 - screenSideOffset * num)
-			{
-				screenUIPosition.x = num2 - screenSideOffset * num;
-				flag = true;
-			}
-			if (screenUIPosition.y < screenBottomOffset * num)
-			{
-				screenUIPosition.y = screenBottomOffset * num;
-				flag = true;
-			}
-			if (flag)
-			{
-				SetSpriteEnable(true);
-				Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-				Vector3 val3 = transform.get_position() - val2;
-				if (val3.get_sqrMagnitude() >= 2E-05f)
-				{
-					transform.set_position(val2);
-				}
-				if (arrowTransform != null)
-				{
-					Vector3 val4 = val - screenUIPosition;
-					if (val4 != Vector3.get_zero())
-					{
-						float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
-					}
-					else
-					{
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
-					}
+					arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
 				}
 			}
-			else
-			{
-				SetSpriteEnable(false);
-			}
+		}
+		else
+		{
+			SetSpriteEnable(enable: false);
 		}
 	}
 

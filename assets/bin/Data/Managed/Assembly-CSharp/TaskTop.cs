@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class TaskTop : GameSection
@@ -45,13 +46,13 @@ public class TaskTop : GameSection
 		public TaskInfo info;
 	}
 
-	private const int ONE_PAGE_ITEM_NUM = 10;
-
 	private readonly string[] STRING_KEY = new string[2]
 	{
 		"STR_NOTACHIEVED",
 		"STR_ACHIEVED"
 	};
+
+	private const int ONE_PAGE_ITEM_NUM = 10;
 
 	private readonly string LIST_ITEM_PREFAB_NAME = "TaskListItem";
 
@@ -66,6 +67,12 @@ public class TaskTop : GameSection
 	private UIScrollView scrollView;
 
 	private List<TaskData>[] taskDataLists = new List<TaskData>[2];
+
+	[CompilerGenerated]
+	private static Comparison<TaskData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static Comparison<TaskData> _003C_003Ef__mg_0024cache1;
 
 	public override IEnumerable<string> requireDataTable
 	{
@@ -119,6 +126,11 @@ public class TaskTop : GameSection
 		}
 		if (a.info.status == b.info.status)
 		{
+			if (a.tableData == null || b.tableData == null)
+			{
+				Debug.LogError((object)("<color=red>" + ((a.tableData != null) ? b.info.taskId : a.info.taskId) + " not found</color>"));
+				return -1;
+			}
 			return a.tableData.orderNo - b.tableData.orderNo;
 		}
 		return 1;
@@ -179,7 +191,7 @@ public class TaskTop : GameSection
 		{
 			item_num = taskDataLists[(int)showType].Count - start;
 		}
-		SetDynamicList(gridTransform, LIST_ITEM_PREFAB_NAME, item_num, true, null, null, delegate(int i, Transform t, bool isRecycle)
+		SetDynamicList(gridTransform, LIST_ITEM_PREFAB_NAME, item_num, reset: true, null, null, delegate(int i, Transform t, bool isRecycle)
 		{
 			InitListItem(taskDataLists[(int)showType][start + i], t);
 		});
@@ -187,59 +199,57 @@ public class TaskTop : GameSection
 
 	private void InitListItem(TaskData data, Transform root)
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Expected O, but got Unknown
-		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Expected O, but got Unknown
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fe: Expected O, but got Unknown
-		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0212: Expected O, but got Unknown
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(root, UI.OBJ_CLEARED_ITEM, data.info.status == 2 || data.info.status == 3);
 		SetActive(root, UI.OBJ_NOT_CLEARED_ITEM, data.info.status == 1);
 		Transform val = FindCtrl(root, UI.SPR_GAUGE);
+		int num = (data.tableData == null) ? int.MaxValue : data.tableData.goalNum;
+		int num2 = (data.tableData != null) ? data.tableData.rewardNum : 0;
+		int num3 = (data.tableData != null) ? data.tableData.itemId : 0;
+		string text = (data.tableData == null) ? string.Empty : data.tableData.title;
+		string text2 = (data.tableData == null) ? string.Empty : data.tableData.detail;
+		REWARD_TYPE rEWARD_TYPE = (data.tableData != null) ? data.tableData.rewardType : REWARD_TYPE.NONE;
 		if (val != null)
 		{
-			val.set_localScale(new Vector3(Mathf.Clamp((float)data.info.progress / (float)data.tableData.goalNum, 0f, 1f), 1f, 1f));
+			val.set_localScale(new Vector3(Mathf.Clamp((float)data.info.progress / (float)num, 0f, 1f), 1f, 1f));
 		}
-		SetLabelText(root, UI.LBL_GAUGE, data.info.progress.ToString() + "/" + data.tableData.goalNum.ToString());
-		SetLabelText(root, UI.LBL_CONDITION, data.tableData.title);
-		SetLabelText(root, UI.LBL_REWARD_NAME, data.tableData.detail);
-		if (data.tableData.rewardNum <= 1)
+		SetLabelText(root, UI.LBL_GAUGE, data.info.progress.ToString() + "/" + num.ToString());
+		SetLabelText(root, UI.LBL_CONDITION, text);
+		SetLabelText(root, UI.LBL_REWARD_NAME, text2);
+		if (num2 <= 1)
 		{
-			SetActive(root, UI.LBL_ITEM, false);
+			SetActive(root, UI.LBL_ITEM, is_visible: false);
 		}
 		else
 		{
-			SetActive(root, UI.LBL_ITEM, true);
-			SetLabelText(root, UI.LBL_ITEM, "x" + data.tableData.rewardNum.ToString());
+			SetActive(root, UI.LBL_ITEM, is_visible: true);
+			SetLabelText(root, UI.LBL_ITEM, "x" + num2.ToString());
 		}
-		ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(data.tableData.rewardType, (uint)data.tableData.itemId, FindCtrl(root, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-		SetMaterialInfo(itemIcon._transform, data.tableData.rewardType, (uint)data.tableData.itemId, scrollView.get_transform());
+		ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(rEWARD_TYPE, (uint)num3, FindCtrl(root, UI.OBJ_ICON_ROOT));
+		SetMaterialInfo(itemIcon._transform, rEWARD_TYPE, (uint)num3, scrollView.get_transform());
 		UIButton component = root.GetComponent<UIButton>();
 		if (component != null)
 		{
 			component.tweenTarget = itemIcon.get_gameObject();
 		}
-		GameObject val2 = FindCtrl(root, UI.SPR_NOT_RECIEVED).get_gameObject();
-		GameObject val3 = FindCtrl(root, UI.SPR_RECIEVED).get_gameObject();
+		GameObject gameObject = FindCtrl(root, UI.SPR_NOT_RECIEVED).get_gameObject();
+		GameObject gameObject2 = FindCtrl(root, UI.SPR_RECIEVED).get_gameObject();
 		if (data.info.status == 2)
 		{
-			SetButtonEnabled(root, true);
+			SetButtonEnabled(root, is_enabled: true);
 			SetEvent(root, "RECEIVE_REWARD", data);
-			val2.SetActive(true);
-			val3.SetActive(false);
+			gameObject.SetActive(true);
+			gameObject2.SetActive(false);
 		}
 		else if (data.info.status == 3)
 		{
-			SetButtonEnabled(root, false);
-			val2.SetActive(false);
-			val3.SetActive(true);
+			SetButtonEnabled(root, is_enabled: false);
+			gameObject.SetActive(false);
+			gameObject2.SetActive(true);
 		}
 		else
 		{
-			SetButtonEnabled(root, false);
+			SetButtonEnabled(root, is_enabled: false);
 		}
 	}
 
@@ -287,7 +297,7 @@ public class TaskTop : GameSection
 			{
 				taskDataLists[0].Remove(data);
 				UpdateUI();
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			}, string.Empty);
 		}
 	}

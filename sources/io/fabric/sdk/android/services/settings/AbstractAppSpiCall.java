@@ -1,18 +1,19 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.Kit;
-import io.fabric.sdk.android.KitInfo;
-import io.fabric.sdk.android.services.common.AbstractSpiCall;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.common.ResponseParser;
-import io.fabric.sdk.android.services.network.HttpMethod;
-import io.fabric.sdk.android.services.network.HttpRequest;
-import io.fabric.sdk.android.services.network.HttpRequestFactory;
-import java.io.Closeable;
+import android.content.res.Resources.NotFoundException;
 import java.io.InputStream;
 import java.util.Locale;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.Kit;
+import p017io.fabric.sdk.android.KitInfo;
+import p017io.fabric.sdk.android.services.common.AbstractSpiCall;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.common.ResponseParser;
+import p017io.fabric.sdk.android.services.network.HttpMethod;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
+import p017io.fabric.sdk.android.services.network.HttpRequestFactory;
 
+/* renamed from: io.fabric.sdk.android.services.settings.AbstractAppSpiCall */
 abstract class AbstractAppSpiCall extends AbstractSpiCall implements AppSpiCall {
     public static final String APP_BUILD_VERSION_PARAM = "app[build_version]";
     public static final String APP_BUILT_SDK_VERSION_PARAM = "app[built_sdk_version]";
@@ -38,24 +39,23 @@ abstract class AbstractAppSpiCall extends AbstractSpiCall implements AppSpiCall 
     }
 
     private HttpRequest applyHeadersTo(HttpRequest httpRequest, AppRequestData appRequestData) {
-        return httpRequest.header(AbstractSpiCall.HEADER_API_KEY, appRequestData.apiKey).header(AbstractSpiCall.HEADER_CLIENT_TYPE, AbstractSpiCall.ANDROID_CLIENT_TYPE).header(AbstractSpiCall.HEADER_CLIENT_VERSION, this.kit.getVersion());
+        return httpRequest.header(AbstractSpiCall.HEADER_API_KEY, appRequestData.apiKey).header(AbstractSpiCall.HEADER_CLIENT_TYPE, "android").header(AbstractSpiCall.HEADER_CLIENT_VERSION, this.kit.getVersion());
     }
 
     private HttpRequest applyMultipartDataTo(HttpRequest httpRequest, AppRequestData appRequestData) {
-        Closeable closeable = null;
-        HttpRequest part = httpRequest.part(APP_IDENTIFIER_PARAM, appRequestData.appId).part(APP_NAME_PARAM, appRequestData.name).part(APP_DISPLAY_VERSION_PARAM, appRequestData.displayVersion).part(APP_BUILD_VERSION_PARAM, appRequestData.buildVersion).part(APP_SOURCE_PARAM, Integer.valueOf(appRequestData.source)).part(APP_MIN_SDK_VERSION_PARAM, appRequestData.minSdkVersion).part(APP_BUILT_SDK_VERSION_PARAM, appRequestData.builtSdkVersion);
+        InputStream inputStream = null;
+        HttpRequest part = httpRequest.part(APP_IDENTIFIER_PARAM, appRequestData.appId).part(APP_NAME_PARAM, appRequestData.name).part(APP_DISPLAY_VERSION_PARAM, appRequestData.displayVersion).part(APP_BUILD_VERSION_PARAM, appRequestData.buildVersion).part(APP_SOURCE_PARAM, (Number) Integer.valueOf(appRequestData.source)).part(APP_MIN_SDK_VERSION_PARAM, appRequestData.minSdkVersion).part(APP_BUILT_SDK_VERSION_PARAM, appRequestData.builtSdkVersion);
         if (!CommonUtils.isNullOrEmpty(appRequestData.instanceIdentifier)) {
             part.part(APP_INSTANCE_IDENTIFIER_PARAM, appRequestData.instanceIdentifier);
         }
         if (appRequestData.icon != null) {
             try {
-                closeable = this.kit.getContext().getResources().openRawResource(appRequestData.icon.iconResourceId);
-                part.part(APP_ICON_HASH_PARAM, appRequestData.icon.hash).part(APP_ICON_DATA_PARAM, ICON_FILE_NAME, ICON_CONTENT_TYPE, (InputStream) closeable).part(APP_ICON_WIDTH_PARAM, Integer.valueOf(appRequestData.icon.width)).part(APP_ICON_HEIGHT_PARAM, Integer.valueOf(appRequestData.icon.height));
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Failed to find app icon with resource ID: " + appRequestData.icon.iconResourceId, e);
+                inputStream = this.kit.getContext().getResources().openRawResource(appRequestData.icon.iconResourceId);
+                part.part(APP_ICON_HASH_PARAM, appRequestData.icon.hash).part(APP_ICON_DATA_PARAM, ICON_FILE_NAME, ICON_CONTENT_TYPE, inputStream).part(APP_ICON_WIDTH_PARAM, (Number) Integer.valueOf(appRequestData.icon.width)).part(APP_ICON_HEIGHT_PARAM, (Number) Integer.valueOf(appRequestData.icon.height));
+            } catch (NotFoundException e) {
+                Fabric.getLogger().mo20972e(Fabric.TAG, "Failed to find app icon with resource ID: " + appRequestData.icon.iconResourceId, e);
             } finally {
-                part = "Failed to close app icon InputStream.";
-                CommonUtils.closeOrLog(closeable, part);
+                CommonUtils.closeOrLog(inputStream, "Failed to close app icon InputStream.");
             }
         }
         if (appRequestData.sdkKits != null) {
@@ -67,24 +67,26 @@ abstract class AbstractAppSpiCall extends AbstractSpiCall implements AppSpiCall 
         return part;
     }
 
-    String getKitBuildTypeKey(KitInfo kitInfo) {
+    /* access modifiers changed from: 0000 */
+    public String getKitBuildTypeKey(KitInfo kitInfo) {
         return String.format(Locale.US, APP_SDK_MODULES_PARAM_BUILD_TYPE, new Object[]{kitInfo.getIdentifier()});
     }
 
-    String getKitVersionKey(KitInfo kitInfo) {
+    /* access modifiers changed from: 0000 */
+    public String getKitVersionKey(KitInfo kitInfo) {
         return String.format(Locale.US, APP_SDK_MODULES_PARAM_VERSION, new Object[]{kitInfo.getIdentifier()});
     }
 
     public boolean invoke(AppRequestData appRequestData) {
         HttpRequest applyMultipartDataTo = applyMultipartDataTo(applyHeadersTo(getHttpRequest(), appRequestData), appRequestData);
-        Fabric.getLogger().mo4289d("Fabric", "Sending app info to " + getUrl());
+        Fabric.getLogger().mo20969d(Fabric.TAG, "Sending app info to " + getUrl());
         if (appRequestData.icon != null) {
-            Fabric.getLogger().mo4289d("Fabric", "App icon hash is " + appRequestData.icon.hash);
-            Fabric.getLogger().mo4289d("Fabric", "App icon size is " + appRequestData.icon.width + "x" + appRequestData.icon.height);
+            Fabric.getLogger().mo20969d(Fabric.TAG, "App icon hash is " + appRequestData.icon.hash);
+            Fabric.getLogger().mo20969d(Fabric.TAG, "App icon size is " + appRequestData.icon.width + "x" + appRequestData.icon.height);
         }
         int code = applyMultipartDataTo.code();
-        Fabric.getLogger().mo4289d("Fabric", (HttpRequest.METHOD_POST.equals(applyMultipartDataTo.method()) ? "Create" : "Update") + " app request ID: " + applyMultipartDataTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
-        Fabric.getLogger().mo4289d("Fabric", "Result was " + code);
+        Fabric.getLogger().mo20969d(Fabric.TAG, (HttpRequest.METHOD_POST.equals(applyMultipartDataTo.method()) ? "Create" : "Update") + " app request ID: " + applyMultipartDataTo.header(AbstractSpiCall.HEADER_REQUEST_ID));
+        Fabric.getLogger().mo20969d(Fabric.TAG, "Result was " + code);
         return ResponseParser.parse(code) == 0;
     }
 }

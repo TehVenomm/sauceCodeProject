@@ -1,11 +1,10 @@
 using System;
+using System.Runtime.CompilerServices;
 
 public class TaskTable : Singleton<TaskTable>, IDataTable
 {
 	public class TaskData
 	{
-		public const string NT = "taskId,title,detail,orderNo,openRequirements,startTime,endTime,goalNum,conditionVal1,conditionVal2,conditionVal3,conditionVal4,conditionVal5,rewardType,itemId,rewardNum,rewardVal1,rewardVal2,minVersion";
-
 		public int id;
 
 		public string title;
@@ -44,6 +43,8 @@ public class TaskTable : Singleton<TaskTable>, IDataTable
 
 		public string minVersion;
 
+		public const string NT = "taskId,title,detail,orderNo,openRequirements,startTime,endTime,goalNum,conditionVal1,conditionVal2,conditionVal3,conditionVal4,conditionVal5,rewardType,itemId,rewardNum,rewardVal1,rewardVal2,minVersion";
+
 		public static bool cb(CSVReader csv_reader, TaskData data, ref uint key)
 		{
 			data.id = (int)key;
@@ -61,7 +62,7 @@ public class TaskTable : Singleton<TaskTable>, IDataTable
 			csv_reader.Pop(ref data.conditionVal5);
 			string value = string.Empty;
 			csv_reader.Pop(ref value);
-			data.rewardType = (REWARD_TYPE)(int)Enum.Parse(typeof(REWARD_TYPE), value);
+			data.rewardType = (REWARD_TYPE)Enum.Parse(typeof(REWARD_TYPE), value);
 			csv_reader.Pop(ref data.itemId);
 			csv_reader.Pop(ref data.rewardNum);
 			csv_reader.Pop(ref data.rewartVal1);
@@ -82,9 +83,12 @@ public class TaskTable : Singleton<TaskTable>, IDataTable
 
 	private UIntKeyTable<TaskData> taskDataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<TaskData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		taskDataTable = TableUtility.CreateUIntKeyTable<TaskData>(csv_text, TaskData.cb, "taskId,title,detail,orderNo,openRequirements,startTime,endTime,goalNum,conditionVal1,conditionVal2,conditionVal3,conditionVal4,conditionVal5,rewardType,itemId,rewardNum,rewardVal1,rewardVal2,minVersion", null);
+		taskDataTable = TableUtility.CreateUIntKeyTable<TaskData>(csv_text, TaskData.cb, "taskId,title,detail,orderNo,openRequirements,startTime,endTime,goalNum,conditionVal1,conditionVal2,conditionVal3,conditionVal4,conditionVal5,rewardType,itemId,rewardNum,rewardVal1,rewardVal2,minVersion");
 		taskDataTable.TrimExcess();
 	}
 

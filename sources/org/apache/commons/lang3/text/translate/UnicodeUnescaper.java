@@ -15,15 +15,16 @@ public class UnicodeUnescaper extends CharSequenceTranslator {
         if (i + i2 < charSequence.length() && charSequence.charAt(i + i2) == '+') {
             i2++;
         }
-        if ((i + i2) + 4 <= charSequence.length()) {
-            CharSequence subSequence = charSequence.subSequence(i + i2, (i + i2) + 4);
+        if (i + i2 + 4 <= charSequence.length()) {
+            CharSequence subSequence = charSequence.subSequence(i + i2, i + i2 + 4);
             try {
                 writer.write((char) Integer.parseInt(subSequence.toString(), 16));
                 return i2 + 4;
-            } catch (Throwable e) {
+            } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Unable to parse unicode value: " + subSequence, e);
             }
+        } else {
+            throw new IllegalArgumentException("Less than 4 hex digits in unicode value: '" + charSequence.subSequence(i, charSequence.length()) + "' due to end of CharSequence");
         }
-        throw new IllegalArgumentException("Less than 4 hex digits in unicode value: '" + charSequence.subSequence(i, charSequence.length()) + "' due to end of CharSequence");
     }
 }

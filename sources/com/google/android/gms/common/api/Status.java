@@ -6,42 +6,68 @@ import android.content.IntentSender.SendIntentException;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
+import com.google.android.gms.common.annotation.KeepForSdk;
+import com.google.android.gms.common.internal.Objects;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
+import com.google.android.gms.common.util.VisibleForTesting;
 
-public final class Status extends zza implements Result, ReflectedParcelable {
-    public static final Creator<Status> CREATOR = new zzh();
-    public static final Status zzfhp = new Status(0);
-    public static final Status zzfhq = new Status(14);
-    public static final Status zzfhr = new Status(8);
-    public static final Status zzfhs = new Status(15);
-    public static final Status zzfht = new Status(16);
-    private static Status zzfhu = new Status(17);
-    private static Status zzfhv = new Status(18);
-    private final PendingIntent mPendingIntent;
-    private int zzdxt;
-    private final int zzezx;
-    private final String zzffa;
+@KeepForSdk
+@Class(creator = "StatusCreator")
+public final class Status extends AbstractSafeParcelable implements Result, ReflectedParcelable {
+    public static final Creator<Status> CREATOR = new zzb();
+    @KeepForSdk
+    public static final Status RESULT_CANCELED = new Status(16);
+    @KeepForSdk
+    public static final Status RESULT_DEAD_CLIENT = new Status(18);
+    @KeepForSdk
+    public static final Status RESULT_INTERNAL_ERROR = new Status(8);
+    @KeepForSdk
+    public static final Status RESULT_INTERRUPTED = new Status(14);
+    @KeepForSdk
+    @VisibleForTesting
+    public static final Status RESULT_SUCCESS = new Status(0);
+    @KeepForSdk
+    public static final Status RESULT_TIMEOUT = new Status(15);
+    private static final Status zzar = new Status(17);
+    @VersionField(mo13996id = 1000)
+    private final int zzg;
+    @Field(getter = "getStatusCode", mo13990id = 1)
+    private final int zzh;
+    @Nullable
+    @Field(getter = "getPendingIntent", mo13990id = 3)
+    private final PendingIntent zzi;
+    @Nullable
+    @Field(getter = "getStatusMessage", mo13990id = 2)
+    private final String zzj;
 
+    @KeepForSdk
     public Status(int i) {
         this(i, null);
     }
 
-    Status(int i, int i2, String str, PendingIntent pendingIntent) {
-        this.zzdxt = i;
-        this.zzezx = i2;
-        this.zzffa = str;
-        this.mPendingIntent = pendingIntent;
+    @Constructor
+    @KeepForSdk
+    Status(@Param(mo13993id = 1000) int i, @Param(mo13993id = 1) int i2, @Nullable @Param(mo13993id = 2) String str, @Nullable @Param(mo13993id = 3) PendingIntent pendingIntent) {
+        this.zzg = i;
+        this.zzh = i2;
+        this.zzj = str;
+        this.zzi = pendingIntent;
     }
 
-    public Status(int i, String str) {
+    @KeepForSdk
+    public Status(int i, @Nullable String str) {
         this(1, i, str, null);
     }
 
-    public Status(int i, String str, PendingIntent pendingIntent) {
+    @KeepForSdk
+    public Status(int i, @Nullable String str, @Nullable PendingIntent pendingIntent) {
         this(1, i, str, pendingIntent);
     }
 
@@ -50,66 +76,69 @@ public final class Status extends zza implements Result, ReflectedParcelable {
             return false;
         }
         Status status = (Status) obj;
-        return this.zzdxt == status.zzdxt && this.zzezx == status.zzezx && zzbf.equal(this.zzffa, status.zzffa) && zzbf.equal(this.mPendingIntent, status.mPendingIntent);
+        return this.zzg == status.zzg && this.zzh == status.zzh && Objects.equal(this.zzj, status.zzj) && Objects.equal(this.zzi, status.zzi);
     }
 
     public final PendingIntent getResolution() {
-        return this.mPendingIntent;
+        return this.zzi;
     }
 
+    @KeepForSdk
     public final Status getStatus() {
         return this;
     }
 
     public final int getStatusCode() {
-        return this.zzezx;
+        return this.zzh;
     }
 
     @Nullable
     public final String getStatusMessage() {
-        return this.zzffa;
+        return this.zzj;
     }
 
+    @VisibleForTesting
     public final boolean hasResolution() {
-        return this.mPendingIntent != null;
+        return this.zzi != null;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzdxt), Integer.valueOf(this.zzezx), this.zzffa, this.mPendingIntent});
+        return Objects.hashCode(Integer.valueOf(this.zzg), Integer.valueOf(this.zzh), this.zzj, this.zzi);
     }
 
     public final boolean isCanceled() {
-        return this.zzezx == 16;
+        return this.zzh == 16;
     }
 
     public final boolean isInterrupted() {
-        return this.zzezx == 14;
+        return this.zzh == 14;
     }
 
     public final boolean isSuccess() {
-        return this.zzezx <= 0;
+        return this.zzh <= 0;
     }
 
     public final void startResolutionForResult(Activity activity, int i) throws SendIntentException {
         if (hasResolution()) {
-            activity.startIntentSenderForResult(this.mPendingIntent.getIntentSender(), i, null, 0, 0, 0);
+            activity.startIntentSenderForResult(this.zzi.getIntentSender(), i, null, 0, 0, 0);
         }
     }
 
     public final String toString() {
-        return zzbf.zzt(this).zzg("statusCode", zzaft()).zzg("resolution", this.mPendingIntent).toString();
+        return Objects.toStringHelper(this).add("statusCode", zzg()).add("resolution", this.zzi).toString();
     }
 
+    @KeepForSdk
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, getStatusCode());
-        zzd.zza(parcel, 2, getStatusMessage(), false);
-        zzd.zza(parcel, 3, this.mPendingIntent, i, false);
-        zzd.zzc(parcel, 1000, this.zzdxt);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, getStatusCode());
+        SafeParcelWriter.writeString(parcel, 2, getStatusMessage(), false);
+        SafeParcelWriter.writeParcelable(parcel, 3, this.zzi, i, false);
+        SafeParcelWriter.writeInt(parcel, 1000, this.zzg);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final String zzaft() {
-        return this.zzffa != null ? this.zzffa : CommonStatusCodes.getStatusCodeString(this.zzezx);
+    public final String zzg() {
+        return this.zzj != null ? this.zzj : CommonStatusCodes.getStatusCodeString(this.zzh);
     }
 }

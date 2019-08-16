@@ -1,28 +1,37 @@
 package com.google.android.gms.auth.api.signin.internal;
 
-import android.os.RemoteException;
+import android.content.Intent;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.Api.zzb;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 
-final class zzf extends zzl<GoogleSignInResult> {
-    final /* synthetic */ zzy zzecv;
-    final /* synthetic */ GoogleSignInOptions zzecw;
-
-    zzf(GoogleApiClient googleApiClient, zzy zzy, GoogleSignInOptions googleSignInOptions) {
-        this.zzecv = zzy;
-        this.zzecw = googleSignInOptions;
-        super(googleApiClient);
+public final class zzf implements GoogleSignInApi {
+    private static GoogleSignInOptions zzc(GoogleApiClient googleApiClient) {
+        return ((zzg) googleApiClient.getClient(Auth.zzh)).zzg();
     }
 
-    protected final /* synthetic */ void zza(zzb zzb) throws RemoteException {
-        ((zzt) ((zzd) zzb).zzajj()).zza(new zzg(this), this.zzecw);
+    public final Intent getSignInIntent(GoogleApiClient googleApiClient) {
+        return zzh.zzc(googleApiClient.getContext(), zzc(googleApiClient));
     }
 
-    protected final /* synthetic */ Result zzb(Status status) {
-        return new GoogleSignInResult(null, status);
+    public final GoogleSignInResult getSignInResultFromIntent(Intent intent) {
+        return zzh.getSignInResultFromIntent(intent);
+    }
+
+    public final PendingResult<Status> revokeAccess(GoogleApiClient googleApiClient) {
+        return zzh.zzd(googleApiClient, googleApiClient.getContext(), false);
+    }
+
+    public final PendingResult<Status> signOut(GoogleApiClient googleApiClient) {
+        return zzh.zzc(googleApiClient, googleApiClient.getContext(), false);
+    }
+
+    public final OptionalPendingResult<GoogleSignInResult> silentSignIn(GoogleApiClient googleApiClient) {
+        return zzh.zzc(googleApiClient, googleApiClient.getContext(), zzc(googleApiClient), false);
     }
 }

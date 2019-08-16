@@ -1,6 +1,7 @@
 using MsgPack;
 using MsgPack.Serialization;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class CoopPacketMsgpackUnitySerializer : CoopPacketSerializer
 {
 	public int version = int.Parse("10");
 
-	private SerializationContext context = SerializationContext.Default;
+	private SerializationContext context = SerializationContext.get_Default();
 
 	private ObjectPacker packer = new ObjectPacker();
 
@@ -19,14 +20,14 @@ public class CoopPacketMsgpackUnitySerializer : CoopPacketSerializer
 
 	public static void RegisterOverrideCommon(SerializationContext context)
 	{
-		context.Serializers.RegisterOverride(new Vector3Serializer(context));
-		context.Serializers.RegisterOverride(new QuaternionSerializer(context));
-		context.Serializers.RegisterOverride(new ListSerializer<int>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<float>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<bool>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<string>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<Vector3>(context));
-		context.Serializers.RegisterOverride(new ListSerializer<SkillInfo.SkillBaseInfo>(context));
+		context.get_Serializers().RegisterOverride<Vector3>(new Vector3Serializer(context));
+		context.get_Serializers().RegisterOverride<Quaternion>(new QuaternionSerializer(context));
+		context.get_Serializers().RegisterOverride<List<int>>(new ListSerializer<int>(context));
+		context.get_Serializers().RegisterOverride<List<float>>(new ListSerializer<float>(context));
+		context.get_Serializers().RegisterOverride<List<bool>>(new ListSerializer<bool>(context));
+		context.get_Serializers().RegisterOverride<List<string>>(new ListSerializer<string>(context));
+		context.get_Serializers().RegisterOverride<List<Vector3>>(new ListSerializer<Vector3>(context));
+		context.get_Serializers().RegisterOverride<List<SkillInfo.SkillBaseInfo>>(new ListSerializer<SkillInfo.SkillBaseInfo>(context));
 	}
 
 	public override PacketStream Serialize(CoopPacket packet)

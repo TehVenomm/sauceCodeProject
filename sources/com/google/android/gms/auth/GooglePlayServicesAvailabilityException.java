@@ -3,14 +3,14 @@ package com.google.android.gms.auth;
 import android.content.Intent;
 
 public class GooglePlayServicesAvailabilityException extends UserRecoverableAuthException {
-    private final int zzdxs;
+    private final int zzu;
 
     GooglePlayServicesAvailabilityException(int i, String str, Intent intent) {
         super(str, intent);
-        this.zzdxs = i;
+        this.zzu = i;
     }
 
     public int getConnectionStatusCode() {
-        return this.zzdxs;
+        return this.zzu;
     }
 }

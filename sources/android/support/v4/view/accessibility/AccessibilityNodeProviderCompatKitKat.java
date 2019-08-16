@@ -1,16 +1,16 @@
-package android.support.v4.view.accessibility;
+package android.support.p000v4.view.accessibility;
 
-import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityNodeProvider;
 import java.util.List;
 
-@TargetApi(19)
 @RequiresApi(19)
+/* renamed from: android.support.v4.view.accessibility.AccessibilityNodeProviderCompatKitKat */
 class AccessibilityNodeProviderCompatKitKat {
 
+    /* renamed from: android.support.v4.view.accessibility.AccessibilityNodeProviderCompatKitKat$AccessibilityNodeInfoBridge */
     interface AccessibilityNodeInfoBridge {
         Object createAccessibilityNodeInfo(int i);
 

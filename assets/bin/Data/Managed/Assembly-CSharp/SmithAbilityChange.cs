@@ -33,7 +33,6 @@ public class SmithAbilityChange : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		equipItemInfo = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData;
 		Transform val = SetPrefab((Enum)UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
 		abilityList = val.get_gameObject().AddComponent<AbilityChangeAbilityList>();
@@ -52,17 +51,17 @@ public class SmithAbilityChange : GameSection
 	protected override void OnOpen()
 	{
 		abilityList.InitUI();
-		abilityList.Open(UITransition.TYPE.OPEN);
+		abilityList.Open();
 		base.OnOpen();
 	}
 
 	public override void UpdateUI()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		SetFontStyle((Enum)UI.STR_TITLE_MONEY, 2);
 		abilityList.SetParameter(equipItemInfo);
 		int needMoney = GetNeedMoney();
@@ -89,7 +88,7 @@ public class SmithAbilityChange : GameSection
 		SmithManager.ERR_SMITH_SEND eRR_SMITH_SEND = MonoBehaviourSingleton<SmithManager>.I.CheckAbilityChange(equipItemInfo);
 		if (eRR_SMITH_SEND != 0)
 		{
-			GameSection.ChangeEvent(eRR_SMITH_SEND.ToString(), null);
+			GameSection.ChangeEvent(eRR_SMITH_SEND.ToString());
 		}
 		else
 		{
@@ -110,11 +109,11 @@ public class SmithAbilityChange : GameSection
 				SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
 				smithGrowData.selectEquipData = model;
 				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 			else
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 		});
 	}
@@ -124,7 +123,7 @@ public class SmithAbilityChange : GameSection
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().Exists((GameSectionHistory.HistoryData x) => x.sectionName == "SmithAbilityChangeSelect"))
 		{
 			GameSection.StopEvent();
-			DispatchEvent("MAIN_MENU_STATUS", null);
+			TO_UNIQUE_OR_MAIN_STATUS();
 		}
 	}
 

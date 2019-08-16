@@ -25,7 +25,7 @@ public class FriendSearchName : ConfigName
 	protected override void SetBeforeText()
 	{
 		before_text = string.Empty;
-		inputMaxLength = 12;
+		inputMaxLength = 14;
 	}
 
 	private void OnQuery_OK()
@@ -42,7 +42,7 @@ public class FriendSearchName : ConfigName
 				recv_data,
 				input_text
 			});
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

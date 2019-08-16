@@ -1,4 +1,4 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
 import android.util.Log;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/* renamed from: android.support.v4.util.AtomicFile */
 public class AtomicFile {
     private final File mBackupName;
     private final File mBaseName;
@@ -39,7 +40,7 @@ public class AtomicFile {
                 fileOutputStream.close();
                 this.mBaseName.delete();
                 this.mBackupName.renameTo(this.mBaseName);
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 Log.w("AtomicFile", "failWrite: Got exception:", e);
             }
         }
@@ -51,7 +52,7 @@ public class AtomicFile {
             try {
                 fileOutputStream.close();
                 this.mBackupName.delete();
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 Log.w("AtomicFile", "finishWrite: Got exception:", e);
             }
         }
@@ -70,27 +71,23 @@ public class AtomicFile {
     }
 
     public byte[] readFully() throws IOException {
-        int i = 0;
         FileInputStream openRead = openRead();
         try {
             byte[] bArr = new byte[openRead.available()];
+            int i = 0;
             while (true) {
                 int read = openRead.read(bArr, i, bArr.length - i);
                 if (read <= 0) {
-                    break;
+                    return bArr;
                 }
-                read += i;
-                i = openRead.available();
-                if (i > bArr.length - read) {
-                    Object obj = new byte[(i + read)];
-                    System.arraycopy(bArr, 0, obj, 0, read);
-                    bArr = obj;
-                    i = read;
-                } else {
-                    i = read;
+                i += read;
+                int available = openRead.available();
+                if (available > bArr.length - i) {
+                    byte[] bArr2 = new byte[(available + i)];
+                    System.arraycopy(bArr, 0, bArr2, 0, i);
+                    bArr = bArr2;
                 }
             }
-            return bArr;
         } finally {
             openRead.close();
         }
@@ -107,14 +104,14 @@ public class AtomicFile {
         try {
             return new FileOutputStream(this.mBaseName);
         } catch (FileNotFoundException e) {
-            if (this.mBaseName.getParentFile().mkdirs()) {
-                try {
-                    return new FileOutputStream(this.mBaseName);
-                } catch (FileNotFoundException e2) {
-                    throw new IOException("Couldn't create " + this.mBaseName);
-                }
+            if (!this.mBaseName.getParentFile().mkdirs()) {
+                throw new IOException("Couldn't create directory " + this.mBaseName);
             }
-            throw new IOException("Couldn't create directory " + this.mBaseName);
+            try {
+                return new FileOutputStream(this.mBaseName);
+            } catch (FileNotFoundException e2) {
+                throw new IOException("Couldn't create " + this.mBaseName);
+            }
         }
     }
 }

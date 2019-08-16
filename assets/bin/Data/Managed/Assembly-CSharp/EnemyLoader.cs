@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class EnemyLoader : ModelLoaderBase
 {
+	public delegate void OnCompleteLoad(Enemy enemy);
+
 	public class MaterialParams
 	{
 		public Material material;
@@ -21,8 +23,6 @@ public class EnemyLoader : ModelLoaderBase
 
 		public bool hasVanishRate;
 	}
-
-	public delegate void OnCompleteLoad(Enemy enemy);
 
 	private static UIntKeyTable<Material> materialCaches;
 
@@ -135,9 +135,8 @@ public class EnemyLoader : ModelLoaderBase
 		throw new NotImplementedException();
 	}
 
-	public void StartLoad(int body_id, int anim_id, float scale, string base_effect, string base_effect_node, bool need_shadow, bool enable_light_probes, bool need_anim_event_res_cache, SHADER_TYPE shader_type, int layer = -1, string foundation_name = null, bool need_stamp_effect = false, bool will_stock = false, OnCompleteLoad callback = null)
+	public void StartLoad(int body_id, int anim_id, float scale, string base_effect, string base_effect_node, bool need_shadow, bool enable_light_probes, bool need_anim_event_res_cache, SHADER_TYPE shader_type, int layer = -1, string foundation_name = null, bool need_stamp_effect = false, bool will_stock = false, string weather_effect = "", OnCompleteLoad callback = null)
 	{
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		if (isLoading)
 		{
 			Log.Error(LOG.RESOURCE, this.get_name() + " now loading.");
@@ -148,11 +147,11 @@ public class EnemyLoader : ModelLoaderBase
 		}
 		else
 		{
-			this.StartCoroutine(DoLoad(body_id, anim_id, scale, base_effect, base_effect_node, need_shadow, enable_light_probes, need_anim_event_res_cache, shader_type, layer, foundation_name, need_stamp_effect, will_stock, callback));
+			this.StartCoroutine(DoLoad(body_id, anim_id, scale, base_effect, base_effect_node, need_shadow, enable_light_probes, need_anim_event_res_cache, shader_type, layer, foundation_name, need_stamp_effect, will_stock, weather_effect, callback));
 		}
 	}
 
-	private IEnumerator DoLoad(int body_id, int anim_id, float scale, string base_effect, string base_effect_node, bool need_shadow, bool enable_light_probes, bool need_anim_event_res_cache, SHADER_TYPE shader_type, int layer, string foundation_name, bool need_stamp_effect, bool will_stock, OnCompleteLoad callback)
+	private IEnumerator DoLoad(int body_id, int anim_id, float scale, string base_effect, string base_effect_node, bool need_shadow, bool enable_light_probes, bool need_anim_event_res_cache, SHADER_TYPE shader_type, int layer, string foundation_name, bool need_stamp_effect, bool will_stock, string weather_effect, OnCompleteLoad callback)
 	{
 		Enemy enemy = this.get_gameObject().GetComponent<Enemy>();
 		if (enemy != null)
@@ -171,7 +170,7 @@ public class EnemyLoader : ModelLoaderBase
 			}
 			if (enemy.packetReceiver != null)
 			{
-				enemy.packetReceiver.SetStopPacketUpdate(true);
+				enemy.packetReceiver.SetStopPacketUpdate(is_stop: true);
 			}
 			enemy.OnLoadStart();
 		}
@@ -185,12 +184,12 @@ public class EnemyLoader : ModelLoaderBase
 		LoadObject lo_mate = (mate_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.ENEMY_MATERIAL, body_name, new string[1]
 		{
 			mate_name
-		}, false);
+		});
 		LoadObject lo_anim = load_queue.Load(RESOURCE_CATEGORY.ENEMY_ANIM, anim_name, new string[2]
 		{
 			anim_name + "Ctrl",
 			anim_name + "Event"
-		}, false);
+		});
 		if (!string.IsNullOrEmpty(base_effect))
 		{
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, base_effect);
@@ -204,7 +203,7 @@ public class EnemyLoader : ModelLoaderBase
 			}
 			lo_foundation = load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.FOUNDATION_MODEL, foundation_name);
 		}
-		yield return (object)load_queue.Wait();
+		yield return load_queue.Wait();
 		body = lo_body.Realizes(_this, (layer != -1) ? layer : 11);
 		if (layer == -1)
 		{
@@ -215,10 +214,10 @@ public class EnemyLoader : ModelLoaderBase
 		renderersBody = body.get_gameObject().GetComponentsInChildren<Renderer>();
 		if (lo_mate != null && lo_mate.loadedObject != null && renderersBody.Length == 1)
 		{
-			Material mate = lo_mate.loadedObject as Material;
-			if (mate != null)
+			Material val = lo_mate.loadedObject as Material;
+			if (val != null)
 			{
-				renderersBody[0].set_sharedMaterial(mate);
+				renderersBody[0].set_sharedMaterial(val);
 			}
 		}
 		if (enemy != null)
@@ -242,21 +241,31 @@ public class EnemyLoader : ModelLoaderBase
 		}
 		if (!string.IsNullOrEmpty(base_effect))
 		{
-			string node_name = base_effect_node;
-			if (string.IsNullOrEmpty(node_name))
+			string text = base_effect_node;
+			if (string.IsNullOrEmpty(text))
 			{
-				node_name = "Root";
+				text = "Root";
 			}
-			Transform node = Utility.Find(body, node_name);
-			Transform effect_transform = EffectManager.GetEffect(base_effect, node);
-			if (effect_transform != null)
+			Transform parent = Utility.Find(body, text);
+			Transform effect = EffectManager.GetEffect(base_effect, parent);
+			if (effect != null)
 			{
-				baseEffect = effect_transform;
+				baseEffect = effect;
 				if (layer != -1)
 				{
-					Utility.SetLayerWithChildren(effect_transform, layer);
+					Utility.SetLayerWithChildren(effect, layer);
 				}
 			}
+		}
+		if (!string.IsNullOrEmpty(weather_effect) && MonoBehaviourSingleton<StageManager>.IsValid())
+		{
+			LoadingQueue queue = new LoadingQueue(this);
+			queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, weather_effect);
+			if (queue.IsLoading())
+			{
+				yield return queue.Wait();
+			}
+			MonoBehaviourSingleton<StageManager>.I.SetWeatherEffect(weather_effect);
 		}
 		if (shader_type == SHADER_TYPE.LIGHTWEIGHT)
 		{
@@ -265,10 +274,10 @@ public class EnemyLoader : ModelLoaderBase
 		if (is_boss)
 		{
 			materialParamsList = new List<MaterialParams>();
-			Shader.PropertyToID("_RimPower");
-			Shader.PropertyToID("_RimWidth");
-			Shader.PropertyToID("_Vanish_flag");
-			Shader.PropertyToID("_Vanish_rate");
+			int ID_RIM_POWER = Shader.PropertyToID("_RimPower");
+			int ID_RIM_WIDTH = Shader.PropertyToID("_RimWidth");
+			int ID_VANISH_FLAG = Shader.PropertyToID("_Vanish_flag");
+			int ID_VANISH_RATE = Shader.PropertyToID("_Vanish_rate");
 			Utility.MaterialForEach(renderersBody, delegate(Material material)
 			{
 				if (material != null)
@@ -277,44 +286,44 @@ public class EnemyLoader : ModelLoaderBase
 					{
 						material = material
 					};
-					if (materialParams.hasRimPower = material.HasProperty(((_003CDoLoad_003Ec__Iterator228)/*Error near IL_062d: stateMachine*/)._003CID_RIM_POWER_003E__16))
+					if (materialParams.hasRimPower = material.HasProperty(ID_RIM_POWER))
 					{
-						materialParams.defaultRimPower = material.GetFloat(((_003CDoLoad_003Ec__Iterator228)/*Error near IL_062d: stateMachine*/)._003CID_RIM_POWER_003E__16);
+						materialParams.defaultRimPower = material.GetFloat(ID_RIM_POWER);
 					}
-					if (materialParams.hasRimWidth = material.HasProperty(((_003CDoLoad_003Ec__Iterator228)/*Error near IL_062d: stateMachine*/)._003CID_RIM_WIDTH_003E__17))
+					if (materialParams.hasRimWidth = material.HasProperty(ID_RIM_WIDTH))
 					{
-						materialParams.defaultRimWidth = material.GetFloat(((_003CDoLoad_003Ec__Iterator228)/*Error near IL_062d: stateMachine*/)._003CID_RIM_WIDTH_003E__17);
+						materialParams.defaultRimWidth = material.GetFloat(ID_RIM_WIDTH);
 					}
-					materialParams.hasVanishFlag = material.HasProperty(((_003CDoLoad_003Ec__Iterator228)/*Error near IL_062d: stateMachine*/)._003CID_VANISH_FLAG_003E__18);
-					materialParams.hasVanishRate = material.HasProperty(((_003CDoLoad_003Ec__Iterator228)/*Error near IL_062d: stateMachine*/)._003CID_VANISH_RATE_003E__19);
-					((_003CDoLoad_003Ec__Iterator228)/*Error near IL_062d: stateMachine*/)._003C_003Ef__this.materialParamsList.Add(materialParams);
+					materialParams.hasVanishFlag = material.HasProperty(ID_VANISH_FLAG);
+					materialParams.hasVanishRate = material.HasProperty(ID_VANISH_RATE);
+					materialParamsList.Add(materialParams);
 				}
 			});
 		}
-		int l = 0;
-		for (int k = renderersBody.Length; l < k; l++)
+		int i = 0;
+		for (int num = renderersBody.Length; i < num; i++)
 		{
-			renderersBody[l].set_useLightProbes(enable_light_probes);
+			renderersBody[i].set_useLightProbes(enable_light_probes);
 		}
 		EnemyParam param = body.get_gameObject().GetComponent<EnemyParam>();
 		body.get_gameObject().SetActive(false);
 		if (need_anim_event_res_cache && animator != null && lo_anim.loadedObjects != null && lo_anim.loadedObjects[1] != null)
 		{
-			AnimEventData tmpAnimEventData = lo_anim.loadedObjects[1].obj as AnimEventData;
-			if (tmpAnimEventData != null)
+			AnimEventData animEventData = lo_anim.loadedObjects[1].obj as AnimEventData;
+			if (animEventData != null)
 			{
 				if (enemy == null)
 				{
-					load_queue.CacheAnimDataUseResource(tmpAnimEventData, null, null);
+					load_queue.CacheAnimDataUseResource(animEventData);
 				}
 				else
 				{
 					LoadingQueue loadingQueue = load_queue;
-					AnimEventData animEventData = tmpAnimEventData;
+					AnimEventData animEventData2 = animEventData;
 					Enemy enemy2 = enemy;
-					loadingQueue.CacheAnimDataUseResource(animEventData, ((Character)enemy2).EffectNameAnalyzer, enemy.continusAtkEventDataList);
+					loadingQueue.CacheAnimDataUseResource(animEventData2, ((Character)enemy2).EffectNameAnalyzer, enemy.continusAtkEventDataList);
 				}
-				PreSetAnimationEventDataParamToEnemy(tmpAnimEventData, enemy);
+				PreSetAnimationEventDataParamToEnemy(animEventData, enemy);
 			}
 		}
 		AnimEventData.ResidentEffectData[] residentEffectList = null;
@@ -323,12 +332,12 @@ public class EnemyLoader : ModelLoaderBase
 			residentEffectList = this.animEventData.residentEffectDataList;
 			if (residentEffectList != null)
 			{
-				int numEffect3 = residentEffectList.Length;
-				for (int ef3 = 0; ef3 < numEffect3; ef3++)
+				int num2 = residentEffectList.Length;
+				for (int j = 0; j < num2; j++)
 				{
-					if (!string.IsNullOrEmpty(residentEffectList[ef3].effectName))
+					if (!string.IsNullOrEmpty(residentEffectList[j].effectName))
 					{
-						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, residentEffectList[ef3].effectName);
+						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, residentEffectList[j].effectName);
 					}
 				}
 			}
@@ -338,38 +347,38 @@ public class EnemyLoader : ModelLoaderBase
 			if (enemy != null || need_stamp_effect)
 			{
 				StageObject.StampInfo[] stampInfos = param.stampInfos;
-				foreach (StageObject.StampInfo info4 in stampInfos)
+				foreach (StageObject.StampInfo stampInfo in stampInfos)
 				{
-					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, info4.effectName);
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, stampInfo.effectName);
 				}
 			}
 			if (param.isHide)
 			{
-				FieldMapTable.GatherPointViewTableData viewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(param.gatherPointViewId);
-				if (viewData != null)
+				FieldMapTable.GatherPointViewTableData gatherPointViewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(param.gatherPointViewId);
+				if (gatherPointViewData != null)
 				{
-					if (!string.IsNullOrEmpty(viewData.targetEffectName))
+					if (!string.IsNullOrEmpty(gatherPointViewData.targetEffectName))
 					{
-						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, viewData.targetEffectName);
+						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, gatherPointViewData.targetEffectName);
 					}
-					if (!string.IsNullOrEmpty(viewData.gatherEffectName))
+					if (!string.IsNullOrEmpty(gatherPointViewData.gatherEffectName))
 					{
-						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, viewData.gatherEffectName);
+						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, gatherPointViewData.gatherEffectName);
 					}
 				}
 			}
-			SystemEffectSetting sysEffectSetting2 = param.residentEffectSetting;
-			if (sysEffectSetting2 != null)
+			SystemEffectSetting residentEffectSetting = param.residentEffectSetting;
+			if (residentEffectSetting != null)
 			{
-				SystemEffectSetting.Data[] effectDataList = sysEffectSetting2.effectDataList;
+				SystemEffectSetting.Data[] effectDataList = residentEffectSetting.effectDataList;
 				if (effectDataList != null)
 				{
-					int numEffect2 = effectDataList.Length;
-					for (int ef2 = 0; ef2 < numEffect2; ef2++)
+					int num3 = effectDataList.Length;
+					for (int l = 0; l < num3; l++)
 					{
-						if (!string.IsNullOrEmpty(effectDataList[ef2].effectName))
+						if (!string.IsNullOrEmpty(effectDataList[l].effectName))
 						{
-							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effectDataList[ef2].effectName);
+							load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effectDataList[l].effectName);
 						}
 					}
 				}
@@ -377,118 +386,124 @@ public class EnemyLoader : ModelLoaderBase
 		}
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		if (enemy != null)
 		{
 			if (param != null)
 			{
-				EnemyTable.EnemyData data = enemy.enemyTableData;
+				EnemyTable.EnemyData enemyTableData = enemy.enemyTableData;
 				AttackHitInfo[] attackHitInfos = param.attackHitInfos;
-				foreach (AttackHitInfo temp_info in attackHitInfos)
+				foreach (AttackHitInfo attackHitInfo in attackHitInfos)
 				{
-					AttackHitInfo info = temp_info;
-					if (!string.IsNullOrEmpty(data.convertRegionKey))
+					AttackHitInfo attackHitInfo2 = attackHitInfo;
+					if (!string.IsNullOrEmpty(enemyTableData.convertRegionKey))
 					{
-						string convert_name = info.name + "_" + data.convertRegionKey;
+						string b = attackHitInfo2.name + "_" + enemyTableData.convertRegionKey;
 						AttackHitInfo[] convertAttackHitInfos = param.convertAttackHitInfos;
-						foreach (AttackHitInfo convert_info in convertAttackHitInfos)
+						foreach (AttackHitInfo attackHitInfo3 in convertAttackHitInfos)
 						{
-							if (convert_info.name == convert_name)
+							if (attackHitInfo3.name == b)
 							{
-								info = convert_info;
+								attackHitInfo2 = attackHitInfo3;
 								break;
 							}
 						}
 					}
-					if (info.hitSEID != 0)
+					if (attackHitInfo2.hitSEID != 0)
 					{
-						load_queue.CacheSE(info.hitSEID, null);
+						load_queue.CacheSE(attackHitInfo2.hitSEID);
 					}
-					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, info.hitEffectName);
-					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, info.remainEffectName);
-					load_queue.CacheBulletDataUseResource(info.bulletData, null);
-					RestraintInfo restInfo = temp_info.restraintInfo;
-					if (restInfo.enable && !string.IsNullOrEmpty(restInfo.effectName))
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, attackHitInfo2.hitEffectName);
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, attackHitInfo2.remainEffectName);
+					load_queue.CacheBulletDataUseResource(attackHitInfo2.bulletData);
+					RestraintInfo restraintInfo = attackHitInfo.restraintInfo;
+					if (restraintInfo.enable && !string.IsNullOrEmpty(restraintInfo.effectName))
 					{
-						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, restInfo.effectName);
+						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, restraintInfo.effectName);
 						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_target_flick");
-						if (temp_info.toPlayer.reactionType != 0)
+						if (attackHitInfo.toPlayer.reactionType != 0)
 						{
-							Log.Error(LOG.INGAME, "Can't use reactionType with RestraintInfo!! " + temp_info.name);
+							Log.Error(LOG.INGAME, "Can't use reactionType with RestraintInfo!! " + attackHitInfo.name);
 						}
 					}
-					GrabInfo grabInfo = temp_info.grabInfo;
-					if (grabInfo != null && grabInfo.enable && temp_info.toPlayer.reactionType != 0)
+					GrabInfo grabInfo = attackHitInfo.grabInfo;
+					if (grabInfo != null && grabInfo.enable && attackHitInfo.toPlayer.reactionType != 0)
 					{
-						Log.Error(LOG.INGAME, "Can't use reactionType with GrabInfo!! " + temp_info.name);
+						Log.Error(LOG.INGAME, "Can't use reactionType with GrabInfo!! " + attackHitInfo.name);
 					}
-					InkSplashInfo inkSplashInfo = temp_info.inkSplashInfo;
+					InkSplashInfo inkSplashInfo = attackHitInfo.inkSplashInfo;
 					if (inkSplashInfo != null && inkSplashInfo.duration > 0f)
 					{
 						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_pl_blind_01");
 						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_pl_blind_02");
 						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_target_flick");
 					}
+					if (attackHitInfo.badStatus.stone > 0f)
+					{
+						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_pl_stone_01");
+					}
 				}
 				AttackContinuationInfo[] attackContinuationInfos = param.attackContinuationInfos;
-				foreach (AttackContinuationInfo temp_info2 in attackContinuationInfos)
+				foreach (AttackContinuationInfo attackContinuationInfo in attackContinuationInfos)
 				{
-					AttackContinuationInfo info2 = temp_info2;
-					if (!string.IsNullOrEmpty(data.convertRegionKey))
+					AttackContinuationInfo attackContinuationInfo2 = attackContinuationInfo;
+					if (!string.IsNullOrEmpty(enemyTableData.convertRegionKey))
 					{
-						string convert_name2 = info2.name + "_" + data.convertRegionKey;
+						string b2 = attackContinuationInfo2.name + "_" + enemyTableData.convertRegionKey;
 						AttackContinuationInfo[] convertAttackContinuationInfos = param.convertAttackContinuationInfos;
-						foreach (AttackContinuationInfo convert_info2 in convertAttackContinuationInfos)
+						foreach (AttackContinuationInfo attackContinuationInfo3 in convertAttackContinuationInfos)
 						{
-							if (convert_info2.name == convert_name2)
+							if (attackContinuationInfo3.name == b2)
 							{
-								info2 = convert_info2;
+								attackContinuationInfo2 = attackContinuationInfo3;
 								break;
 							}
 						}
 					}
-					load_queue.CacheBulletDataUseResource(info2.bulletData, null);
+					load_queue.CacheBulletDataUseResource(attackContinuationInfo2.bulletData);
 				}
 				Enemy.RegionInfo[] regionInfos = param.regionInfos;
-				foreach (Enemy.RegionInfo temp_info3 in regionInfos)
+				foreach (Enemy.RegionInfo regionInfo in regionInfos)
 				{
-					Enemy.RegionInfo info3 = temp_info3;
-					if (!string.IsNullOrEmpty(data.convertRegionKey))
+					Enemy.RegionInfo regionInfo2 = regionInfo;
+					if (!string.IsNullOrEmpty(enemyTableData.convertRegionKey))
 					{
-						string convert_name3 = info3.name + "_" + data.convertRegionKey;
+						string b3 = regionInfo2.name + "_" + enemyTableData.convertRegionKey;
 						Enemy.RegionInfo[] convertRegionInfos = param.convertRegionInfos;
-						foreach (Enemy.RegionInfo convert_info3 in convertRegionInfos)
+						foreach (Enemy.RegionInfo regionInfo3 in convertRegionInfos)
 						{
-							if (convert_info3.name == convert_name3)
+							if (regionInfo3.name == b3)
 							{
-								info3 = convert_info3;
+								regionInfo2 = regionInfo3;
 								break;
 							}
 						}
 					}
-					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, info3.breakEffect.effectName);
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, regionInfo2.breakEffect.effectName);
 				}
 				if (Singleton<EnemyHitMaterialTable>.IsValid())
 				{
-					int j = 0;
-					for (int len2 = param.regionInfos.Length; j < len2 + 1; j++)
+					int num8 = 0;
+					for (int num9 = param.regionInfos.Length; num8 < num9 + 1; num8++)
 					{
-						string hit_material_name = (j >= len2) ? param.baseHitMaterialName : param.regionInfos[j].hitMaterialName;
-						if (!string.IsNullOrEmpty(hit_material_name))
+						string text2 = (num8 >= num9) ? param.baseHitMaterialName : param.regionInfos[num8].hitMaterialName;
+						if (string.IsNullOrEmpty(text2))
 						{
-							EnemyHitMaterialTable.MaterialData check_data = Singleton<EnemyHitMaterialTable>.I.GetData(hit_material_name);
-							if (check_data != null)
+							continue;
+						}
+						EnemyHitMaterialTable.MaterialData data = Singleton<EnemyHitMaterialTable>.I.GetData(text2);
+						if (data == null)
+						{
+							continue;
+						}
+						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.addEffectName);
+						int[] typeSEIDs = data.typeSEIDs;
+						foreach (int num11 in typeSEIDs)
+						{
+							if (num11 != 0)
 							{
-								load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, check_data.addEffectName);
-								int[] typeSEIDs = check_data.typeSEIDs;
-								foreach (int type_se_id in typeSEIDs)
-								{
-									if (type_se_id != 0)
-									{
-										load_queue.CacheSE(type_se_id, null);
-									}
-								}
+								load_queue.CacheSE(num11);
 							}
 						}
 					}
@@ -498,71 +513,96 @@ public class EnemyLoader : ModelLoaderBase
 			{
 				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyParalyzeHitEffectName);
 				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyPoisonHitEffectName);
+				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyFreezeHitEffectName);
 			}
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_shock_01");
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_gravity_01");
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_fire_01");
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_pl_movedown_01");
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_bindring_01");
+			if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+			{
+				InGameSettingsManager.LightRingParam lightRingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.lightRingParam;
+				if (lightRingParam.startSeId != 0)
+				{
+					load_queue.CacheSE(lightRingParam.startSeId);
+				}
+				if (lightRingParam.loopSeId != 0)
+				{
+					load_queue.CacheSE(lightRingParam.loopSeId);
+				}
+				if (lightRingParam.endSeId != 0)
+				{
+					load_queue.CacheSE(lightRingParam.endSeId);
+				}
+			}
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_erosion_01");
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_acid_01");
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_corruption_01");
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.stigmataParam.effectName);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.cyclonicThunderstormParam.effectName);
 			EffectPlayProcessor processor = body.get_gameObject().GetComponent<EffectPlayProcessor>();
 			if (processor != null && processor.effectSettings != null)
 			{
 				enemy.effectPlayProcessor = processor;
-				int i = 0;
-				for (int len = processor.effectSettings.Length; i < len; i++)
+				int num12 = 0;
+				for (int num13 = processor.effectSettings.Length; num12 < num13; num12++)
 				{
-					if (!string.IsNullOrEmpty(processor.effectSettings[i].effectName))
+					if (!string.IsNullOrEmpty(processor.effectSettings[num12].effectName))
 					{
-						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, processor.effectSettings[i].effectName);
+						load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, processor.effectSettings[num12].effectName);
 					}
 				}
 			}
 			if (load_queue.IsLoading())
 			{
-				yield return (object)load_queue.Wait();
+				yield return load_queue.Wait();
 			}
 		}
 		body.get_gameObject().SetActive(true);
 		if (residentEffectList != null)
 		{
-			int numEffect = residentEffectList.Length;
-			for (int ef = 0; ef < numEffect; ef++)
+			int num14 = residentEffectList.Length;
+			for (int num15 = 0; num15 < num14; num15++)
 			{
-				AnimEventData.ResidentEffectData effectData = residentEffectList[ef];
-				if (!string.IsNullOrEmpty(effectData.effectName) && !string.IsNullOrEmpty(effectData.linkNodeName))
+				AnimEventData.ResidentEffectData residentEffectData = residentEffectList[num15];
+				if (string.IsNullOrEmpty(residentEffectData.effectName) || string.IsNullOrEmpty(residentEffectData.linkNodeName))
 				{
-					Transform parentTrans = Utility.Find(body.get_transform(), effectData.linkNodeName);
-					if (parentTrans == null)
+					continue;
+				}
+				Transform val2 = Utility.Find(body.get_transform(), residentEffectData.linkNodeName);
+				if (val2 == null)
+				{
+					val2 = body.get_transform();
+				}
+				Transform effect2 = EffectManager.GetEffect(residentEffectData.effectName, val2);
+				if (effect2 != null)
+				{
+					if (layer != -1)
 					{
-						parentTrans = body.get_transform();
+						Utility.SetLayerWithChildren(effect2, layer);
 					}
-					Transform effectTrans = EffectManager.GetEffect(effectData.effectName, parentTrans);
-					if (effectTrans != null)
+					Vector3 localScale = effect2.get_localScale();
+					effect2.set_localScale(localScale * residentEffectData.scale);
+					effect2.set_localPosition(residentEffectData.offsetPos);
+					effect2.set_localRotation(Quaternion.Euler(residentEffectData.offsetRot));
+					ResidentEffectObject residentEffectObject = effect2.get_gameObject().AddComponent<ResidentEffectObject>();
+					residentEffectObject.Initialize(residentEffectData);
+					if (enemy != null)
 					{
-						if (layer != -1)
-						{
-							Utility.SetLayerWithChildren(effectTrans, layer);
-						}
-						Vector3 basisScale = effectTrans.get_localScale();
-						effectTrans.set_localScale(basisScale * effectData.scale);
-						effectTrans.set_localPosition(effectData.offsetPos);
-						effectTrans.set_localRotation(Quaternion.Euler(effectData.offsetRot));
-						ResidentEffectObject residentEffect = effectTrans.get_gameObject().AddComponent<ResidentEffectObject>();
-						residentEffect.Initialize(effectData);
-						if (enemy != null)
-						{
-							enemy.RegisterResidentEffect(residentEffect);
-						}
+						enemy.RegisterResidentEffect(residentEffectObject);
 					}
 				}
 			}
 		}
 		if (param != null)
 		{
-			SystemEffectSetting sysEffectSetting = param.residentEffectSetting;
-			SysEffectCreate(enemy, layer, sysEffectSetting);
+			SystemEffectSetting residentEffectSetting2 = param.residentEffectSetting;
+			SysEffectCreate(enemy, layer, residentEffectSetting2);
 		}
 		if (need_shadow && param != null && param.shadowSize > 0f)
 		{
-			shadow = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.CreateShadow(param.shadowSize, param.bodyRadius, bodyScale, true, _this, shader_type == SHADER_TYPE.LIGHTWEIGHT);
+			shadow = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.CreateShadow(param.shadowSize, param.bodyRadius, bodyScale, fixedY0: true, _this, shader_type == SHADER_TYPE.LIGHTWEIGHT);
 		}
 		if (enemy != null)
 		{
@@ -579,7 +619,7 @@ public class EnemyLoader : ModelLoaderBase
 			enemy.OnLoadComplete();
 			if (enemy.packetReceiver != null)
 			{
-				enemy.packetReceiver.SetStopPacketUpdate(false);
+				enemy.packetReceiver.SetStopPacketUpdate(is_stop: false);
 			}
 		}
 		callback?.Invoke(enemy);
@@ -593,10 +633,6 @@ public class EnemyLoader : ModelLoaderBase
 
 	public void SysEffectCreate(Enemy enemy, int layer, SystemEffectSetting sysEffectSetting)
 	{
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Expected O, but got Unknown
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Expected O, but got Unknown
 		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
@@ -604,70 +640,72 @@ public class EnemyLoader : ModelLoaderBase
 		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
 		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		if (sysEffectSetting != null)
+		if (!(sysEffectSetting != null))
 		{
-			int[] array = sysEffectSetting.startGroupIds;
-			bool flag = false;
-			if (array == null || array.Length == 0)
+			return;
+		}
+		int[] array = sysEffectSetting.startGroupIds;
+		bool flag = false;
+		if (array == null || array.Length == 0)
+		{
+			flag = true;
+			array = new int[1];
+		}
+		else if (array[0] < 0)
+		{
+			return;
+		}
+		SystemEffectSetting.Data[] effectDataList = sysEffectSetting.effectDataList;
+		if (effectDataList == null)
+		{
+			return;
+		}
+		int num = effectDataList.Length;
+		for (int i = 0; i < num; i++)
+		{
+			SystemEffectSetting.Data data = effectDataList[i];
+			if (!flag)
 			{
-				flag = true;
-				array = new int[1];
-			}
-			else if (array[0] < 0)
-			{
-				return;
-			}
-			SystemEffectSetting.Data[] effectDataList = sysEffectSetting.effectDataList;
-			if (effectDataList != null)
-			{
-				int num = effectDataList.Length;
-				for (int i = 0; i < num; i++)
+				bool flag2 = false;
+				int j = 0;
+				for (int num2 = array.Length; j < num2; j++)
 				{
-					SystemEffectSetting.Data data = effectDataList[i];
-					if (!flag)
+					if (array[j] == data.groupID)
 					{
-						bool flag2 = false;
-						int j = 0;
-						for (int num2 = array.Length; j < num2; j++)
-						{
-							if (array[j] == data.groupID)
-							{
-								flag2 = true;
-								break;
-							}
-						}
-						if (!flag2)
-						{
-							continue;
-						}
+						flag2 = true;
+						break;
 					}
-					if (!string.IsNullOrEmpty(data.effectName) && !string.IsNullOrEmpty(data.linkNodeName))
-					{
-						Transform val = Utility.Find(body.get_transform(), data.linkNodeName);
-						if (val == null)
-						{
-							val = body.get_transform();
-						}
-						Transform effect = EffectManager.GetEffect(data.effectName, val);
-						if (effect != null)
-						{
-							if (layer != -1)
-							{
-								Utility.SetLayerWithChildren(effect, layer);
-							}
-							Vector3 localScale = effect.get_localScale();
-							effect.set_localScale(localScale * data.scale);
-							effect.set_localPosition(data.offsetPos);
-							effect.set_localRotation(Quaternion.Euler(data.offsetRot));
-							ResidentEffectObject residentEffectObject = effect.get_gameObject().AddComponent<ResidentEffectObject>();
-							residentEffectObject.Initialize(data);
-							if (enemy != null)
-							{
-								enemy.RegisterResidentEffect(residentEffectObject);
-							}
-						}
-					}
+				}
+				if (!flag2)
+				{
+					continue;
+				}
+			}
+			if (string.IsNullOrEmpty(data.effectName) || string.IsNullOrEmpty(data.linkNodeName))
+			{
+				continue;
+			}
+			Transform val = Utility.Find(body.get_transform(), data.linkNodeName);
+			if (val == null)
+			{
+				val = body.get_transform();
+			}
+			Transform effect = EffectManager.GetEffect(data.effectName, val);
+			if (effect != null)
+			{
+				if (layer != -1)
+				{
+					Utility.SetLayerWithChildren(effect, layer);
+				}
+				Vector3 localScale = effect.get_localScale();
+				effect.set_localScale(localScale * data.scale);
+				effect.set_localPosition(data.offsetPos);
+				effect.set_localRotation(Quaternion.Euler(data.offsetRot));
+				ResidentEffectObject residentEffectObject = effect.get_gameObject().AddComponent<ResidentEffectObject>();
+				residentEffectObject.Initialize(data);
+				if (enemy != null)
+				{
+					enemy.RegisterResidentEffect(residentEffectObject);
 				}
 			}
 		}
@@ -695,64 +733,86 @@ public class EnemyLoader : ModelLoaderBase
 
 	private void PreSetAnimationEventDataParamToEnemy(AnimEventData animEventData, Enemy enemy)
 	{
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animEventData == null))
+		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+		if (animEventData == null || enemy == null)
 		{
-			AnimEventData.AnimData[] animations = animEventData.animations;
-			if (animations != null)
+			return;
+		}
+		AnimEventData.AnimData[] animations = animEventData.animations;
+		if (animations == null)
+		{
+			return;
+		}
+		int i = 0;
+		for (int num = animations.Length; i < num; i++)
+		{
+			AnimEventData.EventData[] events = animations[i].events;
+			if (events == null)
 			{
-				int i = 0;
-				for (int num = animations.Length; i < num; i++)
+				continue;
+			}
+			int j = 0;
+			for (int num2 = events.Length; j < num2; j++)
+			{
+				AnimEventData.EventData eventData = events[j];
+				if (eventData == null)
 				{
-					AnimEventData.EventData[] events = animations[i].events;
-					if (events != null)
+					continue;
+				}
+				switch (eventData.id)
+				{
+				case AnimEventFormat.ID.MOVE_SIDEWAYS_LOOK_TARGET:
+					if (eventData.floatArgs.Length >= 2)
 					{
-						int j = 0;
-						for (int num2 = events.Length; j < num2; j++)
+						enemy.moveAngle_deg = eventData.floatArgs[0];
+						enemy.moveAngleSpeed_deg = eventData.floatArgs[1];
+					}
+					break;
+				case AnimEventFormat.ID.MOVE_POINT_DATA:
+					if (eventData.floatArgs.Length >= 2)
+					{
+						enemy.movePointPos = new Vector3(eventData.floatArgs[0], 0f, eventData.floatArgs[1]);
+					}
+					break;
+				case AnimEventFormat.ID.MOVE_LOOKAT_DATA:
+					if (eventData.floatArgs.Length >= 3)
+					{
+						enemy.moveLookAtPos = new Vector3(eventData.floatArgs[0], 0f, eventData.floatArgs[1]);
+						enemy.moveLookAtAngle = eventData.floatArgs[2];
+					}
+					break;
+				case AnimEventFormat.ID.EFFECT:
+					if (animations[i].name == "paralyze")
+					{
+						if (eventData.floatArgs.Length > 0)
 						{
-							AnimEventData.EventData eventData = events[j];
-							if (eventData != null)
-							{
-								switch (eventData.id)
-								{
-								case AnimEventFormat.ID.MOVE_SIDEWAYS_LOOK_TARGET:
-									if (eventData.floatArgs.Length >= 2)
-									{
-										enemy.moveAngle_deg = eventData.floatArgs[0];
-										enemy.moveAngleSpeed_deg = eventData.floatArgs[1];
-									}
-									break;
-								case AnimEventFormat.ID.MOVE_POINT_DATA:
-									if (eventData.floatArgs.Length >= 2)
-									{
-										enemy.movePointPos = new Vector3(eventData.floatArgs[0], 0f, eventData.floatArgs[1]);
-									}
-									break;
-								case AnimEventFormat.ID.MOVE_LOOKAT_DATA:
-									if (eventData.floatArgs.Length >= 3)
-									{
-										enemy.moveLookAtPos = new Vector3(eventData.floatArgs[0], 0f, eventData.floatArgs[1]);
-										enemy.moveLookAtAngle = eventData.floatArgs[2];
-									}
-									break;
-								case AnimEventFormat.ID.EFFECT:
-									if (animations[i].name == "paralyze")
-									{
-										if (eventData.floatArgs.Length > 0)
-										{
-											enemy.paralyzeEffectScale = eventData.floatArgs[0];
-										}
-										if (eventData.stringArgs.Length > 0)
-										{
-											enemy.paralyzeEffectName = eventData.stringArgs[0];
-										}
-									}
-									break;
-								}
-							}
+							enemy.paralyzeEffectScale = eventData.floatArgs[0];
+						}
+						if (eventData.stringArgs.Length > 0)
+						{
+							enemy.paralyzeEffectName = eventData.stringArgs[0];
 						}
 					}
+					break;
+				case AnimEventFormat.ID.SUMMON_ENEMY:
+				{
+					int enemyId2 = eventData.intArgs[0];
+					int num3 = eventData.intArgs[1];
+					if (num3 == 0 && eventData.intArgs[2] > 0)
+					{
+						num3 = Mathf.FloorToInt((float)((int)enemy.enemyLevel / eventData.intArgs[2]));
+					}
+					this.StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPopForSummon(enemyId2, num3));
+					break;
+				}
+				case AnimEventFormat.ID.SUMMON_ATTACK:
+					if (!enemy.isSummonAttack)
+					{
+						int enemyId = eventData.intArgs[0];
+						this.StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPopForSummonAttack(enemyId, enemy.enemyLevel));
+					}
+					break;
 				}
 			}
 		}
@@ -760,8 +820,6 @@ public class EnemyLoader : ModelLoaderBase
 
 	public void DeleteLoadedObjects()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (body != null)
 		{
 			Object.DestroyImmediate(body.get_gameObject());
@@ -780,8 +838,6 @@ public class EnemyLoader : ModelLoaderBase
 
 	public void ApplyGachaDisplayScaleToParentNode()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		if (body != null && body.get_parent() != null)
 		{

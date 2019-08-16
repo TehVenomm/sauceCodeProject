@@ -1,4 +1,4 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
 import android.os.Environment;
 import com.github.droidfu.cachefu.AbstractCache;
@@ -11,10 +11,12 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import org.apache.commons.lang3.time.DateUtils;
 
+/* renamed from: jp.colopl.util.CacheUtil */
 public class CacheUtil {
     private static final String DIR_NAME = "/Android/data/jp.colopl/cache/menu";
 
     public static String get(String str) {
+        StringBuilder sb;
         File file = new File(Environment.getExternalStorageDirectory() + DIR_NAME, str);
         if (!file.exists()) {
             return null;
@@ -23,25 +25,27 @@ public class CacheUtil {
             file.delete();
             return null;
         }
-        StringBuilder stringBuilder;
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            stringBuilder = new StringBuilder();
+            sb = new StringBuilder();
             while (true) {
                 try {
                     String readLine = bufferedReader.readLine();
                     if (readLine == null) {
                         break;
                     }
-                    stringBuilder.append(readLine);
+                    sb.append(readLine);
                 } catch (IOException e) {
                 }
             }
             bufferedReader.close();
         } catch (IOException e2) {
-            stringBuilder = null;
+            sb = null;
         }
-        return (stringBuilder == null || stringBuilder.length() == 0) ? null : stringBuilder.toString();
+        if (sb == null || sb.length() == 0) {
+            return null;
+        }
+        return sb.toString();
     }
 
     public static void removeAllMenuCache() {

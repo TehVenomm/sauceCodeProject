@@ -16,7 +16,6 @@ public class UriToFileUtil {
     }
 
     public static String getDataColumn(Context context, Uri uri, String str, String[] strArr) {
-        Throwable th;
         Cursor cursor = null;
         String str2 = "_data";
         try {
@@ -24,15 +23,15 @@ public class UriToFileUtil {
             if (query != null) {
                 try {
                     if (query.moveToFirst()) {
-                        str2 = query.getString(query.getColumnIndexOrThrow("_data"));
+                        String string = query.getString(query.getColumnIndexOrThrow("_data"));
                         if (query == null) {
-                            return str2;
+                            return string;
                         }
                         query.close();
-                        return str2;
+                        return string;
                     }
-                } catch (Throwable th2) {
-                    th = th2;
+                } catch (Throwable th) {
+                    th = th;
                     cursor = query;
                     if (cursor != null) {
                         cursor.close();
@@ -44,12 +43,8 @@ public class UriToFileUtil {
                 query.close();
             }
             return null;
-        } catch (Throwable th3) {
-            th = th3;
-            if (cursor != null) {
-                cursor.close();
-            }
-            throw th;
+        } catch (Throwable th2) {
+            th = th2;
         }
     }
 
@@ -84,164 +79,149 @@ public class UriToFileUtil {
         if (extension.length() <= 0) {
             return DEFAULT_MIMETYPE;
         }
-        extension = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        return extension != null ? extension : DEFAULT_MIMETYPE;
+        String mimeTypeFromExtension = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        return mimeTypeFromExtension != null ? mimeTypeFromExtension : DEFAULT_MIMETYPE;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
     @android.annotation.SuppressLint({"NewApi"})
+    /* Code decompiled incorrectly, please refer to instructions dump. */
     public static java.lang.String getPath(android.content.Context r7, android.net.Uri r8) {
         /*
-        r4 = 1;
-        r1 = 0;
-        r2 = 0;
-        r0 = android.os.Build.VERSION.SDK_INT;
-        r3 = 19;
-        if (r0 < r3) goto L_0x004a;
-    L_0x0009:
-        r0 = r4;
-    L_0x000a:
-        if (r0 == 0) goto L_0x00d1;
-    L_0x000c:
-        r0 = android.provider.DocumentsContract.isDocumentUri(r7, r8);
-        if (r0 == 0) goto L_0x00d1;
-    L_0x0012:
-        r0 = isExternalStorageDocument(r8);
-        if (r0 == 0) goto L_0x004c;
-    L_0x0018:
-        r0 = android.provider.DocumentsContract.getDocumentId(r8);
-        r3 = ":";
-        r0 = r0.split(r3);
-        r2 = r0[r2];
-        r3 = "primary";
-        r2 = r3.equalsIgnoreCase(r2);
-        if (r2 == 0) goto L_0x0049;
-    L_0x002c:
-        r1 = new java.lang.StringBuilder;
-        r1.<init>();
-        r2 = android.os.Environment.getExternalStorageDirectory();
-        r1 = r1.append(r2);
-        r2 = "/";
-        r1 = r1.append(r2);
-        r0 = r0[r4];
-        r0 = r1.append(r0);
-        r1 = r0.toString();
-    L_0x0049:
-        return r1;
-    L_0x004a:
-        r0 = r2;
-        goto L_0x000a;
-    L_0x004c:
-        r0 = isDownloadsDocument(r8);
-        if (r0 == 0) goto L_0x006d;
-    L_0x0052:
-        r0 = android.provider.DocumentsContract.getDocumentId(r8);
-        r2 = "content://downloads/public_downloads";
-        r2 = android.net.Uri.parse(r2);
-        r0 = java.lang.Long.valueOf(r0);
-        r4 = r0.longValue();
-        r0 = android.content.ContentUris.withAppendedId(r2, r4);
-        r1 = getDataColumn(r7, r0, r1, r1);
-        goto L_0x0049;
-    L_0x006d:
-        r0 = isMediaDocument(r8);
-        if (r0 == 0) goto L_0x0049;
-    L_0x0073:
-        r0 = android.provider.DocumentsContract.getDocumentId(r8);
-        r3 = ":";
-        r5 = r0.split(r3);
-        r0 = r5[r2];
-        if (r0 != 0) goto L_0x0089;
-    L_0x0081:
-        r0 = r5[r2];
-        r0 = r0.isEmpty();
-        if (r0 != 0) goto L_0x00a7;
-    L_0x0089:
-        r0 = r5[r2];
-    L_0x008b:
-        r3 = -1;
-        r6 = r0.hashCode();
-        switch(r6) {
-            case 93166550: goto L_0x00be;
-            case 100313435: goto L_0x00aa;
-            case 112202875: goto L_0x00b4;
-            default: goto L_0x0093;
-        };
-    L_0x0093:
-        r0 = r3;
-    L_0x0094:
-        switch(r0) {
-            case 0: goto L_0x00c8;
-            case 1: goto L_0x00cb;
-            case 2: goto L_0x00ce;
-            default: goto L_0x0097;
-        };
-    L_0x0097:
-        r0 = r1;
-    L_0x0098:
-        r1 = "_id=?";
-        r1 = new java.lang.String[r4];
-        r3 = r5[r4];
-        r1[r2] = r3;
-        r2 = "_id=?";
-        r1 = getDataColumn(r7, r0, r2, r1);
-        goto L_0x0049;
-    L_0x00a7:
-        r0 = "";
-        goto L_0x008b;
-    L_0x00aa:
-        r6 = "image";
-        r0 = r0.equals(r6);
-        if (r0 == 0) goto L_0x0093;
-    L_0x00b2:
-        r0 = r2;
-        goto L_0x0094;
-    L_0x00b4:
-        r6 = "video";
-        r0 = r0.equals(r6);
-        if (r0 == 0) goto L_0x0093;
-    L_0x00bc:
-        r0 = r4;
-        goto L_0x0094;
-    L_0x00be:
-        r6 = "audio";
-        r0 = r0.equals(r6);
-        if (r0 == 0) goto L_0x0093;
-    L_0x00c6:
-        r0 = 2;
-        goto L_0x0094;
-    L_0x00c8:
-        r0 = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        goto L_0x0098;
-    L_0x00cb:
-        r0 = android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-        goto L_0x0098;
-    L_0x00ce:
-        r0 = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        goto L_0x0098;
-    L_0x00d1:
-        r0 = "content";
-        r2 = r8.getScheme();
-        r0 = r0.equalsIgnoreCase(r2);
-        if (r0 == 0) goto L_0x00ef;
-    L_0x00dd:
-        r0 = isGooglePhotosUri(r8);
-        if (r0 == 0) goto L_0x00e9;
-    L_0x00e3:
-        r1 = r8.getLastPathSegment();
-        goto L_0x0049;
-    L_0x00e9:
-        r1 = getDataColumn(r7, r8, r1, r1);
-        goto L_0x0049;
-    L_0x00ef:
-        r0 = "file";
-        r2 = r8.getScheme();
-        r0 = r0.equalsIgnoreCase(r2);
-        if (r0 == 0) goto L_0x0049;
-    L_0x00fb:
-        r1 = r8.getPath();
-        goto L_0x0049;
+            r4 = 1
+            r1 = 0
+            r2 = 0
+            int r0 = android.os.Build.VERSION.SDK_INT
+            r3 = 19
+            if (r0 < r3) goto L_0x004a
+            r0 = r4
+        L_0x000a:
+            if (r0 == 0) goto L_0x00d1
+            boolean r0 = android.provider.DocumentsContract.isDocumentUri(r7, r8)
+            if (r0 == 0) goto L_0x00d1
+            boolean r0 = isExternalStorageDocument(r8)
+            if (r0 == 0) goto L_0x004c
+            java.lang.String r0 = android.provider.DocumentsContract.getDocumentId(r8)
+            java.lang.String r3 = ":"
+            java.lang.String[] r0 = r0.split(r3)
+            r2 = r0[r2]
+            java.lang.String r3 = "primary"
+            boolean r2 = r3.equalsIgnoreCase(r2)
+            if (r2 == 0) goto L_0x0049
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.io.File r2 = android.os.Environment.getExternalStorageDirectory()
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r2 = "/"
+            java.lang.StringBuilder r1 = r1.append(r2)
+            r0 = r0[r4]
+            java.lang.StringBuilder r0 = r1.append(r0)
+            java.lang.String r1 = r0.toString()
+        L_0x0049:
+            return r1
+        L_0x004a:
+            r0 = r2
+            goto L_0x000a
+        L_0x004c:
+            boolean r0 = isDownloadsDocument(r8)
+            if (r0 == 0) goto L_0x006d
+            java.lang.String r0 = android.provider.DocumentsContract.getDocumentId(r8)
+            java.lang.String r2 = "content://downloads/public_downloads"
+            android.net.Uri r2 = android.net.Uri.parse(r2)
+            java.lang.Long r0 = java.lang.Long.valueOf(r0)
+            long r4 = r0.longValue()
+            android.net.Uri r0 = android.content.ContentUris.withAppendedId(r2, r4)
+            java.lang.String r1 = getDataColumn(r7, r0, r1, r1)
+            goto L_0x0049
+        L_0x006d:
+            boolean r0 = isMediaDocument(r8)
+            if (r0 == 0) goto L_0x0049
+            java.lang.String r0 = android.provider.DocumentsContract.getDocumentId(r8)
+            java.lang.String r3 = ":"
+            java.lang.String[] r5 = r0.split(r3)
+            r0 = r5[r2]
+            if (r0 != 0) goto L_0x0089
+            r0 = r5[r2]
+            boolean r0 = r0.isEmpty()
+            if (r0 != 0) goto L_0x00a7
+        L_0x0089:
+            r0 = r5[r2]
+        L_0x008b:
+            r3 = -1
+            int r6 = r0.hashCode()
+            switch(r6) {
+                case 93166550: goto L_0x00be;
+                case 100313435: goto L_0x00aa;
+                case 112202875: goto L_0x00b4;
+                default: goto L_0x0093;
+            }
+        L_0x0093:
+            r0 = r3
+        L_0x0094:
+            switch(r0) {
+                case 0: goto L_0x00c8;
+                case 1: goto L_0x00cb;
+                case 2: goto L_0x00ce;
+                default: goto L_0x0097;
+            }
+        L_0x0097:
+            r0 = r1
+        L_0x0098:
+            java.lang.String r1 = "_id=?"
+            java.lang.String[] r1 = new java.lang.String[r4]
+            r3 = r5[r4]
+            r1[r2] = r3
+            java.lang.String r2 = "_id=?"
+            java.lang.String r1 = getDataColumn(r7, r0, r2, r1)
+            goto L_0x0049
+        L_0x00a7:
+            java.lang.String r0 = ""
+            goto L_0x008b
+        L_0x00aa:
+            java.lang.String r6 = "image"
+            boolean r0 = r0.equals(r6)
+            if (r0 == 0) goto L_0x0093
+            r0 = r2
+            goto L_0x0094
+        L_0x00b4:
+            java.lang.String r6 = "video"
+            boolean r0 = r0.equals(r6)
+            if (r0 == 0) goto L_0x0093
+            r0 = r4
+            goto L_0x0094
+        L_0x00be:
+            java.lang.String r6 = "audio"
+            boolean r0 = r0.equals(r6)
+            if (r0 == 0) goto L_0x0093
+            r0 = 2
+            goto L_0x0094
+        L_0x00c8:
+            android.net.Uri r0 = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            goto L_0x0098
+        L_0x00cb:
+            android.net.Uri r0 = android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            goto L_0x0098
+        L_0x00ce:
+            android.net.Uri r0 = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            goto L_0x0098
+        L_0x00d1:
+            java.lang.String r0 = "content"
+            java.lang.String r2 = r8.getScheme()
+            boolean r0 = r0.equalsIgnoreCase(r2)
+            if (r0 == 0) goto L_0x00ef
+            boolean r0 = isGooglePhotosUri(r8)
+            if (r0 == 0) goto L_0x00e9
+            java.lang.String r1 = r8.getLastPathSegment()
+            goto L_0x0049
+        L_0x00e9:
+            java.lang.String r1 = getDataColumn(r7, r8, r1, r1)
+            goto L_0x0049
+        L_0x00ef:
+            java.lang.String r0 = "file"
+            java.lang.String r2 = r8.getScheme()
+            boolean r0 = r0.equalsIgnoreCase(r2)
+            if (r0 == 0) goto L_0x0049
+            java.lang.String r1 = r8.getPath()
+            goto L_0x0049
         */
         throw new UnsupportedOperationException("Method not decompiled: com.zopim.android.sdk.attachment.UriToFileUtil.getPath(android.content.Context, android.net.Uri):java.lang.String");
     }
@@ -259,7 +239,7 @@ public class UriToFileUtil {
     }
 
     public static boolean isLocal(String str) {
-        return (str == null || str.startsWith("http://") || str.startsWith("https://")) ? false : true;
+        return str != null && !str.startsWith("http://") && !str.startsWith("https://");
     }
 
     public static boolean isMediaDocument(Uri uri) {

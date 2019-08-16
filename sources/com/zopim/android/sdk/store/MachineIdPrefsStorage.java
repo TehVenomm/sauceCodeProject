@@ -3,7 +3,7 @@ package com.zopim.android.sdk.store;
 import android.content.Context;
 import android.util.Log;
 
-public final class MachineIdPrefsStorage extends C0898a implements MachineIdStorage {
+public final class MachineIdPrefsStorage extends C1267a implements MachineIdStorage {
     private static final String LOG_TAG = MachineIdPrefsStorage.class.getSimpleName();
     private static final String MACHINE_ID_KEY = "stored_machine_id";
     private static final String PREFS_NAME = "machine_id";
@@ -21,7 +21,10 @@ public final class MachineIdPrefsStorage extends C0898a implements MachineIdStor
     }
 
     public String getMachineId() {
-        return this.mDisabled ? null : this.mStoragePreferences.getString(MACHINE_ID_KEY, null);
+        if (this.mDisabled) {
+            return null;
+        }
+        return this.mStoragePreferences.getString(MACHINE_ID_KEY, null);
     }
 
     public void setMachineId(String str) {

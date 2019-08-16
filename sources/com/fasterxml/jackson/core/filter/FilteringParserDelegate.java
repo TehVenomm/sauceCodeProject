@@ -48,7 +48,10 @@ public class FilteringParserDelegate extends JsonParserDelegate {
 
     public final int getCurrentTokenId() {
         JsonToken jsonToken = this._currToken;
-        return jsonToken == null ? 0 : jsonToken.id();
+        if (jsonToken == null) {
+            return 0;
+        }
+        return jsonToken.mo9113id();
     }
 
     public boolean hasCurrentToken() {
@@ -62,7 +65,7 @@ public class FilteringParserDelegate extends JsonParserDelegate {
                 return true;
             }
             return false;
-        } else if (jsonToken.id() != i) {
+        } else if (jsonToken.mo9113id() != i) {
             return false;
         } else {
             return true;
@@ -94,8 +97,11 @@ public class FilteringParserDelegate extends JsonParserDelegate {
         if (this._currToken != JsonToken.START_OBJECT && this._currToken != JsonToken.START_ARRAY) {
             return _filterContext.getCurrentName();
         }
-        _filterContext = _filterContext.getParent();
-        return _filterContext == null ? null : _filterContext.getCurrentName();
+        JsonStreamContext parent = _filterContext.getParent();
+        if (parent == null) {
+            return null;
+        }
+        return parent.getCurrentName();
     }
 
     public void clearCurrentToken() {
@@ -114,8 +120,8 @@ public class FilteringParserDelegate extends JsonParserDelegate {
     }
 
     public JsonToken nextToken() throws IOException {
-        JsonToken currentToken;
-        if (!(this._allowMultipleMatches || this._currToken == null || this._exposedContext != null)) {
+        JsonToken jsonToken;
+        if (!this._allowMultipleMatches && this._currToken != null && this._exposedContext == null) {
             if (this._currToken.isStructEnd() && this._headContext.isStartHandled()) {
                 this._currToken = null;
                 return null;
@@ -134,7 +140,7 @@ public class FilteringParserDelegate extends JsonParserDelegate {
                 } else if (tokenFilterContext == this._headContext) {
                     this._exposedContext = null;
                     if (tokenFilterContext.inArray()) {
-                        currentToken = this.delegate.getCurrentToken();
+                        JsonToken currentToken = this.delegate.getCurrentToken();
                         this._currToken = currentToken;
                         return currentToken;
                     }
@@ -145,44 +151,43 @@ public class FilteringParserDelegate extends JsonParserDelegate {
             } while (tokenFilterContext != null);
             throw _constructError("Unexpected problem: chain of filtered context broken");
         }
-        currentToken = this.delegate.nextToken();
-        if (currentToken == null) {
-            this._currToken = currentToken;
-            return currentToken;
+        JsonToken nextToken = this.delegate.nextToken();
+        if (nextToken == null) {
+            this._currToken = nextToken;
+            return nextToken;
         }
-        TokenFilter tokenFilter;
-        TokenFilter filter;
-        switch (currentToken.id()) {
+        switch (nextToken.mo9113id()) {
             case 1:
-                tokenFilter = this._itemFilter;
+                TokenFilter tokenFilter = this._itemFilter;
                 if (tokenFilter == TokenFilter.INCLUDE_ALL) {
                     this._headContext = this._headContext.createChildObjectContext(tokenFilter, true);
-                    this._currToken = currentToken;
-                    return currentToken;
+                    this._currToken = nextToken;
+                    return nextToken;
                 } else if (tokenFilter == null) {
                     this.delegate.skipChildren();
                     break;
                 } else {
-                    tokenFilter = this._headContext.checkValue(tokenFilter);
-                    if (tokenFilter == null) {
+                    TokenFilter checkValue = this._headContext.checkValue(tokenFilter);
+                    if (checkValue == null) {
                         this.delegate.skipChildren();
                         break;
-                    }
-                    if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                        tokenFilter = tokenFilter.filterStartObject();
-                    }
-                    this._itemFilter = tokenFilter;
-                    if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                        this._headContext = this._headContext.createChildObjectContext(tokenFilter, true);
-                        this._currToken = currentToken;
-                        return currentToken;
-                    }
-                    this._headContext = this._headContext.createChildObjectContext(tokenFilter, false);
-                    if (this._includePath) {
-                        currentToken = _nextTokenWithBuffering(this._headContext);
-                        if (currentToken != null) {
-                            this._currToken = currentToken;
-                            return currentToken;
+                    } else {
+                        if (checkValue != TokenFilter.INCLUDE_ALL) {
+                            checkValue = checkValue.filterStartObject();
+                        }
+                        this._itemFilter = checkValue;
+                        if (checkValue == TokenFilter.INCLUDE_ALL) {
+                            this._headContext = this._headContext.createChildObjectContext(checkValue, true);
+                            this._currToken = nextToken;
+                            return nextToken;
+                        }
+                        this._headContext = this._headContext.createChildObjectContext(checkValue, false);
+                        if (this._includePath) {
+                            JsonToken _nextTokenWithBuffering = _nextTokenWithBuffering(this._headContext);
+                            if (_nextTokenWithBuffering != null) {
+                                this._currToken = _nextTokenWithBuffering;
+                                return _nextTokenWithBuffering;
+                            }
                         }
                     }
                 }
@@ -190,99 +195,100 @@ public class FilteringParserDelegate extends JsonParserDelegate {
             case 2:
             case 4:
                 boolean isStartHandled = this._headContext.isStartHandled();
-                filter = this._headContext.getFilter();
+                TokenFilter filter = this._headContext.getFilter();
                 if (!(filter == null || filter == TokenFilter.INCLUDE_ALL)) {
                     filter.filterFinishArray();
                 }
                 this._headContext = this._headContext.getParent();
                 this._itemFilter = this._headContext.getFilter();
                 if (isStartHandled) {
-                    this._currToken = currentToken;
-                    return currentToken;
+                    this._currToken = nextToken;
+                    return nextToken;
                 }
                 break;
             case 3:
-                tokenFilter = this._itemFilter;
-                if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                    this._headContext = this._headContext.createChildArrayContext(tokenFilter, true);
-                    this._currToken = currentToken;
-                    return currentToken;
-                } else if (tokenFilter == null) {
+                TokenFilter tokenFilter2 = this._itemFilter;
+                if (tokenFilter2 == TokenFilter.INCLUDE_ALL) {
+                    this._headContext = this._headContext.createChildArrayContext(tokenFilter2, true);
+                    this._currToken = nextToken;
+                    return nextToken;
+                } else if (tokenFilter2 == null) {
                     this.delegate.skipChildren();
                     break;
                 } else {
-                    tokenFilter = this._headContext.checkValue(tokenFilter);
-                    if (tokenFilter == null) {
+                    TokenFilter checkValue2 = this._headContext.checkValue(tokenFilter2);
+                    if (checkValue2 == null) {
                         this.delegate.skipChildren();
                         break;
-                    }
-                    if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                        tokenFilter = tokenFilter.filterStartArray();
-                    }
-                    this._itemFilter = tokenFilter;
-                    if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                        this._headContext = this._headContext.createChildArrayContext(tokenFilter, true);
-                        this._currToken = currentToken;
-                        return currentToken;
-                    }
-                    this._headContext = this._headContext.createChildArrayContext(tokenFilter, false);
-                    if (this._includePath) {
-                        currentToken = _nextTokenWithBuffering(this._headContext);
-                        if (currentToken != null) {
-                            this._currToken = currentToken;
-                            return currentToken;
+                    } else {
+                        if (checkValue2 != TokenFilter.INCLUDE_ALL) {
+                            checkValue2 = checkValue2.filterStartArray();
+                        }
+                        this._itemFilter = checkValue2;
+                        if (checkValue2 == TokenFilter.INCLUDE_ALL) {
+                            this._headContext = this._headContext.createChildArrayContext(checkValue2, true);
+                            this._currToken = nextToken;
+                            return nextToken;
+                        }
+                        this._headContext = this._headContext.createChildArrayContext(checkValue2, false);
+                        if (this._includePath) {
+                            JsonToken _nextTokenWithBuffering2 = _nextTokenWithBuffering(this._headContext);
+                            if (_nextTokenWithBuffering2 != null) {
+                                this._currToken = _nextTokenWithBuffering2;
+                                return _nextTokenWithBuffering2;
+                            }
                         }
                     }
                 }
                 break;
             case 5:
                 String currentName = this.delegate.getCurrentName();
-                filter = this._headContext.setFieldName(currentName);
-                if (filter == TokenFilter.INCLUDE_ALL) {
-                    JsonToken jsonToken;
-                    this._itemFilter = filter;
+                TokenFilter fieldName = this._headContext.setFieldName(currentName);
+                if (fieldName == TokenFilter.INCLUDE_ALL) {
+                    this._itemFilter = fieldName;
                     if (this._includePath || !this._includeImmediateParent || this._headContext.isStartHandled()) {
-                        jsonToken = currentToken;
+                        jsonToken = nextToken;
                     } else {
                         jsonToken = this._headContext.nextTokenToRead();
                         this._exposedContext = this._headContext;
                     }
                     this._currToken = jsonToken;
                     return jsonToken;
-                } else if (filter == null) {
+                } else if (fieldName == null) {
                     this.delegate.nextToken();
                     this.delegate.skipChildren();
                     break;
                 } else {
-                    tokenFilter = filter.includeProperty(currentName);
-                    if (tokenFilter == null) {
+                    TokenFilter includeProperty = fieldName.includeProperty(currentName);
+                    if (includeProperty == null) {
                         this.delegate.nextToken();
                         this.delegate.skipChildren();
                         break;
-                    }
-                    this._itemFilter = tokenFilter;
-                    if (tokenFilter == TokenFilter.INCLUDE_ALL && this._includePath) {
-                        this._currToken = currentToken;
-                        return currentToken;
-                    } else if (this._includePath) {
-                        currentToken = _nextTokenWithBuffering(this._headContext);
-                        if (currentToken != null) {
-                            this._currToken = currentToken;
-                            return currentToken;
+                    } else {
+                        this._itemFilter = includeProperty;
+                        if (includeProperty == TokenFilter.INCLUDE_ALL && this._includePath) {
+                            this._currToken = nextToken;
+                            return nextToken;
+                        } else if (this._includePath) {
+                            JsonToken _nextTokenWithBuffering3 = _nextTokenWithBuffering(this._headContext);
+                            if (_nextTokenWithBuffering3 != null) {
+                                this._currToken = _nextTokenWithBuffering3;
+                                return _nextTokenWithBuffering3;
+                            }
                         }
                     }
                 }
                 break;
             default:
-                tokenFilter = this._itemFilter;
-                if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                    this._currToken = currentToken;
-                    return currentToken;
-                } else if (tokenFilter != null) {
-                    tokenFilter = this._headContext.checkValue(tokenFilter);
-                    if (tokenFilter == TokenFilter.INCLUDE_ALL || (tokenFilter != null && tokenFilter.includeValue(this.delegate))) {
-                        this._currToken = currentToken;
-                        return currentToken;
+                TokenFilter tokenFilter3 = this._itemFilter;
+                if (tokenFilter3 == TokenFilter.INCLUDE_ALL) {
+                    this._currToken = nextToken;
+                    return nextToken;
+                } else if (tokenFilter3 != null) {
+                    TokenFilter checkValue3 = this._headContext.checkValue(tokenFilter3);
+                    if (checkValue3 == TokenFilter.INCLUDE_ALL || (checkValue3 != null && checkValue3.includeValue(this.delegate))) {
+                        this._currToken = nextToken;
+                        return nextToken;
                     }
                 }
                 break;
@@ -290,19 +296,18 @@ public class FilteringParserDelegate extends JsonParserDelegate {
         return _nextToken2();
     }
 
-    protected final JsonToken _nextToken2() throws IOException {
+    /* access modifiers changed from: protected */
+    public final JsonToken _nextToken2() throws IOException {
+        JsonToken nextToken;
         while (true) {
-            JsonToken nextToken = this.delegate.nextToken();
+            nextToken = this.delegate.nextToken();
             if (nextToken == null) {
                 this._currToken = nextToken;
                 return nextToken;
             }
-            TokenFilter tokenFilter;
-            JsonToken _nextTokenWithBuffering;
-            TokenFilter filter;
-            switch (nextToken.id()) {
+            switch (nextToken.mo9113id()) {
                 case 1:
-                    tokenFilter = this._itemFilter;
+                    TokenFilter tokenFilter = this._itemFilter;
                     if (tokenFilter == TokenFilter.INCLUDE_ALL) {
                         this._headContext = this._headContext.createChildObjectContext(tokenFilter, true);
                         this._currToken = nextToken;
@@ -311,35 +316,38 @@ public class FilteringParserDelegate extends JsonParserDelegate {
                         this.delegate.skipChildren();
                         break;
                     } else {
-                        tokenFilter = this._headContext.checkValue(tokenFilter);
-                        if (tokenFilter == null) {
+                        TokenFilter checkValue = this._headContext.checkValue(tokenFilter);
+                        if (checkValue == null) {
                             this.delegate.skipChildren();
                             break;
-                        }
-                        if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                            tokenFilter = tokenFilter.filterStartObject();
-                        }
-                        this._itemFilter = tokenFilter;
-                        if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                            this._headContext = this._headContext.createChildObjectContext(tokenFilter, true);
-                            this._currToken = nextToken;
-                            return nextToken;
-                        }
-                        this._headContext = this._headContext.createChildObjectContext(tokenFilter, false);
-                        if (this._includePath) {
-                            _nextTokenWithBuffering = _nextTokenWithBuffering(this._headContext);
-                            if (_nextTokenWithBuffering == null) {
-                                break;
+                        } else {
+                            if (checkValue != TokenFilter.INCLUDE_ALL) {
+                                checkValue = checkValue.filterStartObject();
                             }
-                            this._currToken = _nextTokenWithBuffering;
-                            return _nextTokenWithBuffering;
+                            this._itemFilter = checkValue;
+                            if (checkValue == TokenFilter.INCLUDE_ALL) {
+                                this._headContext = this._headContext.createChildObjectContext(checkValue, true);
+                                this._currToken = nextToken;
+                                return nextToken;
+                            }
+                            this._headContext = this._headContext.createChildObjectContext(checkValue, false);
+                            if (this._includePath) {
+                                JsonToken _nextTokenWithBuffering = _nextTokenWithBuffering(this._headContext);
+                                if (_nextTokenWithBuffering == null) {
+                                    break;
+                                } else {
+                                    this._currToken = _nextTokenWithBuffering;
+                                    return _nextTokenWithBuffering;
+                                }
+                            } else {
+                                continue;
+                            }
                         }
-                        continue;
                     }
                 case 2:
                 case 4:
                     boolean isStartHandled = this._headContext.isStartHandled();
-                    filter = this._headContext.getFilter();
+                    TokenFilter filter = this._headContext.getFilter();
                     if (!(filter == null || filter == TokenFilter.INCLUDE_ALL)) {
                         filter.filterFinishArray();
                     }
@@ -347,224 +355,310 @@ public class FilteringParserDelegate extends JsonParserDelegate {
                     this._itemFilter = this._headContext.getFilter();
                     if (!isStartHandled) {
                         break;
+                    } else {
+                        this._currToken = nextToken;
+                        return nextToken;
                     }
-                    this._currToken = nextToken;
-                    return nextToken;
                 case 3:
-                    tokenFilter = this._itemFilter;
-                    if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                        this._headContext = this._headContext.createChildArrayContext(tokenFilter, true);
+                    TokenFilter tokenFilter2 = this._itemFilter;
+                    if (tokenFilter2 == TokenFilter.INCLUDE_ALL) {
+                        this._headContext = this._headContext.createChildArrayContext(tokenFilter2, true);
                         this._currToken = nextToken;
                         return nextToken;
-                    } else if (tokenFilter == null) {
+                    } else if (tokenFilter2 == null) {
                         this.delegate.skipChildren();
                         break;
                     } else {
-                        tokenFilter = this._headContext.checkValue(tokenFilter);
-                        if (tokenFilter == null) {
+                        TokenFilter checkValue2 = this._headContext.checkValue(tokenFilter2);
+                        if (checkValue2 == null) {
                             this.delegate.skipChildren();
                             break;
-                        }
-                        if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                            tokenFilter = tokenFilter.filterStartArray();
-                        }
-                        this._itemFilter = tokenFilter;
-                        if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                            this._headContext = this._headContext.createChildArrayContext(tokenFilter, true);
-                            this._currToken = nextToken;
-                            return nextToken;
-                        }
-                        this._headContext = this._headContext.createChildArrayContext(tokenFilter, false);
-                        if (this._includePath) {
-                            _nextTokenWithBuffering = _nextTokenWithBuffering(this._headContext);
-                            if (_nextTokenWithBuffering == null) {
-                                break;
-                            }
-                            this._currToken = _nextTokenWithBuffering;
-                            return _nextTokenWithBuffering;
-                        }
-                        continue;
-                    }
-                case 5:
-                    String currentName = this.delegate.getCurrentName();
-                    filter = this._headContext.setFieldName(currentName);
-                    if (filter == TokenFilter.INCLUDE_ALL) {
-                        this._itemFilter = filter;
-                        this._currToken = nextToken;
-                        return nextToken;
-                    } else if (filter == null) {
-                        this.delegate.nextToken();
-                        this.delegate.skipChildren();
-                        break;
-                    } else {
-                        tokenFilter = filter.includeProperty(currentName);
-                        if (tokenFilter == null) {
-                            this.delegate.nextToken();
-                            this.delegate.skipChildren();
-                            break;
-                        }
-                        this._itemFilter = tokenFilter;
-                        if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                            if (!this._includePath) {
-                                break;
-                            }
-                            this._currToken = nextToken;
-                            return nextToken;
-                        } else if (this._includePath) {
-                            _nextTokenWithBuffering = _nextTokenWithBuffering(this._headContext);
-                            if (_nextTokenWithBuffering == null) {
-                                break;
-                            }
-                            this._currToken = _nextTokenWithBuffering;
-                            return _nextTokenWithBuffering;
                         } else {
-                            continue;
-                        }
-                    }
-                default:
-                    tokenFilter = this._itemFilter;
-                    if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                        this._currToken = nextToken;
-                        return nextToken;
-                    } else if (tokenFilter != null) {
-                        tokenFilter = this._headContext.checkValue(tokenFilter);
-                        if (tokenFilter == TokenFilter.INCLUDE_ALL || (tokenFilter != null && tokenFilter.includeValue(this.delegate))) {
-                            this._currToken = nextToken;
-                            return nextToken;
-                        }
-                    } else {
-                        continue;
-                    }
-            }
-        }
-    }
-
-    protected final JsonToken _nextTokenWithBuffering(TokenFilterContext tokenFilterContext) throws IOException {
-        while (true) {
-            JsonToken nextToken = this.delegate.nextToken();
-            if (nextToken == null) {
-                return nextToken;
-            }
-            TokenFilter tokenFilter;
-            switch (nextToken.id()) {
-                case 1:
-                    tokenFilter = this._itemFilter;
-                    if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                        if (tokenFilter != null) {
-                            tokenFilter = this._headContext.checkValue(tokenFilter);
-                            if (tokenFilter != null) {
-                                if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                                    tokenFilter = tokenFilter.filterStartObject();
-                                }
-                                this._itemFilter = tokenFilter;
-                                if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                                    this._headContext = this._headContext.createChildObjectContext(tokenFilter, false);
-                                    break;
-                                }
-                                this._headContext = this._headContext.createChildObjectContext(tokenFilter, true);
-                                return _nextBuffered(tokenFilterContext);
+                            if (checkValue2 != TokenFilter.INCLUDE_ALL) {
+                                checkValue2 = checkValue2.filterStartArray();
                             }
-                            this.delegate.skipChildren();
-                            break;
+                            this._itemFilter = checkValue2;
+                            if (checkValue2 == TokenFilter.INCLUDE_ALL) {
+                                this._headContext = this._headContext.createChildArrayContext(checkValue2, true);
+                                this._currToken = nextToken;
+                                return nextToken;
+                            }
+                            this._headContext = this._headContext.createChildArrayContext(checkValue2, false);
+                            if (this._includePath) {
+                                JsonToken _nextTokenWithBuffering2 = _nextTokenWithBuffering(this._headContext);
+                                if (_nextTokenWithBuffering2 == null) {
+                                    break;
+                                } else {
+                                    this._currToken = _nextTokenWithBuffering2;
+                                    return _nextTokenWithBuffering2;
+                                }
+                            } else {
+                                continue;
+                            }
                         }
-                        this.delegate.skipChildren();
-                        break;
                     }
-                    this._headContext = this._headContext.createChildObjectContext(tokenFilter, true);
-                    return nextToken;
-                case 2:
-                case 4:
-                    boolean z;
-                    tokenFilter = this._headContext.getFilter();
-                    if (!(tokenFilter == null || tokenFilter == TokenFilter.INCLUDE_ALL)) {
-                        tokenFilter.filterFinishArray();
-                    }
-                    boolean z2 = this._headContext == tokenFilterContext;
-                    if (z2 && this._headContext.isStartHandled()) {
-                        z = true;
-                    } else {
-                        z = false;
-                    }
-                    this._headContext = this._headContext.getParent();
-                    this._itemFilter = this._headContext.getFilter();
-                    if (!z) {
-                        if (!z2 && this._headContext != tokenFilterContext) {
-                            break;
-                        }
-                        return null;
-                    }
-                    return nextToken;
-                case 3:
-                    tokenFilter = this._headContext.checkValue(this._itemFilter);
-                    if (tokenFilter != null) {
-                        if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                            tokenFilter = tokenFilter.filterStartArray();
-                        }
-                        this._itemFilter = tokenFilter;
-                        if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                            this._headContext = this._headContext.createChildArrayContext(tokenFilter, false);
-                            break;
-                        }
-                        this._headContext = this._headContext.createChildArrayContext(tokenFilter, true);
-                        return _nextBuffered(tokenFilterContext);
-                    }
-                    this.delegate.skipChildren();
-                    break;
                 case 5:
                     String currentName = this.delegate.getCurrentName();
                     TokenFilter fieldName = this._headContext.setFieldName(currentName);
-                    if (fieldName != TokenFilter.INCLUDE_ALL) {
-                        if (fieldName != null) {
-                            tokenFilter = fieldName.includeProperty(currentName);
-                            if (tokenFilter != null) {
-                                this._itemFilter = tokenFilter;
-                                if (tokenFilter != TokenFilter.INCLUDE_ALL) {
-                                    break;
-                                }
-                                return _nextBuffered(tokenFilterContext);
-                            }
-                            this.delegate.nextToken();
-                            this.delegate.skipChildren();
-                            break;
-                        }
+                    if (fieldName == TokenFilter.INCLUDE_ALL) {
+                        this._itemFilter = fieldName;
+                        this._currToken = nextToken;
+                        return nextToken;
+                    } else if (fieldName == null) {
                         this.delegate.nextToken();
                         this.delegate.skipChildren();
                         break;
-                    }
-                    this._itemFilter = fieldName;
-                    return _nextBuffered(tokenFilterContext);
-                default:
-                    tokenFilter = this._itemFilter;
-                    if (tokenFilter == TokenFilter.INCLUDE_ALL) {
-                        return _nextBuffered(tokenFilterContext);
-                    }
-                    if (tokenFilter != null) {
-                        tokenFilter = this._headContext.checkValue(tokenFilter);
-                        if (tokenFilter == TokenFilter.INCLUDE_ALL || (tokenFilter != null && tokenFilter.includeValue(this.delegate))) {
-                            return _nextBuffered(tokenFilterContext);
+                    } else {
+                        TokenFilter includeProperty = fieldName.includeProperty(currentName);
+                        if (includeProperty == null) {
+                            this.delegate.nextToken();
+                            this.delegate.skipChildren();
+                            break;
+                        } else {
+                            this._itemFilter = includeProperty;
+                            if (includeProperty == TokenFilter.INCLUDE_ALL) {
+                                if (!this._includePath) {
+                                    break;
+                                } else {
+                                    this._currToken = nextToken;
+                                    return nextToken;
+                                }
+                            } else if (this._includePath) {
+                                JsonToken _nextTokenWithBuffering3 = _nextTokenWithBuffering(this._headContext);
+                                if (_nextTokenWithBuffering3 == null) {
+                                    break;
+                                } else {
+                                    this._currToken = _nextTokenWithBuffering3;
+                                    return _nextTokenWithBuffering3;
+                                }
+                            } else {
+                                continue;
+                            }
                         }
                     }
-                    continue;
+                default:
+                    TokenFilter tokenFilter3 = this._itemFilter;
+                    if (tokenFilter3 == TokenFilter.INCLUDE_ALL) {
+                        this._currToken = nextToken;
+                        return nextToken;
+                    } else if (tokenFilter3 != null) {
+                        TokenFilter checkValue3 = this._headContext.checkValue(tokenFilter3);
+                        if (checkValue3 == TokenFilter.INCLUDE_ALL || (checkValue3 != null && checkValue3.includeValue(this.delegate))) {
+                            this._currToken = nextToken;
+                            break;
+                        }
+                    } else {
+                        continue;
+                    }
             }
         }
+        this._currToken = nextToken;
+        return nextToken;
+    }
+
+    /* access modifiers changed from: protected */
+    /* JADX WARNING: Code restructure failed: missing block: B:107:?, code lost:
+        return _nextBuffered(r7);
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public final com.fasterxml.jackson.core.JsonToken _nextTokenWithBuffering(com.fasterxml.jackson.core.filter.TokenFilterContext r7) throws java.io.IOException {
+        /*
+            r6 = this;
+            r2 = 0
+            r1 = 1
+        L_0x0002:
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            com.fasterxml.jackson.core.JsonToken r3 = r0.nextToken()
+            if (r3 != 0) goto L_0x000c
+            r0 = r3
+        L_0x000b:
+            return r0
+        L_0x000c:
+            int r0 = r3.mo9113id()
+            switch(r0) {
+                case 1: goto L_0x0052;
+                case 2: goto L_0x009e;
+                case 3: goto L_0x001e;
+                case 4: goto L_0x009e;
+                case 5: goto L_0x00df;
+                default: goto L_0x0013;
+            }
+        L_0x0013:
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r6._itemFilter
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 != r3) goto L_0x0123
+            com.fasterxml.jackson.core.JsonToken r0 = r6._nextBuffered(r7)
+            goto L_0x000b
+        L_0x001e:
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = r6._itemFilter
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r0.checkValue(r3)
+            if (r0 != 0) goto L_0x002e
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            r0.skipChildren()
+            goto L_0x0002
+        L_0x002e:
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 == r3) goto L_0x0036
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r0.filterStartArray()
+        L_0x0036:
+            r6._itemFilter = r0
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 != r3) goto L_0x0049
+            com.fasterxml.jackson.core.filter.TokenFilterContext r2 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r2.createChildArrayContext(r0, r1)
+            r6._headContext = r0
+            com.fasterxml.jackson.core.JsonToken r0 = r6._nextBuffered(r7)
+            goto L_0x000b
+        L_0x0049:
+            com.fasterxml.jackson.core.filter.TokenFilterContext r3 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r3.createChildArrayContext(r0, r2)
+            r6._headContext = r0
+            goto L_0x0002
+        L_0x0052:
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r6._itemFilter
+            com.fasterxml.jackson.core.filter.TokenFilter r4 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 != r4) goto L_0x0062
+            com.fasterxml.jackson.core.filter.TokenFilterContext r2 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r2.createChildObjectContext(r0, r1)
+            r6._headContext = r0
+            r0 = r3
+            goto L_0x000b
+        L_0x0062:
+            if (r0 != 0) goto L_0x006a
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            r0.skipChildren()
+            goto L_0x0002
+        L_0x006a:
+            com.fasterxml.jackson.core.filter.TokenFilterContext r3 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r3.checkValue(r0)
+            if (r0 != 0) goto L_0x0078
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            r0.skipChildren()
+            goto L_0x0002
+        L_0x0078:
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 == r3) goto L_0x0080
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r0.filterStartObject()
+        L_0x0080:
+            r6._itemFilter = r0
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 != r3) goto L_0x0094
+            com.fasterxml.jackson.core.filter.TokenFilterContext r2 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r2.createChildObjectContext(r0, r1)
+            r6._headContext = r0
+            com.fasterxml.jackson.core.JsonToken r0 = r6._nextBuffered(r7)
+            goto L_0x000b
+        L_0x0094:
+            com.fasterxml.jackson.core.filter.TokenFilterContext r3 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r3.createChildObjectContext(r0, r2)
+            r6._headContext = r0
+            goto L_0x0002
+        L_0x009e:
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r0.getFilter()
+            if (r0 == 0) goto L_0x00ad
+            com.fasterxml.jackson.core.filter.TokenFilter r4 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 == r4) goto L_0x00ad
+            r0.filterFinishArray()
+        L_0x00ad:
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r6._headContext
+            if (r0 != r7) goto L_0x00d2
+            r4 = r1
+        L_0x00b2:
+            if (r4 == 0) goto L_0x00d4
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r6._headContext
+            boolean r0 = r0.isStartHandled()
+            if (r0 == 0) goto L_0x00d4
+            r0 = r1
+        L_0x00bd:
+            com.fasterxml.jackson.core.filter.TokenFilterContext r5 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilterContext r5 = r5.getParent()
+            r6._headContext = r5
+            com.fasterxml.jackson.core.filter.TokenFilterContext r5 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilter r5 = r5.getFilter()
+            r6._itemFilter = r5
+            if (r0 == 0) goto L_0x00d6
+            r0 = r3
+            goto L_0x000b
+        L_0x00d2:
+            r4 = r2
+            goto L_0x00b2
+        L_0x00d4:
+            r0 = r2
+            goto L_0x00bd
+        L_0x00d6:
+            if (r4 != 0) goto L_0x00dc
+            com.fasterxml.jackson.core.filter.TokenFilterContext r0 = r6._headContext
+            if (r0 != r7) goto L_0x0002
+        L_0x00dc:
+            r0 = 0
+            goto L_0x000b
+        L_0x00df:
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            java.lang.String r0 = r0.getCurrentName()
+            com.fasterxml.jackson.core.filter.TokenFilterContext r3 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = r3.setFieldName(r0)
+            com.fasterxml.jackson.core.filter.TokenFilter r4 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r3 != r4) goto L_0x00f7
+            r6._itemFilter = r3
+            com.fasterxml.jackson.core.JsonToken r0 = r6._nextBuffered(r7)
+            goto L_0x000b
+        L_0x00f7:
+            if (r3 != 0) goto L_0x0105
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            r0.nextToken()
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            r0.skipChildren()
+            goto L_0x0002
+        L_0x0105:
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r3.includeProperty(r0)
+            if (r0 != 0) goto L_0x0117
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            r0.nextToken()
+            com.fasterxml.jackson.core.JsonParser r0 = r6.delegate
+            r0.skipChildren()
+            goto L_0x0002
+        L_0x0117:
+            r6._itemFilter = r0
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 != r3) goto L_0x0002
+            com.fasterxml.jackson.core.JsonToken r0 = r6._nextBuffered(r7)
+            goto L_0x000b
+        L_0x0123:
+            if (r0 == 0) goto L_0x0002
+            com.fasterxml.jackson.core.filter.TokenFilterContext r3 = r6._headContext
+            com.fasterxml.jackson.core.filter.TokenFilter r0 = r3.checkValue(r0)
+            com.fasterxml.jackson.core.filter.TokenFilter r3 = com.fasterxml.jackson.core.filter.TokenFilter.INCLUDE_ALL
+            if (r0 == r3) goto L_0x0139
+            if (r0 == 0) goto L_0x0002
+            com.fasterxml.jackson.core.JsonParser r3 = r6.delegate
+            boolean r0 = r0.includeValue(r3)
+            if (r0 == 0) goto L_0x0002
+        L_0x0139:
+            com.fasterxml.jackson.core.JsonToken r0 = r6._nextBuffered(r7)
+            goto L_0x000b
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.filter.FilteringParserDelegate._nextTokenWithBuffering(com.fasterxml.jackson.core.filter.TokenFilterContext):com.fasterxml.jackson.core.JsonToken");
     }
 
     private JsonToken _nextBuffered(TokenFilterContext tokenFilterContext) throws IOException {
         this._exposedContext = tokenFilterContext;
         JsonToken nextTokenToRead = tokenFilterContext.nextTokenToRead();
-        if (nextTokenToRead == null) {
-            while (tokenFilterContext != this._headContext) {
-                tokenFilterContext = this._exposedContext.findChildOf(tokenFilterContext);
-                this._exposedContext = tokenFilterContext;
-                if (tokenFilterContext == null) {
-                    throw _constructError("Unexpected problem: chain of filtered context broken");
-                }
-                nextTokenToRead = this._exposedContext.nextTokenToRead();
-                if (nextTokenToRead != null) {
-                }
-            }
-            throw _constructError("Internal error: failed to locate expected buffered tokens");
+        if (nextTokenToRead != null) {
+            return nextTokenToRead;
         }
+        while (tokenFilterContext != this._headContext) {
+            tokenFilterContext = this._exposedContext.findChildOf(tokenFilterContext);
+            this._exposedContext = tokenFilterContext;
+            if (tokenFilterContext == null) {
+                throw _constructError("Unexpected problem: chain of filtered context broken");
+            }
+            nextTokenToRead = this._exposedContext.nextTokenToRead();
+            if (nextTokenToRead != null) {
+            }
+        }
+        throw _constructError("Internal error: failed to locate expected buffered tokens");
         return nextTokenToRead;
     }
 
@@ -718,7 +812,8 @@ public class FilteringParserDelegate extends JsonParserDelegate {
         return this.delegate.getTokenLocation();
     }
 
-    protected JsonStreamContext _filterContext() {
+    /* access modifiers changed from: protected */
+    public JsonStreamContext _filterContext() {
         if (this._exposedContext != null) {
             return this._exposedContext;
         }

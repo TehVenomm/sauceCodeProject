@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.app.Service;
 import android.content.Intent;
@@ -13,8 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import net.gogame.gowrap.ui.customtabs.ICustomTabsService.Stub;
+import net.gogame.gowrap.p019ui.customtabs.ICustomTabsService.Stub;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsService */
 public abstract class CustomTabsService extends Service {
     public static final String ACTION_CUSTOM_TABS_CONNECTION = "android.support.customtabs.action.CustomTabsService";
     public static final String KEY_URL = "android.support.customtabs.otherurls.URL";
@@ -24,14 +25,7 @@ public abstract class CustomTabsService extends Service {
     public static final int RESULT_FAILURE_MESSAGING_ERROR = -3;
     public static final int RESULT_FAILURE_REMOTE_ERROR = -2;
     public static final int RESULT_SUCCESS = 0;
-    private Stub mBinder = new C11471();
-    private final Map<IBinder, DeathRecipient> mDeathRecipientMap = new HashMap();
-
-    /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsService$1 */
-    class C11471 extends Stub {
-        C11471() {
-        }
-
+    private Stub mBinder = new Stub() {
         public boolean warmup(long j) {
             return CustomTabsService.this.warmup(j);
         }
@@ -40,19 +34,19 @@ public abstract class CustomTabsService extends Service {
             boolean z = false;
             final CustomTabsSessionToken customTabsSessionToken = new CustomTabsSessionToken(iCustomTabsCallback);
             try {
-                DeathRecipient c11461 = new DeathRecipient() {
+                C14481 r2 = new DeathRecipient() {
                     public void binderDied() {
                         CustomTabsService.this.cleanUpSession(customTabsSessionToken);
                     }
                 };
                 synchronized (CustomTabsService.this.mDeathRecipientMap) {
-                    iCustomTabsCallback.asBinder().linkToDeath(c11461, 0);
-                    CustomTabsService.this.mDeathRecipientMap.put(iCustomTabsCallback.asBinder(), c11461);
+                    iCustomTabsCallback.asBinder().linkToDeath(r2, 0);
+                    CustomTabsService.this.mDeathRecipientMap.put(iCustomTabsCallback.asBinder(), r2);
                 }
-                z = CustomTabsService.this.newSession(customTabsSessionToken);
+                return CustomTabsService.this.newSession(customTabsSessionToken);
             } catch (RemoteException e) {
+                return z;
             }
-            return z;
         }
 
         public boolean mayLaunchUrl(ICustomTabsCallback iCustomTabsCallback, Uri uri, Bundle bundle, List<Bundle> list) {
@@ -78,37 +72,50 @@ public abstract class CustomTabsService extends Service {
         public boolean validateRelationship(ICustomTabsCallback iCustomTabsCallback, int i, Uri uri, Bundle bundle) {
             return CustomTabsService.this.validateRelationship(new CustomTabsSessionToken(iCustomTabsCallback), i, uri, bundle);
         }
-    }
+    };
+    /* access modifiers changed from: private */
+    public final Map<IBinder, DeathRecipient> mDeathRecipientMap = new HashMap();
 
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsService$Relation */
     public @interface Relation {
     }
 
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsService$Result */
     public @interface Result {
     }
 
-    protected abstract Bundle extraCommand(String str, Bundle bundle);
+    /* access modifiers changed from: protected */
+    public abstract Bundle extraCommand(String str, Bundle bundle);
 
-    protected abstract boolean mayLaunchUrl(CustomTabsSessionToken customTabsSessionToken, Uri uri, Bundle bundle, List<Bundle> list);
+    /* access modifiers changed from: protected */
+    public abstract boolean mayLaunchUrl(CustomTabsSessionToken customTabsSessionToken, Uri uri, Bundle bundle, List<Bundle> list);
 
-    protected abstract boolean newSession(CustomTabsSessionToken customTabsSessionToken);
+    /* access modifiers changed from: protected */
+    public abstract boolean newSession(CustomTabsSessionToken customTabsSessionToken);
 
-    protected abstract int postMessage(CustomTabsSessionToken customTabsSessionToken, String str, Bundle bundle);
+    /* access modifiers changed from: protected */
+    public abstract int postMessage(CustomTabsSessionToken customTabsSessionToken, String str, Bundle bundle);
 
-    protected abstract boolean requestPostMessageChannel(CustomTabsSessionToken customTabsSessionToken, Uri uri);
+    /* access modifiers changed from: protected */
+    public abstract boolean requestPostMessageChannel(CustomTabsSessionToken customTabsSessionToken, Uri uri);
 
-    protected abstract boolean updateVisuals(CustomTabsSessionToken customTabsSessionToken, Bundle bundle);
+    /* access modifiers changed from: protected */
+    public abstract boolean updateVisuals(CustomTabsSessionToken customTabsSessionToken, Bundle bundle);
 
-    protected abstract boolean validateRelationship(CustomTabsSessionToken customTabsSessionToken, int i, Uri uri, Bundle bundle);
+    /* access modifiers changed from: protected */
+    public abstract boolean validateRelationship(CustomTabsSessionToken customTabsSessionToken, int i, Uri uri, Bundle bundle);
 
-    protected abstract boolean warmup(long j);
+    /* access modifiers changed from: protected */
+    public abstract boolean warmup(long j);
 
     public IBinder onBind(Intent intent) {
         return this.mBinder;
     }
 
-    protected boolean cleanUpSession(CustomTabsSessionToken customTabsSessionToken) {
+    /* access modifiers changed from: protected */
+    public boolean cleanUpSession(CustomTabsSessionToken customTabsSessionToken) {
         try {
             synchronized (this.mDeathRecipientMap) {
                 IBinder callbackBinder = customTabsSessionToken.getCallbackBinder();

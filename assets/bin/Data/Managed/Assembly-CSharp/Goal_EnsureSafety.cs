@@ -14,42 +14,38 @@ public class Goal_EnsureSafety : GoalComposite
 		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		RemoveAllSubGoals(brain);
-		if (brain.dangerRader != null && brain.dangerRader.AskDanger(0.2f))
+		if (brain.dangerRader != null && brain.dangerRader.AskDanger())
 		{
-			if (brain.dangerRader.AskWillBulletHit(0.2f))
+			if (brain.dangerRader.AskWillBulletHit())
 			{
 				AddSubGoal<Goal_AvoidRightAndLeft>();
 			}
-			else if (brain.dangerRader.AskWillDashHit(0.2f))
+			else if (brain.dangerRader.AskWillDashHit())
 			{
 				if (brain.weaponCtrl.IsGuardAttack())
 				{
 					AddSubGoal<Goal_Guard>().SetGiveupTime(5f);
+					return;
 				}
-				else
+				PLACE pLACE = brain.dangerRader.GetSafetySide();
+				if (!brain.moveCtrl.CanPlaceAvoid(pLACE))
 				{
-					PLACE pLACE = brain.dangerRader.GetSafetySide();
-					if (!brain.moveCtrl.CanPlaceAvoid(pLACE))
-					{
-						pLACE = ((pLACE == PLACE.LEFT) ? PLACE.RIGHT : PLACE.LEFT);
-					}
-					AddSubGoal<Goal_Avoid>().SetPlace(pLACE);
-					AddSubGoal<Goal_Avoid>().SetPlace(pLACE);
+					pLACE = ((pLACE == PLACE.LEFT) ? PLACE.RIGHT : PLACE.LEFT);
 				}
+				AddSubGoal<Goal_Avoid>().SetPlace(pLACE);
+				AddSubGoal<Goal_Avoid>().SetPlace(pLACE);
 			}
-			else if (brain.dangerRader.AskDangerPosition(brain.owner._position, 0.2f))
+			else if (brain.dangerRader.AskDangerPosition(brain.owner._position))
 			{
 				if (brain.weaponCtrl.IsGuardAttack())
 				{
 					AddSubGoal<Goal_Guard>().SetGiveupTime(5f);
+					return;
 				}
-				else
-				{
-					PLACE safetyPlace = brain.dangerRader.GetSafetyPlace();
-					AddSubGoal<Goal_Avoid>().SetPlace(safetyPlace);
-				}
+				PLACE safetyPlace = brain.dangerRader.GetSafetyPlace();
+				AddSubGoal<Goal_Avoid>().SetPlace(safetyPlace);
 			}
-			else if (brain.dangerRader.AskDangerPosition(brain.moveCtrl.targetPos, 0.2f))
+			else if (brain.dangerRader.AskDangerPosition(brain.moveCtrl.targetPos))
 			{
 				PLACE safetySide = brain.dangerRader.GetSafetySide();
 				AddSubGoal<Goal_MoveToAround>().SetParam(safetySide, brain.moveCtrl.targetPos, 3f);

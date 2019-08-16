@@ -5,7 +5,6 @@ import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.model.SharePhoto;
 import java.util.List;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,12 +17,24 @@ public final class OpenGraphJSONUtility {
     private OpenGraphJSONUtility() {
     }
 
-    private static JSONArray toJSONArray(List list, PhotoJSONProcessor photoJSONProcessor) throws JSONException {
-        JSONArray jSONArray = new JSONArray();
-        for (Object toJSONValue : list) {
-            jSONArray.put(toJSONValue(toJSONValue, photoJSONProcessor));
-        }
-        return jSONArray;
+    /* JADX WARNING: Incorrect type for immutable var: ssa=java.util.List, code=java.util.List<java.lang.Object>, for r3v0, types: [java.util.List, java.util.List<java.lang.Object>] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private static org.json.JSONArray toJSONArray(java.util.List<java.lang.Object> r3, com.facebook.share.internal.OpenGraphJSONUtility.PhotoJSONProcessor r4) throws org.json.JSONException {
+        /*
+            org.json.JSONArray r0 = new org.json.JSONArray
+            r0.<init>()
+            java.util.Iterator r1 = r3.iterator()
+        L_0x0009:
+            boolean r2 = r1.hasNext()
+            if (r2 == 0) goto L_0x001b
+            java.lang.Object r2 = r1.next()
+            java.lang.Object r2 = toJSONValue(r2, r4)
+            r0.put(r2)
+            goto L_0x0009
+        L_0x001b:
+            return r0
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.facebook.share.internal.OpenGraphJSONUtility.toJSONArray(java.util.List, com.facebook.share.internal.OpenGraphJSONUtility$PhotoJSONProcessor):org.json.JSONArray");
     }
 
     public static JSONObject toJSONObject(ShareOpenGraphAction shareOpenGraphAction, PhotoJSONProcessor photoJSONProcessor) throws JSONException {
@@ -50,11 +61,13 @@ public final class OpenGraphJSONUtility {
             return obj;
         }
         if (obj instanceof SharePhoto) {
-            return photoJSONProcessor != null ? photoJSONProcessor.toJSONObject((SharePhoto) obj) : null;
-        } else {
-            if (obj instanceof ShareOpenGraphObject) {
-                return toJSONObject((ShareOpenGraphObject) obj, photoJSONProcessor);
+            if (photoJSONProcessor != null) {
+                return photoJSONProcessor.toJSONObject((SharePhoto) obj);
             }
+            return null;
+        } else if (obj instanceof ShareOpenGraphObject) {
+            return toJSONObject((ShareOpenGraphObject) obj, photoJSONProcessor);
+        } else {
             if (obj instanceof List) {
                 return toJSONArray((List) obj, photoJSONProcessor);
             }

@@ -14,19 +14,18 @@ public class HomeIAPPopAd : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		productId = (GameSection.GetEventData() as string);
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		GlobalSettingsManager.PackParam.PackInfo pack_info = MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.GetPack(productId);
+		ProductDataTable.PackInfo pack_info = Singleton<ProductDataTable>.I.GetPack(productId);
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, pack_info.popupAdsBanner, false);
+		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, pack_info.popupAdsBanner);
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		if (loTex.loadedObject != null)
 		{

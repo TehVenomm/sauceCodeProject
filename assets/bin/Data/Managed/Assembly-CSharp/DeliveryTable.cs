@@ -2,6 +2,8 @@ using Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 {
@@ -131,16 +133,6 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			}
 		}
 
-		public const string NT = "id,locaitonNum,questID,name,type,subType,textType,clearIngameType,eventID,fieldMode,difficulty,npcID,npcComment,npcClearComment,clearEventID,clearEventTitle,jumpType,jumpMapID,targetPortalID_1,targetPortalID_2,targetPortalID_3,placeName,enemyName,appearQuestId,appearDeliveryId,conditionType_0,enemyId_0,mapId_0,questId_0,rateType_0,needName_0,needNum_0,needId_0,conditionType_1,enemyId_1,mapId_1,rateType_1,needName_1,needNum_1,needId_1,conditionType_2,enemyId_2,mapId_2,rateType_2,needName_2,needNum_2,needId_2,conditionType_3,enemyId_3,mapId_3,rateType_3,needName_3,needNum_3,needId_3,conditionType_4,enemyId_4,mapId_4,rateType_4,needName_4,needNum_4,needId_4,regionId,appearRegionId";
-
-		private const string DEFEAT_CONDITION = "DEFEAT_QUEST";
-
-		private const string DEFEAT_FIELD_CONDITION = "DEFEAT_FIELD";
-
-		private const DELIVERY_RATE_TYPE DROP_DIFFICULTY_RARE = DELIVERY_RATE_TYPE.RATE_1500;
-
-		private const DELIVERY_RATE_TYPE DROP_DIFFICULTY_SUPER_RARE = DELIVERY_RATE_TYPE.RATE_500;
-
 		public uint id;
 
 		public string locationNumber;
@@ -157,6 +149,8 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 		public CLEAR_INGAME clearIngameType;
 
+		public int displayOrder;
+
 		public int eventID;
 
 		public DIFFICULTY_MODE fieldMode;
@@ -170,6 +164,8 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 		public string npcComment;
 
 		public string npcClearComment;
+
+		public uint readScriptId;
 
 		public uint clearEventID;
 
@@ -193,7 +189,19 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 		public int regionId;
 
+		public List<int> tipsIdList = new List<int>();
+
 		public int appearRegionId;
+
+		public const string NT = "id,locaitonNum,questID,name,type,subType,textType,clearIngameType,displayOrder,eventID,fieldMode,difficulty,npcID,npcComment,npcClearComment,readScriptId,clearEventID,clearEventTitle,jumpType,jumpMapID,targetPortalID_1,targetPortalID_2,targetPortalID_3,placeName,enemyName,appearQuestId,appearDeliveryId,conditionType_0,enemyId_0,mapId_0,questId_0,rateType_0,needName_0,needNum_0,needId_0,conditionType_1,enemyId_1,mapId_1,rateType_1,needName_1,needNum_1,needId_1,conditionType_2,enemyId_2,mapId_2,rateType_2,needName_2,needNum_2,needId_2,conditionType_3,enemyId_3,mapId_3,rateType_3,needName_3,needNum_3,needId_3,conditionType_4,enemyId_4,mapId_4,rateType_4,needName_4,needNum_4,needId_4,regionId,tipsIds";
+
+		private const string DEFEAT_CONDITION = "DEFEAT_QUEST";
+
+		private const string DEFEAT_FIELD_CONDITION = "DEFEAT_FIELD";
+
+		private const DELIVERY_RATE_TYPE DROP_DIFFICULTY_RARE = DELIVERY_RATE_TYPE.RATE_1500;
+
+		private const DELIVERY_RATE_TYPE DROP_DIFFICULTY_SUPER_RARE = DELIVERY_RATE_TYPE.RATE_500;
 
 		public static bool cb(CSVReader csv_reader, DeliveryData data, ref uint key)
 		{
@@ -205,12 +213,14 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			csv_reader.PopEnum(ref data.subType, DELIVERY_SUB_TYPE.NONE);
 			csv_reader.PopEnum(ref data.textType, DELIVERY_TYPE.ETC);
 			csv_reader.PopEnum(ref data.clearIngameType, CLEAR_INGAME.DEAFULT);
+			csv_reader.Pop(ref data.displayOrder);
 			csv_reader.Pop(ref data.eventID);
 			csv_reader.Pop(ref data.fieldMode);
 			csv_reader.Pop(ref data.difficulty);
 			csv_reader.Pop(ref data.npcID);
 			csv_reader.Pop(ref data.npcComment);
 			csv_reader.Pop(ref data.npcClearComment);
+			csv_reader.Pop(ref data.readScriptId);
 			csv_reader.Pop(ref data.clearEventID);
 			csv_reader.Pop(ref data.clearEventTitle);
 			csv_reader.Pop(ref data.jumpType);
@@ -261,6 +271,14 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 				data.deliveryNumber = (data.id % 100u).ToString();
 			}
 			csv_reader.Pop(ref data.regionId);
+			string value9 = string.Empty;
+			csv_reader.Pop(ref value9);
+			data.tipsIdList = new List<int>();
+			int[] array = TableUtility.ParseStringToIntArray(value9);
+			if (array != null)
+			{
+				data.tipsIdList.AddRange(array);
+			}
 			csv_reader.Pop(ref data.appearRegionId);
 			return true;
 		}
@@ -271,26 +289,28 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			locationNumber = reader.ReadString(string.Empty);
 			deliveryNumber = reader.ReadString(string.Empty);
 			name = reader.ReadString(string.Empty);
-			type = (DELIVERY_TYPE)reader.ReadUInt32(0u);
-			subType = (DELIVERY_SUB_TYPE)reader.ReadUInt32(0u);
-			textType = (DELIVERY_TYPE)reader.ReadUInt32(0u);
-			eventID = reader.ReadInt32(0);
-			fieldMode = (DIFFICULTY_MODE)reader.ReadUInt32(0u);
-			difficulty = (DIFFICULTY_MODE)reader.ReadUInt32(0u);
-			npcID = reader.ReadUInt32(0u);
+			type = (DELIVERY_TYPE)reader.ReadUInt32();
+			subType = (DELIVERY_SUB_TYPE)reader.ReadUInt32();
+			textType = (DELIVERY_TYPE)reader.ReadUInt32();
+			displayOrder = reader.ReadInt32();
+			eventID = reader.ReadInt32();
+			fieldMode = (DIFFICULTY_MODE)reader.ReadUInt32();
+			difficulty = (DIFFICULTY_MODE)reader.ReadUInt32();
+			npcID = reader.ReadUInt32();
 			npcComment = reader.ReadString(string.Empty);
 			npcClearComment = reader.ReadString(string.Empty);
-			clearEventID = reader.ReadUInt32(0u);
+			readScriptId = reader.ReadUInt32();
+			clearEventID = reader.ReadUInt32();
 			clearEventTitle = reader.ReadString(string.Empty);
-			jumpType = reader.ReadInt32(0);
-			jumpMapID = reader.ReadInt32(0);
-			targetPortalID[0] = reader.ReadInt32(0);
-			targetPortalID[1] = reader.ReadInt32(0);
-			targetPortalID[2] = reader.ReadInt32(0);
+			jumpType = reader.ReadInt32();
+			jumpMapID = reader.ReadInt32();
+			targetPortalID[0] = reader.ReadInt32();
+			targetPortalID[1] = reader.ReadInt32();
+			targetPortalID[2] = reader.ReadInt32();
 			placeName = reader.ReadString(string.Empty);
 			enemyName = reader.ReadString(string.Empty);
-			appearQuestId = reader.ReadUInt32(0u);
-			appearDeliveryId = reader.ReadUInt32(0u);
+			appearQuestId = reader.ReadUInt32();
+			appearDeliveryId = reader.ReadUInt32();
 			List<NeedData> list = new List<NeedData>();
 			int i = 0;
 			for (int num = 5; i < num; i++)
@@ -303,17 +323,17 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 				string empty = string.Empty;
 				uint num4 = 0u;
 				uint num5 = 0u;
-				dELIVERY_CONDITION_TYPE = (DELIVERY_CONDITION_TYPE)reader.ReadUInt32(0u);
-				num2 = reader.ReadUInt32(0u);
-				num3 = reader.ReadUInt32(0u);
+				dELIVERY_CONDITION_TYPE = (DELIVERY_CONDITION_TYPE)reader.ReadUInt32();
+				num2 = reader.ReadUInt32();
+				num3 = reader.ReadUInt32();
 				if (i == 0)
 				{
-					questId = reader.ReadUInt32(0u);
+					questId = reader.ReadUInt32();
 				}
-				dELIVERY_RATE_TYPE = (DELIVERY_RATE_TYPE)reader.ReadUInt32(0u);
+				dELIVERY_RATE_TYPE = (DELIVERY_RATE_TYPE)reader.ReadUInt32();
 				empty = reader.ReadString(string.Empty);
-				num4 = reader.ReadUInt32(0u);
-				num5 = reader.ReadUInt32(0u);
+				num4 = reader.ReadUInt32();
+				num5 = reader.ReadUInt32();
 				NeedData needData = new NeedData(dELIVERY_CONDITION_TYPE, num2, num3, questId, dELIVERY_RATE_TYPE, empty, num4, num5);
 				if (needData.IsValid())
 				{
@@ -340,12 +360,14 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			writer.Write((int)type);
 			writer.Write((int)subType);
 			writer.Write((int)textType);
+			writer.Write(displayOrder);
 			writer.Write(eventID);
 			writer.Write((int)fieldMode);
 			writer.Write((int)difficulty);
 			writer.Write(npcID);
 			writer.Write(npcComment);
 			writer.Write(npcClearComment);
+			writer.Write(readScriptId);
 			writer.Write(clearEventID);
 			writer.Write(clearEventTitle);
 			writer.Write(jumpType);
@@ -411,7 +433,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			return DeliveryManager.IsInvalidClearInGame(type, fieldMode);
 		}
 
-		public DELIVERY_CONDITION_TYPE GetConditionType(uint idx = 0)
+		public DELIVERY_CONDITION_TYPE GetConditionType(uint idx = 0u)
 		{
 			if (needs == null)
 			{
@@ -424,7 +446,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			return needs[idx].conditionType;
 		}
 
-		public bool IsDefeatCondition(uint idx = 0)
+		public bool IsDefeatCondition(uint idx = 0u)
 		{
 			if (needs == null)
 			{
@@ -450,7 +472,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			return false;
 		}
 
-		public uint GetEnemyID(uint idx = 0)
+		public uint GetEnemyID(uint idx = 0u)
 		{
 			if (needs == null)
 			{
@@ -486,7 +508,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			return list;
 		}
 
-		public uint GetMapID(uint idx = 0)
+		public uint GetMapID(uint idx = 0u)
 		{
 			if (needs == null)
 			{
@@ -522,7 +544,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			return list;
 		}
 
-		public DELIVERY_RATE_TYPE GetRateType(uint idx = 0)
+		public DELIVERY_RATE_TYPE GetRateType(uint idx = 0u)
 		{
 			if (needs == null)
 			{
@@ -548,7 +570,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			return needs[idx].IsNeedTarget(enemyId, mapId);
 		}
 
-		public string GetNeedItemName(uint idx = 0)
+		public string GetNeedItemName(uint idx = 0u)
 		{
 			if (needs == null)
 			{
@@ -561,7 +583,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			return needs[idx].needName;
 		}
 
-		public uint GetNeedItemNum(uint idx = 0)
+		public uint GetNeedItemNum(uint idx = 0u)
 		{
 			if (needs == null)
 			{
@@ -595,31 +617,31 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			{
 				return UIType.EVENT;
 			}
-			if (fieldMode != DIFFICULTY_MODE.HARD)
+			if (fieldMode == DIFFICULTY_MODE.HARD)
 			{
-				switch (type)
-				{
-				case DELIVERY_TYPE.STORY:
-					return UIType.STORY;
-				case DELIVERY_TYPE.DAILY:
-				case DELIVERY_TYPE.MON:
-				case DELIVERY_TYPE.TUE:
-				case DELIVERY_TYPE.WED:
-				case DELIVERY_TYPE.THU:
-				case DELIVERY_TYPE.FRI:
-				case DELIVERY_TYPE.SAT:
-				case DELIVERY_TYPE.SUN:
-				case DELIVERY_TYPE.DAY_OF_WEEK:
-					return UIType.DAILY;
-				case DELIVERY_TYPE.WEEKLY:
-					return UIType.WEEKLY;
-				case DELIVERY_TYPE.SUB_EVENT:
-					return UIType.SUB_EVENT;
-				default:
-					return UIType.NONE;
-				}
+				return UIType.HARD;
 			}
-			return UIType.HARD;
+			switch (type)
+			{
+			case DELIVERY_TYPE.STORY:
+				return UIType.STORY;
+			case DELIVERY_TYPE.DAILY:
+			case DELIVERY_TYPE.MON:
+			case DELIVERY_TYPE.TUE:
+			case DELIVERY_TYPE.WED:
+			case DELIVERY_TYPE.THU:
+			case DELIVERY_TYPE.FRI:
+			case DELIVERY_TYPE.SAT:
+			case DELIVERY_TYPE.SUN:
+			case DELIVERY_TYPE.DAY_OF_WEEK:
+				return UIType.DAILY;
+			case DELIVERY_TYPE.WEEKLY:
+				return UIType.WEEKLY;
+			case DELIVERY_TYPE.SUB_EVENT:
+				return UIType.SUB_EVENT;
+			default:
+				return UIType.NONE;
+			}
 		}
 
 		public UIType GetUITextType()
@@ -674,7 +696,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 		public DELIVERY_DROP_DIFFICULTY GetDeliveryDropRarity()
 		{
-			DELIVERY_RATE_TYPE rateType = GetRateType(0u);
+			DELIVERY_RATE_TYPE rateType = GetRateType();
 			if (rateType >= DELIVERY_RATE_TYPE.RATE_500)
 			{
 				return DELIVERY_DROP_DIFFICULTY.SUPER_RARE;
@@ -702,7 +724,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 		public ArenaTable.ArenaData GetArenaData()
 		{
-			if (GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
+			if (GetConditionType() == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
 			{
 				return GetArenaDataWithRankUpDelivery();
 			}
@@ -753,7 +775,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			{
 				return false;
 			}
-			bool flag = id == deliveryData.id && locationNumber == deliveryData.locationNumber && deliveryNumber == deliveryData.deliveryNumber && name == deliveryData.name && type == deliveryData.type && textType == deliveryData.textType && eventID == deliveryData.eventID && fieldMode == deliveryData.fieldMode && difficulty == deliveryData.difficulty && eventFlag == deliveryData.eventFlag && npcID == deliveryData.npcID && npcComment == deliveryData.npcComment && npcClearComment == deliveryData.npcClearComment && clearEventID == deliveryData.clearEventID && clearEventTitle == deliveryData.clearEventTitle && jumpType == deliveryData.jumpType && jumpMapID == deliveryData.jumpMapID && targetPortalID[0] == deliveryData.targetPortalID[0] && targetPortalID[1] == deliveryData.targetPortalID[1] && targetPortalID[2] == deliveryData.targetPortalID[2] && placeName == deliveryData.placeName && enemyName == deliveryData.enemyName && appearQuestId == deliveryData.appearQuestId && appearDeliveryId == deliveryData.appearDeliveryId;
+			bool flag = id == deliveryData.id && locationNumber == deliveryData.locationNumber && deliveryNumber == deliveryData.deliveryNumber && name == deliveryData.name && type == deliveryData.type && textType == deliveryData.textType && eventID == deliveryData.eventID && fieldMode == deliveryData.fieldMode && difficulty == deliveryData.difficulty && eventFlag == deliveryData.eventFlag && npcID == deliveryData.npcID && npcComment == deliveryData.npcComment && npcClearComment == deliveryData.npcClearComment && readScriptId == deliveryData.readScriptId && clearEventID == deliveryData.clearEventID && clearEventTitle == deliveryData.clearEventTitle && jumpType == deliveryData.jumpType && jumpMapID == deliveryData.jumpMapID && targetPortalID[0] == deliveryData.targetPortalID[0] && targetPortalID[1] == deliveryData.targetPortalID[1] && targetPortalID[2] == deliveryData.targetPortalID[2] && placeName == deliveryData.placeName && enemyName == deliveryData.enemyName && appearQuestId == deliveryData.appearQuestId && appearDeliveryId == deliveryData.appearDeliveryId;
 			if (needs.Length == deliveryData.needs.Length)
 			{
 				for (int i = 0; i < needs.Length; i++)
@@ -775,15 +797,21 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 		public override string ToString()
 		{
-			return "id:" + id + ", locationNumber:" + locationNumber + ", deliveryNumber:" + deliveryNumber + ", name:" + name + ", type:" + type + ", subType:" + subType + ", textType:" + textType + ", eventID:" + eventID + ", fieldMode:" + fieldMode + ", difficulty:" + difficulty + ", eventFlag:" + eventFlag + ", npcID:" + npcID + ", npcComment:" + npcComment + ", npcClearComment:" + npcClearComment + ", clearEventID:" + clearEventID + ", clearEventTitle:" + clearEventTitle + ", jumpType:" + jumpType + ", jumpMapID:" + jumpMapID + ", targetPortalID[0]" + targetPortalID[0] + ", targetPortalID[1]:" + targetPortalID[1] + ", targetPortalID[2]:" + targetPortalID[2] + ", placeName:" + placeName + ", enemyName:" + enemyName + ", appearQuestId:" + appearQuestId + ", appearDeliveryId:" + appearDeliveryId;
+			return "id:" + id + ", locationNumber:" + locationNumber + ", deliveryNumber:" + deliveryNumber + ", name:" + name + ", type:" + type + ", subType:" + subType + ", textType:" + textType + ", eventID:" + eventID + ", fieldMode:" + fieldMode + ", difficulty:" + difficulty + ", eventFlag:" + eventFlag + ", npcID:" + npcID + ", npcComment:" + npcComment + ", npcClearComment:" + npcClearComment + ", readScriptId:" + readScriptId + ", clearEventID:" + clearEventID + ", clearEventTitle:" + clearEventTitle + ", jumpType:" + jumpType + ", jumpMapID:" + jumpMapID + ", targetPortalID[0]" + targetPortalID[0] + ", targetPortalID[1]:" + targetPortalID[1] + ", targetPortalID[2]:" + targetPortalID[2] + ", placeName:" + placeName + ", enemyName:" + enemyName + ", appearQuestId:" + appearQuestId + ", appearDeliveryId:" + appearDeliveryId;
 		}
 	}
 
 	private UIntKeyTable<DeliveryData> tableData;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<DeliveryData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<DeliveryData> _003C_003Ef__mg_0024cache1;
+
 	public static UIntKeyTable<DeliveryData> CreateTableCSV(string csv_text)
 	{
-		return TableUtility.CreateUIntKeyTable<DeliveryData>(csv_text, DeliveryData.cb, "id,locaitonNum,questID,name,type,subType,textType,clearIngameType,eventID,fieldMode,difficulty,npcID,npcComment,npcClearComment,clearEventID,clearEventTitle,jumpType,jumpMapID,targetPortalID_1,targetPortalID_2,targetPortalID_3,placeName,enemyName,appearQuestId,appearDeliveryId,conditionType_0,enemyId_0,mapId_0,questId_0,rateType_0,needName_0,needNum_0,needId_0,conditionType_1,enemyId_1,mapId_1,rateType_1,needName_1,needNum_1,needId_1,conditionType_2,enemyId_2,mapId_2,rateType_2,needName_2,needNum_2,needId_2,conditionType_3,enemyId_3,mapId_3,rateType_3,needName_3,needNum_3,needId_3,conditionType_4,enemyId_4,mapId_4,rateType_4,needName_4,needNum_4,needId_4,regionId,appearRegionId", null);
+		return TableUtility.CreateUIntKeyTable<DeliveryData>(csv_text, DeliveryData.cb, "id,locaitonNum,questID,name,type,subType,textType,clearIngameType,displayOrder,eventID,fieldMode,difficulty,npcID,npcComment,npcClearComment,readScriptId,clearEventID,clearEventTitle,jumpType,jumpMapID,targetPortalID_1,targetPortalID_2,targetPortalID_3,placeName,enemyName,appearQuestId,appearDeliveryId,conditionType_0,enemyId_0,mapId_0,questId_0,rateType_0,needName_0,needNum_0,needId_0,conditionType_1,enemyId_1,mapId_1,rateType_1,needName_1,needNum_1,needId_1,conditionType_2,enemyId_2,mapId_2,rateType_2,needName_2,needNum_2,needId_2,conditionType_3,enemyId_3,mapId_3,rateType_3,needName_3,needNum_3,needId_3,conditionType_4,enemyId_4,mapId_4,rateType_4,needName_4,needNum_4,needId_4,regionId,tipsIds");
 	}
 
 	public void CreateTable(string csv_text)
@@ -794,7 +822,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(tableData, csv_text, DeliveryData.cb, "id,locaitonNum,questID,name,type,subType,textType,clearIngameType,eventID,fieldMode,difficulty,npcID,npcComment,npcClearComment,clearEventID,clearEventTitle,jumpType,jumpMapID,targetPortalID_1,targetPortalID_2,targetPortalID_3,placeName,enemyName,appearQuestId,appearDeliveryId,conditionType_0,enemyId_0,mapId_0,questId_0,rateType_0,needName_0,needNum_0,needId_0,conditionType_1,enemyId_1,mapId_1,rateType_1,needName_1,needNum_1,needId_1,conditionType_2,enemyId_2,mapId_2,rateType_2,needName_2,needNum_2,needId_2,conditionType_3,enemyId_3,mapId_3,rateType_3,needName_3,needNum_3,needId_3,conditionType_4,enemyId_4,mapId_4,rateType_4,needName_4,needNum_4,needId_4,regionId,appearRegionId", null);
+		TableUtility.AddUIntKeyTable(tableData, csv_text, DeliveryData.cb, "id,locaitonNum,questID,name,type,subType,textType,clearIngameType,displayOrder,eventID,fieldMode,difficulty,npcID,npcComment,npcClearComment,readScriptId,clearEventID,clearEventTitle,jumpType,jumpMapID,targetPortalID_1,targetPortalID_2,targetPortalID_3,placeName,enemyName,appearQuestId,appearDeliveryId,conditionType_0,enemyId_0,mapId_0,questId_0,rateType_0,needName_0,needNum_0,needId_0,conditionType_1,enemyId_1,mapId_1,rateType_1,needName_1,needNum_1,needId_1,conditionType_2,enemyId_2,mapId_2,rateType_2,needName_2,needNum_2,needId_2,conditionType_3,enemyId_3,mapId_3,rateType_3,needName_3,needNum_3,needId_3,conditionType_4,enemyId_4,mapId_4,rateType_4,needName_4,needNum_4,needId_4,regionId,tipsIds");
 	}
 
 	public static UIntKeyTable<DeliveryData> CreateTableBinary(byte[] bytes)
@@ -848,6 +876,19 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 		return list.ToArray();
 	}
 
+	public List<int> GetTipsList(uint questId)
+	{
+		List<int> list = new List<int>();
+		DeliveryData deliveryTableDataFromQuestId = GetDeliveryTableDataFromQuestId(questId);
+		if (deliveryTableDataFromQuestId != null)
+		{
+			list.AddRange(from num in deliveryTableDataFromQuestId.tipsIdList
+			where num > 0
+			select num);
+		}
+		return list;
+	}
+
 	public void AllDeliveryData(Action<DeliveryData> call_back)
 	{
 		if (tableData != null && call_back != null)
@@ -857,6 +898,37 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 				call_back(data);
 			});
 		}
+	}
+
+	public void AllDeliveryDataAsc(Action<DeliveryData> call_back)
+	{
+		if (tableData != null && call_back != null)
+		{
+			tableData.ForEachAsc(delegate(DeliveryData data)
+			{
+				call_back(data);
+			});
+		}
+	}
+
+	public void AllDeliveryDataDesc(Action<DeliveryData> call_back)
+	{
+		if (tableData != null && call_back != null)
+		{
+			tableData.ForEachDesc(delegate(DeliveryData data)
+			{
+				call_back(data);
+			});
+		}
+	}
+
+	public DeliveryData GetDeliveryTableDataFromQuestId(uint questId)
+	{
+		if (tableData == null)
+		{
+			return null;
+		}
+		return tableData.Find((DeliveryData d) => d.needs.Length > 0 && d.needs[0].questId == questId);
 	}
 
 	public int GetSortPriority(DELIVERY_TYPE type)

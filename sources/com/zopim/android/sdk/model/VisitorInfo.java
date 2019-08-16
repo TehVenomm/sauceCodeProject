@@ -15,7 +15,7 @@ public class VisitorInfo implements Serializable {
         String phoneNumber;
 
         public VisitorInfo build() {
-            return new VisitorInfo();
+            return new VisitorInfo(this);
         }
 
         public Builder email(String str) {

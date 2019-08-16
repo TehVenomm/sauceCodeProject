@@ -7,14 +7,7 @@ import android.support.annotation.Nullable;
 import com.facebook.share.model.ShareMedia.Type;
 
 public final class ShareVideo extends ShareMedia {
-    public static final Creator<ShareVideo> CREATOR = new C05191();
-    private final Uri localUrl;
-
-    /* renamed from: com.facebook.share.model.ShareVideo$1 */
-    static final class C05191 implements Creator<ShareVideo> {
-        C05191() {
-        }
-
+    public static final Creator<ShareVideo> CREATOR = new Creator<ShareVideo>() {
         public ShareVideo createFromParcel(Parcel parcel) {
             return new ShareVideo(parcel);
         }
@@ -22,21 +15,24 @@ public final class ShareVideo extends ShareMedia {
         public ShareVideo[] newArray(int i) {
             return new ShareVideo[i];
         }
-    }
+    };
+    private final Uri localUrl;
 
     public static final class Builder extends com.facebook.share.model.ShareMedia.Builder<ShareVideo, Builder> {
-        private Uri localUrl;
+        /* access modifiers changed from: private */
+        public Uri localUrl;
 
         public ShareVideo build() {
-            return new ShareVideo();
+            return new ShareVideo(this);
         }
 
-        Builder readFrom(Parcel parcel) {
+        /* access modifiers changed from: 0000 */
+        public Builder readFrom(Parcel parcel) {
             return readFrom((ShareVideo) parcel.readParcelable(ShareVideo.class.getClassLoader()));
         }
 
         public Builder readFrom(ShareVideo shareVideo) {
-            return shareVideo == null ? this : ((Builder) super.readFrom((ShareMedia) shareVideo)).setLocalUrl(shareVideo.getLocalUrl());
+            return shareVideo == null ? this : ((Builder) super.readFrom(shareVideo)).setLocalUrl(shareVideo.getLocalUrl());
         }
 
         public Builder setLocalUrl(@Nullable Uri uri) {

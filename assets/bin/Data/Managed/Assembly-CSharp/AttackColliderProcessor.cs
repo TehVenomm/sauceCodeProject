@@ -11,6 +11,8 @@ public class AttackColliderProcessor : StageObjectManager.IDetachedNotify
 
 	protected bool m_isValidTriggerStay;
 
+	protected bool m_isValidMultiHitInterval;
+
 	public AttackInfo attackInfo
 	{
 		get;
@@ -52,6 +54,11 @@ public class AttackColliderProcessor : StageObjectManager.IDetachedNotify
 		m_isValidTriggerStay = true;
 	}
 
+	public void ValidMultiHitInterval()
+	{
+		m_isValidMultiHitInterval = true;
+	}
+
 	public virtual void SetFromInfo(AttackInfo _attack_info, StageObject _object, Collider _collider, IAttackCollider _collider_interface)
 	{
 		attackInfo = _attack_info;
@@ -60,9 +67,17 @@ public class AttackColliderProcessor : StageObjectManager.IDetachedNotify
 		colliderInterface = _collider_interface;
 		targetPointList = null;
 		Player player = fromObject as Player;
-		if (player != null && player.targetingPointList != null)
+		AttackHitInfo attackHitInfo = _attack_info as AttackHitInfo;
+		if (player != null && attackHitInfo != null)
 		{
-			targetPointList = player.targetingPointList.GetRange(0, player.targetingPointList.Count);
+			if (attackHitInfo.attackType == AttackHitInfo.ATTACK_TYPE.ARROW_RAIN && attackInfo.rateInfoRate >= 1f)
+			{
+				targetPointList = player.arrowRainTargetPointList.GetRange(0, player.arrowRainTargetPointList.Count);
+			}
+			else
+			{
+				targetPointList = player.targetingPointList.GetRange(0, player.targetingPointList.Count);
+			}
 		}
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{

@@ -4,88 +4,129 @@ import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbh;
-import com.google.android.gms.common.util.zzg;
+import android.support.annotation.Nullable;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Asserts;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Objects.ToStringHelper;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.DataUtils;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayerEntity;
-import com.google.android.gms.games.internal.zzc;
-import java.util.Arrays;
+import com.google.android.gms.games.internal.zzd;
 
-public final class AchievementEntity extends zzc implements Achievement {
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "AchievementEntityCreator")
+@Reserved({1000})
+public final class AchievementEntity extends zzd implements Achievement {
     public static final Creator<AchievementEntity> CREATOR = new zza();
-    private final String mName;
-    private final int mState;
-    private final String zzdmz;
-    private final int zzeda;
-    private final String zzhdk;
-    private final Uri zzhdl;
-    private final String zzhdm;
-    private final Uri zzhdn;
-    private final String zzhdo;
-    private final int zzhdp;
-    private final String zzhdq;
-    private final PlayerEntity zzhdr;
-    private final int zzhds;
-    private final String zzhdt;
-    private final long zzhdu;
-    private final long zzhdv;
+    @Field(getter = "getDescription", mo13990id = 4)
+    private final String description;
+    @Field(getter = "getName", mo13990id = 3)
+    private final String name;
+    @Field(getter = "getState", mo13990id = 12)
+    private final int state;
+    @Field(getter = "getType", mo13990id = 2)
+    private final int type;
+    @Field(getter = "getAchievementId", mo13990id = 1)
+    private final String zzfc;
+    @Field(getter = "getUnlockedImageUri", mo13990id = 5)
+    private final Uri zzfd;
+    @Field(getter = "getUnlockedImageUrl", mo13990id = 6)
+    private final String zzfe;
+    @Field(getter = "getRevealedImageUri", mo13990id = 7)
+    private final Uri zzff;
+    @Field(getter = "getRevealedImageUrl", mo13990id = 8)
+    private final String zzfg;
+    @Field(getter = "getTotalStepsRaw", mo13990id = 9)
+    private final int zzfh;
+    @Field(getter = "getFormattedTotalStepsRaw", mo13990id = 10)
+    private final String zzfi;
+    @Nullable
+    @Field(getter = "getPlayerInternal", mo13990id = 11)
+    private final PlayerEntity zzfj;
+    @Field(getter = "getCurrentStepsRaw", mo13990id = 13)
+    private final int zzfk;
+    @Field(getter = "getFormattedCurrentStepsRaw", mo13990id = 14)
+    private final String zzfl;
+    @Field(getter = "getLastUpdatedTimestamp", mo13990id = 15)
+    private final long zzfm;
+    @Field(getter = "getXpValue", mo13990id = 16)
+    private final long zzfn;
+    @Field(defaultValue = "-1.0f", getter = "getRarityPercent", mo13990id = 17)
+    private final float zzfo;
+    @Field(getter = "getApplicationId", mo13990id = 18)
+    private final String zzm;
 
     public AchievementEntity(Achievement achievement) {
-        this.zzhdk = achievement.getAchievementId();
-        this.zzeda = achievement.getType();
-        this.mName = achievement.getName();
-        this.zzdmz = achievement.getDescription();
-        this.zzhdl = achievement.getUnlockedImageUri();
-        this.zzhdm = achievement.getUnlockedImageUrl();
-        this.zzhdn = achievement.getRevealedImageUri();
-        this.zzhdo = achievement.getRevealedImageUrl();
-        this.zzhdr = (PlayerEntity) achievement.getPlayer().freeze();
-        this.mState = achievement.getState();
-        this.zzhdu = achievement.getLastUpdatedTimestamp();
-        this.zzhdv = achievement.getXpValue();
-        if (achievement.getType() == 1) {
-            this.zzhdp = achievement.getTotalSteps();
-            this.zzhdq = achievement.getFormattedTotalSteps();
-            this.zzhds = achievement.getCurrentSteps();
-            this.zzhdt = achievement.getFormattedCurrentSteps();
+        this.zzfc = achievement.getAchievementId();
+        this.type = achievement.getType();
+        this.name = achievement.getName();
+        this.description = achievement.getDescription();
+        this.zzfd = achievement.getUnlockedImageUri();
+        this.zzfe = achievement.getUnlockedImageUrl();
+        this.zzff = achievement.getRevealedImageUri();
+        this.zzfg = achievement.getRevealedImageUrl();
+        if (achievement.zzw() != null) {
+            this.zzfj = (PlayerEntity) achievement.zzw().freeze();
         } else {
-            this.zzhdp = 0;
-            this.zzhdq = null;
-            this.zzhds = 0;
-            this.zzhdt = null;
+            this.zzfj = null;
         }
-        com.google.android.gms.common.internal.zzc.zzr(this.zzhdk);
-        com.google.android.gms.common.internal.zzc.zzr(this.zzdmz);
+        this.state = achievement.getState();
+        this.zzfm = achievement.getLastUpdatedTimestamp();
+        this.zzfn = achievement.getXpValue();
+        this.zzfo = achievement.zzx();
+        this.zzm = achievement.getApplicationId();
+        if (achievement.getType() == 1) {
+            this.zzfh = achievement.getTotalSteps();
+            this.zzfi = achievement.getFormattedTotalSteps();
+            this.zzfk = achievement.getCurrentSteps();
+            this.zzfl = achievement.getFormattedCurrentSteps();
+        } else {
+            this.zzfh = 0;
+            this.zzfi = null;
+            this.zzfk = 0;
+            this.zzfl = null;
+        }
+        Asserts.checkNotNull(this.zzfc);
+        Asserts.checkNotNull(this.description);
     }
 
-    AchievementEntity(String str, int i, String str2, String str3, Uri uri, String str4, Uri uri2, String str5, int i2, String str6, PlayerEntity playerEntity, int i3, int i4, String str7, long j, long j2) {
-        this.zzhdk = str;
-        this.zzeda = i;
-        this.mName = str2;
-        this.zzdmz = str3;
-        this.zzhdl = uri;
-        this.zzhdm = str4;
-        this.zzhdn = uri2;
-        this.zzhdo = str5;
-        this.zzhdp = i2;
-        this.zzhdq = str6;
-        this.zzhdr = playerEntity;
-        this.mState = i3;
-        this.zzhds = i4;
-        this.zzhdt = str7;
-        this.zzhdu = j;
-        this.zzhdv = j2;
+    @Constructor
+    AchievementEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) int i, @Param(mo13993id = 3) String str2, @Param(mo13993id = 4) String str3, @Param(mo13993id = 5) Uri uri, @Param(mo13993id = 6) String str4, @Param(mo13993id = 7) Uri uri2, @Param(mo13993id = 8) String str5, @Param(mo13993id = 9) int i2, @Param(mo13993id = 10) String str6, @Nullable @Param(mo13993id = 11) PlayerEntity playerEntity, @Param(mo13993id = 12) int i3, @Param(mo13993id = 13) int i4, @Param(mo13993id = 14) String str7, @Param(mo13993id = 15) long j, @Param(mo13993id = 16) long j2, @Param(mo13993id = 17) float f, @Param(mo13993id = 18) String str8) {
+        this.zzfc = str;
+        this.type = i;
+        this.name = str2;
+        this.description = str3;
+        this.zzfd = uri;
+        this.zzfe = str4;
+        this.zzff = uri2;
+        this.zzfg = str5;
+        this.zzfh = i2;
+        this.zzfi = str6;
+        this.zzfj = playerEntity;
+        this.state = i3;
+        this.zzfk = i4;
+        this.zzfl = str7;
+        this.zzfm = j;
+        this.zzfn = j2;
+        this.zzfo = f;
+        this.zzm = str8;
     }
 
     static String zza(Achievement achievement) {
-        zzbh zzg = zzbf.zzt(achievement).zzg("Id", achievement.getAchievementId()).zzg("Type", Integer.valueOf(achievement.getType())).zzg("Name", achievement.getName()).zzg("Description", achievement.getDescription()).zzg("Player", achievement.getPlayer()).zzg("State", Integer.valueOf(achievement.getState()));
+        ToStringHelper add = Objects.toStringHelper(achievement).add("Id", achievement.getAchievementId()).add("Game Id", achievement.getApplicationId()).add("Type", Integer.valueOf(achievement.getType())).add("Name", achievement.getName()).add("Description", achievement.getDescription()).add("Player", achievement.zzw()).add("State", Integer.valueOf(achievement.getState())).add("Rarity Percent", Float.valueOf(achievement.zzx()));
         if (achievement.getType() == 1) {
-            zzg.zzg("CurrentSteps", Integer.valueOf(achievement.getCurrentSteps()));
-            zzg.zzg("TotalSteps", Integer.valueOf(achievement.getTotalSteps()));
+            add.add("CurrentSteps", Integer.valueOf(achievement.getCurrentSteps()));
+            add.add("TotalSteps", Integer.valueOf(achievement.getTotalSteps()));
         }
-        return zzg.toString();
+        return add.toString();
     }
 
     public final boolean equals(Object obj) {
@@ -94,16 +135,7 @@ public final class AchievementEntity extends zzc implements Achievement {
                 return true;
             }
             Achievement achievement = (Achievement) obj;
-            boolean equal;
-            boolean equal2;
-            if (getType() == 1) {
-                equal = zzbf.equal(Integer.valueOf(achievement.getCurrentSteps()), Integer.valueOf(getCurrentSteps()));
-                equal2 = zzbf.equal(Integer.valueOf(achievement.getTotalSteps()), Integer.valueOf(getTotalSteps()));
-            } else {
-                equal = true;
-                equal2 = true;
-            }
-            if (zzbf.equal(achievement.getAchievementId(), getAchievementId()) && zzbf.equal(achievement.getName(), getName()) && zzbf.equal(Integer.valueOf(achievement.getType()), Integer.valueOf(getType())) && zzbf.equal(achievement.getDescription(), getDescription()) && zzbf.equal(Long.valueOf(achievement.getXpValue()), Long.valueOf(getXpValue())) && zzbf.equal(Integer.valueOf(achievement.getState()), Integer.valueOf(getState())) && zzbf.equal(Long.valueOf(achievement.getLastUpdatedTimestamp()), Long.valueOf(getLastUpdatedTimestamp())) && zzbf.equal(achievement.getPlayer(), getPlayer()) && r1 && r2) {
+            if (achievement.getType() == getType() && ((getType() != 1 || (achievement.getCurrentSteps() == getCurrentSteps() && achievement.getTotalSteps() == getTotalSteps())) && achievement.getXpValue() == getXpValue() && achievement.getState() == getState() && achievement.getLastUpdatedTimestamp() == getLastUpdatedTimestamp() && Objects.equal(achievement.getAchievementId(), getAchievementId()) && Objects.equal(achievement.getApplicationId(), getApplicationId()) && Objects.equal(achievement.getName(), getName()) && Objects.equal(achievement.getDescription(), getDescription()) && Objects.equal(achievement.zzw(), zzw()) && achievement.zzx() == zzx())) {
                 return true;
             }
         }
@@ -115,7 +147,11 @@ public final class AchievementEntity extends zzc implements Achievement {
     }
 
     public final String getAchievementId() {
-        return this.zzhdk;
+        return this.zzfc;
+    }
+
+    public final String getApplicationId() {
+        return this.zzm;
     }
 
     public final int getCurrentSteps() {
@@ -123,16 +159,16 @@ public final class AchievementEntity extends zzc implements Achievement {
         if (getType() != 1) {
             z = false;
         }
-        com.google.android.gms.common.internal.zzc.zzbg(z);
-        return this.zzhds;
+        Asserts.checkState(z);
+        return this.zzfk;
     }
 
     public final String getDescription() {
-        return this.zzdmz;
+        return this.description;
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.zzdmz, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.description, charArrayBuffer);
     }
 
     public final String getFormattedCurrentSteps() {
@@ -140,8 +176,8 @@ public final class AchievementEntity extends zzc implements Achievement {
         if (getType() != 1) {
             z = false;
         }
-        com.google.android.gms.common.internal.zzc.zzbg(z);
-        return this.zzhdt;
+        Asserts.checkState(z);
+        return this.zzfl;
     }
 
     public final void getFormattedCurrentSteps(CharArrayBuffer charArrayBuffer) {
@@ -149,8 +185,8 @@ public final class AchievementEntity extends zzc implements Achievement {
         if (getType() != 1) {
             z = false;
         }
-        com.google.android.gms.common.internal.zzc.zzbg(z);
-        zzg.zzb(this.zzhdt, charArrayBuffer);
+        Asserts.checkState(z);
+        DataUtils.copyStringToBuffer(this.zzfl, charArrayBuffer);
     }
 
     public final String getFormattedTotalSteps() {
@@ -158,8 +194,8 @@ public final class AchievementEntity extends zzc implements Achievement {
         if (getType() != 1) {
             z = false;
         }
-        com.google.android.gms.common.internal.zzc.zzbg(z);
-        return this.zzhdq;
+        Asserts.checkState(z);
+        return this.zzfi;
     }
 
     public final void getFormattedTotalSteps(CharArrayBuffer charArrayBuffer) {
@@ -167,36 +203,36 @@ public final class AchievementEntity extends zzc implements Achievement {
         if (getType() != 1) {
             z = false;
         }
-        com.google.android.gms.common.internal.zzc.zzbg(z);
-        zzg.zzb(this.zzhdq, charArrayBuffer);
+        Asserts.checkState(z);
+        DataUtils.copyStringToBuffer(this.zzfi, charArrayBuffer);
     }
 
     public final long getLastUpdatedTimestamp() {
-        return this.zzhdu;
+        return this.zzfm;
     }
 
     public final String getName() {
-        return this.mName;
+        return this.name;
     }
 
     public final void getName(CharArrayBuffer charArrayBuffer) {
-        zzg.zzb(this.mName, charArrayBuffer);
+        DataUtils.copyStringToBuffer(this.name, charArrayBuffer);
     }
 
     public final Player getPlayer() {
-        return this.zzhdr;
+        return (Player) Preconditions.checkNotNull(this.zzfj);
     }
 
     public final Uri getRevealedImageUri() {
-        return this.zzhdn;
+        return this.zzff;
     }
 
     public final String getRevealedImageUrl() {
-        return this.zzhdo;
+        return this.zzfg;
     }
 
     public final int getState() {
-        return this.mState;
+        return this.state;
     }
 
     public final int getTotalSteps() {
@@ -204,37 +240,37 @@ public final class AchievementEntity extends zzc implements Achievement {
         if (getType() != 1) {
             z = false;
         }
-        com.google.android.gms.common.internal.zzc.zzbg(z);
-        return this.zzhdp;
+        Asserts.checkState(z);
+        return this.zzfh;
     }
 
     public final int getType() {
-        return this.zzeda;
+        return this.type;
     }
 
     public final Uri getUnlockedImageUri() {
-        return this.zzhdl;
+        return this.zzfd;
     }
 
     public final String getUnlockedImageUrl() {
-        return this.zzhdm;
+        return this.zzfe;
     }
 
     public final long getXpValue() {
-        return this.zzhdv;
+        return this.zzfn;
     }
 
     public final int hashCode() {
-        int currentSteps;
-        int totalSteps;
+        int i;
+        int i2;
         if (getType() == 1) {
-            currentSteps = getCurrentSteps();
-            totalSteps = getTotalSteps();
+            i2 = getCurrentSteps();
+            i = getTotalSteps();
         } else {
-            currentSteps = 0;
-            totalSteps = 0;
+            i = 0;
+            i2 = 0;
         }
-        return Arrays.hashCode(new Object[]{getAchievementId(), getName(), Integer.valueOf(getType()), getDescription(), Long.valueOf(getXpValue()), Integer.valueOf(getState()), Long.valueOf(getLastUpdatedTimestamp()), getPlayer(), Integer.valueOf(currentSteps), Integer.valueOf(totalSteps)});
+        return Objects.hashCode(getAchievementId(), getApplicationId(), getName(), Integer.valueOf(getType()), getDescription(), Long.valueOf(getXpValue()), Integer.valueOf(getState()), Long.valueOf(getLastUpdatedTimestamp()), zzw(), Integer.valueOf(i2), Integer.valueOf(i));
     }
 
     public final boolean isDataValid() {
@@ -246,23 +282,34 @@ public final class AchievementEntity extends zzc implements Achievement {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getAchievementId(), false);
-        zzd.zzc(parcel, 2, getType());
-        zzd.zza(parcel, 3, getName(), false);
-        zzd.zza(parcel, 4, getDescription(), false);
-        zzd.zza(parcel, 5, getUnlockedImageUri(), i, false);
-        zzd.zza(parcel, 6, getUnlockedImageUrl(), false);
-        zzd.zza(parcel, 7, getRevealedImageUri(), i, false);
-        zzd.zza(parcel, 8, getRevealedImageUrl(), false);
-        zzd.zzc(parcel, 9, this.zzhdp);
-        zzd.zza(parcel, 10, this.zzhdq, false);
-        zzd.zza(parcel, 11, getPlayer(), i, false);
-        zzd.zzc(parcel, 12, getState());
-        zzd.zzc(parcel, 13, this.zzhds);
-        zzd.zza(parcel, 14, this.zzhdt, false);
-        zzd.zza(parcel, 15, getLastUpdatedTimestamp());
-        zzd.zza(parcel, 16, getXpValue());
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, getAchievementId(), false);
+        SafeParcelWriter.writeInt(parcel, 2, getType());
+        SafeParcelWriter.writeString(parcel, 3, getName(), false);
+        SafeParcelWriter.writeString(parcel, 4, getDescription(), false);
+        SafeParcelWriter.writeParcelable(parcel, 5, getUnlockedImageUri(), i, false);
+        SafeParcelWriter.writeString(parcel, 6, getUnlockedImageUrl(), false);
+        SafeParcelWriter.writeParcelable(parcel, 7, getRevealedImageUri(), i, false);
+        SafeParcelWriter.writeString(parcel, 8, getRevealedImageUrl(), false);
+        SafeParcelWriter.writeInt(parcel, 9, this.zzfh);
+        SafeParcelWriter.writeString(parcel, 10, this.zzfi, false);
+        SafeParcelWriter.writeParcelable(parcel, 11, this.zzfj, i, false);
+        SafeParcelWriter.writeInt(parcel, 12, getState());
+        SafeParcelWriter.writeInt(parcel, 13, this.zzfk);
+        SafeParcelWriter.writeString(parcel, 14, this.zzfl, false);
+        SafeParcelWriter.writeLong(parcel, 15, getLastUpdatedTimestamp());
+        SafeParcelWriter.writeLong(parcel, 16, getXpValue());
+        SafeParcelWriter.writeFloat(parcel, 17, this.zzfo);
+        SafeParcelWriter.writeString(parcel, 18, this.zzm, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    @Nullable
+    public final Player zzw() {
+        return this.zzfj;
+    }
+
+    public final float zzx() {
+        return this.zzfo;
     }
 }

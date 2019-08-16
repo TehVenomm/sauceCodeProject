@@ -13,7 +13,7 @@ public class ValueInjector extends Std {
     protected final Object _valueId;
 
     public ValueInjector(PropertyName propertyName, JavaType javaType, Annotations annotations, AnnotatedMember annotatedMember, Object obj) {
-        super(propertyName, javaType, null, annotations, annotatedMember, PropertyMetadata.STD_OPTIONAL);
+        super(propertyName, javaType, (PropertyName) null, annotations, annotatedMember, PropertyMetadata.STD_OPTIONAL);
         this._valueId = obj;
     }
 

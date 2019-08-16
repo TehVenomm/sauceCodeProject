@@ -19,20 +19,20 @@ public class AppCall {
     }
 
     public static AppCall finishPendingCall(UUID uuid, int i) {
-        AppCall currentPendingCall;
+        AppCall currentPendingCall2;
         synchronized (AppCall.class) {
             try {
-                currentPendingCall = getCurrentPendingCall();
-                if (currentPendingCall != null && currentPendingCall.getCallId().equals(uuid) && currentPendingCall.getRequestCode() == i) {
-                    setCurrentPendingCall(null);
+                currentPendingCall2 = getCurrentPendingCall();
+                if (currentPendingCall2 == null || !currentPendingCall2.getCallId().equals(uuid) || currentPendingCall2.getRequestCode() != i) {
+                    currentPendingCall2 = null;
                 } else {
-                    currentPendingCall = null;
+                    setCurrentPendingCall(null);
                 }
-            } catch (Throwable th) {
-                Class cls = AppCall.class;
+            } finally {
+                Class<AppCall> cls = AppCall.class;
             }
         }
-        return currentPendingCall;
+        return currentPendingCall2;
     }
 
     public static AppCall getCurrentPendingCall() {
@@ -43,11 +43,11 @@ public class AppCall {
         boolean z;
         synchronized (AppCall.class) {
             try {
-                AppCall currentPendingCall = getCurrentPendingCall();
+                AppCall currentPendingCall2 = getCurrentPendingCall();
                 currentPendingCall = appCall;
-                z = currentPendingCall != null;
-            } catch (Throwable th) {
-                Class cls = AppCall.class;
+                z = currentPendingCall2 != null;
+            } finally {
+                Class<AppCall> cls = AppCall.class;
             }
         }
         return z;

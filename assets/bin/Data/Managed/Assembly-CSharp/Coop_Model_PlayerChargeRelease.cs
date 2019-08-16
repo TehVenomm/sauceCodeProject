@@ -22,7 +22,7 @@ public class Coop_Model_PlayerChargeRelease : Coop_Model_ObjectSyncPositionBase
 	public override bool IsHandleable(StageObject owner)
 	{
 		Player player = owner as Player;
-		if ((player.actionID == Character.ACTION_ID.ATTACK || player.actionID == (Character.ACTION_ID)20) && !player.enableInputCharge)
+		if ((player.actionID == Character.ACTION_ID.ATTACK || player.actionID == (Character.ACTION_ID)22) && !player.enableInputCharge)
 		{
 			return false;
 		}

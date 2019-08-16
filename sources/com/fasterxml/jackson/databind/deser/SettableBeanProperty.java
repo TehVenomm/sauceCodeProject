@@ -142,8 +142,8 @@ public abstract class SettableBeanProperty extends ConcreteBeanPropertyBase impl
     }
 
     public SettableBeanProperty withSimpleName(String str) {
-        PropertyName propertyName = this._propName == null ? new PropertyName(str) : this._propName.withSimpleName(str);
-        return propertyName == this._propName ? this : withName(propertyName);
+        PropertyName withSimpleName = this._propName == null ? new PropertyName(str) : this._propName.withSimpleName(str);
+        return withSimpleName == this._propName ? this : withName(withSimpleName);
     }
 
     @Deprecated
@@ -202,7 +202,8 @@ public abstract class SettableBeanProperty extends ConcreteBeanPropertyBase impl
         }
     }
 
-    protected final Class<?> getDeclaringClass() {
+    /* access modifiers changed from: protected */
+    public final Class<?> getDeclaringClass() {
         return getMember().getDeclaringClass();
     }
 
@@ -264,44 +265,61 @@ public abstract class SettableBeanProperty extends ConcreteBeanPropertyBase impl
         return this._valueDeserializer.deserialize(jsonParser, deserializationContext);
     }
 
-    protected void _throwAsIOE(JsonParser jsonParser, Exception exception, Object obj) throws IOException {
-        if (exception instanceof IllegalArgumentException) {
+    /* access modifiers changed from: protected */
+    public void _throwAsIOE(JsonParser jsonParser, Exception exc, Object obj) throws IOException {
+        if (exc instanceof IllegalArgumentException) {
             String name = obj == null ? "[NULL]" : obj.getClass().getName();
             StringBuilder append = new StringBuilder("Problem deserializing property '").append(getName());
             append.append("' (expected type: ").append(getType());
             append.append("; actual type: ").append(name).append(")");
-            name = exception.getMessage();
-            if (name != null) {
-                append.append(", problem: ").append(name);
+            String message = exc.getMessage();
+            if (message != null) {
+                append.append(", problem: ").append(message);
             } else {
                 append.append(" (no error message provided)");
             }
-            throw JsonMappingException.from(jsonParser, append.toString(), (Throwable) exception);
+            throw JsonMappingException.from(jsonParser, append.toString(), (Throwable) exc);
         }
-        _throwAsIOE(jsonParser, exception);
+        _throwAsIOE(jsonParser, exc);
     }
 
-    protected IOException _throwAsIOE(JsonParser jsonParser, Exception exception) throws IOException {
-        if (exception instanceof IOException) {
-            throw ((IOException) exception);
-        } else if (exception instanceof RuntimeException) {
-            throw ((RuntimeException) exception);
-        } else {
-            Throwable cause;
-            while (cause.getCause() != null) {
-                cause = cause.getCause();
-            }
-            throw JsonMappingException.from(jsonParser, cause.getMessage(), cause);
-        }
+    /* access modifiers changed from: protected */
+    /* JADX WARNING: Incorrect type for immutable var: ssa=java.lang.Exception, code=java.lang.Throwable, for r3v0, types: [java.lang.Throwable, java.lang.Exception] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public java.io.IOException _throwAsIOE(com.fasterxml.jackson.core.JsonParser r2, java.lang.Throwable r3) throws java.io.IOException {
+        /*
+            r1 = this;
+            boolean r0 = r3 instanceof java.io.IOException
+            if (r0 == 0) goto L_0x0007
+            java.io.IOException r3 = (java.io.IOException) r3
+            throw r3
+        L_0x0007:
+            boolean r0 = r3 instanceof java.lang.RuntimeException
+            if (r0 == 0) goto L_0x000e
+            java.lang.RuntimeException r3 = (java.lang.RuntimeException) r3
+            throw r3
+        L_0x000e:
+            java.lang.Throwable r0 = r3.getCause()
+            if (r0 == 0) goto L_0x0019
+            java.lang.Throwable r3 = r3.getCause()
+            goto L_0x000e
+        L_0x0019:
+            java.lang.String r0 = r3.getMessage()
+            com.fasterxml.jackson.databind.JsonMappingException r0 = com.fasterxml.jackson.databind.JsonMappingException.from(r2, r0, r3)
+            throw r0
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.deser.SettableBeanProperty._throwAsIOE(com.fasterxml.jackson.core.JsonParser, java.lang.Exception):java.io.IOException");
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected IOException _throwAsIOE(Exception exception) throws IOException {
-        return _throwAsIOE((JsonParser) null, exception);
+    public IOException _throwAsIOE(Exception exc) throws IOException {
+        return _throwAsIOE((JsonParser) null, exc);
     }
 
-    protected void _throwAsIOE(Exception exception, Object obj) throws IOException {
-        _throwAsIOE((JsonParser) null, exception, obj);
+    /* access modifiers changed from: protected */
+    public void _throwAsIOE(Exception exc, Object obj) throws IOException {
+        _throwAsIOE(null, exc, obj);
     }
 
     public String toString() {

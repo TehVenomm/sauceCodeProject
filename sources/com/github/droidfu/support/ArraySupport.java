@@ -8,12 +8,12 @@ public class ArraySupport {
         if (i < 0 || i >= length) {
             throw new IndexOutOfBoundsException("Index: " + i + ", Length: " + length);
         }
-        Object[] objArr = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length - 1);
-        System.arraycopy(tArr, 0, objArr, 0, i);
+        T[] tArr2 = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length - 1);
+        System.arraycopy(tArr, 0, tArr2, 0, i);
         if (i < length - 1) {
-            System.arraycopy(tArr, i + 1, objArr, i, (length - i) - 1);
+            System.arraycopy(tArr, i + 1, tArr2, i, (length - i) - 1);
         }
-        return objArr;
+        return tArr2;
     }
 
     public static <T> int find(T[] tArr, T t) {
@@ -32,9 +32,9 @@ public class ArraySupport {
         if (tArr2 == null) {
             return tArr;
         }
-        T[] tArr3 = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), tArr.length + tArr2.length);
-        System.arraycopy(tArr, 0, tArr3, 0, tArr.length);
-        System.arraycopy(tArr2, 0, tArr3, tArr.length, tArr2.length);
-        return tArr3;
+        Object[] objArr = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), tArr.length + tArr2.length);
+        System.arraycopy(tArr, 0, objArr, 0, tArr.length);
+        System.arraycopy(tArr2, 0, objArr, tArr.length, tArr2.length);
+        return objArr;
     }
 }

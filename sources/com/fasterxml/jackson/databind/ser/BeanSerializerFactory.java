@@ -1,12 +1,11 @@
 package com.fasterxml.jackson.databind.ser;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.AnnotationIntrospector.ReferenceProperty;
 import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.BeanProperty.Std;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -16,9 +15,7 @@ import com.fasterxml.jackson.databind.PropertyMetadata;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.cfg.SerializerFactoryConfig;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
@@ -37,7 +34,6 @@ import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.databind.util.Converter;
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,54 +53,55 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         if (this._factoryConfig == serializerFactoryConfig) {
             return this;
         }
-        if (getClass() != BeanSerializerFactory.class) {
-            throw new IllegalStateException("Subtype of BeanSerializerFactory (" + getClass().getName() + ") has not properly overridden method 'withAdditionalSerializers': can not instantiate subtype with " + "additional serializer definitions");
+        if (getClass() == BeanSerializerFactory.class) {
+            return new BeanSerializerFactory(serializerFactoryConfig);
         }
-        this(serializerFactoryConfig);
-        return this;
+        throw new IllegalStateException("Subtype of BeanSerializerFactory (" + getClass().getName() + ") has not properly overridden method 'withAdditionalSerializers': can not instantiate subtype with " + "additional serializer definitions");
     }
 
-    protected Iterable<Serializers> customSerializers() {
+    /* access modifiers changed from: protected */
+    public Iterable<Serializers> customSerializers() {
         return this._factoryConfig.serializers();
     }
 
     public JsonSerializer<Object> createSerializer(SerializerProvider serializerProvider, JavaType javaType) throws JsonMappingException {
-        MapperConfig config = serializerProvider.getConfig();
+        boolean z;
+        JsonSerializer jsonSerializer;
+        SerializationConfig config = serializerProvider.getConfig();
         BeanDescription introspect = config.introspect(javaType);
-        JsonSerializer<Object> findSerializerFromAnnotation = findSerializerFromAnnotation(serializerProvider, introspect.getClassInfo());
+        JsonSerializer findSerializerFromAnnotation = findSerializerFromAnnotation(serializerProvider, introspect.getClassInfo());
         if (findSerializerFromAnnotation != null) {
             return findSerializerFromAnnotation;
         }
-        boolean z;
         AnnotationIntrospector annotationIntrospector = config.getAnnotationIntrospector();
         JavaType refineSerializationType = annotationIntrospector == null ? javaType : annotationIntrospector.refineSerializationType(config, introspect.getClassInfo(), javaType);
         if (refineSerializationType == javaType) {
             z = false;
-        } else if (refineSerializationType.hasRawClass(javaType.getRawClass())) {
+        } else if (!refineSerializationType.hasRawClass(javaType.getRawClass())) {
+            introspect = config.introspect(refineSerializationType);
             z = true;
         } else {
-            introspect = config.introspect(refineSerializationType);
             z = true;
         }
         Converter findSerializationConverter = introspect.findSerializationConverter();
         if (findSerializationConverter == null) {
             return _createSerializer2(serializerProvider, refineSerializationType, introspect, z);
         }
-        JsonSerializer findSerializerFromAnnotation2;
         JavaType outputType = findSerializationConverter.getOutputType(serializerProvider.getTypeFactory());
-        if (outputType.hasRawClass(refineSerializationType.getRawClass())) {
-            JsonSerializer<Object> jsonSerializer = findSerializerFromAnnotation;
-        } else {
+        if (!outputType.hasRawClass(refineSerializationType.getRawClass())) {
             introspect = config.introspect(outputType);
-            findSerializerFromAnnotation2 = findSerializerFromAnnotation(serializerProvider, introspect.getClassInfo());
+            jsonSerializer = findSerializerFromAnnotation(serializerProvider, introspect.getClassInfo());
+        } else {
+            jsonSerializer = findSerializerFromAnnotation;
         }
-        if (findSerializerFromAnnotation2 == null && !outputType.isJavaLangObject()) {
-            findSerializerFromAnnotation2 = _createSerializer2(serializerProvider, outputType, introspect, true);
+        if (jsonSerializer == null && !outputType.isJavaLangObject()) {
+            jsonSerializer = _createSerializer2(serializerProvider, outputType, introspect, true);
         }
-        return new StdDelegatingSerializer(findSerializationConverter, outputType, findSerializerFromAnnotation2);
+        return new StdDelegatingSerializer(findSerializationConverter, outputType, jsonSerializer);
     }
 
-    protected JsonSerializer<?> _createSerializer2(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> _createSerializer2(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
         JsonSerializer<?> jsonSerializer = null;
         SerializationConfig config = serializerProvider.getConfig();
         if (javaType.isContainerType()) {
@@ -115,18 +112,20 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
             if (jsonSerializer != null) {
                 return jsonSerializer;
             }
-        }
-        if (!javaType.isReferenceType()) {
-            for (Serializers findSerializer : customSerializers()) {
-                jsonSerializer = findSerializer.findSerializer(config, javaType, beanDescription);
-                if (jsonSerializer != null) {
-                    break;
+        } else {
+            if (!javaType.isReferenceType()) {
+                for (Serializers findSerializer : customSerializers()) {
+                    jsonSerializer = findSerializer.findSerializer(config, javaType, beanDescription);
+                    if (jsonSerializer != null) {
+                        break;
+                    }
                 }
+            } else {
+                jsonSerializer = findReferenceSerializer(serializerProvider, (ReferenceType) javaType, beanDescription, z);
             }
-        }
-        jsonSerializer = findReferenceSerializer(serializerProvider, (ReferenceType) javaType, beanDescription, z);
-        if (jsonSerializer == null) {
-            jsonSerializer = findSerializerByAnnotations(serializerProvider, javaType, beanDescription);
+            if (jsonSerializer == null) {
+                jsonSerializer = findSerializerByAnnotations(serializerProvider, javaType, beanDescription);
+            }
         }
         if (jsonSerializer == null) {
             jsonSerializer = findSerializerByLookup(javaType, config, beanDescription, z);
@@ -146,11 +145,14 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         if (jsonSerializer == null || !this._factoryConfig.hasSerializerModifiers()) {
             return jsonSerializer;
         }
-        JsonSerializer<?> jsonSerializer2 = jsonSerializer;
-        for (BeanSerializerModifier modifySerializer : this._factoryConfig.serializerModifiers()) {
-            jsonSerializer2 = modifySerializer.modifySerializer(config, beanDescription, jsonSerializer2);
+        Iterator it = this._factoryConfig.serializerModifiers().iterator();
+        while (true) {
+            JsonSerializer jsonSerializer2 = jsonSerializer;
+            if (!it.hasNext()) {
+                return jsonSerializer2;
+            }
+            jsonSerializer = ((BeanSerializerModifier) it.next()).modifySerializer(config, beanDescription, jsonSerializer2);
         }
-        return jsonSerializer2;
     }
 
     public JsonSerializer<Object> findBeanSerializer(SerializerProvider serializerProvider, JavaType javaType, BeanDescription beanDescription) throws JsonMappingException {
@@ -161,24 +163,24 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
     }
 
     public JsonSerializer<?> findReferenceSerializer(SerializerProvider serializerProvider, ReferenceType referenceType, BeanDescription beanDescription, boolean z) throws JsonMappingException {
-        TypeSerializer createTypeSerializer;
+        TypeSerializer typeSerializer;
         JavaType contentType = referenceType.getContentType();
-        TypeSerializer typeSerializer = (TypeSerializer) contentType.getTypeHandler();
+        TypeSerializer typeSerializer2 = (TypeSerializer) contentType.getTypeHandler();
         SerializationConfig config = serializerProvider.getConfig();
-        if (typeSerializer == null) {
-            createTypeSerializer = createTypeSerializer(config, contentType);
+        if (typeSerializer2 == null) {
+            typeSerializer = createTypeSerializer(config, contentType);
         } else {
-            createTypeSerializer = typeSerializer;
+            typeSerializer = typeSerializer2;
         }
         JsonSerializer jsonSerializer = (JsonSerializer) contentType.getValueHandler();
         for (Serializers findReferenceSerializer : customSerializers()) {
-            JsonSerializer<?> findReferenceSerializer2 = findReferenceSerializer.findReferenceSerializer(config, referenceType, beanDescription, createTypeSerializer, jsonSerializer);
+            JsonSerializer<?> findReferenceSerializer2 = findReferenceSerializer.findReferenceSerializer(config, referenceType, beanDescription, typeSerializer, jsonSerializer);
             if (findReferenceSerializer2 != null) {
                 return findReferenceSerializer2;
             }
         }
         if (referenceType.isTypeOrSubTypeOf(AtomicReference.class)) {
-            return new AtomicReferenceSerializer(referenceType, z, createTypeSerializer, jsonSerializer);
+            return new AtomicReferenceSerializer(referenceType, z, typeSerializer, jsonSerializer);
         }
         return null;
     }
@@ -200,45 +202,56 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         return findPropertyContentTypeResolver.buildTypeSerializer(serializationConfig, contentType, serializationConfig.getSubtypeResolver().collectAndResolveSubtypesByClass(serializationConfig, annotatedMember, contentType));
     }
 
-    protected JsonSerializer<Object> constructBeanSerializer(SerializerProvider serializerProvider, BeanDescription beanDescription) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> constructBeanSerializer(SerializerProvider serializerProvider, BeanDescription beanDescription) throws JsonMappingException {
+        List removeOverlappingTypeIds;
+        List list;
+        List list2;
+        BeanSerializerBuilder beanSerializerBuilder;
+        JsonSerializer jsonSerializer;
         if (beanDescription.getBeanClass() == Object.class) {
             return serializerProvider.getUnknownTypeSerializer(Object.class);
         }
-        List list;
-        BeanSerializerBuilder beanSerializerBuilder;
-        MapperConfig config = serializerProvider.getConfig();
+        SerializationConfig config = serializerProvider.getConfig();
         BeanSerializerBuilder constructBeanSerializerBuilder = constructBeanSerializerBuilder(beanDescription);
         constructBeanSerializerBuilder.setConfig(config);
         List findBeanProperties = findBeanProperties(serializerProvider, beanDescription, constructBeanSerializerBuilder);
         if (findBeanProperties == null) {
-            findBeanProperties = new ArrayList();
+            removeOverlappingTypeIds = new ArrayList();
         } else {
-            findBeanProperties = removeOverlappingTypeIds(serializerProvider, beanDescription, constructBeanSerializerBuilder, findBeanProperties);
+            removeOverlappingTypeIds = removeOverlappingTypeIds(serializerProvider, beanDescription, constructBeanSerializerBuilder, findBeanProperties);
         }
-        serializerProvider.getAnnotationIntrospector().findAndAddVirtualProperties(config, beanDescription.getClassInfo(), findBeanProperties);
+        serializerProvider.getAnnotationIntrospector().findAndAddVirtualProperties(config, beanDescription.getClassInfo(), removeOverlappingTypeIds);
         if (this._factoryConfig.hasSerializerModifiers()) {
-            list = findBeanProperties;
-            for (BeanSerializerModifier changeProperties : this._factoryConfig.serializerModifiers()) {
-                list = changeProperties.changeProperties(config, beanDescription, list);
+            Iterator it = this._factoryConfig.serializerModifiers().iterator();
+            while (true) {
+                list = removeOverlappingTypeIds;
+                if (!it.hasNext()) {
+                    break;
+                }
+                removeOverlappingTypeIds = ((BeanSerializerModifier) it.next()).changeProperties(config, beanDescription, list);
             }
         } else {
-            list = findBeanProperties;
+            list = removeOverlappingTypeIds;
         }
-        findBeanProperties = filterBeanProperties(config, beanDescription, list);
+        List filterBeanProperties = filterBeanProperties(config, beanDescription, list);
         if (this._factoryConfig.hasSerializerModifiers()) {
-            list = findBeanProperties;
-            for (BeanSerializerModifier changeProperties2 : this._factoryConfig.serializerModifiers()) {
-                list = changeProperties2.orderProperties(config, beanDescription, list);
+            Iterator it2 = this._factoryConfig.serializerModifiers().iterator();
+            while (true) {
+                list2 = filterBeanProperties;
+                if (!it2.hasNext()) {
+                    break;
+                }
+                filterBeanProperties = ((BeanSerializerModifier) it2.next()).orderProperties(config, beanDescription, list2);
             }
         } else {
-            list = findBeanProperties;
+            list2 = filterBeanProperties;
         }
-        constructBeanSerializerBuilder.setObjectIdWriter(constructObjectIdHandler(serializerProvider, beanDescription, list));
-        constructBeanSerializerBuilder.setProperties(list);
+        constructBeanSerializerBuilder.setObjectIdWriter(constructObjectIdHandler(serializerProvider, beanDescription, list2));
+        constructBeanSerializerBuilder.setProperties(list2);
         constructBeanSerializerBuilder.setFilterId(findFilterId(config, beanDescription));
-        Annotated findAnyGetter = beanDescription.findAnyGetter();
+        AnnotatedMember findAnyGetter = beanDescription.findAnyGetter();
         if (findAnyGetter != null) {
-            JsonSerializer construct;
             if (config.canOverrideAccessModifiers()) {
                 findAnyGetter.fixAccess(config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
             }
@@ -248,11 +261,11 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
             TypeSerializer createTypeSerializer = createTypeSerializer(config, contentType);
             JsonSerializer findSerializerFromAnnotation = findSerializerFromAnnotation(serializerProvider, findAnyGetter);
             if (findSerializerFromAnnotation == null) {
-                construct = MapSerializer.construct(null, type, isEnabled, createTypeSerializer, null, null, null);
+                jsonSerializer = MapSerializer.construct(null, type, isEnabled, createTypeSerializer, null, null, null);
             } else {
-                construct = findSerializerFromAnnotation;
+                jsonSerializer = findSerializerFromAnnotation;
             }
-            constructBeanSerializerBuilder.setAnyGetter(new AnyGetterWriter(new Std(PropertyName.construct(findAnyGetter.getName()), contentType, null, beanDescription.getClassAnnotations(), (AnnotatedMember) findAnyGetter, PropertyMetadata.STD_OPTIONAL), findAnyGetter, construct));
+            constructBeanSerializerBuilder.setAnyGetter(new AnyGetterWriter(new Std(PropertyName.construct(findAnyGetter.getName()), contentType, (PropertyName) null, beanDescription.getClassAnnotations(), findAnyGetter, PropertyMetadata.STD_OPTIONAL), findAnyGetter, jsonSerializer));
         }
         processViews(config, constructBeanSerializerBuilder);
         if (this._factoryConfig.hasSerializerModifiers()) {
@@ -264,18 +277,19 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
             beanSerializerBuilder = constructBeanSerializerBuilder;
         }
         JsonSerializer<Object> build = beanSerializerBuilder.build();
-        if (build == null && beanDescription.hasKnownClassAnnotations()) {
-            return beanSerializerBuilder.createDummy();
+        if (build != null || !beanDescription.hasKnownClassAnnotations()) {
+            return build;
         }
-        return build;
+        return beanSerializerBuilder.createDummy();
     }
 
-    protected ObjectIdWriter constructObjectIdHandler(SerializerProvider serializerProvider, BeanDescription beanDescription, List<BeanPropertyWriter> list) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public ObjectIdWriter constructObjectIdHandler(SerializerProvider serializerProvider, BeanDescription beanDescription, List<BeanPropertyWriter> list) throws JsonMappingException {
         ObjectIdInfo objectIdInfo = beanDescription.getObjectIdInfo();
         if (objectIdInfo == null) {
             return null;
         }
-        Type generatorType = objectIdInfo.getGeneratorType();
+        Class<PropertyGenerator> generatorType = objectIdInfo.getGeneratorType();
         if (generatorType == PropertyGenerator.class) {
             String simpleName = objectIdInfo.getPropertyName().getSimpleName();
             int size = list.size();
@@ -286,7 +300,7 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
                         list.remove(i);
                         list.add(0, beanPropertyWriter);
                     }
-                    return ObjectIdWriter.construct(beanPropertyWriter.getType(), (PropertyName) null, new PropertyBasedObjectIdGenerator(objectIdInfo, beanPropertyWriter), objectIdInfo.getAlwaysAsId());
+                    return ObjectIdWriter.construct(beanPropertyWriter.getType(), (PropertyName) null, (ObjectIdGenerator<?>) new PropertyBasedObjectIdGenerator<Object>(objectIdInfo, beanPropertyWriter), objectIdInfo.getAlwaysAsId());
                 }
             }
             throw new IllegalArgumentException("Invalid Object Id definition for " + beanDescription.getBeanClass().getName() + ": can not find property with name '" + simpleName + "'");
@@ -294,23 +308,29 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         return ObjectIdWriter.construct(serializerProvider.getTypeFactory().findTypeParameters(serializerProvider.constructType(generatorType), ObjectIdGenerator.class)[0], objectIdInfo.getPropertyName(), serializerProvider.objectIdGeneratorInstance(beanDescription.getClassInfo(), objectIdInfo), objectIdInfo.getAlwaysAsId());
     }
 
-    protected BeanPropertyWriter constructFilteredBeanWriter(BeanPropertyWriter beanPropertyWriter, Class<?>[] clsArr) {
+    /* access modifiers changed from: protected */
+    public BeanPropertyWriter constructFilteredBeanWriter(BeanPropertyWriter beanPropertyWriter, Class<?>[] clsArr) {
         return FilteredBeanPropertyWriter.constructViewBased(beanPropertyWriter, clsArr);
     }
 
-    protected PropertyBuilder constructPropertyBuilder(SerializationConfig serializationConfig, BeanDescription beanDescription) {
+    /* access modifiers changed from: protected */
+    public PropertyBuilder constructPropertyBuilder(SerializationConfig serializationConfig, BeanDescription beanDescription) {
         return new PropertyBuilder(serializationConfig, beanDescription);
     }
 
-    protected BeanSerializerBuilder constructBeanSerializerBuilder(BeanDescription beanDescription) {
+    /* access modifiers changed from: protected */
+    public BeanSerializerBuilder constructBeanSerializerBuilder(BeanDescription beanDescription) {
         return new BeanSerializerBuilder(beanDescription);
     }
 
-    protected boolean isPotentialBeanType(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public boolean isPotentialBeanType(Class<?> cls) {
         return ClassUtil.canBeABeanType(cls) == null && !ClassUtil.isProxyType(cls);
     }
 
-    protected List<BeanPropertyWriter> findBeanProperties(SerializerProvider serializerProvider, BeanDescription beanDescription, BeanSerializerBuilder beanSerializerBuilder) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public List<BeanPropertyWriter> findBeanProperties(SerializerProvider serializerProvider, BeanDescription beanDescription, BeanSerializerBuilder beanSerializerBuilder) throws JsonMappingException {
+        boolean z;
         List<BeanPropertyDefinition> findProperties = beanDescription.findProperties();
         SerializationConfig config = serializerProvider.getConfig();
         removeIgnorableTypes(config, beanDescription, findProperties);
@@ -320,15 +340,14 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         if (findProperties.isEmpty()) {
             return null;
         }
-        boolean z;
         boolean usesStaticTyping = usesStaticTyping(config, beanDescription, null);
         PropertyBuilder constructPropertyBuilder = constructPropertyBuilder(config, beanDescription);
         ArrayList arrayList = new ArrayList(findProperties.size());
         boolean canOverrideAccessModifiers = config.canOverrideAccessModifiers();
-        if (canOverrideAccessModifiers && config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS)) {
-            z = true;
-        } else {
+        if (!canOverrideAccessModifiers || !config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS)) {
             z = false;
+        } else {
+            z = true;
         }
         for (BeanPropertyDefinition beanPropertyDefinition : findProperties) {
             AnnotatedMember accessor = beanPropertyDefinition.getAccessor();
@@ -351,7 +370,8 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         return arrayList;
     }
 
-    protected List<BeanPropertyWriter> filterBeanProperties(SerializationConfig serializationConfig, BeanDescription beanDescription, List<BeanPropertyWriter> list) {
+    /* access modifiers changed from: protected */
+    public List<BeanPropertyWriter> filterBeanProperties(SerializationConfig serializationConfig, BeanDescription beanDescription, List<BeanPropertyWriter> list) {
         String[] findPropertiesToIgnore = serializationConfig.getAnnotationIntrospector().findPropertiesToIgnore(beanDescription.getClassInfo(), true);
         if (findPropertiesToIgnore != null && findPropertiesToIgnore.length > 0) {
             HashSet arrayToSet = ArrayBuilders.arrayToSet(findPropertiesToIgnore);
@@ -365,7 +385,8 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         return list;
     }
 
-    protected void processViews(SerializationConfig serializationConfig, BeanSerializerBuilder beanSerializerBuilder) {
+    /* access modifiers changed from: protected */
+    public void processViews(SerializationConfig serializationConfig, BeanSerializerBuilder beanSerializerBuilder) {
         List properties = beanSerializerBuilder.getProperties();
         boolean isEnabled = serializationConfig.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION);
         int size = properties.size();
@@ -373,29 +394,24 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         int i = 0;
         int i2 = 0;
         while (i < size) {
-            int i3;
             BeanPropertyWriter beanPropertyWriter = (BeanPropertyWriter) properties.get(i);
             Class[] views = beanPropertyWriter.getViews();
-            if (views == null) {
-                if (isEnabled) {
-                    beanPropertyWriterArr[i] = beanPropertyWriter;
-                    i3 = i2;
-                }
-                i3 = i2;
-            } else {
+            if (views != null) {
                 i2++;
                 beanPropertyWriterArr[i] = constructFilteredBeanWriter(beanPropertyWriter, views);
-                i3 = i2;
+            } else if (isEnabled) {
+                beanPropertyWriterArr[i] = beanPropertyWriter;
             }
             i++;
-            i2 = i3;
+            i2 = i2;
         }
         if (!isEnabled || i2 != 0) {
             beanSerializerBuilder.setFilteredProperties(beanPropertyWriterArr);
         }
     }
 
-    protected void removeIgnorableTypes(SerializationConfig serializationConfig, BeanDescription beanDescription, List<BeanPropertyDefinition> list) {
+    /* access modifiers changed from: protected */
+    public void removeIgnorableTypes(SerializationConfig serializationConfig, BeanDescription beanDescription, List<BeanPropertyDefinition> list) {
         AnnotationIntrospector annotationIntrospector = serializationConfig.getAnnotationIntrospector();
         HashMap hashMap = new HashMap();
         Iterator it = list.iterator();
@@ -420,24 +436,31 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         }
     }
 
-    protected void removeSetterlessGetters(SerializationConfig serializationConfig, BeanDescription beanDescription, List<BeanPropertyDefinition> list) {
+    /* access modifiers changed from: protected */
+    public void removeSetterlessGetters(SerializationConfig serializationConfig, BeanDescription beanDescription, List<BeanPropertyDefinition> list) {
         Iterator it = list.iterator();
         while (it.hasNext()) {
             BeanPropertyDefinition beanPropertyDefinition = (BeanPropertyDefinition) it.next();
-            if (!(beanPropertyDefinition.couldDeserialize() || beanPropertyDefinition.isExplicitlyIncluded())) {
+            if (!beanPropertyDefinition.couldDeserialize() && !beanPropertyDefinition.isExplicitlyIncluded()) {
                 it.remove();
             }
         }
     }
 
-    protected List<BeanPropertyWriter> removeOverlappingTypeIds(SerializerProvider serializerProvider, BeanDescription beanDescription, BeanSerializerBuilder beanSerializerBuilder, List<BeanPropertyWriter> list) {
+    /* access modifiers changed from: protected */
+    public List<BeanPropertyWriter> removeOverlappingTypeIds(SerializerProvider serializerProvider, BeanDescription beanDescription, BeanSerializerBuilder beanSerializerBuilder, List<BeanPropertyWriter> list) {
         int size = list.size();
         for (int i = 0; i < size; i++) {
             BeanPropertyWriter beanPropertyWriter = (BeanPropertyWriter) list.get(i);
             TypeSerializer typeSerializer = beanPropertyWriter.getTypeSerializer();
-            if (typeSerializer != null && typeSerializer.getTypeInclusion() == As.EXTERNAL_PROPERTY) {
+            if (typeSerializer != null && typeSerializer.getTypeInclusion() == C0861As.EXTERNAL_PROPERTY) {
                 PropertyName construct = PropertyName.construct(typeSerializer.getPropertyName());
-                for (BeanPropertyWriter beanPropertyWriter2 : list) {
+                Iterator it = list.iterator();
+                while (true) {
+                    if (!it.hasNext()) {
+                        break;
+                    }
+                    BeanPropertyWriter beanPropertyWriter2 = (BeanPropertyWriter) it.next();
                     if (beanPropertyWriter2 != beanPropertyWriter && beanPropertyWriter2.wouldConflictWithName(construct)) {
                         beanPropertyWriter.assignTypeSerializer(null);
                         break;
@@ -448,13 +471,14 @@ public class BeanSerializerFactory extends BasicSerializerFactory implements Ser
         return list;
     }
 
-    protected BeanPropertyWriter _constructWriter(SerializerProvider serializerProvider, BeanPropertyDefinition beanPropertyDefinition, PropertyBuilder propertyBuilder, boolean z, AnnotatedMember annotatedMember) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public BeanPropertyWriter _constructWriter(SerializerProvider serializerProvider, BeanPropertyDefinition beanPropertyDefinition, PropertyBuilder propertyBuilder, boolean z, AnnotatedMember annotatedMember) throws JsonMappingException {
         PropertyName fullName = beanPropertyDefinition.getFullName();
         if (serializerProvider.canOverrideAccessModifiers()) {
             annotatedMember.fixAccess(serializerProvider.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
         }
         JavaType type = annotatedMember.getType();
-        BeanProperty std = new Std(fullName, type, beanPropertyDefinition.getWrapperName(), propertyBuilder.getClassAnnotations(), annotatedMember, beanPropertyDefinition.getMetadata());
+        Std std = new Std(fullName, type, beanPropertyDefinition.getWrapperName(), propertyBuilder.getClassAnnotations(), annotatedMember, beanPropertyDefinition.getMetadata());
         JsonSerializer findSerializerFromAnnotation = findSerializerFromAnnotation(serializerProvider, annotatedMember);
         if (findSerializerFromAnnotation instanceof ResolvableSerializer) {
             ((ResolvableSerializer) findSerializerFromAnnotation).resolve(serializerProvider);

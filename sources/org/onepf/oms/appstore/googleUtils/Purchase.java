@@ -45,7 +45,7 @@ public class Purchase implements Cloneable {
     public Object clone() {
         try {
             return super.clone();
-        } catch (Throwable e) {
+        } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Somebody forgot to add Cloneable to class", e);
         }
     }

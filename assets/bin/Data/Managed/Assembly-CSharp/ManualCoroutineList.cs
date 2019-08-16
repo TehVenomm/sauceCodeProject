@@ -55,7 +55,7 @@ public class ManualCoroutineList
 	public void Push(int id)
 	{
 		stack.Add(id);
-		SetActiveToggle(id, true);
+		SetActiveToggle(id);
 	}
 
 	public void Pop()
@@ -66,7 +66,7 @@ public class ManualCoroutineList
 		}
 		if (stack.Count > 0)
 		{
-			SetActiveToggle(stack[stack.Count - 1], true);
+			SetActiveToggle(stack[stack.Count - 1]);
 		}
 	}
 

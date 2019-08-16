@@ -1,12 +1,13 @@
-package net.gogame.gowrap.ui.dpro.service;
+package net.gogame.gowrap.p019ui.dpro.service;
 
 import java.io.IOException;
+import net.gogame.gowrap.p019ui.dpro.model.leaderboard.FriendsLeaderboardRequest;
+import net.gogame.gowrap.p019ui.dpro.model.leaderboard.LeaderboardResponse;
+import net.gogame.gowrap.p019ui.dpro.model.leaderboard.LevelTierLeaderboardRequest;
+import net.gogame.gowrap.p019ui.dpro.model.leaderboard.NewUsersLeaderboardRequest;
 import net.gogame.gowrap.support.HttpException;
-import net.gogame.gowrap.ui.dpro.model.leaderboard.FriendsLeaderboardRequest;
-import net.gogame.gowrap.ui.dpro.model.leaderboard.LeaderboardResponse;
-import net.gogame.gowrap.ui.dpro.model.leaderboard.LevelTierLeaderboardRequest;
-import net.gogame.gowrap.ui.dpro.model.leaderboard.NewUsersLeaderboardRequest;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.service.LeaderboardService */
 public interface LeaderboardService<T extends LeaderboardResponse> {
     T getLeaderboard(FriendsLeaderboardRequest friendsLeaderboardRequest) throws IOException, HttpException;
 

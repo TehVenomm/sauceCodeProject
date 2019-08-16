@@ -23,89 +23,7 @@ import java.util.HashSet;
 import java.util.TimeZone;
 
 public class DateDeserializers {
-    private static final HashSet<String> _classNames = new HashSet();
-
-    protected static abstract class DateBasedDeserializer<T> extends StdScalarDeserializer<T> implements ContextualDeserializer {
-        protected final DateFormat _customFormat;
-        protected final String _formatString;
-
-        protected abstract DateBasedDeserializer<T> withDateFormat(DateFormat dateFormat, String str);
-
-        protected DateBasedDeserializer(Class<?> cls) {
-            super((Class) cls);
-            this._customFormat = null;
-            this._formatString = null;
-        }
-
-        protected DateBasedDeserializer(DateBasedDeserializer<T> dateBasedDeserializer, DateFormat dateFormat, String str) {
-            super(dateBasedDeserializer._valueClass);
-            this._customFormat = dateFormat;
-            this._formatString = str;
-        }
-
-        public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
-            if (beanProperty == null) {
-                return this;
-            }
-            Value findFormat = deserializationContext.getAnnotationIntrospector().findFormat(beanProperty.getMember());
-            if (findFormat == null) {
-                return this;
-            }
-            TimeZone timeZone = findFormat.getTimeZone();
-            if (findFormat.hasPattern()) {
-                TimeZone timeZone2;
-                String pattern = findFormat.getPattern();
-                DateFormat simpleDateFormat = new SimpleDateFormat(pattern, findFormat.hasLocale() ? findFormat.getLocale() : deserializationContext.getLocale());
-                if (timeZone == null) {
-                    timeZone2 = deserializationContext.getTimeZone();
-                } else {
-                    timeZone2 = timeZone;
-                }
-                simpleDateFormat.setTimeZone(timeZone2);
-                return withDateFormat(simpleDateFormat, pattern);
-            } else if (timeZone == null) {
-                return this;
-            } else {
-                DateFormat dateFormat = deserializationContext.getConfig().getDateFormat();
-                if (dateFormat.getClass() == StdDateFormat.class) {
-                    dateFormat = ((StdDateFormat) dateFormat).withTimeZone(timeZone).withLocale(findFormat.hasLocale() ? findFormat.getLocale() : deserializationContext.getLocale());
-                } else {
-                    dateFormat = (DateFormat) dateFormat.clone();
-                    dateFormat.setTimeZone(timeZone);
-                }
-                return withDateFormat(dateFormat, this._formatString);
-            }
-        }
-
-        protected Date _parseDate(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-            if (this._customFormat != null) {
-                JsonToken currentToken = jsonParser.getCurrentToken();
-                Date parse;
-                if (currentToken == JsonToken.VALUE_STRING) {
-                    String trim = jsonParser.getText().trim();
-                    if (trim.length() == 0) {
-                        return (Date) getEmptyValue(deserializationContext);
-                    }
-                    synchronized (this._customFormat) {
-                        try {
-                            parse = this._customFormat.parse(trim);
-                        } catch (ParseException e) {
-                            throw new IllegalArgumentException("Failed to parse Date value '" + trim + "' (format: \"" + this._formatString + "\"): " + e.getMessage());
-                        }
-                    }
-                    return parse;
-                } else if (currentToken == JsonToken.START_ARRAY && deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
-                    jsonParser.nextToken();
-                    parse = _parseDate(jsonParser, deserializationContext);
-                    if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
-                        return parse;
-                    }
-                    throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "Attempted to unwrap single value array for single 'java.util.Date' value but there was more than a single value in the array");
-                }
-            }
-            return super._parseDate(jsonParser, deserializationContext);
-        }
-    }
+    private static final HashSet<String> _classNames = new HashSet<>();
 
     @JacksonStdImpl
     public static class CalendarDeserializer extends DateBasedDeserializer<Calendar> {
@@ -130,7 +48,8 @@ public class DateDeserializers {
             this._calendarClass = calendarDeserializer._calendarClass;
         }
 
-        protected CalendarDeserializer withDateFormat(DateFormat dateFormat, String str) {
+        /* access modifiers changed from: protected */
+        public CalendarDeserializer withDateFormat(DateFormat dateFormat, String str) {
             return new CalendarDeserializer(this, dateFormat, str);
         }
 
@@ -151,9 +70,94 @@ public class DateDeserializers {
                 }
                 calendar.setTimeZone(timeZone);
                 return calendar;
-            } catch (Throwable e) {
-                throw deserializationContext.instantiationException(this._calendarClass, e);
+            } catch (Exception e) {
+                throw deserializationContext.instantiationException(this._calendarClass, (Throwable) e);
             }
+        }
+    }
+
+    protected static abstract class DateBasedDeserializer<T> extends StdScalarDeserializer<T> implements ContextualDeserializer {
+        protected final DateFormat _customFormat;
+        protected final String _formatString;
+
+        /* access modifiers changed from: protected */
+        public abstract DateBasedDeserializer<T> withDateFormat(DateFormat dateFormat, String str);
+
+        protected DateBasedDeserializer(Class<?> cls) {
+            super(cls);
+            this._customFormat = null;
+            this._formatString = null;
+        }
+
+        protected DateBasedDeserializer(DateBasedDeserializer<T> dateBasedDeserializer, DateFormat dateFormat, String str) {
+            super(dateBasedDeserializer._valueClass);
+            this._customFormat = dateFormat;
+            this._formatString = str;
+        }
+
+        public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
+            DateFormat dateFormat;
+            TimeZone timeZone;
+            if (beanProperty == null) {
+                return this;
+            }
+            Value findFormat = deserializationContext.getAnnotationIntrospector().findFormat(beanProperty.getMember());
+            if (findFormat == null) {
+                return this;
+            }
+            TimeZone timeZone2 = findFormat.getTimeZone();
+            if (findFormat.hasPattern()) {
+                String pattern = findFormat.getPattern();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern, findFormat.hasLocale() ? findFormat.getLocale() : deserializationContext.getLocale());
+                if (timeZone2 == null) {
+                    timeZone = deserializationContext.getTimeZone();
+                } else {
+                    timeZone = timeZone2;
+                }
+                simpleDateFormat.setTimeZone(timeZone);
+                return withDateFormat(simpleDateFormat, pattern);
+            } else if (timeZone2 == null) {
+                return this;
+            } else {
+                DateFormat dateFormat2 = deserializationContext.getConfig().getDateFormat();
+                if (dateFormat2.getClass() == StdDateFormat.class) {
+                    dateFormat = ((StdDateFormat) dateFormat2).withTimeZone(timeZone2).withLocale(findFormat.hasLocale() ? findFormat.getLocale() : deserializationContext.getLocale());
+                } else {
+                    dateFormat = (DateFormat) dateFormat2.clone();
+                    dateFormat.setTimeZone(timeZone2);
+                }
+                return withDateFormat(dateFormat, this._formatString);
+            }
+        }
+
+        /* access modifiers changed from: protected */
+        public Date _parseDate(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+            Date parse;
+            if (this._customFormat != null) {
+                JsonToken currentToken = jsonParser.getCurrentToken();
+                if (currentToken == JsonToken.VALUE_STRING) {
+                    String trim = jsonParser.getText().trim();
+                    if (trim.length() == 0) {
+                        return (Date) getEmptyValue(deserializationContext);
+                    }
+                    synchronized (this._customFormat) {
+                        try {
+                            parse = this._customFormat.parse(trim);
+                        } catch (ParseException e) {
+                            throw new IllegalArgumentException("Failed to parse Date value '" + trim + "' (format: \"" + this._formatString + "\"): " + e.getMessage());
+                        }
+                    }
+                    return parse;
+                } else if (currentToken == JsonToken.START_ARRAY && deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
+                    jsonParser.nextToken();
+                    Date _parseDate = _parseDate(jsonParser, deserializationContext);
+                    if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
+                        return _parseDate;
+                    }
+                    throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "Attempted to unwrap single value array for single 'java.util.Date' value but there was more than a single value in the array");
+                }
+            }
+            return super._parseDate(jsonParser, deserializationContext);
         }
     }
 
@@ -172,7 +176,8 @@ public class DateDeserializers {
             super(dateDeserializer, dateFormat, str);
         }
 
-        protected DateDeserializer withDateFormat(DateFormat dateFormat, String str) {
+        /* access modifiers changed from: protected */
+        public DateDeserializer withDateFormat(DateFormat dateFormat, String str) {
             return new DateDeserializer(this, dateFormat, str);
         }
 
@@ -194,13 +199,17 @@ public class DateDeserializers {
             super(sqlDateDeserializer, dateFormat, str);
         }
 
-        protected SqlDateDeserializer withDateFormat(DateFormat dateFormat, String str) {
+        /* access modifiers changed from: protected */
+        public SqlDateDeserializer withDateFormat(DateFormat dateFormat, String str) {
             return new SqlDateDeserializer(this, dateFormat, str);
         }
 
         public java.sql.Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
             Date _parseDate = _parseDate(jsonParser, deserializationContext);
-            return _parseDate == null ? null : new java.sql.Date(_parseDate.getTime());
+            if (_parseDate == null) {
+                return null;
+            }
+            return new java.sql.Date(_parseDate.getTime());
         }
     }
 
@@ -217,7 +226,8 @@ public class DateDeserializers {
             super(timestampDeserializer, dateFormat, str);
         }
 
-        protected TimestampDeserializer withDateFormat(DateFormat dateFormat, String str) {
+        /* access modifiers changed from: protected */
+        public TimestampDeserializer withDateFormat(DateFormat dateFormat, String str) {
             return new TimestampDeserializer(this, dateFormat, str);
         }
 
@@ -227,12 +237,8 @@ public class DateDeserializers {
     }
 
     static {
-        int i = 0;
-        Class[] clsArr = new Class[]{Calendar.class, GregorianCalendar.class, java.sql.Date.class, Date.class, Timestamp.class};
-        int length = clsArr.length;
-        while (i < length) {
-            _classNames.add(clsArr[i].getName());
-            i++;
+        for (Class name : new Class[]{Calendar.class, GregorianCalendar.class, java.sql.Date.class, Date.class, Timestamp.class}) {
+            _classNames.add(name.getName());
         }
     }
 

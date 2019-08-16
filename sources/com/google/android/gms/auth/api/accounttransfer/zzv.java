@@ -1,64 +1,41 @@
 package com.google.android.gms.auth.api.accounttransfer;
 
-import android.app.PendingIntent;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
-import com.google.android.gms.common.internal.safeparcel.zzc;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzv implements Creator<zzu> {
+public final class zzv implements Creator<DeviceMetaData> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        long j = 0;
+        boolean z = false;
+        boolean z2 = false;
         int i = 0;
-        String str = null;
-        int zzd = zzb.zzd(parcel);
-        Set hashSet = new HashSet();
-        PendingIntent pendingIntent = null;
-        byte[] bArr = null;
-        DeviceMetaData deviceMetaData = null;
-        int i2 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i = zzb.zzg(parcel, readInt);
-                    hashSet.add(Integer.valueOf(1));
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    str = zzb.zzq(parcel, readInt);
-                    hashSet.add(Integer.valueOf(2));
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 3:
-                    i2 = zzb.zzg(parcel, readInt);
-                    hashSet.add(Integer.valueOf(3));
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 4:
-                    bArr = zzb.zzt(parcel, readInt);
-                    hashSet.add(Integer.valueOf(4));
-                    break;
-                case 5:
-                    PendingIntent pendingIntent2 = (PendingIntent) zzb.zza(parcel, readInt, PendingIntent.CREATOR);
-                    hashSet.add(Integer.valueOf(5));
-                    pendingIntent = pendingIntent2;
-                    break;
-                case 6:
-                    DeviceMetaData deviceMetaData2 = (DeviceMetaData) zzb.zza(parcel, readInt, DeviceMetaData.CREATOR);
-                    hashSet.add(Integer.valueOf(6));
-                    deviceMetaData = deviceMetaData2;
+                    z2 = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        if (parcel.dataPosition() == zzd) {
-            return new zzu(hashSet, i, str, i2, bArr, pendingIntent, deviceMetaData);
-        }
-        throw new zzc("Overread allowed size end=" + zzd, parcel);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new DeviceMetaData(i, z, j, z2);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {
-        return new zzu[i];
+        return new DeviceMetaData[i];
     }
 }

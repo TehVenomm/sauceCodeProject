@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimCtrlNormalizer
+public class AnimCtrlNormalizer : MonoBehaviour
 {
 	public RuntimeAnimatorController animCtrl;
 

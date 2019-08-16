@@ -1,6 +1,5 @@
 package org.onepf.oms.appstore.googleUtils;
 
-import com.facebook.share.internal.ShareConstants;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +23,7 @@ public class SkuDetails {
         this.mJson = str2;
         JSONObject jSONObject = new JSONObject(this.mJson);
         this.mSku = jSONObject.optString(AmazonAppstoreBillingService.JSON_KEY_PRODUCT_ID);
-        this.mType = jSONObject.optString(ShareConstants.MEDIA_TYPE);
+        this.mType = jSONObject.optString("type");
         this.mPrice = jSONObject.optString(Param.PRICE);
         this.mTitle = jSONObject.optString("title");
         this.mDescription = jSONObject.optString("description");

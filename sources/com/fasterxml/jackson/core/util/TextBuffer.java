@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.core.util;
 
-import com.fasterxml.jackson.core.io.NumberInput;
+import com.fasterxml.jackson.core.p015io.NumberInput;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,7 +115,10 @@ public final class TextBuffer {
     }
 
     public int getTextOffset() {
-        return this._inputStart >= 0 ? this._inputStart : 0;
+        if (this._inputStart >= 0) {
+            return this._inputStart;
+        }
+        return 0;
     }
 
     public boolean hasTextAsCharacters() {
@@ -133,13 +136,13 @@ public final class TextBuffer {
             return this._resultArray;
         }
         if (this._resultString != null) {
-            char[] toCharArray = this._resultString.toCharArray();
-            this._resultArray = toCharArray;
-            return toCharArray;
-        } else if (this._hasSegments) {
-            return contentsAsArray();
-        } else {
+            char[] charArray = this._resultString.toCharArray();
+            this._resultArray = charArray;
+            return charArray;
+        } else if (!this._hasSegments) {
             return this._currentSegment == null ? NO_CHARS : this._currentSegment;
+        } else {
+            return contentsAsArray();
         }
     }
 
@@ -153,16 +156,16 @@ public final class TextBuffer {
                 if (i == 0) {
                     this._resultString = i2 == 0 ? "" : new String(this._currentSegment, 0, i2);
                 } else {
-                    StringBuilder stringBuilder = new StringBuilder(i + i2);
+                    StringBuilder sb = new StringBuilder(i + i2);
                     if (this._segments != null) {
                         int size = this._segments.size();
-                        for (i2 = 0; i2 < size; i2++) {
-                            char[] cArr = (char[]) this._segments.get(i2);
-                            stringBuilder.append(cArr, 0, cArr.length);
+                        for (int i3 = 0; i3 < size; i3++) {
+                            char[] cArr = (char[]) this._segments.get(i3);
+                            sb.append(cArr, 0, cArr.length);
                         }
                     }
-                    stringBuilder.append(this._currentSegment, 0, this._currentSize);
-                    this._resultString = stringBuilder.toString();
+                    sb.append(this._currentSegment, 0, this._currentSize);
+                    this._resultString = sb.toString();
                 }
             } else if (this._inputLen < 1) {
                 String str = "";
@@ -180,9 +183,9 @@ public final class TextBuffer {
         if (cArr != null) {
             return cArr;
         }
-        cArr = resultArray();
-        this._resultArray = cArr;
-        return cArr;
+        char[] resultArray = resultArray();
+        this._resultArray = resultArray;
+        return resultArray;
     }
 
     public BigDecimal contentsAsDecimal() throws NumberFormatException {
@@ -230,15 +233,15 @@ public final class TextBuffer {
         }
         this._resultString = null;
         this._resultArray = null;
-        Object obj = this._currentSegment;
-        int length = obj.length - this._currentSize;
+        char[] cArr2 = this._currentSegment;
+        int length = cArr2.length - this._currentSize;
         if (length >= i2) {
-            System.arraycopy(cArr, i, obj, this._currentSize, i2);
+            System.arraycopy(cArr, i, cArr2, this._currentSize, i2);
             this._currentSize += i2;
             return;
         }
         if (length > 0) {
-            System.arraycopy(cArr, i, obj, this._currentSize, length);
+            System.arraycopy(cArr, i, cArr2, this._currentSize, length);
             i += length;
             i2 -= length;
         }
@@ -308,9 +311,9 @@ public final class TextBuffer {
         if (cArr != null) {
             return cArr;
         }
-        cArr = buf(0);
-        this._currentSegment = cArr;
-        return cArr;
+        char[] buf = buf(0);
+        this._currentSegment = buf;
+        return buf;
     }
 
     public int getCurrentSegmentSize() {
@@ -335,19 +338,19 @@ public final class TextBuffer {
     public char[] finishCurrentSegment() {
         int i = 1000;
         if (this._segments == null) {
-            this._segments = new ArrayList();
+            this._segments = new ArrayList<>();
         }
         this._hasSegments = true;
         this._segments.add(this._currentSegment);
         int length = this._currentSegment.length;
         this._segmentSize += length;
         this._currentSize = 0;
-        length += length >> 1;
-        if (length >= 1000) {
-            if (length > 262144) {
+        int i2 = length + (length >> 1);
+        if (i2 >= 1000) {
+            if (i2 > 262144) {
                 i = 262144;
             } else {
-                i = length;
+                i = i2;
             }
         }
         char[] carr = carr(i);
@@ -372,9 +375,9 @@ public final class TextBuffer {
         if (cArr.length >= i) {
             return cArr;
         }
-        cArr = Arrays.copyOf(cArr, i);
-        this._currentSegment = cArr;
-        return cArr;
+        char[] copyOf = Arrays.copyOf(cArr, i);
+        this._currentSegment = copyOf;
+        return copyOf;
     }
 
     public String toString() {
@@ -384,7 +387,7 @@ public final class TextBuffer {
     private void unshare(int i) {
         int i2 = this._inputLen;
         this._inputLen = 0;
-        Object obj = this._inputBuffer;
+        char[] cArr = this._inputBuffer;
         this._inputBuffer = null;
         int i3 = this._inputStart;
         this._inputStart = -1;
@@ -393,7 +396,7 @@ public final class TextBuffer {
             this._currentSegment = buf(i4);
         }
         if (i2 > 0) {
-            System.arraycopy(obj, i3, this._currentSegment, 0, i2);
+            System.arraycopy(cArr, i3, this._currentSegment, 0, i2);
         }
         this._segmentSize = 0;
         this._currentSize = i2;
@@ -402,57 +405,56 @@ public final class TextBuffer {
     private void expand(int i) {
         int i2 = 1000;
         if (this._segments == null) {
-            this._segments = new ArrayList();
+            this._segments = new ArrayList<>();
         }
-        Object obj = this._currentSegment;
+        char[] cArr = this._currentSegment;
         this._hasSegments = true;
-        this._segments.add(obj);
-        this._segmentSize += obj.length;
+        this._segments.add(cArr);
+        this._segmentSize += cArr.length;
         this._currentSize = 0;
-        int length = obj.length;
-        length += length >> 1;
-        if (length >= 1000) {
-            if (length > 262144) {
+        int length = cArr.length;
+        int i3 = length + (length >> 1);
+        if (i3 >= 1000) {
+            if (i3 > 262144) {
                 i2 = 262144;
             } else {
-                i2 = length;
+                i2 = i3;
             }
         }
         this._currentSegment = carr(i2);
     }
 
     private char[] resultArray() {
+        int i;
         if (this._resultString != null) {
             return this._resultString.toCharArray();
         }
-        int i;
-        int i2;
         if (this._inputStart >= 0) {
-            i = this._inputLen;
-            if (i < 1) {
+            int i2 = this._inputLen;
+            if (i2 < 1) {
                 return NO_CHARS;
             }
-            i2 = this._inputStart;
-            if (i2 == 0) {
-                return Arrays.copyOf(this._inputBuffer, i);
+            int i3 = this._inputStart;
+            if (i3 == 0) {
+                return Arrays.copyOf(this._inputBuffer, i2);
             }
-            return Arrays.copyOfRange(this._inputBuffer, i2, i + i2);
+            return Arrays.copyOfRange(this._inputBuffer, i3, i2 + i3);
         }
-        i = size();
-        if (i < 1) {
+        int size = size();
+        if (size < 1) {
             return NO_CHARS;
         }
-        Object carr = carr(i);
+        char[] carr = carr(size);
         if (this._segments != null) {
-            int size = this._segments.size();
-            i2 = 0;
-            for (int i3 = 0; i3 < size; i3++) {
-                char[] cArr = (char[]) this._segments.get(i3);
+            int size2 = this._segments.size();
+            int i4 = 0;
+            for (int i5 = 0; i5 < size2; i5++) {
+                char[] cArr = (char[]) this._segments.get(i5);
                 int length = cArr.length;
-                System.arraycopy(cArr, 0, carr, i2, length);
-                i2 += length;
+                System.arraycopy(cArr, 0, carr, i4, length);
+                i4 += length;
             }
-            i = i2;
+            i = i4;
         } else {
             i = 0;
         }

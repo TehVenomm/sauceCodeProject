@@ -8,11 +8,16 @@ public class Transaction {
     private final double totalTax;
 
     public static class Builder {
-        private final String orderId;
-        private double shippingCost = 0.0d;
-        private String storeName = null;
-        private final double totalCost;
-        private double totalTax = 0.0d;
+        /* access modifiers changed from: private */
+        public final String orderId;
+        /* access modifiers changed from: private */
+        public double shippingCost = 0.0d;
+        /* access modifiers changed from: private */
+        public String storeName = null;
+        /* access modifiers changed from: private */
+        public final double totalCost;
+        /* access modifiers changed from: private */
+        public double totalTax = 0.0d;
 
         public Builder(String str, double d) {
             if (str == null || str.trim().length() == 0) {
@@ -23,7 +28,7 @@ public class Transaction {
         }
 
         public Transaction build() {
-            return new Transaction();
+            return new Transaction(this);
         }
 
         public Builder setShippingCost(double d) {
@@ -50,23 +55,28 @@ public class Transaction {
         this.shippingCost = builder.shippingCost;
     }
 
-    String getOrderId() {
+    /* access modifiers changed from: 0000 */
+    public String getOrderId() {
         return this.orderId;
     }
 
-    double getShippingCost() {
+    /* access modifiers changed from: 0000 */
+    public double getShippingCost() {
         return this.shippingCost;
     }
 
-    String getStoreName() {
+    /* access modifiers changed from: 0000 */
+    public String getStoreName() {
         return this.storeName;
     }
 
-    double getTotalCost() {
+    /* access modifiers changed from: 0000 */
+    public double getTotalCost() {
         return this.totalCost;
     }
 
-    double getTotalTax() {
+    /* access modifiers changed from: 0000 */
+    public double getTotalTax() {
         return this.totalTax;
     }
 }

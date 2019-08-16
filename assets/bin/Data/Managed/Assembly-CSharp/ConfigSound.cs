@@ -46,19 +46,38 @@ public class ConfigSound : GameSection
 
 	private void OnQuery_VOICE_ENGLISH()
 	{
-		GameSaveData.instance.voiceOption = 0;
-		RefreshUI();
+		if (GameSaveData.instance.voiceOption != 0)
+		{
+			GameSaveData.instance.voiceOption = 0;
+			RefreshUI();
+			OnReturnToTitle();
+		}
 	}
 
 	private void OnQuery_VOICE_JAPANESE()
 	{
-		GameSaveData.instance.voiceOption = 1;
-		RefreshUI();
+		if (GameSaveData.instance.voiceOption != 1)
+		{
+			GameSaveData.instance.voiceOption = 1;
+			RefreshUI();
+			OnReturnToTitle();
+		}
 	}
 
 	private void OnQuery_VOICE_MUTE()
 	{
-		GameSaveData.instance.voiceOption = 2;
-		RefreshUI();
+		if (GameSaveData.instance.voiceOption != 2)
+		{
+			GameSaveData.instance.voiceOption = 2;
+			RefreshUI();
+		}
+	}
+
+	private void OnReturnToTitle()
+	{
+		if (MonoBehaviourSingleton<AppMain>.IsValid())
+		{
+			MonoBehaviourSingleton<AppMain>.I.Reset(need_clear_cache: false, need_predownload: false);
+		}
 	}
 }

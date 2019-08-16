@@ -17,7 +17,8 @@ public enum AccessTokenSource {
         this.canExtendToken = z;
     }
 
-    boolean canExtendToken() {
+    /* access modifiers changed from: 0000 */
+    public boolean canExtendToken() {
         return this.canExtendToken;
     }
 }

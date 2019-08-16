@@ -25,7 +25,7 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 		AddNextEvolveDataRecursive(list);
 		currentEvolveStage = 0;
 		currentEvolveIndex = 0;
-		root = SetPrefab(base.collectUI, "ItemDetailEquipMaxParamDialog", true);
+		root = SetPrefab(base.collectUI, "ItemDetailEquipMaxParamDialog");
 		materialId = (uint)array[2];
 		base.Initialize();
 	}
@@ -41,15 +41,15 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 		int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(table_data.defElement);
 		int num2 = Mathf.Max(growParamElemDef);
 		int growParamHp = growEquipItemData.GetGrowParamHp(table_data.baseHp);
-		SetActive(detailBase, UI.STR_LV, true);
-		SetActive(detailBase, UI.STR_ONLY_VISUAL, false);
+		SetActive(detailBase, UI.STR_LV, is_visible: true);
+		SetActive(detailBase, UI.STR_ONLY_VISUAL, is_visible: false);
 		SetLabelText(detailBase, UI.LBL_LV_NOW, table_data.maxLv.ToString());
 		SetLabelText(detailBase, UI.LBL_ATK, growParamAtk.ToString());
 		SetLabelText(detailBase, UI.LBL_ELEM, num.ToString());
 		SetLabelText(detailBase, UI.LBL_DEF, growParamDef.ToString());
 		SetLabelText(detailBase, UI.LBL_ELEM_DEF, num2.ToString());
 		SetLabelText(detailBase, UI.LBL_HP, growParamHp.ToString());
-		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
+		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
 	}
 
 	public override void UpdateUI()
@@ -61,44 +61,38 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 
 	private void DisableMagiSlotButton()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
 		Transform ctrl = GetCtrl(UI.OBJ_SKILL_BUTTON_ROOT);
-		Transform val = ctrl.FindChild("SkillIconButton");
-		base.SetEnabled<UIButton>(val, false);
+		Transform val = ctrl.Find("SkillIconButton");
+		SetEnabled<UIButton>(val, is_enabled: false);
 		val.GetComponent<BoxCollider>().set_enabled(false);
 	}
 
 	private void UpdatePaging()
 	{
 		bool is_visible = allEquipData.Count + allEquipData[currentEvolveStage].Count >= 2;
-		SetActive((Enum)UI.OBJ_EVOLVE_SELECT, true);
+		SetActive((Enum)UI.OBJ_EVOLVE_SELECT, is_visible: true);
 		SetActive((Enum)UI.OBJ_ARROW_BTN_ROOT, is_visible);
 		if (currentEvolveStage == 0)
 		{
-			SetActive((Enum)UI.LBL_EVOLVE_NORMAL, true);
+			SetActive((Enum)UI.LBL_EVOLVE_NORMAL, is_visible: true);
 			SetLabelText((Enum)UI.LBL_EVOLVE_NORMAL, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 13u));
-			SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, false);
-			SetActive((Enum)UI.SPR_EVOLVE_ELEM, false);
+			SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, is_visible: false);
+			SetActive((Enum)UI.SPR_EVOLVE_ELEM, is_visible: false);
+			return;
 		}
-		else
+		EquipItemTable.EquipItemData currentEquipItemData = GetCurrentEquipItemData();
+		int targetElementPriorityToTable = (int)currentEquipItemData.GetTargetElementPriorityToTable();
+		bool flag = targetElementPriorityToTable == 6;
+		SetActive((Enum)UI.LBL_EVOLVE_NORMAL, flag);
+		SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, !flag);
+		SetActive((Enum)UI.SPR_EVOLVE_ELEM, !flag);
+		if (flag)
 		{
-			EquipItemTable.EquipItemData currentEquipItemData = GetCurrentEquipItemData();
-			int targetElementPriorityToTable = (int)currentEquipItemData.GetTargetElementPriorityToTable();
-			bool flag = targetElementPriorityToTable == 6;
-			SetActive((Enum)UI.LBL_EVOLVE_NORMAL, flag);
-			SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, !flag);
-			SetActive((Enum)UI.SPR_EVOLVE_ELEM, !flag);
-			if (flag)
-			{
-				SetLabelText((Enum)UI.LBL_EVOLVE_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 14u), currentEvolveStage.ToString()));
-			}
-			else
-			{
-				SetLabelText((Enum)UI.LBL_EVOLVE_ATTRIBUTE, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 15u), currentEvolveStage.ToString()));
-				SetElementSprite((Enum)UI.SPR_EVOLVE_ELEM, targetElementPriorityToTable);
-			}
+			SetLabelText((Enum)UI.LBL_EVOLVE_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 14u), currentEvolveStage.ToString()));
+			return;
 		}
+		SetLabelText((Enum)UI.LBL_EVOLVE_ATTRIBUTE, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 15u), currentEvolveStage.ToString()));
+		SetElementSprite((Enum)UI.SPR_EVOLVE_ELEM, targetElementPriorityToTable);
 	}
 
 	private void OnQuery_NEXT_EVOLVE()
@@ -140,14 +134,37 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 	private void OnQuery_LOTTERY_LIST()
 	{
 		CreateEquipItemTable.CreateEquipItemData createEquipItemByPart = Singleton<CreateEquipItemTable>.I.GetCreateEquipItemByPart(materialId, GetCurrentEquipItemData().type);
-		if (createEquipItemByPart == null)
+		CreateEquipItemTable.CreateEquipItemData createEquipItemData = new CreateEquipItemTable.CreateEquipItemData();
+		if (createEquipItemData == null)
 		{
 			GameSection.StopEvent();
+			return;
+		}
+		if (createEquipItemByPart.id == 20160100 && currentEvolveStage == 3 && currentEvolveIndex == 0)
+		{
+			createEquipItemData.id = 80160111u;
+		}
+		else if (createEquipItemByPart.id == 21160100 && currentEvolveStage == 3 && currentEvolveIndex == 0)
+		{
+			createEquipItemData.id = 81160110u;
+		}
+		else if (createEquipItemByPart.id == 22160100 && currentEvolveStage == 3 && currentEvolveIndex == 0)
+		{
+			createEquipItemData.id = 82160110u;
+		}
+		else if (createEquipItemByPart.id == 23160100 && currentEvolveStage == 3 && currentEvolveIndex == 0)
+		{
+			createEquipItemData.id = 83160110u;
+		}
+		else if (createEquipItemByPart.id == 24160100 && currentEvolveStage == 3 && currentEvolveIndex == 0)
+		{
+			createEquipItemData.id = 84160110u;
 		}
 		else
 		{
-			GameSection.SetEventData(createEquipItemByPart);
+			createEquipItemData.id = createEquipItemByPart.id;
 		}
+		GameSection.SetEventData(createEquipItemData);
 	}
 
 	private EquipItemTable.EquipItemData GetCurrentEquipItemData()
@@ -178,31 +195,33 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 
 	private void AddNextEvolveDataRecursive(List<EquipItemTable.EquipItemData> tabledata)
 	{
-		if (tabledata != null && tabledata.Count > 0)
+		if (tabledata == null || tabledata.Count <= 0)
 		{
-			List<EquipItemTable.EquipItemData> list = new List<EquipItemTable.EquipItemData>();
-			HashSet<uint> hashSet = new HashSet<uint>();
-			int i = 0;
-			for (int count = tabledata.Count; i < count; i++)
+			return;
+		}
+		List<EquipItemTable.EquipItemData> list = new List<EquipItemTable.EquipItemData>();
+		HashSet<uint> hashSet = new HashSet<uint>();
+		int i = 0;
+		for (int count = tabledata.Count; i < count; i++)
+		{
+			EquipItemTable.EquipItemData[] nextEvolveData = GetNextEvolveData(tabledata[i]);
+			if (nextEvolveData == null)
 			{
-				EquipItemTable.EquipItemData[] nextEvolveData = GetNextEvolveData(tabledata[i]);
-				if (nextEvolveData != null)
+				continue;
+			}
+			int j = 0;
+			for (int num = nextEvolveData.Length; j < num; j++)
+			{
+				if (hashSet.Add(nextEvolveData[j].id))
 				{
-					int j = 0;
-					for (int num = nextEvolveData.Length; j < num; j++)
-					{
-						if (hashSet.Add(nextEvolveData[j].id))
-						{
-							list.Add(nextEvolveData[j]);
-						}
-					}
+					list.Add(nextEvolveData[j]);
 				}
 			}
-			if (list.Count >= 1)
-			{
-				allEquipData.Add(list);
-			}
-			AddNextEvolveDataRecursive(list);
 		}
+		if (list.Count >= 1)
+		{
+			allEquipData.Add(list);
+		}
+		AddNextEvolveDataRecursive(list);
 	}
 }

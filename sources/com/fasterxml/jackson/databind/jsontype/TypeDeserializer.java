@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -25,7 +25,7 @@ public abstract class TypeDeserializer {
 
     public abstract TypeIdResolver getTypeIdResolver();
 
-    public abstract As getTypeInclusion();
+    public abstract C0861As getTypeInclusion();
 
     public static Object deserializeIfNatural(JsonParser jsonParser, DeserializationContext deserializationContext, JavaType javaType) throws IOException {
         return deserializeIfNatural(jsonParser, deserializationContext, javaType.getRawClass());

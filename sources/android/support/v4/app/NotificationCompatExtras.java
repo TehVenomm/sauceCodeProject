@@ -1,5 +1,6 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
+/* renamed from: android.support.v4.app.NotificationCompatExtras */
 public final class NotificationCompatExtras {
     public static final String EXTRA_ACTION_EXTRAS = "android.support.actionExtras";
     public static final String EXTRA_GROUP_KEY = "android.support.groupKey";

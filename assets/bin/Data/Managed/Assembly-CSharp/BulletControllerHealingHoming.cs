@@ -13,14 +13,12 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	protected Animator m_effectAnimator;
 
-	private List<int> m_buffIdList;
+	protected List<int> m_buffIdList;
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
 		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 		BulletData.BulletHealingHoming dataHealingHomingBullet = bullet.dataHealingHomingBullet;
 		if (dataHealingHomingBullet != null)
@@ -36,8 +34,8 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	public override bool IsHit(Collider collider)
 	{
-		StageObject target = GetTarget();
-		if (m_isIgnoreColliderExceptTarget && target != null && target.get_name() != collider.get_name())
+		StageObject targetObject = base.targetObject;
+		if (m_isIgnoreColliderExceptTarget && targetObject != null && targetObject.get_name() != collider.get_name())
 		{
 			return false;
 		}
@@ -46,7 +44,6 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	public override void OnHit(Collider collider)
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isAlreadyDoneHitProcess)
 		{
 			m_isAlreadyDoneHitProcess = true;
@@ -74,10 +71,14 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 	{
 		if (base.bulletSkillInfoParam != null)
 		{
-			StageObject target = GetTarget();
-			if (!(target == null) && (target.IsCoopNone() || target.IsOriginal()) && target is Player)
+			StageObject targetObject = base.targetObject;
+			if (!(targetObject == null) && (targetObject.IsCoopNone() || targetObject.IsOriginal()) && targetObject is Player)
 			{
-				(target as Player).OnHealReceive(base.bulletSkillInfoParam.healHp, base.bulletSkillInfoParam.tableData.healType, HEAL_EFFECT_TYPE.BASIS, true);
+				Character.HealData healData = new Character.HealData(base.bulletSkillInfoParam.healHp, base.bulletSkillInfoParam.tableData.healType, HEAL_EFFECT_TYPE.BASIS, new List<int>
+				{
+					10
+				});
+				(targetObject as Player).OnHealReceive(healData);
 			}
 		}
 	}
@@ -89,32 +90,7 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 			int i = 0;
 			for (int count = m_buffIdList.Count; i < count; i++)
 			{
-				int num = m_buffIdList[i];
-				if (Singleton<BuffTable>.IsValid() && num > 0)
-				{
-					BuffTable.BuffData data = Singleton<BuffTable>.I.GetData((uint)num);
-					if (data != null)
-					{
-						BuffParam.BuffData buffData = new BuffParam.BuffData();
-						buffData.type = data.type;
-						buffData.interval = data.interval;
-						buffData.valueType = data.valueType;
-						buffData.time = data.duration;
-						float num2 = (float)data.value;
-						GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(data.growID, base.bulletSkillInfoParam.baseInfo.level);
-						if (growSkillItemData != null)
-						{
-							buffData.time = data.duration * (float)(int)growSkillItemData.supprtTime[0].rate * 0.01f + (float)growSkillItemData.supprtTime[0].add;
-							num2 = (float)(data.value * (int)growSkillItemData.supprtValue[0].rate) * 0.01f + (float)(int)growSkillItemData.supprtValue[0].add;
-						}
-						if (buffData.valueType == BuffParam.VALUE_TYPE.RATE && BuffParam.IsTypeValueBasedOnHP(buffData.type))
-						{
-							num2 = (float)_player.hpMax * num2 * 0.01f;
-						}
-						buffData.value = Mathf.FloorToInt(num2);
-						_player.OnBuffStart(buffData);
-					}
-				}
+				_player.StartBuffByBuffTableId(m_buffIdList[i], base.bulletSkillInfoParam);
 			}
 		}
 	}

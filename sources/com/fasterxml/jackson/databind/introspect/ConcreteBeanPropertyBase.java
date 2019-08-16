@@ -44,7 +44,7 @@ public abstract class ConcreteBeanPropertyBase implements BeanProperty, Serializ
             return value;
         }
         if (annotationIntrospector != null) {
-            Annotated member = getMember();
+            AnnotatedMember member = getMember();
             if (member != null) {
                 value = annotationIntrospector.findFormat(member);
             }
@@ -58,7 +58,7 @@ public abstract class ConcreteBeanPropertyBase implements BeanProperty, Serializ
     public Value findPropertyFormat(MapperConfig<?> mapperConfig, Class<?> cls) {
         Value defaultPropertyFormat = mapperConfig.getDefaultPropertyFormat(cls);
         AnnotationIntrospector annotationIntrospector = mapperConfig.getAnnotationIntrospector();
-        Annotated member = getMember();
+        AnnotatedMember member = getMember();
         if (annotationIntrospector == null || member == null) {
             return defaultPropertyFormat;
         }
@@ -69,7 +69,7 @@ public abstract class ConcreteBeanPropertyBase implements BeanProperty, Serializ
     public JsonInclude.Value findPropertyInclusion(MapperConfig<?> mapperConfig, Class<?> cls) {
         JsonInclude.Value defaultPropertyInclusion = mapperConfig.getDefaultPropertyInclusion(cls);
         AnnotationIntrospector annotationIntrospector = mapperConfig.getAnnotationIntrospector();
-        Annotated member = getMember();
+        AnnotatedMember member = getMember();
         if (annotationIntrospector == null || member == null) {
             return defaultPropertyInclusion;
         }

@@ -6,7 +6,6 @@ public class WebViewDialog : GameSection
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			if (this.get_gameObject().get_name() == "WebViewDialog")
 			{
 				return "[BACK]";
@@ -30,7 +29,7 @@ public class WebViewDialog : GameSection
 		{
 			MonoBehaviourSingleton<WebViewManager>.I.Open(NetworkManager.APP_HOST + text, delegate
 			{
-				DispatchEvent("CLOSE", null);
+				DispatchEvent("CLOSE");
 			});
 		}
 		base.Initialize();

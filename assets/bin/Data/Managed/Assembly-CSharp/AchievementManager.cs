@@ -1,11 +1,16 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 {
+	private List<AchievementCounter> achievementCounterList = new List<AchievementCounter>();
+
+	private List<TaskInfo> taskInfos = new List<TaskInfo>();
+
+	private Queue<TaskInfo> achievedTask = new Queue<TaskInfo>();
+
 	private const uint STR_CRYSTAL = 100u;
 
 	private const uint STR_GOLD = 101u;
@@ -13,12 +18,6 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 	private const uint STR_EXP = 102u;
 
 	private const uint STR_PIECE = 3000u;
-
-	private List<AchievementCounter> achievementCounterList = new List<AchievementCounter>();
-
-	private List<TaskInfo> taskInfos = new List<TaskInfo>();
-
-	private Queue<TaskInfo> achievedTask = new Queue<TaskInfo>();
 
 	private bool firstSetAchievement = true;
 
@@ -52,7 +51,7 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 
 	public int GetEquipItemCollectionNum()
 	{
-		AchievementCounter achievementCounter = _GetAchievementCounter(ACHIEVEMENT_TYPE.EQUIP_ITEM_COLLECTION, 0);
+		AchievementCounter achievementCounter = _GetAchievementCounter(ACHIEVEMENT_TYPE.EQUIP_ITEM_COLLECTION);
 		if (achievementCounter == null)
 		{
 			return 0;
@@ -62,7 +61,7 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 
 	public int GetEnemyCollectionNum()
 	{
-		AchievementCounter achievementCounter = _GetAchievementCounter(ACHIEVEMENT_TYPE.ENEMY_COLLECTION, 0);
+		AchievementCounter achievementCounter = _GetAchievementCounter(ACHIEVEMENT_TYPE.ENEMY_COLLECTION);
 		if (achievementCounter == null)
 		{
 			return 0;
@@ -90,7 +89,7 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 
 	public bool CheckEquipItemCollection(EquipItemTable.EquipItemData equipItem)
 	{
-		if (equipItem.obtained.category.Length == 0 || equipItem.obtained.flag < 0 || equipItem.obtained.flag >= 64)
+		if (equipItem == null || equipItem.obtained == null || equipItem.obtained.category.Length == 0 || equipItem.obtained.flag < 0 || equipItem.obtained.flag >= 64)
 		{
 			return false;
 		}
@@ -150,6 +149,19 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 			}
 			break;
 		}
+		case REWARD_TYPE.ACCESSORY:
+		{
+			AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData(itemId);
+			if (data != null)
+			{
+				text = data.name;
+				if (num > 1)
+				{
+					text = text + num.ToString() + StringTable.Get(STRING_CATEGORY.COMMON, 3000u);
+				}
+			}
+			break;
+		}
 		}
 		return text;
 	}
@@ -172,30 +184,6 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		}
 	}
 
-	public void SendDebugSetEquipTargetNum(int targetNum, int collectionNum, Action<bool> call_back)
-	{
-		DebugSetEquipTargetNumModel.RequestSendForm requestSendForm = new DebugSetEquipTargetNumModel.RequestSendForm();
-		requestSendForm.targetNum = targetNum;
-		requestSendForm.collectionNum = collectionNum;
-		Protocol.Send(DebugSetEquipTargetNumModel.URL, requestSendForm, delegate(DebugSetEquipTargetNumModel ret)
-		{
-			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void SendDebugSetEquipCollection(string obtained, int on, Action<bool> call_back)
-	{
-		DebugSetEquipCollectionModel.RequestSendForm requestSendForm = new DebugSetEquipCollectionModel.RequestSendForm();
-		requestSendForm.obtained = obtained;
-		requestSendForm.on = on;
-		Protocol.Send(DebugSetEquipCollectionModel.URL, requestSendForm, delegate(DebugSetEquipCollectionModel ret)
-		{
-			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back(obj);
-		}, string.Empty);
-	}
-
 	public void OnDiff(BaseModelDiff.DiffAchievement diff)
 	{
 		if (Utility.IsExist(diff.add))
@@ -205,9 +193,9 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		if (Utility.IsExist(diff.update))
 		{
 			long num = 0L;
-			if (_GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL, 0) != null)
+			if (_GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL) != null)
 			{
-				num = _GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL, 0).Count;
+				num = _GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL).Count;
 			}
 			diff.update.ForEach(delegate(AchievementCounter achieve)
 			{
@@ -218,9 +206,9 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 				}
 			});
 			long num2 = 0L;
-			if (_GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL, 0) != null)
+			if (_GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL) != null)
 			{
-				num2 = _GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL, 0).Count;
+				num2 = _GetAchievementCounter(ACHIEVEMENT_TYPE.BOSS_KILL).Count;
 			}
 			if ((num2 >= 20 && num < 20) || (num2 >= 50 && num < 50) || (num2 >= 100 && num < 100) || (num2 >= 200 && num < 200) || (num2 >= 300 && num < 300) || (num2 >= 400 && num < 400))
 			{
@@ -252,7 +240,7 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		if (flag && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene" && MonoBehaviourSingleton<SmithManager>.IsValid())
 		{
 			int badgeTotalNum = MonoBehaviourSingleton<SmithManager>.I.GetBadgeTotalNum();
-			MonoBehaviourSingleton<SmithManager>.I.CreateBadgeData(true);
+			MonoBehaviourSingleton<SmithManager>.I.CreateBadgeData(is_force: true);
 			if (MonoBehaviourSingleton<SmithManager>.I.GetBadgeTotalNum() != badgeTotalNum)
 			{
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SMITH_BADGE);
@@ -281,7 +269,7 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		if (diff.update != null)
 		{
 			int i;
-			for (i = 0; i < diff.update.Count; flag = true, i++)
+			for (i = 0; i < diff.update.Count; i++)
 			{
 				TaskInfo taskInfo = taskInfos.Find((TaskInfo info) => info.taskId == diff.update[i].taskId);
 				MonoBehaviourSingleton<NativeGameService>.I.SetAchievementStep(diff.update[i].taskId, diff.update[i].progress, taskInfo.progress);
@@ -289,10 +277,10 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 				taskInfo.progress = diff.update[i].progress;
 				taskInfo.status = diff.update[i].status;
 				taskInfo.taskId = diff.update[i].taskId;
-				if (taskInfo.status != 2)
+				if (taskInfo.status == 2)
 				{
-					continue;
 				}
+				flag = true;
 			}
 		}
 		if (flag)
@@ -304,27 +292,28 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 	private IEnumerator DispTaskAnnounce()
 	{
 		TaskClearAnnounce taskClearAnnounce = MonoBehaviourSingleton<UIManager>.I.taskClearAnnouce;
-		if (!(taskClearAnnounce == null))
+		if (taskClearAnnounce == null)
 		{
-			while (achievedTask.Count != 0)
-			{
-				TaskInfo taskInfo = achievedTask.Dequeue();
-				TaskTable.TaskData tableData = Singleton<TaskTable>.I.Get((uint)taskInfo.taskId);
-				if (tableData != null)
-				{
-					bool wait = true;
-					taskClearAnnounce.Play(tableData.title, tableData.GetRewardString(), delegate
-					{
-						((_003CDispTaskAnnounce_003Ec__Iterator1EC)/*Error near IL_00b8: stateMachine*/)._003Cwait_003E__3 = false;
-					});
-					while (wait)
-					{
-						yield return (object)null;
-					}
-					yield return (object)new WaitForSeconds(0.3f);
-				}
-			}
-			yield return (object)null;
+			yield break;
 		}
+		while (achievedTask.Count != 0)
+		{
+			TaskInfo taskInfo = achievedTask.Dequeue();
+			TaskTable.TaskData tableData = Singleton<TaskTable>.I.Get((uint)taskInfo.taskId);
+			if (tableData != null)
+			{
+				bool wait = true;
+				taskClearAnnounce.Play(tableData.title, tableData.GetRewardString(), delegate
+				{
+					wait = false;
+				});
+				while (wait)
+				{
+					yield return null;
+				}
+				yield return (object)new WaitForSeconds(0.3f);
+			}
+		}
+		yield return null;
 	}
 }

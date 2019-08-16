@@ -34,6 +34,18 @@ public class HomeInfoModel : BaseModel
 
 		public int pointShopBanner;
 
+		public int tradingDay;
+
+		public int tradingStatus;
+
+		public int tradingAccept;
+
+		public int tradingConditionDay;
+
+		public int tradingSellMinGem;
+
+		public int tradingSellMaxGem;
+
 		public bool isOneTimesOfferActive;
 
 		public ClanAdvisaryData advisory;
@@ -48,7 +60,11 @@ public class HomeInfoModel : BaseModel
 
 		public List<Network.EventData> events = new List<Network.EventData>();
 
+		public List<int> futureEventIds = new List<int>();
+
 		public List<Network.EventData> bingoEvents = new List<Network.EventData>();
+
+		public List<EventItemCounts> eventItemCounts = new List<EventItemCounts>();
 
 		public int task;
 
@@ -72,10 +88,22 @@ public class HomeInfoModel : BaseModel
 
 		public bool isGuildRequestOpen;
 
+		public bool isTheaterRenewal;
+
+		public int clanDisplayType;
+
+		public int clanRequestNum = -1;
+
+		public int clanInviteNum;
+
 		public string blackShopEndDate;
+
+		public bool isWheelOfFortuneOn = true;
+
+		public List<Network.HomeBanner> homeBanner = new List<Network.HomeBanner>();
 	}
 
-	public static string URL = "ajax/home/info";
+	public const string URL = "ajax/home/info";
 
-	public Param result = new Param();
+	public readonly Param result = new Param();
 }

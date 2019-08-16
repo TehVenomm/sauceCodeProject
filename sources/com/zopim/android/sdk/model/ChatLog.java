@@ -4,17 +4,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.appsflyer.share.Constants;
-import com.facebook.share.internal.ShareConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatLog implements Comparable<ChatLog> {
+    /* access modifiers changed from: private */
     @JsonIgnore
-    private static final String LOG_TAG = ChatLog.class.getSimpleName();
+    public static final String LOG_TAG = ChatLog.class.getSimpleName();
     @JsonProperty("attachment")
     private Attachment attachment;
     @JsonProperty("new_comment$string")
@@ -56,7 +57,7 @@ public class ChatLog implements Comparable<ChatLog> {
 
     public enum Error {
         UPLOAD_SIZE_ERROR("size"),
-        UPLOAD_FILE_EXTENSION_ERROR(ShareConstants.MEDIA_TYPE),
+        UPLOAD_FILE_EXTENSION_ERROR("type"),
         UPLOAD_FAILED_ERROR("upload_request_failed"),
         UNKNOWN("unknown");
         
@@ -68,9 +69,10 @@ public class ChatLog implements Comparable<ChatLog> {
 
         @NonNull
         public static Error getType(String str) {
-            for (Error error : values()) {
-                if (error.getValue().equals(str)) {
-                    return error;
+            Error[] values;
+            for (Error error2 : values()) {
+                if (error2.getValue().equals(str)) {
+                    return error2;
                 }
             }
             return UNKNOWN;
@@ -126,9 +128,10 @@ public class ChatLog implements Comparable<ChatLog> {
 
         @NonNull
         public static Rating getRating(String str) {
-            for (Rating rating : values()) {
-                if (rating.getValue().equals(str)) {
-                    return rating;
+            Rating[] values;
+            for (Rating rating2 : values()) {
+                if (rating2.getValue().equals(str)) {
+                    return rating2;
                 }
             }
             return UNKNOWN;
@@ -153,34 +156,35 @@ public class ChatLog implements Comparable<ChatLog> {
     }
 
     /* renamed from: com.zopim.android.sdk.model.ChatLog$a */
-    private enum C0875a {
+    private enum C1244a {
         AGENT_SYSTEM("agent:system"),
         AGENT_TRIGGER("agent:trigger"),
         AGENT_MSG("agent"),
         VISITOR_MSG("visitor"),
         UNKNOWN("unknown");
         
-        /* renamed from: f */
-        final String f881f;
 
-        private C0875a(String str) {
-            this.f881f = str;
+        /* renamed from: f */
+        final String f925f;
+
+        private C1244a(String str) {
+            this.f925f = str;
         }
 
         @NonNull
         /* renamed from: a */
-        public static C0875a m705a(String str) {
+        public static C1244a m718a(String str) {
             return (str == null || str.isEmpty()) ? UNKNOWN : "agent:system".equals(str) ? AGENT_SYSTEM : "agent:trigger".equals(str) ? AGENT_TRIGGER : str.contains("agent") ? AGENT_MSG : str.contains("visitor") ? VISITOR_MSG : UNKNOWN;
         }
 
         /* renamed from: a */
-        public String m706a() {
-            return this.f881f;
+        public String mo20878a() {
+            return this.f925f;
         }
     }
 
     /* renamed from: com.zopim.android.sdk.model.ChatLog$b */
-    private enum C0876b {
+    private enum C1245b {
         CHAT_MSG("chat.msg"),
         MEMBER_JOIN("chat.memberjoin"),
         MEMBER_LEAVE("chat.memberleave"),
@@ -192,27 +196,29 @@ public class ChatLog implements Comparable<ChatLog> {
         CHAT_COMMENT("chat.comment"),
         UNKNOWN("unknown");
         
-        /* renamed from: k */
-        final String f893k;
 
-        private C0876b(String str) {
-            this.f893k = str;
+        /* renamed from: k */
+        final String f937k;
+
+        private C1245b(String str) {
+            this.f937k = str;
         }
 
         @NonNull
         /* renamed from: a */
-        public static C0876b m707a(String str) {
-            for (C0876b c0876b : C0876b.values()) {
-                if (c0876b.m708a().equals(str)) {
-                    return c0876b;
+        public static C1245b m720a(String str) {
+            C1245b[] values;
+            for (C1245b bVar : values()) {
+                if (bVar.mo20879a().equals(str)) {
+                    return bVar;
                 }
             }
             return UNKNOWN;
         }
 
         /* renamed from: a */
-        public String m708a() {
-            return this.f893k;
+        public String mo20879a() {
+            return this.f937k;
         }
     }
 
@@ -220,38 +226,38 @@ public class ChatLog implements Comparable<ChatLog> {
         this.uploadProgress = 0;
     }
 
-    public ChatLog(String str, Type type, String str2) {
+    public ChatLog(String str, Type type2, String str2) {
         this.uploadProgress = 0;
         this.timestamp = Long.valueOf(System.currentTimeMillis());
         this.displayName = str;
         this.message = str2;
         this.unverified = Boolean.valueOf(true);
         this.failed = Boolean.valueOf(false);
-        switch (C0877a.f894a[type.ordinal()]) {
+        switch (C1246a.f938a[type2.ordinal()]) {
             case 1:
-                this.type = C0876b.CHAT_MSG.m708a();
-                this.nick = C0875a.VISITOR_MSG.m706a();
+                this.type = C1245b.CHAT_MSG.mo20879a();
+                this.nick = C1244a.VISITOR_MSG.mo20878a();
                 return;
             case 2:
-                this.type = C0876b.CHAT_MSG.m708a();
-                this.nick = C0875a.AGENT_MSG.m706a();
+                this.type = C1245b.CHAT_MSG.mo20879a();
+                this.nick = C1244a.AGENT_MSG.mo20878a();
                 return;
             case 3:
-                this.type = C0876b.CHAT_EVENT.m708a();
-                this.nick = C0875a.AGENT_SYSTEM.m706a();
+                this.type = C1245b.CHAT_EVENT.mo20879a();
+                this.nick = C1244a.AGENT_SYSTEM.mo20878a();
                 return;
             case 4:
-                this.type = C0876b.CHAT_MSG.m708a();
-                this.nick = C0875a.AGENT_TRIGGER.m706a();
+                this.type = C1245b.CHAT_MSG.mo20879a();
+                this.nick = C1244a.AGENT_TRIGGER.mo20878a();
                 return;
             case 5:
-                this.type = C0876b.MEMBER_JOIN.m708a();
+                this.type = C1245b.MEMBER_JOIN.mo20879a();
                 return;
             case 6:
-                this.type = C0876b.MEMBER_LEAVE.m708a();
+                this.type = C1245b.MEMBER_LEAVE.mo20879a();
                 return;
             case 7:
-                this.type = C0876b.SYSTEM_OFFLINE.m708a();
+                this.type = C1245b.SYSTEM_OFFLINE.mo20879a();
                 return;
             default:
                 return;
@@ -284,16 +290,18 @@ public class ChatLog implements Comparable<ChatLog> {
         int i = 0;
         if (chatLog == null) {
             Log.w(LOG_TAG, "Passed parameter must not be null. Can not compare. Declaring them as same.");
+            return i;
         } else if (this.timestamp == null || chatLog.getTimestamp() == null) {
             Log.w(LOG_TAG, "Error comparing chat logs. Timestamp was null. Declaring them as same.");
+            return i;
         } else {
             try {
-                i = this.timestamp.compareTo(chatLog.getTimestamp());
-            } catch (Throwable e) {
+                return this.timestamp.compareTo(chatLog.getTimestamp());
+            } catch (NullPointerException e) {
                 Log.w(LOG_TAG, "Error comparing chat logs. Timestamp was not initialized. Declaring them as same.", e);
+                return i;
             }
         }
-        return i;
     }
 
     @Nullable
@@ -356,9 +364,9 @@ public class ChatLog implements Comparable<ChatLog> {
 
     @NonNull
     public Type getType() {
-        switch (C0877a.f896c[C0876b.m707a(this.type).ordinal()]) {
+        switch (C1246a.f940c[C1245b.m720a(this.type).ordinal()]) {
             case 1:
-                switch (C0877a.f895b[C0875a.m705a(this.nick).ordinal()]) {
+                switch (C1246a.f939b[C1244a.m718a(this.nick).ordinal()]) {
                     case 1:
                         return Type.CHAT_MSG_SYSTEM;
                     case 2:
@@ -396,7 +404,7 @@ public class ChatLog implements Comparable<ChatLog> {
         }
         try {
             return new URL(this.uploadUrl);
-        } catch (Throwable e) {
+        } catch (MalformedURLException e) {
             Log.w(LOG_TAG, "Can not retrieve url. ", e);
             return null;
         }
@@ -421,16 +429,16 @@ public class ChatLog implements Comparable<ChatLog> {
         this.comment = str;
     }
 
-    public void setError(Error error) {
-        this.error = error.getValue();
+    public void setError(Error error2) {
+        this.error = error2.getValue();
     }
 
     public void setFailed(boolean z) {
         this.failed = Boolean.valueOf(z);
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setFile(File file2) {
+        this.file = file2;
     }
 
     public void setProgress(int i) {
@@ -443,8 +451,8 @@ public class ChatLog implements Comparable<ChatLog> {
         }
     }
 
-    public void setRating(Rating rating) {
-        this.rating = rating.getValue();
+    public void setRating(Rating rating2) {
+        this.rating = rating2.getValue();
     }
 
     public String toString() {

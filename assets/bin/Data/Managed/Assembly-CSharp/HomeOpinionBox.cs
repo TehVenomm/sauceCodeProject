@@ -21,7 +21,12 @@ public class HomeOpinionBox : OpinionBox
 	protected override void OnQuery_SEND()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<UserInfoManager>.I.SendOpinionMessage(GetInputValue((Enum)UI.IPT_TEXT), delegate(bool is_success)
+		string text = GetInputValue((Enum)UI.IPT_TEXT);
+		if (!string.IsNullOrEmpty(text))
+		{
+			text = text.Replace("\n", "\\n");
+		}
+		MonoBehaviourSingleton<UserInfoManager>.I.SendOpinionMessage(text, delegate(bool is_success)
 		{
 			if (isFromRieviewAppeal && is_success)
 			{
@@ -29,7 +34,7 @@ public class HomeOpinionBox : OpinionBox
 			}
 			else
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			}
 		});
 	}
@@ -52,7 +57,7 @@ public class HomeOpinionBox : OpinionBox
 	{
 		MonoBehaviourSingleton<UserInfoManager>.I.SendAppReviewInfo(starValue, replyAction, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

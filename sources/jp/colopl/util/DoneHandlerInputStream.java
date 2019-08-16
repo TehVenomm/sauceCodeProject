@@ -1,9 +1,10 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/* renamed from: jp.colopl.util.DoneHandlerInputStream */
 final class DoneHandlerInputStream extends FilterInputStream {
     private boolean done;
 

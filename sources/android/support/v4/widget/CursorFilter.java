@@ -1,12 +1,14 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.database.Cursor;
 import android.widget.Filter;
 import android.widget.Filter.FilterResults;
 
+/* renamed from: android.support.v4.widget.CursorFilter */
 class CursorFilter extends Filter {
     CursorFilterClient mClient;
 
+    /* renamed from: android.support.v4.widget.CursorFilter$CursorFilterClient */
     interface CursorFilterClient {
         void changeCursor(Cursor cursor);
 
@@ -25,7 +27,8 @@ class CursorFilter extends Filter {
         return this.mClient.convertToString((Cursor) obj);
     }
 
-    protected FilterResults performFiltering(CharSequence charSequence) {
+    /* access modifiers changed from: protected */
+    public FilterResults performFiltering(CharSequence charSequence) {
         Cursor runQueryOnBackgroundThread = this.mClient.runQueryOnBackgroundThread(charSequence);
         FilterResults filterResults = new FilterResults();
         if (runQueryOnBackgroundThread != null) {
@@ -38,7 +41,8 @@ class CursorFilter extends Filter {
         return filterResults;
     }
 
-    protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+    /* access modifiers changed from: protected */
+    public void publishResults(CharSequence charSequence, FilterResults filterResults) {
         Cursor cursor = this.mClient.getCursor();
         if (filterResults.values != null && filterResults.values != cursor) {
             this.mClient.changeCursor((Cursor) filterResults.values);

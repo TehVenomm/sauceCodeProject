@@ -17,8 +17,7 @@ namespace BestHTTP
 
 		public static SupportedProtocols GetProtocolFromUri(Uri uri)
 		{
-			string text = uri.Scheme.ToLowerInvariant();
-			switch (text)
+			switch (uri.Scheme.ToLowerInvariant())
 			{
 			case "ws":
 			case "wss":
@@ -30,8 +29,7 @@ namespace BestHTTP
 
 		public static bool IsSecureProtocol(Uri uri)
 		{
-			string text = uri.Scheme.ToLowerInvariant();
-			switch (text)
+			switch (uri.Scheme.ToLowerInvariant())
 			{
 			case "https":
 			case "wss":

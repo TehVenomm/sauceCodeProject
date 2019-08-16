@@ -9,9 +9,8 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.p000v4.app.NotificationCompat;
 import android.util.Log;
-import com.zopim.android.sdk.api.FileTransfers.C0793a;
-import com.zopim.android.sdk.api.FileTransfers.C0794b;
 import com.zopim.android.sdk.api.ZopimChat.SessionConfig;
 import com.zopim.android.sdk.attachment.SdkCache;
 import com.zopim.android.sdk.data.ConnectionPath.ConnectivityReceiver;
@@ -40,68 +39,81 @@ public class ChatService extends Service implements Chat {
     static final String EXTRA_ACCOUNT_KEY = "ACCOUNT_KEY";
     static final String EXTRA_MACHINE_ID = "MACHINE_ID";
     static final String EXTRA_SESSION_CONFIG = "SESSION_CONFIG";
-    private static final String LOG_TAG = ChatService.class.getSimpleName();
-    private static C0797a mChat;
+    /* access modifiers changed from: private */
+    public static final String LOG_TAG = ChatService.class.getSimpleName();
+    /* access modifiers changed from: private */
+    public static C1137a mChat;
     private long mChatInitializationTimeout;
-    private boolean mChatInitialized;
-    ChatLogObserver mChatLogObserver = new C0799c(this);
+    /* access modifiers changed from: private */
+    public boolean mChatInitialized;
+    ChatLogObserver mChatLogObserver = new C1142c(this);
     private long mChatSessionTimeout;
     private final ChatTimeoutReceiver mChatTimeoutReceiver = new ChatTimeoutReceiver();
-    ConnectionObserver mConnectionObserver = new C0803f(this);
+    ConnectionObserver mConnectionObserver = new C1145f(this);
     private final ConnectivityReceiver mConnectivityReceiver = new ConnectivityReceiver();
-    private String mDepartment;
+    /* access modifiers changed from: private */
+    public String mDepartment;
     private boolean mEnded;
     ScheduledFuture mKeepAliveRunner;
-    private PreChatForm mPreChatForm;
+    /* access modifiers changed from: private */
+    public PreChatForm mPreChatForm;
     private String mReferrer;
     private final IBinder mServiceBinder = new LocalBinder();
-    private String[] mTags;
+    /* access modifiers changed from: private */
+    public String[] mTags;
     private String mTitle;
     Queue<File> mUnsentFiles = new ConcurrentLinkedQueue();
     Queue<String> mUnsentMessages = new ConcurrentLinkedQueue();
-    private String mVisitorEmail;
-    private String mVisitorName;
-    private String mVisitorPhoneNumber;
+    /* access modifiers changed from: private */
+    public String mVisitorEmail;
+    /* access modifiers changed from: private */
+    public String mVisitorName;
+    /* access modifiers changed from: private */
+    public String mVisitorPhoneNumber;
 
     public class LocalBinder extends Binder {
+        public LocalBinder() {
+        }
+
         public Chat getService() {
             return ChatService.this;
         }
     }
 
-    private boolean canCommunicate() {
+    /* access modifiers changed from: private */
+    public boolean canCommunicate() {
         if (this.mChatInitialized) {
             Connection connection = ZopimChat.getDataSource().getConnection();
             if ((connection != null ? connection.getStatus() : Status.UNKNOWN) == Status.CONNECTED) {
                 return true;
             }
         }
-        Logger.m562i(LOG_TAG, "Can not communicate at the moment. Chat is either not initialized or not connected.");
+        Logger.m575i(LOG_TAG, "Can not communicate at the moment. Chat is either not initialized or not connected.");
         return false;
     }
 
     private void configureInitializationTimeout(boolean z) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService("alarm");
+        AlarmManager alarmManager = (AlarmManager) getSystemService(NotificationCompat.CATEGORY_ALARM);
         Intent intent = new Intent(this, ChatService.class);
         intent.setAction(ChatSession.ACTION_CHAT_INITIALIZATION_TIMEOUT);
         PendingIntent service = PendingIntent.getService(this, 0, intent, 134217728);
         if (alarmManager != null) {
-            Logger.m564v(LOG_TAG, "Alarm manager acquired, scheduling chat initialization timeout");
+            Logger.m577v(LOG_TAG, "Alarm manager acquired, scheduling chat initialization timeout");
             long elapsedRealtime = SystemClock.elapsedRealtime() + this.mChatInitializationTimeout;
             if (z) {
                 alarmManager.set(3, elapsedRealtime, service);
-                return;
             } else {
                 alarmManager.cancel(service);
-                return;
             }
+        } else {
+            Log.w(LOG_TAG, "Could not get the Alarm manager, will not set chat initialization timeout");
         }
-        Log.w(LOG_TAG, "Could not get the Alarm manager, will not set chat initialization timeout");
     }
 
-    private void onChatInitialized() {
+    /* access modifiers changed from: private */
+    public void onChatInitialized() {
         Log.v(LOG_TAG, "Chat initialization completed");
-        mChat.mo4234b();
+        mChat.mo20638b();
         this.mChatInitialized = true;
         configureInitializationTimeout(false);
         Profile profile = ZopimChat.getDataSource().getProfile();
@@ -113,17 +125,17 @@ public class ChatService extends Service implements Chat {
         setPhoneNumber(this.mVisitorPhoneNumber);
         setDepartment(this.mDepartment);
         if (this.mTags != null && this.mTags.length > 0) {
-            mChat.mo4233a(this.mTags);
+            mChat.mo20637a(this.mTags);
         }
     }
 
     private void prepareTimeout() {
-        AlarmManager alarmManager = (AlarmManager) getSystemService("alarm");
+        AlarmManager alarmManager = (AlarmManager) getSystemService(NotificationCompat.CATEGORY_ALARM);
         Intent intent = new Intent(this, ChatService.class);
         intent.setAction(ChatSession.ACTION_CHAT_SESSION_TIMEOUT);
         PendingIntent service = PendingIntent.getService(this, 0, intent, 134217728);
         if (alarmManager != null) {
-            Logger.m564v(LOG_TAG, "Alarm manager acquired, scheduling chat timeout");
+            Logger.m577v(LOG_TAG, "Alarm manager acquired, scheduling chat timeout");
             alarmManager.set(3, SystemClock.elapsedRealtime() + this.mChatSessionTimeout, service);
             return;
         }
@@ -131,7 +143,10 @@ public class ChatService extends Service implements Chat {
     }
 
     public boolean emailTranscript(String str) {
-        return canCommunicate() ? mChat.emailTranscript(str) : false;
+        if (canCommunicate()) {
+            return mChat.emailTranscript(str);
+        }
+        return false;
     }
 
     public void endChat() {
@@ -147,13 +162,14 @@ public class ChatService extends Service implements Chat {
         stopSelf();
     }
 
-    protected void finalize() {
-        Logger.m564v(LOG_TAG, "Service cleared from memory by GC");
+    /* access modifiers changed from: protected */
+    public void finalize() {
+        Logger.m577v(LOG_TAG, "Service cleared from memory by GC");
         super.finalize();
     }
 
     public ChatConfig getConfig() {
-        return new C0804g(this);
+        return new C1146g(this);
     }
 
     public boolean hasEnded() {
@@ -187,16 +203,15 @@ public class ChatService extends Service implements Chat {
 
     public int onStartCommand(Intent intent, int i, int i2) {
         if (intent == null) {
-            Logger.m564v(LOG_TAG, "Service restarted by the system, will not reinitialize the web binder");
+            Logger.m577v(LOG_TAG, "Service restarted by the system, will not reinitialize the web binder");
             return 1;
         }
         String action = intent.getAction();
-        Intent intent2;
         if (ChatSession.ACTION_CHAT_INITIALIZATION_TIMEOUT.equals(action)) {
             if (this.mChatInitialized) {
                 return 1;
             }
-            intent2 = new Intent();
+            Intent intent2 = new Intent();
             intent2.setAction(ChatSession.ACTION_CHAT_INITIALIZATION_TIMEOUT);
             intent2.setPackage(getApplicationContext().getPackageName());
             sendOrderedBroadcast(intent2, null);
@@ -205,17 +220,14 @@ public class ChatService extends Service implements Chat {
             return 2;
         } else if (ChatSession.ACTION_CHAT_SESSION_TIMEOUT.equals(action)) {
             Log.i(LOG_TAG, "Chat has timed out. Ending chat session.");
-            intent2 = new Intent();
-            intent2.setAction(ChatSession.ACTION_CHAT_SESSION_TIMEOUT);
-            intent2.setPackage(getApplicationContext().getPackageName());
-            sendBroadcast(intent2);
+            Intent intent3 = new Intent();
+            intent3.setAction(ChatSession.ACTION_CHAT_SESSION_TIMEOUT);
+            intent3.setPackage(getApplicationContext().getPackageName());
+            sendBroadcast(intent3);
             endChat();
             return 2;
-        } else if (ACTION_CHAT_RECONNECT.equals(action) && this.mChatInitialized) {
-            Logger.m562i(LOG_TAG, "Chat service already running and initialized, no need to re-initialize the web widget");
-            return 1;
-        } else {
-            mChat = new C0821x(this);
+        } else if (!ACTION_CHAT_RECONNECT.equals(action) || !this.mChatInitialized) {
+            mChat = new C1164x(this);
             this.mChatInitialized = false;
             this.mEnded = false;
             ZopimChat.getDataSource().clear();
@@ -254,9 +266,12 @@ public class ChatService extends Service implements Chat {
                 this.mChatSessionTimeout = ChatSession.DEFAULT_CHAT_SESSION_TIMEOUT;
             }
             configureInitializationTimeout(true);
-            this.mKeepAliveRunner = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new C0798b(this), 1, 1, TimeUnit.MINUTES);
-            mChat.mo4232a(stringExtra, stringExtra2, this.mTitle, this.mReferrer);
+            this.mKeepAliveRunner = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new C1141b(this), 1, 1, TimeUnit.MINUTES);
+            mChat.mo20636a(stringExtra, stringExtra2, this.mTitle, this.mReferrer);
             Log.v(LOG_TAG, "Chat service started");
+            return 1;
+        } else {
+            Logger.m575i(LOG_TAG, "Chat service already running and initialized, no need to re-initialize the web widget");
             return 1;
         }
     }
@@ -276,13 +291,13 @@ public class ChatService extends Service implements Chat {
 
     public void send(File file) {
         if (canCommunicate()) {
-            C0793a find = FileTransfers.INSTANCE.find(file);
-            if (find == null || find.f615b != C0794b.f620e) {
+            C1134a find = FileTransfers.INSTANCE.find(file);
+            if (find == null || find.f659b != C1135b.f664e) {
                 mChat.send(file);
                 return;
             }
-            Logger.m564v(LOG_TAG, "Re-sending file");
-            find.f615b = C0794b.f617b;
+            Logger.m577v(LOG_TAG, "Re-sending file");
+            find.f659b = C1135b.f661b;
             LivechatChatLogPath.getInstance().broadcast();
             return;
         }
@@ -312,7 +327,10 @@ public class ChatService extends Service implements Chat {
     }
 
     public boolean sendOfflineMessage(String str, String str2, String str3) {
-        return canCommunicate() ? mChat.sendOfflineMessage(str, str2, str3) : false;
+        if (canCommunicate()) {
+            return mChat.sendOfflineMessage(str, str2, str3);
+        }
+        return false;
     }
 
     public void setDepartment(String str) {

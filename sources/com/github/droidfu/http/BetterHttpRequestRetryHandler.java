@@ -14,8 +14,8 @@ import org.apache.http.protocol.HttpContext;
 
 public class BetterHttpRequestRetryHandler implements HttpRequestRetryHandler {
     private static final int RETRY_SLEEP_TIME_MILLIS = 1500;
-    private static HashSet<Class<?>> exceptionBlacklist = new HashSet();
-    private static HashSet<Class<?>> exceptionWhitelist = new HashSet();
+    private static HashSet<Class<?>> exceptionBlacklist = new HashSet<>();
+    private static HashSet<Class<?>> exceptionWhitelist = new HashSet<>();
     private int maxRetries;
     private int timesRetried;
 

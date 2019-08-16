@@ -3,7 +3,7 @@ package com.google.android.gms.auth.api.credentials;
 import android.accounts.Account;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 
 public final class IdentityProviders {
     public static final String FACEBOOK = "https://www.facebook.com";
@@ -19,7 +19,13 @@ public final class IdentityProviders {
 
     @Nullable
     public static final String getIdentityProviderForAccount(@NonNull Account account) {
-        zzbp.zzb((Object) account, (Object) "account cannot be null");
-        return "com.google".equals(account.type) ? GOOGLE : "com.facebook.auth.login".equals(account.type) ? FACEBOOK : null;
+        Preconditions.checkNotNull(account, "account cannot be null");
+        if ("com.google".equals(account.type)) {
+            return GOOGLE;
+        }
+        if ("com.facebook.auth.login".equals(account.type)) {
+            return FACEBOOK;
+        }
+        return null;
     }
 }

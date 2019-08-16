@@ -1,12 +1,11 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ArenaTable : Singleton<ArenaTable>, IDataTable
 {
 	public class ArenaData
 	{
-		public const string NT = "id,groupId,rank,limit_0,limit_1,limit_2,condition_0,condition_1,condition_2,timeLimit,level,questId_0,questId_1,questId_2,questId_3,questId_4";
-
 		public int id;
 
 		public ARENA_GROUP group;
@@ -22,6 +21,8 @@ public class ArenaTable : Singleton<ArenaTable>, IDataTable
 		public int level;
 
 		public int[] questIds;
+
+		public const string NT = "id,groupId,rank,limit_0,limit_1,limit_2,condition_0,condition_1,condition_2,timeLimit,level,questId_0,questId_1,questId_2,questId_3,questId_4";
 
 		public static bool cb(CSVReader csv_reader, ArenaData data, ref uint key)
 		{
@@ -80,9 +81,12 @@ public class ArenaTable : Singleton<ArenaTable>, IDataTable
 
 	private UIntKeyTable<ArenaData> arenaDataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<ArenaData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		arenaDataTable = TableUtility.CreateUIntKeyTable<ArenaData>(csv_text, ArenaData.cb, "id,groupId,rank,limit_0,limit_1,limit_2,condition_0,condition_1,condition_2,timeLimit,level,questId_0,questId_1,questId_2,questId_3,questId_4", null);
+		arenaDataTable = TableUtility.CreateUIntKeyTable<ArenaData>(csv_text, ArenaData.cb, "id,groupId,rank,limit_0,limit_1,limit_2,condition_0,condition_1,condition_2,timeLimit,level,questId_0,questId_1,questId_2,questId_3,questId_4");
 		arenaDataTable.TrimExcess();
 	}
 

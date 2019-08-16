@@ -1,5 +1,6 @@
-package jp.colopl.libs;
+package p018jp.colopl.libs;
 
+/* renamed from: jp.colopl.libs.GuestCheckinInfo */
 public class GuestCheckinInfo {
     private String mAppId;
     private String mGuestUserId;

@@ -30,7 +30,6 @@ public class GuildInfoDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		_clanId = (int)GameSection.GetEventData();
 		this.StartCoroutine(DoInitialize());
 	}
@@ -40,12 +39,12 @@ public class GuildInfoDialog : GameSection
 		bool finish_get_statistic = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(_clanId, delegate(bool success, GuildStatisticInfo info)
 		{
-			((_003CDoInitialize_003Ec__Iterator4B)/*Error near IL_0038: stateMachine*/)._003Cfinish_get_statistic_003E__0 = true;
-			((_003CDoInitialize_003Ec__Iterator4B)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this._info = info;
+			finish_get_statistic = true;
+			_info = info;
 		});
 		while (!finish_get_statistic)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.Initialize();
 	}
@@ -76,8 +75,8 @@ public class GuildInfoDialog : GameSection
 		SetLabelText((Enum)UI.LBL_HUNTER_NUM, $"{_info.currentMem}/{_info.memCap}");
 		SetActive((Enum)UI.BTN_JOIN, _info.privacy == 0);
 		SetActive((Enum)UI.BTN_REQUEST, _info.privacy == 1);
-		SetButtonEnabled((Enum)UI.BTN_JOIN, _info.canJoin, true);
-		SetButtonEnabled((Enum)UI.BTN_REQUEST, _info.canJoin, true);
+		SetButtonEnabled((Enum)UI.BTN_JOIN, _info.canJoin, is_update_child_label: true);
+		SetButtonEnabled((Enum)UI.BTN_REQUEST, _info.canJoin, is_update_child_label: true);
 	}
 
 	private void OnQuery_JOIN()
@@ -86,14 +85,17 @@ public class GuildInfoDialog : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(_clanId, -1, delegate(bool isSuccess, Error error)
 		{
-			GuildInfoDialog guildInfoDialog = this;
 			DoWaitProtocolBusyFinish(delegate
 			{
 				if (!GuildManager.IsValidInGuild())
 				{
-					GameSection.ChangeStayEvent("REQUEST", null);
+					GameSection.ChangeStayEvent("REQUEST");
 				}
-				GameSection.ResumeEvent(isSuccess, null);
+				else
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.UPDATE_EQUIP_CHANGE);
+				}
+				GameSection.ResumeEvent(isSuccess);
 			});
 		});
 	}
@@ -117,13 +119,13 @@ public class GuildInfoDialog : GameSection
 			{
 				if (isSuccess)
 				{
-					guildInfoDialog.SetButtonEnabled((Enum)UI.BTN_REQUEST, false, true);
+					guildInfoDialog.SetButtonEnabled((Enum)UI.BTN_REQUEST, is_enabled: false, is_update_child_label: true);
 				}
 				if (GuildManager.IsValidInGuild())
 				{
-					GameSection.ChangeStayEvent("JOIN", null);
+					GameSection.ChangeStayEvent("JOIN");
 				}
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			});
 		});
 	}

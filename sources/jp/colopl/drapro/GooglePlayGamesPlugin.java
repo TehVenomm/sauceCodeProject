@@ -1,4 +1,4 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -7,6 +7,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/* renamed from: jp.colopl.drapro.GooglePlayGamesPlugin */
 public class GooglePlayGamesPlugin {
     public static void connect(StartActivity startActivity) {
         startActivity.connect();

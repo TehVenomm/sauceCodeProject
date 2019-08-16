@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPacketSender
+public class ObjectPacketSender : MonoBehaviour
 {
 	public class ActionHistoryData
 	{
@@ -44,10 +44,6 @@ public class ObjectPacketSender
 
 	public static ObjectPacketSender SetupComponent(StageObject set_object)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (set_object is Enemy)
 		{
 			return set_object.get_gameObject().AddComponent<EnemyPacketSender>();
@@ -160,11 +156,11 @@ public class ObjectPacketSender
 		{
 			if (to_client_id == 0)
 			{
-				SendBroadcast(actionHistoryList[i], false, null, null);
+				SendBroadcast(actionHistoryList[i]);
 			}
 			else
 			{
-				SendToExtra(to_client_id, actionHistoryList[i], false, null, null);
+				SendToExtra(to_client_id, actionHistoryList[i]);
 			}
 		}
 		SaveNeedWaitSyncTime();
@@ -205,7 +201,7 @@ public class ObjectPacketSender
 		{
 			Coop_Model_ObjectDestroy coop_Model_ObjectDestroy = new Coop_Model_ObjectDestroy();
 			coop_Model_ObjectDestroy.id = owner.id;
-			SendBroadcast(coop_Model_ObjectDestroy, true, null, null);
+			SendBroadcast(coop_Model_ObjectDestroy, promise: true);
 		}
 	}
 
@@ -216,7 +212,7 @@ public class ObjectPacketSender
 			Coop_Model_ObjectAttackedHitOwner coop_Model_ObjectAttackedHitOwner = new Coop_Model_ObjectAttackedHitOwner();
 			coop_Model_ObjectAttackedHitOwner.id = owner.id;
 			coop_Model_ObjectAttackedHitOwner.SetAttackedHitStatus(status);
-			SendTo(owner.coopClientId, coop_Model_ObjectAttackedHitOwner, false, null, null);
+			SendTo(owner.coopClientId, coop_Model_ObjectAttackedHitOwner);
 		}
 	}
 
@@ -233,12 +229,16 @@ public class ObjectPacketSender
 			{
 				flag = true;
 			}
+			if (status.reactionType == 22)
+			{
+				flag = true;
+			}
 			Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix = new Coop_Model_ObjectAttackedHitFix();
 			coop_Model_ObjectAttackedHitFix.id = owner.id;
 			coop_Model_ObjectAttackedHitFix.SetAttackedHitStatus(status);
 			if (flag)
 			{
-				SendBroadcast(coop_Model_ObjectAttackedHitFix, true, null, delegate(Coop_Model_Base send_model)
+				SendBroadcast(coop_Model_ObjectAttackedHitFix, promise: true, null, delegate(Coop_Model_Base send_model)
 				{
 					if (owner == null)
 					{
@@ -259,12 +259,17 @@ public class ObjectPacketSender
 							coop_Model_ObjectAttackedHitFix2.reactionType = 0;
 						}
 					}
+					BarrierBulletObject barrierBulletObject = owner as BarrierBulletObject;
+					if (barrierBulletObject != null)
+					{
+						coop_Model_ObjectAttackedHitFix2.afterHP = barrierBulletObject.GetHp();
+					}
 					return true;
 				});
 			}
 			else
 			{
-				SendBroadcast(coop_Model_ObjectAttackedHitFix, false, null, null);
+				SendBroadcast(coop_Model_ObjectAttackedHitFix);
 			}
 		}
 	}
@@ -276,7 +281,7 @@ public class ObjectPacketSender
 			Coop_Model_ObjectKeepWaitingPacket coop_Model_ObjectKeepWaitingPacket = new Coop_Model_ObjectKeepWaitingPacket();
 			coop_Model_ObjectKeepWaitingPacket.id = owner.id;
 			coop_Model_ObjectKeepWaitingPacket.type = (int)waiting_packet_type;
-			SendBroadcast(coop_Model_ObjectKeepWaitingPacket, false, null, null);
+			SendBroadcast(coop_Model_ObjectKeepWaitingPacket);
 		}
 	}
 
@@ -287,18 +292,78 @@ public class ObjectPacketSender
 			Coop_Model_ObjectBulletObservableSet coop_Model_ObjectBulletObservableSet = new Coop_Model_ObjectBulletObservableSet();
 			coop_Model_ObjectBulletObservableSet.id = owner.id;
 			coop_Model_ObjectBulletObservableSet.observedID = observedID;
-			SendBroadcast(coop_Model_ObjectBulletObservableSet, false, null, null);
+			SendBroadcast(coop_Model_ObjectBulletObservableSet);
 		}
 	}
 
-	public void OnBulletObservableBroken(int observedID)
+	public void OnBulletObservableBroken(int observedID, bool isSendOnlyOriginal)
+	{
+		if (!enableSend)
+		{
+			return;
+		}
+		if (isSendOnlyOriginal)
+		{
+			if (!owner.IsOriginal())
+			{
+				return;
+			}
+		}
+		else if (owner.IsCoopNone())
+		{
+			return;
+		}
+		Coop_Model_ObjectBulletObservableBroken coop_Model_ObjectBulletObservableBroken = new Coop_Model_ObjectBulletObservableBroken();
+		coop_Model_ObjectBulletObservableBroken.id = owner.id;
+		coop_Model_ObjectBulletObservableBroken.observedID = observedID;
+		SendBroadcast(coop_Model_ObjectBulletObservableBroken);
+	}
+
+	public void OnBulletObservableSearchTarget(int observedID, int targetId)
 	{
 		if (enableSend && owner.IsOriginal())
 		{
-			Coop_Model_ObjectBulletObservableBroken coop_Model_ObjectBulletObservableBroken = new Coop_Model_ObjectBulletObservableBroken();
-			coop_Model_ObjectBulletObservableBroken.id = owner.id;
-			coop_Model_ObjectBulletObservableBroken.observedID = observedID;
-			SendBroadcast(coop_Model_ObjectBulletObservableBroken, false, null, null);
+			Coop_Model_ObjectBulletObservableSearchTarget coop_Model_ObjectBulletObservableSearchTarget = new Coop_Model_ObjectBulletObservableSearchTarget();
+			coop_Model_ObjectBulletObservableSearchTarget.id = owner.id;
+			coop_Model_ObjectBulletObservableSearchTarget.observedID = observedID;
+			coop_Model_ObjectBulletObservableSearchTarget.targetId = targetId;
+			SendBroadcast(coop_Model_ObjectBulletObservableSearchTarget);
+		}
+	}
+
+	public void OnBulletObservableTurretBitTarget(int observedID, int targetId, int regionId)
+	{
+		if (enableSend && owner.IsOriginal())
+		{
+			Coop_Model_ObjectBulletObservableTurretBitTarget coop_Model_ObjectBulletObservableTurretBitTarget = new Coop_Model_ObjectBulletObservableTurretBitTarget();
+			coop_Model_ObjectBulletObservableTurretBitTarget.id = owner.id;
+			coop_Model_ObjectBulletObservableTurretBitTarget.observedID = observedID;
+			coop_Model_ObjectBulletObservableTurretBitTarget.targetId = targetId;
+			SendBroadcast(coop_Model_ObjectBulletObservableTurretBitTarget);
+		}
+	}
+
+	public void OnShotGimmickGenerator(Vector3 pos)
+	{
+		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		if (enableSend && owner.IsOriginal())
+		{
+			Coop_Model_ObjectShotGimmickGenerator coop_Model_ObjectShotGimmickGenerator = new Coop_Model_ObjectShotGimmickGenerator();
+			coop_Model_ObjectShotGimmickGenerator.id = owner.id;
+			coop_Model_ObjectShotGimmickGenerator.pos = pos;
+			SendBroadcast(coop_Model_ObjectShotGimmickGenerator);
+		}
+	}
+
+	public void OnSetCoopMode(StageObject.COOP_MODE_TYPE coopModeType)
+	{
+		if (enableSend && owner.IsOriginal())
+		{
+			Coop_Model_ObjectCoopInfo coop_Model_ObjectCoopInfo = new Coop_Model_ObjectCoopInfo();
+			coop_Model_ObjectCoopInfo.id = owner.id;
+			coop_Model_ObjectCoopInfo.CoopModeType = coopModeType;
+			SendBroadcast(coop_Model_ObjectCoopInfo);
 		}
 	}
 }

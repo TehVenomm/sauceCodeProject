@@ -30,7 +30,6 @@ public class SmithAbilityItemResult : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		equipItemInfo = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData;
 		Transform val = SetPrefab((Enum)UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
 		abilityList = val.get_gameObject().AddComponent<AbilityChangeAbilityList>();
@@ -47,9 +46,9 @@ public class SmithAbilityItemResult : GameSection
 	protected override void OnOpen()
 	{
 		abilityList.InitUI();
-		abilityList.Open(UITransition.TYPE.OPEN);
-		PlayTween(callback: PlayDirection, ctrl_enum: UI.OBJ_DELAY_1, forward: true, is_input_block: true, tween_ctrl_id: 0);
-		SetActive((Enum)UI.OBJ_DELAY_2, false);
+		abilityList.Open();
+		PlayTween((Enum)UI.OBJ_DELAY_1, forward: true, (EventDelegate.Callback)PlayDirection, is_input_block: true, 0);
+		SetActive((Enum)UI.OBJ_DELAY_2, is_visible: false);
 		base.OnOpen();
 	}
 
@@ -60,16 +59,15 @@ public class SmithAbilityItemResult : GameSection
 
 	private void EndAllDirection()
 	{
-		SetActive((Enum)UI.OBJ_DELAY_2, true);
+		SetActive((Enum)UI.OBJ_DELAY_2, is_visible: true);
 		ResetTween((Enum)UI.OBJ_DELAY_2, 0);
-		PlayTween((Enum)UI.OBJ_DELAY_2, true, (EventDelegate.Callback)null, true, 0);
-		SetActive((Enum)UI.TEX_MODEL, false);
+		PlayTween((Enum)UI.OBJ_DELAY_2, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
+		SetActive((Enum)UI.TEX_MODEL, is_visible: false);
 		RefreshUI();
 	}
 
 	private void PlayDirection()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(_PlayDirection());
 	}
 
@@ -88,7 +86,7 @@ public class SmithAbilityItemResult : GameSection
 	{
 		SetFontStyle((Enum)label, 2);
 		SetLabelText((Enum)label, text);
-		PlayTween(callback: EndAllDirection, ctrl_enum: directionObj, forward: true, is_input_block: false, tween_ctrl_id: 0);
+		PlayTween((Enum)directionObj, forward: true, (EventDelegate.Callback)EndAllDirection, is_input_block: false, 0);
 	}
 
 	private void OnQuery_NEXT()
@@ -101,7 +99,7 @@ public class SmithAbilityItemResult : GameSection
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().Exists((GameSectionHistory.HistoryData x) => x.sectionName == "SmithAbilityChangeSelect"))
 		{
 			GameSection.StopEvent();
-			DispatchEvent("MAIN_MENU_STATUS", null);
+			DispatchEvent("MAIN_MENU_STATUS");
 		}
 	}
 
@@ -111,7 +109,7 @@ public class SmithAbilityItemResult : GameSection
 		{
 			isFirstTap = false;
 			EquipItemAbility[] lotteryAbility = equipItemInfo.GetLotteryAbility();
-			UITweenCtrl.SetDurationWithRate(GetCtrl(UI.OBJ_DIRECTION_1), 0.5f, 0);
+			UITweenCtrl.SetDurationWithRate(GetCtrl(UI.OBJ_DIRECTION_1), 0.5f);
 		}
 	}
 

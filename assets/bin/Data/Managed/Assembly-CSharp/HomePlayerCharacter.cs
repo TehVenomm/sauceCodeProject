@@ -3,13 +3,15 @@ using UnityEngine;
 
 public class HomePlayerCharacter : HomePlayerCharacterBase
 {
-	private static PlayerLoader Load(HomePlayerCharacter chara, GameObject go, FriendCharaInfo chara_info, PlayerLoader.OnCompleteLoad callback)
+	private PlayerLoader _playerLoader;
+
+	private PlayerLoader Load(HomePlayerCharacter chara, GameObject go, FriendCharaInfo chara_info, PlayerLoader.OnCompleteLoad callback)
 	{
-		PlayerLoader playerLoader = go.AddComponent<PlayerLoader>();
+		_playerLoader = go.AddComponent<PlayerLoader>();
 		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
 		if (chara_info != null)
 		{
-			playerLoadInfo.Apply(chara_info, false, true, true, true);
+			playerLoadInfo.Apply(chara_info, need_weapon: false, need_helm: true, need_leg: true, is_priority_visual_equip: true);
 			chara.sexType = chara_info.sex;
 		}
 		else
@@ -37,7 +39,9 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 			int hair_color_id = defaultHasHairColorIndexes[Random.Range(0, defaultHasHairColorIndexes.Length)];
 			playerLoadInfo.SetFace(num, face_type_id, skin_color_id);
 			playerLoadInfo.SetHair(num, hair_style_id, hair_color_id);
-			OutGameSettingsManager.HomeScene.RandomEquip randomEquip = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.randomEquip;
+			IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+			OutGameSettingsManager.HomeScene sceneSetting = currentIHomeManager.GetSceneSetting();
+			OutGameSettingsManager.HomeScene.RandomEquip randomEquip = sceneSetting.randomEquip;
 			uint equip_body_item_id = (uint)Utility.Lot(randomEquip.bodys);
 			uint equip_head_item_id = (uint)Utility.Lot(randomEquip.helms);
 			uint equip_arm_item_id = (uint)Utility.Lot(randomEquip.arms);
@@ -51,14 +55,12 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 			playerLoadInfo.SetEquipLeg(num, equip_leg_item_id);
 			chara.sexType = num;
 		}
-		playerLoader.StartLoad(playerLoadInfo, 0, 99, false, false, true, true, false, false, true, true, SHADER_TYPE.NORMAL, callback, true, -1);
-		return playerLoader;
+		_playerLoader.StartLoad(playerLoadInfo, 0, 99, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.NORMAL, callback);
+		return _playerLoader;
 	}
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
 		return Load(this, this.get_gameObject(), charaInfo, null);
 	}
 
@@ -74,9 +76,7 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 
 	public override bool DispatchEvent()
 	{
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Expected O, but got Unknown
-		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || TutorialMessage.GetCursor(0) != null)
+		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || TutorialMessage.GetCursor() != null)
 		{
 			return false;
 		}
@@ -86,7 +86,7 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 		}
 		if (GetFriendCharaInfo() != null)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomePlayerCharacter", this.get_gameObject(), "HOME_FRIENDS", GetFriendCharaInfo(), null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomePlayerCharacter", this.get_gameObject(), "HOME_FRIENDS", GetFriendCharaInfo());
 			return true;
 		}
 		return false;

@@ -1,10 +1,9 @@
-package net.gogame.gowrap.ui.customtabs.browseractions;
+package net.gogame.gowrap.p019ui.customtabs.browseractions;
 
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
@@ -13,6 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.browseractions.BrowserActionsIntent */
 public class BrowserActionsIntent {
     public static final String ACTION_BROWSER_ACTIONS_OPEN = "android.support.customtabs.browseractions.browser_action_open";
     public static final String EXTRA_APP_ID = "android.support.customtabs.browseractions.APP_ID";
@@ -40,13 +40,16 @@ public class BrowserActionsIntent {
     public final Intent mIntent;
 
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: net.gogame.gowrap.ui.customtabs.browseractions.BrowserActionsIntent$BrowserActionsItemId */
     public @interface BrowserActionsItemId {
     }
 
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: net.gogame.gowrap.ui.customtabs.browseractions.BrowserActionsIntent$BrowserActionsUrlType */
     public @interface BrowserActionsUrlType {
     }
 
+    /* renamed from: net.gogame.gowrap.ui.customtabs.browseractions.BrowserActionsIntent$Builder */
     public static final class Builder {
         private Context mContext;
         private final Intent mIntent = new Intent(BrowserActionsIntent.ACTION_BROWSER_ACTIONS_OPEN);
@@ -59,7 +62,7 @@ public class BrowserActionsIntent {
             this.mContext = context;
             this.mUri = uri;
             this.mType = 0;
-            this.mMenuItems = new ArrayList();
+            this.mMenuItems = new ArrayList<>();
         }
 
         public Builder setUrlType(int i) {
@@ -72,17 +75,20 @@ public class BrowserActionsIntent {
                 throw new IllegalStateException("Exceeded maximum toolbar item count of 5");
             }
             int i = 0;
-            while (i < arrayList.size()) {
-                if (((BrowserActionItem) arrayList.get(i)).getTitle() == null) {
+            while (true) {
+                int i2 = i;
+                if (i2 >= arrayList.size()) {
+                    return this;
+                }
+                if (((BrowserActionItem) arrayList.get(i2)).getTitle() == null) {
                     throw new IllegalArgumentException("Custom item title is null");
-                } else if (((BrowserActionItem) arrayList.get(i)).getAction() == null) {
+                } else if (((BrowserActionItem) arrayList.get(i2)).getAction() == null) {
                     throw new IllegalArgumentException("Custom item action is null");
                 } else {
-                    this.mMenuItems.add(getBundleFromItem((BrowserActionItem) arrayList.get(i)));
-                    i++;
+                    this.mMenuItems.add(getBundleFromItem((BrowserActionItem) arrayList.get(i2)));
+                    i = i2 + 1;
                 }
             }
-            return this;
         }
 
         public Builder setOnItemSelectedAction(PendingIntent pendingIntent) {
@@ -127,6 +133,7 @@ public class BrowserActionsIntent {
     }
 
     public static void launchIntent(Context context, Intent intent) {
+        int i = 0;
         List browserActionsIntentHandlers = getBrowserActionsIntentHandlers(context);
         if (browserActionsIntentHandlers == null || browserActionsIntentHandlers.size() == 0) {
             openFallbackBrowserActionsMenu(context, intent);
@@ -138,10 +145,15 @@ public class BrowserActionsIntent {
             ResolveInfo resolveActivity = context.getPackageManager().resolveActivity(new Intent("android.intent.action.VIEW", Uri.parse(TEST_URL)), 65536);
             if (resolveActivity != null) {
                 String str = resolveActivity.activityInfo.packageName;
-                for (int i = 0; i < browserActionsIntentHandlers.size(); i++) {
-                    if (str.equals(((ResolveInfo) browserActionsIntentHandlers.get(i)).activityInfo.packageName)) {
+                while (true) {
+                    int i2 = i;
+                    if (i2 >= browserActionsIntentHandlers.size()) {
+                        break;
+                    } else if (str.equals(((ResolveInfo) browserActionsIntentHandlers.get(i2)).activityInfo.packageName)) {
                         intent.setPackage(str);
                         break;
+                    } else {
+                        i = i2 + 1;
                     }
                 }
             }
@@ -167,30 +179,75 @@ public class BrowserActionsIntent {
     private static void openFallbackBrowserActionsMenu(Context context, Uri uri, int i, List<BrowserActionItem> list) {
     }
 
-    public static List<BrowserActionItem> parseBrowserActionItems(ArrayList<Bundle> arrayList) {
-        List<BrowserActionItem> arrayList2 = new ArrayList();
-        int i = 0;
-        while (i < arrayList.size()) {
-            Bundle bundle = (Bundle) arrayList.get(i);
-            String string = bundle.getString(KEY_TITLE);
-            PendingIntent pendingIntent = (PendingIntent) bundle.getParcelable(KEY_ACTION);
-            Bitmap bitmap = (Bitmap) bundle.getParcelable(KEY_ICON);
-            if (string != null && pendingIntent != null) {
-                BrowserActionItem browserActionItem = new BrowserActionItem(string, pendingIntent);
-                if (bitmap != null) {
-                    browserActionItem.setIcon(bitmap);
-                }
-                arrayList2.add(browserActionItem);
-                i++;
-            } else if (string != null) {
-                throw new IllegalArgumentException("Missing action for item: " + i);
-            } else if (pendingIntent != null) {
-                throw new IllegalArgumentException("Missing title for item: " + i);
-            } else {
-                throw new IllegalArgumentException("Missing title and action for item: " + i);
-            }
-        }
-        return arrayList2;
+    /* JADX WARNING: Removed duplicated region for block: B:11:0x0040  */
+    /* JADX WARNING: Removed duplicated region for block: B:13:0x0059  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static java.util.List<net.gogame.gowrap.p019ui.customtabs.browseractions.BrowserActionItem> parseBrowserActionItems(java.util.ArrayList<android.os.Bundle> r6) {
+        /*
+            java.util.ArrayList r3 = new java.util.ArrayList
+            r3.<init>()
+            r0 = 0
+            r2 = r0
+        L_0x0007:
+            int r0 = r6.size()
+            if (r2 >= r0) goto L_0x008d
+            java.lang.Object r0 = r6.get(r2)
+            android.os.Bundle r0 = (android.os.Bundle) r0
+            java.lang.String r1 = "android.support.customtabs.browseractions.TITLE"
+            java.lang.String r4 = r0.getString(r1)
+            java.lang.String r1 = "android.support.customtabs.browseractions.ACTION"
+            android.os.Parcelable r1 = r0.getParcelable(r1)
+            android.app.PendingIntent r1 = (android.app.PendingIntent) r1
+            java.lang.String r5 = "android.support.customtabs.browseractions.ICON"
+            android.os.Parcelable r0 = r0.getParcelable(r5)
+            android.graphics.Bitmap r0 = (android.graphics.Bitmap) r0
+            if (r4 == 0) goto L_0x003e
+            if (r1 == 0) goto L_0x003e
+            net.gogame.gowrap.ui.customtabs.browseractions.BrowserActionItem r5 = new net.gogame.gowrap.ui.customtabs.browseractions.BrowserActionItem
+            r5.<init>(r4, r1)
+            if (r0 == 0) goto L_0x0037
+            r5.setIcon(r0)
+        L_0x0037:
+            r3.add(r5)
+            int r0 = r2 + 1
+            r2 = r0
+            goto L_0x0007
+        L_0x003e:
+            if (r4 == 0) goto L_0x0059
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r3 = "Missing action for item: "
+            java.lang.StringBuilder r1 = r1.append(r3)
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r1 = r1.toString()
+            r0.<init>(r1)
+            throw r0
+        L_0x0059:
+            if (r1 == 0) goto L_0x0074
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r3 = "Missing title for item: "
+            java.lang.StringBuilder r1 = r1.append(r3)
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r1 = r1.toString()
+            r0.<init>(r1)
+            throw r0
+        L_0x0074:
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r3 = "Missing title and action for item: "
+            java.lang.StringBuilder r1 = r1.append(r3)
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r1 = r1.toString()
+            r0.<init>(r1)
+            throw r0
+        L_0x008d:
+            return r3
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.gogame.gowrap.p019ui.customtabs.browseractions.BrowserActionsIntent.parseBrowserActionItems(java.util.ArrayList):java.util.List");
     }
 
     public static String getCreatorPackageName(Intent intent) {

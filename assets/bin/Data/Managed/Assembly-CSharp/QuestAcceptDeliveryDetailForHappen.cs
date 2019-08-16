@@ -91,30 +91,39 @@ public class QuestAcceptDeliveryDetailForHappen : QuestAcceptDeliveryDetail
 		submissionFrame = GetCtrl(UI.OBJ_SUBMISSION_FRAME);
 	}
 
+	protected override Vector3 GetEquipBtnPos()
+	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		return new Vector3(170f, -350f, 0f);
+	}
+
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
 		QuestTable.QuestTableData questData = info.GetQuestData();
-		if (questData != null)
+		if (questData == null)
 		{
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
-			if (enemyData != null)
+			return;
+		}
+		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
+		if (enemyData != null)
+		{
+			string text = info.enemyName;
+			if (string.IsNullOrEmpty(text))
 			{
-				SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
-				ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-				itemIcon.SetDepth(7);
-				SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
-				SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-				SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+				text = enemyData.name;
 			}
+			SetLabelText((Enum)UI.LBL_ENEMY_NAME, text);
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY));
+			itemIcon.SetDepth(7);
+			SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+			SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
 		}
 	}
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
 		{
 			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();

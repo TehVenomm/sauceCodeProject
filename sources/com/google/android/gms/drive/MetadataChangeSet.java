@@ -1,16 +1,21 @@
 package com.google.android.gms.drive;
 
-import com.google.android.gms.common.internal.zzbp;
+import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.google.android.gms.common.annotation.KeepForSdk;
+import com.google.android.gms.common.data.BitmapTeleporter;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.drive.metadata.CustomPropertyKey;
 import com.google.android.gms.drive.metadata.MetadataField;
 import com.google.android.gms.drive.metadata.internal.AppVisibleCustomProperties;
 import com.google.android.gms.drive.metadata.internal.AppVisibleCustomProperties.zza;
 import com.google.android.gms.drive.metadata.internal.MetadataBundle;
-import com.google.android.gms.internal.zzbnr;
-import com.google.android.gms.internal.zzboe;
-import com.google.firebase.analytics.FirebaseAnalytics.Param;
+import com.google.android.gms.internal.drive.zzhp;
+import com.google.android.gms.internal.drive.zzic;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 public final class MetadataChangeSet {
@@ -19,139 +24,166 @@ public final class MetadataChangeSet {
     public static final int MAX_PRIVATE_PROPERTIES_PER_RESOURCE_PER_APP = 30;
     public static final int MAX_PUBLIC_PROPERTIES_PER_RESOURCE = 30;
     public static final int MAX_TOTAL_PROPERTIES_PER_RESOURCE = 100;
-    public static final MetadataChangeSet zzgeb = new MetadataChangeSet(MetadataBundle.zzant());
-    private final MetadataBundle zzgec;
+    public static final MetadataChangeSet zzav = new MetadataChangeSet(MetadataBundle.zzaw());
+    private final MetadataBundle zzaw;
 
     public static class Builder {
-        private final MetadataBundle zzgec = MetadataBundle.zzant();
-        private zza zzged;
+        private final MetadataBundle zzaw = MetadataBundle.zzaw();
+        private zza zzax;
 
-        private final zza zzanb() {
-            if (this.zzged == null) {
-                this.zzged = new zza();
+        private static void zza(String str, int i, int i2) {
+            Preconditions.checkArgument(i2 <= i, String.format(Locale.US, "%s must be no more than %d bytes, but is %d bytes.", new Object[]{str, Integer.valueOf(i), Integer.valueOf(i2)}));
+        }
+
+        private static int zzb(@Nullable String str) {
+            if (str == null) {
+                return 0;
             }
-            return this.zzged;
+            return str.getBytes().length;
         }
 
-        private static int zzgp(String str) {
-            return str == null ? 0 : str.getBytes().length;
-        }
-
-        private static void zzi(String str, int i, int i2) {
-            zzbp.zzb(i2 <= i, String.format("%s must be no more than %d bytes, but is %d bytes.", new Object[]{str, Integer.valueOf(i), Integer.valueOf(i2)}));
+        private final zza zzq() {
+            if (this.zzax == null) {
+                this.zzax = new zza();
+            }
+            return this.zzax;
         }
 
         public MetadataChangeSet build() {
-            if (this.zzged != null) {
-                this.zzgec.zzc(zzbnr.zzgkv, this.zzged.zzanq());
+            if (this.zzax != null) {
+                this.zzaw.zzb(zzhp.zzix, this.zzax.zzat());
             }
-            return new MetadataChangeSet(this.zzgec);
+            return new MetadataChangeSet(this.zzaw);
         }
 
         public Builder deleteCustomProperty(CustomPropertyKey customPropertyKey) {
-            zzbp.zzb((Object) customPropertyKey, (Object) "key");
-            zzanb().zza(customPropertyKey, null);
+            Preconditions.checkNotNull(customPropertyKey, "key");
+            zzq().zza(customPropertyKey, null);
             return this;
         }
 
         public Builder setCustomProperty(CustomPropertyKey customPropertyKey, String str) {
-            zzbp.zzb((Object) customPropertyKey, (Object) "key");
-            zzbp.zzb((Object) str, Param.VALUE);
-            zzi("The total size of key string and value string of a custom property", MetadataChangeSet.CUSTOM_PROPERTY_SIZE_LIMIT_BYTES, zzgp(customPropertyKey.getKey()) + zzgp(str));
-            zzanb().zza(customPropertyKey, str);
+            Preconditions.checkNotNull(customPropertyKey, "key");
+            Preconditions.checkNotNull(str, "value");
+            zza("The total size of key string and value string of a custom property", MetadataChangeSet.CUSTOM_PROPERTY_SIZE_LIMIT_BYTES, zzb(customPropertyKey.getKey()) + zzb(str));
+            zzq().zza(customPropertyKey, str);
             return this;
         }
 
         public Builder setDescription(String str) {
-            this.zzgec.zzc(zzbnr.zzgkw, str);
+            this.zzaw.zzb(zzhp.zziy, str);
             return this;
         }
 
         public Builder setIndexableText(String str) {
-            zzi("Indexable text size", 131072, zzgp(str));
-            this.zzgec.zzc(zzbnr.zzglc, str);
+            zza("Indexable text size", 131072, zzb(str));
+            this.zzaw.zzb(zzhp.zzje, str);
             return this;
         }
 
         public Builder setLastViewedByMeDate(Date date) {
-            this.zzgec.zzc(zzboe.zzgmm, date);
+            this.zzaw.zzb(zzic.zzko, date);
             return this;
         }
 
-        public Builder setMimeType(String str) {
-            this.zzgec.zzc(zzbnr.zzglq, str);
+        public Builder setMimeType(@NonNull String str) {
+            Preconditions.checkNotNull(str);
+            this.zzaw.zzb(zzhp.zzjs, str);
             return this;
         }
 
         public Builder setPinned(boolean z) {
-            this.zzgec.zzc(zzbnr.zzgli, Boolean.valueOf(z));
+            this.zzaw.zzb(zzhp.zzjk, Boolean.valueOf(z));
             return this;
         }
 
         public Builder setStarred(boolean z) {
-            this.zzgec.zzc(zzbnr.zzglx, Boolean.valueOf(z));
+            this.zzaw.zzb(zzhp.zzjz, Boolean.valueOf(z));
             return this;
         }
 
-        public Builder setTitle(String str) {
-            this.zzgec.zzc(zzbnr.zzglz, str);
+        public Builder setTitle(@NonNull String str) {
+            Preconditions.checkNotNull(str, "Title cannot be null.");
+            this.zzaw.zzb(zzhp.zzkb, str);
             return this;
         }
 
+        public Builder setViewed() {
+            this.zzaw.zzb(zzhp.zzjr, Boolean.valueOf(true));
+            return this;
+        }
+
+        @Deprecated
         public Builder setViewed(boolean z) {
-            this.zzgec.zzc(zzbnr.zzglp, Boolean.valueOf(z));
+            if (z) {
+                this.zzaw.zzb(zzhp.zzjr, Boolean.valueOf(true));
+            } else if (this.zzaw.zzd(zzhp.zzjr)) {
+                this.zzaw.zzc(zzhp.zzjr);
+            }
             return this;
         }
     }
 
     public MetadataChangeSet(MetadataBundle metadataBundle) {
-        this.zzgec = metadataBundle.zzanu();
+        this.zzaw = metadataBundle.zzax();
     }
 
     public final Map<CustomPropertyKey, String> getCustomPropertyChangeMap() {
-        AppVisibleCustomProperties appVisibleCustomProperties = (AppVisibleCustomProperties) this.zzgec.zza(zzbnr.zzgkv);
-        return appVisibleCustomProperties == null ? Collections.emptyMap() : appVisibleCustomProperties.zzanp();
+        AppVisibleCustomProperties appVisibleCustomProperties = (AppVisibleCustomProperties) this.zzaw.zza((MetadataField<T>) zzhp.zzix);
+        return appVisibleCustomProperties == null ? Collections.emptyMap() : appVisibleCustomProperties.zzas();
     }
 
+    @Nullable
     public final String getDescription() {
-        return (String) this.zzgec.zza(zzbnr.zzgkw);
+        return (String) this.zzaw.zza(zzhp.zziy);
     }
 
+    @Nullable
     public final String getIndexableText() {
-        return (String) this.zzgec.zza(zzbnr.zzglc);
+        return (String) this.zzaw.zza(zzhp.zzje);
     }
 
+    @Nullable
     public final Date getLastViewedByMeDate() {
-        return (Date) this.zzgec.zza(zzboe.zzgmm);
+        return (Date) this.zzaw.zza((MetadataField<T>) zzic.zzko);
     }
 
+    @Nullable
     public final String getMimeType() {
-        return (String) this.zzgec.zza(zzbnr.zzglq);
+        return (String) this.zzaw.zza((MetadataField<T>) zzhp.zzjs);
     }
 
+    @Nullable
+    @KeepForSdk
+    public final Bitmap getThumbnail() {
+        BitmapTeleporter bitmapTeleporter = (BitmapTeleporter) this.zzaw.zza(zzhp.zzka);
+        if (bitmapTeleporter == null) {
+            return null;
+        }
+        return bitmapTeleporter.get();
+    }
+
+    @Nullable
     public final String getTitle() {
-        return (String) this.zzgec.zza(zzbnr.zzglz);
+        return (String) this.zzaw.zza((MetadataField<T>) zzhp.zzkb);
     }
 
+    @Nullable
     public final Boolean isPinned() {
-        return (Boolean) this.zzgec.zza(zzbnr.zzgli);
+        return (Boolean) this.zzaw.zza((MetadataField<T>) zzhp.zzjk);
     }
 
+    @Nullable
     public final Boolean isStarred() {
-        return (Boolean) this.zzgec.zza(zzbnr.zzglx);
+        return (Boolean) this.zzaw.zza((MetadataField<T>) zzhp.zzjz);
     }
 
+    @Nullable
     public final Boolean isViewed() {
-        return (Boolean) this.zzgec.zza(zzbnr.zzglp);
+        return (Boolean) this.zzaw.zza(zzhp.zzjr);
     }
 
-    public final <T> MetadataChangeSet zza(MetadataField<T> metadataField, T t) {
-        MetadataChangeSet metadataChangeSet = new MetadataChangeSet(this.zzgec);
-        metadataChangeSet.zzgec.zzc(metadataField, t);
-        return metadataChangeSet;
-    }
-
-    public final MetadataBundle zzana() {
-        return this.zzgec;
+    public final MetadataBundle zzp() {
+        return this.zzaw;
     }
 }

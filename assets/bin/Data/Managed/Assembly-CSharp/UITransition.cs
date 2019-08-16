@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class UITransition
+public class UITransition : MonoBehaviour
 {
 	public enum TYPE
 	{
@@ -68,39 +69,39 @@ public class UITransition
 
 	private void StartAnim(UITweener[] tweens, Action _callback)
 	{
-		if (busyCount == 0)
+		if (busyCount != 0)
 		{
-			callback = _callback;
-			if (tweens == null || tweens.Length == 0)
+			return;
+		}
+		callback = _callback;
+		if (tweens == null || tweens.Length == 0)
+		{
+			busyCount = 1;
+			AppMain i = MonoBehaviourSingleton<AppMain>.I;
+			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
 			{
-				busyCount = 1;
-				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					OnFinished();
-				});
-			}
-			else
+				OnFinished();
+			});
+			return;
+		}
+		busyCount = tweens.Length;
+		int j = 0;
+		for (int num = tweens.Length; j < num; j++)
+		{
+			tweens[j].set_enabled(true);
+			tweens[j].ResetToBeginning();
+		}
+		if (!GameSceneManager.isAutoEventSkip || !isBusy)
+		{
+			return;
+		}
+		int k = 0;
+		for (int num2 = tweens.Length; k < num2; k++)
+		{
+			if (tweens[k] != null)
 			{
-				busyCount = tweens.Length;
-				int j = 0;
-				for (int num = tweens.Length; j < num; j++)
-				{
-					tweens[j].set_enabled(true);
-					tweens[j].ResetToBeginning();
-				}
-				if (GameSceneManager.isAutoEventSkip && isBusy)
-				{
-					int k = 0;
-					for (int num2 = tweens.Length; k < num2; k++)
-					{
-						if (tweens[k] != null)
-						{
-							tweens[k].tweenFactor = 1f;
-							tweens[k].Sample(1f, false);
-						}
-					}
-				}
+				tweens[k].tweenFactor = 1f;
+				tweens[k].Sample(1f, isFinished: false);
 			}
 		}
 	}

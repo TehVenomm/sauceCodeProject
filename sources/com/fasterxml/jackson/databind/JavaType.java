@@ -16,8 +16,9 @@ public abstract class JavaType extends ResolvedType implements Serializable, Typ
     protected final Object _typeHandler;
     protected final Object _valueHandler;
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected abstract JavaType _narrow(Class<?> cls);
+    public abstract JavaType _narrow(Class<?> cls);
 
     public abstract JavaType containedType(int i);
 
@@ -34,9 +35,9 @@ public abstract class JavaType extends ResolvedType implements Serializable, Typ
 
     public abstract TypeBindings getBindings();
 
-    public abstract StringBuilder getErasedSignature(StringBuilder stringBuilder);
+    public abstract StringBuilder getErasedSignature(StringBuilder sb);
 
-    public abstract StringBuilder getGenericSignature(StringBuilder stringBuilder);
+    public abstract StringBuilder getGenericSignature(StringBuilder sb);
 
     public abstract List<JavaType> getInterfaces();
 
@@ -201,15 +202,15 @@ public abstract class JavaType extends ResolvedType implements Serializable, Typ
     }
 
     public String getGenericSignature() {
-        StringBuilder stringBuilder = new StringBuilder(40);
-        getGenericSignature(stringBuilder);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(40);
+        getGenericSignature(sb);
+        return sb.toString();
     }
 
     public String getErasedSignature() {
-        StringBuilder stringBuilder = new StringBuilder(40);
-        getErasedSignature(stringBuilder);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(40);
+        getErasedSignature(sb);
+        return sb.toString();
     }
 
     public final int hashCode() {

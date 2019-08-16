@@ -43,9 +43,13 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 		BTN_BACK,
 		TGL_CHANGE_INVENTORY,
 		TGL_ICON_ASC,
+		BTN_CHANGE_INVENTORY,
 		OBJ_EMPTY_SKILL_ROOT,
 		TEX_EMPTY_SKILL,
-		LBL_EMPTY_SKILL_TYPE
+		SPR_EMPTY_SKILL,
+		LBL_EMPTY_SKILL_TYPE,
+		OBJ_CAPTION_3,
+		LBL_CAPTION
 	}
 
 	private int preInventoryDataSize;
@@ -64,9 +68,9 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetVisibleEmptySkillType(false, 0);
-		SetActive((Enum)UI.BTN_DECISION, false);
-		SetActive((Enum)UI.BTN_SKILL_DECISION, true);
+		SetVisibleEmptySkillType(is_visible: false);
+		SetActive((Enum)UI.BTN_DECISION, is_visible: false);
+		SetActive((Enum)UI.BTN_SKILL_DECISION, is_visible: true);
 		SetLabelText((Enum)UI.STR_SKILL_DECISION, base.sectionData.GetText("STR_DECISION"));
 		SetLabelText((Enum)UI.STR_SKILL_DECISION_R, base.sectionData.GetText("STR_DECISION"));
 	}
@@ -78,20 +82,20 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 
 	protected override ItemStorageTop.SkillItemInventory CreateInventory()
 	{
-		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.GROW_BASE_SKILL_ITEM, SKILL_SLOT_TYPE.NONE, false);
+		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.GROW_BASE_SKILL_ITEM);
 	}
 
 	protected override void OnOpen()
 	{
-		SetEnabledUIModelRenderTexture(UI.TEX_MODEL, true);
-		SetEnabledUIModelRenderTexture(UI.TEX_INNER_MODEL, true);
+		SetEnabledUIModelRenderTexture(UI.TEX_MODEL, enabled: true);
+		SetEnabledUIModelRenderTexture(UI.TEX_INNER_MODEL, enabled: true);
 		base.OnOpen();
 	}
 
 	protected override void OnClose()
 	{
-		SetEnabledUIModelRenderTexture(UI.TEX_MODEL, false);
-		SetEnabledUIModelRenderTexture(UI.TEX_INNER_MODEL, false);
+		SetEnabledUIModelRenderTexture(UI.TEX_MODEL, enabled: false);
+		SetEnabledUIModelRenderTexture(UI.TEX_INNER_MODEL, enabled: false);
 		base.OnClose();
 	}
 
@@ -105,6 +109,8 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 			reset = true;
 			preInventoryDataSize = num;
 		}
+		m_generatedIconList.Clear();
+		UpdateNewIconInfo();
 		SetDynamicList((Enum)inventoryUI, (string)null, num, reset, (Func<int, bool>)delegate(int i)
 		{
 			SortCompareData sortCompareData2 = inventory.datas[i];
@@ -136,8 +142,16 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 					bool isValidExceed = skillItemInfo.IsEnableExceed();
 					ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, base.IsShowMainStatus, t, "SELECT", i, is_new, 100, selectIndex == i, sortCompareData.IsEquipping(), isValidExceed, isShowEnableExceed);
 					itemIcon.SetItemID(sortCompareData.GetTableID());
-					itemIcon.SetButtonColor(inventory.datas[i].IsPriority(inventory.sortSettings.orderTypeAsc), true);
+					itemIcon.SetButtonColor(inventory.datas[i].IsPriority(inventory.sortSettings.orderTypeAsc), is_instant: true);
 					SetLongTouch(itemIcon.transform, "DETAIL", i);
+					if (itemIcon != null && sortCompareData != null)
+					{
+						itemIcon.SetInitData(sortCompareData);
+					}
+					if (!m_generatedIconList.Contains(itemIcon))
+					{
+						m_generatedIconList.Add(itemIcon);
+					}
 				}
 			}
 		});
@@ -146,16 +160,17 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 	private void SetEnabledUIModelRenderTexture(Enum ctrl_enum, bool enabled)
 	{
 		Transform ctrl = GetCtrl(ctrl_enum);
-		if (Object.op_Implicit(ctrl))
+		if (!Object.op_Implicit(ctrl))
 		{
-			UIModelRenderTexture component = ctrl.GetComponent<UIModelRenderTexture>();
-			if (Object.op_Implicit(component))
+			return;
+		}
+		UIModelRenderTexture component = ctrl.GetComponent<UIModelRenderTexture>();
+		if (Object.op_Implicit(component))
+		{
+			component.set_enabled(enabled);
+			if (!enabled)
 			{
-				component.set_enabled(enabled);
-				if (!enabled)
-				{
-					component.Clear();
-				}
+				component.Clear();
 			}
 		}
 	}
@@ -220,5 +235,10 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 			}
 		}
 		return base.CheckAutoEvent(event_name, event_data);
+	}
+
+	public void OnQuery_SECTION_BACK()
+	{
+		MonoBehaviourSingleton<SmithManager>.I.BackSection();
 	}
 }

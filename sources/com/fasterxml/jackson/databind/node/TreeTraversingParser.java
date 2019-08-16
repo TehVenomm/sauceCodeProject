@@ -69,15 +69,15 @@ public class TreeTraversingParser extends ParserMinimalBase {
             return this._currToken;
         } else if (this._startContainer) {
             this._startContainer = false;
-            if (this._nodeCursor.currentHasChildren()) {
-                this._nodeCursor = this._nodeCursor.iterateChildren();
-                this._currToken = this._nodeCursor.nextToken();
-                if (this._currToken == JsonToken.START_OBJECT || this._currToken == JsonToken.START_ARRAY) {
-                    this._startContainer = true;
-                }
+            if (!this._nodeCursor.currentHasChildren()) {
+                this._currToken = this._currToken == JsonToken.START_OBJECT ? JsonToken.END_OBJECT : JsonToken.END_ARRAY;
                 return this._currToken;
             }
-            this._currToken = this._currToken == JsonToken.START_OBJECT ? JsonToken.END_OBJECT : JsonToken.END_ARRAY;
+            this._nodeCursor = this._nodeCursor.iterateChildren();
+            this._currToken = this._nodeCursor.nextToken();
+            if (this._currToken == JsonToken.START_OBJECT || this._currToken == JsonToken.START_ARRAY) {
+                this._startContainer = true;
+            }
             return this._currToken;
         } else if (this._nodeCursor == null) {
             this._closed = true;
@@ -112,7 +112,10 @@ public class TreeTraversingParser extends ParserMinimalBase {
     }
 
     public String getCurrentName() {
-        return this._nodeCursor == null ? null : this._nodeCursor.getCurrentName();
+        if (this._nodeCursor == null) {
+            return null;
+        }
+        return this._nodeCursor.getCurrentName();
     }
 
     public void overrideCurrentName(String str) {
@@ -126,11 +129,11 @@ public class TreeTraversingParser extends ParserMinimalBase {
     }
 
     public JsonLocation getTokenLocation() {
-        return JsonLocation.NA;
+        return JsonLocation.f405NA;
     }
 
     public JsonLocation getCurrentLocation() {
-        return JsonLocation.NA;
+        return JsonLocation.f405NA;
     }
 
     public String getText() {
@@ -175,7 +178,10 @@ public class TreeTraversingParser extends ParserMinimalBase {
 
     public NumberType getNumberType() throws IOException, JsonParseException {
         JsonNode currentNumericNode = currentNumericNode();
-        return currentNumericNode == null ? null : currentNumericNode.numberType();
+        if (currentNumericNode == null) {
+            return null;
+        }
+        return currentNumericNode.numberType();
     }
 
     public BigInteger getBigIntegerValue() throws IOException, JsonParseException {
@@ -247,14 +253,16 @@ public class TreeTraversingParser extends ParserMinimalBase {
         return binaryValue.length;
     }
 
-    protected JsonNode currentNode() {
+    /* access modifiers changed from: protected */
+    public JsonNode currentNode() {
         if (this._closed || this._nodeCursor == null) {
             return null;
         }
         return this._nodeCursor.currentNode();
     }
 
-    protected JsonNode currentNumericNode() throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public JsonNode currentNumericNode() throws JsonParseException {
         JsonNode currentNode = currentNode();
         if (currentNode != null && currentNode.isNumber()) {
             return currentNode;
@@ -262,7 +270,8 @@ public class TreeTraversingParser extends ParserMinimalBase {
         throw _constructError("Current token (" + (currentNode == null ? null : currentNode.asToken()) + ") not numeric, can not use numeric value accessors");
     }
 
-    protected void _handleEOF() throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _handleEOF() throws JsonParseException {
         _throwInternal();
     }
 }

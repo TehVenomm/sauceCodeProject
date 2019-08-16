@@ -108,8 +108,8 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 			{
 				OnNotFoundQuest();
 			}
-			GameSection.ResumeEvent(true, null);
-		}, true);
+			GameSection.ResumeEvent(is_resume: true);
+		}, saveSettings: true);
 	}
 
 	protected override void SendRandomMatching()
@@ -125,7 +125,7 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 			{
 				OnNotFoundMatchingParty();
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 
@@ -160,7 +160,7 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 	{
 		if (minFloorPopup == null)
 		{
-			minFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MIN_FLOOR), false);
+			minFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MIN_FLOOR), check_panel: false);
 		}
 		if (!(minFloorPopup == null))
 		{
@@ -170,7 +170,7 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 			{
 				array[i] = (i <= getCurrentSelectMaxFloorIndex());
 			}
-			UIScrollablePopupList.CreatePopup(minFloorPopup, GetCtrl(UI.POP_TARGET_MIN_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, minFloorList, array, currentSelectMinFloorIndex, delegate(int index)
+			UIScrollablePopupList.CreatePopup(minFloorPopup, GetCtrl(UI.POP_TARGET_MIN_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, minFloorList, array, currentSelectMinFloorIndex, delegate(int index)
 			{
 				searchParam.minFloorQuestId = questIdList[index];
 				RefreshUI();
@@ -182,7 +182,7 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 	{
 		if (maxFloorPopup == null)
 		{
-			maxFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MAX_FLOOR), false);
+			maxFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MAX_FLOOR), check_panel: false);
 		}
 		if (!(maxFloorPopup == null))
 		{
@@ -192,7 +192,7 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 			{
 				array[i] = (i >= getCurrentSelectMinFloorIndex());
 			}
-			UIScrollablePopupList.CreatePopup(maxFloorPopup, GetCtrl(UI.POP_TARGET_MAX_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, maxFloorList, array, currentSelectMaxFloorIndex, delegate(int index)
+			UIScrollablePopupList.CreatePopup(maxFloorPopup, GetCtrl(UI.POP_TARGET_MAX_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, maxFloorList, array, currentSelectMaxFloorIndex, delegate(int index)
 			{
 				searchParam.maxFloorQuestId = questIdList[index];
 				RefreshUI();

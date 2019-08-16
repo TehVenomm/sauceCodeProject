@@ -11,21 +11,19 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.sql.Time;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public final class TimeTypeAdapter extends TypeAdapter<Time> {
-    public static final TypeAdapterFactory FACTORY = new C07001();
-    private final DateFormat format = new SimpleDateFormat("hh:mm:ss a");
-
-    /* renamed from: com.google.gson.internal.bind.TimeTypeAdapter$1 */
-    static final class C07001 implements TypeAdapterFactory {
-        C07001() {
-        }
-
+    public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
         public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            return typeToken.getRawType() == Time.class ? new TimeTypeAdapter() : null;
+            if (typeToken.getRawType() == Time.class) {
+                return new TimeTypeAdapter();
+            }
+            return null;
         }
-    }
+    };
+    private final DateFormat format = new SimpleDateFormat("hh:mm:ss a");
 
     public Time read(JsonReader jsonReader) throws IOException {
         Time time;
@@ -36,8 +34,8 @@ public final class TimeTypeAdapter extends TypeAdapter<Time> {
             } else {
                 try {
                     time = new Time(this.format.parse(jsonReader.nextString()).getTime());
-                } catch (Throwable e) {
-                    throw new JsonSyntaxException(e);
+                } catch (ParseException e) {
+                    throw new JsonSyntaxException((Throwable) e);
                 }
             }
         }

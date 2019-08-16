@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimEventComponent
+public class AnimEventComponent : MonoBehaviour
 {
 	public AnimEventData animEventData;
 
@@ -17,7 +17,6 @@ public class AnimEventComponent
 
 	private void Start()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		if (animator == null)
 		{
 			animator = this.get_gameObject().GetComponent<Animator>();

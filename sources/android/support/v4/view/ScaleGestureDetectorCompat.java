@@ -1,57 +1,33 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
 import android.os.Build.VERSION;
+import android.view.ScaleGestureDetector;
 
+/* renamed from: android.support.v4.view.ScaleGestureDetectorCompat */
 public final class ScaleGestureDetectorCompat {
-    static final ScaleGestureDetectorImpl IMPL;
-
-    interface ScaleGestureDetectorImpl {
-        boolean isQuickScaleEnabled(Object obj);
-
-        void setQuickScaleEnabled(Object obj, boolean z);
-    }
-
-    private static class BaseScaleGestureDetectorImpl implements ScaleGestureDetectorImpl {
-        BaseScaleGestureDetectorImpl() {
-        }
-
-        public boolean isQuickScaleEnabled(Object obj) {
-            return false;
-        }
-
-        public void setQuickScaleEnabled(Object obj, boolean z) {
-        }
-    }
-
-    private static class ScaleGestureDetectorCompatKitKatImpl implements ScaleGestureDetectorImpl {
-        ScaleGestureDetectorCompatKitKatImpl() {
-        }
-
-        public boolean isQuickScaleEnabled(Object obj) {
-            return ScaleGestureDetectorCompatKitKat.isQuickScaleEnabled(obj);
-        }
-
-        public void setQuickScaleEnabled(Object obj, boolean z) {
-            ScaleGestureDetectorCompatKitKat.setQuickScaleEnabled(obj, z);
-        }
-    }
-
-    static {
-        if (VERSION.SDK_INT >= 19) {
-            IMPL = new ScaleGestureDetectorCompatKitKatImpl();
-        } else {
-            IMPL = new BaseScaleGestureDetectorImpl();
-        }
-    }
-
     private ScaleGestureDetectorCompat() {
     }
 
-    public static boolean isQuickScaleEnabled(Object obj) {
-        return IMPL.isQuickScaleEnabled(obj);
+    public static boolean isQuickScaleEnabled(ScaleGestureDetector scaleGestureDetector) {
+        if (VERSION.SDK_INT >= 19) {
+            return scaleGestureDetector.isQuickScaleEnabled();
+        }
+        return false;
     }
 
+    @Deprecated
+    public static boolean isQuickScaleEnabled(Object obj) {
+        return isQuickScaleEnabled((ScaleGestureDetector) obj);
+    }
+
+    public static void setQuickScaleEnabled(ScaleGestureDetector scaleGestureDetector, boolean z) {
+        if (VERSION.SDK_INT >= 19) {
+            scaleGestureDetector.setQuickScaleEnabled(z);
+        }
+    }
+
+    @Deprecated
     public static void setQuickScaleEnabled(Object obj, boolean z) {
-        IMPL.setQuickScaleEnabled(obj, z);
+        setQuickScaleEnabled((ScaleGestureDetector) obj, z);
     }
 }

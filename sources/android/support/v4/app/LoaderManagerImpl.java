@@ -1,29 +1,31 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
-import android.support.v4.content.Loader.OnLoadCanceledListener;
-import android.support.v4.content.Loader.OnLoadCompleteListener;
-import android.support.v4.util.DebugUtils;
-import android.support.v4.util.SparseArrayCompat;
+import android.support.p000v4.app.LoaderManager.LoaderCallbacks;
+import android.support.p000v4.content.Loader;
+import android.support.p000v4.content.Loader.OnLoadCanceledListener;
+import android.support.p000v4.content.Loader.OnLoadCompleteListener;
+import android.support.p000v4.util.DebugUtils;
+import android.support.p000v4.util.SparseArrayCompat;
 import android.util.Log;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.lang.reflect.Modifier;
 
+/* renamed from: android.support.v4.app.LoaderManagerImpl */
 class LoaderManagerImpl extends LoaderManager {
     static boolean DEBUG = false;
     static final String TAG = "LoaderManager";
     boolean mCreatingLoader;
     FragmentHostCallback mHost;
-    final SparseArrayCompat<LoaderInfo> mInactiveLoaders = new SparseArrayCompat();
-    final SparseArrayCompat<LoaderInfo> mLoaders = new SparseArrayCompat();
+    final SparseArrayCompat<LoaderInfo> mInactiveLoaders = new SparseArrayCompat<>();
+    final SparseArrayCompat<LoaderInfo> mLoaders = new SparseArrayCompat<>();
     boolean mRetaining;
     boolean mRetainingStarted;
     boolean mStarted;
     final String mWho;
 
+    /* renamed from: android.support.v4.app.LoaderManagerImpl$LoaderInfo */
     final class LoaderInfo implements OnLoadCompleteListener<Object>, OnLoadCanceledListener<Object> {
         final Bundle mArgs;
         LoaderCallbacks<Object> mCallbacks;
@@ -46,7 +48,8 @@ class LoaderManagerImpl extends LoaderManager {
             this.mCallbacks = loaderCallbacks;
         }
 
-        void callOnLoadFinished(Loader<Object> loader, Object obj) {
+        /* access modifiers changed from: 0000 */
+        public void callOnLoadFinished(Loader<Object> loader, Object obj) {
             String str;
             if (this.mCallbacks != null) {
                 if (LoaderManagerImpl.this.mHost != null) {
@@ -70,7 +73,8 @@ class LoaderManagerImpl extends LoaderManager {
             }
         }
 
-        boolean cancel() {
+        /* access modifiers changed from: 0000 */
+        public boolean cancel() {
             if (LoaderManagerImpl.DEBUG) {
                 Log.v(LoaderManagerImpl.TAG, "  Canceling: " + this);
             }
@@ -85,9 +89,9 @@ class LoaderManagerImpl extends LoaderManager {
             return cancelLoad;
         }
 
-        void destroy() {
+        /* access modifiers changed from: 0000 */
+        public void destroy() {
             String str;
-            LoaderCallbacks loaderCallbacks = null;
             if (LoaderManagerImpl.DEBUG) {
                 Log.v(LoaderManagerImpl.TAG, "  Destroying: " + this);
             }
@@ -108,15 +112,13 @@ class LoaderManagerImpl extends LoaderManager {
                 try {
                     this.mCallbacks.onLoaderReset(this.mLoader);
                 } finally {
-                    loaderCallbacks = LoaderManagerImpl.this.mHost;
-                    if (loaderCallbacks != null) {
-                        loaderCallbacks = LoaderManagerImpl.this.mHost.mFragmentManager;
-                        loaderCallbacks.mNoTransactionsBecause = str;
+                    if (LoaderManagerImpl.this.mHost != null) {
+                        LoaderManagerImpl.this.mHost.mFragmentManager.mNoTransactionsBecause = str;
                     }
                 }
             }
-            this.mCallbacks = loaderCallbacks;
-            this.mData = loaderCallbacks;
+            this.mCallbacks = null;
+            this.mData = null;
             this.mHaveData = false;
             if (this.mLoader != null) {
                 if (this.mListenerRegistered) {
@@ -179,13 +181,14 @@ class LoaderManagerImpl extends LoaderManager {
             }
         }
 
-        void finishRetain() {
+        /* access modifiers changed from: 0000 */
+        public void finishRetain() {
             if (this.mRetaining) {
                 if (LoaderManagerImpl.DEBUG) {
                     Log.v(LoaderManagerImpl.TAG, "  Finished Retaining: " + this);
                 }
                 this.mRetaining = false;
-                if (!(this.mStarted == this.mRetainingStarted || this.mStarted)) {
+                if (this.mStarted != this.mRetainingStarted && !this.mStarted) {
                     stop();
                 }
             }
@@ -238,17 +241,17 @@ class LoaderManagerImpl extends LoaderManager {
                     LoaderManagerImpl.this.installLoader(loaderInfo);
                     return;
                 }
-                if (!(this.mData == obj && this.mHaveData)) {
+                if (this.mData != obj || !this.mHaveData) {
                     this.mData = obj;
                     this.mHaveData = true;
                     if (this.mStarted) {
                         callOnLoadFinished(loader, obj);
                     }
                 }
-                loaderInfo = (LoaderInfo) LoaderManagerImpl.this.mInactiveLoaders.get(this.mId);
-                if (!(loaderInfo == null || loaderInfo == this)) {
-                    loaderInfo.mDeliveredData = false;
-                    loaderInfo.destroy();
+                LoaderInfo loaderInfo2 = (LoaderInfo) LoaderManagerImpl.this.mInactiveLoaders.get(this.mId);
+                if (!(loaderInfo2 == null || loaderInfo2 == this)) {
+                    loaderInfo2.mDeliveredData = false;
+                    loaderInfo2.destroy();
                     LoaderManagerImpl.this.mInactiveLoaders.remove(this.mId);
                 }
                 if (LoaderManagerImpl.this.mHost != null && !LoaderManagerImpl.this.hasRunningLoaders()) {
@@ -259,7 +262,8 @@ class LoaderManagerImpl extends LoaderManager {
             }
         }
 
-        void reportStart() {
+        /* access modifiers changed from: 0000 */
+        public void reportStart() {
             if (this.mStarted && this.mReportNextStart) {
                 this.mReportNextStart = false;
                 if (this.mHaveData && !this.mRetaining) {
@@ -268,7 +272,8 @@ class LoaderManagerImpl extends LoaderManager {
             }
         }
 
-        void retain() {
+        /* access modifiers changed from: 0000 */
+        public void retain() {
             if (LoaderManagerImpl.DEBUG) {
                 Log.v(LoaderManagerImpl.TAG, "  Retaining: " + this);
             }
@@ -278,7 +283,8 @@ class LoaderManagerImpl extends LoaderManager {
             this.mCallbacks = null;
         }
 
-        void start() {
+        /* access modifiers changed from: 0000 */
+        public void start() {
             if (this.mRetaining && this.mRetainingStarted) {
                 this.mStarted = true;
             } else if (!this.mStarted) {
@@ -305,7 +311,8 @@ class LoaderManagerImpl extends LoaderManager {
             }
         }
 
-        void stop() {
+        /* access modifiers changed from: 0000 */
+        public void stop() {
             if (LoaderManagerImpl.DEBUG) {
                 Log.v(LoaderManagerImpl.TAG, "  Stopping: " + this);
             }
@@ -319,15 +326,15 @@ class LoaderManagerImpl extends LoaderManager {
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder(64);
-            stringBuilder.append("LoaderInfo{");
-            stringBuilder.append(Integer.toHexString(System.identityHashCode(this)));
-            stringBuilder.append(" #");
-            stringBuilder.append(this.mId);
-            stringBuilder.append(" : ");
-            DebugUtils.buildShortClassTag(this.mLoader, stringBuilder);
-            stringBuilder.append("}}");
-            return stringBuilder.toString();
+            StringBuilder sb = new StringBuilder(64);
+            sb.append("LoaderInfo{");
+            sb.append(Integer.toHexString(System.identityHashCode(this)));
+            sb.append(" #");
+            sb.append(this.mId);
+            sb.append(" : ");
+            DebugUtils.buildShortClassTag(this.mLoader, sb);
+            sb.append("}}");
+            return sb.toString();
         }
     }
 
@@ -367,24 +374,24 @@ class LoaderManagerImpl extends LoaderManager {
             this.mLoaders.removeAt(indexOfKey);
             loaderInfo.destroy();
         }
-        indexOfKey = this.mInactiveLoaders.indexOfKey(i);
-        if (indexOfKey >= 0) {
-            loaderInfo = (LoaderInfo) this.mInactiveLoaders.valueAt(indexOfKey);
-            this.mInactiveLoaders.removeAt(indexOfKey);
-            loaderInfo.destroy();
+        int indexOfKey2 = this.mInactiveLoaders.indexOfKey(i);
+        if (indexOfKey2 >= 0) {
+            LoaderInfo loaderInfo2 = (LoaderInfo) this.mInactiveLoaders.valueAt(indexOfKey2);
+            this.mInactiveLoaders.removeAt(indexOfKey2);
+            loaderInfo2.destroy();
         }
         if (this.mHost != null && !hasRunningLoaders()) {
             this.mHost.mFragmentManager.startPendingDeferredFragments();
         }
     }
 
-    void doDestroy() {
-        int size;
+    /* access modifiers changed from: 0000 */
+    public void doDestroy() {
         if (!this.mRetaining) {
             if (DEBUG) {
                 Log.v(TAG, "Destroying Active in " + this);
             }
-            for (size = this.mLoaders.size() - 1; size >= 0; size--) {
+            for (int size = this.mLoaders.size() - 1; size >= 0; size--) {
                 ((LoaderInfo) this.mLoaders.valueAt(size)).destroy();
             }
             this.mLoaders.clear();
@@ -392,47 +399,52 @@ class LoaderManagerImpl extends LoaderManager {
         if (DEBUG) {
             Log.v(TAG, "Destroying Inactive in " + this);
         }
-        for (size = this.mInactiveLoaders.size() - 1; size >= 0; size--) {
-            ((LoaderInfo) this.mInactiveLoaders.valueAt(size)).destroy();
+        for (int size2 = this.mInactiveLoaders.size() - 1; size2 >= 0; size2--) {
+            ((LoaderInfo) this.mInactiveLoaders.valueAt(size2)).destroy();
         }
         this.mInactiveLoaders.clear();
+        this.mHost = null;
     }
 
-    void doReportNextStart() {
+    /* access modifiers changed from: 0000 */
+    public void doReportNextStart() {
         for (int size = this.mLoaders.size() - 1; size >= 0; size--) {
             ((LoaderInfo) this.mLoaders.valueAt(size)).mReportNextStart = true;
         }
     }
 
-    void doReportStart() {
+    /* access modifiers changed from: 0000 */
+    public void doReportStart() {
         for (int size = this.mLoaders.size() - 1; size >= 0; size--) {
             ((LoaderInfo) this.mLoaders.valueAt(size)).reportStart();
         }
     }
 
-    void doRetain() {
+    /* access modifiers changed from: 0000 */
+    public void doRetain() {
         if (DEBUG) {
             Log.v(TAG, "Retaining in " + this);
         }
-        if (this.mStarted) {
-            this.mRetaining = true;
-            this.mStarted = false;
-            for (int size = this.mLoaders.size() - 1; size >= 0; size--) {
-                ((LoaderInfo) this.mLoaders.valueAt(size)).retain();
-            }
+        if (!this.mStarted) {
+            RuntimeException runtimeException = new RuntimeException("here");
+            runtimeException.fillInStackTrace();
+            Log.w(TAG, "Called doRetain when not started: " + this, runtimeException);
             return;
         }
-        Throwable runtimeException = new RuntimeException("here");
-        runtimeException.fillInStackTrace();
-        Log.w(TAG, "Called doRetain when not started: " + this, runtimeException);
+        this.mRetaining = true;
+        this.mStarted = false;
+        for (int size = this.mLoaders.size() - 1; size >= 0; size--) {
+            ((LoaderInfo) this.mLoaders.valueAt(size)).retain();
+        }
     }
 
-    void doStart() {
+    /* access modifiers changed from: 0000 */
+    public void doStart() {
         if (DEBUG) {
             Log.v(TAG, "Starting in " + this);
         }
         if (this.mStarted) {
-            Throwable runtimeException = new RuntimeException("here");
+            RuntimeException runtimeException = new RuntimeException("here");
             runtimeException.fillInStackTrace();
             Log.w(TAG, "Called doStart when already started: " + this, runtimeException);
             return;
@@ -443,33 +455,33 @@ class LoaderManagerImpl extends LoaderManager {
         }
     }
 
-    void doStop() {
+    /* access modifiers changed from: 0000 */
+    public void doStop() {
         if (DEBUG) {
             Log.v(TAG, "Stopping in " + this);
         }
-        if (this.mStarted) {
-            for (int size = this.mLoaders.size() - 1; size >= 0; size--) {
-                ((LoaderInfo) this.mLoaders.valueAt(size)).stop();
-            }
-            this.mStarted = false;
+        if (!this.mStarted) {
+            RuntimeException runtimeException = new RuntimeException("here");
+            runtimeException.fillInStackTrace();
+            Log.w(TAG, "Called doStop when not started: " + this, runtimeException);
             return;
         }
-        Throwable runtimeException = new RuntimeException("here");
-        runtimeException.fillInStackTrace();
-        Log.w(TAG, "Called doStop when not started: " + this, runtimeException);
+        for (int size = this.mLoaders.size() - 1; size >= 0; size--) {
+            ((LoaderInfo) this.mLoaders.valueAt(size)).stop();
+        }
+        this.mStarted = false;
     }
 
     public void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
-        int i = 0;
         if (this.mLoaders.size() > 0) {
             printWriter.print(str);
             printWriter.println("Active Loaders:");
             String str2 = str + "    ";
-            for (int i2 = 0; i2 < this.mLoaders.size(); i2++) {
-                LoaderInfo loaderInfo = (LoaderInfo) this.mLoaders.valueAt(i2);
+            for (int i = 0; i < this.mLoaders.size(); i++) {
+                LoaderInfo loaderInfo = (LoaderInfo) this.mLoaders.valueAt(i);
                 printWriter.print(str);
                 printWriter.print("  #");
-                printWriter.print(this.mLoaders.keyAt(i2));
+                printWriter.print(this.mLoaders.keyAt(i));
                 printWriter.print(": ");
                 printWriter.println(loaderInfo.toString());
                 loaderInfo.dump(str2, fileDescriptor, printWriter, strArr);
@@ -479,20 +491,20 @@ class LoaderManagerImpl extends LoaderManager {
             printWriter.print(str);
             printWriter.println("Inactive Loaders:");
             String str3 = str + "    ";
-            while (i < this.mInactiveLoaders.size()) {
-                loaderInfo = (LoaderInfo) this.mInactiveLoaders.valueAt(i);
+            for (int i2 = 0; i2 < this.mInactiveLoaders.size(); i2++) {
+                LoaderInfo loaderInfo2 = (LoaderInfo) this.mInactiveLoaders.valueAt(i2);
                 printWriter.print(str);
                 printWriter.print("  #");
-                printWriter.print(this.mInactiveLoaders.keyAt(i));
+                printWriter.print(this.mInactiveLoaders.keyAt(i2));
                 printWriter.print(": ");
-                printWriter.println(loaderInfo.toString());
-                loaderInfo.dump(str3, fileDescriptor, printWriter, strArr);
-                i++;
+                printWriter.println(loaderInfo2.toString());
+                loaderInfo2.dump(str3, fileDescriptor, printWriter, strArr);
             }
         }
     }
 
-    void finishRetain() {
+    /* access modifiers changed from: 0000 */
+    public void finishRetain() {
         if (this.mRetaining) {
             if (DEBUG) {
                 Log.v(TAG, "Finished Retaining in " + this);
@@ -509,18 +521,19 @@ class LoaderManagerImpl extends LoaderManager {
             throw new IllegalStateException("Called while creating a loader");
         }
         LoaderInfo loaderInfo = (LoaderInfo) this.mLoaders.get(i);
-        return loaderInfo != null ? loaderInfo.mPendingLoader != null ? loaderInfo.mPendingLoader.mLoader : loaderInfo.mLoader : null;
+        if (loaderInfo != null) {
+            return loaderInfo.mPendingLoader != null ? loaderInfo.mPendingLoader.mLoader : loaderInfo.mLoader;
+        }
+        return null;
     }
 
     public boolean hasRunningLoaders() {
-        int size = this.mLoaders.size();
         boolean z = false;
         int i = 0;
-        while (i < size) {
+        while (i < this.mLoaders.size()) {
             LoaderInfo loaderInfo = (LoaderInfo) this.mLoaders.valueAt(i);
-            int i2 = (!loaderInfo.mStarted || loaderInfo.mDeliveredData) ? 0 : 1;
             i++;
-            z = i2 | z;
+            z = (loaderInfo.mStarted && !loaderInfo.mDeliveredData) | z;
         }
         return z;
     }
@@ -550,7 +563,8 @@ class LoaderManagerImpl extends LoaderManager {
         return loaderInfo.mLoader;
     }
 
-    void installLoader(LoaderInfo loaderInfo) {
+    /* access modifiers changed from: 0000 */
+    public void installLoader(LoaderInfo loaderInfo) {
         this.mLoaders.put(loaderInfo.mId, loaderInfo);
         if (this.mStarted) {
             loaderInfo.start();
@@ -581,7 +595,13 @@ class LoaderManagerImpl extends LoaderManager {
                 loaderInfo2.destroy();
                 loaderInfo.mLoader.abandon();
                 this.mInactiveLoaders.put(i, loaderInfo);
-            } else if (loaderInfo.cancel()) {
+            } else if (!loaderInfo.cancel()) {
+                if (DEBUG) {
+                    Log.v(TAG, "  Current loader is stopped; replacing");
+                }
+                this.mLoaders.put(i, null);
+                loaderInfo.destroy();
+            } else {
                 if (DEBUG) {
                     Log.v(TAG, "  Current loader is running; configuring pending loader");
                 }
@@ -597,28 +617,23 @@ class LoaderManagerImpl extends LoaderManager {
                 }
                 loaderInfo.mPendingLoader = createLoader(i, bundle, loaderCallbacks);
                 return loaderInfo.mPendingLoader.mLoader;
-            } else {
-                if (DEBUG) {
-                    Log.v(TAG, "  Current loader is stopped; replacing");
-                }
-                this.mLoaders.put(i, null);
-                loaderInfo.destroy();
             }
         }
         return createAndInstallLoader(i, bundle, loaderCallbacks).mLoader;
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(128);
-        stringBuilder.append("LoaderManager{");
-        stringBuilder.append(Integer.toHexString(System.identityHashCode(this)));
-        stringBuilder.append(" in ");
-        DebugUtils.buildShortClassTag(this.mHost, stringBuilder);
-        stringBuilder.append("}}");
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("LoaderManager{");
+        sb.append(Integer.toHexString(System.identityHashCode(this)));
+        sb.append(" in ");
+        DebugUtils.buildShortClassTag(this.mHost, sb);
+        sb.append("}}");
+        return sb.toString();
     }
 
-    void updateHostController(FragmentHostCallback fragmentHostCallback) {
+    /* access modifiers changed from: 0000 */
+    public void updateHostController(FragmentHostCallback fragmentHostCallback) {
         this.mHost = fragmentHostCallback;
     }
 }

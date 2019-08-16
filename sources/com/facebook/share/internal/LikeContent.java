@@ -5,16 +5,10 @@ import android.os.Parcelable.Creator;
 import com.facebook.share.model.ShareModel;
 import com.facebook.share.model.ShareModelBuilder;
 
+@Deprecated
 public class LikeContent implements ShareModel {
-    public static final Creator<LikeContent> CREATOR = new C04881();
-    private final String objectId;
-    private final String objectType;
-
-    /* renamed from: com.facebook.share.internal.LikeContent$1 */
-    static final class C04881 implements Creator<LikeContent> {
-        C04881() {
-        }
-
+    @Deprecated
+    public static final Creator<LikeContent> CREATOR = new Creator<LikeContent>() {
         public LikeContent createFromParcel(Parcel parcel) {
             return new LikeContent(parcel);
         }
@@ -22,31 +16,41 @@ public class LikeContent implements ShareModel {
         public LikeContent[] newArray(int i) {
             return new LikeContent[i];
         }
-    }
+    };
+    private final String objectId;
+    private final String objectType;
 
+    @Deprecated
     public static class Builder implements ShareModelBuilder<LikeContent, Builder> {
-        private String objectId;
-        private String objectType;
+        /* access modifiers changed from: private */
+        public String objectId;
+        /* access modifiers changed from: private */
+        public String objectType;
 
+        @Deprecated
         public LikeContent build() {
-            return new LikeContent();
+            return new LikeContent(this);
         }
 
+        @Deprecated
         public Builder readFrom(LikeContent likeContent) {
             return likeContent == null ? this : setObjectId(likeContent.getObjectId()).setObjectType(likeContent.getObjectType());
         }
 
+        @Deprecated
         public Builder setObjectId(String str) {
             this.objectId = str;
             return this;
         }
 
+        @Deprecated
         public Builder setObjectType(String str) {
             this.objectType = str;
             return this;
         }
     }
 
+    @Deprecated
     LikeContent(Parcel parcel) {
         this.objectId = parcel.readString();
         this.objectType = parcel.readString();
@@ -57,18 +61,22 @@ public class LikeContent implements ShareModel {
         this.objectType = builder.objectType;
     }
 
+    @Deprecated
     public int describeContents() {
         return 0;
     }
 
+    @Deprecated
     public String getObjectId() {
         return this.objectId;
     }
 
+    @Deprecated
     public String getObjectType() {
         return this.objectType;
     }
 
+    @Deprecated
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.objectId);
         parcel.writeString(this.objectType);

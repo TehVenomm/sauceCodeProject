@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class BulletData
+public class BulletData : ScriptableObject
 {
 	public enum BULLET_TYPE
 	{
@@ -31,7 +31,18 @@ public class BulletData
 		PAIR_SWORDS_SOUL,
 		PAIR_SWORDS_LASER,
 		HEALING_HOMING,
-		ARROW_SOUL
+		ARROW_SOUL,
+		ENEMY_PRESENT,
+		CRASH_BIT,
+		BARRIER,
+		ROTATE_BIT,
+		SPEAR_BARRIER,
+		RESURRECTION_HOMING,
+		SEARCH,
+		TURRET_BIT,
+		RANDOM_HOMING,
+		ORACLE_SPEAR_SP,
+		DECOY_TURRET_BIT
 	}
 
 	public enum AXIS
@@ -293,6 +304,8 @@ public class BulletData
 
 		public float searchRange;
 
+		public string finalAtkInfoName;
+
 		public BulletFunnel GetRateBullet(BulletFunnel srcInfo, float rate)
 		{
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
@@ -312,6 +325,7 @@ public class BulletData
 			bulletFunnel.lookAtAngle = AttackInfo.GetRateValue(lookAtAngle, srcInfo.lookAtAngle, rate);
 			bulletFunnel.bitBullet = bitBullet;
 			bulletFunnel.searchRange = AttackInfo.GetRateValue(searchRange, srcInfo.searchRange, rate);
+			bulletFunnel.finalAtkInfoName = finalAtkInfoName;
 			return bulletFunnel;
 		}
 	}
@@ -361,6 +375,8 @@ public class BulletData
 
 		public int emissionNum;
 
+		public bool isPerfectTrack;
+
 		public BulletData emissionBullet;
 
 		public BulletTracking GetRateBullet(BulletTracking srcInfo, float rate)
@@ -374,6 +390,7 @@ public class BulletData
 			bulletTracking.attackInterval = AttackInfo.GetRateValue(attackInterval, srcInfo.attackInterval, rate);
 			bulletTracking.emitInterval = AttackInfo.GetRateValue(emitInterval, srcInfo.emitInterval, rate);
 			bulletTracking.emissionNum = AttackInfo.GetRateValue(emissionNum, srcInfo.emissionNum, rate);
+			bulletTracking.isPerfectTrack = isPerfectTrack;
 			bulletTracking.emissionBullet = emissionBullet;
 			return bulletTracking;
 		}
@@ -566,6 +583,20 @@ public class BulletData
 	}
 
 	[Serializable]
+	public class BulletEnemyPresent
+	{
+		public bool isHitEnemyMove;
+
+		public bool isHitEnemyAttack;
+
+		public int value;
+
+		public CALCULATE_TYPE valueType = CALCULATE_TYPE.CONSTANT;
+
+		public List<int> buffIds = new List<int>();
+	}
+
+	[Serializable]
 	public class BulletCannonball
 	{
 		public float gravityStartTime = -1f;
@@ -627,6 +658,12 @@ public class BulletData
 		public HateInfo[] addDecoyHate;
 
 		public HateInfo[] addOwnerHate;
+
+		public float hateDecreaseRate = 1f;
+
+		public int explodeHitNum = 1;
+
+		public float hateInterval;
 	}
 
 	[Serializable]
@@ -644,8 +681,6 @@ public class BulletData
 
 		public bool isTakeOverHitCount;
 
-		public bool isIgnoreHitAttackable;
-
 		public bool isIgnoreHitEnemyBody;
 
 		public bool isIgnoreHitEnemyMove;
@@ -657,6 +692,12 @@ public class BulletData
 		public bool isIgnoreHitPlayerAttack;
 
 		public bool isIgnoreHitWallAndObject;
+
+		public bool isIgnoreHitCountPlayerBody = true;
+
+		public BulletData emissionBulletOnBroken;
+
+		public string emissionBulletAttackInfoName;
 
 		public int toEnduranceDamege;
 	}
@@ -726,20 +767,59 @@ public class BulletData
 				return this;
 			}
 			BulletHealingHoming bulletHealingHoming = new BulletHealingHoming();
-			bulletHealingHoming.limitAngel = AttackInfo.GetRateValue(limitAngel, _target.limitAngel, _ratio);
-			bulletHealingHoming.limitChangeStartTime = AttackInfo.GetRateValue(limitChangeStartTime, _target.limitChangeStartTime, _ratio);
-			bulletHealingHoming.limitChangeAngel = AttackInfo.GetRateValue(limitChangeAngel, _target.limitChangeAngel, _ratio);
-			bulletHealingHoming.hightLock = AttackInfo.GetRateValue(hightLock, _target.hightLock, _ratio);
-			bulletHealingHoming.isTakeOverTarget = AttackInfo.GetRateValue(isTakeOverTarget, _target.isTakeOverTarget, _ratio);
-			bulletHealingHoming.acceleration = AttackInfo.GetRateValue(acceleration, _target.acceleration, _ratio);
-			bulletHealingHoming.isIgnoreColliderExceptTarget = AttackInfo.GetRateValue(isIgnoreColliderExceptTarget, _target.isIgnoreColliderExceptTarget, _ratio);
-			bulletHealingHoming.defaultGenerateLayer = ((!(_ratio <= 0.5f)) ? _target.defaultGenerateLayer : defaultGenerateLayer);
+			bulletHealingHoming.MergeParam(_target, _ratio);
+			return bulletHealingHoming;
+		}
+
+		protected void MergeParam(BulletHealingHoming _target, float _ratio)
+		{
+			limitAngel = AttackInfo.GetRateValue(limitAngel, _target.limitAngel, _ratio);
+			limitChangeStartTime = AttackInfo.GetRateValue(limitChangeStartTime, _target.limitChangeStartTime, _ratio);
+			limitChangeAngel = AttackInfo.GetRateValue(limitChangeAngel, _target.limitChangeAngel, _ratio);
+			hightLock = AttackInfo.GetRateValue(hightLock, _target.hightLock, _ratio);
+			isTakeOverTarget = AttackInfo.GetRateValue(isTakeOverTarget, _target.isTakeOverTarget, _ratio);
+			acceleration = AttackInfo.GetRateValue(acceleration, _target.acceleration, _ratio);
+			isIgnoreColliderExceptTarget = AttackInfo.GetRateValue(isIgnoreColliderExceptTarget, _target.isIgnoreColliderExceptTarget, _ratio);
+			defaultGenerateLayer = ((!(_ratio <= 0.5f)) ? _target.defaultGenerateLayer : defaultGenerateLayer);
 			int i = 0;
 			for (int count = buffIds.Count; i < count; i++)
 			{
-				bulletHealingHoming.buffIds.Add(AttackInfo.GetRateValue(buffIds[i], _target.buffIds[i], _ratio));
+				buffIds.Add(AttackInfo.GetRateValue(buffIds[i], _target.buffIds[i], _ratio));
 			}
-			return bulletHealingHoming;
+		}
+	}
+
+	[Serializable]
+	public class BulletResurrectionHoming : BulletHealingHoming
+	{
+		public bool isAddBuffActionOnResurrected = true;
+
+		public BulletResurrectionHoming()
+		{
+			isAddBuffActionOnResurrected = true;
+		}
+
+		public BulletResurrectionHoming(BulletResurrectionHoming _bulletRH)
+			: base(_bulletRH)
+		{
+			isAddBuffActionOnResurrected = _bulletRH.isAddBuffActionOnResurrected;
+		}
+
+		public BulletResurrectionHoming CreateParamMergedInstance(BulletResurrectionHoming _target, float _ratio)
+		{
+			if (_target == null)
+			{
+				return this;
+			}
+			BulletResurrectionHoming bulletResurrectionHoming = new BulletResurrectionHoming();
+			bulletResurrectionHoming.MergeParam(_target, _ratio);
+			return bulletResurrectionHoming;
+		}
+
+		protected void MergeParam(BulletResurrectionHoming _target, float _ratio)
+		{
+			MergeParam((BulletHealingHoming)_target, _ratio);
+			isAddBuffActionOnResurrected = AttackInfo.GetRateValue(isAddBuffActionOnResurrected, _target.isAddBuffActionOnResurrected, _ratio);
 		}
 	}
 
@@ -757,6 +837,123 @@ public class BulletData
 		public float angularStartTime;
 
 		public float ignoreAngle;
+	}
+
+	[Serializable]
+	public class BulletBarrier
+	{
+		public int baseHp;
+
+		public int baseDef;
+
+		public string effectNameInBarrier = string.Empty;
+	}
+
+	[Serializable]
+	public class BulletRotateBit
+	{
+		public bool isSetCentralPosition;
+
+		public Vector3 centralPosition;
+
+		public float rotateAngle_Deg;
+
+		public float rotateRadius;
+
+		public Vector3 rotateAxis;
+
+		public int rotateSign;
+
+		public float waitTime;
+
+		public bool isLinearAngleSpeedUp;
+
+		public float speedUpTime;
+	}
+
+	[Serializable]
+	public class BulletSearch
+	{
+		public float searchStartTime;
+
+		public float searchRangeSqr;
+
+		public float angularVelocity;
+	}
+
+	[Serializable]
+	public class BulletFollow
+	{
+		public Vector3 followOffset;
+
+		public float attenuation;
+	}
+
+	[Serializable]
+	public class BulletTurretBit : BulletFollow
+	{
+		public float firstShotDelay_Sec;
+
+		public float shotInterval_Sec;
+
+		public string normalAtkInfoName;
+
+		public string finalAtkInfoName;
+
+		public float lookAtInterpolate;
+
+		public float searchInterval_Sec;
+
+		public float searchRangeSqr;
+
+		public int uniqueId;
+	}
+
+	[Serializable]
+	public class BulletOracleSpearSp
+	{
+		public string chargedEffectName;
+
+		public bool useWeaponElementEffect;
+
+		public int chargedSEId;
+
+		public string GetEffectName(Player player)
+		{
+			if (!useWeaponElementEffect || player == null)
+			{
+				return chargedEffectName;
+			}
+			return chargedEffectName + player.GetCurrentWeaponElement();
+		}
+	}
+
+	[Serializable]
+	public class BulletDecoyTurretBit : BulletDecoy
+	{
+		public float firstShotDelay_Sec;
+
+		public float shotInterval_Sec;
+
+		public string normalAtkInfoName = string.Empty;
+
+		public string finalAtkInfoName = string.Empty;
+
+		public float lookAtInterpolate;
+
+		public float searchInterval_Sec;
+
+		public float searchRangeSqr;
+
+		public string rotateNodeName = string.Empty;
+
+		public string chargeEffectName = string.Empty;
+
+		public string chargeEffectParentNodename = string.Empty;
+
+		public Vector3 chargeEffectDispOffset;
+
+		public Vector3 chargeEffectDispRotation;
 	}
 
 	public BULLET_TYPE type;
@@ -811,9 +1008,37 @@ public class BulletData
 
 	public BulletArrowSoul dataArrowSoul;
 
+	public BulletEnemyPresent dataEnemyPresent;
+
+	public BulletBarrier dataBarrier;
+
+	public BulletRotateBit dataRotateBit;
+
+	public BulletResurrectionHoming dataResurrectionHomingBullet;
+
+	public BulletSearch dataSearch;
+
+	public BulletFollow dataFollow;
+
+	public BulletTurretBit dataTurretBit;
+
+	public BulletOracleSpearSp dataOracleSpearSp;
+
+	public BulletDecoyTurretBit dataDecoyTurretBit;
+
 	public BulletData()
 		: this()
 	{
+	}
+
+	public bool IsDecoy()
+	{
+		BULLET_TYPE bULLET_TYPE = type;
+		if (bULLET_TYPE == BULLET_TYPE.DECOY || bULLET_TYPE == BULLET_TYPE.DECOY_TURRET_BIT)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public BulletData GetRateBulletData(BulletData rate_info, float rate)
@@ -897,6 +1122,24 @@ public class BulletData
 			break;
 		case BULLET_TYPE.ARROW_SOUL:
 			bulletData.dataArrowSoul = new BulletArrowSoul();
+			break;
+		case BULLET_TYPE.ENEMY_PRESENT:
+			bulletData.dataEnemyPresent = dataEnemyPresent;
+			break;
+		case BULLET_TYPE.BARRIER:
+			bulletData.dataBarrier = new BulletBarrier();
+			break;
+		case BULLET_TYPE.ROTATE_BIT:
+			bulletData.dataRotateBit = new BulletRotateBit();
+			break;
+		case BULLET_TYPE.RESURRECTION_HOMING:
+			bulletData.dataResurrectionHomingBullet = dataResurrectionHomingBullet.CreateParamMergedInstance(rate_info.dataResurrectionHomingBullet, rate);
+			break;
+		case BULLET_TYPE.SEARCH:
+			bulletData.dataSearch = new BulletSearch();
+			break;
+		case BULLET_TYPE.DECOY_TURRET_BIT:
+			bulletData.dataDecoyTurretBit = new BulletDecoyTurretBit();
 			break;
 		}
 		return bulletData;

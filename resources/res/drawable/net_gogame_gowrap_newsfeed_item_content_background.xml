@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<level-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/net_gogame_gowrap_button_background_facebook" android:maxLevel="0"/>
-    <item android:drawable="@drawable/net_gogame_gowrap_button_background_youtube" android:maxLevel="1"/>
-    <item android:drawable="@drawable/net_gogame_gowrap_button_background_instagram" android:maxLevel="2"/>
-    <item android:drawable="@drawable/net_gogame_gowrap_button_background_twitter" android:maxLevel="3"/>
-    <item android:drawable="@drawable/net_gogame_gowrap_button_background_forum" android:maxLevel="4"/>
-    <item android:drawable="@drawable/net_gogame_gowrap_button_background_wiki" android:maxLevel="5"/>
-</level-list>

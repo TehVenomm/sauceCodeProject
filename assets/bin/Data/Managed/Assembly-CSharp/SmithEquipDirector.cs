@@ -23,16 +23,6 @@ public class SmithEquipDirector : AnimationDirector
 		ABILITY_CHANGE_ONEND = 40000045
 	}
 
-	private const string STATE_NAME_CREATE = "CREATE";
-
-	private const string STATE_NAME_GROW = "GROW";
-
-	private const string STATE_NAME_EVOLVE = "EVOLVE";
-
-	private const string STATE_NAME_EXCEED = "EXCEED";
-
-	private const string STATE_NAME_ABILITY_CHANGE = "ABILITY_CHANGE";
-
 	[SerializeField]
 	private Transform npcParent;
 
@@ -78,17 +68,22 @@ public class SmithEquipDirector : AnimationDirector
 
 	private float time;
 
+	private const string STATE_NAME_CREATE = "CREATE";
+
+	private const string STATE_NAME_GROW = "GROW";
+
+	private const string STATE_NAME_EVOLVE = "EVOLVE";
+
+	private const string STATE_NAME_EXCEED = "EXCEED";
+
+	private const string STATE_NAME_ABILITY_CHANGE = "ABILITY_CHANGE";
+
 	private void Start()
 	{
 	}
 
 	public void SetNPC003(GameObject npcObject)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
 		if (!(npcObject == null))
 		{
 			Utility.Attach(npc003Parent, npcObject.get_transform());
@@ -101,11 +96,6 @@ public class SmithEquipDirector : AnimationDirector
 
 	public void SetNPC004(GameObject npcObject)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
 		Utility.Attach(npcParent, npcObject.get_transform());
 		Utility.SetLayerWithChildren(npcObject.get_transform(), npcParent.get_gameObject().get_layer());
 		npc004Animator = npcObject.GetComponentInChildren<Animator>();
@@ -160,7 +150,8 @@ public class SmithEquipDirector : AnimationDirector
 	public void StartGrow(Action onEnd)
 	{
 		updateFOV = true;
-		effectBindTarget = Utility.FindChild(npcParent, "NPC004_001/NPC004_Origin/Move/Root/Tools/Hammer_L");
+		string text = $"{GetNpcRoot()}Tools/Hammer_L";
+		effectBindTarget = Utility.FindChild(npcParent, "NPC004_003/");
 		SetEffects(growEffectPrefabs);
 		PlayDirection("GROW", onEnd);
 		PlayNPCAnimation("GROW");
@@ -169,9 +160,9 @@ public class SmithEquipDirector : AnimationDirector
 
 	public void StartEvolve(Action onEnd)
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		updateFOV = false;
-		effectBindTarget = Utility.FindChild(npcParent, "NPC004_001/NPC004_Origin/Move/Root/Hip/Spine00/Spine01/L_Shoulder/L_Upperarm/L_Forearm/L_Hand/L_Wep");
+		string name = $"{GetNpcRoot()}Hip/Spine00/Spine01/L_Shoulder/L_Upperarm/L_Forearm/L_Hand/L_Wep";
+		effectBindTarget = Utility.FindChild(npcParent, name);
 		SetEffects(evolveEffectPrefabs);
 		PlayDirection("EVOLVE", onEnd);
 		PlayNPCAnimation("EVOLVE");
@@ -182,9 +173,10 @@ public class SmithEquipDirector : AnimationDirector
 
 	public void StartExceed(Action onEnd)
 	{
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		updateFOV = false;
-		effectBindTarget = Utility.FindChild(npcParent, "NPC004_001/NPC004_Origin/Move/Root/Tools/Hammer_L");
+		string name = $"{GetNpcRoot()}Tools/Hammer_L";
+		effectBindTarget = Utility.FindChild(npcParent, name);
 		SetEffects(exceedEffectPrefabs);
 		PlayDirection("EXCEED", onEnd);
 		PlayNPCAnimation("EXCEED");
@@ -193,6 +185,12 @@ public class SmithEquipDirector : AnimationDirector
 		{
 			PlayBindEffect(0, effectBindTarget, new Vector3(0f, 0f, 0.522f));
 		}
+	}
+
+	public string GetNpcRoot()
+	{
+		int num = (!StatusManager.IsUnique()) ? 1 : 3;
+		return $"NPC004_{num:D3}/NPC004_Origin/Move/Root/";
 	}
 
 	public void StartAbilityChange(Action onEnd)
@@ -208,89 +206,104 @@ public class SmithEquipDirector : AnimationDirector
 	{
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetSmithCharacterActivateFlag(false);
+			MonoBehaviourSingleton<StatusStageManager>.I.SetEnableSmithCharacterActivate(active: false);
 		}
 		if (MonoBehaviourSingleton<AppMain>.IsValid())
 		{
-			SetLinkCamera(true);
+			SetLinkCamera(is_link: true);
 		}
 		Play(name, delegate
 		{
 			ResetPlayRate();
-			SoundManager.StopSEAll(0);
+			SoundManager.StopSEAll();
 			PlayAudioOnEnd(name);
 			onEnd();
-		}, 0f);
+		});
 	}
 
 	private void PlayAudioOnEnd(string name)
 	{
-		switch (name)
+		if (name == null)
 		{
-		case "GROW":
-			break;
-		case "ABILITY_CHANGE":
-			break;
-		case "CREATE":
+			return;
+		}
+		if (!(name == "CREATE"))
+		{
+			if (name == "GROW")
+			{
+				return;
+			}
+			if (!(name == "EVOLVE"))
+			{
+				if (!(name == "EXCEED"))
+				{
+					if (name == "ABILITY_CHANGE")
+					{
+					}
+				}
+				else
+				{
+					PlayAudio(AUDIO.GROW_ONEND);
+				}
+			}
+			else
+			{
+				PlayAudio(AUDIO.GROW_ONEND);
+			}
+		}
+		else
+		{
 			PlayAudio(AUDIO.CREATE_ONEND);
-			break;
-		case "EVOLVE":
-			PlayAudio(AUDIO.GROW_ONEND);
-			break;
-		case "EXCEED":
-			PlayAudio(AUDIO.GROW_ONEND);
-			break;
 		}
 	}
 
 	private void SetEffects(GameObject[] prefabs)
 	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Expected O, but got Unknown
-		if (prefabs != null && prefabs.Length > 0)
+		if (prefabs == null || prefabs.Length <= 0)
 		{
-			Camera val = (!MonoBehaviourSingleton<AppMain>.IsValid()) ? ((object)useCamera) : ((object)MonoBehaviourSingleton<AppMain>.I.mainCamera);
-			List<Animator> list = new List<Animator>();
-			effects = (GameObject[])new GameObject[prefabs.Length];
-			for (int i = 0; i < prefabs.Length; i++)
+			return;
+		}
+		Camera val = (!MonoBehaviourSingleton<AppMain>.IsValid()) ? useCamera : MonoBehaviourSingleton<AppMain>.I.mainCamera;
+		List<Animator> list = new List<Animator>();
+		effects = (GameObject[])new GameObject[prefabs.Length];
+		for (int i = 0; i < prefabs.Length; i++)
+		{
+			GameObject gameObject = ResourceUtility.Realizes(prefabs[i], effectParent, effectParent.get_gameObject().get_layer()).get_gameObject();
+			rymFX component = gameObject.GetComponent<rymFX>();
+			if (component != null)
 			{
-				GameObject val2 = ResourceUtility.Realizes(prefabs[i], effectParent, effectParent.get_gameObject().get_layer()).get_gameObject();
-				rymFX component = val2.GetComponent<rymFX>();
-				if (component != null)
+				component.Cameras = (Camera[])new Camera[1]
 				{
-					component.Cameras = (Camera[])new Camera[1]
-					{
-						val
-					};
-					val2.GetComponentsInChildren<Animator>(list);
-					animators.AddRange(list);
-				}
-				val2.SetActive(false);
-				effects[i] = val2;
+					val
+				};
+				gameObject.GetComponentsInChildren<Animator>(list);
+				animators.AddRange(list);
 			}
+			gameObject.SetActive(false);
+			effects[i] = gameObject;
 		}
 	}
 
 	public override void Reset()
 	{
-		if (!AppMain.isApplicationQuit)
+		if (AppMain.isApplicationQuit)
 		{
-			skip = false;
-			if (effects != null)
+			return;
+		}
+		skip = false;
+		if (effects != null)
+		{
+			for (int i = 0; i < effects.Length; i++)
 			{
-				for (int i = 0; i < effects.Length; i++)
+				GameObject val = effects[i];
+				if (Object.op_Implicit(val))
 				{
-					GameObject val = effects[i];
-					if (Object.op_Implicit(val))
-					{
-						Object.Destroy(val);
-					}
+					Object.Destroy(val);
 				}
 			}
-			animators.Clear();
-			base.Reset();
 		}
+		animators.Clear();
+		base.Reset();
 	}
 
 	protected override void Update()
@@ -317,7 +330,6 @@ public class SmithEquipDirector : AnimationDirector
 
 	protected override void LateUpdate()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		if (updateFOV && useCamera != null)
@@ -334,35 +346,37 @@ public class SmithEquipDirector : AnimationDirector
 
 	public override void Skip()
 	{
-		if (!skip)
+		if (skip)
 		{
-			for (int i = 0; i < effects.Length; i++)
-			{
-				GameObject val = effects[i];
-				if (val != null)
-				{
-					rymFX component = val.GetComponent<rymFX>();
-					if (component != null)
-					{
-						float num = component.GetEndFrame() - component.GetCurFrame();
-						if (num > 0f)
-						{
-							float num2 = num / 30f;
-							component.UpdateFx(num2, null, component.IsLoop());
-						}
-					}
-				}
-			}
-			if (animators != null && animators.Count > 0)
-			{
-				for (int j = 0; j < animators.Count; j++)
-				{
-					animators[j].set_speed(10000f);
-				}
-			}
-			SoundManager.StopSEAll(0);
-			base.Skip();
+			return;
 		}
+		for (int i = 0; i < effects.Length; i++)
+		{
+			GameObject val = effects[i];
+			if (!(val != null))
+			{
+				continue;
+			}
+			rymFX component = val.GetComponent<rymFX>();
+			if (component != null)
+			{
+				float num = component.GetEndFrame() - component.GetCurFrame();
+				if (num > 0f)
+				{
+					float num2 = num / 30f;
+					component.UpdateFx(num2, null, component.IsLoop());
+				}
+			}
+		}
+		if (animators != null && animators.Count > 0)
+		{
+			for (int j = 0; j < animators.Count; j++)
+			{
+				animators[j].set_speed(10000f);
+			}
+		}
+		SoundManager.StopSEAll();
+		base.Skip();
 	}
 
 	private void ResetPlayRate()
@@ -385,21 +399,37 @@ public class SmithEquipDirector : AnimationDirector
 			npc003Animator.Play(stateName, 0, 0f);
 			npc003Animator.Update(0f);
 		}
-		switch (stateName)
+		if (stateName == null)
 		{
-		case "GROW":
-			break;
-		case "ABILITY_CHANGE":
-			break;
-		case "CREATE":
+			return;
+		}
+		if (!(stateName == "CREATE"))
+		{
+			if (stateName == "GROW")
+			{
+				return;
+			}
+			if (!(stateName == "EVOLVE"))
+			{
+				if (!(stateName == "EXCEED"))
+				{
+					if (stateName == "ABILITY_CHANGE")
+					{
+					}
+				}
+				else
+				{
+					PlayAudio(AUDIO.EXCEED_START);
+				}
+			}
+			else
+			{
+				PlayAudio(AUDIO.EVOLVE_START);
+			}
+		}
+		else
+		{
 			PlayAudio(AUDIO.CREATE_START);
-			break;
-		case "EVOLVE":
-			PlayAudio(AUDIO.EVOLVE_START);
-			break;
-		case "EXCEED":
-			PlayAudio(AUDIO.EXCEED_START);
-			break;
 		}
 	}
 
@@ -420,8 +450,6 @@ public class SmithEquipDirector : AnimationDirector
 
 	private void PlayEffectWithParent(string name)
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
@@ -435,11 +463,11 @@ public class SmithEquipDirector : AnimationDirector
 				Transform val3 = SearchNpc004Transform(array[1]);
 				if (val2 != null && val3 != null)
 				{
-					Transform val4 = val2.get_transform();
-					val4.set_parent(val3);
-					val4.set_localPosition(Vector3.get_zero());
-					val4.set_localScale(Vector3.get_one());
-					val4.set_localRotation(Quaternion.get_identity());
+					Transform transform = val2.get_transform();
+					transform.set_parent(val3);
+					transform.set_localPosition(Vector3.get_zero());
+					transform.set_localScale(Vector3.get_one());
+					transform.set_localRotation(Quaternion.get_identity());
 					val2.SetActive(true);
 				}
 			}
@@ -452,8 +480,6 @@ public class SmithEquipDirector : AnimationDirector
 
 	private void PlayEffectSilvy(string name)
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
@@ -467,11 +493,11 @@ public class SmithEquipDirector : AnimationDirector
 				Transform val3 = SearchNpc003Transform(array[1]);
 				if (val2 != null && val3 != null)
 				{
-					Transform val4 = val2.get_transform();
-					val4.set_parent(val3);
-					val4.set_localPosition(Vector3.get_zero());
-					val4.set_localScale(Vector3.get_one());
-					val4.set_localRotation(Quaternion.get_identity());
+					Transform transform = val2.get_transform();
+					transform.set_parent(val3);
+					transform.set_localPosition(Vector3.get_zero());
+					transform.set_localScale(Vector3.get_one());
+					transform.set_localRotation(Quaternion.get_identity());
 					val2.SetActive(true);
 				}
 			}
@@ -484,8 +510,6 @@ public class SmithEquipDirector : AnimationDirector
 
 	private void PlayBindEffect(int effectIndex, Transform bindTarget, Vector3 offset)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		GameObject val = effects[effectIndex];
 		val.get_transform().set_parent(bindTarget);
@@ -515,7 +539,7 @@ public class SmithEquipDirector : AnimationDirector
 		GameObject e = FindEffect("ef_studio_evolve_01");
 		for (float time = 0.3f; time > 0f; time -= Time.get_deltaTime())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (Object.op_Implicit(e))
 		{

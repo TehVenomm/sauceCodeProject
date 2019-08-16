@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui;
+package net.gogame.gowrap.p019ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -10,6 +10,7 @@ import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.integrations.IntegrationSupport;
 
 @TargetApi(11)
+/* renamed from: net.gogame.gowrap.ui.ActivityHelper */
 public final class ActivityHelper implements ActivityLifecycleCallbacks {
     public static final ActivityHelper INSTANCE = new ActivityHelper();
     private Activity currentActivity = null;
@@ -30,7 +31,7 @@ public final class ActivityHelper implements ActivityLifecycleCallbacks {
             for (IntegrationSupport onActivityCreated : GoWrapImpl.INSTANCE.getIntegrationSupportList()) {
                 try {
                     onActivityCreated.onActivityCreated(activity);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Exception", e);
                 }
             }
@@ -42,7 +43,7 @@ public final class ActivityHelper implements ActivityLifecycleCallbacks {
             for (IntegrationSupport onActivityStarted : GoWrapImpl.INSTANCE.getIntegrationSupportList()) {
                 try {
                     onActivityStarted.onActivityStarted(activity);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Exception", e);
                 }
             }
@@ -55,7 +56,7 @@ public final class ActivityHelper implements ActivityLifecycleCallbacks {
             for (IntegrationSupport onActivityResumed : GoWrapImpl.INSTANCE.getIntegrationSupportList()) {
                 try {
                     onActivityResumed.onActivityResumed(activity);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Exception", e);
                 }
             }
@@ -67,7 +68,7 @@ public final class ActivityHelper implements ActivityLifecycleCallbacks {
             for (IntegrationSupport onActivityPaused : GoWrapImpl.INSTANCE.getIntegrationSupportList()) {
                 try {
                     onActivityPaused.onActivityPaused(activity);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Exception", e);
                 }
             }
@@ -79,7 +80,7 @@ public final class ActivityHelper implements ActivityLifecycleCallbacks {
             for (IntegrationSupport onActivityStopped : GoWrapImpl.INSTANCE.getIntegrationSupportList()) {
                 try {
                     onActivityStopped.onActivityStopped(activity);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Exception", e);
                 }
             }
@@ -94,7 +95,7 @@ public final class ActivityHelper implements ActivityLifecycleCallbacks {
             for (IntegrationSupport onActivityDestroyed : GoWrapImpl.INSTANCE.getIntegrationSupportList()) {
                 try {
                     onActivityDestroyed.onActivityDestroyed(activity);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Exception", e);
                 }
             }

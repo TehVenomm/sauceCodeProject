@@ -9,5 +9,5 @@ public interface zzc extends IInterface {
 
     void zza(zza zza, String str) throws RemoteException;
 
-    void zzap(boolean z) throws RemoteException;
+    void zzb(boolean z) throws RemoteException;
 }

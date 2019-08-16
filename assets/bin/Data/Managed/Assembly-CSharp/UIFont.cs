@@ -2,24 +2,24 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Font")]
 [ExecuteInEditMode]
-public class UIFont
+[AddComponentMenu("NGUI/UI/NGUI Font")]
+public class UIFont : MonoBehaviour
 {
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material mMat;
 
 	[HideInInspector]
 	[SerializeField]
 	private Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private BMFont mFont = new BMFont();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIAtlas mAtlas;
 
 	[HideInInspector]
@@ -38,8 +38,8 @@ public class UIFont
 	[SerializeField]
 	private int mDynamicFontSize = 16;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private FontStyle mDynamicFontStyle;
 
 	[NonSerialized]
@@ -124,8 +124,12 @@ public class UIFont
 			{
 				mReplacement.atlas = value;
 			}
-			else if (mAtlas != value)
+			else
 			{
+				if (!(mAtlas != value))
+				{
+					return;
+				}
 				mPMA = -1;
 				mAtlas = value;
 				if (mAtlas != null)
@@ -145,11 +149,6 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Expected O, but got Unknown
 			if (mReplacement != null)
 			{
 				return mReplacement.material;
@@ -200,8 +199,6 @@ public class UIFont
 	{
 		get
 		{
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			if (mReplacement != null)
 			{
 				return mReplacement.premultipliedAlphaShader;
@@ -223,8 +220,6 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			if (mReplacement != null)
 			{
 				return mReplacement.packedFontShader;
@@ -246,8 +241,6 @@ public class UIFont
 	{
 		get
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Expected O, but got Unknown
 			if (mReplacement != null)
 			{
 				return mReplacement.texture;
@@ -426,7 +419,7 @@ public class UIFont
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? ((object)mDynamicFont) : ((object)mReplacement.dynamicFont);
+			return (!(mReplacement != null)) ? mDynamicFont : mReplacement.dynamicFont;
 		}
 		set
 		{
@@ -477,9 +470,6 @@ public class UIFont
 	{
 		get
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Expected O, but got Unknown
 			if (Object.op_Implicit(mReplacement))
 			{
 				return mReplacement.dynamicTexture;
@@ -507,7 +497,7 @@ public class UIFont
 		Texture texture = mAtlas.texture;
 		if (texture != null && mSprite != null)
 		{
-			Rect val = NGUIMath.ConvertToPixels(mUVRect, this.texture.get_width(), this.texture.get_height(), true);
+			Rect val = NGUIMath.ConvertToPixels(mUVRect, this.texture.get_width(), this.texture.get_height(), round: true);
 			Rect val2 = default(Rect);
 			val2._002Ector((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
 			int xMin = Mathf.RoundToInt(val2.get_xMin() - val.get_xMin());
@@ -546,8 +536,6 @@ public class UIFont
 
 	public void MarkAsChanged()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Expected O, but got Unknown
 		if (mReplacement != null)
 		{
 			mReplacement.MarkAsChanged();
@@ -579,17 +567,18 @@ public class UIFont
 		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		if (!(mAtlas == null))
+		if (mAtlas == null)
 		{
-			Texture texture = mAtlas.texture;
-			if (texture != null)
+			return;
+		}
+		Texture texture = mAtlas.texture;
+		if (texture != null)
+		{
+			mUVRect = new Rect((float)(mSprite.x - mSprite.paddingLeft), (float)(mSprite.y - mSprite.paddingTop), (float)(mSprite.width + mSprite.paddingLeft + mSprite.paddingRight), (float)(mSprite.height + mSprite.paddingTop + mSprite.paddingBottom));
+			mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, texture.get_width(), texture.get_height());
+			if (mSprite.hasPadding)
 			{
-				mUVRect = new Rect((float)(mSprite.x - mSprite.paddingLeft), (float)(mSprite.y - mSprite.paddingTop), (float)(mSprite.width + mSprite.paddingLeft + mSprite.paddingRight), (float)(mSprite.height + mSprite.paddingTop + mSprite.paddingBottom));
-				mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, texture.get_width(), texture.get_height());
-				if (mSprite.hasPadding)
-				{
-					Trim();
-				}
+				Trim();
 			}
 		}
 	}
@@ -627,21 +616,22 @@ public class UIFont
 		{
 			BMSymbol bMSymbol = mSymbols[i];
 			int length = bMSymbol.length;
-			if (length != 0 && textLength >= length)
+			if (length == 0 || textLength < length)
 			{
-				bool flag = true;
-				for (int j = 0; j < length; j++)
+				continue;
+			}
+			bool flag = true;
+			for (int j = 0; j < length; j++)
+			{
+				if (text[offset + j] != bMSymbol.sequence[j])
 				{
-					if (text[offset + j] != bMSymbol.sequence[j])
-					{
-						flag = false;
-						break;
-					}
+					flag = false;
+					break;
 				}
-				if (flag && bMSymbol.Validate(atlas))
-				{
-					return bMSymbol;
-				}
+			}
+			if (flag && bMSymbol.Validate(atlas))
+			{
+				return bMSymbol;
 			}
 		}
 		return null;
@@ -649,14 +639,14 @@ public class UIFont
 
 	public void AddSymbol(string sequence, string spriteName)
 	{
-		BMSymbol symbol = GetSymbol(sequence, true);
+		BMSymbol symbol = GetSymbol(sequence, createIfMissing: true);
 		symbol.spriteName = spriteName;
 		MarkAsChanged();
 	}
 
 	public void RemoveSymbol(string sequence)
 	{
-		BMSymbol symbol = GetSymbol(sequence, false);
+		BMSymbol symbol = GetSymbol(sequence, createIfMissing: false);
 		if (symbol != null)
 		{
 			symbols.Remove(symbol);
@@ -666,7 +656,7 @@ public class UIFont
 
 	public void RenameSymbol(string before, string after)
 	{
-		BMSymbol symbol = GetSymbol(before, false);
+		BMSymbol symbol = GetSymbol(before, createIfMissing: false);
 		if (symbol != null)
 		{
 			symbol.sequence = after;

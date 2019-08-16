@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class QuestToFieldTable : Singleton<QuestToFieldTable>, IDataTable
 {
 	public class QuestToFieldData
 	{
-		public const string NT = "questId,mapId,eventId";
-
 		public uint questId;
 
 		public uint mapId;
@@ -14,6 +13,8 @@ public class QuestToFieldTable : Singleton<QuestToFieldTable>, IDataTable
 		public uint eventId;
 
 		public int grade;
+
+		public const string NT = "questId,mapId,eventId";
 
 		public static bool cb(CSVReader csv_reader, QuestToFieldData data, ref uint key1, ref uint key2)
 		{
@@ -31,15 +32,27 @@ public class QuestToFieldTable : Singleton<QuestToFieldTable>, IDataTable
 
 	private DoubleUIntKeyTable<QuestToFieldData> questToItemTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<QuestToFieldData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<QuestToFieldData> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
+
 	public void CreateTable(string csv_text)
 	{
-		questToItemTable = TableUtility.CreateDoubleUIntKeyTable<QuestToFieldData>(csv_text, QuestToFieldData.cb, "questId,mapId,eventId", QuestToFieldData.CBSecondKey, null, null, null);
+		questToItemTable = TableUtility.CreateDoubleUIntKeyTable<QuestToFieldData>(csv_text, QuestToFieldData.cb, "questId,mapId,eventId", QuestToFieldData.CBSecondKey);
 		questToItemTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(questToItemTable, csv_text, QuestToFieldData.cb, "questId,mapId,eventId", QuestToFieldData.CBSecondKey, null, null);
+		TableUtility.AddDoubleUIntKeyTable(questToItemTable, csv_text, QuestToFieldData.cb, "questId,mapId,eventId", QuestToFieldData.CBSecondKey);
 	}
 
 	public void InitDependencyData()
@@ -89,7 +102,7 @@ public class QuestToFieldTable : Singleton<QuestToFieldTable>, IDataTable
 
 	public FieldMapTable.FieldMapTableData[] GetFieldMapTableFromQuestIdWithClosedField(uint questId)
 	{
-		return GetFieldMapTableFromQuestId(questId, true);
+		return GetFieldMapTableFromQuestId(questId, hasIncludelockedField: true);
 	}
 
 	public FieldMapTable.FieldMapTableData[] GetFieldMapTableFromQuestId(uint questId, bool hasIncludelockedField = false)

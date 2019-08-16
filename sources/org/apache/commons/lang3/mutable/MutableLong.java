@@ -6,6 +6,9 @@ public class MutableLong extends Number implements Comparable<MutableLong>, Muta
     private static final long serialVersionUID = 62986528375L;
     private long value;
 
+    public MutableLong() {
+    }
+
     public MutableLong(long j) {
         this.value = j;
     }
@@ -75,10 +78,10 @@ public class MutableLong extends Number implements Comparable<MutableLong>, Muta
     }
 
     public boolean equals(Object obj) {
-        if ((obj instanceof MutableLong) && this.value == ((MutableLong) obj).longValue()) {
-            return true;
+        if (!(obj instanceof MutableLong) || this.value != ((MutableLong) obj).longValue()) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {

@@ -18,7 +18,7 @@ public class Coop_Model_CharacterUpdateActionPosition : Coop_Model_ObjectBase
 	public override bool IsHandleable(StageObject owner)
 	{
 		Character character = owner as Character;
-		if ((character.actionID == Character.ACTION_ID.ATTACK || character.actionID == (Character.ACTION_ID)20) && (!character.actionPositionWaitSync || character.actionPositionWaitTrigger != trigger))
+		if ((character.actionID == Character.ACTION_ID.ATTACK || character.actionID == (Character.ACTION_ID)22) && (!character.actionPositionWaitSync || character.actionPositionWaitTrigger != trigger))
 		{
 			return false;
 		}

@@ -37,7 +37,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		private set;
 	}
 
-	public ClanChatRoom clanChat
+	public ChatRoom clanChat
 	{
 		get;
 		private set;
@@ -62,6 +62,10 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 	public event Action<ChatRoom> OnCreateLoungeChat;
 
 	public event Action<ChatRoom> OnDestroyLoungeChat;
+
+	public event Action<ChatRoom> OnCreateClanChat;
+
+	public event Action<ChatRoom> OnDestroyClanChat;
 
 	public void OnNotifyUpdateChannnelInfo(ChatChannelInfo info)
 	{
@@ -152,20 +156,17 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 
 	private void ConnectHomeChat(ChatChannel channel)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		currentChannel = channel;
 		if (channel == invalidChannel || channel == offlineChannel)
 		{
 			homeChat.SetConnection(new ChatOfflineConnection());
+			return;
 		}
-		else
-		{
-			ChatWebSocketConnection chatWebSocketConnection = this.get_gameObject().AddComponent<ChatWebSocketConnection>();
-			chatWebSocketConnection.Setup(channel.host, channel.port, channel.path, true);
-			homeChat.SetConnection(chatWebSocketConnection);
-			int roomNo = 1;
-			homeChat.JoinRoom(roomNo);
-		}
+		ChatWebSocketConnection chatWebSocketConnection = this.get_gameObject().AddComponent<ChatWebSocketConnection>();
+		chatWebSocketConnection.Setup(channel.host, channel.port, channel.path);
+		homeChat.SetConnection(chatWebSocketConnection);
+		int roomNo = 1;
+		homeChat.JoinRoom(roomNo);
 	}
 
 	public void CreateHomeChat()
@@ -241,7 +242,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 	{
 		if (roomChat != null)
 		{
-			roomChat.Disconnect(null);
+			roomChat.Disconnect();
 			if (this.OnDestroyRoomChat != null)
 			{
 				this.OnDestroyRoomChat(roomChat);
@@ -281,7 +282,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 	{
 		if (loungeChat != null)
 		{
-			loungeChat.Disconnect(null);
+			loungeChat.Disconnect();
 			if (this.OnDestroyLoungeChat != null)
 			{
 				this.OnDestroyLoungeChat(loungeChat);
@@ -301,7 +302,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 		if (loungeChat != null)
 		{
 			IChatConnection connection = loungeChat.connection;
-			loungeChat.Disconnect(null);
+			loungeChat.Disconnect();
 			if (this.OnDestroyLoungeChat != null)
 			{
 				this.OnDestroyLoungeChat(loungeChat);
@@ -312,71 +313,18 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 
 	public void CreateClanChat(ChatChannelInfo info, int clanId, Action<bool> callback = null)
 	{
-		if (info == null)
+	}
+
+	public void CreateClanChat(IChatConnection conn)
+	{
+		if (clanChat == null)
 		{
-			Log.Error(LOG.NETWORK, "clanChat info is null!!");
-			if (callback != null)
+			clanChat = new ChatRoom();
+			clanChat.SetConnection(conn);
+			if (this.OnCreateClanChat != null)
 			{
-				callback(false);
+				this.OnCreateClanChat(clanChat);
 			}
-		}
-		else if (clanChat != null && clanChat.HasConnect)
-		{
-			Log.Error(LOG.NETWORK, "ClanChat has already connected!");
-			if (callback != null)
-			{
-				callback(true);
-			}
-		}
-		else if (clanChat != null)
-		{
-			Log.Warning(LOG.NETWORK, "ClanChat reconnect!");
-			clanChat.JoinRoom(clanId);
-			if (callback != null)
-			{
-				callback(true);
-			}
-		}
-		else
-		{
-			clanChat = new ClanChatRoom();
-			Protocol.Force(delegate
-			{
-				SendClanChannelEnter(info.recommend, delegate(ChatChannel chatChannel)
-				{
-					//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-					if (chatChannel == null)
-					{
-						Log.Error(LOG.NETWORK, "Clan Chat channel is null");
-						clanChat.LeaveRoom(clanId);
-						if (callback != null)
-						{
-							callback(false);
-						}
-					}
-					else if (chatChannel == invalidChannel || chatChannel == offlineChannel)
-					{
-						clanChat.SetConnection(new ClanChatOfflineConnection());
-						Log.Error(LOG.NETWORK, "Use Clan chat Offline Connection");
-						if (callback != null)
-						{
-							callback(true);
-						}
-					}
-					else
-					{
-						ClanChatWebSocketConnection clanChatWebSocketConnection = this.get_gameObject().AddComponent<ClanChatWebSocketConnection>();
-						clanChatWebSocketConnection.Setup(chatChannel.host, chatChannel.port, chatChannel.path, true);
-						clanChat.SetConnection(clanChatWebSocketConnection);
-						clanChat.JoinRoom(clanId);
-						Log.Error(LOG.NETWORK, "Create Clan Chat Successful !");
-						if (callback != null)
-						{
-							callback(true);
-						}
-					}
-				});
-			});
 		}
 	}
 
@@ -384,9 +332,13 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 	{
 		if (clanChat != null)
 		{
-			Log.Error(LOG.NETWORK, "Destroy clan chat successful!");
-			clanChat.LeaveRoom(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId);
-			clanChat.Disconnect(null);
+			IChatConnection connection = clanChat.connection;
+			clanChat.Disconnect();
+			if (this.OnDestroyClanChat != null)
+			{
+				this.OnDestroyClanChat(clanChat);
+			}
+			clanChat = null;
 		}
 	}
 

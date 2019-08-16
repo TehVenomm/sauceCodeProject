@@ -1,8 +1,9 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.net.Uri;
 import android.os.Bundle;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsCallback */
 public class CustomTabsCallback {
     public static final int NAVIGATION_ABORTED = 4;
     public static final int NAVIGATION_FAILED = 3;

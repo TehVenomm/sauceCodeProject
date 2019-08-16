@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.facebook.internal.NativeProtocol;
 import com.facebook.internal.PlatformServiceClient;
 
+@Deprecated
 final class LikeStatusClient extends PlatformServiceClient {
     private String objectId;
 
@@ -13,7 +14,8 @@ final class LikeStatusClient extends PlatformServiceClient {
         this.objectId = str2;
     }
 
-    protected void populateRequestBundle(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void populateRequestBundle(Bundle bundle) {
         bundle.putString(ShareConstants.EXTRA_OBJECT_ID, this.objectId);
     }
 }

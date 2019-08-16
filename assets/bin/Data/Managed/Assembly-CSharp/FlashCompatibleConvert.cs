@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class FlashCompatibleConvert
+public class FlashCompatibleConvert : MonoBehaviour
 {
 	public FlashCompatibleConvert()
 		: this()
@@ -27,7 +28,7 @@ public class FlashCompatibleConvert
 			{
 				throw new Exception("FlashCompatibleConvert.ToInt32 was passed a wrong argument: " + s);
 			}
-			num2 += (double)num3 * Math.Pow(10.0, (double)(s.Length - i - 1));
+			num2 += (double)num3 * Math.Pow(10.0, s.Length - i - 1);
 		}
 		return (int)(num2 * (double)((!flag) ? 1 : (-1)));
 	}
@@ -137,7 +138,7 @@ public class FlashCompatibleConvert
 				{
 					throw new Exception("FlashCompatibleConvert.ToDouble was passed a wrong argument: " + s);
 				}
-				num6 = ((num == -1 || k <= num) ? (num6 + (double)num7 * Math.Pow(10.0, (double)(num5 - k - 1))) : (num6 + (double)num7 * Math.Pow(0.1, (double)(k - num))));
+				num6 = ((num == -1 || k <= num) ? (num6 + (double)num7 * Math.Pow(10.0, num5 - k - 1)) : (num6 + (double)num7 * Math.Pow(0.1, k - num)));
 			}
 		}
 		if (num3 != -1)

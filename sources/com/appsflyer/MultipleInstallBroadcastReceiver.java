@@ -11,16 +11,16 @@ public class MultipleInstallBroadcastReceiver extends BroadcastReceiver {
             String stringExtra = intent.getStringExtra("referrer");
             if (stringExtra != null) {
                 if ("AppsFlyer_Test".equals(stringExtra) && intent.getStringExtra("TestIntegrationMode") != null) {
-                    AppsFlyerLib.getInstance().m257(context, intent);
+                    AppsFlyerLib.getInstance().mo6481(context, intent);
                     return;
                 } else if (context.getSharedPreferences("appsflyer-data", 0).getString("referrer", null) != null) {
                     AppsFlyerLib.getInstance();
-                    AppsFlyerLib.m243(context, stringExtra);
+                    AppsFlyerLib.m223(context, stringExtra);
                     return;
                 }
             }
             AFLogger.afInfoLog("MultipleInstallBroadcastReceiver called");
-            AppsFlyerLib.getInstance().m257(context, intent);
+            AppsFlyerLib.getInstance().mo6481(context, intent);
             for (ResolveInfo resolveInfo : context.getPackageManager().queryBroadcastReceivers(new Intent("com.android.vending.INSTALL_REFERRER"), 0)) {
                 String action = intent.getAction();
                 if (resolveInfo.activityInfo.packageName.equals(context.getPackageName()) && "com.android.vending.INSTALL_REFERRER".equals(action) && !getClass().getName().equals(resolveInfo.activityInfo.name)) {

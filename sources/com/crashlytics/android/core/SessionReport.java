@@ -1,21 +1,24 @@
 package com.crashlytics.android.core;
 
-import io.fabric.sdk.android.Fabric;
+import com.crashlytics.android.core.Report.Type;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import p017io.fabric.sdk.android.Fabric;
 
 class SessionReport implements Report {
     private final Map<String, String> customHeaders;
     private final File file;
+    private final File[] files;
 
-    public SessionReport(File file) {
-        this(file, Collections.emptyMap());
+    public SessionReport(File file2) {
+        this(file2, Collections.emptyMap());
     }
 
-    public SessionReport(File file, Map<String, String> map) {
-        this.file = file;
+    public SessionReport(File file2, Map<String, String> map) {
+        this.file = file2;
+        this.files = new File[]{file2};
         this.customHeaders = new HashMap(map);
         if (this.file.length() == 0) {
             this.customHeaders.putAll(ReportUploader.HEADER_INVALID_CLS_FILE);
@@ -34,13 +37,21 @@ class SessionReport implements Report {
         return getFile().getName();
     }
 
+    public File[] getFiles() {
+        return this.files;
+    }
+
     public String getIdentifier() {
         String fileName = getFileName();
         return fileName.substring(0, fileName.lastIndexOf(46));
     }
 
-    public boolean remove() {
-        Fabric.getLogger().mo4289d("Fabric", "Removing report at " + this.file.getPath());
-        return this.file.delete();
+    public Type getType() {
+        return Type.JAVA;
+    }
+
+    public void remove() {
+        Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Removing report at " + this.file.getPath());
+        this.file.delete();
     }
 }

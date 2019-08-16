@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class EnemyTable : Singleton<EnemyTable>, IDataTable
 {
 	public class EnemyData
 	{
-		public const string NT = "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,exActionId,exActionCondition,exActionConditionValue";
-
 		public uint id;
 
 		public uint enemyCollectionId;
@@ -55,6 +54,10 @@ public class EnemyTable : Singleton<EnemyTable>, IDataTable
 
 		public uint growId;
 
+		public string weatherChangeEffect;
+
+		public const string NT = "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,weatherChangeEffect,exActionId,exActionCondition,exActionConditionValue";
+
 		public bool IsEnableNowApplicationVersion()
 		{
 			return AppMain.CheckApplicationVersion(appVer);
@@ -81,7 +84,7 @@ public class EnemyTable : Singleton<EnemyTable>, IDataTable
 			csv_reader.Pop(ref value);
 			if (value.Length > 1)
 			{
-				data.element = (ELEMENT_TYPE)(int)Enum.Parse(typeof(ELEMENT_TYPE), value);
+				data.element = (ELEMENT_TYPE)Enum.Parse(typeof(ELEMENT_TYPE), value);
 			}
 			else
 			{
@@ -90,7 +93,7 @@ public class EnemyTable : Singleton<EnemyTable>, IDataTable
 			csv_reader.Pop(ref value);
 			if (value.Length > 1)
 			{
-				data.weakElement = (ELEMENT_TYPE)(int)Enum.Parse(typeof(ELEMENT_TYPE), value);
+				data.weakElement = (ELEMENT_TYPE)Enum.Parse(typeof(ELEMENT_TYPE), value);
 			}
 			else
 			{
@@ -106,26 +109,36 @@ public class EnemyTable : Singleton<EnemyTable>, IDataTable
 			csv_reader.Pop(ref data.effectEnemyKey);
 			csv_reader.Pop(ref data.personality);
 			csv_reader.Pop(ref data.growId);
+			csv_reader.Pop(ref data.weatherChangeEffect);
 			return true;
 		}
 	}
 
 	private UIntKeyTable<EnemyData> enemyTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyData> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyData> _003C_003Ef__mg_0024cache2;
+
 	public void CreateTable(string csv_text)
 	{
-		enemyTable = TableUtility.CreateUIntKeyTable<EnemyData>(csv_text, EnemyData.cb, "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,exActionId,exActionCondition,exActionConditionValue", null);
+		enemyTable = TableUtility.CreateUIntKeyTable<EnemyData>(csv_text, EnemyData.cb, "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,weatherChangeEffect,exActionId,exActionCondition,exActionConditionValue");
 	}
 
 	public void CreateTable(string csv_text, TableUtility.Progress progress)
 	{
-		enemyTable = TableUtility.CreateUIntKeyTable<EnemyData>(csv_text, EnemyData.cb, "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,exActionId,exActionCondition,exActionConditionValue", progress);
+		enemyTable = TableUtility.CreateUIntKeyTable<EnemyData>(csv_text, EnemyData.cb, "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,weatherChangeEffect,exActionId,exActionCondition,exActionConditionValue", progress);
 		enemyTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(enemyTable, csv_text, EnemyData.cb, "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,exActionId,exActionCondition,exActionConditionValue", null);
+		TableUtility.AddUIntKeyTable(enemyTable, csv_text, EnemyData.cb, "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,weatherChangeEffect,exActionId,exActionCondition,exActionConditionValue");
 	}
 
 	public EnemyData GetEnemyData(uint id)

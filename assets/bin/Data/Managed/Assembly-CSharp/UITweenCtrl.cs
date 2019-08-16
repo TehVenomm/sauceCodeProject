@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UITweenCtrl
+public class UITweenCtrl : MonoBehaviour
 {
 	[SerializeField]
 	private int _id;
@@ -21,7 +21,6 @@ public class UITweenCtrl
 
 	public static void Set(Transform root)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		UITweenCtrl component = root.GetComponent<UITweenCtrl>();
 		if (!(component != null))
 		{
@@ -68,13 +67,13 @@ public class UITweenCtrl
 		{
 			if (is_input_block)
 			{
-				MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, true);
+				MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, is_disable: true);
 			}
 			uITweenCtrl.Play(forward, delegate
 			{
 				if (is_input_block)
 				{
-					MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, false);
+					MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, is_disable: false);
 				}
 				if (callback != null)
 				{
@@ -128,49 +127,47 @@ public class UITweenCtrl
 
 	protected void _Play(UITweener[] target_tweens, bool forward = true, EventDelegate.Callback onFinished = null)
 	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		if (target_tweens != null && target_tweens.Length != 0 && !isPlaying)
+		if (target_tweens == null || target_tweens.Length == 0 || isPlaying)
 		{
-			if (target_tweens[0] == null)
+			return;
+		}
+		if (target_tweens[0] == null)
+		{
+			Log.Error("tween[0] = null!");
+			return;
+		}
+		isPlaying = true;
+		uiTable = this.get_gameObject().GetComponentInParent<UITable>();
+		if (onFinished != null)
+		{
+			EventDelegate.Add(target_tweens[0].onFinished, onFinished, oneShot: true);
+		}
+		EventDelegate.Add(target_tweens[0].onFinished, OnFinished);
+		int i = 0;
+		for (int num = target_tweens.Length; i < num; i++)
+		{
+			if (!(target_tweens[i] == null))
 			{
-				Log.Error("tween[0] = null!");
+				_TweenPlay(target_tweens[i], forward);
 			}
-			else
+		}
+		if (GameSceneManager.isAutoEventSkip)
+		{
+			AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
+			i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
 			{
-				isPlaying = true;
-				uiTable = this.get_gameObject().GetComponentInParent<UITable>();
-				if (onFinished != null)
+				if (isPlaying)
 				{
-					EventDelegate.Add(target_tweens[0].onFinished, onFinished, true);
-				}
-				EventDelegate.Add(target_tweens[0].onFinished, OnFinished);
-				int i = 0;
-				for (int num = target_tweens.Length; i < num; i++)
-				{
-					if (!(target_tweens[i] == null))
+					int j = 0;
+					for (int num2 = target_tweens.Length; j < num2; j++)
 					{
-						_TweenPlay(target_tweens[i], forward);
+						if (target_tweens[j] != null)
+						{
+							target_tweens[j].tweenFactor = 1f;
+						}
 					}
 				}
-				if (GameSceneManager.isAutoEventSkip)
-				{
-					AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
-					i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
-					{
-						if (isPlaying)
-						{
-							int j = 0;
-							for (int num2 = target_tweens.Length; j < num2; j++)
-							{
-								if (target_tweens[j] != null)
-								{
-									target_tweens[j].tweenFactor = 1f;
-								}
-							}
-						}
-					});
-				}
-			}
+			});
 		}
 	}
 
@@ -186,26 +183,24 @@ public class UITweenCtrl
 
 	protected void _Reset(UITweener[] target_tweens)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		if (target_tweens != null && target_tweens.Length != 0)
+		if (target_tweens == null || target_tweens.Length == 0)
 		{
-			if (target_tweens[0] == null)
+			return;
+		}
+		if (target_tweens[0] == null)
+		{
+			Log.Error("tween[0] = null!");
+			return;
+		}
+		isPlaying = false;
+		uiTable = this.get_gameObject().GetComponentInParent<UITable>();
+		EventDelegate.Set(target_tweens[0].onFinished, OnFinished);
+		int i = 0;
+		for (int num = target_tweens.Length; i < num; i++)
+		{
+			if (!(target_tweens[i] == null))
 			{
-				Log.Error("tween[0] = null!");
-			}
-			else
-			{
-				isPlaying = false;
-				uiTable = this.get_gameObject().GetComponentInParent<UITable>();
-				EventDelegate.Set(target_tweens[0].onFinished, OnFinished);
-				int i = 0;
-				for (int num = target_tweens.Length; i < num; i++)
-				{
-					if (!(target_tweens[i] == null))
-					{
-						_TweenReset(target_tweens[i]);
-					}
-				}
+				_TweenReset(target_tweens[i]);
 			}
 		}
 	}
@@ -218,7 +213,7 @@ public class UITweenCtrl
 		target.duration = 0f;
 		target.delay = 0f;
 		target.style = UITweener.Style.Once;
-		target.Play(false);
+		target.Play(forward: false);
 		target.style = style;
 		target.duration = duration;
 		target.delay = delay;
@@ -231,17 +226,18 @@ public class UITweenCtrl
 
 	protected void _Skip(UITweener[] target_tweens, bool forward = true)
 	{
-		if (target_tweens != null && target_tweens.Length != 0)
+		if (target_tweens == null || target_tweens.Length == 0)
 		{
-			int i = 0;
-			for (int num = target_tweens.Length; i < num; i++)
+			return;
+		}
+		int i = 0;
+		for (int num = target_tweens.Length; i < num; i++)
+		{
+			if (!(target_tweens[i] == null))
 			{
-				if (!(target_tweens[i] == null))
-				{
-					float tweenFactor = (float)(forward ? 1 : 0);
-					target_tweens[i].tweenFactor = tweenFactor;
-					target_tweens[i].Sample(target_tweens[i].tweenFactor, false);
-				}
+				float tweenFactor = forward ? 1 : 0;
+				target_tweens[i].tweenFactor = tweenFactor;
+				target_tweens[i].Sample(target_tweens[i].tweenFactor, isFinished: false);
 			}
 		}
 	}
@@ -269,24 +265,25 @@ public class UITweenCtrl
 		int num = tweens.Length;
 		for (int i = 0; i < num; i++)
 		{
-			if (tweens[i] == null)
+			if (!(tweens[i] == null))
 			{
-				num--;
-				int j = i;
-				for (int num2 = tweens.Length; j < num2; j++)
-				{
-					if (j < num2 - 1)
-					{
-						tweens[j] = tweens[j + 1];
-					}
-					else
-					{
-						tweens[j] = null;
-					}
-				}
-				Array.Resize(ref tweens, num);
-				i--;
+				continue;
 			}
+			num--;
+			int j = i;
+			for (int num2 = tweens.Length; j < num2; j++)
+			{
+				if (j < num2 - 1)
+				{
+					tweens[j] = tweens[j + 1];
+				}
+				else
+				{
+					tweens[j] = null;
+				}
+			}
+			Array.Resize(ref tweens, num);
+			i--;
 		}
 	}
 }

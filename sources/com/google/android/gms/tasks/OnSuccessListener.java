@@ -1,5 +1,5 @@
 package com.google.android.gms.tasks;
 
 public interface OnSuccessListener<TResult> {
-    void onSuccess(TResult tResult);
+    void onSuccess(TResult tresult);
 }

@@ -27,16 +27,16 @@ namespace Network
 		public List<ProductData> GetBundleList()
 		{
 			return (from o in shopList
-			where MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasPack(o.productId)
+			where Singleton<ProductDataTable>.I.HasPack(o.productId)
 			select o).ToList();
 		}
 
 		public bool HasPurchasedBundle()
 		{
 			List<ProductData> list = (from o in shopList
-			where MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasPack(o.productId)
+			where Singleton<ProductDataTable>.I.HasPack(o.productId)
 			select o).ToList();
-			return list != null && list.Count < MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.TotalPack();
+			return list != null && list.Count < Singleton<ProductDataTable>.I.TotalPack();
 		}
 	}
 }

@@ -1,4 +1,6 @@
-public class EnemyEffectObject
+using UnityEngine;
+
+public class EnemyEffectObject : MonoBehaviour
 {
 	public enum DELETE_CONDITION
 	{
@@ -35,45 +37,42 @@ public class EnemyEffectObject
 
 	private void SelfDestroy()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
 		if (m_targetEnemy != null)
 		{
 			m_targetEnemy.OnNotifyDeleteEnemyEffect(this);
 			m_targetEnemy = null;
 		}
-		EffectManager.ReleaseEffect(this.get_gameObject(), true, false);
+		EffectManager.ReleaseEffect(this.get_gameObject());
 		m_isDeleted = true;
 	}
 
 	private void Update()
 	{
-		if (!m_isDeleted)
+		if (m_isDeleted)
 		{
-			if (m_targetEnemy == null || m_targetEnemy.isDead)
-			{
-				SelfDestroy();
-			}
-			else
-			{
-				bool flag = false;
-				switch (m_deleteCondition)
-				{
-				case DELETE_CONDITION.BarrierHp:
-					flag = ((int)m_targetEnemy.BarrierHp <= 0);
-					break;
-				case DELETE_CONDITION.RegionHp:
-					flag = ((int)m_enemyRegionWork.hp <= 0);
-					break;
-				case DELETE_CONDITION.ShieldHp:
-					flag = ((int)m_targetEnemy.ShieldHp <= 0);
-					break;
-				}
-				if (flag)
-				{
-					SelfDestroy();
-				}
-			}
+			return;
+		}
+		if (m_targetEnemy == null || m_targetEnemy.isDead)
+		{
+			SelfDestroy();
+			return;
+		}
+		bool flag = false;
+		switch (m_deleteCondition)
+		{
+		case DELETE_CONDITION.BarrierHp:
+			flag = ((int)m_targetEnemy.BarrierHp <= 0);
+			break;
+		case DELETE_CONDITION.RegionHp:
+			flag = ((int)m_enemyRegionWork.hp <= 0);
+			break;
+		case DELETE_CONDITION.ShieldHp:
+			flag = ((int)m_targetEnemy.ShieldHp <= 0);
+			break;
+		}
+		if (flag)
+		{
+			SelfDestroy();
 		}
 	}
 }

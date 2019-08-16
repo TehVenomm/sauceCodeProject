@@ -2,9 +2,10 @@ using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class CoopStage
+public class CoopStage : MonoBehaviour
 {
 	public enum STAGE_REQUEST_ERROR
 	{
@@ -63,6 +64,10 @@ public class CoopStage
 	private Coroutine specialEnemyAnnounceGone;
 
 	private ENEMY_POP_TYPE currentAnnounceType;
+
+	private bool isInFieldFishingEnemyBattle;
+
+	private bool isPresentQuest;
 
 	private Coop_Model_WaveMatchInfo firstWaveMatchInfo;
 
@@ -170,10 +175,18 @@ public class CoopStage
 		return isInFieldEnemyBossBattle;
 	}
 
+	public bool HasFieldEnemyBossLimitTime()
+	{
+		return isInFieldEnemyBossBattle && !isInFieldFishingEnemyBattle;
+	}
+
+	public bool GetisInFieldFishingEnemyBattle()
+	{
+		return isInFieldFishingEnemyBattle;
+	}
+
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		packetSender = this.get_gameObject().AddComponent<CoopStagePacketSender>();
 		packetReceiver = this.get_gameObject().AddComponent<CoopStagePacketReceiver>();
 	}
@@ -184,7 +197,7 @@ public class CoopStage
 		fieldRewardPool.OnUpdate();
 		if (closeEntrySpan.IsReady())
 		{
-			CheckEntryClose(false);
+			CheckEntryClose();
 		}
 		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
@@ -200,35 +213,36 @@ public class CoopStage
 
 	private void CheckCharacterSync()
 	{
-		if (isActivateStart && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<StageObjectManager>.IsValid() && !MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOfflinePlay)
+		if (!isActivateStart || !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() || !MonoBehaviourSingleton<StageObjectManager>.IsValid() || MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOfflinePlay)
 		{
-			ForEachClients(delegate(CoopClient c)
+			return;
+		}
+		ForEachClients(delegate(CoopClient c)
+		{
+			if (!(c is CoopMyClient) && c.IsBattleStart() && !c.isBattleRetire && !c.IsBattleEnd() && !c.isLeave)
 			{
-				if (!(c is CoopMyClient) && c.IsBattleStart() && !c.isBattleRetire && !c.IsBattleEnd() && !c.isLeave)
+				if (c.IsPlayerPop())
 				{
-					if (c.IsPlayerPop())
+					Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(c.playerId) as Player;
+					if (player2 == null)
 					{
-						Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(c.playerId) as Player;
-						if (player2 == null)
-						{
-							player2 = (MonoBehaviourSingleton<StageObjectManager>.I.FindCache(c.playerId) as Player);
-						}
-						if (player2 != null)
-						{
-							return;
-						}
+						player2 = (MonoBehaviourSingleton<StageObjectManager>.I.FindCache(c.playerId) as Player);
 					}
-					packetSender.SendRequestPop(c.clientId, true, true, false);
+					if (player2 != null)
+					{
+						return;
+					}
 				}
-			});
-			int i = 0;
-			for (int count = MonoBehaviourSingleton<StageObjectManager>.I.cacheList.Count; i < count; i++)
+				packetSender.SendRequestPop(c.clientId, is_player: true, is_self: true);
+			}
+		});
+		int i = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.cacheList.Count; i < count; i++)
+		{
+			Player player = MonoBehaviourSingleton<StageObjectManager>.I.cacheList[i] as Player;
+			if (player != null && player.IsPuppet() && player.playerSender != null)
 			{
-				Player player = MonoBehaviourSingleton<StageObjectManager>.I.cacheList[i] as Player;
-				if (player != null && player.IsPuppet() && player.playerSender != null)
-				{
-					player.playerSender.OnLoadComplete(false);
-				}
+				player.playerSender.OnLoadComplete(promise: false);
 			}
 		}
 	}
@@ -237,7 +251,6 @@ public class CoopStage
 	{
 		if (!Log.enabled)
 		{
-			return;
 		}
 	}
 
@@ -358,7 +371,7 @@ public class CoopStage
 		Logd("OnLeaveClient: client={0}.", client);
 		if (chatConnection != null && QuestManager.IsValidInGame() && !(client is CoopMyClient) && client.GetPlayer() != null)
 		{
-			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.CHAT, 6u, client.GetPlayerName()));
+			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.CHAT, 6u, client.GetPlayerName()), string.Empty);
 		}
 		client.PopCachePlayer(StageObject.COOP_MODE_TYPE.PUPPET);
 		CoopStageObjectUtility.TransfarOwnerForClientObjects(client.clientId, host_client_id);
@@ -397,13 +410,13 @@ public class CoopStage
 		{
 			if (!(c is CoopMyClient))
 			{
-				c.PopCachePlayer(StageObject.COOP_MODE_TYPE.NONE);
+				c.PopCachePlayer();
 				if (!c.IsPlayerPop() && c.userInfo != null && c.userInfo.equipSet.Count > 0)
 				{
 					int playerID = MonoBehaviourSingleton<CoopManager>.I.GetPlayerID(c);
 					if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 					{
-						MonoBehaviourSingleton<StageObjectManager>.I.CreateGuest(playerID, c.userInfo, null);
+						MonoBehaviourSingleton<StageObjectManager>.I.CreateGuest(playerID, c.userInfo);
 						c.SetPlayerID(playerID);
 					}
 				}
@@ -433,7 +446,7 @@ public class CoopStage
 			{
 				if (!(c is CoopMyClient))
 				{
-					c.PopCachePlayer(StageObject.COOP_MODE_TYPE.NONE);
+					c.PopCachePlayer();
 					if (!c.IsPlayerPop() && !c.isStageResponseEnd && c.userInfo != null && c.userInfo.equipSet.Count > 0)
 					{
 						int playerID = MonoBehaviourSingleton<CoopManager>.I.GetPlayerID(c);
@@ -444,11 +457,11 @@ public class CoopStage
 								Player player = o as Player;
 								if (MonoBehaviourSingleton<CoopManager>.I.coopRoom.IsBattle())
 								{
-									player.ActBattleStart(false);
+									player.ActBattleStart();
 								}
 								else if (player.controller != null)
 								{
-									player.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_START);
+									player.controller.SetEnableControll(enable: false, ControllerBase.DISABLE_FLAG.BATTLE_START);
 								}
 							});
 							c.SetPlayerID(playerID);
@@ -472,64 +485,62 @@ public class CoopStage
 
 	public void OnPlayerPop(int player_id)
 	{
-		if (player_id == 0)
+		if (player_id != 0)
 		{
-			return;
 		}
 	}
 
 	public void SetHostClient(int host_client_id)
 	{
-		if (hostClientId != host_client_id)
+		if (hostClientId == host_client_id)
 		{
-			if (host_client_id == 0)
+			return;
+		}
+		if (host_client_id == 0)
+		{
+			MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave();
+			return;
+		}
+		CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(hostClientId);
+		CoopClient coopClient2 = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(host_client_id);
+		Logd("SetHostClient: SwitchHost: old host={0}", coopClient);
+		Logd("SetHostClient: SwitchHost: new host={0}", coopClient2);
+		if (coopClient2 != null && coopClient2 is CoopMyClient)
+		{
+			ReSendStageInfo();
+			MonoBehaviourSingleton<CoopManager>.I.coopStage.OnSwitchHost();
+			if (!coopClient2.IsBattleStart() && coopClient != null && coopClient.IsBattleStart() && QuestManager.IsValidInGame())
 			{
-				MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(false);
-			}
-			else
-			{
-				CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(hostClientId);
-				CoopClient coopClient2 = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(host_client_id);
-				Logd("SetHostClient: SwitchHost: old host={0}", coopClient);
-				Logd("SetHostClient: SwitchHost: new host={0}", coopClient2);
-				if (coopClient2 != null && coopClient2 is CoopMyClient)
+				if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
 				{
-					ReSendStageInfo();
-					MonoBehaviourSingleton<CoopManager>.I.coopStage.OnSwitchHost();
-					if (!coopClient2.IsBattleStart() && coopClient != null && coopClient.IsBattleStart() && QuestManager.IsValidInGame())
+					if (!IsOtherClientProgressed())
 					{
-						if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
-						{
-							if (!IsOtherClientProgressed())
-							{
-								MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(false);
-							}
-						}
-						else if (QuestManager.IsValidInGameExplore())
-						{
-							if (MonoBehaviourSingleton<QuestManager>.I.IsExploreBossMap())
-							{
-								MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(false);
-							}
-						}
-						else
-						{
-							MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(false);
-						}
+						MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave();
 					}
 				}
-				if (coopClient != null && coopClient.stageId == stageId)
+				else if (QuestManager.IsValidInGameExplore())
 				{
-					coopClient.SetStageHost(false);
+					if (MonoBehaviourSingleton<QuestManager>.I.IsExploreBossMap())
+					{
+						MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave();
+					}
 				}
-				if (coopClient2 != null && coopClient2.stageId == stageId)
+				else
 				{
-					coopClient2.SetStageHost(true);
+					MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave();
 				}
-				Logd("SetHostClient: hostClientId {0} => {1}", hostClientId, host_client_id);
-				hostClientId = host_client_id;
 			}
 		}
+		if (coopClient != null && coopClient.stageId == stageId)
+		{
+			coopClient.SetStageHost(is_host: false);
+		}
+		if (coopClient2 != null && coopClient2.stageId == stageId)
+		{
+			coopClient2.SetStageHost(is_host: true);
+		}
+		Logd("SetHostClient: hostClientId {0} => {1}", hostClientId, host_client_id);
+		hostClientId = host_client_id;
 	}
 
 	private bool IsWait(Func<bool> cb)
@@ -549,7 +560,6 @@ public class CoopStage
 
 	public IEnumerator DoActivate()
 	{
-		Logd("Activate!");
 		isActivateStart = true;
 		if (MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
 		{
@@ -569,135 +579,166 @@ public class CoopStage
 			}
 			self.SetCoopMode(StageObject.COOP_MODE_TYPE.NONE, 0);
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetPlayerID(self.id);
-			Logd("Activate: self id is {0}", self.id);
 		}
 		forceNextWave = false;
-		Logd("Activate: Stage request wait...");
 		MonoBehaviourSingleton<CoopManager>.I.coopMyClient.StageRequest();
 		MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageRequest();
-		while (IsAsyncWait(() => ((_003CDoActivate_003Ec__Iterator177)/*Error near IL_019e: stateMachine*/)._003C_003Ef__this.isStageRequested))
+		while (IsAsyncWait(() => isStageRequested))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (IsOtherClientProgressed())
 		{
 			ForceProgressNextWave();
+			yield break;
 		}
-		else
+		if (MonoBehaviourSingleton<InGameManager>.I.isValidGimmickObject)
 		{
-			if (MonoBehaviourSingleton<InGameManager>.I.isValidGimmickObject)
+			Logd("Activate: Gimmick wait...");
+			while (IsGuestAsyncWait((Func<bool>)this.get_isRecvStageInfo))
 			{
-				Logd("Activate: Gimmick wait...");
-				while (IsGuestAsyncWait(() => ((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0237: stateMachine*/)._003C_003Ef__this.isRecvStageInfo))
+				if (IsOtherClientProgressed())
 				{
-					if (IsOtherClientProgressed())
-					{
-						ForceProgressNextWave();
-						yield break;
-					}
-					yield return (object)null;
+					ForceProgressNextWave();
+					yield break;
 				}
+				yield return null;
 			}
-			if (QuestManager.IsValidInGameExplore())
+		}
+		if (QuestManager.IsValidInGameExplore())
+		{
+			while (IsGuestAsyncWait((Func<bool>)this.get_isRecvStageInfo))
 			{
-				while (IsGuestAsyncWait(() => ((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0275: stateMachine*/)._003C_003Ef__this.isRecvStageInfo))
-				{
-					yield return (object)null;
-				}
+				yield return null;
 			}
-			bool rushTryReentry = false;
-			if (MonoBehaviourSingleton<InGameManager>.I.IsNeedInitBoss())
+		}
+		bool rushTryReentry2 = false;
+		if (MonoBehaviourSingleton<InGameManager>.I.IsNeedInitBoss())
+		{
+			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+			float waitStart = Time.get_time();
+			bool rushTryReentry;
+			while (IsWait(delegate
 			{
-				Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-				Logd("Activate: Boss wait... {0}", boss);
-				Time.get_time();
-				while (IsWait(delegate
+				boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+				if (boss == null)
 				{
-					((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003Cboss_003E__2 = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-					if (((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003Cboss_003E__2 == null)
+					if (QuestManager.IsValidInGameExplore() && MonoBehaviourSingleton<QuestManager>.I.IsExploreBossDead())
 					{
-						if (QuestManager.IsValidInGameExplore() && MonoBehaviourSingleton<QuestManager>.I.IsExploreBossDead())
-						{
-							return true;
-						}
-						float num = Time.get_time() - ((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003CwaitStart_003E__3;
-						if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && (num > 15f || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
-						{
-							((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003C_003Ef__this.Logd("Give up Boss wait.");
-							((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003CrushTryReentry_003E__1 = true;
-							return true;
-						}
-						if (QuestManager.IsValidInGameWaveMatch())
-						{
-							return true;
-						}
-						return false;
-					}
-					if (((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003Cboss_003E__2.IsOriginal() || ((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003Cboss_003E__2.IsCoopNone())
-					{
-						return ((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003Cboss_003E__2.isInitialized;
-					}
-					return ((_003CDoActivate_003Ec__Iterator177)/*Error near IL_0319: stateMachine*/)._003Cboss_003E__2.isCoopInitialized;
-				}))
-				{
-					if (IsOtherClientProgressed())
-					{
-						ForceProgressNextWave();
-						yield break;
-					}
-					yield return (object)null;
-				}
-				Logd("Activate: Boss complete... {0}", boss);
-				if (boss != null)
-				{
-					if (boss.IsOriginal() || boss.IsCoopNone())
-					{
-						MonoBehaviourSingleton<StageObjectManager>.I.self.SetAppearPosOwner(boss._position);
-					}
-					else
-					{
-						MonoBehaviourSingleton<StageObjectManager>.I.self.SetAppearPosGuest(boss._position);
-					}
-					if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<InGameManager>.I.isRushReentry)
-					{
-						MonoBehaviourSingleton<InGameManager>.I.RestoreRushInReentry();
-					}
-				}
-			}
-			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null && bossBreakIDLists != null)
-			{
-				int series = (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex;
-				bossBreakIDLists[series] = MonoBehaviourSingleton<StageObjectManager>.I.boss.GetBreakRegionIDList();
-			}
-			if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
-			{
-				Logd("Activate: Self poss wait...");
-				while (IsWait(delegate
-				{
-					if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && (MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.FIELD_REENTRY || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
-					{
-						((_003CDoActivate_003Ec__Iterator177)/*Error near IL_04b2: stateMachine*/)._003CrushTryReentry_003E__1 = true;
 						return true;
 					}
-					return MonoBehaviourSingleton<StageObjectManager>.I.self.isSetAppearPos;
-				}))
-				{
-					if (IsOtherClientProgressed())
+					float num = Time.get_time() - waitStart;
+					if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && (num > 15f || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
 					{
-						ForceProgressNextWave();
-						yield break;
+						Logd("Give up Boss wait.");
+						rushTryReentry = true;
+						return true;
 					}
-					yield return (object)null;
+					if (QuestManager.IsValidInGameSeries() && (num > 15f || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+					{
+						rushTryReentry = true;
+						return true;
+					}
+					if (QuestManager.IsValidInGameWaveMatch())
+					{
+						return true;
+					}
+					return false;
+				}
+				if (boss.IsOriginal() || boss.IsCoopNone())
+				{
+					return boss.isInitialized;
+				}
+				return boss.isCoopInitialized;
+			}))
+			{
+				if (IsOtherClientProgressed())
+				{
+					ForceProgressNextWave();
+					yield break;
+				}
+				yield return null;
+			}
+			if (boss != null)
+			{
+				if (boss.IsOriginal() || boss.IsCoopNone())
+				{
+					MonoBehaviourSingleton<StageObjectManager>.I.self.SetAppearPosOwner(boss._position);
+				}
+				else
+				{
+					MonoBehaviourSingleton<StageObjectManager>.I.self.SetAppearPosGuest(boss._position);
+				}
+				if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<InGameManager>.I.isRushReentry)
+				{
+					MonoBehaviourSingleton<InGameManager>.I.RestoreRushInReentry();
+				}
+				if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<InGameManager>.I.isSeriesReentry)
+				{
+					MonoBehaviourSingleton<InGameManager>.I.RestoreSeriesInReentry();
 				}
 			}
-			if (rushTryReentry)
-			{
-				Logd("Rush try reentry.");
-				MonoBehaviourSingleton<InGameProgress>.I.FieldReentry();
-			}
-			Logd("Activate: Start battle.");
-			StartBattle();
 		}
+		if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null && bossBreakIDLists != null)
+		{
+			int currentQuestSeriesIndex = (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex;
+			bossBreakIDLists[currentQuestSeriesIndex] = MonoBehaviourSingleton<StageObjectManager>.I.boss.GetBreakRegionIDList();
+		}
+		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		{
+			Logd("Activate: Self poss wait...");
+			while (IsWait(delegate
+			{
+				if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && (MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.FIELD_REENTRY || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+				{
+					rushTryReentry2 = true;
+					return true;
+				}
+				if (QuestManager.IsValidInGameSeries() && (MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.FIELD_REENTRY || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+				{
+					rushTryReentry2 = true;
+					return true;
+				}
+				if (QuestManager.IsValidInGameWaveMatch() && (MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.FIELD_REENTRY || !MonoBehaviourSingleton<KtbWebSocket>.I.IsOpen()))
+				{
+					rushTryReentry2 = true;
+					return true;
+				}
+				return MonoBehaviourSingleton<StageObjectManager>.I.self.isSetAppearPos;
+			}))
+			{
+				if (IsOtherClientProgressed())
+				{
+					ForceProgressNextWave();
+					yield break;
+				}
+				yield return null;
+			}
+		}
+		if (rushTryReentry2)
+		{
+			Logd("Rush try reentry.");
+			MonoBehaviourSingleton<InGameProgress>.I.FieldReentry();
+		}
+		isPresentQuest = false;
+		int eventId = Utility.GetCurrentEventID();
+		if (eventId > 0)
+		{
+			Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
+			where e.eventId == eventId
+			select e).FirstOrDefault();
+			if (eventData != null && eventData.eventTypeEnum == EVENT_TYPE.PRESENT_QUEST)
+			{
+				isPresentQuest = true;
+			}
+		}
+		Logd("Activate: Start battle.");
+		StartBattle();
+	}
+
+	public bool IsPresentQuest()
+	{
+		return isPresentQuest;
 	}
 
 	public void Deactivate()
@@ -721,52 +762,50 @@ public class CoopStage
 
 	private void StartBattle()
 	{
-		if (!MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
+		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
 		{
-			Logd("StartBattle!");
-			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.StartBattle();
-			MonoBehaviourSingleton<CoopManager>.I.coopRoom.StartBattle();
-			MonoBehaviourSingleton<CoopNetworkManager>.I.BattleStart();
-			if (MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<InGameProgress>.IsValid())
-			{
-				MonoBehaviourSingleton<InGameProgress>.I.StartTimer(0f);
-			}
-			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-			{
-				MonoBehaviourSingleton<InGameProgress>.I.BattleStart();
-				if (InGameManager.IsReentry() && !CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
-				{
-					MonoBehaviourSingleton<InGameProgress>.I.FieldReentry();
-				}
-			}
-			fieldRewardPool.SetFieldId(MonoBehaviourSingleton<FieldManager>.I.GetFieldId());
-			int num = MonoBehaviourSingleton<FieldManager>.I.GetMapId();
-			if (QuestManager.IsValidInGameExplore())
-			{
-				num = MonoBehaviourSingleton<QuestManager>.I.ExploreMapIndexToId(MonoBehaviourSingleton<CoopManager>.I.coopMyClient.exploreMapIndex);
-			}
-			fieldRewardPool.SetMapId(num);
-			if (QuestManager.IsValidInGameExplore() && Singleton<QuestTable>.IsValid() && Singleton<EnemyTable>.IsValid())
-			{
-				MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestMapChange(num, delegate
-				{
-				});
-				CheckBossTrace(num);
-			}
-			if (FieldManager.IsValidInGameNoQuest())
-			{
-				SetSpecialEnemyAnounceIfNeed(num);
-			}
-			MonoBehaviourSingleton<InGameManager>.I.ResetRushInReentry();
+			return;
 		}
+		Logd("StartBattle!");
+		MonoBehaviourSingleton<CoopManager>.I.coopMyClient.StartBattle();
+		MonoBehaviourSingleton<CoopManager>.I.coopRoom.StartBattle();
+		MonoBehaviourSingleton<CoopNetworkManager>.I.BattleStart();
+		if (MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameProgress>.I.StartTimer();
+		}
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameProgress>.I.BattleStart();
+			if (InGameManager.IsReentry() && !CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
+			{
+				MonoBehaviourSingleton<InGameProgress>.I.FieldReentry();
+			}
+		}
+		fieldRewardPool.SetFieldId(MonoBehaviourSingleton<FieldManager>.I.GetFieldId());
+		int num = MonoBehaviourSingleton<FieldManager>.I.GetMapId();
+		if (QuestManager.IsValidInGameExplore())
+		{
+			num = MonoBehaviourSingleton<QuestManager>.I.ExploreMapIndexToId(MonoBehaviourSingleton<CoopManager>.I.coopMyClient.exploreMapIndex);
+		}
+		fieldRewardPool.SetMapId(num);
+		if (QuestManager.IsValidInGameExplore() && Singleton<QuestTable>.IsValid() && Singleton<EnemyTable>.IsValid())
+		{
+			MonoBehaviourSingleton<FieldManager>.I.SendFieldQuestMapChange(num, delegate
+			{
+			});
+			CheckBossTrace(num);
+		}
+		if (FieldManager.IsValidInGameNoQuest())
+		{
+			SetSpecialEnemyAnounceIfNeed(num);
+		}
+		MonoBehaviourSingleton<InGameManager>.I.ResetRushInReentry();
+		MonoBehaviourSingleton<InGameManager>.I.ResetSeriesInReentry();
 	}
 
 	private void SetSpecialEnemyAnounceIfNeed(int mapId)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Expected O, but got Unknown
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Expected O, but got Unknown
 		ClearAllSpecialEnemyAnnounce();
 		if (Singleton<FieldMapEnemyPopTimeZoneTable>.I.TryGetEnableLastEndTime(mapId, out FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData resultTimeZone, out ENEMY_POP_TYPE resultType))
 		{
@@ -774,7 +813,7 @@ public class CoopStage
 			specialEnemyAnnounceGone = this.StartCoroutine(AnnounceSpecialEnemyGone(resultType, resultTimeZone));
 			if (!ExistSpecialEnemyOnField())
 			{
-				specialEnemyAnnounceExist = this.StartCoroutine(AnnounceSpecialEnemyExist(resultType));
+				specialEnemyAnnounceExist = this.StartCoroutine(AnnounceSpecialEnemyExist(resultType, resultTimeZone));
 			}
 		}
 	}
@@ -808,16 +847,24 @@ public class CoopStage
 		}
 	}
 
-	private IEnumerator AnnounceSpecialEnemyExist(ENEMY_POP_TYPE type)
+	private IEnumerator AnnounceSpecialEnemyExist(ENEMY_POP_TYPE type, FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData timeZoneData)
 	{
 		while (!readyToPlay)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		yield return (object)new WaitForSeconds(1f);
-		if (!ExistSpecialEnemyOnField())
+		if (ExistSpecialEnemyOnField())
 		{
-			uint msgIndex = 9000u;
+			yield break;
+		}
+		uint msgIndex = 9000u;
+		if (timeZoneData.existStrId != 0)
+		{
+			msgIndex = timeZoneData.existStrId;
+		}
+		else
+		{
 			switch (type)
 			{
 			case ENEMY_POP_TYPE.FIELD_BOSS:
@@ -827,39 +874,48 @@ public class CoopStage
 				msgIndex = 9002u;
 				break;
 			}
-			string msg = StringTable.Format(STRING_CATEGORY.IN_GAME, msgIndex);
-			UIInGamePopupDialog.PushOpen(msg, false, 1.8f);
 		}
+		string msg = StringTable.Format(STRING_CATEGORY.IN_GAME, msgIndex);
+		UIInGamePopupDialog.PushOpen(msg, is_important: false);
 	}
 
 	private IEnumerator AnnounceSpecialEnemyGone(ENEMY_POP_TYPE type, FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData timeZoneData)
 	{
-		if (timeZoneData.TryGetEndTime(out DateTime endTime))
+		if (!timeZoneData.TryGetEndTime(out DateTime endTime2))
 		{
-			DateTime now = TimeManager.GetNow();
-			endTime = TimeManager.CombineDateAndTime(now, endTime);
-			TimeSpan stayTime = endTime - now;
-			if (!(stayTime <= TimeSpan.Zero))
+			yield break;
+		}
+		DateTime now = TimeManager.GetNow();
+		endTime2 = TimeManager.CombineDateAndTime(now, endTime2);
+		TimeSpan stayTime = endTime2 - now;
+		if (stayTime <= TimeSpan.Zero)
+		{
+			yield break;
+		}
+		yield return (object)new WaitForSeconds((float)stayTime.TotalSeconds);
+		while (ExistSpecialEnemyOnField())
+		{
+			yield return (object)new WaitForSeconds(10f);
+		}
+		uint msgIndex = 9001u;
+		if (timeZoneData.goneStrId != 0)
+		{
+			msgIndex = timeZoneData.goneStrId;
+		}
+		else
+		{
+			switch (type)
 			{
-				yield return (object)new WaitForSeconds((float)stayTime.TotalSeconds);
-				while (ExistSpecialEnemyOnField())
-				{
-					yield return (object)new WaitForSeconds(10f);
-				}
-				uint msgIndex = 9001u;
-				switch (type)
-				{
-				case ENEMY_POP_TYPE.FIELD_BOSS:
-					msgIndex = 9001u;
-					break;
-				case ENEMY_POP_TYPE.RARE_SPECIES:
-					msgIndex = 9003u;
-					break;
-				}
-				string msg = StringTable.Format(STRING_CATEGORY.IN_GAME, msgIndex);
-				UIInGamePopupDialog.PushOpen(msg, false, 1.8f);
+			case ENEMY_POP_TYPE.FIELD_BOSS:
+				msgIndex = 9001u;
+				break;
+			case ENEMY_POP_TYPE.RARE_SPECIES:
+				msgIndex = 9003u;
+				break;
 			}
 		}
+		string msg = StringTable.Format(STRING_CATEGORY.IN_GAME, msgIndex);
+		UIInGamePopupDialog.PushOpen(msg, is_important: false);
 	}
 
 	private bool ExistSpecialEnemyOnField()
@@ -913,9 +969,9 @@ public class CoopStage
 			int mainEnemyID2 = questData2.GetMainEnemyID();
 			EnemyTable.EnemyData enemyData2 = Singleton<EnemyTable>.I.GetEnemyData((uint)mainEnemyID2);
 			string text2 = StringTable.Format(STRING_CATEGORY.IN_GAME, 8001u, enemyData2.name);
-			UIInGamePopupDialog.PushOpen(text2, false, 1.4f);
+			UIInGamePopupDialog.PushOpen(text2, is_important: false, 1.4f);
 			MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendNotifyTraceBoss(mapId, 0);
-			MonoBehaviourSingleton<QuestManager>.I.UpdateBossTraceHistory(mapId, 0, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, false);
+			MonoBehaviourSingleton<QuestManager>.I.UpdateBossTraceHistory(mapId, 0, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, reserve: false);
 			return true;
 		}
 		case EXPLORE_HISTORY_TYPE.SECOND_LAST:
@@ -924,9 +980,9 @@ public class CoopStage
 			int mainEnemyID = questData.GetMainEnemyID();
 			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)mainEnemyID);
 			string text = StringTable.Format(STRING_CATEGORY.IN_GAME, 8002u, enemyData.name);
-			UIInGamePopupDialog.PushOpen(text, false, 1.4f);
+			UIInGamePopupDialog.PushOpen(text, is_important: false, 1.4f);
 			MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendNotifyTraceBoss(mapId, 1);
-			MonoBehaviourSingleton<QuestManager>.I.UpdateBossTraceHistory(mapId, 1, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, false);
+			MonoBehaviourSingleton<QuestManager>.I.UpdateBossTraceHistory(mapId, 1, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, reserve: false);
 			return true;
 		}
 		default:
@@ -943,7 +999,7 @@ public class CoopStage
 			EXPLORE_HISTORY_TYPE historyType = reservedTraceInfo.historyType;
 			num = ((historyType != EXPLORE_HISTORY_TYPE.LAST) ? 8004 : 8003);
 			string text = StringTable.Format(STRING_CATEGORY.IN_GAME, (uint)num, reservedTraceInfo.playerName);
-			UIInGamePopupDialog.PushOpen(text, false, 1.22f);
+			UIInGamePopupDialog.PushOpen(text, is_important: false, 1.22f);
 			MonoBehaviourSingleton<QuestManager>.I.CompleteBossTracePopup();
 		}
 	}
@@ -977,28 +1033,27 @@ public class CoopStage
 			{
 				packetSender.SendStageResponseEnd(STAGE_REQUEST_ERROR.STAGE_CLOSE_FAILED, client.clientId);
 			}
+			return;
 		}
-		else if (!isActivateStart)
+		if (!isActivateStart)
 		{
 			Logd("OnRequestedClient: DEACTIVATE. to={0}", client.clientId);
 			packetSender.SendStageResponseEnd(STAGE_REQUEST_ERROR.DEACTIVATE, client.clientId);
+			return;
 		}
-		else
+		if (!client.isSendPopOriginal)
 		{
-			if (!client.isSendPopOriginal)
-			{
-				SendOriginalObjectPop(client.clientId);
-				client.isSendPopOriginal = true;
-			}
-			if (MonoBehaviourSingleton<CoopManager>.I.isStageHost && !client.isSendStageInfo)
-			{
-				Logd("OnRequestedClient: Send StageInfo. to={0}", client.clientId);
-				packetSender.SendStageInfo(client.clientId);
-				client.isSendStageInfo = true;
-			}
-			Logd("OnRequestedClient: Send ResponseEnd. to={0}", client.clientId);
-			packetSender.SendStageResponseEnd(STAGE_REQUEST_ERROR.NONE, client.clientId);
+			SendOriginalObjectPop(client.clientId);
+			client.isSendPopOriginal = true;
 		}
+		if (MonoBehaviourSingleton<CoopManager>.I.isStageHost && !client.isSendStageInfo)
+		{
+			Logd("OnRequestedClient: Send StageInfo. to={0}", client.clientId);
+			packetSender.SendStageInfo(client.clientId);
+			client.isSendStageInfo = true;
+		}
+		Logd("OnRequestedClient: Send ResponseEnd. to={0}", client.clientId);
+		packetSender.SendStageResponseEnd(STAGE_REQUEST_ERROR.NONE, client.clientId);
 	}
 
 	public void ReSendStageInfo()
@@ -1019,36 +1074,54 @@ public class CoopStage
 
 	public void SendOriginalObjectPop(int to_client_id)
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject o)
+			return;
+		}
+		MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject o)
+		{
+			Player player = o as Player;
+			if (player != null && (player.IsOriginal() || player.IsCoopNone()))
 			{
-				Player player = o as Player;
-				if (player != null && (player.IsOriginal() || player.IsCoopNone()))
+				packetSender.SendStagePlayerPop(player, to_client_id);
+				if (player is Self)
 				{
-					packetSender.SendStagePlayerPop(player, to_client_id);
-					if (player is Self)
-					{
-						Logd("StageRequest response SelfPop({0}). to={1}", player.id, to_client_id);
-					}
-					else
-					{
-						Logd("StageRequest response PlayerPop({0}). to={1}", player.id, to_client_id);
-					}
+					Logd("StageRequest response SelfPop({0}). to={1}", player.id, to_client_id);
 				}
-				else if (player == null)
+				else
 				{
-					Log.Warning(LOG.COOP, "SendOriginalObjectPop, player is null. to_client_id:{0}", to_client_id);
+					Logd("StageRequest response PlayerPop({0}). to={1}", player.id, to_client_id);
 				}
-			});
+			}
+			else if (player == null)
+			{
+				Log.Warning(LOG.COOP, "SendOriginalObjectPop, player is null. to_client_id:{0}", to_client_id);
+			}
+		});
+		if (!MonoBehaviourSingleton<CoopManager>.IsValid() || !MonoBehaviourSingleton<CoopManager>.I.isStageHost)
+		{
+			return;
+		}
+		List<StageObject> allCoopObjectList = MonoBehaviourSingleton<StageObjectManager>.I.GetAllCoopObjectList();
+		if (allCoopObjectList == null)
+		{
+			return;
+		}
+		int i = 0;
+		for (int count = allCoopObjectList.Count; i < count; i++)
+		{
+			if (!(allCoopObjectList[i] == null))
+			{
+				allCoopObjectList[i].SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
+				packetSender.SendObjectInfo(allCoopObjectList[i], StageObject.COOP_MODE_TYPE.MIRROR, to_client_id);
+			}
 		}
 	}
 
 	public bool OnRecvStagePlayerPop(Coop_Model_StagePlayerPop model, CoopPacket packet)
 	{
-		//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0477: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
 		if (!isActivateStart)
 		{
 			return false;
@@ -1127,7 +1200,7 @@ public class CoopStage
 				createPlayerInfo.charaInfo = model.charaInfo;
 				Logd("CreatePlayer. sid={0},userId={1}", model.sid, createPlayerInfo.charaInfo.userId);
 				createPlayerInfo.extentionInfo = model.extentionInfo;
-				player = MonoBehaviourSingleton<StageObjectManager>.I.CreatePlayer(model.sid, createPlayerInfo, false, Vector3.get_zero(), 0f, model.transferInfo, callback);
+				player = MonoBehaviourSingleton<StageObjectManager>.I.CreatePlayer(model.sid, createPlayerInfo, self: false, Vector3.get_zero(), 0f, model.transferInfo, callback);
 				if (QuestManager.IsValidInGame())
 				{
 					MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.AddPlayer(createPlayerInfo.charaInfo);
@@ -1155,43 +1228,39 @@ public class CoopStage
 
 	protected void OnPopPlayerLoadComplete(Player player, int client_id)
 	{
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || !MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
 		{
-			if (player.IsOriginal() || player.IsCoopNone())
+			return;
+		}
+		if (player.IsOriginal() || player.IsCoopNone())
+		{
+			Logd("PlayerLoadComplete skip. became original in loading. player={0},client={1}", player.id, client_id);
+			CoopStageObjectUtility.ShrinkOriginalNonPlayer(4);
+			if (QuestManager.IsValidInGameDefenseBattle())
 			{
-				Logd("PlayerLoadComplete skip. became original in loading. player={0},client={1}", player.id, client_id);
-				CoopStageObjectUtility.ShrinkOriginalNonPlayer(4);
-				if (QuestManager.IsValidInGameDefenseBattle())
-				{
-					CoopStageObjectUtility.DestroyAllNonPlayer();
-				}
+				CoopStageObjectUtility.DestroyAllNonPlayer();
 			}
-			else
-			{
-				player.RemoveController();
-				if (player.isCoopInitialized)
-				{
-					Logd("PlayerLoadComplete skip. already initilized. player={0},client={1}", player.id, client_id);
-				}
-				else
-				{
-					Logd("PlayerLoadComplete. player={0},client={1}", player.id, client_id);
-					player.get_gameObject().SetActive(false);
-					MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(player);
-					player.packetReceiver.SetFilterMode(ObjectPacketReceiver.FILTER_MODE.WAIT_INITIALIZE);
-					player.playerSender.OnLoadComplete(true);
-					if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && !(player is NonPlayer))
-					{
-						MonoBehaviourSingleton<UIInGameMessageBar>.I.Announce(player.charaName, StringTable.Get(STRING_CATEGORY.IN_GAME, 0u));
-					}
-					CoopStageObjectUtility.ShrinkOriginalNonPlayer(4);
-					if (QuestManager.IsValidInGameDefenseBattle())
-					{
-						CoopStageObjectUtility.DestroyAllNonPlayer();
-					}
-				}
-			}
+			return;
+		}
+		player.RemoveController();
+		if (player.isCoopInitialized)
+		{
+			Logd("PlayerLoadComplete skip. already initilized. player={0},client={1}", player.id, client_id);
+			return;
+		}
+		Logd("PlayerLoadComplete. player={0},client={1}", player.id, client_id);
+		player.get_gameObject().SetActive(false);
+		MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(player);
+		player.packetReceiver.SetFilterMode(ObjectPacketReceiver.FILTER_MODE.WAIT_INITIALIZE);
+		player.playerSender.OnLoadComplete();
+		if (MonoBehaviourSingleton<UIInGameMessageBar>.IsValid() && !(player is NonPlayer))
+		{
+			MonoBehaviourSingleton<UIInGameMessageBar>.I.Announce(player.charaName, StringTable.Get(STRING_CATEGORY.IN_GAME, 0u));
+		}
+		CoopStageObjectUtility.ShrinkOriginalNonPlayer(4);
+		if (QuestManager.IsValidInGameDefenseBattle())
+		{
+			CoopStageObjectUtility.DestroyAllNonPlayer();
 		}
 	}
 
@@ -1203,17 +1272,9 @@ public class CoopStage
 
 	private bool PopEnemy(Coop_Model_EnemyPop model, out Enemy outEnmey)
 	{
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0271: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0460: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_041b: Unknown result type (might be due to invalid IL or missing references)
 		outEnmey = null;
 		if (!isActivateStart)
 		{
@@ -1238,6 +1299,10 @@ public class CoopStage
 			Logd("OnRecvEnemyPop. enemy is loading...");
 			return false;
 		}
+		if (QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameSeriesArena())
+		{
+			return PopEnemyForSeries(model, enemy);
+		}
 		FieldMapTable.EnemyPopTableData enemyPopData = Singleton<FieldMapTable>.I.GetEnemyPopData(MonoBehaviourSingleton<FieldManager>.I.currentMapID, model.popIndex);
 		if (enemyPopData == null)
 		{
@@ -1260,46 +1325,13 @@ public class CoopStage
 		{
 			if (enemy == null)
 			{
-				if (qUEST_TYPE == QUEST_TYPE.DEFENSE)
+				enemy = ((qUEST_TYPE != QUEST_TYPE.DEFENSE) ? ((qUEST_STYLE != QUEST_STYLE.DEFENSE) ? MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.get_zero(), 0f, num, num2, enemyPopData.bossFlag, enemyPopData.bigMonsterFlag, set_ai: true, willStock: false, delegate(Enemy target)
 				{
-					Vector3 bossAppearOffsetPos = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearOffsetPos;
-					float bossAppearAngleY = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearAngleY;
-					enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyWithAI(model.sid, bossAppearOffsetPos, bossAppearAngleY, num, num2, enemyPopData.bossFlag, delegate(Enemy target)
+					if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 					{
-						if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-						{
-							MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
-						}
-					});
-					enemy.SetAppearPos(bossAppearOffsetPos);
-				}
-				else
-				{
-					QUEST_STYLE qUEST_STYLE2 = qUEST_STYLE;
-					if (qUEST_STYLE2 == QUEST_STYLE.DEFENSE)
-					{
-						Vector3 bossAppearOffsetPos2 = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearOffsetPos;
-						float bossAppearAngleY2 = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearAngleY;
-						enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyWithAI(model.sid, bossAppearOffsetPos2, bossAppearAngleY2, num, num2, enemyPopData.bossFlag, delegate(Enemy target)
-						{
-							if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-							{
-								MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
-							}
-						});
-						enemy.SetAppearPos(bossAppearOffsetPos2);
+						MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
 					}
-					else
-					{
-						enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.get_zero(), 0f, num, num2, enemyPopData.bossFlag, true, false, delegate(Enemy target)
-						{
-							if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-							{
-								MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
-							}
-						});
-					}
-				}
+				}) : MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForDefenseBattle(model.sid, num, num2)) : MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForDefenseBattle(model.sid, num, num2));
 				if (model.popIndex >= 0 && MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
 				{
 					MonoBehaviourSingleton<CoopOfflineManager>.I.OnEnemyPop(model.popIndex, model.sid);
@@ -1324,14 +1356,21 @@ public class CoopStage
 			}
 			if (enemy.isBoss && enemy.controller != null && !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
 			{
-				enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.BATTLE_START);
+				enemy.controller.SetEnableControll(enable: false, ControllerBase.DISABLE_FLAG.BATTLE_START);
 			}
 			enemy.CheckFirstMadMode();
 			enemy.SafeActIdle();
 			enemy.enemyPopIndex = model.popIndex;
 			if (!enemy.isSetAppearPos)
 			{
-				enemy.SetAppearPosEnemy();
+				if (model.setPos)
+				{
+					enemy.SetAppearPosForce(new Vector3(model.x, 0f, model.z), enemyPopData);
+				}
+				else
+				{
+					enemy.SetAppearPosEnemy();
+				}
 			}
 			Logd("OnRecvEnemyPop. my owner enemy({0}). is load={1}...", enemy, enemy.isLoading);
 		}
@@ -1339,9 +1378,9 @@ public class CoopStage
 		{
 			if (enemy == null)
 			{
-				enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.get_zero(), 0f, num, num2, enemyPopData.bossFlag, false, false, delegate(Enemy target)
+				enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(model.sid, Vector3.get_zero(), 0f, num, num2, enemyPopData.bossFlag, enemyPopData.bigMonsterFlag, set_ai: false, willStock: false, delegate(Enemy target)
 				{
-					OnPopEnemyLoadComplete(target, model.ownerClientId, true);
+					OnPopEnemyLoadComplete(target, model.ownerClientId);
 				});
 				enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, model.ownerClientId);
 				enemy.enemyPopIndex = model.popIndex;
@@ -1355,7 +1394,11 @@ public class CoopStage
 				enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, model.ownerClientId);
 				enemy.isCoopInitialized = false;
 				enemy.SafeActIdle();
-				OnPopEnemyLoadComplete(enemy, model.ownerClientId, false);
+				OnPopEnemyLoadComplete(enemy, model.ownerClientId, init: false);
+			}
+			if (enemyPopData.enablePopY)
+			{
+				enemy.onTheGround = false;
 			}
 			Logd("OnRecvEnemyPop. other owner enemy({0}). is load={1}...", enemy, enemy.isLoading);
 		}
@@ -1373,11 +1416,89 @@ public class CoopStage
 		return true;
 	}
 
+	private bool PopEnemyForSeries(Coop_Model_EnemyPop model, Enemy enemy)
+	{
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestSeriesIndex((uint)model.seriesIdx);
+		if (model.ownerClientId != MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId)
+		{
+			if (enemy != null)
+			{
+				enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, model.ownerClientId);
+				enemy.isCoopInitialized = false;
+				enemy.SafeActIdle();
+				if (MonoBehaviourSingleton<SoundManager>.IsValid())
+				{
+					SoundManager.RequestBGM(MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID());
+				}
+				OnPopEnemyLoadComplete(enemy, model.ownerClientId, init: false);
+				return true;
+			}
+			enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSeries(model.sid, model.seriesIdx, delegate(Enemy target)
+			{
+				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+				{
+					MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
+				}
+				OnPopEnemyLoadComplete(target, model.ownerClientId);
+				if (model.seriesIdx > 0)
+				{
+					this.StartCoroutine(MonoBehaviourSingleton<StageObjectManager>.I.CreateNextEnemyForSeriesOfBattles(target));
+				}
+			});
+			enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, model.ownerClientId);
+			return true;
+		}
+		if (enemy != null)
+		{
+			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(enemy);
+			enemy.get_gameObject().SetActive(true);
+			if (MonoBehaviourSingleton<SoundManager>.IsValid())
+			{
+				SoundManager.RequestBGM(MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID());
+			}
+		}
+		else
+		{
+			enemy = MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSeries(model.sid, model.seriesIdx, delegate(Enemy target)
+			{
+				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+				{
+					MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(target.id, target.hpMax);
+				}
+				if (model.seriesIdx > 0)
+				{
+					target.get_gameObject().SetActive(false);
+					this.StartCoroutine(MonoBehaviourSingleton<StageObjectManager>.I.CreateNextEnemyForSeriesOfBattles(enemy));
+				}
+			});
+		}
+		if (IsSolo())
+		{
+			enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.NONE, 0);
+		}
+		else
+		{
+			enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
+		}
+		if (enemy.controller == null)
+		{
+			enemy.AddController<EnemyController>();
+		}
+		if (enemy.isBoss && enemy.controller != null && !MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
+		{
+			enemy.controller.SetEnableControll(enable: false, ControllerBase.DISABLE_FLAG.BATTLE_START);
+		}
+		enemy.CheckFirstMadMode();
+		enemy.SafeActIdle();
+		if (!enemy.isSetAppearPos)
+		{
+			enemy.SetAppearPosEnemy();
+		}
+		return true;
+	}
+
 	public bool OnRecvEnemyBossPop(Coop_Model_EnemyBossPop model)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (!PopEnemy(model, out Enemy outEnmey))
 		{
 			fieldEnemyBossEntering = false;
@@ -1414,74 +1535,89 @@ public class CoopStage
 					yield break;
 				}
 				requestTimer += Time.get_deltaTime();
-				yield return (object)null;
+				yield return null;
 			}
 			requestedEnemyBossAlive = false;
 		}
-		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!MonoBehaviourSingleton<InGameProgress>.IsValid() || !MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StageObjectManager>.I.SetFieldEnemyBoss(enemy);
-			fieldEnemyBossEntering = true;
-			while (!readyToPlay)
-			{
-				yield return (object)null;
-			}
-			if (enemy == null)
-			{
-				fieldEnemyBossEntering = false;
-			}
-			else if (isInFieldEnemyBossBattle)
-			{
-				fieldEnemyBossEntering = false;
-				enemy.get_gameObject().SetActive(true);
-			}
-			else
-			{
-				ShowFieldEnemyBossStartUI();
-				isInFieldEnemyBossBattle = true;
-				if (isEnterFieldEnemyBossBattle)
-				{
-					fieldEnemyBossEntering = false;
-					isEnterFieldEnemyBossBattle = false;
-					enemy.get_gameObject().SetActive(true);
-				}
-				else
-				{
-					FieldMapTable.EnemyPopTableData popData = Singleton<FieldMapTable>.I.GetEnemyPopData(MonoBehaviourSingleton<FieldManager>.I.currentMapID, model.popIndex);
-					int escapeTime = 300;
-					if (popData != null)
-					{
-						escapeTime = popData.escapeTime;
-					}
-					if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-					{
-						MonoBehaviourSingleton<InGameProgress>.I.ResetStartTimer((float)escapeTime, 0f);
-					}
-					yield return (object)this.StartCoroutine(LoadFieldEnemyEntryExitEffect());
-					Transform effectTrans = EffectManager.GetEffect("ef_btl_enemy_entry_01", null);
-					Vector3 effectPos = enemy._transform.get_localPosition();
-					effectPos.y = StageManager.GetHeight(enemy._transform.get_position());
-					effectTrans.set_localPosition(effectPos);
-					enemy.get_gameObject().SetActive(true);
-					enemy.hitOffFlag |= StageObject.HIT_OFF_FLAG.FORCE;
-					GoUpCharacterFromUnderGround(enemy, delegate
-					{
-						//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000d: Expected O, but got Unknown
-						EffectManager.ReleaseEffect(((_003CStartEnemyBoss_003Ec__Iterator17A)/*Error near IL_0305: stateMachine*/)._003CeffectTrans_003E__3.get_gameObject(), true, false);
-						((_003CStartEnemyBoss_003Ec__Iterator17A)/*Error near IL_0305: stateMachine*/).enemy.ActMadMode();
-						((_003CStartEnemyBoss_003Ec__Iterator17A)/*Error near IL_0305: stateMachine*/).enemy.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.FORCE;
-						((_003CStartEnemyBoss_003Ec__Iterator17A)/*Error near IL_0305: stateMachine*/)._003C_003Ef__this.fieldEnemyBossEntering = false;
-					});
-					this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
-				}
-			}
+			yield break;
 		}
+		MonoBehaviourSingleton<StageObjectManager>.I.SetFieldEnemyBoss(enemy);
+		fieldEnemyBossEntering = true;
+		while (!readyToPlay)
+		{
+			yield return null;
+		}
+		if (enemy == null)
+		{
+			fieldEnemyBossEntering = false;
+			yield break;
+		}
+		if (isInFieldEnemyBossBattle)
+		{
+			fieldEnemyBossEntering = false;
+			enemy.get_gameObject().SetActive(true);
+			yield break;
+		}
+		bool isGimmickPop = false;
+		FieldMapTable.EnemyPopTableData popData = Singleton<FieldMapTable>.I.GetEnemyPopData(MonoBehaviourSingleton<FieldManager>.I.currentMapID, model.popIndex);
+		if (popData.enemyPopType == ENEMY_POP_TYPE.GIMMICK_POP || popData.enemyPopType == ENEMY_POP_TYPE.GIMMICK_POP_RARE)
+		{
+			if (!isInFieldFishingEnemyBattle)
+			{
+				ShowFieldFishingBossStartUI(popData.enemyPopType == ENEMY_POP_TYPE.GIMMICK_POP_RARE);
+			}
+			isInFieldFishingEnemyBattle = true;
+			isGimmickPop = true;
+		}
+		else
+		{
+			ShowFieldEnemyBossStartUI();
+			isInFieldFishingEnemyBattle = false;
+		}
+		isInFieldEnemyBossBattle = true;
+		if (isEnterFieldEnemyBossBattle)
+		{
+			fieldEnemyBossEntering = false;
+			isEnterFieldEnemyBossBattle = false;
+			enemy.get_gameObject().SetActive(true);
+			yield break;
+		}
+		int escapeTime = 300;
+		if (popData != null)
+		{
+			escapeTime = popData.escapeTime;
+		}
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && !isGimmickPop)
+		{
+			MonoBehaviourSingleton<InGameProgress>.I.ResetStartTimer(escapeTime);
+		}
+		yield return this.StartCoroutine(LoadFieldEnemyEntryExitEffect());
+		Transform effectTrans = EffectManager.GetEffect("ef_btl_enemy_entry_01");
+		Vector3 effectPos = enemy._transform.get_localPosition();
+		effectPos.y = StageManager.GetHeight(enemy._transform.get_position());
+		effectTrans.set_localPosition(effectPos);
+		enemy.get_gameObject().SetActive(true);
+		enemy.hitOffFlag |= StageObject.HIT_OFF_FLAG.FORCE;
+		enemy.isFirstMadMode = !isGimmickPop;
+		GoUpCharacterFromUnderGround(enemy, delegate
+		{
+			EffectManager.ReleaseEffect(effectTrans.get_gameObject());
+			if (!isGimmickPop)
+			{
+				enemy.ActMadMode();
+			}
+			enemy.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.FORCE;
+			fieldEnemyBossEntering = false;
+		});
+		this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
 	}
 
 	private void SetFalseEnemyBossBattleFlag()
 	{
 		isInFieldEnemyBossBattle = false;
+		isInFieldFishingEnemyBattle = false;
 		isEnterFieldEnemyBossBattle = false;
 		fieldEnemyBossEntering = false;
 	}
@@ -1492,7 +1628,7 @@ public class CoopStage
 		loadingQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enemy_entry_01");
 		while (loadingQueue.IsLoading())
 		{
-			yield return (object)loadingQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 	}
 
@@ -1503,23 +1639,23 @@ public class CoopStage
 			bool loadedEffectUI = false;
 			MonoBehaviourSingleton<InGameProgress>.I.RealizesLinkResourcesFieldEnemyBoss(delegate
 			{
-				((_003CLoadFieldTimesUpVictoryeffect_003Ec__Iterator17C)/*Error near IL_004b: stateMachine*/)._003CloadedEffectUI_003E__0 = true;
+				loadedEffectUI = true;
 			});
 			int count = 100;
 			while (loadedEffectUI && count > 0)
 			{
 				count--;
-				yield return (object)null;
+				yield return null;
 			}
 		}
 	}
 
 	private IEnumerator LoadAndPlayVictoryEffect()
 	{
-		yield return (object)this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
+		yield return this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
 		while (!readyToPlay)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		MonoBehaviourSingleton<InGameProgress>.I.PlayFieldEnemyBossVictoryEffect();
 	}
@@ -1528,7 +1664,7 @@ public class CoopStage
 	{
 		if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
 		{
-			MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Play(ENEMY_TYPE.NONE, 0, true);
+			MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Play(ENEMY_TYPE.NONE, 0, isFieldBoss: true);
 			MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.FadeOut(4f, 1f, null);
 		}
 		if (MonoBehaviourSingleton<UIFieldBossInfo>.IsValid())
@@ -1537,9 +1673,17 @@ public class CoopStage
 		}
 	}
 
+	public void ShowFieldFishingBossStartUI(bool isRare)
+	{
+		if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
+		{
+			MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.PlayFieldFishingEnemy(isRare);
+			MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.FadeOut(4f, 1f, null);
+		}
+	}
+
 	public bool OnRecvEnemyBossEscape(Coop_Model_EnemyBossEscape model)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(EscapeEnemyBoss(model.sid));
 		return true;
 	}
@@ -1559,15 +1703,15 @@ public class CoopStage
 
 	public void EscapeHostEnmeyBoss()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageObjectManager>.I.fieldEnemyBoss == null)
 		{
 			isInFieldEnemyBossBattle = false;
+			isInFieldFishingEnemyBattle = false;
 		}
 		else
 		{
 			int id = MonoBehaviourSingleton<StageObjectManager>.I.fieldEnemyBoss.id;
-			packetSender.SendEnemyBossEscape(id, true);
+			packetSender.SendEnemyBossEscape(id, promise: true);
 			this.StartCoroutine(EscapeEnemyBoss(id));
 		}
 	}
@@ -1577,14 +1721,15 @@ public class CoopStage
 		if (isInFieldEnemyBossBattle)
 		{
 			isInFieldEnemyBossBattle = false;
+			isInFieldFishingEnemyBattle = false;
 			while (!readyToPlay)
 			{
-				yield return (object)null;
+				yield return null;
 			}
-			yield return (object)this.StartCoroutine(LoadFieldEnemyEntryExitEffect());
+			yield return this.StartCoroutine(LoadFieldEnemyEntryExitEffect());
 			while (fieldEnemyBossEntering)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			Enemy enemy = null;
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
@@ -1597,18 +1742,16 @@ public class CoopStage
 			}
 			if (enemy != null)
 			{
-				Transform effectTrans = EffectManager.GetEffect("ef_btl_enemy_entry_01", null);
+				Transform effectTrans = EffectManager.GetEffect("ef_btl_enemy_entry_01");
 				Vector3 effectPos = enemy._transform.get_localPosition();
 				effectPos.y = StageManager.GetHeight(enemy._transform.get_position());
 				effectTrans.set_localPosition(effectPos);
 				GoDownCharacterToUnderGround(enemy, delegate
 				{
-					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-					//IL_000d: Expected O, but got Unknown
-					EffectManager.ReleaseEffect(((_003CEscapeEnemyBoss_003Ec__Iterator17E)/*Error near IL_0183: stateMachine*/)._003CeffectTrans_003E__1.get_gameObject(), true, false);
-					((_003CEscapeEnemyBoss_003Ec__Iterator17E)/*Error near IL_0183: stateMachine*/)._003C_003Ef__this.ResetBGM();
+					EffectManager.ReleaseEffect(effectTrans.get_gameObject());
+					ResetBGM();
 				});
-				yield return (object)this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
+				yield return this.StartCoroutine(LoadFieldTimesUpVictoryeffect());
 				MonoBehaviourSingleton<InGameProgress>.I.PlayFieldEnemyBossTimesUpEffect();
 				enemy.OnEndEscape();
 			}
@@ -1620,14 +1763,43 @@ public class CoopStage
 		if (model.no == 1)
 		{
 			firstWaveMatchInfo = model;
-			firstWaveMatchPopSec = (float)model.popGuardSec;
+			firstWaveMatchPopSec = model.popGuardSec;
 		}
 		firstWaveMatchSet = MonoBehaviourSingleton<UIWaveMatchAnnounce>.IsValid();
 		if (firstWaveMatchSet)
 		{
 			MonoBehaviourSingleton<UIWaveMatchAnnounce>.I.Announce(model);
 		}
+		if (!QuestManager.IsValidInGameWaveStrategy())
+		{
+			return true;
+		}
+		DrawEachLineByPopData(model.no);
 		return true;
+	}
+
+	private void DrawEachLineByPopData(int waveNo)
+	{
+		List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+		if (enemyPopList.IsNullOrEmpty())
+		{
+			Log.Error(LOG.COOP, "CoopStage: OnRecvWaveMatchInfo. not found field enemy pop data. mapId={0}", MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+			return;
+		}
+		int i = 0;
+		for (int count = enemyPopList.Count; i < count; i++)
+		{
+			if (enemyPopList[i].waveNo == waveNo)
+			{
+				MonoBehaviourSingleton<StageObjectManager>.I.DrawWaveTargetLine(enemyPopList[i]);
+			}
+		}
+	}
+
+	public void SetFirstWaveMatchInfoForStageInfo(ref Coop_Model_StageInfo model)
+	{
+		model.firstWaveMatchInfo = firstWaveMatchInfo;
+		model.firstWaveMatchPopSec = firstWaveMatchPopSec;
 	}
 
 	private void CheckFirstWaveMatchInfo()
@@ -1640,7 +1812,7 @@ public class CoopStage
 				firstWaveMatchInfo = null;
 			}
 		}
-		if (!firstWaveMatchSet && MonoBehaviourSingleton<UIWaveMatchAnnounce>.IsValid())
+		if (firstWaveMatchInfo != null && !firstWaveMatchSet && MonoBehaviourSingleton<UIWaveMatchAnnounce>.IsValid())
 		{
 			firstWaveMatchInfo.popGuardSec = Mathf.FloorToInt(firstWaveMatchPopSec);
 			MonoBehaviourSingleton<UIWaveMatchAnnounce>.I.Announce(firstWaveMatchInfo);
@@ -1652,24 +1824,28 @@ public class CoopStage
 	{
 		if (MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			SoundManager.RequestBGM(MonoBehaviourSingleton<FieldManager>.I.GetCurrentMapBGMID(), true);
+			SoundManager.RequestBGM(MonoBehaviourSingleton<FieldManager>.I.GetCurrentMapBGMID());
 		}
 	}
 
 	public void GoUpCharacterFromUnderGround(Enemy enemy, Action OnEndAction)
 	{
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		if (enemy.controller != null)
 		{
-			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
+			enemy.controller.SetEnableControll(enable: false);
 		}
-		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), 3f, delegate
+		float time = 3f;
+		if (isInFieldFishingEnemyBattle)
+		{
+			time = MonoBehaviourSingleton<InGameSettingsManager>.I.fishingParam.hitEnemyMoveSec;
+		}
+		this.StartCoroutine(SimpleMoveCharacterY(enemy, -10f, StageManager.GetHeight(enemy._transform.get_position()), time, delegate
 		{
 			OnEndAction.SafeInvoke();
 			if (enemy.controller != null)
 			{
-				enemy.controller.SetEnableControll(true, ControllerBase.DISABLE_FLAG.DEFAULT);
+				enemy.controller.SetEnableControll(enable: true);
 			}
 		}));
 	}
@@ -1678,13 +1854,12 @@ public class CoopStage
 	{
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		if (enemy.controller != null)
 		{
-			enemy.controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
+			enemy.controller.SetEnableControll(enable: false);
 		}
 		enemy.PrepareVanishLocal();
-		enemy.ActIdle(false, -1f);
+		enemy.ActIdle();
 		Enemy enemy2 = enemy;
 		Vector3 position = enemy._transform.get_position();
 		this.StartCoroutine(SimpleMoveCharacterY(enemy2, position.y, -10f, 3f, delegate
@@ -1694,7 +1869,7 @@ public class CoopStage
 		}));
 	}
 
-	private IEnumerator SimpleMoveCharacterY(Character enemy, float from, float to, float time, Action OnEndAction)
+	public IEnumerator SimpleMoveCharacterY(Character enemy, float from, float to, float time, Action OnEndAction)
 	{
 		enemy.onTheGround = false;
 		Vector3 startPos = enemy._transform.get_position();
@@ -1716,7 +1891,7 @@ public class CoopStage
 			{
 				break;
 			}
-			yield return (object)null;
+			yield return null;
 		}
 		enemy.onTheGround = true;
 		OnEndAction.SafeInvoke();
@@ -1724,12 +1899,13 @@ public class CoopStage
 
 	public void OnDefeatFieldEnemyBoss()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && isInFieldEnemyBossBattle)
 		{
 			this.StartCoroutine(LoadAndPlayVictoryEffect());
 			isInFieldEnemyBossBattle = false;
+			isInFieldFishingEnemyBattle = false;
 			MonoBehaviourSingleton<InGameProgress>.I.StopTimer();
+			MonoBehaviourSingleton<InGameProgress>.I.SetLimitTime(0f);
 			if (MonoBehaviourSingleton<UIFieldBossInfo>.IsValid())
 			{
 				MonoBehaviourSingleton<UIFieldBossInfo>.I.FadeOut(0f, 1f, null);
@@ -1740,42 +1916,38 @@ public class CoopStage
 
 	protected void OnPopEnemyLoadComplete(Enemy enemy, int client_id, bool init = true)
 	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(enemy.id, enemy.hpMax);
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || !MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
 		{
-			if (enemy.IsOriginal() || enemy.IsCoopNone())
-			{
-				Logd("EnemyLoadComplete skip. became original in loading. enemy={0},client={1}", enemy.id, client_id);
-			}
-			else
-			{
-				enemy.RemoveController();
-				if (enemy.isCoopInitialized)
-				{
-					Logd("EnemyLoadComplete skip. already initilized. enemy={0},client={1}", enemy.id, client_id);
-				}
-				else
-				{
-					Logd("EnemyLoadComplete. enemy={0},client={1}", enemy.id, client_id);
-					if (init)
-					{
-						enemy.get_gameObject().SetActive(false);
-						MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(enemy);
-					}
-					enemy.packetReceiver.SetFilterMode(ObjectPacketReceiver.FILTER_MODE.WAIT_INITIALIZE);
-					enemy.enemySender.OnLoadComplete(true);
-				}
-			}
+			return;
 		}
+		if (enemy.IsOriginal() || enemy.IsCoopNone())
+		{
+			Logd("EnemyLoadComplete skip. became original in loading. enemy={0},client={1}", enemy.id, client_id);
+			return;
+		}
+		enemy.RemoveController();
+		if (enemy.isCoopInitialized)
+		{
+			Logd("EnemyLoadComplete skip. already initilized. enemy={0},client={1}", enemy.id, client_id);
+			return;
+		}
+		Logd("EnemyLoadComplete. enemy={0},client={1}", enemy.id, client_id);
+		if (init)
+		{
+			enemy.get_gameObject().SetActive(false);
+			MonoBehaviourSingleton<StageObjectManager>.I.AddCacheObject(enemy);
+		}
+		enemy.packetReceiver.SetFilterMode(ObjectPacketReceiver.FILTER_MODE.WAIT_INITIALIZE);
+		enemy.enemySender.OnLoadComplete();
 	}
 
 	public bool OnRecvStageInfo(Coop_Model_StageInfo model, CoopPacket packet)
 	{
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0325: Unknown result type (might be due to invalid IL or missing references)
 		if (!isActivateStart)
 		{
 			return false;
@@ -1787,23 +1959,26 @@ public class CoopStage
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
 			if (coopClient != null && coopClient.IsBattleStart())
 			{
-				if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && model.rushLimitTime >= 0f)
+				if ((MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch()) && model.rushLimitTime >= 0f)
 				{
 					MonoBehaviourSingleton<InGameProgress>.I.SetLimitTime(model.rushLimitTime);
 				}
 				MonoBehaviourSingleton<InGameProgress>.I.StartTimer(model.elapsedTime);
 			}
+			isInFieldFishingEnemyBattle = model.isInFieldFishingEnemyBattle;
 			if (model.isInFieldEnemyBossBattle)
 			{
 				isEnterFieldEnemyBossBattle = true;
-				MonoBehaviourSingleton<InGameProgress>.I.ResetStartTimer(model.rushLimitTime, model.elapsedTime);
+				if (!isInFieldFishingEnemyBattle)
+				{
+					MonoBehaviourSingleton<InGameProgress>.I.ResetStartTimer(model.rushLimitTime, model.elapsedTime);
+				}
 			}
 		}
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			model.gimmicks.ForEach(delegate(Coop_Model_StageInfo.GimmickInfo gimmick)
 			{
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindGimmick(gimmick.id);
 				if (stageObject != null)
 				{
@@ -1811,6 +1986,59 @@ public class CoopStage
 					stageObject.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, packet.fromClientId);
 				}
 			});
+			model.carriableGimmickInfos.ForEach(delegate(Coop_Model_StageInfo.FieldCarriableGimmickInfo gimmickInfo)
+			{
+				FieldCarriableGimmickObject fieldCarriableGimmickObject = MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmickObj(InGameProgress.eFieldGimmick.CarriableGimmick, gimmickInfo.pointId) as FieldCarriableGimmickObject;
+				if (!(fieldCarriableGimmickObject == null) && fieldCarriableGimmickObject.GetId() == gimmickInfo.pointId)
+				{
+					fieldCarriableGimmickObject.SetCarriableGimmickInfo(gimmickInfo);
+					if (!fieldCarriableGimmickObject.isCarrying && fieldCarriableGimmickObject.get_gameObject().get_activeSelf())
+					{
+						fieldCarriableGimmickObject.EndCarry();
+					}
+				}
+			});
+			model.supplyGimmickInfos.ForEach(delegate(Coop_Model_StageInfo.FieldSupplyGimmickInfo gimmickInfo)
+			{
+				FieldSupplyGimmickObject fieldSupplyGimmickObject = MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmickObj(InGameProgress.eFieldGimmick.SupplyGimmick, gimmickInfo.pointId) as FieldSupplyGimmickObject;
+				if (!(fieldSupplyGimmickObject == null) && fieldSupplyGimmickObject.GetId() == gimmickInfo.pointId)
+				{
+					fieldSupplyGimmickObject.SetSupplyGimmickInfo(gimmickInfo);
+				}
+			});
+			if (!MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.IsNullOrEmpty() && !model.waveTargets.IsNullOrEmpty())
+			{
+				for (int i = 0; i < MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.Count; i++)
+				{
+					FieldWaveTargetObject fieldWaveTargetObject = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i] as FieldWaveTargetObject;
+					if (fieldWaveTargetObject == null)
+					{
+						continue;
+					}
+					bool flag = false;
+					for (int j = 0; j < model.waveTargets.Count; j++)
+					{
+						Coop_Model_StageInfo.WaveTargetInfo waveTargetInfo = model.waveTargets[j];
+						if (fieldWaveTargetObject.id == waveTargetInfo.id)
+						{
+							fieldWaveTargetObject.SetHp(waveTargetInfo.hp, fieldWaveTargetObject.maxHp, changeOwner: true);
+							flag = true;
+							break;
+						}
+					}
+					if (!flag)
+					{
+						fieldWaveTargetObject.SetHp(0, fieldWaveTargetObject.maxHp, changeOwner: true);
+					}
+				}
+			}
+			if (model.firstWaveMatchInfo != null && model.firstWaveMatchPopSec >= 0f && firstWaveMatchInfo == null && firstWaveMatchPopSec <= 0f)
+			{
+				firstWaveMatchInfo = model.firstWaveMatchInfo;
+				firstWaveMatchPopSec = model.firstWaveMatchPopSec;
+				firstWaveMatchSet = false;
+				DrawEachLineByPopData(firstWaveMatchInfo.no);
+			}
 		}
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null && !MonoBehaviourSingleton<StageObjectManager>.I.self.isSetAppearPos)
 		{
@@ -1822,45 +2050,45 @@ public class CoopStage
 	public virtual bool OnRecvStageResponseEnd(Coop_Model_StageResponseEnd model, CoopPacket packet)
 	{
 		CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
-		if (!(coopClient == null))
+		if (coopClient == null)
 		{
-			if (coopClient.isStageHost)
-			{
-				isHostStageResponseEnd = true;
-			}
-			coopClient.isStageResponseEnd = true;
-			STAGE_REQUEST_ERROR error_id = (STAGE_REQUEST_ERROR)model.error_id;
-			Logd("Responsed End from {0}. isStageHost={1}. error={2}.", packet.fromClientId, coopClient.isStageHost, error_id);
-			switch (error_id)
-			{
-			case STAGE_REQUEST_ERROR.ENTRY_CLOSE:
-			case STAGE_REQUEST_ERROR.STAGE_CLOSE_FAILED:
-			case STAGE_REQUEST_ERROR.STAGE_CLOSE_SUCCEED:
-				if (QuestManager.IsValidInGameExplore() && error_id == STAGE_REQUEST_ERROR.STAGE_CLOSE_SUCCEED)
-				{
-					isQuestClose = true;
-					isQuestSucceed = true;
-					return true;
-				}
-				if (MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOwnerFirstClear)
-				{
-					isQuestClose = true;
-					isQuestSucceed = (error_id == STAGE_REQUEST_ERROR.STAGE_CLOSE_SUCCEED);
-				}
-				MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(false);
-				return true;
-			case STAGE_REQUEST_ERROR.DEACTIVATE:
-				return true;
-			default:
-				if (!coopClient.isSendPopOriginal)
-				{
-					SendOriginalObjectPop(packet.fromClientId);
-					coopClient.isSendPopOriginal = true;
-				}
-				return true;
-			}
+			return true;
 		}
-		return true;
+		if (coopClient.isStageHost)
+		{
+			isHostStageResponseEnd = true;
+		}
+		coopClient.isStageResponseEnd = true;
+		STAGE_REQUEST_ERROR error_id = (STAGE_REQUEST_ERROR)model.error_id;
+		Logd("Responsed End from {0}. isStageHost={1}. error={2}.", packet.fromClientId, coopClient.isStageHost, error_id);
+		switch (error_id)
+		{
+		case STAGE_REQUEST_ERROR.ENTRY_CLOSE:
+		case STAGE_REQUEST_ERROR.STAGE_CLOSE_FAILED:
+		case STAGE_REQUEST_ERROR.STAGE_CLOSE_SUCCEED:
+			if (QuestManager.IsValidInGameExplore() && error_id == STAGE_REQUEST_ERROR.STAGE_CLOSE_SUCCEED)
+			{
+				isQuestClose = true;
+				isQuestSucceed = true;
+				return true;
+			}
+			if (MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOwnerFirstClear)
+			{
+				isQuestClose = true;
+				isQuestSucceed = (error_id == STAGE_REQUEST_ERROR.STAGE_CLOSE_SUCCEED);
+			}
+			MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave();
+			return true;
+		case STAGE_REQUEST_ERROR.DEACTIVATE:
+			return true;
+		default:
+			if (!coopClient.isSendPopOriginal)
+			{
+				SendOriginalObjectPop(packet.fromClientId);
+				coopClient.isSendPopOriginal = true;
+			}
+			return true;
+		}
 	}
 
 	public bool OnRecvRequestPop(Coop_Model_StageRequestPop model, CoopPacket packet)
@@ -1895,35 +2123,36 @@ public class CoopStage
 
 	public void CheckEntryClose(bool force = false)
 	{
-		if (!isEntryClose && isActivateStart && QuestManager.IsValidInGame())
+		if (isEntryClose || !isActivateStart || !QuestManager.IsValidInGame())
 		{
-			int num = 0;
-			if (force)
+			return;
+		}
+		int num = 0;
+		if (force)
+		{
+			num = 10;
+		}
+		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+		{
+			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+			int num2 = (int)((float)boss.hpMax * MonoBehaviourSingleton<InGameSettingsManager>.I.room.entryCloseEnemyHpRate);
+			if ((boss.IsCoopNone() || boss.IsOriginal()) && boss.hp < num2)
 			{
-				num = 10;
+				num = 1;
 			}
-			if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+		}
+		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+		{
+			int num3 = (int)(MonoBehaviourSingleton<InGameProgress>.I.limitTime * MonoBehaviourSingleton<InGameSettingsManager>.I.room.entryCloseTimeRate);
+			if ((float)num3 > MonoBehaviourSingleton<InGameProgress>.I.remaindTime)
 			{
-				Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-				int num2 = (int)((float)boss.hpMax * MonoBehaviourSingleton<InGameSettingsManager>.I.room.entryCloseEnemyHpRate);
-				if ((boss.IsCoopNone() || boss.IsOriginal()) && boss.hp < num2)
-				{
-					num = 1;
-				}
+				num = 2;
 			}
-			if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart() && MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
-			{
-				int num3 = (int)(MonoBehaviourSingleton<InGameProgress>.I.limitTime * MonoBehaviourSingleton<InGameSettingsManager>.I.room.entryCloseTimeRate);
-				if ((float)num3 > MonoBehaviourSingleton<InGameProgress>.I.remaindTime)
-				{
-					num = 2;
-				}
-			}
-			if (num != 0)
-			{
-				isEntryClose = true;
-				MonoBehaviourSingleton<CoopNetworkManager>.I.RoomEntryClose(num);
-			}
+		}
+		if (num != 0)
+		{
+			isEntryClose = true;
+			MonoBehaviourSingleton<CoopNetworkManager>.I.RoomEntryClose(num);
 		}
 	}
 
@@ -1949,10 +2178,10 @@ public class CoopStage
 				return;
 			}
 		}
-		CheckEntryClose(true);
+		CheckEntryClose(force: true);
 		isQuestClose = true;
 		isQuestSucceed = false;
-		packetSender.SendStageQuestClose(false);
+		packetSender.SendStageQuestClose(is_succeed: false);
 	}
 
 	public bool OnRecvQuestClose(bool is_succeed)
@@ -2045,11 +2274,11 @@ public class CoopStage
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(fromClientId);
 			if (coopClient != null)
 			{
-				chatConnection.OnReceiveMessage(model.user_id, coopClient.GetPlayerName(), model.text);
+				chatConnection.OnReceiveMessage(model.user_id, coopClient.GetPlayerName(), model.text, string.Empty);
 			}
 			else if (character != null)
 			{
-				chatConnection.OnReceiveMessage(model.user_id, character.charaName, model.text);
+				chatConnection.OnReceiveMessage(model.user_id, character.charaName, model.text, string.Empty);
 			}
 		}
 		return true;
@@ -2071,11 +2300,11 @@ public class CoopStage
 			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(model.chara_id);
 			if (coopClient != null)
 			{
-				chatConnection.OnReceiveStamp(model.user_id, coopClient.GetPlayerName(), model.stamp_id);
+				chatConnection.OnReceiveStamp(model.user_id, coopClient.GetPlayerName(), model.stamp_id, string.Empty);
 			}
 			else if (character != null)
 			{
-				chatConnection.OnReceiveStamp(model.user_id, character.charaName, model.stamp_id);
+				chatConnection.OnReceiveStamp(model.user_id, character.charaName, model.stamp_id, string.Empty);
 			}
 		}
 		return true;
@@ -2142,7 +2371,7 @@ public class CoopStage
 			}
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.ExpProgress01 >= 1f)
 			{
-				fieldRewardPool.SendFieldDrop(null);
+				fieldRewardPool.SendFieldDrop();
 			}
 		}
 		if (MonoBehaviourSingleton<FieldManager>.IsValid())
@@ -2168,7 +2397,7 @@ public class CoopStage
 				{
 					if (MonoBehaviourSingleton<FieldManager>.I.AddPortalPointToPortalInfo(model.ppt))
 					{
-						fieldRewardPool.SendFieldDrop(null);
+						fieldRewardPool.SendFieldDrop();
 					}
 					if (portalPointToPortalInfo != null && MonoBehaviourSingleton<InGameProgress>.IsValid())
 					{
@@ -2181,7 +2410,7 @@ public class CoopStage
 		{
 			Vector3 pos = default(Vector3);
 			pos._002Ector((float)model.x, 0f, (float)model.z);
-			EffectManager.OneShot("ef_btl_drop_coin_01", pos, Quaternion.get_identity(), false);
+			EffectManager.OneShot("ef_btl_drop_coin_01", pos, Quaternion.get_identity());
 			SoundManager.PlayOneShotSE(10000065, pos);
 		}
 		return true;
@@ -2231,7 +2460,7 @@ public class CoopStage
 		if (MonoBehaviourSingleton<UIDropAnnounce>.IsValid() && defeatFieldEnemyDelivery != null)
 		{
 			defeatFieldEnemyDeliveryList.Remove(defeatFieldEnemyDelivery);
-			List<UIDropAnnounce.DropAnnounceInfo> list = MonoBehaviourSingleton<InGameManager>.I.CreateDropAnnounceInfoList(defeatFieldEnemyDelivery.deliveryList, new List<InGameManager.DropItemInfo>(), false);
+			List<UIDropAnnounce.DropAnnounceInfo> list = MonoBehaviourSingleton<InGameManager>.I.CreateDropAnnounceInfoList(defeatFieldEnemyDelivery.deliveryList, new List<InGameManager.DropItemInfo>(), isTreasureBox: false);
 			int i = 0;
 			for (int count = list.Count; i < count; i++)
 			{
@@ -2255,7 +2484,7 @@ public class CoopStage
 		}
 		if (!MonoBehaviourSingleton<CoopManager>.I.coopMyClient.IsBattleStart())
 		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(false);
+			MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave();
 		}
 		else
 		{
@@ -2266,7 +2495,6 @@ public class CoopStage
 
 	public bool OnRecvEventHappenQuest(Coop_Model_EventHappenQuest model)
 	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			return true;
@@ -2293,6 +2521,38 @@ public class CoopStage
 		}
 		MonoBehaviourSingleton<InGameProgress>.I.HappenQuestDirection(qId, reward, model.rareBossType);
 		return true;
+	}
+
+	public bool OnRecvEventHappenQuestStatus(Coop_Model_EventHappenQuestStatus model)
+	{
+		if (MonoBehaviourSingleton<InGameManager>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameManager>.I.happenQuestStatusList = model.statusList;
+		}
+		return true;
+	}
+
+	public void OnRecvSyncTimeRequest(Coop_Model_StageSyncTimeRequest model, int toClientId)
+	{
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			this.StartCoroutine(DoStageSyncTime(model, toClientId));
+		}
+	}
+
+	private IEnumerator DoStageSyncTime(Coop_Model_StageSyncTimeRequest model, int toClientId)
+	{
+		yield return (object)new WaitForSeconds(2f);
+		float elapsedTime = MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime();
+		packetSender.SendStageSyncTime(elapsedTime, toClientId);
+	}
+
+	public void OnRecvSyncTime(Coop_Model_StageSyncTime model)
+	{
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && !(model.elapsedTime < MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime()))
+		{
+			MonoBehaviourSingleton<InGameProgress>.I.SetElapsedTime(model.elapsedTime);
+		}
 	}
 
 	public void OnRecvSyncPlayerRecord(Coop_Model_StageSyncPlayerRecord model)
@@ -2338,7 +2598,7 @@ public class CoopStage
 			if (model.currentWaveIndex > rushIndex)
 			{
 				isRecvRushRequested = true;
-				MonoBehaviourSingleton<InGameProgress>.I.StartTimer(0f);
+				MonoBehaviourSingleton<InGameProgress>.I.StartTimer();
 				MonoBehaviourSingleton<InGameProgress>.I.StopTimer();
 				MonoBehaviourSingleton<InGameProgress>.I.SetElapsedTime(model.syncData.elapsedTime);
 				bossBreakIDLists[0] = model.syncData.bossBreakIds;
@@ -2348,7 +2608,6 @@ public class CoopStage
 
 	private void ForceProgressNextWave()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		Logd("ForceProgressNextWave current:{0}, other:{1}", MonoBehaviourSingleton<InGameManager>.I.GetRushIndex(), GetOtherRushIndex());
 		this.StartCoroutine(_ForceProgressNextWave());
 	}
@@ -2361,7 +2620,7 @@ public class CoopStage
 		float time = Time.get_time();
 		while (!isRecvRushRequested)
 		{
-			yield return (object)null;
+			yield return null;
 			if (Time.get_time() - time > 5f)
 			{
 				Logd("Timeout RushRequest");
@@ -2370,7 +2629,7 @@ public class CoopStage
 			}
 		}
 		isRecvRushRequested = true;
-		MonoBehaviourSingleton<InGameProgress>.I.BattleComplete(true);
+		MonoBehaviourSingleton<InGameProgress>.I.BattleComplete(forceComplete: true);
 	}
 
 	private int GetOtherRushIndex()
@@ -2389,5 +2648,42 @@ public class CoopStage
 	private bool IsOtherClientProgressed()
 	{
 		return MonoBehaviourSingleton<InGameManager>.I.IsRush() && GetOtherRushIndex() > MonoBehaviourSingleton<InGameManager>.I.GetRushIndex();
+	}
+
+	public bool OnRecvStageObjectInfo(Coop_Model_StageObjectInfo model, CoopPacket packet)
+	{
+		if (!isActivateStart)
+		{
+			return false;
+		}
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return true;
+		}
+		CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(packet.fromClientId);
+		if (coopClient == null)
+		{
+			return true;
+		}
+		Logd("Responsed StageObjectInfo from {0}. sid={1}, CoopMode:{2}, userid={3}", packet.fromClientId, model.StageObjectID, model.CoopModeType, coopClient.userId);
+		StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(model.StageObjectID);
+		if (stageObject == null)
+		{
+			return false;
+		}
+		stageObject.SetCoopMode(model.CoopModeType, packet.fromClientId);
+		return true;
+	}
+
+	public void ActiveSupply(int pointId)
+	{
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			FieldSupplyGimmickObject fieldSupplyGimmickObject = MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmickObj(InGameProgress.eFieldGimmick.SupplyGimmick, pointId) as FieldSupplyGimmickObject;
+			if (fieldSupplyGimmickObject != null)
+			{
+				fieldSupplyGimmickObject.Active();
+			}
+		}
 	}
 }

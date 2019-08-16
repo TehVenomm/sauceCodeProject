@@ -1,14 +1,27 @@
 package com.google.android.gms.drive;
 
-public final class zzp extends ExecutionOptions {
-    private boolean zzgdy;
+import com.google.android.gms.drive.ExecutionOptions.Builder;
 
-    private zzp(String str, boolean z, int i, boolean z2) {
-        super(str, z, i);
-        this.zzgdy = z2;
+public final class zzp extends Builder {
+    private boolean zzar = true;
+
+    public final /* synthetic */ ExecutionOptions build() {
+        zzn();
+        return new zzn(this.zzao, this.zzap, this.zzaq, this.zzar);
     }
 
-    public final boolean zzamz() {
-        return this.zzgdy;
+    public final /* synthetic */ Builder setConflictStrategy(int i) {
+        super.setConflictStrategy(i);
+        return this;
+    }
+
+    public final /* synthetic */ Builder setNotifyOnCompletion(boolean z) {
+        super.setNotifyOnCompletion(z);
+        return this;
+    }
+
+    public final /* synthetic */ Builder setTrackingTag(String str) {
+        super.setTrackingTag(str);
+        return this;
     }
 }

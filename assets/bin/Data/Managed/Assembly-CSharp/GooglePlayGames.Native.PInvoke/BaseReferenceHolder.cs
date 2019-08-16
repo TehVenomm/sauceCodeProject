@@ -33,12 +33,12 @@ namespace GooglePlayGames.Native.PInvoke
 
 		~BaseReferenceHolder()
 		{
-			Dispose(true);
+			Dispose(fromFinalizer: true);
 		}
 
 		public void Dispose()
 		{
-			Dispose(false);
+			Dispose(fromFinalizer: false);
 			GC.SuppressFinalize(this);
 		}
 
@@ -66,7 +66,7 @@ namespace GooglePlayGames.Native.PInvoke
 			if (_refs.ContainsKey(SelfPtr()))
 			{
 				_refs.Remove(SelfPtr());
-				Dispose(false);
+				Dispose(fromFinalizer: false);
 			}
 		}
 	}

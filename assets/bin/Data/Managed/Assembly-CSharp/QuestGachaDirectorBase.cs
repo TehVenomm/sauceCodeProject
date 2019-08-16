@@ -92,14 +92,13 @@ public class QuestGachaDirectorBase : AnimationDirector
 		m_isFirstSkipped = false;
 		m_isSkipAppearEnemy = false;
 		stageAnimator.Play("StageAnim_Init");
-		Play("MainAnim_Init", null, 0f);
+		Play("MainAnim_Init");
 		time = 0f;
 		Delete();
 	}
 
 	protected void Delete()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int count = objects.Count; i < count; i++)
 		{
@@ -112,11 +111,9 @@ public class QuestGachaDirectorBase : AnimationDirector
 		objects.Clear();
 		effects.ForEach(delegate(Transform o)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
 			if (o != null)
 			{
-				EffectManager.ReleaseEffect(o.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(o.get_gameObject());
 			}
 		});
 		effects.Clear();
@@ -130,7 +127,6 @@ public class QuestGachaDirectorBase : AnimationDirector
 
 	public void StartDirection(ISectionCommand command_receiver)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		sectionCommandReceiver = command_receiver;
 		if (coroutine != null)
 		{
@@ -146,10 +142,9 @@ public class QuestGachaDirectorBase : AnimationDirector
 
 	protected NPCLoader LoadNPC()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = Utility.CreateGameObject("NPC", npcPosition, -1);
+		Transform val = Utility.CreateGameObject("NPC", npcPosition);
 		NPCLoader nPCLoader = val.get_gameObject().AddComponent<NPCLoader>();
-		nPCLoader.Load(Singleton<NPCTable>.I.GetNPCData(2).npcModelID, 0, false, true, SHADER_TYPE.NORMAL, null);
+		nPCLoader.Load(Singleton<NPCTable>.I.GetNPCData(2).npcModelID, 0, need_shadow: false, enable_light_probes: true, SHADER_TYPE.NORMAL, null);
 		objects.Add(nPCLoader);
 		return nPCLoader;
 	}
@@ -165,11 +160,9 @@ public class QuestGachaDirectorBase : AnimationDirector
 
 	protected EnemyLoader LoadEnemy(Transform parent, int model_id, int anim_id, float displayScale, string base_effect, string base_effect_node)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		GameObject val = Utility.CreateGameObject("Enemy", parent, -1).get_gameObject();
-		EnemyLoader enemyLoader = val.AddComponent<EnemyLoader>();
-		enemyLoader.StartLoad(model_id, anim_id, 1f, base_effect, base_effect_node, false, true, false, SHADER_TYPE.NORMAL, -1, null, false, false, null);
+		GameObject gameObject = Utility.CreateGameObject("Enemy", parent).get_gameObject();
+		EnemyLoader enemyLoader = gameObject.AddComponent<EnemyLoader>();
+		enemyLoader.StartLoad(model_id, anim_id, 1f, base_effect, base_effect_node, need_shadow: false, enable_light_probes: true, need_anim_event_res_cache: false, SHADER_TYPE.NORMAL, -1, null, need_stamp_effect: false, will_stock: false, string.Empty);
 		enemyLoader.DisplayGachaScale = displayScale;
 		objects.Add(enemyLoader);
 		return enemyLoader;
@@ -201,7 +194,7 @@ public class QuestGachaDirectorBase : AnimationDirector
 			DeleteMagicEffect();
 			magicEffect = PlayEffect(magicEffectPrefabs[rarity - 1]);
 		}
-		Play("MainAnim_MagicAngle0" + rarity, null, 0f);
+		Play("MainAnim_MagicAngle0" + rarity);
 	}
 
 	protected void DeleteMagicEffect()
@@ -228,7 +221,7 @@ public class QuestGachaDirectorBase : AnimationDirector
 
 	protected Transform PlayEffect(Transform parent, GameObject prefab)
 	{
-		Transform val = ResourceUtility.Realizes(prefab, parent, -1);
+		Transform val = ResourceUtility.Realizes(prefab, parent);
 		effects.Add(val);
 		rymFX component = val.GetComponent<rymFX>();
 		if (component != null)
@@ -253,30 +246,28 @@ public class QuestGachaDirectorBase : AnimationDirector
 
 	public override void Skip()
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		if (!skip)
+		if (skip)
 		{
-			if (m_isFirstSkipped)
-			{
-				m_isSkipAppearEnemy = true;
-			}
-			else
-			{
-				ActivateFirstSkipFlag();
-				base.Skip();
-				if (m_skipCoroutine != null)
-				{
-					this.StopCoroutine(m_skipCoroutine);
-				}
-				m_skipCoroutine = DoSkip();
-				this.StartCoroutine(m_skipCoroutine);
-			}
+			return;
 		}
+		if (m_isFirstSkipped)
+		{
+			m_isSkipAppearEnemy = true;
+			return;
+		}
+		ActivateFirstSkipFlag();
+		base.Skip();
+		if (m_skipCoroutine != null)
+		{
+			this.StopCoroutine(m_skipCoroutine);
+		}
+		m_skipCoroutine = DoSkip();
+		this.StartCoroutine(m_skipCoroutine);
 	}
 
 	private IEnumerator DoSkip()
 	{
-		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.BLACK);
+		yield return MonoBehaviourSingleton<TransitionManager>.I.Out();
 		Time.set_timeScale(100f);
 	}
 
@@ -293,7 +284,7 @@ public class QuestGachaDirectorBase : AnimationDirector
 	public void PlayUIRarityEffect(RARITY_TYPE rarity, Transform effect_parent_ui, Transform effect_target_ui)
 	{
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		PlayRarityAudio(rarity, false);
+		PlayRarityAudio(rarity);
 		GameObject val = null;
 		int num = rarity.ToRarityExpressionID2();
 		if (num > 0)
@@ -316,13 +307,13 @@ public class QuestGachaDirectorBase : AnimationDirector
 		int[] array2 = array;
 		foreach (int se_id in array2)
 		{
-			lo_queue.CacheSE(se_id, null);
+			lo_queue.CacheSE(se_id);
 		}
 	}
 
 	protected void PlayAudio(AUDIO audio)
 	{
-		PlayAudio(audio, false);
+		PlayAudio(audio, ignore_skip: false);
 	}
 
 	protected void PlayAudio(AUDIO audio, bool ignore_skip)
@@ -370,35 +361,37 @@ public class QuestGachaDirectorBase : AnimationDirector
 
 	protected void CacheEnemyAudio(EnemyTable.EnemyData enemyData, LoadingQueue lo_queue)
 	{
-		if (lo_queue != null)
+		if (lo_queue == null)
 		{
-			OutGameSettingsManager.EnemyDisplayInfo enemyDisplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemyData);
-			if (enemyDisplayInfo != null)
+			return;
+		}
+		OutGameSettingsManager.EnemyDisplayInfo enemyDisplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemyData);
+		if (enemyDisplayInfo != null)
+		{
+			if (enemyDisplayInfo.seIdGachaShort > 0)
 			{
-				if (enemyDisplayInfo.seIdGachaShort > 0)
-				{
-					lo_queue.CacheSE(enemyDisplayInfo.seIdGachaShort, null);
-				}
-				if (enemyDisplayInfo.seIdGachaLong > 0)
-				{
-					lo_queue.CacheSE(enemyDisplayInfo.seIdGachaLong, null);
-				}
+				lo_queue.CacheSE(enemyDisplayInfo.seIdGachaShort);
+			}
+			if (enemyDisplayInfo.seIdGachaLong > 0)
+			{
+				lo_queue.CacheSE(enemyDisplayInfo.seIdGachaLong);
 			}
 		}
 	}
 
 	protected void PlayEnemyAudio(EnemyTable.EnemyData enemyData, bool is_short = false)
 	{
-		if (!skip)
+		if (skip)
 		{
-			OutGameSettingsManager.EnemyDisplayInfo enemyDisplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemyData);
-			if (enemyDisplayInfo != null)
+			return;
+		}
+		OutGameSettingsManager.EnemyDisplayInfo enemyDisplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemyData);
+		if (enemyDisplayInfo != null)
+		{
+			int num = (!is_short) ? enemyDisplayInfo.seIdGachaLong : enemyDisplayInfo.seIdGachaShort;
+			if (num > 0)
 			{
-				int num = (!is_short) ? enemyDisplayInfo.seIdGachaLong : enemyDisplayInfo.seIdGachaShort;
-				if (num > 0)
-				{
-					SoundManager.PlayOneshotJingle(num, null, null);
-				}
+				SoundManager.PlayOneshotJingle(num);
 			}
 		}
 	}
@@ -435,20 +428,21 @@ public class QuestGachaDirectorBase : AnimationDirector
 		Shader val = null;
 		if (enemyLoader.bodyID == 2023)
 		{
-			val = ResourceUtility.FindShader("mobile/Custom/enemy_reflective_simple");
+			val = ResourceUtility.FindShader("mobile/Custom/Enemy/enemy_reflective_simple");
 		}
-		if (val != null)
+		if (!(val != null))
 		{
-			enemyLoader.body.GetComponentsInChildren<Renderer>(Temporary.rendererList);
-			for (int i = 0; i < Temporary.rendererList.Count; i++)
+			return;
+		}
+		enemyLoader.body.GetComponentsInChildren<Renderer>(Temporary.rendererList);
+		for (int i = 0; i < Temporary.rendererList.Count; i++)
+		{
+			Renderer val2 = Temporary.rendererList[i];
+			if (val2 is MeshRenderer || val2 is SkinnedMeshRenderer)
 			{
-				Renderer val2 = Temporary.rendererList[i];
-				if (val2 is MeshRenderer || val2 is SkinnedMeshRenderer)
+				for (int j = 0; j < val2.get_materials().Length; j++)
 				{
-					for (int j = 0; j < val2.get_materials().Length; j++)
-					{
-						val2.get_materials()[j].set_shader(val);
-					}
+					val2.get_materials()[j].set_shader(val);
 				}
 			}
 		}

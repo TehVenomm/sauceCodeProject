@@ -43,22 +43,16 @@ public static class SaveData
 	{
 		try
 		{
-			if (HasKey(key))
+			if (!HasKey(key))
 			{
-				string @string = GetString(key, string.Empty);
-				return JsonUtility.FromJson<T>(@string);
+				return new T();
 			}
-			return new T();
-			IL_004c:
-			T result;
-			return result;
+			string @string = GetString(key, string.Empty);
+			return JsonUtility.FromJson<T>(@string);
 		}
 		catch
 		{
 			return new T();
-			IL_007b:
-			T result;
-			return result;
 		}
 	}
 

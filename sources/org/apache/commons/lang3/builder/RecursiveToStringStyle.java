@@ -14,13 +14,15 @@ public class RecursiveToStringStyle extends ToStringStyle {
         }
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, Collection<?> collection) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, Collection<?> collection) {
         appendClassName(stringBuffer, collection);
         appendIdentityHashCode(stringBuffer, collection);
         appendDetail(stringBuffer, str, collection.toArray());
     }
 
-    protected boolean accept(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public boolean accept(Class<?> cls) {
         return true;
     }
 }

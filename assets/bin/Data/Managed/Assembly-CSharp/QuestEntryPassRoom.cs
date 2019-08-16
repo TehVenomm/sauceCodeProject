@@ -39,7 +39,7 @@ public class QuestEntryPassRoom : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_SETTINGS, false);
+		SetActive((Enum)UI.STR_NON_SETTINGS, is_visible: false);
 		SetLabelText((Enum)UI.LBL_INPUT_PASS_1, passCode[0]);
 		SetLabelText((Enum)UI.LBL_INPUT_PASS_2, passCode[1]);
 		SetLabelText((Enum)UI.LBL_INPUT_PASS_3, passCode[2]);
@@ -131,7 +131,7 @@ public class QuestEntryPassRoom : GameSection
 
 	protected virtual void OnQuery_ROOM()
 	{
-		SendApply(0);
+		SendApply();
 	}
 
 	protected void SendApply(int questId = 0)
@@ -143,7 +143,7 @@ public class QuestEntryPassRoom : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<PartyManager>.I.SendApply(string.Join(string.Empty, passCode), delegate(bool is_apply, Error ret_code)
 		{
-			if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
+			if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId()))
 			{
 				Protocol.Force(delegate
 				{
@@ -154,12 +154,12 @@ public class QuestEntryPassRoom : GameSection
 			}
 			else if (ret_code == Error.WRN_PARTY_SEARCH_NOT_FOUND_PARTY || ret_code == Error.WRN_PARTY_OWNER_REJOIN)
 			{
-				GameSection.ChangeStayEvent("NOT_FOUND_PARTY", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ChangeStayEvent("NOT_FOUND_PARTY");
+				GameSection.ResumeEvent(is_resume: true);
 			}
 			else
 			{
-				GameSection.ResumeEvent(is_apply, null);
+				GameSection.ResumeEvent(is_apply);
 			}
 		}, questId);
 	}

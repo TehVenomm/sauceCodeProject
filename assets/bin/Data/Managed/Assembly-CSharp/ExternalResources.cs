@@ -20,7 +20,7 @@ public static class ExternalResources
 		if (!request.get_isDone())
 		{
 			progress(request);
-			yield return (object)null;
+			yield return null;
 		}
 		if (request.get_asset() != null)
 		{

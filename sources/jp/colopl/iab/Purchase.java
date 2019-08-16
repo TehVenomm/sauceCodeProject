@@ -1,9 +1,10 @@
-package jp.colopl.iab;
+package p018jp.colopl.iab;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.oms.appstore.AmazonAppstoreBillingService;
 
+/* renamed from: jp.colopl.iab.Purchase */
 public class Purchase {
     String mDeveloperPayload;
     String mItemType;

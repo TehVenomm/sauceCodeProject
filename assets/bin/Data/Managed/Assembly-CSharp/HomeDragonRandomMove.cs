@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HomeDragonRandomMove
+public class HomeDragonRandomMove : MonoBehaviour
 {
 	private readonly float MAX_DISTANCE = 0.4f;
 
@@ -29,8 +29,6 @@ public class HomeDragonRandomMove
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		this.set_enabled(false);
 	}
@@ -78,14 +76,20 @@ public class HomeDragonRandomMove
 		float num3 = (Mathf.PerlinNoise(coordZ.x, coordZ.y) - 0.5f) * maxDistance;
 		_transform.set_localPosition(originalPosition + new Vector3(num, num2, num3));
 		float num4 = Time.get_deltaTime() * 0.5f;
-		coordX.x += dirX.x * num4;
-		coordX.y += dirX.y * num4;
+		ref Vector2 reference = ref coordX;
+		reference.x += dirX.x * num4;
+		ref Vector2 reference2 = ref coordX;
+		reference2.y += dirX.y * num4;
 		num4 *= 0.9f;
-		coordY.x += dirY.x * num4;
-		coordY.y += dirY.y * num4;
+		ref Vector2 reference3 = ref coordY;
+		reference3.x += dirY.x * num4;
+		ref Vector2 reference4 = ref coordY;
+		reference4.y += dirY.y * num4;
 		num4 *= 0.9f;
-		coordZ.x += dirZ.x * num4;
-		coordZ.y += dirZ.y * num4;
+		ref Vector2 reference5 = ref coordZ;
+		reference5.x += dirZ.x * num4;
+		ref Vector2 reference6 = ref coordZ;
+		reference6.y += dirZ.y * num4;
 		if (maxDistance < MAX_DISTANCE)
 		{
 			maxDistance += Time.get_deltaTime() * 0.5f;

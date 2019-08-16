@@ -1,0 +1,9 @@
+public enum USER_SORT_TYPE
+{
+	NAME,
+	LEVEL,
+	LOGIN,
+	PLAY_COUNT,
+	REGISTER,
+	MAX
+}

@@ -1,44 +1,64 @@
 package com.crashlytics.android.core;
 
 import com.facebook.appevents.AppEventsConstants;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.services.common.ApiKey;
-import io.fabric.sdk.android.services.common.BackgroundPriorityRunnable;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.services.common.BackgroundPriorityRunnable;
 
 class ReportUploader {
-    private static final String CLS_FILE_EXT = ".cls";
     static final Map<String, String> HEADER_INVALID_CLS_FILE = Collections.singletonMap("X-CRASHLYTICS-INVALID-SESSION", AppEventsConstants.EVENT_PARAM_VALUE_YES);
-    private static final short[] RETRY_INTERVALS = new short[]{(short) 10, (short) 20, (short) 30, (short) 60, (short) 120, (short) 300};
-    private static final FilenameFilter crashFileFilter = new C03331();
+    /* access modifiers changed from: private */
+    public static final short[] RETRY_INTERVALS = {10, 20, 30, 60, 120, 300};
+    private final String apiKey;
     private final CreateReportSpiCall createReportCall;
     private final Object fileAccessLock = new Object();
-    private Thread uploadThread;
+    /* access modifiers changed from: private */
+    public final HandlingExceptionCheck handlingExceptionCheck;
+    private final ReportFilesProvider reportFilesProvider;
+    /* access modifiers changed from: private */
+    public Thread uploadThread;
 
-    /* renamed from: com.crashlytics.android.core.ReportUploader$1 */
-    static final class C03331 implements FilenameFilter {
-        C03331() {
+    static final class AlwaysSendCheck implements SendCheck {
+        AlwaysSendCheck() {
         }
 
-        public boolean accept(File file, String str) {
-            return str.endsWith(".cls") && !str.contains("Session");
+        public boolean canSendReports() {
+            return true;
         }
+    }
+
+    interface HandlingExceptionCheck {
+        boolean isHandlingException();
+    }
+
+    interface ReportFilesProvider {
+        File[] getCompleteSessionFiles();
+
+        File[] getInvalidSessionFiles();
+
+        File[] getNativeReportFiles();
+    }
+
+    interface SendCheck {
+        boolean canSendReports();
     }
 
     private class Worker extends BackgroundPriorityRunnable {
         private final float delay;
+        private final SendCheck sendCheck;
 
-        Worker(float f) {
+        Worker(float f, SendCheck sendCheck2) {
             this.delay = f;
+            this.sendCheck = sendCheck2;
         }
 
         private void attemptUploadWithRetry() {
-            Fabric.getLogger().mo4289d("Fabric", "Starting report processing in " + this.delay + " second(s)...");
+            Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Starting report processing in " + this.delay + " second(s)...");
             if (this.delay > 0.0f) {
                 try {
                     Thread.sleep((long) (this.delay * 1000.0f));
@@ -47,21 +67,19 @@ class ReportUploader {
                     return;
                 }
             }
-            CrashlyticsCore instance = CrashlyticsCore.getInstance();
-            CrashlyticsUncaughtExceptionHandler handler = instance.getHandler();
             List<Report> findReports = ReportUploader.this.findReports();
-            if (!handler.isHandlingException()) {
-                if (findReports.isEmpty() || instance.canSendWithUserApproval()) {
+            if (!ReportUploader.this.handlingExceptionCheck.isHandlingException()) {
+                if (findReports.isEmpty() || this.sendCheck.canSendReports()) {
                     int i = 0;
-                    while (!findReports.isEmpty() && !CrashlyticsCore.getInstance().getHandler().isHandlingException()) {
-                        Fabric.getLogger().mo4289d("Fabric", "Attempting to send " + findReports.size() + " report(s)");
+                    while (!findReports.isEmpty() && !ReportUploader.this.handlingExceptionCheck.isHandlingException()) {
+                        Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Attempting to send " + findReports.size() + " report(s)");
                         for (Report forceUpload : findReports) {
                             ReportUploader.this.forceUpload(forceUpload);
                         }
-                        List findReports2 = ReportUploader.this.findReports();
-                        if (!findReports2.isEmpty()) {
+                        findReports = ReportUploader.this.findReports();
+                        if (!findReports.isEmpty()) {
                             long j = (long) ReportUploader.RETRY_INTERVALS[Math.min(i, ReportUploader.RETRY_INTERVALS.length - 1)];
-                            Fabric.getLogger().mo4289d("Fabric", "Report submisson: scheduling delayed retry in " + j + " seconds");
+                            Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Report submisson: scheduling delayed retry in " + j + " seconds");
                             try {
                                 Thread.sleep(j * 1000);
                                 i++;
@@ -73,9 +91,9 @@ class ReportUploader {
                     }
                     return;
                 }
-                Fabric.getLogger().mo4289d("Fabric", "User declined to send. Removing " + findReports.size() + " Report(s).");
-                for (Report forceUpload2 : findReports) {
-                    forceUpload2.remove();
+                Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "User declined to send. Removing " + findReports.size() + " Report(s).");
+                for (Report remove : findReports) {
+                    remove.remove();
                 }
             }
         }
@@ -83,68 +101,99 @@ class ReportUploader {
         public void onRun() {
             try {
                 attemptUploadWithRetry();
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "An unexpected error occurred while attempting to upload crash reports.", e);
+            } catch (Exception e) {
+                Fabric.getLogger().mo20972e(CrashlyticsCore.TAG, "An unexpected error occurred while attempting to upload crash reports.", e);
             }
             ReportUploader.this.uploadThread = null;
         }
     }
 
-    public ReportUploader(CreateReportSpiCall createReportSpiCall) {
+    public ReportUploader(String str, CreateReportSpiCall createReportSpiCall, ReportFilesProvider reportFilesProvider2, HandlingExceptionCheck handlingExceptionCheck2) {
         if (createReportSpiCall == null) {
             throw new IllegalArgumentException("createReportCall must not be null.");
         }
         this.createReportCall = createReportSpiCall;
+        this.apiKey = str;
+        this.reportFilesProvider = reportFilesProvider2;
+        this.handlingExceptionCheck = handlingExceptionCheck2;
     }
 
-    List<Report> findReports() {
-        Fabric.getLogger().mo4289d("Fabric", "Checking for crash reports...");
+    /* access modifiers changed from: 0000 */
+    public List<Report> findReports() {
+        File[] completeSessionFiles;
+        File[] invalidSessionFiles;
+        File[] nativeReportFiles;
+        Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Checking for crash reports...");
         synchronized (this.fileAccessLock) {
-            File[] listFiles = CrashlyticsCore.getInstance().getSdkDirectory().listFiles(crashFileFilter);
+            completeSessionFiles = this.reportFilesProvider.getCompleteSessionFiles();
+            invalidSessionFiles = this.reportFilesProvider.getInvalidSessionFiles();
+            nativeReportFiles = this.reportFilesProvider.getNativeReportFiles();
         }
-        List<Report> linkedList = new LinkedList();
-        for (File file : listFiles) {
-            Fabric.getLogger().mo4289d("Fabric", "Found crash report " + file.getPath());
-            linkedList.add(new SessionReport(file));
+        LinkedList linkedList = new LinkedList();
+        if (completeSessionFiles != null) {
+            for (File file : completeSessionFiles) {
+                Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Found crash report " + file.getPath());
+                linkedList.add(new SessionReport(file));
+            }
+        }
+        HashMap hashMap = new HashMap();
+        if (invalidSessionFiles != null) {
+            for (File file2 : invalidSessionFiles) {
+                String sessionIdFromSessionFile = CrashlyticsController.getSessionIdFromSessionFile(file2);
+                if (!hashMap.containsKey(sessionIdFromSessionFile)) {
+                    hashMap.put(sessionIdFromSessionFile, new LinkedList());
+                }
+                ((List) hashMap.get(sessionIdFromSessionFile)).add(file2);
+            }
+        }
+        for (String str : hashMap.keySet()) {
+            Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Found invalid session: " + str);
+            List list = (List) hashMap.get(str);
+            linkedList.add(new InvalidSessionReport(str, (File[]) list.toArray(new File[list.size()])));
+        }
+        if (nativeReportFiles != null) {
+            for (File nativeSessionReport : nativeReportFiles) {
+                linkedList.add(new NativeSessionReport(nativeSessionReport));
+            }
         }
         if (linkedList.isEmpty()) {
-            Fabric.getLogger().mo4289d("Fabric", "No reports found.");
+            Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "No reports found.");
         }
         return linkedList;
     }
 
-    boolean forceUpload(Report report) {
+    /* access modifiers changed from: 0000 */
+    public boolean forceUpload(Report report) {
         boolean z;
         synchronized (this.fileAccessLock) {
             try {
-                boolean invoke = this.createReportCall.invoke(new CreateReportRequest(new ApiKey().getValue(CrashlyticsCore.getInstance().getContext()), report));
-                Fabric.getLogger().mo4294i("Fabric", "Crashlytics report upload " + (invoke ? "complete: " : "FAILED: ") + report.getFileName());
+                boolean invoke = this.createReportCall.invoke(new CreateReportRequest(this.apiKey, report));
+                Fabric.getLogger().mo20974i(CrashlyticsCore.TAG, "Crashlytics report upload " + (invoke ? "complete: " : "FAILED: ") + report.getIdentifier());
                 if (invoke) {
                     report.remove();
                     z = true;
                 } else {
                     z = false;
                 }
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Error occurred sending report " + report, e);
+            } catch (Exception e) {
+                Fabric.getLogger().mo20972e(CrashlyticsCore.TAG, "Error occurred sending report " + report, e);
                 z = false;
             }
         }
         return z;
     }
 
-    boolean isUploading() {
+    /* access modifiers changed from: 0000 */
+    public boolean isUploading() {
         return this.uploadThread != null;
     }
 
-    public void uploadReports() {
-        uploadReports(0.0f);
-    }
-
-    public void uploadReports(float f) {
+    public void uploadReports(float f, SendCheck sendCheck) {
         synchronized (this) {
-            if (this.uploadThread == null) {
-                this.uploadThread = new Thread(new Worker(f), "Crashlytics Report Uploader");
+            if (this.uploadThread != null) {
+                Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Report upload has already been started.");
+            } else {
+                this.uploadThread = new Thread(new Worker(f, sendCheck), "Crashlytics Report Uploader");
                 this.uploadThread.start();
             }
         }

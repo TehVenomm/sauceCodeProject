@@ -18,7 +18,8 @@ public abstract class DelegatingDeserializer extends StdDeserializer<Object> imp
     private static final long serialVersionUID = 1;
     protected final JsonDeserializer<?> _delegatee;
 
-    protected abstract JsonDeserializer<?> newDelegatingInstance(JsonDeserializer<?> jsonDeserializer);
+    /* access modifiers changed from: protected */
+    public abstract JsonDeserializer<?> newDelegatingInstance(JsonDeserializer<?> jsonDeserializer);
 
     public DelegatingDeserializer(JsonDeserializer<?> jsonDeserializer) {
         super(_figureType(jsonDeserializer));
@@ -37,12 +38,13 @@ public abstract class DelegatingDeserializer extends StdDeserializer<Object> imp
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
-        JsonDeserializer handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(this._delegatee, beanProperty, deserializationContext.constructType(this._delegatee.handledType()));
+        JsonDeserializer<?> handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(this._delegatee, beanProperty, deserializationContext.constructType(this._delegatee.handledType()));
         return handleSecondaryContextualization == this._delegatee ? this : newDelegatingInstance(handleSecondaryContextualization);
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JsonDeserializer<?> _createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty, JsonDeserializer<?> jsonDeserializer) {
+    public JsonDeserializer<?> _createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty, JsonDeserializer<?> jsonDeserializer) {
         return jsonDeserializer == this._delegatee ? this : newDelegatingInstance(jsonDeserializer);
     }
 

@@ -7,49 +7,35 @@ public class GuildItemManager
 {
 	private static GuildItemManager _instance;
 
-	private List<GuildItemInfoModel.EmblemInfo> mEmblemInfos = new List<GuildItemInfoModel.EmblemInfo>();
+	private readonly List<GuildItemInfoModel.EmblemInfo> _emblemInfos = new List<GuildItemInfoModel.EmblemInfo>();
 
-	public static GuildItemManager I
-	{
-		get
-		{
-			if (_instance == null)
-			{
-				_instance = new GuildItemManager();
-			}
-			return _instance;
-		}
-	}
+	private bool _init;
 
-	public bool Inited
-	{
-		get;
-		private set;
-	}
+	public static GuildItemManager I => _instance ?? (_instance = new GuildItemManager());
 
 	public List<GuildItemInfoModel.EmblemInfo> GetEmblemInfos()
 	{
-		return mEmblemInfos;
+		return _emblemInfos;
 	}
 
 	public GuildItemInfoModel.EmblemInfo[] GetEmblemLayer1Infos()
 	{
-		return mEmblemInfos.FindAll((GuildItemInfoModel.EmblemInfo x) => x.type == 0).ToArray();
+		return _emblemInfos.FindAll((GuildItemInfoModel.EmblemInfo x) => x.type == 0).ToArray();
 	}
 
 	public GuildItemInfoModel.EmblemInfo[] GetEmblemLayer2Infos()
 	{
-		return mEmblemInfos.FindAll((GuildItemInfoModel.EmblemInfo x) => x.type == 1).ToArray();
+		return _emblemInfos.FindAll((GuildItemInfoModel.EmblemInfo x) => x.type == 1).ToArray();
 	}
 
 	public GuildItemInfoModel.EmblemInfo[] GetEmblemLayer3Infos()
 	{
-		return mEmblemInfos.FindAll((GuildItemInfoModel.EmblemInfo x) => x.type == 2).ToArray();
+		return _emblemInfos.FindAll((GuildItemInfoModel.EmblemInfo x) => x.type == 2).ToArray();
 	}
 
 	public string GetItemSprite(int id)
 	{
-		GuildItemInfoModel.EmblemInfo emblemInfo = mEmblemInfos.Find((GuildItemInfoModel.EmblemInfo x) => x.id == id);
+		GuildItemInfoModel.EmblemInfo emblemInfo = _emblemInfos.Find((GuildItemInfoModel.EmblemInfo x) => x.id == id);
 		if (emblemInfo == null)
 		{
 			return string.Empty;
@@ -77,23 +63,32 @@ public class GuildItemManager
 
 	public void Init(Action callback)
 	{
-		Inited = false;
-		mEmblemInfos.Clear();
-		GuildItemInfoModel.RequestAllItemInfo post_data = new GuildItemInfoModel.RequestAllItemInfo();
-		Protocol.Send(GuildItemInfoModel.RequestAllItemInfo.path, post_data, delegate(GuildItemInfoModel ret)
+		if (_init)
 		{
-			if (ret.Error == Error.None)
-			{
-				foreach (GuildItemInfoModel.EmblemInfo item in ret.result.emblem)
-				{
-					mEmblemInfos.Add(item);
-				}
-			}
-			Inited = true;
 			if (callback != null)
 			{
 				callback();
 			}
-		}, string.Empty);
+		}
+		else
+		{
+			_emblemInfos.Clear();
+			GuildItemInfoModel.RequestAllItemInfo postData = new GuildItemInfoModel.RequestAllItemInfo();
+			Protocol.SendAsync(GuildItemInfoModel.RequestAllItemInfo.path, postData, delegate(GuildItemInfoModel ret)
+			{
+				if (ret.Error == Error.None)
+				{
+					foreach (GuildItemInfoModel.EmblemInfo item in ret.result.emblem)
+					{
+						_emblemInfos.Add(item);
+					}
+				}
+				_init = true;
+				if (callback != null)
+				{
+					callback();
+				}
+			}, string.Empty);
+		}
 	}
 }

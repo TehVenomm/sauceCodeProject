@@ -2,20 +2,32 @@ package com.google.android.gms.nearby.connection;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import java.util.Locale;
 
-public final class Strategy extends zza {
-    public static final Creator<Strategy> CREATOR = new zzf();
+@Class(creator = "StrategyCreator")
+@Reserved({1000})
+public final class Strategy extends AbstractSafeParcelable {
+    public static final Creator<Strategy> CREATOR = new zzj();
     public static final Strategy P2P_CLUSTER = new Strategy(1, 3);
+    public static final Strategy P2P_POINT_TO_POINT = new Strategy(1, 1);
     public static final Strategy P2P_STAR = new Strategy(1, 2);
-    private final int zzjax;
-    private final int zzjay;
+    @Field(getter = "getConnectionType", mo13990id = 3)
+    private final int zzaj;
+    @Field(getter = "getTopology", mo13990id = 4)
+    private final int zzak;
 
-    Strategy(int i, int i2) {
-        this.zzjax = i;
-        this.zzjay = i2;
+    @Constructor
+    Strategy(@Param(mo13993id = 3) int i, @Param(mo13993id = 4) int i2) {
+        this.zzaj = i;
+        this.zzak = i2;
     }
 
     public final boolean equals(Object obj) {
@@ -24,10 +36,7 @@ public final class Strategy extends zza {
                 return false;
             }
             Strategy strategy = (Strategy) obj;
-            if (this.zzjax != strategy.zzjax) {
-                return false;
-            }
-            if (this.zzjay != strategy.zzjay) {
+            if (!(this.zzaj == strategy.zzaj && this.zzak == strategy.zzak)) {
                 return false;
             }
         }
@@ -35,18 +44,19 @@ public final class Strategy extends zza {
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzjax), Integer.valueOf(this.zzjay)});
+        return Objects.hashCode(Integer.valueOf(this.zzaj), Integer.valueOf(this.zzak));
     }
 
     public final String toString() {
-        String str = P2P_CLUSTER.equals(this) ? "P2P_CLUSTER" : P2P_STAR.equals(this) ? "P2P_STAR" : "UNKNOWN";
-        return String.format("Strategy(%s){connectionType=%d, topology=%d}", new Object[]{str, Integer.valueOf(this.zzjax), Integer.valueOf(this.zzjay)});
+        Locale locale = Locale.US;
+        String str = P2P_CLUSTER.equals(this) ? "P2P_CLUSTER" : P2P_STAR.equals(this) ? "P2P_STAR" : P2P_POINT_TO_POINT.equals(this) ? "P2P_POINT_TO_POINT" : "UNKNOWN";
+        return String.format(locale, "Strategy(%s){connectionType=%d, topology=%d}", new Object[]{str, Integer.valueOf(this.zzaj), Integer.valueOf(this.zzak)});
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 3, this.zzjax);
-        zzd.zzc(parcel, 4, this.zzjay);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 3, this.zzaj);
+        SafeParcelWriter.writeInt(parcel, 4, this.zzak);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

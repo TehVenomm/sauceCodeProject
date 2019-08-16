@@ -1,4 +1,4 @@
-package android.support.v4.media.session;
+package android.support.p000v4.media.session;
 
 import android.app.PendingIntent;
 import android.net.Uri;
@@ -8,17 +8,22 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.RatingCompat;
-import android.support.v4.media.session.MediaSessionCompat.QueueItem;
+import android.support.p000v4.media.MediaDescriptionCompat;
+import android.support.p000v4.media.MediaMetadataCompat;
+import android.support.p000v4.media.RatingCompat;
+import android.support.p000v4.media.session.MediaSessionCompat.QueueItem;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import java.util.List;
 
+/* renamed from: android.support.v4.media.session.IMediaSession */
 public interface IMediaSession extends IInterface {
 
+    /* renamed from: android.support.v4.media.session.IMediaSession$Stub */
     public static abstract class Stub extends Binder implements IMediaSession {
         private static final String DESCRIPTOR = "android.support.v4.media.session.IMediaSession";
+        static final int TRANSACTION_addQueueItem = 41;
+        static final int TRANSACTION_addQueueItemAt = 42;
         static final int TRANSACTION_adjustVolume = 11;
         static final int TRANSACTION_fastForward = 22;
         static final int TRANSACTION_getExtras = 31;
@@ -30,8 +35,12 @@ public interface IMediaSession extends IInterface {
         static final int TRANSACTION_getQueue = 29;
         static final int TRANSACTION_getQueueTitle = 30;
         static final int TRANSACTION_getRatingType = 32;
+        static final int TRANSACTION_getRepeatMode = 37;
+        static final int TRANSACTION_getShuffleMode = 47;
         static final int TRANSACTION_getTag = 7;
         static final int TRANSACTION_getVolumeAttributes = 10;
+        static final int TRANSACTION_isCaptioningEnabled = 45;
+        static final int TRANSACTION_isShuffleModeEnabledDeprecated = 38;
         static final int TRANSACTION_isTransportControlEnabled = 5;
         static final int TRANSACTION_next = 20;
         static final int TRANSACTION_pause = 18;
@@ -45,22 +54,69 @@ public interface IMediaSession extends IInterface {
         static final int TRANSACTION_prepareFromUri = 36;
         static final int TRANSACTION_previous = 21;
         static final int TRANSACTION_rate = 25;
+        static final int TRANSACTION_rateWithExtras = 51;
         static final int TRANSACTION_registerCallbackListener = 3;
+        static final int TRANSACTION_removeQueueItem = 43;
+        static final int TRANSACTION_removeQueueItemAt = 44;
         static final int TRANSACTION_rewind = 23;
         static final int TRANSACTION_seekTo = 24;
         static final int TRANSACTION_sendCommand = 1;
         static final int TRANSACTION_sendCustomAction = 26;
         static final int TRANSACTION_sendMediaButton = 2;
+        static final int TRANSACTION_setCaptioningEnabled = 46;
+        static final int TRANSACTION_setRepeatMode = 39;
+        static final int TRANSACTION_setShuffleMode = 48;
+        static final int TRANSACTION_setShuffleModeEnabledDeprecated = 40;
         static final int TRANSACTION_setVolumeTo = 12;
         static final int TRANSACTION_skipToQueueItem = 17;
         static final int TRANSACTION_stop = 19;
         static final int TRANSACTION_unregisterCallbackListener = 4;
 
+        /* renamed from: android.support.v4.media.session.IMediaSession$Stub$Proxy */
         private static class Proxy implements IMediaSession {
             private IBinder mRemote;
 
             Proxy(IBinder iBinder) {
                 this.mRemote = iBinder;
+            }
+
+            public void addQueueItem(MediaDescriptionCompat mediaDescriptionCompat) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (mediaDescriptionCompat != null) {
+                        obtain.writeInt(1);
+                        mediaDescriptionCompat.writeToParcel(obtain, 0);
+                    } else {
+                        obtain.writeInt(0);
+                    }
+                    this.mRemote.transact(41, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public void addQueueItemAt(MediaDescriptionCompat mediaDescriptionCompat, int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (mediaDescriptionCompat != null) {
+                        obtain.writeInt(1);
+                        mediaDescriptionCompat.writeToParcel(obtain, 0);
+                    } else {
+                        obtain.writeInt(0);
+                    }
+                    obtain.writeInt(i);
+                    this.mRemote.transact(42, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
             }
 
             public void adjustVolume(int i, int i2, String str) throws RemoteException {
@@ -101,13 +157,10 @@ public interface IMediaSession extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(Stub.TRANSACTION_getExtras, obtain, obtain2, 0);
+                    this.mRemote.transact(31, obtain, obtain2, 0);
                     obtain2.readException();
-                    Bundle bundle = obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return bundle;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -120,8 +173,7 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(9, obtain, obtain2, 0);
                     obtain2.readException();
-                    long readLong = obtain2.readLong();
-                    return readLong;
+                    return obtain2.readLong();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -139,11 +191,8 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(8, obtain, obtain2, 0);
                     obtain2.readException();
-                    PendingIntent pendingIntent = obtain2.readInt() != 0 ? (PendingIntent) PendingIntent.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return pendingIntent;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (PendingIntent) PendingIntent.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -156,11 +205,8 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(27, obtain, obtain2, 0);
                     obtain2.readException();
-                    MediaMetadataCompat mediaMetadataCompat = obtain2.readInt() != 0 ? (MediaMetadataCompat) MediaMetadataCompat.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return mediaMetadataCompat;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (MediaMetadataCompat) MediaMetadataCompat.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -173,8 +219,7 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(6, obtain, obtain2, 0);
                     obtain2.readException();
-                    String readString = obtain2.readString();
-                    return readString;
+                    return obtain2.readString();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -188,11 +233,8 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(28, obtain, obtain2, 0);
                     obtain2.readException();
-                    PlaybackStateCompat playbackStateCompat = obtain2.readInt() != 0 ? (PlaybackStateCompat) PlaybackStateCompat.CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return playbackStateCompat;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (PlaybackStateCompat) PlaybackStateCompat.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -203,10 +245,9 @@ public interface IMediaSession extends IInterface {
                 Parcel obtain2 = Parcel.obtain();
                 try {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(Stub.TRANSACTION_getQueue, obtain, obtain2, 0);
+                    this.mRemote.transact(29, obtain, obtain2, 0);
                     obtain2.readException();
-                    List<QueueItem> createTypedArrayList = obtain2.createTypedArrayList(QueueItem.CREATOR);
-                    return createTypedArrayList;
+                    return obtain2.createTypedArrayList(QueueItem.CREATOR);
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -220,11 +261,8 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(30, obtain, obtain2, 0);
                     obtain2.readException();
-                    CharSequence charSequence = obtain2.readInt() != 0 ? (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(obtain2) : null;
-                    obtain2.recycle();
-                    obtain.recycle();
-                    return charSequence;
-                } catch (Throwable th) {
+                    return obtain2.readInt() != 0 ? (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -237,8 +275,35 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(32, obtain, obtain2, 0);
                     obtain2.readException();
-                    int readInt = obtain2.readInt();
-                    return readInt;
+                    return obtain2.readInt();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public int getRepeatMode() throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(37, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public int getShuffleMode() throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(47, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -252,8 +317,7 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(7, obtain, obtain2, 0);
                     obtain2.readException();
-                    String readString = obtain2.readString();
-                    return readString;
+                    return obtain2.readString();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -267,11 +331,44 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     this.mRemote.transact(10, obtain, obtain2, 0);
                     obtain2.readException();
-                    ParcelableVolumeInfo parcelableVolumeInfo = obtain2.readInt() != 0 ? (ParcelableVolumeInfo) ParcelableVolumeInfo.CREATOR.createFromParcel(obtain2) : null;
+                    return obtain2.readInt() != 0 ? (ParcelableVolumeInfo) ParcelableVolumeInfo.CREATOR.createFromParcel(obtain2) : null;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
-                    return parcelableVolumeInfo;
-                } catch (Throwable th) {
+                }
+            }
+
+            public boolean isCaptioningEnabled() throws RemoteException {
+                boolean z = false;
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(45, obtain, obtain2, 0);
+                    obtain2.readException();
+                    if (obtain2.readInt() != 0) {
+                        z = true;
+                    }
+                    return z;
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public boolean isShuffleModeEnabledDeprecated() throws RemoteException {
+                boolean z = false;
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(38, obtain, obtain2, 0);
+                    obtain2.readException();
+                    if (obtain2.readInt() != 0) {
+                        z = true;
+                    }
+                    return z;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -288,10 +385,8 @@ public interface IMediaSession extends IInterface {
                     if (obtain2.readInt() != 0) {
                         z = true;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return z;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -511,6 +606,31 @@ public interface IMediaSession extends IInterface {
                 }
             }
 
+            public void rateWithExtras(RatingCompat ratingCompat, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (ratingCompat != null) {
+                        obtain.writeInt(1);
+                        ratingCompat.writeToParcel(obtain, 0);
+                    } else {
+                        obtain.writeInt(0);
+                    }
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
+                    } else {
+                        obtain.writeInt(0);
+                    }
+                    this.mRemote.transact(51, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
             public void registerCallbackListener(IMediaControllerCallback iMediaControllerCallback) throws RemoteException {
                 Parcel obtain = Parcel.obtain();
                 Parcel obtain2 = Parcel.obtain();
@@ -518,6 +638,39 @@ public interface IMediaSession extends IInterface {
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     obtain.writeStrongBinder(iMediaControllerCallback != null ? iMediaControllerCallback.asBinder() : null);
                     this.mRemote.transact(3, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public void removeQueueItem(MediaDescriptionCompat mediaDescriptionCompat) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (mediaDescriptionCompat != null) {
+                        obtain.writeInt(1);
+                        mediaDescriptionCompat.writeToParcel(obtain, 0);
+                    } else {
+                        obtain.writeInt(0);
+                    }
+                    this.mRemote.transact(43, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public void removeQueueItemAt(int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    this.mRemote.transact(44, obtain, obtain2, 0);
                     obtain2.readException();
                 } finally {
                     obtain2.recycle();
@@ -590,7 +743,7 @@ public interface IMediaSession extends IInterface {
                     } else {
                         obtain.writeInt(0);
                     }
-                    this.mRemote.transact(Stub.TRANSACTION_sendCustomAction, obtain, obtain2, 0);
+                    this.mRemote.transact(26, obtain, obtain2, 0);
                     obtain2.readException();
                 } finally {
                     obtain2.recycle();
@@ -615,10 +768,72 @@ public interface IMediaSession extends IInterface {
                     if (obtain2.readInt() != 0) {
                         z = true;
                     }
+                    return z;
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
-                    return z;
-                } catch (Throwable th) {
+                }
+            }
+
+            public void setCaptioningEnabled(boolean z) throws RemoteException {
+                int i = 0;
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (z) {
+                        i = 1;
+                    }
+                    obtain.writeInt(i);
+                    this.mRemote.transact(46, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public void setRepeatMode(int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    this.mRemote.transact(39, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public void setShuffleMode(int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    this.mRemote.transact(48, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
+                    obtain2.recycle();
+                    obtain.recycle();
+                }
+            }
+
+            public void setShuffleModeEnabledDeprecated(boolean z) throws RemoteException {
+                int i = 0;
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (z) {
+                        i = 1;
+                    }
+                    obtain.writeInt(i);
+                    this.mRemote.transact(40, obtain, obtain2, 0);
+                    obtain2.readException();
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -699,9 +914,7 @@ public interface IMediaSession extends IInterface {
         }
 
         public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-            int i3 = 0;
-            boolean sendMediaButton;
-            String packageName;
+            boolean z = false;
             switch (i) {
                 case 1:
                     parcel.enforceInterface(DESCRIPTOR);
@@ -710,40 +923,40 @@ public interface IMediaSession extends IInterface {
                     return true;
                 case 2:
                     parcel.enforceInterface(DESCRIPTOR);
-                    sendMediaButton = sendMediaButton(parcel.readInt() != 0 ? (KeyEvent) KeyEvent.CREATOR.createFromParcel(parcel) : null);
+                    boolean sendMediaButton = sendMediaButton(parcel.readInt() != 0 ? (KeyEvent) KeyEvent.CREATOR.createFromParcel(parcel) : null);
                     parcel2.writeNoException();
                     parcel2.writeInt(sendMediaButton ? 1 : 0);
                     return true;
                 case 3:
                     parcel.enforceInterface(DESCRIPTOR);
-                    registerCallbackListener(android.support.v4.media.session.IMediaControllerCallback.Stub.asInterface(parcel.readStrongBinder()));
+                    registerCallbackListener(android.support.p000v4.media.session.IMediaControllerCallback.Stub.asInterface(parcel.readStrongBinder()));
                     parcel2.writeNoException();
                     return true;
                 case 4:
                     parcel.enforceInterface(DESCRIPTOR);
-                    unregisterCallbackListener(android.support.v4.media.session.IMediaControllerCallback.Stub.asInterface(parcel.readStrongBinder()));
+                    unregisterCallbackListener(android.support.p000v4.media.session.IMediaControllerCallback.Stub.asInterface(parcel.readStrongBinder()));
                     parcel2.writeNoException();
                     return true;
                 case 5:
                     parcel.enforceInterface(DESCRIPTOR);
-                    sendMediaButton = isTransportControlEnabled();
+                    boolean isTransportControlEnabled = isTransportControlEnabled();
                     parcel2.writeNoException();
-                    if (sendMediaButton) {
-                        i3 = 1;
+                    if (isTransportControlEnabled) {
+                        z = true;
                     }
-                    parcel2.writeInt(i3);
+                    parcel2.writeInt(z ? 1 : 0);
                     return true;
                 case 6:
                     parcel.enforceInterface(DESCRIPTOR);
-                    packageName = getPackageName();
+                    String packageName = getPackageName();
                     parcel2.writeNoException();
                     parcel2.writeString(packageName);
                     return true;
                 case 7:
                     parcel.enforceInterface(DESCRIPTOR);
-                    packageName = getTag();
+                    String tag = getTag();
                     parcel2.writeNoException();
-                    parcel2.writeString(packageName);
+                    parcel2.writeString(tag);
                     return true;
                 case 8:
                     parcel.enforceInterface(DESCRIPTOR);
@@ -848,7 +1061,7 @@ public interface IMediaSession extends IInterface {
                     rate(parcel.readInt() != 0 ? (RatingCompat) RatingCompat.CREATOR.createFromParcel(parcel) : null);
                     parcel2.writeNoException();
                     return true;
-                case TRANSACTION_sendCustomAction /*26*/:
+                case 26:
                     parcel.enforceInterface(DESCRIPTOR);
                     sendCustomAction(parcel.readString(), parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
                     parcel2.writeNoException();
@@ -875,7 +1088,7 @@ public interface IMediaSession extends IInterface {
                     }
                     parcel2.writeInt(0);
                     return true;
-                case TRANSACTION_getQueue /*29*/:
+                case 29:
                     parcel.enforceInterface(DESCRIPTOR);
                     List queue = getQueue();
                     parcel2.writeNoException();
@@ -892,7 +1105,7 @@ public interface IMediaSession extends IInterface {
                     }
                     parcel2.writeInt(0);
                     return true;
-                case TRANSACTION_getExtras /*31*/:
+                case 31:
                     parcel.enforceInterface(DESCRIPTOR);
                     Bundle extras = getExtras();
                     parcel2.writeNoException();
@@ -929,6 +1142,87 @@ public interface IMediaSession extends IInterface {
                     prepareFromUri(parcel.readInt() != 0 ? (Uri) Uri.CREATOR.createFromParcel(parcel) : null, parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
                     parcel2.writeNoException();
                     return true;
+                case 37:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    int repeatMode = getRepeatMode();
+                    parcel2.writeNoException();
+                    parcel2.writeInt(repeatMode);
+                    return true;
+                case 38:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    boolean isShuffleModeEnabledDeprecated = isShuffleModeEnabledDeprecated();
+                    parcel2.writeNoException();
+                    if (isShuffleModeEnabledDeprecated) {
+                        z = true;
+                    }
+                    parcel2.writeInt(z ? 1 : 0);
+                    return true;
+                case 39:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    setRepeatMode(parcel.readInt());
+                    parcel2.writeNoException();
+                    return true;
+                case 40:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    if (parcel.readInt() != 0) {
+                        z = true;
+                    }
+                    setShuffleModeEnabledDeprecated(z);
+                    parcel2.writeNoException();
+                    return true;
+                case 41:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    addQueueItem(parcel.readInt() != 0 ? (MediaDescriptionCompat) MediaDescriptionCompat.CREATOR.createFromParcel(parcel) : null);
+                    parcel2.writeNoException();
+                    return true;
+                case 42:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    addQueueItemAt(parcel.readInt() != 0 ? (MediaDescriptionCompat) MediaDescriptionCompat.CREATOR.createFromParcel(parcel) : null, parcel.readInt());
+                    parcel2.writeNoException();
+                    return true;
+                case 43:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    removeQueueItem(parcel.readInt() != 0 ? (MediaDescriptionCompat) MediaDescriptionCompat.CREATOR.createFromParcel(parcel) : null);
+                    parcel2.writeNoException();
+                    return true;
+                case 44:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    removeQueueItemAt(parcel.readInt());
+                    parcel2.writeNoException();
+                    return true;
+                case 45:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    boolean isCaptioningEnabled = isCaptioningEnabled();
+                    parcel2.writeNoException();
+                    if (isCaptioningEnabled) {
+                        z = true;
+                    }
+                    parcel2.writeInt(z ? 1 : 0);
+                    return true;
+                case 46:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    if (parcel.readInt() != 0) {
+                        z = true;
+                    }
+                    setCaptioningEnabled(z);
+                    parcel2.writeNoException();
+                    return true;
+                case 47:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    int shuffleMode = getShuffleMode();
+                    parcel2.writeNoException();
+                    parcel2.writeInt(shuffleMode);
+                    return true;
+                case 48:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    setShuffleMode(parcel.readInt());
+                    parcel2.writeNoException();
+                    return true;
+                case 51:
+                    parcel.enforceInterface(DESCRIPTOR);
+                    rateWithExtras(parcel.readInt() != 0 ? (RatingCompat) RatingCompat.CREATOR.createFromParcel(parcel) : null, parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
+                    parcel2.writeNoException();
+                    return true;
                 case 1598968902:
                     parcel2.writeString(DESCRIPTOR);
                     return true;
@@ -937,6 +1231,10 @@ public interface IMediaSession extends IInterface {
             }
         }
     }
+
+    void addQueueItem(MediaDescriptionCompat mediaDescriptionCompat) throws RemoteException;
+
+    void addQueueItemAt(MediaDescriptionCompat mediaDescriptionCompat, int i) throws RemoteException;
 
     void adjustVolume(int i, int i2, String str) throws RemoteException;
 
@@ -960,9 +1258,17 @@ public interface IMediaSession extends IInterface {
 
     int getRatingType() throws RemoteException;
 
+    int getRepeatMode() throws RemoteException;
+
+    int getShuffleMode() throws RemoteException;
+
     String getTag() throws RemoteException;
 
     ParcelableVolumeInfo getVolumeAttributes() throws RemoteException;
+
+    boolean isCaptioningEnabled() throws RemoteException;
+
+    boolean isShuffleModeEnabledDeprecated() throws RemoteException;
 
     boolean isTransportControlEnabled() throws RemoteException;
 
@@ -990,7 +1296,13 @@ public interface IMediaSession extends IInterface {
 
     void rate(RatingCompat ratingCompat) throws RemoteException;
 
+    void rateWithExtras(RatingCompat ratingCompat, Bundle bundle) throws RemoteException;
+
     void registerCallbackListener(IMediaControllerCallback iMediaControllerCallback) throws RemoteException;
+
+    void removeQueueItem(MediaDescriptionCompat mediaDescriptionCompat) throws RemoteException;
+
+    void removeQueueItemAt(int i) throws RemoteException;
 
     void rewind() throws RemoteException;
 
@@ -1001,6 +1313,14 @@ public interface IMediaSession extends IInterface {
     void sendCustomAction(String str, Bundle bundle) throws RemoteException;
 
     boolean sendMediaButton(KeyEvent keyEvent) throws RemoteException;
+
+    void setCaptioningEnabled(boolean z) throws RemoteException;
+
+    void setRepeatMode(int i) throws RemoteException;
+
+    void setShuffleMode(int i) throws RemoteException;
+
+    void setShuffleModeEnabledDeprecated(boolean z) throws RemoteException;
 
     void setVolumeTo(int i, int i2, String str) throws RemoteException;
 

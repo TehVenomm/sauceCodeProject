@@ -6,7 +6,7 @@ public interface IBulletObservable
 
 	void RegisterObserver();
 
-	void NotifyBroken();
+	void NotifyBroken(bool isSendOnlyOriginal = true);
 
 	void NotifyDestroy();
 

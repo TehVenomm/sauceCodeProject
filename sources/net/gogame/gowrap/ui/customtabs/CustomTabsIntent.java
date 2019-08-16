@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.app.ActivityOptions;
 import android.app.PendingIntent;
@@ -12,6 +12,7 @@ import android.widget.RemoteViews;
 import com.google.android.gms.drive.DriveFile;
 import java.util.ArrayList;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsIntent */
 public final class CustomTabsIntent {
     public static final String EXTRA_ACTION_BUTTON_BUNDLE = "android.support.customtabs.extra.ACTION_BUTTON_BUNDLE";
     public static final String EXTRA_CLOSE_BUTTON_ICON = "android.support.customtabs.extra.CLOSE_BUTTON_ICON";
@@ -43,6 +44,7 @@ public final class CustomTabsIntent {
     public final Intent intent;
     public final Bundle startAnimationBundle;
 
+    /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsIntent$Builder */
     public static final class Builder {
         private ArrayList<Bundle> mActionButtons;
         private boolean mInstantAppsEnabled;
@@ -65,7 +67,7 @@ public final class CustomTabsIntent {
                 this.mIntent.setPackage(customTabsSession.getComponentName().getPackageName());
             }
             Bundle bundle = new Bundle();
-            String str = CustomTabsIntent.EXTRA_SESSION;
+            String str = "android.support.customtabs.extra.SESSION";
             if (customTabsSession != null) {
                 iBinder = customTabsSession.getBinder();
             }
@@ -74,49 +76,49 @@ public final class CustomTabsIntent {
         }
 
         public Builder setToolbarColor(int i) {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, i);
+            this.mIntent.putExtra("android.support.customtabs.extra.TOOLBAR_COLOR", i);
             return this;
         }
 
         public Builder enableUrlBarHiding() {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_ENABLE_URLBAR_HIDING, true);
+            this.mIntent.putExtra("android.support.customtabs.extra.ENABLE_URLBAR_HIDING", true);
             return this;
         }
 
         public Builder setCloseButtonIcon(Bitmap bitmap) {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_CLOSE_BUTTON_ICON, bitmap);
+            this.mIntent.putExtra("android.support.customtabs.extra.CLOSE_BUTTON_ICON", bitmap);
             return this;
         }
 
         public Builder setShowTitle(boolean z) {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_TITLE_VISIBILITY_STATE, z ? 1 : 0);
+            this.mIntent.putExtra("android.support.customtabs.extra.TITLE_VISIBILITY", z ? 1 : 0);
             return this;
         }
 
         public Builder addMenuItem(String str, PendingIntent pendingIntent) {
             if (this.mMenuItems == null) {
-                this.mMenuItems = new ArrayList();
+                this.mMenuItems = new ArrayList<>();
             }
             Bundle bundle = new Bundle();
-            bundle.putString(CustomTabsIntent.KEY_MENU_ITEM_TITLE, str);
-            bundle.putParcelable(CustomTabsIntent.KEY_PENDING_INTENT, pendingIntent);
+            bundle.putString("android.support.customtabs.customaction.MENU_ITEM_TITLE", str);
+            bundle.putParcelable("android.support.customtabs.customaction.PENDING_INTENT", pendingIntent);
             this.mMenuItems.add(bundle);
             return this;
         }
 
         public Builder addDefaultShareMenuItem() {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_DEFAULT_SHARE_MENU_ITEM, true);
+            this.mIntent.putExtra("android.support.customtabs.extra.SHARE_MENU_ITEM", true);
             return this;
         }
 
         public Builder setActionButton(Bitmap bitmap, String str, PendingIntent pendingIntent, boolean z) {
             Bundle bundle = new Bundle();
-            bundle.putInt(CustomTabsIntent.KEY_ID, 0);
-            bundle.putParcelable(CustomTabsIntent.KEY_ICON, bitmap);
-            bundle.putString(CustomTabsIntent.KEY_DESCRIPTION, str);
-            bundle.putParcelable(CustomTabsIntent.KEY_PENDING_INTENT, pendingIntent);
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_ACTION_BUTTON_BUNDLE, bundle);
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_TINT_ACTION_BUTTON, z);
+            bundle.putInt("android.support.customtabs.customaction.ID", 0);
+            bundle.putParcelable("android.support.customtabs.customaction.ICON", bitmap);
+            bundle.putString("android.support.customtabs.customaction.DESCRIPTION", str);
+            bundle.putParcelable("android.support.customtabs.customaction.PENDING_INTENT", pendingIntent);
+            this.mIntent.putExtra("android.support.customtabs.extra.ACTION_BUTTON_BUNDLE", bundle);
+            this.mIntent.putExtra("android.support.customtabs.extra.TINT_ACTION_BUTTON", z);
             return this;
         }
 
@@ -127,29 +129,29 @@ public final class CustomTabsIntent {
         @Deprecated
         public Builder addToolbarItem(int i, Bitmap bitmap, String str, PendingIntent pendingIntent) throws IllegalStateException {
             if (this.mActionButtons == null) {
-                this.mActionButtons = new ArrayList();
+                this.mActionButtons = new ArrayList<>();
             }
             if (this.mActionButtons.size() >= 5) {
                 throw new IllegalStateException("Exceeded maximum toolbar item count of 5");
             }
             Bundle bundle = new Bundle();
-            bundle.putInt(CustomTabsIntent.KEY_ID, i);
-            bundle.putParcelable(CustomTabsIntent.KEY_ICON, bitmap);
-            bundle.putString(CustomTabsIntent.KEY_DESCRIPTION, str);
-            bundle.putParcelable(CustomTabsIntent.KEY_PENDING_INTENT, pendingIntent);
+            bundle.putInt("android.support.customtabs.customaction.ID", i);
+            bundle.putParcelable("android.support.customtabs.customaction.ICON", bitmap);
+            bundle.putString("android.support.customtabs.customaction.DESCRIPTION", str);
+            bundle.putParcelable("android.support.customtabs.customaction.PENDING_INTENT", pendingIntent);
             this.mActionButtons.add(bundle);
             return this;
         }
 
         public Builder setSecondaryToolbarColor(int i) {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_SECONDARY_TOOLBAR_COLOR, i);
+            this.mIntent.putExtra("android.support.customtabs.extra.SECONDARY_TOOLBAR_COLOR", i);
             return this;
         }
 
         public Builder setSecondaryToolbarViews(RemoteViews remoteViews, int[] iArr, PendingIntent pendingIntent) {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_REMOTEVIEWS, remoteViews);
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_REMOTEVIEWS_VIEW_IDS, iArr);
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_REMOTEVIEWS_PENDINGINTENT, pendingIntent);
+            this.mIntent.putExtra("android.support.customtabs.extra.EXTRA_REMOTEVIEWS", remoteViews);
+            this.mIntent.putExtra("android.support.customtabs.extra.EXTRA_REMOTEVIEWS_VIEW_IDS", iArr);
+            this.mIntent.putExtra("android.support.customtabs.extra.EXTRA_REMOTEVIEWS_PENDINGINTENT", pendingIntent);
             return this;
         }
 
@@ -164,18 +166,18 @@ public final class CustomTabsIntent {
         }
 
         public Builder setExitAnimations(Context context, int i, int i2) {
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_EXIT_ANIMATION_BUNDLE, ActivityOptions.makeCustomAnimation(context, i, i2).toBundle());
+            this.mIntent.putExtra("android.support.customtabs.extra.EXIT_ANIMATION_BUNDLE", ActivityOptions.makeCustomAnimation(context, i, i2).toBundle());
             return this;
         }
 
         public CustomTabsIntent build() {
             if (this.mMenuItems != null) {
-                this.mIntent.putParcelableArrayListExtra(CustomTabsIntent.EXTRA_MENU_ITEMS, this.mMenuItems);
+                this.mIntent.putParcelableArrayListExtra("android.support.customtabs.extra.MENU_ITEMS", this.mMenuItems);
             }
             if (this.mActionButtons != null) {
-                this.mIntent.putParcelableArrayListExtra(CustomTabsIntent.EXTRA_TOOLBAR_ITEMS, this.mActionButtons);
+                this.mIntent.putParcelableArrayListExtra("android.support.customtabs.extra.TOOLBAR_ITEMS", this.mActionButtons);
             }
-            this.mIntent.putExtra(CustomTabsIntent.EXTRA_ENABLE_INSTANT_APPS, this.mInstantAppsEnabled);
+            this.mIntent.putExtra("android.support.customtabs.extra.EXTRA_ENABLE_INSTANT_APPS", this.mInstantAppsEnabled);
             return new CustomTabsIntent(this.mIntent, this.mStartAnimationBundle);
         }
     }
@@ -185,8 +187,8 @@ public final class CustomTabsIntent {
         context.startActivity(this.intent, this.startAnimationBundle);
     }
 
-    private CustomTabsIntent(Intent intent, Bundle bundle) {
-        this.intent = intent;
+    private CustomTabsIntent(Intent intent2, Bundle bundle) {
+        this.intent = intent2;
         this.startAnimationBundle = bundle;
     }
 
@@ -194,17 +196,17 @@ public final class CustomTabsIntent {
         return 5;
     }
 
-    public static Intent setAlwaysUseBrowserUI(Intent intent) {
-        if (intent == null) {
-            intent = new Intent("android.intent.action.VIEW");
+    public static Intent setAlwaysUseBrowserUI(Intent intent2) {
+        if (intent2 == null) {
+            intent2 = new Intent("android.intent.action.VIEW");
         }
-        intent.addFlags(DriveFile.MODE_READ_ONLY);
-        intent.putExtra(EXTRA_USER_OPT_OUT_FROM_CUSTOM_TABS, true);
-        return intent;
+        intent2.addFlags(DriveFile.MODE_READ_ONLY);
+        intent2.putExtra(EXTRA_USER_OPT_OUT_FROM_CUSTOM_TABS, true);
+        return intent2;
     }
 
-    public static boolean shouldAlwaysUseBrowserUI(Intent intent) {
-        if (!intent.getBooleanExtra(EXTRA_USER_OPT_OUT_FROM_CUSTOM_TABS, false) || (intent.getFlags() & DriveFile.MODE_READ_ONLY) == 0) {
+    public static boolean shouldAlwaysUseBrowserUI(Intent intent2) {
+        if (!intent2.getBooleanExtra(EXTRA_USER_OPT_OUT_FROM_CUSTOM_TABS, false) || (intent2.getFlags() & DriveFile.MODE_READ_ONLY) == 0) {
             return false;
         }
         return true;

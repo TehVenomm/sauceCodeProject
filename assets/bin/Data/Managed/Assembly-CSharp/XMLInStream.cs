@@ -554,20 +554,14 @@ public class XMLInStream
 		try
 		{
 			return FlashCompatibleConvert.ToDouble(val);
-			IL_000c:
-			double result;
-			return result;
 		}
 		catch
 		{
-			if (!val.Contains("."))
+			if (val.Contains("."))
 			{
-				return FlashCompatibleConvert.ToDouble(val.Replace(',', '.'));
+				return FlashCompatibleConvert.ToDouble(val.Replace('.', ','));
 			}
-			return FlashCompatibleConvert.ToDouble(val.Replace('.', ','));
-			IL_004c:
-			double result;
-			return result;
+			return FlashCompatibleConvert.ToDouble(val.Replace(',', '.'));
 		}
 	}
 }

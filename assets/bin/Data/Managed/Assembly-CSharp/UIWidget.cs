@@ -19,6 +19,10 @@ public class UIWidget : UIRect
 		BottomRight
 	}
 
+	public delegate void OnDimensionsChanged();
+
+	public delegate void OnPostFillCallback(UIWidget widget, int bufferOffset, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols);
+
 	public enum AspectRatioSource
 	{
 		Free,
@@ -26,14 +30,10 @@ public class UIWidget : UIRect
 		BasedOnHeight
 	}
 
-	public delegate void OnDimensionsChanged();
-
-	public delegate void OnPostFillCallback(UIWidget widget, int bufferOffset, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols);
-
 	public delegate bool HitCheck(Vector3 worldPos);
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected Color mColor = Color.get_white();
 
 	[HideInInspector]
@@ -44,8 +44,8 @@ public class UIWidget : UIRect
 	[SerializeField]
 	protected int mWidth = 100;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected int mHeight = 100;
 
 	[HideInInspector]
@@ -124,7 +124,7 @@ public class UIWidget : UIRect
 		}
 		set
 		{
-			if ((MulticastDelegate)mOnRender != (MulticastDelegate)value)
+			if (mOnRender != value)
 			{
 				if (drawCall != null && drawCall.onRender != null && mOnRender != null)
 				{
@@ -181,43 +181,43 @@ public class UIWidget : UIRect
 			{
 				value = minWidth;
 			}
-			if (mWidth != value && keepAspectRatio != AspectRatioSource.BasedOnHeight)
+			if (mWidth == value || keepAspectRatio == AspectRatioSource.BasedOnHeight)
 			{
-				if (isAnchoredHorizontally)
+				return;
+			}
+			if (isAnchoredHorizontally)
+			{
+				if (leftAnchor.target != null && rightAnchor.target != null)
 				{
-					if (leftAnchor.target != null && rightAnchor.target != null)
+					if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Left || mPivot == Pivot.TopLeft)
 					{
-						if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Left || mPivot == Pivot.TopLeft)
-						{
-							NGUIMath.AdjustWidget(this, 0f, 0f, (float)(value - mWidth), 0f);
-						}
-						else if (mPivot == Pivot.BottomRight || mPivot == Pivot.Right || mPivot == Pivot.TopRight)
-						{
-							NGUIMath.AdjustWidget(this, (float)(mWidth - value), 0f, 0f, 0f);
-						}
-						else
-						{
-							int num = value - mWidth;
-							num -= (num & 1);
-							if (num != 0)
-							{
-								NGUIMath.AdjustWidget(this, (float)(-num) * 0.5f, 0f, (float)num * 0.5f, 0f);
-							}
-						}
+						NGUIMath.AdjustWidget(this, 0f, 0f, value - mWidth, 0f);
+						return;
 					}
-					else if (leftAnchor.target != null)
+					if (mPivot == Pivot.BottomRight || mPivot == Pivot.Right || mPivot == Pivot.TopRight)
 					{
-						NGUIMath.AdjustWidget(this, 0f, 0f, (float)(value - mWidth), 0f);
+						NGUIMath.AdjustWidget(this, mWidth - value, 0f, 0f, 0f);
+						return;
 					}
-					else
+					int num = value - mWidth;
+					num -= (num & 1);
+					if (num != 0)
 					{
-						NGUIMath.AdjustWidget(this, (float)(mWidth - value), 0f, 0f, 0f);
+						NGUIMath.AdjustWidget(this, (float)(-num) * 0.5f, 0f, (float)num * 0.5f, 0f);
 					}
+				}
+				else if (leftAnchor.target != null)
+				{
+					NGUIMath.AdjustWidget(this, 0f, 0f, value - mWidth, 0f);
 				}
 				else
 				{
-					SetDimensions(value, mHeight);
+					NGUIMath.AdjustWidget(this, mWidth - value, 0f, 0f, 0f);
 				}
+			}
+			else
+			{
+				SetDimensions(value, mHeight);
 			}
 		}
 	}
@@ -235,43 +235,43 @@ public class UIWidget : UIRect
 			{
 				value = minHeight;
 			}
-			if (mHeight != value && keepAspectRatio != AspectRatioSource.BasedOnWidth)
+			if (mHeight == value || keepAspectRatio == AspectRatioSource.BasedOnWidth)
 			{
-				if (isAnchoredVertically)
+				return;
+			}
+			if (isAnchoredVertically)
+			{
+				if (bottomAnchor.target != null && topAnchor.target != null)
 				{
-					if (bottomAnchor.target != null && topAnchor.target != null)
+					if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight)
 					{
-						if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight)
-						{
-							NGUIMath.AdjustWidget(this, 0f, 0f, 0f, (float)(value - mHeight));
-						}
-						else if (mPivot == Pivot.TopLeft || mPivot == Pivot.Top || mPivot == Pivot.TopRight)
-						{
-							NGUIMath.AdjustWidget(this, 0f, (float)(mHeight - value), 0f, 0f);
-						}
-						else
-						{
-							int num = value - mHeight;
-							num -= (num & 1);
-							if (num != 0)
-							{
-								NGUIMath.AdjustWidget(this, 0f, (float)(-num) * 0.5f, 0f, (float)num * 0.5f);
-							}
-						}
+						NGUIMath.AdjustWidget(this, 0f, 0f, 0f, value - mHeight);
+						return;
 					}
-					else if (bottomAnchor.target != null)
+					if (mPivot == Pivot.TopLeft || mPivot == Pivot.Top || mPivot == Pivot.TopRight)
 					{
-						NGUIMath.AdjustWidget(this, 0f, 0f, 0f, (float)(value - mHeight));
+						NGUIMath.AdjustWidget(this, 0f, mHeight - value, 0f, 0f);
+						return;
 					}
-					else
+					int num = value - mHeight;
+					num -= (num & 1);
+					if (num != 0)
 					{
-						NGUIMath.AdjustWidget(this, 0f, (float)(mHeight - value), 0f, 0f);
+						NGUIMath.AdjustWidget(this, 0f, (float)(-num) * 0.5f, 0f, (float)num * 0.5f);
 					}
+				}
+				else if (bottomAnchor.target != null)
+				{
+					NGUIMath.AdjustWidget(this, 0f, 0f, 0f, value - mHeight);
 				}
 				else
 				{
-					SetDimensions(mWidth, value);
+					NGUIMath.AdjustWidget(this, 0f, mHeight - value, 0f, 0f);
 				}
+			}
+			else
+			{
+				SetDimensions(mWidth, value);
 			}
 		}
 	}
@@ -309,7 +309,7 @@ public class UIWidget : UIRect
 			if (mColor.a != value)
 			{
 				mColor.a = value;
-				Invalidate(true);
+				Invalidate(includeChildren: true);
 			}
 		}
 	}
@@ -388,21 +388,22 @@ public class UIWidget : UIRect
 		}
 		set
 		{
-			if (mDepth != value)
+			if (mDepth == value)
 			{
-				if (panel != null)
+				return;
+			}
+			if (panel != null)
+			{
+				panel.RemoveWidget(this);
+			}
+			mDepth = value;
+			if (panel != null)
+			{
+				panel.AddWidget(this);
+				if (!Application.get_isPlaying())
 				{
-					panel.RemoveWidget(this);
-				}
-				mDepth = value;
-				if (panel != null)
-				{
-					panel.AddWidget(this);
-					if (!Application.get_isPlaying())
-					{
-						panel.SortWidgets();
-						panel.RebuildAllDrawCalls();
-					}
+					panel.SortWidgets();
+					panel.RebuildAllDrawCalls();
 				}
 			}
 		}
@@ -526,7 +527,7 @@ public class UIWidget : UIRect
 		}
 		set
 		{
-			throw new NotImplementedException(GetType() + " has no material setter");
+			throw new NotImplementedException(base.GetType() + " has no material setter");
 		}
 	}
 
@@ -534,10 +535,6 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			Material material = this.material;
 			if (material != null && material.get_shader() != null && !material.get_shader().get_isSupported())
 			{
@@ -548,7 +545,7 @@ public class UIWidget : UIRect
 		}
 		set
 		{
-			throw new NotImplementedException(GetType() + " has no mainTexture setter");
+			throw new NotImplementedException(base.GetType() + " has no mainTexture setter");
 		}
 	}
 
@@ -556,13 +553,12 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			Material material = this.material;
 			return (!(material != null)) ? null : material.get_shader();
 		}
 		set
 		{
-			throw new NotImplementedException(GetType() + " has no shader setter");
+			throw new NotImplementedException(base.GetType() + " has no shader setter");
 		}
 	}
 
@@ -684,12 +680,10 @@ public class UIWidget : UIRect
 		if (!mIsVisibleByAlpha || !mIsInFront)
 		{
 			finalAlpha = 0f;
+			return;
 		}
-		else
-		{
-			UIRect parent = base.parent;
-			finalAlpha = ((!(parent != null)) ? mColor.a : (parent.CalculateFinalAlpha(frameID) * mColor.a));
-		}
+		UIRect parent = base.parent;
+		finalAlpha = ((!(parent != null)) ? mColor.a : (parent.CalculateFinalAlpha(frameID) * mColor.a));
 	}
 
 	public override void Invalidate(bool includeChildren)
@@ -703,7 +697,7 @@ public class UIWidget : UIRect
 			UpdateFinalAlpha(Time.get_frameCount());
 			if (includeChildren)
 			{
-				base.Invalidate(true);
+				base.Invalidate(includeChildren: true);
 			}
 		}
 	}
@@ -721,8 +715,6 @@ public class UIWidget : UIRect
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Expected O, but got Unknown
 		Vector2 pivotOffset = this.pivotOffset;
 		float num = Mathf.Lerp(x, x + width, pivotOffset.x);
 		float num2 = Mathf.Lerp(y, y + height, pivotOffset.y);
@@ -775,8 +767,6 @@ public class UIWidget : UIRect
 
 	public void ResizeCollider()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
 		if (NGUITools.GetActive(this))
 		{
 			NGUITools.UpdateWidgetCollider(this.get_gameObject());
@@ -886,8 +876,6 @@ public class UIWidget : UIRect
 
 	public virtual void MarkAsChanged()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
 		if (NGUITools.GetActive(this))
 		{
 			mChanged = true;
@@ -901,17 +889,15 @@ public class UIWidget : UIRect
 
 	public UIPanel CreatePanel()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		if (mStarted && panel == null && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
 		{
-			panel = UIPanel.Find(base.cachedTransform, true, base.cachedGameObject.get_layer());
+			panel = UIPanel.Find(base.cachedTransform, createIfMissing: true, base.cachedGameObject.get_layer());
 			if (panel != null)
 			{
 				mParentFound = false;
 				panel.AddWidget(this);
 				CheckLayer();
-				Invalidate(true);
+				Invalidate(includeChildren: true);
 			}
 		}
 		return panel;
@@ -919,10 +905,6 @@ public class UIWidget : UIRect
 
 	public void CheckLayer()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		if (panel != null && panel.get_gameObject().get_layer() != this.get_gameObject().get_layer())
 		{
 			Debug.LogWarning((object)"You can't place widgets on a layer different than the UIPanel that manages them.\nIf you want to move widgets to a different layer, parent them to a new panel instead.", this);
@@ -935,7 +917,7 @@ public class UIWidget : UIRect
 		base.ParentHasChanged();
 		if (panel != null)
 		{
-			UIPanel uIPanel = UIPanel.Find(base.cachedTransform, true, base.cachedGameObject.get_layer());
+			UIPanel uIPanel = UIPanel.Find(base.cachedTransform, createIfMissing: true, base.cachedGameObject.get_layer());
 			if (panel != uIPanel)
 			{
 				RemoveFromPanel();
@@ -946,8 +928,6 @@ public class UIWidget : UIRect
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		mGo = this.get_gameObject();
 		mPlayMode = Application.get_isPlaying();
 	}
@@ -976,12 +956,10 @@ public class UIWidget : UIRect
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Expected O, but got Unknown
 		Vector3 localScale = base.cachedTransform.get_localScale();
 		mWidth = Mathf.Abs(Mathf.RoundToInt(localScale.x));
 		mHeight = Mathf.Abs(Mathf.RoundToInt(localScale.y));
-		NGUITools.UpdateWidgetCollider(this.get_gameObject(), true);
+		NGUITools.UpdateWidgetCollider(this.get_gameObject(), considerInactive: true);
 	}
 
 	protected override void OnStart()
@@ -991,8 +969,6 @@ public class UIWidget : UIRect
 
 	protected override void OnAnchor()
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Expected O, but got Unknown
 		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
@@ -1012,7 +988,7 @@ public class UIWidget : UIRect
 		//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
 		Transform cachedTransform = base.cachedTransform;
-		Transform val = cachedTransform.get_parent();
+		Transform parent = cachedTransform.get_parent();
 		Vector3 localPosition = cachedTransform.get_localPosition();
 		Vector2 pivotOffset = this.pivotOffset;
 		float num;
@@ -1021,7 +997,7 @@ public class UIWidget : UIRect
 		float num4;
 		if (leftAnchor.target == bottomAnchor.target && leftAnchor.target == rightAnchor.target && leftAnchor.target == topAnchor.target)
 		{
-			Vector3[] sides = leftAnchor.GetSides(val);
+			Vector3[] sides = leftAnchor.GetSides(parent);
 			if (sides != null)
 			{
 				num = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
@@ -1032,7 +1008,7 @@ public class UIWidget : UIRect
 			}
 			else
 			{
-				Vector3 localPos = GetLocalPos(leftAnchor, val);
+				Vector3 localPos = GetLocalPos(leftAnchor, parent);
 				num = localPos.x + (float)leftAnchor.absolute;
 				num3 = localPos.y + (float)bottomAnchor.absolute;
 				num2 = localPos.x + (float)rightAnchor.absolute;
@@ -1045,14 +1021,14 @@ public class UIWidget : UIRect
 			mIsInFront = true;
 			if (Object.op_Implicit(leftAnchor.target))
 			{
-				Vector3[] sides2 = leftAnchor.GetSides(val);
+				Vector3[] sides2 = leftAnchor.GetSides(parent);
 				if (sides2 != null)
 				{
 					num = NGUIMath.Lerp(sides2[0].x, sides2[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos2 = GetLocalPos(leftAnchor, val);
+					Vector3 localPos2 = GetLocalPos(leftAnchor, parent);
 					num = localPos2.x + (float)leftAnchor.absolute;
 				}
 			}
@@ -1062,14 +1038,14 @@ public class UIWidget : UIRect
 			}
 			if (Object.op_Implicit(rightAnchor.target))
 			{
-				Vector3[] sides3 = rightAnchor.GetSides(val);
+				Vector3[] sides3 = rightAnchor.GetSides(parent);
 				if (sides3 != null)
 				{
 					num2 = NGUIMath.Lerp(sides3[0].x, sides3[2].x, rightAnchor.relative) + (float)rightAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos3 = GetLocalPos(rightAnchor, val);
+					Vector3 localPos3 = GetLocalPos(rightAnchor, parent);
 					num2 = localPos3.x + (float)rightAnchor.absolute;
 				}
 			}
@@ -1079,14 +1055,14 @@ public class UIWidget : UIRect
 			}
 			if (Object.op_Implicit(bottomAnchor.target))
 			{
-				Vector3[] sides4 = bottomAnchor.GetSides(val);
+				Vector3[] sides4 = bottomAnchor.GetSides(parent);
 				if (sides4 != null)
 				{
 					num3 = NGUIMath.Lerp(sides4[3].y, sides4[1].y, bottomAnchor.relative) + (float)bottomAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos4 = GetLocalPos(bottomAnchor, val);
+					Vector3 localPos4 = GetLocalPos(bottomAnchor, parent);
 					num3 = localPos4.y + (float)bottomAnchor.absolute;
 				}
 			}
@@ -1096,14 +1072,14 @@ public class UIWidget : UIRect
 			}
 			if (Object.op_Implicit(topAnchor.target))
 			{
-				Vector3[] sides5 = topAnchor.GetSides(val);
+				Vector3[] sides5 = topAnchor.GetSides(parent);
 				if (sides5 != null)
 				{
 					num4 = NGUIMath.Lerp(sides5[3].y, sides5[1].y, topAnchor.relative) + (float)topAnchor.absolute;
 				}
 				else
 				{
-					Vector3 localPos5 = GetLocalPos(topAnchor, val);
+					Vector3 localPos5 = GetLocalPos(topAnchor, parent);
 					num4 = localPos5.y + (float)topAnchor.absolute;
 				}
 			}
@@ -1112,10 +1088,10 @@ public class UIWidget : UIRect
 				num4 = localPosition.y - pivotOffset.y * (float)mHeight + (float)mHeight;
 			}
 		}
-		Vector3 val2 = default(Vector3);
-		val2._002Ector(Mathf.Lerp(num, num2, pivotOffset.x), Mathf.Lerp(num3, num4, pivotOffset.y), localPosition.z);
-		val2.x = Mathf.Round(val2.x);
-		val2.y = Mathf.Round(val2.y);
+		Vector3 val = default(Vector3);
+		val._002Ector(Mathf.Lerp(num, num2, pivotOffset.x), Mathf.Lerp(num3, num4, pivotOffset.y), localPosition.z);
+		val.x = Mathf.Round(val.x);
+		val.y = Mathf.Round(val.y);
 		int num5 = Mathf.FloorToInt(num2 - num + 0.5f);
 		int num6 = Mathf.FloorToInt(num4 - num3 + 0.5f);
 		if (keepAspectRatio != 0 && aspectRatio != 0f)
@@ -1137,9 +1113,9 @@ public class UIWidget : UIRect
 		{
 			num6 = minHeight;
 		}
-		if (Vector3.SqrMagnitude(localPosition - val2) > 0.001f)
+		if (Vector3.SqrMagnitude(localPosition - val) > 0.001f)
 		{
-			base.cachedTransform.set_localPosition(val2);
+			base.cachedTransform.set_localPosition(val);
 			if (mIsInFront)
 			{
 				mChanged = true;

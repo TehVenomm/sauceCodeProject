@@ -30,7 +30,7 @@ public class Party_Model_RegisterACK : Coop_Model_ACK
 				partyId = array[3];
 				int.TryParse(array[4], out questId);
 				int.TryParse(array[5], out int result);
-				lastExecTime = UTC_TIME.AddSeconds((double)result);
+				lastExecTime = UTC_TIME.AddSeconds(result);
 			}
 		}
 

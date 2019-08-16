@@ -1,9 +1,10 @@
-package net.gogame.gowrap.ui.view;
+package net.gogame.gowrap.p019ui.view;
 
 import android.os.Bundle;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 
+/* renamed from: net.gogame.gowrap.ui.view.AutoClosingExpandableListViewListener */
 public class AutoClosingExpandableListViewListener implements OnGroupExpandListener {
     private int lastExpandedPosition = -1;
     private final ExpandableListView parent;

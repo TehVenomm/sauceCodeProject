@@ -37,7 +37,6 @@ public class BeginnerLoginBonusPop : GameSection
 
 	public override void Initialize()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
 		InitTween((Enum)UI.OBJ_IMG_ROOT);
 		this.StartCoroutine(DoInitialize());
@@ -49,14 +48,14 @@ public class BeginnerLoginBonusPop : GameSection
 		{
 			loadQueue = new LoadingQueue(this);
 		}
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.LOGINBONUS_IMAGE, "BLBP", false);
+		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.LOGINBONUS_IMAGE, "BLBP");
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		if (lo_image.loadedObject == null)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		Transform texture = GetCtrl(UI.TEX);
 		UITexture uiTexture = texture.GetComponent<UITexture>();
@@ -66,9 +65,6 @@ public class BeginnerLoginBonusPop : GameSection
 
 	private void Update()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (!stateInitialized)
 		{
 			switch (currentState)
@@ -98,16 +94,16 @@ public class BeginnerLoginBonusPop : GameSection
 
 	private IEnumerator StartAnimation()
 	{
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
 		bool wait = true;
-		PlayAudio(AUDIO.START, 1.3f, false);
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, true, (EventDelegate.Callback)delegate
+		PlayAudio(AUDIO.START, 1.3f);
+		PlayTween((Enum)UI.OBJ_IMG_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CStartAnimation_003Ec__Iterator74)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
-		}, true, 0);
+			wait = false;
+		}, is_input_block: true, 0);
 		while (wait)
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		ChangeState(State.SHOW);
 	}
@@ -121,13 +117,13 @@ public class BeginnerLoginBonusPop : GameSection
 			showTimer += Time.get_deltaTime();
 			if (1.2f < showTimer && !skip.get_gameObject().get_activeSelf())
 			{
-				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, true);
+				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: true);
 			}
 			if (skipRequest && 1.2f < showTimer)
 			{
 				wait = false;
 			}
-			yield return (object)0;
+			yield return 0;
 		}
 		ChangeState(State.END);
 	}
@@ -135,13 +131,13 @@ public class BeginnerLoginBonusPop : GameSection
 	private IEnumerator EndAnimation()
 	{
 		bool wait = true;
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, false, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_IMG_ROOT, forward: false, (EventDelegate.Callback)delegate
 		{
-			((_003CEndAnimation_003Ec__Iterator76)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
-		}, true, 0);
+			wait = false;
+		}, is_input_block: true, 0);
 		while (wait)
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		GameSection.BackSection();
 	}

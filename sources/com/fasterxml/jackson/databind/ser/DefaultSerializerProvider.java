@@ -2,6 +2,7 @@ package com.fasterxml.jackson.databind.ser;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class DefaultSerializerProvider extends SerializerProvider implements Serializable {
     private static final long serialVersionUID = 1;
@@ -36,6 +36,9 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
 
     public static final class Impl extends DefaultSerializerProvider {
         private static final long serialVersionUID = 1;
+
+        public Impl() {
+        }
 
         public Impl(Impl impl) {
             super(impl);
@@ -47,7 +50,7 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
 
         public DefaultSerializerProvider copy() {
             if (getClass() != Impl.class) {
-                return super.copy();
+                return DefaultSerializerProvider.super.copy();
             }
             return new Impl(this);
         }
@@ -80,7 +83,7 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
             _serializeNull(jsonGenerator);
             return;
         }
-        JsonSerializer findTypedValueSerializer = findTypedValueSerializer(obj.getClass(), true, null);
+        JsonSerializer findTypedValueSerializer = findTypedValueSerializer(obj.getClass(), true, (BeanProperty) null);
         PropertyName fullRootName = this._config.getFullRootName();
         if (fullRootName == null) {
             z = this._config.isEnabled(SerializationFeature.WRAP_ROOT_VALUE);
@@ -101,13 +104,13 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
             }
         } catch (IOException e) {
             throw e;
-        } catch (Throwable e2) {
-            Throwable th = e2;
-            String message = th.getMessage();
+        } catch (Exception e2) {
+            Exception exc = e2;
+            String message = exc.getMessage();
             if (message == null) {
-                message = "[no message for " + th.getClass().getName() + "]";
+                message = "[no message for " + exc.getClass().getName() + "]";
             }
-            throw new JsonMappingException((Closeable) jsonGenerator, message, th);
+            throw new JsonMappingException((Closeable) jsonGenerator, message, (Throwable) exc);
         }
     }
 
@@ -120,7 +123,7 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
         if (!javaType.getRawClass().isAssignableFrom(obj.getClass())) {
             _reportIncompatibleRootType(obj, javaType);
         }
-        JsonSerializer findTypedValueSerializer = findTypedValueSerializer(javaType, true, null);
+        JsonSerializer findTypedValueSerializer = findTypedValueSerializer(javaType, true, (BeanProperty) null);
         PropertyName fullRootName = this._config.getFullRootName();
         if (fullRootName == null) {
             z = this._config.isEnabled(SerializationFeature.WRAP_ROOT_VALUE);
@@ -141,13 +144,13 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
             }
         } catch (IOException e) {
             throw e;
-        } catch (Throwable e2) {
-            Throwable th = e2;
-            String message = th.getMessage();
+        } catch (Exception e2) {
+            Exception exc = e2;
+            String message = exc.getMessage();
             if (message == null) {
-                message = "[no message for " + th.getClass().getName() + "]";
+                message = "[no message for " + exc.getClass().getName() + "]";
             }
-            throw JsonMappingException.from(jsonGenerator, message, th);
+            throw JsonMappingException.from(jsonGenerator, message, (Throwable) exc);
         }
     }
 
@@ -157,11 +160,11 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
             _serializeNull(jsonGenerator);
             return;
         }
-        if (!(javaType == null || javaType.getRawClass().isAssignableFrom(obj.getClass()))) {
+        if (javaType != null && !javaType.getRawClass().isAssignableFrom(obj.getClass())) {
             _reportIncompatibleRootType(obj, javaType);
         }
         if (jsonSerializer == null) {
-            jsonSerializer = findTypedValueSerializer(javaType, true, null);
+            jsonSerializer = findTypedValueSerializer(javaType, true, (BeanProperty) null);
         }
         PropertyName fullRootName = this._config.getFullRootName();
         if (fullRootName == null) {
@@ -186,60 +189,60 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
             }
         } catch (IOException e) {
             throw e;
-        } catch (Throwable e2) {
-            Throwable th = e2;
-            String message = th.getMessage();
+        } catch (Exception e2) {
+            Exception exc = e2;
+            String message = exc.getMessage();
             if (message == null) {
-                message = "[no message for " + th.getClass().getName() + "]";
+                message = "[no message for " + exc.getClass().getName() + "]";
             }
-            throw JsonMappingException.from(jsonGenerator, message, th);
+            throw JsonMappingException.from(jsonGenerator, message, (Throwable) exc);
         }
     }
 
     public void serializePolymorphic(JsonGenerator jsonGenerator, Object obj, JavaType javaType, JsonSerializer<Object> jsonSerializer, TypeSerializer typeSerializer) throws IOException {
+        boolean z;
         if (obj == null) {
             _serializeNull(jsonGenerator);
             return;
         }
-        boolean isEnabled;
-        if (!(javaType == null || javaType.getRawClass().isAssignableFrom(obj.getClass()))) {
+        if (javaType != null && !javaType.getRawClass().isAssignableFrom(obj.getClass())) {
             _reportIncompatibleRootType(obj, javaType);
         }
         if (jsonSerializer == null) {
             if (javaType == null || !javaType.isContainerType()) {
-                jsonSerializer = findValueSerializer(obj.getClass(), null);
+                jsonSerializer = findValueSerializer(obj.getClass(), (BeanProperty) null);
             } else {
-                jsonSerializer = findValueSerializer(javaType, null);
+                jsonSerializer = findValueSerializer(javaType, (BeanProperty) null);
             }
         }
         PropertyName fullRootName = this._config.getFullRootName();
         if (fullRootName == null) {
-            isEnabled = this._config.isEnabled(SerializationFeature.WRAP_ROOT_VALUE);
-            if (isEnabled) {
+            z = this._config.isEnabled(SerializationFeature.WRAP_ROOT_VALUE);
+            if (z) {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeFieldName(this._config.findRootName(obj.getClass()).simpleAsEncoded(this._config));
             }
         } else if (fullRootName.isEmpty()) {
-            isEnabled = false;
+            z = false;
         } else {
-            isEnabled = true;
+            z = true;
             jsonGenerator.writeStartObject();
             jsonGenerator.writeFieldName(fullRootName.getSimpleName());
         }
         try {
             jsonSerializer.serializeWithType(obj, jsonGenerator, this, typeSerializer);
-            if (isEnabled) {
+            if (z) {
                 jsonGenerator.writeEndObject();
             }
         } catch (IOException e) {
             throw e;
-        } catch (Throwable e2) {
-            Throwable th = e2;
-            String message = th.getMessage();
+        } catch (Exception e2) {
+            Exception exc = e2;
+            String message = exc.getMessage();
             if (message == null) {
-                message = "[no message for " + th.getClass().getName() + "]";
+                message = "[no message for " + exc.getClass().getName() + "]";
             }
-            throw JsonMappingException.from(jsonGenerator, message, th);
+            throw JsonMappingException.from(jsonGenerator, message, (Throwable) exc);
         }
     }
 
@@ -248,17 +251,18 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
         serializePolymorphic(jsonGenerator, obj, obj == null ? null : this._config.constructType(obj.getClass()), null, typeSerializer);
     }
 
-    protected void _serializeNull(JsonGenerator jsonGenerator) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _serializeNull(JsonGenerator jsonGenerator) throws IOException {
         try {
             getDefaultNullValueSerializer().serialize(null, jsonGenerator, this);
         } catch (IOException e) {
             throw e;
-        } catch (Throwable e2) {
+        } catch (Exception e2) {
             String message = e2.getMessage();
             if (message == null) {
                 message = "[no message for " + e2.getClass().getName() + "]";
             }
-            throw JsonMappingException.from(jsonGenerator, message, e2);
+            throw JsonMappingException.from(jsonGenerator, message, (Throwable) e2);
         }
     }
 
@@ -267,10 +271,10 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
         if (cls == null) {
             throw new IllegalArgumentException("A class must be provided");
         }
-        JsonSerializer findValueSerializer = findValueSerializer((Class) cls, null);
-        JsonNode schema = findValueSerializer instanceof SchemaAware ? ((SchemaAware) findValueSerializer).getSchema(this, null) : JsonSchema.getDefaultSchemaNode();
-        if (schema instanceof ObjectNode) {
-            return new JsonSchema((ObjectNode) schema);
+        JsonSerializer findValueSerializer = findValueSerializer(cls, (BeanProperty) null);
+        JsonNode defaultSchemaNode = findValueSerializer instanceof SchemaAware ? ((SchemaAware) findValueSerializer).getSchema(this, null) : JsonSchema.getDefaultSchemaNode();
+        if (defaultSchemaNode instanceof ObjectNode) {
+            return new JsonSchema((ObjectNode) defaultSchemaNode);
         }
         throw new IllegalArgumentException("Class " + cls.getName() + " would not be serialized as a JSON object and therefore has no schema");
     }
@@ -280,30 +284,47 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
             throw new IllegalArgumentException("A class must be provided");
         }
         jsonFormatVisitorWrapper.setProvider(this);
-        findValueSerializer(javaType, null).acceptJsonFormatVisitor(jsonFormatVisitorWrapper, javaType);
+        findValueSerializer(javaType, (BeanProperty) null).acceptJsonFormatVisitor(jsonFormatVisitorWrapper, javaType);
     }
 
-    public boolean hasSerializerFor(Class<?> cls, AtomicReference<Throwable> atomicReference) {
-        if (cls == Object.class && !this._config.isEnabled(SerializationFeature.FAIL_ON_EMPTY_BEANS)) {
-            return true;
-        }
-        try {
-            if (_findExplicitUntypedSerializer(cls) == null) {
-                return false;
-            }
-            return true;
-        } catch (JsonMappingException e) {
-            if (atomicReference != null) {
-                atomicReference.set(e);
-            }
-            return false;
-        } catch (RuntimeException e2) {
-            if (atomicReference == null) {
-                throw e2;
-            }
-            atomicReference.set(e2);
-            return false;
-        }
+    /* JADX WARNING: Code restructure failed: missing block: B:19:?, code lost:
+        return false;
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public boolean hasSerializerFor(java.lang.Class<?> r5, java.util.concurrent.atomic.AtomicReference<java.lang.Throwable> r6) {
+        /*
+            r4 = this;
+            r0 = 1
+            r1 = 0
+            java.lang.Class<java.lang.Object> r2 = java.lang.Object.class
+            if (r5 != r2) goto L_0x0011
+            com.fasterxml.jackson.databind.SerializationConfig r2 = r4._config
+            com.fasterxml.jackson.databind.SerializationFeature r3 = com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS
+            boolean r2 = r2.isEnabled(r3)
+            if (r2 != 0) goto L_0x0011
+        L_0x0010:
+            return r0
+        L_0x0011:
+            com.fasterxml.jackson.databind.JsonSerializer r2 = r4._findExplicitUntypedSerializer(r5)     // Catch:{ JsonMappingException -> 0x0019, RuntimeException -> 0x0021 }
+            if (r2 != 0) goto L_0x0010
+            r0 = r1
+            goto L_0x0010
+        L_0x0019:
+            r0 = move-exception
+            if (r6 == 0) goto L_0x001f
+            r6.set(r0)
+        L_0x001f:
+            r0 = r1
+            goto L_0x0010
+        L_0x0021:
+            r0 = move-exception
+            if (r6 != 0) goto L_0x0025
+            throw r0
+        L_0x0025:
+            r6.set(r0)
+            goto L_0x001f
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.DefaultSerializerProvider.hasSerializerFor(java.lang.Class, java.util.concurrent.atomic.AtomicReference):boolean");
     }
 
     public int cachedSerializersCount() {
@@ -324,17 +345,22 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
                 return writableObjectId;
             }
         }
-        if (this._objectIdGenerators == null) {
-            this._objectIdGenerators = new ArrayList(8);
-            objectIdGenerator2 = null;
-        } else {
+        if (this._objectIdGenerators != null) {
             int size = this._objectIdGenerators.size();
-            for (int i = 0; i < size; i++) {
+            int i = 0;
+            while (true) {
+                if (i >= size) {
+                    objectIdGenerator2 = null;
+                    break;
+                }
                 objectIdGenerator2 = (ObjectIdGenerator) this._objectIdGenerators.get(i);
                 if (objectIdGenerator2.canUseFor(objectIdGenerator)) {
                     break;
                 }
+                i++;
             }
+        } else {
+            this._objectIdGenerators = new ArrayList<>(8);
             objectIdGenerator2 = null;
         }
         if (objectIdGenerator2 == null) {
@@ -346,7 +372,8 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
         return writableObjectId2;
     }
 
-    protected Map<Object, WritableObjectId> _createObjectIdMap() {
+    /* access modifiers changed from: protected */
+    public Map<Object, WritableObjectId> _createObjectIdMap() {
         if (isEnabled(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID)) {
             return new HashMap();
         }
@@ -354,33 +381,33 @@ public abstract class DefaultSerializerProvider extends SerializerProvider imple
     }
 
     public JsonSerializer<Object> serializerInstance(Annotated annotated, Object obj) throws JsonMappingException {
-        JsonSerializer<Object> jsonSerializer = null;
+        JsonSerializer jsonSerializer;
+        JsonSerializer jsonSerializer2 = null;
         if (obj == null) {
             return null;
         }
         if (obj instanceof JsonSerializer) {
-            obj = (JsonSerializer) obj;
-        } else if (obj instanceof Class) {
-            Class cls = (Class) obj;
+            jsonSerializer = (JsonSerializer) obj;
+        } else if (!(obj instanceof Class)) {
+            throw new IllegalStateException("AnnotationIntrospector returned serializer definition of type " + obj.getClass().getName() + "; expected type JsonSerializer or Class<JsonSerializer> instead");
+        } else {
+            Class<None> cls = (Class) obj;
             if (cls == None.class || ClassUtil.isBogusClass(cls)) {
                 return null;
             }
-            if (JsonSerializer.class.isAssignableFrom(cls)) {
-                HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
-                if (handlerInstantiator != null) {
-                    jsonSerializer = handlerInstantiator.serializerInstance(this._config, annotated, cls);
-                }
-                if (jsonSerializer == null) {
-                    JsonSerializer jsonSerializer2 = (JsonSerializer) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
-                } else {
-                    JsonSerializer<Object> jsonSerializer3 = jsonSerializer;
-                }
-            } else {
+            if (!JsonSerializer.class.isAssignableFrom(cls)) {
                 throw new IllegalStateException("AnnotationIntrospector returned Class " + cls.getName() + "; expected Class<JsonSerializer>");
             }
-        } else {
-            throw new IllegalStateException("AnnotationIntrospector returned serializer definition of type " + obj.getClass().getName() + "; expected type JsonSerializer or Class<JsonSerializer> instead");
+            HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
+            if (handlerInstantiator != null) {
+                jsonSerializer2 = handlerInstantiator.serializerInstance(this._config, annotated, cls);
+            }
+            if (jsonSerializer2 == null) {
+                jsonSerializer = (JsonSerializer) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
+            } else {
+                jsonSerializer = jsonSerializer2;
+            }
         }
-        return _handleResolvable(obj);
+        return _handleResolvable(jsonSerializer);
     }
 }

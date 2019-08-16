@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:id="@+id/messenger_send_button" style="@style/MessengerButton.Blue.Large">
-    <TextView android:text="@string/messenger_send_button_text" style="@style/MessengerButtonText.Blue.Large"/>
-</FrameLayout>

@@ -14,7 +14,6 @@ public class ShopPopUpAdDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		textureName = (GameSection.GetEventData() as string);
 		this.StartCoroutine(DoInitialize());
 	}
@@ -22,16 +21,16 @@ public class ShopPopUpAdDialog : GameSection
 	private IEnumerator DoInitialize()
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, textureName, false);
+		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, textureName);
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		if (loTex.loadedObject != null)
 		{
 			SetTexture((Enum)UI.TEX_MAIN, loTex.loadedObject as Texture);
 		}
-		PlayTween((Enum)UI.OBJ_FRAME, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween((Enum)UI.OBJ_FRAME, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 		base.Initialize();
 	}
 

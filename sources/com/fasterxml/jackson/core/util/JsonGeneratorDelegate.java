@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
+import com.fasterxml.jackson.core.p015io.CharacterEscapes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;

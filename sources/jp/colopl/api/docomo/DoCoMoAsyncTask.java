@@ -1,9 +1,10 @@
-package jp.colopl.api.docomo;
+package p018jp.colopl.api.docomo;
 
 import android.content.Context;
 import com.github.droidfu.concurrent.BetterAsyncTask;
-import jp.colopl.util.Util;
+import p018jp.colopl.util.Util;
 
+/* renamed from: jp.colopl.api.docomo.DoCoMoAsyncTask */
 public class DoCoMoAsyncTask extends BetterAsyncTask<Void, Void, DoCoMoLocationInfo> {
     private DoCoMoAsyncTaskDelegate delegate;
 
@@ -11,7 +12,8 @@ public class DoCoMoAsyncTask extends BetterAsyncTask<Void, Void, DoCoMoLocationI
         super(context);
     }
 
-    protected void after(Context context, DoCoMoLocationInfo doCoMoLocationInfo) {
+    /* access modifiers changed from: protected */
+    public void after(Context context, DoCoMoLocationInfo doCoMoLocationInfo) {
         if (this.delegate != null) {
             if (doCoMoLocationInfo == null) {
                 Util.eLog("DoCoMoAsyncTask", "doCoMoLocationInfo is null");
@@ -29,7 +31,8 @@ public class DoCoMoAsyncTask extends BetterAsyncTask<Void, Void, DoCoMoLocationI
         }
     }
 
-    protected DoCoMoLocationInfo doCheckedInBackground(Context context, Void... voidArr) throws Exception {
+    /* access modifiers changed from: protected */
+    public DoCoMoLocationInfo doCheckedInBackground(Context context, Void... voidArr) throws Exception {
         return new DoCoMoAPI().getLocationInfo();
     }
 
@@ -37,7 +40,8 @@ public class DoCoMoAsyncTask extends BetterAsyncTask<Void, Void, DoCoMoLocationI
         return this.delegate;
     }
 
-    protected void handleError(Context context, Exception exception) {
+    /* access modifiers changed from: protected */
+    public void handleError(Context context, Exception exc) {
     }
 
     public void setDelegate(DoCoMoAsyncTaskDelegate doCoMoAsyncTaskDelegate) {

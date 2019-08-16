@@ -4,21 +4,22 @@ import android.content.Context;
 import android.os.AsyncTask;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.zze;
 import com.google.android.gms.security.ProviderInstaller.ProviderInstallListener;
 
 final class zza extends AsyncTask<Void, Void, Integer> {
-    private /* synthetic */ Context zzaok;
-    private /* synthetic */ ProviderInstallListener zzjna;
+    private final /* synthetic */ Context val$context;
+    private final /* synthetic */ ProviderInstallListener zzix;
 
     zza(Context context, ProviderInstallListener providerInstallListener) {
-        this.zzaok = context;
-        this.zzjna = providerInstallListener;
+        this.val$context = context;
+        this.zzix = providerInstallListener;
     }
 
-    private final Integer zzb(Void... voidArr) {
+    /* access modifiers changed from: private */
+    /* renamed from: zza */
+    public final Integer doInBackground(Void... voidArr) {
         try {
-            ProviderInstaller.installIfNeeded(this.zzaok);
+            ProviderInstaller.installIfNeeded(this.val$context);
             return Integer.valueOf(0);
         } catch (GooglePlayServicesRepairableException e) {
             return Integer.valueOf(e.getConnectionStatusCode());
@@ -27,17 +28,13 @@ final class zza extends AsyncTask<Void, Void, Integer> {
         }
     }
 
-    protected final /* synthetic */ Object doInBackground(Object[] objArr) {
-        return zzb((Void[]) objArr);
-    }
-
-    protected final /* synthetic */ void onPostExecute(Object obj) {
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ void onPostExecute(Object obj) {
         Integer num = (Integer) obj;
         if (num.intValue() == 0) {
-            this.zzjna.onProviderInstalled();
+            this.zzix.onProviderInstalled();
             return;
         }
-        ProviderInstaller.zzjmy;
-        this.zzjna.onProviderInstallFailed(num.intValue(), zze.zza(this.zzaok, num.intValue(), "pi"));
+        this.zzix.onProviderInstallFailed(num.intValue(), ProviderInstaller.zziv.getErrorResolutionIntent(this.val$context, num.intValue(), "pi"));
     }
 }

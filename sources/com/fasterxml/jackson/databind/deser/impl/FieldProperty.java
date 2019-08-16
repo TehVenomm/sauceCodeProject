@@ -27,7 +27,7 @@ public final class FieldProperty extends SettableBeanProperty {
     }
 
     protected FieldProperty(FieldProperty fieldProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) fieldProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) fieldProperty, jsonDeserializer);
         this._annotated = fieldProperty._annotated;
         this._field = fieldProperty._field;
     }
@@ -53,11 +53,14 @@ public final class FieldProperty extends SettableBeanProperty {
     }
 
     public FieldProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new FieldProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new FieldProperty(this, jsonDeserializer);
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {
-        return this._annotated == null ? null : this._annotated.getAnnotation(cls);
+        if (this._annotated == null) {
+            return null;
+        }
+        return this._annotated.getAnnotation(cls);
     }
 
     public AnnotatedMember getMember() {
@@ -100,7 +103,8 @@ public final class FieldProperty extends SettableBeanProperty {
         return obj;
     }
 
-    Object readResolve() {
+    /* access modifiers changed from: 0000 */
+    public Object readResolve() {
         return new FieldProperty(this);
     }
 }

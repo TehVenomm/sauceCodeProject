@@ -2,7 +2,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Internal/Property Binding")]
-public class PropertyBinding
+public class PropertyBinding : MonoBehaviour
 {
 	public enum UpdateCondition
 	{
@@ -84,33 +84,36 @@ public class PropertyBinding
 	[ContextMenu("Update Now")]
 	public void UpdateTarget()
 	{
-		if (source != null && target != null && source.isValid && target.isValid)
+		if (source == null || target == null || !source.isValid || !target.isValid)
 		{
-			if (direction == Direction.SourceUpdatesTarget)
+			return;
+		}
+		if (direction == Direction.SourceUpdatesTarget)
+		{
+			target.Set(source.Get());
+		}
+		else if (direction == Direction.TargetUpdatesSource)
+		{
+			source.Set(target.Get());
+		}
+		else
+		{
+			if (source.GetPropertyType() != target.GetPropertyType())
 			{
-				target.Set(source.Get());
+				return;
 			}
-			else if (direction == Direction.TargetUpdatesSource)
+			object obj = source.Get();
+			if (mLastValue == null || !mLastValue.Equals(obj))
 			{
-				source.Set(target.Get());
+				mLastValue = obj;
+				target.Set(obj);
+				return;
 			}
-			else if (source.GetPropertyType() == target.GetPropertyType())
+			obj = target.Get();
+			if (!mLastValue.Equals(obj))
 			{
-				object obj = source.Get();
-				if (mLastValue == null || !mLastValue.Equals(obj))
-				{
-					mLastValue = obj;
-					target.Set(obj);
-				}
-				else
-				{
-					obj = target.Get();
-					if (!mLastValue.Equals(obj))
-					{
-						mLastValue = obj;
-						source.Set(obj);
-					}
-				}
+				mLastValue = obj;
+				source.Set(obj);
 			}
 		}
 	}

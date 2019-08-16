@@ -5,12 +5,12 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import bolts.AppLinks;
 import com.facebook.FacebookSdk;
+import com.facebook.internal.FacebookSignatureValidator;
 import com.facebook.internal.ServerProtocol;
 import com.facebook.messenger.MessengerThreadParams.Origin;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class MessengerUtils {
 
     private static Set<Integer> getAllAvailableProtocolVersions(Context context) {
         ContentResolver contentResolver = context.getContentResolver();
-        Set<Integer> hashSet = new HashSet();
+        HashSet hashSet = new HashSet();
         Cursor query = contentResolver.query(Uri.parse("content://com.facebook.orca.provider.MessengerPlatformProvider/versions"), new String[]{ServerProtocol.FALLBACK_DIALOG_PARAM_VERSION}, null, null, null);
         if (query != null) {
             try {
@@ -100,12 +100,7 @@ public class MessengerUtils {
     }
 
     public static boolean hasMessengerInstalled(Context context) {
-        try {
-            context.getPackageManager().getPackageInfo(PACKAGE_NAME, 0);
-            return true;
-        } catch (NameNotFoundException e) {
-            return false;
-        }
+        return FacebookSignatureValidator.validateSignature(context, PACKAGE_NAME);
     }
 
     public static void openMessengerInPlayStore(Context context) {
@@ -121,7 +116,7 @@ public class MessengerUtils {
             return Collections.emptyList();
         }
         String[] split = str.split(",");
-        List<String> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (String trim : split) {
             arrayList.add(trim.trim());
         }

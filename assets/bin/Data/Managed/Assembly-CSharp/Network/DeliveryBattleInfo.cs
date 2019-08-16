@@ -51,9 +51,16 @@ namespace Network
 
 		public int totalAttackCount;
 
+		public int attackCount;
+
 		public List<SkillCount> totalSkillCountList = new List<SkillCount>();
 
+		public List<SkillCount> mySkillCountList = new List<SkillCount>();
+
 		public List<DamageByWeapon> damageByWeaponList = new List<DamageByWeapon>();
+
+		[NonSerialized]
+		public List<DamageByWeapon> currentDamageByWeaponList = new List<DamageByWeapon>();
 
 		public List<PlayerActionInfo> playerActionInfoList = new List<PlayerActionInfo>();
 	}

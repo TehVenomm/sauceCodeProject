@@ -66,8 +66,11 @@ public final class AnnotatedConstructor extends AnnotatedWithParams {
     }
 
     public Class<?> getRawParameterType(int i) {
-        Class[] parameterTypes = this._constructor.getParameterTypes();
-        return i >= parameterTypes.length ? null : parameterTypes[i];
+        Class<?>[] parameterTypes = this._constructor.getParameterTypes();
+        if (i >= parameterTypes.length) {
+            return null;
+        }
+        return parameterTypes[i];
     }
 
     public JavaType getParameterType(int i) {
@@ -127,14 +130,16 @@ public final class AnnotatedConstructor extends AnnotatedWithParams {
         return true;
     }
 
-    Object writeReplace() {
+    /* access modifiers changed from: 0000 */
+    public Object writeReplace() {
         return new AnnotatedConstructor(new Serialization(this._constructor));
     }
 
-    Object readResolve() {
-        Class cls = this._serialization.clazz;
+    /* access modifiers changed from: 0000 */
+    public Object readResolve() {
+        Class<?> cls = this._serialization.clazz;
         try {
-            Object declaredConstructor = cls.getDeclaredConstructor(this._serialization.args);
+            Constructor declaredConstructor = cls.getDeclaredConstructor(this._serialization.args);
             if (!declaredConstructor.isAccessible()) {
                 ClassUtil.checkAndFixAccess(declaredConstructor, false);
             }

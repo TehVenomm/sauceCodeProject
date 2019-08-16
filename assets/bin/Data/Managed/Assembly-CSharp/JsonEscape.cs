@@ -16,43 +16,47 @@ public static class JsonEscape
 			c = s[i];
 			switch (c)
 			{
-			case '"':
-			case '\\':
-				stringBuilder.Append('\\');
-				stringBuilder.Append(c);
-				break;
-			case '/':
-				stringBuilder.Append('\\');
-				stringBuilder.Append(c);
-				break;
 			case '\b':
 				stringBuilder.Append("\\b");
-				break;
+				continue;
 			case '\t':
 				stringBuilder.Append("\\t");
-				break;
+				continue;
 			case '\n':
 				stringBuilder.Append("\\n");
-				break;
+				continue;
 			case '\f':
 				stringBuilder.Append("\\f");
-				break;
+				continue;
 			case '\r':
 				stringBuilder.Append("\\r");
-				break;
-			default:
-				if (c > '\u007f')
-				{
-					int num = c;
-					string value = "\\u" + num.ToString("x4");
-					stringBuilder.Append(value);
-				}
-				else
-				{
-					stringBuilder.Append(c);
-				}
-				break;
+				continue;
 			}
+			if (c != '"')
+			{
+				if (c == '/')
+				{
+					stringBuilder.Append('\\');
+					stringBuilder.Append(c);
+					continue;
+				}
+				if (c != '\\')
+				{
+					if (c > '\u007f')
+					{
+						int num = c;
+						string value = "\\u" + num.ToString("x4");
+						stringBuilder.Append(value);
+					}
+					else
+					{
+						stringBuilder.Append(c);
+					}
+					continue;
+				}
+			}
+			stringBuilder.Append('\\');
+			stringBuilder.Append(c);
 		}
 		return stringBuilder.ToString();
 	}

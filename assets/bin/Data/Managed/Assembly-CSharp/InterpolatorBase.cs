@@ -55,7 +55,7 @@ public abstract class InterpolatorBase<T> : Interpolator
 
 	public void Set(T value)
 	{
-		Set(0f, value, value, null, default(T), null);
+		Set(0f, value, value);
 	}
 
 	public void Play()
@@ -63,13 +63,11 @@ public abstract class InterpolatorBase<T> : Interpolator
 		if (time == 0f)
 		{
 			Stop();
+			return;
 		}
-		else
-		{
-			play = true;
-			turn = false;
-			nowTime = 0f;
-		}
+		play = true;
+		turn = false;
+		nowTime = 0f;
 	}
 
 	public void Stop()
@@ -92,52 +90,50 @@ public abstract class InterpolatorBase<T> : Interpolator
 		if (!IsPlaying())
 		{
 			nowValue = endValue;
+			return;
 		}
-		else
+		switch (loopType)
 		{
-			switch (loopType)
+		case LOOP.NONE:
+			nowTime += dt;
+			if (nowTime >= time)
 			{
-			case LOOP.NONE:
-				nowTime += dt;
-				if (nowTime >= time)
-				{
-					nowValue = endValue;
-					Stop();
-					return;
-				}
-				break;
-			case LOOP.REPETE:
-				nowTime += dt;
-				if (nowTime >= time)
-				{
-					nowTime %= time;
-				}
-				break;
-			case LOOP.PINGPONG:
-				if (!turn)
-				{
-					nowTime += dt;
-					if (nowTime >= time)
-					{
-						nowTime = time - nowTime % time;
-						turn = true;
-					}
-				}
-				else
-				{
-					nowTime -= dt;
-					if (nowTime <= 0f)
-					{
-						nowTime = (0f - nowTime) % time;
-						turn = false;
-					}
-				}
-				break;
+				nowValue = endValue;
+				Stop();
+				return;
 			}
-			float num = nowTime / time;
-			float r = (easeCurve == null) ? num : easeCurve.Evaluate(num);
-			Calc(num, r);
+			break;
+		case LOOP.REPETE:
+			nowTime += dt;
+			if (nowTime >= time)
+			{
+				nowTime %= time;
+			}
+			break;
+		case LOOP.PINGPONG:
+			if (!turn)
+			{
+				nowTime += dt;
+				if (nowTime >= time)
+				{
+					nowTime = time - nowTime % time;
+					turn = true;
+				}
+			}
+			else
+			{
+				nowTime -= dt;
+				if (nowTime <= 0f)
+				{
+					nowTime = (0f - nowTime) % time;
+					turn = false;
+				}
+			}
+			break;
 		}
+		float num = nowTime / time;
+		float r = (easeCurve == null) ? num : easeCurve.Evaluate(num);
+		Calc(num, r);
 	}
 
 	public T Update()

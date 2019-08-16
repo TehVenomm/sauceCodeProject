@@ -85,19 +85,22 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		BTN_WAVEMATCH_NEW,
 		BTN_WAVEMATCH_PASS,
 		BTN_WAVEMATCH_AUTO,
+		OBJ_CARNIVAL_ROOT,
+		LBL_POINT_CARNIVAL,
 		LBL_LIMIT_TIME,
 		OBJ_CLEAR_ICON_ROOT,
 		OBJ_CLEAR_REWARD,
-		BTN_CREATE_OFF
+		BTN_CREATE_OFF,
+		SPR_TYPE_DIFFICULTY
 	}
-
-	private const string WINDOW_SPRITE = "RequestWindowBase_Explorer";
-
-	private const string MESSAGE_SPRITE = "Checkhukidashi_Explorer";
 
 	private Network.EventData eventData;
 
 	private QuestTable.QuestTableData questTableData;
+
+	private const string WINDOW_SPRITE = "RequestWindowBase_Explorer";
+
+	private const string MESSAGE_SPRITE = "Checkhukidashi_Explorer";
 
 	public override void Initialize()
 	{
@@ -115,35 +118,36 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, true);
+		SetActive((Enum)UI.OBJ_CLEAR_REWARD, is_visible: true);
 		base.UpdateUI();
 		questTableData = info.GetQuestData();
-		if (questTableData != null)
+		if (questTableData == null)
 		{
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questTableData.GetMainEnemyID());
-			if (enemyData != null)
+			return;
+		}
+		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questTableData.GetMainEnemyID());
+		if (enemyData != null)
+		{
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY));
+			itemIcon.SetDepth(7);
+			SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+			SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+			int num = (int)questTableData.limitTime;
+			SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
+			if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
 			{
-				SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
-				ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-				itemIcon.SetDepth(7);
-				SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
-				SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-				SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
-				int num = (int)questTableData.limitTime;
-				SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
-				if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
-				{
-					SetActive((Enum)UI.BTN_CREATE_OFF, false);
-				}
-				else
-				{
-					SetActive((Enum)UI.BTN_CREATE, IsCreatableRoom());
-					SetActive((Enum)UI.BTN_CREATE_OFF, !IsCreatableRoom());
-				}
-				SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Explorer");
-				SetSprite(baseRoot, UI.SPR_MESSAGE_BG, "Checkhukidashi_Explorer");
-				SetActive(baseRoot, UI.OBJ_COMPLETE_ROOT, base.isComplete);
+				SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: false);
 			}
+			else
+			{
+				SetActive((Enum)UI.BTN_CREATE, IsCreatableRoom());
+				SetActive((Enum)UI.BTN_CREATE_OFF, !IsCreatableRoom());
+			}
+			SetDifficultySprite();
+			SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Explorer");
+			SetSprite(baseRoot, UI.SPR_MESSAGE_BG, "Checkhukidashi_Explorer");
+			SetActive(baseRoot, UI.OBJ_COMPLETE_ROOT, base.isComplete);
 		}
 	}
 
@@ -164,9 +168,6 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
 		{
 			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();
@@ -187,23 +188,21 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 				text
 			};
 			GameSection.ChangeEvent("HOST_LIMIT", text);
+			return;
 		}
-		else
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId);
+		if (questTableData != null)
 		{
-			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
-			if (questTableData != null)
+			GameSection.SetEventData(new object[1]
 			{
-				GameSection.SetEventData(new object[1]
-				{
-					questTableData.questType
-				});
-			}
+				questTableData.questType
+			});
 		}
 	}
 
 	private void OnQuery_JOIN()
 	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId);
 	}
 
 	private void OnQuery_MATCHING()
@@ -214,13 +213,12 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		});
 		GameSection.StayEvent();
 		int retryCount = 0;
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 1);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		PartyManager.PartySetting setting = new PartyManager.PartySetting(is_lock: false, 0, 0, 0, 1);
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: true, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			if (!is_success)
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 			else if (maxRetryCount > 0)
 			{
@@ -234,7 +232,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 			else
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 		});
 	}
@@ -242,40 +240,39 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
 		yield return (object)new WaitForSeconds(time);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, true, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: true, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			if (!is_success)
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 			else if (maxRetryCount > 0)
 			{
-				if (((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/).retryCount >= maxRetryCount)
+				if (retryCount >= maxRetryCount)
 				{
-					((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+					OnQuery_AUTO_CREATE_ROOM();
 				}
 				else
 				{
-					((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/).retryCount++;
-					((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.MatchAtRandom(((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/).setting, ((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/).retryCount, waitTime));
+					retryCount++;
+					this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 				}
 			}
 			else if (!isJoined)
 			{
-				((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+				OnQuery_AUTO_CREATE_ROOM();
 			}
 			else
 			{
-				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(((_003CMatchAtRandom_003Ec__Iterator10A)/*Error near IL_0061: stateMachine*/).setting);
-				GameSection.ResumeEvent(true, null);
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 		});
 	}
 
 	private void OnQuery_AUTO_CREATE_ROOM()
 	{
-		GameSection.ResumeEvent(false, null);
+		GameSection.ResumeEvent(is_resume: false);
 		string text = StringTable.Get(STRING_CATEGORY.MATCHING, 1u);
 		object[] array = new object[1]
 		{
@@ -287,5 +284,11 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 	private bool IsCreatableRoom()
 	{
 		return eventData.hostCountLimit > 0;
+	}
+
+	private void SetDifficultySprite()
+	{
+		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
+		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

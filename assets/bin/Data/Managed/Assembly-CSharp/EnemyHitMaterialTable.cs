@@ -1,15 +1,16 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTable
 {
 	public class MaterialData
 	{
-		public const string NT = "name,se_id_,add_effect_name";
-
 		public int[] typeSEIDs;
 
 		public string addEffectName;
+
+		public const string NT = "name,se_id_,add_effect_name";
 
 		public static bool cb(CSVReader csv, MaterialData data, ref string key)
 		{
@@ -53,6 +54,9 @@ public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTabl
 
 	protected List<string> typeKeyTable = new List<string>();
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackStringKeyReadCSV<MaterialData> _003C_003Ef__mg_0024cache0;
+
 	public StringKeyTable<MaterialData> dataTable
 	{
 		get;
@@ -69,31 +73,29 @@ public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTabl
 		if (!Singleton<EnemyHitTypeTable>.IsValid() || Singleton<EnemyHitTypeTable>.I.dataTable == null)
 		{
 			Log.Error(LOG.INGAME, "EnemyHitMaterialTable::CreateTable() Err ( EnemyHitTypeTable is invalid. )");
+			return;
 		}
-		else
+		typeKeyTable = new List<string>();
+		Singleton<EnemyHitTypeTable>.I.dataTable.ForEachKeys(delegate(string key)
 		{
-			typeKeyTable = new List<string>();
-			Singleton<EnemyHitTypeTable>.I.dataTable.ForEachKeys(delegate(string key)
+			if (key.IndexOf("@") < 0)
 			{
-				if (key.IndexOf("@") < 0)
-				{
-					typeKeyTable.Add(key);
-				}
-			});
-			string text = string.Empty;
-			int i = 0;
-			for (int count = typeKeyTable.Count; i < count; i++)
-			{
-				text = text + "se_id_" + typeKeyTable[i];
-				if (i != count - 1)
-				{
-					text += ",";
-				}
+				typeKeyTable.Add(key);
 			}
-			string name_table = "name,se_id_,add_effect_name".Replace("se_id_", text);
-			dataTable = TableUtility.CreateStringKeyTable<MaterialData>(csv, MaterialData.cb, name_table);
-			dataTable.TrimExcess();
+		});
+		string text = string.Empty;
+		int i = 0;
+		for (int count = typeKeyTable.Count; i < count; i++)
+		{
+			text = text + "se_id_" + typeKeyTable[i];
+			if (i != count - 1)
+			{
+				text += ",";
+			}
 		}
+		string name_table = "name,se_id_,add_effect_name".Replace("se_id_", text);
+		dataTable = TableUtility.CreateStringKeyTable<MaterialData>(csv, MaterialData.cb, name_table);
+		dataTable.TrimExcess();
 	}
 
 	public MaterialData GetData(string name)

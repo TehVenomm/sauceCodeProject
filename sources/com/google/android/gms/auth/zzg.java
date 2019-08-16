@@ -2,20 +2,20 @@ package com.google.android.gms.auth;
 
 import android.os.IBinder;
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzei;
+import com.google.android.gms.internal.auth.zzf;
 import java.io.IOException;
 import java.util.List;
 
-final class zzg implements zzi<List<AccountChangeEvent>> {
-    private /* synthetic */ String zzdxq;
-    private /* synthetic */ int zzdxr;
+final class zzg implements zzj<List<AccountChangeEvent>> {
+    private final /* synthetic */ String zzr;
+    private final /* synthetic */ int zzs;
 
     zzg(String str, int i) {
-        this.zzdxq = str;
-        this.zzdxr = i;
+        this.zzr = str;
+        this.zzs = i;
     }
 
-    public final /* synthetic */ Object zzaa(IBinder iBinder) throws RemoteException, IOException, GoogleAuthException {
-        return ((AccountChangeEventsResponse) zzd.zzl(zzei.zza(iBinder).zza(new AccountChangeEventsRequest().setAccountName(this.zzdxq).setEventIndex(this.zzdxr)))).getEvents();
+    public final /* synthetic */ Object zzb(IBinder iBinder) throws RemoteException, IOException, GoogleAuthException {
+        return ((AccountChangeEventsResponse) zzd.zza(zzf.zza(iBinder).zza(new AccountChangeEventsRequest().setAccountName(this.zzr).setEventIndex(this.zzs)))).getEvents();
     }
 }

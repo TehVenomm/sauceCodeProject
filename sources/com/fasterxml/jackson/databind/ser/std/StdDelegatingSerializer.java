@@ -43,7 +43,8 @@ public class StdDelegatingSerializer extends StdSerializer<Object> implements Co
         this._delegateSerializer = jsonSerializer;
     }
 
-    protected StdDelegatingSerializer withDelegate(Converter<Object, ?> converter, JavaType javaType, JsonSerializer<?> jsonSerializer) {
+    /* access modifiers changed from: protected */
+    public StdDelegatingSerializer withDelegate(Converter<Object, ?> converter, JavaType javaType, JsonSerializer<?> jsonSerializer) {
         if (getClass() == StdDelegatingSerializer.class) {
             return new StdDelegatingSerializer(converter, javaType, jsonSerializer);
         }
@@ -57,7 +58,7 @@ public class StdDelegatingSerializer extends StdSerializer<Object> implements Co
     }
 
     public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer jsonSerializer = this._delegateSerializer;
+        JsonSerializer<Object> jsonSerializer = this._delegateSerializer;
         JavaType javaType = this._delegateType;
         if (jsonSerializer == null) {
             if (javaType == null) {
@@ -73,7 +74,8 @@ public class StdDelegatingSerializer extends StdSerializer<Object> implements Co
         return (jsonSerializer == this._delegateSerializer && javaType == this._delegateType) ? this : withDelegate(this._converter, javaType, jsonSerializer);
     }
 
-    protected Converter<Object, ?> getConverter() {
+    /* access modifiers changed from: protected */
+    public Converter<Object, ?> getConverter() {
         return this._converter;
     }
 
@@ -87,7 +89,7 @@ public class StdDelegatingSerializer extends StdSerializer<Object> implements Co
             serializerProvider.defaultSerializeNull(jsonGenerator);
             return;
         }
-        JsonSerializer jsonSerializer = this._delegateSerializer;
+        JsonSerializer<Object> jsonSerializer = this._delegateSerializer;
         if (jsonSerializer == null) {
             jsonSerializer = _findSerializer(convertValue, serializerProvider);
         }
@@ -96,7 +98,7 @@ public class StdDelegatingSerializer extends StdSerializer<Object> implements Co
 
     public void serializeWithType(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {
         Object convertValue = convertValue(obj);
-        JsonSerializer jsonSerializer = this._delegateSerializer;
+        JsonSerializer<Object> jsonSerializer = this._delegateSerializer;
         if (jsonSerializer == null) {
             jsonSerializer = _findSerializer(obj, serializerProvider);
         }
@@ -112,9 +114,8 @@ public class StdDelegatingSerializer extends StdSerializer<Object> implements Co
         Object convertValue = convertValue(obj);
         if (this._delegateSerializer == null) {
             return obj == null;
-        } else {
-            return this._delegateSerializer.isEmpty(serializerProvider, convertValue);
         }
+        return this._delegateSerializer.isEmpty(serializerProvider, convertValue);
     }
 
     public JsonNode getSchema(SerializerProvider serializerProvider, Type type) throws JsonMappingException {
@@ -137,11 +138,13 @@ public class StdDelegatingSerializer extends StdSerializer<Object> implements Co
         }
     }
 
-    protected Object convertValue(Object obj) {
+    /* access modifiers changed from: protected */
+    public Object convertValue(Object obj) {
         return this._converter.convert(obj);
     }
 
-    protected JsonSerializer<Object> _findSerializer(Object obj, SerializerProvider serializerProvider) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _findSerializer(Object obj, SerializerProvider serializerProvider) throws JsonMappingException {
         return serializerProvider.findValueSerializer(obj.getClass());
     }
 }

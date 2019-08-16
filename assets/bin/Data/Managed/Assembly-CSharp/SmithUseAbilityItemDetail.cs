@@ -90,7 +90,7 @@ public class SmithUseAbilityItemDetail : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<SmithManager>.I.SendUseAbilityItem(equipItemInfo.uniqueID, abilityItemInfo.GetUniqID(), delegate(Error error, EquipItemInfo itemInfo)
 		{
-			GameSection.ResumeEvent(error == Error.None, null);
+			GameSection.ResumeEvent(error == Error.None);
 		});
 	}
 
@@ -99,7 +99,7 @@ public class SmithUseAbilityItemDetail : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<SmithManager>.I.SendUseAbilityItem(equipItemInfo.uniqueID, abilityItemInfo.GetUniqID(), delegate(Error error, EquipItemInfo itemInfo)
 		{
-			GameSection.ResumeEvent(error != Error.None, null);
+			GameSection.ResumeEvent(error != Error.None);
 		});
 	}
 }

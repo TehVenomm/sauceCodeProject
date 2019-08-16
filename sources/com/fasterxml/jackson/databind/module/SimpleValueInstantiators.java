@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class SimpleValueInstantiators extends Base implements Serializable {
     private static final long serialVersionUID = -8929386427526115130L;
-    protected HashMap<ClassKey, ValueInstantiator> _classMappings = new HashMap();
+    protected HashMap<ClassKey, ValueInstantiator> _classMappings = new HashMap<>();
 
     public SimpleValueInstantiators addValueInstantiator(Class<?> cls, ValueInstantiator valueInstantiator) {
         this._classMappings.put(new ClassKey(cls), valueInstantiator);

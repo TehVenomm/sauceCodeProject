@@ -1,4 +1,4 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -12,15 +12,16 @@ import android.util.Log;
 import com.facebook.appevents.AppEventsConstants;
 import com.google.android.zippy.SharedPreferencesCompat;
 import com.unity3d.player.UnityPlayer;
-import jp.colopl.config.Config;
-import jp.colopl.config.Session;
-import jp.colopl.libs.AnalyticsService;
-import jp.colopl.libs.AssetService;
-import jp.colopl.util.Crypto;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p018jp.colopl.config.Config;
+import p018jp.colopl.config.Session;
+import p018jp.colopl.libs.AnalyticsService;
+import p018jp.colopl.libs.AssetService;
+import p018jp.colopl.util.Crypto;
 
+/* renamed from: jp.colopl.drapro.NetworkHelper */
 public class NetworkHelper {
     public static final String KEY = "e87e03526ab";
     private static final String TAG = "NetworkHelper";
@@ -40,45 +41,47 @@ public class NetworkHelper {
     }
 
     public static String getDefaultUserAgent() {
-        StringBuilder stringBuilder = new StringBuilder(64);
-        stringBuilder.append("Dalvik/");
-        stringBuilder.append(System.getProperty("java.vm.version"));
-        stringBuilder.append(" (Linux; U; Android ");
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("Dalvik/");
+        sb.append(System.getProperty("java.vm.version"));
+        sb.append(" (Linux; U; Android ");
         String str = VERSION.RELEASE;
         if (str.length() <= 0) {
             str = "1.0";
         }
-        stringBuilder.append(str);
+        sb.append(str);
         if ("REL".equals(VERSION.CODENAME)) {
-            str = Build.MODEL;
-            if (str.length() > 0) {
-                stringBuilder.append("; ");
-                stringBuilder.append(str);
+            String str2 = Build.MODEL;
+            if (str2.length() > 0) {
+                sb.append("; ");
+                sb.append(str2);
             }
         }
-        str = Build.ID;
-        if (str.length() > 0) {
-            stringBuilder.append(" Build/");
-            stringBuilder.append(str);
+        String str3 = Build.ID;
+        if (str3.length() > 0) {
+            sb.append(" Build/");
+            sb.append(str3);
         }
-        stringBuilder.append(")");
-        return stringBuilder.toString();
+        sb.append(")");
+        return sb.toString();
     }
 
     public static String getGoogleAccounts(String str) {
+        Account[] accountsByType;
+        String str2;
         JSONArray jSONArray = new JSONArray();
         for (Account account : AccountManager.get(activity).getAccountsByType("com.google")) {
             JSONObject jSONObject = new JSONObject();
-            String str2 = "";
+            String str3 = "";
             try {
-                Object encrypt = Crypto.encrypt(AppEventsConstants.EVENT_PARAM_VALUE_YES + ":" + String.valueOf(System.currentTimeMillis()) + ":" + account.name);
+                str2 = Crypto.encrypt(AppEventsConstants.EVENT_PARAM_VALUE_YES + ":" + String.valueOf(System.currentTimeMillis()) + ":" + account.name);
             } catch (Exception e) {
                 e.printStackTrace();
-                String str3 = str2;
+                str2 = str3;
             }
             try {
                 jSONObject.put("name", account.name);
-                jSONObject.put("key", encrypt);
+                jSONObject.put("key", str2);
             } catch (JSONException e2) {
                 e2.printStackTrace();
             }
@@ -92,8 +95,8 @@ public class NetworkHelper {
         }
         try {
             jSONObject2.put("googleAccounts", jSONArray);
-        } catch (JSONException e22) {
-            e22.printStackTrace();
+        } catch (JSONException e4) {
+            e4.printStackTrace();
         }
         return jSONObject2.toString();
     }
@@ -117,15 +120,6 @@ public class NetworkHelper {
         return activity.getSharedPreferences(Session.PREFERENCE_NAME, 0).getString(str, "");
     }
 
-    public static String getSystemProperty(String str) {
-        try {
-            return (String) Class.forName("android.os.SystemProperties").getMethod("get", new Class[]{String.class}).invoke(null, new Object[]{str});
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static String getUniqueId(String str) {
         if (TextUtils.isEmpty(str) || !str.equals(KEY)) {
             return "";
@@ -136,15 +130,15 @@ public class NetworkHelper {
         }
         Log.d("dragon", "device id : " + string);
         try {
-            string = Crypto.encrypt(AppEventsConstants.EVENT_PARAM_VALUE_YES + ":" + Crypto.encryptMD5(string + ":" + KEY));
-            Log.d("dragon", "encrypted : " + string);
-            return string;
+            String encrypt = Crypto.encrypt(AppEventsConstants.EVENT_PARAM_VALUE_YES + ":" + Crypto.encryptMD5(string + ":" + KEY));
+            Log.d("dragon", "encrypted : " + encrypt);
+            return encrypt;
         } catch (Exception e) {
-            Exception exception = e;
-            string = "";
-            exception.printStackTrace();
+            Exception exc = e;
+            String str2 = "";
+            exc.printStackTrace();
             Log.d("dragon", "encrypted error : " + "");
-            return string;
+            return str2;
         }
     }
 
@@ -156,12 +150,8 @@ public class NetworkHelper {
         return Config.getVersionName(activity);
     }
 
-    public static void init(Activity activity) {
-        activity = activity;
-    }
-
-    public static boolean isRazerPhone() {
-        return Build.BRAND == "razer" && getSystemProperty("ro.razer.internal.api") != null && getSystemProperty("ro.razer.internal.list") != null && getSystemProperty("ro.razer.internal.mask") != null && getSystemProperty("ro.razer.internal.zval") != null && getSystemProperty("ro.razer.internal.api") == AppEventsConstants.EVENT_PARAM_VALUE_YES && getSystemProperty("ro.razer.internal.list") == "9" && getSystemProperty("ro.razer.internal.mask") == "254" && getSystemProperty("ro.razer.internal.zval") == "26";
+    public static void init(Activity activity2) {
+        activity = activity2;
     }
 
     public static void setAnalytics(String str) {

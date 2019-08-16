@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackActionMine : IAttackCollider
+public class AttackActionMine : MonoBehaviour, IAttackCollider
 {
 	public enum Function
 	{
@@ -34,7 +34,7 @@ public class AttackActionMine : IAttackCollider
 		DIRECTION_CHANGE
 	}
 
-	public class ReflectBulletCondition
+	public class ReflectBulletCondition : MonoBehaviour
 	{
 		public int actionMineID = -1;
 
@@ -116,23 +116,14 @@ public class AttackActionMine : IAttackCollider
 
 	public void Initialize(InitParamActionMine initParam)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Expected O, but got Unknown
 		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Expected O, but got Unknown
 		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
 		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Expected O, but got Unknown
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
@@ -148,69 +139,71 @@ public class AttackActionMine : IAttackCollider
 			attackHitInfo.enableIdentityCheck = false;
 		}
 		BulletData bulletData = m_atkInfo.bulletData;
-		if (!(bulletData == null))
+		if (bulletData == null)
 		{
-			BulletData.BulletBase data = bulletData.data;
-			if (data != null)
+			return;
+		}
+		BulletData.BulletBase data = bulletData.data;
+		if (data == null)
+		{
+			return;
+		}
+		BulletData.BulletActionMine dataActionMine = bulletData.dataActionMine;
+		if (dataActionMine != null)
+		{
+			m_actionCoolTime = dataActionMine.actionCoolTime;
+			m_attacker = initParam.attacker;
+			m_landHitEffectName = data.landHiteffectName;
+			m_aliveTime = data.appearTime;
+			m_unbreakableTimer = dataActionMine.unbrakableTime;
+			m_mineData = dataActionMine;
+			m_isDeleted = false;
+			m_cachedTransform = this.get_transform();
+			m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
+			m_cachedTransform.set_position(initParam.position);
+			m_cachedTransform.set_rotation(initParam.rotation);
+			m_cachedTransform.set_localScale(data.timeStartScale);
+			Transform effect = EffectManager.GetEffect(data.effectName, this.get_transform());
+			effect.set_localPosition(data.dispOffset);
+			effect.set_localRotation(Quaternion.Euler(data.dispRotation));
+			effect.set_localScale(Vector3.get_one());
+			m_effectObj = effect.get_gameObject();
+			m_effectDeleteAnimator = m_effectObj.GetComponent<Animator>();
+			m_capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
+			m_capsule.set_direction(2);
+			m_capsule.set_radius(data.radius);
+			m_capsule.set_height(0f);
+			m_capsule.set_enabled(true);
+			m_capsule.set_center(Vector3.get_zero());
+			m_capsule.set_isTrigger(true);
+			Rigidbody val = this.get_gameObject().AddComponent<Rigidbody>();
+			val.set_useGravity(false);
+			int num = 0;
+			if (dataActionMine.isIgnoreHitEnemyAttack)
 			{
-				BulletData.BulletActionMine dataActionMine = bulletData.dataActionMine;
-				if (dataActionMine != null)
-				{
-					m_actionCoolTime = dataActionMine.actionCoolTime;
-					m_attacker = initParam.attacker;
-					m_landHitEffectName = data.landHiteffectName;
-					m_aliveTime = data.appearTime;
-					m_unbreakableTimer = dataActionMine.unbrakableTime;
-					m_mineData = dataActionMine;
-					m_isDeleted = false;
-					m_cachedTransform = this.get_transform();
-					m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-					m_cachedTransform.set_position(initParam.position);
-					m_cachedTransform.set_rotation(initParam.rotation);
-					m_cachedTransform.set_localScale(data.timeStartScale);
-					Transform effect = EffectManager.GetEffect(data.effectName, this.get_transform());
-					effect.set_localPosition(data.dispOffset);
-					effect.set_localRotation(Quaternion.Euler(data.dispRotation));
-					effect.set_localScale(Vector3.get_one());
-					m_effectObj = effect.get_gameObject();
-					m_effectDeleteAnimator = m_effectObj.GetComponent<Animator>();
-					m_capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
-					m_capsule.set_direction(2);
-					m_capsule.set_radius(data.radius);
-					m_capsule.set_height(0f);
-					m_capsule.set_enabled(true);
-					m_capsule.set_center(Vector3.get_zero());
-					m_capsule.set_isTrigger(true);
-					Rigidbody val = this.get_gameObject().AddComponent<Rigidbody>();
-					val.set_useGravity(false);
-					int num = 0;
-					if (dataActionMine.isIgnoreHitEnemyAttack)
-					{
-						num |= 0x2000;
-					}
-					if (dataActionMine.isIgnoreHitEnemyMove)
-					{
-						num |= 0x400;
-					}
-					if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
-					{
-						m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_atkInfo, m_attacker, m_capsule, this, Player.ATTACK_MODE.NONE, null);
-						m_attackHitChecker = m_attacker.ReferenceAttackHitChecker();
-					}
-					rand = new Random(initParam.randomSeed);
-					objId = initParam.id;
-					if (!string.IsNullOrEmpty(m_mineData.appearEffectName))
-					{
-						Vector3 position = m_cachedTransform.get_position();
-						float x = position.x;
-						Vector3 position2 = m_cachedTransform.get_position();
-						Vector3 pos = default(Vector3);
-						pos._002Ector(x, 0.1f, position2.z);
-						EffectManager.OneShot(m_mineData.appearEffectName, pos, m_cachedTransform.get_rotation(), true);
-					}
-					RequestMain();
-				}
+				num |= 0x2000;
 			}
+			if (dataActionMine.isIgnoreHitEnemyMove)
+			{
+				num |= 0x400;
+			}
+			if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
+			{
+				m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_atkInfo, m_attacker, m_capsule, this);
+				m_attackHitChecker = m_attacker.ReferenceAttackHitChecker();
+			}
+			rand = new Random(initParam.randomSeed);
+			objId = initParam.id;
+			if (!string.IsNullOrEmpty(m_mineData.appearEffectName))
+			{
+				Vector3 position = m_cachedTransform.get_position();
+				float x = position.x;
+				Vector3 position2 = m_cachedTransform.get_position();
+				Vector3 pos = default(Vector3);
+				pos._002Ector(x, 0.1f, position2.z);
+				EffectManager.OneShot(m_mineData.appearEffectName, pos, m_cachedTransform.get_rotation(), is_priority: true);
+			}
+			RequestMain();
 		}
 	}
 
@@ -235,85 +228,90 @@ public class AttackActionMine : IAttackCollider
 
 	private void FuncMain()
 	{
-		if (!m_isDeleted)
+		if (m_isDeleted)
 		{
-			m_unbreakableTimer -= Time.get_deltaTime();
-			m_actionCoolTimer -= Time.get_deltaTime();
-			if (m_timeCount >= m_aliveTime)
+			return;
+		}
+		m_unbreakableTimer -= Time.get_deltaTime();
+		m_actionCoolTimer -= Time.get_deltaTime();
+		if (m_timeCount >= m_aliveTime)
+		{
+			RequestDestroy();
+		}
+		else
+		{
+			if (m_mineData.actionType != BulletData.BulletActionMine.ACTION_TYPE.REFLECT)
 			{
-				RequestDestroy(true);
+				return;
 			}
-			else if (m_mineData.actionType == BulletData.BulletActionMine.ACTION_TYPE.REFLECT)
+			switch (reactionType)
 			{
-				switch (reactionType)
+			case REACTION_TYPE.REFLECT:
+				if (m_actionCoolTimer <= 0f)
 				{
-				case REACTION_TYPE.REFLECT:
-					if (m_actionCoolTimer <= 0f)
-					{
-						RequestReflect(true);
-					}
-					break;
-				case REACTION_TYPE.DIRECTION_CHANGE:
-					if (m_actionCoolTimer <= 0f)
-					{
-						RequestReflect(false);
-					}
-					break;
-				case REACTION_TYPE.EXPLODE:
-					if (hitObject != null && m_unbreakableTimer <= 0f)
-					{
-						bool isExplode = false;
-						if (!IsAvoidExplode(hitLayer) && IsLayerExplode(hitLayer))
-						{
-							isExplode = true;
-						}
-						if (m_attacker != null)
-						{
-							Enemy enemy = m_attacker as Enemy;
-							if (enemy != null && enemy.enemySender != null)
-							{
-								enemy.ActDestroyActionMine(objId, isExplode);
-								enemy.enemySender.OnDestroyActionMine(objId, isExplode);
-							}
-						}
-					}
+					RequestReflect();
+				}
+				break;
+			case REACTION_TYPE.DIRECTION_CHANGE:
+				if (m_actionCoolTimer <= 0f)
+				{
+					RequestReflect(isCreate: false);
+				}
+				break;
+			case REACTION_TYPE.EXPLODE:
+			{
+				if (!(hitObject != null) || !(m_unbreakableTimer <= 0f))
+				{
 					break;
 				}
-				ResetHit();
+				bool isExplode = false;
+				if (!IsAvoidExplode(hitLayer) && IsLayerExplode(hitLayer))
+				{
+					isExplode = true;
+				}
+				if (m_attacker != null)
+				{
+					Enemy enemy = m_attacker as Enemy;
+					if (enemy != null && enemy.enemySender != null)
+					{
+						enemy.ActDestroyActionMine(objId, isExplode);
+						enemy.enemySender.OnDestroyActionMine(objId, isExplode);
+					}
+				}
+				break;
 			}
+			}
+			ResetHit();
 		}
 	}
 
 	public void RequestDestroy(bool isExplode = true)
 	{
-		if (m_func != Function.DELETE && !m_isDeleted)
+		if (m_func == Function.DELETE || m_isDeleted)
 		{
-			RequestFunction(Function.DELETE);
-			if (isExplode)
-			{
-				CreateExplosion();
-				ResetHit();
-			}
-			if (m_effectDeleteAnimator == null)
-			{
-				Destroy();
-			}
-			else
-			{
-				string text = (!isExplode) ? "END" : string.Empty;
-				if (string.IsNullOrEmpty(text))
-				{
-					Destroy();
-				}
-				else
-				{
-					m_effectDeleteAnimHash = Animator.StringToHash(text);
-					if (m_effectDeleteAnimator.HasState(0, m_effectDeleteAnimHash))
-					{
-						m_effectDeleteAnimator.Play(m_effectDeleteAnimHash, 0, 0f);
-					}
-				}
-			}
+			return;
+		}
+		RequestFunction(Function.DELETE);
+		if (isExplode)
+		{
+			CreateExplosion();
+			ResetHit();
+		}
+		if (m_effectDeleteAnimator == null)
+		{
+			Destroy();
+			return;
+		}
+		string text = (!isExplode) ? "END" : string.Empty;
+		if (string.IsNullOrEmpty(text))
+		{
+			Destroy();
+			return;
+		}
+		m_effectDeleteAnimHash = Animator.StringToHash(text);
+		if (m_effectDeleteAnimator.HasState(0, m_effectDeleteAnimHash))
+		{
+			m_effectDeleteAnimator.Play(m_effectDeleteAnimHash, 0, 0f);
 		}
 	}
 
@@ -321,26 +319,26 @@ public class AttackActionMine : IAttackCollider
 	{
 		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_isDeleted)
+		if (m_isDeleted)
 		{
-			m_isDeleted = true;
-			if (!string.IsNullOrEmpty(m_landHitEffectName))
-			{
-				Transform effect = EffectManager.GetEffect(m_landHitEffectName, null);
-				if (effect != null)
-				{
-					effect.set_position(m_cachedTransform.get_position());
-					effect.set_rotation(m_cachedTransform.get_rotation());
-				}
-			}
-			Enemy enemy = m_attacker as Enemy;
-			if (enemy != null)
-			{
-				enemy.OnDestroyActionMine(this);
-			}
-			Object.Destroy(this.get_gameObject());
+			return;
 		}
+		m_isDeleted = true;
+		if (!string.IsNullOrEmpty(m_landHitEffectName))
+		{
+			Transform effect = EffectManager.GetEffect(m_landHitEffectName);
+			if (effect != null)
+			{
+				effect.set_position(m_cachedTransform.get_position());
+				effect.set_rotation(m_cachedTransform.get_rotation());
+			}
+		}
+		Enemy enemy = m_attacker as Enemy;
+		if (enemy != null)
+		{
+			enemy.OnDestroyActionMine(this);
+		}
+		Object.Destroy(this.get_gameObject());
 	}
 
 	private AnimEventShot CreateExplosion()
@@ -371,7 +369,7 @@ public class AttackActionMine : IAttackCollider
 		}
 		Quaternion rotation = m_cachedTransform.get_rotation();
 		Vector3 position = m_cachedTransform.get_position();
-		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataActionMine.explodeBullet, m_attacker, m_atkInfo, position, rotation, null, Player.ATTACK_MODE.NONE, null);
+		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataActionMine.explodeBullet, m_attacker, m_atkInfo, position, rotation);
 		if (animEventShot == null)
 		{
 			return null;
@@ -382,26 +380,27 @@ public class AttackActionMine : IAttackCollider
 	private void RequestReflect(bool isCreate = true)
 	{
 		m_actionCoolTimer = m_actionCoolTime;
-		if (m_func != Function.DELETE && !m_isDeleted)
+		if (m_func == Function.DELETE || m_isDeleted)
 		{
-			if (isCreate)
+			return;
+		}
+		if (isCreate)
+		{
+			Enemy enemy = m_attacker as Enemy;
+			if (enemy != null && fromObject != null && fromObject is Self)
 			{
-				Enemy enemy = m_attacker as Enemy;
-				if (enemy != null && fromObject != null && fromObject is Self)
+				int num = rand.Next(-1073741824, 1073741823);
+				enemy.ActResetActionMineRandom(num);
+				if (enemy.enemySender != null)
 				{
-					int num = rand.Next(-1073741824, 1073741823);
-					enemy.ActResetActionMineRandom(num);
-					if (enemy.enemySender != null)
-					{
-						enemy.enemySender.OnCreateReflectBullet(objId, num);
-					}
-					CreateReflectBullet();
+					enemy.enemySender.OnCreateReflectBullet(objId, num);
 				}
+				CreateReflectBullet();
 			}
-			else
-			{
-				ChangeBulletDirection();
-			}
+		}
+		else
+		{
+			ChangeBulletDirection();
 		}
 	}
 
@@ -412,7 +411,6 @@ public class AttackActionMine : IAttackCollider
 		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
@@ -437,7 +435,7 @@ public class AttackActionMine : IAttackCollider
 		Quaternion rot = m_cachedTransform.get_rotation();
 		if (IsGetTarget(m_cachedTransform.get_position(), ref rot))
 		{
-			AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(m_mineData.actionBullet, m_attacker, m_atkInfo, m_cachedTransform.get_position(), rot, null, Player.ATTACK_MODE.NONE, null);
+			AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(m_mineData.actionBullet, m_attacker, m_atkInfo, m_cachedTransform.get_position(), rot);
 			if (animEventShot == null)
 			{
 				return null;
@@ -446,11 +444,11 @@ public class AttackActionMine : IAttackCollider
 			reflectBulletCondition.actionMineID = objId;
 			if (!string.IsNullOrEmpty(m_mineData.actionEffectName1))
 			{
-				EffectManager.OneShot(m_mineData.actionEffectName1, m_cachedTransform.get_position() + m_mineData.actionEffectOffset, rot, false);
+				EffectManager.OneShot(m_mineData.actionEffectName1, m_cachedTransform.get_position() + m_mineData.actionEffectOffset, rot);
 			}
 			if (!string.IsNullOrEmpty(m_mineData.actionEffectName2))
 			{
-				EffectManager.OneShot(m_mineData.actionEffectName2, m_cachedTransform.get_position() + m_mineData.actionEffectOffset, rot, false);
+				EffectManager.OneShot(m_mineData.actionEffectName2, m_cachedTransform.get_position() + m_mineData.actionEffectOffset, rot);
 			}
 			return animEventShot;
 		}
@@ -459,10 +457,8 @@ public class AttackActionMine : IAttackCollider
 
 	private void ChangeBulletDirection()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
@@ -471,16 +467,17 @@ public class AttackActionMine : IAttackCollider
 		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 		Quaternion rot = hitObject.get_transform().get_rotation();
-		if (IsGetTarget(hitObject.get_transform().get_position(), ref rot))
+		if (!IsGetTarget(hitObject.get_transform().get_position(), ref rot))
 		{
-			BulletControllerBase component = hitObject.GetComponent<BulletControllerBase>();
-			if (component != null)
+			return;
+		}
+		BulletControllerBase component = hitObject.GetComponent<BulletControllerBase>();
+		if (component != null)
+		{
+			component.Initialize(m_mineData.actionBullet, null, component._transform.get_position(), rot);
+			if (!string.IsNullOrEmpty(m_mineData.actionEffectName2))
 			{
-				component.Initialize(m_mineData.actionBullet, null, component._transform.get_position(), rot);
-				if (!string.IsNullOrEmpty(m_mineData.actionEffectName2))
-				{
-					EffectManager.OneShot(m_mineData.actionEffectName2, component._transform.get_position() + m_mineData.actionEffectOffset, rot, false);
-				}
+				EffectManager.OneShot(m_mineData.actionEffectName2, component._transform.get_position() + m_mineData.actionEffectOffset, rot);
 			}
 		}
 	}
@@ -555,8 +552,8 @@ public class AttackActionMine : IAttackCollider
 
 	private void FuncDelete()
 	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_state)
 		{
 		case 1:
@@ -589,7 +586,7 @@ public class AttackActionMine : IAttackCollider
 	{
 		if (m_effectObj != null)
 		{
-			EffectManager.ReleaseEffect(m_effectObj, true, false);
+			EffectManager.ReleaseEffect(m_effectObj);
 			m_effectObj = null;
 		}
 	}
@@ -732,51 +729,50 @@ public class AttackActionMine : IAttackCollider
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		hitObject = collider.get_gameObject();
 		hitLayer = hitObject.get_layer();
-		if (((1 << hitLayer) & ignoreLayerMask) <= 0 && (hitLayer != 8 || !(hitObject.GetComponent<DangerRader>() != null)))
+		if (((1 << hitLayer) & ignoreLayerMask) > 0 || (hitLayer == 8 && hitObject.GetComponent<DangerRader>() != null))
 		{
-			HealAttackObject component = collider.get_gameObject().GetComponent<HealAttackObject>();
-			if (!(component != null))
+			return;
+		}
+		HealAttackObject component = collider.get_gameObject().GetComponent<HealAttackObject>();
+		if (component != null)
+		{
+			return;
+		}
+		IAttackCollider component2 = hitObject.GetComponent<IAttackCollider>();
+		if (component2 != null)
+		{
+			AttackInfo attackInfo = component2.GetAttackInfo();
+			fromObject = component2.GetFromObject();
+			if (attackInfo != null)
 			{
-				IAttackCollider component2 = hitObject.GetComponent<IAttackCollider>();
-				if (component2 != null)
+				if (attackInfo.isSkillReference)
 				{
-					AttackInfo attackInfo = component2.GetAttackInfo();
-					fromObject = component2.GetFromObject();
-					if (attackInfo != null)
+					reactionType = REACTION_TYPE.REFLECT;
+					collider.set_enabled(false);
+					BulletObject component3 = collider.GetComponent<BulletObject>();
+					if (component3 != null)
 					{
-						if (attackInfo.isSkillReference)
-						{
-							reactionType = REACTION_TYPE.REFLECT;
-							collider.set_enabled(false);
-							BulletObject component3 = collider.GetComponent<BulletObject>();
-							if (component3 != null)
-							{
-								component3.OnDestroy();
-							}
-							return;
-						}
-						ReflectBulletCondition component4 = collider.GetComponent<ReflectBulletCondition>();
-						if (component4 != null)
-						{
-							if (component4.actionMineID != objId)
-							{
-								reactionType = REACTION_TYPE.DIRECTION_CHANGE;
-								component4.actionMineID = objId;
-								component4.reflectCount++;
-								reflectCount++;
-							}
-							return;
-						}
+						component3.OnDestroy();
 					}
+					return;
 				}
-				reactionType = REACTION_TYPE.EXPLODE;
-				m_capsule.set_enabled(false);
+				ReflectBulletCondition component4 = collider.GetComponent<ReflectBulletCondition>();
+				if (component4 != null)
+				{
+					if (component4.actionMineID != objId)
+					{
+						reactionType = REACTION_TYPE.DIRECTION_CHANGE;
+						component4.actionMineID = objId;
+						component4.reflectCount++;
+						reflectCount++;
+					}
+					return;
+				}
 			}
 		}
+		reactionType = REACTION_TYPE.EXPLODE;
+		m_capsule.set_enabled(false);
 	}
 }

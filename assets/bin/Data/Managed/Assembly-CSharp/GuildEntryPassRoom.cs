@@ -15,17 +15,19 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 
 	private GuildStatisticInfo _info;
 
+	public override string overrideBackKeyEvent => "[BACK]";
+
 	private IEnumerator GetClanStatistic(int clanID)
 	{
 		bool finish_get_statistic = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(clanID, delegate(bool success, GuildStatisticInfo info)
 		{
-			((_003CGetClanStatistic_003Ec__Iterator49)/*Error near IL_0033: stateMachine*/)._003Cfinish_get_statistic_003E__0 = true;
-			((_003CGetClanStatistic_003Ec__Iterator49)/*Error near IL_0033: stateMachine*/)._003C_003Ef__this._info = info;
+			finish_get_statistic = true;
+			_info = info;
 		});
 		while (!finish_get_statistic)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		HandleEvent(clanID);
 	}
@@ -38,12 +40,12 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 			int clanId = int.Parse(string.Join(string.Empty, passCode));
 			MonoBehaviourSingleton<GuildManager>.I.SendSearchWithID(clanId, delegate(bool is_success, Error err)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 		catch
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		}
 	}
 
@@ -55,7 +57,7 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 			{
 				MonoBehaviourSingleton<GuildManager>.I.SendRequestJoin(clanId, -1, delegate
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Guild", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Guild");
 				});
 			}
 			else if (_info.privacy == 1)
@@ -68,14 +70,14 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 					}
 				});
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		}
 	}
 
 	private void OpenDialog()
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, base.sectionData.GetText("TEXT_NOITICE"), null, null, null, null), delegate
+		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, base.sectionData.GetText("TEXT_NOITICE")), delegate
 		{
-		}, false, 0);
+		});
 	}
 }

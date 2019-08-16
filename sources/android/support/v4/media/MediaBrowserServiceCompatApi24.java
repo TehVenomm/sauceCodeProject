@@ -1,6 +1,5 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.browse.MediaBrowser.MediaItem;
 import android.os.Bundle;
@@ -13,16 +12,14 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-@TargetApi(24)
 @RequiresApi(24)
+/* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi24 */
 class MediaBrowserServiceCompatApi24 {
     private static final String TAG = "MBSCompatApi24";
-    private static Field sResultFlags;
+    /* access modifiers changed from: private */
+    public static Field sResultFlags;
 
-    public interface ServiceCompatProxy extends android.support.v4.media.MediaBrowserServiceCompatApi23.ServiceCompatProxy {
-        void onLoadChildren(String str, ResultWrapper resultWrapper, Bundle bundle);
-    }
-
+    /* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi24$MediaBrowserServiceAdaptor */
     static class MediaBrowserServiceAdaptor extends MediaBrowserServiceAdaptor {
         MediaBrowserServiceAdaptor(Context context, ServiceCompatProxy serviceCompatProxy) {
             super(context, serviceCompatProxy);
@@ -33,6 +30,7 @@ class MediaBrowserServiceCompatApi24 {
         }
     }
 
+    /* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi24$ResultWrapper */
     static class ResultWrapper {
         Result mResultObj;
 
@@ -44,11 +42,12 @@ class MediaBrowserServiceCompatApi24 {
             this.mResultObj.detach();
         }
 
-        List<MediaItem> parcelListToItemList(List<Parcel> list) {
+        /* access modifiers changed from: 0000 */
+        public List<MediaItem> parcelListToItemList(List<Parcel> list) {
             if (list == null) {
                 return null;
             }
-            List<MediaItem> arrayList = new ArrayList();
+            ArrayList arrayList = new ArrayList();
             for (Parcel parcel : list) {
                 parcel.setDataPosition(0);
                 arrayList.add(MediaItem.CREATOR.createFromParcel(parcel));
@@ -60,18 +59,23 @@ class MediaBrowserServiceCompatApi24 {
         public void sendResult(List<Parcel> list, int i) {
             try {
                 MediaBrowserServiceCompatApi24.sResultFlags.setInt(this.mResultObj, i);
-            } catch (Throwable e) {
+            } catch (IllegalAccessException e) {
                 Log.w(MediaBrowserServiceCompatApi24.TAG, e);
             }
             this.mResultObj.sendResult(parcelListToItemList(list));
         }
     }
 
+    /* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi24$ServiceCompatProxy */
+    public interface ServiceCompatProxy extends android.support.p000v4.media.MediaBrowserServiceCompatApi23.ServiceCompatProxy {
+        void onLoadChildren(String str, ResultWrapper resultWrapper, Bundle bundle);
+    }
+
     static {
         try {
             sResultFlags = Result.class.getDeclaredField("mFlags");
             sResultFlags.setAccessible(true);
-        } catch (Throwable e) {
+        } catch (NoSuchFieldException e) {
             Log.w(TAG, e);
         }
     }

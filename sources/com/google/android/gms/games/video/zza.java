@@ -2,40 +2,40 @@ package com.google.android.gms.games.video;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zza implements Creator<VideoCapabilities> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         boolean[] zArr = null;
-        boolean z = false;
-        int zzd = zzb.zzd(parcel);
         boolean[] zArr2 = null;
+        boolean z = false;
         boolean z2 = false;
         boolean z3 = false;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    z = zzb.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 2:
-                    z2 = zzb.zzc(parcel, readInt);
+                    z2 = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 3:
-                    z3 = zzb.zzc(parcel, readInt);
+                    z3 = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 4:
-                    zArr = zzb.zzv(parcel, readInt);
+                    zArr = SafeParcelReader.createBooleanArray(parcel, readHeader);
                     break;
                 case 5:
-                    zArr2 = zzb.zzv(parcel, readInt);
+                    zArr2 = SafeParcelReader.createBooleanArray(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new VideoCapabilities(z, z2, z3, zArr, zArr2);
     }
 

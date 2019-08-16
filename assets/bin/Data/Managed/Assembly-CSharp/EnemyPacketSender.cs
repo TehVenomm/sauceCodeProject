@@ -16,7 +16,7 @@ public class EnemyPacketSender : CharacterPacketSender
 		{
 			Coop_Model_EnemyLoadComplete coop_Model_EnemyLoadComplete = new Coop_Model_EnemyLoadComplete();
 			coop_Model_EnemyLoadComplete.id = base.owner.id;
-			SendToExtra(base.owner.coopClientId, coop_Model_EnemyLoadComplete, promise, null, null);
+			SendToExtra(base.owner.coopClientId, coop_Model_EnemyLoadComplete, promise);
 		}
 	}
 
@@ -31,32 +31,33 @@ public class EnemyPacketSender : CharacterPacketSender
 
 	public override void SendInitialize(int to_client_id = 0)
 	{
-		if (base.enableSend && base.owner.IsOriginal())
+		if (!base.enableSend || !base.owner.IsOriginal())
 		{
-			Coop_Model_EnemyInitialize model = new Coop_Model_EnemyInitialize();
-			SetupEnemyInitializeModel(model, to_client_id != 0, false);
-			if (to_client_id == 0)
-			{
-				SendBroadcast(model, true, null, delegate(Coop_Model_Base send_model)
-				{
-					SetupEnemyInitializeModel(send_model as Coop_Model_EnemyInitialize, false, true);
-					return true;
-				});
-			}
-			else
-			{
-				SendToExtra(to_client_id, model, true, null, delegate(Coop_Model_Base send_model)
-				{
-					SetupEnemyInitializeModel(send_model as Coop_Model_EnemyInitialize, true, true);
-					return true;
-				});
-				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-				{
-					MonoBehaviourSingleton<CoopManager>.I.coopStage.SendSyncPlayerRecord(to_client_id, true);
-				}
-			}
-			SendActionHistory(to_client_id);
+			return;
 		}
+		Coop_Model_EnemyInitialize model = new Coop_Model_EnemyInitialize();
+		SetupEnemyInitializeModel(model, to_client_id != 0, resend: false);
+		if (to_client_id == 0)
+		{
+			SendBroadcast(model, promise: true, null, delegate(Coop_Model_Base send_model)
+			{
+				SetupEnemyInitializeModel(send_model as Coop_Model_EnemyInitialize, send_to: false, resend: true);
+				return true;
+			});
+		}
+		else
+		{
+			SendToExtra(to_client_id, model, promise: true, null, delegate(Coop_Model_Base send_model)
+			{
+				SetupEnemyInitializeModel(send_model as Coop_Model_EnemyInitialize, send_to: true, resend: true);
+				return true;
+			});
+			if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+			{
+				MonoBehaviourSingleton<CoopManager>.I.coopStage.SendSyncPlayerRecord(to_client_id);
+			}
+		}
+		SendActionHistory(to_client_id);
 	}
 
 	public void SetupEnemyInitializeModel(Coop_Model_EnemyInitialize model, bool send_to, bool resend)
@@ -79,22 +80,37 @@ public class EnemyPacketSender : CharacterPacketSender
 		model.hpDamageRate = enemy.damageHpRate;
 		model.downTotal = enemy.downTotal;
 		model.downCount = enemy.downCount;
+		model.concussionTotal = enemy.concussionTotal;
+		model.concussionMax = enemy.concussionMax;
+		model.concussionExtend = enemy.concussionExtend;
 		model.badStatusMax = enemy.badStatusMax;
 		model.SetRegionWorks(enemy.regionWorks);
 		model.nowAngryId = enemy.NowAngryID;
 		model.execAngryIds = enemy.ExecAngryIDList;
 		model.target_id = ((!(enemy.actionTarget != null)) ? (-1) : enemy.actionTarget.id);
-		model.buff_sync_param = enemy.buffParam.CreateSyncParam(BuffParam.BUFFTYPE.NONE);
+		model.buff_sync_param = enemy.buffParam.CreateSyncParam();
 		model.cntAtkSyncParam = enemy.continusAttackParam.CreateSyncParam();
 		model.barrierHp = enemy.BarrierHp;
 		model.isHiding = enemy.isHiding;
 		model.shieldHp = enemy.ShieldHp;
 		model.grabHp = enemy.GrabHp;
 		model.bulletIndex = enemy.bulletIndex;
+		model.walkSpeedRateFromTable = enemy.walkSpeedRateFromTable;
 		model.aegisSetupParam = enemy.GetAegisSetupParam();
+		model.changeElementIcon = enemy.changeElementIcon;
+		model.changeWeakElementIcon = enemy.changeWeakElementIcon;
+		model.changeToleranceRegionId = enemy.changeToleranceRegionId;
+		model.changeToleranceScroll = enemy.changeToleranceScroll;
+		model.shaderSyncParam = enemy.blendColorCtrl.GetShaderParamList();
+		model.deadReviveCount = enemy.deadReviveCount;
+		model.isFirstMadMode = enemy.isFirstMadMode;
 		if (enemy.tailController != null)
 		{
 			model.tailPosList = enemy.tailController.PreviousPositionList;
+		}
+		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+		{
+			model.recoveredHP = MonoBehaviourSingleton<InGameRecorder>.I.GetEnemyRecoveredHpById(enemy.id);
 		}
 	}
 
@@ -105,7 +121,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			Coop_Model_EnemyUpdateBleedDamage coop_Model_EnemyUpdateBleedDamage = new Coop_Model_EnemyUpdateBleedDamage();
 			coop_Model_EnemyUpdateBleedDamage.id = base.owner.id;
 			coop_Model_EnemyUpdateBleedDamage.sync_data = sync_data;
-			SendBroadcast(coop_Model_EnemyUpdateBleedDamage, false, null, null);
+			SendBroadcast(coop_Model_EnemyUpdateBleedDamage);
 		}
 	}
 
@@ -116,7 +132,18 @@ public class EnemyPacketSender : CharacterPacketSender
 			Coop_Model_EnemyUpdateShadowSealing coop_Model_EnemyUpdateShadowSealing = new Coop_Model_EnemyUpdateShadowSealing();
 			coop_Model_EnemyUpdateShadowSealing.id = base.owner.id;
 			coop_Model_EnemyUpdateShadowSealing.sync_data = sync_data;
-			SendBroadcast(coop_Model_EnemyUpdateShadowSealing, false, null, null);
+			SendBroadcast(coop_Model_EnemyUpdateShadowSealing);
+		}
+	}
+
+	public virtual void OnUpdateBombArrow(int regionId)
+	{
+		if (base.enableSend && base.owner.IsOriginal())
+		{
+			Coop_Model_EnemyUpdateBombArrow coop_Model_EnemyUpdateBombArrow = new Coop_Model_EnemyUpdateBombArrow();
+			coop_Model_EnemyUpdateBombArrow.id = base.owner.id;
+			coop_Model_EnemyUpdateBombArrow.regionId = regionId;
+			SendBroadcast(coop_Model_EnemyUpdateBombArrow);
 		}
 	}
 
@@ -130,9 +157,9 @@ public class EnemyPacketSender : CharacterPacketSender
 		coop_Model_EnemyAngry.SetSyncPosition(base.owner);
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_EnemyAngry, true, null, null);
+			SendBroadcast(coop_Model_EnemyAngry, promise: true);
 		}
-		StackActionHistory(coop_Model_EnemyAngry, true);
+		StackActionHistory(coop_Model_EnemyAngry, is_act_model: true);
 	}
 
 	public virtual void OnActStep(int motion_id)
@@ -143,9 +170,9 @@ public class EnemyPacketSender : CharacterPacketSender
 		coop_Model_EnemyStep.motion_id = motion_id;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_EnemyStep, false, null, null);
+			SendBroadcast(coop_Model_EnemyStep);
 		}
-		StackActionHistory(coop_Model_EnemyStep, true);
+		StackActionHistory(coop_Model_EnemyStep, is_act_model: true);
 	}
 
 	public virtual void OnReviveRegion(int region_id)
@@ -155,7 +182,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			Coop_Model_EnemyReviveRegion coop_Model_EnemyReviveRegion = new Coop_Model_EnemyReviveRegion();
 			coop_Model_EnemyReviveRegion.id = base.owner.id;
 			coop_Model_EnemyReviveRegion.region_id = region_id;
-			SendBroadcast(coop_Model_EnemyReviveRegion, true, null, delegate(Coop_Model_Base send_model)
+			SendBroadcast(coop_Model_EnemyReviveRegion, promise: true, null, delegate(Coop_Model_Base send_model)
 			{
 				if (base.owner == null)
 				{
@@ -180,9 +207,9 @@ public class EnemyPacketSender : CharacterPacketSender
 		coop_Model_EnemyWarp.SetSyncPosition(base.owner);
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_EnemyWarp, false, null, null);
+			SendBroadcast(coop_Model_EnemyWarp);
 		}
-		StackActionHistory(coop_Model_EnemyWarp, false);
+		StackActionHistory(coop_Model_EnemyWarp, is_act_model: false);
 	}
 
 	public void TargetRandamShotEvent(List<Enemy.RandomShotInfo.TargetInfo> targets)
@@ -192,7 +219,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			Coop_Model_EnemyTargetShotEvent coop_Model_EnemyTargetShotEvent = new Coop_Model_EnemyTargetShotEvent();
 			coop_Model_EnemyTargetShotEvent.id = base.owner.id;
 			coop_Model_EnemyTargetShotEvent.targets = targets;
-			SendBroadcast(coop_Model_EnemyTargetShotEvent, false, null, null);
+			SendBroadcast(coop_Model_EnemyTargetShotEvent);
 		}
 	}
 
@@ -203,7 +230,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			Coop_Model_EnemyRandomShotEvent coop_Model_EnemyRandomShotEvent = new Coop_Model_EnemyRandomShotEvent();
 			coop_Model_EnemyRandomShotEvent.id = base.owner.id;
 			coop_Model_EnemyRandomShotEvent.points = points;
-			SendBroadcast(coop_Model_EnemyRandomShotEvent, false, null, null);
+			SendBroadcast(coop_Model_EnemyRandomShotEvent);
 		}
 	}
 
@@ -215,7 +242,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_EnemyReleasedGrabbedPlayer.id = base.owner.id;
 			coop_Model_EnemyReleasedGrabbedPlayer.angle = angle;
 			coop_Model_EnemyReleasedGrabbedPlayer.power = power;
-			SendBroadcast(coop_Model_EnemyReleasedGrabbedPlayer, false, null, null);
+			SendBroadcast(coop_Model_EnemyReleasedGrabbedPlayer);
 		}
 	}
 
@@ -228,7 +255,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_EnemyShot.atkName = atkName;
 			coop_Model_EnemyShot.posList = points;
 			coop_Model_EnemyShot.rotList = rots;
-			SendBroadcast(coop_Model_EnemyShot, false, null, null);
+			SendBroadcast(coop_Model_EnemyShot);
 		}
 	}
 
@@ -241,7 +268,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_CreateIceFloor.atkName = atkName;
 			coop_Model_CreateIceFloor.posList = points;
 			coop_Model_CreateIceFloor.rotList = rots;
-			SendBroadcast(coop_Model_CreateIceFloor, false, null, null);
+			SendBroadcast(coop_Model_CreateIceFloor);
 		}
 	}
 
@@ -254,7 +281,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_ActionMine.id = base.owner.id;
 			coop_Model_ActionMine.atkInfoName = atkInfoName;
 			coop_Model_ActionMine.randSeed = randSeed;
-			SendBroadcast(coop_Model_ActionMine, false, null, null);
+			SendBroadcast(coop_Model_ActionMine);
 		}
 	}
 
@@ -267,7 +294,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_ActionMine.id = base.owner.id;
 			coop_Model_ActionMine.objId = objId;
 			coop_Model_ActionMine.randSeed = randSeed;
-			SendBroadcast(coop_Model_ActionMine, false, null, null);
+			SendBroadcast(coop_Model_ActionMine);
 		}
 	}
 
@@ -279,7 +306,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_ActionMine.type = (isExplode ? 1 : 0);
 			coop_Model_ActionMine.id = base.owner.id;
 			coop_Model_ActionMine.objId = objId;
-			SendBroadcast(coop_Model_ActionMine, false, null, null);
+			SendBroadcast(coop_Model_ActionMine);
 		}
 	}
 
@@ -294,7 +321,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_ActionMine.objId = -1;
 			coop_Model_ActionMine.nodeName = nodeName;
 			coop_Model_ActionMine.randSeed = randSeed;
-			SendBroadcast(coop_Model_ActionMine, false, null, null);
+			SendBroadcast(coop_Model_ActionMine);
 		}
 	}
 
@@ -305,7 +332,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			Coop_Model_EnemyRecoverHp coop_Model_EnemyRecoverHp = new Coop_Model_EnemyRecoverHp();
 			coop_Model_EnemyRecoverHp.id = base.owner.id;
 			coop_Model_EnemyRecoverHp.value = recoverValue;
-			SendBroadcast(coop_Model_EnemyRecoverHp, false, null, null);
+			SendBroadcast(coop_Model_EnemyRecoverHp);
 		}
 	}
 
@@ -315,7 +342,7 @@ public class EnemyPacketSender : CharacterPacketSender
 		{
 			Coop_Model_EnemyTurnUp coop_Model_EnemyTurnUp = new Coop_Model_EnemyTurnUp();
 			coop_Model_EnemyTurnUp.id = base.owner.id;
-			SendBroadcast(coop_Model_EnemyTurnUp, false, null, null);
+			SendBroadcast(coop_Model_EnemyTurnUp);
 		}
 	}
 
@@ -326,7 +353,7 @@ public class EnemyPacketSender : CharacterPacketSender
 			Coop_Model_EnemySyncTarget coop_Model_EnemySyncTarget = new Coop_Model_EnemySyncTarget();
 			coop_Model_EnemySyncTarget.id = base.owner.id;
 			coop_Model_EnemySyncTarget.targetId = ((!(target != null)) ? (-1) : target.id);
-			SendBroadcast(coop_Model_EnemySyncTarget, false, null, null);
+			SendBroadcast(coop_Model_EnemySyncTarget);
 		}
 	}
 
@@ -339,7 +366,26 @@ public class EnemyPacketSender : CharacterPacketSender
 			coop_Model_EnemyRegionNodeActivate.regionIDs = regionIDs;
 			coop_Model_EnemyRegionNodeActivate.isRandom = isRandom;
 			coop_Model_EnemyRegionNodeActivate.randomSelectedID = randomSelectedID;
-			SendBroadcast(coop_Model_EnemyRegionNodeActivate, false, null, null);
+			SendBroadcast(coop_Model_EnemyRegionNodeActivate);
+		}
+	}
+
+	public void OnSummonAttack(int enemyId, int attackId, Vector3 pos, Vector3 rot, int targetId)
+	{
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		if (this.get_enabled() && base.owner.IsOriginal())
+		{
+			Coop_Model_EnemySummonAttack coop_Model_EnemySummonAttack = new Coop_Model_EnemySummonAttack();
+			coop_Model_EnemySummonAttack.id = base.owner.id;
+			coop_Model_EnemySummonAttack.enemyId = enemyId;
+			coop_Model_EnemySummonAttack.attackId = attackId;
+			coop_Model_EnemySummonAttack.summonPos = pos;
+			coop_Model_EnemySummonAttack.summonRot = rot;
+			coop_Model_EnemySummonAttack.targetId = targetId;
+			SendBroadcast(coop_Model_EnemySummonAttack);
 		}
 	}
 }

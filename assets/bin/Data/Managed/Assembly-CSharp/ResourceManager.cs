@@ -36,6 +36,8 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 		public bool internalMode;
 
+		public bool eventAsset;
+
 		public object progressObject;
 
 		public LoadComplateDelegate onComplate;
@@ -87,7 +89,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 		public void Setup()
 		{
-			if (category != RESOURCE_CATEGORY.MAX)
+			if (category == RESOURCE_CATEGORY.ASSETBUNDLEINFO)
+			{
+				packageName = "assetbundleinfo.dat";
+			}
+			else if (category != RESOURCE_CATEGORY.MAX)
 			{
 				packageName = category.ToAssetBundleName(packageName);
 			}
@@ -166,8 +172,6 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	public delegate void LoadErrorDelegate(LoadRequest request, ERROR_CODE error_node);
 
-	public const int DEFAULT_LOADING_ASSET_COUNT_LIMIT = 4;
-
 	public static bool isDownloadAssets = false;
 
 	public static bool enableLoadDirect = true;
@@ -194,7 +198,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private int _manifestVersion = -1;
 
-	private int _assetIndex = 4;
+	private int _assetIndex = 7;
 
 	private int _tableIndex = 1;
 
@@ -214,6 +218,8 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	public int stayCount;
 
+	public const int DEFAULT_LOADING_ASSET_COUNT_LIMIT = 4;
+
 	public bool isLoadingManifest
 	{
 		get;
@@ -226,7 +232,37 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		private set;
 	}
 
+	public string downloadEventUrl
+	{
+		get;
+		private set;
+	}
+
 	public AssetBundleManifest manifest
+	{
+		get;
+		private set;
+	}
+
+	public bool isLoadingSizeInfoManifest
+	{
+		get;
+		private set;
+	}
+
+	public string downloadSizeInfoURL
+	{
+		get;
+		private set;
+	}
+
+	public AssetBundleManifest sizeInfoManifest
+	{
+		get;
+		private set;
+	}
+
+	public AssetBundleManifest event_manifest
 	{
 		get;
 		private set;
@@ -305,7 +341,6 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	protected override void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		this.get_gameObject().AddComponent<GoGameResourceManager>();
 		Object.DontDestroyOnLoad(this);
@@ -344,11 +379,92 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 	{
 		int assetIndex = this.assetIndex;
 		downloadURL = $"{baseURL}assets/{assetIndex}/{GetPlatformName()}/";
+		downloadSizeInfoURL = $"{baseURL}assets/{assetIndex}/{GetPlatformName()}_info/";
+		downloadEventUrl = $"{baseURL}assets/event/{GetPlatformName()}/";
+	}
+
+	public void LoadSizeInfoManifest()
+	{
+		this.StartCoroutine(DoLoadSizeInfoManifest());
+	}
+
+	private IEnumerator DoLoadSizeInfoManifest()
+	{
+		while (isLoadingSizeInfoManifest || isLoading)
+		{
+			yield return null;
+		}
+		isLoadingSizeInfoManifest = true;
+		sizeInfoManifest = null;
+		if (isDownloadAssets)
+		{
+			UpdateDownloadURL();
+			string url = $"{downloadSizeInfoURL}{GetPlatformName()}_info";
+			int retry_count = 0;
+			Error error_code;
+			do
+			{
+				error_code = Error.None;
+				string www_url = url;
+				WWW _www = new WWW(www_url);
+				yield return _www;
+				string www_error = _www.get_error();
+				if (!string.IsNullOrEmpty(www_error))
+				{
+					error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+				}
+				else if (_www.get_assetBundle() != null)
+				{
+					sizeInfoManifest = _www.get_assetBundle().LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+					_www.get_assetBundle().Unload(false);
+				}
+				else
+				{
+					error_code = Error.AssetLoadFailed;
+					Log.Error(LOG.RESOURCE, _www.get_text());
+				}
+				_www.Dispose();
+				if (error_code == Error.None)
+				{
+					continue;
+				}
+				retry_count++;
+				if (retry_count >= 3)
+				{
+					Log.Error(LOG.RESOURCE, www_error);
+					int query_result = 0;
+					if (onDownloadErrorQuery != null)
+					{
+						while (onDownloadErrorQuery != null)
+						{
+							query_result = onDownloadErrorQuery(arg1: true, error_code);
+							if (query_result == 0)
+							{
+								break;
+							}
+							yield return null;
+						}
+						while (query_result == 0 && onDownloadErrorQuery != null)
+						{
+							query_result = onDownloadErrorQuery(arg1: false, error_code);
+							yield return null;
+						}
+						if (query_result == -1)
+						{
+							yield break;
+						}
+					}
+					retry_count = 0;
+				}
+				yield return (object)new WaitForSeconds(1f);
+			}
+			while (error_code != 0);
+		}
+		isLoadingSizeInfoManifest = false;
 	}
 
 	public void LoadManifest()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoLoadManifest());
 	}
 
@@ -356,7 +472,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 	{
 		while (isLoadingManifest || isLoading)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		isLoadingManifest = true;
 		manifest = null;
@@ -371,7 +487,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				error_code = Error.None;
 				string www_url = url;
 				WWW _www = new WWW(www_url);
-				yield return (object)_www;
+				yield return _www;
 				string www_error = _www.get_error();
 				if (!string.IsNullOrEmpty(www_error))
 				{
@@ -388,38 +504,108 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 					Log.Error(LOG.RESOURCE, _www.get_text());
 				}
 				_www.Dispose();
-				if (error_code != 0)
+				if (error_code == Error.None)
 				{
-					retry_count++;
-					if (retry_count >= 3)
-					{
-						Log.Error(LOG.RESOURCE, www_error);
-						int query_result = 0;
-						if (onDownloadErrorQuery != null)
-						{
-							while (onDownloadErrorQuery != null)
-							{
-								query_result = onDownloadErrorQuery(true, error_code);
-								if (query_result == 0)
-								{
-									break;
-								}
-								yield return (object)null;
-							}
-							while (query_result == 0 && onDownloadErrorQuery != null)
-							{
-								query_result = onDownloadErrorQuery(false, error_code);
-								yield return (object)null;
-							}
-							if (query_result == -1)
-							{
-								yield break;
-							}
-						}
-						retry_count = 0;
-					}
-					yield return (object)new WaitForSeconds(1f);
+					continue;
 				}
+				retry_count++;
+				if (retry_count >= 3)
+				{
+					Log.Error(LOG.RESOURCE, www_error);
+					int query_result = 0;
+					if (onDownloadErrorQuery != null)
+					{
+						while (onDownloadErrorQuery != null)
+						{
+							query_result = onDownloadErrorQuery(arg1: true, error_code);
+							if (query_result == 0)
+							{
+								break;
+							}
+							yield return null;
+						}
+						while (query_result == 0 && onDownloadErrorQuery != null)
+						{
+							query_result = onDownloadErrorQuery(arg1: false, error_code);
+							yield return null;
+						}
+						if (query_result == -1)
+						{
+							yield break;
+						}
+					}
+					retry_count = 0;
+				}
+				yield return (object)new WaitForSeconds(1f);
+			}
+			while (error_code != 0);
+		}
+		yield return this.StartCoroutine(DoLoadEventManifest());
+	}
+
+	private IEnumerator DoLoadEventManifest()
+	{
+		event_manifest = null;
+		if (isDownloadAssets)
+		{
+			string url = $"{downloadEventUrl}{GetPlatformName()}_v{manifestVersion}";
+			int retry_count = 0;
+			Error error_code;
+			do
+			{
+				error_code = Error.None;
+				string www_url = url;
+				WWW _www = new WWW(www_url);
+				yield return _www;
+				string www_error = _www.get_error();
+				if (!string.IsNullOrEmpty(www_error))
+				{
+					error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+				}
+				else if (_www.get_assetBundle() != null)
+				{
+					event_manifest = _www.get_assetBundle().LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+					_www.get_assetBundle().Unload(false);
+				}
+				else
+				{
+					error_code = Error.AssetLoadFailed;
+					Log.Error(LOG.RESOURCE, _www.get_text());
+				}
+				_www.Dispose();
+				if (error_code == Error.None)
+				{
+					continue;
+				}
+				retry_count++;
+				if (retry_count >= 3)
+				{
+					Log.Error(LOG.RESOURCE, www_error);
+					int query_result = 0;
+					if (onDownloadErrorQuery != null)
+					{
+						while (onDownloadErrorQuery != null)
+						{
+							query_result = onDownloadErrorQuery(arg1: true, error_code);
+							if (query_result == 0)
+							{
+								break;
+							}
+							yield return null;
+						}
+						while (query_result == 0 && onDownloadErrorQuery != null)
+						{
+							query_result = onDownloadErrorQuery(arg1: false, error_code);
+							yield return null;
+						}
+						if (query_result == -1)
+						{
+							yield break;
+						}
+					}
+					retry_count = 0;
+				}
+				yield return (object)new WaitForSeconds(1f);
 			}
 			while (error_code != 0);
 		}
@@ -435,7 +621,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		CancelAll();
 		loadRequests.Clear();
 		this.StopAllCoroutines();
-		cache.ClearObjectCaches(true);
+		cache.ClearObjectCaches(clearPreloaded: true);
 		cache.ClearPackageCaches();
 		cache.ClearSystemPackageCaches();
 		cache.ClearSENameDictionary();
@@ -444,6 +630,24 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		downloadList.Clear();
 		m_cacheABDependencies.Clear();
 		isDownloadError = false;
+	}
+
+	public void Load(bool isEventAsset, object master, RESOURCE_CATEGORY category, string resource_name, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
+	{
+		LoadRequest loadRequest = new LoadRequest();
+		loadRequest.master = master;
+		loadRequest.category = category;
+		loadRequest.packageName = resource_name;
+		loadRequest.resourceNames = new string[1]
+		{
+			resource_name
+		};
+		loadRequest.onComplate = complate_func;
+		loadRequest.onError = error_func;
+		loadRequest.cachePackage = cache_package;
+		loadRequest.userData = userData;
+		loadRequest.eventAsset = isEventAsset;
+		Load(loadRequest);
 	}
 
 	public void Load(object master, RESOURCE_CATEGORY category, string resource_name, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
@@ -463,6 +667,21 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		Load(loadRequest);
 	}
 
+	public void Load(bool isEventAsset, object master, RESOURCE_CATEGORY category, string package_name, string[] resource_names, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
+	{
+		LoadRequest loadRequest = new LoadRequest();
+		loadRequest.master = master;
+		loadRequest.category = category;
+		loadRequest.packageName = package_name;
+		loadRequest.resourceNames = resource_names;
+		loadRequest.onComplate = complate_func;
+		loadRequest.onError = error_func;
+		loadRequest.cachePackage = cache_package;
+		loadRequest.userData = userData;
+		loadRequest.eventAsset = isEventAsset;
+		Load(loadRequest);
+	}
+
 	public void Load(object master, RESOURCE_CATEGORY category, string package_name, string[] resource_names, LoadComplateDelegate complate_func, LoadErrorDelegate error_func, bool cache_package = false, object userData = null)
 	{
 		LoadRequest loadRequest = new LoadRequest();
@@ -479,8 +698,12 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private void Load(LoadRequest request)
 	{
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		request.enableCache = enableCache;
 		request.downloadOnly = downloadOnly;
 		request.internalMode = internalMode;
@@ -489,12 +712,31 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 			request.internalMode = false;
 		}
 		List<LoadRequest> list = null;
-		if ((!request.internalMode || request.downloadOnly) && isDownloadAssets && manifest != null)
+		AssetBundleManifest val = manifest;
+		if (request.category == RESOURCE_CATEGORY.ASSETBUNDLEINFO)
+		{
+			request.internalMode = false;
+			request.downloadOnly = false;
+			val = sizeInfoManifest;
+		}
+		if ((!request.internalMode || request.downloadOnly) && isDownloadAssets && val != null)
 		{
 			request.Setup();
-			if (request.category != RESOURCE_CATEGORY.UI)
+			if (request.category == RESOURCE_CATEGORY.ASSETBUNDLEINFO)
 			{
-				request.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(request.packageName));
+				request.hash = sizeInfoManifest.GetAssetBundleHash(request.packageName);
+			}
+			else if (request.category != RESOURCE_CATEGORY.UI)
+			{
+				if (request.eventAsset)
+				{
+					Debug.Log((object)("Check hash: " + request.packageName));
+					request.hash = event_manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(request.packageName));
+				}
+				else
+				{
+					request.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(request.packageName));
+				}
 				list = GetManifestDependencyRequests(request);
 			}
 			else
@@ -537,37 +779,39 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		for (int count = loadRequests.Count; k < count; k++)
 		{
 			LoadRequest loadRequest2 = loadRequests[k];
-			if ((loadRequest2.master != null || loadRequest2.sameRequests != null) && !(loadRequest2.packageName != request.packageName))
+			if ((loadRequest2.master == null && loadRequest2.sameRequests == null) || loadRequest2.packageName != request.packageName)
 			{
-				if (loadRequest2.category == request.category)
-				{
-					if (loadRequest2.resourceNames != null && request.resourceNames != null)
-					{
-						if (loadRequest2.resourceNames.Length != request.resourceNames.Length)
-						{
-							loadRequest = loadRequest2;
-							continue;
-						}
-						int l = 0;
-						int num;
-						for (num = loadRequest2.resourceNames.Length; l < num && !(loadRequest2.resourceNames[l] != request.resourceNames[l]); l++)
-						{
-						}
-						if (l != num)
-						{
-							loadRequest = loadRequest2;
-							continue;
-						}
-					}
-					if (loadRequest2.sameRequests == null)
-					{
-						loadRequest2.sameRequests = new List<LoadRequest>();
-					}
-					loadRequest2.sameRequests.Add(request);
-					return;
-				}
-				loadRequest = loadRequest2;
+				continue;
 			}
+			if (loadRequest2.category != request.category)
+			{
+				loadRequest = loadRequest2;
+				continue;
+			}
+			if (loadRequest2.resourceNames != null && request.resourceNames != null)
+			{
+				if (loadRequest2.resourceNames.Length != request.resourceNames.Length)
+				{
+					loadRequest = loadRequest2;
+					continue;
+				}
+				int l = 0;
+				int num;
+				for (num = loadRequest2.resourceNames.Length; l < num && !(loadRequest2.resourceNames[l] != request.resourceNames[l]); l++)
+				{
+				}
+				if (l != num)
+				{
+					loadRequest = loadRequest2;
+					continue;
+				}
+			}
+			if (loadRequest2.sameRequests == null)
+			{
+				loadRequest2.sameRequests = new List<LoadRequest>();
+			}
+			loadRequest2.sameRequests.Add(request);
+			return;
 		}
 		if (loadRequest != null)
 		{
@@ -584,8 +828,6 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private UIDependency GetUIDependency(LoadRequest request)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
 		string str = Path.GetFileNameWithoutExtension(request.packageName).ToLower();
 		TextAsset val = Resources.Load("InternalUI/Deps/" + str) as TextAsset;
 		if (val != null)
@@ -615,51 +857,52 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		for (int num = array.Length; i < num; i++)
 		{
 			string bundleNameWithoutVariant = MonoBehaviourSingleton<GoGameResourceManager>.I.GetBundleNameWithoutVariant(array[i]);
-			if (!(bundleNameWithoutVariant == "shader" + GoGameResourceManager.GetDefaultAssetBundleExtension()) && !(bundleNameWithoutVariant == "ui_font" + GoGameResourceManager.GetDefaultAssetBundleExtension()) && cache.GetCachedPackage(bundleNameWithoutVariant) == null)
+			if (bundleNameWithoutVariant == "shader" + GoGameResourceManager.GetDefaultAssetBundleExtension() || bundleNameWithoutVariant == "ui_font" + GoGameResourceManager.GetDefaultAssetBundleExtension() || cache.GetCachedPackage(bundleNameWithoutVariant) != null)
 			{
-				if (list == null)
-				{
-					list = new List<LoadRequest>();
-				}
-				LoadRequest loadRequest = null;
-				int j = 0;
-				for (int count = loadRequests.Count; j < count; j++)
-				{
-					if (loadRequests[j].packageName == bundleNameWithoutVariant)
-					{
-						loadRequest = loadRequests[j];
-						break;
-					}
-				}
-				if (loadRequest == null)
-				{
-					loadRequest = new LoadRequest();
-					loadRequest.master = request.master;
-					loadRequest.category = RESOURCE_CATEGORY.MAX;
-					loadRequest.packageName = array[i];
-					loadRequest.resourceNames = null;
-					loadRequest.onComplate = null;
-					loadRequest.onError = null;
-					loadRequest.cachePackage = true;
-					loadRequest.userData = null;
-					loadRequest.enableCache = true;
-					loadRequest.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(bundleNameWithoutVariant));
-					loadRequest.downloadOnly = downloadOnly;
-				}
-				else
-				{
-					loadRequest.cachePackage = true;
-				}
-				list.Add(loadRequest);
+				continue;
 			}
+			if (list == null)
+			{
+				list = new List<LoadRequest>();
+			}
+			LoadRequest loadRequest = null;
+			int j = 0;
+			for (int count = loadRequests.Count; j < count; j++)
+			{
+				if (loadRequests[j].packageName == bundleNameWithoutVariant)
+				{
+					loadRequest = loadRequests[j];
+					break;
+				}
+			}
+			if (loadRequest == null)
+			{
+				loadRequest = new LoadRequest();
+				loadRequest.master = request.master;
+				loadRequest.category = RESOURCE_CATEGORY.MAX;
+				loadRequest.packageName = array[i];
+				loadRequest.resourceNames = null;
+				loadRequest.onComplate = null;
+				loadRequest.onError = null;
+				loadRequest.cachePackage = true;
+				loadRequest.userData = null;
+				loadRequest.enableCache = true;
+				loadRequest.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(bundleNameWithoutVariant));
+				loadRequest.downloadOnly = downloadOnly;
+			}
+			else
+			{
+				loadRequest.cachePackage = true;
+			}
+			list.Add(loadRequest);
 		}
 		return list;
 	}
 
 	private List<LoadRequest> GetUIDependencyRequests(LoadRequest request, UIDependency dep)
 	{
+		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
 		List<LoadRequest> list = null;
 		for (int i = 0; i < dep.atlasPaths.Length; i++)
 		{
@@ -671,61 +914,57 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 			if (cachedPackage != null)
 			{
 				LinkAtlas(cachedPackage, atlasPath, resourceName);
+				continue;
 			}
-			else
+			LoadRequest loadRequest = null;
+			int j = 0;
+			for (int count = loadRequests.Count; j < count; j++)
 			{
-				LoadRequest loadRequest = null;
-				int j = 0;
-				for (int count = loadRequests.Count; j < count; j++)
+				if (loadRequests[j].packageName == text)
 				{
-					if (loadRequests[j].packageName == text)
-					{
-						loadRequest = loadRequests[j];
-						break;
-					}
+					loadRequest = loadRequests[j];
+					break;
 				}
-				if (loadRequest == null)
-				{
-					loadRequest = new LoadRequest();
-					loadRequest.master = request.master;
-					loadRequest.category = RESOURCE_CATEGORY.UI_ATLAS;
-					loadRequest.packageName = text;
-					loadRequest.resourceNames = new string[1]
-					{
-						resourceName
-					};
-					loadRequest.onComplate = null;
-					if (!request.downloadOnly)
-					{
-						loadRequest.onAtlasComplete = delegate(LoadRequest req, ResourceObject[] objs)
-						{
-							if (objs != null && objs.Length >= 1)
-							{
-								LinkAtlas(objs[0].package, atlasPath, resourceName);
-							}
-						};
-					}
-					loadRequest.onError = null;
-					loadRequest.cachePackage = true;
-					loadRequest.userData = null;
-					loadRequest.enableCache = true;
-					loadRequest.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(text));
-					loadRequest.downloadOnly = downloadOnly;
-				}
-				if (list == null)
-				{
-					list = new List<LoadRequest>();
-				}
-				list.Add(loadRequest);
 			}
+			if (loadRequest == null)
+			{
+				loadRequest = new LoadRequest();
+				loadRequest.master = request.master;
+				loadRequest.category = RESOURCE_CATEGORY.UI_ATLAS;
+				loadRequest.packageName = text;
+				loadRequest.resourceNames = new string[1]
+				{
+					resourceName
+				};
+				loadRequest.onComplate = null;
+				if (!request.downloadOnly)
+				{
+					loadRequest.onAtlasComplete = delegate(LoadRequest req, ResourceObject[] objs)
+					{
+						if (objs != null && objs.Length >= 1)
+						{
+							LinkAtlas(objs[0].package, atlasPath, resourceName);
+						}
+					};
+				}
+				loadRequest.onError = null;
+				loadRequest.cachePackage = true;
+				loadRequest.userData = null;
+				loadRequest.enableCache = true;
+				loadRequest.hash = manifest.GetAssetBundleHash(MonoBehaviourSingleton<GoGameResourceManager>.I.GetFullBundleName(text));
+				loadRequest.downloadOnly = downloadOnly;
+			}
+			if (list == null)
+			{
+				list = new List<LoadRequest>();
+			}
+			list.Add(loadRequest);
 		}
 		return list;
 	}
 
 	private void LinkAtlas(PackageObject package, string atlasPath, string resourceName)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
 		GameObject val = Resources.Load(atlasPath) as GameObject;
 		UIAtlas uIAtlas = package.hostAtlas = val.GetComponent<UIAtlas>();
 		AssetBundle val2 = package.obj as AssetBundle;
@@ -738,7 +977,6 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private void AddRequest(LoadRequest request)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		loadRequests.Add(request);
 		if (onAddRequest != null)
 		{
@@ -781,14 +1019,14 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 					BreakRequest(ref request);
 					yield break;
 				}
-				yield return (object)null;
+				yield return null;
 			}
 			stayCount--;
 		}
 		if (request.dependencyRequests != null)
 		{
-			int k = 0;
-			int l = request.dependencyRequests.Count;
+			int j = 0;
+			int k = request.dependencyRequests.Count;
 			while (true)
 			{
 				if (!request.IsValid())
@@ -797,11 +1035,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 					yield break;
 				}
 				bool wait = false;
-				LoadRequest dependency_request = request.dependencyRequests[k];
-				int m = 0;
-				for (int n = loadRequests.Count; m < n; m++)
+				LoadRequest dependency_request = request.dependencyRequests[j];
+				int num = 0;
+				for (int count = loadRequests.Count; num < count; num++)
 				{
-					if (loadRequests[m] == dependency_request)
+					if (loadRequests[num] == dependency_request)
 					{
 						wait = true;
 						break;
@@ -809,15 +1047,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				}
 				if (wait)
 				{
-					yield return (object)null;
+					yield return null;
+					continue;
 				}
-				else
+				j++;
+				if (j == k)
 				{
-					k++;
-					if (k == l)
-					{
-						break;
-					}
+					break;
 				}
 			}
 		}
@@ -826,7 +1062,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		{
 			while (isDownloadError && !request.internalMode)
 			{
-				yield return (object)null;
+				yield return null;
 				if (!request.IsValid())
 				{
 					BreakRequest(ref request);
@@ -864,20 +1100,20 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		}
 		if (loaded_num < load_num && cache.objectCaches != null && cache.systemCaches != null && object_cache_category != null)
 		{
-			int i2 = 0;
-			for (int n2 = load_num; i2 < n2; i2++)
+			int num2 = 0;
+			for (int num3 = load_num; num2 < num3; num2++)
 			{
-				if (load_objects[i2] == null)
+				if (load_objects[num2] == null)
 				{
-					string res_name = request.resourceNames[i2];
-					load_objects[i2] = object_cache_category.Get(res_name);
-					if (load_objects[i2] == null)
+					string res_name = request.resourceNames[num2];
+					load_objects[num2] = object_cache_category.Get(res_name);
+					if (load_objects[num2] == null)
 					{
-						load_objects[i2] = cache.systemCaches.Find((ResourceObject o) => o.obj.get_name() == ((_003CDoLoad_003Ec__Iterator23D)/*Error near IL_04da: stateMachine*/)._003Cres_name_003E__19);
+						load_objects[num2] = cache.systemCaches.Find((ResourceObject o) => o.obj.get_name() == res_name);
 					}
-					if (load_objects[i2] != null)
+					if (load_objects[num2] != null)
 					{
-						use_object_caches[i2] = true;
+						use_object_caches[num2] = true;
 						loaded_num++;
 					}
 				}
@@ -885,8 +1121,8 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		}
 		if (loaded_num < load_num && !request.downloadOnly && load_package != null && asset_bundle != null)
 		{
-			int i8 = 0;
-			for (int n6 = load_num; i8 < n6; i8++)
+			int i2 = 0;
+			for (int n = load_num; i2 < n; i2++)
 			{
 				if (request.master == null && request.sameRequests == null)
 				{
@@ -896,41 +1132,43 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				{
 					break;
 				}
-				if (load_objects[i8] == null)
+				if (load_objects[i2] != null)
 				{
-					if (onAsyncLoadQuery())
+					continue;
+				}
+				if (onAsyncLoadQuery())
+				{
+					while (IsWaitAssetBundleLoadAsync())
 					{
-						while (IsWaitAssetBundleLoadAsync())
-						{
-							yield return (object)null;
-						}
-						loadingAssetCountFromAssetBundle++;
-						AssetBundleRequest asset_bundle_load_asset2 = asset_bundle.LoadAssetAsync(request.resourceNames[i8]);
-						while (!asset_bundle_load_asset2.get_isDone())
-						{
-							yield return (object)null;
-						}
-						load_objects[i8] = ResourceObject.Get(request.category, request.resourceNames[i8], asset_bundle_load_asset2.get_asset());
-						loadingAssetCountFromAssetBundle--;
+						yield return null;
 					}
-					else
+					loadingAssetCountFromAssetBundle++;
+					AssetBundleRequest asset_bundle_load_asset2 = asset_bundle.LoadAssetAsync(request.resourceNames[i2]);
+					while (!asset_bundle_load_asset2.get_isDone())
 					{
-						load_objects[i8] = ResourceObject.Get(request.category, request.resourceNames[i8], asset_bundle.LoadAsset(request.resourceNames[i8]));
+						yield return null;
 					}
-					if (load_objects[i8] != null)
-					{
-						loaded_num++;
-					}
+					load_objects[i2] = ResourceObject.Get(request.category, request.resourceNames[i2], asset_bundle_load_asset2.get_asset());
+					loadingAssetCountFromAssetBundle--;
+				}
+				else
+				{
+					load_objects[i2] = ResourceObject.Get(request.category, request.resourceNames[i2], asset_bundle.LoadAsset(request.resourceNames[i2]));
+				}
+				if (load_objects[i2] != null)
+				{
+					loaded_num++;
 				}
 			}
 		}
 		if (load_package == null && (loaded_num < load_num || package_only))
 		{
-			if (request.category == RESOURCE_CATEGORY.MAX || (isDownloadAssets && manifest != null && (!request.internalMode || request.downloadOnly)))
+			bool isExistManifest = (request.category == RESOURCE_CATEGORY.ASSETBUNDLEINFO) ? (sizeInfoManifest != null) : (manifest != null);
+			if (request.category == RESOURCE_CATEGORY.MAX || (isDownloadAssets && isExistManifest && (!request.internalMode || request.downloadOnly)))
 			{
 				while (downloadList.size >= MAX_DL_COUNT || CheckPackageDownloading(request))
 				{
-					yield return (object)null;
+					yield return null;
 					if (!request.IsValid())
 					{
 						BreakRequest(ref request);
@@ -957,89 +1195,81 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 							use_package_cache = true;
 						}
 					}
-					if (load_package != null || asset_bundle == null)
+					if (load_package == null && !(asset_bundle == null))
 					{
-						while (isDownloadError && !request.internalMode)
+						continue;
+					}
+					while (isDownloadError && !request.internalMode)
+					{
+						yield return null;
+						if (!request.IsValid())
 						{
-							yield return (object)null;
+							BreakRequest(ref request);
+							yield break;
+						}
+					}
+					RESOURCE_CATEGORY? category = MonoBehaviourSingleton<GoGameResourceManager>.I.GetCategory(request.packageName);
+					string url;
+					if (request.eventAsset)
+					{
+						url = downloadEventUrl + request.packageName + "?v=" + ((object)request.hash).ToString();
+					}
+					else
+					{
+						string variantName = MonoBehaviourSingleton<GoGameResourceManager>.I.GetVariantName(category.HasValue ? category.Value : RESOURCE_CATEGORY.MAX);
+						url = ((!request.packageName.Contains("-sd")) ? (downloadURL + request.packageName + variantName + "?v=" + ((object)request.hash).ToString()) : (downloadURL + request.packageName + "?v=" + ((object)request.hash).ToString()));
+					}
+					if (request.category == RESOURCE_CATEGORY.ASSETBUNDLEINFO)
+					{
+						url = downloadSizeInfoURL + request.packageName + "?v=" + ((object)request.hash).ToString();
+					}
+					string filename = Path.GetFileName(request.packageName);
+					string www_url = url;
+					if (!request.IsValid())
+					{
+						continue;
+					}
+					bool is_cached = IsVersionCached(filename, request.hash);
+					WWW www = null;
+					Error error_code = Error.None;
+					AssetBundle loaded_assetBundle = null;
+					if (!is_cached)
+					{
+						www = new WWW(www_url);
+						request.progressObject = www;
+						float timeOut = WWW_TIME_OUT;
+						float currentProgress = www.get_progress();
+						while (!www.get_isDone() && timeOut > 0f)
+						{
+							yield return null;
+							if (currentProgress == www.get_progress())
+							{
+								timeOut -= Time.get_deltaTime();
+							}
+							else
+							{
+								currentProgress = www.get_progress();
+								timeOut = WWW_TIME_OUT;
+							}
 							if (!request.IsValid())
 							{
+								www.Dispose();
 								BreakRequest(ref request);
 								yield break;
 							}
 						}
-						RESOURCE_CATEGORY? category = MonoBehaviourSingleton<GoGameResourceManager>.I.GetCategory(request.packageName);
-						string tail = MonoBehaviourSingleton<GoGameResourceManager>.I.GetVariantName(category.HasValue ? category.Value : RESOURCE_CATEGORY.MAX);
-						string url = (!request.packageName.Contains("-sd")) ? (downloadURL + request.packageName + tail + "?v=" + request.hash.ToString()) : (downloadURL + request.packageName + "?v=" + request.hash.ToString());
-						string filename = Path.GetFileName(request.packageName);
-						string www_url = url;
-						if (request.IsValid())
+						if (!www.get_isDone())
 						{
-							bool is_cached = IsVersionCached(filename, request.hash);
-							WWW www = null;
-							Error error_code = Error.None;
-							AssetBundle loaded_assetBundle = null;
-							if (!is_cached)
+							error_code = Error.AssetLoadFailed;
+						}
+						else if (www.get_error() != null)
+						{
+							error_code = ((!www.get_error().Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+						}
+						else
+						{
+							if (!request.downloadOnly)
 							{
-								www = (request.progressObject = (object)new WWW(www_url));
-								float timeOut = WWW_TIME_OUT;
-								float currentProgress = www.get_progress();
-								while (!www.get_isDone() && timeOut > 0f)
-								{
-									yield return (object)null;
-									if (currentProgress == www.get_progress())
-									{
-										timeOut -= Time.get_deltaTime();
-									}
-									else
-									{
-										currentProgress = www.get_progress();
-										timeOut = WWW_TIME_OUT;
-									}
-									if (!request.IsValid())
-									{
-										www.Dispose();
-										BreakRequest(ref request);
-										yield break;
-									}
-								}
-								if (!www.get_isDone())
-								{
-									error_code = Error.AssetLoadFailed;
-								}
-								else if (www.get_error() != null)
-								{
-									error_code = ((!www.get_error().Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
-								}
-								else
-								{
-									if (!request.downloadOnly)
-									{
-										CrashlyticsReporter.SetLoadingBundle(url);
-										loaded_assetBundle = cache.PopDelayUnloadAssetBundle(request.packageName);
-										if (loaded_assetBundle == null)
-										{
-											load_package = cache.GetCachedPackage(request.packageName);
-											if (load_package != null)
-											{
-												loaded_assetBundle = (load_package.obj as AssetBundle);
-												asset_bundle = loaded_assetBundle;
-												use_package_cache = true;
-												use_package_cache_delay = true;
-											}
-										}
-										if (loaded_assetBundle == null)
-										{
-											loaded_assetBundle = www.get_assetBundle();
-										}
-										CrashlyticsReporter.SetLoadingBundle(string.Empty);
-									}
-									error_code = SaveAssetBundle(filename, request.hash, www.get_bytes());
-								}
-							}
-							else if (!request.downloadOnly)
-							{
-								string path = GetCachePath(filename, request.hash);
 								CrashlyticsReporter.SetLoadingBundle(url);
 								loaded_assetBundle = cache.PopDelayUnloadAssetBundle(request.packageName);
 								if (loaded_assetBundle == null)
@@ -1055,152 +1285,173 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 								}
 								if (loaded_assetBundle == null)
 								{
-									AssetBundleCreateRequest req = AssetBundle.LoadFromFileAsync(path);
-									yield return (object)req;
-									loaded_assetBundle = req.get_assetBundle();
+									loaded_assetBundle = www.get_assetBundle();
 								}
 								CrashlyticsReporter.SetLoadingBundle(string.Empty);
-								if (loaded_assetBundle == null)
-								{
-									Log.Warning(LOG.RESOURCE, "cached file load failed: {0}", filename);
-									error_code = Error.AssetLoadFailed;
-									if (File.Exists(path))
-									{
-										File.Delete(path);
-									}
-								}
-								yield return (object)null;
 							}
-							if (request.progressObject != null)
+							error_code = SaveAssetBundle(filename, request.hash, www.get_bytes());
+						}
+					}
+					else if (!request.downloadOnly)
+					{
+						string path = GetCachePath(filename, request.hash);
+						CrashlyticsReporter.SetLoadingBundle(url);
+						loaded_assetBundle = cache.PopDelayUnloadAssetBundle(request.packageName);
+						if (loaded_assetBundle == null)
+						{
+							load_package = cache.GetCachedPackage(request.packageName);
+							if (load_package != null)
 							{
-								request.progressObject = PROGRESS_COMPLATE;
+								loaded_assetBundle = (load_package.obj as AssetBundle);
+								asset_bundle = loaded_assetBundle;
+								use_package_cache = true;
+								use_package_cache_delay = true;
 							}
-							while (isDownloadError && !request.internalMode)
+						}
+						if (loaded_assetBundle == null)
+						{
+							AssetBundleCreateRequest req = AssetBundle.LoadFromFileAsync(path);
+							yield return req;
+							loaded_assetBundle = req.get_assetBundle();
+						}
+						CrashlyticsReporter.SetLoadingBundle(string.Empty);
+						if (loaded_assetBundle == null)
+						{
+							Log.Warning(LOG.RESOURCE, "cached file load failed: {0}", filename);
+							error_code = Error.AssetLoadFailed;
+							if (File.Exists(path))
 							{
-								yield return (object)null;
-								if (!request.IsValid())
-								{
-									cache.AddDelayUnloadAssetBundle(request.packageName, ref loaded_assetBundle);
-									www.Dispose();
-									BreakRequest(ref request);
-									yield break;
-								}
+								File.Delete(path);
 							}
-							if (error_code == Error.None)
+						}
+						yield return null;
+					}
+					if (request.progressObject != null)
+					{
+						request.progressObject = PROGRESS_COMPLATE;
+					}
+					while (isDownloadError && !request.internalMode)
+					{
+						yield return null;
+						if (!request.IsValid())
+						{
+							cache.AddDelayUnloadAssetBundle(request.packageName, ref loaded_assetBundle);
+							www.Dispose();
+							BreakRequest(ref request);
+							yield break;
+						}
+					}
+					if (error_code == Error.None)
+					{
+						if (!request.downloadOnly && (request.cachePackage || !package_only || request.category == RESOURCE_CATEGORY.MAX))
+						{
+							load_package = PackageObject.Get(request.packageName, loaded_assetBundle);
+							asset_bundle = (load_package.obj as AssetBundle);
+						}
+						if (www != null)
+						{
+							www.Dispose();
+						}
+						if (!use_package_cache_delay)
+						{
+							use_package_cache = false;
+						}
+						continue;
+					}
+					load_package = cache.GetCachedPackage(request.packageName);
+					if (load_package != null)
+					{
+						asset_bundle = (load_package.obj as AssetBundle);
+						use_package_cache = true;
+					}
+					if (load_package != null || asset_bundle == null)
+					{
+						retry_count++;
+						if (autoRetry)
+						{
+							retry_count = 0;
+						}
+						if (retry_count < 3)
+						{
+							yield return (object)new WaitForSeconds(1f);
+							is_retry = true;
+						}
+						else
+						{
+							if (error_code == Error.AssetLoadFailed)
 							{
-								if (!request.downloadOnly && (request.cachePackage || !package_only || request.category == RESOURCE_CATEGORY.MAX))
-								{
-									load_package = PackageObject.Get(request.packageName, loaded_assetBundle);
-									asset_bundle = (load_package.obj as AssetBundle);
-								}
-								if (www != null)
-								{
-									www.Dispose();
-								}
-								if (!use_package_cache_delay)
-								{
-									use_package_cache = false;
-								}
+								Log.Error(LOG.RESOURCE, "{0}:{1}", error_code.ToString(), url);
 							}
 							else
 							{
-								load_package = cache.GetCachedPackage(request.packageName);
-								if (load_package != null)
+								Log.Error("{0}:{1}:{2}:{3}", error_code.ToString(), request.category, request.packageName, url);
+							}
+							if (isDownloadError)
+							{
+								while (isDownloadError)
 								{
-									asset_bundle = (load_package.obj as AssetBundle);
-									use_package_cache = true;
-								}
-								if (load_package != null || asset_bundle == null)
-								{
-									retry_count++;
-									if (autoRetry)
+									if (!request.IsValid())
 									{
-										retry_count = 0;
-									}
-									if (retry_count < 3)
-									{
-										yield return (object)new WaitForSeconds(1f);
-										is_retry = true;
-									}
-									else
-									{
-										if (error_code == Error.AssetLoadFailed)
-										{
-											Log.Error(LOG.RESOURCE, "{0}:{1}", error_code.ToString(), url);
-										}
-										else
-										{
-											Log.Error("{0}:{1}:{2}:{3}", error_code.ToString(), request.category, request.packageName, url);
-										}
-										if (isDownloadError)
-										{
-											while (isDownloadError)
-											{
-												if (!request.IsValid())
-												{
-													BreakRequest(ref request);
-													yield break;
-												}
-											}
-											retry_count = 0;
-											is_retry = true;
-										}
-										else
-										{
-											isDownloadError = true;
-											int query_result = 0;
-											if (request.IsValid() && onDownloadErrorQuery != null)
-											{
-												while (onDownloadErrorQuery != null)
-												{
-													query_result = onDownloadErrorQuery(true, error_code);
-													if (query_result == 0)
-													{
-														break;
-													}
-													yield return (object)null;
-												}
-												while (query_result == 0 && onDownloadErrorQuery != null)
-												{
-													query_result = onDownloadErrorQuery(false, error_code);
-													yield return (object)null;
-												}
-												if (query_result == -1)
-												{
-													cache.AddDelayUnloadAssetBundle(request.packageName, ref loaded_assetBundle);
-													BreakRequest(ref request);
-													yield break;
-												}
-											}
-											isDownloadError = false;
-											if (query_result != 1)
-											{
-												if (request.onError != null)
-												{
-													request.onError(request, ERROR_CODE.WWW_ERROR);
-												}
-											}
-											else
-											{
-												retry_count = 0;
-												is_retry = true;
-											}
-										}
+										BreakRequest(ref request);
+										yield break;
 									}
 								}
-								if (www != null)
+								retry_count = 0;
+								is_retry = true;
+							}
+							else
+							{
+								isDownloadError = true;
+								int query_result = 0;
+								if (request.IsValid() && onDownloadErrorQuery != null)
 								{
-									www.Dispose();
+									while (onDownloadErrorQuery != null)
+									{
+										query_result = onDownloadErrorQuery(arg1: true, error_code);
+										if (query_result == 0)
+										{
+											break;
+										}
+										yield return null;
+									}
+									while (query_result == 0 && onDownloadErrorQuery != null)
+									{
+										query_result = onDownloadErrorQuery(arg1: false, error_code);
+										yield return null;
+									}
+									if (query_result == -1)
+									{
+										cache.AddDelayUnloadAssetBundle(request.packageName, ref loaded_assetBundle);
+										BreakRequest(ref request);
+										yield break;
+									}
+								}
+								isDownloadError = false;
+								if (query_result != 1)
+								{
+									if (request.onError != null)
+									{
+										request.onError(request, ERROR_CODE.WWW_ERROR);
+									}
+								}
+								else
+								{
+									retry_count = 0;
+									is_retry = true;
 								}
 							}
 						}
+					}
+					if (www != null)
+					{
+						www.Dispose();
 					}
 				}
 				while (is_retry);
 				if (asset_bundle != null)
 				{
-					int i6 = 0;
-					for (int n5 = load_num; i6 < n5; i6++)
+					int m = 0;
+					for (int l = load_num; m < l; m++)
 					{
 						if (request.master == null && request.sameRequests == null)
 						{
@@ -1210,31 +1461,33 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						{
 							break;
 						}
-						if (load_objects[i6] == null)
+						if (load_objects[m] != null)
 						{
-							if (onAsyncLoadQuery())
+							continue;
+						}
+						if (onAsyncLoadQuery())
+						{
+							while (IsWaitAssetBundleLoadAsync())
 							{
-								while (IsWaitAssetBundleLoadAsync())
-								{
-									yield return (object)null;
-								}
-								loadingAssetCountFromAssetBundle++;
-								AssetBundleRequest asset_bundle_load_asset = asset_bundle.LoadAssetAsync(request.resourceNames[i6]);
-								while (!asset_bundle_load_asset.get_isDone())
-								{
-									yield return (object)null;
-								}
-								load_objects[i6] = ResourceObject.Get(request.category, request.resourceNames[i6], asset_bundle_load_asset.get_asset());
-								loadingAssetCountFromAssetBundle--;
+								yield return null;
 							}
-							else
+							loadingAssetCountFromAssetBundle++;
+							AssetBundleRequest asset_bundle_load_asset = asset_bundle.LoadAssetAsync(request.resourceNames[m]);
+							asset_bundle.AllAssetNames();
+							while (!asset_bundle_load_asset.get_isDone())
 							{
-								load_objects[i6] = ResourceObject.Get(request.category, request.resourceNames[i6], asset_bundle.LoadAsset(request.resourceNames[i6]));
+								yield return null;
 							}
-							if (load_objects[i6] != null)
-							{
-								loaded_num++;
-							}
+							load_objects[m] = ResourceObject.Get(request.category, request.resourceNames[m], asset_bundle_load_asset.get_asset());
+							loadingAssetCountFromAssetBundle--;
+						}
+						else
+						{
+							load_objects[m] = ResourceObject.Get(request.category, request.resourceNames[m], asset_bundle.LoadAsset(request.resourceNames[m]));
+						}
+						if (load_objects[m] != null)
+						{
+							loaded_num++;
 						}
 					}
 				}
@@ -1266,74 +1519,76 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				}
 				if (request.category == RESOURCE_CATEGORY.PLAYER_HIGH_RESO_TEX)
 				{
-					string f3 = request.packageName.Substring(0, 3);
-					string f2 = request.packageName.Substring(3, 2);
-					if (!f3.Equals("WEP"))
+					string text = request.packageName.Substring(0, 3);
+					string text2 = request.packageName.Substring(3, 2);
+					if (!text.Equals("WEP"))
 					{
-						f2 = (int.Parse(f2) / 10 * 10).ToString("00");
+						text2 = (int.Parse(text2) / 10 * 10).ToString("00");
 					}
-					sub_path = f3 + "/" + f3 + f2 + "/" + sub_path;
+					sub_path = text + "/" + text + text2 + "/" + sub_path;
 				}
-				for (int i7 = 0; i7 < load_num; i7++)
+				int i;
+				for (i = 0; i < load_num; i++)
 				{
-					if (load_objects[i7] == null)
+					if (load_objects[i] != null)
 					{
-						if (!request.internalMode && request.category != RESOURCE_CATEGORY.UI)
+						continue;
+					}
+					if (!request.internalMode && request.category != RESOURCE_CATEGORY.UI)
+					{
+						bool save_enableLoadDirect = enableLoadDirect;
+						enableLoadDirect = true;
+						Coroutine c = this.StartCoroutine(LoadDirect(request, sub_path + request.resourceNames[i], delegate(Object o)
 						{
-							bool save_enableLoadDirect = enableLoadDirect;
-							enableLoadDirect = true;
-							Coroutine c = this.StartCoroutine(LoadDirect(request, sub_path + request.resourceNames[i7], delegate(Object o)
+							if (o != null)
 							{
-								if (o != null)
-								{
-									((_003CDoLoad_003Ec__Iterator23D)/*Error near IL_177d: stateMachine*/)._003Cload_objects_003E__9[((_003CDoLoad_003Ec__Iterator23D)/*Error near IL_177d: stateMachine*/)._003Ci_003E__45] = ResourceObject.Get(((_003CDoLoad_003Ec__Iterator23D)/*Error near IL_177d: stateMachine*/).request.category, ((_003CDoLoad_003Ec__Iterator23D)/*Error near IL_177d: stateMachine*/).request.resourceNames[((_003CDoLoad_003Ec__Iterator23D)/*Error near IL_177d: stateMachine*/)._003Ci_003E__45], o);
-								}
-							}));
-							enableLoadDirect = save_enableLoadDirect;
-							yield return (object)c;
-						}
-						else if (request.category == RESOURCE_CATEGORY.UI)
+								load_objects[i] = ResourceObject.Get(request.category, request.resourceNames[i], o);
+							}
+						}));
+						enableLoadDirect = save_enableLoadDirect;
+						yield return c;
+					}
+					else if (request.category == RESOURCE_CATEGORY.UI)
+					{
+						string path3 = request.uiDep.path;
+						if (onAsyncLoadQuery() || request.downloadOnly)
 						{
-							string path3 = request.uiDep.path;
-							if (onAsyncLoadQuery() || request.downloadOnly)
+							ResourceRequest req3 = Resources.LoadAsync(path3);
+							while (!req3.get_isDone())
 							{
-								ResourceRequest req3 = Resources.LoadAsync(path3);
-								while (!req3.get_isDone())
-								{
-									yield return (object)null;
-								}
-								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], req3.get_asset());
+								yield return null;
 							}
-							else
-							{
-								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], Resources.Load(path3));
-							}
+							load_objects[i] = ResourceObject.Get(request.category, request.resourceNames[i], req3.get_asset());
 						}
 						else
 						{
-							string path2 = $"Internal/internal__{request.category.ToString()}__{request.resourceNames[i7]}";
-							if (onAsyncLoadQuery() || request.downloadOnly)
-							{
-								ResourceRequest req2 = Resources.LoadAsync(path2);
-								while (!req2.get_isDone())
-								{
-									yield return (object)null;
-								}
-								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], req2.get_asset());
-							}
-							else
-							{
-								load_objects[i7] = ResourceObject.Get(request.category, request.resourceNames[i7], Resources.Load(path2));
-							}
+							load_objects[i] = ResourceObject.Get(request.category, request.resourceNames[i], Resources.Load(path3));
 						}
-						if (request.master == null && request.sameRequests == null)
+					}
+					else
+					{
+						string path2 = $"Internal/internal__{request.category.ToString()}__{request.resourceNames[i]}";
+						if (onAsyncLoadQuery() || request.downloadOnly)
 						{
-							break;
+							ResourceRequest req2 = Resources.LoadAsync(path2);
+							while (!req2.get_isDone())
+							{
+								yield return null;
+							}
+							load_objects[i] = ResourceObject.Get(request.category, request.resourceNames[i], req2.get_asset());
 						}
-						if (load_objects[i7] != null)
+						else
 						{
-							loaded_num++;
+							load_objects[i] = ResourceObject.Get(request.category, request.resourceNames[i], Resources.Load(path2));
 						}
+					}
+					if (request.master == null && request.sameRequests == null)
+					{
+						break;
+					}
+					if (load_objects[i] != null)
+					{
+						loaded_num++;
 					}
 				}
 				if (!use_package_cache && request.cachePackage)
@@ -1349,10 +1604,10 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		}
 		if (request.sameRequests != null)
 		{
-			int i5 = 0;
-			for (int n4 = request.sameRequests.Count; i5 < n4; i5++)
+			int num4 = 0;
+			for (int count2 = request.sameRequests.Count; num4 < count2; num4++)
 			{
-				if (request.sameRequests[i5].master != null)
+				if (request.sameRequests[num4].master != null)
 				{
 					enable_request_count++;
 				}
@@ -1372,11 +1627,11 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 						cache.objectCaches[(int)request.category] = object_cache_category;
 					}
 				}
-				for (int i4 = 0; i4 < load_num; i4++)
+				for (int num5 = 0; num5 < load_num; num5++)
 				{
-					if (!use_object_caches[i4] && load_objects[i4] != null)
+					if (!use_object_caches[num5] && load_objects[num5] != null)
 					{
-						object_cache_category.Add(request.resourceNames[i4], load_objects[i4]);
+						object_cache_category.Add(request.resourceNames[num5], load_objects[num5]);
 					}
 				}
 			}
@@ -1387,25 +1642,25 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 			}
 			if (load_package != null && load_objects != null)
 			{
-				int j3 = 0;
-				for (int m3 = load_objects.Length; j3 < m3; j3++)
+				int num6 = 0;
+				for (int num7 = load_objects.Length; num6 < num7; num6++)
 				{
-					if (load_objects[j3] != null)
+					if (load_objects[num6] != null)
 					{
 						load_package.refCount += enable_request_count;
-						load_objects[j3].package = load_package;
+						load_objects[num6].package = load_package;
 					}
 				}
 				if (dependency_packages != null)
 				{
-					int j2 = 0;
-					for (int m2 = dependency_packages.size; j2 < m2; j2++)
+					int num8 = 0;
+					for (int size = dependency_packages.size; num8 < size; num8++)
 					{
-						PackageObject pakobj = dependency_packages[j2];
-						if (pakobj != null)
+						PackageObject packageObject = dependency_packages[num8];
+						if (packageObject != null)
 						{
-							pakobj.refCount += enable_request_count;
-							load_package.linkPackages.Add(pakobj);
+							packageObject.refCount += enable_request_count;
+							load_package.linkPackages.Add(packageObject);
 						}
 					}
 				}
@@ -1433,17 +1688,17 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				}
 				if (request.sameRequests != null)
 				{
-					int i3 = 0;
-					for (int n3 = request.sameRequests.Count; i3 < n3; i3++)
+					int num9 = 0;
+					for (int count3 = request.sameRequests.Count; num9 < count3; num9++)
 					{
-						LoadRequest same_request2 = request.sameRequests[i3];
-						if (same_request2.onAtlasComplete != null && same_request2.category == RESOURCE_CATEGORY.UI_ATLAS)
+						LoadRequest loadRequest = request.sameRequests[num9];
+						if (loadRequest.onAtlasComplete != null && loadRequest.category == RESOURCE_CATEGORY.UI_ATLAS)
 						{
-							same_request2.onAtlasComplete(same_request2, load_objects);
+							loadRequest.onAtlasComplete(loadRequest, load_objects);
 						}
-						if (same_request2.master != null && same_request2.onComplate != null)
+						if (loadRequest.master != null && loadRequest.onComplate != null)
 						{
-							same_request2.onComplate(same_request2, load_objects);
+							loadRequest.onComplate(loadRequest, load_objects);
 						}
 					}
 				}
@@ -1456,13 +1711,13 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 				}
 				if (request.sameRequests != null)
 				{
-					int j = 0;
-					for (int i = request.sameRequests.Count; j < i; j++)
+					int num10 = 0;
+					for (int count4 = request.sameRequests.Count; num10 < count4; num10++)
 					{
-						LoadRequest same_request = request.sameRequests[j];
-						if (same_request.master != null && same_request.onError != null)
+						LoadRequest loadRequest2 = request.sameRequests[num10];
+						if (loadRequest2.master != null && loadRequest2.onError != null)
 						{
-							same_request.onError(same_request, ERROR_CODE.NOT_FOUND);
+							loadRequest2.onError(loadRequest2, ERROR_CODE.NOT_FOUND);
 						}
 					}
 				}
@@ -1572,23 +1827,24 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		for (int count = loadRequests.Count; i < count; i++)
 		{
 			LoadRequest loadRequest = loadRequests[i];
-			if (loadRequest.category == category && loadRequest.packageName == package_name)
+			if (loadRequest.category != category || !(loadRequest.packageName == package_name))
 			{
-				if (loadRequest.resourceNames == null && resource_names == null)
+				continue;
+			}
+			if (loadRequest.resourceNames == null && resource_names == null)
+			{
+				return true;
+			}
+			if (loadRequest.resourceNames.Length == resource_names.Length)
+			{
+				int j = 0;
+				int num;
+				for (num = loadRequest.resourceNames.Length; j < num && !(loadRequest.resourceNames[j] != resource_names[j]); j++)
+				{
+				}
+				if (j == num)
 				{
 					return true;
-				}
-				if (loadRequest.resourceNames.Length == resource_names.Length)
-				{
-					int j = 0;
-					int num;
-					for (num = loadRequest.resourceNames.Length; j < num && !(loadRequest.resourceNames[j] != resource_names[j]); j++)
-					{
-					}
-					if (j == num)
-					{
-						return true;
-					}
 				}
 			}
 		}
@@ -1602,7 +1858,7 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	public bool IsCached(string dependency)
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		if (manifest == null)
 		{
 			return false;
@@ -1646,20 +1902,20 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		return array;
 	}
 
-	private bool IsVersionCached(string filename, Hash128 hash)
+	public static bool IsVersionCached(string filename, Hash128 hash)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		string cachePath = GetCachePath(filename, hash);
 		return File.Exists(cachePath);
 	}
 
-	private string GetCachePath(string filename, Hash128 hash)
+	public static string GetCachePath(string filename, Hash128 hash)
 	{
 		string cacheDir = GetCacheDir(filename);
-		return Path.Combine(cacheDir, filename + "." + hash.ToString());
+		return Path.Combine(cacheDir, filename + "." + ((object)hash).ToString());
 	}
 
-	private string GetCacheDir(string filename)
+	public static string GetCacheDir(string filename)
 	{
 		string path = ((byte)(filename.GetHashCode() % 256)).ToString("X2");
 		return Path.Combine(cacheDir, path);
@@ -1667,36 +1923,36 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 
 	private Error SaveAssetBundle(string filename, Hash128 hash, byte[] bytes)
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		if (bytes.Length != 0)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		if (bytes.Length == 0)
 		{
-			Error result = Error.None;
-			string cacheDir = GetCacheDir(filename);
-			if (Directory.Exists(cacheDir))
+			return Error.AssetLoadFailed;
+		}
+		Error result = Error.None;
+		string cacheDir = GetCacheDir(filename);
+		if (Directory.Exists(cacheDir))
+		{
+			string[] files = Directory.GetFiles(cacheDir, filename + "*");
+			string[] array = files;
+			foreach (string path in array)
 			{
-				string[] files = Directory.GetFiles(cacheDir, filename + "*");
-				string[] array = files;
-				foreach (string path in array)
-				{
-					File.Delete(path);
-				}
-			}
-			else
-			{
-				Directory.CreateDirectory(cacheDir);
-			}
-			string cachePath = GetCachePath(filename, hash);
-			try
-			{
-				File.WriteAllBytes(cachePath, bytes);
-				return result;
-			}
-			catch
-			{
-				return Error.AssetSaveFailed;
+				File.Delete(path);
 			}
 		}
-		return Error.AssetLoadFailed;
+		else
+		{
+			Directory.CreateDirectory(cacheDir);
+		}
+		string cachePath = GetCachePath(filename, hash);
+		try
+		{
+			File.WriteAllBytes(cachePath, bytes);
+			return result;
+		}
+		catch
+		{
+			return Error.AssetSaveFailed;
+		}
 	}
 
 	public static IEnumerator ClearCache()
@@ -1705,10 +1961,10 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		for (int i = 0; i < dirs.Length; i++)
 		{
 			string dir = dirs[i];
-			Directory.Delete(dir, true);
+			Directory.Delete(dir, recursive: true);
 			if (i % 2 == 0)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 	}
@@ -1743,49 +1999,48 @@ public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
 		{
 			Log.Error(LOG.RESOURCE, "can not LoadDirect. " + category.ToString() + " : " + resource_name);
 			onComplete(load_object);
+			yield break;
 		}
-		else
+		string[] paths = ResourceDefine.subPaths[(int)category];
+		int j = 0;
+		for (int i = paths.Length; j < i; j++)
 		{
-			string[] paths = ResourceDefine.subPaths[(int)category];
-			int j = 0;
-			for (int i = paths.Length; j < i; j++)
+			string path2 = paths[j] + resource_name;
+			if (path2.Contains("StreamingAssets"))
 			{
-				string path2 = paths[j] + resource_name;
-				if (path2.Contains("StreamingAssets"))
+				path2 = Application.get_streamingAssetsPath() + path2.Replace("StreamingAssets", string.Empty).ToLower();
+				WWW www = new WWW(path2);
+				request.progressObject = www;
+				while (!www.get_isDone())
 				{
-					path2 = Application.get_streamingAssetsPath() + path2.Replace("StreamingAssets", string.Empty).ToLower();
-					WWW www = request.progressObject = (object)new WWW(path2);
-					while (!www.get_isDone())
-					{
-						yield return (object)null;
-					}
-					request.progressObject = PROGRESS_COMPLATE;
-					load_object = www.get_assetBundle();
-					www.Dispose();
+					yield return null;
 				}
-				else if (onAsyncLoadQuery() || request.downloadOnly)
-				{
-					yield return (object)ExternalResources.LoadAsync<Object>(path2, (Action<ResourceRequest>)delegate(ResourceRequest progress)
-					{
-						((_003CLoadDirect_003Ec__Iterator23F)/*Error near IL_01c2: stateMachine*/).request.progressObject = progress;
-					}, (Action<Object>)delegate(Object asset)
-					{
-						((_003CLoadDirect_003Ec__Iterator23F)/*Error near IL_01ce: stateMachine*/).request.progressObject = PROGRESS_COMPLATE;
-						((_003CLoadDirect_003Ec__Iterator23F)/*Error near IL_01ce: stateMachine*/)._003Cload_object_003E__1 = asset;
-					});
-				}
-				else
-				{
-					yield return (object)null;
-					load_object = ExternalResources.Load<Object>(path2);
-				}
-				if (load_object != null)
-				{
-					break;
-				}
+				request.progressObject = PROGRESS_COMPLATE;
+				load_object = www.get_assetBundle();
+				www.Dispose();
 			}
-			onComplete(load_object);
+			else if (onAsyncLoadQuery() || request.downloadOnly)
+			{
+				yield return ExternalResources.LoadAsync<Object>(path2, (Action<ResourceRequest>)delegate(ResourceRequest progress)
+				{
+					request.progressObject = progress;
+				}, (Action<Object>)delegate(Object asset)
+				{
+					request.progressObject = PROGRESS_COMPLATE;
+					load_object = asset;
+				});
+			}
+			else
+			{
+				yield return null;
+				load_object = ExternalResources.Load<Object>(path2);
+			}
+			if (load_object != null)
+			{
+				break;
+			}
 		}
+		onComplete(load_object);
 	}
 
 	public static Object LoadDirect(RESOURCE_CATEGORY category, string package_name, string resource_name)

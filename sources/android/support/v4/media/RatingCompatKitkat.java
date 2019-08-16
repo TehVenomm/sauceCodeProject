@@ -1,11 +1,10 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.media.Rating;
 import android.support.annotation.RequiresApi;
 
-@TargetApi(19)
 @RequiresApi(19)
+/* renamed from: android.support.v4.media.RatingCompatKitkat */
 class RatingCompatKitkat {
     RatingCompatKitkat() {
     }

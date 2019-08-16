@@ -20,7 +20,7 @@ public class WordUtils {
         }
         int length = str.length();
         int i2 = 0;
-        StringBuilder stringBuilder = new StringBuilder(length + 32);
+        StringBuilder sb = new StringBuilder(length + 32);
         while (i2 < length) {
             if (str.charAt(i2) == ' ') {
                 i2++;
@@ -29,28 +29,28 @@ public class WordUtils {
             } else {
                 int lastIndexOf = str.lastIndexOf(32, i + i2);
                 if (lastIndexOf >= i2) {
-                    stringBuilder.append(str.substring(i2, lastIndexOf));
-                    stringBuilder.append(str2);
+                    sb.append(str.substring(i2, lastIndexOf));
+                    sb.append(str2);
                     i2 = lastIndexOf + 1;
                 } else if (z) {
-                    stringBuilder.append(str.substring(i2, i + i2));
-                    stringBuilder.append(str2);
+                    sb.append(str.substring(i2, i + i2));
+                    sb.append(str2);
                     i2 += i;
                 } else {
-                    lastIndexOf = str.indexOf(32, i + i2);
-                    if (lastIndexOf >= 0) {
-                        stringBuilder.append(str.substring(i2, lastIndexOf));
-                        stringBuilder.append(str2);
-                        i2 = lastIndexOf + 1;
+                    int indexOf = str.indexOf(32, i + i2);
+                    if (indexOf >= 0) {
+                        sb.append(str.substring(i2, indexOf));
+                        sb.append(str2);
+                        i2 = indexOf + 1;
                     } else {
-                        stringBuilder.append(str.substring(i2));
+                        sb.append(str.substring(i2));
                         i2 = length;
                     }
                 }
             }
         }
-        stringBuilder.append(str.substring(i2));
-        return stringBuilder.toString();
+        sb.append(str.substring(i2));
+        return sb.toString();
     }
 
     public static String capitalize(String str) {
@@ -62,18 +62,18 @@ public class WordUtils {
         if (StringUtils.isEmpty(str) || length == 0) {
             return str;
         }
-        char[] toCharArray = str.toCharArray();
-        Object obj = 1;
-        for (length = 0; length < toCharArray.length; length++) {
-            char c = toCharArray[length];
+        char[] charArray = str.toCharArray();
+        boolean z = true;
+        for (int i = 0; i < charArray.length; i++) {
+            char c = charArray[i];
             if (isDelimiter(c, cArr)) {
-                obj = 1;
-            } else if (obj != null) {
-                toCharArray[length] = Character.toTitleCase(c);
-                obj = null;
+                z = true;
+            } else if (z) {
+                charArray[i] = Character.toTitleCase(c);
+                z = false;
             }
         }
-        return new String(toCharArray);
+        return new String(charArray);
     }
 
     public static String capitalizeFully(String str) {
@@ -93,44 +93,44 @@ public class WordUtils {
         if (StringUtils.isEmpty(str) || length == 0) {
             return str;
         }
-        char[] toCharArray = str.toCharArray();
-        Object obj = 1;
-        for (length = 0; length < toCharArray.length; length++) {
-            char c = toCharArray[length];
+        char[] charArray = str.toCharArray();
+        boolean z = true;
+        for (int i = 0; i < charArray.length; i++) {
+            char c = charArray[i];
             if (isDelimiter(c, cArr)) {
-                obj = 1;
-            } else if (obj != null) {
-                toCharArray[length] = Character.toLowerCase(c);
-                obj = null;
+                z = true;
+            } else if (z) {
+                charArray[i] = Character.toLowerCase(c);
+                z = false;
             }
         }
-        return new String(toCharArray);
+        return new String(charArray);
     }
 
     public static String swapCase(String str) {
         if (StringUtils.isEmpty(str)) {
             return str;
         }
-        char[] toCharArray = str.toCharArray();
+        char[] charArray = str.toCharArray();
         boolean z = true;
-        for (int i = 0; i < toCharArray.length; i++) {
-            char c = toCharArray[i];
+        for (int i = 0; i < charArray.length; i++) {
+            char c = charArray[i];
             if (Character.isUpperCase(c)) {
-                toCharArray[i] = Character.toLowerCase(c);
+                charArray[i] = Character.toLowerCase(c);
                 z = false;
             } else if (Character.isTitleCase(c)) {
-                toCharArray[i] = Character.toLowerCase(c);
+                charArray[i] = Character.toLowerCase(c);
                 z = false;
             } else if (!Character.isLowerCase(c)) {
                 z = Character.isWhitespace(c);
             } else if (z) {
-                toCharArray[i] = Character.toTitleCase(c);
+                charArray[i] = Character.toTitleCase(c);
                 z = false;
             } else {
-                toCharArray[i] = Character.toUpperCase(c);
+                charArray[i] = Character.toUpperCase(c);
             }
         }
-        return new String(toCharArray);
+        return new String(charArray);
     }
 
     public static String initials(String str) {
@@ -146,20 +146,20 @@ public class WordUtils {
         }
         int length = str.length();
         char[] cArr2 = new char[((length / 2) + 1)];
-        int i = 1;
-        int i2 = 0;
-        for (int i3 = 0; i3 < length; i3++) {
-            char charAt = str.charAt(i3);
+        boolean z = true;
+        int i = 0;
+        for (int i2 = 0; i2 < length; i2++) {
+            char charAt = str.charAt(i2);
             if (isDelimiter(charAt, cArr)) {
-                i = 1;
-            } else if (i != 0) {
-                i = i2 + 1;
-                cArr2[i2] = charAt;
-                i2 = i;
-                i = 0;
+                z = true;
+            } else if (z) {
+                int i3 = i + 1;
+                cArr2[i] = charAt;
+                z = false;
+                i = i3;
             }
         }
-        return new String(cArr2, 0, i2);
+        return new String(cArr2, 0, i);
     }
 
     private static boolean isDelimiter(char c, char[] cArr) {

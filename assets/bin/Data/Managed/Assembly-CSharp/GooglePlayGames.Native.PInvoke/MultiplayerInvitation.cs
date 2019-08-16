@@ -73,7 +73,7 @@ namespace GooglePlayGames.Native.PInvoke
 			Invitation.InvType invType = ToInvType(Type());
 			string invId = Id();
 			int variant = (int)Variant();
-			Participant inviter = default(Participant);
+			Participant inviter;
 			using (MultiplayerParticipant multiplayerParticipant = Inviter())
 			{
 				inviter = multiplayerParticipant?.AsParticipant();

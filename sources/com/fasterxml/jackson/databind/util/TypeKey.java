@@ -8,6 +8,9 @@ public class TypeKey {
     protected boolean _isTyped;
     protected JavaType _type;
 
+    public TypeKey() {
+    }
+
     public TypeKey(TypeKey typeKey) {
         this._hashCode = typeKey._hashCode;
         this._class = typeKey._class;
@@ -19,7 +22,7 @@ public class TypeKey {
         this._class = cls;
         this._type = null;
         this._isTyped = z;
-        this._hashCode = z ? typedHash((Class) cls) : untypedHash((Class) cls);
+        this._hashCode = z ? typedHash(cls) : untypedHash(cls);
     }
 
     public TypeKey(JavaType javaType, boolean z) {
@@ -49,14 +52,14 @@ public class TypeKey {
         this._type = null;
         this._class = cls;
         this._isTyped = true;
-        this._hashCode = typedHash((Class) cls);
+        this._hashCode = typedHash(cls);
     }
 
     public final void resetUntyped(Class<?> cls) {
         this._type = null;
         this._class = cls;
         this._isTyped = false;
-        this._hashCode = untypedHash((Class) cls);
+        this._hashCode = untypedHash(cls);
     }
 
     public final void resetTyped(JavaType javaType) {

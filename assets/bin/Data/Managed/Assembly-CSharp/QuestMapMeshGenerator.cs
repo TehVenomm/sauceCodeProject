@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class QuestMapMeshGenerator
+public class QuestMapMeshGenerator : MonoBehaviour
 {
 	public float heightMax = 10f;
 

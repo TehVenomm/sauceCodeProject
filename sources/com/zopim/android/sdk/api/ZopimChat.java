@@ -6,10 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.p000v4.app.Fragment;
+import android.support.p000v4.app.FragmentActivity;
+import android.support.p000v4.app.FragmentManager;
+import android.support.p000v4.app.FragmentTransaction;
 import android.util.Log;
 import com.zopim.android.sdk.data.DataSource;
 import com.zopim.android.sdk.data.PathDataSource;
@@ -26,30 +26,49 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ZopimChat implements Chat, ChatSession {
     private static final DataSource DATA_SOURCE = new PathDataSource();
-    private static final String LOG_TAG = ZopimChat.class.getSimpleName();
-    private static boolean mDisableVisitorInfo;
-    private static Long mInitializationTimeout;
-    private static Long mReconnectTimeout;
-    private static String mReferrer;
-    private static Long mSessionTimeout;
-    private static String mTitle;
-    private static VisitorInfo mVisitorInfo;
-    private static ZopimChat singleton;
-    private String mAccountKey;
-    private Chat mChatService;
-    private ChatServiceBinder mChatServiceBinder;
-    private String mDepartment;
-    private boolean mEnded;
-    private PreChatForm mPreChatForm = new Builder().build();
-    private SessionConfig mSessionConfig;
-    private String[] mTags;
+    /* access modifiers changed from: private */
+    public static final String LOG_TAG = ZopimChat.class.getSimpleName();
+    /* access modifiers changed from: private */
+    public static boolean mDisableVisitorInfo;
+    /* access modifiers changed from: private */
+    public static Long mInitializationTimeout;
+    /* access modifiers changed from: private */
+    public static Long mReconnectTimeout;
+    /* access modifiers changed from: private */
+    public static String mReferrer;
+    /* access modifiers changed from: private */
+    public static Long mSessionTimeout;
+    /* access modifiers changed from: private */
+    public static String mTitle;
+    /* access modifiers changed from: private */
+    public static VisitorInfo mVisitorInfo;
+    /* access modifiers changed from: private */
+    public static ZopimChat singleton;
+    /* access modifiers changed from: private */
+    public String mAccountKey;
+    /* access modifiers changed from: private */
+    public Chat mChatService;
+    /* access modifiers changed from: private */
+    public ChatServiceBinder mChatServiceBinder;
+    /* access modifiers changed from: private */
+    public String mDepartment;
+    /* access modifiers changed from: private */
+    public boolean mEnded;
+    /* access modifiers changed from: private */
+    public PreChatForm mPreChatForm = new Builder().build();
+    /* access modifiers changed from: private */
+    public SessionConfig mSessionConfig;
+    /* access modifiers changed from: private */
+    public String[] mTags;
     Queue<File> mUnsentFiles = new ConcurrentLinkedQueue();
     Queue<String> mUnsentMessages = new ConcurrentLinkedQueue();
 
     public static class ChatServiceBinder extends Fragment {
-        private static final String LOG_TAG = ChatServiceBinder.class.getSimpleName();
-        private boolean mBound;
-        private ServiceConnection mConnection = new ac(this);
+        /* access modifiers changed from: private */
+        public static final String LOG_TAG = ChatServiceBinder.class.getSimpleName();
+        /* access modifiers changed from: private */
+        public boolean mBound;
+        private ServiceConnection mConnection = new C1140ac(this);
 
         private void bind() {
             if (getActivity() != null) {
@@ -63,20 +82,22 @@ public class ZopimChat implements Chat, ChatSession {
                     }
                 }
                 getActivity().bindService(intent, this.mConnection, 1);
-                Logger.m564v(LOG_TAG, "Binding chat service with activity " + getActivity());
+                Logger.m577v(LOG_TAG, "Binding chat service with activity " + getActivity());
             }
         }
 
-        private void unbind() {
+        /* access modifiers changed from: private */
+        public void unbind() {
             if (this.mBound && getActivity() != null) {
                 getActivity().unbindService(this.mConnection);
                 this.mBound = false;
-                Logger.m564v(LOG_TAG, "Unbinding chat service from activity " + getActivity());
+                Logger.m577v(LOG_TAG, "Unbinding chat service from activity " + getActivity());
             }
         }
 
-        protected void finalize() {
-            Logger.m564v(LOG_TAG, "Service binder cleared from memory by GC");
+        /* access modifiers changed from: protected */
+        public void finalize() {
+            Logger.m577v(LOG_TAG, "Service binder cleared from memory by GC");
             super.finalize();
         }
 
@@ -86,28 +107,28 @@ public class ZopimChat implements Chat, ChatSession {
 
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            Logger.m564v(LOG_TAG, "Attached to " + activity);
+            Logger.m577v(LOG_TAG, "Attached to " + activity);
         }
 
         public void onDestroy() {
             super.onDestroy();
-            Logger.m564v(LOG_TAG, "On host activity destroy " + getActivity());
+            Logger.m577v(LOG_TAG, "On host activity destroy " + getActivity());
         }
 
         public void onDetach() {
             super.onDetach();
-            Logger.m564v(LOG_TAG, "Detached from " + getActivity());
+            Logger.m577v(LOG_TAG, "Detached from " + getActivity());
         }
 
         public void onPause() {
             super.onPause();
-            Logger.m564v(LOG_TAG, "Host activity pause");
+            Logger.m577v(LOG_TAG, "Host activity pause");
             unbind();
         }
 
         public void onResume() {
             super.onResume();
-            Logger.m564v(LOG_TAG, "Host activity resume");
+            Logger.m577v(LOG_TAG, "Host activity resume");
             if (!ZopimChat.singleton.hasEnded()) {
                 bind();
                 ZopimChat.singleton.mChatServiceBinder = this;
@@ -120,17 +141,17 @@ public class ZopimChat implements Chat, ChatSession {
             if (intent == null || !ChatSession.ACTION_CHAT_SESSION_TIMEOUT.equals(intent.getAction())) {
                 Log.w(ZopimChat.LOG_TAG, "onReceive: intent was null or getAction() was mismatched");
             } else if (ZopimChat.isInitialized()) {
-                Logger.m562i(ZopimChat.LOG_TAG, "Received chat timeout. Ending chat.");
+                Logger.m575i(ZopimChat.LOG_TAG, "Received chat timeout. Ending chat.");
                 ZopimChat.singleton.endChat();
                 if (!ZopimChat.singleton.hasEnded()) {
-                    Logger.m562i(ZopimChat.LOG_TAG, "Chat previously expired. Updating chat state as ended.");
+                    Logger.m575i(ZopimChat.LOG_TAG, "Chat previously expired. Updating chat state as ended.");
                     ZopimChat.singleton.mEnded = true;
                 }
             }
         }
     }
 
-    public class DefaultConfig extends C0795i<DefaultConfig> {
+    public class DefaultConfig extends C1148i<DefaultConfig> {
         private static final long serialVersionUID = -3486736815047202381L;
         boolean disableVisitorInfoStorage;
         Long initializationTimeout;
@@ -138,6 +159,10 @@ public class ZopimChat implements Chat, ChatSession {
         Long sessionTimeout;
 
         private DefaultConfig() {
+        }
+
+        /* synthetic */ DefaultConfig(ZopimChat zopimChat, C1139ab abVar) {
+            this();
         }
 
         public Void build() {
@@ -204,7 +229,7 @@ public class ZopimChat implements Chat, ChatSession {
         }
     }
 
-    public static class SessionConfig extends C0795i<SessionConfig> implements Serializable {
+    public static class SessionConfig extends C1148i<SessionConfig> implements Serializable {
         private static final long serialVersionUID = -4343330703382755112L;
         Long initializationTimeout;
         Long sessionTimeout;
@@ -213,10 +238,10 @@ public class ZopimChat implements Chat, ChatSession {
         public Chat build(FragmentActivity fragmentActivity) {
             if (!ZopimChat.isInitialized()) {
                 Log.e(ZopimChat.LOG_TAG, "Have you initialized?");
-                return new C0818v();
+                return new C1162v();
             } else if (fragmentActivity == null) {
                 Log.e(ZopimChat.LOG_TAG, "Can not build the chat. Activity must not be null.");
-                return new C0818v();
+                return new C1162v();
             } else {
                 Storage.init(fragmentActivity);
                 if (ZopimChat.mDisableVisitorInfo) {
@@ -225,10 +250,10 @@ public class ZopimChat implements Chat, ChatSession {
                 ZopimChat.singleton.mEnded = false;
                 FragmentManager supportFragmentManager = fragmentActivity.getSupportFragmentManager();
                 if (supportFragmentManager.findFragmentByTag(ChatServiceBinder.class.getName()) == null) {
-                    Logger.m564v(ZopimChat.LOG_TAG, "Adding chat service binder fragment to the host activity");
+                    Logger.m577v(ZopimChat.LOG_TAG, "Adding chat service binder fragment to the host activity");
                     FragmentTransaction beginTransaction = supportFragmentManager.beginTransaction();
                     ZopimChat.singleton.mChatServiceBinder = new ChatServiceBinder();
-                    beginTransaction.add(ZopimChat.singleton.mChatServiceBinder, ChatServiceBinder.class.getName());
+                    beginTransaction.add((Fragment) ZopimChat.singleton.mChatServiceBinder, ChatServiceBinder.class.getName());
                     beginTransaction.commit();
                     if (ZopimChat.mVisitorInfo != null) {
                         this.visitorInfo = ZopimChat.mVisitorInfo;
@@ -283,13 +308,15 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     /* renamed from: com.zopim.android.sdk.api.ZopimChat$a */
-    private static class C0796a {
-        /* renamed from: a */
-        private static final ZopimChat f623a = new ZopimChat();
+    private static class C1136a {
 
+        /* renamed from: a */
+        private static final ZopimChat f667a = new ZopimChat();
+
+        /* access modifiers changed from: private */
         /* renamed from: b */
-        private static ZopimChat m569b() {
-            return f623a;
+        public static ZopimChat m582b() {
+            return f667a;
         }
     }
 
@@ -303,7 +330,7 @@ public class ZopimChat implements Chat, ChatSession {
         if (z && z2) {
             return true;
         }
-        Logger.m562i(LOG_TAG, "Can not chat at the moment. Chat is not connected to the chat service.");
+        Logger.m575i(LOG_TAG, "Can not chat at the moment. Chat is not connected to the chat service.");
         return false;
     }
 
@@ -312,23 +339,21 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     public static Long getInitializationTimeout() {
-        if (isInitialized()) {
-            ZopimChat zopimChat = singleton;
-            return mInitializationTimeout != null ? mInitializationTimeout : Long.valueOf(DEFAULT_CHAT_INITIALIZATION_TIMEOUT);
-        } else {
+        if (!isInitialized()) {
             Log.w(LOG_TAG, "Chat must be initialized to use initialization timeout configuration. Will return default timeout.");
             return Long.valueOf(DEFAULT_CHAT_INITIALIZATION_TIMEOUT);
         }
+        ZopimChat zopimChat = singleton;
+        return mInitializationTimeout != null ? mInitializationTimeout : Long.valueOf(DEFAULT_CHAT_INITIALIZATION_TIMEOUT);
     }
 
     public static Long getReconnectTimeout() {
-        if (isInitialized()) {
-            ZopimChat zopimChat = singleton;
-            return mReconnectTimeout != null ? mReconnectTimeout : Long.valueOf(DEFAULT_RECONNECT_TIMEOUT);
-        } else {
+        if (!isInitialized()) {
             Log.w(LOG_TAG, "Chat must be initialized to use reconnect timeout configuration. Will return default timeout.");
             return Long.valueOf(DEFAULT_RECONNECT_TIMEOUT);
         }
+        ZopimChat zopimChat = singleton;
+        return mReconnectTimeout != null ? mReconnectTimeout : Long.valueOf(DEFAULT_RECONNECT_TIMEOUT);
     }
 
     public static DefaultConfig init(String str) {
@@ -337,16 +362,17 @@ public class ZopimChat implements Chat, ChatSession {
         }
         if (singleton == null) {
             Log.i(LOG_TAG, "Initializing Chat SDK");
-            singleton = C0796a.m569b();
+            singleton = C1136a.m582b();
         }
         singleton.mAccountKey = str;
         Log.v(LOG_TAG, "Staring chat configuration");
         ZopimChat zopimChat = singleton;
         zopimChat.getClass();
-        return new DefaultConfig();
+        return new DefaultConfig(zopimChat, null);
     }
 
-    private static boolean isInitialized() {
+    /* access modifiers changed from: private */
+    public static boolean isInitialized() {
         if (singleton != null) {
             return true;
         }
@@ -354,7 +380,8 @@ public class ZopimChat implements Chat, ChatSession {
         return false;
     }
 
-    private void resendUnsentFiles() {
+    /* access modifiers changed from: private */
+    public void resendUnsentFiles() {
         if (!this.mUnsentFiles.isEmpty()) {
             Log.v(LOG_TAG, "Resending cached unsent files");
             while (true) {
@@ -368,7 +395,8 @@ public class ZopimChat implements Chat, ChatSession {
         }
     }
 
-    private void resendUnsentMessages() {
+    /* access modifiers changed from: private */
+    public void resendUnsentMessages() {
         if (!this.mUnsentMessages.isEmpty()) {
             Log.v(LOG_TAG, "Resending cached unsent messages");
             while (true) {
@@ -383,21 +411,21 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     public static synchronized Chat resume(FragmentActivity fragmentActivity) {
-        Chat c0818v;
+        Chat vVar;
         synchronized (ZopimChat.class) {
             if (!isInitialized()) {
                 Log.e(LOG_TAG, "Have you initialized?");
-                c0818v = new C0818v();
+                vVar = new C1162v();
             } else if (fragmentActivity == null) {
                 Log.e(LOG_TAG, "Chat can not be resumed. Activity must not be null.");
-                c0818v = new C0818v();
+                vVar = new C1162v();
             } else {
                 FragmentManager supportFragmentManager = fragmentActivity.getSupportFragmentManager();
                 if (supportFragmentManager.findFragmentByTag(ChatServiceBinder.class.getName()) == null) {
-                    Logger.m564v(LOG_TAG, "Adding chat service binder fragment to the host activity");
+                    Logger.m577v(LOG_TAG, "Adding chat service binder fragment to the host activity");
                     FragmentTransaction beginTransaction = supportFragmentManager.beginTransaction();
                     singleton.mChatServiceBinder = new ChatServiceBinder();
-                    beginTransaction.add(singleton.mChatServiceBinder, ChatServiceBinder.class.getName());
+                    beginTransaction.add((Fragment) singleton.mChatServiceBinder, ChatServiceBinder.class.getName());
                     beginTransaction.commit();
                 }
                 if (singleton.mChatService == null || singleton.hasEnded()) {
@@ -407,22 +435,22 @@ public class ZopimChat implements Chat, ChatSession {
                     }
                     String machineId = Storage.machineId().getMachineId();
                     if (machineId == null || machineId.isEmpty()) {
-                        Logger.m562i(LOG_TAG, "Can not resume chat without machine id. Chat either expired or not yet started.");
-                        c0818v = new C0818v();
+                        Logger.m575i(LOG_TAG, "Can not resume chat without machine id. Chat either expired or not yet started.");
+                        vVar = new C1162v();
                     } else {
                         Intent intent = new Intent(fragmentActivity.getApplicationContext(), ChatService.class);
                         intent.putExtra("ACCOUNT_KEY", singleton.mAccountKey);
                         intent.putExtra("MACHINE_ID", machineId);
                         intent.setAction("chat.action.RECONNECT");
                         fragmentActivity.getApplicationContext().startService(intent);
-                        c0818v = singleton;
+                        vVar = singleton;
                     }
                 } else {
-                    c0818v = singleton;
+                    vVar = singleton;
                 }
             }
         }
-        return c0818v;
+        return vVar;
     }
 
     public static void setVisitorInfo(VisitorInfo visitorInfo) {
@@ -438,7 +466,10 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     public boolean emailTranscript(String str) {
-        return canCommunicate() ? this.mChatService.emailTranscript(str) : false;
+        if (canCommunicate()) {
+            return this.mChatService.emailTranscript(str);
+        }
+        return false;
     }
 
     public void endChat() {
@@ -452,7 +483,7 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     public ChatConfig getConfig() {
-        return new ab(this);
+        return new C1139ab(this);
     }
 
     public boolean hasEnded() {
@@ -503,7 +534,10 @@ public class ZopimChat implements Chat, ChatSession {
     }
 
     public boolean sendOfflineMessage(String str, String str2, String str3) {
-        return canCommunicate() ? this.mChatService.sendOfflineMessage(str, str2, str3) : false;
+        if (canCommunicate()) {
+            return this.mChatService.sendOfflineMessage(str, str2, str3);
+        }
+        return false;
     }
 
     public void setDepartment(String str) {

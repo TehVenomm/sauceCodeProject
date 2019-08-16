@@ -1,7 +1,7 @@
-using System;
-
 public class SortCompareData
 {
+	public long sortingData;
+
 	public const long SHIFT_BASE = 1L;
 
 	public const int PRIORITY_SHIFT_VALUE = 61;
@@ -9,8 +9,6 @@ public class SortCompareData
 	public const int SUPER_PRIORITY_SHIFT_VALUE = 62;
 
 	public const int REQUIREMENT_SHIFT_VALUE = 31;
-
-	public long sortingData;
 
 	protected REWARD_CATEGORY m_category;
 
@@ -176,19 +174,24 @@ public class SortCompareData
 					flag = true;
 				}
 			}
-			else if (settings.dialogType == SortBase.DIALOG_TYPE.ABILITY_ITEM)
+			else if (settings.dialogType == SortBase.DIALOG_TYPE.TYPE_FILTERABLE_WEAPON || settings.dialogType == SortBase.DIALOG_TYPE.TYPE_FILTERABLE_ARMOR)
 			{
 				if ((settings.type & GetItemType()) == 0)
 				{
 					flag = true;
 				}
+				if ((settings.equipFilter & getEquipFilterPay()) == 0)
+				{
+					flag = true;
+				}
+				ELEMENT_TYPE iconElement3 = GetIconElement();
 				int num5 = 1 << (int)GetIconElement();
 				if ((num5 & settings.element) == 0)
 				{
 					flag = true;
 				}
 			}
-			else
+			else if (settings.dialogType == SortBase.DIALOG_TYPE.ABILITY_ITEM)
 			{
 				if ((settings.type & GetItemType()) == 0)
 				{
@@ -200,6 +203,46 @@ public class SortCompareData
 					flag = true;
 				}
 			}
+			else if (settings.dialogType == SortBase.DIALOG_TYPE.SKILL || settings.dialogType == SortBase.DIALOG_TYPE.STORAGE_SKILL)
+			{
+				if ((settings.type & GetItemType()) == 0)
+				{
+					flag = true;
+				}
+				if (GetIconElementSub() == ELEMENT_TYPE.MAX)
+				{
+					int num7 = 1 << (int)GetIconElement();
+					if ((num7 & settings.element) == 0)
+					{
+						flag = true;
+					}
+				}
+				else
+				{
+					int num8 = 1 << (int)GetIconElement();
+					int num9 = 1 << (int)GetIconElementSub();
+					if ((num8 & settings.element) == 0 && (num9 & settings.element) == 0)
+					{
+						flag = true;
+					}
+				}
+			}
+			else
+			{
+				if ((settings.type & GetItemType()) == 0)
+				{
+					flag = true;
+				}
+				int num10 = 1 << (int)GetIconElement();
+				if ((num10 & settings.element) == 0)
+				{
+					flag = true;
+				}
+			}
+		}
+		if (settings.dialogType == SortBase.DIALOG_TYPE.ACCESSORY)
+		{
+			flag = false;
 		}
 		sortingData <<= 31;
 		if (settings.orderTypeAsc == flag)
@@ -220,7 +263,7 @@ public class SortCompareData
 		}
 	}
 
-	public static SORT_DATA[] CreateSortDataAry<ITEM_DATA, SORT_DATA>(ITEM_DATA[] data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
+	public unsafe static SORT_DATA[] CreateSortDataAry<ITEM_DATA, SORT_DATA>(ITEM_DATA[] data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
 	{
 		EquipItemStatus equipItemStatus = null;
 		if (sort_equip_set_info != null)
@@ -232,30 +275,30 @@ public class SortCompareData
 		for (i = 0; i < data.Length; i++)
 		{
 			equipItemSortAry[i] = (SORT_DATA)new SORT_DATA();
-			equipItemSortAry[i].SetItem(data[i]);
+			((SORT_DATA*)(&equipItemSortAry[i]))->SetItem(data[i]);
 			EquipItemStatus equipItemStatus2 = new EquipItemStatus(equipItemStatus);
 			if (equipItemStatus != null)
 			{
 				bool exclusion = false;
-				sort_equip_set_info?.exclusionUniqID.ForEach((Action<ulong>)delegate(ulong uniq_id)
+				sort_equip_set_info?.exclusionUniqID.ForEach(delegate(ulong uniq_id)
 				{
-					if (!exclusion && equipItemSortAry[i].GetUniqID() == uniq_id)
+					if (!exclusion && ((SORT_DATA*)(&equipItemSortAry[i]))->GetUniqID() == uniq_id)
 					{
 						exclusion = true;
 					}
 				});
 				if (!exclusion)
 				{
-					equipItemStatus2.Add(equipItemSortAry[i].GetItemStatus());
+					equipItemStatus2.Add(((SORT_DATA*)(&equipItemSortAry[i]))->GetItemStatus());
 				}
 			}
-			equipItemSortAry[i].SetupSortingData(sort_settings.requirement, equipItemStatus2);
-			equipItemSortAry[i].Filtering(sort_settings);
+			((SORT_DATA*)(&equipItemSortAry[i]))->SetupSortingData(sort_settings.requirement, equipItemStatus2);
+			((SORT_DATA*)(&equipItemSortAry[i]))->Filtering(sort_settings);
 		}
 		return (SORT_DATA[])equipItemSortAry;
 	}
 
-	public static void InitSortDataAry<SORT_DATA>(SORT_DATA[] sort_data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
+	public unsafe static void InitSortDataAry<SORT_DATA>(SORT_DATA[] sort_data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
 	{
 		EquipItemStatus equipItemStatus = null;
 		if (sort_equip_set_info != null)
@@ -269,9 +312,9 @@ public class SortCompareData
 			if (equipItemStatus != null)
 			{
 				bool exclusion = false;
-				sort_equip_set_info?.exclusionUniqID.ForEach((Action<ulong>)delegate(ulong uniq_id)
+				sort_equip_set_info?.exclusionUniqID.ForEach(delegate(ulong uniq_id)
 				{
-					if (!exclusion && sortData.GetUniqID() == uniq_id)
+					if (!exclusion && ((SORT_DATA*)(&sortData))->GetUniqID() == uniq_id)
 					{
 						exclusion = true;
 					}
@@ -281,8 +324,8 @@ public class SortCompareData
 					equipItemStatus2.Add(sort_data[i].GetItemStatus());
 				}
 			}
-			sortData.SetupSortingData(sort_settings.requirement, equipItemStatus2);
-			sortData.Filtering(sort_settings);
+			((SORT_DATA*)(&sortData))->SetupSortingData(sort_settings.requirement, equipItemStatus2);
+			((SORT_DATA*)(&sortData))->Filtering(sort_settings);
 		}
 	}
 
@@ -332,6 +375,11 @@ public class SortCompareData
 	}
 
 	public virtual ELEMENT_TYPE GetIconElement()
+	{
+		return ELEMENT_TYPE.MAX;
+	}
+
+	public virtual ELEMENT_TYPE GetIconElementSub()
 	{
 		return ELEMENT_TYPE.MAX;
 	}
@@ -424,6 +472,16 @@ public class SortCompareData
 	public virtual uint GetMainorSortWeight()
 	{
 		return 0u;
+	}
+
+	public virtual bool IsUniqueEquipping()
+	{
+		return false;
+	}
+
+	public virtual bool IsHomeEquipping()
+	{
+		return false;
 	}
 
 	public REWARD_CATEGORY GetCategory()

@@ -21,7 +21,7 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 
 	protected override IEnumerator DoInitialize()
 	{
-		SetActive((Enum)UI.OBJ_IMAGE, false);
+		SetActive((Enum)UI.OBJ_IMAGE, is_visible: false);
 		GetDeliveryList();
 		EndInitialize();
 		yield break;
@@ -43,6 +43,7 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 			Reposition(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		}
 		isInActiveRotate = false;
+		SetActive((Enum)UI.BTN_INGAME_INFO, !string.IsNullOrEmpty(eventData.linkName));
 		base.UpdateUI();
 	}
 
@@ -69,8 +70,6 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (base.transferUI != null)
 		{
 			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
@@ -83,5 +82,11 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 		{
 			Reposition(isPortrait);
 		}
+	}
+
+	protected override void OnQuery_INFO()
+	{
+		string eventData = string.Format(WebViewManager.NewsWithLinkParamFormatFromInGame, base.eventData.linkName);
+		GameSection.SetEventData(eventData);
 	}
 }

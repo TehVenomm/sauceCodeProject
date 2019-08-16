@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
@@ -21,11 +21,12 @@ public class AsExternalTypeDeserializer extends AsArrayTypeDeserializer {
         return beanProperty == this._property ? this : new AsExternalTypeDeserializer(this, beanProperty);
     }
 
-    public As getTypeInclusion() {
-        return As.EXTERNAL_PROPERTY;
+    public C0861As getTypeInclusion() {
+        return C0861As.EXTERNAL_PROPERTY;
     }
 
-    protected boolean _usesExternalId() {
+    /* access modifiers changed from: protected */
+    public boolean _usesExternalId() {
         return true;
     }
 }

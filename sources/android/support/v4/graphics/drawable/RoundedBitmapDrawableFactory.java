@@ -1,24 +1,27 @@
-package android.support.v4.graphics.drawable;
+package android.support.p000v4.graphics.drawable;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Build.VERSION;
-import android.support.v4.graphics.BitmapCompat;
-import android.support.v4.view.GravityCompat;
+import android.support.p000v4.graphics.BitmapCompat;
+import android.support.p000v4.view.GravityCompat;
 import android.util.Log;
 import java.io.InputStream;
 
+/* renamed from: android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory */
 public final class RoundedBitmapDrawableFactory {
-    private static final String TAG = "RoundedBitmapDrawableFactory";
+    private static final String TAG = "RoundedBitmapDrawableFa";
 
+    /* renamed from: android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory$DefaultRoundedBitmapDrawable */
     private static class DefaultRoundedBitmapDrawable extends RoundedBitmapDrawable {
         DefaultRoundedBitmapDrawable(Resources resources, Bitmap bitmap) {
             super(resources, bitmap);
         }
 
-        void gravityCompatApply(int i, int i2, int i3, Rect rect, Rect rect2) {
+        /* access modifiers changed from: 0000 */
+        public void gravityCompatApply(int i, int i2, int i3, Rect rect, Rect rect2) {
             GravityCompat.apply(i, i2, i3, rect, rect2, 0);
         }
 

@@ -4,67 +4,78 @@ import android.accounts.Account;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.text.TextUtils;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 
-public class AccountChangeEventsRequest extends zza {
+@Class(creator = "AccountChangeEventsRequestCreator")
+public class AccountChangeEventsRequest extends AbstractSafeParcelable {
     public static final Creator<AccountChangeEventsRequest> CREATOR = new zzb();
-    private int mVersion;
-    private Account zzdva;
+    @VersionField(mo13996id = 1)
+    private final int zze;
+    @Field(mo13990id = 3)
     @Deprecated
-    private String zzdxg;
-    private int zzdxi;
+    private String zzg;
+    @Field(mo13990id = 2)
+    private int zzi;
+    @Field(mo13990id = 4)
+    private Account zzk;
 
     public AccountChangeEventsRequest() {
-        this.mVersion = 1;
+        this.zze = 1;
     }
 
-    AccountChangeEventsRequest(int i, int i2, String str, Account account) {
-        this.mVersion = i;
-        this.zzdxi = i2;
-        this.zzdxg = str;
+    @Constructor
+    AccountChangeEventsRequest(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) int i2, @Param(mo13993id = 3) String str, @Param(mo13993id = 4) Account account) {
+        this.zze = i;
+        this.zzi = i2;
+        this.zzg = str;
         if (account != null || TextUtils.isEmpty(str)) {
-            this.zzdva = account;
+            this.zzk = account;
         } else {
-            this.zzdva = new Account(str, "com.google");
+            this.zzk = new Account(str, "com.google");
         }
     }
 
     public Account getAccount() {
-        return this.zzdva;
+        return this.zzk;
     }
 
     @Deprecated
     public String getAccountName() {
-        return this.zzdxg;
+        return this.zzg;
     }
 
     public int getEventIndex() {
-        return this.zzdxi;
+        return this.zzi;
     }
 
     public AccountChangeEventsRequest setAccount(Account account) {
-        this.zzdva = account;
+        this.zzk = account;
         return this;
     }
 
     @Deprecated
     public AccountChangeEventsRequest setAccountName(String str) {
-        this.zzdxg = str;
+        this.zzg = str;
         return this;
     }
 
     public AccountChangeEventsRequest setEventIndex(int i) {
-        this.zzdxi = i;
+        this.zzi = i;
         return this;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.mVersion);
-        zzd.zzc(parcel, 2, this.zzdxi);
-        zzd.zza(parcel, 3, this.zzdxg, false);
-        zzd.zza(parcel, 4, this.zzdva, i, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zze);
+        SafeParcelWriter.writeInt(parcel, 2, this.zzi);
+        SafeParcelWriter.writeString(parcel, 3, this.zzg, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, this.zzk, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

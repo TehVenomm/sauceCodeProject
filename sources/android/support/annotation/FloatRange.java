@@ -12,7 +12,8 @@ public @interface FloatRange {
 
     boolean fromInclusive() default true;
 
-    double to() default Double.POSITIVE_INFINITY;
+    /* renamed from: to */
+    double mo54to() default Double.POSITIVE_INFINITY;
 
     boolean toInclusive() default true;
 }

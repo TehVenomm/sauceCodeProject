@@ -55,8 +55,8 @@ public interface DownloadManager {
             return this.uri;
         }
 
-        public void setUri(Uri uri) {
-            this.uri = uri;
+        public void setUri(Uri uri2) {
+            this.uri = uri2;
         }
 
         public Integer getPlaceholderResourceId() {
@@ -79,8 +79,8 @@ public interface DownloadManager {
             return this.target;
         }
 
-        public void setTarget(Target target) {
-            this.target = target;
+        public void setTarget(Target target2) {
+            this.target = target2;
         }
     }
 

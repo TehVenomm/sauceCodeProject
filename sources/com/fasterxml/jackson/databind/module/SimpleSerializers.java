@@ -22,12 +22,15 @@ public class SimpleSerializers extends Base implements Serializable {
     protected boolean _hasEnumSerializer = false;
     protected HashMap<ClassKey, JsonSerializer<?>> _interfaceMappings = null;
 
+    public SimpleSerializers() {
+    }
+
     public SimpleSerializers(List<JsonSerializer<?>> list) {
         addSerializers(list);
     }
 
     public void addSerializer(JsonSerializer<?> jsonSerializer) {
-        Class handledType = jsonSerializer.handledType();
+        Class<Object> handledType = jsonSerializer.handledType();
         if (handledType == null || handledType == Object.class) {
             throw new IllegalArgumentException("JsonSerializer of type " + jsonSerializer.getClass().getName() + " does not define valid handledType() -- must either register with method that takes type argument " + " or make serializer extend 'com.fasterxml.jackson.databind.ser.std.StdSerializer'");
         }
@@ -45,43 +48,42 @@ public class SimpleSerializers extends Base implements Serializable {
     }
 
     public JsonSerializer<?> findSerializer(SerializationConfig serializationConfig, JavaType javaType, BeanDescription beanDescription) {
-        JsonSerializer<?> jsonSerializer;
+        JsonSerializer _findInterfaceMapping;
         Class rawClass = javaType.getRawClass();
         ClassKey classKey = new ClassKey(rawClass);
         if (rawClass.isInterface()) {
             if (this._interfaceMappings != null) {
-                jsonSerializer = (JsonSerializer) this._interfaceMappings.get(classKey);
+                JsonSerializer<?> jsonSerializer = (JsonSerializer) this._interfaceMappings.get(classKey);
                 if (jsonSerializer != null) {
                     return jsonSerializer;
                 }
             }
         } else if (this._classMappings != null) {
-            jsonSerializer = (JsonSerializer) this._classMappings.get(classKey);
-            if (jsonSerializer != null) {
-                return jsonSerializer;
+            JsonSerializer<?> jsonSerializer2 = (JsonSerializer) this._classMappings.get(classKey);
+            if (jsonSerializer2 != null) {
+                return jsonSerializer2;
             }
             if (this._hasEnumSerializer && javaType.isEnumType()) {
                 classKey.reset(Enum.class);
-                jsonSerializer = (JsonSerializer) this._classMappings.get(classKey);
-                if (jsonSerializer != null) {
-                    return jsonSerializer;
+                JsonSerializer<?> jsonSerializer3 = (JsonSerializer) this._classMappings.get(classKey);
+                if (jsonSerializer3 != null) {
+                    return jsonSerializer3;
                 }
             }
             for (Class cls = rawClass; cls != null; cls = cls.getSuperclass()) {
                 classKey.reset(cls);
-                jsonSerializer = (JsonSerializer) this._classMappings.get(classKey);
-                if (jsonSerializer != null) {
-                    return jsonSerializer;
+                JsonSerializer<?> jsonSerializer4 = (JsonSerializer) this._classMappings.get(classKey);
+                if (jsonSerializer4 != null) {
+                    return jsonSerializer4;
                 }
             }
         }
         if (this._interfaceMappings != null) {
-            jsonSerializer = _findInterfaceMapping(rawClass, classKey);
-            if (jsonSerializer != null) {
-                return jsonSerializer;
+            JsonSerializer<?> _findInterfaceMapping2 = _findInterfaceMapping(rawClass, classKey);
+            if (_findInterfaceMapping2 != null) {
+                return _findInterfaceMapping2;
             }
             if (!rawClass.isInterface()) {
-                JsonSerializer<?> _findInterfaceMapping;
                 Class cls2 = rawClass;
                 do {
                     cls2 = cls2.getSuperclass();
@@ -115,32 +117,35 @@ public class SimpleSerializers extends Base implements Serializable {
         return findSerializer(serializationConfig, mapLikeType, beanDescription);
     }
 
-    protected JsonSerializer<?> _findInterfaceMapping(Class<?> cls, ClassKey classKey) {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> _findInterfaceMapping(Class<?> cls, ClassKey classKey) {
+        Class[] interfaces;
         for (Class cls2 : cls.getInterfaces()) {
             classKey.reset(cls2);
             JsonSerializer<?> jsonSerializer = (JsonSerializer) this._interfaceMappings.get(classKey);
             if (jsonSerializer != null) {
                 return jsonSerializer;
             }
-            jsonSerializer = _findInterfaceMapping(cls2, classKey);
-            if (jsonSerializer != null) {
-                return jsonSerializer;
+            JsonSerializer<?> _findInterfaceMapping = _findInterfaceMapping(cls2, classKey);
+            if (_findInterfaceMapping != null) {
+                return _findInterfaceMapping;
             }
         }
         return null;
     }
 
-    protected void _addSerializer(Class<?> cls, JsonSerializer<?> jsonSerializer) {
+    /* access modifiers changed from: protected */
+    public void _addSerializer(Class<?> cls, JsonSerializer<?> jsonSerializer) {
         ClassKey classKey = new ClassKey(cls);
         if (cls.isInterface()) {
             if (this._interfaceMappings == null) {
-                this._interfaceMappings = new HashMap();
+                this._interfaceMappings = new HashMap<>();
             }
             this._interfaceMappings.put(classKey, jsonSerializer);
             return;
         }
         if (this._classMappings == null) {
-            this._classMappings = new HashMap();
+            this._classMappings = new HashMap<>();
         }
         this._classMappings.put(classKey, jsonSerializer);
         if (cls == Enum.class) {

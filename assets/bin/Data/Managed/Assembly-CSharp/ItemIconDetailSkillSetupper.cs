@@ -14,7 +14,13 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 
 	public UISprite spEnableExceed;
 
+	public UISprite spSameSkillExceedExp;
+
+	public UISprite spSameSkillExceedExpUp;
+
 	public UISprite[] spriteBg;
+
+	private bool isSameSkillExceed;
 
 	protected override UISprite selectSP => spMaterialSelectNumber;
 
@@ -25,13 +31,8 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 
 	public override void Set(object[] data = null)
 	{
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		base.Set(null);
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		base.Set();
 		if (infoRootAry[0] != null)
 		{
 			infoRootAry[0].SetActive(false);
@@ -41,8 +42,9 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 			}
 		}
 		SkillItemSortData skillItemSortData = data[0] as SkillItemSortData;
+		isSameSkillExceed = (bool)data[4];
 		SetupSelectNumberSprite((int)data[2]);
-		ItemIconDetail.ICON_STATUS iCON_STATUS = (ItemIconDetail.ICON_STATUS)(int)data[3];
+		ItemIconDetail.ICON_STATUS iCON_STATUS = (ItemIconDetail.ICON_STATUS)data[3];
 		SkillItemInfo skillItemInfo = skillItemSortData.GetItemData() as SkillItemInfo;
 		string text = $"{skillItemSortData.GetLevel()}/{skillItemInfo.GetMaxLevel()}";
 		if (skillItemInfo.IsExceeded())
@@ -52,9 +54,9 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 		infoRootAry[1].SetActive(true);
 		infoRootAry[2].SetActive(false);
 		SetName(skillItemSortData.GetName());
-		SetVisibleBG(true);
+		SetVisibleBG(is_visible: true);
 		lblDescription.supportEncoding = true;
-		lblDescription.text = skillItemInfo.GetExplanationText(false);
+		lblDescription.text = skillItemInfo.GetExplanationText();
 		UILabel[] lABELS_LV_HEAD = LABELS_LV_HEAD;
 		foreach (UILabel uILabel in lABELS_LV_HEAD)
 		{
@@ -68,6 +70,7 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 			uILabel2.text = text;
 		}
 		spEnableExceed.get_gameObject().SetActive(iCON_STATUS == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0);
+		spSameSkillExceedExpUp.get_gameObject().SetActive(isSameSkillExceed);
 		bool flag = iCON_STATUS == ItemIconDetail.ICON_STATUS.VALID_EXCEED || iCON_STATUS == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0;
 		spriteBg[0].get_gameObject().SetActive(!flag);
 		spriteBg[1].get_gameObject().SetActive(flag);
@@ -81,5 +84,11 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 	private void SetGrayOut(bool is_visible)
 	{
 		spGrayOut.set_enabled(is_visible);
+	}
+
+	public override void SetupSelectNumberSprite(int select_number)
+	{
+		base.SetupSelectNumberSprite(select_number);
+		spSameSkillExceedExp.get_gameObject().SetActive(isSameSkillExceed && select_number <= 0);
 	}
 }

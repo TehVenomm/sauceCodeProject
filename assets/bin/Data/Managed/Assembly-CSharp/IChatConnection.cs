@@ -15,6 +15,8 @@ public interface IChatConnection
 
 	event ChatRoom.OnReceiveNotification onReceiveNotification;
 
+	event ChatRoom.OnAfterSendUserMessage onAfterSendUserMessage;
+
 	event ChatRoom.OnDisconnect onDisconnect;
 
 	void Connect();

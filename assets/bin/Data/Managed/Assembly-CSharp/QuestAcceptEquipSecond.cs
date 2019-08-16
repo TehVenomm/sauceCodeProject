@@ -77,7 +77,7 @@ public class QuestAcceptEquipSecond : StatusEquipSecond
 	{
 		if (OnSelectItemAndChekIsGoStatus())
 		{
-			GameSection.ChangeEvent("USER_EQUIP", null);
+			GameSection.ChangeEvent("USER_EQUIP");
 		}
 	}
 
@@ -86,30 +86,28 @@ public class QuestAcceptEquipSecond : StatusEquipSecond
 		GameSection.SetEventData(new ChangeEquipData(base.selectEquipSetData.setNo, base.selectEquipSetData.index, select_item));
 		if (old_item == null || select_item == null)
 		{
-			GameSection.ChangeEvent("USER_EQUIP", null);
+			GameSection.ChangeEvent("USER_EQUIP");
+			return;
+		}
+		bool flag = false;
+		for (int i = 0; i < old_item.GetMaxSlot(); i++)
+		{
+			if (old_item.GetSkillItem(i, MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo()) != null)
+			{
+				flag = true;
+				break;
+			}
+		}
+		if (flag)
+		{
+			migrationOldItem = old_item;
+			migrationSelectItem = select_item;
+			object eventData = GameSection.GetEventData();
+			GameSection.ChangeEvent("MIGRATION_SKILL_CONFIRM");
 		}
 		else
 		{
-			bool flag = false;
-			for (int i = 0; i < old_item.GetMaxSlot(); i++)
-			{
-				if (old_item.GetSkillItem(i, MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo()) != null)
-				{
-					flag = true;
-					break;
-				}
-			}
-			if (flag)
-			{
-				migrationOldItem = old_item;
-				migrationSelectItem = select_item;
-				object eventData = GameSection.GetEventData();
-				GameSection.ChangeEvent("MIGRATION_SKILL_CONFIRM", null);
-			}
-			else
-			{
-				GameSection.ChangeEvent("USER_EQUIP", null);
-			}
+			GameSection.ChangeEvent("USER_EQUIP");
 		}
 	}
 

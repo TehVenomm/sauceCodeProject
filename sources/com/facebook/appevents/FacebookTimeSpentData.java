@@ -2,6 +2,7 @@ package com.facebook.appevents;
 
 import android.os.Bundle;
 import com.facebook.LoggingBehavior;
+import com.facebook.appevents.AppEventsLogger.FlushBehavior;
 import com.facebook.internal.Logger;
 import java.io.Serializable;
 import java.util.Locale;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.time.DateUtils;
 class FacebookTimeSpentData implements Serializable {
     private static final long APP_ACTIVATE_SUPPRESSION_PERIOD_IN_MILLISECONDS = 300000;
     private static final long FIRST_TIME_LOAD_RESUME_TIME = -1;
-    private static final long[] INACTIVE_SECONDS_QUANTA = new long[]{APP_ACTIVATE_SUPPRESSION_PERIOD_IN_MILLISECONDS, 900000, 1800000, DateUtils.MILLIS_PER_HOUR, 21600000, 43200000, DateUtils.MILLIS_PER_DAY, 172800000, 259200000, 604800000, 1209600000, 1814400000, 2419200000L, 5184000000L, 7776000000L, 10368000000L, 12960000000L, 15552000000L, 31536000000L};
+    private static final long[] INACTIVE_SECONDS_QUANTA = {APP_ACTIVATE_SUPPRESSION_PERIOD_IN_MILLISECONDS, 900000, 1800000, DateUtils.MILLIS_PER_HOUR, 21600000, 43200000, DateUtils.MILLIS_PER_DAY, 172800000, 259200000, 604800000, 1209600000, 1814400000, 2419200000L, 5184000000L, 7776000000L, 10368000000L, 12960000000L, 15552000000L, 31536000000L};
     private static final long INTERRUPTION_THRESHOLD_MILLISECONDS = 1000;
     private static final long NUM_MILLISECONDS_IDLE_TO_BE_NEW_SESSION = 60000;
     private static final String TAG = FacebookTimeSpentData.class.getCanonicalName();
@@ -124,13 +125,17 @@ class FacebookTimeSpentData implements Serializable {
         return new SerializationProxyV2(this.lastResumeTime, this.lastSuspendTime, this.millisecondsSpentInSession, this.interruptionCount, this.firstOpenSourceApplication);
     }
 
-    void onResume(AppEventsLogger appEventsLogger, long j, String str) {
+    /* access modifiers changed from: 0000 */
+    public void onResume(AppEventsLogger appEventsLogger, long j, String str) {
         long j2 = 0;
         if (isColdLaunch() || j - this.lastActivateEventLoggedTime > APP_ACTIVATE_SUPPRESSION_PERIOD_IN_MILLISECONDS) {
             Bundle bundle = new Bundle();
             bundle.putString(AppEventsConstants.EVENT_PARAM_SOURCE_APPLICATION, str);
             appEventsLogger.logEvent(AppEventsConstants.EVENT_NAME_ACTIVATED_APP, bundle);
             this.lastActivateEventLoggedTime = j;
+            if (AppEventsLogger.getFlushBehavior() != FlushBehavior.EXPLICIT_ONLY) {
+                appEventsLogger.flush();
+            }
         }
         if (this.isAppActive) {
             Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Resume for active app");
@@ -154,20 +159,21 @@ class FacebookTimeSpentData implements Serializable {
         this.isAppActive = true;
     }
 
-    void onSuspend(AppEventsLogger appEventsLogger, long j) {
+    /* access modifiers changed from: 0000 */
+    public void onSuspend(AppEventsLogger appEventsLogger, long j) {
         long j2 = 0;
-        if (this.isAppActive) {
-            long j3 = j - this.lastResumeTime;
-            if (j3 < 0) {
-                Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Clock skew detected");
-            } else {
-                j2 = j3;
-            }
-            this.millisecondsSpentInSession = j2 + this.millisecondsSpentInSession;
-            this.lastSuspendTime = j;
-            this.isAppActive = false;
+        if (!this.isAppActive) {
+            Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Suspend for inactive app");
             return;
         }
-        Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Suspend for inactive app");
+        long j3 = j - this.lastResumeTime;
+        if (j3 < 0) {
+            Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Clock skew detected");
+        } else {
+            j2 = j3;
+        }
+        this.millisecondsSpentInSession = j2 + this.millisecondsSpentInSession;
+        this.lastSuspendTime = j;
+        this.isAppActive = false;
     }
 }

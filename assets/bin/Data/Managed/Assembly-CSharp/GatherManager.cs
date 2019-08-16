@@ -53,23 +53,21 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 	{
 		if (!firstSendGatherList)
 		{
-			call_back(true);
+			call_back(obj: true);
+			return;
 		}
-		else
+		firstSendGatherList = false;
+		Protocol.Send(OnceGatherListModel.URL, delegate(OnceGatherListModel ret)
 		{
-			firstSendGatherList = false;
-			Protocol.Send(OnceGatherListModel.URL, delegate(OnceGatherListModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					gathering = ret.result.gathering;
-					gatherPointList = ret.result.gather;
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
+				obj = true;
+				gathering = ret.result.gathering;
+				gatherPointList = ret.result.gather;
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendGatherEnter(Action<bool, GatherEnterData> call_back)
@@ -147,57 +145,6 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 		requestSendForm.pid = pointId;
 		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
 		Protocol.Send(GatherShortcutModel.URL, requestSendForm, delegate(GatherShortcutModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void SendDebugSetFairyNum(int num, Action<bool> call_back)
-	{
-		DebugSetFairyNumModel.RequestSendForm requestSendForm = new DebugSetFairyNumModel.RequestSendForm();
-		requestSendForm.num = num;
-		Protocol.Send(DebugSetFairyNumModel.URL, requestSendForm, delegate(DebugSetFairyNumModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void SendDebugSetGather(int pid, int gid, int interval, Action<bool> call_back)
-	{
-		DebugSetGatherModel.RequestSendForm requestSendForm = new DebugSetGatherModel.RequestSendForm();
-		requestSendForm.pid = pid;
-		requestSendForm.gid = gid;
-		requestSendForm.interval = interval;
-		Protocol.Send(DebugSetGatherModel.URL, requestSendForm, delegate(DebugSetGatherModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void SendDebugChangeGatherTime(int pid, string appear, string disappear, string gatherStart, string gatherEnd, Action<bool> call_back)
-	{
-		DebugChangeGatherTimeModel.RequestSendForm requestSendForm = new DebugChangeGatherTimeModel.RequestSendForm();
-		requestSendForm.pid = pid;
-		requestSendForm.appear = appear;
-		requestSendForm.disappear = disappear;
-		requestSendForm.gatherStart = gatherStart;
-		requestSendForm.gatherEnd = gatherEnd;
-		Protocol.Send(DebugChangeGatherTimeModel.URL, requestSendForm, delegate(DebugChangeGatherTimeModel ret)
 		{
 			bool obj = false;
 			if (ret.Error == Error.None)

@@ -1,5 +1,6 @@
-package io.fabric.sdk.android;
+package p017io.fabric.sdk.android;
 
+/* renamed from: io.fabric.sdk.android.KitInfo */
 public class KitInfo {
     private final String buildType;
     private final String identifier;

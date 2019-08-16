@@ -1,16 +1,16 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Sprite")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Sprite")]
 public class UISprite : UIBasicSprite
 {
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UIAtlas mAtlas;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string mSpriteName;
 
 	[HideInInspector]
@@ -299,32 +299,35 @@ public class UISprite : UIBasicSprite
 
 	public override void MakePixelPerfect()
 	{
-		if (isValid)
+		if (!isValid)
 		{
-			base.MakePixelPerfect();
-			if (mType != Type.Tiled)
+			return;
+		}
+		base.MakePixelPerfect();
+		if (mType == Type.Tiled)
+		{
+			return;
+		}
+		UISpriteData atlasSprite = GetAtlasSprite();
+		if (atlasSprite == null)
+		{
+			return;
+		}
+		Texture mainTexture = this.mainTexture;
+		if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !atlasSprite.hasBorder) && mainTexture != null)
+		{
+			int num = Mathf.RoundToInt(pixelSize * (float)(atlasSprite.width + atlasSprite.paddingLeft + atlasSprite.paddingRight));
+			int num2 = Mathf.RoundToInt(pixelSize * (float)(atlasSprite.height + atlasSprite.paddingTop + atlasSprite.paddingBottom));
+			if ((num & 1) == 1)
 			{
-				UISpriteData atlasSprite = GetAtlasSprite();
-				if (atlasSprite != null)
-				{
-					Texture mainTexture = this.mainTexture;
-					if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !atlasSprite.hasBorder) && mainTexture != null)
-					{
-						int num = Mathf.RoundToInt(pixelSize * (float)(atlasSprite.width + atlasSprite.paddingLeft + atlasSprite.paddingRight));
-						int num2 = Mathf.RoundToInt(pixelSize * (float)(atlasSprite.height + atlasSprite.paddingTop + atlasSprite.paddingBottom));
-						if ((num & 1) == 1)
-						{
-							num++;
-						}
-						if ((num2 & 1) == 1)
-						{
-							num2++;
-						}
-						base.width = num;
-						base.height = num2;
-					}
-				}
+				num++;
 			}
+			if ((num2 & 1) == 1)
+			{
+				num2++;
+			}
+			base.width = num;
+			base.height = num2;
 		}
 	}
 
@@ -360,26 +363,27 @@ public class UISprite : UIBasicSprite
 		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
 		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		Texture mainTexture = this.mainTexture;
-		if (!(mainTexture == null))
+		if (mainTexture == null)
 		{
-			if (mSprite == null)
+			return;
+		}
+		if (mSprite == null)
+		{
+			mSprite = atlas.GetSprite(spriteName);
+		}
+		if (mSprite != null)
+		{
+			Rect val = default(Rect);
+			val._002Ector((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
+			Rect val2 = default(Rect);
+			val2._002Ector((float)(mSprite.x + mSprite.borderLeft), (float)(mSprite.y + mSprite.borderTop), (float)(mSprite.width - mSprite.borderLeft - mSprite.borderRight), (float)(mSprite.height - mSprite.borderBottom - mSprite.borderTop));
+			val = NGUIMath.ConvertToTexCoords(val, mainTexture.get_width(), mainTexture.get_height());
+			val2 = NGUIMath.ConvertToTexCoords(val2, mainTexture.get_width(), mainTexture.get_height());
+			int size = verts.size;
+			Fill(verts, uvs, cols, val, val2);
+			if (onPostFill != null)
 			{
-				mSprite = atlas.GetSprite(spriteName);
-			}
-			if (mSprite != null)
-			{
-				Rect val = default(Rect);
-				val._002Ector((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
-				Rect val2 = default(Rect);
-				val2._002Ector((float)(mSprite.x + mSprite.borderLeft), (float)(mSprite.y + mSprite.borderTop), (float)(mSprite.width - mSprite.borderLeft - mSprite.borderRight), (float)(mSprite.height - mSprite.borderBottom - mSprite.borderTop));
-				val = NGUIMath.ConvertToTexCoords(val, mainTexture.get_width(), mainTexture.get_height());
-				val2 = NGUIMath.ConvertToTexCoords(val2, mainTexture.get_width(), mainTexture.get_height());
-				int size = verts.size;
-				Fill(verts, uvs, cols, val, val2);
-				if (onPostFill != null)
-				{
-					onPostFill(this, size, verts, uvs, cols);
-				}
+				onPostFill(this, size, verts, uvs, cols);
 			}
 		}
 	}

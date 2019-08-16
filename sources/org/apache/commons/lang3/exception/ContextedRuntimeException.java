@@ -27,12 +27,12 @@ public class ContextedRuntimeException extends RuntimeException implements Excep
         this.exceptionContext = new DefaultExceptionContext();
     }
 
-    public ContextedRuntimeException(String str, Throwable th, ExceptionContext exceptionContext) {
+    public ContextedRuntimeException(String str, Throwable th, ExceptionContext exceptionContext2) {
         super(str, th);
-        if (exceptionContext == null) {
-            exceptionContext = new DefaultExceptionContext();
+        if (exceptionContext2 == null) {
+            exceptionContext2 = new DefaultExceptionContext();
         }
-        this.exceptionContext = exceptionContext;
+        this.exceptionContext = exceptionContext2;
     }
 
     public ContextedRuntimeException addContextValue(String str, Object obj) {

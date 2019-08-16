@@ -1,5 +1,10 @@
 package com.google.android.gms.games.multiplayer;
 
+import com.google.android.gms.common.util.VisibleForTesting;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@VisibleForTesting
 public interface Multiplayer {
     public static final String EXTRA_EXCLUSIVE_BIT_MASK = "exclusive_bit_mask";
     public static final String EXTRA_INVITATION = "invitation";
@@ -11,4 +16,8 @@ public interface Multiplayer {
     public static final int MAX_UNRELIABLE_MESSAGE_LEN = 1168;
     public static final int SORT_ORDER_MOST_RECENT_FIRST = 0;
     public static final int SORT_ORDER_SOCIAL_AGGREGATION = 1;
+
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface InvitationSortOrder {
+    }
 }

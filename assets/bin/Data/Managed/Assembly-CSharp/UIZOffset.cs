@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIZOffset
+public class UIZOffset : MonoBehaviour
 {
 	private Material _mat;
 
@@ -16,9 +16,8 @@ public class UIZOffset
 
 	private void Awake()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
+		//IL_0018: Expected O, but got Unknown
 		MeshRenderer component = this.GetComponent<MeshRenderer>();
 		_mat = new Material(component.get_sharedMaterial());
 		sourceQueue = _mat.get_renderQueue();

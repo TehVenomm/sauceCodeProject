@@ -36,13 +36,12 @@ public class SmithGrowSkillPerformance : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		resultData = (array[0] as SmithManager.ResultData);
 		isGreat = (bool)array[1];
 		materials = (array[2] as SkillItemInfo[]);
 		isExceed = (bool)array[3];
-		SetToggle((Enum)UI.TGL_DIRECTION, true);
+		SetToggle((Enum)UI.TGL_DIRECTION, value: true);
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -50,51 +49,49 @@ public class SmithGrowSkillPerformance : GameSection
 	{
 		SkillItemInfo skillItemInfo = resultData.itemData as SkillItemInfo;
 		magiLoader = new GameObject("magimodel").AddComponent<ItemLoader>();
-		int wait3 = 1;
+		int wait = 1;
 		magiLoader.LoadSkillItem(skillItemInfo.tableID, magiLoader.get_transform(), magiLoader.get_gameObject().get_layer(), delegate
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			((_003CDoInitialize_003Ec__Iterator135)/*Error near IL_009c: stateMachine*/)._003C_003Ef__this.magiLoader.nodeMain.get_gameObject().SetActive(false);
-			((_003CDoInitialize_003Ec__Iterator135)/*Error near IL_009c: stateMachine*/)._003Cwait_003E__1--;
+			magiLoader.nodeMain.get_gameObject().SetActive(false);
+			wait--;
 		});
-		wait3++;
+		wait++;
 		magiSymbolLoader = new GameObject("magisymbol").AddComponent<ItemLoader>();
 		magiSymbolLoader.LoadSkillItemSymbol(skillItemInfo.tableID, magiSymbolLoader.get_transform(), magiSymbolLoader.get_gameObject().get_layer(), delegate
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			((_003CDoInitialize_003Ec__Iterator135)/*Error near IL_0110: stateMachine*/)._003C_003Ef__this.magiSymbolLoader.nodeMain.get_gameObject().SetActive(false);
-			((_003CDoInitialize_003Ec__Iterator135)/*Error near IL_0110: stateMachine*/)._003Cwait_003E__1--;
+			magiSymbolLoader.nodeMain.get_gameObject().SetActive(false);
+			wait--;
 		});
 		LoadingQueue loadingQueue = new LoadingQueue(this);
-		LoadObject lo_direction = loadingQueue.Load(RESOURCE_CATEGORY.UI, "GrowSkillDirection", false);
+		LoadObject lo_direction = loadingQueue.Load(RESOURCE_CATEGORY.UI, "GrowSkillDirection");
 		LoadObject[] materialLoadObjects = new LoadObject[materials.Length];
-		for (int j = 0; j < materials.Length; j++)
-		{
-			SkillItemTable.SkillItemData data = Singleton<SkillItemTable>.I.GetSkillItemData(materials[j].tableID);
-			materialLoadObjects[j] = loadingQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemModel(data.modelID), false);
-		}
-		wait3++;
-		NPCTable.NPCData npcData = Singleton<NPCTable>.I.GetNPCData(3);
-		GameObject npcRoot = new GameObject("NPC");
-		npcData.LoadModel(npcRoot, false, true, delegate
-		{
-			((_003CDoInitialize_003Ec__Iterator135)/*Error near IL_0224: stateMachine*/)._003Cwait_003E__1--;
-		}, false);
-		CacheAudio(loadingQueue);
-		yield return (object)loadingQueue.Wait();
-		while (wait3 > 0)
-		{
-			yield return (object)null;
-		}
-		Object directionObject = lo_direction.loadedObject;
-		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject, -1);
-		GameObject[] materialObjects = (GameObject[])new GameObject[materials.Length];
 		for (int i = 0; i < materials.Length; i++)
 		{
-			SkillItemTable.SkillItemData data2 = Singleton<SkillItemTable>.I.GetSkillItemData(materials[i].tableID);
-			Transform item = ResourceUtility.Realizes(materialLoadObjects[i].loadedObject, -1);
-			PlayerLoader.SetEquipColor(item, data2.modelColor.ToColor());
-			materialObjects[i] = item.get_gameObject();
+			SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(materials[i].tableID);
+			materialLoadObjects[i] = loadingQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemModel(skillItemData.modelID));
+		}
+		wait++;
+		NPCTable.NPCData npcData = Singleton<NPCTable>.I.GetNPCData(3);
+		GameObject npcRoot = new GameObject("NPC");
+		npcData.LoadModel(npcRoot, need_shadow: false, enable_light_probe: true, delegate
+		{
+			wait--;
+		}, useSpecialModel: false);
+		CacheAudio(loadingQueue);
+		yield return loadingQueue.Wait();
+		while (wait > 0)
+		{
+			yield return null;
+		}
+		Object directionObject = lo_direction.loadedObject;
+		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject);
+		GameObject[] materialObjects = (GameObject[])new GameObject[materials.Length];
+		for (int j = 0; j < materials.Length; j++)
+		{
+			SkillItemTable.SkillItemData skillItemData2 = Singleton<SkillItemTable>.I.GetSkillItemData(materials[j].tableID);
+			Transform val = ResourceUtility.Realizes(materialLoadObjects[j].loadedObject);
+			PlayerLoader.SetEquipColor(val, skillItemData2.modelColor.ToColor());
+			materialObjects[j] = val.get_gameObject();
 		}
 		magiLoader.nodeMain.get_gameObject().SetActive(true);
 		magiSymbolLoader.nodeMain.get_gameObject().SetActive(true);
@@ -119,19 +116,17 @@ public class SmithGrowSkillPerformance : GameSection
 		SetActive((Enum)UI.OBJ_GREAT, shouldShowGreatEffect);
 		if (shouldShowGreatEffect)
 		{
-			PlayTween((Enum)UI.OBJ_GREAT, true, (EventDelegate.Callback)delegate
+			PlayTween((Enum)UI.OBJ_GREAT, forward: true, (EventDelegate.Callback)delegate
 			{
-				DispatchEvent("SKIP", null);
-			}, false, 0);
-			SoundManager.PlayOneShotSE(40000066, null, null);
+				DispatchEvent("SKIP");
+			}, is_input_block: false, 0);
+			SoundManager.PlayOneShotSE(40000066);
 		}
 		SetLabelText((Enum)UI.LBL_GET_EXP, (skillItemInfo.exp - resultData.beforeExp).ToString());
 	}
 
 	public override void Exit()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		if (Object.op_Implicit(director))
 		{
 			director.Reset();
@@ -169,11 +164,11 @@ public class SmithGrowSkillPerformance : GameSection
 		{
 			shouldShowGreatEffect = true;
 		}
-		SetToggle((Enum)UI.TGL_DIRECTION, false);
+		SetToggle((Enum)UI.TGL_DIRECTION, value: false);
 		RefreshUI();
 		if (!shouldShowGreatEffect)
 		{
-			DispatchEvent("SKIP", null);
+			DispatchEvent("SKIP");
 		}
 	}
 }

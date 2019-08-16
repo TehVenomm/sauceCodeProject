@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UIShowControlScheme
+public class UIShowControlScheme : MonoBehaviour
 {
 	public GameObject target;
 

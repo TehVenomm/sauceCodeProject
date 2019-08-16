@@ -1,6 +1,7 @@
-package net.gogame.gowrap.ui.v2017_1;
+package net.gogame.gowrap.p019ui.v2017_1;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.JsonReader;
 import android.util.Log;
@@ -8,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import com.facebook.share.internal.ShareConstants;
@@ -19,14 +19,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.integrations.core.CoreSupport;
 import net.gogame.gowrap.integrations.core.Wrapper;
-import net.gogame.gowrap.io.utils.IOUtils;
 import net.gogame.gowrap.model.configuration.Configuration.Integrations.Core.LocaleConfiguration;
 import net.gogame.gowrap.model.feed.Feed;
 import net.gogame.gowrap.model.feed.Feed.Item;
+import net.gogame.gowrap.p019ui.UIContext;
+import net.gogame.gowrap.p019ui.layout.CustomGridLayout;
+import net.gogame.gowrap.p019ui.layout.CustomGridLayout.LayoutParams;
+import net.gogame.gowrap.p019ui.utils.ExternalAppLauncher;
+import net.gogame.gowrap.p019ui.utils.ShareHelper;
+import net.gogame.gowrap.p021io.utils.IOUtils;
 import net.gogame.gowrap.support.DownloadManager.Listener;
 import net.gogame.gowrap.support.DownloadManager.Request.Builder;
 import net.gogame.gowrap.support.DownloadUtils;
@@ -34,11 +39,8 @@ import net.gogame.gowrap.support.DownloadUtils.Callback;
 import net.gogame.gowrap.support.DownloadUtils.FileTarget;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
-import net.gogame.gowrap.ui.UIContext;
-import net.gogame.gowrap.ui.layout.CustomGridLayout;
-import net.gogame.gowrap.ui.utils.ExternalAppLauncher;
-import net.gogame.gowrap.ui.utils.ShareHelper;
 
+/* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment */
 public class NewsFeedFragment extends Fragment {
     private static final String CUSTOM_GRID_LAYOUT_BUNDLE_NAME = "customGridLayout";
     private static final String CUSTOM_GRID_LAYOUT_BUNDLE_PROPERTY_NAME_CHILD_COUNT = "childCount";
@@ -49,24 +51,7 @@ public class NewsFeedFragment extends Fragment {
     private static final String SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_Y = "scrollY";
     private static final boolean VIDEO_ENABLED = false;
     private CustomGridLayout customGridLayout;
-    private Listener downloadManagerListener = new C11941();
-    private boolean downloadingFeed;
-    private Feed feed;
-    private View moreButton;
-    private int pageSize = 2;
-    private ProgressBar progressBar;
-    private ProgressBar progressBar2;
-    private Bundle savedInstanceState;
-    private ScrollView scrollView;
-    private UIContext uiContext;
-    private boolean viewExists = false;
-    private View visitSiteForMoreButton;
-
-    /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$1 */
-    class C11941 implements Listener {
-        C11941() {
-        }
-
+    private Listener downloadManagerListener = new Listener() {
         public void onDownloadsStarted() {
             NewsFeedFragment.this.updateProgress();
         }
@@ -74,41 +59,34 @@ public class NewsFeedFragment extends Fragment {
         public void onDownloadsFinished() {
             NewsFeedFragment.this.updateProgress();
         }
-    }
-
-    /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$3 */
-    class C12003 implements OnClickListener {
-        C12003() {
-        }
-
-        public void onClick(View view) {
-            NewsFeedFragment.this.appendItems(NewsFeedFragment.this.pageSize);
-        }
-    }
-
-    /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$4 */
-    class C12014 implements OnClickListener {
-        C12014() {
-        }
-
-        public void onClick(View view) {
-            LocaleConfiguration localeConfiguration = Wrapper.INSTANCE.getLocaleConfiguration(NewsFeedFragment.this.getActivity());
-            if (localeConfiguration != null && localeConfiguration.getFacebookUrl() != null) {
-                ExternalAppLauncher.openUrlInExternalBrowser(NewsFeedFragment.this.getActivity(), localeConfiguration.getFacebookUrl());
-            }
-        }
-    }
+    };
+    /* access modifiers changed from: private */
+    public boolean downloadingFeed;
+    /* access modifiers changed from: private */
+    public Feed feed;
+    private View moreButton;
+    /* access modifiers changed from: private */
+    public int pageSize = 2;
+    private ProgressBar progressBar;
+    private ProgressBar progressBar2;
+    private Bundle savedInstanceState;
+    /* access modifiers changed from: private */
+    public ScrollView scrollView;
+    /* access modifiers changed from: private */
+    public UIContext uiContext;
+    private boolean viewExists = false;
+    private View visitSiteForMoreButton;
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        View inflate = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_fragment_newsfeed, viewGroup, false);
-        this.customGridLayout = (CustomGridLayout) inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed);
+        View inflate = layoutInflater.inflate(C1423R.C1425layout.net_gogame_gowrap_fragment_newsfeed, viewGroup, false);
+        this.customGridLayout = (CustomGridLayout) inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed);
         this.viewExists = true;
         if (getActivity() instanceof UIContext) {
             this.uiContext = (UIContext) getActivity();
         }
-        this.progressBar = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progressBar);
-        this.progressBar2 = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progressBar2);
-        this.scrollView = (ScrollView) inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed_scroll_view);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_progressBar);
+        this.progressBar2 = (ProgressBar) inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_progressBar2);
+        this.scrollView = (ScrollView) inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_scroll_view);
         if (CoreSupport.INSTANCE.getAppId() != null) {
             try {
                 URL url = new URL("http://gw-sites.gogame.net/sites/" + CoreSupport.INSTANCE.getAppId() + "/data/feed.json");
@@ -117,62 +95,32 @@ public class NewsFeedFragment extends Fragment {
                 this.downloadingFeed = true;
                 updateProgress();
                 DownloadUtils.download(getActivity(), url, new FileTarget(file), file.isFile(), new Callback() {
-
-                    /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$1 */
-                    class C11951 implements Runnable {
-                        C11951() {
-                        }
-
-                        public void run() {
-                            NewsFeedFragment.this.updateProgress();
-                        }
-                    }
-
-                    /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$2 */
-                    class C11962 implements Runnable {
-                        C11962() {
-                        }
-
-                        public void run() {
-                            NewsFeedFragment.this.initializeNewsFeed();
-                        }
-                    }
-
-                    /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$3 */
-                    class C11973 implements Runnable {
-                        C11973() {
-                        }
-
-                        public void run() {
-                            NewsFeedFragment.this.updateProgress();
-                            NewsFeedFragment.this.uiContext.pushFragment(new CommunityFragment());
-                        }
-                    }
-
-                    /* renamed from: net.gogame.gowrap.ui.v2017_1.NewsFeedFragment$2$4 */
-                    class C11984 implements Runnable {
-                        C11984() {
-                        }
-
-                        public void run() {
-                            NewsFeedFragment.this.updateProgress();
-                            NewsFeedFragment.this.uiContext.pushFragment(new CommunityFragment());
-                        }
-                    }
-
                     public void onDownloadSucceeded() {
                         NewsFeedFragment.this.downloadingFeed = false;
                         if (NewsFeedFragment.this.getActivity() != null) {
                             try {
-                                NewsFeedFragment.this.getActivity().runOnUiThread(new C11951());
+                                NewsFeedFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        NewsFeedFragment.this.updateProgress();
+                                    }
+                                });
                                 NewsFeedFragment.this.feed = NewsFeedFragment.this.readFeed(file);
-                                NewsFeedFragment.this.getActivity().runOnUiThread(new C11962());
+                                NewsFeedFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        NewsFeedFragment.this.initializeNewsFeed();
+                                    }
+                                });
                             } catch (Throwable th) {
                                 Log.e(Constants.TAG, "Exception", th);
                                 try {
-                                    NewsFeedFragment.this.getActivity().runOnUiThread(new C11973());
-                                } catch (Throwable th2) {
-                                    Log.e(Constants.TAG, "Exception", th2);
+                                    NewsFeedFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            NewsFeedFragment.this.updateProgress();
+                                            NewsFeedFragment.this.uiContext.pushFragment(new CommunityFragment());
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    Log.e(Constants.TAG, "Exception", e);
                                 }
                             }
                         }
@@ -182,21 +130,37 @@ public class NewsFeedFragment extends Fragment {
                         NewsFeedFragment.this.downloadingFeed = false;
                         if (NewsFeedFragment.this.getActivity() != null) {
                             try {
-                                NewsFeedFragment.this.getActivity().runOnUiThread(new C11984());
-                            } catch (Throwable e) {
+                                NewsFeedFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        NewsFeedFragment.this.updateProgress();
+                                        NewsFeedFragment.this.uiContext.pushFragment(new CommunityFragment());
+                                    }
+                                });
+                            } catch (Exception e) {
                                 Log.e(Constants.TAG, "Exception", e);
                             }
                         }
                     }
                 });
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }
-        this.moreButton = inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed_button_more);
-        this.moreButton.setOnClickListener(new C12003());
-        this.visitSiteForMoreButton = inflate.findViewById(C1110R.id.net_gogame_gowrap_newsfeed_button_visit_site_for_more);
-        this.visitSiteForMoreButton.setOnClickListener(new C12014());
+        this.moreButton = inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_button_more);
+        this.moreButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                NewsFeedFragment.this.appendItems(NewsFeedFragment.this.pageSize);
+            }
+        });
+        this.visitSiteForMoreButton = inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_button_visit_site_for_more);
+        this.visitSiteForMoreButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                LocaleConfiguration localeConfiguration = Wrapper.INSTANCE.getLocaleConfiguration((Context) NewsFeedFragment.this.getActivity());
+                if (localeConfiguration != null && localeConfiguration.getFacebookUrl() != null) {
+                    ExternalAppLauncher.openUrlInExternalBrowser(NewsFeedFragment.this.getActivity(), localeConfiguration.getFacebookUrl());
+                }
+            }
+        });
         return inflate;
     }
 
@@ -224,15 +188,16 @@ public class NewsFeedFragment extends Fragment {
             bundle.putBundle(CUSTOM_GRID_LAYOUT_BUNDLE_NAME, bundle2);
         }
         if (this.scrollView != null) {
-            bundle2 = new Bundle();
-            bundle2.putInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_X, this.scrollView.getScrollX());
-            bundle2.putInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_Y, this.scrollView.getScrollY());
-            bundle.putBundle(SCROLL_VIEW_BUNDLE_NAME, bundle2);
+            Bundle bundle3 = new Bundle();
+            bundle3.putInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_X, this.scrollView.getScrollX());
+            bundle3.putInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_Y, this.scrollView.getScrollY());
+            bundle.putBundle(SCROLL_VIEW_BUNDLE_NAME, bundle3);
         }
         this.savedInstanceState = bundle;
     }
 
-    private void updateProgress() {
+    /* access modifiers changed from: private */
+    public void updateProgress() {
         if (this.uiContext != null) {
             boolean z = this.downloadingFeed || this.uiContext.getDownloadManager().isDownloading();
             updateProgress(this.progressBar, z);
@@ -240,50 +205,50 @@ public class NewsFeedFragment extends Fragment {
         }
     }
 
-    private void updateProgress(ProgressBar progressBar, boolean z) {
-        if (progressBar != null) {
+    private void updateProgress(ProgressBar progressBar3, boolean z) {
+        if (progressBar3 != null) {
             if (z) {
-                progressBar.setVisibility(0);
+                progressBar3.setVisibility(0);
             } else {
-                progressBar.setVisibility(8);
+                progressBar3.setVisibility(8);
             }
         }
     }
 
-    private void initializeNewsFeed() {
-        if (!this.viewExists) {
-            return;
-        }
-        if (this.savedInstanceState != null) {
-            Bundle bundle = this.savedInstanceState.getBundle(CUSTOM_GRID_LAYOUT_BUNDLE_NAME);
-            if (bundle != null) {
-                appendItems(bundle.getInt(CUSTOM_GRID_LAYOUT_BUNDLE_PROPERTY_NAME_CHILD_COUNT, this.pageSize));
-            } else {
-                appendItems(this.pageSize);
-            }
-            bundle = this.savedInstanceState.getBundle(SCROLL_VIEW_BUNDLE_NAME);
-            if (bundle != null) {
-                final View childAt = this.scrollView.getChildAt(0);
-                if (this.scrollView != null && childAt != null) {
-                    final int i = bundle.getInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_X, 0);
-                    final int i2 = bundle.getInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_Y, 0);
-                    this.scrollView.postDelayed(new Runnable() {
-                        public void run() {
-                            if (childAt.getHeight() >= i2) {
-                                NewsFeedFragment.this.scrollView.scrollTo(i, i2);
-                                return;
+    /* access modifiers changed from: private */
+    public void initializeNewsFeed() {
+        if (this.viewExists) {
+            if (this.savedInstanceState != null) {
+                Bundle bundle = this.savedInstanceState.getBundle(CUSTOM_GRID_LAYOUT_BUNDLE_NAME);
+                if (bundle != null) {
+                    appendItems(bundle.getInt(CUSTOM_GRID_LAYOUT_BUNDLE_PROPERTY_NAME_CHILD_COUNT, this.pageSize));
+                } else {
+                    appendItems(this.pageSize);
+                }
+                Bundle bundle2 = this.savedInstanceState.getBundle(SCROLL_VIEW_BUNDLE_NAME);
+                if (bundle2 != null) {
+                    final View childAt = this.scrollView.getChildAt(0);
+                    if (this.scrollView != null && childAt != null) {
+                        final int i = bundle2.getInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_X, 0);
+                        final int i2 = bundle2.getInt(SCROLL_VIEW_BUNDLE_PROPERTY_NAME_SCROLL_Y, 0);
+                        this.scrollView.postDelayed(new Runnable() {
+                            public void run() {
+                                if (childAt.getHeight() >= i2) {
+                                    NewsFeedFragment.this.scrollView.scrollTo(i, i2);
+                                    return;
+                                }
+                                NewsFeedFragment.this.scrollView.scrollTo(i, childAt.getHeight());
+                                NewsFeedFragment.this.scrollView.postDelayed(this, 1000);
                             }
-                            NewsFeedFragment.this.scrollView.scrollTo(i, childAt.getHeight());
-                            NewsFeedFragment.this.scrollView.postDelayed(this, 1000);
-                        }
-                    }, 1000);
+                        }, 1000);
+                        return;
+                    }
                     return;
                 }
                 return;
             }
-            return;
+            appendItems(this.pageSize);
         }
-        appendItems(this.pageSize);
     }
 
     private String sanitizeMessage(String str) {
@@ -297,10 +262,11 @@ public class NewsFeedFragment extends Fragment {
         return Double.valueOf(num.doubleValue() / num2.doubleValue());
     }
 
-    private void appendItems(int i) {
+    /* access modifiers changed from: private */
+    public void appendItems(int i) {
+        PhotoNewsFeedItemView photoNewsFeedItemView;
         if (this.feed != null && this.feed.getItems() != null) {
             for (int i2 = 0; i2 < i && this.customGridLayout.getChildCount() < this.feed.getItems().size(); i2++) {
-                View photoNewsFeedItemView;
                 int childCount = this.customGridLayout.getChildCount();
                 final Item item = (Item) this.feed.getItems().get(childCount);
                 Double aspectRatio = getAspectRatio(item.getMediaWidth(), item.getMediaHeight());
@@ -315,16 +281,15 @@ public class NewsFeedFragment extends Fragment {
                         if (this.uiContext != null) {
                             this.uiContext.getDownloadManager().download(Builder.newBuilder(item.getMediaSource()).into(photoNewsFeedItemView));
                         }
-                    } else {
                     }
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Exception", e);
                     photoNewsFeedItemView = null;
                 }
                 if (photoNewsFeedItemView != null) {
                     photoNewsFeedItemView.setTimestamp(item.getCreatedTime());
                     photoNewsFeedItemView.setMessage(sanitizeMessage(item.getMessage()));
-                    photoNewsFeedItemView.setButtonImage(getActivity().getResources().getDrawable(C1110R.drawable.net_gogame_gowrap_icon_share));
+                    photoNewsFeedItemView.setButtonImage(getActivity().getResources().getDrawable(C1423R.C1427drawable.net_gogame_gowrap_icon_share));
                     photoNewsFeedItemView.setAspectRatio(aspectRatio.doubleValue());
                     photoNewsFeedItemView.setPosition(childCount);
                     if (!(this.uiContext == null || (item.getLink() == null && item.getArticleLink() == null))) {
@@ -345,7 +310,7 @@ public class NewsFeedFragment extends Fragment {
                             });
                         }
                     }
-                    LayoutParams layoutParams = new CustomGridLayout.LayoutParams(-1, -2);
+                    LayoutParams layoutParams = new LayoutParams(-1, -2);
                     layoutParams.gravity = 1;
                     layoutParams.topMargin = 0;
                     layoutParams.bottomMargin = 0;
@@ -366,22 +331,24 @@ public class NewsFeedFragment extends Fragment {
         }
     }
 
-    private Feed readFeed(File file) throws IOException {
+    /* access modifiers changed from: private */
+    public Feed readFeed(File file) throws IOException {
         JsonReader jsonReader;
-        InputStream fileInputStream = new FileInputStream(file);
+        FileInputStream fileInputStream = new FileInputStream(file);
         try {
-            Reader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
             try {
                 jsonReader = new JsonReader(inputStreamReader);
-                Feed feed = new Feed(jsonReader);
+                Feed feed2 = new Feed(jsonReader);
                 JSONUtils.closeQuietly(jsonReader);
-                IOUtils.closeQuietly(inputStreamReader);
-                return feed;
+                IOUtils.closeQuietly((Reader) inputStreamReader);
+                return feed2;
             } catch (Throwable th) {
-                IOUtils.closeQuietly(inputStreamReader);
+                IOUtils.closeQuietly((Reader) inputStreamReader);
+                throw th;
             }
         } finally {
-            IOUtils.closeQuietly(fileInputStream);
+            IOUtils.closeQuietly((InputStream) fileInputStream);
         }
     }
 }

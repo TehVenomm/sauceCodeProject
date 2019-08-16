@@ -1,31 +1,29 @@
 package com.google.android.gms.tasks;
 
 final class zzd implements Runnable {
-    private /* synthetic */ Task zzkfl;
-    private /* synthetic */ zzc zzkfn;
+    private final /* synthetic */ Task zzg;
+    private final /* synthetic */ zzc zzh;
 
     zzd(zzc zzc, Task task) {
-        this.zzkfn = zzc;
-        this.zzkfl = task;
+        this.zzh = zzc;
+        this.zzg = task;
     }
 
     public final void run() {
+        if (this.zzg.isCanceled()) {
+            this.zzh.zzf.zza();
+            return;
+        }
         try {
-            Task task = (Task) this.zzkfn.zzkfj.then(this.zzkfl);
-            if (task == null) {
-                this.zzkfn.onFailure(new NullPointerException("Continuation returned null"));
-                return;
-            }
-            task.addOnSuccessListener(TaskExecutors.zzkfx, this.zzkfn);
-            task.addOnFailureListener(TaskExecutors.zzkfx, this.zzkfn);
-        } catch (Exception e) {
+            this.zzh.zzf.setResult(this.zzh.zze.then(this.zzg));
+        } catch (RuntimeExecutionException e) {
             if (e.getCause() instanceof Exception) {
-                this.zzkfn.zzkfk.setException((Exception) e.getCause());
+                this.zzh.zzf.setException((Exception) e.getCause());
             } else {
-                this.zzkfn.zzkfk.setException(e);
+                this.zzh.zzf.setException(e);
             }
         } catch (Exception e2) {
-            this.zzkfn.zzkfk.setException(e2);
+            this.zzh.zzf.setException(e2);
         }
     }
 }

@@ -50,6 +50,7 @@ public class LoungeMemberInfo : FriendInfo
 		SPR_FOLLOW_ARROW,
 		SPR_FOLLOWER_ARROW,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		LBL_LEVEL_WEAPON_1,
 		LBL_LEVEL_WEAPON_2,
 		LBL_LEVEL_WEAPON_3,
@@ -70,28 +71,27 @@ public class LoungeMemberInfo : FriendInfo
 
 	public override void Initialize()
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		data = (GameSection.GetEventData() as CharaInfo);
 		if (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 		{
 			InitializeBase();
+			return;
 		}
-		else
+		FollowLoungeMember followLoungeMember = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetFollowLoungeMember(data.userId);
+		if (followLoungeMember == null)
 		{
-			FollowLoungeMember followLoungeMember = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetFollowLoungeMember(data.userId);
-			if (followLoungeMember == null)
-			{
-				InitializeBase();
-			}
-			else
-			{
-				dataFollower = followLoungeMember.follower;
-				dataFollowing = followLoungeMember.following;
-				nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-				isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
-				InitializeBase();
-			}
+			InitializeBase();
+			return;
 		}
+		dataFollower = followLoungeMember.follower;
+		dataFollowing = followLoungeMember.following;
+		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
+		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
+		InitializeBase();
+	}
+
+	protected override void OnOpen()
+	{
 	}
 
 	public override void UpdateUI()
@@ -104,30 +104,36 @@ public class LoungeMemberInfo : FriendInfo
 	{
 		if (!CheckExistTarget())
 		{
-			DispatchEvent("NON_TARGET_PLAYER", null);
+			DispatchEvent("NON_TARGET_PLAYER");
+			return;
 		}
-		else
+		int ownerUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetOwnerUserId();
+		bool is_visible = ownerUserId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+		SetActive((Enum)UI.BTN_KICK, is_visible);
+		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
 		{
-			int ownerUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetOwnerUserId();
-			bool is_visible = ownerUserId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			SetActive((Enum)UI.BTN_KICK, is_visible);
-			if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
+			SetActive((Enum)UI.BTN_JOIN, is_visible: false);
+			status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data.userId];
+			switch (status.GetStatus())
 			{
-				SetActive((Enum)UI.BTN_JOIN, false);
-				status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data.userId];
-				switch (status.GetStatus())
-				{
-				case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
-				case LoungeMemberStatus.MEMBER_STATUS.FIELD:
-					SetActive((Enum)UI.BTN_JOIN, true);
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.QUEST:
-					SetActive((Enum)UI.BTN_JOIN, !CheckRush(status.questId));
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-					SetActive((Enum)UI.BTN_JOIN, false);
-					break;
-				}
+			case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
+			case LoungeMemberStatus.MEMBER_STATUS.FIELD:
+				SetActive((Enum)UI.BTN_JOIN, is_visible: true);
+				break;
+			case LoungeMemberStatus.MEMBER_STATUS.QUEST:
+				SetActive((Enum)UI.BTN_JOIN, !CheckRush(status.questId));
+				break;
+			case LoungeMemberStatus.MEMBER_STATUS.ARENA:
+				SetActive((Enum)UI.BTN_JOIN, is_visible: false);
+				break;
+			}
+			if (data != null && data.userClanData != null)
+			{
+				UpdateClanInfo(data);
+			}
+			else
+			{
+				DisableClanInfo();
 			}
 		}
 	}
@@ -151,48 +157,46 @@ public class LoungeMemberInfo : FriendInfo
 		if (fieldMapId == MonoBehaviourSingleton<FieldManager>.I.currentMapID)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)fieldMapId);
+		if (fieldMapData == null || fieldMapData.jumpPortalID == 0)
 		{
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)fieldMapId);
-			if (fieldMapData == null || fieldMapData.jumpPortalID == 0)
+			Log.Error("RegionMap.OnQuery_SELECT() jumpPortalID is not found.");
+			return;
+		}
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(fieldMapData.jumpPortalID, check_dst_quest: false))
+		{
+			GameSection.StopEvent();
+			return;
+		}
+		if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapData))
+		{
+			DispatchEvent("CANT_JUMP");
+			return;
+		}
+		GameSection.StayEvent();
+		CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
+		{
+			if (!is_connect)
 			{
-				Log.Error("RegionMap.OnQuery_SELECT() jumpPortalID is not found.");
-			}
-			else if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(fieldMapData.jumpPortalID, false, true))
-			{
-				GameSection.StopEvent();
-			}
-			else if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapData))
-			{
-				DispatchEvent("CANT_JUMP", null);
+				GameSection.ChangeStayEvent("COOP_SERVER_INVALID");
+				GameSection.ResumeEvent(is_resume: true);
+				AppMain i = MonoBehaviourSingleton<AppMain>.I;
+				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+				{
+					DispatchEvent("CLOSE");
+				});
 			}
 			else
 			{
-				GameSection.StayEvent();
-				CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
+				GameSection.ResumeEvent(is_regist);
+				if (is_regist)
 				{
-					if (!is_connect)
-					{
-						GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-						GameSection.ResumeEvent(true, null);
-						AppMain i = MonoBehaviourSingleton<AppMain>.I;
-						i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-						{
-							DispatchEvent("CLOSE", null);
-						});
-					}
-					else
-					{
-						GameSection.ResumeEvent(is_regist, null);
-						if (is_regist)
-						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-						}
-					}
-				});
+					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame");
+				}
 			}
-		}
+		});
 	}
 
 	private void JoinParty(string partyId)
@@ -208,7 +212,7 @@ public class LoungeMemberInfo : FriendInfo
 
 	private bool CheckExistTarget()
 	{
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(data.userId);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(data.userId);
 		return slotInfoByUserId != null;
 	}
 
@@ -236,25 +240,23 @@ public class LoungeMemberInfo : FriendInfo
 		if (!CheckExistTarget())
 		{
 			GameSection.StopEvent();
-			DispatchEvent("NON_TARGET_PLAYER", null);
+			DispatchEvent("NON_TARGET_PLAYER");
+			return;
 		}
-		else
+		GameSection.SetEventData(new object[1]
 		{
-			GameSection.SetEventData(new object[1]
+			data.name
+		});
+		List<int> list = new List<int>();
+		list.Add(data.userId);
+		SendFollow(list, delegate(bool is_success)
+		{
+			if (is_success)
 			{
-				data.name
-			});
-			List<int> list = new List<int>();
-			list.Add(data.userId);
-			SendFollow(list, delegate(bool is_success)
-			{
-				if (is_success)
-				{
-					dataFollowing = !dataFollowing;
-					SetFollowLoungeCharaInfo(data.userId, true);
-				}
-			});
-		}
+				dataFollowing = !dataFollowing;
+				SetFollowLoungeCharaInfo(data.userId, follow: true);
+			}
+		});
 	}
 
 	protected override void OnQuery_UNFOLLOW()
@@ -262,7 +264,7 @@ public class LoungeMemberInfo : FriendInfo
 		if (!CheckExistTarget())
 		{
 			GameSection.StopEvent();
-			DispatchEvent("NON_TARGET_PLAYER", null);
+			DispatchEvent("NON_TARGET_PLAYER");
 		}
 		else
 		{
@@ -278,7 +280,7 @@ public class LoungeMemberInfo : FriendInfo
 		if (!CheckExistTarget())
 		{
 			GameSection.StopEvent();
-			DispatchEvent("NON_TARGET_PLAYER", null);
+			DispatchEvent("NON_TARGET_PLAYER");
 		}
 		else
 		{
@@ -291,7 +293,7 @@ public class LoungeMemberInfo : FriendInfo
 				if (is_success)
 				{
 					dataFollowing = !dataFollowing;
-					SetFollowLoungeCharaInfo(data.userId, false);
+					SetFollowLoungeCharaInfo(data.userId, follow: false);
 				}
 			});
 		}
@@ -310,7 +312,7 @@ public class LoungeMemberInfo : FriendInfo
 		if (!CheckExistTarget())
 		{
 			GameSection.StopEvent();
-			DispatchEvent("NON_TARGET_PLAYER", null);
+			DispatchEvent("NON_TARGET_PLAYER");
 		}
 		else
 		{
@@ -323,7 +325,7 @@ public class LoungeMemberInfo : FriendInfo
 		if (!CheckExistTarget())
 		{
 			GameSection.StopEvent();
-			DispatchEvent("NON_TARGET_PLAYER", null);
+			DispatchEvent("NON_TARGET_PLAYER");
 		}
 		else
 		{
@@ -336,7 +338,7 @@ public class LoungeMemberInfo : FriendInfo
 		if (!CheckExistTarget())
 		{
 			GameSection.StopEvent();
-			DispatchEvent("NON_TARGET_PLAYER", null);
+			DispatchEvent("NON_TARGET_PLAYER");
 		}
 		else
 		{
@@ -344,7 +346,7 @@ public class LoungeMemberInfo : FriendInfo
 		}
 	}
 
-	private void OnQuery_KickConfirm_YES()
+	private void OnQuery_LoungeKickConfirm_YES()
 	{
 		GameSection.SetEventData(new object[1]
 		{
@@ -353,11 +355,12 @@ public class LoungeMemberInfo : FriendInfo
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendRoomPartyKick(delegate(bool isSuccess)
 		{
-			if (isSuccess && MonoBehaviourSingleton<LoungeManager>.IsValid())
+			if (isSuccess)
 			{
-				MonoBehaviourSingleton<LoungeManager>.I.HomePeople.DestroyLoungePlayer(data.userId);
+				IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+				currentIHomeManager.IHomePeople.CastToLoungePeople()?.DestroyLoungePlayer(data.userId);
 			}
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess);
 		}, data.userId);
 	}
 }

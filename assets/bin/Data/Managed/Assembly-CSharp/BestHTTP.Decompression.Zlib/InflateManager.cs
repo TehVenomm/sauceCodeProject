@@ -46,8 +46,8 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			0,
 			0,
-			byte.MaxValue,
-			byte.MaxValue
+			255,
+			255
 		};
 
 		internal bool HandleRfc1950HeaderBytes
@@ -108,199 +108,197 @@ namespace BestHTTP.Decompression.Zlib
 
 		internal int Inflate(FlushType flush)
 		{
-			if (_codec.InputBuffer != null)
+			if (_codec.InputBuffer == null)
 			{
-				int num = 0;
-				int num2 = -5;
-				while (true)
+				throw new ZlibException("InputBuffer is null. ");
+			}
+			int num = 0;
+			int num2 = -5;
+			while (true)
+			{
+				switch (mode)
 				{
-					switch (mode)
+				case InflateManagerMode.METHOD:
+					if (_codec.AvailableBytesIn == 0)
 					{
-					case InflateManagerMode.METHOD:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						if (((method = _codec.InputBuffer[_codec.NextIn++]) & 0xF) != 8)
-						{
-							mode = InflateManagerMode.BAD;
-							_codec.Message = $"unknown compression method (0x{method:X2})";
-							marker = 5;
-						}
-						else if ((method >> 4) + 8 > wbits)
-						{
-							mode = InflateManagerMode.BAD;
-							_codec.Message = $"invalid window size ({(method >> 4) + 8})";
-							marker = 5;
-						}
-						else
-						{
-							mode = InflateManagerMode.FLAG;
-						}
-						break;
-					case InflateManagerMode.FLAG:
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					if (((method = _codec.InputBuffer[_codec.NextIn++]) & 0xF) != 8)
 					{
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
+						mode = InflateManagerMode.BAD;
+						_codec.Message = $"unknown compression method (0x{method:X2})";
+						marker = 5;
+					}
+					else if ((method >> 4) + 8 > wbits)
+					{
+						mode = InflateManagerMode.BAD;
+						_codec.Message = $"invalid window size ({(method >> 4) + 8})";
+						marker = 5;
+					}
+					else
+					{
+						mode = InflateManagerMode.FLAG;
+					}
+					break;
+				case InflateManagerMode.FLAG:
+				{
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					int num3 = _codec.InputBuffer[_codec.NextIn++] & 0xFF;
+					if (((method << 8) + num3) % 31 != 0)
+					{
+						mode = InflateManagerMode.BAD;
+						_codec.Message = "incorrect header check";
+						marker = 5;
+					}
+					else
+					{
+						mode = (((num3 & 0x20) != 0) ? InflateManagerMode.DICT4 : InflateManagerMode.BLOCKS);
+					}
+					break;
+				}
+				case InflateManagerMode.DICT4:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 4278190080u);
+					mode = InflateManagerMode.DICT3;
+					break;
+				case InflateManagerMode.DICT3:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0xFF0000);
+					mode = InflateManagerMode.DICT2;
+					break;
+				case InflateManagerMode.DICT2:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0xFF00);
+					mode = InflateManagerMode.DICT1;
+					break;
+				case InflateManagerMode.DICT1:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0xFF);
+					_codec._Adler32 = expectedCheck;
+					mode = InflateManagerMode.DICT0;
+					return 2;
+				case InflateManagerMode.DICT0:
+					mode = InflateManagerMode.BAD;
+					_codec.Message = "need dictionary";
+					marker = 0;
+					return -2;
+				case InflateManagerMode.BLOCKS:
+					num2 = blocks.Process(num2);
+					switch (num2)
+					{
+					case -3:
+						mode = InflateManagerMode.BAD;
+						marker = 0;
+						continue;
+					case 0:
 						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						int num3 = _codec.InputBuffer[_codec.NextIn++] & 0xFF;
-						if (((method << 8) + num3) % 31 != 0)
-						{
-							mode = InflateManagerMode.BAD;
-							_codec.Message = "incorrect header check";
-							marker = 5;
-						}
-						else
-						{
-							mode = (((num3 & 0x20) != 0) ? InflateManagerMode.DICT4 : InflateManagerMode.BLOCKS);
-						}
 						break;
 					}
-					case InflateManagerMode.DICT4:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 4278190080u);
-						mode = InflateManagerMode.DICT3;
-						break;
-					case InflateManagerMode.DICT3:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0xFF0000);
-						mode = InflateManagerMode.DICT2;
-						break;
-					case InflateManagerMode.DICT2:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0xFF00);
-						mode = InflateManagerMode.DICT1;
-						break;
-					case InflateManagerMode.DICT1:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0xFF);
-						_codec._Adler32 = expectedCheck;
-						mode = InflateManagerMode.DICT0;
-						return 2;
-					case InflateManagerMode.DICT0:
-						mode = InflateManagerMode.BAD;
-						_codec.Message = "need dictionary";
-						marker = 0;
-						return -2;
-					case InflateManagerMode.BLOCKS:
-						num2 = blocks.Process(num2);
-						switch (num2)
-						{
-						case -3:
-							mode = InflateManagerMode.BAD;
-							marker = 0;
-							break;
-						case 0:
-							num2 = num;
-							goto default;
-						default:
-							if (num2 != 1)
-							{
-								return num2;
-							}
-							num2 = num;
-							computedCheck = blocks.Reset();
-							if (!HandleRfc1950HeaderBytes)
-							{
-								mode = InflateManagerMode.DONE;
-								return 1;
-							}
-							mode = InflateManagerMode.CHECK4;
-							break;
-						}
-						break;
-					case InflateManagerMode.CHECK4:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 4278190080u);
-						mode = InflateManagerMode.CHECK3;
-						break;
-					case InflateManagerMode.CHECK3:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0xFF0000);
-						mode = InflateManagerMode.CHECK2;
-						break;
-					case InflateManagerMode.CHECK2:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0xFF00);
-						mode = InflateManagerMode.CHECK1;
-						break;
-					case InflateManagerMode.CHECK1:
-						if (_codec.AvailableBytesIn == 0)
-						{
-							return num2;
-						}
-						num2 = num;
-						_codec.AvailableBytesIn--;
-						_codec.TotalBytesIn++;
-						expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0xFF);
-						if (computedCheck == expectedCheck)
-						{
-							mode = InflateManagerMode.DONE;
-							return 1;
-						}
+					if (num2 != 1)
+					{
+						return num2;
+					}
+					num2 = num;
+					computedCheck = blocks.Reset();
+					if (!HandleRfc1950HeaderBytes)
+					{
+						mode = InflateManagerMode.DONE;
+						return 1;
+					}
+					mode = InflateManagerMode.CHECK4;
+					break;
+				case InflateManagerMode.CHECK4:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 4278190080u);
+					mode = InflateManagerMode.CHECK3;
+					break;
+				case InflateManagerMode.CHECK3:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0xFF0000);
+					mode = InflateManagerMode.CHECK2;
+					break;
+				case InflateManagerMode.CHECK2:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0xFF00);
+					mode = InflateManagerMode.CHECK1;
+					break;
+				case InflateManagerMode.CHECK1:
+					if (_codec.AvailableBytesIn == 0)
+					{
+						return num2;
+					}
+					num2 = num;
+					_codec.AvailableBytesIn--;
+					_codec.TotalBytesIn++;
+					expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0xFF);
+					if (computedCheck != expectedCheck)
+					{
 						mode = InflateManagerMode.BAD;
 						_codec.Message = "incorrect data check";
 						marker = 5;
 						break;
-					case InflateManagerMode.DONE:
-						return 1;
-					case InflateManagerMode.BAD:
-						throw new ZlibException($"Bad state ({_codec.Message})");
-					default:
-						throw new ZlibException("Stream error.");
 					}
+					mode = InflateManagerMode.DONE;
+					return 1;
+				case InflateManagerMode.DONE:
+					return 1;
+				case InflateManagerMode.BAD:
+					throw new ZlibException($"Bad state ({_codec.Message})");
+				default:
+					throw new ZlibException("Stream error.");
 				}
 			}
-			throw new ZlibException("InputBuffer is null. ");
 		}
 
 		internal int SetDictionary(byte[] dictionary)

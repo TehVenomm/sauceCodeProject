@@ -1,0 +1,5 @@
+public enum CLAN_JOIN_TYPE
+{
+	AUTO,
+	NEED_APPROVAL
+}

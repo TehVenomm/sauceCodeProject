@@ -2,6 +2,7 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -9,6 +10,12 @@ namespace GooglePlayGames.Native.PInvoke
 	internal class NativeMessageListenerHelper : BaseReferenceHolder
 	{
 		internal delegate void OnMessageReceived(long localClientId, string remoteEndpointId, byte[] data, bool isReliable);
+
+		[CompilerGenerated]
+		private static MessageListenerHelper.OnMessageReceivedCallback _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static MessageListenerHelper.OnDisconnectedCallback _003C_003Ef__mg_0024cache1;
 
 		internal NativeMessageListenerHelper()
 			: base(MessageListenerHelper.MessageListenerHelper_Construct())

@@ -1,0 +1,7 @@
+public enum USER_CLAN_STATUS_TYPE
+{
+	NONE,
+	MEMBER,
+	SUB_MASTER,
+	MASTER
+}

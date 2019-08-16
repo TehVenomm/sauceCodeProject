@@ -21,6 +21,7 @@ public class Account {
         }
 
         public static Status getStatus(String str) {
+            Status[] values;
             for (Status status : values()) {
                 if (status.getValue().equals(str)) {
                     return status;

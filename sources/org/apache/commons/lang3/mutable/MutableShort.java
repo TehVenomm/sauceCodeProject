@@ -6,6 +6,9 @@ public class MutableShort extends Number implements Comparable<MutableShort>, Mu
     private static final long serialVersionUID = -2135791679;
     private short value;
 
+    public MutableShort() {
+    }
+
     public MutableShort(short s) {
         this.value = s;
     }
@@ -79,10 +82,10 @@ public class MutableShort extends Number implements Comparable<MutableShort>, Mu
     }
 
     public boolean equals(Object obj) {
-        if ((obj instanceof MutableShort) && this.value == ((MutableShort) obj).shortValue()) {
-            return true;
+        if (!(obj instanceof MutableShort) || this.value != ((MutableShort) obj).shortValue()) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {

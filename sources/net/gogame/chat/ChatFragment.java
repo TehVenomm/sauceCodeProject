@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.p000v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,7 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,16 +31,17 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ChatFragment extends Fragment {
     public static final int PICK_IMAGE_RESULT_CODE = 5001;
-    private ChatAdapter chatAdapter;
+    /* access modifiers changed from: private */
+    public ChatAdapter chatAdapter;
 
     @Nullable
     public View onCreateView(LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup, @Nullable Bundle bundle) {
         this.chatAdapter = ((ZopimMainActivity) getActivity()).getChatAdapter();
-        View inflate = layoutInflater.inflate(C0785R.layout.net_gogame_chat_fragment_chat, viewGroup, false);
-        ListView listView = (ListView) inflate.findViewById(C0785R.id.listView);
+        View inflate = layoutInflater.inflate(C1122R.C1126layout.net_gogame_chat_fragment_chat, viewGroup, false);
+        ListView listView = (ListView) inflate.findViewById(C1122R.C1125id.listView);
         listView.setAdapter(this.chatAdapter);
         listView.setDivider(null);
-        final EditText editText = (EditText) inflate.findViewById(C0785R.id.editText);
+        final EditText editText = (EditText) inflate.findViewById(C1122R.C1125id.editText);
         editText.setImeOptions(4);
         editText.setOnEditorActionListener(new OnEditorActionListener() {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -62,7 +63,7 @@ public class ChatFragment extends Fragment {
                 return true;
             }
         });
-        final ImageButton imageButton = (ImageButton) inflate.findViewById(C0785R.id.sendButton);
+        final ImageButton imageButton = (ImageButton) inflate.findViewById(C1122R.C1125id.sendButton);
         imageButton.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
                 if (ChatFragment.this.isSendButton(imageButton, editText.getText())) {
@@ -91,34 +92,36 @@ public class ChatFragment extends Fragment {
         return inflate;
     }
 
-    private boolean isSendButton(ImageButton imageButton, Editable editable) {
-        boolean isAttachmentSupported;
+    /* access modifiers changed from: private */
+    public boolean isSendButton(ImageButton imageButton, Editable editable) {
+        boolean z;
         ChatContext chatContext = null;
         if (this.chatAdapter != null) {
             chatContext = this.chatAdapter.getChatContext();
         }
         if (chatContext != null) {
-            isAttachmentSupported = chatContext.isAttachmentSupported();
+            z = chatContext.isAttachmentSupported();
         } else {
-            isAttachmentSupported = false;
+            z = false;
         }
-        if (isAttachmentSupported && StringUtils.trimToNull(editable.toString()) == null) {
-            return false;
+        if (!z || StringUtils.trimToNull(editable.toString()) != null) {
+            return true;
         }
-        return true;
+        return false;
     }
 
-    private void updateSendButton(ImageButton imageButton, Editable editable) {
+    /* access modifiers changed from: private */
+    public void updateSendButton(ImageButton imageButton, Editable editable) {
         if (isSendButton(imageButton, editable)) {
-            imageButton.setBackgroundResource(C0785R.drawable.net_gogame_chat_send_message_icon);
+            imageButton.setBackgroundResource(C1122R.C1124drawable.net_gogame_chat_send_message_icon);
         } else {
-            imageButton.setBackgroundResource(C0785R.drawable.net_gogame_chat_attachment_icon);
+            imageButton.setBackgroundResource(C1122R.C1124drawable.net_gogame_chat_attachment_icon);
         }
     }
 
     public void onActivityResult(int i, int i2, Intent intent) {
         super.onActivityResult(i, i2, intent);
-        if (i != PICK_IMAGE_RESULT_CODE || i2 != -1) {
+        if (i != 5001 || i2 != -1) {
             return;
         }
         if (intent == null) {
@@ -129,6 +132,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void send(Uri uri) {
+        FileOutputStream fileOutputStream;
         try {
             String filename = ContentUtils.getFilename(getActivity(), uri);
             if (filename == null) {
@@ -136,13 +140,12 @@ public class ChatFragment extends Fragment {
             }
             File file = new File(getActivity().getCacheDir(), filename);
             InputStream openInputStream = getActivity().getContentResolver().openInputStream(uri);
-            OutputStream fileOutputStream;
             try {
                 fileOutputStream = new FileOutputStream(file);
                 IOUtils.copy(openInputStream, fileOutputStream);
-                IOUtils.closeQuietly(fileOutputStream);
+                IOUtils.closeQuietly((OutputStream) fileOutputStream);
                 if (file.length() > Constants.MAX_IMAGE_SIZE) {
-                    Toast.makeText(getActivity(), C0785R.string.net_gogame_chat_image_too_big_message, 1).show();
+                    Toast.makeText(getActivity(), C1122R.string.net_gogame_chat_image_too_big_message, 1).show();
                     IOUtils.closeQuietly(openInputStream);
                     return;
                 }
@@ -151,9 +154,10 @@ public class ChatFragment extends Fragment {
                 IOUtils.closeQuietly(openInputStream);
             } catch (Throwable th) {
                 IOUtils.closeQuietly(openInputStream);
+                throw th;
             }
         } catch (IOException e) {
-            Toast.makeText(getActivity(), C0785R.string.net_gogame_chat_error_sending_picture_message, 1).show();
+            Toast.makeText(getActivity(), C1122R.string.net_gogame_chat_error_sending_picture_message, 1).show();
         }
     }
 }

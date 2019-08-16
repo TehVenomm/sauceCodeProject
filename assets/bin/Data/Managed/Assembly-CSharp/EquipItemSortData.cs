@@ -160,11 +160,33 @@ public class EquipItemSortData : SortCompareData
 		return num + (typeToMinorSortValue << 7);
 	}
 
+	public override bool IsUniqueEquipping()
+	{
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "UniqueStatusScene")
+		{
+			return MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData);
+		}
+		return MonoBehaviourSingleton<StatusManager>.I.IsUniqueEquipping(equipData);
+	}
+
+	public override bool IsHomeEquipping()
+	{
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "StatusScene")
+		{
+			return MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData);
+		}
+		return MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipData);
+	}
+
 	public override bool IsEquipping()
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "StatusScene")
 		{
-			return MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData) || IsVisualEquip();
+			return MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData) || IsVisualEquip() || MonoBehaviourSingleton<StatusManager>.I.IsUniqueEquipping(equipData);
+		}
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "UniqueStatusScene")
+		{
+			return MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData) || IsVisualEquip() || MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipData);
 		}
 		return _EquipSomewhere() || IsVisualEquip();
 	}
@@ -189,6 +211,19 @@ public class EquipItemSortData : SortCompareData
 			{
 				EquipItemInfo equippingItemInfo = MonoBehaviourSingleton<StatusManager>.I.GetEquippingItemInfo(j, i);
 				if (equippingItemInfo != null && equippingItemInfo.uniqueID == equipData.uniqueID)
+				{
+					return true;
+				}
+			}
+		}
+		int k = 0;
+		for (int num3 = MonoBehaviourSingleton<StatusManager>.I.UniqueEquipSetNum(); k < num3; k++)
+		{
+			int l = 0;
+			for (int num4 = 7; l < num4; l++)
+			{
+				EquipItemInfo uniqueEquippingItemInfo = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingItemInfo(l, k);
+				if (uniqueEquippingItemInfo != null && uniqueEquippingItemInfo.uniqueID == equipData.uniqueID)
 				{
 					return true;
 				}

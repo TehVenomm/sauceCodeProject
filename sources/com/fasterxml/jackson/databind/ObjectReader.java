@@ -152,23 +152,28 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return PackageVersion.VERSION;
     }
 
-    protected ObjectReader _new(ObjectReader objectReader, JsonFactory jsonFactory) {
+    /* access modifiers changed from: protected */
+    public ObjectReader _new(ObjectReader objectReader, JsonFactory jsonFactory) {
         return new ObjectReader(objectReader, jsonFactory);
     }
 
-    protected ObjectReader _new(ObjectReader objectReader, DeserializationConfig deserializationConfig) {
+    /* access modifiers changed from: protected */
+    public ObjectReader _new(ObjectReader objectReader, DeserializationConfig deserializationConfig) {
         return new ObjectReader(objectReader, deserializationConfig);
     }
 
-    protected ObjectReader _new(ObjectReader objectReader, DeserializationConfig deserializationConfig, JavaType javaType, JsonDeserializer<Object> jsonDeserializer, Object obj, FormatSchema formatSchema, InjectableValues injectableValues, DataFormatReaders dataFormatReaders) {
+    /* access modifiers changed from: protected */
+    public ObjectReader _new(ObjectReader objectReader, DeserializationConfig deserializationConfig, JavaType javaType, JsonDeserializer<Object> jsonDeserializer, Object obj, FormatSchema formatSchema, InjectableValues injectableValues, DataFormatReaders dataFormatReaders) {
         return new ObjectReader(objectReader, deserializationConfig, javaType, jsonDeserializer, obj, formatSchema, injectableValues, dataFormatReaders);
     }
 
-    protected <T> MappingIterator<T> _newIterator(JsonParser jsonParser, DeserializationContext deserializationContext, JsonDeserializer<?> jsonDeserializer, boolean z) {
-        return new MappingIterator(this._valueType, jsonParser, deserializationContext, jsonDeserializer, z, this._valueToUpdate);
+    /* access modifiers changed from: protected */
+    public <T> MappingIterator<T> _newIterator(JsonParser jsonParser, DeserializationContext deserializationContext, JsonDeserializer<?> jsonDeserializer, boolean z) {
+        return new MappingIterator<>(this._valueType, jsonParser, deserializationContext, jsonDeserializer, z, this._valueToUpdate);
     }
 
-    protected JsonToken _initForReading(JsonParser jsonParser) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonToken _initForReading(JsonParser jsonParser) throws IOException {
         if (this._schema != null) {
             jsonParser.setSchema(this._schema);
         }
@@ -183,7 +188,8 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return currentToken;
     }
 
-    protected void _initForMultiRead(JsonParser jsonParser) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _initForMultiRead(JsonParser jsonParser) throws IOException {
         if (this._schema != null) {
             jsonParser.setSchema(this._schema);
         }
@@ -304,7 +310,7 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectReader forType(Class<?> cls) {
-        return forType(this._config.constructType((Class) cls));
+        return forType(this._config.constructType(cls));
     }
 
     public ObjectReader forType(TypeReference<?> typeReference) {
@@ -318,7 +324,7 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
 
     @Deprecated
     public ObjectReader withType(Class<?> cls) {
-        return forType(this._config.constructType((Class) cls));
+        return forType(this._config.constructType(cls));
     }
 
     @Deprecated
@@ -332,23 +338,23 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
     }
 
     public ObjectReader withValueToUpdate(Object obj) {
+        JavaType javaType;
         if (obj == this._valueToUpdate) {
             return this;
         }
         if (obj == null) {
             throw new IllegalArgumentException("cat not update null value");
         }
-        JavaType constructType;
         if (this._valueType == null) {
-            constructType = this._config.constructType(obj.getClass());
+            javaType = this._config.constructType(obj.getClass());
         } else {
-            constructType = this._valueType;
+            javaType = this._valueType;
         }
-        return _new(this, this._config, constructType, this._rootDeserializer, obj, this._schema, this._injectableValues, this._dataFormatReaders);
+        return _new(this, this._config, javaType, this._rootDeserializer, obj, this._schema, this._injectableValues, this._dataFormatReaders);
     }
 
     public ObjectReader withView(Class<?> cls) {
-        return _with(this._config.withView((Class) cls));
+        return _with(this._config.withView(cls));
     }
 
     public ObjectReader with(Locale locale) {
@@ -391,7 +397,8 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return _with((DeserializationConfig) this._config.withoutAttribute(obj));
     }
 
-    protected ObjectReader _with(DeserializationConfig deserializationConfig) {
+    /* access modifiers changed from: protected */
+    public ObjectReader _with(DeserializationConfig deserializationConfig) {
         if (deserializationConfig == this._config) {
             return this;
         }
@@ -439,11 +446,11 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> T readValue(JsonParser jsonParser, Class<T> cls) throws IOException {
-        return forType((Class) cls).readValue(jsonParser);
+        return forType(cls).readValue(jsonParser);
     }
 
     public <T> T readValue(JsonParser jsonParser, TypeReference<?> typeReference) throws IOException {
-        return forType((TypeReference) typeReference).readValue(jsonParser);
+        return forType(typeReference).readValue(jsonParser);
     }
 
     public <T> T readValue(JsonParser jsonParser, ResolvedType resolvedType) throws IOException, JsonProcessingException {
@@ -455,11 +462,11 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> Iterator<T> readValues(JsonParser jsonParser, Class<T> cls) throws IOException {
-        return forType((Class) cls).readValues(jsonParser);
+        return forType(cls).readValues(jsonParser);
     }
 
     public <T> Iterator<T> readValues(JsonParser jsonParser, TypeReference<?> typeReference) throws IOException {
-        return forType((TypeReference) typeReference).readValues(jsonParser);
+        return forType(typeReference).readValues(jsonParser);
     }
 
     public <T> Iterator<T> readValues(JsonParser jsonParser, ResolvedType resolvedType) throws IOException {
@@ -568,7 +575,7 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
     }
 
     public <T> MappingIterator<T> readValues(JsonParser jsonParser) throws IOException, JsonProcessingException {
-        DeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
+        DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
         return _newIterator(jsonParser, createDeserializationContext, _findRootDeserializer(createDeserializationContext), false);
     }
 
@@ -586,7 +593,7 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         JsonParser _considerFilter = _considerFilter(this._parserFactory.createParser(reader), true);
         _initForMultiRead(_considerFilter);
         _considerFilter.nextToken();
-        DeserializationContext createDeserializationContext = createDeserializationContext(_considerFilter);
+        DefaultDeserializationContext createDeserializationContext = createDeserializationContext(_considerFilter);
         return _newIterator(_considerFilter, createDeserializationContext, _findRootDeserializer(createDeserializationContext), true);
     }
 
@@ -597,7 +604,7 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         JsonParser _considerFilter = _considerFilter(this._parserFactory.createParser(str), true);
         _initForMultiRead(_considerFilter);
         _considerFilter.nextToken();
-        DeserializationContext createDeserializationContext = createDeserializationContext(_considerFilter);
+        DefaultDeserializationContext createDeserializationContext = createDeserializationContext(_considerFilter);
         return _newIterator(_considerFilter, createDeserializationContext, _findRootDeserializer(createDeserializationContext), true);
     }
 
@@ -628,10 +635,10 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
 
     public <T> T treeToValue(TreeNode treeNode, Class<T> cls) throws JsonProcessingException {
         try {
-            return readValue(treeAsTokens(treeNode), (Class) cls);
+            return readValue(treeAsTokens(treeNode), cls);
         } catch (JsonProcessingException e) {
             throw e;
-        } catch (Throwable e2) {
+        } catch (IOException e2) {
             throw new IllegalArgumentException(e2.getMessage(), e2);
         }
     }
@@ -640,60 +647,61 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         throw new UnsupportedOperationException("Not implemented for ObjectReader");
     }
 
-    protected Object _bind(JsonParser jsonParser, Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _bind(JsonParser jsonParser, Object obj) throws IOException {
         JsonToken _initForReading = _initForReading(jsonParser);
-        DeserializationContext createDeserializationContext;
         if (_initForReading == JsonToken.VALUE_NULL) {
             if (obj == null) {
-                createDeserializationContext = createDeserializationContext(jsonParser);
+                DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
                 obj = _findRootDeserializer(createDeserializationContext).getNullValue(createDeserializationContext);
             }
         } else if (!(_initForReading == JsonToken.END_ARRAY || _initForReading == JsonToken.END_OBJECT)) {
-            createDeserializationContext = createDeserializationContext(jsonParser);
-            JsonDeserializer _findRootDeserializer = _findRootDeserializer(createDeserializationContext);
+            DefaultDeserializationContext createDeserializationContext2 = createDeserializationContext(jsonParser);
+            JsonDeserializer _findRootDeserializer = _findRootDeserializer(createDeserializationContext2);
             if (this._unwrapRoot) {
-                obj = _unwrapAndDeserialize(jsonParser, createDeserializationContext, this._valueType, _findRootDeserializer);
+                obj = _unwrapAndDeserialize(jsonParser, createDeserializationContext2, this._valueType, _findRootDeserializer);
             } else if (obj == null) {
-                obj = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext);
+                obj = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2);
             } else {
-                _findRootDeserializer.deserialize(jsonParser, createDeserializationContext, obj);
+                _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2, obj);
             }
         }
         jsonParser.clearCurrentToken();
         return obj;
     }
 
-    protected JsonParser _considerFilter(JsonParser jsonParser, boolean z) {
+    /* access modifiers changed from: protected */
+    public JsonParser _considerFilter(JsonParser jsonParser, boolean z) {
         return (this._filter == null || FilteringParserDelegate.class.isInstance(jsonParser)) ? jsonParser : new FilteringParserDelegate(jsonParser, this._filter, false, z);
     }
 
-    protected Object _bindAndClose(JsonParser jsonParser) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _bindAndClose(JsonParser jsonParser) throws IOException {
+        Object obj;
         try {
-            Object nullValue;
             JsonToken _initForReading = _initForReading(jsonParser);
-            DeserializationContext createDeserializationContext;
             if (_initForReading == JsonToken.VALUE_NULL) {
                 if (this._valueToUpdate == null) {
-                    createDeserializationContext = createDeserializationContext(jsonParser);
-                    nullValue = _findRootDeserializer(createDeserializationContext).getNullValue(createDeserializationContext);
+                    DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
+                    obj = _findRootDeserializer(createDeserializationContext).getNullValue(createDeserializationContext);
                 } else {
-                    nullValue = this._valueToUpdate;
+                    obj = this._valueToUpdate;
                 }
             } else if (_initForReading == JsonToken.END_ARRAY || _initForReading == JsonToken.END_OBJECT) {
-                nullValue = this._valueToUpdate;
+                obj = this._valueToUpdate;
             } else {
-                createDeserializationContext = createDeserializationContext(jsonParser);
-                JsonDeserializer _findRootDeserializer = _findRootDeserializer(createDeserializationContext);
+                DefaultDeserializationContext createDeserializationContext2 = createDeserializationContext(jsonParser);
+                JsonDeserializer _findRootDeserializer = _findRootDeserializer(createDeserializationContext2);
                 if (this._unwrapRoot) {
-                    nullValue = _unwrapAndDeserialize(jsonParser, createDeserializationContext, this._valueType, _findRootDeserializer);
+                    obj = _unwrapAndDeserialize(jsonParser, createDeserializationContext2, this._valueType, _findRootDeserializer);
                 } else if (this._valueToUpdate == null) {
-                    nullValue = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext);
+                    obj = _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2);
                 } else {
-                    _findRootDeserializer.deserialize(jsonParser, createDeserializationContext, this._valueToUpdate);
-                    nullValue = this._valueToUpdate;
+                    _findRootDeserializer.deserialize(jsonParser, createDeserializationContext2, this._valueToUpdate);
+                    obj = this._valueToUpdate;
                 }
             }
-            return nullValue;
+            return obj;
         } finally {
             try {
                 jsonParser.close();
@@ -702,10 +710,10 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         }
     }
 
-    protected JsonNode _bindAndCloseAsTree(JsonParser jsonParser) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonNode _bindAndCloseAsTree(JsonParser jsonParser) throws IOException {
         try {
-            JsonNode _bindAsTree = _bindAsTree(jsonParser);
-            return _bindAsTree;
+            return _bindAsTree(jsonParser);
         } finally {
             try {
                 jsonParser.close();
@@ -714,13 +722,14 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         }
     }
 
-    protected JsonNode _bindAsTree(JsonParser jsonParser) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonNode _bindAsTree(JsonParser jsonParser) throws IOException {
         JsonNode jsonNode;
         JsonToken _initForReading = _initForReading(jsonParser);
         if (_initForReading == JsonToken.VALUE_NULL || _initForReading == JsonToken.END_ARRAY || _initForReading == JsonToken.END_OBJECT) {
             jsonNode = NullNode.instance;
         } else {
-            DeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
+            DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
             JsonDeserializer _findTreeDeserializer = _findTreeDeserializer(createDeserializationContext);
             if (this._unwrapRoot) {
                 jsonNode = (JsonNode) _unwrapAndDeserialize(jsonParser, createDeserializationContext, JSON_NODE_TYPE, _findTreeDeserializer);
@@ -732,14 +741,17 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return jsonNode;
     }
 
-    protected <T> MappingIterator<T> _bindAndReadValues(JsonParser jsonParser) throws IOException {
+    /* access modifiers changed from: protected */
+    public <T> MappingIterator<T> _bindAndReadValues(JsonParser jsonParser) throws IOException {
         _initForMultiRead(jsonParser);
         jsonParser.nextToken();
-        DeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
+        DefaultDeserializationContext createDeserializationContext = createDeserializationContext(jsonParser);
         return _newIterator(jsonParser, createDeserializationContext, _findRootDeserializer(createDeserializationContext), true);
     }
 
-    protected Object _unwrapAndDeserialize(JsonParser jsonParser, DeserializationContext deserializationContext, JavaType javaType, JsonDeserializer<Object> jsonDeserializer) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _unwrapAndDeserialize(JsonParser jsonParser, DeserializationContext deserializationContext, JavaType javaType, JsonDeserializer<Object> jsonDeserializer) throws IOException {
+        Object obj;
         String simpleName = this._config.findRootName(javaType).getSimpleName();
         if (jsonParser.getCurrentToken() != JsonToken.START_OBJECT) {
             throw JsonMappingException.from(jsonParser, "Current token not START_OBJECT (needed to unwrap root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
@@ -747,25 +759,25 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
             throw JsonMappingException.from(jsonParser, "Current token not FIELD_NAME (to contain expected root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
         } else {
             String currentName = jsonParser.getCurrentName();
-            if (simpleName.equals(currentName)) {
-                Object deserialize;
-                jsonParser.nextToken();
-                if (this._valueToUpdate == null) {
-                    deserialize = jsonDeserializer.deserialize(jsonParser, deserializationContext);
-                } else {
-                    jsonDeserializer.deserialize(jsonParser, deserializationContext, this._valueToUpdate);
-                    deserialize = this._valueToUpdate;
-                }
-                if (jsonParser.nextToken() == JsonToken.END_OBJECT) {
-                    return deserialize;
-                }
-                throw JsonMappingException.from(jsonParser, "Current token not END_OBJECT (to match wrapper object with root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
+            if (!simpleName.equals(currentName)) {
+                throw JsonMappingException.from(jsonParser, "Root name '" + currentName + "' does not match expected ('" + simpleName + "') for type " + javaType);
             }
-            throw JsonMappingException.from(jsonParser, "Root name '" + currentName + "' does not match expected ('" + simpleName + "') for type " + javaType);
+            jsonParser.nextToken();
+            if (this._valueToUpdate == null) {
+                obj = jsonDeserializer.deserialize(jsonParser, deserializationContext);
+            } else {
+                jsonDeserializer.deserialize(jsonParser, deserializationContext, this._valueToUpdate);
+                obj = this._valueToUpdate;
+            }
+            if (jsonParser.nextToken() == JsonToken.END_OBJECT) {
+                return obj;
+            }
+            throw JsonMappingException.from(jsonParser, "Current token not END_OBJECT (to match wrapper object with root name '" + simpleName + "'), but " + jsonParser.getCurrentToken());
         }
     }
 
-    protected Object _detectBindAndClose(byte[] bArr, int i, int i2) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _detectBindAndClose(byte[] bArr, int i, int i2) throws IOException {
         Match findFormat = this._dataFormatReaders.findFormat(bArr, i, i2);
         if (!findFormat.hasMatch()) {
             _reportUnkownFormat(this._dataFormatReaders, findFormat);
@@ -773,7 +785,8 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return findFormat.getReader()._bindAndClose(findFormat.createParserWithMatch());
     }
 
-    protected Object _detectBindAndClose(Match match, boolean z) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _detectBindAndClose(Match match, boolean z) throws IOException {
         if (!match.hasMatch()) {
             _reportUnkownFormat(this._dataFormatReaders, match);
         }
@@ -784,7 +797,8 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return match.getReader()._bindAndClose(createParserWithMatch);
     }
 
-    protected <T> MappingIterator<T> _detectBindAndReadValues(Match match, boolean z) throws IOException, JsonProcessingException {
+    /* access modifiers changed from: protected */
+    public <T> MappingIterator<T> _detectBindAndReadValues(Match match, boolean z) throws IOException, JsonProcessingException {
         if (!match.hasMatch()) {
             _reportUnkownFormat(this._dataFormatReaders, match);
         }
@@ -795,7 +809,8 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return match.getReader()._bindAndReadValues(createParserWithMatch);
     }
 
-    protected JsonNode _detectBindAndCloseAsTree(InputStream inputStream) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonNode _detectBindAndCloseAsTree(InputStream inputStream) throws IOException {
         Match findFormat = this._dataFormatReaders.findFormat(inputStream);
         if (!findFormat.hasMatch()) {
             _reportUnkownFormat(this._dataFormatReaders, findFormat);
@@ -805,33 +820,40 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return findFormat.getReader()._bindAndCloseAsTree(createParserWithMatch);
     }
 
-    protected void _reportUnkownFormat(DataFormatReaders dataFormatReaders, Match match) throws JsonProcessingException {
-        throw new JsonParseException(null, "Can not detect format from input, does not look like any of detectable formats " + dataFormatReaders.toString());
+    /* access modifiers changed from: protected */
+    public void _reportUnkownFormat(DataFormatReaders dataFormatReaders, Match match) throws JsonProcessingException {
+        throw new JsonParseException((JsonParser) null, "Can not detect format from input, does not look like any of detectable formats " + dataFormatReaders.toString());
     }
 
-    protected void _verifySchemaType(FormatSchema formatSchema) {
+    /* access modifiers changed from: protected */
+    public void _verifySchemaType(FormatSchema formatSchema) {
         if (formatSchema != null && !this._parserFactory.canUseSchema(formatSchema)) {
             throw new IllegalArgumentException("Can not use FormatSchema of type " + formatSchema.getClass().getName() + " for format " + this._parserFactory.getFormatName());
         }
     }
 
-    protected DefaultDeserializationContext createDeserializationContext(JsonParser jsonParser) {
+    /* access modifiers changed from: protected */
+    public DefaultDeserializationContext createDeserializationContext(JsonParser jsonParser) {
         return this._context.createInstance(this._config, jsonParser, this._injectableValues);
     }
 
-    protected void _reportUndetectableSource(Object obj) throws JsonProcessingException {
-        throw new JsonParseException(null, "Can not use source of type " + obj.getClass().getName() + " with format auto-detection: must be byte- not char-based");
+    /* access modifiers changed from: protected */
+    public void _reportUndetectableSource(Object obj) throws JsonProcessingException {
+        throw new JsonParseException((JsonParser) null, "Can not use source of type " + obj.getClass().getName() + " with format auto-detection: must be byte- not char-based");
     }
 
-    protected InputStream _inputStream(URL url) throws IOException {
+    /* access modifiers changed from: protected */
+    public InputStream _inputStream(URL url) throws IOException {
         return url.openStream();
     }
 
-    protected InputStream _inputStream(File file) throws IOException {
+    /* access modifiers changed from: protected */
+    public InputStream _inputStream(File file) throws IOException {
         return new FileInputStream(file);
     }
 
-    protected JsonDeserializer<Object> _findRootDeserializer(DeserializationContext deserializationContext) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _findRootDeserializer(DeserializationContext deserializationContext) throws JsonMappingException {
         if (this._rootDeserializer != null) {
             return this._rootDeserializer;
         }
@@ -843,15 +865,16 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         if (jsonDeserializer != null) {
             return jsonDeserializer;
         }
-        jsonDeserializer = deserializationContext.findRootValueDeserializer(javaType);
-        if (jsonDeserializer == null) {
+        JsonDeserializer<Object> findRootValueDeserializer = deserializationContext.findRootValueDeserializer(javaType);
+        if (findRootValueDeserializer == null) {
             throw JsonMappingException.from(deserializationContext, "Can not find a deserializer for type " + javaType);
         }
-        this._rootDeserializers.put(javaType, jsonDeserializer);
-        return jsonDeserializer;
+        this._rootDeserializers.put(javaType, findRootValueDeserializer);
+        return findRootValueDeserializer;
     }
 
-    protected JsonDeserializer<Object> _findTreeDeserializer(DeserializationContext deserializationContext) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _findTreeDeserializer(DeserializationContext deserializationContext) throws JsonMappingException {
         JsonDeserializer<Object> jsonDeserializer = (JsonDeserializer) this._rootDeserializers.get(JSON_NODE_TYPE);
         if (jsonDeserializer == null) {
             jsonDeserializer = deserializationContext.findRootValueDeserializer(JSON_NODE_TYPE);
@@ -863,7 +886,8 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return jsonDeserializer;
     }
 
-    protected JsonDeserializer<Object> _prefetchRootDeserializer(JavaType javaType) {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _prefetchRootDeserializer(JavaType javaType) {
         JsonDeserializer<Object> jsonDeserializer = null;
         if (javaType != null && this._config.isEnabled(DeserializationFeature.EAGER_DESERIALIZER_FETCH)) {
             jsonDeserializer = (JsonDeserializer) this._rootDeserializers.get(javaType);
@@ -880,11 +904,13 @@ public class ObjectReader extends ObjectCodec implements Versioned, Serializable
         return jsonDeserializer;
     }
 
-    public ObjectReader at(String str) {
-        return new ObjectReader(this, new JsonPointerBasedFilter(str));
+    /* renamed from: at */
+    public ObjectReader mo10293at(String str) {
+        return new ObjectReader(this, (TokenFilter) new JsonPointerBasedFilter(str));
     }
 
-    public ObjectReader at(JsonPointer jsonPointer) {
-        return new ObjectReader(this, new JsonPointerBasedFilter(jsonPointer));
+    /* renamed from: at */
+    public ObjectReader mo10292at(JsonPointer jsonPointer) {
+        return new ObjectReader(this, (TokenFilter) new JsonPointerBasedFilter(jsonPointer));
     }
 }

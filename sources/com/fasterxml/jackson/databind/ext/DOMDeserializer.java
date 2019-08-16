@@ -46,10 +46,11 @@ public abstract class DOMDeserializer<T> extends FromStringDeserializer<T> {
         super(cls);
     }
 
-    protected final Document parse(String str) throws IllegalArgumentException {
+    /* access modifiers changed from: protected */
+    public final Document parse(String str) throws IllegalArgumentException {
         try {
             return _parserFactory.newDocumentBuilder().parse(new InputSource(new StringReader(str)));
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Failed to parse JSON String as XML: " + e.getMessage(), e);
         }
     }

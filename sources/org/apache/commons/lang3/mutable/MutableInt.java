@@ -6,6 +6,9 @@ public class MutableInt extends Number implements Comparable<MutableInt>, Mutabl
     private static final long serialVersionUID = 512176391864L;
     private int value;
 
+    public MutableInt() {
+    }
+
     public MutableInt(int i) {
         this.value = i;
     }
@@ -75,10 +78,10 @@ public class MutableInt extends Number implements Comparable<MutableInt>, Mutabl
     }
 
     public boolean equals(Object obj) {
-        if ((obj instanceof MutableInt) && this.value == ((MutableInt) obj).intValue()) {
-            return true;
+        if (!(obj instanceof MutableInt) || this.value != ((MutableInt) obj).intValue()) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {

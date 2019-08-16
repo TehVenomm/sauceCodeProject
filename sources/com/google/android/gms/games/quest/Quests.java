@@ -10,7 +10,7 @@ import com.google.android.gms.common.api.Result;
 public interface Quests {
     public static final String EXTRA_QUEST = "quest";
     public static final int SELECT_ACCEPTED = 3;
-    public static final int[] SELECT_ALL_QUESTS = new int[]{1, 2, 3, 4, SELECT_COMPLETED_UNCLAIMED, 5, 102, 6, SELECT_RECENTLY_FAILED};
+    public static final int[] SELECT_ALL_QUESTS = {1, 2, 3, 4, 101, 5, 102, 6, 103};
     public static final int SELECT_COMPLETED = 4;
     public static final int SELECT_COMPLETED_UNCLAIMED = 101;
     public static final int SELECT_ENDING_SOON = 102;
@@ -22,10 +22,6 @@ public interface Quests {
     public static final int SORT_ORDER_ENDING_SOON_FIRST = 1;
     public static final int SORT_ORDER_RECENTLY_UPDATED_FIRST = 0;
 
-    public interface LoadQuestsResult extends Releasable, Result {
-        QuestBuffer getQuests();
-    }
-
     public interface AcceptQuestResult extends Result {
         Quest getQuest();
     }
@@ -34,6 +30,10 @@ public interface Quests {
         Milestone getMilestone();
 
         Quest getQuest();
+    }
+
+    public interface LoadQuestsResult extends Releasable, Result {
+        QuestBuffer getQuests();
     }
 
     PendingResult<AcceptQuestResult> accept(GoogleApiClient googleApiClient, String str);

@@ -17,7 +17,7 @@ public class Goal_Stop : Goal
 
 	public Goal_Stop SetGiveupLen(float len)
 	{
-		giveupLen = (double)len;
+		giveupLen = len;
 		return this;
 	}
 
@@ -33,7 +33,7 @@ public class Goal_Stop : Goal
 	{
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		double num = (double)AIUtility.GetLengthWithBetweenPosition(brain.owner._transform.get_position(), stopPos);
+		double num = AIUtility.GetLengthWithBetweenPosition(brain.owner._transform.get_position(), stopPos);
 		if (num > giveupLen)
 		{
 			SetStatus(STATUS.COMPLETED);

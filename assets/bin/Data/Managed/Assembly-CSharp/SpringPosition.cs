@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Tween/Spring Position")]
-public class SpringPosition
+public class SpringPosition : MonoBehaviour
 {
 	public delegate void OnFinished();
 
@@ -19,8 +19,8 @@ public class SpringPosition
 
 	public OnFinished onFinished;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private GameObject eventReceiver;
 
 	[SerializeField]
@@ -42,10 +42,6 @@ public class SpringPosition
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		mTrans = this.get_transform();
 		if (updateScrollView)
 		{
@@ -116,7 +112,7 @@ public class SpringPosition
 		}
 		if (mSv != null)
 		{
-			mSv.UpdateScrollbars(true);
+			mSv.UpdateScrollbars(recalculateBounds: true);
 		}
 	}
 

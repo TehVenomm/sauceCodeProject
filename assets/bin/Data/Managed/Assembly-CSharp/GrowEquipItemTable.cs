@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 {
 	public class GrowEquipItemData : IDoubleUIntKeyBinaryTableData
 	{
-		public const string NT = "growId,level,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd";
-
 		public XorUInt id = 0u;
 
 		public XorUInt lv = 0u;
@@ -22,6 +21,8 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 		public GrowRate[] elemAtk;
 
 		public GrowRate[] elemDef;
+
+		public const string NT = "growId,level,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd";
 
 		public static bool cb(CSVReader csv_reader, GrowEquipItemData data, ref uint key1, ref uint key2)
 		{
@@ -57,17 +58,17 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 
 		public int GetGrowParamAtk(int base_atk)
 		{
-			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_atk, atk, false);
+			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_atk, atk);
 		}
 
 		public int GetGrowParamDef(int base_def)
 		{
-			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_def, def, false);
+			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_def, def);
 		}
 
 		public int GetGrowParamHp(int base_hp)
 		{
-			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_hp, hp, false);
+			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_hp, hp);
 		}
 
 		public int[] GetGrowParamElemAtk(int[] base_elem_atk)
@@ -77,7 +78,7 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			int i = 0;
 			for (int num2 = num; i < num2; i++)
 			{
-				array[i] = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_elem_atk[i], elemAtk[i], true);
+				array[i] = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_elem_atk[i], elemAtk[i], is_element: true);
 			}
 			return array;
 		}
@@ -89,7 +90,7 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			int i = 0;
 			for (int num2 = num; i < num2; i++)
 			{
-				array[i] = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_elem_def[i], elemDef[i], true);
+				array[i] = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_elem_def[i], elemDef[i], is_element: true);
 			}
 			return array;
 		}
@@ -99,29 +100,29 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			id = key1;
 			lv = key2;
 			atk = new GrowRate();
-			atk.rate = reader.ReadInt32(0);
-			atk.add = reader.ReadInt32(0);
+			atk.rate = reader.ReadInt32();
+			atk.add = reader.ReadInt32();
 			def = new GrowRate();
-			def.rate = reader.ReadInt32(0);
-			def.add = reader.ReadInt32(0);
+			def.rate = reader.ReadInt32();
+			def.add = reader.ReadInt32();
 			hp = new GrowRate();
-			hp.rate = reader.ReadInt32(0);
-			hp.add = reader.ReadInt32(0);
+			hp.rate = reader.ReadInt32();
+			hp.add = reader.ReadInt32();
 			elemAtk = new GrowRate[6];
 			int i = 0;
 			for (int num = 6; i < num; i++)
 			{
 				elemAtk[i] = new GrowRate();
-				elemAtk[i].rate = reader.ReadInt32(0);
-				elemAtk[i].add = reader.ReadInt32(0);
+				elemAtk[i].rate = reader.ReadInt32();
+				elemAtk[i].add = reader.ReadInt32();
 			}
 			elemDef = new GrowRate[6];
 			int j = 0;
 			for (int num2 = 6; j < num2; j++)
 			{
 				elemDef[j] = new GrowRate();
-				elemDef[j].rate = reader.ReadInt32(0);
-				elemDef[j].add = reader.ReadInt32(0);
+				elemDef[j].rate = reader.ReadInt32();
+				elemDef[j].add = reader.ReadInt32();
 			}
 		}
 
@@ -183,8 +184,6 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 
 	public class GrowEquipItemNeedItemData : IDoubleUIntKeyBinaryTableData
 	{
-		public const string NT = "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money";
-
 		public uint id;
 
 		public uint lv;
@@ -194,6 +193,8 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 		public int needMoney;
 
 		private static readonly int NEED_MATERIAL_LENGTH_MAX = 10;
+
+		public const string NT = "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money";
 
 		private static List<NeedMaterial> need_material = new List<NeedMaterial>();
 
@@ -225,15 +226,15 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			need_material.Clear();
 			for (int i = 0; i < NEED_MATERIAL_LENGTH_MAX; i++)
 			{
-				uint num = reader.ReadUInt32(0u);
-				int num2 = reader.ReadInt32(0);
+				uint num = reader.ReadUInt32();
+				int num2 = reader.ReadInt32();
 				if (num != 0 && num2 != 0)
 				{
 					need_material.Add(new NeedMaterial(num, num2));
 				}
 			}
 			needMaterial = need_material.ToArray();
-			needMoney = reader.ReadInt32(0);
+			needMoney = reader.ReadInt32();
 		}
 
 		public void DumpBinary(BinaryWriter writer)
@@ -298,9 +299,29 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 
 	private DoubleUIntKeyTable<GrowEquipItemNeedItemData> needUniqueTableData;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemData> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache3;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache4;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache5;
+
+	public DoubleUIntKeyTable<GrowEquipItemData> GrowTableData => growTableData;
+
 	public static DoubleUIntKeyTable<GrowEquipItemData> CreateGrowTableCSV(string csv_text)
 	{
-		return TableUtility.CreateDoubleUIntKeyTable<GrowEquipItemData>(csv_text, GrowEquipItemData.cb, "growId,level,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd", null, null, null, null);
+		return TableUtility.CreateDoubleUIntKeyTable<GrowEquipItemData>(csv_text, GrowEquipItemData.cb, "growId,level,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd", null);
 	}
 
 	public void CreateGrowTable(string csv_text)
@@ -310,12 +331,12 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 
 	public void AddGrowTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(growTableData, csv_text, GrowEquipItemData.cb, "growId,level,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd", null, null, null);
+		TableUtility.AddDoubleUIntKeyTable(growTableData, csv_text, GrowEquipItemData.cb, "growId,level,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd", null);
 	}
 
 	public static DoubleUIntKeyTable<GrowEquipItemNeedItemData> CreateNeedTableCSV(string csv_text)
 	{
-		return TableUtility.CreateDoubleUIntKeyTable<GrowEquipItemNeedItemData>(csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null, null, null, null);
+		return TableUtility.CreateDoubleUIntKeyTable<GrowEquipItemNeedItemData>(csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null);
 	}
 
 	public void CreateNeedTable(string csv_text)
@@ -325,7 +346,7 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 
 	public void AddNeedTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(needTableData, csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null, null, null);
+		TableUtility.AddDoubleUIntKeyTable(needTableData, csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null);
 	}
 
 	public static DoubleUIntKeyTable<GrowEquipItemData> CreateGrowTableBinary(byte[] bytes)
@@ -344,8 +365,8 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 		BinaryTableReader binaryTableReader = new BinaryTableReader(bytes);
 		while (binaryTableReader.MoveNext())
 		{
-			uint key = binaryTableReader.ReadUInt32(0u);
-			uint key2 = binaryTableReader.ReadUInt32(0u);
+			uint key = binaryTableReader.ReadUInt32();
+			uint key2 = binaryTableReader.ReadUInt32();
 			GrowEquipItemNeedItemData growEquipItemNeedItemData = new GrowEquipItemNeedItemData();
 			growEquipItemNeedItemData.LoadFromBinary(binaryTableReader, ref key, ref key2);
 			doubleUIntKeyTable.Add(key, key2, growEquipItemNeedItemData);
@@ -365,12 +386,12 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 
 	public void CreateNeedUniqueTable(string csv_text)
 	{
-		needUniqueTableData = TableUtility.CreateDoubleUIntKeyTable<GrowEquipItemNeedItemData>(csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null, null, null, null);
+		needUniqueTableData = TableUtility.CreateDoubleUIntKeyTable<GrowEquipItemNeedItemData>(csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null);
 	}
 
 	public void AddNeedUniqueTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(needUniqueTableData, csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null, null, null);
+		TableUtility.AddDoubleUIntKeyTable(needUniqueTableData, csv_text, GrowEquipItemNeedItemData.cb, "needId,level,itemID_0,itemNum_0,itemID_1,itemNum_1,itemID_2,itemNum_2,itemID_3,itemNum_3,itemID_4,itemNum_4,itemID_5,itemNum_5,itemID_6,itemNum_6,itemID_7,itemNum_7,itemID_8,itemNum_8,itemID_9,itemNum_9,money", null);
 	}
 
 	public GrowEquipItemData GetGrowEquipItemData(uint id, uint lv)

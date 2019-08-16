@@ -40,12 +40,11 @@ public class AppLink {
     }
 
     public AppLink(Uri uri, List<Target> list, Uri uri2) {
-        List emptyList;
         this.sourceUrl = uri;
         if (list == null) {
-            emptyList = Collections.emptyList();
+            list = Collections.emptyList();
         }
-        this.targets = emptyList;
+        this.targets = list;
         this.webUrl = uri2;
     }
 

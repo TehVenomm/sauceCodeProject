@@ -1,4 +1,6 @@
-public class ModelViewerProxy
+using UnityEngine;
+
+public class ModelViewerProxy : MonoBehaviour
 {
 	public ModelViewer modelViewer;
 

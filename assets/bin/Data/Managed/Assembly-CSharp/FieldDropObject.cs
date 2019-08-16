@@ -2,7 +2,7 @@ using rhyme;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FieldDropObject : IAnimEvent
+public class FieldDropObject : MonoBehaviour, IAnimEvent
 {
 	protected enum AnimationStep
 	{
@@ -107,60 +107,78 @@ public class FieldDropObject : IAnimEvent
 	private static UIDropAnnounce.COLOR GetColor(Coop_Model_EnemyDefeat model, List<InGameManager.DropDeliveryInfo> deliveryList)
 	{
 		UIDropAnnounce.COLOR cOLOR = UIDropAnnounce.COLOR.NORMAL;
-		if (!model.dropLoungeShare)
+		if (model.dropLoungeShare)
 		{
-			switch (model.boxType)
-			{
-			case 1:
-				return UIDropAnnounce.COLOR.SP_N;
-			case 2:
-				return UIDropAnnounce.COLOR.SP_HN;
-			case 3:
-				return UIDropAnnounce.COLOR.SP_R;
-			case 4:
-				return UIDropAnnounce.COLOR.HALLOWEEN;
-			default:
-			{
-				int i = 0;
-				for (int count = model.dropIds.Count; i < count; i++)
-				{
-					if (cOLOR == UIDropAnnounce.COLOR.NORMAL)
-					{
-						switch (model.dropTypes[i])
-						{
-						case 5:
-							cOLOR = UIDropAnnounce.COLOR.RARE;
-							break;
-						case 4:
-						{
-							EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)model.dropItemIds[i]);
-							if (equipItemData != null && GameDefine.IsRare(equipItemData.rarity))
-							{
-								cOLOR = UIDropAnnounce.COLOR.RARE;
-							}
-							break;
-						}
-						default:
-						{
-							ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)model.dropItemIds[i]);
-							if (itemData != null && GameDefine.IsRare(itemData.rarity))
-							{
-								cOLOR = UIDropAnnounce.COLOR.RARE;
-							}
-							break;
-						}
-						}
-					}
-				}
-				if (deliveryList.Count > 0 && cOLOR == UIDropAnnounce.COLOR.NORMAL)
-				{
-					cOLOR = UIDropAnnounce.COLOR.DELIVERY;
-				}
-				return cOLOR;
-			}
-			}
+			return UIDropAnnounce.COLOR.LOUNGE;
 		}
-		return UIDropAnnounce.COLOR.LOUNGE;
+		switch (model.boxType)
+		{
+		case 1:
+			return UIDropAnnounce.COLOR.SP_N;
+		case 2:
+			return UIDropAnnounce.COLOR.SP_HN;
+		case 3:
+			return UIDropAnnounce.COLOR.SP_R;
+		case 4:
+			return UIDropAnnounce.COLOR.HALLOWEEN;
+		case 5:
+			return UIDropAnnounce.COLOR.ESP_N;
+		case 6:
+			return UIDropAnnounce.COLOR.ESP_HN;
+		case 7:
+			return UIDropAnnounce.COLOR.ESP_R;
+		case 8:
+			return UIDropAnnounce.COLOR.SEASONAL;
+		default:
+		{
+			int i = 0;
+			for (int count = model.dropIds.Count; i < count; i++)
+			{
+				if (cOLOR != 0)
+				{
+					continue;
+				}
+				switch (model.dropTypes[i])
+				{
+				case 5:
+					cOLOR = UIDropAnnounce.COLOR.RARE;
+					break;
+				case 4:
+				{
+					EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)model.dropItemIds[i]);
+					if (equipItemData != null && GameDefine.IsRare(equipItemData.rarity))
+					{
+						cOLOR = UIDropAnnounce.COLOR.RARE;
+					}
+					break;
+				}
+				case 14:
+				{
+					AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData((uint)model.dropItemIds[i]);
+					if (data != null && GameDefine.IsRare(data.rarity))
+					{
+						cOLOR = UIDropAnnounce.COLOR.RARE;
+					}
+					break;
+				}
+				default:
+				{
+					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)model.dropItemIds[i]);
+					if (itemData != null && GameDefine.IsRare(itemData.rarity))
+					{
+						cOLOR = UIDropAnnounce.COLOR.RARE;
+					}
+					break;
+				}
+				}
+			}
+			if (deliveryList.Count > 0 && cOLOR == UIDropAnnounce.COLOR.NORMAL)
+			{
+				cOLOR = UIDropAnnounce.COLOR.DELIVERY;
+			}
+			return cOLOR;
+		}
+		}
 	}
 
 	public static FieldDropObject CreateTreasureBox(Coop_Model_EnemyDefeat model, List<InGameManager.DropDeliveryInfo> deliveryList, List<InGameManager.DropItemInfo> itemList, UIDropAnnounce.COLOR color)
@@ -220,9 +238,6 @@ public class FieldDropObject : IAnimEvent
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		_transform = this.get_transform();
 		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
 		animator = this.get_gameObject().GetComponentInChildren<Animator>();
@@ -275,8 +290,6 @@ public class FieldDropObject : IAnimEvent
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Expected O, but got Unknown
 		if (targetObject.isInitialized && !isOpend && animationStep != AnimationStep.MOVE_TO_TARGET_POS && animationStep != AnimationStep.OPEN && IsSelfAttack(collider.get_gameObject()))
 		{
 			OpenDropObject();
@@ -313,7 +326,7 @@ public class FieldDropObject : IAnimEvent
 			{
 				animEventProcessor.CrossFade(openAnimHash, 0f);
 			}
-			effect = EffectManager.GetEffect("ef_btl_treasurebox_01", null);
+			effect = EffectManager.GetEffect("ef_btl_treasurebox_01");
 			effect.set_position(_transform.get_position());
 			rymFX component = effect.GetComponent<rymFX>();
 			if (component != null)
@@ -340,143 +353,136 @@ public class FieldDropObject : IAnimEvent
 
 	private void LateUpdate()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Expected O, but got Unknown
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
 		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
 		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0254: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
 		if (targetObject == null)
 		{
 			this.get_gameObject().SetActive(false);
+			return;
 		}
-		else
+		if (animEventProcessor != null)
 		{
-			if (animEventProcessor != null)
+			animEventProcessor.Update();
+		}
+		switch (animationStep)
+		{
+		case AnimationStep.MOVE_TO_TARGET_POS:
+		{
+			animationTimer += Time.get_deltaTime();
+			Vector3 position2 = Vector3.Lerp(dropPos, targetPos, animationTimer / MOVE_TO_TARGET_TIME);
+			float x = position2.x;
+			Vector3 position3 = _transform.get_position();
+			position2._002Ector(x, position3.y, position2.z);
+			_transform.set_position(position2);
+			if (animationTimer >= MOVE_TO_TARGET_TIME)
 			{
-				animEventProcessor.Update();
+				animationStep = AnimationStep.DROP_TO_GROUND;
 			}
-			switch (animationStep)
+			break;
+		}
+		case AnimationStep.DROP_TO_GROUND:
+		{
+			AnimatorStateInfo currentAnimatorStateInfo2 = animator.GetCurrentAnimatorStateInfo(0);
+			if (currentAnimatorStateInfo2.get_fullPathHash() == endAnimHash)
 			{
-			case AnimationStep.MOVE_TO_TARGET_POS:
-			{
-				animationTimer += Time.get_deltaTime();
-				Vector3 position2 = Vector3.Lerp(dropPos, targetPos, animationTimer / MOVE_TO_TARGET_TIME);
-				float x = position2.x;
-				Vector3 position3 = _transform.get_position();
-				position2._002Ector(x, position3.y, position2.z);
-				_transform.set_position(position2);
-				if (animationTimer >= MOVE_TO_TARGET_TIME)
-				{
-					animationStep = AnimationStep.DROP_TO_GROUND;
-				}
-				break;
+				targetPoint = this.GetComponent<TargetPoint>();
+				animationStep = AnimationStep.NONE;
 			}
-			case AnimationStep.DROP_TO_GROUND:
+			if (isRare)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo2 = animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo2.get_fullPathHash() == endAnimHash)
-				{
-					targetPoint = this.GetComponent<TargetPoint>();
-					animationStep = AnimationStep.NONE;
-				}
-				if (isRare)
-				{
-					SoundManager.PlayOneShotUISE(10000061);
-				}
-				else
-				{
-					SoundManager.PlayOneShotUISE(10000062);
-				}
-				break;
+				SoundManager.PlayOneShotUISE(10000061);
 			}
-			case AnimationStep.OPEN:
+			else
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == openAnimHash && currentAnimatorStateInfo.get_normalizedTime() > 0.99f)
-				{
-					animationStep = AnimationStep.NONE;
-					if (effect != null)
-					{
-						EffectManager.ReleaseEffect(effect.get_gameObject(), true, false);
-					}
-					this.get_gameObject().SetActive(false);
-				}
-				break;
+				SoundManager.PlayOneShotUISE(10000062);
 			}
-			case AnimationStep.GET:
+			break;
+		}
+		case AnimationStep.OPEN:
+		{
+			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+			if (currentAnimatorStateInfo.get_fullPathHash() == openAnimHash && currentAnimatorStateInfo.get_normalizedTime() > 0.99f)
+			{
+				animationStep = AnimationStep.NONE;
+				if (effect != null)
+				{
+					EffectManager.ReleaseEffect(effect.get_gameObject());
+				}
+				this.get_gameObject().SetActive(false);
+			}
+			break;
+		}
+		case AnimationStep.GET:
+			if (distanceAnim.IsPlaying())
+			{
+				moveTime += Time.get_deltaTime();
+				Bounds bounds = targetObject._collider.get_bounds();
+				Vector3 center = bounds.get_center();
+				Vector3 val = _transform.get_position() - center;
+				float magnitude = val.get_magnitude();
+				if (distance < magnitude)
+				{
+					distance = magnitude;
+				}
+				val = val.get_normalized() * distance * (1f - distanceAnim.Update());
+				Vector3 val2 = Quaternion.AngleAxis(moveTime * speedAnim.Update(), Vector3.get_up()) * val;
+				Vector3 position = center + val2;
+				_transform.set_position(position);
+				Vector3 localScale = Vector3.get_one() * scaleAnim.Update();
 				if (distanceAnim.IsPlaying())
 				{
-					moveTime += Time.get_deltaTime();
-					Bounds bounds = targetObject._collider.get_bounds();
-					Vector3 center = bounds.get_center();
-					Vector3 val = _transform.get_position() - center;
-					float magnitude = val.get_magnitude();
-					if (distance < magnitude)
-					{
-						distance = magnitude;
-					}
-					val = val.get_normalized() * distance * (1f - distanceAnim.Update());
-					Vector3 val2 = Quaternion.AngleAxis(moveTime * speedAnim.Update(), Vector3.get_up()) * val;
-					Vector3 position = center + val2;
-					_transform.set_position(position);
-					Vector3 localScale = Vector3.get_one() * scaleAnim.Update();
-					if (distanceAnim.IsPlaying())
-					{
-						_transform.set_localScale(localScale);
-					}
+					_transform.set_localScale(localScale);
 				}
-				else
-				{
-					Transform val3 = EffectManager.GetEffect("ef_btl_mpdrop_01", null);
-					val3.set_position(_transform.get_position());
-					rymFX component = val3.GetComponent<rymFX>();
-					if (component != null)
-					{
-						component.AutoDelete = true;
-						component.LoopEnd = true;
-					}
-					this.get_gameObject().SetActive(false);
-				}
-				break;
 			}
+			else
+			{
+				Transform val3 = EffectManager.GetEffect("ef_btl_mpdrop_01");
+				val3.set_position(_transform.get_position());
+				rymFX component = val3.GetComponent<rymFX>();
+				if (component != null)
+				{
+					component.AutoDelete = true;
+					component.LoopEnd = true;
+				}
+				this.get_gameObject().SetActive(false);
+			}
+			break;
 		}
 	}
 
@@ -506,7 +512,6 @@ public class FieldDropObject : IAnimEvent
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 		if (!isDelete)
 		{
 			isDelete = true;
@@ -516,15 +521,15 @@ public class FieldDropObject : IAnimEvent
 				targetObject = MonoBehaviourSingleton<StageObjectManager>.I.self;
 				Bounds bounds = targetObject._collider.get_bounds();
 				distance = Vector3.Distance(bounds.get_center(), _transform.get_position());
-				distanceAnim.Set(parameter.getAnimTime, 0f, 1f, parameter.distanceAnim, 0f, null);
+				distanceAnim.Set(parameter.getAnimTime, 0f, 1f, parameter.distanceAnim, 0f);
 				distanceAnim.Play();
-				speedAnim.Set(parameter.getAnimTime, 0f, parameter.rotateSpeed, parameter.rotateSpeedAnim, 0f, null);
+				speedAnim.Set(parameter.getAnimTime, 0f, parameter.rotateSpeed, parameter.rotateSpeedAnim, 0f);
 				speedAnim.Play();
-				scaleAnim.Set(parameter.getAnimTime, 0f, 1f, parameter.scaleAnim, 0f, null);
+				scaleAnim.Set(parameter.getAnimTime, 0f, 1f, parameter.scaleAnim, 0f);
 				scaleAnim.Play();
 				moveTime = 0f;
 				animationStep = AnimationStep.OPEN;
-				announceInfo = MonoBehaviourSingleton<InGameManager>.I.CreateDropAnnounceInfoList(deliveryInfo, itemInfo, true);
+				announceInfo = MonoBehaviourSingleton<InGameManager>.I.CreateDropAnnounceInfoList(deliveryInfo, itemInfo, isTreasureBox: true);
 			}
 			else
 			{

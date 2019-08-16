@@ -2,30 +2,37 @@ package com.google.android.gms.nearby.connection;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import java.util.List;
 
+@Class(creator = "AppMetadataCreator")
+@Reserved({1000})
 @Deprecated
-public final class AppMetadata extends zza {
-    public static final Creator<AppMetadata> CREATOR = new zzc();
-    private final List<AppIdentifier> zzjaj;
+public final class AppMetadata extends AbstractSafeParcelable {
+    public static final Creator<AppMetadata> CREATOR = new zzd();
+    @Field(getter = "getAppIdentifiers", mo13990id = 1)
+    private final List<AppIdentifier> zzp;
 
-    public AppMetadata(List<AppIdentifier> list) {
-        this.zzjaj = (List) zzbp.zzb((Object) list, (Object) "Must specify application identifiers");
-        if (list.size() == 0) {
-            throw new IllegalArgumentException(String.valueOf("Application identifiers cannot be empty"));
-        }
+    @Constructor
+    public AppMetadata(@Param(mo13993id = 1) List<AppIdentifier> list) {
+        this.zzp = (List) Preconditions.checkNotNull(list, "Must specify application identifiers");
+        Preconditions.checkNotZero(list.size(), (Object) "Application identifiers cannot be empty");
     }
 
     public final List<AppIdentifier> getAppIdentifiers() {
-        return this.zzjaj;
+        return this.zzp;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, getAppIdentifiers(), false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeTypedList(parcel, 1, getAppIdentifiers(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -1,14 +1,15 @@
 using GooglePlayGames.BasicApi;
 using System;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	internal class PlayGamesAchievement
+	internal class PlayGamesAchievement : IAchievement, IAchievementDescription
 	{
 		private readonly ReportProgress mProgressCallback;
 
-		private string mId;
+		private string mId = string.Empty;
 
 		private bool mIsIncremental;
 
@@ -22,19 +23,19 @@ namespace GooglePlayGames
 
 		private bool mHidden;
 
-		private DateTime mLastModifiedTime;
+		private DateTime mLastModifiedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
-		private string mTitle;
+		private string mTitle = string.Empty;
 
-		private string mRevealedImageUrl;
+		private string mRevealedImageUrl = string.Empty;
 
-		private string mUnlockedImageUrl;
+		private string mUnlockedImageUrl = string.Empty;
 
 		private WWW mImageFetcher;
 
 		private Texture2D mImage;
 
-		private string mDescription;
+		private string mDescription = string.Empty;
 
 		private ulong mPoints;
 
@@ -85,20 +86,12 @@ namespace GooglePlayGames
 		public int points => (int)mPoints;
 
 		internal PlayGamesAchievement()
+			: this(PlayGamesPlatform.Instance.ReportProgress)
 		{
-			PlayGamesPlatform instance = PlayGamesPlatform.Instance;
-			this._002Ector(instance.ReportProgress);
 		}
 
 		internal PlayGamesAchievement(ReportProgress progressCallback)
 		{
-			mId = string.Empty;
-			mLastModifiedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-			mTitle = string.Empty;
-			mRevealedImageUrl = string.Empty;
-			mUnlockedImageUrl = string.Empty;
-			mDescription = string.Empty;
-			base._002Ector();
 			mProgressCallback = progressCallback;
 		}
 
@@ -142,9 +135,7 @@ namespace GooglePlayGames
 		private Texture2D LoadImage()
 		{
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Expected O, but got Unknown
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Expected O, but got Unknown
+			//IL_0062: Expected O, but got Unknown
 			if (hidden)
 			{
 				return null;

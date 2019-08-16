@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class DraggableCamera
+public class DraggableCamera : MonoBehaviour
 {
 	protected Camera __camera;
 
@@ -25,8 +25,6 @@ public class DraggableCamera
 	{
 		get
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Expected O, but got Unknown
 			if (_cameraTransform == null)
 			{
 				_cameraTransform = _camera.get_transform();
@@ -188,34 +186,36 @@ public class DraggableCamera
 		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
 		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		if (IsInteractive() && touch_info0 != null && touch_info1 != null)
+		if (!IsInteractive() || touch_info0 == null || touch_info1 == null)
 		{
-			Plane hitPlane = this.hitPlane;
-			cameraMove = Vector3.get_zero();
-			Vector2 val = (touch_info0.position + touch_info1.position) * 0.5f;
-			Ray val2 = _camera.ScreenPointToRay(val.ToVector3XY());
-			float num = default(float);
-			if (hitPlane.Raycast(val2, ref num))
+			return;
+		}
+		Plane hitPlane = this.hitPlane;
+		cameraMove = Vector3.get_zero();
+		Vector2 val = (touch_info0.position + touch_info1.position) * 0.5f;
+		Ray val2 = _camera.ScreenPointToRay(val.ToVector3XY());
+		float num = default(float);
+		if (!hitPlane.Raycast(val2, ref num))
+		{
+			return;
+		}
+		Vector3 point = val2.GetPoint(num);
+		distance -= pinch_length * 0.01f;
+		distance = Mathf.Clamp(distance, cameraManualDistanceMin, cameraManualDistanceMax);
+		distanceManual = distance;
+		UpdateCameraTransform();
+		Vector2 val3 = _camera.WorldToScreenPoint(point).ToVector2XY();
+		Vector2 val4 = _camera.WorldToScreenPoint(targetPos).ToVector2XY();
+		Vector2 vector = val4 + (val3 - val);
+		val2 = _camera.ScreenPointToRay(vector.ToVector3XY());
+		if (hitPlane.Raycast(val2, ref num))
+		{
+			Vector3 point2 = val2.GetPoint(num);
+			point2.y = 0f;
+			Vector3 val5 = point2 - targetPos;
+			if (!(val5.get_magnitude() < float.Epsilon))
 			{
-				Vector3 point = val2.GetPoint(num);
-				distance -= pinch_length * 0.01f;
-				distance = Mathf.Clamp(distance, cameraManualDistanceMin, cameraManualDistanceMax);
-				distanceManual = distance;
-				UpdateCameraTransform();
-				Vector2 val3 = Utility.ToVector2XY(_camera.WorldToScreenPoint(point));
-				Vector2 val4 = Utility.ToVector2XY(_camera.WorldToScreenPoint(targetPos));
-				Vector2 vector = val4 + (val3 - val);
-				val2 = _camera.ScreenPointToRay(vector.ToVector3XY());
-				if (hitPlane.Raycast(val2, ref num))
-				{
-					Vector3 point2 = val2.GetPoint(num);
-					point2.y = 0f;
-					Vector3 val5 = point2 - targetPos;
-					if (!(val5.get_magnitude() < 1.401298E-45f))
-					{
-						targetPos = point2;
-					}
-				}
+				targetPos = point2;
 			}
 		}
 	}

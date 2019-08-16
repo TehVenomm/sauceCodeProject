@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class AnimatedWidget
+public class AnimatedWidget : MonoBehaviour
 {
 	public float width = 1f;
 

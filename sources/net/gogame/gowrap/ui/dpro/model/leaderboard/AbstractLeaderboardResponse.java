@@ -1,14 +1,16 @@
-package net.gogame.gowrap.ui.dpro.model.leaderboard;
+package net.gogame.gowrap.p019ui.dpro.model.leaderboard;
 
 import android.util.JsonReader;
 import android.util.JsonToken;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import net.gogame.gowrap.p019ui.dpro.model.BaseResponse;
+import net.gogame.gowrap.p019ui.dpro.model.leaderboard.LeaderboardEntry;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
-import net.gogame.gowrap.ui.dpro.model.BaseResponse;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.leaderboard.AbstractLeaderboardResponse */
 public abstract class AbstractLeaderboardResponse<T extends LeaderboardEntry> extends BaseResponse implements LeaderboardResponse<T> {
     private static final String KEY_DATE = "date";
     private static final String KEY_RECORDS = "records";
@@ -17,13 +19,18 @@ public abstract class AbstractLeaderboardResponse<T extends LeaderboardEntry> ex
     private List<T> records;
     private Long totalRecordCount;
 
-    protected abstract T doParseEntry(JsonReader jsonReader) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract T doParseEntry(JsonReader jsonReader) throws IOException;
+
+    public AbstractLeaderboardResponse() {
+    }
 
     public AbstractLeaderboardResponse(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_DATE)) {
             this.date = JSONUtils.optString(jsonReader);
             return true;

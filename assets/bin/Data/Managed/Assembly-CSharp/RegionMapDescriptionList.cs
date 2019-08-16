@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class RegionMapDescriptionList : GameSection
@@ -15,7 +16,8 @@ public class RegionMapDescriptionList : GameSection
 		BTN_TO_FIELD,
 		LBL_NON_LIST,
 		SPR_BG_FRAME,
-		TEX_FIELD
+		TEX_FIELD,
+		OBJ_BACK
 	}
 
 	private struct EnemyDataForDisplay
@@ -43,6 +45,16 @@ public class RegionMapDescriptionList : GameSection
 			this.uId = uId;
 		}
 	}
+
+	private const float ANCHOR_LEFT = 0f;
+
+	private const float ANCHOR_CENTER = 0.5f;
+
+	private const float ANCHOR_RIGHT = 1f;
+
+	private const float ANCHOR_BOT = 0f;
+
+	private const float ANCHOR_TOP = 1f;
 
 	private RegionMap.SpotEventData mapData;
 
@@ -113,24 +125,24 @@ public class RegionMapDescriptionList : GameSection
 		ClearTable();
 		int num2 = count + count3 + count2 + num;
 		SetActive((Enum)UI.LBL_NON_LIST, num2 <= 0);
-		SetTable(UI.TBL_ALL, string.Empty, num2, true, delegate(int i, Transform parent)
+		SetTable(UI.TBL_ALL, string.Empty, num2, reset: true, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (borderIndexTitleDic.ContainsKey(i))
 			{
-				return Realizes("RegionMapDescriptionBorderItem", parent, true);
+				return Realizes("RegionMapDescriptionBorderItem", parent);
 			}
 			if (i >= enemyStartIndex)
 			{
-				return Realizes("RegionMapDescriptionEnemyItem", parent, true);
+				return Realizes("RegionMapDescriptionEnemyItem", parent);
 			}
 			if (i >= happenStartIndex)
 			{
-				return Realizes("RegionMapDescriptionHappenItem", parent, true);
+				return Realizes("RegionMapDescriptionHappenItem", parent);
 			}
 			if (i >= deliveryStartIndex)
 			{
-				return Realizes("RegionMapDescriptionDeliveryItem", parent, true);
+				return Realizes("RegionMapDescriptionDeliveryItem", parent);
 			}
 			return result;
 		}, delegate(int i, Transform t, bool is_recycle)
@@ -139,26 +151,26 @@ public class RegionMapDescriptionList : GameSection
 			if (borderIndexTitleDic.TryGetValue(i, out value))
 			{
 				SetLabelText(t, UI.LBL_BORDER_TITLE, value);
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 			}
 			else if (i >= enemyStartIndex && i - enemyStartIndex < enemyDataList.Count)
 			{
 				SetupEnemyListItem(t, enemyDataList[i - enemyStartIndex]);
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 			}
 			else if (i >= happenStartIndex && i - happenStartIndex < happenDataList.Count)
 			{
 				SetupHappenListItem(t, happenDataList[i - happenStartIndex]);
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 			}
 			else if (i >= deliveryStartIndex && i - deliveryStartIndex < deliveryDataAndUIdList.Count)
 			{
 				SetupDeliveryListItem(t, deliveryDataAndUIdList[i - deliveryStartIndex]);
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 			}
 			else
 			{
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 			}
 		});
 	}
@@ -191,7 +203,7 @@ public class RegionMapDescriptionList : GameSection
 
 	private List<DeliveryDataAndUId> CreateDeliveryList(uint mapId)
 	{
-		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(false);
+		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(do_sort: false);
 		List<DeliveryDataAndUId> list = new List<DeliveryDataAndUId>();
 		if (deliveryList == null)
 		{
@@ -203,7 +215,7 @@ public class RegionMapDescriptionList : GameSection
 			Delivery delivery = deliveryList[i];
 			int dId = delivery.dId;
 			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)dId);
-			if (IsExistTargetEnemy(deliveryTableData, mapId))
+			if (IsExistTargetEnemy(deliveryTableData, mapId) && (!deliveryTableData.IsEvent() || !MonoBehaviourSingleton<QuestManager>.I.bingoEventList.Any((Network.EventData e) => e.eventId == deliveryTableData.eventID)))
 			{
 				list.Add(new DeliveryDataAndUId(deliveryTableData, delivery.uId));
 			}
@@ -257,36 +269,36 @@ public class RegionMapDescriptionList : GameSection
 		int i = 0;
 		for (int count = enemyPopList.Count; i < count; i++)
 		{
-			if (enemyPopList[i].enemyPopType == ENEMY_POP_TYPE.NONE)
+			if (enemyPopList[i].enemyPopType != 0 && enemyPopList[i].enemyPopType != ENEMY_POP_TYPE.FIELD_BOSS)
 			{
-				EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData(enemyPopList[i].enemyID);
-				uint num = enemyPopList[i].enemyLv;
-				if (num == 0)
-				{
-					int num2 = enemyData.level;
-					num = (uint)num2;
-				}
-				if (dictionary.TryGetValue(enemyData.id, out HashSet<uint> value))
-				{
-					if (!value.Add(num))
-					{
-						continue;
-					}
-				}
-				else
-				{
-					dictionary[enemyData.id] = new HashSet<uint>();
-					dictionary[enemyData.id].Add(num);
-				}
-				list.Add(new EnemyDataForDisplay(enemyData, num));
+				continue;
 			}
+			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData(enemyPopList[i].enemyID);
+			uint num = enemyPopList[i].enemyLv;
+			if (num == 0)
+			{
+				int num2 = enemyData.level;
+				num = (uint)num2;
+			}
+			if (dictionary.TryGetValue(enemyData.id, out HashSet<uint> value))
+			{
+				if (!value.Add(num))
+				{
+					continue;
+				}
+			}
+			else
+			{
+				dictionary[enemyData.id] = new HashSet<uint>();
+				dictionary[enemyData.id].Add(num);
+			}
+			list.Add(new EnemyDataForDisplay(enemyData, num));
 		}
 		return list;
 	}
 
 	private void SetupDeliveryListItem(Transform t, DeliveryDataAndUId deliveryDataAndUId)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		RegionMapDescriptionDeliveryItem regionMapDescriptionDeliveryItem = t.GetComponent<RegionMapDescriptionDeliveryItem>();
 		if (regionMapDescriptionDeliveryItem == null)
 		{
@@ -301,45 +313,40 @@ public class RegionMapDescriptionList : GameSection
 	{
 		DeliveryDataAndUId dataAndUId = (DeliveryDataAndUId)GameSection.GetEventData();
 		DeliveryTable.DeliveryData data = dataAndUId.data;
-		int id = (int)dataAndUId.data.id;
-		bool is_enough_material = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(id);
+		int deliveryId = (int)dataAndUId.data.id;
+		bool is_enough_material = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryId);
 		if (!is_enough_material)
 		{
 			GameSection.SetEventData(new object[4]
 			{
-				id,
+				deliveryId,
 				null,
 				false,
 				mapData
 			});
+			return;
+		}
+		bool flag = FieldManager.IsValidInGame();
+		bool flag2 = data.clearEventID != 0;
+		if (flag)
+		{
+			GameSection.StayEvent();
+			MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop(delegate(bool b)
+			{
+				if (b)
+				{
+					SendDeliveryComplete(data, dataAndUId.uId, is_enough_material);
+					if (Singleton<FieldMapTable>.I.GetDeliveryRelationPortalData((uint)deliveryId) != null)
+					{
+						MonoBehaviourSingleton<DeliveryManager>.I.CheckAnnouncePortalOpen();
+					}
+				}
+			});
 		}
 		else
 		{
-			bool flag = FieldManager.IsValidInGame();
-			bool flag2 = data.clearEventID != 0;
-			if (flag)
-			{
-				if (data.IsInvalidClearIngame() || flag2)
-				{
-					GameSection.ChangeEvent("DELIVERY_ITEM_COMPLETE", null);
-				}
-				else
-				{
-					GameSection.StayEvent();
-					MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop(delegate(bool b)
-					{
-						if (b)
-						{
-							SendDeliveryComplete(data, dataAndUId.uId, is_enough_material);
-						}
-					});
-				}
-			}
-			else
-			{
-				GameSection.StayEvent();
-				SendDeliveryComplete(data, dataAndUId.uId, is_enough_material);
-			}
+			GameSection.StayEvent();
+			SendDeliveryComplete(data, dataAndUId.uId, is_enough_material);
 		}
 	}
 
@@ -380,16 +387,40 @@ public class RegionMapDescriptionList : GameSection
 						delivery_id,
 						recv_reward
 					});
+					if (FieldManager.IsValidInGame())
+					{
+						is_success = false;
+						List<int> list = new List<int>(MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame);
+						for (int j = 0; j < list.Count; j++)
+						{
+							int item = list[j];
+							if (!MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Contains(item))
+							{
+								MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Add(item);
+							}
+						}
+						EventData[] requestEventData = new EventData[2]
+						{
+							new EventData("STORY_DELIVERY_REWARD", new object[2]
+							{
+								delivery_id,
+								recv_reward
+							}),
+							new EventData("PORTAL_RELEASE", GameSaveData.instance.newReleasePortals)
+						};
+						GameSaveData.instance.newReleasePortals = new List<uint>();
+						MonoBehaviourSingleton<InGameProgress>.I.FieldReadStory((int)deliveryData.clearEventID, isSend: true, requestEventData);
+						MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame.Clear();
+					}
 				}
 				deliveryDataAndUIdList = CreateDeliveryList(mapData.mapId);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
 	private void SetupHappenListItem(Transform t, QuestTable.QuestTableData happenData)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		RegionMapDescriptionHappenItem regionMapDescriptionHappenItem = t.GetComponent<RegionMapDescriptionHappenItem>();
 		if (regionMapDescriptionHappenItem == null)
 		{
@@ -408,7 +439,6 @@ public class RegionMapDescriptionList : GameSection
 
 	private void SetupEnemyListItem(Transform t, EnemyDataForDisplay enemyData)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		RegionMapDescriptionEnemyItem regionMapDescriptionEnemyItem = t.GetComponent<RegionMapDescriptionEnemyItem>();
 		if (regionMapDescriptionEnemyItem == null)
 		{
@@ -425,18 +455,15 @@ public class RegionMapDescriptionList : GameSection
 
 	private void ClearTable()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.TBL_ALL);
 		if (Object.op_Implicit(ctrl))
 		{
 			int i = 0;
 			for (int childCount = ctrl.get_childCount(); i < childCount; i++)
 			{
-				Transform val = ctrl.GetChild(0);
-				val.set_parent(null);
-				Object.Destroy(val.get_gameObject());
+				Transform child = ctrl.GetChild(0);
+				child.set_parent(null);
+				Object.Destroy(child.get_gameObject());
 			}
 		}
 	}
@@ -465,11 +492,45 @@ public class RegionMapDescriptionList : GameSection
 
 	private void Reposition()
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		UIScreenRotationHandler[] componentsInChildren = base._transform.GetComponentsInChildren<UIScreenRotationHandler>();
 		for (int i = 0; i < componentsInChildren.Length; i++)
 		{
 			componentsInChildren[i].InvokeRotate();
+		}
+		if (SpecialDeviceManager.HasSpecialDeviceInfo)
+		{
+			DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+			if (specialDeviceInfo.NeedModifyRegionMapDescriptionList)
+			{
+				UIWidget component = GetCtrl(UI.OBJ_BACK).GetComponent<UIWidget>();
+				UISprite component2 = GetCtrl(UI.BTN_TO_FIELD).GetComponent<UISprite>();
+				if (SpecialDeviceManager.IsPortrait)
+				{
+					component.leftAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorPortrait.left);
+					component.rightAnchor.Set(0.5f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorPortrait.right);
+					component.bottomAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorPortrait.bottom);
+					component.topAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorPortrait.top);
+					component.UpdateAnchors();
+					component2.leftAnchor.Set(0.5f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorPortrait.left);
+					component2.rightAnchor.Set(0.5f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorPortrait.right);
+					component2.bottomAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorPortrait.bottom);
+					component2.topAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorPortrait.top);
+					component2.UpdateAnchors();
+				}
+				else
+				{
+					component.leftAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorLandscape.left);
+					component.rightAnchor.Set(0.5f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorLandscape.right);
+					component.bottomAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorLandscape.bottom);
+					component.topAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBACKAnchorLandscape.top);
+					component.UpdateAnchors();
+					component2.leftAnchor.Set(0.5f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorLandscape.left);
+					component2.rightAnchor.Set(0.5f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorLandscape.right);
+					component2.bottomAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorLandscape.bottom);
+					component2.topAnchor.Set(0f, specialDeviceInfo.RegionMapDescriptionListBTNTOFIELDAnchorLandscape.top);
+					component2.UpdateAnchors();
+				}
+			}
 		}
 		GetCtrl(UI.SPR_BG_FRAME).GetComponent<UIRect>().UpdateAnchors();
 		UpdateAnchors();

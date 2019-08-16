@@ -43,12 +43,16 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 		BTN_BACK,
 		TGL_CHANGE_INVENTORY,
 		TGL_ICON_ASC,
+		BTN_CHANGE_INVENTORY,
 		OBJ_EMPTY_SKILL_ROOT,
+		TEX_EMPTY_SKILL,
 		SPR_EMPTY_SKILL,
 		LBL_EMPTY_SKILL_TYPE,
 		OBJ_CAPTION_3,
 		LBL_CAPTION
 	}
+
+	public const int DETACH_ALL_SKILL_INDEX = -2;
 
 	protected bool isVisibleEmptySkill;
 
@@ -56,6 +60,11 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 	{
 		InitializeCaption();
 		base.Initialize();
+	}
+
+	protected virtual void Update()
+	{
+		ObserveItemList();
 	}
 
 	public override void UpdateUI()
@@ -67,22 +76,23 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 	{
 		isVisibleEmptySkill = is_visible;
 		SetActive((Enum)UI.OBJ_EMPTY_SKILL_ROOT, is_visible);
-		if (is_visible)
+		if (!is_visible)
 		{
-			SKILL_SLOT_TYPE sKILL_SLOT_TYPE = SKILL_SLOT_TYPE.NONE;
-			if (equipItem != null)
-			{
-				SkillItemTable.SkillSlotData[] skillSlot = equipItem.tableData.GetSkillSlot(equipItem.exceed);
-				if (skillSlot == null || skillSlot.Length <= index)
-				{
-					SetActive((Enum)UI.OBJ_EMPTY_SKILL_ROOT, false);
-					return;
-				}
-				sKILL_SLOT_TYPE = skillSlot[index].slotType;
-			}
-			SetLabelText((Enum)UI.LBL_EMPTY_SKILL_TYPE, MonoBehaviourSingleton<StatusManager>.I.GetSkillItemGroupString(sKILL_SLOT_TYPE));
-			SetSprite((Enum)UI.SPR_EMPTY_SKILL, UIBehaviour.GetSkillIconSpriteName(sKILL_SLOT_TYPE, true, true));
+			return;
 		}
+		SKILL_SLOT_TYPE sKILL_SLOT_TYPE = SKILL_SLOT_TYPE.NONE;
+		if (equipItem != null)
+		{
+			SkillItemTable.SkillSlotData[] skillSlot = equipItem.tableData.GetSkillSlot(equipItem.exceed);
+			if (skillSlot == null || skillSlot.Length <= index)
+			{
+				SetActive((Enum)UI.OBJ_EMPTY_SKILL_ROOT, is_visible: false);
+				return;
+			}
+			sKILL_SLOT_TYPE = skillSlot[index].slotType;
+		}
+		SetLabelText((Enum)UI.LBL_EMPTY_SKILL_TYPE, MonoBehaviourSingleton<StatusManager>.I.GetSkillItemGroupString(sKILL_SLOT_TYPE));
+		SetSprite((Enum)UI.SPR_EMPTY_SKILL, UIBehaviour.GetSkillIconSpriteName(sKILL_SLOT_TYPE, is_attached: true, is_button_icon: true));
 	}
 
 	protected override void UpdateParam()
@@ -96,6 +106,11 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 		{
 			selectIndex = num;
 			selectSkillItem = (inventory.datas[selectIndex].GetItemData() as SkillItemInfo);
+		}
+		else if (num == -2)
+		{
+			selectIndex = -2;
+			selectSkillItem = null;
 		}
 		else
 		{
@@ -119,7 +134,6 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
@@ -132,7 +146,7 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 }

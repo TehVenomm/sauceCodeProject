@@ -1,10 +1,14 @@
-package net.gogame.gowrap.ui.dpro.view;
+package net.gogame.gowrap.p019ui.dpro.view;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.view.Margins */
 public class Margins {
     public float bottom;
     public float left;
     public float right;
     public float top;
+
+    public Margins() {
+    }
 
     public Margins(float f, float f2, float f3, float f4) {
         this.left = f;

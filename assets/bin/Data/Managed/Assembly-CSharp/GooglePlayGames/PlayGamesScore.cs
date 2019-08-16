@@ -1,8 +1,9 @@
 using System;
+using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	public class PlayGamesScore
+	public class PlayGamesScore : IScore
 	{
 		private string mLbId;
 

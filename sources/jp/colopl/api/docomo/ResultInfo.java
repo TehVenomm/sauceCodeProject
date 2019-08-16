@@ -1,11 +1,13 @@
-package jp.colopl.api.docomo;
+package p018jp.colopl.api.docomo;
 
-import com.google.android.gms.games.GamesStatusCodes;
-
+/* renamed from: jp.colopl.api.docomo.ResultInfo */
 public class ResultInfo {
     private String errorMessage = null;
     private int resultCode = 0;
     private int totalCount = 0;
+
+    public ResultInfo() {
+    }
 
     ResultInfo(int i, int i2, String str) {
         this.totalCount = i;
@@ -22,7 +24,16 @@ public class ResultInfo {
     }
 
     public int getStatus() {
-        return (this.resultCode < 2000 || this.resultCode > 2999) ? (this.resultCode < 3000 || this.resultCode > 3999) ? (this.resultCode < GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND || this.resultCode > 4999) ? (this.resultCode < 5000 || this.resultCode > 5999) ? -1 : 2 : 3 : 2 : 0;
+        if (this.resultCode >= 2000 && this.resultCode <= 2999) {
+            return 0;
+        }
+        if (this.resultCode >= 3000 && this.resultCode <= 3999) {
+            return 2;
+        }
+        if (this.resultCode < 4000 || this.resultCode > 4999) {
+            return (this.resultCode < 5000 || this.resultCode > 5999) ? -1 : 2;
+        }
+        return 3;
     }
 
     public int getTotalCount() {
@@ -30,11 +41,17 @@ public class ResultInfo {
     }
 
     public String getUrlForAuthorize() {
-        return isNeedToAuthroize() ? this.errorMessage : isNeedToAuthroizeAll() ? DoCoMoAPI.SETTING_SITE_URL : null;
+        if (isNeedToAuthroize()) {
+            return this.errorMessage;
+        }
+        if (isNeedToAuthroizeAll()) {
+            return DoCoMoAPI.SETTING_SITE_URL;
+        }
+        return null;
     }
 
     public boolean isNeedToAuthroize() {
-        return this.resultCode == GamesStatusCodes.STATUS_SNAPSHOT_CONTENTS_UNAVAILABLE;
+        return this.resultCode == 4002;
     }
 
     public boolean isNeedToAuthroizeAll() {

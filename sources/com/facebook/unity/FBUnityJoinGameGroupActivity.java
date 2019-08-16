@@ -11,16 +11,17 @@ import com.facebook.share.widget.JoinAppGroupDialog.Result;
 public class FBUnityJoinGameGroupActivity extends BaseActivity {
     public static String JOIN_GAME_GROUP_PARAMS = "join_game_group_params";
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Bundle bundleExtra = getIntent().getBundleExtra(JOIN_GAME_GROUP_PARAMS);
         final UnityMessage unityMessage = new UnityMessage("OnJoinGroupComplete");
         if (bundleExtra.containsKey(Constants.CALLBACK_ID_KEY)) {
             unityMessage.put(Constants.CALLBACK_ID_KEY, bundleExtra.getString(Constants.CALLBACK_ID_KEY));
         }
-        Object obj = "";
+        String str = "";
         if (bundleExtra.containsKey("id")) {
-            obj = bundleExtra.getString("id");
+            str = bundleExtra.getString("id");
         }
         JoinAppGroupDialog joinAppGroupDialog = new JoinAppGroupDialog((Activity) this);
         joinAppGroupDialog.registerCallback(this.mCallbackManager, new FacebookCallback<Result>() {
@@ -38,6 +39,6 @@ public class FBUnityJoinGameGroupActivity extends BaseActivity {
                 unityMessage.send();
             }
         });
-        joinAppGroupDialog.show(obj);
+        joinAppGroupDialog.show(str);
     }
 }

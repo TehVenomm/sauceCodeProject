@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerMarker
+public class PlayerMarker : MonoBehaviour
 {
 	[SerializeField]
 	private float speed;
@@ -27,10 +27,6 @@ public class PlayerMarker
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
 		_transform = this.get_transform();
 		MeshRenderer component = this.GetComponent<MeshRenderer>();
 		if (component != null)

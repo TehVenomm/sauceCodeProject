@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.v2017_1;
+package net.gogame.gowrap.p019ui.v2017_1;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -16,40 +16,36 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 
+/* renamed from: net.gogame.gowrap.ui.v2017_1.AbstractNewsFeedItemView */
 public abstract class AbstractNewsFeedItemView extends FrameLayout {
     public static final String DEFAULT_TIMESTAMP_DATE_FORMAT = "MMM d, yy h:mm a";
-    private Double aspectRatio;
-    private Integer availableWidth;
+    /* access modifiers changed from: private */
+    public Double aspectRatio;
+    /* access modifiers changed from: private */
+    public Integer availableWidth;
     private int contentBackgroundCount = 1;
-    private View resizingView;
+    /* access modifiers changed from: private */
+    public View resizingView;
 
-    /* renamed from: net.gogame.gowrap.ui.v2017_1.AbstractNewsFeedItemView$1 */
-    class C11861 implements OnGlobalLayoutListener {
-        C11861() {
-        }
+    /* access modifiers changed from: protected */
+    public abstract void customInit(Context context);
 
-        public void onGlobalLayout() {
-            if (AbstractNewsFeedItemView.this.availableWidth == null) {
-                AbstractNewsFeedItemView.this.availableWidth = Integer.valueOf(AbstractNewsFeedItemView.this.resizingView.getWidth());
-                AbstractNewsFeedItemView.this.resizeView(AbstractNewsFeedItemView.this.resizingView, AbstractNewsFeedItemView.this.availableWidth, AbstractNewsFeedItemView.this.aspectRatio);
-                AbstractNewsFeedItemView.this.onLayoutCompleted();
-            }
-        }
-    }
+    /* access modifiers changed from: protected */
+    public abstract int[] getButtonClickResourceIds();
 
-    protected abstract void customInit(Context context);
+    /* access modifiers changed from: protected */
+    public abstract int[] getClickResourceIds();
 
-    protected abstract int[] getButtonClickResourceIds();
+    /* access modifiers changed from: protected */
+    public abstract Integer getResizingViewResourceId();
 
-    protected abstract int[] getClickResourceIds();
+    /* access modifiers changed from: protected */
+    public abstract int getViewResourceId();
 
-    protected abstract Integer getResizingViewResourceId();
-
-    protected abstract int getViewResourceId();
-
-    protected abstract void onLayoutCompleted();
+    /* access modifiers changed from: protected */
+    public abstract void onLayoutCompleted();
 
     public AbstractNewsFeedItemView(Context context) {
         super(context);
@@ -72,7 +68,8 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
         init(context, attributeSet);
     }
 
-    protected boolean isLayoutCompleted() {
+    /* access modifiers changed from: protected */
+    public boolean isLayoutCompleted() {
         return this.availableWidth != null;
     }
 
@@ -81,22 +78,30 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
         if (inflate != null) {
             addView(inflate);
         }
-        this.contentBackgroundCount = getResources().getInteger(C1110R.integer.net_gogame_gowrap_newsfeed_item_content_backgrounds);
+        this.contentBackgroundCount = getResources().getInteger(C1423R.integer.net_gogame_gowrap_newsfeed_item_content_backgrounds);
         customInit(context);
         if (getResizingViewResourceId() != null) {
             this.resizingView = findViewById(getResizingViewResourceId().intValue());
             if (this.resizingView != null) {
-                this.resizingView.getViewTreeObserver().addOnGlobalLayoutListener(new C11861());
+                this.resizingView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+                    public void onGlobalLayout() {
+                        if (AbstractNewsFeedItemView.this.availableWidth == null) {
+                            AbstractNewsFeedItemView.this.availableWidth = Integer.valueOf(AbstractNewsFeedItemView.this.resizingView.getWidth());
+                            AbstractNewsFeedItemView.this.resizeView(AbstractNewsFeedItemView.this.resizingView, AbstractNewsFeedItemView.this.availableWidth, AbstractNewsFeedItemView.this.aspectRatio);
+                            AbstractNewsFeedItemView.this.onLayoutCompleted();
+                        }
+                    }
+                });
             }
         }
     }
 
     public void setPosition(int i) {
-        ((ImageView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_content_background)).setImageLevel(i % this.contentBackgroundCount);
+        ((ImageView) findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_item_content_background)).setImageLevel(i % this.contentBackgroundCount);
     }
 
     public void setButtonImage(Drawable drawable) {
-        ((ImageView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_button)).setImageDrawable(drawable);
+        ((ImageView) findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_item_button)).setImageDrawable(drawable);
     }
 
     public void setTimestamp(Long l) {
@@ -116,7 +121,7 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
     }
 
     public void setTimestamp(String str) {
-        TextView textView = (TextView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_timestamp);
+        TextView textView = (TextView) findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_item_timestamp);
         if (str != null) {
             textView.setText(str);
             textView.setVisibility(0);
@@ -126,7 +131,7 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
     }
 
     public void setMessage(String str) {
-        TextView textView = (TextView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_message);
+        TextView textView = (TextView) findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_item_message);
         if (str != null) {
             textView.setText(str);
             textView.setVisibility(0);
@@ -157,7 +162,8 @@ public abstract class AbstractNewsFeedItemView extends FrameLayout {
         resizeView(this.resizingView, this.availableWidth, Double.valueOf(d));
     }
 
-    protected void resizeView(View view, Integer num, Double d) {
+    /* access modifiers changed from: protected */
+    public void resizeView(View view, Integer num, Double d) {
         if (view != null && num != null && d != null) {
             int intValue = num.intValue();
             int doubleValue = (int) (num.doubleValue() / d.doubleValue());

@@ -18,11 +18,11 @@ public abstract class ObjectIdGenerator<T> implements Serializable {
             this.type = cls;
             this.scope = cls2;
             this.key = obj;
-            int hashCode = obj.hashCode() + cls.getName().hashCode();
+            int hashCode2 = obj.hashCode() + cls.getName().hashCode();
             if (cls2 != null) {
-                hashCode ^= cls2.getName().hashCode();
+                hashCode2 ^= cls2.getName().hashCode();
             }
-            this.hashCode = hashCode;
+            this.hashCode = hashCode2;
         }
 
         public int hashCode() {

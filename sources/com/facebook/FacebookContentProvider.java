@@ -10,11 +10,13 @@ import android.util.Pair;
 import com.appsflyer.share.Constants;
 import com.facebook.internal.NativeAppCallAttachmentStore;
 import com.google.android.gms.drive.DriveFile;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.UUID;
 
 public class FacebookContentProvider extends ContentProvider {
     private static final String ATTACHMENT_URL_BASE = "content://com.facebook.app.FacebookContentProvider";
+    private static final String INVALID_FILE_NAME = "..";
     private static final String TAG = FacebookContentProvider.class.getName();
 
     public static String getAttachmentUrl(String str, UUID uuid, String str2) {
@@ -43,18 +45,27 @@ public class FacebookContentProvider extends ContentProvider {
             throw new FileNotFoundException();
         }
         try {
-            return ParcelFileDescriptor.open(NativeAppCallAttachmentStore.openAttachment((UUID) parseCallIdAndAttachmentName.first, (String) parseCallIdAndAttachmentName.second), DriveFile.MODE_READ_ONLY);
+            File openAttachment = NativeAppCallAttachmentStore.openAttachment((UUID) parseCallIdAndAttachmentName.first, (String) parseCallIdAndAttachmentName.second);
+            if (openAttachment != null) {
+                return ParcelFileDescriptor.open(openAttachment, DriveFile.MODE_READ_ONLY);
+            }
+            throw new FileNotFoundException();
         } catch (FileNotFoundException e) {
             Log.e(TAG, "Got unexpected exception:" + e);
             throw e;
         }
     }
 
-    Pair<UUID, String> parseCallIdAndAttachmentName(Uri uri) {
+    /* access modifiers changed from: 0000 */
+    public Pair<UUID, String> parseCallIdAndAttachmentName(Uri uri) {
         try {
             String[] split = uri.getPath().substring(1).split(Constants.URL_PATH_DELIMITER);
             String str = split[0];
-            return new Pair(UUID.fromString(str), split[1]);
+            String str2 = split[1];
+            if (!INVALID_FILE_NAME.contentEquals(str) && !INVALID_FILE_NAME.contentEquals(str2)) {
+                return new Pair<>(UUID.fromString(str), str2);
+            }
+            throw new Exception();
         } catch (Exception e) {
             return null;
         }

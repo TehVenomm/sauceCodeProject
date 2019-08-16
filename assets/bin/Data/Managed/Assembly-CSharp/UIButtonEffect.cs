@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIButtonEffect
+public class UIButtonEffect : MonoBehaviour
 {
 	private class CacheParam
 	{
@@ -81,8 +81,6 @@ public class UIButtonEffect
 
 	private void Start()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
 		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
@@ -107,34 +105,30 @@ public class UIButtonEffect
 	{
 		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		if (mStarted && buttonScale_tweenTarget != null)
+		if (!mStarted || !(buttonScale_tweenTarget != null))
 		{
-			TweenScale component = buttonScale_tweenTarget.GetComponent<TweenScale>();
-			if (component != null)
+			return;
+		}
+		TweenScale component = buttonScale_tweenTarget.GetComponent<TweenScale>();
+		if (component != null)
+		{
+			if (buttonScale_Collider != null)
 			{
-				if (buttonScale_Collider != null)
-				{
-					buttonScale_Collider.set_size(buttonScale_ColliderSize);
-				}
-				component.value = buttonScale_mScale;
-				component.set_enabled(false);
+				buttonScale_Collider.set_size(buttonScale_ColliderSize);
 			}
+			component.value = buttonScale_mScale;
+			component.set_enabled(false);
 		}
 	}
 
 	private void Awake()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
 		wasSetup = false;
 		thisTransform = this.get_gameObject().get_transform();
 	}
 
 	public void Setup(Transform ef)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
 		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
@@ -145,7 +139,6 @@ public class UIButtonEffect
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
@@ -153,9 +146,7 @@ public class UIButtonEffect
 		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f0: Expected O, but got Unknown
 		effect = ef;
 		effectObj = effect.get_gameObject();
 		float duration = 0.35f;
@@ -191,10 +182,10 @@ public class UIButtonEffect
 		if (null != component && null != component2 && component.pivot != UIWidget.Pivot.Center)
 		{
 			component.pivot = UIWidget.Pivot.Center;
-			pivotOffset = CalcPivotOffset(component2, true);
+			pivotOffset = CalcPivotOffset(component2);
 			Transform obj = effect;
 			obj.set_localPosition(obj.get_localPosition() - pivotOffset);
-			Vector3 offset = CalcPivotOffset(component2, false);
+			Vector3 offset = CalcPivotOffset(component2, isScaling: false);
 			int childCount = effect.get_childCount();
 			for (int i = 0; i < childCount; i++)
 			{
@@ -243,7 +234,6 @@ public class UIButtonEffect
 
 	private UISprite[] CollectToggleSprites(UISprite[] orgArray)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		int num = orgArray.Length;
 		UISprite[] array = new UISprite[num];
 		for (int i = 0; i < num; i++)
@@ -265,29 +255,30 @@ public class UIButtonEffect
 
 	private void FindAndDelete(string name)
 	{
-		if (name != null && name.Length != 0)
+		if (name == null || name.Length == 0)
 		{
-			int hashCode = name.GetHashCode();
-			int count = cacheObjects.Count;
-			for (int i = 0; i < count; i++)
+			return;
+		}
+		int hashCode = name.GetHashCode();
+		int count = cacheObjects.Count;
+		for (int i = 0; i < count; i++)
+		{
+			CacheParam cacheParam = cacheObjects[i];
+			if (hashCode == cacheParam.nameHash)
 			{
-				CacheParam cacheParam = cacheObjects[i];
-				if (hashCode == cacheParam.nameHash)
-				{
-					Object.DestroyImmediate(cacheParam.clone);
-					cacheObjects.Remove(cacheParam);
-					break;
-				}
+				Object.DestroyImmediate(cacheParam.clone);
+				cacheObjects.Remove(cacheParam);
+				break;
 			}
-			CacheParam[] array = cacheObjects.ToArray();
-			count = array.Length;
-			for (int j = 0; j < count; j++)
+		}
+		CacheParam[] array = cacheObjects.ToArray();
+		count = array.Length;
+		for (int j = 0; j < count; j++)
+		{
+			CacheParam cacheParam2 = array[j];
+			if (null == cacheParam2.clone)
 			{
-				CacheParam cacheParam2 = array[j];
-				if (null == cacheParam2.clone)
-				{
-					cacheObjects.Remove(cacheParam2);
-				}
+				cacheObjects.Remove(cacheParam2);
 			}
 		}
 	}
@@ -329,9 +320,7 @@ public class UIButtonEffect
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
 		trs.set_localPosition(trs.get_localPosition() + offset);
 		int childCount = trs.get_childCount();
 		for (int i = 0; i < childCount; i++)
@@ -360,8 +349,6 @@ public class UIButtonEffect
 
 	private void OnClick()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
 		if (TutorialMessage.IsActiveButton(this.get_gameObject()) && wasSetup && this.get_enabled() && null != effect)
 		{
 			if (isToggle)
@@ -386,88 +373,80 @@ public class UIButtonEffect
 
 	private void OnPress(bool isDown)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Expected O, but got Unknown
 		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0235: Unknown result type (might be due to invalid IL or missing references)
 		//IL_023a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		if (TutorialMessage.IsActiveButton(this.get_gameObject()))
+		if (!TutorialMessage.IsActiveButton(this.get_gameObject()))
 		{
-			if (existsIcon && isDown && !isSimple)
+			return;
+		}
+		if (existsIcon && isDown && !isSimple)
+		{
+			this.get_gameObject().GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+			for (int i = 0; i < Temporary.itemIconList.Count; i++)
 			{
-				this.get_gameObject().GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
-				for (int i = 0; i < Temporary.itemIconList.Count; i++)
+				if (!(Temporary.itemIconList[i].icon.mainTexture == null) && !cacheIconNames.Contains(Temporary.itemIconList[i].icon.mainTexture.get_name()))
 				{
-					if (!(Temporary.itemIconList[i].icon.mainTexture == null) && !cacheIconNames.Contains(Temporary.itemIconList[i].icon.mainTexture.get_name()))
-					{
-						Reset();
-						break;
-					}
+					Reset();
+					break;
 				}
-				Temporary.itemIconList.Clear();
 			}
-			if (isDown && !wasSetup && !isSimple)
+			Temporary.itemIconList.Clear();
+		}
+		if (isDown && !wasSetup && !isSimple)
+		{
+			cacheObjects = new List<CacheParam>();
+			Transform val = CreateSprites(thisTransform, MonoBehaviourSingleton<UIManager>.I.buttonEffectTop, cacheObjects);
+			val.set_position(thisTransform.get_position());
+			Setup(val);
+			this.get_gameObject().GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+			if (Temporary.itemIconList.Count > 0)
 			{
-				cacheObjects = new List<CacheParam>();
-				Transform val = CreateSprites(thisTransform, MonoBehaviourSingleton<UIManager>.I.buttonEffectTop, cacheObjects);
-				val.set_position(thisTransform.get_position());
-				Setup(val);
-				this.get_gameObject().GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
-				if (Temporary.itemIconList.Count > 0)
+				cacheIconNames = new List<string>();
+				for (int j = 0; j < Temporary.itemIconList.Count; j++)
 				{
-					cacheIconNames = new List<string>();
-					for (int j = 0; j < Temporary.itemIconList.Count; j++)
+					if (!(Temporary.itemIconList[j].icon.mainTexture == null))
 					{
-						if (!(Temporary.itemIconList[j].icon.mainTexture == null))
-						{
-							cacheIconNames.Add(Temporary.itemIconList[j].icon.mainTexture.get_name());
-						}
+						cacheIconNames.Add(Temporary.itemIconList[j].icon.mainTexture.get_name());
 					}
-					existsIcon = true;
 				}
-				Temporary.itemIconList.Clear();
+				existsIcon = true;
 			}
-			if (this.get_enabled())
+			Temporary.itemIconList.Clear();
+		}
+		if (!this.get_enabled())
+		{
+			return;
+		}
+		if (!mStarted)
+		{
+			Start();
+		}
+		TweenScale.Begin(buttonScale_tweenTarget.get_gameObject(), buttonScale_duration, (!isDown) ? buttonScale_mScale : Vector3.Scale(buttonScale_mScale, buttonScale_pressed)).method = UITweener.Method.EaseInOut;
+		if (buttonScale_Collider != null)
+		{
+			if (isDown)
 			{
-				if (!mStarted)
-				{
-					Start();
-				}
-				TweenScale.Begin(buttonScale_tweenTarget.get_gameObject(), buttonScale_duration, (!isDown) ? buttonScale_mScale : Vector3.Scale(buttonScale_mScale, buttonScale_pressed)).method = UITweener.Method.EaseInOut;
-				if (buttonScale_Collider != null)
-				{
-					if (isDown)
-					{
-						buttonScale_Collider.set_size(buttonScale_ColliderSize.Div(buttonScale_pressed) + new Vector3(0.01f, 0.01f, 0.01f));
-					}
-					else
-					{
-						buttonScale_Collider.set_size(buttonScale_ColliderSize);
-					}
-				}
+				buttonScale_Collider.set_size(buttonScale_ColliderSize.Div(buttonScale_pressed) + new Vector3(0.01f, 0.01f, 0.01f));
+			}
+			else
+			{
+				buttonScale_Collider.set_size(buttonScale_ColliderSize);
 			}
 		}
 	}
 
 	private void CreateGlowAtlas()
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 		Transform atlasTop = MonoBehaviourSingleton<UIManager>.I.atlasTop;
 		effect.GetComponentsInChildren<UISprite>(true, Temporary.uiSpriteList);
 		int i = 0;
@@ -479,23 +458,21 @@ public class UIButtonEffect
 				Temporary.uiSpriteList.RemoveAt(i);
 				i--;
 				num--;
+				continue;
 			}
-			else
+			UISpriteAddShaderReplacer uISpriteAddShaderReplacer = uISprite.get_gameObject().GetComponent<UISpriteAddShaderReplacer>();
+			if (null == uISpriteAddShaderReplacer)
 			{
-				UISpriteAddShaderReplacer uISpriteAddShaderReplacer = uISprite.get_gameObject().GetComponent<UISpriteAddShaderReplacer>();
-				if (null == uISpriteAddShaderReplacer)
-				{
-					uISpriteAddShaderReplacer = uISprite.get_gameObject().AddComponent<UISpriteAddShaderReplacer>();
-				}
-				uISpriteAddShaderReplacer.Replace("mobile/Custom/ui_add_mul_internal");
-				Material spriteMaterial = uISprite.atlas.spriteMaterial;
-				if (null != spriteMaterial)
-				{
-					spriteMaterial.SetColor(TintColorID, new Color(1f, 1f, 1f, 1f));
-					spriteMaterial.SetFloat(MulColorID, 4f);
-				}
-				uISprite.atlas.get_gameObject().get_transform().SetParent(atlasTop);
+				uISpriteAddShaderReplacer = uISprite.get_gameObject().AddComponent<UISpriteAddShaderReplacer>();
 			}
+			uISpriteAddShaderReplacer.Replace("mobile/Custom/UI/ui_add_mul_internal");
+			Material spriteMaterial = uISprite.atlas.spriteMaterial;
+			if (null != spriteMaterial)
+			{
+				spriteMaterial.SetColor(TintColorID, new Color(1f, 1f, 1f, 1f));
+				spriteMaterial.SetFloat(MulColorID, 4f);
+			}
+			uISprite.atlas.get_gameObject().get_transform().SetParent(atlasTop);
 		}
 		cacheSprites = Temporary.uiSpriteList.ToArray();
 		Temporary.uiSpriteList.Clear();
@@ -587,20 +564,12 @@ public class UIButtonEffect
 	private static Transform CreateSprites(Transform org, Transform parent, List<CacheParam> cacheObjects)
 	{
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
+		//IL_000c: Expected O, but got Unknown
 		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Expected O, but got Unknown
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Expected O, but got Unknown
 		GameObject val = new GameObject(org.get_name());
-		Transform val2 = val.get_transform();
+		Transform transform = val.get_transform();
 		UISprite component = org.GetComponent<UISprite>();
 		if (null != component)
 		{
@@ -616,9 +585,9 @@ public class UIButtonEffect
 			uISprite.flip = component.flip;
 			uISprite.pivot = component.pivot;
 		}
-		val2.SetParent(parent);
-		val2.set_localPosition(org.get_localPosition());
-		val2.set_localScale(org.get_localScale());
+		transform.SetParent(parent);
+		transform.set_localPosition(org.get_localPosition());
+		transform.set_localScale(org.get_localScale());
 		val.set_layer(org.get_gameObject().get_layer());
 		val.SetActive(org.get_gameObject().get_activeSelf());
 		CacheParam cacheParam = new CacheParam();
@@ -629,8 +598,8 @@ public class UIButtonEffect
 		int childCount = org.get_childCount();
 		for (int i = 0; i < childCount; i++)
 		{
-			CreateSprites(org.GetChild(i), val2, cacheObjects);
+			CreateSprites(org.GetChild(i), transform, cacheObjects);
 		}
-		return val2;
+		return transform;
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShieldEffectCtrl
+public class ShieldEffectCtrl : MonoBehaviour
 {
 	[Serializable]
 	private class ColorSet
@@ -21,24 +21,24 @@ public class ShieldEffectCtrl
 	[Tooltip("LOOPを指定")]
 	private Transform targetRotateRoot;
 
-	[Tooltip("HITを指定")]
 	[SerializeField]
+	[Tooltip("HITを指定")]
 	private Transform hitEffectRoot;
 
 	[SerializeField]
 	[Tooltip("エフェクトのク\u30fcルタイム")]
 	private float effectTime = 0.5f;
 
-	[Tooltip("1秒で回転する角度")]
 	[SerializeField]
+	[Tooltip("1秒で回転する角度")]
 	private float rotateSpeed = 180f;
 
-	[Tooltip("シ\u30fcルドHPが0の時のScale")]
 	[SerializeField]
+	[Tooltip("シ\u30fcルドHPが0の時のScale")]
 	private Vector3 afterScale;
 
-	[Tooltip("Element0(HP MAX),Element1,...,ElementN(HP 0)の順でシ\u30fcルドHPに合わせて変化する")]
 	[SerializeField]
+	[Tooltip("Element0(HP MAX),Element1,...,ElementN(HP 0)の順でシ\u30fcルドHPに合わせて変化する")]
 	private ColorSet[] colorVariation;
 
 	private Transform[] targetObject;
@@ -74,11 +74,6 @@ public class ShieldEffectCtrl
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Expected O, but got Unknown
 		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
 		_transform = this.get_transform();
 		targetCharacter = GetTargetCharacter(_transform);
@@ -118,8 +113,6 @@ public class ShieldEffectCtrl
 
 	private void Update()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Expected O, but got Unknown
 		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
@@ -140,80 +133,77 @@ public class ShieldEffectCtrl
 		//IL_0276: Unknown result type (might be due to invalid IL or missing references)
 		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02db: Expected O, but got Unknown
-		//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
 		if (targetCharacter == null || targetObject == null)
 		{
 			this.set_enabled(false);
-			EffectManager.ReleaseEffect(this.get_gameObject(), false, false);
+			EffectManager.ReleaseEffect(this.get_gameObject(), isPlayEndAnimation: false);
+			return;
 		}
-		else
+		if (targetCharacter.actionID == (Character.ACTION_ID)36 && !isWarping)
 		{
-			if (targetCharacter.actionID == (Character.ACTION_ID)34 && !isWarping)
+			SetActiveRenderer(active: false);
+			isWarping = true;
+		}
+		if (targetCharacter.actionID != (Character.ACTION_ID)36 && isWarping)
+		{
+			SetActiveRenderer(active: true);
+			isWarping = false;
+		}
+		if (targetRotateRoot != null)
+		{
+			if (isSetOtherParent)
 			{
-				SetActiveRenderer(false);
-				isWarping = true;
+				_transform.set_position(targetCharacter._transform.get_position());
 			}
-			if (targetCharacter.actionID != (Character.ACTION_ID)34 && isWarping)
+			if (rotateSpeed != 0f)
 			{
-				SetActiveRenderer(true);
-				isWarping = false;
+				targetRotateRoot.Rotate(VECTOR_UP, rotateSpeed * Time.get_deltaTime());
+				hitEffectRoot.Rotate(VECTOR_UP, rotateSpeed * Time.get_deltaTime());
 			}
-			if (targetRotateRoot != null)
+		}
+		float num = (float)(int)targetCharacter.ShieldHp / (float)(int)targetCharacter.ShieldHpMax;
+		if (cache_rate == num)
+		{
+			return;
+		}
+		Vector3 localScale = num * VECTOR_ONE + (1f - num) * afterScale;
+		Transform[] array = targetObject;
+		foreach (Transform val in array)
+		{
+			val.set_localScale(localScale);
+		}
+		if (colorVariation != null && colorVariation.Length > 1)
+		{
+			float num2 = 1f / (float)(colorVariation.Length - 1);
+			float num3 = 1f - num;
+			for (int j = 1; j < colorVariation.Length; j++)
 			{
-				if (isSetOtherParent)
+				if (!(num3 < num2 * (float)j))
 				{
-					_transform.set_position(targetCharacter._transform.get_position());
+					continue;
 				}
-				if (rotateSpeed != 0f)
+				float num4 = (num2 * (float)j - num3) / num2;
+				for (int k = 0; k < targetMaterial.Length; k++)
 				{
-					targetRotateRoot.Rotate(VECTOR_UP, rotateSpeed * Time.get_deltaTime());
-					hitEffectRoot.Rotate(VECTOR_UP, rotateSpeed * Time.get_deltaTime());
-				}
-			}
-			float num = (float)(int)targetCharacter.ShieldHp / (float)(int)targetCharacter.ShieldHpMax;
-			if (cache_rate != num)
-			{
-				Vector3 localScale = num * VECTOR_ONE + (1f - num) * afterScale;
-				Transform[] array = targetObject;
-				foreach (Transform val in array)
-				{
-					val.set_localScale(localScale);
-				}
-				if (colorVariation != null && colorVariation.Length > 1)
-				{
-					float num2 = 1f / (float)(colorVariation.Length - 1);
-					float num3 = 1f - num;
-					for (int j = 1; j < colorVariation.Length; j++)
+					if (targetMaterial[k].HasProperty(ID_RIM_COLOR))
 					{
-						if (num3 < num2 * (float)j)
-						{
-							float num4 = (num2 * (float)j - num3) / num2;
-							for (int k = 0; k < targetMaterial.Length; k++)
-							{
-								if (targetMaterial[k].HasProperty(ID_RIM_COLOR))
-								{
-									Color val2 = Color.Lerp(colorVariation[j].rimColor, colorVariation[j - 1].rimColor, num4);
-									targetMaterial[k].SetColor(ID_RIM_COLOR, val2);
-								}
-								if (targetMaterial[k].HasProperty(ID_INNER_COLOR))
-								{
-									Color val3 = Color.Lerp(colorVariation[j].innerColor, colorVariation[j - 1].innerColor, num4);
-									targetMaterial[k].SetColor(ID_INNER_COLOR, val3);
-								}
-							}
-							break;
-						}
+						Color val2 = Color.Lerp(colorVariation[j].rimColor, colorVariation[j - 1].rimColor, num4);
+						targetMaterial[k].SetColor(ID_RIM_COLOR, val2);
+					}
+					if (targetMaterial[k].HasProperty(ID_INNER_COLOR))
+					{
+						Color val3 = Color.Lerp(colorVariation[j].innerColor, colorVariation[j - 1].innerColor, num4);
+						targetMaterial[k].SetColor(ID_INNER_COLOR, val3);
 					}
 				}
-				if (num < cache_rate)
-				{
-					this.StartCoroutine(PlayHitEffect(hitEffectRoot.get_gameObject()));
-				}
-				cache_rate = num;
+				break;
 			}
 		}
+		if (num < cache_rate)
+		{
+			this.StartCoroutine(PlayHitEffect(hitEffectRoot.get_gameObject()));
+		}
+		cache_rate = num;
 	}
 
 	private IEnumerator PlayHitEffect(GameObject go)
@@ -228,9 +218,6 @@ public class ShieldEffectCtrl
 
 	private Character GetTargetCharacter(Transform child)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
 		Character component = child.GetComponent<Character>();
 		if (component != null)
 		{
@@ -245,14 +232,15 @@ public class ShieldEffectCtrl
 
 	private void SetActiveRenderer(bool active)
 	{
-		if (!targetRenderer.IsNullOrEmpty())
+		if (targetRenderer.IsNullOrEmpty())
 		{
-			for (int i = 0; i < targetRenderer.Length; i++)
+			return;
+		}
+		for (int i = 0; i < targetRenderer.Length; i++)
+		{
+			if (!(targetRenderer[i] == null))
 			{
-				if (!(targetRenderer[i] == null))
-				{
-					targetRenderer[i].set_enabled(active);
-				}
+				targetRenderer[i].set_enabled(active);
 			}
 		}
 	}

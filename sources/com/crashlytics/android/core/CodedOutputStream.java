@@ -1,10 +1,11 @@
 package com.crashlytics.android.core;
 
-import android.support.v4.media.TransportMediator;
+import com.google.android.gms.games.Notifications;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 final class CodedOutputStream implements Flushable {
     public static final int DEFAULT_BUFFER_SIZE = 4096;
@@ -98,7 +99,10 @@ final class CodedOutputStream implements Flushable {
     }
 
     public static int computeInt32SizeNoTag(int i) {
-        return i >= 0 ? computeRawVarint32Size(i) : 10;
+        if (i >= 0) {
+            return computeRawVarint32Size(i);
+        }
+        return 10;
     }
 
     public static int computeInt64Size(int i, long j) {
@@ -110,19 +114,55 @@ final class CodedOutputStream implements Flushable {
     }
 
     static int computePreferredBufferSize(int i) {
-        return i > 4096 ? 4096 : i;
+        if (i > 4096) {
+            return 4096;
+        }
+        return i;
     }
 
     public static int computeRawMessageSetExtensionSize(int i, ByteString byteString) {
-        return ((computeTagSize(1) * 2) + computeUInt32Size(2, i)) + computeBytesSize(3, byteString);
+        return (computeTagSize(1) * 2) + computeUInt32Size(2, i) + computeBytesSize(3, byteString);
     }
 
     public static int computeRawVarint32Size(int i) {
-        return (i & -128) == 0 ? 1 : (i & -16384) == 0 ? 2 : (-2097152 & i) == 0 ? 3 : (-268435456 & i) == 0 ? 4 : 5;
+        if ((i & -128) == 0) {
+            return 1;
+        }
+        if ((i & -16384) == 0) {
+            return 2;
+        }
+        if ((-2097152 & i) == 0) {
+            return 3;
+        }
+        return (-268435456 & i) == 0 ? 4 : 5;
     }
 
     public static int computeRawVarint64Size(long j) {
-        return (-128 & j) == 0 ? 1 : (-16384 & j) == 0 ? 2 : (-2097152 & j) == 0 ? 3 : (-268435456 & j) == 0 ? 4 : (-34359738368L & j) == 0 ? 5 : (-4398046511104L & j) == 0 ? 6 : (-562949953421312L & j) == 0 ? 7 : (-72057594037927936L & j) == 0 ? 8 : (Long.MIN_VALUE & j) == 0 ? 9 : 10;
+        if ((-128 & j) == 0) {
+            return 1;
+        }
+        if ((-16384 & j) == 0) {
+            return 2;
+        }
+        if ((-2097152 & j) == 0) {
+            return 3;
+        }
+        if ((-268435456 & j) == 0) {
+            return 4;
+        }
+        if ((-34359738368L & j) == 0) {
+            return 5;
+        }
+        if ((-4398046511104L & j) == 0) {
+            return 6;
+        }
+        if ((-562949953421312L & j) == 0) {
+            return 7;
+        }
+        if ((-72057594037927936L & j) == 0) {
+            return 8;
+        }
+        return (Long.MIN_VALUE & j) == 0 ? 9 : 10;
     }
 
     public static int computeSFixed32Size(int i, int i2) {
@@ -165,7 +205,7 @@ final class CodedOutputStream implements Flushable {
         try {
             byte[] bytes = str.getBytes("UTF-8");
             return bytes.length + computeRawVarint32Size(bytes.length);
-        } catch (Throwable e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("UTF-8 not supported.", e);
         }
     }
@@ -354,26 +394,26 @@ final class CodedOutputStream implements Flushable {
         int i3 = this.limit - this.position;
         byteString.copyTo(this.buffer, i, this.position, i3);
         int i4 = i + i3;
-        i3 = i2 - i3;
+        int i5 = i2 - i3;
         this.position = this.limit;
         refreshBuffer();
-        if (i3 <= this.limit) {
-            byteString.copyTo(this.buffer, i4, 0, i3);
-            this.position = i3;
+        if (i5 <= this.limit) {
+            byteString.copyTo(this.buffer, i4, 0, i5);
+            this.position = i5;
             return;
         }
         InputStream newInput = byteString.newInput();
         if (((long) i4) != newInput.skip((long) i4)) {
             throw new IllegalStateException("Skip failed.");
         }
-        while (i3 > 0) {
-            i4 = Math.min(i3, this.limit);
-            int read = newInput.read(this.buffer, 0, i4);
-            if (read != i4) {
+        while (i5 > 0) {
+            int min = Math.min(i5, this.limit);
+            int read = newInput.read(this.buffer, 0, min);
+            if (read != min) {
                 throw new IllegalStateException("Read failed.");
             }
             this.output.write(this.buffer, 0, read);
-            i3 -= read;
+            i5 -= read;
         }
     }
 
@@ -390,15 +430,15 @@ final class CodedOutputStream implements Flushable {
         int i3 = this.limit - this.position;
         System.arraycopy(bArr, i, this.buffer, this.position, i3);
         int i4 = i + i3;
-        i3 = i2 - i3;
+        int i5 = i2 - i3;
         this.position = this.limit;
         refreshBuffer();
-        if (i3 <= this.limit) {
-            System.arraycopy(bArr, i4, this.buffer, 0, i3);
-            this.position = i3;
+        if (i5 <= this.limit) {
+            System.arraycopy(bArr, i4, this.buffer, 0, i5);
+            this.position = i5;
             return;
         }
-        this.output.write(bArr, i4, i3);
+        this.output.write(bArr, i4, i5);
     }
 
     public void writeRawLittleEndian32(int i) throws IOException {
@@ -428,7 +468,7 @@ final class CodedOutputStream implements Flushable {
 
     public void writeRawVarint32(int i) throws IOException {
         while ((i & -128) != 0) {
-            writeRawByte((i & TransportMediator.KEYCODE_MEDIA_PAUSE) | 128);
+            writeRawByte((i & Notifications.NOTIFICATION_TYPES_ALL) | 128);
             i >>>= 7;
         }
         writeRawByte(i);
@@ -436,7 +476,7 @@ final class CodedOutputStream implements Flushable {
 
     public void writeRawVarint64(long j) throws IOException {
         while ((-128 & j) != 0) {
-            writeRawByte((((int) j) & TransportMediator.KEYCODE_MEDIA_PAUSE) | 128);
+            writeRawByte((((int) j) & Notifications.NOTIFICATION_TYPES_ALL) | 128);
             j >>>= 7;
         }
         writeRawByte((int) j);

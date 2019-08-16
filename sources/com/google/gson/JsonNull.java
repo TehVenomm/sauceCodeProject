@@ -3,7 +3,8 @@ package com.google.gson;
 public final class JsonNull extends JsonElement {
     public static final JsonNull INSTANCE = new JsonNull();
 
-    JsonNull deepCopy() {
+    /* access modifiers changed from: 0000 */
+    public JsonNull deepCopy() {
         return INSTANCE;
     }
 

@@ -43,6 +43,21 @@ public class ItemInfo : ItemInfoBase<Item>
 		return itemInfo;
 	}
 
+	public static ItemInfo CreateItemInfo(int itemId)
+	{
+		Item item = new Item();
+		item.uniqId = "0";
+		item.itemId = itemId;
+		item.num = 0;
+		Item item2 = item;
+		return CreateItemInfo(item2);
+	}
+
+	public new ITEM_TYPE GetType()
+	{
+		return tableData.type;
+	}
+
 	public int GetNum()
 	{
 		if (expiredAtItem == null)

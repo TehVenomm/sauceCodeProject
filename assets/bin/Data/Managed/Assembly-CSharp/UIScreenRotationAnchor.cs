@@ -20,10 +20,10 @@ public class UIScreenRotationAnchor : UIScreenRotationHandler
 
 		public void Set(UIRect rect)
 		{
-			rect.leftAnchor.Set(leftAnchor.target, leftAnchor.relative, (float)leftAnchor.absolute);
-			rect.rightAnchor.Set(rightAnchor.target, rightAnchor.relative, (float)rightAnchor.absolute);
-			rect.bottomAnchor.Set(bottomAnchor.target, bottomAnchor.relative, (float)bottomAnchor.absolute);
-			rect.topAnchor.Set(topAnchor.target, topAnchor.relative, (float)topAnchor.absolute);
+			rect.leftAnchor.Set(leftAnchor.target, leftAnchor.relative, leftAnchor.absolute);
+			rect.rightAnchor.Set(rightAnchor.target, rightAnchor.relative, rightAnchor.absolute);
+			rect.bottomAnchor.Set(bottomAnchor.target, bottomAnchor.relative, bottomAnchor.absolute);
+			rect.topAnchor.Set(topAnchor.target, topAnchor.relative, topAnchor.absolute);
 		}
 	}
 

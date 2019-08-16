@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.cfg.ConfigFeature;
+import com.fasterxml.jackson.databind.cfg.MapperConfigBase;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector.MixInResolver;
 import com.fasterxml.jackson.databind.introspect.SimpleMixInResolver;
@@ -23,7 +25,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 public abstract class MapperConfigBase<CFG extends ConfigFeature, T extends MapperConfigBase<CFG, T>> extends MapperConfig<T> implements Serializable {
-    private static final int DEFAULT_MAPPER_FEATURES = MapperConfig.collectFeatureDefaults(MapperFeature.class);
+    private static final int DEFAULT_MAPPER_FEATURES = collectFeatureDefaults(MapperFeature.class);
     protected final ContextAttributes _attributes;
     protected final SimpleMixInResolver _mixIns;
     protected final PropertyName _rootName;
@@ -88,7 +90,7 @@ public abstract class MapperConfigBase<CFG extends ConfigFeature, T extends Mapp
     }
 
     protected MapperConfigBase(MapperConfigBase<CFG, T> mapperConfigBase, BaseSettings baseSettings) {
-        super((MapperConfig) mapperConfigBase, baseSettings);
+        super((MapperConfig<T>) mapperConfigBase, baseSettings);
         this._mixIns = mapperConfigBase._mixIns;
         this._subtypeResolver = mapperConfigBase._subtypeResolver;
         this._rootNames = mapperConfigBase._rootNames;
@@ -98,7 +100,7 @@ public abstract class MapperConfigBase<CFG extends ConfigFeature, T extends Mapp
     }
 
     protected MapperConfigBase(MapperConfigBase<CFG, T> mapperConfigBase, int i) {
-        super((MapperConfig) mapperConfigBase, i);
+        super((MapperConfig<T>) mapperConfigBase, i);
         this._mixIns = mapperConfigBase._mixIns;
         this._subtypeResolver = mapperConfigBase._subtypeResolver;
         this._rootNames = mapperConfigBase._rootNames;
@@ -192,7 +194,10 @@ public abstract class MapperConfigBase<CFG extends ConfigFeature, T extends Mapp
 
     @Deprecated
     public final String getRootName() {
-        return this._rootName == null ? null : this._rootName.getSimpleName();
+        if (this._rootName == null) {
+            return null;
+        }
+        return this._rootName.getSimpleName();
     }
 
     public final PropertyName getFullRootName() {
@@ -211,14 +216,14 @@ public abstract class MapperConfigBase<CFG extends ConfigFeature, T extends Mapp
         if (this._rootName != null) {
             return this._rootName;
         }
-        return this._rootNames.findRootName(javaType, (MapperConfig) this);
+        return this._rootNames.findRootName(javaType, (MapperConfig<?>) this);
     }
 
     public PropertyName findRootName(Class<?> cls) {
         if (this._rootName != null) {
             return this._rootName;
         }
-        return this._rootNames.findRootName((Class) cls, (MapperConfig) this);
+        return this._rootNames.findRootName(cls, (MapperConfig<?>) this);
     }
 
     public final Class<?> findMixInClassFor(Class<?> cls) {

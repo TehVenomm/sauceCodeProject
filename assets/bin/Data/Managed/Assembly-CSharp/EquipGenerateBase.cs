@@ -161,59 +161,60 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 			exceed = equipData.exceed;
 		}
 		EquipItemTable.EquipItemData table_data = GetEquipTableData();
-		if (table_data != null)
+		if (table_data == null)
 		{
-			EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = table_data.GetExceedParam((uint)exceed);
-			if (equipItemExceedParamAll == null)
+			return;
+		}
+		EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = table_data.GetExceedParam((uint)exceed);
+		if (equipItemExceedParamAll == null)
+		{
+			equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
+		}
+		SetLabelText((Enum)UI.LBL_NAME, table_data.name);
+		SetLabelText((Enum)UI.LBL_LV_NOW, "1");
+		SetLabelText((Enum)UI.LBL_LV_MAX, table_data.maxLv.ToString());
+		int num = (int)table_data.baseAtk + (int)equipItemExceedParamAll.atk;
+		int elemAtk = equipItemExceedParamAll.GetElemAtk(table_data.atkElement);
+		SetElementSprite((Enum)UI.SPR_ELEM, equipItemExceedParamAll.GetElemAtkType(table_data.atkElement));
+		SetLabelText((Enum)UI.LBL_ATK, num.ToString());
+		SetLabelText((Enum)UI.LBL_ELEM, elemAtk.ToString());
+		int num2 = (int)table_data.baseDef + (int)equipItemExceedParamAll.def;
+		SetLabelText((Enum)UI.LBL_DEF, num2.ToString());
+		int elemDef = equipItemExceedParamAll.GetElemDef(table_data.defElement);
+		SetDefElementSprite((Enum)UI.SPR_ELEM_DEF, equipItemExceedParamAll.GetElemDefType(table_data.defElement));
+		SetLabelText((Enum)UI.LBL_ELEM_DEF, elemDef.ToString());
+		int num3 = (int)table_data.baseHp + (int)equipItemExceedParamAll.hp;
+		SetLabelText((Enum)UI.LBL_HP, num3.ToString());
+		SetActive((Enum)UI.SPR_IS_EVOLVE, table_data.IsEvolve());
+		SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, table_data);
+		SetLabelText((Enum)UI.LBL_SELL, table_data.sale.ToString());
+		if (smithType != SmithType.EVOLVE)
+		{
+			SetSkillIconButton(UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", table_data, GetSkillSlotData(table_data, 0), null);
+			if (table_data.fixedAbility.Length > 0)
 			{
-				equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
+				string allAbilityName = string.Empty;
+				string allAp = string.Empty;
+				string allAbilityDesc = string.Empty;
+				SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table_data.fixedAbility.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
+				{
+					EquipItemAbility equipItemAbility = new EquipItemAbility((uint)table_data.fixedAbility[i].id, table_data.fixedAbility[i].pt);
+					SetActive(t, is_visible: true);
+					SetActive(t, UI.OBJ_FIXEDABILITY, is_visible: true);
+					SetActive(t, UI.OBJ_ABILITY, is_visible: false);
+					SetLabelText(t, UI.LBL_FIXEDABILITY, equipItemAbility.GetName());
+					SetLabelText(t, UI.LBL_FIXEDABILITY_NUM, equipItemAbility.GetAP());
+					SetAbilityItemEvent(t, i, touchAndReleaseButtons);
+					allAbilityName += equipItemAbility.GetName();
+					allAp += equipItemAbility.GetAP();
+					allAbilityDesc += equipItemAbility.GetDescription();
+				});
+				SetActive((Enum)UI.STR_NON_ABILITY, is_visible: false);
+				PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 			}
-			SetLabelText((Enum)UI.LBL_NAME, table_data.name);
-			SetLabelText((Enum)UI.LBL_LV_NOW, "1");
-			SetLabelText((Enum)UI.LBL_LV_MAX, table_data.maxLv.ToString());
-			int num = (int)table_data.baseAtk + (int)equipItemExceedParamAll.atk;
-			int elemAtk = equipItemExceedParamAll.GetElemAtk(table_data.atkElement);
-			SetElementSprite((Enum)UI.SPR_ELEM, equipItemExceedParamAll.GetElemAtkType(table_data.atkElement));
-			SetLabelText((Enum)UI.LBL_ATK, num.ToString());
-			SetLabelText((Enum)UI.LBL_ELEM, elemAtk.ToString());
-			int num2 = (int)table_data.baseDef + (int)equipItemExceedParamAll.def;
-			SetLabelText((Enum)UI.LBL_DEF, num2.ToString());
-			int elemDef = equipItemExceedParamAll.GetElemDef(table_data.defElement);
-			SetDefElementSprite((Enum)UI.SPR_ELEM_DEF, equipItemExceedParamAll.GetElemDefType(table_data.defElement));
-			SetLabelText((Enum)UI.LBL_ELEM_DEF, elemDef.ToString());
-			int num3 = (int)table_data.baseHp + (int)equipItemExceedParamAll.hp;
-			SetLabelText((Enum)UI.LBL_HP, num3.ToString());
-			SetActive((Enum)UI.SPR_IS_EVOLVE, table_data.IsEvolve());
-			SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, table_data);
-			SetLabelText((Enum)UI.LBL_SELL, table_data.sale.ToString());
-			if (smithType != SmithType.EVOLVE)
+			else
 			{
-				SetSkillIconButton(UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", table_data, GetSkillSlotData(table_data, 0), null, 0);
-				if (table_data.fixedAbility.Length > 0)
-				{
-					string allAbilityName = string.Empty;
-					string allAp = string.Empty;
-					string allAbilityDesc = string.Empty;
-					SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table_data.fixedAbility.Length, false, delegate(int i, Transform t, bool is_recycle)
-					{
-						EquipItemAbility equipItemAbility = new EquipItemAbility((uint)table_data.fixedAbility[i].id, table_data.fixedAbility[i].pt);
-						SetActive(t, true);
-						SetActive(t, UI.OBJ_FIXEDABILITY, true);
-						SetActive(t, UI.OBJ_ABILITY, false);
-						SetLabelText(t, UI.LBL_FIXEDABILITY, equipItemAbility.GetName());
-						SetLabelText(t, UI.LBL_FIXEDABILITY_NUM, equipItemAbility.GetAP());
-						SetAbilityItemEvent(t, i, touchAndReleaseButtons);
-						allAbilityName += equipItemAbility.GetName();
-						allAp += equipItemAbility.GetAP();
-						allAbilityDesc += equipItemAbility.GetDescription();
-					});
-					SetActive((Enum)UI.STR_NON_ABILITY, false);
-					PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
-				}
-				else
-				{
-					SetActive((Enum)UI.STR_NON_ABILITY, true);
-				}
+				SetActive((Enum)UI.STR_NON_ABILITY, is_visible: true);
 			}
 		}
 	}
@@ -232,16 +233,14 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 		SmithManager.ERR_SMITH_SEND eRR_SMITH_SEND = MonoBehaviourSingleton<SmithManager>.I.CheckCreateEquipItem(GetCreateEquiptableID());
 		if (eRR_SMITH_SEND != 0)
 		{
-			GameSection.ChangeEvent(eRR_SMITH_SEND.ToString(), null);
+			GameSection.ChangeEvent(eRR_SMITH_SEND.ToString());
+			return;
 		}
-		else
+		isDialogEventYES = false;
+		GameSection.SetEventData(new object[1]
 		{
-			isDialogEventYES = false;
-			GameSection.SetEventData(new object[1]
-			{
-				GetEquipItemName()
-			});
-		}
+			GetEquipItemName()
+		});
 	}
 
 	protected override void Send()
@@ -256,14 +255,14 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 			case Error.None:
 				result_data.itemData = create_item;
 				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 				break;
 			case Error.WRN_SMITH_OVER_EQUIP_ITEM_NUM:
-				GameSection.ChangeStayEvent("CREATE_OVER_EQUIP", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ChangeStayEvent("CREATE_OVER_EQUIP");
+				GameSection.ResumeEvent(is_resume: true);
 				break;
 			default:
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 				break;
 			}
 		});
@@ -284,7 +283,7 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 
 	public void OnQuery_SmithCreateOverEquipItem_EXPAND_STORAGE()
 	{
-		DispatchEvent("EXPAND_STORAGE", null);
+		DispatchEvent("EXPAND_STORAGE");
 	}
 
 	protected virtual void OnQuery_ABILITY_DATA_POPUP()

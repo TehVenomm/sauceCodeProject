@@ -34,7 +34,7 @@ public class SimpleMixInResolver implements MixInResolver, Serializable {
             this._localMixIns = null;
             return;
         }
-        Map hashMap = new HashMap(map.size());
+        HashMap hashMap = new HashMap(map.size());
         for (Entry entry : map.entrySet()) {
             hashMap.put(new ClassKey((Class) entry.getKey()), entry.getValue());
         }
@@ -49,12 +49,12 @@ public class SimpleMixInResolver implements MixInResolver, Serializable {
     }
 
     public SimpleMixInResolver copy() {
-        Map map = null;
+        HashMap hashMap = null;
         MixInResolver copy = this._overrides == null ? null : this._overrides.copy();
         if (this._localMixIns != null) {
-            map = new HashMap(this._localMixIns);
+            hashMap = new HashMap(this._localMixIns);
         }
-        return new SimpleMixInResolver(copy, map);
+        return new SimpleMixInResolver(copy, hashMap);
     }
 
     public Class<?> findMixInClassFor(Class<?> cls) {
@@ -66,6 +66,9 @@ public class SimpleMixInResolver implements MixInResolver, Serializable {
     }
 
     public int localSize() {
-        return this._localMixIns == null ? 0 : this._localMixIns.size();
+        if (this._localMixIns == null) {
+            return 0;
+        }
+        return this._localMixIns.size();
     }
 }

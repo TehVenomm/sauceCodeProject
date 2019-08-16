@@ -6,25 +6,74 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
+import com.facebook.share.model.ShareCameraEffectContent;
 import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.ShareMedia;
 import com.facebook.share.model.ShareMediaContent;
+import com.facebook.share.model.ShareMessengerActionButton;
+import com.facebook.share.model.ShareMessengerGenericTemplateContent;
+import com.facebook.share.model.ShareMessengerMediaTemplateContent;
+import com.facebook.share.model.ShareMessengerOpenGraphMusicTemplateContent;
+import com.facebook.share.model.ShareMessengerURLActionButton;
 import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.model.ShareOpenGraphValueContainer;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.model.ShareStoryContent;
 import com.facebook.share.model.ShareVideo;
 import com.facebook.share.model.ShareVideoContent;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
 public class ShareContentValidation {
     private static Validator ApiValidator;
     private static Validator DefaultValidator;
+    private static Validator StoryValidator;
     private static Validator WebShareValidator;
+
+    private static class ApiValidator extends Validator {
+        private ApiValidator() {
+            super();
+        }
+
+        public void validate(ShareLinkContent shareLinkContent) {
+            if (!Utility.isNullOrEmpty(shareLinkContent.getQuote())) {
+                throw new FacebookException("Cannot share link content with quote using the share api");
+            }
+        }
+
+        public void validate(ShareMediaContent shareMediaContent) {
+            throw new FacebookException("Cannot share ShareMediaContent using the share api");
+        }
+
+        public void validate(SharePhoto sharePhoto) {
+            ShareContentValidation.validatePhotoForApi(sharePhoto, this);
+        }
+
+        public void validate(ShareVideoContent shareVideoContent) {
+            if (!Utility.isNullOrEmpty(shareVideoContent.getPlaceId())) {
+                throw new FacebookException("Cannot share video content with place IDs using the share api");
+            } else if (!Utility.isNullOrEmpty((Collection<T>) shareVideoContent.getPeopleIds())) {
+                throw new FacebookException("Cannot share video content with people IDs using the share api");
+            } else if (!Utility.isNullOrEmpty(shareVideoContent.getRef())) {
+                throw new FacebookException("Cannot share video content with referrer URL using the share api");
+            }
+        }
+    }
+
+    private static class StoryShareValidator extends Validator {
+        private StoryShareValidator() {
+            super();
+        }
+
+        public void validate(ShareStoryContent shareStoryContent) {
+            ShareContentValidation.validateStoryContent(shareStoryContent, this);
+        }
+    }
 
     private static class Validator {
         private boolean isOpenGraphContent;
@@ -37,6 +86,10 @@ public class ShareContentValidation {
             return this.isOpenGraphContent;
         }
 
+        public void validate(ShareCameraEffectContent shareCameraEffectContent) {
+            ShareContentValidation.validateCameraEffectContent(shareCameraEffectContent, this);
+        }
+
         public void validate(ShareLinkContent shareLinkContent) {
             ShareContentValidation.validateLinkContent(shareLinkContent, this);
         }
@@ -47,6 +100,18 @@ public class ShareContentValidation {
 
         public void validate(ShareMediaContent shareMediaContent) {
             ShareContentValidation.validateMediaContent(shareMediaContent, this);
+        }
+
+        public void validate(ShareMessengerGenericTemplateContent shareMessengerGenericTemplateContent) {
+            ShareContentValidation.validateShareMessengerGenericTemplateContent(shareMessengerGenericTemplateContent);
+        }
+
+        public void validate(ShareMessengerMediaTemplateContent shareMessengerMediaTemplateContent) {
+            ShareContentValidation.validateShareMessengerMediaTemplateContent(shareMessengerMediaTemplateContent);
+        }
+
+        public void validate(ShareMessengerOpenGraphMusicTemplateContent shareMessengerOpenGraphMusicTemplateContent) {
+            ShareContentValidation.validateMessengerOpenGraphMusicTemplate(shareMessengerOpenGraphMusicTemplateContent);
         }
 
         public void validate(ShareOpenGraphAction shareOpenGraphAction) {
@@ -74,42 +139,16 @@ public class ShareContentValidation {
             ShareContentValidation.validatePhotoContent(sharePhotoContent, this);
         }
 
+        public void validate(ShareStoryContent shareStoryContent) {
+            ShareContentValidation.validateStoryContent(shareStoryContent, this);
+        }
+
         public void validate(ShareVideo shareVideo) {
             ShareContentValidation.validateVideo(shareVideo, this);
         }
 
         public void validate(ShareVideoContent shareVideoContent) {
             ShareContentValidation.validateVideoContent(shareVideoContent, this);
-        }
-    }
-
-    private static class ApiValidator extends Validator {
-        private ApiValidator() {
-            super();
-        }
-
-        public void validate(ShareLinkContent shareLinkContent) {
-            if (!Utility.isNullOrEmpty(shareLinkContent.getQuote())) {
-                throw new FacebookException("Cannot share link content with quote using the share api");
-            }
-        }
-
-        public void validate(ShareMediaContent shareMediaContent) {
-            throw new FacebookException("Cannot share ShareMediaContent using the share api");
-        }
-
-        public void validate(SharePhoto sharePhoto) {
-            ShareContentValidation.validatePhotoForApi(sharePhoto, this);
-        }
-
-        public void validate(ShareVideoContent shareVideoContent) {
-            if (!Utility.isNullOrEmpty(shareVideoContent.getPlaceId())) {
-                throw new FacebookException("Cannot share video content with place IDs using the share api");
-            } else if (!Utility.isNullOrEmpty(shareVideoContent.getPeopleIds())) {
-                throw new FacebookException("Cannot share video content with people IDs using the share api");
-            } else if (!Utility.isNullOrEmpty(shareVideoContent.getRef())) {
-                throw new FacebookException("Cannot share video content with referrer URL using the share api");
-            }
         }
     }
 
@@ -124,10 +163,6 @@ public class ShareContentValidation {
 
         public void validate(SharePhoto sharePhoto) {
             ShareContentValidation.validatePhotoForWebDialog(sharePhoto, this);
-        }
-
-        public void validate(SharePhotoContent sharePhotoContent) {
-            throw new FacebookException("Cannot share SharePhotoContent via web sharing dialogs");
         }
 
         public void validate(ShareVideoContent shareVideoContent) {
@@ -147,6 +182,13 @@ public class ShareContentValidation {
             DefaultValidator = new Validator();
         }
         return DefaultValidator;
+    }
+
+    private static Validator getStoryValidator() {
+        if (StoryValidator == null) {
+            StoryValidator = new StoryShareValidator();
+        }
+        return StoryValidator;
     }
 
     private static Validator getWebShareValidator() {
@@ -169,6 +211,23 @@ public class ShareContentValidation {
             validator.validate((ShareOpenGraphContent) shareContent);
         } else if (shareContent instanceof ShareMediaContent) {
             validator.validate((ShareMediaContent) shareContent);
+        } else if (shareContent instanceof ShareCameraEffectContent) {
+            validator.validate((ShareCameraEffectContent) shareContent);
+        } else if (shareContent instanceof ShareMessengerOpenGraphMusicTemplateContent) {
+            validator.validate((ShareMessengerOpenGraphMusicTemplateContent) shareContent);
+        } else if (shareContent instanceof ShareMessengerMediaTemplateContent) {
+            validator.validate((ShareMessengerMediaTemplateContent) shareContent);
+        } else if (shareContent instanceof ShareMessengerGenericTemplateContent) {
+            validator.validate((ShareMessengerGenericTemplateContent) shareContent);
+        } else if (shareContent instanceof ShareStoryContent) {
+            validator.validate((ShareStoryContent) shareContent);
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public static void validateCameraEffectContent(ShareCameraEffectContent shareCameraEffectContent, Validator validator) {
+        if (Utility.isNullOrEmpty(shareCameraEffectContent.getEffectId())) {
+            throw new FacebookException("Must specify a non-empty effectId");
         }
     }
 
@@ -184,18 +243,24 @@ public class ShareContentValidation {
         validate(shareContent, getDefaultValidator());
     }
 
+    public static void validateForStoryShare(ShareContent shareContent) {
+        validate(shareContent, getStoryValidator());
+    }
+
     public static void validateForWebShare(ShareContent shareContent) {
         validate(shareContent, getWebShareValidator());
     }
 
-    private static void validateLinkContent(ShareLinkContent shareLinkContent, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validateLinkContent(ShareLinkContent shareLinkContent, Validator validator) {
         Uri imageUrl = shareLinkContent.getImageUrl();
         if (imageUrl != null && !Utility.isWebUri(imageUrl)) {
             throw new FacebookException("Image Url must be an http:// or https:// url");
         }
     }
 
-    private static void validateMediaContent(ShareMediaContent shareMediaContent, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validateMediaContent(ShareMediaContent shareMediaContent, Validator validator) {
         List<ShareMedia> media = shareMediaContent.getMedia();
         if (media == null || media.isEmpty()) {
             throw new FacebookException("Must specify at least one medium in ShareMediaContent.");
@@ -218,7 +283,19 @@ public class ShareContentValidation {
         }
     }
 
-    private static void validateOpenGraphAction(ShareOpenGraphAction shareOpenGraphAction, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validateMessengerOpenGraphMusicTemplate(ShareMessengerOpenGraphMusicTemplateContent shareMessengerOpenGraphMusicTemplateContent) {
+        if (Utility.isNullOrEmpty(shareMessengerOpenGraphMusicTemplateContent.getPageId())) {
+            throw new FacebookException("Must specify Page Id for ShareMessengerOpenGraphMusicTemplateContent");
+        } else if (shareMessengerOpenGraphMusicTemplateContent.getUrl() == null) {
+            throw new FacebookException("Must specify url for ShareMessengerOpenGraphMusicTemplateContent");
+        } else {
+            validateShareMessengerActionButton(shareMessengerOpenGraphMusicTemplateContent.getButton());
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public static void validateOpenGraphAction(ShareOpenGraphAction shareOpenGraphAction, Validator validator) {
         if (shareOpenGraphAction == null) {
             throw new FacebookException("Must specify a non-null ShareOpenGraphAction");
         } else if (Utility.isNullOrEmpty(shareOpenGraphAction.getActionType())) {
@@ -228,13 +305,14 @@ public class ShareContentValidation {
         }
     }
 
-    private static void validateOpenGraphContent(ShareOpenGraphContent shareOpenGraphContent, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validateOpenGraphContent(ShareOpenGraphContent shareOpenGraphContent, Validator validator) {
         validator.validate(shareOpenGraphContent.getAction());
         String previewPropertyName = shareOpenGraphContent.getPreviewPropertyName();
         if (Utility.isNullOrEmpty(previewPropertyName)) {
             throw new FacebookException("Must specify a previewPropertyName.");
         } else if (shareOpenGraphContent.getAction().get(previewPropertyName) == null) {
-            throw new FacebookException("Property \"" + previewPropertyName + "\" was not found on the action. " + "The name of the preview property must match the name of an " + "action property.");
+            throw new FacebookException("Property \"" + previewPropertyName + "\" was not found on the action. The name of the preview property must match the name of an action property.");
         }
     }
 
@@ -252,14 +330,16 @@ public class ShareContentValidation {
         }
     }
 
-    private static void validateOpenGraphObject(ShareOpenGraphObject shareOpenGraphObject, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validateOpenGraphObject(ShareOpenGraphObject shareOpenGraphObject, Validator validator) {
         if (shareOpenGraphObject == null) {
             throw new FacebookException("Cannot share a null ShareOpenGraphObject");
         }
         validator.validate(shareOpenGraphObject, true);
     }
 
-    private static void validateOpenGraphValueContainer(ShareOpenGraphValueContainer shareOpenGraphValueContainer, Validator validator, boolean z) {
+    /* access modifiers changed from: private */
+    public static void validateOpenGraphValueContainer(ShareOpenGraphValueContainer shareOpenGraphValueContainer, Validator validator, boolean z) {
         for (String str : shareOpenGraphValueContainer.keySet()) {
             validateOpenGraphKey(str, z);
             Object obj = shareOpenGraphValueContainer.get(str);
@@ -285,7 +365,19 @@ public class ShareContentValidation {
         }
     }
 
-    private static void validatePhotoContent(SharePhotoContent sharePhotoContent, Validator validator) {
+    private static void validatePhoto(SharePhoto sharePhoto) {
+        if (sharePhoto == null) {
+            throw new FacebookException("Cannot share a null SharePhoto");
+        }
+        Bitmap bitmap = sharePhoto.getBitmap();
+        Uri imageUrl = sharePhoto.getImageUrl();
+        if (bitmap == null && imageUrl == null) {
+            throw new FacebookException("SharePhoto does not have a Bitmap or ImageUrl specified");
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public static void validatePhotoContent(SharePhotoContent sharePhotoContent, Validator validator) {
         List<SharePhoto> photos = sharePhotoContent.getPhotos();
         if (photos == null || photos.isEmpty()) {
             throw new FacebookException("Must specify at least one Photo in SharePhotoContent.");
@@ -298,40 +390,84 @@ public class ShareContentValidation {
         }
     }
 
-    private static void validatePhotoForApi(SharePhoto sharePhoto, Validator validator) {
-        if (sharePhoto == null) {
-            throw new FacebookException("Cannot share a null SharePhoto");
-        }
+    /* access modifiers changed from: private */
+    public static void validatePhotoForApi(SharePhoto sharePhoto, Validator validator) {
+        validatePhoto(sharePhoto);
         Bitmap bitmap = sharePhoto.getBitmap();
         Uri imageUrl = sharePhoto.getImageUrl();
-        if (bitmap != null) {
-            return;
-        }
-        if (imageUrl == null) {
-            throw new FacebookException("SharePhoto does not have a Bitmap or ImageUrl specified");
-        } else if (Utility.isWebUri(imageUrl) && !validator.isOpenGraphContent()) {
+        if (bitmap == null && Utility.isWebUri(imageUrl) && !validator.isOpenGraphContent()) {
             throw new FacebookException("Cannot set the ImageUrl of a SharePhoto to the Uri of an image on the web when sharing SharePhotoContent");
         }
     }
 
-    private static void validatePhotoForNativeDialog(SharePhoto sharePhoto, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validatePhotoForNativeDialog(SharePhoto sharePhoto, Validator validator) {
         validatePhotoForApi(sharePhoto, validator);
         if (sharePhoto.getBitmap() != null || !Utility.isWebUri(sharePhoto.getImageUrl())) {
             Validate.hasContentProvider(FacebookSdk.getApplicationContext());
         }
     }
 
-    private static void validatePhotoForWebDialog(SharePhoto sharePhoto, Validator validator) {
-        if (sharePhoto == null) {
-            throw new FacebookException("Cannot share a null SharePhoto");
-        }
-        Uri imageUrl = sharePhoto.getImageUrl();
-        if (imageUrl == null || !Utility.isWebUri(imageUrl)) {
-            throw new FacebookException("SharePhoto must have a non-null imageUrl set to the Uri of an image on the web");
+    /* access modifiers changed from: private */
+    public static void validatePhotoForWebDialog(SharePhoto sharePhoto, Validator validator) {
+        validatePhoto(sharePhoto);
+    }
+
+    private static void validateShareMessengerActionButton(ShareMessengerActionButton shareMessengerActionButton) {
+        if (shareMessengerActionButton != null) {
+            if (Utility.isNullOrEmpty(shareMessengerActionButton.getTitle())) {
+                throw new FacebookException("Must specify title for ShareMessengerActionButton");
+            } else if (shareMessengerActionButton instanceof ShareMessengerURLActionButton) {
+                validateShareMessengerURLActionButton((ShareMessengerURLActionButton) shareMessengerActionButton);
+            }
         }
     }
 
-    private static void validateVideo(ShareVideo shareVideo, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validateShareMessengerGenericTemplateContent(ShareMessengerGenericTemplateContent shareMessengerGenericTemplateContent) {
+        if (Utility.isNullOrEmpty(shareMessengerGenericTemplateContent.getPageId())) {
+            throw new FacebookException("Must specify Page Id for ShareMessengerGenericTemplateContent");
+        } else if (shareMessengerGenericTemplateContent.getGenericTemplateElement() == null) {
+            throw new FacebookException("Must specify element for ShareMessengerGenericTemplateContent");
+        } else if (Utility.isNullOrEmpty(shareMessengerGenericTemplateContent.getGenericTemplateElement().getTitle())) {
+            throw new FacebookException("Must specify title for ShareMessengerGenericTemplateElement");
+        } else {
+            validateShareMessengerActionButton(shareMessengerGenericTemplateContent.getGenericTemplateElement().getButton());
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public static void validateShareMessengerMediaTemplateContent(ShareMessengerMediaTemplateContent shareMessengerMediaTemplateContent) {
+        if (Utility.isNullOrEmpty(shareMessengerMediaTemplateContent.getPageId())) {
+            throw new FacebookException("Must specify Page Id for ShareMessengerMediaTemplateContent");
+        } else if (shareMessengerMediaTemplateContent.getMediaUrl() != null || !Utility.isNullOrEmpty(shareMessengerMediaTemplateContent.getAttachmentId())) {
+            validateShareMessengerActionButton(shareMessengerMediaTemplateContent.getButton());
+        } else {
+            throw new FacebookException("Must specify either attachmentId or mediaURL for ShareMessengerMediaTemplateContent");
+        }
+    }
+
+    private static void validateShareMessengerURLActionButton(ShareMessengerURLActionButton shareMessengerURLActionButton) {
+        if (shareMessengerURLActionButton.getUrl() == null) {
+            throw new FacebookException("Must specify url for ShareMessengerURLActionButton");
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public static void validateStoryContent(ShareStoryContent shareStoryContent, Validator validator) {
+        if (shareStoryContent == null || (shareStoryContent.getBackgroundAsset() == null && shareStoryContent.getStickerAsset() == null)) {
+            throw new FacebookException("Must pass the Facebook app a background asset, a sticker asset, or both");
+        }
+        if (shareStoryContent.getBackgroundAsset() != null) {
+            validator.validate(shareStoryContent.getBackgroundAsset());
+        }
+        if (shareStoryContent.getStickerAsset() != null) {
+            validator.validate(shareStoryContent.getStickerAsset());
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public static void validateVideo(ShareVideo shareVideo, Validator validator) {
         if (shareVideo == null) {
             throw new FacebookException("Cannot share a null ShareVideo");
         }
@@ -343,7 +479,8 @@ public class ShareContentValidation {
         }
     }
 
-    private static void validateVideoContent(ShareVideoContent shareVideoContent, Validator validator) {
+    /* access modifiers changed from: private */
+    public static void validateVideoContent(ShareVideoContent shareVideoContent, Validator validator) {
         validator.validate(shareVideoContent.getVideo());
         SharePhoto previewPhoto = shareVideoContent.getPreviewPhoto();
         if (previewPhoto != null) {

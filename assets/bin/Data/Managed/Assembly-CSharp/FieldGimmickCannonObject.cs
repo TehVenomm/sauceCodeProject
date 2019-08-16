@@ -24,6 +24,8 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	private const float RADIUS_TARGET_CANNON = 2f;
 
+	private const float SQR_RADIUS_TARGET_CANNON = 4f;
+
 	private const float TIME_DEFAULT_COOL_TIME = 2f;
 
 	public const int SE_ID_TURN_TO_TARGET = 10000079;
@@ -68,13 +70,7 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(pointData);
 		m_coolFinishTime = pointData.value1;
 		m_baseTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
@@ -111,9 +107,19 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 		return m_state == STATE.COOLTIME;
 	}
 
+	public bool IsAimCamera()
+	{
+		return true;
+	}
+
 	public override float GetTargetRadius()
 	{
 		return 2f;
+	}
+
+	public override float GetTargetSqrRadius()
+	{
+		return 4f;
 	}
 
 	private void SetState(STATE state)
@@ -124,7 +130,7 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 	public void OnLeave()
 	{
 		m_owner = null;
-		ballisticLineRenderer.SetVisible(false);
+		ballisticLineRenderer.SetVisible(enabled: false);
 		SetState(STATE.NONE);
 	}
 
@@ -143,7 +149,7 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 	{
 		if (m_owner is Self)
 		{
-			ballisticLineRenderer.SetVisible(true);
+			ballisticLineRenderer.SetVisible(enabled: true);
 		}
 		SetState(STATE.READY);
 	}
@@ -175,36 +181,32 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	protected override void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		_transform = this.get_transform();
 		Utility.SetLayerWithChildren(this.get_transform(), 19);
 	}
 
 	private void Update()
 	{
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_state)
 		{
 		case STATE.NONE:
@@ -232,33 +234,31 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 				if (num >= 1f)
 				{
 					SetStateReady();
+					break;
 				}
-				else
-				{
-					SetStateRotate();
-					SoundManager.PlayOneShotSE(10000079, _transform.get_position());
-				}
+				SetStateRotate();
+				SoundManager.PlayOneShotSE(10000079, _transform.get_position());
 			}
 			break;
 		case STATE.ROTATE:
+		{
 			m_rotateTime += Time.get_deltaTime();
 			if (m_rotateFinishTime <= 0f)
+			{
+				SetStateReady();
+				break;
+			}
+			float num2 = Mathf.Clamp(m_rotateTime / m_rotateFinishTime, 0f, 1f);
+			if (num2 >= 1f)
 			{
 				SetStateReady();
 			}
 			else
 			{
-				float num2 = Mathf.Clamp(m_rotateTime / m_rotateFinishTime, 0f, 1f);
-				if (num2 >= 1f)
-				{
-					SetStateReady();
-				}
-				else
-				{
-					m_baseTrans.set_localRotation(Quaternion.Lerp(m_rotStart, m_rotEnd, num2));
-				}
+				m_baseTrans.set_localRotation(Quaternion.Lerp(m_rotStart, m_rotEnd, num2));
 			}
 			break;
+		}
 		case STATE.READY:
 			if (IsRemainCooltime())
 			{
@@ -298,7 +298,7 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 		}
 	}
 
-	public void UpdateTargetMarker(bool isNear)
+	public new void UpdateTargetMarker(bool isNear)
 	{
 		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
@@ -316,11 +316,9 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Expected O, but got Unknown
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null && boss.IsValidShield() && !IsUsing() && isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)29))
+		if (boss != null && boss.IsValidShield() && !IsUsing() && isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)31))
 		{
 			if (m_targetEffect == null && !string.IsNullOrEmpty(ResourceName.GetFieldGimmickCannonTargetEffect()))
 			{
@@ -338,7 +336,7 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 		}
 		else if (m_targetEffect != null)
 		{
-			EffectManager.ReleaseEffect(m_targetEffect.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(m_targetEffect.get_gameObject());
 		}
 	}
 
@@ -415,7 +413,7 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Expected O, but got Unknown
+		//IL_00a3: Expected O, but got Unknown
 		if (IsReadyForShot())
 		{
 			if (_animator != null)
@@ -444,6 +442,22 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 	public Transform GetCannonTransform()
 	{
 		return m_cannonTrans;
+	}
+
+	public Transform GetBaseTransform()
+	{
+		return m_baseTrans;
+	}
+
+	public Vector3 GetBaseTransformForward()
+	{
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		if (m_baseTrans == null)
+		{
+			return Vector3.get_forward();
+		}
+		return m_baseTrans.get_forward();
 	}
 
 	public Vector3 GetPosition()

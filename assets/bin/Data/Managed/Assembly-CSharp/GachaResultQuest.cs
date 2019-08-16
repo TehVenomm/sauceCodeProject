@@ -1,12 +1,15 @@
 using Network;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GachaResultQuest : GachaResultBase
 {
 	private enum UI
 	{
+		TEX_MODEL,
+		TEX_INNER_MODEL,
 		LBL_NAME,
 		LBL_CRYSTAL_NUM,
 		TEX_TICKET,
@@ -27,6 +30,11 @@ public class GachaResultQuest : GachaResultBase
 		OBJ_RARITY_TEXT_ROOT,
 		OBJ_SINGLE_ROOT,
 		OBJ_MULTI_ROOT,
+		LBL_ATK,
+		LBL_DEF,
+		LBL_HP,
+		LBL_DESCRIPTION,
+		OBJ_ICONS_ROOT,
 		OBJ_ICON_ROOT_0,
 		OBJ_ICON_ROOT_1,
 		OBJ_ICON_ROOT_2,
@@ -49,15 +57,33 @@ public class GachaResultQuest : GachaResultBase
 		LBL_ENEMY_LV_8,
 		LBL_ENEMY_LV_9,
 		LBL_ENEMY_LV_10,
+		LBL_MAGI_NAME_0,
+		LBL_MAGI_NAME_1,
+		LBL_MAGI_NAME_2,
+		LBL_MAGI_NAME_3,
+		LBL_MAGI_NAME_4,
+		LBL_MAGI_NAME_5,
+		LBL_MAGI_NAME_6,
+		LBL_MAGI_NAME_7,
+		LBL_MAGI_NAME_8,
+		LBL_MAGI_NAME_9,
+		LBL_MAGI_NAME_10,
 		BTN_GACHA,
 		OBJ_GACHA_ENABLE_ROOT,
 		OBJ_GACHA_DISABLE_ROOT,
 		OBJ_BG_SINGLE,
 		OBJ_BG_MULTI,
+		SPR_LINE_TOP,
+		SPR_LINE_BOTTOM,
 		FOOTER_ROOT,
 		FOOTER_GUARANTEE_ROOT,
+		FOOTER_MULTI_RESULT_ROOT,
+		OBJ_GUARANTEE,
 		BG_MULTI,
-		FOOTER_ROOT_OFFER,
+		BTN_NEXT,
+		BTN_BACK,
+		BTN_BATTLE,
+		BTN_EQUIP,
 		GACHATICKETCOUNTERSRESULT,
 		COUNTER_PROGRESSBAR_FOREGROUND,
 		COUNTER_LBL,
@@ -111,85 +137,96 @@ public class GachaResultQuest : GachaResultBase
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
+		currentGachaGuarantee = MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee;
+		nextGachaGuarantee = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().gachaGuaranteeCampaignInfo;
+		MonoBehaviourSingleton<GachaManager>.I.SetSelectGachaGuarantee(nextGachaGuarantee);
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		nextGuachaGuarantee = MonoBehaviourSingleton<GachaManager>.I.gachaResult.gachaGuaranteeCampaignInfo;
-		MonoBehaviourSingleton<GachaManager>.I.SetSelectGachaGuarantee(nextGuachaGuarantee);
-		if (nextGuachaGuarantee.IsValid())
+		if (MonoBehaviourSingleton<GachaManager>.I.IsResultBonus() && !MonoBehaviourSingleton<GachaManager>.I.IsExistNextGachaResult())
+		{
+			yield return LoadFeverResultUI(loadQueue);
+		}
+		else if (MonoBehaviourSingleton<GachaManager>.I.IsMultiResult())
+		{
+			yield return LoadMultiResultUI(loadQueue);
+		}
+		else
+		{
+			yield return LoadNormalUI(loadQueue);
+		}
+		base.Initialize();
+	}
+
+	protected IEnumerator LoadFeverResultUI(LoadingQueue loadQueue)
+	{
+		SetActive((Enum)UI.FOOTER_ROOT, is_visible: false);
+		if (MonoBehaviourSingleton<GachaManager>.I.enableFeverDirector)
+		{
+			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: true);
+			SetActive((Enum)UI.FOOTER_MULTI_RESULT_ROOT, is_visible: false);
+			footerRoot = GetCtrl(UI.FOOTER_GUARANTEE_ROOT);
+			yield return LoadGachaButton(buttonName: CreateButtonName(), loadQueue: loadQueue, parent: FindCtrl(footerRoot, UI.BTN_GACHA));
+			yield return LoadGachaGuaranteeCounter(loadQueue, nextGachaGuarantee, delegate(LoadObject lo_guarantee)
+			{
+				SetTexture(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
+			});
+		}
+		else
+		{
+			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
+			SetActive((Enum)UI.FOOTER_MULTI_RESULT_ROOT, is_visible: true);
+			footerRoot = GetCtrl(UI.FOOTER_MULTI_RESULT_ROOT);
+			yield return LoadFeverGachaGuaranteeCounter(loadQueue, currentGachaGuarantee, delegate(LoadObject lo_guarantee)
+			{
+				SetTexture(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
+			});
+			yield return LoadGachaButton(loadQueue, FindCtrl(footerRoot, UI.BTN_NEXT), "BTN_GACHA_FEVER_NEXT");
+		}
+	}
+
+	protected IEnumerator LoadFeverGachaGuaranteeCounter(LoadingQueue loadQueue, GachaGuaranteeCampaignInfo guarantee, Action<LoadObject> callback)
+	{
+		string imgName = string.Empty;
+		if (guarantee.IsValid())
+		{
+			imgName = guarantee.GetTitleImageName() + "_FEVER";
+		}
+		if (imgName != string.Empty)
+		{
+			LoadObject loadObject = loadQueue.Load(RESOURCE_CATEGORY.GACHA_GUARANTEE_COUNTER, imgName);
+			if (loadQueue.IsLoading())
+			{
+				yield return loadQueue.Wait();
+			}
+			callback(loadObject);
+		}
+	}
+
+	protected override IEnumerator LoadMultiResultUI(LoadingQueue loadQueue)
+	{
+		yield return base.LoadMultiResultUI(loadQueue);
+		GetCtrl(UI.BG_MULTI).GetComponent<UISprite>().height = 750;
+	}
+
+	private IEnumerator LoadNormalUI(LoadingQueue loadQueue)
+	{
+		if (nextGachaGuarantee.IsValid())
 		{
 			footerRoot = GetCtrl(UI.FOOTER_GUARANTEE_ROOT);
-			SetActive((Enum)UI.FOOTER_ROOT, false);
-			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, true);
-			GetCtrl(UI.BG_MULTI).GetComponent<UISprite>().height = 750;
 		}
 		else
 		{
 			footerRoot = GetCtrl(UI.FOOTER_ROOT);
-			SetActive((Enum)UI.FOOTER_ROOT, true);
-			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, false);
-			GetCtrl(UI.BG_MULTI).GetComponent<UISprite>().height = 740;
 		}
-		Debug.Log((object)("counter: " + MonoBehaviourSingleton<GachaManager>.I.gachaResult.counter));
-		Debug.Log((object)("oncePurchasedState: " + MonoBehaviourSingleton<GachaManager>.I.gachaResult.oncePurchasedState));
-		if (MonoBehaviourSingleton<GachaManager>.I.gachaResult.oncePurchasedState)
+		yield return LoadGachaButton(buttonName: CreateButtonName(), loadQueue: loadQueue, parent: FindCtrl(footerRoot, UI.BTN_GACHA));
+		yield return LoadGachaGuaranteeCounter(loadQueue, nextGachaGuarantee, delegate(LoadObject lo_guarantee)
 		{
-			SetActive((Enum)UI.FOOTER_ROOT, false);
-			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, false);
-			SetActive((Enum)UI.FOOTER_ROOT_OFFER, true);
-		}
-		string empty = string.Empty;
-		string buttonName = (MonoBehaviourSingleton<GachaManager>.I.gachaResult.counter != 0 || MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId == 0) ? CreateButtonName() : "BTN_GACHA_TICKET1_Skaku_RESULT";
-		LoadObject lo_button = loadQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, buttonName, false);
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		buttonObj = (Object.Instantiate(lo_button.loadedObject) as GameObject);
-		buttonObj.get_transform().set_parent(FindCtrl(footerRoot, UI.BTN_GACHA));
-		buttonObj.get_transform().set_name(UI.BTN_GACHA.ToString());
-		buttonObj.get_transform().set_localScale(new Vector3(1f, 1f, 1f));
-		buttonObj.get_transform().set_localPosition(new Vector3(0f, 0f, 0f));
-		if (nextGuachaGuarantee.IsValid())
-		{
-			bool isGuaranteeLoaded = false;
-			yield return (object)LoadGachaGuaranteeCounter(delegate(LoadObject lo_guarantee)
-			{
-				((_003CDoInitialize_003Ec__Iterator45)/*Error near IL_0361: stateMachine*/)._003CisGuaranteeLoaded_003E__3 = true;
-				((_003CDoInitialize_003Ec__Iterator45)/*Error near IL_0361: stateMachine*/)._003C_003Ef__this.SetTexture(((_003CDoInitialize_003Ec__Iterator45)/*Error near IL_0361: stateMachine*/)._003C_003Ef__this.footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
-			});
-			if (!isGuaranteeLoaded)
-			{
-				yield return (object)loadQueue.Wait();
-			}
-			Transform guaranteeCountDown = FindCtrl(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN);
-			if (!nextGuachaGuarantee.IsItemConfirmed())
-			{
-				guaranteeCountDown.GetComponent<UIButton>().set_enabled(false);
-			}
-			else
-			{
-				REWARD_TYPE type = (REWARD_TYPE)nextGuachaGuarantee.type;
-				if (type != REWARD_TYPE.SKILL_ITEM)
-				{
-					guaranteeCountDown.GetComponent<UIButton>().set_enabled(false);
-				}
-				else
-				{
-					guaranteeCountDown.GetComponent<UIButton>().set_enabled(true);
-					SetEvent(guaranteeCountDown, "SKILL_DETAIL", new object[2]
-					{
-						ItemDetailEquip.CURRENT_SECTION.SHOP_TOP,
-						Singleton<SkillItemTable>.I.GetSkillItemData((uint)nextGuachaGuarantee.itemId)
-					});
-				}
-			}
-		}
-		base.Initialize();
+			SetTexture(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
+		});
 	}
 
 	public override void UpdateUI()
@@ -201,119 +238,374 @@ public class GachaResultQuest : GachaResultBase
 		SetActive((Enum)UI.OBJ_BG_MULTI, !flag);
 		if (flag)
 		{
-			string text = string.Empty;
-			int star_num = 0;
-			GachaResult.GachaReward gachaReward = MonoBehaviourSingleton<GachaManager>.I.gachaResult.reward[0];
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)gachaReward.itemId);
-			if (questData != null)
-			{
-				text = questData.questText;
-				star_num = (int)questData.difficulty;
-			}
-			SetLabelText((Enum)UI.LBL_NAME, text);
-			RARITY_TYPE[] array = (RARITY_TYPE[])Enum.GetValues(typeof(RARITY_TYPE));
-			int i = 0;
-			for (int num = array.Length; i < num; i++)
-			{
-				SetActive((Enum)rarityAnimRoot[i], questData.rarity == array[i]);
-			}
-			SetGachaQuestDifficulty(UI.OBJ_DIFFICULTY_ROOT, star_num);
-			ResetTween((Enum)UI.OBJ_DIFFICULTY_ROOT, 0);
-			ResetTween((Enum)rarityAnimRoot[(int)questData.rarity], 0);
-			ResetTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, 0);
-			if (questData.rarity <= RARITY_TYPE.C)
-			{
-				ResetTween((Enum)UI.OBJ_RARITY_LIGHT, 0);
-				PlayTween((Enum)UI.OBJ_RARITY_LIGHT, true, (EventDelegate.Callback)null, false, 0);
-			}
-			PlayTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, true, (EventDelegate.Callback)null, false, 0);
-			PlayTween((Enum)rarityAnimRoot[(int)questData.rarity], true, (EventDelegate.Callback)delegate
-			{
-				PlayTween((Enum)UI.OBJ_DIFFICULTY_ROOT, true, (EventDelegate.Callback)null, false, 0);
-			}, false, 0);
-			QuestGachaDirectorBase questGachaDirectorBase = AnimationDirector.I as QuestGachaDirectorBase;
-			if (questGachaDirectorBase != null)
-			{
-				questGachaDirectorBase.PlayRarityAudio(questData.rarity, true);
-				questGachaDirectorBase.PlayUIRarityEffect(questData.rarity, GetCtrl(UI.OBJ_RARITY_ROOT), GetCtrl(rarityAnimRoot[(int)questData.rarity]));
-			}
+			UpdateSingleGachaUI();
 		}
 		else
 		{
-			int index = 0;
-			MonoBehaviourSingleton<GachaManager>.I.gachaResult.reward.ForEach(delegate(GachaResult.GachaReward reward)
-			{
-				bool flag2 = false;
-				int num3 = 0;
-				QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem((uint)reward.itemId);
-				if (questItem != null)
-				{
-					flag2 = GameSaveData.instance.IsNewItem(ITEM_ICON_TYPE.QUEST_ITEM, questItem.uniqueID);
-					flag2 = IsNewItemQuestEnemySpecies(questItem);
-					num3 = questItem.infoData.questData.tableData.GetMainEnemyLv();
-				}
-				bool is_new = flag2;
-				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.QUEST_ITEM, (uint)reward.itemId, GetCtrl(iconRootAry[index]), -1, null, 0, is_new, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				itemIcon.SetEnableCollider(false);
-				string text2 = string.Empty;
-				if (num3 > 0)
-				{
-					text2 = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), num3.ToString());
-				}
-				SetLabelText(GetCtrl(iconRootAry[index]), iconLevelAry[index], text2);
-				SetEvent(GetCtrl(iconRootAry[index]), "QUEST_DETAIL", index);
-				index++;
-			});
+			UpdateMultiGachaUI();
 		}
-		int num2 = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
+		if (!MonoBehaviourSingleton<GachaManager>.I.IsExistNextGachaResult() && MonoBehaviourSingleton<GachaManager>.I.IsResultBonus())
+		{
+			UpdateFeverResultFooterUI();
+		}
+		else if (MonoBehaviourSingleton<GachaManager>.I.IsMultiResult())
+		{
+			UpdateMultiResultFooterUI();
+		}
+		else
+		{
+			UpdateSingleResultFooterUI();
+		}
+	}
+
+	protected void UpdateSingleGachaUI()
+	{
+		string text = string.Empty;
+		int star_num = 0;
+		GachaResult.GachaReward gachaReward = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward[0];
+		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)gachaReward.itemId);
+		if (questData != null)
+		{
+			text = questData.questText;
+			star_num = (int)questData.difficulty;
+		}
+		SetLabelText((Enum)UI.LBL_NAME, text);
+		RARITY_TYPE[] array = (RARITY_TYPE[])Enum.GetValues(typeof(RARITY_TYPE));
+		int i = 0;
+		for (int num = array.Length; i < num; i++)
+		{
+			SetActive((Enum)rarityAnimRoot[i], questData.rarity == array[i]);
+		}
+		SetGachaQuestDifficulty(UI.OBJ_DIFFICULTY_ROOT, star_num);
+		ResetTween((Enum)UI.OBJ_DIFFICULTY_ROOT, 0);
+		ResetTween((Enum)rarityAnimRoot[(int)questData.rarity], 0);
+		ResetTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, 0);
+		if (questData.rarity <= RARITY_TYPE.C)
+		{
+			ResetTween((Enum)UI.OBJ_RARITY_LIGHT, 0);
+			PlayTween((Enum)UI.OBJ_RARITY_LIGHT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		}
+		PlayTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween((Enum)rarityAnimRoot[(int)questData.rarity], forward: true, (EventDelegate.Callback)delegate
+		{
+			PlayTween((Enum)UI.OBJ_DIFFICULTY_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		}, is_input_block: false, 0);
+		QuestGachaDirectorBase questGachaDirectorBase = AnimationDirector.I as QuestGachaDirectorBase;
+		if (questGachaDirectorBase != null)
+		{
+			questGachaDirectorBase.PlayRarityAudio(questData.rarity, ignore_skip_check: true);
+			questGachaDirectorBase.PlayUIRarityEffect(questData.rarity, GetCtrl(UI.OBJ_RARITY_ROOT), GetCtrl(rarityAnimRoot[(int)questData.rarity]));
+		}
+	}
+
+	protected void UpdateMultiGachaUI()
+	{
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0301: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
+		//IL_031c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0337: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+		List<GachaResult.GachaReward> list = (!MonoBehaviourSingleton<GachaManager>.I.enableFeverDirector) ? MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward : MonoBehaviourSingleton<GachaManager>.I.gachaResultBonus.reward;
+		int index = 0;
+		list.ForEach(delegate(GachaResult.GachaReward reward)
+		{
+			bool flag = false;
+			int num = 0;
+			QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem((uint)reward.itemId);
+			if (questItem != null)
+			{
+				flag = GameSaveData.instance.IsNewItem(ITEM_ICON_TYPE.QUEST_ITEM, questItem.uniqueID);
+				flag = IsNewItemQuestEnemySpecies(questItem);
+				num = questItem.infoData.questData.tableData.GetMainEnemyLv();
+			}
+			REWARD_TYPE rewardType = REWARD_TYPE.QUEST_ITEM;
+			uint itemId = (uint)reward.itemId;
+			Transform ctrl = GetCtrl(iconRootAry[index]);
+			bool is_new = flag;
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(rewardType, itemId, ctrl, -1, null, 0, is_new);
+			itemIcon.SetEnableCollider(is_enable: false);
+			string text = string.Empty;
+			if (num > 0)
+			{
+				text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), num.ToString());
+			}
+			SetLabelText(GetCtrl(iconRootAry[index]), iconLevelAry[index], text);
+			SetEvent(GetCtrl(iconRootAry[index]), "QUEST_DETAIL", index);
+			index++;
+		});
+		for (int i = index; i < iconRootAry.Length; i++)
+		{
+			SetActive((Enum)iconRootAry[i], is_visible: false);
+		}
+		Vector3[] array = null;
+		switch (list.Count)
+		{
+		case 2:
+			array = (Vector3[])new Vector3[2]
+			{
+				new Vector3(-90f, -160f),
+				new Vector3(90f, -160f)
+			};
+			break;
+		case 4:
+			array = (Vector3[])new Vector3[4]
+			{
+				new Vector3(-90f, -160f),
+				new Vector3(90f, -160f),
+				new Vector3(-90f, -296f),
+				new Vector3(90f, -296f)
+			};
+			break;
+		case 7:
+			array = (Vector3[])new Vector3[7]
+			{
+				new Vector3(-90f, -92f),
+				new Vector3(90f, -92f),
+				new Vector3(-90f, -228f),
+				new Vector3(90f, -228f),
+				new Vector3(-133f, -364f),
+				new Vector3(0f, -364f),
+				new Vector3(133f, -364f)
+			};
+			break;
+		case 9:
+			array = (Vector3[])new Vector3[9]
+			{
+				new Vector3(-133f, -92f),
+				new Vector3(0f, -92f),
+				new Vector3(133f, -92f),
+				new Vector3(-133f, -228f),
+				new Vector3(0f, -228f),
+				new Vector3(133f, -228f),
+				new Vector3(-133f, -364f),
+				new Vector3(0f, -364f),
+				new Vector3(133f, -364f)
+			};
+			break;
+		}
+		if (array != null)
+		{
+			for (int j = 0; j < list.Count; j++)
+			{
+				GetCtrl(iconRootAry[j]).set_localPosition(array[j]);
+			}
+		}
+	}
+
+	protected void UpdateSingleResultFooterUI()
+	{
+		SetActive((Enum)UI.FOOTER_MULTI_RESULT_ROOT, is_visible: false);
+		if (nextGachaGuarantee.IsValid())
+		{
+			SetActive((Enum)UI.FOOTER_ROOT, is_visible: false);
+			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: true);
+			GetCtrl(UI.BG_MULTI).GetComponent<UISprite>().height = 750;
+		}
+		else
+		{
+			SetActive((Enum)UI.FOOTER_ROOT, is_visible: true);
+			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
+			GetCtrl(UI.BG_MULTI).GetComponent<UISprite>().height = 740;
+		}
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_WIN))
+		{
+			SetActive(footerRoot, UI.BTN_BACK, is_visible: false);
+		}
+		int num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
 		if (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0)
 		{
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId);
-			UITexture[] array2 = new UITexture[3]
+			UITexture[] array = new UITexture[3]
 			{
 				FindCtrl(FindCtrl(footerRoot, UI.OBJ_GACHA_DISABLE_ROOT), UI.TEX_TICKET).GetComponent<UITexture>(),
 				FindCtrl(FindCtrl(footerRoot, UI.OBJ_GACHA_ENABLE_ROOT), UI.TEX_TICKET).GetComponent<UITexture>(),
 				FindCtrl(footerRoot, UI.TEX_TICKET_HAVE).GetComponent<UITexture>()
 			};
-			UITexture[] array3 = array2;
-			foreach (UITexture ui_tex in array3)
+			UITexture[] array2 = array;
+			foreach (UITexture ui_tex in array2)
 			{
 				ResourceLoad.LoadItemIconTexture(ui_tex, itemData.iconID);
 			}
-			num2 = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == itemData.id, 1, false);
-			if (MonoBehaviourSingleton<GachaManager>.I.gachaResult.counter >= 0)
+			num = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == itemData.id, 1);
+			SetActive(footerRoot, UI.GACHATICKETCOUNTERSRESULT, is_visible: true);
+			SetActive(footerRoot, UI.S_COUNTER, is_visible: false);
+			SetActive(footerRoot, UI.S_AVAILABLE, is_visible: true);
+			if (MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult() != null && MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().counter >= 0)
 			{
-				SetActive(footerRoot, UI.GACHATICKETCOUNTERSRESULT, false);
-				SetActive(footerRoot, UI.S_COUNTER, false);
-				SetActive(footerRoot, UI.S_AVAILABLE, true);
+				SetActive(footerRoot, UI.GACHATICKETCOUNTERSRESULT, is_visible: false);
+				SetActive(footerRoot, UI.S_COUNTER, is_visible: false);
+				SetActive(footerRoot, UI.S_AVAILABLE, is_visible: true);
 			}
-			else if (MonoBehaviourSingleton<GachaManager>.I.gachaResult.counter > 0)
+			else if (MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult() != null && MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().counter > 0)
 			{
-				SetActive(footerRoot, UI.GACHATICKETCOUNTERSRESULT, true);
-				SetActive(footerRoot, UI.S_COUNTER, true);
-				SetActive(footerRoot, UI.S_AVAILABLE, false);
-				SetActive(footerRoot, UI.NUMBER_COUNTER_IMG, true);
-				FindCtrl(footerRoot, UI.NUMBER_COUNTER_IMG).GetComponent<UISprite>().spriteName = MonoBehaviourSingleton<GachaManager>.I.gachaResult.counter.ToString();
-				FindCtrl(FindCtrl(footerRoot, UI.GACHATICKETCOUNTERSRESULT), UI.COUNTER_PROGRESSBAR_FOREGROUND).GetComponent<UISprite>().fillAmount = (float)(10 - MonoBehaviourSingleton<GachaManager>.I.gachaResult.counter) / 10f;
-				SetLabelText(footerRoot, UI.COUNTER_LBL, MonoBehaviourSingleton<GachaManager>.I.gachaResult.counter);
+				SetActive(footerRoot, UI.GACHATICKETCOUNTERSRESULT, is_visible: true);
+				SetActive(footerRoot, UI.S_COUNTER, is_visible: true);
+				SetActive(footerRoot, UI.S_AVAILABLE, is_visible: false);
+				SetActive(footerRoot, UI.NUMBER_COUNTER_IMG, is_visible: true);
+				FindCtrl(footerRoot, UI.NUMBER_COUNTER_IMG).GetComponent<UISprite>().spriteName = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().counter.ToString();
+				FindCtrl(FindCtrl(footerRoot, UI.GACHATICKETCOUNTERSRESULT), UI.COUNTER_PROGRESSBAR_FOREGROUND).GetComponent<UISprite>().fillAmount = (float)(10 - MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().counter) / 10f;
+				SetLabelText(footerRoot, UI.COUNTER_LBL, MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().counter);
 			}
 			else
 			{
-				SetActive(footerRoot, UI.GACHATICKETCOUNTERSRESULT, true);
-				SetActive(footerRoot, UI.S_COUNTER, false);
-				SetActive(footerRoot, UI.S_AVAILABLE, true);
+				SetActive(footerRoot, UI.GACHATICKETCOUNTERSRESULT, is_visible: true);
+				SetActive(footerRoot, UI.S_COUNTER, is_visible: false);
+				SetActive(footerRoot, UI.S_AVAILABLE, is_visible: true);
 			}
 		}
 		SetActive(footerRoot, UI.SPR_CRYSTAL, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId == 0);
 		SetActive(footerRoot, UI.TEX_TICKET_HAVE, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0);
-		SetLabelText(footerRoot, UI.LBL_CRYSTAL_NUM, num2.ToString());
-		if (MonoBehaviourSingleton<GachaManager>.I.gachaResult.gachaGuaranteeCampaignInfo == null)
+		SetLabelText(footerRoot, UI.LBL_CRYSTAL_NUM, num.ToString());
+		bool gachaButtonActive = IsEnableEntry();
+		SetGachaButtonActive(gachaButtonActive);
+		SetEventDetailImageButton();
+	}
+
+	protected void UpdateMultiResultFooterUI()
+	{
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<GachaManager>.I.IsExistNextGachaResult())
 		{
-			SetGachaButtonActive(!MonoBehaviourSingleton<GachaManager>.I.IsSelectTutorialGacha() && MonoBehaviourSingleton<GachaManager>.I.gachaResult.remainCount != 0);
+			SetActive(footerRoot, UI.BTN_NEXT, is_visible: true);
+			SetActive(footerRoot, UI.BTN_BACK, is_visible: false);
+			SetActive(footerRoot, UI.BTN_BATTLE, is_visible: false);
+			SetActive(footerRoot, UI.OBJ_GUARANTEE, is_visible: true);
+			SetActive(footerRoot, UI.SPR_LINE_BOTTOM, is_visible: false);
+			GetCtrl(UI.OBJ_ICONS_ROOT).set_localPosition(new Vector3(0f, 0f, 0f));
 		}
 		else
 		{
-			SetGachaButtonActive(!MonoBehaviourSingleton<GachaManager>.I.IsSelectTutorialGacha());
+			SetActive(footerRoot, UI.BTN_NEXT, is_visible: false);
+			SetActive(footerRoot, UI.BTN_BACK, is_visible: true);
+			SetActive(footerRoot, UI.BTN_BATTLE, is_visible: true);
+			SetActive(footerRoot, UI.OBJ_GUARANTEE, is_visible: false);
+			SetActive(footerRoot, UI.SPR_LINE_BOTTOM, is_visible: true);
+			GetCtrl(UI.OBJ_ICONS_ROOT).set_localPosition(new Vector3(0f, -90f, 0f));
+		}
+		bool gachaButtonActive = IsEnableEntry();
+		SetGachaButtonActive(gachaButtonActive);
+		SetEventDetailImageButton();
+	}
+
+	protected void UpdateFeverResultFooterUI()
+	{
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		if (MonoBehaviourSingleton<GachaManager>.I.enableFeverDirector)
+		{
+			SetActive(footerRoot, UI.BTN_BACK, is_visible: true);
+			SetActive(footerRoot, UI.BTN_BATTLE, is_visible: true);
+			SetActive(footerRoot, UI.OBJ_GUARANTEE, is_visible: true);
+			SetLabelText(footerRoot, UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString());
+		}
+		else
+		{
+			SetActive(footerRoot, UI.BTN_BACK, is_visible: false);
+			SetActive(footerRoot, UI.BTN_BATTLE, is_visible: false);
+			SetActive(footerRoot, UI.OBJ_GUARANTEE, is_visible: true);
+			SetActive(footerRoot, UI.SPR_LINE_BOTTOM, is_visible: false);
+			GetCtrl(UI.BG_MULTI).GetComponent<UISprite>().height = 830;
+			FindCtrl(footerRoot, UI.BTN_NEXT).set_localPosition(new Vector3(5f, -258f));
+		}
+		bool gachaButtonActive = IsEnableEntry();
+		SetGachaButtonActive(gachaButtonActive);
+		SetEventDetailImageButton();
+	}
+
+	private void SetEventDetailImageButton()
+	{
+		Transform val = FindCtrl(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN);
+		if (val == null)
+		{
+			return;
+		}
+		if (isExistDetailButton)
+		{
+			if (!nextGachaGuarantee.IsValid() || !nextGachaGuarantee.IsItemConfirmed())
+			{
+				if (!nextGachaGuarantee.link.IsNullOrWhiteSpace())
+				{
+					val.GetComponent<UIButton>().set_enabled(true);
+					SetEvent(val, "GUARANTEE_GACHA_DETAIL_WEB", nextGachaGuarantee.link);
+				}
+				else
+				{
+					val.GetComponent<UIButton>().set_enabled(false);
+				}
+				return;
+			}
+			switch (nextGachaGuarantee.type)
+			{
+			default:
+				val.GetComponent<UIButton>().set_enabled(false);
+				break;
+			case 5:
+				val.GetComponent<UIButton>().set_enabled(true);
+				SetEvent(val, "SKILL_DETAIL", new object[2]
+				{
+					ItemDetailEquip.CURRENT_SECTION.SHOP_TOP,
+					Singleton<SkillItemTable>.I.GetSkillItemData((uint)nextGachaGuarantee.itemId)
+				});
+				break;
+			case 14:
+			{
+				val.GetComponent<UIButton>().set_enabled(true);
+				AccessorySortData accessorySortData = new AccessorySortData();
+				AccessoryInfo accessoryInfo = new AccessoryInfo();
+				accessoryInfo.SetValue((uint)nextGachaGuarantee.itemId);
+				accessorySortData.SetItem(accessoryInfo);
+				SetEvent(val, "ACCESSORY_SELECT", new object[2]
+				{
+					ItemDetailEquip.CURRENT_SECTION.SHOP_TOP,
+					accessorySortData
+				});
+				break;
+			}
+			}
+		}
+		else
+		{
+			val.GetComponent<UIButton>().set_enabled(false);
 		}
 	}
 
@@ -354,25 +646,28 @@ public class GachaResultQuest : GachaResultBase
 	private void OnQuery_QUEST_DETAIL()
 	{
 		int num = (int)GameSection.GetEventData();
-		int count = MonoBehaviourSingleton<GachaManager>.I.gachaResult.reward.Count;
+		List<GachaResult.GachaReward> list = (!MonoBehaviourSingleton<GachaManager>.I.enableFeverDirector) ? MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward : MonoBehaviourSingleton<GachaManager>.I.gachaResultBonus.reward;
+		int count = list.Count;
 		if (num < 0 || num >= count)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem((uint)list[num].itemId);
+		if (questItem == null)
 		{
-			QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem((uint)MonoBehaviourSingleton<GachaManager>.I.gachaResult.reward[num].itemId);
-			if (questItem == null)
-			{
-				GameSection.StopEvent();
-			}
-			else
-			{
-				QuestSortData questSortData = new QuestSortData();
-				questSortData.SetItem(questItem);
-				GameSection.SetEventData(questSortData);
-			}
+			GameSection.StopEvent();
+			return;
 		}
+		QuestSortData questSortData = new QuestSortData();
+		questSortData.SetItem(questItem);
+		GameSection.SetEventData(questSortData);
+	}
+
+	private void OnQuery_BATTLE()
+	{
+		isJumpToBattle = true;
+		OnCloseDialog_GachaResultToBattleConfirm();
 	}
 
 	private void OnQuery_GachaResultToBattleConfirm_YES()
@@ -391,15 +686,15 @@ public class GachaResultQuest : GachaResultBase
 		{
 			EventData[] array = null;
 			bool flag = MonoBehaviourSingleton<GachaManager>.I.selectGacha.num == 1;
-			string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+			string goingHomeEvent = GameSection.GetGoingHomeEvent();
 			array = ((!flag) ? new EventData[3]
 			{
-				new EventData(name, null),
+				new EventData(goingHomeEvent, null),
 				new EventData("GACHA_QUEST_COUNTER", null),
 				new EventData("TO_GACHA_QUEST_COUNTER", null)
 			} : new EventData[3]
 			{
-				new EventData(name, null),
+				new EventData(goingHomeEvent, null),
 				new EventData("GACHA_QUEST_COUNTER", null),
 				new EventData("TO_GACHA_QUEST_COUNTER", null)
 			});
@@ -420,27 +715,6 @@ public class GachaResultQuest : GachaResultBase
 		}
 	}
 
-	protected override void SetGachaButtonActive(bool enableRetry)
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Expected O, but got Unknown
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Expected O, but got Unknown
-		Transform root = FindCtrl(buttonObj.get_transform(), (!enableRetry) ? UI.OBJ_GACHA_DISABLE_ROOT : UI.OBJ_GACHA_ENABLE_ROOT);
-		SetActive(buttonObj.get_transform(), UI.OBJ_GACHA_ENABLE_ROOT, enableRetry);
-		SetActive(buttonObj.get_transform(), UI.OBJ_GACHA_DISABLE_ROOT, !enableRetry);
-		int num = (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId <= 0) ? GetCrystalNum() : MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum;
-		SetLabelText(root, UI.LBL_PRICE, num.ToString());
-		if (!enableRetry)
-		{
-			SetButtonEnabled(buttonObj.get_transform(), false);
-		}
-	}
-
 	protected void _OnDestroy()
 	{
 		base.OnDestroy();
@@ -448,15 +722,12 @@ public class GachaResultQuest : GachaResultBase
 
 	protected void SetGachaQuestDifficulty(Enum _enum, int star_num)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(_enum);
 		int i = 0;
 		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
 		{
-			Transform val = ctrl.GetChild(i);
-			val.get_gameObject().SetActive(i <= star_num);
+			Transform child = ctrl.GetChild(i);
+			child.get_gameObject().SetActive(i <= star_num);
 		}
 		ctrl.GetComponent<UIGrid>().Reposition();
 	}
@@ -544,13 +815,13 @@ public class GachaResultQuest : GachaResultBase
 	{
 		if (rarity <= RARITY_TYPE.C)
 		{
-			PlayTween((Enum)UI.OBJ_RARITY_LIGHT, true, (EventDelegate.Callback)null, false, 0);
+			PlayTween((Enum)UI.OBJ_RARITY_LIGHT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 		}
-		PlayTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, true, (EventDelegate.Callback)null, false, 0);
-		PlayTween((Enum)rarityAnimRoot[(int)rarity], true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween((Enum)rarityAnimRoot[(int)rarity], forward: true, (EventDelegate.Callback)delegate
 		{
-			PlayTween((Enum)UI.OBJ_DIFFICULTY_ROOT, true, (EventDelegate.Callback)null, false, 0);
-		}, false, 0);
+			PlayTween((Enum)UI.OBJ_DIFFICULTY_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		}, is_input_block: false, 0);
 		if (AnimationDirector.I is QuestGachaDirectorBase)
 		{
 			(AnimationDirector.I as QuestGachaDirectorBase).PlayUIRarityEffect(rarity, GetCtrl(UI.OBJ_RARITY_ROOT), GetCtrl(rarityAnimRoot[(int)rarity]));

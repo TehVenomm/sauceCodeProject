@@ -39,11 +39,12 @@ public class UIButton : UIButtonColor
 
 	private bool isCheckNeedButtonEffect;
 
+	private UIButtonEffect AutoAddButtonEffect;
+
 	public override bool isEnabled
 	{
 		get
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			if (!this.get_enabled())
 			{
 				return false;
@@ -58,38 +59,36 @@ public class UIButton : UIButtonColor
 		}
 		set
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			if (isEnabled != value)
+			if (isEnabled == value)
 			{
-				Collider component = this.get_gameObject().GetComponent<Collider>();
-				if (component != null)
+				return;
+			}
+			Collider component = this.get_gameObject().GetComponent<Collider>();
+			if (component != null)
+			{
+				component.set_enabled(value);
+				UIButton[] components = this.GetComponents<UIButton>();
+				UIButton[] array = components;
+				foreach (UIButton uIButton in array)
 				{
-					component.set_enabled(value);
-					UIButton[] components = this.GetComponents<UIButton>();
-					UIButton[] array = components;
-					foreach (UIButton uIButton in array)
-					{
-						uIButton.SetState((!value) ? State.Disabled : State.Normal, false);
-					}
+					uIButton.SetState((!value) ? State.Disabled : State.Normal, immediate: false);
 				}
-				else
+				return;
+			}
+			Collider2D component2 = this.GetComponent<Collider2D>();
+			if (component2 != null)
+			{
+				component2.set_enabled(value);
+				UIButton[] components2 = this.GetComponents<UIButton>();
+				UIButton[] array2 = components2;
+				foreach (UIButton uIButton2 in array2)
 				{
-					Collider2D component2 = this.GetComponent<Collider2D>();
-					if (component2 != null)
-					{
-						component2.set_enabled(value);
-						UIButton[] components2 = this.GetComponents<UIButton>();
-						UIButton[] array2 = components2;
-						foreach (UIButton uIButton2 in array2)
-						{
-							uIButton2.SetState((!value) ? State.Disabled : State.Normal, false);
-						}
-					}
-					else
-					{
-						this.set_enabled(value);
-					}
+					uIButton2.SetState((!value) ? State.Disabled : State.Normal, immediate: false);
 				}
+			}
+			else
+			{
+				this.set_enabled(value);
 			}
 		}
 	}
@@ -115,14 +114,12 @@ public class UIButton : UIButtonColor
 				mNormalSprite = value;
 				SetSprite(value);
 				NGUITools.SetDirty(mSprite);
+				return;
 			}
-			else
+			mNormalSprite = value;
+			if (mState == State.Normal)
 			{
-				mNormalSprite = value;
-				if (mState == State.Normal)
-				{
-					SetSprite(value);
-				}
+				SetSprite(value);
 			}
 		}
 	}
@@ -148,14 +145,12 @@ public class UIButton : UIButtonColor
 				mNormalSprite2D = value;
 				SetSprite(value);
 				NGUITools.SetDirty(mSprite);
+				return;
 			}
-			else
+			mNormalSprite2D = value;
+			if (mState == State.Normal)
 			{
-				mNormalSprite2D = value;
-				if (mState == State.Normal)
-				{
-					SetSprite(value);
-				}
+				SetSprite(value);
 			}
 		}
 	}
@@ -177,7 +172,6 @@ public class UIButton : UIButtonColor
 
 	protected override void OnEnable()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (isEnabled)
 		{
 			if (mInitDone)
@@ -187,13 +181,12 @@ public class UIButton : UIButtonColor
 		}
 		else
 		{
-			SetState(State.Disabled, true);
+			SetState(State.Disabled, immediate: true);
 		}
 	}
 
 	protected override void OnDragOver()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == this.get_gameObject()))
 		{
 			base.OnDragOver();
@@ -202,7 +195,6 @@ public class UIButton : UIButtonColor
 
 	protected override void OnDragOut()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == this.get_gameObject()))
 		{
 			base.OnDragOut();
@@ -211,8 +203,6 @@ public class UIButton : UIButtonColor
 
 	protected virtual void OnClick()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
 		if (current == null && isEnabled && TutorialMessage.IsActiveButton(this.get_gameObject()))
 		{
 			current = this;
@@ -288,15 +278,27 @@ public class UIButton : UIButtonColor
 
 	protected override void OnPress(bool isPressed)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		if (!isCheckNeedButtonEffect)
 		{
 			if (this.GetComponent<UINoAuto>() == null && null == this.GetComponent<UIButtonEffect>())
 			{
-				this.get_gameObject().AddComponent<UIButtonEffect>();
+				AutoAddButtonEffect = this.get_gameObject().AddComponent<UIButtonEffect>();
 			}
 			isCheckNeedButtonEffect = true;
 		}
 		base.OnPress(isPressed);
+	}
+
+	public void RemoveAutoAddButtonEffect()
+	{
+		if (isCheckNeedButtonEffect)
+		{
+			if (AutoAddButtonEffect != null)
+			{
+				Object.Destroy(AutoAddButtonEffect);
+				AutoAddButtonEffect = null;
+			}
+			isCheckNeedButtonEffect = false;
+		}
 	}
 }

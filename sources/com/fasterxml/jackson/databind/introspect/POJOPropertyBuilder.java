@@ -11,9 +11,7 @@ import com.fasterxml.jackson.databind.util.ClassUtil;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -27,104 +25,6 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     protected final PropertyName _internalName;
     protected final PropertyName _name;
     protected Linked<AnnotatedMethod> _setters;
-
-    private interface WithMember<T> {
-        T withMember(AnnotatedMember annotatedMember);
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$1 */
-    class C05601 implements WithMember<Class<?>[]> {
-        C05601() {
-        }
-
-        public Class<?>[] withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.findViews(annotatedMember);
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$2 */
-    class C05612 implements WithMember<ReferenceProperty> {
-        C05612() {
-        }
-
-        public ReferenceProperty withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.findReferenceType(annotatedMember);
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$3 */
-    class C05623 implements WithMember<Boolean> {
-        C05623() {
-        }
-
-        public Boolean withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.isTypeId(annotatedMember);
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$4 */
-    class C05634 implements WithMember<Boolean> {
-        C05634() {
-        }
-
-        public Boolean withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.hasRequiredMarker(annotatedMember);
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$5 */
-    class C05645 implements WithMember<String> {
-        C05645() {
-        }
-
-        public String withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.findPropertyDescription(annotatedMember);
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$6 */
-    class C05656 implements WithMember<Integer> {
-        C05656() {
-        }
-
-        public Integer withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.findPropertyIndex(annotatedMember);
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$7 */
-    class C05667 implements WithMember<String> {
-        C05667() {
-        }
-
-        public String withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.findPropertyDefaultValue(annotatedMember);
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$8 */
-    class C05678 implements WithMember<ObjectIdInfo> {
-        C05678() {
-        }
-
-        public ObjectIdInfo withMember(AnnotatedMember annotatedMember) {
-            ObjectIdInfo findObjectIdInfo = POJOPropertyBuilder.this._annotationIntrospector.findObjectIdInfo(annotatedMember);
-            if (findObjectIdInfo != null) {
-                return POJOPropertyBuilder.this._annotationIntrospector.findObjectReferenceInfo(annotatedMember, findObjectIdInfo);
-            }
-            return findObjectIdInfo;
-        }
-    }
-
-    /* renamed from: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$9 */
-    class C05689 implements WithMember<Access> {
-        C05689() {
-        }
-
-        public Access withMember(AnnotatedMember annotatedMember) {
-            return POJOPropertyBuilder.this._annotationIntrospector.findPropertyAccess(annotatedMember);
-        }
-    }
 
     protected static final class Linked<T> {
         public final boolean isMarkedIgnored;
@@ -175,16 +75,18 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
         }
 
         public Linked<T> withoutIgnored() {
-            if (this.isMarkedIgnored) {
-                return this.next == null ? null : this.next.withoutIgnored();
-            } else {
+            if (!this.isMarkedIgnored) {
                 if (this.next != null) {
-                    Linked withoutIgnored = this.next.withoutIgnored();
+                    Linked<T> withoutIgnored = this.next.withoutIgnored();
                     if (withoutIgnored != this.next) {
                         return withNext(withoutIgnored);
                     }
                 }
                 return this;
+            } else if (this.next == null) {
+                return null;
+            } else {
+                return this.next.withoutIgnored();
             }
         }
 
@@ -193,7 +95,8 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
             return this.isVisible ? withNext(withoutNonVisible) : withoutNonVisible;
         }
 
-        protected Linked<T> append(Linked<T> linked) {
+        /* access modifiers changed from: protected */
+        public Linked<T> append(Linked<T> linked) {
             if (this.next == null) {
                 return withNext(linked);
             }
@@ -244,14 +147,18 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
             if (this.next == null) {
                 throw new NoSuchElementException();
             }
-            AnnotatedMember annotatedMember = (AnnotatedMember) this.next.value;
+            T t = (AnnotatedMember) this.next.value;
             this.next = this.next.next;
-            return annotatedMember;
+            return t;
         }
 
         public void remove() {
             throw new UnsupportedOperationException();
         }
+    }
+
+    private interface WithMember<T> {
+        T withMember(AnnotatedMember annotatedMember);
     }
 
     public POJOPropertyBuilder(MapperConfig<?> mapperConfig, AnnotationIntrospector annotationIntrospector, boolean z, PropertyName propertyName) {
@@ -299,7 +206,10 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public String getName() {
-        return this._name == null ? null : this._name.getSimpleName();
+        if (this._name == null) {
+            return null;
+        }
+        return this._name.getSimpleName();
     }
 
     public PropertyName getFullName() {
@@ -315,8 +225,11 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public PropertyName getWrapperName() {
-        Annotated primaryMember = getPrimaryMember();
-        return (primaryMember == null || this._annotationIntrospector == null) ? null : this._annotationIntrospector.findWrapperName(primaryMember);
+        AnnotatedMember primaryMember = getPrimaryMember();
+        if (primaryMember == null || this._annotationIntrospector == null) {
+            return null;
+        }
+        return this._annotationIntrospector.findWrapperName(primaryMember);
     }
 
     public boolean isExplicitlyIncluded() {
@@ -352,91 +265,91 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public AnnotatedMethod getGetter() {
-        Linked linked = this._getters;
-        if (linked == null) {
+        Linked linked;
+        Linked linked2 = this._getters;
+        if (linked2 == null) {
             return null;
         }
-        Linked linked2 = linked.next;
-        if (linked2 == null) {
-            return (AnnotatedMethod) linked.value;
+        Linked<T> linked3 = linked2.next;
+        if (linked3 == null) {
+            return (AnnotatedMethod) linked2.value;
         }
-        while (linked2 != null) {
-            Linked linked3;
-            Class declaringClass = ((AnnotatedMethod) linked.value).getDeclaringClass();
-            Class declaringClass2 = ((AnnotatedMethod) linked2.value).getDeclaringClass();
+        while (linked3 != null) {
+            Class declaringClass = ((AnnotatedMethod) linked2.value).getDeclaringClass();
+            Class declaringClass2 = ((AnnotatedMethod) linked3.value).getDeclaringClass();
             if (declaringClass != declaringClass2) {
                 if (declaringClass.isAssignableFrom(declaringClass2)) {
-                    linked3 = linked2;
+                    linked = linked3;
                 } else if (declaringClass2.isAssignableFrom(declaringClass)) {
-                    linked3 = linked;
+                    linked = linked2;
                 }
-                linked2 = linked2.next;
-                linked = linked3;
+                linked3 = linked3.next;
+                linked2 = linked;
             }
-            int _getterPriority = _getterPriority((AnnotatedMethod) linked2.value);
-            int _getterPriority2 = _getterPriority((AnnotatedMethod) linked.value);
+            int _getterPriority = _getterPriority((AnnotatedMethod) linked3.value);
+            int _getterPriority2 = _getterPriority((AnnotatedMethod) linked2.value);
             if (_getterPriority != _getterPriority2) {
                 if (_getterPriority < _getterPriority2) {
-                    linked3 = linked2;
+                    linked = linked3;
                 } else {
-                    linked3 = linked;
+                    linked = linked2;
                 }
-                linked2 = linked2.next;
-                linked = linked3;
+                linked3 = linked3.next;
+                linked2 = linked;
             } else {
-                throw new IllegalArgumentException("Conflicting getter definitions for property \"" + getName() + "\": " + ((AnnotatedMethod) linked.value).getFullName() + " vs " + ((AnnotatedMethod) linked2.value).getFullName());
+                throw new IllegalArgumentException("Conflicting getter definitions for property \"" + getName() + "\": " + ((AnnotatedMethod) linked2.value).getFullName() + " vs " + ((AnnotatedMethod) linked3.value).getFullName());
             }
         }
-        this._getters = linked.withoutNext();
-        return (AnnotatedMethod) linked.value;
+        this._getters = linked2.withoutNext();
+        return (AnnotatedMethod) linked2.value;
     }
 
     public AnnotatedMethod getSetter() {
-        Linked linked = this._setters;
-        if (linked == null) {
+        Linked linked;
+        Linked linked2 = this._setters;
+        if (linked2 == null) {
             return null;
         }
-        Linked linked2 = linked.next;
-        if (linked2 == null) {
-            return (AnnotatedMethod) linked.value;
+        Linked<T> linked3 = linked2.next;
+        if (linked3 == null) {
+            return (AnnotatedMethod) linked2.value;
         }
-        while (linked2 != null) {
-            Linked linked3;
-            Class declaringClass = ((AnnotatedMethod) linked.value).getDeclaringClass();
-            Class declaringClass2 = ((AnnotatedMethod) linked2.value).getDeclaringClass();
+        while (linked3 != null) {
+            Class declaringClass = ((AnnotatedMethod) linked2.value).getDeclaringClass();
+            Class declaringClass2 = ((AnnotatedMethod) linked3.value).getDeclaringClass();
             if (declaringClass != declaringClass2) {
                 if (declaringClass.isAssignableFrom(declaringClass2)) {
-                    linked3 = linked2;
+                    linked = linked3;
                 } else if (declaringClass2.isAssignableFrom(declaringClass)) {
-                    linked3 = linked;
+                    linked = linked2;
                 }
-                linked2 = linked2.next;
-                linked = linked3;
+                linked3 = linked3.next;
+                linked2 = linked;
             }
-            AnnotatedMethod annotatedMethod = (AnnotatedMethod) linked2.value;
-            AnnotatedMethod annotatedMethod2 = (AnnotatedMethod) linked.value;
+            AnnotatedMethod annotatedMethod = (AnnotatedMethod) linked3.value;
+            AnnotatedMethod annotatedMethod2 = (AnnotatedMethod) linked2.value;
             int _setterPriority = _setterPriority(annotatedMethod);
             int _setterPriority2 = _setterPriority(annotatedMethod2);
             if (_setterPriority == _setterPriority2) {
                 if (this._annotationIntrospector != null) {
                     AnnotatedMethod resolveSetterConflict = this._annotationIntrospector.resolveSetterConflict(this._config, annotatedMethod2, annotatedMethod);
                     if (resolveSetterConflict == annotatedMethod2) {
-                        linked3 = linked;
+                        linked = linked2;
                     } else if (resolveSetterConflict == annotatedMethod) {
-                        linked3 = linked2;
+                        linked = linked3;
                     }
                 }
-                throw new IllegalArgumentException("Conflicting setter definitions for property \"" + getName() + "\": " + ((AnnotatedMethod) linked.value).getFullName() + " vs " + ((AnnotatedMethod) linked2.value).getFullName());
+                throw new IllegalArgumentException("Conflicting setter definitions for property \"" + getName() + "\": " + ((AnnotatedMethod) linked2.value).getFullName() + " vs " + ((AnnotatedMethod) linked3.value).getFullName());
             } else if (_setterPriority < _setterPriority2) {
-                linked3 = linked2;
+                linked = linked3;
             } else {
-                linked3 = linked;
+                linked = linked2;
             }
-            linked2 = linked2.next;
-            linked = linked3;
+            linked3 = linked3.next;
+            linked2 = linked;
         }
-        this._setters = linked.withoutNext();
-        return (AnnotatedMethod) linked.value;
+        this._setters = linked2.withoutNext();
+        return (AnnotatedMethod) linked2.value;
     }
 
     public AnnotatedField getField() {
@@ -444,22 +357,22 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
             return null;
         }
         AnnotatedField annotatedField = (AnnotatedField) this._fields.value;
-        Linked linked = this._fields.next;
+        Linked<T> linked = this._fields.next;
         AnnotatedField annotatedField2 = annotatedField;
         while (linked != null) {
-            annotatedField = (AnnotatedField) linked.value;
+            AnnotatedField annotatedField3 = (AnnotatedField) linked.value;
             Class declaringClass = annotatedField2.getDeclaringClass();
-            Class declaringClass2 = annotatedField.getDeclaringClass();
+            Class declaringClass2 = annotatedField3.getDeclaringClass();
             if (declaringClass != declaringClass2) {
                 if (!declaringClass.isAssignableFrom(declaringClass2)) {
                     if (declaringClass2.isAssignableFrom(declaringClass)) {
-                        annotatedField = annotatedField2;
+                        annotatedField3 = annotatedField2;
                     }
                 }
                 linked = linked.next;
-                annotatedField2 = annotatedField;
+                annotatedField2 = annotatedField3;
             }
-            throw new IllegalArgumentException("Multiple fields representing property \"" + getName() + "\": " + annotatedField2.getFullName() + " vs " + annotatedField.getFullName());
+            throw new IllegalArgumentException("Multiple fields representing property \"" + getName() + "\": " + annotatedField2.getFullName() + " vs " + annotatedField3.getFullName());
         }
         return annotatedField2;
     }
@@ -469,14 +382,16 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
             return null;
         }
         Linked linked = this._ctorParameters;
-        while (!(((AnnotatedParameter) linked.value).getOwner() instanceof AnnotatedConstructor)) {
-            Linked linked2 = linked.next;
-            if (linked2 == null) {
+        while (true) {
+            Linked linked2 = linked;
+            if (((AnnotatedParameter) linked2.value).getOwner() instanceof AnnotatedConstructor) {
+                return (AnnotatedParameter) linked2.value;
+            }
+            linked = linked2.next;
+            if (linked == null) {
                 return (AnnotatedParameter) this._ctorParameters.value;
             }
-            linked = linked2;
         }
-        return (AnnotatedParameter) linked.value;
     }
 
     public Iterator<AnnotatedParameter> getConstructorParameters() {
@@ -487,7 +402,7 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public AnnotatedMember getAccessor() {
-        AnnotatedMember getter = getGetter();
+        AnnotatedMethod getter = getGetter();
         if (getter == null) {
             return getField();
         }
@@ -495,19 +410,19 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public AnnotatedMember getMutator() {
-        AnnotatedMember constructorParameter = getConstructorParameter();
+        AnnotatedParameter constructorParameter = getConstructorParameter();
         if (constructorParameter != null) {
             return constructorParameter;
         }
-        constructorParameter = getSetter();
-        if (constructorParameter == null) {
+        AnnotatedMethod setter = getSetter();
+        if (setter == null) {
             return getField();
         }
-        return constructorParameter;
+        return setter;
     }
 
     public AnnotatedMember getNonConstructorMutator() {
-        AnnotatedMember setter = getSetter();
+        AnnotatedMethod setter = getSetter();
         if (setter == null) {
             return getField();
         }
@@ -521,7 +436,8 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
         return getMutator();
     }
 
-    protected int _getterPriority(AnnotatedMethod annotatedMethod) {
+    /* access modifiers changed from: protected */
+    public int _getterPriority(AnnotatedMethod annotatedMethod) {
         String name = annotatedMethod.getName();
         if (name.startsWith("get") && name.length() > 3) {
             return 1;
@@ -532,7 +448,8 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
         return 2;
     }
 
-    protected int _setterPriority(AnnotatedMethod annotatedMethod) {
+    /* access modifiers changed from: protected */
+    public int _setterPriority(AnnotatedMethod annotatedMethod) {
         String name = annotatedMethod.getName();
         if (!name.startsWith("set") || name.length() <= 3) {
             return 2;
@@ -541,15 +458,27 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public Class<?>[] findViews() {
-        return (Class[]) fromMemberAnnotations(new C05601());
+        return (Class[]) fromMemberAnnotations(new WithMember<Class<?>[]>() {
+            public Class<?>[] withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.findViews(annotatedMember);
+            }
+        });
     }
 
     public ReferenceProperty findReferenceType() {
-        return (ReferenceProperty) fromMemberAnnotations(new C05612());
+        return (ReferenceProperty) fromMemberAnnotations(new WithMember<ReferenceProperty>() {
+            public ReferenceProperty withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.findReferenceType(annotatedMember);
+            }
+        });
     }
 
     public boolean isTypeId() {
-        Boolean bool = (Boolean) fromMemberAnnotations(new C05623());
+        Boolean bool = (Boolean) fromMemberAnnotations(new WithMember<Boolean>() {
+            public Boolean withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.isTypeId(annotatedMember);
+            }
+        });
         return bool != null && bool.booleanValue();
     }
 
@@ -560,29 +489,56 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
         String _findDefaultValue = _findDefaultValue();
         if (_findRequired == null && _findIndex == null && _findDefaultValue == null) {
             return _findDescription == null ? PropertyMetadata.STD_REQUIRED_OR_OPTIONAL : PropertyMetadata.STD_REQUIRED_OR_OPTIONAL.withDescription(_findDescription);
-        } else {
-            return PropertyMetadata.construct(_findRequired.booleanValue(), _findDescription, _findIndex, _findDefaultValue);
         }
+        return PropertyMetadata.construct(_findRequired.booleanValue(), _findDescription, _findIndex, _findDefaultValue);
     }
 
-    protected Boolean _findRequired() {
-        return (Boolean) fromMemberAnnotations(new C05634());
+    /* access modifiers changed from: protected */
+    public Boolean _findRequired() {
+        return (Boolean) fromMemberAnnotations(new WithMember<Boolean>() {
+            public Boolean withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.hasRequiredMarker(annotatedMember);
+            }
+        });
     }
 
-    protected String _findDescription() {
-        return (String) fromMemberAnnotations(new C05645());
+    /* access modifiers changed from: protected */
+    public String _findDescription() {
+        return (String) fromMemberAnnotations(new WithMember<String>() {
+            public String withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.findPropertyDescription(annotatedMember);
+            }
+        });
     }
 
-    protected Integer _findIndex() {
-        return (Integer) fromMemberAnnotations(new C05656());
+    /* access modifiers changed from: protected */
+    public Integer _findIndex() {
+        return (Integer) fromMemberAnnotations(new WithMember<Integer>() {
+            public Integer withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.findPropertyIndex(annotatedMember);
+            }
+        });
     }
 
-    protected String _findDefaultValue() {
-        return (String) fromMemberAnnotations(new C05667());
+    /* access modifiers changed from: protected */
+    public String _findDefaultValue() {
+        return (String) fromMemberAnnotations(new WithMember<String>() {
+            public String withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.findPropertyDefaultValue(annotatedMember);
+            }
+        });
     }
 
     public ObjectIdInfo findObjectIdInfo() {
-        return (ObjectIdInfo) fromMemberAnnotations(new C05678());
+        return (ObjectIdInfo) fromMemberAnnotations(new WithMember<ObjectIdInfo>() {
+            public ObjectIdInfo withMember(AnnotatedMember annotatedMember) {
+                ObjectIdInfo findObjectIdInfo = POJOPropertyBuilder.this._annotationIntrospector.findObjectIdInfo(annotatedMember);
+                if (findObjectIdInfo != null) {
+                    return POJOPropertyBuilder.this._annotationIntrospector.findObjectReferenceInfo(annotatedMember, findObjectIdInfo);
+                }
+                return findObjectIdInfo;
+            }
+        });
     }
 
     public Value findInclusion() {
@@ -596,23 +552,27 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public Access findAccess() {
-        return (Access) fromMemberAnnotationsExcept(new C05689(), Access.AUTO);
+        return (Access) fromMemberAnnotationsExcept(new WithMember<Access>() {
+            public Access withMember(AnnotatedMember annotatedMember) {
+                return POJOPropertyBuilder.this._annotationIntrospector.findPropertyAccess(annotatedMember);
+            }
+        }, Access.AUTO);
     }
 
     public void addField(AnnotatedField annotatedField, PropertyName propertyName, boolean z, boolean z2, boolean z3) {
-        this._fields = new Linked(annotatedField, this._fields, propertyName, z, z2, z3);
+        this._fields = new Linked<>(annotatedField, this._fields, propertyName, z, z2, z3);
     }
 
     public void addCtor(AnnotatedParameter annotatedParameter, PropertyName propertyName, boolean z, boolean z2, boolean z3) {
-        this._ctorParameters = new Linked(annotatedParameter, this._ctorParameters, propertyName, z, z2, z3);
+        this._ctorParameters = new Linked<>(annotatedParameter, this._ctorParameters, propertyName, z, z2, z3);
     }
 
     public void addGetter(AnnotatedMethod annotatedMethod, PropertyName propertyName, boolean z, boolean z2, boolean z3) {
-        this._getters = new Linked(annotatedMethod, this._getters, propertyName, z, z2, z3);
+        this._getters = new Linked<>(annotatedMethod, this._getters, propertyName, z, z2, z3);
     }
 
     public void addSetter(AnnotatedMethod annotatedMethod, PropertyName propertyName, boolean z, boolean z2, boolean z3) {
-        this._setters = new Linked(annotatedMethod, this._setters, propertyName, z, z2, z3);
+        this._setters = new Linked<>(annotatedMethod, this._setters, propertyName, z, z2, z3);
     }
 
     public void addAll(POJOPropertyBuilder pOJOPropertyBuilder) {
@@ -797,7 +757,7 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
     }
 
     public Collection<POJOPropertyBuilder> explode(Collection<PropertyName> collection) {
-        Object hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         _explode(collection, hashMap, this._fields);
         _explode(collection, hashMap, this._getters);
         _explode(collection, hashMap, this._setters);
@@ -805,54 +765,135 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
         return hashMap.values();
     }
 
-    private void _explode(Collection<PropertyName> collection, Map<PropertyName, POJOPropertyBuilder> map, Linked<?> linked) {
-        for (Linked linked2 = linked; linked2 != null; linked2 = linked2.next) {
-            PropertyName propertyName = linked2.name;
-            if (linked2.isNameExplicit && propertyName != null) {
-                POJOPropertyBuilder pOJOPropertyBuilder = (POJOPropertyBuilder) map.get(propertyName);
-                if (pOJOPropertyBuilder == null) {
-                    pOJOPropertyBuilder = new POJOPropertyBuilder(this._config, this._annotationIntrospector, this._forSerialization, this._internalName, propertyName);
-                    map.put(propertyName, pOJOPropertyBuilder);
-                }
-                if (linked == this._fields) {
-                    pOJOPropertyBuilder._fields = linked2.withNext(pOJOPropertyBuilder._fields);
-                } else if (linked == this._getters) {
-                    pOJOPropertyBuilder._getters = linked2.withNext(pOJOPropertyBuilder._getters);
-                } else if (linked == this._setters) {
-                    pOJOPropertyBuilder._setters = linked2.withNext(pOJOPropertyBuilder._setters);
-                } else if (linked == this._ctorParameters) {
-                    pOJOPropertyBuilder._ctorParameters = linked2.withNext(pOJOPropertyBuilder._ctorParameters);
-                } else {
-                    throw new IllegalStateException("Internal error: mismatched accessors, property: " + this);
-                }
-            } else if (linked2.isVisible) {
-                throw new IllegalStateException("Conflicting/ambiguous property name definitions (implicit name '" + this._name + "'): found multiple explicit names: " + collection + ", but also implicit accessor: " + linked2);
-            }
-        }
+    /* JADX WARNING: Incorrect type for immutable var: ssa=com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<?>, code=com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked, for r10v0, types: [com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<?>, com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void _explode(java.util.Collection<com.fasterxml.jackson.databind.PropertyName> r8, java.util.Map<com.fasterxml.jackson.databind.PropertyName, com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder> r9, com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder.Linked r10) {
+        /*
+            r7 = this;
+            r6 = r10
+        L_0x0001:
+            if (r6 == 0) goto L_0x00a7
+            com.fasterxml.jackson.databind.PropertyName r5 = r6.name
+            boolean r0 = r6.isNameExplicit
+            if (r0 == 0) goto L_0x000b
+            if (r5 != 0) goto L_0x0042
+        L_0x000b:
+            boolean r0 = r6.isVisible
+            if (r0 != 0) goto L_0x0013
+        L_0x000f:
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<T> r0 = r6.next
+            r6 = r0
+            goto L_0x0001
+        L_0x0013:
+            java.lang.IllegalStateException r0 = new java.lang.IllegalStateException
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r2 = "Conflicting/ambiguous property name definitions (implicit name '"
+            java.lang.StringBuilder r1 = r1.append(r2)
+            com.fasterxml.jackson.databind.PropertyName r2 = r7._name
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r2 = "'): found multiple explicit names: "
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.StringBuilder r1 = r1.append(r8)
+            java.lang.String r2 = ", but also implicit accessor: "
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.StringBuilder r1 = r1.append(r6)
+            java.lang.String r1 = r1.toString()
+            r0.<init>(r1)
+            throw r0
+        L_0x0042:
+            java.lang.Object r0 = r9.get(r5)
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder r0 = (com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder) r0
+            if (r0 != 0) goto L_0x005a
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder r0 = new com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder
+            com.fasterxml.jackson.databind.cfg.MapperConfig<?> r1 = r7._config
+            com.fasterxml.jackson.databind.AnnotationIntrospector r2 = r7._annotationIntrospector
+            boolean r3 = r7._forSerialization
+            com.fasterxml.jackson.databind.PropertyName r4 = r7._internalName
+            r0.<init>(r1, r2, r3, r4, r5)
+            r9.put(r5, r0)
+        L_0x005a:
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedField> r1 = r7._fields
+            if (r10 != r1) goto L_0x0067
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedField> r1 = r0._fields
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked r1 = r6.withNext(r1)
+            r0._fields = r1
+            goto L_0x000f
+        L_0x0067:
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedMethod> r1 = r7._getters
+            if (r10 != r1) goto L_0x0074
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedMethod> r1 = r0._getters
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked r1 = r6.withNext(r1)
+            r0._getters = r1
+            goto L_0x000f
+        L_0x0074:
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedMethod> r1 = r7._setters
+            if (r10 != r1) goto L_0x0081
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedMethod> r1 = r0._setters
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked r1 = r6.withNext(r1)
+            r0._setters = r1
+            goto L_0x000f
+        L_0x0081:
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedParameter> r1 = r7._ctorParameters
+            if (r10 != r1) goto L_0x008e
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<com.fasterxml.jackson.databind.introspect.AnnotatedParameter> r1 = r0._ctorParameters
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked r1 = r6.withNext(r1)
+            r0._ctorParameters = r1
+            goto L_0x000f
+        L_0x008e:
+            java.lang.IllegalStateException r0 = new java.lang.IllegalStateException
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r2 = "Internal error: mismatched accessors, property: "
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.StringBuilder r1 = r1.append(r7)
+            java.lang.String r1 = r1.toString()
+            r0.<init>(r1)
+            throw r0
+        L_0x00a7:
+            return
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder._explode(java.util.Collection, java.util.Map, com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked):void");
     }
 
-    private Set<PropertyName> _findExplicitNames(Linked<? extends AnnotatedMember> linked, Set<PropertyName> set) {
-        Set<PropertyName> set2 = set;
-        while (linked != null) {
-            if (linked.isNameExplicit && linked.name != null) {
-                if (set2 == null) {
-                    set2 = new HashSet();
-                }
-                set2.add(linked.name);
-            }
-            linked = linked.next;
-        }
-        return set2;
+    /* JADX WARNING: Incorrect type for immutable var: ssa=com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<? extends com.fasterxml.jackson.databind.introspect.AnnotatedMember>, code=com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked, for r3v0, types: [com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<? extends com.fasterxml.jackson.databind.introspect.AnnotatedMember>, com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private java.util.Set<com.fasterxml.jackson.databind.PropertyName> _findExplicitNames(com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder.Linked r3, java.util.Set<com.fasterxml.jackson.databind.PropertyName> r4) {
+        /*
+            r2 = this;
+            r0 = r4
+        L_0x0001:
+            if (r3 == 0) goto L_0x001b
+            boolean r1 = r3.isNameExplicit
+            if (r1 == 0) goto L_0x000b
+            com.fasterxml.jackson.databind.PropertyName r1 = r3.name
+            if (r1 != 0) goto L_0x000e
+        L_0x000b:
+            com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked<T> r3 = r3.next
+            goto L_0x0001
+        L_0x000e:
+            if (r0 != 0) goto L_0x0015
+            java.util.HashSet r0 = new java.util.HashSet
+            r0.<init>()
+        L_0x0015:
+            com.fasterxml.jackson.databind.PropertyName r1 = r3.name
+            r0.add(r1)
+            goto L_0x000b
+        L_0x001b:
+            return r0
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder._findExplicitNames(com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder$Linked, java.util.Set):java.util.Set");
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[Property '").append(this._name).append("'; ctors: ").append(this._ctorParameters).append(", field(s): ").append(this._fields).append(", getter(s): ").append(this._getters).append(", setter(s): ").append(this._setters);
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("[Property '").append(this._name).append("'; ctors: ").append(this._ctorParameters).append(", field(s): ").append(this._fields).append(", getter(s): ").append(this._getters).append(", setter(s): ").append(this._setters);
+        sb.append("]");
+        return sb.toString();
     }
 
-    protected <T> T fromMemberAnnotations(WithMember<T> withMember) {
+    /* access modifiers changed from: protected */
+    public <T> T fromMemberAnnotations(WithMember<T> withMember) {
         T t = null;
         if (this._annotationIntrospector == null) {
             return null;
@@ -873,60 +914,60 @@ public class POJOPropertyBuilder extends BeanPropertyDefinition implements Compa
         return withMember.withMember((AnnotatedMember) this._fields.value);
     }
 
-    protected <T> T fromMemberAnnotationsExcept(WithMember<T> withMember, T t) {
+    /* access modifiers changed from: protected */
+    public <T> T fromMemberAnnotationsExcept(WithMember<T> withMember, T t) {
         if (this._annotationIntrospector == null) {
             return null;
         }
-        T withMember2;
         if (this._forSerialization) {
             if (this._getters != null) {
-                withMember2 = withMember.withMember((AnnotatedMember) this._getters.value);
+                T withMember2 = withMember.withMember((AnnotatedMember) this._getters.value);
                 if (!(withMember2 == null || withMember2 == t)) {
                     return withMember2;
                 }
             }
             if (this._fields != null) {
-                withMember2 = withMember.withMember((AnnotatedMember) this._fields.value);
-                if (!(withMember2 == null || withMember2 == t)) {
-                    return withMember2;
+                T withMember3 = withMember.withMember((AnnotatedMember) this._fields.value);
+                if (!(withMember3 == null || withMember3 == t)) {
+                    return withMember3;
                 }
             }
             if (this._ctorParameters != null) {
-                withMember2 = withMember.withMember((AnnotatedMember) this._ctorParameters.value);
-                if (!(withMember2 == null || withMember2 == t)) {
-                    return withMember2;
+                T withMember4 = withMember.withMember((AnnotatedMember) this._ctorParameters.value);
+                if (!(withMember4 == null || withMember4 == t)) {
+                    return withMember4;
                 }
             }
             if (this._setters != null) {
-                withMember2 = withMember.withMember((AnnotatedMember) this._setters.value);
-                if (!(withMember2 == null || withMember2 == t)) {
-                    return withMember2;
+                T withMember5 = withMember.withMember((AnnotatedMember) this._setters.value);
+                if (!(withMember5 == null || withMember5 == t)) {
+                    return withMember5;
                 }
             }
             return null;
         }
         if (this._ctorParameters != null) {
-            withMember2 = withMember.withMember((AnnotatedMember) this._ctorParameters.value);
-            if (!(withMember2 == null || withMember2 == t)) {
-                return withMember2;
+            T withMember6 = withMember.withMember((AnnotatedMember) this._ctorParameters.value);
+            if (!(withMember6 == null || withMember6 == t)) {
+                return withMember6;
             }
         }
         if (this._setters != null) {
-            withMember2 = withMember.withMember((AnnotatedMember) this._setters.value);
-            if (!(withMember2 == null || withMember2 == t)) {
-                return withMember2;
+            T withMember7 = withMember.withMember((AnnotatedMember) this._setters.value);
+            if (!(withMember7 == null || withMember7 == t)) {
+                return withMember7;
             }
         }
         if (this._fields != null) {
-            withMember2 = withMember.withMember((AnnotatedMember) this._fields.value);
-            if (!(withMember2 == null || withMember2 == t)) {
-                return withMember2;
+            T withMember8 = withMember.withMember((AnnotatedMember) this._fields.value);
+            if (!(withMember8 == null || withMember8 == t)) {
+                return withMember8;
             }
         }
         if (this._getters != null) {
-            withMember2 = withMember.withMember((AnnotatedMember) this._getters.value);
-            if (!(withMember2 == null || withMember2 == t)) {
-                return withMember2;
+            T withMember9 = withMember.withMember((AnnotatedMember) this._getters.value);
+            if (!(withMember9 == null || withMember9 == t)) {
+                return withMember9;
             }
         }
         return null;

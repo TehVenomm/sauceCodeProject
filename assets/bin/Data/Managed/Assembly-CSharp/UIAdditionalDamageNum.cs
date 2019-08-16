@@ -49,13 +49,13 @@ public class UIAdditionalDamageNum : UIDamageNum
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
-		worldPos = pos;
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+		base.worldPos = pos;
+		ref Vector3 worldPos = ref base.worldPos;
 		worldPos.y += offsetY;
 		float num = (float)Screen.get_height() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
 		float num2 = (float)Screen.get_width() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
@@ -81,7 +81,6 @@ public class UIAdditionalDamageNum : UIDamageNum
 				animPos = animPosGood;
 				animScale = animScaleGood;
 				damadeNum = damageNumGood;
-				color = DAMAGE_COLOR.GOOD;
 				num3 = 1.2f;
 			}
 			else
@@ -92,22 +91,23 @@ public class UIAdditionalDamageNum : UIDamageNum
 				animPos = animPosBad;
 				animScale = animScaleBad;
 				damadeNum = damageNumBad;
-				color = DAMAGE_COLOR.BAD;
 			}
 			higthOffset_f *= num3;
 			widthOffset *= num3;
+			color = calcColor(color, effective);
 		}
 		if (groupOffset == 0 && 0 >= effective)
 		{
 			animScale.from = new Vector3(1f, 1f, 1f);
 			animScale.to = new Vector3(1f, 1f, 1f);
 		}
-		if (!SetPosFromWorld(worldPos))
+		if (!SetPosFromWorld(base.worldPos))
 		{
 			return false;
 		}
 		enable = true;
 		damadeNum.text = damage.ToString();
+		damageLength = damadeNum.text.Length;
 		ChangeColor(color, damadeNum);
 		if (animPos != null)
 		{
@@ -135,17 +135,45 @@ public class UIAdditionalDamageNum : UIDamageNum
 		{
 			while (animPos.get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		if (animScale != null)
 		{
 			while (animScale.get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		enable = false;
 		damadeNum.alpha = 0.01f;
+	}
+
+	private DAMAGE_COLOR calcColor(DAMAGE_COLOR color, int effective)
+	{
+		switch (color)
+		{
+		case DAMAGE_COLOR.REGION_ONLY_NORMAL:
+		case DAMAGE_COLOR.REGION_ONLY_ELEMENT:
+		case DAMAGE_COLOR.REGION_ONLY_BUFF:
+			return color;
+		case DAMAGE_COLOR.FIRE:
+		case DAMAGE_COLOR.WATER:
+		case DAMAGE_COLOR.THUNDER:
+		case DAMAGE_COLOR.SOIL:
+		case DAMAGE_COLOR.LIGHT:
+		case DAMAGE_COLOR.DARK:
+			return color;
+		default:
+			if (effective == 0)
+			{
+				return color;
+			}
+			if (0 < effective)
+			{
+				return DAMAGE_COLOR.GOOD;
+			}
+			return DAMAGE_COLOR.BAD;
+		}
 	}
 }

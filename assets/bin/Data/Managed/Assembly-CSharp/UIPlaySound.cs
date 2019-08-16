@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Play Sound")]
-public class UIPlaySound
+public class UIPlaySound : MonoBehaviour
 {
 	public enum Trigger
 	{

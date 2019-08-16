@@ -39,8 +39,6 @@ public class SmithExceedDialog : GameSection
 		LBL_LIMITED
 	}
 
-	private const int MAX_SHOW_EXCEED_NUM = 3;
-
 	protected int exceedCount;
 
 	protected EquipItemTable.EquipItemData itemTable;
@@ -56,6 +54,10 @@ public class SmithExceedDialog : GameSection
 	private int selectPageIndex;
 
 	private int maxPageIndex;
+
+	private const int MAX_SHOW_EXCEED_NUM = 3;
+
+	private int need_select_index;
 
 	public override IEnumerable<string> requireDataTable
 	{
@@ -79,8 +81,8 @@ public class SmithExceedDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 		smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		SetupExceedData();
 		exceedData = Singleton<EquipItemExceedTable>.I.GetEquipItemExceedDataIncludeLimited(itemTable);
@@ -91,17 +93,17 @@ public class SmithExceedDialog : GameSection
 		SetLabelText((Enum)UI.LBL_SELECT_NOW, (selectPageIndex + 1).ToString());
 		if (num == 0)
 		{
-			SetActive((Enum)UI.OBJ_SELECT, false);
+			SetActive((Enum)UI.OBJ_SELECT, is_visible: false);
 		}
 		else if (num <= 1)
 		{
-			SetActive((Enum)UI.BTN_AIM_R, false);
-			SetActive((Enum)UI.BTN_AIM_L, false);
+			SetActive((Enum)UI.BTN_AIM_R, is_visible: false);
+			SetActive((Enum)UI.BTN_AIM_L, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_AIM_R_INACTIVE, false);
-			SetActive((Enum)UI.BTN_AIM_L_INACTIVE, false);
+			SetActive((Enum)UI.BTN_AIM_R_INACTIVE, is_visible: false);
+			SetActive((Enum)UI.BTN_AIM_L_INACTIVE, is_visible: false);
 		}
 		UILabel component = base.GetComponent<UILabel>((Enum)UI.LBL_EXCEED_0);
 		if (component != null)
@@ -119,38 +121,36 @@ public class SmithExceedDialog : GameSection
 		SetActive((Enum)UI.SPR_COUNT_2_ON, exceedCount > 2);
 		SetActive((Enum)UI.SPR_COUNT_3_ON, exceedCount > 3);
 		SetLabelText((Enum)UI.LBL_SELECT_NOW, (selectPageIndex + 1).ToString());
-		UpdateBonusDetail(true);
+		UpdateBonusDetail();
 		bool is_only_lapis = true;
 		int item_num = exceedData.exceed.Length;
-		SetGrid(UI.GRD_LAPIS, "SmithExceedItem", item_num, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_LAPIS, "SmithExceedItem", item_num, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
 			if (exceedCount >= 4)
 			{
-				SetActive(t, false);
+				SetActive(t, is_visible: false);
 			}
 			else if (i < selectPageIndex * 3 || i >= (selectPageIndex + 1) * 3)
 			{
-				SetActive(t, false);
+				SetActive(t, is_visible: false);
 			}
 			else
 			{
 				EquipItemExceedTable.EquipItemExceedData.ExceedNeedItem exceedNeedItem = exceedData.exceed[i];
 				if (exceedNeedItem == null || exceedNeedItem.itemId == 0 || exceedNeedItem.num[exceedCount] == 0)
 				{
-					SetActive(t, false);
+					SetActive(t, is_visible: false);
 				}
 				else
 				{
 					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(exceedNeedItem.itemId);
 					if (itemData == null)
 					{
-						SetActive(t, false);
+						SetActive(t, is_visible: false);
 					}
 					else
 					{
@@ -158,18 +158,18 @@ public class SmithExceedDialog : GameSection
 						{
 							is_only_lapis = false;
 						}
-						SetActive(t, true);
+						SetActive(t, is_visible: true);
 						int haveingItemNum = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum(exceedNeedItem.itemId);
 						int num = (int)exceedNeedItem.num[exceedCount];
-						ItemIcon.GetIconShowData(REWARD_TYPE.ITEM, exceedNeedItem.itemId, out int _, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? _, out ELEMENT_TYPE _, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _, 0);
+						ItemIcon.GetIconShowData(REWARD_TYPE.ITEM, exceedNeedItem.itemId, out int _, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? _, out ELEMENT_TYPE _, out ELEMENT_TYPE _, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _);
 						Transform val = FindCtrl(t, UI.OBJ_MATERIAL_ICON_ROOT);
 						bool flag2 = haveingItemNum >= num;
-						ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(icon_type, itemData, val, haveingItemNum, num, (!flag2) ? "NEED" : "NEXT", i, false);
+						ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(icon_type, itemData, val, haveingItemNum, num, (!flag2) ? "NEED" : "NEXT", i);
 						SetMaterialInfo(itemIcon._transform, REWARD_TYPE.ITEM, exceedNeedItem.itemId, GetCtrl(UI.SCR_LAPIS_ROOT));
 						ItemIconMaterial itemIconMaterial = itemIcon as ItemIconMaterial;
 						if (itemIconMaterial != null)
 						{
-							itemIconMaterial.SetVisibleBG(false);
+							itemIconMaterial.SetVisibleBG(is_visible: false);
 						}
 						FindCtrl(val, UI.SPR_EXCEED_BTN_BG).set_parent(itemIcon._transform);
 						SetActive(t, UI.SPR_EXCEED_GRAYOUT, !flag2);
@@ -180,7 +180,7 @@ public class SmithExceedDialog : GameSection
 						}
 						else
 						{
-							SetActive(t, UI.OBJ_EXCEED_LIMITED, false);
+							SetActive(t, UI.OBJ_EXCEED_LIMITED, is_visible: false);
 						}
 						if (!IsValidExceedSection())
 						{
@@ -250,20 +250,18 @@ public class SmithExceedDialog : GameSection
 		if (smithData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		selectIndex = (int)GameSection.GetEventData();
+		int exceed = smithData.selectEquipData.exceed;
+		int needNum = (int)exceedData.exceed[selectIndex].getNeedNum(exceed + 1);
+		ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(exceedData.exceed[selectIndex].itemId);
+		GameSection.SetEventData(new object[3]
 		{
-			selectIndex = (int)GameSection.GetEventData();
-			int exceed = smithData.selectEquipData.exceed;
-			int needNum = (int)exceedData.exceed[selectIndex].getNeedNum(exceed + 1);
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(exceedData.exceed[selectIndex].itemId);
-			GameSection.SetEventData(new object[3]
-			{
-				itemData.name,
-				needNum,
-				smithData.selectEquipData.tableData.name
-			});
-		}
+			itemData.name,
+			needNum,
+			smithData.selectEquipData.tableData.name
+		});
 	}
 
 	private void OnQuery_NEED()
@@ -271,31 +269,35 @@ public class SmithExceedDialog : GameSection
 		if (smithData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		need_select_index = (int)GameSection.GetEventData();
+		int num = (int)GameSection.GetEventData();
+		int exceed = smithData.selectEquipData.exceed;
+		int needNum = (int)exceedData.exceed[num].getNeedNum(exceed + 1);
+		ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(exceedData.exceed[num].itemId);
+		uint id = 7u;
+		if (itemData.type == ITEM_TYPE.LAPIS)
 		{
-			int num = (int)GameSection.GetEventData();
-			int exceed = smithData.selectEquipData.exceed;
-			int needNum = (int)exceedData.exceed[num].getNeedNum(exceed + 1);
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(exceedData.exceed[num].itemId);
-			uint id = 7u;
-			if (itemData.type == ITEM_TYPE.LAPIS)
+			id = ((!Singleton<EquipItemExceedTable>.I.IsFreeLapis(itemData.rarity, itemData.id, itemData.eventId)) ? 4u : 3u);
+			if (Singleton<LimitedEquipItemExceedTable>.I.IsLimitedLapis(itemData.id))
 			{
-				id = (uint)((!Singleton<EquipItemExceedTable>.I.IsFreeLapis(itemData.rarity, itemData.id, itemData.eventId)) ? 4 : 3);
-				if (Singleton<LimitedEquipItemExceedTable>.I.IsLimitedLapis(itemData.id))
-				{
-					id = 8u;
-				}
+				id = 8u;
 			}
-			string text = string.Format(StringTable.Get(STRING_CATEGORY.ITEM_DETAIL, id), itemData.rarity.ToString());
-			GameSection.SetEventData(new object[4]
-			{
-				itemData.name,
-				needNum,
-				smithData.selectEquipData.tableData.name,
-				text
-			});
 		}
+		string text = string.Format(StringTable.Get(STRING_CATEGORY.ITEM_DETAIL, id), itemData.rarity.ToString());
+		GameSection.SetEventData(new object[4]
+		{
+			itemData.name,
+			needNum,
+			smithData.selectEquipData.tableData.name,
+			text
+		});
+	}
+
+	private void OnQuery_SmithExceedNeedMessage_YES()
+	{
+		MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostFindData((int)exceedData.exceed[need_select_index].itemId);
 	}
 
 	private void OnQuery_SmithExceedConfirm_YES()
@@ -303,49 +305,43 @@ public class SmithExceedDialog : GameSection
 		if (smithData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		EquipItemInfo selectEquipData = smithData.selectEquipData;
+		if (selectEquipData == null)
 		{
-			EquipItemInfo selectEquipData = smithData.selectEquipData;
-			if (selectEquipData == null)
-			{
-				GameSection.StopEvent();
-			}
-			else
-			{
-				SmithManager.ResultData result_data = new SmithManager.ResultData();
-				result_data.beforeRarity = (int)selectEquipData.tableData.rarity;
-				result_data.beforeLevel = selectEquipData.level;
-				result_data.beforeMaxLevel = selectEquipData.tableData.maxLv;
-				result_data.beforeExceedCnt = selectEquipData.exceed;
-				result_data.beforeAtk = selectEquipData.atk;
-				result_data.beforeDef = selectEquipData.def;
-				result_data.beforeHp = selectEquipData.hp;
-				result_data.beforeElemAtk = selectEquipData.elemAtk;
-				result_data.beforeElemDef = selectEquipData.elemDef;
-				result_data.isExceed = true;
-				EquipItemExceedTable.EquipItemExceedData equipItemExceedDataIncludeLimited = Singleton<EquipItemExceedTable>.I.GetEquipItemExceedDataIncludeLimited(selectEquipData.tableData);
-				if (equipItemExceedDataIncludeLimited == null || equipItemExceedDataIncludeLimited.exceed.Length - 1 < selectIndex)
-				{
-					GameSection.StopEvent();
-				}
-				else
-				{
-					uint itemId = equipItemExceedDataIncludeLimited.exceed[selectIndex].itemId;
-					GameSection.StayEvent();
-					MonoBehaviourSingleton<SmithManager>.I.SendExceedEquipItem(selectEquipData.uniqueID, itemId, delegate(Error err, EquipItemInfo exceed_equip_item)
-					{
-						bool flag = err == Error.None;
-						GameSection.ResumeEvent(flag, null);
-						if (flag)
-						{
-							result_data.itemData = exceed_equip_item;
-							GameSection.SetEventData(result_data);
-						}
-					});
-				}
-			}
+			GameSection.StopEvent();
+			return;
 		}
+		SmithManager.ResultData result_data = new SmithManager.ResultData();
+		result_data.beforeRarity = (int)selectEquipData.tableData.rarity;
+		result_data.beforeLevel = selectEquipData.level;
+		result_data.beforeMaxLevel = selectEquipData.tableData.maxLv;
+		result_data.beforeExceedCnt = selectEquipData.exceed;
+		result_data.beforeAtk = selectEquipData.atk;
+		result_data.beforeDef = selectEquipData.def;
+		result_data.beforeHp = selectEquipData.hp;
+		result_data.beforeElemAtk = selectEquipData.elemAtk;
+		result_data.beforeElemDef = selectEquipData.elemDef;
+		result_data.isExceed = true;
+		EquipItemExceedTable.EquipItemExceedData equipItemExceedDataIncludeLimited = Singleton<EquipItemExceedTable>.I.GetEquipItemExceedDataIncludeLimited(selectEquipData.tableData);
+		if (equipItemExceedDataIncludeLimited == null || equipItemExceedDataIncludeLimited.exceed.Length - 1 < selectIndex)
+		{
+			GameSection.StopEvent();
+			return;
+		}
+		uint itemId = equipItemExceedDataIncludeLimited.exceed[selectIndex].itemId;
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<SmithManager>.I.SendExceedEquipItem(selectEquipData.uniqueID, itemId, delegate(Error err, EquipItemInfo exceed_equip_item)
+		{
+			bool flag = err == Error.None;
+			GameSection.ResumeEvent(flag);
+			if (flag)
+			{
+				result_data.itemData = exceed_equip_item;
+				GameSection.SetEventData(result_data);
+			}
+		});
 	}
 
 	private void OnQuery_SmithExceedConfirm_NO()

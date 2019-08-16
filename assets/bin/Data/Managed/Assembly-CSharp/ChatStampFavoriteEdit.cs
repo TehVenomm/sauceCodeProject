@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ChatStampFavoriteEdit
+public class ChatStampFavoriteEdit : MonoBehaviour
 {
 	public UIGrid favoriteGrid;
 
@@ -50,10 +50,10 @@ public class ChatStampFavoriteEdit
 		if (!initialized)
 		{
 			LoadingQueue loadingQueue = new LoadingQueue(this);
-			LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItemFavorite", false);
+			LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItemFavorite");
 			if (loadingQueue.IsLoading())
 			{
-				yield return (object)loadingQueue.Wait();
+				yield return loadingQueue.Wait();
 			}
 			mChatStampPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
 			yesButton.onClick.Add(new EventDelegate(OnYes));
@@ -63,7 +63,7 @@ public class ChatStampFavoriteEdit
 			unlockIcons = new List<Transform>();
 		}
 		selectedIcon = CreateStampItem(selectedIconRoot.get_transform()).GetComponent<ChatStampListItem>();
-		selectedIcon.SetActiveComponents(false);
+		selectedIcon.SetActiveComponents(isActive: false);
 		CreateFavoriteStampList();
 		InitFavoriteStampList();
 		CreateUnlockStampList();
@@ -72,44 +72,37 @@ public class ChatStampFavoriteEdit
 
 	public void Open()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(true);
-		tweenCtrl.Play(true, null);
+		tweenCtrl.Play();
 		currentFavorite = MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.ToArray();
 		currentUnlockStamps = Singleton<StampTable>.I.GetUnlockStamps(MonoBehaviourSingleton<UserInfoManager>.I);
-		SetBlocker(true);
+		SetBlocker(isTopActive: true);
 		this.StartCoroutine(DoOpen());
 	}
 
 	public void Close(bool update)
 	{
-		tweenCtrl.Play(false, delegate
+		tweenCtrl.Play(forward: false, delegate
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			this.get_gameObject().SetActive(false);
 		});
 		if (update)
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.SetFavoriteStamp(currentFavorite.ToList());
 			MonoBehaviourSingleton<UIManager>.I.mainChat.UpdateStampList();
+			return;
 		}
-		else
+		for (int i = 0; i < currentFavorite.Length; i++)
 		{
-			for (int i = 0; i < currentFavorite.Length; i++)
+			if (currentFavorite[i] != MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[i])
 			{
-				if (currentFavorite[i] != MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[i])
-				{
-					favoriteIcons[i].GetComponent<ChatStampListItem>().Init(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[i]);
-				}
+				favoriteIcons[i].GetComponent<ChatStampListItem>().Init(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[i]);
 			}
 		}
 	}
 
 	private void CreateFavoriteStampList()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		for (int i = favoriteIcons.Count; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count; i++)
 		{
 			Transform item = CreateStampItem(favoriteGrid.get_transform());
@@ -120,8 +113,6 @@ public class ChatStampFavoriteEdit
 
 	private void CreateUnlockStampList()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		for (int i = unlockIcons.Count; i < currentUnlockStamps.Count; i++)
 		{
 			Transform item = CreateStampItem(unlockGrid.get_transform());
@@ -176,7 +167,7 @@ public class ChatStampFavoriteEdit
 	private void OnClickFavoriteStamp(int index)
 	{
 		selectFavoriteStampIndex = index;
-		SetBlocker(false);
+		SetBlocker(isTopActive: false);
 		SetSelectedFavoriteIcon(favoriteIcons[index], currentFavorite[index]);
 	}
 
@@ -192,12 +183,12 @@ public class ChatStampFavoriteEdit
 				ChatStampListItem component = favoriteIcons[selectFavoriteStampIndex].GetComponent<ChatStampListItem>();
 				component.Init(stampId);
 				component.GetComponent<UITweenCtrl>().Reset();
-				component.GetComponent<UITweenCtrl>().Play(true, null);
+				component.GetComponent<UITweenCtrl>().Play();
 				currentFavorite[num] = num2;
 				component = favoriteIcons[num].GetComponent<ChatStampListItem>();
 				component.Init(num2);
 				component.GetComponent<UITweenCtrl>().Reset();
-				component.GetComponent<UITweenCtrl>().Play(true, null);
+				component.GetComponent<UITweenCtrl>().Play();
 			}
 		}
 		else
@@ -206,9 +197,9 @@ public class ChatStampFavoriteEdit
 			ChatStampListItem component2 = favoriteIcons[selectFavoriteStampIndex].GetComponent<ChatStampListItem>();
 			component2.Init(stampId);
 			component2.GetComponent<UITweenCtrl>().Reset();
-			component2.GetComponent<UITweenCtrl>().Play(true, null);
+			component2.GetComponent<UITweenCtrl>().Play();
 		}
-		SetBlocker(true);
+		SetBlocker(isTopActive: true);
 	}
 
 	private void SetBlocker(bool isTopActive)
@@ -223,7 +214,6 @@ public class ChatStampFavoriteEdit
 
 	private void SetSelectedFavoriteIcon(Transform selectIcon, int stampId)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		selectedIcon.get_transform().set_localPosition(selectIcon.get_localPosition());
 		selectedIcon.Init(stampId);
@@ -231,13 +221,13 @@ public class ChatStampFavoriteEdit
 
 	private void OnYes()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.OK, 1f);
-		Close(true);
+		SoundManager.PlaySystemSE(SoundID.UISE.OK);
+		Close(update: true);
 	}
 
 	private void OnNo()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
-		Close(false);
+		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
+		Close(update: false);
 	}
 }

@@ -12,7 +12,8 @@ public abstract class Pair<L, R> implements Entry<L, R>, Comparable<Pair<L, R>>,
 
     public abstract R getRight();
 
-    public static <L, R> Pair<L, R> of(L l, R r) {
+    /* renamed from: of */
+    public static <L, R> Pair<L, R> m1019of(L l, R r) {
         return new ImmutablePair(l, r);
     }
 
@@ -36,10 +37,10 @@ public abstract class Pair<L, R> implements Entry<L, R>, Comparable<Pair<L, R>>,
             return false;
         }
         Entry entry = (Entry) obj;
-        if (ObjectUtils.equals(getKey(), entry.getKey()) && ObjectUtils.equals(getValue(), entry.getValue())) {
-            return true;
+        if (!ObjectUtils.equals(getKey(), entry.getKey()) || !ObjectUtils.equals(getValue(), entry.getValue())) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {

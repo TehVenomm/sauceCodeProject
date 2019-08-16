@@ -26,12 +26,6 @@ public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
 
 	public const string PROTOCOL_VERSION = "00";
 
-	private const int SEQUENCE_MAX = 10000000;
-
-	public const float HEARTBEAT_TIMEOUT = 10f;
-
-	public const float HEARTBEAT_INTERVAL = 3f;
-
 	private WebSocket sock;
 
 	private bool isConnect;
@@ -52,6 +46,12 @@ public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
 
 	[SerializeField]
 	private int _packetSendCount;
+
+	private const int SEQUENCE_MAX = 10000000;
+
+	public const float HEARTBEAT_TIMEOUT = 10f;
+
+	public const float HEARTBEAT_INTERVAL = 3f;
 
 	private DateTime lastPacketReceivedTime;
 
@@ -216,7 +216,7 @@ public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
 
 	public int Send<T>(T model, int to_id, bool promise = true) where T : Chat_Model_Base
 	{
-		return Send(model, typeof(T), to_id, promise, null, null);
+		return Send(model, typeof(T), to_id, promise);
 	}
 
 	public int Send(Chat_Model_Base model, Type type, int to_id, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null)
@@ -226,12 +226,9 @@ public class ChatWebSocket : MonoBehaviourSingleton<ChatWebSocket>
 		ChatPacketHeader chatPacketHeader2 = chatPacket.header = new ChatPacketHeader(0, model.commandId, fromId);
 		chatPacket.model = model;
 		PacketStream stream = chatPacket.Serialize();
-		if (model.commandId == 502)
+		if (model.commandId != 502)
 		{
-			goto IL_0040;
 		}
-		goto IL_0040;
-		IL_0040:
 		NativeSend(stream);
 		return result;
 	}

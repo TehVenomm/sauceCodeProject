@@ -5,19 +5,10 @@ import android.os.Parcelable.Creator;
 import android.text.TextUtils;
 import net.gogame.gowrap.InternalConstants;
 
+@Deprecated
 public final class AppInviteContent implements ShareModel {
-    public static final Creator<AppInviteContent> CREATOR = new C05091();
-    private final String applinkUrl;
-    private final Destination destination;
-    private final String previewImageUrl;
-    private final String promoCode;
-    private final String promoText;
-
-    /* renamed from: com.facebook.share.model.AppInviteContent$1 */
-    static final class C05091 implements Creator<AppInviteContent> {
-        C05091() {
-        }
-
+    @Deprecated
+    public static final Creator<AppInviteContent> CREATOR = new Creator<AppInviteContent>() {
         public AppInviteContent createFromParcel(Parcel parcel) {
             return new AppInviteContent(parcel);
         }
@@ -25,15 +16,27 @@ public final class AppInviteContent implements ShareModel {
         public AppInviteContent[] newArray(int i) {
             return new AppInviteContent[i];
         }
-    }
+    };
+    private final String applinkUrl;
+    private final Destination destination;
+    private final String previewImageUrl;
+    private final String promoCode;
+    private final String promoText;
 
+    @Deprecated
     public static class Builder implements ShareModelBuilder<AppInviteContent, Builder> {
-        private String applinkUrl;
-        private Destination destination;
-        private String previewImageUrl;
-        private String promoCode;
-        private String promoText;
+        /* access modifiers changed from: private */
+        public String applinkUrl;
+        /* access modifiers changed from: private */
+        public Destination destination;
+        /* access modifiers changed from: private */
+        public String previewImageUrl;
+        /* access modifiers changed from: private */
+        public String promoCode;
+        /* access modifiers changed from: private */
+        public String promoText;
 
+        @Deprecated
         public enum Destination {
             FACEBOOK(InternalConstants.COMMUNITY_FACEBOOK),
             MESSENGER("messenger");
@@ -45,7 +48,10 @@ public final class AppInviteContent implements ShareModel {
             }
 
             public boolean equalsName(String str) {
-                return str == null ? false : this.name.equals(str);
+                if (str == null) {
+                    return false;
+                }
+                return this.name.equals(str);
             }
 
             public String toString() {
@@ -63,44 +69,50 @@ public final class AppInviteContent implements ShareModel {
             return true;
         }
 
+        @Deprecated
         public AppInviteContent build() {
-            return new AppInviteContent();
+            return new AppInviteContent(this);
         }
 
+        @Deprecated
         public Builder readFrom(AppInviteContent appInviteContent) {
             return appInviteContent == null ? this : setApplinkUrl(appInviteContent.getApplinkUrl()).setPreviewImageUrl(appInviteContent.getPreviewImageUrl()).setPromotionDetails(appInviteContent.getPromotionText(), appInviteContent.getPromotionCode()).setDestination(appInviteContent.getDestination());
         }
 
+        @Deprecated
         public Builder setApplinkUrl(String str) {
             this.applinkUrl = str;
             return this;
         }
 
-        public Builder setDestination(Destination destination) {
-            this.destination = destination;
+        @Deprecated
+        public Builder setDestination(Destination destination2) {
+            this.destination = destination2;
             return this;
         }
 
+        @Deprecated
         public Builder setPreviewImageUrl(String str) {
             this.previewImageUrl = str;
             return this;
         }
 
+        @Deprecated
         public Builder setPromotionDetails(String str, String str2) {
-            if (TextUtils.isEmpty(str)) {
-                if (!TextUtils.isEmpty(str2)) {
-                    throw new IllegalArgumentException("promotionCode cannot be specified without a valid promotionText");
+            if (!TextUtils.isEmpty(str)) {
+                if (str.length() > 80) {
+                    throw new IllegalArgumentException("Invalid promotion text, promotionText needs to be between1 and 80 characters long");
+                } else if (!isAlphanumericWithSpaces(str)) {
+                    throw new IllegalArgumentException("Invalid promotion text, promotionText can only contain alphanumericcharacters and spaces.");
+                } else if (!TextUtils.isEmpty(str2)) {
+                    if (str2.length() > 10) {
+                        throw new IllegalArgumentException("Invalid promotion code, promotionCode can be between1 and 10 characters long");
+                    } else if (!isAlphanumericWithSpaces(str2)) {
+                        throw new IllegalArgumentException("Invalid promotion code, promotionCode can only contain alphanumeric characters and spaces.");
+                    }
                 }
-            } else if (str.length() > 80) {
-                throw new IllegalArgumentException("Invalid promotion text, promotionText needs to be between1 and 80 characters long");
-            } else if (!isAlphanumericWithSpaces(str)) {
-                throw new IllegalArgumentException("Invalid promotion text, promotionText can only contain alphanumericcharacters and spaces.");
             } else if (!TextUtils.isEmpty(str2)) {
-                if (str2.length() > 10) {
-                    throw new IllegalArgumentException("Invalid promotion code, promotionCode can be between1 and 10 characters long");
-                } else if (!isAlphanumericWithSpaces(str2)) {
-                    throw new IllegalArgumentException("Invalid promotion code, promotionCode can only contain alphanumeric characters and spaces.");
-                }
+                throw new IllegalArgumentException("promotionCode cannot be specified without a valid promotionText");
             }
             this.promoCode = str2;
             this.promoText = str;
@@ -108,6 +120,7 @@ public final class AppInviteContent implements ShareModel {
         }
     }
 
+    @Deprecated
     AppInviteContent(Parcel parcel) {
         this.applinkUrl = parcel.readString();
         this.previewImageUrl = parcel.readString();
@@ -129,30 +142,37 @@ public final class AppInviteContent implements ShareModel {
         this.destination = builder.destination;
     }
 
+    @Deprecated
     public int describeContents() {
         return 0;
     }
 
+    @Deprecated
     public String getApplinkUrl() {
         return this.applinkUrl;
     }
 
+    @Deprecated
     public Destination getDestination() {
         return this.destination != null ? this.destination : Destination.FACEBOOK;
     }
 
+    @Deprecated
     public String getPreviewImageUrl() {
         return this.previewImageUrl;
     }
 
+    @Deprecated
     public String getPromotionCode() {
         return this.promoCode;
     }
 
+    @Deprecated
     public String getPromotionText() {
         return this.promoText;
     }
 
+    @Deprecated
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.applinkUrl);
         parcel.writeString(this.previewImageUrl);

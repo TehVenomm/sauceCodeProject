@@ -24,6 +24,16 @@ public static class ResultUtility
 		}
 	}
 
+	private class RewardAccessoryItemSortData : AccessorySortData
+	{
+		public int rewardNum = -1;
+
+		public override int GetNum()
+		{
+			return rewardNum;
+		}
+	}
+
 	public static void DevideRewardDropAndEvent(QuestCompleteReward reward, ref QuestCompleteReward dropReward, ref QuestCompleteReward eventReward, ref List<string> eventRewardTitles)
 	{
 		List<string> list = new List<string>();
@@ -44,58 +54,60 @@ public static class ResultUtility
 			if (string.IsNullOrEmpty(reward.item[j].rewardTitle))
 			{
 				dropReward.item.Add(reward.item[j]);
+				continue;
 			}
-			else
-			{
-				eventReward.item.Add(reward.item[j]);
-				list.Add(reward.item[j].rewardTitle);
-			}
+			eventReward.item.Add(reward.item[j]);
+			list.Add(reward.item[j].rewardTitle);
 		}
 		for (int k = 0; k < reward.skillItem.Count; k++)
 		{
 			if (string.IsNullOrEmpty(reward.skillItem[k].rewardTitle))
 			{
 				dropReward.skillItem.Add(reward.skillItem[k]);
+				continue;
 			}
-			else
-			{
-				eventReward.skillItem.Add(reward.skillItem[k]);
-				list.Add(reward.skillItem[k].rewardTitle);
-			}
+			eventReward.skillItem.Add(reward.skillItem[k]);
+			list.Add(reward.skillItem[k].rewardTitle);
 		}
 		for (int l = 0; l < reward.equipItem.Count; l++)
 		{
 			if (string.IsNullOrEmpty(reward.equipItem[l].rewardTitle))
 			{
 				dropReward.equipItem.Add(reward.equipItem[l]);
+				continue;
 			}
-			else
-			{
-				eventReward.equipItem.Add(reward.equipItem[l]);
-				list.Add(reward.equipItem[l].rewardTitle);
-			}
+			eventReward.equipItem.Add(reward.equipItem[l]);
+			list.Add(reward.equipItem[l].rewardTitle);
 		}
 		for (int m = 0; m < reward.questItem.Count; m++)
 		{
 			if (string.IsNullOrEmpty(reward.questItem[m].rewardTitle))
 			{
 				dropReward.questItem.Add(reward.questItem[m]);
+				continue;
 			}
-			else
+			eventReward.questItem.Add(reward.questItem[m]);
+			list.Add(reward.questItem[m].rewardTitle);
+		}
+		for (int n = 0; n < reward.accessoryItem.Count; n++)
+		{
+			if (string.IsNullOrEmpty(reward.accessoryItem[n].rewardTitle))
 			{
-				eventReward.questItem.Add(reward.questItem[m]);
-				list.Add(reward.questItem[m].rewardTitle);
+				dropReward.accessoryItem.Add(reward.accessoryItem[n]);
+				continue;
 			}
+			eventReward.accessoryItem.Add(reward.accessoryItem[n]);
+			list.Add(reward.accessoryItem[n].rewardTitle);
 		}
 		if (eventRewardTitles == null)
 		{
 			eventRewardTitles = new List<string>();
 		}
-		for (int n = 0; n < list.Count; n++)
+		for (int num3 = 0; num3 < list.Count; num3++)
 		{
-			if (!eventRewardTitles.Contains(list[n]))
+			if (!eventRewardTitles.Contains(list[num3]))
 			{
-				eventRewardTitles.Add(list[n]);
+				eventRewardTitles.Add(list[num3]);
 			}
 		}
 	}
@@ -272,6 +284,40 @@ public static class ResultUtility
 			{
 				QuestSortData questSortData2 = sortCompareData as QuestSortData;
 				questSortData2.itemData.infoData.questData.num += ary[i].num;
+			}
+		}
+		return num;
+	}
+
+	public static int SetDropData(List<SortCompareData> drop_ary, int start_ary_index, List<QuestCompleteReward.AccessoryItem> drop_data, REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
+	{
+		int num = start_ary_index;
+		QuestCompleteReward.AccessoryItem[] ary = drop_data.ToArray();
+		int i = 0;
+		for (int num2 = ary.Length; i < num2; i++)
+		{
+			SortCompareData sortCompareData = null;
+			if (num > 0 && category != REWARD_CATEGORY.BREAK)
+			{
+				sortCompareData = drop_ary.Find((SortCompareData _data) => _data != null && _data.GetTableID() == (uint)ary[i].accessoryId && _data is RewardAccessoryItemSortData);
+			}
+			if (sortCompareData == null)
+			{
+				AccessoryInfo accessoryInfo = new AccessoryInfo();
+				accessoryInfo.tableID = (uint)ary[i].accessoryId;
+				accessoryInfo.tableData = Singleton<AccessoryTable>.I.GetData(accessoryInfo.tableID);
+				accessoryInfo.tableInfos = Singleton<AccessoryTable>.I.GetInfoList(accessoryInfo.tableID);
+				RewardAccessoryItemSortData rewardAccessoryItemSortData = new RewardAccessoryItemSortData();
+				rewardAccessoryItemSortData.SetItem(accessoryInfo);
+				rewardAccessoryItemSortData.SetCategory(category);
+				rewardAccessoryItemSortData.rewardNum = ary[i].num;
+				drop_ary.Add(rewardAccessoryItemSortData);
+				num++;
+			}
+			else
+			{
+				RewardAccessoryItemSortData rewardAccessoryItemSortData2 = sortCompareData as RewardAccessoryItemSortData;
+				rewardAccessoryItemSortData2.rewardNum += ary[i].num;
 			}
 		}
 		return num;

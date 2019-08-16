@@ -17,10 +17,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Task<TResult> {
     public static final ExecutorService BACKGROUND_EXECUTOR = BoltsExecutors.background();
     private static final Executor IMMEDIATE_EXECUTOR = BoltsExecutors.immediate();
-    private static Task<?> TASK_CANCELLED = new Task(true);
-    private static Task<Boolean> TASK_FALSE = new Task(Boolean.valueOf(false));
-    private static Task<?> TASK_NULL = new Task(null);
-    private static Task<Boolean> TASK_TRUE = new Task(Boolean.valueOf(true));
+    private static Task<?> TASK_CANCELLED = new Task<>(true);
+    private static Task<Boolean> TASK_FALSE = new Task<>((TResult) Boolean.valueOf(false));
+    private static Task<?> TASK_NULL = new Task<>((TResult) null);
+    private static Task<Boolean> TASK_TRUE = new Task<>((TResult) Boolean.valueOf(true));
     public static final Executor UI_THREAD_EXECUTOR = AndroidExecutors.uiThread();
     private static volatile UnobservedExceptionHandler unobservedExceptionHandler;
     private boolean cancelled;
@@ -31,16 +31,6 @@ public class Task<TResult> {
     private final Object lock = new Object();
     private TResult result;
     private UnobservedErrorNotifier unobservedErrorNotifier;
-
-    /* renamed from: bolts.Task$3 */
-    class C01733 implements Continuation<TResult, Task<Void>> {
-        C01733() {
-        }
-
-        public Task<Void> then(Task<TResult> task) throws Exception {
-            return task.isCancelled() ? Task.cancelled() : task.isFaulted() ? Task.forError(task.getError()) : Task.forResult(null);
-        }
-    }
 
     public class TaskCompletionSource extends TaskCompletionSource<TResult> {
         TaskCompletionSource() {
@@ -54,8 +44,8 @@ public class Task<TResult> {
     Task() {
     }
 
-    private Task(TResult tResult) {
-        trySetResult(tResult);
+    private Task(TResult tresult) {
+        trySetResult(tresult);
     }
 
     private Task(boolean z) {
@@ -86,16 +76,14 @@ public class Task<TResult> {
                     if (cancellationToken == null || !cancellationToken.isCancellationRequested()) {
                         try {
                             taskCompletionSource.setResult(callable.call());
-                            return;
                         } catch (CancellationException e) {
                             taskCompletionSource.setCancelled();
-                            return;
                         } catch (Exception e2) {
                             taskCompletionSource.setError(e2);
-                            return;
                         }
+                    } else {
+                        taskCompletionSource.setCancelled();
                     }
-                    taskCompletionSource.setCancelled();
                 }
             });
         } catch (Exception e) {
@@ -116,49 +104,40 @@ public class Task<TResult> {
         return TASK_CANCELLED;
     }
 
-    private static <TContinuationResult, TResult> void completeAfterTask(final TaskCompletionSource<TContinuationResult> taskCompletionSource, final Continuation<TResult, Task<TContinuationResult>> continuation, final Task<TResult> task, Executor executor, final CancellationToken cancellationToken) {
+    /* access modifiers changed from: private */
+    public static <TContinuationResult, TResult> void completeAfterTask(final TaskCompletionSource<TContinuationResult> taskCompletionSource, final Continuation<TResult, Task<TContinuationResult>> continuation, final Task<TResult> task, Executor executor, final CancellationToken cancellationToken) {
         try {
             executor.execute(new Runnable() {
-
-                /* renamed from: bolts.Task$15$1 */
-                class C01701 implements Continuation<TContinuationResult, Void> {
-                    C01701() {
-                    }
-
-                    public Void then(Task<TContinuationResult> task) {
-                        if (cancellationToken != null && cancellationToken.isCancellationRequested()) {
-                            taskCompletionSource.setCancelled();
-                        } else if (task.isCancelled()) {
-                            taskCompletionSource.setCancelled();
-                        } else if (task.isFaulted()) {
-                            taskCompletionSource.setError(task.getError());
-                        } else {
-                            taskCompletionSource.setResult(task.getResult());
-                        }
-                        return null;
-                    }
-                }
-
                 public void run() {
                     if (cancellationToken == null || !cancellationToken.isCancellationRequested()) {
                         try {
                             Task task = (Task) continuation.then(task);
                             if (task == null) {
                                 taskCompletionSource.setResult(null);
-                                return;
                             } else {
-                                task.continueWith(new C01701());
-                                return;
+                                task.continueWith(new Continuation<TContinuationResult, Void>() {
+                                    public Void then(Task<TContinuationResult> task) {
+                                        if (cancellationToken != null && cancellationToken.isCancellationRequested()) {
+                                            taskCompletionSource.setCancelled();
+                                        } else if (task.isCancelled()) {
+                                            taskCompletionSource.setCancelled();
+                                        } else if (task.isFaulted()) {
+                                            taskCompletionSource.setError(task.getError());
+                                        } else {
+                                            taskCompletionSource.setResult(task.getResult());
+                                        }
+                                        return null;
+                                    }
+                                });
                             }
                         } catch (CancellationException e) {
                             taskCompletionSource.setCancelled();
-                            return;
                         } catch (Exception e2) {
                             taskCompletionSource.setError(e2);
-                            return;
                         }
+                    } else {
+                        taskCompletionSource.setCancelled();
                     }
-                    taskCompletionSource.setCancelled();
                 }
             });
         } catch (Exception e) {
@@ -166,23 +145,22 @@ public class Task<TResult> {
         }
     }
 
-    private static <TContinuationResult, TResult> void completeImmediately(final TaskCompletionSource<TContinuationResult> taskCompletionSource, final Continuation<TResult, TContinuationResult> continuation, final Task<TResult> task, Executor executor, final CancellationToken cancellationToken) {
+    /* access modifiers changed from: private */
+    public static <TContinuationResult, TResult> void completeImmediately(final TaskCompletionSource<TContinuationResult> taskCompletionSource, final Continuation<TResult, TContinuationResult> continuation, final Task<TResult> task, Executor executor, final CancellationToken cancellationToken) {
         try {
             executor.execute(new Runnable() {
                 public void run() {
                     if (cancellationToken == null || !cancellationToken.isCancellationRequested()) {
                         try {
                             taskCompletionSource.setResult(continuation.then(task));
-                            return;
                         } catch (CancellationException e) {
                             taskCompletionSource.setCancelled();
-                            return;
                         } catch (Exception e2) {
                             taskCompletionSource.setError(e2);
-                            return;
                         }
+                    } else {
+                        taskCompletionSource.setCancelled();
                     }
-                    taskCompletionSource.setCancelled();
                 }
             });
         } catch (Exception e) {
@@ -193,7 +171,7 @@ public class Task<TResult> {
     public static <TResult> TaskCompletionSource create() {
         Task task = new Task();
         task.getClass();
-        return new TaskCompletionSource();
+        return new TaskCompletionSource<>();
     }
 
     public static Task<Void> delay(long j) {
@@ -228,23 +206,22 @@ public class Task<TResult> {
         return taskCompletionSource.getTask();
     }
 
-    public static <TResult> Task<TResult> forError(Exception exception) {
+    public static <TResult> Task<TResult> forError(Exception exc) {
         TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
-        taskCompletionSource.setError(exception);
+        taskCompletionSource.setError(exc);
         return taskCompletionSource.getTask();
     }
 
-    public static <TResult> Task<TResult> forResult(TResult tResult) {
-        if (tResult == null) {
+    public static <TResult> Task<TResult> forResult(TResult tresult) {
+        if (tresult == null) {
             return TASK_NULL;
         }
-        if (tResult instanceof Boolean) {
-            return ((Boolean) tResult).booleanValue() ? TASK_TRUE : TASK_FALSE;
-        } else {
-            TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
-            taskCompletionSource.setResult(tResult);
-            return taskCompletionSource.getTask();
+        if (tresult instanceof Boolean) {
+            return ((Boolean) tresult).booleanValue() ? TASK_TRUE : TASK_FALSE;
         }
+        TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
+        taskCompletionSource.setResult(tresult);
+        return taskCompletionSource.getTask();
     }
 
     public static UnobservedExceptionHandler getUnobservedExceptionHandler() {
@@ -258,7 +235,7 @@ public class Task<TResult> {
                     then.then(this);
                 } catch (RuntimeException e) {
                     throw e;
-                } catch (Throwable e2) {
+                } catch (Exception e2) {
                     throw new RuntimeException(e2);
                 }
             }
@@ -266,8 +243,8 @@ public class Task<TResult> {
         }
     }
 
-    public static void setUnobservedExceptionHandler(UnobservedExceptionHandler unobservedExceptionHandler) {
-        unobservedExceptionHandler = unobservedExceptionHandler;
+    public static void setUnobservedExceptionHandler(UnobservedExceptionHandler unobservedExceptionHandler2) {
+        unobservedExceptionHandler = unobservedExceptionHandler2;
     }
 
     public static Task<Void> whenAll(Collection<? extends Task<?>> collection) {
@@ -295,7 +272,7 @@ public class Task<TResult> {
                             if (arrayList.size() == 1) {
                                 taskCompletionSource.setError((Exception) arrayList.get(0));
                             } else {
-                                taskCompletionSource.setError(new AggregateException(String.format("There were %d exceptions.", new Object[]{Integer.valueOf(arrayList.size())}), arrayList));
+                                taskCompletionSource.setError(new AggregateException(String.format("There were %d exceptions.", new Object[]{Integer.valueOf(arrayList.size())}), (List<? extends Throwable>) arrayList));
                             }
                         } else if (atomicBoolean.get()) {
                             taskCompletionSource.setCancelled();
@@ -316,7 +293,7 @@ public class Task<TResult> {
                 if (collection.size() == 0) {
                     return Collections.emptyList();
                 }
-                List<TResult> arrayList = new ArrayList();
+                ArrayList arrayList = new ArrayList();
                 for (Task result : collection) {
                     arrayList.add(result.getResult());
                 }
@@ -410,9 +387,10 @@ public class Task<TResult> {
     }
 
     public <TContinuationResult> Task<TContinuationResult> continueWith(Continuation<TResult, TContinuationResult> continuation, Executor executor, CancellationToken cancellationToken) {
+        boolean isCompleted;
         final TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
         synchronized (this.lock) {
-            boolean isCompleted = isCompleted();
+            isCompleted = isCompleted();
             if (!isCompleted) {
                 final Continuation<TResult, TContinuationResult> continuation2 = continuation;
                 final Executor executor2 = executor;
@@ -444,9 +422,10 @@ public class Task<TResult> {
     }
 
     public <TContinuationResult> Task<TContinuationResult> continueWithTask(Continuation<TResult, Task<TContinuationResult>> continuation, Executor executor, CancellationToken cancellationToken) {
+        boolean isCompleted;
         final TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
         synchronized (this.lock) {
-            boolean isCompleted = isCompleted();
+            isCompleted = isCompleted();
             if (!isCompleted) {
                 final Continuation<TResult, Task<TContinuationResult>> continuation2 = continuation;
                 final Executor executor2 = executor;
@@ -466,7 +445,7 @@ public class Task<TResult> {
     }
 
     public Exception getError() {
-        Exception exception;
+        Exception exc;
         synchronized (this.lock) {
             if (this.error != null) {
                 this.errorHasBeenObserved = true;
@@ -475,17 +454,17 @@ public class Task<TResult> {
                     this.unobservedErrorNotifier = null;
                 }
             }
-            exception = this.error;
+            exc = this.error;
         }
-        return exception;
+        return exc;
     }
 
     public TResult getResult() {
-        TResult tResult;
+        TResult tresult;
         synchronized (this.lock) {
-            tResult = this.result;
+            tresult = this.result;
         }
-        return tResult;
+        return tresult;
     }
 
     public boolean isCancelled() {
@@ -513,7 +492,11 @@ public class Task<TResult> {
     }
 
     public Task<Void> makeVoid() {
-        return continueWithTask(new C01733());
+        return continueWithTask(new Continuation<TResult, Task<Void>>() {
+            public Task<Void> then(Task<TResult> task) throws Exception {
+                return task.isCancelled() ? Task.cancelled() : task.isFaulted() ? Task.forError(task.getError()) : Task.forResult(null);
+            }
+        });
     }
 
     public <TContinuationResult> Task<TContinuationResult> onSuccess(Continuation<TResult, TContinuationResult> continuation) {
@@ -529,7 +512,7 @@ public class Task<TResult> {
     }
 
     public <TContinuationResult> Task<TContinuationResult> onSuccess(final Continuation<TResult, TContinuationResult> continuation, Executor executor, final CancellationToken cancellationToken) {
-        return continueWithTask(new Continuation<TResult, Task<TContinuationResult>>() {
+        return continueWithTask((Continuation<TResult, Task<TContinuationResult>>) new Continuation<TResult, Task<TContinuationResult>>() {
             public Task<TContinuationResult> then(Task<TResult> task) {
                 return (cancellationToken == null || !cancellationToken.isCancellationRequested()) ? task.isFaulted() ? Task.forError(task.getError()) : task.isCancelled() ? Task.cancelled() : task.continueWith(continuation) : Task.cancelled();
             }
@@ -537,7 +520,7 @@ public class Task<TResult> {
     }
 
     public <TContinuationResult> Task<TContinuationResult> onSuccessTask(Continuation<TResult, Task<TContinuationResult>> continuation) {
-        return onSuccessTask((Continuation) continuation, IMMEDIATE_EXECUTOR);
+        return onSuccessTask(continuation, IMMEDIATE_EXECUTOR);
     }
 
     public <TContinuationResult> Task<TContinuationResult> onSuccessTask(Continuation<TResult, Task<TContinuationResult>> continuation, CancellationToken cancellationToken) {
@@ -549,14 +532,15 @@ public class Task<TResult> {
     }
 
     public <TContinuationResult> Task<TContinuationResult> onSuccessTask(final Continuation<TResult, Task<TContinuationResult>> continuation, Executor executor, final CancellationToken cancellationToken) {
-        return continueWithTask(new Continuation<TResult, Task<TContinuationResult>>() {
+        return continueWithTask((Continuation<TResult, Task<TContinuationResult>>) new Continuation<TResult, Task<TContinuationResult>>() {
             public Task<TContinuationResult> then(Task<TResult> task) {
                 return (cancellationToken == null || !cancellationToken.isCancellationRequested()) ? task.isFaulted() ? Task.forError(task.getError()) : task.isCancelled() ? Task.cancelled() : task.continueWithTask(continuation) : Task.cancelled();
             }
         }, executor);
     }
 
-    boolean trySetCancelled() {
+    /* access modifiers changed from: 0000 */
+    public boolean trySetCancelled() {
         boolean z = true;
         synchronized (this.lock) {
             if (this.complete) {
@@ -571,59 +555,60 @@ public class Task<TResult> {
         return z;
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* access modifiers changed from: 0000 */
+    /* JADX WARNING: Code restructure failed: missing block: B:17:?, code lost:
+        return true;
+     */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    boolean trySetError(java.lang.Exception r5) {
+    public boolean trySetError(java.lang.Exception r5) {
         /*
-        r4 = this;
-        r1 = 1;
-        r0 = 0;
-        r2 = r4.lock;
-        monitor-enter(r2);
-        r3 = r4.complete;	 Catch:{ all -> 0x002f }
-        if (r3 == 0) goto L_0x000b;
-    L_0x0009:
-        monitor-exit(r2);	 Catch:{ all -> 0x002f }
-    L_0x000a:
-        return r0;
-    L_0x000b:
-        r0 = 1;
-        r4.complete = r0;	 Catch:{ all -> 0x002f }
-        r4.error = r5;	 Catch:{ all -> 0x002f }
-        r0 = 0;
-        r4.errorHasBeenObserved = r0;	 Catch:{ all -> 0x002f }
-        r0 = r4.lock;	 Catch:{ all -> 0x002f }
-        r0.notifyAll();	 Catch:{ all -> 0x002f }
-        r4.runContinuations();	 Catch:{ all -> 0x002f }
-        r0 = r4.errorHasBeenObserved;	 Catch:{ all -> 0x002f }
-        if (r0 != 0) goto L_0x002c;
-    L_0x001f:
-        r0 = getUnobservedExceptionHandler();	 Catch:{ all -> 0x002f }
-        if (r0 == 0) goto L_0x002c;
-    L_0x0025:
-        r0 = new bolts.UnobservedErrorNotifier;	 Catch:{ all -> 0x002f }
-        r0.<init>(r4);	 Catch:{ all -> 0x002f }
-        r4.unobservedErrorNotifier = r0;	 Catch:{ all -> 0x002f }
-    L_0x002c:
-        monitor-exit(r2);	 Catch:{ all -> 0x002f }
-        r0 = r1;
-        goto L_0x000a;
-    L_0x002f:
-        r0 = move-exception;
-        monitor-exit(r2);	 Catch:{ all -> 0x002f }
-        throw r0;
+            r4 = this;
+            r1 = 1
+            r0 = 0
+            java.lang.Object r2 = r4.lock
+            monitor-enter(r2)
+            boolean r3 = r4.complete     // Catch:{ all -> 0x002f }
+            if (r3 == 0) goto L_0x000b
+            monitor-exit(r2)     // Catch:{ all -> 0x002f }
+        L_0x000a:
+            return r0
+        L_0x000b:
+            r0 = 1
+            r4.complete = r0     // Catch:{ all -> 0x002f }
+            r4.error = r5     // Catch:{ all -> 0x002f }
+            r0 = 0
+            r4.errorHasBeenObserved = r0     // Catch:{ all -> 0x002f }
+            java.lang.Object r0 = r4.lock     // Catch:{ all -> 0x002f }
+            r0.notifyAll()     // Catch:{ all -> 0x002f }
+            r4.runContinuations()     // Catch:{ all -> 0x002f }
+            boolean r0 = r4.errorHasBeenObserved     // Catch:{ all -> 0x002f }
+            if (r0 != 0) goto L_0x002c
+            bolts.Task$UnobservedExceptionHandler r0 = getUnobservedExceptionHandler()     // Catch:{ all -> 0x002f }
+            if (r0 == 0) goto L_0x002c
+            bolts.UnobservedErrorNotifier r0 = new bolts.UnobservedErrorNotifier     // Catch:{ all -> 0x002f }
+            r0.<init>(r4)     // Catch:{ all -> 0x002f }
+            r4.unobservedErrorNotifier = r0     // Catch:{ all -> 0x002f }
+        L_0x002c:
+            monitor-exit(r2)     // Catch:{ all -> 0x002f }
+            r0 = r1
+            goto L_0x000a
+        L_0x002f:
+            r0 = move-exception
+            monitor-exit(r2)     // Catch:{ all -> 0x002f }
+            throw r0
         */
         throw new UnsupportedOperationException("Method not decompiled: bolts.Task.trySetError(java.lang.Exception):boolean");
     }
 
-    boolean trySetResult(TResult tResult) {
+    /* access modifiers changed from: 0000 */
+    public boolean trySetResult(TResult tresult) {
         boolean z = true;
         synchronized (this.lock) {
             if (this.complete) {
                 z = false;
             } else {
                 this.complete = true;
-                this.result = tResult;
+                this.result = tresult;
                 this.lock.notifyAll();
                 runContinuations();
             }

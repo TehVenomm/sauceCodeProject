@@ -37,8 +37,6 @@ public class HomeStageAreaEvent : HomeStageEventBase
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Expected O, but got Unknown
 		base.Awake();
 		_transform = this.get_transform();
 		_collider = this.GetComponent<SphereCollider>();

@@ -19,9 +19,12 @@ public class FriendArenaRankingBase : FollowListBase
 		GRD_LIST,
 		TEX_MODEL,
 		STR_NON_LIST,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		OBJ_COMMENT,
 		LBL_COMMENT,
 		LBL_LAST_LOGIN,
@@ -40,6 +43,17 @@ public class FriendArenaRankingBase : FollowListBase
 		STR_TITLE_REFLECT,
 		OBJ_DEGREE_FRAME_ROOT,
 		SPR_ICON_FIRST_MET,
+		OBJ_SWITCH_INFO,
+		DEFAULT_STATUS_ROOT,
+		JOIN_STATUS_ROOT,
+		ONLINE_TEXT_ROOT,
+		ONLINE_TEXT,
+		DETAIL_TEXT,
+		JOIN_BUTTON_ROOT,
+		BTN_JOIN_BUTTON,
+		LBL_BUTTON_TEXT,
+		BTN_SORT,
+		LBL_SORT,
 		OBJ_STATUS,
 		LBL_TIME,
 		LBL_ARENA_NAME,
@@ -100,44 +114,44 @@ public class FriendArenaRankingBase : FollowListBase
 	{
 		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
 		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		if (isOwn)
+		if (!isOwn)
 		{
-			if (scrollView == null)
+			return;
+		}
+		if (scrollView == null)
+		{
+			scrollView = GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>();
+			scrollPanel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
+		}
+		int num = -1;
+		int i = 0;
+		for (int count = rankingDataList.Count; i < count; i++)
+		{
+			if (rankingDataList[i].friendCharaInfo.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				scrollView = GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>();
-				scrollPanel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
+				num = i;
+				break;
 			}
-			int num = -1;
-			int i = 0;
-			for (int count = rankingDataList.Count; i < count; i++)
+		}
+		if (num <= -1)
+		{
+			DispatchEvent("OUT_OF_RANK");
+		}
+		else if (rankingDataList.Count > 3 && num > 3)
+		{
+			int count2 = rankingDataList.Count;
+			float num2 = (float)num / (float)count2;
+			if (num2 >= 0.6f)
 			{
-				if (rankingDataList[i].friendCharaInfo.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
-				{
-					num = i;
-					break;
-				}
+				num += 2;
+				num2 = (float)num / (float)count2;
 			}
-			if (num <= -1)
-			{
-				DispatchEvent("OUT_OF_RANK", null);
-			}
-			else if (rankingDataList.Count > 3 && num > 3)
-			{
-				int count2 = rankingDataList.Count;
-				float num2 = (float)num / (float)count2;
-				if (num2 >= 0.6f)
-				{
-					num += 2;
-					num2 = (float)num / (float)count2;
-				}
-				scrollView.SetDragAmount(num2, num2, true);
-				Vector2 clipOffset = scrollPanel.clipOffset;
-				scrollView.get_transform().set_localPosition(Vector2.op_Implicit(-clipOffset));
-			}
+			scrollView.SetDragAmount(num2, num2, updateScrollbars: true);
+			Vector2 clipOffset = scrollPanel.clipOffset;
+			scrollView.get_transform().set_localPosition(Vector2.op_Implicit(-clipOffset));
 		}
 	}
 
@@ -150,8 +164,8 @@ public class FriendArenaRankingBase : FollowListBase
 	protected virtual void SetRankiItem(int i, Transform t)
 	{
 		ArenaRankingData arenaRankingData = rankingDataList[i];
-		SetActive(t, UI.OBJ_COMMENT, false);
-		SetActive(t, UI.OBJ_STATUS, false);
+		SetActive(t, UI.OBJ_COMMENT, is_visible: false);
+		SetActive(t, UI.OBJ_STATUS, is_visible: false);
 		SetTime(t, arenaRankingData.clearMilliSec);
 		SetRank(t, arenaRankingData.rank);
 	}
@@ -181,13 +195,11 @@ public class FriendArenaRankingBase : FollowListBase
 		}
 		if (rank <= num)
 		{
-			SetActive(t, UI.LBL_RANK, false);
+			SetActive(t, UI.LBL_RANK, is_visible: false);
+			return;
 		}
-		else
-		{
-			SetActive(t, UI.LBL_RANK, true);
-			SetLabelText(t, UI.LBL_RANK, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 5u), rank.ToString()));
-		}
+		SetActive(t, UI.LBL_RANK, is_visible: true);
+		SetLabelText(t, UI.LBL_RANK, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 5u), rank.ToString()));
 	}
 
 	protected List<FriendCharaInfo> CreateFriendCharaInfoList(List<ArenaRankingData> rankingDataList)

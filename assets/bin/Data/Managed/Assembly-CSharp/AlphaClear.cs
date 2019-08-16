@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class AlphaClear
+public class AlphaClear : MonoBehaviour
 {
 	[SerializeField]
 	private Mesh quad;
@@ -24,7 +24,7 @@ public class AlphaClear
 		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Expected O, but got Unknown
+		//IL_0053: Expected O, but got Unknown
 		matrix = Matrix4x4.get_identity();
 		matrix.SetTRS(Vector3.get_zero(), Quaternion.AngleAxis(90f, Vector3.get_right()), new Vector3(100f, 100f, 1f));
 		alphaClearMaterial = new Material(ResourceUtility.FindShader("Custom/AlphaClear"));

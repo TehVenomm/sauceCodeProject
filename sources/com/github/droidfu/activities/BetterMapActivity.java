@@ -3,14 +3,13 @@ package com.github.droidfu.activities;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.ZoomControls;
 import com.github.droidfu.DroidFuApplication;
@@ -27,40 +26,11 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
     private MyLocationOverlay myLocationOverlay;
     private int progressDialogMsgId;
     private int progressDialogTitleId;
-    private GestureDetector tapDetector;
+    /* access modifiers changed from: private */
+    public GestureDetector tapDetector;
     private OnTouchListener tapListener;
     private boolean wasCreated;
     private boolean wasInterrupted;
-
-    /* renamed from: com.github.droidfu.activities.BetterMapActivity$1 */
-    class C05911 implements OnClickListener {
-        C05911() {
-        }
-
-        public void onClick(View view) {
-            BetterMapActivity.this.getMapView().getController().zoomInFixing(BetterMapActivity.this.getMapView().getWidth() / 2, BetterMapActivity.this.getMapView().getHeight() / 2);
-        }
-    }
-
-    /* renamed from: com.github.droidfu.activities.BetterMapActivity$2 */
-    class C05922 implements OnClickListener {
-        C05922() {
-        }
-
-        public void onClick(View view) {
-            BetterMapActivity.this.getMapView().getController().zoomOut();
-        }
-    }
-
-    /* renamed from: com.github.droidfu.activities.BetterMapActivity$3 */
-    class C05933 implements OnTouchListener {
-        C05933() {
-        }
-
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            return BetterMapActivity.this.tapDetector.onTouchEvent(motionEvent);
-        }
-    }
 
     public Intent getCurrentIntent() {
         return this.currentIntent;
@@ -74,10 +44,12 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
         return this.myLocationOverlay;
     }
 
+    /* JADX WARNING: type inference failed for: r1v0, types: [com.github.droidfu.activities.BetterMapActivity, android.app.Activity] */
     public int getWindowFeatures() {
         return BetterActivityHelper.getWindowFeatures(this);
     }
 
+    /* JADX WARNING: type inference failed for: r1v0, types: [android.content.Context, com.github.droidfu.activities.BetterMapActivity] */
     public boolean isApplicationBroughtToBackground() {
         return BetterActivityHelper.isApplicationBroughtToBackground(this);
     }
@@ -102,36 +74,44 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
         return !this.wasCreated;
     }
 
-    protected boolean isRouteDisplayed() {
+    /* access modifiers changed from: protected */
+    public boolean isRouteDisplayed() {
         return false;
     }
 
+    /* JADX WARNING: type inference failed for: r3v0, types: [android.content.Context, com.github.droidfu.activities.BetterMapActivity] */
     public AlertDialog newAlertDialog(int i, int i2) {
         return BetterActivityHelper.newMessageDialog(this, getString(i), getString(i2), 17301543);
     }
 
-    public AlertDialog newErrorHandlerDialog(int i, Exception exception) {
-        return BetterActivityHelper.newErrorHandlerDialog(this, getString(i), exception);
+    /* JADX WARNING: type inference failed for: r1v0, types: [com.github.droidfu.activities.BetterMapActivity, android.app.Activity] */
+    public AlertDialog newErrorHandlerDialog(int i, Exception exc) {
+        return BetterActivityHelper.newErrorHandlerDialog(this, getString(i), exc);
     }
 
-    public AlertDialog newErrorHandlerDialog(Exception exception) {
-        return newErrorHandlerDialog(getResources().getIdentifier(BetterActivityHelper.ERROR_DIALOG_TITLE_RESOURCE, "string", getPackageName()), exception);
+    public AlertDialog newErrorHandlerDialog(Exception exc) {
+        return newErrorHandlerDialog(getResources().getIdentifier(BetterActivityHelper.ERROR_DIALOG_TITLE_RESOURCE, "string", getPackageName()), exc);
     }
 
+    /* JADX WARNING: type inference failed for: r3v0, types: [android.content.Context, com.github.droidfu.activities.BetterMapActivity] */
     public AlertDialog newInfoDialog(int i, int i2) {
         return BetterActivityHelper.newMessageDialog(this, getString(i), getString(i2), 17301659);
     }
 
+    /* JADX WARNING: type inference failed for: r1v0, types: [com.github.droidfu.activities.BetterMapActivity, android.app.Activity] */
     public <T> Dialog newListDialog(String str, List<T> list, DialogClickListener<T> dialogClickListener, boolean z) {
         return BetterActivityHelper.newListDialog(this, str, list, dialogClickListener, z);
     }
 
-    public AlertDialog newYesNoDialog(int i, int i2, DialogInterface.OnClickListener onClickListener) {
+    /* JADX WARNING: type inference failed for: r3v0, types: [android.content.Context, com.github.droidfu.activities.BetterMapActivity] */
+    public AlertDialog newYesNoDialog(int i, int i2, OnClickListener onClickListener) {
         return BetterActivityHelper.newYesNoDialog(this, getString(i), getString(i2), 17301659, onClickListener);
     }
 
-    protected void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
+    /* JADX WARNING: type inference failed for: r2v0, types: [android.content.Context, java.lang.Object, com.github.droidfu.activities.BetterMapActivity, com.google.android.maps.MapActivity] */
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
+        BetterMapActivity.super.onCreate(bundle);
         this.wasCreated = true;
         this.currentIntent = getIntent();
         Application application = getApplication();
@@ -140,22 +120,26 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
         }
     }
 
-    protected Dialog onCreateDialog(int i) {
+    /* JADX WARNING: type inference failed for: r2v0, types: [com.github.droidfu.activities.BetterMapActivity, android.app.Activity] */
+    /* access modifiers changed from: protected */
+    public Dialog onCreateDialog(int i) {
         return BetterActivityHelper.createProgressDialog(this, this.progressDialogTitleId, this.progressDialogMsgId);
     }
 
+    /* JADX WARNING: type inference failed for: r1v0, types: [android.content.Context, com.github.droidfu.activities.BetterMapActivity, com.google.android.maps.MapActivity] */
     public boolean onKeyDown(int i, KeyEvent keyEvent) {
         BetterActivityHelper.handleApplicationClosing(this, i);
-        return super.onKeyDown(i, keyEvent);
+        return BetterMapActivity.super.onKeyDown(i, keyEvent);
     }
 
     public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
+        BetterMapActivity.super.onNewIntent(intent);
         this.currentIntent = intent;
     }
 
-    protected void onPause() {
-        super.onPause();
+    /* access modifiers changed from: protected */
+    public void onPause() {
+        BetterMapActivity.super.onPause();
         this.wasInterrupted = false;
         this.wasCreated = false;
         if (this.myLocationOverlay != null) {
@@ -163,37 +147,52 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
         }
     }
 
-    protected void onRestoreInstanceState(Bundle bundle) {
-        super.onRestoreInstanceState(bundle);
+    /* access modifiers changed from: protected */
+    public void onRestoreInstanceState(Bundle bundle) {
+        BetterMapActivity.super.onRestoreInstanceState(bundle);
         this.wasInterrupted = true;
     }
 
-    protected void onResume() {
-        super.onResume();
+    /* access modifiers changed from: protected */
+    public void onResume() {
+        BetterMapActivity.super.onResume();
         if (this.myLocationOverlay != null) {
             this.myLocationOverlay.enableMyLocation();
         }
     }
 
-    protected void setMapGestureListener(MapGestureListener mapGestureListener) {
+    /* access modifiers changed from: protected */
+    public void setMapGestureListener(MapGestureListener mapGestureListener) {
         this.tapDetector = new GestureDetector(mapGestureListener);
-        this.tapListener = new C05933();
+        this.tapListener = new OnTouchListener() {
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return BetterMapActivity.this.tapDetector.onTouchEvent(motionEvent);
+            }
+        };
         this.mapView.setOnTouchListener(this.tapListener);
     }
 
     public void setMapView(int i) {
-        this.mapView = (MapView) findViewById(i);
+        this.mapView = findViewById(i);
     }
 
     public void setMapViewWithZoom(int i, int i2) {
-        this.mapView = (MapView) findViewById(i);
+        this.mapView = findViewById(i);
         ZoomControls zoomControls = (ZoomControls) findViewById(i2);
-        zoomControls.setOnZoomInClickListener(new C05911());
-        zoomControls.setOnZoomOutClickListener(new C05922());
+        zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                BetterMapActivity.this.getMapView().getController().zoomInFixing(BetterMapActivity.this.getMapView().getWidth() / 2, BetterMapActivity.this.getMapView().getHeight() / 2);
+            }
+        });
+        zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                BetterMapActivity.this.getMapView().getController().zoomOut();
+            }
+        });
     }
 
-    public void setMyLocationOverlay(MyLocationOverlay myLocationOverlay) {
-        this.myLocationOverlay = myLocationOverlay;
+    public void setMyLocationOverlay(MyLocationOverlay myLocationOverlay2) {
+        this.myLocationOverlay = myLocationOverlay2;
         this.mapView.getOverlays().add(this.myLocationOverlay);
     }
 

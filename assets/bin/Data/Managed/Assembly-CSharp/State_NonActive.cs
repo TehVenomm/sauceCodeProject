@@ -41,40 +41,44 @@ public class State_NonActive : State
 
 	public override void HandleEvent(StateMachine fsm, Brain brain, BRAIN_EVENT ev, object param = null)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		if (ev == BRAIN_EVENT.ATTACKED_HIT)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		if (ev != BRAIN_EVENT.ATTACKED_HIT)
 		{
-			ChangeActiveState(fsm, brain);
-			Vector3 position = brain.owner._position;
-			if (brain.param.scoutParam != null)
+			return;
+		}
+		ChangeActiveState(fsm, brain);
+		Vector3 position = brain.owner._position;
+		if (brain.param.scoutParam == null)
+		{
+			return;
+		}
+		List<StageObject> allyObjectList = brain.GetAllyObjectList();
+		for (int i = 0; i < allyObjectList.Count; i++)
+		{
+			if (allyObjectList[i].controller == null)
 			{
-				List<StageObject> allyObjectList = brain.GetAllyObjectList();
-				for (int i = 0; i < allyObjectList.Count; i++)
+				continue;
+			}
+			Brain brain2 = allyObjectList[i].controller.brain;
+			if (brain2 == null)
+			{
+				continue;
+			}
+			Vector3 val = allyObjectList[i]._position - position;
+			if (val.get_sqrMagnitude() < brain.param.scoutParam.scoutingAudibilitySqr)
+			{
+				if (brain2.owner != null)
 				{
-					if (!(allyObjectList[i].controller == null))
-					{
-						Brain brain2 = allyObjectList[i].controller.brain;
-						if (!(brain2 == null))
-						{
-							Vector3 val = allyObjectList[i]._position - position;
-							if (val.get_sqrMagnitude() < brain.param.scoutParam.scoutingAudibilitySqr)
-							{
-								if (brain2.owner != null)
-								{
-									brain2.owner.SafeActIdle();
-								}
-								if (brain2.fsm != null)
-								{
-									brain2.fsm.ChangeState(STATE_TYPE.ACTIVE);
-								}
-							}
-						}
-					}
+					brain2.owner.SafeActIdle();
+				}
+				if (brain2.fsm != null)
+				{
+					brain2.fsm.ChangeState(STATE_TYPE.ACTIVE);
 				}
 			}
 		}

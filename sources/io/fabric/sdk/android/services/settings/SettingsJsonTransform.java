@@ -1,13 +1,12 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
-import io.fabric.sdk.android.services.common.CurrentTimeProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p017io.fabric.sdk.android.services.common.CurrentTimeProvider;
 
+/* renamed from: io.fabric.sdk.android.services.settings.SettingsJsonTransform */
 public interface SettingsJsonTransform {
     SettingsData buildFromJson(CurrentTimeProvider currentTimeProvider, JSONObject jSONObject) throws JSONException;
-
-    JSONObject sanitizeTraceInfo(JSONObject jSONObject) throws JSONException;
 
     JSONObject toJson(SettingsData settingsData) throws JSONException;
 }

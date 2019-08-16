@@ -2,28 +2,38 @@ package com.google.android.gms.games;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.games.internal.zzc;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.games.internal.zzd;
 
-public final class PlayerLevel extends zzc {
-    public static final Creator<PlayerLevel> CREATOR = new zzh();
-    private final int zzhdb;
-    private final long zzhdc;
-    private final long zzhdd;
+@Class(creator = "PlayerLevelCreator")
+@Reserved({1000})
+public final class PlayerLevel extends zzd {
+    public static final Creator<PlayerLevel> CREATOR = new zzaq();
+    @Field(getter = "getLevelNumber", mo13990id = 1)
+    private final int zzcr;
+    @Field(getter = "getMinXp", mo13990id = 2)
+    private final long zzcs;
+    @Field(getter = "getMaxXp", mo13990id = 3)
+    private final long zzct;
 
-    public PlayerLevel(int i, long j, long j2) {
+    @Constructor
+    public PlayerLevel(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) long j, @Param(mo13993id = 3) long j2) {
         boolean z = true;
-        zzbp.zza(j >= 0, (Object) "Min XP must be positive!");
+        Preconditions.checkState(j >= 0, "Min XP must be positive!");
         if (j2 <= j) {
             z = false;
         }
-        zzbp.zza(z, (Object) "Max XP must be more than min XP!");
-        this.zzhdb = i;
-        this.zzhdc = j;
-        this.zzhdd = j2;
+        Preconditions.checkState(z, "Max XP must be more than min XP!");
+        this.zzcr = i;
+        this.zzcs = j;
+        this.zzct = j2;
     }
 
     public final boolean equals(Object obj) {
@@ -34,34 +44,34 @@ public final class PlayerLevel extends zzc {
             return true;
         }
         PlayerLevel playerLevel = (PlayerLevel) obj;
-        return zzbf.equal(Integer.valueOf(playerLevel.getLevelNumber()), Integer.valueOf(getLevelNumber())) && zzbf.equal(Long.valueOf(playerLevel.getMinXp()), Long.valueOf(getMinXp())) && zzbf.equal(Long.valueOf(playerLevel.getMaxXp()), Long.valueOf(getMaxXp()));
+        return Objects.equal(Integer.valueOf(playerLevel.getLevelNumber()), Integer.valueOf(getLevelNumber())) && Objects.equal(Long.valueOf(playerLevel.getMinXp()), Long.valueOf(getMinXp())) && Objects.equal(Long.valueOf(playerLevel.getMaxXp()), Long.valueOf(getMaxXp()));
     }
 
     public final int getLevelNumber() {
-        return this.zzhdb;
+        return this.zzcr;
     }
 
     public final long getMaxXp() {
-        return this.zzhdd;
+        return this.zzct;
     }
 
     public final long getMinXp() {
-        return this.zzhdc;
+        return this.zzcs;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzhdb), Long.valueOf(this.zzhdc), Long.valueOf(this.zzhdd)});
+        return Objects.hashCode(Integer.valueOf(this.zzcr), Long.valueOf(this.zzcs), Long.valueOf(this.zzct));
     }
 
     public final String toString() {
-        return zzbf.zzt(this).zzg("LevelNumber", Integer.valueOf(getLevelNumber())).zzg("MinXp", Long.valueOf(getMinXp())).zzg("MaxXp", Long.valueOf(getMaxXp())).toString();
+        return Objects.toStringHelper(this).add("LevelNumber", Integer.valueOf(getLevelNumber())).add("MinXp", Long.valueOf(getMinXp())).add("MaxXp", Long.valueOf(getMaxXp())).toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, getLevelNumber());
-        zzd.zza(parcel, 2, getMinXp());
-        zzd.zza(parcel, 3, getMaxXp());
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, getLevelNumber());
+        SafeParcelWriter.writeLong(parcel, 2, getMinXp());
+        SafeParcelWriter.writeLong(parcel, 3, getMaxXp());
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

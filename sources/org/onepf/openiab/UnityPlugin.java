@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
-import com.facebook.share.internal.ShareConstants;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
 import com.unity3d.player.UnityPlayer;
 import java.util.Arrays;
@@ -46,69 +45,23 @@ public class UnityPlugin {
     public static final String YANDEX_STORE_SERVICE = "com.yandex.store.service";
     private static UnityPlugin _instance;
     public static boolean sendRequest = false;
-    private BroadcastReceiver _billingReceiver = new C13479();
-    OnConsumeFinishedListener _consumeFinishedListener = new C13468();
-    private OpenIabHelper _helper;
-    OnIabPurchaseFinishedListener _purchaseFinishedListener = new C13457();
-    QueryInventoryFinishedListener _queryInventoryListener = new C13446();
+    private BroadcastReceiver _billingReceiver = new BroadcastReceiver() {
+        private static final String TAG = "YandexBillingReceiver";
 
-    /* renamed from: org.onepf.openiab.UnityPlugin$2 */
-    class C13402 implements Runnable {
-        C13402() {
+        private void purchaseStateChanged(Intent intent) {
+            Log.d(TAG, "purchaseStateChanged intent: " + intent);
+            UnityPlugin.this._helper.handleActivityResult(10001, -1, intent);
         }
 
-        public void run() {
-            UnityPlugin.this._helper.queryInventoryAsync(UnityPlugin.this._queryInventoryListener);
-        }
-    }
-
-    /* renamed from: org.onepf.openiab.UnityPlugin$6 */
-    class C13446 implements QueryInventoryFinishedListener {
-        C13446() {
-        }
-
-        public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
-            Log.d(UnityPlugin.TAG, "Query inventory finished.");
-            if (iabResult.isFailure()) {
-                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.QUERY_INVENTORY_FAILED_CALLBACK, iabResult.getMessage());
-                return;
-            }
-            Log.d(UnityPlugin.TAG, "Query inventory was successful.");
-            try {
-                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.QUERY_INVENTORY_SUCCEEDED_CALLBACK, UnityPlugin.this.inventoryToJson(inventory));
-            } catch (JSONException e) {
-                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.QUERY_INVENTORY_FAILED_CALLBACK, "Couldn't serialize the inventory");
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG, "onReceive intent: " + intent);
+            if (UnityPlugin.YANDEX_STORE_ACTION_PURCHASE_STATE_CHANGED.equals(action)) {
+                purchaseStateChanged(intent);
             }
         }
-    }
-
-    /* renamed from: org.onepf.openiab.UnityPlugin$7 */
-    class C13457 implements OnIabPurchaseFinishedListener {
-        C13457() {
-        }
-
-        public void onIabPurchaseFinished(IabResult iabResult, Purchase purchase) {
-            UnityPlayer.currentActivity.sendBroadcast(new Intent("org.onepf.openiab.ACTION_FINISH"));
-            Log.d(UnityPlugin.TAG, "Purchase finished: " + iabResult + ", purchase: " + purchase);
-            if (iabResult.isFailure()) {
-                Log.e(UnityPlugin.TAG, "Error purchasing: " + iabResult);
-                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.PURCHASE_FAILED_CALLBACK, iabResult.getResponse() + "|" + iabResult.getMessage());
-                return;
-            }
-            Log.d(UnityPlugin.TAG, "Purchase successful.");
-            try {
-                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.PURCHASE_SUCCEEDED_CALLBACK, UnityPlugin.this.purchaseToJson(purchase));
-            } catch (JSONException e) {
-                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.PURCHASE_FAILED_CALLBACK, "-1|Couldn't serialize the purchase");
-            }
-        }
-    }
-
-    /* renamed from: org.onepf.openiab.UnityPlugin$8 */
-    class C13468 implements OnConsumeFinishedListener {
-        C13468() {
-        }
-
+    };
+    OnConsumeFinishedListener _consumeFinishedListener = new OnConsumeFinishedListener() {
         public void onConsumeFinished(Purchase purchase, IabResult iabResult) {
             Log.d(UnityPlugin.TAG, "Consumption finished. Purchase: " + purchase + ", result: " + iabResult);
             purchase.setSku(SkuManager.getInstance().getSku(purchase.getAppstoreName(), purchase.getSku()));
@@ -124,30 +77,44 @@ public class UnityPlugin {
                 UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.CONSUME_PURCHASE_FAILED_CALLBACK, "Couldn't serialize the purchase");
             }
         }
-    }
-
-    /* renamed from: org.onepf.openiab.UnityPlugin$9 */
-    class C13479 extends BroadcastReceiver {
-        private static final String TAG = "YandexBillingReceiver";
-
-        C13479() {
-        }
-
-        private void purchaseStateChanged(Intent intent) {
-            Log.d(TAG, "purchaseStateChanged intent: " + intent);
-            UnityPlugin.this._helper.handleActivityResult(10001, -1, intent);
-        }
-
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.d(TAG, "onReceive intent: " + intent);
-            if (UnityPlugin.YANDEX_STORE_ACTION_PURCHASE_STATE_CHANGED.equals(action)) {
-                purchaseStateChanged(intent);
+    };
+    /* access modifiers changed from: private */
+    public OpenIabHelper _helper;
+    OnIabPurchaseFinishedListener _purchaseFinishedListener = new OnIabPurchaseFinishedListener() {
+        public void onIabPurchaseFinished(IabResult iabResult, Purchase purchase) {
+            UnityPlayer.currentActivity.sendBroadcast(new Intent("org.onepf.openiab.ACTION_FINISH"));
+            Log.d(UnityPlugin.TAG, "Purchase finished: " + iabResult + ", purchase: " + purchase);
+            if (iabResult.isFailure()) {
+                Log.e(UnityPlugin.TAG, "Error purchasing: " + iabResult);
+                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.PURCHASE_FAILED_CALLBACK, iabResult.getResponse() + "|" + iabResult.getMessage());
+                return;
+            }
+            Log.d(UnityPlugin.TAG, "Purchase successful.");
+            try {
+                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.PURCHASE_SUCCEEDED_CALLBACK, UnityPlugin.this.purchaseToJson(purchase));
+            } catch (JSONException e) {
+                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.PURCHASE_FAILED_CALLBACK, "-1|Couldn't serialize the purchase");
             }
         }
-    }
+    };
+    QueryInventoryFinishedListener _queryInventoryListener = new QueryInventoryFinishedListener() {
+        public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
+            Log.d(UnityPlugin.TAG, "Query inventory finished.");
+            if (iabResult.isFailure()) {
+                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.QUERY_INVENTORY_FAILED_CALLBACK, iabResult.getMessage());
+                return;
+            }
+            Log.d(UnityPlugin.TAG, "Query inventory was successful.");
+            try {
+                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.QUERY_INVENTORY_SUCCEEDED_CALLBACK, UnityPlugin.this.inventoryToJson(inventory));
+            } catch (JSONException e) {
+                UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.QUERY_INVENTORY_FAILED_CALLBACK, "Couldn't serialize the inventory");
+            }
+        }
+    };
 
-    private void createBroadcasts() {
+    /* access modifiers changed from: private */
+    public void createBroadcasts() {
         Log.d(TAG, "createBroadcasts");
         UnityPlayer.currentActivity.registerReceiver(this._billingReceiver, new IntentFilter(YANDEX_STORE_ACTION_PURCHASE_STATE_CHANGED));
     }
@@ -168,7 +135,8 @@ public class UnityPlugin {
         return _instance;
     }
 
-    private String inventoryToJson(Inventory inventory) throws JSONException {
+    /* access modifiers changed from: private */
+    public String inventoryToJson(Inventory inventory) throws JSONException {
         JSONStringer object = new JSONStringer().object();
         object.key("purchaseMap").array();
         for (Entry entry : inventory.getPurchaseMap().entrySet()) {
@@ -190,12 +158,13 @@ public class UnityPlugin {
         return object.toString();
     }
 
-    private String purchaseToJson(Purchase purchase) throws JSONException {
+    /* access modifiers changed from: private */
+    public String purchaseToJson(Purchase purchase) throws JSONException {
         return new JSONStringer().object().key(AmazonAppstoreBillingService.JSON_KEY_RECEIPT_ITEM_TYPE).value(purchase.getItemType()).key(AmazonAppstoreBillingService.JSON_KEY_ORDER_ID).value(purchase.getOrderId()).key("packageName").value(purchase.getPackageName()).key("sku").value(purchase.getSku()).key("purchaseTime").value(purchase.getPurchaseTime()).key("purchaseState").value((long) purchase.getPurchaseState()).key("developerPayload").value(purchase.getDeveloperPayload()).key("token").value(purchase.getToken()).key("originalJson").value(purchase.getOriginalJson()).key("signature").value(purchase.getSignature()).key("appstoreName").value(purchase.getAppstoreName()).endObject().toString();
     }
 
     private String skuDetailsToJson(SkuDetails skuDetails) throws JSONException {
-        return new JSONStringer().object().key(AmazonAppstoreBillingService.JSON_KEY_RECEIPT_ITEM_TYPE).value(skuDetails.getItemType()).key("sku").value(skuDetails.getSku()).key(ShareConstants.MEDIA_TYPE).value(skuDetails.getType()).key(Param.PRICE).value(skuDetails.getPrice()).key("title").value(skuDetails.getTitle()).key("description").value(skuDetails.getDescription()).key("json").value(skuDetails.getJson()).endObject().toString();
+        return new JSONStringer().object().key(AmazonAppstoreBillingService.JSON_KEY_RECEIPT_ITEM_TYPE).value(skuDetails.getItemType()).key("sku").value(skuDetails.getSku()).key("type").value(skuDetails.getType()).key(Param.PRICE).value(skuDetails.getPrice()).key("title").value(skuDetails.getTitle()).key("description").value(skuDetails.getDescription()).key("json").value(skuDetails.getJson()).endObject().toString();
     }
 
     private void startProxyPurchaseActivity(String str, boolean z, String str2) {
@@ -262,29 +231,22 @@ public class UnityPlugin {
 
     public void initWithOptions(final Options options) {
         UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
-
-            /* renamed from: org.onepf.openiab.UnityPlugin$1$1 */
-            class C13381 implements OnIabSetupFinishedListener {
-                C13381() {
-                }
-
-                public void onIabSetupFinished(IabResult iabResult) {
-                    Log.d(UnityPlugin.TAG, "Setup finished.");
-                    if (iabResult.isFailure()) {
-                        Log.e(UnityPlugin.TAG, "Problem setting up in-app billing: " + iabResult);
-                        UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.BILLING_NOT_SUPPORTED_CALLBACK, iabResult.getMessage());
-                        return;
-                    }
-                    Log.d(UnityPlugin.TAG, "Setup successful.");
-                    UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.BILLING_SUPPORTED_CALLBACK, "");
-                }
-            }
-
             public void run() {
-                UnityPlugin.this._helper = new OpenIabHelper(UnityPlayer.currentActivity, options);
+                UnityPlugin.this._helper = new OpenIabHelper((Context) UnityPlayer.currentActivity, options);
                 UnityPlugin.this.createBroadcasts();
                 Log.d(UnityPlugin.TAG, "Starting setup.");
-                UnityPlugin.this._helper.startSetup(new C13381());
+                UnityPlugin.this._helper.startSetup(new OnIabSetupFinishedListener() {
+                    public void onIabSetupFinished(IabResult iabResult) {
+                        Log.d(UnityPlugin.TAG, "Setup finished.");
+                        if (iabResult.isFailure()) {
+                            Log.e(UnityPlugin.TAG, "Problem setting up in-app billing: " + iabResult);
+                            UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.BILLING_NOT_SUPPORTED_CALLBACK, iabResult.getMessage());
+                            return;
+                        }
+                        Log.d(UnityPlugin.TAG, "Setup successful.");
+                        UnityPlayer.UnitySendMessage(UnityPlugin.EVENT_MANAGER, UnityPlugin.BILLING_SUPPORTED_CALLBACK, "");
+                    }
+                });
             }
         });
     }
@@ -311,7 +273,11 @@ public class UnityPlugin {
     }
 
     public void queryInventory() {
-        UnityPlayer.currentActivity.runOnUiThread(new C13402());
+        UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                UnityPlugin.this._helper.queryInventoryAsync(UnityPlugin.this._queryInventoryListener);
+            }
+        });
     }
 
     public void queryInventory(final String[] strArr) {

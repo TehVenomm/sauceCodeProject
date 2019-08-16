@@ -18,7 +18,7 @@ public class Coop_Model_PlayerGather : Coop_Model_ObjectSyncPositionBase
 	public override bool IsHandleable(StageObject owner)
 	{
 		Character character = owner as Character;
-		if (!character.IsChangeableAction((Character.ACTION_ID)26))
+		if (!character.IsChangeableAction((Character.ACTION_ID)28))
 		{
 			return false;
 		}

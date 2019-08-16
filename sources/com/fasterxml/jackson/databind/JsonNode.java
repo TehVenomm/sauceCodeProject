@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 public abstract class JsonNode extends Base implements TreeNode, Iterable<JsonNode> {
-    protected abstract JsonNode _at(JsonPointer jsonPointer);
+    /* access modifiers changed from: protected */
+    public abstract JsonNode _at(JsonPointer jsonPointer);
 
     public abstract String asText();
 
@@ -89,7 +90,8 @@ public abstract class JsonNode extends Base implements TreeNode, Iterable<JsonNo
         return ClassUtil.emptyIterator();
     }
 
-    public final JsonNode at(JsonPointer jsonPointer) {
+    /* renamed from: at */
+    public final JsonNode m397at(JsonPointer jsonPointer) {
         if (jsonPointer.matches()) {
             return this;
         }
@@ -97,11 +99,12 @@ public abstract class JsonNode extends Base implements TreeNode, Iterable<JsonNo
         if (_at == null) {
             return MissingNode.getInstance();
         }
-        return _at.at(jsonPointer.tail());
+        return _at.mo9158at(jsonPointer.tail());
     }
 
-    public final JsonNode at(String str) {
-        return at(JsonPointer.compile(str));
+    /* renamed from: at */
+    public final JsonNode m398at(String str) {
+        return mo9158at(JsonPointer.compile(str));
     }
 
     public final boolean isPojo() {
@@ -189,7 +192,7 @@ public abstract class JsonNode extends Base implements TreeNode, Iterable<JsonNo
     }
 
     public short shortValue() {
-        return (short) 0;
+        return 0;
     }
 
     public int intValue() {
@@ -263,12 +266,12 @@ public abstract class JsonNode extends Base implements TreeNode, Iterable<JsonNo
 
     public boolean hasNonNull(String str) {
         JsonNode jsonNode = get(str);
-        return (jsonNode == null || jsonNode.isNull()) ? false : true;
+        return jsonNode != null && !jsonNode.isNull();
     }
 
     public boolean hasNonNull(int i) {
         JsonNode jsonNode = get(i);
-        return (jsonNode == null || jsonNode.isNull()) ? false : true;
+        return jsonNode != null && !jsonNode.isNull();
     }
 
     public final Iterator<JsonNode> iterator() {

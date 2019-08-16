@@ -11,7 +11,7 @@ public abstract class PPInputBase : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_PW, string.Empty, 4, (EventDelegate.Callback)OnInputChange);
+		SetInput(UI.IPT_PW, string.Empty, 4, OnInputChange);
 	}
 
 	private void OnInputChange()

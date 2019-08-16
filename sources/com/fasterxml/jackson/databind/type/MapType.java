@@ -20,18 +20,19 @@ public final class MapType extends MapLikeType {
 
     @Deprecated
     public static MapType construct(Class<?> cls, JavaType javaType, JavaType javaType2) {
-        TypeBindings emptyBindings;
+        TypeBindings typeBindings;
         TypeVariable[] typeParameters = cls.getTypeParameters();
         if (typeParameters == null || typeParameters.length != 2) {
-            emptyBindings = TypeBindings.emptyBindings();
+            typeBindings = TypeBindings.emptyBindings();
         } else {
-            emptyBindings = TypeBindings.create(cls, javaType, javaType2);
+            typeBindings = TypeBindings.create(cls, javaType, javaType2);
         }
-        return new MapType(cls, emptyBindings, TypeBase._bogusSuperClass(cls), null, javaType, javaType2, null, null, false);
+        return new MapType(cls, typeBindings, _bogusSuperClass(cls), null, javaType, javaType2, null, null, false);
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         return new MapType(cls, this._bindings, this._superClass, this._superInterfaces, this._keyType, this._valueType, this._valueHandler, this._typeHandler, this._asStatic);
     }
 

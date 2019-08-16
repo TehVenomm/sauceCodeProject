@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIOpenAppSettingBtn
+public class UIOpenAppSettingBtn : MonoBehaviour
 {
 	private BootProcess currentBootProcess;
 
@@ -27,13 +27,12 @@ public class UIOpenAppSettingBtn
 	public void AskPermission()
 	{
 		currentBootProcess.OnGrantButtonPress();
-		MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(true);
+		MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(isShow: true);
 		MonoBehaviourSingleton<UIManager>.I.loading.HideAllTextMsg();
 	}
 
 	private void OnEnable()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		currentBootProcess = MonoBehaviourSingleton<AppMain>.I.get_gameObject().GetComponent<BootProcess>();
 	}
 

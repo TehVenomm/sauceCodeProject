@@ -1,6 +1,5 @@
-package android.support.v4.graphics.drawable;
+package android.support.p000v4.graphics.drawable;
 
-import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -16,8 +15,8 @@ import android.support.annotation.RequiresApi;
 import android.util.DisplayMetrics;
 import com.github.droidfu.support.DisplaySupport;
 
-@TargetApi(9)
 @RequiresApi(9)
+/* renamed from: android.support.v4.graphics.drawable.RoundedBitmapDrawable */
 public abstract class RoundedBitmapDrawable extends Drawable {
     private static final int DEFAULT_PAINT_FLAGS = 3;
     private boolean mApplyGravity = true;
@@ -114,7 +113,8 @@ public abstract class RoundedBitmapDrawable extends Drawable {
         return this.mPaint;
     }
 
-    void gravityCompatApply(int i, int i2, int i3, Rect rect, Rect rect2) {
+    /* access modifiers changed from: 0000 */
+    public void gravityCompatApply(int i, int i2, int i3, Rect rect, Rect rect2) {
         throw new UnsupportedOperationException();
     }
 
@@ -130,7 +130,8 @@ public abstract class RoundedBitmapDrawable extends Drawable {
         return this.mIsCircular;
     }
 
-    protected void onBoundsChange(Rect rect) {
+    /* access modifiers changed from: protected */
+    public void onBoundsChange(Rect rect) {
         super.onBoundsChange(rect);
         if (this.mIsCircular) {
             updateCircularCornerRadius();
@@ -223,7 +224,8 @@ public abstract class RoundedBitmapDrawable extends Drawable {
         setTargetDensity(displayMetrics.densityDpi);
     }
 
-    void updateDstRect() {
+    /* access modifiers changed from: 0000 */
+    public void updateDstRect() {
         if (this.mApplyGravity) {
             if (this.mIsCircular) {
                 int min = Math.min(this.mBitmapWidth, this.mBitmapHeight);

@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(UIGameSceneEventSender))]
 [AddComponentMenu("ProjectUI/UIButtonTweenEventCtrl")]
+[RequireComponent(typeof(UIGameSceneEventSender))]
 public class UIButtonTweenEventCtrl : UITweenCtrl
 {
 	public UITweener[] pushTweens;
@@ -42,8 +42,6 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 
 	private void Strat()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		UIGameSceneEventSender uIGameSceneEventSender = this.get_gameObject().GetComponent<UIGameSceneEventSender>();
 		if (uIGameSceneEventSender == null)
 		{
@@ -62,7 +60,7 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 			isEnd = false;
 			_Reset(pushTweens);
 			isPlaying = false;
-			_Play(pushTweens, isDown, null);
+			_Play(pushTweens, isDown);
 		}
 		else
 		{
@@ -99,21 +97,22 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 
 	private void End(UITweener[] target_tweens)
 	{
-		if (target_tweens != null && target_tweens.Length != 0 && !isEnd)
+		if (target_tweens == null || target_tweens.Length == 0 || isEnd)
 		{
-			isEnd = true;
-			int i = 0;
-			for (int num = target_tweens.Length; i < num; i++)
+			return;
+		}
+		isEnd = true;
+		int i = 0;
+		for (int num = target_tweens.Length; i < num; i++)
+		{
+			if (!(target_tweens[i] == null))
 			{
-				if (!(target_tweens[i] == null))
-				{
-					UITweener.Style style = target_tweens[i].style;
-					target_tweens[i].style = UITweener.Style.Once;
-					target_tweens[i].tweenFactor = 1f;
-					target_tweens[i].Sample(target_tweens[i].tweenFactor, true);
-					target_tweens[i].PlayForward();
-					target_tweens[i].style = style;
-				}
+				UITweener.Style style = target_tweens[i].style;
+				target_tweens[i].style = UITweener.Style.Once;
+				target_tweens[i].tweenFactor = 1f;
+				target_tweens[i].Sample(target_tweens[i].tweenFactor, isFinished: true);
+				target_tweens[i].PlayForward();
+				target_tweens[i].style = style;
 			}
 		}
 	}

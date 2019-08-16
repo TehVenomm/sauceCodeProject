@@ -78,70 +78,70 @@ final class LegacyTokenHelper {
         if (string.equals(TYPE_BOOLEAN)) {
             bundle.putBoolean(str, jSONObject.getBoolean("value"));
         } else if (string.equals(TYPE_BOOLEAN_ARRAY)) {
-            r1 = jSONObject.getJSONArray("value");
-            boolean[] zArr = new boolean[r1.length()];
+            JSONArray jSONArray = jSONObject.getJSONArray("value");
+            boolean[] zArr = new boolean[jSONArray.length()];
             while (i < zArr.length) {
-                zArr[i] = r1.getBoolean(i);
+                zArr[i] = jSONArray.getBoolean(i);
                 i++;
             }
             bundle.putBooleanArray(str, zArr);
         } else if (string.equals(TYPE_BYTE)) {
             bundle.putByte(str, (byte) jSONObject.getInt("value"));
         } else if (string.equals(TYPE_BYTE_ARRAY)) {
-            r1 = jSONObject.getJSONArray("value");
-            byte[] bArr = new byte[r1.length()];
+            JSONArray jSONArray2 = jSONObject.getJSONArray("value");
+            byte[] bArr = new byte[jSONArray2.length()];
             while (i < bArr.length) {
-                bArr[i] = (byte) ((byte) r1.getInt(i));
+                bArr[i] = (byte) ((byte) jSONArray2.getInt(i));
                 i++;
             }
             bundle.putByteArray(str, bArr);
         } else if (string.equals(TYPE_SHORT)) {
             bundle.putShort(str, (short) jSONObject.getInt("value"));
         } else if (string.equals(TYPE_SHORT_ARRAY)) {
-            r1 = jSONObject.getJSONArray("value");
-            short[] sArr = new short[r1.length()];
+            JSONArray jSONArray3 = jSONObject.getJSONArray("value");
+            short[] sArr = new short[jSONArray3.length()];
             while (i < sArr.length) {
-                sArr[i] = (short) ((short) r1.getInt(i));
+                sArr[i] = (short) ((short) jSONArray3.getInt(i));
                 i++;
             }
             bundle.putShortArray(str, sArr);
         } else if (string.equals(TYPE_INTEGER)) {
             bundle.putInt(str, jSONObject.getInt("value"));
         } else if (string.equals(TYPE_INTEGER_ARRAY)) {
-            r1 = jSONObject.getJSONArray("value");
-            int[] iArr = new int[r1.length()];
+            JSONArray jSONArray4 = jSONObject.getJSONArray("value");
+            int[] iArr = new int[jSONArray4.length()];
             while (i < iArr.length) {
-                iArr[i] = r1.getInt(i);
+                iArr[i] = jSONArray4.getInt(i);
                 i++;
             }
             bundle.putIntArray(str, iArr);
         } else if (string.equals(TYPE_LONG)) {
             bundle.putLong(str, jSONObject.getLong("value"));
         } else if (string.equals(TYPE_LONG_ARRAY)) {
-            r1 = jSONObject.getJSONArray("value");
-            long[] jArr = new long[r1.length()];
+            JSONArray jSONArray5 = jSONObject.getJSONArray("value");
+            long[] jArr = new long[jSONArray5.length()];
             while (i < jArr.length) {
-                jArr[i] = r1.getLong(i);
+                jArr[i] = jSONArray5.getLong(i);
                 i++;
             }
             bundle.putLongArray(str, jArr);
         } else if (string.equals(TYPE_FLOAT)) {
             bundle.putFloat(str, (float) jSONObject.getDouble("value"));
         } else if (string.equals(TYPE_FLOAT_ARRAY)) {
-            r1 = jSONObject.getJSONArray("value");
-            float[] fArr = new float[r1.length()];
+            JSONArray jSONArray6 = jSONObject.getJSONArray("value");
+            float[] fArr = new float[jSONArray6.length()];
             while (i < fArr.length) {
-                fArr[i] = (float) r1.getDouble(i);
+                fArr[i] = (float) jSONArray6.getDouble(i);
                 i++;
             }
             bundle.putFloatArray(str, fArr);
         } else if (string.equals(TYPE_DOUBLE)) {
             bundle.putDouble(str, jSONObject.getDouble("value"));
         } else if (string.equals(TYPE_DOUBLE_ARRAY)) {
-            r1 = jSONObject.getJSONArray("value");
-            double[] dArr = new double[r1.length()];
+            JSONArray jSONArray7 = jSONObject.getJSONArray("value");
+            double[] dArr = new double[jSONArray7.length()];
             while (i < dArr.length) {
-                dArr[i] = r1.getDouble(i);
+                dArr[i] = jSONArray7.getDouble(i);
                 i++;
             }
             bundle.putDoubleArray(str, dArr);
@@ -151,36 +151,30 @@ final class LegacyTokenHelper {
                 bundle.putChar(str, string2.charAt(0));
             }
         } else if (string.equals(TYPE_CHAR_ARRAY)) {
-            r2 = jSONObject.getJSONArray("value");
-            char[] cArr = new char[r2.length()];
-            for (r1 = 0; r1 < cArr.length; r1++) {
-                String string3 = r2.getString(r1);
+            JSONArray jSONArray8 = jSONObject.getJSONArray("value");
+            char[] cArr = new char[jSONArray8.length()];
+            for (int i2 = 0; i2 < cArr.length; i2++) {
+                String string3 = jSONArray8.getString(i2);
                 if (string3 != null && string3.length() == 1) {
-                    cArr[r1] = string3.charAt(0);
+                    cArr[i2] = string3.charAt(0);
                 }
             }
             bundle.putCharArray(str, cArr);
         } else if (string.equals(TYPE_STRING)) {
             bundle.putString(str, jSONObject.getString("value"));
         } else if (string.equals(TYPE_STRING_LIST)) {
-            r2 = jSONObject.getJSONArray("value");
-            int length = r2.length();
+            JSONArray jSONArray9 = jSONObject.getJSONArray("value");
+            int length = jSONArray9.length();
             ArrayList arrayList = new ArrayList(length);
-            for (r1 = 0; r1 < length; r1++) {
-                Object obj = r2.get(r1);
-                if (obj == JSONObject.NULL) {
-                    obj = null;
-                } else {
-                    String str2 = (String) obj;
-                }
-                arrayList.add(r1, obj);
+            for (int i3 = 0; i3 < length; i3++) {
+                Object obj = jSONArray9.get(i3);
+                arrayList.add(i3, obj == JSONObject.NULL ? null : (String) obj);
             }
             bundle.putStringArrayList(str, arrayList);
         } else if (string.equals(TYPE_ENUM)) {
             try {
                 bundle.putSerializable(str, Enum.valueOf(Class.forName(jSONObject.getString(JSON_VALUE_ENUM_TYPE)), jSONObject.getString("value")));
-            } catch (ClassNotFoundException e) {
-            } catch (IllegalArgumentException e2) {
+            } catch (ClassNotFoundException | IllegalArgumentException e) {
             }
         }
     }
@@ -195,7 +189,10 @@ final class LegacyTokenHelper {
             return null;
         }
         long j = bundle.getLong(str, INVALID_BUNDLE_MILLISECONDS);
-        return j != INVALID_BUNDLE_MILLISECONDS ? new Date(j) : null;
+        if (j != INVALID_BUNDLE_MILLISECONDS) {
+            return new Date(j);
+        }
+        return null;
     }
 
     public static Date getExpirationDate(Bundle bundle) {
@@ -220,8 +217,11 @@ final class LegacyTokenHelper {
 
     public static Set<String> getPermissions(Bundle bundle) {
         Validate.notNull(bundle, "bundle");
-        Collection stringArrayList = bundle.getStringArrayList(PERMISSIONS_KEY);
-        return stringArrayList == null ? null : new HashSet(stringArrayList);
+        ArrayList stringArrayList = bundle.getStringArrayList(PERMISSIONS_KEY);
+        if (stringArrayList == null) {
+            return null;
+        }
+        return new HashSet(stringArrayList);
     }
 
     public static AccessTokenSource getSource(Bundle bundle) {
@@ -297,147 +297,139 @@ final class LegacyTokenHelper {
     }
 
     private void serializeKey(String str, Bundle bundle, Editor editor) throws JSONException {
-        Object obj = null;
+        String str2;
+        JSONArray jSONArray;
+        String str3;
         int i = 0;
-        Object obj2 = bundle.get(str);
-        if (obj2 != null) {
+        Object obj = bundle.get(str);
+        if (obj != null) {
             JSONObject jSONObject = new JSONObject();
-            String str2;
-            if (obj2 instanceof Byte) {
-                str2 = TYPE_BYTE;
-                jSONObject.put("value", ((Byte) obj2).intValue());
-                obj2 = null;
-                obj = str2;
-            } else if (obj2 instanceof Short) {
-                str2 = TYPE_SHORT;
-                jSONObject.put("value", ((Short) obj2).intValue());
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof Integer) {
-                str2 = TYPE_INTEGER;
-                jSONObject.put("value", ((Integer) obj2).intValue());
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof Long) {
-                str2 = TYPE_LONG;
-                jSONObject.put("value", ((Long) obj2).longValue());
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof Float) {
-                str2 = TYPE_FLOAT;
-                jSONObject.put("value", ((Float) obj2).doubleValue());
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof Double) {
-                str2 = TYPE_DOUBLE;
-                jSONObject.put("value", ((Double) obj2).doubleValue());
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof Boolean) {
-                str2 = TYPE_BOOLEAN;
-                jSONObject.put("value", ((Boolean) obj2).booleanValue());
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof Character) {
-                str2 = TYPE_CHAR;
-                jSONObject.put("value", obj2.toString());
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof String) {
-                str2 = TYPE_STRING;
-                jSONObject.put("value", (String) obj2);
-                obj2 = null;
-                r2 = str2;
-            } else if (obj2 instanceof Enum) {
-                str2 = TYPE_ENUM;
-                jSONObject.put("value", obj2.toString());
-                jSONObject.put(JSON_VALUE_ENUM_TYPE, obj2.getClass().getName());
-                obj2 = null;
-                r2 = str2;
+            if (obj instanceof Byte) {
+                str3 = TYPE_BYTE;
+                jSONObject.put("value", ((Byte) obj).intValue());
+                jSONArray = null;
+            } else if (obj instanceof Short) {
+                str3 = TYPE_SHORT;
+                jSONObject.put("value", ((Short) obj).intValue());
+                jSONArray = null;
+            } else if (obj instanceof Integer) {
+                str3 = TYPE_INTEGER;
+                jSONObject.put("value", ((Integer) obj).intValue());
+                jSONArray = null;
+            } else if (obj instanceof Long) {
+                str3 = TYPE_LONG;
+                jSONObject.put("value", ((Long) obj).longValue());
+                jSONArray = null;
+            } else if (obj instanceof Float) {
+                str3 = TYPE_FLOAT;
+                jSONObject.put("value", ((Float) obj).doubleValue());
+                jSONArray = null;
+            } else if (obj instanceof Double) {
+                str3 = TYPE_DOUBLE;
+                jSONObject.put("value", ((Double) obj).doubleValue());
+                jSONArray = null;
+            } else if (obj instanceof Boolean) {
+                str3 = TYPE_BOOLEAN;
+                jSONObject.put("value", ((Boolean) obj).booleanValue());
+                jSONArray = null;
+            } else if (obj instanceof Character) {
+                str3 = TYPE_CHAR;
+                jSONObject.put("value", obj.toString());
+                jSONArray = null;
+            } else if (obj instanceof String) {
+                str3 = TYPE_STRING;
+                jSONObject.put("value", (String) obj);
+                jSONArray = null;
+            } else if (obj instanceof Enum) {
+                str3 = TYPE_ENUM;
+                jSONObject.put("value", obj.toString());
+                jSONObject.put(JSON_VALUE_ENUM_TYPE, obj.getClass().getName());
+                jSONArray = null;
             } else {
-                JSONArray jSONArray = new JSONArray();
-                int length;
-                if (obj2 instanceof byte[]) {
-                    obj = TYPE_BYTE_ARRAY;
-                    byte[] bArr = (byte[]) obj2;
-                    length = bArr.length;
+                JSONArray jSONArray2 = new JSONArray();
+                if (obj instanceof byte[]) {
+                    str2 = TYPE_BYTE_ARRAY;
+                    byte[] bArr = (byte[]) obj;
+                    int length = bArr.length;
                     while (i < length) {
-                        jSONArray.put(bArr[i]);
+                        jSONArray2.put(bArr[i]);
                         i++;
                     }
-                } else if (obj2 instanceof short[]) {
-                    obj = TYPE_SHORT_ARRAY;
-                    short[] sArr = (short[]) obj2;
-                    length = sArr.length;
-                    while (i < length) {
-                        jSONArray.put(sArr[i]);
+                } else if (obj instanceof short[]) {
+                    str2 = TYPE_SHORT_ARRAY;
+                    short[] sArr = (short[]) obj;
+                    int length2 = sArr.length;
+                    while (i < length2) {
+                        jSONArray2.put(sArr[i]);
                         i++;
                     }
-                } else if (obj2 instanceof int[]) {
-                    obj = TYPE_INTEGER_ARRAY;
-                    int[] iArr = (int[]) obj2;
-                    length = iArr.length;
-                    while (i < length) {
-                        jSONArray.put(iArr[i]);
+                } else if (obj instanceof int[]) {
+                    str2 = TYPE_INTEGER_ARRAY;
+                    int[] iArr = (int[]) obj;
+                    int length3 = iArr.length;
+                    while (i < length3) {
+                        jSONArray2.put(iArr[i]);
                         i++;
                     }
-                } else if (obj2 instanceof long[]) {
-                    obj = TYPE_LONG_ARRAY;
-                    long[] jArr = (long[]) obj2;
-                    length = jArr.length;
-                    while (i < length) {
-                        jSONArray.put(jArr[i]);
+                } else if (obj instanceof long[]) {
+                    str2 = TYPE_LONG_ARRAY;
+                    long[] jArr = (long[]) obj;
+                    int length4 = jArr.length;
+                    while (i < length4) {
+                        jSONArray2.put(jArr[i]);
                         i++;
                     }
-                } else if (obj2 instanceof float[]) {
-                    obj = TYPE_FLOAT_ARRAY;
-                    float[] fArr = (float[]) obj2;
-                    length = fArr.length;
-                    while (i < length) {
-                        jSONArray.put((double) fArr[i]);
+                } else if (obj instanceof float[]) {
+                    str2 = TYPE_FLOAT_ARRAY;
+                    float[] fArr = (float[]) obj;
+                    int length5 = fArr.length;
+                    while (i < length5) {
+                        jSONArray2.put((double) fArr[i]);
                         i++;
                     }
-                } else if (obj2 instanceof double[]) {
-                    obj = TYPE_DOUBLE_ARRAY;
-                    double[] dArr = (double[]) obj2;
-                    length = dArr.length;
-                    while (i < length) {
-                        jSONArray.put(dArr[i]);
+                } else if (obj instanceof double[]) {
+                    str2 = TYPE_DOUBLE_ARRAY;
+                    double[] dArr = (double[]) obj;
+                    int length6 = dArr.length;
+                    while (i < length6) {
+                        jSONArray2.put(dArr[i]);
                         i++;
                     }
-                } else if (obj2 instanceof boolean[]) {
-                    obj = TYPE_BOOLEAN_ARRAY;
-                    boolean[] zArr = (boolean[]) obj2;
-                    length = zArr.length;
-                    while (i < length) {
-                        jSONArray.put(zArr[i]);
+                } else if (obj instanceof boolean[]) {
+                    str2 = TYPE_BOOLEAN_ARRAY;
+                    boolean[] zArr = (boolean[]) obj;
+                    int length7 = zArr.length;
+                    while (i < length7) {
+                        jSONArray2.put(zArr[i]);
                         i++;
                     }
-                } else if (obj2 instanceof char[]) {
-                    obj = TYPE_CHAR_ARRAY;
-                    char[] cArr = (char[]) obj2;
-                    length = cArr.length;
-                    while (i < length) {
-                        jSONArray.put(String.valueOf(cArr[i]));
+                } else if (obj instanceof char[]) {
+                    str2 = TYPE_CHAR_ARRAY;
+                    char[] cArr = (char[]) obj;
+                    int length8 = cArr.length;
+                    while (i < length8) {
+                        jSONArray2.put(String.valueOf(cArr[i]));
                         i++;
                     }
-                } else if (obj2 instanceof List) {
-                    obj = TYPE_STRING_LIST;
-                    for (Object obj22 : (List) obj22) {
-                        if (obj22 == null) {
-                            obj22 = JSONObject.NULL;
+                } else if (obj instanceof List) {
+                    str2 = TYPE_STRING_LIST;
+                    for (Object obj2 : (List) obj) {
+                        if (obj2 == null) {
+                            obj2 = JSONObject.NULL;
                         }
-                        jSONArray.put(obj22);
+                        jSONArray2.put(obj2);
                     }
                 } else {
-                    obj22 = null;
+                    jSONArray = null;
+                    str3 = null;
                 }
-                JSONArray jSONArray2 = jSONArray;
+                jSONArray = jSONArray2;
+                str3 = str2;
             }
-            if (obj != null) {
-                jSONObject.put(JSON_VALUE_TYPE, obj);
-                if (obj22 != null) {
-                    jSONObject.putOpt("value", obj22);
+            if (str3 != null) {
+                jSONObject.put(JSON_VALUE_TYPE, str3);
+                if (jSONArray != null) {
+                    jSONObject.putOpt("value", jSONArray);
                 }
                 editor.putString(str, jSONObject.toString());
             }

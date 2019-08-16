@@ -2,12 +2,12 @@ package com.google.android.gms.nearby.messages;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzg implements Creator<Strategy> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         boolean z = false;
-        int zzd = zzb.zzd(parcel);
         int i = 0;
         int i2 = 0;
         int i3 = 0;
@@ -15,39 +15,39 @@ public final class zzg implements Creator<Strategy> {
         int i5 = 0;
         int i6 = 0;
         int i7 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i2 = zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    i3 = zzb.zzg(parcel, readInt);
+                    i3 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    i4 = zzb.zzg(parcel, readInt);
+                    i4 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 4:
-                    z = zzb.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 5:
-                    i5 = zzb.zzg(parcel, readInt);
+                    i5 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 6:
-                    i6 = zzb.zzg(parcel, readInt);
+                    i6 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 7:
-                    i7 = zzb.zzg(parcel, readInt);
+                    i7 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 1000:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new Strategy(i, i2, i3, i4, z, i5, i6, i7);
     }
 

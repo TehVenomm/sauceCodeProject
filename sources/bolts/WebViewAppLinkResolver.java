@@ -7,7 +7,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import bolts.AppLink.Target;
 import com.facebook.appevents.AppEventsConstants;
-import com.google.android.gms.nearby.messages.Strategy;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,10 +38,11 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
     private static final String META_TAG_PREFIX = "al";
     private static final String PREFER_HEADER = "Prefer-Html-Meta-Tags";
     private static final String TAG_EXTRACTION_JAVASCRIPT = "javascript:boltsWebViewAppLinkResolverResult.setValue((function() {  var metaTags = document.getElementsByTagName('meta');  var results = [];  for (var i = 0; i < metaTags.length; i++) {    var property = metaTags[i].getAttribute('property');    if (property && property.substring(0, 'al:'.length) === 'al:') {      var tag = { \"property\": metaTags[i].getAttribute('property') };      if (metaTags[i].hasAttribute('content')) {        tag['content'] = metaTags[i].getAttribute('content');      }      results.push(tag);    }  }  return JSON.stringify(results);})())";
-    private final Context context;
+    /* access modifiers changed from: private */
+    public final Context context;
 
-    public WebViewAppLinkResolver(Context context) {
-        this.context = context;
+    public WebViewAppLinkResolver(Context context2) {
+        this.context = context2;
     }
 
     private static List<Map<String, Object>> getAlList(Map<String, Object> map, String str) {
@@ -50,19 +50,19 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
         return list == null ? Collections.emptyList() : list;
     }
 
-    private static AppLink makeAppLinkFromAlData(Map<String, Object> map, Uri uri) {
-        Map map2;
+    /* access modifiers changed from: private */
+    public static AppLink makeAppLinkFromAlData(Map<String, Object> map, Uri uri) {
         Uri uri2;
-        List arrayList = new ArrayList();
-        List list = (List) map.get("android");
+        ArrayList arrayList = new ArrayList();
+        List<Map> list = (List) map.get("android");
         if (list == null) {
             list = Collections.emptyList();
         }
-        for (Map map22 : r0) {
-            List alList = getAlList(map22, "url");
-            List alList2 = getAlList(map22, KEY_PACKAGE);
-            List alList3 = getAlList(map22, KEY_CLASS);
-            List alList4 = getAlList(map22, "app_name");
+        for (Map map2 : list) {
+            List alList = getAlList(map2, "url");
+            List alList2 = getAlList(map2, KEY_PACKAGE);
+            List alList3 = getAlList(map2, KEY_CLASS);
+            List alList4 = getAlList(map2, "app_name");
             int max = Math.max(alList.size(), Math.max(alList2.size(), Math.max(alList3.size(), alList4.size())));
             int i = 0;
             while (i < max) {
@@ -70,28 +70,30 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
                 i++;
             }
         }
-        list = (List) map.get("web");
-        if (list == null || list.size() <= 0) {
+        List list2 = (List) map.get("web");
+        if (list2 == null || list2.size() <= 0) {
             uri2 = uri;
         } else {
-            map22 = (Map) list.get(0);
-            List list2 = (List) map22.get("url");
-            list = (List) map22.get(KEY_SHOULD_FALLBACK);
-            if (list != null && list.size() > 0) {
-                if (Arrays.asList(new String[]{"no", "false", AppEventsConstants.EVENT_PARAM_VALUE_NO}).contains(((String) ((Map) list.get(0)).get("value")).toLowerCase())) {
+            Map map3 = (Map) list2.get(0);
+            List list3 = (List) map3.get("url");
+            List list4 = (List) map3.get(KEY_SHOULD_FALLBACK);
+            if (list4 != null && list4.size() > 0) {
+                if (Arrays.asList(new String[]{"no", "false", AppEventsConstants.EVENT_PARAM_VALUE_NO}).contains(((String) ((Map) list4.get(0)).get("value")).toLowerCase())) {
                     uri2 = null;
-                    if (!(uri2 == null || list2 == null || list2.size() <= 0)) {
-                        uri2 = tryCreateUrl((String) ((Map) list2.get(0)).get("value"));
+                    if (!(uri2 == null || list3 == null || list3.size() <= 0)) {
+                        uri2 = tryCreateUrl((String) ((Map) list3.get(0)).get("value"));
                     }
                 }
             }
             uri2 = uri;
-            uri2 = tryCreateUrl((String) ((Map) list2.get(0)).get("value"));
+            uri2 = tryCreateUrl((String) ((Map) list3.get(0)).get("value"));
         }
         return new AppLink(uri, arrayList, uri2);
     }
 
-    private static Map<String, Object> parseAlData(JSONArray jSONArray) throws JSONException {
+    /* access modifiers changed from: private */
+    public static Map<String, Object> parseAlData(JSONArray jSONArray) throws JSONException {
+        List list;
         Map hashMap = new HashMap();
         for (int i = 0; i < jSONArray.length(); i++) {
             JSONObject jSONObject = jSONArray.getJSONObject(i);
@@ -100,7 +102,6 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
                 Map map = hashMap;
                 int i2 = 1;
                 while (i2 < split.length) {
-                    List list;
                     List list2 = (List) map.get(split[i2]);
                     if (list2 == null) {
                         ArrayList arrayList = new ArrayList();
@@ -129,9 +130,10 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
         return hashMap;
     }
 
-    private static String readFromConnection(URLConnection uRLConnection) throws IOException {
+    /* access modifiers changed from: private */
+    public static String readFromConnection(URLConnection uRLConnection) throws IOException {
         InputStream inputStream;
-        String str = null;
+        String str;
         if (uRLConnection instanceof HttpURLConnection) {
             HttpURLConnection httpURLConnection = (HttpURLConnection) uRLConnection;
             try {
@@ -143,7 +145,6 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
             inputStream = uRLConnection.getInputStream();
         }
         try {
-            String substring;
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] bArr = new byte[1024];
             while (true) {
@@ -155,29 +156,38 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
             }
             String contentEncoding = uRLConnection.getContentEncoding();
             if (contentEncoding == null) {
-                for (String str2 : uRLConnection.getContentType().split(";")) {
-                    str2 = str2.trim();
-                    if (str2.startsWith("charset=")) {
-                        substring = str2.substring("charset=".length());
+                String[] split = uRLConnection.getContentType().split(";");
+                int length = split.length;
+                int i = 0;
+                while (true) {
+                    if (i >= length) {
+                        str = contentEncoding;
                         break;
                     }
+                    String trim = split[i].trim();
+                    if (trim.startsWith("charset=")) {
+                        str = trim.substring("charset=".length());
+                        break;
+                    }
+                    i++;
                 }
-                substring = contentEncoding;
-                if (substring == null) {
-                    substring = "UTF-8";
+                if (str == null) {
+                    str = "UTF-8";
                 }
             } else {
-                substring = contentEncoding;
+                str = contentEncoding;
             }
-            str2 = new String(byteArrayOutputStream.toByteArray(), substring);
-            return str2;
+            return new String(byteArrayOutputStream.toByteArray(), str);
         } finally {
             inputStream.close();
         }
     }
 
     private static Uri tryCreateUrl(String str) {
-        return str == null ? null : Uri.parse(str);
+        if (str == null) {
+            return null;
+        }
+        return Uri.parse(str);
     }
 
     public Task<AppLink> getAppLinkFromUrlInBackground(final Uri uri) {
@@ -185,9 +195,8 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
         final Capture capture2 = new Capture();
         return Task.callInBackground(new Callable<Void>() {
             public Void call() throws Exception {
-                Void voidR = null;
-                URL url = new URL(uri.toString());
                 URLConnection uRLConnection = null;
+                URL url = new URL(uri.toString());
                 while (url != null) {
                     URLConnection openConnection = url.openConnection();
                     if (openConnection instanceof HttpURLConnection) {
@@ -197,14 +206,13 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
                     openConnection.connect();
                     if (openConnection instanceof HttpURLConnection) {
                         HttpURLConnection httpURLConnection = (HttpURLConnection) openConnection;
-                        if (httpURLConnection.getResponseCode() < Strategy.TTL_SECONDS_DEFAULT || httpURLConnection.getResponseCode() >= 400) {
+                        if (httpURLConnection.getResponseCode() < 300 || httpURLConnection.getResponseCode() >= 400) {
                             uRLConnection = openConnection;
                             url = null;
                         } else {
-                            URL url2 = new URL(httpURLConnection.getHeaderField("Location"));
+                            url = new URL(httpURLConnection.getHeaderField("Location"));
                             httpURLConnection.disconnect();
                             uRLConnection = openConnection;
-                            url = url2;
                         }
                     } else {
                         uRLConnection = openConnection;
@@ -214,53 +222,45 @@ public class WebViewAppLinkResolver implements AppLinkResolver {
                 try {
                     capture.set(WebViewAppLinkResolver.readFromConnection(uRLConnection));
                     capture2.set(uRLConnection.getContentType());
-                    return voidR;
+                    return null;
                 } finally {
-                    voidR = uRLConnection instanceof HttpURLConnection;
-                    if (voidR != null) {
+                    if (uRLConnection instanceof HttpURLConnection) {
                         ((HttpURLConnection) uRLConnection).disconnect();
                     }
                 }
             }
-        }).onSuccessTask(new Continuation<Void, Task<JSONArray>>() {
-
-            /* renamed from: bolts.WebViewAppLinkResolver$2$1 */
-            class C01811 extends WebViewClient {
-                private boolean loaded = false;
-
-                C01811() {
-                }
-
-                private void runJavaScript(WebView webView) {
-                    if (!this.loaded) {
-                        this.loaded = true;
-                        webView.loadUrl(WebViewAppLinkResolver.TAG_EXTRACTION_JAVASCRIPT);
-                    }
-                }
-
-                public void onLoadResource(WebView webView, String str) {
-                    super.onLoadResource(webView, str);
-                    runJavaScript(webView);
-                }
-
-                public void onPageFinished(WebView webView, String str) {
-                    super.onPageFinished(webView, str);
-                    runJavaScript(webView);
-                }
-            }
-
+        }).onSuccessTask((Continuation<TResult, Task<TContinuationResult>>) new Continuation<Void, Task<JSONArray>>() {
             public Task<JSONArray> then(Task<Void> task) throws Exception {
                 final TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
                 WebView webView = new WebView(WebViewAppLinkResolver.this.context);
                 webView.getSettings().setJavaScriptEnabled(true);
                 webView.setNetworkAvailable(false);
-                webView.setWebViewClient(new C01811());
+                webView.setWebViewClient(new WebViewClient() {
+                    private boolean loaded = false;
+
+                    private void runJavaScript(WebView webView) {
+                        if (!this.loaded) {
+                            this.loaded = true;
+                            webView.loadUrl(WebViewAppLinkResolver.TAG_EXTRACTION_JAVASCRIPT);
+                        }
+                    }
+
+                    public void onLoadResource(WebView webView, String str) {
+                        super.onLoadResource(webView, str);
+                        runJavaScript(webView);
+                    }
+
+                    public void onPageFinished(WebView webView, String str) {
+                        super.onPageFinished(webView, str);
+                        runJavaScript(webView);
+                    }
+                });
                 webView.addJavascriptInterface(new Object() {
                     @JavascriptInterface
                     public void setValue(String str) {
                         try {
                             taskCompletionSource.trySetResult(new JSONArray(str));
-                        } catch (Exception e) {
+                        } catch (JSONException e) {
                             taskCompletionSource.trySetError(e);
                         }
                     }

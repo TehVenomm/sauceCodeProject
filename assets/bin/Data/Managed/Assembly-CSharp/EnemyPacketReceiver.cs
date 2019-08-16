@@ -14,12 +14,13 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
 	{
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_040b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0456: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0525: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0570: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0932: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0939: Unknown result type (might be due to invalid IL or missing references)
 		switch (packet.packetType)
 		{
 		case PACKET_TYPE.ENEMY_LOAD_COMPLETE:
@@ -34,32 +35,44 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return false;
 			}
-			Coop_Model_EnemyInitialize model8 = packet.GetModel<Coop_Model_EnemyInitialize>();
-			enemy.ApplySyncPosition(model8.pos, model8.dir, !enemy.isCoopInitialized);
-			enemy.hp = model8.hp;
-			enemy.hpMax = model8.hpMax;
-			enemy.damageHpRate = model8.hpDamageRate;
-			enemy.downTotal = model8.downTotal;
-			enemy.downCount = model8.downCount;
-			enemy.badStatusMax = model8.badStatusMax;
-			enemy.NowAngryID = model8.nowAngryId;
-			enemy.ExecAngryIDList = model8.execAngryIds;
-			enemy.BarrierHp = model8.barrierHp;
-			enemy.isHiding = model8.isHiding;
-			enemy.ShieldHp = model8.shieldHp;
-			enemy.GrabHp = model8.grabHp;
-			enemy.bulletIndex = model8.bulletIndex;
-			enemy.SetupAegis(model8.aegisSetupParam);
-			enemy.regionWorks.ApplyRegionWorks(model8);
+			Coop_Model_EnemyInitialize model16 = packet.GetModel<Coop_Model_EnemyInitialize>();
+			enemy.ApplySyncPosition(model16.pos, model16.dir, !enemy.isCoopInitialized);
+			enemy.hp = model16.hp;
+			enemy.hpMax = model16.hpMax;
+			enemy.damageHpRate = model16.hpDamageRate;
+			enemy.downTotal = model16.downTotal;
+			enemy.downCount = model16.downCount;
+			enemy.concussionTotal = model16.concussionTotal;
+			enemy.concussionMax = model16.concussionMax;
+			enemy.concussionExtend = model16.concussionExtend;
+			enemy.badStatusMax = model16.badStatusMax;
+			enemy.NowAngryID = model16.nowAngryId;
+			enemy.ExecAngryIDList = model16.execAngryIds;
+			enemy.BarrierHp = model16.barrierHp;
+			enemy.isHiding = model16.isHiding;
+			enemy.ShieldHp = model16.shieldHp;
+			enemy.GrabHp = model16.grabHp;
+			enemy.bulletIndex = model16.bulletIndex;
+			enemy.walkSpeedRateFromTable = model16.walkSpeedRateFromTable;
+			enemy.SetupAegis(model16.aegisSetupParam);
+			enemy.changeElementIcon = model16.changeElementIcon;
+			enemy.changeWeakElementIcon = model16.changeWeakElementIcon;
+			enemy.changeToleranceRegionId = model16.changeToleranceRegionId;
+			enemy.changeToleranceScroll = model16.changeToleranceScroll;
+			enemy.ProcessElementToleranceChange(enemy.changeToleranceRegionId, enemy.changeToleranceScroll);
+			enemy.SetBlendColor(model16.shaderSyncParam);
+			enemy.deadReviveCount = model16.deadReviveCount;
+			enemy.isFirstMadMode = model16.isFirstMadMode;
+			enemy.regionWorks.ApplyRegionWorks(model16);
 			enemy.UpdateRegionVisual();
-			StageObject target2 = null;
-			if (model8.target_id >= 0)
+			StageObject target3 = null;
+			if (model16.target_id >= 0)
 			{
-				target2 = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(model8.target_id);
+				target3 = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(model16.target_id);
 			}
-			enemy.SetActionTarget(target2, true);
-			enemy.buffParam.SetSyncParam(model8.buff_sync_param, true);
-			enemy.continusAttackParam.ApplySyncParam(model8.cntAtkSyncParam);
+			enemy.SetActionTarget(target3);
+			enemy.buffParam.SetSyncParam(model16.buff_sync_param);
+			enemy.continusAttackParam.ApplySyncParam(model16.cntAtkSyncParam);
 			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(enemy);
 			enemy.get_gameObject().SetActive(true);
 			SetFilterMode(FILTER_MODE.NONE);
@@ -71,11 +84,15 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			}
 			if (enemy.tailController != null)
 			{
-				enemy.tailController.SetPreviousPositionList(model8.tailPosList);
+				enemy.tailController.SetPreviousPositionList(model16.tailPosList);
 			}
 			if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopStage.bossStartHpDamageRate == 0f)
 			{
 				MonoBehaviourSingleton<CoopManager>.I.coopStage.bossStartHpDamageRate = enemy.damageHpRate;
+			}
+			if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+			{
+				MonoBehaviourSingleton<InGameRecorder>.I.SetEnemyRecoveredHP(enemy.id, model16.recoveredHP);
 			}
 			if (enemy.isHideSpawn)
 			{
@@ -90,20 +107,20 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			}
 			else
 			{
-				enemy.ActIdle(false, -1f);
+				enemy.ActIdle();
 			}
 			break;
 		}
 		case PACKET_TYPE.ENEMY_UPDATE_BLEED_DAMAGE:
 		{
-			Coop_Model_EnemyUpdateBleedDamage model2 = packet.GetModel<Coop_Model_EnemyUpdateBleedDamage>();
-			enemy.OnUpdateBleedDamage(model2.sync_data);
+			Coop_Model_EnemyUpdateBleedDamage model10 = packet.GetModel<Coop_Model_EnemyUpdateBleedDamage>();
+			enemy.OnUpdateBleedDamage(model10.sync_data);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_UPDATE_SHADOWSEALING:
 		{
-			Coop_Model_EnemyUpdateShadowSealing model14 = packet.GetModel<Coop_Model_EnemyUpdateShadowSealing>();
-			enemy.OnUpdateShadowSealing(model14.sync_data);
+			Coop_Model_EnemyUpdateShadowSealing model6 = packet.GetModel<Coop_Model_EnemyUpdateShadowSealing>();
+			enemy.OnUpdateShadowSealing(model6.sync_data);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_STEP:
@@ -112,9 +129,9 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyStep model3 = packet.GetModel<Coop_Model_EnemyStep>();
-			enemy.ApplySyncPosition(model3.pos, model3.dir, false);
-			enemy.ActStep(model3.motion_id);
+			Coop_Model_EnemyStep model11 = packet.GetModel<Coop_Model_EnemyStep>();
+			enemy.ApplySyncPosition(model11.pos, model11.dir);
+			enemy.ActStep(model11.motion_id);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_ANGRY:
@@ -123,16 +140,16 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyAngry model12 = packet.GetModel<Coop_Model_EnemyAngry>();
-			enemy.ApplySyncPosition(model12.pos, model12.dir, false);
-			enemy.ActAngry(model12.angryActionId, model12.angryId);
-			enemy.ExecAngryIDList = model12.execAngryIds;
+			Coop_Model_EnemyAngry model3 = packet.GetModel<Coop_Model_EnemyAngry>();
+			enemy.ApplySyncPosition(model3.pos, model3.dir);
+			enemy.ActAngry(model3.angryActionId, model3.angryId);
+			enemy.ExecAngryIDList = model3.execAngryIds;
 			break;
 		}
 		case PACKET_TYPE.ENEMY_REVIVE_REGION:
 		{
-			Coop_Model_EnemyReviveRegion model9 = packet.GetModel<Coop_Model_EnemyReviveRegion>();
-			enemy.ReviveRegion(model9.region_id);
+			Coop_Model_EnemyReviveRegion model17 = packet.GetModel<Coop_Model_EnemyReviveRegion>();
+			enemy.ReviveRegion(model17.region_id);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_WARP:
@@ -141,8 +158,8 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyWarp model6 = packet.GetModel<Coop_Model_EnemyWarp>();
-			enemy.ApplySyncPosition(model6.pos, model6.dir, true);
+			Coop_Model_EnemyWarp model14 = packet.GetModel<Coop_Model_EnemyWarp>();
+			enemy.ApplySyncPosition(model14.pos, model14.dir, force_sync: true);
 			enemy.SetWarp();
 			break;
 		}
@@ -152,8 +169,8 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyTargetShotEvent model15 = packet.GetModel<Coop_Model_EnemyTargetShotEvent>();
-			enemy.TargetRandamShotEvent(model15.targets);
+			Coop_Model_EnemyTargetShotEvent model8 = packet.GetModel<Coop_Model_EnemyTargetShotEvent>();
+			enemy.TargetRandamShotEvent(model8.targets);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_RANDOMSHOT_EVENT:
@@ -162,8 +179,8 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyRandomShotEvent model11 = packet.GetModel<Coop_Model_EnemyRandomShotEvent>();
-			enemy.PointRandamShotEvent(model11.points);
+			Coop_Model_EnemyRandomShotEvent model2 = packet.GetModel<Coop_Model_EnemyRandomShotEvent>();
+			enemy.PointRandamShotEvent(model2.points);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_RELEASE_GRABBED_PLAYER:
@@ -172,8 +189,8 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyReleasedGrabbedPlayer model7 = packet.GetModel<Coop_Model_EnemyReleasedGrabbedPlayer>();
-			enemy.ActReleaseGrabbedPlayers(false, false, true, model7.angle, model7.power);
+			Coop_Model_EnemyReleasedGrabbedPlayer model15 = packet.GetModel<Coop_Model_EnemyReleasedGrabbedPlayer>();
+			enemy.ActReleaseGrabbedPlayers(isWeakHit: false, isSpWeakhit: false, forceRelease: true, model15.angle, model15.power);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_SHOT:
@@ -182,8 +199,8 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyShot model5 = packet.GetModel<Coop_Model_EnemyShot>();
-			enemy.ActShotBullet(model5.atkName, model5.posList, model5.rotList);
+			Coop_Model_EnemyShot model13 = packet.GetModel<Coop_Model_EnemyShot>();
+			enemy.ActShotBullet(model13.atkName, model13.posList, model13.rotList);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_RECOVER_HP:
@@ -192,8 +209,8 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyRecoverHp model16 = packet.GetModel<Coop_Model_EnemyRecoverHp>();
-			enemy.RecoverHp(model16.value);
+			Coop_Model_EnemyRecoverHp model7 = packet.GetModel<Coop_Model_EnemyRecoverHp>();
+			enemy.RecoverHp(model7.value, isSend: true);
 			break;
 		}
 		case PACKET_TYPE.CREATE_ICE_FLOOR:
@@ -202,8 +219,8 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_CreateIceFloor model13 = packet.GetModel<Coop_Model_CreateIceFloor>();
-			enemy.ActCreateIceFloor(model13.atkName, model13.posList, model13.rotList);
+			Coop_Model_CreateIceFloor model5 = packet.GetModel<Coop_Model_CreateIceFloor>();
+			enemy.ActCreateIceFloor(model5.atkName, model5.posList, model5.rotList);
 			break;
 		}
 		case PACKET_TYPE.ACTION_MINE:
@@ -212,20 +229,20 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_ActionMine model10 = packet.GetModel<Coop_Model_ActionMine>();
-			switch (model10.type)
+			Coop_Model_ActionMine model18 = packet.GetModel<Coop_Model_ActionMine>();
+			switch (model18.type)
 			{
 			case 0:
-				enemy.ActDestroyActionMine(model10.objId, false);
+				enemy.ActDestroyActionMine(model18.objId, isExplode: false);
 				break;
 			case 1:
-				enemy.ActDestroyActionMine(model10.objId, true);
+				enemy.ActDestroyActionMine(model18.objId, isExplode: true);
 				break;
 			case 2:
-				enemy.ActCreateReflectBullet(model10.atkInfoName, model10.nodeName, model10.objId, model10.randSeed);
+				enemy.ActCreateReflectBullet(model18.atkInfoName, model18.nodeName, model18.objId, model18.randSeed);
 				break;
 			case 3:
-				enemy.ActCreateActionMine(model10.atkInfoName, model10.randSeed);
+				enemy.ActCreateActionMine(model18.atkInfoName, model18.randSeed);
 				break;
 			}
 			break;
@@ -243,13 +260,13 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemySyncTarget model4 = packet.GetModel<Coop_Model_EnemySyncTarget>();
-			StageObject target = null;
-			if (model4.targetId >= 0)
+			Coop_Model_EnemySyncTarget model12 = packet.GetModel<Coop_Model_EnemySyncTarget>();
+			StageObject target2 = null;
+			if (model12.targetId >= 0)
 			{
-				target = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(model4.targetId);
+				target2 = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(model12.targetId);
 			}
-			enemy.SetActionTarget(target, true);
+			enemy.SetActionTarget(target2);
 			break;
 		}
 		case PACKET_TYPE.ENEMY_REGION_NODE_ACTIVATE:
@@ -258,8 +275,34 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			{
 				return true;
 			}
-			Coop_Model_EnemyRegionNodeActivate model = packet.GetModel<Coop_Model_EnemyRegionNodeActivate>();
-			enemy.ActivateRegionNode(model.regionIDs, model.isRandom, model.randomSelectedID);
+			Coop_Model_EnemyRegionNodeActivate model9 = packet.GetModel<Coop_Model_EnemyRegionNodeActivate>();
+			enemy.ActivateRegionNode(model9.regionIDs, model9.isRandom, model9.randomSelectedID);
+			break;
+		}
+		case PACKET_TYPE.ENEMY_SUMMON_ATTACK:
+		{
+			if (enemy.isDead)
+			{
+				return true;
+			}
+			Coop_Model_EnemySummonAttack model4 = packet.GetModel<Coop_Model_EnemySummonAttack>();
+			StageObject target = null;
+			if (model4.targetId > 0)
+			{
+				target = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(model4.targetId);
+			}
+			enemy.SetActionTarget(target);
+			enemy.ActSummonAttack(model4.enemyId, model4.attackId, model4.summonPos, model4.summonRot);
+			break;
+		}
+		case PACKET_TYPE.ENEMY_UPDATE_BOMBARROW:
+		{
+			if (enemy.isDead)
+			{
+				return true;
+			}
+			Coop_Model_EnemyUpdateBombArrow model = packet.GetModel<Coop_Model_EnemyUpdateBombArrow>();
+			enemy.OnUpdateBombArrow(model.regionId);
 			break;
 		}
 		default:

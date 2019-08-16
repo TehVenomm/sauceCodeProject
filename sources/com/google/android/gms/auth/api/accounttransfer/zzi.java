@@ -1,18 +1,20 @@
 package com.google.android.gms.auth.api.accounttransfer;
 
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzaru;
-import com.google.android.gms.internal.zzasc;
+import com.google.android.gms.internal.auth.zzah;
+import com.google.android.gms.internal.auth.zzx;
+import com.google.android.gms.internal.auth.zzz;
 
 final class zzi extends zzc {
-    private /* synthetic */ zzasc zzdza;
+    private final /* synthetic */ zzah zzat;
 
-    zzi(AccountTransferClient accountTransferClient, zzasc zzasc) {
-        this.zzdza = zzasc;
-        super();
+    zzi(AccountTransferClient accountTransferClient, zzah zzah) {
+        this.zzat = zzah;
+        super(null);
     }
 
-    protected final void zza(zzaru zzaru) throws RemoteException {
-        zzaru.zza(this.zzdze, this.zzdza);
+    /* access modifiers changed from: protected */
+    public final void zza(zzz zzz) throws RemoteException {
+        zzz.zza((zzx) this.zzax, this.zzat);
     }
 }

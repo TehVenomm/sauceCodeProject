@@ -85,7 +85,7 @@ public class QuestAcceptArenaRoomUserEquipDetail : ItemDetailEquipDialog
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_CHANGE, true);
+		SetActive((Enum)UI.BTN_CHANGE, is_visible: true);
 	}
 
 	protected override void OnQuery_SKILL_ICON_BUTTON()

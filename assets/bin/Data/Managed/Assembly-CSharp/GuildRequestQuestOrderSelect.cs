@@ -60,6 +60,7 @@ public class GuildRequestQuestOrderSelect : QuestOrderSelect
 		OBJ_DIFFICULT_STAR_8,
 		OBJ_DIFFICULT_STAR_9,
 		OBJ_DIFFICULT_STAR_10,
+		TXT_NEED_POINT,
 		OBJ_ICON,
 		OBJ_ICON_NEW,
 		OBJ_ICON_CLEARED,
@@ -95,11 +96,11 @@ public class GuildRequestQuestOrderSelect : QuestOrderSelect
 		base.UpdateUI();
 		if (MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.challengeInfo != null && MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount != null)
 		{
-			SetActive(GetCtrl(UI.OBJ_FRAME), UI.BTN_SHADOW_COUNT, true);
+			SetActive(GetCtrl(UI.OBJ_FRAME), UI.BTN_SHADOW_COUNT, is_visible: true);
 		}
 		else
 		{
-			SetActive(GetCtrl(UI.OBJ_FRAME), UI.BTN_SHADOW_COUNT, false);
+			SetActive(GetCtrl(UI.OBJ_FRAME), UI.BTN_SHADOW_COUNT, is_visible: false);
 		}
 	}
 
@@ -109,17 +110,16 @@ public class GuildRequestQuestOrderSelect : QuestOrderSelect
 		if (num < 0 || num >= questGridDatas.Length)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(questGridDatas[num].questSortData.GetTableID(), true))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(questGridDatas[num].questSortData.GetTableID()))
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
-		{
-			QuestInfoData infoData = questGridDatas[num].questSortData.itemData.infoData;
-			GameSection.SetEventData(infoData);
-			isScrollViewReady = false;
-		}
+		QuestInfoData infoData = questGridDatas[num].questSortData.itemData.infoData;
+		GameSection.SetEventData(infoData);
+		isScrollViewReady = false;
 	}
 
 	public override void OnQuery_SELECT_CHALLENGE()
@@ -128,11 +128,11 @@ public class GuildRequestQuestOrderSelect : QuestOrderSelect
 		{
 			if (!MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsSatisfy())
 			{
-				GameSection.ChangeEvent("NO_SATISFY", null);
+				GameSection.ChangeEvent("NO_SATISFY");
 			}
 			else if (MonoBehaviourSingleton<PartyManager>.I.challengeInfo.num == 0)
 			{
-				GameSection.ChangeEvent("NUM_ZERO", null);
+				GameSection.ChangeEvent("NUM_ZERO");
 			}
 		}
 	}

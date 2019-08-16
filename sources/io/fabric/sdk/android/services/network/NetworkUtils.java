@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.network;
+package p017io.fabric.sdk.android.services.network;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -6,6 +6,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
+/* renamed from: io.fabric.sdk.android.services.network.NetworkUtils */
 public final class NetworkUtils {
     private NetworkUtils() {
     }

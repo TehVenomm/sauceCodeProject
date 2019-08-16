@@ -21,16 +21,6 @@ public class TimedSemaphore {
     private long totalAcquireCount;
     private final TimeUnit unit;
 
-    /* renamed from: org.apache.commons.lang3.concurrent.TimedSemaphore$1 */
-    class C12841 implements Runnable {
-        C12841() {
-        }
-
-        public void run() {
-            TimedSemaphore.this.endOfPeriod();
-        }
-    }
-
     public TimedSemaphore(long j, TimeUnit timeUnit, int i) {
         this(null, j, timeUnit, i);
     }
@@ -43,7 +33,7 @@ public class TimedSemaphore {
             this.executorService = scheduledExecutorService;
             this.ownExecutor = false;
         } else {
-            ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
             scheduledThreadPoolExecutor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
             scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
             this.executorService = scheduledThreadPoolExecutor;
@@ -77,23 +67,22 @@ public class TimedSemaphore {
     }
 
     public synchronized void acquire() throws InterruptedException {
+        boolean z;
         if (isShutdown()) {
             throw new IllegalStateException("TimedSemaphore is shut down!");
         }
         if (this.task == null) {
             this.task = startTimer();
         }
-        Object obj;
         do {
-            obj = (getLimit() <= 0 || this.acquireCount < getLimit()) ? 1 : null;
-            if (obj == null) {
+            z = getLimit() <= 0 || this.acquireCount < getLimit();
+            if (!z) {
                 wait();
                 continue;
             } else {
                 this.acquireCount++;
-                continue;
             }
-        } while (obj == null);
+        } while (!z);
     }
 
     public synchronized int getLastAcquiresPerPeriod() {
@@ -120,15 +109,22 @@ public class TimedSemaphore {
         return this.unit;
     }
 
-    protected ScheduledExecutorService getExecutorService() {
+    /* access modifiers changed from: protected */
+    public ScheduledExecutorService getExecutorService() {
         return this.executorService;
     }
 
-    protected ScheduledFuture<?> startTimer() {
-        return getExecutorService().scheduleAtFixedRate(new C12841(), getPeriod(), getPeriod(), getUnit());
+    /* access modifiers changed from: protected */
+    public ScheduledFuture<?> startTimer() {
+        return getExecutorService().scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                TimedSemaphore.this.endOfPeriod();
+            }
+        }, getPeriod(), getPeriod(), getUnit());
     }
 
-    synchronized void endOfPeriod() {
+    /* access modifiers changed from: 0000 */
+    public synchronized void endOfPeriod() {
         this.lastCallsPerPeriod = this.acquireCount;
         this.totalAcquireCount += (long) this.acquireCount;
         this.periodCount++;

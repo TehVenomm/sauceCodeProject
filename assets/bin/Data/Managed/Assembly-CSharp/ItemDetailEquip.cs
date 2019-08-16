@@ -162,9 +162,8 @@ public class ItemDetailEquip : SkillInfoBase
 
 	public override void Initialize()
 	{
-		//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
 		gameEventData = (GameSection.GetEventData() as object[]);
-		callSection = (CURRENT_SECTION)(int)gameEventData[0];
+		callSection = (CURRENT_SECTION)gameEventData[0];
 		eventData = gameEventData[1];
 		localEquipSetData = gameEventData.OfType<StatusEquip.LocalEquipSetData>().FirstOrDefault();
 		switch (callSection)
@@ -287,7 +286,7 @@ public class ItemDetailEquip : SkillInfoBase
 	public override void UpdateUI()
 	{
 		SetActive((Enum)UI.OBJ_FRAME_BG, IsShowFrameBG());
-		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailEquipBase", true);
+		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailEquipBase");
 		SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, 2);
 		SetFontStyle(detailBase, UI.STR_TITLE_STATUS, 2);
 		SetFontStyle(detailBase, UI.STR_TITLE_SKILL_SLOT, 2);
@@ -315,7 +314,7 @@ public class ItemDetailEquip : SkillInfoBase
 			SetActive((Enum)UI.SPR_COUNT_2_ON, exceed > 2);
 			SetActive((Enum)UI.SPR_COUNT_3_ON, exceed > 3);
 			EquipParam(equip);
-			SetSkillIconButton(detailBase, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", equip.tableData, equipAttachSkill, "SKILL_ICON_BUTTON", 0);
+			SetSkillIconButton(detailBase, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", equip.tableData, equipAttachSkill);
 			SetSprite((Enum)UI.SPR_SP_ATTACK_TYPE, (!equip.tableData.IsWeapon()) ? string.Empty : equip.tableData.spAttackType.GetBigFrameSpriteName());
 			AbilityItemInfo abilityItem = equip.GetAbilityItem();
 			bool flag = abilityItem != null;
@@ -326,48 +325,46 @@ public class ItemDetailEquip : SkillInfoBase
 				string allAbilityName = string.Empty;
 				string allAp = string.Empty;
 				string allAbilityDesc = string.Empty;
-				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", equip.ability.Length + (flag ? 1 : 0), false, delegate(int i, Transform t, bool is_recycle)
+				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", equip.ability.Length + (flag ? 1 : 0), reset: false, delegate(int i, Transform t, bool is_recycle)
 				{
-					//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0312: Expected O, but got Unknown
 					if (i < equip.ability.Length)
 					{
 						EquipItemAbility equipItemAbility2 = equip.ability[i];
 						if (equipItemAbility2.id == 0)
 						{
-							SetActive(t, false);
+							SetActive(t, is_visible: false);
 						}
 						else
 						{
-							SetActive(t, true);
+							SetActive(t, is_visible: true);
 							if (equipItemAbility2.IsNeedUpdate())
 							{
-								SetActive(t, UI.OBJ_ABILITY, false);
-								SetActive(t, UI.OBJ_FIXEDABILITY, false);
-								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, true);
+								SetActive(t, UI.OBJ_ABILITY, is_visible: false);
+								SetActive(t, UI.OBJ_FIXEDABILITY, is_visible: false);
+								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, is_visible: true);
 								SetLabelText(t, UI.LBL_NEED_UPDATE_ABILITY, StringTable.Get(STRING_CATEGORY.ABILITY, 0u));
-								SetButtonEnabled(t, false);
+								SetButtonEnabled(t, is_enabled: false);
 							}
 							else if (!equipItemAbility2.IsActiveAbility())
 							{
-								SetActive(t, UI.OBJ_ABILITY, false);
-								SetActive(t, UI.OBJ_FIXEDABILITY, false);
-								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, true);
+								SetActive(t, UI.OBJ_ABILITY, is_visible: false);
+								SetActive(t, UI.OBJ_FIXEDABILITY, is_visible: false);
+								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, is_visible: true);
 								SetLabelText(t, UI.LBL_NEED_UPDATE_ABILITY, StringTable.Get(STRING_CATEGORY.ABILITY, 1u));
-								SetButtonEnabled(t, false);
+								SetButtonEnabled(t, is_enabled: false);
 							}
 							else if (equip.IsFixedAbility(i))
 							{
-								SetActive(t, UI.OBJ_ABILITY, false);
-								SetActive(t, UI.OBJ_FIXEDABILITY, true);
-								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, false);
+								SetActive(t, UI.OBJ_ABILITY, is_visible: false);
+								SetActive(t, UI.OBJ_FIXEDABILITY, is_visible: true);
+								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, is_visible: false);
 								SetLabelText(t, UI.LBL_FIXEDABILITY, Utility.TrimText(equipItemAbility2.GetName(), FindCtrl(t, UI.LBL_FIXEDABILITY).GetComponent<UILabel>()));
 								SetLabelText(t, UI.LBL_FIXEDABILITY_NUM, equipItemAbility2.GetAP());
 							}
 							else
 							{
 								empty_ability = false;
-								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, false);
+								SetActive(t, UI.OBJ_NEED_UPDATE_ABILITY, is_visible: false);
 								SetLabelText(t, UI.LBL_ABILITY, Utility.TrimText(equipItemAbility2.GetName(), FindCtrl(t, UI.LBL_ABILITY).GetComponent<UILabel>()));
 								SetLabelText(t, UI.LBL_ABILITY_NUM, equipItemAbility2.GetAP());
 							}
@@ -379,8 +376,8 @@ public class ItemDetailEquip : SkillInfoBase
 					}
 					else
 					{
-						SetActive(t, UI.OBJ_ABILITY, false);
-						SetActive(t, UI.OBJ_ABILITY_ITEM, true);
+						SetActive(t, UI.OBJ_ABILITY, is_visible: false);
+						SetActive(t, UI.OBJ_ABILITY_ITEM, is_visible: true);
 						SetLabelText(t, UI.LBL_ABILITY_ITEM, abilityItem.GetName());
 						SetTouchAndRelease(t.GetComponentInChildren<UIButton>().get_transform(), "ABILITY_ITEM_DATA_POPUP", "RELEASE_ABILITY", t);
 						allAbilityName += abilityItem.GetName();
@@ -391,50 +388,59 @@ public class ItemDetailEquip : SkillInfoBase
 				if (empty_ability)
 				{
 					SetActive(detailBase, UI.STR_NON_ABILITY, 0 == validAbilityLength);
-					SetActive((Enum)UI.BTN_ABILITY, false);
+					SetActive((Enum)UI.BTN_ABILITY, is_visible: false);
 					SetActive((Enum)UI.BTN_ABILITY_OFF, CanSmithSection(callSection));
 				}
 				else
 				{
-					SetActive(detailBase, UI.STR_NON_ABILITY, false);
-					SetActive((Enum)UI.BTN_ABILITY_OFF, false);
+					SetActive(detailBase, UI.STR_NON_ABILITY, is_visible: false);
+					SetActive((Enum)UI.BTN_ABILITY_OFF, is_visible: false);
 				}
 				if (equip.tableData.IsShadow())
 				{
-					SetActive(detailBase, UI.STR_NON_ABILITY, false);
+					SetActive(detailBase, UI.STR_NON_ABILITY, is_visible: false);
 					SetActive((Enum)UI.BTN_ABILITY, CanSmithSection(callSection));
 					SetActive((Enum)UI.BTN_ABILITY_OFF, CanSmithSection(callSection));
 				}
 			}
 			else
 			{
-				SetActive(detailBase, UI.STR_NON_ABILITY, true);
-				SetActive((Enum)UI.BTN_ABILITY, false);
+				SetActive(detailBase, UI.STR_NON_ABILITY, is_visible: true);
+				SetActive((Enum)UI.BTN_ABILITY, is_visible: false);
 				SetActive((Enum)UI.BTN_ABILITY_OFF, CanSmithSection(callSection));
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_COUNT_0_ON, false);
-			SetActive((Enum)UI.SPR_COUNT_1_ON, false);
-			SetActive((Enum)UI.SPR_COUNT_2_ON, false);
-			SetActive((Enum)UI.SPR_COUNT_3_ON, false);
+			SetActive((Enum)UI.SPR_COUNT_0_ON, is_visible: false);
+			SetActive((Enum)UI.SPR_COUNT_1_ON, is_visible: false);
+			SetActive((Enum)UI.SPR_COUNT_2_ON, is_visible: false);
+			SetActive((Enum)UI.SPR_COUNT_3_ON, is_visible: false);
 			EquipItemTable.EquipItemData table = detailItemData as EquipItemTable.EquipItemData;
 			SetActive((Enum)UI.BTN_EXCEED, table.exceedID != 0);
 			EquipTableParam(table);
-			SetSkillIconButton(detailBase, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", table, equipAttachSkill, "SKILL_ICON_BUTTON", 0);
+			EquipItemTable.EquipItemData equipItemData = detailItemData as EquipItemTable.EquipItemData;
+			if (equipItemData.id == 81160110 || equipItemData.id == 82160110 || equipItemData.id == 83160110 || equipItemData.id == 84160110 || equipItemData.id == 21160111 || equipItemData.id == 22160111 || equipItemData.id == 23160111 || equipItemData.id == 24160111)
+			{
+				SkillSlotUIData[] skillSlotData = GetSkillSlotData(detailItemData as EquipItemTable.EquipItemData, 0);
+				SetSkillIconButton(detailBase, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", table, skillSlotData);
+			}
+			else
+			{
+				SetSkillIconButton(detailBase, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", table, equipAttachSkill);
+			}
 			SetSprite((Enum)UI.SPR_SP_ATTACK_TYPE, (!table.IsWeapon()) ? string.Empty : table.spAttackType.GetBigFrameSpriteName());
 			if (table.fixedAbility.Length > 0)
 			{
 				string allAbilityName2 = string.Empty;
 				string allAp2 = string.Empty;
 				string allAbilityDesc2 = string.Empty;
-				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table.fixedAbility.Length, false, delegate(int i, Transform t, bool is_recycle)
+				SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table.fixedAbility.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 				{
 					EquipItemAbility equipItemAbility = new EquipItemAbility((uint)table.fixedAbility[i].id, table.fixedAbility[i].pt);
-					SetActive(t, true);
-					SetActive(t, UI.OBJ_ABILITY, false);
-					SetActive(t, UI.OBJ_FIXEDABILITY, true);
+					SetActive(t, is_visible: true);
+					SetActive(t, UI.OBJ_ABILITY, is_visible: false);
+					SetActive(t, UI.OBJ_FIXEDABILITY, is_visible: true);
 					SetLabelText(t, UI.LBL_FIXEDABILITY, Utility.TrimText(equipItemAbility.GetName(), FindCtrl(t, UI.LBL_FIXEDABILITY).GetComponent<UILabel>()));
 					SetLabelText(t, UI.LBL_FIXEDABILITY_NUM, equipItemAbility.GetAP());
 					SetAbilityItemEvent(t, i, touchAndReleaseButtons);
@@ -443,11 +449,11 @@ public class ItemDetailEquip : SkillInfoBase
 					allAbilityDesc2 += equipItemAbility.GetDescription();
 				});
 				PreCacheAbilityDetail(allAbilityName2, allAp2, allAbilityDesc2);
-				SetActive(detailBase, UI.STR_NON_ABILITY, false);
+				SetActive(detailBase, UI.STR_NON_ABILITY, is_visible: false);
 			}
 			else
 			{
-				SetActive(detailBase, UI.STR_NON_ABILITY, true);
+				SetActive(detailBase, UI.STR_NON_ABILITY, is_visible: true);
 			}
 		}
 	}
@@ -480,8 +486,8 @@ public class ItemDetailEquip : SkillInfoBase
 			SetActive(detailBase, UI.SPR_IS_EVOLVE, item.tableData.IsEvolve());
 			SetEquipmentTypeIcon(detailBase, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, item.tableData);
 			SetRenderEquipModel((Enum)UI.TEX_MODEL, equipItemData.id, sex, faceID, 1f);
-			ResetTween(detailBase, UI.TWN_FAVORITE, 0);
-			ResetTween(detailBase, UI.TWN_UNFAVORITE, 0);
+			ResetTween(detailBase, UI.TWN_FAVORITE);
+			ResetTween(detailBase, UI.TWN_UNFAVORITE);
 			SetActive(detailBase, UI.TWN_UNFAVORITE, !item.isFavorite);
 			SetActive(detailBase, UI.TWN_FAVORITE, item.isFavorite);
 			bool flag2 = !item.IsLevelMax() || !item.IsExceedMax() || item.tableData.IsEvolve() || item.tableData.IsShadow();
@@ -511,13 +517,13 @@ public class ItemDetailEquip : SkillInfoBase
 			SetLabelText(detailBase, UI.LBL_LV_MAX, table_data.maxLv.ToString());
 			SetLabelText(detailBase, UI.LBL_ATK, num.ToString());
 			SetLabelText(detailBase, UI.LBL_ELEM, num3.ToString());
-			SetElementSprite(detailBase, UI.SPR_ELEM, table_data.GetElemAtkType(null));
+			SetElementSprite(detailBase, UI.SPR_ELEM, table_data.GetElemAtkType());
 			SetLabelText(detailBase, UI.LBL_DEF, num2.ToString());
 			SetLabelText(detailBase, UI.LBL_ELEM_DEF, num4.ToString());
-			SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, table_data.GetElemDefType(null));
+			SetDefElementSprite(detailBase, UI.SPR_ELEM_DEF, table_data.GetElemDefType());
 			SetLabelText(detailBase, UI.LBL_HP, num5.ToString());
 			SetLabelText(detailBase, UI.LBL_SELL, table_data.sale.ToString());
-			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
+			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
 			SetActive(detailBase, UI.SPR_IS_EVOLVE, table_data.IsEvolve());
 			SetEquipmentTypeIcon(detailBase, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, table_data);
 			SetRenderEquipModel((Enum)UI.TEX_MODEL, table_data.id, sex, faceID, 1f);
@@ -538,10 +544,10 @@ public class ItemDetailEquip : SkillInfoBase
 		SetLabelText(detailBase, UI.LBL_ATK, text);
 		SetLabelText(detailBase, UI.LBL_DEF, text);
 		SetLabelText(detailBase, UI.LBL_ELEM, text);
-		SetActive(detailBase, UI.OBJ_ATK_ROOT, false);
-		SetActive(detailBase, UI.OBJ_DEF_ROOT, false);
-		SetActive(detailBase, UI.OBJ_ELEM_ROOT, false);
-		SetActive(detailBase, UI.SPR_IS_EVOLVE, false);
+		SetActive(detailBase, UI.OBJ_ATK_ROOT, is_visible: false);
+		SetActive(detailBase, UI.OBJ_DEF_ROOT, is_visible: false);
+		SetActive(detailBase, UI.OBJ_ELEM_ROOT, is_visible: false);
+		SetActive(detailBase, UI.SPR_IS_EVOLVE, is_visible: false);
 	}
 
 	protected void OnQuery_SWITCH_FAVORITE()
@@ -566,30 +572,30 @@ public class ItemDetailEquip : SkillInfoBase
 					callback(recv_equip_item);
 					if (recv_equip_item.isFavorite)
 					{
-						SetActive(detailBase, UI.TWN_UNFAVORITE, false);
-						SetActive(detailBase, UI.TWN_FAVORITE, true);
-						ResetTween(detailBase, UI.TWN_FAVORITE, 0);
-						PlayTween(detailBase, UI.TWN_FAVORITE, true, delegate
+						SetActive(detailBase, UI.TWN_UNFAVORITE, is_visible: false);
+						SetActive(detailBase, UI.TWN_FAVORITE, is_visible: true);
+						ResetTween(detailBase, UI.TWN_FAVORITE);
+						PlayTween(detailBase, UI.TWN_FAVORITE, forward: true, delegate
 						{
-							GameSection.ChangeStayEvent("FAVORITE", null);
-							GameSection.ResumeEvent(is_success, null);
-						}, true, 0);
+							GameSection.ChangeStayEvent("FAVORITE");
+							GameSection.ResumeEvent(is_success);
+						});
 					}
 					else
 					{
-						SetActive(detailBase, UI.TWN_FAVORITE, false);
-						SetActive(detailBase, UI.TWN_UNFAVORITE, true);
-						ResetTween(detailBase, UI.TWN_UNFAVORITE, 0);
-						PlayTween(detailBase, UI.TWN_UNFAVORITE, true, delegate
+						SetActive(detailBase, UI.TWN_FAVORITE, is_visible: false);
+						SetActive(detailBase, UI.TWN_UNFAVORITE, is_visible: true);
+						ResetTween(detailBase, UI.TWN_UNFAVORITE);
+						PlayTween(detailBase, UI.TWN_UNFAVORITE, forward: true, delegate
 						{
-							GameSection.ChangeStayEvent("RELEASE_FAVORITE", null);
-							GameSection.ResumeEvent(is_success, null);
-						}, true, 0);
+							GameSection.ChangeStayEvent("RELEASE_FAVORITE");
+							GameSection.ResumeEvent(is_success);
+						});
 					}
 				}
 				else
 				{
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success);
 				}
 			});
 		}
@@ -613,12 +619,10 @@ public class ItemDetailEquip : SkillInfoBase
 			if (equipItemInfo == null || MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(equipItemInfo.uniqueID) == null)
 			{
 				GameSection.StopEvent();
+				break;
 			}
-			else
-			{
-				SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-				smithGrowData.selectEquipData = equipItemInfo;
-			}
+			SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
+			smithGrowData.selectEquipData = equipItemInfo;
 			break;
 		}
 		}
@@ -630,36 +634,38 @@ public class ItemDetailEquip : SkillInfoBase
 		if (equipItemInfo == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		EquipItemSortData equipItemSortData = new EquipItemSortData();
+		equipItemSortData.SetItem(equipItemInfo);
+		if (!equipItemSortData.CanSale())
 		{
-			EquipItemSortData equipItemSortData = new EquipItemSortData();
-			equipItemSortData.SetItem(equipItemInfo);
-			if (!equipItemSortData.CanSale())
+			if (equipItemSortData.IsFavorite())
 			{
-				if (equipItemSortData.IsFavorite())
-				{
-					GameSection.ChangeEvent("NOT_SALE_FAVORITE", null);
-				}
-				else
-				{
-					GameSection.ChangeEvent("NOT_SALE_EQUIPPING", null);
-				}
+				GameSection.ChangeEvent("NOT_SALE_FAVORITE");
 			}
-			else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && equipItemSortData.GetTableID() == 10000000)
+			else if (equipItemSortData.IsHomeEquipping())
 			{
-				GameSection.ChangeEvent("NOT_SELL_DEFAULT_WEAPON", null);
+				GameSection.ChangeEvent("NOT_SALE_EQUIPPING");
 			}
 			else
 			{
-				List<SortCompareData> list = new List<SortCompareData>();
-				list.Add(equipItemSortData);
-				GameSection.ChangeEvent("SELL", new object[2]
-				{
-					ItemStorageTop.TAB_MODE.EQUIP,
-					list
-				});
+				GameSection.ChangeEvent("NOT_SALE_UNIQUE_EQUIPPING");
 			}
+		}
+		else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && equipItemSortData.GetTableID() == 10000000)
+		{
+			GameSection.ChangeEvent("NOT_SELL_DEFAULT_WEAPON");
+		}
+		else
+		{
+			List<SortCompareData> list = new List<SortCompareData>();
+			list.Add(equipItemSortData);
+			GameSection.ChangeEvent("SELL", new object[2]
+			{
+				ItemStorageTop.TAB_MODE.EQUIP,
+				list
+			});
 		}
 	}
 
@@ -700,26 +706,28 @@ public class ItemDetailEquip : SkillInfoBase
 		if (localEquipSetData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		if (StatusManager.IsUnique())
 		{
-			MonoBehaviourSingleton<StatusManager>.I.SetEquippingItem(localEquipSetData.equipSetInfo.item[localEquipSetData.index]);
-			MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = StatusTop.GetInventoryType(localEquipSetData.equipSetInfo, localEquipSetData.index);
-			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA2))
+			GameSection.ChangeEvent("UNIQUE_CHANGE");
+		}
+		MonoBehaviourSingleton<StatusManager>.I.SetEquippingItem(localEquipSetData.equipSetInfo.item[localEquipSetData.index]);
+		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = StatusTop.GetInventoryType(localEquipSetData.equipSetInfo, localEquipSetData.index);
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN))
+		{
+			List<EquipItemInfo> weaponInventory = MonoBehaviourSingleton<InventoryManager>.I.GetWeaponInventory();
+			for (int i = 0; i < weaponInventory.Count; i++)
 			{
-				List<EquipItemInfo> weaponInventory = MonoBehaviourSingleton<InventoryManager>.I.GetWeaponInventory();
-				for (int i = 0; i < weaponInventory.Count; i++)
+				if (weaponInventory[i].tableData.rarity >= RARITY_TYPE.S)
 				{
-					if (weaponInventory[i].tableData.rarity >= RARITY_TYPE.S)
-					{
-						MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = (InventoryManager.INVENTORY_TYPE)(UIBehaviour.GetEquipmentTypeIndex(weaponInventory[i].tableData.type) + 1);
-						break;
-					}
+					MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = (InventoryManager.INVENTORY_TYPE)(UIBehaviour.GetEquipmentTypeIndex(weaponInventory[i].tableData.type) + 1);
+					break;
 				}
 			}
-			DetailEquipEventData detailEquipEventData = new DetailEquipEventData(gameEventData, localEquipSetData);
-			GameSection.SetEventData(detailEquipEventData);
 		}
+		DetailEquipEventData detailEquipEventData = new DetailEquipEventData(gameEventData, localEquipSetData);
+		GameSection.SetEventData(detailEquipEventData);
 	}
 
 	protected void OnQuery_GROW()
@@ -737,7 +745,7 @@ public class ItemDetailEquip : SkillInfoBase
 				SmithEquipBase.SmithType.EVOLVE,
 				(detailItemData as EquipItemInfo).tableData.type
 			});
-			GameSection.ChangeEvent("EVOLVE", null);
+			GameSection.ChangeEvent("EVOLVE");
 		}
 		else
 		{

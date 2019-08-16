@@ -1,14 +1,13 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
 {
 	public class ItemToFieldData
 	{
-		public const string NT = "itemId,fieldId,enemyId_0,enemyId_1,enemyId_2,enemyId_3,enemyId_4,pointId_0,pointId_1,pointId_2,pointId_3,pointId_4";
-
 		public uint itemId;
 
 		public uint fieldId;
@@ -20,6 +19,8 @@ public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
 		public int grade;
 
 		private uint key2;
+
+		public const string NT = "itemId,fieldId,enemyId_0,enemyId_1,enemyId_2,enemyId_3,enemyId_4,pointId_0,pointId_1,pointId_2,pointId_3,pointId_4";
 
 		public static bool cb(CSVReader csv_reader, ItemToFieldData data, ref uint key1, ref uint key2)
 		{
@@ -122,15 +123,27 @@ public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
 
 	private DoubleUIntKeyTable<ItemToFieldData> itemToFieldTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<ItemToFieldData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<ItemToFieldData> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
+
 	public void CreateTable(string csv_text)
 	{
-		itemToFieldTable = TableUtility.CreateDoubleUIntKeyTable<ItemToFieldData>(csv_text, ItemToFieldData.cb, "itemId,fieldId,enemyId_0,enemyId_1,enemyId_2,enemyId_3,enemyId_4,pointId_0,pointId_1,pointId_2,pointId_3,pointId_4", ItemToFieldData.CBSecondKey, null, null, null);
+		itemToFieldTable = TableUtility.CreateDoubleUIntKeyTable<ItemToFieldData>(csv_text, ItemToFieldData.cb, "itemId,fieldId,enemyId_0,enemyId_1,enemyId_2,enemyId_3,enemyId_4,pointId_0,pointId_1,pointId_2,pointId_3,pointId_4", ItemToFieldData.CBSecondKey);
 		itemToFieldTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(itemToFieldTable, csv_text, ItemToFieldData.cb, "itemId,fieldId,enemyId_0,enemyId_1,enemyId_2,enemyId_3,enemyId_4,pointId_0,pointId_1,pointId_2,pointId_3,pointId_4", ItemToFieldData.CBSecondKey, null, null);
+		TableUtility.AddDoubleUIntKeyTable(itemToFieldTable, csv_text, ItemToFieldData.cb, "itemId,fieldId,enemyId_0,enemyId_1,enemyId_2,enemyId_3,enemyId_4,pointId_0,pointId_1,pointId_2,pointId_3,pointId_4", ItemToFieldData.CBSecondKey);
 	}
 
 	public void InitDependencyData()
@@ -292,7 +305,7 @@ public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
 
 	public RecommendFieldData GetRecommendField(uint item_id, int max_num, bool isExcludeNotPlayable = false)
 	{
-		RecommendFieldData recommendFieldData = new RecommendFieldData(null, false);
+		RecommendFieldData recommendFieldData = new RecommendFieldData(null, find_unknown: false);
 		bool find_unknown_field = false;
 		ItemDetailToFieldData[] array = GetFieldTableFromItemID(item_id, out find_unknown_field, isExcludeNotPlayable);
 		if (array == null || array.Length == 0 || max_num <= 0)
@@ -349,6 +362,7 @@ public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
 		{
 			List<Network.EventData> list = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
 			list.RemoveAll((Network.EventData e) => e.HasEndDate() && e.GetRest() < 0);
+			list.RemoveAll((Network.EventData e) => !e.enableEvent);
 			if (list.Find((Network.EventData e) => e.eventId == field_table.eventId) != null)
 			{
 				available_choices = FIELD_AVAILABLE_CHOICES.AVAILABLE;

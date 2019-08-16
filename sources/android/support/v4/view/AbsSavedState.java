@@ -1,26 +1,15 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.Parcelable.ClassLoaderCreator;
 import android.os.Parcelable.Creator;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 
+/* renamed from: android.support.v4.view.AbsSavedState */
 public abstract class AbsSavedState implements Parcelable {
-    public static final Creator<AbsSavedState> CREATOR = ParcelableCompat.newCreator(new C01102());
-    public static final AbsSavedState EMPTY_STATE = new C01091();
-    private final Parcelable mSuperState;
-
-    /* renamed from: android.support.v4.view.AbsSavedState$1 */
-    static final class C01091 extends AbsSavedState {
-        C01091() {
-            super();
-        }
-    }
-
-    /* renamed from: android.support.v4.view.AbsSavedState$2 */
-    static final class C01102 implements ParcelableCompatCreatorCallbacks<AbsSavedState> {
-        C01102() {
+    public static final Creator<AbsSavedState> CREATOR = new ClassLoaderCreator<AbsSavedState>() {
+        public AbsSavedState createFromParcel(Parcel parcel) {
+            return createFromParcel(parcel, (ClassLoader) null);
         }
 
         public AbsSavedState createFromParcel(Parcel parcel, ClassLoader classLoader) {
@@ -33,7 +22,10 @@ public abstract class AbsSavedState implements Parcelable {
         public AbsSavedState[] newArray(int i) {
             return new AbsSavedState[i];
         }
-    }
+    };
+    public static final AbsSavedState EMPTY_STATE = new AbsSavedState() {
+    };
+    private final Parcelable mSuperState;
 
     private AbsSavedState() {
         this.mSuperState = null;

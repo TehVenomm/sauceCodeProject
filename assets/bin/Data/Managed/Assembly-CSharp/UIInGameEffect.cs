@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIInGameEffect
+public class UIInGameEffect : MonoBehaviour
 {
 	[SerializeField]
 	protected UITweenCtrl tweenCtrl;
@@ -13,12 +13,11 @@ public class UIInGameEffect
 	private void Start()
 	{
 		tweenCtrl.Reset();
-		tweenCtrl.Play(true, null);
+		tweenCtrl.Play();
 	}
 
 	private void Update()
 	{
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = tweenCtrl.tweens.Length; i < num; i++)
 		{

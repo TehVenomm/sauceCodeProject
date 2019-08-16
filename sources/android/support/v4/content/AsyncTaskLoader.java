@@ -1,17 +1,18 @@
-package android.support.v4.content;
+package android.support.p000v4.content;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.os.OperationCanceledException;
-import android.support.v4.util.TimeUtils;
+import android.support.p000v4.p002os.OperationCanceledException;
+import android.support.p000v4.util.TimeUtils;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 
+/* renamed from: android.support.v4.content.AsyncTaskLoader */
 public abstract class AsyncTaskLoader<D> extends Loader<D> {
     static final boolean DEBUG = false;
     static final String TAG = "AsyncTaskLoader";
@@ -22,6 +23,7 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
     volatile LoadTask mTask;
     long mUpdateThrottle;
 
+    /* renamed from: android.support.v4.content.AsyncTaskLoader$LoadTask */
     final class LoadTask extends ModernAsyncTask<Void, Void, D> implements Runnable {
         private final CountDownLatch mDone = new CountDownLatch(1);
         boolean waiting;
@@ -29,7 +31,8 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
         LoadTask() {
         }
 
-        protected D doInBackground(Void... voidArr) {
+        /* access modifiers changed from: protected */
+        public D doInBackground(Void... voidArr) {
             try {
                 return AsyncTaskLoader.this.onLoadInBackground();
             } catch (OperationCanceledException e) {
@@ -40,7 +43,8 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
             }
         }
 
-        protected void onCancelled(D d) {
+        /* access modifiers changed from: protected */
+        public void onCancelled(D d) {
             try {
                 AsyncTaskLoader.this.dispatchOnCancelled(this, d);
             } finally {
@@ -48,7 +52,8 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
             }
         }
 
-        protected void onPostExecute(D d) {
+        /* access modifiers changed from: protected */
+        public void onPostExecute(D d) {
             try {
                 AsyncTaskLoader.this.dispatchOnLoadComplete(this, d);
             } finally {
@@ -82,7 +87,8 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
     public void cancelLoadInBackground() {
     }
 
-    void dispatchOnCancelled(LoadTask loadTask, D d) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchOnCancelled(LoadTask loadTask, D d) {
         onCanceled(d);
         if (this.mCancellingTask == loadTask) {
             rollbackContentChanged();
@@ -93,7 +99,8 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
         }
     }
 
-    void dispatchOnLoadComplete(LoadTask loadTask, D d) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchOnLoadComplete(LoadTask loadTask, D d) {
         if (this.mTask != loadTask) {
             dispatchOnCancelled(loadTask, d);
         } else if (isAbandoned()) {
@@ -132,14 +139,15 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
         }
     }
 
-    void executePendingTask() {
+    /* access modifiers changed from: 0000 */
+    public void executePendingTask() {
         if (this.mCancellingTask == null && this.mTask != null) {
             if (this.mTask.waiting) {
                 this.mTask.waiting = false;
                 this.mHandler.removeCallbacks(this.mTask);
             }
             if (this.mUpdateThrottle <= 0 || SystemClock.uptimeMillis() >= this.mLastLoadCompleteTime + this.mUpdateThrottle) {
-                this.mTask.executeOnExecutor(this.mExecutor, (Void[]) null);
+                this.mTask.executeOnExecutor(this.mExecutor, null);
                 return;
             }
             this.mTask.waiting = true;
@@ -153,9 +161,13 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
 
     public abstract D loadInBackground();
 
-    protected boolean onCancelLoad() {
+    /* access modifiers changed from: protected */
+    public boolean onCancelLoad() {
         boolean z = false;
         if (this.mTask != null) {
+            if (!this.mStarted) {
+                this.mContentChanged = true;
+            }
             if (this.mCancellingTask != null) {
                 if (this.mTask.waiting) {
                     this.mTask.waiting = false;
@@ -181,14 +193,16 @@ public abstract class AsyncTaskLoader<D> extends Loader<D> {
     public void onCanceled(D d) {
     }
 
-    protected void onForceLoad() {
+    /* access modifiers changed from: protected */
+    public void onForceLoad() {
         super.onForceLoad();
         cancelLoad();
-        this.mTask = new LoadTask();
+        this.mTask = new LoadTask<>();
         executePendingTask();
     }
 
-    protected D onLoadInBackground() {
+    /* access modifiers changed from: protected */
+    public D onLoadInBackground() {
         return loadInBackground();
     }
 

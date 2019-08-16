@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class FixedViewQuad
+public class FixedViewQuad : MonoBehaviour
 {
 	public Camera targetCamera;
 
@@ -18,8 +18,6 @@ public class FixedViewQuad
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		_meshRenderer = this.GetComponent<MeshRenderer>();
 		if (targetCamera == null)
@@ -40,7 +38,6 @@ public class FixedViewQuad
 		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 		if (_meshRenderer != null)
 		{

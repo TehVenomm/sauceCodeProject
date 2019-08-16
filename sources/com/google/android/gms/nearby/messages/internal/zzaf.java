@@ -2,21 +2,29 @@ package com.google.android.gms.nearby.messages.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 import com.google.android.gms.nearby.messages.Message;
-import java.util.Arrays;
 
-public final class zzaf extends zza {
+@Class(creator = "MessageWrapperCreator")
+public final class zzaf extends AbstractSafeParcelable {
     public static final Creator<zzaf> CREATOR = new zzag();
-    private int zzdxt;
-    private Message zzjfy;
+    @VersionField(mo13996id = 1000)
+    private final int versionCode;
+    @Field(mo13990id = 1)
+    private final Message zzhk;
 
-    zzaf(int i, Message message) {
-        this.zzdxt = i;
-        this.zzjfy = (Message) zzbp.zzu(message);
+    @Constructor
+    zzaf(@Param(mo13993id = 1000) int i, @Param(mo13993id = 1) Message message) {
+        this.versionCode = i;
+        this.zzhk = (Message) Preconditions.checkNotNull(message);
     }
 
     public static final zzaf zza(Message message) {
@@ -30,22 +38,22 @@ public final class zzaf extends zza {
         if (!(obj instanceof zzaf)) {
             return false;
         }
-        return zzbf.equal(this.zzjfy, ((zzaf) obj).zzjfy);
+        return Objects.equal(this.zzhk, ((zzaf) obj).zzhk);
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzjfy});
+        return Objects.hashCode(this.zzhk);
     }
 
     public final String toString() {
-        String message = this.zzjfy.toString();
+        String message = this.zzhk.toString();
         return new StringBuilder(String.valueOf(message).length() + 24).append("MessageWrapper{message=").append(message).append("}").toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.zzjfy, i, false);
-        zzd.zzc(parcel, 1000, this.zzdxt);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 1, this.zzhk, i, false);
+        SafeParcelWriter.writeInt(parcel, 1000, this.versionCode);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

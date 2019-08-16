@@ -1,50 +1,23 @@
 package com.google.android.gms.nearby.messages.internal;
 
-import android.os.IBinder;
-import android.os.Parcel;
-import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import android.os.RemoteException;
+import com.google.android.gms.common.api.Api.AnyClient;
+import com.google.android.gms.common.api.internal.ListenerHolder.ListenerKey;
+import com.google.android.gms.common.api.internal.UnregisterListenerMethod;
+import com.google.android.gms.tasks.TaskCompletionSource;
 
-public final class zzba implements Creator<zzaz> {
-    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        boolean z = false;
-        IBinder iBinder = null;
-        int zzd = zzb.zzd(parcel);
-        IBinder iBinder2 = null;
-        String str = null;
-        ClientAppContext clientAppContext = null;
-        int i = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 1:
-                    i = zzb.zzg(parcel, readInt);
-                    break;
-                case 2:
-                    iBinder = zzb.zzr(parcel, readInt);
-                    break;
-                case 3:
-                    iBinder2 = zzb.zzr(parcel, readInt);
-                    break;
-                case 4:
-                    z = zzb.zzc(parcel, readInt);
-                    break;
-                case 5:
-                    str = zzb.zzq(parcel, readInt);
-                    break;
-                case 6:
-                    clientAppContext = (ClientAppContext) zzb.zza(parcel, readInt, ClientAppContext.CREATOR);
-                    break;
-                default:
-                    zzb.zzb(parcel, readInt);
-                    break;
-            }
-        }
-        zzb.zzaf(parcel, zzd);
-        return new zzaz(i, iBinder, iBinder2, z, str, clientAppContext);
+final class zzba extends UnregisterListenerMethod<zzah, T> {
+    private final /* synthetic */ zzak zzia;
+    private final /* synthetic */ zzbd zzie;
+
+    zzba(zzak zzak, ListenerKey listenerKey, zzbd zzbd) {
+        this.zzia = zzak;
+        this.zzie = zzbd;
+        super(listenerKey);
     }
 
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzaz[i];
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ void unregisterListener(AnyClient anyClient, TaskCompletionSource taskCompletionSource) throws RemoteException {
+        this.zzie.zza((zzah) anyClient, this.zzia.zza(taskCompletionSource));
     }
 }

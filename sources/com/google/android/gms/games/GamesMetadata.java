@@ -5,8 +5,10 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Releasable;
 import com.google.android.gms.common.api.Result;
 
+@Deprecated
 public interface GamesMetadata {
 
+    @Deprecated
     public interface LoadGamesResult extends Releasable, Result {
         GameBuffer getGames();
     }

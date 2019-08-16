@@ -49,7 +49,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 	public static AudioControlGroup Create(CullingTypes type = CullingTypes.NONE, int LimitNum = int.MaxValue)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
+		//IL_000b: Expected O, but got Unknown
 		GameObject val = new GameObject("AudioControlGroup");
 		AudioControlGroup audioControlGroup = val.AddComponent<AudioControlGroup>();
 		audioControlGroup._transform.set_parent(MonoBehaviourSingleton<SoundManager>.I._transform);
@@ -103,12 +103,12 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 	{
 		if (m_bUnique && m_lastAudio != null)
 		{
-			m_lastAudio.Stop(0);
+			m_lastAudio.Stop();
 			m_lastAudio = null;
 		}
 		if (m_dicPlayingAudio.ContainsKey(clip_id))
 		{
-			m_dicPlayingAudio[clip_id].OpanPlaySlot(1, false);
+			m_dicPlayingAudio[clip_id].OpanPlaySlot(1);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 			return null;
 		}
 		PrepareKeyOn(clip_id);
-		Transform parent = (!(_parent == null)) ? ((object)_parent) : ((object)base._transform);
+		Transform parent = (!(_parent == null)) ? _parent : base._transform;
 		return m_lastAudio = AudioObject.Create(clip, clip_id, volume, loop, mixer_group, this, is3DSound, master, parent, initPos);
 	}
 

@@ -28,6 +28,9 @@ public class RestraintInfo
 	[Tooltip("モ\u30fcションを停止させるか？")]
 	public bool isStopMotion;
 
+	[Tooltip("仲間の攻撃で解除禁止か?")]
+	public bool isDisableRemoveByPlayerAttack;
+
 	public void Copy(RestraintInfo src)
 	{
 		enable = src.enable;
@@ -38,5 +41,6 @@ public class RestraintInfo
 		radius = src.radius;
 		effectName = src.effectName;
 		isStopMotion = src.isStopMotion;
+		isDisableRemoveByPlayerAttack = src.isDisableRemoveByPlayerAttack;
 	}
 }

@@ -8,7 +8,9 @@ import java.io.IOException;
 
 public final class WritableObjectId {
     public final ObjectIdGenerator<?> generator;
-    public Object id;
+
+    /* renamed from: id */
+    public Object f428id;
     protected boolean idWritten = false;
 
     public WritableObjectId(ObjectIdGenerator<?> objectIdGenerator) {
@@ -16,33 +18,33 @@ public final class WritableObjectId {
     }
 
     public boolean writeAsId(JsonGenerator jsonGenerator, SerializerProvider serializerProvider, ObjectIdWriter objectIdWriter) throws IOException {
-        if (this.id == null || (!this.idWritten && !objectIdWriter.alwaysAsId)) {
+        if (this.f428id == null || (!this.idWritten && !objectIdWriter.alwaysAsId)) {
             return false;
         }
         if (jsonGenerator.canWriteObjectId()) {
-            jsonGenerator.writeObjectRef(String.valueOf(this.id));
+            jsonGenerator.writeObjectRef(String.valueOf(this.f428id));
         } else {
-            objectIdWriter.serializer.serialize(this.id, jsonGenerator, serializerProvider);
+            objectIdWriter.serializer.serialize(this.f428id, jsonGenerator, serializerProvider);
         }
         return true;
     }
 
     public Object generateId(Object obj) {
         Object generateId = this.generator.generateId(obj);
-        this.id = generateId;
+        this.f428id = generateId;
         return generateId;
     }
 
     public void writeAsField(JsonGenerator jsonGenerator, SerializerProvider serializerProvider, ObjectIdWriter objectIdWriter) throws IOException {
         this.idWritten = true;
         if (jsonGenerator.canWriteObjectId()) {
-            jsonGenerator.writeObjectId(String.valueOf(this.id));
+            jsonGenerator.writeObjectId(String.valueOf(this.f428id));
             return;
         }
         SerializableString serializableString = objectIdWriter.propertyName;
         if (serializableString != null) {
             jsonGenerator.writeFieldName(serializableString);
-            objectIdWriter.serializer.serialize(this.id, jsonGenerator, serializerProvider);
+            objectIdWriter.serializer.serialize(this.f428id, jsonGenerator, serializerProvider);
         }
     }
 }

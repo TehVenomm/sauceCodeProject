@@ -4,37 +4,57 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
 
-public final class HintRequest extends zza implements ReflectedParcelable {
-    public static final Creator<HintRequest> CREATOR = new zzg();
-    private int zzdxt;
-    private final String[] zzean;
-    private final boolean zzeaq;
-    private final String zzear;
-    private final String zzeas;
-    private final CredentialPickerConfig zzeau;
-    private final boolean zzeav;
-    private final boolean zzeaw;
+@Class(creator = "HintRequestCreator")
+public final class HintRequest extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<HintRequest> CREATOR = new zzj();
+    @Field(getter = "getAccountTypes", mo13990id = 4)
+    private final String[] zzaa;
+    @Field(getter = "isIdTokenRequested", mo13990id = 5)
+    private final boolean zzad;
+    @Field(getter = "getServerClientId", mo13990id = 6)
+    private final String zzae;
+    @Field(getter = "getIdTokenNonce", mo13990id = 7)
+    private final String zzaf;
+    @Field(getter = "getHintPickerConfig", mo13990id = 1)
+    private final CredentialPickerConfig zzah;
+    @Field(getter = "isEmailAddressIdentifierSupported", mo13990id = 2)
+    private final boolean zzai;
+    @Field(getter = "isPhoneNumberIdentifierSupported", mo13990id = 3)
+    private final boolean zzaj;
+    @Field(mo13990id = 1000)
+    private final int zzu;
 
     public static final class Builder {
-        private String[] zzean;
-        private boolean zzeaq = false;
-        private String zzear;
-        private String zzeas;
-        private CredentialPickerConfig zzeau = new com.google.android.gms.auth.api.credentials.CredentialPickerConfig.Builder().build();
-        private boolean zzeav;
-        private boolean zzeaw;
+        /* access modifiers changed from: private */
+        public String[] zzaa;
+        /* access modifiers changed from: private */
+        public boolean zzad = false;
+        /* access modifiers changed from: private */
+        public String zzae;
+        /* access modifiers changed from: private */
+        public String zzaf;
+        /* access modifiers changed from: private */
+        public CredentialPickerConfig zzah = new com.google.android.gms.auth.api.credentials.CredentialPickerConfig.Builder().build();
+        /* access modifiers changed from: private */
+        public boolean zzai;
+        /* access modifiers changed from: private */
+        public boolean zzaj;
 
         public final HintRequest build() {
-            if (this.zzean == null) {
-                this.zzean = new String[0];
+            if (this.zzaa == null) {
+                this.zzaa = new String[0];
             }
-            if (this.zzeav || this.zzeaw || this.zzean.length != 0) {
-                return new HintRequest();
+            if (this.zzai || this.zzaj || this.zzaa.length != 0) {
+                return new HintRequest(this);
             }
             throw new IllegalStateException("At least one authentication method must be specified");
         }
@@ -43,100 +63,101 @@ public final class HintRequest extends zza implements ReflectedParcelable {
             if (strArr == null) {
                 strArr = new String[0];
             }
-            this.zzean = strArr;
+            this.zzaa = strArr;
             return this;
         }
 
         public final Builder setEmailAddressIdentifierSupported(boolean z) {
-            this.zzeav = z;
+            this.zzai = z;
             return this;
         }
 
         public final Builder setHintPickerConfig(@NonNull CredentialPickerConfig credentialPickerConfig) {
-            this.zzeau = (CredentialPickerConfig) zzbp.zzu(credentialPickerConfig);
+            this.zzah = (CredentialPickerConfig) Preconditions.checkNotNull(credentialPickerConfig);
             return this;
         }
 
         public final Builder setIdTokenNonce(@Nullable String str) {
-            this.zzeas = str;
+            this.zzaf = str;
             return this;
         }
 
         public final Builder setIdTokenRequested(boolean z) {
-            this.zzeaq = z;
+            this.zzad = z;
             return this;
         }
 
         public final Builder setPhoneNumberIdentifierSupported(boolean z) {
-            this.zzeaw = z;
+            this.zzaj = z;
             return this;
         }
 
         public final Builder setServerClientId(@Nullable String str) {
-            this.zzear = str;
+            this.zzae = str;
             return this;
         }
     }
 
-    HintRequest(int i, CredentialPickerConfig credentialPickerConfig, boolean z, boolean z2, String[] strArr, boolean z3, String str, String str2) {
-        this.zzdxt = i;
-        this.zzeau = (CredentialPickerConfig) zzbp.zzu(credentialPickerConfig);
-        this.zzeav = z;
-        this.zzeaw = z2;
-        this.zzean = (String[]) zzbp.zzu(strArr);
-        if (this.zzdxt < 2) {
-            this.zzeaq = true;
-            this.zzear = null;
-            this.zzeas = null;
+    @Constructor
+    HintRequest(@Param(mo13993id = 1000) int i, @Param(mo13993id = 1) CredentialPickerConfig credentialPickerConfig, @Param(mo13993id = 2) boolean z, @Param(mo13993id = 3) boolean z2, @Param(mo13993id = 4) String[] strArr, @Param(mo13993id = 5) boolean z3, @Param(mo13993id = 6) String str, @Param(mo13993id = 7) String str2) {
+        this.zzu = i;
+        this.zzah = (CredentialPickerConfig) Preconditions.checkNotNull(credentialPickerConfig);
+        this.zzai = z;
+        this.zzaj = z2;
+        this.zzaa = (String[]) Preconditions.checkNotNull(strArr);
+        if (this.zzu < 2) {
+            this.zzad = true;
+            this.zzae = null;
+            this.zzaf = null;
             return;
         }
-        this.zzeaq = z3;
-        this.zzear = str;
-        this.zzeas = str2;
+        this.zzad = z3;
+        this.zzae = str;
+        this.zzaf = str2;
     }
 
     private HintRequest(Builder builder) {
-        this(2, builder.zzeau, builder.zzeav, builder.zzeaw, builder.zzean, builder.zzeaq, builder.zzear, builder.zzeas);
+        this(2, builder.zzah, builder.zzai, builder.zzaj, builder.zzaa, builder.zzad, builder.zzae, builder.zzaf);
     }
 
     @NonNull
     public final String[] getAccountTypes() {
-        return this.zzean;
+        return this.zzaa;
     }
 
     @NonNull
     public final CredentialPickerConfig getHintPickerConfig() {
-        return this.zzeau;
+        return this.zzah;
     }
 
     @Nullable
     public final String getIdTokenNonce() {
-        return this.zzeas;
+        return this.zzaf;
     }
 
     @Nullable
     public final String getServerClientId() {
-        return this.zzear;
+        return this.zzae;
     }
 
     public final boolean isEmailAddressIdentifierSupported() {
-        return this.zzeav;
+        return this.zzai;
     }
 
     public final boolean isIdTokenRequested() {
-        return this.zzeaq;
+        return this.zzad;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getHintPickerConfig(), i, false);
-        zzd.zza(parcel, 2, isEmailAddressIdentifierSupported());
-        zzd.zza(parcel, 3, this.zzeaw);
-        zzd.zza(parcel, 4, getAccountTypes(), false);
-        zzd.zza(parcel, 5, isIdTokenRequested());
-        zzd.zza(parcel, 6, getServerClientId(), false);
-        zzd.zza(parcel, 7, getIdTokenNonce(), false);
-        zzd.zzc(parcel, 1000, this.zzdxt);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 1, getHintPickerConfig(), i, false);
+        SafeParcelWriter.writeBoolean(parcel, 2, isEmailAddressIdentifierSupported());
+        SafeParcelWriter.writeBoolean(parcel, 3, this.zzaj);
+        SafeParcelWriter.writeStringArray(parcel, 4, getAccountTypes(), false);
+        SafeParcelWriter.writeBoolean(parcel, 5, isIdTokenRequested());
+        SafeParcelWriter.writeString(parcel, 6, getServerClientId(), false);
+        SafeParcelWriter.writeString(parcel, 7, getIdTokenNonce(), false);
+        SafeParcelWriter.writeInt(parcel, 1000, this.zzu);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

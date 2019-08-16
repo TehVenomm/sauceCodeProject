@@ -44,11 +44,17 @@ public interface BeanProperty extends Named {
         }
 
         public <A extends Annotation> A getAnnotation(Class<A> cls) {
-            return this._member == null ? null : this._member.getAnnotation(cls);
+            if (this._member == null) {
+                return null;
+            }
+            return this._member.getAnnotation(cls);
         }
 
         public <A extends Annotation> A getContextAnnotation(Class<A> cls) {
-            return this._contextAnnotations == null ? null : this._contextAnnotations.get(cls);
+            if (this._contextAnnotations == null) {
+                return null;
+            }
+            return this._contextAnnotations.get(cls);
         }
 
         @Deprecated

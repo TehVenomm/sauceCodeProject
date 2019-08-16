@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIStatusGizmoBase
+public class UIStatusGizmoBase : MonoBehaviour
 {
 	protected static List<UIStatusGizmoBase> uiList = new List<UIStatusGizmoBase>();
 
 	protected static int listUpdateCount = 0;
+
+	private UIPanel basePanel;
 
 	protected float screenZ;
 
@@ -13,15 +15,20 @@ public class UIStatusGizmoBase
 
 	protected Transform transform;
 
+	[HideInInspector]
+	public bool isHostPlayer;
+
+	public UIPanel BasePanel => basePanel ?? (basePanel = this.GetComponent<UIPanel>());
+
+	public float ScreenZ => screenZ;
+
 	public UIStatusGizmoBase()
 		: this()
 	{
 	}
 
-	protected static void SortAll()
+	protected virtual void SortAll()
 	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Expected O, but got Unknown
 		uiList.Sort(delegate(UIStatusGizmoBase a, UIStatusGizmoBase b)
 		{
 			if (a.screenZ == b.screenZ)
@@ -60,9 +67,6 @@ public class UIStatusGizmoBase
 
 	protected virtual void OnEnable()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
 		uiList.Add(this);
 		transform = this.get_gameObject().get_transform();
 	}

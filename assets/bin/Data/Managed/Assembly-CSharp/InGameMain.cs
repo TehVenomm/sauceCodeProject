@@ -2,6 +2,7 @@ using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class InGameMain : GameSection
@@ -59,6 +60,7 @@ public class InGameMain : GameSection
 			yield return "EnemyAngryTable";
 			yield return "EnemyActionTable";
 			yield return "NpcLevelTable";
+			yield return "NpcLevelSpecialTable";
 		}
 	}
 
@@ -72,7 +74,6 @@ public class InGameMain : GameSection
 
 	public override void OnPressBackKey()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (QuestManager.IsValidInGame())
 		{
 			if (MonoBehaviourSingleton<UIInGameMenu>.IsValid() && MonoBehaviourSingleton<UIInGameMenu>.I.get_gameObject().get_activeInHierarchy())
@@ -81,7 +82,7 @@ public class InGameMain : GameSection
 			}
 			else
 			{
-				DispatchEvent("RETIRE", null);
+				DispatchEvent("RETIRE");
 			}
 		}
 		else if (UIInGameFieldMenu.IsValid())
@@ -92,14 +93,13 @@ public class InGameMain : GameSection
 			}
 			else
 			{
-				DispatchEvent("RETURN", null);
+				DispatchEvent("RETURN");
 			}
 		}
 	}
 
 	public override void Initialize()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<ShopManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ShopManager>.I.trackPlayerDie = false;
@@ -109,10 +109,18 @@ public class InGameMain : GameSection
 
 	private IEnumerator DoInitialize()
 	{
-		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, true);
+		if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 0)
+		{
+			UILabel.OutlineLimit = true;
+		}
+		else
+		{
+			UILabel.OutlineLimit = false;
+		}
+		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, is_stop: true);
 		while (MonoBehaviourSingleton<DataTableManager>.I.IsLoading())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.isRetry)
 		{
@@ -121,22 +129,44 @@ public class InGameMain : GameSection
 			{
 				CoopApp.EnterArenaQuestOffline(delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
 				{
-					((_003CDoInitialize_003Ec__IteratorB0)/*Error near IL_00b2: stateMachine*/)._003CisWaitQuestLoad_003E__0 = !isStart;
+					isWaitQuestLoad = !isStart;
 				});
+			}
+			else if (MonoBehaviourSingleton<StatusManager>.IsValid() && MonoBehaviourSingleton<StatusManager>.I.assignedCharaInfo != null && MonoBehaviourSingleton<StatusManager>.I.assignedEquipmentData != null)
+			{
+				CoopApp.EnterQuestOfflineAssignedEquipment(null, null, delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+				{
+					isWaitQuestLoad = !isStart;
+				});
+			}
+			else
+			{
+				MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)GameSaveData.instance.lastQusetID);
+				if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+				{
+					CoopApp.EnterSeriesArenaQuestOffline(delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+					{
+						isWaitQuestLoad = !isStart;
+					});
+				}
 			}
 			while (isWaitQuestLoad)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			if (MonoBehaviourSingleton<QuestManager>.IsValid())
 			{
-				int bgm_id = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID();
-				SoundManager.RequestBGM(bgm_id, true);
+				int currentQuestBGMID = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID();
+				SoundManager.RequestBGM(currentQuestBGMID);
 			}
 			MonoBehaviourSingleton<InGameManager>.I.isRetry = false;
 		}
 		SetActive((Enum)UI.BTN_QUEST_MENU, QuestManager.IsValidInGame());
 		InitializeChatUI();
+		if (MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE.NORMAL).Length >= 2)
+		{
+			SetEvent((Enum)UI.BTN_REQUEST, "QUEST_SELECT_WINDOW", (int)MonoBehaviourSingleton<FieldManager>.I.currentMapData.regionId);
+		}
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
@@ -147,7 +177,7 @@ public class InGameMain : GameSection
 		}
 		while (MonoBehaviourSingleton<LoadingProcess>.IsValid())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (QuestManager.IsValidInGame() && MonoBehaviourSingleton<AppMain>.IsValid() && !MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
@@ -173,11 +203,11 @@ public class InGameMain : GameSection
 			"PlayerAttackInfo_02",
 			"PlayerAttackInfo_04",
 			"PlayerAttackInfo_05"
-		}, false);
+		});
 		LoadObject lo_tutorial_prefab = null;
 		if (!TutorialStep.HasFirstDeliveryCompleted() && TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02))
 		{
-			lo_tutorial_prefab = load_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialFieldHelper", false);
+			lo_tutorial_prefab = load_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialFieldHelper");
 		}
 		LoadObject lo_link_resources;
 		if (FieldManager.IsValidInTutorial())
@@ -187,23 +217,21 @@ public class InGameMain : GameSection
 				"InGameLinkResourcesCommon",
 				"InGameLinkResourcesQuest",
 				"InGameLinkResourcesField"
-			}, false);
+			});
 		}
 		else
 		{
-			List<string> linkResources = new List<string>(3)
-			{
-				"InGameLinkResourcesCommon"
-			};
+			List<string> list = new List<string>(3);
+			list.Add("InGameLinkResourcesCommon");
 			if (QuestManager.IsValidInGame() || InGameManager.IsValidInGameTest())
 			{
-				linkResources.Add("InGameLinkResourcesQuest");
+				list.Add("InGameLinkResourcesQuest");
 			}
 			if (FieldManager.IsValidInGameNoBoss() || InGameManager.IsValidInGameTest())
 			{
-				linkResources.Add("InGameLinkResourcesField");
+				list.Add("InGameLinkResourcesField");
 			}
-			lo_link_resources = load_queue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemInGameLinkResources", linkResources.ToArray(), false);
+			lo_link_resources = load_queue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemInGameLinkResources", list.ToArray());
 		}
 		ResourceManager.enableCache = true;
 		VorgonPreEventController vorgonPreEventController = null;
@@ -223,11 +251,11 @@ public class InGameMain : GameSection
 					cutScenePlayer = questControllerObj.AddComponent<CutScenePlayer>();
 					cutScenePlayer.Init(path, delegate
 					{
-						((_003CDoInitialize_003Ec__IteratorB0)/*Error near IL_047f: stateMachine*/)._003Cwait_003E__12 = false;
+						wait = false;
 					});
 					while (wait)
 					{
-						yield return (object)null;
+						yield return null;
 					}
 				}
 			}
@@ -238,16 +266,16 @@ public class InGameMain : GameSection
 			MonoBehaviourSingleton<ExploreMiniMap>.I.Preload(load_queue);
 		}
 		LoadObject lo_ingame_rush = null;
-		if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
+		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true))
 		{
-			lo_ingame_rush = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameRush", false);
+			lo_ingame_rush = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameRush");
 		}
-		LoadObject loAdditionalDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameAdditionalDamageNum", false);
-		LoadObject loPlayerDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGamePlayerDamageNum", false);
-		LoadObject loDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameDamageNum", false);
+		LoadObject loAdditionalDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameAdditionalDamageNum");
+		LoadObject loPlayerDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGamePlayerDamageNum");
+		LoadObject loDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameDamageNum");
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
@@ -256,9 +284,9 @@ public class InGameMain : GameSection
 		Transform _setting_transform = null;
 		InGameSettingsManager.Player player_setting = null;
 		ResourceObject[] loadedObjects = lo_prefabs.loadedObjects;
-		foreach (ResourceObject prefab in loadedObjects)
+		foreach (ResourceObject resourceObject in loadedObjects)
 		{
-			string name = prefab.obj.get_name();
+			string name = resourceObject.obj.get_name();
 			if (name.Contains("PlayerAttackInfo"))
 			{
 				if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
@@ -272,60 +300,60 @@ public class InGameMain : GameSection
 						player_setting = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
 						player_setting.attackInfosAll = new AttackInfo[0];
 					}
-					GameObject obj = ResourceUtility.Realizes(prefab.obj, _setting_transform, -1).get_gameObject();
-					AttackInfos attack_infos = obj.GetComponent<AttackInfos>();
-					player_setting.weaponAttackInfoList.Add(attack_infos);
-					player_setting.attackInfosAll = Utility.CreateMergedArray(player_setting.attackInfosAll, attack_infos.attackHitInfos);
+					GameObject gameObject = ResourceUtility.Realizes(resourceObject.obj, _setting_transform).get_gameObject();
+					AttackInfos component = gameObject.GetComponent<AttackInfos>();
+					player_setting.weaponAttackInfoList.Add(component);
+					player_setting.attackInfosAll = Utility.CreateMergedArray(player_setting.attackInfosAll, component.attackHitInfos);
 				}
 			}
 			else if (name.Contains("PuniConManager"))
 			{
-				ResourceUtility.Realizes(prefab.obj, inGameUIMembers, 5);
+				ResourceUtility.Realizes(resourceObject.obj, inGameUIMembers, 5);
 				MonoBehaviourSingleton<PuniConManager>.I.enableMultiTouch = true;
 			}
 			else
 			{
-				ResourceUtility.Realizes(prefab.obj, _transform, -1);
+				ResourceUtility.Realizes(resourceObject.obj, _transform);
 			}
 		}
 		ResourceObject[] loadedObjects2 = lo_link_resources.loadedObjects;
-		foreach (ResourceObject prefab2 in loadedObjects2)
+		foreach (ResourceObject resourceObject2 in loadedObjects2)
 		{
-			ResourceUtility.Realizes(prefab2.obj, MonoBehaviourSingleton<InGameSettingsManager>.I._transform, -1);
+			ResourceUtility.Realizes(resourceObject2.obj, MonoBehaviourSingleton<InGameSettingsManager>.I._transform);
 		}
-		Utility.CreateGameObjectAndComponent("StageObjectManager", _transform, -1);
-		Utility.CreateGameObjectAndComponent("TargetMarkerManager", _transform, -1);
-		Utility.CreateGameObjectAndComponent("InGameProgress", _transform, -1);
-		Utility.CreateGameObjectAndComponent("AIManager", _transform, -1);
+		Utility.CreateGameObjectAndComponent("StageObjectManager", _transform);
+		Utility.CreateGameObjectAndComponent("TargetMarkerManager", _transform);
+		Utility.CreateGameObjectAndComponent("InGameProgress", _transform);
+		Utility.CreateGameObjectAndComponent("AIManager", _transform);
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.get_gameObject().SetActive(true);
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
 			{
-				MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open(UITransition.TYPE.OPEN);
+				MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open();
 			}
 		}
 		if (lo_tutorial_prefab != null)
 		{
-			Transform t = ResourceUtility.Realizes(lo_tutorial_prefab.loadedObject, inGameUIMembers, -1);
-			if (t != null)
+			Transform val = ResourceUtility.Realizes(lo_tutorial_prefab.loadedObject, inGameUIMembers);
+			if (val != null)
 			{
-				UITutorialFieldHelper h = t.GetComponent<UITutorialFieldHelper>();
-				if (h != null)
+				UITutorialFieldHelper component2 = val.GetComponent<UITutorialFieldHelper>();
+				if (component2 != null)
 				{
-					h.Setup(this);
+					component2.Setup(this);
 				}
 			}
 		}
-		if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
+		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true))
 		{
-			GameObject inGameRushUI = Object.Instantiate(lo_ingame_rush.loadedObject) as GameObject;
-			inGameRushUI.get_transform().set_parent(MonoBehaviourSingleton<UIContinueButton>.I._transform.get_parent());
-			inGameRushUI.get_transform().set_localPosition(Vector3.get_zero());
-			inGameRushUI.get_transform().set_localRotation(Quaternion.get_identity());
-			inGameRushUI.get_transform().set_localScale(Vector3.get_one());
-			UIStaticPanelChanger panelChanger = inGameRushUI.GetComponentInParent<UIStaticPanelChanger>();
-			MonoBehaviourSingleton<UISpectatorButton>.I.Initialize(panelChanger);
+			GameObject val2 = Object.Instantiate(lo_ingame_rush.loadedObject) as GameObject;
+			val2.get_transform().set_parent(MonoBehaviourSingleton<UIContinueButton>.I._transform.get_parent());
+			val2.get_transform().set_localPosition(Vector3.get_zero());
+			val2.get_transform().set_localRotation(Quaternion.get_identity());
+			val2.get_transform().set_localScale(Vector3.get_one());
+			UIStaticPanelChanger componentInParent = val2.GetComponentInParent<UIStaticPanelChanger>();
+			MonoBehaviourSingleton<UISpectatorButton>.I.Initialize(componentInParent);
 		}
 		if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
 		{
@@ -339,14 +367,11 @@ public class InGameMain : GameSection
 		MonoBehaviourSingleton<StageManager>.I.LoadStage(stage_name);
 		while (MonoBehaviourSingleton<StageManager>.I.isLoading)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		if (MonoBehaviourSingleton<StageManager>.I.isValidInside)
+		if (!MonoBehaviourSingleton<StageManager>.I.isValidInside)
 		{
-			goto IL_0a47;
 		}
-		goto IL_0a47;
-		IL_0a47:
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(40);
@@ -354,48 +379,54 @@ public class InGameMain : GameSection
 		InGameSettingsManager inGameSettings = MonoBehaviourSingleton<InGameSettingsManager>.I;
 		GlobalSettingsManager.LinkResources globalResources = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources;
 		List<string> loadEffectNames = new List<string>();
-		for (int k = 0; k < 3; k++)
+		for (int l = 0; l < 3; l++)
 		{
-			InGameSettingsManager.UseResources use_res = null;
-			switch (k)
+			InGameSettingsManager.UseResources useResources = null;
+			switch (l)
 			{
 			case 0:
-				use_res = globalResources.inGameCommonResources;
+				useResources = globalResources.inGameCommonResources;
 				break;
 			case 1:
 				if (FieldManager.IsValidInGameNoQuest() || FieldManager.IsValidInGameNoBoss())
 				{
-					use_res = inGameSettings.useResourcesField;
+					useResources = inGameSettings.useResourcesField;
 				}
 				break;
 			case 2:
 				if (QuestManager.IsValidInGame() || InGameManager.IsValidInGameTest() || FieldManager.IsValidInTutorial())
 				{
-					use_res = globalResources.inGameQuestResources;
+					useResources = globalResources.inGameQuestResources;
 				}
 				break;
 			}
-			if (use_res != null)
+			if (useResources != null)
 			{
-				string[] effects = use_res.effects;
-				foreach (string effect_name in effects)
+				string[] effects = useResources.effects;
+				foreach (string text in effects)
 				{
-					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effect_name);
-					loadEffectNames.Add(effect_name);
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text);
+					loadEffectNames.Add(text);
 				}
-				string[] uiEffects = use_res.uiEffects;
-				foreach (string effect_name2 in uiEffects)
+				string[] uiEffects = useResources.uiEffects;
+				foreach (string name2 in uiEffects)
 				{
-					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effect_name2);
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, name2);
 				}
 			}
 		}
 		InGameSettingsManager.Player player = inGameSettings.player;
 		string[] stunnedEffectList = globalResources.stunnedEffectList;
-		foreach (string effect_name3 in stunnedEffectList)
+		foreach (string text2 in stunnedEffectList)
 		{
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effect_name3);
-			loadEffectNames.Add(effect_name3);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text2);
+			loadEffectNames.Add(text2);
+		}
+		string[] charmEffectList = globalResources.charmEffectList;
+		foreach (string text3 in charmEffectList)
+		{
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text3);
+			loadEffectNames.Add(text3);
 		}
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.battleStartEffectName);
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.changeWeaponEffectName);
@@ -408,15 +439,15 @@ public class InGameMain : GameSection
 		int[] elementHitSEIDs = inGameSettings.enemy.elementHitSEIDs;
 		foreach (int se_id in elementHitSEIDs)
 		{
-			load_queue.CacheSE(se_id, null);
+			load_queue.CacheSE(se_id);
 		}
 		if (FieldManager.IsValidInGameNoBoss())
 		{
 			string[] effectNames = inGameSettings.portal.effectNames;
-			foreach (string effect_name4 in effectNames)
+			foreach (string text4 in effectNames)
 			{
-				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effect_name4);
-				loadEffectNames.Add(effect_name4);
+				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text4);
+				loadEffectNames.Add(text4);
 			}
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, inGameSettings.fieldDrop.tresureBoxOpenEffect);
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, inGameSettings.portal.pointGetEffectName);
@@ -430,22 +461,22 @@ public class InGameMain : GameSection
 			{
 				MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Load(load_queue);
 			}
-			load_queue.CacheAnimDataUseResource(MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop.animEventData, null, null);
+			load_queue.CacheAnimDataUseResource(MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop.animEventData);
 		}
 		else
 		{
-			InGameSettingsManager.ShadowSealingParam ssp = inGameSettings.debuff.shadowSealingParam;
-			if (ssp.startSeId != 0)
+			InGameSettingsManager.ShadowSealingParam shadowSealingParam = inGameSettings.debuff.shadowSealingParam;
+			if (shadowSealingParam.startSeId != 0)
 			{
-				load_queue.CacheSE(ssp.startSeId, null);
+				load_queue.CacheSE(shadowSealingParam.startSeId);
 			}
-			if (ssp.loopSeId != 0)
+			if (shadowSealingParam.loopSeId != 0)
 			{
-				load_queue.CacheSE(ssp.loopSeId, null);
+				load_queue.CacheSE(shadowSealingParam.loopSeId);
 			}
-			if (ssp.endSeId != 0)
+			if (shadowSealingParam.endSeId != 0)
 			{
-				load_queue.CacheSE(ssp.endSeId, null);
+				load_queue.CacheSE(shadowSealingParam.endSeId);
 			}
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.shadowSealingEffectName);
 			loadEffectNames.Add(globalResources.shadowSealingEffectName);
@@ -458,27 +489,44 @@ public class InGameMain : GameSection
 		string shadowSealingEffect = "ef_btl_wsk_bow_01_04";
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, shadowSealingEffect);
 		loadEffectNames.Add(shadowSealingEffect);
+		string concussionEffect = "ef_btl_enm_flinch_01";
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, concussionEffect);
+		loadEffectNames.Add(concussionEffect);
+		InGameSettingsManager.Concussion concussionParam = inGameSettings.debuff.concussion;
+		if (concussionParam.startSeId != 0)
+		{
+			load_queue.CacheSE(concussionParam.startSeId);
+		}
+		if (concussionParam.loopSeId != 0)
+		{
+			load_queue.CacheSE(concussionParam.loopSeId);
+		}
+		if (concussionParam.endSeId != 0)
+		{
+			load_queue.CacheSE(concussionParam.endSeId);
+		}
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.bleedingParam.effectName);
 		MonoBehaviourSingleton<InGameProgress>.I.CacheUseResources(load_queue, ref loadEffectNames);
 		MonoBehaviourSingleton<ResourceManager>.I.cache.AddIgnoreCategorySpecifiedReleaseList(loadEffectNames);
 		if (QuestManager.IsValidInGameWaveMatch())
 		{
-			InGameSettingsManager.WaveMatchParam wmParam = inGameSettings.waveMatchParam;
-			load_queue.CacheSE(wmParam.waveJingleId, null);
-			load_queue.CacheSE(wmParam.targetHitSeId, null);
-			load_queue.CacheSE(wmParam.targetBreakSeId, null);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, wmParam.targetChangeAnimEffect);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, wmParam.targetHitEffect);
+			InGameSettingsManager.WaveMatchParam waveMatchParam = inGameSettings.GetWaveMatchParam();
+			load_queue.CacheSE(waveMatchParam.waveJingleId);
+			load_queue.CacheSE(waveMatchParam.targetHitSeId);
+			load_queue.CacheSE(waveMatchParam.targetBreakSeId);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, waveMatchParam.targetChangeAnimEffect);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, waveMatchParam.targetHitEffect);
 		}
 		CacheAudio(load_queue);
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(70);
 		}
-		yield return (object)this.StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPop());
+		yield return this.StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPop());
 		InGameManager.IntervalTransferInfo interval_transfer_info = null;
 		if (MonoBehaviourSingleton<InGameManager>.IsValid())
 		{
@@ -493,22 +541,22 @@ public class InGameMain : GameSection
 			MonoBehaviourSingleton<StageObjectManager>.I.Init(interval_transfer_info);
 		}
 		List<Character> load_check_list = new List<Character>();
-		int j = 0;
-		for (int len2 = MonoBehaviourSingleton<StageObjectManager>.I.characterList.Count; j < len2; j++)
+		int num5 = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.characterList.Count; num5 < count; num5++)
 		{
-			Character character = MonoBehaviourSingleton<StageObjectManager>.I.characterList[j] as Character;
-			if (character.IsCoopNone() && character.isLoading && MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(character.id) == null)
+			Character character2 = MonoBehaviourSingleton<StageObjectManager>.I.characterList[num5] as Character;
+			if (character2.IsCoopNone() && character2.isLoading && MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(character2.id) == null)
 			{
-				load_check_list.Add(character);
+				load_check_list.Add(character2);
 			}
 		}
 		int i = 0;
 		for (int len = load_check_list.Count; i < len; i++)
 		{
-			Character character2 = load_check_list[i];
-			while (character2.isLoading)
+			Character character = load_check_list[i];
+			while (character.isLoading)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
@@ -525,19 +573,19 @@ public class InGameMain : GameSection
 		}
 		if (!FieldManager.IsValidInTutorial())
 		{
-			yield return (object)MonoBehaviourSingleton<AppMain>.I.ClearMemory(false, false);
+			yield return MonoBehaviourSingleton<AppMain>.I.ClearMemory(clearObjCaches: false, clearPreloaded: false);
 		}
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
-			float limit_time = MonoBehaviourSingleton<InGameManager>.I.GetCurrentLimitTime();
-			MonoBehaviourSingleton<InGameProgress>.I.SetLimitTime(limit_time);
+			float currentLimitTime = MonoBehaviourSingleton<InGameManager>.I.GetCurrentLimitTime();
+			MonoBehaviourSingleton<InGameProgress>.I.SetLimitTime(currentLimitTime);
 			if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
 			{
-				MonoBehaviourSingleton<InGameProgress>.I.SetRushRemainTime((int)limit_time);
+				MonoBehaviourSingleton<InGameProgress>.I.SetRushRemainTime((int)currentLimitTime);
 			}
 			if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
 			{
-				MonoBehaviourSingleton<InGameProgress>.I.SetArenaRemainTime(Mathf.FloorToInt(limit_time));
+				MonoBehaviourSingleton<InGameProgress>.I.SetArenaRemainTime(Mathf.FloorToInt(currentLimitTime));
 			}
 			if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle())
 			{
@@ -553,7 +601,7 @@ public class InGameMain : GameSection
 			}
 			if (QuestManager.IsValidInGameExplore() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<InGameManager>.I.isAlreadyBattleStarted && MonoBehaviourSingleton<InGameProgress>.I.enableLimitTime)
 			{
-				MonoBehaviourSingleton<InGameProgress>.I.StartTimer(0f);
+				MonoBehaviourSingleton<InGameProgress>.I.StartTimer();
 			}
 			if (FieldManager.IsValidInGameNoQuest())
 			{
@@ -563,13 +611,13 @@ public class InGameMain : GameSection
 		MonoBehaviourSingleton<InGameManager>.I.CheckStageInitialState();
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
-			yield return (object)this.StartCoroutine(MonoBehaviourSingleton<CoopManager>.I.coopStage.DoActivate());
+			yield return this.StartCoroutine(MonoBehaviourSingleton<CoopManager>.I.coopStage.DoActivate());
 		}
 		MonoBehaviourSingleton<StageObjectManager>.I.objectList.ForEach(delegate(StageObject o)
 		{
 			if (o.controller != null)
 			{
-				o.controller.SetEnableControll(true, ControllerBase.DISABLE_FLAG.BATTLE_START);
+				o.controller.SetEnableControll(enable: true, ControllerBase.DISABLE_FLAG.BATTLE_START);
 			}
 		});
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
@@ -578,7 +626,7 @@ public class InGameMain : GameSection
 			self.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.INITIALIZE;
 			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 			{
-				self.SetActionTarget(MonoBehaviourSingleton<StageObjectManager>.I.boss, true);
+				self.SetActionTarget(MonoBehaviourSingleton<StageObjectManager>.I.boss);
 			}
 		}
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
@@ -616,8 +664,8 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<UIEnduranceStatus>.I.DoDisable();
 		}
-		yield return (object)0;
-		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, false);
+		yield return 0;
+		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, is_stop: false);
 		if (vorgonPreEventController != null)
 		{
 			vorgonPreEventController.set_enabled(true);
@@ -633,24 +681,26 @@ public class InGameMain : GameSection
 		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.self.ResetShadowSealingUI();
+			MonoBehaviourSingleton<StageObjectManager>.I.self.ResetConcussionUI();
 		}
+		SyncRotatePosition();
 		if (UIInGameFieldMenu.IsValid() && !UIInGameFieldMenu.I.IsPopMenu())
 		{
-			FieldMapTable.FieldMapTableData field = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-			if (field != null)
+			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+			if (fieldMapData != null)
 			{
-				if (!FieldManager.HasWorldMap(field.mapID))
+				if (!FieldManager.HasWorldMap(fieldMapData.mapID))
 				{
-					UIInGameFieldMenu.I.SetDisableMapButton(true);
+					UIInGameFieldMenu.I.SetDisableMapButton(disable: true);
 				}
 			}
 			else
 			{
-				UIInGameFieldMenu.I.SetDisableMapButton(true);
+				UIInGameFieldMenu.I.SetDisableMapButton(disable: true);
 			}
 			if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
 			{
-				UIInGameFieldMenu.I.SetDisableEventButton(true);
+				UIInGameFieldMenu.I.SetDisableEventButton(disable: true);
 			}
 		}
 		bool waitGetAutoTime = true;
@@ -658,21 +708,15 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<UIPlayerStatus>.I.autoBattleButton.GetAutoPlayTime(delegate
 			{
-				((_003CDoInitialize_003Ec__IteratorB0)/*Error near IL_1863: stateMachine*/)._003CwaitGetAutoTime_003E__70 = false;
+				waitGetAutoTime = false;
 			});
 		}
 		while (waitGetAutoTime)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		while (!MonoBehaviourSingleton<UIManager>.I.canHideGGTutorialMessage(5f))
-		{
-			yield return (object)null;
-		}
-		MonoBehaviourSingleton<UIManager>.I.HideGGTutorialMessage();
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 3)
 		{
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_mission_start, "Tutorial");
 		}
 		if (MonoBehaviourSingleton<UIQuestRepeat>.IsValid())
 		{
@@ -683,34 +727,34 @@ public class InGameMain : GameSection
 
 	public void SetMapButtonState()
 	{
-		if (UIInGameFieldMenu.IsValid())
+		if (!UIInGameFieldMenu.IsValid())
 		{
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-			if (fieldMapData != null)
+			return;
+		}
+		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+		if (fieldMapData != null)
+		{
+			if (!FieldManager.HasWorldMap(fieldMapData.mapID))
 			{
-				if (!FieldManager.HasWorldMap(fieldMapData.mapID))
-				{
-					UIInGameFieldMenu.I.SetDisableMapButton(true);
-				}
+				UIInGameFieldMenu.I.SetDisableMapButton(disable: true);
 			}
-			else
-			{
-				UIInGameFieldMenu.I.SetDisableMapButton(true);
-			}
-			if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
-			{
-				UIInGameFieldMenu.I.SetDisableEventButton(true);
-			}
-			else
-			{
-				UIInGameFieldMenu.I.SetDisableEventButton(false);
-			}
+		}
+		else
+		{
+			UIInGameFieldMenu.I.SetDisableMapButton(disable: true);
+		}
+		if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
+		{
+			UIInGameFieldMenu.I.SetDisableEventButton(disable: true);
+		}
+		else
+		{
+			UIInGameFieldMenu.I.SetDisableEventButton(disable: false);
 		}
 	}
 
 	protected override void OnOpen()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIExplorePlayerStatusList componentInChildren = this.GetComponentInChildren<UIExplorePlayerStatusList>(true);
 		if (Object.op_Implicit(componentInChildren))
 		{
@@ -722,10 +766,9 @@ public class InGameMain : GameSection
 
 	public override void StartSection()
 	{
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 		if (UITutorialFieldHelper.IsValid())
 		{
-			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, false);
+			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, disable: false);
 			switch (UITutorialFieldHelper.m_State)
 			{
 			case UITutorialFieldHelper.MessageState.CollectItemImg:
@@ -764,6 +807,10 @@ public class InGameMain : GameSection
 		{
 			SetCoopStageReady();
 		}
+		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.EnableClanChat)
+		{
+			MonoBehaviourSingleton<ClanMatchingManager>.I.UpdateUnreadMessage();
+		}
 		base.StartSection();
 	}
 
@@ -780,16 +827,16 @@ public class InGameMain : GameSection
 		int completableDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum();
 		int completableEventDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum();
 		int num = completableDeliveryNum - completableEventDeliveryNum;
-		SetBadge((Enum)UI.BTN_REQUEST, num, 3, -5, -5, false);
-		SetBadge((Enum)UI.BTN_EVENT, completableEventDeliveryNum, 3, -5, -5, false);
+		SetBadge((Enum)UI.BTN_REQUEST, num, 3, -5, -5, is_scale_normalize: false);
+		SetBadge((Enum)UI.BTN_EVENT, completableEventDeliveryNum, 3, -5, -5, is_scale_normalize: false);
 		if (LoungeMatchingManager.IsValidInLounge())
 		{
 			int num2 = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount() - 1;
-			SetBadge((Enum)UI.BTN_LOUNGE_MEMBER, num2, 3, -5, -5, false);
+			SetBadge((Enum)UI.BTN_LOUNGE_MEMBER, num2, 3, -5, -5, is_scale_normalize: false);
 		}
 		if (UIInGameFieldMenu.IsValid() && !UIInGameFieldMenu.I.IsPopMenu())
 		{
-			SetBadge((Enum)UI.BTN_INGAME_MENU, completableDeliveryNum, 3, -5, -5, false);
+			SetBadge((Enum)UI.BTN_INGAME_MENU, completableDeliveryNum, 3, -5, -5, is_scale_normalize: false);
 		}
 	}
 
@@ -805,11 +852,11 @@ public class InGameMain : GameSection
 			TutorialStep4_2();
 			if (!UIInGameFieldMenu.I.IsPopMenu())
 			{
-				SetBadge((Enum)UI.BTN_INGAME_MENU, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(), 3, -5, -5, false);
+				SetBadge((Enum)UI.BTN_INGAME_MENU, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(), 3, -5, -5, is_scale_normalize: false);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_INGAME_MENU, 0, 3, -5, -5, false);
+				SetBadge((Enum)UI.BTN_INGAME_MENU, 0, 3, -5, -5, is_scale_normalize: false);
 			}
 		}
 	}
@@ -819,8 +866,8 @@ public class InGameMain : GameSection
 		if (is_collect_tutorial)
 		{
 			execTutorial4_1 = true;
-			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, true);
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("InGameScene", "TutorialStep4_1_1", null);
+			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, disable: true);
+			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("InGameScene", "TutorialStep4_1_1");
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.self.hitOffFlag |= StageObject.HIT_OFF_FLAG.TUTORIAL;
@@ -830,10 +877,10 @@ public class InGameMain : GameSection
 
 	private void TutorialStep4_2()
 	{
-		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, false);
+		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_TUTORIAL, disable: false);
 		if (is_collect_tutorial)
 		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("InGameScene", "TutorialStep4_1_2", null);
+			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("InGameScene", "TutorialStep4_1_2");
 		}
 	}
 
@@ -854,22 +901,20 @@ public class InGameMain : GameSection
 
 	private void OnDisable()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		if (inGameMembers != null)
 		{
 			MonoBehaviourSingleton<InGameManager>.I.SetIntervalTransferSelf();
-			Object.Destroy(inGameMembers.get_gameObject());
+			Object.DestroyImmediate(inGameMembers.get_gameObject());
 			inGameMembers = null;
 		}
 		if (inGameUIMembers != null)
 		{
-			Object.Destroy(inGameUIMembers.get_gameObject());
+			Object.DestroyImmediate(inGameUIMembers.get_gameObject());
 			inGameUIMembers = null;
 		}
 		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
 		{
-			Object.Destroy(MonoBehaviourSingleton<DropTargetMarkerManeger>.I);
+			Object.DestroyImmediate(MonoBehaviourSingleton<DropTargetMarkerManeger>.I);
 		}
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
@@ -885,12 +930,56 @@ public class InGameMain : GameSection
 		}
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
-			Object.Destroy(MonoBehaviourSingleton<AttackColliderManager>.I);
+			Object.DestroyImmediate(MonoBehaviourSingleton<AttackColliderManager>.I);
 		}
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
 		{
-			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close(UITransition.TYPE.CLOSE);
+			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close();
 		}
+	}
+
+	private void OnQuery_BINGO()
+	{
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<QuestManager>.I.SendGetBingoEventList(delegate
+		{
+			List<Network.EventData> validBingoDataListInSection = MonoBehaviourSingleton<QuestManager>.I.GetValidBingoDataListInSection();
+			if (validBingoDataListInSection != null && validBingoDataListInSection.Count > 0)
+			{
+				if (validBingoDataListInSection.Count == 1)
+				{
+					Network.EventData firstEvent = validBingoDataListInSection[0];
+					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(do_sort: false);
+					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
+					int num = (from d in deliveryTableDataList
+					where d.IsEvent() && d.eventID == firstEvent.eventId
+					select d).Count();
+					int num2 = 0;
+					for (int i = 0; i < clearStatusDelivery.Count; i++)
+					{
+						ClearStatusDelivery clearStatusDelivery2 = clearStatusDelivery[i];
+						DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)clearStatusDelivery2.deliveryId);
+						if (deliveryTableData == null)
+						{
+							Log.Warning("DeliveryTable Not Found : dId " + clearStatusDelivery2.deliveryId);
+						}
+						else if (deliveryTableData.IsEvent() && deliveryTableData.eventID == firstEvent.eventId && clearStatusDelivery2.deliveryStatus == 3)
+						{
+							num2++;
+						}
+					}
+					if (num + num2 == 18)
+					{
+						GameSection.ChangeStayEvent("MINI_BINGO");
+					}
+				}
+				else
+				{
+					GameSection.ChangeStayEvent("MINI_BINGO");
+				}
+			}
+			GameSection.ResumeEvent(is_resume: true);
+		});
 	}
 
 	private void OnQuery_RETIRE()
@@ -902,8 +991,8 @@ public class InGameMain : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool isSuccess)
 		{
-			GameSection.ResumeEvent(isSuccess, null);
-		}, false);
+			GameSection.ResumeEvent(isSuccess);
+		});
 	}
 
 	private void OnQuery_CONTINUE()
@@ -911,19 +1000,17 @@ public class InGameMain : GameSection
 		if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsTutorialCurrentQuest())
 		{
 			GameSection.SetEventData(StringTable.Get(STRING_CATEGORY.IN_GAME, 1007u));
+			return;
 		}
-		else
+		int num = 0;
+		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
-			int num = 0;
-			if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
-			{
-				num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_CONTINUE_USE_CRYSTAL;
-			}
-			GameSection.SetEventData(new object[1]
-			{
-				num
-			});
+			num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_CONTINUE_USE_CRYSTAL;
 		}
+		GameSection.SetEventData(new object[1]
+		{
+			num
+		});
 	}
 
 	private void OnQuery_WORLDMAP()
@@ -938,6 +1025,10 @@ public class InGameMain : GameSection
 		if (FieldManager.HasWorldMap(fieldMapData.mapID))
 		{
 			RequestEvent("DIRECT_REGION", num);
+		}
+		else
+		{
+			GameSceneEvent.Cancel();
 		}
 		CloseChatWindow();
 	}
@@ -978,11 +1069,10 @@ public class InGameMain : GameSection
 	{
 		if (FieldManager.IsValidInTutorial())
 		{
-			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_guide_movement, "Tutorial");
 			MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(MonoBehaviourSingleton<InGameProgress>.I.checkPortalObject.portalID);
 			MonoBehaviourSingleton<FieldManager>.I.useFastTravel = true;
 			GameSceneEvent.Cancel();
-			MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Title", "CharaMake", UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+			MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Title", "CharaMake");
 		}
 		else
 		{
@@ -991,6 +1081,11 @@ public class InGameMain : GameSection
 	}
 
 	private void OnQuery_InGameMainPortalHomeConfirm_YES()
+	{
+		PortalNext();
+	}
+
+	private void OnQuery_InGameMainPortalLoungeConfirm_YES()
 	{
 		PortalNext();
 	}
@@ -1060,13 +1155,34 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 			{
-			}, false);
+			});
+		});
+		Protocol.Force(delegate
+		{
+			MonoBehaviourSingleton<ClanMatchingManager>.I.SendInfo(delegate
+			{
+			});
 		});
 	}
 
 	private void OnQuery_QUEST_WINDOW()
 	{
 		CloseChatWindow();
+	}
+
+	private void OnQuery_QUEST_SELECT_WINDOW()
+	{
+		CloseChatWindow();
+		int num = (int)GameSection.GetEventData();
+		int count = MonoBehaviourSingleton<DeliveryManager>.I.GetNormalDeliveryList(num).Count;
+		List<EventData> list = new List<EventData>();
+		list.Add(new EventData("QUEST_WINDOW", null));
+		list.Add(new EventData("SELECT_NORMAL", null));
+		if (count > 0)
+		{
+			list.Add(new EventData("SELECT_AREA", num));
+		}
+		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(list.ToArray());
 	}
 
 	private void OnQuery_RETURN()
@@ -1086,36 +1202,35 @@ public class InGameMain : GameSection
 
 	private void OnQuery_EVENT_WINDOW()
 	{
-		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-		int completableEventDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(fieldMapData.eventId);
-		if (completableEventDeliveryNum > 0)
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent())
 		{
-			List<Network.EventData> eventList = MonoBehaviourSingleton<QuestManager>.I.eventList;
-			foreach (Network.EventData item in eventList)
+			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+			int count = MonoBehaviourSingleton<DeliveryManager>.I.GetEventDeliveryList(fieldMapData.eventId).Count;
+			if (count > 0)
 			{
-				if (item.eventId == fieldMapData.eventId)
+				List<Network.EventData> eventList = MonoBehaviourSingleton<QuestManager>.I.eventList;
+				foreach (Network.EventData item in eventList)
 				{
-					EventData[] autoEvents = new EventData[1]
+					if (item.eventId == fieldMapData.eventId)
 					{
-						new EventData("SELECT", item)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-					break;
+						EventData[] autoEvents = new EventData[1]
+						{
+							new EventData("SELECT", item)
+						};
+						MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
+						break;
+					}
 				}
 			}
 		}
 	}
 
-	private void OnQuery_INVITATION_LIST()
-	{
-	}
-
 	private void OnQuery_RALLY_INVITE()
 	{
-		MonoBehaviourSingleton<UIPlayerStatus>.I.SetDisableRalltBtn(true);
+		MonoBehaviourSingleton<UIPlayerStatus>.I.SetDisableRalltBtn(isDisable: true);
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendRally(delegate
 		{
-			UIInGamePopupDialog.PushOpen(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 35u), false, 3f);
+			UIInGamePopupDialog.PushOpen(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 35u), is_important: false, 3f);
 		});
 	}
 
@@ -1125,7 +1240,7 @@ public class InGameMain : GameSection
 		{
 			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 			{
-				MonoBehaviourSingleton<StageObjectManager>.I.self.OnSetPlayerStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.atk, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.def, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hp, true, null);
+				MonoBehaviourSingleton<StageObjectManager>.I.self.OnSetPlayerStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.atk, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.def, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hp);
 			}
 			if (MonoBehaviourSingleton<UIManager>.IsValid())
 			{
@@ -1134,11 +1249,11 @@ public class InGameMain : GameSection
 			prevLevel = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
 			if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
 			{
-				UIInGameFieldMenu.I.SetDisableEventButton(true);
+				UIInGameFieldMenu.I.SetDisableEventButton(disable: true);
 			}
 			else
 			{
-				UIInGameFieldMenu.I.SetDisableEventButton(false);
+				UIInGameFieldMenu.I.SetDisableEventButton(disable: false);
 			}
 		}
 		if ((NOTIFY_FLAG.UPDATE_DELIVERY_UPDATE & flags) != (NOTIFY_FLAG)0L)
@@ -1158,11 +1273,11 @@ public class InGameMain : GameSection
 			{
 				if (MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite && !MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.isOpen && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "InGameMain")
 				{
-					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open(UITransition.TYPE.OPEN);
+					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open();
 				}
 				else if (!MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.isOpen)
 				{
-					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close(UITransition.TYPE.CLOSE);
+					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close();
 				}
 			}
 		}
@@ -1172,11 +1287,11 @@ public class InGameMain : GameSection
 			{
 				if (MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite && !MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.isOpen && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "InGameMain")
 				{
-					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open(UITransition.TYPE.OPEN);
+					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open();
 				}
 				else if (!MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.isOpen)
 				{
-					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close(UITransition.TYPE.CLOSE);
+					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close();
 				}
 			}
 		}
@@ -1191,16 +1306,29 @@ public class InGameMain : GameSection
 		}
 		if ((flags & NOTIFY_FLAG.LOUNGE_KICKED) != (NOTIFY_FLAG)0L)
 		{
-			DispatchEvent("LOUNGE_KICKED", null);
+			DispatchEvent("LOUNGE_KICKED");
+			return;
 		}
-		else
+		if ((flags & NOTIFY_FLAG.RECEIVE_COOP_ROOM_UPDATE) != (NOTIFY_FLAG)0L && MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 		{
-			if ((flags & NOTIFY_FLAG.RECEIVE_COOP_ROOM_UPDATE) != (NOTIFY_FLAG)0L && MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
-			{
-				RefreshUI();
-			}
-			base.OnNotify(flags);
+			RefreshUI();
 		}
+		if ((flags & NOTIFY_FLAG.TRANSITION_END) != (NOTIFY_FLAG)0L)
+		{
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss != null)
+			{
+				MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss.ClearAnnounce();
+				if (MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss.IsKnockDownRaidBossByRaidBossHp())
+				{
+					MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss.PlayKnockDown();
+				}
+			}
+			if (MonoBehaviourSingleton<FieldManager>.IsValid())
+			{
+				MonoBehaviourSingleton<FieldManager>.I.MatchingNotice();
+			}
+		}
+		base.OnNotify(flags);
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
@@ -1210,7 +1338,6 @@ public class InGameMain : GameSection
 
 	private void InitializeExplorePlayerStatuses()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIExplorePlayerStatusList componentInChildren = this.GetComponentInChildren<UIExplorePlayerStatusList>(true);
 		if (Object.op_Implicit(componentInChildren))
 		{
@@ -1222,14 +1349,16 @@ public class InGameMain : GameSection
 
 	private void InitializeChatUI()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<ChatManager>.I.CreateRoomChatWithCoopIfNeeded();
 		MonoBehaviourSingleton<ChatManager>.I.roomChat.JoinRoom(0);
 		UIButton component = GetCtrl(UI.BTN_CHAT).GetComponent<UIButton>();
 		if (!(component == null))
 		{
 			if (!TutorialStep.HasAllTutorialCompleted())
+			{
+				component.get_gameObject().SetActive(false);
+			}
+			else if (QuestManager.IsValidInGameSeriesArena())
 			{
 				component.get_gameObject().SetActive(false);
 			}
@@ -1257,17 +1386,11 @@ public class InGameMain : GameSection
 
 	public override void OnModifyChat(MainChat.NOTIFY_FLAG flag)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
 			if ((flag & MainChat.NOTIFY_FLAG.ARRIVED_MESSAGE) != 0)
 			{
-				SpriteAlignment align = LoungeMatchingManager.IsValidInLounge() ? 1 : 3;
-				SetBadge((Enum)UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNumWithoutRoom(), align, -5, -5, false);
+				SetBadge((Enum)UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNum(), 1, -5, -5, is_scale_normalize: false);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.CLOSE_WINDOW) != 0)
 			{
@@ -1286,37 +1409,71 @@ public class InGameMain : GameSection
 
 	private void OnScreenRotate(bool is_portrait)
 	{
-		float num = (!is_portrait) ? 10f : 323f;
-		UIWidget component = GetCtrl(UI.WGT_CHAT_PARENT).GetComponent<UIWidget>();
-		if (Object.op_Implicit(component))
+		SyncRotatePosition();
+	}
+
+	private void SyncRotatePosition()
+	{
+		bool isPortrait = SpecialDeviceManager.IsPortrait;
+		Transform ctrl = GetCtrl(UI.WGT_CHAT_PARENT);
+		if (!Object.op_Implicit(ctrl))
 		{
-			UIStaticPanelChanger staticPanelChanger = component.GetComponentInParent<UIStaticPanelChanger>();
-			if (Object.op_Implicit(staticPanelChanger))
+			return;
+		}
+		UIWidget component = ctrl.get_gameObject().GetComponent<UIWidget>();
+		if (!Object.op_Implicit(component))
+		{
+			return;
+		}
+		UIStaticPanelChanger staticPanelChanger = ctrl.GetComponentInParent<UIStaticPanelChanger>();
+		if (!Object.op_Implicit(staticPanelChanger))
+		{
+			return;
+		}
+		staticPanelChanger.UnLock();
+		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyInGameChatOpenPosition)
+		{
+			DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+			if (SpecialDeviceManager.IsPortrait)
 			{
-				staticPanelChanger.UnLock();
-				component.topAnchor.Set(0f, num + (float)component.height);
-				component.bottomAnchor.Set(0f, num);
-				component.UpdateAnchors();
-				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					staticPanelChanger.Lock();
-				});
+				component.leftAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorPortrait.left);
+				component.rightAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorPortrait.right);
+				component.bottomAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorPortrait.bottom);
+				component.topAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorPortrait.top);
+			}
+			else
+			{
+				component.leftAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorLandscape.left);
+				component.rightAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorLandscape.right);
+				component.bottomAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorLandscape.bottom);
+				component.topAnchor.Set(0f, specialDeviceInfo.ChatButtonAnchorLandscape.top);
 			}
 		}
+		else
+		{
+			float num = (!isPortrait) ? 10f : 323f;
+			component.topAnchor.Set(0f, num + (float)component.height);
+			component.bottomAnchor.Set(0f, num);
+		}
+		component.UpdateAnchors();
+		AppMain i = MonoBehaviourSingleton<AppMain>.I;
+		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+		{
+			staticPanelChanger.Lock();
+		});
 	}
 
 	private void OnQuery_EVOLVE()
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && !object.ReferenceEquals(MonoBehaviourSingleton<StageObjectManager>.I.self, null) && MonoBehaviourSingleton<StageObjectManager>.I.self.ExecEvolve())
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && !object.ReferenceEquals(MonoBehaviourSingleton<StageObjectManager>.I.self, null) && MonoBehaviourSingleton<UIPlayerStatus>.I.IsEnableWeaponChangeButton() && MonoBehaviourSingleton<StageObjectManager>.I.self.ExecEvolve())
 		{
 			if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 			{
-				MonoBehaviourSingleton<UIPlayerStatus>.I.RestrictPopMenu(true);
+				MonoBehaviourSingleton<UIPlayerStatus>.I.RestrictPopMenu(isRestrict: true);
 			}
 			if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
 			{
-				MonoBehaviourSingleton<UIEnduranceStatus>.I.RestrictPopMenu(true);
+				MonoBehaviourSingleton<UIEnduranceStatus>.I.RestrictPopMenu(isRestrict: true);
 			}
 		}
 	}
@@ -1325,11 +1482,11 @@ public class InGameMain : GameSection
 	{
 		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 		{
-			MonoBehaviourSingleton<UIPlayerStatus>.I.RestrictPopMenu(false);
+			MonoBehaviourSingleton<UIPlayerStatus>.I.RestrictPopMenu(isRestrict: false);
 		}
 		if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
 		{
-			MonoBehaviourSingleton<UIEnduranceStatus>.I.RestrictPopMenu(false);
+			MonoBehaviourSingleton<UIEnduranceStatus>.I.RestrictPopMenu(isRestrict: false);
 		}
 	}
 }

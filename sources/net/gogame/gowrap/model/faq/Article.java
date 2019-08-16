@@ -12,6 +12,9 @@ public class Article {
     private String body;
     private String title;
 
+    public Article() {
+    }
+
     public Article(String str, String str2) {
         this.title = str;
         this.body = str2;

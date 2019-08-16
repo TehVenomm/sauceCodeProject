@@ -1,30 +1,28 @@
 package com.google.android.gms.common.internal;
 
-import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.BinderThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import android.os.Parcel;
+import android.os.RemoteException;
+import com.google.android.gms.dynamic.IObjectWrapper;
+import com.google.android.gms.dynamic.IObjectWrapper.Stub;
+import com.google.android.gms.internal.common.zza;
 
-public final class zzk extends zzaw {
-    private zzd zzfth;
-    private final int zzfti;
-
-    public zzk(@NonNull zzd zzd, int i) {
-        this.zzfth = zzd;
-        this.zzfti = i;
+public final class zzk extends zza implements zzi {
+    zzk(IBinder iBinder) {
+        super(iBinder, "com.google.android.gms.common.internal.ICertData");
     }
 
-    @BinderThread
-    public final void zza(int i, @Nullable Bundle bundle) {
-        Log.wtf("GmsClient", "received deprecated onAccountValidationComplete callback, ignoring", new Exception());
+    public final IObjectWrapper zzb() throws RemoteException {
+        Parcel zza = zza(1, zza());
+        IObjectWrapper asInterface = Stub.asInterface(zza.readStrongBinder());
+        zza.recycle();
+        return asInterface;
     }
 
-    @BinderThread
-    public final void zza(int i, @NonNull IBinder iBinder, @Nullable Bundle bundle) {
-        zzbp.zzb(this.zzfth, (Object) "onPostInitComplete can be called only once per call to getRemoteService");
-        this.zzfth.zza(i, iBinder, bundle, this.zzfti);
-        this.zzfth = null;
+    public final int zzc() throws RemoteException {
+        Parcel zza = zza(2, zza());
+        int readInt = zza.readInt();
+        zza.recycle();
+        return readInt;
     }
 }

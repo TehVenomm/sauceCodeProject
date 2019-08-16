@@ -50,7 +50,7 @@ public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_SETTINGS, false);
+		SetActive((Enum)UI.STR_NON_SETTINGS, is_visible: false);
 		int i = 0;
 		for (int num = passCode.Length; i < num; i++)
 		{
@@ -59,7 +59,7 @@ public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 		string text = string.Join(string.Empty, passCode);
 		if (text.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_SETTINGS, true);
+			SetActive((Enum)UI.STR_NON_SETTINGS, is_visible: true);
 		}
 		else
 		{
@@ -95,7 +95,7 @@ public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 		text = text.Replace("-", string.Empty);
 		int.TryParse(text, out result);
 		MonoBehaviourSingleton<PartyManager>.I.partySetting.level = result;
-		GameSection.ChangeEvent("[BACK]", null);
+		GameSection.ChangeEvent("[BACK]");
 	}
 
 	private void OnQuery_SECTION_BACK()

@@ -1,12 +1,13 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
 import android.os.Build.VERSION;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.media.VolumeProviderCompatApi21.Delegate;
+import android.support.p000v4.media.VolumeProviderCompatApi21.Delegate;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/* renamed from: android.support.v4.media.VolumeProviderCompat */
 public abstract class VolumeProviderCompat {
     public static final int VOLUME_CONTROL_ABSOLUTE = 2;
     public static final int VOLUME_CONTROL_FIXED = 0;
@@ -17,26 +18,14 @@ public abstract class VolumeProviderCompat {
     private final int mMaxVolume;
     private Object mVolumeProviderObj;
 
-    /* renamed from: android.support.v4.media.VolumeProviderCompat$1 */
-    class C00821 implements Delegate {
-        C00821() {
-        }
-
-        public void onAdjustVolume(int i) {
-            VolumeProviderCompat.this.onAdjustVolume(i);
-        }
-
-        public void onSetVolumeTo(int i) {
-            VolumeProviderCompat.this.onSetVolumeTo(i);
-        }
-    }
-
+    /* renamed from: android.support.v4.media.VolumeProviderCompat$Callback */
     public static abstract class Callback {
         public abstract void onVolumeChanged(VolumeProviderCompat volumeProviderCompat);
     }
 
     @RestrictTo({Scope.LIBRARY_GROUP})
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.media.VolumeProviderCompat$ControlType */
     public @interface ControlType {
     }
 
@@ -59,10 +48,17 @@ public abstract class VolumeProviderCompat {
     }
 
     public Object getVolumeProvider() {
-        if (this.mVolumeProviderObj != null || VERSION.SDK_INT < 21) {
-            return this.mVolumeProviderObj;
+        if (this.mVolumeProviderObj == null && VERSION.SDK_INT >= 21) {
+            this.mVolumeProviderObj = VolumeProviderCompatApi21.createVolumeProvider(this.mControlType, this.mMaxVolume, this.mCurrentVolume, new Delegate() {
+                public void onAdjustVolume(int i) {
+                    VolumeProviderCompat.this.onAdjustVolume(i);
+                }
+
+                public void onSetVolumeTo(int i) {
+                    VolumeProviderCompat.this.onSetVolumeTo(i);
+                }
+            });
         }
-        this.mVolumeProviderObj = VolumeProviderCompatApi21.createVolumeProvider(this.mControlType, this.mMaxVolume, this.mCurrentVolume, new C00821());
         return this.mVolumeProviderObj;
     }
 
@@ -79,7 +75,7 @@ public abstract class VolumeProviderCompat {
     public final void setCurrentVolume(int i) {
         this.mCurrentVolume = i;
         Object volumeProvider = getVolumeProvider();
-        if (volumeProvider != null) {
+        if (volumeProvider != null && VERSION.SDK_INT >= 21) {
             VolumeProviderCompatApi21.setCurrentVolume(volumeProvider, i);
         }
         if (this.mCallback != null) {

@@ -9,14 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class ShareMediaContent extends ShareContent<ShareMediaContent, Builder> {
-    public static final Creator<ShareMediaContent> CREATOR = new C05131();
-    private final List<ShareMedia> media;
-
-    /* renamed from: com.facebook.share.model.ShareMediaContent$1 */
-    static final class C05131 implements Creator<ShareMediaContent> {
-        C05131() {
-        }
-
+    public static final Creator<ShareMediaContent> CREATOR = new Creator<ShareMediaContent>() {
         public ShareMediaContent createFromParcel(Parcel parcel) {
             return new ShareMediaContent(parcel);
         }
@@ -24,10 +17,12 @@ public final class ShareMediaContent extends ShareContent<ShareMediaContent, Bui
         public ShareMediaContent[] newArray(int i) {
             return new ShareMediaContent[i];
         }
-    }
+    };
+    private final List<ShareMedia> media;
 
     public static class Builder extends com.facebook.share.model.ShareContent.Builder<ShareMediaContent, Builder> {
-        private final List<ShareMedia> media = new ArrayList();
+        /* access modifiers changed from: private */
+        public final List<ShareMedia> media = new ArrayList();
 
         public Builder addMedia(@Nullable List<ShareMedia> list) {
             if (list != null) {
@@ -39,8 +34,8 @@ public final class ShareMediaContent extends ShareContent<ShareMediaContent, Bui
         }
 
         public Builder addMedium(@Nullable ShareMedia shareMedia) {
+            Object build;
             if (shareMedia != null) {
-                Object build;
                 if (shareMedia instanceof SharePhoto) {
                     build = new com.facebook.share.model.SharePhoto.Builder().readFrom((SharePhoto) shareMedia).build();
                 } else if (shareMedia instanceof ShareVideo) {
@@ -54,11 +49,11 @@ public final class ShareMediaContent extends ShareContent<ShareMediaContent, Bui
         }
 
         public ShareMediaContent build() {
-            return new ShareMediaContent();
+            return new ShareMediaContent(this);
         }
 
         public Builder readFrom(ShareMediaContent shareMediaContent) {
-            return shareMediaContent == null ? this : ((Builder) super.readFrom((ShareContent) shareMediaContent)).addMedia(shareMediaContent.getMedia());
+            return shareMediaContent == null ? this : ((Builder) super.readFrom(shareMediaContent)).addMedia(shareMediaContent.getMedia());
         }
 
         public Builder setMedia(@Nullable List<ShareMedia> list) {

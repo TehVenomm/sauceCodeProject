@@ -3,7 +3,6 @@ package com.squareup.picasso;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
@@ -15,7 +14,7 @@ import com.squareup.picasso.RequestHandler.Result;
 import java.io.IOException;
 
 class MediaStoreRequestHandler extends ContentStreamRequestHandler {
-    private static final String[] CONTENT_ORIENTATION = new String[]{"orientation"};
+    private static final String[] CONTENT_ORIENTATION = {"orientation"};
 
     enum PicassoKind {
         MICRO(3, 96, 96),
@@ -43,21 +42,21 @@ class MediaStoreRequestHandler extends ContentStreamRequestHandler {
     }
 
     public Result load(Request request, int i) throws IOException {
+        Bitmap thumbnail;
         ContentResolver contentResolver = this.context.getContentResolver();
         int exifOrientation = getExifOrientation(contentResolver, request.uri);
         String type = contentResolver.getType(request.uri);
-        Object obj = (type == null || !type.startsWith("video/")) ? null : 1;
+        boolean z = type != null && type.startsWith("video/");
         if (request.hasSize()) {
             PicassoKind picassoKind = getPicassoKind(request.targetWidth, request.targetHeight);
-            if (obj == null && picassoKind == PicassoKind.FULL) {
+            if (!z && picassoKind == PicassoKind.FULL) {
                 return new Result(null, getInputStream(request), LoadedFrom.DISK, exifOrientation);
             }
-            Bitmap thumbnail;
             long parseId = ContentUris.parseId(request.uri);
-            Options createBitmapOptions = RequestHandler.createBitmapOptions(request);
+            Options createBitmapOptions = createBitmapOptions(request);
             createBitmapOptions.inJustDecodeBounds = true;
-            RequestHandler.calculateInSampleSize(request.targetWidth, request.targetHeight, picassoKind.width, picassoKind.height, createBitmapOptions, request);
-            if (obj != null) {
+            calculateInSampleSize(request.targetWidth, request.targetHeight, picassoKind.width, picassoKind.height, createBitmapOptions, request);
+            if (z) {
                 thumbnail = Thumbnails.getThumbnail(contentResolver, parseId, picassoKind == PicassoKind.FULL ? 1 : picassoKind.androidKind, createBitmapOptions);
             } else {
                 thumbnail = Images.Thumbnails.getThumbnail(contentResolver, parseId, picassoKind.androidKind, createBitmapOptions);
@@ -79,53 +78,60 @@ class MediaStoreRequestHandler extends ContentStreamRequestHandler {
         return PicassoKind.MINI;
     }
 
-    static int getExifOrientation(ContentResolver contentResolver, Uri uri) {
-        Cursor cursor;
-        Throwable th;
-        Cursor query;
-        try {
-            query = contentResolver.query(uri, CONTENT_ORIENTATION, null, null, null);
-            if (query != null) {
-                try {
-                    if (query.moveToFirst()) {
-                        int i = query.getInt(0);
-                        if (query == null) {
-                            return i;
-                        }
-                        query.close();
-                        return i;
-                    }
-                } catch (RuntimeException e) {
-                    cursor = query;
-                    if (cursor != null) {
-                        cursor.close();
-                    }
-                    return 0;
-                } catch (Throwable th2) {
-                    th = th2;
-                    if (query != null) {
-                        query.close();
-                    }
-                    throw th;
-                }
-            }
-            if (query != null) {
-                query.close();
-            }
-            return 0;
-        } catch (RuntimeException e2) {
-            cursor = null;
-            if (cursor != null) {
-                cursor.close();
-            }
-            return 0;
-        } catch (Throwable th3) {
-            th = th3;
-            query = null;
-            if (query != null) {
-                query.close();
-            }
-            throw th;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:23:0x0034  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    static int getExifOrientation(android.content.ContentResolver r8, android.net.Uri r9) {
+        /*
+            r6 = 0
+            r7 = 0
+            java.lang.String[] r2 = CONTENT_ORIENTATION     // Catch:{ RuntimeException -> 0x0027, all -> 0x0030 }
+            r3 = 0
+            r4 = 0
+            r5 = 0
+            r0 = r8
+            r1 = r9
+            android.database.Cursor r1 = r0.query(r1, r2, r3, r4, r5)     // Catch:{ RuntimeException -> 0x0027, all -> 0x0030 }
+            if (r1 == 0) goto L_0x0015
+            boolean r0 = r1.moveToFirst()     // Catch:{ RuntimeException -> 0x003a, all -> 0x0038 }
+            if (r0 != 0) goto L_0x001c
+        L_0x0015:
+            if (r1 == 0) goto L_0x001a
+            r1.close()
+        L_0x001a:
+            r0 = r6
+        L_0x001b:
+            return r0
+        L_0x001c:
+            r0 = 0
+            int r0 = r1.getInt(r0)     // Catch:{ RuntimeException -> 0x003a, all -> 0x0038 }
+            if (r1 == 0) goto L_0x001b
+            r1.close()
+            goto L_0x001b
+        L_0x0027:
+            r0 = move-exception
+            r0 = r7
+        L_0x0029:
+            if (r0 == 0) goto L_0x002e
+            r0.close()
+        L_0x002e:
+            r0 = r6
+            goto L_0x001b
+        L_0x0030:
+            r0 = move-exception
+            r1 = r7
+        L_0x0032:
+            if (r1 == 0) goto L_0x0037
+            r1.close()
+        L_0x0037:
+            throw r0
+        L_0x0038:
+            r0 = move-exception
+            goto L_0x0032
+        L_0x003a:
+            r0 = move-exception
+            r0 = r1
+            goto L_0x0029
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.squareup.picasso.MediaStoreRequestHandler.getExifOrientation(android.content.ContentResolver, android.net.Uri):int");
     }
 }

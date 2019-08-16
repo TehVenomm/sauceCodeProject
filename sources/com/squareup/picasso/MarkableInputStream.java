@@ -7,7 +7,9 @@ import java.io.InputStream;
 final class MarkableInputStream extends InputStream {
     private static final int DEFAULT_BUFFER_SIZE = 4096;
     private long defaultMark;
-    private final InputStream in;
+
+    /* renamed from: in */
+    private final InputStream f443in;
     private long limit;
     private long offset;
     private long reset;
@@ -21,7 +23,7 @@ final class MarkableInputStream extends InputStream {
         if (!inputStream.markSupported()) {
             inputStream = new BufferedInputStream(inputStream, i);
         }
-        this.in = inputStream;
+        this.f443in = inputStream;
     }
 
     public void mark(int i) {
@@ -40,10 +42,10 @@ final class MarkableInputStream extends InputStream {
         try {
             if (this.reset >= this.offset || this.offset > this.limit) {
                 this.reset = this.offset;
-                this.in.mark((int) (j - this.offset));
+                this.f443in.mark((int) (j - this.offset));
             } else {
-                this.in.reset();
-                this.in.mark((int) (j - this.reset));
+                this.f443in.reset();
+                this.f443in.mark((int) (j - this.reset));
                 skip(this.reset, this.offset);
             }
             this.limit = j;
@@ -60,14 +62,14 @@ final class MarkableInputStream extends InputStream {
         if (this.offset > this.limit || j < this.reset) {
             throw new IOException("Cannot reset");
         }
-        this.in.reset();
+        this.f443in.reset();
         skip(this.reset, j);
         this.offset = j;
     }
 
     private void skip(long j, long j2) throws IOException {
         while (j < j2) {
-            long skip = this.in.skip(j2 - j);
+            long skip = this.f443in.skip(j2 - j);
             if (skip == 0) {
                 if (read() != -1) {
                     skip = 1;
@@ -80,7 +82,7 @@ final class MarkableInputStream extends InputStream {
     }
 
     public int read() throws IOException {
-        int read = this.in.read();
+        int read = this.f443in.read();
         if (read != -1) {
             this.offset++;
         }
@@ -88,7 +90,7 @@ final class MarkableInputStream extends InputStream {
     }
 
     public int read(byte[] bArr) throws IOException {
-        int read = this.in.read(bArr);
+        int read = this.f443in.read(bArr);
         if (read != -1) {
             this.offset += (long) read;
         }
@@ -96,7 +98,7 @@ final class MarkableInputStream extends InputStream {
     }
 
     public int read(byte[] bArr, int i, int i2) throws IOException {
-        int read = this.in.read(bArr, i, i2);
+        int read = this.f443in.read(bArr, i, i2);
         if (read != -1) {
             this.offset += (long) read;
         }
@@ -104,20 +106,20 @@ final class MarkableInputStream extends InputStream {
     }
 
     public long skip(long j) throws IOException {
-        long skip = this.in.skip(j);
+        long skip = this.f443in.skip(j);
         this.offset += skip;
         return skip;
     }
 
     public int available() throws IOException {
-        return this.in.available();
+        return this.f443in.available();
     }
 
     public void close() throws IOException {
-        this.in.close();
+        this.f443in.close();
     }
 
     public boolean markSupported() {
-        return this.in.markSupported();
+        return this.f443in.markSupported();
     }
 }

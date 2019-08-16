@@ -1,13 +1,17 @@
-package android.support.v4.text;
+package android.support.p000v4.text;
 
 import android.text.SpannableStringBuilder;
 import java.util.Locale;
 
+/* renamed from: android.support.v4.text.BidiFormatter */
 public final class BidiFormatter {
     private static final int DEFAULT_FLAGS = 2;
-    private static final BidiFormatter DEFAULT_LTR_INSTANCE = new BidiFormatter(false, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
-    private static final BidiFormatter DEFAULT_RTL_INSTANCE = new BidiFormatter(true, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
-    private static TextDirectionHeuristicCompat DEFAULT_TEXT_DIRECTION_HEURISTIC = TextDirectionHeuristicsCompat.FIRSTSTRONG_LTR;
+    /* access modifiers changed from: private */
+    public static final BidiFormatter DEFAULT_LTR_INSTANCE = new BidiFormatter(false, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
+    /* access modifiers changed from: private */
+    public static final BidiFormatter DEFAULT_RTL_INSTANCE = new BidiFormatter(true, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
+    /* access modifiers changed from: private */
+    public static TextDirectionHeuristicCompat DEFAULT_TEXT_DIRECTION_HEURISTIC = TextDirectionHeuristicsCompat.FIRSTSTRONG_LTR;
     private static final int DIR_LTR = -1;
     private static final int DIR_RTL = 1;
     private static final int DIR_UNKNOWN = 0;
@@ -24,6 +28,7 @@ public final class BidiFormatter {
     private final int mFlags;
     private final boolean mIsRtlContext;
 
+    /* renamed from: android.support.v4.text.BidiFormatter$Builder */
     public static final class Builder {
         private int mFlags;
         private boolean mIsRtlContext;
@@ -70,6 +75,7 @@ public final class BidiFormatter {
         }
     }
 
+    /* renamed from: android.support.v4.text.BidiFormatter$DirectionalityEstimator */
     private static class DirectionalityEstimator {
         private static final byte[] DIR_TYPE_CACHE = new byte[DIR_TYPE_CACHE_SIZE];
         private static final int DIR_TYPE_CACHE_SIZE = 1792;
@@ -92,7 +98,7 @@ public final class BidiFormatter {
         }
 
         private static byte getCachedDirectionality(char c) {
-            return c < '܀' ? DIR_TYPE_CACHE[c] : Character.getDirectionality(c);
+            return c < DIR_TYPE_CACHE_SIZE ? DIR_TYPE_CACHE[c] : Character.getDirectionality(c);
         }
 
         private byte skipEntityBackward() {
@@ -106,12 +112,13 @@ public final class BidiFormatter {
                     if (this.lastChar == ';') {
                         break;
                     }
+                } else {
+                    return 12;
                 }
-                return (byte) 12;
             }
             this.charIndex = i;
             this.lastChar = (char) 59;
-            return (byte) 13;
+            return 13;
         }
 
         private byte skipEntityForward() {
@@ -125,7 +132,7 @@ public final class BidiFormatter {
                     break;
                 }
             }
-            return (byte) 12;
+            return 12;
         }
 
         private byte skipTagBackward() {
@@ -136,7 +143,7 @@ public final class BidiFormatter {
                 this.charIndex = i2;
                 this.lastChar = charSequence.charAt(i2);
                 if (this.lastChar == '<') {
-                    return (byte) 12;
+                    return 12;
                 }
                 if (this.lastChar == '>') {
                     break;
@@ -156,7 +163,7 @@ public final class BidiFormatter {
             }
             this.charIndex = i;
             this.lastChar = (char) 62;
-            return (byte) 13;
+            return 13;
         }
 
         private byte skipTagForward() {
@@ -167,7 +174,7 @@ public final class BidiFormatter {
                 this.charIndex = i2 + 1;
                 this.lastChar = charSequence.charAt(i2);
                 if (this.lastChar == '>') {
-                    return (byte) 12;
+                    return 12;
                 }
                 if (this.lastChar == '\"' || this.lastChar == '\'') {
                     char c = this.lastChar;
@@ -185,10 +192,11 @@ public final class BidiFormatter {
             }
             this.charIndex = i;
             this.lastChar = (char) 60;
-            return (byte) 13;
+            return 13;
         }
 
-        byte dirTypeBackward() {
+        /* access modifiers changed from: 0000 */
+        public byte dirTypeBackward() {
             this.lastChar = this.text.charAt(this.charIndex - 1);
             if (Character.isLowSurrogate(this.lastChar)) {
                 int codePointBefore = Character.codePointBefore(this.text, this.charIndex);
@@ -200,7 +208,8 @@ public final class BidiFormatter {
             return this.isHtml ? this.lastChar == '>' ? skipTagBackward() : this.lastChar == ';' ? skipEntityBackward() : cachedDirectionality : cachedDirectionality;
         }
 
-        byte dirTypeForward() {
+        /* access modifiers changed from: 0000 */
+        public byte dirTypeForward() {
             this.lastChar = this.text.charAt(this.charIndex);
             if (Character.isHighSurrogate(this.lastChar)) {
                 int codePointAt = Character.codePointAt(this.text, this.charIndex);
@@ -212,39 +221,42 @@ public final class BidiFormatter {
             return this.isHtml ? this.lastChar == '<' ? skipTagForward() : this.lastChar == '&' ? skipEntityForward() : cachedDirectionality : cachedDirectionality;
         }
 
-        int getEntryDir() {
+        /* access modifiers changed from: 0000 */
+        public int getEntryDir() {
             this.charIndex = 0;
             int i = 0;
             int i2 = 0;
             int i3 = 0;
             while (this.charIndex < this.length && i == 0) {
                 switch (dirTypeForward()) {
-                    case (byte) 0:
+                    case 0:
                         if (i3 != 0) {
                             i = i3;
                             break;
+                        } else {
+                            return -1;
                         }
-                        return -1;
-                    case (byte) 1:
-                    case (byte) 2:
+                    case 1:
+                    case 2:
                         if (i3 != 0) {
                             i = i3;
                             break;
+                        } else {
+                            return 1;
                         }
-                        return 1;
-                    case (byte) 9:
+                    case 9:
                         break;
-                    case (byte) 14:
-                    case (byte) 15:
+                    case 14:
+                    case 15:
                         i3++;
                         i2 = -1;
                         break;
-                    case (byte) 16:
-                    case (byte) 17:
+                    case 16:
+                    case 17:
                         i3++;
                         i2 = 1;
                         break;
-                    case (byte) 18:
+                    case 18:
                         i3--;
                         i2 = 0;
                         break;
@@ -261,80 +273,88 @@ public final class BidiFormatter {
             }
             while (this.charIndex > 0) {
                 switch (dirTypeBackward()) {
-                    case (byte) 14:
-                    case (byte) 15:
+                    case 14:
+                    case 15:
                         if (i != i3) {
                             i3--;
                             break;
+                        } else {
+                            return -1;
                         }
-                        return -1;
-                    case (byte) 16:
-                    case (byte) 17:
+                    case 16:
+                    case 17:
                         if (i != i3) {
                             i3--;
                             break;
+                        } else {
+                            return 1;
                         }
-                        return 1;
-                    case (byte) 18:
+                    case 18:
                         i3++;
-                        break;
-                    default:
                         break;
                 }
             }
             return 0;
         }
 
-        int getExitDir() {
+        /* access modifiers changed from: 0000 */
+        public int getExitDir() {
             this.charIndex = this.length;
             int i = 0;
             int i2 = 0;
             while (this.charIndex > 0) {
                 switch (dirTypeBackward()) {
-                    case (byte) 0:
+                    case 0:
                         if (i2 != 0) {
                             if (i != 0) {
                                 break;
+                            } else {
+                                i = i2;
+                                break;
                             }
-                            i = i2;
-                            break;
+                        } else {
+                            return -1;
                         }
-                        return -1;
-                    case (byte) 1:
-                    case (byte) 2:
+                    case 1:
+                    case 2:
                         if (i2 != 0) {
                             if (i != 0) {
                                 break;
+                            } else {
+                                i = i2;
+                                break;
                             }
-                            i = i2;
-                            break;
+                        } else {
+                            return 1;
                         }
-                        return 1;
-                    case (byte) 9:
+                    case 9:
                         break;
-                    case (byte) 14:
-                    case (byte) 15:
+                    case 14:
+                    case 15:
                         if (i != i2) {
                             i2--;
                             break;
+                        } else {
+                            return -1;
                         }
-                        return -1;
-                    case (byte) 16:
-                    case (byte) 17:
+                    case 16:
+                    case 17:
                         if (i != i2) {
                             i2--;
                             break;
+                        } else {
+                            return 1;
                         }
-                        return 1;
-                    case (byte) 18:
+                    case 18:
                         i2++;
                         break;
                     default:
                         if (i != 0) {
                             break;
+                        } else {
+                            i = i2;
+                            break;
                         }
-                        i = i2;
-                        break;
                 }
             }
             return 0;
@@ -367,18 +387,19 @@ public final class BidiFormatter {
         return new Builder(z).build();
     }
 
-    private static boolean isRtlLocale(Locale locale) {
+    /* access modifiers changed from: private */
+    public static boolean isRtlLocale(Locale locale) {
         return TextUtilsCompat.getLayoutDirectionFromLocale(locale) == 1;
     }
 
     private String markAfter(CharSequence charSequence, TextDirectionHeuristicCompat textDirectionHeuristicCompat) {
         boolean isRtl = textDirectionHeuristicCompat.isRtl(charSequence, 0, charSequence.length());
-        return (this.mIsRtlContext || !(isRtl || getExitDir(charSequence) == 1)) ? (!this.mIsRtlContext || (isRtl && getExitDir(charSequence) != -1)) ? "" : RLM_STRING : LRM_STRING;
+        return (this.mIsRtlContext || (!isRtl && getExitDir(charSequence) != 1)) ? (!this.mIsRtlContext || (isRtl && getExitDir(charSequence) != -1)) ? "" : RLM_STRING : LRM_STRING;
     }
 
     private String markBefore(CharSequence charSequence, TextDirectionHeuristicCompat textDirectionHeuristicCompat) {
         boolean isRtl = textDirectionHeuristicCompat.isRtl(charSequence, 0, charSequence.length());
-        return (this.mIsRtlContext || !(isRtl || getEntryDir(charSequence) == 1)) ? (!this.mIsRtlContext || (isRtl && getEntryDir(charSequence) != -1)) ? "" : RLM_STRING : LRM_STRING;
+        return (this.mIsRtlContext || (!isRtl && getEntryDir(charSequence) != 1)) ? (!this.mIsRtlContext || (isRtl && getEntryDir(charSequence) != -1)) ? "" : RLM_STRING : LRM_STRING;
     }
 
     public boolean getStereoReset() {
@@ -441,7 +462,10 @@ public final class BidiFormatter {
     }
 
     public String unicodeWrap(String str, TextDirectionHeuristicCompat textDirectionHeuristicCompat, boolean z) {
-        return str == null ? null : unicodeWrap((CharSequence) str, textDirectionHeuristicCompat, z).toString();
+        if (str == null) {
+            return null;
+        }
+        return unicodeWrap((CharSequence) str, textDirectionHeuristicCompat, z).toString();
     }
 
     public String unicodeWrap(String str, boolean z) {

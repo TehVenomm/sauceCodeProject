@@ -96,7 +96,7 @@ namespace BestHTTP.PlatformSupport.Cryptography
 
 		~MD5CryptoServiceProvider()
 		{
-			Dispose(false);
+			Dispose(disposing: false);
 		}
 
 		protected override void Dispose(bool disposing)

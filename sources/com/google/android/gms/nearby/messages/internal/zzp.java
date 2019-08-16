@@ -5,5 +5,5 @@ import android.os.RemoteException;
 import com.google.android.gms.common.api.Status;
 
 public interface zzp extends IInterface {
-    void zzag(Status status) throws RemoteException;
+    void zza(Status status) throws RemoteException;
 }

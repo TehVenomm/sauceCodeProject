@@ -2,29 +2,57 @@ package com.google.android.gms.drive.events;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
-import com.google.android.gms.internal.zzbhe;
+import android.support.annotation.Nullable;
+import com.google.android.gms.common.data.DataHolder;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.drive.zzu;
 
-public final class zzo implements Creator<zzn> {
-    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
-        zzbhe zzbhe = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 2:
-                    zzbhe = (zzbhe) zzb.zza(parcel, readInt, zzbhe.CREATOR);
-                    break;
-                default:
-                    zzb.zzb(parcel, readInt);
-                    break;
-            }
-        }
-        zzb.zzaf(parcel, zzd);
-        return new zzn(zzbhe);
+@Class(creator = "QueryResultEventParcelableCreator")
+@Reserved({1})
+public final class zzo extends zzu implements DriveEvent {
+    public static final Creator<zzo> CREATOR = new zzp();
+    @Nullable
+    @Field(mo13990id = 2)
+    private final DataHolder zzat;
+    @Field(mo13990id = 3)
+    private final boolean zzco;
+    @Field(mo13990id = 4)
+    private final int zzcp;
+
+    @Constructor
+    public zzo(@Nullable @Param(mo13993id = 2) DataHolder dataHolder, @Param(mo13993id = 3) boolean z, @Param(mo13993id = 4) int i) {
+        this.zzat = dataHolder;
+        this.zzco = z;
+        this.zzcp = i;
     }
 
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzn[i];
+    public final int getType() {
+        return 3;
+    }
+
+    public final void zza(Parcel parcel, int i) {
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.zzat, i, false);
+        SafeParcelWriter.writeBoolean(parcel, 3, this.zzco);
+        SafeParcelWriter.writeInt(parcel, 4, this.zzcp);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    public final int zzaa() {
+        return this.zzcp;
+    }
+
+    @Nullable
+    public final DataHolder zzy() {
+        return this.zzat;
+    }
+
+    public final boolean zzz() {
+        return this.zzco;
     }
 }

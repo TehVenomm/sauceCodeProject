@@ -78,10 +78,10 @@ public class VirtualAnnotatedMember extends AnnotatedMember implements Serializa
             return false;
         }
         VirtualAnnotatedMember virtualAnnotatedMember = (VirtualAnnotatedMember) obj;
-        if (virtualAnnotatedMember._declaringClass == this._declaringClass && virtualAnnotatedMember._name.equals(this._name)) {
-            return true;
+        if (virtualAnnotatedMember._declaringClass != this._declaringClass || !virtualAnnotatedMember._name.equals(this._name)) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public String toString() {

@@ -20,6 +20,7 @@ public class SortSettings
 		EXCEED_SKILL_ITEM,
 		STORAGE_ABILITY_ITEM,
 		ELEMENT,
+		STORAGE_ACCESSORY,
 		MAX
 	}
 
@@ -86,7 +87,7 @@ public class SortSettings
 		}
 		if (memSettings == null)
 		{
-			memSettings = new SortSettings[13];
+			memSettings = new SortSettings[14];
 		}
 		SortSettings sortSettings = memSettings[(int)memory_type];
 		bool flag = sortSettings != null;
@@ -105,9 +106,11 @@ public class SortSettings
 		case SortBase.DIALOG_TYPE.WEAPON:
 		case SortBase.DIALOG_TYPE.ARMOR:
 		case SortBase.DIALOG_TYPE.STORAGE_EQUIP:
+		case SortBase.DIALOG_TYPE.TYPE_FILTERABLE_WEAPON:
+		case SortBase.DIALOG_TYPE.TYPE_FILTERABLE_ARMOR:
 		{
 			sortSettings.TYPE_ALL = SortBase.TYPE.EQUIP_ALL;
-			SortBase.SORT_REQUIREMENT sORT_REQUIREMENT = (dialog_type != SortBase.DIALOG_TYPE.ARMOR) ? SortBase.SORT_REQUIREMENT.REQUIREMENT_WEAPON_BIT : SortBase.SORT_REQUIREMENT.REQUIREMENT_ARMORS_BIT;
+			SortBase.SORT_REQUIREMENT sORT_REQUIREMENT = (dialog_type != SortBase.DIALOG_TYPE.ARMOR && dialog_type != SortBase.DIALOG_TYPE.TYPE_FILTERABLE_ARMOR) ? SortBase.SORT_REQUIREMENT.REQUIREMENT_WEAPON_BIT : SortBase.SORT_REQUIREMENT.REQUIREMENT_ARMORS_BIT;
 			if (!flag)
 			{
 				sortSettings.requirement = SortBase.SORT_REQUIREMENT.ELEMENT;
@@ -314,12 +317,6 @@ public class SortSettings
 		GameSaveData.Save();
 	}
 
-	public static void DeleteAllMemorySortData()
-	{
-		GameSaveData.instance.DeleteAllSortBit();
-		GameSaveData.Save();
-	}
-
 	public static SETTINGS_TYPE GetSettingsTypeBySortBit(string bit)
 	{
 		return (SETTINGS_TYPE)GetBitRange(bit, DATA_INDEX.SETTINGS_TYPE);
@@ -370,7 +367,7 @@ public class SortSettings
 		}
 		else
 		{
-			result = 2147483647;
+			result = int.MaxValue;
 		}
 		return result;
 	}

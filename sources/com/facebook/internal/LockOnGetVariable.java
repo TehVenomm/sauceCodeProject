@@ -6,8 +6,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 
 public class LockOnGetVariable<T> {
-    private CountDownLatch initLatch;
-    private T value;
+    /* access modifiers changed from: private */
+    public CountDownLatch initLatch;
+    /* access modifiers changed from: private */
+    public T value;
 
     public LockOnGetVariable(T t) {
         this.value = t;
@@ -16,12 +18,15 @@ public class LockOnGetVariable<T> {
     public LockOnGetVariable(final Callable<T> callable) {
         this.initLatch = new CountDownLatch(1);
         FacebookSdk.getExecutor().execute(new FutureTask(new Callable<Void>() {
+            /* JADX INFO: finally extract failed */
             public Void call() throws Exception {
                 try {
                     LockOnGetVariable.this.value = callable.call();
-                    return null;
-                } finally {
                     LockOnGetVariable.this.initLatch.countDown();
+                    return null;
+                } catch (Throwable th) {
+                    LockOnGetVariable.this.initLatch.countDown();
+                    throw th;
                 }
             }
         }));

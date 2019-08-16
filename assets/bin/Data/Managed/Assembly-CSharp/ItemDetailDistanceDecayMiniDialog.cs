@@ -33,18 +33,17 @@ public class ItemDetailDistanceDecayMiniDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject distanceCircleObject = loadQueue.Load(RESOURCE_CATEGORY.UI, "DistanceCircle", false);
-		LoadObject distanceBarObject = loadQueue.Load(RESOURCE_CATEGORY.UI, "DistanceBar", false);
+		LoadObject distanceCircleObject = loadQueue.Load(RESOURCE_CATEGORY.UI, "DistanceCircle");
+		LoadObject distanceBarObject = loadQueue.Load(RESOURCE_CATEGORY.UI, "DistanceBar");
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		circlePrefab = (distanceCircleObject.loadedObject as GameObject);
 		barPrefab = (distanceBarObject.loadedObject as GameObject);
@@ -86,7 +85,6 @@ public class ItemDetailDistanceDecayMiniDialog : GameSection
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		Transform val = ResourceUtility.Realizes(circlePrefab, startPoint, 5);
 		Vector3 pos = GetPos(point);
@@ -103,9 +101,7 @@ public class ItemDetailDistanceDecayMiniDialog : GameSection
 		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 pos = GetPos(point);

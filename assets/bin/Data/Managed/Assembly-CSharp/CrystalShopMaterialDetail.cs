@@ -33,7 +33,6 @@ public class CrystalShopMaterialDetail : GameSection
 
 	public override void Initialize()
 	{
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		materialData = (array[0] as ProductData);
 		priceStr = (array[1] as string);
@@ -56,10 +55,10 @@ public class CrystalShopMaterialDetail : GameSection
 	{
 		string buttonName = "BTN_SHOP_NORMAL1";
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject lo_button = loadQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, buttonName, false);
+		LoadObject lo_button = loadQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, buttonName);
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		GameObject buttonObj = Object.Instantiate(lo_button.loadedObject) as GameObject;
 		buttonObj.get_transform().set_parent(FindCtrl(base._transform, UI.OBJ_BUY));
@@ -72,7 +71,7 @@ public class CrystalShopMaterialDetail : GameSection
 	{
 		SetLabelText(base._transform, UI.LBL_PRICE, priceStr);
 		SetActive((Enum)UI.SPR_SALE, materialData.offerType == 3);
-		SetGrid(UI.GRD_DETAIL, null, datas.Count, true, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_DETAIL, null, datas.Count, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
 			ItemSortData data = datas[i];
 			SetItemIcon(t, data, i);
@@ -125,7 +124,7 @@ public class CrystalShopMaterialDetail : GameSection
 		case ITEM_ICON_TYPE.QUEST_ITEM:
 		{
 			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0L)
+			if (uniqID != 0)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
@@ -160,9 +159,9 @@ public class CrystalShopMaterialDetail : GameSection
 		}
 		else
 		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, false, null, false, enemy_icon_id, 0, false, GET_TYPE.PAY);
+			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
 		}
-		itemIcon.SetRewardBG(true);
+		itemIcon.SetRewardBG(is_visible: true);
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
 	}
 

@@ -1,5 +1,6 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
+/* renamed from: io.fabric.sdk.android.services.settings.AppIconSettingsData */
 class AppIconSettingsData {
     public final String hash;
     public final int height;

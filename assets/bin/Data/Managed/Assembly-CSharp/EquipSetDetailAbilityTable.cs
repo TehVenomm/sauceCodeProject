@@ -71,7 +71,9 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 		SPR_TYPE_ICON_BG,
 		SPR_TYPE_ICON_RARITY,
 		OBJ_CAPTION_3,
-		LBL_CAPTION
+		LBL_CAPTION,
+		OBJ_EMPTY,
+		LBL_NO_ITEM
 	}
 
 	private AbilityDetailPopUp abilityDetailPopUp;
@@ -82,6 +84,7 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 		{
 			yield return "AbilityTable";
 			yield return "AbilityDataTable";
+			yield return "AbilityItemLotTable";
 			foreach (string item in base.requireDataTable)
 			{
 				yield return item;
@@ -109,15 +112,11 @@ public class EquipSetDetailAbilityTable : EquipSetDetailStatusAndAbilityTable
 
 	protected override void SetAbilityItemEvent(Transform t, int index)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
 		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().get_transform(), "ABILITY_DATA", "RELEASE_ABILITY", index);
 	}
 
 	protected override void SetAbilityItemItemEvent(Transform t, int index)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
 		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().get_transform(), "ABILITY_ITEM_DATA", "RELEASE_ABILITY", index);
 	}
 

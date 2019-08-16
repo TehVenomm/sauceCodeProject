@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -17,29 +18,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
 
 class UnityWebRequest implements Runnable {
-    /* renamed from: e */
-    private static final String[] f469e = new String[]{"TLSv1.2", "TLSv1.1"};
-    /* renamed from: f */
-    private static volatile SSLSocketFactory f470f;
-    /* renamed from: a */
-    private long f471a;
-    /* renamed from: b */
-    private String f472b;
-    /* renamed from: c */
-    private String f473c;
-    /* renamed from: d */
-    private Map f474d;
 
-    UnityWebRequest(long j, String str, Map map, String str2) {
-        this.f471a = j;
-        this.f472b = str2;
-        this.f473c = str;
-        this.f474d = map;
+    /* renamed from: a */
+    private long f540a;
+
+    /* renamed from: b */
+    private String f541b;
+
+    /* renamed from: c */
+    private String f542c;
+
+    /* renamed from: d */
+    private Map f543d;
+
+    /* renamed from: e */
+    private int f544e;
+
+    /* renamed from: f */
+    private long f545f;
+
+    UnityWebRequest(long j, String str, Map map, String str2, int i) {
+        this.f540a = j;
+        this.f541b = str2;
+        this.f542c = str;
+        this.f543d = map;
+        this.f544e = i;
     }
 
     private static native void contentLengthCallback(long j, int i);
@@ -48,32 +55,8 @@ class UnityWebRequest implements Runnable {
 
     private static native void errorCallback(long j, int i, String str);
 
-    private static SSLSocketFactory getSSLSocketFactory() {
-        if (C0774q.f541g) {
-            return null;
-        }
-        if (f470f != null) {
-            return f470f;
-        }
-        synchronized (f469e) {
-            String[] strArr = f469e;
-            int length = strArr.length;
-            int i = 0;
-            while (i < length) {
-                String str = strArr[i];
-                try {
-                    SSLContext instance = SSLContext.getInstance(str);
-                    instance.init(null, null, null);
-                    SSLSocketFactory socketFactory = instance.getSocketFactory();
-                    f470f = socketFactory;
-                    return socketFactory;
-                } catch (Exception e) {
-                    C0768m.Log(5, "UnityWebRequest: No support for " + str + " (" + e.getMessage() + ")");
-                    i++;
-                }
-            }
-            return null;
-        }
+    private boolean hasTimedOut() {
+        return this.f544e > 0 && System.currentTimeMillis() - this.f545f >= ((long) this.f544e);
     }
 
     private static native void headerCallback(long j, String str, String str2);
@@ -82,27 +65,33 @@ class UnityWebRequest implements Runnable {
 
     private static native int uploadCallback(long j, ByteBuffer byteBuffer);
 
-    protected void badProtocolCallback(String str) {
-        errorCallback(this.f471a, 4, str);
+    /* access modifiers changed from: protected */
+    public void badProtocolCallback(String str) {
+        errorCallback(this.f540a, 4, str);
     }
 
-    protected void contentLengthCallback(int i) {
-        contentLengthCallback(this.f471a, i);
+    /* access modifiers changed from: protected */
+    public void contentLengthCallback(int i) {
+        contentLengthCallback(this.f540a, i);
     }
 
-    protected boolean downloadCallback(ByteBuffer byteBuffer, int i) {
-        return downloadCallback(this.f471a, byteBuffer, i);
+    /* access modifiers changed from: protected */
+    public boolean downloadCallback(ByteBuffer byteBuffer, int i) {
+        return downloadCallback(this.f540a, byteBuffer, i);
     }
 
-    protected void errorCallback(String str) {
-        errorCallback(this.f471a, 2, str);
+    /* access modifiers changed from: protected */
+    public void errorCallback(String str) {
+        errorCallback(this.f540a, 2, str);
     }
 
-    protected void headerCallback(String str, String str2) {
-        headerCallback(this.f471a, str, str2);
+    /* access modifiers changed from: protected */
+    public void headerCallback(String str, String str2) {
+        headerCallback(this.f540a, str, str2);
     }
 
-    protected void headerCallback(Map map) {
+    /* access modifiers changed from: protected */
+    public void headerCallback(Map map) {
         if (map != null && map.size() != 0) {
             for (Entry entry : map.entrySet()) {
                 String str = (String) entry.getKey();
@@ -116,22 +105,28 @@ class UnityWebRequest implements Runnable {
         }
     }
 
-    protected void malformattedUrlCallback(String str) {
-        errorCallback(this.f471a, 5, str);
+    /* access modifiers changed from: protected */
+    public void malformattedUrlCallback(String str) {
+        errorCallback(this.f540a, 5, str);
     }
 
-    protected void responseCodeCallback(int i) {
-        responseCodeCallback(this.f471a, i);
+    /* access modifiers changed from: protected */
+    public void responseCodeCallback(int i) {
+        responseCodeCallback(this.f540a, i);
     }
 
     public void run() {
+        InputStream inputStream;
+        this.f545f = System.currentTimeMillis();
         try {
-            URL url = new URL(this.f472b);
+            URL url = new URL(this.f541b);
             URLConnection openConnection = url.openConnection();
+            openConnection.setConnectTimeout(this.f544e);
+            openConnection.setReadTimeout(this.f544e);
             if (openConnection instanceof HttpsURLConnection) {
-                SSLSocketFactory sSLSocketFactory = getSSLSocketFactory();
-                if (sSLSocketFactory != null) {
-                    ((HttpsURLConnection) openConnection).setSSLSocketFactory(sSLSocketFactory);
+                SSLSocketFactory a = C1095a.m511a();
+                if (a != null) {
+                    ((HttpsURLConnection) openConnection).setSSLSocketFactory(a);
                 }
             }
             if (url.getProtocol().equalsIgnoreCase("file") && !url.getHost().isEmpty()) {
@@ -139,31 +134,33 @@ class UnityWebRequest implements Runnable {
             } else if (openConnection instanceof JarURLConnection) {
                 badProtocolCallback("A URL Connection to a Java ARchive (JAR) file or an entry in a JAR file is not supported");
             } else {
-                HttpURLConnection httpURLConnection;
-                ByteBuffer allocateDirect;
                 if (openConnection instanceof HttpURLConnection) {
                     try {
-                        httpURLConnection = (HttpURLConnection) openConnection;
-                        httpURLConnection.setRequestMethod(this.f473c);
+                        HttpURLConnection httpURLConnection = (HttpURLConnection) openConnection;
+                        httpURLConnection.setRequestMethod(this.f542c);
                         httpURLConnection.setInstanceFollowRedirects(false);
                     } catch (ProtocolException e) {
                         badProtocolCallback(e.toString());
                         return;
                     }
                 }
-                if (this.f474d != null) {
-                    for (Entry entry : this.f474d.entrySet()) {
+                if (this.f543d != null) {
+                    for (Entry entry : this.f543d.entrySet()) {
                         openConnection.addRequestProperty((String) entry.getKey(), (String) entry.getValue());
                     }
                 }
-                int uploadCallback = uploadCallback(null);
-                if (uploadCallback > 0) {
+                ByteBuffer allocateDirect = ByteBuffer.allocateDirect(131072);
+                if (uploadCallback(null) > 0) {
                     openConnection.setDoOutput(true);
                     try {
-                        allocateDirect = ByteBuffer.allocateDirect(Math.min(uploadCallback, 1428));
                         OutputStream outputStream = openConnection.getOutputStream();
-                        uploadCallback = uploadCallback(allocateDirect);
+                        int uploadCallback = uploadCallback(allocateDirect);
                         while (uploadCallback > 0) {
+                            if (hasTimedOut()) {
+                                outputStream.close();
+                                errorCallback(this.f540a, 14, "WebRequest timed out.");
+                                return;
+                            }
                             outputStream.write(allocateDirect.array(), allocateDirect.arrayOffset(), uploadCallback);
                             uploadCallback = uploadCallback(allocateDirect);
                         }
@@ -177,8 +174,11 @@ class UnityWebRequest implements Runnable {
                         responseCodeCallback(((HttpURLConnection) openConnection).getResponseCode());
                     } catch (UnknownHostException e3) {
                         unknownHostCallback(e3.toString());
-                    } catch (IOException e4) {
-                        errorCallback(e4.toString());
+                    } catch (SocketTimeoutException e4) {
+                        errorCallback(this.f540a, 14, e4.toString());
+                        return;
+                    } catch (IOException e5) {
+                        errorCallback(e5.toString());
                         return;
                     }
                 }
@@ -190,55 +190,65 @@ class UnityWebRequest implements Runnable {
                 if ((headerFields == null || !headerFields.containsKey("content-type")) && openConnection.getContentType() != null) {
                     headerCallback("content-type", openConnection.getContentType());
                 }
-                uploadCallback = openConnection.getContentLength();
-                if (uploadCallback > 0) {
-                    contentLengthCallback(uploadCallback);
-                }
-                int min = url.getProtocol().equalsIgnoreCase("file") ? uploadCallback == 0 ? 32768 : Math.min(uploadCallback, 32768) : 1428;
+                contentLengthCallback(openConnection.getContentLength());
                 try {
-                    InputStream errorStream;
                     if (openConnection instanceof HttpURLConnection) {
-                        httpURLConnection = (HttpURLConnection) openConnection;
-                        responseCodeCallback(httpURLConnection.getResponseCode());
-                        errorStream = httpURLConnection.getErrorStream();
+                        HttpURLConnection httpURLConnection2 = (HttpURLConnection) openConnection;
+                        responseCodeCallback(httpURLConnection2.getResponseCode());
+                        inputStream = httpURLConnection2.getErrorStream();
                     } else {
-                        errorStream = null;
+                        inputStream = null;
                     }
-                    if (errorStream == null) {
-                        errorStream = openConnection.getInputStream();
+                    if (inputStream == null) {
+                        inputStream = openConnection.getInputStream();
                     }
-                    ReadableByteChannel newChannel = Channels.newChannel(errorStream);
-                    allocateDirect = ByteBuffer.allocateDirect(min);
-                    uploadCallback = newChannel.read(allocateDirect);
-                    while (uploadCallback != -1 && downloadCallback(allocateDirect, uploadCallback)) {
-                        allocateDirect.clear();
-                        uploadCallback = newChannel.read(allocateDirect);
+                    ReadableByteChannel newChannel = Channels.newChannel(inputStream);
+                    int read = newChannel.read(allocateDirect);
+                    while (read != -1) {
+                        if (!hasTimedOut()) {
+                            if (!downloadCallback(allocateDirect, read)) {
+                                break;
+                            }
+                            allocateDirect.clear();
+                            read = newChannel.read(allocateDirect);
+                        } else {
+                            newChannel.close();
+                            errorCallback(this.f540a, 14, "WebRequest timed out.");
+                            return;
+                        }
                     }
                     newChannel.close();
-                } catch (UnknownHostException e32) {
-                    unknownHostCallback(e32.toString());
-                } catch (SSLHandshakeException e5) {
-                    sslCannotConnectCallback(e5.toString());
-                } catch (Exception e22) {
-                    errorCallback(e22.toString());
+                } catch (UnknownHostException e6) {
+                    unknownHostCallback(e6.toString());
+                } catch (SSLHandshakeException e7) {
+                    sslCannotConnectCallback(e7.toString());
+                } catch (SocketTimeoutException e8) {
+                    errorCallback(this.f540a, 14, e8.toString());
+                } catch (IOException e9) {
+                    errorCallback(this.f540a, 14, e9.toString());
+                } catch (Exception e10) {
+                    errorCallback(e10.toString());
                 }
             }
-        } catch (MalformedURLException e6) {
-            malformattedUrlCallback(e6.toString());
-        } catch (IOException e42) {
-            errorCallback(e42.toString());
+        } catch (MalformedURLException e11) {
+            malformattedUrlCallback(e11.toString());
+        } catch (IOException e12) {
+            errorCallback(e12.toString());
         }
     }
 
-    protected void sslCannotConnectCallback(String str) {
-        errorCallback(this.f471a, 16, str);
+    /* access modifiers changed from: protected */
+    public void sslCannotConnectCallback(String str) {
+        errorCallback(this.f540a, 16, str);
     }
 
-    protected void unknownHostCallback(String str) {
-        errorCallback(this.f471a, 7, str);
+    /* access modifiers changed from: protected */
+    public void unknownHostCallback(String str) {
+        errorCallback(this.f540a, 7, str);
     }
 
-    protected int uploadCallback(ByteBuffer byteBuffer) {
-        return uploadCallback(this.f471a, byteBuffer);
+    /* access modifiers changed from: protected */
+    public int uploadCallback(ByteBuffer byteBuffer) {
+        return uploadCallback(this.f540a, byteBuffer);
     }
 }

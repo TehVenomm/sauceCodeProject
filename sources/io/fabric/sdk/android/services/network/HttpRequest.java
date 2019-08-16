@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.network;
+package p017io.fabric.sdk.android.services.network;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
@@ -21,9 +22,11 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
@@ -32,26 +35,19 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.GZIPInputStream;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
+/* renamed from: io.fabric.sdk.android.services.network.HttpRequest */
 public class HttpRequest {
     private static final String BOUNDARY = "00content0boundary00";
     public static final String CHARSET_UTF8 = "UTF-8";
@@ -88,9 +84,8 @@ public class HttpRequest {
     public static final String METHOD_PUT = "PUT";
     public static final String METHOD_TRACE = "TRACE";
     public static final String PARAM_CHARSET = "charset";
-    private static SSLSocketFactory TRUSTED_FACTORY;
-    private static HostnameVerifier TRUSTED_VERIFIER;
-    private int bufferSize = 8192;
+    /* access modifiers changed from: private */
+    public int bufferSize = 8192;
     private HttpURLConnection connection = null;
     private boolean form;
     private String httpProxyHost;
@@ -102,110 +97,11 @@ public class HttpRequest {
     private boolean uncompress = false;
     public final URL url;
 
-    protected static abstract class Operation<V> implements Callable<V> {
-        protected Operation() {
-        }
-
-        public V call() throws HttpRequestException {
-            Throwable th;
-            Object obj = 1;
-            try {
-                V run = run();
-                try {
-                    done();
-                    return run;
-                } catch (IOException e) {
-                    throw new HttpRequestException(e);
-                }
-            } catch (HttpRequestException e2) {
-                throw e2;
-            } catch (IOException e3) {
-                throw new HttpRequestException(e3);
-            } catch (Throwable th2) {
-                th = th2;
-            }
-            try {
-                done();
-            } catch (IOException e4) {
-                if (obj == null) {
-                    throw new HttpRequestException(e4);
-                }
-            }
-            throw th;
-        }
-
-        protected abstract void done() throws IOException;
-
-        protected abstract V run() throws HttpRequestException, IOException;
-    }
-
-    protected static abstract class FlushOperation<V> extends Operation<V> {
-        private final Flushable flushable;
-
-        protected FlushOperation(Flushable flushable) {
-            this.flushable = flushable;
-        }
-
-        protected void done() throws IOException {
-            this.flushable.flush();
-        }
-    }
-
-    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$1 */
-    static final class C09371 implements X509TrustManager {
-        C09371() {
-        }
-
-        public void checkClientTrusted(X509Certificate[] x509CertificateArr, String str) {
-        }
-
-        public void checkServerTrusted(X509Certificate[] x509CertificateArr, String str) {
-        }
-
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-        }
-    }
-
-    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$2 */
-    static final class C09382 implements HostnameVerifier {
-        C09382() {
-        }
-
-        public boolean verify(String str, SSLSession sSLSession) {
-            return true;
-        }
-    }
-
-    protected static abstract class CloseOperation<V> extends Operation<V> {
-        private final Closeable closeable;
-        private final boolean ignoreCloseExceptions;
-
-        protected CloseOperation(Closeable closeable, boolean z) {
-            this.closeable = closeable;
-            this.ignoreCloseExceptions = z;
-        }
-
-        protected void done() throws IOException {
-            if (this.closeable instanceof Flushable) {
-                ((Flushable) this.closeable).flush();
-            }
-            if (this.ignoreCloseExceptions) {
-                try {
-                    this.closeable.close();
-                    return;
-                } catch (IOException e) {
-                    return;
-                }
-            }
-            this.closeable.close();
-        }
-    }
-
+    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$Base64 */
     public static class Base64 {
-        private static final byte EQUALS_SIGN = (byte) 61;
+        private static final byte EQUALS_SIGN = 61;
         private static final String PREFERRED_ENCODING = "US-ASCII";
-        private static final byte[] _STANDARD_ALPHABET = new byte[]{(byte) 65, (byte) 66, (byte) 67, (byte) 68, (byte) 69, (byte) 70, (byte) 71, (byte) 72, (byte) 73, (byte) 74, (byte) 75, (byte) 76, (byte) 77, (byte) 78, (byte) 79, (byte) 80, (byte) 81, (byte) 82, (byte) 83, (byte) 84, (byte) 85, (byte) 86, (byte) 87, (byte) 88, (byte) 89, (byte) 90, (byte) 97, (byte) 98, (byte) 99, (byte) 100, (byte) 101, (byte) 102, (byte) 103, (byte) 104, (byte) 105, (byte) 106, (byte) 107, (byte) 108, (byte) 109, (byte) 110, (byte) 111, (byte) 112, (byte) 113, (byte) 114, (byte) 115, (byte) 116, (byte) 117, (byte) 118, (byte) 119, (byte) 120, (byte) 121, (byte) 122, (byte) 48, (byte) 49, (byte) 50, (byte) 51, (byte) 52, (byte) 53, (byte) 54, (byte) 55, (byte) 56, (byte) 57, (byte) 43, (byte) 47};
+        private static final byte[] _STANDARD_ALPHABET = {65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 47};
 
         private Base64() {
         }
@@ -228,25 +124,25 @@ public class HttpRequest {
             if (i2 > 2) {
                 i4 = (bArr[i + 2] << 24) >>> 24;
             }
-            i4 |= i6 | i5;
+            int i7 = i4 | i6 | i5;
             switch (i2) {
                 case 1:
-                    bArr2[i3] = (byte) bArr3[i4 >>> 18];
-                    bArr2[i3 + 1] = (byte) bArr3[(i4 >>> 12) & 63];
+                    bArr2[i3] = (byte) bArr3[i7 >>> 18];
+                    bArr2[i3 + 1] = (byte) bArr3[(i7 >>> 12) & 63];
                     bArr2[i3 + 2] = (byte) 61;
                     bArr2[i3 + 3] = (byte) 61;
                     break;
                 case 2:
-                    bArr2[i3] = (byte) bArr3[i4 >>> 18];
-                    bArr2[i3 + 1] = (byte) bArr3[(i4 >>> 12) & 63];
-                    bArr2[i3 + 2] = (byte) bArr3[(i4 >>> 6) & 63];
+                    bArr2[i3] = (byte) bArr3[i7 >>> 18];
+                    bArr2[i3 + 1] = (byte) bArr3[(i7 >>> 12) & 63];
+                    bArr2[i3 + 2] = (byte) bArr3[(i7 >>> 6) & 63];
                     bArr2[i3 + 3] = (byte) 61;
                     break;
                 case 3:
-                    bArr2[i3] = (byte) bArr3[i4 >>> 18];
-                    bArr2[i3 + 1] = (byte) bArr3[(i4 >>> 12) & 63];
-                    bArr2[i3 + 2] = (byte) bArr3[(i4 >>> 6) & 63];
-                    bArr2[i3 + 3] = (byte) bArr3[i4 & 63];
+                    bArr2[i3] = (byte) bArr3[i7 >>> 18];
+                    bArr2[i3 + 1] = (byte) bArr3[(i7 >>> 12) & 63];
+                    bArr2[i3 + 2] = (byte) bArr3[(i7 >>> 6) & 63];
+                    bArr2[i3 + 3] = (byte) bArr3[i7 & 63];
                     break;
             }
             return bArr2;
@@ -273,38 +169,59 @@ public class HttpRequest {
             } else if (i2 < 0) {
                 throw new IllegalArgumentException("Cannot have length offset: " + i2);
             } else if (i + i2 > bArr.length) {
-                throw new IllegalArgumentException(String.format("Cannot have offset of %d and length of %d with array of length %d", new Object[]{Integer.valueOf(i), Integer.valueOf(i2), Integer.valueOf(bArr.length)}));
+                throw new IllegalArgumentException(String.format(Locale.ENGLISH, "Cannot have offset of %d and length of %d with array of length %d", new Object[]{Integer.valueOf(i), Integer.valueOf(i2), Integer.valueOf(bArr.length)}));
             } else {
-                Object obj = new byte[((i2 % 3 > 0 ? 4 : 0) + ((i2 / 3) * 4))];
+                byte[] bArr2 = new byte[((i2 % 3 > 0 ? 4 : 0) + ((i2 / 3) * 4))];
                 int i3 = 0;
                 int i4 = 0;
                 while (i3 < i2 - 2) {
-                    encode3to4(bArr, i3 + i, 3, obj, i4);
+                    encode3to4(bArr, i3 + i, 3, bArr2, i4);
                     i3 += 3;
                     i4 += 4;
                 }
                 if (i3 < i2) {
-                    encode3to4(bArr, i3 + i, i2 - i3, obj, i4);
+                    encode3to4(bArr, i3 + i, i2 - i3, bArr2, i4);
                     i4 += 4;
                 }
-                if (i4 > obj.length - 1) {
-                    return obj;
+                if (i4 > bArr2.length - 1) {
+                    return bArr2;
                 }
-                Object obj2 = new byte[i4];
-                System.arraycopy(obj, 0, obj2, 0, i4);
-                return obj2;
+                byte[] bArr3 = new byte[i4];
+                System.arraycopy(bArr2, 0, bArr3, 0, i4);
+                return bArr3;
             }
         }
     }
 
-    public interface ConnectionFactory {
-        public static final ConnectionFactory DEFAULT = new C09461();
+    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$CloseOperation */
+    protected static abstract class CloseOperation<V> extends Operation<V> {
+        private final Closeable closeable;
+        private final boolean ignoreCloseExceptions;
 
-        /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$ConnectionFactory$1 */
-        static final class C09461 implements ConnectionFactory {
-            C09461() {
+        protected CloseOperation(Closeable closeable2, boolean z) {
+            this.closeable = closeable2;
+            this.ignoreCloseExceptions = z;
+        }
+
+        /* access modifiers changed from: protected */
+        public void done() throws IOException {
+            if (this.closeable instanceof Flushable) {
+                ((Flushable) this.closeable).flush();
             }
+            if (this.ignoreCloseExceptions) {
+                try {
+                    this.closeable.close();
+                } catch (IOException e) {
+                }
+            } else {
+                this.closeable.close();
+            }
+        }
+    }
 
+    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$ConnectionFactory */
+    public interface ConnectionFactory {
+        public static final ConnectionFactory DEFAULT = new ConnectionFactory() {
             public HttpURLConnection create(URL url) throws IOException {
                 return (HttpURLConnection) url.openConnection();
             }
@@ -312,13 +229,28 @@ public class HttpRequest {
             public HttpURLConnection create(URL url, Proxy proxy) throws IOException {
                 return (HttpURLConnection) url.openConnection(proxy);
             }
-        }
+        };
 
         HttpURLConnection create(URL url) throws IOException;
 
         HttpURLConnection create(URL url, Proxy proxy) throws IOException;
     }
 
+    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$FlushOperation */
+    protected static abstract class FlushOperation<V> extends Operation<V> {
+        private final Flushable flushable;
+
+        protected FlushOperation(Flushable flushable2) {
+            this.flushable = flushable2;
+        }
+
+        /* access modifiers changed from: protected */
+        public void done() throws IOException {
+            this.flushable.flush();
+        }
+    }
+
+    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$HttpRequestException */
     public static class HttpRequestException extends RuntimeException {
         private static final long serialVersionUID = -1170466989781746231L;
 
@@ -331,8 +263,49 @@ public class HttpRequest {
         }
     }
 
+    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$Operation */
+    protected static abstract class Operation<V> implements Callable<V> {
+        protected Operation() {
+        }
+
+        public V call() throws HttpRequestException {
+            boolean z = true;
+            try {
+                V run = run();
+                try {
+                    done();
+                    return run;
+                } catch (IOException e) {
+                    throw new HttpRequestException(e);
+                }
+            } catch (HttpRequestException e2) {
+                throw e2;
+            } catch (IOException e3) {
+                throw new HttpRequestException(e3);
+            } catch (Throwable th) {
+                th = th;
+            }
+            try {
+                done();
+            } catch (IOException e4) {
+                if (!z) {
+                    throw new HttpRequestException(e4);
+                }
+            }
+            throw th;
+        }
+
+        /* access modifiers changed from: protected */
+        public abstract void done() throws IOException;
+
+        /* access modifiers changed from: protected */
+        public abstract V run() throws HttpRequestException, IOException;
+    }
+
+    /* renamed from: io.fabric.sdk.android.services.network.HttpRequest$RequestOutputStream */
     public static class RequestOutputStream extends BufferedOutputStream {
-        private final CharsetEncoder encoder;
+        /* access modifiers changed from: private */
+        public final CharsetEncoder encoder;
 
         public RequestOutputStream(OutputStream outputStream, String str, int i) {
             super(outputStream, i);
@@ -350,32 +323,32 @@ public class HttpRequest {
         try {
             this.url = new URL(charSequence.toString());
             this.requestMethod = str;
-        } catch (IOException e) {
+        } catch (MalformedURLException e) {
             throw new HttpRequestException(e);
         }
     }
 
-    public HttpRequest(URL url, String str) throws HttpRequestException {
-        this.url = url;
+    public HttpRequest(URL url2, String str) throws HttpRequestException {
+        this.url = url2;
         this.requestMethod = str;
     }
 
-    private static StringBuilder addParamPrefix(String str, StringBuilder stringBuilder) {
+    private static StringBuilder addParamPrefix(String str, StringBuilder sb) {
         int indexOf = str.indexOf(63);
-        int length = stringBuilder.length() - 1;
+        int length = sb.length() - 1;
         if (indexOf == -1) {
-            stringBuilder.append('?');
+            sb.append('?');
         } else if (indexOf < length && str.charAt(length) != '&') {
-            stringBuilder.append('&');
+            sb.append('&');
         }
-        return stringBuilder;
+        return sb;
     }
 
-    private static StringBuilder addPathSeparator(String str, StringBuilder stringBuilder) {
+    private static StringBuilder addPathSeparator(String str, StringBuilder sb) {
         if (str.indexOf(58) + 2 == str.lastIndexOf(47)) {
-            stringBuilder.append('/');
+            sb.append('/');
         }
-        return stringBuilder;
+        return sb;
     }
 
     public static String append(CharSequence charSequence, Map<?, ?> map) {
@@ -383,28 +356,28 @@ public class HttpRequest {
         if (map == null || map.isEmpty()) {
             return charSequence2;
         }
-        StringBuilder stringBuilder = new StringBuilder(charSequence2);
-        addPathSeparator(charSequence2, stringBuilder);
-        addParamPrefix(charSequence2, stringBuilder);
+        StringBuilder sb = new StringBuilder(charSequence2);
+        addPathSeparator(charSequence2, sb);
+        addParamPrefix(charSequence2, sb);
         Iterator it = map.entrySet().iterator();
         Entry entry = (Entry) it.next();
-        stringBuilder.append(entry.getKey().toString());
-        stringBuilder.append('=');
+        sb.append(entry.getKey().toString());
+        sb.append('=');
         Object value = entry.getValue();
         if (value != null) {
-            stringBuilder.append(value);
+            sb.append(value);
         }
         while (it.hasNext()) {
-            stringBuilder.append('&');
-            entry = (Entry) it.next();
-            stringBuilder.append(entry.getKey().toString());
-            stringBuilder.append('=');
-            value = entry.getValue();
-            if (value != null) {
-                stringBuilder.append(value);
+            sb.append('&');
+            Entry entry2 = (Entry) it.next();
+            sb.append(entry2.getKey().toString());
+            sb.append('=');
+            Object value2 = entry2.getValue();
+            if (value2 != null) {
+                sb.append(value2);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static String append(CharSequence charSequence, Object... objArr) {
@@ -415,25 +388,25 @@ public class HttpRequest {
         if (objArr.length % 2 != 0) {
             throw new IllegalArgumentException("Must specify an even number of parameter names/values");
         }
-        StringBuilder stringBuilder = new StringBuilder(charSequence2);
-        addPathSeparator(charSequence2, stringBuilder);
-        addParamPrefix(charSequence2, stringBuilder);
-        stringBuilder.append(objArr[0]);
-        stringBuilder.append('=');
+        StringBuilder sb = new StringBuilder(charSequence2);
+        addPathSeparator(charSequence2, sb);
+        addParamPrefix(charSequence2, sb);
+        sb.append(objArr[0]);
+        sb.append('=');
         Object obj = objArr[1];
         if (obj != null) {
-            stringBuilder.append(obj);
+            sb.append(obj);
         }
         for (int i = 2; i < objArr.length; i += 2) {
-            stringBuilder.append('&');
-            stringBuilder.append(objArr[i]);
-            stringBuilder.append('=');
+            sb.append('&');
+            sb.append(objArr[i]);
+            sb.append('=');
             Object obj2 = objArr[i + 1];
             if (obj2 != null) {
-                stringBuilder.append(obj2);
+                sb.append(obj2);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private HttpURLConnection createConnection() {
@@ -455,41 +428,38 @@ public class HttpRequest {
     }
 
     public static HttpRequest delete(CharSequence charSequence, Map<?, ?> map, boolean z) {
-        CharSequence append = append(charSequence, (Map) map);
+        String append = append(charSequence, map);
         if (z) {
             append = encode(append);
         }
-        return delete(append);
+        return delete((CharSequence) append);
     }
 
     public static HttpRequest delete(CharSequence charSequence, boolean z, Object... objArr) {
-        CharSequence append = append(charSequence, objArr);
+        String append = append(charSequence, objArr);
         if (z) {
             append = encode(append);
         }
-        return delete(append);
+        return delete((CharSequence) append);
     }
 
-    public static HttpRequest delete(URL url) throws HttpRequestException {
-        return new HttpRequest(url, METHOD_DELETE);
+    public static HttpRequest delete(URL url2) throws HttpRequestException {
+        return new HttpRequest(url2, METHOD_DELETE);
     }
 
     public static String encode(CharSequence charSequence) throws HttpRequestException {
         try {
-            URL url = new URL(charSequence.toString());
-            String host = url.getHost();
-            int port = url.getPort();
+            URL url2 = new URL(charSequence.toString());
+            String host = url2.getHost();
+            int port = url2.getPort();
             if (port != -1) {
                 host = host + ':' + Integer.toString(port);
             }
             try {
-                String toASCIIString = new URI(url.getProtocol(), host, url.getPath(), url.getQuery(), null).toASCIIString();
-                int indexOf = toASCIIString.indexOf(63);
-                if (indexOf > 0 && indexOf + 1 < toASCIIString.length()) {
-                    toASCIIString = toASCIIString.substring(0, indexOf + 1) + toASCIIString.substring(indexOf + 1).replace("+", "%2B");
-                }
-                return toASCIIString;
-            } catch (Throwable e) {
+                String aSCIIString = new URI(url2.getProtocol(), host, url2.getPath(), url2.getQuery(), url2.getRef()).toASCIIString();
+                int indexOf = aSCIIString.indexOf(63);
+                return (indexOf <= 0 || indexOf + 1 >= aSCIIString.length()) ? aSCIIString : aSCIIString.substring(0, indexOf + 1) + aSCIIString.substring(indexOf + 1).replace("+", "%2B").replace("#", "%23");
+            } catch (URISyntaxException e) {
                 IOException iOException = new IOException("Parsing URI failed");
                 iOException.initCause(e);
                 throw new HttpRequestException(iOException);
@@ -504,50 +474,27 @@ public class HttpRequest {
     }
 
     public static HttpRequest get(CharSequence charSequence, Map<?, ?> map, boolean z) {
-        CharSequence append = append(charSequence, (Map) map);
+        String append = append(charSequence, map);
         if (z) {
             append = encode(append);
         }
-        return get(append);
+        return get((CharSequence) append);
     }
 
     public static HttpRequest get(CharSequence charSequence, boolean z, Object... objArr) {
-        CharSequence append = append(charSequence, objArr);
+        String append = append(charSequence, objArr);
         if (z) {
             append = encode(append);
         }
-        return get(append);
+        return get((CharSequence) append);
     }
 
-    public static HttpRequest get(URL url) throws HttpRequestException {
-        return new HttpRequest(url, METHOD_GET);
+    public static HttpRequest get(URL url2) throws HttpRequestException {
+        return new HttpRequest(url2, METHOD_GET);
     }
 
-    private static SSLSocketFactory getTrustedFactory() throws HttpRequestException {
-        if (TRUSTED_FACTORY == null) {
-            C09371 c09371 = new C09371();
-            try {
-                SSLContext instance = SSLContext.getInstance("TLS");
-                TrustManager[] trustManagerArr = new TrustManager[]{c09371};
-                instance.init(null, trustManagerArr, new SecureRandom());
-                TRUSTED_FACTORY = instance.getSocketFactory();
-            } catch (Throwable e) {
-                IOException iOException = new IOException("Security exception configuring SSL context");
-                iOException.initCause(e);
-                throw new HttpRequestException(iOException);
-            }
-        }
-        return TRUSTED_FACTORY;
-    }
-
-    private static HostnameVerifier getTrustedVerifier() {
-        if (TRUSTED_VERIFIER == null) {
-            TRUSTED_VERIFIER = new C09382();
-        }
-        return TRUSTED_VERIFIER;
-    }
-
-    private static String getValidCharset(String str) {
+    /* access modifiers changed from: private */
+    public static String getValidCharset(String str) {
         return (str == null || str.length() <= 0) ? "UTF-8" : str;
     }
 
@@ -556,23 +503,23 @@ public class HttpRequest {
     }
 
     public static HttpRequest head(CharSequence charSequence, Map<?, ?> map, boolean z) {
-        CharSequence append = append(charSequence, (Map) map);
+        String append = append(charSequence, map);
         if (z) {
             append = encode(append);
         }
-        return head(append);
+        return head((CharSequence) append);
     }
 
     public static HttpRequest head(CharSequence charSequence, boolean z, Object... objArr) {
-        CharSequence append = append(charSequence, objArr);
+        String append = append(charSequence, objArr);
         if (z) {
             append = encode(append);
         }
-        return head(append);
+        return head((CharSequence) append);
     }
 
-    public static HttpRequest head(URL url) throws HttpRequestException {
-        return new HttpRequest(url, METHOD_HEAD);
+    public static HttpRequest head(URL url2) throws HttpRequestException {
+        return new HttpRequest(url2, METHOD_HEAD);
     }
 
     public static void keepAlive(boolean z) {
@@ -584,21 +531,21 @@ public class HttpRequest {
             setProperty("http.nonProxyHosts", null);
             return;
         }
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         int length = strArr.length - 1;
         for (int i = 0; i < length; i++) {
-            stringBuilder.append(strArr[i]).append('|');
+            sb.append(strArr[i]).append('|');
         }
-        stringBuilder.append(strArr[length]);
-        setProperty("http.nonProxyHosts", stringBuilder.toString());
+        sb.append(strArr[length]);
+        setProperty("http.nonProxyHosts", sb.toString());
     }
 
     public static HttpRequest options(CharSequence charSequence) throws HttpRequestException {
         return new HttpRequest(charSequence, METHOD_OPTIONS);
     }
 
-    public static HttpRequest options(URL url) throws HttpRequestException {
-        return new HttpRequest(url, METHOD_OPTIONS);
+    public static HttpRequest options(URL url2) throws HttpRequestException {
+        return new HttpRequest(url2, METHOD_OPTIONS);
     }
 
     public static HttpRequest post(CharSequence charSequence) throws HttpRequestException {
@@ -606,23 +553,23 @@ public class HttpRequest {
     }
 
     public static HttpRequest post(CharSequence charSequence, Map<?, ?> map, boolean z) {
-        CharSequence append = append(charSequence, (Map) map);
+        String append = append(charSequence, map);
         if (z) {
             append = encode(append);
         }
-        return post(append);
+        return post((CharSequence) append);
     }
 
     public static HttpRequest post(CharSequence charSequence, boolean z, Object... objArr) {
-        CharSequence append = append(charSequence, objArr);
+        String append = append(charSequence, objArr);
         if (z) {
             append = encode(append);
         }
-        return post(append);
+        return post((CharSequence) append);
     }
 
-    public static HttpRequest post(URL url) throws HttpRequestException {
-        return new HttpRequest(url, METHOD_POST);
+    public static HttpRequest post(URL url2) throws HttpRequestException {
+        return new HttpRequest(url2, METHOD_POST);
     }
 
     public static void proxyHost(String str) {
@@ -641,23 +588,23 @@ public class HttpRequest {
     }
 
     public static HttpRequest put(CharSequence charSequence, Map<?, ?> map, boolean z) {
-        CharSequence append = append(charSequence, (Map) map);
+        String append = append(charSequence, map);
         if (z) {
             append = encode(append);
         }
-        return put(append);
+        return put((CharSequence) append);
     }
 
     public static HttpRequest put(CharSequence charSequence, boolean z, Object... objArr) {
-        CharSequence append = append(charSequence, objArr);
+        String append = append(charSequence, objArr);
         if (z) {
             append = encode(append);
         }
-        return put(append);
+        return put((CharSequence) append);
     }
 
-    public static HttpRequest put(URL url) throws HttpRequestException {
-        return new HttpRequest(url, METHOD_PUT);
+    public static HttpRequest put(URL url2) throws HttpRequestException {
+        return new HttpRequest(url2, METHOD_PUT);
     }
 
     public static void setConnectionFactory(ConnectionFactory connectionFactory) {
@@ -684,8 +631,8 @@ public class HttpRequest {
         return new HttpRequest(charSequence, METHOD_TRACE);
     }
 
-    public static HttpRequest trace(URL url) throws HttpRequestException {
-        return new HttpRequest(url, METHOD_TRACE);
+    public static HttpRequest trace(URL url2) throws HttpRequestException {
+        return new HttpRequest(url2, METHOD_TRACE);
     }
 
     public HttpRequest accept(String str) {
@@ -735,9 +682,9 @@ public class HttpRequest {
     }
 
     public String body(String str) throws HttpRequestException {
-        OutputStream byteStream = byteStream();
+        ByteArrayOutputStream byteStream = byteStream();
         try {
-            copy(buffer(), byteStream);
+            copy((InputStream) buffer(), (OutputStream) byteStream);
             return byteStream.toString(getValidCharset(str));
         } catch (IOException e) {
             throw new HttpRequestException(e);
@@ -768,15 +715,16 @@ public class HttpRequest {
         return new BufferedReader(reader(str), this.bufferSize);
     }
 
-    protected ByteArrayOutputStream byteStream() {
+    /* access modifiers changed from: protected */
+    public ByteArrayOutputStream byteStream() {
         int contentLength = contentLength();
         return contentLength > 0 ? new ByteArrayOutputStream(contentLength) : new ByteArrayOutputStream();
     }
 
     public byte[] bytes() throws HttpRequestException {
-        OutputStream byteStream = byteStream();
+        ByteArrayOutputStream byteStream = byteStream();
         try {
-            copy(buffer(), byteStream);
+            copy((InputStream) buffer(), (OutputStream) byteStream);
             return byteStream.toByteArray();
         } catch (IOException e) {
             throw new HttpRequestException(e);
@@ -796,7 +744,8 @@ public class HttpRequest {
         return this;
     }
 
-    protected HttpRequest closeOutput() throws IOException {
+    /* access modifiers changed from: protected */
+    public HttpRequest closeOutput() throws IOException {
         if (this.output != null) {
             if (this.multipart) {
                 this.output.write("\r\n--00content0boundary00--\r\n");
@@ -814,7 +763,8 @@ public class HttpRequest {
         return this;
     }
 
-    protected HttpRequest closeOutputQuietly() throws HttpRequestException {
+    /* access modifiers changed from: protected */
+    public HttpRequest closeOutputQuietly() throws HttpRequestException {
         try {
             return closeOutput();
         } catch (IOException e) {
@@ -870,7 +820,8 @@ public class HttpRequest {
         return header(HEADER_CONTENT_TYPE);
     }
 
-    protected HttpRequest copy(InputStream inputStream, OutputStream outputStream) throws IOException {
+    /* access modifiers changed from: protected */
+    public HttpRequest copy(InputStream inputStream, OutputStream outputStream) throws IOException {
         final InputStream inputStream2 = inputStream;
         final OutputStream outputStream2 = outputStream;
         return (HttpRequest) new CloseOperation<HttpRequest>(inputStream, this.ignoreCloseExceptions) {
@@ -887,7 +838,8 @@ public class HttpRequest {
         }.call();
     }
 
-    protected HttpRequest copy(Reader reader, Writer writer) throws IOException {
+    /* access modifiers changed from: protected */
+    public HttpRequest copy(Reader reader, Writer writer) throws IOException {
         final Reader reader2 = reader;
         final Writer writer2 = writer;
         return (HttpRequest) new CloseOperation<HttpRequest>(reader, this.ignoreCloseExceptions) {
@@ -967,7 +919,7 @@ public class HttpRequest {
     }
 
     public HttpRequest form(Entry<?, ?> entry) throws HttpRequestException {
-        return form((Entry) entry, "UTF-8");
+        return form(entry, "UTF-8");
     }
 
     public HttpRequest form(Entry<?, ?> entry, String str) throws HttpRequestException {
@@ -975,13 +927,13 @@ public class HttpRequest {
     }
 
     public HttpRequest form(Map<?, ?> map) throws HttpRequestException {
-        return form((Map) map, "UTF-8");
+        return form(map, "UTF-8");
     }
 
     public HttpRequest form(Map<?, ?> map, String str) throws HttpRequestException {
         if (!map.isEmpty()) {
-            for (Entry form : map.entrySet()) {
-                form(form, str);
+            for (Entry form2 : map.entrySet()) {
+                form(form2, str);
             }
         }
         return this;
@@ -994,7 +946,9 @@ public class HttpRequest {
         return this.connection;
     }
 
-    protected String getParam(String str, String str2) {
+    /* access modifiers changed from: protected */
+    public String getParam(String str, String str2) {
+        int i;
         if (str == null || str.length() == 0) {
             return null;
         }
@@ -1007,25 +961,26 @@ public class HttpRequest {
         if (indexOf2 == -1) {
             indexOf2 = length;
         }
-        while (indexOf < indexOf2) {
+        while (indexOf < i) {
             int indexOf3 = str.indexOf(61, indexOf);
-            if (indexOf3 != -1 && indexOf3 < indexOf2 && str2.equals(str.substring(indexOf, indexOf3).trim())) {
-                String trim = str.substring(indexOf3 + 1, indexOf2).trim();
-                indexOf3 = trim.length();
-                if (indexOf3 != 0) {
-                    return (indexOf3 > 2 && '\"' == trim.charAt(0) && '\"' == trim.charAt(indexOf3 - 1)) ? trim.substring(1, indexOf3 - 1) : trim;
+            if (indexOf3 != -1 && indexOf3 < i && str2.equals(str.substring(indexOf, indexOf3).trim())) {
+                String trim = str.substring(indexOf3 + 1, i).trim();
+                int length2 = trim.length();
+                if (length2 != 0) {
+                    return (length2 > 2 && '\"' == trim.charAt(0) && '\"' == trim.charAt(length2 + -1)) ? trim.substring(1, length2 - 1) : trim;
                 }
             }
-            indexOf = indexOf2 + 1;
-            indexOf2 = str.indexOf(59, indexOf);
-            if (indexOf2 == -1) {
-                indexOf2 = length;
+            indexOf = i + 1;
+            i = str.indexOf(59, indexOf);
+            if (i == -1) {
+                i = length;
             }
         }
         return null;
     }
 
-    protected Map<String, String> getParams(String str) {
+    /* access modifiers changed from: protected */
+    public Map<String, String> getParams(String str) {
         if (str == null || str.length() == 0) {
             return Collections.emptyMap();
         }
@@ -1038,16 +993,14 @@ public class HttpRequest {
         if (indexOf2 == -1) {
             indexOf2 = length;
         }
-        Map<String, String> linkedHashMap = new LinkedHashMap();
-        int i = indexOf;
-        indexOf = indexOf2;
-        indexOf2 = i;
-        while (indexOf2 < indexOf) {
-            int indexOf3 = str.indexOf(61, indexOf2);
-            if (indexOf3 != -1 && indexOf3 < indexOf) {
-                String trim = str.substring(indexOf2, indexOf3).trim();
+        LinkedHashMap linkedHashMap = new LinkedHashMap();
+        int i = indexOf2;
+        while (indexOf < i) {
+            int indexOf3 = str.indexOf(61, indexOf);
+            if (indexOf3 != -1 && indexOf3 < i) {
+                String trim = str.substring(indexOf, indexOf3).trim();
                 if (trim.length() > 0) {
-                    String trim2 = str.substring(indexOf3 + 1, indexOf).trim();
+                    String trim2 = str.substring(indexOf3 + 1, i).trim();
                     int length2 = trim2.length();
                     if (length2 != 0) {
                         if (length2 > 2 && '\"' == trim2.charAt(0) && '\"' == trim2.charAt(length2 - 1)) {
@@ -1058,10 +1011,13 @@ public class HttpRequest {
                     }
                 }
             }
-            indexOf2 = indexOf + 1;
-            indexOf = str.indexOf(59, indexOf2);
-            if (indexOf == -1) {
-                indexOf = length;
+            int i2 = i + 1;
+            i = str.indexOf(59, i2);
+            if (i == -1) {
+                indexOf = i2;
+                i = length;
+            } else {
+                indexOf = i2;
             }
         }
         return linkedHashMap;
@@ -1168,11 +1124,13 @@ public class HttpRequest {
         return 304 == code();
     }
 
-    public boolean ok() throws HttpRequestException {
+    /* renamed from: ok */
+    public boolean mo22482ok() throws HttpRequestException {
         return 200 == code();
     }
 
-    protected HttpRequest openOutput() throws IOException {
+    /* access modifiers changed from: protected */
+    public HttpRequest openOutput() throws IOException {
         if (this.output == null) {
             getConnection().setDoOutput(true);
             this.output = new RequestOutputStream(getConnection().getOutputStream(), getParam(getConnection().getRequestProperty(HEADER_CONTENT_TYPE), PARAM_CHARSET), this.bufferSize);
@@ -1189,23 +1147,23 @@ public class HttpRequest {
     }
 
     public HttpRequest part(String str, File file) throws HttpRequestException {
-        return part(str, null, file);
+        return part(str, (String) null, file);
     }
 
     public HttpRequest part(String str, InputStream inputStream) throws HttpRequestException {
-        return part(str, null, null, inputStream);
+        return part(str, (String) null, (String) null, inputStream);
     }
 
     public HttpRequest part(String str, Number number) throws HttpRequestException {
-        return part(str, null, number);
+        return part(str, (String) null, number);
     }
 
     public HttpRequest part(String str, String str2) {
-        return part(str, null, str2);
+        return part(str, (String) null, str2);
     }
 
     public HttpRequest part(String str, String str2, File file) throws HttpRequestException {
-        return part(str, str2, null, file);
+        return part(str, str2, (String) null, file);
     }
 
     public HttpRequest part(String str, String str2, Number number) throws HttpRequestException {
@@ -1213,67 +1171,65 @@ public class HttpRequest {
     }
 
     public HttpRequest part(String str, String str2, String str3) throws HttpRequestException {
-        return part(str, str2, null, str3);
+        return part(str, str2, (String) null, str3);
     }
 
-    public HttpRequest part(String str, String str2, String str3, File file) throws HttpRequestException {
-        IOException e;
-        Throwable th;
-        InputStream inputStream = null;
-        InputStream bufferedInputStream;
-        try {
-            bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
-            try {
-                HttpRequest part = part(str, str2, str3, bufferedInputStream);
-                if (bufferedInputStream != null) {
-                    try {
-                        bufferedInputStream.close();
-                    } catch (IOException e2) {
-                    }
-                }
-                return part;
-            } catch (IOException e3) {
-                e = e3;
-                try {
-                    throw new HttpRequestException(e);
-                } catch (Throwable th2) {
-                    th = th2;
-                    inputStream = bufferedInputStream;
-                    bufferedInputStream = inputStream;
-                    if (bufferedInputStream != null) {
-                        try {
-                            bufferedInputStream.close();
-                        } catch (IOException e4) {
-                        }
-                    }
-                    throw th;
-                }
-            } catch (Throwable th3) {
-                th = th3;
-                if (bufferedInputStream != null) {
-                    bufferedInputStream.close();
-                }
-                throw th;
-            }
-        } catch (IOException e5) {
-            e = e5;
-            bufferedInputStream = null;
-            throw new HttpRequestException(e);
-        } catch (Throwable th4) {
-            th = th4;
-            bufferedInputStream = inputStream;
-            if (bufferedInputStream != null) {
-                bufferedInputStream.close();
-            }
-            throw th;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:18:0x0022 A[SYNTHETIC, Splitter:B:18:0x0022] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public p017io.fabric.sdk.android.services.network.HttpRequest part(java.lang.String r4, java.lang.String r5, java.lang.String r6, java.io.File r7) throws p017io.fabric.sdk.android.services.network.HttpRequest.HttpRequestException {
+        /*
+            r3 = this;
+            r2 = 0
+            java.io.BufferedInputStream r1 = new java.io.BufferedInputStream     // Catch:{ IOException -> 0x0015, all -> 0x002e }
+            java.io.FileInputStream r0 = new java.io.FileInputStream     // Catch:{ IOException -> 0x0015, all -> 0x002e }
+            r0.<init>(r7)     // Catch:{ IOException -> 0x0015, all -> 0x002e }
+            r1.<init>(r0)     // Catch:{ IOException -> 0x0015, all -> 0x002e }
+            io.fabric.sdk.android.services.network.HttpRequest r0 = r3.part(r4, r5, r6, r1)     // Catch:{ IOException -> 0x0026, all -> 0x0028 }
+            if (r1 == 0) goto L_0x0014
+            r1.close()     // Catch:{ IOException -> 0x002a }
+        L_0x0014:
+            return r0
+        L_0x0015:
+            r0 = move-exception
+            r1 = r2
+        L_0x0017:
+            io.fabric.sdk.android.services.network.HttpRequest$HttpRequestException r2 = new io.fabric.sdk.android.services.network.HttpRequest$HttpRequestException     // Catch:{ all -> 0x001d }
+            r2.<init>(r0)     // Catch:{ all -> 0x001d }
+            throw r2     // Catch:{ all -> 0x001d }
+        L_0x001d:
+            r0 = move-exception
+            r2 = r1
+        L_0x001f:
+            r1 = r2
+        L_0x0020:
+            if (r1 == 0) goto L_0x0025
+            r1.close()     // Catch:{ IOException -> 0x002c }
+        L_0x0025:
+            throw r0
+        L_0x0026:
+            r0 = move-exception
+            goto L_0x0017
+        L_0x0028:
+            r0 = move-exception
+            goto L_0x0020
+        L_0x002a:
+            r1 = move-exception
+            goto L_0x0014
+        L_0x002c:
+            r1 = move-exception
+            goto L_0x0025
+        L_0x002e:
+            r0 = move-exception
+            goto L_0x001f
+        */
+        throw new UnsupportedOperationException("Method not decompiled: p017io.fabric.sdk.android.services.network.HttpRequest.part(java.lang.String, java.lang.String, java.lang.String, java.io.File):io.fabric.sdk.android.services.network.HttpRequest");
     }
 
     public HttpRequest part(String str, String str2, String str3, InputStream inputStream) throws HttpRequestException {
         try {
             startPart();
             writePartHeader(str, str2, str3);
-            copy(inputStream, this.output);
+            copy(inputStream, (OutputStream) this.output);
             return this;
         } catch (IOException e) {
             throw new HttpRequestException(e);
@@ -1292,7 +1248,7 @@ public class HttpRequest {
     }
 
     public HttpRequest partHeader(String str, String str2) throws HttpRequestException {
-        return send((CharSequence) str).send((CharSequence) ": ").send((CharSequence) str2).send(CRLF);
+        return send((CharSequence) str).send((CharSequence) ": ").send((CharSequence) str2).send((CharSequence) CRLF);
     }
 
     public HttpRequest proxyAuthorization(String str) {
@@ -1315,27 +1271,28 @@ public class HttpRequest {
     public InputStreamReader reader(String str) throws HttpRequestException {
         try {
             return new InputStreamReader(stream(), getValidCharset(str));
-        } catch (IOException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new HttpRequestException(e);
         }
     }
 
     public HttpRequest receive(File file) throws HttpRequestException {
         try {
-            final Object bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file), this.bufferSize);
+            final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file), this.bufferSize);
             return (HttpRequest) new CloseOperation<HttpRequest>(this.ignoreCloseExceptions, bufferedOutputStream) {
-                protected HttpRequest run() throws HttpRequestException, IOException {
+                /* access modifiers changed from: protected */
+                public HttpRequest run() throws HttpRequestException, IOException {
                     return HttpRequest.this.receive(bufferedOutputStream);
                 }
             }.call();
-        } catch (IOException e) {
+        } catch (FileNotFoundException e) {
             throw new HttpRequestException(e);
         }
     }
 
     public HttpRequest receive(OutputStream outputStream) throws HttpRequestException {
         try {
-            return copy(buffer(), outputStream);
+            return copy((InputStream) buffer(), outputStream);
         } catch (IOException e) {
             throw new HttpRequestException(e);
         }
@@ -1346,25 +1303,25 @@ public class HttpRequest {
     }
 
     public HttpRequest receive(Writer writer) throws HttpRequestException {
-        Closeable bufferedReader = bufferedReader();
-        final Closeable closeable = bufferedReader;
+        BufferedReader bufferedReader = bufferedReader();
+        final BufferedReader bufferedReader2 = bufferedReader;
         final Writer writer2 = writer;
         return (HttpRequest) new CloseOperation<HttpRequest>(bufferedReader, this.ignoreCloseExceptions) {
             public HttpRequest run() throws IOException {
-                return HttpRequest.this.copy(closeable, writer2);
+                return HttpRequest.this.copy((Reader) bufferedReader2, writer2);
             }
         }.call();
     }
 
     public HttpRequest receive(Appendable appendable) throws HttpRequestException {
-        Closeable bufferedReader = bufferedReader();
-        final Closeable closeable = bufferedReader;
+        BufferedReader bufferedReader = bufferedReader();
+        final BufferedReader bufferedReader2 = bufferedReader;
         final Appendable appendable2 = appendable;
         return (HttpRequest) new CloseOperation<HttpRequest>(bufferedReader, this.ignoreCloseExceptions) {
             public HttpRequest run() throws IOException {
-                Object allocate = CharBuffer.allocate(HttpRequest.this.bufferSize);
+                CharBuffer allocate = CharBuffer.allocate(HttpRequest.this.bufferSize);
                 while (true) {
-                    int read = closeable.read(allocate);
+                    int read = bufferedReader2.read(allocate);
                     if (read == -1) {
                         return HttpRequest.this;
                     }
@@ -1382,8 +1339,8 @@ public class HttpRequest {
 
     public HttpRequest send(File file) throws HttpRequestException {
         try {
-            return send(new BufferedInputStream(new FileInputStream(file)));
-        } catch (IOException e) {
+            return send((InputStream) new BufferedInputStream(new FileInputStream(file)));
+        } catch (FileNotFoundException e) {
             throw new HttpRequestException(e);
         }
     }
@@ -1391,7 +1348,7 @@ public class HttpRequest {
     public HttpRequest send(InputStream inputStream) throws HttpRequestException {
         try {
             openOutput();
-            copy(inputStream, this.output);
+            copy(inputStream, (OutputStream) this.output);
             return this;
         } catch (IOException e) {
             throw new HttpRequestException(e);
@@ -1401,9 +1358,10 @@ public class HttpRequest {
     public HttpRequest send(final Reader reader) throws HttpRequestException {
         try {
             openOutput();
-            final Object outputStreamWriter = new OutputStreamWriter(this.output, this.output.encoder.charset());
+            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.output, this.output.encoder.charset());
             return (HttpRequest) new FlushOperation<HttpRequest>(outputStreamWriter) {
-                protected HttpRequest run() throws IOException {
+                /* access modifiers changed from: protected */
+                public HttpRequest run() throws IOException {
                     return HttpRequest.this.copy(reader, outputStreamWriter);
                 }
             }.call();
@@ -1423,7 +1381,7 @@ public class HttpRequest {
     }
 
     public HttpRequest send(byte[] bArr) throws HttpRequestException {
-        return send(new ByteArrayInputStream(bArr));
+        return send((InputStream) new ByteArrayInputStream(bArr));
     }
 
     public String server() {
@@ -1434,40 +1392,43 @@ public class HttpRequest {
         return 500 == code();
     }
 
-    protected HttpRequest startPart() throws IOException {
-        if (this.multipart) {
-            this.output.write("\r\n--00content0boundary00\r\n");
-        } else {
+    /* access modifiers changed from: protected */
+    public HttpRequest startPart() throws IOException {
+        if (!this.multipart) {
             this.multipart = true;
             contentType(CONTENT_TYPE_MULTIPART).openOutput();
             this.output.write("--00content0boundary00\r\n");
+        } else {
+            this.output.write("\r\n--00content0boundary00\r\n");
         }
         return this;
     }
 
     public InputStream stream() throws HttpRequestException {
+        InputStream errorStream;
         if (code() < 400) {
             try {
-                InputStream inputStream = getConnection().getInputStream();
+                errorStream = getConnection().getInputStream();
             } catch (IOException e) {
                 throw new HttpRequestException(e);
             }
-        }
-        inputStream = getConnection().getErrorStream();
-        if (inputStream == null) {
-            try {
-                inputStream = getConnection().getInputStream();
-            } catch (IOException e2) {
-                throw new HttpRequestException(e2);
+        } else {
+            errorStream = getConnection().getErrorStream();
+            if (errorStream == null) {
+                try {
+                    errorStream = getConnection().getInputStream();
+                } catch (IOException e2) {
+                    throw new HttpRequestException(e2);
+                }
             }
         }
         if (!this.uncompress || !ENCODING_GZIP.equals(contentEncoding())) {
-            return inputStream;
+            return errorStream;
         }
         try {
-            return new GZIPInputStream(inputStream);
-        } catch (IOException e22) {
-            throw new HttpRequestException(e22);
+            return new GZIPInputStream(errorStream);
+        } catch (IOException e3) {
+            throw new HttpRequestException(e3);
         }
     }
 
@@ -1476,18 +1437,10 @@ public class HttpRequest {
     }
 
     public HttpRequest trustAllCerts() throws HttpRequestException {
-        HttpURLConnection connection = getConnection();
-        if (connection instanceof HttpsURLConnection) {
-            ((HttpsURLConnection) connection).setSSLSocketFactory(getTrustedFactory());
-        }
         return this;
     }
 
     public HttpRequest trustAllHosts() {
-        HttpURLConnection connection = getConnection();
-        if (connection instanceof HttpsURLConnection) {
-            ((HttpsURLConnection) connection).setHostnameVerifier(getTrustedVerifier());
-        }
         return this;
     }
 
@@ -1518,22 +1471,24 @@ public class HttpRequest {
         return header("User-Agent", str);
     }
 
-    protected HttpRequest writePartHeader(String str, String str2) throws IOException {
+    /* access modifiers changed from: protected */
+    public HttpRequest writePartHeader(String str, String str2) throws IOException {
         return writePartHeader(str, str2, null);
     }
 
-    protected HttpRequest writePartHeader(String str, String str2, String str3) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("form-data; name=\"").append(str);
+    /* access modifiers changed from: protected */
+    public HttpRequest writePartHeader(String str, String str2, String str3) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("form-data; name=\"").append(str);
         if (str2 != null) {
-            stringBuilder.append("\"; filename=\"").append(str2);
+            sb.append("\"; filename=\"").append(str2);
         }
-        stringBuilder.append('\"');
-        partHeader("Content-Disposition", stringBuilder.toString());
+        sb.append('\"');
+        partHeader("Content-Disposition", sb.toString());
         if (str3 != null) {
             partHeader(HEADER_CONTENT_TYPE, str3);
         }
-        return send(CRLF);
+        return send((CharSequence) CRLF);
     }
 
     public OutputStreamWriter writer() throws HttpRequestException {

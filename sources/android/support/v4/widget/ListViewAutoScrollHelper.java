@@ -1,7 +1,8 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.widget.ListView;
 
+/* renamed from: android.support.v4.widget.ListViewAutoScrollHelper */
 public class ListViewAutoScrollHelper extends AutoScrollHelper {
     private final ListView mTarget;
 

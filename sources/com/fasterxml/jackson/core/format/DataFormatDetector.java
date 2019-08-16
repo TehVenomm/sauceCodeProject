@@ -53,50 +53,46 @@ public class DataFormatDetector {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('[');
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
         int length = this._detectors.length;
         if (length > 0) {
-            stringBuilder.append(this._detectors[0].getFormatName());
+            sb.append(this._detectors[0].getFormatName());
             for (int i = 1; i < length; i++) {
-                stringBuilder.append(", ");
-                stringBuilder.append(this._detectors[i].getFormatName());
+                sb.append(", ");
+                sb.append(this._detectors[i].getFormatName());
             }
         }
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append(']');
+        return sb.toString();
     }
 
     private DataFormatMatcher _findFormat(Std std) throws IOException {
+        MatchStrength matchStrength;
         JsonFactory jsonFactory;
-        MatchStrength hasFormat;
         JsonFactory[] jsonFactoryArr = this._detectors;
         int length = jsonFactoryArr.length;
         int i = 0;
+        MatchStrength matchStrength2 = null;
         JsonFactory jsonFactory2 = null;
-        MatchStrength matchStrength = null;
-        while (i < length) {
-            JsonFactory jsonFactory3;
+        while (true) {
+            if (i >= length) {
+                matchStrength = matchStrength2;
+                jsonFactory = jsonFactory2;
+                break;
+            }
             jsonFactory = jsonFactoryArr[i];
             std.reset();
-            hasFormat = jsonFactory.hasFormat(std);
-            if (hasFormat == null) {
-                jsonFactory3 = jsonFactory2;
-            } else if (hasFormat.ordinal() < this._minimalMatch.ordinal()) {
-                jsonFactory3 = jsonFactory2;
-            } else if (jsonFactory2 != null && matchStrength.ordinal() >= hasFormat.ordinal()) {
-                jsonFactory3 = jsonFactory2;
-            } else if (hasFormat.ordinal() >= this._optimalMatch.ordinal()) {
-                break;
-            } else {
-                matchStrength = hasFormat;
-                jsonFactory3 = jsonFactory;
+            matchStrength = jsonFactory.hasFormat(std);
+            if (matchStrength != null && matchStrength.ordinal() >= this._minimalMatch.ordinal() && (jsonFactory2 == null || matchStrength2.ordinal() < matchStrength.ordinal())) {
+                if (matchStrength.ordinal() >= this._optimalMatch.ordinal()) {
+                    break;
+                }
+                matchStrength2 = matchStrength;
+                jsonFactory2 = jsonFactory;
             }
             i++;
-            jsonFactory2 = jsonFactory3;
         }
-        hasFormat = matchStrength;
-        jsonFactory = jsonFactory2;
-        return std.createMatcher(jsonFactory, hasFormat);
+        return std.createMatcher(jsonFactory, matchStrength);
     }
 }

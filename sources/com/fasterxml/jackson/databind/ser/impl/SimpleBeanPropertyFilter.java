@@ -24,11 +24,13 @@ public class SimpleBeanPropertyFilter implements BeanPropertyFilter, PropertyFil
             this._propertiesToInclude = set;
         }
 
-        protected boolean include(BeanPropertyWriter beanPropertyWriter) {
+        /* access modifiers changed from: protected */
+        public boolean include(BeanPropertyWriter beanPropertyWriter) {
             return this._propertiesToInclude.contains(beanPropertyWriter.getName());
         }
 
-        protected boolean include(PropertyWriter propertyWriter) {
+        /* access modifiers changed from: protected */
+        public boolean include(PropertyWriter propertyWriter) {
             return this._propertiesToInclude.contains(propertyWriter.getName());
         }
     }
@@ -46,11 +48,13 @@ public class SimpleBeanPropertyFilter implements BeanPropertyFilter, PropertyFil
             this._propertiesToExclude = set;
         }
 
-        protected boolean include(BeanPropertyWriter beanPropertyWriter) {
+        /* access modifiers changed from: protected */
+        public boolean include(BeanPropertyWriter beanPropertyWriter) {
             return !this._propertiesToExclude.contains(beanPropertyWriter.getName());
         }
 
-        protected boolean include(PropertyWriter propertyWriter) {
+        /* access modifiers changed from: protected */
+        public boolean include(PropertyWriter propertyWriter) {
             return !this._propertiesToExclude.contains(propertyWriter.getName());
         }
     }
@@ -72,7 +76,7 @@ public class SimpleBeanPropertyFilter implements BeanPropertyFilter, PropertyFil
     }
 
     public static SimpleBeanPropertyFilter filterOutAllExcept(String... strArr) {
-        Object hashSet = new HashSet(strArr.length);
+        HashSet hashSet = new HashSet(strArr.length);
         Collections.addAll(hashSet, strArr);
         return new FilterExceptFilter(hashSet);
     }
@@ -82,7 +86,7 @@ public class SimpleBeanPropertyFilter implements BeanPropertyFilter, PropertyFil
     }
 
     public static SimpleBeanPropertyFilter serializeAllExcept(String... strArr) {
-        Object hashSet = new HashSet(strArr.length);
+        HashSet hashSet = new HashSet(strArr.length);
         Collections.addAll(hashSet, strArr);
         return new SerializeExceptFilter(hashSet);
     }
@@ -107,15 +111,18 @@ public class SimpleBeanPropertyFilter implements BeanPropertyFilter, PropertyFil
         };
     }
 
-    protected boolean include(BeanPropertyWriter beanPropertyWriter) {
+    /* access modifiers changed from: protected */
+    public boolean include(BeanPropertyWriter beanPropertyWriter) {
         return true;
     }
 
-    protected boolean include(PropertyWriter propertyWriter) {
+    /* access modifiers changed from: protected */
+    public boolean include(PropertyWriter propertyWriter) {
         return true;
     }
 
-    protected boolean includeElement(Object obj) {
+    /* access modifiers changed from: protected */
+    public boolean includeElement(Object obj) {
         return true;
     }
 

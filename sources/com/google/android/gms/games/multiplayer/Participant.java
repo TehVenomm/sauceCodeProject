@@ -3,10 +3,13 @@ package com.google.android.gms.games.multiplayer;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.android.gms.common.data.Freezable;
+import com.google.android.gms.common.util.VisibleForTesting;
 import com.google.android.gms.games.Player;
 
+@VisibleForTesting
 public interface Participant extends Parcelable, Freezable<Participant> {
     public static final int STATUS_DECLINED = 3;
     public static final int STATUS_FINISHED = 5;
@@ -22,27 +25,33 @@ public interface Participant extends Parcelable, Freezable<Participant> {
 
     void getDisplayName(CharArrayBuffer charArrayBuffer);
 
+    @Nullable
     Uri getHiResImageUri();
 
+    @Nullable
     @KeepName
     @Deprecated
     String getHiResImageUrl();
 
+    @Nullable
     Uri getIconImageUri();
 
+    @Nullable
     @KeepName
     @Deprecated
     String getIconImageUrl();
 
     String getParticipantId();
 
+    @Nullable
     Player getPlayer();
 
+    @Nullable
     ParticipantResult getResult();
 
     int getStatus();
 
     boolean isConnectedToRoom();
 
-    String zzaru();
+    String zzdn();
 }

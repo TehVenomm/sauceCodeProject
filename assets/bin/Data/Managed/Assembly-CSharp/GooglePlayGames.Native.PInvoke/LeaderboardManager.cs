@@ -3,12 +3,37 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class LeaderboardManager
 	{
 		private readonly GameServices mServices;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.LeaderboardManager.ShowAllUICallback _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.LeaderboardManager.ShowUICallback _003C_003Ef__mg_0024cache1;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchResponse> _003C_003Ef__mg_0024cache2;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.LeaderboardManager.FetchCallback _003C_003Ef__mg_0024cache3;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchScoreSummaryResponse> _003C_003Ef__mg_0024cache4;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.LeaderboardManager.FetchScoreSummaryCallback _003C_003Ef__mg_0024cache5;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchScorePageResponse> _003C_003Ef__mg_0024cache6;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.LeaderboardManager.FetchScorePageCallback _003C_003Ef__mg_0024cache7;
 
 		internal int LeaderboardMaxResults => 25;
 
@@ -84,20 +109,18 @@ namespace GooglePlayGames.Native.PInvoke
 				Logger.w("Error returned from fetchScoreSummary: " + response);
 				data.Status = (ResponseStatus)response.GetStatus();
 				callback(data);
+				return;
+			}
+			NativeScoreSummary scoreSummary = response.GetScoreSummary();
+			data.ApproximateCount = scoreSummary.ApproximateResults();
+			data.PlayerScore = scoreSummary.LocalUserScore().AsScore(data.Id, selfPlayerId);
+			if (maxResults <= 0)
+			{
+				callback(data);
 			}
 			else
 			{
-				NativeScoreSummary scoreSummary = response.GetScoreSummary();
-				data.ApproximateCount = scoreSummary.ApproximateResults();
-				data.PlayerScore = scoreSummary.LocalUserScore().AsScore(data.Id, selfPlayerId);
-				if (maxResults <= 0)
-				{
-					callback(data);
-				}
-				else
-				{
-					LoadScorePage(data, maxResults, token, callback);
-				}
+				LoadScorePage(data, maxResults, token, callback);
 			}
 		}
 

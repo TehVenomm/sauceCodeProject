@@ -26,31 +26,30 @@ public abstract class AbstractMultiBroadcastReceiver extends BroadcastReceiver {
                 if (broadcastReceiver != null) {
                     broadcastReceiver.onReceive(context, intent);
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Could not broadcast to: " + str, e);
             }
         }
     }
 
     private Collection<String> getBroadcastReceiverClassNames(Context context) {
-        Collection hashSet = new HashSet();
+        HashSet hashSet = new HashSet();
         try {
             ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), 128);
             if (applicationInfo.metaData != null) {
                 for (String str : applicationInfo.metaData.keySet()) {
-                    String str2;
-                    if (str2.startsWith(this.metadataPrefix)) {
-                        str2 = applicationInfo.metaData.getString(str2);
-                        if (str2 != null) {
-                            hashSet.add(str2);
-                            Log.d(Constants.TAG, String.format("[%s] Registered %s", new Object[]{this.type, str2}));
+                    if (str.startsWith(this.metadataPrefix)) {
+                        String string = applicationInfo.metaData.getString(str);
+                        if (string != null) {
+                            hashSet.add(string);
+                            Log.d(Constants.TAG, String.format("[%s] Registered %s", new Object[]{this.type, string}));
                         }
                     }
                 }
             }
         } catch (NameNotFoundException e) {
             Log.e(Constants.TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
-        } catch (Throwable e2) {
+        } catch (Exception e2) {
             Log.e(Constants.TAG, "Failed to load meta-data", e2);
         }
         return hashSet;
@@ -59,12 +58,12 @@ public abstract class AbstractMultiBroadcastReceiver extends BroadcastReceiver {
     private BroadcastReceiver getBroadcastReceiver(String str) {
         try {
             return (BroadcastReceiver) Class.forName(str).newInstance();
-        } catch (Throwable e) {
+        } catch (ClassNotFoundException e) {
             Log.e(Constants.TAG, "Broadcast receiver not found: " + str, e);
-        } catch (Throwable e2) {
+        } catch (InstantiationException e2) {
             Log.e(Constants.TAG, "Broadcast receiver could not be instantiated: " + str, e2);
-        } catch (Throwable e22) {
-            Log.e(Constants.TAG, "Broadcast receiver could not be instantiated (illegal access): " + str, e22);
+        } catch (IllegalAccessException e3) {
+            Log.e(Constants.TAG, "Broadcast receiver could not be instantiated (illegal access): " + str, e3);
         }
         return null;
     }

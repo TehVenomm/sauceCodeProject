@@ -1,7 +1,7 @@
 package com.amazon.device.iap.model;
 
 import com.amazon.device.iap.internal.model.UserDataResponseBuilder;
-import com.amazon.device.iap.internal.util.C0243d;
+import com.amazon.device.iap.internal.util.C0408d;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,8 +21,8 @@ public final class UserDataResponse {
     }
 
     public UserDataResponse(UserDataResponseBuilder userDataResponseBuilder) {
-        C0243d.m169a(userDataResponseBuilder.getRequestId(), "requestId");
-        C0243d.m169a(userDataResponseBuilder.getRequestStatus(), "requestStatus");
+        C0408d.m164a((Object) userDataResponseBuilder.getRequestId(), "requestId");
+        C0408d.m164a((Object) userDataResponseBuilder.getRequestStatus(), "requestStatus");
         this.requestId = userDataResponseBuilder.getRequestId();
         this.requestStatus = userDataResponseBuilder.getRequestStatus();
         this.userData = userDataResponseBuilder.getUserData();
@@ -49,10 +49,6 @@ public final class UserDataResponse {
     }
 
     public String toString() {
-        String obj = super.toString();
-        RequestId requestId = this.requestId;
-        String requestStatus = this.requestStatus != null ? this.requestStatus.toString() : "null";
-        String userData = this.userData != null ? this.userData.toString() : "null";
-        return String.format(TO_STRING_FORMAT, new Object[]{obj, requestId, requestStatus, userData});
+        return String.format(TO_STRING_FORMAT, new Object[]{super.toString(), this.requestId, this.requestStatus != null ? this.requestStatus.toString() : "null", this.userData != null ? this.userData.toString() : "null"});
     }
 }

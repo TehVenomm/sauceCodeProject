@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CircleShadow
+public class CircleShadow : MonoBehaviour
 {
 	private Transform _transform;
 
@@ -13,8 +13,6 @@ public class CircleShadow
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 	}
 

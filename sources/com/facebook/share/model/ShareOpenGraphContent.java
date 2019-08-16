@@ -5,15 +5,7 @@ import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
 
 public final class ShareOpenGraphContent extends ShareContent<ShareOpenGraphContent, Builder> {
-    public static final Creator<ShareOpenGraphContent> CREATOR = new C05151();
-    private final ShareOpenGraphAction action;
-    private final String previewPropertyName;
-
-    /* renamed from: com.facebook.share.model.ShareOpenGraphContent$1 */
-    static final class C05151 implements Creator<ShareOpenGraphContent> {
-        C05151() {
-        }
-
+    public static final Creator<ShareOpenGraphContent> CREATOR = new Creator<ShareOpenGraphContent>() {
         public ShareOpenGraphContent createFromParcel(Parcel parcel) {
             return new ShareOpenGraphContent(parcel);
         }
@@ -21,18 +13,22 @@ public final class ShareOpenGraphContent extends ShareContent<ShareOpenGraphCont
         public ShareOpenGraphContent[] newArray(int i) {
             return new ShareOpenGraphContent[i];
         }
-    }
+    };
+    private final ShareOpenGraphAction action;
+    private final String previewPropertyName;
 
     public static final class Builder extends com.facebook.share.model.ShareContent.Builder<ShareOpenGraphContent, Builder> {
-        private ShareOpenGraphAction action;
-        private String previewPropertyName;
+        /* access modifiers changed from: private */
+        public ShareOpenGraphAction action;
+        /* access modifiers changed from: private */
+        public String previewPropertyName;
 
         public ShareOpenGraphContent build() {
-            return new ShareOpenGraphContent();
+            return new ShareOpenGraphContent(this);
         }
 
         public Builder readFrom(ShareOpenGraphContent shareOpenGraphContent) {
-            return shareOpenGraphContent == null ? this : ((Builder) super.readFrom((ShareContent) shareOpenGraphContent)).setAction(shareOpenGraphContent.getAction()).setPreviewPropertyName(shareOpenGraphContent.getPreviewPropertyName());
+            return shareOpenGraphContent == null ? this : ((Builder) super.readFrom(shareOpenGraphContent)).setAction(shareOpenGraphContent.getAction()).setPreviewPropertyName(shareOpenGraphContent.getPreviewPropertyName());
         }
 
         public Builder setAction(@Nullable ShareOpenGraphAction shareOpenGraphAction) {

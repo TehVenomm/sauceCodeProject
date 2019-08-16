@@ -1,9 +1,10 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ProgressBar;
 
+/* renamed from: android.support.v4.widget.ContentLoadingProgressBar */
 public class ContentLoadingProgressBar extends ProgressBar {
     private static final int MIN_DELAY = 500;
     private static final int MIN_SHOW_TIME = 500;
@@ -13,32 +14,6 @@ public class ContentLoadingProgressBar extends ProgressBar {
     boolean mPostedHide;
     boolean mPostedShow;
     long mStartTime;
-
-    /* renamed from: android.support.v4.widget.ContentLoadingProgressBar$1 */
-    class C01361 implements Runnable {
-        C01361() {
-        }
-
-        public void run() {
-            ContentLoadingProgressBar.this.mPostedHide = false;
-            ContentLoadingProgressBar.this.mStartTime = -1;
-            ContentLoadingProgressBar.this.setVisibility(8);
-        }
-    }
-
-    /* renamed from: android.support.v4.widget.ContentLoadingProgressBar$2 */
-    class C01372 implements Runnable {
-        C01372() {
-        }
-
-        public void run() {
-            ContentLoadingProgressBar.this.mPostedShow = false;
-            if (!ContentLoadingProgressBar.this.mDismissed) {
-                ContentLoadingProgressBar.this.mStartTime = System.currentTimeMillis();
-                ContentLoadingProgressBar.this.setVisibility(0);
-            }
-        }
-    }
 
     public ContentLoadingProgressBar(Context context) {
         this(context, null);
@@ -50,8 +25,22 @@ public class ContentLoadingProgressBar extends ProgressBar {
         this.mPostedHide = false;
         this.mPostedShow = false;
         this.mDismissed = false;
-        this.mDelayedHide = new C01361();
-        this.mDelayedShow = new C01372();
+        this.mDelayedHide = new Runnable() {
+            public void run() {
+                ContentLoadingProgressBar.this.mPostedHide = false;
+                ContentLoadingProgressBar.this.mStartTime = -1;
+                ContentLoadingProgressBar.this.setVisibility(8);
+            }
+        };
+        this.mDelayedShow = new Runnable() {
+            public void run() {
+                ContentLoadingProgressBar.this.mPostedShow = false;
+                if (!ContentLoadingProgressBar.this.mDismissed) {
+                    ContentLoadingProgressBar.this.mStartTime = System.currentTimeMillis();
+                    ContentLoadingProgressBar.this.setVisibility(0);
+                }
+            }
+        };
     }
 
     private void removeCallbacks() {

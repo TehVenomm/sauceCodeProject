@@ -5,51 +5,51 @@ import android.net.Uri;
 import com.google.android.gms.common.data.BitmapTeleporter;
 
 public interface SnapshotMetadataChange {
-    public static final SnapshotMetadataChange EMPTY_CHANGE = new zze();
+    public static final SnapshotMetadataChange EMPTY_CHANGE = new SnapshotMetadataChangeEntity();
 
     public static final class Builder {
-        private String zzdmz;
-        private Long zzhoi;
-        private Long zzhoj;
-        private BitmapTeleporter zzhok;
-        private Uri zzhol;
+        private String description;
+        private Long zzrt;
+        private Long zzru;
+        private BitmapTeleporter zzrv;
+        private Uri zzrw;
 
         public final SnapshotMetadataChange build() {
-            return new zze(this.zzdmz, this.zzhoi, this.zzhok, this.zzhol, this.zzhoj);
+            return new SnapshotMetadataChangeEntity(this.description, this.zzrt, this.zzrv, this.zzrw, this.zzru);
         }
 
         public final Builder fromMetadata(SnapshotMetadata snapshotMetadata) {
-            this.zzdmz = snapshotMetadata.getDescription();
-            this.zzhoi = Long.valueOf(snapshotMetadata.getPlayedTime());
-            this.zzhoj = Long.valueOf(snapshotMetadata.getProgressValue());
-            if (this.zzhoi.longValue() == -1) {
-                this.zzhoi = null;
+            this.description = snapshotMetadata.getDescription();
+            this.zzrt = Long.valueOf(snapshotMetadata.getPlayedTime());
+            this.zzru = Long.valueOf(snapshotMetadata.getProgressValue());
+            if (this.zzrt.longValue() == -1) {
+                this.zzrt = null;
             }
-            this.zzhol = snapshotMetadata.getCoverImageUri();
-            if (this.zzhol != null) {
-                this.zzhok = null;
+            this.zzrw = snapshotMetadata.getCoverImageUri();
+            if (this.zzrw != null) {
+                this.zzrv = null;
             }
             return this;
         }
 
         public final Builder setCoverImage(Bitmap bitmap) {
-            this.zzhok = new BitmapTeleporter(bitmap);
-            this.zzhol = null;
+            this.zzrv = new BitmapTeleporter(bitmap);
+            this.zzrw = null;
             return this;
         }
 
         public final Builder setDescription(String str) {
-            this.zzdmz = str;
+            this.description = str;
             return this;
         }
 
         public final Builder setPlayedTimeMillis(long j) {
-            this.zzhoi = Long.valueOf(j);
+            this.zzrt = Long.valueOf(j);
             return this;
         }
 
         public final Builder setProgressValue(long j) {
-            this.zzhoj = Long.valueOf(j);
+            this.zzru = Long.valueOf(j);
             return this;
         }
     }
@@ -62,5 +62,5 @@ public interface SnapshotMetadataChange {
 
     Long getProgressValue();
 
-    BitmapTeleporter zzary();
+    BitmapTeleporter zzdt();
 }

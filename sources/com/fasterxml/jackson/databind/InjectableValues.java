@@ -29,15 +29,15 @@ public abstract class InjectableValues {
         }
 
         public Object findInjectableValue(Object obj, DeserializationContext deserializationContext, BeanProperty beanProperty, Object obj2) {
-            if (obj instanceof String) {
-                String str = (String) obj;
-                Object obj3 = this._values.get(str);
-                if (obj3 != null || this._values.containsKey(str)) {
-                    return obj3;
-                }
-                throw new IllegalArgumentException("No injectable id with value '" + str + "' found (for property '" + beanProperty.getName() + "')");
+            if (!(obj instanceof String)) {
+                throw new IllegalArgumentException("Unrecognized inject value id type (" + (obj == null ? "[null]" : obj.getClass().getName()) + "), expecting String");
             }
-            throw new IllegalArgumentException("Unrecognized inject value id type (" + (obj == null ? "[null]" : obj.getClass().getName()) + "), expecting String");
+            String str = (String) obj;
+            Object obj3 = this._values.get(str);
+            if (obj3 != null || this._values.containsKey(str)) {
+                return obj3;
+            }
+            throw new IllegalArgumentException("No injectable id with value '" + str + "' found (for property '" + beanProperty.getName() + "')");
         }
     }
 

@@ -3,13 +3,18 @@ package com.google.android.gms.games.multiplayer.turnbased;
 import android.database.CharArrayBuffer;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.android.gms.common.data.Freezable;
+import com.google.android.gms.common.util.VisibleForTesting;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.Participatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
+@VisibleForTesting
 public interface TurnBasedMatch extends Parcelable, Freezable<TurnBasedMatch>, Participatable {
     public static final int MATCH_STATUS_ACTIVE = 1;
     public static final int MATCH_STATUS_AUTO_MATCHING = 0;
@@ -17,15 +22,20 @@ public interface TurnBasedMatch extends Parcelable, Freezable<TurnBasedMatch>, P
     public static final int MATCH_STATUS_COMPLETE = 2;
     public static final int MATCH_STATUS_EXPIRED = 3;
     @KeepName
-    public static final int[] MATCH_TURN_STATUS_ALL = new int[]{0, 1, 2, 3};
+    public static final int[] MATCH_TURN_STATUS_ALL = {0, 1, 2, 3};
     public static final int MATCH_TURN_STATUS_COMPLETE = 3;
     public static final int MATCH_TURN_STATUS_INVITED = 0;
     public static final int MATCH_TURN_STATUS_MY_TURN = 1;
     public static final int MATCH_TURN_STATUS_THEIR_TURN = 2;
     public static final int MATCH_VARIANT_DEFAULT = -1;
 
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MatchTurnStatus {
+    }
+
     boolean canRematch();
 
+    @Nullable
     Bundle getAutoMatchCriteria();
 
     int getAvailableAutoMatchSlots();

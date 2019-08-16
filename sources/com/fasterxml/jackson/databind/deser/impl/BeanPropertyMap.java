@@ -33,33 +33,33 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         init(collection);
     }
 
-    protected void init(Collection<SettableBeanProperty> collection) {
+    /* access modifiers changed from: protected */
+    public void init(Collection<SettableBeanProperty> collection) {
         this._size = collection.size();
         int findSize = findSize(this._size);
         this._hashMask = findSize - 1;
         Object[] objArr = new Object[(((findSize >> 1) + findSize) * 2)];
-        Object[] objArr2 = objArr;
         int i = 0;
         for (SettableBeanProperty settableBeanProperty : collection) {
             if (settableBeanProperty != null) {
                 String propertyName = getPropertyName(settableBeanProperty);
                 int _hashCode = _hashCode(propertyName);
                 int i2 = _hashCode << 1;
-                if (objArr2[i2] != null) {
+                if (objArr[i2] != null) {
                     i2 = ((_hashCode >> 1) + findSize) << 1;
-                    if (objArr2[i2] != null) {
+                    if (objArr[i2] != null) {
                         i2 = (((findSize >> 1) + findSize) << 1) + i;
                         i += 2;
-                        if (i2 >= objArr2.length) {
-                            objArr2 = Arrays.copyOf(objArr2, objArr2.length + 4);
+                        if (i2 >= objArr.length) {
+                            objArr = Arrays.copyOf(objArr, objArr.length + 4);
                         }
                     }
                 }
-                objArr2[i2] = propertyName;
-                objArr2[i2 + 1] = settableBeanProperty;
+                objArr[i2] = propertyName;
+                objArr[i2 + 1] = settableBeanProperty;
             }
         }
-        this._hashArea = objArr2;
+        this._hashArea = objArr;
         this._spillCount = i;
     }
 
@@ -82,54 +82,58 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
     }
 
     public BeanPropertyMap withProperty(SettableBeanProperty settableBeanProperty) {
-        int i;
         String propertyName = getPropertyName(settableBeanProperty);
         int length = this._hashArea.length;
-        for (i = 1; i < length; i += 2) {
-            SettableBeanProperty settableBeanProperty2 = (SettableBeanProperty) this._hashArea[i];
-            if (settableBeanProperty2 != null && settableBeanProperty2.getName().equals(propertyName)) {
-                this._hashArea[i] = settableBeanProperty;
-                this._propsInOrder[_findFromOrdered(settableBeanProperty2)] = settableBeanProperty;
-                break;
-            }
-        }
-        i = _hashCode(propertyName);
-        length = this._hashMask + 1;
-        int i2 = i << 1;
-        if (this._hashArea[i2] != null) {
-            i2 = ((i >> 1) + length) << 1;
-            if (this._hashArea[i2] != null) {
-                i2 = (((length >> 1) + length) << 1) + this._spillCount;
-                this._spillCount += 2;
-                if (i2 >= this._hashArea.length) {
-                    this._hashArea = Arrays.copyOf(this._hashArea, this._hashArea.length + 4);
+        int i = 1;
+        while (true) {
+            if (i < length) {
+                SettableBeanProperty settableBeanProperty2 = (SettableBeanProperty) this._hashArea[i];
+                if (settableBeanProperty2 != null && settableBeanProperty2.getName().equals(propertyName)) {
+                    this._hashArea[i] = settableBeanProperty;
+                    this._propsInOrder[_findFromOrdered(settableBeanProperty2)] = settableBeanProperty;
+                    break;
                 }
+                i += 2;
+            } else {
+                int _hashCode = _hashCode(propertyName);
+                int i2 = this._hashMask + 1;
+                int i3 = _hashCode << 1;
+                if (this._hashArea[i3] != null) {
+                    i3 = ((_hashCode >> 1) + i2) << 1;
+                    if (this._hashArea[i3] != null) {
+                        i3 = (((i2 >> 1) + i2) << 1) + this._spillCount;
+                        this._spillCount += 2;
+                        if (i3 >= this._hashArea.length) {
+                            this._hashArea = Arrays.copyOf(this._hashArea, this._hashArea.length + 4);
+                        }
+                    }
+                }
+                this._hashArea[i3] = propertyName;
+                this._hashArea[i3 + 1] = settableBeanProperty;
+                int length2 = this._propsInOrder.length;
+                this._propsInOrder = (SettableBeanProperty[]) Arrays.copyOf(this._propsInOrder, length2 + 1);
+                this._propsInOrder[length2] = settableBeanProperty;
             }
         }
-        this._hashArea[i2] = propertyName;
-        this._hashArea[i2 + 1] = settableBeanProperty;
-        i = this._propsInOrder.length;
-        this._propsInOrder = (SettableBeanProperty[]) Arrays.copyOf(this._propsInOrder, i + 1);
-        this._propsInOrder[i] = settableBeanProperty;
         return this;
     }
 
     public BeanPropertyMap assignIndexes() {
-        int i = 0;
+        int i;
+        int i2 = 0;
         int length = this._hashArea.length;
-        int i2 = 1;
-        while (i2 < length) {
-            int i3;
-            SettableBeanProperty settableBeanProperty = (SettableBeanProperty) this._hashArea[i2];
+        int i3 = 1;
+        while (i3 < length) {
+            SettableBeanProperty settableBeanProperty = (SettableBeanProperty) this._hashArea[i3];
             if (settableBeanProperty != null) {
-                int i4 = i + 1;
-                settableBeanProperty.assignIndex(i);
-                i3 = i4;
+                int i4 = i2 + 1;
+                settableBeanProperty.assignIndex(i2);
+                i = i4;
             } else {
-                i3 = i;
+                i = i2;
             }
-            i2 += 2;
-            i = i3;
+            i3 += 2;
+            i2 = i;
         }
         return this;
     }
@@ -138,7 +142,7 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         if (nameTransformer == null || nameTransformer == NameTransformer.NOP) {
             return this;
         }
-        Collection arrayList = new ArrayList(r1);
+        ArrayList arrayList = new ArrayList(r1);
         for (SettableBeanProperty settableBeanProperty : this._propsInOrder) {
             if (settableBeanProperty == null) {
                 arrayList.add(settableBeanProperty);
@@ -162,7 +166,7 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
     }
 
     private List<SettableBeanProperty> properties() {
-        List arrayList = new ArrayList(this._size);
+        ArrayList arrayList = new ArrayList(this._size);
         int length = this._hashArea.length;
         for (int i = 1; i < length; i += 2) {
             SettableBeanProperty settableBeanProperty = (SettableBeanProperty) this._hashArea[i];
@@ -181,7 +185,8 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         return this._propsInOrder;
     }
 
-    protected final String getPropertyName(SettableBeanProperty settableBeanProperty) {
+    /* access modifiers changed from: protected */
+    public final String getPropertyName(SettableBeanProperty settableBeanProperty) {
         return this._caseInsensitive ? settableBeanProperty.getName().toLowerCase() : settableBeanProperty.getName();
     }
 
@@ -205,11 +210,11 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         }
         int hashCode = str.hashCode() & this._hashMask;
         int i = hashCode << 1;
-        String str2 = this._hashArea[i];
-        if (str2 == str || str.equals(str2)) {
+        Object obj = this._hashArea[i];
+        if (obj == str || str.equals(obj)) {
             return (SettableBeanProperty) this._hashArea[i + 1];
         }
-        return _find2(str, hashCode, str2);
+        return _find2(str, hashCode, obj);
     }
 
     private final SettableBeanProperty _find2(String str, int i, Object obj) {
@@ -225,14 +230,14 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         if (obj2 == null) {
             return null;
         }
-        i2 = (i2 + (i2 >> 1)) << 1;
-        i3 = this._spillCount + i2;
-        while (i2 < i3) {
-            String str2 = this._hashArea[i2];
-            if (str2 == str || str.equals(str2)) {
-                return (SettableBeanProperty) this._hashArea[i2 + 1];
+        int i4 = (i2 + (i2 >> 1)) << 1;
+        int i5 = this._spillCount + i4;
+        while (i4 < i5) {
+            Object obj3 = this._hashArea[i4];
+            if (obj3 == str || str.equals(obj3)) {
+                return (SettableBeanProperty) this._hashArea[i4 + 1];
             }
-            i2 += 2;
+            i4 += 2;
         }
         return null;
     }
@@ -242,7 +247,7 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
     }
 
     public void remove(SettableBeanProperty settableBeanProperty) {
-        Collection arrayList = new ArrayList(this._size);
+        ArrayList arrayList = new ArrayList(this._size);
         String propertyName = getPropertyName(settableBeanProperty);
         boolean z = false;
         int length = this._hashArea.length;
@@ -258,11 +263,10 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
                 arrayList.add(settableBeanProperty2);
             }
         }
-        if (z) {
-            init(arrayList);
-            return;
+        if (!z) {
+            throw new NoSuchElementException("No entry '" + settableBeanProperty.getName() + "' found, can't remove");
         }
-        throw new NoSuchElementException("No entry '" + settableBeanProperty.getName() + "' found, can't remove");
+        init(arrayList);
     }
 
     public boolean findDeserializeAndSet(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, String str) throws IOException {
@@ -272,34 +276,35 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         }
         try {
             find.deserializeAndSet(jsonParser, deserializationContext, obj);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             wrapAndThrow(e, obj, str, deserializationContext);
         }
         return true;
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Properties=[");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Properties=[");
         Iterator it = iterator();
         int i = 0;
         while (it.hasNext()) {
             SettableBeanProperty settableBeanProperty = (SettableBeanProperty) it.next();
             int i2 = i + 1;
             if (i > 0) {
-                stringBuilder.append(", ");
+                sb.append(", ");
             }
-            stringBuilder.append(settableBeanProperty.getName());
-            stringBuilder.append('(');
-            stringBuilder.append(settableBeanProperty.getType());
-            stringBuilder.append(')');
+            sb.append(settableBeanProperty.getName());
+            sb.append('(');
+            sb.append(settableBeanProperty.getType());
+            sb.append(')');
             i = i2;
         }
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append(']');
+        return sb.toString();
     }
 
-    protected SettableBeanProperty _rename(SettableBeanProperty settableBeanProperty, NameTransformer nameTransformer) {
+    /* access modifiers changed from: protected */
+    public SettableBeanProperty _rename(SettableBeanProperty settableBeanProperty, NameTransformer nameTransformer) {
         if (settableBeanProperty == null) {
             return settableBeanProperty;
         }
@@ -314,7 +319,8 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         return withSimpleName;
     }
 
-    protected void wrapAndThrow(Throwable th, Object obj, String str, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public void wrapAndThrow(Throwable th, Object obj, String str, DeserializationContext deserializationContext) throws IOException {
         Throwable th2 = th;
         while ((th2 instanceof InvocationTargetException) && th2.getCause() != null) {
             th2 = th2.getCause();
@@ -322,12 +328,12 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         if (th2 instanceof Error) {
             throw ((Error) th2);
         }
-        Object obj2 = (deserializationContext == null || deserializationContext.isEnabled(DeserializationFeature.WRAP_EXCEPTIONS)) ? 1 : null;
+        boolean z = deserializationContext == null || deserializationContext.isEnabled(DeserializationFeature.WRAP_EXCEPTIONS);
         if (th2 instanceof IOException) {
-            if (obj2 == null || !(th2 instanceof JsonProcessingException)) {
+            if (!z || !(th2 instanceof JsonProcessingException)) {
                 throw ((IOException) th2);
             }
-        } else if (obj2 == null && (th2 instanceof RuntimeException)) {
+        } else if (!z && (th2 instanceof RuntimeException)) {
             throw ((RuntimeException) th2);
         }
         throw JsonMappingException.wrapWithPath(th2, obj, str);
@@ -339,18 +345,18 @@ public class BeanPropertyMap implements Iterable<SettableBeanProperty>, Serializ
         if (str.equals(this._hashArea[i])) {
             return i + 1;
         }
-        i = this._hashMask + 1;
-        _hashCode = ((_hashCode >> 1) + i) << 1;
-        if (str.equals(this._hashArea[_hashCode])) {
-            return _hashCode + 1;
+        int i2 = this._hashMask + 1;
+        int i3 = ((_hashCode >> 1) + i2) << 1;
+        if (str.equals(this._hashArea[i3])) {
+            return i3 + 1;
         }
-        _hashCode = ((i >> 1) + i) << 1;
-        i = this._spillCount + _hashCode;
-        while (_hashCode < i) {
-            if (str.equals(this._hashArea[_hashCode])) {
-                return _hashCode + 1;
+        int i4 = ((i2 >> 1) + i2) << 1;
+        int i5 = this._spillCount + i4;
+        while (i4 < i5) {
+            if (str.equals(this._hashArea[i4])) {
+                return i4 + 1;
             }
-            _hashCode += 2;
+            i4 += 2;
         }
         return -1;
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UVScroller
+public class UVScroller : MonoBehaviour
 {
 	private Material mat;
 
@@ -16,8 +16,6 @@ public class UVScroller
 
 	private void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
 		mat = this.GetComponent<Renderer>().get_material();
 	}
 

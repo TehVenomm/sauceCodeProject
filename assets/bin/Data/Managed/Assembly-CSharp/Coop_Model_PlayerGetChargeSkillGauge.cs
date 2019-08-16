@@ -8,6 +8,8 @@ public class Coop_Model_PlayerGetChargeSkillGauge : Coop_Model_ObjectBase
 
 	public bool receive;
 
+	public bool isCorrectWaveMatch;
+
 	public Coop_Model_PlayerGetChargeSkillGauge()
 	{
 		base.packetType = PACKET_TYPE.PLAYER_GET_CHARGE_SKILLGAUGE;

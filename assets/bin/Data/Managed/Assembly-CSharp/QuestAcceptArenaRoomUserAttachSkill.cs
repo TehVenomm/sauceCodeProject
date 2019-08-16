@@ -8,17 +8,15 @@ public class QuestAcceptArenaRoomUserAttachSkill : EquipSetDetailAttachSkillDial
 		if (selectSkillIndex < 0 || selectEquipIndex < 0)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		EquipItemInfo equipItemInfo = equipAndSkill[selectEquipIndex].equipItemInfo;
+		GameSection.SetEventData(new object[4]
 		{
-			EquipItemInfo equipItemInfo = equipAndSkill[selectEquipIndex].equipItemInfo;
-			GameSection.SetEventData(new object[4]
-			{
-				ItemDetailEquip.CURRENT_SECTION.QUEST_ROOM,
-				null,
-				equipItemInfo,
-				selectSkillIndex
-			});
-		}
+			ItemDetailEquip.CURRENT_SECTION.QUEST_ROOM,
+			null,
+			equipItemInfo,
+			selectSkillIndex
+		});
 	}
 }

@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 {
-	private const int STACK_MAX = 100;
+	private const int STACK_MAX = 20;
 
 	private int current_index;
 
@@ -14,7 +15,7 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 	protected override void Awake()
 	{
 		base.Awake();
-		CreateStack();
+		this.StartCoroutine(CreateStack());
 	}
 
 	public static void StopAllLentObjects()
@@ -25,7 +26,7 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 			{
 				if (ao != null)
 				{
-					ao.Stop(0);
+					ao.Stop();
 				}
 			});
 		}
@@ -39,7 +40,7 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 			{
 				if (ao != null && ao.PlayPhase == AudioObject.Phase.PLAYING)
 				{
-					ao.Stop(0);
+					ao.Stop();
 				}
 			});
 		}
@@ -59,30 +60,29 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 
 	private void ForEachLentObjects(Action<AudioObject> act)
 	{
-		if (audio_object_stack != null)
+		if (audio_object_stack == null)
 		{
-			int num = current_index - 1;
-			if (num >= 0)
+			return;
+		}
+		int num = current_index - 1;
+		if (num >= 0)
+		{
+			for (int i = num; i < 20; i++)
 			{
-				for (int i = num; i < 100; i++)
-				{
-					act(audio_object_stack[i]);
-				}
+				act(audio_object_stack[i]);
 			}
 		}
 	}
 
-	private void CreateStack()
+	private IEnumerator CreateStack()
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		audio_object_stack = new AudioObject[100];
-		for (int i = 0; i < 100; i++)
+		audio_object_stack = new AudioObject[20];
+		for (int i = 0; i < 20; i++)
 		{
 			audio_object_stack[i] = CreateObject(i + 1);
 			audio_object_stack[i].get_transform().set_parent(this.get_transform());
 			audio_object_stack[i].get_gameObject().SetActive(false);
+			yield return null;
 		}
 		SetCursorTail();
 	}
@@ -90,11 +90,12 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 	private AudioObject CreateObject(int managed_id)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
+		//IL_000b: Expected O, but got Unknown
 		GameObject val = new GameObject("AudioObject");
 		AudioObject audioObject = val.AddComponent<AudioObject>();
-		AudioSource source = val.AddComponent<AudioSource>();
-		AudioObject.Init(audioObject, source, managed_id);
+		AudioSource val2 = val.AddComponent<AudioSource>();
+		val2.set_playOnAwake(false);
+		AudioObject.Init(audioObject, val2, managed_id);
 		return audioObject;
 	}
 
@@ -109,7 +110,6 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 
 	private AudioObject Borrow_Imm()
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		if (CachedObjectCount > 0)
 		{
 			AudioObject audioObject = audio_object_stack[current_index];
@@ -130,10 +130,6 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 
 	private void Release_Imm(AudioObject obj)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		if (obj.ID > 0)
 		{
 			UpCursor();
@@ -149,12 +145,12 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 
 	private void SetCursorTail()
 	{
-		current_index = 99;
+		current_index = 19;
 	}
 
 	private void UpCursor()
 	{
-		current_index = Mathf.Min(current_index + 1, 99);
+		current_index = Mathf.Min(current_index + 1, 19);
 	}
 
 	private void DownCursor()

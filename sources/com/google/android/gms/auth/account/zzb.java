@@ -3,24 +3,21 @@ package com.google.android.gms.auth.account;
 import android.accounts.Account;
 import android.os.Parcel;
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzef;
-import com.google.android.gms.internal.zzeg;
+import com.google.android.gms.internal.auth.zzc;
 
-public abstract class zzb extends zzef implements zza {
+public abstract class zzb extends com.google.android.gms.internal.auth.zzb implements zza {
     public zzb() {
-        attachInterface(this, "com.google.android.gms.auth.account.IWorkAccountCallback");
+        super("com.google.android.gms.auth.account.IWorkAccountCallback");
     }
 
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        if (zza(i, parcel, parcel2, i2)) {
-            return true;
-        }
+    /* access modifiers changed from: protected */
+    public final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         switch (i) {
             case 1:
-                zzd((Account) zzeg.zza(parcel, Account.CREATOR));
+                zzc((Account) zzc.zza(parcel, Account.CREATOR));
                 break;
             case 2:
-                zzao(zzeg.zza(parcel));
+                zza(zzc.zza(parcel));
                 break;
             default:
                 return false;

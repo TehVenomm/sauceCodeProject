@@ -53,8 +53,8 @@ public final class CollectionTypeAdapterFactory implements TypeAdapterFactory {
         }
     }
 
-    public CollectionTypeAdapterFactory(ConstructorConstructor constructorConstructor) {
-        this.constructorConstructor = constructorConstructor;
+    public CollectionTypeAdapterFactory(ConstructorConstructor constructorConstructor2) {
+        this.constructorConstructor = constructorConstructor2;
     }
 
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {

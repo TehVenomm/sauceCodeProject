@@ -2,10 +2,10 @@ package com.google.android.gms.games.internal.experience;
 
 import android.net.Uri;
 import android.os.Parcel;
-import com.google.android.gms.common.data.zzc;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.games.Game;
 
-public final class ExperienceEventRef extends zzc implements ExperienceEvent {
+public final class ExperienceEventRef extends DataBufferRef implements ExperienceEvent {
     public final int describeContents() {
         throw new NoSuchMethodError();
     }
@@ -46,31 +46,31 @@ public final class ExperienceEventRef extends zzc implements ExperienceEvent {
         throw new NoSuchMethodError();
     }
 
-    public final String zzarb() {
+    public final String zzcu() {
         throw new NoSuchMethodError();
     }
 
-    public final String zzarc() {
+    public final String zzcv() {
         throw new NoSuchMethodError();
     }
 
-    public final String zzard() {
+    public final String zzcw() {
         throw new NoSuchMethodError();
     }
 
-    public final long zzare() {
+    public final long zzcx() {
         throw new NoSuchMethodError();
     }
 
-    public final long zzarf() {
+    public final long zzcy() {
         throw new NoSuchMethodError();
     }
 
-    public final long zzarg() {
+    public final long zzcz() {
         throw new NoSuchMethodError();
     }
 
-    public final int zzarh() {
+    public final int zzda() {
         throw new NoSuchMethodError();
     }
 }

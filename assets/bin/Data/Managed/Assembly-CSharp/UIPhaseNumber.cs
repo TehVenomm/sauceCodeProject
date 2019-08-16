@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIPhaseNumber
+public class UIPhaseNumber : MonoBehaviour
 {
 	[SerializeField]
 	protected UILabel label;
@@ -20,7 +20,6 @@ public class UIPhaseNumber
 
 	private void Update()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = anims.Length; i < num; i++)
 		{

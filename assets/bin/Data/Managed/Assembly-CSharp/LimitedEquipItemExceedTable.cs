@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 public class LimitedEquipItemExceedTable : Singleton<LimitedEquipItemExceedTable>, IDataTable
 {
@@ -22,8 +23,6 @@ public class LimitedEquipItemExceedTable : Singleton<LimitedEquipItemExceedTable
 			}
 		}
 
-		public const string NT = "id,rarity,equipmentType,getType,eventId,equipmentId,exceedItemId,exceedNum1,exceedNum2,exceedNum3,exceedNum4";
-
 		public uint id;
 
 		public RARITY_TYPE rarity;
@@ -37,6 +36,8 @@ public class LimitedEquipItemExceedTable : Singleton<LimitedEquipItemExceedTable
 		public int equipmentId;
 
 		public ExceedNeedItem exceed;
+
+		public const string NT = "id,rarity,equipmentType,getType,eventId,equipmentId,exceedItemId,exceedNum1,exceedNum2,exceedNum3,exceedNum4";
 
 		public static bool cb(CSVReader csv_reader, LimitedEquipItemExceedData data, ref uint key)
 		{
@@ -62,9 +63,12 @@ public class LimitedEquipItemExceedTable : Singleton<LimitedEquipItemExceedTable
 
 	private UIntKeyTable<LimitedEquipItemExceedData> limitedEquipItemExceedTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<LimitedEquipItemExceedData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		limitedEquipItemExceedTable = TableUtility.CreateUIntKeyTable<LimitedEquipItemExceedData>(csv_text, LimitedEquipItemExceedData.cb, "id,rarity,equipmentType,getType,eventId,equipmentId,exceedItemId,exceedNum1,exceedNum2,exceedNum3,exceedNum4", null);
+		limitedEquipItemExceedTable = TableUtility.CreateUIntKeyTable<LimitedEquipItemExceedData>(csv_text, LimitedEquipItemExceedData.cb, "id,rarity,equipmentType,getType,eventId,equipmentId,exceedItemId,exceedNum1,exceedNum2,exceedNum3,exceedNum4");
 		limitedEquipItemExceedTable.TrimExcess();
 	}
 
@@ -81,40 +85,38 @@ public class LimitedEquipItemExceedTable : Singleton<LimitedEquipItemExceedTable
 			if (itemData.id == validItemData[i].equipmentId)
 			{
 				list.Add(validItemData[i]);
+				continue;
 			}
-			else
+			if (itemData.rarity == validItemData[i].rarity && itemData.type == validItemData[i].equipmentType && itemData.getType == validItemData[i].getType)
 			{
-				if (itemData.rarity == validItemData[i].rarity && itemData.type == validItemData[i].equipmentType && itemData.getType == validItemData[i].getType)
+				if (validItemData[i].getType != GET_TYPE.EVENT)
 				{
-					if (validItemData[i].getType != GET_TYPE.EVENT)
-					{
-						list.Add(validItemData[i]);
-						continue;
-					}
-					if (itemData.eventId == validItemData[i].eventId)
-					{
-						list.Add(validItemData[i]);
-						continue;
-					}
+					list.Add(validItemData[i]);
+					continue;
 				}
-				if (validItemData[i].equipmentType == EQUIPMENT_TYPE.NONE && validItemData[i].getType == GET_TYPE.NONE)
+				if (itemData.eventId == validItemData[i].eventId)
 				{
-					if (itemData.rarity == validItemData[i].rarity)
-					{
-						list.Add(validItemData[i]);
-					}
+					list.Add(validItemData[i]);
+					continue;
 				}
-				else if (validItemData[i].equipmentType == EQUIPMENT_TYPE.NONE)
-				{
-					if (itemData.rarity == validItemData[i].rarity && itemData.getType == validItemData[i].getType)
-					{
-						list.Add(validItemData[i]);
-					}
-				}
-				else if (validItemData[i].getType == GET_TYPE.NONE && itemData.rarity == validItemData[i].rarity && itemData.type == validItemData[i].equipmentType)
+			}
+			if (validItemData[i].equipmentType == EQUIPMENT_TYPE.NONE && validItemData[i].getType == GET_TYPE.NONE)
+			{
+				if (itemData.rarity == validItemData[i].rarity)
 				{
 					list.Add(validItemData[i]);
 				}
+			}
+			else if (validItemData[i].equipmentType == EQUIPMENT_TYPE.NONE)
+			{
+				if (itemData.rarity == validItemData[i].rarity && itemData.getType == validItemData[i].getType)
+				{
+					list.Add(validItemData[i]);
+				}
+			}
+			else if (validItemData[i].getType == GET_TYPE.NONE && itemData.rarity == validItemData[i].rarity && itemData.type == validItemData[i].equipmentType)
+			{
+				list.Add(validItemData[i]);
 			}
 		}
 		list.Sort((LimitedEquipItemExceedData a, LimitedEquipItemExceedData b) => (int)(a.id - b.id));

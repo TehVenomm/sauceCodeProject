@@ -15,8 +15,6 @@ public class UIParticle : UIWidget
 	{
 		get
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Expected O, but got Unknown
 			if (_particleRenderer == null)
 			{
 				_particleRenderer = this.GetComponentInChildren<ParticleSystemRenderer>(true);
@@ -25,14 +23,14 @@ public class UIParticle : UIWidget
 		}
 		set
 		{
-			throw new NotImplementedException(GetType() + " has no material setter");
+			throw new NotImplementedException(base.GetType() + " has no material setter");
 		}
 	}
 
 	protected override void OnStart()
 	{
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Expected O, but got Unknown
+		//IL_006a: Expected O, but got Unknown
 		base.OnStart();
 		_renderers = this.GetComponentsInChildren<Renderer>(true);
 		if (Application.get_isPlaying() && !_createMaterial)
@@ -56,23 +54,25 @@ public class UIParticle : UIWidget
 	protected override void OnUpdate()
 	{
 		base.OnUpdate();
-		if (!(drawCall == null))
+		if (drawCall == null)
 		{
-			int renderQueue = drawCall.renderQueue;
-			if (_lastQueue != renderQueue)
+			return;
+		}
+		int renderQueue = drawCall.renderQueue;
+		if (_lastQueue == renderQueue)
+		{
+			return;
+		}
+		_lastQueue = renderQueue;
+		Renderer[] renderers = _renderers;
+		foreach (Renderer val in renderers)
+		{
+			Material[] sharedMaterials = val.get_sharedMaterials();
+			foreach (Material val2 in sharedMaterials)
 			{
-				_lastQueue = renderQueue;
-				Renderer[] renderers = _renderers;
-				foreach (Renderer val in renderers)
-				{
-					Material[] sharedMaterials = val.get_sharedMaterials();
-					foreach (Material val2 in sharedMaterials)
-					{
-						val2.set_renderQueue(_lastQueue);
-					}
-					val.set_sortingOrder(drawCall.sortingOrder);
-				}
+				val2.set_renderQueue(_lastQueue);
 			}
+			val.set_sortingOrder(drawCall.sortingOrder);
 		}
 	}
 

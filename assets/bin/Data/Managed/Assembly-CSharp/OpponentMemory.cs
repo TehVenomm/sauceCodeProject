@@ -70,7 +70,7 @@ public class OpponentMemory
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			string empty = string.Empty;
-			empty = string.Concat((object)empty, (object)"pos=", (object)pos);
+			empty = empty + "pos=" + pos;
 			empty = empty + ", len=" + distance;
 			empty = empty + ", front=" + distanceFront;
 			empty = empty + ", D=" + distanceType;
@@ -223,31 +223,31 @@ public class OpponentMemory
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
 			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0444: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0400: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0427: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0446: Unknown result type (might be due to invalid IL or missing references)
 			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0453: Unknown result type (might be due to invalid IL or missing references)
 			Character character = opponent_obj as Character;
 			if (!(character != null) || !character.isDead)
 			{
@@ -449,7 +449,7 @@ public class OpponentMemory
 		{
 			return false;
 		}
-		return brain.owner.IsArrivalPosition(opponentRecord.record.pos, 0f);
+		return brain.owner.IsArrivalPosition(opponentRecord.record.pos);
 	}
 
 	public bool IsArrivalAttackPosition(StageObject obj)
@@ -460,7 +460,7 @@ public class OpponentMemory
 		{
 			return false;
 		}
-		return brain.owner.IsArrivalPosition(opponentRecord.record.attackPos, 0f);
+		return brain.owner.IsArrivalPosition(opponentRecord.record.attackPos);
 	}
 
 	public float GetLengthWithAttackPos(StageObject obj, Vector3 check_pos)
@@ -531,49 +531,51 @@ public class OpponentMemory
 
 	public void UpdateHate()
 	{
-		if (haveHateControl)
+		if (!haveHateControl)
 		{
-			bool flag = false;
-			turnCountForHateCycle++;
-			if (turnCountForHateCycle > hateParam.cycleTurnMax)
+			return;
+		}
+		bool flag = false;
+		turnCountForHateCycle++;
+		if (turnCountForHateCycle > hateParam.cycleTurnMax)
+		{
+			turnCountForHateCycle = 0;
+			flag = true;
+		}
+		List<OpponentRecord> listOfSensedOpponent = GetListOfSensedOpponent();
+		for (int i = 0; i < listOfSensedOpponent.Count; i++)
+		{
+			OpponentRecord opponentRecord = listOfSensedOpponent[i];
+			if (!opponentRecord.IsAlive())
 			{
-				turnCountForHateCycle = 0;
-				flag = true;
+				continue;
 			}
-			List<OpponentRecord> listOfSensedOpponent = GetListOfSensedOpponent();
-			for (int i = 0; i < listOfSensedOpponent.Count; i++)
+			opponentRecord.hate.val[0] = hateParam.distanceHateParams[(int)opponentRecord.record.distanceType];
+			Player player = opponentRecord.obj as Player;
+			if (player != null)
 			{
-				OpponentRecord opponentRecord = listOfSensedOpponent[i];
-				if (opponentRecord.IsAlive())
+				int num = (int)Mathf.Lerp(1000f, 0f, (float)player.hp / (float)player.hpMax);
+				opponentRecord.hate.val[1] = num;
+			}
+			if (opponentRecord.obj == brain.targetCtrl.GetCurrentTarget())
+			{
+				for (int j = 2; j < 7; j++)
 				{
-					opponentRecord.hate.val[0] = hateParam.distanceHateParams[(int)opponentRecord.record.distanceType];
-					Player player = opponentRecord.obj as Player;
-					if (player != null)
+					if (opponentRecord.record.isDamaged)
 					{
-						int num = (int)Mathf.Lerp(1000f, 0f, (float)player.hp / (float)player.hpMax);
-						opponentRecord.hate.val[1] = num;
+						opponentRecord.hate.val[j] = (int)((float)opponentRecord.hate.val[j] * hateParam.categoryParam[j].atackedVolatizeRate);
+						opponentRecord.record.isDamaged = false;
 					}
-					if (opponentRecord.obj == brain.targetCtrl.GetCurrentTarget())
+					else
 					{
-						for (int j = 2; j < 7; j++)
-						{
-							if (opponentRecord.record.isDamaged)
-							{
-								opponentRecord.hate.val[j] = (int)((float)opponentRecord.hate.val[j] * hateParam.categoryParam[j].atackedVolatizeRate);
-								opponentRecord.record.isDamaged = false;
-							}
-							else
-							{
-								opponentRecord.hate.val[j] = (int)((float)opponentRecord.hate.val[j] * hateParam.categoryParam[j].volatilizeRate);
-							}
-						}
-					}
-					opponentRecord.hate.turnVal = 0;
-					if (flag)
-					{
-						opponentRecord.hate.cycleLockCount = 0;
+						opponentRecord.hate.val[j] = (int)((float)opponentRecord.hate.val[j] * hateParam.categoryParam[j].volatilizeRate);
 					}
 				}
+			}
+			opponentRecord.hate.turnVal = 0;
+			if (flag)
+			{
+				opponentRecord.hate.cycleLockCount = 0;
 			}
 		}
 	}

@@ -2,13 +2,11 @@ package com.facebook.internal;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import com.facebook.internal.ImageRequest.Callback;
 import com.facebook.internal.WorkQueue.WorkItem;
-import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +23,8 @@ public class ImageDownloader {
         private Context context;
         private RequestKey key;
 
-        CacheReadWorkItem(Context context, RequestKey requestKey, boolean z) {
-            this.context = context;
+        CacheReadWorkItem(Context context2, RequestKey requestKey, boolean z) {
+            this.context = context2;
             this.key = requestKey;
             this.allowCachedRedirects = z;
         }
@@ -40,8 +38,8 @@ public class ImageDownloader {
         private Context context;
         private RequestKey key;
 
-        DownloadImageWorkItem(Context context, RequestKey requestKey) {
-            this.context = context;
+        DownloadImageWorkItem(Context context2, RequestKey requestKey) {
+            this.context = context2;
             this.key = requestKey;
         }
 
@@ -65,8 +63,8 @@ public class ImageDownloader {
         Object tag;
         Uri uri;
 
-        RequestKey(Uri uri, Object obj) {
-            this.uri = uri;
+        RequestKey(Uri uri2, Object obj) {
+            this.uri = uri2;
             this.tag = obj;
         }
 
@@ -106,160 +104,171 @@ public class ImageDownloader {
         UrlRedirectCache.clearCache();
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private static void download(com.facebook.internal.ImageDownloader.RequestKey r11, android.content.Context r12) {
-        /*
-        r4 = 1;
-        r5 = 0;
-        r2 = 0;
-        r0 = new java.net.URL;	 Catch:{ IOException -> 0x00c4, all -> 0x00bb }
-        r1 = r11.uri;	 Catch:{ IOException -> 0x00c4, all -> 0x00bb }
-        r1 = r1.toString();	 Catch:{ IOException -> 0x00c4, all -> 0x00bb }
-        r0.<init>(r1);	 Catch:{ IOException -> 0x00c4, all -> 0x00bb }
-        r0 = r0.openConnection();	 Catch:{ IOException -> 0x00c4, all -> 0x00bb }
-        r0 = (java.net.HttpURLConnection) r0;	 Catch:{ IOException -> 0x00c4, all -> 0x00bb }
-        r1 = 0;
-        r0.setInstanceFollowRedirects(r1);	 Catch:{ IOException -> 0x00c9, all -> 0x00be }
-        r1 = r0.getResponseCode();	 Catch:{ IOException -> 0x00c9, all -> 0x00be }
-        switch(r1) {
-            case 200: goto L_0x0089;
-            case 301: goto L_0x0053;
-            case 302: goto L_0x0053;
-            default: goto L_0x001f;
-        };	 Catch:{ IOException -> 0x00c9, all -> 0x00be }
-    L_0x001f:
-        r1 = r0.getErrorStream();	 Catch:{ IOException -> 0x00c9, all -> 0x00be }
-        r6 = new java.lang.StringBuilder;	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r6.<init>();	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        if (r1 == 0) goto L_0x00a6;
-    L_0x002a:
-        r3 = new java.io.InputStreamReader;	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r3.<init>(r1);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r7 = 128; // 0x80 float:1.794E-43 double:6.32E-322;
-        r7 = new char[r7];	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-    L_0x0033:
-        r8 = 0;
-        r9 = r7.length;	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r8 = r3.read(r7, r8, r9);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        if (r8 <= 0) goto L_0x0096;
-    L_0x003b:
-        r9 = 0;
-        r6.append(r7, r9, r8);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        goto L_0x0033;
-    L_0x0040:
-        r3 = move-exception;
-        r10 = r3;
-        r3 = r1;
-        r1 = r0;
-        r0 = r10;
-    L_0x0045:
-        com.facebook.internal.Utility.closeQuietly(r3);
-        com.facebook.internal.Utility.disconnectQuietly(r1);
-        r3 = r4;
-        r4 = r0;
-    L_0x004d:
-        if (r3 == 0) goto L_0x0052;
-    L_0x004f:
-        issueResponse(r11, r4, r2, r5);
-    L_0x0052:
-        return;
-    L_0x0053:
-        r1 = "location";
-        r1 = r0.getHeaderField(r1);	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r3 = com.facebook.internal.Utility.isNullOrEmpty(r1);	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        if (r3 != 0) goto L_0x00d8;
-    L_0x005f:
-        r1 = android.net.Uri.parse(r1);	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r3 = r11.uri;	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        com.facebook.internal.UrlRedirectCache.cacheUriRedirect(r3, r1);	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r3 = removePendingRequest(r11);	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        if (r3 == 0) goto L_0x00d8;
-    L_0x006e:
-        r4 = r3.isCancelled;	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        if (r4 != 0) goto L_0x00d8;
-    L_0x0072:
-        r3 = r3.request;	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r4 = new com.facebook.internal.ImageDownloader$RequestKey;	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r6 = r11.tag;	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r4.<init>(r1, r6);	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r1 = 0;
-        enqueueCacheRead(r3, r4, r1);	 Catch:{ IOException -> 0x00d0, all -> 0x00be }
-        r1 = r2;
-        r3 = r5;
-        r4 = r2;
-    L_0x0082:
+    /* access modifiers changed from: private */
+    /* JADX WARNING: Code restructure failed: missing block: B:30:0x0080, code lost:
         com.facebook.internal.Utility.closeQuietly(r1);
         com.facebook.internal.Utility.disconnectQuietly(r0);
-        goto L_0x004d;
-    L_0x0089:
-        r1 = com.facebook.internal.ImageResponseCache.interceptAndCacheImageStream(r12, r0);	 Catch:{ IOException -> 0x00c9, all -> 0x00be }
-        r3 = android.graphics.BitmapFactory.decodeStream(r1);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r10 = r3;
-        r3 = r4;
-        r4 = r2;
-        r2 = r10;
-        goto L_0x0082;
-    L_0x0096:
-        com.facebook.internal.Utility.closeQuietly(r3);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-    L_0x0099:
-        r3 = new com.facebook.FacebookException;	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r6 = r6.toString();	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r3.<init>(r6);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r10 = r4;
-        r4 = r3;
-        r3 = r10;
-        goto L_0x0082;
-    L_0x00a6:
-        r3 = com.facebook.C0365R.string.com_facebook_image_download_unknown_error;	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r3 = r12.getString(r3);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        r6.append(r3);	 Catch:{ IOException -> 0x0040, all -> 0x00b0 }
-        goto L_0x0099;
-    L_0x00b0:
-        r2 = move-exception;
-        r10 = r2;
-        r2 = r0;
-        r0 = r10;
-    L_0x00b4:
-        com.facebook.internal.Utility.closeQuietly(r1);
-        com.facebook.internal.Utility.disconnectQuietly(r2);
-        throw r0;
-    L_0x00bb:
-        r0 = move-exception;
-        r1 = r2;
-        goto L_0x00b4;
-    L_0x00be:
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:44:0x00b5, code lost:
         r1 = move-exception;
-        r10 = r1;
-        r1 = r2;
-        r2 = r0;
-        r0 = r10;
-        goto L_0x00b4;
-    L_0x00c4:
-        r0 = move-exception;
-        r1 = r2;
-        r3 = r2;
-        goto L_0x0045;
-    L_0x00c9:
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:45:0x00b6, code lost:
+        r3 = r1;
+        r4 = r0;
+        r5 = null;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:48:0x00bf, code lost:
         r1 = move-exception;
-        r3 = r2;
-        r10 = r0;
-        r0 = r1;
-        r1 = r10;
-        goto L_0x0045;
-    L_0x00d0:
-        r1 = move-exception;
-        r3 = r2;
-        r4 = r5;
-        r10 = r1;
-        r1 = r0;
-        r0 = r10;
-        goto L_0x0045;
-    L_0x00d8:
-        r1 = r2;
-        r3 = r5;
-        r4 = r2;
-        goto L_0x0082;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:49:0x00c0, code lost:
+        r3 = r1;
+        r6 = r0;
+        r7 = null;
+     */
+    /* JADX WARNING: Failed to process nested try/catch */
+    /* JADX WARNING: Removed duplicated region for block: B:19:0x004c  */
+    /* JADX WARNING: Removed duplicated region for block: B:44:0x00b5 A[ExcHandler: all (r1v4 'th' java.lang.Throwable A[CUSTOM_DECLARE]), Splitter:B:4:0x0015] */
+    /* JADX WARNING: Removed duplicated region for block: B:55:? A[RETURN, SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static void download(com.facebook.internal.ImageDownloader.RequestKey r10, android.content.Context r11) {
+        /*
+            r4 = 1
+            r5 = 0
+            r2 = 0
+            java.net.URL r0 = new java.net.URL     // Catch:{ IOException -> 0x00ba, all -> 0x00b0 }
+            android.net.Uri r1 = r10.uri     // Catch:{ IOException -> 0x00ba, all -> 0x00b0 }
+            java.lang.String r1 = r1.toString()     // Catch:{ IOException -> 0x00ba, all -> 0x00b0 }
+            r0.<init>(r1)     // Catch:{ IOException -> 0x00ba, all -> 0x00b0 }
+            java.net.URLConnection r0 = r0.openConnection()     // Catch:{ IOException -> 0x00ba, all -> 0x00b0 }
+            java.net.HttpURLConnection r0 = (java.net.HttpURLConnection) r0     // Catch:{ IOException -> 0x00ba, all -> 0x00b0 }
+            r1 = 0
+            r0.setInstanceFollowRedirects(r1)     // Catch:{ IOException -> 0x00bf, all -> 0x00b5 }
+            int r1 = r0.getResponseCode()     // Catch:{ IOException -> 0x00bf, all -> 0x00b5 }
+            switch(r1) {
+                case 200: goto L_0x0087;
+                case 301: goto L_0x0050;
+                case 302: goto L_0x0050;
+                default: goto L_0x001f;
+            }     // Catch:{ IOException -> 0x00bf, all -> 0x00b5 }
+        L_0x001f:
+            java.io.InputStream r1 = r0.getErrorStream()     // Catch:{ IOException -> 0x00bf, all -> 0x00b5 }
+            java.lang.StringBuilder r6 = new java.lang.StringBuilder     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            r6.<init>()     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            if (r1 == 0) goto L_0x009f
+            java.io.InputStreamReader r3 = new java.io.InputStreamReader     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            r3.<init>(r1)     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            r7 = 128(0x80, float:1.794E-43)
+            char[] r7 = new char[r7]     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+        L_0x0033:
+            r8 = 0
+            int r9 = r7.length     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            int r8 = r3.read(r7, r8, r9)     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            if (r8 <= 0) goto L_0x0091
+            r9 = 0
+            r6.append(r7, r9, r8)     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            goto L_0x0033
+        L_0x0040:
+            r3 = move-exception
+            r6 = r0
+            r7 = r1
+        L_0x0043:
+            com.facebook.internal.Utility.closeQuietly(r7)
+            com.facebook.internal.Utility.disconnectQuietly(r6)
+            r6 = r2
+        L_0x004a:
+            if (r4 == 0) goto L_0x004f
+            issueResponse(r10, r3, r6, r5)
+        L_0x004f:
+            return
+        L_0x0050:
+            java.lang.String r1 = "location"
+            java.lang.String r1 = r0.getHeaderField(r1)     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            boolean r3 = com.facebook.internal.Utility.isNullOrEmpty(r1)     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            if (r3 != 0) goto L_0x00cb
+            android.net.Uri r1 = android.net.Uri.parse(r1)     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            android.net.Uri r3 = r10.uri     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            com.facebook.internal.UrlRedirectCache.cacheUriRedirect(r3, r1)     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            com.facebook.internal.ImageDownloader$DownloaderContext r3 = removePendingRequest(r10)     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            if (r3 == 0) goto L_0x00cb
+            boolean r4 = r3.isCancelled     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            if (r4 != 0) goto L_0x00cb
+            com.facebook.internal.ImageRequest r3 = r3.request     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            com.facebook.internal.ImageDownloader$RequestKey r4 = new com.facebook.internal.ImageDownloader$RequestKey     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            java.lang.Object r6 = r10.tag     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            r4.<init>(r1, r6)     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            r1 = 0
+            enqueueCacheRead(r3, r4, r1)     // Catch:{ IOException -> 0x00c4, all -> 0x00b5 }
+            r1 = r2
+            r3 = r2
+            r4 = r5
+            r6 = r2
+        L_0x0080:
+            com.facebook.internal.Utility.closeQuietly(r1)
+            com.facebook.internal.Utility.disconnectQuietly(r0)
+            goto L_0x004a
+        L_0x0087:
+            java.io.InputStream r1 = com.facebook.internal.ImageResponseCache.interceptAndCacheImageStream(r11, r0)     // Catch:{ IOException -> 0x00bf, all -> 0x00b5 }
+            android.graphics.Bitmap r6 = android.graphics.BitmapFactory.decodeStream(r1)     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            r3 = r2
+            goto L_0x0080
+        L_0x0091:
+            com.facebook.internal.Utility.closeQuietly(r3)     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+        L_0x0094:
+            com.facebook.FacebookException r3 = new com.facebook.FacebookException     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            java.lang.String r6 = r6.toString()     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            r3.<init>(r6)     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            r6 = r2
+            goto L_0x0080
+        L_0x009f:
+            java.lang.String r3 = "Unexpected error while downloading an image."
+            r6.append(r3)     // Catch:{ IOException -> 0x0040, all -> 0x00a5 }
+            goto L_0x0094
+        L_0x00a5:
+            r2 = move-exception
+            r3 = r2
+            r4 = r0
+            r5 = r1
+        L_0x00a9:
+            com.facebook.internal.Utility.closeQuietly(r5)
+            com.facebook.internal.Utility.disconnectQuietly(r4)
+            throw r3
+        L_0x00b0:
+            r0 = move-exception
+            r3 = r0
+            r4 = r2
+            r5 = r2
+            goto L_0x00a9
+        L_0x00b5:
+            r1 = move-exception
+            r3 = r1
+            r4 = r0
+            r5 = r2
+            goto L_0x00a9
+        L_0x00ba:
+            r0 = move-exception
+            r3 = r0
+            r6 = r2
+            r7 = r2
+            goto L_0x0043
+        L_0x00bf:
+            r1 = move-exception
+            r3 = r1
+            r6 = r0
+            r7 = r2
+            goto L_0x0043
+        L_0x00c4:
+            r1 = move-exception
+            r3 = r1
+            r6 = r0
+            r7 = r2
+            r4 = r5
+            goto L_0x0043
+        L_0x00cb:
+            r1 = r2
+            r3 = r2
+            r4 = r5
+            r6 = r2
+            goto L_0x0080
         */
         throw new UnsupportedOperationException("Method not decompiled: com.facebook.internal.ImageDownloader.download(com.facebook.internal.ImageDownloader$RequestKey, android.content.Context):void");
     }
@@ -298,33 +307,32 @@ public class ImageDownloader {
     }
 
     private static Handler getHandler() {
+        Handler handler2;
         synchronized (ImageDownloader.class) {
-            Class mainLooper;
             try {
                 if (handler == null) {
-                    mainLooper = Looper.getMainLooper();
-                    handler = new Handler(mainLooper);
+                    handler = new Handler(Looper.getMainLooper());
                 }
-                Handler handler = handler;
-                return handler;
+                handler2 = handler;
             } finally {
-                mainLooper = ImageDownloader.class;
+                Class<ImageDownloader> cls = ImageDownloader.class;
             }
         }
+        return handler2;
     }
 
-    private static void issueResponse(RequestKey requestKey, Exception exception, Bitmap bitmap, boolean z) {
+    private static void issueResponse(RequestKey requestKey, Exception exc, Bitmap bitmap, boolean z) {
         DownloaderContext removePendingRequest = removePendingRequest(requestKey);
         if (removePendingRequest != null && !removePendingRequest.isCancelled) {
             final ImageRequest imageRequest = removePendingRequest.request;
             final Callback callback = imageRequest.getCallback();
             if (callback != null) {
-                final Exception exception2 = exception;
+                final Exception exc2 = exc;
                 final boolean z2 = z;
                 final Bitmap bitmap2 = bitmap;
                 getHandler().post(new Runnable() {
                     public void run() {
-                        callback.onCompleted(new ImageResponse(imageRequest, exception2, z2, bitmap2));
+                        callback.onCompleted(new ImageResponse(imageRequest, exc2, z2, bitmap2));
                     }
                 });
             }
@@ -341,47 +349,46 @@ public class ImageDownloader {
         }
     }
 
-    private static void readFromCache(RequestKey requestKey, Context context, boolean z) {
-        Closeable cachedImageStream;
-        DownloaderContext removePendingRequest;
-        boolean z2 = false;
-        if (z) {
-            Uri redirectedUri = UrlRedirectCache.getRedirectedUri(requestKey.uri);
-            if (redirectedUri != null) {
-                cachedImageStream = ImageResponseCache.getCachedImageStream(redirectedUri, context);
-                if (cachedImageStream != null) {
-                    z2 = true;
-                }
-                if (!z2) {
-                    cachedImageStream = ImageResponseCache.getCachedImageStream(requestKey.uri, context);
-                }
-                if (cachedImageStream == null) {
-                    Bitmap decodeStream = BitmapFactory.decodeStream(cachedImageStream);
-                    Utility.closeQuietly(cachedImageStream);
-                    issueResponse(requestKey, null, decodeStream, z2);
-                }
-                removePendingRequest = removePendingRequest(requestKey);
-                if (removePendingRequest != null && !removePendingRequest.isCancelled) {
-                    enqueueDownload(removePendingRequest.request, requestKey);
-                    return;
-                }
-                return;
-            }
-        }
-        cachedImageStream = null;
-        if (z2) {
-            cachedImageStream = ImageResponseCache.getCachedImageStream(requestKey.uri, context);
-        }
-        if (cachedImageStream == null) {
-            removePendingRequest = removePendingRequest(requestKey);
-            if (removePendingRequest != null) {
-                return;
-            }
-            return;
-        }
-        Bitmap decodeStream2 = BitmapFactory.decodeStream(cachedImageStream);
-        Utility.closeQuietly(cachedImageStream);
-        issueResponse(requestKey, null, decodeStream2, z2);
+    /* access modifiers changed from: private */
+    /* JADX WARNING: Removed duplicated region for block: B:10:0x001d  */
+    /* JADX WARNING: Removed duplicated region for block: B:11:0x0028  */
+    /* JADX WARNING: Removed duplicated region for block: B:8:0x0015  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static void readFromCache(com.facebook.internal.ImageDownloader.RequestKey r4, android.content.Context r5, boolean r6) {
+        /*
+            r1 = 0
+            r2 = 0
+            if (r6 == 0) goto L_0x0038
+            android.net.Uri r0 = r4.uri
+            android.net.Uri r0 = com.facebook.internal.UrlRedirectCache.getRedirectedUri(r0)
+            if (r0 == 0) goto L_0x0038
+            java.io.InputStream r0 = com.facebook.internal.ImageResponseCache.getCachedImageStream(r0, r5)
+            if (r0 == 0) goto L_0x0013
+            r2 = 1
+        L_0x0013:
+            if (r2 != 0) goto L_0x001b
+            android.net.Uri r0 = r4.uri
+            java.io.InputStream r0 = com.facebook.internal.ImageResponseCache.getCachedImageStream(r0, r5)
+        L_0x001b:
+            if (r0 == 0) goto L_0x0028
+            android.graphics.Bitmap r3 = android.graphics.BitmapFactory.decodeStream(r0)
+            com.facebook.internal.Utility.closeQuietly(r0)
+            issueResponse(r4, r1, r3, r2)
+        L_0x0027:
+            return
+        L_0x0028:
+            com.facebook.internal.ImageDownloader$DownloaderContext r0 = removePendingRequest(r4)
+            if (r0 == 0) goto L_0x0027
+            boolean r1 = r0.isCancelled
+            if (r1 != 0) goto L_0x0027
+            com.facebook.internal.ImageRequest r0 = r0.request
+            enqueueDownload(r0, r4)
+            goto L_0x0027
+        L_0x0038:
+            r0 = r1
+            goto L_0x0013
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.facebook.internal.ImageDownloader.readFromCache(com.facebook.internal.ImageDownloader$RequestKey, android.content.Context, boolean):void");
     }
 
     private static DownloaderContext removePendingRequest(RequestKey requestKey) {

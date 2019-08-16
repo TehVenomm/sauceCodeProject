@@ -27,7 +27,8 @@ public class JsonWriteContext extends JsonStreamContext {
         this._index = -1;
     }
 
-    protected JsonWriteContext reset(int i) {
+    /* access modifiers changed from: protected */
+    public JsonWriteContext reset(int i) {
         this._type = i;
         this._index = -1;
         this._currentName = null;
@@ -144,29 +145,30 @@ public class JsonWriteContext extends JsonStreamContext {
         }
     }
 
-    protected void appendDesc(StringBuilder stringBuilder) {
+    /* access modifiers changed from: protected */
+    public void appendDesc(StringBuilder sb) {
         if (this._type == 2) {
-            stringBuilder.append('{');
+            sb.append('{');
             if (this._currentName != null) {
-                stringBuilder.append('\"');
-                stringBuilder.append(this._currentName);
-                stringBuilder.append('\"');
+                sb.append('\"');
+                sb.append(this._currentName);
+                sb.append('\"');
             } else {
-                stringBuilder.append('?');
+                sb.append('?');
             }
-            stringBuilder.append('}');
+            sb.append('}');
         } else if (this._type == 1) {
-            stringBuilder.append('[');
-            stringBuilder.append(getCurrentIndex());
-            stringBuilder.append(']');
+            sb.append('[');
+            sb.append(getCurrentIndex());
+            sb.append(']');
         } else {
-            stringBuilder.append(Constants.URL_PATH_DELIMITER);
+            sb.append(Constants.URL_PATH_DELIMITER);
         }
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(64);
-        appendDesc(stringBuilder);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(64);
+        appendDesc(sb);
+        return sb.toString();
     }
 }

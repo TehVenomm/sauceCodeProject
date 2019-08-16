@@ -20,23 +20,20 @@ public class QuestAcceptShadowCountDetail : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Expected O, but got Unknown
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 		string text = StringTable.Format(STRING_CATEGORY.SHADOW_COUNT, 0u, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount.startDate);
 		SetLabelText((Enum)UI.LBL_FIRST_SENTENSE, text);
 		if (MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsRankingEvent())
 		{
-			SetActive((Enum)UI.LBL_SECOND_SENTENSE, true);
-			SetActive((Enum)UI.PADDING_2, true);
+			SetActive((Enum)UI.LBL_SECOND_SENTENSE, is_visible: true);
+			SetActive((Enum)UI.PADDING_2, is_visible: true);
 			SetLabelText((Enum)UI.LBL_SECOND_SENTENSE, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 1u));
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_SECOND_SENTENSE, false);
-			SetActive((Enum)UI.PADDING_2, false);
+			SetActive((Enum)UI.LBL_SECOND_SENTENSE, is_visible: false);
+			SetActive((Enum)UI.PADDING_2, is_visible: false);
 		}
 		SetLabelText((Enum)UI.LBL_DESCRIPTION, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 2u));
 		SetLabelText((Enum)UI.LBL_BONUS_NUM, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount.num.ToString());
@@ -46,14 +43,14 @@ public class QuestAcceptShadowCountDetail : GameSection
 		int childCount = GetCtrl(UI.TBL_CONTENTS).get_childCount();
 		for (int i = 0; i < childCount; i++)
 		{
-			Transform val = GetCtrl(UI.TBL_CONTENTS).GetChild(i);
-			if (val.get_gameObject().get_activeSelf())
+			Transform child = GetCtrl(UI.TBL_CONTENTS).GetChild(i);
+			if (child.get_gameObject().get_activeSelf())
 			{
-				num += val.GetComponent<UIWidget>().height;
+				num += child.GetComponent<UIWidget>().height;
 			}
 		}
 		num = Mathf.Max(num, 0);
-		float num2 = (float)(123 + num);
+		float num2 = 123 + num;
 		Vector3 localScale = ctrl.get_localScale();
 		int height = (int)(num2 / localScale.y);
 		SetHeight((Enum)UI.SPR_FRAME, height);

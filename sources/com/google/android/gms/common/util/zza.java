@@ -1,104 +1,55 @@
 package com.google.android.gms.common.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.PowerManager;
+import android.os.SystemClock;
+import com.google.firebase.analytics.FirebaseAnalytics.Param;
 
 public final class zza {
-    public static <T> ArrayList<T> zza(T[] tArr) {
-        ArrayList<T> arrayList = new ArrayList(r1);
-        for (Object add : tArr) {
-            arrayList.add(add);
+    private static final IntentFilter filter = new IntentFilter("android.intent.action.BATTERY_CHANGED");
+    private static long zzgv;
+    private static float zzgw = Float.NaN;
+
+    @TargetApi(20)
+    public static int zzg(Context context) {
+        int i = 1;
+        if (context == null || context.getApplicationContext() == null) {
+            return -1;
         }
-        return arrayList;
+        Intent registerReceiver = context.getApplicationContext().registerReceiver(null, filter);
+        boolean z = ((registerReceiver == null ? 0 : registerReceiver.getIntExtra("plugged", 0)) & 7) != 0;
+        PowerManager powerManager = (PowerManager) context.getSystemService("power");
+        if (powerManager == null) {
+            return -1;
+        }
+        int i2 = PlatformVersion.isAtLeastKitKatWatch() ? powerManager.isInteractive() : powerManager.isScreenOn() ? 2 : 0;
+        if (!z) {
+            i = 0;
+        }
+        return i2 | i;
     }
 
-    public static void zza(StringBuilder stringBuilder, double[] dArr) {
-        int length = dArr.length;
-        for (int i = 0; i < length; i++) {
-            if (i != 0) {
-                stringBuilder.append(",");
+    public static float zzh(Context context) {
+        float f;
+        synchronized (zza.class) {
+            try {
+                if (SystemClock.elapsedRealtime() - zzgv >= 60000 || Float.isNaN(zzgw)) {
+                    Intent registerReceiver = context.getApplicationContext().registerReceiver(null, filter);
+                    if (registerReceiver != null) {
+                        zzgw = ((float) registerReceiver.getIntExtra(Param.LEVEL, -1)) / ((float) registerReceiver.getIntExtra("scale", -1));
+                    }
+                    zzgv = SystemClock.elapsedRealtime();
+                    f = zzgw;
+                } else {
+                    f = zzgw;
+                }
+            } finally {
+                Class<zza> cls = zza.class;
             }
-            stringBuilder.append(Double.toString(dArr[i]));
         }
-    }
-
-    public static void zza(StringBuilder stringBuilder, float[] fArr) {
-        int length = fArr.length;
-        for (int i = 0; i < length; i++) {
-            if (i != 0) {
-                stringBuilder.append(",");
-            }
-            stringBuilder.append(Float.toString(fArr[i]));
-        }
-    }
-
-    public static void zza(StringBuilder stringBuilder, long[] jArr) {
-        int length = jArr.length;
-        for (int i = 0; i < length; i++) {
-            if (i != 0) {
-                stringBuilder.append(",");
-            }
-            stringBuilder.append(Long.toString(jArr[i]));
-        }
-    }
-
-    public static <T> void zza(StringBuilder stringBuilder, T[] tArr) {
-        int length = tArr.length;
-        for (int i = 0; i < length; i++) {
-            if (i != 0) {
-                stringBuilder.append(",");
-            }
-            stringBuilder.append(tArr[i].toString());
-        }
-    }
-
-    public static void zza(StringBuilder stringBuilder, String[] strArr) {
-        int length = strArr.length;
-        for (int i = 0; i < length; i++) {
-            if (i != 0) {
-                stringBuilder.append(",");
-            }
-            stringBuilder.append("\"").append(strArr[i]).append("\"");
-        }
-    }
-
-    public static void zza(StringBuilder stringBuilder, boolean[] zArr) {
-        int length = zArr.length;
-        for (int i = 0; i < length; i++) {
-            if (i != 0) {
-                stringBuilder.append(",");
-            }
-            stringBuilder.append(Boolean.toString(zArr[i]));
-        }
-    }
-
-    public static byte[] zza(byte[]... bArr) {
-        if (bArr.length == 0) {
-            return new byte[0];
-        }
-        int i = 0;
-        for (byte[] length : bArr) {
-            i += length.length;
-        }
-        Object copyOf = Arrays.copyOf(bArr[0], i);
-        i = bArr[0].length;
-        for (int i2 = 1; i2 < bArr.length; i2++) {
-            Object obj = bArr[i2];
-            System.arraycopy(obj, 0, copyOf, i, obj.length);
-            i += obj.length;
-        }
-        return copyOf;
-    }
-
-    public static Integer[] zzc(int[] iArr) {
-        if (iArr == null) {
-            return null;
-        }
-        int length = iArr.length;
-        Integer[] numArr = new Integer[length];
-        for (int i = 0; i < length; i++) {
-            numArr[i] = Integer.valueOf(iArr[i]);
-        }
-        return numArr;
+        return f;
     }
 }

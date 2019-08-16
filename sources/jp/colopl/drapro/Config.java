@@ -1,8 +1,9 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+/* renamed from: jp.colopl.drapro.Config */
 public class Config {
     public static final int APP_PURCHASE_TYPE = 0;
     public static final int APP_PURCHASE_TYPE_AMAZON = 1;
@@ -15,8 +16,8 @@ public class Config {
     private static final String SETTING_KEY_SCREEN_LOCK_MODE = "screenLockMode";
     private Context context;
 
-    public Config(Context context) {
-        this.context = context;
+    public Config(Context context2) {
+        this.context = context2;
     }
 
     public boolean getEnableAdView() {

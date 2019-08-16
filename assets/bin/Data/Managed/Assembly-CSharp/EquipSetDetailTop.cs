@@ -43,7 +43,7 @@ public class EquipSetDetailTop : SkillInfoBase
 	public override void Initialize()
 	{
 		object[] array = GameSection.GetEventData() as object[];
-		callSection = (ItemDetailEquip.CURRENT_SECTION)(int)array[0];
+		callSection = (ItemDetailEquip.CURRENT_SECTION)array[0];
 		equipAndSkill = (array[1] as EquipItemAndSkillData[]);
 		lookOnly = (bool)array[2];
 		sex = (int)array[3];
@@ -57,8 +57,6 @@ public class EquipSetDetailTop : SkillInfoBase
 
 	public override void UpdateUI()
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Expected O, but got Unknown
 		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
@@ -75,89 +73,88 @@ public class EquipSetDetailTop : SkillInfoBase
 		{
 			if (j < ctrl.get_childCount())
 			{
-				Transform val = ctrl.GetChild(j);
-				Transform val2 = FindCtrl(val, UI.SPR_EQUIP_INDEX_ICON);
-				Vector3 localPosition = val2.get_localPosition();
+				Transform child = ctrl.GetChild(j);
+				Transform val = FindCtrl(child, UI.SPR_EQUIP_INDEX_ICON);
+				Vector3 localPosition = val.get_localPosition();
 				localPosition.y = 0f;
-				Transform obj = val;
+				Transform obj = child;
 				Vector3 localPosition2 = localPosition;
-				val2.set_localPosition(localPosition2);
+				val.set_localPosition(localPosition2);
 				obj.set_localPosition(localPosition2);
-				Transform t3 = FindCtrl(val, UI.GRD_ATTACH_SKILL);
+				Transform t3 = FindCtrl(child, UI.GRD_ATTACH_SKILL);
 				t3.DestroyChildren();
-				base.GetComponent<UITable>(val, (Enum)UI.TBL_SPACE).Reposition();
+				base.GetComponent<UITable>(child, (Enum)UI.TBL_SPACE).Reposition();
 			}
 		}
-		SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", num, false, delegate(int i, Transform t, bool is_recycle)
+		SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", num, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
 			EquipSetDetailTop equipSetDetailTop = this;
 			EquipItemInfo item = equipAndSkill[i].equipItemInfo;
 			if (item == null || item.GetMaxSlot() == 0)
 			{
-				SetActive(t, false);
+				SetActive(t, is_visible: false);
 			}
 			else
 			{
-				EquipSetDetailTop equipSetDetailTop2 = this;
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(item, sex, FindCtrl(t, UI.OBJ_ICON_ROOT), null, -1, null, 0, false, -1, false, null, false, false);
-				itemIcon.SetEnableCollider(false);
+				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(item, sex, FindCtrl(t, UI.OBJ_ICON_ROOT));
+				itemIcon.SetEnableCollider(is_enable: false);
 				SetEquipIndexIcon(t, UI.SPR_EQUIP_INDEX_ICON, i);
 				SetLabelText(t, UI.LBL_EQUIP_NAME, item.tableData.name);
 				SetLabelText(t, UI.LBL_EQUIP_NOW_LV, item.level.ToString());
 				SetLabelText(t, UI.LBL_EQUIP_MAX_LV, item.tableData.maxLv.ToString());
 				SkillSlotUIData[] slotData = equipAndSkill[i].skillSlotUIData;
-				SetGrid(t, UI.GRD_ATTACH_SKILL, "EquipSetDetailTopItem2", item.GetMaxSlot(), true, delegate(int i2, Transform t2, bool is_recycle2)
+				SetGrid(t, UI.GRD_ATTACH_SKILL, "EquipSetDetailTopItem2", item.GetMaxSlot(), reset: true, delegate(int i2, Transform t2, bool is_recycle2)
 				{
-					//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0293: Unknown result type (might be due to invalid IL or missing references)
 					int num3 = (i << 16) + i2;
 					SkillItemInfo skillItemInfo = slotData[i2].itemData;
 					bool flag = skillItemInfo != null && slotData[i2].slotData.skill_id != 0 && skillItemInfo.tableData.type == slotData[i2].slotData.slotType;
-					equipSetDetailTop2.SetSkillIcon(t2, UI.TEX_SKILL_ICON, slotData[i2].slotData.slotType, flag, false);
+					equipSetDetailTop.SetSkillIcon(t2, UI.TEX_SKILL_ICON, slotData[i2].slotData.slotType, flag, is_button_icon: false);
 					if (!flag)
 					{
 						skillItemInfo = null;
 					}
-					equipSetDetailTop2.SetToggle(t2, UI.TGL_ACTIVE_OBJ, skillItemInfo != null);
-					equipSetDetailTop2.SetActive(t2, UI.LBL_NAME, true);
-					equipSetDetailTop2.SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, false);
-					equipSetDetailTop2.SetEvent(t2, (!flag) ? "SLOT" : "SLOT_DETAIL", num3);
-					equipSetDetailTop2.SetLongTouch(t2, "SLOT_DETAIL", num3);
+					equipSetDetailTop.SetToggle(t2, UI.TGL_ACTIVE_OBJ, skillItemInfo != null);
+					equipSetDetailTop.SetActive(t2, UI.LBL_NAME, is_visible: true);
+					equipSetDetailTop.SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, is_visible: false);
+					equipSetDetailTop.SetEvent(t2, (!flag) ? "SLOT" : "SLOT_DETAIL", num3);
+					equipSetDetailTop.SetLongTouch(t2, "SLOT_DETAIL", num3);
 					if (skillItemInfo == null)
 					{
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NAME, equipSetDetailTop2.sectionData.GetText("EMPTY_SLOT"));
-						equipSetDetailTop2.SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, false);
+						equipSetDetailTop.SetLabelText(t2, UI.LBL_NAME, equipSetDetailTop.sectionData.GetText("EMPTY_SLOT"));
+						equipSetDetailTop.SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, is_visible: false);
 					}
 					else
 					{
 						SkillItemTable.SkillItemData tableData = skillItemInfo.tableData;
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NAME, tableData.name);
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, tableData.name);
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_NOW_LV, skillItemInfo.level.ToString());
-						equipSetDetailTop2.SetLabelText(t2, UI.LBL_MAX_LV, skillItemInfo.tableData.GetMaxLv(skillItemInfo.exceedCnt).ToString());
+						equipSetDetailTop.SetLabelText(t2, UI.LBL_NAME, tableData.name);
+						equipSetDetailTop.SetLabelText(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, tableData.name);
+						equipSetDetailTop.SetLabelText(t2, UI.LBL_NOW_LV, skillItemInfo.level.ToString());
+						equipSetDetailTop.SetLabelText(t2, UI.LBL_MAX_LV, skillItemInfo.tableData.GetMaxLv(skillItemInfo.exceedCnt).ToString());
 						bool flag2 = skillItemInfo.IsExceeded();
-						equipSetDetailTop2.SetActive(t2, UI.LBL_EX_LV, flag2);
+						equipSetDetailTop.SetActive(t2, UI.LBL_EX_LV, flag2);
 						if (flag2)
 						{
-							equipSetDetailTop2.SetSupportEncoding(t2, UI.LBL_EX_LV, true);
-							equipSetDetailTop2.SetLabelText(t2, UI.LBL_EX_LV, UIUtility.GetColorText(StringTable.Format(STRING_CATEGORY.SMITH, 9u, skillItemInfo.exceedCnt), ExceedSkillItemTable.color));
+							equipSetDetailTop.SetSupportEncoding(t2, UI.LBL_EX_LV, isEnable: true);
+							equipSetDetailTop.SetLabelText(t2, UI.LBL_EX_LV, UIUtility.GetColorText(StringTable.Format(STRING_CATEGORY.SMITH, 9u, skillItemInfo.exceedCnt), ExceedSkillItemTable.color));
 						}
 						EQUIPMENT_TYPE? enableEquipType = skillItemInfo.tableData.GetEnableEquipType();
-						equipSetDetailTop2.SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.HasValue);
+						equipSetDetailTop.SetActive(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.HasValue);
 						if (enableEquipType.HasValue)
 						{
 							bool flag3 = enableEquipType.Value == item.tableData.type;
-							equipSetDetailTop2.SetSkillEquipIconKind(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.Value, flag3);
-							equipSetDetailTop2.SetActive(t2, UI.LBL_NAME, flag3);
-							equipSetDetailTop2.SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, !flag3);
+							equipSetDetailTop.SetSkillEquipIconKind(t2, UI.SPR_ENABLE_WEAPON_TYPE, enableEquipType.Value, flag3);
+							equipSetDetailTop.SetActive(t2, UI.LBL_NAME, flag3);
+							equipSetDetailTop.SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, !flag3);
 						}
 					}
 				});
@@ -183,23 +180,27 @@ public class EquipSetDetailTop : SkillInfoBase
 		if (lookOnly || selectSkillIndex < 0 || selectEquipIndex < 0)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else if (MonoBehaviourSingleton<InventoryManager>.I.skillItemInventory.GetCount() <= 0)
+		if (MonoBehaviourSingleton<InventoryManager>.I.skillItemInventory.GetCount() <= 0)
 		{
-			GameSection.ChangeEvent("NOT_HAVE_SKILL_ITEM", null);
+			GameSection.ChangeEvent("NOT_HAVE_SKILL_ITEM");
+			return;
 		}
-		else
+		GameSection.ChangeEvent("ATTACH");
+		EquipItemInfo equipItemInfo = equipAndSkill[selectEquipIndex].equipItemInfo;
+		SkillItemInfo skillItemInfo = equipItemInfo.GetSkillItem(selectSkillIndex);
+		if (StatusManager.IsUnique())
 		{
-			GameSection.ChangeEvent("ATTACH", null);
-			EquipItemInfo equipItemInfo = equipAndSkill[selectEquipIndex].equipItemInfo;
-			GameSection.SetEventData(new object[4]
-			{
-				callSection,
-				equipItemInfo.GetSkillItem(selectSkillIndex),
-				equipItemInfo,
-				selectSkillIndex
-			});
+			skillItemInfo = equipItemInfo.GetUniqueSkillItem(selectSkillIndex);
 		}
+		GameSection.SetEventData(new object[4]
+		{
+			callSection,
+			skillItemInfo,
+			equipItemInfo,
+			selectSkillIndex
+		});
 	}
 
 	private void OnQuery_SLOT_DETAIL()
@@ -210,28 +211,24 @@ public class EquipSetDetailTop : SkillInfoBase
 		if (lookOnly || selectSkillIndex < 0 || selectEquipIndex < 0)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		SkillItemInfo itemData = equipAndSkill[selectEquipIndex].skillSlotUIData[selectSkillIndex].itemData;
+		EquipItemInfo equipItemInfo = equipAndSkill[selectEquipIndex].equipItemInfo;
+		if (itemData == null)
 		{
-			SkillItemInfo itemData = equipAndSkill[selectEquipIndex].skillSlotUIData[selectSkillIndex].itemData;
-			EquipItemInfo equipItemInfo = equipAndSkill[selectEquipIndex].equipItemInfo;
-			if (itemData == null)
-			{
-				GameSection.StopEvent();
-			}
-			else
-			{
-				SkillItemSortData skillItemSortData = new SkillItemSortData();
-				skillItemSortData.SetItem(itemData);
-				GameSection.SetEventData(new object[4]
-				{
-					ItemDetailEquip.CURRENT_SECTION.STATUS_SKILL_LIST,
-					skillItemSortData,
-					equipItemInfo,
-					selectSkillIndex
-				});
-			}
+			GameSection.StopEvent();
+			return;
 		}
+		SkillItemSortData skillItemSortData = new SkillItemSortData();
+		skillItemSortData.SetItem(itemData);
+		GameSection.SetEventData(new object[4]
+		{
+			ItemDetailEquip.CURRENT_SECTION.STATUS_SKILL_LIST,
+			skillItemSortData,
+			equipItemInfo,
+			selectSkillIndex
+		});
 	}
 
 	public override void OnNotify(NOTIFY_FLAG flags)

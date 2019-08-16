@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIInGamePopBase
+public class UIInGamePopBase : MonoBehaviour
 {
 	[SerializeField]
 	protected UITweenCtrl tweenCtrl;
@@ -91,7 +91,7 @@ public class UIInGamePopBase
 			}
 			icons[0].SetActive(true);
 			icons[1].SetActive(false);
-			SoundManager.PlaySystemSE(SoundID.UISE.MENU_OPEN, 1f);
+			SoundManager.PlaySystemSE(SoundID.UISE.MENU_OPEN);
 		}
 		else
 		{
@@ -105,7 +105,7 @@ public class UIInGamePopBase
 			}
 			icons[0].SetActive(false);
 			icons[1].SetActive(true);
-			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
+			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 		}
 	}
 

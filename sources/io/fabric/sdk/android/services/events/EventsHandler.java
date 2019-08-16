@@ -1,75 +1,67 @@
-package io.fabric.sdk.android.services.events;
+package p017io.fabric.sdk.android.services.events;
 
 import android.content.Context;
-import io.fabric.sdk.android.services.common.CommonUtils;
 import java.util.concurrent.ScheduledExecutorService;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
 
+/* renamed from: io.fabric.sdk.android.services.events.EventsHandler */
 public abstract class EventsHandler<T> implements EventsStorageListener {
     protected final Context context;
     protected final ScheduledExecutorService executor;
     protected EventsStrategy<T> strategy;
 
-    /* renamed from: io.fabric.sdk.android.services.events.EventsHandler$3 */
-    class C09343 implements Runnable {
-        C09343() {
-        }
-
-        public void run() {
-            try {
-                EventsHandler.this.strategy.sendEvents();
-            } catch (Throwable e) {
-                CommonUtils.logControlledError(EventsHandler.this.context, "Failed to send events files.", e);
-            }
-        }
-    }
-
-    /* renamed from: io.fabric.sdk.android.services.events.EventsHandler$4 */
-    class C09354 implements Runnable {
-        C09354() {
-        }
-
-        public void run() {
-            try {
-                EventsStrategy eventsStrategy = EventsHandler.this.strategy;
-                EventsHandler.this.strategy = EventsHandler.this.getDisabledEventsStrategy();
-                eventsStrategy.deleteAllEvents();
-            } catch (Throwable e) {
-                CommonUtils.logControlledError(EventsHandler.this.context, "Failed to disable events.", e);
-            }
-        }
-    }
-
-    public EventsHandler(Context context, EventsStrategy<T> eventsStrategy, EventsFilesManager eventsFilesManager, ScheduledExecutorService scheduledExecutorService) {
-        this.context = context.getApplicationContext();
+    public EventsHandler(Context context2, EventsStrategy<T> eventsStrategy, EventsFilesManager eventsFilesManager, ScheduledExecutorService scheduledExecutorService) {
+        this.context = context2.getApplicationContext();
         this.executor = scheduledExecutorService;
         this.strategy = eventsStrategy;
         eventsFilesManager.registerRollOverListener(this);
     }
 
     public void disable() {
-        executeAsync(new C09354());
+        executeAsync(new Runnable() {
+            public void run() {
+                try {
+                    EventsStrategy<T> eventsStrategy = EventsHandler.this.strategy;
+                    EventsHandler.this.strategy = EventsHandler.this.getDisabledEventsStrategy();
+                    eventsStrategy.deleteAllEvents();
+                } catch (Exception e) {
+                    CommonUtils.logControlledError(EventsHandler.this.context, "Failed to disable events.", e);
+                }
+            }
+        });
     }
 
-    protected void executeAsync(Runnable runnable) {
+    /* access modifiers changed from: protected */
+    public void executeAsync(Runnable runnable) {
         try {
             this.executor.submit(runnable);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             CommonUtils.logControlledError(this.context, "Failed to submit events task", e);
         }
     }
 
-    protected void executeSync(Runnable runnable) {
+    /* access modifiers changed from: protected */
+    public void executeSync(Runnable runnable) {
         try {
             this.executor.submit(runnable).get();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             CommonUtils.logControlledError(this.context, "Failed to run events task", e);
         }
     }
 
-    protected abstract EventsStrategy<T> getDisabledEventsStrategy();
+    /* access modifiers changed from: protected */
+    public abstract EventsStrategy<T> getDisabledEventsStrategy();
 
     public void onRollOver(String str) {
-        executeAsync(new C09343());
+        executeAsync(new Runnable() {
+            public void run() {
+                try {
+                    EventsHandler.this.strategy.sendEvents();
+                } catch (Exception e) {
+                    CommonUtils.logControlledError(EventsHandler.this.context, "Failed to send events files.", e);
+                }
+            }
+        });
     }
 
     public void recordEventAsync(final T t, final boolean z) {
@@ -80,7 +72,7 @@ public abstract class EventsHandler<T> implements EventsStorageListener {
                     if (z) {
                         EventsHandler.this.strategy.rollFileOver();
                     }
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     CommonUtils.logControlledError(EventsHandler.this.context, "Failed to record event.", e);
                 }
             }
@@ -92,7 +84,7 @@ public abstract class EventsHandler<T> implements EventsStorageListener {
             public void run() {
                 try {
                     EventsHandler.this.strategy.recordEvent(t);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     CommonUtils.logControlledError(EventsHandler.this.context, "Crashlytics failed to record event", e);
                 }
             }

@@ -1,33 +1,33 @@
 package com.google.android.gms.games.multiplayer;
 
 import android.os.Parcel;
-import com.facebook.share.internal.ShareConstants;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameRef;
+import com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty;
 import java.util.ArrayList;
 
-public final class zzb extends zzc implements Invitation {
-    private final Game zzhkx;
-    private final ArrayList<Participant> zzhmc;
-    private final ParticipantRef zzhmf;
+public final class zzb extends DataBufferRef implements Invitation {
+    private final Game zznw;
+    private final ArrayList<Participant> zzpc;
+    private final ParticipantRef zzpf;
 
     zzb(DataHolder dataHolder, int i, int i2) {
         super(dataHolder, i);
-        this.zzhkx = new GameRef(dataHolder, i);
-        this.zzhmc = new ArrayList(i2);
+        this.zznw = new GameRef(dataHolder, i);
+        this.zzpc = new ArrayList<>(i2);
         String string = getString("external_inviter_id");
-        Object obj = null;
+        ParticipantRef participantRef = null;
         for (int i3 = 0; i3 < i2; i3++) {
-            ParticipantRef participantRef = new ParticipantRef(this.zzfkz, this.zzfqb + i3);
-            if (participantRef.getParticipantId().equals(string)) {
-                obj = participantRef;
+            ParticipantRef participantRef2 = new ParticipantRef(this.mDataHolder, this.mDataRow + i3);
+            if (participantRef2.getParticipantId().equals(string)) {
+                participantRef = participantRef2;
             }
-            this.zzhmc.add(participantRef);
+            this.zzpc.add(participantRef2);
         }
-        this.zzhmf = (ParticipantRef) zzbp.zzb(obj, (Object) "Must have a valid inviter!");
+        this.zzpf = (ParticipantRef) Preconditions.checkNotNull(participantRef, "Must have a valid inviter!");
     }
 
     public final int describeContents() {
@@ -43,15 +43,18 @@ public final class zzb extends zzc implements Invitation {
     }
 
     public final int getAvailableAutoMatchSlots() {
-        return !getBoolean("has_automatch_criteria") ? 0 : getInteger("automatch_max_players");
+        if (!getBoolean("has_automatch_criteria")) {
+            return 0;
+        }
+        return getInteger("automatch_max_players");
     }
 
     public final long getCreationTimestamp() {
-        return Math.max(getLong("creation_timestamp"), getLong("last_modified_timestamp"));
+        return Math.max(getLong(ConditionalUserProperty.CREATION_TIMESTAMP), getLong("last_modified_timestamp"));
     }
 
     public final Game getGame() {
-        return this.zzhkx;
+        return this.zznw;
     }
 
     public final String getInvitationId() {
@@ -59,15 +62,15 @@ public final class zzb extends zzc implements Invitation {
     }
 
     public final int getInvitationType() {
-        return getInteger(ShareConstants.MEDIA_TYPE);
+        return getInteger("type");
     }
 
     public final Participant getInviter() {
-        return this.zzhmf;
+        return this.zzpf;
     }
 
     public final ArrayList<Participant> getParticipants() {
-        return this.zzhmc;
+        return this.zzpc;
     }
 
     public final int getVariant() {
@@ -75,7 +78,7 @@ public final class zzb extends zzc implements Invitation {
     }
 
     public final int hashCode() {
-        return InvitationEntity.zza(this);
+        return InvitationEntity.zza((Invitation) this);
     }
 
     public final String toString() {

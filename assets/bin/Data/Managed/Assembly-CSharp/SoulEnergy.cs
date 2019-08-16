@@ -60,7 +60,7 @@ public class SoulEnergy
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (object.ReferenceEquals(effectTrans, null))
 		{
-			effectTrans = EffectManager.GetUIEffect("ef_btl_soul_energy_01", parent, -0.001f, 0, null);
+			effectTrans = EffectManager.GetUIEffect("ef_btl_soul_energy_01", parent);
 		}
 		if (!object.ReferenceEquals(effectTrans, null))
 		{
@@ -75,7 +75,6 @@ public class SoulEnergy
 
 	public void Tap()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.CanTap)
 		{
@@ -102,11 +101,9 @@ public class SoulEnergy
 
 	public void Sleep()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		if (!object.ReferenceEquals(effectTrans, null))
 		{
-			EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(effectTrans.get_gameObject());
 			effectTrans = null;
 		}
 		state = eState.Sleep;
@@ -114,11 +111,9 @@ public class SoulEnergy
 
 	private void OnDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		if (!object.ReferenceEquals(effectTrans, null))
 		{
-			EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(effectTrans.get_gameObject());
 			effectTrans = null;
 		}
 	}

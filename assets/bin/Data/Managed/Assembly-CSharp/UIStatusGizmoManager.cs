@@ -24,6 +24,9 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 	[SerializeField]
 	protected GameObject waveTargetGizmo;
 
+	[SerializeField]
+	protected GameObject chatGimmickGizmo;
+
 	protected List<UIPlayerStatusGizmo> playerList = new List<UIPlayerStatusGizmo>();
 
 	protected List<UIEnemyStatusGizmo> enemyList = new List<UIEnemyStatusGizmo>();
@@ -38,6 +41,8 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	protected List<UIWaveTargetGizmo> waveTargetList = new List<UIWaveTargetGizmo>();
 
+	protected List<UIChatGimmickGizmo> chatGimmickList = new List<UIChatGimmickGizmo>();
+
 	private int depth;
 
 	private void LateUpdate()
@@ -48,45 +53,63 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		if (GameSaveData.instance.headName && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		if (!GameSaveData.instance.headName || !MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			Vector3 val = Vector3.get_zero();
-			StageObject stageObject = null;
-			if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			return;
+		}
+		Vector3 val = Vector3.get_zero();
+		StageObject stageObject = null;
+		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		{
+			val = MonoBehaviourSingleton<StageObjectManager>.I.self.GetCameraTargetPos();
+			val.y = 0f;
+			if (MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint != null)
 			{
-				val = MonoBehaviourSingleton<StageObjectManager>.I.self.GetCameraTargetPos();
-				val.y = 0f;
-				if (MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint != null)
+				stageObject = MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint.owner;
+			}
+		}
+		List<StageObject> list = MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
+		int num = 0;
+		int count = list.Count;
+		Enemy enemy;
+		float num2;
+		while (true)
+		{
+			if (num >= count)
+			{
+				return;
+			}
+			enemy = (list[num] as Enemy);
+			if (!enemy.isDead && enemy.isInitialized)
+			{
+				num2 = Vector3.Distance(val, list[num]._position);
+				if (enemy.uiShowDistance > 0f)
 				{
-					stageObject = MonoBehaviourSingleton<StageObjectManager>.I.self.targetingPoint.owner;
+					break;
+				}
+				if (num2 < enemy.enemyParameter.showStatusUIRange || stageObject == enemy)
+				{
+					enemy.CreateStatusGizmo();
+				}
+				else if (num2 > enemy.enemyParameter.showStatusUIRange + 1f)
+				{
+					enemy.DeleteStatusGizmo();
 				}
 			}
-			List<StageObject> list = MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				Enemy enemy = list[i] as Enemy;
-				if (!enemy.isDead && enemy.isInitialized)
-				{
-					float num = Vector3.Distance(val, list[i]._position);
-					if (num < enemy.enemyParameter.showStatusUIRange || stageObject == enemy)
-					{
-						enemy.CreateStatusGizmo();
-					}
-					else if (num > enemy.enemyParameter.showStatusUIRange + 1f)
-					{
-						enemy.DeleteStatusGizmo();
-					}
-				}
-			}
+			num++;
+		}
+		if (num2 < enemy.uiShowDistance || stageObject == enemy)
+		{
+			enemy.CreateStatusGizmo();
+		}
+		else if (num2 > enemy.uiShowDistance + 1f)
+		{
+			enemy.DeleteStatusGizmo();
 		}
 	}
 
 	public UIPlayerStatusGizmo Create(Player owner)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Expected O, but got Unknown
 		UIPlayerStatusGizmo uIPlayerStatusGizmo = null;
 		int i = 0;
 		for (int count = playerList.Count; i < count; i++)
@@ -99,7 +122,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 		}
 		if (uIPlayerStatusGizmo == null)
 		{
-			Transform val = ResourceUtility.Realizes(playerStatusGizmo, base._transform, -1);
+			Transform val = ResourceUtility.Realizes(playerStatusGizmo, base._transform);
 			if (val == null)
 			{
 				return null;
@@ -119,9 +142,6 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	public UIEnemyStatusGizmo Create(Enemy owner)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Expected O, but got Unknown
 		UIEnemyStatusGizmo uIEnemyStatusGizmo = null;
 		int i = 0;
 		for (int count = enemyList.Count; i < count; i++)
@@ -134,7 +154,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 		}
 		if (uIEnemyStatusGizmo == null)
 		{
-			Transform val = ResourceUtility.Realizes(enemyStatusGizmo, base._transform, -1);
+			Transform val = ResourceUtility.Realizes(enemyStatusGizmo, base._transform);
 			if (val == null)
 			{
 				return null;
@@ -154,9 +174,6 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	public UIPortalStatusGizmo Create(PortalObject owner)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Expected O, but got Unknown
 		UIPortalStatusGizmo uIPortalStatusGizmo = null;
 		int i = 0;
 		for (int count = portalList.Count; i < count; i++)
@@ -169,7 +186,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 		}
 		if (uIPortalStatusGizmo == null)
 		{
-			Transform val = ResourceUtility.Realizes(portalStatusGizmo, base._transform, -1);
+			Transform val = ResourceUtility.Realizes(portalStatusGizmo, base._transform);
 			if (val == null)
 			{
 				return null;
@@ -189,9 +206,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	public UICannonGizmo Create(FieldGimmickCannonObject owner)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
-		UICannonGizmo orCreate = this.GetOrCreate<UICannonGizmo>(cannonList, cannonGizmo);
+		UICannonGizmo orCreate = GetOrCreate(cannonList, cannonGizmo);
 		orCreate.owner = owner;
 		SetDepth(orCreate.get_gameObject());
 		return orCreate;
@@ -199,9 +214,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	public UISonarGizmo CreateSonar(FieldSonarObject sonar)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Expected O, but got Unknown
-		UISonarGizmo orCreate = this.GetOrCreate<UISonarGizmo>(sonarList, sonarGizmo);
+		UISonarGizmo orCreate = GetOrCreate(sonarList, sonarGizmo);
 		orCreate.sonar = sonar;
 		SetDepth(orCreate.get_gameObject());
 		return orCreate;
@@ -209,27 +222,30 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 
 	public UIGrabStatusGizmo CreateGrab()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		UIGrabStatusGizmo orCreate = this.GetOrCreate<UIGrabStatusGizmo>(grabList, grabStatusGizmo);
+		UIGrabStatusGizmo orCreate = GetOrCreate(grabList, grabStatusGizmo);
 		SetDepth(orCreate.get_gameObject());
 		return orCreate;
 	}
 
 	public UIWaveTargetGizmo CreateWaveTarget(FieldWaveTargetObject wt)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
-		UIWaveTargetGizmo orCreate = this.GetOrCreate<UIWaveTargetGizmo>(waveTargetList, waveTargetGizmo);
+		UIWaveTargetGizmo orCreate = GetOrCreate(waveTargetList, waveTargetGizmo);
 		orCreate.waveTarget = wt;
 		orCreate.Initialize();
 		SetDepth(orCreate.get_gameObject());
 		return orCreate;
 	}
 
+	public UIChatGimmickGizmo CreateGimmick(FieldChatGimmickObject cg)
+	{
+		UIChatGimmickGizmo orCreate = GetOrCreate(chatGimmickList, chatGimmickGizmo);
+		orCreate.Initialize(cg);
+		SetDepth(orCreate.get_gameObject());
+		return orCreate;
+	}
+
 	protected T GetOrCreate<T>(List<T> objects, GameObject obj) where T : MonoBehaviour
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		T val = (T)(object)null;
 		for (int i = 0; i < objects.Count; i++)
 		{
@@ -241,7 +257,7 @@ public class UIStatusGizmoManager : MonoBehaviourSingleton<UIStatusGizmoManager>
 		}
 		if ((object)val == null)
 		{
-			Transform val2 = ResourceUtility.Realizes(obj, base._transform, -1);
+			Transform val2 = ResourceUtility.Realizes(obj, base._transform);
 			if (val2 == null)
 			{
 				return (T)(object)null;

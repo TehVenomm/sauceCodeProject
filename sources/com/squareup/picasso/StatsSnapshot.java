@@ -3,7 +3,6 @@ package com.squareup.picasso;
 import android.util.Log;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 
 public class StatsSnapshot {
     public final long averageDownloadSize;
@@ -39,7 +38,7 @@ public class StatsSnapshot {
     }
 
     public void dump() {
-        Writer stringWriter = new StringWriter();
+        StringWriter stringWriter = new StringWriter();
         dump(new PrintWriter(stringWriter));
         Log.i("Picasso", stringWriter.toString());
     }

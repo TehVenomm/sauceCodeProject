@@ -15,7 +15,9 @@ public class ReadableObjectId {
     protected LinkedList<Referring> _referringProperties;
     protected ObjectIdResolver _resolver;
     @Deprecated
-    public final Object id;
+
+    /* renamed from: id */
+    public final Object f426id;
     @Deprecated
     public Object item;
 
@@ -45,13 +47,13 @@ public class ReadableObjectId {
 
     @Deprecated
     public ReadableObjectId(Object obj) {
-        this.id = obj;
+        this.f426id = obj;
         this._key = null;
     }
 
     public ReadableObjectId(IdKey idKey) {
         this._key = idKey;
-        this.id = idKey.key;
+        this.f426id = idKey.key;
     }
 
     public void setResolver(ObjectIdResolver objectIdResolver) {
@@ -64,7 +66,7 @@ public class ReadableObjectId {
 
     public void appendReferring(Referring referring) {
         if (this._referringProperties == null) {
-            this._referringProperties = new LinkedList();
+            this._referringProperties = new LinkedList<>();
         }
         this._referringProperties.add(referring);
     }
@@ -76,7 +78,7 @@ public class ReadableObjectId {
             Iterator it = this._referringProperties.iterator();
             this._referringProperties = null;
             while (it.hasNext()) {
-                ((Referring) it.next()).handleResolvedForwardReference(this.id, obj);
+                ((Referring) it.next()).handleResolvedForwardReference(this.f426id, obj);
             }
         }
     }
@@ -88,7 +90,7 @@ public class ReadableObjectId {
     }
 
     public boolean hasReferringProperties() {
-        return (this._referringProperties == null || this._referringProperties.isEmpty()) ? false : true;
+        return this._referringProperties != null && !this._referringProperties.isEmpty();
     }
 
     public Iterator<Referring> referringProperties() {

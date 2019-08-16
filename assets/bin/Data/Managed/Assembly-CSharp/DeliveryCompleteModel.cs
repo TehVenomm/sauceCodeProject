@@ -10,6 +10,8 @@ public class DeliveryCompleteModel : BaseModel
 		public DeliveryRewardList reward = new DeliveryRewardList();
 
 		public List<int> openRegionIds;
+
+		public List<int> openEventIds;
 	}
 
 	public class RequestSendForm

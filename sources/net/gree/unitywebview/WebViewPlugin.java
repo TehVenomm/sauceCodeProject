@@ -1,5 +1,6 @@
 package net.gree.unitywebview;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -19,35 +21,37 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 public class WebViewPlugin {
-    private int bottomMargin;
-    private HashMap<String, ArrayList<String>> cookies;
-    private boolean isDestroyed;
-    private FrameLayout layout = null;
-    private int leftMargin;
+    /* access modifiers changed from: private */
+    public int bottomMargin;
+    /* access modifiers changed from: private */
+    public HashMap<String, ArrayList<String>> cookies;
+    /* access modifiers changed from: private */
+    public boolean isDestroyed;
+    /* access modifiers changed from: private */
+    public FrameLayout layout = null;
+    /* access modifiers changed from: private */
+    public int leftMargin;
     private long mDownTime;
-    private WebView mWebView;
-    private int rightMargin;
-    private int topMargin;
-
-    /* renamed from: net.gree.unitywebview.WebViewPlugin$2 */
-    class C12612 implements Runnable {
-        C12612() {
-        }
-
-        public void run() {
-            if (WebViewPlugin.this.mWebView != null) {
-                WebViewPlugin.this.layout.removeView(WebViewPlugin.this.mWebView);
-                WebViewPlugin.this.mWebView = null;
-            }
-            if (WebViewPlugin.this.layout != null) {
-                WebViewPlugin.this.layout = null;
-            }
-        }
-    }
+    /* access modifiers changed from: private */
+    public WebView mWebView;
+    /* access modifiers changed from: private */
+    public int rightMargin;
+    /* access modifiers changed from: private */
+    public int topMargin;
 
     public void Destroy() {
         this.isDestroyed = true;
-        UnityPlayer.currentActivity.runOnUiThread(new C12612());
+        UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                if (WebViewPlugin.this.mWebView != null) {
+                    WebViewPlugin.this.layout.removeView(WebViewPlugin.this.mWebView);
+                    WebViewPlugin.this.mWebView = null;
+                }
+                if (WebViewPlugin.this.layout != null) {
+                    WebViewPlugin.this.layout = null;
+                }
+            }
+        });
     }
 
     public void EvaluateJS(final String str) {
@@ -62,8 +66,9 @@ public class WebViewPlugin {
 
     public void Init(final String str) {
         final Activity activity = UnityPlayer.currentActivity;
-        this.cookies = new HashMap();
+        this.cookies = new HashMap<>();
         activity.runOnUiThread(new Runnable() {
+            @SuppressLint({"WrongConstant"})
             public void run() {
                 WebViewPlugin.this.mWebView = new WebView(activity);
                 WebViewPlugin.this.mWebView.setVisibility(8);
@@ -77,10 +82,10 @@ public class WebViewPlugin {
                 }
                 WebViewPlugin.this.layout.addView(WebViewPlugin.this.mWebView, new FrameLayout.LayoutParams(-1, -1, 0));
                 WebViewPlugin.this.mWebView.setWebChromeClient(new WebChromeClient());
-                WebView access$1 = WebViewPlugin.this.mWebView;
-                final String str = str;
-                access$1.setWebViewClient(new WebViewClient() {
-                    void ChangeActivity(String str) {
+                WebViewPlugin.this.mWebView.setWebViewClient(new WebViewClient() {
+                    /* access modifiers changed from: 0000 */
+                    @SuppressLint({"WrongConstant"})
+                    public void ChangeActivity(String str) {
                         if (!WebViewPlugin.this.isDestroyed) {
                             Activity activity = UnityPlayer.currentActivity;
                             Intent intent = new Intent();
@@ -97,7 +102,7 @@ public class WebViewPlugin {
                                     Iterator it = ((ArrayList) entry.getValue()).iterator();
                                     String str3 = str2;
                                     while (it.hasNext()) {
-                                        str3 = new StringBuilder(String.valueOf(str3)).append((String) it.next()).append(";").toString();
+                                        str3 = str3 + it.next() + ";";
                                     }
                                     str2 = str3;
                                 }
@@ -109,7 +114,8 @@ public class WebViewPlugin {
                         }
                     }
 
-                    boolean isWebViewActivityUrl(String str) {
+                    /* access modifiers changed from: 0000 */
+                    public boolean isWebViewActivityUrl(String str) {
                         return str.indexOf("/opinion") >= 0;
                     }
 
@@ -142,7 +148,7 @@ public class WebViewPlugin {
                 WebSettings settings = WebViewPlugin.this.mWebView.getSettings();
                 settings.setSupportZoom(false);
                 settings.setJavaScriptEnabled(true);
-                settings.setPluginsEnabled(true);
+                settings.setPluginState(PluginState.ON);
             }
         });
     }
@@ -151,6 +157,7 @@ public class WebViewPlugin {
         UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
             public void run() {
                 if (WebViewPlugin.this.mWebView != null) {
+                    WebViewPlugin.this.mWebView.getSettings().setDefaultTextEncodingName("utf-8");
                     WebViewPlugin.this.mWebView.loadUrl(str);
                 }
             }
@@ -188,6 +195,7 @@ public class WebViewPlugin {
 
     public void SetVisibility(final boolean z) {
         UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+            @SuppressLint({"WrongConstant"})
             public void run() {
                 if (WebViewPlugin.this.mWebView == null) {
                     return;

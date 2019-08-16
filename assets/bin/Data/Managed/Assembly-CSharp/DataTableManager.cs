@@ -137,23 +137,19 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	protected override void Awake()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		cache = new DataTableCache(null);
+		cache = new DataTableCache();
 		dataLoader = this.get_gameObject().AddComponent<DataLoader>();
-		dataLoader.SetCache(new DataTableCache(null));
+		dataLoader.SetCache(new DataTableCache());
 		forceLoadCSV = false;
 		loadStatus = LoadStatus.NotInitialize;
 	}
 
 	public void OnReceiveTableManifestVersion(int version)
 	{
-		if (lastReceiveManifestVersion == version)
+		if (lastReceiveManifestVersion != version)
 		{
-			goto IL_000c;
 		}
-		goto IL_000c;
-		IL_000c:
 		lastReceiveManifestVersion = version;
 	}
 
@@ -165,7 +161,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	public void UpdateManifest(Action onComplete)
 	{
 		int version = lastReceiveManifestVersion;
-		DataLoadRequest dataLoadRequest = CreateRequest(MANIFEST_NAME, new ManifestVersion(version), DATA_TABLE_DIRECTORY, false);
+		DataLoadRequest dataLoadRequest = CreateRequest(MANIFEST_NAME, new ManifestVersion(version), DATA_TABLE_DIRECTORY);
 		dataLoadRequest.processCompressedTextData = delegate(byte[] bytes)
 		{
 			try
@@ -177,7 +173,6 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			{
 				Log.Error(LOG.DATA_TABLE, "manifest load error: {0}", ex.ToString());
 				throw;
-				IL_0040:;
 			}
 		};
 		dataLoadRequest.onComplete += onComplete;
@@ -190,29 +185,31 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		{
 			loadStatus = LoadStatus.LoadingInitialTable;
 		}
-		RequestParam[] array = new RequestParam[21]
+		RequestParam[] array = new RequestParam[23]
 		{
-			new RequestParam("AvatarTable", null),
-			new RequestParam("CreateEquipItemTable", null),
-			new RequestParam("CreatePickupItemTable", null),
-			new RequestParam("DeliveryTable", null),
-			new RequestParam("EquipItemTable", null),
-			new RequestParam("EquipModelTable", null),
-			new RequestParam("GrowSkillItemTable", null),
-			new RequestParam("HomeThemeTable", null),
-			new RequestParam("CountdownTable", null),
-			new RequestParam("NPCMessageTable", null),
-			new RequestParam("NPCTable", null),
-			new RequestParam("QuestTable", null),
-			new RequestParam("SkillItemTable", null),
-			new RequestParam("ExceedSkillItemTable", null),
-			new RequestParam("StageTable", null),
-			new RequestParam("TutorialMessageTable", null),
-			new RequestParam("StampTypeTable", null),
-			new RequestParam("EquipItemExceedParamTable", null),
-			new RequestParam("RegionTable", null),
-			new RequestParam("FieldMapTable", null),
-			new RequestParam("FieldMapPortalTable", null)
+			new RequestParam("AvatarTable"),
+			new RequestParam("AccessoryTable"),
+			new RequestParam("AccessoryInfoTable"),
+			new RequestParam("CreateEquipItemTable"),
+			new RequestParam("CreatePickupItemTable"),
+			new RequestParam("DeliveryTable"),
+			new RequestParam("EquipItemTable"),
+			new RequestParam("EquipModelTable"),
+			new RequestParam("GrowSkillItemTable"),
+			new RequestParam("HomeThemeTable"),
+			new RequestParam("CountdownTable"),
+			new RequestParam("NPCMessageTable"),
+			new RequestParam("NPCTable"),
+			new RequestParam("QuestTable"),
+			new RequestParam("SkillItemTable"),
+			new RequestParam("ExceedSkillItemTable"),
+			new RequestParam("StageTable"),
+			new RequestParam("TutorialMessageTable"),
+			new RequestParam("StampTypeTable"),
+			new RequestParam("EquipItemExceedParamTable"),
+			new RequestParam("RegionTable"),
+			new RequestParam("FieldMapTable"),
+			new RequestParam("FieldMapPortalTable")
 		};
 		List<DataLoadRequest> list = new List<DataLoadRequest>();
 		int i = 0;
@@ -245,51 +242,60 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public List<DataLoadRequest> LoadAllTable(Action onComplete, bool downloadOnly = false)
 	{
-		RequestParam[] array = new RequestParam[43]
+		RequestParam[] array = new RequestParam[52]
 		{
-			new RequestParam("AbilityDataTable", null),
-			new RequestParam("AbilityTable", null),
-			new RequestParam("AudioSettingTable", null),
-			new RequestParam("DeliveryRewardTable", null),
-			new RequestParam("EnemyTable", null),
-			new RequestParam("EquipItemExceedTable", null),
-			new RequestParam("EvolveEquipItemTable", null),
-			new RequestParam("GrowEnemyTable", null),
-			new RequestParam("ItemTable", null),
-			new RequestParam("SETable", null),
-			new RequestParam("StringTable", null),
-			new RequestParam("TaskTable", null),
-			new RequestParam("UserLevelTable", null),
-			new RequestParam("GrowEquipItemTable", null),
-			new RequestParam("GrowEquipItemNeedItemTable", null),
-			new RequestParam("GrowEquipItemNeedUniqueItemTable", null),
-			new RequestParam("MissionTable", null),
-			new RequestParam("RegionTable", null),
-			new RequestParam("FieldMapTable", null),
-			new RequestParam("FieldMapPortalTable", null),
-			new RequestParam("FieldMapEnemyPopTable", null),
-			new RequestParam("FieldMapGatherPointTable", null),
-			new RequestParam("FieldMapGatherPointViewTable", null),
-			new RequestParam("FieldMapGimmickPointTable", null),
-			new RequestParam("FieldMapGimmickActionTable", null),
-			new RequestParam("QuestToFieldTable", null),
-			new RequestParam("ItemToFieldTable", null),
-			new RequestParam("EnemyHitTypeTable", null),
-			new RequestParam("EnemyHitMaterialTable", null),
-			new RequestParam("EnemyPersonalityTable", null),
-			new RequestParam("PointShopGetPointTable", null),
-			new RequestParam("DegreeTable", null),
-			new RequestParam("DamageDistanceTable", null),
-			new RequestParam("GachaSearchEnemyTable", null),
-			new RequestParam("BuffTable", null),
-			new RequestParam("FieldBuffTable", null),
-			new RequestParam("LimitedEquipItemExceedTable", null),
-			new RequestParam("PlayDataTable", null),
-			new RequestParam("ArenaTable", null),
-			new RequestParam("EnemyAngryTable", null),
-			new RequestParam("EnemyActionTable", null),
-			new RequestParam("NpcLevelTable", null),
-			new RequestParam("FieldMapEnemyPopTimeZoneTable", null)
+			new RequestParam("AbilityDataTable"),
+			new RequestParam("AbilityTable"),
+			new RequestParam("AbilityItemLotTable"),
+			new RequestParam("AudioSettingTable"),
+			new RequestParam("DeliveryRewardTable"),
+			new RequestParam("EnemyTable"),
+			new RequestParam("EquipItemExceedTable"),
+			new RequestParam("EvolveEquipItemTable"),
+			new RequestParam("GrowEnemyTable"),
+			new RequestParam("ItemTable"),
+			new RequestParam("TutorialGearSetTable"),
+			new RequestParam("TradingPostTable"),
+			new RequestParam("SETable"),
+			new RequestParam("StringTable"),
+			new RequestParam("TaskTable"),
+			new RequestParam("UserLevelTable"),
+			new RequestParam("GrowEquipItemTable"),
+			new RequestParam("GrowEquipItemNeedItemTable"),
+			new RequestParam("GrowEquipItemNeedUniqueItemTable"),
+			new RequestParam("MissionTable"),
+			new RequestParam("RegionTable"),
+			new RequestParam("FieldMapTable"),
+			new RequestParam("FieldMapPortalTable"),
+			new RequestParam("FieldMapEnemyPopTable"),
+			new RequestParam("FieldMapGatherPointTable"),
+			new RequestParam("FieldMapGatherPointViewTable"),
+			new RequestParam("FieldMapGimmickPointTable"),
+			new RequestParam("FieldMapGimmickActionTable"),
+			new RequestParam("QuestToFieldTable"),
+			new RequestParam("ItemToFieldTable"),
+			new RequestParam("EnemyHitTypeTable"),
+			new RequestParam("EnemyHitMaterialTable"),
+			new RequestParam("EnemyPersonalityTable"),
+			new RequestParam("PointShopGetPointTable"),
+			new RequestParam("DegreeTable"),
+			new RequestParam("DamageDistanceTable"),
+			new RequestParam("GachaSearchEnemyTable"),
+			new RequestParam("BuffTable"),
+			new RequestParam("FieldBuffTable"),
+			new RequestParam("WaveMatchDropTable"),
+			new RequestParam("LimitedEquipItemExceedTable"),
+			new RequestParam("PlayDataTable"),
+			new RequestParam("ArenaTable"),
+			new RequestParam("EnemyAngryTable"),
+			new RequestParam("EnemyActionTable"),
+			new RequestParam("NpcLevelTable"),
+			new RequestParam("NpcLevelSpecialTable"),
+			new RequestParam("FieldMapEnemyPopTimeZoneTable"),
+			new RequestParam("GatherItemTable"),
+			new RequestParam("AssignedEquipmentTable"),
+			new RequestParam("SymbolTable"),
+			new RequestParam("ProductDataTable")
 		};
 		List<DataLoadRequest> list = new List<DataLoadRequest>();
 		int i = 0;
@@ -327,16 +333,17 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		{
 			DataLoadRequest dataLoadRequest = reqs[i];
 			DataTableContainer value = null;
-			if (tables.TryGetValue(dataLoadRequest.name, out value))
+			if (!tables.TryGetValue(dataLoadRequest.name, out value))
 			{
-				DataTableContainer dependency = value.GetDependency();
-				if (dependency != null)
+				continue;
+			}
+			DataTableContainer dependency = value.GetDependency();
+			if (dependency != null)
+			{
+				DataLoadRequest dataLoadRequest2 = reqs.Find((DataLoadRequest o) => o.name == dependency.name);
+				if (dataLoadRequest2 != null)
 				{
-					DataLoadRequest dataLoadRequest2 = reqs.Find((DataLoadRequest o) => o.name == dependency.name);
-					if (dataLoadRequest2 != null)
-					{
-						dataLoadRequest.DependsOn(dataLoadRequest2);
-					}
+					dataLoadRequest.DependsOn(dataLoadRequest2);
 				}
 			}
 		}
@@ -344,7 +351,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public DataLoadRequest RequestLoadTable(string name, IDataTable table, Action onComplete, bool downloadOnly = false)
 	{
-		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, table, downloadOnly, null);
+		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, table, downloadOnly);
 		dataLoadRequest.onComplete += onComplete;
 		Request(dataLoadRequest);
 		return dataLoadRequest;
@@ -353,7 +360,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	public DataLoadRequest RequestLoadTable(string name, Action onComplete, bool downloadOnly = false)
 	{
 		tables.TryGetValue(name, out DataTableContainer value);
-		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, value, downloadOnly, null);
+		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, value, downloadOnly);
 		dataLoadRequest.onComplete += onComplete;
 		Request(dataLoadRequest);
 		return dataLoadRequest;
@@ -362,7 +369,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	public DataLoadRequest RequestLoadTable(string name, Action<byte[]> processBinaryData, Action onComplete, bool downloadOnly = false)
 	{
 		tables.TryGetValue(name, out DataTableContainer value);
-		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, value, downloadOnly, null);
+		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, value, downloadOnly);
 		dataLoadRequest.onComplete += onComplete;
 		if (processBinaryData != null)
 		{
@@ -499,6 +506,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		Clear();
 		Singleton<AbilityDataTable>.Create();
 		Singleton<AbilityTable>.Create();
+		Singleton<AbilityItemLotTable>.Create();
+		Singleton<AccessoryTable>.Create();
 		Singleton<AudioSettingTable>.Create();
 		Singleton<AvatarTable>.Create();
 		Singleton<CreateEquipItemTable>.Create();
@@ -519,6 +528,8 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		Singleton<GrowEquipItemTable>.Create();
 		Singleton<GrowSkillItemTable>.Create();
 		Singleton<ItemTable>.Create();
+		Singleton<TutorialGearSetTable>.Create();
+		Singleton<TradingPostTable>.Create();
 		Singleton<ItemToFieldTable>.Create();
 		Singleton<ItemToQuestTable>.Create();
 		Singleton<NPCMessageTable>.Create();
@@ -543,53 +554,64 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		Singleton<CountdownTable>.Create();
 		Singleton<BuffTable>.Create();
 		Singleton<FieldBuffTable>.Create();
+		Singleton<WaveMatchDropTable>.Create();
 		Singleton<LimitedEquipItemExceedTable>.Create();
 		Singleton<PlayDataTable>.Create();
 		Singleton<ArenaTable>.Create();
 		Singleton<EnemyAngryTable>.Create();
 		Singleton<EnemyActionTable>.Create();
 		Singleton<NpcLevelTable>.Create();
+		Singleton<NpcLevelSpecialTable>.Create();
 		Singleton<FieldMapEnemyPopTimeZoneTable>.Create();
-		RegisterTable("AbilityDataTable", Singleton<AbilityDataTable>.I, null);
-		RegisterTable("AbilityTable", Singleton<AbilityTable>.I, null);
-		RegisterTable("AudioSettingTable", Singleton<AudioSettingTable>.I, null);
-		RegisterTable("AvatarTable", Singleton<AvatarTable>.I, null);
-		RegisterTable("CreateEquipItemTable", Singleton<CreateEquipItemTable>.I, null);
-		RegisterTable("CreatePickupItemTable", Singleton<CreatePickupItemTable>.I, null);
-		RegisterTable("DeliveryRewardTable", Singleton<DeliveryRewardTable>.I, null);
-		RegisterTable("DeliveryTable", Singleton<DeliveryTable>.I, null);
-		EnemyTable i = Singleton<EnemyTable>.I;
-		RegisterTable("EnemyTable", new DataTableInterfaceProxy(i.CreateTable), null);
-		RegisterTable("EquipItemExceedParamTable", Singleton<EquipItemExceedParamTable>.I, null);
-		RegisterTable("EquipItemExceedTable", Singleton<EquipItemExceedTable>.I, null);
-		EquipItemTable i2 = Singleton<EquipItemTable>.I;
-		RegisterTable("EquipItemTable", new DataTableInterfaceProxy(i2.CreateTable), null);
-		RegisterTable("EquipModelTable", Singleton<EquipModelTable>.I, null);
-		RegisterTable("EvolveEquipItemTable", Singleton<EvolveEquipItemTable>.I, null);
-		RegisterTable("GrowEnemyTable", Singleton<GrowEnemyTable>.I, null);
-		GrowSkillItemTable i3 = Singleton<GrowSkillItemTable>.I;
-		RegisterTable("GrowSkillItemTable", new DataTableInterfaceProxy(i3.CreateTable), null);
-		RegisterTable("ItemTable", Singleton<ItemTable>.I, null);
-		RegisterTable("NPCMessageTable", Singleton<NPCMessageTable>.I, null);
-		RegisterTable("NPCTable", Singleton<NPCTable>.I, null);
-		RegisterTable("SETable", Singleton<SETable>.I, null);
-		RegisterTable("SkillItemTable", Singleton<SkillItemTable>.I, null);
-		RegisterTable("ExceedSkillItemTable", Singleton<ExceedSkillItemTable>.I, null);
-		RegisterTable("StageTable", Singleton<StageTable>.I, null);
-		RegisterTable("StampTypeTable", Singleton<StampTable>.I, null);
-		RegisterTable("StringTable", Singleton<StringTable>.I, null);
-		RegisterTable("TaskTable", Singleton<TaskTable>.I, null);
-		RegisterTable("TutorialMessageTable", Singleton<TutorialMessageTable>.I, null);
-		RegisterTable("UserLevelTable", Singleton<UserLevelTable>.I, null);
-		RegisterTable("GachaSearchEnemyTable", Singleton<GachaSearchEnemyTable>.I, null);
-		RegisterTable("HomeThemeTable", Singleton<HomeThemeTable>.I, null);
-		RegisterTable("CountdownTable", Singleton<CountdownTable>.I, null);
+		Singleton<GatherItemTable>.Create();
+		Singleton<AssignedEquipmentTable>.Create();
+		Singleton<SymbolTable>.Create();
+		Singleton<ProductDataTable>.Create();
+		RegisterTable("AbilityDataTable", Singleton<AbilityDataTable>.I);
+		RegisterTable("AbilityTable", Singleton<AbilityTable>.I);
+		RegisterTable("AbilityItemLotTable", Singleton<AbilityItemLotTable>.I);
+		RegisterTable("AccessoryTable", new DataTableInterfaceProxy(Singleton<AccessoryTable>.I.CreateTable));
+		RegisterTable("AccessoryInfoTable", new DataTableInterfaceProxy(Singleton<AccessoryTable>.I.CreateInfoTable));
+		RegisterTable("AudioSettingTable", Singleton<AudioSettingTable>.I);
+		RegisterTable("AvatarTable", Singleton<AvatarTable>.I);
+		RegisterTable("CreateEquipItemTable", Singleton<CreateEquipItemTable>.I);
+		RegisterTable("CreatePickupItemTable", Singleton<CreatePickupItemTable>.I);
+		RegisterTable("DeliveryRewardTable", Singleton<DeliveryRewardTable>.I);
+		RegisterTable("DeliveryTable", Singleton<DeliveryTable>.I);
+		RegisterTable("EnemyTable", new DataTableInterfaceProxy(Singleton<EnemyTable>.I.CreateTable));
+		RegisterTable("EquipItemExceedParamTable", Singleton<EquipItemExceedParamTable>.I);
+		RegisterTable("EquipItemExceedTable", Singleton<EquipItemExceedTable>.I);
+		RegisterTable("EquipItemTable", new DataTableInterfaceProxy(Singleton<EquipItemTable>.I.CreateTable));
+		RegisterTable("EquipModelTable", Singleton<EquipModelTable>.I);
+		RegisterTable("EvolveEquipItemTable", Singleton<EvolveEquipItemTable>.I);
+		RegisterTable("GrowEnemyTable", Singleton<GrowEnemyTable>.I);
+		RegisterTable("GrowSkillItemTable", new DataTableInterfaceProxy(Singleton<GrowSkillItemTable>.I.CreateTable));
+		RegisterTable("ItemTable", Singleton<ItemTable>.I);
+		RegisterTable("TutorialGearSetTable", new DataTableInterfaceProxy(Singleton<TutorialGearSetTable>.I.CreateTable));
+		RegisterTable("TradingPostTable", new DataTableInterfaceProxy(Singleton<TradingPostTable>.I.CreateTable));
+		RegisterTable("NPCMessageTable", Singleton<NPCMessageTable>.I);
+		RegisterTable("NPCTable", Singleton<NPCTable>.I);
+		RegisterTable("SETable", Singleton<SETable>.I);
+		RegisterTable("SkillItemTable", Singleton<SkillItemTable>.I);
+		RegisterTable("ExceedSkillItemTable", Singleton<ExceedSkillItemTable>.I);
+		RegisterTable("StageTable", Singleton<StageTable>.I);
+		RegisterTable("StampTypeTable", Singleton<StampTable>.I);
+		RegisterTable("StringTable", Singleton<StringTable>.I);
+		RegisterTable("TaskTable", Singleton<TaskTable>.I);
+		RegisterTable("TutorialMessageTable", Singleton<TutorialMessageTable>.I);
+		RegisterTable("UserLevelTable", Singleton<UserLevelTable>.I);
+		RegisterTable("GachaSearchEnemyTable", Singleton<GachaSearchEnemyTable>.I);
+		RegisterTable("HomeThemeTable", Singleton<HomeThemeTable>.I);
+		RegisterTable("CountdownTable", Singleton<CountdownTable>.I);
 		RegisterTable("LimitedEquipItemExceedTable", Singleton<LimitedEquipItemExceedTable>.I, "ItemTable");
-		RegisterTable("PlayDataTable", Singleton<PlayDataTable>.I, null);
-		RegisterTable("ArenaTable", Singleton<ArenaTable>.I, null);
-		RegisterTable("EnemyAngryTable", Singleton<EnemyAngryTable>.I, null);
-		RegisterTable("EnemyActionTable", Singleton<EnemyActionTable>.I, null);
-		RegisterTable("NpcLevelTable", Singleton<NpcLevelTable>.I, null);
+		RegisterTable("PlayDataTable", Singleton<PlayDataTable>.I);
+		RegisterTable("ArenaTable", Singleton<ArenaTable>.I);
+		RegisterTable("EnemyAngryTable", Singleton<EnemyAngryTable>.I);
+		RegisterTable("EnemyActionTable", Singleton<EnemyActionTable>.I);
+		RegisterTable("NpcLevelTable", Singleton<NpcLevelTable>.I);
+		RegisterTable("NpcLevelSpecialTable", Singleton<NpcLevelSpecialTable>.I);
+		RegisterTable("AssignedEquipmentTable", Singleton<AssignedEquipmentTable>.I);
+		RegisterTable("SymbolTable", Singleton<SymbolTable>.I);
 		RegisterTable("GrowEquipItemTable", new DataTableInterfaceProxy(Singleton<GrowEquipItemTable>.I.CreateGrowTable), "ItemTable");
 		RegisterTable("GrowEquipItemNeedItemTable", new DataTableInterfaceProxy(Singleton<GrowEquipItemTable>.I.CreateNeedTable), "ItemTable");
 		RegisterTable("GrowEquipItemNeedUniqueItemTable", new DataTableInterfaceProxy(Singleton<GrowEquipItemTable>.I.CreateNeedUniqueTable), "ItemTable");
@@ -600,16 +622,16 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			{
 				Singleton<QuestTable>.I.InitQuestDependencyData();
 			});
-		}), null);
-		RegisterTable("MissionTable", new DataTableInterfaceProxy(Singleton<QuestTable>.I.CreateMissionTable), null);
-		RegisterTable("RegionTable", Singleton<RegionTable>.I, null);
-		RegisterTable("FieldMapTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateFieldMapTable), null);
-		RegisterTable("FieldMapPortalTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreatePortalTable), null);
-		RegisterTable("FieldMapEnemyPopTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateEnemyPopTable), null);
-		RegisterTable("FieldMapGatherPointTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGatherPointTable), null);
-		RegisterTable("FieldMapGatherPointViewTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGatherPointViewTable), null);
-		RegisterTable("FieldMapGimmickPointTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGimmickPointTable), null);
-		RegisterTable("FieldMapGimmickActionTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGimmickActionTable), null);
+		}));
+		RegisterTable("MissionTable", new DataTableInterfaceProxy(Singleton<QuestTable>.I.CreateMissionTable));
+		RegisterTable("RegionTable", Singleton<RegionTable>.I);
+		RegisterTable("FieldMapTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateFieldMapTable));
+		RegisterTable("FieldMapPortalTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreatePortalTable));
+		RegisterTable("FieldMapEnemyPopTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateEnemyPopTable));
+		RegisterTable("FieldMapGatherPointTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGatherPointTable));
+		RegisterTable("FieldMapGatherPointViewTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGatherPointViewTable));
+		RegisterTable("FieldMapGimmickPointTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGimmickPointTable));
+		RegisterTable("FieldMapGimmickActionTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGimmickActionTable));
 		RegisterTable("QuestToFieldTable", new DataTableInterfaceProxy(delegate(string csv)
 		{
 			Singleton<QuestToFieldTable>.I.CreateTable(csv);
@@ -617,7 +639,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			{
 				Singleton<QuestToFieldTable>.I.InitDependencyData();
 			});
-		}), null);
+		}));
 		RegisterTable("ItemToFieldTable", new DataTableInterfaceProxy(delegate(string csv)
 		{
 			Singleton<ItemToFieldTable>.I.CreateTable(csv);
@@ -625,16 +647,19 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			{
 				Singleton<ItemToFieldTable>.I.InitDependencyData();
 			});
-		}), null);
-		RegisterTable("EnemyHitTypeTable", Singleton<EnemyHitTypeTable>.I, null);
+		}));
+		RegisterTable("EnemyHitTypeTable", Singleton<EnemyHitTypeTable>.I);
 		RegisterTable("EnemyHitMaterialTable", Singleton<EnemyHitMaterialTable>.I, "EnemyHitTypeTable");
-		RegisterTable("EnemyPersonalityTable", Singleton<EnemyPersonalityTable>.I, null);
-		RegisterTable("PointShopGetPointTable", Singleton<PointShopGetPointTable>.I, null);
-		RegisterTable("DegreeTable", Singleton<DegreeTable>.I, null);
-		RegisterTable("DamageDistanceTable", Singleton<DamageDistanceTable>.I, null);
-		RegisterTable("BuffTable", Singleton<BuffTable>.I, null);
-		RegisterTable("FieldBuffTable", Singleton<FieldBuffTable>.I, null);
-		RegisterTable("FieldMapEnemyPopTimeZoneTable", Singleton<FieldMapEnemyPopTimeZoneTable>.I, null);
+		RegisterTable("EnemyPersonalityTable", Singleton<EnemyPersonalityTable>.I);
+		RegisterTable("PointShopGetPointTable", Singleton<PointShopGetPointTable>.I);
+		RegisterTable("DegreeTable", Singleton<DegreeTable>.I);
+		RegisterTable("DamageDistanceTable", Singleton<DamageDistanceTable>.I);
+		RegisterTable("BuffTable", Singleton<BuffTable>.I);
+		RegisterTable("FieldBuffTable", Singleton<FieldBuffTable>.I);
+		RegisterTable("WaveMatchDropTable", Singleton<WaveMatchDropTable>.I);
+		RegisterTable("FieldMapEnemyPopTimeZoneTable", Singleton<FieldMapEnemyPopTimeZoneTable>.I);
+		RegisterTable("GatherItemTable", Singleton<GatherItemTable>.I);
+		RegisterTable("ProductDataTable", Singleton<ProductDataTable>.I);
 		UpdateDependency();
 	}
 
@@ -644,67 +669,79 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		DataTableInterfaceProxy table = new DataTableInterfaceProxy(delegate
 		{
 		});
-		RegisterTable("AvatarTable", table, null);
-		RegisterTable("CreateEquipItemTable", table, null);
-		RegisterTable("CreatePickupItemTable", table, null);
-		RegisterTable("DeliveryTable", table, null);
-		RegisterTable("EquipItemTable", table, null);
-		RegisterTable("EquipModelTable", table, null);
-		RegisterTable("GrowSkillItemTable", table, null);
-		RegisterTable("HomeThemeTable", table, null);
-		RegisterTable("CountdownTable", table, null);
-		RegisterTable("NPCMessageTable", table, null);
-		RegisterTable("NPCTable", table, null);
-		RegisterTable("QuestTable", table, null);
-		RegisterTable("SkillItemTable", table, null);
-		RegisterTable("ExceedSkillItemTable", table, null);
-		RegisterTable("StageTable", table, null);
-		RegisterTable("TutorialMessageTable", table, null);
-		RegisterTable("StampTypeTable", table, null);
-		RegisterTable("EquipItemExceedParamTable", table, null);
-		RegisterTable("AbilityDataTable", table, null);
-		RegisterTable("AbilityTable", table, null);
-		RegisterTable("AudioSettingTable", table, null);
-		RegisterTable("DeliveryRewardTable", table, null);
-		RegisterTable("EnemyTable", table, null);
-		RegisterTable("EquipItemExceedTable", table, null);
-		RegisterTable("EvolveEquipItemTable", table, null);
-		RegisterTable("GrowEnemyTable", table, null);
-		RegisterTable("ItemTable", table, null);
-		RegisterTable("SETable", table, null);
-		RegisterTable("StringTable", table, null);
-		RegisterTable("TaskTable", table, null);
-		RegisterTable("UserLevelTable", table, null);
-		RegisterTable("GrowEquipItemTable", table, null);
-		RegisterTable("GrowEquipItemNeedItemTable", table, null);
-		RegisterTable("GrowEquipItemNeedUniqueItemTable", table, null);
-		RegisterTable("MissionTable", table, null);
-		RegisterTable("RegionTable", table, null);
-		RegisterTable("FieldMapTable", table, null);
-		RegisterTable("FieldMapPortalTable", table, null);
-		RegisterTable("FieldMapEnemyPopTable", table, null);
-		RegisterTable("FieldMapGatherPointTable", table, null);
-		RegisterTable("FieldMapGatherPointViewTable", table, null);
-		RegisterTable("FieldMapGimmickPointTable", table, null);
-		RegisterTable("FieldMapGimmickActionTable", table, null);
-		RegisterTable("QuestToFieldTable", table, null);
-		RegisterTable("ItemToFieldTable", table, null);
-		RegisterTable("EnemyHitTypeTable", table, null);
-		RegisterTable("EnemyHitMaterialTable", table, null);
-		RegisterTable("EnemyPersonalityTable", table, null);
-		RegisterTable("PointShopGetPointTable", table, null);
-		RegisterTable("DegreeTable", table, null);
-		RegisterTable("DamageDistanceTable", table, null);
-		RegisterTable("GachaSearchEnemyTable", table, null);
-		RegisterTable("BuffTable", table, null);
-		RegisterTable("FieldBuffTable", table, null);
-		RegisterTable("LimitedEquipItemExceedTable", table, null);
-		RegisterTable("PlayDataTable", table, null);
-		RegisterTable("ArenaTable", table, null);
-		RegisterTable("EnemyAngryTable", table, null);
-		RegisterTable("EnemyActionTable", table, null);
-		RegisterTable("NpcLevelTable", table, null);
-		RegisterTable("FieldMapEnemyPopTimeZoneTable", table, null);
+		RegisterTable("AvatarTable", table);
+		RegisterTable("AccessoryTable", table);
+		RegisterTable("AccessoryInfoTable", table);
+		RegisterTable("AccessoryDataTable", table);
+		RegisterTable("CreateEquipItemTable", table);
+		RegisterTable("CreatePickupItemTable", table);
+		RegisterTable("DeliveryTable", table);
+		RegisterTable("EquipItemTable", table);
+		RegisterTable("EquipModelTable", table);
+		RegisterTable("GrowSkillItemTable", table);
+		RegisterTable("HomeThemeTable", table);
+		RegisterTable("CountdownTable", table);
+		RegisterTable("NPCMessageTable", table);
+		RegisterTable("NPCTable", table);
+		RegisterTable("QuestTable", table);
+		RegisterTable("SkillItemTable", table);
+		RegisterTable("ExceedSkillItemTable", table);
+		RegisterTable("StageTable", table);
+		RegisterTable("TutorialMessageTable", table);
+		RegisterTable("StampTypeTable", table);
+		RegisterTable("EquipItemExceedParamTable", table);
+		RegisterTable("AbilityDataTable", table);
+		RegisterTable("AbilityTable", table);
+		RegisterTable("AbilityItemLotTable", table);
+		RegisterTable("AudioSettingTable", table);
+		RegisterTable("DeliveryRewardTable", table);
+		RegisterTable("EnemyTable", table);
+		RegisterTable("EquipItemExceedTable", table);
+		RegisterTable("EvolveEquipItemTable", table);
+		RegisterTable("GrowEnemyTable", table);
+		RegisterTable("ItemTable", table);
+		RegisterTable("TutorialGearSetTable", table);
+		RegisterTable("TradingPostTable", table);
+		RegisterTable("SETable", table);
+		RegisterTable("StringTable", table);
+		RegisterTable("TaskTable", table);
+		RegisterTable("UserLevelTable", table);
+		RegisterTable("GrowEquipItemTable", table);
+		RegisterTable("GrowEquipItemNeedItemTable", table);
+		RegisterTable("GrowEquipItemNeedUniqueItemTable", table);
+		RegisterTable("MissionTable", table);
+		RegisterTable("RegionTable", table);
+		RegisterTable("FieldMapTable", table);
+		RegisterTable("FieldMapPortalTable", table);
+		RegisterTable("FieldMapEnemyPopTable", table);
+		RegisterTable("FieldMapGatherPointTable", table);
+		RegisterTable("FieldMapGatherPointViewTable", table);
+		RegisterTable("FieldMapGimmickPointTable", table);
+		RegisterTable("FieldMapGimmickActionTable", table);
+		RegisterTable("QuestToFieldTable", table);
+		RegisterTable("ItemToFieldTable", table);
+		RegisterTable("EnemyHitTypeTable", table);
+		RegisterTable("EnemyHitMaterialTable", table);
+		RegisterTable("EnemyPersonalityTable", table);
+		RegisterTable("PointShopGetPointTable", table);
+		RegisterTable("DegreeTable", table);
+		RegisterTable("DamageDistanceTable", table);
+		RegisterTable("GachaSearchEnemyTable", table);
+		RegisterTable("BuffTable", table);
+		RegisterTable("FieldBuffTable", table);
+		RegisterTable("WaveMatchDropTable", table);
+		RegisterTable("LimitedEquipItemExceedTable", table);
+		RegisterTable("PlayDataTable", table);
+		RegisterTable("ArenaTable", table);
+		RegisterTable("EnemyAngryTable", table);
+		RegisterTable("EnemyActionTable", table);
+		RegisterTable("NpcLevelTable", table);
+		RegisterTable("NpcLevelSpecialTable", table);
+		RegisterTable("FieldMapEnemyPopTimeZoneTable", table);
+		RegisterTable("GatherItemTable", table);
+		RegisterTable("AssignedEquipmentTable", table);
+		RegisterTable("SymbolTable", table);
+		RegisterTable("ProductDataTable", table);
 	}
 
 	public void RegisterTable(string name, IDataTable table, string dependencyTableName = null)
@@ -758,7 +795,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	public static string DecompressToString(byte[] bytes)
 	{
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
+		//IL_001f: Expected O, but got Unknown
 		string text = null;
 		using (MemoryStream memoryStream = new MemoryStream(bytes))
 		{
@@ -775,8 +812,6 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 					catch (Exception)
 					{
 						throw;
-						IL_0035:
-						return text;
 					}
 				}
 			}
@@ -792,7 +827,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		return delegate(byte[] bytes)
 		{
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Expected O, but got Unknown
+			//IL_0020: Expected O, but got Unknown
 			MemoryStream memoryStream = new MemoryStream();
 			using (MemoryStream memoryStream2 = new MemoryStream(bytes))
 			{
@@ -803,7 +838,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 					try
 					{
 						int count;
-						while ((count = val.Read(array, 0, array.Length)) != 0)
+						while ((count = ((Stream)val).Read(array, 0, array.Length)) != 0)
 						{
 							memoryStream.Write(array, 0, count);
 						}
@@ -867,7 +902,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	public void LoadStory(string storyName, Action<string> onComplete)
 	{
 		DataTableInterfaceProxy table = new DataTableInterfaceProxy(onComplete);
-		DataLoadRequest req = CreateRequestLoadTable(storyName, table, false, null);
+		DataLoadRequest req = CreateRequestLoadTable(storyName, table);
 		Request(req);
 	}
 }

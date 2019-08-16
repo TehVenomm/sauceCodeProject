@@ -1,5 +1,6 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
+/* renamed from: android.support.v4.util.LongSparseArray */
 public class LongSparseArray<E> implements Cloneable {
     private static final Object DELETED = new Object();
     private boolean mGarbage;
@@ -24,7 +25,8 @@ public class LongSparseArray<E> implements Cloneable {
         this.mSize = 0;
     }
 
-    private void gc() {
+    /* renamed from: gc */
+    private void m2gc() {
         int i = this.mSize;
         long[] jArr = this.mKeys;
         Object[] objArr = this.mValues;
@@ -47,17 +49,17 @@ public class LongSparseArray<E> implements Cloneable {
     public void append(long j, E e) {
         if (this.mSize == 0 || j > this.mKeys[this.mSize - 1]) {
             if (this.mGarbage && this.mSize >= this.mKeys.length) {
-                gc();
+                m2gc();
             }
             int i = this.mSize;
             if (i >= this.mKeys.length) {
                 int idealLongArraySize = ContainerHelpers.idealLongArraySize(i + 1);
-                Object obj = new long[idealLongArraySize];
-                Object obj2 = new Object[idealLongArraySize];
-                System.arraycopy(this.mKeys, 0, obj, 0, this.mKeys.length);
-                System.arraycopy(this.mValues, 0, obj2, 0, this.mValues.length);
-                this.mKeys = obj;
-                this.mValues = obj2;
+                long[] jArr = new long[idealLongArraySize];
+                Object[] objArr = new Object[idealLongArraySize];
+                System.arraycopy(this.mKeys, 0, jArr, 0, this.mKeys.length);
+                System.arraycopy(this.mValues, 0, objArr, 0, this.mValues.length);
+                this.mKeys = jArr;
+                this.mValues = objArr;
             }
             this.mKeys[i] = j;
             this.mValues[i] = e;
@@ -111,14 +113,14 @@ public class LongSparseArray<E> implements Cloneable {
 
     public int indexOfKey(long j) {
         if (this.mGarbage) {
-            gc();
+            m2gc();
         }
         return ContainerHelpers.binarySearch(this.mKeys, this.mSize, j);
     }
 
     public int indexOfValue(E e) {
         if (this.mGarbage) {
-            gc();
+            m2gc();
         }
         for (int i = 0; i < this.mSize; i++) {
             if (this.mValues[i] == e) {
@@ -130,7 +132,7 @@ public class LongSparseArray<E> implements Cloneable {
 
     public long keyAt(int i) {
         if (this.mGarbage) {
-            gc();
+            m2gc();
         }
         return this.mKeys[i];
     }
@@ -141,32 +143,32 @@ public class LongSparseArray<E> implements Cloneable {
             this.mValues[binarySearch] = e;
             return;
         }
-        binarySearch ^= -1;
-        if (binarySearch >= this.mSize || this.mValues[binarySearch] != DELETED) {
+        int i = binarySearch ^ -1;
+        if (i >= this.mSize || this.mValues[i] != DELETED) {
             if (this.mGarbage && this.mSize >= this.mKeys.length) {
-                gc();
-                binarySearch = ContainerHelpers.binarySearch(this.mKeys, this.mSize, j) ^ -1;
+                m2gc();
+                i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, j) ^ -1;
             }
             if (this.mSize >= this.mKeys.length) {
                 int idealLongArraySize = ContainerHelpers.idealLongArraySize(this.mSize + 1);
-                Object obj = new long[idealLongArraySize];
-                Object obj2 = new Object[idealLongArraySize];
-                System.arraycopy(this.mKeys, 0, obj, 0, this.mKeys.length);
-                System.arraycopy(this.mValues, 0, obj2, 0, this.mValues.length);
-                this.mKeys = obj;
-                this.mValues = obj2;
+                long[] jArr = new long[idealLongArraySize];
+                Object[] objArr = new Object[idealLongArraySize];
+                System.arraycopy(this.mKeys, 0, jArr, 0, this.mKeys.length);
+                System.arraycopy(this.mValues, 0, objArr, 0, this.mValues.length);
+                this.mKeys = jArr;
+                this.mValues = objArr;
             }
-            if (this.mSize - binarySearch != 0) {
-                System.arraycopy(this.mKeys, binarySearch, this.mKeys, binarySearch + 1, this.mSize - binarySearch);
-                System.arraycopy(this.mValues, binarySearch, this.mValues, binarySearch + 1, this.mSize - binarySearch);
+            if (this.mSize - i != 0) {
+                System.arraycopy(this.mKeys, i, this.mKeys, i + 1, this.mSize - i);
+                System.arraycopy(this.mValues, i, this.mValues, i + 1, this.mSize - i);
             }
-            this.mKeys[binarySearch] = j;
-            this.mValues[binarySearch] = e;
+            this.mKeys[i] = j;
+            this.mValues[i] = e;
             this.mSize++;
             return;
         }
-        this.mKeys[binarySearch] = j;
-        this.mValues[binarySearch] = e;
+        this.mKeys[i] = j;
+        this.mValues[i] = e;
     }
 
     public void remove(long j) {
@@ -182,14 +184,14 @@ public class LongSparseArray<E> implements Cloneable {
 
     public void setValueAt(int i, E e) {
         if (this.mGarbage) {
-            gc();
+            m2gc();
         }
         this.mValues[i] = e;
     }
 
     public int size() {
         if (this.mGarbage) {
-            gc();
+            m2gc();
         }
         return this.mSize;
     }
@@ -198,28 +200,28 @@ public class LongSparseArray<E> implements Cloneable {
         if (size() <= 0) {
             return "{}";
         }
-        StringBuilder stringBuilder = new StringBuilder(this.mSize * 28);
-        stringBuilder.append('{');
+        StringBuilder sb = new StringBuilder(this.mSize * 28);
+        sb.append('{');
         for (int i = 0; i < this.mSize; i++) {
             if (i > 0) {
-                stringBuilder.append(", ");
+                sb.append(", ");
             }
-            stringBuilder.append(keyAt(i));
-            stringBuilder.append('=');
-            LongSparseArray valueAt = valueAt(i);
+            sb.append(keyAt(i));
+            sb.append('=');
+            Object valueAt = valueAt(i);
             if (valueAt != this) {
-                stringBuilder.append(valueAt);
+                sb.append(valueAt);
             } else {
-                stringBuilder.append("(this Map)");
+                sb.append("(this Map)");
             }
         }
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        sb.append('}');
+        return sb.toString();
     }
 
     public E valueAt(int i) {
         if (this.mGarbage) {
-            gc();
+            m2gc();
         }
         return this.mValues[i];
     }

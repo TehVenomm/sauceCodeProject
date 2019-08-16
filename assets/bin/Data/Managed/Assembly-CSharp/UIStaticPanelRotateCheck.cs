@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIStaticPanelRotateCheck
+public class UIStaticPanelRotateCheck : MonoBehaviour
 {
 	[SerializeField]
 	protected UIPanel panel;
@@ -45,32 +45,34 @@ public class UIStaticPanelRotateCheck
 
 	protected virtual void Update()
 	{
-		if (!panel.widgetsAreStatic)
+		if (panel.widgetsAreStatic)
 		{
-			updateCount++;
-			if (updateCount >= 3)
+			return;
+		}
+		updateCount++;
+		if (updateCount < 3)
+		{
+			return;
+		}
+		if (updateAnchors)
+		{
+			int i = 0;
+			for (int num = anchors.Length; i < num; i++)
 			{
-				if (updateAnchors)
-				{
-					int i = 0;
-					for (int num = anchors.Length; i < num; i++)
-					{
-						anchors[i].set_enabled(true);
-					}
-					this.GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
-					int j = 0;
-					for (int count = Temporary.uiRectList.Count; j < count; j++)
-					{
-						Temporary.uiRectList[j].UpdateAnchors();
-					}
-					Temporary.uiRectList.Clear();
-					updateAnchors = false;
-				}
-				else
-				{
-					panel.widgetsAreStatic = true;
-				}
+				anchors[i].set_enabled(true);
 			}
+			this.GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
+			int j = 0;
+			for (int count = Temporary.uiRectList.Count; j < count; j++)
+			{
+				Temporary.uiRectList[j].UpdateAnchors();
+			}
+			Temporary.uiRectList.Clear();
+			updateAnchors = false;
+		}
+		else
+		{
+			panel.widgetsAreStatic = true;
 		}
 	}
 

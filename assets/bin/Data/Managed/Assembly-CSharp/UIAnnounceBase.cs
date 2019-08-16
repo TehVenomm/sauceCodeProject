@@ -30,12 +30,20 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 
 	protected override void Awake()
 	{
+		OnAfterAwake();
 		base.Awake();
 		InitAnim();
+		OnBeforeAwake();
+	}
+
+	protected void Start()
+	{
+		OnStart();
 	}
 
 	private void InitAnim()
 	{
+		OnBeforeInitAnimation();
 		int i = 0;
 		for (int num = starAnim.Length; i < num; i++)
 		{
@@ -46,7 +54,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		for (int num2 = effAnim.Length; j < num2; j++)
 		{
 			effAnim[j].set_enabled(false);
-			effAnim[j].Sample(1f, true);
+			effAnim[j].Sample(1f, isFinished: true);
 		}
 		int k = 0;
 		for (int num3 = loopAnim.Length; k < num3; k++)
@@ -58,6 +66,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		{
 			endAnim[l].set_enabled(false);
 		}
+		OnAfterInitAnimation();
 	}
 
 	protected override void OnDisable()
@@ -89,8 +98,6 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 
 	protected bool AnnounceStart()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		if (!this.get_gameObject().get_activeInHierarchy())
 		{
 			return false;
@@ -110,48 +117,78 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 
 	protected IEnumerator Direction()
 	{
-		int i4 = 0;
-		for (int n4 = this.endAnim.Length; i4 < n4; i4++)
+		OnBeforeStartAnimation();
+		int k = 0;
+		for (int num = endAnim.Length; k < num; k++)
 		{
-			this.endAnim[i4].set_enabled(false);
+			endAnim[k].set_enabled(false);
 		}
-		int i3 = 0;
-		for (int n3 = this.starAnim.Length; i3 < n3; i3++)
+		int l = 0;
+		for (int num2 = starAnim.Length; l < num2; l++)
 		{
-			this.starAnim[i3].ResetToBeginning();
-			this.starAnim[i3].PlayForward();
+			starAnim[l].ResetToBeginning();
+			starAnim[l].PlayForward();
 		}
-		int i2 = 0;
-		for (int n2 = this.effAnim.Length; i2 < n2; i2++)
+		int m = 0;
+		for (int num3 = effAnim.Length; m < num3; m++)
 		{
-			this.effAnim[i2].ResetToBeginning();
-			this.effAnim[i2].PlayForward();
+			effAnim[m].ResetToBeginning();
+			effAnim[m].PlayForward();
 		}
 		int n = 0;
-		for (int m = this.loopAnim.Length; n < m; n++)
+		for (int num4 = loopAnim.Length; n < num4; n++)
 		{
-			this.loopAnim[n].ResetToBeginning();
-			this.loopAnim[n].PlayForward();
+			loopAnim[n].ResetToBeginning();
+			loopAnim[n].PlayForward();
 		}
-		yield return (object)new WaitForSeconds(this.GetDispSec());
-		int l = 0;
-		for (int k = this.endAnim.Length; l < k; l++)
+		yield return (object)new WaitForSeconds(GetDispSec());
+		int num5 = 0;
+		for (int num6 = endAnim.Length; num5 < num6; num5++)
 		{
-			this.endAnim[l].ResetToBeginning();
-			this.endAnim[l].PlayForward();
+			endAnim[num5].ResetToBeginning();
+			endAnim[num5].PlayForward();
 		}
 		int j = 0;
-		for (int i = this.endAnim.Length; j < i; j++)
+		for (int i = endAnim.Length; j < i; j++)
 		{
-			while (this.endAnim[j].get_enabled())
+			while (endAnim[j].get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
-		if (this.panelChange != null)
+		if (panelChange != null)
 		{
-			this.panelChange.Lock();
+			panelChange.Lock();
 		}
-		this.routineWork = null;
+		routineWork = null;
+		OnAfterAnimation();
+	}
+
+	protected virtual void OnBeforeAwake()
+	{
+	}
+
+	protected virtual void OnAfterAwake()
+	{
+	}
+
+	protected virtual void OnStart()
+	{
+	}
+
+	protected virtual void OnBeforeInitAnimation()
+	{
+	}
+
+	protected virtual void OnAfterInitAnimation()
+	{
+	}
+
+	protected virtual void OnBeforeStartAnimation()
+	{
+	}
+
+	protected virtual void OnAfterAnimation()
+	{
 	}
 }

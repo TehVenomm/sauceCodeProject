@@ -18,9 +18,6 @@ namespace BestHTTP.Caching
 					FileLocks.Add(uri, value = new object());
 				}
 				return value;
-				IL_0037:
-				object result;
-				return result;
 			}
 		}
 

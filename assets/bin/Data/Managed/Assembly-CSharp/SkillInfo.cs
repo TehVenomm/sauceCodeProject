@@ -41,9 +41,11 @@ public class SkillInfo
 
 		public float useGaugeCounter;
 
+		public bool isUsingSecondGrade;
+
 		public AtkAttribute atk = new AtkAttribute();
 
-		public float atkRate = 1f;
+		public float[] atkRates;
 
 		public int healHp;
 
@@ -57,6 +59,25 @@ public class SkillInfo
 
 		public XorInt useGauge;
 
+		public XorInt useGauge2;
+
+		public float atkRate
+		{
+			get
+			{
+				if (atkRates != null && atkRates.Length > 0)
+				{
+					return atkRates[0];
+				}
+				return 1f;
+			}
+		}
+
+		public XorInt GetMaxGaugeValue()
+		{
+			return (int)useGauge + (int)useGauge2;
+		}
+
 		public bool IsActiveType()
 		{
 			if (tableData == null)
@@ -64,15 +85,55 @@ public class SkillInfo
 				return false;
 			}
 			bool result = false;
-			switch (tableData.type)
+			SKILL_SLOT_TYPE type = tableData.type;
+			if (type == SKILL_SLOT_TYPE.ATTACK || type == SKILL_SLOT_TYPE.HEAL || type == SKILL_SLOT_TYPE.SUPPORT)
 			{
-			case SKILL_SLOT_TYPE.ATTACK:
-			case SKILL_SLOT_TYPE.SUPPORT:
-			case SKILL_SLOT_TYPE.HEAL:
 				result = true;
-				break;
 			}
 			return result;
+		}
+
+		public float GetAttackRateByIndex(int index)
+		{
+			if (atkRates != null && atkRates.Length > index)
+			{
+				return atkRates[index];
+			}
+			return 1f;
+		}
+
+		public int GetSupportValueTotalByType(BuffParam.BUFFTYPE type)
+		{
+			if (tableData == null)
+			{
+				return 0;
+			}
+			int num = 0;
+			for (int i = 0; i < tableData.supportType.Length; i++)
+			{
+				if (tableData.supportType[i] == type)
+				{
+					num += supportValue[i];
+				}
+			}
+			return num;
+		}
+
+		public float GetSupportValueTotalAsRateByType(BuffParam.BUFFTYPE type)
+		{
+			if (tableData == null)
+			{
+				return 0f;
+			}
+			float num = 0f;
+			for (int i = 0; i < tableData.supportType.Length; i++)
+			{
+				if (tableData.supportType[i] == type)
+				{
+					num += (float)supportValue[i] * 0.01f;
+				}
+			}
+			return num;
 		}
 	}
 
@@ -191,11 +252,22 @@ public class SkillInfo
 			return 1f;
 		}
 		float num = skillParam.useGaugeCounter / (float)(int)skillParam.useGauge;
-		if (num > 1f)
+		return Mathf.Clamp01(num);
+	}
+
+	public float GetPercentUseGauge2nd(int skill_index)
+	{
+		if (GetPercentUseGauge(skill_index) < 1f)
 		{
-			num = 1f;
+			return 0f;
 		}
-		return num;
+		SkillParam skillParam = GetSkillParam(skill_index);
+		if ((float)(int)skillParam.useGauge2 <= 0f)
+		{
+			return 0f;
+		}
+		float num = (skillParam.useGaugeCounter - (float)(int)skillParam.useGauge) / (float)(int)skillParam.useGauge2;
+		return Mathf.Clamp01(num);
 	}
 
 	public void OnUpdate()
@@ -204,7 +276,7 @@ public class SkillInfo
 		{
 			float num = MonoBehaviourSingleton<InGameSettingsManager>.I.player.healSkillGaugePerSecond * Time.get_deltaTime();
 			num *= player.buffParam.GetSkillHealSpeedUp();
-			AddUseGauge(num, true, false);
+			AddUseGauge(num, set_only: true);
 		}
 	}
 
@@ -213,7 +285,22 @@ public class SkillInfo
 		SkillParam actSkillParam = this.actSkillParam;
 		if (actSkillParam != null)
 		{
-			actSkillParam.useGaugeCounter = 0f;
+			actSkillParam.isUsingSecondGrade = false;
+			if ((int)actSkillParam.useGauge2 <= 0)
+			{
+				actSkillParam.useGaugeCounter = 0f;
+			}
+			else if (actSkillParam.useGaugeCounter >= (float)(int)actSkillParam.GetMaxGaugeValue())
+			{
+				actSkillParam.useGaugeCounter = 0f;
+				actSkillParam.isUsingSecondGrade = true;
+			}
+			else
+			{
+				float num = actSkillParam.useGaugeCounter - (float)(int)actSkillParam.useGauge;
+				float num2 = num / (float)(int)actSkillParam.useGauge2;
+				actSkillParam.useGaugeCounter = num2 * (float)(int)actSkillParam.useGauge;
+			}
 		}
 	}
 
@@ -223,7 +310,7 @@ public class SkillInfo
 		{
 			float num = (!attack_info.toEnemy.isSpecialAttack) ? player.weaponInfo.healSkillGaugeHitRate : player.weaponInfo.healSkillGaugeHitRateSpecialAttack;
 			float add_gauge = player.playerParameter.healSkillGaugeHit * num * attack_info.atkRate;
-			AddUseGauge(add_gauge, true, true);
+			AddUseGauge(add_gauge, set_only: true, isNotBuff: true);
 		}
 	}
 
@@ -232,7 +319,20 @@ public class SkillInfo
 		if (player.weaponInfo != null)
 		{
 			float add_gauge = player.playerParameter.healSkillGaugeHit * player.playerParameter.ohsActionInfo.Common_CounterHealSkillRate;
-			AddUseGauge(add_gauge, true, true);
+			AddUseGauge(add_gauge, set_only: true, isNotBuff: true);
+		}
+	}
+
+	public void DebugAddUseGauge1st()
+	{
+		int i = 0;
+		for (int num = 9; i < num; i++)
+		{
+			if (skillParams[i].isValid && !((float)(int)skillParams[i].useGauge2 <= 0f))
+			{
+				AddUseGaugeByIndex(i, float.MinValue);
+				AddUseGaugeByIndex(i, (int)skillParams[i].useGauge);
+			}
 		}
 	}
 
@@ -241,79 +341,88 @@ public class SkillInfo
 		int i = 0;
 		for (int num = 9; i < num; i++)
 		{
-			AddUseGaugeByIndex(i, add_gauge, set_only, false, isNotBuff);
+			AddUseGaugeByIndex(i, add_gauge, set_only, isForceSet: false, isNotBuff);
 		}
 	}
 
-	public void AddUseGaugeByIndex(int index, float add_gauge, bool set_only = false, bool isForceSet = false, bool isNotBuff = false)
+	public void AddUseGaugeByIndex(int index, float add_gauge, bool set_only = false, bool isForceSet = false, bool isNotBuff = false, bool isCorrectWaveMatch = true)
 	{
-		if ((!set_only || (index >= weaponOffset && index < weaponOffset + 3)) && skillParams[index].isValid && !IsArenaForbidSlotType(skillParams[index].tableData.type))
+		if ((set_only && (index < weaponOffset || index >= weaponOffset + 3)) || !skillParams[index].isValid || IsArenaForbidSlotType(skillParams[index].tableData.type))
 		{
-			if (!isForceSet && !skillParams[index].tableData.lockBuffTypes.IsNullOrEmpty())
+			return;
+		}
+		if (!isForceSet && !skillParams[index].tableData.lockBuffTypes.IsNullOrEmpty())
+		{
+			int[] lockBuffTypes = skillParams[index].tableData.lockBuffTypes;
+			for (int i = 0; i < lockBuffTypes.Length; i++)
 			{
-				int[] lockBuffTypes = skillParams[index].tableData.lockBuffTypes;
-				for (int i = 0; i < lockBuffTypes.Length; i++)
+				if (player.IsValidBuff((BuffParam.BUFFTYPE)lockBuffTypes[i]))
 				{
-					if (player.IsValidBuff((BuffParam.BUFFTYPE)lockBuffTypes[i]))
-					{
-						return;
-					}
+					return;
 				}
-			}
-			if (!player.IsValidShield() || !player.buffParam.IsValidShieldBuff(skillParams[index].skillIndex) || isForceSet)
-			{
-				if (player.IsValidShield())
-				{
-					int shieldFromSkillIndex = player.buffParam.GetShieldFromSkillIndex();
-					if (shieldFromSkillIndex < 0 || (IsSkillApplyShield(skillParams[index].tableData) && IsExistShieldInLockBuffTypes(skillParams[shieldFromSkillIndex].tableData.lockBuffTypes) && !isForceSet))
-					{
-						return;
-					}
-				}
-				float useGaugeCounter = skillParams[index].useGaugeCounter;
-				float num = add_gauge;
-				if (isNotBuff)
-				{
-					num *= player.buffParam.GetSkillAbsorbUp((skillParams[index].tableData.type != SKILL_SLOT_TYPE.ATTACK) ? ELEMENT_TYPE.MAX : skillParams[index].tableData.skillAtkType);
-					if (QuestManager.IsValidInGameWaveMatch() && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
-					{
-						InGameSettingsManager.WaveMatchParam waveMatchParam = MonoBehaviourSingleton<InGameSettingsManager>.I.waveMatchParam;
-						switch (waveMatchParam.skillGaugeType)
-						{
-						case InGameSettingsManager.WaveMatchParam.eGaugeType.Zero:
-							return;
-						case InGameSettingsManager.WaveMatchParam.eGaugeType.Rate:
-							num *= waveMatchParam.skillGaugeValue;
-							break;
-						case InGameSettingsManager.WaveMatchParam.eGaugeType.Constant:
-							num = waveMatchParam.skillGaugeValue;
-							break;
-						}
-					}
-				}
-				if (num == 3.40282347E+38f)
-				{
-					useGaugeCounter = (float)(int)skillParams[index].useGauge;
-				}
-				else if (num == -3.40282347E+38f)
-				{
-					useGaugeCounter = 0f;
-				}
-				else
-				{
-					useGaugeCounter += num;
-					if (useGaugeCounter < 0f)
-					{
-						useGaugeCounter = 0f;
-					}
-					if (useGaugeCounter > (float)(int)skillParams[index].useGauge)
-					{
-						useGaugeCounter = (float)(int)skillParams[index].useGauge;
-					}
-				}
-				skillParams[index].useGaugeCounter = useGaugeCounter;
 			}
 		}
+		if (player.IsValidShield() && player.buffParam.IsValidShieldBuff(skillParams[index].skillIndex) && !isForceSet)
+		{
+			return;
+		}
+		if (player.IsValidShield())
+		{
+			int shieldFromSkillIndex = player.buffParam.GetShieldFromSkillIndex();
+			if (shieldFromSkillIndex < 0 || (IsSkillApplyShield(skillParams[index].tableData) && IsExistShieldInLockBuffTypes(skillParams[shieldFromSkillIndex].tableData.lockBuffTypes) && !isForceSet))
+			{
+				return;
+			}
+		}
+		float useGaugeCounter = skillParams[index].useGaugeCounter;
+		float num = add_gauge;
+		if (isNotBuff)
+		{
+			if (skillParams[index].tableData.GetAttackElementNum() <= 1)
+			{
+				num *= player.buffParam.GetSkillAbsorbUp((skillParams[index].tableData.type != SKILL_SLOT_TYPE.ATTACK) ? ELEMENT_TYPE.MAX : skillParams[index].tableData.skillAtkType);
+			}
+			else if (skillParams[index].tableData.type == SKILL_SLOT_TYPE.ATTACK)
+			{
+				num *= player.buffParam.GetSkillAbsorbUpByElementList(skillParams[index].tableData.skillAtkTypes);
+			}
+			if (isCorrectWaveMatch && QuestManager.IsValidInGameWaveMatch() && MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+			{
+				InGameSettingsManager.WaveMatchParam waveMatchParam = MonoBehaviourSingleton<InGameSettingsManager>.I.GetWaveMatchParam();
+				switch (waveMatchParam.skillGaugeType)
+				{
+				case InGameSettingsManager.WaveMatchParam.eGaugeType.Zero:
+					return;
+				case InGameSettingsManager.WaveMatchParam.eGaugeType.Rate:
+					num *= waveMatchParam.skillGaugeValue;
+					break;
+				case InGameSettingsManager.WaveMatchParam.eGaugeType.Constant:
+					num = waveMatchParam.skillGaugeValue;
+					break;
+				}
+			}
+		}
+		if (num == float.MaxValue)
+		{
+			useGaugeCounter = (int)skillParams[index].GetMaxGaugeValue();
+		}
+		else if (num == float.MinValue)
+		{
+			useGaugeCounter = 0f;
+		}
+		else
+		{
+			useGaugeCounter += num;
+			if (useGaugeCounter < 0f)
+			{
+				useGaugeCounter = 0f;
+			}
+			if (useGaugeCounter > (float)(int)skillParams[index].GetMaxGaugeValue())
+			{
+				useGaugeCounter = (int)skillParams[index].GetMaxGaugeValue();
+			}
+		}
+		skillParams[index].useGaugeCounter = useGaugeCounter;
 	}
 
 	public void SetUseGaugeFull()
@@ -323,7 +432,7 @@ public class SkillInfo
 		{
 			if (skillParams[i].isValid)
 			{
-				skillParams[i].useGaugeCounter = (float)(int)skillParams[i].useGauge;
+				skillParams[i].useGaugeCounter = (int)skillParams[i].GetMaxGaugeValue();
 			}
 		}
 	}
@@ -336,6 +445,18 @@ public class SkillInfo
 			if (skillParams[i].isValid)
 			{
 				skillParams[i].useGaugeCounter = 0f;
+			}
+		}
+	}
+
+	public void ResetSecondGradeFlags()
+	{
+		int i = 0;
+		for (int num = 9; i < num; i++)
+		{
+			if (skillParams[i].isValid)
+			{
+				skillParams[i].isUsingSecondGrade = false;
 			}
 		}
 	}
@@ -356,160 +477,186 @@ public class SkillInfo
 			SkillParam skillParam = new SkillParam();
 			skillParam.skillIndex = j;
 			skillParams.Add(skillParam);
-			if (skill_settings != null && Singleton<SkillItemTable>.IsValid())
+			if (skill_settings == null || !Singleton<SkillItemTable>.IsValid())
 			{
-				SkillSettingsInfo.Element element = skill_settings.elementList[j];
-				if (element != null)
+				continue;
+			}
+			SkillSettingsInfo.Element element = skill_settings.elementList[j];
+			if (element == null)
+			{
+				continue;
+			}
+			skillParam.baseInfo = element.baseInfo;
+			skillParam.useGaugeCounter = element.useGaugeCounter;
+			if (skillParam.baseInfo == null || skillParam.baseInfo.id == 0)
+			{
+				continue;
+			}
+			skillParam.tableData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)skillParam.baseInfo.id);
+			if (skillParam.tableData == null || !skillParam.IsActiveType())
+			{
+				continue;
+			}
+			if (weapon_list[j / 3] != null)
+			{
+				EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)weapon_list[j / 3].eId);
+				if (equipItemData != null && !skillParam.tableData.IsEnableEquipType(equipItemData.type))
 				{
-					skillParam.baseInfo = element.baseInfo;
-					skillParam.useGaugeCounter = element.useGaugeCounter;
-					if (skillParam.baseInfo != null && skillParam.baseInfo.id != 0)
+					continue;
+				}
+			}
+			switch (skillParam.tableData.skillAtkType)
+			{
+			case ELEMENT_TYPE.FIRE:
+				skillParam.atk.fire = (int)skillParam.tableData.skillAtk;
+				break;
+			case ELEMENT_TYPE.WATER:
+				skillParam.atk.water = (int)skillParam.tableData.skillAtk;
+				break;
+			case ELEMENT_TYPE.THUNDER:
+				skillParam.atk.thunder = (int)skillParam.tableData.skillAtk;
+				break;
+			case ELEMENT_TYPE.SOIL:
+				skillParam.atk.soil = (int)skillParam.tableData.skillAtk;
+				break;
+			case ELEMENT_TYPE.LIGHT:
+				skillParam.atk.light = (int)skillParam.tableData.skillAtk;
+				break;
+			case ELEMENT_TYPE.DARK:
+				skillParam.atk.dark = (int)skillParam.tableData.skillAtk;
+				break;
+			default:
+				skillParam.atk.normal = (int)skillParam.tableData.skillAtk;
+				break;
+			}
+			int attackElementNum = skillParam.tableData.GetAttackElementNum();
+			if (attackElementNum > 0)
+			{
+				skillParam.atkRates = new float[attackElementNum];
+				for (int k = 0; k < attackElementNum; k++)
+				{
+					skillParam.atkRates[k] = (float)(int)skillParam.tableData.skillAtkRates[k] * 0.01f;
+				}
+			}
+			skillParam.healHp = skillParam.tableData.healHp;
+			for (int l = 0; l < 3; l++)
+			{
+				skillParam.supportValue[l] = skillParam.tableData.supportValue[l];
+				skillParam.supportTime[l] = skillParam.tableData.supportTime[l];
+			}
+			skillParam.castTimeRate = 0f;
+			skillParam.useGauge = skillParam.tableData.useGauge;
+			skillParam.useGauge2 = skillParam.tableData.useGauge2;
+			if (Singleton<GrowSkillItemTable>.IsValid())
+			{
+				GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillParam.tableData.growID, skillParam.baseInfo.level, skillParam.baseInfo.exceedCnt);
+				if (growSkillItemData != null)
+				{
+					float num2 = growSkillItemData.GetGrowParamSkillAtk(skillParam.tableData.skillAtk);
+					switch (skillParam.tableData.skillAtkType)
 					{
-						skillParam.tableData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)skillParam.baseInfo.id);
-						if (skillParam.tableData != null && skillParam.IsActiveType())
+					case ELEMENT_TYPE.FIRE:
+						skillParam.atk.fire = num2;
+						break;
+					case ELEMENT_TYPE.WATER:
+						skillParam.atk.water = num2;
+						break;
+					case ELEMENT_TYPE.THUNDER:
+						skillParam.atk.thunder = num2;
+						break;
+					case ELEMENT_TYPE.SOIL:
+						skillParam.atk.soil = num2;
+						break;
+					case ELEMENT_TYPE.LIGHT:
+						skillParam.atk.light = num2;
+						break;
+					case ELEMENT_TYPE.DARK:
+						skillParam.atk.dark = num2;
+						break;
+					default:
+						skillParam.atk.normal = num2;
+						break;
+					}
+					if (attackElementNum > 0)
+					{
+						for (int m = 0; m < attackElementNum; m++)
 						{
-							if (weapon_list[j / 3] != null)
-							{
-								EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)weapon_list[j / 3].eId);
-								if (equipItemData != null && !skillParam.tableData.IsEnableEquipType(equipItemData.type))
-								{
-									continue;
-								}
-							}
-							switch (skillParam.tableData.skillAtkType)
-							{
-							case ELEMENT_TYPE.FIRE:
-								skillParam.atk.fire = (float)(int)skillParam.tableData.skillAtk;
-								break;
-							case ELEMENT_TYPE.WATER:
-								skillParam.atk.water = (float)(int)skillParam.tableData.skillAtk;
-								break;
-							case ELEMENT_TYPE.THUNDER:
-								skillParam.atk.thunder = (float)(int)skillParam.tableData.skillAtk;
-								break;
-							case ELEMENT_TYPE.SOIL:
-								skillParam.atk.soil = (float)(int)skillParam.tableData.skillAtk;
-								break;
-							case ELEMENT_TYPE.LIGHT:
-								skillParam.atk.light = (float)(int)skillParam.tableData.skillAtk;
-								break;
-							case ELEMENT_TYPE.DARK:
-								skillParam.atk.dark = (float)(int)skillParam.tableData.skillAtk;
-								break;
-							default:
-								skillParam.atk.normal = (float)(int)skillParam.tableData.skillAtk;
-								break;
-							}
-							skillParam.atkRate = (float)(int)skillParam.tableData.skillAtkRate * 0.01f;
-							skillParam.healHp = skillParam.tableData.healHp;
-							for (int k = 0; k < 3; k++)
-							{
-								skillParam.supportValue[k] = skillParam.tableData.supportValue[k];
-								skillParam.supportTime[k] = skillParam.tableData.supportTime[k];
-							}
-							skillParam.castTimeRate = 0f;
-							skillParam.useGauge = skillParam.tableData.useGauge;
-							if (Singleton<GrowSkillItemTable>.IsValid())
-							{
-								GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillParam.tableData.growID, skillParam.baseInfo.level);
-								if (growSkillItemData != null)
-								{
-									float num2 = (float)growSkillItemData.GetGrowParamSkillAtk(skillParam.tableData.skillAtk);
-									switch (skillParam.tableData.skillAtkType)
-									{
-									case ELEMENT_TYPE.FIRE:
-										skillParam.atk.fire = num2;
-										break;
-									case ELEMENT_TYPE.WATER:
-										skillParam.atk.water = num2;
-										break;
-									case ELEMENT_TYPE.THUNDER:
-										skillParam.atk.thunder = num2;
-										break;
-									case ELEMENT_TYPE.SOIL:
-										skillParam.atk.soil = num2;
-										break;
-									case ELEMENT_TYPE.LIGHT:
-										skillParam.atk.light = num2;
-										break;
-									case ELEMENT_TYPE.DARK:
-										skillParam.atk.dark = num2;
-										break;
-									default:
-										skillParam.atk.normal = num2;
-										break;
-									}
-									skillParam.atkRate = (float)growSkillItemData.GetGrowParamSkillAtkRate(skillParam.tableData.skillAtkRate) * 0.01f;
-									skillParam.healHp = growSkillItemData.GetGrowParamHealHp(skillParam.tableData.healHp);
-									for (int l = 0; l < 3; l++)
-									{
-										skillParam.supportValue[l] = growSkillItemData.GetGrowParamSupprtValue(skillParam.tableData.supportValue, l);
-										skillParam.supportTime[l] = growSkillItemData.GetGrowParamSupprtTime(skillParam.tableData.supportTime, l);
-									}
-									skillParam.castTimeRate = growSkillItemData.GetGrowParamCastTimeRate();
-									skillParam.useGauge = growSkillItemData.GetGrowParamUseGauge(skillParam.tableData.useGauge);
-								}
-							}
-							if (Singleton<ExceedSkillItemTable>.IsValid())
-							{
-								ExceedSkillItemTable.ExceedSkillItemData exceedSkillItemData = Singleton<ExceedSkillItemTable>.I.GetExceedSkillItemData(skillParam.baseInfo.exceedCnt);
-								if (exceedSkillItemData != null)
-								{
-									skillParam.useGauge = exceedSkillItemData.GetExceedUseGauge(skillParam.useGauge);
-								}
-							}
-							if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
-							{
-								InGameSettingsManager.ArenaParam arenaParam = i2.arenaParam;
-								if ((float)skillParam.baseInfo.exceedCnt < arenaParam.magiSpeedDownRegistSkillExceedLv && i.ContainsArenaCondition(ARENA_CONDITION.RECOVER_MAGI_SPEED_DOWN))
-								{
-									float num3 = arenaParam.magiSpeedDownRateBase - arenaParam.magiSpeedDownRate * (float)skillParam.baseInfo.exceedCnt;
-									if (num3 < 0f)
-									{
-										num3 = 0f;
-									}
-									SkillParam skillParam2 = skillParam;
-									skillParam2.useGauge = (int)skillParam2.useGauge + Mathf.FloorToInt((float)(int)skillParam.useGauge * num3);
-								}
-								if (i.ContainsArenaCondition(ARENA_CONDITION.RECOVER_MAGI_SPEED_UP))
-								{
-									SkillParam skillParam3 = skillParam;
-									skillParam3.useGauge = (int)skillParam3.useGauge - Mathf.FloorToInt((float)(int)skillParam.useGauge * arenaParam.magiSpeedUpBaseRate);
-								}
-							}
-							if (list != null && list.Count > 0)
-							{
-								for (int m = 0; m < list.Count; m++)
-								{
-									if (list[m] != null && list[m].tableData != null && list[m].tableData.name == skillParam.tableData.name && list[m].bullet != null)
-									{
-										skillParam.bullet = list[j].bullet;
-									}
-								}
-							}
-							skillParam.isValid = true;
+							skillParam.atkRates[m] = (float)growSkillItemData.GetGrowParamSkillAtkRate(skillParam.tableData.skillAtkRates[m]) * 0.01f;
 						}
+					}
+					skillParam.healHp = growSkillItemData.GetGrowParamHealHp(skillParam.tableData.healHp);
+					for (int n = 0; n < 3; n++)
+					{
+						skillParam.supportValue[n] = growSkillItemData.GetGrowParamSupprtValue(skillParam.tableData.supportValue, n);
+						skillParam.supportTime[n] = growSkillItemData.GetGrowParamSupprtTime(skillParam.tableData.supportTime, n);
+					}
+					skillParam.castTimeRate = growSkillItemData.GetGrowParamCastTimeRate();
+					skillParam.useGauge = growSkillItemData.GetGrowParamUseGauge(skillParam.tableData.useGauge);
+					skillParam.useGauge2 = growSkillItemData.GetGrowParamUseGauge2(skillParam.tableData.useGauge2);
+				}
+			}
+			if (Singleton<ExceedSkillItemTable>.IsValid())
+			{
+				ExceedSkillItemTable.ExceedSkillItemData exceedSkillItemData = Singleton<ExceedSkillItemTable>.I.GetExceedSkillItemData(skillParam.baseInfo.exceedCnt);
+				if (exceedSkillItemData != null)
+				{
+					skillParam.useGauge = exceedSkillItemData.GetExceedUseGauge(skillParam.useGauge);
+					skillParam.useGauge2 = exceedSkillItemData.GetExceedUseGauge2(skillParam.useGauge2);
+				}
+			}
+			if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
+			{
+				InGameSettingsManager.ArenaParam arenaParam = i2.arenaParam;
+				if ((float)skillParam.baseInfo.exceedCnt < arenaParam.magiSpeedDownRegistSkillExceedLv && i.ContainsArenaCondition(ARENA_CONDITION.RECOVER_MAGI_SPEED_DOWN))
+				{
+					float num3 = arenaParam.magiSpeedDownRateBase - arenaParam.magiSpeedDownRate * (float)skillParam.baseInfo.exceedCnt;
+					if (num3 < 0f)
+					{
+						num3 = 0f;
+					}
+					SkillParam skillParam2 = skillParam;
+					skillParam2.useGauge = (int)skillParam2.useGauge + Mathf.FloorToInt((float)(int)skillParam.useGauge * num3);
+					SkillParam skillParam3 = skillParam;
+					skillParam3.useGauge2 = (int)skillParam3.useGauge2 + Mathf.FloorToInt((float)(int)skillParam.useGauge2 * num3);
+				}
+				if (i.ContainsArenaCondition(ARENA_CONDITION.RECOVER_MAGI_SPEED_UP))
+				{
+					SkillParam skillParam4 = skillParam;
+					skillParam4.useGauge = (int)skillParam4.useGauge - Mathf.FloorToInt((float)(int)skillParam.useGauge * arenaParam.magiSpeedUpBaseRate);
+					SkillParam skillParam5 = skillParam;
+					skillParam5.useGauge2 = (int)skillParam5.useGauge2 - Mathf.FloorToInt((float)(int)skillParam.useGauge2 * arenaParam.magiSpeedUpBaseRate);
+				}
+			}
+			if (list != null && list.Count > 0)
+			{
+				for (int num4 = 0; num4 < list.Count; num4++)
+				{
+					if (list[num4] != null && list[num4].tableData != null && list[num4].tableData.name == skillParam.tableData.name && list[num4].bullet != null)
+					{
+						skillParam.bullet = list[j].bullet;
 					}
 				}
 			}
+			skillParam.isValid = true;
 		}
 		arenaConditionList = i.GetArenaConditions();
-		if (!arenaConditionList.IsNullOrEmpty())
+		if (arenaConditionList.IsNullOrEmpty())
 		{
-			for (int n = 0; n < arenaConditionList.Length; n++)
+			return;
+		}
+		for (int num5 = 0; num5 < arenaConditionList.Length; num5++)
+		{
+			switch (arenaConditionList[num5])
 			{
-				switch (arenaConditionList[n])
-				{
-				case ARENA_CONDITION.FORBID_MAGI_ATTACK:
-					isArenaForbidMagiAttack = true;
-					break;
-				case ARENA_CONDITION.FORBID_MAGI_SUPPORT:
-					isArenaForbidMagiSupport = true;
-					break;
-				case ARENA_CONDITION.FORBID_MAGI_HEAL:
-					isArenaForbidMagiHeal = true;
-					break;
-				}
+			case ARENA_CONDITION.FORBID_MAGI_ATTACK:
+				isArenaForbidMagiAttack = true;
+				break;
+			case ARENA_CONDITION.FORBID_MAGI_SUPPORT:
+				isArenaForbidMagiSupport = true;
+				break;
+			case ARENA_CONDITION.FORBID_MAGI_HEAL:
+				isArenaForbidMagiHeal = true;
+				break;
 			}
 		}
 	}

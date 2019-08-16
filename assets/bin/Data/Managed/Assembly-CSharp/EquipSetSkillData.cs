@@ -25,4 +25,22 @@ public class EquipSetSkillData
 		equipSlotNo = setSkill.slotNo;
 		equipSetNo = setSkill.setNo;
 	}
+
+	public EquipSetSkillData(SkillItem.UniqueEquipSetSlot setSkill)
+	{
+		if (ulong.TryParse(setSkill.euid, out ulong result))
+		{
+			equipItemUniqId = result;
+		}
+		else if (string.IsNullOrEmpty(setSkill.euid))
+		{
+			equipItemUniqId = 0uL;
+		}
+		else
+		{
+			Log.Error("Equip Item EquipUniqueId Error euid:{0}", setSkill.euid);
+		}
+		equipSlotNo = setSkill.slotNo;
+		equipSetNo = 0;
+	}
 }

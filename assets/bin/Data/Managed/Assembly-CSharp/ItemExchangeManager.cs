@@ -60,7 +60,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 		{
 			ulong uniq_id = ulong.Parse(str_uniq_id);
 			SkillItemInfo skillItem = MonoBehaviourSingleton<InventoryManager>.I.GetSkillItem(uniq_id);
-			if (skillItem != null && skillItem.isAttached)
+			if (skillItem != null && (skillItem.isAttached || skillItem.isUniqueAttached))
 			{
 				is_attach = true;
 			}
@@ -137,7 +137,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 		{
 			ulong uniq_id = ulong.Parse(str_uniq_id);
 			AbilityItemInfo abilityItem = MonoBehaviourSingleton<InventoryManager>.I.GetAbilityItem(uniq_id);
-			if (abilityItem != null && abilityItem.equipUniqueId != 0L)
+			if (abilityItem != null && abilityItem.equipUniqueId != 0)
 			{
 				is_attach = true;
 			}

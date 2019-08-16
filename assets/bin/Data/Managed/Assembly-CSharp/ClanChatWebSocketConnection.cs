@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class ClanChatWebSocketConnection : IClanChatConnection
+public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 {
 	private static readonly string STAMP_SYMBOL_BEGIN = "[STMP]";
 
@@ -68,12 +68,10 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 
 	public void Setup(string host, int port, string path, bool autoReconnect = true)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
 		UriBuilder uriBuilder = new UriBuilder("ws", host, port, path);
 		uri = uriBuilder.Uri.ToString();
 		this.autoReconnect = autoReconnect;
-		chatWebSocket = (Utility.CreateGameObjectAndComponent("ClanChatWebSocket", this.get_transform(), -1) as ClanChatWebSocket);
+		chatWebSocket = (Utility.CreateGameObjectAndComponent("ClanChatWebSocket", this.get_transform()) as ClanChatWebSocket);
 	}
 
 	private void OnWebSocketClosed()
@@ -93,7 +91,6 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 
 	private void Reconnect(int count)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		reconnecting = true;
 		this.StartCoroutine(TryReconnect(count));
 	}
@@ -102,21 +99,21 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 	{
 		for (float time = RECONNECT_WAIT_SEC * (float)(RECONNECT_RETRY_LIMIT - count + 1); time > 0f; time -= Time.get_deltaTime())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		TryConnect(delegate(bool success)
 		{
-			((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.reconnecting = false;
+			reconnecting = false;
 			if (!success)
 			{
-				if (((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/).count > 0)
+				if (count > 0)
 				{
-					((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Reconnect(((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/).count - 1);
+					Reconnect(count - 1);
 				}
 			}
 			else
 			{
-				((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Join(((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.roomId, ((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.userName);
+				Join(roomId, userName);
 			}
 		});
 	}
@@ -130,32 +127,27 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 
 	private void TryConnect(Action<bool> onFinished)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Expected O, but got Unknown
 		if (isEstablished)
 		{
-			onFinished?.Invoke(true);
+			onFinished?.Invoke(obj: true);
+			return;
 		}
-		else if (isConnectProcessing)
+		if (isConnectProcessing)
 		{
 			this.StartCoroutine(WaitConnectProcess(onFinished));
+			return;
 		}
-		else
-		{
-			chatWebSocket.ReceivePacketAction = OnReceivePacket;
-			m_ConnectProcess = this.StartCoroutine(ConnectProcess(onFinished));
-		}
+		chatWebSocket.ReceivePacketAction = OnReceivePacket;
+		m_ConnectProcess = this.StartCoroutine(ConnectProcess(onFinished));
 	}
 
 	public void Disconnect(Action onFinished = null)
 	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		if (isEstablished)
 		{
 			chatWebSocket.OnClosed -= OnWebSocketClosed;
-			chatWebSocket.Send(Chat_Model_LeaveRoom_Request.Create(roomId), 0, true);
-			chatWebSocket.Close(1000, "Bye!");
+			chatWebSocket.Send(Chat_Model_LeaveRoom_Request.Create(roomId), 0);
+			chatWebSocket.Close(1000);
 			established = false;
 			joined = false;
 			if ((onFinished != null || this.onDisconnect != null) && !AppMain.isApplicationQuit)
@@ -178,7 +170,7 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 	{
 		while (chatWebSocket.IsOpen())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		onFinished?.Invoke();
 		if (this.onDisconnect != null)
@@ -201,7 +193,7 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 		{
 			if (result)
 			{
-				chatWebSocket.Send(Chat_Model_JoinClanRoom.Create(this.roomId, this.userName), 0, true);
+				chatWebSocket.Send(Chat_Model_JoinClanRoom.Create(this.roomId, this.userName), 0);
 			}
 			else
 			{
@@ -224,7 +216,7 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 		{
 			if (result)
 			{
-				chatWebSocket.Send(Chat_Model_LeaveClanRoom.Create(this.roomId, this.userName), 0, true);
+				chatWebSocket.Send(Chat_Model_LeaveClanRoom.Create(this.roomId, this.userName), 0);
 			}
 			else
 			{
@@ -257,7 +249,7 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 
 	private void Send(string message)
 	{
-		chatWebSocket.Send(Chat_Model_BroadcastClanMessage_Request.Create(roomId, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message), 0, true);
+		chatWebSocket.Send(Chat_Model_BroadcastClanMessage_Request.Create(roomId, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message), 0);
 	}
 
 	public void SendPrivateText(string target_id, string message)
@@ -284,7 +276,7 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 
 	private void SendPrivate(string target_id, string message)
 	{
-		chatWebSocket.Send(Chat_Model_SendToClanMessage_Request.Create(target_id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, roomId, message), 0, true);
+		chatWebSocket.Send(Chat_Model_SendToClanMessage_Request.Create(target_id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, roomId, message), 0);
 	}
 
 	private void OnReceivePacket(ChatPacket packet)
@@ -315,22 +307,23 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 	private void OnJoin(ChatPacket packet)
 	{
 		Chat_Model_JoinClanRoom chat_Model_JoinClanRoom = packet.model as Chat_Model_JoinClanRoom;
-		if (chat_Model_JoinClanRoom != null && chat_Model_JoinClanRoom.errorType == CHAT_ERROR_TYPE.NO_ERROR)
+		if (chat_Model_JoinClanRoom == null || chat_Model_JoinClanRoom.errorType != 0)
 		{
-			long result = 0L;
-			long.TryParse(packet.header.fromId, out result);
-			long result2 = 0L;
-			long.TryParse(chatWebSocket.fromId, out result2);
-			if (result == result2)
+			return;
+		}
+		long result = 0L;
+		long.TryParse(packet.header.fromId, out result);
+		long result2 = 0L;
+		long.TryParse(chatWebSocket.fromId, out result2);
+		if (result == result2)
+		{
+			if (string.IsNullOrEmpty(chat_Model_JoinClanRoom.UserId))
 			{
-				if (string.IsNullOrEmpty(chat_Model_JoinClanRoom.UserId))
-				{
-					joined = true;
-				}
-				if (this.onJoin != null)
-				{
-					this.onJoin(chat_Model_JoinClanRoom.errorType, chat_Model_JoinClanRoom.UserId);
-				}
+				joined = true;
+			}
+			if (this.onJoin != null)
+			{
+				this.onJoin(chat_Model_JoinClanRoom.errorType, chat_Model_JoinClanRoom.UserId);
 			}
 		}
 	}
@@ -338,22 +331,23 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 	private void OnLeave(ChatPacket packet)
 	{
 		Chat_Model_LeaveClanRoom chat_Model_LeaveClanRoom = packet.model as Chat_Model_LeaveClanRoom;
-		if (chat_Model_LeaveClanRoom != null && chat_Model_LeaveClanRoom.errorType == CHAT_ERROR_TYPE.NO_ERROR)
+		if (chat_Model_LeaveClanRoom == null || chat_Model_LeaveClanRoom.errorType != 0)
 		{
-			long result = 0L;
-			long.TryParse(packet.header.fromId, out result);
-			long result2 = 0L;
-			long.TryParse(chatWebSocket.fromId, out result2);
-			if (result == result2)
+			return;
+		}
+		long result = 0L;
+		long.TryParse(packet.header.fromId, out result);
+		long result2 = 0L;
+		long.TryParse(chatWebSocket.fromId, out result2);
+		if (result == result2)
+		{
+			if (chat_Model_LeaveClanRoom.Owner == 1)
 			{
-				if (chat_Model_LeaveClanRoom.Owner == 1)
-				{
-					joined = false;
-				}
-				if (this.onLeave != null)
-				{
-					this.onLeave(chat_Model_LeaveClanRoom.errorType, chat_Model_LeaveClanRoom.UserId);
-				}
+				joined = false;
+			}
+			if (this.onLeave != null)
+			{
+				this.onLeave(chat_Model_LeaveClanRoom.errorType, chat_Model_LeaveClanRoom.UserId);
 			}
 		}
 	}
@@ -479,35 +473,33 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 	{
 		if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
-			onFinished(false);
+			onFinished(obj: false);
+			yield break;
 		}
-		else
+		isConnectProcessing = true;
+		string fromId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
+		chatWebSocket.Connect(uri, fromId, 0);
+		float waitTimeRest = CONNECTION_TRY_TIMEOUT;
+		while (!chatWebSocket.IsConnected() && chatWebSocket.CurrentConnectionStatus != ClanChatWebSocket.CONNECTION_STATUS.ERROR && waitTimeRest > 0f)
 		{
-			isConnectProcessing = true;
-			string fromId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
-			chatWebSocket.Connect(uri, fromId, 0);
-			float waitTimeRest = CONNECTION_TRY_TIMEOUT;
-			while (!chatWebSocket.IsConnected() && chatWebSocket.CurrentConnectionStatus != ClanChatWebSocket.CONNECTION_STATUS.ERROR && waitTimeRest > 0f)
-			{
-				waitTimeRest -= Time.get_deltaTime();
-				yield return (object)null;
-			}
-			m_ConnectProcess = null;
-			established = chatWebSocket.IsConnected();
-			if (established)
-			{
-				chatWebSocket.OnClosed += OnWebSocketClosed;
-			}
-			onFinished?.Invoke(isEstablished);
-			isConnectProcessing = false;
+			waitTimeRest -= Time.get_deltaTime();
+			yield return null;
 		}
+		m_ConnectProcess = null;
+		established = chatWebSocket.IsConnected();
+		if (established)
+		{
+			chatWebSocket.OnClosed += OnWebSocketClosed;
+		}
+		onFinished?.Invoke(isEstablished);
+		isConnectProcessing = false;
 	}
 
 	private IEnumerator WaitConnectProcess(Action<bool> onFinished)
 	{
 		while (isConnectProcessing)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		onFinished?.Invoke(isEstablished);
 	}
@@ -535,8 +527,7 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 
 	private void OnDestroy()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Disconnect(null);
+		Disconnect();
 		if (Object.op_Implicit(chatWebSocket))
 		{
 			Object.Destroy(chatWebSocket.get_gameObject());
@@ -549,7 +540,7 @@ public class ClanChatWebSocketConnection : IClanChatConnection
 		{
 			if (chatWebSocket != null)
 			{
-				Disconnect(null);
+				Disconnect();
 			}
 		}
 		else

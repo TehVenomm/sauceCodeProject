@@ -1,5 +1,6 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
+/* renamed from: android.support.v4.util.CircularIntArray */
 public final class CircularIntArray {
     private int mCapacityBitmask;
     private int[] mElements;
@@ -31,10 +32,10 @@ public final class CircularIntArray {
         if (i2 < 0) {
             throw new RuntimeException("Max array capacity exceeded");
         }
-        Object obj = new int[i2];
-        System.arraycopy(this.mElements, this.mHead, obj, 0, i);
-        System.arraycopy(this.mElements, 0, obj, i, this.mHead);
-        this.mElements = obj;
+        int[] iArr = new int[i2];
+        System.arraycopy(this.mElements, this.mHead, iArr, 0, i);
+        System.arraycopy(this.mElements, 0, iArr, i, this.mHead);
+        this.mElements = iArr;
         this.mHead = 0;
         this.mTail = length;
         this.mCapacityBitmask = i2 - 1;

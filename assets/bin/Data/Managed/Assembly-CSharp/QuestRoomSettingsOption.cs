@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class QuestRoomSettingsOption
+public class QuestRoomSettingsOption : MonoBehaviour
 {
 	public Color texEnableColor;
 
@@ -28,9 +28,9 @@ public class QuestRoomSettingsOption
 	public void SetShowOption(bool is_enable)
 	{
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
 		int num = (lbls != null) ? lbls.Length : 0;
 		if (is_enable)
 		{
@@ -62,6 +62,6 @@ public class QuestRoomSettingsOption
 			spr.spriteName = frameSpriteName[1];
 			tex.color = disableColor;
 		}
-		btn.UpdateColor(true);
+		btn.UpdateColor(instant: true);
 	}
 }

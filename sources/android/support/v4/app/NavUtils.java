@@ -1,4 +1,4 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -8,104 +8,35 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build.VERSION;
 import android.support.annotation.Nullable;
-import android.support.v4.content.IntentCompat;
 import android.util.Log;
 import net.gogame.gowrap.InternalConstants;
-import org.apache.commons.lang3.ClassUtils;
 
+/* renamed from: android.support.v4.app.NavUtils */
 public final class NavUtils {
-    private static final NavUtilsImpl IMPL;
     public static final String PARENT_ACTIVITY = "android.support.PARENT_ACTIVITY";
     private static final String TAG = "NavUtils";
-
-    interface NavUtilsImpl {
-        Intent getParentActivityIntent(Activity activity);
-
-        String getParentActivityName(Context context, ActivityInfo activityInfo);
-
-        void navigateUpTo(Activity activity, Intent intent);
-
-        boolean shouldUpRecreateTask(Activity activity, Intent intent);
-    }
-
-    static class NavUtilsImplBase implements NavUtilsImpl {
-        NavUtilsImplBase() {
-        }
-
-        public Intent getParentActivityIntent(Activity activity) {
-            String parentActivityName = NavUtils.getParentActivityName(activity);
-            if (parentActivityName == null) {
-                return null;
-            }
-            ComponentName componentName = new ComponentName(activity, parentActivityName);
-            try {
-                return NavUtils.getParentActivityName(activity, componentName) == null ? IntentCompat.makeMainActivity(componentName) : new Intent().setComponent(componentName);
-            } catch (NameNotFoundException e) {
-                Log.e(NavUtils.TAG, "getParentActivityIntent: bad parentActivityName '" + parentActivityName + "' in manifest");
-                return null;
-            }
-        }
-
-        public String getParentActivityName(Context context, ActivityInfo activityInfo) {
-            if (activityInfo.metaData == null) {
-                return null;
-            }
-            String string = activityInfo.metaData.getString(NavUtils.PARENT_ACTIVITY);
-            return string != null ? string.charAt(0) == ClassUtils.PACKAGE_SEPARATOR_CHAR ? context.getPackageName() + string : string : null;
-        }
-
-        public void navigateUpTo(Activity activity, Intent intent) {
-            intent.addFlags(InternalConstants.DISKLRUCACHE_MAXSIZE);
-            activity.startActivity(intent);
-            activity.finish();
-        }
-
-        public boolean shouldUpRecreateTask(Activity activity, Intent intent) {
-            String action = activity.getIntent().getAction();
-            return (action == null || action.equals("android.intent.action.MAIN")) ? false : true;
-        }
-    }
-
-    static class NavUtilsImplJB extends NavUtilsImplBase {
-        NavUtilsImplJB() {
-        }
-
-        public Intent getParentActivityIntent(Activity activity) {
-            Intent parentActivityIntent = NavUtilsJB.getParentActivityIntent(activity);
-            return parentActivityIntent == null ? superGetParentActivityIntent(activity) : parentActivityIntent;
-        }
-
-        public String getParentActivityName(Context context, ActivityInfo activityInfo) {
-            String parentActivityName = NavUtilsJB.getParentActivityName(activityInfo);
-            return parentActivityName == null ? super.getParentActivityName(context, activityInfo) : parentActivityName;
-        }
-
-        public void navigateUpTo(Activity activity, Intent intent) {
-            NavUtilsJB.navigateUpTo(activity, intent);
-        }
-
-        public boolean shouldUpRecreateTask(Activity activity, Intent intent) {
-            return NavUtilsJB.shouldUpRecreateTask(activity, intent);
-        }
-
-        Intent superGetParentActivityIntent(Activity activity) {
-            return super.getParentActivityIntent(activity);
-        }
-    }
-
-    static {
-        if (VERSION.SDK_INT >= 16) {
-            IMPL = new NavUtilsImplJB();
-        } else {
-            IMPL = new NavUtilsImplBase();
-        }
-    }
 
     private NavUtils() {
     }
 
     public static Intent getParentActivityIntent(Activity activity) {
-        return IMPL.getParentActivityIntent(activity);
+        if (VERSION.SDK_INT >= 16) {
+            Intent parentActivityIntent = activity.getParentActivityIntent();
+            if (parentActivityIntent != null) {
+                return parentActivityIntent;
+            }
+        }
+        String parentActivityName = getParentActivityName(activity);
+        if (parentActivityName == null) {
+            return null;
+        }
+        ComponentName componentName = new ComponentName(activity, parentActivityName);
+        try {
+            return getParentActivityName(activity, componentName) == null ? Intent.makeMainActivity(componentName) : new Intent().setComponent(componentName);
+        } catch (NameNotFoundException e) {
+            Log.e(TAG, "getParentActivityIntent: bad parentActivityName '" + parentActivityName + "' in manifest");
+            return null;
+        }
     }
 
     public static Intent getParentActivityIntent(Context context, ComponentName componentName) throws NameNotFoundException {
@@ -114,7 +45,7 @@ public final class NavUtils {
             return null;
         }
         ComponentName componentName2 = new ComponentName(componentName.getPackageName(), parentActivityName);
-        return getParentActivityName(context, componentName2) == null ? IntentCompat.makeMainActivity(componentName2) : new Intent().setComponent(componentName2);
+        return getParentActivityName(context, componentName2) == null ? Intent.makeMainActivity(componentName2) : new Intent().setComponent(componentName2);
     }
 
     public static Intent getParentActivityIntent(Context context, Class<?> cls) throws NameNotFoundException {
@@ -123,21 +54,35 @@ public final class NavUtils {
             return null;
         }
         ComponentName componentName = new ComponentName(context, parentActivityName);
-        return getParentActivityName(context, componentName) == null ? IntentCompat.makeMainActivity(componentName) : new Intent().setComponent(componentName);
+        return getParentActivityName(context, componentName) == null ? Intent.makeMainActivity(componentName) : new Intent().setComponent(componentName);
     }
 
     @Nullable
     public static String getParentActivityName(Activity activity) {
         try {
             return getParentActivityName(activity, activity.getComponentName());
-        } catch (Throwable e) {
+        } catch (NameNotFoundException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
     @Nullable
     public static String getParentActivityName(Context context, ComponentName componentName) throws NameNotFoundException {
-        return IMPL.getParentActivityName(context, context.getPackageManager().getActivityInfo(componentName, 128));
+        ActivityInfo activityInfo = context.getPackageManager().getActivityInfo(componentName, 128);
+        if (VERSION.SDK_INT >= 16) {
+            String str = activityInfo.parentActivityName;
+            if (str != null) {
+                return str;
+            }
+        }
+        if (activityInfo.metaData == null) {
+            return null;
+        }
+        String string = activityInfo.metaData.getString(PARENT_ACTIVITY);
+        if (string == null) {
+            return null;
+        }
+        return string.charAt(0) == '.' ? context.getPackageName() + string : string;
     }
 
     public static void navigateUpFromSameTask(Activity activity) {
@@ -149,10 +94,20 @@ public final class NavUtils {
     }
 
     public static void navigateUpTo(Activity activity, Intent intent) {
-        IMPL.navigateUpTo(activity, intent);
+        if (VERSION.SDK_INT >= 16) {
+            activity.navigateUpTo(intent);
+            return;
+        }
+        intent.addFlags(InternalConstants.DISKLRUCACHE_MAXSIZE);
+        activity.startActivity(intent);
+        activity.finish();
     }
 
     public static boolean shouldUpRecreateTask(Activity activity, Intent intent) {
-        return IMPL.shouldUpRecreateTask(activity, intent);
+        if (VERSION.SDK_INT >= 16) {
+            return activity.shouldUpRecreateTask(intent);
+        }
+        String action = activity.getIntent().getAction();
+        return action != null && !action.equals("android.intent.action.MAIN");
     }
 }

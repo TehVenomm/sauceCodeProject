@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UITexture))]
-public class UIColorPicker
+public class UIColorPicker : MonoBehaviour
 {
 	public static UIColorPicker current;
 
@@ -49,13 +49,10 @@ public class UIColorPicker
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Expected O, but got Unknown
+		//IL_00ee: Expected O, but got Unknown
 		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
 		mTrans = this.get_transform();
@@ -130,9 +127,7 @@ public class UIColorPicker
 		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Expected O, but got Unknown
 		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 val = Vector2.op_Implicit(UICamera.lastEventPosition);
@@ -163,10 +158,8 @@ public class UIColorPicker
 		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Expected O, but got Unknown
 		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
 		v.x = Mathf.Clamp01(v.x);
@@ -198,9 +191,7 @@ public class UIColorPicker
 		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Expected O, but got Unknown
 		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
@@ -209,7 +200,7 @@ public class UIColorPicker
 			value = c;
 			return mPos;
 		}
-		float num = 3.40282347E+38f;
+		float num = float.MaxValue;
 		for (int i = 0; i < mHeight; i++)
 		{
 			float y = ((float)i - 1f) / (float)mHeight;
@@ -266,7 +257,7 @@ public class UIColorPicker
 		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Expected O, but got Unknown
+		//IL_00f2: Expected O, but got Unknown
 		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
@@ -284,7 +275,7 @@ public class UIColorPicker
 		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Expected O, but got Unknown
+		//IL_01da: Expected O, but got Unknown
 		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
@@ -302,7 +293,7 @@ public class UIColorPicker
 		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bd: Expected O, but got Unknown
+		//IL_02c2: Expected O, but got Unknown
 		//IL_0330: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0331: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0343: Unknown result type (might be due to invalid IL or missing references)

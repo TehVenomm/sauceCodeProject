@@ -3,13 +3,13 @@ package com.google.android.gms.games.quest;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.games.GameEntity;
 import java.util.ArrayList;
 
 public final class zzc implements Creator<QuestEntity> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         GameEntity gameEntity = null;
         String str = null;
         long j = 0;
@@ -26,63 +26,63 @@ public final class zzc implements Creator<QuestEntity> {
         int i = 0;
         int i2 = 0;
         ArrayList arrayList = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    gameEntity = (GameEntity) zzb.zza(parcel, readInt, GameEntity.CREATOR);
+                    gameEntity = (GameEntity) SafeParcelReader.createParcelable(parcel, readHeader, GameEntity.CREATOR);
                     break;
                 case 2:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    j = zzb.zzi(parcel, readInt);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 4:
-                    uri = (Uri) zzb.zza(parcel, readInt, Uri.CREATOR);
+                    uri = (Uri) SafeParcelReader.createParcelable(parcel, readHeader, Uri.CREATOR);
                     break;
                 case 5:
-                    str2 = zzb.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 6:
-                    str3 = zzb.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 7:
-                    j2 = zzb.zzi(parcel, readInt);
+                    j2 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 8:
-                    j3 = zzb.zzi(parcel, readInt);
+                    j3 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 9:
-                    uri2 = (Uri) zzb.zza(parcel, readInt, Uri.CREATOR);
+                    uri2 = (Uri) SafeParcelReader.createParcelable(parcel, readHeader, Uri.CREATOR);
                     break;
                 case 10:
-                    str4 = zzb.zzq(parcel, readInt);
+                    str4 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 12:
-                    str5 = zzb.zzq(parcel, readInt);
+                    str5 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 13:
-                    j4 = zzb.zzi(parcel, readInt);
+                    j4 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 14:
-                    j5 = zzb.zzi(parcel, readInt);
+                    j5 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 15:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 16:
-                    i2 = zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 17:
-                    arrayList = zzb.zzc(parcel, readInt, MilestoneEntity.CREATOR);
+                    arrayList = SafeParcelReader.createTypedList(parcel, readHeader, MilestoneEntity.CREATOR);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new QuestEntity(gameEntity, str, j, uri, str2, str3, j2, j3, uri2, str4, str5, j4, j5, i, i2, arrayList);
     }
 

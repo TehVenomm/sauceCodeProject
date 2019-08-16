@@ -6,19 +6,27 @@ using UnityEngine;
 
 public class GachaManager : MonoBehaviourSingleton<GachaManager>
 {
+	private int currentGachaIndex;
+
 	public GachaList gachaData
 	{
 		get;
 		private set;
 	}
 
-	public GachaResult gachaResult
+	public List<GachaResult> gachaResultList
 	{
 		get;
 		private set;
 	}
 
-	public int gachaResultPresentCount
+	public GachaResult gachaResultBonus
+	{
+		get;
+		private set;
+	}
+
+	public bool enableFeverDirector
 	{
 		get;
 		private set;
@@ -51,6 +59,59 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 	public GachaManager()
 	{
 		gachaData = new GachaList();
+	}
+
+	public bool IsMultiResult()
+	{
+		return gachaResultList.Count > 1;
+	}
+
+	public bool IsExistNextGachaResult()
+	{
+		return gachaResultList.Count > currentGachaIndex + 1;
+	}
+
+	public bool IsResultBonus()
+	{
+		return gachaResultBonus != null;
+	}
+
+	public void ResetGachaIndex()
+	{
+		currentGachaIndex = 0;
+		enableFeverDirector = false;
+	}
+
+	public void IncrementGachaIndex()
+	{
+		currentGachaIndex++;
+	}
+
+	public void SetNextFever()
+	{
+		enableFeverDirector = true;
+	}
+
+	public GachaResult GetCurrentGachaResult()
+	{
+		if (gachaResultList == null)
+		{
+			return null;
+		}
+		return gachaResultList[currentGachaIndex];
+	}
+
+	public GachaResult GetNextGachaResult()
+	{
+		if (gachaResultList == null)
+		{
+			return null;
+		}
+		if (gachaResultList.Count <= currentGachaIndex + 1)
+		{
+			return null;
+		}
+		return gachaResultList[currentGachaIndex + 1];
 	}
 
 	public void ResetGachaType()
@@ -88,21 +149,22 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 			for (int j = 0; j < gachaType.groups.Count; j++)
 			{
 				GachaList.GachaGroup gachaGroup = gachaType.groups[j];
-				if (gachaGroup.gachas.Count > gachaIndex)
+				if (gachaGroup.gachas.Count <= gachaIndex)
 				{
-					GachaList.Gacha gacha = gachaGroup.gachas[gachaIndex];
-					if (gacha.gachaId == gachaId)
+					continue;
+				}
+				GachaList.Gacha gacha = gachaGroup.gachas[gachaIndex];
+				if (gacha.gachaId == gachaId)
+				{
+					result = gacha;
+					gacha_type = gachaType.ViewType;
+					real_type = gachaType.Type;
+					guaranteeInfo = gachaGroup.gachaGuaranteeCampaignInfo.Find((GachaGuaranteeCampaignInfo info) => info.gachaId == gachaId);
+					if (guaranteeInfo == null)
 					{
-						result = gacha;
-						gacha_type = gachaType.ViewType;
-						real_type = gachaType.Type;
-						guaranteeInfo = gachaGroup.gachaGuaranteeCampaignInfo.Find((GachaGuaranteeCampaignInfo info) => info.gachaId == gachaId);
-						if (guaranteeInfo == null)
-						{
-							guaranteeInfo = new GachaGuaranteeCampaignInfo();
-						}
-						return result;
+						guaranteeInfo = new GachaGuaranteeCampaignInfo();
 					}
+					return result;
 				}
 			}
 		}
@@ -116,13 +178,19 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 
 	public RARITY_TYPE GetMaxRarity()
 	{
+		List<GachaResult.GachaReward> reward = GetCurrentGachaResult().reward;
+		return GetMaxRarity(reward);
+	}
+
+	public RARITY_TYPE GetMaxRarity(List<GachaResult.GachaReward> rewardList)
+	{
 		RARITY_TYPE rARITY_TYPE = RARITY_TYPE.D;
-		if (gachaResult != null && gachaResult.reward != null)
+		if (rewardList != null)
 		{
 			int i = 0;
-			for (int count = gachaResult.reward.Count; i < count; i++)
+			for (int count = rewardList.Count; i < count; i++)
 			{
-				GachaResult.GachaReward gachaReward = gachaResult.reward[i];
+				GachaResult.GachaReward gachaReward = rewardList[i];
 				RARITY_TYPE rARITY_TYPE2 = RARITY_TYPE.D;
 				switch (selectGachaType)
 				{
@@ -154,6 +222,40 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		return rARITY_TYPE;
 	}
 
+	public int GetCountOverRarity(List<GachaResult.GachaReward> rewardList, RARITY_TYPE rarity)
+	{
+		int num = 0;
+		if (rewardList != null)
+		{
+			for (int i = 0; i < rewardList.Count; i++)
+			{
+				GachaResult.GachaReward gachaReward = rewardList[i];
+				switch (selectGachaType)
+				{
+				case GACHA_TYPE.QUEST:
+				{
+					QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)gachaReward.itemId);
+					if (questData != null && questData.rarity >= rarity)
+					{
+						num++;
+					}
+					break;
+				}
+				case GACHA_TYPE.SKILL:
+				{
+					SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)gachaReward.itemId);
+					if (skillItemData != null && skillItemData.rarity >= rarity)
+					{
+						num++;
+					}
+					break;
+				}
+				}
+			}
+		}
+		return num;
+	}
+
 	public bool IsReam()
 	{
 		if (selectGacha == null)
@@ -171,96 +273,101 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		}
 	}
 
-	private void TrackGachaEvent()
+	private void TrackGachaEvent(GachaResult result)
 	{
-		if (selectGacha.crystalNum != 0 || selectGacha.requiredItemId != 0)
+		if ((selectGacha.crystalNum == 0 && selectGacha.requiredItemId == 0) || result == null || result.reward == null || result.reward.Count == 0)
 		{
-			if (selectGachaType == GACHA_TYPE.QUEST)
+			return;
+		}
+		if (selectGachaType == GACHA_TYPE.QUEST)
+		{
+			int count = result.reward.Count;
+			int[] array = new int[count];
+			int i = 0;
+			for (int count2 = result.reward.Count; i < count2; i++)
 			{
-				int[] array = new int[gachaResult.reward.Count];
-				int i = 0;
-				for (int count = gachaResult.reward.Count; i < count; i++)
-				{
-					array[i] = gachaResult.reward[i].itemId;
-				}
-				Dictionary<string, object> dictionary = new Dictionary<string, object>();
-				dictionary.Add("quest_id", array.ToJoinString(",", null));
-				dictionary.Add("amount", array.Length);
-				if (selectGacha.crystalNum > 0)
-				{
-					dictionary.Add("currency_type", "gem");
-					dictionary.Add("currency_value", selectGacha.crystalNum);
-				}
-				else if (selectGacha.requiredItemId != 0)
-				{
-					dictionary.Add("currency_type", "ticket");
-					dictionary.Add("currency_value", selectGacha.needItemNum);
-				}
-				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_monster", "Credit_Spend", dictionary);
+				array[i] = result.reward[i].itemId;
 			}
-			else if (selectGachaType == GACHA_TYPE.SKILL)
+			Dictionary<string, object> dictionary = new Dictionary<string, object>();
+			dictionary.Add("quest_id", array.ToJoinString());
+			dictionary.Add("amount", array.Length);
+			if (selectGacha.crystalNum > 0)
 			{
-				int[] array2 = new int[gachaResult.reward.Count];
-				int j = 0;
-				for (int count2 = gachaResult.reward.Count; j < count2; j++)
-				{
-					array2[j] = gachaResult.reward[j].itemId;
-				}
-				Dictionary<string, object> dictionary2 = new Dictionary<string, object>();
-				dictionary2.Add("skill_id", array2.ToJoinString(",", null));
-				dictionary2.Add("amount", array2.Length);
-				if (selectGacha.crystalNum > 0)
-				{
-					dictionary2.Add("currency_type", "gem");
-					dictionary2.Add("currency_value", selectGacha.crystalNum);
-				}
-				else if (selectGacha.requiredItemId != 0)
-				{
-					dictionary2.Add("currency_type", "ticket");
-					dictionary2.Add("currency_value", selectGacha.needItemNum);
-				}
-				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_magi", "Credit_Spend", dictionary2);
+				dictionary.Add("currency_type", "gem");
+				dictionary.Add("currency_value", selectGacha.crystalNum);
 			}
+			else if (selectGacha.requiredItemId != 0)
+			{
+				dictionary.Add("currency_type", "ticket");
+				dictionary.Add("currency_value", selectGacha.needItemNum);
+			}
+			MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_monster", "Credit_Spend", dictionary);
+		}
+		else if (selectGachaType == GACHA_TYPE.SKILL)
+		{
+			int[] array2 = new int[result.reward.Count];
+			int j = 0;
+			for (int count3 = result.reward.Count; j < count3; j++)
+			{
+				array2[j] = result.reward[j].itemId;
+			}
+			Dictionary<string, object> dictionary2 = new Dictionary<string, object>();
+			dictionary2.Add("skill_id", array2.ToJoinString());
+			dictionary2.Add("amount", array2.Length);
+			if (selectGacha.crystalNum > 0)
+			{
+				dictionary2.Add("currency_type", "gem");
+				dictionary2.Add("currency_value", selectGacha.crystalNum);
+			}
+			else if (selectGacha.requiredItemId != 0)
+			{
+				dictionary2.Add("currency_type", "ticket");
+				dictionary2.Add("currency_value", selectGacha.needItemNum);
+			}
+			MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_magi", "Credit_Spend", dictionary2);
 		}
 	}
 
-	private void SortGachaResult()
+	private void SortGachaResult(List<GachaResult.GachaReward> rewardList)
 	{
 		int num = -1;
+		bool flag = false;
 		int index = -1;
-		if (selectGachaType == GACHA_TYPE.QUEST)
+		if (rewardList[0].rewardType == 6)
 		{
 			int i = 0;
-			for (int count = gachaResult.reward.Count; i < count; i++)
+			for (int count = rewardList.Count; i < count; i++)
 			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)gachaResult.reward[i].itemId);
-				if (questData != null && (int)questData.rarity > num)
+				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)rewardList[i].itemId);
+				if (questData != null && ((int)questData.rarity > num || (questData.rarity == (RARITY_TYPE)num && !flag && 0 < rewardList[i].lotGroupNo)))
 				{
 					num = (int)questData.rarity;
+					flag = (0 < rewardList[i].lotGroupNo);
 					index = i;
 				}
 			}
 		}
 		else
 		{
-			if (selectGachaType != GACHA_TYPE.SKILL)
+			if (rewardList[0].rewardType != 5)
 			{
 				return;
 			}
 			int j = 0;
-			for (int count2 = gachaResult.reward.Count; j < count2; j++)
+			for (int count2 = rewardList.Count; j < count2; j++)
 			{
-				SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)gachaResult.reward[j].itemId);
-				if (skillItemData != null && (int)skillItemData.rarity > num)
+				SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)rewardList[j].itemId);
+				if (skillItemData != null && ((int)skillItemData.rarity > num || (skillItemData.rarity == (RARITY_TYPE)num && !flag && 0 < rewardList[j].lotGroupNo)))
 				{
 					num = (int)skillItemData.rarity;
+					flag = (0 < rewardList[j].lotGroupNo);
 					index = j;
 				}
 			}
 		}
-		GachaResult.GachaReward value = gachaResult.reward[index];
-		gachaResult.reward[index] = gachaResult.reward[gachaResult.reward.Count - 1];
-		gachaResult.reward[gachaResult.reward.Count - 1] = value;
+		GachaResult.GachaReward value = rewardList[index];
+		rewardList[index] = rewardList[rewardList.Count - 1];
+		rewardList[rewardList.Count - 1] = value;
 	}
 
 	public void SendGetGacha(Action<bool> call_back)
@@ -281,26 +388,33 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 				{
 					type.groups.ForEach(delegate(GachaList.GachaGroup gr)
 					{
-						List<GachaList.Gacha> source = (from g in gr.gachas
+						List<GachaList.Gacha> oncePurchaseGachaList = (from g in gr.gachas
 						where g.IsOncePurchase()
 						select g).ToList();
-						int num = source.Count();
+						int num = oncePurchaseGachaList.Count();
 						for (int i = 0; i < num; i++)
 						{
-							GachaList.Gacha gacha = source.ElementAt(i);
+							GachaList.Gacha gacha = oncePurchaseGachaList.ElementAt(i);
 							int gachaId = gacha.gachaId;
-							gr.gachas.Remove(gacha);
-							int targetSubGroup = (from g in gr.gachas
+							List<GachaList.Gacha> list = (from g in gr.gachas
 							where g.gachaId == gachaId
-							select g.subGroup).First();
-							int index = (from ano in gr.gachas.Select((GachaList.Gacha g, int j) => new
+							where oncePurchaseGachaList.IndexOf(g) == -1
+							select g).ToList();
+							if (list.Count > 0)
 							{
-								Content = g,
-								Index = j
-							})
-							where ano.Content.subGroup == targetSubGroup
-							select ano.Index).First();
-							gr.gachas.Insert(index, gacha);
+								gr.gachas.Remove(gacha);
+								int targetSubGroup = (from g in gr.gachas
+								where g.gachaId == gachaId
+								select g.subGroup).First();
+								int index = (from ano in gr.gachas.Select((GachaList.Gacha g, int j) => new
+								{
+									Content = g,
+									Index = j
+								})
+								where ano.Content.subGroup == targetSubGroup
+								select ano.Index).First();
+								gr.gachas.Insert(index, gacha);
+							}
 						}
 					});
 				});
@@ -310,29 +424,47 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		}, string.Empty);
 	}
 
-	public void SendGachaGacha(int gachaId, int requiredItemId, string productId, int campaignId, int campaignType, int remainCount, int userCount, bool isStepUpTicket, Action<Error> call_back)
+	public void SendGachaGacha(int gachaId, int requiredItemId, string productId, int campaignId, int campaignType, int remainCount, int userCount, bool isStepUpTicket, int seriesId, Action<Error> call_back)
 	{
 		GachaGachaModel.RequestSendForm requestSendForm = new GachaGachaModel.RequestSendForm();
 		requestSendForm.id = gachaId;
 		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-		requestSendForm.ticketCL = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == requiredItemId, 1, true);
+		requestSendForm.ticketCL = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == requiredItemId, 1, isItemNum: true);
 		requestSendForm.productId = productId;
 		requestSendForm.guaranteeCampaignId = campaignId;
 		requestSendForm.guaranteeCampaignType = campaignType;
 		requestSendForm.guaranteeRemainCount = remainCount;
 		requestSendForm.guaranteeUserCount = userCount;
 		requestSendForm.useStepUpTicket = (isStepUpTicket ? 1 : 0);
-		gachaResult = null;
-		int old_present_num = MonoBehaviourSingleton<PresentManager>.I.presentNum;
+		requestSendForm.seriesId = seriesId;
+		gachaResultList = new List<GachaResult>();
+		gachaResultBonus = null;
+		int presentNum = MonoBehaviourSingleton<PresentManager>.I.presentNum;
 		Protocol.Send(GachaGachaModel.URL, requestSendForm, delegate(GachaGachaModel ret)
 		{
 			if (ret.Error == Error.None)
 			{
-				gachaResult = ret.result;
-				if (gachaResult.oncePurchaseItemToShop == null || string.IsNullOrEmpty(gachaResult.oncePurchaseItemToShop.productId))
+				gachaResultList.Add(ret.result);
+				if (ret.resultArray != null && ret.resultArray.Count > 0)
 				{
-					gachaResultPresentCount = MonoBehaviourSingleton<PresentManager>.I.presentNum - old_present_num;
-					SortGachaResult();
+					gachaResultList.AddRange(ret.resultArray);
+				}
+				if (ret.resultBonus.reward != null)
+				{
+					gachaResultBonus = ret.resultBonus;
+				}
+				ResetGachaIndex();
+				GachaResult currentGachaResult = GetCurrentGachaResult();
+				if (currentGachaResult == null || currentGachaResult.oncePurchaseItemToShop == null || string.IsNullOrEmpty(currentGachaResult.oncePurchaseItemToShop.productId))
+				{
+					for (int i = 0; i < gachaResultList.Count; i++)
+					{
+						SortGachaResult(gachaResultList[i].reward);
+					}
+					if (IsResultBonus())
+					{
+						SortGachaResult(gachaResultBonus.reward);
+					}
 					if (selectGachaType == GACHA_TYPE.QUEST)
 					{
 						GameSaveData.instance.recommendedOrderCheck = 1;
@@ -340,7 +472,7 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 					}
 					Dirty();
 					CheckGachaShowBannerInvite();
-					TrackGachaEvent();
+					TrackGachaEvent(ret.result);
 				}
 			}
 			call_back(ret.Error);
@@ -416,14 +548,14 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 			{
 				text = "BTN_GACHA_STEP10_Pay";
 			}
-			if (guarantee.IsStepUp())
+			if (guarantee.IsStepUp() || guarantee.IsFever())
 			{
 				text = ((!guarantee.hasFreeGachaReward) ? (text + "_" + guarantee.GetImageCount()) : (text + "_FREE"));
 			}
 		}
-		if (resultScene && MonoBehaviourSingleton<GachaManager>.I.gachaResult != null && !string.IsNullOrEmpty(MonoBehaviourSingleton<GachaManager>.I.gachaResult.buttonImg) && string.IsNullOrEmpty(text))
+		if (resultScene && MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult() != null && !string.IsNullOrEmpty(MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().buttonImg) && string.IsNullOrEmpty(text))
 		{
-			text = MonoBehaviourSingleton<GachaManager>.I.gachaResult.buttonImg;
+			text = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().buttonImg;
 		}
 		if (string.IsNullOrEmpty(text))
 		{

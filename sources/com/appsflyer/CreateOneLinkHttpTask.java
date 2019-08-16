@@ -6,29 +6,34 @@ import android.support.annotation.WorkerThread;
 import com.appsflyer.share.Constants;
 import com.appsflyer.share.LinkGenerator;
 import com.facebook.share.internal.ShareConstants;
-import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
 
 public class CreateOneLinkHttpTask extends OneLinkHttpTask {
+
     /* renamed from: ʼ */
-    private Context f200;
+    private Context f216;
+
     /* renamed from: ʽ */
-    private boolean f201 = false;
+    private boolean f217 = false;
+
     /* renamed from: ˋ */
-    private String f202 = "";
+    private String f218 = "";
+
     /* renamed from: ˎ */
-    private ResponseListener f203;
+    private ResponseListener f219;
+
     /* renamed from: ˏ */
-    private String f204;
+    private String f220;
+
     /* renamed from: ॱ */
-    private Map<String, String> f205;
+    private Map<String, String> f221;
 
     public interface ResponseListener {
         @WorkerThread
@@ -40,67 +45,71 @@ public class CreateOneLinkHttpTask extends OneLinkHttpTask {
 
     public CreateOneLinkHttpTask(@NonNull String str, @NonNull Map<String, String> map, AppsFlyerLib appsFlyerLib, @NonNull Context context, boolean z) {
         super(appsFlyerLib);
-        this.f201 = z;
-        this.f200 = context;
-        if (this.f200 != null) {
-            this.f202 = context.getPackageName();
+        this.f217 = z;
+        this.f216 = context;
+        if (this.f216 != null) {
+            this.f218 = context.getPackageName();
         } else {
             AFLogger.afWarnLog("CreateOneLinkHttpTask: context can't be null");
         }
-        this.f197 = str;
-        this.f204 = "-1";
-        this.f205 = map;
+        this.f222 = str;
+        this.f220 = "-1";
+        this.f221 = map;
     }
 
     public void setListener(@NonNull ResponseListener responseListener) {
-        this.f203 = responseListener;
+        this.f219 = responseListener;
     }
 
+    /* access modifiers changed from: 0000 */
     /* renamed from: ॱ */
-    final void mo1215(HttpsURLConnection httpsURLConnection) throws JSONException, IOException {
-        if (!this.f201) {
+    public final void mo6531(HttpsURLConnection httpsURLConnection) throws JSONException, IOException {
+        if (!this.f217) {
             httpsURLConnection.setRequestMethod(HttpRequest.METHOD_POST);
             httpsURLConnection.setDoInput(true);
             httpsURLConnection.setDoOutput(true);
             httpsURLConnection.setUseCaches(false);
             JSONObject jSONObject = new JSONObject();
-            JSONObject jSONObject2 = new JSONObject(this.f205);
-            jSONObject.put("ttl", this.f204);
+            JSONObject jSONObject2 = new JSONObject(this.f221);
+            jSONObject.put("ttl", this.f220);
             jSONObject.put(ShareConstants.WEB_DIALOG_PARAM_DATA, jSONObject2);
             httpsURLConnection.connect();
-            OutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream());
+            DataOutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream());
             dataOutputStream.writeBytes(jSONObject.toString());
             dataOutputStream.flush();
             dataOutputStream.close();
         }
     }
 
+    /* access modifiers changed from: 0000 */
     /* renamed from: ˊ */
-    final String mo1212() {
-        return new StringBuilder().append(ServerConfigHandler.getUrl("https://onelink.%s/shortlink-sdk/v1")).append(Constants.URL_PATH_DELIMITER).append(this.f197).toString();
+    public final String mo6528() {
+        return new StringBuilder().append(ServerConfigHandler.getUrl("https://onelink.%s/shortlink-sdk/v1")).append(Constants.URL_PATH_DELIMITER).append(this.f222).toString();
     }
 
+    /* access modifiers changed from: 0000 */
     /* renamed from: ˊ */
-    final void mo1213(String str) {
+    public final void mo6529(String str) {
         try {
             JSONObject jSONObject = new JSONObject(str);
             Iterator keys = jSONObject.keys();
             while (keys.hasNext()) {
-                this.f203.onResponse(jSONObject.optString((String) keys.next()));
+                this.f219.onResponse(jSONObject.optString((String) keys.next()));
             }
-        } catch (Throwable e) {
-            this.f203.onResponseError("Can't parse one link data");
+        } catch (JSONException e) {
+            this.f219.onResponseError("Can't parse one link data");
             AFLogger.afErrorLog("Error while parsing to json ".concat(String.valueOf(str)), e);
         }
     }
 
+    /* access modifiers changed from: 0000 */
     /* renamed from: ˎ */
-    final void mo1214() {
-        LinkGenerator addParameters = new LinkGenerator(Constants.USER_INVITE_LINK_TYPE).setBaseURL(this.f197, AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.ONELINK_DOMAIN), this.f202).addParameter(Constants.URL_SITE_ID, this.f202).addParameters(this.f205);
+    public final void mo6530() {
+        LinkGenerator addParameters = new LinkGenerator(Constants.USER_INVITE_LINK_TYPE).setBaseURL(this.f222, AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.ONELINK_DOMAIN), this.f218).addParameter(Constants.URL_SITE_ID, this.f218).addParameters(this.f221);
         String string = AppsFlyerProperties.getInstance().getString(AppsFlyerProperties.APP_USER_ID);
         if (string != null) {
             addParameters.setReferrerCustomerId(string);
         }
-        this.f203.onResponse(addParameters.generateLink());
+        this.f219.onResponse(addParameters.generateLink());
     }
 }

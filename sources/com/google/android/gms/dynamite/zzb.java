@@ -1,24 +1,25 @@
 package com.google.android.gms.dynamite;
 
 import android.content.Context;
-import com.google.android.gms.dynamite.DynamiteModule.zzc;
-import com.google.android.gms.dynamite.DynamiteModule.zzd;
+import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zza;
 
-final class zzb implements zzd {
+final class zzb implements VersionPolicy {
     zzb() {
     }
 
-    public final zzj zza(Context context, String str, zzi zzi) throws zzc {
-        zzj zzj = new zzj();
-        zzj.zzgpq = zzi.zzb(context, str, true);
-        if (zzj.zzgpq != 0) {
-            zzj.zzgpr = 1;
+    public final com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zzb zza(Context context, String str, zza zza) throws LoadingException {
+        com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zzb zzb = new com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zzb();
+        zzb.zzis = zza.zza(context, str, true);
+        if (zzb.zzis != 0) {
+            zzb.zzit = 1;
         } else {
-            zzj.zzgpp = zzi.zzae(context, str);
-            if (zzj.zzgpp != 0) {
-                zzj.zzgpr = -1;
+            zzb.zzir = zza.getLocalVersion(context, str);
+            if (zzb.zzir != 0) {
+                zzb.zzit = -1;
             }
         }
-        return zzj;
+        return zzb;
     }
 }

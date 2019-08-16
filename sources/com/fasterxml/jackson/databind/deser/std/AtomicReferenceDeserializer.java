@@ -34,30 +34,31 @@ public class AtomicReferenceDeserializer extends StdDeserializer<AtomicReference
     }
 
     public AtomicReference<?> getNullValue(DeserializationContext deserializationContext) {
-        return new AtomicReference();
+        return new AtomicReference<>();
     }
 
     @Deprecated
     public AtomicReference<?> getNullValue() {
-        return new AtomicReference();
+        return new AtomicReference<>();
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
+        JsonDeserializer handleSecondaryContextualization;
+        JsonDeserializer<?> jsonDeserializer = this._valueDeserializer;
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         if (jsonDeserializer == null) {
-            jsonDeserializer = deserializationContext.findContextualValueDeserializer(this._referencedType, beanProperty);
+            handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(this._referencedType, beanProperty);
         } else {
-            jsonDeserializer = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, this._referencedType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, this._referencedType);
         }
         if (typeDeserializer != null) {
             typeDeserializer = typeDeserializer.forProperty(beanProperty);
         }
-        return withResolved(typeDeserializer, jsonDeserializer);
+        return withResolved(typeDeserializer, handleSecondaryContextualization);
     }
 
     public AtomicReference<?> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        return new AtomicReference(this._valueTypeDeserializer == null ? this._valueDeserializer.deserialize(jsonParser, deserializationContext) : this._valueDeserializer.deserializeWithType(jsonParser, deserializationContext, this._valueTypeDeserializer));
+        return new AtomicReference<>(this._valueTypeDeserializer == null ? this._valueDeserializer.deserialize(jsonParser, deserializationContext) : this._valueDeserializer.deserializeWithType(jsonParser, deserializationContext, this._valueTypeDeserializer));
     }
 
     public Object deserializeWithType(JsonParser jsonParser, DeserializationContext deserializationContext, TypeDeserializer typeDeserializer) throws IOException {

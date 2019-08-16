@@ -1,9 +1,22 @@
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ResourceLoad : DisableNotifyMonoBehaviour
 {
 	public BetterList<ResourceObject> list;
+
+	[CompilerGenerated]
+	private static ResourceManager.LoadComplateDelegate _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static ResourceManager.LoadErrorDelegate _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static ResourceManager.LoadComplateDelegate _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static ResourceManager.LoadErrorDelegate _003C_003Ef__mg_0024cache3;
 
 	public bool destroyNotify
 	{
@@ -25,26 +38,28 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 
 	public void SetReference(ResourceObject[] resobjs)
 	{
-		if (resobjs != null)
+		if (resobjs == null)
 		{
-			int i = 0;
-			for (int num = resobjs.Length; i < num; i++)
+			return;
+		}
+		int i = 0;
+		for (int num = resobjs.Length; i < num; i++)
+		{
+			if (resobjs[i] != null)
 			{
-				if (resobjs[i] != null)
-				{
-					resobjs[i].refCount++;
-				}
+				resobjs[i].refCount++;
 			}
-			if (list != null)
+		}
+		if (list == null)
+		{
+			return;
+		}
+		int j = 0;
+		for (int num2 = resobjs.Length; j < num2; j++)
+		{
+			if (resobjs[j] != null)
 			{
-				int j = 0;
-				for (int num2 = resobjs.Length; j < num2; j++)
-				{
-					if (resobjs[j] != null)
-					{
-						list.Add(resobjs[j]);
-					}
-				}
+				list.Add(resobjs[j]);
 			}
 		}
 	}
@@ -84,8 +99,6 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 
 	public static ResourceLoad GetResourceLoad(MonoBehaviour mono_behaviour, bool destroy_notify = false)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		ResourceLoad resourceLoad = mono_behaviour.get_gameObject().GetComponent<ResourceLoad>();
 		if (resourceLoad == null)
 		{
@@ -96,31 +109,29 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		return resourceLoad;
 	}
 
-	public static void LoadIconTexture(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string name, Action load_start_callback, Action<Texture> loaded_callback)
+	public static void LoadIconTexture(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string name, Action load_start_callback, Action<Texture> loaded_callback, bool isEventAsset = false)
 	{
 		ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(category, name);
 		if (cachedResourceObject != null)
 		{
 			loaded_callback(cachedResourceObject.obj as Texture);
+			return;
+		}
+		load_start_callback?.Invoke();
+		if (string.IsNullOrEmpty(name))
+		{
+			loaded_callback(null);
+		}
+		else if (ResourceDefine.types[(int)category] == ResourceManager.CATEGORY_TYPE.HASH256)
+		{
+			MonoBehaviourSingleton<ResourceManager>.I.Load(isEventAsset, GetResourceLoad(mono_behaviour, destroy_notify: true), category, category.ToHash256String(name), new string[1]
+			{
+				name
+			}, OnLoadIconTextureComplate, OnLoadIconTextureError, cache_package: false, loaded_callback);
 		}
 		else
 		{
-			load_start_callback?.Invoke();
-			if (string.IsNullOrEmpty(name))
-			{
-				loaded_callback(null);
-			}
-			else if (ResourceDefine.types[(int)category] == ResourceManager.CATEGORY_TYPE.HASH256)
-			{
-				MonoBehaviourSingleton<ResourceManager>.I.Load(GetResourceLoad(mono_behaviour, true), category, category.ToHash256String(name), new string[1]
-				{
-					name
-				}, OnLoadIconTextureComplate, OnLoadIconTextureError, false, loaded_callback);
-			}
-			else
-			{
-				MonoBehaviourSingleton<ResourceManager>.I.Load(GetResourceLoad(mono_behaviour, true), category, name, OnLoadIconTextureComplate, OnLoadIconTextureError, false, loaded_callback);
-			}
+			MonoBehaviourSingleton<ResourceManager>.I.Load(isEventAsset, GetResourceLoad(mono_behaviour, destroy_notify: true), category, name, OnLoadIconTextureComplate, OnLoadIconTextureError, cache_package: false, loaded_callback);
 		}
 	}
 
@@ -245,7 +256,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				callback(tex);
 			}
-		});
+		}, isEventAsset: true);
 	}
 
 	public static void LoadShopImageOfferTexture(UITexture ui_tex, uint image_id, Action<Texture> callback)
@@ -309,6 +320,20 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		});
 	}
 
+	public static void LoadCommonTexture(UITexture ui_tex, string tex_name)
+	{
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, tex_name, delegate
+		{
+			ui_tex.mainTexture = null;
+		}, delegate(Texture tex)
+		{
+			if (ui_tex != null)
+			{
+				ui_tex.mainTexture = tex;
+			}
+		});
+	}
+
 	public static void LoadPointShopBannerTexture(UITexture ui_tex, uint image_id)
 	{
 		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointShopBannerImageName((int)image_id), delegate
@@ -320,7 +345,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, isEventAsset: true);
 	}
 
 	public static void LoadPointShopBGTexture(UITexture ui_tex, uint image_id)
@@ -334,7 +359,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 			{
 				ui_tex.mainTexture = tex;
 			}
-		});
+		}, isEventAsset: true);
 	}
 
 	public static void LoadHomePointSHopBannerTexture(UITexture ui_tex, uint image_id)
@@ -415,9 +440,31 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		});
 	}
 
+	public static void LoadFortuneWheelIconTexture(UITexture ui_tex, string imageName, Action<Texture> callback)
+	{
+		LoadIconTexture(ui_tex, RESOURCE_CATEGORY.SHOP_IMG, imageName, null, delegate(Texture tex)
+		{
+			if (callback != null)
+			{
+				callback(tex);
+			}
+		});
+	}
+
 	public static void ItemIconLoadItemIconTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
 	{
 		LoadIconTexture(item_icon, RESOURCE_CATEGORY.ICON_ITEM, ResourceName.GetItemIcon(icon_id), null, delegate(Texture tex)
+		{
+			if (callback != null)
+			{
+				callback(item_icon, tex, icon_id);
+			}
+		});
+	}
+
+	public static void ItemIconLoadAccessoryIconTexture(ItemIcon item_icon, int icon_id, Action<ItemIcon, Texture, int> callback)
+	{
+		LoadIconTexture(item_icon, RESOURCE_CATEGORY.ICON_ACCESSORY, ResourceName.GetAccessoryIcon(icon_id), null, delegate(Texture tex)
 		{
 			if (callback != null)
 			{
@@ -532,6 +579,15 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 		else
 		{
 			(request.userData as Action<Texture>)(null);
+		}
+	}
+
+	public void ReleaseAllResources()
+	{
+		if (MonoBehaviourSingleton<ResourceManager>.IsValid() && MonoBehaviourSingleton<ResourceManager>.I.cache != null && list != null && list.buffer != null)
+		{
+			MonoBehaviourSingleton<ResourceManager>.I.cache.ReleaseResourceObjects(list.buffer);
+			list.Release();
 		}
 	}
 }

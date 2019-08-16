@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Naka
+public class Naka : MonoBehaviour
 {
 	private class Msg
 	{
@@ -42,8 +42,6 @@ public class Naka
 
 	private void Awake()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		if (isSpeedTestForEach)
 		{
 			this.get_gameObject().AddComponent<SpeedTest_ForEach>();
@@ -79,10 +77,6 @@ public class Naka
 	private void OnGUI()
 	{
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Expected O, but got Unknown
 		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		scrollPosition = GUILayout.BeginScrollView(scrollPosition, (GUILayoutOption[])new GUILayoutOption[2]

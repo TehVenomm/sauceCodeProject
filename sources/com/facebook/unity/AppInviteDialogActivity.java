@@ -12,7 +12,8 @@ import com.facebook.share.widget.AppInviteDialog.Result;
 public class AppInviteDialogActivity extends BaseActivity {
     public static final String DIALOG_PARAMS = "dialog_params";
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         final UnityMessage unityMessage = new UnityMessage("OnAppInviteComplete");
         Bundle bundleExtra = getIntent().getBundleExtra(DIALOG_PARAMS);

@@ -6,7 +6,7 @@ import android.util.Log;
 import com.zopim.android.sdk.model.VisitorInfo;
 import com.zopim.android.sdk.model.VisitorInfo.Builder;
 
-public final class VisitorInfoPrefsStorage extends C0898a implements VisitorInfoStorage {
+public final class VisitorInfoPrefsStorage extends C1267a implements VisitorInfoStorage {
     private static final String EMAIL_KEY = "email_key";
     private static final String LOG_TAG = VisitorInfoPrefsStorage.class.getSimpleName();
     private static final String NAME_KEY = "name_key";
@@ -32,7 +32,10 @@ public final class VisitorInfoPrefsStorage extends C0898a implements VisitorInfo
         String string = this.mStoragePreferences.getString(EMAIL_KEY, null);
         String string2 = this.mStoragePreferences.getString(NAME_KEY, null);
         String string3 = this.mStoragePreferences.getString(PHONE_NUMBER_KEY, null);
-        return (string == null && string2 == null && string3 == null) ? null : new Builder().email(string).name(string2).phoneNumber(string3).build();
+        if (string == null && string2 == null && string3 == null) {
+            return null;
+        }
+        return new Builder().email(string).name(string2).phoneNumber(string3).build();
     }
 
     public void setVisitorInfo(VisitorInfo visitorInfo) {
@@ -45,13 +48,13 @@ public final class VisitorInfoPrefsStorage extends C0898a implements VisitorInfo
             String email = visitorInfo.getEmail();
             String name = visitorInfo.getName();
             String phoneNumber = visitorInfo.getPhoneNumber();
-            if (!(email == null || email.isEmpty())) {
+            if (email != null && !email.isEmpty()) {
                 edit.putString(EMAIL_KEY, email);
             }
-            if (!(name == null || name.isEmpty())) {
+            if (name != null && !name.isEmpty()) {
                 edit.putString(NAME_KEY, name);
             }
-            if (!(phoneNumber == null || phoneNumber.isEmpty())) {
+            if (phoneNumber != null && !phoneNumber.isEmpty()) {
                 edit.putString(PHONE_NUMBER_KEY, phoneNumber);
             }
             edit.apply();

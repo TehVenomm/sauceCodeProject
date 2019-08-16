@@ -27,7 +27,7 @@ public class Goal_Guard : Goal
 		if (ev == BRAIN_EVENT.END_ACTION)
 		{
 			int num = (int)param;
-			if (num == 18)
+			if (num == 19)
 			{
 				SetStatus(STATUS.COMPLETED);
 			}

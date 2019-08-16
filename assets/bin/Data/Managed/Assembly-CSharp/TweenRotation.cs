@@ -16,8 +16,6 @@ public class TweenRotation : UITweener
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
 			if (mTrans == null)
 			{
 				mTrans = this.get_transform();
@@ -75,14 +73,14 @@ public class TweenRotation : UITweener
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		TweenRotation tweenRotation = UITweener.Begin<TweenRotation>(go, duration, true);
+		TweenRotation tweenRotation = UITweener.Begin<TweenRotation>(go, duration);
 		TweenRotation tweenRotation2 = tweenRotation;
 		Quaternion value = tweenRotation.value;
 		tweenRotation2.from = value.get_eulerAngles();
 		tweenRotation.to = rot.get_eulerAngles();
 		if (duration <= 0f)
 		{
-			tweenRotation.Sample(1f, true);
+			tweenRotation.Sample(1f, isFinished: true);
 			tweenRotation.set_enabled(false);
 		}
 		return tweenRotation;

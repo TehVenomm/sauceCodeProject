@@ -1,4 +1,4 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -10,20 +10,17 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore.Audio;
-import android.provider.MediaStore.Images.Media;
+import android.provider.MediaStore.Audio.Media;
+import android.provider.MediaStore.Images;
 import android.text.format.DateFormat;
-import com.appsflyer.share.Constants;
 import com.google.android.gms.nearby.messages.Message;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 
+/* renamed from: jp.colopl.util.ImageUtil */
 public class ImageUtil {
     public static final int CROP_MAX_SIZE = 320;
     public static final String DATE_PATTERN = "yyyy-MM-dd_kk.mm.ss";
@@ -38,129 +35,170 @@ public class ImageUtil {
         return addImageAsApplication(contentResolver, str2, currentTimeMillis, str, str2, bitmap, null);
     }
 
-    public static Uri addImageAsApplication(ContentResolver contentResolver, String str, long j, String str2, String str3, Bitmap bitmap, byte[] bArr) {
-        Throwable th;
-        String str4 = str2 + Constants.URL_PATH_DELIMITER + str3;
-        OutputStream fileOutputStream;
-        try {
-            File file = new File(str2);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            File file2 = new File(str2, str3);
-            if (file2.createNewFile()) {
-                fileOutputStream = new FileOutputStream(file2);
-                if (bitmap != null) {
-                    try {
-                        bitmap.compress(CompressFormat.JPEG, 90, fileOutputStream);
-                    } catch (FileNotFoundException e) {
-                        if (fileOutputStream != null) {
-                            return null;
-                        }
-                        try {
-                            fileOutputStream.close();
-                            return null;
-                        } catch (Throwable th2) {
-                            return null;
-                        }
-                    } catch (IOException e2) {
-                        if (fileOutputStream != null) {
-                            return null;
-                        }
-                        try {
-                            fileOutputStream.close();
-                            return null;
-                        } catch (Throwable th3) {
-                            return null;
-                        }
-                    } catch (Throwable th4) {
-                        th = th4;
-                        if (fileOutputStream != null) {
-                            try {
-                                fileOutputStream.close();
-                            } catch (Throwable th5) {
-                            }
-                        }
-                        throw th;
-                    }
-                }
-                fileOutputStream.write(bArr);
-            } else {
-                fileOutputStream = null;
-            }
-            if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                } catch (Throwable th6) {
-                }
-            }
-            ContentValues contentValues = new ContentValues(7);
-            contentValues.put("title", str);
-            contentValues.put("_display_name", str3);
-            contentValues.put("datetaken", Long.valueOf(j));
-            contentValues.put("mime_type", "image/jpeg");
-            contentValues.put("_data", str4);
-            return contentResolver.insert(Media.EXTERNAL_CONTENT_URI, contentValues);
-        } catch (FileNotFoundException e3) {
-            fileOutputStream = null;
-            if (fileOutputStream != null) {
-                return null;
-            }
-            fileOutputStream.close();
-            return null;
-        } catch (IOException e4) {
-            fileOutputStream = null;
-            if (fileOutputStream != null) {
-                return null;
-            }
-            fileOutputStream.close();
-            return null;
-        } catch (Throwable th7) {
-            th = th7;
-            fileOutputStream = null;
-            if (fileOutputStream != null) {
-                fileOutputStream.close();
-            }
-            throw th;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:27:0x0084 A[SYNTHETIC, Splitter:B:27:0x0084] */
+    /* JADX WARNING: Removed duplicated region for block: B:33:0x008f A[SYNTHETIC, Splitter:B:33:0x008f] */
+    /* JADX WARNING: Removed duplicated region for block: B:44:? A[RETURN, SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static android.net.Uri addImageAsApplication(android.content.ContentResolver r6, java.lang.String r7, long r8, java.lang.String r10, java.lang.String r11, android.graphics.Bitmap r12, byte[] r13) {
+        /*
+            r0 = 0
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.StringBuilder r1 = r1.append(r10)
+            java.lang.String r2 = "/"
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.StringBuilder r1 = r1.append(r11)
+            java.lang.String r2 = r1.toString()
+            java.io.File r1 = new java.io.File     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            r1.<init>(r10)     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            boolean r3 = r1.exists()     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            if (r3 != 0) goto L_0x0026
+            r1.mkdirs()     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+        L_0x0026:
+            java.io.File r3 = new java.io.File     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            r3.<init>(r10, r11)     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            boolean r1 = r3.createNewFile()     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            if (r1 == 0) goto L_0x009d
+            java.io.FileOutputStream r1 = new java.io.FileOutputStream     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            r1.<init>(r3)     // Catch:{ FileNotFoundException -> 0x007d, IOException -> 0x0080, all -> 0x008a }
+            if (r12 == 0) goto L_0x0070
+            android.graphics.Bitmap$CompressFormat r3 = android.graphics.Bitmap.CompressFormat.JPEG     // Catch:{ FileNotFoundException -> 0x0074, IOException -> 0x009b, all -> 0x0093 }
+            r4 = 90
+            r12.compress(r3, r4, r1)     // Catch:{ FileNotFoundException -> 0x0074, IOException -> 0x009b, all -> 0x0093 }
+        L_0x003f:
+            if (r1 == 0) goto L_0x0044
+            r1.close()     // Catch:{ Throwable -> 0x0097 }
+        L_0x0044:
+            android.content.ContentValues r0 = new android.content.ContentValues
+            r1 = 7
+            r0.<init>(r1)
+            java.lang.String r1 = "title"
+            r0.put(r1, r7)
+            java.lang.String r1 = "_display_name"
+            r0.put(r1, r11)
+            java.lang.String r1 = "datetaken"
+            java.lang.Long r3 = java.lang.Long.valueOf(r8)
+            r0.put(r1, r3)
+            java.lang.String r1 = "mime_type"
+            java.lang.String r3 = "image/jpeg"
+            r0.put(r1, r3)
+            java.lang.String r1 = "_data"
+            r0.put(r1, r2)
+            android.net.Uri r1 = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            android.net.Uri r0 = r6.insert(r1, r0)
+        L_0x006f:
+            return r0
+        L_0x0070:
+            r1.write(r13)     // Catch:{ FileNotFoundException -> 0x0074, IOException -> 0x009b, all -> 0x0093 }
+            goto L_0x003f
+        L_0x0074:
+            r2 = move-exception
+        L_0x0075:
+            if (r1 == 0) goto L_0x006f
+            r1.close()     // Catch:{ Throwable -> 0x007b }
+            goto L_0x006f
+        L_0x007b:
+            r1 = move-exception
+            goto L_0x006f
+        L_0x007d:
+            r1 = move-exception
+            r1 = r0
+            goto L_0x0075
+        L_0x0080:
+            r1 = move-exception
+            r1 = r0
+        L_0x0082:
+            if (r1 == 0) goto L_0x006f
+            r1.close()     // Catch:{ Throwable -> 0x0088 }
+            goto L_0x006f
+        L_0x0088:
+            r1 = move-exception
+            goto L_0x006f
+        L_0x008a:
+            r1 = move-exception
+            r2 = r0
+            r3 = r1
+        L_0x008d:
+            if (r2 == 0) goto L_0x0092
+            r2.close()     // Catch:{ Throwable -> 0x0099 }
+        L_0x0092:
+            throw r3
+        L_0x0093:
+            r0 = move-exception
+            r2 = r1
+            r3 = r0
+            goto L_0x008d
+        L_0x0097:
+            r0 = move-exception
+            goto L_0x0044
+        L_0x0099:
+            r0 = move-exception
+            goto L_0x0092
+        L_0x009b:
+            r2 = move-exception
+            goto L_0x0082
+        L_0x009d:
+            r1 = r0
+            goto L_0x003f
+        */
+        throw new UnsupportedOperationException("Method not decompiled: p018jp.colopl.util.ImageUtil.addImageAsApplication(android.content.ContentResolver, java.lang.String, long, java.lang.String, java.lang.String, android.graphics.Bitmap, byte[]):android.net.Uri");
     }
 
-    public static File convertImageUriToFile(Context context, Uri uri) {
-        Throwable th;
-        Cursor cursor = null;
-        try {
-            Cursor query = context.getContentResolver().query(uri, new String[]{"_data", "_id", "orientation"}, null, null, null);
-            try {
-                int columnIndexOrThrow = query.getColumnIndexOrThrow("_data");
-                int columnIndexOrThrow2 = query.getColumnIndexOrThrow("orientation");
-                if (query.moveToFirst()) {
-                    query.getString(columnIndexOrThrow2);
-                    File file = new File(query.getString(columnIndexOrThrow));
-                    if (query == null) {
-                        return file;
-                    }
-                    query.close();
-                    return file;
-                }
-                if (query != null) {
-                    query.close();
-                }
-                return null;
-            } catch (Throwable th2) {
-                th = th2;
-                cursor = query;
-                if (cursor != null) {
-                    cursor.close();
-                }
-                throw th;
-            }
-        } catch (Throwable th3) {
-            th = th3;
-            if (cursor != null) {
-                cursor.close();
-            }
-            throw th;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:15:0x004d  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static java.io.File convertImageUriToFile(android.content.Context r7, android.net.Uri r8) {
+        /*
+            r6 = 0
+            android.content.ContentResolver r0 = r7.getContentResolver()     // Catch:{ all -> 0x004a }
+            r1 = 3
+            java.lang.String[] r2 = new java.lang.String[r1]     // Catch:{ all -> 0x004a }
+            r1 = 0
+            java.lang.String r3 = "_data"
+            r2[r1] = r3     // Catch:{ all -> 0x004a }
+            r1 = 1
+            java.lang.String r3 = "_id"
+            r2[r1] = r3     // Catch:{ all -> 0x004a }
+            r1 = 2
+            java.lang.String r3 = "orientation"
+            r2[r1] = r3     // Catch:{ all -> 0x004a }
+            r3 = 0
+            r4 = 0
+            r5 = 0
+            r1 = r8
+            android.database.Cursor r1 = r0.query(r1, r2, r3, r4, r5)     // Catch:{ all -> 0x004a }
+            java.lang.String r0 = "_data"
+            int r2 = r1.getColumnIndexOrThrow(r0)     // Catch:{ all -> 0x0051 }
+            java.lang.String r0 = "orientation"
+            int r0 = r1.getColumnIndexOrThrow(r0)     // Catch:{ all -> 0x0051 }
+            boolean r3 = r1.moveToFirst()     // Catch:{ all -> 0x0051 }
+            if (r3 == 0) goto L_0x0043
+            r1.getString(r0)     // Catch:{ all -> 0x0051 }
+            java.io.File r0 = new java.io.File     // Catch:{ all -> 0x0051 }
+            java.lang.String r2 = r1.getString(r2)     // Catch:{ all -> 0x0051 }
+            r0.<init>(r2)     // Catch:{ all -> 0x0051 }
+            if (r1 == 0) goto L_0x0042
+            r1.close()
+        L_0x0042:
+            return r0
+        L_0x0043:
+            if (r1 == 0) goto L_0x0048
+            r1.close()
+        L_0x0048:
+            r0 = r6
+            goto L_0x0042
+        L_0x004a:
+            r0 = move-exception
+        L_0x004b:
+            if (r6 == 0) goto L_0x0050
+            r6.close()
+        L_0x0050:
+            throw r0
+        L_0x0051:
+            r0 = move-exception
+            r6 = r1
+            goto L_0x004b
+        */
+        throw new UnsupportedOperationException("Method not decompiled: p018jp.colopl.util.ImageUtil.convertImageUriToFile(android.content.Context, android.net.Uri):java.io.File");
     }
 
     public static String convertToFilePath(Context context, Uri uri) {
@@ -182,37 +220,39 @@ public class ImageUtil {
 
     public static Bitmap getBitmapFromExternalStorage(File file, String str) {
         Bitmap bitmap = null;
-        if (isSdCardWriteable()) {
-            File file2 = new File(file, str);
-            if (file2.exists()) {
-                try {
-                    bitmap = BitmapFactory.decodeStream(new FileInputStream(file2));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        if (!isSdCardWriteable()) {
+            return bitmap;
         }
-        return bitmap;
+        File file2 = new File(file, str);
+        if (!file2.exists()) {
+            return bitmap;
+        }
+        try {
+            return BitmapFactory.decodeStream(new FileInputStream(file2));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return bitmap;
+        }
     }
 
     public static Bitmap getBitmapFromInternalStorage(Context context, String str) {
-        Bitmap bitmap = null;
+        boolean z = false;
         try {
             FileInputStream openFileInput = context.openFileInput(str);
-            Object obj = new byte[Message.MAX_CONTENT_SIZE_BYTES];
-            int read = openFileInput.read(obj);
+            byte[] bArr = new byte[Message.MAX_CONTENT_SIZE_BYTES];
+            int read = openFileInput.read(bArr);
             openFileInput.close();
-            Object obj2 = new byte[read];
-            System.arraycopy(obj, 0, obj2, 0, read);
-            bitmap = BitmapFactory.decodeByteArray(obj2, 0, obj2.length);
+            byte[] bArr2 = new byte[read];
+            System.arraycopy(bArr, 0, bArr2, 0, read);
+            return BitmapFactory.decodeByteArray(bArr2, 0, bArr2.length);
         } catch (Exception e) {
             e.printStackTrace();
+            return z;
         }
-        return bitmap;
     }
 
     public static byte[] getByteFromBitmap(Bitmap bitmap) {
-        OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(CompressFormat.PNG, 100, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
     }
@@ -226,9 +266,14 @@ public class ImageUtil {
             int intValue = ((Integer) cls.getDeclaredField("ORIENTATION_ROTATE_90").get(Integer.TYPE)).intValue();
             int intValue2 = ((Integer) cls.getDeclaredField("ORIENTATION_ROTATE_180").get(Integer.TYPE)).intValue();
             int intValue3 = ((Integer) cls.getDeclaredField("ORIENTATION_ROTATE_270").get(Integer.TYPE)).intValue();
-            Integer num = new Integer(((Integer) cls.getDeclaredField("ORIENTATION_UNDEFINED").get(Integer.TYPE)).intValue());
-            int intValue4 = ((Integer) method.invoke(newInstance, new Object[]{str2, num})).intValue();
-            return intValue4 == intValue ? 90 : intValue4 == intValue2 ? 180 : intValue4 == intValue3 ? 270 : 0;
+            int intValue4 = ((Integer) method.invoke(newInstance, new Object[]{str2, new Integer(((Integer) cls.getDeclaredField("ORIENTATION_UNDEFINED").get(Integer.TYPE)).intValue())})).intValue();
+            if (intValue4 == intValue) {
+                return 90;
+            }
+            if (intValue4 == intValue2) {
+                return 180;
+            }
+            return intValue4 == intValue3 ? 270 : 0;
         } catch (Exception e) {
             return 0;
         }
@@ -255,6 +300,8 @@ public class ImageUtil {
     }
 
     public static Bitmap resizeBitmapByEdge(Bitmap bitmap, int i) {
+        int i2;
+        int i3;
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         if (width == 0 || height == 0) {
@@ -266,15 +313,15 @@ public class ImageUtil {
         if (i > bitmap.getWidth() || i > bitmap.getHeight()) {
             return null;
         }
-        int i2;
         if (width > height) {
+            i3 = (int) ((((float) i) * ((float) height)) / ((float) width));
             i2 = i;
-            i = (int) ((((float) i) * ((float) height)) / ((float) width));
         } else {
             i2 = (int) ((((float) i) * ((float) width)) / ((float) height));
+            i3 = i;
         }
         float f = ((float) i2) / ((float) width);
-        float f2 = ((float) i) / ((float) height);
+        float f2 = ((float) i3) / ((float) height);
         Matrix matrix = new Matrix();
         matrix.postScale(f, f2);
         return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
@@ -286,7 +333,7 @@ public class ImageUtil {
         contentValues.put("_display_name", str);
         contentValues.put("mime_type", "image/jpeg");
         try {
-            decodeByteArray.compress(CompressFormat.JPEG, 90, context.getContentResolver().openOutputStream(context.getContentResolver().insert(Audio.Media.EXTERNAL_CONTENT_URI, contentValues)));
+            decodeByteArray.compress(CompressFormat.JPEG, 90, context.getContentResolver().openOutputStream(context.getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, contentValues)));
         } catch (Exception e) {
             throw e;
         }
@@ -297,7 +344,7 @@ public class ImageUtil {
         ContentValues contentValues = new ContentValues();
         contentValues.put("_display_name", str2);
         contentValues.put("mime_type", "image/jpeg");
-        Media.insertImage(context.getContentResolver(), decodeFile, str2, null);
+        Images.Media.insertImage(context.getContentResolver(), decodeFile, str2, null);
     }
 
     public static Boolean saveImageToExternelStoragy(Bitmap bitmap, File file, String str) {
@@ -306,7 +353,7 @@ public class ImageUtil {
             file.mkdirs();
         }
         try {
-            OutputStream fileOutputStream = new FileOutputStream(file2.getPath());
+            FileOutputStream fileOutputStream = new FileOutputStream(file2.getPath());
             bitmap.compress(CompressFormat.PNG, 100, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();

@@ -2,19 +2,19 @@ package com.google.android.gms.auth.account;
 
 import android.content.Context;
 import android.os.Looper;
+import com.google.android.gms.common.api.Api.AbstractClientBuilder;
 import com.google.android.gms.common.api.Api.ApiOptions.NoOptions;
-import com.google.android.gms.common.api.Api.zza;
-import com.google.android.gms.common.api.Api.zze;
+import com.google.android.gms.common.api.Api.Client;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.internal.zzq;
-import com.google.android.gms.internal.zzarh;
+import com.google.android.gms.common.internal.ClientSettings;
+import com.google.android.gms.internal.auth.zzr;
 
-final class zzf extends zza<zzarh, NoOptions> {
+final class zzf extends AbstractClientBuilder<zzr, NoOptions> {
     zzf() {
     }
 
-    public final /* synthetic */ zze zza(Context context, Looper looper, zzq zzq, Object obj, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener) {
-        return new zzarh(context, looper, zzq, connectionCallbacks, onConnectionFailedListener);
+    public final /* synthetic */ Client buildClient(Context context, Looper looper, ClientSettings clientSettings, Object obj, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener) {
+        return new zzr(context, looper, clientSettings, connectionCallbacks, onConnectionFailedListener);
     }
 }

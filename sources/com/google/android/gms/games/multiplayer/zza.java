@@ -2,62 +2,59 @@ package com.google.android.gms.games.multiplayer;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.games.GameEntity;
 import java.util.ArrayList;
 
 public class zza implements Creator<InvitationEntity> {
-    public /* synthetic */ Object createFromParcel(Parcel parcel) {
-        return zzk(parcel);
-    }
-
     public /* synthetic */ Object[] newArray(int i) {
         return new InvitationEntity[i];
     }
 
-    public InvitationEntity zzk(Parcel parcel) {
-        int i = 0;
-        GameEntity gameEntity = null;
-        int zzd = zzb.zzd(parcel);
+    /* renamed from: zze */
+    public InvitationEntity createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         long j = 0;
+        GameEntity gameEntity = null;
         String str = null;
         ParticipantEntity participantEntity = null;
         ArrayList arrayList = null;
+        int i = 0;
         int i2 = 0;
         int i3 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    gameEntity = (GameEntity) zzb.zza(parcel, readInt, GameEntity.CREATOR);
+                    gameEntity = (GameEntity) SafeParcelReader.createParcelable(parcel, readHeader, GameEntity.CREATOR);
                     break;
                 case 2:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    j = zzb.zzi(parcel, readInt);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 4:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 5:
-                    participantEntity = (ParticipantEntity) zzb.zza(parcel, readInt, ParticipantEntity.CREATOR);
+                    participantEntity = (ParticipantEntity) SafeParcelReader.createParcelable(parcel, readHeader, ParticipantEntity.CREATOR);
                     break;
                 case 6:
-                    arrayList = zzb.zzc(parcel, readInt, ParticipantEntity.CREATOR);
+                    arrayList = SafeParcelReader.createTypedList(parcel, readHeader, ParticipantEntity.CREATOR);
                     break;
                 case 7:
-                    i2 = zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 8:
-                    i3 = zzb.zzg(parcel, readInt);
+                    i3 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new InvitationEntity(gameEntity, str, j, i, participantEntity, arrayList, i2, i3);
     }
 }

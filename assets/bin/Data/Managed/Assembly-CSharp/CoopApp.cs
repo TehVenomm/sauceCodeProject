@@ -8,10 +8,6 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 {
 	protected override void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		this.get_gameObject().AddComponent<CoopManager>();
 		this.get_gameObject().AddComponent<KtbWebSocket>();
@@ -23,7 +19,6 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 	{
 		if (!Log.enabled)
 		{
-			return;
 		}
 	}
 
@@ -46,6 +41,33 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		});
 	}
 
+	public static void EnterQuestOfflineAssignedEquipment(AssignedEquipmentTable.AssignedEquipmentData assignedEquipmentData, CharaInfo charaInfo, Action<bool, bool, bool, bool> callBack = null)
+	{
+		StartCoopOffline(delegate(bool isMatching, bool isConnect, bool isRegist)
+		{
+			QuestStart(delegate(bool isStart)
+			{
+				if (isStart)
+				{
+					if (assignedEquipmentData != null && charaInfo != null)
+					{
+						MonoBehaviourSingleton<StatusManager>.I.SetAssignedEquipmentData(assignedEquipmentData, charaInfo);
+					}
+					MonoBehaviourSingleton<QuestManager>.I.StartTrial();
+				}
+				if (callBack != null)
+				{
+					callBack(isMatching, isConnect, isRegist, isStart);
+				}
+			});
+		});
+	}
+
+	public static void EnterSeriesArenaQuestOffline(Action<bool, bool, bool, bool> callBack = null)
+	{
+		EnterQuestOffline(callBack);
+	}
+
 	public static void EnterArenaQuestOffline(Action<bool, bool, bool, bool> callBack = null)
 	{
 		QuestManager questMgr = MonoBehaviourSingleton<QuestManager>.I;
@@ -55,10 +77,10 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			ArenaStartModel.RequestSendForm requestData = new ArenaStartModel.RequestSendForm
 			{
 				aid = questMgr.currentArenaId,
-				qid = MonoBehaviourSingleton<InGameManager>.I.GetFirstArenaQuestId(),
+				qid = (int)MonoBehaviourSingleton<InGameManager>.I.GetFirstArenaQuestId(),
 				setNo = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo
 			};
-			questMgr.SetCurrentQuestID(MonoBehaviourSingleton<InGameManager>.I.GetFirstArenaQuestId(), true);
+			questMgr.SetCurrentQuestID(MonoBehaviourSingleton<InGameManager>.I.GetFirstArenaQuestId());
 			questMgr.SendArenaQuestStart(requestData, delegate(bool isStart)
 			{
 				Logd("QuestStarted: {0}: ", isStart);
@@ -87,14 +109,14 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			Logd("already in quest.");
 			if (call_back != null)
 			{
-				call_back(true, true, true, true);
+				call_back(arg1: true, arg2: true, arg3: true, arg4: true);
 			}
 		}
 		else
 		{
 			MatchingQuestField(delegate(bool is_m)
 			{
-				StartCoopAndQuestStart(is_m, true, call_back);
+				StartCoopAndQuestStart(is_m, isFromField: true, call_back);
 			});
 		}
 	}
@@ -106,15 +128,15 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			Logd("already in party quest.");
 			if (call_back != null)
 			{
-				call_back(true, true, true, QuestManager.IsValidInGame());
+				call_back(arg1: true, arg2: true, arg3: true, QuestManager.IsValidInGame());
 			}
 		}
 		else
 		{
 			MatchingPartyField(delegate(bool is_m)
 			{
-				StartCoopAndQuestStart(is_m, false, call_back);
-			}, false);
+				StartCoopAndQuestStart(is_m, isFromField: false, call_back);
+			});
 		}
 	}
 
@@ -125,7 +147,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			Logd("already in party field.");
 			if (call_back != null)
 			{
-				call_back(true, true, true);
+				call_back(arg1: true, arg2: true, arg3: true);
 			}
 		}
 		else
@@ -144,29 +166,34 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 				}
 				else if (call_back != null)
 				{
-					call_back(is_m, false, false);
+					call_back(is_m, arg2: false, arg3: false);
 				}
-			}, true);
+			}, is_force_enter: true);
 		}
 	}
 
 	public static void EnterField(uint portal_id, uint deliveryId, Action<bool, bool, bool> call_back = null)
+	{
+		EnterField(portal_id, deliveryId, 0, call_back);
+	}
+
+	public static void EnterField(uint portal_id, uint deliveryId, int _toUserId, Action<bool, bool, bool> call_back = null)
 	{
 		if (MonoBehaviourSingleton<CoopManager>.I.coopRoom.IsActivate())
 		{
 			Logd("already in field.");
 			if (call_back != null)
 			{
-				call_back(true, true, true);
+				call_back(arg1: true, arg2: true, arg3: true);
 			}
 		}
-		else if (!MonoBehaviourSingleton<GameSceneManager>.IsValid() || MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portal_id, false, true))
+		else if (!MonoBehaviourSingleton<GameSceneManager>.IsValid() || MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portal_id, check_dst_quest: false))
 		{
 			if (portal_id != MonoBehaviourSingleton<FieldManager>.I.currentPortalID)
 			{
 				MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(portal_id);
 			}
-			MatchingField(deliveryId, delegate(bool is_m)
+			MatchingField(deliveryId, _toUserId, delegate(bool is_m)
 			{
 				if (is_m)
 				{
@@ -176,11 +203,11 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 						{
 							call_back(is_m, is_c, is_r);
 						}
-					}, false);
+					});
 				}
 				else if (call_back != null)
 				{
-					call_back(is_m, false, false);
+					call_back(is_m, arg2: false, arg3: false);
 				}
 			});
 		}
@@ -193,51 +220,52 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 			Logd("already in quest.");
 			if (call_back != null)
 			{
-				call_back(true, true, true, true);
+				call_back(arg1: true, arg2: true, arg3: true, arg4: true);
 			}
 		}
 		else
 		{
 			RandomMatchingQuestField(delegate(bool isSuccess)
 			{
-				StartCoopAndQuestStart(isSuccess, true, call_back);
+				StartCoopAndQuestStart(isSuccess, isFromField: true, call_back);
 			});
 		}
 	}
 
 	private static void StartCoopOffline(Action<bool, bool, bool> call_back = null)
 	{
-		if (!CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
+		if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
 		{
-			StageObjectManager.CreatePlayerInfo createPlayerInfo = MonoBehaviourSingleton<StatusManager>.I.GetCreatePlayerInfo();
-			if (createPlayerInfo != null)
+			return;
+		}
+		StageObjectManager.CreatePlayerInfo createPlayerInfo = MonoBehaviourSingleton<StatusManager>.I.GetCreatePlayerInfo();
+		if (createPlayerInfo != null)
+		{
+			CharaInfo chara_info = createPlayerInfo.charaInfo;
+			if (MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
 			{
-				CharaInfo chara_info = createPlayerInfo.charaInfo;
-				if (MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
-				{
-					MonoBehaviourSingleton<CoopOfflineManager>.I.Activate();
-				}
-				CoopNetworkManager.ConnectData conn_data = new CoopNetworkManager.ConnectData();
-				MonoBehaviourSingleton<CoopNetworkManager>.I.Regist(conn_data, delegate(bool is_regist)
-				{
-					if (is_regist)
-					{
-						List<FieldModel.SlotInfo> slot_infos = new List<FieldModel.SlotInfo>
-						{
-							new FieldModel.SlotInfo
-							{
-								userId = chara_info.userId,
-								userInfo = (chara_info as FriendCharaInfo)
-							}
-						};
-						MonoBehaviourSingleton<CoopManager>.I.coopRoom.Activate(slot_infos);
-					}
-					if (call_back != null)
-					{
-						call_back(true, true, is_regist);
-					}
-				});
+				MonoBehaviourSingleton<CoopOfflineManager>.I.Activate();
 			}
+			CoopNetworkManager.ConnectData conn_data = new CoopNetworkManager.ConnectData();
+			MonoBehaviourSingleton<CoopNetworkManager>.I.Regist(conn_data, delegate(bool is_regist)
+			{
+				if (is_regist)
+				{
+					List<FieldModel.SlotInfo> slot_infos = new List<FieldModel.SlotInfo>
+					{
+						new FieldModel.SlotInfo
+						{
+							userId = chara_info.userId,
+							userInfo = (chara_info as FriendCharaInfo)
+						}
+					};
+					MonoBehaviourSingleton<CoopManager>.I.coopRoom.Activate(slot_infos);
+				}
+				if (call_back != null)
+				{
+					call_back(arg1: true, arg2: true, is_regist);
+				}
+			});
 		}
 	}
 
@@ -271,7 +299,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 					{
 						call_back(is_connect, is_regist);
 					}
-				}, false, false);
+				});
 			}
 		});
 	}
@@ -287,12 +315,12 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 				if (explore != null)
 				{
 					MonoBehaviourSingleton<QuestManager>.I.SetExploreInfo(explore);
-					MonoBehaviourSingleton<QuestManager>.I.SetExploreStatus(new ExploreStatus(explore, true));
+					MonoBehaviourSingleton<QuestManager>.I.SetExploreStatus(new ExploreStatus(explore, host: true));
 				}
 				if (partyData.quest.rush != null)
 				{
 					MonoBehaviourSingleton<InGameManager>.I.SetRushInfo(partyData.quest.questId, partyData.quest.rush);
-					MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)partyData.quest.rush.waves[0].questId, true);
+					MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)partyData.quest.rush.waves[0].questId);
 				}
 			}
 			if (isFromField)
@@ -317,20 +345,20 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 				}
 				else if (call_back != null)
 				{
-					call_back(is_m, is_c, is_r, false);
+					call_back(is_m, is_c, is_r, arg4: false);
 				}
-			}, false);
+			});
 		}
 		else if (call_back != null)
 		{
-			call_back(is_m, false, false, false);
+			call_back(is_m, arg2: false, arg3: false, arg4: false);
 		}
 	}
 
-	private static void MatchingField(uint deliveryId, Action<bool> call_back = null)
+	private static void MatchingField(uint _deliveryId, int _toUserId, Action<bool> call_back = null)
 	{
 		int currentPortalID = (int)MonoBehaviourSingleton<FieldManager>.I.currentPortalID;
-		MonoBehaviourSingleton<FieldManager>.I.SendMatching(currentPortalID, deliveryId, delegate(bool is_matching)
+		MonoBehaviourSingleton<FieldManager>.I.SendMatching(currentPortalID, _deliveryId, _toUserId, delegate(bool is_matching)
 		{
 			Logd("Matched:{0}", is_matching);
 			if (call_back != null)
@@ -356,12 +384,12 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 	private static void RandomMatchingQuestField(Action<bool> call_back = null)
 	{
 		int quest_id = (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestID;
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching(quest_id, 0, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching(quest_id, 0, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
 			Logd("Matched:{0}", is_success);
 			if (is_success)
 			{
-				PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
+				PartyManager.PartySetting setting = new PartyManager.PartySetting(is_lock: false, 0, 0);
 				if (!isJoined)
 				{
 					MonoBehaviourSingleton<PartyManager>.I.SendCreate(quest_id, setting, delegate(bool is_success2)
@@ -370,18 +398,18 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 						{
 							MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 						}
-						MatchingPartyField(call_back, false);
+						MatchingPartyField(call_back);
 					});
 				}
 				else
 				{
 					MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
-					MatchingPartyField(call_back, false);
+					MatchingPartyField(call_back);
 				}
 			}
 			else
 			{
-				call_back.SafeInvoke(false);
+				call_back.SafeInvoke(t: false);
 			}
 		});
 	}
@@ -392,26 +420,24 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		{
 			if (call_back != null)
 			{
-				call_back(false);
+				call_back(obj: false);
 			}
+			return;
 		}
-		else
+		string partyId = MonoBehaviourSingleton<PartyManager>.I.GetPartyId();
+		bool is_owner = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
+		if (is_force_enter)
 		{
-			string partyId = MonoBehaviourSingleton<PartyManager>.I.GetPartyId();
-			bool is_owner = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
-			if (is_force_enter)
-			{
-				is_owner = false;
-			}
-			MonoBehaviourSingleton<FieldManager>.I.SendParty(partyId, is_owner, delegate(bool is_matching)
-			{
-				Logd("Matched:{0}", is_matching);
-				if (call_back != null)
-				{
-					call_back(is_matching);
-				}
-			});
+			is_owner = false;
 		}
+		MonoBehaviourSingleton<FieldManager>.I.SendParty(partyId, is_owner, delegate(bool is_matching)
+		{
+			Logd("Matched:{0}", is_matching);
+			if (call_back != null)
+			{
+				call_back(is_matching);
+			}
+		});
 	}
 
 	public static void UpdateField(Action<bool> call_back = null)
@@ -487,60 +513,72 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		{
 			if (call_back != null)
 			{
-				call_back(false, Error.Unknown);
+				call_back(arg1: false, Error.Unknown);
 			}
+			return;
+		}
+		List<List<int>> list = new List<List<int>>();
+		float hpRate = 100f;
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			list = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists;
+			hpRate = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossStartHpDamageRate;
+		}
+		if (QuestManager.IsValidInGameExplore())
+		{
+			List<int> exploreBossBreakIdList = MonoBehaviourSingleton<QuestManager>.I.GetExploreBossBreakIdList();
+			if (list == null)
+			{
+				MonoBehaviourSingleton<CoopManager>.I.coopStage.InitBossBreakIdList();
+				list = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists;
+			}
+			if (list.Count == 0)
+			{
+				list.Add(exploreBossBreakIdList);
+			}
+			else
+			{
+				list[0] = exploreBossBreakIdList;
+			}
+			hpRate = 100f;
+		}
+		if (QuestManager.IsValidInGameWaveMatch())
+		{
+			List<int> list2 = new List<int>();
+			list2.Add(0);
+			if (list.Count > 0)
+			{
+				list[0] = list2;
+			}
+			else
+			{
+				list.Add(list2);
+			}
+		}
+		List<int> missionClearStatuses = MonoBehaviourSingleton<InGameProgress>.I.GetMissionClearStatuses();
+		List<int> memIds = null;
+		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
+		{
+			memIds = MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.GetUserIdList(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
+		}
+		List<QuestCompleteModel.BattleUserLog> logs = null;
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			logs = MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.list;
+		}
+		if (QuestManager.IsValidTrial())
+		{
+			MonoBehaviourSingleton<QuestManager>.I.SendQuestCompleteTrial(missionClearStatuses, delegate(bool is_comp, Error result)
+			{
+				Logd("Trial Completed:{0}", is_comp);
+				if (call_back != null)
+				{
+					call_back(is_comp, result);
+				}
+			});
 		}
 		else
 		{
-			List<List<int>> list = new List<List<int>>();
-			float hpRate = 100f;
-			if (MonoBehaviourSingleton<CoopManager>.IsValid())
-			{
-				list = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists;
-				hpRate = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossStartHpDamageRate;
-			}
-			if (QuestManager.IsValidInGameExplore())
-			{
-				List<int> exploreBossBreakIdList = MonoBehaviourSingleton<QuestManager>.I.GetExploreBossBreakIdList();
-				if (list == null)
-				{
-					MonoBehaviourSingleton<CoopManager>.I.coopStage.InitBossBreakIdList();
-					list = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists;
-				}
-				if (list.Count == 0)
-				{
-					list.Add(exploreBossBreakIdList);
-				}
-				else
-				{
-					list[0] = exploreBossBreakIdList;
-				}
-				hpRate = 100f;
-			}
-			if (QuestManager.IsValidInGameWaveMatch())
-			{
-				List<int> list2 = new List<int>();
-				list2.Add(0);
-				if (list.Count > 0)
-				{
-					list[0] = list2;
-				}
-				else
-				{
-					list.Add(list2);
-				}
-			}
-			List<int> missionClearStatuses = MonoBehaviourSingleton<InGameProgress>.I.GetMissionClearStatuses();
-			List<int> memIds = null;
-			if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
-			{
-				memIds = MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.GetUserIdList(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-			}
-			List<QuestCompleteModel.BattleUserLog> logs = null;
-			if (MonoBehaviourSingleton<CoopManager>.IsValid())
-			{
-				logs = MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.list;
-			}
 			MonoBehaviourSingleton<QuestManager>.I.SendQuestComplete(list, missionClearStatuses, memIds, hpRate, logs, delegate(bool is_comp, Error result)
 			{
 				Logd("Quest Completed:{0}", is_comp);
@@ -556,7 +594,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 	{
 		if (!MonoBehaviourSingleton<QuestManager>.IsValid() && callBack != null)
 		{
-			callBack(false, Error.Unknown);
+			callBack(arg1: false, Error.Unknown);
 		}
 		else
 		{
@@ -606,16 +644,14 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 
 	public void Leave(Action<bool> call_back = null, bool toHome = false, bool fieldRetire = false)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		Logd("Leave. start");
-		this.StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire, false));
+		this.StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire));
 	}
 
 	public void LeaveWithParty(Action<bool> call_back = null, bool toHome = false, bool fieldRetire = false)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		Logd("LeaveWithParty. start");
-		this.StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire, true));
+		this.StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire, isParty: true));
 	}
 
 	private IEnumerator LeaveCoroutine(Action<bool> call_back = null, bool toHome = false, bool fieldRetire = false, bool isParty = false)
@@ -623,45 +659,45 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		bool is_success = true;
 		if (FieldManager.IsValidInField())
 		{
-			bool is_leaved2 = false;
-			bool wait3 = true;
+			bool is_leaved = false;
+			bool wait = true;
 			MonoBehaviourSingleton<FieldManager>.I.SendLeave(toHome, fieldRetire, delegate(bool is_leave)
 			{
-				((_003CLeaveCoroutine_003Ec__Iterator172)/*Error near IL_0059: stateMachine*/)._003Cwait_003E__2 = false;
-				((_003CLeaveCoroutine_003Ec__Iterator172)/*Error near IL_0059: stateMachine*/)._003Cis_leaved_003E__1 = is_leave;
-			});
-			while (wait3)
-			{
-				yield return (object)null;
-			}
-			Logd("LeaveCoroutine. Field leaved:{0}", is_leaved2);
-			is_success = is_leaved2;
-		}
-		if (isParty && PartyManager.IsValidInParty())
-		{
-			bool is_leaved = false;
-			bool wait2 = true;
-			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
-			{
-				((_003CLeaveCoroutine_003Ec__Iterator172)/*Error near IL_00df: stateMachine*/)._003Cwait_003E__4 = false;
-				((_003CLeaveCoroutine_003Ec__Iterator172)/*Error near IL_00df: stateMachine*/)._003Cis_leaved_003E__3 = is_leave;
-			});
-			while (wait2)
-			{
-				yield return (object)null;
-			}
-			Logd("LeaveCoroutine. Party leaved:{0}", is_leaved);
-		}
-		if (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
-		{
-			bool wait = true;
-			MonoBehaviourSingleton<CoopNetworkManager>.I.Close(1000, "Bye!", delegate
-			{
-				((_003CLeaveCoroutine_003Ec__Iterator172)/*Error near IL_0156: stateMachine*/)._003Cwait_003E__5 = false;
+				wait = false;
+				is_leaved = is_leave;
 			});
 			while (wait)
 			{
-				yield return (object)null;
+				yield return null;
+			}
+			Logd("LeaveCoroutine. Field leaved:{0}", is_leaved);
+			is_success = is_leaved;
+		}
+		if (isParty && PartyManager.IsValidInParty())
+		{
+			bool is_leaved2 = false;
+			bool wait2 = true;
+			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
+			{
+				wait2 = false;
+				is_leaved2 = is_leave;
+			});
+			while (wait2)
+			{
+				yield return null;
+			}
+			Logd("LeaveCoroutine. Party leaved:{0}", is_leaved2);
+		}
+		if (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
+		{
+			bool wait3 = true;
+			MonoBehaviourSingleton<CoopNetworkManager>.I.Close(1000, "Bye!", delegate
+			{
+				wait3 = false;
+			});
+			while (wait3)
+			{
+				yield return null;
 			}
 		}
 		MonoBehaviourSingleton<CoopManager>.I.Clear();
@@ -670,32 +706,56 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 
 	private IEnumerator OnApplicationPause(bool paused)
 	{
-		if (CoopWebSocketSingleton<KtbWebSocket>.IsValidOpen())
+		if (!CoopWebSocketSingleton<KtbWebSocket>.IsValidOpen())
 		{
-			Logd("OnApplicationPause. pause={0}, is_connect={1}", paused, CoopWebSocketSingleton<KtbWebSocket>.IsValidOpen());
-			if (paused)
+			yield break;
+		}
+		Logd("OnApplicationPause. pause={0}, is_connect={1}", paused, CoopWebSocketSingleton<KtbWebSocket>.IsValidOpen());
+		if (paused)
+		{
+			if (!MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
 			{
-				if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
-				{
-					MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(true);
-				}
-				if (PartyManager.IsValidInParty() && !InGameManager.IsReentryNotLeaveParty())
-				{
-					Protocol.Force(delegate
-					{
-						MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
-						{
-							Logd("PartyLeave. {0}", is_leave);
-						});
-					});
-				}
-				MonoBehaviourSingleton<KtbWebSocket>.I.Close(1000, "Bye!");
+				yield break;
 			}
-			else
+			if (MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.IsEnabledStandby())
 			{
-				MonoBehaviourSingleton<KtbWebSocket>.I.ClearLastPacketReceivedTime();
+				MonoBehaviourSingleton<CoopNetworkManager>.I.Standby();
+				yield break;
+			}
+			MonoBehaviourSingleton<CoopNetworkManager>.I.LoopBackRoomLeave(is_force: true);
+			if (PartyManager.IsValidInParty() && !InGameManager.IsReentryNotLeaveParty())
+			{
+				Protocol.Force(delegate
+				{
+					MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
+					{
+						Logd("PartyLeave. {0}", is_leave);
+					});
+				});
+			}
+			MonoBehaviourSingleton<KtbWebSocket>.I.Close(1000);
+			yield break;
+		}
+		if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.IsEnabledStandby())
+		{
+			MonoBehaviourSingleton<CoopNetworkManager>.I.Resume();
+			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+			{
+				MonoBehaviourSingleton<CoopManager>.I.coopStage.packetSender.SendStageSyncTimeRequest();
+			}
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.playerList != null)
+			{
+				List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
+				for (int i = 0; i < playerList.Count; i++)
+				{
+					Player player = playerList[i] as Player;
+					if (player != null && player.rescueTime > 0f && !player.IsPrayed() && !player.isWaitingResurrectionHoming)
+					{
+						player.playerSender.SendDeadCountRequest(player.id);
+					}
+				}
 			}
 		}
-		yield break;
+		MonoBehaviourSingleton<KtbWebSocket>.I.ClearLastPacketReceivedTime();
 	}
 }

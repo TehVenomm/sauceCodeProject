@@ -55,8 +55,8 @@ public class ImageLoader implements Runnable {
                     imageCache = new ImageCache(25, 1440, 3);
                     imageCache.enableDiskCache(context, 1);
                 }
-            } catch (Throwable th) {
-                Class cls = ImageLoader.class;
+            } finally {
+                Class<ImageLoader> cls = ImageLoader.class;
             }
         }
     }
@@ -105,16 +105,19 @@ public class ImageLoader implements Runnable {
         start(str, imageLoaderHandler.getImageView(), imageLoaderHandler, drawable, drawable2);
     }
 
-    protected Bitmap downloadImage() {
+    /* access modifiers changed from: protected */
+    public Bitmap downloadImage() {
         int i = 1;
-        while (i <= numRetries) {
+        while (true) {
+            if (i > numRetries) {
+                break;
+            }
             try {
-                Object retrieveImageData = retrieveImageData();
+                byte[] retrieveImageData = retrieveImageData();
                 if (retrieveImageData != null) {
                     imageCache.put(this.imageUrl, retrieveImageData);
                     return BitmapFactory.decodeByteArray(retrieveImageData, 0, retrieveImageData.length);
                 }
-                return null;
             } catch (Throwable th) {
                 Log.w(LOG_TAG, "download for " + this.imageUrl + " failed (attempt " + i + ")");
                 th.printStackTrace();
@@ -135,7 +138,8 @@ public class ImageLoader implements Runnable {
         this.handler.sendMessage(message);
     }
 
-    protected byte[] retrieveImageData() throws IOException {
+    /* access modifiers changed from: protected */
+    public byte[] retrieveImageData() throws IOException {
         int i = 0;
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(this.imageUrl).openConnection();
         int contentLength = httpURLConnection.getContentLength();
@@ -146,9 +150,15 @@ public class ImageLoader implements Runnable {
         Log.d(LOG_TAG, "fetching image " + this.imageUrl + " (" + contentLength + ")");
         BufferedInputStream bufferedInputStream = new BufferedInputStream(httpURLConnection.getInputStream());
         int i2 = 0;
-        while (i != -1 && i2 < contentLength) {
-            i = bufferedInputStream.read(bArr, i2, contentLength - i2);
-            i2 += i;
+        while (true) {
+            int i3 = i;
+            if (i2 == -1 || i3 >= contentLength) {
+                bufferedInputStream.close();
+                httpURLConnection.disconnect();
+            } else {
+                i2 = bufferedInputStream.read(bArr, i3, contentLength - i3);
+                i = i3 + i2;
+            }
         }
         bufferedInputStream.close();
         httpURLConnection.disconnect();

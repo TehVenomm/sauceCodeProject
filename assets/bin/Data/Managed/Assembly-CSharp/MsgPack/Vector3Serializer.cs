@@ -21,7 +21,7 @@ namespace MsgPack
 		protected override Vector3 UnpackFromCore(Unpacker unpacker)
 		{
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			if (!unpacker.IsArrayHeader)
+			if (!unpacker.get_IsArrayHeader())
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
@@ -30,23 +30,26 @@ namespace MsgPack
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
-			if (!unpacker.IsArrayHeader)
+			if (!unpacker.get_IsArrayHeader())
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
-			if (!unpacker.ReadSingle(out float result))
+			float num = default(float);
+			if (!unpacker.ReadSingle(ref num))
 			{
 				throw SerializationExceptions.NewMissingItem(0);
 			}
-			if (!unpacker.ReadSingle(out float result2))
+			float num2 = default(float);
+			if (!unpacker.ReadSingle(ref num2))
 			{
 				throw SerializationExceptions.NewMissingItem(1);
 			}
-			if (!unpacker.ReadSingle(out float result3))
+			float num3 = default(float);
+			if (!unpacker.ReadSingle(ref num3))
 			{
 				throw SerializationExceptions.NewMissingItem(2);
 			}
-			return new Vector3(result, result2, result3);
+			return new Vector3(num, num2, num3);
 		}
 	}
 }

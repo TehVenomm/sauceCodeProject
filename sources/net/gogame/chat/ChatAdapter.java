@@ -5,30 +5,24 @@ import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 
 public class ChatAdapter extends BaseAdapter {
     private final ChatContext chatContext;
     private final Context context;
-    private final DataSetObserver dataSetObserver = new C09991();
-    private final UIContext uiContext;
-    private final ChatAdapterViewFactory viewFactory;
-
-    /* renamed from: net.gogame.chat.ChatAdapter$1 */
-    class C09991 extends DataSetObserver {
-        C09991() {
-        }
-
+    private final DataSetObserver dataSetObserver = new DataSetObserver() {
         public void onChanged() {
             ChatAdapter.this.notifyDataSetChanged();
         }
-    }
+    };
+    private final UIContext uiContext;
+    private final ChatAdapterViewFactory viewFactory;
 
-    public ChatAdapter(Context context, UIContext uIContext, ChatAdapterViewFactory chatAdapterViewFactory, ChatContext chatContext) {
-        this.context = context;
+    public ChatAdapter(Context context2, UIContext uIContext, ChatAdapterViewFactory chatAdapterViewFactory, ChatContext chatContext2) {
+        this.context = context2;
         this.uiContext = uIContext;
         this.viewFactory = chatAdapterViewFactory;
-        this.chatContext = chatContext;
+        this.chatContext = chatContext2;
     }
 
     public ChatContext getChatContext() {
@@ -73,7 +67,7 @@ public class ChatAdapter extends BaseAdapter {
             }
             return view2;
         } else if (((AgentTypingEntry) item).isTyping()) {
-            return this.viewFactory.getNotificationView(view, viewGroup, this.context.getResources().getString(C0785R.string.net_gogame_chat_agent_typing_message));
+            return this.viewFactory.getNotificationView(view, viewGroup, this.context.getResources().getString(C1122R.string.net_gogame_chat_agent_typing_message));
         } else {
             return this.viewFactory.getNotificationView(view, viewGroup, null, true);
         }

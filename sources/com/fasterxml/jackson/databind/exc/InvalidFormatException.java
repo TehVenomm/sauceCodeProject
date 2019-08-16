@@ -12,14 +12,14 @@ public class InvalidFormatException extends JsonMappingException {
 
     @Deprecated
     public InvalidFormatException(String str, Object obj, Class<?> cls) {
-        super(null, str);
+        super((Closeable) null, str);
         this._value = obj;
         this._targetType = cls;
     }
 
     @Deprecated
     public InvalidFormatException(String str, JsonLocation jsonLocation, Object obj, Class<?> cls) {
-        super(null, str, jsonLocation);
+        super((Closeable) null, str, jsonLocation);
         this._value = obj;
         this._targetType = cls;
     }
@@ -31,7 +31,7 @@ public class InvalidFormatException extends JsonMappingException {
     }
 
     public static InvalidFormatException from(JsonParser jsonParser, String str, Object obj, Class<?> cls) {
-        return new InvalidFormatException(jsonParser, str, obj, (Class) cls);
+        return new InvalidFormatException(jsonParser, str, obj, cls);
     }
 
     public Object getValue() {

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChatStampAll
+public class ChatStampAll : MonoBehaviour
 {
 	public UIGrid grid;
 
@@ -28,10 +28,8 @@ public class ChatStampAll
 
 	public void Open()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(true);
-		tweenCtrl.Play(true, null);
+		tweenCtrl.Play();
 		this.StartCoroutine(DoOpen());
 	}
 
@@ -40,10 +38,10 @@ public class ChatStampAll
 		if (!initailized)
 		{
 			LoadingQueue loadingQueue = new LoadingQueue(this);
-			LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem", false);
+			LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
 			if (loadingQueue.IsLoading())
 			{
-				yield return (object)loadingQueue.Wait();
+				yield return loadingQueue.Wait();
 			}
 			mChatStampPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
 			closeButton.onClick.Add(new EventDelegate(OnClose));
@@ -58,17 +56,14 @@ public class ChatStampAll
 
 	public void Close()
 	{
-		tweenCtrl.Play(false, delegate
+		tweenCtrl.Play(forward: false, delegate
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			this.get_gameObject().SetActive(false);
 		});
 	}
 
 	private void CreateStampList()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		for (int i = createIcons.Count; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + currentUnlockStamps.Count; i++)
 		{
 			Transform val = CreateStampItem(grid.get_transform());
@@ -127,7 +122,7 @@ public class ChatStampAll
 
 	private void OnClose()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 		Close();
 	}
 }

@@ -39,7 +39,7 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, false);
+		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, is_visible: false);
 		base.Initialize();
 	}
 
@@ -52,10 +52,10 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		}
 		if (array == null || array.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-			SetActive((Enum)UI.GRD_LIST, false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive((Enum)UI.GRD_LIST, is_visible: false);
+			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
 			SetLabelText((Enum)UI.LBL_NOW, "0");
 			SetLabelText((Enum)UI.LBL_MAX, "0");
 		}
@@ -63,8 +63,8 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		{
 			SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
 			SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetActive((Enum)UI.GRD_LIST, true);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+			SetActive((Enum)UI.GRD_LIST, is_visible: true);
 			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
 			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 			UpdateDynamicList();
@@ -86,9 +86,9 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		if (GameDefine.ACTIVE_DEGREE)
 		{
 			UIGrid component = GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>();
-			component.cellHeight = (float)GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
+			component.cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
 			SetListItem(i, t, is_recycle, info[i]);
 		});
@@ -113,11 +113,11 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		SetEvent(t, "GUILD_INFO", i);
 		if (isGM)
 		{
-			SetRenderNPCModel(t, UI.TEX_MODEL, 0, new Vector3(0f, -1.49f, 1.87f), new Vector3(0f, 154f, 0f), 10f, null);
+			SetRenderNPCModel(t, UI.TEX_MODEL, 0, new Vector3(0f, -1.49f, 1.87f), new Vector3(0f, 154f, 0f), 10f);
 		}
 		else
 		{
-			SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, false, true, false, true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), true, null);
+			SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		}
 		SetLabelText(t, UI.LBL_NAME, data.name);
 		SetLabelText(t, UI.LBL_LEVEL, data.level.ToString());
@@ -125,13 +125,13 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		SetLabelText(t, UI.LBL_LAST_LOGIN, base.sectionData.GetText("LAST_LOGIN"));
 		SetLabelText(t, UI.LBL_LAST_LOGIN_TIME, data.lastLogin);
 		EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(i + 4);
-		otherEquipSetCalculator.SetEquipSet(data.equipSet, false);
+		otherEquipSetCalculator.SetEquipSet(data.equipSet);
 		SimpleStatus finalStatus = otherEquipSetCalculator.GetFinalStatus(0, data.hp, data.atk, data.def);
 		SetLabelText(t, UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
 		SetLabelText(t, UI.LBL_DEF, finalStatus.defences[0].ToString());
 		SetLabelText(t, UI.LBL_HP, finalStatus.hp.ToString());
 		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(data.selectedDegrees, false, delegate
+		component.Initialize(data.selectedDegrees, isButton: false, delegate
 		{
 			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().Reposition();
 		});

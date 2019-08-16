@@ -16,11 +16,7 @@ public class PropertyBasedObjectIdGenerator extends PropertyGenerator {
     }
 
     public ObjectIdGenerator<Object> forScope(Class<?> cls) {
-        if (cls == this._scope) {
-            return this;
-        }
-        this(cls);
-        return this;
+        return cls == this._scope ? this : new PropertyBasedObjectIdGenerator(cls);
     }
 
     public ObjectIdGenerator<Object> newForSerialization(Object obj) {

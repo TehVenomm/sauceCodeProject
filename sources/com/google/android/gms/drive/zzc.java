@@ -3,67 +3,48 @@ package com.google.android.gms.drive;
 import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzc extends zza {
-    public static final Creator<zzc> CREATOR = new zzd();
-    private String zzaxy;
-    private ParcelFileDescriptor zzfrg;
-    final int zzgcv;
-    private int zzgcw;
-    private DriveId zzgcx;
-    private boolean zzgcy;
-
-    public zzc(ParcelFileDescriptor parcelFileDescriptor, int i, int i2, DriveId driveId, boolean z, String str) {
-        this.zzfrg = parcelFileDescriptor;
-        this.zzgcv = i;
-        this.zzgcw = i2;
-        this.zzgcx = driveId;
-        this.zzgcy = z;
-        this.zzaxy = str;
+public final class zzc implements Creator<Contents> {
+    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        ParcelFileDescriptor parcelFileDescriptor = null;
+        DriveId driveId = null;
+        String str = null;
+        boolean z = false;
+        int i = 0;
+        int i2 = 0;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 2:
+                    parcelFileDescriptor = (ParcelFileDescriptor) SafeParcelReader.createParcelable(parcel, readHeader, ParcelFileDescriptor.CREATOR);
+                    break;
+                case 3:
+                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                case 4:
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                case 5:
+                    driveId = (DriveId) SafeParcelReader.createParcelable(parcel, readHeader, DriveId.CREATOR);
+                    break;
+                case 7:
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                case 8:
+                    str = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
+            }
+        }
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new Contents(parcelFileDescriptor, i, i2, driveId, z, str);
     }
 
-    public final DriveId getDriveId() {
-        return this.zzgcx;
-    }
-
-    public final InputStream getInputStream() {
-        return new FileInputStream(this.zzfrg.getFileDescriptor());
-    }
-
-    public final int getMode() {
-        return this.zzgcw;
-    }
-
-    public final OutputStream getOutputStream() {
-        return new FileOutputStream(this.zzfrg.getFileDescriptor());
-    }
-
-    public final ParcelFileDescriptor getParcelFileDescriptor() {
-        return this.zzfrg;
-    }
-
-    public final int getRequestId() {
-        return this.zzgcv;
-    }
-
-    public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzfrg, i, false);
-        zzd.zzc(parcel, 3, this.zzgcv);
-        zzd.zzc(parcel, 4, this.zzgcw);
-        zzd.zza(parcel, 5, this.zzgcx, i, false);
-        zzd.zza(parcel, 7, this.zzgcy);
-        zzd.zza(parcel, 8, this.zzaxy, false);
-        zzd.zzai(parcel, zze);
-    }
-
-    public final boolean zzamp() {
-        return this.zzgcy;
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new Contents[i];
     }
 }

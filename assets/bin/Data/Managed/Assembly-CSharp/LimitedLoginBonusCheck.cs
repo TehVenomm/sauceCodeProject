@@ -5,7 +5,6 @@ public class LimitedLoginBonusCheck : GameSection
 {
 	public override void Initialize()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
 		this.StartCoroutine("DoCheck");
 	}
@@ -14,7 +13,7 @@ public class LimitedLoginBonusCheck : GameSection
 	{
 		while (MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		CheckNextLoginBonus();
 	}
@@ -24,32 +23,30 @@ public class LimitedLoginBonusCheck : GameSection
 		if (MonoBehaviourSingleton<AccountManager>.I.logInBonus == null)
 		{
 			GameSection.BackSection();
+			return;
 		}
-		else if (MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count == 0)
+		if (MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count == 0)
 		{
 			GameSection.BackSection();
+			return;
+		}
+		LoginBonus loginBonus = MonoBehaviourSingleton<AccountManager>.I.logInBonus[0];
+		if (loginBonus.priority > 0)
+		{
+			DispatchEvent("LIMITED_LOGIN_BONUS");
+		}
+		else if (loginBonus.type == 0)
+		{
+			DispatchEvent("LOGIN_BONUS");
 		}
 		else
 		{
-			LoginBonus loginBonus = MonoBehaviourSingleton<AccountManager>.I.logInBonus[0];
-			if (loginBonus.priority > 0)
-			{
-				DispatchEvent("LIMITED_LOGIN_BONUS", null);
-			}
-			else if (loginBonus.type == 0)
-			{
-				DispatchEvent("LOGIN_BONUS", null);
-			}
-			else
-			{
-				GameSection.BackSection();
-			}
+			GameSection.BackSection();
 		}
 	}
 
 	public void OnCloseDialog(string section_name)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine("DoCheck");
 	}
 }

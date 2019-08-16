@@ -15,8 +15,9 @@ public class DeviceLoginButton extends LoginButton {
             super();
         }
 
-        protected LoginManager getLoginManager() {
-            LoginManager instance = DeviceLoginManager.getInstance();
+        /* access modifiers changed from: protected */
+        public LoginManager getLoginManager() {
+            DeviceLoginManager instance = DeviceLoginManager.getInstance();
             instance.setDefaultAudience(DeviceLoginButton.this.getDefaultAudience());
             instance.setLoginBehavior(LoginBehavior.DEVICE_AUTH);
             instance.setDeviceRedirectUri(DeviceLoginButton.this.getDeviceRedirectUri());
@@ -40,7 +41,8 @@ public class DeviceLoginButton extends LoginButton {
         return this.deviceRedirectUri;
     }
 
-    protected LoginClickListener getNewLoginClickListener() {
+    /* access modifiers changed from: protected */
+    public LoginClickListener getNewLoginClickListener() {
         return new DeviceLoginClickListener();
     }
 

@@ -19,7 +19,7 @@ public class CompareToBuilder implements Builder<Integer> {
     }
 
     public static int reflectionCompare(Object obj, Object obj2, Collection<String> collection) {
-        return reflectionCompare(obj, obj2, ReflectionToStringBuilder.toNoNullStringArray((Collection) collection));
+        return reflectionCompare(obj, obj2, ReflectionToStringBuilder.toNoNullStringArray(collection));
     }
 
     public static int reflectionCompare(Object obj, Object obj2, String... strArr) {
@@ -34,24 +34,24 @@ public class CompareToBuilder implements Builder<Integer> {
             throw new NullPointerException();
         }
         Class<?> cls2 = obj.getClass();
-        if (cls2.isInstance(obj2)) {
-            CompareToBuilder compareToBuilder = new CompareToBuilder();
-            reflectionAppend(obj, obj2, cls2, compareToBuilder, z, strArr);
-            while (cls2.getSuperclass() != null && cls2 != cls) {
-                cls2 = cls2.getSuperclass();
-                reflectionAppend(obj, obj2, cls2, compareToBuilder, z, strArr);
-            }
-            return compareToBuilder.toComparison();
+        if (!cls2.isInstance(obj2)) {
+            throw new ClassCastException();
         }
-        throw new ClassCastException();
+        CompareToBuilder compareToBuilder = new CompareToBuilder();
+        reflectionAppend(obj, obj2, cls2, compareToBuilder, z, strArr);
+        while (cls2.getSuperclass() != null && cls2 != cls) {
+            cls2 = cls2.getSuperclass();
+            reflectionAppend(obj, obj2, cls2, compareToBuilder, z, strArr);
+        }
+        return compareToBuilder.toComparison();
     }
 
     private static void reflectionAppend(Object obj, Object obj2, Class<?> cls, CompareToBuilder compareToBuilder, boolean z, String[] strArr) {
-        AccessibleObject[] declaredFields = cls.getDeclaredFields();
+        Field[] declaredFields = cls.getDeclaredFields();
         AccessibleObject.setAccessible(declaredFields, true);
         for (int i = 0; i < declaredFields.length && compareToBuilder.comparison == 0; i++) {
             Field field = declaredFields[i];
-            if (!ArrayUtils.contains((Object[]) strArr, field.getName()) && field.getName().indexOf(36) == -1 && ((z || !Modifier.isTransient(field.getModifiers())) && !Modifier.isStatic(field.getModifiers()))) {
+            if (!ArrayUtils.contains((Object[]) strArr, (Object) field.getName()) && field.getName().indexOf(36) == -1 && ((z || !Modifier.isTransient(field.getModifiers())) && !Modifier.isStatic(field.getModifiers()))) {
                 try {
                     compareToBuilder.append(field.get(obj), field.get(obj2));
                 } catch (IllegalAccessException e) {
@@ -96,7 +96,7 @@ public class CompareToBuilder implements Builder<Integer> {
                 } else if (obj instanceof boolean[]) {
                     append((boolean[]) obj, (boolean[]) obj2);
                 } else {
-                    append((Object[]) obj, (Object[]) obj2, (Comparator) comparator);
+                    append((Object[]) obj, (Object[]) obj2, comparator);
                 }
             } else if (comparator == null) {
                 this.comparison = ((Comparable) obj).compareTo(obj2);
@@ -163,10 +163,10 @@ public class CompareToBuilder implements Builder<Integer> {
 
     public CompareToBuilder append(boolean z, boolean z2) {
         if (this.comparison == 0 && z != z2) {
-            if (z) {
-                this.comparison = 1;
-            } else {
+            if (!z) {
                 this.comparison = -1;
+            } else {
+                this.comparison = 1;
             }
         }
         return this;
@@ -189,8 +189,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < objArr.length && this.comparison == 0; i++) {
-                    append(objArr[i], objArr2[i], (Comparator) comparator);
+                for (int i2 = 0; i2 < objArr.length && this.comparison == 0; i2++) {
+                    append(objArr[i2], objArr2[i2], comparator);
                 }
             }
         }
@@ -210,8 +210,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < jArr.length && this.comparison == 0; i++) {
-                    append(jArr[i], jArr2[i]);
+                for (int i2 = 0; i2 < jArr.length && this.comparison == 0; i2++) {
+                    append(jArr[i2], jArr2[i2]);
                 }
             }
         }
@@ -231,8 +231,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < iArr.length && this.comparison == 0; i++) {
-                    append(iArr[i], iArr2[i]);
+                for (int i2 = 0; i2 < iArr.length && this.comparison == 0; i2++) {
+                    append(iArr[i2], iArr2[i2]);
                 }
             }
         }
@@ -252,8 +252,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < sArr.length && this.comparison == 0; i++) {
-                    append(sArr[i], sArr2[i]);
+                for (int i2 = 0; i2 < sArr.length && this.comparison == 0; i2++) {
+                    append(sArr[i2], sArr2[i2]);
                 }
             }
         }
@@ -273,8 +273,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < cArr.length && this.comparison == 0; i++) {
-                    append(cArr[i], cArr2[i]);
+                for (int i2 = 0; i2 < cArr.length && this.comparison == 0; i2++) {
+                    append(cArr[i2], cArr2[i2]);
                 }
             }
         }
@@ -294,8 +294,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < bArr.length && this.comparison == 0; i++) {
-                    append(bArr[i], bArr2[i]);
+                for (int i2 = 0; i2 < bArr.length && this.comparison == 0; i2++) {
+                    append(bArr[i2], bArr2[i2]);
                 }
             }
         }
@@ -315,8 +315,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < dArr.length && this.comparison == 0; i++) {
-                    append(dArr[i], dArr2[i]);
+                for (int i2 = 0; i2 < dArr.length && this.comparison == 0; i2++) {
+                    append(dArr[i2], dArr2[i2]);
                 }
             }
         }
@@ -336,8 +336,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < fArr.length && this.comparison == 0; i++) {
-                    append(fArr[i], fArr2[i]);
+                for (int i2 = 0; i2 < fArr.length && this.comparison == 0; i2++) {
+                    append(fArr[i2], fArr2[i2]);
                 }
             }
         }
@@ -357,8 +357,8 @@ public class CompareToBuilder implements Builder<Integer> {
                 }
                 this.comparison = i;
             } else {
-                for (i = 0; i < zArr.length && this.comparison == 0; i++) {
-                    append(zArr[i], zArr2[i]);
+                for (int i2 = 0; i2 < zArr.length && this.comparison == 0; i2++) {
+                    append(zArr[i2], zArr2[i2]);
                 }
             }
         }

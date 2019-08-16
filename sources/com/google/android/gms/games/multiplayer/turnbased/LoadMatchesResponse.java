@@ -2,43 +2,43 @@ package com.google.android.gms.games.multiplayer.turnbased;
 
 import android.os.Bundle;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.games.internal.zze;
+import com.google.android.gms.games.internal.zzbd;
 import com.google.android.gms.games.multiplayer.InvitationBuffer;
 
 public final class LoadMatchesResponse {
-    private final InvitationBuffer zzhmz;
-    private final TurnBasedMatchBuffer zzhna;
-    private final TurnBasedMatchBuffer zzhnb;
-    private final TurnBasedMatchBuffer zzhnc;
+    private final InvitationBuffer zzqh;
+    private final TurnBasedMatchBuffer zzqi;
+    private final TurnBasedMatchBuffer zzqj;
+    private final TurnBasedMatchBuffer zzqk;
 
     public LoadMatchesResponse(Bundle bundle) {
-        DataHolder zzc = zzc(bundle, 0);
-        if (zzc != null) {
-            this.zzhmz = new InvitationBuffer(zzc);
+        DataHolder zza = zza(bundle, 0);
+        if (zza != null) {
+            this.zzqh = new InvitationBuffer(zza);
         } else {
-            this.zzhmz = null;
+            this.zzqh = null;
         }
-        zzc = zzc(bundle, 1);
-        if (zzc != null) {
-            this.zzhna = new TurnBasedMatchBuffer(zzc);
+        DataHolder zza2 = zza(bundle, 1);
+        if (zza2 != null) {
+            this.zzqi = new TurnBasedMatchBuffer(zza2);
         } else {
-            this.zzhna = null;
+            this.zzqi = null;
         }
-        zzc = zzc(bundle, 2);
-        if (zzc != null) {
-            this.zzhnb = new TurnBasedMatchBuffer(zzc);
+        DataHolder zza3 = zza(bundle, 2);
+        if (zza3 != null) {
+            this.zzqj = new TurnBasedMatchBuffer(zza3);
         } else {
-            this.zzhnb = null;
+            this.zzqj = null;
         }
-        zzc = zzc(bundle, 3);
-        if (zzc != null) {
-            this.zzhnc = new TurnBasedMatchBuffer(zzc);
+        DataHolder zza4 = zza(bundle, 3);
+        if (zza4 != null) {
+            this.zzqk = new TurnBasedMatchBuffer(zza4);
         } else {
-            this.zzhnc = null;
+            this.zzqk = null;
         }
     }
 
-    private static DataHolder zzc(Bundle bundle, int i) {
+    private static DataHolder zza(Bundle bundle, int i) {
         String str;
         switch (i) {
             case 0:
@@ -54,11 +54,14 @@ public final class LoadMatchesResponse {
                 str = "TURN_STATUS_COMPLETE";
                 break;
             default:
-                zze.zzz("MatchTurnStatus", "Unknown match turn status: " + i);
+                zzbd.m430e("MatchTurnStatus", "Unknown match turn status: " + i);
                 str = "TURN_STATUS_UNKNOWN";
                 break;
         }
-        return !bundle.containsKey(str) ? null : (DataHolder) bundle.getParcelable(str);
+        if (!bundle.containsKey(str)) {
+            return null;
+        }
+        return (DataHolder) bundle.getParcelable(str);
     }
 
     @Deprecated
@@ -67,37 +70,46 @@ public final class LoadMatchesResponse {
     }
 
     public final TurnBasedMatchBuffer getCompletedMatches() {
-        return this.zzhnc;
+        return this.zzqk;
     }
 
     public final InvitationBuffer getInvitations() {
-        return this.zzhmz;
+        return this.zzqh;
     }
 
     public final TurnBasedMatchBuffer getMyTurnMatches() {
-        return this.zzhna;
+        return this.zzqi;
     }
 
     public final TurnBasedMatchBuffer getTheirTurnMatches() {
-        return this.zzhnb;
+        return this.zzqj;
     }
 
     public final boolean hasData() {
-        return (this.zzhmz == null || this.zzhmz.getCount() <= 0) ? (this.zzhna == null || this.zzhna.getCount() <= 0) ? (this.zzhnb == null || this.zzhnb.getCount() <= 0) ? this.zzhnc != null && this.zzhnc.getCount() > 0 : true : true : true;
+        if (this.zzqh != null && this.zzqh.getCount() > 0) {
+            return true;
+        }
+        if (this.zzqi != null && this.zzqi.getCount() > 0) {
+            return true;
+        }
+        if (this.zzqj == null || this.zzqj.getCount() <= 0) {
+            return this.zzqk != null && this.zzqk.getCount() > 0;
+        }
+        return true;
     }
 
     public final void release() {
-        if (this.zzhmz != null) {
-            this.zzhmz.release();
+        if (this.zzqh != null) {
+            this.zzqh.release();
         }
-        if (this.zzhna != null) {
-            this.zzhna.release();
+        if (this.zzqi != null) {
+            this.zzqi.release();
         }
-        if (this.zzhnb != null) {
-            this.zzhnb.release();
+        if (this.zzqj != null) {
+            this.zzqj.release();
         }
-        if (this.zzhnc != null) {
-            this.zzhnc.release();
+        if (this.zzqk != null) {
+            this.zzqk.release();
         }
     }
 }

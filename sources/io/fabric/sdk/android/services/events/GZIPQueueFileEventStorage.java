@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.events;
+package p017io.fabric.sdk.android.services.events;
 
 import android.content.Context;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
+/* renamed from: io.fabric.sdk.android.services.events.GZIPQueueFileEventStorage */
 public class GZIPQueueFileEventStorage extends QueueFileEventStorage {
     public GZIPQueueFileEventStorage(Context context, File file, String str, String str2) throws IOException {
         super(context, file, str, str2);

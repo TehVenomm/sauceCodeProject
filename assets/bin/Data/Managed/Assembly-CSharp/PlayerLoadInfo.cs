@@ -1,5 +1,7 @@
 using Network;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 [Serializable]
 public class PlayerLoadInfo
@@ -49,6 +51,46 @@ public class PlayerLoadInfo
 	public uint weaponSpAttackType;
 
 	public int actionVoiceBaseID = -1;
+
+	public List<uint> accUIDs = new List<uint>();
+
+	public bool isNeedToCache;
+
+	public override string ToString()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.AppendFormat("---- ktnt ----\n");
+		stringBuilder.AppendFormat("- isNeedToCache: {0}\n", isNeedToCache);
+		stringBuilder.AppendFormat("- faceModelID: {0}\n", faceModelID);
+		stringBuilder.AppendFormat("- hairModelID: {0}\n", hairModelID);
+		stringBuilder.AppendFormat("- headModelID: {0}\n", headModelID);
+		stringBuilder.AppendFormat("- bodyModelID: {0}\n", bodyModelID);
+		stringBuilder.AppendFormat("- armModelID: {0}\n", armModelID);
+		stringBuilder.AppendFormat("- legModelID: {0}\n", legModelID);
+		stringBuilder.AppendFormat("- weaponModelID: {0}\n", weaponModelID);
+		stringBuilder.AppendFormat("- skinColor: {0}\n", skinColor);
+		stringBuilder.AppendFormat("- hairColor: {0}\n", hairColor);
+		stringBuilder.AppendFormat("- headColor: {0}\n", headColor);
+		stringBuilder.AppendFormat("- bodyColor: {0}\n", bodyColor);
+		stringBuilder.AppendFormat("- armColor: {0}\n", armColor);
+		stringBuilder.AppendFormat("- legColor: {0}\n", legColor);
+		stringBuilder.AppendFormat("- weaponColor0: {0}\n", weaponColor0);
+		stringBuilder.AppendFormat("- weaponColor1: {0}\n", weaponColor1);
+		stringBuilder.AppendFormat("- weaponColor2: {0}\n", weaponColor2);
+		stringBuilder.AppendFormat("- weaponEffectID: {0}\n", weaponEffectID);
+		stringBuilder.AppendFormat("- weaponEffectParam: {0}\n", weaponEffectParam);
+		stringBuilder.AppendFormat("- weaponEffectColor: {0}\n", weaponEffectColor);
+		stringBuilder.AppendFormat("- weaponEvolveId: {0}\n", weaponEvolveId);
+		stringBuilder.AppendFormat("- equipType: {0}\n", equipType);
+		stringBuilder.AppendFormat("- weaponSpAttackType: {0}\n", weaponSpAttackType);
+		stringBuilder.AppendFormat("- actionVoiceBaseID: {0}\n", actionVoiceBaseID);
+		stringBuilder.AppendFormat("- accUIDs:\n");
+		foreach (uint accUID in accUIDs)
+		{
+			stringBuilder.AppendFormat("-- {0}\n", accUID);
+		}
+		return stringBuilder.ToString();
+	}
 
 	public bool Equals(PlayerLoadInfo info)
 	{
@@ -144,6 +186,27 @@ public class PlayerLoadInfo
 		{
 			return false;
 		}
+		if (!EqualsAccessory(info.accUIDs))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private bool EqualsAccessory(List<uint> _accUIDs)
+	{
+		if (accUIDs.Count != _accUIDs.Count)
+		{
+			return false;
+		}
+		int i = 0;
+		for (int count = accUIDs.Count; i < count; i++)
+		{
+			if (!_accUIDs.Contains(accUIDs[i]))
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
@@ -173,6 +236,8 @@ public class PlayerLoadInfo
 		playerLoadInfo.equipType = equipType;
 		playerLoadInfo.weaponSpAttackType = weaponSpAttackType;
 		playerLoadInfo.actionVoiceBaseID = actionVoiceBaseID;
+		playerLoadInfo.accUIDs.Clear();
+		playerLoadInfo.accUIDs.AddRange(accUIDs);
 		return playerLoadInfo;
 	}
 
@@ -389,10 +454,10 @@ public class PlayerLoadInfo
 	{
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
 		uint num = MonoBehaviourSingleton<StatusManager>.I.GetEquippingItemTableID(0, set_no);
-		uint num2 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.armorUniqId) : 0;
-		uint num3 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.helmUniqId) : 0;
-		uint num4 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.armUniqId) : 0;
-		uint num5 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.legUniqId) : 0;
+		uint num2 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.armorUniqId) : 0u;
+		uint num3 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.helmUniqId) : 0u;
+		uint num4 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.armUniqId) : 0u;
+		uint num5 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.legUniqId) : 0u;
 		if (num2 == 0)
 		{
 			num2 = MonoBehaviourSingleton<StatusManager>.I.GetEquippingItemTableID(3, set_no);
@@ -425,17 +490,88 @@ public class PlayerLoadInfo
 		{
 			num = 0u;
 		}
+		ApplyAccessory(MonoBehaviourSingleton<StatusManager>.I.GetEquippingAccessoryInfo(set_no));
 		SetupLoadInfo(num, num2, num3, num4, num5);
+	}
+
+	public void ApplyUserUniqueStatus(bool need_weapon, bool is_priority_visual_equip, int set_no = -1)
+	{
+		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
+		uint weapon_id = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingItemTableID(0, set_no);
+		uint num = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.armorUniqId) : 0u;
+		uint num2 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.helmUniqId) : 0u;
+		uint num3 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.armUniqId) : 0u;
+		uint num4 = is_priority_visual_equip ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(userStatus.legUniqId) : 0u;
+		if (num == 0)
+		{
+			num = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingItemTableID(3, set_no);
+		}
+		if (num2 == 0)
+		{
+			num2 = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingItemTableID(4, set_no);
+		}
+		if (num3 == 0)
+		{
+			num3 = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingItemTableID(5, set_no);
+		}
+		if (num4 == 0)
+		{
+			num4 = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingItemTableID(6, set_no);
+		}
+		if (MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingShowHelm(set_no) == 0)
+		{
+			num2 = 0u;
+		}
+		if (num == 0)
+		{
+			num = 10100u;
+		}
+		if (!need_weapon)
+		{
+			weapon_id = 0u;
+		}
+		ApplyAccessory(MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquippingAccessoryInfo(set_no));
+		SetupLoadInfo(weapon_id, num, num2, num3, num4);
 	}
 
 	public void SetupLoadInfo(EquipSetInfo equip_set, ulong weapon_uniq_id, ulong armor_uniq_id, ulong helm_uniq_id, ulong arm_uniq_id, ulong leg_uniq_id, bool show_helm)
 	{
-		EquipItemInfo equipItemInfo = (weapon_uniq_id != 0L) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(weapon_uniq_id) : equip_set.item[0];
-		EquipItemInfo equipItemInfo2 = (armor_uniq_id != 0L) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(armor_uniq_id) : equip_set.item[3];
-		EquipItemInfo equipItemInfo3 = (!show_helm) ? null : ((helm_uniq_id != 0L) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(helm_uniq_id) : equip_set.item[4]);
-		EquipItemInfo equipItemInfo4 = (arm_uniq_id != 0L) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(arm_uniq_id) : equip_set.item[5];
-		EquipItemInfo equipItemInfo5 = (leg_uniq_id != 0L) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(leg_uniq_id) : equip_set.item[6];
-		SetupLoadInfo((equipItemInfo != null) ? equipItemInfo.tableID : 0, (equipItemInfo2 != null) ? equipItemInfo2.tableID : 0, (equipItemInfo3 != null) ? equipItemInfo3.tableID : 0, (equipItemInfo4 != null) ? equipItemInfo4.tableID : 0, (equipItemInfo5 != null) ? equipItemInfo5.tableID : 0);
+		EquipItemInfo equipItemInfo = (weapon_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(weapon_uniq_id) : equip_set.item[0];
+		EquipItemInfo equipItemInfo2 = (armor_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(armor_uniq_id) : equip_set.item[3];
+		EquipItemInfo equipItemInfo3 = (!show_helm) ? null : ((helm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(helm_uniq_id) : equip_set.item[4]);
+		EquipItemInfo equipItemInfo4 = (arm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(arm_uniq_id) : equip_set.item[5];
+		EquipItemInfo equipItemInfo5 = (leg_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(leg_uniq_id) : equip_set.item[6];
+		ApplyAccessory(equip_set.acc);
+		SetupLoadInfo((equipItemInfo != null) ? equipItemInfo.tableID : 0u, (equipItemInfo2 != null) ? equipItemInfo2.tableID : 0u, (equipItemInfo3 != null) ? equipItemInfo3.tableID : 0u, (equipItemInfo4 != null) ? equipItemInfo4.tableID : 0u, (equipItemInfo5 != null) ? equipItemInfo5.tableID : 0u);
+	}
+
+	public void SetUpCharaMakeLoadInfo(EquipSetInfo equip_set, ulong armor_uniq_id, ulong helm_uniq_id, ulong arm_uniq_id, ulong leg_uniq_id, int sex, bool isShowhelm)
+	{
+		EquipItemInfo equipItemInfo = (armor_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(armor_uniq_id) : equip_set.item[3];
+		EquipItemInfo equipItemInfo2 = (arm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(arm_uniq_id) : equip_set.item[5];
+		EquipItemInfo equipItemInfo3 = (helm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(helm_uniq_id) : equip_set.item[4];
+		EquipItemInfo equipItemInfo4 = (leg_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(leg_uniq_id) : equip_set.item[6];
+		if (equipItemInfo != null)
+		{
+			SetEquipBody(sex, equipItemInfo.tableID);
+		}
+		if (equipItemInfo2 != null)
+		{
+			SetEquipArm(sex, equipItemInfo2.tableID);
+		}
+		if (equipItemInfo4 != null)
+		{
+			SetEquipLeg(sex, equipItemInfo4.tableID);
+		}
+		else
+		{
+			SetEquipLeg(sex, null);
+		}
+		if (isShowhelm && equipItemInfo3 != null)
+		{
+			SetEquipHead(sex, equipItemInfo3.tableID);
+		}
+		ApplyAccessory(equip_set.acc);
 	}
 
 	public void SetupLoadInfo(uint weapon_id, uint armor_id, uint helm_id, uint arm_id, uint leg_id)
@@ -475,7 +611,7 @@ public class PlayerLoadInfo
 		}
 		info.equipSet.ForEach(delegate(CharaInfo.EquipItem o)
 		{
-			SetEquip(info.sex, (uint)o.eId, false, show_helm, need_weapon);
+			SetEquip(info.sex, (uint)o.eId, overwrite: false, show_helm, need_weapon);
 		});
 		if (!need_leg)
 		{
@@ -490,6 +626,7 @@ public class PlayerLoadInfo
 			SetEquipBody(info.sex, 10100u);
 		}
 		SetActionVoiceBaseID(info.sex, info.voiceId);
+		ApplyAccessory(info.accessory);
 	}
 
 	public static PlayerLoadInfo FromCharaInfo(CharaInfo chara_info, bool need_weapon, bool need_helm, bool need_leg, bool is_priority_visual_equip)
@@ -504,5 +641,85 @@ public class PlayerLoadInfo
 		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
 		playerLoadInfo.ApplyUserStatus(need_weapon, is_priority_visual_equip, set_no);
 		return playerLoadInfo;
+	}
+
+	public static PlayerLoadInfo FromUserUniqueStatus(bool need_weapon, bool is_priority_visual_equip, int set_no = -1)
+	{
+		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
+		playerLoadInfo.ApplyUserUniqueStatus(need_weapon, is_priority_visual_equip, set_no);
+		return playerLoadInfo;
+	}
+
+	public static PlayerLoadInfo GenerateForTutorial(int sex, uint weaponId, uint bodyId, uint headId, uint armId, uint legId)
+	{
+		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
+		playerLoadInfo.SetFace(sex, 0, 0);
+		playerLoadInfo.SetHair(sex, 0, 0);
+		playerLoadInfo.SetEquipWeapon(sex, weaponId);
+		playerLoadInfo.SetEquipBody(sex, bodyId);
+		playerLoadInfo.SetEquipHead(sex, headId);
+		playerLoadInfo.SetEquipArm(sex, armId);
+		playerLoadInfo.SetEquipLeg(sex, legId);
+		playerLoadInfo.SetActionVoiceBaseID(sex, 0);
+		return playerLoadInfo;
+	}
+
+	private void ApplyAccessory(AccessoryPlaceInfo info)
+	{
+		accUIDs.Clear();
+		int i = 0;
+		for (int count = info.ids.Count; i < count; i++)
+		{
+			uint tableID = MonoBehaviourSingleton<InventoryManager>.I.accessoryInventory.GetTableID(info.ids[i]);
+			if (tableID == 0)
+			{
+				continue;
+			}
+			List<AccessoryTable.AccessoryInfoData> infoList = Singleton<AccessoryTable>.I.GetInfoList(tableID);
+			if (infoList.IsNullOrEmpty())
+			{
+				continue;
+			}
+			int num = int.Parse(info.parts[i]);
+			int j = 0;
+			for (int count2 = infoList.Count; j < count2; j++)
+			{
+				AccessoryTable.AccessoryInfoData accessoryInfoData = infoList[j];
+				if (accessoryInfoData.attachPlace == (ACCESSORY_PART)num)
+				{
+					accUIDs.Add(accessoryInfoData.id);
+					break;
+				}
+			}
+		}
+	}
+
+	private void ApplyAccessory(List<CharaInfo.UserAccessory> list)
+	{
+		accUIDs.Clear();
+		if (list.IsNullOrEmpty())
+		{
+			return;
+		}
+		int i = 0;
+		for (int count = list.Count; i < count; i++)
+		{
+			CharaInfo.UserAccessory userAccessory = list[i];
+			List<AccessoryTable.AccessoryInfoData> infoList = Singleton<AccessoryTable>.I.GetInfoList((uint)userAccessory.accessoryId);
+			if (infoList.IsNullOrEmpty())
+			{
+				continue;
+			}
+			int j = 0;
+			for (int count2 = infoList.Count; j < count2; j++)
+			{
+				AccessoryTable.AccessoryInfoData accessoryInfoData = infoList[j];
+				if (accessoryInfoData.attachPlace == (ACCESSORY_PART)userAccessory.place)
+				{
+					accUIDs.Add(accessoryInfoData.id);
+					break;
+				}
+			}
+		}
 	}
 }

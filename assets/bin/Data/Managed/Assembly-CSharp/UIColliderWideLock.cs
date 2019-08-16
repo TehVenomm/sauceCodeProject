@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIColliderWideLock
+public class UIColliderWideLock : MonoBehaviour
 {
 	private BoxCollider attach_collider;
 

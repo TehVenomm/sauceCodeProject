@@ -28,9 +28,29 @@ namespace Network
 
 		public int hostCountLimit;
 
-		private DateTime receiveDateTime;
+		public int displayLocationType;
 
-		private Version requiredVersion;
+		protected DateTime receiveDateTime;
+
+		protected Version requiredVersion;
+
+		public int orderNo;
+
+		public bool enableEvent;
+
+		public int preEventId;
+
+		public int preDeliveryId;
+
+		public int subButtonType;
+
+		public bool enableRanking;
+
+		public EVENT_TYPE eventTypeEnum
+		{
+			get;
+			protected set;
+		}
 
 		public bool IsPlayableWith(Version version)
 		{
@@ -63,6 +83,11 @@ namespace Network
 			{
 				requiredVersion = new Version(minVersion);
 			}
+		}
+
+		public virtual void SetupEnum()
+		{
+			eventTypeEnum = (EVENT_TYPE)eventType;
 		}
 	}
 }

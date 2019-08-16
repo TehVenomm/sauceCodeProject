@@ -18,11 +18,11 @@ public class DateFormatUtils {
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("GMT");
 
     public static String formatUTC(long j, String str) {
-        return format(new Date(j), str, UTC_TIME_ZONE, null);
+        return format(new Date(j), str, UTC_TIME_ZONE, (Locale) null);
     }
 
     public static String formatUTC(Date date, String str) {
-        return format(date, str, UTC_TIME_ZONE, null);
+        return format(date, str, UTC_TIME_ZONE, (Locale) null);
     }
 
     public static String formatUTC(long j, String str, Locale locale) {
@@ -34,39 +34,39 @@ public class DateFormatUtils {
     }
 
     public static String format(long j, String str) {
-        return format(new Date(j), str, null, null);
+        return format(new Date(j), str, (TimeZone) null, (Locale) null);
     }
 
     public static String format(Date date, String str) {
-        return format(date, str, null, null);
+        return format(date, str, (TimeZone) null, (Locale) null);
     }
 
     public static String format(Calendar calendar, String str) {
-        return format(calendar, str, null, null);
+        return format(calendar, str, (TimeZone) null, (Locale) null);
     }
 
     public static String format(long j, String str, TimeZone timeZone) {
-        return format(new Date(j), str, timeZone, null);
+        return format(new Date(j), str, timeZone, (Locale) null);
     }
 
     public static String format(Date date, String str, TimeZone timeZone) {
-        return format(date, str, timeZone, null);
+        return format(date, str, timeZone, (Locale) null);
     }
 
     public static String format(Calendar calendar, String str, TimeZone timeZone) {
-        return format(calendar, str, timeZone, null);
+        return format(calendar, str, timeZone, (Locale) null);
     }
 
     public static String format(long j, String str, Locale locale) {
-        return format(new Date(j), str, null, locale);
+        return format(new Date(j), str, (TimeZone) null, locale);
     }
 
     public static String format(Date date, String str, Locale locale) {
-        return format(date, str, null, locale);
+        return format(date, str, (TimeZone) null, locale);
     }
 
     public static String format(Calendar calendar, String str, Locale locale) {
-        return format(calendar, str, null, locale);
+        return format(calendar, str, (TimeZone) null, locale);
     }
 
     public static String format(long j, String str, TimeZone timeZone, Locale locale) {

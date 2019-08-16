@@ -75,7 +75,7 @@ namespace Network
 
 		public TimeSpan GetBonusRemainTime()
 		{
-			TimeSpan t = TimeSpan.FromMinutes((double)MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.GUILD_REQUEST_EARLY_RECEIVE_MIN);
+			TimeSpan t = TimeSpan.FromMinutes(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.GUILD_REQUEST_EARLY_RECEIVE_MIN);
 			if (endAt == null)
 			{
 				return TimeSpan.FromTicks(0L);

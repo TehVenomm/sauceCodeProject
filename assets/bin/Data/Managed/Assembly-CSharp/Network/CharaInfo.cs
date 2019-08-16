@@ -58,6 +58,15 @@ namespace Network
 				empty = text + "ai(" + ai + ")";
 				return base.ToString() + empty;
 			}
+
+			public int GetSkillExceed(int idx)
+			{
+				if (sExs == null || sExs.Count <= idx)
+				{
+					return 0;
+				}
+				return sExs[idx];
+			}
 		}
 
 		[Serializable]
@@ -68,6 +77,16 @@ namespace Network
 			public int[] emblem;
 
 			public string tag;
+		}
+
+		[Serializable]
+		public class UserAccessory
+		{
+			public string uniqId;
+
+			public int accessoryId;
+
+			public int place;
 		}
 
 		public int userId;
@@ -112,11 +131,48 @@ namespace Network
 
 		public int showHelm;
 
+		public string equipSetName;
+
 		public List<EquipItem> equipSet = new List<EquipItem>();
 
 		public List<int> selectedDegrees;
 
 		public ClanInfo clanInfo;
+
+		public UserClanData userClanData;
+
+		public bool isInviteToClan;
+
+		public List<UserAccessory> accessory = new List<UserAccessory>();
+
+		public bool isEqualAccessory(List<UserAccessory> src)
+		{
+			if (accessory.IsNullOrEmpty() && src.IsNullOrEmpty())
+			{
+				return true;
+			}
+			if (accessory.IsNullOrEmpty() || src.IsNullOrEmpty())
+			{
+				return false;
+			}
+			if (accessory.Count != src.Count)
+			{
+				return false;
+			}
+			for (int i = 0; i < accessory.Count; i++)
+			{
+				UserAccessory userAccessory = accessory[i];
+				for (int j = 0; j < src.Count; j++)
+				{
+					UserAccessory userAccessory2 = src[j];
+					if (userAccessory.uniqId == userAccessory2.uniqId && userAccessory.accessoryId == userAccessory2.accessoryId && userAccessory.place == userAccessory2.place)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 
 		public override string ToString()
 		{
@@ -146,8 +202,16 @@ namespace Network
 			{
 				equipSet.ForEach(delegate(EquipItem e)
 				{
+					string text2 = str;
+					str = text2 + "[" + e + "],";
+				});
+			}
+			if (!accessory.IsNullOrEmpty())
+			{
+				accessory.ForEach(delegate(UserAccessory a)
+				{
 					string text = str;
-					str = text + "[" + e + "],";
+					str = text + "[" + a + "],";
 				});
 			}
 			return base.ToString() + str;

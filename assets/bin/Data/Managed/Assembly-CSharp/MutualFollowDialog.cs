@@ -13,20 +13,26 @@ public class MutualFollowDialog : GameSection
 		LBL_REMAIN_NUM,
 		LBL_MESSAGE,
 		LBL_LOUNGE_REMAIN_NUM,
-		OBJ_FIRST_MET_LOUNGE
+		OBJ_FIRST_MET_LOUNGE,
+		OBJ_AREA,
+		OBJ_AREA2,
+		OBJ_TWITTER_ROOT,
+		OBJ_LINE_ROOT,
+		BTN_DETAIL,
+		LBL_SERVICE_MESSAGE,
+		LBL_INVITE
 	}
-
-	private const string MUTUAL_FOLLOW_BANNER_NAME = "IMG_00000001";
 
 	private string linkMessage;
 
 	private FriendFollowLinkResult followLinkResult;
 
+	private const string MUTUAL_FOLLOW_BANNER_NAME = "IMG_00000001";
+
 	private LoadingQueue loadQueue;
 
 	public override void Initialize()
 	{
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
 		followLinkResult = MonoBehaviourSingleton<FriendManager>.I.followLinkResult;
 		SetLabelText((Enum)UI.LBL_FOLLOWER_NUM, followLinkResult.followCnt.ToString() + "/" + followLinkResult.followMaxCnt.ToString());
 		string text = base.sectionData.GetText("REMAIN");
@@ -37,7 +43,25 @@ public class MutualFollowDialog : GameSection
 		string message = followLinkResult.message;
 		linkMessage = string.Format(message, followLinkResult.link);
 		linkMessage = linkMessage.Replace("<BR>", "\n");
-		this.StartCoroutine(LoadTopBanner());
+		if (!MonoBehaviourSingleton<AccountManager>.I.usageLimitMode)
+		{
+			SetActive((Enum)UI.OBJ_AREA, is_visible: true);
+			SetActive((Enum)UI.OBJ_AREA2, is_visible: false);
+			SetActive((Enum)UI.LBL_SERVICE_MESSAGE, is_visible: false);
+			SetActive((Enum)UI.LBL_INVITE, is_visible: true);
+			this.StartCoroutine(LoadTopBanner());
+		}
+		else
+		{
+			SetActive((Enum)UI.LBL_INVITE, is_visible: false);
+			SetActive((Enum)UI.OBJ_AREA, is_visible: false);
+			SetActive((Enum)UI.OBJ_AREA2, is_visible: false);
+			SetActive((Enum)UI.OBJ_LINE_ROOT, is_visible: false);
+			SetActive((Enum)UI.OBJ_TWITTER_ROOT, is_visible: false);
+			SetActive((Enum)UI.BTN_DETAIL, is_visible: false);
+			SetActive((Enum)UI.LBL_SERVICE_MESSAGE, is_visible: true);
+			SetLabelText((Enum)UI.LBL_SERVICE_MESSAGE, base.sectionData.GetText("SERVICE_LIMITED"));
+		}
 		base.Initialize();
 	}
 
@@ -47,10 +71,10 @@ public class MutualFollowDialog : GameSection
 		{
 			loadQueue = new LoadingQueue(this);
 		}
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001", false);
+		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001");
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		if (!(lo_image.loadedObject == null))
 		{
@@ -80,13 +104,13 @@ public class MutualFollowDialog : GameSection
 				GameSection.StayEvent();
 				MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(delegate(bool success, string r)
 				{
-					GameSection.ResumeEvent(success, null);
+					GameSection.ResumeEvent(success);
 				});
 			}
 		}
 		else
 		{
-			GameSection.ChangeEvent("FACEBOOK_CONNECT", null);
+			GameSection.ChangeEvent("FACEBOOK_CONNECT");
 		}
 	}
 

@@ -11,18 +11,20 @@ public abstract class StrMatcher {
     private static final StrMatcher SINGLE_QUOTE_MATCHER = new CharMatcher('\'');
     private static final StrMatcher SPACE_MATCHER = new CharMatcher(' ');
     private static final StrMatcher SPLIT_MATCHER = new CharSetMatcher(" \t\n\r\f".toCharArray());
-    private static final StrMatcher TAB_MATCHER = new CharMatcher('\t');
+    private static final StrMatcher TAB_MATCHER = new CharMatcher(9);
     private static final StrMatcher TRIM_MATCHER = new TrimMatcher();
 
     static final class CharMatcher extends StrMatcher {
-        private final char ch;
+
+        /* renamed from: ch */
+        private final char f1425ch;
 
         CharMatcher(char c) {
-            this.ch = c;
+            this.f1425ch = c;
         }
 
         public int isMatch(char[] cArr, int i, int i2, int i3) {
-            return this.ch == cArr[i] ? 1 : 0;
+            return this.f1425ch == cArr[i] ? 1 : 0;
         }
     }
 

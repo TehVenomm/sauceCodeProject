@@ -14,6 +14,9 @@ public class Section {
     private List<Article> articles;
     private String name;
 
+    public Section() {
+    }
+
     public Section(String str, List<Article> list) {
         this.name = str;
         this.articles = list;

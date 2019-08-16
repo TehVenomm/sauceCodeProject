@@ -24,7 +24,7 @@ namespace GooglePlayGames.Native.PInvoke
 				{
 					return TimeSpan.FromMilliseconds(0.0);
 				}
-				return TimeSpan.FromMilliseconds((double)num);
+				return TimeSpan.FromMilliseconds(num);
 			}
 		}
 

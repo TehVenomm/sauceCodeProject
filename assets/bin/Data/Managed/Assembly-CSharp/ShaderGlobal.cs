@@ -216,27 +216,31 @@ public static class ShaderGlobal
 
 	public static void ChangeWantLightweightShader(Renderer[] renderers)
 	{
-		Utility.MaterialForEach(renderers, delegate(Material material)
+		if (!renderers.IsNullOrEmpty())
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			Shader val = ResourceUtility.FindShader(material.get_shader().get_name() + "__l");
-			if (val != null)
+			Utility.MaterialForEach(renderers, delegate(Material material)
 			{
-				material.set_shader(val);
-			}
-		});
+				Shader val = ResourceUtility.FindShader(material.get_shader().get_name() + "__l");
+				if (val != null)
+				{
+					material.set_shader(val);
+				}
+			});
+		}
 	}
 
 	public static void ChangeWantUIShader(Renderer[] renderers)
 	{
-		Utility.MaterialForEach(renderers, delegate(Material material)
+		if (!renderers.IsNullOrEmpty())
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			Shader val = ResourceUtility.FindShader(material.get_shader().get_name() + "__u");
-			if (val != null)
+			Utility.MaterialForEach(renderers, delegate(Material material)
 			{
-				material.set_shader(val);
-			}
-		});
+				Shader val = ResourceUtility.FindShader(material.get_shader().get_name() + "__u");
+				if (val != null)
+				{
+					material.set_shader(val);
+				}
+			});
+		}
 	}
 }

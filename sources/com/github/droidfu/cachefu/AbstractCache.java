@@ -35,12 +35,12 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         this.cache = mapMaker.makeMap();
     }
 
-    private void cacheToDisk(KeyT keyT, ValT valT) {
-        File file = new File(this.diskCacheDirectory + Constants.URL_PATH_DELIMITER + getFileNameForKey(keyT));
+    private void cacheToDisk(KeyT keyt, ValT valt) {
+        File file = new File(this.diskCacheDirectory + Constants.URL_PATH_DELIMITER + getFileNameForKey(keyt));
         try {
             file.createNewFile();
             file.deleteOnExit();
-            writeValueToDisk(file, valT);
+            writeValueToDisk(file, valt);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e2) {
@@ -48,8 +48,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         }
     }
 
-    private File getFileForKey(KeyT keyT) {
-        return new File(this.diskCacheDirectory + Constants.URL_PATH_DELIMITER + getFileNameForKey(keyT));
+    private File getFileForKey(KeyT keyt) {
+        return new File(this.diskCacheDirectory + Constants.URL_PATH_DELIMITER + getFileNameForKey(keyt));
     }
 
     private void setRootDir(String str) {
@@ -95,19 +95,19 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     public boolean enableDiskCache(Context context, int i) {
-        String str;
+        String absolutePath;
         Context applicationContext = context.getApplicationContext();
-        if (i == 1 && "mounted".equals(Environment.getExternalStorageState())) {
-            str = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + applicationContext.getPackageName() + "/cache";
-        } else {
+        if (i != 1 || !"mounted".equals(Environment.getExternalStorageState())) {
             File cacheDir = applicationContext.getCacheDir();
             if (cacheDir == null) {
                 this.isDiskCacheEnabled = false;
                 return false;
             }
-            str = cacheDir.getAbsolutePath();
+            absolutePath = cacheDir.getAbsolutePath();
+        } else {
+            absolutePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + applicationContext.getPackageName() + "/cache";
         }
-        setRootDir(str);
+        setRootDir(absolutePath);
         File file = new File(this.diskCacheDirectory);
         if (file.mkdirs()) {
             try {
@@ -117,10 +117,10 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
             }
         }
         this.isDiskCacheEnabled = file.exists();
-        if (this.isDiskCacheEnabled) {
-            Log.d(this.name, "enabled write through to " + this.diskCacheDirectory);
-        } else {
+        if (!this.isDiskCacheEnabled) {
             Log.w(LOG_TAG, "Failed creating disk cache directory " + this.diskCacheDirectory);
+        } else {
+            Log.d(this.name, "enabled write through to " + this.diskCacheDirectory);
         }
         return this.isDiskCacheEnabled;
     }
@@ -130,36 +130,36 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     public ValT get(Object obj) {
-        ValT valT;
+        ValT valt;
         synchronized (this) {
-            valT = this.cache.get(obj);
-            if (valT != null) {
+            valt = this.cache.get(obj);
+            if (valt != null) {
                 Log.d(this.name, "MEM cache hit for " + obj.toString());
             } else {
                 File fileForKey = getFileForKey(obj);
                 if (fileForKey.exists()) {
                     Log.d(this.name, "DISK cache hit for " + obj.toString());
                     try {
-                        valT = readValueFromDisk(fileForKey);
-                        if (valT != null) {
-                            this.cache.put(obj, valT);
+                        valt = readValueFromDisk(fileForKey);
+                        if (valt != null) {
+                            this.cache.put(obj, valt);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        valT = null;
+                        valt = null;
                     }
                 }
-                valT = null;
+                valt = null;
             }
         }
-        return valT;
+        return valt;
     }
 
     public String getDiskCacheDirectory() {
         return this.diskCacheDirectory;
     }
 
-    public abstract String getFileNameForKey(KeyT keyT);
+    public abstract String getFileNameForKey(KeyT keyt);
 
     public boolean isDiskCacheEnabled() {
         return this.isDiskCacheEnabled;
@@ -177,13 +177,13 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return this.cache.keySet();
     }
 
-    public ValT put(KeyT keyT, ValT valT) {
+    public ValT put(KeyT keyt, ValT valt) {
         ValT put;
         synchronized (this) {
             if (this.isDiskCacheEnabled) {
-                cacheToDisk(keyT, valT);
+                cacheToDisk(keyt, valt);
             }
-            put = this.cache.put(keyT, valT);
+            put = this.cache.put(keyt, valt);
         }
         return put;
     }
@@ -194,7 +194,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         }
     }
 
-    protected abstract ValT readValueFromDisk(File file) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract ValT readValueFromDisk(File file) throws IOException;
 
     public ValT remove(Object obj) {
         ValT removeKey;
@@ -235,5 +236,6 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return this.cache.values();
     }
 
-    protected abstract void writeValueToDisk(File file, ValT valT) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract void writeValueToDisk(File file, ValT valt) throws IOException;
 }

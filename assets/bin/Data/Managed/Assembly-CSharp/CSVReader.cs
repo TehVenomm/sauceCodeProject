@@ -32,22 +32,9 @@ public class CSVReader
 			_result = result;
 		}
 
-		public override bool Equals(object o)
+		public static bool IsParseSucceeded(PopResult _result)
 		{
-			if (o == null)
-			{
-				return false;
-			}
-			if (GetType() != o.GetType())
-			{
-				return false;
-			}
-			return _result == ((PopResult)o)._result;
-		}
-
-		public override int GetHashCode()
-		{
-			return _result.GetHashCode();
+			return (Result)_result != Result.DONT_DEFINE_ERROR && (Result)_result != Result.UNKNOWN;
 		}
 
 		public static bool operator ==(PopResult a, PopResult b)
@@ -77,6 +64,24 @@ public class CSVReader
 		{
 			return result._result;
 		}
+
+		public override bool Equals(object o)
+		{
+			if (o == null)
+			{
+				return false;
+			}
+			if (GetType() != o.GetType())
+			{
+				return false;
+			}
+			return _result == ((PopResult)o)._result;
+		}
+
+		public override int GetHashCode()
+		{
+			return _result.GetHashCode();
+		}
 	}
 
 	private int pos;
@@ -103,7 +108,7 @@ public class CSVReader
 
 	public CSVReader(string text, string name_table, bool decrypt = false)
 	{
-		Initialize(text, false, name_table, decrypt);
+		Initialize(text, single_line: false, name_table, decrypt);
 	}
 
 	public void Initialize(string csv_text, bool single_line = false, string name_table = null, bool decrypt = false)
@@ -135,29 +140,45 @@ public class CSVReader
 
 	private void SetupNameTable(string name_table, int start_pos)
 	{
-		if (!string.IsNullOrEmpty(name_table))
+		if (string.IsNullOrEmpty(name_table))
 		{
-			string value = string.Empty;
-			namedStr = null;
-			pos = start_pos;
-			int num = 0;
-			while (NextValue())
+			return;
+		}
+		string value = string.Empty;
+		namedStr = null;
+		pos = start_pos;
+		int num = 0;
+		while (NextValue())
+		{
+			num++;
+		}
+		string[] array = name_table.Split(',');
+		int[] array2 = new int[num];
+		int i = 0;
+		for (int num2 = array2.Length; i < num2; i++)
+		{
+			array2[i] = -1;
+		}
+		pos = start_pos;
+		int j = 0;
+		int num3 = -1;
+		for (int num4 = array.Length; j < num4; j++)
+		{
+			bool flag = false;
+			while ((bool)Pop(ref value))
 			{
-				num++;
+				num3++;
+				if (value == array[j])
+				{
+					flag = true;
+					array2[num3] = j;
+					break;
+				}
 			}
-			string[] array = name_table.Split(',');
-			int[] array2 = new int[num];
-			int i = 0;
-			for (int num2 = array2.Length; i < num2; i++)
+			if (!flag)
 			{
-				array2[i] = -1;
-			}
-			pos = start_pos;
-			int j = 0;
-			int num3 = -1;
-			for (int num4 = array.Length; j < num4; j++)
-			{
-				bool flag = false;
+				num3 = -1;
+				pos = start_pos;
 				while ((bool)Pop(ref value))
 				{
 					num3++;
@@ -168,35 +189,19 @@ public class CSVReader
 						break;
 					}
 				}
-				if (!flag)
-				{
-					num3 = -1;
-					pos = start_pos;
-					while ((bool)Pop(ref value))
-					{
-						num3++;
-						if (value == array[j])
-						{
-							flag = true;
-							array2[num3] = j;
-							break;
-						}
-					}
-				}
-				if (flag)
-				{
-					continue;
-				}
 			}
-			namedIndex = array2;
-			namedStr = new StringBuilder[array.Length];
-			int k = 0;
-			for (int num5 = namedStr.Length; k < num5; k++)
+			if (!flag)
 			{
-				namedStr[k] = new StringBuilder(64);
 			}
-			namedPopIndex = namedStr.Length;
 		}
+		namedIndex = array2;
+		namedStr = new StringBuilder[array.Length];
+		int k = 0;
+		for (int num5 = namedStr.Length; k < num5; k++)
+		{
+			namedStr[k] = new StringBuilder(64);
+		}
+		namedPopIndex = namedStr.Length;
 	}
 
 	public bool NextLine()
@@ -307,31 +312,7 @@ public class CSVReader
 			return false;
 		}
 		builder.Length = 0;
-		if (c != '"')
-		{
-			while (num < num2)
-			{
-				c = text[num];
-				switch (c)
-				{
-				case ',':
-					pos = num + 1;
-					return true;
-				case '\n':
-				case '\r':
-					pos = num;
-					return true;
-				}
-				builder.Append(c);
-				num++;
-				if (num >= num2)
-				{
-					pos = num;
-					return true;
-				}
-			}
-		}
-		else
+		if (c == '"')
 		{
 			num++;
 			while (num < num2)
@@ -354,6 +335,30 @@ public class CSVReader
 				else
 				{
 					builder.Append(c);
+				}
+			}
+		}
+		else
+		{
+			while (num < num2)
+			{
+				c = text[num];
+				switch (c)
+				{
+				case ',':
+					pos = num + 1;
+					return true;
+				case '\n':
+				case '\r':
+					pos = num;
+					return true;
+				}
+				builder.Append(c);
+				num++;
+				if (num >= num2)
+				{
+					pos = num;
+					return true;
 				}
 			}
 		}
@@ -391,7 +396,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.PARSE_ERROR;
-			IL_004a:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -421,7 +425,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.PARSE_ERROR;
-			IL_004a:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -451,7 +454,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.PARSE_ERROR;
-			IL_004a:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -473,7 +475,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.PARSE_ERROR;
-			IL_004a:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -495,7 +496,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.PARSE_ERROR;
-			IL_004a:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -517,7 +517,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.PARSE_ERROR;
-			IL_004a:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -539,7 +538,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.PARSE_ERROR;
-			IL_004a:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -658,7 +656,6 @@ public class CSVReader
 		catch
 		{
 			return PopResult.DONT_DEFINE;
-			IL_0087:;
 		}
 		return PopResult.SUCCESS;
 	}
@@ -688,7 +685,6 @@ public class CSVReader
 		{
 			value = defValue;
 			return PopResult.UNKNOWN;
-			IL_00a3:;
 		}
 		return PopResult.SUCCESS;
 	}

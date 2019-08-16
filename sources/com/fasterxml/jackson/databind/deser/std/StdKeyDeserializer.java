@@ -2,7 +2,7 @@ package com.fasterxml.jackson.databind.deser.std;
 
 import com.facebook.internal.ServerProtocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.io.NumberInput;
+import com.fasterxml.jackson.core.p015io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -94,16 +94,16 @@ public class StdKeyDeserializer extends KeyDeserializer implements Serializable 
             if (this._factory != null) {
                 try {
                     return this._factory.call1(str);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     ClassUtil.unwrapAndThrowAsIAE(e);
                 }
             }
-            EnumResolver _getToStringResolver = deserializationContext.isEnabled(DeserializationFeature.READ_ENUMS_USING_TO_STRING) ? _getToStringResolver() : this._byNameResolver;
-            Enum findEnum = _getToStringResolver.findEnum(str);
+            EnumResolver enumResolver = deserializationContext.isEnabled(DeserializationFeature.READ_ENUMS_USING_TO_STRING) ? _getToStringResolver() : this._byNameResolver;
+            Enum findEnum = enumResolver.findEnum(str);
             if (findEnum != null || deserializationContext.getConfig().isEnabled(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)) {
                 return findEnum;
             }
-            throw deserializationContext.weirdKeyException(this._keyClass, str, "not one of values excepted for Enum class: " + _getToStringResolver.getEnumIds());
+            throw deserializationContext.weirdKeyException(this._keyClass, str, "not one of values excepted for Enum class: " + enumResolver.getEnumIds());
         }
 
         private EnumResolver _getToStringResolver() {
@@ -181,10 +181,10 @@ public class StdKeyDeserializer extends KeyDeserializer implements Serializable 
     }
 
     public static StdKeyDeserializer forType(Class<?> cls) {
+        int i;
         if (cls == String.class || cls == Object.class) {
             return StringKD.forType(cls);
         }
-        int i;
         if (cls == UUID.class) {
             i = 12;
         } else if (cls == Integer.class) {
@@ -246,8 +246,8 @@ public class StdKeyDeserializer extends KeyDeserializer implements Serializable 
         return this._keyClass;
     }
 
-    protected Object _parse(String str, DeserializationContext deserializationContext) throws Exception {
-        int _parseInt;
+    /* access modifiers changed from: protected */
+    public Object _parse(String str, DeserializationContext deserializationContext) throws Exception {
         switch (this._kind) {
             case 1:
                 if (ServerProtocol.DIALOG_RETURN_SCOPES_TRUE.equals(str)) {
@@ -258,15 +258,15 @@ public class StdKeyDeserializer extends KeyDeserializer implements Serializable 
                 }
                 throw deserializationContext.weirdKeyException(this._keyClass, str, "value not 'true' or 'false'");
             case 2:
-                _parseInt = _parseInt(str);
+                int _parseInt = _parseInt(str);
                 if (_parseInt >= -128 && _parseInt <= 255) {
                     return Byte.valueOf((byte) _parseInt);
                 }
                 throw deserializationContext.weirdKeyException(this._keyClass, str, "overflow, value can not be represented as 8-bit value");
             case 3:
-                _parseInt = _parseInt(str);
-                if (_parseInt >= -32768 && _parseInt <= 32767) {
-                    return Short.valueOf((short) _parseInt);
+                int _parseInt2 = _parseInt(str);
+                if (_parseInt2 >= -32768 && _parseInt2 <= 32767) {
+                    return Short.valueOf((short) _parseInt2);
                 }
                 throw deserializationContext.weirdKeyException(this._keyClass, str, "overflow, value can not be represented as 16-bit value");
             case 4:
@@ -319,15 +319,18 @@ public class StdKeyDeserializer extends KeyDeserializer implements Serializable 
         }
     }
 
-    protected int _parseInt(String str) throws IllegalArgumentException {
+    /* access modifiers changed from: protected */
+    public int _parseInt(String str) throws IllegalArgumentException {
         return Integer.parseInt(str);
     }
 
-    protected long _parseLong(String str) throws IllegalArgumentException {
+    /* access modifiers changed from: protected */
+    public long _parseLong(String str) throws IllegalArgumentException {
         return Long.parseLong(str);
     }
 
-    protected double _parseDouble(String str) throws IllegalArgumentException {
+    /* access modifiers changed from: protected */
+    public double _parseDouble(String str) throws IllegalArgumentException {
         return NumberInput.parseDouble(str);
     }
 }

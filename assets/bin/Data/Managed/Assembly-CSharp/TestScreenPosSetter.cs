@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TestScreenPosSetter
+public class TestScreenPosSetter : MonoBehaviour
 {
 	public PuniController punicon;
 

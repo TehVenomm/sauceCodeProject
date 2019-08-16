@@ -8,6 +8,8 @@ public class Coop_Model_PlayerSkillAction : Coop_Model_ObjectSyncPositionBase
 
 	public int skill_index;
 
+	public bool isUsingSecondGrade;
+
 	public Coop_Model_PlayerSkillAction()
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -18,7 +20,7 @@ public class Coop_Model_PlayerSkillAction : Coop_Model_ObjectSyncPositionBase
 	public override bool IsHandleable(StageObject owner)
 	{
 		Character character = owner as Character;
-		if (!character.IsChangeableAction((Character.ACTION_ID)20))
+		if (!character.IsChangeableAction((Character.ACTION_ID)22))
 		{
 			return false;
 		}

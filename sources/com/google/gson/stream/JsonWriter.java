@@ -108,7 +108,7 @@ public class JsonWriter implements Closeable, Flushable {
 
     private void newline() throws IOException {
         if (this.indent != null) {
-            this.out.write(StringUtils.LF);
+            this.out.write(StringUtils.f1199LF);
             int i = this.stackSize;
             for (int i2 = 1; i2 < i; i2++) {
                 this.out.write(this.indent);
@@ -132,54 +132,81 @@ public class JsonWriter implements Closeable, Flushable {
 
     private void push(int i) {
         if (this.stackSize == this.stack.length) {
-            Object obj = new int[(this.stackSize * 2)];
-            System.arraycopy(this.stack, 0, obj, 0, this.stackSize);
-            this.stack = obj;
+            int[] iArr = new int[(this.stackSize * 2)];
+            System.arraycopy(this.stack, 0, iArr, 0, this.stackSize);
+            this.stack = iArr;
         }
-        int[] iArr = this.stack;
+        int[] iArr2 = this.stack;
         int i2 = this.stackSize;
         this.stackSize = i2 + 1;
-        iArr[i2] = i;
+        iArr2[i2] = i;
     }
 
     private void replaceTop(int i) {
         this.stack[this.stackSize - 1] = i;
     }
 
-    private void string(String str) throws IOException {
-        int i = 0;
-        String[] strArr = this.htmlSafe ? HTML_SAFE_REPLACEMENT_CHARS : REPLACEMENT_CHARS;
-        this.out.write("\"");
-        int length = str.length();
-        for (int i2 = 0; i2 < length; i2++) {
-            char charAt = str.charAt(i2);
-            String str2;
-            if (charAt < '') {
-                str2 = strArr[charAt];
-                if (str2 == null) {
-                }
-                if (i < i2) {
-                    this.out.write(str, i, i2 - i);
-                }
-                this.out.write(str2);
-                i = i2 + 1;
-            } else {
-                if (charAt == ' ') {
-                    str2 = "\\u2028";
-                } else if (charAt == ' ') {
-                    str2 = "\\u2029";
-                }
-                if (i < i2) {
-                    this.out.write(str, i, i2 - i);
-                }
-                this.out.write(str2);
-                i = i2 + 1;
-            }
-        }
-        if (i < length) {
-            this.out.write(str, i, length - i);
-        }
-        this.out.write("\"");
+    /* JADX WARNING: Removed duplicated region for block: B:15:0x0031  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void string(java.lang.String r8) throws java.io.IOException {
+        /*
+            r7 = this;
+            r2 = 0
+            boolean r0 = r7.htmlSafe
+            if (r0 == 0) goto L_0x0026
+            java.lang.String[] r0 = HTML_SAFE_REPLACEMENT_CHARS
+        L_0x0007:
+            java.io.Writer r1 = r7.out
+            java.lang.String r3 = "\""
+            r1.write(r3)
+            int r4 = r8.length()
+            r3 = r2
+            r1 = r2
+        L_0x0014:
+            if (r3 >= r4) goto L_0x0047
+            char r2 = r8.charAt(r3)
+            r5 = 128(0x80, float:1.794E-43)
+            if (r2 >= r5) goto L_0x0029
+            r2 = r0[r2]
+            if (r2 != 0) goto L_0x002f
+        L_0x0022:
+            int r2 = r3 + 1
+            r3 = r2
+            goto L_0x0014
+        L_0x0026:
+            java.lang.String[] r0 = REPLACEMENT_CHARS
+            goto L_0x0007
+        L_0x0029:
+            r5 = 8232(0x2028, float:1.1535E-41)
+            if (r2 != r5) goto L_0x0040
+            java.lang.String r2 = "\\u2028"
+        L_0x002f:
+            if (r1 >= r3) goto L_0x0038
+            java.io.Writer r5 = r7.out
+            int r6 = r3 - r1
+            r5.write(r8, r1, r6)
+        L_0x0038:
+            java.io.Writer r1 = r7.out
+            r1.write(r2)
+            int r1 = r3 + 1
+            goto L_0x0022
+        L_0x0040:
+            r5 = 8233(0x2029, float:1.1537E-41)
+            if (r2 != r5) goto L_0x0022
+            java.lang.String r2 = "\\u2029"
+            goto L_0x002f
+        L_0x0047:
+            if (r1 >= r4) goto L_0x0050
+            java.io.Writer r0 = r7.out
+            int r2 = r4 - r1
+            r0.write(r8, r1, r2)
+        L_0x0050:
+            java.io.Writer r0 = r7.out
+            java.lang.String r1 = "\""
+            r0.write(r1)
+            return
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.gson.stream.JsonWriter.string(java.lang.String):void");
     }
 
     private void writeDeferredName() throws IOException {
@@ -317,8 +344,8 @@ public class JsonWriter implements Closeable, Flushable {
             return nullValue();
         }
         writeDeferredName();
-        CharSequence obj = number.toString();
-        if (this.lenient || !(obj.equals("-Infinity") || obj.equals("Infinity") || obj.equals("NaN"))) {
+        String obj = number.toString();
+        if (this.lenient || (!obj.equals("-Infinity") && !obj.equals("Infinity") && !obj.equals("NaN"))) {
             beforeValue(false);
             this.out.append(obj);
             return this;

@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.databind.ser.std;
 
-import com.facebook.share.internal.ShareConstants;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -22,7 +21,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 public class StdArraySerializers {
-    protected static final HashMap<String, JsonSerializer<?>> _arraySerializers = new HashMap();
+    protected static final HashMap<String, JsonSerializer<?>> _arraySerializers = new HashMap<>();
 
     @JacksonStdImpl
     public static class BooleanArraySerializer extends ArraySerializerBase<boolean[]> {
@@ -62,13 +61,13 @@ public class StdArraySerializers {
 
         public final void serialize(boolean[] zArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             int length = zArr.length;
-            if (length == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
+            if (length != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+                jsonGenerator.writeStartArray(length);
                 serializeContents(zArr, jsonGenerator, serializerProvider);
+                jsonGenerator.writeEndArray();
                 return;
             }
-            jsonGenerator.writeStartArray(length);
             serializeContents(zArr, jsonGenerator, serializerProvider);
-            jsonGenerator.writeEndArray();
         }
 
         public void serializeContents(boolean[] zArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
@@ -78,7 +77,7 @@ public class StdArraySerializers {
         }
 
         public JsonNode getSchema(SerializerProvider serializerProvider, Type type) {
-            JsonNode createSchemaNode = createSchemaNode("array", true);
+            ObjectNode createSchemaNode = createSchemaNode("array", true);
             createSchemaNode.set("items", createSchemaNode("boolean"));
             return createSchemaNode;
         }
@@ -129,8 +128,8 @@ public class StdArraySerializers {
 
         public JsonNode getSchema(SerializerProvider serializerProvider, Type type) {
             ObjectNode createSchemaNode = createSchemaNode("array", true);
-            JsonNode createSchemaNode2 = createSchemaNode("string");
-            createSchemaNode2.put(ShareConstants.MEDIA_TYPE, "string");
+            ObjectNode createSchemaNode2 = createSchemaNode("string");
+            createSchemaNode2.put("type", "string");
             return createSchemaNode.set("items", createSchemaNode2);
         }
 
@@ -177,13 +176,13 @@ public class StdArraySerializers {
 
         public final void serialize(double[] dArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             int length = dArr.length;
-            if (length == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
+            if (length != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+                jsonGenerator.writeStartArray(length);
                 serializeContents(dArr, jsonGenerator, serializerProvider);
+                jsonGenerator.writeEndArray();
                 return;
             }
-            jsonGenerator.writeStartArray(length);
             serializeContents(dArr, jsonGenerator, serializerProvider);
-            jsonGenerator.writeEndArray();
         }
 
         public void serializeContents(double[] dArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -198,20 +197,6 @@ public class StdArraySerializers {
 
         public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType) throws JsonMappingException {
             visitArrayFormat(jsonFormatVisitorWrapper, javaType, JsonFormatTypes.NUMBER);
-        }
-    }
-
-    protected static abstract class TypedPrimitiveArraySerializer<T> extends ArraySerializerBase<T> {
-        protected final TypeSerializer _valueTypeSerializer;
-
-        protected TypedPrimitiveArraySerializer(Class<T> cls) {
-            super((Class) cls);
-            this._valueTypeSerializer = null;
-        }
-
-        protected TypedPrimitiveArraySerializer(TypedPrimitiveArraySerializer<T> typedPrimitiveArraySerializer, BeanProperty beanProperty, TypeSerializer typeSerializer, Boolean bool) {
-            super(typedPrimitiveArraySerializer, beanProperty, bool);
-            this._valueTypeSerializer = typeSerializer;
         }
     }
 
@@ -253,20 +238,19 @@ public class StdArraySerializers {
 
         public final void serialize(float[] fArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             int length = fArr.length;
-            if (length == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
+            if (length != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+                jsonGenerator.writeStartArray(length);
                 serializeContents(fArr, jsonGenerator, serializerProvider);
+                jsonGenerator.writeEndArray();
                 return;
             }
-            jsonGenerator.writeStartArray(length);
             serializeContents(fArr, jsonGenerator, serializerProvider);
-            jsonGenerator.writeEndArray();
         }
 
         public void serializeContents(float[] fArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
             int i = 0;
-            int length;
             if (this._valueTypeSerializer != null) {
-                length = fArr.length;
+                int length = fArr.length;
                 while (i < length) {
                     this._valueTypeSerializer.writeTypePrefixForScalar(null, jsonGenerator, Float.TYPE);
                     jsonGenerator.writeNumber(fArr[i]);
@@ -275,8 +259,8 @@ public class StdArraySerializers {
                 }
                 return;
             }
-            length = fArr.length;
-            while (i < length) {
+            int length2 = fArr.length;
+            while (i < length2) {
                 jsonGenerator.writeNumber(fArr[i]);
                 i++;
             }
@@ -329,13 +313,13 @@ public class StdArraySerializers {
 
         public final void serialize(int[] iArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             int length = iArr.length;
-            if (length == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
+            if (length != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+                jsonGenerator.writeStartArray(length);
                 serializeContents(iArr, jsonGenerator, serializerProvider);
+                jsonGenerator.writeEndArray();
                 return;
             }
-            jsonGenerator.writeStartArray(length);
             serializeContents(iArr, jsonGenerator, serializerProvider);
-            jsonGenerator.writeEndArray();
         }
 
         public void serializeContents(int[] iArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -391,20 +375,19 @@ public class StdArraySerializers {
 
         public final void serialize(long[] jArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             int length = jArr.length;
-            if (length == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
+            if (length != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+                jsonGenerator.writeStartArray(length);
                 serializeContents(jArr, jsonGenerator, serializerProvider);
+                jsonGenerator.writeEndArray();
                 return;
             }
-            jsonGenerator.writeStartArray(length);
             serializeContents(jArr, jsonGenerator, serializerProvider);
-            jsonGenerator.writeEndArray();
         }
 
         public void serializeContents(long[] jArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             int i = 0;
-            int length;
             if (this._valueTypeSerializer != null) {
-                length = jArr.length;
+                int length = jArr.length;
                 while (i < length) {
                     this._valueTypeSerializer.writeTypePrefixForScalar(null, jsonGenerator, Long.TYPE);
                     jsonGenerator.writeNumber(jArr[i]);
@@ -413,8 +396,8 @@ public class StdArraySerializers {
                 }
                 return;
             }
-            length = jArr.length;
-            while (i < length) {
+            int length2 = jArr.length;
+            while (i < length2) {
                 jsonGenerator.writeNumber(jArr[i]);
                 i++;
             }
@@ -467,20 +450,19 @@ public class StdArraySerializers {
 
         public final void serialize(short[] sArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             int length = sArr.length;
-            if (length == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
+            if (length != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+                jsonGenerator.writeStartArray(length);
                 serializeContents(sArr, jsonGenerator, serializerProvider);
+                jsonGenerator.writeEndArray();
                 return;
             }
-            jsonGenerator.writeStartArray(length);
             serializeContents(sArr, jsonGenerator, serializerProvider);
-            jsonGenerator.writeEndArray();
         }
 
         public void serializeContents(short[] sArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
             int i = 0;
-            int length;
             if (this._valueTypeSerializer != null) {
-                length = sArr.length;
+                int length = sArr.length;
                 while (i < length) {
                     this._valueTypeSerializer.writeTypePrefixForScalar(null, jsonGenerator, Short.TYPE);
                     jsonGenerator.writeNumber(sArr[i]);
@@ -489,9 +471,9 @@ public class StdArraySerializers {
                 }
                 return;
             }
-            length = sArr.length;
-            while (i < length) {
-                jsonGenerator.writeNumber(sArr[i]);
+            int length2 = sArr.length;
+            while (i < length2) {
+                jsonGenerator.writeNumber((int) sArr[i]);
                 i++;
             }
         }
@@ -502,6 +484,20 @@ public class StdArraySerializers {
 
         public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType) throws JsonMappingException {
             visitArrayFormat(jsonFormatVisitorWrapper, javaType, JsonFormatTypes.INTEGER);
+        }
+    }
+
+    protected static abstract class TypedPrimitiveArraySerializer<T> extends ArraySerializerBase<T> {
+        protected final TypeSerializer _valueTypeSerializer;
+
+        protected TypedPrimitiveArraySerializer(Class<T> cls) {
+            super(cls);
+            this._valueTypeSerializer = null;
+        }
+
+        protected TypedPrimitiveArraySerializer(TypedPrimitiveArraySerializer<T> typedPrimitiveArraySerializer, BeanProperty beanProperty, TypeSerializer typeSerializer, Boolean bool) {
+            super(typedPrimitiveArraySerializer, beanProperty, bool);
+            this._valueTypeSerializer = typeSerializer;
         }
     }
 

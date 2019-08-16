@@ -2,13 +2,12 @@ package com.crashlytics.android.answers;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION;
-import io.fabric.sdk.android.services.events.EventTransform;
 import java.io.IOException;
+import org.json.JSONException;
 import org.json.JSONObject;
+import p017io.fabric.sdk.android.services.events.EventTransform;
 
 class SessionEventTransform implements EventTransform<SessionEvent> {
-    static final String ADVERTISING_ID_KEY = "advertisingId";
-    static final String ANDROID_ID_KEY = "androidId";
     static final String APP_BUNDLE_ID_KEY = "appBundleId";
     static final String APP_VERSION_CODE_KEY = "appVersionCode";
     static final String APP_VERSION_NAME_KEY = "appVersionName";
@@ -20,7 +19,10 @@ class SessionEventTransform implements EventTransform<SessionEvent> {
     static final String DEVICE_MODEL_KEY = "deviceModel";
     static final String EXECUTION_ID_KEY = "executionId";
     static final String INSTALLATION_ID_KEY = "installationId";
+    static final String LIMIT_AD_TRACKING_ENABLED_KEY = "limitAdTrackingEnabled";
     static final String OS_VERSION_KEY = "osVersion";
+    static final String PREDEFINED_ATTRIBUTES = "predefinedAttributes";
+    static final String PREDEFINED_TYPE = "predefinedType";
     static final String TIMESTAMP_KEY = "timestamp";
     static final String TYPE_KEY = "type";
 
@@ -35,8 +37,7 @@ class SessionEventTransform implements EventTransform<SessionEvent> {
             jSONObject.put(APP_BUNDLE_ID_KEY, sessionEventMetadata.appBundleId);
             jSONObject.put(EXECUTION_ID_KEY, sessionEventMetadata.executionId);
             jSONObject.put(INSTALLATION_ID_KEY, sessionEventMetadata.installationId);
-            jSONObject.put(ANDROID_ID_KEY, sessionEventMetadata.androidId);
-            jSONObject.put(ADVERTISING_ID_KEY, sessionEventMetadata.advertisingId);
+            jSONObject.put(LIMIT_AD_TRACKING_ENABLED_KEY, sessionEventMetadata.limitAdTrackingEnabled);
             jSONObject.put(BETA_DEVICE_TOKEN_KEY, sessionEventMetadata.betaDeviceToken);
             jSONObject.put(BUILD_ID_KEY, sessionEventMetadata.buildId);
             jSONObject.put(OS_VERSION_KEY, sessionEventMetadata.osVersion);
@@ -45,11 +46,19 @@ class SessionEventTransform implements EventTransform<SessionEvent> {
             jSONObject.put(APP_VERSION_NAME_KEY, sessionEventMetadata.appVersionName);
             jSONObject.put("timestamp", sessionEvent.timestamp);
             jSONObject.put("type", sessionEvent.type.toString());
-            jSONObject.put(DETAILS_KEY, new JSONObject(sessionEvent.details));
+            if (sessionEvent.details != null) {
+                jSONObject.put(DETAILS_KEY, new JSONObject(sessionEvent.details));
+            }
             jSONObject.put(CUSTOM_TYPE, sessionEvent.customType);
-            jSONObject.put(CUSTOM_ATTRIBUTES, new JSONObject(sessionEvent.customAttributes));
+            if (sessionEvent.customAttributes != null) {
+                jSONObject.put(CUSTOM_ATTRIBUTES, new JSONObject(sessionEvent.customAttributes));
+            }
+            jSONObject.put(PREDEFINED_TYPE, sessionEvent.predefinedType);
+            if (sessionEvent.predefinedAttributes != null) {
+                jSONObject.put(PREDEFINED_ATTRIBUTES, new JSONObject(sessionEvent.predefinedAttributes));
+            }
             return jSONObject;
-        } catch (Throwable e) {
+        } catch (JSONException e) {
             if (VERSION.SDK_INT >= 9) {
                 throw new IOException(e.getMessage(), e);
             }

@@ -29,12 +29,13 @@ public class Config {
     public boolean getBoolean(String str, boolean z) {
         try {
             Object obj = this.valueMap.get(str);
-            if (obj != null) {
-                z = ((Boolean) obj).booleanValue();
+            if (obj == null) {
+                return z;
             }
+            return ((Boolean) obj).booleanValue();
         } catch (Exception e) {
+            return z;
         }
-        return z;
     }
 
     public void putBoolean(String str, boolean z) {
@@ -44,12 +45,13 @@ public class Config {
     public int getInt(String str, int i) {
         try {
             Object obj = this.valueMap.get(str);
-            if (obj != null) {
-                i = ((Integer) obj).intValue();
+            if (obj == null) {
+                return i;
             }
+            return ((Integer) obj).intValue();
         } catch (Exception e) {
+            return i;
         }
-        return i;
     }
 
     public void putInt(String str, int i) {

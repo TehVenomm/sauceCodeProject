@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
@@ -8,8 +9,6 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 	[Serializable]
 	public class NpcLevelData
 	{
-		public const string NT = "lv,hp,atk,atk_1,atk_2,atk_3,atk_4,atk_5,atk_6,def,def_1,def_2,def_3,def_4,def_5,def_6,w1,w1Lv,w2,w2Lv,w3,w3Lv,armor,armorLv,helm,helmLv,arm,armLv,leg,legLv";
-
 		public uint lv;
 
 		public int hp;
@@ -25,6 +24,8 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 		public CharaInfo.EquipItem[] equipItems = new CharaInfo.EquipItem[7];
 
 		public int lvIndex;
+
+		public const string NT = "lv,hp,atk,atk_1,atk_2,atk_3,atk_4,atk_5,atk_6,def,def_1,def_2,def_3,def_4,def_5,def_6,w1,w1Lv,w2,w2Lv,w3,w3Lv,armor,armorLv,helm,helmLv,arm,armLv,leg,legLv";
 
 		public static bool CB(CSVReader csv, NpcLevelData data, ref uint key1)
 		{
@@ -51,11 +52,11 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 			return true;
 		}
 
-		public void CopyHomeCharaInfo(CharaInfo info, StageObjectManager.CreatePlayerInfo.ExtentionInfo extentionInfo)
+		public void CopyHomeCharaInfo(CharaInfo info, StageObjectManager.CreatePlayerInfo.ExtentionInfo extentionInfo, float atkRate = 1f)
 		{
 			info.level = (int)lv;
 			info.hp = hp;
-			info.atk = atk;
+			info.atk = (int)((float)atk * atkRate);
 			info.def = def;
 			int i = 0;
 			for (int num = equipItems.Length; i < num; i++)
@@ -102,6 +103,9 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 	private UIntKeyTable<List<NpcLevelData>> dataTable;
 
 	private List<uint> lvList = new List<uint>();
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<NpcLevelData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv)
 	{

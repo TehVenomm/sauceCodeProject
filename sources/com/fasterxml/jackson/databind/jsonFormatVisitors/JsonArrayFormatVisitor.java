@@ -9,6 +9,9 @@ public interface JsonArrayFormatVisitor extends JsonFormatVisitorWithSerializerP
     public static class Base implements JsonArrayFormatVisitor {
         protected SerializerProvider _provider;
 
+        public Base() {
+        }
+
         public Base(SerializerProvider serializerProvider) {
             this._provider = serializerProvider;
         }

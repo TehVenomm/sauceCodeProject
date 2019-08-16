@@ -281,12 +281,6 @@ public class FieldRewardPool
 		}
 	}
 
-	private const string SAVE_KEY = "FieldRewardPool";
-
-	private const string VER_SAVE_KEY = "FieldRewardPool.ver";
-
-	private const string SAVE_VERSION = "1.0";
-
 	private string fieldId = string.Empty;
 
 	private int mapId;
@@ -296,6 +290,12 @@ public class FieldRewardPool
 	private List<Reward> rewardList = new List<Reward>();
 
 	private SpanTimer sendTimer = new SpanTimer(30f);
+
+	private const string SAVE_KEY = "FieldRewardPool";
+
+	private const string VER_SAVE_KEY = "FieldRewardPool.ver";
+
+	private const string SAVE_VERSION = "1.0";
 
 	public void Clear()
 	{
@@ -309,7 +309,7 @@ public class FieldRewardPool
 	{
 		if (sendTimer.IsReady())
 		{
-			SendFieldDrop(null);
+			SendFieldDrop();
 		}
 	}
 
@@ -326,10 +326,10 @@ public class FieldRewardPool
 	public void AddEnemyDefeat(Coop_Model_EnemyDefeat model, bool IsDefeatFieldDelivery)
 	{
 		defeatList.Add(new DefeatEnemy(model));
-		rewardList.Add(new Reward(model, true));
+		rewardList.Add(new Reward(model, isTreasure: true));
 		if (IsDefeatFieldDelivery)
 		{
-			rewardList.Add(new Reward(model, false));
+			rewardList.Add(new Reward(model, isTreasure: false));
 		}
 		Save();
 	}
@@ -392,7 +392,7 @@ public class FieldRewardPool
 		{
 			if (call_back != null)
 			{
-				call_back(true);
+				call_back(obj: true);
 			}
 		}
 		else
@@ -432,7 +432,7 @@ public class FieldRewardPool
 
 	public void MergeFieldDrop()
 	{
-		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(false);
+		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(do_sort: false);
 		int i = 0;
 		for (int count = rewardList.Count; i < count; i++)
 		{
@@ -442,34 +442,37 @@ public class FieldRewardPool
 
 	private void ProgressDelivery(Delivery[] list, Reward reward)
 	{
-		if (reward.IsPickup())
+		if (!reward.IsPickup())
 		{
-			int i = 0;
-			for (int num = list.Length; i < num; i++)
+			return;
+		}
+		int i = 0;
+		for (int num = list.Length; i < num; i++)
+		{
+			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)list[i].dId);
+			if (deliveryTableData == null)
 			{
-				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)list[i].dId);
-				if (deliveryTableData != null)
+				continue;
+			}
+			int j = 0;
+			for (int num2 = deliveryTableData.needs.Length; j < num2; j++)
+			{
+				uint num3 = (uint)j;
+				if (!deliveryTableData.IsNeedTarget(num3, (uint)reward.enemyId, (uint)mapId) || (reward.sigInfo.deliver.bit & (1 << (int)deliveryTableData.GetRateType(num3))) <= 0)
 				{
-					int j = 0;
-					for (int num2 = deliveryTableData.needs.Length; j < num2; j++)
+					continue;
+				}
+				int have = 0;
+				int need = 0;
+				MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(list[i].dId, out have, out need, num3);
+				if (have < need)
+				{
+					int num4 = 1;
+					if ((reward.sigInfo.deliver.boostBit & (1 << (int)deliveryTableData.GetRateType(num3))) > 0)
 					{
-						uint num3 = (uint)j;
-						if (deliveryTableData.IsNeedTarget(num3, (uint)reward.enemyId, (uint)mapId) && (reward.sigInfo.deliver.bit & (1 << (int)deliveryTableData.GetRateType(num3))) > 0)
-						{
-							int have = 0;
-							int need = 0;
-							MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(list[i].dId, out have, out need, num3);
-							if (have < need)
-							{
-								int num4 = 1;
-								if ((reward.sigInfo.deliver.boostBit & (1 << (int)deliveryTableData.GetRateType(num3))) > 0)
-								{
-									num4 += reward.sigInfo.deliver.boostNum;
-								}
-								MonoBehaviourSingleton<DeliveryManager>.I.ProgressDelivery(list[i].dId, (int)num3, num4);
-							}
-						}
+						num4 += reward.sigInfo.deliver.boostNum;
 					}
+					MonoBehaviourSingleton<DeliveryManager>.I.ProgressDelivery(list[i].dId, (int)num3, num4);
 				}
 			}
 		}
@@ -488,24 +491,22 @@ public class FieldRewardPool
 			{
 				DeleteSave();
 			}
+			return;
 		}
-		else
+		SaveData savedata = new SaveData();
+		savedata.fieldId = fieldId;
+		savedata.mapId = mapId;
+		defeatList.ForEach(delegate(DefeatEnemy d)
 		{
-			SaveData savedata = new SaveData();
-			savedata.fieldId = fieldId;
-			savedata.mapId = mapId;
-			defeatList.ForEach(delegate(DefeatEnemy d)
-			{
-				savedata.defeatList.Add(new SaveData_1_0.SaveDefeatEnemy(d));
-			});
-			rewardList.ForEach(delegate(Reward r)
-			{
-				savedata.rewardList.Add(new SaveData_1_0.SaveReward(r));
-			});
-			string text = JsonUtility.ToJson((object)savedata);
-			PlayerPrefs.SetString("FieldRewardPool.ver", "1.0");
-			PlayerPrefs.SetString("FieldRewardPool", text);
-		}
+			savedata.defeatList.Add(new SaveData_1_0.SaveDefeatEnemy(d));
+		});
+		rewardList.ForEach(delegate(Reward r)
+		{
+			savedata.rewardList.Add(new SaveData_1_0.SaveReward(r));
+		});
+		string text = JsonUtility.ToJson((object)savedata);
+		PlayerPrefs.SetString("FieldRewardPool.ver", "1.0");
+		PlayerPrefs.SetString("FieldRewardPool", text);
 	}
 
 	public static bool HasSave()

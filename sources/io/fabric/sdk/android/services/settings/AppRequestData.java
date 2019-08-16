@@ -1,8 +1,9 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
-import io.fabric.sdk.android.KitInfo;
 import java.util.Collection;
+import p017io.fabric.sdk.android.KitInfo;
 
+/* renamed from: io.fabric.sdk.android.services.settings.AppRequestData */
 public class AppRequestData {
     public final String apiKey;
     public final String appId;

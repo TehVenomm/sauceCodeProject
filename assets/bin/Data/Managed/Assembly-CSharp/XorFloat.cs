@@ -3,13 +3,13 @@ using System.Threading;
 
 public class XorFloat
 {
-	private const int gens = 5;
-
 	private byte[] key;
 
 	private byte[] rawValue = new byte[4];
 
 	private byte[] tmpValue = new byte[4];
+
+	private const int gens = 5;
 
 	private static Random[] s_rnds = new Random[5]
 	{
@@ -66,6 +66,16 @@ public class XorFloat
 		return outBuf;
 	}
 
+	public static implicit operator float(XorFloat xor)
+	{
+		return xor?.value ?? 0f;
+	}
+
+	public static implicit operator XorFloat(float val)
+	{
+		return new XorFloat(val);
+	}
+
 	public override string ToString()
 	{
 		return value.ToString();
@@ -84,16 +94,6 @@ public class XorFloat
 	public string ToString(string format, IFormatProvider provider)
 	{
 		return value.ToString(format, provider);
-	}
-
-	public static implicit operator float(XorFloat xor)
-	{
-		return xor?.value ?? 0f;
-	}
-
-	public static implicit operator XorFloat(float val)
-	{
-		return new XorFloat(val);
 	}
 
 	public static XorFloat operator ++(XorFloat value)

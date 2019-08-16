@@ -25,7 +25,8 @@ public abstract class DateTimeSerializerBase<T> extends StdScalarSerializer<T> i
     protected final DateFormat _customFormat;
     protected final Boolean _useTimestamp;
 
-    protected abstract long _timestamp(T t);
+    /* access modifiers changed from: protected */
+    public abstract long _timestamp(T t);
 
     public abstract void serialize(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException;
 
@@ -38,6 +39,7 @@ public abstract class DateTimeSerializerBase<T> extends StdScalarSerializer<T> i
     }
 
     public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
+        TimeZone timeZone;
         if (beanProperty == null) {
             return this;
         }
@@ -52,9 +54,8 @@ public abstract class DateTimeSerializerBase<T> extends StdScalarSerializer<T> i
         if (shape != Shape.STRING && !findFormat.hasPattern() && !findFormat.hasLocale() && !findFormat.hasTimeZone()) {
             return this;
         }
-        TimeZone timeZone;
         TimeZone timeZone2 = findFormat.getTimeZone();
-        DateFormat simpleDateFormat = new SimpleDateFormat(findFormat.hasPattern() ? findFormat.getPattern() : StdDateFormat.DATE_FORMAT_STR_ISO8601, findFormat.hasLocale() ? findFormat.getLocale() : serializerProvider.getLocale());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(findFormat.hasPattern() ? findFormat.getPattern() : StdDateFormat.DATE_FORMAT_STR_ISO8601, findFormat.hasLocale() ? findFormat.getLocale() : serializerProvider.getLocale());
         if (timeZone2 == null) {
             timeZone = serializerProvider.getTimeZone();
         } else {
@@ -81,7 +82,8 @@ public abstract class DateTimeSerializerBase<T> extends StdScalarSerializer<T> i
         _acceptJsonFormatVisitor(jsonFormatVisitorWrapper, javaType, _asTimestamp(jsonFormatVisitorWrapper.getProvider()));
     }
 
-    protected boolean _asTimestamp(SerializerProvider serializerProvider) {
+    /* access modifiers changed from: protected */
+    public boolean _asTimestamp(SerializerProvider serializerProvider) {
         if (this._useTimestamp != null) {
             return this._useTimestamp.booleanValue();
         }
@@ -94,7 +96,8 @@ public abstract class DateTimeSerializerBase<T> extends StdScalarSerializer<T> i
         throw new IllegalArgumentException("Null SerializerProvider passed for " + handledType().getName());
     }
 
-    protected void _acceptJsonFormatVisitor(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, boolean z) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void _acceptJsonFormatVisitor(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, boolean z) throws JsonMappingException {
         if (z) {
             visitIntFormat(jsonFormatVisitorWrapper, javaType, NumberType.LONG, JsonValueFormat.UTC_MILLISEC);
         } else {

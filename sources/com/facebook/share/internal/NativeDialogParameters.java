@@ -1,15 +1,21 @@
 package com.facebook.share.internal;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import com.facebook.FacebookException;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
+import com.facebook.share.model.ShareCameraEffectContent;
 import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.ShareMediaContent;
+import com.facebook.share.model.ShareMessengerGenericTemplateContent;
+import com.facebook.share.model.ShareMessengerMediaTemplateContent;
+import com.facebook.share.model.ShareMessengerOpenGraphMusicTemplateContent;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.model.ShareStoryContent;
 import com.facebook.share.model.ShareVideoContent;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,12 +25,31 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class NativeDialogParameters {
+    private static Bundle create(ShareCameraEffectContent shareCameraEffectContent, Bundle bundle, boolean z) {
+        Bundle createBaseParameters = createBaseParameters(shareCameraEffectContent, z);
+        Utility.putNonEmptyString(createBaseParameters, ShareConstants.EFFECT_ID, shareCameraEffectContent.getEffectId());
+        if (bundle != null) {
+            createBaseParameters.putBundle(ShareConstants.EFFECT_TEXTURES, bundle);
+        }
+        try {
+            JSONObject convertToJSON = CameraEffectJSONUtility.convertToJSON(shareCameraEffectContent.getArguments());
+            if (convertToJSON != null) {
+                Utility.putNonEmptyString(createBaseParameters, ShareConstants.EFFECT_ARGS, convertToJSON.toString());
+            }
+            return createBaseParameters;
+        } catch (JSONException e) {
+            throw new FacebookException("Unable to create a JSON Object from the provided CameraEffectArguments: " + e.getMessage());
+        }
+    }
+
     private static Bundle create(ShareLinkContent shareLinkContent, boolean z) {
         Bundle createBaseParameters = createBaseParameters(shareLinkContent, z);
         Utility.putNonEmptyString(createBaseParameters, ShareConstants.TITLE, shareLinkContent.getContentTitle());
         Utility.putNonEmptyString(createBaseParameters, ShareConstants.DESCRIPTION, shareLinkContent.getContentDescription());
         Utility.putUri(createBaseParameters, ShareConstants.IMAGE_URL, shareLinkContent.getImageUrl());
         Utility.putNonEmptyString(createBaseParameters, ShareConstants.QUOTE, shareLinkContent.getQuote());
+        Utility.putUri(createBaseParameters, ShareConstants.MESSENGER_URL, shareLinkContent.getContentUrl());
+        Utility.putUri(createBaseParameters, ShareConstants.TARGET_DISPLAY, shareLinkContent.getContentUrl());
         return createBaseParameters;
     }
 
@@ -32,6 +57,36 @@ public class NativeDialogParameters {
         Bundle createBaseParameters = createBaseParameters(shareMediaContent, z);
         createBaseParameters.putParcelableArrayList(ShareConstants.MEDIA, new ArrayList(list));
         return createBaseParameters;
+    }
+
+    private static Bundle create(ShareMessengerGenericTemplateContent shareMessengerGenericTemplateContent, boolean z) {
+        Bundle createBaseParameters = createBaseParameters(shareMessengerGenericTemplateContent, z);
+        try {
+            MessengerShareContentUtility.addGenericTemplateContent(createBaseParameters, shareMessengerGenericTemplateContent);
+            return createBaseParameters;
+        } catch (JSONException e) {
+            throw new FacebookException("Unable to create a JSON Object from the provided ShareMessengerGenericTemplateContent: " + e.getMessage());
+        }
+    }
+
+    private static Bundle create(ShareMessengerMediaTemplateContent shareMessengerMediaTemplateContent, boolean z) {
+        Bundle createBaseParameters = createBaseParameters(shareMessengerMediaTemplateContent, z);
+        try {
+            MessengerShareContentUtility.addMediaTemplateContent(createBaseParameters, shareMessengerMediaTemplateContent);
+            return createBaseParameters;
+        } catch (JSONException e) {
+            throw new FacebookException("Unable to create a JSON Object from the provided ShareMessengerMediaTemplateContent: " + e.getMessage());
+        }
+    }
+
+    private static Bundle create(ShareMessengerOpenGraphMusicTemplateContent shareMessengerOpenGraphMusicTemplateContent, boolean z) {
+        Bundle createBaseParameters = createBaseParameters(shareMessengerOpenGraphMusicTemplateContent, z);
+        try {
+            MessengerShareContentUtility.addOpenGraphMusicTemplateContent(createBaseParameters, shareMessengerOpenGraphMusicTemplateContent);
+            return createBaseParameters;
+        } catch (JSONException e) {
+            throw new FacebookException("Unable to create a JSON Object from the provided ShareMessengerOpenGraphMusicTemplateContent: " + e.getMessage());
+        }
     }
 
     private static Bundle create(ShareOpenGraphContent shareOpenGraphContent, JSONObject jSONObject, boolean z) {
@@ -45,6 +100,22 @@ public class NativeDialogParameters {
     private static Bundle create(SharePhotoContent sharePhotoContent, List<String> list, boolean z) {
         Bundle createBaseParameters = createBaseParameters(sharePhotoContent, z);
         createBaseParameters.putStringArrayList(ShareConstants.PHOTOS, new ArrayList(list));
+        return createBaseParameters;
+    }
+
+    private static Bundle create(ShareStoryContent shareStoryContent, @Nullable Bundle bundle, @Nullable Bundle bundle2, boolean z) {
+        Bundle createBaseParameters = createBaseParameters(shareStoryContent, z);
+        if (bundle != null) {
+            createBaseParameters.putParcelable(ShareConstants.STORY_BG_ASSET, bundle);
+        }
+        if (bundle2 != null) {
+            createBaseParameters.putParcelable(ShareConstants.STORY_INTERACTIVE_ASSET_URI, bundle2);
+        }
+        List backgroundColorList = shareStoryContent.getBackgroundColorList();
+        if (!Utility.isNullOrEmpty((Collection<T>) backgroundColorList)) {
+            createBaseParameters.putStringArrayList(ShareConstants.STORY_INTERACTIVE_COLOR_LIST, new ArrayList(backgroundColorList));
+        }
+        Utility.putNonEmptyString(createBaseParameters, ShareConstants.STORY_DEEP_LINK_URL, shareStoryContent.getAttributionLink());
         return createBaseParameters;
     }
 
@@ -75,11 +146,26 @@ public class NativeDialogParameters {
             } catch (JSONException e) {
                 throw new FacebookException("Unable to create a JSON Object from the provided ShareOpenGraphContent: " + e.getMessage());
             }
-        } else if (!(shareContent instanceof ShareMediaContent)) {
-            return null;
-        } else {
+        } else if (shareContent instanceof ShareMediaContent) {
             ShareMediaContent shareMediaContent = (ShareMediaContent) shareContent;
             return create(shareMediaContent, ShareInternalUtility.getMediaInfos(shareMediaContent, uuid), z);
+        } else if (shareContent instanceof ShareCameraEffectContent) {
+            ShareCameraEffectContent shareCameraEffectContent = (ShareCameraEffectContent) shareContent;
+            return create(shareCameraEffectContent, ShareInternalUtility.getTextureUrlBundle(shareCameraEffectContent, uuid), z);
+        } else if (shareContent instanceof ShareMessengerGenericTemplateContent) {
+            return create((ShareMessengerGenericTemplateContent) shareContent, z);
+        } else {
+            if (shareContent instanceof ShareMessengerOpenGraphMusicTemplateContent) {
+                return create((ShareMessengerOpenGraphMusicTemplateContent) shareContent, z);
+            }
+            if (shareContent instanceof ShareMessengerMediaTemplateContent) {
+                return create((ShareMessengerMediaTemplateContent) shareContent, z);
+            }
+            if (!(shareContent instanceof ShareStoryContent)) {
+                return null;
+            }
+            ShareStoryContent shareStoryContent = (ShareStoryContent) shareContent;
+            return create(shareStoryContent, ShareInternalUtility.getBackgroundAssetMediaInfo(shareStoryContent, uuid), ShareInternalUtility.getStickerUrl(shareStoryContent, uuid), z);
         }
     }
 
@@ -87,10 +173,11 @@ public class NativeDialogParameters {
         Bundle bundle = new Bundle();
         Utility.putUri(bundle, ShareConstants.CONTENT_URL, shareContent.getContentUrl());
         Utility.putNonEmptyString(bundle, ShareConstants.PLACE_ID, shareContent.getPlaceId());
+        Utility.putNonEmptyString(bundle, ShareConstants.PAGE_ID, shareContent.getPageId());
         Utility.putNonEmptyString(bundle, ShareConstants.REF, shareContent.getRef());
         bundle.putBoolean(ShareConstants.DATA_FAILURES_FATAL, z);
-        Collection peopleIds = shareContent.getPeopleIds();
-        if (!Utility.isNullOrEmpty(peopleIds)) {
+        List peopleIds = shareContent.getPeopleIds();
+        if (!Utility.isNullOrEmpty((Collection<T>) peopleIds)) {
             bundle.putStringArrayList(ShareConstants.PEOPLE_IDS, new ArrayList(peopleIds));
         }
         ShareHashtag shareHashtag = shareContent.getShareHashtag();

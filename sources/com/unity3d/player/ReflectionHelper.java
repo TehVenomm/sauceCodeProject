@@ -15,41 +15,47 @@ import org.apache.commons.lang3.ClassUtils;
 final class ReflectionHelper {
     protected static boolean LOG = false;
     protected static final boolean LOGV = false;
+
     /* renamed from: a */
-    private static C0729a[] f379a = new C0729a[4096];
+    private static C1064a[] f445a = new C1064a[4096];
 
     /* renamed from: com.unity3d.player.ReflectionHelper$a */
-    private static final class C0729a {
-        /* renamed from: a */
-        public volatile Member f374a;
-        /* renamed from: b */
-        private final Class f375b;
-        /* renamed from: c */
-        private final String f376c;
-        /* renamed from: d */
-        private final String f377d;
-        /* renamed from: e */
-        private final int f378e = (((((this.f375b.hashCode() + 527) * 31) + this.f376c.hashCode()) * 31) + this.f377d.hashCode());
+    private static final class C1064a {
 
-        C0729a(Class cls, String str, String str2) {
-            this.f375b = cls;
-            this.f376c = str;
-            this.f377d = str2;
+        /* renamed from: a */
+        public volatile Member f448a;
+
+        /* renamed from: b */
+        private final Class f449b;
+
+        /* renamed from: c */
+        private final String f450c;
+
+        /* renamed from: d */
+        private final String f451d;
+
+        /* renamed from: e */
+        private final int f452e = (((((this.f449b.hashCode() + 527) * 31) + this.f450c.hashCode()) * 31) + this.f451d.hashCode());
+
+        C1064a(Class cls, String str, String str2) {
+            this.f449b = cls;
+            this.f450c = str;
+            this.f451d = str2;
         }
 
         public final boolean equals(Object obj) {
             if (obj == this) {
                 return true;
             }
-            if (!(obj instanceof C0729a)) {
+            if (!(obj instanceof C1064a)) {
                 return false;
             }
-            C0729a c0729a = (C0729a) obj;
-            return this.f378e == c0729a.f378e && this.f377d.equals(c0729a.f377d) && this.f376c.equals(c0729a.f376c) && this.f375b.equals(c0729a.f375b);
+            C1064a aVar = (C1064a) obj;
+            return this.f452e == aVar.f452e && this.f451d.equals(aVar.f451d) && this.f450c.equals(aVar.f450c) && this.f449b.equals(aVar.f449b);
         }
 
         public final int hashCode() {
-            return this.f378e;
+            return this.f452e;
         }
     }
 
@@ -57,11 +63,11 @@ final class ReflectionHelper {
     }
 
     /* renamed from: a */
-    private static float m398a(Class cls, Class cls2) {
+    private static float m443a(Class cls, Class cls2) {
         if (cls.equals(cls2)) {
             return 1.0f;
         }
-        if (!(cls.isPrimitive() || cls2.isPrimitive())) {
+        if (!cls.isPrimitive() && !cls2.isPrimitive()) {
             try {
                 if (cls.asSubclass(cls2) != null) {
                     return 0.5f;
@@ -79,8 +85,7 @@ final class ReflectionHelper {
     }
 
     /* renamed from: a */
-    private static float m399a(Class cls, Class[] clsArr, Class[] clsArr2) {
-        int i = 0;
+    private static float m444a(Class cls, Class[] clsArr, Class[] clsArr2) {
         if (clsArr2.length == 0) {
             return 0.1f;
         }
@@ -89,29 +94,30 @@ final class ReflectionHelper {
         }
         float f = 1.0f;
         if (clsArr != null) {
-            int i2 = 0;
-            while (i < clsArr.length) {
-                float a = m398a(clsArr[i], clsArr2[i2]) * f;
+            int i = 0;
+            for (Class a : clsArr) {
+                f *= m443a(a, clsArr2[i]);
                 i++;
-                i2++;
-                f = a;
             }
         }
-        return f * m398a(cls, clsArr2[clsArr2.length - 1]);
+        return f * m443a(cls, clsArr2[clsArr2.length - 1]);
     }
 
     /* renamed from: a */
-    private static Class m400a(String str, int[] iArr) {
-        while (iArr[0] < str.length()) {
+    private static Class m445a(String str, int[] iArr) {
+        while (true) {
+            if (iArr[0] >= str.length()) {
+                break;
+            }
             int i = iArr[0];
             iArr[0] = i + 1;
             char charAt = str.charAt(i);
             if (charAt != '(' && charAt != ')') {
                 if (charAt == 'L') {
-                    i = str.indexOf(59, iArr[0]);
-                    if (i != -1) {
-                        String substring = str.substring(iArr[0], i);
-                        iArr[0] = i + 1;
+                    int indexOf = str.indexOf(59, iArr[0]);
+                    if (indexOf != -1) {
+                        String substring = str.substring(iArr[0], indexOf);
+                        iArr[0] = indexOf + 1;
                         try {
                             return Class.forName(substring.replace('/', ClassUtils.PACKAGE_SEPARATOR_CHAR));
                         } catch (ClassNotFoundException e) {
@@ -142,38 +148,38 @@ final class ReflectionHelper {
                         return Double.TYPE;
                     }
                     if (charAt == '[') {
-                        return Array.newInstance(m400a(str, iArr), 0).getClass();
+                        return Array.newInstance(m445a(str, iArr), 0).getClass();
                     }
-                    C0768m.Log(5, "! parseType; " + charAt + " is not known!");
+                    C1104e.Log(5, "! parseType; " + charAt + " is not known!");
                 }
-                return null;
             }
         }
         return null;
     }
 
     /* renamed from: a */
-    private static void m403a(C0729a c0729a, Member member) {
-        c0729a.f374a = member;
-        f379a[c0729a.hashCode() & (f379a.length - 1)] = c0729a;
+    private static void m448a(C1064a aVar, Member member) {
+        aVar.f448a = member;
+        f445a[aVar.hashCode() & (f445a.length - 1)] = aVar;
     }
 
     /* renamed from: a */
-    private static boolean m404a(C0729a c0729a) {
-        C0729a c0729a2 = f379a[c0729a.hashCode() & (f379a.length - 1)];
-        if (!c0729a.equals(c0729a2)) {
+    private static boolean m449a(C1064a aVar) {
+        C1064a aVar2 = f445a[aVar.hashCode() & (f445a.length - 1)];
+        if (!aVar.equals(aVar2)) {
             return false;
         }
-        c0729a.f374a = c0729a2.f374a;
+        aVar.f448a = aVar2.f448a;
         return true;
     }
 
     /* renamed from: a */
-    private static Class[] m405a(String str) {
-        int[] iArr = new int[]{0};
+    private static Class[] m450a(String str) {
+        int i = 0;
+        int[] iArr = {0};
         ArrayList arrayList = new ArrayList();
         while (iArr[0] < str.length()) {
-            Class a = m400a(str, iArr);
+            Class a = m445a(str, iArr);
             if (a == null) {
                 break;
             }
@@ -181,45 +187,48 @@ final class ReflectionHelper {
         }
         Class[] clsArr = new Class[arrayList.size()];
         Iterator it = arrayList.iterator();
-        int i = 0;
-        while (it.hasNext()) {
-            clsArr[i] = (Class) it.next();
-            i++;
+        while (true) {
+            int i2 = i;
+            if (!it.hasNext()) {
+                return clsArr;
+            }
+            clsArr[i2] = (Class) it.next();
+            i = i2 + 1;
         }
-        return clsArr;
     }
 
     protected static Constructor getConstructorID(Class cls, String str) {
         Constructor constructor;
         Constructor constructor2 = null;
-        C0729a c0729a = new C0729a(cls, "", str);
-        if (m404a(c0729a)) {
-            constructor = (Constructor) c0729a.f374a;
+        C1064a aVar = new C1064a(cls, "", str);
+        if (m449a(aVar)) {
+            constructor = (Constructor) aVar.f448a;
         } else {
-            Class[] a = m405a(str);
+            Class[] a = m450a(str);
             float f = 0.0f;
             Constructor[] constructors = cls.getConstructors();
             int length = constructors.length;
             int i = 0;
-            while (i < length) {
-                float f2;
+            while (true) {
+                if (i >= length) {
+                    constructor = constructor2;
+                    break;
+                }
                 constructor = constructors[i];
-                float a2 = m399a(Void.TYPE, constructor.getParameterTypes(), a);
+                float a2 = m444a(Void.TYPE, constructor.getParameterTypes(), a);
                 if (a2 > f) {
                     if (a2 == 1.0f) {
                         break;
                     }
-                    f2 = a2;
                 } else {
                     constructor = constructor2;
-                    f2 = f;
+                    a2 = f;
                 }
                 i++;
-                f = f2;
                 constructor2 = constructor;
+                f = a2;
             }
-            constructor = constructor2;
-            m403a(c0729a, r0);
+            m448a(aVar, (Member) constructor);
         }
         if (constructor != null) {
             return constructor;
@@ -229,113 +238,119 @@ final class ReflectionHelper {
 
     protected static Field getFieldID(Class cls, String str, String str2, boolean z) {
         Field field;
-        C0729a c0729a = new C0729a(cls, str, str2);
-        if (m404a(c0729a)) {
-            field = (Field) c0729a.f374a;
+        float f;
+        C1064a aVar = new C1064a(cls, str, str2);
+        if (m449a(aVar)) {
+            field = (Field) aVar.f448a;
         } else {
-            Class[] a = m405a(str2);
+            Class[] a = m450a(str2);
             field = null;
-            float f = 0.0f;
+            float f2 = 0.0f;
             while (cls != null) {
                 Field[] declaredFields = cls.getDeclaredFields();
                 int length = declaredFields.length;
                 int i = 0;
+                float f3 = f2;
                 Field field2 = field;
-                while (i < length) {
-                    float a2;
-                    Field field3;
-                    Field field4 = declaredFields[i];
-                    if (z == Modifier.isStatic(field4.getModifiers()) && field4.getName().compareTo(str) == 0) {
-                        a2 = m399a(field4.getType(), null, a);
-                        if (a2 > f) {
-                            if (a2 == 1.0f) {
-                                f = a2;
-                                field = field4;
+                while (true) {
+                    if (i >= length) {
+                        f2 = f3;
+                        field = field2;
+                        break;
+                    }
+                    Field field3 = declaredFields[i];
+                    if (z == Modifier.isStatic(field3.getModifiers()) && field3.getName().compareTo(str) == 0) {
+                        f2 = m444a(field3.getType(), (Class[]) null, a);
+                        if (f2 > f3) {
+                            if (f2 == 1.0f) {
+                                field = field3;
                                 break;
                             }
-                            field3 = field4;
+                            f = f2;
                             i++;
+                            f3 = f;
                             field2 = field3;
-                            f = a2;
                         }
                     }
-                    a2 = f;
+                    f = f3;
                     field3 = field2;
                     i++;
+                    f3 = f;
                     field2 = field3;
-                    f = a2;
                 }
-                field = field2;
-                if (f == 1.0f || cls.isPrimitive() || cls.isInterface() || cls.equals(Object.class) || cls.equals(Void.TYPE)) {
+                if (f2 == 1.0f || cls.isPrimitive() || cls.isInterface() || cls.equals(Object.class) || cls.equals(Void.TYPE)) {
                     break;
                 }
                 cls = cls.getSuperclass();
             }
-            m403a(c0729a, r0);
+            m448a(aVar, (Member) field);
         }
         if (field != null) {
             return field;
         }
-        String str3 = z ? "non-static" : "static";
-        throw new NoSuchFieldError(String.format("no %s field with name='%s' signature='%s' in class L%s;", new Object[]{str3, str, str2, cls.getName()}));
+        throw new NoSuchFieldError(String.format("no %s field with name='%s' signature='%s' in class L%s;", new Object[]{z ? "static" : "non-static", str, str2, cls.getName()}));
     }
 
     protected static Method getMethodID(Class cls, String str, String str2, boolean z) {
         Method method;
-        C0729a c0729a = new C0729a(cls, str, str2);
-        if (m404a(c0729a)) {
-            method = (Method) c0729a.f374a;
+        float f;
+        C1064a aVar = new C1064a(cls, str, str2);
+        if (m449a(aVar)) {
+            method = (Method) aVar.f448a;
         } else {
-            Class[] a = m405a(str2);
+            Class[] a = m450a(str2);
             method = null;
-            float f = 0.0f;
+            float f2 = 0.0f;
             while (cls != null) {
                 Method[] declaredMethods = cls.getDeclaredMethods();
                 int length = declaredMethods.length;
                 int i = 0;
+                float f3 = f2;
                 Method method2 = method;
-                while (i < length) {
-                    float a2;
-                    Method method3;
-                    Method method4 = declaredMethods[i];
-                    if (z == Modifier.isStatic(method4.getModifiers()) && method4.getName().compareTo(str) == 0) {
-                        a2 = m399a(method4.getReturnType(), method4.getParameterTypes(), a);
-                        if (a2 > f) {
-                            if (a2 == 1.0f) {
-                                f = a2;
-                                method = method4;
+                while (true) {
+                    if (i >= length) {
+                        f2 = f3;
+                        method = method2;
+                        break;
+                    }
+                    Method method3 = declaredMethods[i];
+                    if (z == Modifier.isStatic(method3.getModifiers()) && method3.getName().compareTo(str) == 0) {
+                        f2 = m444a(method3.getReturnType(), method3.getParameterTypes(), a);
+                        if (f2 > f3) {
+                            if (f2 == 1.0f) {
+                                method = method3;
                                 break;
                             }
-                            method3 = method4;
+                            f = f2;
                             i++;
+                            f3 = f;
                             method2 = method3;
-                            f = a2;
                         }
                     }
-                    a2 = f;
+                    f = f3;
                     method3 = method2;
                     i++;
+                    f3 = f;
                     method2 = method3;
-                    f = a2;
                 }
-                method = method2;
-                if (f == 1.0f || cls.isPrimitive() || cls.isInterface() || cls.equals(Object.class) || cls.equals(Void.TYPE)) {
+                if (f2 == 1.0f || cls.isPrimitive() || cls.isInterface() || cls.equals(Object.class) || cls.equals(Void.TYPE)) {
                     break;
                 }
                 cls = cls.getSuperclass();
             }
-            m403a(c0729a, r0);
+            m448a(aVar, (Member) method);
         }
         if (method != null) {
             return method;
         }
-        String str3 = z ? "non-static" : "static";
-        throw new NoSuchMethodError(String.format("no %s method with name='%s' signature='%s' in class L%s;", new Object[]{str3, str, str2, cls.getName()}));
+        throw new NoSuchMethodError(String.format("no %s method with name='%s' signature='%s' in class L%s;", new Object[]{z ? "static" : "non-static", str, str2, cls.getName()}));
     }
 
-    private static native void nativeProxyFinalize(int i);
+    /* access modifiers changed from: private */
+    public static native void nativeProxyFinalize(int i);
 
-    private static native Object nativeProxyInvoke(int i, String str, Object[] objArr);
+    /* access modifiers changed from: private */
+    public static native Object nativeProxyInvoke(int i, String str, Object[] objArr);
 
     protected static Object newProxyInstance(int i, Class cls) {
         return newProxyInstance(i, new Class[]{cls});
@@ -343,7 +358,8 @@ final class ReflectionHelper {
 
     protected static Object newProxyInstance(final int i, final Class[] clsArr) {
         return Proxy.newProxyInstance(ReflectionHelper.class.getClassLoader(), clsArr, new InvocationHandler() {
-            protected final void finalize() {
+            /* access modifiers changed from: protected */
+            public final void finalize() {
                 try {
                     ReflectionHelper.nativeProxyFinalize(i);
                 } finally {

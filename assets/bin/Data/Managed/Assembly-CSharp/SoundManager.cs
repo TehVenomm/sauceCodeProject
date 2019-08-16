@@ -36,7 +36,23 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		}
 	}
 
+	private int m_requestBGMID;
+
+	private bool m_IsNextBGMLoop = true;
+
+	public float volumeSE = 1f;
+
+	public float volumeBGM = 1f;
+
+	public float volumeVOICE = 1f;
+
+	public float fadeOutTime;
+
 	public const float BGM_FADEOUT_TIME = 1f;
+
+	private AudioMixerSnapshot mixerCurrent;
+
+	private AudioMixerSnapshot mixerSnapshotDefault;
 
 	private const string DEFAULT_SNAPSHOT_NAME = "Default";
 
@@ -54,33 +70,19 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	private const uint VOICE_CH_MAX = 6u;
 
+	private AudioControlGroup[] audioControllVoice;
+
 	public const uint VOICE_CH_DEFAULT = 0u;
 
 	public const uint VOICE_CH_ENEMY = 1u;
 
 	private const uint VOICE_CH_PLAYER_HEAD = 2u;
 
-	private int m_requestBGMID;
-
-	private bool m_IsNextBGMLoop = true;
-
-	public float volumeSE = 1f;
-
-	public float volumeBGM = 1f;
-
-	public float volumeVOICE = 1f;
-
-	public float fadeOutTime;
-
-	private AudioMixerSnapshot mixerCurrent;
-
-	private AudioMixerSnapshot mixerSnapshotDefault;
-
-	private AudioControlGroup[] audioControllVoice;
-
 	public Dictionary<int, uint> m_dicReservedVoiceChannel;
 
 	private bool m_IsLoading;
+
+	private bool m_IsLoaded;
 
 	public UIntKeyTable<AudioClip> m_SystemSEClips;
 
@@ -215,7 +217,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		SetAudioMixer(audioMixer);
 		SetupAudioControlGroup();
 		mixerCurrent = mixerSnapshotDefault;
-		TransitionPreset(0u);
+		TransitionPreset();
 		IsActiveSoundEffect = true;
 	}
 
@@ -224,7 +226,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		audioMixer = Resources.Load<AudioMixer>("Audio/MainMixer");
 	}
 
-	public void TransitionPreset(uint presetId = 0)
+	public void TransitionPreset(uint presetId = 0u)
 	{
 		string text = "Default";
 		float minDistance = 15f;
@@ -240,13 +242,11 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 			}
 		}
 		CurrentPreset = new AudioPreset(text, minDistance, maxDistance);
-		TransitionTo(text, 1f);
+		TransitionTo(text);
 	}
 
 	public void TransitionTo(string snapshotName, float transitionTime = 1f)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		if (!(audioMixer == null))
 		{
 			AudioMixerSnapshot val = audioMixer.FindSnapshot(snapshotName);
@@ -278,8 +278,6 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public void SetAudioMixer(AudioMixer audio_mixer)
 	{
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Expected O, but got Unknown
 		audioMixer = audio_mixer;
 		if (audio_mixer != null)
 		{
@@ -323,11 +321,11 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		if (audioControlSESelf == null)
 		{
-			audioControlSESelf = AudioControlGroup.Create(AudioControlGroup.CullingTypes.NONE, 2147483647);
+			audioControlSESelf = AudioControlGroup.Create();
 		}
 		if (audioControlJingle == null)
 		{
-			audioControlJingle = AudioControlGroup.Create(AudioControlGroup.CullingTypes.NONE, 2147483647);
+			audioControlJingle = AudioControlGroup.Create();
 		}
 		if (audioControllVoice == null)
 		{
@@ -343,71 +341,72 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		while (true)
 		{
-			yield return (object)null;
-			if (playingBGMID != requestBGMID)
+			yield return null;
+			if (playingBGMID == requestBGMID)
 			{
-				changingBGM = true;
-				playingBGMID = requestBGMID;
-				LoadObject lo_bgm = null;
-				if (playingBGMID != 0)
-				{
-					ResourceManager.enableCache = false;
-					lo_bgm = new LoadObject(this, RESOURCE_CATEGORY.SOUND_BGM, ResourceName.GetBGM(requestBGMID), false);
-					ResourceManager.enableCache = true;
-				}
-				if (audioSourceBGM != null && audioSourceBGM.get_isPlaying())
-				{
-					bool is_play_fadeout = true;
-					EventDelegate.Callback OnFinishedCallBack = delegate
-					{
-						((_003CStart_003Ec__Iterator240)/*Error near IL_00f3: stateMachine*/)._003Cis_play_fadeout_003E__1 = false;
-					};
-					TweenVolume fadeout = TweenVolume.Begin(this.get_gameObject(), fadeOutTime, 0f);
-					EventDelegate.Add(fadeout.onFinished, OnFinishedCallBack);
-					while (is_play_fadeout)
-					{
-						audioSourceBGM.set_volume(fadeout.value);
-						yield return (object)null;
-					}
-					EventDelegate.Remove(fadeout.onFinished, OnFinishedCallBack);
-				}
-				if (lo_bgm != null)
-				{
-					if (lo_bgm.isLoading)
-					{
-						yield return (object)lo_bgm.Wait(this);
-					}
-					if (!(lo_bgm.loadedObject != null))
-					{
-						int num3 = playingBGMID = (requestBGMID = 0);
-					}
-					else
-					{
-						if (audioSourceBGM == null)
-						{
-							audioSourceBGM = this.get_gameObject().AddComponent<AudioSource>();
-						}
-						if (audioSourceBGM != null)
-						{
-							audioSourceBGM.set_priority(0);
-							audioSourceBGM.set_reverbZoneMix(0f);
-							audioSourceBGM.set_spread(360f);
-							audioSourceBGM.set_spatialBlend(0f);
-							audioSourceBGM.set_outputAudioMixerGroup(mixerGroupBGM);
-							audioSourceBGM.set_loop(m_IsNextBGMLoop);
-							audioSourceBGM.set_enabled(true);
-							audioSourceBGM.set_clip(lo_bgm.loadedObject as AudioClip);
-							audioSourceBGM.set_volume(volumeBGM);
-							audioSourceBGM.Play(0uL);
-						}
-					}
-				}
-				if (playingBGMID == 0 && audioSourceBGM != null)
-				{
-					audioSourceBGM.Stop();
-				}
-				changingBGM = false;
+				continue;
 			}
+			changingBGM = true;
+			playingBGMID = requestBGMID;
+			LoadObject lo_bgm = null;
+			if (playingBGMID != 0)
+			{
+				ResourceManager.enableCache = false;
+				lo_bgm = new LoadObject(this, RESOURCE_CATEGORY.SOUND_BGM, ResourceName.GetBGM(requestBGMID));
+				ResourceManager.enableCache = true;
+			}
+			if (audioSourceBGM != null && audioSourceBGM.get_isPlaying())
+			{
+				bool is_play_fadeout = true;
+				EventDelegate.Callback OnFinishedCallBack = delegate
+				{
+					is_play_fadeout = false;
+				};
+				TweenVolume fadeout = TweenVolume.Begin(this.get_gameObject(), fadeOutTime, 0f);
+				EventDelegate.Add(fadeout.onFinished, OnFinishedCallBack);
+				while (is_play_fadeout)
+				{
+					audioSourceBGM.set_volume(fadeout.value);
+					yield return null;
+				}
+				EventDelegate.Remove(fadeout.onFinished, OnFinishedCallBack);
+			}
+			if (lo_bgm != null)
+			{
+				if (lo_bgm.isLoading)
+				{
+					yield return lo_bgm.Wait(this);
+				}
+				if (!(lo_bgm.loadedObject != null))
+				{
+					int num3 = playingBGMID = (requestBGMID = 0);
+				}
+				else
+				{
+					if (audioSourceBGM == null)
+					{
+						audioSourceBGM = this.get_gameObject().AddComponent<AudioSource>();
+					}
+					if (audioSourceBGM != null)
+					{
+						audioSourceBGM.set_priority(0);
+						audioSourceBGM.set_reverbZoneMix(0f);
+						audioSourceBGM.set_spread(360f);
+						audioSourceBGM.set_spatialBlend(0f);
+						audioSourceBGM.set_outputAudioMixerGroup(mixerGroupBGM);
+						audioSourceBGM.set_loop(m_IsNextBGMLoop);
+						audioSourceBGM.set_enabled(true);
+						audioSourceBGM.set_clip(lo_bgm.loadedObject as AudioClip);
+						audioSourceBGM.set_volume(volumeBGM);
+						audioSourceBGM.Play(0uL);
+					}
+				}
+			}
+			if (playingBGMID == 0 && audioSourceBGM != null)
+			{
+				audioSourceBGM.Stop();
+			}
+			changingBGM = false;
 		}
 	}
 
@@ -436,7 +435,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 			return null;
 		}
 		float volume2 = volume * MonoBehaviourSingleton<SoundManager>.I.volumeSE;
-		return MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, config_id, volume2, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE, false, null, parent, null);
+		return MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, config_id, volume2, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE, is3DSound: false, null, parent);
 	}
 
 	public static void PlaySystemSE(SoundID.UISE SEType, float volume = 1f)
@@ -446,7 +445,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 			AudioClip val = MonoBehaviourSingleton<SoundManager>.I.m_SystemSEClips.Get((uint)SEType);
 			if (!(val == null))
 			{
-				PlayUISE(val, volume, false, null, (int)SEType);
+				PlayUISE(val, volume, loop: false, null, (int)SEType);
 			}
 		}
 	}
@@ -469,9 +468,9 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		if (int.TryParse(s, out result))
 		{
 			Vector3 position = parent.get_position();
-			return MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, result, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, true, null, null, position);
+			return MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, result, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, is3DSound: true, null, null, position);
 		}
-		return AudioObject.Create(clip, 0, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf, true, null, parent, null);
+		return AudioObject.Create(clip, 0, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf, is3DSound: true, null, parent);
 	}
 
 	public static void PlayOneShotSE(int se_id, Vector3 pos)
@@ -479,7 +478,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, true, null, null, pos);
+			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, is3DSound: true, null, null, pos);
 		}
 	}
 
@@ -503,7 +502,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE, false, null, null, null);
+			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE);
 		}
 	}
 
@@ -511,7 +510,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		if (MonoBehaviourSingleton<SoundManager>.IsValid() && !(clip == null))
 		{
-			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE, false, null, null, null);
+			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(clip, se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE);
 		}
 	}
 
@@ -521,14 +520,14 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		{
 			return null;
 		}
-		return MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE, false, null, null, null);
+		return MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupUISE);
 	}
 
 	public static void PlayOneShotSE(int se_id, DisableNotifyMonoBehaviour master = null, Transform parent = null)
 	{
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, true, master, parent, null);
+			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, is3DSound: true, master, parent);
 		}
 	}
 
@@ -540,19 +539,19 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		}
 	}
 
-	public static void PlayVoice(int voice_id, float volume = 1f, uint ch_id = 0, DisableNotifyMonoBehaviour master = null, Transform parent = null)
+	public static void PlayVoice(int voice_id, float volume = 1f, uint ch_id = 0u, DisableNotifyMonoBehaviour master = null, Transform parent = null)
 	{
 		AudioClip storyVoiceAudioClip = GetStoryVoiceAudioClip(voice_id);
 		PlayVoice(storyVoiceAudioClip, voice_id, volume, ch_id, master, parent);
 	}
 
-	public static void PlayActionVoice(int voice_id, float volume = 1f, uint ch_id = 0, DisableNotifyMonoBehaviour master = null, Transform parent = null)
+	public static void PlayActionVoice(int voice_id, float volume = 1f, uint ch_id = 0u, DisableNotifyMonoBehaviour master = null, Transform parent = null)
 	{
 		AudioClip actionVoiceAudioClip = GetActionVoiceAudioClip(voice_id);
 		PlayVoice(actionVoiceAudioClip, voice_id, volume, ch_id, master, parent);
 	}
 
-	public static void StopVoice(uint ch_id = 0, int fadeout_frame = 2)
+	public static void StopVoice(uint ch_id = 0u, int fadeout_frame = 2)
 	{
 		AudioControlGroup audioControlVoice = MonoBehaviourSingleton<SoundManager>.I.GetAudioControlVoice(ch_id);
 		if (!(audioControlVoice == null))
@@ -561,24 +560,25 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		}
 	}
 
-	public static void PlayVoice(AudioClip audio_clip, int voice_id, float volume = 1f, uint ch_id = 0, DisableNotifyMonoBehaviour master = null, Transform parent = null)
+	public static void PlayVoice(AudioClip audio_clip, int voice_id, float volume = 1f, uint ch_id = 0u, DisableNotifyMonoBehaviour master = null, Transform parent = null)
 	{
-		if (GameSaveData.instance.voiceOption != 2 && MonoBehaviourSingleton<SoundManager>.IsValid() && !(audio_clip == null))
+		if (GameSaveData.instance.voiceOption == 2 || !MonoBehaviourSingleton<SoundManager>.IsValid() || audio_clip == null)
 		{
-			float num = volume * MonoBehaviourSingleton<SoundManager>.I.volumeVOICE;
-			if (!(num < 0.05f))
+			return;
+		}
+		float num = volume * MonoBehaviourSingleton<SoundManager>.I.volumeVOICE;
+		if (!(num < 0.05f))
+		{
+			bool is3DSound = (!(parent == null)) ? true : false;
+			AudioControlGroup audioControlVoice = MonoBehaviourSingleton<SoundManager>.I.GetAudioControlVoice(ch_id);
+			if (!(audioControlVoice == null))
 			{
-				bool is3DSound = (!(parent == null)) ? true : false;
-				AudioControlGroup audioControlVoice = MonoBehaviourSingleton<SoundManager>.I.GetAudioControlVoice(ch_id);
-				if (!(audioControlVoice == null))
-				{
-					audioControlVoice.CreateAudio(audio_clip, voice_id, num, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupVoice, is3DSound, master, parent, null);
-				}
+				audioControlVoice.CreateAudio(audio_clip, voice_id, num, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupVoice, is3DSound, master, parent);
 			}
 		}
 	}
 
-	public AudioControlGroup GetAudioControlVoice(uint ch_id = 0)
+	public AudioControlGroup GetAudioControlVoice(uint ch_id = 0u)
 	{
 		if (audioControllVoice == null)
 		{
@@ -595,7 +595,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			MonoBehaviourSingleton<SoundManager>.I.audioControlJingle.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupJingle, false, master, parent, null);
+			MonoBehaviourSingleton<SoundManager>.I.audioControlJingle.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupJingle, is3DSound: false, master, parent);
 		}
 	}
 
@@ -603,7 +603,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	{
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
-			MonoBehaviourSingleton<SoundManager>.I.audioControlJingle.CreateAudio(clip, se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupJingle, false, master, parent, null);
+			MonoBehaviourSingleton<SoundManager>.I.audioControlJingle.CreateAudio(clip, se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: false, MonoBehaviourSingleton<SoundManager>.I.mixerGroupJingle, is3DSound: false, master, parent);
 		}
 	}
 
@@ -612,46 +612,50 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
 			bool is3DSound = (!(parent == null)) ? true : false;
-			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, true, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, is3DSound, master, parent, null);
+			MonoBehaviourSingleton<SoundManager>.I.audioControlSESelf.CreateAudio(GetSEAudioClip(se_id), se_id, MonoBehaviourSingleton<SoundManager>.I.volumeSE, loop: true, MonoBehaviourSingleton<SoundManager>.I.mixerGroupSE, is3DSound, master, parent);
 		}
 	}
 
 	public static void StopLoopSE(int se_id, DisableNotifyMonoBehaviour master)
 	{
-		if (MonoBehaviourSingleton<SoundManager>.IsValid() && master.notifyServants != null)
+		if (!MonoBehaviourSingleton<SoundManager>.IsValid() || master.notifyServants == null)
 		{
-			List<DisableNotifyMonoBehaviour>.Enumerator enumerator = master.notifyServants.GetEnumerator();
-			AudioObject audioObject;
-			do
-			{
-				if (!enumerator.MoveNext())
-				{
-					return;
-				}
-				audioObject = (enumerator.Current as AudioObject);
-			}
-			while (!(audioObject != null) || audioObject.clipId != se_id);
-			audioObject.Stop(0);
+			return;
 		}
+		List<DisableNotifyMonoBehaviour>.Enumerator enumerator = master.notifyServants.GetEnumerator();
+		AudioObject audioObject;
+		do
+		{
+			if (enumerator.MoveNext())
+			{
+				audioObject = (enumerator.Current as AudioObject);
+				continue;
+			}
+			return;
+		}
+		while (!(audioObject != null) || audioObject.clipId != se_id);
+		audioObject.Stop();
 	}
 
 	public static void LoopOff(int se_id, DisableNotifyMonoBehaviour master)
 	{
-		if (MonoBehaviourSingleton<SoundManager>.IsValid() && master.notifyServants != null)
+		if (!MonoBehaviourSingleton<SoundManager>.IsValid() || master.notifyServants == null)
 		{
-			List<DisableNotifyMonoBehaviour>.Enumerator enumerator = master.notifyServants.GetEnumerator();
-			AudioObject audioObject;
-			do
-			{
-				if (!enumerator.MoveNext())
-				{
-					return;
-				}
-				audioObject = (enumerator.Current as AudioObject);
-			}
-			while (!(audioObject != null) || audioObject.clipId != se_id || !audioObject.GetLoopFlag());
-			audioObject.SetLoopFlag(false);
+			return;
 		}
+		List<DisableNotifyMonoBehaviour>.Enumerator enumerator = master.notifyServants.GetEnumerator();
+		AudioObject audioObject;
+		do
+		{
+			if (enumerator.MoveNext())
+			{
+				audioObject = (enumerator.Current as AudioObject);
+				continue;
+			}
+			return;
+		}
+		while (!(audioObject != null) || audioObject.clipId != se_id || !audioObject.GetLoopFlag());
+		audioObject.SetLoopFlag(flag: false);
 	}
 
 	public static AudioClip GetSEAudioClip(int se_id)
@@ -667,28 +671,28 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 	private static AudioClip GetAudioClip(RESOURCE_CATEGORY category, string name)
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, name);
 	}
 
 	private static AudioClip GetAudioClip(RESOURCE_CATEGORY category, string package_name, string name)
 	{
 		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
+		//IL_0018: Expected O, but got Unknown
 		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, package_name, name);
 	}
 
 	private static AudioClip GetActionVoiceAudioClip(int voice_id)
 	{
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
+		//IL_0023: Expected O, but got Unknown
 		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageNameFromVoiceID(voice_id), ResourceName.GetActionVoiceName(voice_id));
 	}
 
 	public static AudioClip GetStoryVoiceAudioClip(int voice_id)
 	{
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
+		//IL_0023: Expected O, but got Unknown
 		return MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetStoryVoicePackageNameFromVoiceID(voice_id), ResourceName.GetStoryVoiceName(voice_id));
 	}
 
@@ -763,15 +767,12 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 
 	public void LoadParmanentAudioClip()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		m_IsLoading = true;
 		this.StartCoroutine(DoLoading());
 	}
 
 	public Coroutine WaitLoading()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
 		return this.StartCoroutine(DoWaitLoading());
 	}
 
@@ -784,11 +785,20 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		return m_IsLoading;
 	}
 
+	public bool IsLoadedAudioClip()
+	{
+		if (!MonoBehaviourSingleton<SoundManager>.IsValid())
+		{
+			return false;
+		}
+		return m_IsLoaded;
+	}
+
 	private IEnumerator DoWaitLoading()
 	{
 		while (IsLoadingAudioClip())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 	}
 
@@ -802,19 +812,20 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		ResourceManager.internalMode = true;
 		ResourceManager.enableCache = false;
 		int[] array = values;
-		foreach (int id in array)
+		foreach (int num in array)
 		{
-			if (id > 0)
+			if (num > 0)
 			{
-				LoadObject lo = load_queue.LoadSE(id);
-				los.Add(lo);
+				LoadObject item = load_queue.LoadSE(num);
+				los.Add(item);
 			}
 		}
 		ResourceManager.internalMode = internal_mode;
 		ResourceManager.enableCache = enable_cache;
-		yield return (object)load_queue.Wait();
+		yield return load_queue.Wait();
 		SetSystemSEClips(values, los);
 		m_IsLoading = false;
+		m_IsLoaded = true;
 	}
 
 	public static AudioClip GetAttachedAudio(GameObject go, string filter = null)
@@ -836,28 +847,29 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
 		m_SystemSEClips = new UIntKeyTable<AudioClip>();
 		foreach (int num in values)
 		{
-			if (num > 0)
+			if (num <= 0)
 			{
-				string sE = ResourceName.GetSE(num);
-				LoadObject loadObject = null;
-				foreach (LoadObject lo in los)
+				continue;
+			}
+			string sE = ResourceName.GetSE(num);
+			LoadObject loadObject = null;
+			foreach (LoadObject lo in los)
+			{
+				if (lo != null && lo.loadedObject != null && !string.IsNullOrEmpty(lo.loadedObject.get_name()))
 				{
-					if (lo != null && lo.loadedObject != null && !string.IsNullOrEmpty(lo.loadedObject.get_name()))
+					string b = ResourceName.Normalize(lo.loadedObject.get_name());
+					if (sE == b)
 					{
-						string b = ResourceName.Normalize(lo.loadedObject.get_name());
-						if (sE == b)
-						{
-							loadObject = lo;
-						}
+						loadObject = lo;
 					}
 				}
-				if (loadObject != null)
+			}
+			if (loadObject != null)
+			{
+				AudioClip val = loadObject.loadedObject as AudioClip;
+				if (val != null)
 				{
-					AudioClip val = loadObject.loadedObject as AudioClip;
-					if (val != null)
-					{
-						m_SystemSEClips.Add((uint)num, val);
-					}
+					m_SystemSEClips.Add((uint)num, val);
 				}
 			}
 		}

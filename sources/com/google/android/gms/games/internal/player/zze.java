@@ -1,189 +1,66 @@
 package com.google.android.gms.games.internal.player;
 
-import android.text.TextUtils;
+import android.os.Parcel;
+import android.os.Parcelable.Creator;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zze {
-    public final String name;
-    public final String title;
-    public final String zzhjj;
-    public final String zzhjk;
-    public final String zzhjl;
-    public final String zzhjm;
-    public final String zzhjn;
-    public final String zzhjo;
-    public final String zzhjp;
-    public final String zzhjq;
-    public final String zzhjr;
-    public final String zzhjs;
-    public final String zzhjt;
-    public final String zzhju;
-    public final String zzhjv;
-    public final String zzhjw;
-    public final String zzhjx;
-    public final String zzhjy;
-    private String zzhjz;
-    public final String zzhka;
-    public final String zzhkb;
-    public final String zzhkc;
-    public final String zzhkd;
-    public final String zzhke;
-    public final String zzhkf;
-    public final String zzhkg;
-    public final String zzhkh;
-    public final String zzhki;
-    public final String zzhkj;
-    public final String zzhkk;
-    public final String zzhkl;
-    public final String zzhkm;
-    public final String zzhkn;
-    public final String zzhko;
-    public final String zzhkp;
-
-    public zze(String str) {
-        String str2;
-        if (TextUtils.isEmpty(str)) {
-            this.zzhjj = "external_player_id";
-            this.zzhjk = "profile_name";
-            this.zzhjl = "profile_icon_image_uri";
-            this.zzhjm = "profile_icon_image_url";
-            this.zzhjn = "profile_hi_res_image_uri";
-            this.zzhjo = "profile_hi_res_image_url";
-            this.zzhjp = "last_updated";
-            this.zzhjq = "is_in_circles";
-            this.zzhjr = "played_with_timestamp";
-            this.zzhjs = "current_xp_total";
-            this.zzhjt = "current_level";
-            this.zzhju = "current_level_min_xp";
-            this.zzhjv = "current_level_max_xp";
-            this.zzhjw = "next_level";
-            this.zzhjx = "next_level_max_xp";
-            this.zzhjy = "last_level_up_timestamp";
-            this.title = "player_title";
-            this.zzhjz = "has_all_public_acls";
-            this.zzhka = "is_profile_visible";
-            this.zzhkb = "most_recent_external_game_id";
-            this.zzhkc = "most_recent_game_name";
-            this.zzhkd = "most_recent_activity_timestamp";
-            this.zzhke = "most_recent_game_icon_uri";
-            this.zzhkf = "most_recent_game_hi_res_uri";
-            this.zzhkg = "most_recent_game_featured_uri";
-            this.zzhkh = "has_debug_access";
-            this.zzhki = "gamer_tag";
-            this.name = "real_name";
-            this.zzhkj = "banner_image_landscape_uri";
-            this.zzhkk = "banner_image_landscape_url";
-            this.zzhkl = "banner_image_portrait_uri";
-            this.zzhkm = "banner_image_portrait_url";
-            this.zzhkn = "gamer_friend_status";
-            this.zzhko = "gamer_friend_update_timestamp";
-            str2 = "is_muted";
-        } else {
-            String valueOf = String.valueOf(str);
-            str2 = String.valueOf("external_player_id");
-            this.zzhjj = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("profile_name");
-            this.zzhjk = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("profile_icon_image_uri");
-            this.zzhjl = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("profile_icon_image_url");
-            this.zzhjm = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("profile_hi_res_image_uri");
-            this.zzhjn = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("profile_hi_res_image_url");
-            this.zzhjo = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("last_updated");
-            this.zzhjp = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("is_in_circles");
-            this.zzhjq = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("played_with_timestamp");
-            this.zzhjr = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("current_xp_total");
-            this.zzhjs = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("current_level");
-            this.zzhjt = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("current_level_min_xp");
-            this.zzhju = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("current_level_max_xp");
-            this.zzhjv = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("next_level");
-            this.zzhjw = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("next_level_max_xp");
-            this.zzhjx = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("last_level_up_timestamp");
-            this.zzhjy = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("player_title");
-            this.title = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("has_all_public_acls");
-            this.zzhjz = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("is_profile_visible");
-            this.zzhka = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("most_recent_external_game_id");
-            this.zzhkb = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("most_recent_game_name");
-            this.zzhkc = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("most_recent_activity_timestamp");
-            this.zzhkd = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("most_recent_game_icon_uri");
-            this.zzhke = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("most_recent_game_hi_res_uri");
-            this.zzhkf = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("most_recent_game_featured_uri");
-            this.zzhkg = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("has_debug_access");
-            this.zzhkh = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("gamer_tag");
-            this.zzhki = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("real_name");
-            this.name = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("banner_image_landscape_uri");
-            this.zzhkj = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("banner_image_landscape_url");
-            this.zzhkk = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("banner_image_portrait_uri");
-            this.zzhkl = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("banner_image_portrait_url");
-            this.zzhkm = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("gamer_friend_status");
-            this.zzhkn = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("gamer_friend_update_timestamp");
-            this.zzhko = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
-            valueOf = String.valueOf(str);
-            str2 = String.valueOf("is_muted");
-            str2 = str2.length() != 0 ? valueOf.concat(str2) : new String(valueOf);
+public final class zze implements Creator<ProfileSettingsEntity> {
+    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        Status status = null;
+        String str = null;
+        StockProfileImageEntity stockProfileImageEntity = null;
+        boolean z = false;
+        boolean z2 = false;
+        boolean z3 = false;
+        boolean z4 = false;
+        boolean z5 = false;
+        boolean z6 = false;
+        int i = 0;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 1:
+                    status = (Status) SafeParcelReader.createParcelable(parcel, readHeader, Status.CREATOR);
+                    break;
+                case 2:
+                    str = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 3:
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                case 4:
+                    z2 = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                case 5:
+                    z3 = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                case 6:
+                    stockProfileImageEntity = (StockProfileImageEntity) SafeParcelReader.createParcelable(parcel, readHeader, StockProfileImageEntity.CREATOR);
+                    break;
+                case 7:
+                    z4 = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                case 8:
+                    z5 = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                case 9:
+                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                case 10:
+                    z6 = SafeParcelReader.readBoolean(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
+            }
         }
-        this.zzhkp = str2;
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new ProfileSettingsEntity(status, str, z, z2, z3, stockProfileImageEntity, z4, z5, i, z6);
+    }
+
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new ProfileSettingsEntity[i];
     }
 }

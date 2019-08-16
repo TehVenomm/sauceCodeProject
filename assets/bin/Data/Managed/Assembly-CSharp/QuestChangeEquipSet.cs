@@ -152,8 +152,6 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 
 	protected override void UpdateEquipIcon(List<CharaInfo.EquipItem> equip_set_info)
 	{
-		//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0398: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.LBL_CHANGE_MODE, isVisualMode);
 		int i = 0;
 		for (int num = 7; i < num; i++)
@@ -172,7 +170,7 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 			for (int num2 = localEquipSet.item.Length; j < num2; j++)
 			{
 				ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-				RARITY_TYPE? nullable = null;
+				RARITY_TYPE? rARITY_TYPE = null;
 				ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
 				int num3 = -1;
 				EquipItemInfo equipItemInfo = localEquipSet.item[j];
@@ -201,16 +199,16 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 					if (equipItemData != null)
 					{
 						iTEM_ICON_TYPE = ItemIcon.GetItemIconType(equipItemData.type);
-						nullable = equipItemData.rarity;
+						rARITY_TYPE = equipItemData.rarity;
 						eLEMENT_TYPE = equipItemData.GetTargetElementPriorityToTable();
 						num3 = equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
-						SetActive(FindCtrl(transRoot, icons_level[j]), false);
+						SetActive(FindCtrl(transRoot, icons_level[j]), is_visible: false);
 					}
 				}
 				else if (equipItemInfo != null && equipItemInfo.tableID != 0)
 				{
 					num3 = equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
-					SetActive(FindCtrl(transRoot, icons_level[j]), true);
+					SetActive(FindCtrl(transRoot, icons_level[j]), is_visible: true);
 					string text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), equipItemInfo.level.ToString());
 					SetLabelText(FindCtrl(transRoot, icons_level[j]), text);
 				}
@@ -222,7 +220,7 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 					Temporary.itemIconList[k].get_gameObject().SetActive(true);
 				}
 				Temporary.itemIconList.Clear();
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, val, null, -1, "EQUIP", j, false, -1, false, null, false, false);
+				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, val, null, -1, "EQUIP", j);
 				SetLongTouch(itemIcon.transform, "DETAIL", j);
 				SetEvent(FindCtrl(transRoot, icons_btn[j]), "DETAIL", j);
 				itemIcon.get_gameObject().SetActive(num3 != -1);
@@ -232,8 +230,8 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 				}
 				UpdateEquipSkillButton(equipItemInfo, j);
 			}
-			ResetTween(transRoot, UI.OBJ_EQUIP_ROOT, 0);
-			PlayTween(transRoot, UI.OBJ_EQUIP_ROOT, true, null, false, 0);
+			ResetTween(transRoot, UI.OBJ_EQUIP_ROOT);
+			PlayTween(transRoot, UI.OBJ_EQUIP_ROOT, forward: true, null, is_input_block: false);
 		}
 		if (flag && record.charaInfo.hId != 0)
 		{
@@ -275,11 +273,11 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 
 	protected virtual void OnQuery_DECISION()
 	{
-		GameSection.ChangeEvent("[BACK]", null);
+		GameSection.ChangeEvent("[BACK]");
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquipSet(selfCharaEquipSetNo, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -288,15 +286,14 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.SetLocalEquipSetNo(-1);
 		base.OnQuery_SECTION_BACK();
-		MonoBehaviourSingleton<PartyManager>.I.SendIsEquip(false, delegate(bool is_success)
+		MonoBehaviourSingleton<PartyManager>.I.SendIsEquip(isEquip: false, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
 	protected void OnQuery_EQUIP_SET_L()
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		selfCharaEquipSetNo--;
 		if (selfCharaEquipSetNo < 0)
 		{
@@ -308,7 +305,6 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 
 	protected void OnQuery_EQUIP_SET_R()
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		selfCharaEquipSetNo++;
 		if (selfCharaEquipSetNo >= equipSetMax)
 		{
@@ -328,7 +324,7 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 	{
 		while (UIModelRenderTexture.Get(FindCtrl(transRoot, UI.TEX_MODEL)).IsLoadingPlayer())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		ReloadModel();
 	}

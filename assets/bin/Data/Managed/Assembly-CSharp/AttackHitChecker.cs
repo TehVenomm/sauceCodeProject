@@ -8,6 +8,8 @@ public class AttackHitChecker
 		public StageObject target;
 
 		public float lastHitTime = -1f;
+
+		public int hitCount;
 	}
 
 	protected StringKeyTable<List<HitRecord>> attackHitList = new StringKeyTable<List<HitRecord>>();
@@ -37,6 +39,7 @@ public class AttackHitChecker
 			list.Add(hitRecord);
 		}
 		hitRecord.lastHitTime = Time.get_time();
+		hitRecord.hitCount++;
 	}
 
 	public bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
@@ -55,6 +58,10 @@ public class AttackHitChecker
 						return false;
 					}
 					if (Time.get_time() - hitRecord.lastHitTime <= info.hitIntervalTime)
+					{
+						return false;
+					}
+					if (info.hitCountMax > 0 && info.hitCountMax <= hitRecord.hitCount)
 					{
 						return false;
 					}
@@ -86,25 +93,27 @@ public class AttackHitChecker
 	public void ClearTarget(AttackInfo info, StageObject target)
 	{
 		List<HitRecord> list = attackHitList.Get(info.name);
-		if (!object.ReferenceEquals(list, null))
+		if (object.ReferenceEquals(list, null))
 		{
-			int num = 0;
-			int count = list.Count;
-			HitRecord hitRecord;
-			while (true)
+			return;
+		}
+		int num = 0;
+		int count = list.Count;
+		HitRecord hitRecord;
+		while (true)
+		{
+			if (num < count)
 			{
-				if (num >= count)
-				{
-					return;
-				}
 				hitRecord = list[num];
 				if (hitRecord.target == target)
 				{
 					break;
 				}
 				num++;
+				continue;
 			}
-			list.Remove(hitRecord);
+			return;
 		}
+		list.Remove(hitRecord);
 	}
 }

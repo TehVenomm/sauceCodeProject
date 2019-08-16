@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Button Keys (Legacy)")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Button Keys (Legacy)")]
 public class UIButtonKeys : UIKeyNavigation
 {
 	public UIButtonKeys selectOnClick;
@@ -22,16 +22,6 @@ public class UIButtonKeys : UIKeyNavigation
 
 	public void Upgrade()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Expected O, but got Unknown
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Expected O, but got Unknown
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Expected O, but got Unknown
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Expected O, but got Unknown
 		if (onClick == null && selectOnClick != null)
 		{
 			onClick = selectOnClick.get_gameObject();

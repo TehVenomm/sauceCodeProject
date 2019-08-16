@@ -11,8 +11,6 @@ public class BulletControllerSnatch : BulletControllerBase
 		DESTROY
 	}
 
-	private BulletObject bullet;
-
 	private Player owner;
 
 	private STATE state;
@@ -81,7 +79,7 @@ public class BulletControllerSnatch : BulletControllerBase
 			SetState(STATE.DESTROY);
 			break;
 		case STATE.DESTROY:
-			bullet.OnDestroy();
+			bulletObject.OnDestroy();
 			SetState(STATE.NONE);
 			break;
 		}
@@ -93,9 +91,6 @@ public class BulletControllerSnatch : BulletControllerBase
 
 	public override bool IsHit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		int layer = collider.get_gameObject().get_layer();
 		switch (layer)
 		{
@@ -124,24 +119,20 @@ public class BulletControllerSnatch : BulletControllerBase
 
 	public override void OnHit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		int layer = collider.get_gameObject().get_layer();
 		if (layer != 11 && layer != 10)
+		{
+			SetState(STATE.MISS);
+			return;
+		}
+		AttackRestraintObject component = collider.get_gameObject().GetComponent<AttackRestraintObject>();
+		if (component != null)
 		{
 			SetState(STATE.MISS);
 		}
 		else
 		{
-			AttackRestraintObject component = collider.get_gameObject().GetComponent<AttackRestraintObject>();
-			if (component != null)
-			{
-				SetState(STATE.MISS);
-			}
-			else
-			{
-				SetState(STATE.SNATCH);
-			}
+			SetState(STATE.SNATCH);
 		}
 	}
 
@@ -150,14 +141,9 @@ public class BulletControllerSnatch : BulletControllerBase
 		OnHit(collider);
 	}
 
-	public void SetBulletObject(BulletObject bullet)
+	public override void RegisterFromObject(StageObject obj)
 	{
-		this.bullet = bullet;
-	}
-
-	public void SetFromObject(StageObject stageObject)
-	{
-		owner = (stageObject as Player);
+		owner = (obj as Player);
 		if (owner != null)
 		{
 			owner.snatchCtrl.SetSnatchBulletTrans(base._transform);

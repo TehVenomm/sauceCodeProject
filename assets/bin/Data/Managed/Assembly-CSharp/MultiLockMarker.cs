@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MultiLockMarker
+public class MultiLockMarker : MonoBehaviour
 {
 	public const int kLayerMask = 16;
 
@@ -33,8 +33,6 @@ public class MultiLockMarker
 
 	public void Init()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		_lockOrder.Clear();
 		_lockInterval = 0f;
@@ -88,9 +86,10 @@ public class MultiLockMarker
 
 	public void EndBoost(bool isHide)
 	{
+		int soulArrowNormalLockNum = MonoBehaviourSingleton<StageObjectManager>.I.self.GetSoulArrowNormalLockNum();
 		for (int i = 0; i < _lockOrder.Count; i++)
 		{
-			if (_lockOrder[i] > info.soulLockMax)
+			if (_lockOrder[i] > soulArrowNormalLockNum)
 			{
 				_lockOrder.RemoveRange(i, _lockOrder.Count - i);
 				break;

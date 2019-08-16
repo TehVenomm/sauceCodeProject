@@ -1,9 +1,12 @@
 package com.zopim.android.sdk.data;
 
 import android.util.Log;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zopim.android.sdk.model.Agent;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,15 +42,15 @@ public class LivechatAgentsPath extends Path<LinkedHashMap<String, Agent>> {
                     if (agent != null) {
                         ObjectMapper mapper = this.PARSER.getMapper();
                         JsonNode valueToTree = mapper.valueToTree(agent);
-                        agent = (Agent) ((LinkedHashMap) this.mData).get(str);
-                        if (agent == null) {
+                        Agent agent2 = (Agent) ((LinkedHashMap) this.mData).get(str);
+                        if (agent2 == null) {
                             ((LinkedHashMap) this.mData).remove(str);
                         } else {
                             try {
-                                ((LinkedHashMap) this.mData).put(str, (Agent) mapper.readerForUpdating(agent).readValue(valueToTree));
-                            } catch (Throwable e) {
+                                ((LinkedHashMap) this.mData).put(str, (Agent) mapper.readerForUpdating(agent2).readValue(valueToTree));
+                            } catch (JsonProcessingException e) {
                                 Log.w(TAG, "Failed to process json. Agent could not be updated.", e);
-                            } catch (Throwable e2) {
+                            } catch (IOException e2) {
                                 Log.w(TAG, "IO error. Agent could not be updated.", e2);
                             }
                         }
@@ -57,8 +60,8 @@ public class LivechatAgentsPath extends Path<LinkedHashMap<String, Agent>> {
                 } else if (agent != null) {
                     try {
                         ((LinkedHashMap) this.mData).put(str, agent);
-                    } catch (Throwable e22) {
-                        Log.w(TAG, "Failed to process json. Agent could not be created.", e22);
+                    } catch (Exception e3) {
+                        Log.w(TAG, "Failed to process json. Agent could not be created.", e3);
                     }
                 } else {
                     continue;
@@ -68,21 +71,23 @@ public class LivechatAgentsPath extends Path<LinkedHashMap<String, Agent>> {
         }
     }
 
-    void clear() {
+    /* access modifiers changed from: 0000 */
+    public void clear() {
         if (this.mData != null) {
             ((LinkedHashMap) this.mData).clear();
         }
     }
 
     public LinkedHashMap<String, Agent> getData() {
-        return this.mData != null ? new LinkedHashMap((Map) this.mData) : new LinkedHashMap();
+        return this.mData != null ? new LinkedHashMap((Map) this.mData) : new LinkedHashMap<>();
     }
 
-    void update(String str) {
+    /* access modifiers changed from: 0000 */
+    public void update(String str) {
         if (isClearRequired(str)) {
             clear();
         } else if (!str.isEmpty()) {
-            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0865c(this)));
+            updateInternal((LinkedHashMap) this.PARSER.parse(str, (TypeReference<T>) new C1234c<T>(this)));
         }
     }
 }

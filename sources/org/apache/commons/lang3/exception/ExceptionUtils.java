@@ -3,7 +3,6 @@ package org.apache.commons.lang3.exception;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -15,12 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 public class ExceptionUtils {
-    private static final String[] CAUSE_METHOD_NAMES = new String[]{"getCause", "getNextException", "getTargetException", "getException", "getSourceException", "getRootCause", "getCausedByException", "getNested", "getLinkedException", "getNestedException", "getLinkedCause", "getThrowable"};
+    private static final String[] CAUSE_METHOD_NAMES = {"getCause", "getNextException", "getTargetException", "getException", "getSourceException", "getRootCause", "getCausedByException", "getNested", "getLinkedException", "getNestedException", "getLinkedCause", "getThrowable"};
     static final String WRAPPED_MARKER = " [wrapped] ";
 
     @Deprecated
     public static String[] getDefaultCauseMethodNames() {
-        return (String[]) ArrayUtils.clone(CAUSE_METHOD_NAMES);
+        return (String[]) ArrayUtils.clone((T[]) CAUSE_METHOD_NAMES);
     }
 
     @Deprecated
@@ -36,7 +35,7 @@ public class ExceptionUtils {
         if (strArr == null) {
             strArr = CAUSE_METHOD_NAMES;
         }
-        for (String str : r5) {
+        for (String str : strArr) {
             if (str != null) {
                 Throwable causeUsingMethodName = getCauseUsingMethodName(th, str);
                 if (causeUsingMethodName != null) {
@@ -49,7 +48,10 @@ public class ExceptionUtils {
 
     public static Throwable getRootCause(Throwable th) {
         List throwableList = getThrowableList(th);
-        return throwableList.size() < 2 ? null : (Throwable) throwableList.get(throwableList.size() - 1);
+        if (throwableList.size() < 2) {
+            return null;
+        }
+        return (Throwable) throwableList.get(throwableList.size() - 1);
     }
 
     private static Throwable getCauseUsingMethodName(Throwable th, String str) {
@@ -64,9 +66,7 @@ public class ExceptionUtils {
         if (method != null && Throwable.class.isAssignableFrom(method.getReturnType())) {
             try {
                 return (Throwable) method.invoke(th, new Object[0]);
-            } catch (IllegalAccessException e3) {
-            } catch (IllegalArgumentException e4) {
-            } catch (InvocationTargetException e5) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e3) {
             }
         }
         return null;
@@ -82,7 +82,7 @@ public class ExceptionUtils {
     }
 
     public static List<Throwable> getThrowableList(Throwable th) {
-        List<Throwable> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         while (th != null && !arrayList.contains(th)) {
             arrayList.add(th);
             th = getCause(th);
@@ -164,12 +164,13 @@ public class ExceptionUtils {
     }
 
     public static String[] getRootCauseStackTrace(Throwable th) {
+        List list;
         if (th == null) {
             return ArrayUtils.EMPTY_STRING_ARRAY;
         }
         Throwable[] throwables = getThrowables(th);
         int length = throwables.length;
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         List stackFrameList = getStackFrameList(throwables[length - 1]);
         int i = length;
         while (true) {
@@ -177,7 +178,6 @@ public class ExceptionUtils {
             if (i2 < 0) {
                 return (String[]) arrayList.toArray(new String[arrayList.size()]);
             }
-            List list;
             if (i2 != 0) {
                 List stackFrameList2 = getStackFrameList(throwables[i2 - 1]);
                 removeCommonFrames(stackFrameList, stackFrameList2);
@@ -190,8 +190,8 @@ public class ExceptionUtils {
             } else {
                 arrayList.add(WRAPPED_MARKER + throwables[i2].toString());
             }
-            for (i = 0; i < stackFrameList.size(); i++) {
-                arrayList.add(stackFrameList.get(i));
+            for (int i3 = 0; i3 < stackFrameList.size(); i3++) {
+                arrayList.add(stackFrameList.get(i3));
             }
             i = i2;
             stackFrameList = list;
@@ -212,7 +212,7 @@ public class ExceptionUtils {
     }
 
     public static String getStackTrace(Throwable th) {
-        Writer stringWriter = new StringWriter();
+        StringWriter stringWriter = new StringWriter();
         th.printStackTrace(new PrintWriter(stringWriter, true));
         return stringWriter.getBuffer().toString();
     }
@@ -226,7 +226,7 @@ public class ExceptionUtils {
 
     static String[] getStackFrames(String str) {
         StringTokenizer stringTokenizer = new StringTokenizer(str, SystemUtils.LINE_SEPARATOR);
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         while (stringTokenizer.hasMoreTokens()) {
             arrayList.add(stringTokenizer.nextToken());
         }
@@ -235,15 +235,15 @@ public class ExceptionUtils {
 
     static List<String> getStackFrameList(Throwable th) {
         StringTokenizer stringTokenizer = new StringTokenizer(getStackTrace(th), SystemUtils.LINE_SEPARATOR);
-        List<String> arrayList = new ArrayList();
-        int i = 0;
+        ArrayList arrayList = new ArrayList();
+        boolean z = false;
         while (stringTokenizer.hasMoreTokens()) {
             String nextToken = stringTokenizer.nextToken();
             int indexOf = nextToken.indexOf("at");
             if (indexOf != -1 && nextToken.substring(0, indexOf).trim().isEmpty()) {
-                i = 1;
+                z = true;
                 arrayList.add(nextToken);
-            } else if (i != 0) {
+            } else if (z) {
                 break;
             }
         }

@@ -9,10 +9,12 @@ public interface PlayerStats extends Parcelable, Freezable<PlayerStats> {
 
     float getAverageSessionLength();
 
+    @Deprecated
     float getChurnProbability();
 
     int getDaysSinceLastPlayed();
 
+    @Deprecated
     float getHighSpenderProbability();
 
     int getNumberOfPurchases();
@@ -23,9 +25,11 @@ public interface PlayerStats extends Parcelable, Freezable<PlayerStats> {
 
     float getSpendPercentile();
 
+    @Deprecated
     float getSpendProbability();
 
+    @Deprecated
     float getTotalSpendNext28Days();
 
-    Bundle zzarz();
+    Bundle zzdu();
 }

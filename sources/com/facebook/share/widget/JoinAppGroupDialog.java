@@ -17,10 +17,12 @@ import com.facebook.share.internal.ShareInternalUtility;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class JoinAppGroupDialog extends FacebookDialogBase<String, Result> {
     private static final int DEFAULT_REQUEST_CODE = RequestCodeOffset.AppGroupJoin.toRequestCode();
     private static final String JOIN_GAME_GROUP_DIALOG = "game_group_join";
 
+    @Deprecated
     public static final class Result {
         private final Bundle data;
 
@@ -51,15 +53,18 @@ public class JoinAppGroupDialog extends FacebookDialogBase<String, Result> {
         }
     }
 
+    @Deprecated
     public JoinAppGroupDialog(Activity activity) {
         super(activity, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public JoinAppGroupDialog(Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
-    public JoinAppGroupDialog(android.support.v4.app.Fragment fragment) {
+    @Deprecated
+    public JoinAppGroupDialog(android.support.p000v4.app.Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
@@ -67,19 +72,23 @@ public class JoinAppGroupDialog extends FacebookDialogBase<String, Result> {
         super(fragmentWrapper, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public static boolean canShow() {
         return true;
     }
 
+    @Deprecated
     public static void show(Activity activity, String str) {
         new JoinAppGroupDialog(activity).show(str);
     }
 
+    @Deprecated
     public static void show(Fragment fragment, String str) {
         show(new FragmentWrapper(fragment), str);
     }
 
-    public static void show(android.support.v4.app.Fragment fragment, String str) {
+    @Deprecated
+    public static void show(android.support.p000v4.app.Fragment fragment, String str) {
         show(new FragmentWrapper(fragment), str);
     }
 
@@ -87,25 +96,28 @@ public class JoinAppGroupDialog extends FacebookDialogBase<String, Result> {
         new JoinAppGroupDialog(fragmentWrapper).show(str);
     }
 
-    protected AppCall createBaseAppCall() {
+    /* access modifiers changed from: protected */
+    public AppCall createBaseAppCall() {
         return new AppCall(getRequestCode());
     }
 
-    protected List<ModeHandler> getOrderedModeHandlers() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<ModeHandler> getOrderedModeHandlers() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(new WebHandler());
         return arrayList;
     }
 
-    protected void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
-        final ResultProcessor c05291 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
+    /* access modifiers changed from: protected */
+    public void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
+        final C08371 r0 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
             public void onSuccess(AppCall appCall, Bundle bundle) {
                 facebookCallback.onSuccess(new Result(bundle));
             }
         };
         callbackManagerImpl.registerCallback(getRequestCode(), new Callback() {
             public boolean onActivityResult(int i, Intent intent) {
-                return ShareInternalUtility.handleActivityResult(JoinAppGroupDialog.this.getRequestCode(), i, intent, c05291);
+                return ShareInternalUtility.handleActivityResult(JoinAppGroupDialog.this.getRequestCode(), i, intent, r0);
             }
         });
     }

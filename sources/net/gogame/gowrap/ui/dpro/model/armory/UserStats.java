@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.armory;
+package net.gogame.gowrap.p019ui.dpro.model.armory;
 
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -7,6 +7,7 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.armory.UserStats */
 public class UserStats extends BaseJsonObject {
     private static final String KEY_EQUIP_SLOT = "equipSlot";
     private static final String KEY_LEVEL = "level";
@@ -35,11 +36,15 @@ public class UserStats extends BaseJsonObject {
     private Long subItemId;
     private Integer subItemType;
 
+    public UserStats() {
+    }
+
     public UserStats(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_EQUIP_SLOT)) {
             this.equipSlot = JSONUtils.optInt(jsonReader);
             return true;
@@ -188,7 +193,7 @@ public class UserStats extends BaseJsonObject {
         return this.stats;
     }
 
-    public void setStats(Stats stats) {
-        this.stats = stats;
+    public void setStats(Stats stats2) {
+        this.stats = stats2;
     }
 }

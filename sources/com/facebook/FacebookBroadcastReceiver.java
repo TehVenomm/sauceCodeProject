@@ -7,7 +7,8 @@ import android.os.Bundle;
 import com.facebook.internal.NativeProtocol;
 
 public class FacebookBroadcastReceiver extends BroadcastReceiver {
-    protected void onFailedAppCall(String str, String str2, Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onFailedAppCall(String str, String str2, Bundle bundle) {
     }
 
     public void onReceive(Context context, Intent intent) {
@@ -23,6 +24,7 @@ public class FacebookBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    protected void onSuccessfulAppCall(String str, String str2, Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onSuccessfulAppCall(String str, String str2, Bundle bundle) {
     }
 }

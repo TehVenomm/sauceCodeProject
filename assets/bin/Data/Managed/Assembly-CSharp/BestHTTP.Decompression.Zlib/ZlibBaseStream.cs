@@ -181,86 +181,92 @@ namespace BestHTTP.Decompression.Zlib
 
 		private void finish()
 		{
-			if (_z != null)
+			if (_z == null)
 			{
-				if (_streamMode == StreamMode.Writer)
+				return;
+			}
+			if (_streamMode == StreamMode.Writer)
+			{
+				bool flag = false;
+				do
 				{
-					bool flag = false;
-					do
+					_z.OutputBuffer = workingBuffer;
+					_z.NextOut = 0;
+					_z.AvailableBytesOut = _workingBuffer.Length;
+					int num = (!_wantCompress) ? _z.Inflate(FlushType.Finish) : _z.Deflate(FlushType.Finish);
+					if (num != 1 && num != 0)
 					{
-						_z.OutputBuffer = workingBuffer;
-						_z.NextOut = 0;
-						_z.AvailableBytesOut = _workingBuffer.Length;
-						int num = (!_wantCompress) ? _z.Inflate(FlushType.Finish) : _z.Deflate(FlushType.Finish);
-						if (num != 1 && num != 0)
+						string text = ((!_wantCompress) ? "in" : "de") + "flating";
+						if (_z.Message == null)
 						{
-							string text = ((!_wantCompress) ? "in" : "de") + "flating";
-							if (_z.Message == null)
-							{
-								throw new ZlibException($"{text}: (rc = {num})");
-							}
-							throw new ZlibException(text + ": " + _z.Message);
+							throw new ZlibException($"{text}: (rc = {num})");
 						}
-						if (_workingBuffer.Length - _z.AvailableBytesOut > 0)
-						{
-							_stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
-						}
-						flag = (_z.AvailableBytesIn == 0 && _z.AvailableBytesOut != 0);
-						if (_flavor == ZlibStreamFlavor.GZIP && !_wantCompress)
-						{
-							flag = (_z.AvailableBytesIn == 8 && _z.AvailableBytesOut != 0);
-						}
+						throw new ZlibException(text + ": " + _z.Message);
 					}
-					while (!flag);
-					Flush();
-					if (_flavor == ZlibStreamFlavor.GZIP)
+					if (_workingBuffer.Length - _z.AvailableBytesOut > 0)
 					{
-						if (!_wantCompress)
-						{
-							throw new ZlibException("Writing with decompression is not supported.");
-						}
-						int crc32Result = crc.Crc32Result;
-						_stream.Write(BitConverter.GetBytes(crc32Result), 0, 4);
-						int value = (int)(crc.TotalBytesRead & uint.MaxValue);
-						_stream.Write(BitConverter.GetBytes(value), 0, 4);
+						_stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
+					}
+					flag = (_z.AvailableBytesIn == 0 && _z.AvailableBytesOut != 0);
+					if (_flavor == ZlibStreamFlavor.GZIP && !_wantCompress)
+					{
+						flag = (_z.AvailableBytesIn == 8 && _z.AvailableBytesOut != 0);
 					}
 				}
-				else if (_streamMode == StreamMode.Reader && _flavor == ZlibStreamFlavor.GZIP)
+				while (!flag);
+				Flush();
+				if (_flavor == ZlibStreamFlavor.GZIP)
 				{
-					if (_wantCompress)
+					if (!_wantCompress)
 					{
-						throw new ZlibException("Reading with compression is not supported.");
+						throw new ZlibException("Writing with decompression is not supported.");
 					}
-					if (_z.TotalBytesOut != 0L)
+					int crc32Result = crc.Crc32Result;
+					_stream.Write(BitConverter.GetBytes(crc32Result), 0, 4);
+					int value = (int)(crc.TotalBytesRead & uint.MaxValue);
+					_stream.Write(BitConverter.GetBytes(value), 0, 4);
+				}
+			}
+			else
+			{
+				if (_streamMode != StreamMode.Reader || _flavor != ZlibStreamFlavor.GZIP)
+				{
+					return;
+				}
+				if (_wantCompress)
+				{
+					throw new ZlibException("Reading with compression is not supported.");
+				}
+				if (_z.TotalBytesOut == 0)
+				{
+					return;
+				}
+				byte[] array = new byte[8];
+				if (_z.AvailableBytesIn < 8)
+				{
+					Array.Copy(_z.InputBuffer, _z.NextIn, array, 0, _z.AvailableBytesIn);
+					int num2 = 8 - _z.AvailableBytesIn;
+					int num3 = _stream.Read(array, _z.AvailableBytesIn, num2);
+					if (num2 != num3)
 					{
-						byte[] array = new byte[8];
-						if (_z.AvailableBytesIn < 8)
-						{
-							Array.Copy(_z.InputBuffer, _z.NextIn, array, 0, _z.AvailableBytesIn);
-							int num2 = 8 - _z.AvailableBytesIn;
-							int num3 = _stream.Read(array, _z.AvailableBytesIn, num2);
-							if (num2 != num3)
-							{
-								throw new ZlibException($"Missing or incomplete GZIP trailer. Expected 8 bytes, got {_z.AvailableBytesIn + num3}.");
-							}
-						}
-						else
-						{
-							Array.Copy(_z.InputBuffer, _z.NextIn, array, 0, array.Length);
-						}
-						int num4 = BitConverter.ToInt32(array, 0);
-						int crc32Result2 = crc.Crc32Result;
-						int num5 = BitConverter.ToInt32(array, 4);
-						int num6 = (int)(_z.TotalBytesOut & uint.MaxValue);
-						if (crc32Result2 != num4)
-						{
-							throw new ZlibException($"Bad CRC32 in GZIP trailer. (actual({crc32Result2:X8})!=expected({num4:X8}))");
-						}
-						if (num6 != num5)
-						{
-							throw new ZlibException($"Bad size in GZIP trailer. (actual({num6})!=expected({num5}))");
-						}
+						throw new ZlibException($"Missing or incomplete GZIP trailer. Expected 8 bytes, got {_z.AvailableBytesIn + num3}.");
 					}
+				}
+				else
+				{
+					Array.Copy(_z.InputBuffer, _z.NextIn, array, 0, array.Length);
+				}
+				int num4 = BitConverter.ToInt32(array, 0);
+				int crc32Result2 = crc.Crc32Result;
+				int num5 = BitConverter.ToInt32(array, 4);
+				int num6 = (int)(_z.TotalBytesOut & uint.MaxValue);
+				if (crc32Result2 != num4)
+				{
+					throw new ZlibException($"Bad CRC32 in GZIP trailer. (actual({crc32Result2:X8})!=expected({num4:X8}))");
+				}
+				if (num6 != num5)
+				{
+					throw new ZlibException($"Bad size in GZIP trailer. (actual({num6})!=expected({num5}))");
 				}
 			}
 		}
@@ -359,7 +365,7 @@ namespace BestHTTP.Decompression.Zlib
 					throw new ZlibException("Bad GZIP header.");
 				}
 				int num3 = BitConverter.ToInt32(array, 4);
-				_GzipMtime = GZipStream._unixEpoch.AddSeconds((double)num3);
+				_GzipMtime = GZipStream._unixEpoch.AddSeconds(num3);
 				num += num2;
 				if ((array[3] & 4) == 4)
 				{
@@ -467,30 +473,24 @@ namespace BestHTTP.Decompression.Zlib
 			while (((!nomoreinput && num != 1) || _z.AvailableBytesOut != count) && _z.AvailableBytesOut > 0 && !nomoreinput && num == 0);
 			if (_z.AvailableBytesOut > 0)
 			{
-				if (num == 0 && _z.AvailableBytesIn != 0)
+				if (num != 0 || _z.AvailableBytesIn == 0)
 				{
-					goto IL_028a;
 				}
-				goto IL_028a;
+				if (nomoreinput && _wantCompress)
+				{
+					num = _z.Deflate(FlushType.Finish);
+					if (num != 0 && num != 1)
+					{
+						throw new ZlibException($"Deflating:  rc={num}  msg={_z.Message}");
+					}
+				}
 			}
-			goto IL_02db;
-			IL_02db:
 			num = count - _z.AvailableBytesOut;
 			if (crc != null)
 			{
 				crc.SlurpBlock(buffer, offset, num);
 			}
 			return num;
-			IL_028a:
-			if (nomoreinput && _wantCompress)
-			{
-				num = _z.Deflate(FlushType.Finish);
-				if (num != 0 && num != 1)
-				{
-					throw new ZlibException($"Deflating:  rc={num}  msg={_z.Message}");
-				}
-			}
-			goto IL_02db;
 		}
 
 		public static void CompressString(string s, Stream compressor)
@@ -527,9 +527,6 @@ namespace BestHTTP.Decompression.Zlib
 				memoryStream.Seek(0L, SeekOrigin.Begin);
 				StreamReader streamReader = new StreamReader(memoryStream, uTF);
 				return streamReader.ReadToEnd();
-				IL_006e:
-				string result;
-				return result;
 			}
 		}
 
@@ -547,9 +544,6 @@ namespace BestHTTP.Decompression.Zlib
 					}
 				}
 				return memoryStream.ToArray();
-				IL_0052:
-				byte[] result;
-				return result;
 			}
 		}
 	}

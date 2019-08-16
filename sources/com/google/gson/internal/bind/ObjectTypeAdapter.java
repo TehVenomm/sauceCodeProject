@@ -9,31 +9,26 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public final class ObjectTypeAdapter extends TypeAdapter<Object> {
-    public static final TypeAdapterFactory FACTORY = new C06961();
+    public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+            if (typeToken.getRawType() == Object.class) {
+                return new ObjectTypeAdapter(gson);
+            }
+            return null;
+        }
+    };
     private final Gson gson;
 
-    /* renamed from: com.google.gson.internal.bind.ObjectTypeAdapter$1 */
-    static final class C06961 implements TypeAdapterFactory {
-        C06961() {
-        }
-
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            return typeToken.getRawType() == Object.class ? new ObjectTypeAdapter(gson) : null;
-        }
-    }
-
-    private ObjectTypeAdapter(Gson gson) {
-        this.gson = gson;
+    private ObjectTypeAdapter(Gson gson2) {
+        this.gson = gson2;
     }
 
     public Object read(JsonReader jsonReader) throws IOException {
         switch (jsonReader.peek()) {
             case BEGIN_ARRAY:
-                List arrayList = new ArrayList();
+                ArrayList arrayList = new ArrayList();
                 jsonReader.beginArray();
                 while (jsonReader.hasNext()) {
                     arrayList.add(read(jsonReader));
@@ -41,7 +36,7 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
                 jsonReader.endArray();
                 return arrayList;
             case BEGIN_OBJECT:
-                Map linkedTreeMap = new LinkedTreeMap();
+                LinkedTreeMap linkedTreeMap = new LinkedTreeMap();
                 jsonReader.beginObject();
                 while (jsonReader.hasNext()) {
                     linkedTreeMap.put(jsonReader.nextName(), read(jsonReader));

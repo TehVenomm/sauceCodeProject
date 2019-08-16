@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PackageObject
 {
-	private class Pool_PackageObject
+	private class Pool_PackageObject : rymTPool<PackageObject>
 	{
 	}
 

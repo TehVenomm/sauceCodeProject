@@ -2,29 +2,25 @@ package com.google.android.gms.drive.events;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzc implements Creator<zzb> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         zze zze = null;
-        int zzd = zzb.zzd(parcel);
-        String str = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 2:
-                    str = zzb.zzq(parcel, readInt);
-                    break;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 3:
-                    zze = (zze) zzb.zza(parcel, readInt, zze.CREATOR);
+                    zze = (zze) SafeParcelReader.createParcelable(parcel, readHeader, zze.CREATOR);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
-        return new zzb(str, zze);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new zzb(zze);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

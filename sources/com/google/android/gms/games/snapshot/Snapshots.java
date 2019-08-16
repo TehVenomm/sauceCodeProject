@@ -7,6 +7,7 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Releasable;
 import com.google.android.gms.common.api.Result;
 
+@Deprecated
 public interface Snapshots {
     public static final int DISPLAY_LIMIT_NONE = -1;
     public static final String EXTRA_SNAPSHOT_METADATA = "com.google.android.gms.games.SNAPSHOT_METADATA";
@@ -17,10 +18,22 @@ public interface Snapshots {
     public static final int RESOLUTION_POLICY_MANUAL = -1;
     public static final int RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED = 3;
 
+    @Deprecated
+    public interface CommitSnapshotResult extends Result {
+        SnapshotMetadata getSnapshotMetadata();
+    }
+
+    @Deprecated
+    public interface DeleteSnapshotResult extends Result {
+        String getSnapshotId();
+    }
+
+    @Deprecated
     public interface LoadSnapshotsResult extends Releasable, Result {
         SnapshotMetadataBuffer getSnapshots();
     }
 
+    @Deprecated
     public interface OpenSnapshotResult extends Result {
         String getConflictId();
 
@@ -29,14 +42,6 @@ public interface Snapshots {
         SnapshotContents getResolutionSnapshotContents();
 
         Snapshot getSnapshot();
-    }
-
-    public interface CommitSnapshotResult extends Result {
-        SnapshotMetadata getSnapshotMetadata();
-    }
-
-    public interface DeleteSnapshotResult extends Result {
-        String getSnapshotId();
     }
 
     PendingResult<CommitSnapshotResult> commitAndClose(GoogleApiClient googleApiClient, Snapshot snapshot, SnapshotMetadataChange snapshotMetadataChange);

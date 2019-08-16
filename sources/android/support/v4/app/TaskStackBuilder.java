@@ -1,68 +1,60 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build.VERSION;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.RequiresApi;
+import android.support.p000v4.content.ContextCompat;
 import android.util.Log;
 import com.google.android.gms.drive.DriveFile;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/* renamed from: android.support.v4.app.TaskStackBuilder */
 public final class TaskStackBuilder implements Iterable<Intent> {
-    private static final TaskStackBuilderImpl IMPL;
+    private static final TaskStackBuilderBaseImpl IMPL;
     private static final String TAG = "TaskStackBuilder";
-    private final ArrayList<Intent> mIntents = new ArrayList();
+    private final ArrayList<Intent> mIntents = new ArrayList<>();
     private final Context mSourceContext;
 
+    /* renamed from: android.support.v4.app.TaskStackBuilder$SupportParentable */
     public interface SupportParentable {
         Intent getSupportParentActivityIntent();
     }
 
-    interface TaskStackBuilderImpl {
-        PendingIntent getPendingIntent(Context context, Intent[] intentArr, int i, int i2, Bundle bundle);
-    }
-
-    static class TaskStackBuilderImplBase implements TaskStackBuilderImpl {
-        TaskStackBuilderImplBase() {
-        }
-
-        public PendingIntent getPendingIntent(Context context, Intent[] intentArr, int i, int i2, Bundle bundle) {
-            Intent intent = new Intent(intentArr[intentArr.length - 1]);
-            intent.addFlags(DriveFile.MODE_READ_ONLY);
-            return PendingIntent.getActivity(context, i, intent, i2);
-        }
-    }
-
-    static class TaskStackBuilderImplHoneycomb implements TaskStackBuilderImpl {
-        TaskStackBuilderImplHoneycomb() {
+    @RequiresApi(16)
+    /* renamed from: android.support.v4.app.TaskStackBuilder$TaskStackBuilderApi16Impl */
+    static class TaskStackBuilderApi16Impl extends TaskStackBuilderBaseImpl {
+        TaskStackBuilderApi16Impl() {
         }
 
         public PendingIntent getPendingIntent(Context context, Intent[] intentArr, int i, int i2, Bundle bundle) {
             intentArr[0] = new Intent(intentArr[0]).addFlags(268484608);
-            return TaskStackBuilderHoneycomb.getActivitiesPendingIntent(context, i, intentArr, i2);
+            return PendingIntent.getActivities(context, i, intentArr, i2, bundle);
         }
     }
 
-    static class TaskStackBuilderImplJellybean implements TaskStackBuilderImpl {
-        TaskStackBuilderImplJellybean() {
+    /* renamed from: android.support.v4.app.TaskStackBuilder$TaskStackBuilderBaseImpl */
+    static class TaskStackBuilderBaseImpl {
+        TaskStackBuilderBaseImpl() {
         }
 
         public PendingIntent getPendingIntent(Context context, Intent[] intentArr, int i, int i2, Bundle bundle) {
             intentArr[0] = new Intent(intentArr[0]).addFlags(268484608);
-            return TaskStackBuilderJellybean.getActivitiesPendingIntent(context, i, intentArr, i2, bundle);
+            return PendingIntent.getActivities(context, i, intentArr, i2);
         }
     }
 
     static {
-        if (VERSION.SDK_INT >= 11) {
-            IMPL = new TaskStackBuilderImplHoneycomb();
+        if (VERSION.SDK_INT >= 16) {
+            IMPL = new TaskStackBuilderApi16Impl();
         } else {
-            IMPL = new TaskStackBuilderImplBase();
+            IMPL = new TaskStackBuilderBaseImpl();
         }
     }
 
@@ -101,14 +93,14 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         if (activity instanceof SupportParentable) {
             intent = ((SupportParentable) activity).getSupportParentActivityIntent();
         }
-        Intent parentActivityIntent = intent == null ? NavUtils.getParentActivityIntent(activity) : intent;
-        if (parentActivityIntent != null) {
-            ComponentName component = parentActivityIntent.getComponent();
+        Intent intent2 = intent == null ? NavUtils.getParentActivityIntent(activity) : intent;
+        if (intent2 != null) {
+            ComponentName component = intent2.getComponent();
             if (component == null) {
-                component = parentActivityIntent.resolveActivity(this.mSourceContext.getPackageManager());
+                component = intent2.resolveActivity(this.mSourceContext.getPackageManager());
             }
             addParentStack(component);
-            addNextIntent(parentActivityIntent);
+            addNextIntent(intent2);
         }
         return this;
     }
@@ -122,7 +114,7 @@ public final class TaskStackBuilder implements Iterable<Intent> {
                 parentActivityIntent = NavUtils.getParentActivityIntent(this.mSourceContext, parentActivityIntent.getComponent());
             }
             return this;
-        } catch (Throwable e) {
+        } catch (NameNotFoundException e) {
             Log.e(TAG, "Bad ComponentName while traversing activity parent metadata");
             throw new IllegalArgumentException(e);
         }
@@ -149,8 +141,14 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         Intent[] intentArr = new Intent[this.mIntents.size()];
         if (intentArr.length != 0) {
             intentArr[0] = new Intent((Intent) this.mIntents.get(0)).addFlags(268484608);
-            for (int i = 1; i < intentArr.length; i++) {
-                intentArr[i] = new Intent((Intent) this.mIntents.get(i));
+            int i = 1;
+            while (true) {
+                int i2 = i;
+                if (i2 >= intentArr.length) {
+                    break;
+                }
+                intentArr[i2] = new Intent((Intent) this.mIntents.get(i2));
+                i = i2 + 1;
             }
         }
         return intentArr;

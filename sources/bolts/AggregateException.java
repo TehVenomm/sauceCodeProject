@@ -14,8 +14,7 @@ public class AggregateException extends Exception {
     private List<Throwable> innerThrowables;
 
     public AggregateException(String str, List<? extends Throwable> list) {
-        Throwable th = (list == null || list.size() <= 0) ? null : (Throwable) list.get(0);
-        super(str, th);
+        super(str, (list == null || list.size() <= 0) ? null : (Throwable) list.get(0));
         this.innerThrowables = Collections.unmodifiableList(list);
     }
 
@@ -24,7 +23,7 @@ public class AggregateException extends Exception {
     }
 
     public AggregateException(List<? extends Throwable> list) {
-        this(DEFAULT_MESSAGE, (List) list);
+        this(DEFAULT_MESSAGE, list);
     }
 
     @Deprecated
@@ -34,7 +33,7 @@ public class AggregateException extends Exception {
 
     @Deprecated
     public List<Exception> getErrors() {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         if (this.innerThrowables != null) {
             for (Throwable th : this.innerThrowables) {
                 if (th instanceof Exception) {
@@ -55,13 +54,13 @@ public class AggregateException extends Exception {
         super.printStackTrace(printStream);
         int i = -1;
         for (Throwable th : this.innerThrowables) {
-            printStream.append(StringUtils.LF);
+            printStream.append(StringUtils.f1199LF);
             printStream.append("  Inner throwable #");
             i++;
             printStream.append(Integer.toString(i));
             printStream.append(": ");
             th.printStackTrace(printStream);
-            printStream.append(StringUtils.LF);
+            printStream.append(StringUtils.f1199LF);
         }
     }
 
@@ -69,13 +68,13 @@ public class AggregateException extends Exception {
         super.printStackTrace(printWriter);
         int i = -1;
         for (Throwable th : this.innerThrowables) {
-            printWriter.append(StringUtils.LF);
+            printWriter.append(StringUtils.f1199LF);
             printWriter.append("  Inner throwable #");
             i++;
             printWriter.append(Integer.toString(i));
             printWriter.append(": ");
             th.printStackTrace(printWriter);
-            printWriter.append(StringUtils.LF);
+            printWriter.append(StringUtils.f1199LF);
         }
     }
 }

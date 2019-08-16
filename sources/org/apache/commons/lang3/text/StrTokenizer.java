@@ -192,8 +192,8 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 
     public List<String> getTokenList() {
         checkTokenized();
-        List<String> arrayList = new ArrayList(this.tokens.length);
-        for (Object add : this.tokens) {
+        ArrayList arrayList = new ArrayList(this.tokens.length);
+        for (String add : this.tokens) {
             arrayList.add(add);
         }
         return arrayList;
@@ -276,20 +276,21 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
             return;
         }
         if (this.chars == null) {
-            List tokenize = tokenize(null, 0, 0);
-            this.tokens = (String[]) tokenize.toArray(new String[tokenize.size()]);
+            List list = tokenize(null, 0, 0);
+            this.tokens = (String[]) list.toArray(new String[list.size()]);
             return;
         }
-        tokenize = tokenize(this.chars, 0, this.chars.length);
-        this.tokens = (String[]) tokenize.toArray(new String[tokenize.size()]);
+        List list2 = tokenize(this.chars, 0, this.chars.length);
+        this.tokens = (String[]) list2.toArray(new String[list2.size()]);
     }
 
-    protected List<String> tokenize(char[] cArr, int i, int i2) {
+    /* access modifiers changed from: protected */
+    public List<String> tokenize(char[] cArr, int i, int i2) {
         if (cArr == null || i2 == 0) {
             return Collections.emptyList();
         }
         StrBuilder strBuilder = new StrBuilder();
-        List<String> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         int i3 = i;
         while (i3 >= 0 && i3 < i2) {
             i3 = readNextToken(cArr, i3, i2, strBuilder, arrayList);
@@ -326,41 +327,40 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
             addToken(list, "");
             return -1;
         }
-        max = getDelimiterMatcher().isMatch(cArr, i3, i3, i2);
-        if (max > 0) {
+        int isMatch = getDelimiterMatcher().isMatch(cArr, i3, i3, i2);
+        if (isMatch > 0) {
             addToken(list, "");
-            return max + i3;
+            return isMatch + i3;
         }
-        int isMatch = getQuoteMatcher().isMatch(cArr, i3, i3, i2);
-        if (isMatch <= 0) {
+        int isMatch2 = getQuoteMatcher().isMatch(cArr, i3, i3, i2);
+        if (isMatch2 <= 0) {
             return readWithQuotes(cArr, i3, i2, strBuilder, list, 0, 0);
         }
-        return readWithQuotes(cArr, i3 + isMatch, i2, strBuilder, list, i3, isMatch);
+        return readWithQuotes(cArr, i3 + isMatch2, i2, strBuilder, list, i3, isMatch2);
     }
 
     private int readWithQuotes(char[] cArr, int i, int i2, StrBuilder strBuilder, List<String> list, int i3, int i4) {
         strBuilder.clear();
         int i5 = 0;
-        Object obj = i4 > 0 ? 1 : null;
+        boolean z = i4 > 0;
         int i6 = i;
         while (i6 < i2) {
-            int i7;
-            if (obj == null) {
+            if (!z) {
                 int isMatch = getDelimiterMatcher().isMatch(cArr, i6, i, i2);
                 if (isMatch > 0) {
                     addToken(list, strBuilder.substring(0, i5));
                     return isMatch + i6;
                 } else if (i4 <= 0 || !isQuote(cArr, i6, i2, i3, i4)) {
-                    isMatch = getIgnoredMatcher().isMatch(cArr, i6, i, i2);
-                    if (isMatch > 0) {
-                        i6 += isMatch;
+                    int isMatch2 = getIgnoredMatcher().isMatch(cArr, i6, i, i2);
+                    if (isMatch2 > 0) {
+                        i6 += isMatch2;
                     } else {
-                        isMatch = getTrimmerMatcher().isMatch(cArr, i6, i, i2);
-                        if (isMatch > 0) {
-                            strBuilder.append(cArr, i6, isMatch);
-                            i6 += isMatch;
+                        int isMatch3 = getTrimmerMatcher().isMatch(cArr, i6, i, i2);
+                        if (isMatch3 > 0) {
+                            strBuilder.append(cArr, i6, isMatch3);
+                            i6 += isMatch3;
                         } else {
-                            i7 = i6 + 1;
+                            int i7 = i6 + 1;
                             strBuilder.append(cArr[i6]);
                             i5 = strBuilder.size();
                             i6 = i7;
@@ -368,7 +368,7 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
                     }
                 } else {
                     i6 += i4;
-                    obj = 1;
+                    z = true;
                 }
             } else if (isQuote(cArr, i6, i2, i3, i4)) {
                 if (isQuote(cArr, i6 + i4, i2, i3, i4)) {
@@ -377,13 +377,13 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
                     i5 = strBuilder.size();
                 } else {
                     i6 += i4;
-                    obj = null;
+                    z = false;
                 }
             } else {
-                i7 = i6 + 1;
+                int i8 = i6 + 1;
                 strBuilder.append(cArr[i6]);
                 i5 = strBuilder.size();
-                i6 = i7;
+                i6 = i8;
             }
         }
         addToken(list, strBuilder.substring(0, i5));
@@ -391,12 +391,10 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
     }
 
     private boolean isQuote(char[] cArr, int i, int i2, int i3, int i4) {
-        int i5 = 0;
-        while (i5 < i4) {
+        for (int i5 = 0; i5 < i4; i5++) {
             if (i + i5 >= i2 || cArr[i + i5] != cArr[i3 + i5]) {
                 return false;
             }
-            i5++;
         }
         return true;
     }
@@ -496,7 +494,8 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
         }
     }
 
-    Object cloneReset() throws CloneNotSupportedException {
+    /* access modifiers changed from: 0000 */
+    public Object cloneReset() throws CloneNotSupportedException {
         StrTokenizer strTokenizer = (StrTokenizer) super.clone();
         if (strTokenizer.chars != null) {
             strTokenizer.chars = (char[]) strTokenizer.chars.clone();

@@ -14,10 +14,10 @@ public class MessengerThreadParams {
         UNKNOWN
     }
 
-    public MessengerThreadParams(Origin origin, String str, String str2, List<String> list) {
+    public MessengerThreadParams(Origin origin2, String str, String str2, List<String> list) {
         this.threadToken = str;
         this.metadata = str2;
         this.participants = list;
-        this.origin = origin;
+        this.origin = origin2;
     }
 }

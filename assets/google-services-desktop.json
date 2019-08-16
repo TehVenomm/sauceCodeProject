@@ -1,0 +1,37 @@
+{
+  "client": [
+    {
+      "services": {
+        "appinvite_service": {
+          "status": 1
+        }, 
+        "analytics_service": {
+          "status": 0
+        }
+      }, 
+      "oauth_client": [
+        {
+          "client_id": "683498632423-dlrdlqphqd42tcld7vg9n39hf6bp6ah7.apps.googleusercontent.com"
+        }
+      ], 
+      "api_key": [
+        {
+          "current_key": "AIzaSyAroYSeBSZoOUwtDnU9N5QKxSvbDtca-sc"
+        }
+      ], 
+      "client_info": {
+        "mobilesdk_app_id": "1:683498632423:ios:bdbb31f29c96b74a", 
+        "android_client_info": {
+          "package_name": "net.gogame.dragon"
+        }
+      }
+    }
+  ], 
+  "configuration_version": "1", 
+  "project_info": {
+    "storage_bucket": "dragon-project-90587868.appspot.com", 
+    "project_id": "dragon-project-90587868", 
+    "firebase_url": "https://dragon-project-90587868.firebaseio.com", 
+    "project_number": "683498632423"
+  }
+}

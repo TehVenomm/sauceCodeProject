@@ -4,31 +4,31 @@ import android.os.Bundle;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig.Builder;
 
 public final class zzb extends TurnBasedMatchConfig {
-    private final int zzhmd;
-    private final Bundle zzhmu;
-    private final String[] zzhmv;
-    private final int zzhnd;
+    private final int zzpd;
+    private final Bundle zzpz;
+    private final String[] zzqb;
+    private final int zzql;
 
     zzb(Builder builder) {
-        this.zzhmd = builder.zzhmd;
-        this.zzhnd = builder.zzhnd;
-        this.zzhmu = builder.zzhmu;
-        this.zzhmv = (String[]) builder.zzhmt.toArray(new String[builder.zzhmt.size()]);
+        this.zzpd = builder.zzpd;
+        this.zzql = builder.zzql;
+        this.zzpz = builder.zzpz;
+        this.zzqb = (String[]) builder.zzpy.toArray(new String[builder.zzpy.size()]);
     }
 
     public final Bundle getAutoMatchCriteria() {
-        return this.zzhmu;
+        return this.zzpz;
     }
 
     public final String[] getInvitedPlayerIds() {
-        return this.zzhmv;
+        return this.zzqb;
     }
 
     public final int getVariant() {
-        return this.zzhmd;
+        return this.zzpd;
     }
 
-    public final int zzarv() {
-        return this.zzhnd;
+    public final int zzdp() {
+        return this.zzql;
     }
 }

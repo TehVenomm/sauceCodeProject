@@ -55,7 +55,7 @@ namespace GooglePlayGames.Native
 		public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant, Action<UIStatus, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch> callback)
 		{
 			callback = Callbacks.AsOnGameThreadCallback(callback);
-			mTurnBasedManager.ShowPlayerSelectUI(minOpponents, maxOpponents, true, delegate(PlayerSelectUIResponse result)
+			mTurnBasedManager.ShowPlayerSelectUI(minOpponents, maxOpponents, allowAutomatching: true, delegate(PlayerSelectUIResponse result)
 			{
 				if (result.Status() != CommonErrorStatus.UIStatus.VALID)
 				{
@@ -163,13 +163,13 @@ namespace GooglePlayGames.Native
 				{
 					if (nativeTurnBasedMatch == null)
 					{
-						callback(false, null);
+						callback(arg1: false, null);
 					}
 					else
 					{
 						GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch turnBasedMatch = nativeTurnBasedMatch.AsTurnBasedMatch(mNativeClient.GetUserId());
 						Logger.d("Passing converted match to user callback:" + turnBasedMatch);
-						callback(true, turnBasedMatch);
+						callback(arg1: true, turnBasedMatch);
 					}
 				}
 			});
@@ -183,7 +183,7 @@ namespace GooglePlayGames.Native
 				if (invitation == null)
 				{
 					Logger.e("Could not find invitation with id " + invitationId);
-					callback(false, null);
+					callback(arg1: false, null);
 				}
 				else
 				{
@@ -244,17 +244,15 @@ namespace GooglePlayGames.Native
 				if (eventType == Types.MultiplayerEvent.REMOVED)
 				{
 					Logger.d("Ignoring REMOVE event for match " + matchId);
+					return;
 				}
-				else
+				bool shouldAutolaunch = eventType == Types.MultiplayerEvent.UPDATED_FROM_APP_LAUNCH;
+				match.ReferToMe();
+				Callbacks.AsCoroutine(WaitForLogin(delegate
 				{
-					bool shouldAutolaunch = eventType == Types.MultiplayerEvent.UPDATED_FROM_APP_LAUNCH;
-					match.ReferToMe();
-					Callbacks.AsCoroutine(WaitForLogin(delegate
-					{
-						currentDelegate(match.AsTurnBasedMatch(mNativeClient.GetUserId()), shouldAutolaunch);
-						match.ForgetMe();
-					}));
-				}
+					currentDelegate(match.AsTurnBasedMatch(mNativeClient.GetUserId()), shouldAutolaunch);
+					match.ForgetMe();
+				}));
 			}
 		}
 
@@ -262,7 +260,7 @@ namespace GooglePlayGames.Native
 		{
 			if (string.IsNullOrEmpty(mNativeClient.GetUserId()))
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			method();
 		}
@@ -277,12 +275,12 @@ namespace GooglePlayGames.Native
 				{
 					if (result.RequestSucceeded())
 					{
-						callback(true);
+						callback(obj: true);
 					}
 					else
 					{
 						Logger.d("Taking turn failed: " + result.ResponseStatus());
-						callback(false);
+						callback(obj: false);
 					}
 				});
 			});
@@ -297,12 +295,12 @@ namespace GooglePlayGames.Native
 					if (nativeTurnBasedMatch == null)
 					{
 						Logger.e($"Could not find match {match.MatchId}");
-						onFailure(false);
+						onFailure(obj: false);
 					}
 					else if (nativeTurnBasedMatch.Version() != match.Version)
 					{
 						Logger.e($"Attempted to update a stale version of the match. Expected version was {match.Version} but current version is {nativeTurnBasedMatch.Version()}.");
-						onFailure(false);
+						onFailure(obj: false);
 					}
 					else
 					{
@@ -321,20 +319,21 @@ namespace GooglePlayGames.Native
 					using (GooglePlayGames.Native.PInvoke.MultiplayerParticipant arg = GooglePlayGames.Native.PInvoke.MultiplayerParticipant.AutomatchingSentinel())
 					{
 						onFoundParticipantAndMatch(arg, foundMatch);
-						return;
-						IL_0023:;
 					}
 				}
-				using (GooglePlayGames.Native.PInvoke.MultiplayerParticipant multiplayerParticipant = foundMatch.ParticipantWithId(participantId))
+				else
 				{
-					if (multiplayerParticipant == null)
+					using (GooglePlayGames.Native.PInvoke.MultiplayerParticipant multiplayerParticipant = foundMatch.ParticipantWithId(participantId))
 					{
-						Logger.e($"Located match {match.MatchId} but desired participant with ID {participantId} could not be found");
-						onFailure(false);
-					}
-					else
-					{
-						onFoundParticipantAndMatch(multiplayerParticipant, foundMatch);
+						if (multiplayerParticipant == null)
+						{
+							Logger.e($"Located match {match.MatchId} but desired participant with ID {participantId} could not be found");
+							onFailure(obj: false);
+						}
+						else
+						{
+							onFoundParticipantAndMatch(multiplayerParticipant, foundMatch);
+						}
 					}
 				}
 			});
@@ -362,7 +361,7 @@ namespace GooglePlayGames.Native
 						if (matchResult != matchResult2 || placementFor != num)
 						{
 							Logger.e($"Attempted to override existing results for participant {participantId}: Placing {num}, Result {matchResult2}");
-							callback(false);
+							callback(obj: false);
 							return;
 						}
 					}
@@ -451,7 +450,7 @@ namespace GooglePlayGames.Native
 			callback = Callbacks.AsOnGameThreadCallback(callback);
 			FindEqualVersionMatch(match, delegate
 			{
-				callback(false, null);
+				callback(arg1: false, null);
 			}, delegate(NativeTurnBasedMatch foundMatch)
 			{
 				mTurnBasedManager.Rematch(foundMatch, BridgeMatchToUserCallback(delegate(UIStatus status, GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch m)

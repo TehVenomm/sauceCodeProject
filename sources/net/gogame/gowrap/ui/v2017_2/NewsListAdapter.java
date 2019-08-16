@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.v2017_2;
+package net.gogame.gowrap.p019ui.v2017_2;
 
 import android.content.Context;
 import android.os.Build.VERSION;
@@ -16,28 +16,29 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 import net.gogame.gowrap.inbox.DefaultMessageStateManager;
 import net.gogame.gowrap.inbox.MessageState;
 import net.gogame.gowrap.inbox.MessageStateManager;
 import net.gogame.gowrap.model.news.Article;
 import net.gogame.gowrap.model.news.Article.Category;
-import net.gogame.gowrap.ui.utils.DisplayUtils;
+import net.gogame.gowrap.p019ui.utils.DisplayUtils;
 
+/* renamed from: net.gogame.gowrap.ui.v2017_2.NewsListAdapter */
 public class NewsListAdapter extends BaseAdapter {
     private static final String KEY_ELEMENTS = "elements";
     private static final String KEY_STATE_MAP = "stateMap";
     private static final String MESSAGE_TYPE = "news";
-    private static final String[] NEWS_TYPES = new String[]{"Admin", "Event", "Important", "Notice", "Summon", "Tips"};
+    private static final String[] NEWS_TYPES = {"Admin", "Event", "Important", "Notice", "Summon", "Tips"};
     private final Context context;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("d/M", Locale.getDefault());
     private ArrayList<Article> elements;
     private final MessageStateManager messageStateManager;
     private HashMap<Long, MessageState> messageStateMap;
 
-    public NewsListAdapter(Context context) {
-        this.context = context;
-        this.messageStateManager = new DefaultMessageStateManager(context);
+    public NewsListAdapter(Context context2) {
+        this.context = context2;
+        this.messageStateManager = new DefaultMessageStateManager(context2);
     }
 
     public List<Article> getElements() {
@@ -50,10 +51,10 @@ public class NewsListAdapter extends BaseAdapter {
         } else if (list instanceof ArrayList) {
             this.elements = (ArrayList) list;
         } else {
-            this.elements = new ArrayList(list);
+            this.elements = new ArrayList<>(list);
         }
         List<MessageState> messageStates = this.messageStateManager.getMessageStates(MESSAGE_TYPE, System.currentTimeMillis() - 2592000000L);
-        HashMap hashMap = new HashMap();
+        HashMap<Long, MessageState> hashMap = new HashMap<>();
         if (messageStates != null) {
             for (MessageState messageState : messageStates) {
                 if (messageState != null) {
@@ -117,8 +118,6 @@ public class NewsListAdapter extends BaseAdapter {
                 return 1;
             case IMPORTANT:
                 return 2;
-            case NOTICE:
-                return 3;
             case SUMMON:
                 return 4;
             case TIPS:
@@ -142,12 +141,12 @@ public class NewsListAdapter extends BaseAdapter {
 
     public View getView(int i, Article article, View view, ViewGroup viewGroup) {
         if (view == null) {
-            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1110R.layout.net_gogame_gowrap_news_list_item, viewGroup, false);
+            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1423R.C1425layout.net_gogame_gowrap_news_list_item, viewGroup, false);
         }
-        TextView textView = (TextView) view.findViewById(C1110R.id.net_gogame_gowrap_news_icon_top);
-        TextView textView2 = (TextView) view.findViewById(C1110R.id.net_gogame_gowrap_news_icon_bottom);
-        TextView textView3 = (TextView) view.findViewById(C1110R.id.net_gogame_gowrap_news_title);
-        ImageView imageView = (ImageView) view.findViewById(C1110R.id.net_gogame_gowrap_news_status);
+        TextView textView = (TextView) view.findViewById(C1423R.C1424id.net_gogame_gowrap_news_icon_top);
+        TextView textView2 = (TextView) view.findViewById(C1423R.C1424id.net_gogame_gowrap_news_icon_bottom);
+        TextView textView3 = (TextView) view.findViewById(C1423R.C1424id.net_gogame_gowrap_news_title);
+        ImageView imageView = (ImageView) view.findViewById(C1423R.C1424id.net_gogame_gowrap_news_status);
         if (VERSION.SDK_INT >= 17) {
             textView.setTextAlignment(4);
             textView2.setTextAlignment(4);
@@ -169,8 +168,7 @@ public class NewsListAdapter extends BaseAdapter {
             if (this.messageStateMap != null) {
                 messageState = (MessageState) this.messageStateMap.get(Long.valueOf(article.getId()));
             }
-            int i2 = (messageState == null || !messageState.isRead()) ? 1 : 0;
-            setSourceLevel(i2, imageView);
+            setSourceLevel((messageState == null || !messageState.isRead()) ? 1 : 0, imageView);
         } else {
             setBackgroundLevel(getLevel(null), textView, textView2);
             textView3.setText(null);
@@ -180,8 +178,8 @@ public class NewsListAdapter extends BaseAdapter {
     }
 
     public Parcelable onSaveInstanceState() {
-        Parcelable bundle = new Bundle();
-        bundle.putSerializable(KEY_ELEMENTS, this.elements);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("elements", this.elements);
         bundle.putSerializable(KEY_STATE_MAP, this.messageStateMap);
         return bundle;
     }
@@ -189,7 +187,7 @@ public class NewsListAdapter extends BaseAdapter {
     public void onRestoreInstanceState(Parcelable parcelable) {
         if (parcelable != null && (parcelable instanceof Bundle)) {
             Bundle bundle = (Bundle) parcelable;
-            this.elements = (ArrayList) bundle.getSerializable(KEY_ELEMENTS);
+            this.elements = (ArrayList) bundle.getSerializable("elements");
             this.messageStateMap = (HashMap) bundle.getSerializable(KEY_STATE_MAP);
         }
     }

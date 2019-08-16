@@ -6,7 +6,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class ReflectionToStringBuilder extends ToStringBuilder {
@@ -36,7 +35,7 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
     }
 
     public static String toStringExclude(Object obj, Collection<String> collection) {
-        return toStringExclude(obj, toNoNullStringArray((Collection) collection));
+        return toStringExclude(obj, toNoNullStringArray(collection));
     }
 
     static String[] toNoNullStringArray(Collection<String> collection) {
@@ -47,7 +46,7 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
     }
 
     static String[] toNoNullStringArray(Object[] objArr) {
-        List arrayList = new ArrayList(objArr.length);
+        ArrayList arrayList = new ArrayList(objArr.length);
         for (Object obj : objArr) {
             if (obj != null) {
                 arrayList.add(obj.toString());
@@ -79,7 +78,8 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
         setAppendStatics(z2);
     }
 
-    protected boolean accept(Field field) {
+    /* access modifiers changed from: protected */
+    public boolean accept(Field field) {
         if (field.getName().indexOf(36) != -1) {
             return false;
         }
@@ -95,12 +95,13 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
         return false;
     }
 
-    protected void appendFieldsIn(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public void appendFieldsIn(Class<?> cls) {
         if (cls.isArray()) {
             reflectionAppendArray(getObject());
             return;
         }
-        AccessibleObject[] declaredFields = cls.getDeclaredFields();
+        Field[] declaredFields = cls.getDeclaredFields();
         AccessibleObject.setAccessible(declaredFields, true);
         for (Field field : declaredFields) {
             String name = field.getName();
@@ -122,7 +123,8 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
         return this.upToClass;
     }
 
-    protected Object getValue(Field field) throws IllegalArgumentException, IllegalAccessException {
+    /* access modifiers changed from: protected */
+    public Object getValue(Field field) throws IllegalArgumentException, IllegalAccessException {
         return field.get(getObject());
     }
 
@@ -160,7 +162,7 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
     public void setUpToClass(Class<?> cls) {
         if (cls != null) {
             Object object = getObject();
-            if (!(object == null || cls.isInstance(object))) {
+            if (object != null && !cls.isInstance(object)) {
                 throw new IllegalArgumentException("Specified class is not a superclass of the object");
             }
         }

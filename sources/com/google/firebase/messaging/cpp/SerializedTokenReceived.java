@@ -40,15 +40,22 @@ public final class SerializedTokenReceived extends Table {
 
     public void __init(int i, ByteBuffer byteBuffer) {
         this.bb_pos = i;
-        this.bb = byteBuffer;
+        this.f441bb = byteBuffer;
     }
 
     public String token() {
         int __offset = __offset(4);
-        return __offset != 0 ? __string(__offset + this.bb_pos) : null;
+        if (__offset != 0) {
+            return __string(__offset + this.bb_pos);
+        }
+        return null;
     }
 
     public ByteBuffer tokenAsByteBuffer() {
         return __vector_as_bytebuffer(4, 1);
+    }
+
+    public ByteBuffer tokenInByteBuffer(ByteBuffer byteBuffer) {
+        return __vector_in_bytebuffer(byteBuffer, 4, 1);
     }
 }

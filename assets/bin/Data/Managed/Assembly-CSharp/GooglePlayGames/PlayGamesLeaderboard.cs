@@ -6,7 +6,7 @@ using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	public class PlayGamesLeaderboard
+	public class PlayGamesLeaderboard : ILeaderboard
 	{
 		private string mId;
 

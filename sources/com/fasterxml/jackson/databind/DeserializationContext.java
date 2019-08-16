@@ -35,7 +35,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class DeserializationContext extends DatabindContext implements Serializable {
     private static final int MAX_ERROR_STR_LEN = 500;
@@ -65,7 +64,7 @@ public abstract class DeserializationContext extends DatabindContext implements 
     public abstract KeyDeserializer keyDeserializerInstance(Annotated annotated, Object obj) throws JsonMappingException;
 
     protected DeserializationContext(DeserializerFactory deserializerFactory) {
-        this(deserializerFactory, null);
+        this(deserializerFactory, (DeserializerCache) null);
     }
 
     protected DeserializationContext(DeserializerFactory deserializerFactory, DeserializerCache deserializerCache) {
@@ -161,7 +160,10 @@ public abstract class DeserializationContext extends DatabindContext implements 
     }
 
     public JavaType getContextualType() {
-        return this._currentType == null ? null : (JavaType) this._currentType.value();
+        if (this._currentType == null) {
+            return null;
+        }
+        return (JavaType) this._currentType.value();
     }
 
     public DeserializerFactory getFactory() {
@@ -208,21 +210,34 @@ public abstract class DeserializationContext extends DatabindContext implements 
         return hasValueDeserializerFor(javaType, null);
     }
 
-    public boolean hasValueDeserializerFor(JavaType javaType, AtomicReference<Throwable> atomicReference) {
-        try {
-            return this._cache.hasValueDeserializerFor(this, this._factory, javaType);
-        } catch (JsonMappingException e) {
-            if (atomicReference != null) {
-                atomicReference.set(e);
-            }
-            return false;
-        } catch (RuntimeException e2) {
-            if (atomicReference == null) {
-                throw e2;
-            }
-            atomicReference.set(e2);
-            return false;
-        }
+    /* JADX WARNING: Code restructure failed: missing block: B:10:?, code lost:
+        return false;
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public boolean hasValueDeserializerFor(com.fasterxml.jackson.databind.JavaType r3, java.util.concurrent.atomic.AtomicReference<java.lang.Throwable> r4) {
+        /*
+            r2 = this;
+            com.fasterxml.jackson.databind.deser.DeserializerCache r0 = r2._cache     // Catch:{ JsonMappingException -> 0x0009, RuntimeException -> 0x0011 }
+            com.fasterxml.jackson.databind.deser.DeserializerFactory r1 = r2._factory     // Catch:{ JsonMappingException -> 0x0009, RuntimeException -> 0x0011 }
+            boolean r0 = r0.hasValueDeserializerFor(r2, r1, r3)     // Catch:{ JsonMappingException -> 0x0009, RuntimeException -> 0x0011 }
+        L_0x0008:
+            return r0
+        L_0x0009:
+            r0 = move-exception
+            if (r4 == 0) goto L_0x000f
+            r4.set(r0)
+        L_0x000f:
+            r0 = 0
+            goto L_0x0008
+        L_0x0011:
+            r0 = move-exception
+            if (r4 != 0) goto L_0x0015
+            throw r0
+        L_0x0015:
+            r4.set(r0)
+            goto L_0x000f
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.DeserializationContext.hasValueDeserializerFor(com.fasterxml.jackson.databind.JavaType, java.util.concurrent.atomic.AtomicReference):boolean");
     }
 
     public final JsonDeserializer<Object> findContextualValueDeserializer(JavaType javaType, BeanProperty beanProperty) throws JsonMappingException {
@@ -242,7 +257,7 @@ public abstract class DeserializationContext extends DatabindContext implements 
         if (findValueDeserializer == null) {
             return null;
         }
-        JsonDeserializer<Object> handleSecondaryContextualization = handleSecondaryContextualization(findValueDeserializer, null, javaType);
+        JsonDeserializer handleSecondaryContextualization = handleSecondaryContextualization(findValueDeserializer, null, javaType);
         TypeDeserializer findTypeDeserializer = this._factory.findTypeDeserializer(this._config, javaType);
         return findTypeDeserializer != null ? new TypeWrappedDeserializer(findTypeDeserializer.forProperty(null), handleSecondaryContextualization) : handleSecondaryContextualization;
     }
@@ -256,7 +271,7 @@ public abstract class DeserializationContext extends DatabindContext implements 
     }
 
     public final JavaType constructType(Class<?> cls) {
-        return this._config.constructType((Class) cls);
+        return this._config.constructType(cls);
     }
 
     public Class<?> findClass(String str) throws ClassNotFoundException {
@@ -287,7 +302,7 @@ public abstract class DeserializationContext extends DatabindContext implements 
 
     public JsonDeserializer<?> handlePrimaryContextualization(JsonDeserializer<?> jsonDeserializer, BeanProperty beanProperty, JavaType javaType) throws JsonMappingException {
         if (jsonDeserializer instanceof ContextualDeserializer) {
-            this._currentType = new LinkedNode(javaType, this._currentType);
+            this._currentType = new LinkedNode<>(javaType, this._currentType);
             try {
                 jsonDeserializer = ((ContextualDeserializer) jsonDeserializer).createContextual(this, beanProperty);
             } finally {
@@ -299,7 +314,7 @@ public abstract class DeserializationContext extends DatabindContext implements 
 
     public JsonDeserializer<?> handleSecondaryContextualization(JsonDeserializer<?> jsonDeserializer, BeanProperty beanProperty, JavaType javaType) throws JsonMappingException {
         if (jsonDeserializer instanceof ContextualDeserializer) {
-            this._currentType = new LinkedNode(javaType, this._currentType);
+            this._currentType = new LinkedNode<>(javaType, this._currentType);
             try {
                 jsonDeserializer = ((ContextualDeserializer) jsonDeserializer).createContextual(this, beanProperty);
             } finally {
@@ -357,8 +372,7 @@ public abstract class DeserializationContext extends DatabindContext implements 
         if (findContextualValueDeserializer != null) {
             return findContextualValueDeserializer.deserialize(jsonParser, this);
         }
-        String str = beanProperty == null ? "NULL" : "'" + beanProperty.getName() + "'";
-        throw mappingException("Could not find JsonDeserializer for type %s (via property %s)", javaType, str);
+        throw mappingException("Could not find JsonDeserializer for type %s (via property %s)", javaType, beanProperty == null ? "NULL" : "'" + beanProperty.getName() + "'");
     }
 
     public boolean handleUnknownProperty(JsonParser jsonParser, JsonDeserializer<?> jsonDeserializer, Object obj, String str) throws IOException, JsonProcessingException {
@@ -387,14 +401,14 @@ public abstract class DeserializationContext extends DatabindContext implements 
     }
 
     public JsonMappingException reportInstantiationException(Class<?> cls, Throwable th) throws JsonMappingException {
-        throw instantiationException((Class) cls, th);
+        throw instantiationException(cls, th);
     }
 
     public JsonMappingException reportInstantiationException(Class<?> cls, String str, Object... objArr) throws JsonMappingException {
         if (objArr.length > 0) {
             str = String.format(str, objArr);
         }
-        throw instantiationException((Class) cls, str);
+        throw instantiationException(cls, str);
     }
 
     public <T> T reportWeirdStringException(String str, Class<?> cls, String str2, Object... objArr) throws JsonMappingException {
@@ -434,7 +448,7 @@ public abstract class DeserializationContext extends DatabindContext implements 
     }
 
     public JsonMappingException mappingException(Class<?> cls) {
-        return mappingException((Class) cls, this._parser.getCurrentToken());
+        return mappingException(cls, this._parser.getCurrentToken());
     }
 
     public JsonMappingException mappingException(Class<?> cls, JsonToken jsonToken) {
@@ -494,7 +508,8 @@ public abstract class DeserializationContext extends DatabindContext implements 
         return JsonMappingException.from(this._parser, "Unexpected end-of-input when trying to deserialize a " + cls.getName());
     }
 
-    protected DateFormat getDateFormat() {
+    /* access modifiers changed from: protected */
+    public DateFormat getDateFormat() {
         if (this._dateFormat != null) {
             return this._dateFormat;
         }
@@ -503,18 +518,21 @@ public abstract class DeserializationContext extends DatabindContext implements 
         return dateFormat;
     }
 
-    protected String determineClassName(Object obj) {
+    /* access modifiers changed from: protected */
+    public String determineClassName(Object obj) {
         return ClassUtil.getClassDescription(obj);
     }
 
-    protected String _calcName(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public String _calcName(Class<?> cls) {
         if (cls.isArray()) {
             return _calcName(cls.getComponentType()) + "[]";
         }
         return cls.getName();
     }
 
-    protected String _valueDesc() {
+    /* access modifiers changed from: protected */
+    public String _valueDesc() {
         try {
             return _desc(this._parser.getText());
         } catch (Exception e) {
@@ -522,7 +540,8 @@ public abstract class DeserializationContext extends DatabindContext implements 
         }
     }
 
-    protected String _desc(String str) {
+    /* access modifiers changed from: protected */
+    public String _desc(String str) {
         if (str == null) {
             return "[N/A]";
         }
@@ -532,7 +551,8 @@ public abstract class DeserializationContext extends DatabindContext implements 
         return str;
     }
 
-    protected String _quotedString(String str) {
+    /* access modifiers changed from: protected */
+    public String _quotedString(String str) {
         if (str == null) {
             return "[N/A]";
         }

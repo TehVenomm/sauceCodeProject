@@ -1,4 +1,4 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+/* renamed from: android.support.v4.widget.ResourceCursorAdapter */
 public abstract class ResourceCursorAdapter extends CursorAdapter {
     private int mDropDownLayout;
     private LayoutInflater mInflater;

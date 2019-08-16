@@ -129,7 +129,7 @@ namespace MsgPack.Compiler
 			Variable v4 = Variable.CreateLocal(il.DeclareLocal(typeof(IDictionary<string, int>)));
 			Variable variable2 = Variable.CreateLocal(il.DeclareLocal(typeof(int)));
 			Variable v5 = Variable.CreateLocal(il.DeclareLocal(typeof(Type)));
-			EmitUnpackReadAndTypeCheckCode(il, variable, typeof(MsgPackReader).GetMethod("IsMap"), method, true);
+			EmitUnpackReadAndTypeCheckCode(il, variable, typeof(MsgPackReader).GetMethod("IsMap"), method, nullCheckAndReturn: true);
 			il.Emit(OpCodes.Ldtoken, type);
 			il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle"));
 			il.EmitSt(v5);
@@ -149,7 +149,7 @@ namespace MsgPack.Compiler
 			il.EmitSt(v3);
 			il.Emit(OpCodes.Br, label2);
 			il.MarkLabel(label);
-			EmitUnpackReadAndTypeCheckCode(il, variable, typeof(MsgPackReader).GetMethod("IsRaw"), method, false);
+			EmitUnpackReadAndTypeCheckCode(il, variable, typeof(MsgPackReader).GetMethod("IsRaw"), method, nullCheckAndReturn: false);
 			Label label3 = il.DefineLabel();
 			il.EmitLd(v4);
 			il.EmitLd(variable);
@@ -202,7 +202,7 @@ namespace MsgPack.Compiler
 			Variable v = Variable.CreateLocal(il.DeclareLocal(typeof(int)));
 			Variable variable3 = Variable.CreateLocal(il.DeclareLocal(typeof(int)));
 			Variable v2 = Variable.CreateLocal(il.DeclareLocal(typeof(Type)));
-			EmitUnpackReadAndTypeCheckCode(il, variable, typeof(MsgPackReader).GetMethod("IsArray"), method, true);
+			EmitUnpackReadAndTypeCheckCode(il, variable, typeof(MsgPackReader).GetMethod("IsArray"), method, nullCheckAndReturn: true);
 			il.Emit(OpCodes.Ldtoken, elementType);
 			il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle"));
 			il.EmitSt(v2);

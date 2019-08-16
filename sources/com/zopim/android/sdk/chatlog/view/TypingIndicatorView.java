@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import java.util.concurrent.TimeUnit;
 
 public class TypingIndicatorView extends LinearLayout {
@@ -29,15 +29,15 @@ public class TypingIndicatorView extends LinearLayout {
     @TargetApi(16)
     private AnimationDrawable[] prepareAnimations() {
         int childCount = getChildCount();
-        int integer = getResources().getInteger(C0785R.integer.typing_dot_duration);
+        int integer = getResources().getInteger(C1122R.integer.typing_dot_duration);
         this.mTransitionDelay = ((long) integer) > TYPING_INDICATOR_MAX_DELAY ? TYPING_INDICATOR_MAX_DELAY : (long) integer;
-        Drawable drawable = getResources().getDrawable(C0785R.drawable.ic_typing_dot_secondary);
-        Drawable drawable2 = getResources().getDrawable(C0785R.drawable.ic_typing_dot_primary);
+        Drawable drawable = getResources().getDrawable(C1122R.C1124drawable.ic_typing_dot_secondary);
+        Drawable drawable2 = getResources().getDrawable(C1122R.C1124drawable.ic_typing_dot_primary);
         AnimationDrawable[] animationDrawableArr = new AnimationDrawable[childCount];
         int i = 0;
         while (getChildAt(i) instanceof ImageView) {
             ImageView imageView = (ImageView) getChildAt(i);
-            Drawable animationDrawable = new AnimationDrawable();
+            AnimationDrawable animationDrawable = new AnimationDrawable();
             animationDrawable.addFrame(drawable, (childCount - 1) * integer);
             animationDrawable.addFrame(drawable2, integer);
             animationDrawable.setOneShot(false);
@@ -56,8 +56,8 @@ public class TypingIndicatorView extends LinearLayout {
     public void start() {
         this.mAnimations = prepareAnimations();
         long j = 0;
-        for (AnimationDrawable c0856a : this.mAnimations) {
-            postDelayed(new C0856a(this, c0856a), j);
+        for (AnimationDrawable aVar : this.mAnimations) {
+            postDelayed(new C1225a(this, aVar), j);
             j += this.mTransitionDelay;
         }
     }

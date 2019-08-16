@@ -34,7 +34,6 @@ public class InGameGuildInvitedJoinDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		guildInviteInfo = (GameSection.GetEventData() as GuildInvitedModel.GuildInvitedInfo);
 		_clanId = guildInviteInfo.clanId;
 		this.StartCoroutine(DoInitialize());
@@ -45,17 +44,17 @@ public class InGameGuildInvitedJoinDialog : GameSection
 		bool finish_get_statistic = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(_clanId, delegate(bool success, GuildStatisticInfo info)
 		{
-			((_003CDoInitialize_003Ec__IteratorAD)/*Error near IL_0038: stateMachine*/)._003Cfinish_get_statistic_003E__0 = true;
-			((_003CDoInitialize_003Ec__IteratorAD)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this._info = info;
+			finish_get_statistic = true;
+			_info = info;
 		});
 		while (!finish_get_statistic)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (_info != null)
 		{
-			Transform t = GetCtrl(UI.BTN_ACCEPT_INVITE);
-			SetEvent(t, "JOIN", null);
+			Transform ctrl = GetCtrl(UI.BTN_ACCEPT_INVITE);
+			SetEvent(ctrl, "JOIN", null);
 		}
 		base.Initialize();
 	}
@@ -107,15 +106,15 @@ public class InGameGuildInvitedJoinDialog : GameSection
 			{
 				if (!GuildManager.IsValidInGuild())
 				{
-					GameSection.ChangeStayEvent("REQUEST", null);
+					GameSection.ChangeStayEvent("REQUEST");
 				}
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 				if (GuildManager.IsValidInGuild())
 				{
 					MonoBehaviourSingleton<GuildManager>.I.guildInviteList.Clear();
 					MonoBehaviourSingleton<UserInfoManager>.I.ClearPartyInvite();
-					MonoBehaviourSingleton<UIManager>.I.invitationButton.Close(UITransition.TYPE.CLOSE);
-					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close(UITransition.TYPE.CLOSE);
+					MonoBehaviourSingleton<UIManager>.I.invitationButton.Close();
+					MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close();
 					MonoBehaviourSingleton<UserInfoManager>.I.showJoinClanInGame = true;
 					inGameGuildInvitedJoinDialog.BackToHome();
 				}
@@ -131,7 +130,7 @@ public class InGameGuildInvitedJoinDialog : GameSection
 			InGameGuildInvitedJoinDialog inGameGuildInvitedJoinDialog = this;
 			DoWaitProtocolBusyFinish(delegate
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 				MonoBehaviourSingleton<GuildManager>.I.guildInviteList.Remove(inGameGuildInvitedJoinDialog.guildInviteInfo);
 			});
 		});

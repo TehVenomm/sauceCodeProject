@@ -70,7 +70,9 @@ public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
 		SPR_TYPE_ICON_BG,
 		SPR_TYPE_ICON_RARITY,
 		OBJ_CAPTION_3,
-		LBL_CAPTION
+		LBL_CAPTION,
+		OBJ_WEAPON_INFO,
+		OBJ_EQUIP_SET_SELECT
 	}
 
 	public override void Initialize()
@@ -102,7 +104,13 @@ public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
 	{
 		int sex = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex;
 		EquipItemInfo equipItemInfo = equipSet.item[selectEquipIndex];
-		ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, sex, GetCtrl(UI.ICON_WEAPON), null, -1, "DETAIL", 0, false, -1, false, null, false, false);
+		ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, sex, GetCtrl(UI.ICON_WEAPON), null, -1, "DETAIL");
+		if (equipItemInfo == null)
+		{
+			SetActive((Enum)UI.OBJ_WEAPON_INFO, is_visible: false);
+			SetActive((Enum)UI.OBJ_EQUIP_SET_SELECT, is_visible: false);
+			return;
+		}
 		if (equipItemInfo != null && equipItemInfo.tableID != 0)
 		{
 			itemIcon.SetEquipExt(equipItemInfo, base.GetComponent<UILabel>((Enum)UI.LBL_LV_NOW));
@@ -114,7 +122,7 @@ public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
 		Transform t_icon = FindCtrl(ctrl, UI.SPR_TYPE_ICON);
 		Transform val = FindCtrl(ctrl, UI.SPR_TYPE_ICON_RARITY);
 		SetEquipmentTypeIcon(t_icon, ctrl, val, equipItemInfo.tableData);
-		SetActive(val, false);
+		SetActive(val, is_visible: false);
 		SetEvent(GetCtrl(UI.ICON_WEAPON), "DETAIL", selectEquipIndex);
 	}
 
@@ -135,7 +143,6 @@ public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
@@ -148,7 +155,7 @@ public class EquipSetDetailStatus : EquipSetDetailStatusAndAbilityTable
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 }

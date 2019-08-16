@@ -141,8 +141,6 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 
 	protected override void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		this.get_gameObject().AddComponent<PartyWebSocket>();
 		this.get_gameObject().AddComponent<PartyNetworkManager>();
@@ -279,6 +277,34 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		return null;
 	}
 
+	public bool IsMaxPartyMember()
+	{
+		if (partyData != null)
+		{
+			int count = partyData.slotInfos.Count;
+			int memberCount = GetMemberCount();
+			return memberCount >= count;
+		}
+		return false;
+	}
+
+	public int GetMemberCount()
+	{
+		if (partyData == null)
+		{
+			return 0;
+		}
+		int num = 0;
+		for (int i = 0; i < partyData.slotInfos.Count; i++)
+		{
+			if (partyData.slotInfos[i].userInfo != null)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+
 	public PartyModel.SlotInfo GetSlotInfoByUserId(int user_id)
 	{
 		int slotIndex = GetSlotIndex(user_id);
@@ -369,7 +395,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				});
 				if (updated)
 				{
-					UpdateParty(partyData, followPartyMember, partyServerData, inviteFriendInfo, null);
+					UpdateParty(partyData, followPartyMember, partyServerData, inviteFriendInfo);
 				}
 			}
 			if (callback != null)
@@ -389,7 +415,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				if (followPartyMember != null && followPartyMember.following)
 				{
 					followPartyMember.following = false;
-					UpdateParty(partyData, this.followPartyMember, partyServerData, inviteFriendInfo, null);
+					UpdateParty(partyData, this.followPartyMember, partyServerData, inviteFriendInfo);
 				}
 			}
 			if (callback != null)
@@ -452,13 +478,15 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 	public void SendSearch(Action<bool, Error> call_back, bool saveSettings)
 	{
 		partys = null;
-		SetSearchRequest(null);
+		SetSearchRequest();
 		PartySearchModel.RequestSendForm requestSendForm = new PartySearchModel.RequestSendForm();
 		requestSendForm.order = searchRequest.order;
 		requestSendForm.rarityBit = searchRequest.rarityBit;
 		requestSendForm.elementBit = searchRequest.elementBit;
 		requestSendForm.enemyLevelMin = searchRequest.enemyLevelMin;
 		requestSendForm.enemyLevelMax = searchRequest.enemyLevelMax;
+		requestSendForm.isCs = searchRequest.isCs;
+		requestSendForm.isFs = searchRequest.isFs;
 		if (!string.IsNullOrEmpty(searchRequest.targetEnemySpeciesName))
 		{
 			requestSendForm.enemySpecies = searchRequest.GetEnemySpeciesId(searchRequest.targetEnemySpeciesName);
@@ -487,7 +515,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 	public void SendSearchRandomMatching(Action<bool, Error> call_back)
 	{
 		ClearParty();
-		SetSearchRequest(null);
+		SetSearchRequest();
 		PartyModel.RequestSearchRandomMatching requestSearchRandomMatching = new PartyModel.RequestSearchRandomMatching();
 		requestSearchRandomMatching.token = GenerateToken();
 		requestSearchRandomMatching.order = searchRequest.order;
@@ -495,6 +523,8 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		requestSearchRandomMatching.elementBit = searchRequest.elementBit;
 		requestSearchRandomMatching.enemyLevelMin = searchRequest.enemyLevelMin;
 		requestSearchRandomMatching.enemyLevelMax = searchRequest.enemyLevelMax;
+		requestSearchRandomMatching.isCs = searchRequest.isCs;
+		requestSearchRandomMatching.isFs = searchRequest.isFs;
 		if (!string.IsNullOrEmpty(searchRequest.targetEnemySpeciesName))
 		{
 			requestSearchRandomMatching.enemySpecies = searchRequest.GetEnemySpeciesId(searchRequest.targetEnemySpeciesName);
@@ -507,7 +537,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			if (ret.Error == Error.None && ret.result.party != null)
 			{
 				arg = true;
-				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, null);
+				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo);
 				if (ret.result.randomMatchingInfo != null)
 				{
 					UpdateRandomMatchingInfo(ret.result.randomMatchingInfo);
@@ -525,6 +555,8 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 	{
 		PlayerPrefs.SetInt("GACHA_SEARCH_RAIRTY_KEY", searchRequest.rarityBit);
 		PlayerPrefs.SetInt("GACHA_SEARCH_ELEMENT_KEY", searchRequest.elementBit);
+		PlayerPrefs.SetInt("GACHA_SEARCH_PRIORITY_FS_KEY", searchRequest.isFs);
+		PlayerPrefs.SetInt("GACHA_SEARCH_PRIORITY_CS_KEY", searchRequest.isCs);
 		PlayerPrefs.SetInt("GACHA_SEARCH_LEVEL_MIN_KEY", searchRequest.enemyLevelMin);
 		PlayerPrefs.SetInt("GACHA_SEARCH_LEVEL_MAX_KEY", searchRequest.enemyLevelMax);
 		if (!string.IsNullOrEmpty(searchRequest.targetEnemySpeciesName))
@@ -539,9 +571,15 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		searchRequest = new QuestSearchRoomCondition.SearchRequestParam();
 		searchRequest.rarityBit = PlayerPrefs.GetInt("GACHA_SEARCH_RAIRTY_KEY", 8388607);
 		searchRequest.elementBit = PlayerPrefs.GetInt("GACHA_SEARCH_ELEMENT_KEY", 8388607);
+		searchRequest.isFs = PlayerPrefs.GetInt("GACHA_SEARCH_PRIORITY_FS_KEY", 1);
+		searchRequest.isCs = PlayerPrefs.GetInt("GACHA_SEARCH_PRIORITY_CS_KEY", 1);
 		searchRequest.enemyLevelMin = PlayerPrefs.GetInt("GACHA_SEARCH_LEVEL_MIN_KEY", 1);
-		int pARTY_SEARCH_QUEST_LEVEL_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_LEVEL_MAX;
-		searchRequest.enemyLevelMax = PlayerPrefs.GetInt("GACHA_SEARCH_LEVEL_MAX_KEY", pARTY_SEARCH_QUEST_LEVEL_MAX);
+		int num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_LEVEL_MAX;
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX > 0)
+		{
+			num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX;
+		}
+		searchRequest.enemyLevelMax = PlayerPrefs.GetInt("GACHA_SEARCH_LEVEL_MAX_KEY", num);
 		searchRequest.targetEnemySpeciesName = PlayerPrefs.GetString("GACHA_SEARCH_SPECIES_KEY", (string)null);
 	}
 
@@ -593,7 +631,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			if (ret.Error == Error.None && ret.result.party != null)
 			{
 				arg = true;
-				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, null);
+				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo);
 				if (ret.result.randomMatchingInfo != null)
 				{
 					UpdateRandomMatchingInfo(ret.result.randomMatchingInfo);
@@ -626,6 +664,27 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		nowRushQuestIds = idList;
 	}
 
+	public void SendEventSearch(int eventId, Action<bool, Error> call_back)
+	{
+		partys = null;
+		PartySearchEventModel.RequestSendForm requestSendForm = new PartySearchEventModel.RequestSendForm();
+		requestSendForm.eid = eventId;
+		Protocol.Send(PartySearchEventModel.URL, requestSendForm, delegate(PartySearchModel ret)
+		{
+			bool arg = false;
+			Error error = ret.Error;
+			if (error == Error.None || error == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
+			{
+				if (ret.Error == Error.None)
+				{
+					arg = true;
+				}
+				UpdatePartyList(ret.result.partys);
+			}
+			call_back(arg, ret.Error);
+		}, string.Empty);
+	}
+
 	public void SetPartySetting(PartySetting setting)
 	{
 		partySetting = setting;
@@ -652,7 +711,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				arg4 = ret.result.randomMatchingInfo.waitTime;
 				if (ret.result.party != null)
 				{
-					UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, null);
+					UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo);
 					Dirty();
 					arg3 = 0;
 					arg2 = true;
@@ -675,7 +734,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			{
 			case Error.None:
 				arg = true;
-				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, null);
+				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo);
 				Dirty();
 				break;
 			case Error.WRN_QUEST_IS_ORDER:
@@ -710,7 +769,8 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			{
 			case Error.None:
 				obj = true;
-				UpdateParty(ret.result.party, null, ret.result.partyServer, ret.result.inviteFriendInfo, null);
+				MonoBehaviourSingleton<UserInfoManager>.I.repeatPartyEnable = ret.result.repeatFeatureEnable;
+				UpdateParty(ret.result.party, null, ret.result.partyServer, ret.result.inviteFriendInfo);
 				Dirty();
 				break;
 			}
@@ -731,7 +791,9 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			if (ret.Error == Error.None)
 			{
 				arg = true;
-				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, null);
+				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo);
+				MonoBehaviourSingleton<UserInfoManager>.I.repeatPartyEnable = ret.result.repeatFeatureEnable;
+				is_repeat_quest = (ret.result.repeatStatus == 1);
 				Dirty();
 			}
 			if (call_back != null)
@@ -754,7 +816,8 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			if (ret.Error == Error.None)
 			{
 				obj = true;
-				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, null);
+				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo);
+				MonoBehaviourSingleton<UserInfoManager>.I.repeatPartyEnable = ret.result.repeatFeatureEnable;
 				is_repeat_quest = (ret.result.repeatStatus == 1);
 				Dirty();
 			}
@@ -766,206 +829,188 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 	{
 		if (partyData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		if (MonoBehaviourSingleton<QuestManager>.IsValid())
 		{
-			if (MonoBehaviourSingleton<QuestManager>.IsValid())
-			{
-				MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.Clear();
-			}
-			PartyModel.RequestInfo requestInfo = new PartyModel.RequestInfo();
-			requestInfo.id = partyData.id;
-			Protocol.Send(PartyModel.RequestInfo.path, requestInfo, delegate(PartyModel ret)
-			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, ret.result.isEquipList);
-					is_repeat_quest = (ret.result.repeatStatus == 1);
-					Dirty();
-				}
-				else
-				{
-					ClearParty();
-				}
-				call_back(obj);
-			}, string.Empty);
+			MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.Clear();
 		}
+		PartyModel.RequestInfo requestInfo = new PartyModel.RequestInfo();
+		requestInfo.id = partyData.id;
+		Protocol.Send(PartyModel.RequestInfo.path, requestInfo, delegate(PartyModel ret)
+		{
+			bool obj = false;
+			if (ret.Error == Error.None)
+			{
+				obj = true;
+				UpdateParty(ret.result.party, ret.result.friend, ret.result.partyServer, ret.result.inviteFriendInfo, ret.result.isEquipList);
+				is_repeat_quest = (ret.result.repeatStatus == 1);
+				Dirty();
+			}
+			else
+			{
+				ClearParty();
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendIsEquip(bool isEquip, Action<bool> call_back)
 	{
 		if (partyData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		PartyModel.RequestIsEquip requestIsEquip = new PartyModel.RequestIsEquip();
+		requestIsEquip.id = partyData.id;
+		requestIsEquip.isEquip = isEquip;
+		Protocol.Send(PartyModel.RequestIsEquip.path, requestIsEquip, delegate(PartyModel ret)
 		{
-			PartyModel.RequestIsEquip requestIsEquip = new PartyModel.RequestIsEquip();
-			requestIsEquip.id = partyData.id;
-			requestIsEquip.isEquip = isEquip;
-			Protocol.Send(PartyModel.RequestIsEquip.path, requestIsEquip, delegate(PartyModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
+				obj = true;
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendReady(bool enable_ready, Action<bool> call_back)
 	{
 		if (partyData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		int slotIndex = GetSlotIndex(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
+		if (slotIndex < 0)
 		{
-			int slotIndex = GetSlotIndex(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-			if (slotIndex < 0)
-			{
-				call_back(false);
-			}
-			else
-			{
-				PARTY_PLAYER_STATUS pARTY_PLAYER_STATUS = (!enable_ready) ? PARTY_PLAYER_STATUS.JOINED : PARTY_PLAYER_STATUS.READY;
-				if (partyData.slotInfos[slotIndex].status == (int)pARTY_PLAYER_STATUS)
-				{
-					call_back(true);
-				}
-				else
-				{
-					partyData.slotInfos[slotIndex].status = (int)pARTY_PLAYER_STATUS;
-					PartyModel.RequestReady requestReady = new PartyModel.RequestReady();
-					requestReady.id = partyData.id;
-					requestReady.enable = (enable_ready ? 1 : 0);
-					Protocol.Send(PartyModel.RequestReady.path, requestReady, delegate(PartyModel ret)
-					{
-						bool obj = false;
-						if (ret.Error == Error.None)
-						{
-							obj = true;
-							UpdateParty(ret.result.party, null, null, ret.result.inviteFriendInfo, null);
-							Dirty();
-						}
-						call_back(obj);
-					}, string.Empty);
-				}
-			}
+			call_back(obj: false);
+			return;
 		}
+		PARTY_PLAYER_STATUS pARTY_PLAYER_STATUS = (!enable_ready) ? PARTY_PLAYER_STATUS.JOINED : PARTY_PLAYER_STATUS.READY;
+		if (partyData.slotInfos[slotIndex].status == (int)pARTY_PLAYER_STATUS)
+		{
+			call_back(obj: true);
+			return;
+		}
+		partyData.slotInfos[slotIndex].status = (int)pARTY_PLAYER_STATUS;
+		PartyModel.RequestReady requestReady = new PartyModel.RequestReady();
+		requestReady.id = partyData.id;
+		requestReady.enable = (enable_ready ? 1 : 0);
+		Protocol.Send(PartyModel.RequestReady.path, requestReady, delegate(PartyModel ret)
+		{
+			bool obj = false;
+			if (ret.Error == Error.None)
+			{
+				obj = true;
+				UpdateParty(ret.result.party, null, null, ret.result.inviteFriendInfo);
+				Dirty();
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendLeave(Action<bool> call_back)
 	{
 		if (partyData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		PartyLeaveModel.RequestSendForm requestSendForm = new PartyLeaveModel.RequestSendForm();
+		requestSendForm.id = partyData.id;
+		if (followPartyMember != null)
 		{
-			PartyLeaveModel.RequestSendForm requestSendForm = new PartyLeaveModel.RequestSendForm();
-			requestSendForm.id = partyData.id;
-			if (followPartyMember != null)
-			{
-				followPartyMember.Clear();
-			}
-			Protocol.Send(PartyLeaveModel.URL, requestSendForm, delegate(PartyLeaveModel ret)
-			{
-				bool obj = false;
-				Error error = ret.Error;
-				if (error == Error.None || error == Error.ERR_PARTY_NOT_FOUND_PARTY)
-				{
-					obj = true;
-					ClearParty();
-					Dirty();
-				}
-				call_back(obj);
-			}, string.Empty);
+			followPartyMember.Clear();
 		}
+		Protocol.Send(PartyLeaveModel.URL, requestSendForm, delegate(PartyLeaveModel ret)
+		{
+			bool obj = false;
+			Error error = ret.Error;
+			if (error == Error.None || error == Error.ERR_PARTY_NOT_FOUND_PARTY)
+			{
+				obj = true;
+				ClearParty();
+				Dirty();
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendEdit(PartySetting party_setting, Action<bool> call_back)
 	{
 		if (partyData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		PartyModel.RequestEdit requestEdit = new PartyModel.RequestEdit();
+		requestEdit.id = partyData.id;
+		requestEdit.isLock = (party_setting.isLock ? 1 : 0);
+		requestEdit.lv = party_setting.level;
+		requestEdit.power = party_setting.total;
+		Protocol.Send(PartyModel.RequestEdit.path, requestEdit, delegate(PartyModel ret)
 		{
-			PartyModel.RequestEdit requestEdit = new PartyModel.RequestEdit();
-			requestEdit.id = partyData.id;
-			requestEdit.isLock = (party_setting.isLock ? 1 : 0);
-			requestEdit.lv = party_setting.level;
-			requestEdit.power = party_setting.total;
-			Protocol.Send(PartyModel.RequestEdit.path, requestEdit, delegate(PartyModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
+				obj = true;
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendInviteList(Action<bool, PartyInviteCharaInfo[]> call_back)
 	{
 		if (partyData == null)
 		{
-			call_back(false, null);
+			call_back(arg1: false, null);
+			return;
 		}
-		else
+		PartyInviteListModel.RequestSendForm requestSendForm = new PartyInviteListModel.RequestSendForm();
+		requestSendForm.id = partyData.id;
+		Protocol.Send(PartyInviteListModel.URL, requestSendForm, delegate(PartyInviteListModel ret)
 		{
-			PartyInviteListModel.RequestSendForm requestSendForm = new PartyInviteListModel.RequestSendForm();
-			requestSendForm.id = partyData.id;
-			Protocol.Send(PartyInviteListModel.URL, requestSendForm, delegate(PartyInviteListModel ret)
+			bool arg = false;
+			PartyInviteCharaInfo[] arg2 = null;
+			if (ret.Error == Error.None)
 			{
-				bool arg = false;
-				PartyInviteCharaInfo[] arg2 = null;
-				if (ret.Error == Error.None)
-				{
-					arg = true;
-					arg2 = ret.result.ToArray();
-				}
-				call_back(arg, arg2);
-			}, string.Empty);
-		}
+				arg = true;
+				arg2 = ret.result.ToArray();
+			}
+			call_back(arg, arg2);
+		}, string.Empty);
 	}
 
 	public void SendInvite(int[] userIds, Action<bool, int[]> call_back)
 	{
 		if (partyData == null)
 		{
-			call_back(false, null);
+			call_back(arg1: false, null);
+			return;
 		}
-		else
+		PartyInviteModel.RequestSendForm requestSendForm = new PartyInviteModel.RequestSendForm();
+		requestSendForm.id = partyData.id;
+		foreach (int item in userIds)
 		{
-			PartyInviteModel.RequestSendForm requestSendForm = new PartyInviteModel.RequestSendForm();
-			requestSendForm.id = partyData.id;
-			foreach (int item in userIds)
-			{
-				requestSendForm.ids.Add(item);
-			}
-			Protocol.Send(PartyInviteModel.URL, requestSendForm, delegate(PartyInviteModel ret)
-			{
-				bool arg = false;
-				if (ret.Error == Error.None)
-				{
-					arg = true;
-					call_back(arg, ret.result.ToArray());
-				}
-				else
-				{
-					call_back(arg, null);
-				}
-			}, string.Empty);
+			requestSendForm.ids.Add(item);
 		}
+		Protocol.Send(PartyInviteModel.URL, requestSendForm, delegate(PartyInviteModel ret)
+		{
+			bool arg = false;
+			if (ret.Error == Error.None)
+			{
+				arg = true;
+				call_back(arg, ret.result.ToArray());
+			}
+			else
+			{
+				call_back(arg, null);
+			}
+		}, string.Empty);
 	}
 
 	public void SendInvitedParty(Action<bool> call_back, bool isResumed = false)
@@ -980,7 +1025,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				UpdatePartyList(ret.result.partys);
 				if (IsValidNotEmptyList() && isResumed)
 				{
-					MonoBehaviourSingleton<UserInfoManager>.I.SetPartyInviteResume(true);
+					MonoBehaviourSingleton<UserInfoManager>.I.SetPartyInviteResume(flag: true);
 				}
 			}
 			call_back(obj);
@@ -1019,26 +1064,23 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		{
 			if (call_back != null)
 			{
-				call_back(false, false);
+				call_back(arg1: false, arg2: false);
 			}
 		}
 		else if (!MonoBehaviourSingleton<PartyNetworkManager>.IsValid())
 		{
 			if (call_back != null)
 			{
-				call_back(false, false);
+				call_back(arg1: false, arg2: false);
 			}
 		}
 		else
 		{
 			MonoBehaviourSingleton<PartyNetworkManager>.I.ConnectAndRegist(webSockConnectData, delegate(bool is_connect, bool is_regist)
 			{
-				if (!is_regist)
+				if (is_regist)
 				{
-					goto IL_0006;
 				}
-				goto IL_0006;
-				IL_0006:
 				if (call_back != null)
 				{
 					call_back(is_connect, is_regist);
@@ -1054,14 +1096,14 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			challengeInfo = new QuestChallengeInfoModel.Param();
 			if (call_back != null)
 			{
-				call_back(true, Error.None);
+				call_back(arg1: true, Error.None);
 			}
 		}
 		else
 		{
 			challengeInfo = null;
-			QuestChallengeInfoModel.RequestSendForm post_data = new QuestChallengeInfoModel.RequestSendForm();
-			Protocol.Send(QuestChallengeInfoModel.URL, post_data, delegate(QuestChallengeInfoModel ret)
+			QuestChallengeInfoModel.RequestSendForm postData = new QuestChallengeInfoModel.RequestSendForm();
+			Protocol.Send(QuestChallengeInfoModel.URL, postData, delegate(QuestChallengeInfoModel ret)
 			{
 				bool arg = false;
 				if (ret.Error == Error.None)
@@ -1081,54 +1123,50 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 	{
 		if (partyData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		PartyRepeatModel.RequestSendForm requestSendForm = new PartyRepeatModel.RequestSendForm();
+		requestSendForm.id = partyData.id;
+		requestSendForm.st = (isOn ? 1 : 0);
+		requestSendForm.cs = setting_cs;
+		requestSendForm.ce = setting_ce;
+		Protocol.Send(PartyRepeatModel.URL, requestSendForm, delegate(PartyRepeatModel ret)
 		{
-			PartyRepeatModel.RequestSendForm requestSendForm = new PartyRepeatModel.RequestSendForm();
-			requestSendForm.id = partyData.id;
-			requestSendForm.st = (isOn ? 1 : 0);
-			requestSendForm.cs = setting_cs;
-			requestSendForm.ce = setting_ce;
-			Protocol.Send(PartyRepeatModel.URL, requestSendForm, delegate(PartyRepeatModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					is_repeat_quest = isOn;
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
+				obj = true;
+				is_repeat_quest = isOn;
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendGetNextParty(Action<bool> call_back)
 	{
 		if (partyData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		PartyNextModel.RequestSendForm requestSendForm = new PartyNextModel.RequestSendForm();
+		requestSendForm.id = partyData.id;
+		Protocol.Send(PartyNextModel.URL, requestSendForm, delegate(PartyNextModel ret)
 		{
-			PartyNextModel.RequestSendForm requestSendForm = new PartyNextModel.RequestSendForm();
-			requestSendForm.id = partyData.id;
-			Protocol.Send(PartyNextModel.URL, requestSendForm, delegate(PartyNextModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
+				repeatPartyStatus = ret.result.repeatPartyStatus;
+				if (ret.result.repeatPartyStatus > 0)
 				{
-					repeatPartyStatus = ret.result.repeatPartyStatus;
-					if (ret.result.repeatPartyStatus > 0)
-					{
-						UpdateParty(ret.result.party, null, ret.result.partyServer, ret.result.inviteFriendInfo, null);
-						is_repeat_quest = (ret.result.repeatStatus == 1);
-					}
-					obj = true;
+					UpdateParty(ret.result.party, null, ret.result.partyServer, ret.result.inviteFriendInfo);
+					is_repeat_quest = (ret.result.repeatStatus == 1);
 				}
-				call_back(obj);
-			}, string.Empty);
-		}
+				obj = true;
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void UpdatePartyRepeat(PartyModel.Party party, List<FollowPartyMember> followPartyMember, PartyModel.PartyServer partyServer, PartyModel.InviteFriendInfo inviteFriendInfo, List<IsEquipPartyMember> isEquipList = null)

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PuniController
+public class PuniController : MonoBehaviour
 {
 	public Camera uiCamera;
 
@@ -25,12 +25,9 @@ public class PuniController
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		slimeParentTransform = this.get_transform();
 		Vector3 position = slimeParentTransform.get_position();
 		position.z = posZ;

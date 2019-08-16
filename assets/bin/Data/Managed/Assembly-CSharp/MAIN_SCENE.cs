@@ -2,6 +2,7 @@ public enum MAIN_SCENE
 {
 	HOME,
 	LOUNGE,
+	CLAN,
 	QUEST,
 	STUDIO,
 	GATHER,

@@ -5,132 +5,157 @@ import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable.Creator;
 import android.os.RemoteException;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.google.android.gms.common.data.BitmapTeleporter;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.util.zzm;
+import com.google.android.gms.common.internal.GmsLogger;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.metadata.internal.MetadataBundle;
-import com.google.android.gms.internal.zzbjv;
-import com.google.android.gms.internal.zzbli;
-import com.google.android.gms.internal.zzbnr;
+import com.google.android.gms.internal.drive.zzev;
+import com.google.android.gms.internal.drive.zzhp;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public final class CompletionEvent extends zza implements ResourceEvent {
+@Class(creator = "CompletionEventCreator")
+@Reserved({1})
+public final class CompletionEvent extends AbstractSafeParcelable implements ResourceEvent {
     public static final Creator<CompletionEvent> CREATOR = new zzg();
     public static final int STATUS_CANCELED = 3;
     public static final int STATUS_CONFLICT = 2;
     public static final int STATUS_FAILURE = 1;
     public static final int STATUS_SUCCESS = 0;
-    private int zzbyx;
-    private String zzdxg;
-    private DriveId zzgcx;
-    private ParcelFileDescriptor zzgey;
-    private ParcelFileDescriptor zzgez;
-    private MetadataBundle zzgfa;
-    private List<String> zzgfb;
-    private IBinder zzgfc;
-    private boolean zzgfd = false;
-    private boolean zzgfe = false;
-    private boolean zzgff = false;
+    private static final GmsLogger zzbx = new GmsLogger("CompletionEvent", "");
+    @Field(mo13990id = 8)
+    private final int status;
+    @Nullable
+    @Field(mo13990id = 3)
+    private final String zzby;
+    @Nullable
+    @Field(mo13990id = 4)
+    private final ParcelFileDescriptor zzbz;
+    @Nullable
+    @Field(mo13990id = 5)
+    private final ParcelFileDescriptor zzca;
+    @Nullable
+    @Field(mo13990id = 6)
+    private final MetadataBundle zzcb;
+    @Field(mo13990id = 7)
+    private final List<String> zzcc;
+    @Field(mo13990id = 9)
+    private final IBinder zzcd;
+    private boolean zzce = false;
+    private boolean zzcf = false;
+    private boolean zzcg = false;
+    @Field(mo13990id = 2)
+    private final DriveId zzk;
 
-    CompletionEvent(DriveId driveId, String str, ParcelFileDescriptor parcelFileDescriptor, ParcelFileDescriptor parcelFileDescriptor2, MetadataBundle metadataBundle, List<String> list, int i, IBinder iBinder) {
-        this.zzgcx = driveId;
-        this.zzdxg = str;
-        this.zzgey = parcelFileDescriptor;
-        this.zzgez = parcelFileDescriptor2;
-        this.zzgfa = metadataBundle;
-        this.zzgfb = list;
-        this.zzbyx = i;
-        this.zzgfc = iBinder;
+    @Constructor
+    CompletionEvent(@Param(mo13993id = 2) DriveId driveId, @Param(mo13993id = 3) String str, @Param(mo13993id = 4) ParcelFileDescriptor parcelFileDescriptor, @Param(mo13993id = 5) ParcelFileDescriptor parcelFileDescriptor2, @Param(mo13993id = 6) MetadataBundle metadataBundle, @Param(mo13993id = 7) List<String> list, @Param(mo13993id = 8) int i, @Param(mo13993id = 9) IBinder iBinder) {
+        this.zzk = driveId;
+        this.zzby = str;
+        this.zzbz = parcelFileDescriptor;
+        this.zzca = parcelFileDescriptor2;
+        this.zzcb = metadataBundle;
+        this.zzcc = list;
+        this.status = i;
+        this.zzcd = iBinder;
     }
 
-    private final void zzanc() {
-        if (this.zzgff) {
+    private final void zza(boolean z) {
+        zzu();
+        this.zzcg = true;
+        IOUtils.closeQuietly(this.zzbz);
+        IOUtils.closeQuietly(this.zzca);
+        if (this.zzcb != null && this.zzcb.zzd(zzhp.zzka)) {
+            ((BitmapTeleporter) this.zzcb.zza(zzhp.zzka)).release();
+        }
+        if (this.zzcd == null) {
+            zzbx.efmt("CompletionEvent", "No callback on %s", z ? "snooze" : "dismiss");
+            return;
+        }
+        try {
+            zzev.zza(this.zzcd).zza(z);
+        } catch (RemoteException e) {
+            zzbx.mo13929e("CompletionEvent", String.format("RemoteException on %s", new Object[]{z ? "snooze" : "dismiss"}), e);
+        }
+    }
+
+    private final void zzu() {
+        if (this.zzcg) {
             throw new IllegalStateException("Event has already been dismissed or snoozed.");
         }
     }
 
-    private final void zzr(boolean z) {
-        zzanc();
-        this.zzgff = true;
-        zzm.zza(this.zzgey);
-        zzm.zza(this.zzgez);
-        if (this.zzgfa != null && this.zzgfa.zzc(zzbnr.zzgly)) {
-            ((BitmapTeleporter) this.zzgfa.zza(zzbnr.zzgly)).release();
-        }
-        if (this.zzgfc == null) {
-            String valueOf = String.valueOf(z ? "snooze" : "dismiss");
-            zzbjv.zzz("CompletionEvent", valueOf.length() != 0 ? "No callback on ".concat(valueOf) : new String("No callback on "));
-            return;
-        }
-        try {
-            zzbli.zzam(this.zzgfc).zzr(z);
-        } catch (RemoteException e) {
-            RemoteException remoteException = e;
-            valueOf = z ? "snooze" : "dismiss";
-            String valueOf2 = String.valueOf(remoteException);
-            zzbjv.zzz("CompletionEvent", new StringBuilder((String.valueOf(valueOf).length() + 21) + String.valueOf(valueOf2).length()).append("RemoteException on ").append(valueOf).append(": ").append(valueOf2).toString());
-        }
-    }
-
     public final void dismiss() {
-        zzr(false);
+        zza(false);
     }
 
+    @Nullable
     public final String getAccountName() {
-        zzanc();
-        return this.zzdxg;
+        zzu();
+        return this.zzby;
     }
 
+    @Nullable
     public final InputStream getBaseContentsInputStream() {
-        zzanc();
-        if (this.zzgey == null) {
+        zzu();
+        if (this.zzbz == null) {
             return null;
         }
-        if (this.zzgfd) {
+        if (this.zzce) {
             throw new IllegalStateException("getBaseInputStream() can only be called once per CompletionEvent instance.");
         }
-        this.zzgfd = true;
-        return new FileInputStream(this.zzgey.getFileDescriptor());
+        this.zzce = true;
+        return new FileInputStream(this.zzbz.getFileDescriptor());
     }
 
     public final DriveId getDriveId() {
-        zzanc();
-        return this.zzgcx;
+        zzu();
+        return this.zzk;
     }
 
+    @Nullable
     public final InputStream getModifiedContentsInputStream() {
-        zzanc();
-        if (this.zzgez == null) {
+        zzu();
+        if (this.zzca == null) {
             return null;
         }
-        if (this.zzgfe) {
+        if (this.zzcf) {
             throw new IllegalStateException("getModifiedInputStream() can only be called once per CompletionEvent instance.");
         }
-        this.zzgfe = true;
-        return new FileInputStream(this.zzgez.getFileDescriptor());
+        this.zzcf = true;
+        return new FileInputStream(this.zzca.getFileDescriptor());
     }
 
+    @Nullable
     public final MetadataChangeSet getModifiedMetadataChangeSet() {
-        zzanc();
-        return this.zzgfa != null ? new MetadataChangeSet(this.zzgfa) : null;
+        zzu();
+        if (this.zzcb != null) {
+            return new MetadataChangeSet(this.zzcb);
+        }
+        return null;
     }
 
     public final int getStatus() {
-        zzanc();
-        return this.zzbyx;
+        zzu();
+        return this.status;
     }
 
     public final List<String> getTrackingTags() {
-        zzanc();
-        return new ArrayList(this.zzgfb);
+        zzu();
+        return new ArrayList(this.zzcc);
     }
 
     public final int getType() {
@@ -138,31 +163,31 @@ public final class CompletionEvent extends zza implements ResourceEvent {
     }
 
     public final void snooze() {
-        zzr(true);
+        zza(true);
     }
 
     public final String toString() {
-        String str;
-        if (this.zzgfb == null) {
-            str = "<null>";
+        String sb;
+        if (this.zzcc == null) {
+            sb = "<null>";
         } else {
-            str = TextUtils.join("','", this.zzgfb);
-            str = new StringBuilder(String.valueOf(str).length() + 2).append("'").append(str).append("'").toString();
+            String join = TextUtils.join("','", this.zzcc);
+            sb = new StringBuilder(String.valueOf(join).length() + 2).append("'").append(join).append("'").toString();
         }
-        return String.format(Locale.US, "CompletionEvent [id=%s, status=%s, trackingTag=%s]", new Object[]{this.zzgcx, Integer.valueOf(this.zzbyx), str});
+        return String.format(Locale.US, "CompletionEvent [id=%s, status=%s, trackingTag=%s]", new Object[]{this.zzk, Integer.valueOf(this.status), sb});
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
         int i2 = i | 1;
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzgcx, i2, false);
-        zzd.zza(parcel, 3, this.zzdxg, false);
-        zzd.zza(parcel, 4, this.zzgey, i2, false);
-        zzd.zza(parcel, 5, this.zzgez, i2, false);
-        zzd.zza(parcel, 6, this.zzgfa, i2, false);
-        zzd.zzb(parcel, 7, this.zzgfb, false);
-        zzd.zzc(parcel, 8, this.zzbyx);
-        zzd.zza(parcel, 9, this.zzgfc, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.zzk, i2, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzby, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, this.zzbz, i2, false);
+        SafeParcelWriter.writeParcelable(parcel, 5, this.zzca, i2, false);
+        SafeParcelWriter.writeParcelable(parcel, 6, this.zzcb, i2, false);
+        SafeParcelWriter.writeStringList(parcel, 7, this.zzcc, false);
+        SafeParcelWriter.writeInt(parcel, 8, this.status);
+        SafeParcelWriter.writeIBinder(parcel, 9, this.zzcd, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	public class PlayGamesUserProfile
+	public class PlayGamesUserProfile : IUserProfile
 	{
 		private string mDisplayName;
 
@@ -69,7 +69,7 @@ namespace GooglePlayGames
 				WWW www = new WWW(AvatarURL);
 				while (!www.get_isDone())
 				{
-					yield return (object)null;
+					yield return null;
 				}
 				if (www.get_error() == null)
 				{

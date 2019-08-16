@@ -18,22 +18,22 @@ public class InGameInterval : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)null;
+		yield return null;
 		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
-			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, false);
-			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, false);
+			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, disable: false);
+			MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, disable: false);
 		}
 		MonoBehaviourSingleton<InGameManager>.I.ResumeQuestTransferInfo();
 		bool keep_record = false;
 		bool is_back_transition = false;
 		bool is_back_online_field = false;
+		bool is_send_read_story = true;
 		if (MonoBehaviourSingleton<InGameManager>.I.isTransitionQuestToField)
 		{
 			MonoBehaviourSingleton<InGameManager>.I.isTransitionQuestToField = false;
@@ -48,30 +48,40 @@ public class InGameInterval : GameSection
 			}
 			else if (MonoBehaviourSingleton<InGameManager>.I.backTransitionInfo != null)
 			{
-				FieldManager.FieldTransitionInfo trans_info = MonoBehaviourSingleton<InGameManager>.I.backTransitionInfo;
-				MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(trans_info.portalID, trans_info.mapX, trans_info.mapZ, trans_info.mapDir);
+				FieldManager.FieldTransitionInfo backTransitionInfo = MonoBehaviourSingleton<InGameManager>.I.backTransitionInfo;
+				MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapPortalID(backTransitionInfo.portalID, backTransitionInfo.mapX, backTransitionInfo.mapZ, backTransitionInfo.mapDir);
 				is_back_transition = true;
 				if (MonoBehaviourSingleton<InGameManager>.I.isQuestHappen)
 				{
 					is_back_online_field = true;
+				}
+				if (MonoBehaviourSingleton<InGameManager>.I.readStoryID != 0)
+				{
+					is_send_read_story = false;
+					MonoBehaviourSingleton<DeliveryManager>.I.SendReadStoryRead(MonoBehaviourSingleton<InGameManager>.I.readStoryID, delegate
+					{
+						is_send_read_story = true;
+					});
 				}
 			}
 			MonoBehaviourSingleton<InGameManager>.I.backTransitionInfo = null;
 			MonoBehaviourSingleton<InGameManager>.I.isQuestHappen = false;
 			MonoBehaviourSingleton<InGameManager>.I.isQuestPortal = false;
 			MonoBehaviourSingleton<InGameManager>.I.isQuestGate = false;
+			MonoBehaviourSingleton<InGameManager>.I.isQuestFromGimmick = false;
 			MonoBehaviourSingleton<InGameManager>.I.isStoryPortal = false;
+			MonoBehaviourSingleton<InGameManager>.I.readStoryID = 0;
 		}
 		bool matching_flag = false;
 		Action<bool> matching_end_action = delegate(bool is_connect)
 		{
 			if (!is_connect)
 			{
-				((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_01ba: stateMachine*/)._003C_003Ef__this.coopServerInvalidFlag = true;
+				coopServerInvalidFlag = true;
 			}
 			else
 			{
-				((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_01ba: stateMachine*/)._003Cmatching_flag_003E__4 = true;
+				matching_flag = true;
 			}
 		};
 		if (MonoBehaviourSingleton<InGameManager>.I.isTransitionFieldToQuest)
@@ -87,23 +97,30 @@ public class InGameInterval : GameSection
 				{
 					CoopApp.EnterQuestOffline(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 					{
-						((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0221: stateMachine*/)._003Cmatching_end_action_003E__5(is_c);
+						matching_end_action(is_c);
 					});
 				}
 				else if (MonoBehaviourSingleton<QuestManager>.I.IsForceDefeatQuest())
 				{
 					CoopApp.EnterQuest(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 					{
-						((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0246: stateMachine*/)._003Cmatching_end_action_003E__5(is_c);
+						matching_end_action(is_c);
 					});
 				}
 				else
 				{
 					CoopApp.EnterQuestRandomMatching(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 					{
-						((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_025c: stateMachine*/)._003Cmatching_end_action_003E__5(is_s);
+						matching_end_action(is_s);
 					});
 				}
+			}
+			else if (MonoBehaviourSingleton<InGameManager>.I.isQuestFromGimmick)
+			{
+				CoopApp.EnterQuestRandomMatching(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
+				{
+					matching_end_action(is_s);
+				});
 			}
 			else if (MonoBehaviourSingleton<InGameManager>.I.isQuestHappen)
 			{
@@ -111,11 +128,11 @@ public class InGameInterval : GameSection
 				MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageChange((int)MonoBehaviourSingleton<QuestManager>.I.currentQuestID, 0);
 				while (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected() && now_stage_id4 == MonoBehaviourSingleton<CoopManager>.I.coopStage.stageId)
 				{
-					yield return (object)null;
+					yield return null;
 				}
 				CoopApp.EnterQuestOnly(delegate
 				{
-					((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_02e7: stateMachine*/)._003Cmatching_end_action_003E__5(CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected());
+					matching_end_action(CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected());
 				});
 				if (MonoBehaviourSingleton<CoopManager>.IsValid())
 				{
@@ -130,7 +147,7 @@ public class InGameInterval : GameSection
 				}
 				CoopApp.EnterQuest(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 				{
-					((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0325: stateMachine*/)._003Cmatching_end_action_003E__5(is_c);
+					matching_end_action(is_c);
 				});
 			}
 			if (MonoBehaviourSingleton<InGameManager>.I.isQuestGate)
@@ -147,12 +164,12 @@ public class InGameInterval : GameSection
 			}
 			CoopApp.EnterPartyQuest(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 			{
-				((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0384: stateMachine*/)._003Cmatching_end_action_003E__5(is_c);
+				matching_end_action(is_c);
 			});
 		}
 		else if (QuestManager.IsValidInGame())
 		{
-			if (MonoBehaviourSingleton<QuestManager>.I.IsExplore() || MonoBehaviourSingleton<InGameManager>.I.IsRush())
+			if (MonoBehaviourSingleton<QuestManager>.I.IsExplore() || MonoBehaviourSingleton<InGameManager>.I.IsRush() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsWaveMatch() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
 			{
 				if (MonoBehaviourSingleton<QuestManager>.I.IsExplore())
 				{
@@ -165,24 +182,24 @@ public class InGameInterval : GameSection
 					isTransitionFieldMap = false;
 					is_stage_change = false;
 					bool wait = true;
-					uint currentMapID = MonoBehaviourSingleton<FieldManager>.I.currentMapID;
-					float currentStartMapX = MonoBehaviourSingleton<FieldManager>.I.currentStartMapX;
-					float currentStartMapZ = MonoBehaviourSingleton<FieldManager>.I.currentStartMapZ;
+					uint before_map_id = MonoBehaviourSingleton<FieldManager>.I.currentMapID;
+					float before_map_x = MonoBehaviourSingleton<FieldManager>.I.currentStartMapX;
+					float before_map_z = MonoBehaviourSingleton<FieldManager>.I.currentStartMapZ;
 					CoopApp.EnterPartyField(delegate(bool is_m, bool is_c, bool is_r)
 					{
-						((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0448: stateMachine*/)._003Cwait_003E__8 = false;
+						wait = false;
 						if (is_r)
 						{
-							((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0448: stateMachine*/)._003Cis_stage_change_003E__7 = true;
+							is_stage_change = true;
 						}
-						if (((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0448: stateMachine*/)._003Cbefore_map_id_003E__9 != MonoBehaviourSingleton<FieldManager>.I.currentMapID)
+						if (before_map_id != MonoBehaviourSingleton<FieldManager>.I.currentMapID)
 						{
-							MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapID(((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0448: stateMachine*/)._003Cbefore_map_id_003E__9, ((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0448: stateMachine*/)._003Cbefore_map_x_003E__10, ((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0448: stateMachine*/)._003Cbefore_map_z_003E__11, 0f);
+							MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapID(before_map_id, before_map_x, before_map_z, 0f);
 						}
-					}, true);
+					}, is_reentry: true);
 					while (wait)
 					{
-						yield return (object)null;
+						yield return null;
 					}
 				}
 				else
@@ -202,23 +219,27 @@ public class InGameInterval : GameSection
 					questId = (int)MonoBehaviourSingleton<PartyManager>.I.GetQuestId();
 					mapIndex = MonoBehaviourSingleton<InGameManager>.I.GetRushIndex();
 				}
+				else if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsWaveMatch() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+				{
+					questId = (int)MonoBehaviourSingleton<PartyManager>.I.GetQuestId();
+				}
 				if (is_stage_change && MonoBehaviourSingleton<CoopManager>.I.coopStage.stageIndex != mapIndex)
 				{
 					int now_stage_id2 = MonoBehaviourSingleton<CoopManager>.I.coopStage.stageId;
 					MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageChange(questId, mapIndex);
 					while (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected() && now_stage_id2 == MonoBehaviourSingleton<CoopManager>.I.coopStage.stageId)
 					{
-						yield return (object)null;
+						yield return null;
 					}
 				}
-				matching_end_action(true);
+				matching_end_action(obj: true);
 				keep_record = true;
-				if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
+				if (MonoBehaviourSingleton<InGameManager>.I.IsRush() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsWaveMatch() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
 				{
-					uint map_id = MonoBehaviourSingleton<QuestManager>.I.GetCurrentMapId();
-					if (MonoBehaviourSingleton<FieldManager>.I.currentMapID != map_id)
+					uint currentMapId = MonoBehaviourSingleton<QuestManager>.I.GetCurrentMapId();
+					if (MonoBehaviourSingleton<FieldManager>.I.currentMapID != currentMapId)
 					{
-						MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapID(map_id, 0f, 0f, 0f);
+						MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapID(currentMapId, 0f, 0f, 0f);
 					}
 				}
 				if (MonoBehaviourSingleton<CoopManager>.IsValid())
@@ -241,13 +262,13 @@ public class InGameInterval : GameSection
 				MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageChange((int)MonoBehaviourSingleton<QuestManager>.I.currentQuestID, (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex);
 				while (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected() && now_stage_id3 == MonoBehaviourSingleton<CoopManager>.I.coopStage.stageId)
 				{
-					yield return (object)null;
+					yield return null;
 				}
-				matching_end_action(true);
-				uint map_id2 = MonoBehaviourSingleton<QuestManager>.I.GetCurrentMapId();
-				if (MonoBehaviourSingleton<FieldManager>.I.currentMapID != map_id2)
+				matching_end_action(obj: true);
+				uint map_id = MonoBehaviourSingleton<QuestManager>.I.GetCurrentMapId();
+				if (MonoBehaviourSingleton<FieldManager>.I.currentMapID != map_id)
 				{
-					MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapID(map_id2, 0f, 0f, 0f);
+					MonoBehaviourSingleton<FieldManager>.I.SetCurrentFieldMapID(map_id, 0f, 0f, 0f);
 				}
 				keep_record = true;
 				if (MonoBehaviourSingleton<CoopManager>.IsValid())
@@ -271,7 +292,7 @@ public class InGameInterval : GameSection
 				MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageChange(0, 0);
 				while (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected() && now_stage_id == MonoBehaviourSingleton<CoopManager>.I.coopStage.stageId)
 				{
-					yield return (object)null;
+					yield return null;
 				}
 				matching_end_action(CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected());
 				if (MonoBehaviourSingleton<CoopManager>.IsValid())
@@ -281,59 +302,54 @@ public class InGameInterval : GameSection
 			}
 			else
 			{
-				uint portal_id = MonoBehaviourSingleton<FieldManager>.I.currentPortalID;
-				CoopApp.EnterField(portal_id, 0u, delegate(bool is_m, bool is_c, bool is_r)
+				uint currentPortalID = MonoBehaviourSingleton<FieldManager>.I.currentPortalID;
+				CoopApp.EnterField(currentPortalID, 0u, delegate(bool is_m, bool is_c, bool is_r)
 				{
-					((_003CDoInitialize_003Ec__IteratorAE)/*Error near IL_0889: stateMachine*/)._003Cmatching_end_action_003E__5(is_c);
+					matching_end_action(is_c);
 				});
 			}
 		}
+		while (!is_send_read_story)
+		{
+			yield return null;
+		}
 		while (!matching_flag && !coopServerInvalidFlag)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (coopServerInvalidFlag)
 		{
 			base.Initialize();
+			yield break;
 		}
-		else
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
-			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
-			{
-				MonoBehaviourSingleton<UIManager>.I.mainChat.Open(UITransition.TYPE.OPEN);
-			}
-			if (!keep_record && MonoBehaviourSingleton<InGameRecorder>.IsValid())
-			{
-				Object.DestroyImmediate(MonoBehaviourSingleton<InGameRecorder>.I);
-			}
-			MonoBehaviourSingleton<StageManager>.I.UnloadStage();
-			yield return (object)MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(true);
-			if (MonoBehaviourSingleton<InGameManager>.IsValid())
-			{
-				MonoBehaviourSingleton<InGameManager>.I.ClearAllDrop();
-			}
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().SetActive(true);
-			base.Initialize();
+			MonoBehaviourSingleton<UIManager>.I.mainChat.Open();
 		}
+		if (!keep_record && MonoBehaviourSingleton<InGameRecorder>.IsValid())
+		{
+			Object.DestroyImmediate(MonoBehaviourSingleton<InGameRecorder>.I);
+		}
+		MonoBehaviourSingleton<StageManager>.I.UnloadStage();
+		yield return MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(need_gc_collect: true);
+		if (MonoBehaviourSingleton<InGameManager>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameManager>.I.ClearAllDrop();
+		}
+		MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().SetActive(true);
+		if (MonoBehaviourSingleton<InGameManager>.I.requestEventData != null)
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(MonoBehaviourSingleton<InGameManager>.I.requestEventData);
+			MonoBehaviourSingleton<InGameManager>.I.requestEventData = null;
+		}
+		base.Initialize();
 	}
 
 	public override void StartSection()
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Expected O, but got Unknown
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Expected O, but got Unknown
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Expected O, but got Unknown
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Expected O, but got Unknown
-		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Expected O, but got Unknown
 		if (coopServerInvalidFlag)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "COOP_SERVER_INVALID", null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "COOP_SERVER_INVALID");
 		}
 		else if ((isTransitionFieldMap || isEncounterBoss) && !MonoBehaviourSingleton<FieldManager>.I.useFastTravel)
 		{
@@ -343,7 +359,7 @@ public class InGameInterval : GameSection
 			bool flag4 = MonoBehaviourSingleton<QuestManager>.I.IsExplore();
 			if ((MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.isStoryPortal) || flag3)
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN", null, null, true);
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN");
 			}
 			else if (flag4)
 			{
@@ -357,13 +373,13 @@ public class InGameInterval : GameSection
 					eventType = WorldMapOpenNewRegion.EVENT_TYPE.NONE;
 				}
 				WorldMapOpenNewRegion.SectionEventData user_data = new WorldMapOpenNewRegion.SectionEventData(eventType);
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_REGION", user_data, null, true);
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_REGION", user_data);
 			}
 			else if (IsJumpPortal(portalID))
 			{
 				WorldMapOpenNewField.EVENT_TYPE eventType2 = WorldMapOpenNewField.EVENT_TYPE.QUEST_TO_FIELD;
 				WorldMapOpenNewField.SectionEventData user_data2 = new WorldMapOpenNewField.SectionEventData(eventType2, ENEMY_TYPE.BAT);
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_FIELD", user_data2, null, true);
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_FIELD", user_data2);
 			}
 			else
 			{
@@ -381,12 +397,12 @@ public class InGameInterval : GameSection
 					eventType3 = WorldMapOpenNewField.EVENT_TYPE.EXIST_IN_DUNGEON;
 				}
 				WorldMapOpenNewField.SectionEventData user_data3 = new WorldMapOpenNewField.SectionEventData(eventType3, ENEMY_TYPE.BAT);
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_FIELD", user_data3, null, true);
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_FIELD", user_data3);
 			}
 		}
 		else
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN", null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN");
 		}
 		if (MonoBehaviourSingleton<FieldManager>.IsValid())
 		{
@@ -396,34 +412,24 @@ public class InGameInterval : GameSection
 
 	private void ToExplore()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Expected O, but got Unknown
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Expected O, but got Unknown
 		FieldMapTable.PortalTableData portalData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<InGameManager>.I.beforePortalID);
 		if (portalData == null)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN", null, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN");
+			return;
 		}
-		else
+		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.dstMapID);
+		if (fieldMapData == null)
 		{
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.dstMapID);
-			if (fieldMapData == null)
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN", null, null, true);
-			}
-			else
-			{
-				ExploreMapOpenNewField.EventData eventData = new ExploreMapOpenNewField.EventData();
-				eventData.regionId = fieldMapData.regionId;
-				eventData.portalId = MonoBehaviourSingleton<InGameManager>.I.beforePortalID;
-				eventData.fromBoss = fromBossExplore;
-				eventData.toBoss = isEncounterBoss;
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_EXPLORE", eventData, null, true);
-			}
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INGAME_MAIN");
+			return;
 		}
+		ExploreMapOpenNewField.EventData eventData = new ExploreMapOpenNewField.EventData();
+		eventData.regionId = fieldMapData.regionId;
+		eventData.portalId = MonoBehaviourSingleton<InGameManager>.I.beforePortalID;
+		eventData.fromBoss = fromBossExplore;
+		eventData.toBoss = isEncounterBoss;
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "NEW_EXPLORE", eventData);
 	}
 
 	private static bool IsDifferentRegion(uint portalID)

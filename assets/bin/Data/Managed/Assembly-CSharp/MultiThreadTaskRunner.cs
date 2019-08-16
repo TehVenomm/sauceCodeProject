@@ -12,8 +12,6 @@ public class MultiThreadTaskRunner
 		public Action act;
 	}
 
-	private const int THREAD_COUNT = 3;
-
 	private Thread[] threads;
 
 	private volatile List<TaskParam> tasks = new List<TaskParam>();
@@ -23,6 +21,8 @@ public class MultiThreadTaskRunner
 	private volatile int workingCount;
 
 	private volatile bool stopAllThreads;
+
+	private const int THREAD_COUNT = 3;
 
 	public bool isWorking
 	{
@@ -35,11 +35,11 @@ public class MultiThreadTaskRunner
 			bool flag = false;
 			lock (lockObject)
 			{
-				if (tasks.Count <= 0)
+				if (tasks.Count > 0)
 				{
-					return workingCount != 0;
+					return true;
 				}
-				return true;
+				return workingCount != 0;
 			}
 		}
 	}

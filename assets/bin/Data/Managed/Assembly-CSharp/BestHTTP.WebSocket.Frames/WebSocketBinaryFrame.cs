@@ -32,7 +32,7 @@ namespace BestHTTP.WebSocket.Frames
 		}
 
 		public WebSocketBinaryFrame(byte[] data)
-			: this(data, 0uL, (ulong)((data == null) ? 0 : data.Length), true)
+			: this(data, 0uL, (ulong)((data == null) ? 0 : data.Length), isFinal: true)
 		{
 		}
 
@@ -90,9 +90,6 @@ namespace BestHTTP.WebSocket.Frames
 					memoryStream.WriteByte((byte)(Data[num] ^ bytes3[num % 4uL]));
 				}
 				return memoryStream.ToArray();
-				IL_0162:
-				byte[] result;
-				return result;
 			}
 		}
 	}

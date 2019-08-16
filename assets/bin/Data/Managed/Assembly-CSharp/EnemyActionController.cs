@@ -34,6 +34,8 @@ public class EnemyActionController
 
 	public GrabController grabController;
 
+	private EnemyWaveStrategyController waveStrategyCtrl;
+
 	private Brain brain;
 
 	private Enemy enemy;
@@ -44,6 +46,8 @@ public class EnemyActionController
 	{
 		data = new EnemyActionTable.EnemyActionData()
 	};
+
+	public ActionInfo alteredAction;
 
 	private List<EnemyAngryTable.Data> m_angryDataList = new List<EnemyAngryTable.Data>();
 
@@ -81,6 +85,10 @@ public class EnemyActionController
 			{
 				return actions[nowIndex];
 			}
+			if (alteredAction != null)
+			{
+				return alteredAction;
+			}
 			return EMPTY_ACTION;
 		}
 	}
@@ -109,24 +117,26 @@ public class EnemyActionController
 		enemy = (brain.owner as Enemy);
 		oldIndex = -1;
 		grabController = new GrabController();
+		waveStrategyCtrl = new EnemyWaveStrategyController(enemy);
 	}
 
 	public int GetCounterAttackId()
 	{
 		for (int i = 0; i < actions.Count; i++)
 		{
-			if (actions[i].data.isCounterAttack && (actions[i].data.modeId <= 0 || actions[i].data.modeId == modeId))
+			if (!actions[i].data.isCounterAttack || (actions[i].data.modeId > 0 && actions[i].data.modeId != modeId))
 			{
-				for (int j = 0; j < actions[i].data.combiActionTypeInfos.Length; j++)
+				continue;
+			}
+			for (int j = 0; j < actions[i].data.combiActionTypeInfos.Length; j++)
+			{
+				if (actions[i].data.combiActionTypeInfos[j].type == EnemyActionTable.ACTION_TYPE.ATTACK)
 				{
-					if (actions[i].data.combiActionTypeInfos[j].type == EnemyActionTable.ACTION_TYPE.ATTACK)
-					{
-						return actions[i].data.combiActionTypeInfos[j].id;
-					}
+					return actions[i].data.combiActionTypeInfos[j].id;
 				}
 			}
 		}
-		return 2147483647;
+		return int.MaxValue;
 	}
 
 	public int GetNowModeCounterModeId()
@@ -145,24 +155,26 @@ public class EnemyActionController
 	{
 		actionID = 0u;
 		modeId = 1;
-		if (Singleton<EnemyActionTable>.IsValid())
+		if (!Singleton<EnemyActionTable>.IsValid())
 		{
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)enemy.enemyID);
-			if (enemyData != null)
+			return;
+		}
+		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)enemy.enemyID);
+		if (enemyData == null)
+		{
+			return;
+		}
+		actionID = (uint)enemyData.actionId;
+		List<EnemyActionTable.EnemyActionData> enemyActionList = Singleton<EnemyActionTable>.I.GetEnemyActionList(actionID);
+		if (enemyActionList != null)
+		{
+			m_basisActionDataList = enemyActionList;
+			if (enemy.ExActionID > 0)
 			{
-				actionID = (uint)enemyData.actionId;
-				List<EnemyActionTable.EnemyActionData> enemyActionList = Singleton<EnemyActionTable>.I.GetEnemyActionList(actionID);
-				if (enemyActionList != null)
-				{
-					m_basisActionDataList = enemyActionList;
-					if (enemy.ExActionID > 0)
-					{
-						m_exActionDataList = Singleton<EnemyActionTable>.I.GetEnemyActionList((uint)enemy.ExActionID);
-					}
-					m_enemyData = enemyData;
-					PrepareActionInfoList(enemyActionList, enemyData.actionId);
-				}
+				m_exActionDataList = Singleton<EnemyActionTable>.I.GetEnemyActionList((uint)enemy.ExActionID);
 			}
+			m_enemyData = enemyData;
+			PrepareActionInfoList(enemyActionList, enemyData.actionId);
 		}
 	}
 
@@ -286,27 +298,21 @@ public class EnemyActionController
 	{
 		EnemyTable.EnemyData enemyData = m_enemyData;
 		EXACTION_CONDITION exActionCondition = (EXACTION_CONDITION)enemy.ExActionCondition;
-		switch (exActionCondition)
+		if (exActionCondition > EXACTION_CONDITION.NONE && exActionCondition < EXACTION_CONDITION.MAX && enemy.ExActionID > 0 && m_exActionDataList != null && m_exActionDataList.Count > 0)
 		{
-		case EXACTION_CONDITION.SHIELD_ON:
-			if (enemy.ExActionID > 0 && m_exActionDataList != null && m_exActionDataList.Count > 0)
+			bool flag = false;
+			if (exActionCondition == EXACTION_CONDITION.SHIELD_ON)
 			{
-				bool flag = false;
-				EXACTION_CONDITION eXACTION_CONDITION = exActionCondition;
-				if (eXACTION_CONDITION == EXACTION_CONDITION.SHIELD_ON)
-				{
-					flag = enemy.IsValidShield();
-				}
-				if (flag)
-				{
-					PrepareActionInfoList(m_exActionDataList, enemy.ExActionID);
-				}
-				else
-				{
-					PrepareActionInfoList(m_basisActionDataList, enemyData.actionId);
-				}
+				flag = enemy.IsValidShield();
 			}
-			break;
+			if (flag)
+			{
+				PrepareActionInfoList(m_exActionDataList, enemy.ExActionID);
+			}
+			else
+			{
+				PrepareActionInfoList(m_basisActionDataList, enemyData.actionId);
+			}
 		}
 	}
 
@@ -315,6 +321,7 @@ public class EnemyActionController
 		UpdateActionInfoList();
 		canUseCount = 0;
 		totalWeight = 0;
+		alteredAction = null;
 		int[] array = new int[actions.Count];
 		int continuout_index = -1;
 		int i = 0;
@@ -330,78 +337,89 @@ public class EnemyActionController
 			{
 				flag = false;
 			}
-			if (flag)
+			if (!flag)
 			{
-				canUseCount++;
-				if (canActionWithAliveRegion(actionInfo) && CheckActionByAngryCondition(actionInfo) && (!(actionInfo.data.startWaitInterval > 0f) || !(Time.get_time() - actionInfo.data.startWaitTime < actionInfo.data.startWaitInterval)) && (!(actionInfo.data.lotteryWaitInterval > 0f) || !(Time.get_time() - actionInfo.data.lotteryWaitTime < actionInfo.data.lotteryWaitInterval)))
+				continue;
+			}
+			canUseCount++;
+			if (!canActionWithAliveRegion(actionInfo) || !CheckActionByAngryCondition(actionInfo) || (actionInfo.data.startWaitInterval > 0f && Time.get_time() - actionInfo.data.startWaitTime < actionInfo.data.startWaitInterval) || (actionInfo.data.lotteryWaitInterval > 0f && Time.get_time() - actionInfo.data.lotteryWaitTime < actionInfo.data.lotteryWaitInterval))
+			{
+				continue;
+			}
+			int num = 0;
+			OpponentMemory.OpponentRecord opponent = brain.targetCtrl.GetOpponent();
+			if (opponent != null)
+			{
+				num = GetWeight(actionInfo, opponent.record.distanceType, opponent.record.place);
+			}
+			array[i] = num;
+			if (oldIndex == i && enemy.isBoss)
+			{
+				array[i] /= 2;
+				if (num > 0)
 				{
-					int num = 0;
-					OpponentMemory.OpponentRecord opponent = brain.targetCtrl.GetOpponent();
-					if (opponent != null)
-					{
-						num = GetWeight(actionInfo, opponent.record.distanceType, opponent.record.place);
-					}
-					array[i] = num;
-					if (oldIndex == i && enemy.isBoss)
-					{
-						array[i] /= 2;
-						if (num > 0)
-						{
-							continuout_index = i;
-						}
-					}
-					totalWeight += array[i];
+					continuout_index = i;
+				}
+			}
+			totalWeight += array[i];
+		}
+		if (canUseCount <= 0 || SetupAngryStartAction())
+		{
+			return;
+		}
+		if (totalWeight <= 0)
+		{
+			SetupActionIndexWhenNoWeight(continuout_index);
+			return;
+		}
+		int num2 = 0;
+		int num3 = Random.Range(0, totalWeight) + 1;
+		int j = 0;
+		for (int count2 = actions.Count; j < count2; j++)
+		{
+			if (array[j] > 0)
+			{
+				num2 += array[j];
+				if (num2 >= num3)
+				{
+					oldIndex = nowIndex;
+					nowIndex = j;
+					break;
 				}
 			}
 		}
-		if (canUseCount > 0 && !SetupAngryStartAction())
+		if (grabController.IsReadyForRelease())
 		{
-			if (totalWeight <= 0)
+			nowIndex = actions.FindIndex((ActionInfo action) => action.data.actionID == grabController.releaseActionId);
+		}
+		else if (waveStrategyCtrl.IsActive() && !waveStrategyCtrl.IsArrivedTarget())
+		{
+			nowIndex = -1;
+			alteredAction = waveStrategyCtrl.GetAlteredAction();
+		}
+		else
+		{
+			if (!enemy.counterFlag)
 			{
-				SetupActionIndexWhenNoWeight(continuout_index);
+				return;
 			}
-			else
+			enemy.counterFlag = false;
+			int count3 = actions.Count;
+			int num4 = 0;
+			while (true)
 			{
-				int num2 = 0;
-				int num3 = Random.Range(0, totalWeight) + 1;
-				int j = 0;
-				for (int count2 = actions.Count; j < count2; j++)
+				if (num4 < count3)
 				{
-					if (array[j] > 0)
+					if (actions[num4].data.isCounterAttack && (actions[num4].data.modeId <= 0 || actions[num4].data.modeId == modeId))
 					{
-						num2 += array[j];
-						if (num2 >= num3)
-						{
-							oldIndex = nowIndex;
-							nowIndex = j;
-							break;
-						}
+						break;
 					}
+					num4++;
+					continue;
 				}
-				if (grabController.IsReadyForRelease())
-				{
-					nowIndex = actions.FindIndex((ActionInfo action) => action.data.actionID == grabController.releaseActionId);
-				}
-				else if (enemy.counterFlag)
-				{
-					enemy.counterFlag = false;
-					int count3 = actions.Count;
-					int num4 = 0;
-					while (true)
-					{
-						if (num4 >= count3)
-						{
-							return;
-						}
-						if (actions[num4].data.isCounterAttack && (actions[num4].data.modeId <= 0 || actions[num4].data.modeId == modeId))
-						{
-							break;
-						}
-						num4++;
-					}
-					nowIndex = num4;
-				}
+				return;
 			}
+			nowIndex = num4;
 		}
 	}
 
@@ -425,8 +443,12 @@ public class EnemyActionController
 			{
 				Log.Error("angryData is null!! idx:{0}", i);
 			}
-			else if (!enemy.CheckAngryID(angryData.id))
+			else
 			{
+				if (enemy.CheckAngryID(angryData.id))
+				{
+					continue;
+				}
 				bool flag = false;
 				switch (angryData.condition)
 				{
@@ -479,30 +501,33 @@ public class EnemyActionController
 
 	public void OnReviveRegion(int regionId)
 	{
-		if (!(enemy == null))
+		if (enemy == null)
 		{
-			EnemyRegionWork enemyRegionWork = enemy.SearchRegionWork(regionId);
-			if (enemyRegionWork != null && m_angryDataList != null)
-			{
-				int count = m_angryDataList.Count;
-				int num = 0;
-				EnemyAngryTable.Data data;
-				while (true)
-				{
-					if (num >= count)
-					{
-						return;
-					}
-					data = m_angryDataList[num];
-					if (data.condition == ANGRY_CONDITION.BREAK_PARTS && regionId == data.value1)
-					{
-						break;
-					}
-					num++;
-				}
-				enemy.UnRegisterAngryID(data.id);
-			}
+			return;
 		}
+		EnemyRegionWork enemyRegionWork = enemy.SearchRegionWork(regionId);
+		if (enemyRegionWork == null || m_angryDataList == null)
+		{
+			return;
+		}
+		int count = m_angryDataList.Count;
+		int num = 0;
+		EnemyAngryTable.Data data;
+		while (true)
+		{
+			if (num < count)
+			{
+				data = m_angryDataList[num];
+				if (data.condition == ANGRY_CONDITION.BREAK_PARTS && regionId == data.value1)
+				{
+					break;
+				}
+				num++;
+				continue;
+			}
+			return;
+		}
+		enemy.UnRegisterAngryID(data.id);
 	}
 
 	private void SetupActionIndexWhenNoWeight(int continuout_index)
@@ -513,5 +538,15 @@ public class EnemyActionController
 			nowIndex = continuout_index;
 			totalWeight = 1;
 		}
+	}
+
+	public bool GetMoveMaxLength(ref float length)
+	{
+		if (waveStrategyCtrl.IsActive())
+		{
+			length = 0f;
+			return true;
+		}
+		return false;
 	}
 }

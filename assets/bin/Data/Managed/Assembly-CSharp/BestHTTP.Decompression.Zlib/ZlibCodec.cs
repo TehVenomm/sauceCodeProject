@@ -78,7 +78,7 @@ namespace BestHTTP.Decompression.Zlib
 		public int InitializeInflate(int windowBits)
 		{
 			WindowBits = windowBits;
-			return InitializeInflate(windowBits, true);
+			return InitializeInflate(windowBits, expectRfc1950Header: true);
 		}
 
 		public int InitializeInflate(int windowBits, bool expectRfc1950Header)
@@ -123,13 +123,13 @@ namespace BestHTTP.Decompression.Zlib
 
 		public int InitializeDeflate()
 		{
-			return _InternalInitializeDeflate(true);
+			return _InternalInitializeDeflate(wantRfc1950Header: true);
 		}
 
 		public int InitializeDeflate(CompressionLevel level)
 		{
 			CompressLevel = level;
-			return _InternalInitializeDeflate(true);
+			return _InternalInitializeDeflate(wantRfc1950Header: true);
 		}
 
 		public int InitializeDeflate(CompressionLevel level, bool wantRfc1950Header)
@@ -142,7 +142,7 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			CompressLevel = level;
 			WindowBits = bits;
-			return _InternalInitializeDeflate(true);
+			return _InternalInitializeDeflate(wantRfc1950Header: true);
 		}
 
 		public int InitializeDeflate(CompressionLevel level, int bits, bool wantRfc1950Header)

@@ -36,10 +36,10 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 	protected UISprite vitalSpr;
 
 	[SerializeField]
-	protected UISprite vitalAddSpr;
+	protected UILabel dispName;
 
-	[Tooltip("スクリ\u30fcン横オフセット")]
 	[SerializeField]
+	[Tooltip("スクリ\u30fcン横オフセット")]
 	protected float screenSideOffset = 50f;
 
 	[SerializeField]
@@ -54,15 +54,23 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 	[Tooltip("HPの色")]
 	protected HpColorInfo[] hpColorInfo;
 
+	private readonly string kIconPrefix = "Ingame_portal_";
+
 	protected Transform portalTransform;
 
 	protected Transform arrowTransform;
 
 	protected Animator targetAnimator;
 
+	protected string lastIconName = string.Empty;
+
+	protected string dispNameStr = string.Empty;
+
 	protected float lastHp;
 
 	protected bool isFirst = true;
+
+	protected bool isEnable = true;
 
 	private FieldWaveTargetObject _waveTarget;
 
@@ -74,10 +82,6 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			_waveTarget = value;
 			if (_waveTarget != null)
 			{
@@ -94,32 +98,44 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 
 	public void Initialize()
 	{
-		if (!(_waveTarget == null))
+		if (_waveTarget == null)
 		{
-			if (!_waveTarget.info.name.IsNullOrWhiteSpace())
+			return;
+		}
+		GameObject val = null;
+		if (!_waveTarget.info.name.IsNullOrWhiteSpace())
+		{
+			val = MonoBehaviourSingleton<SceneSettingsManager>.I.GetWaveTarget(_waveTarget.info.name);
+		}
+		else if (_waveTarget.gimmickType == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.WAVE_TARGET3)
+		{
+			val = _waveTarget.get_gameObject();
+		}
+		if (val != null)
+		{
+			targetAnimator = val.GetComponentInChildren<Animator>();
+			if (targetAnimator != null)
 			{
-				GameObject waveTarget = MonoBehaviourSingleton<SceneSettingsManager>.I.GetWaveTarget(_waveTarget.info.name);
-				if (waveTarget != null)
-				{
-					targetAnimator = waveTarget.GetComponent<Animator>();
-					if (targetAnimator != null)
-					{
-						targetAnimator.set_enabled(true);
-					}
-				}
-			}
-			if (!_waveTarget.info.iconName.IsNullOrWhiteSpace())
-			{
-				vitalSpr.spriteName = "Ingame_portal_" + _waveTarget.info.iconName;
-				vitalAddSpr.spriteName = "Ingame_portal_" + _waveTarget.info.iconName + "_add";
+				targetAnimator.set_enabled(true);
 			}
 		}
+		lastIconName = _waveTarget.GetIconName();
+		if (!lastIconName.IsNullOrWhiteSpace())
+		{
+			vitalSpr.spriteName = kIconPrefix + lastIconName;
+		}
+		bool flag = !_waveTarget.info.dispName.IsNullOrWhiteSpace();
+		if (flag)
+		{
+			dispName.text = _waveTarget.info.dispName;
+			dispNameStr = _waveTarget.info.dispName;
+		}
+		dispName.get_gameObject().SetActive(flag);
 	}
 
 	protected override void OnEnable()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Expected O, but got Unknown
+		isEnable = true;
 		base.OnEnable();
 		nearUI.SetActive(false);
 		farUI.SetActive(false);
@@ -130,20 +146,31 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 
 	protected override void OnDisable()
 	{
-		base.OnDisable();
-		SetActiveSafe(nearUI, false);
-		SetActiveSafe(farUI, false);
-		SetActiveSafe(vitalUI, false);
-		SetActiveSafe(arrowUI, false);
-		if (_waveTarget == null && targetAnimator != null)
+		if (!isEnable)
 		{
-			targetAnimator.SetInteger("Rate", 0);
+			return;
+		}
+		isEnable = false;
+		base.OnDisable();
+		SetActiveSafe(nearUI, active: false);
+		SetActiveSafe(farUI, active: false);
+		SetActiveSafe(vitalUI, active: false);
+		SetActiveSafe(arrowUI, active: false);
+		if (_waveTarget == null || _waveTarget.nowHp == 0)
+		{
+			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+			{
+				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestTextAnnounce(string.Format(StringTable.Get(STRING_CATEGORY.WAVE_MATCH, 5u), dispNameStr));
+			}
+			if (targetAnimator != null)
+			{
+				targetAnimator.SetInteger("Rate", 0);
+			}
 		}
 	}
 
 	protected override void UpdateParam()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
@@ -169,100 +196,120 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 		if (waveTarget == null || waveTarget.isDead || !waveTarget.get_gameObject().get_activeSelf())
 		{
 			OnDisable();
+			return;
+		}
+		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position());
+		screenZ = screenUIPosition.z;
+		screenUIPosition.z = 0f;
+		float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
+		Vector3 val = screenUIPosition;
+		bool flag = false;
+		float num2 = Screen.get_width();
+		float num3 = Screen.get_height();
+		if (screenUIPosition.x < screenSideOffset * num)
+		{
+			screenUIPosition.x = screenSideOffset * num;
+			flag = true;
+		}
+		else if (screenUIPosition.x > num2 - screenSideOffset * num)
+		{
+			screenUIPosition.x = num2 - screenSideOffset * num;
+			flag = true;
+		}
+		if (screenUIPosition.y < screenBottomOffset * num)
+		{
+			screenUIPosition.y = screenBottomOffset * num;
+			flag = true;
+		}
+		Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+		val2.y += offsetY;
+		Vector3 val3 = transform.get_position() - val2;
+		if (val3.get_sqrMagnitude() >= 2E-05f)
+		{
+			transform.set_position(val2);
+		}
+		if (flag)
+		{
+			SetActiveSafe(nearUI, active: false);
+			SetActiveSafe(farUI, active: true);
+			if (arrowTransform == null)
+			{
+				return;
+			}
+			Vector3 val4 = val - screenUIPosition;
+			if (val4 == Vector3.get_zero())
+			{
+				SetActiveSafe(arrowUI, active: false);
+				return;
+			}
+			float num4 = 90f - Vector3.Angle(Vector3.get_right(), val4);
+			arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num4));
+			SetActiveSafe(arrowUI, active: true);
 		}
 		else
 		{
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position());
-			screenZ = screenUIPosition.z;
-			screenUIPosition.z = 0f;
-			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
-			bool flag = false;
-			float num2 = (float)Screen.get_width();
-			float num3 = (float)Screen.get_height();
-			if (screenUIPosition.x < screenSideOffset * num)
-			{
-				screenUIPosition.x = screenSideOffset * num;
-				flag = true;
-			}
-			else if (screenUIPosition.x > num2 - screenSideOffset * num)
-			{
-				screenUIPosition.x = num2 - screenSideOffset * num;
-				flag = true;
-			}
-			if (screenUIPosition.y < screenBottomOffset * num)
-			{
-				screenUIPosition.y = screenBottomOffset * num;
-				flag = true;
-			}
-			Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-			val2.y += offsetY;
-			Vector3 val3 = transform.get_position() - val2;
-			if (val3.get_sqrMagnitude() >= 2E-05f)
-			{
-				transform.set_position(val2);
-			}
-			if (flag)
-			{
-				SetActiveSafe(nearUI, false);
-				SetActiveSafe(farUI, true);
-				if (arrowTransform == null)
-				{
-					return;
-				}
-				Vector3 val4 = val - screenUIPosition;
-				if (val4 == Vector3.get_zero())
-				{
-					SetActiveSafe(arrowUI, false);
-					return;
-				}
-				float num4 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-				arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num4));
-				SetActiveSafe(arrowUI, true);
-			}
-			else
-			{
-				SetActiveSafe(nearUI, true);
-				SetActiveSafe(farUI, false);
-				SetActiveSafe(arrowUI, false);
-			}
-			CheckHp();
+			SetActiveSafe(nearUI, active: true);
+			SetActiveSafe(farUI, active: false);
+			SetActiveSafe(arrowUI, active: false);
 		}
+		CheckHp();
 	}
 
 	private void CheckHp()
 	{
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		if (lastHp != (float)waveTarget.nowHp)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		if (lastHp == (float)waveTarget.nowHp)
 		{
-			lastHp = (float)waveTarget.nowHp;
-			float num = waveTarget.GetRate();
-			if (num < 0f)
+			return;
+		}
+		lastHp = waveTarget.nowHp;
+		float num = waveTarget.GetRate();
+		if (num < 0f)
+		{
+			num = 0f;
+		}
+		for (int i = 0; i < this.hpColorInfo.Length; i++)
+		{
+			HpColorInfo hpColorInfo = this.hpColorInfo[i];
+			if (!(num < hpColorInfo.rate))
 			{
-				num = 0f;
+				continue;
 			}
-			for (int i = 0; i < this.hpColorInfo.Length; i++)
+			if (gaugeSpr.color != hpColorInfo.color)
 			{
-				HpColorInfo hpColorInfo = this.hpColorInfo[i];
-				if (num < hpColorInfo.rate)
+				gaugeSpr.color = hpColorInfo.color;
+				if (num <= 0f)
 				{
-					gaugeSpr.color = hpColorInfo.color;
-					break;
+					MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestTextAnnounce(string.Format(StringTable.Get(STRING_CATEGORY.WAVE_MATCH, 5u), waveTarget.info.dispName));
+				}
+				else
+				{
+					MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestTextAnnounce(string.Format(StringTable.Get(STRING_CATEGORY.WAVE_MATCH, 4u), waveTarget.info.dispName, hpColorInfo.rate));
 				}
 			}
-			gaugeUI.SetPercent(num, true);
-			if (targetAnimator != null)
-			{
-				targetAnimator.SetInteger("Rate", (int)(num * 100f));
-			}
-			if (isFirst)
-			{
-				isFirst = false;
-			}
-			else
-			{
-				MonoBehaviourSingleton<MiniMap>.I.ShowAlert();
-			}
+			break;
+		}
+		gaugeUI.SetPercent(num);
+		int num2 = Mathf.CeilToInt(num * 100f);
+		if (targetAnimator != null)
+		{
+			targetAnimator.SetInteger("Rate", num2);
+		}
+		string iconName = _waveTarget.GetIconName(num2);
+		if (!iconName.IsNullOrWhiteSpace() && iconName != lastIconName)
+		{
+			lastIconName = iconName;
+			vitalSpr.spriteName = kIconPrefix + iconName;
+		}
+		if (isFirst)
+		{
+			isFirst = false;
+		}
+		else
+		{
+			MonoBehaviourSingleton<MiniMap>.I.ShowAlert();
 		}
 	}
 }

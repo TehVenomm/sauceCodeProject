@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,9 +25,9 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
 
     public void registerSubtypes(NamedType... namedTypeArr) {
         if (this._registeredSubtypes == null) {
-            this._registeredSubtypes = new LinkedHashSet();
+            this._registeredSubtypes = new LinkedHashSet<>();
         }
-        for (Object add : namedTypeArr) {
+        for (NamedType add : namedTypeArr) {
             this._registeredSubtypes.add(add);
         }
     }
@@ -41,27 +42,25 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
     }
 
     public Collection<NamedType> collectAndResolveSubtypesByClass(MapperConfig<?> mapperConfig, AnnotatedMember annotatedMember, JavaType javaType) {
-        Iterator it;
-        NamedType namedType;
         AnnotationIntrospector annotationIntrospector = mapperConfig.getAnnotationIntrospector();
-        Class rawType = javaType == null ? annotatedMember.getRawType() : javaType.getRawClass();
+        Class rawClass = javaType == null ? annotatedMember.getRawType() : javaType.getRawClass();
         HashMap hashMap = new HashMap();
         if (this._registeredSubtypes != null) {
-            it = this._registeredSubtypes.iterator();
+            Iterator it = this._registeredSubtypes.iterator();
             while (it.hasNext()) {
-                namedType = (NamedType) it.next();
-                if (rawType.isAssignableFrom(namedType.getType())) {
+                NamedType namedType = (NamedType) it.next();
+                if (rawClass.isAssignableFrom(namedType.getType())) {
                     _collectAndResolve(AnnotatedClass.constructWithoutSuperTypes(namedType.getType(), mapperConfig), namedType, mapperConfig, annotationIntrospector, hashMap);
                 }
             }
         }
-        Collection<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedMember);
+        List<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedMember);
         if (findSubtypes != null) {
             for (NamedType namedType2 : findSubtypes) {
                 _collectAndResolve(AnnotatedClass.constructWithoutSuperTypes(namedType2.getType(), mapperConfig), namedType2, mapperConfig, annotationIntrospector, hashMap);
             }
         }
-        _collectAndResolve(AnnotatedClass.constructWithoutSuperTypes(rawType, mapperConfig), new NamedType(rawType, null), mapperConfig, annotationIntrospector, hashMap);
+        _collectAndResolve(AnnotatedClass.constructWithoutSuperTypes(rawClass, mapperConfig), new NamedType(rawClass, null), mapperConfig, annotationIntrospector, hashMap);
         return new ArrayList(hashMap.values());
     }
 
@@ -83,24 +82,22 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
     }
 
     public Collection<NamedType> collectAndResolveSubtypesByTypeId(MapperConfig<?> mapperConfig, AnnotatedMember annotatedMember, JavaType javaType) {
-        Iterator it;
-        NamedType namedType;
         AnnotationIntrospector annotationIntrospector = mapperConfig.getAnnotationIntrospector();
-        Class rawType = javaType == null ? annotatedMember.getRawType() : javaType.getRawClass();
-        Set hashSet = new HashSet();
-        Map linkedHashMap = new LinkedHashMap();
-        _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(rawType, mapperConfig), new NamedType(rawType, null), mapperConfig, hashSet, linkedHashMap);
-        Collection<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedMember);
+        Class rawClass = javaType == null ? annotatedMember.getRawType() : javaType.getRawClass();
+        HashSet hashSet = new HashSet();
+        LinkedHashMap linkedHashMap = new LinkedHashMap();
+        _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(rawClass, mapperConfig), new NamedType(rawClass, null), mapperConfig, hashSet, linkedHashMap);
+        List<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedMember);
         if (findSubtypes != null) {
-            for (NamedType namedType2 : findSubtypes) {
-                _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(namedType2.getType(), mapperConfig), namedType2, mapperConfig, hashSet, linkedHashMap);
+            for (NamedType namedType : findSubtypes) {
+                _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(namedType.getType(), mapperConfig), namedType, mapperConfig, hashSet, linkedHashMap);
             }
         }
         if (this._registeredSubtypes != null) {
-            it = this._registeredSubtypes.iterator();
+            Iterator it = this._registeredSubtypes.iterator();
             while (it.hasNext()) {
-                namedType2 = (NamedType) it.next();
-                if (rawType.isAssignableFrom(namedType2.getType())) {
+                NamedType namedType2 = (NamedType) it.next();
+                if (rawClass.isAssignableFrom(namedType2.getType())) {
                     _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(namedType2.getType(), mapperConfig), namedType2, mapperConfig, hashSet, linkedHashMap);
                 }
             }
@@ -109,8 +106,8 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
     }
 
     public Collection<NamedType> collectAndResolveSubtypesByTypeId(MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass) {
-        Set hashSet = new HashSet();
-        Map linkedHashMap = new LinkedHashMap();
+        HashSet hashSet = new HashSet();
+        LinkedHashMap linkedHashMap = new LinkedHashMap();
         _collectAndResolveByTypeId(annotatedClass, new NamedType(annotatedClass.getRawType(), null), mapperConfig, hashSet, linkedHashMap);
         if (this._registeredSubtypes != null) {
             Class rawType = annotatedClass.getRawType();
@@ -135,7 +132,8 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
         return collectAndResolveSubtypesByClass(mapperConfig, annotatedClass);
     }
 
-    protected void _collectAndResolve(AnnotatedClass annotatedClass, NamedType namedType, MapperConfig<?> mapperConfig, AnnotationIntrospector annotationIntrospector, HashMap<NamedType, NamedType> hashMap) {
+    /* access modifiers changed from: protected */
+    public void _collectAndResolve(AnnotatedClass annotatedClass, NamedType namedType, MapperConfig<?> mapperConfig, AnnotationIntrospector annotationIntrospector, HashMap<NamedType, NamedType> hashMap) {
         if (!namedType.hasName()) {
             String findTypeName = annotationIntrospector.findTypeName(annotatedClass);
             if (findTypeName != null) {
@@ -144,7 +142,7 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
         }
         if (!hashMap.containsKey(namedType)) {
             hashMap.put(namedType, namedType);
-            Collection<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedClass);
+            List<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedClass);
             if (findSubtypes != null && !findSubtypes.isEmpty()) {
                 for (NamedType namedType2 : findSubtypes) {
                     _collectAndResolve(AnnotatedClass.constructWithoutSuperTypes(namedType2.getType(), mapperConfig), namedType2, mapperConfig, annotationIntrospector, hashMap);
@@ -155,7 +153,8 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
         }
     }
 
-    protected void _collectAndResolveByTypeId(AnnotatedClass annotatedClass, NamedType namedType, MapperConfig<?> mapperConfig, Set<Class<?>> set, Map<String, NamedType> map) {
+    /* access modifiers changed from: protected */
+    public void _collectAndResolveByTypeId(AnnotatedClass annotatedClass, NamedType namedType, MapperConfig<?> mapperConfig, Set<Class<?>> set, Map<String, NamedType> map) {
         AnnotationIntrospector annotationIntrospector = mapperConfig.getAnnotationIntrospector();
         if (!namedType.hasName()) {
             String findTypeName = annotationIntrospector.findTypeName(annotatedClass);
@@ -167,7 +166,7 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
             map.put(namedType.getName(), namedType);
         }
         if (set.add(namedType.getType())) {
-            Collection<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedClass);
+            List<NamedType> findSubtypes = annotationIntrospector.findSubtypes(annotatedClass);
             if (findSubtypes != null && !findSubtypes.isEmpty()) {
                 for (NamedType namedType2 : findSubtypes) {
                     _collectAndResolveByTypeId(AnnotatedClass.constructWithoutSuperTypes(namedType2.getType(), mapperConfig), namedType2, mapperConfig, set, map);
@@ -176,8 +175,9 @@ public class StdSubtypeResolver extends SubtypeResolver implements Serializable 
         }
     }
 
-    protected Collection<NamedType> _combineNamedAndUnnamed(Set<Class<?>> set, Map<String, NamedType> map) {
-        Collection arrayList = new ArrayList(map.values());
+    /* access modifiers changed from: protected */
+    public Collection<NamedType> _combineNamedAndUnnamed(Set<Class<?>> set, Map<String, NamedType> map) {
+        ArrayList arrayList = new ArrayList(map.values());
         for (NamedType type : map.values()) {
             set.remove(type.getType());
         }

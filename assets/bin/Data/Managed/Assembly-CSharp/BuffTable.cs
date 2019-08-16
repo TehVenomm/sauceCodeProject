@@ -1,9 +1,9 @@
+using System.Runtime.CompilerServices;
+
 public class BuffTable : Singleton<BuffTable>, IDataTable
 {
 	public class BuffData
 	{
-		public const string NT = "id,growId,type,valueType,value,duration,interval";
-
 		public uint id;
 
 		public uint growID;
@@ -17,6 +17,8 @@ public class BuffTable : Singleton<BuffTable>, IDataTable
 		public float duration;
 
 		public float interval;
+
+		public const string NT = "id,growId,type,valueType,value,duration,interval";
 
 		public static bool cb(CSVReader csv_reader, BuffData data, ref uint key)
 		{
@@ -33,9 +35,12 @@ public class BuffTable : Singleton<BuffTable>, IDataTable
 
 	private UIntKeyTable<BuffData> dataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<BuffData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string text)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<BuffData>(text, BuffData.cb, "id,growId,type,valueType,value,duration,interval", null);
+		dataTable = TableUtility.CreateUIntKeyTable<BuffData>(text, BuffData.cb, "id,growId,type,valueType,value,duration,interval");
 		dataTable.TrimExcess();
 	}
 

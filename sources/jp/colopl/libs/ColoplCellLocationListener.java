@@ -1,11 +1,13 @@
-package jp.colopl.libs;
+package p018jp.colopl.libs;
 
 import android.content.Context;
 import android.location.Location;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import com.facebook.places.model.PlaceFields;
 
+/* renamed from: jp.colopl.libs.ColoplCellLocationListener */
 public class ColoplCellLocationListener extends PhoneStateListener {
     public static final int ERROR_TYPE_FAIL_REFLECTION = 1;
     public static final int ERROR_TYPE_NO_ERROR = 0;
@@ -18,11 +20,11 @@ public class ColoplCellLocationListener extends PhoneStateListener {
     }
 
     public static void startListenCellLocationChange(Context context, ColoplCellLocationListener coloplCellLocationListener) {
-        ((TelephonyManager) context.getSystemService("phone")).listen(coloplCellLocationListener, 16);
+        ((TelephonyManager) context.getSystemService(PlaceFields.PHONE)).listen(coloplCellLocationListener, 16);
     }
 
     public static void stopListenCellLocationChange(Context context, ColoplCellLocationListener coloplCellLocationListener) {
-        ((TelephonyManager) context.getSystemService("phone")).listen(coloplCellLocationListener, 0);
+        ((TelephonyManager) context.getSystemService(PlaceFields.PHONE)).listen(coloplCellLocationListener, 0);
     }
 
     public int getErrorType() {

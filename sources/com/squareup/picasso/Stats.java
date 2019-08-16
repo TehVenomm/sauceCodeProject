@@ -31,9 +31,9 @@ class Stats {
     private static class StatsHandler extends Handler {
         private final Stats stats;
 
-        public StatsHandler(Looper looper, Stats stats) {
+        public StatsHandler(Looper looper, Stats stats2) {
             super(looper);
-            this.stats = stats;
+            this.stats = stats2;
         }
 
         public void handleMessage(final Message message) {
@@ -64,64 +64,76 @@ class Stats {
         }
     }
 
-    Stats(Cache cache) {
-        this.cache = cache;
+    Stats(Cache cache2) {
+        this.cache = cache2;
         this.statsThread.start();
         Utils.flushStackLocalLeaks(this.statsThread.getLooper());
         this.handler = new StatsHandler(this.statsThread.getLooper(), this);
     }
 
-    void dispatchBitmapDecoded(Bitmap bitmap) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchBitmapDecoded(Bitmap bitmap) {
         processBitmap(bitmap, 2);
     }
 
-    void dispatchBitmapTransformed(Bitmap bitmap) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchBitmapTransformed(Bitmap bitmap) {
         processBitmap(bitmap, 3);
     }
 
-    void dispatchDownloadFinished(long j) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchDownloadFinished(long j) {
         this.handler.sendMessage(this.handler.obtainMessage(4, Long.valueOf(j)));
     }
 
-    void dispatchCacheHit() {
+    /* access modifiers changed from: 0000 */
+    public void dispatchCacheHit() {
         this.handler.sendEmptyMessage(0);
     }
 
-    void dispatchCacheMiss() {
+    /* access modifiers changed from: 0000 */
+    public void dispatchCacheMiss() {
         this.handler.sendEmptyMessage(1);
     }
 
-    void shutdown() {
+    /* access modifiers changed from: 0000 */
+    public void shutdown() {
         this.statsThread.quit();
     }
 
-    void performCacheHit() {
+    /* access modifiers changed from: 0000 */
+    public void performCacheHit() {
         this.cacheHits++;
     }
 
-    void performCacheMiss() {
+    /* access modifiers changed from: 0000 */
+    public void performCacheMiss() {
         this.cacheMisses++;
     }
 
-    void performDownloadFinished(Long l) {
+    /* access modifiers changed from: 0000 */
+    public void performDownloadFinished(Long l) {
         this.downloadCount++;
         this.totalDownloadSize += l.longValue();
         this.averageDownloadSize = getAverage(this.downloadCount, this.totalDownloadSize);
     }
 
-    void performBitmapDecoded(long j) {
+    /* access modifiers changed from: 0000 */
+    public void performBitmapDecoded(long j) {
         this.originalBitmapCount++;
         this.totalOriginalBitmapSize += j;
         this.averageOriginalBitmapSize = getAverage(this.originalBitmapCount, this.totalOriginalBitmapSize);
     }
 
-    void performBitmapTransformed(long j) {
+    /* access modifiers changed from: 0000 */
+    public void performBitmapTransformed(long j) {
         this.transformedBitmapCount++;
         this.totalTransformedBitmapSize += j;
         this.averageTransformedBitmapSize = getAverage(this.originalBitmapCount, this.totalTransformedBitmapSize);
     }
 
-    StatsSnapshot createSnapshot() {
+    /* access modifiers changed from: 0000 */
+    public StatsSnapshot createSnapshot() {
         return new StatsSnapshot(this.cache.maxSize(), this.cache.size(), this.cacheHits, this.cacheMisses, this.totalDownloadSize, this.totalOriginalBitmapSize, this.totalTransformedBitmapSize, this.averageDownloadSize, this.averageOriginalBitmapSize, this.averageTransformedBitmapSize, this.downloadCount, this.originalBitmapCount, this.transformedBitmapCount, System.currentTimeMillis());
     }
 

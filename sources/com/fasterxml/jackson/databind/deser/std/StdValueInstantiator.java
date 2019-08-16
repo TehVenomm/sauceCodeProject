@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.databind.deser.std;
 
-import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -10,6 +9,7 @@ import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedWithParams;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -158,7 +158,7 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         try {
             return this._defaultCreator.call();
         } catch (Throwable th) {
-            JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+            throw rewrapCtorProblem(deserializationContext, th);
         }
     }
 
@@ -169,7 +169,7 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         try {
             return this._withArgsCreator.call(objArr);
         } catch (Throwable th) {
-            JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+            throw rewrapCtorProblem(deserializationContext, th);
         }
     }
 
@@ -191,7 +191,7 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         try {
             return this._fromStringCreator.call1(str);
         } catch (Throwable th) {
-            JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+            throw rewrapCtorProblem(deserializationContext, th);
         }
     }
 
@@ -205,7 +205,7 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
             }
             throw deserializationContext.mappingException("Can not instantiate value of type %s from Integral number (%s); no single-int-arg constructor/factory method", getValueTypeDesc(), Integer.valueOf(i));
         } catch (Throwable th) {
-            JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+            throw rewrapCtorProblem(deserializationContext, th);
         }
     }
 
@@ -216,7 +216,7 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         try {
             return this._fromLongCreator.call1(Long.valueOf(j));
         } catch (Throwable th) {
-            JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+            throw rewrapCtorProblem(deserializationContext, th);
         }
     }
 
@@ -227,7 +227,7 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         try {
             return this._fromDoubleCreator.call1(Double.valueOf(d));
         } catch (Throwable th) {
-            JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+            throw rewrapCtorProblem(deserializationContext, th);
         }
     }
 
@@ -238,7 +238,7 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         try {
             return this._fromBooleanCreator.call1(Boolean.valueOf(z));
         } catch (Throwable th) {
-            JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+            throw rewrapCtorProblem(deserializationContext, th);
         }
     }
 
@@ -262,17 +262,19 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         return this._incompleteParameter;
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JsonMappingException wrapException(Throwable th) {
+    public JsonMappingException wrapException(Throwable th) {
         for (Throwable th2 = th; th2 != null; th2 = th2.getCause()) {
             if (th2 instanceof JsonMappingException) {
                 return (JsonMappingException) th2;
             }
         }
-        return new JsonMappingException(null, "Instantiation of " + getValueTypeDesc() + " value failed: " + th.getMessage(), th);
+        return new JsonMappingException((Closeable) null, "Instantiation of " + getValueTypeDesc() + " value failed: " + th.getMessage(), th);
     }
 
-    protected JsonMappingException unwrapAndWrapException(DeserializationContext deserializationContext, Throwable th) {
+    /* access modifiers changed from: protected */
+    public JsonMappingException unwrapAndWrapException(DeserializationContext deserializationContext, Throwable th) {
         for (Throwable th2 = th; th2 != null; th2 = th2.getCause()) {
             if (th2 instanceof JsonMappingException) {
                 return (JsonMappingException) th2;
@@ -281,14 +283,16 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
         return JsonMappingException.from(deserializationContext.getParser(), String.format("Instantiation of %s value failed (%s): %s", new Object[]{getValueTypeDesc(), th.getClass().getName(), th.getMessage()}), th);
     }
 
-    protected JsonMappingException wrapAsJsonMappingException(DeserializationContext deserializationContext, Throwable th) {
+    /* access modifiers changed from: protected */
+    public JsonMappingException wrapAsJsonMappingException(DeserializationContext deserializationContext, Throwable th) {
         if (th instanceof JsonMappingException) {
             return (JsonMappingException) th;
         }
         return JsonMappingException.from(deserializationContext.getParser(), String.format("Instantiation of %s value failed (%s): %s", new Object[]{getValueTypeDesc(), th.getClass().getName(), th.getMessage()}), th);
     }
 
-    protected JsonMappingException rewrapCtorProblem(DeserializationContext deserializationContext, Throwable th) {
+    /* access modifiers changed from: protected */
+    public JsonMappingException rewrapCtorProblem(DeserializationContext deserializationContext, Throwable th) {
         if ((th instanceof ExceptionInInitializerError) || (th instanceof InvocationTargetException)) {
             Throwable cause = th.getCause();
             if (cause != null) {
@@ -305,17 +309,17 @@ public class StdValueInstantiator extends ValueInstantiator implements Serializa
             try {
                 return annotatedWithParams.call1(obj);
             } catch (Throwable th) {
-                JsonMappingException rewrapCtorProblem = rewrapCtorProblem(deserializationContext, th);
+                throw rewrapCtorProblem(deserializationContext, th);
             }
         } else {
             int length = settableBeanPropertyArr.length;
             Object[] objArr = new Object[length];
             for (int i = 0; i < length; i++) {
-                BeanProperty beanProperty = settableBeanPropertyArr[i];
-                if (beanProperty == null) {
+                SettableBeanProperty settableBeanProperty = settableBeanPropertyArr[i];
+                if (settableBeanProperty == null) {
                     objArr[i] = obj;
                 } else {
-                    objArr[i] = deserializationContext.findInjectableValue(beanProperty.getInjectableValueId(), beanProperty, null);
+                    objArr[i] = deserializationContext.findInjectableValue(settableBeanProperty.getInjectableValueId(), settableBeanProperty, null);
                 }
             }
             return annotatedWithParams.call(objArr);

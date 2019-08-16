@@ -115,20 +115,18 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 					{
 						return false;
 					}
+					break;
 				}
-				else
+				if (MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem((uint)param) == null)
 				{
-					if (MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem((uint)param) == null)
-					{
-						return false;
-					}
-					int num = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.FindIndex((ClearStatusQuest clear_data) => clear_data.questId == param && clear_data.questStatus >= 3);
-					if (num != -1)
-					{
-						return false;
-					}
+					return false;
 				}
-				break;
+				int num = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.FindIndex((ClearStatusQuest clear_data) => clear_data.questId == param && clear_data.questStatus >= 3);
+				if (num == -1)
+				{
+					break;
+				}
+				return false;
 			}
 			case NPC_MESSAGE_TYPE.DELIVERY_QUEST:
 			case NPC_MESSAGE_TYPE.NEW_DELIVERY_QUEST:
@@ -161,7 +159,7 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 						}
 					}
 				});
-				Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(false);
+				Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(do_sort: false);
 				Delivery delivery = null;
 				if (deliveryList.Length > 0 && param != 0)
 				{
@@ -177,23 +175,21 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 					{
 						return false;
 					}
+					break;
 				}
-				else
+				if (!find_clear_status)
 				{
-					if (find_clear_status)
+					if (param != 0)
 					{
-						return find_not_clear;
-					}
-					if (param == 0)
-					{
-						return deliveryList.Length > 0;
-					}
-					if (delivery == null)
-					{
+						if (delivery != null)
+						{
+							break;
+						}
 						return false;
 					}
+					return deliveryList.Length > 0;
 				}
-				break;
+				return find_not_clear;
 			}
 			case NPC_MESSAGE_TYPE.ATTACK_OVER:
 			case NPC_MESSAGE_TYPE.ATTACK_UNDER:
@@ -347,12 +343,12 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
 		sections = new List<Section>();
-		CSVReader cSVReader = new CSVReader(csv_text, "section,type,prm,priority,npcid,anim,posX,posY,posZ,rotX,rotY,rotZ,jp,voiceId", false);
+		CSVReader cSVReader = new CSVReader(csv_text, "section,type,prm,priority,npcid,anim,posX,posY,posZ,rotX,rotY,rotZ,jp,voiceId");
 		Section section = null;
 		while (cSVReader.NextLine())
 		{

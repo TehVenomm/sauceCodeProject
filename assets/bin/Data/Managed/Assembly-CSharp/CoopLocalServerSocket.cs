@@ -64,7 +64,7 @@ public class CoopLocalServerSocket
 		coop_Model_RegisterACK.ids.Add(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
 		coop_Model_RegisterACK.stgids.Add(1);
 		coop_Model_RegisterACK.stgidxs.Add(0);
-		coop_Model_RegisterACK.stghosts.Add(true);
+		coop_Model_RegisterACK.stghosts.Add(item: true);
 		return coop_Model_RegisterACK;
 	}
 
@@ -75,6 +75,10 @@ public class CoopLocalServerSocket
 			return null;
 		}
 		stage.StartEnemyPop();
+		if (QuestManager.IsValidInGameSeriesArena())
+		{
+			SendEnemyPopForSeriesArena(0);
+		}
 		SendRoomStageRequested();
 		return null;
 	}
@@ -100,7 +104,7 @@ public class CoopLocalServerSocket
 	{
 		Coop_Model_RoomStageRequested coop_Model_RoomStageRequested = new Coop_Model_RoomStageRequested();
 		coop_Model_RoomStageRequested.cid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
-		Send(coop_Model_RoomStageRequested, true);
+		Send(coop_Model_RoomStageRequested);
 	}
 
 	public void SendEnemyPop(CoopLocalServerEnemy enemy)
@@ -109,12 +113,22 @@ public class CoopLocalServerSocket
 		coop_Model_EnemyPop.sid = enemy.sid;
 		coop_Model_EnemyPop.ownerClientId = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
 		coop_Model_EnemyPop.popIndex = enemy.popIndex;
-		Send(coop_Model_EnemyPop, true);
+		Send(coop_Model_EnemyPop);
+	}
+
+	public void SendEnemyPopForSeriesArena(int index)
+	{
+		Coop_Model_EnemyPop coop_Model_EnemyPop = new Coop_Model_EnemyPop();
+		coop_Model_EnemyPop.sid = stage.GenerateEnemyUniqId();
+		coop_Model_EnemyPop.ownerClientId = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
+		coop_Model_EnemyPop.popIndex = index;
+		coop_Model_EnemyPop.seriesIdx = index;
+		Send(coop_Model_EnemyPop);
 	}
 
 	public void SendEnemyExtermination()
 	{
 		Coop_Model_EnemyExtermination model = new Coop_Model_EnemyExtermination();
-		Send(model, true);
+		Send(model);
 	}
 }

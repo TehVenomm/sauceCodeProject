@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class UIRenderQueueUpdater
+public class UIRenderQueueUpdater : MonoBehaviour
 {
 	private const float OFFSET_GLOBAL_Z = 0.5f;
 
@@ -20,11 +20,8 @@ public class UIRenderQueueUpdater
 
 	private void Awake()
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
@@ -42,7 +39,6 @@ public class UIRenderQueueUpdater
 
 	private void OnRender(Material mat)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (_renderer != null)
 		{
 			_renderer.get_material().set_renderQueue(mat.get_renderQueue());

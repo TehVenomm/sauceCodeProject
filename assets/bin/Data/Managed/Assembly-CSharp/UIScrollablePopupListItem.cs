@@ -1,4 +1,6 @@
-public class UIScrollablePopupListItem
+using UnityEngine;
+
+public class UIScrollablePopupListItem : MonoBehaviour
 {
 	private UIScrollablePopupList popupRoot;
 

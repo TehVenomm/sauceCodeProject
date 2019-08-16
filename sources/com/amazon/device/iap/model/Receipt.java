@@ -1,7 +1,7 @@
 package com.amazon.device.iap.model;
 
 import com.amazon.device.iap.internal.model.ReceiptBuilder;
-import com.amazon.device.iap.internal.util.C0243d;
+import com.amazon.device.iap.internal.util.C0408d;
 import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,10 +20,10 @@ public final class Receipt {
     private final String sku;
 
     public Receipt(ReceiptBuilder receiptBuilder) {
-        C0243d.m169a(receiptBuilder.getSku(), SKU);
-        C0243d.m169a(receiptBuilder.getProductType(), "productType");
+        C0408d.m164a((Object) receiptBuilder.getSku(), SKU);
+        C0408d.m164a((Object) receiptBuilder.getProductType(), "productType");
         if (ProductType.SUBSCRIPTION == receiptBuilder.getProductType()) {
-            C0243d.m169a(receiptBuilder.getPurchaseDate(), PURCHASE_DATE);
+            C0408d.m164a((Object) receiptBuilder.getPurchaseDate(), PURCHASE_DATE);
         }
         this.receiptId = receiptBuilder.getReceiptId();
         this.sku = receiptBuilder.getSku();
@@ -123,11 +123,11 @@ public final class Receipt {
     }
 
     public String toString() {
-        String str = null;
+        boolean z = false;
         try {
-            str = toJSON().toString(4);
+            return toJSON().toString(4);
         } catch (JSONException e) {
+            return z;
         }
-        return str;
     }
 }

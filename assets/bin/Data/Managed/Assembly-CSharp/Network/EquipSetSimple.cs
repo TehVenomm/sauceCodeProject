@@ -24,5 +24,9 @@ namespace Network
 		public string setName = string.Empty;
 
 		public int showHelm;
+
+		public AccessoryPlaceInfo acc = new AccessoryPlaceInfo();
+
+		public int order;
 	}
 }

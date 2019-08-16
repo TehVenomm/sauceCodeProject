@@ -1,15 +1,16 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
-import io.fabric.sdk.android.services.common.CurrentTimeProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p017io.fabric.sdk.android.services.common.CurrentTimeProvider;
 
+/* renamed from: io.fabric.sdk.android.services.settings.DefaultSettingsJsonTransform */
 class DefaultSettingsJsonTransform implements SettingsJsonTransform {
     DefaultSettingsJsonTransform() {
     }
 
     private AnalyticsSettingsData buildAnalyticsSessionDataFrom(JSONObject jSONObject) {
-        return new AnalyticsSettingsData(jSONObject.optString("url", SettingsJsonConstants.ANALYTICS_URL_DEFAULT), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_FLUSH_INTERVAL_SECS_KEY, SettingsJsonConstants.ANALYTICS_FLUSH_INTERVAL_SECS_DEFAULT), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_MAX_BYTE_SIZE_PER_FILE_KEY, 8000), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_MAX_FILE_COUNT_PER_SEND_KEY, 1), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_MAX_PENDING_SEND_FILE_COUNT_KEY, 100), jSONObject.optBoolean(SettingsJsonConstants.ANALYTICS_TRACK_CUSTOM_EVENTS_KEY, true), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_SAMPLING_RATE_KEY, 1));
+        return new AnalyticsSettingsData(jSONObject.optString("url", SettingsJsonConstants.ANALYTICS_URL_DEFAULT), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_FLUSH_INTERVAL_SECS_KEY, SettingsJsonConstants.ANALYTICS_FLUSH_INTERVAL_SECS_DEFAULT), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_MAX_BYTE_SIZE_PER_FILE_KEY, 8000), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_MAX_FILE_COUNT_PER_SEND_KEY, 1), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_MAX_PENDING_SEND_FILE_COUNT_KEY, 100), jSONObject.optBoolean(SettingsJsonConstants.ANALYTICS_FORWARD_TO_GOOGLE_ANALYTICS_KEY, false), jSONObject.optBoolean(SettingsJsonConstants.ANALYTICS_INCLUDE_PURCHASE_EVENTS_IN_FORWARDED_EVENTS_KEY, false), jSONObject.optBoolean(SettingsJsonConstants.ANALYTICS_TRACK_CUSTOM_EVENTS_KEY, true), jSONObject.optBoolean(SettingsJsonConstants.ANALYTICS_TRACK_PREDEFINED_EVENTS_KEY, true), jSONObject.optInt(SettingsJsonConstants.ANALYTICS_SAMPLING_RATE_KEY, 1), jSONObject.optBoolean(SettingsJsonConstants.ANALYTICS_FLUSH_ON_BACKGROUND_KEY, true));
     }
 
     private AppSettingsData buildAppDataFrom(JSONObject jSONObject) throws JSONException {
@@ -17,12 +18,13 @@ class DefaultSettingsJsonTransform implements SettingsJsonTransform {
         String string2 = jSONObject.getString("status");
         String string3 = jSONObject.getString("url");
         String string4 = jSONObject.getString(SettingsJsonConstants.APP_REPORTS_URL_KEY);
+        String string5 = jSONObject.getString(SettingsJsonConstants.APP_NDK_REPORTS_URL_KEY);
         boolean optBoolean = jSONObject.optBoolean(SettingsJsonConstants.APP_UPDATE_REQUIRED_KEY, false);
         AppIconSettingsData appIconSettingsData = null;
         if (jSONObject.has(SettingsJsonConstants.APP_ICON_KEY) && jSONObject.getJSONObject(SettingsJsonConstants.APP_ICON_KEY).has(SettingsJsonConstants.ICON_HASH_KEY)) {
             appIconSettingsData = buildIconDataFrom(jSONObject.getJSONObject(SettingsJsonConstants.APP_ICON_KEY));
         }
-        return new AppSettingsData(string, string2, string3, string4, optBoolean, appIconSettingsData);
+        return new AppSettingsData(string, string2, string3, string4, string5, optBoolean, appIconSettingsData);
     }
 
     private BetaSettingsData buildBetaSettingsDataFrom(JSONObject jSONObject) throws JSONException {
@@ -30,7 +32,7 @@ class DefaultSettingsJsonTransform implements SettingsJsonTransform {
     }
 
     private FeaturesSettingsData buildFeaturesSessionDataFrom(JSONObject jSONObject) {
-        return new FeaturesSettingsData(jSONObject.optBoolean(SettingsJsonConstants.FEATURES_PROMPT_ENABLED_KEY, false), jSONObject.optBoolean(SettingsJsonConstants.FEATURES_COLLECT_LOGGED_EXCEPTIONS_KEY, true), jSONObject.optBoolean(SettingsJsonConstants.FEATURES_COLLECT_REPORTS_KEY, true), jSONObject.optBoolean(SettingsJsonConstants.FEATURES_COLLECT_ANALYTICS_KEY, false));
+        return new FeaturesSettingsData(jSONObject.optBoolean(SettingsJsonConstants.FEATURES_PROMPT_ENABLED_KEY, false), jSONObject.optBoolean(SettingsJsonConstants.FEATURES_COLLECT_LOGGED_EXCEPTIONS_KEY, true), jSONObject.optBoolean(SettingsJsonConstants.FEATURES_COLLECT_REPORTS_KEY, true), jSONObject.optBoolean(SettingsJsonConstants.FEATURES_COLLECT_ANALYTICS_KEY, false), jSONObject.optBoolean(SettingsJsonConstants.FEATURES_FIREBASE_CRASHLYTICS_ENABLED_KEY, false));
     }
 
     private AppIconSettingsData buildIconDataFrom(JSONObject jSONObject) throws JSONException {
@@ -42,7 +44,7 @@ class DefaultSettingsJsonTransform implements SettingsJsonTransform {
     }
 
     private SessionSettingsData buildSessionDataFrom(JSONObject jSONObject) throws JSONException {
-        return new SessionSettingsData(jSONObject.optInt(SettingsJsonConstants.SETTINGS_LOG_BUFFER_SIZE_KEY, SettingsJsonConstants.SETTINGS_LOG_BUFFER_SIZE_DEFAULT), jSONObject.optInt(SettingsJsonConstants.SETTINGS_MAX_CHAINED_EXCEPTION_DEPTH_KEY, 8), jSONObject.optInt(SettingsJsonConstants.SETTINGS_MAX_CUSTOM_EXCEPTION_EVENTS_KEY, 64), jSONObject.optInt(SettingsJsonConstants.SETTINGS_MAX_CUSTOM_KEY_VALUE_PAIRS_KEY, 64), jSONObject.optInt(SettingsJsonConstants.SETTINGS_IDENTIFIER_MASK_KEY, 255), jSONObject.optBoolean(SettingsJsonConstants.SETTINGS_SEND_SESSION_WITHOUT_CRASH_KEY, false));
+        return new SessionSettingsData(jSONObject.optInt(SettingsJsonConstants.SETTINGS_LOG_BUFFER_SIZE_KEY, SettingsJsonConstants.SETTINGS_LOG_BUFFER_SIZE_DEFAULT), jSONObject.optInt(SettingsJsonConstants.SETTINGS_MAX_CHAINED_EXCEPTION_DEPTH_KEY, 8), jSONObject.optInt(SettingsJsonConstants.SETTINGS_MAX_CUSTOM_EXCEPTION_EVENTS_KEY, 64), jSONObject.optInt(SettingsJsonConstants.SETTINGS_MAX_CUSTOM_KEY_VALUE_PAIRS_KEY, 64), jSONObject.optInt(SettingsJsonConstants.SETTINGS_IDENTIFIER_MASK_KEY, 255), jSONObject.optBoolean(SettingsJsonConstants.SETTINGS_SEND_SESSION_WITHOUT_CRASH_KEY, false), jSONObject.optInt(SettingsJsonConstants.SETTINGS_MAX_COMPLETE_SESSIONS_COUNT_KEY, 4));
     }
 
     private long getExpiresAtFrom(CurrentTimeProvider currentTimeProvider, long j, JSONObject jSONObject) throws JSONException {
@@ -54,7 +56,7 @@ class DefaultSettingsJsonTransform implements SettingsJsonTransform {
     }
 
     private JSONObject toAppJson(AppSettingsData appSettingsData) throws JSONException {
-        JSONObject put = new JSONObject().put(SettingsJsonConstants.APP_IDENTIFIER_KEY, appSettingsData.identifier).put("status", appSettingsData.status).put("url", appSettingsData.url).put(SettingsJsonConstants.APP_REPORTS_URL_KEY, appSettingsData.reportsUrl).put(SettingsJsonConstants.APP_UPDATE_REQUIRED_KEY, appSettingsData.updateRequired);
+        JSONObject put = new JSONObject().put(SettingsJsonConstants.APP_IDENTIFIER_KEY, appSettingsData.identifier).put("status", appSettingsData.status).put("url", appSettingsData.url).put(SettingsJsonConstants.APP_REPORTS_URL_KEY, appSettingsData.reportsUrl).put(SettingsJsonConstants.APP_NDK_REPORTS_URL_KEY, appSettingsData.ndkReportsUrl).put(SettingsJsonConstants.APP_UPDATE_REQUIRED_KEY, appSettingsData.updateRequired);
         if (appSettingsData.icon != null) {
             put.put(SettingsJsonConstants.APP_ICON_KEY, toIconJson(appSettingsData.icon));
         }
@@ -85,13 +87,6 @@ class DefaultSettingsJsonTransform implements SettingsJsonTransform {
         int optInt = jSONObject.optInt(SettingsJsonConstants.SETTINGS_VERSION, 0);
         int optInt2 = jSONObject.optInt(SettingsJsonConstants.CACHE_DURATION_KEY, 3600);
         return new SettingsData(getExpiresAtFrom(currentTimeProvider, (long) optInt2, jSONObject), buildAppDataFrom(jSONObject.getJSONObject(SettingsJsonConstants.APP_KEY)), buildSessionDataFrom(jSONObject.getJSONObject(SettingsJsonConstants.SESSION_KEY)), buildPromptDataFrom(jSONObject.getJSONObject(SettingsJsonConstants.PROMPT_KEY)), buildFeaturesSessionDataFrom(jSONObject.getJSONObject(SettingsJsonConstants.FEATURES_KEY)), buildAnalyticsSessionDataFrom(jSONObject.getJSONObject(SettingsJsonConstants.ANALYTICS_KEY)), buildBetaSettingsDataFrom(jSONObject.getJSONObject("beta")), optInt, optInt2);
-    }
-
-    public JSONObject sanitizeTraceInfo(JSONObject jSONObject) throws JSONException {
-        JSONObject jSONObject2 = new JSONObject(jSONObject.toString());
-        jSONObject2.getJSONObject(SettingsJsonConstants.FEATURES_KEY).remove(SettingsJsonConstants.FEATURES_COLLECT_ANALYTICS_KEY);
-        jSONObject2.remove(SettingsJsonConstants.ANALYTICS_KEY);
-        return jSONObject2;
     }
 
     public JSONObject toJson(SettingsData settingsData) throws JSONException {

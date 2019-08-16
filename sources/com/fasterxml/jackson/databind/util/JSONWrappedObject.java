@@ -2,6 +2,7 @@ package com.fasterxml.jackson.databind.util;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonSerializable;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -15,7 +16,7 @@ public class JSONWrappedObject implements JsonSerializable {
     protected final Object _value;
 
     public JSONWrappedObject(String str, String str2, Object obj) {
-        this(str, str2, obj, (JavaType) null);
+        this(str, str2, obj, null);
     }
 
     public JSONWrappedObject(String str, String str2, Object obj, JavaType javaType) {
@@ -36,9 +37,9 @@ public class JSONWrappedObject implements JsonSerializable {
         if (this._value == null) {
             serializerProvider.defaultSerializeNull(jsonGenerator);
         } else if (this._serializationType != null) {
-            serializerProvider.findTypedValueSerializer(this._serializationType, true, null).serialize(this._value, jsonGenerator, serializerProvider);
+            serializerProvider.findTypedValueSerializer(this._serializationType, true, (BeanProperty) null).serialize(this._value, jsonGenerator, serializerProvider);
         } else {
-            serializerProvider.findTypedValueSerializer(this._value.getClass(), true, null).serialize(this._value, jsonGenerator, serializerProvider);
+            serializerProvider.findTypedValueSerializer(this._value.getClass(), true, (BeanProperty) null).serialize(this._value, jsonGenerator, serializerProvider);
         }
         if (this._suffix != null) {
             jsonGenerator.writeRaw(this._suffix);

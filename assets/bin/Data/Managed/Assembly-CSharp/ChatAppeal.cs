@@ -26,7 +26,7 @@ public class ChatAppeal : UIBehaviour
 	{
 		rootPosition = root;
 		isAdjustment = isAdjustmentPos;
-		SetActive((Enum)UI.OBJ_TWEEN_ROOT, true);
+		SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: true);
 		SetLabelText((Enum)UI.LBL_CHAT, text);
 		TweenScale component = GetCtrl(UI.OBJ_TWEEN_ROOT).GetComponent<TweenScale>();
 		component.SetOnFinished(OnFinish);
@@ -36,7 +36,7 @@ public class ChatAppeal : UIBehaviour
 
 	private void OnFinish()
 	{
-		SetActive((Enum)UI.OBJ_TWEEN_ROOT, false);
+		SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: false);
 		rootPosition = null;
 	}
 
@@ -66,11 +66,11 @@ public class ChatAppeal : UIBehaviour
 		{
 			val.z = 0f;
 			GetCtrl(UI.OBJ_TWEEN_ROOT).set_position(val);
-			SetActive((Enum)UI.OBJ_TWEEN_ROOT, true);
+			SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_TWEEN_ROOT, false);
+			SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: false);
 		}
 	}
 }

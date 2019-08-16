@@ -58,6 +58,8 @@ public class PacketTypeUtility
 			return typeof(Coop_Model_RoomTimeUpdate);
 		case PACKET_TYPE.EVENT_HAPPEN_QUEST:
 			return typeof(Coop_Model_EventHappenQuest);
+		case PACKET_TYPE.EVENT_HAPPEN_QUEST_STATUS:
+			return typeof(Coop_Model_EventHappenQuestStatus);
 		case PACKET_TYPE.CLIENT_STATUS:
 			return typeof(Coop_Model_ClientStatus);
 		case PACKET_TYPE.CLIENT_BECAME_HOST:
@@ -116,6 +118,10 @@ public class PacketTypeUtility
 			return typeof(Coop_Model_StageTimeup);
 		case PACKET_TYPE.STAGE_CHAT:
 			return typeof(Coop_Model_StageChat);
+		case PACKET_TYPE.STAGE_SYNC_TIME_REQUEST:
+			return typeof(Coop_Model_StageSyncTimeRequest);
+		case PACKET_TYPE.STAGE_SYNC_TIME:
+			return typeof(Coop_Model_StageSyncTime);
 		case PACKET_TYPE.OBJECT_DESTROY:
 			return typeof(Coop_Model_ObjectDestroy);
 		case PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER:
@@ -182,6 +188,8 @@ public class PacketTypeUtility
 			return typeof(Coop_Model_PlayerStunnedEnd);
 		case PACKET_TYPE.PLAYER_DEAD_COUNT:
 			return typeof(Coop_Model_PlayerDeadCount);
+		case PACKET_TYPE.PLAYER_DEAD_COUNT_REQUEST:
+			return typeof(Coop_Model_PlayerDeadCountRequest);
 		case PACKET_TYPE.PLAYER_DEAD_STANDUP:
 			return typeof(Coop_Model_PlayerDeadStandup);
 		case PACKET_TYPE.PLAYER_GATHER:
@@ -352,6 +360,8 @@ public class PacketTypeUtility
 			return typeof(Coop_Model_EnemyBossAliveRequest);
 		case PACKET_TYPE.ENEMY_BOSS_ALIVE_REQUESTED:
 			return typeof(Coop_Model_EnemyBossAliveRequested);
+		case PACKET_TYPE.ENEMY_FORCE_POP:
+			return typeof(Coop_Model_EnemyForcePop);
 		case PACKET_TYPE.PLAYER_SNATCH_POS:
 			return typeof(Coop_Model_PlayerSnatchPos);
 		case PACKET_TYPE.PLAYER_SNATCH_MOVE_START:
@@ -360,6 +370,12 @@ public class PacketTypeUtility
 			return typeof(Coop_Model_PlayerSnatchMoveEnd);
 		case PACKET_TYPE.WAVEMATCH_INFO:
 			return typeof(Coop_Model_WaveMatchInfo);
+		case PACKET_TYPE.WAVEMATCH_DROP:
+			return typeof(Coop_Model_WaveMatchDrop);
+		case PACKET_TYPE.WAVEMATCH_DROP_CREATE:
+			return typeof(Coop_Model_WaveMatchDropCreate);
+		case PACKET_TYPE.WAVEMATCH_DROP_PICKED:
+			return typeof(Coop_Model_WaveMatchDropPicked);
 		case PACKET_TYPE.PLAYER_PAIR_SWORDS_LASER_END:
 			return typeof(Coop_Model_PlayerPairSwordsLaserEnd);
 		case PACKET_TYPE.ENEMY_REGION_NODE_ACTIVATE:
@@ -370,6 +386,74 @@ public class PacketTypeUtility
 			return typeof(Coop_Model_ObjectBulletObservableSet);
 		case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_BROKEN:
 			return typeof(Coop_Model_ObjectBulletObservableBroken);
+		case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_SEARCH_TARGET:
+			return typeof(Coop_Model_ObjectBulletObservableSearchTarget);
+		case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_TURRETBIT_TARGET:
+			return typeof(Coop_Model_ObjectBulletObservableTurretBitTarget);
+		case PACKET_TYPE.PLAYER_SACRIFICED_HP:
+			return typeof(Coop_Model_PlayerSacrificedHp);
+		case PACKET_TYPE.STAGE_OBJECT_INFO:
+			return typeof(Coop_Model_StageObjectInfo);
+		case PACKET_TYPE.GATHER_GIMMICK_INFO:
+			return typeof(Coop_Model_GatherGimmickInfo);
+		case PACKET_TYPE.PLAYER_GATHER_GIMMICK:
+			return typeof(Coop_Model_PlayerGatherGimmick);
+		case PACKET_TYPE.PLAYER_GATHER_GIMMICK_STATE:
+			return typeof(Coop_Model_PlayerGatherGimmickState);
+		case PACKET_TYPE.PLAYER_SYNC_POSITION:
+			return typeof(Coop_Model_PlayerSyncPosition);
+		case PACKET_TYPE.OBJECT_SHOT_GIMMICK_GENERATOR:
+			return typeof(Coop_Model_ObjectShotGimmickGenerator);
+		case PACKET_TYPE.OBJECT_COOP_INFO:
+			return typeof(Coop_Model_ObjectCoopInfo);
+		case PACKET_TYPE.PLAYER_COOP_FISHING_GAUGE_INCREASE:
+			return typeof(Coop_Model_PlayerCoopFishingGaugeIncrease);
+		case PACKET_TYPE.PLAYER_COOP_FISHING_START:
+			return typeof(Coop_Model_PlayerCoopFishingStart);
+		case PACKET_TYPE.PLAYER_COOP_FISHING_GAUGE_SYNC:
+			return typeof(Coop_Model_PlayerCoopFishingGaugeSync);
+		case PACKET_TYPE.PLAYER_SHOT_RESURRECTION_HOMING:
+			return typeof(Coop_Model_PlayerShotResurrectionHoming);
+		case PACKET_TYPE.PLAYER_STONE_COUNT:
+			return typeof(Coop_Model_PlayerStoneCount);
+		case PACKET_TYPE.PLAYER_STONE_END:
+			return typeof(Coop_Model_PlayerStoneEnd);
+		case PACKET_TYPE.PLAYER_FLICK_ACTION:
+			return typeof(Coop_Model_PlayerFlickAction);
+		case PACKET_TYPE.PLAYER_SYNC_COMBINE:
+			return typeof(Coop_Model_PlayerSyncCombine);
+		case PACKET_TYPE.PLAYER_SYNC_SUBSTITUTE:
+			return typeof(Coop_Model_PlayerSyncSubstitute);
+		case PACKET_TYPE.PLAYER_WEAPON_ACTION_START:
+			return typeof(Coop_Model_PlayerWeaponActionStart);
+		case PACKET_TYPE.PLAYER_WEAPON_ACTION_END:
+			return typeof(Coop_Model_PlayerWeaponActionEnd);
+		case PACKET_TYPE.ENEMY_SUMMON_ATTACK:
+			return typeof(Coop_Model_EnemySummonAttack);
+		case PACKET_TYPE.PLAYER_SHOT_SHIELD_REFLECT:
+			return typeof(Coop_Model_PlayerShotShieldReflect);
+		case PACKET_TYPE.ENEMY_UPDATE_BOMBARROW:
+			return typeof(Coop_Model_EnemyUpdateBombArrow);
+		case PACKET_TYPE.PLAYER_RAIN_SHOT_CHARGE_RELEASE:
+			return typeof(Coop_Model_PlayerRainShotChargeRelease);
+		case PACKET_TYPE.PLAYER_ORACLE_HORIZONTAL_NEXT_MOTION:
+			return typeof(Coop_Model_PlayerOracleHorizontalNextMotion);
+		case PACKET_TYPE.PLAYER_CARRY:
+			return typeof(Coop_Model_PlayerCarry);
+		case PACKET_TYPE.PLAYER_CARRY_IDLE:
+			return typeof(Coop_Model_PlayerCarryIdle);
+		case PACKET_TYPE.PLAYER_CARRY_PUT:
+			return typeof(Coop_Model_PlayerCarryPut);
+		case PACKET_TYPE.ACTIVE_SUPPLY:
+			return typeof(Coop_Model_ActiveSupply);
+		case PACKET_TYPE.PLAYER_TELEPORT_AVOID:
+			return typeof(Coop_Model_PlayerTeleportAvoid);
+		case PACKET_TYPE.PLAYER_QUEST_GIMMICK:
+			return typeof(Coop_Model_PlayerQuestGimmick);
+		case PACKET_TYPE.PLAYER_ORACLE_SPEAR_STOCK:
+			return typeof(Coop_Model_PlayerOracleSpearStock);
+		case PACKET_TYPE.PLAYER_RUSH_AVOID:
+			return typeof(Coop_Model_PlayerRushAvoid);
 		default:
 			if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
 			{

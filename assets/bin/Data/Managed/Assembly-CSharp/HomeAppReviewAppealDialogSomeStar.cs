@@ -34,6 +34,6 @@ public class HomeAppReviewAppealDialogSomeStar : HomeAppReviewAppealDialogBase
 	protected override void OnQuery_NO()
 	{
 		int replyAction = 2;
-		SendInfo(replyAction, null);
+		SendInfo(replyAction);
 	}
 }

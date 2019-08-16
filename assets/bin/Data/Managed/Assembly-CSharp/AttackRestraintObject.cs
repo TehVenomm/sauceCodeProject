@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AttackRestraintObject
+public class AttackRestraintObject : MonoBehaviour
 {
 	public const string ANIM_STATE_LOOP = "LOOP";
 
@@ -26,6 +26,8 @@ public class AttackRestraintObject
 
 	private bool m_isDeleted;
 
+	private bool m_isDisableRemoveRestraintByAttack;
+
 	public TargetPoint BreakTargetPoint => m_targetPoint;
 
 	public bool IsValidFlickInput => m_isValidFlickInput;
@@ -37,53 +39,40 @@ public class AttackRestraintObject
 
 	private void Awake()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Expected O, but got Unknown
 		Utility.SetLayerWithChildren(this.get_transform(), 11);
 	}
 
 	public void Initialize(Player targetPlayer, RestraintInfo restInfo)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Expected O, but got Unknown
 		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Expected O, but got Unknown
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Expected O, but got Unknown
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Expected O, but got Unknown
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Expected O, but got Unknown
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform;
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+		Transform parent = (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform;
 		m_targetPlayer = targetPlayer;
 		Transform transform = targetPlayer._transform;
-		Transform val2 = this.get_transform();
-		val2.set_parent(val);
-		Transform effect = EffectManager.GetEffect(restInfo.effectName, val);
+		Transform transform2 = this.get_transform();
+		transform2.set_parent(parent);
+		Transform effect = EffectManager.GetEffect(restInfo.effectName, parent);
 		effect.set_position(transform.get_position());
 		effect.set_localScale(Vector3.get_one());
 		effect.set_localRotation(Quaternion.get_identity());
 		m_effectRestraint = effect.get_gameObject();
-		m_effectCenterTrans = effect.FindChild("Center");
-		SphereCollider val3 = this.get_gameObject().AddComponent<SphereCollider>();
-		val3.set_isTrigger(true);
-		val3.set_radius(restInfo.radius);
+		m_effectCenterTrans = effect.Find("Center");
+		SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
+		val.set_isTrigger(true);
+		val.set_radius(restInfo.radius);
 		m_isValidFlickInput = (restInfo.reduceTimeByFlick > 0f);
+		m_isDisableRemoveRestraintByAttack = restInfo.isDisableRemoveByPlayerAttack;
 		if (targetPlayer.objectType == StageObject.OBJECT_TYPE.SELF)
 		{
 			if (IsValidFlickInput)
@@ -98,7 +87,7 @@ public class AttackRestraintObject
 				}
 			}
 		}
-		else
+		else if (!m_isDisableRemoveRestraintByAttack)
 		{
 			TargetPoint targetPoint = this.get_gameObject().AddComponent<TargetPoint>();
 			targetPoint.markerZShift = 0f;
@@ -117,17 +106,16 @@ public class AttackRestraintObject
 
 	public void DeleteThis()
 	{
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		if (!m_isDeleted)
 		{
 			if (m_effectRestraint != null)
 			{
-				EffectManager.ReleaseEffect(m_effectRestraint, true, false);
+				EffectManager.ReleaseEffect(m_effectRestraint);
 				m_effectRestraint = null;
 			}
 			if (m_effectFlickWarning != null)
 			{
-				EffectManager.ReleaseEffect(m_effectFlickWarning, true, false);
+				EffectManager.ReleaseEffect(m_effectFlickWarning);
 				m_effectFlickWarning = null;
 			}
 			m_isDeleted = true;
@@ -142,8 +130,6 @@ public class AttackRestraintObject
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		if (m_targetPlayer == null)
 		{
 			DeleteThis();
@@ -159,27 +145,33 @@ public class AttackRestraintObject
 	{
 		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_effectRestraint == null) && IsValidFlickInput)
+		if (m_effectRestraint == null || !IsValidFlickInput)
 		{
-			Animator component = m_effectRestraint.GetComponent<Animator>();
-			if (!(component == null))
+			return;
+		}
+		Animator component = m_effectRestraint.GetComponent<Animator>();
+		if (component == null)
+		{
+			return;
+		}
+		int num = Animator.StringToHash("ACT");
+		if (component.HasState(0, num))
+		{
+			AnimatorStateInfo currentAnimatorStateInfo = component.GetCurrentAnimatorStateInfo(0);
+			if (currentAnimatorStateInfo.get_fullPathHash() != Animator.StringToHash("END"))
 			{
-				int num = Animator.StringToHash("ACT");
-				if (component.HasState(0, num))
-				{
-					AnimatorStateInfo currentAnimatorStateInfo = component.GetCurrentAnimatorStateInfo(0);
-					if (currentAnimatorStateInfo.get_fullPathHash() != Animator.StringToHash("END"))
-					{
-						component.Play(num, 0, 0f);
-						component.Update(0f);
-					}
-				}
+				component.Play(num, 0, 0f);
+				component.Update(0f);
 			}
 		}
 	}
 
 	private bool CheckValidAttack(GameObject hitObj)
 	{
+		if (m_isDisableRemoveRestraintByAttack)
+		{
+			return false;
+		}
 		if (object.ReferenceEquals(hitObj, null))
 		{
 			return false;
@@ -208,7 +200,6 @@ public class AttackRestraintObject
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_effectCenterTrans == null))
 		{

@@ -91,11 +91,11 @@ public final class ReadOnlyClassToSerializerMap {
     }
 
     public JsonSerializer<Object> typedValueSerializer(Class<?> cls) {
-        Bucket bucket = this._buckets[TypeKey.typedHash((Class) cls) & this._mask];
+        Bucket bucket = this._buckets[TypeKey.typedHash(cls) & this._mask];
         if (bucket == null) {
             return null;
         }
-        if (bucket.matchesTyped((Class) cls)) {
+        if (bucket.matchesTyped(cls)) {
             return bucket.value;
         }
         do {
@@ -103,7 +103,7 @@ public final class ReadOnlyClassToSerializerMap {
             if (bucket == null) {
                 return null;
             }
-        } while (!bucket.matchesTyped((Class) cls));
+        } while (!bucket.matchesTyped(cls));
         return bucket.value;
     }
 
@@ -125,11 +125,11 @@ public final class ReadOnlyClassToSerializerMap {
     }
 
     public JsonSerializer<Object> untypedValueSerializer(Class<?> cls) {
-        Bucket bucket = this._buckets[TypeKey.untypedHash((Class) cls) & this._mask];
+        Bucket bucket = this._buckets[TypeKey.untypedHash(cls) & this._mask];
         if (bucket == null) {
             return null;
         }
-        if (bucket.matchesUntyped((Class) cls)) {
+        if (bucket.matchesUntyped(cls)) {
             return bucket.value;
         }
         do {
@@ -137,7 +137,7 @@ public final class ReadOnlyClassToSerializerMap {
             if (bucket == null) {
                 return null;
             }
-        } while (!bucket.matchesUntyped((Class) cls));
+        } while (!bucket.matchesUntyped(cls));
         return bucket.value;
     }
 }

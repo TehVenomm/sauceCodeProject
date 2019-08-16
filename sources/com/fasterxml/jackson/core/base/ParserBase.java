@@ -8,14 +8,13 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.core.json.DupDetector;
 import com.fasterxml.jackson.core.json.JsonReadContext;
 import com.fasterxml.jackson.core.json.PackageVersion;
+import com.fasterxml.jackson.core.p015io.IOContext;
+import com.fasterxml.jackson.core.p015io.NumberInput;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.TextBuffer;
-import com.google.android.gms.nearby.messages.Strategy;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -74,11 +73,14 @@ public abstract class ParserBase extends ParserMinimalBase {
     protected int _tokenInputRow = 1;
     protected long _tokenInputTotal;
 
-    protected abstract void _closeInput() throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract void _closeInput() throws IOException;
 
-    protected abstract void _finishString() throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract void _finishString() throws IOException;
 
-    protected abstract boolean loadMore() throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract boolean loadMore() throws IOException;
 
     protected ParserBase(IOContext iOContext, int i) {
         super(i);
@@ -128,15 +130,16 @@ public abstract class ParserBase extends ParserMinimalBase {
     public JsonParser overrideStdFeatures(int i, int i2) {
         int i3 = this._features;
         int i4 = ((i2 ^ -1) & i3) | (i & i2);
-        i3 ^= i4;
-        if (i3 != 0) {
+        int i5 = i3 ^ i4;
+        if (i5 != 0) {
             this._features = i4;
-            _checkStdFeatureChanges(i4, i3);
+            _checkStdFeatureChanges(i4, i5);
         }
         return this;
     }
 
-    protected void _checkStdFeatureChanges(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void _checkStdFeatureChanges(int i, int i2) {
         int mask = Feature.STRICT_DUPLICATE_DETECTION.getMask();
         if ((i2 & mask) != 0 && (mask & i) != 0) {
             if (this._parsingContext.getDupDetector() == null) {
@@ -164,7 +167,7 @@ public abstract class ParserBase extends ParserMinimalBase {
         }
         try {
             jsonReadContext.setCurrentName(str);
-        } catch (Throwable e) {
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -235,13 +238,15 @@ public abstract class ParserBase extends ParserMinimalBase {
         return i < 0 ? i : i + 1;
     }
 
-    protected final void loadMoreGuaranteed() throws IOException {
+    /* access modifiers changed from: protected */
+    public final void loadMoreGuaranteed() throws IOException {
         if (!loadMore()) {
             _reportInvalidEOF();
         }
     }
 
-    protected void _releaseBuffers() throws IOException {
+    /* access modifiers changed from: protected */
+    public void _releaseBuffers() throws IOException {
         this._textBuffer.releaseBuffers();
         char[] cArr = this._nameCopyBuffer;
         if (cArr != null) {
@@ -250,18 +255,21 @@ public abstract class ParserBase extends ParserMinimalBase {
         }
     }
 
-    protected void _handleEOF() throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _handleEOF() throws JsonParseException {
         if (!this._parsingContext.inRoot()) {
             _reportInvalidEOF(": expected close marker for " + this._parsingContext.getTypeDesc() + " (from " + this._parsingContext.getStartLocation(this._ioContext.getSourceReference()) + ")");
         }
     }
 
-    protected final int _eofAsNextChar() throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public final int _eofAsNextChar() throws JsonParseException {
         _handleEOF();
         return -1;
     }
 
-    protected void _reportMismatchedEndMarker(int i, char c) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _reportMismatchedEndMarker(int i, char c) throws JsonParseException {
         _reportError("Unexpected close marker '" + ((char) i) + "': expected '" + c + "' (for " + this._parsingContext.getTypeDesc() + " starting at " + ("" + this._parsingContext.getStartLocation(this._ioContext.getSourceReference())) + ")");
     }
 
@@ -274,14 +282,16 @@ public abstract class ParserBase extends ParserMinimalBase {
         return this._byteArrayBuilder;
     }
 
-    protected final JsonToken reset(boolean z, int i, int i2, int i3) {
+    /* access modifiers changed from: protected */
+    public final JsonToken reset(boolean z, int i, int i2, int i3) {
         if (i2 >= 1 || i3 >= 1) {
             return resetFloat(z, i, i2, i3);
         }
         return resetInt(z, i);
     }
 
-    protected final JsonToken resetInt(boolean z, int i) {
+    /* access modifiers changed from: protected */
+    public final JsonToken resetInt(boolean z, int i) {
         this._numberNegative = z;
         this._intLength = i;
         this._fractLength = 0;
@@ -290,7 +300,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         return JsonToken.VALUE_NUMBER_INT;
     }
 
-    protected final JsonToken resetFloat(boolean z, int i, int i2, int i3) {
+    /* access modifiers changed from: protected */
+    public final JsonToken resetFloat(boolean z, int i, int i2, int i3) {
         this._numberNegative = z;
         this._intLength = i;
         this._fractLength = i2;
@@ -299,7 +310,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         return JsonToken.VALUE_NUMBER_FLOAT;
     }
 
-    protected final JsonToken resetAsNaN(String str, double d) {
+    /* access modifiers changed from: protected */
+    public final JsonToken resetAsNaN(String str, double d) {
         this._textBuffer.resetWithString(str);
         this._numberDouble = d;
         this._numTypesValid = 8;
@@ -414,7 +426,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         return this._numberBigDecimal;
     }
 
-    protected void _parseNumericValue(int i) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _parseNumericValue(int i) throws IOException {
         if (this._currToken == JsonToken.VALUE_NUMBER_INT) {
             char[] textBuffer = this._textBuffer.getTextBuffer();
             int textOffset = this._textBuffer.getTextOffset();
@@ -423,11 +436,11 @@ public abstract class ParserBase extends ParserMinimalBase {
                 textOffset++;
             }
             if (i2 <= 9) {
-                textOffset = NumberInput.parseInt(textBuffer, textOffset, i2);
+                int parseInt = NumberInput.parseInt(textBuffer, textOffset, i2);
                 if (this._numberNegative) {
-                    textOffset = -textOffset;
+                    parseInt = -parseInt;
                 }
-                this._numberInt = textOffset;
+                this._numberInt = parseInt;
                 this._numTypesValid = 1;
             } else if (i2 <= 18) {
                 long parseLong = NumberInput.parseLong(textBuffer, textOffset, i2);
@@ -459,7 +472,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         }
     }
 
-    protected int _parseIntValue() throws IOException {
+    /* access modifiers changed from: protected */
+    public int _parseIntValue() throws IOException {
         if (this._currToken == JsonToken.VALUE_NUMBER_INT) {
             char[] textBuffer = this._textBuffer.getTextBuffer();
             int textOffset = this._textBuffer.getTextOffset();
@@ -468,13 +482,13 @@ public abstract class ParserBase extends ParserMinimalBase {
                 textOffset++;
             }
             if (i <= 9) {
-                textOffset = NumberInput.parseInt(textBuffer, textOffset, i);
+                int parseInt = NumberInput.parseInt(textBuffer, textOffset, i);
                 if (this._numberNegative) {
-                    textOffset = -textOffset;
+                    parseInt = -parseInt;
                 }
-                this._numberInt = textOffset;
+                this._numberInt = parseInt;
                 this._numTypesValid = 1;
-                return textOffset;
+                return parseInt;
             }
         }
         _parseNumericValue(1);
@@ -489,14 +503,13 @@ public abstract class ParserBase extends ParserMinimalBase {
             try {
                 this._numberBigDecimal = this._textBuffer.contentsAsDecimal();
                 this._numTypesValid = 16;
-                return;
-            } catch (Throwable e) {
+            } catch (NumberFormatException e) {
                 _wrapError("Malformed numeric value '" + this._textBuffer.contentsAsString() + "'", e);
-                return;
             }
+        } else {
+            this._numberDouble = this._textBuffer.contentsAsDouble();
+            this._numTypesValid = 8;
         }
-        this._numberDouble = this._textBuffer.contentsAsDouble();
-        this._numTypesValid = 8;
     }
 
     private void _parseSlowInt(int i, char[] cArr, int i2, int i3) throws IOException {
@@ -509,12 +522,13 @@ public abstract class ParserBase extends ParserMinimalBase {
             }
             this._numberBigInt = new BigInteger(contentsAsString);
             this._numTypesValid = 4;
-        } catch (Throwable e) {
+        } catch (NumberFormatException e) {
             _wrapError("Malformed numeric value '" + contentsAsString + "'", e);
         }
     }
 
-    protected void convertNumberToInt() throws IOException {
+    /* access modifiers changed from: protected */
+    public void convertNumberToInt() throws IOException {
         if ((this._numTypesValid & 2) != 0) {
             int i = (int) this._numberLong;
             if (((long) i) != this._numberLong) {
@@ -542,7 +556,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         this._numTypesValid |= 1;
     }
 
-    protected void convertNumberToLong() throws IOException {
+    /* access modifiers changed from: protected */
+    public void convertNumberToLong() throws IOException {
         if ((this._numTypesValid & 1) != 0) {
             this._numberLong = (long) this._numberInt;
         } else if ((this._numTypesValid & 4) != 0) {
@@ -566,7 +581,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         this._numTypesValid |= 2;
     }
 
-    protected void convertNumberToBigInteger() throws IOException {
+    /* access modifiers changed from: protected */
+    public void convertNumberToBigInteger() throws IOException {
         if ((this._numTypesValid & 16) != 0) {
             this._numberBigInt = this._numberBigDecimal.toBigInteger();
         } else if ((this._numTypesValid & 2) != 0) {
@@ -581,7 +597,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         this._numTypesValid |= 4;
     }
 
-    protected void convertNumberToDouble() throws IOException {
+    /* access modifiers changed from: protected */
+    public void convertNumberToDouble() throws IOException {
         if ((this._numTypesValid & 16) != 0) {
             this._numberDouble = this._numberBigDecimal.doubleValue();
         } else if ((this._numTypesValid & 4) != 0) {
@@ -596,7 +613,8 @@ public abstract class ParserBase extends ParserMinimalBase {
         this._numTypesValid |= 8;
     }
 
-    protected void convertNumberToBigDecimal() throws IOException {
+    /* access modifiers changed from: protected */
+    public void convertNumberToBigDecimal() throws IOException {
         if ((this._numTypesValid & 8) != 0) {
             this._numberBigDecimal = NumberInput.parseBigDecimal(getText());
         } else if ((this._numTypesValid & 4) != 0) {
@@ -611,46 +629,53 @@ public abstract class ParserBase extends ParserMinimalBase {
         this._numTypesValid |= 16;
     }
 
-    protected void reportUnexpectedNumberChar(int i, String str) throws JsonParseException {
-        String str2 = "Unexpected character (" + ParserMinimalBase._getCharDesc(i) + ") in numeric value";
+    /* access modifiers changed from: protected */
+    public void reportUnexpectedNumberChar(int i, String str) throws JsonParseException {
+        String str2 = "Unexpected character (" + _getCharDesc(i) + ") in numeric value";
         if (str != null) {
             str2 = str2 + ": " + str;
         }
         _reportError(str2);
     }
 
-    protected void reportInvalidNumber(String str) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void reportInvalidNumber(String str) throws JsonParseException {
         _reportError("Invalid numeric value: " + str);
     }
 
-    protected void reportOverflowInt() throws IOException {
-        _reportError("Numeric value (" + getText() + ") out of range of int (" + Integer.MIN_VALUE + " - " + Strategy.TTL_SECONDS_INFINITE + ")");
+    /* access modifiers changed from: protected */
+    public void reportOverflowInt() throws IOException {
+        _reportError("Numeric value (" + getText() + ") out of range of int (" + Integer.MIN_VALUE + " - " + Integer.MAX_VALUE + ")");
     }
 
-    protected void reportOverflowLong() throws IOException {
+    /* access modifiers changed from: protected */
+    public void reportOverflowLong() throws IOException {
         _reportError("Numeric value (" + getText() + ") out of range of long (" + Long.MIN_VALUE + " - " + Long.MAX_VALUE + ")");
     }
 
-    protected char _decodeEscaped() throws IOException {
+    /* access modifiers changed from: protected */
+    public char _decodeEscaped() throws IOException {
         throw new UnsupportedOperationException();
     }
 
-    protected final int _decodeBase64Escape(Base64Variant base64Variant, int i, int i2) throws IOException {
+    /* access modifiers changed from: protected */
+    public final int _decodeBase64Escape(Base64Variant base64Variant, int i, int i2) throws IOException {
         if (i != 92) {
             throw reportInvalidBase64Char(base64Variant, i, i2);
         }
-        int _decodeEscaped = _decodeEscaped();
+        char _decodeEscaped = _decodeEscaped();
         if (_decodeEscaped <= ' ' && i2 == 0) {
             return -1;
         }
-        int decodeBase64Char = base64Variant.decodeBase64Char(_decodeEscaped);
+        int decodeBase64Char = base64Variant.decodeBase64Char((int) _decodeEscaped);
         if (decodeBase64Char >= 0) {
             return decodeBase64Char;
         }
         throw reportInvalidBase64Char(base64Variant, _decodeEscaped, i2);
     }
 
-    protected final int _decodeBase64Escape(Base64Variant base64Variant, char c, int i) throws IOException {
+    /* access modifiers changed from: protected */
+    public final int _decodeBase64Escape(Base64Variant base64Variant, char c, int i) throws IOException {
         if (c != '\\') {
             throw reportInvalidBase64Char(base64Variant, c, i);
         }
@@ -665,11 +690,13 @@ public abstract class ParserBase extends ParserMinimalBase {
         throw reportInvalidBase64Char(base64Variant, _decodeEscaped, i);
     }
 
-    protected IllegalArgumentException reportInvalidBase64Char(Base64Variant base64Variant, int i, int i2) throws IllegalArgumentException {
+    /* access modifiers changed from: protected */
+    public IllegalArgumentException reportInvalidBase64Char(Base64Variant base64Variant, int i, int i2) throws IllegalArgumentException {
         return reportInvalidBase64Char(base64Variant, i, i2, null);
     }
 
-    protected IllegalArgumentException reportInvalidBase64Char(Base64Variant base64Variant, int i, int i2, String str) throws IllegalArgumentException {
+    /* access modifiers changed from: protected */
+    public IllegalArgumentException reportInvalidBase64Char(Base64Variant base64Variant, int i, int i2, String str) throws IllegalArgumentException {
         String str2;
         if (i <= 32) {
             str2 = "Illegal white space character (code 0x" + Integer.toHexString(i) + ") as character #" + (i2 + 1) + " of 4-char base64 unit: can only used between units";

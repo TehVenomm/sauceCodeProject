@@ -24,7 +24,7 @@ public class ShopItemSelect : GameSection
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetTable(UI.TBL_LIST, "ShopItemListItem", MonoBehaviourSingleton<ShopManager>.I.shopData.lineups.Count, false, delegate(int i, Transform t, bool b)
+		SetTable(UI.TBL_LIST, "ShopItemListItem", MonoBehaviourSingleton<ShopManager>.I.shopData.lineups.Count, reset: false, delegate(int i, Transform t, bool b)
 		{
 			ShopList.ShopLineup shopLineup = MonoBehaviourSingleton<ShopManager>.I.shopData.lineups[i];
 			SetLabelText(t, UI.LBL_NAME, shopLineup.name);
@@ -32,10 +32,10 @@ public class ShopItemSelect : GameSection
 			SetLabelText(t, UI.LBL_CRYSTAL_NUM, shopLineup.crystalNum.ToString());
 			SetEvent(t, "SELECT", shopLineup.shopLineupId);
 			uint itemId = (uint)shopLineup.itemIds[0];
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, itemId, FindCtrl(t, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, itemId, FindCtrl(t, UI.OBJ_ICON_ROOT));
 			if (itemIcon != null)
 			{
-				itemIcon.SetEnableCollider(false);
+				itemIcon.SetEnableCollider(is_enable: false);
 			}
 		});
 	}
@@ -75,14 +75,14 @@ public class ShopItemSelect : GameSection
 			{
 			case Error.None:
 				selectEventData[6] = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 				break;
 			case Error.ERR_CRYSTAL_NOT_ENOUGH:
-				GameSection.ChangeStayEvent("NOT_ENOUGTH", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ChangeStayEvent("NOT_ENOUGTH");
+				GameSection.ResumeEvent(is_resume: true);
 				break;
 			default:
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 				break;
 			}
 		});

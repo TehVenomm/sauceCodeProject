@@ -19,7 +19,7 @@ public class FieldSonarObject : FieldGimmickObject
 
 	private bool acting;
 
-	public void UpdateTargetMarker(bool isNear)
+	public override void UpdateTargetMarker(bool isNear)
 	{
 		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
@@ -37,10 +37,8 @@ public class FieldSonarObject : FieldGimmickObject
 		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Expected O, but got Unknown
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)33))
+		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)35))
 		{
 			string sonarTargetEffect = ResourceName.GetSonarTargetEffect();
 			if (targetMarker == null && !string.IsNullOrEmpty(sonarTargetEffect))
@@ -59,7 +57,7 @@ public class FieldSonarObject : FieldGimmickObject
 		}
 		else if (targetMarker != null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(targetMarker.get_gameObject());
 		}
 	}
 
@@ -78,7 +76,6 @@ public class FieldSonarObject : FieldGimmickObject
 
 	public void StartSonar()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		if (IsValidSonar())
 		{
 			this.StartCoroutine(ActSonar());
@@ -87,10 +84,6 @@ public class FieldSonarObject : FieldGimmickObject
 
 	public override void RequestDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		if (sonarEffect != null)
 		{
 			if (sonarEffect.get_gameObject() != null)
@@ -117,10 +110,6 @@ public class FieldSonarObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		_transform = this.get_transform();
 		Utility.SetLayerWithChildren(this.get_transform(), 19);
 	}
@@ -137,7 +126,7 @@ public class FieldSonarObject : FieldGimmickObject
 		yield return (object)new WaitForSeconds(0.9f);
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldSonarObject.OnTriggerEnter", this.get_gameObject(), "EXPLOREMAP", ExploreMap.OPEN_MAP_TYPE.SONAR, null, true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldSonarObject.OnTriggerEnter", this.get_gameObject(), "EXPLOREMAP", ExploreMap.OPEN_MAP_TYPE.SONAR);
 		}
 		acting = false;
 	}

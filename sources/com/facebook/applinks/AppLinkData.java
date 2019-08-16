@@ -5,9 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.support.p000v4.app.NotificationCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
@@ -16,10 +15,10 @@ import com.facebook.internal.AttributionIdentifiers;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
 import java.util.Iterator;
-import jp.colopl.drapro.LocalNotificationAlarmReceiver;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p018jp.colopl.drapro.LocalNotificationAlarmReceiver;
 
 public class AppLinkData {
     private static final String APPLINK_BRIDGE_ARGS_KEY = "bridge_args";
@@ -93,9 +92,9 @@ public class AppLinkData {
         if (bundle != null) {
             appLinkData.ref = bundle.getString(REFERER_DATA_REF_KEY);
         }
-        bundle = bundleExtra.getBundle(ARGUMENTS_EXTRAS_KEY);
-        if (bundle != null) {
-            String string2 = bundle.getString("deeplink_context");
+        Bundle bundle2 = bundleExtra.getBundle(ARGUMENTS_EXTRAS_KEY);
+        if (bundle2 != null) {
+            String string2 = bundle2.getString("deeplink_context");
             if (string2 != null) {
                 try {
                     JSONObject jSONObject = new JSONObject(string2);
@@ -103,8 +102,8 @@ public class AppLinkData {
                         appLinkData.promotionCode = jSONObject.getString("promo_code");
                         return appLinkData;
                     }
-                } catch (Throwable e) {
-                    Log.d(TAG, "Unable to parse deeplink_context JSON", e);
+                } catch (JSONException e) {
+                    Utility.logd(TAG, "Unable to parse deeplink_context JSON", e);
                     return appLinkData;
                 }
             }
@@ -119,7 +118,7 @@ public class AppLinkData {
         try {
             JSONObject jSONObject = new JSONObject(str);
             String string = jSONObject.getString("version");
-            if (!jSONObject.getJSONObject("bridge_args").getString(BRIDGE_ARGS_METHOD_KEY).equals("applink") || !string.equals("2")) {
+            if (!jSONObject.getJSONObject("bridge_args").getString("method").equals("applink") || !string.equals("2")) {
                 return null;
             }
             AppLinkData appLinkData = new AppLinkData();
@@ -127,30 +126,30 @@ public class AppLinkData {
             if (appLinkData.arguments.has(METHOD_ARGS_REF_KEY)) {
                 appLinkData.ref = appLinkData.arguments.getString(METHOD_ARGS_REF_KEY);
             } else if (appLinkData.arguments.has(ARGUMENTS_REFERER_DATA_KEY)) {
-                jSONObject = appLinkData.arguments.getJSONObject(ARGUMENTS_REFERER_DATA_KEY);
-                if (jSONObject.has(REFERER_DATA_REF_KEY)) {
-                    appLinkData.ref = jSONObject.getString(REFERER_DATA_REF_KEY);
+                JSONObject jSONObject2 = appLinkData.arguments.getJSONObject(ARGUMENTS_REFERER_DATA_KEY);
+                if (jSONObject2.has(REFERER_DATA_REF_KEY)) {
+                    appLinkData.ref = jSONObject2.getString(REFERER_DATA_REF_KEY);
                 }
             }
             if (appLinkData.arguments.has(METHOD_ARGS_TARGET_URL_KEY)) {
                 appLinkData.targetUri = Uri.parse(appLinkData.arguments.getString(METHOD_ARGS_TARGET_URL_KEY));
             }
             if (appLinkData.arguments.has(ARGUMENTS_EXTRAS_KEY)) {
-                jSONObject = appLinkData.arguments.getJSONObject(ARGUMENTS_EXTRAS_KEY);
-                if (jSONObject.has("deeplink_context")) {
-                    jSONObject = jSONObject.getJSONObject("deeplink_context");
-                    if (jSONObject.has("promo_code")) {
-                        appLinkData.promotionCode = jSONObject.getString("promo_code");
+                JSONObject jSONObject3 = appLinkData.arguments.getJSONObject(ARGUMENTS_EXTRAS_KEY);
+                if (jSONObject3.has("deeplink_context")) {
+                    JSONObject jSONObject4 = jSONObject3.getJSONObject("deeplink_context");
+                    if (jSONObject4.has("promo_code")) {
+                        appLinkData.promotionCode = jSONObject4.getString("promo_code");
                     }
                 }
             }
             appLinkData.argumentBundle = toBundle(appLinkData.arguments);
             return appLinkData;
-        } catch (Throwable e) {
-            Log.d(TAG, "Unable to parse AppLink JSON", e);
+        } catch (JSONException e) {
+            Utility.logd(TAG, "Unable to parse AppLink JSON", e);
             return null;
-        } catch (Throwable e2) {
-            Log.d(TAG, "Unable to parse AppLink JSON", e2);
+        } catch (FacebookException e2) {
+            Utility.logd(TAG, "Unable to parse AppLink JSON", e2);
             return null;
         }
     }
@@ -168,7 +167,7 @@ public class AppLinkData {
         fetchDeferredAppLinkData(context, null, completionHandler);
     }
 
-    public static void fetchDeferredAppLinkData(Context context, String str, final CompletionHandler completionHandler) {
+    public static void fetchDeferredAppLinkData(Context context, final String str, final CompletionHandler completionHandler) {
         Validate.notNull(context, "context");
         Validate.notNull(completionHandler, "completionHandler");
         if (str == null) {
@@ -183,20 +182,22 @@ public class AppLinkData {
         });
     }
 
-    private static void fetchDeferredAppLinkFromServer(Context context, String str, CompletionHandler completionHandler) {
+    /* access modifiers changed from: private */
+    public static void fetchDeferredAppLinkFromServer(Context context, String str, CompletionHandler completionHandler) {
         AppLinkData appLinkData = null;
         JSONObject jSONObject = new JSONObject();
         try {
-            jSONObject.put("event", DEFERRED_APP_LINK_EVENT);
+            jSONObject.put(NotificationCompat.CATEGORY_EVENT, DEFERRED_APP_LINK_EVENT);
             Utility.setAppEventAttributionParameters(jSONObject, AttributionIdentifiers.getAttributionIdentifiers(context), AppEventsLogger.getAnonymousAppDeviceGUID(context), FacebookSdk.getLimitEventAndDataUsage(context));
+            Utility.setAppEventExtendedDeviceInfoParameters(jSONObject, FacebookSdk.getApplicationContext());
             jSONObject.put("application_package_name", context.getPackageName());
             try {
-                jSONObject = GraphRequest.newPostRequest(null, String.format(DEFERRED_APP_LINK_PATH, new Object[]{str}), jSONObject, null).executeAndWait().getJSONObject();
-                if (jSONObject != null) {
-                    Object optString = jSONObject.optString(DEFERRED_APP_LINK_ARGS_FIELD);
-                    long optLong = jSONObject.optLong(DEFERRED_APP_LINK_CLICK_TIME_FIELD, -1);
-                    String optString2 = jSONObject.optString(DEFERRED_APP_LINK_CLASS_FIELD);
-                    String optString3 = jSONObject.optString(DEFERRED_APP_LINK_URL_FIELD);
+                JSONObject jSONObject2 = GraphRequest.newPostRequest(null, String.format(DEFERRED_APP_LINK_PATH, new Object[]{str}), jSONObject, null).executeAndWait().getJSONObject();
+                if (jSONObject2 != null) {
+                    String optString = jSONObject2.optString(DEFERRED_APP_LINK_ARGS_FIELD);
+                    long optLong = jSONObject2.optLong(DEFERRED_APP_LINK_CLICK_TIME_FIELD, -1);
+                    String optString2 = jSONObject2.optString(DEFERRED_APP_LINK_CLASS_FIELD);
+                    String optString3 = jSONObject2.optString(DEFERRED_APP_LINK_URL_FIELD);
                     if (!TextUtils.isEmpty(optString)) {
                         appLinkData = createFromJson(optString);
                         if (optLong != -1) {
@@ -208,7 +209,7 @@ public class AppLinkData {
                                     appLinkData.argumentBundle.putString(ARGUMENTS_TAPTIME_KEY, Long.toString(optLong));
                                 }
                             } catch (JSONException e) {
-                                Log.d(TAG, "Unable to put tap time in AppLinkData.arguments");
+                                Utility.logd(TAG, "Unable to put tap time in AppLinkData.arguments");
                             }
                         }
                         if (optString2 != null) {
@@ -220,7 +221,7 @@ public class AppLinkData {
                                     appLinkData.argumentBundle.putString(ARGUMENTS_NATIVE_CLASS_KEY, optString2);
                                 }
                             } catch (JSONException e2) {
-                                Log.d(TAG, "Unable to put tap time in AppLinkData.arguments");
+                                Utility.logd(TAG, "Unable to put tap time in AppLinkData.arguments");
                             }
                         }
                         if (optString3 != null) {
@@ -232,7 +233,7 @@ public class AppLinkData {
                                     appLinkData.argumentBundle.putString(ARGUMENTS_NATIVE_URL, optString3);
                                 }
                             } catch (JSONException e3) {
-                                Log.d(TAG, "Unable to put tap time in AppLinkData.arguments");
+                                Utility.logd(TAG, "Unable to put tap time in AppLinkData.arguments");
                             }
                         }
                     }
@@ -241,8 +242,8 @@ public class AppLinkData {
                 Utility.logd(TAG, "Unable to fetch deferred applink from server");
             }
             completionHandler.onDeferredAppLinkDataFetched(appLinkData);
-        } catch (Throwable e5) {
-            throw new FacebookException("An error occurred while preparing deferred app link", e5);
+        } catch (JSONException e5) {
+            throw new FacebookException("An error occurred while preparing deferred app link", (Throwable) e5);
         }
     }
 
@@ -260,19 +261,18 @@ public class AppLinkData {
                     bundle.putStringArray(str, new String[0]);
                 } else {
                     Object obj2 = jSONArray.get(0);
-                    int i;
                     if (obj2 instanceof JSONObject) {
-                        Parcelable[] parcelableArr = new Bundle[jSONArray.length()];
-                        for (i = 0; i < jSONArray.length(); i++) {
-                            parcelableArr[i] = toBundle(jSONArray.getJSONObject(i));
+                        Bundle[] bundleArr = new Bundle[jSONArray.length()];
+                        for (int i = 0; i < jSONArray.length(); i++) {
+                            bundleArr[i] = toBundle(jSONArray.getJSONObject(i));
                         }
-                        bundle.putParcelableArray(str, parcelableArr);
+                        bundle.putParcelableArray(str, bundleArr);
                     } else if (obj2 instanceof JSONArray) {
                         throw new FacebookException("Nested arrays are not supported.");
                     } else {
                         String[] strArr = new String[jSONArray.length()];
-                        for (i = 0; i < jSONArray.length(); i++) {
-                            strArr[i] = jSONArray.get(i).toString();
+                        for (int i2 = 0; i2 < jSONArray.length(); i2++) {
+                            strArr[i2] = jSONArray.get(i2).toString();
                         }
                         bundle.putStringArray(str, strArr);
                     }
@@ -297,7 +297,10 @@ public class AppLinkData {
     }
 
     public Bundle getRefererData() {
-        return this.argumentBundle != null ? this.argumentBundle.getBundle(ARGUMENTS_REFERER_DATA_KEY) : null;
+        if (this.argumentBundle != null) {
+            return this.argumentBundle.getBundle(ARGUMENTS_REFERER_DATA_KEY);
+        }
+        return null;
     }
 
     public Uri getTargetUri() {

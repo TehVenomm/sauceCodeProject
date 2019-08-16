@@ -17,10 +17,6 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private const string ANIM_STATE_ACTION = "LOOP2";
 
-	public const string EFFECT_NAME = "ef_btl_bg_geyser_01";
-
-	private const float COOL_TIME = 1f;
-
 	private readonly int IDLE_ANIM_HASH = Animator.StringToHash("START1");
 
 	private readonly int READY_ANIM_HASH = Animator.StringToHash("START2");
@@ -28,6 +24,8 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 	private readonly int ACTION_ANIM_HASH = Animator.StringToHash("LOOP2");
 
 	private readonly int STATE_LENGTH = Enum.GetValues(typeof(STATE)).Length;
+
+	public const string EFFECT_NAME = "ef_btl_bg_geyser_01";
 
 	public Character.REACTION_TYPE reactionType;
 
@@ -44,6 +42,8 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 	private int selfInstanceId;
 
 	private float timer;
+
+	private const float COOL_TIME = 1f;
 
 	public STATE state
 	{
@@ -64,10 +64,6 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(pointData);
 		actionData = Singleton<FieldMapTable>.I.GetFieldGimmickActionData((uint)base.m_pointData.value1);
 		Transform effect = EffectManager.GetEffect("ef_btl_bg_geyser_01", this.get_transform());
@@ -120,12 +116,10 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	public override void RequestDestroy()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
-		SetEnableAction(false);
+		SetEnableAction(value: false);
 		if (effectCtrl != null)
 		{
-			EffectManager.ReleaseEffect(effectCtrl.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(effectCtrl.get_gameObject());
 		}
 		base.RequestDestroy();
 	}
@@ -139,7 +133,6 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private void SetEnableAction(bool value)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		if (this.get_enabled() != value)
 		{
 			Reset();
@@ -153,34 +146,35 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private void Update()
 	{
-		if (!(effectCtrl == null))
+		if (effectCtrl == null)
 		{
-			timer += Time.get_deltaTime();
-			switch (state)
+			return;
+		}
+		timer += Time.get_deltaTime();
+		switch (state)
+		{
+		case STATE.IDLE:
+			if (timer > INTERVAL)
 			{
-			case STATE.IDLE:
-				if (timer > INTERVAL)
-				{
-					effectCtrl.Play(READY_ANIM_HASH);
-					NextState();
-				}
-				break;
-			case STATE.READY:
-				if (effectCtrl.IsCurrentState(ACTION_ANIM_HASH))
-				{
-					actCollider.set_enabled(true);
-					NextState();
-				}
-				break;
-			case STATE.ACTION:
-				if (timer > DURATION)
-				{
-					actCollider.set_enabled(false);
-					effectCtrl.CrossFade(IDLE_ANIM_HASH, 0.3f);
-					NextState();
-				}
-				break;
+				effectCtrl.Play(READY_ANIM_HASH);
+				NextState();
 			}
+			break;
+		case STATE.READY:
+			if (effectCtrl.IsCurrentState(ACTION_ANIM_HASH))
+			{
+				actCollider.set_enabled(true);
+				NextState();
+			}
+			break;
+		case STATE.ACTION:
+			if (timer > DURATION)
+			{
+				actCollider.set_enabled(false);
+				effectCtrl.CrossFade(IDLE_ANIM_HASH, 0.3f);
+				NextState();
+			}
+			break;
 		}
 	}
 
@@ -214,18 +208,18 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 		self.isGatherInterruption = true;
 		Vector3 val = self._transform.get_position() - m_transform.get_position();
 		Vector3 normalized = val.get_normalized();
@@ -234,6 +228,7 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		case Character.REACTION_TYPE.BLOW:
 		case Character.REACTION_TYPE.STUNNED_BLOW:
 		case Character.REACTION_TYPE.FALL_BLOW:
+		case Character.REACTION_TYPE.CHARM_BLOW:
 			self._forward = -normalized;
 			break;
 		}
@@ -244,18 +239,16 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		reactionInfo.blowForce = normalized;
 		reactionInfo.loopTime = actionData.loopTime;
 		reactionInfo.targetId = self.id;
-		self.ActReaction(reactionInfo, true);
+		self.ActReaction(reactionInfo, isSync: true);
 	}
 
 	private void OnTriggerEnter(Collider other)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 		if (selfInstanceId == other.get_gameObject().GetInstanceID() && self != null)
 		{
 			bool flag = self.hitOffFlag == StageObject.HIT_OFF_FLAG.NONE;
 			Character.ACTION_ID actionID = self.actionID;
-			if (actionID == Character.ACTION_ID.DAMAGE || actionID == Character.ACTION_ID.MAX || actionID == (Character.ACTION_ID)19 || actionID == (Character.ACTION_ID)31)
+			if (actionID == Character.ACTION_ID.DAMAGE || actionID == Character.ACTION_ID.MAX || actionID == (Character.ACTION_ID)20 || actionID == (Character.ACTION_ID)33)
 			{
 				flag = true;
 			}
@@ -265,8 +258,8 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 			}
 			if (flag && this.get_enabled())
 			{
-				SetEnableCollider(false);
-				this.StartCoroutine(SetEnableCollider(true, 1f));
+				SetEnableCollider(value: false);
+				this.StartCoroutine(SetEnableCollider(value: true, 1f));
 				ReactPlayer(self);
 			}
 		}

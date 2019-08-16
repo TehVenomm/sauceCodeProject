@@ -15,17 +15,21 @@ public class Finalizer extends Thread {
     private static final Logger logger = Logger.getLogger(Finalizer.class.getName());
     private final WeakReference<Class<?>> finalizableReferenceClassReference;
     private final PhantomReference<Object> frqReference;
-    private final ReferenceQueue<Object> queue = new ReferenceQueue();
+    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     private static class ShutDown extends Exception {
         private ShutDown() {
+        }
+
+        /* synthetic */ ShutDown(ShutDown shutDown) {
+            this();
         }
     }
 
     private Finalizer(Class<?> cls, Object obj) {
         super(Finalizer.class.getName());
-        this.finalizableReferenceClassReference = new WeakReference(cls);
-        this.frqReference = new PhantomReference(obj, this.queue);
+        this.finalizableReferenceClassReference = new WeakReference<>(cls);
+        this.frqReference = new PhantomReference<>(obj, this.queue);
         setDaemon(true);
         try {
             if (inheritableThreadLocals != null) {
@@ -38,25 +42,24 @@ public class Finalizer extends Thread {
 
     private void cleanUp(Reference<?> reference) throws ShutDown {
         Method finalizeReferentMethod = getFinalizeReferentMethod();
-        Reference poll;
         do {
-            poll.clear();
-            if (poll == this.frqReference) {
-                throw new ShutDown();
+            reference.clear();
+            if (reference == this.frqReference) {
+                throw new ShutDown(null);
             }
             try {
-                finalizeReferentMethod.invoke(poll, new Object[0]);
+                finalizeReferentMethod.invoke(reference, new Object[0]);
             } catch (Throwable th) {
                 logger.log(Level.SEVERE, "Error cleaning up after reference.", th);
             }
-            poll = this.queue.poll();
-        } while (poll != null);
+            reference = this.queue.poll();
+        } while (reference != null);
     }
 
     private Method getFinalizeReferentMethod() throws ShutDown {
         Class cls = (Class) this.finalizableReferenceClassReference.get();
         if (cls == null) {
-            throw new ShutDown();
+            throw new ShutDown(null);
         }
         try {
             return cls.getMethod("finalizeReferent", new Class[0]);
@@ -77,12 +80,12 @@ public class Finalizer extends Thread {
     }
 
     public static ReferenceQueue<Object> startFinalizer(Class<?> cls, Object obj) {
-        if (cls.getName().equals(FINALIZABLE_REFERENCE)) {
-            Finalizer finalizer = new Finalizer(cls, obj);
-            finalizer.start();
-            return finalizer.queue;
+        if (!cls.getName().equals(FINALIZABLE_REFERENCE)) {
+            throw new IllegalArgumentException("Expected com.google.common.base.FinalizableReference.");
         }
-        throw new IllegalArgumentException("Expected com.google.common.base.FinalizableReference.");
+        Finalizer finalizer = new Finalizer(cls, obj);
+        finalizer.start();
+        return finalizer.queue;
     }
 
     public void run() {

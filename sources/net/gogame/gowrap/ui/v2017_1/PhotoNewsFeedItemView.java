@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.v2017_1;
+package net.gogame.gowrap.p019ui.v2017_1;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -6,13 +6,14 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 import net.gogame.gowrap.Constants;
+import net.gogame.gowrap.p019ui.download.DownloadResultSource;
+import net.gogame.gowrap.p019ui.utils.ImageUtils;
 import net.gogame.gowrap.support.DownloadManager.DownloadResult;
 import net.gogame.gowrap.support.DownloadManager.Target;
-import net.gogame.gowrap.ui.download.DownloadResultSource;
-import net.gogame.gowrap.ui.utils.ImageUtils;
 
+/* renamed from: net.gogame.gowrap.ui.v2017_1.PhotoNewsFeedItemView */
 public class PhotoNewsFeedItemView extends AbstractNewsFeedItemView implements Target {
     private DownloadResult downloadResult;
     private ImageView imageView;
@@ -34,27 +35,33 @@ public class PhotoNewsFeedItemView extends AbstractNewsFeedItemView implements T
         super(context, attributeSet, i, i2);
     }
 
-    protected void customInit(Context context) {
-        this.imageView = (ImageView) findViewById(C1110R.id.net_gogame_gowrap_newsfeed_item_photo);
+    /* access modifiers changed from: protected */
+    public void customInit(Context context) {
+        this.imageView = (ImageView) findViewById(C1423R.C1424id.net_gogame_gowrap_newsfeed_item_photo);
     }
 
-    protected int getViewResourceId() {
-        return C1110R.layout.net_gogame_gowrap_newsfeed_photo_item;
+    /* access modifiers changed from: protected */
+    public int getViewResourceId() {
+        return C1423R.C1425layout.net_gogame_gowrap_newsfeed_photo_item;
     }
 
-    protected Integer getResizingViewResourceId() {
-        return Integer.valueOf(C1110R.id.net_gogame_gowrap_newsfeed_item_photo);
+    /* access modifiers changed from: protected */
+    public Integer getResizingViewResourceId() {
+        return Integer.valueOf(C1423R.C1424id.net_gogame_gowrap_newsfeed_item_photo);
     }
 
-    protected int[] getClickResourceIds() {
-        return new int[]{C1110R.id.net_gogame_gowrap_newsfeed_item_media, C1110R.id.net_gogame_gowrap_newsfeed_item_content};
+    /* access modifiers changed from: protected */
+    public int[] getClickResourceIds() {
+        return new int[]{C1423R.C1424id.net_gogame_gowrap_newsfeed_item_media, C1423R.C1424id.net_gogame_gowrap_newsfeed_item_content};
     }
 
-    protected int[] getButtonClickResourceIds() {
-        return new int[]{C1110R.id.net_gogame_gowrap_newsfeed_item_button};
+    /* access modifiers changed from: protected */
+    public int[] getButtonClickResourceIds() {
+        return new int[]{C1423R.C1424id.net_gogame_gowrap_newsfeed_item_button};
     }
 
-    protected void onLayoutCompleted() {
+    /* access modifiers changed from: protected */
+    public void onLayoutCompleted() {
         update();
     }
 
@@ -78,8 +85,8 @@ public class PhotoNewsFeedItemView extends AbstractNewsFeedItemView implements T
         }
     }
 
-    public void onDownloadSucceeded(DownloadResult downloadResult) {
-        this.downloadResult = downloadResult;
+    public void onDownloadSucceeded(DownloadResult downloadResult2) {
+        this.downloadResult = downloadResult2;
         update();
     }
 

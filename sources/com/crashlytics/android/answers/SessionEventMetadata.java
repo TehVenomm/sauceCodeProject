@@ -1,8 +1,6 @@
 package com.crashlytics.android.answers;
 
 final class SessionEventMetadata {
-    public final String advertisingId;
-    public final String androidId;
     public final String appBundleId;
     public final String appVersionCode;
     public final String appVersionName;
@@ -11,26 +9,26 @@ final class SessionEventMetadata {
     public final String deviceModel;
     public final String executionId;
     public final String installationId;
+    public final Boolean limitAdTrackingEnabled;
     public final String osVersion;
     private String stringRepresentation;
 
-    public SessionEventMetadata(String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8, String str9, String str10, String str11) {
+    public SessionEventMetadata(String str, String str2, String str3, Boolean bool, String str4, String str5, String str6, String str7, String str8, String str9) {
         this.appBundleId = str;
         this.executionId = str2;
         this.installationId = str3;
-        this.androidId = str4;
-        this.advertisingId = str5;
-        this.betaDeviceToken = str6;
-        this.buildId = str7;
-        this.osVersion = str8;
-        this.deviceModel = str9;
-        this.appVersionCode = str10;
-        this.appVersionName = str11;
+        this.limitAdTrackingEnabled = bool;
+        this.betaDeviceToken = str4;
+        this.buildId = str5;
+        this.osVersion = str6;
+        this.deviceModel = str7;
+        this.appVersionCode = str8;
+        this.appVersionName = str9;
     }
 
     public String toString() {
         if (this.stringRepresentation == null) {
-            this.stringRepresentation = "appBundleId=" + this.appBundleId + ", executionId=" + this.executionId + ", installationId=" + this.installationId + ", androidId=" + this.androidId + ", advertisingId=" + this.advertisingId + ", betaDeviceToken=" + this.betaDeviceToken + ", buildId=" + this.buildId + ", osVersion=" + this.osVersion + ", deviceModel=" + this.deviceModel + ", appVersionCode=" + this.appVersionCode + ", appVersionName=" + this.appVersionName;
+            this.stringRepresentation = "appBundleId=" + this.appBundleId + ", executionId=" + this.executionId + ", installationId=" + this.installationId + ", limitAdTrackingEnabled=" + this.limitAdTrackingEnabled + ", betaDeviceToken=" + this.betaDeviceToken + ", buildId=" + this.buildId + ", osVersion=" + this.osVersion + ", deviceModel=" + this.deviceModel + ", appVersionCode=" + this.appVersionCode + ", appVersionName=" + this.appVersionName;
         }
         return this.stringRepresentation;
     }

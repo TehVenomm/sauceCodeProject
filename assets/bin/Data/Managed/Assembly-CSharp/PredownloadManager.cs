@@ -113,10 +113,10 @@ public class PredownloadManager : MonoBehaviourSingleton<PredownloadManager>
 		LoadingQueue loading_queue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
 		ResourceManager.internalMode = true;
-		LoadObject lo_table = loading_queue.Load(RESOURCE_CATEGORY.TABLE, "PredownloadTable", false);
+		LoadObject lo_table = loading_queue.Load(RESOURCE_CATEGORY.TABLE, "PredownloadTable");
 		ResourceManager.internalMode = false;
 		ResourceManager.enableCache = true;
-		yield return (object)loading_queue.Wait();
+		yield return loading_queue.Wait();
 		PredownloadTable table = lo_table.loadedObject as PredownloadTable;
 		List<LoadInfo> info_list = CreateLoadInfoList(table, isOpening);
 		int info_index = 0;
@@ -124,52 +124,53 @@ public class PredownloadManager : MonoBehaviourSingleton<PredownloadManager>
 		List<LoadObject> loading_list = new List<LoadObject>();
 		while (loadedCount < totalCount)
 		{
-			yield return (object)null;
+			yield return null;
 			MonoBehaviourSingleton<ResourceManager>.I.loadingAssetCountLimit = 4;
-			if (stopFlags == (STOP_FLAG)0)
+			if (stopFlags != 0)
 			{
-				if (isLoadingInOpening)
+				continue;
+			}
+			if (isLoadingInOpening)
+			{
+				MonoBehaviourSingleton<ResourceManager>.I.loadingAssetCountLimit = 1;
+			}
+			while (loading_list.Count < 4 && loadedCount + loading_list.Count < totalCount)
+			{
+				List<LoadInfo> list = info_list;
+				int index;
+				info_index = (index = info_index) + 1;
+				LoadInfo loadInfo = list[index];
+				if (isOpening && info_index < tutorialCount && loadInfo.category != RESOURCE_CATEGORY.STAGE_SCENE)
 				{
-					MonoBehaviourSingleton<ResourceManager>.I.loadingAssetCountLimit = 1;
-				}
-				while (loading_list.Count < 4 && loadedCount + loading_list.Count < totalCount)
-				{
-					List<LoadInfo> list = info_list;
-					int index;
-					info_index = (index = info_index) + 1;
-					LoadInfo info = list[index];
-					if (isOpening && info_index < tutorialCount && info.category != RESOURCE_CATEGORY.STAGE_SCENE)
-					{
-						ResourceManager.enableCache = true;
-						ResourceManager.downloadOnly = false;
-					}
-					else
-					{
-						ResourceManager.enableCache = false;
-						ResourceManager.downloadOnly = true;
-					}
-					bool save_internalMode = ResourceManager.internalMode;
-					ResourceManager.internalMode = false;
-					LoadObject lo = (info.resourceNames == null || info.resourceNames.Length <= 0) ? loading_queue.Load(info.category, info.pakageName, false) : loading_queue.Load(info.category, info.pakageName, info.resourceNames, false);
-					if (lo != null)
-					{
-						loading_list.Add(lo);
-					}
-					ResourceManager.internalMode = save_internalMode;
-					ResourceManager.downloadOnly = false;
 					ResourceManager.enableCache = true;
+					ResourceManager.downloadOnly = false;
 				}
-				int j = 0;
-				for (int i = loading_list.Count; j < i; j++)
+				else
 				{
-					if (!loading_list[j].isLoading)
-					{
-						loading_list[j] = null;
-						loading_list.RemoveAt(j);
-						j--;
-						i--;
-						loadedCount++;
-					}
+					ResourceManager.enableCache = false;
+					ResourceManager.downloadOnly = true;
+				}
+				bool internalMode = ResourceManager.internalMode;
+				ResourceManager.internalMode = false;
+				LoadObject loadObject = (loadInfo.resourceNames == null || loadInfo.resourceNames.Length <= 0) ? loading_queue.Load(loadInfo.category, loadInfo.pakageName) : loading_queue.Load(loadInfo.category, loadInfo.pakageName, loadInfo.resourceNames);
+				if (loadObject != null)
+				{
+					loading_list.Add(loadObject);
+				}
+				ResourceManager.internalMode = internalMode;
+				ResourceManager.downloadOnly = false;
+				ResourceManager.enableCache = true;
+			}
+			int i = 0;
+			for (int num = loading_list.Count; i < num; i++)
+			{
+				if (!loading_list[i].isLoading)
+				{
+					loading_list[i] = null;
+					loading_list.RemoveAt(i);
+					i--;
+					num--;
+					loadedCount++;
 				}
 			}
 		}
@@ -185,46 +186,50 @@ public class PredownloadManager : MonoBehaviourSingleton<PredownloadManager>
 		}
 		AddLoadInfoList(list, table.preloadDatas);
 		AddLoadInfoList(list, table.autoDatas);
+		AddLoadInfoList(list, table.inGameDatas);
 		AddLoadInfoList(list, table.manualDatas);
 		return list;
 	}
 
 	private void AddLoadInfoList(List<LoadInfo> list, List<PredownloadTable.Data> datas)
 	{
-		if (datas != null)
+		if (datas == null)
 		{
-			Type typeFromHandle = typeof(RESOURCE_CATEGORY);
-			int i = 0;
-			for (int count = datas.Count; i < count; i++)
+			return;
+		}
+		Type typeFromHandle = typeof(RESOURCE_CATEGORY);
+		int i = 0;
+		for (int count = datas.Count; i < count; i++)
+		{
+			PredownloadTable.Data data = datas[i];
+			RESOURCE_CATEGORY category = (RESOURCE_CATEGORY)Enum.Parse(typeFromHandle, data.categoryName);
+			int j = 0;
+			for (int count2 = data.packages.Count; j < count2; j++)
 			{
-				PredownloadTable.Data data = datas[i];
-				RESOURCE_CATEGORY category = (RESOURCE_CATEGORY)(int)Enum.Parse(typeFromHandle, data.categoryName);
-				int j = 0;
-				for (int count2 = data.packages.Count; j < count2; j++)
+				PredownloadTable.Package package = data.packages[j];
+				if (package == null || string.IsNullOrEmpty(package.packageName))
 				{
-					PredownloadTable.Package package = data.packages[j];
-					if (package != null && !string.IsNullOrEmpty(package.packageName))
+					continue;
+				}
+				List<string> resourceNames = package.resourceNames;
+				if (package.packageName != null && package.packageName.StartsWith("Debug"))
+				{
+					continue;
+				}
+				resourceNames = new List<string>();
+				int k = 0;
+				for (int count3 = package.resourceNames.Count; k < count3; k++)
+				{
+					if (!package.resourceNames[k].StartsWith("Debug"))
 					{
-						List<string> resourceNames = package.resourceNames;
-						if (package.packageName == null || !package.packageName.StartsWith("Debug"))
-						{
-							resourceNames = new List<string>();
-							int k = 0;
-							for (int count3 = package.resourceNames.Count; k < count3; k++)
-							{
-								if (!package.resourceNames[k].StartsWith("Debug"))
-								{
-									resourceNames.Add(package.resourceNames[k]);
-								}
-							}
-							LoadInfo loadInfo = new LoadInfo();
-							loadInfo.category = category;
-							loadInfo.pakageName = package.packageName;
-							loadInfo.resourceNames = resourceNames.ToArray();
-							list.Add(loadInfo);
-						}
+						resourceNames.Add(package.resourceNames[k]);
 					}
 				}
+				LoadInfo loadInfo = new LoadInfo();
+				loadInfo.category = category;
+				loadInfo.pakageName = package.packageName;
+				loadInfo.resourceNames = resourceNames.ToArray();
+				list.Add(loadInfo);
 			}
 		}
 	}

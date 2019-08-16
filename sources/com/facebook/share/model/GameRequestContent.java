@@ -7,7 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class GameRequestContent implements ShareModel {
-    public static final Creator<GameRequestContent> CREATOR = new C05101();
+    public static final Creator<GameRequestContent> CREATOR = new Creator<GameRequestContent>() {
+        public GameRequestContent createFromParcel(Parcel parcel) {
+            return new GameRequestContent(parcel);
+        }
+
+        public GameRequestContent[] newArray(int i) {
+            return new GameRequestContent[i];
+        }
+    };
     private final ActionType actionType;
     private final String data;
     private final Filters filters;
@@ -17,20 +25,6 @@ public final class GameRequestContent implements ShareModel {
     private final List<String> suggestions;
     private final String title;
 
-    /* renamed from: com.facebook.share.model.GameRequestContent$1 */
-    static final class C05101 implements Creator<GameRequestContent> {
-        C05101() {
-        }
-
-        public GameRequestContent createFromParcel(Parcel parcel) {
-            return new GameRequestContent(parcel);
-        }
-
-        public GameRequestContent[] newArray(int i) {
-            return new GameRequestContent[i];
-        }
-    }
-
     public enum ActionType {
         SEND,
         ASKFOR,
@@ -38,20 +32,29 @@ public final class GameRequestContent implements ShareModel {
     }
 
     public static class Builder implements ShareModelBuilder<GameRequestContent, Builder> {
-        private ActionType actionType;
-        private String data;
-        private Filters filters;
-        private String message;
-        private String objectId;
-        private List<String> recipients;
-        private List<String> suggestions;
-        private String title;
+        /* access modifiers changed from: private */
+        public ActionType actionType;
+        /* access modifiers changed from: private */
+        public String data;
+        /* access modifiers changed from: private */
+        public Filters filters;
+        /* access modifiers changed from: private */
+        public String message;
+        /* access modifiers changed from: private */
+        public String objectId;
+        /* access modifiers changed from: private */
+        public List<String> recipients;
+        /* access modifiers changed from: private */
+        public List<String> suggestions;
+        /* access modifiers changed from: private */
+        public String title;
 
         public GameRequestContent build() {
-            return new GameRequestContent();
+            return new GameRequestContent(this);
         }
 
-        Builder readFrom(Parcel parcel) {
+        /* access modifiers changed from: 0000 */
+        public Builder readFrom(Parcel parcel) {
             return readFrom((GameRequestContent) parcel.readParcelable(GameRequestContent.class.getClassLoader()));
         }
 
@@ -59,8 +62,8 @@ public final class GameRequestContent implements ShareModel {
             return gameRequestContent == null ? this : setMessage(gameRequestContent.getMessage()).setRecipients(gameRequestContent.getRecipients()).setTitle(gameRequestContent.getTitle()).setData(gameRequestContent.getData()).setActionType(gameRequestContent.getActionType()).setObjectId(gameRequestContent.getObjectId()).setFilters(gameRequestContent.getFilters()).setSuggestions(gameRequestContent.getSuggestions());
         }
 
-        public Builder setActionType(ActionType actionType) {
-            this.actionType = actionType;
+        public Builder setActionType(ActionType actionType2) {
+            this.actionType = actionType2;
             return this;
         }
 
@@ -69,8 +72,8 @@ public final class GameRequestContent implements ShareModel {
             return this;
         }
 
-        public Builder setFilters(Filters filters) {
-            this.filters = filters;
+        public Builder setFilters(Filters filters2) {
+            this.filters = filters2;
             return this;
         }
 
@@ -172,7 +175,10 @@ public final class GameRequestContent implements ShareModel {
     }
 
     public String getTo() {
-        return getRecipients() != null ? TextUtils.join(",", getRecipients()) : null;
+        if (getRecipients() != null) {
+            return TextUtils.join(",", getRecipients());
+        }
+        return null;
     }
 
     public void writeToParcel(Parcel parcel, int i) {

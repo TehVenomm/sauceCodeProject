@@ -34,7 +34,7 @@ public class EnumDeserializer extends StdScalarDeserializer<Object> {
         protected final Class<?> _inputType;
 
         public FactoryBasedDeserializer(Class<?> cls, AnnotatedMethod annotatedMethod, Class<?> cls2) {
-            super((Class) cls);
+            super(cls);
             this._factory = annotatedMethod.getAnnotated();
             this._inputType = cls2;
             this._deser = null;
@@ -55,25 +55,25 @@ public class EnumDeserializer extends StdScalarDeserializer<Object> {
         }
 
         public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-            Object deserialize;
+            Object text;
             if (this._deser != null) {
-                deserialize = this._deser.deserialize(jsonParser, deserializationContext);
+                text = this._deser.deserialize(jsonParser, deserializationContext);
             } else {
                 JsonToken currentToken = jsonParser.getCurrentToken();
                 if (currentToken == JsonToken.VALUE_STRING || currentToken == JsonToken.FIELD_NAME) {
-                    deserialize = jsonParser.getText();
+                    text = jsonParser.getText();
                 } else {
-                    deserialize = jsonParser.getValueAsString();
+                    text = jsonParser.getValueAsString();
                 }
             }
             try {
-                return this._factory.invoke(this._valueClass, new Object[]{deserialize});
-            } catch (Throwable th) {
-                Throwable th2 = ClassUtil.getRootCause(th2);
-                if (th2 instanceof IOException) {
-                    throw ((IOException) th2);
+                return this._factory.invoke(this._valueClass, new Object[]{text});
+            } catch (Exception e) {
+                Throwable rootCause = ClassUtil.getRootCause(e);
+                if (rootCause instanceof IOException) {
+                    throw ((IOException) rootCause);
                 }
-                throw deserializationContext.instantiationException(this._valueClass, th2);
+                throw deserializationContext.instantiationException(this._valueClass, rootCause);
             }
         }
 
@@ -106,11 +106,11 @@ public class EnumDeserializer extends StdScalarDeserializer<Object> {
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonToken currentToken = jsonParser.getCurrentToken();
         if (currentToken == JsonToken.VALUE_STRING || currentToken == JsonToken.FIELD_NAME) {
-            CompactStringObjectMap _getToStringLookup = deserializationContext.isEnabled(DeserializationFeature.READ_ENUMS_USING_TO_STRING) ? _getToStringLookup() : this._lookupByName;
+            CompactStringObjectMap compactStringObjectMap = deserializationContext.isEnabled(DeserializationFeature.READ_ENUMS_USING_TO_STRING) ? _getToStringLookup() : this._lookupByName;
             String text = jsonParser.getText();
-            Object find = _getToStringLookup.find(text);
+            Object find = compactStringObjectMap.find(text);
             if (find == null) {
-                return _deserializeAltString(jsonParser, deserializationContext, _getToStringLookup, text);
+                return _deserializeAltString(jsonParser, deserializationContext, compactStringObjectMap, text);
             }
             return find;
         } else if (currentToken != JsonToken.VALUE_NUMBER_INT) {
@@ -130,89 +130,57 @@ public class EnumDeserializer extends StdScalarDeserializer<Object> {
         }
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private final java.lang.Object _deserializeAltString(com.fasterxml.jackson.core.JsonParser r5, com.fasterxml.jackson.databind.DeserializationContext r6, com.fasterxml.jackson.databind.util.CompactStringObjectMap r7, java.lang.String r8) throws java.io.IOException {
-        /*
-        r4 = this;
-        r0 = 0;
-        r1 = r8.trim();
-        r2 = r1.length();
-        if (r2 != 0) goto L_0x0014;
-    L_0x000b:
-        r2 = com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT;
-        r2 = r6.isEnabled(r2);
-        if (r2 == 0) goto L_0x003d;
-    L_0x0013:
-        return r0;
-    L_0x0014:
-        r2 = 0;
-        r2 = r1.charAt(r2);
-        r3 = 48;
-        if (r2 < r3) goto L_0x003d;
-    L_0x001d:
-        r3 = 57;
-        if (r2 > r3) goto L_0x003d;
-    L_0x0021:
-        r2 = java.lang.Integer.parseInt(r1);	 Catch:{ NumberFormatException -> 0x003c }
-        r3 = com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS;	 Catch:{ NumberFormatException -> 0x003c }
-        r3 = r6.isEnabled(r3);	 Catch:{ NumberFormatException -> 0x003c }
-        if (r3 == 0) goto L_0x0030;
-    L_0x002d:
-        r4._failOnNumber(r6, r5, r2);	 Catch:{ NumberFormatException -> 0x003c }
-    L_0x0030:
-        if (r2 < 0) goto L_0x003d;
-    L_0x0032:
-        r3 = r4._enumsByIndex;	 Catch:{ NumberFormatException -> 0x003c }
-        r3 = r3.length;	 Catch:{ NumberFormatException -> 0x003c }
-        if (r2 > r3) goto L_0x003d;
-    L_0x0037:
-        r3 = r4._enumsByIndex;	 Catch:{ NumberFormatException -> 0x003c }
-        r0 = r3[r2];	 Catch:{ NumberFormatException -> 0x003c }
-        goto L_0x0013;
-    L_0x003c:
-        r2 = move-exception;
-    L_0x003d:
-        r2 = com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
-        r2 = r6.isEnabled(r2);
-        if (r2 != 0) goto L_0x0013;
-    L_0x0045:
-        r0 = r4._enumClass();
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = "value not one of declared Enum instance names: ";
-        r2 = r2.append(r3);
-        r3 = r7.keys();
-        r2 = r2.append(r3);
-        r2 = r2.toString();
-        r0 = r6.weirdStringException(r1, r0, r2);
-        throw r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.deser.std.EnumDeserializer._deserializeAltString(com.fasterxml.jackson.core.JsonParser, com.fasterxml.jackson.databind.DeserializationContext, com.fasterxml.jackson.databind.util.CompactStringObjectMap, java.lang.String):java.lang.Object");
-    }
-
-    protected Object _deserializeOther(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        jsonParser.getCurrentToken();
-        if (deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS) && jsonParser.isExpectedStartArrayToken()) {
-            jsonParser.nextToken();
-            Object deserialize = deserialize(jsonParser, deserializationContext);
-            if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
-                return deserialize;
+    private final Object _deserializeAltString(JsonParser jsonParser, DeserializationContext deserializationContext, CompactStringObjectMap compactStringObjectMap, String str) throws IOException {
+        String trim = str.trim();
+        if (trim.length() != 0) {
+            char charAt = trim.charAt(0);
+            if (charAt >= '0' && charAt <= '9') {
+                try {
+                    int parseInt = Integer.parseInt(trim);
+                    if (deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)) {
+                        _failOnNumber(deserializationContext, jsonParser, parseInt);
+                    }
+                    if (parseInt >= 0 && parseInt <= this._enumsByIndex.length) {
+                        return this._enumsByIndex[parseInt];
+                    }
+                } catch (NumberFormatException e) {
+                }
             }
-            throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "Attempted to unwrap single value array for single '" + _enumClass().getName() + "' value but there was more than a single value in the array");
+        } else if (deserializationContext.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)) {
+            return null;
         }
-        throw deserializationContext.mappingException(_enumClass());
+        if (deserializationContext.isEnabled(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)) {
+            return null;
+        }
+        throw deserializationContext.weirdStringException(trim, _enumClass(), "value not one of declared Enum instance names: " + compactStringObjectMap.keys());
     }
 
-    protected void _failOnNumber(DeserializationContext deserializationContext, JsonParser jsonParser, int i) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeOther(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        jsonParser.getCurrentToken();
+        if (!deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS) || !jsonParser.isExpectedStartArrayToken()) {
+            throw deserializationContext.mappingException(_enumClass());
+        }
+        jsonParser.nextToken();
+        Object deserialize = deserialize(jsonParser, deserializationContext);
+        if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
+            return deserialize;
+        }
+        throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "Attempted to unwrap single value array for single '" + _enumClass().getName() + "' value but there was more than a single value in the array");
+    }
+
+    /* access modifiers changed from: protected */
+    public void _failOnNumber(DeserializationContext deserializationContext, JsonParser jsonParser, int i) throws IOException {
         throw InvalidFormatException.from(jsonParser, String.format("Not allowed to deserialize Enum value out of JSON number (%d): disable DeserializationConfig.DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS to allow", new Object[]{Integer.valueOf(i)}), Integer.valueOf(i), _enumClass());
     }
 
-    protected Class<?> _enumClass() {
+    /* access modifiers changed from: protected */
+    public Class<?> _enumClass() {
         return handledType();
     }
 
-    protected CompactStringObjectMap _getToStringLookup() {
+    /* access modifiers changed from: protected */
+    public CompactStringObjectMap _getToStringLookup() {
         CompactStringObjectMap compactStringObjectMap = this._lookupByToString;
         if (compactStringObjectMap == null) {
             synchronized (this) {

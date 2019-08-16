@@ -72,7 +72,8 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 		GRD_ARMOR,
 		OBJ_CAPTION_3,
 		LBL_CAPTION,
-		OBJ_ROOT
+		OBJ_ROOT,
+		LBL_NO_ITEM
 	}
 
 	protected UI[] uiTypeTab = new UI[11]
@@ -126,7 +127,7 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 
 	public override void Initialize()
 	{
-		selectTypeIndex = UIBehaviour.GetEquipmentTypeIndex((EQUIPMENT_TYPE)(int)GameSection.GetEventData());
+		selectTypeIndex = UIBehaviour.GetEquipmentTypeIndex((EQUIPMENT_TYPE)GameSection.GetEventData());
 		weaponPickupIndex = Array.FindIndex(uiTypeTab, (UI ui) => ui == UI.BTN_WEAPON_PICKUP);
 		armorPickupIndex = Array.FindIndex(uiTypeTab, (UI ui) => ui == UI.BTN_ARMOR_PICKUP);
 		SetPrefab((Enum)UI.OBJ_ROOT, "SmithEquipSelectBase_" + prefabSuffix);
@@ -150,11 +151,11 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 			EQUIPMENT_TYPE type = (!is_active) ? EQUIPMENT_TYPE.HELM : EQUIPMENT_TYPE.ONE_HAND_SWORD;
 			int num = (!is_active) ? 1 : 0;
 			ResetTween((Enum)tabAnimTarget[num], 0);
-			PlayTween((Enum)tabAnimTarget[num], true, (EventDelegate.Callback)null, false, 0);
+			PlayTween((Enum)tabAnimTarget[num], forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 			SetActive((Enum)UI.OBJ_ATK_ROOT, is_active);
 			SetActive((Enum)UI.OBJ_DEF_ROOT, !is_active);
 			selectTypeIndex = UIBehaviour.GetEquipmentTypeIndex(type);
-			sortSettings.dialogType = ((!is_active) ? SortBase.DIALOG_TYPE.ARMOR : SortBase.DIALOG_TYPE.WEAPON);
+			sortSettings.dialogType = GetDialogType(is_active);
 			SortBase.SORT_REQUIREMENT sORT_REQUIREMENT = (sortSettings.dialogType != SortBase.DIALOG_TYPE.ARMOR) ? SortBase.SORT_REQUIREMENT.REQUIREMENT_WEAPON_BIT : SortBase.SORT_REQUIREMENT.REQUIREMENT_ARMORS_BIT;
 			if ((sortSettings.requirement & sORT_REQUIREMENT) == (SortBase.SORT_REQUIREMENT)0)
 			{
@@ -186,6 +187,15 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 		});
 	}
 
+	protected virtual SortBase.DIALOG_TYPE GetDialogType(bool isWeapon)
+	{
+		return (!isWeapon) ? SortBase.DIALOG_TYPE.ARMOR : SortBase.DIALOG_TYPE.WEAPON;
+	}
+
+	protected void ShowNoItemText()
+	{
+	}
+
 	protected override void EquipParam()
 	{
 	}
@@ -205,17 +215,17 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 		{
 			SetEvent((Enum)uiTypeTab[i], "TYPE_TAB", i);
 		}
-		SetToggle((Enum)uiTypeTab[selectTypeIndex], true);
+		SetToggle((Enum)uiTypeTab[selectTypeIndex], value: true);
 	}
 
 	protected virtual void OnQuery_SECTION_BACK()
 	{
-		MonoBehaviourSingleton<SmithManager>.I.DisableSmithBlur(false);
+		MonoBehaviourSingleton<SmithManager>.I.BackSection();
+		MonoBehaviourSingleton<SmithManager>.I.DisableSmithBlur(is_instans_end_anim: false);
 	}
 
 	protected void InitializeCaption(string caption)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		SetLabelText(ctrl, UI.LBL_CAPTION, caption);
 		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
@@ -227,7 +237,7 @@ public abstract class SmithEquipSelectBase : EquipSelectBase
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 }

@@ -1,5 +1,7 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
+import android.animation.ValueAnimator;
+import android.content.ClipData;
 import android.content.res.ColorStateList;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -12,44 +14,58 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.os.BuildCompat;
-import android.support.v4.view.ViewCompatLollipop.OnApplyWindowInsetsListenerBridge;
-import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
-import android.support.v4.view.accessibility.AccessibilityNodeProviderCompat;
+import android.support.p000v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.p000v4.view.accessibility.AccessibilityNodeProviderCompat;
 import android.util.Log;
 import android.view.Display;
+import android.view.PointerIcon;
 import android.view.View;
+import android.view.View.DragShadowBuilder;
+import android.view.View.OnApplyWindowInsetsListener;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.WindowInsets;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeProvider;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.WeakHashMap;
 
+/* renamed from: android.support.v4.view.ViewCompat */
 public class ViewCompat {
     public static final int ACCESSIBILITY_LIVE_REGION_ASSERTIVE = 2;
     public static final int ACCESSIBILITY_LIVE_REGION_NONE = 0;
     public static final int ACCESSIBILITY_LIVE_REGION_POLITE = 1;
-    private static final long FAKE_FRAME_TIME = 10;
-    static final ViewCompatImpl IMPL;
+    static final ViewCompatBaseImpl IMPL;
     public static final int IMPORTANT_FOR_ACCESSIBILITY_AUTO = 0;
     public static final int IMPORTANT_FOR_ACCESSIBILITY_NO = 2;
     public static final int IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS = 4;
     public static final int IMPORTANT_FOR_ACCESSIBILITY_YES = 1;
+    @Deprecated
     public static final int LAYER_TYPE_HARDWARE = 2;
+    @Deprecated
     public static final int LAYER_TYPE_NONE = 0;
+    @Deprecated
     public static final int LAYER_TYPE_SOFTWARE = 1;
     public static final int LAYOUT_DIRECTION_INHERIT = 2;
     public static final int LAYOUT_DIRECTION_LOCALE = 3;
     public static final int LAYOUT_DIRECTION_LTR = 0;
     public static final int LAYOUT_DIRECTION_RTL = 1;
+    @Deprecated
     public static final int MEASURED_HEIGHT_STATE_SHIFT = 16;
+    @Deprecated
     public static final int MEASURED_SIZE_MASK = 16777215;
+    @Deprecated
     public static final int MEASURED_STATE_MASK = -16777216;
+    @Deprecated
     public static final int MEASURED_STATE_TOO_SMALL = 16777216;
     @Deprecated
     public static final int OVER_SCROLL_ALWAYS = 0;
@@ -67,306 +83,627 @@ public class ViewCompat {
     public static final int SCROLL_INDICATOR_START = 16;
     public static final int SCROLL_INDICATOR_TOP = 1;
     private static final String TAG = "ViewCompat";
-
-    interface ViewCompatImpl {
-        ViewPropertyAnimatorCompat animate(View view);
-
-        boolean canScrollHorizontally(View view, int i);
-
-        boolean canScrollVertically(View view, int i);
-
-        int combineMeasuredStates(int i, int i2);
-
-        WindowInsetsCompat dispatchApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat);
-
-        void dispatchFinishTemporaryDetach(View view);
-
-        boolean dispatchNestedFling(View view, float f, float f2, boolean z);
-
-        boolean dispatchNestedPreFling(View view, float f, float f2);
-
-        boolean dispatchNestedPreScroll(View view, int i, int i2, int[] iArr, int[] iArr2);
-
-        boolean dispatchNestedScroll(View view, int i, int i2, int i3, int i4, int[] iArr);
-
-        void dispatchStartTemporaryDetach(View view);
-
-        int getAccessibilityLiveRegion(View view);
-
-        AccessibilityNodeProviderCompat getAccessibilityNodeProvider(View view);
-
-        float getAlpha(View view);
-
-        ColorStateList getBackgroundTintList(View view);
-
-        Mode getBackgroundTintMode(View view);
-
-        Rect getClipBounds(View view);
-
-        Display getDisplay(View view);
-
-        float getElevation(View view);
-
-        boolean getFitsSystemWindows(View view);
-
-        int getImportantForAccessibility(View view);
-
-        int getLabelFor(View view);
-
-        int getLayerType(View view);
-
-        int getLayoutDirection(View view);
-
-        @Nullable
-        Matrix getMatrix(View view);
-
-        int getMeasuredHeightAndState(View view);
-
-        int getMeasuredState(View view);
-
-        int getMeasuredWidthAndState(View view);
-
-        int getMinimumHeight(View view);
-
-        int getMinimumWidth(View view);
-
-        int getPaddingEnd(View view);
-
-        int getPaddingStart(View view);
-
-        ViewParent getParentForAccessibility(View view);
-
-        float getPivotX(View view);
-
-        float getPivotY(View view);
-
-        float getRotation(View view);
-
-        float getRotationX(View view);
-
-        float getRotationY(View view);
-
-        float getScaleX(View view);
-
-        float getScaleY(View view);
-
-        int getScrollIndicators(View view);
-
-        String getTransitionName(View view);
-
-        float getTranslationX(View view);
-
-        float getTranslationY(View view);
-
-        float getTranslationZ(View view);
-
-        int getWindowSystemUiVisibility(View view);
-
-        float getX(View view);
-
-        float getY(View view);
-
-        float getZ(View view);
-
-        boolean hasAccessibilityDelegate(View view);
-
-        boolean hasNestedScrollingParent(View view);
-
-        boolean hasOnClickListeners(View view);
-
-        boolean hasOverlappingRendering(View view);
-
-        boolean hasTransientState(View view);
-
-        boolean isAttachedToWindow(View view);
-
-        boolean isImportantForAccessibility(View view);
-
-        boolean isInLayout(View view);
-
-        boolean isLaidOut(View view);
-
-        boolean isLayoutDirectionResolved(View view);
-
-        boolean isNestedScrollingEnabled(View view);
-
-        boolean isPaddingRelative(View view);
-
-        void jumpDrawablesToCurrentState(View view);
-
-        void offsetLeftAndRight(View view, int i);
-
-        void offsetTopAndBottom(View view, int i);
-
-        WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat);
-
-        void onInitializeAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent);
-
-        void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat);
-
-        void onPopulateAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent);
-
-        boolean performAccessibilityAction(View view, int i, Bundle bundle);
-
-        void postInvalidateOnAnimation(View view);
-
-        void postInvalidateOnAnimation(View view, int i, int i2, int i3, int i4);
-
-        void postOnAnimation(View view, Runnable runnable);
-
-        void postOnAnimationDelayed(View view, Runnable runnable, long j);
-
-        void requestApplyInsets(View view);
-
-        int resolveSizeAndState(int i, int i2, int i3);
-
-        void setAccessibilityDelegate(View view, @Nullable AccessibilityDelegateCompat accessibilityDelegateCompat);
-
-        void setAccessibilityLiveRegion(View view, int i);
-
-        void setActivated(View view, boolean z);
-
-        void setAlpha(View view, float f);
-
-        void setBackground(View view, Drawable drawable);
-
-        void setBackgroundTintList(View view, ColorStateList colorStateList);
-
-        void setBackgroundTintMode(View view, Mode mode);
-
-        void setChildrenDrawingOrderEnabled(ViewGroup viewGroup, boolean z);
-
-        void setClipBounds(View view, Rect rect);
-
-        void setElevation(View view, float f);
-
-        void setFitsSystemWindows(View view, boolean z);
-
-        void setHasTransientState(View view, boolean z);
-
-        void setImportantForAccessibility(View view, int i);
-
-        void setLabelFor(View view, int i);
-
-        void setLayerPaint(View view, Paint paint);
-
-        void setLayerType(View view, int i, Paint paint);
-
-        void setLayoutDirection(View view, int i);
-
-        void setNestedScrollingEnabled(View view, boolean z);
-
-        void setOnApplyWindowInsetsListener(View view, OnApplyWindowInsetsListener onApplyWindowInsetsListener);
-
-        void setPaddingRelative(View view, int i, int i2, int i3, int i4);
-
-        void setPivotX(View view, float f);
-
-        void setPivotY(View view, float f);
-
-        void setPointerIcon(View view, PointerIconCompat pointerIconCompat);
-
-        void setRotation(View view, float f);
-
-        void setRotationX(View view, float f);
-
-        void setRotationY(View view, float f);
-
-        void setSaveFromParentEnabled(View view, boolean z);
-
-        void setScaleX(View view, float f);
-
-        void setScaleY(View view, float f);
-
-        void setScrollIndicators(View view, int i);
-
-        void setScrollIndicators(View view, int i, int i2);
-
-        void setTransitionName(View view, String str);
-
-        void setTranslationX(View view, float f);
-
-        void setTranslationY(View view, float f);
-
-        void setTranslationZ(View view, float f);
-
-        void setX(View view, float f);
-
-        void setY(View view, float f);
-
-        void setZ(View view, float f);
-
-        boolean startNestedScroll(View view, int i);
-
-        void stopNestedScroll(View view);
+    public static final int TYPE_NON_TOUCH = 1;
+    public static final int TYPE_TOUCH = 0;
+
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$AccessibilityLiveRegion */
+    private @interface AccessibilityLiveRegion {
     }
 
-    static class BaseViewCompatImpl implements ViewCompatImpl {
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$FocusDirection */
+    public @interface FocusDirection {
+    }
+
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$FocusRealDirection */
+    public @interface FocusRealDirection {
+    }
+
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$FocusRelativeDirection */
+    public @interface FocusRelativeDirection {
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$ImportantForAccessibility */
+    private @interface ImportantForAccessibility {
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$LayerType */
+    private @interface LayerType {
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$LayoutDirectionMode */
+    private @interface LayoutDirectionMode {
+    }
+
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$NestedScrollType */
+    public @interface NestedScrollType {
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$OverScroll */
+    private @interface OverScroll {
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$ResolvedLayoutDirectionMode */
+    private @interface ResolvedLayoutDirectionMode {
+    }
+
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$ScrollAxis */
+    public @interface ScrollAxis {
+    }
+
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.view.ViewCompat$ScrollIndicators */
+    public @interface ScrollIndicators {
+    }
+
+    @RequiresApi(15)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi15Impl */
+    static class ViewCompatApi15Impl extends ViewCompatBaseImpl {
+        ViewCompatApi15Impl() {
+        }
+
+        public boolean hasOnClickListeners(View view) {
+            return view.hasOnClickListeners();
+        }
+    }
+
+    @RequiresApi(16)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi16Impl */
+    static class ViewCompatApi16Impl extends ViewCompatApi15Impl {
+        ViewCompatApi16Impl() {
+        }
+
+        public AccessibilityNodeProviderCompat getAccessibilityNodeProvider(View view) {
+            AccessibilityNodeProvider accessibilityNodeProvider = view.getAccessibilityNodeProvider();
+            if (accessibilityNodeProvider != null) {
+                return new AccessibilityNodeProviderCompat(accessibilityNodeProvider);
+            }
+            return null;
+        }
+
+        public boolean getFitsSystemWindows(View view) {
+            return view.getFitsSystemWindows();
+        }
+
+        public int getImportantForAccessibility(View view) {
+            return view.getImportantForAccessibility();
+        }
+
+        public int getMinimumHeight(View view) {
+            return view.getMinimumHeight();
+        }
+
+        public int getMinimumWidth(View view) {
+            return view.getMinimumWidth();
+        }
+
+        public ViewParent getParentForAccessibility(View view) {
+            return view.getParentForAccessibility();
+        }
+
+        public boolean hasOverlappingRendering(View view) {
+            return view.hasOverlappingRendering();
+        }
+
+        public boolean hasTransientState(View view) {
+            return view.hasTransientState();
+        }
+
+        public boolean performAccessibilityAction(View view, int i, Bundle bundle) {
+            return view.performAccessibilityAction(i, bundle);
+        }
+
+        public void postInvalidateOnAnimation(View view) {
+            view.postInvalidateOnAnimation();
+        }
+
+        public void postInvalidateOnAnimation(View view, int i, int i2, int i3, int i4) {
+            view.postInvalidateOnAnimation(i, i2, i3, i4);
+        }
+
+        public void postOnAnimation(View view, Runnable runnable) {
+            view.postOnAnimation(runnable);
+        }
+
+        public void postOnAnimationDelayed(View view, Runnable runnable, long j) {
+            view.postOnAnimationDelayed(runnable, j);
+        }
+
+        public void requestApplyInsets(View view) {
+            view.requestFitSystemWindows();
+        }
+
+        public void setBackground(View view, Drawable drawable) {
+            view.setBackground(drawable);
+        }
+
+        public void setHasTransientState(View view, boolean z) {
+            view.setHasTransientState(z);
+        }
+
+        public void setImportantForAccessibility(View view, int i) {
+            if (i == 4) {
+                i = 2;
+            }
+            view.setImportantForAccessibility(i);
+        }
+    }
+
+    @RequiresApi(17)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi17Impl */
+    static class ViewCompatApi17Impl extends ViewCompatApi16Impl {
+        ViewCompatApi17Impl() {
+        }
+
+        public Display getDisplay(View view) {
+            return view.getDisplay();
+        }
+
+        public int getLabelFor(View view) {
+            return view.getLabelFor();
+        }
+
+        public int getLayoutDirection(View view) {
+            return view.getLayoutDirection();
+        }
+
+        public int getPaddingEnd(View view) {
+            return view.getPaddingEnd();
+        }
+
+        public int getPaddingStart(View view) {
+            return view.getPaddingStart();
+        }
+
+        public int getWindowSystemUiVisibility(View view) {
+            return view.getWindowSystemUiVisibility();
+        }
+
+        public boolean isPaddingRelative(View view) {
+            return view.isPaddingRelative();
+        }
+
+        public void setLabelFor(View view, int i) {
+            view.setLabelFor(i);
+        }
+
+        public void setLayerPaint(View view, Paint paint) {
+            view.setLayerPaint(paint);
+        }
+
+        public void setLayoutDirection(View view, int i) {
+            view.setLayoutDirection(i);
+        }
+
+        public void setPaddingRelative(View view, int i, int i2, int i3, int i4) {
+            view.setPaddingRelative(i, i2, i3, i4);
+        }
+    }
+
+    @RequiresApi(18)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi18Impl */
+    static class ViewCompatApi18Impl extends ViewCompatApi17Impl {
+        ViewCompatApi18Impl() {
+        }
+
+        public Rect getClipBounds(View view) {
+            return view.getClipBounds();
+        }
+
+        public boolean isInLayout(View view) {
+            return view.isInLayout();
+        }
+
+        public void setClipBounds(View view, Rect rect) {
+            view.setClipBounds(rect);
+        }
+    }
+
+    @RequiresApi(19)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi19Impl */
+    static class ViewCompatApi19Impl extends ViewCompatApi18Impl {
+        ViewCompatApi19Impl() {
+        }
+
+        public int getAccessibilityLiveRegion(View view) {
+            return view.getAccessibilityLiveRegion();
+        }
+
+        public boolean isAttachedToWindow(View view) {
+            return view.isAttachedToWindow();
+        }
+
+        public boolean isLaidOut(View view) {
+            return view.isLaidOut();
+        }
+
+        public boolean isLayoutDirectionResolved(View view) {
+            return view.isLayoutDirectionResolved();
+        }
+
+        public void setAccessibilityLiveRegion(View view, int i) {
+            view.setAccessibilityLiveRegion(i);
+        }
+
+        public void setImportantForAccessibility(View view, int i) {
+            view.setImportantForAccessibility(i);
+        }
+    }
+
+    @RequiresApi(21)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi21Impl */
+    static class ViewCompatApi21Impl extends ViewCompatApi19Impl {
+        private static ThreadLocal<Rect> sThreadLocalRect;
+
+        ViewCompatApi21Impl() {
+        }
+
+        private static Rect getEmptyTempRect() {
+            if (sThreadLocalRect == null) {
+                sThreadLocalRect = new ThreadLocal<>();
+            }
+            Rect rect = (Rect) sThreadLocalRect.get();
+            if (rect == null) {
+                rect = new Rect();
+                sThreadLocalRect.set(rect);
+            }
+            rect.setEmpty();
+            return rect;
+        }
+
+        public WindowInsetsCompat dispatchApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
+            WindowInsets windowInsets = (WindowInsets) WindowInsetsCompat.unwrap(windowInsetsCompat);
+            WindowInsets dispatchApplyWindowInsets = view.dispatchApplyWindowInsets(windowInsets);
+            if (dispatchApplyWindowInsets != windowInsets) {
+                windowInsets = new WindowInsets(dispatchApplyWindowInsets);
+            }
+            return WindowInsetsCompat.wrap(windowInsets);
+        }
+
+        public boolean dispatchNestedFling(View view, float f, float f2, boolean z) {
+            return view.dispatchNestedFling(f, f2, z);
+        }
+
+        public boolean dispatchNestedPreFling(View view, float f, float f2) {
+            return view.dispatchNestedPreFling(f, f2);
+        }
+
+        public boolean dispatchNestedPreScroll(View view, int i, int i2, int[] iArr, int[] iArr2) {
+            return view.dispatchNestedPreScroll(i, i2, iArr, iArr2);
+        }
+
+        public boolean dispatchNestedScroll(View view, int i, int i2, int i3, int i4, int[] iArr) {
+            return view.dispatchNestedScroll(i, i2, i3, i4, iArr);
+        }
+
+        public ColorStateList getBackgroundTintList(View view) {
+            return view.getBackgroundTintList();
+        }
+
+        public Mode getBackgroundTintMode(View view) {
+            return view.getBackgroundTintMode();
+        }
+
+        public float getElevation(View view) {
+            return view.getElevation();
+        }
+
+        public String getTransitionName(View view) {
+            return view.getTransitionName();
+        }
+
+        public float getTranslationZ(View view) {
+            return view.getTranslationZ();
+        }
+
+        public float getZ(View view) {
+            return view.getZ();
+        }
+
+        public boolean hasNestedScrollingParent(View view) {
+            return view.hasNestedScrollingParent();
+        }
+
+        public boolean isImportantForAccessibility(View view) {
+            return view.isImportantForAccessibility();
+        }
+
+        public boolean isNestedScrollingEnabled(View view) {
+            return view.isNestedScrollingEnabled();
+        }
+
+        public void offsetLeftAndRight(View view, int i) {
+            boolean z;
+            Rect emptyTempRect = getEmptyTempRect();
+            ViewParent parent = view.getParent();
+            if (parent instanceof View) {
+                View view2 = (View) parent;
+                emptyTempRect.set(view2.getLeft(), view2.getTop(), view2.getRight(), view2.getBottom());
+                z = !emptyTempRect.intersects(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+            } else {
+                z = false;
+            }
+            super.offsetLeftAndRight(view, i);
+            if (z && emptyTempRect.intersect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom())) {
+                ((View) parent).invalidate(emptyTempRect);
+            }
+        }
+
+        public void offsetTopAndBottom(View view, int i) {
+            boolean z;
+            Rect emptyTempRect = getEmptyTempRect();
+            ViewParent parent = view.getParent();
+            if (parent instanceof View) {
+                View view2 = (View) parent;
+                emptyTempRect.set(view2.getLeft(), view2.getTop(), view2.getRight(), view2.getBottom());
+                z = !emptyTempRect.intersects(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+            } else {
+                z = false;
+            }
+            super.offsetTopAndBottom(view, i);
+            if (z && emptyTempRect.intersect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom())) {
+                ((View) parent).invalidate(emptyTempRect);
+            }
+        }
+
+        public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
+            WindowInsets windowInsets = (WindowInsets) WindowInsetsCompat.unwrap(windowInsetsCompat);
+            WindowInsets onApplyWindowInsets = view.onApplyWindowInsets(windowInsets);
+            if (onApplyWindowInsets != windowInsets) {
+                windowInsets = new WindowInsets(onApplyWindowInsets);
+            }
+            return WindowInsetsCompat.wrap(windowInsets);
+        }
+
+        public void requestApplyInsets(View view) {
+            view.requestApplyInsets();
+        }
+
+        public void setBackgroundTintList(View view, ColorStateList colorStateList) {
+            view.setBackgroundTintList(colorStateList);
+            if (VERSION.SDK_INT == 21) {
+                Drawable background = view.getBackground();
+                boolean z = (view.getBackgroundTintList() == null || view.getBackgroundTintMode() == null) ? false : true;
+                if (background != null && z) {
+                    if (background.isStateful()) {
+                        background.setState(view.getDrawableState());
+                    }
+                    view.setBackground(background);
+                }
+            }
+        }
+
+        public void setBackgroundTintMode(View view, Mode mode) {
+            view.setBackgroundTintMode(mode);
+            if (VERSION.SDK_INT == 21) {
+                Drawable background = view.getBackground();
+                boolean z = (view.getBackgroundTintList() == null || view.getBackgroundTintMode() == null) ? false : true;
+                if (background != null && z) {
+                    if (background.isStateful()) {
+                        background.setState(view.getDrawableState());
+                    }
+                    view.setBackground(background);
+                }
+            }
+        }
+
+        public void setElevation(View view, float f) {
+            view.setElevation(f);
+        }
+
+        public void setNestedScrollingEnabled(View view, boolean z) {
+            view.setNestedScrollingEnabled(z);
+        }
+
+        public void setOnApplyWindowInsetsListener(View view, final OnApplyWindowInsetsListener onApplyWindowInsetsListener) {
+            if (onApplyWindowInsetsListener == null) {
+                view.setOnApplyWindowInsetsListener(null);
+            } else {
+                view.setOnApplyWindowInsetsListener(new OnApplyWindowInsetsListener() {
+                    public WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
+                        return (WindowInsets) WindowInsetsCompat.unwrap(onApplyWindowInsetsListener.onApplyWindowInsets(view, WindowInsetsCompat.wrap(windowInsets)));
+                    }
+                });
+            }
+        }
+
+        public void setTransitionName(View view, String str) {
+            view.setTransitionName(str);
+        }
+
+        public void setTranslationZ(View view, float f) {
+            view.setTranslationZ(f);
+        }
+
+        public void setZ(View view, float f) {
+            view.setZ(f);
+        }
+
+        public boolean startNestedScroll(View view, int i) {
+            return view.startNestedScroll(i);
+        }
+
+        public void stopNestedScroll(View view) {
+            view.stopNestedScroll();
+        }
+    }
+
+    @RequiresApi(23)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi23Impl */
+    static class ViewCompatApi23Impl extends ViewCompatApi21Impl {
+        ViewCompatApi23Impl() {
+        }
+
+        public int getScrollIndicators(View view) {
+            return view.getScrollIndicators();
+        }
+
+        public void offsetLeftAndRight(View view, int i) {
+            view.offsetLeftAndRight(i);
+        }
+
+        public void offsetTopAndBottom(View view, int i) {
+            view.offsetTopAndBottom(i);
+        }
+
+        public void setScrollIndicators(View view, int i) {
+            view.setScrollIndicators(i);
+        }
+
+        public void setScrollIndicators(View view, int i, int i2) {
+            view.setScrollIndicators(i, i2);
+        }
+    }
+
+    @RequiresApi(24)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi24Impl */
+    static class ViewCompatApi24Impl extends ViewCompatApi23Impl {
+        ViewCompatApi24Impl() {
+        }
+
+        public void cancelDragAndDrop(View view) {
+            view.cancelDragAndDrop();
+        }
+
+        public void dispatchFinishTemporaryDetach(View view) {
+            view.dispatchFinishTemporaryDetach();
+        }
+
+        public void dispatchStartTemporaryDetach(View view) {
+            view.dispatchStartTemporaryDetach();
+        }
+
+        public void setPointerIcon(View view, PointerIconCompat pointerIconCompat) {
+            view.setPointerIcon((PointerIcon) (pointerIconCompat != null ? pointerIconCompat.getPointerIcon() : null));
+        }
+
+        public boolean startDragAndDrop(View view, ClipData clipData, DragShadowBuilder dragShadowBuilder, Object obj, int i) {
+            return view.startDragAndDrop(clipData, dragShadowBuilder, obj, i);
+        }
+
+        public void updateDragShadow(View view, DragShadowBuilder dragShadowBuilder) {
+            view.updateDragShadow(dragShadowBuilder);
+        }
+    }
+
+    @RequiresApi(26)
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatApi26Impl */
+    static class ViewCompatApi26Impl extends ViewCompatApi24Impl {
+        ViewCompatApi26Impl() {
+        }
+
+        public void addKeyboardNavigationClusters(@NonNull View view, @NonNull Collection<View> collection, int i) {
+            view.addKeyboardNavigationClusters(collection, i);
+        }
+
+        public int getNextClusterForwardId(@NonNull View view) {
+            return view.getNextClusterForwardId();
+        }
+
+        public boolean hasExplicitFocusable(@NonNull View view) {
+            return view.hasExplicitFocusable();
+        }
+
+        public boolean isFocusedByDefault(@NonNull View view) {
+            return view.isFocusedByDefault();
+        }
+
+        public boolean isKeyboardNavigationCluster(@NonNull View view) {
+            return view.isKeyboardNavigationCluster();
+        }
+
+        public View keyboardNavigationClusterSearch(@NonNull View view, View view2, int i) {
+            return view.keyboardNavigationClusterSearch(view2, i);
+        }
+
+        public boolean restoreDefaultFocus(@NonNull View view) {
+            return view.restoreDefaultFocus();
+        }
+
+        public void setFocusedByDefault(@NonNull View view, boolean z) {
+            view.setFocusedByDefault(z);
+        }
+
+        public void setKeyboardNavigationCluster(@NonNull View view, boolean z) {
+            view.setKeyboardNavigationCluster(z);
+        }
+
+        public void setNextClusterForwardId(@NonNull View view, int i) {
+            view.setNextClusterForwardId(i);
+        }
+
+        public void setTooltipText(View view, CharSequence charSequence) {
+            view.setTooltipText(charSequence);
+        }
+    }
+
+    /* renamed from: android.support.v4.view.ViewCompat$ViewCompatBaseImpl */
+    static class ViewCompatBaseImpl {
+        static boolean sAccessibilityDelegateCheckFailed = false;
+        static Field sAccessibilityDelegateField;
         private static Method sChildrenDrawingOrderMethod;
+        private static Field sMinHeightField;
+        private static boolean sMinHeightFieldFetched;
+        private static Field sMinWidthField;
+        private static boolean sMinWidthFieldFetched;
+        private static WeakHashMap<View, String> sTransitionNameMap;
         private Method mDispatchFinishTemporaryDetach;
         private Method mDispatchStartTemporaryDetach;
         private boolean mTempDetachBound;
         WeakHashMap<View, ViewPropertyAnimatorCompat> mViewPropertyAnimatorCompatMap = null;
 
-        BaseViewCompatImpl() {
+        ViewCompatBaseImpl() {
         }
 
         private void bindTempDetach() {
             try {
                 this.mDispatchStartTemporaryDetach = View.class.getDeclaredMethod("dispatchStartTemporaryDetach", new Class[0]);
                 this.mDispatchFinishTemporaryDetach = View.class.getDeclaredMethod("dispatchFinishTemporaryDetach", new Class[0]);
-            } catch (Throwable e) {
+            } catch (NoSuchMethodException e) {
                 Log.e(ViewCompat.TAG, "Couldn't find method", e);
             }
             this.mTempDetachBound = true;
         }
 
-        private boolean canScrollingViewScrollHorizontally(ScrollingView scrollingView, int i) {
-            int computeHorizontalScrollOffset = scrollingView.computeHorizontalScrollOffset();
-            int computeHorizontalScrollRange = scrollingView.computeHorizontalScrollRange() - scrollingView.computeHorizontalScrollExtent();
-            if (computeHorizontalScrollRange == 0) {
-                return false;
-            }
-            if (i < 0) {
-                if (computeHorizontalScrollOffset <= 0) {
-                    return false;
-                }
-            } else if (computeHorizontalScrollOffset >= computeHorizontalScrollRange - 1) {
-                return false;
-            }
-            return true;
+        private static void tickleInvalidationFlag(View view) {
+            float translationY = view.getTranslationY();
+            view.setTranslationY(1.0f + translationY);
+            view.setTranslationY(translationY);
         }
 
-        private boolean canScrollingViewScrollVertically(ScrollingView scrollingView, int i) {
-            int computeVerticalScrollOffset = scrollingView.computeVerticalScrollOffset();
-            int computeVerticalScrollRange = scrollingView.computeVerticalScrollRange() - scrollingView.computeVerticalScrollExtent();
-            if (computeVerticalScrollRange == 0) {
-                return false;
-            }
-            if (i < 0) {
-                if (computeVerticalScrollOffset <= 0) {
-                    return false;
-                }
-            } else if (computeVerticalScrollOffset >= computeVerticalScrollRange - 1) {
-                return false;
-            }
-            return true;
+        public void addKeyboardNavigationClusters(@NonNull View view, @NonNull Collection<View> collection, int i) {
         }
 
         public ViewPropertyAnimatorCompat animate(View view) {
-            return new ViewPropertyAnimatorCompat(view);
+            if (this.mViewPropertyAnimatorCompatMap == null) {
+                this.mViewPropertyAnimatorCompatMap = new WeakHashMap<>();
+            }
+            ViewPropertyAnimatorCompat viewPropertyAnimatorCompat = (ViewPropertyAnimatorCompat) this.mViewPropertyAnimatorCompatMap.get(view);
+            if (viewPropertyAnimatorCompat != null) {
+                return viewPropertyAnimatorCompat;
+            }
+            ViewPropertyAnimatorCompat viewPropertyAnimatorCompat2 = new ViewPropertyAnimatorCompat(view);
+            this.mViewPropertyAnimatorCompatMap.put(view, viewPropertyAnimatorCompat2);
+            return viewPropertyAnimatorCompat2;
         }
 
-        public boolean canScrollHorizontally(View view, int i) {
-            return (view instanceof ScrollingView) && canScrollingViewScrollHorizontally((ScrollingView) view, i);
-        }
-
-        public boolean canScrollVertically(View view, int i) {
-            return (view instanceof ScrollingView) && canScrollingViewScrollVertically((ScrollingView) view, i);
-        }
-
-        public int combineMeasuredStates(int i, int i2) {
-            return i | i2;
+        public void cancelDragAndDrop(View view) {
         }
 
         public WindowInsetsCompat dispatchApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
@@ -380,29 +717,40 @@ public class ViewCompat {
             if (this.mDispatchFinishTemporaryDetach != null) {
                 try {
                     this.mDispatchFinishTemporaryDetach.invoke(view, new Object[0]);
-                    return;
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.d(ViewCompat.TAG, "Error calling dispatchFinishTemporaryDetach", e);
-                    return;
                 }
+            } else {
+                view.onFinishTemporaryDetach();
             }
-            view.onFinishTemporaryDetach();
         }
 
         public boolean dispatchNestedFling(View view, float f, float f2, boolean z) {
-            return view instanceof NestedScrollingChild ? ((NestedScrollingChild) view).dispatchNestedFling(f, f2, z) : false;
+            if (view instanceof NestedScrollingChild) {
+                return ((NestedScrollingChild) view).dispatchNestedFling(f, f2, z);
+            }
+            return false;
         }
 
         public boolean dispatchNestedPreFling(View view, float f, float f2) {
-            return view instanceof NestedScrollingChild ? ((NestedScrollingChild) view).dispatchNestedPreFling(f, f2) : false;
+            if (view instanceof NestedScrollingChild) {
+                return ((NestedScrollingChild) view).dispatchNestedPreFling(f, f2);
+            }
+            return false;
         }
 
         public boolean dispatchNestedPreScroll(View view, int i, int i2, int[] iArr, int[] iArr2) {
-            return view instanceof NestedScrollingChild ? ((NestedScrollingChild) view).dispatchNestedPreScroll(i, i2, iArr, iArr2) : false;
+            if (view instanceof NestedScrollingChild) {
+                return ((NestedScrollingChild) view).dispatchNestedPreScroll(i, i2, iArr, iArr2);
+            }
+            return false;
         }
 
         public boolean dispatchNestedScroll(View view, int i, int i2, int i3, int i4, int[] iArr) {
-            return view instanceof NestedScrollingChild ? ((NestedScrollingChild) view).dispatchNestedScroll(i, i2, i3, i4, iArr) : false;
+            if (view instanceof NestedScrollingChild) {
+                return ((NestedScrollingChild) view).dispatchNestedScroll(i, i2, i3, i4, iArr);
+            }
+            return false;
         }
 
         public void dispatchStartTemporaryDetach(View view) {
@@ -412,13 +760,12 @@ public class ViewCompat {
             if (this.mDispatchStartTemporaryDetach != null) {
                 try {
                     this.mDispatchStartTemporaryDetach.invoke(view, new Object[0]);
-                    return;
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.d(ViewCompat.TAG, "Error calling dispatchStartTemporaryDetach", e);
-                    return;
                 }
+            } else {
+                view.onStartTemporaryDetach();
             }
-            view.onStartTemporaryDetach();
         }
 
         public int getAccessibilityLiveRegion(View view) {
@@ -429,16 +776,18 @@ public class ViewCompat {
             return null;
         }
 
-        public float getAlpha(View view) {
-            return 1.0f;
-        }
-
         public ColorStateList getBackgroundTintList(View view) {
-            return ViewCompatBase.getBackgroundTintList(view);
+            if (view instanceof TintableBackgroundView) {
+                return ((TintableBackgroundView) view).getSupportBackgroundTintList();
+            }
+            return null;
         }
 
         public Mode getBackgroundTintMode(View view) {
-            return ViewCompatBase.getBackgroundTintMode(view);
+            if (view instanceof TintableBackgroundView) {
+                return ((TintableBackgroundView) view).getSupportBackgroundTintMode();
+            }
+            return null;
         }
 
         public Rect getClipBounds(View view) {
@@ -446,7 +795,10 @@ public class ViewCompat {
         }
 
         public Display getDisplay(View view) {
-            return ViewCompatBase.getDisplay(view);
+            if (isAttachedToWindow(view)) {
+                return ((WindowManager) view.getContext().getSystemService("window")).getDefaultDisplay();
+            }
+            return null;
         }
 
         public float getElevation(View view) {
@@ -457,8 +809,9 @@ public class ViewCompat {
             return false;
         }
 
-        long getFrameTime() {
-            return ViewCompat.FAKE_FRAME_TIME;
+        /* access modifiers changed from: 0000 */
+        public long getFrameTime() {
+            return ValueAnimator.getFrameDelay();
         }
 
         public int getImportantForAccessibility(View view) {
@@ -469,36 +822,48 @@ public class ViewCompat {
             return 0;
         }
 
-        public int getLayerType(View view) {
-            return 0;
-        }
-
         public int getLayoutDirection(View view) {
             return 0;
         }
 
-        public Matrix getMatrix(View view) {
-            return null;
-        }
-
-        public int getMeasuredHeightAndState(View view) {
-            return view.getMeasuredHeight();
-        }
-
-        public int getMeasuredState(View view) {
+        public int getMinimumHeight(View view) {
+            if (!sMinHeightFieldFetched) {
+                try {
+                    sMinHeightField = View.class.getDeclaredField("mMinHeight");
+                    sMinHeightField.setAccessible(true);
+                } catch (NoSuchFieldException e) {
+                }
+                sMinHeightFieldFetched = true;
+            }
+            if (sMinHeightField != null) {
+                try {
+                    return ((Integer) sMinHeightField.get(view)).intValue();
+                } catch (Exception e2) {
+                }
+            }
             return 0;
         }
 
-        public int getMeasuredWidthAndState(View view) {
-            return view.getMeasuredWidth();
-        }
-
-        public int getMinimumHeight(View view) {
-            return ViewCompatBase.getMinimumHeight(view);
-        }
-
         public int getMinimumWidth(View view) {
-            return ViewCompatBase.getMinimumWidth(view);
+            if (!sMinWidthFieldFetched) {
+                try {
+                    sMinWidthField = View.class.getDeclaredField("mMinWidth");
+                    sMinWidthField.setAccessible(true);
+                } catch (NoSuchFieldException e) {
+                }
+                sMinWidthFieldFetched = true;
+            }
+            if (sMinWidthField != null) {
+                try {
+                    return ((Integer) sMinWidthField.get(view)).intValue();
+                } catch (Exception e2) {
+                }
+            }
+            return 0;
+        }
+
+        public int getNextClusterForwardId(@NonNull View view) {
+            return -1;
         }
 
         public int getPaddingEnd(View view) {
@@ -513,48 +878,15 @@ public class ViewCompat {
             return view.getParent();
         }
 
-        public float getPivotX(View view) {
-            return 0.0f;
-        }
-
-        public float getPivotY(View view) {
-            return 0.0f;
-        }
-
-        public float getRotation(View view) {
-            return 0.0f;
-        }
-
-        public float getRotationX(View view) {
-            return 0.0f;
-        }
-
-        public float getRotationY(View view) {
-            return 0.0f;
-        }
-
-        public float getScaleX(View view) {
-            return 0.0f;
-        }
-
-        public float getScaleY(View view) {
-            return 0.0f;
-        }
-
         public int getScrollIndicators(View view) {
             return 0;
         }
 
         public String getTransitionName(View view) {
-            return null;
-        }
-
-        public float getTranslationX(View view) {
-            return 0.0f;
-        }
-
-        public float getTranslationY(View view) {
-            return 0.0f;
+            if (sTransitionNameMap == null) {
+                return null;
+            }
+            return (String) sTransitionNameMap.get(view);
         }
 
         public float getTranslationZ(View view) {
@@ -565,24 +897,44 @@ public class ViewCompat {
             return 0;
         }
 
-        public float getX(View view) {
-            return (float) view.getLeft();
-        }
-
-        public float getY(View view) {
-            return (float) view.getTop();
-        }
-
         public float getZ(View view) {
             return getTranslationZ(view) + getElevation(view);
         }
 
         public boolean hasAccessibilityDelegate(View view) {
-            return false;
+            boolean z = true;
+            if (sAccessibilityDelegateCheckFailed) {
+                return false;
+            }
+            if (sAccessibilityDelegateField == null) {
+                try {
+                    sAccessibilityDelegateField = View.class.getDeclaredField("mAccessibilityDelegate");
+                    sAccessibilityDelegateField.setAccessible(true);
+                } catch (Throwable th) {
+                    sAccessibilityDelegateCheckFailed = true;
+                    return false;
+                }
+            }
+            try {
+                if (sAccessibilityDelegateField.get(view) == null) {
+                    z = false;
+                }
+                return z;
+            } catch (Throwable th2) {
+                sAccessibilityDelegateCheckFailed = true;
+                return false;
+            }
+        }
+
+        public boolean hasExplicitFocusable(@NonNull View view) {
+            return view.hasFocusable();
         }
 
         public boolean hasNestedScrollingParent(View view) {
-            return view instanceof NestedScrollingChild ? ((NestedScrollingChild) view).hasNestedScrollingParent() : false;
+            if (view instanceof NestedScrollingChild) {
+                return ((NestedScrollingChild) view).hasNestedScrollingParent();
+            }
+            return false;
         }
 
         public boolean hasOnClickListeners(View view) {
@@ -598,7 +950,11 @@ public class ViewCompat {
         }
 
         public boolean isAttachedToWindow(View view) {
-            return ViewCompatBase.isAttachedToWindow(view);
+            return view.getWindowToken() != null;
+        }
+
+        public boolean isFocusedByDefault(@NonNull View view) {
+            return false;
         }
 
         public boolean isImportantForAccessibility(View view) {
@@ -609,8 +965,12 @@ public class ViewCompat {
             return false;
         }
 
+        public boolean isKeyboardNavigationCluster(@NonNull View view) {
+            return false;
+        }
+
         public boolean isLaidOut(View view) {
-            return ViewCompatBase.isLaidOut(view);
+            return view.getWidth() > 0 && view.getHeight() > 0;
         }
 
         public boolean isLayoutDirectionResolved(View view) {
@@ -618,35 +978,48 @@ public class ViewCompat {
         }
 
         public boolean isNestedScrollingEnabled(View view) {
-            return view instanceof NestedScrollingChild ? ((NestedScrollingChild) view).isNestedScrollingEnabled() : false;
+            if (view instanceof NestedScrollingChild) {
+                return ((NestedScrollingChild) view).isNestedScrollingEnabled();
+            }
+            return false;
         }
 
         public boolean isPaddingRelative(View view) {
             return false;
         }
 
-        public void jumpDrawablesToCurrentState(View view) {
+        public View keyboardNavigationClusterSearch(@NonNull View view, View view2, int i) {
+            return null;
         }
 
         public void offsetLeftAndRight(View view, int i) {
-            ViewCompatBase.offsetLeftAndRight(view, i);
+            view.offsetLeftAndRight(i);
+            if (view.getVisibility() == 0) {
+                tickleInvalidationFlag(view);
+                ViewParent parent = view.getParent();
+                if (parent instanceof View) {
+                    tickleInvalidationFlag((View) parent);
+                }
+            }
         }
 
         public void offsetTopAndBottom(View view, int i) {
-            ViewCompatBase.offsetTopAndBottom(view, i);
+            view.offsetTopAndBottom(i);
+            if (view.getVisibility() == 0) {
+                tickleInvalidationFlag(view);
+                ViewParent parent = view.getParent();
+                if (parent instanceof View) {
+                    tickleInvalidationFlag((View) parent);
+                }
+            }
         }
 
         public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
             return windowInsetsCompat;
         }
 
-        public void onInitializeAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent) {
-        }
-
         public void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
-        }
-
-        public void onPopulateAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent) {
+            view.onInitializeAccessibilityNodeInfo(accessibilityNodeInfoCompat.unwrap());
         }
 
         public boolean performAccessibilityAction(View view, int i, Bundle bundle) {
@@ -654,11 +1027,11 @@ public class ViewCompat {
         }
 
         public void postInvalidateOnAnimation(View view) {
-            view.invalidate();
+            view.postInvalidate();
         }
 
         public void postInvalidateOnAnimation(View view, int i, int i2, int i3, int i4) {
-            view.invalidate(i, i2, i3, i4);
+            view.postInvalidate(i, i2, i3, i4);
         }
 
         public void postOnAnimation(View view, Runnable runnable) {
@@ -672,20 +1045,15 @@ public class ViewCompat {
         public void requestApplyInsets(View view) {
         }
 
-        public int resolveSizeAndState(int i, int i2, int i3) {
-            return View.resolveSize(i, i2);
+        public boolean restoreDefaultFocus(@NonNull View view) {
+            return view.requestFocus();
         }
 
-        public void setAccessibilityDelegate(View view, AccessibilityDelegateCompat accessibilityDelegateCompat) {
+        public void setAccessibilityDelegate(View view, @Nullable AccessibilityDelegateCompat accessibilityDelegateCompat) {
+            view.setAccessibilityDelegate(accessibilityDelegateCompat == null ? null : accessibilityDelegateCompat.getBridge());
         }
 
         public void setAccessibilityLiveRegion(View view, int i) {
-        }
-
-        public void setActivated(View view, boolean z) {
-        }
-
-        public void setAlpha(View view, float f) {
         }
 
         public void setBackground(View view, Drawable drawable) {
@@ -693,30 +1061,34 @@ public class ViewCompat {
         }
 
         public void setBackgroundTintList(View view, ColorStateList colorStateList) {
-            ViewCompatBase.setBackgroundTintList(view, colorStateList);
+            if (view instanceof TintableBackgroundView) {
+                ((TintableBackgroundView) view).setSupportBackgroundTintList(colorStateList);
+            }
         }
 
         public void setBackgroundTintMode(View view, Mode mode) {
-            ViewCompatBase.setBackgroundTintMode(view, mode);
+            if (view instanceof TintableBackgroundView) {
+                ((TintableBackgroundView) view).setSupportBackgroundTintMode(mode);
+            }
         }
 
         public void setChildrenDrawingOrderEnabled(ViewGroup viewGroup, boolean z) {
             if (sChildrenDrawingOrderMethod == null) {
                 try {
                     sChildrenDrawingOrderMethod = ViewGroup.class.getDeclaredMethod("setChildrenDrawingOrderEnabled", new Class[]{Boolean.TYPE});
-                } catch (Throwable e) {
+                } catch (NoSuchMethodException e) {
                     Log.e(ViewCompat.TAG, "Unable to find childrenDrawingOrderEnabled", e);
                 }
                 sChildrenDrawingOrderMethod.setAccessible(true);
             }
             try {
                 sChildrenDrawingOrderMethod.invoke(viewGroup, new Object[]{Boolean.valueOf(z)});
-            } catch (Throwable e2) {
+            } catch (IllegalAccessException e2) {
                 Log.e(ViewCompat.TAG, "Unable to invoke childrenDrawingOrderEnabled", e2);
-            } catch (Throwable e22) {
-                Log.e(ViewCompat.TAG, "Unable to invoke childrenDrawingOrderEnabled", e22);
-            } catch (Throwable e222) {
-                Log.e(ViewCompat.TAG, "Unable to invoke childrenDrawingOrderEnabled", e222);
+            } catch (IllegalArgumentException e3) {
+                Log.e(ViewCompat.TAG, "Unable to invoke childrenDrawingOrderEnabled", e3);
+            } catch (InvocationTargetException e4) {
+                Log.e(ViewCompat.TAG, "Unable to invoke childrenDrawingOrderEnabled", e4);
             }
         }
 
@@ -726,7 +1098,7 @@ public class ViewCompat {
         public void setElevation(View view, float f) {
         }
 
-        public void setFitsSystemWindows(View view, boolean z) {
+        public void setFocusedByDefault(@NonNull View view, boolean z) {
         }
 
         public void setHasTransientState(View view, boolean z) {
@@ -735,13 +1107,15 @@ public class ViewCompat {
         public void setImportantForAccessibility(View view, int i) {
         }
 
+        public void setKeyboardNavigationCluster(@NonNull View view, boolean z) {
+        }
+
         public void setLabelFor(View view, int i) {
         }
 
         public void setLayerPaint(View view, Paint paint) {
-        }
-
-        public void setLayerType(View view, int i, Paint paint) {
+            view.setLayerType(view.getLayerType(), paint);
+            view.invalidate();
         }
 
         public void setLayoutDirection(View view, int i) {
@@ -753,6 +1127,9 @@ public class ViewCompat {
             }
         }
 
+        public void setNextClusterForwardId(@NonNull View view, int i) {
+        }
+
         public void setOnApplyWindowInsetsListener(View view, OnApplyWindowInsetsListener onApplyWindowInsetsListener) {
         }
 
@@ -760,31 +1137,7 @@ public class ViewCompat {
             view.setPadding(i, i2, i3, i4);
         }
 
-        public void setPivotX(View view, float f) {
-        }
-
-        public void setPivotY(View view, float f) {
-        }
-
         public void setPointerIcon(View view, PointerIconCompat pointerIconCompat) {
-        }
-
-        public void setRotation(View view, float f) {
-        }
-
-        public void setRotationX(View view, float f) {
-        }
-
-        public void setRotationY(View view, float f) {
-        }
-
-        public void setSaveFromParentEnabled(View view, boolean z) {
-        }
-
-        public void setScaleX(View view, float f) {
-        }
-
-        public void setScaleY(View view, float f) {
         }
 
         public void setScrollIndicators(View view, int i) {
@@ -793,29 +1146,31 @@ public class ViewCompat {
         public void setScrollIndicators(View view, int i, int i2) {
         }
 
+        public void setTooltipText(View view, CharSequence charSequence) {
+        }
+
         public void setTransitionName(View view, String str) {
-        }
-
-        public void setTranslationX(View view, float f) {
-        }
-
-        public void setTranslationY(View view, float f) {
+            if (sTransitionNameMap == null) {
+                sTransitionNameMap = new WeakHashMap<>();
+            }
+            sTransitionNameMap.put(view, str);
         }
 
         public void setTranslationZ(View view, float f) {
         }
 
-        public void setX(View view, float f) {
-        }
-
-        public void setY(View view, float f) {
-        }
-
         public void setZ(View view, float f) {
         }
 
+        public boolean startDragAndDrop(View view, ClipData clipData, DragShadowBuilder dragShadowBuilder, Object obj, int i) {
+            return view.startDrag(clipData, dragShadowBuilder, obj, i);
+        }
+
         public boolean startNestedScroll(View view, int i) {
-            return view instanceof NestedScrollingChild ? ((NestedScrollingChild) view).startNestedScroll(i) : false;
+            if (view instanceof NestedScrollingChild) {
+                return ((NestedScrollingChild) view).startNestedScroll(i);
+            }
+            return false;
         }
 
         public void stopNestedScroll(View view) {
@@ -823,647 +1178,63 @@ public class ViewCompat {
                 ((NestedScrollingChild) view).stopNestedScroll();
             }
         }
-    }
 
-    static class HCViewCompatImpl extends BaseViewCompatImpl {
-        HCViewCompatImpl() {
+        public void updateDragShadow(View view, DragShadowBuilder dragShadowBuilder) {
         }
-
-        public int combineMeasuredStates(int i, int i2) {
-            return ViewCompatHC.combineMeasuredStates(i, i2);
-        }
-
-        public float getAlpha(View view) {
-            return ViewCompatHC.getAlpha(view);
-        }
-
-        long getFrameTime() {
-            return ViewCompatHC.getFrameTime();
-        }
-
-        public int getLayerType(View view) {
-            return ViewCompatHC.getLayerType(view);
-        }
-
-        public Matrix getMatrix(View view) {
-            return ViewCompatHC.getMatrix(view);
-        }
-
-        public int getMeasuredHeightAndState(View view) {
-            return ViewCompatHC.getMeasuredHeightAndState(view);
-        }
-
-        public int getMeasuredState(View view) {
-            return ViewCompatHC.getMeasuredState(view);
-        }
-
-        public int getMeasuredWidthAndState(View view) {
-            return ViewCompatHC.getMeasuredWidthAndState(view);
-        }
-
-        public float getPivotX(View view) {
-            return ViewCompatHC.getPivotX(view);
-        }
-
-        public float getPivotY(View view) {
-            return ViewCompatHC.getPivotY(view);
-        }
-
-        public float getRotation(View view) {
-            return ViewCompatHC.getRotation(view);
-        }
-
-        public float getRotationX(View view) {
-            return ViewCompatHC.getRotationX(view);
-        }
-
-        public float getRotationY(View view) {
-            return ViewCompatHC.getRotationY(view);
-        }
-
-        public float getScaleX(View view) {
-            return ViewCompatHC.getScaleX(view);
-        }
-
-        public float getScaleY(View view) {
-            return ViewCompatHC.getScaleY(view);
-        }
-
-        public float getTranslationX(View view) {
-            return ViewCompatHC.getTranslationX(view);
-        }
-
-        public float getTranslationY(View view) {
-            return ViewCompatHC.getTranslationY(view);
-        }
-
-        public float getX(View view) {
-            return ViewCompatHC.getX(view);
-        }
-
-        public float getY(View view) {
-            return ViewCompatHC.getY(view);
-        }
-
-        public void jumpDrawablesToCurrentState(View view) {
-            ViewCompatHC.jumpDrawablesToCurrentState(view);
-        }
-
-        public void offsetLeftAndRight(View view, int i) {
-            ViewCompatHC.offsetLeftAndRight(view, i);
-        }
-
-        public void offsetTopAndBottom(View view, int i) {
-            ViewCompatHC.offsetTopAndBottom(view, i);
-        }
-
-        public int resolveSizeAndState(int i, int i2, int i3) {
-            return ViewCompatHC.resolveSizeAndState(i, i2, i3);
-        }
-
-        public void setActivated(View view, boolean z) {
-            ViewCompatHC.setActivated(view, z);
-        }
-
-        public void setAlpha(View view, float f) {
-            ViewCompatHC.setAlpha(view, f);
-        }
-
-        public void setLayerPaint(View view, Paint paint) {
-            setLayerType(view, getLayerType(view), paint);
-            view.invalidate();
-        }
-
-        public void setLayerType(View view, int i, Paint paint) {
-            ViewCompatHC.setLayerType(view, i, paint);
-        }
-
-        public void setPivotX(View view, float f) {
-            ViewCompatHC.setPivotX(view, f);
-        }
-
-        public void setPivotY(View view, float f) {
-            ViewCompatHC.setPivotY(view, f);
-        }
-
-        public void setRotation(View view, float f) {
-            ViewCompatHC.setRotation(view, f);
-        }
-
-        public void setRotationX(View view, float f) {
-            ViewCompatHC.setRotationX(view, f);
-        }
-
-        public void setRotationY(View view, float f) {
-            ViewCompatHC.setRotationY(view, f);
-        }
-
-        public void setSaveFromParentEnabled(View view, boolean z) {
-            ViewCompatHC.setSaveFromParentEnabled(view, z);
-        }
-
-        public void setScaleX(View view, float f) {
-            ViewCompatHC.setScaleX(view, f);
-        }
-
-        public void setScaleY(View view, float f) {
-            ViewCompatHC.setScaleY(view, f);
-        }
-
-        public void setTranslationX(View view, float f) {
-            ViewCompatHC.setTranslationX(view, f);
-        }
-
-        public void setTranslationY(View view, float f) {
-            ViewCompatHC.setTranslationY(view, f);
-        }
-
-        public void setX(View view, float f) {
-            ViewCompatHC.setX(view, f);
-        }
-
-        public void setY(View view, float f) {
-            ViewCompatHC.setY(view, f);
-        }
-    }
-
-    static class ICSViewCompatImpl extends HCViewCompatImpl {
-        static boolean accessibilityDelegateCheckFailed = false;
-        static Field mAccessibilityDelegateField;
-
-        ICSViewCompatImpl() {
-        }
-
-        public ViewPropertyAnimatorCompat animate(View view) {
-            if (this.mViewPropertyAnimatorCompatMap == null) {
-                this.mViewPropertyAnimatorCompatMap = new WeakHashMap();
-            }
-            ViewPropertyAnimatorCompat viewPropertyAnimatorCompat = (ViewPropertyAnimatorCompat) this.mViewPropertyAnimatorCompatMap.get(view);
-            if (viewPropertyAnimatorCompat != null) {
-                return viewPropertyAnimatorCompat;
-            }
-            viewPropertyAnimatorCompat = new ViewPropertyAnimatorCompat(view);
-            this.mViewPropertyAnimatorCompatMap.put(view, viewPropertyAnimatorCompat);
-            return viewPropertyAnimatorCompat;
-        }
-
-        public boolean canScrollHorizontally(View view, int i) {
-            return ViewCompatICS.canScrollHorizontally(view, i);
-        }
-
-        public boolean canScrollVertically(View view, int i) {
-            return ViewCompatICS.canScrollVertically(view, i);
-        }
-
-        public boolean hasAccessibilityDelegate(View view) {
-            boolean z = true;
-            if (accessibilityDelegateCheckFailed) {
-                return false;
-            }
-            if (mAccessibilityDelegateField == null) {
-                try {
-                    mAccessibilityDelegateField = View.class.getDeclaredField("mAccessibilityDelegate");
-                    mAccessibilityDelegateField.setAccessible(true);
-                } catch (Throwable th) {
-                    accessibilityDelegateCheckFailed = true;
-                    return false;
-                }
-            }
-            try {
-                if (mAccessibilityDelegateField.get(view) == null) {
-                    z = false;
-                }
-                return z;
-            } catch (Throwable th2) {
-                accessibilityDelegateCheckFailed = true;
-                return false;
-            }
-        }
-
-        public void onInitializeAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent) {
-            ViewCompatICS.onInitializeAccessibilityEvent(view, accessibilityEvent);
-        }
-
-        public void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
-            ViewCompatICS.onInitializeAccessibilityNodeInfo(view, accessibilityNodeInfoCompat.getInfo());
-        }
-
-        public void onPopulateAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent) {
-            ViewCompatICS.onPopulateAccessibilityEvent(view, accessibilityEvent);
-        }
-
-        public void setAccessibilityDelegate(View view, @Nullable AccessibilityDelegateCompat accessibilityDelegateCompat) {
-            ViewCompatICS.setAccessibilityDelegate(view, accessibilityDelegateCompat == null ? null : accessibilityDelegateCompat.getBridge());
-        }
-
-        public void setFitsSystemWindows(View view, boolean z) {
-            ViewCompatICS.setFitsSystemWindows(view, z);
-        }
-    }
-
-    static class ICSMr1ViewCompatImpl extends ICSViewCompatImpl {
-        ICSMr1ViewCompatImpl() {
-        }
-
-        public boolean hasOnClickListeners(View view) {
-            return ViewCompatICSMr1.hasOnClickListeners(view);
-        }
-    }
-
-    static class JBViewCompatImpl extends ICSMr1ViewCompatImpl {
-        JBViewCompatImpl() {
-        }
-
-        public AccessibilityNodeProviderCompat getAccessibilityNodeProvider(View view) {
-            Object accessibilityNodeProvider = ViewCompatJB.getAccessibilityNodeProvider(view);
-            return accessibilityNodeProvider != null ? new AccessibilityNodeProviderCompat(accessibilityNodeProvider) : null;
-        }
-
-        public boolean getFitsSystemWindows(View view) {
-            return ViewCompatJB.getFitsSystemWindows(view);
-        }
-
-        public int getImportantForAccessibility(View view) {
-            return ViewCompatJB.getImportantForAccessibility(view);
-        }
-
-        public int getMinimumHeight(View view) {
-            return ViewCompatJB.getMinimumHeight(view);
-        }
-
-        public int getMinimumWidth(View view) {
-            return ViewCompatJB.getMinimumWidth(view);
-        }
-
-        public ViewParent getParentForAccessibility(View view) {
-            return ViewCompatJB.getParentForAccessibility(view);
-        }
-
-        public boolean hasOverlappingRendering(View view) {
-            return ViewCompatJB.hasOverlappingRendering(view);
-        }
-
-        public boolean hasTransientState(View view) {
-            return ViewCompatJB.hasTransientState(view);
-        }
-
-        public boolean performAccessibilityAction(View view, int i, Bundle bundle) {
-            return ViewCompatJB.performAccessibilityAction(view, i, bundle);
-        }
-
-        public void postInvalidateOnAnimation(View view) {
-            ViewCompatJB.postInvalidateOnAnimation(view);
-        }
-
-        public void postInvalidateOnAnimation(View view, int i, int i2, int i3, int i4) {
-            ViewCompatJB.postInvalidateOnAnimation(view, i, i2, i3, i4);
-        }
-
-        public void postOnAnimation(View view, Runnable runnable) {
-            ViewCompatJB.postOnAnimation(view, runnable);
-        }
-
-        public void postOnAnimationDelayed(View view, Runnable runnable, long j) {
-            ViewCompatJB.postOnAnimationDelayed(view, runnable, j);
-        }
-
-        public void requestApplyInsets(View view) {
-            ViewCompatJB.requestApplyInsets(view);
-        }
-
-        public void setBackground(View view, Drawable drawable) {
-            ViewCompatJB.setBackground(view, drawable);
-        }
-
-        public void setHasTransientState(View view, boolean z) {
-            ViewCompatJB.setHasTransientState(view, z);
-        }
-
-        public void setImportantForAccessibility(View view, int i) {
-            if (i == 4) {
-                i = 2;
-            }
-            ViewCompatJB.setImportantForAccessibility(view, i);
-        }
-    }
-
-    static class JbMr1ViewCompatImpl extends JBViewCompatImpl {
-        JbMr1ViewCompatImpl() {
-        }
-
-        public Display getDisplay(View view) {
-            return ViewCompatJellybeanMr1.getDisplay(view);
-        }
-
-        public int getLabelFor(View view) {
-            return ViewCompatJellybeanMr1.getLabelFor(view);
-        }
-
-        public int getLayoutDirection(View view) {
-            return ViewCompatJellybeanMr1.getLayoutDirection(view);
-        }
-
-        public int getPaddingEnd(View view) {
-            return ViewCompatJellybeanMr1.getPaddingEnd(view);
-        }
-
-        public int getPaddingStart(View view) {
-            return ViewCompatJellybeanMr1.getPaddingStart(view);
-        }
-
-        public int getWindowSystemUiVisibility(View view) {
-            return ViewCompatJellybeanMr1.getWindowSystemUiVisibility(view);
-        }
-
-        public boolean isPaddingRelative(View view) {
-            return ViewCompatJellybeanMr1.isPaddingRelative(view);
-        }
-
-        public void setLabelFor(View view, int i) {
-            ViewCompatJellybeanMr1.setLabelFor(view, i);
-        }
-
-        public void setLayerPaint(View view, Paint paint) {
-            ViewCompatJellybeanMr1.setLayerPaint(view, paint);
-        }
-
-        public void setLayoutDirection(View view, int i) {
-            ViewCompatJellybeanMr1.setLayoutDirection(view, i);
-        }
-
-        public void setPaddingRelative(View view, int i, int i2, int i3, int i4) {
-            ViewCompatJellybeanMr1.setPaddingRelative(view, i, i2, i3, i4);
-        }
-    }
-
-    static class JbMr2ViewCompatImpl extends JbMr1ViewCompatImpl {
-        JbMr2ViewCompatImpl() {
-        }
-
-        public Rect getClipBounds(View view) {
-            return ViewCompatJellybeanMr2.getClipBounds(view);
-        }
-
-        public boolean isInLayout(View view) {
-            return ViewCompatJellybeanMr2.isInLayout(view);
-        }
-
-        public void setClipBounds(View view, Rect rect) {
-            ViewCompatJellybeanMr2.setClipBounds(view, rect);
-        }
-    }
-
-    static class KitKatViewCompatImpl extends JbMr2ViewCompatImpl {
-        KitKatViewCompatImpl() {
-        }
-
-        public int getAccessibilityLiveRegion(View view) {
-            return ViewCompatKitKat.getAccessibilityLiveRegion(view);
-        }
-
-        public boolean isAttachedToWindow(View view) {
-            return ViewCompatKitKat.isAttachedToWindow(view);
-        }
-
-        public boolean isLaidOut(View view) {
-            return ViewCompatKitKat.isLaidOut(view);
-        }
-
-        public boolean isLayoutDirectionResolved(View view) {
-            return ViewCompatKitKat.isLayoutDirectionResolved(view);
-        }
-
-        public void setAccessibilityLiveRegion(View view, int i) {
-            ViewCompatKitKat.setAccessibilityLiveRegion(view, i);
-        }
-
-        public void setImportantForAccessibility(View view, int i) {
-            ViewCompatJB.setImportantForAccessibility(view, i);
-        }
-    }
-
-    static class LollipopViewCompatImpl extends KitKatViewCompatImpl {
-        LollipopViewCompatImpl() {
-        }
-
-        public WindowInsetsCompat dispatchApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
-            return WindowInsetsCompat.wrap(ViewCompatLollipop.dispatchApplyWindowInsets(view, WindowInsetsCompat.unwrap(windowInsetsCompat)));
-        }
-
-        public boolean dispatchNestedFling(View view, float f, float f2, boolean z) {
-            return ViewCompatLollipop.dispatchNestedFling(view, f, f2, z);
-        }
-
-        public boolean dispatchNestedPreFling(View view, float f, float f2) {
-            return ViewCompatLollipop.dispatchNestedPreFling(view, f, f2);
-        }
-
-        public boolean dispatchNestedPreScroll(View view, int i, int i2, int[] iArr, int[] iArr2) {
-            return ViewCompatLollipop.dispatchNestedPreScroll(view, i, i2, iArr, iArr2);
-        }
-
-        public boolean dispatchNestedScroll(View view, int i, int i2, int i3, int i4, int[] iArr) {
-            return ViewCompatLollipop.dispatchNestedScroll(view, i, i2, i3, i4, iArr);
-        }
-
-        public ColorStateList getBackgroundTintList(View view) {
-            return ViewCompatLollipop.getBackgroundTintList(view);
-        }
-
-        public Mode getBackgroundTintMode(View view) {
-            return ViewCompatLollipop.getBackgroundTintMode(view);
-        }
-
-        public float getElevation(View view) {
-            return ViewCompatLollipop.getElevation(view);
-        }
-
-        public String getTransitionName(View view) {
-            return ViewCompatLollipop.getTransitionName(view);
-        }
-
-        public float getTranslationZ(View view) {
-            return ViewCompatLollipop.getTranslationZ(view);
-        }
-
-        public float getZ(View view) {
-            return ViewCompatLollipop.getZ(view);
-        }
-
-        public boolean hasNestedScrollingParent(View view) {
-            return ViewCompatLollipop.hasNestedScrollingParent(view);
-        }
-
-        public boolean isImportantForAccessibility(View view) {
-            return ViewCompatLollipop.isImportantForAccessibility(view);
-        }
-
-        public boolean isNestedScrollingEnabled(View view) {
-            return ViewCompatLollipop.isNestedScrollingEnabled(view);
-        }
-
-        public void offsetLeftAndRight(View view, int i) {
-            ViewCompatLollipop.offsetLeftAndRight(view, i);
-        }
-
-        public void offsetTopAndBottom(View view, int i) {
-            ViewCompatLollipop.offsetTopAndBottom(view, i);
-        }
-
-        public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
-            return WindowInsetsCompat.wrap(ViewCompatLollipop.onApplyWindowInsets(view, WindowInsetsCompat.unwrap(windowInsetsCompat)));
-        }
-
-        public void requestApplyInsets(View view) {
-            ViewCompatLollipop.requestApplyInsets(view);
-        }
-
-        public void setBackgroundTintList(View view, ColorStateList colorStateList) {
-            ViewCompatLollipop.setBackgroundTintList(view, colorStateList);
-        }
-
-        public void setBackgroundTintMode(View view, Mode mode) {
-            ViewCompatLollipop.setBackgroundTintMode(view, mode);
-        }
-
-        public void setElevation(View view, float f) {
-            ViewCompatLollipop.setElevation(view, f);
-        }
-
-        public void setNestedScrollingEnabled(View view, boolean z) {
-            ViewCompatLollipop.setNestedScrollingEnabled(view, z);
-        }
-
-        public void setOnApplyWindowInsetsListener(View view, final OnApplyWindowInsetsListener onApplyWindowInsetsListener) {
-            if (onApplyWindowInsetsListener == null) {
-                ViewCompatLollipop.setOnApplyWindowInsetsListener(view, null);
-            } else {
-                ViewCompatLollipop.setOnApplyWindowInsetsListener(view, new OnApplyWindowInsetsListenerBridge() {
-                    public Object onApplyWindowInsets(View view, Object obj) {
-                        return WindowInsetsCompat.unwrap(onApplyWindowInsetsListener.onApplyWindowInsets(view, WindowInsetsCompat.wrap(obj)));
-                    }
-                });
-            }
-        }
-
-        public void setTransitionName(View view, String str) {
-            ViewCompatLollipop.setTransitionName(view, str);
-        }
-
-        public void setTranslationZ(View view, float f) {
-            ViewCompatLollipop.setTranslationZ(view, f);
-        }
-
-        public void setZ(View view, float f) {
-            ViewCompatLollipop.setZ(view, f);
-        }
-
-        public boolean startNestedScroll(View view, int i) {
-            return ViewCompatLollipop.startNestedScroll(view, i);
-        }
-
-        public void stopNestedScroll(View view) {
-            ViewCompatLollipop.stopNestedScroll(view);
-        }
-    }
-
-    static class MarshmallowViewCompatImpl extends LollipopViewCompatImpl {
-        MarshmallowViewCompatImpl() {
-        }
-
-        public int getScrollIndicators(View view) {
-            return ViewCompatMarshmallow.getScrollIndicators(view);
-        }
-
-        public void offsetLeftAndRight(View view, int i) {
-            ViewCompatMarshmallow.offsetLeftAndRight(view, i);
-        }
-
-        public void offsetTopAndBottom(View view, int i) {
-            ViewCompatMarshmallow.offsetTopAndBottom(view, i);
-        }
-
-        public void setScrollIndicators(View view, int i) {
-            ViewCompatMarshmallow.setScrollIndicators(view, i);
-        }
-
-        public void setScrollIndicators(View view, int i, int i2) {
-            ViewCompatMarshmallow.setScrollIndicators(view, i, i2);
-        }
-    }
-
-    static class Api24ViewCompatImpl extends MarshmallowViewCompatImpl {
-        Api24ViewCompatImpl() {
-        }
-
-        public void setPointerIcon(View view, PointerIconCompat pointerIconCompat) {
-            ViewCompatApi24.setPointerIcon(view, pointerIconCompat != null ? pointerIconCompat.getPointerIcon() : null);
-        }
-    }
-
-    @RestrictTo({Scope.LIBRARY_GROUP})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface FocusDirection {
-    }
-
-    @RestrictTo({Scope.LIBRARY_GROUP})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface FocusRealDirection {
-    }
-
-    @RestrictTo({Scope.LIBRARY_GROUP})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface FocusRelativeDirection {
-    }
-
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ScrollIndicators {
     }
 
     static {
-        int i = VERSION.SDK_INT;
-        if (BuildCompat.isAtLeastN()) {
-            IMPL = new Api24ViewCompatImpl();
-        } else if (i >= 23) {
-            IMPL = new MarshmallowViewCompatImpl();
-        } else if (i >= 21) {
-            IMPL = new LollipopViewCompatImpl();
-        } else if (i >= 19) {
-            IMPL = new KitKatViewCompatImpl();
-        } else if (i >= 18) {
-            IMPL = new JbMr2ViewCompatImpl();
-        } else if (i >= 17) {
-            IMPL = new JbMr1ViewCompatImpl();
-        } else if (i >= 16) {
-            IMPL = new JBViewCompatImpl();
-        } else if (i >= 15) {
-            IMPL = new ICSMr1ViewCompatImpl();
-        } else if (i >= 14) {
-            IMPL = new ICSViewCompatImpl();
-        } else if (i >= 11) {
-            IMPL = new HCViewCompatImpl();
+        if (VERSION.SDK_INT >= 26) {
+            IMPL = new ViewCompatApi26Impl();
+        } else if (VERSION.SDK_INT >= 24) {
+            IMPL = new ViewCompatApi24Impl();
+        } else if (VERSION.SDK_INT >= 23) {
+            IMPL = new ViewCompatApi23Impl();
+        } else if (VERSION.SDK_INT >= 21) {
+            IMPL = new ViewCompatApi21Impl();
+        } else if (VERSION.SDK_INT >= 19) {
+            IMPL = new ViewCompatApi19Impl();
+        } else if (VERSION.SDK_INT >= 18) {
+            IMPL = new ViewCompatApi18Impl();
+        } else if (VERSION.SDK_INT >= 17) {
+            IMPL = new ViewCompatApi17Impl();
+        } else if (VERSION.SDK_INT >= 16) {
+            IMPL = new ViewCompatApi16Impl();
+        } else if (VERSION.SDK_INT >= 15) {
+            IMPL = new ViewCompatApi15Impl();
         } else {
-            IMPL = new BaseViewCompatImpl();
+            IMPL = new ViewCompatBaseImpl();
         }
     }
 
     protected ViewCompat() {
     }
 
+    public static void addKeyboardNavigationClusters(@NonNull View view, @NonNull Collection<View> collection, int i) {
+        IMPL.addKeyboardNavigationClusters(view, collection, i);
+    }
+
     public static ViewPropertyAnimatorCompat animate(View view) {
         return IMPL.animate(view);
     }
 
+    @Deprecated
     public static boolean canScrollHorizontally(View view, int i) {
-        return IMPL.canScrollHorizontally(view, i);
+        return view.canScrollHorizontally(i);
     }
 
+    @Deprecated
     public static boolean canScrollVertically(View view, int i) {
-        return IMPL.canScrollVertically(view, i);
+        return view.canScrollVertically(i);
     }
 
+    public static void cancelDragAndDrop(View view) {
+        IMPL.cancelDragAndDrop(view);
+    }
+
+    @Deprecated
     public static int combineMeasuredStates(int i, int i2) {
-        return IMPL.combineMeasuredStates(i, i2);
+        return View.combineMeasuredStates(i, i2);
     }
 
     public static WindowInsetsCompat dispatchApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
@@ -1474,20 +1245,40 @@ public class ViewCompat {
         IMPL.dispatchFinishTemporaryDetach(view);
     }
 
-    public static boolean dispatchNestedFling(View view, float f, float f2, boolean z) {
+    public static boolean dispatchNestedFling(@NonNull View view, float f, float f2, boolean z) {
         return IMPL.dispatchNestedFling(view, f, f2, z);
     }
 
-    public static boolean dispatchNestedPreFling(View view, float f, float f2) {
+    public static boolean dispatchNestedPreFling(@NonNull View view, float f, float f2) {
         return IMPL.dispatchNestedPreFling(view, f, f2);
     }
 
-    public static boolean dispatchNestedPreScroll(View view, int i, int i2, int[] iArr, int[] iArr2) {
+    public static boolean dispatchNestedPreScroll(@NonNull View view, int i, int i2, @Nullable int[] iArr, @Nullable int[] iArr2) {
         return IMPL.dispatchNestedPreScroll(view, i, i2, iArr, iArr2);
     }
 
-    public static boolean dispatchNestedScroll(View view, int i, int i2, int i3, int i4, int[] iArr) {
+    public static boolean dispatchNestedPreScroll(@NonNull View view, int i, int i2, @Nullable int[] iArr, @Nullable int[] iArr2, int i3) {
+        if (view instanceof NestedScrollingChild2) {
+            return ((NestedScrollingChild2) view).dispatchNestedPreScroll(i, i2, iArr, iArr2, i3);
+        }
+        if (i3 == 0) {
+            return IMPL.dispatchNestedPreScroll(view, i, i2, iArr, iArr2);
+        }
+        return false;
+    }
+
+    public static boolean dispatchNestedScroll(@NonNull View view, int i, int i2, int i3, int i4, @Nullable int[] iArr) {
         return IMPL.dispatchNestedScroll(view, i, i2, i3, i4, iArr);
+    }
+
+    public static boolean dispatchNestedScroll(@NonNull View view, int i, int i2, int i3, int i4, @Nullable int[] iArr, int i5) {
+        if (view instanceof NestedScrollingChild2) {
+            return ((NestedScrollingChild2) view).dispatchNestedScroll(i, i2, i3, i4, iArr, i5);
+        }
+        if (i5 == 0) {
+            return IMPL.dispatchNestedScroll(view, i, i2, i3, i4, iArr);
+        }
+        return false;
     }
 
     public static void dispatchStartTemporaryDetach(View view) {
@@ -1502,8 +1293,9 @@ public class ViewCompat {
         return IMPL.getAccessibilityNodeProvider(view);
     }
 
+    @Deprecated
     public static float getAlpha(View view) {
-        return IMPL.getAlpha(view);
+        return view.getAlpha();
     }
 
     public static ColorStateList getBackgroundTintList(View view) {
@@ -1538,8 +1330,9 @@ public class ViewCompat {
         return IMPL.getLabelFor(view);
     }
 
+    @Deprecated
     public static int getLayerType(View view) {
-        return IMPL.getLayerType(view);
+        return view.getLayerType();
     }
 
     public static int getLayoutDirection(View view) {
@@ -1547,20 +1340,24 @@ public class ViewCompat {
     }
 
     @Nullable
+    @Deprecated
     public static Matrix getMatrix(View view) {
-        return IMPL.getMatrix(view);
+        return view.getMatrix();
     }
 
+    @Deprecated
     public static int getMeasuredHeightAndState(View view) {
-        return IMPL.getMeasuredHeightAndState(view);
+        return view.getMeasuredHeightAndState();
     }
 
+    @Deprecated
     public static int getMeasuredState(View view) {
-        return IMPL.getMeasuredState(view);
+        return view.getMeasuredState();
     }
 
+    @Deprecated
     public static int getMeasuredWidthAndState(View view) {
-        return IMPL.getMeasuredWidthAndState(view);
+        return view.getMeasuredWidthAndState();
     }
 
     public static int getMinimumHeight(View view) {
@@ -1569,6 +1366,10 @@ public class ViewCompat {
 
     public static int getMinimumWidth(View view) {
         return IMPL.getMinimumWidth(view);
+    }
+
+    public static int getNextClusterForwardId(@NonNull View view) {
+        return IMPL.getNextClusterForwardId(view);
     }
 
     @Deprecated
@@ -1588,32 +1389,39 @@ public class ViewCompat {
         return IMPL.getParentForAccessibility(view);
     }
 
+    @Deprecated
     public static float getPivotX(View view) {
-        return IMPL.getPivotX(view);
+        return view.getPivotX();
     }
 
+    @Deprecated
     public static float getPivotY(View view) {
-        return IMPL.getPivotY(view);
+        return view.getPivotY();
     }
 
+    @Deprecated
     public static float getRotation(View view) {
-        return IMPL.getRotation(view);
+        return view.getRotation();
     }
 
+    @Deprecated
     public static float getRotationX(View view) {
-        return IMPL.getRotationX(view);
+        return view.getRotationX();
     }
 
+    @Deprecated
     public static float getRotationY(View view) {
-        return IMPL.getRotationY(view);
+        return view.getRotationY();
     }
 
+    @Deprecated
     public static float getScaleX(View view) {
-        return IMPL.getScaleX(view);
+        return view.getScaleX();
     }
 
+    @Deprecated
     public static float getScaleY(View view) {
-        return IMPL.getScaleY(view);
+        return view.getScaleY();
     }
 
     public static int getScrollIndicators(@NonNull View view) {
@@ -1624,12 +1432,14 @@ public class ViewCompat {
         return IMPL.getTransitionName(view);
     }
 
+    @Deprecated
     public static float getTranslationX(View view) {
-        return IMPL.getTranslationX(view);
+        return view.getTranslationX();
     }
 
+    @Deprecated
     public static float getTranslationY(View view) {
-        return IMPL.getTranslationY(view);
+        return view.getTranslationY();
     }
 
     public static float getTranslationZ(View view) {
@@ -1640,12 +1450,14 @@ public class ViewCompat {
         return IMPL.getWindowSystemUiVisibility(view);
     }
 
+    @Deprecated
     public static float getX(View view) {
-        return IMPL.getX(view);
+        return view.getX();
     }
 
+    @Deprecated
     public static float getY(View view) {
-        return IMPL.getY(view);
+        return view.getY();
     }
 
     public static float getZ(View view) {
@@ -1656,8 +1468,21 @@ public class ViewCompat {
         return IMPL.hasAccessibilityDelegate(view);
     }
 
-    public static boolean hasNestedScrollingParent(View view) {
+    public static boolean hasExplicitFocusable(@NonNull View view) {
+        return IMPL.hasExplicitFocusable(view);
+    }
+
+    public static boolean hasNestedScrollingParent(@NonNull View view) {
         return IMPL.hasNestedScrollingParent(view);
+    }
+
+    public static boolean hasNestedScrollingParent(@NonNull View view, int i) {
+        if (view instanceof NestedScrollingChild2) {
+            ((NestedScrollingChild2) view).hasNestedScrollingParent(i);
+        } else if (i == 0) {
+            return IMPL.hasNestedScrollingParent(view);
+        }
+        return false;
     }
 
     public static boolean hasOnClickListeners(View view) {
@@ -1676,12 +1501,20 @@ public class ViewCompat {
         return IMPL.isAttachedToWindow(view);
     }
 
+    public static boolean isFocusedByDefault(@NonNull View view) {
+        return IMPL.isFocusedByDefault(view);
+    }
+
     public static boolean isImportantForAccessibility(View view) {
         return IMPL.isImportantForAccessibility(view);
     }
 
     public static boolean isInLayout(View view) {
         return IMPL.isInLayout(view);
+    }
+
+    public static boolean isKeyboardNavigationCluster(@NonNull View view) {
+        return IMPL.isKeyboardNavigationCluster(view);
     }
 
     public static boolean isLaidOut(View view) {
@@ -1692,7 +1525,7 @@ public class ViewCompat {
         return IMPL.isLayoutDirectionResolved(view);
     }
 
-    public static boolean isNestedScrollingEnabled(View view) {
+    public static boolean isNestedScrollingEnabled(@NonNull View view) {
         return IMPL.isNestedScrollingEnabled(view);
     }
 
@@ -1705,8 +1538,13 @@ public class ViewCompat {
         return IMPL.isPaddingRelative(view);
     }
 
+    @Deprecated
     public static void jumpDrawablesToCurrentState(View view) {
-        IMPL.jumpDrawablesToCurrentState(view);
+        view.jumpDrawablesToCurrentState();
+    }
+
+    public static View keyboardNavigationClusterSearch(@NonNull View view, View view2, int i) {
+        return IMPL.keyboardNavigationClusterSearch(view, view2, i);
     }
 
     public static void offsetLeftAndRight(View view, int i) {
@@ -1721,16 +1559,18 @@ public class ViewCompat {
         return IMPL.onApplyWindowInsets(view, windowInsetsCompat);
     }
 
+    @Deprecated
     public static void onInitializeAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent) {
-        IMPL.onInitializeAccessibilityEvent(view, accessibilityEvent);
+        view.onInitializeAccessibilityEvent(accessibilityEvent);
     }
 
     public static void onInitializeAccessibilityNodeInfo(View view, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
         IMPL.onInitializeAccessibilityNodeInfo(view, accessibilityNodeInfoCompat);
     }
 
+    @Deprecated
     public static void onPopulateAccessibilityEvent(View view, AccessibilityEvent accessibilityEvent) {
-        IMPL.onPopulateAccessibilityEvent(view, accessibilityEvent);
+        view.onPopulateAccessibilityEvent(accessibilityEvent);
     }
 
     public static boolean performAccessibilityAction(View view, int i, Bundle bundle) {
@@ -1757,8 +1597,13 @@ public class ViewCompat {
         IMPL.requestApplyInsets(view);
     }
 
+    @Deprecated
     public static int resolveSizeAndState(int i, int i2, int i3) {
-        return IMPL.resolveSizeAndState(i, i2, i3);
+        return View.resolveSizeAndState(i, i2, i3);
+    }
+
+    public static boolean restoreDefaultFocus(@NonNull View view) {
+        return IMPL.restoreDefaultFocus(view);
     }
 
     public static void setAccessibilityDelegate(View view, AccessibilityDelegateCompat accessibilityDelegateCompat) {
@@ -1769,12 +1614,14 @@ public class ViewCompat {
         IMPL.setAccessibilityLiveRegion(view, i);
     }
 
+    @Deprecated
     public static void setActivated(View view, boolean z) {
-        IMPL.setActivated(view, z);
+        view.setActivated(z);
     }
 
-    public static void setAlpha(View view, @FloatRange(from = 0.0d, to = 1.0d) float f) {
-        IMPL.setAlpha(view, f);
+    @Deprecated
+    public static void setAlpha(View view, @FloatRange(from = 0.0d, mo54to = 1.0d) float f) {
+        view.setAlpha(f);
     }
 
     public static void setBackground(View view, Drawable drawable) {
@@ -1801,8 +1648,13 @@ public class ViewCompat {
         IMPL.setElevation(view, f);
     }
 
+    @Deprecated
     public static void setFitsSystemWindows(View view, boolean z) {
-        IMPL.setFitsSystemWindows(view, z);
+        view.setFitsSystemWindows(z);
+    }
+
+    public static void setFocusedByDefault(@NonNull View view, boolean z) {
+        IMPL.setFocusedByDefault(view, z);
     }
 
     public static void setHasTransientState(View view, boolean z) {
@@ -1813,6 +1665,10 @@ public class ViewCompat {
         IMPL.setImportantForAccessibility(view, i);
     }
 
+    public static void setKeyboardNavigationCluster(@NonNull View view, boolean z) {
+        IMPL.setKeyboardNavigationCluster(view, z);
+    }
+
     public static void setLabelFor(View view, @IdRes int i) {
         IMPL.setLabelFor(view, i);
     }
@@ -1821,16 +1677,21 @@ public class ViewCompat {
         IMPL.setLayerPaint(view, paint);
     }
 
+    @Deprecated
     public static void setLayerType(View view, int i, Paint paint) {
-        IMPL.setLayerType(view, i, paint);
+        view.setLayerType(i, paint);
     }
 
     public static void setLayoutDirection(View view, int i) {
         IMPL.setLayoutDirection(view, i);
     }
 
-    public static void setNestedScrollingEnabled(View view, boolean z) {
+    public static void setNestedScrollingEnabled(@NonNull View view, boolean z) {
         IMPL.setNestedScrollingEnabled(view, z);
+    }
+
+    public static void setNextClusterForwardId(@NonNull View view, int i) {
+        IMPL.setNextClusterForwardId(view, i);
     }
 
     public static void setOnApplyWindowInsetsListener(View view, OnApplyWindowInsetsListener onApplyWindowInsetsListener) {
@@ -1846,40 +1707,48 @@ public class ViewCompat {
         IMPL.setPaddingRelative(view, i, i2, i3, i4);
     }
 
+    @Deprecated
     public static void setPivotX(View view, float f) {
-        IMPL.setPivotX(view, f);
+        view.setPivotX(f);
     }
 
+    @Deprecated
     public static void setPivotY(View view, float f) {
-        IMPL.setPivotY(view, f);
+        view.setPivotY(f);
     }
 
     public static void setPointerIcon(@NonNull View view, PointerIconCompat pointerIconCompat) {
         IMPL.setPointerIcon(view, pointerIconCompat);
     }
 
+    @Deprecated
     public static void setRotation(View view, float f) {
-        IMPL.setRotation(view, f);
+        view.setRotation(f);
     }
 
+    @Deprecated
     public static void setRotationX(View view, float f) {
-        IMPL.setRotationX(view, f);
+        view.setRotationX(f);
     }
 
+    @Deprecated
     public static void setRotationY(View view, float f) {
-        IMPL.setRotationY(view, f);
+        view.setRotationY(f);
     }
 
+    @Deprecated
     public static void setSaveFromParentEnabled(View view, boolean z) {
-        IMPL.setSaveFromParentEnabled(view, z);
+        view.setSaveFromParentEnabled(z);
     }
 
+    @Deprecated
     public static void setScaleX(View view, float f) {
-        IMPL.setScaleX(view, f);
+        view.setScaleX(f);
     }
 
+    @Deprecated
     public static void setScaleY(View view, float f) {
-        IMPL.setScaleY(view, f);
+        view.setScaleY(f);
     }
 
     public static void setScrollIndicators(@NonNull View view, int i) {
@@ -1890,39 +1759,73 @@ public class ViewCompat {
         IMPL.setScrollIndicators(view, i, i2);
     }
 
+    public static void setTooltipText(@NonNull View view, @Nullable CharSequence charSequence) {
+        IMPL.setTooltipText(view, charSequence);
+    }
+
     public static void setTransitionName(View view, String str) {
         IMPL.setTransitionName(view, str);
     }
 
+    @Deprecated
     public static void setTranslationX(View view, float f) {
-        IMPL.setTranslationX(view, f);
+        view.setTranslationX(f);
     }
 
+    @Deprecated
     public static void setTranslationY(View view, float f) {
-        IMPL.setTranslationY(view, f);
+        view.setTranslationY(f);
     }
 
     public static void setTranslationZ(View view, float f) {
         IMPL.setTranslationZ(view, f);
     }
 
+    @Deprecated
     public static void setX(View view, float f) {
-        IMPL.setX(view, f);
+        view.setX(f);
     }
 
+    @Deprecated
     public static void setY(View view, float f) {
-        IMPL.setY(view, f);
+        view.setY(f);
     }
 
     public static void setZ(View view, float f) {
         IMPL.setZ(view, f);
     }
 
-    public static boolean startNestedScroll(View view, int i) {
+    public static boolean startDragAndDrop(View view, ClipData clipData, DragShadowBuilder dragShadowBuilder, Object obj, int i) {
+        return IMPL.startDragAndDrop(view, clipData, dragShadowBuilder, obj, i);
+    }
+
+    public static boolean startNestedScroll(@NonNull View view, int i) {
         return IMPL.startNestedScroll(view, i);
     }
 
-    public static void stopNestedScroll(View view) {
+    public static boolean startNestedScroll(@NonNull View view, int i, int i2) {
+        if (view instanceof NestedScrollingChild2) {
+            return ((NestedScrollingChild2) view).startNestedScroll(i, i2);
+        }
+        if (i2 == 0) {
+            return IMPL.startNestedScroll(view, i);
+        }
+        return false;
+    }
+
+    public static void stopNestedScroll(@NonNull View view) {
         IMPL.stopNestedScroll(view);
+    }
+
+    public static void stopNestedScroll(@NonNull View view, int i) {
+        if (view instanceof NestedScrollingChild2) {
+            ((NestedScrollingChild2) view).stopNestedScroll(i);
+        } else if (i == 0) {
+            IMPL.stopNestedScroll(view);
+        }
+    }
+
+    public static void updateDragShadow(View view, DragShadowBuilder dragShadowBuilder) {
+        IMPL.updateDragShadow(view, dragShadowBuilder);
     }
 }

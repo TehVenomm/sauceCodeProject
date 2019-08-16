@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -50,7 +51,8 @@ public class CoreXMLDeserializers extends Base {
             return CoreXMLDeserializers._dataTypeFactory.newXMLGregorianCalendar(gregorianCalendar);
         }
 
-        protected Object _deserialize(String str, DeserializationContext deserializationContext) throws IllegalArgumentException {
+        /* access modifiers changed from: protected */
+        public Object _deserialize(String str, DeserializationContext deserializationContext) throws IllegalArgumentException {
             switch (this._kind) {
                 case 1:
                     return CoreXMLDeserializers._dataTypeFactory.newDuration(str);
@@ -65,13 +67,13 @@ public class CoreXMLDeserializers extends Base {
     static {
         try {
             _dataTypeFactory = DatatypeFactory.newInstance();
-        } catch (Throwable e) {
+        } catch (DatatypeConfigurationException e) {
             throw new RuntimeException(e);
         }
     }
 
     public JsonDeserializer<?> findBeanDeserializer(JavaType javaType, DeserializationConfig deserializationConfig, BeanDescription beanDescription) {
-        Class rawClass = javaType.getRawClass();
+        Class<Duration> rawClass = javaType.getRawClass();
         if (rawClass == QName.class) {
             return new Std(rawClass, 3);
         }

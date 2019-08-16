@@ -38,6 +38,23 @@ public class DeliveryBattleChecker : BattleCheckerBase
 		}
 	}
 
+	public void AddMySkillCount(int skillId, int count = 1)
+	{
+		if (deliveryBattleInfo.mySkillCountList == null)
+		{
+			deliveryBattleInfo.mySkillCountList = new List<DeliveryBattleInfo.SkillCount>();
+		}
+		DeliveryBattleInfo.SkillCount skillCount = deliveryBattleInfo.mySkillCountList.FirstOrDefault((DeliveryBattleInfo.SkillCount skill) => skill.skillId == skillId);
+		if (skillCount == null || skillCount.skillId <= 0)
+		{
+			deliveryBattleInfo.mySkillCountList.Add(new DeliveryBattleInfo.SkillCount(skillId, count));
+		}
+		else
+		{
+			skillCount.totalCount += count;
+		}
+	}
+
 	public void SetMaxDamageSelf(int damage)
 	{
 		deliveryBattleInfo.maxDamageSelf = Mathf.Max(deliveryBattleInfo.maxDamageSelf, damage);
@@ -48,28 +65,36 @@ public class DeliveryBattleChecker : BattleCheckerBase
 		deliveryBattleInfo.totalAttackCount += count;
 	}
 
+	public void AddAttackCount(int count = 1)
+	{
+		deliveryBattleInfo.attackCount += count;
+	}
+
 	public void ClearDamageByWeapon()
 	{
 		deliveryBattleInfo.damageByWeaponList.Clear();
+		deliveryBattleInfo.currentDamageByWeaponList.Clear();
 		weaponListIndex.Clear();
 	}
 
 	public void ResetItemDamageByWeapon(List<EquipItemTable.EquipItemData> weaponEquipItemDataList)
 	{
-		if (!weaponEquipItemDataList.IsNullOrEmpty())
+		if (weaponEquipItemDataList.IsNullOrEmpty())
 		{
-			deliveryBattleInfo.damageByWeaponList.Clear();
-			weaponListIndex.Clear();
-			for (int i = 0; i < weaponEquipItemDataList.Count; i++)
+			return;
+		}
+		deliveryBattleInfo.currentDamageByWeaponList.Clear();
+		weaponListIndex.Clear();
+		for (int i = 0; i < weaponEquipItemDataList.Count; i++)
+		{
+			if (weaponEquipItemDataList[i] != null)
 			{
-				if (weaponEquipItemDataList[i] != null)
-				{
-					weaponListIndex.Add(i, deliveryBattleInfo.damageByWeaponList.Count);
-					DeliveryBattleInfo.DamageByWeapon damageByWeapon = new DeliveryBattleInfo.DamageByWeapon();
-					damageByWeapon.equipmentType = (int)weaponEquipItemDataList[i].type;
-					damageByWeapon.spAttackType = (int)weaponEquipItemDataList[i].spAttackType;
-					deliveryBattleInfo.damageByWeaponList.Add(damageByWeapon);
-				}
+				weaponListIndex.Add(i, deliveryBattleInfo.currentDamageByWeaponList.Count);
+				DeliveryBattleInfo.DamageByWeapon damageByWeapon = new DeliveryBattleInfo.DamageByWeapon();
+				damageByWeapon.equipmentType = (int)weaponEquipItemDataList[i].type;
+				damageByWeapon.spAttackType = (int)weaponEquipItemDataList[i].spAttackType;
+				deliveryBattleInfo.currentDamageByWeaponList.Add(damageByWeapon);
+				deliveryBattleInfo.damageByWeaponList.Add(damageByWeapon);
 			}
 		}
 	}
@@ -79,9 +104,9 @@ public class DeliveryBattleChecker : BattleCheckerBase
 		if (weaponListIndex.ContainsKey(weaponIndex))
 		{
 			int num = weaponListIndex[weaponIndex];
-			if (num < deliveryBattleInfo.damageByWeaponList.Count)
+			if (num < deliveryBattleInfo.currentDamageByWeaponList.Count)
 			{
-				deliveryBattleInfo.damageByWeaponList[num].damage += damage;
+				deliveryBattleInfo.currentDamageByWeaponList[num].damage += damage;
 			}
 		}
 	}
@@ -180,6 +205,56 @@ public class DeliveryBattleChecker : BattleCheckerBase
 	public void OnJump(int damage)
 	{
 		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.JUMP, damage);
+	}
+
+	public void OnSoulSpear()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.SOUL_SPEAR, 0);
+	}
+
+	protected override void OnBurstOneHandSword(int damage)
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.BURST_ONE_HAND_SWORD, damage);
+	}
+
+	public void OnBurstTwoHandSword()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.BURST_TWO_HAND_SWORD, 0);
+	}
+
+	public void OnBurstPairSwords()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.BURST_PAIR_SWORDS, 0);
+	}
+
+	public void OnBurstSpear()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.BURST_SPEAR, 0);
+	}
+
+	public void OnBurstArrow()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.BURST_ARROW, 0);
+	}
+
+	public void OnConcussion()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.CONCUSSION, 0);
+	}
+
+	public void OnOracleOneHandSword()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.ORACLE_ONE_HAND_SWORD, 0);
+	}
+
+	public void OnOracleSpear()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.ORACLE_SPEAR, 0);
+	}
+
+	public void OnOraclePairSwords()
+	{
+		UpdateHitTypeInfo(PLAYER_ACTION_TYPE.ORACLE_PAIR_SWORDS, 0);
 	}
 
 	private void UpdateHitTypeInfo(PLAYER_ACTION_TYPE type, int damage)

@@ -1,12 +1,13 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
 import android.util.Log;
 import com.facebook.appevents.AppEventsConstants;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import jp.colopl.drapro.BuildConfig;
+import p018jp.colopl.drapro.BuildConfig;
 
+/* renamed from: jp.colopl.util.Util */
 public class Util {
     public static byte[] asByteArray(String str) {
         byte[] bArr = new byte[(str.length() / 2)];

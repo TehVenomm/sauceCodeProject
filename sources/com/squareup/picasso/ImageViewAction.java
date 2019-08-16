@@ -8,9 +8,9 @@ import com.squareup.picasso.Picasso.LoadedFrom;
 class ImageViewAction extends Action<ImageView> {
     Callback callback;
 
-    ImageViewAction(Picasso picasso, ImageView imageView, Request request, int i, int i2, int i3, Drawable drawable, String str, Object obj, Callback callback, boolean z) {
+    ImageViewAction(Picasso picasso, ImageView imageView, Request request, int i, int i2, int i3, Drawable drawable, String str, Object obj, Callback callback2, boolean z) {
         super(picasso, imageView, request, i, i2, i3, drawable, str, obj, z);
-        this.callback = callback;
+        this.callback = callback2;
     }
 
     public void complete(Bitmap bitmap, LoadedFrom loadedFrom) {
@@ -42,7 +42,8 @@ class ImageViewAction extends Action<ImageView> {
         }
     }
 
-    void cancel() {
+    /* access modifiers changed from: 0000 */
+    public void cancel() {
         super.cancel();
         if (this.callback != null) {
             this.callback = null;

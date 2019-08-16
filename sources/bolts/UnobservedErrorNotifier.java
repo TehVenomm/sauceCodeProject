@@ -5,21 +5,21 @@ import bolts.Task.UnobservedExceptionHandler;
 class UnobservedErrorNotifier {
     private Task<?> task;
 
-    public UnobservedErrorNotifier(Task<?> task) {
-        this.task = task;
+    public UnobservedErrorNotifier(Task<?> task2) {
+        this.task = task2;
     }
 
-    protected void finalize() throws Throwable {
+    /* access modifiers changed from: protected */
+    public void finalize() throws Throwable {
         try {
-            Task task = this.task;
-            if (task != null) {
+            Task<?> task2 = this.task;
+            if (task2 != null) {
                 UnobservedExceptionHandler unobservedExceptionHandler = Task.getUnobservedExceptionHandler();
                 if (unobservedExceptionHandler != null) {
-                    unobservedExceptionHandler.unobservedException(task, new UnobservedTaskException(task.getError()));
+                    unobservedExceptionHandler.unobservedException(task2, new UnobservedTaskException(task2.getError()));
                 }
             }
-            super.finalize();
-        } catch (Throwable th) {
+        } finally {
             super.finalize();
         }
     }

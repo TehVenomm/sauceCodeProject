@@ -6,11 +6,13 @@ public class ChatRoom
 
 	public delegate void OnJoinClan(CHAT_ERROR_TYPE errorType, bool owner, string userId);
 
-	public delegate void OnReceiveText(int userId, string userName, string message);
+	public delegate void OnReceiveText(int userId, string userName, string message, string chatItemId, bool isOldMessage = false);
 
-	public delegate void OnReceiveStamp(int userId, string userName, int stampId);
+	public delegate void OnReceiveStamp(int userId, string userName, int stampId, string chatItemId, bool isOldMessage = false);
 
-	public delegate void OnReceiveNotification(string message);
+	public delegate void OnReceiveNotification(string message, string chatItemId, bool isOldMessage = false);
+
+	public delegate void OnAfterSendUserMessage();
 
 	public delegate void OnDisconnect();
 
@@ -56,11 +58,9 @@ public class ChatRoom
 
 	public event OnReceiveStamp onReceiveStamp;
 
-	public event OnReceiveText onReceivePrivateText;
-
-	public event OnReceiveStamp onReceivePrivateStamp;
-
 	public event OnReceiveNotification onReceiveNotification;
+
+	public event OnAfterSendUserMessage onAfterSendUserMessage;
 
 	public event OnDisconnect onDisconnect;
 
@@ -81,7 +81,7 @@ public class ChatRoom
 		{
 			if (this.connection.isEstablished)
 			{
-				this.connection.Disconnect(null);
+				this.connection.Disconnect();
 			}
 			connection.onReceiveText -= _OnReceiveText;
 			connection.onReceiveStamp -= _OnReceiveStamp;
@@ -93,6 +93,7 @@ public class ChatRoom
 		connection.onReceiveStamp += _OnReceiveStamp;
 		connection.onReceiveNotification += _OnReceiveNotification;
 		connection.onDisconnect += _OnDisconnect;
+		connection.onAfterSendUserMessage += _OnAfterSendUserMessage;
 	}
 
 	public void JoinRoom(int roomNo)
@@ -154,43 +155,35 @@ public class ChatRoom
 		}
 	}
 
-	private void _OnReceiveText(int userId, string userName, string message)
+	private void _OnReceiveText(int userId, string userName, string message, string chatItemId, bool isOldMessage = false)
 	{
 		if (this.onReceiveText != null)
 		{
-			this.onReceiveText(userId, userName, message);
+			this.onReceiveText(userId, userName, message, chatItemId, isOldMessage);
 		}
 	}
 
-	private void _OnReceiveStamp(int userId, string userName, int stampId)
+	private void _OnReceiveStamp(int userId, string userName, int stampId, string chatItemId, bool isOldMessage = false)
 	{
 		if (this.onReceiveStamp != null)
 		{
-			this.onReceiveStamp(userId, userName, stampId);
+			this.onReceiveStamp(userId, userName, stampId, chatItemId, isOldMessage);
 		}
 	}
 
-	private void _OnReceivePrivateText(int userId, string userName, string message)
-	{
-		if (this.onReceivePrivateText != null)
-		{
-			this.onReceivePrivateText(userId, userName, message);
-		}
-	}
-
-	private void _OnReceivePrivateStamp(int userId, string userName, int stampId)
-	{
-		if (this.onReceivePrivateStamp != null)
-		{
-			this.onReceivePrivateStamp(userId, userName, stampId);
-		}
-	}
-
-	private void _OnReceiveNotification(string message)
+	private void _OnReceiveNotification(string message, string chatItemId, bool isOldMessage = false)
 	{
 		if (this.onReceiveNotification != null)
 		{
-			this.onReceiveNotification(message);
+			this.onReceiveNotification(message, chatItemId, isOldMessage);
+		}
+	}
+
+	private void _OnAfterSendUserMessage()
+	{
+		if (this.onAfterSendUserMessage != null)
+		{
+			this.onAfterSendUserMessage();
 		}
 	}
 

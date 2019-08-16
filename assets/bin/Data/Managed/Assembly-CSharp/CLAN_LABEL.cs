@@ -1,0 +1,10 @@
+public enum CLAN_LABEL
+{
+	NONE,
+	ANYONE,
+	BEGINNER,
+	EXPERT,
+	LAIDBACK,
+	EXCITE,
+	QUIET
+}

@@ -1,20 +1,12 @@
 package com.google.android.gms.auth.api.signin.internal;
 
-public final class zzo {
-    private static int zzedb = 31;
-    private int zzedc = 1;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.internal.BaseImplementation.ApiMethodImpl;
 
-    public final int zzaan() {
-        return this.zzedc;
-    }
-
-    public final zzo zzaq(boolean z) {
-        this.zzedc = (z ? 1 : 0) + (zzedb * this.zzedc);
-        return this;
-    }
-
-    public final zzo zzo(Object obj) {
-        this.zzedc = (obj == null ? 0 : obj.hashCode()) + (zzedb * this.zzedc);
-        return this;
+abstract class zzo<R extends Result> extends ApiMethodImpl<R, zzg> {
+    public zzo(GoogleApiClient googleApiClient) {
+        super(Auth.GOOGLE_SIGN_IN_API, googleApiClient);
     }
 }

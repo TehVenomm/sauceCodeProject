@@ -9,14 +9,17 @@ public class FBUnityLoginActivity extends BaseActivity {
 
     public enum LoginType {
         READ,
-        PUBLISH
+        PUBLISH,
+        TV_READ,
+        TV_PUBLISH
     }
 
     public CallbackManager getCallbackManager() {
         return this.mCallbackManager;
     }
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         LoginType loginType = (LoginType) getIntent().getSerializableExtra(LOGIN_TYPE);
         String stringExtra = getIntent().getStringExtra(LOGIN_PARAMS);
@@ -26,6 +29,12 @@ public class FBUnityLoginActivity extends BaseActivity {
                 return;
             case PUBLISH:
                 FBLogin.loginWithPublishPermissions(stringExtra, this);
+                return;
+            case TV_READ:
+                FBLogin.loginForTVWithReadPermissions(stringExtra, this);
+                return;
+            case TV_PUBLISH:
+                FBLogin.loginForTVWithPublishPermissions(stringExtra, this);
                 return;
             default:
                 return;

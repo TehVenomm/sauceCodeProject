@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TailController
+public class TailController : MonoBehaviour
 {
 	public class JointInfo
 	{

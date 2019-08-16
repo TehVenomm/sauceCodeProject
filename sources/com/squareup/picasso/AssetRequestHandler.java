@@ -18,10 +18,10 @@ class AssetRequestHandler extends RequestHandler {
 
     public boolean canHandleRequest(Request request) {
         Uri uri = request.uri;
-        if ("file".equals(uri.getScheme()) && !uri.getPathSegments().isEmpty() && ANDROID_ASSET.equals(uri.getPathSegments().get(0))) {
-            return true;
+        if (!"file".equals(uri.getScheme()) || uri.getPathSegments().isEmpty() || !ANDROID_ASSET.equals(uri.getPathSegments().get(0))) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public Result load(Request request, int i) throws IOException {

@@ -130,9 +130,9 @@ public final class ArrayBuilders {
     }
 
     public static <T> HashSet<T> arrayToSet(T[] tArr) {
-        HashSet<T> hashSet = new HashSet();
+        HashSet<T> hashSet = new HashSet<>();
         if (tArr != null) {
-            for (Object add : tArr) {
+            for (T add : tArr) {
                 hashSet.add(add);
             }
         }
@@ -140,9 +140,9 @@ public final class ArrayBuilders {
     }
 
     public static <T> ArrayList<T> arrayToList(T[] tArr) {
-        ArrayList<T> arrayList = new ArrayList();
+        ArrayList<T> arrayList = new ArrayList<>();
         if (tArr != null) {
-            for (Object add : tArr) {
+            for (T add : tArr) {
                 arrayList.add(add);
             }
         }
@@ -150,12 +150,12 @@ public final class ArrayBuilders {
     }
 
     public static <T> HashSet<T> setAndArray(Set<T> set, T[] tArr) {
-        HashSet<T> hashSet = new HashSet();
+        HashSet<T> hashSet = new HashSet<>();
         if (set != null) {
             hashSet.addAll(set);
         }
         if (tArr != null) {
-            for (Object add : tArr) {
+            for (T add : tArr) {
                 hashSet.add(add);
             }
         }
@@ -164,7 +164,7 @@ public final class ArrayBuilders {
 
     public static <T> List<T> addToList(List<T> list, T t) {
         if (list == null) {
-            list = new ArrayList();
+            list = new ArrayList<>();
         }
         list.add(t);
         return list;
@@ -172,16 +172,15 @@ public final class ArrayBuilders {
 
     public static <T> T[] insertInList(T[] tArr, T t) {
         int length = tArr.length;
-        Object[] objArr = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length + 1);
+        T[] tArr2 = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length + 1);
         if (length > 0) {
-            System.arraycopy(tArr, 0, objArr, 1, length);
+            System.arraycopy(tArr, 0, tArr2, 1, length);
         }
-        objArr[0] = t;
-        return objArr;
+        tArr2[0] = t;
+        return tArr2;
     }
 
     public static <T> T[] insertInListNoDup(T[] tArr, T t) {
-        Object[] objArr;
         int length = tArr.length;
         int i = 0;
         while (i < length) {
@@ -190,23 +189,23 @@ public final class ArrayBuilders {
             } else if (i == 0) {
                 return tArr;
             } else {
-                objArr = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length);
-                System.arraycopy(tArr, 0, objArr, 1, i);
-                objArr[0] = t;
-                i++;
-                int i2 = length - i;
-                if (i2 <= 0) {
-                    return objArr;
+                T[] tArr2 = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length);
+                System.arraycopy(tArr, 0, tArr2, 1, i);
+                tArr2[0] = t;
+                int i2 = i + 1;
+                int i3 = length - i2;
+                if (i3 <= 0) {
+                    return tArr2;
                 }
-                System.arraycopy(tArr, i, objArr, i, i2);
-                return objArr;
+                System.arraycopy(tArr, i2, tArr2, i2, i3);
+                return tArr2;
             }
         }
-        objArr = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length + 1);
+        T[] tArr3 = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length + 1);
         if (length > 0) {
-            System.arraycopy(tArr, 0, objArr, 1, length);
+            System.arraycopy(tArr, 0, tArr3, 1, length);
         }
-        objArr[0] = t;
-        return objArr;
+        tArr3[0] = t;
+        return tArr3;
     }
 }

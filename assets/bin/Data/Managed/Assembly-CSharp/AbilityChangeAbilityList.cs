@@ -64,58 +64,60 @@ public class AbilityChangeAbilityList : UIBehaviour
 
 	public override void UpdateUI()
 	{
-		if (equipItemInfo != null)
+		if (equipItemInfo == null)
 		{
-			SetFontStyle((Enum)UI.STR_ABILITY, 2);
-			SetFontStyle((Enum)UI.LBL_NAME_1, 3);
-			SetFontStyle((Enum)UI.LBL_NAME_2, 3);
-			SetFontStyle((Enum)UI.LBL_NAME_3, 3);
-			SetLabelText((Enum)UI.LBL_NAME, equipItemInfo.tableData.name);
-			SetLabelText((Enum)UI.LBL_LV_NOW, equipItemInfo.level.ToString());
-			SetLabelText((Enum)UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
-			SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
-			EquipItemAbility[] validAbility = equipItemInfo.GetValidAbility();
-			bool enableAbilityChange = false;
-			int num = 0;
-			for (num = 0; num < validAbility.Length; num++)
+			return;
+		}
+		SetFontStyle((Enum)UI.STR_ABILITY, 2);
+		SetFontStyle((Enum)UI.LBL_NAME_1, 3);
+		SetFontStyle((Enum)UI.LBL_NAME_2, 3);
+		SetFontStyle((Enum)UI.LBL_NAME_3, 3);
+		SetLabelText((Enum)UI.LBL_NAME, equipItemInfo.tableData.name);
+		SetLabelText((Enum)UI.LBL_LV_NOW, equipItemInfo.level.ToString());
+		SetLabelText((Enum)UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
+		SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
+		EquipItemAbility[] validAbility = equipItemInfo.GetValidAbility();
+		bool enableAbilityChange = false;
+		int num = 0;
+		int num2 = (validAbility.Length <= 3) ? validAbility.Length : 3;
+		for (num = 0; num < num2; num++)
+		{
+			if (equipItemInfo.IsFixedAbility(num))
 			{
-				if (equipItemInfo.IsFixedAbility(num))
-				{
-					SetAbilityActive(num, false);
-					SetAbilityActive(num + 3, true);
-					SetAbilityData(num + 3, validAbility[num]);
-				}
-				else
-				{
-					enableAbilityChange = true;
-					SetAbilityActive(num, true);
-					SetAbilityData(num, validAbility[num]);
-				}
-			}
-			EnableAbilityChange = enableAbilityChange;
-			for (; num < 3; num++)
-			{
-				SetAbilityActive(num, false);
-			}
-			bool flag = abilityItemInfo != null;
-			bool flag2 = !equipItemInfo.tableData.IsEquipableAbilityItem() || !flag;
-			SetActive((Enum)UI.OBJ_ABILITY_ITEM_ITEM_ROOT, flag);
-			SetActive((Enum)UI.LBL_NO_ABILITY_ITEM, flag2);
-			if (flag2)
-			{
-				if (!equipItemInfo.tableData.IsEquipableAbilityItem())
-				{
-					SetLabelText((Enum)UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 23u));
-				}
-				else
-				{
-					SetLabelText((Enum)UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 24u));
-				}
+				SetAbilityActive(num, active: false);
+				SetAbilityActive(num + 3, active: true);
+				SetAbilityData(num + 3, validAbility[num]);
 			}
 			else
 			{
-				SetAbilityItemData();
+				enableAbilityChange = true;
+				SetAbilityActive(num, active: true);
+				SetAbilityData(num, validAbility[num]);
 			}
+		}
+		EnableAbilityChange = enableAbilityChange;
+		for (; num < 3; num++)
+		{
+			SetAbilityActive(num, active: false);
+		}
+		bool flag = abilityItemInfo != null;
+		bool flag2 = !equipItemInfo.tableData.IsEquipableAbilityItem() || !flag;
+		SetActive((Enum)UI.OBJ_ABILITY_ITEM_ITEM_ROOT, flag);
+		SetActive((Enum)UI.LBL_NO_ABILITY_ITEM, flag2);
+		if (flag2)
+		{
+			if (!equipItemInfo.tableData.IsEquipableAbilityItem())
+			{
+				SetLabelText((Enum)UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 23u));
+			}
+			else
+			{
+				SetLabelText((Enum)UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 24u));
+			}
+		}
+		else
+		{
+			SetAbilityItemData();
 		}
 	}
 

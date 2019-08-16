@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManager>
@@ -140,25 +141,35 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 		public GameObject shadowPrefabLightweight;
 
+		[NonSerialized]
 		public GameObject itemIconPrefab;
 
 		public string itemIconPackageName;
 
+		[NonSerialized]
 		public GameObject itemIconDetailPrefab;
 
 		public string itemIconDetailPackageName;
 
+		[NonSerialized]
 		public GameObject itemIconDetailSmallPrefab;
 
 		public string itemIconDetailSmallPackageName;
 
+		[NonSerialized]
 		public GameObject itemIconMaterialPrefab;
 
 		public string itemIconMaterialPackageName;
 
+		[NonSerialized]
 		public GameObject itemIconEquipMaterialPrefab;
 
 		public string itemIconEquipMaterialPackageName;
+
+		[NonSerialized]
+		public GameObject accessoryIconPrefab;
+
+		public string accessoryIconPrefabPackageName;
 
 		public Texture errorIcon;
 
@@ -184,22 +195,56 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		[Tooltip("スタン用エフェクト")]
 		public string[] stunnedEffectList;
 
+		[Tooltip("魅了用エフェクト")]
+		public string[] charmEffectList;
+
 		[Tooltip("敵の麻痺ヒットエフェクト名")]
 		public string enemyParalyzeHitEffectName;
 
 		[Tooltip("敵の毒ヒットエフェクト名")]
 		public string enemyPoisonHitEffectName;
 
+		[Tooltip("敵の凍結ヒットエフェクト名")]
+		public string enemyFreezeHitEffectName;
+
 		[Tooltip("敵の他人用簡易ヒットエフェクト名")]
 		public string enemyOtherSimpleHitEffectName;
+
+		public List<string> GetEffectNames()
+		{
+			List<string> list = new List<string>();
+			FieldInfo[] fields = GetType().GetFields();
+			FieldInfo[] array = fields;
+			foreach (FieldInfo fieldInfo in array)
+			{
+				object value = fieldInfo.GetValue(this);
+				if (value == null)
+				{
+					continue;
+				}
+				if (fieldInfo.Name.EndsWith("EffectName"))
+				{
+					if (value.GetType() == typeof(string))
+					{
+						string item = (string)value;
+						list.Add(item);
+					}
+				}
+				else if (fieldInfo.Name.EndsWith("EffectList") && value.GetType() == typeof(string[]))
+				{
+					string[] collection = (string[])value;
+					list.AddRange(collection);
+				}
+			}
+			return list;
+		}
 
 		public Transform CreateShadow(float size, float body_radius, float scale, bool fixedY0, Transform parent = null, bool is_lightweight = false)
 		{
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = (!is_lightweight) ? ResourceUtility.Realizes(shadowPrefab, parent, -1) : ResourceUtility.Realizes(shadowPrefabLightweight, parent, -1);
+			Transform val = (!is_lightweight) ? ResourceUtility.Realizes(shadowPrefab, parent) : ResourceUtility.Realizes(shadowPrefabLightweight, parent);
 			size *= 0.5f;
 			val.set_localPosition(new Vector3(0f, 0.01f, 0f));
 			val.set_localEulerAngles(Vector3.get_zero());
@@ -214,20 +259,22 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		public IEnumerator LoadIconPrefabs(MonoBehaviour mono)
 		{
 			LoadingQueue loadQueue = new LoadingQueue(mono);
-			LoadObject itemIconLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconPackageName, true);
-			LoadObject itemIconDetailLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailPackageName, true);
-			LoadObject itemIconDetailSmallLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailSmallPackageName, true);
-			LoadObject itemIconMaterialLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconMaterialPackageName, true);
-			LoadObject itemIconEquipMaterialLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconEquipMaterialPackageName, true);
+			LoadObject itemIconLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconPackageName, cache_package: true);
+			LoadObject itemIconDetailLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailPackageName, cache_package: true);
+			LoadObject itemIconDetailSmallLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailSmallPackageName, cache_package: true);
+			LoadObject itemIconMaterialLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconMaterialPackageName, cache_package: true);
+			LoadObject itemIconEquipMaterialLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconEquipMaterialPackageName, cache_package: true);
+			LoadObject accessoryIconLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, accessoryIconPrefabPackageName, cache_package: true);
 			if (loadQueue.IsLoading())
 			{
-				yield return (object)loadQueue.Wait();
+				yield return loadQueue.Wait();
 			}
 			itemIconPrefab = (itemIconLoadObject.loadedObject as GameObject);
 			itemIconDetailPrefab = (itemIconDetailLoadObject.loadedObject as GameObject);
 			itemIconDetailSmallPrefab = (itemIconDetailSmallLoadObject.loadedObject as GameObject);
 			itemIconMaterialPrefab = (itemIconMaterialLoadObject.loadedObject as GameObject);
 			itemIconEquipMaterialPrefab = (itemIconEquipMaterialLoadObject.loadedObject as GameObject);
+			accessoryIconPrefab = (accessoryIconLoadObject.loadedObject as GameObject);
 		}
 	}
 
@@ -352,21 +399,6 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		public List<PackInfo> packs;
 
 		public List<SpecialInfo> specials;
-
-		public PackInfo GetPack(string id)
-		{
-			return packs.Find((PackInfo o) => o.bundleId == id);
-		}
-
-		public bool HasPack(string id)
-		{
-			return packs.Find((PackInfo o) => o.bundleId == id) != null;
-		}
-
-		public int TotalPack()
-		{
-			return packs.Count;
-		}
 
 		public SpecialInfo GetSpecial(string id)
 		{
@@ -512,6 +544,22 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 	}
 
 	[Serializable]
+	public class HasSymbols
+	{
+		public int[] hasRawIds;
+
+		public int[] hasMarkIndexes;
+
+		public int[] hasFrameIndexes;
+
+		public int[] hasPatternIndexes;
+
+		public int[] hasColorIndexes;
+
+		public Color[] symbolColors;
+	}
+
+	[Serializable]
 	public class HasVisuals
 	{
 		public int[] hasRawIds;
@@ -589,6 +637,22 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		}
 	}
 
+	[Serializable]
+	public class InGameFieldSetting
+	{
+		[Tooltip("ステ\u30fcジのコリジョンを高くする")]
+		public bool isRaiseWallCollider;
+
+		[Tooltip("高くする場合のサイズ(Box)")]
+		public float raiseWallColliderSizeY = 20f;
+
+		[Tooltip("オフセットY(Box)")]
+		public float raiseWallColliderOffsetY;
+
+		[Tooltip("スケ\u30fcルY(Mesh)")]
+		public float raiseWallColliderScaleY = 1f;
+	}
+
 	public bool submissionVersion;
 
 	public int tipsCount = 10;
@@ -617,7 +681,7 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	public Transform npcLightDirection;
 
-	public Color defaultAmbientColor = new Color(0.8392157f, 0.8392157f, 0.8392157f);
+	public Color defaultAmbientColor = new Color(214f / 255f, 214f / 255f, 214f / 255f);
 
 	public WorldMapParam worldMapParam;
 
@@ -633,11 +697,125 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	public HasVisuals hasVisuals;
 
+	public HasSymbols hasSymbols;
+
+	public InGameFieldSetting inGameFieldSetting;
+
 	public int unlockEventLevel = 20;
 
 	public bool enableRepeatQuest = true;
 
 	public bool enableBlackMarketBanner = true;
+
+	public bool enableFortuneWheelBanner = true;
+
+	public bool enableTradingPostBanner = true;
+
+	public List<int> bossIdqQuest = new List<int>
+	{
+		994419202,
+		994417601,
+		994412511
+	};
+
+	public int AndroidMemoryClearDivider = 6;
+
+	public int IosMemoryClearDivider = 4;
+
+	public List<string> stageCache = new List<string>();
+
+	public List<string> skyboxCaches = new List<string>
+	{
+		"SK011D_01",
+		"SK062D_01",
+		"SK001D_01",
+		"SK011D_01",
+		"SK001D_02",
+		"SK022D_02",
+		"SK028D_01",
+		"SK062D_01",
+		"SK001D_01",
+		"SK001D_01",
+		"SK011D_01",
+		"SK011D_01",
+		"SK022N_01",
+		"SK022N_01",
+		"SK001N_01",
+		"SK001N_01",
+		"SK022N_01",
+		"SK092N_02",
+		"SK092N_01",
+		"SK092N_01",
+		"SK092N_03",
+		"SK006D_01",
+		"SK006D_01",
+		"SK001D_01",
+		"SK001D_01",
+		"SK021N_02"
+	};
+
+	public List<string> stageEffectCaches = new List<string>
+	{
+		"ef_btl_bg_hp001_01",
+		"ef_btl_bg_questboard_01",
+		"ef_btl_bg_hp001_02",
+		"ef_btl_bg_questboard_02"
+	};
+
+	public List<string> stageShouldPreOpenCamera = new List<string>
+	{
+		"HomeTop",
+		"StatusTop",
+		"ShopTop"
+	};
+
+	public List<int> noBlurEffectEventId = new List<int>
+	{
+		99001301
+	};
+
+	public List<int> noBlurEffectBossId = new List<int>
+	{
+		994419602,
+		993318100,
+		993218200,
+		300000522,
+		100000524
+	};
+
+	public List<ITEM_TYPE> itemMaterialType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.MATERIAL_BONE,
+		ITEM_TYPE.MATERIAL_CLOTH,
+		ITEM_TYPE.MATERIAL_EQUIP,
+		ITEM_TYPE.MATERIAL_METAL,
+		ITEM_TYPE.MATERIAL_PELT,
+		ITEM_TYPE.MATERIAL_SCALE,
+		ITEM_TYPE.MATERIAL_WOOD,
+		ITEM_TYPE.UNIQUE_MATERIAL,
+		ITEM_TYPE.LITHOGRAPH
+	};
+
+	public List<ITEM_TYPE> itemItemType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.ABILITY_ITEM,
+		ITEM_TYPE.USE_ITEM
+	};
+
+	public List<ITEM_TYPE> itemLapisType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.LAPIS
+	};
+
+	public List<ITEM_TYPE> itemMagiType = new List<ITEM_TYPE>
+	{
+		ITEM_TYPE.MATERIAL_MAGI
+	};
+
+	public List<string> noBlurEffectForDeviceModel = new List<string>
+	{
+		"OnePlus"
+	};
 
 	private Quaternion initLightRot;
 
@@ -662,6 +840,7 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		initLightRot = lightDirection.get_localRotation();
 		initNpcLightRot = npcLightDirection.get_localRotation();
 		initAmbientColor = defaultAmbientColor;
+		AppMain.amountMemoryClear = SystemInfo.get_systemMemorySize() / AndroidMemoryClearDivider;
 	}
 
 	public void ResetLightRot()
@@ -681,13 +860,12 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	public void LoadLinkResources(Action callback)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(_LoadLinkResources(callback));
 	}
 
 	private IEnumerator _LoadLinkResources(Action callback)
 	{
-		yield return (object)this.StartCoroutine(linkResources.LoadIconPrefabs(this));
+		yield return this.StartCoroutine(linkResources.LoadIconPrefabs(this));
 		callback();
 	}
 

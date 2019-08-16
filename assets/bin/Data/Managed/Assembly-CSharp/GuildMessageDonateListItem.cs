@@ -2,7 +2,7 @@ using Network;
 using System;
 using UnityEngine;
 
-public class GuildMessageDonateListItem
+public class GuildMessageDonateListItem : MonoBehaviour
 {
 	[SerializeField]
 	private UISprite m_PinButton;
@@ -54,7 +54,6 @@ public class GuildMessageDonateListItem
 
 	private void OnStart()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (m_PinButton != null)
 		{
 			m_PinButton.get_gameObject().SetActive(false);
@@ -63,16 +62,12 @@ public class GuildMessageDonateListItem
 
 	public void SetDonateInfo(DonateInfo _info)
 	{
-		if (MonoBehaviourSingleton<ChatManager>.I.clanChat != null)
-		{
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveUpdateStatus += OnReceiveUpdateStatus;
-		}
 		info = _info;
 		timeLeft = (info.expired - MonoBehaviourSingleton<GuildManager>.I.SystemTime) / 1000.0;
 		m_TimeExpire.text = SecondToTime(timeLeft);
 		minChangeColorTime = 900.0;
 		SetUIActive();
-		int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+		int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
 		bool flag = itemNum > 0 && info.itemNum < info.quantity;
 		m_ButtonGift.SetState(UIButtonColor.State.Normal, flag);
 		m_ButtonGift.state = ((!flag) ? UIButtonColor.State.Disabled : UIButtonColor.State.Normal);
@@ -93,20 +88,18 @@ public class GuildMessageDonateListItem
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		m_TimeExpire.color = Color.get_white();
 		m_OwnerBackground.color = Color.get_white();
 		m_TargetBackground.color = Color.get_white();
 		m_Clock.color = Color.get_white();
 		if (m_AskForHelp.get_gameObject().get_activeInHierarchy())
 		{
-			m_AskForHelp.SetState(UIButtonColor.State.Normal, true);
+			m_AskForHelp.SetState(UIButtonColor.State.Normal, immediate: true);
 			m_AskForHelp.isEnabled = true;
 		}
 		if (m_ButtonGift.get_gameObject().get_activeInHierarchy())
 		{
-			m_ButtonGift.SetState(UIButtonColor.State.Normal, true);
+			m_ButtonGift.SetState(UIButtonColor.State.Normal, immediate: true);
 			m_ButtonGift.isEnabled = true;
 		}
 	}
@@ -117,8 +110,6 @@ public class GuildMessageDonateListItem
 		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		m_TimeExpire.text = "Expired!";
 		m_TimeExpire.color = Color.get_gray();
 		m_OwnerBackground.color = Color.get_gray();
@@ -126,22 +117,18 @@ public class GuildMessageDonateListItem
 		m_Clock.color = Color.get_gray();
 		if (m_AskForHelp.get_gameObject().get_activeInHierarchy())
 		{
-			m_AskForHelp.SetState(UIButtonColor.State.Disabled, true);
+			m_AskForHelp.SetState(UIButtonColor.State.Disabled, immediate: true);
 			m_AskForHelp.isEnabled = false;
 		}
 		if (m_ButtonGift.get_gameObject().get_activeInHierarchy())
 		{
 			m_ButtonGift.isEnabled = false;
-			m_ButtonGift.SetState(UIButtonColor.State.Disabled, true);
+			m_ButtonGift.SetState(UIButtonColor.State.Disabled, immediate: true);
 		}
 	}
 
 	protected void OnDestroy()
 	{
-		if (MonoBehaviourSingleton<ChatManager>.I.clanChat != null)
-		{
-			MonoBehaviourSingleton<ChatManager>.I.clanChat.onReceiveUpdateStatus -= OnReceiveUpdateStatus;
-		}
 	}
 
 	private void Start()
@@ -157,9 +144,6 @@ public class GuildMessageDonateListItem
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		if (checkLongPress)
 		{
 			float num = Vector2.Distance(mousePosition, Vector2.op_Implicit(Input.get_mousePosition()));
@@ -179,13 +163,11 @@ public class GuildMessageDonateListItem
 		if (counter <= tick)
 		{
 			counter += Time.get_deltaTime();
+			return;
 		}
-		else
-		{
-			counter = 0f;
-			timeLeft -= 1.0;
-			SetupUI();
-		}
+		counter = 0f;
+		timeLeft -= 1.0;
+		SetupUI();
 	}
 
 	private void SetupUI()
@@ -232,7 +214,6 @@ public class GuildMessageDonateListItem
 
 	public void HidePinButton()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		m_PinButton.get_gameObject().SetActive(false);
 	}
 

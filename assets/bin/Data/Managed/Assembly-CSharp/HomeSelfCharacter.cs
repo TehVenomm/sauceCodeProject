@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class HomeSelfCharacter : HomePlayerCharacterBase
@@ -48,11 +49,11 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 		{
 			return false;
 		}
-		if (isPlayingSitAnimation)
+		if (isPlayingSitAnimation || isPlayingStandAnimation)
 		{
 			return false;
 		}
-		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "HomeTop" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "LoungeTop" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "GuildTop")
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "HomeTop" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "LoungeTop" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "ClanTop")
 		{
 			return false;
 		}
@@ -66,44 +67,87 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 
 	public void Sit()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		base.CurrentActionType = LOUNGE_ACTION_TYPE.SIT;
 		isSitting = true;
-		chairPoint = MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearSitPoint(this);
+		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
+		{
+			chairPoint = MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearSitPoint(base._transform.get_position());
+		}
+		if (MonoBehaviourSingleton<ClanManager>.IsValid())
+		{
+			chairPoint = MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearSitPoint(base._transform.get_position());
+		}
 		Vector3 position = chairPoint.get_transform().get_position();
 		SendMoveToSitPosition(position);
 		SendSit();
 		this.StartCoroutine(DoSit());
 	}
 
-	private void StandUp()
+	protected new IEnumerator StandUp()
 	{
 		base.CurrentActionType = LOUNGE_ACTION_TYPE.STAND_UP;
 		SendStandUp();
 		chairPoint.ResetSittingCharacter();
-		PLCA anim = (sexType != 0) ? PLCA.STAND_UP_F : PLCA.STAND_UP;
-		animCtrl.Play(anim, false);
-		MonoBehaviourSingleton<LoungeManager>.I.HomeCamera.ChangeView(HomeCamera.VIEW_MODE.NORMAL);
+		PLCA standUpMotion;
+		switch (chairPoint.chairType)
+		{
+		default:
+			standUpMotion = ((sexType != 0) ? PLCA.STAND_UP_F : PLCA.STAND_UP);
+			break;
+		case ChairPoint.CHAIR_TYPE.BENTCH:
+			standUpMotion = ((sexType != 0) ? PLCA.STAND_BENCH_UP_F : PLCA.STAND_BENCH_UP);
+			break;
+		case ChairPoint.CHAIR_TYPE.SOFA:
+			standUpMotion = ((sexType != 0) ? PLCA.STAND_SOFA_UP_F : PLCA.STAND_SOFA_UP);
+			break;
+		}
+		animCtrl.Play(standUpMotion);
+		IHomeManager iHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+		iHomeManager.HomeCamera.ChangeView(HomeCamera.VIEW_MODE.NORMAL);
 		isSitting = false;
+		isStanding = true;
+		isPlayingStandAnimation = true;
+		while (true)
+		{
+			AnimatorStateInfo currentAnimatorStateInfo = animCtrl.animator.GetCurrentAnimatorStateInfo(0);
+			if (1f < currentAnimatorStateInfo.get_normalizedTime())
+			{
+				yield return null;
+				continue;
+			}
+			break;
+		}
+		while (true)
+		{
+			AnimatorStateInfo currentAnimatorStateInfo2 = animCtrl.animator.GetCurrentAnimatorStateInfo(0);
+			if (!(1f > currentAnimatorStateInfo2.get_normalizedTime()))
+			{
+				break;
+			}
+			yield return null;
+		}
+		isPlayingStandAnimation = false;
+		isStanding = false;
 	}
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		lastTargetNPCID = -1;
 		sexType = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex;
 		PlayerLoader playerLoader = this.get_gameObject().AddComponent<PlayerLoader>();
-		playerLoader.StartLoad(PlayerLoadInfo.FromUserStatus(false, true, -1), 8, 99, false, false, true, true, false, false, false, false, SHADER_TYPE.NORMAL, null, true, -1);
+		PlayerLoadInfo playerLoadInfo = PlayerLoadInfo.FromUserStatus(need_weapon: false, is_priority_visual_equip: true);
+		playerLoadInfo.isNeedToCache = true;
+		playerLoader.StartLoad(playerLoadInfo, 8, 99, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: false, need_dev_frame_instantiate: false, SHADER_TYPE.NORMAL, null);
 		return playerLoader;
 	}
 
 	protected override void InitCollider()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		base.InitCollider();
 		Rigidbody component = this.get_gameObject().GetComponent<Rigidbody>();
 		component.set_isKinematic(false);
@@ -147,78 +191,71 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 
 	private void OnTap(InputManager.TouchInfo info)
 	{
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		if (IsEnableControl())
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		if (!IsEnableControl())
 		{
-			HomeCamera homeCamera = null;
-			if (MonoBehaviourSingleton<HomeManager>.IsValid())
+			return;
+		}
+		HomeCamera homeCamera = null;
+		IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+		if (currentIHomeManager != null)
+		{
+			homeCamera = currentIHomeManager.HomeCamera;
+		}
+		if (homeCamera.viewMode != 0)
+		{
+			return;
+		}
+		HomeCharacterBase homeCharacterBase = null;
+		HomeStageTouchEvent homeStageTouchEvent = null;
+		if (targetEvent != null)
+		{
+			targetEvent.DispatchEvent();
+		}
+		else if (targetChara != null)
+		{
+			homeCharacterBase = targetChara;
+		}
+		else
+		{
+			Ray val = default(Ray);
+			if (currentIHomeManager != null)
 			{
-				homeCamera = MonoBehaviourSingleton<HomeManager>.I.HomeCamera;
+				val = homeCamera.targetCamera.ScreenPointToRay(Vector2.op_Implicit(info.position));
 			}
-			else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
+			RaycastHit val2 = default(RaycastHit);
+			if (Physics.Raycast(val, ref val2, 100f, 259))
 			{
-				homeCamera = MonoBehaviourSingleton<LoungeManager>.I.HomeCamera;
+				homeCharacterBase = val2.get_transform().GetComponent<HomeCharacterBase>();
+				homeStageTouchEvent = val2.get_transform().GetComponent<HomeStageTouchEvent>();
 			}
-			else if (MonoBehaviourSingleton<GuildStageManager>.IsValid())
+		}
+		if (homeCharacterBase != null)
+		{
+			if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 			{
-				homeCamera = MonoBehaviourSingleton<GuildStageManager>.I.HomeCamera;
-			}
-			if (homeCamera.viewMode == HomeCamera.VIEW_MODE.NORMAL)
-			{
-				HomeCharacterBase homeCharacterBase = null;
-				HomeStageTouchEvent homeStageTouchEvent = null;
-				if (targetEvent != null)
+				if (homeCharacterBase is HomeNPCCharacter)
 				{
-					targetEvent.DispatchEvent();
-				}
-				else if (targetChara != null)
-				{
-					homeCharacterBase = targetChara;
+					lastTargetNPCID = ((HomeNPCCharacter)homeCharacterBase).npcInfo.npcID;
 				}
 				else
 				{
-					Ray val = default(Ray);
-					if (MonoBehaviourSingleton<HomeManager>.IsValid() || MonoBehaviourSingleton<LoungeManager>.IsValid() || MonoBehaviourSingleton<GuildStageManager>.IsValid())
-					{
-						val = homeCamera.targetCamera.ScreenPointToRay(Vector2.op_Implicit(info.position));
-					}
-					RaycastHit val2 = default(RaycastHit);
-					if (Physics.Raycast(val, ref val2, 100f, 259))
-					{
-						homeCharacterBase = val2.get_transform().GetComponent<HomeCharacterBase>();
-						homeStageTouchEvent = val2.get_transform().GetComponent<HomeStageTouchEvent>();
-					}
+					lastTargetNPCID = 0;
 				}
-				if (homeCharacterBase != null)
+				if (homeCharacterBase.DispatchEvent())
 				{
-					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-					{
-						if (homeCharacterBase is HomeNPCCharacter)
-						{
-							lastTargetNPCID = ((HomeNPCCharacter)homeCharacterBase).npcInfo.npcID;
-						}
-						else
-						{
-							lastTargetNPCID = 0;
-						}
-						if (homeCharacterBase.DispatchEvent())
-						{
-							homeCharacterBase.StopMoving();
-						}
-					}
-				}
-				else if (homeStageTouchEvent != null)
-				{
-					homeStageTouchEvent.DispatchEvent();
+					homeCharacterBase.StopMoving();
 				}
 			}
+		}
+		else if (homeStageTouchEvent != null)
+		{
+			homeStageTouchEvent.DispatchEvent();
 		}
 	}
 
@@ -226,112 +263,121 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 	{
 		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animCtrl == null) && animCtrl.animator.get_enabled())
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0242: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+		if (animCtrl == null || !animCtrl.animator.get_enabled())
 		{
-			Vector3 val = Vector3.get_zero();
-			if (dragTouchInfo != null && dragTouchInfo.enable && MonoBehaviourSingleton<InputManager>.I.GetActiveInfoCount() == 1 && IsEnableControl())
+			return;
+		}
+		Vector3 val = Vector3.get_zero();
+		if (dragTouchInfo != null && dragTouchInfo.enable && MonoBehaviourSingleton<InputManager>.I.GetActiveInfoCount() == 1 && IsEnableControl())
+		{
+			if (isSitting)
+			{
+				this.StartCoroutine("StandUp");
+				val = Vector3.get_zero();
+			}
+			else
 			{
 				val = (dragTouchInfo.position - dragTouchInfo.beginPosition).ToVector3XZ();
 				val = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation() * val;
 				val.y = 0f;
 				val.Normalize();
 			}
+		}
+		else
+		{
+			val = Vector3.get_zero();
+		}
+		if (val.get_sqrMagnitude() > 0.01f)
+		{
+			base._transform.set_rotation(Quaternion.Slerp(base._transform.get_rotation(), Quaternion.LookRotation(val), 0.5f));
+			animCtrl.PlayMove();
+			base.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
+			if (MonoBehaviourSingleton<LoungeManager>.IsValid() || MonoBehaviourSingleton<ClanManager>.IsValid())
+			{
+				SendMove(isMoving: true);
+			}
+		}
+		else if (!isSitting && !isStanding)
+		{
+			base.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
+			if (sentPosition != base._transform.get_position() && (MonoBehaviourSingleton<LoungeManager>.IsValid() || MonoBehaviourSingleton<ClanManager>.IsValid()))
+			{
+				SendMove(isMoving: false);
+			}
+			animCtrl.PlayDefault();
+		}
+		if (!IsEnableControl())
+		{
+			return;
+		}
+		RaycastHit val2 = default(RaycastHit);
+		if (Physics.Raycast(base._transform.get_localPosition() + new Vector3(0f, 50f, 0f), Vector3.get_down(), ref val2, 50f, 4))
+		{
+			HomeStageAreaEvent component = val2.get_collider().GetComponent<HomeStageAreaEvent>();
+			if (!(component != null))
+			{
+				return;
+			}
+			if (noticeCallback != null)
+			{
+				noticeCallback(component);
+			}
+			if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+			{
+				return;
+			}
+			float num = component.defaultRadius * component.defaultRadius;
+			Vector2 val3 = component._transform.TransformPoint(component._collider.get_center()).ToVector2XZ() - base._transform.get_localPosition().ToVector2XZ();
+			if (val3.get_sqrMagnitude() <= num)
+			{
+				if (lastEvent != component)
+				{
+					component.DispatchEvent();
+					lastEvent = component;
+				}
+			}
 			else
 			{
-				val = Vector3.get_zero();
+				lastEvent = null;
 			}
-			if (val.get_sqrMagnitude() > 0.01f)
+		}
+		else
+		{
+			if (noticeCallback != null)
 			{
-				base._transform.set_rotation(Quaternion.Slerp(base._transform.get_rotation(), Quaternion.LookRotation(val), 0.5f));
-				animCtrl.PlayMove(false);
-				base.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
-				if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-				{
-					SendMove(true);
-				}
-				if (isSitting)
-				{
-					StandUp();
-				}
+				noticeCallback(null);
 			}
-			else if (!isSitting)
-			{
-				base.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
-				if (sentPosition != base._transform.get_position() && MonoBehaviourSingleton<LoungeManager>.IsValid())
-				{
-					SendMove(false);
-				}
-				animCtrl.PlayDefault(false);
-			}
-			if (IsEnableControl())
-			{
-				RaycastHit val2 = default(RaycastHit);
-				if (Physics.Raycast(base._transform.get_localPosition() + new Vector3(0f, 50f, 0f), Vector3.get_down(), ref val2, 50f, 4))
-				{
-					HomeStageAreaEvent component = val2.get_collider().GetComponent<HomeStageAreaEvent>();
-					if (component != null)
-					{
-						if (noticeCallback != null)
-						{
-							noticeCallback(component);
-						}
-						if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-						{
-							float num = component.defaultRadius * component.defaultRadius;
-							Vector2 val3 = component._transform.TransformPoint(component._collider.get_center()).ToVector2XZ() - base._transform.get_localPosition().ToVector2XZ();
-							if (val3.get_sqrMagnitude() <= num)
-							{
-								if (lastEvent != component)
-								{
-									component.DispatchEvent();
-									lastEvent = component;
-								}
-							}
-							else
-							{
-								lastEvent = null;
-							}
-						}
-					}
-				}
-				else
-				{
-					if (noticeCallback != null)
-					{
-						noticeCallback(null);
-					}
-					lastEvent = null;
-				}
-			}
+			lastEvent = null;
 		}
 	}
 
@@ -341,8 +387,8 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		float num = (!isMoving) ? 0.3f : 5f;
 		float num2 = Vector3.Distance(sentPosition, base._transform.get_position());
 		if (num2 > num)
@@ -351,7 +397,14 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 			lounge_Model_RoomMove.id = 1005;
 			lounge_Model_RoomMove.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 			lounge_Model_RoomMove.pos = base._transform.get_position();
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove, false, null, null);
+			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+			{
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove);
+			}
+			if (ClanMatchingManager.IsValidInClan() && MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+			{
+				MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove);
+			}
 			sentPosition = lounge_Model_RoomMove.pos;
 		}
 	}
@@ -360,13 +413,20 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 	{
 		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		Lounge_Model_RoomMove lounge_Model_RoomMove = new Lounge_Model_RoomMove();
 		lounge_Model_RoomMove.id = 1005;
 		lounge_Model_RoomMove.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		lounge_Model_RoomMove.pos = pos;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove, false, null, null);
+		if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+		{
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove);
+		}
+		if (MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+		{
+			MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove);
+		}
 		sentPosition = lounge_Model_RoomMove.pos;
 	}
 
@@ -376,7 +436,14 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 		lounge_Model_RoomAction.id = 1005;
 		lounge_Model_RoomAction.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		lounge_Model_RoomAction.aid = 1;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction, false, null, null);
+		if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+		{
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction);
+		}
+		if (MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+		{
+			MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction);
+		}
 	}
 
 	private void SendStandUp()
@@ -385,7 +452,14 @@ public class HomeSelfCharacter : HomePlayerCharacterBase
 		lounge_Model_RoomAction.id = 1005;
 		lounge_Model_RoomAction.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		lounge_Model_RoomAction.aid = 2;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction, false, null, null);
+		if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+		{
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction);
+		}
+		if (MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+		{
+			MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction);
+		}
 	}
 
 	public LOUNGE_ACTION_TYPE GetActionType()

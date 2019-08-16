@@ -10,12 +10,12 @@ public class ItemIconDetailItemSetupper : ItemIconDetailSetuperBase
 
 	public override void Set(object[] data = null)
 	{
-		base.Set(null);
+		base.Set();
 		ItemTable.ItemData itemData = data[0] as ItemTable.ItemData;
 		int num = (int)data[1];
 		bool flag = (bool)data[2];
 		SetName(itemData.name);
-		SetVisibleBG(true);
+		SetVisibleBG(is_visible: true);
 		if (flag)
 		{
 			SetActiveInfo(0);

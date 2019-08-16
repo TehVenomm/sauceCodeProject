@@ -1,4 +1,4 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.app.Notification;
 import android.os.Binder;
@@ -7,14 +7,17 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+/* renamed from: android.support.v4.app.INotificationSideChannel */
 public interface INotificationSideChannel extends IInterface {
 
+    /* renamed from: android.support.v4.app.INotificationSideChannel$Stub */
     public static abstract class Stub extends Binder implements INotificationSideChannel {
         private static final String DESCRIPTOR = "android.support.v4.app.INotificationSideChannel";
         static final int TRANSACTION_cancel = 2;
         static final int TRANSACTION_cancelAll = 3;
         static final int TRANSACTION_notify = 1;
 
+        /* renamed from: android.support.v4.app.INotificationSideChannel$Stub$Proxy */
         private static class Proxy implements INotificationSideChannel {
             private IBinder mRemote;
 

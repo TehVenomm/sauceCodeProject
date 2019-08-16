@@ -15,7 +15,6 @@ public class UIQuestInfoRush : MonoBehaviourSingleton<UIQuestInfoRush>
 
 	private void Start()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(IsEnable());
 		if (IsEnable())
 		{

@@ -18,17 +18,6 @@ public abstract class ShareButtonBase extends FacebookButtonBase {
     private int requestCode = 0;
     private ShareContent shareContent;
 
-    /* renamed from: com.facebook.share.widget.ShareButtonBase$1 */
-    class C05351 implements OnClickListener {
-        C05351() {
-        }
-
-        public void onClick(View view) {
-            ShareButtonBase.this.callExternalOnClickListener(view);
-            ShareButtonBase.this.getDialog().show(ShareButtonBase.this.getShareContent());
-        }
-    }
-
     protected ShareButtonBase(Context context, AttributeSet attributeSet, int i, String str, String str2) {
         super(context, attributeSet, i, 0, str, str2);
         this.requestCode = isInEditMode() ? 0 : getDefaultRequestCode();
@@ -40,16 +29,19 @@ public abstract class ShareButtonBase extends FacebookButtonBase {
         this.enabledExplicitlySet = false;
     }
 
-    protected boolean canShare() {
+    /* access modifiers changed from: protected */
+    public boolean canShare() {
         return getDialog().canShow(getShareContent());
     }
 
-    protected void configureButton(Context context, AttributeSet attributeSet, int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void configureButton(Context context, AttributeSet attributeSet, int i, int i2) {
         super.configureButton(context, attributeSet, i, i2);
         setInternalOnClickListener(getShareOnClickListener());
     }
 
-    protected abstract FacebookDialogBase<ShareContent, Result> getDialog();
+    /* access modifiers changed from: protected */
+    public abstract FacebookDialogBase<ShareContent, Result> getDialog();
 
     public int getRequestCode() {
         return this.requestCode;
@@ -59,8 +51,14 @@ public abstract class ShareButtonBase extends FacebookButtonBase {
         return this.shareContent;
     }
 
-    protected OnClickListener getShareOnClickListener() {
-        return new C05351();
+    /* access modifiers changed from: protected */
+    public OnClickListener getShareOnClickListener() {
+        return new OnClickListener() {
+            public void onClick(View view) {
+                ShareButtonBase.this.callExternalOnClickListener(view);
+                ShareButtonBase.this.getDialog().show(ShareButtonBase.this.getShareContent());
+            }
+        };
     }
 
     public void registerCallback(CallbackManager callbackManager, FacebookCallback<Result> facebookCallback) {
@@ -77,15 +75,16 @@ public abstract class ShareButtonBase extends FacebookButtonBase {
         this.enabledExplicitlySet = true;
     }
 
-    protected void setRequestCode(int i) {
+    /* access modifiers changed from: protected */
+    public void setRequestCode(int i) {
         if (FacebookSdk.isFacebookRequestCode(i)) {
             throw new IllegalArgumentException("Request code " + i + " cannot be within the range reserved by the Facebook SDK.");
         }
         this.requestCode = i;
     }
 
-    public void setShareContent(ShareContent shareContent) {
-        this.shareContent = shareContent;
+    public void setShareContent(ShareContent shareContent2) {
+        this.shareContent = shareContent2;
         if (!this.enabledExplicitlySet) {
             internalSetEnabled(canShare());
         }

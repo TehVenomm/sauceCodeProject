@@ -104,11 +104,13 @@ public class ItemDetailQuest : QuestSelect
 
 	private bool isGachaResult;
 
+	private bool isInProgressMultiResultGacha;
+
 	public override void Initialize()
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 		data = (GameSection.GetEventData() as QuestSortData);
 		QuestItemInfo questItemInfo = data.GetItemData() as QuestItemInfo;
 		GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.QUEST_ITEM, data.GetUniqID());
@@ -116,8 +118,20 @@ public class ItemDetailQuest : QuestSelect
 		isGachaResult = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName().Contains("Gacha");
 		if (isGachaResult)
 		{
+			isInProgressMultiResultGacha = false;
+			if (MonoBehaviourSingleton<GachaManager>.IsValid())
+			{
+				if (MonoBehaviourSingleton<GachaManager>.I.IsMultiResult() && MonoBehaviourSingleton<GachaManager>.I.IsExistNextGachaResult())
+				{
+					isInProgressMultiResultGacha = true;
+				}
+				else if (MonoBehaviourSingleton<GachaManager>.I.IsResultBonus() && !MonoBehaviourSingleton<GachaManager>.I.enableFeverDirector)
+				{
+					isInProgressMultiResultGacha = true;
+				}
+			}
 			backupAmbientLight = RenderSettings.get_ambientLight();
-			RenderSettings.set_ambientLight(Utility.MakeColorByInt(201, 210, 226, 255));
+			RenderSettings.set_ambientLight(Utility.MakeColorByInt(201, 210, 226));
 		}
 		base.Initialize();
 	}
@@ -135,15 +149,15 @@ public class ItemDetailQuest : QuestSelect
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_NEXT, false);
-		SetActive((Enum)UI.OBJ_NEXT_OPT, false);
-		SetActive((Enum)UI.BTN_PARTY, false);
-		SetActive((Enum)UI.OBJ_PARTY_OPT, false);
-		SetActive((Enum)UI.BTN_BACK, false);
-		questPrefab = SetPrefab(base.collectUI, "ItemDetailQuest", true);
+		SetActive((Enum)UI.BTN_NEXT, is_visible: false);
+		SetActive((Enum)UI.OBJ_NEXT_OPT, is_visible: false);
+		SetActive((Enum)UI.BTN_PARTY, is_visible: false);
+		SetActive((Enum)UI.OBJ_PARTY_OPT, is_visible: false);
+		SetActive((Enum)UI.BTN_BACK, is_visible: false);
+		questPrefab = SetPrefab(base.collectUI, "ItemDetailQuest");
 		SetActive(questPrefab, UI.BTN_SELL, !isGachaResult);
-		SetActive(questPrefab, UI.BTN_BATTLE, isGachaResult);
-		SetActive((Enum)UI.OBJ_PARTY_BTN_ROOT, false);
+		SetActive(questPrefab, UI.BTN_BATTLE, isGachaResult && !isInProgressMultiResultGacha);
+		SetActive((Enum)UI.OBJ_PARTY_BTN_ROOT, is_visible: false);
 		SetLabelText(questPrefab, UI.STR_BTN_SELL, base.sectionData.GetText("TEXT_EXCHANGE"));
 		SetLabelText(questPrefab, UI.STR_BTN_SELL_D, base.sectionData.GetText("TEXT_EXCHANGE"));
 		SetActive(questPrefab, UI.OBJ_ICON, !isGachaResult);
@@ -161,7 +175,7 @@ public class ItemDetailQuest : QuestSelect
 	{
 		if (!data.CanSale())
 		{
-			GameSection.ChangeEvent("NOT_SELL", null);
+			GameSection.ChangeEvent("NOT_SELL");
 		}
 		else
 		{
@@ -179,10 +193,10 @@ public class ItemDetailQuest : QuestSelect
 
 	protected void OnQuery_ItemDetailJumpQuestConfirm_YES()
 	{
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+		string goingHomeEvent = GameSection.GetGoingHomeEvent();
 		EventData[] autoEvents = new EventData[4]
 		{
-			new EventData(name, null),
+			new EventData(goingHomeEvent, null),
 			new EventData("GACHA_QUEST_COUNTER", null),
 			new EventData("TO_GACHA_QUEST_COUNTER", null),
 			new EventData("SELECT_ORDER", data.GetTableID())

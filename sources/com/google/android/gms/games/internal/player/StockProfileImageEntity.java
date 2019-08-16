@@ -3,19 +3,30 @@ package com.google.android.gms.games.internal.player;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.games.internal.zzc;
-import java.util.Arrays;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.games.internal.zzd;
 
-public final class StockProfileImageEntity extends zzc implements StockProfileImage {
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "StockProfileImageEntityCreator")
+@Reserved({1000})
+public final class StockProfileImageEntity extends zzd implements StockProfileImage {
     public static final Creator<StockProfileImageEntity> CREATOR = new zzf();
-    private final String zzhkq;
-    private final Uri zzhkr;
+    @Field(getter = "getImageUri", mo13990id = 2)
+    private final Uri zzfu;
+    @Field(getter = "getImageUrl", mo13990id = 1)
+    private final String zznq;
 
-    public StockProfileImageEntity(String str, Uri uri) {
-        this.zzhkq = str;
-        this.zzhkr = uri;
+    @Constructor
+    public StockProfileImageEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) Uri uri) {
+        this.zznq = str;
+        this.zzfu = uri;
     }
 
     public final boolean equals(Object obj) {
@@ -26,7 +37,7 @@ public final class StockProfileImageEntity extends zzc implements StockProfileIm
             return true;
         }
         StockProfileImage stockProfileImage = (StockProfileImage) obj;
-        return zzbf.equal(this.zzhkq, stockProfileImage.getImageUrl()) && zzbf.equal(this.zzhkr, stockProfileImage.zzaro());
+        return Objects.equal(this.zznq, stockProfileImage.getImageUrl()) && Objects.equal(this.zzfu, stockProfileImage.zzae());
     }
 
     public final /* bridge */ /* synthetic */ Object freeze() {
@@ -37,11 +48,11 @@ public final class StockProfileImageEntity extends zzc implements StockProfileIm
     }
 
     public final String getImageUrl() {
-        return this.zzhkq;
+        return this.zznq;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzhkq, this.zzhkr});
+        return Objects.hashCode(this.zznq, this.zzfu);
     }
 
     public final boolean isDataValid() {
@@ -49,17 +60,17 @@ public final class StockProfileImageEntity extends zzc implements StockProfileIm
     }
 
     public final String toString() {
-        return zzbf.zzt(this).zzg("ImageId", this.zzhkq).zzg("ImageUri", this.zzhkr).toString();
+        return Objects.toStringHelper(this).add("ImageId", this.zznq).add("ImageUri", this.zzfu).toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getImageUrl(), false);
-        zzd.zza(parcel, 2, this.zzhkr, i, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, getImageUrl(), false);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.zzfu, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final Uri zzaro() {
-        return this.zzhkr;
+    public final Uri zzae() {
+        return this.zzfu;
     }
 }

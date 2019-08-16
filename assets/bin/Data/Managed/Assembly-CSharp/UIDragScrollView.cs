@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Drag Scroll View")]
-public class UIDragScrollView
+public class UIDragScrollView : MonoBehaviour
 {
 	public UIScrollView scrollView;
 
@@ -24,8 +24,6 @@ public class UIDragScrollView
 
 	private void OnEnable()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		mTrans = this.get_transform();
 		if (scrollView == null && draggablePanel != null)
 		{
@@ -62,7 +60,6 @@ public class UIDragScrollView
 
 	private void AttachUIButtonEffect()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		UIButton component = this.GetComponent<UIButton>();
 		if (component != null && this.GetComponent<UINoAuto>() == null && component.GetComponent<UIButtonEffect>() == null)
 		{
@@ -73,8 +70,6 @@ public class UIDragScrollView
 
 	private void OnPress(bool pressed)
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
 		if (mAutoFind && mScroll != scrollView)
 		{
 			mScroll = scrollView;

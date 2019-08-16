@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class DeliveryRewardTable : Singleton<DeliveryRewardTable>, IDataTable
 {
@@ -15,13 +16,13 @@ public class DeliveryRewardTable : Singleton<DeliveryRewardTable>, IDataTable
 			public int param;
 		}
 
-		public const string NT = "id,type,itemId,num,param_0";
-
 		public uint id;
 
 		public uint rewardIndex;
 
 		public Reward reward;
+
+		public const string NT = "id,type,itemId,num,param_0";
 
 		public static bool cb(CSVReader csv_reader, DeliveryRewardData data, ref uint key1, ref uint key2)
 		{
@@ -44,15 +45,27 @@ public class DeliveryRewardTable : Singleton<DeliveryRewardTable>, IDataTable
 
 	private DoubleUIntKeyTable<DeliveryRewardData> tableData;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<DeliveryRewardData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<DeliveryRewardData> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
+
 	public void CreateTable(string csv_text)
 	{
-		tableData = TableUtility.CreateDoubleUIntKeyTable<DeliveryRewardData>(csv_text, DeliveryRewardData.cb, "id,type,itemId,num,param_0", DeliveryRewardData.CBSecondKey, null, null, null);
+		tableData = TableUtility.CreateDoubleUIntKeyTable<DeliveryRewardData>(csv_text, DeliveryRewardData.cb, "id,type,itemId,num,param_0", DeliveryRewardData.CBSecondKey);
 		tableData.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(tableData, csv_text, DeliveryRewardData.cb, "id,type,itemId,num,param_0", DeliveryRewardData.CBSecondKey, null, null);
+		TableUtility.AddDoubleUIntKeyTable(tableData, csv_text, DeliveryRewardData.cb, "id,type,itemId,num,param_0", DeliveryRewardData.CBSecondKey);
 	}
 
 	public DeliveryRewardData[] GetDeliveryRewardTableData(uint id)

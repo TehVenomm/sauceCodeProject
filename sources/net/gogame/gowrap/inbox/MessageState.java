@@ -3,7 +3,9 @@ package net.gogame.gowrap.inbox;
 import java.io.Serializable;
 
 public class MessageState implements Serializable {
-    private long id;
+
+    /* renamed from: id */
+    private long f1404id;
     private boolean read;
     private long timestamp;
     private String type;
@@ -17,11 +19,11 @@ public class MessageState implements Serializable {
     }
 
     public long getId() {
-        return this.id;
+        return this.f1404id;
     }
 
     public void setId(long j) {
-        this.id = j;
+        this.f1404id = j;
     }
 
     public long getTimestamp() {

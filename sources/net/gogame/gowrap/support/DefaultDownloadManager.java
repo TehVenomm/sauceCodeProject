@@ -4,8 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.events.EventsFilesManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,23 +21,18 @@ import net.gogame.gowrap.support.DownloadManager.Listener;
 import net.gogame.gowrap.support.DownloadManager.Request;
 import net.gogame.gowrap.support.DownloadManager.Target;
 import net.gogame.gowrap.support.DownloadUtils.Callback;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.events.EventsFilesManager;
 
 public class DefaultDownloadManager implements DownloadManager {
-    private final Context context;
-    private final DiskLruCache diskLruCache;
+    /* access modifiers changed from: private */
+    public final Context context;
+    /* access modifiers changed from: private */
+    public final DiskLruCache diskLruCache;
     private int downloadCount = 0;
-    private final Handler handler = new Handler();
+    /* access modifiers changed from: private */
+    public final Handler handler = new Handler();
     private final Set<Listener> listeners = new HashSet();
-
-    /* renamed from: net.gogame.gowrap.support.DefaultDownloadManager$1 */
-    class C11181 implements Runnable {
-        C11181() {
-        }
-
-        public void run() {
-            DefaultDownloadManager.this.fireDownloadsFinished();
-        }
-    }
 
     private class DefaultDownloadResult implements DownloadResult {
         private final String key;
@@ -68,15 +61,15 @@ public class DefaultDownloadManager implements DownloadManager {
         }
     }
 
-    public DefaultDownloadManager(Context context, DiskLruCache diskLruCache) {
-        this.context = context;
-        this.diskLruCache = diskLruCache;
+    public DefaultDownloadManager(Context context2, DiskLruCache diskLruCache2) {
+        this.context = context2;
+        this.diskLruCache = diskLruCache2;
     }
 
     private static String toKey(Uri uri) {
         try {
-            return computeDigest(uri.toString(), CommonUtils.SHA1_INSTANCE) + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + computeDigest(uri.toString(), CommonUtils.MD5_INSTANCE);
-        } catch (Throwable e) {
+            return computeDigest(uri.toString(), CommonUtils.SHA1_INSTANCE) + EventsFilesManager.ROLL_OVER_FILE_NAME_SEPARATOR + computeDigest(uri.toString(), "MD5");
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -85,11 +78,11 @@ public class DefaultDownloadManager implements DownloadManager {
         MessageDigest instance = MessageDigest.getInstance(str2);
         instance.update(str.getBytes("UTF-8"));
         byte[] digest = instance.digest();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < digest.length; i++) {
-            stringBuilder.append(String.format("%02x", new Object[]{Integer.valueOf(digest[i] & 255)}));
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest) {
+            sb.append(String.format("%02x", new Object[]{Integer.valueOf(b & 255)}));
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private synchronized void onDownloadStarted() {
@@ -97,13 +90,18 @@ public class DefaultDownloadManager implements DownloadManager {
         fireDownloadsStarted();
     }
 
-    private synchronized void onDownloadFinished() {
+    /* access modifiers changed from: private */
+    public synchronized void onDownloadFinished() {
         this.downloadCount--;
         if (this.downloadCount < 0) {
             this.downloadCount = 0;
         }
         if (this.downloadCount == 0) {
-            this.handler.post(new C11181());
+            this.handler.post(new Runnable() {
+                public void run() {
+                    DefaultDownloadManager.this.fireDownloadsFinished();
+                }
+            });
         }
     }
 
@@ -111,15 +109,15 @@ public class DefaultDownloadManager implements DownloadManager {
         if (request.getUri() != null && request.getTarget() != null) {
             final Target target = request.getTarget();
             try {
-                final String toKey = toKey(request.getUri());
-                Snapshot snapshot = this.diskLruCache.get(toKey);
+                final String key = toKey(request.getUri());
+                Snapshot snapshot = this.diskLruCache.get(key);
                 if (snapshot != null) {
                     snapshot.close();
                     this.handler.post(new Runnable() {
                         public void run() {
                             try {
-                                target.onDownloadSucceeded(new DefaultDownloadResult(toKey));
-                            } catch (Throwable e) {
+                                target.onDownloadSucceeded(new DefaultDownloadResult(key));
+                            } catch (Exception e) {
                                 Log.e(Constants.TAG, "Exception", e);
                             }
                         }
@@ -143,62 +141,49 @@ public class DefaultDownloadManager implements DownloadManager {
 
                     public void setEtag(String str) throws IOException {
                         if (this.editor == null) {
-                            this.editor = DefaultDownloadManager.this.diskLruCache.edit(toKey);
+                            this.editor = DefaultDownloadManager.this.diskLruCache.edit(key);
                         }
                         this.editor.set(1, str);
                     }
 
                     public OutputStream getOutputStream() throws IOException {
                         if (this.editor == null) {
-                            this.editor = DefaultDownloadManager.this.diskLruCache.edit(toKey);
+                            this.editor = DefaultDownloadManager.this.diskLruCache.edit(key);
                         }
                         return this.editor.newOutputStream(0);
                     }
                 }, false, new Callback() {
-
-                    /* renamed from: net.gogame.gowrap.support.DefaultDownloadManager$4$1 */
-                    class C11211 implements Runnable {
-                        C11211() {
-                        }
-
-                        public void run() {
-                            try {
-                                target.onDownloadSucceeded(new DefaultDownloadResult(toKey));
-                            } catch (Throwable e) {
-                                Log.e(Constants.TAG, "Exception", e);
-                            }
-                        }
-                    }
-
-                    /* renamed from: net.gogame.gowrap.support.DefaultDownloadManager$4$2 */
-                    class C11222 implements Runnable {
-                        C11222() {
-                        }
-
-                        public void run() {
-                            try {
-                                if (request.getErrorResourceId() != null) {
-                                    target.onDownloadFailed(DefaultDownloadManager.this.context.getResources().getDrawable(request.getErrorResourceId().intValue()));
-                                } else {
-                                    target.onDownloadFailed(null);
-                                }
-                            } catch (Throwable e) {
-                                Log.e(Constants.TAG, "Exception", e);
-                            }
-                        }
-                    }
-
                     public void onDownloadSucceeded() {
                         DefaultDownloadManager.this.onDownloadFinished();
-                        DefaultDownloadManager.this.handler.post(new C11211());
+                        DefaultDownloadManager.this.handler.post(new Runnable() {
+                            public void run() {
+                                try {
+                                    target.onDownloadSucceeded(new DefaultDownloadResult(key));
+                                } catch (Exception e) {
+                                    Log.e(Constants.TAG, "Exception", e);
+                                }
+                            }
+                        });
                     }
 
                     public void onDownloadFailed() {
                         DefaultDownloadManager.this.onDownloadFinished();
-                        DefaultDownloadManager.this.handler.post(new C11222());
+                        DefaultDownloadManager.this.handler.post(new Runnable() {
+                            public void run() {
+                                try {
+                                    if (request.getErrorResourceId() != null) {
+                                        target.onDownloadFailed(DefaultDownloadManager.this.context.getResources().getDrawable(request.getErrorResourceId().intValue()));
+                                    } else {
+                                        target.onDownloadFailed(null);
+                                    }
+                                } catch (Exception e) {
+                                    Log.e(Constants.TAG, "Exception", e);
+                                }
+                            }
+                        });
                     }
                 });
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }
@@ -224,17 +209,18 @@ public class DefaultDownloadManager implements DownloadManager {
         for (Listener onDownloadsStarted : this.listeners) {
             try {
                 onDownloadsStarted.onDownloadsStarted();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }
     }
 
-    private void fireDownloadsFinished() {
+    /* access modifiers changed from: private */
+    public void fireDownloadsFinished() {
         for (Listener onDownloadsFinished : this.listeners) {
             try {
                 onDownloadsFinished.onDownloadsFinished();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }

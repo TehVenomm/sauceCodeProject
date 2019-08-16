@@ -6,11 +6,11 @@ public class LoadAndInstantiateObject : LoadObject
 
 	public LoadAndInstantiateObject(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name)
 	{
-		Load(mono_behaviour, category, resource_name, false);
+		Load(mono_behaviour, category, resource_name, cache_package: false);
 		if (MonoBehaviourSingleton<InstantiateManager>.IsValid() && !base.isLoading && loadedObject != null)
 		{
 			base.isLoading = true;
-			InstantiateManager.Request(resLoad, loadedObject, OnInstantiate, true);
+			InstantiateManager.Request(resLoad, loadedObject, OnInstantiate, is_inactivate_instantiated_object: true);
 		}
 	}
 
@@ -25,7 +25,7 @@ public class LoadAndInstantiateObject : LoadObject
 			loadedObject = objs[0].obj;
 			loadedObjects = objs;
 			resLoad.SetReference(loadedObjects);
-			InstantiateManager.Request(resLoad, objs[0].obj, OnInstantiate, true);
+			InstantiateManager.Request(resLoad, objs[0].obj, OnInstantiate, is_inactivate_instantiated_object: true);
 		}
 		else
 		{

@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.network;
+package p017io.fabric.sdk.android.services.network;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -13,18 +13,19 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+/* renamed from: io.fabric.sdk.android.services.network.SystemKeyStore */
 class SystemKeyStore {
     private final HashMap<Principal, X509Certificate> trustRoots;
     final KeyStore trustStore;
 
     public SystemKeyStore(InputStream inputStream, String str) {
-        KeyStore trustStore = getTrustStore(inputStream, str);
-        this.trustRoots = initializeTrustedRoots(trustStore);
-        this.trustStore = trustStore;
+        KeyStore trustStore2 = getTrustStore(inputStream, str);
+        this.trustRoots = initializeTrustedRoots(trustStore2);
+        this.trustStore = trustStore2;
     }
 
     private KeyStore getTrustStore(InputStream inputStream, String str) {
-        InputStream bufferedInputStream;
+        BufferedInputStream bufferedInputStream;
         try {
             KeyStore instance = KeyStore.getInstance("BKS");
             bufferedInputStream = new BufferedInputStream(inputStream);
@@ -41,12 +42,13 @@ class SystemKeyStore {
             throw new AssertionError(e4);
         } catch (Throwable th) {
             bufferedInputStream.close();
+            throw th;
         }
     }
 
     private HashMap<Principal, X509Certificate> initializeTrustedRoots(KeyStore keyStore) {
         try {
-            HashMap<Principal, X509Certificate> hashMap = new HashMap();
+            HashMap<Principal, X509Certificate> hashMap = new HashMap<>();
             Enumeration aliases = keyStore.aliases();
             while (aliases.hasMoreElements()) {
                 X509Certificate x509Certificate = (X509Certificate) keyStore.getCertificate((String) aliases.nextElement());

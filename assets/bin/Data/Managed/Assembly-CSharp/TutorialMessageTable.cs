@@ -98,7 +98,7 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 			{
 				return null;
 			}
-			return (TUTORIAL_MENU_BIT)(int)Enum.Parse(typeof(TUTORIAL_MENU_BIT), strAppearTutorialBit);
+			return (TUTORIAL_MENU_BIT)Enum.Parse(typeof(TUTORIAL_MENU_BIT), strAppearTutorialBit);
 		}
 
 		public TUTORIAL_MENU_BIT? GetFinishTutorialBit()
@@ -107,7 +107,7 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 			{
 				return null;
 			}
-			return (TUTORIAL_MENU_BIT)(int)Enum.Parse(typeof(TUTORIAL_MENU_BIT), strFinishTutorialBit);
+			return (TUTORIAL_MENU_BIT)Enum.Parse(typeof(TUTORIAL_MENU_BIT), strFinishTutorialBit);
 		}
 
 		public TUTORIAL_MENU_BIT? GetSetBit()
@@ -116,13 +116,13 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 			{
 				return null;
 			}
-			return (TUTORIAL_MENU_BIT)(int)Enum.Parse(typeof(TUTORIAL_MENU_BIT), strSetBit);
+			return (TUTORIAL_MENU_BIT)Enum.Parse(typeof(TUTORIAL_MENU_BIT), strSetBit);
 		}
 	}
 
-	private const string NT = "id,scene_name,section_name,message_id,trigger_event_name,completed_tutorial_step,appear_tutorial_bit,finish_tutorial_bit,appear,appear_delivery_id,only_new_section,set_bit,force_resend,check_keyword,position,npc_id,face_type,message,image_resource_name,voice_id,cursor_target,focus_pattern,wait_event_name,focus_frame,wait,cursor_offset_x,cursor_offset_y,cursor_angle,cursor_delay";
-
 	private TutorialReadData m_ReadData;
+
+	private const string NT = "id,scene_name,section_name,message_id,trigger_event_name,completed_tutorial_step,appear_tutorial_bit,finish_tutorial_bit,appear,appear_delivery_id,only_new_section,set_bit,force_resend,check_keyword,position,npc_id,face_type,message,image_resource_name,voice_id,cursor_target,focus_pattern,wait_event_name,focus_frame,wait,cursor_offset_x,cursor_offset_y,cursor_angle,cursor_delay";
 
 	private UIntKeyTable<TutorialMessageData> tutorialSectionMessages = new UIntKeyTable<TutorialMessageData>();
 
@@ -297,85 +297,85 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		CSVReader cSVReader = new CSVReader(csv_text, "id,scene_name,section_name,message_id,trigger_event_name,completed_tutorial_step,appear_tutorial_bit,finish_tutorial_bit,appear,appear_delivery_id,only_new_section,set_bit,force_resend,check_keyword,position,npc_id,face_type,message,image_resource_name,voice_id,cursor_target,focus_pattern,wait_event_name,focus_frame,wait,cursor_offset_x,cursor_offset_y,cursor_angle,cursor_delay", false);
+		CSVReader cSVReader = new CSVReader(csv_text, "id,scene_name,section_name,message_id,trigger_event_name,completed_tutorial_step,appear_tutorial_bit,finish_tutorial_bit,appear,appear_delivery_id,only_new_section,set_bit,force_resend,check_keyword,position,npc_id,face_type,message,image_resource_name,voice_id,cursor_target,focus_pattern,wait_event_name,focus_frame,wait,cursor_offset_x,cursor_offset_y,cursor_angle,cursor_delay");
 		TutorialMessageData tutorialMessageData = null;
-		uint value = 0u;
+		uint num = 0u;
 		while (cSVReader.NextLine())
 		{
-			value = 0u;
-			cSVReader.Pop(ref value);
-			if (value != 0)
+			num = 0u;
+			cSVReader.Pop(ref num);
+			if (num != 0)
 			{
 				if (tutorialMessageData != null)
 				{
 					tutorialSectionMessages.Add((uint)tutorialMessageData.tutorialId, tutorialMessageData);
 				}
+				string value = string.Empty;
 				string value2 = string.Empty;
 				string value3 = string.Empty;
-				string value4 = string.Empty;
-				int value5 = 0;
+				int value4 = 0;
+				string value5 = string.Empty;
 				string value6 = string.Empty;
-				string value7 = string.Empty;
+				int value7 = 0;
 				int value8 = 0;
 				int value9 = 0;
-				int value10 = 0;
-				bool value11 = false;
-				string value12 = string.Empty;
-				FORCE_RESEND_DIALOG_FLAG value13 = FORCE_RESEND_DIALOG_FLAG.NONE;
-				string value14 = string.Empty;
+				bool value10 = false;
+				string value11 = string.Empty;
+				FORCE_RESEND_DIALOG_FLAG value12 = FORCE_RESEND_DIALOG_FLAG.NONE;
+				string value13 = string.Empty;
+				cSVReader.Pop(ref value);
 				cSVReader.Pop(ref value2);
+				cSVReader.Pop(ref value9);
 				cSVReader.Pop(ref value3);
-				cSVReader.Pop(ref value10);
 				cSVReader.Pop(ref value4);
 				cSVReader.Pop(ref value5);
 				cSVReader.Pop(ref value6);
 				cSVReader.Pop(ref value7);
 				cSVReader.Pop(ref value8);
-				cSVReader.Pop(ref value9);
+				cSVReader.Pop(ref value10);
 				cSVReader.Pop(ref value11);
 				cSVReader.Pop(ref value12);
 				cSVReader.Pop(ref value13);
-				cSVReader.Pop(ref value14);
-				if (GetTutorialTheSection(value3, value10) != null)
+				if (GetTutorialTheSection(value2, value9) != null)
 				{
-					Log.Warning(LOG.SYSTEM, "同一セクション内で message_id が重複しています : id " + value + " : " + value3 + " - " + value10);
+					Log.Warning(LOG.SYSTEM, "同一セクション内で message_id が重複しています : id " + num + " : " + value2 + " - " + value9);
 					continue;
 				}
 				tutorialMessageData = new TutorialMessageData();
-				tutorialMessageData.tutorialId = (int)value;
-				tutorialMessageData.sceneName = value2;
-				tutorialMessageData.sectionName = value3;
-				tutorialMessageData.messageId = value10;
-				tutorialMessageData.triggerEventName = value4;
-				tutorialMessageData.completedTutorialStep = value5;
-				tutorialMessageData.strAppearTutorialBit = value6;
-				tutorialMessageData.strFinishTutorialBit = value7;
-				tutorialMessageData.appearId = value8;
-				tutorialMessageData.appearDeliveryId = value9;
-				tutorialMessageData.isNewSectionOnly = value11;
-				tutorialMessageData.strSetBit = value12;
-				tutorialMessageData.resendFrag = value13;
-				tutorialMessageData.checkKeyword = value14;
+				tutorialMessageData.tutorialId = (int)num;
+				tutorialMessageData.sceneName = value;
+				tutorialMessageData.sectionName = value2;
+				tutorialMessageData.messageId = value9;
+				tutorialMessageData.triggerEventName = value3;
+				tutorialMessageData.completedTutorialStep = value4;
+				tutorialMessageData.strAppearTutorialBit = value5;
+				tutorialMessageData.strFinishTutorialBit = value6;
+				tutorialMessageData.appearId = value7;
+				tutorialMessageData.appearDeliveryId = value8;
+				tutorialMessageData.isNewSectionOnly = value10;
+				tutorialMessageData.strSetBit = value11;
+				tutorialMessageData.resendFrag = value12;
+				tutorialMessageData.checkKeyword = value13;
 				tutorialMessageData.messageData = new List<TutorialMessageData.MessageData>();
 			}
 			else
 			{
-				string value15 = string.Empty;
-				int value16 = 0;
-				bool value17 = false;
+				string value14 = string.Empty;
+				int value15 = 0;
+				bool value16 = false;
+				cSVReader.Pop(ref value14);
+				cSVReader.Pop(ref value14);
+				cSVReader.Pop(ref value15);
+				cSVReader.Pop(ref value14);
+				cSVReader.Pop(ref value15);
+				cSVReader.Pop(ref value14);
+				cSVReader.Pop(ref value14);
 				cSVReader.Pop(ref value15);
 				cSVReader.Pop(ref value15);
 				cSVReader.Pop(ref value16);
-				cSVReader.Pop(ref value15);
-				cSVReader.Pop(ref value16);
-				cSVReader.Pop(ref value15);
-				cSVReader.Pop(ref value15);
-				cSVReader.Pop(ref value16);
-				cSVReader.Pop(ref value16);
-				cSVReader.Pop(ref value17);
-				cSVReader.Pop(ref value15);
-				cSVReader.Pop(ref value15);
-				cSVReader.Pop(ref value15);
+				cSVReader.Pop(ref value14);
+				cSVReader.Pop(ref value14);
+				cSVReader.Pop(ref value14);
 			}
 			if (tutorialMessageData != null && tutorialMessageData.messageData != null)
 			{

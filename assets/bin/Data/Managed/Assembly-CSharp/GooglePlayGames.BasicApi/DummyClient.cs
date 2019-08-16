@@ -14,7 +14,7 @@ namespace GooglePlayGames.BasicApi
 		public void Authenticate(Action<bool, string> callback, bool silent)
 		{
 			LogUsage();
-			callback?.Invoke(false, "Not implemented on this platform");
+			callback?.Invoke(arg1: false, "Not implemented on this platform");
 		}
 
 		public bool IsAuthenticated()
@@ -90,25 +90,25 @@ namespace GooglePlayGames.BasicApi
 		public void UnlockAchievement(string achId, Action<bool> callback)
 		{
 			LogUsage();
-			callback?.Invoke(false);
+			callback?.Invoke(obj: false);
 		}
 
 		public void RevealAchievement(string achId, Action<bool> callback)
 		{
 			LogUsage();
-			callback?.Invoke(false);
+			callback?.Invoke(obj: false);
 		}
 
 		public void IncrementAchievement(string achId, int steps, Action<bool> callback)
 		{
 			LogUsage();
-			callback?.Invoke(false);
+			callback?.Invoke(obj: false);
 		}
 
 		public void SetStepsAtLeast(string achId, int steps, Action<bool> callback)
 		{
 			LogUsage();
-			callback?.Invoke(false);
+			callback?.Invoke(obj: false);
 		}
 
 		public void ShowAchievementsUI(Action<UIStatus> callback)
@@ -143,13 +143,13 @@ namespace GooglePlayGames.BasicApi
 		public void SubmitScore(string leaderboardId, long score, Action<bool> callback)
 		{
 			LogUsage();
-			callback?.Invoke(false);
+			callback?.Invoke(obj: false);
 		}
 
 		public void SubmitScore(string leaderboardId, long score, string metadata, Action<bool> callback)
 		{
 			LogUsage();
-			callback?.Invoke(false);
+			callback?.Invoke(obj: false);
 		}
 
 		public IRealTimeMultiplayerClient GetRtmpClient()
@@ -208,7 +208,7 @@ namespace GooglePlayGames.BasicApi
 		public void LoadFriends(Action<bool> callback)
 		{
 			LogUsage();
-			callback(false);
+			callback(obj: false);
 		}
 
 		public IUserProfile[] GetFriends()

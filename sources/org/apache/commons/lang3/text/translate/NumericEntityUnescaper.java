@@ -23,16 +23,21 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
     }
 
     public boolean isSet(OPTION option) {
-        return this.options == null ? false : this.options.contains(option);
+        if (this.options == null) {
+            return false;
+        }
+        return this.options.contains(option);
     }
 
     public int translate(CharSequence charSequence, int i, Writer writer) throws IOException {
-        int i2 = 1;
+        boolean z;
+        int parseInt;
+        int i2;
+        int i3 = 1;
         int length = charSequence.length();
         if (charSequence.charAt(i) != '&' || i >= length - 2 || charSequence.charAt(i + 1) != '#') {
             return 0;
         }
-        int i3;
         int i4 = i + 2;
         char charAt = charSequence.charAt(i4);
         if (charAt == 'x' || charAt == 'X') {
@@ -40,18 +45,16 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
             if (i4 == length) {
                 return 0;
             }
-            i3 = i4;
-            i4 = 1;
+            z = true;
         } else {
-            i3 = i4;
-            i4 = 0;
+            z = false;
         }
-        int i5 = i3;
+        int i5 = i4;
         while (i5 < length && ((charSequence.charAt(i5) >= '0' && charSequence.charAt(i5) <= '9') || ((charSequence.charAt(i5) >= 'a' && charSequence.charAt(i5) <= 'f') || (charSequence.charAt(i5) >= 'A' && charSequence.charAt(i5) <= 'F')))) {
             i5++;
         }
-        length = (i5 == length || charSequence.charAt(i5) != ';') ? 0 : 1;
-        if (length == 0) {
+        boolean z2 = i5 != length && charSequence.charAt(i5) == ';';
+        if (!z2) {
             if (isSet(OPTION.semiColonRequired)) {
                 return 0;
             }
@@ -59,31 +62,32 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
                 throw new IllegalArgumentException("Semi-colon required at end of numeric entity");
             }
         }
-        if (i4 != 0) {
+        if (z) {
             try {
-                int parseInt = Integer.parseInt(charSequence.subSequence(i3, i5).toString(), 16);
+                parseInt = Integer.parseInt(charSequence.subSequence(i4, i5).toString(), 16);
             } catch (NumberFormatException e) {
                 return 0;
             }
+        } else {
+            parseInt = Integer.parseInt(charSequence.subSequence(i4, i5).toString(), 10);
         }
-        parseInt = Integer.parseInt(charSequence.subSequence(i3, i5).toString(), 10);
         if (parseInt > 65535) {
-            char[] toChars = Character.toChars(parseInt);
-            writer.write(toChars[0]);
-            writer.write(toChars[1]);
+            char[] chars = Character.toChars(parseInt);
+            writer.write(chars[0]);
+            writer.write(chars[1]);
         } else {
             writer.write(parseInt);
         }
-        i3 = (i5 + 2) - i3;
-        if (i4 != 0) {
-            i4 = 1;
+        int i6 = (i5 + 2) - i4;
+        if (z) {
+            i2 = 1;
         } else {
-            i4 = 0;
-        }
-        i4 += i3;
-        if (length == 0) {
             i2 = 0;
         }
-        return i4 + i2;
+        int i7 = i2 + i6;
+        if (!z2) {
+            i3 = 0;
+        }
+        return i7 + i3;
     }
 }

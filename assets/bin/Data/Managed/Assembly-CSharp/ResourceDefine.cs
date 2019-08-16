@@ -1,6 +1,6 @@
 public static class ResourceDefine
 {
-	public static readonly ResourceManager.CATEGORY_TYPE[] types = new ResourceManager.CATEGORY_TYPE[83]
+	public static readonly ResourceManager.CATEGORY_TYPE[] types = new ResourceManager.CATEGORY_TYPE[91]
 	{
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
@@ -15,25 +15,28 @@ public static class ResourceDefine
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.FOLDER,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.FOLDER,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.FOLDER,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.FOLDER,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.HASH256,
 		ResourceManager.CATEGORY_TYPE.HASH256,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
@@ -44,15 +47,17 @@ public static class ResourceDefine
 		ResourceManager.CATEGORY_TYPE.FOLDER,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.FOLDER,
-		ResourceManager.CATEGORY_TYPE.FOLDER,
-		ResourceManager.CATEGORY_TYPE.FOLDER,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
-		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.FOLDER,
+		ResourceManager.CATEGORY_TYPE.FOLDER,
+		ResourceManager.CATEGORY_TYPE.FOLDER,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
+		ResourceManager.CATEGORY_TYPE.FOLDER,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
@@ -72,6 +77,7 @@ public static class ResourceDefine
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.FOLDER,
+		ResourceManager.CATEGORY_TYPE.FOLDER,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE,
@@ -84,11 +90,19 @@ public static class ResourceDefine
 		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.PACK,
 		ResourceManager.CATEGORY_TYPE.PACK,
+		ResourceManager.CATEGORY_TYPE.PACK,
+		ResourceManager.CATEGORY_TYPE.SINGLE,
 		ResourceManager.CATEGORY_TYPE.SINGLE
 	};
 
-	public static readonly string[] suffix = new string[83]
+	public static readonly string[] suffix = new string[91]
 	{
+		string.Empty,
+		string.Empty,
+		string.Empty,
+		string.Empty,
+		string.Empty,
+		string.Empty,
 		string.Empty,
 		string.Empty,
 		string.Empty,
@@ -171,10 +185,12 @@ public static class ResourceDefine
 		"_at",
 		string.Empty,
 		string.Empty,
+		string.Empty,
+		string.Empty,
 		string.Empty
 	};
 
-	public static readonly string[][] rootPaths = new string[83][]
+	public static readonly string[][] rootPaths = new string[91][]
 	{
 		new string[1]
 		{
@@ -183,6 +199,10 @@ public static class ResourceDefine
 		new string[1]
 		{
 			"assets/app/external/externalresources/quest/area/abi/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/quest/area/abu/"
 		},
 		new string[1]
 		{
@@ -261,9 +281,10 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/quest/event/ebg/"
 		},
-		new string[1]
+		new string[2]
 		{
-			"assets/app/external/externalresources/quest/event/ebi/"
+			"assets/app/external/externalresources/quest/event/ebi/",
+			"assets/app/external/externalresources/quest/event/ebi2/"
 		},
 		new string[1]
 		{
@@ -277,9 +298,16 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/shop/banner/"
 		},
-		new string[1]
+		new string[8]
 		{
-			"assets/app/external/externalresources/shop/button/"
+			"assets/app/external/externalresources/shop/button/",
+			"assets/app/external/variants/es-sd/shop/button/",
+			"assets/app/external/variants/fr-sd/shop/button/",
+			"assets/app/external/variants/ge-sd/shop/button/",
+			"assets/app/external/variants/it-sd/shop/button/",
+			"assets/app/external/variants/po-sd/shop/button/",
+			"assets/app/external/variants/th-sd/shop/button/",
+			"assets/app/external/variants/vn-sd/shop/button/"
 		},
 		new string[1]
 		{
@@ -299,11 +327,19 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
+			"assets/app/external/externalresources/homebanner/ads/"
+		},
+		new string[1]
+		{
 			"assets/app/external/externalresources/homebanner/image/"
 		},
 		new string[1]
 		{
 			"assets/app/external/externalresources/homebanner/gachadecoimage/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/accessory/icon/"
 		},
 		new string[1]
 		{
@@ -344,6 +380,10 @@ public static class ResourceDefine
 		new string[1]
 		{
 			"assets/app/external/externalresources/character/npc/model/npc/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/character/player/model/acc/"
 		},
 		new string[1]
 		{
@@ -393,9 +433,16 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/quest/icon/"
 		},
-		new string[1]
+		new string[8]
 		{
-			"assets/app/external/externalresources/uiresources/quest/"
+			"assets/app/external/externalresources/uiresources/quest/",
+			"assets/app/external/variants/es-sd/uiresources/quest/",
+			"assets/app/external/variants/fr-sd/uiresources/quest/",
+			"assets/app/external/variants/ge-sd/uiresources/quest/",
+			"assets/app/external/variants/it-sd/uiresources/quest/",
+			"assets/app/external/variants/po-sd/uiresources/quest/",
+			"assets/app/external/variants/th-sd/uiresources/quest/",
+			"assets/app/external/variants/vn-sd/uiresources/quest/"
 		},
 		new string[1]
 		{
@@ -425,6 +472,10 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/rush/tips/"
 		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/seriesarena/aric/"
+		},
 		new string[4]
 		{
 			"assets/app/external/externalresources/shader/",
@@ -449,13 +500,18 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/sound/voice/",
 			"assets/app/external/variants/jp-sd/sound/voice/"
 		},
-		new string[1]
+		new string[2]
 		{
-			"assets/app/external/externalresources/stage/gimmick/cmn/"
+			"assets/app/external/externalresources/stage/gimmick/cmn/",
+			"assets/app/external/externalresources/stage/gimmick/wm/"
 		},
 		new string[1]
 		{
 			"assets/app/external/externalresources/stage/image/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/stage/light/"
 		},
 		new string[1]
 		{
@@ -497,9 +553,16 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/ui/"
 		},
-		new string[1]
+		new string[8]
 		{
-			"assets/app/external/externalresources/uiresources/atlas/"
+			"assets/app/external/externalresources/uiresources/atlas/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/"
 		},
 		new string[1]
 		{
@@ -511,12 +574,31 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
-			"assets/app/external/externalresources/uiresources/worldmap/"
+			"assets/app/external/externalresources/uiresources/symbol/"
+		},
+		new string[8]
+		{
+			"assets/app/external/externalresources/uiresources/worldmap/",
+			"assets/app/external/variants/es-sd/uiresources/worldmap/",
+			"assets/app/external/variants/fr-sd/uiresources/worldmap/",
+			"assets/app/external/variants/ge-sd/uiresources/worldmap/",
+			"assets/app/external/variants/it-sd/uiresources/worldmap/",
+			"assets/app/external/variants/po-sd/uiresources/worldmap/",
+			"assets/app/external/variants/th-sd/uiresources/worldmap/",
+			"assets/app/external/variants/vn-sd/uiresources/worldmap/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/assetbundleinfo/"
 		}
 	};
 
-	public static readonly string[][] variants = new string[83][]
+	public static readonly string[][] variants = new string[91][]
 	{
+		new string[1]
+		{
+			string.Empty
+		},
 		new string[1]
 		{
 			string.Empty
@@ -602,9 +684,33 @@ public static class ResourceDefine
 		{
 			string.Empty
 		},
+		new string[2]
+		{
+			string.Empty,
+			string.Empty
+		},
 		new string[1]
 		{
 			string.Empty
+		},
+		new string[1]
+		{
+			string.Empty
+		},
+		new string[1]
+		{
+			string.Empty
+		},
+		new string[8]
+		{
+			"en-sd",
+			"es-sd",
+			"fr-sd",
+			"ge-sd",
+			"it-sd",
+			"po-sd",
+			"th-sd",
+			"vn-sd"
 		},
 		new string[1]
 		{
@@ -730,9 +836,16 @@ public static class ResourceDefine
 		{
 			string.Empty
 		},
-		new string[1]
+		new string[8]
 		{
-			string.Empty
+			"en-sd",
+			"es-sd",
+			"fr-sd",
+			"ge-sd",
+			"it-sd",
+			"po-sd",
+			"th-sd",
+			"vn-sd"
 		},
 		new string[1]
 		{
@@ -790,8 +903,9 @@ public static class ResourceDefine
 			"en-sd",
 			"jp-sd"
 		},
-		new string[1]
+		new string[2]
 		{
+			string.Empty,
 			string.Empty
 		},
 		new string[1]
@@ -842,6 +956,17 @@ public static class ResourceDefine
 		{
 			string.Empty
 		},
+		new string[8]
+		{
+			"en-sd",
+			"es-sd",
+			"fr-sd",
+			"ge-sd",
+			"it-sd",
+			"po-sd",
+			"th-sd",
+			"vn-sd"
+		},
 		new string[1]
 		{
 			string.Empty
@@ -849,6 +974,21 @@ public static class ResourceDefine
 		new string[1]
 		{
 			string.Empty
+		},
+		new string[1]
+		{
+			string.Empty
+		},
+		new string[8]
+		{
+			"en-sd",
+			"es-sd",
+			"fr-sd",
+			"ge-sd",
+			"it-sd",
+			"po-sd",
+			"th-sd",
+			"vn-sd"
 		},
 		new string[1]
 		{
@@ -856,7 +996,7 @@ public static class ResourceDefine
 		}
 	};
 
-	public static readonly string[][] subPaths = new string[83][]
+	public static readonly string[][] subPaths = new string[91][]
 	{
 		new string[1]
 		{
@@ -868,9 +1008,13 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
+			"assets/app/external/externalresources/quest/area/abu/"
+		},
+		new string[1]
+		{
 			"assets/app/external/externalresources/arena/aric/"
 		},
-		new string[9]
+		new string[10]
 		{
 			"assets/app/external/externalresources/common/cic/",
 			"assets/app/external/externalresources/common/dic/",
@@ -880,7 +1024,8 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/common/pbg/",
 			"assets/app/external/externalresources/common/pbi/",
 			"assets/app/external/externalresources/common/pic/",
-			"assets/app/external/externalresources/common/pig/"
+			"assets/app/external/externalresources/common/pig/",
+			"assets/app/external/externalresources/common/texture/"
 		},
 		new string[1]
 		{
@@ -965,9 +1110,10 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/quest/event/ebg/"
 		},
-		new string[1]
+		new string[2]
 		{
-			"assets/app/external/externalresources/quest/event/ebi/"
+			"assets/app/external/externalresources/quest/event/ebi/",
+			"assets/app/external/externalresources/quest/event/ebi2/"
 		},
 		new string[1]
 		{
@@ -981,9 +1127,16 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/shop/banner/"
 		},
-		new string[1]
+		new string[8]
 		{
-			"assets/app/external/externalresources/shop/button/"
+			"assets/app/external/externalresources/shop/button/",
+			"assets/app/external/variants/es-sd/shop/button/",
+			"assets/app/external/variants/fr-sd/shop/button/",
+			"assets/app/external/variants/ge-sd/shop/button/",
+			"assets/app/external/variants/it-sd/shop/button/",
+			"assets/app/external/variants/po-sd/shop/button/",
+			"assets/app/external/variants/th-sd/shop/button/",
+			"assets/app/external/variants/vn-sd/shop/button/"
 		},
 		new string[1]
 		{
@@ -1003,11 +1156,19 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
+			"assets/app/external/externalresources/homebanner/ads/"
+		},
+		new string[1]
+		{
 			"assets/app/external/externalresources/homebanner/image/"
 		},
 		new string[1]
 		{
 			"assets/app/external/externalresources/homebanner/gachadecoimage/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/accessory/icon/"
 		},
 		new string[2]
 		{
@@ -1049,7 +1210,7 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/character/npc/icon/"
 		},
-		new string[23]
+		new string[24]
 		{
 			"assets/app/external/externalresources/character/npc/model/npc/npc000/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc001/",
@@ -1068,12 +1229,17 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/character/npc/model/npc/npc014/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc015/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc016/",
+			"assets/app/external/externalresources/character/npc/model/npc/npc017/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc100/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc102/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc103/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc200/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc201/",
 			"assets/app/external/externalresources/character/npc/model/npc/npc206/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/character/player/model/acc/"
 		},
 		new string[1]
 		{
@@ -1134,21 +1300,29 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/character/player/model/leg/leg4/",
 			"assets/app/external/externalresources/character/player/model/leg/leg9/"
 		},
-		new string[5]
+		new string[6]
 		{
 			"assets/app/external/externalresources/character/player/model/wep/wep00/",
 			"assets/app/external/externalresources/character/player/model/wep/wep01/",
 			"assets/app/external/externalresources/character/player/model/wep/wep02/",
 			"assets/app/external/externalresources/character/player/model/wep/wep04/",
-			"assets/app/external/externalresources/character/player/model/wep/wep05/"
+			"assets/app/external/externalresources/character/player/model/wep/wep05/",
+			"assets/app/external/externalresources/character/player/model/wep/wep19/"
 		},
 		new string[1]
 		{
 			"assets/app/external/externalresources/quest/icon/"
 		},
-		new string[1]
+		new string[8]
 		{
-			"assets/app/external/externalresources/uiresources/quest/"
+			"assets/app/external/externalresources/uiresources/quest/",
+			"assets/app/external/variants/es-sd/uiresources/quest/",
+			"assets/app/external/variants/fr-sd/uiresources/quest/",
+			"assets/app/external/variants/ge-sd/uiresources/quest/",
+			"assets/app/external/variants/it-sd/uiresources/quest/",
+			"assets/app/external/variants/po-sd/uiresources/quest/",
+			"assets/app/external/variants/th-sd/uiresources/quest/",
+			"assets/app/external/variants/vn-sd/uiresources/quest/"
 		},
 		new string[1]
 		{
@@ -1178,20 +1352,25 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/rush/tips/"
 		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/seriesarena/aric/"
+		},
 		new string[4]
 		{
 			"assets/app/external/externalresources/shader/",
-			"assets/app/resources/shader/",
-			"assets/ngui/resources/shaders/",
-			"assets/plugins/rhyme/eel/resources/eelshaders/"
+			"shader/",
+			"shaders/",
+			"eelshaders/"
 		},
-		new string[5]
+		new string[6]
 		{
 			"assets/app/external/externalresources/shop/image/",
-			"assets/app/external/externalresources/shop/image/bundle/",
-			"assets/app/external/externalresources/shop/image/materialpack/",
+			"assets/app/external/externalresources/shop/image/blackmarket/",
+			"assets/app/external/externalresources/shop/image/fortunewheel/",
 			"assets/app/external/externalresources/shop/image/gem/",
-			"assets/app/external/externalresources/shop/image/BlackMarket/"
+			"assets/app/external/externalresources/shop/image/materialpack/",
+			"assets/app/external/externalresources/shop/image/bundle/"
 		},
 		new string[1]
 		{
@@ -1211,9 +1390,10 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/sound/voice/",
 			"assets/app/external/variants/jp-sd/sound/voice/"
 		},
-		new string[1]
+		new string[2]
 		{
-			"assets/app/external/externalresources/stage/gimmick/cmn/"
+			"assets/app/external/externalresources/stage/gimmick/cmn/",
+			"assets/app/external/externalresources/stage/gimmick/wm/"
 		},
 		new string[2]
 		{
@@ -1222,11 +1402,16 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
-			"assets/app/external/externalresources/stage/object/"
+			"assets/app/external/externalresources/stage/light/"
 		},
 		new string[1]
 		{
-			"assets/app/external/stagescenes/"
+			"assets/app/external/externalresources/stage/object/"
+		},
+		new string[2]
+		{
+			"assets/app/external/stagescenes/",
+			"assets/app/external/stagescenes/fi086d_001/"
 		},
 		new string[1]
 		{
@@ -1283,20 +1468,27 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/ui/ui_friend/texture/",
 			"assets/app/external/externalresources/ui/ui_tutorial/materials/"
 		},
-		new string[36]
+		new string[355]
 		{
 			"assets/app/external/externalresources/uiresources/atlas/",
 			"assets/app/external/externalresources/uiresources/atlas/areamap/",
 			"assets/app/external/externalresources/uiresources/atlas/arearelease/",
 			"assets/app/external/externalresources/uiresources/atlas/bingo/",
+			"assets/app/external/externalresources/uiresources/atlas/carnival/",
 			"assets/app/external/externalresources/uiresources/atlas/charactercreate/",
 			"assets/app/external/externalresources/uiresources/atlas/chat/",
+			"assets/app/external/externalresources/uiresources/atlas/clan/",
 			"assets/app/external/externalresources/uiresources/atlas/common/",
 			"assets/app/external/externalresources/uiresources/atlas/complete/",
 			"assets/app/external/externalresources/uiresources/atlas/equipfactory/",
 			"assets/app/external/externalresources/uiresources/atlas/explorer/",
 			"assets/app/external/externalresources/uiresources/atlas/failed/",
 			"assets/app/external/externalresources/uiresources/atlas/footer/",
+			"assets/app/external/externalresources/uiresources/atlas/gg_commonui/",
+			"assets/app/external/externalresources/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/externalresources/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/externalresources/uiresources/atlas/gatheritem/",
+			"assets/app/external/externalresources/uiresources/atlas/guild/",
 			"assets/app/external/externalresources/uiresources/atlas/guildrequest/",
 			"assets/app/external/externalresources/uiresources/atlas/header/",
 			"assets/app/external/externalresources/uiresources/atlas/home/",
@@ -1317,10 +1509,322 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/uiresources/atlas/story/",
 			"assets/app/external/externalresources/uiresources/atlas/theatermode/",
 			"assets/app/external/externalresources/uiresources/atlas/title/",
+			"assets/app/external/externalresources/uiresources/atlas/tradingpost/",
+			"assets/app/external/externalresources/uiresources/atlas/trial/",
 			"assets/app/external/externalresources/uiresources/atlas/tutorial/",
 			"assets/app/external/externalresources/uiresources/atlas/victory/",
+			"assets/app/external/externalresources/uiresources/atlas/wavematch/",
+			"assets/app/external/externalresources/uiresources/atlas/guild/emblem/",
 			"assets/app/external/externalresources/uiresources/atlas/houndgrandprix/materials/",
-			"assets/app/external/externalresources/uiresources/atlas/houndgrandprix/textures/"
+			"assets/app/external/externalresources/uiresources/atlas/houndgrandprix/textures/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/areamap/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/arearelease/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/bingo/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/carnival/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/charactercreate/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/chat/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/clan/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/common/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/complete/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/equipfactory/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/explorer/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/failed/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/footer/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/gg_commonui/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/gatheritem/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/guild/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/guildrequest/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/header/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/home/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/honor/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/icons/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/ingame/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/load/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/lounge/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/old/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/result/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/rush/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/shop/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/smithgrowskillperformance/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/social/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/special/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/specialloginbonus/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/story/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/theatermode/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/title/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/tradingpost/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/trial/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/tutorial/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/victory/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/wavematch/",
+			"assets/app/external/variants/es-sd/uiresources/atlas/guild/emblem/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/areamap/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/arearelease/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/bingo/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/carnival/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/charactercreate/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/chat/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/clan/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/common/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/complete/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/equipfactory/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/explorer/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/failed/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/footer/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/gg_commonui/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/gatheritem/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/guild/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/guildrequest/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/header/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/home/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/honor/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/icons/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/ingame/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/load/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/lounge/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/old/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/result/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/rush/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/shop/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/smithgrowskillperformance/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/social/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/special/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/specialloginbonus/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/story/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/theatermode/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/title/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/tradingpost/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/trial/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/tutorial/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/victory/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/wavematch/",
+			"assets/app/external/variants/fr-sd/uiresources/atlas/guild/emblem/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/areamap/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/arearelease/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/bingo/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/carnival/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/charactercreate/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/chat/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/clan/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/common/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/complete/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/equipfactory/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/explorer/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/failed/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/footer/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/gg_commonui/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/gatheritem/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/guild/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/guildrequest/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/header/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/home/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/honor/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/icons/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/ingame/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/load/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/lounge/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/old/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/result/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/rush/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/shop/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/smithgrowskillperformance/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/social/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/special/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/specialloginbonus/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/story/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/theatermode/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/title/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/tradingpost/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/trial/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/tutorial/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/victory/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/wavematch/",
+			"assets/app/external/variants/ge-sd/uiresources/atlas/guild/emblem/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/areamap/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/arearelease/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/bingo/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/carnival/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/charactercreate/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/chat/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/clan/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/common/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/complete/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/equipfactory/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/explorer/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/failed/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/footer/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/gg_commonui/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/gatheritem/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/guild/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/guildrequest/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/header/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/home/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/honor/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/icons/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/ingame/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/load/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/lounge/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/old/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/result/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/rush/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/shop/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/smithgrowskillperformance/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/social/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/special/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/specialloginbonus/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/story/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/theatermode/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/title/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/tradingpost/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/trial/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/tutorial/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/victory/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/wavematch/",
+			"assets/app/external/variants/it-sd/uiresources/atlas/guild/emblem/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/areamap/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/arearelease/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/bingo/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/carnival/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/charactercreate/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/chat/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/clan/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/common/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/complete/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/equipfactory/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/explorer/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/failed/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/footer/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/gg_commonui/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/gatheritem/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/guild/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/guildrequest/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/header/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/home/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/honor/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/icons/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/ingame/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/load/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/lounge/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/old/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/result/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/rush/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/shop/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/smithgrowskillperformance/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/social/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/special/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/specialloginbonus/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/story/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/theatermode/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/title/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/tradingpost/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/trial/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/tutorial/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/victory/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/wavematch/",
+			"assets/app/external/variants/po-sd/uiresources/atlas/guild/emblem/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/areamap/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/arearelease/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/bingo/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/carnival/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/charactercreate/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/chat/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/clan/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/common/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/complete/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/equipfactory/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/explorer/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/failed/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/footer/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/gg_commonui/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/gatheritem/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/guild/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/guildrequest/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/header/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/home/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/honor/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/icons/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/ingame/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/load/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/lounge/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/old/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/result/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/rush/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/shop/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/smithgrowskillperformance/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/social/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/special/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/specialloginbonus/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/story/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/theatermode/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/title/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/tradingpost/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/trial/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/tutorial/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/victory/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/wavematch/",
+			"assets/app/external/variants/th-sd/uiresources/atlas/guild/emblem/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/areamap/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/arearelease/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/bingo/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/carnival/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/charactercreate/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/chat/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/clan/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/common/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/complete/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/equipfactory/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/explorer/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/failed/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/footer/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/gg_commonui/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/gg_commonui_add/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/gg_commonui_nor/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/gatheritem/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/guild/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/guildrequest/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/header/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/home/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/honor/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/icons/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/ingame/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/load/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/lounge/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/old/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/result/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/rush/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/shop/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/smithgrowskillperformance/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/social/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/special/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/specialloginbonus/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/story/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/theatermode/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/title/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/tradingpost/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/trial/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/tutorial/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/victory/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/wavematch/",
+			"assets/app/external/variants/vn-sd/uiresources/atlas/guild/emblem/"
 		},
 		new string[1]
 		{
@@ -1330,19 +1834,73 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/uiresources/font/"
 		},
-		new string[6]
+		new string[1]
+		{
+			"assets/app/external/externalresources/uiresources/symbol/"
+		},
+		new string[48]
 		{
 			"assets/app/external/externalresources/uiresources/worldmap/common/",
 			"assets/app/external/externalresources/uiresources/worldmap/explore/",
 			"assets/app/external/externalresources/uiresources/worldmap/region/",
 			"assets/app/external/externalresources/uiresources/worldmap/world/",
 			"assets/app/external/externalresources/uiresources/worldmap/world/chapterimages/",
-			"assets/app/external/externalresources/uiresources/worldmap/world/materials/"
+			"assets/app/external/externalresources/uiresources/worldmap/world/materials/",
+			"assets/app/external/variants/es-sd/uiresources/worldmap/common/",
+			"assets/app/external/variants/es-sd/uiresources/worldmap/explore/",
+			"assets/app/external/variants/es-sd/uiresources/worldmap/region/",
+			"assets/app/external/variants/es-sd/uiresources/worldmap/world/",
+			"assets/app/external/variants/es-sd/uiresources/worldmap/world/chapterimages/",
+			"assets/app/external/variants/es-sd/uiresources/worldmap/world/materials/",
+			"assets/app/external/variants/fr-sd/uiresources/worldmap/common/",
+			"assets/app/external/variants/fr-sd/uiresources/worldmap/explore/",
+			"assets/app/external/variants/fr-sd/uiresources/worldmap/region/",
+			"assets/app/external/variants/fr-sd/uiresources/worldmap/world/",
+			"assets/app/external/variants/fr-sd/uiresources/worldmap/world/chapterimages/",
+			"assets/app/external/variants/fr-sd/uiresources/worldmap/world/materials/",
+			"assets/app/external/variants/ge-sd/uiresources/worldmap/common/",
+			"assets/app/external/variants/ge-sd/uiresources/worldmap/explore/",
+			"assets/app/external/variants/ge-sd/uiresources/worldmap/region/",
+			"assets/app/external/variants/ge-sd/uiresources/worldmap/world/",
+			"assets/app/external/variants/ge-sd/uiresources/worldmap/world/chapterimages/",
+			"assets/app/external/variants/ge-sd/uiresources/worldmap/world/materials/",
+			"assets/app/external/variants/it-sd/uiresources/worldmap/common/",
+			"assets/app/external/variants/it-sd/uiresources/worldmap/explore/",
+			"assets/app/external/variants/it-sd/uiresources/worldmap/region/",
+			"assets/app/external/variants/it-sd/uiresources/worldmap/world/",
+			"assets/app/external/variants/it-sd/uiresources/worldmap/world/chapterimages/",
+			"assets/app/external/variants/it-sd/uiresources/worldmap/world/materials/",
+			"assets/app/external/variants/po-sd/uiresources/worldmap/common/",
+			"assets/app/external/variants/po-sd/uiresources/worldmap/explore/",
+			"assets/app/external/variants/po-sd/uiresources/worldmap/region/",
+			"assets/app/external/variants/po-sd/uiresources/worldmap/world/",
+			"assets/app/external/variants/po-sd/uiresources/worldmap/world/chapterimages/",
+			"assets/app/external/variants/po-sd/uiresources/worldmap/world/materials/",
+			"assets/app/external/variants/th-sd/uiresources/worldmap/common/",
+			"assets/app/external/variants/th-sd/uiresources/worldmap/explore/",
+			"assets/app/external/variants/th-sd/uiresources/worldmap/region/",
+			"assets/app/external/variants/th-sd/uiresources/worldmap/world/",
+			"assets/app/external/variants/th-sd/uiresources/worldmap/world/chapterimages/",
+			"assets/app/external/variants/th-sd/uiresources/worldmap/world/materials/",
+			"assets/app/external/variants/vn-sd/uiresources/worldmap/common/",
+			"assets/app/external/variants/vn-sd/uiresources/worldmap/explore/",
+			"assets/app/external/variants/vn-sd/uiresources/worldmap/region/",
+			"assets/app/external/variants/vn-sd/uiresources/worldmap/world/",
+			"assets/app/external/variants/vn-sd/uiresources/worldmap/world/chapterimages/",
+			"assets/app/external/variants/vn-sd/uiresources/worldmap/world/materials/"
+		},
+		new string[1]
+		{
+			"assets/app/external/externalresources/assetbundleinfo/"
 		}
 	};
 
-	public static readonly string[][] exts = new string[83][]
+	public static readonly string[][] exts = new string[91][]
 	{
+		new string[1]
+		{
+			".png"
+		},
 		new string[1]
 		{
 			".png"
@@ -1482,6 +2040,14 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
+			".png"
+		},
+		new string[1]
+		{
+			".png"
+		},
+		new string[1]
+		{
 			".asset"
 		},
 		new string[2]
@@ -1519,6 +2085,10 @@ public static class ResourceDefine
 		{
 			".prefab"
 		},
+		new string[1]
+		{
+			".prefab"
+		},
 		new string[2]
 		{
 			".controller",
@@ -1593,6 +2163,10 @@ public static class ResourceDefine
 		new string[1]
 		{
 			".prefab"
+		},
+		new string[1]
+		{
+			".png"
 		},
 		new string[1]
 		{
@@ -1626,10 +2200,16 @@ public static class ResourceDefine
 		{
 			".prefab"
 		},
-		new string[2]
+		new string[3]
 		{
 			".prefab",
-			".png"
+			".png",
+			".tga"
+		},
+		new string[2]
+		{
+			".asset",
+			".exr"
 		},
 		new string[1]
 		{
@@ -1685,11 +2265,19 @@ public static class ResourceDefine
 		{
 			".otf"
 		},
+		new string[1]
+		{
+			".png"
+		},
 		new string[3]
 		{
 			".prefab",
 			".mat",
 			".png"
+		},
+		new string[1]
+		{
+			".asset"
 		}
 	};
 }

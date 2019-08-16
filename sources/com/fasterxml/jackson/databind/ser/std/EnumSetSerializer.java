@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 public class EnumSetSerializer extends AsArraySerializerBase<EnumSet<? extends Enum<?>>> {
     public EnumSetSerializer(JavaType javaType) {
-        super(EnumSet.class, javaType, true, null, null);
+        super(EnumSet.class, javaType, true, (TypeSerializer) null, null);
     }
 
     @Deprecated
@@ -22,7 +22,7 @@ public class EnumSetSerializer extends AsArraySerializerBase<EnumSet<? extends E
     }
 
     public EnumSetSerializer(EnumSetSerializer enumSetSerializer, BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool) {
-        super((AsArraySerializerBase) enumSetSerializer, beanProperty, typeSerializer, (JsonSerializer) jsonSerializer, bool);
+        super((AsArraySerializerBase<?>) enumSetSerializer, beanProperty, typeSerializer, jsonSerializer, bool);
     }
 
     public EnumSetSerializer _withValueTypeSerializer(TypeSerializer typeSerializer) {
@@ -43,13 +43,13 @@ public class EnumSetSerializer extends AsArraySerializerBase<EnumSet<? extends E
 
     public final void serialize(EnumSet<? extends Enum<?>> enumSet, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         int size = enumSet.size();
-        if (size == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
-            serializeContents((EnumSet) enumSet, jsonGenerator, serializerProvider);
+        if (size != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+            jsonGenerator.writeStartArray(size);
+            serializeContents(enumSet, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray(size);
-        serializeContents((EnumSet) enumSet, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
+        serializeContents(enumSet, jsonGenerator, serializerProvider);
     }
 
     public void serializeContents(EnumSet<? extends Enum<?>> enumSet, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {

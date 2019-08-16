@@ -46,24 +46,24 @@ public class ItemIconDetailEquipSetupper : ItemIconDetailSetuperBase
 
 	private static readonly string SPR_TYPE_DEF = "EquipStatusDEF_W";
 
-	public static readonly string[] SPR_EQUIP_INDEX = new string[3]
+	public static readonly string[] SPR_EQUIP_INDEX = new string[4]
 	{
 		"ItemIconEquipMark01",
 		"ItemIconEquipMark02",
-		"ItemIconEquipMark03"
+		"ItemIconEquipMark03",
+		"ItemIconEquipMark"
 	};
 
 	protected override UISprite selectSP => spSellSelectNumber;
 
 	public override void Set(object[] data = null)
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		base.Set(null);
+		base.Set();
 		if (data != null)
 		{
 			SkillSlotUIData[] slot_data = data[1] as SkillSlotUIData[];
 			bool is_show_main_status = (bool)data[2];
-			ItemIconDetail.ICON_STATUS iconStatusSprite = (ItemIconDetail.ICON_STATUS)(int)data[3];
+			ItemIconDetail.ICON_STATUS iconStatusSprite = (ItemIconDetail.ICON_STATUS)data[3];
 			int equipping_sp_index = (int)data[4] - 1;
 			infoRootAry[1].SetActive(true);
 			SetupSelectNumberSprite((int)data[5]);
@@ -85,20 +85,12 @@ public class ItemIconDetailEquipSetupper : ItemIconDetailSetuperBase
 
 	protected void Set(EquipItemInfo item, SkillSlotUIData[] slot_data, bool is_show_main_status, int equipping_sp_index)
 	{
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
 		SetEquipIndexSprite(equipping_sp_index);
 		SetFavorite(item.isFavorite);
 		bool flag = item.tableData.IsWeapon();
 		if (flag)
 		{
-			SetElement(item.GetTargetElement(), item.elemAtk, true);
+			SetElement(item.GetTargetElement(), item.elemAtk, isWeapon: true);
 		}
 		else
 		{
@@ -107,153 +99,141 @@ public class ItemIconDetailEquipSetupper : ItemIconDetailSetuperBase
 			{
 				num = Mathf.FloorToInt((float)num * 0.1f);
 			}
-			SetElement(item.GetTargetElement(), num, false);
+			SetElement(item.GetTargetElement(), num, isWeapon: false);
 		}
 		if (is_show_main_status)
 		{
 			infoRootAry[2].SetActive(true);
 			infoRootAry[3].SetActive(false);
-			SetVisibleBG(true);
+			SetVisibleBG(is_visible: true);
 			SetName(item.tableData.name);
 			SetLevel(item.level, item.tableData.maxLv, item.tableData.IsVisual());
 			SetEquipValue(flag, (!flag) ? item.def : item.atk);
+			return;
 		}
-		else
+		infoRootAry[2].SetActive(false);
+		infoRootAry[3].SetActive(true);
+		SetVisibleBG(is_visible: false);
+		SetName(string.Empty);
+		int num2 = (slot_data != null && slot_data.Length > 0) ? slot_data.Length : 0;
+		bool flag2 = num2 > 0;
+		spSkillBG.get_gameObject().SetActive(flag2);
+		grdSkillRoot.get_gameObject().SetActive(flag2);
+		lblNonSkillSlot.get_gameObject().SetActive(!flag2);
+		if (flag2)
 		{
-			infoRootAry[2].SetActive(false);
-			infoRootAry[3].SetActive(true);
-			SetVisibleBG(false);
-			SetName(string.Empty);
-			int num2 = (slot_data != null && slot_data.Length > 0) ? slot_data.Length : 0;
-			bool flag2 = num2 > 0;
-			spSkillBG.get_gameObject().SetActive(flag2);
-			grdSkillRoot.get_gameObject().SetActive(flag2);
-			lblNonSkillSlot.get_gameObject().SetActive(!flag2);
-			if (flag2)
+			int childCount = grdSkillRoot.get_transform().get_childCount();
+			for (int i = 0; i < childCount; i++)
 			{
-				int childCount = grdSkillRoot.get_transform().get_childCount();
-				for (int i = 0; i < childCount; i++)
+				bool flag3 = false;
+				UISprite component = grdSkillRoot.get_transform().GetChild(i).GetComponent<UISprite>();
+				if (i < num2 && component != null && slot_data[i] != null && slot_data[i].slotData != null)
 				{
-					bool flag3 = false;
-					UISprite component = grdSkillRoot.get_transform().GetChild(i).GetComponent<UISprite>();
-					if (i < num2 && component != null && slot_data[i] != null && slot_data[i].slotData != null)
-					{
-						flag3 = true;
-					}
-					if (flag3)
-					{
-						bool is_attached = slot_data[i].itemData != null && slot_data[i].itemData.isAttached && slot_data[i].itemData.tableData.type == slot_data[i].slotData.slotType;
-						component.get_gameObject().SetActive(true);
-						component.spriteName = UIBehaviour.GetSkillIconSpriteName(slot_data[i].slotData.slotType, is_attached, false);
-					}
-					else
-					{
-						component.get_gameObject().SetActive(false);
-						component.spriteName = string.Empty;
-					}
+					flag3 = true;
+				}
+				if (flag3)
+				{
+					bool is_attached = slot_data[i].itemData != null && (slot_data[i].itemData.isAttached || slot_data[i].itemData.isUniqueAttached) && slot_data[i].itemData.tableData.type == slot_data[i].slotData.slotType;
+					component.get_gameObject().SetActive(true);
+					component.spriteName = UIBehaviour.GetSkillIconSpriteName(slot_data[i].slotData.slotType, is_attached, is_button_icon: false);
+				}
+				else
+				{
+					component.get_gameObject().SetActive(false);
+					component.spriteName = string.Empty;
 				}
 			}
-			grdSkillRoot.Reposition();
-			bool enabled = true;
-			EquipItemAbility[] ability = item.ability;
-			objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
-			int j = 0;
-			for (int count = Temporary.uiLabelList.Count; j < count; j++)
-			{
-				UILabel uILabel = Temporary.uiLabelList[j];
-				uILabel.set_enabled(j < ability.Length && ability[j].id != 0 && ability[j].ap > 0);
-				if (uILabel.get_enabled())
-				{
-					uILabel.text = ability[j].GetNameAndAP();
-					enabled = false;
-				}
-			}
-			Temporary.uiLabelList.Clear();
-			lblNonAbility.set_enabled(enabled);
 		}
+		grdSkillRoot.Reposition();
+		bool enabled = true;
+		EquipItemAbility[] ability = item.ability;
+		objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
+		int j = 0;
+		for (int count = Temporary.uiLabelList.Count; j < count; j++)
+		{
+			UILabel uILabel = Temporary.uiLabelList[j];
+			uILabel.set_enabled(j < ability.Length && ability[j].id != 0 && ability[j].ap > 0);
+			if (uILabel.get_enabled())
+			{
+				uILabel.text = ability[j].GetNameAndAP();
+				enabled = false;
+			}
+		}
+		Temporary.uiLabelList.Clear();
+		lblNonAbility.set_enabled(enabled);
 	}
 
 	protected void Set(EquipItemTable.EquipItemData table, SkillSlotUIData[] slot_data, bool is_show_main_status)
 	{
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
 		SetEquipIndexSprite(-1);
-		SetFavorite(false);
+		SetFavorite(is_favorite: false);
 		bool flag = table.IsWeapon();
 		SetElement(table.GetTargetElement(0), (!flag) ? table.baseElemDef : table.baseElemAtk, flag);
 		if (is_show_main_status)
 		{
 			infoRootAry[2].SetActive(true);
 			infoRootAry[3].SetActive(false);
-			SetVisibleBG(true);
+			SetVisibleBG(is_visible: true);
 			SetName(table.name);
 			SetLevel(1, table.maxLv, table.IsVisual());
 			SetEquipValue(flag, (!flag) ? table.baseDef : table.baseAtk);
+			return;
 		}
-		else
+		infoRootAry[2].SetActive(false);
+		infoRootAry[3].SetActive(true);
+		SetVisibleBG(is_visible: false);
+		SetName(string.Empty);
+		int num = (slot_data != null && slot_data.Length > 0) ? slot_data.Length : 0;
+		bool flag2 = num > 0;
+		spSkillBG.get_gameObject().SetActive(flag2);
+		grdSkillRoot.get_gameObject().SetActive(flag2);
+		lblNonSkillSlot.get_gameObject().SetActive(!flag2);
+		if (flag2)
 		{
-			infoRootAry[2].SetActive(false);
-			infoRootAry[3].SetActive(true);
-			SetVisibleBG(false);
-			SetName(string.Empty);
-			int num = (slot_data != null && slot_data.Length > 0) ? slot_data.Length : 0;
-			bool flag2 = num > 0;
-			spSkillBG.get_gameObject().SetActive(flag2);
-			grdSkillRoot.get_gameObject().SetActive(flag2);
-			lblNonSkillSlot.get_gameObject().SetActive(!flag2);
-			if (flag2)
+			int childCount = grdSkillRoot.get_transform().get_childCount();
+			for (int i = 0; i < childCount; i++)
 			{
-				int childCount = grdSkillRoot.get_transform().get_childCount();
-				for (int i = 0; i < childCount; i++)
+				bool flag3 = false;
+				UISprite component = grdSkillRoot.get_transform().GetChild(i).GetComponent<UISprite>();
+				if (i < num && component != null && slot_data[i] != null && slot_data[i].slotData != null)
 				{
-					bool flag3 = false;
-					UISprite component = grdSkillRoot.get_transform().GetChild(i).GetComponent<UISprite>();
-					if (i < num && component != null && slot_data[i] != null && slot_data[i].slotData != null)
-					{
-						flag3 = true;
-					}
-					if (flag3)
-					{
-						bool is_attached = slot_data[i].itemData != null && slot_data[i].itemData.isAttached && slot_data[i].itemData.tableData.type == slot_data[i].slotData.slotType;
-						component.get_gameObject().SetActive(true);
-						component.spriteName = UIBehaviour.GetSkillIconSpriteName(slot_data[i].slotData.slotType, is_attached, false);
-					}
-					else
-					{
-						component.get_gameObject().SetActive(false);
-						component.spriteName = string.Empty;
-					}
+					flag3 = true;
+				}
+				if (flag3)
+				{
+					bool is_attached = slot_data[i].itemData != null && (slot_data[i].itemData.isAttached || slot_data[i].itemData.isUniqueAttached) && slot_data[i].itemData.tableData.type == slot_data[i].slotData.slotType;
+					component.get_gameObject().SetActive(true);
+					component.spriteName = UIBehaviour.GetSkillIconSpriteName(slot_data[i].slotData.slotType, is_attached, is_button_icon: false);
+				}
+				else
+				{
+					component.get_gameObject().SetActive(false);
+					component.spriteName = string.Empty;
 				}
 			}
-			grdSkillRoot.Reposition();
-			bool enabled = true;
-			objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
-			EquipItemAbility[] array = new EquipItemAbility[Temporary.uiLabelList.Count];
-			int j = 0;
-			for (int count = Temporary.uiLabelList.Count; j < count; j++)
-			{
-				UILabel uILabel = Temporary.uiLabelList[j];
-				array[j] = null;
-				if (j < table.fixedAbility.Length)
-				{
-					array[j] = new EquipItemAbility((uint)table.fixedAbility[j].id, table.fixedAbility[j].pt);
-				}
-				uILabel.set_enabled(array[j] != null && array[j].id != 0 && array[j].ap > 0);
-				if (uILabel.get_enabled())
-				{
-					uILabel.text = array[j].GetNameAndAP();
-					enabled = false;
-				}
-			}
-			Temporary.uiLabelList.Clear();
-			lblNonAbility.set_enabled(enabled);
 		}
+		grdSkillRoot.Reposition();
+		bool enabled = true;
+		objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
+		EquipItemAbility[] array = new EquipItemAbility[Temporary.uiLabelList.Count];
+		int j = 0;
+		for (int count = Temporary.uiLabelList.Count; j < count; j++)
+		{
+			UILabel uILabel = Temporary.uiLabelList[j];
+			array[j] = null;
+			if (j < table.fixedAbility.Length)
+			{
+				array[j] = new EquipItemAbility((uint)table.fixedAbility[j].id, table.fixedAbility[j].pt);
+			}
+			uILabel.set_enabled(array[j] != null && array[j].id != 0 && array[j].ap > 0);
+			if (uILabel.get_enabled())
+			{
+				uILabel.text = array[j].GetNameAndAP();
+				enabled = false;
+			}
+		}
+		Temporary.uiLabelList.Clear();
+		lblNonAbility.set_enabled(enabled);
 	}
 
 	protected void SetLevel(int lv, int lv_max, bool is_visual_equip = false)
@@ -268,7 +248,6 @@ public class ItemIconDetailEquipSetupper : ItemIconDetailSetuperBase
 
 	protected void SetEquipValue(bool is_weapon, int value)
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		spValueType.spriteName = ((!is_weapon) ? SPR_TYPE_DEF : SPR_TYPE_ATK);
 		lblValue.get_gameObject().SetActive(true);
 		lblValue.text = value.ToString();
@@ -276,7 +255,6 @@ public class ItemIconDetailEquipSetupper : ItemIconDetailSetuperBase
 
 	protected void SetElement(ELEMENT_TYPE elem_type, int value, bool isWeapon)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		spElem.get_gameObject().SetActive(value > 0);
 		if (value > 0)
 		{
@@ -287,11 +265,7 @@ public class ItemIconDetailEquipSetupper : ItemIconDetailSetuperBase
 
 	protected void SetIconStatusSprite(ItemIconDetail.ICON_STATUS icon_status)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		SetRegistedIcon(false);
+		SetRegistedIcon(is_visible: false);
 		switch (icon_status)
 		{
 		case ItemIconDetail.ICON_STATUS.VALID_EVOLVE:
@@ -332,7 +306,6 @@ public class ItemIconDetailEquipSetupper : ItemIconDetailSetuperBase
 
 	protected void SetFavorite(bool is_favorite)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		spEquipFavorite.get_gameObject().SetActive(is_favorite);
 		if (gridEquipMark != null)
 		{

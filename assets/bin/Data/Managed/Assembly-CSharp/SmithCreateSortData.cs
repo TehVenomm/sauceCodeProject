@@ -16,46 +16,42 @@ public class SmithCreateSortData : SortCompareData
 	{
 		switch (requirement)
 		{
-		default:
-		{
-			sortingData = 0L;
-			CreatePickupItemTable.CreatePickupItemData pickupCreateItem = Singleton<CreatePickupItemTable>.I.GetPickupCreateItem(createData.smithCreateTableData.id);
-			if (pickupCreateItem != null)
-			{
-				sortingData = pickupCreateItem.id;
-			}
-			break;
-		}
 		case SortBase.SORT_REQUIREMENT.GET:
 			sortingData = 0L;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.RARITY:
 			sortingData = (long)createData.equipTableData.rarity;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.LV:
 			sortingData = 1L;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.ATK:
 			sortingData = (int)createData.equipTableData.baseAtk + createData.equipTableData.baseElemAtk;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.DEF:
 			sortingData = (int)createData.equipTableData.baseDef + createData.equipTableData.baseElemDef;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.SALE:
 			sortingData = createData.equipTableData.sale;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.SOCKET:
 			sortingData = createData.equipTableData.maxSlot;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.PRICE:
 			sortingData = (int)createData.smithCreateTableData.needMoney;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.NUM:
 			sortingData = 1L;
-			break;
+			return;
 		case SortBase.SORT_REQUIREMENT.ELEMENT:
 			sortingData = 6L - (long)GetIconElement();
-			break;
+			return;
+		}
+		sortingData = 0L;
+		CreatePickupItemTable.CreatePickupItemData pickupCreateItem = Singleton<CreatePickupItemTable>.I.GetPickupCreateItem(createData.smithCreateTableData.id);
+		if (pickupCreateItem != null)
+		{
+			sortingData = pickupCreateItem.id;
 		}
 	}
 
@@ -71,7 +67,7 @@ public class SmithCreateSortData : SortCompareData
 
 	public override ELEMENT_TYPE GetIconElement()
 	{
-		return (ELEMENT_TYPE)((!createData.equipTableData.IsWeapon()) ? createData.equipTableData.GetElemDefTypePriorityToTable(null) : createData.equipTableData.GetElemAtkTypePriorityToTable(null));
+		return (ELEMENT_TYPE)((!createData.equipTableData.IsWeapon()) ? createData.equipTableData.GetElemDefTypePriorityToTable() : createData.equipTableData.GetElemAtkTypePriorityToTable());
 	}
 
 	public override int GetItemType()

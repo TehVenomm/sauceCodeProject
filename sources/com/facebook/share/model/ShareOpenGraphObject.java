@@ -5,13 +5,7 @@ import android.os.Parcelable.Creator;
 import com.facebook.internal.NativeProtocol;
 
 public final class ShareOpenGraphObject extends ShareOpenGraphValueContainer<ShareOpenGraphObject, Builder> {
-    public static final Creator<ShareOpenGraphObject> CREATOR = new C05161();
-
-    /* renamed from: com.facebook.share.model.ShareOpenGraphObject$1 */
-    static final class C05161 implements Creator<ShareOpenGraphObject> {
-        C05161() {
-        }
-
+    public static final Creator<ShareOpenGraphObject> CREATOR = new Creator<ShareOpenGraphObject>() {
         public ShareOpenGraphObject createFromParcel(Parcel parcel) {
             return new ShareOpenGraphObject(parcel);
         }
@@ -19,7 +13,7 @@ public final class ShareOpenGraphObject extends ShareOpenGraphValueContainer<Sha
         public ShareOpenGraphObject[] newArray(int i) {
             return new ShareOpenGraphObject[i];
         }
-    }
+    };
 
     public static final class Builder extends com.facebook.share.model.ShareOpenGraphValueContainer.Builder<ShareOpenGraphObject, Builder> {
         public Builder() {
@@ -27,11 +21,12 @@ public final class ShareOpenGraphObject extends ShareOpenGraphValueContainer<Sha
         }
 
         public ShareOpenGraphObject build() {
-            return new ShareOpenGraphObject();
+            return new ShareOpenGraphObject(this);
         }
 
-        Builder readFrom(Parcel parcel) {
-            return (Builder) readFrom((ShareOpenGraphValueContainer) (ShareOpenGraphObject) parcel.readParcelable(ShareOpenGraphObject.class.getClassLoader()));
+        /* access modifiers changed from: 0000 */
+        public Builder readFrom(Parcel parcel) {
+            return (Builder) readFrom((ShareOpenGraphObject) parcel.readParcelable(ShareOpenGraphObject.class.getClassLoader()));
         }
     }
 
@@ -40,6 +35,6 @@ public final class ShareOpenGraphObject extends ShareOpenGraphValueContainer<Sha
     }
 
     private ShareOpenGraphObject(Builder builder) {
-        super((com.facebook.share.model.ShareOpenGraphValueContainer.Builder) builder);
+        super((com.facebook.share.model.ShareOpenGraphValueContainer.Builder<P, E>) builder);
     }
 }

@@ -1,13 +1,15 @@
-package io.fabric.sdk.android.services.network;
+package p017io.fabric.sdk.android.services.network;
 
-import io.fabric.sdk.android.DefaultLogger;
-import io.fabric.sdk.android.Logger;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
+import p017io.fabric.sdk.android.DefaultLogger;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.Logger;
 
+/* renamed from: io.fabric.sdk.android.services.network.DefaultHttpRequestFactory */
 public class DefaultHttpRequestFactory implements HttpRequestFactory {
     private static final String HTTPS = "https";
     private boolean attemptedSslInit;
@@ -19,8 +21,8 @@ public class DefaultHttpRequestFactory implements HttpRequestFactory {
         this(new DefaultLogger());
     }
 
-    public DefaultHttpRequestFactory(Logger logger) {
-        this.logger = logger;
+    public DefaultHttpRequestFactory(Logger logger2) {
+        this.logger = logger2;
     }
 
     private SSLSocketFactory getSSLSocketFactory() {
@@ -40,9 +42,9 @@ public class DefaultHttpRequestFactory implements HttpRequestFactory {
             this.attemptedSslInit = true;
             try {
                 sSLSocketFactory = NetworkUtils.getSSLSocketFactory(this.pinningInfo);
-                this.logger.mo4289d("Fabric", "Custom SSL pinning enabled");
-            } catch (Throwable e) {
-                this.logger.mo4292e("Fabric", "Exception while validating pinned certs", e);
+                this.logger.mo20969d(Fabric.TAG, "Custom SSL pinning enabled");
+            } catch (Exception e) {
+                this.logger.mo20972e(Fabric.TAG, "Exception while validating pinned certs", e);
                 sSLSocketFactory = null;
             }
         }
@@ -65,19 +67,19 @@ public class DefaultHttpRequestFactory implements HttpRequestFactory {
     }
 
     public HttpRequest buildHttpRequest(HttpMethod httpMethod, String str, Map<String, String> map) {
-        HttpRequest httpRequest;
+        HttpRequest delete;
         switch (httpMethod) {
             case GET:
-                httpRequest = HttpRequest.get((CharSequence) str, (Map) map, true);
+                delete = HttpRequest.get((CharSequence) str, map, true);
                 break;
             case POST:
-                httpRequest = HttpRequest.post((CharSequence) str, (Map) map, true);
+                delete = HttpRequest.post((CharSequence) str, map, true);
                 break;
             case PUT:
-                httpRequest = HttpRequest.put((CharSequence) str);
+                delete = HttpRequest.put((CharSequence) str);
                 break;
             case DELETE:
-                httpRequest = HttpRequest.delete((CharSequence) str);
+                delete = HttpRequest.delete((CharSequence) str);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported HTTP method!");
@@ -85,10 +87,10 @@ public class DefaultHttpRequestFactory implements HttpRequestFactory {
         if (isHttps(str) && this.pinningInfo != null) {
             SSLSocketFactory sSLSocketFactory = getSSLSocketFactory();
             if (sSLSocketFactory != null) {
-                ((HttpsURLConnection) httpRequest.getConnection()).setSSLSocketFactory(sSLSocketFactory);
+                ((HttpsURLConnection) delete.getConnection()).setSSLSocketFactory(sSLSocketFactory);
             }
         }
-        return httpRequest;
+        return delete;
     }
 
     public PinningInfoProvider getPinningInfoProvider() {

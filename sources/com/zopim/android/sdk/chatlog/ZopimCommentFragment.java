@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.p000v4.app.Fragment;
+import android.support.p000v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,7 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.ZopimChat;
 import com.zopim.android.sdk.chatlog.ConnectionFragment.ConnectionListener;
@@ -48,7 +48,7 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
     public void onConnected() {
         this.mNoConnection = false;
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.send_comment);
+            MenuItem findItem = this.mMenu.findItem(C1122R.C1125id.send_comment);
             if (findItem != null && !findItem.isEnabled()) {
                 findItem.setEnabled(true);
             }
@@ -59,30 +59,30 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
         super.onCreate(bundle);
         this.mChat = ZopimChat.resume(getActivity());
         if (bundle == null) {
-            Fragment connectionToastFragment = new ConnectionToastFragment();
-            Fragment connectionFragment = new ConnectionFragment();
+            ConnectionToastFragment connectionToastFragment = new ConnectionToastFragment();
+            ConnectionFragment connectionFragment = new ConnectionFragment();
             FragmentTransaction beginTransaction = getChildFragmentManager().beginTransaction();
-            beginTransaction.add(C0785R.id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
-            beginTransaction.add(connectionFragment, ConnectionFragment.class.getName());
+            beginTransaction.add(C1122R.C1125id.toast_fragment_container, connectionToastFragment, ConnectionToastFragment.class.getName());
+            beginTransaction.add((Fragment) connectionFragment, ConnectionFragment.class.getName());
             beginTransaction.commit();
         }
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
-        menuInflater.inflate(C0785R.menu.chat_comment_menu, menu);
-        menu.findItem(C0785R.id.send_comment).setEnabled(this.mStateMenuItemEnabled);
+        menuInflater.inflate(C1122R.menu.chat_comment_menu, menu);
+        menu.findItem(C1122R.C1125id.send_comment).setEnabled(this.mStateMenuItemEnabled);
         this.mMenu = menu;
     }
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        return layoutInflater.inflate(C0785R.layout.zopim_comment_fragment, viewGroup, false);
+        return layoutInflater.inflate(C1122R.C1126layout.zopim_comment_fragment, viewGroup, false);
     }
 
     public void onDisconnected() {
         this.mNoConnection = true;
         if (this.mMenu != null) {
-            MenuItem findItem = this.mMenu.findItem(C0785R.id.send_comment);
+            MenuItem findItem = this.mMenu.findItem(C1122R.C1125id.send_comment);
             if (findItem != null && findItem.isEnabled()) {
                 findItem.setEnabled(false);
             }
@@ -90,7 +90,7 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (C0785R.id.send_comment != menuItem.getItemId()) {
+        if (C1122R.C1125id.send_comment != menuItem.getItemId()) {
             return super.onOptionsItemSelected(menuItem);
         }
         if (!this.mChat.hasEnded()) {
@@ -100,17 +100,17 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
     }
 
     public void onPause() {
-        Object obj = 1;
+        boolean z = true;
         super.onPause();
-        Object obj2 = !this.mChat.hasEnded() ? 1 : null;
+        boolean z2 = !this.mChat.hasEnded();
         if (VERSION.SDK_INT >= 11) {
-            if (obj2 == null || getActivity().isChangingConfigurations()) {
-                obj = null;
+            if (!z2 || getActivity().isChangingConfigurations()) {
+                z = false;
             }
-        } else if (obj2 == null || !getActivity().isFinishing()) {
-            obj = null;
+        } else if (!z2 || !getActivity().isFinishing()) {
+            z = false;
         }
-        if (obj != null) {
+        if (z) {
             getActivity().startService(new Intent(getActivity(), ChatWidgetService.class));
         }
     }
@@ -123,13 +123,13 @@ public class ZopimCommentFragment extends Fragment implements ConnectionListener
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         bundle.putBoolean(STATE_NO_CONNECTION, this.mNoConnection);
-        bundle.putBoolean("MENU_ITEM_ENABLED", this.mMenu.findItem(C0785R.id.send_comment).isEnabled());
+        bundle.putBoolean("MENU_ITEM_ENABLED", this.mMenu.findItem(C1122R.C1125id.send_comment).isEnabled());
     }
 
     public void onViewCreated(View view, @Nullable Bundle bundle) {
         super.onViewCreated(view, bundle);
         setHasOptionsMenu(true);
-        this.mCommentEditor = (EditText) view.findViewById(C0785R.id.comment_editor);
+        this.mCommentEditor = (EditText) view.findViewById(C1122R.C1125id.comment_editor);
     }
 
     public void onViewStateRestored(@Nullable Bundle bundle) {

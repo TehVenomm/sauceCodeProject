@@ -2,6 +2,7 @@ package com.facebook.unity;
 
 import android.net.Uri;
 import android.os.Bundle;
+import com.facebook.share.internal.ShareConstants;
 import com.facebook.share.internal.ShareFeedContent.Builder;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog.Mode;
@@ -44,8 +45,8 @@ class FBDialogUtils {
         if (bundle.containsKey("content_description")) {
             builder.setContentDescription(bundle.getString("content_description"));
         }
-        if (bundle.containsKey("content_url")) {
-            builder.setContentUrl(Uri.parse(bundle.getString("content_url")));
+        if (bundle.containsKey(ShareConstants.STORY_DEEP_LINK_URL)) {
+            builder.setContentUrl(Uri.parse(bundle.getString(ShareConstants.STORY_DEEP_LINK_URL)));
         }
         if (bundle.containsKey("photo_url")) {
             builder.setImageUrl(Uri.parse(bundle.getString("photo_url")));

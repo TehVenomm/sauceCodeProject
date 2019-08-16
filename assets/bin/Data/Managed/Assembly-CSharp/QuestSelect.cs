@@ -151,13 +151,12 @@ public class QuestSelect : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)_Initialize();
+		yield return _Initialize();
 		InitializeBase();
 	}
 
@@ -171,26 +170,26 @@ public class QuestSelect : GameSection
 		questInfo = (GameSection.GetEventData() as QuestInfoData);
 		if (questInfo.questData.tableData.questType == QUEST_TYPE.ORDER)
 		{
-			QuestItemInfo item = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(questInfo.questData.tableData.questID);
-			if (item != null)
+			QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(questInfo.questData.tableData.questID);
+			if (questItem != null)
 			{
-				GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.QUEST_ITEM, item.uniqueID);
+				GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.QUEST_ITEM, questItem.uniqueID);
 			}
 		}
 		LoadingQueue load_queue = new LoadingQueue(this);
 		if (questInfo != null)
 		{
-			EnemyTable.EnemyData enemy_data = Singleton<EnemyTable>.I.GetEnemyData((uint)questInfo.questData.tableData.GetMainEnemyID());
-			if (enemy_data != null)
+			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questInfo.questData.tableData.GetMainEnemyID());
+			if (enemyData != null)
 			{
-				EnemyLoader.CacheUIElementEffect(load_queue, enemy_data.element);
+				EnemyLoader.CacheUIElementEffect(load_queue, enemyData.element);
 			}
 		}
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_new");
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_complete");
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 	}
 
@@ -272,15 +271,15 @@ public class QuestSelect : GameSection
 		SetLabelText((Enum)UI.LBL_QUEST_NAME, info.questData.tableData.questText);
 		int num2 = (int)info.questData.tableData.limitTime;
 		SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num2 / 60:D2}:{num2 % 60:D2}");
-		SetActive((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, false);
-		SetActive((Enum)UI.STR_MISSION_EMPTY, false);
+		SetActive((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, is_visible: false);
+		SetActive((Enum)UI.STR_MISSION_EMPTY, is_visible: false);
 		if (!info.isExistMission)
 		{
-			SetActive((Enum)UI.OBJ_MISSION_INFO_ROOT, false);
+			SetActive((Enum)UI.OBJ_MISSION_INFO_ROOT, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_MISSION_INFO_ROOT, true);
+			SetActive((Enum)UI.OBJ_MISSION_INFO_ROOT, is_visible: true);
 			int i = 0;
 			for (int num3 = info.missionData.Length; i < num3; i++)
 			{
@@ -296,11 +295,11 @@ public class QuestSelect : GameSection
 		}
 		if (questType == QUEST_TYPE.ORDER)
 		{
-			SetActive((Enum)UI.OBJ_SELL_ITEM, true);
+			SetActive((Enum)UI.OBJ_SELL_ITEM, is_visible: true);
 			QuestItemInfo quest_item = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(info.questData.tableData.questID);
 			if (quest_item != null && quest_item.sellItems != null && quest_item.sellItems.Count > 0)
 			{
-				SetGrid(UI.GRD_REWARD_SELL, string.Empty, quest_item.sellItems.Count, false, delegate(int i_2, Transform t_2, bool is_recycle_2)
+				SetGrid(UI.GRD_REWARD_SELL, string.Empty, quest_item.sellItems.Count, reset: false, delegate(int i_2, Transform t_2, bool is_recycle_2)
 				{
 					QuestItem.SellItem sellItem = quest_item.sellItems[i_2];
 					REWARD_TYPE type2 = (REWARD_TYPE)sellItem.type;
@@ -312,22 +311,22 @@ public class QuestSelect : GameSection
 					else
 					{
 						int num4 = -1;
-						ItemIcon itemIcon4 = ItemIcon.CreateRewardItemIcon(type2, itemId, t_2, num4, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-						SetMaterialInfo(itemIcon4.transform, type2, itemId, null);
+						ItemIcon itemIcon4 = ItemIcon.CreateRewardItemIcon(type2, itemId, t_2, num4);
+						SetMaterialInfo(itemIcon4.transform, type2, itemId);
 					}
 				});
 			}
-			SetActive((Enum)UI.OBJ_TOP_CROWN_ROOT, false);
+			SetActive((Enum)UI.OBJ_TOP_CROWN_ROOT, is_visible: false);
 		}
-		SetActive((Enum)UI.OBJ_TREASURE, true);
-		SetGrid(UI.GRD_REWARD_QUEST, string.Empty, 5, false, delegate(int i_2, Transform t_2, bool is_recycle_2)
+		SetActive((Enum)UI.OBJ_TREASURE, is_visible: true);
+		SetGrid(UI.GRD_REWARD_QUEST, string.Empty, 5, reset: false, delegate(int i_2, Transform t_2, bool is_recycle_2)
 		{
 			if (info.questData.reward != null && info.questData.reward.Length > i_2)
 			{
 				REWARD_TYPE type = (REWARD_TYPE)info.questData.reward[i_2].type;
 				uint id = (uint)info.questData.reward[i_2].id;
-				ItemIcon itemIcon3 = ItemIcon.CreateRewardItemIcon(type, id, t_2, -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				SetMaterialInfo(itemIcon3.transform, type, id, null);
+				ItemIcon itemIcon3 = ItemIcon.CreateRewardItemIcon(type, id, t_2);
+				SetMaterialInfo(itemIcon3.transform, type, id);
 			}
 		});
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)info.questData.tableData.GetMainEnemyID());
@@ -335,15 +334,15 @@ public class QuestSelect : GameSection
 		{
 			int iconId = enemyData.iconId;
 			RARITY_TYPE? rarity = (info.questData.tableData.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(info.questData.tableData.rarity);
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-			itemIcon.SetEnableCollider(false);
-			ItemIcon itemIcon2 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-			itemIcon2.SetEnableCollider(false);
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element);
+			itemIcon.SetEnableCollider(is_enable: false);
+			ItemIcon itemIcon2 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element);
+			itemIcon2.SetEnableCollider(is_enable: false);
 		}
-		SetActive((Enum)UI.SPR_ELEMENT_ROOT, false);
+		SetActive((Enum)UI.SPR_ELEMENT_ROOT, is_visible: false);
 		if (enemyData != null)
 		{
-			SetActive((Enum)UI.SPR_ELEMENT_ROOT_2, true);
+			SetActive((Enum)UI.SPR_ELEMENT_ROOT_2, is_visible: true);
 			SetElementSprite((Enum)UI.SPR_ELEMENT_2, (int)enemyData.element);
 			SetActive((Enum)UI.STR_NON_ELEMENT_2, enemyData.element == ELEMENT_TYPE.MAX);
 			SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT_2, (int)enemyData.weakElement);
@@ -351,16 +350,16 @@ public class QuestSelect : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_ELEMENT_ROOT_2, false);
-			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT_2, false);
+			SetActive((Enum)UI.SPR_ELEMENT_ROOT_2, is_visible: false);
+			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT_2, is_visible: false);
 		}
 		ShowInfo(questType, isShowDropInfo);
-		SetActive((Enum)UI.TWN_DIFFICULT_STAR, false);
+		SetActive((Enum)UI.TWN_DIFFICULT_STAR, is_visible: false);
 		num = (MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestEnemySpecies(info.questData.tableData.questID)?.questStatus ?? 1);
 		SetClearStatus((CLEAR_STATUS)num);
 		if (!MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			SetActive((Enum)UI.BTN_GUILD_REQUEST, false);
+			SetActive((Enum)UI.BTN_GUILD_REQUEST, is_visible: false);
 		}
 	}
 
@@ -372,13 +371,13 @@ public class QuestSelect : GameSection
 		SetToggleGroup((Enum)UI.OBJ_ICON_COMPLETE, value);
 		if (clear_status != CLEAR_STATUS.NEW)
 		{
-			SetToggle((Enum)UI.OBJ_ICON_NEW, false);
-			SetToggle((Enum)UI.OBJ_ICON_CLEARED, false);
-			SetToggle((Enum)UI.OBJ_ICON_COMPLETE, false);
+			SetToggle((Enum)UI.OBJ_ICON_NEW, value: false);
+			SetToggle((Enum)UI.OBJ_ICON_CLEARED, value: false);
+			SetToggle((Enum)UI.OBJ_ICON_COMPLETE, value: false);
 		}
 		else
 		{
-			SetToggle((Enum)UI.OBJ_ICON_NEW, true);
+			SetToggle((Enum)UI.OBJ_ICON_NEW, value: true);
 			SetVisibleWidgetEffect(UI.SPR_ICON_NEW, "ef_ui_questselect_new");
 		}
 	}
@@ -389,19 +388,19 @@ public class QuestSelect : GameSection
 		{
 			SetActive((Enum)UI.OBJ_TREASURE, is_show_drop_info);
 			SetActive((Enum)UI.OBJ_MISSION_INFO, !is_show_drop_info);
-			SetActive((Enum)UI.OBJ_SELL_ITEM, false);
+			SetActive((Enum)UI.OBJ_SELL_ITEM, is_visible: false);
 			SetActive((Enum)UI.OBJ_CHANGE_INFO_TREASURE_ROOT, isShowDropInfo);
 			SetActive((Enum)UI.OBJ_CHANGE_INFO_MISSION_ROOT, !isShowDropInfo);
-			SetActive((Enum)UI.OBJ_CHANGE_INFO_SELL_ROOT, false);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_SELL_ROOT, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_MISSION_INFO, false);
+			SetActive((Enum)UI.OBJ_MISSION_INFO, is_visible: false);
 			SetActive((Enum)UI.OBJ_TREASURE, is_show_drop_info);
 			SetActive((Enum)UI.OBJ_SELL_ITEM, !is_show_drop_info);
 			SetActive((Enum)UI.OBJ_CHANGE_INFO_TREASURE_ROOT, isShowDropInfo);
 			SetActive((Enum)UI.OBJ_CHANGE_INFO_SELL_ROOT, !isShowDropInfo);
-			SetActive((Enum)UI.OBJ_CHANGE_INFO_MISSION_ROOT, false);
+			SetActive((Enum)UI.OBJ_CHANGE_INFO_MISSION_ROOT, is_visible: false);
 		}
 	}
 
@@ -414,12 +413,12 @@ public class QuestSelect : GameSection
 		if (autoMatchEventIssue && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
 		{
 			autoMatchEventIssue = false;
-			DispatchEvent("AUTO_MATCH", null);
+			DispatchEvent("AUTO_MATCH");
 		}
 		if (createOrderRoomEventIssue && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
 		{
 			createOrderRoomEventIssue = false;
-			DispatchEvent("CREATE_ROOM", null);
+			DispatchEvent("CREATE_ROOM");
 		}
 	}
 
@@ -430,18 +429,15 @@ public class QuestSelect : GameSection
 			if (base.state != STATE.OPEN)
 			{
 				loadModeRequest = true;
+				return;
 			}
-			else
-			{
-				LoadModel();
-				loadModeRequest = false;
-			}
+			LoadModel();
+			loadModeRequest = false;
 		}
 	}
 
 	private void DeleteModel()
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		DeleteRenderTexture((Enum)UI.TEX_ENEMY);
 		SetVisibleWidgetEffect(UI.TEX_ENEMY, null);
 		if (model != null)
@@ -462,23 +458,20 @@ public class QuestSelect : GameSection
 			SetRenderEnemyModel((Enum)UI.TEX_ENEMY, (uint)questInfo.questData.tableData.GetMainEnemyID(), questInfo.questData.tableData.GetFoundationName(), OutGameSettingsManager.EnemyDisplayInfo.SCENE.QUEST, (Action<bool, EnemyLoader>)delegate
 			{
 				CompleteEnemyLoading();
-			}, UIModelRenderTexture.ENEMY_MOVE_TYPE.DEFULT, true);
+			}, UIModelRenderTexture.ENEMY_MOVE_TYPE.DEFULT, is_Howl: true);
 		}
 	}
 
 	private void InitLoading()
 	{
 		loadComplete = false;
-		SetActive((Enum)UI.OBJ_LOADING, true);
+		SetActive((Enum)UI.OBJ_LOADING, is_visible: true);
 	}
 
 	private void CompleteEnemyLoading()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.OBJ_LOADING, false);
+		SetActive((Enum)UI.OBJ_LOADING, is_visible: false);
 		Transform renderTextureModelTransform = GetRenderTextureModelTransform(UI.TEX_ENEMY);
 		if (renderTextureModelTransform != null && MonoBehaviourSingleton<OutGameEffectManager>.IsValid())
 		{
@@ -505,9 +498,9 @@ public class QuestSelect : GameSection
 		PLCA default_anim = PlayerAnimCtrl.StringToEnum(npc_data.anim);
 		model.set_localPosition(new Vector3(0f, -1.5f, 1.5f));
 		model.set_localEulerAngles(new Vector3(0f, 180f, 0f));
-		PlayerAnimCtrl.Get(loader.animator, default_anim, null, null, null);
+		PlayerAnimCtrl.Get(loader.animator, default_anim);
 		EnableRenderTexture(UI.TEX_ENEMY);
-		SetActive((Enum)UI.OBJ_LOADING, false);
+		SetActive((Enum)UI.OBJ_LOADING, is_visible: false);
 		GetCtrl(UI.SPR_LOAD_ROTATE_CIRCLE).set_localRotation(Quaternion.get_identity());
 		loadComplete = true;
 	}
@@ -521,14 +514,14 @@ public class QuestSelect : GameSection
 	private void OnQuery_CHANGE_INFO()
 	{
 		ResetTween((Enum)UI.TWN_CHANGE_BTN, 0);
-		PlayTween((Enum)UI.TWN_CHANGE_BTN, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween((Enum)UI.TWN_CHANGE_BTN, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 		isShowDropInfo = !isShowDropInfo;
 		ShowInfo(questInfo.questData.tableData.questType, isShowDropInfo);
 	}
 
 	protected virtual void OnQuery_CREATE_ROOM()
 	{
-		AnimBtnInvisible(true);
+		AnimBtnInvisible(isforward: true);
 		GameSection.SetEventData(new object[2]
 		{
 			questInfo.questData.tableData.questType,
@@ -543,7 +536,7 @@ public class QuestSelect : GameSection
 
 	protected void _OnCloseRoomSettings()
 	{
-		AnimBtnInvisible(false);
+		AnimBtnInvisible(isforward: false);
 	}
 
 	public void OnCloseDialog_QuestStartChangeEquipSet()
@@ -555,13 +548,11 @@ public class QuestSelect : GameSection
 	{
 		if (!isSuccessChangeEquipSet)
 		{
-			AnimBtnInvisible(false);
+			AnimBtnInvisible(isforward: false);
+			return;
 		}
-		else
-		{
-			isSuccessChangeEquipSet = false;
-			autoMatchEventIssue = true;
-		}
+		isSuccessChangeEquipSet = false;
+		autoMatchEventIssue = true;
 	}
 
 	private void OnQuery_AUTO_MATCH()
@@ -569,10 +560,9 @@ public class QuestSelect : GameSection
 		GameSection.StayEvent();
 		Action<bool, bool, bool, bool> matching_end_action = delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 		{
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 			if (!is_m)
 			{
-				QuestResume(false);
+				QuestResume(is_success: false);
 			}
 			else if (is_s)
 			{
@@ -581,10 +571,9 @@ public class QuestSelect : GameSection
 				{
 					component.enemyAnimCtrl.PlayQuestStartAnim(delegate
 					{
-						//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 						this.StartCoroutine(GoToQuest(delegate
 						{
-							QuestResume(true);
+							QuestResume(is_success: true);
 						}));
 					});
 				}
@@ -592,24 +581,24 @@ public class QuestSelect : GameSection
 				{
 					this.StartCoroutine(GoToQuest(delegate
 					{
-						QuestResume(true);
+						QuestResume(is_success: true);
 					}));
 				}
 			}
 			else if (!is_c)
 			{
-				GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-				QuestResume(true);
+				GameSection.ChangeStayEvent("COOP_SERVER_INVALID");
+				QuestResume(is_success: true);
 			}
 			else
 			{
-				QuestResume(false);
+				QuestResume(is_success: false);
 			}
 		};
 		if (questInfo.questData.tableData.questType == QUEST_TYPE.ORDER)
 		{
 			int questID = (int)questInfo.questData.tableData.questID;
-			PartyManager.PartySetting party_setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
+			PartyManager.PartySetting party_setting = new PartyManager.PartySetting(is_lock: false, 0, 0);
 			MonoBehaviourSingleton<PartyManager>.I.SendCreate(questID, party_setting, delegate(bool is_success)
 			{
 				if (is_success)
@@ -618,7 +607,7 @@ public class QuestSelect : GameSection
 				}
 				else
 				{
-					QuestResume(false);
+					QuestResume(is_success: false);
 				}
 			});
 		}
@@ -632,14 +621,14 @@ public class QuestSelect : GameSection
 	{
 		if (!is_success)
 		{
-			AnimBtnInvisible(false);
+			AnimBtnInvisible(isforward: false);
 		}
-		GameSection.ResumeEvent(is_success, null);
+		GameSection.ResumeEvent(is_success);
 	}
 
 	private IEnumerator GoToQuest(Action onComplete)
 	{
-		yield return (object)null;
+		yield return null;
 		yield return (object)new WaitForSeconds(1f);
 		onComplete();
 	}
@@ -649,13 +638,13 @@ public class QuestSelect : GameSection
 		GameSection.StayEvent();
 		CoopApp.EnterQuestOffline(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 		{
-			GameSection.ResumeEvent(is_s, null);
+			GameSection.ResumeEvent(is_s);
 		});
 	}
 
 	protected void OnQuery_CoopServerInvalidConfirm_NO()
 	{
-		AnimBtnInvisible(false);
+		AnimBtnInvisible(isforward: false);
 	}
 
 	private void OnQuery_QuestOrderCreateRoomConfirm_YES()
@@ -681,7 +670,7 @@ public class QuestSelect : GameSection
 		}
 		else
 		{
-			AnimBtnInvisible(false);
+			AnimBtnInvisible(isforward: false);
 		}
 		isCreateOrderRoom = false;
 	}

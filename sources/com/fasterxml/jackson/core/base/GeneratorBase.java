@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.core.base;
 
-import android.support.v4.media.TransportMediator;
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
@@ -13,6 +12,7 @@ import com.fasterxml.jackson.core.json.DupDetector;
 import com.fasterxml.jackson.core.json.JsonWriteContext;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.core.util.VersionUtil;
+import com.google.android.gms.games.Notifications;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -34,9 +34,11 @@ public abstract class GeneratorBase extends JsonGenerator {
     protected ObjectCodec _objectCodec;
     protected JsonWriteContext _writeContext;
 
-    protected abstract void _releaseBuffers();
+    /* access modifiers changed from: protected */
+    public abstract void _releaseBuffers();
 
-    protected abstract void _verifyValueWrite(String str) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract void _verifyValueWrite(String str) throws IOException;
 
     public abstract void flush() throws IOException;
 
@@ -81,7 +83,7 @@ public abstract class GeneratorBase extends JsonGenerator {
             if (feature == Feature.WRITE_NUMBERS_AS_STRINGS) {
                 this._cfgNumbersAsStrings = true;
             } else if (feature == Feature.ESCAPE_NON_ASCII) {
-                setHighestNonEscapedChar(TransportMediator.KEYCODE_MEDIA_PAUSE);
+                setHighestNonEscapedChar(Notifications.NOTIFICATION_TYPES_ALL);
             } else if (feature == Feature.STRICT_DUPLICATE_DETECTION && this._writeContext.getDupDetector() == null) {
                 this._writeContext = this._writeContext.withDupDetector(DupDetector.rootDetector((JsonGenerator) this));
             }
@@ -117,20 +119,21 @@ public abstract class GeneratorBase extends JsonGenerator {
     public JsonGenerator overrideStdFeatures(int i, int i2) {
         int i3 = this._features;
         int i4 = ((i2 ^ -1) & i3) | (i & i2);
-        i3 ^= i4;
-        if (i3 != 0) {
+        int i5 = i3 ^ i4;
+        if (i5 != 0) {
             this._features = i4;
-            _checkStdFeatureChanges(i4, i3);
+            _checkStdFeatureChanges(i4, i5);
         }
         return this;
     }
 
-    protected void _checkStdFeatureChanges(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void _checkStdFeatureChanges(int i, int i2) {
         if ((DERIVED_FEATURES_MASK & i2) != 0) {
             this._cfgNumbersAsStrings = Feature.WRITE_NUMBERS_AS_STRINGS.enabledIn(i);
             if (Feature.ESCAPE_NON_ASCII.enabledIn(i2)) {
                 if (Feature.ESCAPE_NON_ASCII.enabledIn(i)) {
-                    setHighestNonEscapedChar(TransportMediator.KEYCODE_MEDIA_PAUSE);
+                    setHighestNonEscapedChar(Notifications.NOTIFICATION_TYPES_ALL);
                 } else {
                     setHighestNonEscapedChar(0);
                 }
@@ -224,14 +227,16 @@ public abstract class GeneratorBase extends JsonGenerator {
         return this._closed;
     }
 
-    protected PrettyPrinter _constructDefaultPrettyPrinter() {
+    /* access modifiers changed from: protected */
+    public PrettyPrinter _constructDefaultPrettyPrinter() {
         return new DefaultPrettyPrinter();
     }
 
-    protected final int _decodeSurrogate(int i, int i2) throws IOException {
-        if (i2 < SURR2_FIRST || i2 > SURR2_LAST) {
+    /* access modifiers changed from: protected */
+    public final int _decodeSurrogate(int i, int i2) throws IOException {
+        if (i2 < 56320 || i2 > 57343) {
             _reportError("Incomplete surrogate pair: first char 0x" + Integer.toHexString(i) + ", second 0x" + Integer.toHexString(i2));
         }
-        return (65536 + ((i - SURR1_FIRST) << 10)) + (i2 - SURR2_FIRST);
+        return 65536 + ((i - SURR1_FIRST) << 10) + (i2 - SURR2_FIRST);
     }
 }

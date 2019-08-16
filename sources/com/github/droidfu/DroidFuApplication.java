@@ -7,9 +7,10 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 public class DroidFuApplication extends Application {
-    private HashMap<String, WeakReference<Context>> contextObjects = new HashMap();
+    private HashMap<String, WeakReference<Context>> contextObjects = new HashMap<>();
 
-    protected void attachBaseContext(Context context) {
+    /* access modifiers changed from: protected */
+    public void attachBaseContext(Context context) {
         super.attachBaseContext(context);
         MultiDex.install(this);
     }

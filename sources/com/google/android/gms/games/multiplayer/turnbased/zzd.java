@@ -3,24 +3,26 @@ package com.google.android.gms.games.multiplayer.turnbased;
 import android.database.CharArrayBuffer;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.support.annotation.Nullable;
 import com.facebook.internal.ServerProtocol;
 import com.facebook.share.internal.ShareConstants;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameRef;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.ParticipantRef;
+import com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty;
 import java.util.ArrayList;
 
-public final class zzd extends zzc implements TurnBasedMatch {
-    private final Game zzhkx;
-    private final int zzhky;
+public final class zzd extends DataBufferRef implements TurnBasedMatch {
+    private final Game zznw;
+    private final int zznx;
 
     zzd(DataHolder dataHolder, int i, int i2) {
         super(dataHolder, i);
-        this.zzhkx = new GameRef(dataHolder, i);
-        this.zzhky = i2;
+        this.zznw = new GameRef(dataHolder, i);
+        this.zznx = i2;
     }
 
     public final boolean canRematch() {
@@ -39,16 +41,23 @@ public final class zzd extends zzc implements TurnBasedMatch {
         return new TurnBasedMatchEntity(this);
     }
 
+    @Nullable
     public final Bundle getAutoMatchCriteria() {
-        return !getBoolean("has_automatch_criteria") ? null : TurnBasedMatchConfig.createAutoMatchCriteria(getInteger("automatch_min_players"), getInteger("automatch_max_players"), getLong("automatch_bit_mask"));
+        if (!getBoolean("has_automatch_criteria")) {
+            return null;
+        }
+        return TurnBasedMatchConfig.createAutoMatchCriteria(getInteger("automatch_min_players"), getInteger("automatch_max_players"), getLong("automatch_bit_mask"));
     }
 
     public final int getAvailableAutoMatchSlots() {
-        return !getBoolean("has_automatch_criteria") ? 0 : getInteger("automatch_max_players");
+        if (!getBoolean("has_automatch_criteria")) {
+            return 0;
+        }
+        return getInteger("automatch_max_players");
     }
 
     public final long getCreationTimestamp() {
-        return getLong("creation_timestamp");
+        return getLong(ConditionalUserProperty.CREATION_TIMESTAMP);
     }
 
     public final String getCreatorId() {
@@ -64,12 +73,15 @@ public final class zzd extends zzc implements TurnBasedMatch {
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zza("description", charArrayBuffer);
+        copyToBuffer("description", charArrayBuffer);
     }
 
     public final Participant getDescriptionParticipant() {
         String descriptionParticipantId = getDescriptionParticipantId();
-        return descriptionParticipantId == null ? null : getParticipant(descriptionParticipantId);
+        if (descriptionParticipantId == null) {
+            return null;
+        }
+        return getParticipant(descriptionParticipantId);
     }
 
     public final String getDescriptionParticipantId() {
@@ -77,7 +89,7 @@ public final class zzd extends zzc implements TurnBasedMatch {
     }
 
     public final Game getGame() {
-        return this.zzhkx;
+        return this.zznw;
     }
 
     public final long getLastUpdatedTimestamp() {
@@ -113,9 +125,9 @@ public final class zzd extends zzc implements TurnBasedMatch {
     }
 
     public final ArrayList<Participant> getParticipants() {
-        ArrayList<Participant> arrayList = new ArrayList(this.zzhky);
-        for (int i = 0; i < this.zzhky; i++) {
-            arrayList.add(new ParticipantRef(this.zzfkz, this.zzfqb + i));
+        ArrayList<Participant> arrayList = new ArrayList<>(this.zznx);
+        for (int i = 0; i < this.zznx; i++) {
+            arrayList.add(new ParticipantRef(this.mDataHolder, this.mDataRow + i));
         }
         return arrayList;
     }

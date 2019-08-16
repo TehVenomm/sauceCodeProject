@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -146,16 +145,16 @@ public class TypeUtils {
             return isAssignable(type, (Class) type2);
         }
         if (type2 instanceof ParameterizedType) {
-            return isAssignable(type, (ParameterizedType) type2, (Map) map);
+            return isAssignable(type, (ParameterizedType) type2, map);
         }
         if (type2 instanceof GenericArrayType) {
-            return isAssignable(type, (GenericArrayType) type2, (Map) map);
+            return isAssignable(type, (GenericArrayType) type2, map);
         }
         if (type2 instanceof WildcardType) {
-            return isAssignable(type, (WildcardType) type2, (Map) map);
+            return isAssignable(type, (WildcardType) type2, map);
         }
         if (type2 instanceof TypeVariable) {
-            return isAssignable(type, (TypeVariable) type2, (Map) map);
+            return isAssignable(type, (TypeVariable) type2, map);
         }
         throw new IllegalStateException("found an unhandled type: " + type2);
     }
@@ -173,14 +172,14 @@ public class TypeUtils {
                 return true;
             }
             if (type instanceof Class) {
-                return ClassUtils.isAssignable((Class) type, (Class) cls);
+                return ClassUtils.isAssignable((Class) type, cls);
             }
             if (type instanceof ParameterizedType) {
-                return isAssignable(getRawType((ParameterizedType) type), (Class) cls);
+                return isAssignable((Type) getRawType((ParameterizedType) type), cls);
             }
             if (type instanceof TypeVariable) {
                 for (Type isAssignable : ((TypeVariable) type).getBounds()) {
-                    if (isAssignable(isAssignable, (Class) cls)) {
+                    if (isAssignable(isAssignable, cls)) {
                         return true;
                     }
                 }
@@ -216,12 +215,12 @@ public class TypeUtils {
         if (typeArguments.isEmpty()) {
             return true;
         }
-        Map typeArguments2 = getTypeArguments(parameterizedType, rawType, (Map) map);
+        Map typeArguments2 = getTypeArguments(parameterizedType, rawType, map);
         for (TypeVariable typeVariable : typeArguments2.keySet()) {
             Type unrollVariableAssignments = unrollVariableAssignments(typeVariable, typeArguments2);
             Type unrollVariableAssignments2 = unrollVariableAssignments(typeVariable, typeArguments);
-            if (!(unrollVariableAssignments2 == null || unrollVariableAssignments.equals(unrollVariableAssignments2))) {
-                if (!(unrollVariableAssignments instanceof WildcardType) || !isAssignable(unrollVariableAssignments2, unrollVariableAssignments, (Map) map)) {
+            if (unrollVariableAssignments2 != null && !unrollVariableAssignments.equals(unrollVariableAssignments2)) {
+                if (!(unrollVariableAssignments instanceof WildcardType) || !isAssignable(unrollVariableAssignments2, unrollVariableAssignments, map)) {
                     return false;
                 }
             }
@@ -254,12 +253,12 @@ public class TypeUtils {
         Type genericComponentType = genericArrayType.getGenericComponentType();
         if (type instanceof Class) {
             Class cls = (Class) type;
-            if (cls.isArray() && isAssignable(cls.getComponentType(), genericComponentType, (Map) map)) {
-                return true;
+            if (!cls.isArray() || !isAssignable((Type) cls.getComponentType(), genericComponentType, map)) {
+                return false;
             }
-            return false;
+            return true;
         } else if (type instanceof GenericArrayType) {
-            return isAssignable(((GenericArrayType) type).getGenericComponentType(), genericComponentType, (Map) map);
+            return isAssignable(((GenericArrayType) type).getGenericComponentType(), genericComponentType, map);
         } else {
             if (type instanceof WildcardType) {
                 for (Type isAssignable : getImplicitUpperBounds((WildcardType) type)) {
@@ -295,37 +294,35 @@ public class TypeUtils {
         }
         Type[] implicitUpperBounds = getImplicitUpperBounds(wildcardType);
         Type[] implicitLowerBounds = getImplicitLowerBounds(wildcardType);
-        Type substituteTypeVariables;
         if (type instanceof WildcardType) {
-            Type substituteTypeVariables2;
             WildcardType wildcardType2 = (WildcardType) type;
             Type[] implicitUpperBounds2 = getImplicitUpperBounds(wildcardType2);
             Type[] implicitLowerBounds2 = getImplicitLowerBounds(wildcardType2);
-            for (Type substituteTypeVariables3 : implicitUpperBounds) {
-                substituteTypeVariables2 = substituteTypeVariables(substituteTypeVariables3, map);
+            for (Type substituteTypeVariables : implicitUpperBounds) {
+                Type substituteTypeVariables2 = substituteTypeVariables(substituteTypeVariables, map);
                 for (Type isAssignable : implicitUpperBounds2) {
-                    if (!isAssignable(isAssignable, substituteTypeVariables2, (Map) map)) {
+                    if (!isAssignable(isAssignable, substituteTypeVariables2, map)) {
                         return false;
                     }
                 }
             }
-            for (Type substituteTypeVariables32 : implicitLowerBounds) {
-                substituteTypeVariables = substituteTypeVariables(substituteTypeVariables32, map);
-                for (Type substituteTypeVariables22 : implicitLowerBounds2) {
-                    if (!isAssignable(substituteTypeVariables, substituteTypeVariables22, (Map) map)) {
+            for (Type substituteTypeVariables3 : implicitLowerBounds) {
+                Type substituteTypeVariables4 = substituteTypeVariables(substituteTypeVariables3, map);
+                for (Type isAssignable2 : implicitLowerBounds2) {
+                    if (!isAssignable(substituteTypeVariables4, isAssignable2, map)) {
                         return false;
                     }
                 }
             }
             return true;
         }
-        for (Type substituteTypeVariables4 : implicitUpperBounds) {
-            if (!isAssignable(type, substituteTypeVariables(substituteTypeVariables4, map), (Map) map)) {
+        for (Type substituteTypeVariables5 : implicitUpperBounds) {
+            if (!isAssignable(type, substituteTypeVariables(substituteTypeVariables5, map), map)) {
                 return false;
             }
         }
-        for (Type substituteTypeVariables5 : implicitLowerBounds) {
-            if (!isAssignable(substituteTypeVariables(substituteTypeVariables5, map), type, (Map) map)) {
+        for (Type substituteTypeVariables6 : implicitLowerBounds) {
+            if (!isAssignable(substituteTypeVariables(substituteTypeVariables6, map), type, map)) {
                 return false;
             }
         }
@@ -344,7 +341,7 @@ public class TypeUtils {
         }
         if (type instanceof TypeVariable) {
             for (Type isAssignable : getImplicitBounds((TypeVariable) type)) {
-                if (isAssignable(isAssignable, (TypeVariable) typeVariable, (Map) map)) {
+                if (isAssignable(isAssignable, typeVariable, map)) {
                     return true;
                 }
             }
@@ -371,42 +368,41 @@ public class TypeUtils {
     }
 
     public static Map<TypeVariable<?>, Type> getTypeArguments(Type type, Class<?> cls) {
-        return getTypeArguments(type, (Class) cls, null);
+        return getTypeArguments(type, cls, null);
     }
 
     private static Map<TypeVariable<?>, Type> getTypeArguments(Type type, Class<?> cls, Map<TypeVariable<?>, Type> map) {
         int i = 0;
         if (type instanceof Class) {
-            return getTypeArguments((Class) type, (Class) cls, (Map) map);
+            return getTypeArguments((Class) type, cls, map);
         }
         if (type instanceof ParameterizedType) {
-            return getTypeArguments((ParameterizedType) type, (Class) cls, (Map) map);
+            return getTypeArguments((ParameterizedType) type, cls, map);
         }
         if (type instanceof GenericArrayType) {
-            Class componentType;
             Type genericComponentType = ((GenericArrayType) type).getGenericComponentType();
             if (cls.isArray()) {
-                componentType = cls.getComponentType();
+                cls = cls.getComponentType();
             }
-            return getTypeArguments(genericComponentType, componentType, (Map) map);
+            return getTypeArguments(genericComponentType, cls, map);
         } else if (type instanceof WildcardType) {
-            r2 = getImplicitUpperBounds((WildcardType) type);
-            r3 = r2.length;
-            while (i < r3) {
-                r4 = r2[i];
-                if (isAssignable(r4, (Class) cls)) {
-                    return getTypeArguments(r4, (Class) cls, (Map) map);
+            Type[] implicitUpperBounds = getImplicitUpperBounds((WildcardType) type);
+            int length = implicitUpperBounds.length;
+            while (i < length) {
+                Type type2 = implicitUpperBounds[i];
+                if (isAssignable(type2, cls)) {
+                    return getTypeArguments(type2, cls, map);
                 }
                 i++;
             }
             return null;
         } else if (type instanceof TypeVariable) {
-            r2 = getImplicitBounds((TypeVariable) type);
-            r3 = r2.length;
-            while (i < r3) {
-                r4 = r2[i];
-                if (isAssignable(r4, (Class) cls)) {
-                    return getTypeArguments(r4, (Class) cls, (Map) map);
+            Type[] implicitBounds = getImplicitBounds((TypeVariable) type);
+            int length2 = implicitBounds.length;
+            while (i < length2) {
+                Type type3 = implicitBounds[i];
+                if (isAssignable(type3, cls)) {
+                    return getTypeArguments(type3, cls, map);
                 }
                 i++;
             }
@@ -417,33 +413,39 @@ public class TypeUtils {
     }
 
     private static Map<TypeVariable<?>, Type> getTypeArguments(ParameterizedType parameterizedType, Class<?> cls, Map<TypeVariable<?>, Type> map) {
-        Type rawType = getRawType(parameterizedType);
-        if (!isAssignable(rawType, (Class) cls)) {
+        Map<TypeVariable<?>, Type> hashMap;
+        Class rawType = getRawType(parameterizedType);
+        if (!isAssignable((Type) rawType, cls)) {
             return null;
         }
-        Map typeArguments;
         Type ownerType = parameterizedType.getOwnerType();
         if (ownerType instanceof ParameterizedType) {
             ParameterizedType parameterizedType2 = (ParameterizedType) ownerType;
-            typeArguments = getTypeArguments(parameterizedType2, getRawType(parameterizedType2), (Map) map);
+            hashMap = getTypeArguments(parameterizedType2, getRawType(parameterizedType2), map);
         } else {
-            Object hashMap = map == null ? new HashMap() : new HashMap(map);
+            hashMap = map == null ? new HashMap() : new HashMap(map);
         }
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         TypeVariable[] typeParameters = rawType.getTypeParameters();
-        for (int i = 0; i < typeParameters.length; i++) {
-            Object obj = actualTypeArguments[i];
-            Object obj2 = typeParameters[i];
-            if (typeArguments.containsKey(obj)) {
-                obj = (Type) typeArguments.get(obj);
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 >= typeParameters.length) {
+                break;
             }
-            typeArguments.put(obj2, obj);
+            Type type = actualTypeArguments[i2];
+            TypeVariable typeVariable = typeParameters[i2];
+            if (hashMap.containsKey(type)) {
+                type = (Type) hashMap.get(type);
+            }
+            hashMap.put(typeVariable, type);
+            i = i2 + 1;
         }
-        return !cls.equals(rawType) ? getTypeArguments(getClosestParentType(rawType, cls), (Class) cls, typeArguments) : typeArguments;
+        return !cls.equals(rawType) ? getTypeArguments(getClosestParentType(rawType, cls), cls, hashMap) : hashMap;
     }
 
     private static Map<TypeVariable<?>, Type> getTypeArguments(Class<?> cls, Class<?> cls2, Map<TypeVariable<?>, Type> map) {
-        if (!isAssignable((Type) cls, (Class) cls2)) {
+        if (!isAssignable((Type) cls, cls2)) {
             return null;
         }
         if (cls.isPrimitive()) {
@@ -452,11 +454,11 @@ public class TypeUtils {
             }
             cls = ClassUtils.primitiveToWrapper(cls);
         }
-        Map hashMap = map == null ? new HashMap() : new HashMap(map);
-        if (cls2.equals(cls)) {
-            return hashMap;
+        HashMap hashMap = map == null ? new HashMap() : new HashMap(map);
+        if (!cls2.equals(cls)) {
+            return getTypeArguments(getClosestParentType(cls, cls2), cls2, (Map<TypeVariable<?>, Type>) hashMap);
         }
-        return getTypeArguments(getClosestParentType(cls, cls2), (Class) cls2, hashMap);
+        return hashMap;
     }
 
     public static Map<TypeVariable<?>, Type> determineTypeArguments(Class<?> cls, ParameterizedType parameterizedType) {
@@ -474,7 +476,7 @@ public class TypeUtils {
             return determineTypeArguments((Class) closestParentType, parameterizedType);
         }
         ParameterizedType parameterizedType2 = (ParameterizedType) closestParentType;
-        Map<TypeVariable<?>, Type> determineTypeArguments = determineTypeArguments(getRawType(parameterizedType2), parameterizedType);
+        Map determineTypeArguments = determineTypeArguments(getRawType(parameterizedType2), parameterizedType);
         mapTypeVariablesToArguments(cls, parameterizedType2, determineTypeArguments);
         return determineTypeArguments;
     }
@@ -487,32 +489,39 @@ public class TypeUtils {
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         TypeVariable[] typeParameters = getRawType(parameterizedType).getTypeParameters();
         List asList = Arrays.asList(cls.getTypeParameters());
-        for (int i = 0; i < actualTypeArguments.length; i++) {
-            Object obj = typeParameters[i];
-            Object obj2 = actualTypeArguments[i];
-            if (asList.contains(obj2) && map.containsKey(obj)) {
-                map.put((TypeVariable) obj2, map.get(obj));
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 < actualTypeArguments.length) {
+                TypeVariable typeVariable = typeParameters[i2];
+                Type type = actualTypeArguments[i2];
+                if (asList.contains(type) && map.containsKey(typeVariable)) {
+                    map.put((TypeVariable) type, map.get(typeVariable));
+                }
+                i = i2 + 1;
+            } else {
+                return;
             }
         }
     }
 
     private static Type getClosestParentType(Class<?> cls, Class<?> cls2) {
+        Class cls3;
         if (cls2.isInterface()) {
             Type[] genericInterfaces = cls.getGenericInterfaces();
             Type type = null;
             int length = genericInterfaces.length;
             int i = 0;
             while (i < length) {
-                Type rawType;
                 Type type2 = genericInterfaces[i];
                 if (type2 instanceof ParameterizedType) {
-                    rawType = getRawType((ParameterizedType) type2);
+                    cls3 = getRawType((ParameterizedType) type2);
                 } else if (type2 instanceof Class) {
-                    Class cls3 = (Class) type2;
+                    cls3 = (Class) type2;
                 } else {
                     throw new IllegalStateException("Unexpected generic interface type found: " + type2);
                 }
-                if (!isAssignable(rawType, (Class) cls2) || !isAssignable(type, rawType)) {
+                if (!isAssignable((Type) cls3, cls2) || !isAssignable(type, (Type) cls3)) {
                     type2 = type;
                 }
                 i++;
@@ -530,30 +539,37 @@ public class TypeUtils {
             return false;
         }
         if (obj != null) {
-            return isAssignable(obj.getClass(), type, null);
+            return isAssignable((Type) obj.getClass(), type, null);
         }
-        if ((type instanceof Class) && ((Class) type).isPrimitive()) {
-            return false;
+        if (!(type instanceof Class) || !((Class) type).isPrimitive()) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static Type[] normalizeUpperBounds(Type[] typeArr) {
+        boolean z;
         Validate.notNull(typeArr, "null value specified for bounds array", new Object[0]);
         if (typeArr.length < 2) {
             return typeArr;
         }
-        Set hashSet = new HashSet(typeArr.length);
+        HashSet hashSet = new HashSet(typeArr.length);
         for (Type type : typeArr) {
-            int i;
-            for (Type type2 : typeArr) {
-                if (type != type2 && isAssignable(type2, type, null)) {
-                    i = 1;
+            int length = typeArr.length;
+            int i = 0;
+            while (true) {
+                if (i >= length) {
+                    z = false;
                     break;
                 }
+                Type type2 = typeArr[i];
+                if (type != type2 && isAssignable(type2, type, null)) {
+                    z = true;
+                    break;
+                }
+                i++;
             }
-            i = 0;
-            if (i == 0) {
+            if (!z) {
                 hashSet.add(type);
             }
         }
@@ -592,9 +608,15 @@ public class TypeUtils {
         for (Entry entry : map.entrySet()) {
             TypeVariable typeVariable = (TypeVariable) entry.getKey();
             Type type = (Type) entry.getValue();
-            for (Type substituteTypeVariables : getImplicitBounds(typeVariable)) {
-                if (!isAssignable(type, substituteTypeVariables(substituteTypeVariables, map), (Map) map)) {
-                    return false;
+            Type[] implicitBounds = getImplicitBounds(typeVariable);
+            int length = implicitBounds.length;
+            int i = 0;
+            while (true) {
+                if (i < length) {
+                    if (!isAssignable(type, substituteTypeVariables(implicitBounds[i], map), map)) {
+                        return false;
+                    }
+                    i++;
                 }
             }
         }
@@ -674,7 +696,7 @@ public class TypeUtils {
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             if (parameterizedType.getOwnerType() != null) {
-                Map<TypeVariable<?>, Type> hashMap = new HashMap(map);
+                HashMap hashMap = new HashMap(map);
                 hashMap.putAll(getTypeArguments(parameterizedType));
                 map = hashMap;
             }
@@ -695,16 +717,18 @@ public class TypeUtils {
     }
 
     private static Type[] unrollBounds(Map<TypeVariable<?>, Type> map, Type[] typeArr) {
-        int i = 0;
-        while (i < typeArr.length) {
-            Type unrollVariables = unrollVariables(map, typeArr[i]);
+        int i;
+        int i2 = 0;
+        while (i2 < typeArr.length) {
+            Type unrollVariables = unrollVariables(map, typeArr[i2]);
             if (unrollVariables == null) {
-                typeArr = (Type[]) ArrayUtils.remove((Object[]) typeArr, i);
-                i--;
+                i = i2 - 1;
+                typeArr = (Type[]) ArrayUtils.remove((T[]) typeArr, i2);
             } else {
-                typeArr[i] = unrollVariables;
+                typeArr[i2] = unrollVariables;
+                i = i2;
             }
-            i++;
+            i2 = i + 1;
         }
         return typeArr;
     }
@@ -738,13 +762,13 @@ public class TypeUtils {
     }
 
     public static final ParameterizedType parameterize(Class<?> cls, Type... typeArr) {
-        return parameterizeWithOwner(null, (Class) cls, typeArr);
+        return parameterizeWithOwner((Type) null, cls, typeArr);
     }
 
     public static final ParameterizedType parameterize(Class<?> cls, Map<TypeVariable<?>, Type> map) {
         Validate.notNull(cls, "raw class is null", new Object[0]);
         Validate.notNull(map, "typeArgMappings is null", new Object[0]);
-        return parameterizeWithOwner(null, (Class) cls, extractTypeArgumentsFrom(map, cls.getTypeParameters()));
+        return parameterizeWithOwner((Type) null, cls, extractTypeArgumentsFrom(map, cls.getTypeParameters()));
     }
 
     public static final ParameterizedType parameterizeWithOwner(Type type, Class<?> cls, Type... typeArr) {
@@ -758,7 +782,7 @@ public class TypeUtils {
         } else {
             Validate.isTrue(isAssignable(type, cls.getEnclosingClass()), "%s is invalid owner type for parameterized %s", type, cls);
         }
-        Validate.noNullElements((Object[]) typeArr, "null type argument at index %s", new Object[0]);
+        Validate.noNullElements((T[]) typeArr, "null type argument at index %s", new Object[0]);
         if (cls.getTypeParameters().length == typeArr.length) {
             z = true;
         } else {
@@ -771,7 +795,7 @@ public class TypeUtils {
     public static final ParameterizedType parameterizeWithOwner(Type type, Class<?> cls, Map<TypeVariable<?>, Type> map) {
         Validate.notNull(cls, "raw class is null", new Object[0]);
         Validate.notNull(map, "typeArgMappings is null", new Object[0]);
-        return parameterizeWithOwner(type, (Class) cls, extractTypeArgumentsFrom(map, cls.getTypeParameters()));
+        return parameterizeWithOwner(type, cls, extractTypeArgumentsFrom(map, cls.getTypeParameters()));
     }
 
     private static Type[] extractTypeArgumentsFrom(Map<TypeVariable<?>, Type> map, TypeVariable<?>[] typeVariableArr) {
@@ -780,10 +804,10 @@ public class TypeUtils {
         int i = 0;
         int i2 = 0;
         while (i < length) {
-            Type type = typeVariableArr[i];
-            Validate.isTrue(map.containsKey(type), "missing argument mapping for %s", toString(type));
+            TypeVariable<?> typeVariable = typeVariableArr[i];
+            Validate.isTrue(map.containsKey(typeVariable), "missing argument mapping for %s", toString(typeVariable));
             int i3 = i2 + 1;
-            typeArr[i2] = (Type) map.get(type);
+            typeArr[i2] = (Type) map.get(typeVariable);
             i++;
             i2 = i3;
         }
@@ -814,7 +838,8 @@ public class TypeUtils {
         return false;
     }
 
-    private static boolean equals(ParameterizedType parameterizedType, Type type) {
+    /* access modifiers changed from: private */
+    public static boolean equals(ParameterizedType parameterizedType, Type type) {
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType2 = (ParameterizedType) type;
             if (equals(parameterizedType.getRawType(), parameterizedType2.getRawType()) && equals(parameterizedType.getOwnerType(), parameterizedType2.getOwnerType())) {
@@ -824,19 +849,21 @@ public class TypeUtils {
         return false;
     }
 
-    private static boolean equals(GenericArrayType genericArrayType, Type type) {
+    /* access modifiers changed from: private */
+    public static boolean equals(GenericArrayType genericArrayType, Type type) {
         return (type instanceof GenericArrayType) && equals(genericArrayType.getGenericComponentType(), ((GenericArrayType) type).getGenericComponentType());
     }
 
-    private static boolean equals(WildcardType wildcardType, Type type) {
+    /* access modifiers changed from: private */
+    public static boolean equals(WildcardType wildcardType, Type type) {
         if (!(type instanceof WildcardType)) {
             return true;
         }
         WildcardType wildcardType2 = (WildcardType) type;
-        if (equals(getImplicitLowerBounds(wildcardType), getImplicitLowerBounds(wildcardType2)) && equals(getImplicitUpperBounds(wildcardType), getImplicitUpperBounds(wildcardType2))) {
-            return true;
+        if (!equals(getImplicitLowerBounds(wildcardType), getImplicitLowerBounds(wildcardType2)) || !equals(getImplicitUpperBounds(wildcardType), getImplicitUpperBounds(wildcardType2))) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     private static boolean equals(Type[] typeArr, Type[] typeArr2) {
@@ -873,21 +900,21 @@ public class TypeUtils {
 
     public static String toLongString(TypeVariable<?> typeVariable) {
         Validate.notNull(typeVariable, "var is null", new Object[0]);
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         GenericDeclaration genericDeclaration = typeVariable.getGenericDeclaration();
         if (genericDeclaration instanceof Class) {
             Class cls = (Class) genericDeclaration;
             while (cls.getEnclosingClass() != null) {
-                stringBuilder.insert(0, cls.getSimpleName()).insert(0, ClassUtils.PACKAGE_SEPARATOR_CHAR);
+                sb.insert(0, cls.getSimpleName()).insert(0, ClassUtils.PACKAGE_SEPARATOR_CHAR);
                 cls = cls.getEnclosingClass();
             }
-            stringBuilder.insert(0, cls.getName());
+            sb.insert(0, cls.getName());
         } else if (genericDeclaration instanceof Type) {
-            stringBuilder.append(toString((Type) genericDeclaration));
+            sb.append(toString((Type) genericDeclaration));
         } else {
-            stringBuilder.append(genericDeclaration);
+            sb.append(genericDeclaration);
         }
-        return stringBuilder.append(':').append(typeVariableToString(typeVariable)).toString();
+        return sb.append(':').append(typeVariableToString(typeVariable)).toString();
     }
 
     public static <T> Typed<T> wrap(final Type type) {
@@ -903,47 +930,47 @@ public class TypeUtils {
     }
 
     private static String classToString(Class<?> cls) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (cls.getEnclosingClass() != null) {
-            stringBuilder.append(classToString(cls.getEnclosingClass())).append(ClassUtils.PACKAGE_SEPARATOR_CHAR).append(cls.getSimpleName());
+            sb.append(classToString(cls.getEnclosingClass())).append(ClassUtils.PACKAGE_SEPARATOR_CHAR).append(cls.getSimpleName());
         } else {
-            stringBuilder.append(cls.getName());
+            sb.append(cls.getName());
         }
         if (cls.getTypeParameters().length > 0) {
-            stringBuilder.append('<');
-            appendAllTo(stringBuilder, ", ", cls.getTypeParameters());
-            stringBuilder.append('>');
+            sb.append('<');
+            appendAllTo(sb, ", ", cls.getTypeParameters());
+            sb.append('>');
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private static String typeVariableToString(TypeVariable<?> typeVariable) {
-        StringBuilder stringBuilder = new StringBuilder(typeVariable.getName());
+        StringBuilder sb = new StringBuilder(typeVariable.getName());
         Type[] bounds = typeVariable.getBounds();
-        if (bounds.length > 0 && !(bounds.length == 1 && Object.class.equals(bounds[0]))) {
-            stringBuilder.append(" extends ");
-            appendAllTo(stringBuilder, " & ", typeVariable.getBounds());
+        if (bounds.length > 0 && (bounds.length != 1 || !Object.class.equals(bounds[0]))) {
+            sb.append(" extends ");
+            appendAllTo(sb, " & ", typeVariable.getBounds());
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private static String parameterizedTypeToString(ParameterizedType parameterizedType) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         Type ownerType = parameterizedType.getOwnerType();
         Class cls = (Class) parameterizedType.getRawType();
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         if (ownerType == null) {
-            stringBuilder.append(cls.getName());
+            sb.append(cls.getName());
         } else {
             if (ownerType instanceof Class) {
-                stringBuilder.append(((Class) ownerType).getName());
+                sb.append(((Class) ownerType).getName());
             } else {
-                stringBuilder.append(ownerType.toString());
+                sb.append(ownerType.toString());
             }
-            stringBuilder.append(ClassUtils.PACKAGE_SEPARATOR_CHAR).append(cls.getSimpleName());
+            sb.append(ClassUtils.PACKAGE_SEPARATOR_CHAR).append(cls.getSimpleName());
         }
-        appendAllTo(stringBuilder.append('<'), ", ", actualTypeArguments).append('>');
-        return stringBuilder.toString();
+        appendAllTo(sb.append('<'), ", ", actualTypeArguments).append('>');
+        return sb.toString();
     }
 
     private static String wildcardTypeToString(WildcardType wildcardType) {
@@ -962,14 +989,14 @@ public class TypeUtils {
         return String.format("%s[]", new Object[]{toString(genericArrayType.getGenericComponentType())});
     }
 
-    private static StringBuilder appendAllTo(StringBuilder stringBuilder, String str, Type... typeArr) {
-        Validate.notEmpty(Validate.noNullElements((Object[]) typeArr));
+    private static StringBuilder appendAllTo(StringBuilder sb, String str, Type... typeArr) {
+        Validate.notEmpty((T[]) Validate.noNullElements((T[]) typeArr));
         if (typeArr.length > 0) {
-            stringBuilder.append(toString(typeArr[0]));
+            sb.append(toString(typeArr[0]));
             for (int i = 1; i < typeArr.length; i++) {
-                stringBuilder.append(str).append(toString(typeArr[i]));
+                sb.append(str).append(toString(typeArr[i]));
             }
         }
-        return stringBuilder;
+        return sb;
     }
 }

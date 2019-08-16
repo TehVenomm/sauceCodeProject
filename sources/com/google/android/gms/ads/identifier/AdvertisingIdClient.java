@@ -3,82 +3,98 @@ package com.google.android.gms.ads.identifier;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.RemoteException;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.facebook.appevents.AppEventsConstants;
+import com.google.android.gms.common.BlockingServiceConnection;
+import com.google.android.gms.common.GoogleApiAvailabilityLight;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.annotation.KeepForSdk;
 import com.google.android.gms.common.annotation.KeepForSdkWithMembers;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.common.zze;
-import com.google.android.gms.internal.zzfh;
-import com.google.android.gms.internal.zzfi;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.stats.ConnectionTracker;
+import com.google.android.gms.common.util.VisibleForTesting;
+import com.google.android.gms.internal.ads_identifier.zze;
+import com.google.android.gms.internal.ads_identifier.zzf;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.concurrent.GuardedBy;
 
-@KeepForSdkWithMembers
+@KeepForSdk
+@ParametersAreNonnullByDefault
 public class AdvertisingIdClient {
+    @GuardedBy("this")
     private final Context mContext;
     @Nullable
-    private com.google.android.gms.common.zza zzalw;
+    @GuardedBy("this")
+    private BlockingServiceConnection zze;
     @Nullable
-    private zzfh zzalx;
-    private boolean zzaly;
-    private Object zzalz;
+    @GuardedBy("this")
+    private zze zzf;
+    @GuardedBy("this")
+    private boolean zzg;
+    private final Object zzh;
     @Nullable
-    private zza zzama;
-    private long zzamb;
+    @GuardedBy("mAutoDisconnectTaskLock")
+    private zza zzi;
+    private final boolean zzj;
+    private final long zzk;
 
+    @KeepForSdkWithMembers
     public static final class Info {
-        private final String zzamh;
-        private final boolean zzami;
+        private final String zzq;
+        private final boolean zzr;
 
         public Info(String str, boolean z) {
-            this.zzamh = str;
-            this.zzami = z;
+            this.zzq = str;
+            this.zzr = z;
         }
 
         public final String getId() {
-            return this.zzamh;
+            return this.zzq;
         }
 
         public final boolean isLimitAdTrackingEnabled() {
-            return this.zzami;
+            return this.zzr;
         }
 
         public final String toString() {
-            String str = this.zzamh;
-            return new StringBuilder(String.valueOf(str).length() + 7).append("{").append(str).append("}").append(this.zzami).toString();
+            String str = this.zzq;
+            return new StringBuilder(String.valueOf(str).length() + 7).append("{").append(str).append("}").append(this.zzr).toString();
         }
     }
 
+    @VisibleForTesting
     static final class zza extends Thread {
-        private WeakReference<AdvertisingIdClient> zzamd;
-        private long zzame;
-        CountDownLatch zzamf = new CountDownLatch(1);
-        boolean zzamg = false;
+        private WeakReference<AdvertisingIdClient> zzm;
+        private long zzn;
+        CountDownLatch zzo = new CountDownLatch(1);
+        boolean zzp = false;
 
         public zza(AdvertisingIdClient advertisingIdClient, long j) {
-            this.zzamd = new WeakReference(advertisingIdClient);
-            this.zzame = j;
+            this.zzm = new WeakReference<>(advertisingIdClient);
+            this.zzn = j;
             start();
         }
 
         private final void disconnect() {
-            AdvertisingIdClient advertisingIdClient = (AdvertisingIdClient) this.zzamd.get();
+            AdvertisingIdClient advertisingIdClient = (AdvertisingIdClient) this.zzm.get();
             if (advertisingIdClient != null) {
                 advertisingIdClient.finish();
-                this.zzamg = true;
+                this.zzp = true;
             }
         }
 
         public final void run() {
             try {
-                if (!this.zzamf.await(this.zzame, TimeUnit.MILLISECONDS)) {
+                if (!this.zzo.await(this.zzn, TimeUnit.MILLISECONDS)) {
                     disconnect();
                 }
             } catch (InterruptedException e) {
@@ -87,13 +103,15 @@ public class AdvertisingIdClient {
         }
     }
 
+    @KeepForSdk
     public AdvertisingIdClient(Context context) {
-        this(context, 30000, false);
+        this(context, 30000, false, false);
     }
 
-    public AdvertisingIdClient(Context context, long j, boolean z) {
-        this.zzalz = new Object();
-        zzbp.zzu(context);
+    @VisibleForTesting
+    private AdvertisingIdClient(Context context, long j, boolean z, boolean z2) {
+        this.zzh = new Object();
+        Preconditions.checkNotNull(context);
         if (z) {
             Context applicationContext = context.getApplicationContext();
             if (applicationContext != null) {
@@ -103,88 +121,121 @@ public class AdvertisingIdClient {
         } else {
             this.mContext = context;
         }
-        this.zzaly = false;
-        this.zzamb = j;
+        this.zzg = false;
+        this.zzk = j;
+        this.zzj = z2;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static com.google.android.gms.ads.identifier.AdvertisingIdClient.Info getAdvertisingIdInfo(android.content.Context r6) throws java.io.IOException, java.lang.IllegalStateException, com.google.android.gms.common.GooglePlayServicesNotAvailableException, com.google.android.gms.common.GooglePlayServicesRepairableException {
-        /*
-        r4 = 0;
-        r0 = new com.google.android.gms.ads.identifier.zzd;
-        r0.<init>(r6);
-        r1 = "gads:ad_id_app_context:enabled";
-        r1 = r0.getBoolean(r1, r4);
-        r2 = "gads:ad_id_app_context:ping_ratio";
-        r3 = 0;
-        r2 = r0.getFloat(r2, r3);
-        r3 = "gads:ad_id_use_shared_preference:enabled";
-        r0 = r0.getBoolean(r3, r4);
-        if (r0 == 0) goto L_0x0026;
-    L_0x001b:
-        r0 = com.google.android.gms.ads.identifier.zzb.zze(r6);
-        r0 = r0.getInfo();
-        if (r0 == 0) goto L_0x0026;
-    L_0x0025:
-        return r0;
-    L_0x0026:
-        r3 = new com.google.android.gms.ads.identifier.AdvertisingIdClient;
-        r4 = -1;
-        r3.<init>(r6, r4, r1);
-        r0 = 0;
-        r3.start(r0);	 Catch:{ Throwable -> 0x003d }
-        r0 = r3.getInfo();	 Catch:{ Throwable -> 0x003d }
-        r4 = 0;
-        r3.zza(r0, r1, r2, r4);	 Catch:{ Throwable -> 0x003d }
-        r3.finish();
-        goto L_0x0025;
-    L_0x003d:
-        r0 = move-exception;
-        r4 = 0;
-        r3.zza(r4, r1, r2, r0);	 Catch:{ all -> 0x0043 }
-        throw r0;	 Catch:{ all -> 0x0043 }
-    L_0x0043:
-        r0 = move-exception;
-        r3.finish();
-        throw r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.ads.identifier.AdvertisingIdClient.getAdvertisingIdInfo(android.content.Context):com.google.android.gms.ads.identifier.AdvertisingIdClient$Info");
+    @KeepForSdk
+    public static Info getAdvertisingIdInfo(Context context) throws IOException, IllegalStateException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
+        zzb zzb = new zzb(context);
+        boolean z = zzb.getBoolean("gads:ad_id_app_context:enabled", false);
+        float f = zzb.getFloat("gads:ad_id_app_context:ping_ratio", 0.0f);
+        String string = zzb.getString("gads:ad_id_use_shared_preference:experiment_id", "");
+        AdvertisingIdClient advertisingIdClient = new AdvertisingIdClient(context, -1, z, zzb.getBoolean("gads:ad_id_use_persistent_service:enabled", false));
+        try {
+            long elapsedRealtime = SystemClock.elapsedRealtime();
+            advertisingIdClient.zza(false);
+            Info info = advertisingIdClient.getInfo();
+            advertisingIdClient.zza(info, z, f, SystemClock.elapsedRealtime() - elapsedRealtime, string, null);
+            advertisingIdClient.finish();
+            return info;
+        } catch (Throwable th) {
+            advertisingIdClient.finish();
+            throw th;
+        }
     }
 
+    @KeepForSdk
+    public static boolean getIsAdIdFakeForDebugLogging(Context context) throws IOException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
+        zzb zzb = new zzb(context);
+        AdvertisingIdClient advertisingIdClient = new AdvertisingIdClient(context, -1, zzb.getBoolean("gads:ad_id_app_context:enabled", false), zzb.getBoolean("com.google.android.gms.ads.identifier.service.PERSISTENT_START", false));
+        try {
+            advertisingIdClient.zza(false);
+            return advertisingIdClient.zzb();
+        } finally {
+            advertisingIdClient.finish();
+        }
+    }
+
+    @KeepForSdk
     public static void setShouldSkipGmsCoreVersionCheck(boolean z) {
     }
 
-    private final void start(boolean z) throws IOException, IllegalStateException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
-        zzbp.zzgg("Calling this from your main thread can lead to deadlock");
-        synchronized (this) {
-            if (this.zzaly) {
-                finish();
+    private static BlockingServiceConnection zza(Context context, boolean z) throws IOException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
+        try {
+            context.getPackageManager().getPackageInfo("com.android.vending", 0);
+            switch (GoogleApiAvailabilityLight.getInstance().isGooglePlayServicesAvailable(context, 12451000)) {
+                case 0:
+                case 2:
+                    String str = z ? "com.google.android.gms.ads.identifier.service.PERSISTENT_START" : AdvertisingInfoServiceStrategy.GOOGLE_PLAY_SERVICES_INTENT;
+                    BlockingServiceConnection blockingServiceConnection = new BlockingServiceConnection();
+                    Intent intent = new Intent(str);
+                    intent.setPackage("com.google.android.gms");
+                    try {
+                        if (ConnectionTracker.getInstance().bindService(context, intent, blockingServiceConnection, 1)) {
+                            return blockingServiceConnection;
+                        }
+                        throw new IOException("Connection failure");
+                    } catch (Throwable th) {
+                        throw new IOException(th);
+                    }
+                default:
+                    throw new IOException("Google Play services not available");
             }
-            this.zzalw = zzd(this.mContext);
-            this.zzalx = zza(this.mContext, this.zzalw);
-            this.zzaly = true;
-            if (z) {
-                zzbi();
-            }
+        } catch (NameNotFoundException e) {
+            throw new GooglePlayServicesNotAvailableException(9);
         }
     }
 
-    private static zzfh zza(Context context, com.google.android.gms.common.zza zza) throws IOException {
+    @VisibleForTesting
+    private static zze zza(Context context, BlockingServiceConnection blockingServiceConnection) throws IOException {
         try {
-            return zzfi.zzd(zza.zza(10000, TimeUnit.MILLISECONDS));
+            return zzf.zza(blockingServiceConnection.getServiceWithTimeout(10000, TimeUnit.MILLISECONDS));
         } catch (InterruptedException e) {
             throw new IOException("Interrupted exception");
         } catch (Throwable th) {
-            IOException iOException = new IOException(th);
+            throw new IOException(th);
         }
     }
 
-    private final boolean zza(Info info, boolean z, float f, Throwable th) {
+    private final void zza() {
+        synchronized (this.zzh) {
+            if (this.zzi != null) {
+                this.zzi.zzo.countDown();
+                try {
+                    this.zzi.join();
+                } catch (InterruptedException e) {
+                }
+            }
+            if (this.zzk > 0) {
+                this.zzi = new zza(this, this.zzk);
+            }
+        }
+    }
+
+    @VisibleForTesting
+    private final void zza(boolean z) throws IOException, IllegalStateException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
+        Preconditions.checkNotMainThread("Calling this from your main thread can lead to deadlock");
+        synchronized (this) {
+            if (this.zzg) {
+                finish();
+            }
+            this.zze = zza(this.mContext, this.zzj);
+            this.zzf = zza(this.mContext, this.zze);
+            this.zzg = true;
+            if (z) {
+                zza();
+            }
+        }
+    }
+
+    @VisibleForTesting
+    private final boolean zza(Info info, boolean z, float f, long j, String str, Throwable th) {
         if (Math.random() > ((double) f)) {
             return false;
         }
-        Map hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         hashMap.put("app_context", z ? AppEventsConstants.EVENT_PARAM_VALUE_YES : AppEventsConstants.EVENT_PARAM_VALUE_NO);
         if (info != null) {
             hashMap.put("limit_ad_tracking", info.isLimitAdTrackingEnabled() ? AppEventsConstants.EVENT_PARAM_VALUE_YES : AppEventsConstants.EVENT_PARAM_VALUE_NO);
@@ -195,134 +246,132 @@ public class AdvertisingIdClient {
         if (th != null) {
             hashMap.put("error", th.getClass().getName());
         }
+        if (str != null && !str.isEmpty()) {
+            hashMap.put("experiment_id", str);
+        }
+        hashMap.put("tag", "AdvertisingIdClient");
+        hashMap.put("time_spent", Long.toString(j));
         new zza(this, hashMap).start();
         return true;
     }
 
-    private final void zzbi() {
-        synchronized (this.zzalz) {
-            if (this.zzama != null) {
-                this.zzama.zzamf.countDown();
-                try {
-                    this.zzama.join();
-                } catch (InterruptedException e) {
-                }
-            }
-            if (this.zzamb > 0) {
-                this.zzama = new zza(this, this.zzamb);
-            }
-        }
-    }
-
-    private static com.google.android.gms.common.zza zzd(Context context) throws IOException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
-        try {
-            context.getPackageManager().getPackageInfo("com.android.vending", 0);
-            switch (zze.zzaew().isGooglePlayServicesAvailable(context)) {
-                case 0:
-                case 2:
-                    Object zza = new com.google.android.gms.common.zza();
-                    Intent intent = new Intent(AdvertisingInfoServiceStrategy.GOOGLE_PLAY_SERVICES_INTENT);
-                    intent.setPackage("com.google.android.gms");
-                    try {
-                        if (com.google.android.gms.common.stats.zza.zzaky().zza(context, intent, zza, 1)) {
-                            return zza;
-                        }
-                        throw new IOException("Connection failure");
-                    } catch (Throwable th) {
-                        IOException iOException = new IOException(th);
-                    }
-                default:
-                    throw new IOException("Google Play services not available");
-            }
-        } catch (NameNotFoundException e) {
-            throw new GooglePlayServicesNotAvailableException(9);
-        }
-    }
-
-    protected void finalize() throws Throwable {
-        finish();
-        super.finalize();
-    }
-
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public void finish() {
-        /*
-        r3 = this;
-        r0 = "Calling this from your main thread can lead to deadlock";
-        com.google.android.gms.common.internal.zzbp.zzgg(r0);
-        monitor-enter(r3);
-        r0 = r3.mContext;	 Catch:{ all -> 0x0029 }
-        if (r0 == 0) goto L_0x000e;
-    L_0x000a:
-        r0 = r3.zzalw;	 Catch:{ all -> 0x0029 }
-        if (r0 != 0) goto L_0x0010;
-    L_0x000e:
-        monitor-exit(r3);	 Catch:{ all -> 0x0029 }
-    L_0x000f:
-        return;
-    L_0x0010:
-        r0 = r3.zzaly;	 Catch:{ Throwable -> 0x002c }
-        if (r0 == 0) goto L_0x001e;
-    L_0x0014:
-        com.google.android.gms.common.stats.zza.zzaky();	 Catch:{ Throwable -> 0x002c }
-        r0 = r3.mContext;	 Catch:{ Throwable -> 0x002c }
-        r1 = r3.zzalw;	 Catch:{ Throwable -> 0x002c }
-        r0.unbindService(r1);	 Catch:{ Throwable -> 0x002c }
-    L_0x001e:
-        r0 = 0;
-        r3.zzaly = r0;	 Catch:{ all -> 0x0029 }
-        r0 = 0;
-        r3.zzalx = r0;	 Catch:{ all -> 0x0029 }
-        r0 = 0;
-        r3.zzalw = r0;	 Catch:{ all -> 0x0029 }
-        monitor-exit(r3);	 Catch:{ all -> 0x0029 }
-        goto L_0x000f;
-    L_0x0029:
-        r0 = move-exception;
-        monitor-exit(r3);	 Catch:{ all -> 0x0029 }
-        throw r0;
-    L_0x002c:
-        r0 = move-exception;
-        r1 = "AdvertisingIdClient";
-        r2 = "AdvertisingIdClient unbindService failed.";
-        android.util.Log.i(r1, r2, r0);	 Catch:{ all -> 0x0029 }
-        goto L_0x001e;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.ads.identifier.AdvertisingIdClient.finish():void");
-    }
-
-    public Info getInfo() throws IOException {
-        Info info;
-        zzbp.zzgg("Calling this from your main thread can lead to deadlock");
+    private final boolean zzb() throws IOException {
+        boolean zzc;
+        Preconditions.checkNotMainThread("Calling this from your main thread can lead to deadlock");
         synchronized (this) {
-            if (!this.zzaly) {
-                synchronized (this.zzalz) {
-                    if (this.zzama == null || !this.zzama.zzamg) {
+            if (!this.zzg) {
+                synchronized (this.zzh) {
+                    if (this.zzi == null || !this.zzi.zzp) {
                         throw new IOException("AdvertisingIdClient is not connected.");
                     }
                 }
                 try {
-                    start(false);
-                    if (!this.zzaly) {
+                    zza(false);
+                    if (!this.zzg) {
                         throw new IOException("AdvertisingIdClient cannot reconnect.");
                     }
-                } catch (Throwable e) {
+                } catch (RemoteException e) {
                     Log.i("AdvertisingIdClient", "GMS remote exception ", e);
                     throw new IOException("Remote exception");
-                } catch (Throwable e2) {
+                } catch (Exception e2) {
                     throw new IOException("AdvertisingIdClient cannot reconnect.", e2);
                 }
             }
-            zzbp.zzu(this.zzalw);
-            zzbp.zzu(this.zzalx);
-            info = new Info(this.zzalx.getId(), this.zzalx.zzb(true));
+            Preconditions.checkNotNull(this.zze);
+            Preconditions.checkNotNull(this.zzf);
+            zzc = this.zzf.zzc();
         }
-        zzbi();
+        zza();
+        return zzc;
+    }
+
+    /* access modifiers changed from: protected */
+    public void finalize() throws Throwable {
+        finish();
+        super.finalize();
+    }
+
+    /* JADX WARNING: Code restructure failed: missing block: B:24:?, code lost:
+        return;
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public final void finish() {
+        /*
+            r3 = this;
+            java.lang.String r0 = "Calling this from your main thread can lead to deadlock"
+            com.google.android.gms.common.internal.Preconditions.checkNotMainThread(r0)
+            monitor-enter(r3)
+            android.content.Context r0 = r3.mContext     // Catch:{ all -> 0x002a }
+            if (r0 == 0) goto L_0x000e
+            com.google.android.gms.common.BlockingServiceConnection r0 = r3.zze     // Catch:{ all -> 0x002a }
+            if (r0 != 0) goto L_0x0010
+        L_0x000e:
+            monitor-exit(r3)     // Catch:{ all -> 0x002a }
+        L_0x000f:
+            return
+        L_0x0010:
+            boolean r0 = r3.zzg     // Catch:{ Throwable -> 0x002d }
+            if (r0 == 0) goto L_0x001f
+            com.google.android.gms.common.stats.ConnectionTracker r0 = com.google.android.gms.common.stats.ConnectionTracker.getInstance()     // Catch:{ Throwable -> 0x002d }
+            android.content.Context r1 = r3.mContext     // Catch:{ Throwable -> 0x002d }
+            com.google.android.gms.common.BlockingServiceConnection r2 = r3.zze     // Catch:{ Throwable -> 0x002d }
+            r0.unbindService(r1, r2)     // Catch:{ Throwable -> 0x002d }
+        L_0x001f:
+            r0 = 0
+            r3.zzg = r0     // Catch:{ all -> 0x002a }
+            r0 = 0
+            r3.zzf = r0     // Catch:{ all -> 0x002a }
+            r0 = 0
+            r3.zze = r0     // Catch:{ all -> 0x002a }
+            monitor-exit(r3)     // Catch:{ all -> 0x002a }
+            goto L_0x000f
+        L_0x002a:
+            r0 = move-exception
+            monitor-exit(r3)     // Catch:{ all -> 0x002a }
+            throw r0
+        L_0x002d:
+            r0 = move-exception
+            java.lang.String r1 = "AdvertisingIdClient"
+            java.lang.String r2 = "AdvertisingIdClient unbindService failed."
+            android.util.Log.i(r1, r2, r0)     // Catch:{ all -> 0x002a }
+            goto L_0x001f
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.ads.identifier.AdvertisingIdClient.finish():void");
+    }
+
+    @KeepForSdk
+    public Info getInfo() throws IOException {
+        Info info;
+        Preconditions.checkNotMainThread("Calling this from your main thread can lead to deadlock");
+        synchronized (this) {
+            if (!this.zzg) {
+                synchronized (this.zzh) {
+                    if (this.zzi == null || !this.zzi.zzp) {
+                        throw new IOException("AdvertisingIdClient is not connected.");
+                    }
+                }
+                try {
+                    zza(false);
+                    if (!this.zzg) {
+                        throw new IOException("AdvertisingIdClient cannot reconnect.");
+                    }
+                } catch (RemoteException e) {
+                    Log.i("AdvertisingIdClient", "GMS remote exception ", e);
+                    throw new IOException("Remote exception");
+                } catch (Exception e2) {
+                    throw new IOException("AdvertisingIdClient cannot reconnect.", e2);
+                }
+            }
+            Preconditions.checkNotNull(this.zze);
+            Preconditions.checkNotNull(this.zzf);
+            info = new Info(this.zzf.getId(), this.zzf.zzb(true));
+        }
+        zza();
         return info;
     }
 
+    @KeepForSdk
     public void start() throws IOException, IllegalStateException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
-        start(true);
+        zza(true);
     }
 }

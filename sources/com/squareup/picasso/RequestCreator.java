@@ -30,13 +30,13 @@ public class RequestCreator {
     private boolean setPlaceholder;
     private Object tag;
 
-    RequestCreator(Picasso picasso, Uri uri, int i) {
+    RequestCreator(Picasso picasso2, Uri uri, int i) {
         this.setPlaceholder = true;
-        if (picasso.shutdown) {
+        if (picasso2.shutdown) {
             throw new IllegalStateException("Picasso instance already shut down. Cannot submit new requests.");
         }
-        this.picasso = picasso;
-        this.data = new Builder(uri, i, picasso.defaultBitmapConfig);
+        this.picasso = picasso2;
+        this.data = new Builder(uri, i, picasso2.defaultBitmapConfig);
     }
 
     RequestCreator() {
@@ -118,7 +118,8 @@ public class RequestCreator {
         return this;
     }
 
-    RequestCreator unfit() {
+    /* access modifiers changed from: 0000 */
+    public RequestCreator unfit() {
         this.deferred = false;
         return this;
     }
@@ -179,7 +180,7 @@ public class RequestCreator {
     }
 
     public RequestCreator transform(List<? extends Transformation> list) {
-        this.data.transform((List) list);
+        this.data.transform(list);
         return this;
     }
 
@@ -188,39 +189,39 @@ public class RequestCreator {
         return memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
     }
 
-    public RequestCreator memoryPolicy(MemoryPolicy memoryPolicy, MemoryPolicy... memoryPolicyArr) {
-        if (memoryPolicy == null) {
+    public RequestCreator memoryPolicy(MemoryPolicy memoryPolicy2, MemoryPolicy... memoryPolicyArr) {
+        if (memoryPolicy2 == null) {
             throw new IllegalArgumentException("Memory policy cannot be null.");
         }
-        this.memoryPolicy |= memoryPolicy.index;
+        this.memoryPolicy |= memoryPolicy2.index;
         if (memoryPolicyArr == null) {
             throw new IllegalArgumentException("Memory policy cannot be null.");
         }
         if (memoryPolicyArr.length > 0) {
-            for (MemoryPolicy memoryPolicy2 : memoryPolicyArr) {
-                if (memoryPolicy2 == null) {
+            for (MemoryPolicy memoryPolicy3 : memoryPolicyArr) {
+                if (memoryPolicy3 == null) {
                     throw new IllegalArgumentException("Memory policy cannot be null.");
                 }
-                this.memoryPolicy = memoryPolicy2.index | this.memoryPolicy;
+                this.memoryPolicy = memoryPolicy3.index | this.memoryPolicy;
             }
         }
         return this;
     }
 
-    public RequestCreator networkPolicy(NetworkPolicy networkPolicy, NetworkPolicy... networkPolicyArr) {
-        if (networkPolicy == null) {
+    public RequestCreator networkPolicy(NetworkPolicy networkPolicy2, NetworkPolicy... networkPolicyArr) {
+        if (networkPolicy2 == null) {
             throw new IllegalArgumentException("Network policy cannot be null.");
         }
-        this.networkPolicy |= networkPolicy.index;
+        this.networkPolicy |= networkPolicy2.index;
         if (networkPolicyArr == null) {
             throw new IllegalArgumentException("Network policy cannot be null.");
         }
         if (networkPolicyArr.length > 0) {
-            for (NetworkPolicy networkPolicy2 : networkPolicyArr) {
-                if (networkPolicy2 == null) {
+            for (NetworkPolicy networkPolicy3 : networkPolicyArr) {
+                if (networkPolicy3 == null) {
                     throw new IllegalArgumentException("Network policy cannot be null.");
                 }
-                this.networkPolicy = networkPolicy2.index | this.networkPolicy;
+                this.networkPolicy = networkPolicy3.index | this.networkPolicy;
             }
         }
         return this;
@@ -280,7 +281,13 @@ public class RequestCreator {
             throw new IllegalArgumentException("Target must not be null.");
         } else if (this.deferred) {
             throw new IllegalStateException("Fit cannot be used with a Target.");
-        } else if (this.data.hasImage()) {
+        } else if (!this.data.hasImage()) {
+            this.picasso.cancelRequest(target);
+            if (this.setPlaceholder) {
+                drawable = getPlaceholderDrawable();
+            }
+            target.onPrepareLoad(drawable);
+        } else {
             Request createRequest = createRequest(nanoTime);
             String createKey = Utils.createKey(createRequest);
             if (MemoryPolicy.shouldReadFromMemoryCache(this.memoryPolicy)) {
@@ -296,12 +303,6 @@ public class RequestCreator {
             }
             target.onPrepareLoad(drawable);
             this.picasso.enqueueAndSubmit(new TargetAction(this.picasso, target, createRequest, this.memoryPolicy, this.networkPolicy, this.errorDrawable, createKey, this.tag, this.errorResId));
-        } else {
-            this.picasso.cancelRequest(target);
-            if (this.setPlaceholder) {
-                drawable = getPlaceholderDrawable();
-            }
-            target.onPrepareLoad(drawable);
         }
     }
 
@@ -353,7 +354,12 @@ public class RequestCreator {
         Utils.checkMain();
         if (imageView == null) {
             throw new IllegalArgumentException("Target must not be null.");
-        } else if (this.data.hasImage()) {
+        } else if (!this.data.hasImage()) {
+            this.picasso.cancelRequest(imageView);
+            if (this.setPlaceholder) {
+                PicassoDrawable.setPlaceholder(imageView, getPlaceholderDrawable());
+            }
+        } else {
             if (this.deferred) {
                 if (this.data.hasSize()) {
                     throw new IllegalStateException("Fit cannot be used with resize.");
@@ -390,11 +396,6 @@ public class RequestCreator {
                 PicassoDrawable.setPlaceholder(imageView, getPlaceholderDrawable());
             }
             this.picasso.enqueueAndSubmit(new ImageViewAction(this.picasso, imageView, createRequest, this.memoryPolicy, this.networkPolicy, this.errorResId, this.errorDrawable, createKey, this.tag, callback, this.noFade));
-        } else {
-            this.picasso.cancelRequest(imageView);
-            if (this.setPlaceholder) {
-                PicassoDrawable.setPlaceholder(imageView, getPlaceholderDrawable());
-            }
         }
     }
 
@@ -408,7 +409,7 @@ public class RequestCreator {
     private Request createRequest(long j) {
         int andIncrement = nextId.getAndIncrement();
         Request build = this.data.build();
-        build.id = andIncrement;
+        build.f444id = andIncrement;
         build.started = j;
         boolean z = this.picasso.loggingEnabled;
         if (z) {
@@ -416,7 +417,7 @@ public class RequestCreator {
         }
         Request transformRequest = this.picasso.transformRequest(build);
         if (transformRequest != build) {
-            transformRequest.id = andIncrement;
+            transformRequest.f444id = andIncrement;
             transformRequest.started = j;
             if (z) {
                 Utils.log("Main", "changed", transformRequest.logId(), "into " + transformRequest);

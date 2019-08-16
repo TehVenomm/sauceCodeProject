@@ -9,7 +9,6 @@ import com.zopim.android.sdk.api.ZopimChat;
 import com.zopim.android.sdk.api.ZopimChat.DefaultConfig;
 import com.zopim.android.sdk.api.ZopimChat.SessionConfig;
 import java.util.ArrayList;
-import java.util.List;
 import net.gogame.gowrap.support.ClassUtils;
 
 public final class ZopimHelper {
@@ -26,22 +25,22 @@ public final class ZopimHelper {
     }
 
     private static String encodeTagComponent(String str) {
-        StringBuilder stringBuilder = new StringBuilder();
+        boolean z;
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
-            Object obj;
             char charAt = str.charAt(i);
             if ((charAt < '0' || charAt > '9') && ((charAt < 'A' || charAt > 'Z') && !((charAt >= 'a' && charAt <= 'z') || charAt == '-' || charAt == '_'))) {
-                obj = null;
+                z = false;
             } else {
-                obj = 1;
+                z = true;
             }
-            if (obj != null) {
-                stringBuilder.append(charAt);
+            if (z) {
+                sb.append(charAt);
             } else {
-                stringBuilder.append('_');
+                sb.append('_');
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private static String makeTag(String str, String str2) {
@@ -49,7 +48,7 @@ public final class ZopimHelper {
     }
 
     private static String getAppLabel(Context context) {
-        CharSequence applicationLabel;
+        Object packageName;
         PackageManager packageManager = context.getPackageManager();
         ApplicationInfo applicationInfo = null;
         try {
@@ -57,11 +56,11 @@ public final class ZopimHelper {
         } catch (NameNotFoundException e) {
         }
         if (applicationInfo != null) {
-            applicationLabel = packageManager.getApplicationLabel(applicationInfo);
+            packageName = packageManager.getApplicationLabel(applicationInfo);
         } else {
-            applicationLabel = context.getApplicationContext().getPackageName();
+            packageName = context.getApplicationContext().getPackageName();
         }
-        return (String) applicationLabel;
+        return (String) packageName;
     }
 
     private static String getAppVersion(Context context) {
@@ -82,7 +81,7 @@ public final class ZopimHelper {
         String packageName = applicationContext.getPackageName();
         String appLabel = getAppLabel(applicationContext);
         String appVersion = getAppVersion(applicationContext);
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         if (packageName != null) {
             arrayList.add(makeTag("packageName", packageName));
         }

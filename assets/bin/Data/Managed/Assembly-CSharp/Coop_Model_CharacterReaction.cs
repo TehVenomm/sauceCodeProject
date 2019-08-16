@@ -10,6 +10,8 @@ public class Coop_Model_CharacterReaction : Coop_Model_ObjectSyncPositionBase
 
 	public int targetId;
 
+	public int deadReviveCount;
+
 	public Coop_Model_CharacterReaction()
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)

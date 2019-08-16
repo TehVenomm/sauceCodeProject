@@ -1,4 +1,4 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,12 +9,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.SimpleArrayMap;
+import android.support.p000v4.util.SimpleArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
+/* renamed from: android.support.v4.app.FragmentHostCallback */
 public abstract class FragmentHostCallback<E> extends FragmentContainer {
     private final Activity mActivity;
     private SimpleArrayMap<String, LoaderManager> mAllLoaderManagers;
@@ -43,26 +44,29 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
         this(fragmentActivity, fragmentActivity, fragmentActivity.mHandler, 0);
     }
 
-    void doLoaderDestroy() {
+    /* access modifiers changed from: 0000 */
+    public void doLoaderDestroy() {
         if (this.mLoaderManager != null) {
             this.mLoaderManager.doDestroy();
         }
     }
 
-    void doLoaderRetain() {
+    /* access modifiers changed from: 0000 */
+    public void doLoaderRetain() {
         if (this.mLoaderManager != null) {
             this.mLoaderManager.doRetain();
         }
     }
 
-    void doLoaderStart() {
+    /* access modifiers changed from: 0000 */
+    public void doLoaderStart() {
         if (!this.mLoadersStarted) {
             this.mLoadersStarted = true;
             if (this.mLoaderManager != null) {
                 this.mLoaderManager.doStart();
             } else if (!this.mCheckedForLoaderManager) {
                 this.mLoaderManager = getLoaderManager("(root)", this.mLoadersStarted, false);
-                if (!(this.mLoaderManager == null || this.mLoaderManager.mStarted)) {
+                if (this.mLoaderManager != null && !this.mLoaderManager.mStarted) {
                     this.mLoaderManager.doStart();
                 }
             }
@@ -70,7 +74,8 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
         }
     }
 
-    void doLoaderStop(boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void doLoaderStop(boolean z) {
         this.mRetainLoaders = z;
         if (this.mLoaderManager != null && this.mLoadersStarted) {
             this.mLoadersStarted = false;
@@ -82,7 +87,8 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
         }
     }
 
-    void dumpLoaders(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
+    /* access modifiers changed from: 0000 */
+    public void dumpLoaders(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
         printWriter.print(str);
         printWriter.print("mLoadersStarted=");
         printWriter.println(this.mLoadersStarted);
@@ -95,40 +101,46 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
         }
     }
 
-    Activity getActivity() {
+    /* access modifiers changed from: 0000 */
+    public Activity getActivity() {
         return this.mActivity;
     }
 
-    Context getContext() {
+    /* access modifiers changed from: 0000 */
+    public Context getContext() {
         return this.mContext;
     }
 
-    FragmentManagerImpl getFragmentManagerImpl() {
+    /* access modifiers changed from: 0000 */
+    public FragmentManagerImpl getFragmentManagerImpl() {
         return this.mFragmentManager;
     }
 
-    Handler getHandler() {
+    /* access modifiers changed from: 0000 */
+    public Handler getHandler() {
         return this.mHandler;
     }
 
-    LoaderManagerImpl getLoaderManager(String str, boolean z, boolean z2) {
+    /* access modifiers changed from: 0000 */
+    public LoaderManagerImpl getLoaderManager(String str, boolean z, boolean z2) {
         if (this.mAllLoaderManagers == null) {
-            this.mAllLoaderManagers = new SimpleArrayMap();
+            this.mAllLoaderManagers = new SimpleArrayMap<>();
         }
         LoaderManagerImpl loaderManagerImpl = (LoaderManagerImpl) this.mAllLoaderManagers.get(str);
-        if (loaderManagerImpl != null) {
-            loaderManagerImpl.updateHostController(this);
-            return loaderManagerImpl;
-        } else if (!z2) {
+        if (loaderManagerImpl == null && z2) {
+            LoaderManagerImpl loaderManagerImpl2 = new LoaderManagerImpl(str, this, z);
+            this.mAllLoaderManagers.put(str, loaderManagerImpl2);
+            return loaderManagerImpl2;
+        } else if (!z || loaderManagerImpl == null || loaderManagerImpl.mStarted) {
             return loaderManagerImpl;
         } else {
-            loaderManagerImpl = new LoaderManagerImpl(str, this, z);
-            this.mAllLoaderManagers.put(str, loaderManagerImpl);
+            loaderManagerImpl.doStart();
             return loaderManagerImpl;
         }
     }
 
-    LoaderManagerImpl getLoaderManagerImpl() {
+    /* access modifiers changed from: 0000 */
+    public LoaderManagerImpl getLoaderManagerImpl() {
         if (this.mLoaderManager != null) {
             return this.mLoaderManager;
         }
@@ -137,11 +149,13 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
         return this.mLoaderManager;
     }
 
-    boolean getRetainLoaders() {
+    /* access modifiers changed from: 0000 */
+    public boolean getRetainLoaders() {
         return this.mRetainLoaders;
     }
 
-    void inactivateFragment(String str) {
+    /* access modifiers changed from: 0000 */
+    public void inactivateFragment(String str) {
         if (this.mAllLoaderManagers != null) {
             LoaderManagerImpl loaderManagerImpl = (LoaderManagerImpl) this.mAllLoaderManagers.get(str);
             if (loaderManagerImpl != null && !loaderManagerImpl.mRetaining) {
@@ -151,7 +165,8 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
         }
     }
 
-    void onAttachFragment(Fragment fragment) {
+    /* access modifiers changed from: 0000 */
+    public void onAttachFragment(Fragment fragment) {
     }
 
     public void onDump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
@@ -213,7 +228,8 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
     public void onSupportInvalidateOptionsMenu() {
     }
 
-    void reportLoaderStart() {
+    /* access modifiers changed from: 0000 */
+    public void reportLoaderStart() {
         if (this.mAllLoaderManagers != null) {
             int size = this.mAllLoaderManagers.size();
             LoaderManagerImpl[] loaderManagerImplArr = new LoaderManagerImpl[size];
@@ -228,22 +244,29 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
         }
     }
 
-    void restoreLoaderNonConfig(SimpleArrayMap<String, LoaderManager> simpleArrayMap) {
+    /* access modifiers changed from: 0000 */
+    public void restoreLoaderNonConfig(SimpleArrayMap<String, LoaderManager> simpleArrayMap) {
+        if (simpleArrayMap != null) {
+            int size = simpleArrayMap.size();
+            for (int i = 0; i < size; i++) {
+                ((LoaderManagerImpl) simpleArrayMap.valueAt(i)).updateHostController(this);
+            }
+        }
         this.mAllLoaderManagers = simpleArrayMap;
     }
 
-    SimpleArrayMap<String, LoaderManager> retainLoaderNonConfig() {
-        int i;
-        int i2 = 0;
+    /* access modifiers changed from: 0000 */
+    public SimpleArrayMap<String, LoaderManager> retainLoaderNonConfig() {
+        boolean z;
         if (this.mAllLoaderManagers != null) {
             int size = this.mAllLoaderManagers.size();
             LoaderManagerImpl[] loaderManagerImplArr = new LoaderManagerImpl[size];
-            for (int i3 = size - 1; i3 >= 0; i3--) {
-                loaderManagerImplArr[i3] = (LoaderManagerImpl) this.mAllLoaderManagers.valueAt(i3);
+            for (int i = size - 1; i >= 0; i--) {
+                loaderManagerImplArr[i] = (LoaderManagerImpl) this.mAllLoaderManagers.valueAt(i);
             }
             boolean retainLoaders = getRetainLoaders();
-            i = 0;
-            while (i2 < size) {
+            z = false;
+            for (int i2 = 0; i2 < size; i2++) {
                 LoaderManagerImpl loaderManagerImpl = loaderManagerImplArr[i2];
                 if (!loaderManagerImpl.mRetaining && retainLoaders) {
                     if (!loaderManagerImpl.mStarted) {
@@ -252,16 +275,18 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
                     loaderManagerImpl.doRetain();
                 }
                 if (loaderManagerImpl.mRetaining) {
-                    i = 1;
+                    z = true;
                 } else {
                     loaderManagerImpl.doDestroy();
                     this.mAllLoaderManagers.remove(loaderManagerImpl.mWho);
                 }
-                i2++;
             }
         } else {
-            i = 0;
+            z = false;
         }
-        return i != 0 ? this.mAllLoaderManagers : null;
+        if (z) {
+            return this.mAllLoaderManagers;
+        }
+        return null;
     }
 }

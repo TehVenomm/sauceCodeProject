@@ -50,7 +50,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
 		public uint GetPlacementFor(string participantId)
 		{
-			return mPlacements.ContainsKey(participantId) ? mPlacements[participantId] : 0;
+			return mPlacements.ContainsKey(participantId) ? mPlacements[participantId] : 0u;
 		}
 
 		public override string ToString()

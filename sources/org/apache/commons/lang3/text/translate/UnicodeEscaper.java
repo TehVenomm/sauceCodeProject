@@ -1,6 +1,5 @@
 package org.apache.commons.lang3.text.translate;
 
-import com.google.android.gms.nearby.messages.Strategy;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -10,7 +9,7 @@ public class UnicodeEscaper extends CodePointTranslator {
     private final boolean between;
 
     public UnicodeEscaper() {
-        this(0, Strategy.TTL_SECONDS_INFINITE, true);
+        this(0, Integer.MAX_VALUE, true);
     }
 
     protected UnicodeEscaper(int i, int i2, boolean z) {
@@ -20,7 +19,7 @@ public class UnicodeEscaper extends CodePointTranslator {
     }
 
     public static UnicodeEscaper below(int i) {
-        return outsideOf(i, Strategy.TTL_SECONDS_INFINITE);
+        return outsideOf(i, Integer.MAX_VALUE);
     }
 
     public static UnicodeEscaper above(int i) {
@@ -55,7 +54,8 @@ public class UnicodeEscaper extends CodePointTranslator {
         return true;
     }
 
-    protected String toUtf16Escape(int i) {
-        return "\\u" + CharSequenceTranslator.hex(i);
+    /* access modifiers changed from: protected */
+    public String toUtf16Escape(int i) {
+        return "\\u" + hex(i);
     }
 }

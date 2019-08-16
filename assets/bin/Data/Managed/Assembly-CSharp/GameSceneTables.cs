@@ -106,7 +106,7 @@ public class GameSceneTables
 				int i = 0;
 				for (int count = preloadResourceList.Count; i < count; i++)
 				{
-					load_queue.Load(RESOURCE_CATEGORY.UI, preloadResourceList[i], false);
+					load_queue.Load(RESOURCE_CATEGORY.UI, preloadResourceList[i]);
 				}
 			}
 		}
@@ -167,10 +167,10 @@ public class GameSceneTables
 	public SceneData GetSceneData(string scene_name, string section_name)
 	{
 		SceneData sceneData = sceneDataTable.Get(scene_name);
-		if (sceneData != (SceneData)null && !string.IsNullOrEmpty(section_name) && sceneData.GetSectionData(section_name) == (SectionData)null)
+		if (sceneData != null && !string.IsNullOrEmpty(section_name) && sceneData.GetSectionData(section_name) == null)
 		{
 			SceneData sceneDataFromSectionName = GetSceneDataFromSectionName(section_name);
-			if (sceneDataFromSectionName != (SceneData)null)
+			if (sceneDataFromSectionName != null)
 			{
 				sceneData = sceneDataFromSectionName;
 			}
@@ -185,14 +185,21 @@ public class GameSceneTables
 		{
 			sceneDataTable.ForEach(delegate(SceneData o)
 			{
-				if (find_data == (SceneData)null && o.GetSectionData(section_name) != (SectionData)null)
+				if (find_data == null && o.GetSectionData(section_name) != null)
 				{
 					find_data = o;
-					if (LoungeMatchingManager.IsValidInLounge() && o.sceneName == "Home")
+					bool flag = LoungeMatchingManager.IsValidInLounge();
+					bool flag2 = ClanMatchingManager.IsValidInClan() || MonoBehaviourSingleton<ClanManager>.IsValid();
+					bool flag3 = !flag && !flag2;
+					if (flag && (o.sceneName == "Home" || o.sceneName == "Clan"))
 					{
 						find_data = null;
 					}
-					if (!LoungeMatchingManager.IsValidInLounge() && o.sceneName == "Lounge")
+					if (flag3 && (o.sceneName == "Lounge" || o.sceneName == "Clan"))
+					{
+						find_data = null;
+					}
+					if (flag2 && (o.sceneName == "Lounge" || o.sceneName == "Home"))
 					{
 						find_data = null;
 					}
@@ -204,10 +211,10 @@ public class GameSceneTables
 
 	public SceneData CreateSceneData(string scene_name, TextAsset text_asset)
 	{
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		try
 		{
-			CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,type,useRes,loadRes,appVer,evName,evTo,retBtn,strKey,strJP", true);
+			CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,type,useRes,loadRes,appVer,evName,evTo,retBtn,strKey,strJP", decrypt: true);
 			SceneData sceneData = new SceneData();
 			sceneData.sceneName = scene_name;
 			SectionData sectionData = null;
@@ -257,7 +264,7 @@ public class GameSceneTables
 					}, StringSplitOptions.RemoveEmptyEntries);
 					try
 					{
-						sectionData.type = (GAME_SECTION_TYPE)(int)Enum.Parse(typeof(GAME_SECTION_TYPE), sectionData.typeParams[0]);
+						sectionData.type = (GAME_SECTION_TYPE)Enum.Parse(typeof(GAME_SECTION_TYPE), sectionData.typeParams[0]);
 					}
 					catch (Exception)
 					{
@@ -327,17 +334,11 @@ public class GameSceneTables
 			}
 			sceneDataTable.Add(scene_name, sceneData);
 			return sceneData;
-			IL_038e:
-			SceneData result;
-			return result;
 		}
 		catch (Exception exc)
 		{
 			Log.Exception(exc);
 			return null;
-			IL_03a4:
-			SceneData result;
-			return result;
 		}
 	}
 
@@ -348,7 +349,7 @@ public class GameSceneTables
 
 	public void CreateCommonResourceTable(TextAsset text_asset)
 	{
-		CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,useRes", true);
+		CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,useRes", decrypt: true);
 		while (cSVReader.NextLine())
 		{
 			string value = string.Empty;

@@ -8,7 +8,6 @@ public class CoopMyClient : CoopClient
 
 	protected override void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		packetSender = this.get_gameObject().AddComponent<CoopClientPacketSender>();
 		base.Awake();
 	}
@@ -36,7 +35,7 @@ public class CoopMyClient : CoopClient
 	protected override void SetStatus(CLIENT_STATUS st)
 	{
 		base.SetStatus(st);
-		packetSender.SendClientStatus(0);
+		packetSender.SendClientStatus();
 	}
 
 	public override void SetLoadingPer(int per)
@@ -53,15 +52,48 @@ public class CoopMyClient : CoopClient
 		{
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
-				MonoBehaviourSingleton<InGameProgress>.I.FieldReentry();
+				if (_CheckWaveMatchRetire())
+				{
+					MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
+				}
+				else
+				{
+					MonoBehaviourSingleton<InGameProgress>.I.FieldReentry();
+				}
 			}
 		}
 		else if (!base.isBattleRetire && IsStageStart() && !MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOfflinePlay && !MonoBehaviourSingleton<CoopManager>.I.coopStage.isQuestClose)
 		{
 			string text = StringTable.Get(STRING_CATEGORY.IN_GAME, 100u);
-			UIInGamePopupDialog.PushOpen(text, false, 1.8f);
+			UIInGamePopupDialog.PushOpen(text, is_important: false);
 			MonoBehaviourSingleton<GoWrapManager>.I.trackBattleDisconnect();
 		}
+	}
+
+	private bool _CheckWaveMatchRetire()
+	{
+		if (!QuestManager.IsValidInGameWaveMatch())
+		{
+			return false;
+		}
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return true;
+		}
+		if (MonoBehaviourSingleton<StageObjectManager>.I.playerList.IsNullOrEmpty())
+		{
+			return true;
+		}
+		int i = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; i < count; i++)
+		{
+			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[i] as Player;
+			if (!(player == null) && !(player == MonoBehaviourSingleton<StageObjectManager>.I.self) && !player.isNpc)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void WelcomeClient(int clientId)

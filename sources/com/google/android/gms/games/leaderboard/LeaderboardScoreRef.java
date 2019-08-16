@@ -2,17 +2,17 @@ package com.google.android.gms.games.leaderboard;
 
 import android.database.CharArrayBuffer;
 import android.net.Uri;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayerRef;
 
-public final class LeaderboardScoreRef extends zzc implements LeaderboardScore {
-    private final PlayerRef zzhlm;
+public final class LeaderboardScoreRef extends DataBufferRef implements LeaderboardScore {
+    private final PlayerRef zzok;
 
     LeaderboardScoreRef(DataHolder dataHolder, int i) {
         super(dataHolder, i);
-        this.zzhlm = new PlayerRef(dataHolder, i);
+        this.zzok = new PlayerRef(dataHolder, i);
     }
 
     public final boolean equals(Object obj) {
@@ -28,7 +28,7 @@ public final class LeaderboardScoreRef extends zzc implements LeaderboardScore {
     }
 
     public final void getDisplayRank(CharArrayBuffer charArrayBuffer) {
-        zza("display_rank", charArrayBuffer);
+        copyToBuffer("display_rank", charArrayBuffer);
     }
 
     public final String getDisplayScore() {
@@ -36,7 +36,7 @@ public final class LeaderboardScoreRef extends zzc implements LeaderboardScore {
     }
 
     public final void getDisplayScore(CharArrayBuffer charArrayBuffer) {
-        zza("display_score", charArrayBuffer);
+        copyToBuffer("display_score", charArrayBuffer);
     }
 
     public final long getRank() {
@@ -48,35 +48,44 @@ public final class LeaderboardScoreRef extends zzc implements LeaderboardScore {
     }
 
     public final Player getScoreHolder() {
-        return zzfv("external_player_id") ? null : this.zzhlm;
+        if (hasNull("external_player_id")) {
+            return null;
+        }
+        return this.zzok;
     }
 
     public final String getScoreHolderDisplayName() {
-        return zzfv("external_player_id") ? getString("default_display_name") : this.zzhlm.getDisplayName();
+        return hasNull("external_player_id") ? getString("default_display_name") : this.zzok.getDisplayName();
     }
 
     public final void getScoreHolderDisplayName(CharArrayBuffer charArrayBuffer) {
-        if (zzfv("external_player_id")) {
-            zza("default_display_name", charArrayBuffer);
+        if (hasNull("external_player_id")) {
+            copyToBuffer("default_display_name", charArrayBuffer);
         } else {
-            this.zzhlm.getDisplayName(charArrayBuffer);
+            this.zzok.getDisplayName(charArrayBuffer);
         }
     }
 
     public final Uri getScoreHolderHiResImageUri() {
-        return zzfv("external_player_id") ? null : this.zzhlm.getHiResImageUri();
+        if (hasNull("external_player_id")) {
+            return null;
+        }
+        return this.zzok.getHiResImageUri();
     }
 
     public final String getScoreHolderHiResImageUrl() {
-        return zzfv("external_player_id") ? null : this.zzhlm.getHiResImageUrl();
+        if (hasNull("external_player_id")) {
+            return null;
+        }
+        return this.zzok.getHiResImageUrl();
     }
 
     public final Uri getScoreHolderIconImageUri() {
-        return zzfv("external_player_id") ? zzfu("default_display_image_uri") : this.zzhlm.getIconImageUri();
+        return hasNull("external_player_id") ? parseUri("default_display_image_uri") : this.zzok.getIconImageUri();
     }
 
     public final String getScoreHolderIconImageUrl() {
-        return zzfv("external_player_id") ? getString("default_display_image_url") : this.zzhlm.getIconImageUrl();
+        return hasNull("external_player_id") ? getString("default_display_image_url") : this.zzok.getIconImageUrl();
     }
 
     public final String getScoreTag() {

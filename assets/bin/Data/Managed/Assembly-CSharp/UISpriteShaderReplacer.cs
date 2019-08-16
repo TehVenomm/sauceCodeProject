@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UISpriteShaderReplacer
+public class UISpriteShaderReplacer : MonoBehaviour
 {
 	private class AtlasEntry
 	{
@@ -34,8 +34,7 @@ public class UISpriteShaderReplacer
 	public void Replace(string shaderName)
 	{
 		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Expected O, but got Unknown
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cb: Expected O, but got Unknown
 		if (!Object.op_Implicit(sprite))
 		{
 			Awake();
@@ -72,29 +71,29 @@ public class UISpriteShaderReplacer
 
 	private void OnDestroy()
 	{
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		if (!AppMain.isApplicationQuit && entry != null)
+		if (AppMain.isApplicationQuit || entry == null)
 		{
-			entry.refCount--;
-			if (entry.refCount <= 0)
+			return;
+		}
+		entry.refCount--;
+		if (entry.refCount <= 0)
+		{
+			UIAtlas uIAtlas = null;
+			foreach (KeyValuePair<UIAtlas, AtlasEntry> atlase in atlases)
 			{
-				UIAtlas uIAtlas = null;
-				foreach (KeyValuePair<UIAtlas, AtlasEntry> atlase in atlases)
+				if (atlase.Value == entry)
 				{
-					if (atlase.Value == entry)
-					{
-						uIAtlas = atlase.Key;
-					}
+					uIAtlas = atlase.Key;
 				}
-				if (null != uIAtlas)
-				{
-					atlases.Remove(uIAtlas);
-				}
-				if (Object.op_Implicit(entry.atlas))
-				{
-					Object.Destroy(entry.atlas.spriteMaterial);
-					Object.Destroy(entry.atlas.get_gameObject());
-				}
+			}
+			if (null != uIAtlas)
+			{
+				atlases.Remove(uIAtlas);
+			}
+			if (Object.op_Implicit(entry.atlas))
+			{
+				Object.Destroy(entry.atlas.spriteMaterial);
+				Object.Destroy(entry.atlas.get_gameObject());
 			}
 		}
 	}

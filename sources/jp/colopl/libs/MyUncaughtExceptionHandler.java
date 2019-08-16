@@ -1,4 +1,4 @@
-package jp.colopl.libs;
+package p018jp.colopl.libs;
 
 import android.os.Environment;
 import java.io.File;
@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 import org.apache.commons.lang3.StringUtils;
 
+/* renamed from: jp.colopl.libs.MyUncaughtExceptionHandler */
 public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
     private static final String TAG = "MyUncaughtExceptionHandler";
     private UncaughtExceptionHandler mDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();
@@ -21,41 +22,38 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
     }
 
     private void saveState(Thread thread, Throwable th) throws FileNotFoundException {
-        int i = 0;
         PrintWriter printWriter = new PrintWriter(new FileOutputStream(getTempFile()));
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("----Thread-----\n");
-        stringBuilder.append("Thread: ").append(thread.toString()).append(StringUtils.LF);
-        stringBuilder.append("----Exception-----").append(StringUtils.LF);
-        stringBuilder.append("Class: ").append(th.getClass().getCanonicalName()).append(StringUtils.LF);
-        stringBuilder.append("Message: ").append(th.getMessage()).append(StringUtils.LF);
-        printWriter.print(stringBuilder.toString());
+        StringBuilder sb = new StringBuilder();
+        sb.append("----Thread-----\n");
+        sb.append("Thread: ").append(thread.toString()).append(StringUtils.f1199LF);
+        sb.append("----Exception-----").append(StringUtils.f1199LF);
+        sb.append("Class: ").append(th.getClass().getCanonicalName()).append(StringUtils.f1199LF);
+        sb.append("Message: ").append(th.getMessage()).append(StringUtils.f1199LF);
+        printWriter.print(sb.toString());
         StackTraceElement[] stackTrace = th.getStackTrace();
         if (stackTrace != null) {
-            stringBuilder.setLength(0);
+            sb.setLength(0);
             for (StackTraceElement stackTraceElement : stackTrace) {
-                stringBuilder.append("     at ").append(stackTraceElement.toString()).append(StringUtils.LF);
+                sb.append("     at ").append(stackTraceElement.toString()).append(StringUtils.f1199LF);
             }
-            printWriter.print(stringBuilder.toString());
+            printWriter.print(sb.toString());
         }
         printWriter.println("----Cause-----");
         Throwable cause = th.getCause();
         if (cause == null) {
             printWriter.println("cause is null");
         } else {
-            stringBuilder.setLength(0);
-            stringBuilder.append("Class: ").append(cause.getClass().getCanonicalName()).append(StringUtils.LF);
-            stringBuilder.append("Message: ").append(cause.getMessage()).append(StringUtils.LF);
-            printWriter.print(stringBuilder.toString());
+            sb.setLength(0);
+            sb.append("Class: ").append(cause.getClass().getCanonicalName()).append(StringUtils.f1199LF);
+            sb.append("Message: ").append(cause.getMessage()).append(StringUtils.f1199LF);
+            printWriter.print(sb.toString());
             StackTraceElement[] stackTrace2 = cause.getStackTrace();
             if (stackTrace2 != null) {
-                stringBuilder.setLength(0);
-                int length = stackTrace2.length;
-                while (i < length) {
-                    stringBuilder.append("     at ").append(stackTrace2[i].toString()).append(StringUtils.LF);
-                    i++;
+                sb.setLength(0);
+                for (StackTraceElement stackTraceElement2 : stackTrace2) {
+                    sb.append("     at ").append(stackTraceElement2.toString()).append(StringUtils.f1199LF);
                 }
-                printWriter.print(stringBuilder.toString());
+                printWriter.print(sb.toString());
             }
         }
         printWriter.println("-------------------------------");

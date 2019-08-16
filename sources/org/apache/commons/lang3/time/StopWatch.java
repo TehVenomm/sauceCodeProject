@@ -15,63 +15,78 @@ public class StopWatch {
 
     private enum State {
         UNSTARTED {
-            boolean isStarted() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStarted() {
                 return false;
             }
 
-            boolean isStopped() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStopped() {
                 return true;
             }
 
-            boolean isSuspended() {
+            /* access modifiers changed from: 0000 */
+            public boolean isSuspended() {
                 return false;
             }
         },
         RUNNING {
-            boolean isStarted() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStarted() {
                 return true;
             }
 
-            boolean isStopped() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStopped() {
                 return false;
             }
 
-            boolean isSuspended() {
+            /* access modifiers changed from: 0000 */
+            public boolean isSuspended() {
                 return false;
             }
         },
         STOPPED {
-            boolean isStarted() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStarted() {
                 return false;
             }
 
-            boolean isStopped() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStopped() {
                 return true;
             }
 
-            boolean isSuspended() {
+            /* access modifiers changed from: 0000 */
+            public boolean isSuspended() {
                 return false;
             }
         },
         SUSPENDED {
-            boolean isStarted() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStarted() {
                 return true;
             }
 
-            boolean isStopped() {
+            /* access modifiers changed from: 0000 */
+            public boolean isStopped() {
                 return false;
             }
 
-            boolean isSuspended() {
+            /* access modifiers changed from: 0000 */
+            public boolean isSuspended() {
                 return true;
             }
         };
 
-        abstract boolean isStarted();
+        /* access modifiers changed from: 0000 */
+        public abstract boolean isStarted();
 
-        abstract boolean isStopped();
+        /* access modifiers changed from: 0000 */
+        public abstract boolean isStopped();
 
-        abstract boolean isSuspended();
+        /* access modifiers changed from: 0000 */
+        public abstract boolean isSuspended();
     }
 
     public void start() {

@@ -26,7 +26,7 @@ public class SmithCreateItem : EquipGenerateBase
 	{
 		if (MonoBehaviourSingleton<AchievementManager>.I.CheckEquipItemCollection(GetEquipTableData()))
 		{
-			GameSection.ChangeEvent("START_REGISTED", null);
+			GameSection.ChangeEvent("START_REGISTED");
 		}
 		base.OnQuery_START();
 	}
@@ -55,5 +55,14 @@ public class SmithCreateItem : EquipGenerateBase
 	{
 		SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
 		return smithData.createEquipItemTable.id;
+	}
+
+	private void OnQuery_SECTION_BACK()
+	{
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("SmithCreateItemSelect"))
+		{
+			GameSection.StopEvent();
+			TO_UNIQUE_OR_MAIN_STATUS();
+		}
 	}
 }

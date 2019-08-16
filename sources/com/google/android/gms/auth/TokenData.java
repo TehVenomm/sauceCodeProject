@@ -5,34 +5,49 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 import java.util.List;
 
-public class TokenData extends zza implements ReflectedParcelable {
-    public static final Creator<TokenData> CREATOR = new zzj();
-    private int zzdxt;
-    private final String zzdxu;
-    private final Long zzdxv;
-    private final boolean zzdxw;
-    private final boolean zzdxx;
-    private final List<String> zzdxy;
+@Class(creator = "TokenDataCreator")
+public class TokenData extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<TokenData> CREATOR = new zzk();
+    @Field(getter = "getGrantedScopes", mo13990id = 6)
+    private final List<String> zzaa;
+    @Field(getter = "getScopeData", mo13990id = 7)
+    private final String zzab;
+    @VersionField(mo13996id = 1)
+    private final int zzv;
+    @Field(getter = "getToken", mo13990id = 2)
+    private final String zzw;
+    @Field(getter = "getExpirationTimeSecs", mo13990id = 3)
+    private final Long zzx;
+    @Field(getter = "isCached", mo13990id = 4)
+    private final boolean zzy;
+    @Field(getter = "isSnowballed", mo13990id = 5)
+    private final boolean zzz;
 
-    TokenData(int i, String str, Long l, boolean z, boolean z2, List<String> list) {
-        this.zzdxt = i;
-        this.zzdxu = zzbp.zzgf(str);
-        this.zzdxv = l;
-        this.zzdxw = z;
-        this.zzdxx = z2;
-        this.zzdxy = list;
+    @Constructor
+    TokenData(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) String str, @Param(mo13993id = 3) Long l, @Param(mo13993id = 4) boolean z, @Param(mo13993id = 5) boolean z2, @Param(mo13993id = 6) List<String> list, @Param(mo13993id = 7) String str2) {
+        this.zzv = i;
+        this.zzw = Preconditions.checkNotEmpty(str);
+        this.zzx = l;
+        this.zzy = z;
+        this.zzz = z2;
+        this.zzaa = list;
+        this.zzab = str2;
     }
 
     @Nullable
-    public static TokenData zzd(Bundle bundle, String str) {
+    public static TokenData zza(Bundle bundle, String str) {
         bundle.setClassLoader(TokenData.class.getClassLoader());
         Bundle bundle2 = bundle.getBundle(str);
         if (bundle2 == null) {
@@ -47,25 +62,26 @@ public class TokenData extends zza implements ReflectedParcelable {
             return false;
         }
         TokenData tokenData = (TokenData) obj;
-        return TextUtils.equals(this.zzdxu, tokenData.zzdxu) && zzbf.equal(this.zzdxv, tokenData.zzdxv) && this.zzdxw == tokenData.zzdxw && this.zzdxx == tokenData.zzdxx && zzbf.equal(this.zzdxy, tokenData.zzdxy);
-    }
-
-    public final String getToken() {
-        return this.zzdxu;
+        return TextUtils.equals(this.zzw, tokenData.zzw) && Objects.equal(this.zzx, tokenData.zzx) && this.zzy == tokenData.zzy && this.zzz == tokenData.zzz && Objects.equal(this.zzaa, tokenData.zzaa) && Objects.equal(this.zzab, tokenData.zzab);
     }
 
     public int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzdxu, this.zzdxv, Boolean.valueOf(this.zzdxw), Boolean.valueOf(this.zzdxx), this.zzdxy});
+        return Objects.hashCode(this.zzw, this.zzx, Boolean.valueOf(this.zzy), Boolean.valueOf(this.zzz), this.zzaa, this.zzab);
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.zzdxt);
-        zzd.zza(parcel, 2, this.zzdxu, false);
-        zzd.zza(parcel, 3, this.zzdxv, false);
-        zzd.zza(parcel, 4, this.zzdxw);
-        zzd.zza(parcel, 5, this.zzdxx);
-        zzd.zzb(parcel, 6, this.zzdxy, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zzv);
+        SafeParcelWriter.writeString(parcel, 2, this.zzw, false);
+        SafeParcelWriter.writeLongObject(parcel, 3, this.zzx, false);
+        SafeParcelWriter.writeBoolean(parcel, 4, this.zzy);
+        SafeParcelWriter.writeBoolean(parcel, 5, this.zzz);
+        SafeParcelWriter.writeStringList(parcel, 6, this.zzaa, false);
+        SafeParcelWriter.writeString(parcel, 7, this.zzab, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    public final String zzb() {
+        return this.zzw;
     }
 }

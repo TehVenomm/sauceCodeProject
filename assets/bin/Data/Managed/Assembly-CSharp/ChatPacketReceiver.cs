@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class ChatPacketReceiver
+public class ChatPacketReceiver : MonoBehaviour
 {
 	[SerializeField]
 	private List<ChatPacket> m_packets = new List<ChatPacket>();
@@ -47,23 +47,24 @@ public class ChatPacketReceiver
 
 	protected virtual void PacketUpdate()
 	{
-		if (!stopPacketUpdate)
+		if (stopPacketUpdate)
 		{
-			int i = 0;
-			for (int count = packets.Count; i < count; i++)
-			{
-				if (stopPacketUpdate)
-				{
-					break;
-				}
-				ChatPacket packet = packets[i];
-				if (HandleCoopEvent(packet))
-				{
-					AddDeleteQueue(packet);
-				}
-			}
-			EraseUsedPacket();
+			return;
 		}
+		int i = 0;
+		for (int count = packets.Count; i < count; i++)
+		{
+			if (stopPacketUpdate)
+			{
+				break;
+			}
+			ChatPacket packet = packets[i];
+			if (HandleCoopEvent(packet))
+			{
+				AddDeleteQueue(packet);
+			}
+		}
+		EraseUsedPacket();
 	}
 
 	protected virtual bool HandleCoopEvent(ChatPacket packet)

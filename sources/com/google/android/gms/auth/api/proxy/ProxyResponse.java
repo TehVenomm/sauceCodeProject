@@ -5,29 +5,42 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import com.google.android.gms.common.annotation.KeepForSdkWithMembers;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 @KeepForSdkWithMembers
-public class ProxyResponse extends zza {
+@Class(creator = "ProxyResponseCreator")
+public class ProxyResponse extends AbstractSafeParcelable {
     public static final Creator<ProxyResponse> CREATOR = new zzb();
     public static final int STATUS_CODE_NO_CONNECTION = -1;
+    @Field(mo13990id = 5)
     public final byte[] body;
+    @Field(mo13990id = 1)
     public final int googlePlayServicesStatusCode;
+    @Field(mo13990id = 2)
     public final PendingIntent recoveryAction;
+    @Field(mo13990id = 3)
     public final int statusCode;
-    private int versionCode;
-    private Bundle zzebo;
+    @VersionField(mo13996id = 1000)
+    private final int versionCode;
+    @Field(mo13990id = 4)
+    private final Bundle zzby;
 
-    ProxyResponse(int i, int i2, PendingIntent pendingIntent, int i3, Bundle bundle, byte[] bArr) {
+    @Constructor
+    ProxyResponse(@Param(mo13993id = 1000) int i, @Param(mo13993id = 1) int i2, @Param(mo13993id = 2) PendingIntent pendingIntent, @Param(mo13993id = 3) int i3, @Param(mo13993id = 4) Bundle bundle, @Param(mo13993id = 5) byte[] bArr) {
         this.versionCode = i;
         this.googlePlayServicesStatusCode = i2;
         this.statusCode = i3;
-        this.zzebo = bundle;
+        this.zzby = bundle;
         this.body = bArr;
         this.recoveryAction = pendingIntent;
     }
@@ -41,14 +54,14 @@ public class ProxyResponse extends zza {
     }
 
     public ProxyResponse(int i, Map<String, String> map, byte[] bArr) {
-        this(i, zzo(map), bArr);
+        this(i, zza(map), bArr);
     }
 
     public static ProxyResponse createErrorProxyResponse(int i, PendingIntent pendingIntent, int i2, Map<String, String> map, byte[] bArr) {
-        return new ProxyResponse(1, i, pendingIntent, i2, zzo(map), bArr);
+        return new ProxyResponse(1, i, pendingIntent, i2, zza(map), bArr);
     }
 
-    private static Bundle zzo(Map<String, String> map) {
+    private static Bundle zza(Map<String, String> map) {
         Bundle bundle = new Bundle();
         if (map != null) {
             for (Entry entry : map.entrySet()) {
@@ -59,24 +72,24 @@ public class ProxyResponse extends zza {
     }
 
     public Map<String, String> getHeaders() {
-        if (this.zzebo == null) {
+        if (this.zzby == null) {
             return Collections.emptyMap();
         }
-        Map<String, String> hashMap = new HashMap();
-        for (String str : this.zzebo.keySet()) {
-            hashMap.put(str, this.zzebo.getString(str));
+        HashMap hashMap = new HashMap();
+        for (String str : this.zzby.keySet()) {
+            hashMap.put(str, this.zzby.getString(str));
         }
         return hashMap;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.googlePlayServicesStatusCode);
-        zzd.zza(parcel, 2, this.recoveryAction, i, false);
-        zzd.zzc(parcel, 3, this.statusCode);
-        zzd.zza(parcel, 4, this.zzebo, false);
-        zzd.zza(parcel, 5, this.body, false);
-        zzd.zzc(parcel, 1000, this.versionCode);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.googlePlayServicesStatusCode);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.recoveryAction, i, false);
+        SafeParcelWriter.writeInt(parcel, 3, this.statusCode);
+        SafeParcelWriter.writeBundle(parcel, 4, this.zzby, false);
+        SafeParcelWriter.writeByteArray(parcel, 5, this.body, false);
+        SafeParcelWriter.writeInt(parcel, 1000, this.versionCode);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

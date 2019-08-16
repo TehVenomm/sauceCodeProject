@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TweenBlur
+public class TweenBlur : MonoBehaviour
 {
 	[Range(0f, 5f)]
 	public float from = 1f;
@@ -59,15 +59,14 @@ public class TweenBlur
 		if (timer < delay)
 		{
 			lod = from;
+			return;
 		}
-		else if (timer < duration + duration)
+		if (timer < duration + duration)
 		{
 			lod = Mathf.Lerp(from, to, (timer - duration) / duration);
+			return;
 		}
-		else
-		{
-			lod = to;
-			this.set_enabled(false);
-		}
+		lod = to;
+		this.set_enabled(false);
 	}
 }

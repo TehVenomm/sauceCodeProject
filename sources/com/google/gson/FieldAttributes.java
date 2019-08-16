@@ -10,12 +10,13 @@ import java.util.Collection;
 public final class FieldAttributes {
     private final Field field;
 
-    public FieldAttributes(Field field) {
-        C$Gson$Preconditions.checkNotNull(field);
-        this.field = field;
+    public FieldAttributes(Field field2) {
+        C$Gson$Preconditions.checkNotNull(field2);
+        this.field = field2;
     }
 
-    Object get(Object obj) throws IllegalAccessException {
+    /* access modifiers changed from: 0000 */
+    public Object get(Object obj) throws IllegalAccessException {
         return this.field.get(obj);
     }
 
@@ -47,7 +48,8 @@ public final class FieldAttributes {
         return (this.field.getModifiers() & i) != 0;
     }
 
-    boolean isSynthetic() {
+    /* access modifiers changed from: 0000 */
+    public boolean isSynthetic() {
         return this.field.isSynthetic();
     }
 }

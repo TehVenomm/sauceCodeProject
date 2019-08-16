@@ -2,11 +2,15 @@ package com.google.android.gms.games.multiplayer.realtime;
 
 import android.content.Intent;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.util.VisibleForTesting;
 import java.util.List;
 
+@Deprecated
+@VisibleForTesting
 public interface RealTimeMultiplayer {
     public static final int REAL_TIME_MESSAGE_FAILED = -1;
 
+    @Deprecated
     public interface ReliableMessageSentCallback {
         void onRealTimeMessageSent(int i, int i2, String str);
     }
@@ -17,10 +21,8 @@ public interface RealTimeMultiplayer {
 
     void dismissInvitation(GoogleApiClient googleApiClient, String str);
 
-    @Deprecated
     Intent getSelectOpponentsIntent(GoogleApiClient googleApiClient, int i, int i2);
 
-    @Deprecated
     Intent getSelectOpponentsIntent(GoogleApiClient googleApiClient, int i, int i2, boolean z);
 
     Intent getWaitingRoomIntent(GoogleApiClient googleApiClient, Room room, int i);

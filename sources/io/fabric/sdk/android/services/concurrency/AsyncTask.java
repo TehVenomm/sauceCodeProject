@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.concurrency;
+package p017io.fabric.sdk.android.services.concurrency;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -20,6 +20,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask */
 public abstract class AsyncTask<Params, Progress, Result> {
     private static final int CORE_POOL_SIZE = (CPU_COUNT + 1);
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
@@ -33,13 +34,20 @@ public abstract class AsyncTask<Params, Progress, Result> {
     private static volatile Executor defaultExecutor = SERIAL_EXECUTOR;
     private static final InternalHandler handler = new InternalHandler();
     private static final BlockingQueue<Runnable> poolWorkQueue = new LinkedBlockingQueue(128);
-    private static final ThreadFactory threadFactory = new C09251();
+    private static final ThreadFactory threadFactory = new ThreadFactory() {
+        private final AtomicInteger count = new AtomicInteger(1);
+
+        public Thread newThread(Runnable runnable) {
+            return new Thread(runnable, "AsyncTask #" + this.count.getAndIncrement());
+        }
+    };
     private final AtomicBoolean cancelled = new AtomicBoolean();
     private final FutureTask<Result> future = new FutureTask<Result>(this.worker) {
-        protected void done() {
+        /* access modifiers changed from: protected */
+        public void done() {
             try {
                 AsyncTask.this.postResultIfNotInvoked(get());
-            } catch (Throwable e) {
+            } catch (InterruptedException e) {
                 Log.w(AsyncTask.LOG_TAG, e);
             } catch (ExecutionException e2) {
                 throw new RuntimeException("An error occured while executing doInBackground()", e2.getCause());
@@ -49,41 +57,17 @@ public abstract class AsyncTask<Params, Progress, Result> {
         }
     };
     private volatile Status status = Status.PENDING;
-    private final AtomicBoolean taskInvoked = new AtomicBoolean();
-    private final WorkerRunnable<Params, Result> worker = new C09262();
-
-    /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$1 */
-    static final class C09251 implements ThreadFactory {
-        private final AtomicInteger count = new AtomicInteger(1);
-
-        C09251() {
-        }
-
-        public Thread newThread(Runnable runnable) {
-            return new Thread(runnable, "AsyncTask #" + this.count.getAndIncrement());
-        }
-    }
-
-    private static abstract class WorkerRunnable<Params, Result> implements Callable<Result> {
-        Params[] params;
-
-        private WorkerRunnable() {
-        }
-    }
-
-    /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$2 */
-    class C09262 extends WorkerRunnable<Params, Result> {
-        C09262() {
-            super();
-        }
-
+    /* access modifiers changed from: private */
+    public final AtomicBoolean taskInvoked = new AtomicBoolean();
+    private final WorkerRunnable<Params, Result> worker = new WorkerRunnable<Params, Result>() {
         public Result call() throws Exception {
             AsyncTask.this.taskInvoked.set(true);
             Process.setThreadPriority(10);
             return AsyncTask.this.postResult(AsyncTask.this.doInBackground(this.params));
         }
-    }
+    };
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$AsyncTaskResult */
     private static class AsyncTaskResult<Data> {
         final Data[] data;
         final AsyncTask task;
@@ -94,6 +78,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
         }
     }
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$InternalHandler */
     private static class InternalHandler extends Handler {
         public InternalHandler() {
             super(Looper.getMainLooper());
@@ -114,12 +99,13 @@ public abstract class AsyncTask<Params, Progress, Result> {
         }
     }
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$SerialExecutor */
     private static class SerialExecutor implements Executor {
         Runnable active;
         final LinkedList<Runnable> tasks;
 
         private SerialExecutor() {
-            this.tasks = new LinkedList();
+            this.tasks = new LinkedList<>();
         }
 
         public void execute(final Runnable runnable) {
@@ -139,7 +125,8 @@ public abstract class AsyncTask<Params, Progress, Result> {
             }
         }
 
-        protected void scheduleNext() {
+        /* access modifiers changed from: protected */
+        public void scheduleNext() {
             synchronized (this) {
                 Runnable runnable = (Runnable) this.tasks.poll();
                 this.active = runnable;
@@ -150,17 +137,27 @@ public abstract class AsyncTask<Params, Progress, Result> {
         }
     }
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$Status */
     public enum Status {
         PENDING,
         RUNNING,
         FINISHED
     }
 
+    /* renamed from: io.fabric.sdk.android.services.concurrency.AsyncTask$WorkerRunnable */
+    private static abstract class WorkerRunnable<Params, Result> implements Callable<Result> {
+        Params[] params;
+
+        private WorkerRunnable() {
+        }
+    }
+
     public static void execute(Runnable runnable) {
         defaultExecutor.execute(runnable);
     }
 
-    private void finish(Result result) {
+    /* access modifiers changed from: private */
+    public void finish(Result result) {
         if (isCancelled()) {
             onCancelled(result);
         } else {
@@ -173,12 +170,14 @@ public abstract class AsyncTask<Params, Progress, Result> {
         handler.getLooper();
     }
 
-    private Result postResult(Result result) {
+    /* access modifiers changed from: private */
+    public Result postResult(Result result) {
         handler.obtainMessage(1, new AsyncTaskResult(this, result)).sendToTarget();
         return result;
     }
 
-    private void postResultIfNotInvoked(Result result) {
+    /* access modifiers changed from: private */
+    public void postResultIfNotInvoked(Result result) {
         if (!this.taskInvoked.get()) {
             postResult(result);
         }
@@ -193,7 +192,8 @@ public abstract class AsyncTask<Params, Progress, Result> {
         return this.future.cancel(z);
     }
 
-    protected abstract Result doInBackground(Params... paramsArr);
+    /* access modifiers changed from: protected */
+    public abstract Result doInBackground(Params... paramsArr);
 
     public final AsyncTask<Params, Progress, Result> execute(Params... paramsArr) {
         return executeOnExecutor(defaultExecutor, paramsArr);
@@ -231,23 +231,29 @@ public abstract class AsyncTask<Params, Progress, Result> {
         return this.cancelled.get();
     }
 
-    protected void onCancelled() {
+    /* access modifiers changed from: protected */
+    public void onCancelled() {
     }
 
-    protected void onCancelled(Result result) {
+    /* access modifiers changed from: protected */
+    public void onCancelled(Result result) {
         onCancelled();
     }
 
-    protected void onPostExecute(Result result) {
+    /* access modifiers changed from: protected */
+    public void onPostExecute(Result result) {
     }
 
-    protected void onPreExecute() {
+    /* access modifiers changed from: protected */
+    public void onPreExecute() {
     }
 
-    protected void onProgressUpdate(Progress... progressArr) {
+    /* access modifiers changed from: protected */
+    public void onProgressUpdate(Progress... progressArr) {
     }
 
-    protected final void publishProgress(Progress... progressArr) {
+    /* access modifiers changed from: protected */
+    public final void publishProgress(Progress... progressArr) {
         if (!isCancelled()) {
             handler.obtainMessage(2, new AsyncTaskResult(this, progressArr)).sendToTarget();
         }

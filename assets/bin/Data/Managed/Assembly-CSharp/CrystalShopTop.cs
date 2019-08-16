@@ -91,8 +91,11 @@ public class CrystalShopTop : GameSection
 		OBJ_OFFER,
 		SPR_GOODBUY,
 		SPR_BESTVALUE,
-		SPR_ONETIMESOFFER
+		SPR_ONETIMESOFFER,
+		LBL_SERVICE_MESSAGE
 	}
+
+	private const string TRADING_POST_LICENSE = "TradingPostLicense";
 
 	private List<ProductData> _purchaseGemList = new List<ProductData>();
 
@@ -136,7 +139,6 @@ public class CrystalShopTop : GameSection
 
 	public override void Initialize()
 	{
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
 		_objBundle = GetCtrl(UI.OBJ_BUNDLE);
 		ShopReceiver i = MonoBehaviourSingleton<ShopReceiver>.I;
 		i.onBillingUnavailable = (Action)Delegate.Combine(i.onBillingUnavailable, new Action(onBillingUnavailable));
@@ -157,11 +159,11 @@ public class CrystalShopTop : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<ShopManager>.I.SendGetGoldPurchaseItemList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator34)/*Error near IL_0031: stateMachine*/)._003Cwait_003E__0 = false;
+			wait = false;
 		});
 		while (wait)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (_nativeStoreList != null && _nativeStoreList.shopList != null && _nativeStoreList.shopList.Count > 0)
 		{
@@ -169,13 +171,13 @@ public class CrystalShopTop : GameSection
 		}
 		else
 		{
-			List<string> item_ids = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
+			List<string> list = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
 			select o.productId).ToList();
-			Native.GetProductDatas(string.Join("----", item_ids.ToArray()));
+			Native.GetProductDatas(string.Join("----", list.ToArray()));
 		}
 		while (!_isFinishGetNativeProductlist)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		_purchaseGemList = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
 		where o.productType == 1
@@ -195,7 +197,14 @@ public class CrystalShopTop : GameSection
 		if (pId != null)
 		{
 			_viewType = VIEW_TYPE.BUNDLE;
+			int num = _purchaseBundleList.FindIndex((ProductData _purchaseBundle) => _purchaseBundle.productId == pId);
+			if (num >= 0)
+			{
+				_currentPageIndex = num;
+			}
 		}
+		SetActive((Enum)UI.LBL_SERVICE_MESSAGE, MonoBehaviourSingleton<AccountManager>.I.usageLimitMode);
+		SetLabelText((Enum)UI.LBL_SERVICE_MESSAGE, string.Format(base.sectionData.GetText("SERVICE_LIMITED")));
 		base.Initialize();
 	}
 
@@ -244,17 +253,17 @@ public class CrystalShopTop : GameSection
 
 	private void _viewGemTab()
 	{
-		SetActive(gemTab, true);
-		SetActive(bundleTab, false);
-		SetActive(materialTab, false);
+		SetActive(gemTab, is_visible: true);
+		SetActive(bundleTab, is_visible: false);
+		SetActive(materialTab, is_visible: false);
 		CheckOpenedGemTab();
 		int j = 0;
-		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, false, delegate(int i, Transform p)
+		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, reset: false, delegate(int i, Transform p)
 		{
 			ProductData productData2 = _purchaseGemList[j];
-			if (MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasSpecial(productData2.productId))
+			if (MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasSpecial(productData2.productId) || (MonoBehaviourSingleton<GoGameSettingsManager>.IsValid() && MonoBehaviourSingleton<GoGameSettingsManager>.I.UseShopUI3(productData2.productId)))
 			{
-				return Realizes("CrystalShopListItem2", p, true);
+				return Realizes("CrystalShopListItem2", p);
 			}
 			return null;
 		}, delegate(int i, Transform t, bool b)
@@ -263,17 +272,17 @@ public class CrystalShopTop : GameSection
 			SetSprite(t, UI.SPR_THUMB, productData.iconImg);
 			SetLabelText(t, UI.LBL_NAME, productData.name);
 			SetLabelText(t, UI.LBL_PRICE, string.Format(base.sectionData.GetText("PRICE"), productData.priceIncludeTax));
-			SetSupportEncoding(t, UI.LBL_PROMO, true);
+			SetSupportEncoding(t, UI.LBL_PROMO, isEnable: true);
 			SetLabelText(t, UI.LBL_PROMO, productData.promo.Replace("\\n", "\n"));
 			if (productData.remainingDay > 0)
 			{
-				SetActive(t, UI.SPR_SOLD, true);
-				SetActive(t, UI.SPR_SOLD_MASK, true);
+				SetActive(t, UI.SPR_SOLD, is_visible: true);
+				SetActive(t, UI.SPR_SOLD_MASK, is_visible: true);
 			}
 			else
 			{
-				SetActive(t, UI.SPR_SOLD, false);
-				SetActive(t, UI.SPR_SOLD_MASK, false);
+				SetActive(t, UI.SPR_SOLD, is_visible: false);
+				SetActive(t, UI.SPR_SOLD_MASK, is_visible: false);
 				if (productData.offerType > 0)
 				{
 					UITexture spro = FindCtrl(t, UI.OBJ_OFFER).GetComponent<UITexture>();
@@ -300,33 +309,47 @@ public class CrystalShopTop : GameSection
 
 	private void _viewBundleTab()
 	{
-		//IL_03b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-		SetActive(gemTab, false);
-		SetActive(materialTab, false);
-		SetActive(bundleTab, true);
+		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+		//IL_041e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0428: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0441: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044b: Unknown result type (might be due to invalid IL or missing references)
+		SetActive(gemTab, is_visible: false);
+		SetActive(materialTab, is_visible: false);
+		SetActive(bundleTab, is_visible: true);
 		CheckOpenedBundleTab();
 		if (_purchaseBundleList.Count == 0)
 		{
-			SetActive((Enum)UI.OBJ_AIM, false);
-			SetActive((Enum)UI.TEX_NPCMODEL, false);
-			SetActive((Enum)UI.SPR_FRAME_DRAGON, false);
-			SetActive((Enum)UI.LBL_NONE, true);
+			SetActive((Enum)UI.OBJ_AIM, is_visible: false);
+			SetActive((Enum)UI.TEX_NPCMODEL, is_visible: false);
+			SetActive((Enum)UI.SPR_FRAME_DRAGON, is_visible: false);
+			SetActive((Enum)UI.LBL_NONE, is_visible: true);
+			return;
 		}
-		else
+		SetActive((Enum)UI.OBJ_AIM, is_visible: true);
+		SetActive((Enum)UI.TEX_NPCMODEL, is_visible: true);
+		SetActive((Enum)UI.SPR_FRAME_DRAGON, is_visible: true);
+		if (_currentPageIndex < _purchaseBundleList.Count)
 		{
-			SetActive((Enum)UI.OBJ_AIM, true);
-			SetActive((Enum)UI.TEX_NPCMODEL, true);
-			SetActive((Enum)UI.SPR_FRAME_DRAGON, true);
-			if (_currentPageIndex < _purchaseBundleList.Count)
+			ProductData productData = _purchaseBundleList[_currentPageIndex];
+			ProductDataTable.PackInfo pack = Singleton<ProductDataTable>.I.GetPack(productData.productId);
+			Transform root = SetPrefab(_objBundle, MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.prefabBundleName);
+			Utility.ToggleActiveChildren(_objBundle, _currentPageIndex);
+			UITexture sprw = FindCtrl(root, UI.SPR_WINDOW).GetComponent<UITexture>();
+			string shopImageName = ResourceName.GetShopImageName((int)pack.bundleImageId);
+			Hash128 val = default(Hash128);
+			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 			{
-				ProductData productData = _purchaseBundleList[_currentPageIndex];
-				GlobalSettingsManager.PackParam.PackInfo pack = MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.GetPack(productData.productId);
-				Transform root = SetPrefab(_objBundle, MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.prefabBundleName, true);
-				Utility.ToggleActiveChildren(_objBundle, _currentPageIndex);
-				UITexture sprw = FindCtrl(root, UI.SPR_WINDOW).GetComponent<UITexture>();
+				val = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.SHOP_IMG.ToAssetBundleName(shopImageName));
+			}
+			if (!val.get_isValid())
+			{
+				sprw.mainTexture = (Resources.Load("Texture/White") as Texture);
+			}
+			else
+			{
 				ResourceLoad.LoadShopImageTexture(sprw, pack.bundleImageId, delegate(Texture tex)
 				{
 					if (sprw != null)
@@ -334,73 +357,73 @@ public class CrystalShopTop : GameSection
 						sprw.mainTexture = tex;
 					}
 				});
-				SetTexture(root, UI.SPR_OFFER, null);
-				if (productData.offerType > 0)
+			}
+			SetTexture(root, UI.SPR_OFFER, null);
+			if (productData.offerType > 0)
+			{
+				UITexture spro = FindCtrl(root, UI.SPR_OFFER).GetComponent<UITexture>();
+				ResourceLoad.LoadShopImageOfferTexture(sprw, (uint)productData.offerType, delegate(Texture tex)
 				{
-					UITexture spro = FindCtrl(root, UI.SPR_OFFER).GetComponent<UITexture>();
-					ResourceLoad.LoadShopImageOfferTexture(sprw, (uint)productData.offerType, delegate(Texture tex)
+					if (sprw != null)
 					{
-						if (sprw != null)
-						{
-							spro.width = tex.get_width();
-							spro.height = tex.get_height();
-							spro.mainTexture = tex;
-						}
-					});
-				}
-				RemoveModel(root, UI.OBJ_MODEL);
-				if (!string.IsNullOrEmpty(pack.chestName))
-				{
-					SetModel(root, UI.OBJ_MODEL, pack.chestName);
-				}
-				SetActive(GetChildSafe(root, UI.OBJ_OFFER, productData.offerType - 1), true);
-				if (productData.remainingDay > 0)
-				{
-					SetButtonEnabled(root, UI.BTN_BUY, false);
-					SetActive(root, UI.LBL_BUNDLE_PRICE, false);
-					SetActive(root, UI.LBL_DAY_LEFT, true);
-					SetLabelText(root, UI.LBL_DAY_LEFT, (productData.remainingDay <= 1) ? string.Format(base.sectionData.GetText("DAY_LEFT"), productData.remainingDay) : string.Format(base.sectionData.GetText("DAYS_LEFT"), productData.remainingDay));
-				}
-				else
-				{
-					SetButtonEnabled(root, UI.BTN_BUY, true);
-					SetActive(root, UI.LBL_BUNDLE_PRICE, true);
-					SetActive(root, UI.LBL_DAY_LEFT, false);
-				}
-				SetLabelText(root, UI.LBL_BUNDLE_PRICE, string.Format(base.sectionData.GetText("PRICE"), productData.priceIncludeTax));
-				if (_nativeStoreList != null)
-				{
-					StoreData product = _nativeStoreList.getProduct(productData.productId);
-					if (product != null)
-					{
-						SetLabelText(root, UI.LBL_BUNDLE_PRICE, product.price.ToString());
+						spro.width = tex.get_width();
+						spro.height = tex.get_height();
+						spro.mainTexture = tex;
 					}
+				});
+			}
+			RemoveModel(root, UI.OBJ_MODEL);
+			if (!string.IsNullOrEmpty(pack.chestName))
+			{
+				SetModel(root, UI.OBJ_MODEL, pack.chestName);
+			}
+			SetActive(GetChildSafe(root, UI.OBJ_OFFER, productData.offerType - 1), is_visible: true);
+			if (productData.remainingDay > 0)
+			{
+				SetButtonEnabled(root, UI.BTN_BUY, is_enabled: false);
+				SetActive(root, UI.LBL_BUNDLE_PRICE, is_visible: false);
+				SetActive(root, UI.LBL_DAY_LEFT, is_visible: true);
+				SetLabelText(root, UI.LBL_DAY_LEFT, (productData.remainingDay <= 1) ? string.Format(base.sectionData.GetText("DAY_LEFT"), productData.remainingDay) : string.Format(base.sectionData.GetText("DAYS_LEFT"), productData.remainingDay));
+			}
+			else
+			{
+				SetButtonEnabled(root, UI.BTN_BUY, is_enabled: true);
+				SetActive(root, UI.LBL_BUNDLE_PRICE, is_visible: true);
+				SetActive(root, UI.LBL_DAY_LEFT, is_visible: false);
+			}
+			SetLabelText(root, UI.LBL_BUNDLE_PRICE, string.Format(base.sectionData.GetText("PRICE"), productData.priceIncludeTax));
+			if (_nativeStoreList != null)
+			{
+				StoreData product = _nativeStoreList.getProduct(productData.productId);
+				if (product != null)
+				{
+					SetLabelText(root, UI.LBL_BUNDLE_PRICE, product.price.ToString());
 				}
 			}
-			SetLabelText(UI.LBL_CURRENT, (_purchaseBundleList.Count <= 0) ? _currentPageIndex : (_currentPageIndex + 1));
-			SetLabelText(UI.LBL_TOTAL, _purchaseBundleList.Count);
-			bool flag = _currentPageIndex > 0;
-			bool flag2 = _currentPageIndex < _purchaseBundleList.Count - 1;
-			SetColor((Enum)UI.SPR_AIM_L, (!flag) ? Color.get_clear() : Color.get_white());
-			SetColor((Enum)UI.SPR_AIM_R, (!flag2) ? Color.get_clear() : Color.get_white());
-			SetButtonEnabled((Enum)UI.BTN_AIM_L, flag);
-			SetButtonEnabled((Enum)UI.BTN_AIM_R, flag2);
-			SetActive((Enum)UI.BTN_AIM_L_INACTIVE, !flag);
-			SetActive((Enum)UI.BTN_AIM_R_INACTIVE, !flag2);
-			SetRepeatButton((Enum)UI.BTN_AIM_L, "AIM_L", (object)null);
-			SetRepeatButton((Enum)UI.BTN_AIM_R, "AIM_R", (object)null);
-			_updateNPC();
 		}
+		SetLabelText(UI.LBL_CURRENT, (_purchaseBundleList.Count <= 0) ? _currentPageIndex : (_currentPageIndex + 1));
+		SetLabelText(UI.LBL_TOTAL, _purchaseBundleList.Count);
+		bool flag = _currentPageIndex > 0;
+		bool flag2 = _currentPageIndex < _purchaseBundleList.Count - 1;
+		SetColor((Enum)UI.SPR_AIM_L, (!flag) ? Color.get_clear() : Color.get_white());
+		SetColor((Enum)UI.SPR_AIM_R, (!flag2) ? Color.get_clear() : Color.get_white());
+		SetButtonEnabled((Enum)UI.BTN_AIM_L, flag);
+		SetButtonEnabled((Enum)UI.BTN_AIM_R, flag2);
+		SetActive((Enum)UI.BTN_AIM_L_INACTIVE, !flag);
+		SetActive((Enum)UI.BTN_AIM_R_INACTIVE, !flag2);
+		SetRepeatButton((Enum)UI.BTN_AIM_L, "AIM_L", (object)null);
+		SetRepeatButton((Enum)UI.BTN_AIM_R, "AIM_R", (object)null);
+		_updateNPC();
 	}
 
 	private void _viewMaterialTab()
 	{
-		SetActive(gemTab, false);
-		SetActive(bundleTab, false);
-		SetActive(materialTab, true);
+		SetActive(gemTab, is_visible: false);
+		SetActive(bundleTab, is_visible: false);
+		SetActive(materialTab, is_visible: true);
 		CheckOpenedMaterialTab();
 		int j = 0;
-		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, false, delegate(int i, Transform t, bool b)
+		SetTable(materialTab, UI.TBL_LIST, "CrystalShopListItemMaterial", _purchaseMaterialList.Count, reset: false, delegate(int i, Transform t, bool b)
 		{
 			ProductData productData = _purchaseMaterialList[j];
 			string text = string.Format(base.sectionData.GetText("PRICE"), productData.priceIncludeTax);
@@ -415,21 +438,21 @@ public class CrystalShopTop : GameSection
 			SetLabelText(t, UI.LBL_NAME, productData.name);
 			SetLabelText(t, UI.LBL_PRICE, text);
 			SetLabelText(t, UI.LBL_PRICE_OLD, (!(productData.oldPrice > 0.0)) ? string.Empty : string.Format(base.sectionData.GetText("PRICE_STRETCH"), productData.oldPrice));
-			SetSupportEncoding(t, UI.LBL_PRICE_OLD, true);
-			SetSupportEncoding(t, UI.LBL_PROMO, true);
+			SetSupportEncoding(t, UI.LBL_PRICE_OLD, isEnable: true);
+			SetSupportEncoding(t, UI.LBL_PROMO, isEnable: true);
 			SetLabelText(t, UI.LBL_PROMO, productData.promo.Replace("\\n", "\n"));
 			if (productData.remainingDay > 0)
 			{
 				string empty = string.Empty;
-				TimeSpan timeSpan = TimeSpan.FromSeconds((double)productData.remainingDay);
+				TimeSpan timeSpan = TimeSpan.FromSeconds(productData.remainingDay);
 				empty = ((timeSpan.Days <= 1) ? string.Format(base.sectionData.GetText("TIME_REMAIN"), $"{timeSpan.Hours:d2}:{timeSpan.Minutes:d2}:{timeSpan.Seconds:d2}") : string.Format(base.sectionData.GetText("DAY_REMAIN"), timeSpan.Days));
 				SetLabelText(t, UI.LBL_REMAIN, empty);
 			}
 			else
 			{
-				SetActive(t, UI.LBL_REMAIN, false);
+				SetActive(t, UI.LBL_REMAIN, is_visible: false);
 			}
-			SetActive(GetChildSafe(t, UI.OBJ_OFFER, productData.offerType - 1), true);
+			SetActive(GetChildSafe(t, UI.OBJ_OFFER, productData.offerType - 1), is_visible: true);
 			if (_nativeStoreList != null)
 			{
 				StoreData product = _nativeStoreList.getProduct(productData.productId);
@@ -481,13 +504,25 @@ public class CrystalShopTop : GameSection
 	private void _disableChest()
 	{
 		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
+		//IL_002f: Expected O, but got Unknown
 		if (!(_objBundle == null))
 		{
-			foreach (Transform item in _objBundle)
+			IEnumerator enumerator = _objBundle.GetEnumerator();
+			try
 			{
-				Transform root = item;
-				SetActiveModel(root, UI.OBJ_MODEL, false);
+				while (enumerator.MoveNext())
+				{
+					Transform root = enumerator.Current;
+					SetActiveModel(root, UI.OBJ_MODEL, active: false);
+				}
+			}
+			finally
+			{
+				IDisposable disposable;
+				if ((disposable = (enumerator as IDisposable)) != null)
+				{
+					disposable.Dispose();
+				}
 			}
 		}
 	}
@@ -495,13 +530,25 @@ public class CrystalShopTop : GameSection
 	private void _enableChest()
 	{
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Expected O, but got Unknown
+		//IL_0047: Expected O, but got Unknown
 		if (!(_objBundle == null) && _viewType != 0 && _viewType != VIEW_TYPE.MATERIAL)
 		{
-			foreach (Transform item in _objBundle)
+			IEnumerator enumerator = _objBundle.GetEnumerator();
+			try
 			{
-				Transform root = item;
-				SetActiveModel(root, UI.OBJ_MODEL, true);
+				while (enumerator.MoveNext())
+				{
+					Transform root = enumerator.Current;
+					SetActiveModel(root, UI.OBJ_MODEL, active: true);
+				}
+			}
+			finally
+			{
+				IDisposable disposable;
+				if ((disposable = (enumerator as IDisposable)) != null)
+				{
+					disposable.Dispose();
+				}
 			}
 		}
 	}
@@ -569,18 +616,16 @@ public class CrystalShopTop : GameSection
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasSpecial(selectProductData.productId) && selectProductData.remainingDay > 0)
 		{
 			GameSection.ChangeEvent("SPECIAL_SOLD", selectProductData);
+			return;
+		}
+		pp = string.Empty;
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isParentPassSet != 0)
+		{
+			GameSection.ChangeEvent("PP_INPUT");
 		}
 		else
 		{
-			pp = string.Empty;
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isParentPassSet != 0)
-			{
-				GameSection.ChangeEvent("PP_INPUT", null);
-			}
-			else
-			{
-				SendGoldCanPurchase();
-			}
+			SendGoldCanPurchase();
 		}
 	}
 
@@ -592,7 +637,7 @@ public class CrystalShopTop : GameSection
 
 	private void OnQuery_CrystalShopStopper_YES()
 	{
-		RequestEvent("STOPPER_TO_BUY", null);
+		RequestEvent("STOPPER_TO_BUY");
 	}
 
 	private void OnQuery_STOPPER_TO_BUY()
@@ -660,6 +705,7 @@ public class CrystalShopTop : GameSection
 	{
 		isSuccessBuyClose = true;
 		isSuccessCrystalBuy = true;
+		MonoBehaviourSingleton<ShopManager>.I.SendGetGoldPurchaseItemList(null);
 	}
 
 	public void Update()
@@ -680,11 +726,11 @@ public class CrystalShopTop : GameSection
 			switch (ret)
 			{
 			case Error.WRN_GOLD_OVER_LIMITTER_OVERUSE:
-				GameSection.ChangeStayEvent("STOPPER", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ChangeStayEvent("STOPPER");
+				GameSection.ResumeEvent(is_resume: true);
 				break;
 			default:
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 				break;
 			case Error.None:
 				DoPurchase();
@@ -702,8 +748,8 @@ public class CrystalShopTop : GameSection
 	private void onBillingUnavailable()
 	{
 		isPurchase = false;
-		GameSection.ChangeStayEvent("BILLING_UNAVAILABLE", null);
-		GameSection.ResumeEvent(true, null);
+		GameSection.ChangeStayEvent("BILLING_UNAVAILABLE");
+		GameSection.ResumeEvent(is_resume: true);
 	}
 
 	private void OnBuyItem(string productId)
@@ -729,7 +775,7 @@ public class CrystalShopTop : GameSection
 		if (isPurchase)
 		{
 			_enableChest();
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
 		}
 	}
 
@@ -744,7 +790,7 @@ public class CrystalShopTop : GameSection
 		if (isPurchase)
 		{
 			_enableChest();
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
 		}
 	}
 
@@ -762,13 +808,13 @@ public class CrystalShopTop : GameSection
 				{
 					_disableChest();
 					GameSection.ChangeStayEvent("SPECIAL_NOTICE", product_data);
-					GameSection.ResumeEvent(true, null);
+					GameSection.ResumeEvent(is_resume: true);
 				});
 			}
 		}
 		if (isPurchase)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
 		}
 	}
 
@@ -788,7 +834,7 @@ public class CrystalShopTop : GameSection
 		}
 		if (isPurchase)
 		{
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
 		}
 	}
 
@@ -797,17 +843,29 @@ public class CrystalShopTop : GameSection
 		return delegate
 		{
 			_disableChest();
-			GameSection.ChangeStayEvent("BUY", new object[7]
+			if (!GameSceneEvent.IsStay())
 			{
-				index,
-				product_data,
-				product_data.name,
-				product_data.discount,
-				product_data.price,
-				10,
-				5
-			});
-			GameSection.ResumeEvent(true, null);
+				GameSection.StayEvent();
+			}
+			if (product_data.skipId == "TradingPostLicense")
+			{
+				MonoBehaviourSingleton<TradingPostManager>.I.tradingStatus = 2;
+				GameSection.ChangeStayEvent("TRADING_POST_LICENSE");
+			}
+			else
+			{
+				GameSection.ChangeStayEvent("BUY", new object[7]
+				{
+					index,
+					product_data,
+					product_data.name,
+					product_data.discount,
+					product_data.price,
+					10,
+					5
+				});
+			}
+			GameSection.ResumeEvent(is_resume: true);
 		};
 	}
 
@@ -816,9 +874,9 @@ public class CrystalShopTop : GameSection
 		return delegate
 		{
 			_disableChest();
-			GlobalSettingsManager.PackParam.PackInfo pack = MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.GetPack(purchaseData.productId);
+			ProductDataTable.PackInfo pack = Singleton<ProductDataTable>.I.GetPack(purchaseData.productId);
 			GameSection.ChangeStayEvent(string.IsNullOrEmpty(pack.eventName) ? "BUNDLE_NOTICE" : pack.eventName, purchaseData);
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		};
 	}
 
@@ -827,7 +885,7 @@ public class CrystalShopTop : GameSection
 		return delegate
 		{
 			GameSection.ChangeStayEvent("BUNDLE_NOTICE", purchaseData);
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		};
 	}
 
@@ -880,16 +938,17 @@ public class CrystalShopTop : GameSection
 		int num2 = 0;
 		while (true)
 		{
-			if (num2 >= count)
+			if (num2 < count)
 			{
-				return;
+				int num3 = @string.IndexOf(_purchaseBundleList[num2].productId);
+				if (num3 < 0)
+				{
+					break;
+				}
+				num2++;
+				continue;
 			}
-			int num3 = @string.IndexOf(_purchaseBundleList[num2].productId);
-			if (num3 < 0)
-			{
-				break;
-			}
-			num2++;
+			return;
 		}
 		isHighlightBundle = true;
 	}
@@ -901,19 +960,19 @@ public class CrystalShopTop : GameSection
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
 		if (isHighlightMaterial)
 		{
-			SetBadge(t, -1, 3, -8, -8, false);
+			SetBadge(t, -1, 3, -8, -8);
 		}
 		else
 		{
-			SetBadge(t, 0, 3, -8, -8, false);
+			SetBadge(t, 0, 3, -8, -8);
 		}
 		if (isHighlightBundle)
 		{
-			SetBadge(t2, -1, 3, -8, -8, false);
+			SetBadge(t2, -1, 3, -8, -8);
 		}
 		else
 		{
-			SetBadge(t2, 0, 3, -8, -8, false);
+			SetBadge(t2, 0, 3, -8, -8);
 		}
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Gem", string.Empty);
 		int count = _purchaseGemList.Count;
@@ -934,14 +993,14 @@ public class CrystalShopTop : GameSection
 		Transform root = FindCtrl(materialTab, UI.SPR_BTN_BORDER);
 		Transform t = FindCtrl(root, UI.BTN_MATERIAL_TAB);
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
-		SetBadge(t, 0, 3, -8, -8, false);
+		SetBadge(t, 0, 3, -8, -8);
 		if (isHighlightBundle)
 		{
-			SetBadge(t2, -1, 3, -8, -8, false);
+			SetBadge(t2, -1, 3, -8, -8);
 		}
 		else
 		{
-			SetBadge(t2, 0, 3, -8, -8, false);
+			SetBadge(t2, 0, 3, -8, -8);
 		}
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Material", string.Empty);
 		int count = _purchaseMaterialList.Count;
@@ -964,13 +1023,13 @@ public class CrystalShopTop : GameSection
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
 		if (isHighlightMaterial)
 		{
-			SetBadge(t, -1, 3, -8, -8, false);
+			SetBadge(t, -1, 3, -8, -8);
 		}
 		else
 		{
-			SetBadge(t, 0, 3, -8, -8, false);
+			SetBadge(t, 0, 3, -8, -8);
 		}
-		SetBadge(t2, 0, 3, -8, -8, false);
+		SetBadge(t2, 0, 3, -8, -8);
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Bundle", string.Empty);
 		int count = _purchaseBundleList.Count;
 		for (int i = 0; i < count; i++)

@@ -19,4 +19,12 @@ public class InGameLinkResourcesField : MonoBehaviourSingleton<InGameLinkResourc
 	public GameObject dropItemBoxSPR;
 
 	public GameObject dropItemHalloween;
+
+	public GameObject dropItemBoxESPN;
+
+	public GameObject dropItemBoxESPHN;
+
+	public GameObject dropItemBoxESPR;
+
+	public GameObject dropItemSeasonal;
 }

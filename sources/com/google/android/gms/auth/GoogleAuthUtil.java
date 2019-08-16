@@ -9,8 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.RequiresPermission;
 import android.util.Log;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.common.zzo;
+import com.google.android.gms.common.internal.Preconditions;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -21,8 +20,8 @@ public final class GoogleAuthUtil extends zzd {
     public static final int CHANGE_TYPE_ACCOUNT_RENAMED_FROM = 3;
     public static final int CHANGE_TYPE_ACCOUNT_RENAMED_TO = 4;
     public static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-    private static String KEY_ANDROID_PACKAGE_NAME = zzd.KEY_ANDROID_PACKAGE_NAME;
-    private static String KEY_CALLER_UID = zzd.KEY_CALLER_UID;
+    private static final String KEY_ANDROID_PACKAGE_NAME = zzd.KEY_ANDROID_PACKAGE_NAME;
+    private static final String KEY_CALLER_UID = zzd.KEY_CALLER_UID;
     public static final String KEY_SUPPRESS_PROGRESS_SCREEN = "suppressProgressScreen";
     public static final String WORK_ACCOUNT_TYPE = "com.google.work";
 
@@ -64,7 +63,7 @@ public final class GoogleAuthUtil extends zzd {
             bundle = new Bundle();
         }
         bundle.putBoolean("handle_notification", true);
-        return zza(context, account, str, bundle).getToken();
+        return zza(context, account, str, bundle).zzb();
     }
 
     public static String getTokenWithNotification(Context context, Account account, String str, Bundle bundle, Intent intent) throws IOException, UserRecoverableNotifiedException, GoogleAuthException {
@@ -78,14 +77,14 @@ public final class GoogleAuthUtil extends zzd {
             }
             bundle.putParcelable("callback_intent", intent);
             bundle.putBoolean("handle_notification", true);
-            return zza(context, account, str, bundle).getToken();
+            return zza(context, account, str, bundle).zzb();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Parameter callback contains invalid data. It must be serializable using toUri() and parseUri().");
         }
     }
 
     public static String getTokenWithNotification(Context context, Account account, String str, Bundle bundle, String str2, Bundle bundle2) throws IOException, UserRecoverableNotifiedException, GoogleAuthException {
-        zzbp.zzh(str2, "Authority cannot be empty or null.");
+        Preconditions.checkNotEmpty(str2, "Authority cannot be empty or null.");
         if (bundle == null) {
             bundle = new Bundle();
         }
@@ -96,7 +95,7 @@ public final class GoogleAuthUtil extends zzd {
         bundle.putString("authority", str2);
         bundle.putBundle("sync_extras", bundle2);
         bundle.putBoolean("handle_notification", true);
-        return zza(context, account, str, bundle).getToken();
+        return zza(context, account, str, bundle).zzb();
     }
 
     @Deprecated
@@ -125,20 +124,25 @@ public final class GoogleAuthUtil extends zzd {
         return zzd.removeAccount(context, account);
     }
 
+    @TargetApi(26)
+    public static Boolean requestGoogleAccountsAccess(Context context) throws GoogleAuthException, IOException {
+        return zzd.requestGoogleAccountsAccess(context);
+    }
+
     private static TokenData zza(Context context, Account account, String str, Bundle bundle) throws IOException, GoogleAuthException {
         if (bundle == null) {
             bundle = new Bundle();
         }
         try {
             TokenData zzb = zzd.zzb(context, account, str, bundle);
-            zzo.zzbw(context);
+            GooglePlayServicesUtil.cancelAvailabilityErrorNotifications(context);
             return zzb;
-        } catch (Throwable e) {
+        } catch (GooglePlayServicesAvailabilityException e) {
             GooglePlayServicesUtil.showErrorNotification(e.getConnectionStatusCode(), context);
             Log.w("GoogleAuthUtil", "Error when getting token", e);
             throw new UserRecoverableNotifiedException("User intervention required. Notification has been pushed.");
-        } catch (Throwable e2) {
-            zzo.zzbw(context);
+        } catch (UserRecoverableAuthException e2) {
+            GooglePlayServicesUtil.cancelAvailabilityErrorNotifications(context);
             Log.w("GoogleAuthUtil", "Error when getting token", e2);
             throw new UserRecoverableNotifiedException("User intervention required. Notification has been pushed.");
         }

@@ -80,6 +80,7 @@ public class RushResultTop : QuestResultTop
 		SPR_WAVE_01,
 		SPR_WAVE_10,
 		SPR_WAVE_100,
+		SPR_WAVE_1000,
 		TBL_DROP_ITEM,
 		LBL_DROP_ITEM_WAVE,
 		STR_TITLE_WAVE,
@@ -117,6 +118,7 @@ public class RushResultTop : QuestResultTop
 		SPR_CROWN01_OFF,
 		SPR_CROWN02_OFF,
 		SPR_CROWN03_OFF,
+		SHADOW,
 		BTN_NEXT_ALL,
 		BTN_END_HUNT_CENTER,
 		BTN_END_HUNT_LEFT,
@@ -160,6 +162,12 @@ public class RushResultTop : QuestResultTop
 		END
 	}
 
+	private ResultReward[] resultRewards;
+
+	private PointEventCurrentData.Reward[] firstRewards;
+
+	private bool is_skip;
+
 	private const string ARRIVAL_EFFECT = "RushArrival";
 
 	private const string ARRIVAL_EFFECT_NAME_BASE = "RushArrival_Wave_Txt_";
@@ -167,12 +175,6 @@ public class RushResultTop : QuestResultTop
 	private const float DROP_ICON_HEIGHT = 100f;
 
 	private const float WAVE_LABEL_HEIGHT = 36f;
-
-	private ResultReward[] resultRewards;
-
-	private PointEventCurrentData.Reward[] firstRewards;
-
-	private bool is_skip;
 
 	private Transform material_info_t;
 
@@ -182,8 +184,8 @@ public class RushResultTop : QuestResultTop
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
-		SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, false);
+		SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, is_visible: false);
+		SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, is_visible: false);
 		material_info_t = CreateMaterialInfo((Enum)UI.PNL_MATERIAL_INFO);
 		base.Initialize();
 	}
@@ -231,37 +233,49 @@ public class RushResultTop : QuestResultTop
 					reward3.num = item3.num;
 					list2.Add(reward3);
 				}
+				foreach (QuestCompleteReward.AccessoryItem item4 in rushReward.first.accessoryItem)
+				{
+					PointEventCurrentData.Reward reward4 = new PointEventCurrentData.Reward();
+					reward4.type = 14;
+					reward4.itemId = item4.accessoryId;
+					reward4.num = item4.num;
+					list2.Add(reward4);
+				}
 				int money = rushReward.first.money;
 				if (money > 0)
 				{
-					PointEventCurrentData.Reward reward4 = new PointEventCurrentData.Reward();
-					reward4.type = 2;
-					reward4.num = money;
-					list2.Add(reward4);
+					PointEventCurrentData.Reward reward5 = new PointEventCurrentData.Reward();
+					reward5.type = 2;
+					reward5.num = money;
+					list2.Add(reward5);
 				}
 				int crystal = rushReward.first.crystal;
 				if (crystal > 0)
 				{
-					PointEventCurrentData.Reward reward5 = new PointEventCurrentData.Reward();
-					reward5.type = 1;
-					reward5.num = crystal;
-					list2.Add(reward5);
+					PointEventCurrentData.Reward reward6 = new PointEventCurrentData.Reward();
+					reward6.type = 1;
+					reward6.num = crystal;
+					list2.Add(reward6);
 				}
 				List<SortCompareData> list3 = new List<SortCompareData>();
 				int start_ary_index = 0;
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, order.item, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, order.equipItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, order.skillItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.item, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.equipItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.skillItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.questItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakReward.item, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakReward.equipItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakReward.skillItem, REWARD_CATEGORY.DROP);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, order.item);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, order.equipItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, order.skillItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, order.accessoryItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.item);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.equipItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.skillItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.questItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, resultReward.dropReward.accessoryItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakReward.item);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakReward.equipItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakReward.skillItem);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakReward.accessoryItem);
 				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakPartsReward.item, REWARD_CATEGORY.BREAK);
 				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakPartsReward.equipItem, REWARD_CATEGORY.BREAK);
 				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakPartsReward.skillItem, REWARD_CATEGORY.BREAK);
+				start_ary_index = ResultUtility.SetDropData(list3, start_ary_index, breakPartsReward.accessoryItem, REWARD_CATEGORY.BREAK);
 				list3.Sort((SortCompareData l, SortCompareData r) => r.GetSortValueQuestResult() - l.GetSortValueQuestResult());
 				resultReward.dropItemIconData = list3.ToArray();
 				dropItemNum += resultReward.dropItemIconData.Length;
@@ -276,21 +290,20 @@ public class RushResultTop : QuestResultTop
 
 	public override void UpdateUI()
 	{
-		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
 		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
 		SetHeight((Enum)UI.BTN_SKIP_IN_SCROLL, dropLineNum * 100);
-		SetActive((Enum)UI.BTN_NEXT, false);
+		SetActive((Enum)UI.BTN_NEXT, is_visible: false);
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
 		SetLabelText((Enum)UI.LBL_QUEST_NAME, questData.questText);
 		string text = string.Format(StringTable.Get(STRING_CATEGORY.RUSH_WAVE, 10004400u), MonoBehaviourSingleton<InGameManager>.I.GetCurrentWaveNum());
 		SetLabelText((Enum)UI.LBL_WAVE, text);
-		SetLabelText((Enum)UI.LBL_TIME, MonoBehaviourSingleton<InGameProgress>.I.GetRushRemainTimeToString());
-		SetActive((Enum)UI.GET_ITEM, true);
+		SetLabelText((Enum)UI.LBL_TIME, MonoBehaviourSingleton<InGameRecorder>.I.rushRemainTimeToString);
+		SetActive((Enum)UI.GET_ITEM, is_visible: true);
 		int num = 0;
 		if (isVictory)
 		{
 			List<QuestCompleteRewardList> rushRewards = MonoBehaviourSingleton<InGameManager>.I.rushRewards;
-			SetTable(GetCtrl(UI.OBJ_TREASURE_ROOT), UI.TBL_DROP_ITEM, "RushWaveDropItem", resultRewards.Length, true, delegate(int i, Transform t, bool is_recycle)
+			SetTable(GetCtrl(UI.OBJ_TREASURE_ROOT), UI.TBL_DROP_ITEM, "RushWaveDropItem", resultRewards.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 			{
 				t.set_name("wave" + MonoBehaviourSingleton<InGameManager>.I.GetWaveNum(i));
 				SetDropItemIcon(resultRewards[i].dropItemIconData, t, MonoBehaviourSingleton<InGameManager>.I.GetWaveNum(i));
@@ -305,26 +318,27 @@ public class RushResultTop : QuestResultTop
 			}
 			if (firstRewards.Length > 0)
 			{
-				SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, true);
-				int index = MonoBehaviourSingleton<InGameManager>.I.GetRushIndex() - ((MonoBehaviourSingleton<InGameProgress>.I.progressEndType != InGameProgress.PROGRESS_END_TYPE.QUEST_VICTORY) ? 1 : 0);
+				SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, is_visible: true);
+				int index = MonoBehaviourSingleton<InGameManager>.I.GetRushIndex() - ((MonoBehaviourSingleton<InGameRecorder>.I.progressEndType != InGameProgress.PROGRESS_END_TYPE.QUEST_VICTORY) ? 1 : 0);
 				int waveNum = MonoBehaviourSingleton<InGameManager>.I.GetWaveNum(index);
 				UISprite component = GetCtrl(UI.SPR_WAVE_01).GetComponent<UISprite>();
 				UISprite component2 = GetCtrl(UI.SPR_WAVE_10).GetComponent<UISprite>();
 				UISprite component3 = GetCtrl(UI.SPR_WAVE_100).GetComponent<UISprite>();
-				string text2 = waveNum.ToString("D3");
-				component.spriteName = "RushArrival_Wave_Txt_" + text2[2];
-				component2.spriteName = "RushArrival_Wave_Txt_" + text2[1];
-				component3.spriteName = ((waveNum < 100) ? string.Empty : ("RushArrival_Wave_Txt_" + text2[0]));
-				SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
-				SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, true);
-				SetGrid(UI.GRD_ARRIVAL_ITEM_ICON, "ItemIconReward", firstRewards.Length, true, delegate(int i, Transform t, bool is_recycle)
+				UISprite component4 = GetCtrl(UI.SPR_WAVE_1000).GetComponent<UISprite>();
+				string text2 = waveNum.ToString("D4");
+				component.spriteName = "RushArrival_Wave_Txt_" + text2[3];
+				component2.spriteName = "RushArrival_Wave_Txt_" + text2[2];
+				component3.spriteName = ((waveNum < 100) ? string.Empty : ("RushArrival_Wave_Txt_" + text2[1]));
+				component4.spriteName = ((waveNum < 1000) ? string.Empty : ("RushArrival_Wave_Txt_" + text2[0]));
+				SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, is_visible: false);
+				SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, is_visible: true);
+				SetGrid(UI.GRD_ARRIVAL_ITEM_ICON, "ItemIconReward", firstRewards.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 				{
-					//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 					PointEventCurrentData.Reward reward = firstRewards[i];
-					ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-					t.FindChild("itemNum").GetComponent<UILabel>().text = "×" + firstRewards[i].num;
+					ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, t, reward.num);
+					t.Find("itemNum").GetComponent<UILabel>().text = "×" + firstRewards[i].num;
 				});
-				SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, false);
+				SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, is_visible: false);
 			}
 		}
 		SetLabelText((Enum)UI.LBL_REWARD_GOLD, num.ToString("N0"));
@@ -332,27 +346,37 @@ public class RushResultTop : QuestResultTop
 		SetActive((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, flag);
 		if (flag)
 		{
-			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, true, delegate(int i, Transform t, bool b)
+			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, reset: true, delegate(int i, Transform t, bool b)
 			{
-				ResetTween(t, 0);
+				ResetTween(t);
 				PointShopResultData pointShopResultData = base.pointShopResultData[i];
 				SetActive(t, UI.OBJ_NORMAL_POINT_SHOP_ROOT, !pointShopResultData.isEvent);
 				if (!pointShopResultData.isEvent)
 				{
 					SetLabelText(t, UI.LBL_NORMAL_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
 					SetLabelText(t, UI.LBL_NORMAL_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-					UITexture component4 = FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>();
-					ResourceLoad.LoadPointIconImageTexture(component4, (uint)pointShopResultData.pointShopId);
+					UITexture component6 = FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>();
+					ResourceLoad.LoadPointIconImageTexture(component6, (uint)pointShopResultData.pointShopId);
 				}
 				SetActive(t, UI.OBJ_EVENT_POINT_SHOP_ROOT, pointShopResultData.isEvent);
 				if (pointShopResultData.isEvent)
 				{
 					SetLabelText(t, UI.LBL_EVENT_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
 					SetLabelText(t, UI.LBL_EVENT_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-					UITexture component5 = FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>();
-					ResourceLoad.LoadPointIconImageTexture(component5, (uint)pointShopResultData.pointShopId);
+					UITexture component7 = FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>();
+					ResourceLoad.LoadPointIconImageTexture(component7, (uint)pointShopResultData.pointShopId);
 				}
 			});
+		}
+		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+		{
+			UIVirtualScreen componentInChildren = this.GetComponentInChildren<UIVirtualScreen>();
+			UIWidget component5 = GetCtrl(UI.SHADOW).GetComponent<UIWidget>();
+			if (componentInChildren != null && component5 != null)
+			{
+				component5.width = (int)componentInChildren.ScreenWidthFull;
+				component5.height = (int)componentInChildren.ScreenHeightFull;
+			}
 		}
 		this.StartCoroutine(PlayAnimation());
 	}
@@ -360,50 +384,50 @@ public class RushResultTop : QuestResultTop
 	private ItemIcon CreateItemIcon(SortCompareData dropItem, Transform o, string event_name, int i)
 	{
 		ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-		RARITY_TYPE? rarity = null;
-		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-		EQUIPMENT_TYPE? magi_enable_icon_type = null;
-		int icon_id = -1;
+		RARITY_TYPE? rARITY_TYPE = null;
+		ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
+		EQUIPMENT_TYPE? eQUIPMENT_TYPE = null;
 		int num = -1;
+		int num2 = -1;
 		if (dropItem != null)
 		{
 			iTEM_ICON_TYPE = dropItem.GetIconType();
-			icon_id = dropItem.GetIconID();
-			rarity = dropItem.GetRarity();
-			element = dropItem.GetIconElement();
-			magi_enable_icon_type = dropItem.GetIconMagiEnableType();
-			num = dropItem.GetNum();
-			if (num == 1)
+			num = dropItem.GetIconID();
+			rARITY_TYPE = dropItem.GetRarity();
+			eLEMENT_TYPE = dropItem.GetIconElement();
+			eQUIPMENT_TYPE = dropItem.GetIconMagiEnableType();
+			num2 = dropItem.GetNum();
+			if (num2 == 1)
 			{
-				num = -1;
+				num2 = -1;
 			}
 		}
-		bool is_new = false;
+		bool flag = false;
 		switch (iTEM_ICON_TYPE)
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
 		{
 			ulong uniqID = dropItem.GetUniqID();
-			if (uniqID != 0L)
+			if (uniqID != 0)
 			{
-				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, dropItem.GetUniqID());
+				flag = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, dropItem.GetUniqID());
 			}
 			break;
 		}
 		default:
-			is_new = true;
+			flag = true;
 			break;
 		case ITEM_ICON_TYPE.NONE:
 			break;
 		}
-		int enemy_icon_id = 0;
-		int enemy_icon_id2 = 0;
+		int num3 = 0;
+		int num4 = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(dropItem.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
-			enemy_icon_id2 = itemData.enemyIconID2;
+			num3 = itemData.enemyIconID;
+			num4 = itemData.enemyIconID2;
 		}
 		ItemIcon itemIcon = null;
 		if (dropItem.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
@@ -416,17 +440,30 @@ public class RushResultTop : QuestResultTop
 			itemIconCreateParam.element = dropItem.GetIconElement();
 			itemIconCreateParam.magi_enable_equip_type = dropItem.GetIconMagiEnableType();
 			itemIconCreateParam.num = dropItem.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.enemy_icon_id2 = enemy_icon_id2;
+			itemIconCreateParam.enemy_icon_id = num3;
+			itemIconCreateParam.enemy_icon_id2 = num4;
 			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
 			itemIcon = ItemIcon.Create(itemIconCreateParam);
 		}
 		else
 		{
+			ITEM_ICON_TYPE icon_type = iTEM_ICON_TYPE;
+			int icon_id = num;
+			RARITY_TYPE? rarity = rARITY_TYPE;
+			ELEMENT_TYPE element = eLEMENT_TYPE;
+			EQUIPMENT_TYPE? magi_enable_icon_type = eQUIPMENT_TYPE;
+			int num5 = num2;
+			bool is_new = flag;
+			int toggle_group = -1;
+			bool is_select = false;
+			string icon_under_text = null;
+			bool is_equipping = false;
+			int enemy_icon_id = num3;
+			int enemy_icon_id2 = num4;
 			GET_TYPE getType = dropItem.GetGetType();
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, o, element, magi_enable_icon_type, num, event_name, i, is_new, -1, false, null, false, enemy_icon_id, enemy_icon_id2, false, getType);
+			itemIcon = ItemIcon.Create(icon_type, icon_id, rarity, o, element, magi_enable_icon_type, num5, event_name, i, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
 		}
-		itemIcon.SetRewardBG(true);
+		itemIcon.SetRewardBG(is_visible: true);
 		itemIcon.SetRewardCategoryInfo(dropItem.GetCategory());
 		Transform ctrl = GetCtrl(UI.PNL_MATERIAL_INFO);
 		MaterialInfoButton.Set(itemIcon.transform, material_info_t, dropItem.GetMaterialType(), dropItem.GetTableID(), base.sectionData.sectionName, ctrl);
@@ -442,14 +479,14 @@ public class RushResultTop : QuestResultTop
 			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)MonoBehaviourSingleton<InGameManager>.I.GetRushQuestId(wave));
 			string text2 = "Lv" + questData.GetMainEnemyLv().ToString() + Singleton<EnemyTable>.I.GetEnemyName((uint)questData.GetMainEnemyID());
 			SetLabelText(t_grid, UI.LBL_BOSS_NAME, text2);
-			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, true, delegate(int i, Transform o, bool is_recycle)
+			SetGrid(t_grid, UI.GRD_DROP_ITEM, null, dropItemList.Length, reset: true, delegate(int i, Transform o, bool is_recycle)
 			{
 				ItemIcon icon = null;
 				if (i < dropItemList.Length)
 				{
 					icon = CreateItemIcon(dropItemList[i], o, "DROP", i);
 				}
-				Transform val = SetPrefab(o, "QuestResultDropIconOpener", true);
+				Transform val = SetPrefab(o, "QuestResultDropIconOpener");
 				QuestResultDropIconOpener.Info info2 = new QuestResultDropIconOpener.Info
 				{
 					IsRare = ResultUtility.IsRare(dropItemList[i]),
@@ -481,109 +518,121 @@ public class RushResultTop : QuestResultTop
 		is_skip = false;
 		animState = RESULT_ANIM_STATE.TITLE;
 		PlayAudio(AUDIO.ADVENT);
-		PlayTween((Enum)UI.OBJ_TITLE, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_TITLE, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_0073: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
+			animState = RESULT_ANIM_STATE.IDLE;
+		}, is_input_block: false, 0);
 		while (animState != 0 && !is_skip)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		animState = RESULT_ANIM_STATE.WAVE;
 		PlayAudio(AUDIO.ACHIEVEMENT);
-		PlayTween((Enum)UI.OBJ_WAVE, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_WAVE, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_00e8: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
+			animState = RESULT_ANIM_STATE.IDLE;
+		}, is_input_block: false, 0);
 		while (animState != 0 && !is_skip)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		animState = RESULT_ANIM_STATE.TIME;
 		PlayAudio(AUDIO.ACHIEVEMENT);
-		PlayTween((Enum)UI.OBJ_TIME, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_TIME, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
+			animState = RESULT_ANIM_STATE.IDLE;
+		}, is_input_block: false, 0);
 		while (animState != 0 && !is_skip)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (firstRewards.Length > 0)
 		{
 			animState = RESULT_ANIM_STATE.ARRIVAL;
-			SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, true);
-			SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, true);
+			SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, is_visible: true);
+			SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, is_visible: true);
 			PlayAudio(AUDIO.ARRIVAL);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)null, false, 1);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
+			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 1);
+			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_0221: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
-			}, false, 2);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
+				PlayAudio(AUDIO.ARRIVAL_WAVE);
+			}, is_input_block: false, 2);
+			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_0242: stateMachine*/)._003C_003Ef__this.PlayAudio(AUDIO.ARRIVAL_WAVE);
-			}, false, 3);
-			PlayTween((Enum)UI.OBJ_ARRIVAL_BONUS, true, (EventDelegate.Callback)null, false, 0);
-			SetActive((Enum)UI.BTN_NEXT, true);
+				PlayAudio(AUDIO.ARRIVAL_WAVE);
+			}, is_input_block: false, 3);
+			PlayTween((Enum)UI.OBJ_ARRIVAL_BONUS, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+			SetActive((Enum)UI.BTN_NEXT, is_visible: true);
 			is_skip = false;
 			while (!is_skip)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			animState = RESULT_ANIM_STATE.ARRIVAL_NEXT;
-			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, (EventDelegate.Callback)delegate
+			PlayTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, (EventDelegate.Callback)delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_02cc: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-			}, false, 4);
+				animState = RESULT_ANIM_STATE.IDLE;
+			}, is_input_block: false, 4);
 			while (animState != 0 && !is_skip)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			is_skip = false;
-			SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, false);
-			SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, false);
+			SetActive((Enum)UI.OBJ_ARRIVAL_EFFECT_ROOT, is_visible: false);
+			SetActive((Enum)UI.OBJ_ARRIVAL_BONUS, is_visible: false);
 		}
 		animState = RESULT_ANIM_STATE.TREASURE;
 		PlayAudio(AUDIO.ACHIEVEMENT);
 		if (pointShopResultData.Count > 0)
 		{
-			foreach (Transform item in GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).get_transform())
+			IEnumerator enumerator = GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).get_transform().GetEnumerator();
+			try
 			{
-				Transform t = item;
-				PlayTween(t, true, null, true, 0);
+				while (enumerator.MoveNext())
+				{
+					Transform t = enumerator.Current;
+					PlayTween(t);
+				}
+			}
+			finally
+			{
+				IDisposable disposable;
+				if ((disposable = (enumerator as IDisposable)) != null)
+				{
+					disposable.Dispose();
+				}
 			}
 		}
-		PlayTween((Enum)UI.OBJ_MONEY, true, (EventDelegate.Callback)null, true, 0);
-		PlayTween((Enum)UI.OBJ_TREASURE_ROOT, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_MONEY, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
+		PlayTween((Enum)UI.OBJ_TREASURE_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_041c: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
+			animState = RESULT_ANIM_STATE.IDLE;
+		}, is_input_block: false, 0);
 		while (animState != 0 && !is_skip)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		is_skip = false;
 		animState = RESULT_ANIM_STATE.ITEM_ICON;
 		this.StartCoroutine(PlayItemAnimation(delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_048b: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+			animState = RESULT_ANIM_STATE.IDLE;
 		}));
 		while (animState != 0 && !is_skip)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		animState = RESULT_ANIM_STATE.EVENT;
 		OpenAllEventRewardDialog(delegate
 		{
-			((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_04ec: stateMachine*/)._003C_003Ef__this.OpenMutualFollowBonusDialog(delegate
+			OpenMutualFollowBonusDialog(delegate
 			{
-				((_003CPlayAnimation_003Ec__Iterator11F)/*Error near IL_04ec: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
+				animState = RESULT_ANIM_STATE.IDLE;
 			});
 		});
 		while (animState != 0 && !is_skip)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		is_skip = true;
 		animState = RESULT_ANIM_STATE.END;
@@ -592,9 +641,9 @@ public class RushResultTop : QuestResultTop
 
 	protected override void VisibleEndButton()
 	{
-		SetActive((Enum)UI.BTN_NEXT, true);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, false);
+		SetActive((Enum)UI.BTN_NEXT, is_visible: true);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
+		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, is_visible: false);
 	}
 
 	private IEnumerator PlayItemAnimation(Action callback)
@@ -603,9 +652,9 @@ public class RushResultTop : QuestResultTop
 		{
 			if (wave == 0)
 			{
-				Transform t_scrollView = GetCtrl(UI.OBJ_SCROLL_VIEW);
-				t_scrollView.GetComponent<UIScrollView>().ResetPosition();
-				preScrollViewPosition = t_scrollView.get_localPosition();
+				Transform ctrl = GetCtrl(UI.OBJ_SCROLL_VIEW);
+				ctrl.GetComponent<UIScrollView>().ResetPosition();
+				preScrollViewPosition = ctrl.get_localPosition();
 			}
 			else
 			{
@@ -613,7 +662,7 @@ public class RushResultTop : QuestResultTop
 				while (animTimer < 0.4f && !is_skip)
 				{
 					animTimer += Time.get_deltaTime();
-					yield return (object)null;
+					yield return null;
 				}
 				int preWaveIconRowNum = Mathf.CeilToInt((float)resultRewards[wave - 1].dropItemIconData.Length / 5f);
 				float scroll_delta = 36f + 100f * (float)preWaveIconRowNum;
@@ -625,7 +674,7 @@ public class RushResultTop : QuestResultTop
 				while (animTimer < 0.4f && !is_skip)
 				{
 					animTimer += Time.get_deltaTime();
-					yield return (object)null;
+					yield return null;
 				}
 				VisibleItemIcon(wave, i, is_skip);
 			}
@@ -640,9 +689,7 @@ public class RushResultTop : QuestResultTop
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
 		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 pos = preScrollViewPosition + Vector3.get_up() * delta;
@@ -652,7 +699,6 @@ public class RushResultTop : QuestResultTop
 
 	private void VisibleItemIcon(int wave, int index, bool is_skip = false)
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		Transform child = GetChild((Enum)UI.TBL_DROP_ITEM, wave);
 		Transform child2 = GetChild(child, UI.GRD_DROP_ITEM, index);
 		QuestResultDropIconOpener componentInChildren = child2.get_gameObject().GetComponentInChildren<QuestResultDropIconOpener>();
@@ -685,54 +731,56 @@ public class RushResultTop : QuestResultTop
 			if (string.IsNullOrEmpty(reward.item[j].rewardTitle))
 			{
 				resultReward.dropReward.item.Add(reward.item[j]);
+				continue;
 			}
-			else
-			{
-				resultReward.eventReward.item.Add(reward.item[j]);
-				list.Add(reward.item[j].rewardTitle);
-			}
+			resultReward.eventReward.item.Add(reward.item[j]);
+			list.Add(reward.item[j].rewardTitle);
 		}
 		for (int k = 0; k < reward.skillItem.Count; k++)
 		{
 			if (string.IsNullOrEmpty(reward.skillItem[k].rewardTitle))
 			{
 				resultReward.dropReward.skillItem.Add(reward.skillItem[k]);
+				continue;
 			}
-			else
-			{
-				resultReward.eventReward.skillItem.Add(reward.skillItem[k]);
-				list.Add(reward.skillItem[k].rewardTitle);
-			}
+			resultReward.eventReward.skillItem.Add(reward.skillItem[k]);
+			list.Add(reward.skillItem[k].rewardTitle);
 		}
 		for (int l = 0; l < reward.equipItem.Count; l++)
 		{
 			if (string.IsNullOrEmpty(reward.equipItem[l].rewardTitle))
 			{
 				resultReward.dropReward.equipItem.Add(reward.equipItem[l]);
+				continue;
 			}
-			else
-			{
-				resultReward.eventReward.equipItem.Add(reward.equipItem[l]);
-				list.Add(reward.equipItem[l].rewardTitle);
-			}
+			resultReward.eventReward.equipItem.Add(reward.equipItem[l]);
+			list.Add(reward.equipItem[l].rewardTitle);
 		}
 		for (int m = 0; m < reward.questItem.Count; m++)
 		{
 			if (string.IsNullOrEmpty(reward.questItem[m].rewardTitle))
 			{
 				resultReward.dropReward.questItem.Add(reward.questItem[m]);
+				continue;
 			}
-			else
-			{
-				resultReward.eventReward.questItem.Add(reward.questItem[m]);
-				list.Add(reward.questItem[m].rewardTitle);
-			}
+			resultReward.eventReward.questItem.Add(reward.questItem[m]);
+			list.Add(reward.questItem[m].rewardTitle);
 		}
-		for (int n = 0; n < list.Count; n++)
+		for (int n = 0; n < reward.accessoryItem.Count; n++)
 		{
-			if (!eventRewardTitles.Contains(list[n]))
+			if (string.IsNullOrEmpty(reward.accessoryItem[n].rewardTitle))
 			{
-				eventRewardTitles.Add(list[n]);
+				resultReward.dropReward.accessoryItem.Add(reward.accessoryItem[n]);
+				continue;
+			}
+			resultReward.eventReward.accessoryItem.Add(reward.accessoryItem[n]);
+			list.Add(reward.accessoryItem[n].rewardTitle);
+		}
+		for (int num3 = 0; num3 < list.Count; num3++)
+		{
+			if (!eventRewardTitles.Contains(list[num3]))
+			{
+				eventRewardTitles.Add(list[num3]);
 			}
 		}
 	}
@@ -745,21 +793,21 @@ public class RushResultTop : QuestResultTop
 		case RESULT_ANIM_STATE.WAVE:
 		case RESULT_ANIM_STATE.TIME:
 		case RESULT_ANIM_STATE.ARRIVAL:
-			SkipTween((Enum)UI.OBJ_TITLE, true, 0);
-			SkipTween((Enum)UI.OBJ_WAVE, true, 0);
-			SkipTween((Enum)UI.OBJ_TIME, true, 0);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 1);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 2);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 3);
+			SkipTween((Enum)UI.OBJ_TITLE, forward: true, 0);
+			SkipTween((Enum)UI.OBJ_WAVE, forward: true, 0);
+			SkipTween((Enum)UI.OBJ_TIME, forward: true, 0);
+			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, 1);
+			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, 2);
+			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, 3);
 			break;
 		case RESULT_ANIM_STATE.ARRIVAL_NEXT:
-			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, true, 4);
-			SkipTween((Enum)UI.OBJ_ARRIVAL_BONUS, true, 0);
+			SkipTween((Enum)UI.OBJ_ARRIVAL_EFFECT, forward: true, 4);
+			SkipTween((Enum)UI.OBJ_ARRIVAL_BONUS, forward: true, 0);
 			break;
 		case RESULT_ANIM_STATE.TREASURE:
-			SkipTween((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, true, 0);
-			SkipTween((Enum)UI.OBJ_MONEY, true, 0);
-			SkipTween((Enum)UI.OBJ_TREASURE_ROOT, true, 0);
+			SkipTween((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, forward: true, 0);
+			SkipTween((Enum)UI.OBJ_MONEY, forward: true, 0);
+			SkipTween((Enum)UI.OBJ_TREASURE_ROOT, forward: true, 0);
 			break;
 		}
 		is_skip = true;
@@ -779,7 +827,7 @@ public class RushResultTop : QuestResultTop
 		SoundManager.PlayOneShotUISE((int)type);
 	}
 
-	private void OpenAllEventRewardDialog(Action endCallback)
+	private new void OpenAllEventRewardDialog(Action endCallback)
 	{
 		eventRewardIndex = 0;
 		eventRewardList = new List<QuestCompleteReward>();
@@ -842,21 +890,28 @@ public class RushResultTop : QuestResultTop
 					}
 				}
 			}
+			for (int num7 = 0; num7 < eventReward.accessoryItem.Count; num7++)
+			{
+				for (int num8 = 0; num8 < eventRewardTitles.Count; num8++)
+				{
+					if (eventRewardTitles[num8] == eventReward.accessoryItem[num7].rewardTitle)
+					{
+						eventRewardList[num8].accessoryItem.Add(eventReward.accessoryItem[num7]);
+					}
+				}
+			}
 		}
 		if (eventRewardList.Count == 0)
 		{
 			endCallback?.Invoke();
+			return;
 		}
-		else
-		{
-			OpenEventRewardDialog(eventRewardList[eventRewardIndex], eventRewardTitles[eventRewardIndex], endCallback);
-			eventRewardIndex++;
-		}
+		OpenEventRewardDialog(eventRewardList[eventRewardIndex], eventRewardTitles[eventRewardIndex], endCallback);
+		eventRewardIndex++;
 	}
 
 	private void OpenMutualFollowBonusDialog(Action end_callback)
 	{
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 		if (base.followReward != null)
 		{
 			QuestCompleteReward followReward = base.followReward;
@@ -866,29 +921,19 @@ public class RushResultTop : QuestResultTop
 			int gold = followReward.money;
 			int crystal = followReward.crystal;
 			int exp = followReward.exp;
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.item, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.equipItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.skillItem, REWARD_CATEGORY.DROP);
-			if (ResultUtility.SetDropData(tmp, start_ary_index, followReward.questItem, REWARD_CATEGORY.DROP) == 0 && crystal == 0 && gold == 0 && exp == 0)
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.item);
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.equipItem);
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.skillItem);
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, followReward.questItem);
+			if (ResultUtility.SetDropData(tmp, start_ary_index, followReward.accessoryItem) == 0 && crystal == 0 && gold == 0 && exp == 0)
 			{
 				end_callback?.Invoke();
+				return;
 			}
-			else
+			followBonusCallback = end_callback;
+			if (!QuestResultTop.IsExecuteNowSceneEvent(GetSceneName()))
 			{
-				followBonusCallback = end_callback;
-				if (!QuestResultTop.IsExecuteNowSceneEvent(GetSceneName()))
-				{
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
-					{
-						DispatchEvent("MUTUAL_FOLLOW_BONUS", new object[3]
-						{
-							tmp,
-							gold,
-							crystal
-						});
-					}));
-				}
-				else
+				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
 				{
 					DispatchEvent("MUTUAL_FOLLOW_BONUS", new object[3]
 					{
@@ -896,7 +941,16 @@ public class RushResultTop : QuestResultTop
 						gold,
 						crystal
 					});
-				}
+				}));
+			}
+			else
+			{
+				DispatchEvent("MUTUAL_FOLLOW_BONUS", new object[3]
+				{
+					tmp,
+					gold,
+					crystal
+				});
 			}
 		}
 		else

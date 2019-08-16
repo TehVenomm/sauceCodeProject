@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.view;
+package net.gogame.gowrap.p019ui.dpro.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -26,9 +26,10 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import java.util.ArrayList;
 import java.util.List;
-import net.gogame.gowrap.ui.dpro.C1155R;
-import net.gogame.gowrap.ui.utils.DisplayUtils;
+import net.gogame.gowrap.p019ui.dpro.C1452R;
+import net.gogame.gowrap.p019ui.utils.DisplayUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel */
 public class CustomTabbelPanel extends ViewGroup {
     private static final float DEFAULT_CHAMFER_SLOPE = 45.0f;
     private static final float DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM = 2.0f;
@@ -123,16 +124,18 @@ public class CustomTabbelPanel extends ViewGroup {
     private final List<TabHolder> tabHolderList = new ArrayList();
     private final List<String> tabLabels = new ArrayList();
 
+    /* renamed from: net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel$Listener */
     public interface Listener {
         void onClose();
 
         void onTabSelected(int i);
     }
 
+    /* renamed from: net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel$LayoutParams */
     public static class LayoutParams extends android.widget.FrameLayout.LayoutParams {
         public LayoutParams(Context context, AttributeSet attributeSet) {
             super(context, attributeSet);
-            context.obtainStyledAttributes(attributeSet, C1155R.styleable.CustomTabbedPanel_Layout).recycle();
+            context.obtainStyledAttributes(attributeSet, C1452R.styleable.CustomTabbedPanel_Layout).recycle();
         }
 
         public LayoutParams(int i, int i2) {
@@ -144,14 +147,15 @@ public class CustomTabbelPanel extends ViewGroup {
         }
     }
 
+    /* renamed from: net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel$TabGeometry */
     private static class TabGeometry {
         private final float contentTop;
         private final RectF labelBounds;
         private final Path path;
         private final RectF tabBounds;
 
-        public TabGeometry(Path path, RectF rectF, RectF rectF2, float f) {
-            this.path = path;
+        public TabGeometry(Path path2, RectF rectF, RectF rectF2, float f) {
+            this.path = path2;
             this.tabBounds = rectF;
             this.labelBounds = rectF2;
             this.contentTop = f;
@@ -174,6 +178,7 @@ public class CustomTabbelPanel extends ViewGroup {
         }
     }
 
+    /* renamed from: net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel$TabHolder */
     private static class TabHolder {
         private final float contentTop;
         private final Path innerPath;
@@ -215,37 +220,40 @@ public class CustomTabbelPanel extends ViewGroup {
         init();
     }
 
+    /* JADX INFO: finally extract failed */
     public CustomTabbelPanel(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C1155R.styleable.CustomTabbelPanel, 0, 0);
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C1452R.styleable.CustomTabbelPanel, 0, 0);
         try {
-            this.mCloseButtonDrawable = obtainStyledAttributes.getDrawable(C1155R.styleable.CustomTabbelPanel_closeButton);
-            this.mPathOffset = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_pathOffset, fromDp(DEFAULT_PATH_OFFSET));
-            this.mTabSlope = obtainStyledAttributes.getFloat(C1155R.styleable.CustomTabbelPanel_tabSlope, DEFAULT_TAB_SLOPE);
-            this.mTabFillColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_tabFillColor, -1071245480);
-            this.mFillColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_fillColor, -1071245480);
-            this.mOuterLineColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_outerLineColor, DEFAULT_OUTER_LINE_COLOR);
-            this.mOuterLineWidth = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_outerLineWidth, fromDp(1.0f));
-            this.mOuterLineChamfer = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_outerLineChamfer, fromDp(8.0f));
-            this.mInnerLineColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_innerLineColor, DEFAULT_INNER_LINE_COLOR);
-            this.mInnerLineWidth = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_innerLineWidth, fromDp(1.0f));
-            this.mFontFamily = obtainStyledAttributes.getString(C1155R.styleable.CustomTabbelPanel_fontFamily);
-            this.mTextSize = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_textSize, fromSp(DEFAULT_TEXT_SIZE));
-            this.mTextStyle = obtainStyledAttributes.getInteger(C1155R.styleable.CustomTabbelPanel_textStyle, 0);
-            this.mTextColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_textColor, -1);
-            this.mSelectedTextStyle = obtainStyledAttributes.getInteger(C1155R.styleable.CustomTabbelPanel_selectedTextStyle, 1);
-            this.mSelectedTextColor = obtainStyledAttributes.getColor(C1155R.styleable.CustomTabbelPanel_selectedTextColor, -1);
-            this.mTabLabelMarginLeft = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginLeft, fromDp(8.0f));
-            this.mTabLabelMarginTop = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginTop, fromDp(16.0f));
-            this.mTabLabelMarginRight = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginRight, fromDp(8.0f));
-            this.mTabLabelMarginBottom = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelMarginBottom, fromDp(16.0f));
-            this.mTabLabelPaddingLeft = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingLeft, fromDp(0.0f));
-            this.mTabLabelPaddingTop = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingTop, fromDp(0.0f));
-            this.mTabLabelPaddingRight = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingRight, fromDp(0.0f));
-            this.mTabLabelPaddingBottom = obtainStyledAttributes.getDimension(C1155R.styleable.CustomTabbelPanel_tabLabelPaddingBottom, fromDp(0.0f));
-            init();
-        } finally {
+            this.mCloseButtonDrawable = obtainStyledAttributes.getDrawable(C1452R.styleable.CustomTabbelPanel_closeButton);
+            this.mPathOffset = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_pathOffset, fromDp(DEFAULT_PATH_OFFSET));
+            this.mTabSlope = obtainStyledAttributes.getFloat(C1452R.styleable.CustomTabbelPanel_tabSlope, DEFAULT_TAB_SLOPE);
+            this.mTabFillColor = obtainStyledAttributes.getColor(C1452R.styleable.CustomTabbelPanel_tabFillColor, -1071245480);
+            this.mFillColor = obtainStyledAttributes.getColor(C1452R.styleable.CustomTabbelPanel_fillColor, -1071245480);
+            this.mOuterLineColor = obtainStyledAttributes.getColor(C1452R.styleable.CustomTabbelPanel_outerLineColor, DEFAULT_OUTER_LINE_COLOR);
+            this.mOuterLineWidth = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_outerLineWidth, fromDp(1.0f));
+            this.mOuterLineChamfer = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_outerLineChamfer, fromDp(8.0f));
+            this.mInnerLineColor = obtainStyledAttributes.getColor(C1452R.styleable.CustomTabbelPanel_innerLineColor, DEFAULT_INNER_LINE_COLOR);
+            this.mInnerLineWidth = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_innerLineWidth, fromDp(1.0f));
+            this.mFontFamily = obtainStyledAttributes.getString(C1452R.styleable.CustomTabbelPanel_fontFamily);
+            this.mTextSize = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_textSize, fromSp(DEFAULT_TEXT_SIZE));
+            this.mTextStyle = obtainStyledAttributes.getInteger(C1452R.styleable.CustomTabbelPanel_textStyle, 0);
+            this.mTextColor = obtainStyledAttributes.getColor(C1452R.styleable.CustomTabbelPanel_textColor, -1);
+            this.mSelectedTextStyle = obtainStyledAttributes.getInteger(C1452R.styleable.CustomTabbelPanel_selectedTextStyle, 1);
+            this.mSelectedTextColor = obtainStyledAttributes.getColor(C1452R.styleable.CustomTabbelPanel_selectedTextColor, -1);
+            this.mTabLabelMarginLeft = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelMarginLeft, fromDp(8.0f));
+            this.mTabLabelMarginTop = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelMarginTop, fromDp(16.0f));
+            this.mTabLabelMarginRight = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelMarginRight, fromDp(8.0f));
+            this.mTabLabelMarginBottom = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelMarginBottom, fromDp(16.0f));
+            this.mTabLabelPaddingLeft = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelPaddingLeft, fromDp(0.0f));
+            this.mTabLabelPaddingTop = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelPaddingTop, fromDp(0.0f));
+            this.mTabLabelPaddingRight = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelPaddingRight, fromDp(0.0f));
+            this.mTabLabelPaddingBottom = obtainStyledAttributes.getDimension(C1452R.styleable.CustomTabbelPanel_tabLabelPaddingBottom, fromDp(0.0f));
             obtainStyledAttributes.recycle();
+            init();
+        } catch (Throwable th) {
+            obtainStyledAttributes.recycle();
+            throw th;
         }
     }
 
@@ -253,8 +261,8 @@ public class CustomTabbelPanel extends ViewGroup {
         return this.listener;
     }
 
-    public void setListener(Listener listener) {
-        this.listener = listener;
+    public void setListener(Listener listener2) {
+        this.listener = listener2;
     }
 
     public void selectTab(int i) {
@@ -262,7 +270,7 @@ public class CustomTabbelPanel extends ViewGroup {
             if (this.listener != null) {
                 try {
                     this.listener.onTabSelected(i);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(TAG, "Exception", e);
                 }
             }
@@ -284,7 +292,7 @@ public class CustomTabbelPanel extends ViewGroup {
                 } else if (this.listener != null) {
                     try {
                         this.listener.onClose();
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         Log.e(TAG, "Error", e);
                     }
                 }
@@ -298,19 +306,23 @@ public class CustomTabbelPanel extends ViewGroup {
         return new LayoutParams(getContext(), attributeSet);
     }
 
-    protected LayoutParams generateDefaultLayoutParams() {
+    /* access modifiers changed from: protected */
+    public LayoutParams generateDefaultLayoutParams() {
         return new LayoutParams(-1, -2);
     }
 
-    protected android.view.ViewGroup.LayoutParams generateLayoutParams(android.view.ViewGroup.LayoutParams layoutParams) {
+    /* access modifiers changed from: protected */
+    public android.view.ViewGroup.LayoutParams generateLayoutParams(android.view.ViewGroup.LayoutParams layoutParams) {
         return new LayoutParams(layoutParams);
     }
 
-    protected boolean checkLayoutParams(android.view.ViewGroup.LayoutParams layoutParams) {
+    /* access modifiers changed from: protected */
+    public boolean checkLayoutParams(android.view.ViewGroup.LayoutParams layoutParams) {
         return layoutParams instanceof LayoutParams;
     }
 
-    protected void onDraw(Canvas canvas) {
+    /* access modifiers changed from: protected */
+    public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawPath(this.mOuterLinePathBottom, this.mFillPaint);
         canvas.drawPath(this.mOuterLinePathBottom, this.mOuterLinePaint);
@@ -327,23 +339,35 @@ public class CustomTabbelPanel extends ViewGroup {
         }
     }
 
-    protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
+    /* access modifiers changed from: protected */
+    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
         this.mTmpContainerRect.left = getPaddingLeft() + ((int) this.mPathOffset);
-        this.mTmpContainerRect.top = getPaddingTop() + ((int) ((((calculateMaxTabLabelHeight() + this.mTabLabelMargins.top) + this.mTabLabelMargins.bottom) + this.mTabLabelPadding.top) + this.mTabLabelPadding.bottom));
+        this.mTmpContainerRect.top = getPaddingTop() + ((int) (calculateMaxTabLabelHeight() + this.mTabLabelMargins.top + this.mTabLabelMargins.bottom + this.mTabLabelPadding.top + this.mTabLabelPadding.bottom));
         this.mTmpContainerRect.right = (getMeasuredWidth() - getPaddingRight()) - ((int) this.mPathOffset);
         this.mTmpContainerRect.bottom = (getMeasuredHeight() - getPaddingBottom()) - ((int) this.mPathOffset);
-        for (int i5 = 0; i5 < getChildCount(); i5++) {
-            View childAt = getChildAt(i5);
-            if (childAt.getVisibility() != 8) {
-                LayoutParams layoutParams = (LayoutParams) childAt.getLayoutParams();
-                Gravity.apply(layoutParams.gravity, childAt.getMeasuredWidth(), childAt.getMeasuredHeight(), this.mTmpContainerRect, this.mTmpChildRect);
-                childAt.layout(this.mTmpChildRect.left, this.mTmpChildRect.top, this.mTmpChildRect.right, this.mTmpChildRect.bottom);
+        int i5 = 0;
+        while (true) {
+            int i6 = i5;
+            if (i6 < getChildCount()) {
+                View childAt = getChildAt(i6);
+                if (childAt.getVisibility() != 8) {
+                    LayoutParams layoutParams = (LayoutParams) childAt.getLayoutParams();
+                    Gravity.apply(layoutParams.gravity, childAt.getMeasuredWidth(), childAt.getMeasuredHeight(), this.mTmpContainerRect, this.mTmpChildRect);
+                    childAt.layout(this.mTmpChildRect.left, this.mTmpChildRect.top, this.mTmpChildRect.right, this.mTmpChildRect.bottom);
+                }
+                i5 = i6 + 1;
+            } else {
+                return;
             }
         }
     }
 
-    protected void onMeasure(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void onMeasure(int i, int i2) {
         int makeMeasureSpec;
+        int makeMeasureSpec2;
+        int i3;
+        int i4;
         int mode = MeasureSpec.getMode(i);
         int size = MeasureSpec.getSize(i);
         int mode2 = MeasureSpec.getMode(i2);
@@ -360,38 +384,38 @@ public class CustomTabbelPanel extends ViewGroup {
         switch (mode2) {
             case Integer.MIN_VALUE:
             case 1073741824:
-                mode2 = MeasureSpec.makeMeasureSpec(Math.max((((size2 - getPaddingTop()) - getPaddingBottom()) - ((int) (this.mPathOffset * DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM))) - ((int) ((((this.mTabLabelMargins.top + this.mTabLabelMargins.bottom) + this.mTabLabelPadding.top) + this.mTabLabelPadding.bottom) + calculateMaxTabLabelHeight())), 0), mode2);
+                makeMeasureSpec2 = MeasureSpec.makeMeasureSpec(Math.max((((size2 - getPaddingTop()) - getPaddingBottom()) - ((int) (this.mPathOffset * DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM))) - ((int) ((((this.mTabLabelMargins.top + this.mTabLabelMargins.bottom) + this.mTabLabelPadding.top) + this.mTabLabelPadding.bottom) + calculateMaxTabLabelHeight())), 0), mode2);
                 break;
             default:
-                mode2 = MeasureSpec.makeMeasureSpec(0, 0);
+                makeMeasureSpec2 = MeasureSpec.makeMeasureSpec(0, 0);
                 break;
         }
-        int i3 = 0;
-        int i4 = 0;
         int i5 = 0;
         int i6 = 0;
-        while (i3 < getChildCount()) {
-            View childAt = getChildAt(i3);
+        int i7 = 0;
+        int i8 = 0;
+        while (i5 < getChildCount()) {
+            View childAt = getChildAt(i5);
             if (childAt.getVisibility() != 8) {
-                measureChildWithMargins(childAt, makeMeasureSpec, 0, mode2, 0);
+                measureChildWithMargins(childAt, makeMeasureSpec, 0, makeMeasureSpec2, 0);
                 MarginLayoutParams marginLayoutParams = (MarginLayoutParams) childAt.getLayoutParams();
-                size2 = Math.max(i5, (childAt.getMeasuredWidth() + marginLayoutParams.leftMargin) + marginLayoutParams.rightMargin);
-                size = Math.max(i4, marginLayoutParams.bottomMargin + (childAt.getMeasuredHeight() + marginLayoutParams.topMargin));
-                i4 = combineMeasuredStates(i6, childAt.getMeasuredState());
+                i4 = Math.max(i7, childAt.getMeasuredWidth() + marginLayoutParams.leftMargin + marginLayoutParams.rightMargin);
+                int max = Math.max(i6, marginLayoutParams.bottomMargin + childAt.getMeasuredHeight() + marginLayoutParams.topMargin);
+                i8 = combineMeasuredStates(i8, childAt.getMeasuredState());
+                i3 = max;
             } else {
-                size = i4;
-                size2 = i5;
-                i4 = i6;
+                i3 = i6;
+                i4 = i7;
             }
-            i3++;
-            i5 = size2;
-            i6 = i4;
-            i4 = size;
+            i5++;
+            i6 = i3;
+            i7 = i4;
         }
-        setMeasuredDimension(resolveSizeAndState(i5, i, i6), resolveSizeAndState(i4, i2, i6 << 16));
+        setMeasuredDimension(resolveSizeAndState(i7, i, i8), resolveSizeAndState(i6, i2, i8 << 16));
     }
 
-    protected void onSizeChanged(int i, int i2, int i3, int i4) {
+    /* access modifiers changed from: protected */
+    public void onSizeChanged(int i, int i2, int i3, int i4) {
         super.onSizeChanged(i, i2, i3, i4);
         calculateBounds(i, i2);
     }
@@ -447,11 +471,17 @@ public class CustomTabbelPanel extends ViewGroup {
             return Integer.valueOf(-1);
         }
         if (this.tabHolderList != null) {
-            for (int i = 0; i < this.tabHolderList.size(); i++) {
-                TabHolder tabHolder = (TabHolder) this.tabHolderList.get(i);
-                if (tabHolder != null && tabHolder.getLabelBounds() != null && tabHolder.getLabelBounds().contains(motionEvent.getX(), motionEvent.getY())) {
-                    return Integer.valueOf(i);
+            int i = 0;
+            while (true) {
+                int i2 = i;
+                if (i2 >= this.tabHolderList.size()) {
+                    break;
                 }
+                TabHolder tabHolder = (TabHolder) this.tabHolderList.get(i2);
+                if (tabHolder != null && tabHolder.getLabelBounds() != null && tabHolder.getLabelBounds().contains(motionEvent.getX(), motionEvent.getY())) {
+                    return Integer.valueOf(i2);
+                }
+                i = i2 + 1;
             }
         }
         return null;
@@ -481,62 +511,65 @@ public class CustomTabbelPanel extends ViewGroup {
     }
 
     private void calculatePaths() {
-        float calculateMaxTabLabelHeight = ((((calculateMaxTabLabelHeight() + this.mTabLabelMargins.top) + this.mTabLabelMargins.bottom) + this.mTabLabelPadding.top) + this.mTabLabelPadding.bottom) + this.mPathOffset;
+        float f;
+        int size;
+        RectF rectF;
+        float calculateMaxTabLabelHeight = calculateMaxTabLabelHeight() + this.mTabLabelMargins.top + this.mTabLabelMargins.bottom + this.mTabLabelPadding.top + this.mTabLabelPadding.bottom + this.mPathOffset;
         int i = 0;
-        float f = 0.0f;
+        float f2 = 0.0f;
         while (i < 2) {
             this.tabHolderList.clear();
-            float f2 = 0.0f;
-            RectF rectF = null;
+            float f3 = 0.0f;
+            RectF rectF2 = null;
             int i2 = 0;
             while (i2 < this.tabLabels.size()) {
-                RectF labelBounds;
                 String str = (String) this.tabLabels.get(i2);
                 if (i2 == this.mSelectedTabIndex) {
                     this.mSelectedTabLabelPaint.getTextBounds(str, 0, str.length(), this.mTmpTabLabelBounds);
                 } else {
                     this.mTabLabelPaint.getTextBounds(str, 0, str.length(), this.mTmpTabLabelBounds);
                 }
-                Rect rect;
-                if (f < 0.0f) {
+                if (f2 < 0.0f) {
                     if (i2 != this.mSelectedTabIndex) {
-                        rect = this.mTmpTabLabelBounds;
-                        rect.right = (int) (((float) rect.right) + f);
+                        Rect rect = this.mTmpTabLabelBounds;
+                        rect.right = (int) (((float) rect.right) + f2);
                     }
-                } else if (f > 0.0f) {
-                    rect = this.mTmpTabLabelBounds;
-                    rect.right = (int) (((float) rect.right) + f);
+                } else if (f2 > 0.0f) {
+                    Rect rect2 = this.mTmpTabLabelBounds;
+                    rect2.right = (int) (((float) rect2.right) + f2);
                 }
-                float width = (((((float) this.mTmpTabLabelBounds.width()) + this.mTabLabelMargins.left) + this.mTabLabelMargins.right) + this.mTabLabelPadding.left) + this.mTabLabelPadding.right;
+                float width = ((float) this.mTmpTabLabelBounds.width()) + this.mTabLabelMargins.left + this.mTabLabelMargins.right + this.mTabLabelPadding.left + this.mTabLabelPadding.right;
                 boolean z = i2 == this.tabLabels.size() + -1;
-                TabGeometry newTopOutlineGeometry = newTopOutlineGeometry(this.mBounds, this.mOuterChamfer, calculateMaxTabLabelHeight, f2, width + this.mPathOffset, this.mPathOffset, 0.0f, z);
-                TabGeometry newTopOutlineGeometry2 = newTopOutlineGeometry(this.mBounds, this.mOuterChamfer, calculateMaxTabLabelHeight, f2, width + this.mPathOffset, this.mPathOffset, this.mPathOffset, z);
+                TabGeometry newTopOutlineGeometry = newTopOutlineGeometry(this.mBounds, this.mOuterChamfer, calculateMaxTabLabelHeight, f3, width + this.mPathOffset, this.mPathOffset, 0.0f, z);
+                TabGeometry newTopOutlineGeometry2 = newTopOutlineGeometry(this.mBounds, this.mOuterChamfer, calculateMaxTabLabelHeight, f3, width + this.mPathOffset, this.mPathOffset, this.mPathOffset, z);
                 TabHolder tabHolder = new TabHolder(newTopOutlineGeometry.getPath(), newTopOutlineGeometry2.getPath(), newTopOutlineGeometry.getTabBounds(), newTopOutlineGeometry2.getLabelBounds(), newTopOutlineGeometry2.getContentTop());
                 this.tabHolderList.add(tabHolder);
-                f2 = tabHolder.getLabelBounds().right - this.mBounds.left;
-                if (rectF == null) {
-                    labelBounds = newTopOutlineGeometry.getLabelBounds();
+                f3 = tabHolder.getLabelBounds().right - this.mBounds.left;
+                if (rectF2 == null) {
+                    rectF = newTopOutlineGeometry.getLabelBounds();
                 } else {
-                    labelBounds = rectF;
+                    rectF = rectF2;
                 }
                 i2++;
-                rectF = labelBounds;
+                rectF2 = rectF;
             }
-            if (!(rectF == null || this.mCloseButtonDrawable == null)) {
-                this.mCloseButtonBounds = new RectF(this.mBounds.right - ((((((((((rectF.bottom - rectF.top) - this.mCloseButtonMargins.top) - this.mCloseButtonMargins.bottom) - this.mCloseButtonPaddingTop) - this.mCloseButtonPaddingBottom) * (((float) this.mCloseButtonDrawable.getIntrinsicWidth()) / ((float) this.mCloseButtonDrawable.getIntrinsicHeight()))) + this.mCloseButtonMargins.left) + this.mCloseButtonMargins.right) + this.mCloseButtonPadding.left) + this.mCloseButtonPadding.right), rectF.top, this.mBounds.right, rectF.bottom);
+            if (!(rectF2 == null || this.mCloseButtonDrawable == null)) {
+                this.mCloseButtonBounds = new RectF(this.mBounds.right - ((((((((((rectF2.bottom - rectF2.top) - this.mCloseButtonMargins.top) - this.mCloseButtonMargins.bottom) - this.mCloseButtonPaddingTop) - this.mCloseButtonPaddingBottom) * (((float) this.mCloseButtonDrawable.getIntrinsicWidth()) / ((float) this.mCloseButtonDrawable.getIntrinsicHeight()))) + this.mCloseButtonMargins.left) + this.mCloseButtonMargins.right) + this.mCloseButtonPadding.left) + this.mCloseButtonPadding.right), rectF2.top, this.mBounds.right, rectF2.bottom);
             }
             RectF tabBounds = ((TabHolder) this.tabHolderList.get(this.tabHolderList.size() - 1)).getTabBounds();
-            float f3 = this.mCloseButtonBounds != null ? this.mCloseButtonBounds.left : this.mBounds.right;
-            if (tabBounds.right == f3) {
+            float f4 = this.mCloseButtonBounds != null ? this.mCloseButtonBounds.left : this.mBounds.right;
+            if (tabBounds.right == f4) {
                 break;
             }
-            if (tabBounds.right < f3) {
-                f3 = (f3 - tabBounds.right) / ((float) this.tabLabels.size());
+            if (tabBounds.right < f4) {
+                f = f4 - tabBounds.right;
+                size = this.tabLabels.size();
             } else {
-                f3 = (f3 - tabBounds.right) / ((float) (this.tabLabels.size() - 1));
+                f = f4 - tabBounds.right;
+                size = this.tabLabels.size() - 1;
             }
             i++;
-            f = f3;
+            f2 = f / ((float) size);
         }
         this.mOuterLinePathBottom = newBottomOutlinePath(this.mBounds, this.mOuterChamfer, calculateMaxTabLabelHeight, 0.0f);
         this.mInnerLinePathBottom = newBottomOutlinePath(this.mBounds, this.mOuterChamfer, calculateMaxTabLabelHeight, this.mPathOffset);
@@ -551,7 +584,7 @@ public class CustomTabbelPanel extends ViewGroup {
         float f6;
         PointF lineTo;
         PointF lineTo2;
-        Object obj = f2 == 0.0f ? 1 : null;
+        boolean z2 = f2 == 0.0f;
         float f7 = rectF.top + f;
         float f8 = f7 - f4;
         float f9 = f8 - pointF.y;
@@ -561,41 +594,42 @@ public class CustomTabbelPanel extends ViewGroup {
         float f13 = f10 + f12;
         float tan = (float) Math.tan(Math.toRadians((double) this.mTabSlope));
         float f14 = rectF.left;
-        float f15 = obj != null ? f14 : pointF.x + f14;
-        float max = obj != null ? f14 : Math.max(f2, pointF.x) + f14;
-        if (obj != null) {
+        float f15 = z2 ? f14 : pointF.x + f14;
+        float max = z2 ? f14 : Math.max(f2, pointF.x) + f14;
+        if (z2) {
             f6 = f12;
         } else {
             f6 = f11;
         }
-        f6 = (f6 / tan) + max;
-        float f16 = f6 + f3;
+        float f16 = (f6 / tan) + max;
+        float f17 = f16 + f3;
         if (!z) {
             f12 = f11;
         }
-        f12 = (f12 / tan) + f16;
-        f11 = rectF.right;
-        tan = f11 - pointF.x;
+        float f18 = (f12 / tan) + f17;
+        float f19 = rectF.right;
+        float f20 = f19 - pointF.x;
         Path path = new Path();
-        moveTo(path, new PointF(f14, f7), 0.0f, f5);
-        if (obj != null) {
+        PointF pointF2 = new PointF(f14, f7);
+        moveTo(path, pointF2, 0.0f, f5);
+        if (z2) {
             lineTo = lineTo(path, new PointF(max, f13), 90.0f - ((90.0f + this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
         } else {
             lineTo(path, new PointF(f14, f8), 90.0f - ((90.0f + this.chamferSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
             lineTo(path, new PointF(f15, f9), (180.0f - this.chamferSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM, f5);
             lineTo = lineTo(path, new PointF(max, f9), 180.0f - ((180.0f + this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
         }
-        PointF lineTo3 = lineTo(path, new PointF(f6, f10), (180.0f - this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM, f5);
-        PointF lineTo4 = lineTo(path, new PointF(f16, f10), 180.0f - ((180.0f - this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
+        PointF lineTo3 = lineTo(path, new PointF(f16, f10), (180.0f - this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM, f5);
+        PointF lineTo4 = lineTo(path, new PointF(f17, f10), 180.0f - ((180.0f - this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
         if (z) {
-            lineTo(path, new PointF(f12, f13), 90.0f + ((90.0f + this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
-            lineTo2 = lineTo(path, new PointF(f12, f9), 135.0f, f5);
+            lineTo(path, new PointF(f18, f13), 90.0f + ((90.0f + this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
+            lineTo2 = lineTo(path, new PointF(f18, f9), 135.0f, f5);
         } else {
-            lineTo2 = lineTo(path, new PointF(f12, f9), (180.0f + this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM, f5);
+            lineTo2 = lineTo(path, new PointF(f18, f9), (180.0f + this.mTabSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM, f5);
         }
-        lineTo(path, new PointF(tan, f9), 180.0f - ((180.0f - this.chamferSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
-        lineTo(path, new PointF(f11, f8), 90.0f + ((90.0f + this.chamferSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
-        lineTo(path, new PointF(f11, f7), 180.0f, f5);
+        lineTo(path, new PointF(f20, f9), 180.0f - ((180.0f - this.chamferSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
+        lineTo(path, new PointF(f19, f8), 90.0f + ((90.0f + this.chamferSlope) / DEFAULT_CLOSE_BUTTON_MARGIN_BOTTOM), f5);
+        lineTo(path, new PointF(f19, f7), 180.0f, f5);
         moveTo(path, new PointF(f14, f7), 0.0f, f5);
         path.close();
         return new TabGeometry(path, new RectF(lineTo.x, lineTo3.y, lineTo2.x, lineTo2.y), new RectF(lineTo3.x, lineTo3.y, lineTo4.x, lineTo2.y), lineTo2.y);
@@ -629,7 +663,7 @@ public class CustomTabbelPanel extends ViewGroup {
         canvas.drawPath(tabHolder.getOuterPath(), this.mOuterLinePaint);
         canvas.drawPath(tabHolder.getInnerPath(), this.mInnerLinePaint);
         RectF labelBounds = tabHolder.getLabelBounds();
-        float f = (labelBounds.left + this.mTabLabelMargins.left) + this.mTabLabelPadding.left;
+        float f = labelBounds.left + this.mTabLabelMargins.left + this.mTabLabelPadding.left;
         float f2 = (labelBounds.bottom - this.mTabLabelMargins.bottom) - this.mTabLabelPadding.bottom;
         float width = (((labelBounds.width() - this.mTabLabelMargins.left) - this.mTabLabelMargins.right) - this.mTabLabelPadding.left) - this.mTabLabelPadding.right;
         if (this.mSelectedTabIndex != i) {
@@ -667,8 +701,8 @@ public class CustomTabbelPanel extends ViewGroup {
         if (f2 == 0.0f) {
             return pointF;
         }
-        double toRadians = Math.toRadians((double) f);
-        return new PointF((float) (((double) pointF.x) + (Math.cos(toRadians) * ((double) f2))), (float) ((Math.sin(toRadians) * ((double) f2)) + ((double) pointF.y)));
+        double radians = Math.toRadians((double) f);
+        return new PointF((float) (((double) pointF.x) + (Math.cos(radians) * ((double) f2))), (float) ((Math.sin(radians) * ((double) f2)) + ((double) pointF.y)));
     }
 
     private float fromDp(float f) {

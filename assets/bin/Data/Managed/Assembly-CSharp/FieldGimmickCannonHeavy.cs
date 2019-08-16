@@ -4,10 +4,6 @@ public class FieldGimmickCannonHeavy : FieldGimmickCannonBase
 {
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
 		base.Initialize(pointData);
 		m_coolTime = MonoBehaviourSingleton<InGameSettingsManager>.I.cannonParam.coolTimeForHeavy;
 		m_baseTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
@@ -23,7 +19,7 @@ public class FieldGimmickCannonHeavy : FieldGimmickCannonBase
 		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Expected O, but got Unknown
+		//IL_0098: Expected O, but got Unknown
 		if (IsReadyForShot())
 		{
 			if (base._animator != null)

@@ -75,6 +75,10 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 
 	public List<EquipSetSkillData> equipSetSkill;
 
+	public EquipSetSkillData uniqueEquipSetSkill;
+
+	public string exceedExtraText;
+
 	private bool isUpdateExplanationText;
 
 	private string explanationText;
@@ -117,11 +121,15 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 
 	public bool isAttached => equipSetSkill != null && equipSetSkill.Count > 0;
 
+	public bool isUniqueAttached => uniqueEquipSetSkill != null && uniqueEquipSetSkill.equipItemUniqId != 0;
+
 	public int atk => atkList[0];
 
 	public int def => defList[0];
 
 	public bool IsCurrentEquipSetAttached => equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo()) != null;
+
+	public bool IsUniqueEquipSetAttached => uniqueEquipSetSkill.equipItemUniqId != 0;
 
 	public int elemAtk
 	{
@@ -148,6 +156,12 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 	}
 
 	public int giveExceedExp
+	{
+		get;
+		private set;
+	}
+
+	public int giveSameSkillExceedExp
 	{
 		get;
 		private set;
@@ -185,6 +199,9 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 			slotNo = index
 		};
 		skillItem.equipSlots.Add(item);
+		skillItem.uniqueEquipSlots = new SkillItem.UniqueEquipSetSlot();
+		skillItem.uniqueEquipSlots.euid = "0";
+		skillItem.uniqueEquipSlots.slotNo = index;
 		skillItem.exp = 0;
 		skillItem.expNext = 0;
 		skillItem.expPrev = 0;
@@ -218,7 +235,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		{
 			if (ulong.TryParse(equipSlot.euid, out ulong result))
 			{
-				if (result != 0L)
+				if (result != 0)
 				{
 					equipSetSkill.Add(new EquipSetSkillData(equipSlot));
 				}
@@ -228,18 +245,19 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 				Log.Error("parse error euid:{0}", equipSlot.euid);
 			}
 		}
+		uniqueEquipSetSkill = new EquipSetSkillData(recv_data.uniqueEquipSlots);
 		UpdateTableData();
-		growData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(tableData.growID, level);
-		nextGrowData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(tableData.growID, level + 1);
+		growData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(tableData.growID, level, exceedCnt);
+		nextGrowData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(tableData.growID, level + 1, exceedCnt);
 		atkList = new List<int>();
 		defList = new List<int>();
 		if (level > 1)
 		{
-			atkList.Add(GetGrowParamAtk(false));
-			defList.Add(GetGrowParamDef(false));
-			hp = GetGrowParamHp(false);
-			int[] growParamElemAtk = GetGrowParamElemAtk(false);
-			int[] growParamElemDef = GetGrowParamElemDef(false);
+			atkList.Add(GetGrowParamAtk());
+			defList.Add(GetGrowParamDef());
+			hp = GetGrowParamHp();
+			int[] growParamElemAtk = GetGrowParamElemAtk();
+			int[] growParamElemDef = GetGrowParamElemDef();
 			int i = 0;
 			for (int num = tableData.atkElement.Length; i < num; i++)
 			{
@@ -248,18 +266,18 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 			}
 			elemAtk = Mathf.Max(growParamElemAtk);
 			elemDef = Mathf.Max(growParamElemDef);
-			skillAtk = GetGrowParamSkillAtk(false);
-			skillAtkRate = GetGrowParamSkillAtkRate(false);
-			healHp = GetGrowParamHealHp(false);
+			skillAtk = GetGrowParamSkillAtk();
+			skillAtkRate = GetGrowParamSkillAtkRate();
+			healHp = GetGrowParamHealHp();
 			supportValue = new int[3];
 			for (int j = 0; j < 3; j++)
 			{
-				supportValue[j] = GetGrowParamSupprtValue(j, false);
+				supportValue[j] = GetGrowParamSupprtValue(j);
 			}
 			supportTime = new float[3];
 			for (int k = 0; k < 3; k++)
 			{
-				supportTime[k] = GetGrowParamSupprtTime(k, false);
+				supportTime[k] = GetGrowParamSupprtTime(k);
 			}
 		}
 		else
@@ -281,9 +299,10 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 			supportValue = tableData.supportValue;
 			supportTime = tableData.supportTime;
 		}
-		needExp = GetGrowParamNeedExp(false);
-		giveExp = GetGrowParamGiveExp(false);
+		needExp = GetGrowParamNeedExp();
+		giveExp = GetGrowParamGiveExp();
 		giveExceedExp = Singleton<ExceedSkillItemTable>.I.GetExceedExp(this);
+		giveSameSkillExceedExp = (int)((float)giveExceedExp * Singleton<ExceedSkillItemTable>.I.GetExceedRaritySamePointRate(tableData.rarity));
 		exceedExpPrev = Singleton<ExceedSkillItemTable>.I.GetNeedExceedExp(tableData.rarity, exceedCnt);
 		exceedExpNext = Singleton<ExceedSkillItemTable>.I.GetNeedExceedExp(tableData.rarity, exceedCnt + 1);
 		isUpdateExplanationText = false;
@@ -298,6 +317,11 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 	public void UpdateEquipSetSkill(List<EquipSetSkillData> updateSkill)
 	{
 		equipSetSkill = updateSkill;
+	}
+
+	public void UpdateUniqueEquipSetSkill(EquipSetSkillData updateSkill)
+	{
+		uniqueEquipSetSkill = updateSkill;
 	}
 
 	private int GetGrowParamAtk(bool is_next_level = false)
@@ -385,6 +409,10 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 	public static InventoryList<SkillItemInfo, SkillItem> CreateListFromItem(List<Item> recv_list)
 	{
 		InventoryList<SkillItemInfo, SkillItem> list = new InventoryList<SkillItemInfo, SkillItem>();
+		if (recv_list.IsNullOrEmpty())
+		{
+			return list;
+		}
 		recv_list.ForEach(delegate(Item o)
 		{
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)o.itemId);
@@ -394,7 +422,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 				{
 					uniqId = o.uniqId,
 					skillItemId = o.itemId,
-					level = (XorInt)1
+					level = 1
 				};
 				list.Add(item);
 				list.GetLastNode().Value.num = o.num;
@@ -482,11 +510,9 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		}
 		if (IsExistNextExceed())
 		{
-			switch (tableData.type)
+			SKILL_SLOT_TYPE type = tableData.type;
+			if (type == SKILL_SLOT_TYPE.ATTACK || type == SKILL_SLOT_TYPE.HEAL || type == SKILL_SLOT_TYPE.SUPPORT)
 			{
-			case SKILL_SLOT_TYPE.ATTACK:
-			case SKILL_SLOT_TYPE.SUPPORT:
-			case SKILL_SLOT_TYPE.HEAL:
 				return true;
 			}
 		}
@@ -526,7 +552,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 			explanationText = GetExplanationText(tableData.text, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd));
 			if (IsLevelMax() && IsExceeded())
 			{
-				exceedExplanationText = "\n" + GetExceedExplanationText(exceedCnt);
+				exceedExplanationText = "\n" + GetExceedExplanationText(tableData, level, exceedCnt);
 			}
 			isUpdateExplanationText = true;
 		}
@@ -537,11 +563,22 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		return explanationText;
 	}
 
-	public static string GetExceedExplanationText(int exceedCnt)
+	public string GetExceedExtraText()
 	{
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		string text = StringTable.Format(STRING_CATEGORY.SMITH, 11u, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt), StringTable.Format(STRING_CATEGORY.SMITH, 8u, GetDecreaseUseGaugePercent(exceedCnt)));
-		return UIUtility.GetColorText(text, ExceedSkillItemTable.color);
+		return GetExceedExtraText(tableData, level, exceedCnt);
+	}
+
+	public static string GetExceedExplanationText(SkillItemTable.SkillItemData data, int level, int exceedCnt)
+	{
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		string text = StringTable.Format(STRING_CATEGORY.SMITH, 8u, GetDecreaseUseGaugePercent(exceedCnt));
+		string text2 = GetExceedExtraText(data, level, exceedCnt);
+		if (!string.IsNullOrEmpty(text2))
+		{
+			text = text + "/" + text2;
+		}
+		string text3 = StringTable.Format(STRING_CATEGORY.SMITH, 11u, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt), text);
+		return UIUtility.GetColorText(text3, ExceedSkillItemTable.color);
 	}
 
 	public string GetExplanationStatusUpText(string format, bool isExceed, bool isHideExplanation)
@@ -552,7 +589,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 			return GetExplanationStatusUpText(tableData.text, format, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd));
 		}
 		empty = ((!isHideExplanation) ? (GetExplanationText(tableData.text, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd)) + "\n") : string.Empty);
-		return empty + GetExceedExplanationText(exceedCnt);
+		return empty + GetExceedExplanationText(tableData, level, exceedCnt);
 	}
 
 	private static int GetDecreaseUseGaugePercent(int exceedCnt)
@@ -624,22 +661,27 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		}
 	}
 
-	public static string GetExplanationText(SkillItemTable.SkillItemData table_data, int level)
+	public static string GetExplanationText(SkillItemTable.SkillItemData table_data, int level, int exceedCnt)
 	{
-		GrowSkillItemTable.GrowSkillItemData grow_data = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(table_data.growID, level);
+		GrowSkillItemTable.GrowSkillItemData grow_data = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(table_data.growID, level, exceedCnt);
 		string text = GetExplanationText(table_data.text, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd, table_data, grow_data, level));
-		int num = grow_data.exceedCnt;
-		if (level >= table_data.GetMaxLv(0) && (Singleton<ExceedSkillItemTable>.I.IsExistExceed(num + 1) || num > 0))
+		if (level >= table_data.GetMaxLv(0) && Singleton<ExceedSkillItemTable>.I.IsExistExceed(exceedCnt + 1) && exceedCnt > 0)
 		{
-			text = text + "\n" + GetExceedExplanationText(num);
+			text = text + "\n" + GetExceedExplanationText(table_data, level, exceedCnt);
 		}
 		return text;
 	}
 
-	public static string GetExplanationStatusUpText(SkillItemTable.SkillItemData table_data, int level, string status_up_format)
+	public static string GetExplanationStatusUpText(SkillItemTable.SkillItemData table_data, int level, int exceedCnt, string status_up_format)
 	{
-		GrowSkillItemTable.GrowSkillItemData grow_data = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(table_data.growID, level);
+		GrowSkillItemTable.GrowSkillItemData grow_data = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(table_data.growID, level, exceedCnt);
 		return GetExplanationStatusUpText(table_data.text, status_up_format, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd, table_data, grow_data, level));
+	}
+
+	public static string GetExceedExtraText(SkillItemTable.SkillItemData data, int level, int exceedCnt)
+	{
+		GrowSkillItemTable.GrowSkillItemData grow_data = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(data.growID, level, exceedCnt);
+		return GetExplanationText(data.exceedExtraText, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd, data, grow_data, level));
 	}
 
 	private static string GetStatusText(EXPLANATION_COMMAND cmd, SkillItemTable.SkillItemData table_data, GrowSkillItemTable.GrowSkillItemData grow_data, int level)
@@ -679,8 +721,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		case EXPLANATION_COMMAND.SKILL_ATK:
 		{
 			int num2 = (level <= 1) ? ((int)table_data.skillAtk) : grow_data.GetGrowParamSkillAtk(table_data.skillAtk);
-			num2 = Mathf.FloorToInt((float)num2 * MonoBehaviourSingleton<GlobalSettingsManager>.I.skillItem.explanationAtkDispRate);
-			return num2.ToString();
+			return Mathf.FloorToInt((float)num2 * MonoBehaviourSingleton<GlobalSettingsManager>.I.skillItem.explanationAtkDispRate).ToString();
 		}
 		case EXPLANATION_COMMAND.SKILL_ATKRATE:
 		{
@@ -725,7 +766,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		{
 			return array;
 		}
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(tableData.growID, level);
+		GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(tableData.growID, level, exceedCnt);
 		if (growSkillItemData == null)
 		{
 			return array;

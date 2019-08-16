@@ -50,7 +50,7 @@ public class ItemDetailSkill : SkillInfoBase
 	public override void Initialize()
 	{
 		object[] array = GameSection.GetEventData() as object[];
-		callSection = (ItemDetailEquip.CURRENT_SECTION)(int)array[0];
+		callSection = (ItemDetailEquip.CURRENT_SECTION)array[0];
 		itemData = array[1];
 		if (array.Length > 2)
 		{
@@ -95,7 +95,7 @@ public class ItemDetailSkill : SkillInfoBase
 
 	protected virtual void SetupDetailBase()
 	{
-		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailSkillBase", true);
+		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailSkillBase");
 		SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, 2);
 		SetFontStyle(detailBase, UI.STR_TITLE_DESCRIPTION, 2);
 		SetFontStyle(detailBase, UI.STR_TITLE_STATUS, 2);
@@ -104,56 +104,61 @@ public class ItemDetailSkill : SkillInfoBase
 
 	private void SkillParam(SkillItemInfo item)
 	{
-		SetActive(detailBase, UI.OBJ_SUB_STATUS, true);
+		SetActive(detailBase, UI.OBJ_SUB_STATUS, is_visible: true);
 		SkillItemTable.SkillItemData tableData = item.tableData;
 		SetLabelText(detailBase, UI.LBL_NAME, tableData.name);
 		SkillCompareParam(item, GetCompareItem());
 		SetLabelText(detailBase, UI.LBL_SELL, item.sellPrice.ToString());
-		SetSupportEncoding(UI.LBL_DESCRIPTION, true);
-		SetLabelText(detailBase, UI.LBL_DESCRIPTION, item.GetExplanationText(true));
+		SetSupportEncoding(UI.LBL_DESCRIPTION, isEnable: true);
+		SetLabelText(detailBase, UI.LBL_DESCRIPTION, item.GetExplanationText(isShowExceed: true));
 		bool is_visible = (callSection & (ItemDetailEquip.CURRENT_SECTION.SMITH_CREATE | ItemDetailEquip.CURRENT_SECTION.SMITH_SKILL_MATERIAL | ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT | ItemDetailEquip.CURRENT_SECTION.UI_PARTS | ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST)) == ItemDetailEquip.CURRENT_SECTION.NONE;
 		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible);
-		ResetTween(detailBase, UI.TWN_FAVORITE, 0);
-		ResetTween(detailBase, UI.TWN_UNFAVORITE, 0);
+		ResetTween(detailBase, UI.TWN_FAVORITE);
+		ResetTween(detailBase, UI.TWN_UNFAVORITE);
 		SetActive(detailBase, UI.TWN_UNFAVORITE, !item.isFavorite);
 		SetActive(detailBase, UI.TWN_FAVORITE, item.isFavorite);
 		if (item.IsLevelMax())
 		{
-			SetProgressInt(detailBase, UI.PRG_EXP_BAR, item.exceedExp, item.exceedExpPrev, item.exceedExpNext, null);
+			SetProgressInt(detailBase, UI.PRG_EXP_BAR, item.exceedExp, item.exceedExpPrev, item.exceedExpNext);
 		}
 		else
 		{
-			SetProgressInt(detailBase, UI.PRG_EXP_BAR, item.exp, item.expPrev, item.expNext, null);
+			SetProgressInt(detailBase, UI.PRG_EXP_BAR, item.exp, item.expPrev, item.expNext);
 		}
 		SetSkillSlotTypeIcon(detailBase, UI.SPR_SKILL_TYPE_ICON, UI.SPR_SKILL_TYPE_ICON_BG, UI.SPR_SKILL_TYPE_ICON_RARITY, tableData);
-		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, tableData.id, true, false);
-		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, tableData.id, true);
+		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, tableData.id, rotation: true, light_rotation: false);
+		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, tableData.id, rotation: true);
 	}
 
 	private void SkillTableParam(SkillItemTable.SkillItemData table_data)
 	{
-		SetActive(detailBase, UI.OBJ_SUB_STATUS, true);
+		SetActive(detailBase, UI.OBJ_SUB_STATUS, is_visible: true);
 		SetLabelText(detailBase, UI.LBL_NAME, table_data.name);
-		SetLabelText(detailBase, UI.LBL_LV_NOW, "1");
+		int level = 1;
+		if (callSection == ItemDetailEquip.CURRENT_SECTION.SHOP_TOP)
+		{
+			level = table_data.GetMaxLv(0);
+		}
+		SetLabelText(detailBase, UI.LBL_LV_NOW, level.ToString());
 		SetLabelText(detailBase, UI.LBL_LV_MAX, table_data.GetMaxLv(0).ToString());
 		SetLabelText(detailBase, UI.LBL_ATK, table_data.baseAtk.ToString());
 		SetLabelText(detailBase, UI.LBL_DEF, table_data.baseDef.ToString());
 		SetLabelText(detailBase, UI.LBL_HP, table_data.baseHp.ToString());
 		SetLabelText(detailBase, UI.LBL_SELL, table_data.baseSell.ToString());
-		SetLabelText(detailBase, UI.LBL_DESCRIPTION, table_data.GetExplanationText(1));
-		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
-		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, table_data.id, true, false);
-		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, table_data.id, true);
-		SetProgressInt(detailBase, UI.PRG_EXP_BAR, 0, -1, -1, null);
+		SetLabelText(detailBase, UI.LBL_DESCRIPTION, table_data.GetExplanationText(level));
+		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
+		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, table_data.id, rotation: true, light_rotation: false);
+		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, table_data.id, rotation: true);
+		SetProgressInt(detailBase, UI.PRG_EXP_BAR, 0);
 		SetSkillSlotTypeIcon(detailBase, UI.SPR_SKILL_TYPE_ICON, UI.SPR_SKILL_TYPE_ICON_BG, UI.SPR_SKILL_TYPE_ICON_RARITY, table_data);
 	}
 
 	private void NotDataEquipParam()
 	{
-		SetActive(detailBase, UI.OBJ_SUB_STATUS, false);
-		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
+		SetActive(detailBase, UI.OBJ_SUB_STATUS, is_visible: false);
+		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
 		SetLabelText(detailBase, UI.LBL_NAME, base.sectionData.GetText("EMPTY"));
-		SetProgressInt(detailBase, UI.PRG_EXP_BAR, 0, -1, -1, null);
+		SetProgressInt(detailBase, UI.PRG_EXP_BAR, 0);
 		SetSkillSlotTypeIcon(detailBase, UI.SPR_SKILL_TYPE_ICON, UI.SPR_SKILL_TYPE_ICON_BG, UI.SPR_SKILL_TYPE_ICON_RARITY, null);
 		SetLabelText(detailBase, UI.LBL_DESCRIPTION, string.Empty);
 		ClearRenderModel((Enum)UI.TEX_MODEL);
@@ -171,9 +176,9 @@ public class ItemDetailSkill : SkillInfoBase
 			SetActive(detailBase, UI.OBJ_LV_EX, item.IsExceeded());
 			if (compare_item != null)
 			{
-				SetLabelCompareParam(detailBase, UI.LBL_ATK, item.atk, compare_item.atk, -1);
-				SetLabelCompareParam(detailBase, UI.LBL_DEF, item.def, compare_item.def, -1);
-				SetLabelCompareParam(detailBase, UI.LBL_HP, item.hp, compare_item.hp, -1);
+				SetLabelCompareParam(detailBase, UI.LBL_ATK, item.atk, compare_item.atk);
+				SetLabelCompareParam(detailBase, UI.LBL_DEF, item.def, compare_item.def);
+				SetLabelCompareParam(detailBase, UI.LBL_HP, item.hp, compare_item.hp);
 			}
 			else
 			{
@@ -220,31 +225,31 @@ public class ItemDetailSkill : SkillInfoBase
 				{
 					if (recv_item.isFavorite)
 					{
-						SetActive(detailBase, UI.TWN_UNFAVORITE, false);
-						SetActive(detailBase, UI.TWN_FAVORITE, true);
-						ResetTween(detailBase, UI.TWN_FAVORITE, 0);
-						PlayTween(detailBase, UI.TWN_FAVORITE, true, delegate
+						SetActive(detailBase, UI.TWN_UNFAVORITE, is_visible: false);
+						SetActive(detailBase, UI.TWN_FAVORITE, is_visible: true);
+						ResetTween(detailBase, UI.TWN_FAVORITE);
+						PlayTween(detailBase, UI.TWN_FAVORITE, forward: true, delegate
 						{
-							GameSection.ChangeStayEvent("FAVORITE", null);
-							GameSection.ResumeEvent(is_success, null);
-						}, true, 0);
+							GameSection.ChangeStayEvent("FAVORITE");
+							GameSection.ResumeEvent(is_success);
+						});
 					}
 					else
 					{
-						SetActive(detailBase, UI.TWN_FAVORITE, false);
-						SetActive(detailBase, UI.TWN_UNFAVORITE, true);
-						ResetTween(detailBase, UI.TWN_UNFAVORITE, 0);
-						PlayTween(detailBase, UI.TWN_UNFAVORITE, true, delegate
+						SetActive(detailBase, UI.TWN_FAVORITE, is_visible: false);
+						SetActive(detailBase, UI.TWN_UNFAVORITE, is_visible: true);
+						ResetTween(detailBase, UI.TWN_UNFAVORITE);
+						PlayTween(detailBase, UI.TWN_UNFAVORITE, forward: true, delegate
 						{
-							GameSection.ChangeStayEvent("RELEASE_FAVORITE", null);
-							GameSection.ResumeEvent(is_success, null);
-						}, true, 0);
+							GameSection.ChangeStayEvent("RELEASE_FAVORITE");
+							GameSection.ResumeEvent(is_success);
+						});
 					}
 					itemData = recv_item;
 				}
 				else
 				{
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success);
 				}
 			});
 		}
@@ -305,18 +310,16 @@ public class ItemDetailSkill : SkillInfoBase
 		skillItemSortData.SetItem(skill);
 		if (!skillItemSortData.CanSale())
 		{
-			GameSection.ChangeEvent("NOT_SALE_FAVORITE", null);
+			GameSection.ChangeEvent("NOT_SALE_FAVORITE");
+			return;
 		}
-		else
+		List<SortCompareData> list = new List<SortCompareData>();
+		list.Add(skillItemSortData);
+		GameSection.ChangeEvent("SELL", new object[2]
 		{
-			List<SortCompareData> list = new List<SortCompareData>();
-			list.Add(skillItemSortData);
-			GameSection.ChangeEvent("SELL", new object[2]
-			{
-				ItemStorageTop.TAB_MODE.SKILL,
-				list
-			});
-		}
+			ItemStorageTop.TAB_MODE.SKILL,
+			list
+		});
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.format.InputAccessor.Std;
 import com.fasterxml.jackson.core.format.MatchStrength;
-import com.fasterxml.jackson.core.io.MergedStream;
+import com.fasterxml.jackson.core.p015io.MergedStream;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -152,50 +152,46 @@ public class DataFormatReaders {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('[');
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
         int length = this._readers.length;
         if (length > 0) {
-            stringBuilder.append(this._readers[0].getFactory().getFormatName());
+            sb.append(this._readers[0].getFactory().getFormatName());
             for (int i = 1; i < length; i++) {
-                stringBuilder.append(", ");
-                stringBuilder.append(this._readers[i].getFactory().getFormatName());
+                sb.append(", ");
+                sb.append(this._readers[i].getFactory().getFormatName());
             }
         }
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append(']');
+        return sb.toString();
     }
 
     private Match _findFormat(AccessorForReader accessorForReader) throws IOException {
+        MatchStrength matchStrength;
         ObjectReader objectReader;
-        MatchStrength hasFormat;
         ObjectReader[] objectReaderArr = this._readers;
         int length = objectReaderArr.length;
         int i = 0;
+        MatchStrength matchStrength2 = null;
         ObjectReader objectReader2 = null;
-        MatchStrength matchStrength = null;
-        while (i < length) {
-            ObjectReader objectReader3;
+        while (true) {
+            if (i >= length) {
+                matchStrength = matchStrength2;
+                objectReader = objectReader2;
+                break;
+            }
             objectReader = objectReaderArr[i];
             accessorForReader.reset();
-            hasFormat = objectReader.getFactory().hasFormat(accessorForReader);
-            if (hasFormat == null) {
-                objectReader3 = objectReader2;
-            } else if (hasFormat.ordinal() < this._minimalMatch.ordinal()) {
-                objectReader3 = objectReader2;
-            } else if (objectReader2 != null && matchStrength.ordinal() >= hasFormat.ordinal()) {
-                objectReader3 = objectReader2;
-            } else if (hasFormat.ordinal() >= this._optimalMatch.ordinal()) {
-                break;
-            } else {
-                matchStrength = hasFormat;
-                objectReader3 = objectReader;
+            matchStrength = objectReader.getFactory().hasFormat(accessorForReader);
+            if (matchStrength != null && matchStrength.ordinal() >= this._minimalMatch.ordinal() && (objectReader2 == null || matchStrength2.ordinal() < matchStrength.ordinal())) {
+                if (matchStrength.ordinal() >= this._optimalMatch.ordinal()) {
+                    break;
+                }
+                matchStrength2 = matchStrength;
+                objectReader2 = objectReader;
             }
             i++;
-            objectReader2 = objectReader3;
         }
-        hasFormat = matchStrength;
-        objectReader = objectReader2;
-        return accessorForReader.createMatcher(objectReader, hasFormat);
+        return accessorForReader.createMatcher(objectReader, matchStrength);
     }
 }

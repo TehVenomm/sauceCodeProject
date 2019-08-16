@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:orientation="horizontal" android:id="@+id/chatOption" android:background="@drawable/net_gogame_chat_rounded_corner_for_agent" android:paddingRight="10dp" android:paddingBottom="5dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <ImageView android:layout_gravity="center_vertical" android:id="@+id/optionBulletImageView" android:background="@drawable/net_gogame_chat_bullet_icon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp" android:contentDescription="@string/net_gogame_chat_option_bullet_description"/>
-    <TextView android:textSize="18dp" android:textColor="#000" android:id="@+id/optionLabelTextView" android:padding="5dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-</LinearLayout>

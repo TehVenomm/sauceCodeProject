@@ -50,7 +50,7 @@ public class EnemyController : ControllerBase
 		isStart = true;
 		if (IsEnableControll())
 		{
-			OnChangeEnableControll(true);
+			OnChangeEnableControll(enable: true);
 		}
 	}
 
@@ -61,7 +61,6 @@ public class EnemyController : ControllerBase
 
 	public override void OnChangeEnableControll(bool enable)
 	{
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		base.OnChangeEnableControll(enable);
 		if (enable)
 		{
@@ -81,7 +80,6 @@ public class EnemyController : ControllerBase
 
 	public override void OnActReaction()
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		base.OnActReaction();
 		if (IsEnableControll() && mainCoroutine != null)
 		{
@@ -93,7 +91,22 @@ public class EnemyController : ControllerBase
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetOffsetByEnemy();
+			MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetPositionByEnemy();
 		}
+	}
+
+	public void OnSetDecoy()
+	{
+		if (enemy.actionID == Character.ACTION_ID.MOVE || enemy.actionID == Character.ACTION_ID.ROTATE)
+		{
+			enemy.ActIdle();
+		}
+		enemyBrain.SetNearDecoyTarget();
+	}
+
+	public void OnCheckMissDecoy(StageObject decoyObj)
+	{
+		enemyBrain.MissDecoyTarget(decoyObj);
 	}
 
 	public void Reset()
@@ -119,46 +132,47 @@ public class EnemyController : ControllerBase
 		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
-		if (enemy.isHiding && (enemy.IsOriginal() || enemy.IsCoopNone()))
+		if (!enemy.isHiding || (!enemy.IsOriginal() && !enemy.IsCoopNone()))
 		{
-			if ((double)turnUpTimer >= 0.5)
-			{
-				if (base.brain.opponentMem != null)
-				{
-					base.brain.opponentMem.Update();
-				}
-				StageObject targetObjectOfNearest = base.brain.targetCtrl.GetTargetObjectOfNearest();
-				if (targetObjectOfNearest != null)
-				{
-					Vector2 val = targetObjectOfNearest._position.ToVector2XZ();
-					Vector2 val2 = enemy._position.ToVector2XZ();
-					float num = Vector2.Distance(val, val2);
-					if (num <= enemy.turnUpDistance)
-					{
-						enemy.TurnUp();
-					}
-				}
-				turnUpTimer = 0f;
-			}
-			turnUpTimer += Time.get_deltaTime();
+			return;
 		}
+		if ((double)turnUpTimer >= 0.5)
+		{
+			if (base.brain.opponentMem != null)
+			{
+				base.brain.opponentMem.Update();
+			}
+			StageObject targetObjectOfNearest = base.brain.targetCtrl.GetTargetObjectOfNearest();
+			if (targetObjectOfNearest != null)
+			{
+				Vector2 val = targetObjectOfNearest._position.ToVector2XZ();
+				Vector2 val2 = enemy._position.ToVector2XZ();
+				float num = Vector2.Distance(val, val2);
+				if (num <= enemy.turnUpDistance)
+				{
+					enemy.TurnUp();
+				}
+			}
+			turnUpTimer = 0f;
+		}
+		turnUpTimer += Time.get_deltaTime();
 	}
 
 	private IEnumerator AIMain()
 	{
 		while (base.brain == null || !base.brain.isInitialized)
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		while (!character.isControllable)
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		if (startWaitTime > 0f)
 		{
 			yield return (object)new WaitForSeconds(startWaitTime);
 		}
-		base.brain.HandleEvent(BRAIN_EVENT.END_ENEMY_ACTION, null);
+		base.brain.HandleEvent(BRAIN_EVENT.END_ENEMY_ACTION);
 		while (this.get_enabled())
 		{
 			while (character.IsMirror())
@@ -167,10 +181,10 @@ public class EnemyController : ControllerBase
 			}
 			while (enemy.isHiding || enemy.IsHideMotionPlaying())
 			{
-				yield return (object)null;
+				yield return null;
 			}
-			yield return (object)this.StartCoroutine(OnAction());
-			yield return (object)0;
+			yield return this.StartCoroutine(OnAction());
+			yield return 0;
 		}
 		mainCoroutine = null;
 	}
@@ -183,15 +197,15 @@ public class EnemyController : ControllerBase
 			is_action = true;
 			if (base.brain.isNonActive)
 			{
-				yield return (object)this.StartCoroutine(OnRotate());
+				yield return this.StartCoroutine(OnRotate());
 			}
 			else
 			{
-				yield return (object)this.StartCoroutine(OnRotateOfAction());
+				yield return this.StartCoroutine(OnRotateOfAction());
 			}
 			while (character.actionID == Character.ACTION_ID.ROTATE)
 			{
-				yield return (object)0;
+				yield return 0;
 			}
 		}
 		if (base.brain.moveCtrl.IsSeek())
@@ -199,25 +213,25 @@ public class EnemyController : ControllerBase
 			is_action = true;
 			if (base.brain.isNonActive)
 			{
-				yield return (object)this.StartCoroutine(OnMove());
+				yield return this.StartCoroutine(OnMove());
 			}
 			else
 			{
-				yield return (object)this.StartCoroutine(OnMoveOfAction());
+				yield return this.StartCoroutine(OnMoveOfAction());
 			}
 			while (character.actionID == Character.ACTION_ID.MOVE)
 			{
-				yield return (object)0;
+				yield return 0;
 			}
 		}
 		if (base.brain.weaponCtrl.IsAttack())
 		{
 			is_action = true;
-			yield return (object)this.StartCoroutine(OnAttackOfAction());
+			yield return this.StartCoroutine(OnAttackOfAction());
 		}
 		if (is_action)
 		{
-			base.brain.HandleEvent(BRAIN_EVENT.END_ENEMY_ACTION, null);
+			base.brain.HandleEvent(BRAIN_EVENT.END_ENEMY_ACTION);
 		}
 	}
 
@@ -226,7 +240,7 @@ public class EnemyController : ControllerBase
 		EnemyActionController.ActionInfo actInfo = enemyBrain.actionCtrl.nowAction;
 		if (actInfo.data.isRotate)
 		{
-			yield return (object)this.StartCoroutine(OnRotateToTarget());
+			yield return this.StartCoroutine(OnRotateToTarget());
 		}
 	}
 
@@ -237,11 +251,11 @@ public class EnemyController : ControllerBase
 		{
 			if (base.brain.param.moveParam.enableActionMoveHoming)
 			{
-				yield return (object)this.StartCoroutine(OnMoveHoming());
+				yield return this.StartCoroutine(OnMoveHoming());
 			}
 			else
 			{
-				yield return (object)this.StartCoroutine(OnMoveToTarget());
+				yield return this.StartCoroutine(OnMoveToTarget());
 			}
 		}
 	}
@@ -260,61 +274,93 @@ public class EnemyController : ControllerBase
 			switch (actionTypeInfo.type)
 			{
 			case EnemyActionTable.ACTION_TYPE.STEP:
-				yield return (object)this.StartCoroutine(OnStep(false));
+				yield return this.StartCoroutine(OnStep());
 				break;
 			case EnemyActionTable.ACTION_TYPE.STEP_BACK:
-				yield return (object)this.StartCoroutine(OnStep(true));
+				yield return this.StartCoroutine(OnStep(is_back: true));
 				break;
 			case EnemyActionTable.ACTION_TYPE.ROTATE:
-				yield return (object)this.StartCoroutine(OnRotateToTarget());
+				yield return this.StartCoroutine(OnRotateToTarget());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE:
-				yield return (object)this.StartCoroutine(OnMoveToTarget());
+				yield return this.StartCoroutine(OnMoveToTarget());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_HOMING:
-				yield return (object)this.StartCoroutine(OnMoveHoming());
+				yield return this.StartCoroutine(OnMoveHoming());
 				break;
 			case EnemyActionTable.ACTION_TYPE.ATTACK:
-				yield return (object)this.StartCoroutine(OnAtk(actionTypeInfo));
+				yield return this.StartCoroutine(OnAtk(actionTypeInfo));
 				break;
 			case EnemyActionTable.ACTION_TYPE.ANGRY:
-				yield return (object)this.StartCoroutine(OnAngry(actionTypeInfo, nowActData.angryId));
+				yield return this.StartCoroutine(OnAngry(actionTypeInfo, nowActData.angryId));
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_SIDE:
-				yield return (object)this.StartCoroutine(OnMoveSideways());
+				yield return this.StartCoroutine(OnMoveSideways());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_POINT:
-				yield return (object)this.StartCoroutine(OnMovePoint());
+				yield return this.StartCoroutine(OnMovePoint());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_LOOKAT:
-				yield return (object)this.StartCoroutine(OnMoveLookAt());
+				yield return this.StartCoroutine(OnMoveLookAt());
 				break;
 			}
 		}
 		while (!character.IsChangeableAction(Character.ACTION_ID.NONE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
-		float time = nowActData.afterWaitTime;
+		float time2 = nowActData.afterWaitTime;
 		if (enemyParameter != null)
 		{
-			time += enemyParameter.baseAfterWaitTime;
+			time2 += enemyParameter.baseAfterWaitTime;
+			time2 += GetAfterWaitTimeByLv(enemy.enemyLevel);
 		}
 		if (enemy.packetSender != null)
 		{
-			time = enemy.packetSender.GetWaitTime(time);
+			time2 = enemy.packetSender.GetWaitTime(time2);
 		}
-		if (time > 0f)
+		if (time2 > 0f)
 		{
-			yield return (object)new WaitForSeconds(time);
+			yield return (object)new WaitForSeconds(time2);
 		}
+	}
+
+	private float GetAfterWaitTimeByLv(int lv)
+	{
+		if (enemyParameter == null)
+		{
+			return 0f;
+		}
+		if (enemyParameter.afterWaitTimeThresholdsByLv.IsNullOrEmpty())
+		{
+			return 0f;
+		}
+		if (enemyParameter.afterWaitTimesByLv.IsNullOrEmpty())
+		{
+			return 0f;
+		}
+		if (enemyParameter.afterWaitTimeThresholdsByLv.Length >= enemyParameter.afterWaitTimesByLv.Length)
+		{
+			return 0f;
+		}
+		int num = enemyParameter.afterWaitTimesByLv.Length - 1;
+		int i = 0;
+		for (int num2 = enemyParameter.afterWaitTimeThresholdsByLv.Length; i < num2; i++)
+		{
+			if ((float)lv <= enemyParameter.afterWaitTimeThresholdsByLv[i])
+			{
+				num = i;
+				break;
+			}
+		}
+		return enemyParameter.afterWaitTimesByLv[num];
 	}
 
 	public IEnumerator OnStep(bool is_back = false)
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.MAX))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		Enemy.SUB_MOTION_ID motion_id = Enemy.SUB_MOTION_ID.STEP;
 		if (is_back)
@@ -328,16 +374,16 @@ public class EnemyController : ControllerBase
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.ATTACK))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
-		character.ActAttack(actionTypeInfo.id, true, false);
+		character.ActAttack(actionTypeInfo.id, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
 	}
 
 	public IEnumerator OnAngry(EnemyActionTable.ActionTypeInfo actionTypeInfo, uint angryId)
 	{
-		while (!character.IsChangeableAction((Character.ACTION_ID)14))
+		while (!character.IsChangeableAction((Character.ACTION_ID)15))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		enemy.ActAngry(actionTypeInfo.id, angryId);
 	}
@@ -346,7 +392,7 @@ public class EnemyController : ControllerBase
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.ROTATE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		if (!character.isControllable)
 		{
@@ -356,7 +402,7 @@ public class EnemyController : ControllerBase
 		{
 			if (base.brain.param.moveParam.motionRotate)
 			{
-				character.ActRotateMotionToTarget(false);
+				character.ActRotateMotionToTarget();
 			}
 			else
 			{
@@ -369,7 +415,7 @@ public class EnemyController : ControllerBase
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.MOVE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		if (!character.isControllable)
 		{
@@ -383,7 +429,12 @@ public class EnemyController : ControllerBase
 			{
 				len = base.brain.param.moveParam.moveMaxLength;
 			}
-			character.ActMoveToTarget(len, false);
+			float alteredLength = 0f;
+			if (enemyBrain.actionCtrl.GetMoveMaxLength(ref alteredLength))
+			{
+				len = alteredLength;
+			}
+			character.ActMoveToTarget(len);
 		}
 	}
 
@@ -391,7 +442,7 @@ public class EnemyController : ControllerBase
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.ROTATE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		Vector3 vec_target = base.brain.moveCtrl.targetPos - character._position;
 		vec_target.y = 0f;
@@ -408,27 +459,27 @@ public class EnemyController : ControllerBase
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.MOVE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		Vector3 vec_target = base.brain.moveCtrl.targetPos - character._position;
 		vec_target.y = 0f;
 		float max_length = base.brain.param.moveParam.moveMaxLength;
 		if (max_length > 0f)
 		{
-			float length = vec_target.get_magnitude();
-			if (length > max_length)
+			float magnitude = vec_target.get_magnitude();
+			if (magnitude > max_length)
 			{
-				vec_target *= max_length / length;
+				vec_target *= max_length / magnitude;
 			}
 		}
-		character.ActMoveToPosition(character._position + vec_target, false);
+		character.ActMoveToPosition(character._position + vec_target);
 	}
 
 	public IEnumerator OnMoveHoming()
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.MOVE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		if (!character.isControllable)
 		{
@@ -445,20 +496,20 @@ public class EnemyController : ControllerBase
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.MOVE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		if (!character.isControllable)
 		{
 			base.brain.opponentMem.Update();
 		}
-		character.ActMoveSideways(0, false);
+		character.ActMoveSideways();
 	}
 
 	public IEnumerator OnMovePoint()
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.MOVE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		if (!character.isControllable)
 		{
@@ -471,13 +522,13 @@ public class EnemyController : ControllerBase
 	{
 		while (!character.IsChangeableAction(Character.ACTION_ID.MOVE))
 		{
-			yield return (object)0;
+			yield return 0;
 		}
 		if (!character.isControllable)
 		{
 			base.brain.opponentMem.Update();
 		}
-		enemy.ActMoveLookAt(enemy.movePointPos, false);
+		enemy.ActMoveLookAt(enemy.movePointPos);
 	}
 
 	public void OnHitAttack(StageObject target)

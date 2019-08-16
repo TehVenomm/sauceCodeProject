@@ -17,6 +17,51 @@ public class PropertyNamingStrategy implements Serializable {
     public static final PropertyNamingStrategy SNAKE_CASE = new SnakeCaseStrategy();
     public static final PropertyNamingStrategy UPPER_CAMEL_CASE = new UpperCamelCaseStrategy();
 
+    public static class KebabCaseStrategy extends PropertyNamingStrategyBase {
+        public String translate(String str) {
+            if (str == null) {
+                return str;
+            }
+            int length = str.length();
+            if (length == 0) {
+                return str;
+            }
+            StringBuilder sb = new StringBuilder((length >> 1) + length);
+            int i = 0;
+            for (int i2 = 0; i2 < length; i2++) {
+                char charAt = str.charAt(i2);
+                char lowerCase = Character.toLowerCase(charAt);
+                if (lowerCase == charAt) {
+                    if (i > 1) {
+                        sb.insert(sb.length() - 1, '-');
+                    }
+                    i = 0;
+                } else {
+                    if (i == 0 && i2 > 0) {
+                        sb.append('-');
+                    }
+                    i++;
+                }
+                sb.append(lowerCase);
+            }
+            return sb.toString();
+        }
+    }
+
+    public static class LowerCaseStrategy extends PropertyNamingStrategyBase {
+        public String translate(String str) {
+            return str.toLowerCase();
+        }
+    }
+
+    @Deprecated
+    public static class LowerCaseWithUnderscoresStrategy extends SnakeCaseStrategy {
+    }
+
+    @Deprecated
+    public static class PascalCaseStrategy extends UpperCamelCaseStrategy {
+    }
+
     public static abstract class PropertyNamingStrategyBase extends PropertyNamingStrategy {
         public abstract String translate(String str);
 
@@ -37,89 +82,34 @@ public class PropertyNamingStrategy implements Serializable {
         }
     }
 
-    public static class KebabCaseStrategy extends PropertyNamingStrategyBase {
-        public String translate(String str) {
-            if (str == null) {
-                return str;
-            }
-            int length = str.length();
-            if (length == 0) {
-                return str;
-            }
-            StringBuilder stringBuilder = new StringBuilder((length >> 1) + length);
-            int i = 0;
-            int i2 = 0;
-            while (i < length) {
-                char charAt = str.charAt(i);
-                char toLowerCase = Character.toLowerCase(charAt);
-                if (toLowerCase == charAt) {
-                    if (i2 > 1) {
-                        stringBuilder.insert(stringBuilder.length() - 1, '-');
-                    }
-                    i2 = 0;
-                } else {
-                    if (i2 == 0 && i > 0) {
-                        stringBuilder.append('-');
-                    }
-                    i2++;
-                }
-                stringBuilder.append(toLowerCase);
-                i++;
-            }
-            return stringBuilder.toString();
-        }
-    }
-
-    public static class LowerCaseStrategy extends PropertyNamingStrategyBase {
-        public String translate(String str) {
-            return str.toLowerCase();
-        }
-    }
-
     public static class SnakeCaseStrategy extends PropertyNamingStrategyBase {
         public String translate(String str) {
             if (str == null) {
                 return str;
             }
             int length = str.length();
-            StringBuilder stringBuilder = new StringBuilder(length * 2);
+            StringBuilder sb = new StringBuilder(length * 2);
+            boolean z = false;
             int i = 0;
-            Object obj = null;
-            int i2 = 0;
-            while (i < length) {
-                Object obj2;
-                char charAt = str.charAt(i);
-                if (i > 0 || charAt != '_') {
-                    int i3;
-                    char c;
+            for (int i2 = 0; i2 < length; i2++) {
+                char charAt = str.charAt(i2);
+                if (i2 > 0 || charAt != '_') {
                     if (Character.isUpperCase(charAt)) {
-                        if (obj == null && i2 > 0 && stringBuilder.charAt(i2 - 1) != '_') {
-                            stringBuilder.append('_');
-                            i2++;
+                        if (!z && i > 0 && sb.charAt(i - 1) != '_') {
+                            sb.append('_');
+                            i++;
                         }
-                        char toLowerCase = Character.toLowerCase(charAt);
-                        obj2 = 1;
-                        i3 = i2;
-                        c = toLowerCase;
+                        charAt = Character.toLowerCase(charAt);
+                        z = true;
                     } else {
-                        i3 = i2;
-                        c = charAt;
-                        obj2 = null;
+                        z = false;
                     }
-                    stringBuilder.append(c);
-                    i2 = i3 + 1;
-                } else {
-                    obj2 = obj;
+                    sb.append(charAt);
+                    i++;
                 }
-                i++;
-                obj = obj2;
             }
-            return i2 > 0 ? stringBuilder.toString() : str;
+            return i > 0 ? sb.toString() : str;
         }
-    }
-
-    @Deprecated
-    public static class LowerCaseWithUnderscoresStrategy extends SnakeCaseStrategy {
     }
 
     public static class UpperCamelCaseStrategy extends PropertyNamingStrategyBase {
@@ -128,18 +118,14 @@ public class PropertyNamingStrategy implements Serializable {
                 return str;
             }
             char charAt = str.charAt(0);
-            char toUpperCase = Character.toUpperCase(charAt);
-            if (charAt == toUpperCase) {
+            char upperCase = Character.toUpperCase(charAt);
+            if (charAt == upperCase) {
                 return str;
             }
-            StringBuilder stringBuilder = new StringBuilder(str);
-            stringBuilder.setCharAt(0, toUpperCase);
-            return stringBuilder.toString();
+            StringBuilder sb = new StringBuilder(str);
+            sb.setCharAt(0, upperCase);
+            return sb.toString();
         }
-    }
-
-    @Deprecated
-    public static class PascalCaseStrategy extends UpperCamelCaseStrategy {
     }
 
     public String nameForField(MapperConfig<?> mapperConfig, AnnotatedField annotatedField, String str) {

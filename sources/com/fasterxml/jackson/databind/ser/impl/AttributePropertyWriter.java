@@ -36,7 +36,8 @@ public class AttributePropertyWriter extends VirtualBeanPropertyWriter {
         throw new IllegalStateException("Should not be called on this type");
     }
 
-    protected Object value(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws Exception {
+    /* access modifiers changed from: protected */
+    public Object value(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws Exception {
         return serializerProvider.getAttribute(this._attrName);
     }
 }

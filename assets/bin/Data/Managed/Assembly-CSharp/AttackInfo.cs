@@ -32,6 +32,9 @@ public class AttackInfo
 	[Tooltip("スキル参照")]
 	public bool isSkillReference;
 
+	[Tooltip("複属性スキルの場合どの属性を使うか")]
+	public int skillElementIndex;
+
 	[Tooltip("時間変化パラメ\u30fcタ")]
 	public TimeChange timeChange = new TimeChange();
 
@@ -65,6 +68,7 @@ public class AttackInfo
 		attackInfo.rateInfoName = rateInfoName;
 		attackInfo.nextBulletInfoName = nextBulletInfoName;
 		attackInfo.isSkillReference = isSkillReference;
+		attackInfo.skillElementIndex = skillElementIndex;
 		if (bulletData != null)
 		{
 			attackInfo.bulletData = bulletData.GetRateBulletData(rate_info.bulletData, rate);
@@ -96,6 +100,7 @@ public class AttackInfo
 		rInfo.rateInfoName = rateInfoName;
 		rInfo.nextBulletInfoName = nextBulletInfoName;
 		rInfo.isSkillReference = isSkillReference;
+		rInfo.skillElementIndex = skillElementIndex;
 		rInfo.timeChange.startTime = timeChange.startTime;
 		rInfo.timeChange.intervalTime = timeChange.intervalTime;
 		rInfo.timeChange.startRate = timeChange.startRate;

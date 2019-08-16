@@ -209,8 +209,6 @@ public abstract class EquipMaterialBase : SmithEquipBase
 
 	public override void Initialize()
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		type = EquipDialogType.MATERIAL;
 		Transform ctrl = GetCtrl(UI.BTN_GRAPH);
 		if (ctrl != null)
@@ -239,8 +237,8 @@ public abstract class EquipMaterialBase : SmithEquipBase
 	{
 		if (smithType == SmithType.GENERATE || smithType == SmithType.SKILL_GROW)
 		{
-			SetActive((Enum)UI.BTN_EXCEED, false);
-			SetActive((Enum)UI.BTN_SHADOW_EVOLVE, false);
+			SetActive((Enum)UI.BTN_EXCEED, is_visible: false);
+			SetActive((Enum)UI.BTN_SHADOW_EVOLVE, is_visible: false);
 		}
 		else
 		{
@@ -263,7 +261,7 @@ public abstract class EquipMaterialBase : SmithEquipBase
 		InitNeedMaterialData();
 		if (!string.IsNullOrEmpty(CreateItemDetailPrefabName()))
 		{
-			detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), CreateItemDetailPrefabName(), true);
+			detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), CreateItemDetailPrefabName());
 			if (detailBase != null)
 			{
 				SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, 2);
@@ -277,10 +275,10 @@ public abstract class EquipMaterialBase : SmithEquipBase
 				SetFontStyle(detailBase, UI.STR_TITLE_DEF, 2);
 				SetFontStyle(detailBase, UI.STR_TITLE_ELEM_DEF, 2);
 				SetFontStyle(detailBase, UI.STR_TITLE_HP, 2);
-				SetActive(detailBase, UI.BTN_SELL, false);
-				SetActive(detailBase, UI.BTN_GROW, false);
-				SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
-				SetActive((Enum)UI.OBJ_DETAIL_BASE_ROOT, false);
+				SetActive(detailBase, UI.BTN_SELL, is_visible: false);
+				SetActive(detailBase, UI.BTN_GROW, is_visible: false);
+				SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
+				SetActive((Enum)UI.OBJ_DETAIL_BASE_ROOT, is_visible: false);
 				SetSprite(detailBase, UI.SPR_SP_ATTACK_TYPE, (!GetEquipTableData().IsWeapon()) ? string.Empty : GetEquipTableData().spAttackType.GetSmallFrameSpriteName());
 			}
 		}
@@ -353,27 +351,28 @@ public abstract class EquipMaterialBase : SmithEquipBase
 				}
 			}
 		}
-		if (needEquip != null)
+		if (needEquip == null)
 		{
-			needEquip = NeedEquip.DivideNeedEquip(needEquip);
-			haveEquipNum = new int[needEquip.Length];
-			if (selectedUniqueIdList == null)
+			return;
+		}
+		needEquip = NeedEquip.DivideNeedEquip(needEquip);
+		haveEquipNum = new int[needEquip.Length];
+		if (selectedUniqueIdList == null)
+		{
+			selectedUniqueIdList = new ulong[needEquip.Length];
+		}
+		List<uint> list2 = new List<uint>();
+		for (int j = 0; j < needEquip.Length; j++)
+		{
+			list2.Add(needEquip[j].equipItemID);
+		}
+		for (LinkedListNode<EquipItemInfo> linkedListNode = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
+		{
+			for (int k = 0; k < needEquip.Length; k++)
 			{
-				selectedUniqueIdList = new ulong[needEquip.Length];
-			}
-			List<uint> list2 = new List<uint>();
-			for (int j = 0; j < needEquip.Length; j++)
-			{
-				list2.Add(needEquip[j].equipItemID);
-			}
-			for (LinkedListNode<EquipItemInfo> linkedListNode = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
-			{
-				for (int k = 0; k < needEquip.Length; k++)
+				if (linkedListNode.Value.tableID == needEquip[k].equipItemID)
 				{
-					if (linkedListNode.Value.tableID == needEquip[k].equipItemID)
-					{
-						haveEquipNum[k]++;
-					}
+					haveEquipNum[k]++;
 				}
 			}
 		}
@@ -381,24 +380,20 @@ public abstract class EquipMaterialBase : SmithEquipBase
 
 	protected override void NeededMaterial()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.GRD_NEED_MATERIAL);
 		while (ctrl.get_childCount() != 0)
 		{
-			Transform val = ctrl.GetChild(0);
-			val.set_parent(null);
-			val.get_gameObject().SetActive(false);
-			Object.Destroy(val.get_gameObject());
+			Transform child = ctrl.GetChild(0);
+			child.set_parent(null);
+			child.get_gameObject().SetActive(false);
+			Object.Destroy(child.get_gameObject());
 		}
 		int needEquipSize = 0;
 		int num = 0;
@@ -411,28 +406,34 @@ public abstract class EquipMaterialBase : SmithEquipBase
 			num = needMaterial.Length;
 		}
 		int needItemSize = needEquipSize + num;
-		SetGrid(UI.GRD_NEED_MATERIAL, null, needItemSize, true, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_NEED_MATERIAL, null, needItemSize, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (i < needEquipSize && needEquip != null)
 			{
 				EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(needEquip[i].equipItemID);
 				if (equipItemData != null)
 				{
+					ITEM_ICON_TYPE itemIconType = ItemIcon.GetItemIconType(equipItemData.type);
+					EquipItemTable.EquipItemData equip_table = equipItemData;
+					int have_num = haveEquipNum[i];
+					int num2 = needEquip[i].num;
+					string event_name = "EQUIP";
+					int event_data = i;
 					GET_TYPE getType = equipItemData.getType;
-					ItemIconEquipMaterial itemIconEquipMaterial = ItemIconEquipMaterial.CreateEquipMaterialIcon(ItemIcon.GetItemIconType(equipItemData.type), equipItemData, t, haveEquipNum[i], needEquip[i].num, "EQUIP", i, false, getType);
+					ItemIconEquipMaterial itemIconEquipMaterial = ItemIconEquipMaterial.CreateEquipMaterialIcon(itemIconType, equip_table, t, have_num, num2, event_name, event_data, is_new: false, getType);
 					itemIconEquipMaterial.SelectUniqueID(selectedUniqueIdList[i]);
 					SetLongTouch(itemIconEquipMaterial.transform, "EQUIP", i);
 				}
 			}
 			else if (i < needItemSize && needMaterial != null)
 			{
-				int num2 = i - needEquipSize;
-				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(needMaterial[num2].itemID);
+				int num3 = i - needEquipSize;
+				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(needMaterial[num3].itemID);
 				if (itemData != null)
 				{
-					ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, t, haveMaterialNum[num2], needMaterial[num2].num, "MATERIAL", num2, false);
-					SetLongTouch(itemIcon.transform, "MATERIAL", num2);
-					SetEvent(t, "MATERIAL", num2);
+					ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, t, haveMaterialNum[num3], needMaterial[num3].num, "MATERIAL", num3);
+					SetLongTouch(itemIcon.transform, "MATERIAL", num3);
+					SetEvent(t, "MATERIAL", num3);
 				}
 			}
 		});
@@ -516,16 +517,14 @@ public abstract class EquipMaterialBase : SmithEquipBase
 		SmithManager.ERR_SMITH_SEND eRR_SMITH_SEND = MonoBehaviourSingleton<SmithManager>.I.CheckGrowEquipItem(GetEquipData());
 		if (eRR_SMITH_SEND != 0)
 		{
-			GameSection.ChangeEvent(eRR_SMITH_SEND.ToString(), null);
+			GameSection.ChangeEvent(eRR_SMITH_SEND.ToString());
+			return;
 		}
-		else
+		isDialogEventYES = false;
+		GameSection.SetEventData(new object[1]
 		{
-			isDialogEventYES = false;
-			GameSection.SetEventData(new object[1]
-			{
-				GetEquipItemName()
-			});
-		}
+			GetEquipItemName()
+		});
 	}
 
 	protected virtual void OnQuery_SKILL_ICON_BUTTON()

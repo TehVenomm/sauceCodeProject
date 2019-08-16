@@ -204,13 +204,13 @@ public class ProfileEditDegree : GameSection
 			SetLabelText((Enum)UI.LBL_SUFFIX, string.Empty);
 			SetLabelText((Enum)UI.LBL_PAGE_MAX, maxPage.ToString());
 			SetLabelText((Enum)UI.LBL_PAGE_NOW, currentPage.ToString());
-			SetActive((Enum)UI.OBJ_ARROW_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_ARROW_INACTIVE_ROOT, true);
-			SetActive((Enum)UI.LBL_NO_SELECTABLE_FRAME, true);
-			currentPlate.Initialize(currentDegrees, false, delegate
+			SetActive((Enum)UI.OBJ_ARROW_ACTIVE_ROOT, is_visible: false);
+			SetActive((Enum)UI.OBJ_ARROW_INACTIVE_ROOT, is_visible: true);
+			SetActive((Enum)UI.LBL_NO_SELECTABLE_FRAME, is_visible: true);
+			currentPlate.Initialize(currentDegrees, isButton: false, delegate
 			{
 			});
-			SetGrid(UI.GRD_WORD_LIST, "DegreeWordList", 0, false, delegate
+			SetGrid(UI.GRD_WORD_LIST, "DegreeWordList", 0, reset: false, delegate
 			{
 			});
 		}
@@ -224,25 +224,24 @@ public class ProfileEditDegree : GameSection
 			SetLabelText((Enum)UI.LBL_PAGE_NOW, currentPage.ToString());
 			SetActive((Enum)UI.OBJ_ARROW_ACTIVE_ROOT, maxPage > 1);
 			SetActive((Enum)UI.OBJ_ARROW_INACTIVE_ROOT, maxPage == 1);
-			SetActive((Enum)UI.LBL_NO_SELECTABLE_FRAME, false);
-			currentPlate.Initialize(currentDegrees, false, delegate
+			SetActive((Enum)UI.LBL_NO_SELECTABLE_FRAME, is_visible: false);
+			currentPlate.Initialize(currentDegrees, isButton: false, delegate
 			{
 			});
 			int item_num = Mathf.Min(GameDefine.DEGREE_WORD_CHANGE_LIST_COUNT, currentShowData.Count - (currentPage - 1) * GameDefine.DEGREE_WORD_CHANGE_LIST_COUNT);
-			SetGrid(UI.GRD_WORD_LIST, "DegreeWordList", item_num, false, delegate(int i, Transform t, bool b)
+			SetGrid(UI.GRD_WORD_LIST, "DegreeWordList", item_num, reset: false, delegate(int i, Transform t, bool b)
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				t.get_gameObject().AddComponent<UIDragScrollView>();
 				int index = i + (currentPage - 1) * GameDefine.DEGREE_WORD_CHANGE_LIST_COUNT;
 				DegreeTable.DegreeData degreeData = currentShowData[index];
 				SetEvent(t, "SELECT", degreeData);
 				if (degreeData.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds))
 				{
-					SetButtonSprite(t, (currentDegrees[(int)currentTab] != degreeData.id) ? WORD_LIST_SPRITE_NAME[0] : WORD_LIST_SPRITE_NAME[1], false);
+					SetButtonSprite(t, (currentDegrees[(int)currentTab] != degreeData.id) ? WORD_LIST_SPRITE_NAME[0] : WORD_LIST_SPRITE_NAME[1]);
 				}
 				else
 				{
-					SetButtonSprite(t, WORD_LIST_SPRITE_NAME[2], false);
+					SetButtonSprite(t, WORD_LIST_SPRITE_NAME[2]);
 				}
 				if (!degreeData.IsSecretName(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds))
 				{
@@ -250,13 +249,13 @@ public class ProfileEditDegree : GameSection
 					SetLabelText(t, UI.LBL_WORD_SELECTED, degreeData.name);
 					SetActive(t, UI.LBL_WORD_NORMAL, currentDegrees[(int)currentTab] != (int)degreeData.id);
 					SetActive(t, UI.LBL_WORD_SELECTED, currentDegrees[(int)currentTab] == (int)degreeData.id);
-					SetActive(t, UI.LBL_WORD_UNKNOWN, false);
+					SetActive(t, UI.LBL_WORD_UNKNOWN, is_visible: false);
 				}
 				else
 				{
-					SetActive(t, UI.LBL_WORD_NORMAL, false);
-					SetActive(t, UI.LBL_WORD_SELECTED, false);
-					SetActive(t, UI.LBL_WORD_UNKNOWN, true);
+					SetActive(t, UI.LBL_WORD_NORMAL, is_visible: false);
+					SetActive(t, UI.LBL_WORD_SELECTED, is_visible: false);
+					SetActive(t, UI.LBL_WORD_UNKNOWN, is_visible: true);
 				}
 				SetActive(t, UI.SPR_WORD_SELECTED, degreeData == currentSelectData);
 			});
@@ -370,10 +369,10 @@ public class ProfileEditDegree : GameSection
 		requestSendForm.degid3 = currentDegrees[3].ToString();
 		Protocol.Send(DegreeEquipModel.URL, requestSendForm, delegate(DegreeEquipModel x)
 		{
-			GameSection.ResumeEvent(x.Error == Error.None, null);
+			GameSection.ResumeEvent(x.Error == Error.None);
 			if (x.Error == Error.None)
 			{
-				RequestEvent("[BACK]", null);
+				RequestEvent("[BACK]");
 			}
 		}, string.Empty);
 	}
@@ -406,15 +405,13 @@ public class ProfileEditDegree : GameSection
 		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0277: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0307: Unknown result type (might be due to invalid IL or missing references)
 		if (frameType != DEGREE_TYPE.SPECIAL_FRAME)
 		{
-			SetButtonSprite((Enum)UI.BTN_PREFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.PREFIX) ? 1 : 0], false);
-			SetButtonSprite((Enum)UI.BTN_CONJUNCTION, TAB_SPRITE_NAME[(selectTab == WORD_TAB.CONJUNCTION) ? 1 : 0], false);
-			SetButtonSprite((Enum)UI.BTN_SUFFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.SUFFIX) ? 1 : 0], false);
+			SetButtonSprite((Enum)UI.BTN_PREFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.PREFIX) ? 1 : 0], with_press: false);
+			SetButtonSprite((Enum)UI.BTN_CONJUNCTION, TAB_SPRITE_NAME[(selectTab == WORD_TAB.CONJUNCTION) ? 1 : 0], with_press: false);
+			SetButtonSprite((Enum)UI.BTN_SUFFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.SUFFIX) ? 1 : 0], with_press: false);
 			SetButtonEnabled((Enum)UI.BTN_PREFIX, selectTab != WORD_TAB.PREFIX);
 			SetButtonEnabled((Enum)UI.BTN_CONJUNCTION, selectTab != WORD_TAB.CONJUNCTION);
 			SetButtonEnabled((Enum)UI.BTN_SUFFIX, selectTab != WORD_TAB.SUFFIX);
@@ -448,12 +445,12 @@ public class ProfileEditDegree : GameSection
 			SetSprite((Enum)UI.BTN_PREFIX, TAB_SPRITE_NAME[2]);
 			SetSprite((Enum)UI.BTN_CONJUNCTION, TAB_SPRITE_NAME[2]);
 			SetSprite((Enum)UI.BTN_SUFFIX, TAB_SPRITE_NAME[2]);
-			SetButtonEnabled((Enum)UI.BTN_PREFIX, false);
-			SetButtonEnabled((Enum)UI.BTN_CONJUNCTION, false);
-			SetButtonEnabled((Enum)UI.BTN_SUFFIX, false);
-			SetActive((Enum)UI.SPR_PREFIX_SELECT, false);
-			SetActive((Enum)UI.SPR_CONJUNCTION_SELECT, false);
-			SetActive((Enum)UI.SPR_SUFFIX_SELECT, false);
+			SetButtonEnabled((Enum)UI.BTN_PREFIX, is_enabled: false);
+			SetButtonEnabled((Enum)UI.BTN_CONJUNCTION, is_enabled: false);
+			SetButtonEnabled((Enum)UI.BTN_SUFFIX, is_enabled: false);
+			SetActive((Enum)UI.SPR_PREFIX_SELECT, is_visible: false);
+			SetActive((Enum)UI.SPR_CONJUNCTION_SELECT, is_visible: false);
+			SetActive((Enum)UI.SPR_SUFFIX_SELECT, is_visible: false);
 			arrowTrans.get_gameObject().SetActive(false);
 		}
 	}

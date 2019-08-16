@@ -26,7 +26,8 @@ public final class NativeBridgeActivity extends Activity {
         activity.startActivity(intent2);
     }
 
-    protected void onActivityResult(int i, int i2, Intent intent) {
+    /* access modifiers changed from: protected */
+    public void onActivityResult(int i, int i2, Intent intent) {
         if (i == GPG_RESPONSE_CODE) {
             Log.d(TAG, "Forwarding activity result to native SDK.");
             forwardActivityResult(i, i2, intent);
@@ -45,7 +46,8 @@ public final class NativeBridgeActivity extends Activity {
         super.onCreate(bundle);
     }
 
-    protected void onDestroy() {
+    /* access modifiers changed from: protected */
+    public void onDestroy() {
         if (this.pendingResult) {
             Log.w(TAG, "onDestroy called with pendingResult == true.  forwarding canceled result");
             forwardActivityResult(GPG_RESPONSE_CODE, 0, null);
@@ -54,7 +56,8 @@ public final class NativeBridgeActivity extends Activity {
         super.onDestroy();
     }
 
-    protected void onStart() {
+    /* access modifiers changed from: protected */
+    public void onStart() {
         Intent intent = (Intent) getIntent().getParcelableExtra(BRIDGED_INTENT);
         if (intent != null) {
             startActivityForResult(intent, GPG_RESPONSE_CODE);

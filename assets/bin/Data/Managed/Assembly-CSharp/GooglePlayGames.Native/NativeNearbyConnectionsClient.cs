@@ -4,6 +4,7 @@ using GooglePlayGames.OurUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace GooglePlayGames.Native
 {
@@ -63,6 +64,9 @@ namespace GooglePlayGames.Native
 
 		private readonly NearbyConnectionsManager mManager;
 
+		[CompilerGenerated]
+		private static Func<string, NativeAppIdentifier> _003C_003Ef__mg_0024cache0;
+
 		internal NativeNearbyConnectionsClient(NearbyConnectionsManager manager)
 		{
 			mManager = Misc.CheckNotNull(manager);
@@ -80,12 +84,12 @@ namespace GooglePlayGames.Native
 
 		public void SendReliable(List<string> recipientEndpointIds, byte[] payload)
 		{
-			InternalSend(recipientEndpointIds, payload, true);
+			InternalSend(recipientEndpointIds, payload, isReliable: true);
 		}
 
 		public void SendUnreliable(List<string> recipientEndpointIds, byte[] payload)
 		{
-			InternalSend(recipientEndpointIds, payload, false);
+			InternalSend(recipientEndpointIds, payload, isReliable: false);
 		}
 
 		private void InternalSend(List<string> recipientEndpointIds, byte[] payload, bool isReliable)
@@ -105,30 +109,28 @@ namespace GooglePlayGames.Native
 			if (recipientEndpointIds.Count == 0)
 			{
 				Logger.w("Attempted to send a reliable message with no recipients");
+				return;
 			}
-			else
+			if (isReliable)
+			{
+				if (payload.Length > MaxReliableMessagePayloadLength())
+				{
+					throw new InvalidOperationException("cannot send more than " + MaxReliableMessagePayloadLength() + " bytes");
+				}
+			}
+			else if (payload.Length > MaxUnreliableMessagePayloadLength())
+			{
+				throw new InvalidOperationException("cannot send more than " + MaxUnreliableMessagePayloadLength() + " bytes");
+			}
+			foreach (string recipientEndpointId in recipientEndpointIds)
 			{
 				if (isReliable)
 				{
-					if (payload.Length > MaxReliableMessagePayloadLength())
-					{
-						throw new InvalidOperationException("cannot send more than " + MaxReliableMessagePayloadLength() + " bytes");
-					}
+					mManager.SendReliable(recipientEndpointId, payload);
 				}
-				else if (payload.Length > MaxUnreliableMessagePayloadLength())
+				else
 				{
-					throw new InvalidOperationException("cannot send more than " + MaxUnreliableMessagePayloadLength() + " bytes");
-				}
-				foreach (string recipientEndpointId in recipientEndpointIds)
-				{
-					if (isReliable)
-					{
-						mManager.SendReliable(recipientEndpointId, payload);
-					}
-					else
-					{
-						mManager.SendUnreliable(recipientEndpointId, payload);
-					}
+					mManager.SendUnreliable(recipientEndpointId, payload);
 				}
 			}
 		}

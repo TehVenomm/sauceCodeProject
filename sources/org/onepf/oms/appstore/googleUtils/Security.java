@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.oms.util.Logger;
@@ -18,14 +19,14 @@ public class Security {
     public static PublicKey generatePublicKey(@NotNull String str) {
         try {
             return KeyFactory.getInstance(KEY_FACTORY_ALGORITHM).generatePublic(new X509EncodedKeySpec(Base64.decode(str)));
-        } catch (Throwable e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
-        } catch (Throwable e2) {
-            Logger.m1002e("Invalid key specification.");
+        } catch (InvalidKeySpecException e2) {
+            Logger.m1027e("Invalid key specification.");
             throw new IllegalArgumentException(e2);
-        } catch (Throwable e22) {
-            Logger.m1002e("Base64 decoding failed.");
-            throw new IllegalArgumentException(e22);
+        } catch (Base64DecoderException e3) {
+            Logger.m1027e("Base64 decoding failed.");
+            throw new IllegalArgumentException(e3);
         }
     }
 
@@ -37,19 +38,19 @@ public class Security {
             if (instance.verify(Base64.decode(str2))) {
                 return true;
             }
-            Logger.m1002e("Signature verification failed.");
+            Logger.m1027e("Signature verification failed.");
             return false;
         } catch (NoSuchAlgorithmException e) {
-            Logger.m1002e("NoSuchAlgorithmException.");
+            Logger.m1027e("NoSuchAlgorithmException.");
             return false;
         } catch (InvalidKeyException e2) {
-            Logger.m1002e("Invalid key specification.");
+            Logger.m1027e("Invalid key specification.");
             return false;
         } catch (SignatureException e3) {
-            Logger.m1002e("Signature exception.");
+            Logger.m1027e("Signature exception.");
             return false;
         } catch (Base64DecoderException e4) {
-            Logger.m1002e("Base64 decoding failed.");
+            Logger.m1027e("Base64 decoding failed.");
             return false;
         }
     }
@@ -58,7 +59,7 @@ public class Security {
         if (!TextUtils.isEmpty(str2) && !TextUtils.isEmpty(str) && !TextUtils.isEmpty(str3)) {
             return verify(generatePublicKey(str), str2, str3);
         }
-        Logger.m1002e("Purchase verification failed: missing data.");
+        Logger.m1027e("Purchase verification failed: missing data.");
         return false;
     }
 }

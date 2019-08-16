@@ -17,10 +17,10 @@ public class UnrecognizedPropertyException extends PropertyBindingException {
     }
 
     public static UnrecognizedPropertyException from(JsonParser jsonParser, Object obj, String str, Collection<Object> collection) {
+        Class cls;
         if (obj == null) {
             throw new IllegalArgumentException();
         }
-        Class cls;
         if (obj instanceof Class) {
             cls = (Class) obj;
         } else {

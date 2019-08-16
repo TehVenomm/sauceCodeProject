@@ -1,3 +1,4 @@
+using Network;
 using System.Collections.Generic;
 
 public class StatusEquipModel : BaseModel
@@ -23,6 +24,8 @@ public class StatusEquipModel : BaseModel
 		public List<string> huids = new List<string>();
 
 		public List<int> shows = new List<int>();
+
+		public List<AccessoryPlaceInfo> accs = new List<AccessoryPlaceInfo>();
 	}
 
 	public static string URL = "ajax/status/equip";

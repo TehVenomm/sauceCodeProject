@@ -1,4 +1,4 @@
-package android.support.v7.widget;
+package android.support.p003v7.widget;
 
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
@@ -10,8 +10,13 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 
+@RequiresApi(21)
+/* renamed from: android.support.v7.widget.RoundRectDrawable */
 class RoundRectDrawable extends Drawable {
+    private ColorStateList mBackground;
     private final RectF mBoundsF;
     private final Rect mBoundsI;
     private boolean mInsetForPadding = false;
@@ -23,16 +28,27 @@ class RoundRectDrawable extends Drawable {
     private PorterDuffColorFilter mTintFilter;
     private Mode mTintMode = Mode.SRC_IN;
 
-    public RoundRectDrawable(int i, float f) {
+    RoundRectDrawable(ColorStateList colorStateList, float f) {
         this.mRadius = f;
         this.mPaint = new Paint(5);
-        this.mPaint.setColor(i);
+        setBackground(colorStateList);
         this.mBoundsF = new RectF();
         this.mBoundsI = new Rect();
     }
 
     private PorterDuffColorFilter createTintFilter(ColorStateList colorStateList, Mode mode) {
-        return (colorStateList == null || mode == null) ? null : new PorterDuffColorFilter(colorStateList.getColorForState(getState(), 0), mode);
+        if (colorStateList == null || mode == null) {
+            return null;
+        }
+        return new PorterDuffColorFilter(colorStateList.getColorForState(getState(), 0), mode);
+    }
+
+    private void setBackground(ColorStateList colorStateList) {
+        if (colorStateList == null) {
+            colorStateList = ColorStateList.valueOf(0);
+        }
+        this.mBackground = colorStateList;
+        this.mPaint.setColor(this.mBackground.getColorForState(getState(), this.mBackground.getDefaultColor()));
     }
 
     private void updateBounds(Rect rect) {
@@ -49,18 +65,22 @@ class RoundRectDrawable extends Drawable {
     }
 
     public void draw(Canvas canvas) {
-        Object obj;
+        boolean z;
         Paint paint = this.mPaint;
         if (this.mTintFilter == null || paint.getColorFilter() != null) {
-            obj = null;
+            z = false;
         } else {
             paint.setColorFilter(this.mTintFilter);
-            obj = 1;
+            z = true;
         }
         canvas.drawRoundRect(this.mBoundsF, this.mRadius, this.mRadius, paint);
-        if (obj != null) {
+        if (z) {
             paint.setColorFilter(null);
         }
+    }
+
+    public ColorStateList getColor() {
+        return this.mBackground;
     }
 
     public int getOpacity() {
@@ -71,7 +91,8 @@ class RoundRectDrawable extends Drawable {
         outline.setRoundRect(this.mBoundsI, this.mRadius);
     }
 
-    float getPadding() {
+    /* access modifiers changed from: 0000 */
+    public float getPadding() {
         return this.mPadding;
     }
 
@@ -80,17 +101,24 @@ class RoundRectDrawable extends Drawable {
     }
 
     public boolean isStateful() {
-        return (this.mTint != null && this.mTint.isStateful()) || super.isStateful();
+        return (this.mTint != null && this.mTint.isStateful()) || (this.mBackground != null && this.mBackground.isStateful()) || super.isStateful();
     }
 
-    protected void onBoundsChange(Rect rect) {
+    /* access modifiers changed from: protected */
+    public void onBoundsChange(Rect rect) {
         super.onBoundsChange(rect);
         updateBounds(rect);
     }
 
-    protected boolean onStateChange(int[] iArr) {
+    /* access modifiers changed from: protected */
+    public boolean onStateChange(int[] iArr) {
+        int colorForState = this.mBackground.getColorForState(iArr, this.mBackground.getDefaultColor());
+        boolean z = colorForState != this.mPaint.getColor();
+        if (z) {
+            this.mPaint.setColor(colorForState);
+        }
         if (this.mTint == null || this.mTintMode == null) {
-            return false;
+            return z;
         }
         this.mTintFilter = createTintFilter(this.mTint, this.mTintMode);
         return true;
@@ -100,8 +128,8 @@ class RoundRectDrawable extends Drawable {
         this.mPaint.setAlpha(i);
     }
 
-    public void setColor(int i) {
-        this.mPaint.setColor(i);
+    public void setColor(@Nullable ColorStateList colorStateList) {
+        setBackground(colorStateList);
         invalidateSelf();
     }
 
@@ -109,7 +137,8 @@ class RoundRectDrawable extends Drawable {
         this.mPaint.setColorFilter(colorFilter);
     }
 
-    void setPadding(float f, boolean z, boolean z2) {
+    /* access modifiers changed from: 0000 */
+    public void setPadding(float f, boolean z, boolean z2) {
         if (f != this.mPadding || this.mInsetForPadding != z || this.mInsetForRadius != z2) {
             this.mPadding = f;
             this.mInsetForPadding = z;
@@ -119,7 +148,8 @@ class RoundRectDrawable extends Drawable {
         }
     }
 
-    void setRadius(float f) {
+    /* access modifiers changed from: 0000 */
+    public void setRadius(float f) {
         if (f != this.mRadius) {
             this.mRadius = f;
             updateBounds(null);

@@ -3,7 +3,7 @@ package com.google.android.gms.drive.metadata.internal;
 import com.google.android.gms.common.data.DataHolder;
 
 public interface zzg {
-    String zzans();
+    String zzav();
 
-    void zzc(DataHolder dataHolder);
+    void zzb(DataHolder dataHolder);
 }

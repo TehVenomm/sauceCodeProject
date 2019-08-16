@@ -1,12 +1,28 @@
 package com.google.android.gms.auth.api;
 
-import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.Api.zza;
-import com.google.android.gms.common.api.Api.zzf;
-import com.google.android.gms.internal.zzasy;
+import android.content.Context;
+import android.os.Looper;
+import android.support.annotation.Nullable;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.internal.zzg;
+import com.google.android.gms.common.api.Api.AbstractClientBuilder;
+import com.google.android.gms.common.api.Api.Client;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.internal.ClientSettings;
+import java.util.Collections;
+import java.util.List;
 
-public final class zzd {
-    public static final Api<zzf> API = new Api("Auth.PROXY_API", zzdyp, zzdyo);
-    private static zzf<zzasy> zzdyo = new zzf();
-    private static final zza<zzasy, zzf> zzdyp = new zze();
+final class zzd extends AbstractClientBuilder<zzg, GoogleSignInOptions> {
+    zzd() {
+    }
+
+    public final /* synthetic */ Client buildClient(Context context, Looper looper, ClientSettings clientSettings, @Nullable Object obj, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener) {
+        return new zzg(context, looper, clientSettings, (GoogleSignInOptions) obj, connectionCallbacks, onConnectionFailedListener);
+    }
+
+    public final /* synthetic */ List getImpliedScopes(@Nullable Object obj) {
+        GoogleSignInOptions googleSignInOptions = (GoogleSignInOptions) obj;
+        return googleSignInOptions == null ? Collections.emptyList() : googleSignInOptions.getScopes();
+    }
 }

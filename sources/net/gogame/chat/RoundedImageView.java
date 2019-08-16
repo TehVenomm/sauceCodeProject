@@ -46,7 +46,8 @@ public class RoundedImageView extends ImageView {
         return createBitmap;
     }
 
-    protected void onDraw(Canvas canvas) {
+    /* access modifiers changed from: protected */
+    public void onDraw(Canvas canvas) {
         Drawable drawable = getDrawable();
         if (drawable != null && getWidth() != 0 && getHeight() != 0 && (drawable instanceof BitmapDrawable)) {
             canvas.drawBitmap(getCroppedBitmap(((BitmapDrawable) drawable).getBitmap().copy(Config.ARGB_8888, true), getWidth()), 0.0f, 0.0f, null);

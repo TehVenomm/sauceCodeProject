@@ -9,6 +9,9 @@ public class TokenResult implements Result {
     private String idToken;
     private Status status;
 
+    public TokenResult() {
+    }
+
     TokenResult(String str, String str2, String str3, int i) {
         this.status = new Status(i);
         this.authCode = str;

@@ -75,14 +75,14 @@ public class Version implements Comparable<Version>, Serializable {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this._majorVersion).append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
-        stringBuilder.append(this._minorVersion).append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
-        stringBuilder.append(this._patchLevel);
+        StringBuilder sb = new StringBuilder();
+        sb.append(this._majorVersion).append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
+        sb.append(this._minorVersion).append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
+        sb.append(this._patchLevel);
         if (isSnapshot()) {
-            stringBuilder.append('-').append(this._snapshotInfo);
+            sb.append('-').append(this._snapshotInfo);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public int hashCode() {
@@ -114,18 +114,18 @@ public class Version implements Comparable<Version>, Serializable {
         if (compareTo != 0) {
             return compareTo;
         }
-        compareTo = this._artifactId.compareTo(version._artifactId);
-        if (compareTo != 0) {
-            return compareTo;
+        int compareTo2 = this._artifactId.compareTo(version._artifactId);
+        if (compareTo2 != 0) {
+            return compareTo2;
         }
-        compareTo = this._majorVersion - version._majorVersion;
-        if (compareTo != 0) {
-            return compareTo;
+        int i = this._majorVersion - version._majorVersion;
+        if (i != 0) {
+            return i;
         }
-        compareTo = this._minorVersion - version._minorVersion;
-        if (compareTo == 0) {
+        int i2 = this._minorVersion - version._minorVersion;
+        if (i2 == 0) {
             return this._patchLevel - version._patchLevel;
         }
-        return compareTo;
+        return i2;
     }
 }

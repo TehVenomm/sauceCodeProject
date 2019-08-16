@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
@@ -65,6 +66,12 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 
 	private UIntKeyTable<DamageDistanceData> dataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<DamageDistanceData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<DamageDistanceData> _003C_003Ef__mg_0024cache1;
+
 	public static bool cb(CSVReader csv_reader, DamageDistanceData data, ref uint key)
 	{
 		data.id = key;
@@ -93,13 +100,13 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<DamageDistanceData>(csv_text, DamageDistanceTable.cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9", null);
+		dataTable = TableUtility.CreateUIntKeyTable<DamageDistanceData>(csv_text, DamageDistanceTable.cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9");
 		dataTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, csv_text, DamageDistanceTable.cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9", null);
+		TableUtility.AddUIntKeyTable(dataTable, csv_text, DamageDistanceTable.cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9");
 	}
 
 	public DamageDistanceData GetData(uint id)

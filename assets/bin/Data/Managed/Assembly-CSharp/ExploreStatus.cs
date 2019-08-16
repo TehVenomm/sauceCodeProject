@@ -116,38 +116,37 @@ public class ExploreStatus
 			{
 				bossMapIdHistory.Add(item);
 			}
+			return;
 		}
-		else
+		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)currentBossMapId);
+		if (portalListByMapID == null)
 		{
-			List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)currentBossMapId, false);
-			if (portalListByMapID != null)
+			return;
+		}
+		List<int> list = new List<int>();
+		for (int j = 0; j < portalListByMapID.Count; j++)
+		{
+			if (portalListByMapID[j].banEnemy != 1)
 			{
-				List<int> list = new List<int>();
-				for (int j = 0; j < portalListByMapID.Count; j++)
+				int dstMapID = (int)portalListByMapID[j].dstMapID;
+				if (dstMapID != exploreInfo.mapIds[0])
 				{
-					if (portalListByMapID[j].banEnemy != 1)
-					{
-						int dstMapID = (int)portalListByMapID[j].dstMapID;
-						if (dstMapID != exploreInfo.mapIds[0])
-						{
-							list.Add(dstMapID);
-						}
-					}
+					list.Add(dstMapID);
 				}
-				if (list.Count > 0)
-				{
-					int index = Random.Range(0, list.Count);
-					int num2 = list[index];
-					int beforeBossMapId = GetBeforeBossMapId();
-					if (beforeBossMapId == num2 && list.Count > 1)
-					{
-						UpdateBossMap();
-					}
-					else
-					{
-						bossMapIdHistory.Add(num2);
-					}
-				}
+			}
+		}
+		if (list.Count > 0)
+		{
+			int index = Random.Range(0, list.Count);
+			int num2 = list[index];
+			int beforeBossMapId = GetBeforeBossMapId();
+			if (beforeBossMapId == num2 && list.Count > 1)
+			{
+				UpdateBossMap();
+			}
+			else
+			{
+				bossMapIdHistory.Add(num2);
 			}
 		}
 	}
@@ -184,28 +183,28 @@ public class ExploreStatus
 		{
 			return EXPLORE_HISTORY_TYPE.NONE;
 		}
-		int? nullable = null;
+		int? num = null;
 		for (int i = 0; i < bossMapIdHistory.Count; i++)
 		{
 			if (bossMapIdHistory[i] == mapId)
 			{
-				nullable = i;
+				num = i;
 			}
 		}
-		if (!nullable.HasValue)
+		if (!num.HasValue)
 		{
 			return EXPLORE_HISTORY_TYPE.NONE;
 		}
 		int count = bossMapIdHistory.Count;
-		if (nullable == count - 1)
+		if (num == count - 1)
 		{
 			return EXPLORE_HISTORY_TYPE.CURRENT;
 		}
-		if (nullable == count - 2)
+		if (num == count - 2)
 		{
 			return EXPLORE_HISTORY_TYPE.LAST;
 		}
-		if (nullable == count - 3)
+		if (num == count - 3)
 		{
 			return EXPLORE_HISTORY_TYPE.SECOND_LAST;
 		}
@@ -270,12 +269,12 @@ public class ExploreStatus
 			ExplorePortalPoint portalData2 = GetPortalData(portalData.id);
 			if (portalData2 != null)
 			{
-				portalData2.UpdatePoint(portalData.pt, false);
+				portalData2.UpdatePoint(portalData.pt);
 				portalData2.UpdateUsedFlag(portalData.u);
 				portalData2 = GetPortalData(portalData2.linkPortalId);
 				if (portalData2 != null)
 				{
-					portalData2.UpdatePoint(portalData.pt, false);
+					portalData2.UpdatePoint(portalData.pt);
 					portalData2.UpdateUsedFlag(portalData.u);
 				}
 			}
@@ -413,16 +412,17 @@ public class ExploreStatus
 		int num = 0;
 		while (true)
 		{
-			if (num >= 8)
+			if (num < 8)
 			{
-				return;
+				ExplorePlayerStatus explorePlayerStatus = playerStatuses[num];
+				if (explorePlayerStatus != null && explorePlayerStatus.userId == coopClient.userId)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			ExplorePlayerStatus explorePlayerStatus = playerStatuses[num];
-			if (explorePlayerStatus != null && explorePlayerStatus.userId == coopClient.userId)
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		playerStatuses[num] = null;
 		if (this.onChangeExploreMemberList != null)
@@ -542,7 +542,7 @@ public class ExploreStatus
 		int i = 0;
 		for (int num = mapIds.Count - 1; i < num; i++)
 		{
-			List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)mapIds[i], false);
+			List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)mapIds[i]);
 			int j = 0;
 			for (int count = portalListByMapID.Count; j < count; j++)
 			{

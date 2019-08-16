@@ -13,11 +13,15 @@ public class QuestListModel : BaseModel
 
 		public List<Network.EventData> events = new List<Network.EventData>();
 
+		public List<int> futureEventIds = new List<int>();
+
 		public List<Network.EventData> bingoEvents = new List<Network.EventData>();
 
 		public float dailyRemainTime = -1f;
 
 		public float weeklyRemainTime = -1f;
+
+		public int carnivalEventId;
 	}
 
 	public class RequestSendForm

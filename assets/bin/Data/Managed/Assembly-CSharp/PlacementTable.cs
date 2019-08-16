@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [Obsolete]
@@ -71,11 +72,17 @@ public class PlacementTable : Singleton<PlacementTable>
 
 	private UIntKeyTable<PlaceableMapData> mapTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<PlaceableObjectData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<PlaceableMapData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(TextAsset placeableObjectTextAsset, TextAsset placeableMapTextAsset)
 	{
-		objectTable = TableUtility.CreateUIntKeyTable<PlaceableObjectData>(placeableObjectTextAsset.get_text(), PlaceableObjectData.cb, PlaceableObjectData.NT, null);
+		objectTable = TableUtility.CreateUIntKeyTable<PlaceableObjectData>(placeableObjectTextAsset.get_text(), PlaceableObjectData.cb, PlaceableObjectData.NT);
 		objectTable.TrimExcess();
-		mapTable = TableUtility.CreateUIntKeyTable<PlaceableMapData>(placeableMapTextAsset.get_text(), PlaceableMapData.cb, PlaceableMapData.NT, null);
+		mapTable = TableUtility.CreateUIntKeyTable<PlaceableMapData>(placeableMapTextAsset.get_text(), PlaceableMapData.cb, PlaceableMapData.NT);
 		mapTable.TrimExcess();
 	}
 

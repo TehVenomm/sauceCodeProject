@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class InGameUtility
 {
 	public class PlayerAtkCalcData
@@ -39,6 +41,10 @@ public class InGameUtility
 	}
 
 	public const float COEFFICIENT_DAMAGE = 4.5f;
+
+	public static readonly Vector3 VECTOR3_ZERO = Vector3.get_zero();
+
+	public static readonly Quaternion QUATERNION_IDENTITY = Quaternion.get_identity();
 
 	public static AtkAttribute CalcPlayerATK(PlayerAtkCalcData calcData)
 	{
@@ -94,8 +100,15 @@ public class InGameUtility
 			{
 				num = 0f;
 			}
-			atkAttribute.ChangeElementType(skillParam.tableData.skillAtkType);
-			atkAttribute.Mul(skillParam.atkRate);
+			ELEMENT_TYPE type = skillParam.tableData.skillAtkType;
+			float val = skillParam.atkRate;
+			if (calcData.atkInfo.skillElementIndex > 0 && skillParam.tableData.GetAttackElementNum() > calcData.atkInfo.skillElementIndex)
+			{
+				type = skillParam.tableData.GetAttackElementByIndex(calcData.atkInfo.skillElementIndex);
+				val = skillParam.GetAttackRateByIndex(calcData.atkInfo.skillElementIndex);
+			}
+			atkAttribute.ChangeElementType(type);
+			atkAttribute.Mul(val);
 		}
 		else if (calcData.isAtkElementOnly && eLEMENT_TYPE != ELEMENT_TYPE.MAX)
 		{
@@ -159,5 +172,35 @@ public class InGameUtility
 	public static float CalcDamageDetailToEnemy(float atk, float defense, float tolerance)
 	{
 		return atk * (1f - tolerance) - defense;
+	}
+
+	public static bool IsDamageUpAtkTypeNormal(Player player, AttackHitInfo info)
+	{
+		if (info.attackType != 0 && info.attackType != AttackHitInfo.ATTACK_TYPE.BURST_THS_COMBO03 && info.attackType != AttackHitInfo.ATTACK_TYPE.BURST_SPEAR_COMBO3 && info.attackType != AttackHitInfo.ATTACK_TYPE.BOOST_BOMB_ARROW && info.attackType != AttackHitInfo.ATTACK_TYPE.BOOST_ARROW_RAIN && info.attackType != AttackHitInfo.ATTACK_TYPE.ARROW_RAIN)
+		{
+			return false;
+		}
+		if (player.attackMode == Player.ATTACK_MODE.ARROW)
+		{
+			return true;
+		}
+		if (info.toEnemy.isSpecialAttack)
+		{
+			return false;
+		}
+		if (player.attackMode == Player.ATTACK_MODE.SPEAR && player.attackID == player.playerParameter.spearActionInfo.Heat_SpAttackId)
+		{
+			return false;
+		}
+		if (player.actionID == (Character.ACTION_ID)37 || player.actionID == (Character.ACTION_ID)38)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public static bool GetBombLevelByAttackInfo(AttackInfo attackInfo, out int lv)
+	{
+		return int.TryParse(attackInfo.name.Substring(attackInfo.name.LastIndexOf("_") + 1), out lv);
 	}
 }

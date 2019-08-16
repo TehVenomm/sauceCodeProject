@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 {
-	public class Pool_List_CoopPacket
+	public class Pool_List_CoopPacket : rymTPool<List<CoopPacket>>
 	{
 	}
 
@@ -68,7 +68,6 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		packetReceiver = this.get_gameObject().AddComponent<LoungePacketReceiver>();
 	}
@@ -102,7 +101,6 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 	{
 		if (!Log.enabled)
 		{
-			return;
 		}
 	}
 
@@ -115,51 +113,47 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public void Connect(ConnectData conn_data, Action<bool> call_back)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
 	}
 
 	private IEnumerator RequestCoroutineConnect(ConnectData conn_data, Action<bool> call_back)
 	{
-		yield return (object)this.StartCoroutine(RequestCoroutineClose(1000, "Bye!", null));
+		yield return this.StartCoroutine(RequestCoroutineClose(1000));
 		if (string.IsNullOrEmpty(conn_data.path))
 		{
 			Logd("Connect fail. nothing connection path...");
-			call_back?.Invoke(false);
+			call_back?.Invoke(obj: false);
+			yield break;
 		}
-		else
+		if (conn_data.ports.Count == 0)
 		{
-			if (conn_data.ports.Count == 0)
-			{
-				Uri uri = new Uri(conn_data.path);
-				conn_data.ports.Add(uri.Port);
-			}
-			bool is_success = false;
-			foreach (int port in conn_data.ports)
-			{
-				float timeoutTimer = 15f;
-				string connectPath = GetRelayServerPath(conn_data.path, port);
-				Logd("Connect. path={0}", connectPath);
-				MonoBehaviourSingleton<LoungeWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
-				while (!MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<LoungeWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<LoungeWebSocket>.CONNECTION_STATUS.ERROR)
-				{
-					timeoutTimer -= Time.get_deltaTime();
-					yield return (object)new WaitForEndOfFrame();
-				}
-				if (MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
-				{
-					is_success = true;
-					RegisterPacketReceiveAction();
-					break;
-				}
-			}
-			call_back?.Invoke(is_success);
+			Uri uri = new Uri(conn_data.path);
+			conn_data.ports.Add(uri.Port);
 		}
+		bool is_success = false;
+		foreach (int port in conn_data.ports)
+		{
+			float timeoutTimer = 15f;
+			string connectPath = GetRelayServerPath(conn_data.path, port);
+			Logd("Connect. path={0}", connectPath);
+			MonoBehaviourSingleton<LoungeWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
+			while (!MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<LoungeWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<LoungeWebSocket>.CONNECTION_STATUS.ERROR)
+			{
+				timeoutTimer -= Time.get_deltaTime();
+				yield return (object)new WaitForEndOfFrame();
+			}
+			if (MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
+			{
+				is_success = true;
+				RegisterPacketReceiveAction();
+				break;
+			}
+		}
+		call_back?.Invoke(is_success);
 	}
 
 	public void Close(ushort code = 1000, string msg = "Bye!", Action call_back = null)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		Logd("Close.");
 		this.StartCoroutine(RequestCoroutineClose(code, msg, call_back));
 	}
@@ -188,21 +182,21 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		party_Model_Register.signature = conn_data.signature;
 		Logd("Regist. roomId={0}", conn_data.roomId);
 		registerAck = null;
-		SendServer(party_Model_Register, true, delegate(Coop_Model_ACK ack)
+		SendServer(party_Model_Register, promise: true, delegate(Coop_Model_ACK ack)
 		{
 			bool obj = true;
 			registerAck = (ack as Party_Model_RegisterACK);
 			if (ack == null || !ack.positive)
 			{
 				obj = false;
-				MonoBehaviourSingleton<LoungeWebSocket>.I.Close(1000, "Bye!");
+				MonoBehaviourSingleton<LoungeWebSocket>.I.Close(1000);
 			}
 			if (call_back != null)
 			{
 				call_back(obj);
 			}
 			return true;
-		}, null);
+		});
 	}
 
 	public void ConnectAndRegist(ConnectData conn_data, Action<bool, bool> call_back)
@@ -214,7 +208,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			{
 				if (call_back != null)
 				{
-					call_back(is_connect, false);
+					call_back(is_connect, arg2: false);
 				}
 			}
 			else
@@ -235,13 +229,13 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 	{
 		Coop_Model_Disconnect coop_Model_Disconnect = new Coop_Model_Disconnect();
 		coop_Model_Disconnect.code = code;
-		SendServer(coop_Model_Disconnect, false, null, null);
+		SendServer(coop_Model_Disconnect, promise: false);
 	}
 
 	public void Alive()
 	{
 		Coop_Model_Alive model = new Coop_Model_Alive();
-		SendServer(model, false, null, null);
+		SendServer(model, promise: false);
 	}
 
 	public void ChatMessage(string message)
@@ -253,7 +247,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			coop_Model_StageChatMessage.text = message;
 			coop_Model_StageChatMessage.chara_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 			coop_Model_StageChatMessage.user_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			SendBroadcast(coop_Model_StageChatMessage, false, null, null);
+			SendBroadcast(coop_Model_StageChatMessage);
 		}
 	}
 
@@ -266,7 +260,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			coop_Model_StageChatStamp.stamp_id = stamp_id;
 			coop_Model_StageChatStamp.chara_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 			coop_Model_StageChatStamp.user_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			SendBroadcast(coop_Model_StageChatStamp, false, null, null);
+			SendBroadcast(coop_Model_StageChatStamp);
 		}
 	}
 
@@ -279,20 +273,19 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		lounge_Model_RoomPosition.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		lounge_Model_RoomPosition.pos = position;
 		lounge_Model_RoomPosition.aid = (int)type;
-		Send(targetUserId, lounge_Model_RoomPosition, typeof(Lounge_Model_RoomPosition), true, null, null);
+		Send(targetUserId, lounge_Model_RoomPosition, typeof(Lounge_Model_RoomPosition));
 	}
 
 	public void JoinNotification(CharaInfo userInfo)
 	{
 		if (chatConnection != null && !string.IsNullOrEmpty(userInfo.name))
 		{
-			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 10u, userInfo.name));
+			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 10u, userInfo.name), string.Empty);
 		}
 	}
 
 	public void SyncSend()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (sendId > 0)
 		{
 			this.StartCoroutine(CoroutineSyncSend(sendId));
@@ -333,7 +326,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 	{
 		if (model.id == -1)
 		{
-			Log.Warning(LOG.COOP, "LoungeNetwork(" + ((CoopWebSocketSingleton<LoungeWebSocket>)MonoBehaviourSingleton<LoungeWebSocket>.I).IsConnected() + "): model.id not set...");
+			Log.Warning(LOG.COOP, "LoungeNetwork(" + MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected() + "): model.id not set...");
 			return -1;
 		}
 		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend);
@@ -381,7 +374,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		lounge_Model_RoomLeaved.id = 1000;
 		lounge_Model_RoomLeaved.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		lounge_Model_RoomLeaved.token = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
-		return CoopPacket.Create(lounge_Model_RoomLeaved, -1000, -2000, false, -8989);
+		return CoopPacket.Create(lounge_Model_RoomLeaved, -1000, -2000, promise: false, -8989);
 	}
 
 	public void LoopBackRoomLeave()
@@ -400,9 +393,9 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 
 	public bool OnRecvRoomJoined(Lounge_Model_RoomJoined model)
 	{
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		Logd("OnRecvRoomJoined. cid={0}", model.cid);
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
@@ -414,16 +407,16 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			{
 				return true;
 			}
-			if (MonoBehaviourSingleton<LoungeManager>.I.HomePeople == null)
+			if (MonoBehaviourSingleton<LoungeManager>.I.IHomePeople == null)
 			{
 				return true;
 			}
-			if (MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara == null)
+			if (MonoBehaviourSingleton<LoungeManager>.I.IHomePeople.selfChara == null)
 			{
 				return true;
 			}
-			Vector3 position = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara._transform.get_position();
-			LOUNGE_ACTION_TYPE actionType = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara.GetActionType();
+			Vector3 position = MonoBehaviourSingleton<LoungeManager>.I.IHomePeople.selfChara._transform.get_position();
+			LOUNGE_ACTION_TYPE actionType = MonoBehaviourSingleton<LoungeManager>.I.IHomePeople.selfChara.GetActionType();
 			RoomPosition(model.cid, position, actionType);
 		}
 		if (FieldManager.IsValidInGame())
@@ -432,11 +425,11 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			{
 				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 				{
-				}, false);
+				});
 			});
 		}
 		string empty = string.Empty;
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
 		if (slotInfoByUserId != null)
 		{
 			empty = slotInfoByUserId.userInfo.name;
@@ -458,7 +451,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		if (model.cid != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
 			string text = string.Empty;
-			LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
+			PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
 			if (slotInfoByUserId != null)
 			{
 				text = slotInfoByUserId.userInfo.name;
@@ -473,7 +466,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			}
 			if (chatConnection != null && !string.IsNullOrEmpty(text))
 			{
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 11u, text));
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 11u, text), string.Empty);
 			}
 		}
 		if (FieldManager.IsValidInGame())
@@ -482,7 +475,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			{
 				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
 				{
-				}, false);
+				});
 			});
 		}
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
@@ -496,7 +489,6 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 	{
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		Logd("OnRecvRoomPosition. cid={0}, pos={1}", model.cid, model.pos);
 		this.StartCoroutine(LoungeManagerRecvRoomPosition(model.cid, model.pos, model.aid));
 		return true;
@@ -506,15 +498,13 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 	{
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		while (!MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		while (!MonoBehaviourSingleton<LoungeManager>.I.IsInitialized)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		MonoBehaviourSingleton<LoungeManager>.I.OnRecvRoomPosition(userId, pos, (LOUNGE_ACTION_TYPE)aid);
 	}
@@ -547,7 +537,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		{
 			return true;
 		}
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
 		if (slotInfoByUserId == null || slotInfoByUserId.userInfo == null)
 		{
 			return true;
@@ -555,7 +545,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.Kick(model.cid);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 12u, slotInfoByUserId.userInfo.name));
+			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 12u, slotInfoByUserId.userInfo.name), string.Empty);
 		}
 		return true;
 	}
@@ -567,7 +557,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		{
 			return true;
 		}
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.cid);
 		if (slotInfoByUserId == null || slotInfoByUserId.userInfo == null)
 		{
 			return true;
@@ -575,7 +565,7 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.Kick(model.cid);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 19u, slotInfoByUserId.userInfo.name));
+			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 19u, slotInfoByUserId.userInfo.name), string.Empty);
 		}
 		return true;
 	}
@@ -588,10 +578,10 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 			return true;
 		}
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.ChangeOwner(model.hostid);
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.hostid);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.hostid);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 13u, slotInfoByUserId.userInfo.name));
+			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 13u, slotInfoByUserId.userInfo.name), string.Empty);
 		}
 		return true;
 	}
@@ -643,10 +633,10 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		{
 			return true;
 		}
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.user_id);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.user_id);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveMessage(model.user_id, slotInfoByUserId.userInfo.name, model.text);
+			chatConnection.OnReceiveMessage(model.user_id, slotInfoByUserId.userInfo.name, model.text, string.Empty);
 		}
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
@@ -662,66 +652,65 @@ public class LoungeNetworkManager : MonoBehaviourSingleton<LoungeNetworkManager>
 		{
 			return true;
 		}
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.user_id);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(model.user_id);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveStamp(model.user_id, slotInfoByUserId.userInfo.name, model.stamp_id);
+			chatConnection.OnReceiveStamp(model.user_id, slotInfoByUserId.userInfo.name, model.stamp_id, string.Empty);
 		}
 		return true;
 	}
 
 	public void MoveLoungeNotification(LoungeMemberStatus.MEMBER_STATUS beforeStatus, LoungeMemberStatus after)
 	{
-		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsUserInLounge(after.userId))
+		if (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsUserInLounge(after.userId))
 		{
-			LoungeMemberStatus.MEMBER_STATUS status = after.GetStatus();
-			LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(after.userId);
-			switch (beforeStatus)
+			return;
+		}
+		LoungeMemberStatus.MEMBER_STATUS status = after.GetStatus();
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(after.userId);
+		switch (beforeStatus)
+		{
+		case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
+			switch (status)
 			{
-			case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
-				switch (status)
-				{
-				case LoungeMemberStatus.MEMBER_STATUS.QUEST:
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
-					if (after.isHost)
-					{
-						chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 14u, slotInfoByUserId.userInfo.name));
-					}
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.FIELD:
-					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 15u, slotInfoByUserId.userInfo.name));
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 20u, slotInfoByUserId.userInfo.name));
-					break;
-				}
-				break;
 			case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
-				if (status == LoungeMemberStatus.MEMBER_STATUS.QUEST)
+				if (after.isHost)
 				{
-					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 16u, slotInfoByUserId.userInfo.name));
+					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 14u, slotInfoByUserId.userInfo.name), string.Empty);
 				}
 				break;
-			case LoungeMemberStatus.MEMBER_STATUS.QUEST:
-				if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
-				{
-					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 17u, slotInfoByUserId.userInfo.name));
-				}
+			case LoungeMemberStatus.MEMBER_STATUS.FIELD:
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 15u, slotInfoByUserId.userInfo.name), string.Empty);
 				break;
 			case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-				if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
-				{
-					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 21u, slotInfoByUserId.userInfo.name));
-				}
-				break;
-			default:
-				if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
-				{
-					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 18u, slotInfoByUserId.userInfo.name));
-				}
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 20u, slotInfoByUserId.userInfo.name), string.Empty);
 				break;
 			}
+			break;
+		case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
+			if (status == LoungeMemberStatus.MEMBER_STATUS.QUEST)
+			{
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 16u, slotInfoByUserId.userInfo.name), string.Empty);
+			}
+			break;
+		case LoungeMemberStatus.MEMBER_STATUS.QUEST:
+			if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
+			{
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 17u, slotInfoByUserId.userInfo.name), string.Empty);
+			}
+			break;
+		case LoungeMemberStatus.MEMBER_STATUS.ARENA:
+			if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
+			{
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 21u, slotInfoByUserId.userInfo.name), string.Empty);
+			}
+			break;
+		default:
+			if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
+			{
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 18u, slotInfoByUserId.userInfo.name), string.Empty);
+			}
+			break;
 		}
 	}
 }

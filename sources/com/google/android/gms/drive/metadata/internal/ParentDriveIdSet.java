@@ -3,37 +3,35 @@ package com.google.android.gms.drive.metadata.internal;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-public class ParentDriveIdSet extends zza implements ReflectedParcelable {
+@Class(creator = "ParentDriveIdSetCreator")
+@Reserved({1})
+public class ParentDriveIdSet extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<ParentDriveIdSet> CREATOR = new zzn();
-    final List<zzq> zzgkr;
+    @Field(mo13990id = 2)
+    final List<zzq> zzit;
 
     public ParentDriveIdSet() {
         this(new ArrayList());
     }
 
-    ParentDriveIdSet(List<zzq> list) {
-        this.zzgkr = list;
+    @Constructor
+    ParentDriveIdSet(@Param(mo13993id = 2) List<zzq> list) {
+        this.zzit = list;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 2, this.zzgkr, false);
-        zzd.zzai(parcel, zze);
-    }
-
-    public final Set<DriveId> zzab(long j) {
-        Set<DriveId> hashSet = new HashSet();
-        for (zzq zzq : this.zzgkr) {
-            hashSet.add(new DriveId(zzq.zzgdj, zzq.zzgdk, j, zzq.zzgdl));
-        }
-        return hashSet;
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeTypedList(parcel, 2, this.zzit, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

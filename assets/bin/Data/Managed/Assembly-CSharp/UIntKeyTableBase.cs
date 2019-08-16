@@ -81,33 +81,34 @@ public abstract class UIntKeyTableBase
 
 	protected void _AddRange(UIntKeyTableBase table)
 	{
-		if (table.lists != null)
+		if (table.lists == null)
 		{
-			if (lists == null)
+			return;
+		}
+		if (lists == null)
+		{
+			if (useHashDivision)
 			{
-				if (useHashDivision)
+				lists = new List<Item>[256];
+			}
+			else
+			{
+				lists = new List<Item>[1];
+			}
+		}
+		int i = 0;
+		for (int num = table.lists.Length; i < num; i++)
+		{
+			List<Item> list = table.lists[i];
+			if (list != null)
+			{
+				if (lists[i] == null)
 				{
-					lists = new List<Item>[256];
+					lists[i] = new List<Item>(list);
 				}
 				else
 				{
-					lists = new List<Item>[1];
-				}
-			}
-			int i = 0;
-			for (int num = table.lists.Length; i < num; i++)
-			{
-				List<Item> list = table.lists[i];
-				if (list != null)
-				{
-					if (lists[i] == null)
-					{
-						lists[i] = new List<Item>(list);
-					}
-					else
-					{
-						lists[i].AddRange(list);
-					}
+					lists[i].AddRange(list);
 				}
 			}
 		}

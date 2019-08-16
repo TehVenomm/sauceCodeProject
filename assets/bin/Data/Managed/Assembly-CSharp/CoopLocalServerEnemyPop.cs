@@ -59,37 +59,38 @@ public class CoopLocalServerEnemyPop
 
 	public void Start()
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && !isStart)
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || isStart)
 		{
-			isStart = true;
-			Action<StageObject> action = delegate(StageObject o)
-			{
-				Enemy enemy = o as Enemy;
-				if (!(enemy == null) && enemy.enemyPopIndex == popIndex)
-				{
-					CoopLocalServerEnemy coopLocalServerEnemy = new CoopLocalServerEnemy(this, 0f);
-					coopLocalServerEnemy.Pop(enemy.id);
-					enemys.Add(coopLocalServerEnemy);
-				}
-			};
-			MonoBehaviourSingleton<StageObjectManager>.I.enemyList.ForEach(action);
-			MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(action);
-			for (int i = enemys.Count; i < data.popNumMax; i++)
-			{
-				float pop_time = data.GeneratePopTime();
-				if (i < data.popNumInit)
-				{
-					pop_time = 0f;
-				}
-				else if (i < data.popNumMin)
-				{
-					pop_time = 0f;
-				}
-				CoopLocalServerEnemy item = new CoopLocalServerEnemy(this, pop_time);
-				enemys.Add(item);
-			}
-			Update();
+			return;
 		}
+		isStart = true;
+		Action<StageObject> action = delegate(StageObject o)
+		{
+			Enemy enemy = o as Enemy;
+			if (!(enemy == null) && enemy.enemyPopIndex == popIndex)
+			{
+				CoopLocalServerEnemy coopLocalServerEnemy = new CoopLocalServerEnemy(this, 0f);
+				coopLocalServerEnemy.Pop(enemy.id);
+				enemys.Add(coopLocalServerEnemy);
+			}
+		};
+		MonoBehaviourSingleton<StageObjectManager>.I.enemyList.ForEach(action);
+		MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(action);
+		for (int i = enemys.Count; i < data.popNumMax; i++)
+		{
+			float pop_time = data.GeneratePopTime();
+			if (i < data.popNumInit)
+			{
+				pop_time = 0f;
+			}
+			else if (i < data.popNumMin)
+			{
+				pop_time = 0f;
+			}
+			CoopLocalServerEnemy item = new CoopLocalServerEnemy(this, pop_time);
+			enemys.Add(item);
+		}
+		Update();
 	}
 
 	public void Update()

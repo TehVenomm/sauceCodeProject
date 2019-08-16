@@ -6,14 +6,14 @@ import android.content.Intent;
 
 public class FragmentWrapper {
     private Fragment nativeFragment;
-    private android.support.v4.app.Fragment supportFragment;
+    private android.support.p000v4.app.Fragment supportFragment;
 
     public FragmentWrapper(Fragment fragment) {
         Validate.notNull(fragment, "fragment");
         this.nativeFragment = fragment;
     }
 
-    public FragmentWrapper(android.support.v4.app.Fragment fragment) {
+    public FragmentWrapper(android.support.p000v4.app.Fragment fragment) {
         Validate.notNull(fragment, "fragment");
         this.supportFragment = fragment;
     }
@@ -26,7 +26,7 @@ public class FragmentWrapper {
         return this.nativeFragment;
     }
 
-    public android.support.v4.app.Fragment getSupportFragment() {
+    public android.support.p000v4.app.Fragment getSupportFragment() {
         return this.supportFragment;
     }
 

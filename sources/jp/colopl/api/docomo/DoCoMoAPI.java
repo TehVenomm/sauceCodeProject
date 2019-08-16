@@ -1,9 +1,10 @@
-package jp.colopl.api.docomo;
+package p018jp.colopl.api.docomo;
 
 import java.io.InputStream;
-import jp.colopl.drapro.ColoplApplication;
-import jp.colopl.util.HTTP;
+import p018jp.colopl.drapro.ColoplApplication;
+import p018jp.colopl.util.HTTP;
 
+/* renamed from: jp.colopl.api.docomo.DoCoMoAPI */
 public class DoCoMoAPI {
     public static final String ENTRY_POINT = "https://api.spmode.ne.jp/nwLocation/GetLocation";
     public static final float PSEUDO_ACCURACY = 250.0f;
@@ -41,7 +42,10 @@ public class DoCoMoAPI {
 
     public DoCoMoLocationInfo getLocationInfo() {
         InputStream post = post();
-        return post == null ? null : new DoCoMoLocationInfoHandler().parse(post);
+        if (post == null) {
+            return null;
+        }
+        return new DoCoMoLocationInfoHandler().parse(post);
     }
 
     public InputStream post() {

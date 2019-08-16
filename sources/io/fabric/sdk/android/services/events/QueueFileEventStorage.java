@@ -1,9 +1,6 @@
-package io.fabric.sdk.android.services.events;
+package p017io.fabric.sdk.android.services.events;
 
 import android.content.Context;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.common.QueueFile;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,7 +9,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.common.QueueFile;
 
+/* renamed from: io.fabric.sdk.android.services.events.QueueFileEventStorage */
 public class QueueFileEventStorage implements EventsStorage {
     private final Context context;
     private QueueFile queueFile = new QueueFile(this.workingFile);
@@ -21,8 +21,8 @@ public class QueueFileEventStorage implements EventsStorage {
     private final File workingDirectory;
     private final File workingFile;
 
-    public QueueFileEventStorage(Context context, File file, String str, String str2) throws IOException {
-        this.context = context;
+    public QueueFileEventStorage(Context context2, File file, String str, String str2) throws IOException {
+        this.context = context2;
         this.workingDirectory = file;
         this.targetDirectoryName = str2;
         this.workingFile = new File(this.workingDirectory, str);
@@ -37,29 +37,31 @@ public class QueueFileEventStorage implements EventsStorage {
     }
 
     private void move(File file, File file2) throws IOException {
-        Closeable fileInputStream;
-        Throwable th;
-        Closeable closeable = null;
+        OutputStream outputStream;
+        FileInputStream fileInputStream;
+        OutputStream outputStream2 = null;
         try {
             fileInputStream = new FileInputStream(file);
             try {
-                closeable = getMoveOutputStream(file2);
-                CommonUtils.copyStream(fileInputStream, closeable, new byte[1024]);
+                outputStream2 = getMoveOutputStream(file2);
+                CommonUtils.copyStream(fileInputStream, outputStream2, new byte[1024]);
                 CommonUtils.closeOrLog(fileInputStream, "Failed to close file input stream");
-                CommonUtils.closeOrLog(closeable, "Failed to close output stream");
+                CommonUtils.closeOrLog(outputStream2, "Failed to close output stream");
                 file.delete();
-            } catch (Throwable th2) {
-                th = th2;
+            } catch (Throwable th) {
+                th = th;
+                outputStream = outputStream2;
                 CommonUtils.closeOrLog(fileInputStream, "Failed to close file input stream");
-                CommonUtils.closeOrLog(closeable, "Failed to close output stream");
+                CommonUtils.closeOrLog(outputStream, "Failed to close output stream");
                 file.delete();
                 throw th;
             }
-        } catch (Throwable th3) {
-            th = th3;
+        } catch (Throwable th2) {
+            th = th2;
             fileInputStream = null;
+            outputStream = null;
             CommonUtils.closeOrLog(fileInputStream, "Failed to close file input stream");
-            CommonUtils.closeOrLog(closeable, "Failed to close output stream");
+            CommonUtils.closeOrLog(outputStream, "Failed to close output stream");
             file.delete();
             throw th;
         }
@@ -93,8 +95,8 @@ public class QueueFileEventStorage implements EventsStorage {
     }
 
     public List<File> getBatchOfFilesToSend(int i) {
-        List<File> arrayList = new ArrayList();
-        for (Object add : this.targetDirectory.listFiles()) {
+        ArrayList arrayList = new ArrayList();
+        for (File add : this.targetDirectory.listFiles()) {
             arrayList.add(add);
             if (arrayList.size() >= i) {
                 break;

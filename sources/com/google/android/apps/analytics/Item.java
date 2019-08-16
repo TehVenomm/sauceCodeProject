@@ -9,12 +9,18 @@ public class Item {
     private final String orderId;
 
     public static class Builder {
-        private String itemCategory = null;
-        private final long itemCount;
-        private String itemName = null;
-        private final double itemPrice;
-        private final String itemSKU;
-        private final String orderId;
+        /* access modifiers changed from: private */
+        public String itemCategory = null;
+        /* access modifiers changed from: private */
+        public final long itemCount;
+        /* access modifiers changed from: private */
+        public String itemName = null;
+        /* access modifiers changed from: private */
+        public final double itemPrice;
+        /* access modifiers changed from: private */
+        public final String itemSKU;
+        /* access modifiers changed from: private */
+        public final String orderId;
 
         public Builder(String str, String str2, double d, long j) {
             if (str == null || str.trim().length() == 0) {
@@ -30,7 +36,7 @@ public class Item {
         }
 
         public Item build() {
-            return new Item();
+            return new Item(this);
         }
 
         public Builder setItemCategory(String str) {
@@ -53,27 +59,33 @@ public class Item {
         this.itemCategory = builder.itemCategory;
     }
 
-    String getItemCategory() {
+    /* access modifiers changed from: 0000 */
+    public String getItemCategory() {
         return this.itemCategory;
     }
 
-    long getItemCount() {
+    /* access modifiers changed from: 0000 */
+    public long getItemCount() {
         return this.itemCount;
     }
 
-    String getItemName() {
+    /* access modifiers changed from: 0000 */
+    public String getItemName() {
         return this.itemName;
     }
 
-    double getItemPrice() {
+    /* access modifiers changed from: 0000 */
+    public double getItemPrice() {
         return this.itemPrice;
     }
 
-    String getItemSKU() {
+    /* access modifiers changed from: 0000 */
+    public String getItemSKU() {
         return this.itemSKU;
     }
 
-    String getOrderId() {
+    /* access modifiers changed from: 0000 */
+    public String getOrderId() {
         return this.orderId;
     }
 }

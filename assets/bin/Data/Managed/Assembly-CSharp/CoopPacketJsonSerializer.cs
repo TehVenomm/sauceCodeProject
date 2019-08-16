@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 
 public class CoopPacketJsonSerializer : CoopPacketSerializer
@@ -25,22 +24,13 @@ public class CoopPacketJsonSerializer : CoopPacketSerializer
 		int num = 0;
 		if (user_token != null)
 		{
-			if (_003C_003Ef__switch_0024mapE == null)
+			if (user_token == string.Empty)
 			{
-				Dictionary<string, int> dictionary = new Dictionary<string, int>(2);
-				dictionary.Add(string.Empty, 0);
-				dictionary.Add(" ", 1);
-				_003C_003Ef__switch_0024mapE = dictionary;
+				return -1000;
 			}
-			if (_003C_003Ef__switch_0024mapE.TryGetValue(user_token, out int value))
+			if (user_token == " ")
 			{
-				switch (value)
-				{
-				case 0:
-					return -1000;
-				case 1:
-					return -2000;
-				}
+				return -2000;
 			}
 		}
 		return int.Parse(user_token);

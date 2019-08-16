@@ -76,7 +76,10 @@ public class BinaryNode extends ValueNode {
     }
 
     public int hashCode() {
-        return this._data == null ? -1 : this._data.length;
+        if (this._data == null) {
+            return -1;
+        }
+        return this._data.length;
     }
 
     public String toString() {

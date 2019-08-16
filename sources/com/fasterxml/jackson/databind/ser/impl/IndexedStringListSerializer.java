@@ -32,27 +32,29 @@ public final class IndexedStringListSerializer extends StaticListSerializerBase<
         return new IndexedStringListSerializer(this, jsonSerializer, bool);
     }
 
-    protected JsonNode contentSchema() {
+    /* access modifiers changed from: protected */
+    public JsonNode contentSchema() {
         return createSchemaNode("string", true);
     }
 
-    protected void acceptContentVisitor(JsonArrayFormatVisitor jsonArrayFormatVisitor) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void acceptContentVisitor(JsonArrayFormatVisitor jsonArrayFormatVisitor) throws JsonMappingException {
         jsonArrayFormatVisitor.itemsFormat(JsonFormatTypes.STRING);
     }
 
     public void serialize(List<String> list, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         int size = list.size();
-        if (size == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
-            _serializeUnwrapped(list, jsonGenerator, serializerProvider);
+        if (size != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+            jsonGenerator.writeStartArray(size);
+            if (this._serializer == null) {
+                serializeContents(list, jsonGenerator, serializerProvider, size);
+            } else {
+                serializeUsingCustom(list, jsonGenerator, serializerProvider, size);
+            }
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray(size);
-        if (this._serializer == null) {
-            serializeContents(list, jsonGenerator, serializerProvider, size);
-        } else {
-            serializeUsingCustom(list, jsonGenerator, serializerProvider, size);
-        }
-        jsonGenerator.writeEndArray();
+        _serializeUnwrapped(list, jsonGenerator, serializerProvider);
     }
 
     private final void _serializeUnwrapped(List<String> list, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -85,28 +87,26 @@ public final class IndexedStringListSerializer extends StaticListSerializerBase<
                     jsonGenerator.writeString(str);
                 }
                 i2++;
-            } catch (Throwable e) {
-                wrapAndThrow(serializerProvider, e, (Object) list, i2);
+            } catch (Exception e) {
+                wrapAndThrow(serializerProvider, (Throwable) e, (Object) list, i2);
                 return;
             }
         }
     }
 
     private final void serializeUsingCustom(List<String> list, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, int i) throws IOException {
-        int i2 = 0;
         try {
             JsonSerializer jsonSerializer = this._serializer;
-            while (i2 < i) {
+            for (int i2 = 0; i2 < i; i2++) {
                 String str = (String) list.get(i2);
                 if (str == null) {
                     serializerProvider.defaultSerializeNull(jsonGenerator);
                 } else {
                     jsonSerializer.serialize(str, jsonGenerator, serializerProvider);
                 }
-                i2++;
             }
-        } catch (Throwable e) {
-            wrapAndThrow(serializerProvider, e, (Object) list, 0);
+        } catch (Exception e) {
+            wrapAndThrow(serializerProvider, (Throwable) e, (Object) list, 0);
         }
     }
 }

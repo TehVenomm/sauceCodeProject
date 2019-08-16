@@ -6,18 +6,18 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 import com.google.android.apps.analytics.Dispatcher.Callbacks;
-import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
 
 class NetworkDispatcher implements Dispatcher {
     private static final String GOOGLE_ANALYTICS_HOST_NAME = "www.google-analytics.com";
@@ -30,70 +30,80 @@ class NetworkDispatcher implements Dispatcher {
     private static final String USER_AGENT_TEMPLATE = "%s/%s (Linux; U; Android %s; %s-%s; %s Build/%s)";
     private DispatcherThread dispatcherThread;
     private boolean dryRun;
-    private final HttpHost googleAnalyticsHost;
+    /* access modifiers changed from: private */
+    public final HttpHost googleAnalyticsHost;
     private final String userAgent;
 
     private static class DispatcherThread extends HandlerThread {
-        private final Callbacks callbacks;
-        private AsyncDispatchTask currentTask;
+        /* access modifiers changed from: private */
+        public final Callbacks callbacks;
+        /* access modifiers changed from: private */
+        public AsyncDispatchTask currentTask;
         volatile Handler handlerExecuteOnDispatcherThread;
-        private int lastStatusCode;
-        private int maxEventsPerRequest;
-        private final NetworkDispatcher parent;
-        private final PipelinedRequester pipelinedRequester;
-        private final RequesterCallbacks requesterCallBacks;
-        private long retryInterval;
-        private final String userAgent;
+        /* access modifiers changed from: private */
+        public int lastStatusCode;
+        /* access modifiers changed from: private */
+        public int maxEventsPerRequest;
+        /* access modifiers changed from: private */
+        public final NetworkDispatcher parent;
+        /* access modifiers changed from: private */
+        public final PipelinedRequester pipelinedRequester;
+        /* access modifiers changed from: private */
+        public final RequesterCallbacks requesterCallBacks;
+        /* access modifiers changed from: private */
+        public long retryInterval;
+        /* access modifiers changed from: private */
+        public final String userAgent;
 
         private class AsyncDispatchTask implements Runnable {
-            private final LinkedList<Hit> hits = new LinkedList();
+            private final LinkedList<Hit> hits = new LinkedList<>();
 
             public AsyncDispatchTask(Hit[] hitArr) {
                 Collections.addAll(this.hits, hitArr);
             }
 
             private void dispatchSomePendingHits(boolean z) throws IOException, ParseException, HttpException {
+                String str;
+                String str2;
+                BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest;
                 if (GoogleAnalyticsTracker.getInstance().getDebug() && z) {
                     Log.v(GoogleAnalyticsTracker.LOG_TAG, "dispatching hits in dry run mode");
                 }
                 int i = 0;
                 while (i < this.hits.size() && i < DispatcherThread.this.maxEventsPerRequest) {
-                    String str;
-                    String str2;
-                    HttpEntityEnclosingRequest basicHttpEntityEnclosingRequest;
                     String addQueueTimeParameter = Utils.addQueueTimeParameter(((Hit) this.hits.get(i)).hitString, System.currentTimeMillis());
                     int indexOf = addQueueTimeParameter.indexOf(63);
                     if (indexOf < 0) {
-                        str = "";
-                        str2 = addQueueTimeParameter;
+                        str2 = "";
+                        str = addQueueTimeParameter;
                     } else {
-                        str2 = indexOf > 0 ? addQueueTimeParameter.substring(0, indexOf) : "";
-                        str = indexOf < addQueueTimeParameter.length() + -2 ? addQueueTimeParameter.substring(indexOf + 1) : "";
+                        str = indexOf > 0 ? addQueueTimeParameter.substring(0, indexOf) : "";
+                        str2 = indexOf < addQueueTimeParameter.length() + -2 ? addQueueTimeParameter.substring(indexOf + 1) : "";
                     }
-                    if (str.length() < NetworkDispatcher.MAX_GET_LENGTH) {
+                    if (str2.length() < NetworkDispatcher.MAX_GET_LENGTH) {
                         basicHttpEntityEnclosingRequest = new BasicHttpEntityEnclosingRequest(HttpRequest.METHOD_GET, addQueueTimeParameter);
                     } else {
-                        HttpEntityEnclosingRequest basicHttpEntityEnclosingRequest2 = new BasicHttpEntityEnclosingRequest(HttpRequest.METHOD_POST, "/p" + str2);
-                        basicHttpEntityEnclosingRequest2.addHeader(HttpRequest.HEADER_CONTENT_LENGTH, Integer.toString(str.length()));
+                        BasicHttpEntityEnclosingRequest basicHttpEntityEnclosingRequest2 = new BasicHttpEntityEnclosingRequest(HttpRequest.METHOD_POST, "/p" + str);
+                        basicHttpEntityEnclosingRequest2.addHeader(HttpRequest.HEADER_CONTENT_LENGTH, Integer.toString(str2.length()));
                         basicHttpEntityEnclosingRequest2.addHeader(HttpRequest.HEADER_CONTENT_TYPE, "text/plain");
-                        basicHttpEntityEnclosingRequest2.setEntity(new StringEntity(str));
+                        basicHttpEntityEnclosingRequest2.setEntity(new StringEntity(str2));
                         basicHttpEntityEnclosingRequest = basicHttpEntityEnclosingRequest2;
                     }
-                    addQueueTimeParameter = DispatcherThread.this.parent.googleAnalyticsHost.getHostName();
-                    if (DispatcherThread.this.parent.googleAnalyticsHost.getPort() != NetworkDispatcher.GOOGLE_ANALYTICS_HOST_PORT) {
-                        addQueueTimeParameter = addQueueTimeParameter + ":" + DispatcherThread.this.parent.googleAnalyticsHost.getPort();
+                    String hostName = DispatcherThread.this.parent.googleAnalyticsHost.getHostName();
+                    if (DispatcherThread.this.parent.googleAnalyticsHost.getPort() != 80) {
+                        hostName = hostName + ":" + DispatcherThread.this.parent.googleAnalyticsHost.getPort();
                     }
-                    basicHttpEntityEnclosingRequest.addHeader("Host", addQueueTimeParameter);
+                    basicHttpEntityEnclosingRequest.addHeader("Host", hostName);
                     basicHttpEntityEnclosingRequest.addHeader("User-Agent", DispatcherThread.this.userAgent);
                     if (GoogleAnalyticsTracker.getInstance().getDebug()) {
                         StringBuffer stringBuffer = new StringBuffer();
-                        for (Object obj : basicHttpEntityEnclosingRequest.getAllHeaders()) {
-                            stringBuffer.append(obj.toString()).append(StringUtils.LF);
+                        for (Header obj : basicHttpEntityEnclosingRequest.getAllHeaders()) {
+                            stringBuffer.append(obj.toString()).append(StringUtils.f1199LF);
                         }
-                        stringBuffer.append(basicHttpEntityEnclosingRequest.getRequestLine().toString()).append(StringUtils.LF);
+                        stringBuffer.append(basicHttpEntityEnclosingRequest.getRequestLine().toString()).append(StringUtils.f1199LF);
                         Log.i(GoogleAnalyticsTracker.LOG_TAG, stringBuffer.toString());
                     }
-                    if (str.length() > 8192) {
+                    if (str2.length() > 8192) {
                         Log.w(GoogleAnalyticsTracker.LOG_TAG, "Hit too long (> 8192 bytes)--not sent");
                         DispatcherThread.this.requesterCallBacks.requestSent();
                     } else if (z) {
@@ -129,12 +139,12 @@ class NetworkDispatcher implements Dispatcher {
                         Thread.sleep(j * 1000);
                         dispatchSomePendingHits(DispatcherThread.this.parent.isDryRun());
                         i++;
-                    } catch (Throwable e) {
+                    } catch (InterruptedException e) {
                         Log.w(GoogleAnalyticsTracker.LOG_TAG, "Couldn't sleep.", e);
-                    } catch (Throwable e2) {
+                    } catch (IOException e2) {
                         Log.w(GoogleAnalyticsTracker.LOG_TAG, "Problem with socket or streams.", e2);
-                    } catch (Throwable e22) {
-                        Log.w(GoogleAnalyticsTracker.LOG_TAG, "Problem with http streams.", e22);
+                    } catch (HttpException e3) {
+                        Log.w(GoogleAnalyticsTracker.LOG_TAG, "Problem with http streams.", e3);
                     }
                 }
                 DispatcherThread.this.pipelinedRequester.finishedCurrentRequests();
@@ -169,20 +179,20 @@ class NetworkDispatcher implements Dispatcher {
             }
         }
 
-        private DispatcherThread(Callbacks callbacks, PipelinedRequester pipelinedRequester, String str, NetworkDispatcher networkDispatcher) {
+        private DispatcherThread(Callbacks callbacks2, PipelinedRequester pipelinedRequester2, String str, NetworkDispatcher networkDispatcher) {
             super("DispatcherThread");
             this.maxEventsPerRequest = 30;
             this.currentTask = null;
-            this.callbacks = callbacks;
+            this.callbacks = callbacks2;
             this.userAgent = str;
-            this.pipelinedRequester = pipelinedRequester;
+            this.pipelinedRequester = pipelinedRequester2;
             this.requesterCallBacks = new RequesterCallbacks();
             this.pipelinedRequester.installCallbacks(this.requesterCallBacks);
             this.parent = networkDispatcher;
         }
 
-        private DispatcherThread(Callbacks callbacks, String str, NetworkDispatcher networkDispatcher) {
-            this(callbacks, new PipelinedRequester(networkDispatcher.googleAnalyticsHost), str, networkDispatcher);
+        private DispatcherThread(Callbacks callbacks2, String str, NetworkDispatcher networkDispatcher) {
+            this(callbacks2, new PipelinedRequester(networkDispatcher.googleAnalyticsHost), str, networkDispatcher);
         }
 
         static /* synthetic */ long access$630(DispatcherThread dispatcherThread, long j) {
@@ -197,7 +207,8 @@ class NetworkDispatcher implements Dispatcher {
             }
         }
 
-        protected void onLooperPrepared() {
+        /* access modifiers changed from: protected */
+        public void onLooperPrepared() {
             this.handlerExecuteOnDispatcherThread = new Handler();
         }
     }
@@ -207,17 +218,14 @@ class NetworkDispatcher implements Dispatcher {
     }
 
     public NetworkDispatcher(String str, String str2) {
-        this(str, str2, GOOGLE_ANALYTICS_HOST_NAME, GOOGLE_ANALYTICS_HOST_PORT);
+        this(str, str2, GOOGLE_ANALYTICS_HOST_NAME, 80);
     }
 
     NetworkDispatcher(String str, String str2, String str3, int i) {
         this.dryRun = false;
         this.googleAnalyticsHost = new HttpHost(str3, i);
         Locale locale = Locale.getDefault();
-        String str4 = VERSION.RELEASE;
-        String toLowerCase = locale.getLanguage() != null ? locale.getLanguage().toLowerCase() : "en";
-        String toLowerCase2 = locale.getCountry() != null ? locale.getCountry().toLowerCase() : "";
-        this.userAgent = String.format(USER_AGENT_TEMPLATE, new Object[]{str, str2, str4, toLowerCase, toLowerCase2, Build.MODEL, Build.ID});
+        this.userAgent = String.format(USER_AGENT_TEMPLATE, new Object[]{str, str2, VERSION.RELEASE, locale.getLanguage() != null ? locale.getLanguage().toLowerCase() : "en", locale.getCountry() != null ? locale.getCountry().toLowerCase() : "", Build.MODEL, Build.ID});
     }
 
     public void dispatchHits(Hit[] hitArr) {
@@ -226,7 +234,8 @@ class NetworkDispatcher implements Dispatcher {
         }
     }
 
-    String getUserAgent() {
+    /* access modifiers changed from: 0000 */
+    public String getUserAgent() {
         return this.userAgent;
     }
 
@@ -257,7 +266,8 @@ class NetworkDispatcher implements Dispatcher {
         }
     }
 
-    void waitForThreadLooper() {
+    /* access modifiers changed from: 0000 */
+    public void waitForThreadLooper() {
         this.dispatcherThread.getLooper();
         while (this.dispatcherThread.handlerExecuteOnDispatcherThread == null) {
             Thread.yield();

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Forward Events (Legacy)")]
-public class UIForwardEvents
+public class UIForwardEvents : MonoBehaviour
 {
 	public GameObject target;
 

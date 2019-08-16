@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TestScript
+public class TestScript : MonoBehaviour
 {
 	public GameObject ref1;
 

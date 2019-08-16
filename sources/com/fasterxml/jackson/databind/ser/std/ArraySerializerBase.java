@@ -19,17 +19,18 @@ public abstract class ArraySerializerBase<T> extends ContainerSerializer<T> impl
 
     public abstract JsonSerializer<?> _withResolved(BeanProperty beanProperty, Boolean bool);
 
-    protected abstract void serializeContents(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract void serializeContents(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException;
 
     protected ArraySerializerBase(Class<T> cls) {
-        super((Class) cls);
+        super(cls);
         this._property = null;
         this._unwrapSingle = null;
     }
 
     @Deprecated
     protected ArraySerializerBase(Class<T> cls, BeanProperty beanProperty) {
-        super((Class) cls);
+        super(cls);
         this._property = beanProperty;
         this._unwrapSingle = null;
     }
@@ -69,14 +70,14 @@ public abstract class ArraySerializerBase<T> extends ContainerSerializer<T> impl
     }
 
     public void serialize(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE) && hasSingleElement(t)) {
+        if (((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE) || !hasSingleElement(t)) {
+            jsonGenerator.writeStartArray();
+            jsonGenerator.setCurrentValue(t);
             serializeContents(t, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray();
-        jsonGenerator.setCurrentValue(t);
         serializeContents(t, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
     }
 
     public final void serializeWithType(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {

@@ -5,8 +5,8 @@ using UnityEngine;
 [Serializable]
 public class BMFont
 {
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private int mSize = 16;
 
 	[HideInInspector]
@@ -21,8 +21,8 @@ public class BMFont
 	[SerializeField]
 	private int mHeight;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string mSpriteName;
 
 	[HideInInspector]
@@ -121,7 +121,7 @@ public class BMFont
 
 	public BMGlyph GetGlyph(int index)
 	{
-		return GetGlyph(index, false);
+		return GetGlyph(index, createIfMissing: false);
 	}
 
 	public void Clear()

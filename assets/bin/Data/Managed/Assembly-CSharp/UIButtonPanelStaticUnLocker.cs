@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(UIButton))]
-public class UIButtonPanelStaticUnLocker
+public class UIButtonPanelStaticUnLocker : MonoBehaviour
 {
 	[SerializeField]
 	protected UIStaticPanelChanger panelChange;

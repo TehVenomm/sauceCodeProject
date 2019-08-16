@@ -3,18 +3,20 @@ package com.google.android.gms.games.multiplayer.realtime;
 import android.database.CharArrayBuffer;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.support.annotation.Nullable;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.ParticipantRef;
+import com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty;
 import java.util.ArrayList;
 
-public final class zzf extends zzc implements Room {
-    private final int zzhky;
+public final class zzf extends DataBufferRef implements Room {
+    private final int zznx;
 
     zzf(DataHolder dataHolder, int i, int i2) {
         super(dataHolder, i);
-        this.zzhky = i2;
+        this.zznx = i2;
     }
 
     public final int describeContents() {
@@ -29,8 +31,12 @@ public final class zzf extends zzc implements Room {
         return new RoomEntity(this);
     }
 
+    @Nullable
     public final Bundle getAutoMatchCriteria() {
-        return !getBoolean("has_automatch_criteria") ? null : RoomConfig.createAutoMatchCriteria(getInteger("automatch_min_players"), getInteger("automatch_max_players"), getLong("automatch_bit_mask"));
+        if (!getBoolean("has_automatch_criteria")) {
+            return null;
+        }
+        return RoomConfig.createAutoMatchCriteria(getInteger("automatch_min_players"), getInteger("automatch_max_players"), getLong("automatch_bit_mask"));
     }
 
     public final int getAutoMatchWaitEstimateSeconds() {
@@ -38,7 +44,7 @@ public final class zzf extends zzc implements Room {
     }
 
     public final long getCreationTimestamp() {
-        return getLong("creation_timestamp");
+        return getLong(ConditionalUserProperty.CREATION_TIMESTAMP);
     }
 
     public final String getCreatorId() {
@@ -50,7 +56,7 @@ public final class zzf extends zzc implements Room {
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zza("description", charArrayBuffer);
+        copyToBuffer("description", charArrayBuffer);
     }
 
     public final Participant getParticipant(String str) {
@@ -70,9 +76,9 @@ public final class zzf extends zzc implements Room {
     }
 
     public final ArrayList<Participant> getParticipants() {
-        ArrayList<Participant> arrayList = new ArrayList(this.zzhky);
-        for (int i = 0; i < this.zzhky; i++) {
-            arrayList.add(new ParticipantRef(this.zzfkz, this.zzfqb + i));
+        ArrayList<Participant> arrayList = new ArrayList<>(this.zznx);
+        for (int i = 0; i < this.zznx; i++) {
+            arrayList.add(new ParticipantRef(this.mDataHolder, this.mDataRow + i));
         }
         return arrayList;
     }
@@ -90,7 +96,7 @@ public final class zzf extends zzc implements Room {
     }
 
     public final int hashCode() {
-        return RoomEntity.zza(this);
+        return RoomEntity.zza((Room) this);
     }
 
     public final String toString() {

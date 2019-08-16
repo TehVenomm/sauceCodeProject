@@ -1,4 +1,6 @@
-public class SkinNormalizer
+using UnityEngine;
+
+public class SkinNormalizer : MonoBehaviour
 {
 	public SkinNormalizer()
 		: this()

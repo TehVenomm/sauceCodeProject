@@ -38,7 +38,6 @@ public class ProfileChangeDegreeFrame : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -52,17 +51,15 @@ public class ProfileChangeDegreeFrame : GameSection
 		{
 			userHaveData = new List<DegreeTable.DegreeData>();
 			base.Initialize();
+			yield break;
 		}
-		else
-		{
-			userHaveData = (from x in allData
-			where x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)
-			select x).ToList();
-			showAll = true;
-			currentPage = 1;
-			yield return (object)0;
-			base.Initialize();
-		}
+		userHaveData = (from x in allData
+		where x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)
+		select x).ToList();
+		showAll = true;
+		currentPage = 1;
+		yield return 0;
+		base.Initialize();
 	}
 
 	public override void UpdateUI()
@@ -75,9 +72,8 @@ public class ProfileChangeDegreeFrame : GameSection
 			maxPage++;
 		}
 		int item_num = Mathf.Min(GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT, currentShow.Count - (currentPage - 1) * GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT);
-		SetGrid(UI.GRD_FRAME, "DegreePlate", item_num, true, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_FRAME, "DegreePlate", item_num, reset: true, delegate(int i, Transform t, bool b)
 		{
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			int index = i + (currentPage - 1) * GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT;
 			DegreePlate component = t.GetComponent<DegreePlate>();
 			DegreeTable.DegreeData degreeData = currentShow[index];
@@ -110,6 +106,7 @@ public class ProfileChangeDegreeFrame : GameSection
 	private void OnQuery_SORT()
 	{
 		showAll = !showAll;
+		currentPage = 1;
 		RefreshUI();
 	}
 

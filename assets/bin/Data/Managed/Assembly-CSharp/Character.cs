@@ -21,6 +21,7 @@ public class Character : StageObject, IAnimEvent
 		HIDE,
 		MOVE_POINT,
 		MOVE_LOOKAT,
+		POSE,
 		MAX
 	}
 
@@ -127,7 +128,14 @@ public class Character : StageObject, IAnimEvent
 		INK_SPLASH,
 		DIZZY,
 		SHADOWSEALING,
-		MAD_MODE
+		MAD_MODE,
+		LIGHT_RING,
+		BIND,
+		STONE,
+		DEAD_REVIVE,
+		SOIL_SHOCK,
+		CONCUSSION,
+		CHARM_BLOW
 	}
 
 	public class ReactionInfo
@@ -139,6 +147,8 @@ public class Character : StageObject, IAnimEvent
 		public float loopTime;
 
 		public int targetId;
+
+		public int deadReviveCount;
 	}
 
 	[Serializable]
@@ -147,6 +157,8 @@ public class Character : StageObject, IAnimEvent
 		public REACTION_TYPE type;
 
 		public int targetId;
+
+		public float reactionLoopTime;
 	}
 
 	public enum STATE_MOVE_POINT
@@ -166,23 +178,48 @@ public class Character : StageObject, IAnimEvent
 		FINISH
 	}
 
-	protected const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
+	public class PlayMotionParam
+	{
+		public int MotionID;
 
-	protected const string ANIMATOR_NEXT_TRIGGER_NAME = "next";
+		public string MotionLayerName = "Base Layer.";
 
-	public const float FREEZE_START_NORMALIZED_TIME = 0.1f;
+		public float TransitionTime = -1f;
+	}
 
-	public const float FREEZE_EFFECT_HEIGHT = 30f;
+	public class HealData
+	{
+		public int healHp;
 
-	public const float FREEZE_EFFECT_SPEED = 5f;
+		public HEAL_TYPE healType;
 
-	private const float DEFAULT_MOVE_ANGLE = 45f;
+		public HEAL_EFFECT_TYPE effectType;
 
-	private const float DEFAULT_MOVE_ANGLE_SPEED_MAX = 20f;
+		public List<int> applyAbilityTypeList = new List<int>();
+
+		public HealData(int healHp, HEAL_TYPE healType, HEAL_EFFECT_TYPE healEffectType, List<int> applyAbilityTypeList)
+		{
+			this.healHp = healHp;
+			this.healType = healType;
+			effectType = healEffectType;
+			this.applyAbilityTypeList = applyAbilityTypeList;
+		}
+
+		public override string ToString()
+		{
+			return $"HealData( healHp: {healHp}, healType: {healType}, effectType: {effectType}, applyAbilityTypeList: {applyAbilityTypeList.ToJoinString()}";
+		}
+	}
 
 	public static readonly string[] motionStateName;
 
-	private static int[] motionHashCaches;
+	public static readonly string poseStateName;
+
+	private static Dictionary<string, int> motionHashCaches;
+
+	public const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
+
+	protected const string ANIMATOR_NEXT_TRIGGER_NAME = "next";
 
 	private static readonly MotionHashTable motionHash;
 
@@ -215,6 +252,9 @@ public class Character : StageObject, IAnimEvent
 
 	[Tooltip("移動回転最大速度（角度/s")]
 	public float moveRotateMaxSpeed = 60f;
+
+	[Tooltip("移動回転最大速度変動掛け率")]
+	public float actionMoveRotateMaxSpeedRate = 1f;
 
 	[Tooltip("移動停止範囲")]
 	public float moveStopRange = 5f;
@@ -309,6 +349,8 @@ public class Character : StageObject, IAnimEvent
 
 	private XorFloat _healWeakRate;
 
+	private XorFloat _elementSpAttackWeakRate;
+
 	private List<AttackColliderObject> m_exAtkColliderObjectList = new List<AttackColliderObject>();
 
 	protected bool[] objectTypeAutoDelete = new bool[4]
@@ -321,7 +363,7 @@ public class Character : StageObject, IAnimEvent
 
 	protected List<List<GameObject>> objectList;
 
-	protected float hitStopTimer = -3.40282347E+38f;
+	protected float hitStopTimer = float.MinValue;
 
 	protected AnimEventProcessor animEventProcessor;
 
@@ -338,6 +380,8 @@ public class Character : StageObject, IAnimEvent
 	protected List<string> hideRendererList = new List<string>();
 
 	protected bool isPlayingEndMotion;
+
+	private bool isImmortal;
 
 	public ContinusAttackParam continusAttackParam;
 
@@ -377,7 +421,19 @@ public class Character : StageObject, IAnimEvent
 
 	public bool onTheGround = true;
 
+	public bool isUseInvincibleBuff;
+
+	public float actionReceiveDamageRate = 1f;
+
+	public bool isUseInvincibleBadStatusBuff;
+
 	private List<GameObject> hittingIceFloor = new List<GameObject>(10);
+
+	public const float FREEZE_START_NORMALIZED_TIME = 0.1f;
+
+	public const float FREEZE_EFFECT_HEIGHT = 30f;
+
+	public const float FREEZE_EFFECT_SPEED = 5f;
 
 	private Renderer[] m_rendererList;
 
@@ -391,9 +447,15 @@ public class Character : StageObject, IAnimEvent
 
 	protected bool m_isStopMotionByDebuff;
 
+	public float stopMotionByDebuffNormalizedTime = -1f;
+
 	protected List<ACTION_ID> shadowSealingStackDebuff = new List<ACTION_ID>();
 
 	protected GameObject m_effectElectricShock;
+
+	private const float DEFAULT_MOVE_ANGLE = 45f;
+
+	private const float DEFAULT_MOVE_ANGLE_SPEED_MAX = 20f;
 
 	private float m_moveAngle_deg = 45f;
 
@@ -448,49 +510,46 @@ public class Character : StageObject, IAnimEvent
 			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			if (!base.isInitialized)
 			{
 				base._position = value;
+				return;
 			}
-			else
+			bool flag = false;
+			if ((base._rigidbody.get_constraints() & 2) != 0)
 			{
-				bool flag = false;
-				if ((base._rigidbody.get_constraints() & 2) != 0)
-				{
-					Vector3 position = base._rigidbody.get_position();
-					if (position.x != value.x)
-					{
-						flag = true;
-					}
-				}
-				if ((base._rigidbody.get_constraints() & 4) != 0)
-				{
-					Vector3 position2 = base._rigidbody.get_position();
-					if (position2.y != value.y)
-					{
-						flag = true;
-					}
-				}
-				if ((base._rigidbody.get_constraints() & 8) != 0)
-				{
-					Vector3 position3 = base._rigidbody.get_position();
-					if (position3.z != value.z)
-					{
-						flag = true;
-					}
-				}
-				if (!base._rigidbody.get_gameObject().get_activeInHierarchy())
+				Vector3 position = base._rigidbody.get_position();
+				if (position.x != value.x)
 				{
 					flag = true;
 				}
-				base._rigidbody.set_position(value);
-				if (flag)
+			}
+			if ((base._rigidbody.get_constraints() & 4) != 0)
+			{
+				Vector3 position2 = base._rigidbody.get_position();
+				if (position2.y != value.y)
 				{
-					base._transform.set_position(value);
+					flag = true;
 				}
+			}
+			if ((base._rigidbody.get_constraints() & 8) != 0)
+			{
+				Vector3 position3 = base._rigidbody.get_position();
+				if (position3.z != value.z)
+				{
+					flag = true;
+				}
+			}
+			if (!base._rigidbody.get_gameObject().get_activeInHierarchy())
+			{
+				flag = true;
+			}
+			base._rigidbody.set_position(value);
+			if (flag)
+			{
+				base._transform.set_position(value);
 			}
 		}
 	}
@@ -506,25 +565,22 @@ public class Character : StageObject, IAnimEvent
 		set
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			if (!base.isInitialized)
 			{
 				base._rotation = value;
+				return;
 			}
-			else
+			bool flag = false;
+			if (!base._rigidbody.get_gameObject().get_activeInHierarchy())
 			{
-				bool flag = false;
-				if (!base._rigidbody.get_gameObject().get_activeInHierarchy())
-				{
-					flag = true;
-				}
-				base._rigidbody.set_rotation(value);
-				if (flag)
-				{
-					base._transform.set_rotation(value);
-				}
+				flag = true;
+			}
+			base._rigidbody.set_rotation(value);
+			if (flag)
+			{
+				base._transform.set_rotation(value);
 			}
 		}
 	}
@@ -688,6 +744,12 @@ public class Character : StageObject, IAnimEvent
 	}
 
 	public bool actionPositionFlag
+	{
+		get;
+		protected set;
+	}
+
+	public bool actionPositionThroughFlag
 	{
 		get;
 		protected set;
@@ -1039,6 +1101,18 @@ public class Character : StageObject, IAnimEvent
 		}
 	}
 
+	public float elementSpAttackWeakRate
+	{
+		get
+		{
+			return _elementSpAttackWeakRate;
+		}
+		protected set
+		{
+			_elementSpAttackWeakRate = value;
+		}
+	}
+
 	public CharacterPacketReceiver characterReceiver => (CharacterPacketReceiver)base.packetReceiver;
 
 	public CharacterPacketSender characterSender => (CharacterPacketSender)base.packetSender;
@@ -1163,25 +1237,55 @@ public class Character : StageObject, IAnimEvent
 		private set;
 	}
 
+	static Character()
+	{
+		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+		motionStateName = new string[16]
+		{
+			string.Empty,
+			"end",
+			"idle",
+			"walk",
+			"rotate_l",
+			"rotate_r",
+			"damage",
+			"dead",
+			"paralyze",
+			"move_side_r",
+			"move_side_l",
+			"hide",
+			"hide_end",
+			"move_point",
+			"move_lookat",
+			"attack_{0:00}"
+		};
+		poseStateName = "pose";
+		motionHashCaches = new Dictionary<string, int>();
+		DEFAULT_MOVE_POINT = Vector3.get_zero();
+		stateNameBuilder = new StringBuilder(1024);
+		motionHash = new MotionHashTable();
+	}
+
 	public Character()
 	{
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
 		base.objectType = OBJECT_TYPE.CHARACTER;
 		animator = null;
 		body = null;
@@ -1216,6 +1320,8 @@ public class Character : StageObject, IAnimEvent
 		damageHealRate = 1f;
 		downPowerWeak = 0f;
 		downPowerSimpleWeak = 0f;
+		actionReceiveDamageRate = 1f;
+		actionMoveRotateMaxSpeedRate = 1f;
 		objectList = new List<List<GameObject>>();
 		for (int i = 0; i < 4; i++)
 		{
@@ -1228,36 +1334,9 @@ public class Character : StageObject, IAnimEvent
 		continusAttackParam = new ContinusAttackParam(this);
 		effectPlayProcessor = null;
 		isSetAppearPos = false;
+		isUseInvincibleBuff = false;
+		isUseInvincibleBadStatusBuff = false;
 		cachedBulletDataTable = new StringKeyTable<BulletData>();
-	}
-
-	static Character()
-	{
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		motionStateName = new string[16]
-		{
-			string.Empty,
-			"end",
-			"idle",
-			"walk",
-			"rotate_l",
-			"rotate_r",
-			"damage",
-			"dead",
-			"paralyze",
-			"move_side_r",
-			"move_side_l",
-			"hide",
-			"hide_end",
-			"move_point",
-			"move_lookat",
-			"attack_{0:00}"
-		};
-		motionHashCaches = new int[15];
-		DEFAULT_MOVE_POINT = Vector3.get_zero();
-		stateNameBuilder = new StringBuilder(1024);
-		motionHash = new MotionHashTable();
 	}
 
 	public override void _LookAt(Vector3 pos)
@@ -1300,6 +1379,66 @@ public class Character : StageObject, IAnimEvent
 		return 1f;
 	}
 
+	public void SetImmortal()
+	{
+		isImmortal = true;
+	}
+
+	public bool IsAbleToInvincibleBuff()
+	{
+		if (isDead)
+		{
+			return false;
+		}
+		if (IsValidBuff(BuffParam.BUFFTYPE.AUTO_REVIVE))
+		{
+			return false;
+		}
+		if (IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS))
+		{
+			return false;
+		}
+		if (IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLECOUNT))
+		{
+			return false;
+		}
+		return !isUseInvincibleBuff;
+	}
+
+	public bool IsAbleToInvincibleBadStatusBuff()
+	{
+		if (isDead)
+		{
+			return false;
+		}
+		if (IsValidBuff(BuffParam.BUFFTYPE.AUTO_REVIVE))
+		{
+			return false;
+		}
+		if (IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLECOUNT))
+		{
+			return false;
+		}
+		if (IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS))
+		{
+			return false;
+		}
+		return !isUseInvincibleBadStatusBuff;
+	}
+
+	public override void LookAt(Vector3 pos, bool isBlindEnable = false)
+	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		if (!isBlindEnable || !IsValidBuffBlind())
+		{
+			Vector3 position = _position;
+			pos.y = position.y;
+			_LookAt(pos);
+		}
+	}
+
 	protected override void Awake()
 	{
 		base.Awake();
@@ -1308,8 +1447,6 @@ public class Character : StageObject, IAnimEvent
 
 	protected override void Clear()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		base.Clear();
 		animator = null;
 		animEventProcessor = null;
@@ -1341,26 +1478,19 @@ public class Character : StageObject, IAnimEvent
 
 	public override void OnLoadComplete()
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Expected O, but got Unknown
 		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 		base.OnLoadComplete();
 		rootNode = Utility.Find(base._transform, "Root");
 		if (base._collider != null && base._rigidbody == null)
 		{
 			base._rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
 		}
-		if (!object.ReferenceEquals((object)body, null))
+		if (!object.ReferenceEquals(body, null))
 		{
 			animator = body.GetComponent<Animator>();
 		}
-		if (object.ReferenceEquals((object)animator, null))
+		if (object.ReferenceEquals(animator, null))
 		{
 			animator = this.get_gameObject().GetComponentInChildren<Animator>();
 		}
@@ -1377,11 +1507,11 @@ public class Character : StageObject, IAnimEvent
 			{
 				animator.set_updateMode(0);
 			}
-			Transform val = animator.get_transform();
-			if (val != base._transform)
+			Transform transform = animator.get_transform();
+			if (transform != base._transform)
 			{
-				base._transform.set_localScale(val.get_localScale());
-				val.set_localScale(Vector3.get_one());
+				base._transform.set_localScale(transform.get_localScale());
+				transform.set_localScale(Vector3.get_one());
 			}
 		}
 		nowAnimCtrlName = null;
@@ -1423,10 +1553,10 @@ public class Character : StageObject, IAnimEvent
 		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
 		UpdateAction();
 		if (hitStopTimer >= 0f)
@@ -1442,13 +1572,13 @@ public class Character : StageObject, IAnimEvent
 		buffParam.Update();
 		if (IsOriginal() && buffSyncLastTime != 0f && Time.get_time() > buffSyncLastTime + charaParameter.buffSyncUpdateInterval)
 		{
-			SendBuffSync(BuffParam.BUFFTYPE.NONE);
+			SendBuffSync();
 		}
 		if (lerpRotateVec != Vector3.get_zero())
 		{
 			Quaternion val = Quaternion.LookRotation(lerpRotateVec);
 			float num = Mathf.Abs(Vector3.Angle(_forward, lerpRotateVec));
-			float num2 = moveRotateMaxSpeed * Time.get_deltaTime() / num;
+			float num2 = moveRotateMaxSpeed * actionMoveRotateMaxSpeedRate * Time.get_deltaTime() / num;
 			if (num2 > 1f)
 			{
 				lerpRotateVec = Vector3.get_zero();
@@ -1475,64 +1605,64 @@ public class Character : StageObject, IAnimEvent
 		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0235: Unknown result type (might be due to invalid IL or missing references)
 		//IL_023a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0245: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0277: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0360: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0432: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0446: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0354: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0367: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0436: Unknown result type (might be due to invalid IL or missing references)
+		//IL_044a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
 		if (rotateToTargetFlag)
 		{
 			if (actionPositionFlag)
@@ -1673,7 +1803,7 @@ public class Character : StageObject, IAnimEvent
 				eventMoveTimeCount = 0f;
 				enableEventMove = false;
 				enableAddForce = false;
-				SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
+				SetVelocity(Vector3.get_zero());
 				eventMoveVelocity = Vector3.get_zero();
 			}
 		}
@@ -1710,187 +1840,194 @@ public class Character : StageObject, IAnimEvent
 		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0303: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-		if (base.isInitialized)
+		//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0314: Unknown result type (might be due to invalid IL or missing references)
+		//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0361: Unknown result type (might be due to invalid IL or missing references)
+		if (!base.isInitialized)
 		{
-			if (enableAddForce)
+			return;
+		}
+		if (enableAddForce)
+		{
+			Vector3 addForceBeforePos = this.addForceBeforePos;
+			addForceBeforePos.y = 0.1f;
+			Vector3 position = _position;
+			position.y = 0.1f;
+			if (addForceBeforePos != position)
 			{
-				Vector3 addForceBeforePos = this.addForceBeforePos;
-				addForceBeforePos.y = 0.1f;
-				Vector3 position = _position;
-				position.y = 0.1f;
-				if (addForceBeforePos != position)
+				Vector3 val = position - addForceBeforePos;
+				if (Physics.Raycast(addForceBeforePos, val, val.get_magnitude(), 393728))
 				{
-					Vector3 val = position - addForceBeforePos;
-					if (Physics.Raycast(addForceBeforePos, val, val.get_magnitude(), 393728))
-					{
-						Vector3 position2 = _position;
-						addForceBeforePos.y = position2.y;
-						_position = addForceBeforePos;
-					}
-					Vector3 position3 = _position;
-					position3.y = 0f;
-					this.addForceBeforePos = position3;
+					Vector3 position2 = _position;
+					addForceBeforePos.y = position2.y;
+					_position = addForceBeforePos;
+				}
+				Vector3 position3 = _position;
+				position3.y = 0f;
+				this.addForceBeforePos = position3;
+			}
+		}
+		else if (!IsHitStop())
+		{
+			float num = 1f;
+			if (enableMoveSuppress && actionPositionFlag && !actionPositionThroughFlag)
+			{
+				Vector3 val2 = actionPosition - _position;
+				val2.y = 0f;
+				if (val2.get_magnitude() <= charaParameter.moveSuppressLength)
+				{
+					num = charaParameter.moveSuppressRate;
 				}
 			}
-			else if (!IsHitStop())
-			{
-				float num = 1f;
-				if (enableMoveSuppress && actionPositionFlag)
-				{
-					Vector3 val2 = actionPosition - _position;
-					val2.y = 0f;
-					if (val2.get_magnitude() <= charaParameter.moveSuppressLength)
-					{
-						num = charaParameter.moveSuppressRate;
-					}
-				}
-				Vector3 velocity = GetVelocity() * num * actionMoveRate;
-				Vector3 velocity2 = base._rigidbody.get_velocity();
-				velocity.y = velocity2.y;
-				base._rigidbody.set_velocity(velocity);
-			}
-			else
+			Vector3 velocity = GetVelocity() * num * actionMoveRate;
+			Vector3 velocity2 = base._rigidbody.get_velocity();
+			velocity.y = velocity2.y;
+			base._rigidbody.set_velocity(velocity);
+		}
+		else
+		{
+			base._rigidbody.set_velocity(Vector3.get_zero());
+		}
+		Vector3 position4 = _position;
+		float height = StageManager.GetHeight(position4);
+		if (!waitAddForce)
+		{
+			if (this.addForce != Vector3.get_zero())
 			{
 				base._rigidbody.set_velocity(Vector3.get_zero());
+				base._rigidbody.AddForce(this.addForce * (0.02f / Time.get_fixedDeltaTime()));
+				Vector3 addForce = this.addForce;
+				if (addForce.y > 0f)
+				{
+					base._rigidbody.set_constraints(base._rigidbody.get_constraints() & -5);
+				}
+				this.addForce = Vector3.get_zero();
+				enableAddForce = true;
+				Vector3 position5 = _position;
+				position5.y = 0f;
+				this.addForceBeforePos = position5;
 			}
-			Vector3 position4 = _position;
-			float height = StageManager.GetHeight(position4);
-			if (!waitAddForce)
+			else if ((base._rigidbody.get_constraints() & 4) == 0 && position4.y <= height + 0.03f)
 			{
-				if (this.addForce != Vector3.get_zero())
+				Vector3 velocity3 = base._rigidbody.get_velocity();
+				if (velocity3.y <= 0f)
 				{
-					base._rigidbody.set_velocity(Vector3.get_zero());
-					base._rigidbody.AddForce(this.addForce * (0.02f / Time.get_fixedDeltaTime()));
-					Vector3 addForce = this.addForce;
-					if (addForce.y > 0f)
-					{
-						base._rigidbody.set_constraints(base._rigidbody.get_constraints() & -5);
-					}
-					this.addForce = Vector3.get_zero();
-					enableAddForce = true;
-					Vector3 position5 = _position;
-					position5.y = 0f;
-					this.addForceBeforePos = position5;
-				}
-				else if ((base._rigidbody.get_constraints() & 4) == 0 && position4.y <= height + 0.03f)
-				{
-					Vector3 velocity3 = base._rigidbody.get_velocity();
-					if (velocity3.y <= 0f)
-					{
-						base._rigidbody.set_constraints(base._rigidbody.get_constraints() | 4);
-						Vector3 velocity4 = base._rigidbody.get_velocity();
-						velocity4.y = 0f;
-						base._rigidbody.set_velocity(velocity4);
-						enableAddForce = false;
-					}
+					base._rigidbody.set_constraints(base._rigidbody.get_constraints() | 4);
+					Vector3 velocity4 = base._rigidbody.get_velocity();
+					velocity4.y = 0f;
+					base._rigidbody.set_velocity(velocity4);
+					enableAddForce = false;
 				}
 			}
-			Vector3 externalVelocity = this.externalVelocity;
-			externalVelocity.y = 0f;
-			object rigidbody = (object)base._rigidbody;
-			rigidbody.set_velocity(rigidbody.get_velocity() + externalVelocity);
-			this.externalVelocity = Vector3.get_zero();
-			if (onTheGround)
+		}
+		Vector3 externalVelocity = this.externalVelocity;
+		externalVelocity.y = 0f;
+		Rigidbody rigidbody = base._rigidbody;
+		rigidbody.set_velocity(rigidbody.get_velocity() + externalVelocity);
+		this.externalVelocity = Vector3.get_zero();
+		if (!onTheGround)
+		{
+			return;
+		}
+		if ((base._rigidbody.get_constraints() & 4) != 0)
+		{
+			if (Mathf.Abs(position4.y - height) > 0.01f)
 			{
-				if ((base._rigidbody.get_constraints() & 4) != 0)
-				{
-					if (Mathf.Abs(position4.y - height) > 0.01f)
-					{
-						position4.y = height;
-						_position = position4;
-					}
-				}
-				else if (position4.y < height)
-				{
-					position4.y = height;
-					_position = position4;
-				}
+				position4.y = height;
+				_position = position4;
 			}
+		}
+		else if (position4.y < height)
+		{
+			position4.y = height;
+			_position = position4;
 		}
 	}
 
 	protected void UpdateNextMotion()
 	{
-		if (animEventProcessor != null && nextMotionHash != 0 && animator != null)
+		if (animEventProcessor == null || nextMotionHash == 0 || !(animator != null))
 		{
-			hitOffFlag &= ~HIT_OFF_FLAG.PLAY_MOTION;
-			string text = nextAnimCtrlName;
-			int motion_hash = nextMotionHash;
-			float motionTransitionTime = nextMotionTransitionTime;
-			if (motionTransitionTime < 0f)
+			return;
+		}
+		hitOffFlag &= ~HIT_OFF_FLAG.PLAY_MOTION;
+		string text = nextAnimCtrlName;
+		int num = nextMotionHash;
+		float motionTransitionTime = nextMotionTransitionTime;
+		if (motionTransitionTime < 0f)
+		{
+			motionTransitionTime = charaParameter.motionTransitionTime;
+		}
+		nextAnimCtrlName = null;
+		nextMotionHash = 0;
+		nextMotionTransitionTime = -1f;
+		if (text != nowAnimCtrlName)
+		{
+			RuntimeAnimatorController animCtrl = GetAnimCtrl(text);
+			AnimEventData animEvent = GetAnimEvent(text);
+			if (animCtrl != null && animEvent != null)
 			{
-				motionTransitionTime = charaParameter.motionTransitionTime;
+				animEventProcessor.ChangeAnimCtrl(animCtrl, animEvent);
+				nowAnimCtrlName = text;
 			}
-			nextAnimCtrlName = null;
-			nextMotionHash = 0;
-			nextMotionTransitionTime = -1f;
-			if (text != nowAnimCtrlName)
+			else
 			{
-				RuntimeAnimatorController animCtrl = GetAnimCtrl(text);
-				AnimEventData animEvent = GetAnimEvent(text);
-				if (animCtrl != null && animEvent != null)
-				{
-					animEventProcessor.ChangeAnimCtrl(animCtrl, animEvent);
-					nowAnimCtrlName = text;
-				}
-				else
-				{
-					Log.Error(LOG.INGAME, "Character.UpdateNextMotion() anim_ctrl or anim_event is null. ctrlName = {0}", text);
-				}
+				Log.Error(LOG.INGAME, "Character.UpdateNextMotion() anim_ctrl or anim_event is null. ctrlName = {0}", text);
 			}
-			animEventProcessor.CrossFade(motion_hash, motionTransitionTime);
-			UpdateAnimatorSpeed();
-			if (actMotionStartTime < 0f)
-			{
-				actMotionStartTime = Time.get_time();
-			}
+		}
+		if (charaName == "Hellish Zaark" && num == 423958061)
+		{
+			Debug.Log((object)("temp hash: " + num + " " + nowAnimCtrlName));
+		}
+		animEventProcessor.CrossFade(num, motionTransitionTime);
+		UpdateAnimatorSpeed();
+		if (actMotionStartTime < 0f)
+		{
+			actMotionStartTime = Time.get_time();
 		}
 	}
 
@@ -1899,7 +2036,7 @@ public class Character : StageObject, IAnimEvent
 		base.OnDetachedObject(stage_object);
 		if (actionTarget == stage_object)
 		{
-			SetActionTarget(null, false);
+			SetActionTarget(null, send: false);
 		}
 		if (attackStartTarget == stage_object)
 		{
@@ -1945,31 +2082,32 @@ public class Character : StageObject, IAnimEvent
 		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
 		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		if (animator != null && animator.get_applyRootMotion() && enableRootMotion && !enableEventMove && !enableAddForce)
+		if (!(animator != null) || !animator.get_applyRootMotion() || !enableRootMotion || enableEventMove || enableAddForce)
 		{
-			float num = (!(Time.get_deltaTime() > 0f)) ? 0f : (1f / Time.get_deltaTime());
-			Vector3 val = animator.get_deltaPosition();
-			val.x *= num;
-			val.z *= num;
-			val *= rootMotionMoveRate;
-			if (lerpRotateVec != Vector3.get_zero())
+			return;
+		}
+		float num = (!(Time.get_deltaTime() > 0f)) ? 0f : (1f / Time.get_deltaTime());
+		Vector3 val = animator.get_deltaPosition();
+		val.x *= num;
+		val.z *= num;
+		val *= rootMotionMoveRate;
+		if (lerpRotateVec != Vector3.get_zero())
+		{
+			SetVelocity(Quaternion.FromToRotation(_forward, lerpRotateVec) * val, VELOCITY_TYPE.ROOT_MOTION);
+		}
+		else
+		{
+			SetVelocity(val, VELOCITY_TYPE.ROOT_MOTION);
+		}
+		if (animator.get_deltaRotation() != Quaternion.get_identity())
+		{
+			if (rootRotationRate == 1f)
 			{
-				SetVelocity(Quaternion.FromToRotation(_forward, lerpRotateVec) * val, VELOCITY_TYPE.ROOT_MOTION);
+				_rotation *= animator.get_deltaRotation();
 			}
 			else
 			{
-				SetVelocity(val, VELOCITY_TYPE.ROOT_MOTION);
-			}
-			if (animator.get_deltaRotation() != Quaternion.get_identity())
-			{
-				if (rootRotationRate == 1f)
-				{
-					_rotation *= animator.get_deltaRotation();
-				}
-				else
-				{
-					_rotation = Quaternion.Lerp(_rotation, _rotation * animator.get_deltaRotation(), rootRotationRate);
-				}
+				_rotation = Quaternion.Lerp(_rotation, _rotation * animator.get_deltaRotation(), rootRotationRate);
 			}
 		}
 	}
@@ -2004,17 +2142,16 @@ public class Character : StageObject, IAnimEvent
 		}
 	}
 
-	public virtual void SetActionPosition(Vector3 position, bool flag)
+	public void SetActionPosition(Vector3 position, bool flag)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		if (!flag)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		if (!flag || IsValidBuffBlind())
 		{
-			position = _position + _forward * 3f;
+			position = _forward * 3f;
+			flag = false;
 		}
 		actionPosition = position;
 		actionPositionFlag = flag;
@@ -2070,10 +2207,10 @@ public class Character : StageObject, IAnimEvent
 	{
 		if (time < 0f)
 		{
-			time = -3.40282347E+38f;
+			time = float.MinValue;
 		}
-		bool flag = time != -3.40282347E+38f;
-		if (flag != (hitStopTimer != -3.40282347E+38f))
+		bool flag = time != float.MinValue;
+		if (flag != (hitStopTimer != float.MinValue))
 		{
 			int i = 0;
 			for (int count = objectList.Count; i < count; i++)
@@ -2111,28 +2248,36 @@ public class Character : StageObject, IAnimEvent
 		UpdateAnimatorSpeed();
 	}
 
+	public void setPauseWithAnim(bool pause)
+	{
+		if (pause)
+		{
+			ActIdle();
+		}
+	}
+
 	protected virtual float GetAnimatorSpeed()
 	{
 		if (IsHitStop())
 		{
 			return 0f;
 		}
-		if (!isPause)
+		if (isPause)
 		{
-			switch (actionID)
-			{
-			case ACTION_ID.ATTACK:
-				return buffParam.GetAtkSpeed();
-			case ACTION_ID.MOVE:
-				return buffParam.GetMoveSpeed();
-			default:
-				return 1f;
-			}
+			return 0f;
 		}
-		return 0f;
+		switch (actionID)
+		{
+		case ACTION_ID.ATTACK:
+			return buffParam.GetAtkSpeed();
+		case ACTION_ID.MOVE:
+			return buffParam.GetMoveSpeed();
+		default:
+			return 1f;
+		}
 	}
 
-	protected void UpdateAnimatorSpeed()
+	public void UpdateAnimatorSpeed()
 	{
 		if (animator != null)
 		{
@@ -2185,7 +2330,7 @@ public class Character : StageObject, IAnimEvent
 			this.lastActionID = lastActionID;
 		}
 		actionID = ACTION_ID.IDLE;
-		if (!IsPlayingMotion(2, true))
+		if (!IsPlayingMotion(2))
 		{
 			PlayMotion(2, transitionTime);
 		}
@@ -2198,20 +2343,25 @@ public class Character : StageObject, IAnimEvent
 
 	public virtual void SafeActIdle()
 	{
-		if (!base.isLoading && !isDead)
+		if (!base.isLoading && !isDead && CanSafeActIdle())
 		{
-			ActIdle(false, -1f);
+			ActIdle();
 		}
 	}
 
-	public virtual void SetLerpRotation(Vector3 velocity)
+	protected virtual bool CanSafeActIdle()
+	{
+		return true;
+	}
+
+	public void SetLerpRotation(Vector3 velocity)
 	{
 		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		velocity.y = 0f;
 		lerpRotateVec = velocity;
 	}
 
-	public bool IsArrivalPosition(Vector3 pos, float margin = 0)
+	public bool IsArrivalPosition(Vector3 pos, float margin = 0f)
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
@@ -2253,13 +2403,13 @@ public class Character : StageObject, IAnimEvent
 		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		if (actionID != ACTION_ID.MOVE || !IsPlayingMotion((int)motion_id, true))
+		if (actionID != ACTION_ID.MOVE || !IsPlayingMotion((int)motion_id))
 		{
 			EndAction();
 			actionID = ACTION_ID.MOVE;
-			if (!IsPlayingMotion((int)motion_id, true))
+			if (!IsPlayingMotion((int)motion_id))
 			{
-				PlayMotion((int)motion_id, -1f);
+				PlayMotion((int)motion_id);
 			}
 			if (characterSender != null)
 			{
@@ -2291,11 +2441,11 @@ public class Character : StageObject, IAnimEvent
 		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		if (actionID != ACTION_ID.MOVE || !IsPlayingMotion(motion_id, true))
+		if (actionID != ACTION_ID.MOVE || !IsPlayingMotion(motion_id))
 		{
 			EndAction();
 			actionID = ACTION_ID.MOVE;
-			PlayMotion(motion_id, -1f);
+			PlayMotion(motion_id);
 		}
 		moveType = MOVE_TYPE.SYNC_VELOCITY;
 		enableRootMotion = false;
@@ -2311,7 +2461,7 @@ public class Character : StageObject, IAnimEvent
 		}
 		if (val == Vector3.get_zero())
 		{
-			moveSyncDirection = -3.40282347E+38f;
+			moveSyncDirection = float.MinValue;
 		}
 		else
 		{
@@ -2320,7 +2470,7 @@ public class Character : StageObject, IAnimEvent
 			moveSyncDirection = eulerAngles.y;
 		}
 		moveSyncDirectionTime = charaParameter.moveSyncRotateTime;
-		StartWaitingPacket(WAITING_PACKET.CHARACTER_MOVE_VELOCITY, false, charaParameter.moveSendInterval);
+		StartWaitingPacket(WAITING_PACKET.CHARACTER_MOVE_VELOCITY, keep_sync: false, charaParameter.moveSendInterval);
 	}
 
 	public virtual void SetMoveSyncVelocityEnd(float time, Vector3 pos, float direction, float sync_speed, int motion_id)
@@ -2361,7 +2511,7 @@ public class Character : StageObject, IAnimEvent
 		}
 		if (val == Vector3.get_zero())
 		{
-			moveSyncDirection = -3.40282347E+38f;
+			moveSyncDirection = float.MinValue;
 		}
 		else
 		{
@@ -2407,19 +2557,19 @@ public class Character : StageObject, IAnimEvent
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		if (IsArrivalPosition(target_pos, 0f))
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		if (IsArrivalPosition(target_pos))
 		{
 			return false;
 		}
 		EndAction();
 		actionID = ACTION_ID.MOVE;
-		PlayMotion(3, -1f);
+		PlayMotion(3);
 		moveTargetPos = target_pos;
 		moveType = MOVE_TYPE.TO_POSITION;
 		if (fix_rotate)
 		{
-			LookAt(moveTargetPos);
+			LookAt(moveTargetPos, isBlindEnable: true);
 		}
 		if (characterSender != null)
 		{
@@ -2442,7 +2592,7 @@ public class Character : StageObject, IAnimEvent
 			SetAttackActionPosition();
 		}
 		actionID = ACTION_ID.MOVE;
-		PlayMotion(3, -1f);
+		PlayMotion(3);
 		moveType = MOVE_TYPE.HOMING;
 		periodicSyncActionPositionLastTime = GetActMotionTime();
 		periodicSyncActionPositionFlag = true;
@@ -2499,11 +2649,11 @@ public class Character : StageObject, IAnimEvent
 		{
 			if (num > 0)
 			{
-				PlayMotion(5, -1f);
+				PlayMotion(5);
 			}
 			else
 			{
-				PlayMotion(4, -1f);
+				PlayMotion(4);
 			}
 		}
 		enableRootMotion = false;
@@ -2529,12 +2679,12 @@ public class Character : StageObject, IAnimEvent
 		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 		if (actionTarget == null)
 		{
 			return false;
@@ -2591,11 +2741,11 @@ public class Character : StageObject, IAnimEvent
 		actionID = ACTION_ID.ROTATE;
 		if (num > 0)
 		{
-			PlayMotion(5, -1f);
+			PlayMotion(5);
 		}
 		else
 		{
-			PlayMotion(4, -1f);
+			PlayMotion(4);
 		}
 		rotateDirection = direction;
 		rotateSign = num;
@@ -2646,7 +2796,7 @@ public class Character : StageObject, IAnimEvent
 	{
 		EndAction();
 		actionID = ACTION_ID.DAMAGE;
-		PlayMotion(6, -1f);
+		PlayMotion(6);
 		OnActReaction();
 	}
 
@@ -2654,7 +2804,7 @@ public class Character : StageObject, IAnimEvent
 	{
 		EndAction();
 		actionID = ACTION_ID.DEAD;
-		PlayMotion(7, -1f);
+		PlayMotion(7);
 		Die();
 		OnActReaction();
 		if (characterSender != null && force_sync)
@@ -2669,7 +2819,7 @@ public class Character : StageObject, IAnimEvent
 		isDead = true;
 		hitOffFlag |= HIT_OFF_FLAG.DEAD;
 		base._collider.set_enabled(false);
-		buffParam.AllBuffEnd(false);
+		buffParam.AllBuffEnd(sync: false);
 		continusAttackParam.RemoveAll();
 	}
 
@@ -2712,14 +2862,14 @@ public class Character : StageObject, IAnimEvent
 					paralyzeEffectName,
 					string.Empty
 				};
-				paralyzeEffectTrans = AnimEventFormat.EffectEventExec(AnimEventFormat.ID.EFFECT, eventData, base._transform, true, EffectNameAnalyzer, ((StageObject)this).FindNode, this);
+				paralyzeEffectTrans = AnimEventFormat.EffectEventExec(AnimEventFormat.ID.EFFECT, eventData, base._transform, is_oneshot_priority: true, EffectNameAnalyzer, ((StageObject)this).FindNode, this);
 			}
 		}
 		else
 		{
 			EndAction();
 			actionID = ACTION_ID.PARALYZE;
-			PlayMotion(8, -1f);
+			PlayMotion(8);
 		}
 		OnActReaction();
 	}
@@ -2733,22 +2883,20 @@ public class Character : StageObject, IAnimEvent
 		ActParalyzeEnd();
 		if (!IsDebuffShadowSealing())
 		{
-			SetNextTrigger(0);
+			SetNextTrigger();
 		}
 		return true;
 	}
 
 	protected virtual void ActParalyzeEnd()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Expected O, but got Unknown
 		badStatusTotal.paralyze = 0f;
 		if (IsDebuffShadowSealing())
 		{
 			_EndDebuffAction(ACTION_ID.PARALYZE);
 			if (!object.ReferenceEquals(paralyzeEffectTrans, null))
 			{
-				EffectManager.ReleaseEffect(paralyzeEffectTrans.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(paralyzeEffectTrans.get_gameObject());
 				paralyzeEffectTrans = null;
 			}
 			if (shadowSealingStackDebuff.Contains(ACTION_ID.PARALYZE))
@@ -2765,68 +2913,70 @@ public class Character : StageObject, IAnimEvent
 
 	public virtual void ActFreezeStart()
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsFreeze())
+		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		if (IsFreeze())
 		{
-			if (IsDebuffShadowSealing())
-			{
-				if (!shadowSealingStackDebuff.Contains(ACTION_ID.FREEZE))
-				{
-					shadowSealingStackDebuff.Add(ACTION_ID.FREEZE);
-				}
-			}
-			else
-			{
-				EndAction();
-				actionID = ACTION_ID.FREEZE;
-				PlayMotion(6, -1f);
-			}
-			CreateFreezeEffect();
-			SwitchFreezeShader();
-			m_freezeTimer = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.freezeParam.duration;
-			m_freezeHeight = 0f;
-			if (base._rigidbody != null)
-			{
-				base._rigidbody.set_velocity(Vector3.get_zero());
-			}
-			rotateEventKeep = false;
-			rotateToTargetFlag = false;
-			rotateEventSpeed = 0f;
-			OnActReaction();
+			return;
 		}
+		if (IsDebuffShadowSealing())
+		{
+			if (!shadowSealingStackDebuff.Contains(ACTION_ID.FREEZE))
+			{
+				shadowSealingStackDebuff.Add(ACTION_ID.FREEZE);
+			}
+		}
+		else
+		{
+			EndAction();
+			actionID = ACTION_ID.FREEZE;
+			PlayMotion(6, (!(stopMotionByDebuffNormalizedTime < 0f)) ? 0f : (-1f));
+		}
+		CreateFreezeEffect();
+		SwitchFreezeShader();
+		m_freezeTimer = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.freezeParam.duration;
+		m_freezeHeight = 0f;
+		if (base._rigidbody != null)
+		{
+			base._rigidbody.set_velocity(Vector3.get_zero());
+		}
+		rotateEventKeep = false;
+		rotateToTargetFlag = false;
+		rotateEventSpeed = 0f;
+		OnActReaction();
 	}
 
 	protected virtual void ActFreezeEnd()
 	{
-		if (IsFreeze())
+		if (!IsFreeze())
 		{
-			if (m_effectFreeze != null)
+			return;
+		}
+		if (m_effectFreeze != null)
+		{
+			EffectManager.ReleaseEffect(m_effectFreeze);
+			m_effectFreeze = null;
+		}
+		RestoreShader();
+		badStatusTotal.freeze = 0f;
+		if (IsDebuffShadowSealing())
+		{
+			_EndDebuffAction(ACTION_ID.FREEZE);
+			if (shadowSealingStackDebuff.Contains(ACTION_ID.FREEZE))
 			{
-				EffectManager.ReleaseEffect(m_effectFreeze, true, false);
-				m_effectFreeze = null;
+				shadowSealingStackDebuff.Remove(ACTION_ID.FREEZE);
 			}
-			RestoreShader();
-			badStatusTotal.freeze = 0f;
-			if (IsDebuffShadowSealing())
-			{
-				_EndDebuffAction(ACTION_ID.FREEZE);
-				if (shadowSealingStackDebuff.Contains(ACTION_ID.FREEZE))
-				{
-					shadowSealingStackDebuff.Remove(ACTION_ID.FREEZE);
-				}
-			}
-			else
-			{
-				setPause(false);
-				m_isStopMotionByDebuff = false;
-			}
+		}
+		else
+		{
+			setPause(pause: false);
+			m_isStopMotionByDebuff = false;
 		}
 	}
 
 	protected bool UpdateFreezeAction()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsFreeze())
 		{
 			return false;
@@ -2838,8 +2988,13 @@ public class Character : StageObject, IAnimEvent
 			ActFreezeEnd();
 			return true;
 		}
+		float num = 0.1f;
+		if (stopMotionByDebuffNormalizedTime >= 0f)
+		{
+			num = stopMotionByDebuffNormalizedTime;
+		}
 		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-		if (currentAnimatorStateInfo.get_normalizedTime() < 0.1f || currentAnimatorStateInfo.get_fullPathHash() != Animator.StringToHash("Base Layer.damage"))
+		if (currentAnimatorStateInfo.get_normalizedTime() < num || currentAnimatorStateInfo.get_fullPathHash() != Animator.StringToHash("Base Layer.damage"))
 		{
 			return false;
 		}
@@ -2847,7 +3002,7 @@ public class Character : StageObject, IAnimEvent
 		{
 			return false;
 		}
-		setPause(true);
+		setPause(pause: true);
 		m_isStopMotionByDebuff = true;
 		return false;
 	}
@@ -2858,7 +3013,6 @@ public class Character : StageObject, IAnimEvent
 		{
 			Utility.MaterialForEach(m_rendererList, delegate(Material material)
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				string name = material.get_shader().get_name();
 				Shader val = ResourceUtility.FindShader(name.Replace("enemy_", "freeze_enemy_"));
 				if (val != null)
@@ -2879,7 +3033,6 @@ public class Character : StageObject, IAnimEvent
 		{
 			Utility.MaterialForEach(m_rendererList, delegate(Material material)
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				string name = material.get_shader().get_name();
 				Shader val = ResourceUtility.FindShader(name.Replace("freeze_", string.Empty));
 				if (val != null)
@@ -2917,25 +3070,24 @@ public class Character : StageObject, IAnimEvent
 		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Expected O, but got Unknown
 		Transform effect = EffectManager.GetEffect("ef_btl_pl_frozen_01", base._transform);
-		if (effect != null)
+		if (!(effect != null))
 		{
-			ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
-			if (componentsInChildren != null)
-			{
-				CalcFreezeEffectEmissionRadius();
-				for (int i = 0; i < componentsInChildren.Length; i++)
-				{
-					ShapeModule shape = componentsInChildren[i].get_shape();
-					shape.set_radius(m_emissionRadius);
-				}
-			}
-			Transform obj = effect;
-			obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * m_emissionRadius);
-			m_effectFreeze = effect.get_gameObject();
+			return;
 		}
+		ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
+		if (componentsInChildren != null)
+		{
+			CalcFreezeEffectEmissionRadius();
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				ShapeModule shape = componentsInChildren[i].get_shape();
+				shape.set_radius(m_emissionRadius);
+			}
+		}
+		Transform obj = effect;
+		obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * m_emissionRadius);
+		m_effectFreeze = effect.get_gameObject();
 	}
 
 	protected void CalcFreezeEffectEmissionRadius()
@@ -2948,21 +3100,24 @@ public class Character : StageObject, IAnimEvent
 			m_emissionRadius = localScale.x;
 			if (!(base._collider == null))
 			{
-				SphereCollider val = base._collider as SphereCollider;
-				if (val != null)
-				{
-					m_emissionRadius *= val.get_radius();
-				}
-				else
-				{
-					CapsuleCollider val2 = base._collider as CapsuleCollider;
-					if (val2 != null)
-					{
-						m_emissionRadius *= val2.get_radius();
-					}
-				}
+				m_emissionRadius *= GetFreezeEffectRadiusRate();
 			}
 		}
+	}
+
+	protected virtual float GetFreezeEffectRadiusRate()
+	{
+		SphereCollider val = base._collider as SphereCollider;
+		if (val != null)
+		{
+			return val.get_radius();
+		}
+		CapsuleCollider val2 = base._collider as CapsuleCollider;
+		if (val2 != null)
+		{
+			return val2.get_radius();
+		}
+		return 1f;
 	}
 
 	public bool IsFreeze()
@@ -2980,6 +3135,16 @@ public class Character : StageObject, IAnimEvent
 		return false;
 	}
 
+	public virtual bool IsConcussion()
+	{
+		return false;
+	}
+
+	public virtual bool IsLightRing()
+	{
+		return false;
+	}
+
 	protected void CreateElectricShockEffect()
 	{
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
@@ -2988,25 +3153,24 @@ public class Character : StageObject, IAnimEvent
 		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Expected O, but got Unknown
 		Transform effect = EffectManager.GetEffect("ef_btl_enm_shock_01", base._transform);
-		if (effect != null)
+		if (!(effect != null))
 		{
-			ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
-			if (componentsInChildren != null)
-			{
-				CalcFreezeEffectEmissionRadius();
-				for (int i = 0; i < componentsInChildren.Length; i++)
-				{
-					ShapeModule shape = componentsInChildren[i].get_shape();
-					shape.set_radius(m_emissionRadius);
-				}
-			}
-			Transform obj = effect;
-			obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * m_emissionRadius);
-			m_effectElectricShock = effect.get_gameObject();
+			return;
 		}
+		ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
+		if (componentsInChildren != null)
+		{
+			CalcFreezeEffectEmissionRadius();
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				ShapeModule shape = componentsInChildren[i].get_shape();
+				shape.set_radius(m_emissionRadius);
+			}
+		}
+		Transform obj = effect;
+		obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * m_emissionRadius);
+		m_effectElectricShock = effect.get_gameObject();
 	}
 
 	public virtual bool IsInkSplash()
@@ -3014,22 +3178,37 @@ public class Character : StageObject, IAnimEvent
 		return false;
 	}
 
-	public virtual void ActAttack(int id, bool send_packet = true, bool sync_immediately = false)
+	public virtual bool IsStone()
+	{
+		return false;
+	}
+
+	public virtual void ActAttack(int id, bool send_packet = true, bool sync_immediately = false, string _motionLayerName = "", string _motionStateName = "")
 	{
 		EndAction();
 		isControllable = false;
 		actionID = ACTION_ID.ATTACK;
 		attackID = id;
-		PlayMotion(15 + id, -1f);
+		PlayMotionParam playMotionParam = new PlayMotionParam();
+		playMotionParam.MotionID = 15 + id;
+		playMotionParam.MotionLayerName = ((!string.IsNullOrEmpty(_motionLayerName)) ? _motionLayerName : "Base Layer.");
+		if (_motionStateName.IsNullOrWhiteSpace())
+		{
+			PlayMotion(playMotionParam);
+		}
+		else
+		{
+			PlayMotionImmidate(null, _motionStateName, 0f);
+		}
 		if (IsCoopNone() || IsOriginal())
 		{
-			SyncRandomSeed = Random.Range(-2147483648, 2147483647);
+			SyncRandomSeed = Random.Range(int.MinValue, int.MaxValue);
 			SetAttackActionPosition();
 		}
 		attackStartTarget = actionTarget;
 		if (send_packet && characterSender != null)
 		{
-			characterSender.OnActAttack(id, sync_immediately, SyncRandomSeed);
+			characterSender.OnActAttack(id, sync_immediately, SyncRandomSeed, playMotionParam.MotionLayerName, _motionStateName);
 		}
 	}
 
@@ -3039,32 +3218,32 @@ public class Character : StageObject, IAnimEvent
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		if (actionTarget != null)
 		{
-			SetActionPosition(GetTargetPosition(actionTarget), true);
+			SetActionPosition(GetTargetPosition(actionTarget), flag: true);
 		}
 		else
 		{
-			SetActionPosition(Vector3.get_zero(), false);
+			SetActionPosition(Vector3.get_zero(), flag: false);
 		}
 	}
 
 	protected virtual void UpdateAction()
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
@@ -3073,21 +3252,21 @@ public class Character : StageObject, IAnimEvent
 		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0397: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+		//IL_029b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0398: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
 		switch (actionID)
 		{
 		case ACTION_ID.FREEZE:
@@ -3100,7 +3279,7 @@ public class Character : StageObject, IAnimEvent
 				{
 					if (!actionPositionFlag)
 					{
-						ActIdle(false, -1f);
+						ActIdle();
 						break;
 					}
 					if (moveMaxDistance > 0f)
@@ -3111,7 +3290,7 @@ public class Character : StageObject, IAnimEvent
 						moveBeforePos = _position;
 						if (moveNowDistance >= moveMaxDistance)
 						{
-							ActIdle(false, -1f);
+							ActIdle();
 							break;
 						}
 					}
@@ -3119,39 +3298,36 @@ public class Character : StageObject, IAnimEvent
 				}
 				if (IsWallStay())
 				{
-					ActIdle(true, -1f);
+					ActIdle(is_sync: true);
+					break;
 				}
-				else if (IsArrivalPosition(moveTargetPos, 0f))
+				if (IsArrivalPosition(moveTargetPos))
 				{
-					ActIdle(false, -1f);
+					ActIdle();
+					break;
 				}
-				else
+				Vector3 val2 = moveTargetPos - _position;
+				val2.y = 0f;
+				val2.Normalize();
+				Vector3 forward = _forward;
+				forward.y = 0f;
+				forward.Normalize();
+				float num3 = Vector3.Angle(forward, val2);
+				if (num3 > 90f)
 				{
-					Vector3 val2 = moveTargetPos - _position;
-					val2.y = 0f;
-					val2.Normalize();
-					Vector3 forward = _forward;
-					forward.y = 0f;
-					forward.Normalize();
-					float num3 = Vector3.Angle(forward, val2);
-					if (num3 > 90f)
-					{
-						ActIdle(false, -1f);
-					}
-					else
-					{
-						Vector3 val3 = Vector3.Cross(forward, val2);
-						int num4 = (val3.y >= 0f) ? 1 : (-1);
-						Quaternion rotation2 = _rotation;
-						Vector3 eulerAngles2 = rotation2.get_eulerAngles();
-						float num5 = Mathf.SmoothDampAngle(0f, num3 * (float)num4, ref rotateVelocity, moveRotateMinimumTime, moveRotateMaxSpeed, Time.get_deltaTime());
-						_rotation = Quaternion.Euler(eulerAngles2.x, eulerAngles2.y + num5, eulerAngles2.z);
-					}
+					ActIdle();
+					break;
 				}
+				Vector3 val3 = Vector3.Cross(forward, val2);
+				int num4 = (val3.y >= 0f) ? 1 : (-1);
+				Quaternion rotation2 = _rotation;
+				Vector3 eulerAngles2 = rotation2.get_eulerAngles();
+				float num5 = Mathf.SmoothDampAngle(0f, num3 * (float)num4, ref rotateVelocity, moveRotateMinimumTime, moveRotateMaxSpeed, Time.get_deltaTime());
+				_rotation = Quaternion.Euler(eulerAngles2.x, eulerAngles2.y + num5, eulerAngles2.z);
 			}
 			else if (moveType == MOVE_TYPE.SYNC_VELOCITY)
 			{
-				if (moveSyncDirection != -3.40282347E+38f)
+				if (moveSyncDirection != float.MinValue)
 				{
 					if (moveSyncDirectionTime > 0f)
 					{
@@ -3170,7 +3346,7 @@ public class Character : StageObject, IAnimEvent
 					if (moveSyncEnd)
 					{
 						_rotation = Quaternion.AngleAxis(moveSyncEndDirection, Vector3.get_up());
-						ActIdle(false, -1f);
+						ActIdle();
 					}
 				}
 			}
@@ -3186,12 +3362,12 @@ public class Character : StageObject, IAnimEvent
 				int num = CalcDiffAngle(rotateDirection, ref diff_angle);
 				if (num != rotateSign)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				if (diff_angle < 0.1f)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				Quaternion rotation = _rotation;
@@ -3210,7 +3386,7 @@ public class Character : StageObject, IAnimEvent
 			UpdateMoveLookAtAction();
 			break;
 		}
-		if (IsPlayingMotion(1, true))
+		if (IsPlayingMotion(1))
 		{
 			OnPlayingEndMotion();
 		}
@@ -3251,7 +3427,14 @@ public class Character : StageObject, IAnimEvent
 		}
 		actionID = ACTION_ID.MOVE;
 		MOTION_ID motion_id = MOTION_ID.MOVE_SIDE_R;
-		if (!isPacket)
+		if (isPacket)
+		{
+			if (moveAngleSign == 0 || moveAngleSign == 1 || moveAngleSign == -1)
+			{
+				m_moveAngleSign = moveAngleSign;
+			}
+		}
+		else
 		{
 			switch (moveAngleSign)
 			{
@@ -3289,10 +3472,6 @@ public class Character : StageObject, IAnimEvent
 				break;
 			}
 		}
-		else if (moveAngleSign == 0 || moveAngleSign == 1 || moveAngleSign == -1)
-		{
-			m_moveAngleSign = moveAngleSign;
-		}
 		switch (m_moveAngleSign)
 		{
 		case 1:
@@ -3302,7 +3481,7 @@ public class Character : StageObject, IAnimEvent
 			motion_id = MOTION_ID.MOVE_SIDE_R;
 			break;
 		}
-		PlayMotion((int)motion_id, -1f);
+		PlayMotion((int)motion_id);
 		moveType = MOVE_TYPE.SIDEWAYS;
 		if (characterSender != null)
 		{
@@ -3325,10 +3504,10 @@ public class Character : StageObject, IAnimEvent
 		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
@@ -3355,48 +3534,44 @@ public class Character : StageObject, IAnimEvent
 		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
 		if (m_moveAngleSign == 0)
 		{
-			ActIdle(false, -1f);
+			ActIdle();
+			return;
 		}
-		else
+		Vector3 val = actionPosition - _position;
+		val.y = 0f;
+		val.Normalize();
+		Vector3 forward = _forward;
+		forward.y = 0f;
+		forward.Normalize();
+		m_diffAngle_deg = Vector3.Angle(forward, val);
+		if (m_diffAngle_deg > 90f)
 		{
-			Vector3 val = actionPosition - _position;
-			val.y = 0f;
-			val.Normalize();
-			Vector3 forward = _forward;
-			forward.y = 0f;
-			forward.Normalize();
-			m_diffAngle_deg = Vector3.Angle(forward, val);
-			if (m_diffAngle_deg > 90f)
-			{
-				ActIdle(false, -1f);
-			}
-			else
-			{
-				Vector3 val2 = Vector3.Cross(forward, val);
-				int num = (val2.y >= 0f) ? 1 : (-1);
-				m_diffAngle_deg *= (float)num;
-				Quaternion rotation = _rotation;
-				Vector3 eulerAngles = rotation.get_eulerAngles();
-				float num2 = Mathf.SmoothDampAngle(0f, m_diffAngle_deg, ref rotateVelocity, rotateMinimumTime, rotateMaxSpeed, Time.get_deltaTime());
-				_rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + num2, eulerAngles.z);
-				Vector3 val3 = _position - actionPosition;
-				val3.Normalize();
-				val3 *= AIUtility.GetLengthWithBetweenPosition(_position, actionPosition);
-				float num3 = moveAngle_deg * Time.get_deltaTime();
-				float num4 = moveAngleSpeed_deg * Time.get_deltaTime();
-				if (num3 > num4)
-				{
-					num3 = num4;
-				}
-				val3 = Quaternion.AngleAxis(num3 * (float)m_moveAngleSign, Vector3.get_up()) * val3;
-				Vector3 val4 = actionPosition + val3 - _position;
-				_position += val4;
-				m_movedAngle_deg += num3;
-				if (moveAngle_deg <= m_movedAngle_deg)
-				{
-					SetNextTrigger(0);
-				}
-			}
+			ActIdle();
+			return;
+		}
+		Vector3 val2 = Vector3.Cross(forward, val);
+		int num = (val2.y >= 0f) ? 1 : (-1);
+		m_diffAngle_deg *= num;
+		Quaternion rotation = _rotation;
+		Vector3 eulerAngles = rotation.get_eulerAngles();
+		float num2 = Mathf.SmoothDampAngle(0f, m_diffAngle_deg, ref rotateVelocity, rotateMinimumTime, rotateMaxSpeed, Time.get_deltaTime());
+		_rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + num2, eulerAngles.z);
+		Vector3 val3 = _position - actionPosition;
+		val3.Normalize();
+		val3 *= AIUtility.GetLengthWithBetweenPosition(_position, actionPosition);
+		float num3 = moveAngle_deg * Time.get_deltaTime();
+		float num4 = moveAngleSpeed_deg * Time.get_deltaTime();
+		if (num3 > num4)
+		{
+			num3 = num4;
+		}
+		val3 = Quaternion.AngleAxis(num3 * (float)m_moveAngleSign, Vector3.get_up()) * val3;
+		Vector3 val4 = actionPosition + val3 - _position;
+		_position += val4;
+		m_movedAngle_deg += num3;
+		if (moveAngle_deg <= m_movedAngle_deg)
+		{
+			SetNextTrigger();
 		}
 	}
 
@@ -3440,17 +3615,17 @@ public class Character : StageObject, IAnimEvent
 
 	protected virtual void OnPlayingEndMotion()
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = false;
 		ACTION_ID actionID = this.actionID;
 		if (actionID == ACTION_ID.ROTATE)
@@ -3459,12 +3634,12 @@ public class Character : StageObject, IAnimEvent
 			{
 				if (rotateTargetEnd)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				if (actionTarget == null)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				Vector3 val = GetTargetPosition(actionTarget) - _position;
@@ -3472,7 +3647,7 @@ public class Character : StageObject, IAnimEvent
 				val.Normalize();
 				if (val == Vector3.get_zero())
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				Quaternion val2 = Quaternion.LookRotation(val);
@@ -3482,15 +3657,15 @@ public class Character : StageObject, IAnimEvent
 				int num = CalcDiffAngle(y, ref diff_angle);
 				if (num != rotateSign)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				if (diff_angle < 10f)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
-				ActRotateMotionToTarget(true);
+				ActRotateMotionToTarget(keep_rotate: true);
 			}
 			else if (rotateType == ROTATE_TYPE.MOTION_TO_DIRECTION)
 			{
@@ -3498,22 +3673,22 @@ public class Character : StageObject, IAnimEvent
 				int num2 = CalcDiffAngle(rotateDirection, ref diff_angle2);
 				if (num2 != rotateSign)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				if (diff_angle2 < 10f)
 				{
-					ActIdle(false, -1f);
+					ActIdle();
 					return;
 				}
 				rootRotationRate = CalcRotateMotionRate(diff_angle2);
 				if (rotateSign > 0)
 				{
-					PlayMotion(5, -1f);
+					PlayMotion(5);
 				}
 				else
 				{
-					PlayMotion(4, -1f);
+					PlayMotion(4);
 				}
 			}
 			else
@@ -3528,222 +3703,226 @@ public class Character : StageObject, IAnimEvent
 		if (flag)
 		{
 			isPlayingEndMotion = true;
-			ActIdle(false, -1f);
+			ActIdle();
 		}
 	}
 
 	protected virtual void EndAction()
 	{
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0497: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0520: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f6: Unknown result type (might be due to invalid IL or missing references)
-		if (base.isInitialized)
+		//IL_049c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0544: Unknown result type (might be due to invalid IL or missing references)
+		if (!base.isInitialized)
 		{
-			if (animEventProcessor != null)
-			{
-				animEventProcessor.ExecuteLastEvent(true);
-			}
-			if (characterSender != null)
-			{
-				characterSender.OnEndAction();
-			}
-			if (base.controller != null)
-			{
-				base.controller.OnCharacterEndAction((int)actionID);
-			}
-			switch (actionID)
-			{
-			case ACTION_ID.MOVE:
-				moveType = MOVE_TYPE.NONE;
-				rotateVelocity = 0f;
-				moveTargetPos = Vector3.get_zero();
-				moveSyncDirection = 0f;
-				moveSyncDirectionTime = 0f;
-				moveSyncTime = 0f;
-				moveSyncEnd = false;
-				moveSyncEndDirection = 0f;
-				moveSyncSpeed = 0f;
-				moveSyncMotionID = 0;
-				moveBeforePos = Vector3.get_zero();
-				moveNowDistance = 0f;
-				moveMaxDistance = 0f;
-				m_movedAngle_deg = 0f;
-				m_diffAngle_deg = 0f;
-				m_moveAngleSign = 0;
-				break;
-			case ACTION_ID.ROTATE:
-				rotateDirection = 0f;
-				rotateSign = 0;
-				rotateVelocity = 0f;
-				rootRotationRate = 1f;
-				rotateTargetEnd = false;
-				rotateTargetCnt = 0;
-				break;
-			case ACTION_ID.ATTACK:
-				attackID = 0;
-				break;
-			case ACTION_ID.PARALYZE:
-				ActParalyzeEnd();
-				break;
-			case ACTION_ID.FREEZE:
-				ActFreezeEnd();
-				break;
-			}
-			EndWaitingPacket(WAITING_PACKET.CHARACTER_MOVE_VELOCITY);
-			EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION);
-			EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_DIRECTION);
-			int i = 0;
-			for (int count = objectList.Count; i < count; i++)
-			{
-				if (objectTypeAutoDelete[i])
-				{
-					DestroyObjectList((OBJECT_LIST_TYPE)i);
-				}
-			}
-			if (animator != null)
-			{
-				int j = 0;
-				for (int count2 = changeTriggerList.Count; j < count2; j++)
-				{
-					animator.ResetTrigger(changeTriggerList[j]);
-				}
-				changeTriggerList.Clear();
-			}
-			if (animator != null)
-			{
-				int k = 0;
-				for (int count3 = animatorBoolList.Count; k < count3; k++)
-				{
-					animator.SetBool(animatorBoolList[k], false);
-				}
-				animatorBoolList.Clear();
-			}
-			int l = 0;
-			for (int count4 = animEventColliderList.Count; l < count4; l++)
-			{
-				if (!animEventColliderList[l].isReleased)
-				{
-					animEventColliderList[l].ReserveRelease();
-				}
-			}
-			if (hideRendererList.Count > 0)
-			{
-				List<string> range = hideRendererList.GetRange(0, hideRendererList.Count);
-				int m = 0;
-				for (int count5 = range.Count; m < count5; m++)
-				{
-					SetEnableNodeRenderer(range[m], true);
-				}
-			}
-			if (referenceCheckerFlag)
-			{
-				attackHitChecker = new AttackHitChecker();
-				referenceCheckerFlag = false;
-			}
-			int n = 0;
-			for (int count6 = loopSeForceEndList.Count; n < count6; n++)
-			{
-				if (loopSeForceEndList[n] >= 0)
-				{
-					SoundManager.LoopOff(loopSeForceEndList[n], this);
-				}
-			}
-			loopSeForceEndList.Clear();
-			wallStayTimer = 0f;
-			isControllable = false;
-			enableMotionCancel = false;
-			enableMoveSuppress = false;
-			SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
-			addForce = Vector3.get_zero();
-			actionMoveRate = 1f;
-			rootMotionMoveRate = 1f;
-			if (animator != null)
-			{
-				animator.set_applyRootMotion(true);
-			}
-			enableRootMotion = true;
-			rotateEventSpeed = 0f;
-			rotateEventDirection = 0f;
-			rotateEventKeep = false;
-			rotateToTargetFlag = false;
-			rotateToTargetDiffAngle = 0f;
-			rotateSafeMode = false;
-			hitOffFlag &= ~HIT_OFF_FLAG.INVICIBLE;
-			hitOffFlag &= ~HIT_OFF_FLAG.DEAD;
-			enableEventMove = false;
-			eventMoveVelocity = Vector3.get_zero();
-			eventMoveTimeCount = 0f;
-			enableAddForce = false;
-			addForceBeforePos = Vector3.get_zero();
-			waitAddForce = false;
-			lastActionID = actionID;
-			actionID = ACTION_ID.NONE;
-			actionPosition = Vector3.get_zero();
-			targetPointPos = Vector3.get_zero();
-			actionPositionFlag = false;
-			actionPositionWaitSync = false;
-			actionPositionWaitTrigger = null;
-			directionWaitSync = false;
-			directionWaitTrigger = null;
-			periodicSyncActionPositionFlag = false;
-			periodicSyncActionPositionLastTime = 0f;
-			periodicSyncActionPositionList.Clear();
-			attackStartTarget = null;
-			isDead = false;
-			lerpRotateVec = Vector3.get_zero();
-			enableReactionDelay = false;
-			isPlayingEndMotion = false;
-			actionRendererModel = null;
-			actionRendererNodeName = null;
-			actMotionStartTime = -1f;
-			isWallStay = false;
-			wallStayTimer = 0f;
-			SetPeriodicSyncTarget(null);
-			if (stepCtrl != null)
-			{
-				stepCtrl.enableAutoStampEffect = true;
-			}
-			if (base._collider != null)
-			{
-				base._collider.set_enabled(true);
-			}
-			if (damegeRemainEffect != null)
-			{
-				EffectManager.ReleaseEffect(damegeRemainEffect, true, false);
-				damegeRemainEffect = null;
-			}
-			if (animEventProcessor != null)
-			{
-				animEventProcessor.IgnoreEventByNextAnim();
-			}
-			if (actionRendererInstance != null)
-			{
-				Object.Destroy(actionRendererInstance.get_gameObject());
-				actionRendererInstance = null;
-			}
-			DeleteExAtkColliderAll();
+			return;
 		}
+		if (animEventProcessor != null)
+		{
+			animEventProcessor.ExecuteLastEvent();
+		}
+		if (characterSender != null)
+		{
+			characterSender.OnEndAction();
+		}
+		if (base.controller != null)
+		{
+			base.controller.OnCharacterEndAction((int)actionID);
+		}
+		switch (actionID)
+		{
+		case ACTION_ID.MOVE:
+			moveType = MOVE_TYPE.NONE;
+			rotateVelocity = 0f;
+			moveTargetPos = Vector3.get_zero();
+			moveSyncDirection = 0f;
+			moveSyncDirectionTime = 0f;
+			moveSyncTime = 0f;
+			moveSyncEnd = false;
+			moveSyncEndDirection = 0f;
+			moveSyncSpeed = 0f;
+			moveSyncMotionID = 0;
+			moveBeforePos = Vector3.get_zero();
+			moveNowDistance = 0f;
+			moveMaxDistance = 0f;
+			m_movedAngle_deg = 0f;
+			m_diffAngle_deg = 0f;
+			m_moveAngleSign = 0;
+			break;
+		case ACTION_ID.ROTATE:
+			rotateDirection = 0f;
+			rotateSign = 0;
+			rotateVelocity = 0f;
+			rootRotationRate = 1f;
+			rotateTargetEnd = false;
+			rotateTargetCnt = 0;
+			break;
+		case ACTION_ID.ATTACK:
+			attackID = 0;
+			break;
+		case ACTION_ID.PARALYZE:
+			ActParalyzeEnd();
+			break;
+		case ACTION_ID.FREEZE:
+			ActFreezeEnd();
+			break;
+		}
+		EndWaitingPacket(WAITING_PACKET.CHARACTER_MOVE_VELOCITY);
+		EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION);
+		EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_DIRECTION);
+		int i = 0;
+		for (int count = objectList.Count; i < count; i++)
+		{
+			if (objectTypeAutoDelete[i])
+			{
+				DestroyObjectList((OBJECT_LIST_TYPE)i);
+			}
+		}
+		if (animator != null)
+		{
+			int j = 0;
+			for (int count2 = changeTriggerList.Count; j < count2; j++)
+			{
+				animator.ResetTrigger(changeTriggerList[j]);
+			}
+			changeTriggerList.Clear();
+		}
+		if (animator != null)
+		{
+			int k = 0;
+			for (int count3 = animatorBoolList.Count; k < count3; k++)
+			{
+				animator.SetBool(animatorBoolList[k], false);
+			}
+			animatorBoolList.Clear();
+		}
+		int l = 0;
+		for (int count4 = animEventColliderList.Count; l < count4; l++)
+		{
+			if (!animEventColliderList[l].isReleased)
+			{
+				animEventColliderList[l].ReserveRelease();
+			}
+		}
+		if (hideRendererList.Count > 0 && !IsCarrying())
+		{
+			List<string> range = hideRendererList.GetRange(0, hideRendererList.Count);
+			int m = 0;
+			for (int count5 = range.Count; m < count5; m++)
+			{
+				SetEnableNodeRenderer(range[m], enable: true);
+			}
+		}
+		if (referenceCheckerFlag)
+		{
+			attackHitChecker = new AttackHitChecker();
+			referenceCheckerFlag = false;
+		}
+		int n = 0;
+		for (int count6 = loopSeForceEndList.Count; n < count6; n++)
+		{
+			if (loopSeForceEndList[n] >= 0)
+			{
+				SoundManager.LoopOff(loopSeForceEndList[n], this);
+			}
+		}
+		loopSeForceEndList.Clear();
+		wallStayTimer = 0f;
+		isControllable = false;
+		enableMotionCancel = false;
+		enableMoveSuppress = false;
+		SetVelocity(Vector3.get_zero());
+		addForce = Vector3.get_zero();
+		actionMoveRate = 1f;
+		rootMotionMoveRate = 1f;
+		if (animator != null)
+		{
+			animator.set_applyRootMotion(true);
+		}
+		enableRootMotion = true;
+		rotateEventSpeed = 0f;
+		rotateEventDirection = 0f;
+		rotateEventKeep = false;
+		rotateToTargetFlag = false;
+		rotateToTargetDiffAngle = 0f;
+		rotateSafeMode = false;
+		hitOffFlag &= ~HIT_OFF_FLAG.INVICIBLE;
+		hitOffFlag &= ~HIT_OFF_FLAG.DEAD;
+		hitOffFlag &= ~HIT_OFF_FLAG.DEAD_REVIVE;
+		enableEventMove = false;
+		eventMoveVelocity = Vector3.get_zero();
+		eventMoveTimeCount = 0f;
+		enableAddForce = false;
+		addForceBeforePos = Vector3.get_zero();
+		waitAddForce = false;
+		lastActionID = actionID;
+		actionID = ACTION_ID.NONE;
+		actionPosition = Vector3.get_zero();
+		targetPointPos = Vector3.get_zero();
+		actionPositionFlag = false;
+		actionPositionThroughFlag = false;
+		actionPositionWaitSync = false;
+		actionPositionWaitTrigger = null;
+		directionWaitSync = false;
+		directionWaitTrigger = null;
+		periodicSyncActionPositionFlag = false;
+		periodicSyncActionPositionLastTime = 0f;
+		periodicSyncActionPositionList.Clear();
+		attackStartTarget = null;
+		isDead = false;
+		lerpRotateVec = Vector3.get_zero();
+		enableReactionDelay = false;
+		isPlayingEndMotion = false;
+		actionRendererModel = null;
+		actionRendererNodeName = null;
+		actMotionStartTime = -1f;
+		actionReceiveDamageRate = 1f;
+		isWallStay = false;
+		wallStayTimer = 0f;
+		SetPeriodicSyncTarget(null);
+		if (stepCtrl != null)
+		{
+			stepCtrl.enableAutoStampEffect = true;
+		}
+		if (base._collider != null)
+		{
+			base._collider.set_enabled(true);
+		}
+		if (damegeRemainEffect != null)
+		{
+			EffectManager.ReleaseEffect(damegeRemainEffect);
+			damegeRemainEffect = null;
+		}
+		if (animEventProcessor != null)
+		{
+			animEventProcessor.IgnoreEventByNextAnim();
+		}
+		if (actionRendererInstance != null)
+		{
+			Object.Destroy(actionRendererInstance.get_gameObject());
+			actionRendererInstance = null;
+		}
+		DeleteExAtkColliderAll();
 	}
 
 	protected virtual void _EndDebuffAction(ACTION_ID beforeActId)
 	{
 	}
 
-	private static string _GetMotionStateName(int motion_id)
+	private static string _GetMotionStateName(int motion_id, string _layerName)
 	{
+		string value = (!string.IsNullOrEmpty(_layerName)) ? _layerName : "Base Layer.";
 		if (motion_id < 115)
 		{
 			stateNameBuilder.Length = 0;
-			stateNameBuilder.Append("Base Layer.");
+			stateNameBuilder.Append(value);
 			if (motion_id >= 15 && motion_id <= 114)
 			{
 				stateNameBuilder.AppendFormat(motionStateName[15], motion_id - 15);
@@ -3757,47 +3936,44 @@ public class Character : StageObject, IAnimEvent
 		return null;
 	}
 
-	protected virtual string GetMotionStateName(int motion_id)
+	protected virtual string GetMotionStateName(int motion_id, string _layerName = "")
 	{
 		if (motion_id < 115)
 		{
-			return _GetMotionStateName(motion_id);
+			return _GetMotionStateName(motion_id, _layerName);
 		}
 		return null;
 	}
 
 	public int GetMotionHash(int motion_id)
 	{
-		int num = _GetCachedHash(motion_id);
-		if (num != 0)
-		{
-			return num;
-		}
-		string text = GetMotionStateName(motion_id);
+		string text = GetMotionStateName(motion_id, ReplaceMotionLayer(motion_id));
 		if (text == null)
 		{
 			return 0;
 		}
+		int num = _GetCachedHash(text);
+		if (num != 0)
+		{
+			return num;
+		}
 		num = GetMotionHash(text);
-		_CacheHash(motion_id, num);
+		_CacheHash(text, num);
 		return num;
 	}
 
-	protected virtual int _GetCachedHash(int motion_id)
+	protected int _GetCachedHash(string motionName)
 	{
-		if (motion_id < 0 || motion_id >= 15)
+		if (!motionHashCaches.ContainsKey(motionName))
 		{
 			return 0;
 		}
-		return motionHashCaches[motion_id];
+		return motionHashCaches[motionName];
 	}
 
-	protected virtual void _CacheHash(int motion_id, int hash)
+	protected void _CacheHash(string motionName, int hash)
 	{
-		if (motion_id >= 0 && motion_id < 15)
-		{
-			motionHashCaches[motion_id] = hash;
-		}
+		motionHashCaches[motionName] = hash;
 	}
 
 	public int GetMotionHash(string state_name)
@@ -3816,9 +3992,26 @@ public class Character : StageObject, IAnimEvent
 		return num;
 	}
 
+	public bool PlayMotion(PlayMotionParam _param)
+	{
+		_param.MotionLayerName = ReplaceMotionLayer(_param.MotionID, _param.MotionLayerName);
+		string text = GetMotionStateName(_param.MotionID, _param.MotionLayerName);
+		if (string.IsNullOrEmpty(text))
+		{
+			Log.Warning(LOG.INGAME, "Character::PlayMotion motion_id is none");
+			return false;
+		}
+		bool result = _PlayMotion(text, null, _param.TransitionTime);
+		if (base.controller != null)
+		{
+			base.controller.OnCharacterPlayMotion(_param.MotionID);
+		}
+		return result;
+	}
+
 	public bool PlayMotion(int motion_id, float transition_time = -1f)
 	{
-		string text = GetMotionStateName(motion_id);
+		string text = GetMotionStateName(motion_id, ReplaceMotionLayer(motion_id));
 		if (string.IsNullOrEmpty(text))
 		{
 			Log.Warning(LOG.INGAME, "Character::PlayMotion motion_id is none");
@@ -3830,6 +4023,11 @@ public class Character : StageObject, IAnimEvent
 			base.controller.OnCharacterPlayMotion(motion_id);
 		}
 		return result;
+	}
+
+	protected virtual string ReplaceMotionLayer(int motionId, string layerName = "Base Layer.")
+	{
+		return layerName;
 	}
 
 	public bool PlayMotion(string anim_format_name, float _transition_time = -1f)
@@ -3852,22 +4050,21 @@ public class Character : StageObject, IAnimEvent
 	{
 		ctrl_name = null;
 		state_name = null;
-		if (!string.IsNullOrEmpty(anim_format_name))
+		if (string.IsNullOrEmpty(anim_format_name))
 		{
-			int num = anim_format_name.IndexOf("@");
-			if (num < 0)
-			{
-				state_name = anim_format_name;
-			}
-			else
-			{
-				ctrl_name = anim_format_name.Substring(0, num);
-				state_name = anim_format_name.Substring(num + 1, anim_format_name.Length - (num + 1));
-				if (ctrl_name == string.Empty)
-				{
-					ctrl_name = state_name.ToUpper();
-				}
-			}
+			return;
+		}
+		int num = anim_format_name.IndexOf("@");
+		if (num < 0)
+		{
+			state_name = anim_format_name;
+			return;
+		}
+		ctrl_name = anim_format_name.Substring(0, num);
+		state_name = anim_format_name.Substring(num + 1, anim_format_name.Length - (num + 1));
+		if (ctrl_name == string.Empty)
+		{
+			ctrl_name = state_name.ToUpper();
 		}
 	}
 
@@ -3875,6 +4072,11 @@ public class Character : StageObject, IAnimEvent
 	{
 		SeparateAnimFormatName(anim_format_name, out string ctrl_name, out string _);
 		return ctrl_name;
+	}
+
+	public bool PlayMotionImmidate(string ctrlName, string stateName, float _transition_time = -1f)
+	{
+		return _PlayMotion("Base Layer." + stateName, ctrlName, _transition_time);
 	}
 
 	protected bool _PlayMotion(string state_name, string controller_name = null, float _transition_time = -1f)
@@ -3887,6 +4089,10 @@ public class Character : StageObject, IAnimEvent
 		nextAnimCtrlName = controller_name;
 		nextMotionHash = GetMotionHash(state_name);
 		nextMotionTransitionTime = _transition_time;
+		if (charaName == "Hellish Zaark" && nextMotionHash == 423958061)
+		{
+			Debug.Log((object)("hash: " + nextMotionHash + " state name: " + state_name));
+		}
 		hitOffFlag |= HIT_OFF_FLAG.PLAY_MOTION;
 		return true;
 	}
@@ -3912,13 +4118,13 @@ public class Character : StageObject, IAnimEvent
 			return 0;
 		}
 		int num = 0;
-		if (!animator.IsInTransition(0))
+		if (animator.IsInTransition(0))
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-			return currentAnimatorStateInfo.get_fullPathHash();
+			AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
+			return nextAnimatorStateInfo.get_fullPathHash();
 		}
-		AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
-		return nextAnimatorStateInfo.get_fullPathHash();
+		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+		return currentAnimatorStateInfo.get_fullPathHash();
 	}
 
 	public bool IsPlayingMotion(int motion_id, bool check_next = true)
@@ -3996,7 +4202,7 @@ public class Character : StageObject, IAnimEvent
 		UpdateAnimatorSpeed();
 		if (buffData.sync)
 		{
-			SendBuffSync(BuffParam.BUFFTYPE.NONE);
+			SendBuffSync();
 		}
 		return true;
 	}
@@ -4009,8 +4215,7 @@ public class Character : StageObject, IAnimEvent
 	{
 		BuffParam.BUFFTYPE type = buffData.type;
 		int value = buffData.value;
-		BuffParam.BUFFTYPE bUFFTYPE = type;
-		if (bUFFTYPE == BuffParam.BUFFTYPE.ELECTRIC_SHOCK && !packet)
+		if ((type == BuffParam.BUFFTYPE.ELECTRIC_SHOCK || type == BuffParam.BUFFTYPE.SOIL_SHOCK) && !packet)
 		{
 			value = buffData.damage;
 		}
@@ -4023,55 +4228,41 @@ public class Character : StageObject, IAnimEvent
 
 	private void OnBuffRoutine(BuffParam.BUFFTYPE type, int value, bool packet = false)
 	{
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 		switch (type)
 		{
-		case BuffParam.BUFFTYPE.INVINCIBLECOUNT:
-		{
-			string empty = string.Empty;
-			empty = ((value > 2) ? "ef_btl_barrier_01" : ((value > 1) ? "ef_btl_barrier_02" : ((value <= 0) ? "ef_btl_barrierbreak" : "ef_btl_barrier_03")));
-			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 position = _position;
-			position.y += 1f;
-			Vector3 val = cameraTransform.get_position() - position;
-			Vector3 pos = val.get_normalized() * -0.5f + position;
-			EffectManager.OneShot(empty, pos, cameraTransform.get_rotation(), this is Self);
-			buffParam.SetValue(type, value);
-			break;
-		}
 		case BuffParam.BUFFTYPE.REGENERATE:
+			if (buffParam.IsValidBuff(BuffParam.BUFFTYPE.CANT_HEAL_HP))
+			{
+				return;
+			}
 			value = (int)((float)value * buffParam.GetHealUp());
 			if (value <= 0)
 			{
 				value = 1;
 			}
-			hp += value;
-			if (hp > hpMax)
-			{
-				hp = hpMax;
-			}
+			RecoverHp(value, isSend: false);
 			EffectManager.GetEffect("ef_btl_sk_heal_02", FindNode("Hip"));
 			break;
+		case BuffParam.BUFFTYPE.REGENERATE_PROPORTION:
+		{
+			if (buffParam.IsValidBuff(BuffParam.BUFFTYPE.CANT_HEAL_HP))
+			{
+				return;
+			}
+			float num = Mathf.Clamp((float)value, 0f, 100f) / 100f;
+			value = (int)((float)hpMax * num);
+			RecoverHp(value, isSend: false);
+			EffectManager.GetEffect("ef_btl_sk_heal_02", FindNode("Hip"));
+			break;
+		}
 		case BuffParam.BUFFTYPE.POISON:
 		case BuffParam.BUFFTYPE.DEADLY_POISON:
 		{
 			float poisonDamageDownRate = buffParam.GetPoisonDamageDownRate();
 			if (poisonDamageDownRate > 0f)
 			{
-				float num2 = Mathf.Clamp(1f - poisonDamageDownRate, 0f, 1f);
-				value = (int)((float)value * num2);
+				float num3 = Mathf.Clamp(1f - poisonDamageDownRate, 0f, 1f);
+				value = (int)((float)value * num3);
 				if (value <= 0)
 				{
 					value = 1;
@@ -4089,8 +4280,8 @@ public class Character : StageObject, IAnimEvent
 			float burnDamageDownRate = buffParam.GetBurnDamageDownRate();
 			if (burnDamageDownRate > 0f)
 			{
-				float num3 = Mathf.Clamp(1f - burnDamageDownRate, 0f, 1f);
-				value = (int)((float)value * num3);
+				float num2 = Mathf.Clamp(1f - burnDamageDownRate, 0f, 1f);
+				value = (int)((float)value * num2);
 				if (value <= 0)
 				{
 					value = 1;
@@ -4104,24 +4295,25 @@ public class Character : StageObject, IAnimEvent
 			break;
 		}
 		case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
+		case BuffParam.BUFFTYPE.EROSION:
+		case BuffParam.BUFFTYPE.SOIL_SHOCK:
+		case BuffParam.BUFFTYPE.ACID:
+		case BuffParam.BUFFTYPE.CORRUPTION:
+		case BuffParam.BUFFTYPE.STIGMATA:
+		case BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM:
 			hp -= value;
 			if (hp <= 1)
 			{
 				hp = 1;
 			}
 			break;
-		case BuffParam.BUFFTYPE.REGENERATE_PROPORTION:
-		{
-			float num = Mathf.Clamp((float)value, 0f, 100f) / 100f;
-			value = (int)((float)hpMax * num);
-			hp += value;
-			if (hp > hpMax)
-			{
-				hp = hpMax;
-			}
-			EffectManager.GetEffect("ef_btl_sk_heal_02", FindNode("Hip"));
+		case BuffParam.BUFFTYPE.INVINCIBLECOUNT:
+		case BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS:
+		case BuffParam.BUFFTYPE.SUBSTITUTE:
+		case BuffParam.BUFFTYPE.ORACLE_OHS_PROTECTION:
+		case BuffParam.BUFFTYPE.ORACLE_SPEAR_GUTS:
+			buffParam.ResetInterval(type);
 			break;
-		}
 		}
 		OnUIBuffRoutine(type, value);
 	}
@@ -4136,6 +4328,9 @@ public class Character : StageObject, IAnimEvent
 		{
 		case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
 			badStatusTotal.speedDown = 0f;
+			break;
+		case BuffParam.BUFFTYPE.BLEEDING:
+			badStatusTotal.bleeding = 0f;
 			break;
 		case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
 			badStatusTotal.attackSpeedDown = 0f;
@@ -4156,17 +4351,40 @@ public class Character : StageObject, IAnimEvent
 			badStatusTotal.slide = 0f;
 			break;
 		case BuffParam.BUFFTYPE.SHIELD:
-			OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_SUPER_ARMOR, false, true);
+			OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_SUPER_ARMOR, sync: false);
+			OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_REFLECT, sync: false);
+			OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_REFLECT_DAMAGE_UP, sync: false);
 			ShieldHp = 0;
 			break;
 		case BuffParam.BUFFTYPE.SILENCE:
 			badStatusTotal.silence = 0f;
 			break;
+		case BuffParam.BUFFTYPE.CANT_HEAL_HP:
+			badStatusTotal.cantHealHp = 0f;
+			break;
+		case BuffParam.BUFFTYPE.BLIND:
+			badStatusTotal.blind = 0f;
+			break;
+		case BuffParam.BUFFTYPE.EROSION:
+			badStatusTotal.erosion = 0f;
+			break;
+		case BuffParam.BUFFTYPE.STONE:
+			badStatusTotal.stone = 0f;
+			break;
+		case BuffParam.BUFFTYPE.ACID:
+			badStatusTotal.acid = 0f;
+			break;
+		case BuffParam.BUFFTYPE.DAMAGE_MOTION_STOP:
+			badStatusTotal.damageMotionStop = 0f;
+			break;
+		case BuffParam.BUFFTYPE.CORRUPTION:
+			badStatusTotal.corruption = 0f;
+			break;
 		}
 		UpdateAnimatorSpeed();
 		if (sync)
 		{
-			SendBuffSync(BuffParam.BUFFTYPE.NONE);
+			SendBuffSync();
 		}
 		return true;
 	}
@@ -4176,6 +4394,10 @@ public class Character : StageObject, IAnimEvent
 	}
 
 	public virtual void OnBurningStart()
+	{
+	}
+
+	public virtual void OnBleedingStart()
 	{
 	}
 
@@ -4203,7 +4425,36 @@ public class Character : StageObject, IAnimEvent
 	{
 	}
 
+	public virtual void OnCantHealHpStart()
+	{
+	}
+
+	public virtual void OnBlindStart()
+	{
+	}
+
 	public virtual void OnBuffCancellation()
+	{
+	}
+
+	public virtual bool IsValidLightRing()
+	{
+		return false;
+	}
+
+	public virtual void OnStoneStart()
+	{
+	}
+
+	public virtual void OnAcidStart()
+	{
+	}
+
+	public virtual void OnDamageMotionStopStart(float time)
+	{
+	}
+
+	public virtual void OnCorruptionStart()
 	{
 	}
 
@@ -4215,6 +4466,24 @@ public class Character : StageObject, IAnimEvent
 	public bool IsValidBuffByAbility(BuffParam.BUFFTYPE targetType)
 	{
 		return buffParam.IsValidBuffByAbility(targetType);
+	}
+
+	public bool IsValidBuffBlind()
+	{
+		return IsValidBuff(BuffParam.BUFFTYPE.BLIND);
+	}
+
+	public virtual void RecoverHp(int recoverValue, bool isSend)
+	{
+		hp += recoverValue;
+		if (hp > hpMax)
+		{
+			hp = hpMax;
+		}
+		if (recoverValue > 0)
+		{
+			OnBuffEnd(BuffParam.BUFFTYPE.BLEEDING, sync: false);
+		}
 	}
 
 	public override bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
@@ -4245,16 +4514,12 @@ public class Character : StageObject, IAnimEvent
 		base.OnAttackedHit(info, hit_param);
 		if (IsValidAttackedHit(hit_param.fromObject) && !IsPuppet() && !hit_param.fromObject.IsPuppet() && (IsMirror() || IsPuppet()) && isLocalDamageApply && hp - localDamage <= 0)
 		{
-			ActDead(true, false);
+			ActDead(force_sync: true);
 		}
 	}
 
 	protected override bool IsValidAttackedHit(StageObject from_object)
 	{
-		if (buffParam.CheckInvincible())
-		{
-			return false;
-		}
 		if (isDead)
 		{
 			return false;
@@ -4312,10 +4577,10 @@ public class Character : StageObject, IAnimEvent
 				switch (status.skillParam.tableData.supportType[i])
 				{
 				case BuffParam.BUFFTYPE.HIT_PARALYZE:
-					targetBadStatus.paralyze += (float)status.skillParam.supportValue[i];
+					targetBadStatus.paralyze += status.skillParam.supportValue[i];
 					break;
 				case BuffParam.BUFFTYPE.HIT_POISON:
-					targetBadStatus.poison += (float)status.skillParam.supportValue[i];
+					targetBadStatus.poison += status.skillParam.supportValue[i];
 					break;
 				}
 			}
@@ -4324,15 +4589,23 @@ public class Character : StageObject, IAnimEvent
 		if (Object.op_Implicit(character))
 		{
 			targetBadStatus.Add(character.atkBadStatus);
-			targetBadStatus.paralyze += (float)character.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_PARALYZE, true);
-			targetBadStatus.poison += (float)character.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_POISON, true);
+			targetBadStatus.paralyze += character.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_PARALYZE);
+			targetBadStatus.poison += character.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_POISON);
+			targetBadStatus.freeze += character.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_FREEZE);
 			if (targetBadStatus.paralyze > 0f)
 			{
-				targetBadStatus.paralyze += character.buffParam.passive.badStatusUp[0];
+				targetBadStatus.paralyze *= character.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.PARALYZE);
+				targetBadStatus.paralyze += character.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.PARALYZE);
 			}
 			if (targetBadStatus.poison > 0f)
 			{
-				targetBadStatus.poison += character.buffParam.passive.badStatusUp[1];
+				targetBadStatus.poison *= character.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.POISON);
+				targetBadStatus.poison += character.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.POISON);
+			}
+			if (targetBadStatus.freeze > 0f)
+			{
+				targetBadStatus.freeze *= character.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.FREEZE);
+				targetBadStatus.freeze += character.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.FREEZE);
 			}
 		}
 		targetBadStatus.Mul(status.attackInfo.atkRate);
@@ -4342,6 +4615,10 @@ public class Character : StageObject, IAnimEvent
 
 	protected override void OnAttackedHitLocal(AttackedHitStatusLocal status)
 	{
+		if (buffParam.IsValidInvincibleCountBuff())
+		{
+			return;
+		}
 		base.OnAttackedHitLocal(status);
 		if (status.validDamage)
 		{
@@ -4354,7 +4631,13 @@ public class Character : StageObject, IAnimEvent
 				fromObject.AbsorptionProc(this, status);
 				fromObject.AbsorptionProcByBuff(status);
 			}
-			if (!CutAndAbsorbDamageByBuff(this, status))
+			bool flag = CutAndAbsorbDamageByBuff(this, status);
+			bool flag2 = false;
+			if (!flag)
+			{
+				flag2 = InvincibleDamageByBuff(this, status);
+			}
+			if (!flag && !flag2)
 			{
 				ChargeSkillWhenDamagedByBuff();
 			}
@@ -4368,6 +4651,52 @@ public class Character : StageObject, IAnimEvent
 	protected virtual int CalcDamage(AttackedHitStatusLocal status, ref AtkAttribute damage_details)
 	{
 		return 0;
+	}
+
+	protected AtkAttribute GetInvinsibleMulRate()
+	{
+		AtkAttribute atkAttribute = new AtkAttribute();
+		atkAttribute.Set(1f);
+		List<BuffParam.BuffData> invincibleBuffDataList = buffParam.GetInvincibleBuffDataList();
+		if (invincibleBuffDataList.IsNullOrEmpty())
+		{
+			return atkAttribute;
+		}
+		for (int i = 0; i < invincibleBuffDataList.Count; i++)
+		{
+			switch (invincibleBuffDataList[i].type)
+			{
+			case BuffParam.BUFFTYPE.INVINCIBLE_NORMAL:
+				atkAttribute.normal = 0f;
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_FIRE:
+				atkAttribute.SetTargetElement(ELEMENT_TYPE.FIRE, 0f);
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_WATER:
+				atkAttribute.SetTargetElement(ELEMENT_TYPE.WATER, 0f);
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_THUNDER:
+				atkAttribute.SetTargetElement(ELEMENT_TYPE.THUNDER, 0f);
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_SOIL:
+				atkAttribute.SetTargetElement(ELEMENT_TYPE.SOIL, 0f);
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_LIGHT:
+				atkAttribute.SetTargetElement(ELEMENT_TYPE.LIGHT, 0f);
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_DARK:
+				atkAttribute.SetTargetElement(ELEMENT_TYPE.DARK, 0f);
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_ALL_ELEMENT:
+				atkAttribute.SetTargetElemetAll(0f);
+				break;
+			case BuffParam.BUFFTYPE.INVINCIBLE_ALL:
+				atkAttribute.normal = 0f;
+				atkAttribute.SetTargetElemetAll(0f);
+				break;
+			}
+		}
+		return atkAttribute;
 	}
 
 	protected virtual AtkAttribute CalcAtk(AttackedHitStatusLocal status)
@@ -4393,12 +4722,12 @@ public class Character : StageObject, IAnimEvent
 		atkAttribute.Add(buffParam.passive.tolUpRate);
 		atkAttribute.Sub(buffParam.passive.tolDownRate);
 		_tolerance.Mul(atkAttribute);
-		_tolerance.fire += (float)buffParam.passive.tolList[0];
-		_tolerance.water += (float)buffParam.passive.tolList[1];
-		_tolerance.thunder += (float)buffParam.passive.tolList[2];
-		_tolerance.soil += (float)buffParam.passive.tolList[3];
-		_tolerance.light += (float)buffParam.passive.tolList[4];
-		_tolerance.dark += (float)buffParam.passive.tolList[5];
+		_tolerance.fire += buffParam.passive.tolList[0];
+		_tolerance.water += buffParam.passive.tolList[1];
+		_tolerance.thunder += buffParam.passive.tolList[2];
+		_tolerance.soil += buffParam.passive.tolList[3];
+		_tolerance.light += buffParam.passive.tolList[4];
+		_tolerance.dark += buffParam.passive.tolList[5];
 		_tolerance.CheckMinus();
 		atkAttribute.Set(0f);
 		atkAttribute.AddElementOnly(1f);
@@ -4411,13 +4740,13 @@ public class Character : StageObject, IAnimEvent
 
 	public void AddToleranceBuff(ref AtkAttribute _tolerance)
 	{
-		float num = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, true);
-		_tolerance.fire += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE, true) + num;
-		_tolerance.water += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER, true) + num;
-		_tolerance.thunder += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER, true) + num;
-		_tolerance.soil += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL, true) + num;
-		_tolerance.light += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT, true) + num;
-		_tolerance.dark += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK, true) + num;
+		float num = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT);
+		_tolerance.fire += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE) + num;
+		_tolerance.water += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER) + num;
+		_tolerance.thunder += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER) + num;
+		_tolerance.soil += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL) + num;
+		_tolerance.light += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT) + num;
+		_tolerance.dark += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK) + num;
 	}
 
 	protected virtual AtkAttribute CalcDefense(AttackedHitStatusLocal status)
@@ -4427,40 +4756,40 @@ public class Character : StageObject, IAnimEvent
 
 	public void AddDefenceBuff(ref AtkAttribute _defence)
 	{
-		float rate = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_NORMAL, true);
+		float rate = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_NORMAL);
 		_defence.AddRate(rate);
 	}
 
 	public void AddElementDefenceBuff(ref AtkAttribute _defence)
 	{
-		float num = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, true);
-		float num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE, true);
+		float num = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT);
+		float num2 = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE);
 		_defence.AddTargetElement(ELEMENT_TYPE.FIRE, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER, true);
+		num2 = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER);
 		_defence.AddTargetElement(ELEMENT_TYPE.WATER, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER, true);
+		num2 = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER);
 		_defence.AddTargetElement(ELEMENT_TYPE.THUNDER, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL, true);
+		num2 = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL);
 		_defence.AddTargetElement(ELEMENT_TYPE.SOIL, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT, true);
+		num2 = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT);
 		_defence.AddTargetElement(ELEMENT_TYPE.LIGHT, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK, true);
+		num2 = buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK);
 		_defence.AddTargetElement(ELEMENT_TYPE.DARK, num2 + num);
 	}
 
 	public override void OnAttackedHitOwner(AttackedHitStatusOwner status)
 	{
-		//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06bd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_073d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0749: Unknown result type (might be due to invalid IL or missing references)
+		//IL_074e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0752: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0757: Unknown result type (might be due to invalid IL or missing references)
 		if (base.controller != null)
 		{
 			base.controller.OnCharacterAttackedHitOwner(status);
@@ -4475,14 +4804,18 @@ public class Character : StageObject, IAnimEvent
 		status.afterShieldHp = ShieldHp;
 		if (status.validDamage && !status.aegisParam.isChange)
 		{
-			status.afterHP -= status.damage;
-			if (IsNarrowEscape(status))
+			if (!status.isDamageRegionOnly)
 			{
-				status.afterHP = 1;
-			}
-			if (status.afterHP < 0)
-			{
-				status.afterHP = 0;
+				status.afterHP -= status.damage;
+				if (IsNarrowEscape(status))
+				{
+					UseNarrowEscape(status);
+					status.afterHP = 1;
+				}
+				if (status.afterHP < 0)
+				{
+					status.afterHP = 0;
+				}
 			}
 			status.afterShieldHp -= status.shieldDamage;
 			if (status.afterShieldHp < 0)
@@ -4492,7 +4825,7 @@ public class Character : StageObject, IAnimEvent
 		}
 		status.badStatusTotal.Copy(badStatusTotal);
 		status.badStatusTotal.Add(status.badStatusAdd);
-		if (status.badStatusTotal.paralyze >= badStatusMax.paralyze && actionID != ACTION_ID.PARALYZE)
+		if (status.badStatusAdd.paralyze > 0f && status.badStatusTotal.paralyze >= badStatusMax.paralyze && actionID != ACTION_ID.PARALYZE)
 		{
 			if (!buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.PARALYZE))
 			{
@@ -4503,7 +4836,7 @@ public class Character : StageObject, IAnimEvent
 				status.badStatusTotal.paralyze = 0f;
 			}
 		}
-		if (status.badStatusTotal.freeze >= badStatusMax.freeze && !IsFreeze())
+		if (status.badStatusAdd.freeze > 0f && status.badStatusTotal.freeze >= badStatusMax.freeze && !IsFreeze())
 		{
 			if (!buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.FREEZE))
 			{
@@ -4514,49 +4847,102 @@ public class Character : StageObject, IAnimEvent
 				status.badStatusTotal.freeze = 0f;
 			}
 		}
-		if (IsFreeze())
+		if (status.badStatusAdd.lightRing > 0f && status.badStatusTotal.lightRing >= badStatusMax.lightRing && !IsLightRing() && IsValidLightRing())
 		{
-			ActFreezeEnd();
-			status.badStatusTotal.freeze = 0f;
+			status.reactionType = 19;
 		}
-		if (status.badStatusTotal.poison >= badStatusMax.poison)
+		if (status.badStatusAdd.poison > 0f && status.badStatusTotal.poison >= badStatusMax.poison)
 		{
 			OnPoisonStart(status.fromObjectID);
 		}
-		if (status.badStatusTotal.deadlyPoison >= badStatusMax.deadlyPoison)
+		if (status.badStatusAdd.deadlyPoison > 0f && status.badStatusTotal.deadlyPoison >= badStatusMax.deadlyPoison)
 		{
 			OnDeadlyPoisonStart();
 		}
-		if (status.badStatusTotal.burning >= badStatusMax.burning)
+		if (status.badStatusAdd.burning > 0f && status.badStatusTotal.burning >= badStatusMax.burning)
 		{
 			OnBurningStart();
 		}
-		if (status.badStatusTotal.speedDown >= badStatusMax.speedDown)
+		if (status.badStatusAdd.speedDown > 0f && status.badStatusTotal.speedDown >= badStatusMax.speedDown)
 		{
 			OnSpeedDown();
 		}
-		if (status.badStatusTotal.attackSpeedDown >= badStatusMax.attackSpeedDown)
+		if (status.badStatusAdd.bleeding > 0f && status.badStatusTotal.bleeding >= badStatusMax.bleeding)
+		{
+			OnBleedingStart();
+		}
+		if (status.badStatusAdd.attackSpeedDown > 0f && status.badStatusTotal.attackSpeedDown >= badStatusMax.attackSpeedDown)
 		{
 			OnAttackSpeedDown();
 		}
-		if (status.badStatusTotal.inkSplash >= badStatusMax.inkSplash && !IsInkSplash())
+		if (status.badStatusAdd.inkSplash > 0f && status.badStatusTotal.inkSplash >= badStatusMax.inkSplash && !IsInkSplash())
 		{
 			OnInkSplash(status.attackInfo.inkSplashInfo);
 		}
-		if (status.badStatusTotal.slide >= badStatusMax.slide)
+		if (status.badStatusAdd.slide > 0f && status.badStatusTotal.slide >= badStatusMax.slide)
 		{
 			OnSlideStart();
 		}
-		if (status.badStatusTotal.silence >= badStatusMax.silence)
+		if (status.badStatusAdd.silence > 0f && status.badStatusTotal.silence >= badStatusMax.silence)
 		{
 			OnSilenceStart();
+		}
+		if (status.badStatusAdd.cantHealHp > 0f && status.badStatusTotal.cantHealHp >= badStatusMax.cantHealHp)
+		{
+			OnCantHealHpStart();
+		}
+		if (status.badStatusAdd.blind > 0f && status.badStatusTotal.blind >= badStatusMax.blind)
+		{
+			OnBlindStart();
+		}
+		if (status.badStatusTotal.stone >= badStatusMax.stone && !IsStone())
+		{
+			if (!buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.STONE))
+			{
+				status.reactionType = 21;
+			}
+			else
+			{
+				status.badStatusTotal.stone = 0f;
+			}
+		}
+		if (status.badStatusAdd.acid > 0f && status.badStatusTotal.acid >= badStatusMax.acid)
+		{
+			OnAcidStart();
+		}
+		if (status.badStatusAdd.damageMotionStop > 0f && status.badStatusTotal.damageMotionStop >= badStatusMax.damageMotionStop)
+		{
+			OnDamageMotionStopStart(status.attackInfo.motionStopTime);
+		}
+		if (status.badStatusAdd.corruption > 0f && status.badStatusTotal.corruption >= badStatusMax.corruption)
+		{
+			OnCorruptionStart();
 		}
 		Quaternion rotation = _rotation;
 		Vector3 eulerAngles = rotation.get_eulerAngles();
 		float y = eulerAngles.y;
 		if (status.afterHP <= 0)
 		{
-			status.reactionType = 8;
+			int deadReviveCount = GetDeadReviveCount();
+			if (0 < deadReviveCount)
+			{
+				status.afterHP = 1;
+				status.reactionType = 22;
+				status.deadReviveCount = deadReviveCount;
+				status.badStatusAdd.Reset();
+				status.downTotal = 0f;
+				status.downAddBase = 0f;
+				status.downAddWeak = 0f;
+				status.concussionTotal = 0f;
+				status.concussionAdd = 0f;
+				status.isArrowBleed = false;
+				status.isShadowSealing = false;
+				status.isArrowBomb = false;
+			}
+			else
+			{
+				status.reactionType = 8;
+			}
 			if (flag)
 			{
 				PlayImmediateDeathEffect();
@@ -4584,6 +4970,7 @@ public class Character : StageObject, IAnimEvent
 			DelayReactionInfo delayReactionInfo = new DelayReactionInfo();
 			delayReactionInfo.type = (REACTION_TYPE)status.reactionType;
 			delayReactionInfo.targetId = status.fromObjectID;
+			delayReactionInfo.reactionLoopTime = status.attackInfo.toEnemy.reactionInfo.reactionLoopTime;
 			RegisterReacionDelayInfo(delayReactionInfo);
 			status.reactionType = 0;
 			isReactionDelaySet = true;
@@ -4593,23 +4980,53 @@ public class Character : StageObject, IAnimEvent
 		Vector3 eulerAngles2 = rotation2.get_eulerAngles();
 		status.hostDir = eulerAngles2.y;
 		status.damageHpRate = (1f - (float)status.afterHP / (float)hpMax) * 100f;
+		if (status.validDamage)
+		{
+			buffParam.DecreaseInvincibleCount();
+		}
 		base.OnAttackedHitOwner(status);
+	}
+
+	protected void ApplyInvicibleCount(AttackedHitStatusOwner status)
+	{
+		if (buffParam.IsValidInvincibleCountBuff())
+		{
+			status.damage = 0;
+			status.damageDetails.Set(0f);
+			status.badStatusAdd.Reset();
+		}
+	}
+
+	protected virtual bool ApplyInvicibleBadStatus(AttackedHitStatusOwner status)
+	{
+		if (!buffParam.IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS))
+		{
+			return false;
+		}
+		if (!status.badStatusAdd.isExist())
+		{
+			return false;
+		}
+		status.badStatusAdd.Reset();
+		return true;
 	}
 
 	protected void PlayImmediateDeathEffect()
 	{
-		if (!(effectPlayProcessor == null))
+		if (effectPlayProcessor == null)
 		{
-			List<EffectPlayProcessor.EffectSetting> settings = effectPlayProcessor.GetSettings("IMMEDIATE_DEATH_EFFECT");
-			if (settings != null)
+			return;
+		}
+		List<EffectPlayProcessor.EffectSetting> settings = effectPlayProcessor.GetSettings("IMMEDIATE_DEATH_EFFECT");
+		if (settings == null)
+		{
+			return;
+		}
+		for (int i = 0; i < settings.Count; i++)
+		{
+			if (settings[i] != null)
 			{
-				for (int i = 0; i < settings.Count; i++)
-				{
-					if (settings[i] != null)
-					{
-						effectPlayProcessor.PlayEffect(settings[i], base._transform);
-					}
-				}
+				effectPlayProcessor.PlayEffect(settings[i], base._transform);
 			}
 		}
 	}
@@ -4619,21 +5036,27 @@ public class Character : StageObject, IAnimEvent
 		return false;
 	}
 
+	protected virtual void UseNarrowEscape(AttackedHitStatusOwner status)
+	{
+	}
+
 	protected virtual bool IsHitReactionValid(AttackedHitStatusOwner status)
 	{
 		return true;
 	}
 
+	protected virtual int GetDeadReviveCount()
+	{
+		return 0;
+	}
+
 	protected virtual bool IsReactionDelayType(int type)
 	{
-		switch (type)
+		if (type == 10 || type == 12)
 		{
-		case 10:
-		case 12:
 			return true;
-		default:
-			return false;
 		}
+		return false;
 	}
 
 	protected virtual REACTION_TYPE OnHitReaction(AttackedHitStatusOwner status)
@@ -4668,57 +5091,75 @@ public class Character : StageObject, IAnimEvent
 		{
 			rEACTION_TYPE = REACTION_TYPE.NONE;
 		}
+		if (rEACTION_TYPE == REACTION_TYPE.CHARM_BLOW && buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.CHARM))
+		{
+			rEACTION_TYPE = REACTION_TYPE.BLOW;
+		}
 		return rEACTION_TYPE;
 	}
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Expected O, but got Unknown
+		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 		base.OnAttackedHitFix(status);
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameProgress>.I.OnDamage(status, this);
 		}
-		if (!isDead)
+		if (isDead)
 		{
-			if (isLocalDamageApply && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == status.fromClientID)
+			return;
+		}
+		if (isLocalDamageApply && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == status.fromClientID)
+		{
+			localDamage -= status.damage;
+			if (localDamage <= 0)
 			{
-				localDamage -= status.damage;
-				if (localDamage <= 0)
-				{
-					localDamage = 0;
-				}
-			}
-			hp = status.afterHP;
-			ShieldHp = status.afterShieldHp;
-			badStatusTotal = status.badStatusTotal;
-			if (IsFreeze() && badStatusTotal.freeze <= 0f)
-			{
-				ActFreezeEnd();
-			}
-			ReactionInfo reactionInfo = new ReactionInfo();
-			reactionInfo.reactionType = (REACTION_TYPE)status.reactionType;
-			reactionInfo.blowForce = status.blowForce;
-			reactionInfo.loopTime = status.attackInfo.toPlayer.reactionLoopTime;
-			reactionInfo.targetId = status.fromObjectID;
-			if (reactionInfo.reactionType != 0)
-			{
-				ApplySyncPosition(status.hostPos, status.hostDir, false);
-			}
-			ActReaction(reactionInfo, false);
-			if (!string.IsNullOrEmpty(status.attackInfo.remainEffectName))
-			{
-				Transform effect = EffectManager.GetEffect(status.attackInfo.remainEffectName, rootNode);
-				if (effect != null)
-				{
-					damegeRemainEffect = effect.get_gameObject();
-				}
+				localDamage = 0;
 			}
 		}
+		hp = status.afterHP;
+		ShieldHp = status.afterShieldHp;
+		badStatusTotal = status.badStatusTotal;
+		MakeReactionInfo(status, out ReactionInfo reactionInfo);
+		if (reactionInfo.reactionType != 0)
+		{
+			ApplySyncPosition(status.hostPos, status.hostDir);
+		}
+		ActReaction(reactionInfo);
+		if (!string.IsNullOrEmpty(status.attackInfo.remainEffectName) && !IsIgnoreHitEffect(status.attackInfo))
+		{
+			Transform effect = EffectManager.GetEffect(status.attackInfo.remainEffectName, rootNode);
+			if (effect != null)
+			{
+				damegeRemainEffect = effect.get_gameObject();
+			}
+		}
+	}
+
+	protected virtual void MakeReactionInfo(AttackedHitStatusFix status, out ReactionInfo reactionInfo)
+	{
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		reactionInfo = new ReactionInfo();
+		reactionInfo.reactionType = (REACTION_TYPE)status.reactionType;
+		reactionInfo.blowForce = status.blowForce;
+		reactionInfo.loopTime = status.attackInfo.toPlayer.reactionLoopTime;
+		reactionInfo.targetId = status.fromObjectID;
+	}
+
+	private bool IsIgnoreHitEffect(AttackHitInfo _info)
+	{
+		if (_info == null)
+		{
+			return false;
+		}
+		AttackHitInfo.ATTACK_TYPE attackType = _info.attackType;
+		if (attackType == AttackHitInfo.ATTACK_TYPE.BURST_THS_SINGLE_SHOT || attackType == AttackHitInfo.ATTACK_TYPE.BURST_THS_FULL_BURST)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public virtual void ActReaction(ReactionInfo info, bool isSync = false)
@@ -4726,7 +5167,7 @@ public class Character : StageObject, IAnimEvent
 		switch (info.reactionType)
 		{
 		case REACTION_TYPE.DEAD:
-			ActDead(false, false);
+			ActDead();
 			break;
 		case REACTION_TYPE.DAMAGE:
 			ActDamage();
@@ -4778,61 +5219,63 @@ public class Character : StageObject, IAnimEvent
 	public virtual void OnReactionDelay(List<DelayReactionInfo> reactionDelayList)
 	{
 		int count = reactionDelayList.Count;
-		if (count > 0)
+		if (count <= 0)
 		{
-			for (int i = 0; i < count; i++)
+			return;
+		}
+		for (int i = 0; i < count; i++)
+		{
+			DelayReactionInfo delayReactionInfo = reactionDelayList[i];
+			switch (delayReactionInfo.type)
 			{
-				DelayReactionInfo delayReactionInfo = reactionDelayList[i];
-				switch (delayReactionInfo.type)
-				{
-				case REACTION_TYPE.PARALYZE:
-					ActParalyze();
-					break;
-				case REACTION_TYPE.FREEZE:
-					ActFreezeStart();
-					break;
-				}
+			case REACTION_TYPE.PARALYZE:
+				ActParalyze();
+				break;
+			case REACTION_TYPE.FREEZE:
+				ActFreezeStart();
+				break;
 			}
-			if (characterSender != null)
-			{
-				characterSender.OnReactionDelay(reactionDelayList);
-			}
+		}
+		if (characterSender != null)
+		{
+			characterSender.OnReactionDelay(reactionDelayList);
 		}
 	}
 
 	protected override void OnAttackedContinuationFixedUpdate(AttackedContinuationStatus status)
 	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 		base.OnAttackedContinuationFixedUpdate(status);
-		if (!isDead)
+		if (isDead)
 		{
-			float continuationTimeChangeRate = GetContinuationTimeChangeRate(status);
-			AttackContinuationInfo.CONTINUATION_TYPE type = status.attackInfo.type;
-			if (type == AttackContinuationInfo.CONTINUATION_TYPE.INHALE && (actionID != ACTION_ID.MOVE || moveType != MOVE_TYPE.SYNC_VELOCITY) && !object.ReferenceEquals(status.fromCollider, null))
+			return;
+		}
+		float continuationTimeChangeRate = GetContinuationTimeChangeRate(status);
+		AttackContinuationInfo.CONTINUATION_TYPE type = status.attackInfo.type;
+		if (type == AttackContinuationInfo.CONTINUATION_TYPE.INHALE && (actionID != ACTION_ID.MOVE || moveType != MOVE_TYPE.SYNC_VELOCITY) && !object.ReferenceEquals(status.fromCollider, null))
+		{
+			Bounds bounds = status.fromCollider.get_bounds();
+			Vector3 val = bounds.get_center() - _position;
+			val.y = 0f;
+			float num = status.attackInfo.inhale.speed * continuationTimeChangeRate;
+			float magnitude = val.get_magnitude();
+			if (num * Time.get_fixedDeltaTime() > magnitude)
 			{
-				Bounds bounds = status.fromCollider.get_bounds();
-				Vector3 val = bounds.get_center() - _position;
-				val.y = 0f;
-				float num = status.attackInfo.inhale.speed * continuationTimeChangeRate;
-				float magnitude = val.get_magnitude();
-				if (num * Time.get_fixedDeltaTime() > magnitude)
-				{
-					num = magnitude / Time.get_fixedDeltaTime();
-				}
-				val.Normalize();
-				externalVelocity = val * num;
+				num = magnitude / Time.get_fixedDeltaTime();
 			}
+			val.Normalize();
+			externalVelocity = val * num;
 		}
 	}
 
-	protected virtual Vector3 GetTransformForward()
+	public virtual Vector3 GetTransformForward()
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -4866,7 +5309,7 @@ public class Character : StageObject, IAnimEvent
 		List<GameObject> range = list.GetRange(0, list.Count);
 		range.ForEach(delegate(GameObject o)
 		{
-			EffectManager.ReleaseEffect(o, true, false);
+			EffectManager.ReleaseEffect(o);
 		});
 		list.Clear();
 	}
@@ -4875,8 +5318,6 @@ public class Character : StageObject, IAnimEvent
 	{
 		objectList.ForEach(delegate(List<GameObject> o)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Expected O, but got Unknown
 			o.Remove(servant.get_gameObject());
 		});
 		buffParam.OnDetachServant(servant);
@@ -4904,7 +5345,7 @@ public class Character : StageObject, IAnimEvent
 	private void EventExAtkColliderStart(AnimEventData.EventData data)
 	{
 		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Expected O, but got Unknown
+		//IL_009d: Expected O, but got Unknown
 		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		float[] floatArgs = data.floatArgs;
@@ -4917,7 +5358,7 @@ public class Character : StageObject, IAnimEvent
 		string name = data.stringArgs[0];
 		string name2 = data.stringArgs[1];
 		int uniqueID = data.intArgs[0];
-		AttackInfo attackInfo = FindAttackInfo(name, true, false);
+		AttackInfo attackInfo = FindAttackInfo(name);
 		if (attackInfo != null)
 		{
 			Transform val = FindNode(name2);
@@ -4936,7 +5377,6 @@ public class Character : StageObject, IAnimEvent
 
 	private void EventExAtkColliderEnd(AnimEventData.EventData data)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		int num = data.intArgs[0];
 		for (int num2 = m_exAtkColliderObjectList.Count - 1; num2 >= 0; num2--)
 		{
@@ -4951,7 +5391,6 @@ public class Character : StageObject, IAnimEvent
 
 	private void DeleteExAtkColliderAll()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < m_exAtkColliderObjectList.Count; i++)
 		{
 			Object.Destroy(m_exAtkColliderObjectList[i].get_gameObject());
@@ -4970,7 +5409,7 @@ public class Character : StageObject, IAnimEvent
 		animator.set_applyRootMotion(false);
 		if (velocityType == VELOCITY_TYPE.ROOT_MOTION)
 		{
-			SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
+			SetVelocity(Vector3.get_zero());
 		}
 	}
 
@@ -4982,30 +5421,29 @@ public class Character : StageObject, IAnimEvent
 	private void EventHideRendererON(AnimEventData.EventData data)
 	{
 		string node_name = data.stringArgs[0];
-		SetEnableNodeRenderer(node_name, false);
+		SetEnableNodeRenderer(node_name, enable: false);
 	}
 
 	private void EventHideRendererOFF(AnimEventData.EventData data)
 	{
 		string node_name = data.stringArgs[0];
-		SetEnableNodeRenderer(node_name, true);
+		SetEnableNodeRenderer(node_name, enable: true);
 	}
 
-	private void EventActionRendererON(AnimEventData.EventData data)
+	public void EventActionRendererON(AnimEventData.EventData data)
 	{
 		if (actionRendererModel != null)
 		{
 			Transform val = FindNode(actionRendererNodeName);
 			if (val != null)
 			{
-				actionRendererInstance = ResourceUtility.Realizes(actionRendererModel, val, -1);
+				actionRendererInstance = ResourceUtility.Realizes(actionRendererModel, val);
 			}
 		}
 	}
 
 	private void EventActionRendererOFF(AnimEventData.EventData data)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (actionRendererInstance != null)
 		{
 			Object.Destroy(actionRendererInstance.get_gameObject());
@@ -5016,13 +5454,15 @@ public class Character : StageObject, IAnimEvent
 	private void EventEffectDelete(AnimEventData.EventData data)
 	{
 		string value = EffectNameAnalyzer(data.stringArgs[0]);
+		bool flag = !data.intArgs.IsNullOrEmpty() && data.intArgs[0] > 0;
 		int count = objectList[2].Count;
 		List<GameObject> range = objectList[2].GetRange(0, count);
 		for (int i = 0; i < count; i++)
 		{
 			if (string.IsNullOrEmpty(value) || range[i].get_name().StartsWith(value))
 			{
-				EffectManager.ReleaseEffect(range[i], true, false);
+				EffectManager.ReleaseEffect(range[i], !flag, flag);
+				objectList[2].Remove(range[i]);
 			}
 		}
 	}
@@ -5037,17 +5477,16 @@ public class Character : StageObject, IAnimEvent
 		if (IsCoopNone() || IsOriginal())
 		{
 			UpdateActionPosition(text);
+			return;
 		}
-		else if (actionPositionWaitSync)
+		if (actionPositionWaitSync)
 		{
 			Log.Error(LOG.INGAME, "Character UPDATE_ACTION_POSITION Err. ( WaitSync already. ) trigger : " + text);
+			return;
 		}
-		else
-		{
-			actionPositionWaitSync = true;
-			actionPositionWaitTrigger = text;
-			StartWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION, false, 0f);
-		}
+		actionPositionWaitSync = true;
+		actionPositionWaitTrigger = text;
+		StartWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION, keep_sync: false);
 	}
 
 	private void EventUpdateDirection(AnimEventData.EventData data)
@@ -5060,17 +5499,16 @@ public class Character : StageObject, IAnimEvent
 		if (IsCoopNone() || IsOriginal())
 		{
 			UpdateDirection(text);
+			return;
 		}
-		else if (directionWaitSync)
+		if (directionWaitSync)
 		{
 			Log.Error(LOG.INGAME, "Character UPDATE_DIRECTION Err. ( WaitSync already. ) trigger : " + text);
+			return;
 		}
-		else
-		{
-			directionWaitSync = true;
-			directionWaitTrigger = text;
-			StartWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_DIRECTION, false, 0f);
-		}
+		directionWaitSync = true;
+		directionWaitTrigger = text;
+		StartWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_DIRECTION, keep_sync: false);
 	}
 
 	private void EventPeriodicSyncActionPositionStart(AnimEventData.EventData data)
@@ -5145,16 +5583,16 @@ public class Character : StageObject, IAnimEvent
 		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 		float num = data.floatArgs[0];
 		Vector3 val = default(Vector3);
 		val.x = data.floatArgs[1];
@@ -5245,6 +5683,85 @@ public class Character : StageObject, IAnimEvent
 		}
 	}
 
+	private void EventRotateToTargetOffset(AnimEventData.EventData data)
+	{
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+		float num = data.floatArgs[0];
+		EndRotate();
+		bool flag = (data.intArgs[0] != 0) ? true : false;
+		Vector3 val = default(Vector3);
+		val._002Ector(0f, 0f, data.floatArgs[1]);
+		Vector3 pos = _position;
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+		{
+			pos = MonoBehaviourSingleton<StageObjectManager>.I.boss._position;
+			if (flag)
+			{
+				Quaternion rotation = MonoBehaviourSingleton<StageObjectManager>.I.boss._rotation;
+				val = Quaternion.Euler(rotation.get_eulerAngles()) * val;
+			}
+		}
+		else
+		{
+			GetTargetPos(out pos);
+		}
+		pos.y = 0f;
+		if (!flag)
+		{
+			val = Quaternion.LookRotation(_position - pos) * val;
+		}
+		Vector3 val2 = pos;
+		if (val2 != _position)
+		{
+			val2 += val;
+		}
+		Quaternion val3 = Quaternion.LookRotation(val2 - _position);
+		Vector3 eulerAngles = val3.get_eulerAngles();
+		rotateEventDirection = eulerAngles.y;
+		if (num > 0f)
+		{
+			rotateEventSpeed = num;
+		}
+		else
+		{
+			_rotation = Quaternion.AngleAxis(rotateEventDirection, Vector3.get_up());
+		}
+	}
+
 	private void EventAnimatorBoolON(AnimEventData.EventData data)
 	{
 		string text = data.stringArgs[0];
@@ -5262,45 +5779,50 @@ public class Character : StageObject, IAnimEvent
 		animatorBoolList.Remove(text);
 	}
 
-	private void EventShotGeneric(AnimEventData.EventData data)
+	protected void EventShotGeneric(AnimEventData.EventData data)
 	{
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		AttackInfo attackInfo = FindAttackInfo(data.stringArgs[0], true, false);
-		if (attackInfo != null)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+		AttackInfo attackInfo = FindAttackInfo(data.stringArgs[0]);
+		if (attackInfo == null)
 		{
-			Vector3 offset = default(Vector3);
-			offset._002Ector(0f, 0f, 0f);
-			if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
-			{
-				if (actionTarget != null)
-				{
-					Vector3 val = default(Vector3);
-					val._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					Quaternion val2 = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
-					val2 = _rotation * val2;
-					Matrix4x4 localToWorldMatrix = actionTarget._transform.get_localToWorldMatrix();
-					val = localToWorldMatrix.MultiplyPoint3x4(val);
-					AnimEventShot.Create(this, attackInfo, val, val2, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-					return;
-				}
-				offset.z += 2f;
-			}
-			AnimEventShot.Create(this, data, attackInfo, offset);
+			return;
 		}
+		Vector3 offset = default(Vector3);
+		offset._002Ector(0f, 0f, 0f);
+		if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
+		{
+			if (actionTarget != null && !IsValidBuffBlind())
+			{
+				Vector3 val = default(Vector3);
+				val._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+				Quaternion val2 = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+				val2 = _rotation * val2;
+				Vector3 localScale = actionTarget._transform.get_localScale();
+				val._002Ector(val.x / localScale.x, val.y / localScale.y, val.z / localScale.z);
+				Matrix4x4 localToWorldMatrix = actionTarget._transform.get_localToWorldMatrix();
+				val = localToWorldMatrix.MultiplyPoint3x4(val);
+				AnimEventShot.Create(this, attackInfo, val, val2);
+				return;
+			}
+			offset.z += 2f;
+		}
+		AnimEventShot.Create(this, data, attackInfo, offset);
 	}
 
 	protected virtual void EventShotPresent(AnimEventData.EventData data)
@@ -5311,24 +5833,30 @@ public class Character : StageObject, IAnimEvent
 	{
 	}
 
-	protected virtual void EventShotDecoy(AnimEventData.EventData data)
+	public virtual void EventShotDecoy(AnimEventData.EventData data)
 	{
 	}
 
 	private void EventGenerateTrackingAttack(AnimEventData.EventData data)
 	{
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Expected O, but got Unknown
+		//IL_0037: Expected O, but got Unknown
 		if (data.stringArgs == null || data.stringArgs.Length <= 0)
 		{
 			Log.Error(LOG.INGAME, "String Data is Empty. Check AnimEvent ( GENERATE_TRACKING ). ");
+			return;
 		}
-		else
+		GameObject val = new GameObject("AttackTrackingTarget");
+		AttackTrackingTarget attackTrackingTarget = val.AddComponent<AttackTrackingTarget>();
+		attackTrackingTarget.Initialize(this, (!IsValidBuffBlind()) ? actionTarget : null, FindAttackInfo(data.stringArgs[0]));
+		TrackingTargetBullet = attackTrackingTarget;
+	}
+
+	private void EventTrackingBulletOff()
+	{
+		if (!(TrackingTargetBullet == null))
 		{
-			GameObject val = new GameObject("AttackTrackingTarget");
-			AttackTrackingTarget attackTrackingTarget = val.AddComponent<AttackTrackingTarget>();
-			attackTrackingTarget.Initialize(this, actionTarget, FindAttackInfo(data.stringArgs[0], true, false));
-			TrackingTargetBullet = attackTrackingTarget;
+			TrackingTargetBullet.TrackOff();
 		}
 	}
 
@@ -5348,6 +5876,14 @@ public class Character : StageObject, IAnimEvent
 	{
 	}
 
+	public virtual void EventCameraTargetRotateOn(AnimEventData.EventData data)
+	{
+	}
+
+	public virtual void EventCameraTargetRotateOff()
+	{
+	}
+
 	protected virtual void EventExecuteEvolve(AnimEventData.EventData data)
 	{
 	}
@@ -5360,348 +5896,441 @@ public class Character : StageObject, IAnimEvent
 	{
 	}
 
+	protected virtual void EventCameraCutOn(AnimEventData.EventData data)
+	{
+	}
+
+	protected virtual void EventCameraCutOff()
+	{
+	}
+
 	public override void OnAnimEvent(AnimEventData.EventData data)
 	{
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c8: Expected O, but got Unknown
-		//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_059b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
 		if (CanPlayEffectEvent())
 		{
-			bool settingFixedUpdate = false;
-			if (!animUpdatePhysics)
-			{
-				settingFixedUpdate = Trail.settingFixedUpdate;
-				Trail.settingFixedUpdate = false;
-			}
-			bool is_oneshot_priority = this is Self;
-			Enemy enemy = this as Enemy;
-			if (enemy != null)
-			{
-				is_oneshot_priority = enemy.isBoss;
-			}
-			bool flag = true;
-			if ((data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_LOOP_CUSTOM || data.id == AnimEventFormat.ID.EFFECT_ONESHOT || data.id == AnimEventFormat.ID.EFFECT_STATIC || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.CAMERA_EFFECT) && data.intArgs != null && data.intArgs.Length > 1)
+			bool beforeTrailSetting = SetTrailSetting();
+			bool is_oneshot_priority = IsOneShotPriority();
+			bool isExecEffect = true;
+			if ((data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_LOOP_CUSTOM || data.id == AnimEventFormat.ID.EFFECT_ONESHOT || data.id == AnimEventFormat.ID.EFFECT_STATIC || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.CAMERA_EFFECT || data.id == AnimEventFormat.ID.EFFECT_SWITCH_OBJECT_BY_CONDITION || data.id == AnimEventFormat.ID.EFFECT_TILING || data.id == AnimEventFormat.ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS) && data.intArgs != null && data.intArgs.Length > 1)
 			{
 				switch (data.intArgs[0])
 				{
 				case 0:
-					flag = true;
+					isExecEffect = true;
 					break;
 				case 1:
-					flag = !buffParam.IsEnableBuff((BuffParam.BUFFTYPE)data.intArgs[1]);
+					isExecEffect = !buffParam.IsEnableBuff((BuffParam.BUFFTYPE)data.intArgs[1]);
 					break;
 				default:
 					Log.Error(LOG.EFFECT, "Not Defined EFFECT_EXEC_CONDITION");
 					break;
 				}
 			}
-			Transform val = null;
-			if (flag)
+			if (ShotAnimEvent(data, beforeTrailSetting, is_oneshot_priority, isExecEffect))
 			{
-				val = AnimEventFormat.EffectEventExec(data.id, data, base._transform, is_oneshot_priority, EffectNameAnalyzer, ((StageObject)this).FindNode, this);
-			}
-			if (!animUpdatePhysics)
-			{
-				Trail.settingFixedUpdate = settingFixedUpdate;
-			}
-			if (val != null)
-			{
-				if (data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE)
-				{
-					AddObjectList(val.get_gameObject(), OBJECT_LIST_TYPE.ANIM_EVENT);
-				}
 				return;
 			}
 		}
-		if (!(stepCtrl != null) || !stepCtrl.OnAnimEvent(data))
+		else if ((data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_LOOP_CUSTOM || data.id == AnimEventFormat.ID.EFFECT_ONESHOT || data.id == AnimEventFormat.ID.EFFECT_STATIC || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS) && data.intArgs != null && data.intArgs.Length > 2 && data.intArgs[2] == 1)
 		{
-			switch (data.id)
+			bool beforeTrailSetting2 = SetTrailSetting();
+			bool is_oneshot_priority2 = IsOneShotPriority();
+			bool isExecEffect2 = true;
+			switch (data.intArgs[0])
 			{
-			case AnimEventFormat.ID.EFFECT:
-			case AnimEventFormat.ID.EFFECT_ONESHOT:
-			case AnimEventFormat.ID.EFFECT_STATIC:
-			case AnimEventFormat.ID.EFFECT_LOOP_CUSTOM:
-			case AnimEventFormat.ID.CAMERA_EFFECT:
-			case AnimEventFormat.ID.MOVE_POINT_DATA:
-			case AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE:
-			case AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT:
-			case AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE:
-			case AnimEventFormat.ID.MOVE_LOOKAT_DATA:
+			case 0:
+				isExecEffect2 = true;
 				break;
-			case AnimEventFormat.ID.EXATK_COLLIDER_START:
-				EventExAtkColliderStart(data);
-				break;
-			case AnimEventFormat.ID.EXATK_COLLIDER_END:
-				EventExAtkColliderEnd(data);
-				break;
-			case AnimEventFormat.ID.ROOT_MOTION_ON:
-				EventRootMotionON(data);
-				break;
-			case AnimEventFormat.ID.ROOT_MOTION_OFF:
-				EventRootMotionOFF(data);
-				break;
-			case AnimEventFormat.ID.ROOT_MOTION_MOVE_RATE:
-				EventRootMotionMoveRate(data);
-				break;
-			case AnimEventFormat.ID.HIDE_RENDERER_ON:
-				EventHideRendererON(data);
-				break;
-			case AnimEventFormat.ID.HIDE_RENDERER_OFF:
-				EventHideRendererOFF(data);
-				break;
-			case AnimEventFormat.ID.ACTION_RENDERER_ON:
-				EventActionRendererON(data);
-				break;
-			case AnimEventFormat.ID.ACTION_RENDERER_OFF:
-				EventActionRendererOFF(data);
-				break;
-			case AnimEventFormat.ID.EFFECT_DELETE:
-				EventEffectDelete(data);
-				break;
-			case AnimEventFormat.ID.UPDATE_ACTION_POSITION:
-				EventUpdateActionPosition(data);
-				break;
-			case AnimEventFormat.ID.UPDATE_DIRECTION:
-				EventUpdateDirection(data);
-				break;
-			case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_START:
-				EventPeriodicSyncActionPositionStart(data);
-				break;
-			case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_END:
-				EventPeriodicSyncActionPositionEnd(data);
-				break;
-			case AnimEventFormat.ID.MOVE_FORWARD_START:
-				EventMoveStart(data, Vector3.get_forward());
-				break;
-			case AnimEventFormat.ID.MOVE_LEFT_START:
-				EventMoveStart(data, -Vector3.get_right());
-				break;
-			case AnimEventFormat.ID.MOVE_RIGHT_START:
-				EventMoveStart(data, Vector3.get_right());
-				break;
-			case AnimEventFormat.ID.MOVE_FORWARD_TO_TARGET:
-				EventMoveForwardToTarget(data);
-				break;
-			case AnimEventFormat.ID.MOVE_TO_WORLDPOS_START:
-				EventMoveToWorldPos(data);
-				break;
-			case AnimEventFormat.ID.MOVE_END:
-				EventMoveEnd();
-				break;
-			case AnimEventFormat.ID.ROTATE_TO_TARGET_START:
-				EventRotateToTargetStart(data);
-				break;
-			case AnimEventFormat.ID.ROTATE_KEEP_TO_TARGET_START:
-				EventRotateKeepToTargetStart(data);
-				break;
-			case AnimEventFormat.ID.ROTATE_TO_ANGLE_START:
-				EventRotateToAngleStart(data);
-				break;
-			case AnimEventFormat.ID.ROTATE_END:
-				EndRotate();
-				break;
-			case AnimEventFormat.ID.MOTION_CANCEL_ON:
-				enableMotionCancel = true;
-				break;
-			case AnimEventFormat.ID.MOTION_CANCEL_OFF:
-				enableMotionCancel = false;
-				break;
-			case AnimEventFormat.ID.ANIMATOR_BOOL_ON:
-				EventAnimatorBoolON(data);
-				break;
-			case AnimEventFormat.ID.ANIMATOR_BOOL_OFF:
-				EventAnimatorBoolOFF(data);
-				break;
-			case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE:
-			case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START:
-				CreateAttackCollider(data, true);
-				break;
-			case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_END:
-				RemoveEventCollider(data.stringArgs[0]);
-				break;
-			case AnimEventFormat.ID.SHOT_GENERIC:
-				EventShotGeneric(data);
-				break;
-			case AnimEventFormat.ID.MOVE_SUPPRESS_ON:
-				enableMoveSuppress = true;
-				break;
-			case AnimEventFormat.ID.MOVE_SUPPRESS_OFF:
-				enableMoveSuppress = false;
-				break;
-			case AnimEventFormat.ID.ROOT_COLLIDER_ON:
-				base._collider.set_enabled(true);
-				break;
-			case AnimEventFormat.ID.ROOT_COLLIDER_OFF:
-				base._collider.set_enabled(false);
-				break;
-			case AnimEventFormat.ID.DELETE_REMAIN_DMG_EFFECT:
-				if (damegeRemainEffect != null)
-				{
-					EffectManager.ReleaseEffect(damegeRemainEffect, true, false);
-					damegeRemainEffect = null;
-				}
-				break;
-			case AnimEventFormat.ID.REACTON_DELAY_ON:
-				enableReactionDelay = true;
-				break;
-			case AnimEventFormat.ID.REACTON_DELAY_OFF:
-				enableReactionDelay = false;
-				break;
-			case AnimEventFormat.ID.BUFF_START:
-				if (IsCoopNone() || IsOriginal())
-				{
-					if (data.intArgs.Length <= 0 || data.floatArgs.Length <= 0)
-					{
-						Log.Error(LOG.INGAME, "No data. Check AnimEvent ( BUFF_START ).");
-					}
-					float num = data.floatArgs[0];
-					if (num <= 0f)
-					{
-						Log.Error(LOG.INGAME, "Not set Buff time. Check AnimEvent ( BUFF_START ).");
-					}
-					else
-					{
-						float interval = 0f;
-						if (data.floatArgs.Length > 1)
-						{
-							interval = data.floatArgs[1];
-						}
-						float num2 = 0f;
-						if (data.floatArgs.Length > 2)
-						{
-							num2 = data.floatArgs[2];
-						}
-						int num3 = data.intArgs[0];
-						if (num3 <= -1 || num3 >= 179)
-						{
-							Log.Error(LOG.INGAME, "Not set valid BUFFTYPE. CHECK AnimEvent ( BUFF_START ).");
-						}
-						else
-						{
-							BuffParam.VALUE_TYPE valueType = BuffParam.VALUE_TYPE.CONSTANT;
-							if (data.intArgs.Length >= 3)
-							{
-								valueType = (BuffParam.VALUE_TYPE)data.intArgs[2];
-							}
-							bool flag2 = false;
-							if (data.intArgs.Length >= 4)
-							{
-								flag2 = (data.intArgs[3] > 0);
-								if (flag2)
-								{
-									num = -1f;
-								}
-							}
-							BuffParam.BuffData data2 = new BuffParam.BuffData();
-							data2.type = (BuffParam.BUFFTYPE)num3;
-							data2.time = ((num2 != 0f) ? num2 : num);
-							data2.interval = interval;
-							data2.endless = flag2;
-							data2.valueType = valueType;
-							data2.value = data.intArgs[1];
-							SetFromInfo(ref data2);
-							OnBuffStart(data2);
-						}
-					}
-				}
-				break;
-			case AnimEventFormat.ID.BUFF_END:
-				if (IsCoopNone() || IsOriginal())
-				{
-					OnBuffEnd((BuffParam.BUFFTYPE)data.intArgs[0], true, true);
-				}
-				break;
-			case AnimEventFormat.ID.CONTINUS_ATTACK:
-				if (IsCoopNone() || IsOriginal())
-				{
-					CreateContinusAttack(data, true, 0f);
-				}
-				break;
-			case AnimEventFormat.ID.CHANGE_SHADER_PARAM:
-				EventChangeShaderParam(data);
-				break;
-			case AnimEventFormat.ID.PLAYER_DISABLE_MOVE:
-				if (MonoBehaviourSingleton<InputManager>.IsValid() && (MonoBehaviourSingleton<InputManager>.I.disableFlags & INPUT_DISABLE_FACTOR.INGAME_COMMAND) == (INPUT_DISABLE_FACTOR)0)
-				{
-					MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, true);
-					this.StartCoroutine(SetEnableInputAfterSeconds(data.floatArgs[0]));
-				}
-				break;
-			case AnimEventFormat.ID.GENERATE_TRACKING:
-				EventGenerateTrackingAttack(data);
-				break;
-			case AnimEventFormat.ID.MOVE_SIDEWAYS_LOOK_TARGET:
-				EventMoveSidewaysLookTarget(data);
-				break;
-			case AnimEventFormat.ID.ACTION_MINE_ATTACK:
-				EventActionMineAttack(data);
-				break;
-			case AnimEventFormat.ID.SHOT_REFLECT_BULLET:
-				EventReflectBulletAttack(data);
-				break;
-			case AnimEventFormat.ID.SHOT_PRESENT:
-				if (IsCoopNone() || IsOriginal())
-				{
-					EventShotPresent(data);
-				}
-				break;
-			case AnimEventFormat.ID.SHOT_ZONE:
-				if (IsCoopNone() || IsOriginal())
-				{
-					EventShotZone(data);
-				}
-				break;
-			case AnimEventFormat.ID.SHOT_DECOY:
-				if (IsCoopNone() || IsOriginal())
-				{
-					EventShotDecoy(data);
-				}
-				break;
-			case AnimEventFormat.ID.STATUS_UP_DEFENCE_ON:
-				EventStatusUpDefenceON(data);
-				break;
-			case AnimEventFormat.ID.STATUS_UP_DEFENCE_OFF:
-				EventStatusUpDefenceOFF();
-				break;
-			case AnimEventFormat.ID.ATTACKHIT_CLEAR_ALL:
-				AttackHitCheckerClearAll();
-				break;
-			case AnimEventFormat.ID.ATTACKHIT_CLEAR_INFO:
-				AttackHitCheckerClearInfo(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_ON:
-				EventCameraTargetOffsetOn(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_OFF:
-				EventCameraTargetOffsetOff();
-				break;
-			case AnimEventFormat.ID.EXECUTE_EVOLVE:
-				EventExecuteEvolve(data);
-				break;
-			case AnimEventFormat.ID.DBG_TIME_START:
-				DbgTimeCount(true);
-				break;
-			case AnimEventFormat.ID.DBG_TIME_END:
-				DbgTimeCount(false);
-				break;
-			case AnimEventFormat.ID.NWAY_LASER_ATTACK:
-				EventNWayLaserAttack(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_STOP_ON:
-				EventCameraStopOn(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_STOP_OFF:
-				EventCameraStopOff();
+			case 1:
+				isExecEffect2 = !buffParam.IsEnableBuff((BuffParam.BUFFTYPE)data.intArgs[1]);
 				break;
 			default:
-				base.OnAnimEvent(data);
+				Log.Error(LOG.EFFECT, "Not Defined EFFECT_EXEC_CONDITION");
 				break;
 			}
+			if (ShotAnimEvent(data, beforeTrailSetting2, is_oneshot_priority2, isExecEffect2))
+			{
+				return;
+			}
 		}
+		if (stepCtrl != null && stepCtrl.OnAnimEvent(data))
+		{
+			return;
+		}
+		switch (data.id)
+		{
+		case AnimEventFormat.ID.EFFECT:
+		case AnimEventFormat.ID.EFFECT_ONESHOT:
+		case AnimEventFormat.ID.EFFECT_STATIC:
+		case AnimEventFormat.ID.EFFECT_LOOP_CUSTOM:
+		case AnimEventFormat.ID.CAMERA_EFFECT:
+		case AnimEventFormat.ID.MOVE_POINT_DATA:
+		case AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE:
+		case AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT:
+		case AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE:
+		case AnimEventFormat.ID.MOVE_LOOKAT_DATA:
+		case AnimEventFormat.ID.EFFECT_SWITCH_OBJECT_BY_CONDITION:
+		case AnimEventFormat.ID.EFFECT_TILING:
+		case AnimEventFormat.ID.LOAD_BULLET:
+		case AnimEventFormat.ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS:
+			break;
+		case AnimEventFormat.ID.EXATK_COLLIDER_START:
+			EventExAtkColliderStart(data);
+			break;
+		case AnimEventFormat.ID.EXATK_COLLIDER_END:
+			EventExAtkColliderEnd(data);
+			break;
+		case AnimEventFormat.ID.ROOT_MOTION_ON:
+			EventRootMotionON(data);
+			break;
+		case AnimEventFormat.ID.ROOT_MOTION_OFF:
+			EventRootMotionOFF(data);
+			break;
+		case AnimEventFormat.ID.ROOT_MOTION_MOVE_RATE:
+			EventRootMotionMoveRate(data);
+			break;
+		case AnimEventFormat.ID.HIDE_RENDERER_ON:
+			EventHideRendererON(data);
+			break;
+		case AnimEventFormat.ID.HIDE_RENDERER_OFF:
+			EventHideRendererOFF(data);
+			break;
+		case AnimEventFormat.ID.ACTION_RENDERER_ON:
+			EventActionRendererON(data);
+			break;
+		case AnimEventFormat.ID.ACTION_RENDERER_OFF:
+			EventActionRendererOFF(data);
+			break;
+		case AnimEventFormat.ID.EFFECT_DELETE:
+			EventEffectDelete(data);
+			break;
+		case AnimEventFormat.ID.UPDATE_ACTION_POSITION:
+			EventUpdateActionPosition(data);
+			break;
+		case AnimEventFormat.ID.UPDATE_DIRECTION:
+			EventUpdateDirection(data);
+			break;
+		case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_START:
+			EventPeriodicSyncActionPositionStart(data);
+			break;
+		case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_END:
+			EventPeriodicSyncActionPositionEnd(data);
+			break;
+		case AnimEventFormat.ID.MOVE_FORWARD_START:
+			EventMoveStart(data, Vector3.get_forward());
+			break;
+		case AnimEventFormat.ID.MOVE_LEFT_START:
+			EventMoveStart(data, -Vector3.get_right());
+			break;
+		case AnimEventFormat.ID.MOVE_RIGHT_START:
+			EventMoveStart(data, Vector3.get_right());
+			break;
+		case AnimEventFormat.ID.MOVE_FORWARD_TO_TARGET:
+			EventMoveForwardToTarget(data);
+			break;
+		case AnimEventFormat.ID.MOVE_TO_WORLDPOS_START:
+			EventMoveToWorldPos(data);
+			break;
+		case AnimEventFormat.ID.MOVE_END:
+			EventMoveEnd();
+			break;
+		case AnimEventFormat.ID.ROTATE_TO_TARGET_START:
+			EventRotateToTargetStart(data);
+			break;
+		case AnimEventFormat.ID.ROTATE_KEEP_TO_TARGET_START:
+			EventRotateKeepToTargetStart(data);
+			break;
+		case AnimEventFormat.ID.ROTATE_TO_ANGLE_START:
+			EventRotateToAngleStart(data);
+			break;
+		case AnimEventFormat.ID.ROTATE_TO_TARGET_OFFSET:
+			EventRotateToTargetOffset(data);
+			break;
+		case AnimEventFormat.ID.ROTATE_END:
+			EndRotate();
+			break;
+		case AnimEventFormat.ID.MOTION_CANCEL_ON:
+			enableMotionCancel = true;
+			break;
+		case AnimEventFormat.ID.MOTION_CANCEL_OFF:
+			enableMotionCancel = false;
+			break;
+		case AnimEventFormat.ID.ANIMATOR_BOOL_ON:
+			EventAnimatorBoolON(data);
+			break;
+		case AnimEventFormat.ID.ANIMATOR_BOOL_OFF:
+			EventAnimatorBoolOFF(data);
+			break;
+		case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE:
+		case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START:
+			CreateAttackCollider(data);
+			break;
+		case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_END:
+			RemoveEventCollider(data.stringArgs[0]);
+			break;
+		case AnimEventFormat.ID.SHOT_GENERIC:
+			EventShotGeneric(data);
+			break;
+		case AnimEventFormat.ID.MOVE_SUPPRESS_ON:
+			enableMoveSuppress = true;
+			break;
+		case AnimEventFormat.ID.MOVE_SUPPRESS_OFF:
+			enableMoveSuppress = false;
+			break;
+		case AnimEventFormat.ID.ROOT_COLLIDER_ON:
+			base._collider.set_enabled(true);
+			break;
+		case AnimEventFormat.ID.ROOT_COLLIDER_OFF:
+			base._collider.set_enabled(false);
+			break;
+		case AnimEventFormat.ID.DELETE_REMAIN_DMG_EFFECT:
+			if (damegeRemainEffect != null)
+			{
+				EffectManager.ReleaseEffect(damegeRemainEffect);
+				damegeRemainEffect = null;
+			}
+			break;
+		case AnimEventFormat.ID.REACTON_DELAY_ON:
+			enableReactionDelay = true;
+			break;
+		case AnimEventFormat.ID.REACTON_DELAY_OFF:
+			enableReactionDelay = false;
+			break;
+		case AnimEventFormat.ID.BUFF_START:
+		{
+			if (!IsCoopNone() && !IsOriginal())
+			{
+				break;
+			}
+			if (data.intArgs.Length <= 0 || data.floatArgs.Length <= 0)
+			{
+				Log.Error(LOG.INGAME, "No data. Check AnimEvent ( BUFF_START ).");
+			}
+			float num = data.floatArgs[0];
+			if (num <= 0f)
+			{
+				Log.Error(LOG.INGAME, "Not set Buff time. Check AnimEvent ( BUFF_START ).");
+				break;
+			}
+			float interval = 0f;
+			if (data.floatArgs.Length > 1)
+			{
+				interval = data.floatArgs[1];
+			}
+			float num2 = 0f;
+			if (data.floatArgs.Length > 2)
+			{
+				num2 = data.floatArgs[2];
+			}
+			int num3 = data.intArgs[0];
+			if (num3 <= -1 || num3 >= 221)
+			{
+				Log.Error(LOG.INGAME, "Not set valid BUFFTYPE. CHECK AnimEvent ( BUFF_START ).");
+				break;
+			}
+			BuffParam.VALUE_TYPE valueType = BuffParam.VALUE_TYPE.CONSTANT;
+			if (data.intArgs.Length >= 3)
+			{
+				valueType = (BuffParam.VALUE_TYPE)data.intArgs[2];
+			}
+			bool flag = false;
+			if (data.intArgs.Length >= 4)
+			{
+				flag = (data.intArgs[3] > 0);
+				if (flag)
+				{
+					num = -1f;
+				}
+			}
+			BuffParam.BuffData data2 = new BuffParam.BuffData();
+			data2.type = (BuffParam.BUFFTYPE)num3;
+			data2.time = ((num2 != 0f) ? num2 : num);
+			data2.interval = interval;
+			data2.endless = flag;
+			data2.valueType = valueType;
+			data2.value = data.intArgs[1];
+			SetFromInfo(ref data2);
+			OnBuffStart(data2);
+			break;
+		}
+		case AnimEventFormat.ID.BUFF_END:
+			if (IsCoopNone() || IsOriginal())
+			{
+				OnBuffEnd((BuffParam.BUFFTYPE)data.intArgs[0], sync: true);
+			}
+			break;
+		case AnimEventFormat.ID.CONTINUS_ATTACK:
+			if (IsCoopNone() || IsOriginal())
+			{
+				CreateContinusAttack(data, isSync: true);
+			}
+			break;
+		case AnimEventFormat.ID.CHANGE_SHADER_PARAM:
+			EventChangeShaderParam(data);
+			break;
+		case AnimEventFormat.ID.PLAYER_DISABLE_MOVE:
+			if (MonoBehaviourSingleton<InputManager>.IsValid() && (MonoBehaviourSingleton<InputManager>.I.disableFlags & INPUT_DISABLE_FACTOR.INGAME_COMMAND) == (INPUT_DISABLE_FACTOR)0)
+			{
+				MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, disable: true);
+				this.StartCoroutine(SetEnableInputAfterSeconds(data.floatArgs[0]));
+			}
+			break;
+		case AnimEventFormat.ID.GENERATE_TRACKING:
+			EventGenerateTrackingAttack(data);
+			break;
+		case AnimEventFormat.ID.MOVE_SIDEWAYS_LOOK_TARGET:
+			EventMoveSidewaysLookTarget(data);
+			break;
+		case AnimEventFormat.ID.ACTION_MINE_ATTACK:
+			EventActionMineAttack(data);
+			break;
+		case AnimEventFormat.ID.SHOT_REFLECT_BULLET:
+			EventReflectBulletAttack(data);
+			break;
+		case AnimEventFormat.ID.SHOT_PRESENT:
+			if (IsCoopNone() || IsOriginal())
+			{
+				EventShotPresent(data);
+			}
+			break;
+		case AnimEventFormat.ID.SHOT_ZONE:
+			if (IsCoopNone() || IsOriginal())
+			{
+				EventShotZone(data);
+			}
+			break;
+		case AnimEventFormat.ID.SHOT_DECOY:
+			if (IsCoopNone() || IsOriginal())
+			{
+				EventShotDecoy(data);
+			}
+			break;
+		case AnimEventFormat.ID.STATUS_UP_DEFENCE_ON:
+			EventStatusUpDefenceON(data);
+			break;
+		case AnimEventFormat.ID.STATUS_UP_DEFENCE_OFF:
+			EventStatusUpDefenceOFF();
+			break;
+		case AnimEventFormat.ID.ATTACKHIT_CLEAR_ALL:
+			AttackHitCheckerClearAll();
+			break;
+		case AnimEventFormat.ID.ATTACKHIT_CLEAR_INFO:
+			AttackHitCheckerClearInfo(data);
+			break;
+		case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_ON:
+			EventCameraTargetOffsetOn(data);
+			break;
+		case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_OFF:
+			EventCameraTargetOffsetOff();
+			break;
+		case AnimEventFormat.ID.EXECUTE_EVOLVE:
+			EventExecuteEvolve(data);
+			break;
+		case AnimEventFormat.ID.DBG_TIME_START:
+			DbgTimeCount(start: true);
+			break;
+		case AnimEventFormat.ID.DBG_TIME_END:
+			DbgTimeCount(start: false);
+			break;
+		case AnimEventFormat.ID.NWAY_LASER_ATTACK:
+			EventNWayLaserAttack(data);
+			break;
+		case AnimEventFormat.ID.CAMERA_STOP_ON:
+			EventCameraStopOn(data);
+			break;
+		case AnimEventFormat.ID.CAMERA_STOP_OFF:
+			EventCameraStopOff();
+			break;
+		case AnimEventFormat.ID.CAMERA_CUT_ON:
+			EventCameraCutOn(data);
+			break;
+		case AnimEventFormat.ID.CAMERA_CUT_OFF:
+			EventCameraCutOff();
+			break;
+		case AnimEventFormat.ID.CAMERA_TARGET_ROTATE_ON:
+			EventCameraTargetRotateOn(data);
+			break;
+		case AnimEventFormat.ID.CAMERA_TARGET_ROTATE_OFF:
+			EventCameraTargetRotateOff();
+			break;
+		case AnimEventFormat.ID.TRACKING_BULLET_OFF:
+			EventTrackingBulletOff();
+			break;
+		case AnimEventFormat.ID.ACTION_RECEIVE_DAMAGE_RATE:
+			if (data.floatArgs.Length > 0)
+			{
+				actionReceiveDamageRate = data.floatArgs[0];
+			}
+			else
+			{
+				actionReceiveDamageRate = 1f;
+			}
+			break;
+		default:
+			base.OnAnimEvent(data);
+			break;
+		}
+	}
+
+	private bool SetTrailSetting()
+	{
+		bool result = false;
+		if (!animUpdatePhysics)
+		{
+			result = Trail.settingFixedUpdate;
+			Trail.settingFixedUpdate = false;
+		}
+		return result;
+	}
+
+	private bool IsOneShotPriority()
+	{
+		bool result = this is Self;
+		Enemy enemy = this as Enemy;
+		if (enemy != null)
+		{
+			result = enemy.isBoss;
+		}
+		return result;
+	}
+
+	private bool ShotAnimEvent(AnimEventData.EventData data, bool beforeTrailSetting, bool is_oneshot_priority, bool isExecEffect)
+	{
+		Transform val = null;
+		if (isExecEffect && data.id != AnimEventFormat.ID.EFFECT_TILING)
+		{
+			val = AnimEventFormat.EffectEventExec(data.id, data, base._transform, is_oneshot_priority, EffectNameAnalyzer, ((StageObject)this).FindNode, this);
+		}
+		if (!animUpdatePhysics)
+		{
+			Trail.settingFixedUpdate = beforeTrailSetting;
+		}
+		if (val != null)
+		{
+			if (data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.EFFECT_SWITCH_OBJECT_BY_CONDITION)
+			{
+				AddObjectList(val.get_gameObject(), OBJECT_LIST_TYPE.ANIM_EVENT);
+			}
+			return true;
+		}
+		if (data.id == AnimEventFormat.ID.EFFECT_TILING && isExecEffect)
+		{
+			Transform[] array = AnimEventFormat.EffectsEventExec(data.id, data, base._transform, is_oneshot_priority, EffectNameAnalyzer, ((StageObject)this).FindNode, this);
+			if (array != null)
+			{
+				int i = 0;
+				for (int num = array.Length; i < num; i++)
+				{
+					AddObjectList(array[i].get_gameObject(), OBJECT_LIST_TYPE.ANIM_EVENT);
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	protected virtual void SetFromInfo(ref BuffParam.BuffData data)
@@ -5723,10 +6352,10 @@ public class Character : StageObject, IAnimEvent
 	private IEnumerator SetEnableInputAfterSeconds(float seconds)
 	{
 		yield return (object)new WaitForSeconds(seconds);
-		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, false);
+		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, disable: false);
 	}
 
-	public void CreateContinusAttack(AnimEventData.EventData eventData, bool isSync, float exEndTime = 0)
+	public void CreateContinusAttack(AnimEventData.EventData eventData, bool isSync, float exEndTime = 0f)
 	{
 		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
@@ -5736,50 +6365,51 @@ public class Character : StageObject, IAnimEvent
 		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		if (eventData != null)
+		if (eventData == null)
 		{
-			float endTime = (float)eventData.intArgs[1];
-			if (exEndTime > 0f)
+			return;
+		}
+		float endTime = eventData.intArgs[1];
+		if (exEndTime > 0f)
+		{
+			endTime = exEndTime;
+		}
+		int eventIndex = -1;
+		int count = continusAtkEventDataList.Count;
+		for (int i = 0; i < count; i++)
+		{
+			if (continusAtkEventDataList[i] == eventData)
 			{
-				endTime = exEndTime;
+				eventIndex = i;
+				break;
 			}
-			int eventIndex = -1;
-			int count = continusAtkEventDataList.Count;
-			for (int i = 0; i < count; i++)
+		}
+		AnimEventCollider animEventCollider = CreateAttackCollider(eventData, isUseColliderList: false);
+		animEventCollider.SetFixedUpdateFlag(flag: false);
+		animEventCollider.SetFixTransformUpdateFlag(flag: false);
+		animEventCollider.ValidTriggerStay();
+		Transform val = null;
+		string text = eventData.stringArgs[2];
+		string text2 = eventData.stringArgs[3];
+		if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(text2))
+		{
+			Vector3 zero = Vector3.get_zero();
+			Quaternion localRotation = Quaternion.get_identity();
+			float[] floatArgs = eventData.floatArgs;
+			if (floatArgs.Length > 8)
 			{
-				if (continusAtkEventDataList[i] == eventData)
-				{
-					eventIndex = i;
-					break;
-				}
+				zero._002Ector(floatArgs[8], floatArgs[9], floatArgs[10]);
+				localRotation = Quaternion.Euler(floatArgs[11], floatArgs[12], floatArgs[13]);
 			}
-			AnimEventCollider animEventCollider = CreateAttackCollider(eventData, false);
-			animEventCollider.SetFixedUpdateFlag(false);
-			animEventCollider.SetFixTransformUpdateFlag(false);
-			animEventCollider.ValidTriggerStay();
-			Transform val = null;
-			string text = eventData.stringArgs[2];
-			string text2 = eventData.stringArgs[3];
-			if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(text2))
-			{
-				Vector3 zero = Vector3.get_zero();
-				Quaternion localRotation = Quaternion.get_identity();
-				float[] floatArgs = eventData.floatArgs;
-				if (floatArgs.Length > 8)
-				{
-					zero._002Ector(floatArgs[8], floatArgs[9], floatArgs[10]);
-					localRotation = Quaternion.Euler(floatArgs[11], floatArgs[12], floatArgs[13]);
-				}
-				Transform parent = Utility.Find(base._transform, text2);
-				val = EffectManager.GetEffect(text, parent);
-				val.set_localPosition(zero);
-				val.set_localRotation(localRotation);
-			}
-			continusAttackParam.Register(eventIndex, endTime, animEventCollider, val);
-			if (isSync)
-			{
-				SendContinusAttackSync();
-			}
+			Transform parent = Utility.Find(base._transform, text2);
+			val = EffectManager.GetEffect(text, parent);
+			val.set_localPosition(zero);
+			val.set_localRotation(localRotation);
+		}
+		continusAttackParam.Register(eventIndex, endTime, animEventCollider, val);
+		if (isSync)
+		{
+			SendContinusAttackSync();
 		}
 	}
 
@@ -5789,7 +6419,7 @@ public class Character : StageObject, IAnimEvent
 		if (eventIndex >= 0 && eventIndex < continusAtkEventDataList.Count)
 		{
 			AnimEventData.EventData eventData = continusAtkEventDataList[syncData.eventIndex];
-			CreateContinusAttack(eventData, false, syncData.endTime);
+			CreateContinusAttack(eventData, isSync: false, syncData.endTime);
 		}
 	}
 
@@ -5835,12 +6465,63 @@ public class Character : StageObject, IAnimEvent
 				animEventColliderList.Add(animEventCollider);
 			}
 		}
-		animEventCollider.Initialize(this, eventData, FindAttackInfo(eventData.stringArgs[0], true, false));
+		animEventCollider.Initialize(this, eventData, FindAttackInfo(eventData.stringArgs[0]));
 		if (eventData.id == AnimEventFormat.ID.ATK_COLLIDER_CAPSULE || eventData.id == AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE)
 		{
 			animEventCollider.ReserveRelease();
 		}
 		return animEventCollider;
+	}
+
+	public IEnumerator CreateMultiAttackCollider(AnimEventData.EventData eventData, bool isUseColliderList = true)
+	{
+		int generateCount = GetColliderGenerateCount(eventData);
+		AnimEventCollider[] event_colliders = new AnimEventCollider[generateCount];
+		List<AnimEventCollider> colList = new List<AnimEventCollider>(animEventColliderList);
+		for (int colIdx = 0; colIdx < generateCount; colIdx++)
+		{
+			AnimEventCollider animEventCollider = event_colliders[colIdx];
+			AnimEventCollider col = null;
+			if (isUseColliderList)
+			{
+				int i = 0;
+				for (int count = colList.Count; i < count; i++)
+				{
+					if (colList[i].isReleased)
+					{
+						col = colList[i];
+						colList.RemoveAt(i);
+						break;
+					}
+				}
+			}
+			if (col == null)
+			{
+				col = new AnimEventCollider();
+				if (isUseColliderList)
+				{
+					animEventColliderList.Add(col);
+				}
+			}
+			col.Initialize(this, eventData, FindAttackInfo(eventData.stringArgs[0]));
+			col.InitTransformSettings(this, eventData);
+			if (eventData.intArgs[2] != 12)
+			{
+				col.OverwriteObjectLayer(eventData.intArgs[2]);
+			}
+			col.ReserveRelease();
+			yield return null;
+		}
+		yield return null;
+	}
+
+	protected virtual int GetColliderGenerateCount(AnimEventData.EventData eventData)
+	{
+		if (eventData.intArgs == null || eventData.intArgs.Length < 2)
+		{
+			return 1;
+		}
+		return eventData.intArgs[1];
 	}
 
 	protected void RemoveEventCollider(string targetName)
@@ -5868,7 +6549,7 @@ public class Character : StageObject, IAnimEvent
 		enableAddForce = false;
 		if (velocityType == VELOCITY_TYPE.EVENT_MOVE)
 		{
-			SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
+			SetVelocity(Vector3.get_zero());
 		}
 		eventMoveVelocity = Vector3.get_zero();
 		eventMoveTimeCount = 0f;
@@ -5961,7 +6642,7 @@ public class Character : StageObject, IAnimEvent
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.StageChat(id, chatID);
 		}
-		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON);
 	}
 
 	public virtual void ChatSay(string message)
@@ -5970,7 +6651,7 @@ public class Character : StageObject, IAnimEvent
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatMessage(id, message);
 		}
-		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON);
 	}
 
 	public virtual void ChatSayStamp(int stamp_id)
@@ -5986,7 +6667,7 @@ public class Character : StageObject, IAnimEvent
 				MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatStamp(id, stamp_id);
 			}
 		}
-		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON);
 	}
 
 	protected void ResetStatusParam()
@@ -6001,7 +6682,7 @@ public class Character : StageObject, IAnimEvent
 		switch (type)
 		{
 		case WAITING_PACKET.CHARACTER_MOVE_VELOCITY:
-			ActIdle(false, -1f);
+			ActIdle();
 			break;
 		case WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION:
 			UpdateActionPosition(actionPositionWaitTrigger);
@@ -6010,7 +6691,7 @@ public class Character : StageObject, IAnimEvent
 			UpdateDirection(directionWaitTrigger);
 			break;
 		case WAITING_PACKET.PLAYER_APPLY_CHANGE_WEAPON:
-			ActIdle(false, -1f);
+			ActIdle();
 			break;
 		}
 		base.OnFailedWaitingPacket(type);
@@ -6114,66 +6795,68 @@ public class Character : StageObject, IAnimEvent
 
 	private void EventChangeShaderParam(AnimEventData.EventData evData)
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
 		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		if (evData != null)
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+		if (evData == null)
 		{
-			int num = evData.stringArgs.Length;
-			if (num >= 2)
+			return;
+		}
+		int num = evData.stringArgs.Length;
+		if (num < 2)
+		{
+			return;
+		}
+		string text = evData.stringArgs[0];
+		if (string.IsNullOrEmpty(text))
+		{
+			return;
+		}
+		Transform val = Utility.Find(base._transform, text);
+		if (val == null)
+		{
+			return;
+		}
+		Renderer component = val.GetComponent<Renderer>();
+		if (component == null)
+		{
+			return;
+		}
+		Material material = component.get_material();
+		if (material == null)
+		{
+			return;
+		}
+		int result = 0;
+		float result2 = 0f;
+		Color white = Color.get_white();
+		for (int i = 1; i < num; i++)
+		{
+			string[] array = evData.stringArgs[i].Split(':');
+			string text2 = array[0];
+			string text3 = array[1];
+			string text4 = array[2];
+			if (!material.HasProperty(text3) || text2 == null)
 			{
-				string text = evData.stringArgs[0];
-				if (!string.IsNullOrEmpty(text))
+				continue;
+			}
+			if (!(text2 == "F"))
+			{
+				if (!(text2 == "I"))
 				{
-					Transform val = Utility.Find(base._transform, text);
-					if (!(val == null))
+					if (text2 == "C" && ColorUtility.TryParseHtmlString("#" + text4, ref white))
 					{
-						Renderer component = val.GetComponent<Renderer>();
-						if (!(component == null))
-						{
-							Material val2 = component.get_material();
-							if (!(val2 == null))
-							{
-								int result = 0;
-								float result2 = 0f;
-								Color white = Color.get_white();
-								for (int i = 1; i < num; i++)
-								{
-									string[] array = evData.stringArgs[i].Split(':');
-									string text2 = array[0];
-									string text3 = array[1];
-									string text4 = array[2];
-									if (val2.HasProperty(text3))
-									{
-										switch (text2)
-										{
-										case "F":
-											if (float.TryParse(text4, out result2))
-											{
-												val2.SetFloat(text3, result2);
-											}
-											break;
-										case "I":
-											if (int.TryParse(text4, out result))
-											{
-												val2.SetInt(text3, result);
-											}
-											break;
-										case "C":
-											if (ColorUtility.TryParseHtmlString("#" + text4, ref white))
-											{
-												val2.SetColor(text3, white);
-											}
-											break;
-										}
-									}
-								}
-							}
-						}
+						material.SetColor(text3, white);
 					}
 				}
+				else if (int.TryParse(text4, out result))
+				{
+					material.SetInt(text3, result);
+				}
+			}
+			else if (float.TryParse(text4, out result2))
+			{
+				material.SetFloat(text3, result2);
 			}
 		}
 	}
@@ -6184,7 +6867,6 @@ public class Character : StageObject, IAnimEvent
 		{
 			Utility.MaterialForEach(m_rendererList, delegate(Material material)
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				if (material.get_shader().get_name().Contains(containsString))
 				{
 					Shader val = ResourceUtility.FindShader(shaderName);
@@ -6205,9 +6887,6 @@ public class Character : StageObject, IAnimEvent
 			string SHADER_PARAM_ALPHA_BLUR = "_Blend";
 			Utility.MaterialForEach(m_rendererList, delegate(Material material)
 			{
-				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 				if (material.HasProperty(SHADER_PARAM_ALPHA_BLUR))
 				{
 					this.StartCoroutine(ChangeShaderParam(material, SHADER_PARAM_ALPHA_BLUR, endParam, duration));
@@ -6222,40 +6901,41 @@ public class Character : StageObject, IAnimEvent
 
 	private IEnumerator ChangeShaderParam(Material mat, string propertyName, float endParam, float duration)
 	{
-		if (!(mat == null))
+		if (mat == null)
 		{
-			float timer = duration;
-			float inputParam = mat.GetFloat(propertyName);
-			bool isPlus = endParam >= inputParam;
-			bool isFinish = false;
-			while (!isFinish)
+			yield break;
+		}
+		float timer = duration;
+		float inputParam = mat.GetFloat(propertyName);
+		bool isPlus = endParam >= inputParam;
+		bool isFinish = false;
+		while (!isFinish)
+		{
+			timer -= duration * Time.get_deltaTime();
+			if (duration <= 0f)
 			{
-				timer -= duration * Time.get_deltaTime();
-				if (duration <= 0f)
-				{
-					inputParam = endParam;
-				}
-				else if (isPlus)
-				{
-					float calcedParam2 = endParam / duration * Time.get_deltaTime();
-					inputParam += calcedParam2;
-				}
-				else
-				{
-					float calcedParam2 = inputParam / duration * Time.get_deltaTime();
-					inputParam -= calcedParam2;
-				}
-				if ((isPlus && inputParam >= endParam) || (!isPlus && inputParam <= endParam))
-				{
-					inputParam = endParam;
-				}
-				mat.SetFloat(propertyName, inputParam);
-				if (timer <= 0f)
-				{
-					isFinish = true;
-				}
-				yield return (object)null;
+				inputParam = endParam;
 			}
+			else if (isPlus)
+			{
+				float calcedParam2 = endParam / duration * Time.get_deltaTime();
+				inputParam += calcedParam2;
+			}
+			else
+			{
+				float calcedParam2 = inputParam / duration * Time.get_deltaTime();
+				inputParam -= calcedParam2;
+			}
+			if ((isPlus && inputParam >= endParam) || (!isPlus && inputParam <= endParam))
+			{
+				inputParam = endParam;
+			}
+			mat.SetFloat(propertyName, inputParam);
+			if (timer <= 0f)
+			{
+				isFinish = true;
+			}
+			yield return null;
 		}
 	}
 
@@ -6278,5 +6958,28 @@ public class Character : StageObject, IAnimEvent
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		pos = Vector3.get_zero();
 		return false;
+	}
+
+	public virtual bool IsCarrying()
+	{
+		return false;
+	}
+
+	public void OnCheckAndResizeColliderOsMapByWeapon(int weapontId)
+	{
+		OnResizeColliderOfMap();
+	}
+
+	private void OnResizeColliderOfMap()
+	{
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 colliderOfMapScale = MonoBehaviourSingleton<GoGameSettingsManager>.I.colliderOfMapScale;
+		MonoBehaviourSingleton<SceneSettingsManager>.I.OnResizeGObjContainColliders(colliderOfMapScale);
+	}
+
+	public void OnCheckAndResizeColliderOsMapByEnemy(int enemyId)
+	{
 	}
 }

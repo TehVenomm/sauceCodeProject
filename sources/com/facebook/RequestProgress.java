@@ -17,26 +17,31 @@ class RequestProgress {
         this.callbackHandler = handler;
     }
 
-    void addProgress(long j) {
+    /* access modifiers changed from: 0000 */
+    public void addProgress(long j) {
         this.progress += j;
         if (this.progress >= this.lastReportedProgress + this.threshold || this.progress >= this.maxProgress) {
             reportProgress();
         }
     }
 
-    void addToMax(long j) {
+    /* access modifiers changed from: 0000 */
+    public void addToMax(long j) {
         this.maxProgress += j;
     }
 
-    long getMaxProgress() {
+    /* access modifiers changed from: 0000 */
+    public long getMaxProgress() {
         return this.maxProgress;
     }
 
-    long getProgress() {
+    /* access modifiers changed from: 0000 */
+    public long getProgress() {
         return this.progress;
     }
 
-    void reportProgress() {
+    /* access modifiers changed from: 0000 */
+    public void reportProgress() {
         if (this.progress > this.lastReportedProgress) {
             Callback callback = this.request.getCallback();
             if (this.maxProgress > 0 && (callback instanceof OnProgressCallback)) {

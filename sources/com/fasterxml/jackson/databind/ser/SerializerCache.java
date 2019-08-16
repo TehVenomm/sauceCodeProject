@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class SerializerCache {
-    private final AtomicReference<ReadOnlyClassToSerializerMap> _readOnlyMap = new AtomicReference();
-    private final HashMap<TypeKey, JsonSerializer<Object>> _sharedMap = new HashMap(64);
+    private final AtomicReference<ReadOnlyClassToSerializerMap> _readOnlyMap = new AtomicReference<>();
+    private final HashMap<TypeKey, JsonSerializer<Object>> _sharedMap = new HashMap<>(64);
 
     public ReadOnlyClassToSerializerMap getReadOnlyLookupMap() {
         ReadOnlyClassToSerializerMap readOnlyClassToSerializerMap = (ReadOnlyClassToSerializerMap) this._readOnlyMap.get();
@@ -35,7 +35,7 @@ public final class SerializerCache {
     public JsonSerializer<Object> untypedValueSerializer(Class<?> cls) {
         JsonSerializer<Object> jsonSerializer;
         synchronized (this) {
-            jsonSerializer = (JsonSerializer) this._sharedMap.get(new TypeKey((Class) cls, false));
+            jsonSerializer = (JsonSerializer) this._sharedMap.get(new TypeKey(cls, false));
         }
         return jsonSerializer;
     }
@@ -59,7 +59,7 @@ public final class SerializerCache {
     public JsonSerializer<Object> typedValueSerializer(Class<?> cls) {
         JsonSerializer<Object> jsonSerializer;
         synchronized (this) {
-            jsonSerializer = (JsonSerializer) this._sharedMap.get(new TypeKey((Class) cls, true));
+            jsonSerializer = (JsonSerializer) this._sharedMap.get(new TypeKey(cls, true));
         }
         return jsonSerializer;
     }
@@ -74,7 +74,7 @@ public final class SerializerCache {
 
     public void addTypedSerializer(Class<?> cls, JsonSerializer<Object> jsonSerializer) {
         synchronized (this) {
-            if (this._sharedMap.put(new TypeKey((Class) cls, true), jsonSerializer) == null) {
+            if (this._sharedMap.put(new TypeKey(cls, true), jsonSerializer) == null) {
                 this._readOnlyMap.set(null);
             }
         }
@@ -82,7 +82,7 @@ public final class SerializerCache {
 
     public void addAndResolveNonTypedSerializer(Class<?> cls, JsonSerializer<Object> jsonSerializer, SerializerProvider serializerProvider) throws JsonMappingException {
         synchronized (this) {
-            if (this._sharedMap.put(new TypeKey((Class) cls, false), jsonSerializer) == null) {
+            if (this._sharedMap.put(new TypeKey(cls, false), jsonSerializer) == null) {
                 this._readOnlyMap.set(null);
             }
             if (jsonSerializer instanceof ResolvableSerializer) {
@@ -104,7 +104,7 @@ public final class SerializerCache {
 
     public void addAndResolveNonTypedSerializer(Class<?> cls, JavaType javaType, JsonSerializer<Object> jsonSerializer, SerializerProvider serializerProvider) throws JsonMappingException {
         synchronized (this) {
-            Object put = this._sharedMap.put(new TypeKey((Class) cls, false), jsonSerializer);
+            Object put = this._sharedMap.put(new TypeKey(cls, false), jsonSerializer);
             Object put2 = this._sharedMap.put(new TypeKey(javaType, false), jsonSerializer);
             if (put == null || put2 == null) {
                 this._readOnlyMap.set(null);

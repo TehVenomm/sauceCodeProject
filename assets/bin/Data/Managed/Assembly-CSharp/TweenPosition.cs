@@ -19,8 +19,6 @@ public class TweenPosition : UITweener
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
 			if (mTrans == null)
 			{
 				mTrans = this.get_transform();
@@ -100,12 +98,12 @@ public class TweenPosition : UITweener
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration, true);
+		TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration);
 		tweenPosition.from = tweenPosition.value;
 		tweenPosition.to = pos;
 		if (duration <= 0f)
 		{
-			tweenPosition.Sample(1f, true);
+			tweenPosition.Sample(1f, isFinished: true);
 			tweenPosition.set_enabled(false);
 		}
 		return tweenPosition;
@@ -117,13 +115,13 @@ public class TweenPosition : UITweener
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration, true);
+		TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration);
 		tweenPosition.worldSpace = worldSpace;
 		tweenPosition.from = tweenPosition.value;
 		tweenPosition.to = pos;
 		if (duration <= 0f)
 		{
-			tweenPosition.Sample(1f, true);
+			tweenPosition.Sample(1f, isFinished: true);
 			tweenPosition.set_enabled(false);
 		}
 		return tweenPosition;

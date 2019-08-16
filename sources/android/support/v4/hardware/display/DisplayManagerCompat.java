@@ -1,45 +1,33 @@
-package android.support.v4.hardware.display;
+package android.support.p000v4.hardware.display;
 
 import android.content.Context;
+import android.hardware.display.DisplayManager;
 import android.os.Build.VERSION;
+import android.support.annotation.RequiresApi;
 import android.view.Display;
 import android.view.WindowManager;
+import com.facebook.internal.ServerProtocol;
 import java.util.WeakHashMap;
 
+/* renamed from: android.support.v4.hardware.display.DisplayManagerCompat */
 public abstract class DisplayManagerCompat {
     public static final String DISPLAY_CATEGORY_PRESENTATION = "android.hardware.display.category.PRESENTATION";
-    private static final WeakHashMap<Context, DisplayManagerCompat> sInstances = new WeakHashMap();
+    private static final WeakHashMap<Context, DisplayManagerCompat> sInstances = new WeakHashMap<>();
 
-    private static class JellybeanMr1Impl extends DisplayManagerCompat {
-        private final Object mDisplayManagerObj;
-
-        public JellybeanMr1Impl(Context context) {
-            this.mDisplayManagerObj = DisplayManagerJellybeanMr1.getDisplayManager(context);
-        }
-
-        public Display getDisplay(int i) {
-            return DisplayManagerJellybeanMr1.getDisplay(this.mDisplayManagerObj, i);
-        }
-
-        public Display[] getDisplays() {
-            return DisplayManagerJellybeanMr1.getDisplays(this.mDisplayManagerObj);
-        }
-
-        public Display[] getDisplays(String str) {
-            return DisplayManagerJellybeanMr1.getDisplays(this.mDisplayManagerObj, str);
-        }
-    }
-
-    private static class LegacyImpl extends DisplayManagerCompat {
+    /* renamed from: android.support.v4.hardware.display.DisplayManagerCompat$DisplayManagerCompatApi14Impl */
+    private static class DisplayManagerCompatApi14Impl extends DisplayManagerCompat {
         private final WindowManager mWindowManager;
 
-        public LegacyImpl(Context context) {
+        DisplayManagerCompatApi14Impl(Context context) {
             this.mWindowManager = (WindowManager) context.getSystemService("window");
         }
 
         public Display getDisplay(int i) {
             Display defaultDisplay = this.mWindowManager.getDefaultDisplay();
-            return defaultDisplay.getDisplayId() == i ? defaultDisplay : null;
+            if (defaultDisplay.getDisplayId() == i) {
+                return defaultDisplay;
+            }
+            return null;
         }
 
         public Display[] getDisplays() {
@@ -51,6 +39,28 @@ public abstract class DisplayManagerCompat {
         }
     }
 
+    @RequiresApi(17)
+    /* renamed from: android.support.v4.hardware.display.DisplayManagerCompat$DisplayManagerCompatApi17Impl */
+    private static class DisplayManagerCompatApi17Impl extends DisplayManagerCompat {
+        private final DisplayManager mDisplayManager;
+
+        DisplayManagerCompatApi17Impl(Context context) {
+            this.mDisplayManager = (DisplayManager) context.getSystemService(ServerProtocol.DIALOG_PARAM_DISPLAY);
+        }
+
+        public Display getDisplay(int i) {
+            return this.mDisplayManager.getDisplay(i);
+        }
+
+        public Display[] getDisplays() {
+            return this.mDisplayManager.getDisplays();
+        }
+
+        public Display[] getDisplays(String str) {
+            return this.mDisplayManager.getDisplays(str);
+        }
+    }
+
     DisplayManagerCompat() {
     }
 
@@ -59,7 +69,7 @@ public abstract class DisplayManagerCompat {
         synchronized (sInstances) {
             displayManagerCompat = (DisplayManagerCompat) sInstances.get(context);
             if (displayManagerCompat == null) {
-                displayManagerCompat = VERSION.SDK_INT >= 17 ? new JellybeanMr1Impl(context) : new LegacyImpl(context);
+                displayManagerCompat = VERSION.SDK_INT >= 17 ? new DisplayManagerCompatApi17Impl(context) : new DisplayManagerCompatApi14Impl(context);
                 sInstances.put(context, displayManagerCompat);
             }
         }

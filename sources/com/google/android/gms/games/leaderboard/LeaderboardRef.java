@@ -2,20 +2,20 @@ package com.google.android.gms.games.leaderboard;
 
 import android.database.CharArrayBuffer;
 import android.net.Uri;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameRef;
 import java.util.ArrayList;
 
-public final class LeaderboardRef extends zzc implements Leaderboard {
-    private final Game zzhkx;
-    private final int zzhky;
+public final class LeaderboardRef extends DataBufferRef implements Leaderboard {
+    private final Game zznw;
+    private final int zznx;
 
     LeaderboardRef(DataHolder dataHolder, int i, int i2) {
         super(dataHolder, i);
-        this.zzhky = i2;
-        this.zzhkx = new GameRef(dataHolder, i);
+        this.zznx = i2;
+        this.zznw = new GameRef(dataHolder, i);
     }
 
     public final boolean equals(Object obj) {
@@ -31,15 +31,15 @@ public final class LeaderboardRef extends zzc implements Leaderboard {
     }
 
     public final void getDisplayName(CharArrayBuffer charArrayBuffer) {
-        zza("name", charArrayBuffer);
+        copyToBuffer("name", charArrayBuffer);
     }
 
     public final Game getGame() {
-        return this.zzhkx;
+        return this.zznw;
     }
 
     public final Uri getIconImageUri() {
-        return zzfu("board_icon_image_uri");
+        return parseUri("board_icon_image_uri");
     }
 
     public final String getIconImageUrl() {
@@ -55,9 +55,9 @@ public final class LeaderboardRef extends zzc implements Leaderboard {
     }
 
     public final ArrayList<LeaderboardVariant> getVariants() {
-        ArrayList<LeaderboardVariant> arrayList = new ArrayList(this.zzhky);
-        for (int i = 0; i < this.zzhky; i++) {
-            arrayList.add(new zzc(this.zzfkz, this.zzfqb + i));
+        ArrayList<LeaderboardVariant> arrayList = new ArrayList<>(this.zznx);
+        for (int i = 0; i < this.zznx; i++) {
+            arrayList.add(new zzb(this.mDataHolder, this.mDataRow + i));
         }
         return arrayList;
     }

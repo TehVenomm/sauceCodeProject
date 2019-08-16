@@ -7,10 +7,6 @@ public class BreakObject : GimmickObject
 
 	protected override bool IsValidAttackedHit(StageObject from_object)
 	{
-		if (!(from_object is Enemy))
-		{
-			return false;
-		}
 		return base.IsValidAttackedHit(from_object);
 	}
 
@@ -28,14 +24,39 @@ public class BreakObject : GimmickObject
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		base.OnAttackedHitFix(status);
-		if (status.damage > 0 && status.fromType == OBJECT_TYPE.ENEMY)
+		if (IsBreakable(status))
 		{
-			EffectManager.OneShot(breakEffectName, _position, _rotation, false);
+			EffectManager.OneShot(breakEffectName, _position, _rotation);
 			this.get_gameObject().SetActive(false);
 		}
+	}
+
+	protected bool IsBreakable(AttackedHitStatusFix _fixedStatus)
+	{
+		if (_fixedStatus.attackInfo != null && _fixedStatus.attackInfo.isBreakObject)
+		{
+			return true;
+		}
+		if (_fixedStatus.fromType == OBJECT_TYPE.ENEMY && _fixedStatus.damage > 0)
+		{
+			return true;
+		}
+		if (_fixedStatus.fromType == OBJECT_TYPE.PLAYER)
+		{
+			return IsBreakableAttack(_fixedStatus.attackInfo.attackType);
+		}
+		return false;
+	}
+
+	protected bool IsBreakableAttack(AttackHitInfo.ATTACK_TYPE _type)
+	{
+		if (_type == AttackHitInfo.ATTACK_TYPE.BURST_THS_SINGLE_SHOT || _type == AttackHitInfo.ATTACK_TYPE.BURST_THS_FULL_BURST)
+		{
+			return true;
+		}
+		return false;
 	}
 }

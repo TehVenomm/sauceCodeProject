@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class QuestRoomObserver
+public class QuestRoomObserver : MonoBehaviour
 {
 	public bool fromSearchSection;
 
@@ -40,7 +41,6 @@ public class QuestRoomObserver
 
 	public QuestRoomObserver Initialize(bool from_search_section, bool is_entry_pass, Action<string> _dispatch_callback, Action<string> _change_event_callback, Action _stay_event_callback, Action<bool> _resume_event_callback, bool? is_update_observe = default(bool?))
 	{
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		fromSearchSection = from_search_section;
 		isEntryPass = is_entry_pass;
 		dispatchCallBack = _dispatch_callback;
@@ -69,60 +69,59 @@ public class QuestRoomObserver
 
 	private void Update()
 	{
-		if (isObserve)
+		if (!isObserve)
 		{
-			if ((!IsValidParty() || !IsConnect()) && !queryInvalidRoom)
+			return;
+		}
+		if ((!IsValidParty() || !IsConnect()) && !queryInvalidRoom)
+		{
+			if (!checkInviteListDone)
 			{
-				if (!checkInviteListDone)
+				if (MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
 				{
-					if (MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
+					if (!isSendingInviteList)
 					{
-						if (!isSendingInviteList)
+						if (!GameSceneEvent.IsStay())
 						{
-							if (!GameSceneEvent.IsStay())
-							{
-								GameSceneEvent.Stay();
-								isStayEvent = true;
-							}
-							MonoBehaviourSingleton<PartyManager>.I.SendInvitedParty(delegate
-							{
-								if (isStayEvent)
-								{
-									GameSceneEvent.Resume(null);
-								}
-								checkInviteListDone = true;
-							}, false);
-							isSendingInviteList = true;
+							GameSceneEvent.Stay();
+							isStayEvent = true;
 						}
-					}
-					else
-					{
-						checkInviteListDone = true;
+						MonoBehaviourSingleton<PartyManager>.I.SendInvitedParty(delegate
+						{
+							if (isStayEvent)
+							{
+								GameSceneEvent.Resume();
+							}
+							checkInviteListDone = true;
+						});
+						isSendingInviteList = true;
 					}
 				}
 				else
 				{
-					string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-					if (section != null && section.sectionData != (GameSceneTables.SectionData)null && section.sectionData.sectionName == currentSectionName && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-					{
-						queryInvalidRoom = true;
-						if (dispatchCallBack != null)
-						{
-							dispatchCallBack("INVALID_ROOM");
-							OffObserve();
-						}
-					}
+					checkInviteListDone = true;
+				}
+				return;
+			}
+			string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
+			if (section != null && section.sectionData != null && section.sectionData.sectionName == currentSectionName && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+			{
+				queryInvalidRoom = true;
+				if (dispatchCallBack != null)
+				{
+					dispatchCallBack("INVALID_ROOM");
+					OffObserve();
 				}
 			}
-			else if (sendInfoSpan.IsReady())
+		}
+		else if (sendInfoSpan.IsReady())
+		{
+			Protocol.Try(delegate
 			{
-				Protocol.Try(delegate
+				MonoBehaviourSingleton<PartyManager>.I.SendInfo(delegate
 				{
-					MonoBehaviourSingleton<PartyManager>.I.SendInfo(delegate
-					{
-					});
 				});
-			}
+			});
 		}
 	}
 
@@ -134,7 +133,7 @@ public class QuestRoomObserver
 			if (!isEntryPass)
 			{
 				stayEventCallBack();
-				resumeEventCallBack(true);
+				resumeEventCallBack(obj: true);
 			}
 		}
 	}

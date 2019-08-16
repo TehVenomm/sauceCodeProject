@@ -26,6 +26,7 @@ public class Connection {
 
         @NonNull
         public static Status getStatus(String str) {
+            Status[] values;
             for (Status status : values()) {
                 if (status.getValue().equals(str)) {
                     return status;
@@ -39,8 +40,11 @@ public class Connection {
         }
     }
 
-    public Connection(Status status) {
-        this.status = status.getValue();
+    public Connection() {
+    }
+
+    public Connection(Status status2) {
+        this.status = status2.getValue();
     }
 
     @Nullable

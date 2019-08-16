@@ -5,13 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build.VERSION;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.p000v4.app.FragmentManager;
+import android.support.p000v4.app.FragmentTransaction;
+import android.support.p003v7.app.AppCompatActivity;
+import android.support.p003v7.widget.Toolbar;
 import android.view.MenuItem;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import com.zopim.android.sdk.api.Chat;
 import com.zopim.android.sdk.api.Logger;
 import com.zopim.android.sdk.api.ZopimChat;
@@ -28,14 +27,14 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
     private boolean mChatInitialized = false;
 
     private void resumeChat() {
-        Logger.m564v(LOG_TAG, "Resuming chat");
+        Logger.m577v(LOG_TAG, "Resuming chat");
         this.mChat = ZopimChat.resume(this);
         this.mChatInitialized = !this.mChat.hasEnded();
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         if (supportFragmentManager.findFragmentByTag(ZopimChatLogFragment.class.getName()) == null) {
-            Fragment zopimChatLogFragment = new ZopimChatLogFragment();
+            ZopimChatLogFragment zopimChatLogFragment = new ZopimChatLogFragment();
             FragmentTransaction beginTransaction = supportFragmentManager.beginTransaction();
-            beginTransaction.add(C0785R.id.chat_fragment_container, zopimChatLogFragment, ZopimChatLogFragment.class.getName());
+            beginTransaction.add(C1122R.C1125id.chat_fragment_container, zopimChatLogFragment, ZopimChatLogFragment.class.getName());
             beginTransaction.commit();
         }
     }
@@ -58,10 +57,11 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
         this.mChat = chat;
     }
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(C0785R.layout.zopim_chat_activity);
-        setSupportActionBar((Toolbar) findViewById(C0785R.id.toolbar));
+        setContentView(C1122R.C1126layout.zopim_chat_activity);
+        setSupportActionBar((Toolbar) findViewById(C1122R.C1125id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (bundle != null) {
             this.mChatInitialized = bundle.getBoolean(STATE_CHAT_INITIALIZED, false);
@@ -81,16 +81,17 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
                 if (getIntent() != null && getIntent().hasExtra(EXTRA_CHAT_CONFIG)) {
                     sessionConfig = (SessionConfig) getIntent().getSerializableExtra(EXTRA_CHAT_CONFIG);
                 }
-                Fragment newInstance = sessionConfig != null ? ZopimChatFragment.newInstance(sessionConfig) : new ZopimChatFragment();
+                ZopimChatFragment zopimChatFragment = sessionConfig != null ? ZopimChatFragment.newInstance(sessionConfig) : new ZopimChatFragment();
                 FragmentTransaction beginTransaction = supportFragmentManager.beginTransaction();
-                beginTransaction.add(C0785R.id.chat_fragment_container, newInstance, ZopimChatFragment.class.getName());
+                beginTransaction.add(C1122R.C1125id.chat_fragment_container, zopimChatFragment, ZopimChatFragment.class.getName());
                 beginTransaction.commit();
             }
         }
     }
 
-    protected void onDestroy() {
-        Logger.m564v(LOG_TAG, "Activity destroyed");
+    /* access modifiers changed from: protected */
+    public void onDestroy() {
+        Logger.m577v(LOG_TAG, "Activity destroyed");
         super.onDestroy();
     }
 
@@ -102,18 +103,21 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
         return super.onOptionsItemSelected(menuItem);
     }
 
-    protected void onSaveInstanceState(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         bundle.putBoolean(STATE_CHAT_INITIALIZED, this.mChatInitialized);
     }
 
-    protected void onStart() {
+    /* access modifiers changed from: protected */
+    public void onStart() {
         super.onStart();
         stopService(new Intent(this, ChatWidgetService.class));
     }
 
+    /* access modifiers changed from: protected */
     @TargetApi(11)
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         boolean isFinishing = VERSION.SDK_INT >= 11 ? !isChangingConfigurations() : isFinishing();
         if (!isFinishing) {
@@ -121,7 +125,7 @@ public class ZopimChatActivity extends AppCompatActivity implements ChatListener
         }
         if (!this.mChatInitialized) {
             this.mChat.endChat();
-            Logger.m562i(LOG_TAG, "Chat initialization aborted. Ending chat.");
+            Logger.m575i(LOG_TAG, "Chat initialization aborted. Ending chat.");
             finish();
         } else if (getSupportFragmentManager().findFragmentByTag(ZopimChatFragment.class.getName()) != null) {
             this.mChat.endChat();

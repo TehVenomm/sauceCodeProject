@@ -40,7 +40,6 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -50,13 +49,13 @@ public abstract class QuestSearchListSelectBase : GameSection
 		bool is_recv = false;
 		SendGetChallengeInfo(delegate
 		{
-			((_003CDoInitialize_003Ec__IteratorB3)/*Error near IL_003d: stateMachine*/)._003Cis_recv_003E__0 = true;
+			is_recv = true;
 		}, null);
 		while (!is_recv)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		yield return (object)this.StartCoroutine(Reload(null));
+		yield return this.StartCoroutine(Reload());
 		base.Initialize();
 	}
 
@@ -65,11 +64,11 @@ public abstract class QuestSearchListSelectBase : GameSection
 		bool is_recv = false;
 		SendSearchRequest(delegate
 		{
-			((_003CReload_003Ec__IteratorB4)/*Error near IL_002e: stateMachine*/)._003Cis_recv_003E__0 = true;
+			is_recv = true;
 		}, cb);
 		while (!is_recv)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		SetDirty(UI.GRD_QUEST);
 		RefreshUI();
@@ -109,34 +108,46 @@ public abstract class QuestSearchListSelectBase : GameSection
 		SetLabelText(t, UI.LBL_LV, base.sectionData.GetText("LV"));
 	}
 
+	protected void SetStatusIconInfo(PartyModel.Party _partyParam, Transform _targetObject)
+	{
+		if (!(_targetObject == null) && _partyParam != null)
+		{
+			QuestUserStatusIconController componentInChildren = _targetObject.GetComponentInChildren<QuestUserStatusIconController>();
+			if (componentInChildren != null)
+			{
+				componentInChildren.Initialize(new QuestUserStatusIconController.InitParam
+				{
+					StatusBit = (uint)_partyParam.iconBit
+				});
+			}
+		}
+	}
+
 	public virtual void OnQuery_SELECT_ROOM()
 	{
 		int index = (int)GameSection.GetEventData();
-		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint)MonoBehaviourSingleton<PartyManager>.I.partys[index].quest.questId, true))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint)MonoBehaviourSingleton<PartyManager>.I.partys[index].quest.questId))
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		GameSection.SetEventData(new object[1]
 		{
-			GameSection.SetEventData(new object[1]
-			{
-				false
-			});
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<PartyManager>.I.partys[index].id, false, delegate(bool is_success)
-			{
-				GameSection.ResumeEvent(is_success, null);
-			});
-		}
+			false
+		});
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<PartyManager>.I.partys[index].id, isLoungeBoard: false, delegate(bool is_success)
+		{
+			GameSection.ResumeEvent(is_success);
+		});
 	}
 
 	public virtual void OnQuery_RELOAD()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		GameSection.StayEvent();
 		this.StartCoroutine(Reload(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b);
 		}));
 	}
 
@@ -151,10 +162,9 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	public void OnCloseDialog_QuestAcceptRoomInvalid()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(Reload(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b);
 		}));
 	}
 
@@ -171,5 +181,27 @@ public abstract class QuestSearchListSelectBase : GameSection
 				cb(is_success);
 			}
 		});
+	}
+
+	protected void SetMemberIcon(Transform t, QuestTable.QuestTableData table)
+	{
+		if (table != null)
+		{
+			SetActive(t, UI.TGL_MEMBER_3, is_visible: true);
+			SetActive(t, UI.TGL_MEMBER_2, is_visible: true);
+			SetActive(t, UI.TGL_MEMBER_1, is_visible: true);
+			if (table.userNumLimit < 4)
+			{
+				SetActive(t, UI.TGL_MEMBER_3, is_visible: false);
+			}
+			if (table.userNumLimit < 3)
+			{
+				SetActive(t, UI.TGL_MEMBER_2, is_visible: false);
+			}
+			if (table.userNumLimit < 2)
+			{
+				SetActive(t, UI.TGL_MEMBER_1, is_visible: false);
+			}
+		}
 	}
 }

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(UISprite))]
-public class ResultExpGaugeCtrl
+public class ResultExpGaugeCtrl : MonoBehaviour
 {
 	public AnimationCurve lvUpCurve;
 
@@ -101,20 +101,18 @@ public class ResultExpGaugeCtrl
 		if (time >= 0f)
 		{
 			UpdateCurveEvaluate();
+			return;
 		}
-		else
-		{
-			time = 0f;
-			addCountExpValue = 0f;
-		}
+		time = 0f;
+		addCountExpValue = 0f;
 	}
 
 	public void UpdateCurveEvaluate()
 	{
 		bool flag = remainLevelUpCnt > 0;
-		float num = (float)((int)levelTable.needExp - (int)nowLevelTable.needExp);
+		float num = (int)levelTable.needExp - (int)nowLevelTable.needExp;
 		float num2 = flag ? num : ((nowLevel != startLevel) ? (totalExp - (float)(int)nowLevelTable.needExp) : getExp);
-		float num3 = (float)(int)nowLevelTable.needExp;
+		float num3 = (int)nowLevelTable.needExp;
 		if (nowLevel == startLevel)
 		{
 			num3 = startExp;
@@ -135,68 +133,69 @@ public class ResultExpGaugeCtrl
 
 	public void Update()
 	{
-		if (isProgressAnim)
+		if (!isProgressAnim)
 		{
-			if (getExp > 0f)
+			return;
+		}
+		if (getExp > 0f)
+		{
+			bool flag = false;
+			bool arg = false;
+			beforeUpdateLevel = nowLevel;
+			UpdateCurveEvaluate();
+			float num = addCountExpValue;
+			if (num >= totalExp || skip)
 			{
-				bool flag = false;
-				bool arg = false;
-				beforeUpdateLevel = nowLevel;
-				UpdateCurveEvaluate();
-				float num = addCountExpValue;
-				if (num >= totalExp || skip)
-				{
-					flag = skip;
-					skip = false;
-					num = totalExp;
-					isProgressAnim = false;
-					isEnd = true;
-					if (callBack != null)
-					{
-						callBack();
-					}
-				}
-				float num2 = 0f;
-				do
-				{
-					num2 = (num - (float)(int)nowLevelTable.needExp) / (float)((int)levelTable.needExp - (int)nowLevelTable.needExp);
-					if (num2 >= 1f)
-					{
-						arg = true;
-						progress.fillAmount = 0f;
-						nowLevel++;
-						remainLevelUpCnt--;
-						time = -1f;
-						UpdateAddCountExp(nowLevel);
-						if ((int)nowLevelTable.lv >= Singleton<UserLevelTable>.I.GetMaxLevel())
-						{
-							num2 = 0f;
-							progress.fillAmount = num2;
-						}
-						if (!flag)
-						{
-							num = (float)(int)nowLevelTable.needExp;
-						}
-					}
-					else
-					{
-						progress.fillAmount = num2;
-					}
-				}
-				while (num2 >= 1f);
-				if (OnUpdate != null)
-				{
-					OnUpdate(arg, (int)(num - startExp), this);
-				}
-			}
-			else
-			{
+				flag = skip;
+				skip = false;
+				num = totalExp;
 				isProgressAnim = false;
 				isEnd = true;
 				if (callBack != null)
 				{
 					callBack();
 				}
+			}
+			float num2 = 0f;
+			do
+			{
+				num2 = (num - (float)(int)nowLevelTable.needExp) / (float)((int)levelTable.needExp - (int)nowLevelTable.needExp);
+				if (num2 >= 1f)
+				{
+					arg = true;
+					progress.fillAmount = 0f;
+					nowLevel++;
+					remainLevelUpCnt--;
+					time = -1f;
+					UpdateAddCountExp(nowLevel);
+					if ((int)nowLevelTable.lv >= Singleton<UserLevelTable>.I.GetMaxLevel())
+					{
+						num2 = 0f;
+						progress.fillAmount = num2;
+					}
+					if (!flag)
+					{
+						num = (int)nowLevelTable.needExp;
+					}
+				}
+				else
+				{
+					progress.fillAmount = num2;
+				}
+			}
+			while (num2 >= 1f);
+			if (OnUpdate != null)
+			{
+				OnUpdate(arg, (int)(num - startExp), this);
+			}
+		}
+		else
+		{
+			isProgressAnim = false;
+			isEnd = true;
+			if (callBack != null)
+			{
+				callBack();
 			}
 		}
 	}

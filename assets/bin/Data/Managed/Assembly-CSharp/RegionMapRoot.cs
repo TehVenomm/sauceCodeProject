@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class RegionMapRoot
+public class RegionMapRoot : MonoBehaviour
 {
 	[SerializeField]
 	public Material roadMaterial;
@@ -59,7 +59,6 @@ public class RegionMapRoot
 
 	public void InitPortalStatus(Action onComplete)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(InitPortalStatusImpl(onComplete));
 	}
 
@@ -67,17 +66,17 @@ public class RegionMapRoot
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
 		UIntKeyTable<LoadObject> loadTextures = new UIntKeyTable<LoadObject>();
-		for (int k = 0; k < locations.Length; k++)
+		for (int i = 0; i < locations.Length; i++)
 		{
-			FieldMapTable.FieldMapTableData tableData = locations[k].tableData;
+			FieldMapTable.FieldMapTableData tableData = locations[i].tableData;
 			if (tableData != null && tableData.hasChildRegion && loadTextures.Get(tableData.iconId) == null)
 			{
-				loadTextures.Add(tableData.iconId, loadQueue.Load(RESOURCE_CATEGORY.DUNGEON_ICON, ResourceName.GetDungeonIcon(tableData.iconId), false));
+				loadTextures.Add(tableData.iconId, loadQueue.Load(RESOURCE_CATEGORY.DUNGEON_ICON, ResourceName.GetDungeonIcon(tableData.iconId)));
 			}
 		}
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		for (int j = 0; j < locations.Length; j++)
 		{
@@ -87,12 +86,12 @@ public class RegionMapRoot
 				locations[j].icon = (loadTextures.Get(tableData2.iconId).loadedObject as Texture2D);
 			}
 		}
-		for (int i = 0; i < portals.Length; i++)
+		for (int k = 0; k < portals.Length; k++)
 		{
-			RegionMapPortal portal = portals[i];
-			if (portal.IsVisited())
+			RegionMapPortal regionMapPortal = portals[k];
+			if (regionMapPortal.IsVisited())
 			{
-				portal.Open();
+				regionMapPortal.Open();
 			}
 		}
 		onComplete?.Invoke();

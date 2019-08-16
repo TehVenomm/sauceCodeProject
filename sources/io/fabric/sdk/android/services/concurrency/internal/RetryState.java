@@ -1,18 +1,19 @@
-package io.fabric.sdk.android.services.concurrency.internal;
+package p017io.fabric.sdk.android.services.concurrency.internal;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.internal.RetryState */
 public class RetryState {
     private final Backoff backoff;
     private final int retryCount;
     private final RetryPolicy retryPolicy;
 
-    public RetryState(int i, Backoff backoff, RetryPolicy retryPolicy) {
+    public RetryState(int i, Backoff backoff2, RetryPolicy retryPolicy2) {
         this.retryCount = i;
-        this.backoff = backoff;
-        this.retryPolicy = retryPolicy;
+        this.backoff = backoff2;
+        this.retryPolicy = retryPolicy2;
     }
 
-    public RetryState(Backoff backoff, RetryPolicy retryPolicy) {
-        this(0, backoff, retryPolicy);
+    public RetryState(Backoff backoff2, RetryPolicy retryPolicy2) {
+        this(0, backoff2, retryPolicy2);
     }
 
     public Backoff getBackoff() {

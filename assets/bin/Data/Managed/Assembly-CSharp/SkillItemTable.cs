@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
@@ -17,8 +18,6 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 				maxLevel = _max_lv;
 			}
 		}
-
-		public const string NT = "skillItemId,appVer,type,name,text,rarity,modelId,R,G,B,iconId,maxLv,growId,needExp,giveExp,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,price,enableEquipType,castTime,useGauge,castStateName,actStateName,startEffectName,startSEID,actLocalEffectName,actOneshotEffectName,actSEID,enchantEffectName,reactionType,bulletName,attackInfoNames0,attackInfoNames1,attackInfoNames2,attackInfoNames3,attackInfoNames4,selfOnly,skillAtk,skillAtkType,skillAtkRate,hitEffectName,hitSEID,skillRange,healHp,healType,supportPassiveEqType1,supportType1,supportValue1,supportTime1,supportEffectName1,supportPassiveEqType2,supportType2,supportValue2,supportTime2,supportEffectName2,supportPassiveEqType3,supportType3,supportValue3,supportTime3,supportEffectName3,supportPassiveSpAttackType,buffTableIds,lockBuffTypes";
 
 		public uint id;
 
@@ -64,6 +63,8 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 		public XorInt useGauge;
 
+		public XorInt useGauge2;
+
 		public string castStateName;
 
 		public string actStateName;
@@ -80,8 +81,6 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 		public string enchantEffectName;
 
-		public AttackHitInfo.ToEnemy.REACTION_TYPE reactionType;
-
 		public string bulletName;
 
 		public string[] attackInfoNames;
@@ -90,9 +89,9 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 		public XorInt skillAtk;
 
-		public ELEMENT_TYPE skillAtkType;
+		public ELEMENT_TYPE[] skillAtkTypes;
 
-		public XorInt skillAtkRate;
+		public XorInt[] skillAtkRates;
 
 		public string hitEffectName;
 
@@ -120,7 +119,37 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 		public int[] lockBuffTypes;
 
+		public bool isTeleportation;
+
+		public string exceedExtraText;
+
 		private UIntKeyTable<SkillMaxLevel> maxLvData = new UIntKeyTable<SkillMaxLevel>();
+
+		public const string NT = "skillItemId,appVer,type,name,text,rarity,R,G,B,iconId,maxLv,growId,needExp,giveExp,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,price,enableEquipType,castTime,useGauge,useGauge2,castStateName,actStateName,startEffectName,startSEID,actLocalEffectName,actOneshotEffectName,actSEID,enchantEffectName,bulletName,attackInfoNames0,attackInfoNames1,attackInfoNames2,attackInfoNames3,attackInfoNames4,selfOnly,skillAtk,skillAtkType,skillAtkRate,skillAtkType2,skillAtkRate2,hitEffectName,hitSEID,skillRange,healHp,healType,supportPassiveEqType1,supportType1,supportValue1,supportTime1,supportEffectName1,supportPassiveEqType2,supportType2,supportValue2,supportTime2,supportEffectName2,supportPassiveEqType3,supportType3,supportValue3,supportTime3,supportEffectName3,supportPassiveSpAttackType,buffTableIds,lockBuffTypes,isTeleportation,exceedExtraText";
+
+		public ELEMENT_TYPE skillAtkType
+		{
+			get
+			{
+				if (skillAtkTypes != null && skillAtkTypes.Length > 0)
+				{
+					return skillAtkTypes[0];
+				}
+				return ELEMENT_TYPE.MAX;
+			}
+		}
+
+		public XorInt skillAtkRate
+		{
+			get
+			{
+				if (skillAtkRates != null && skillAtkRates.Length > 0)
+				{
+					return skillAtkRates[0];
+				}
+				return 0;
+			}
+		}
 
 		public int baseElemAtk
 		{
@@ -169,7 +198,6 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 		private int GetExceedMaxLevel(int exceed_cnt)
 		{
-			int result = 1;
 			GrowSkillItemTable.GrowSkillItemData[] growSkillItemDataAry = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemDataAry(growID);
 			GrowSkillItemTable.GrowSkillItemData under = null;
 			GrowSkillItemTable.GrowSkillItemData over = null;
@@ -184,16 +212,15 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 					under = data;
 				}
 			});
-			if (over == null && under != null)
+			if (over != null)
+			{
+				return over.lv;
+			}
+			if (under != null)
 			{
 				return under.lv;
 			}
-			if (under == null)
-			{
-				return result;
-			}
-			float num = (float)(exceed_cnt + 1 - under.exceedCnt) / (float)(over.exceedCnt - under.exceedCnt);
-			return Mathf.FloorToInt(Mathf.Lerp((float)under.lv, (float)over.lv, num)) - 1;
+			return 1;
 		}
 
 		public bool IsPassive()
@@ -324,14 +351,56 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 			}
 		}
 
-		public string GetExplanationText(int level = 1)
+		public string GetExplanationText(int level = 1, int exceedCnt = 0)
 		{
-			return SkillItemInfo.GetExplanationText(this, level);
+			return SkillItemInfo.GetExplanationText(this, level, exceedCnt);
 		}
 
 		public bool IsEnableNowApplicationVersion()
 		{
 			return AppMain.CheckApplicationVersion(appVer);
+		}
+
+		public ELEMENT_TYPE GetAttackElementByIndex(int index)
+		{
+			if (skillAtkTypes != null && skillAtkTypes.Length > index)
+			{
+				return skillAtkTypes[index];
+			}
+			return ELEMENT_TYPE.MAX;
+		}
+
+		public XorInt GetAttackElementRateByIndex(int index)
+		{
+			if (skillAtkRates != null && skillAtkRates.Length > index)
+			{
+				return skillAtkRates[index];
+			}
+			return 100;
+		}
+
+		public int GetAttackElementNum()
+		{
+			if (skillAtkTypes == null)
+			{
+				return 0;
+			}
+			return skillAtkTypes.Length;
+		}
+
+		public bool HasElement(ELEMENT_TYPE element)
+		{
+			if (skillAtkTypes != null && skillAtkTypes.Length > 0)
+			{
+				for (int i = 0; i < skillAtkTypes.Length; i++)
+				{
+					if (skillAtkTypes[i] == element)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		public static bool cb(CSVReader csv_reader, SkillItemData data, ref uint key)
@@ -342,7 +411,6 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 			csv_reader.Pop(ref data.name);
 			csv_reader.Pop(ref data.text);
 			csv_reader.Pop(ref data.rarity);
-			csv_reader.Pop(ref data.modelID);
 			csv_reader.PopColor(ref data.modelColor);
 			csv_reader.Pop(ref data.iconID);
 			csv_reader.Pop(ref data.maxLv);
@@ -366,6 +434,7 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 			csv_reader.Pop(ref data.enableEquipType);
 			csv_reader.Pop(ref data.castTime);
 			csv_reader.Pop(ref data.useGauge);
+			csv_reader.Pop(ref data.useGauge2);
 			csv_reader.Pop(ref data.castStateName);
 			csv_reader.Pop(ref data.actStateName);
 			csv_reader.Pop(ref data.startEffectName);
@@ -374,7 +443,6 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 			csv_reader.Pop(ref data.actOneshotEffectName);
 			csv_reader.Pop(ref data.actSEID);
 			csv_reader.Pop(ref data.enchantEffectName);
-			csv_reader.Pop(ref data.reactionType);
 			csv_reader.Pop(ref data.bulletName);
 			data.attackInfoNames = new string[5];
 			for (int k = 0; k < 5; k++)
@@ -383,8 +451,30 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 			}
 			csv_reader.Pop(ref data.selfOnly);
 			csv_reader.Pop(ref data.skillAtk);
-			csv_reader.PopEnum(ref data.skillAtkType, ELEMENT_TYPE.MAX);
-			csv_reader.Pop(ref data.skillAtkRate);
+			ELEMENT_TYPE value = ELEMENT_TYPE.MAX;
+			ELEMENT_TYPE value2 = ELEMENT_TYPE.MAX;
+			XorInt value3 = 0;
+			XorInt value4 = 0;
+			csv_reader.PopEnum(ref value, ELEMENT_TYPE.MAX);
+			csv_reader.Pop(ref value3);
+			csv_reader.PopEnum(ref value2, ELEMENT_TYPE.MAX);
+			csv_reader.Pop(ref value4);
+			if (value2 == ELEMENT_TYPE.MAX)
+			{
+				data.skillAtkTypes = new ELEMENT_TYPE[1];
+				data.skillAtkRates = new XorInt[1];
+				data.skillAtkTypes[0] = value;
+				data.skillAtkRates[0] = value3;
+			}
+			else
+			{
+				data.skillAtkTypes = new ELEMENT_TYPE[2];
+				data.skillAtkRates = new XorInt[2];
+				data.skillAtkTypes[0] = value;
+				data.skillAtkRates[0] = value3;
+				data.skillAtkTypes[1] = value2;
+				data.skillAtkRates[1] = value4;
+			}
 			csv_reader.Pop(ref data.hitEffectName);
 			csv_reader.Pop(ref data.hitSEID);
 			csv_reader.Pop(ref data.skillRange);
@@ -404,28 +494,48 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 				csv_reader.Pop(ref data.supportEffectName[l]);
 			}
 			csv_reader.PopEnum(ref data.supportPassiveSpAttackType, SP_ATTACK_TYPE.NONE);
-			string value = string.Empty;
-			csv_reader.Pop(ref value);
-			if (!string.IsNullOrEmpty(value))
+			string value5 = string.Empty;
+			csv_reader.Pop(ref value5);
+			if (!string.IsNullOrEmpty(value5))
 			{
-				string[] array = value.Split(':');
+				string[] array = value5.Split(':');
 				data.buffTableIds = new int[array.Length];
 				for (int m = 0; m < array.Length; m++)
 				{
-					data.buffTableIds[m] = array[m].ToInt32OrDefault(0);
+					data.buffTableIds[m] = array[m].ToInt32OrDefault();
 				}
 			}
-			string value2 = string.Empty;
-			csv_reader.Pop(ref value2);
-			if (!string.IsNullOrEmpty(value2))
+			string value6 = string.Empty;
+			csv_reader.Pop(ref value6);
+			if (!string.IsNullOrEmpty(value6))
 			{
-				string[] array2 = value2.Split(':');
+				string[] array2 = value6.Split(':');
 				data.lockBuffTypes = new int[array2.Length];
 				for (int n = 0; n < array2.Length; n++)
 				{
-					data.lockBuffTypes[n] = array2[n].ToInt32OrDefault(0);
+					data.lockBuffTypes[n] = array2[n].ToInt32OrDefault();
 				}
 			}
+			switch (data.type)
+			{
+			case SKILL_SLOT_TYPE.ATTACK:
+				data.modelID = 1;
+				break;
+			case SKILL_SLOT_TYPE.HEAL:
+				data.modelID = 2;
+				break;
+			case SKILL_SLOT_TYPE.SUPPORT:
+				data.modelID = 3;
+				break;
+			case SKILL_SLOT_TYPE.PASSIVE:
+				data.modelID = 4;
+				break;
+			case SKILL_SLOT_TYPE.GROW:
+				data.modelID = 5;
+				break;
+			}
+			csv_reader.Pop(ref data.isTeleportation);
+			csv_reader.Pop(ref data.exceedExtraText);
 			return true;
 		}
 	}
@@ -455,15 +565,21 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 	private UIntKeyTable<SkillItemData> skillTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<SkillItemData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<SkillItemData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		skillTable = TableUtility.CreateUIntKeyTable<SkillItemData>(csv_text, SkillItemData.cb, "skillItemId,appVer,type,name,text,rarity,modelId,R,G,B,iconId,maxLv,growId,needExp,giveExp,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,price,enableEquipType,castTime,useGauge,castStateName,actStateName,startEffectName,startSEID,actLocalEffectName,actOneshotEffectName,actSEID,enchantEffectName,reactionType,bulletName,attackInfoNames0,attackInfoNames1,attackInfoNames2,attackInfoNames3,attackInfoNames4,selfOnly,skillAtk,skillAtkType,skillAtkRate,hitEffectName,hitSEID,skillRange,healHp,healType,supportPassiveEqType1,supportType1,supportValue1,supportTime1,supportEffectName1,supportPassiveEqType2,supportType2,supportValue2,supportTime2,supportEffectName2,supportPassiveEqType3,supportType3,supportValue3,supportTime3,supportEffectName3,supportPassiveSpAttackType,buffTableIds,lockBuffTypes", null);
+		skillTable = TableUtility.CreateUIntKeyTable<SkillItemData>(csv_text, SkillItemData.cb, "skillItemId,appVer,type,name,text,rarity,R,G,B,iconId,maxLv,growId,needExp,giveExp,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,price,enableEquipType,castTime,useGauge,useGauge2,castStateName,actStateName,startEffectName,startSEID,actLocalEffectName,actOneshotEffectName,actSEID,enchantEffectName,bulletName,attackInfoNames0,attackInfoNames1,attackInfoNames2,attackInfoNames3,attackInfoNames4,selfOnly,skillAtk,skillAtkType,skillAtkRate,skillAtkType2,skillAtkRate2,hitEffectName,hitSEID,skillRange,healHp,healType,supportPassiveEqType1,supportType1,supportValue1,supportTime1,supportEffectName1,supportPassiveEqType2,supportType2,supportValue2,supportTime2,supportEffectName2,supportPassiveEqType3,supportType3,supportValue3,supportTime3,supportEffectName3,supportPassiveSpAttackType,buffTableIds,lockBuffTypes,isTeleportation,exceedExtraText");
 		skillTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(skillTable, csv_text, SkillItemData.cb, "skillItemId,appVer,type,name,text,rarity,modelId,R,G,B,iconId,maxLv,growId,needExp,giveExp,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,price,enableEquipType,castTime,useGauge,castStateName,actStateName,startEffectName,startSEID,actLocalEffectName,actOneshotEffectName,actSEID,enchantEffectName,reactionType,bulletName,attackInfoNames0,attackInfoNames1,attackInfoNames2,attackInfoNames3,attackInfoNames4,selfOnly,skillAtk,skillAtkType,skillAtkRate,hitEffectName,hitSEID,skillRange,healHp,healType,supportPassiveEqType1,supportType1,supportValue1,supportTime1,supportEffectName1,supportPassiveEqType2,supportType2,supportValue2,supportTime2,supportEffectName2,supportPassiveEqType3,supportType3,supportValue3,supportTime3,supportEffectName3,supportPassiveSpAttackType,buffTableIds,lockBuffTypes", null);
+		TableUtility.AddUIntKeyTable(skillTable, csv_text, SkillItemData.cb, "skillItemId,appVer,type,name,text,rarity,R,G,B,iconId,maxLv,growId,needExp,giveExp,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,price,enableEquipType,castTime,useGauge,useGauge2,castStateName,actStateName,startEffectName,startSEID,actLocalEffectName,actOneshotEffectName,actSEID,enchantEffectName,bulletName,attackInfoNames0,attackInfoNames1,attackInfoNames2,attackInfoNames3,attackInfoNames4,selfOnly,skillAtk,skillAtkType,skillAtkRate,skillAtkType2,skillAtkRate2,hitEffectName,hitSEID,skillRange,healHp,healType,supportPassiveEqType1,supportType1,supportValue1,supportTime1,supportEffectName1,supportPassiveEqType2,supportType2,supportValue2,supportTime2,supportEffectName2,supportPassiveEqType3,supportType3,supportValue3,supportTime3,supportEffectName3,supportPassiveSpAttackType,buffTableIds,lockBuffTypes,isTeleportation,exceedExtraText");
 	}
 
 	public SkillItemData GetSkillItemData(uint skill_id)

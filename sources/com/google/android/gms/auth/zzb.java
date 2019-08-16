@@ -3,35 +3,36 @@ package com.google.android.gms.auth;
 import android.accounts.Account;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzb implements Creator<AccountChangeEventsRequest> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         Account account = null;
-        int zzd = com.google.android.gms.common.internal.safeparcel.zzb.zzd(parcel);
+        String str = null;
         int i = 0;
         int i2 = 0;
-        String str = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i2 = com.google.android.gms.common.internal.safeparcel.zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    i = com.google.android.gms.common.internal.safeparcel.zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    str = com.google.android.gms.common.internal.safeparcel.zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    account = (Account) com.google.android.gms.common.internal.safeparcel.zzb.zza(parcel, readInt, Account.CREATOR);
+                    account = (Account) SafeParcelReader.createParcelable(parcel, readHeader, Account.CREATOR);
                     break;
                 default:
-                    com.google.android.gms.common.internal.safeparcel.zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        com.google.android.gms.common.internal.safeparcel.zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new AccountChangeEventsRequest(i2, i, str, account);
     }
 

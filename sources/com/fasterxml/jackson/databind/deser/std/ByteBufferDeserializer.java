@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.util.ByteBufferBackedOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 public class ByteBufferDeserializer extends StdScalarDeserializer<ByteBuffer> {
@@ -19,7 +18,7 @@ public class ByteBufferDeserializer extends StdScalarDeserializer<ByteBuffer> {
     }
 
     public ByteBuffer deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, ByteBuffer byteBuffer) throws IOException {
-        OutputStream byteBufferBackedOutputStream = new ByteBufferBackedOutputStream(byteBuffer);
+        ByteBufferBackedOutputStream byteBufferBackedOutputStream = new ByteBufferBackedOutputStream(byteBuffer);
         jsonParser.readBinaryValue(deserializationContext.getBase64Variant(), byteBufferBackedOutputStream);
         byteBufferBackedOutputStream.close();
         return byteBuffer;

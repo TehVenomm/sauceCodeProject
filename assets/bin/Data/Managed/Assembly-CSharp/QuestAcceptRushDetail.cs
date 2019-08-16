@@ -75,6 +75,17 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		TEX_EVENT_ICON,
 		BTN_CREATE,
 		BTN_JOIN,
+		BTN_MATCHING,
+		BTN_JUMP_SMITH,
+		BTN_JUMP_STATUS,
+		BTN_JUMP_STORAGE,
+		BTN_JUMP_POINT_SHOP,
+		BTN_JUMP_WORLDMAP,
+		BTN_WAVEMATCH_NEW,
+		BTN_WAVEMATCH_PASS,
+		BTN_WAVEMATCH_AUTO,
+		OBJ_CARNIVAL_ROOT,
+		LBL_POINT_CARNIVAL,
 		LBL_LIMIT_TIME,
 		OBJ_CHANGE_INFO,
 		BTN_CHANGE_INFO,
@@ -88,7 +99,8 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		BTN_AUTO_MATCHING,
 		BTN_CREATE_OFF,
 		BTN_JOIN_OFF,
-		BTN_AUTO_MATCHING_OFF
+		BTN_AUTO_MATCHING_OFF,
+		SPR_TYPE_DIFFICULTY
 	}
 
 	protected class ResourceInfo
@@ -106,28 +118,27 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	private const int PREDOWNLOAD_MESSAGE_KEY = 3000;
 
-	private const string WINDOW_SPRITE = "RequestWindowBase_Rush";
-
-	private const string MESSAGE_SPRITE = "Checkhukidashi_Rush";
-
 	private bool isShowDropInfo;
 
 	private QuestTable.QuestTableData questTableData;
 
+	private const string WINDOW_SPRITE = "RequestWindowBase_Rush";
+
+	private const string MESSAGE_SPRITE = "Checkhukidashi_Rush";
+
 	public override void Initialize()
 	{
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize();
 		UITexture component = GetCtrl(UI.TEX_RUSH_IMAGE).GetComponent<UITexture>();
 		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)info.GetQuestData().rushIconId));
 		if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
 		{
-			SetActive((Enum)UI.BTN_JOIN, false);
-			SetActive((Enum)UI.BTN_CREATE, false);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING, false);
-			SetActive((Enum)UI.BTN_JOIN_OFF, false);
-			SetActive((Enum)UI.BTN_CREATE_OFF, false);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, false);
+			SetActive((Enum)UI.BTN_JOIN, is_visible: false);
+			SetActive((Enum)UI.BTN_CREATE, is_visible: false);
+			SetActive((Enum)UI.BTN_AUTO_MATCHING, is_visible: false);
+			SetActive((Enum)UI.BTN_JOIN_OFF, is_visible: false);
+			SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: false);
+			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, is_visible: false);
 		}
 		else
 		{
@@ -137,8 +148,8 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_DROP_REWARD, true);
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, true);
+		SetActive((Enum)UI.OBJ_DROP_REWARD, is_visible: true);
+		SetActive((Enum)UI.OBJ_CLEAR_REWARD, is_visible: true);
 		base.UpdateUI();
 		questTableData = info.GetQuestData();
 		if (questTableData != null)
@@ -148,6 +159,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 			SetLabelText((Enum)UI.LBL_RUSH_LEVEL, string.Empty);
 			SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Rush");
 			SetSprite(baseRoot, UI.SPR_MESSAGE_BG, "Checkhukidashi_Rush");
+			SetDifficultySprite();
 			UpdateRewardInfo();
 		}
 	}
@@ -170,14 +182,14 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 	private void CreateRoom()
 	{
 		GameSection.StayEvent();
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(true, 0, 0, 0, 0);
+		PartyManager.PartySetting setting = new PartyManager.PartySetting(is_lock: true, 0, 0);
 		MonoBehaviourSingleton<PartyManager>.I.SendCreate((int)info.needs[0].questId, setting, delegate(bool is_success)
 		{
 			if (is_success)
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -192,9 +204,6 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
 		{
 			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();
@@ -213,7 +222,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	private void OnQuery_CREATE()
 	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId);
 		if (questTableData != null)
 		{
 			GameSection.SetEventData(new object[1]
@@ -225,17 +234,17 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	private void OnQuery_JOIN()
 	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId);
 	}
 
 	protected IEnumerator StartPredownload()
 	{
-		SetActive((Enum)UI.BTN_JOIN, false);
-		SetActive((Enum)UI.BTN_CREATE, false);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING, false);
-		SetActive((Enum)UI.BTN_JOIN_OFF, false);
-		SetActive((Enum)UI.BTN_CREATE_OFF, false);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, false);
+		SetActive((Enum)UI.BTN_JOIN, is_visible: false);
+		SetActive((Enum)UI.BTN_CREATE, is_visible: false);
+		SetActive((Enum)UI.BTN_AUTO_MATCHING, is_visible: false);
+		SetActive((Enum)UI.BTN_JOIN_OFF, is_visible: false);
+		SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: false);
+		SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, is_visible: false);
 		List<ResourceInfo> list = new List<ResourceInfo>();
 		List<QuestTable.QuestTableData> targetQuest = QuestTable.GetSameRushQuestData(info.GetQuestData().rushId);
 		targetQuest.Remove(info.GetQuestData());
@@ -247,48 +256,48 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 			{
 				yield break;
 			}
-			string stageName = fieldMapData.stageName;
-			if (string.IsNullOrEmpty(stageName))
+			string text = fieldMapData.stageName;
+			if (string.IsNullOrEmpty(text))
 			{
-				stageName = "ST011D_01";
+				text = "ST011D_01";
 			}
-			StageTable.StageData stageData = Singleton<StageTable>.I.GetData(stageName);
-			if (stageData == null)
+			StageTable.StageData data = Singleton<StageTable>.I.GetData(text);
+			if (data == null)
 			{
 				yield break;
 			}
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SCENE, stageData.scene));
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SKY, stageData.sky));
-			if (!string.IsNullOrEmpty(stageData.cameraLinkEffect))
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SCENE, data.scene));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SKY, data.sky));
+			if (!string.IsNullOrEmpty(data.cameraLinkEffect))
 			{
-				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.cameraLinkEffect));
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffect));
 			}
-			if (!string.IsNullOrEmpty(stageData.cameraLinkEffectY0))
+			if (!string.IsNullOrEmpty(data.cameraLinkEffectY0))
 			{
-				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.cameraLinkEffectY0));
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffectY0));
 			}
-			if (!string.IsNullOrEmpty(stageData.rootEffect))
+			if (!string.IsNullOrEmpty(data.rootEffect))
 			{
-				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.rootEffect));
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.rootEffect));
 			}
 			for (int i = 0; i < 8; i++)
 			{
-				if (!string.IsNullOrEmpty(stageData.useEffects[i]))
+				if (!string.IsNullOrEmpty(data.useEffects[i]))
 				{
-					list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.useEffects[i]));
+					list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.useEffects[i]));
 				}
 			}
 			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)item2.enemyID[0]);
-			int bodyId = enemyData.modelId;
-			string bodyName = ResourceName.GetEnemyBody(bodyId);
-			string mateName = ResourceName.GetEnemyMaterial(bodyId);
-			string animName = ResourceName.GetEnemyAnim(enemyData.animId);
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MODEL, bodyName));
-			if (!string.IsNullOrEmpty(mateName))
+			int modelId = enemyData.modelId;
+			string enemyBody = ResourceName.GetEnemyBody(modelId);
+			string enemyMaterial = ResourceName.GetEnemyMaterial(modelId);
+			string enemyAnim = ResourceName.GetEnemyAnim(enemyData.animId);
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MODEL, enemyBody));
+			if (!string.IsNullOrEmpty(enemyMaterial))
 			{
-				list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MATERIAL, bodyName));
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MATERIAL, enemyBody));
 			}
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_ANIM, animName));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_ANIM, enemyAnim));
 			if (!string.IsNullOrEmpty(enemyData.baseEffectName))
 			{
 				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, enemyData.baseEffectName));
@@ -296,19 +305,41 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		}
 		if (list.Find((ResourceInfo x) => !MonoBehaviourSingleton<ResourceManager>.I.IsCached(x.category, x.packageName)) != null)
 		{
-			RequestEvent("ASSET_DOWNLOAD", StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 3000u));
-			SetActive((Enum)UI.BTN_JOIN_OFF, true);
-			SetActive((Enum)UI.BTN_CREATE_OFF, true);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, true);
-			LoadingQueue load_queue = new LoadingQueue(this);
+			List<string> assetNames = new List<string>();
 			foreach (ResourceInfo item3 in list)
 			{
 				if (!string.IsNullOrEmpty(item3.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item3.category, item3.packageName))
 				{
+					assetNames.Add(item3.category.ToAssetBundleName(item3.packageName));
+				}
+			}
+			SetActive((Enum)UI.BTN_JOIN_OFF, is_visible: true);
+			SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: true);
+			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, is_visible: true);
+			yield return ResourceSizeInfo.Init();
+			string act = null;
+			yield return ResourceSizeInfo.OpenConfirmDialog(ResourceSizeInfo.GetAssetsSizeMB(assetNames.ToArray()), 3002u, CommonDialog.TYPE.YES_NO, delegate(string str)
+			{
+				act = str;
+			});
+			if (act == "NO")
+			{
+				while (MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
+				{
+					yield return null;
+				}
+				DispatchEvent("[BACK]");
+				yield break;
+			}
+			LoadingQueue load_queue = new LoadingQueue(this);
+			foreach (ResourceInfo item in list)
+			{
+				if (!string.IsNullOrEmpty(item.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item.category, item.packageName))
+				{
 					ResourceManager.downloadOnly = true;
-					load_queue.Load(item3.category, item3.packageName, null, false);
+					load_queue.Load(item.category, item.packageName, null);
 					ResourceManager.downloadOnly = false;
-					yield return (object)load_queue.Wait();
+					yield return load_queue.Wait();
 				}
 			}
 		}
@@ -329,13 +360,12 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		});
 		GameSection.StayEvent();
 		int retryCount = 0;
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		PartyManager.PartySetting setting = new PartyManager.PartySetting(is_lock: false, 0, 0);
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			if (!is_success)
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 			else if (maxRetryCount > 0)
 			{
@@ -349,7 +379,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 			else
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 		});
 	}
@@ -357,40 +387,39 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
 		yield return (object)new WaitForSeconds(time);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			if (!is_success)
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 			else if (maxRetryCount > 0)
 			{
-				if (((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/).retryCount >= maxRetryCount)
+				if (retryCount >= maxRetryCount)
 				{
-					((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+					OnQuery_AUTO_CREATE_ROOM();
 				}
 				else
 				{
-					((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/).retryCount++;
-					((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.MatchAtRandom(((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/).setting, ((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/).retryCount, waitTime));
+					retryCount++;
+					this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 				}
 			}
 			else if (!isJoined)
 			{
-				((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.OnQuery_AUTO_CREATE_ROOM();
+				OnQuery_AUTO_CREATE_ROOM();
 			}
 			else
 			{
-				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(((_003CMatchAtRandom_003Ec__Iterator10C)/*Error near IL_0061: stateMachine*/).setting);
-				GameSection.ResumeEvent(true, null);
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 		});
 	}
 
 	private void OnQuery_AUTO_CREATE_ROOM()
 	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.GetQuestData().questID, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.GetQuestData().questID);
 		if (questTableData != null)
 		{
 			GameSection.SetEventData(new object[1]
@@ -398,14 +427,20 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 				questTableData.questType
 			});
 		}
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
+		PartyManager.PartySetting setting = new PartyManager.PartySetting(is_lock: false, 0, 0);
 		MonoBehaviourSingleton<PartyManager>.I.SendCreate((int)info.GetQuestData().questID, setting, delegate(bool is_success)
 		{
 			if (is_success)
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
+	}
+
+	private void SetDifficultySprite()
+	{
+		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
+		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

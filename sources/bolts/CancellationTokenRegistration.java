@@ -21,17 +21,17 @@ public class CancellationTokenRegistration implements Closeable {
 
     public void close() {
         synchronized (this.lock) {
-            if (this.closed) {
-                return;
+            if (!this.closed) {
+                this.closed = true;
+                this.tokenSource.unregister(this);
+                this.tokenSource = null;
+                this.action = null;
             }
-            this.closed = true;
-            this.tokenSource.unregister(this);
-            this.tokenSource = null;
-            this.action = null;
         }
     }
 
-    void runAction() {
+    /* access modifiers changed from: 0000 */
+    public void runAction() {
         synchronized (this.lock) {
             throwIfClosed();
             this.action.run();

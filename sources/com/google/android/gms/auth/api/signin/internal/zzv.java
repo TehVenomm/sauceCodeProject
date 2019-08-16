@@ -1,45 +1,37 @@
 package com.google.android.gms.auth.api.signin.internal;
 
-import android.content.Context;
-import android.os.Binder;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import android.os.IBinder;
+import android.os.IInterface;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.RemoteException;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.Api.ApiOptions.HasOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.Builder;
-import com.google.android.gms.common.zzo;
+import com.google.android.gms.internal.auth-api.zzc;
+import com.google.android.gms.internal.auth-api.zze;
 
-public final class zzv extends zzq {
-    private final Context mContext;
-
-    public zzv(Context context) {
-        this.mContext = context;
+public final class zzv extends zzc implements zzu {
+    zzv(IBinder iBinder) {
+        super(iBinder, "com.google.android.gms.auth.api.signin.internal.ISignInService");
     }
 
-    public final void zzaao() {
-        if (zzo.zzf(this.mContext, Binder.getCallingUid())) {
-            zzy zzbm = zzy.zzbm(this.mContext);
-            GoogleSignInAccount zzaar = zzbm.zzaar();
-            HasOptions hasOptions = GoogleSignInOptions.DEFAULT_SIGN_IN;
-            if (zzaar != null) {
-                hasOptions = zzbm.zzaas();
-            }
-            GoogleApiClient build = new Builder(this.mContext).addApi(Auth.GOOGLE_SIGN_IN_API, hasOptions).build();
-            try {
-                if (build.blockingConnect().isSuccess()) {
-                    if (zzaar != null) {
-                        Auth.GoogleSignInApi.revokeAccess(build);
-                    } else {
-                        build.clearDefaultAccountAndReconnect();
-                    }
-                }
-                build.disconnect();
-            } catch (Throwable th) {
-                build.disconnect();
-            }
-        } else {
-            throw new SecurityException("Calling UID " + Binder.getCallingUid() + " is not Google Play services.");
-        }
+    public final void zzc(zzs zzs, GoogleSignInOptions googleSignInOptions) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zze.zzc(obtainAndWriteInterfaceToken, (IInterface) zzs);
+        zze.zzc(obtainAndWriteInterfaceToken, (Parcelable) googleSignInOptions);
+        transactAndReadExceptionReturnVoid(101, obtainAndWriteInterfaceToken);
+    }
+
+    public final void zzd(zzs zzs, GoogleSignInOptions googleSignInOptions) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zze.zzc(obtainAndWriteInterfaceToken, (IInterface) zzs);
+        zze.zzc(obtainAndWriteInterfaceToken, (Parcelable) googleSignInOptions);
+        transactAndReadExceptionReturnVoid(102, obtainAndWriteInterfaceToken);
+    }
+
+    public final void zze(zzs zzs, GoogleSignInOptions googleSignInOptions) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zze.zzc(obtainAndWriteInterfaceToken, (IInterface) zzs);
+        zze.zzc(obtainAndWriteInterfaceToken, (Parcelable) googleSignInOptions);
+        transactAndReadExceptionReturnVoid(103, obtainAndWriteInterfaceToken);
     }
 }

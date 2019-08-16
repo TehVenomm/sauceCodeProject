@@ -3,21 +3,21 @@ package com.google.android.gms.games.snapshot;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameRef;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayerRef;
 
-public final class SnapshotMetadataRef extends zzc implements SnapshotMetadata {
-    private final Game zzhkx;
-    private final Player zzhox;
+public final class SnapshotMetadataRef extends DataBufferRef implements SnapshotMetadata {
+    private final Game zznw;
+    private final Player zzsh;
 
     public SnapshotMetadataRef(DataHolder dataHolder, int i) {
         super(dataHolder, i);
-        this.zzhkx = new GameRef(dataHolder, i);
-        this.zzhox = new PlayerRef(dataHolder, i);
+        this.zznw = new GameRef(dataHolder, i);
+        this.zzsh = new PlayerRef(dataHolder, i);
     }
 
     public final int describeContents() {
@@ -34,11 +34,15 @@ public final class SnapshotMetadataRef extends zzc implements SnapshotMetadata {
 
     public final float getCoverImageAspectRatio() {
         float f = getFloat("cover_icon_image_height");
-        return f == 0.0f ? 0.0f : getFloat("cover_icon_image_width") / f;
+        float f2 = getFloat("cover_icon_image_width");
+        if (f == 0.0f) {
+            return 0.0f;
+        }
+        return f2 / f;
     }
 
     public final Uri getCoverImageUri() {
-        return zzfu("cover_icon_image_uri");
+        return parseUri("cover_icon_image_uri");
     }
 
     public final String getCoverImageUrl() {
@@ -50,7 +54,7 @@ public final class SnapshotMetadataRef extends zzc implements SnapshotMetadata {
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zza("description", charArrayBuffer);
+        copyToBuffer("description", charArrayBuffer);
     }
 
     public final String getDeviceName() {
@@ -58,7 +62,7 @@ public final class SnapshotMetadataRef extends zzc implements SnapshotMetadata {
     }
 
     public final Game getGame() {
-        return this.zzhkx;
+        return this.zznw;
     }
 
     public final long getLastModifiedTimestamp() {
@@ -66,7 +70,7 @@ public final class SnapshotMetadataRef extends zzc implements SnapshotMetadata {
     }
 
     public final Player getOwner() {
-        return this.zzhox;
+        return this.zzsh;
     }
 
     public final long getPlayedTime() {

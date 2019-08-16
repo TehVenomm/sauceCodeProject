@@ -15,8 +15,6 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 
 	protected List<UIPlayerDamageNum> enemyRecoverNumList = new List<UIPlayerDamageNum>();
 
-	private int additionalGroupOffset;
-
 	private UIDamageNum originalDamage;
 
 	private UIPlayerDamageNum currentRecoverNum;
@@ -34,126 +32,85 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 		m_additionalDamageNumObj = additionalDamageNumObj;
 	}
 
-	public void Create(Vector3 pos, int damage, UIDamageNum.DAMAGE_COLOR color, int groupOffset = 0, int effective = 0)
+	public void Create(Vector3 pos, int damage, UIDamageNum.DAMAGE_COLOR color, int groupOffset = 0, int effective = 0, bool isRegionOnly = false)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Expected O, but got Unknown
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Expected O, but got Unknown
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Expected O, but got Unknown
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeInHierarchy())
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0169: Expected O, but got Unknown
+		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+		if (!this.get_gameObject().get_activeInHierarchy())
 		{
-			float pixelHeight = MonoBehaviourSingleton<InGameCameraManager>.I.GetPixelHeight();
-			Vector3 pos2 = default(Vector3);
-			pos2._002Ector(pos.x, pos.y + MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset, pos.z);
-			Vector3 pos3 = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(pos2);
-			if (pos3.y > pixelHeight)
+			return;
+		}
+		float pixelHeight = MonoBehaviourSingleton<InGameCameraManager>.I.GetPixelHeight();
+		Vector3 pos2 = default(Vector3);
+		pos2._002Ector(pos.x, pos.y + MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset, pos.z);
+		Vector3 pos3 = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(pos2);
+		if (pos3.y > pixelHeight)
+		{
+			pos3.y = pixelHeight;
+			pos = MonoBehaviourSingleton<InGameCameraManager>.I.ScreenToWorldPoint(pos3);
+			pos.y -= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset;
+		}
+		bool flag = color != UIDamageNum.DAMAGE_COLOR.BUFF && UIDamageNum.DAMAGE_COLOR.NONE != color;
+		if (isRegionOnly)
+		{
+			color = (flag ? UIDamageNum.DAMAGE_COLOR.REGION_ONLY_ELEMENT : ((color != UIDamageNum.DAMAGE_COLOR.BUFF) ? UIDamageNum.DAMAGE_COLOR.REGION_ONLY_NORMAL : UIDamageNum.DAMAGE_COLOR.REGION_ONLY_BUFF));
+		}
+		if (groupOffset > 0 || flag)
+		{
+			CreateAdditionalDamage(pos, damage, color, groupOffset, originalDamage, effective);
+			return;
+		}
+		UIDamageNum uIDamageNum = null;
+		int num = 0;
+		int i = 0;
+		for (int count = damageNumList.Count; i < count; i++)
+		{
+			if (!damageNumList[i].enable)
 			{
-				pos3.y = pixelHeight;
-				pos = MonoBehaviourSingleton<InGameCameraManager>.I.ScreenToWorldPoint(pos3);
-				pos.y -= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset;
+				uIDamageNum = damageNumList[i];
+				num = i;
+				break;
 			}
-			bool flag = color != UIDamageNum.DAMAGE_COLOR.BUFF && UIDamageNum.DAMAGE_COLOR.NONE != color;
-			if (groupOffset > 0 || flag)
+		}
+		if (uIDamageNum == null)
+		{
+			GameObject val = Object.Instantiate(m_damageNumObj);
+			if (val == null)
 			{
-				CreateAdditionalDamage(pos, damage, color, groupOffset, originalDamage, effective);
+				return;
 			}
-			else
+			Utility.Attach(base._transform, val.get_transform());
+			uIDamageNum = val.GetComponent<UIDamageNum>();
+			if (uIDamageNum == null)
 			{
-				UIDamageNum uIDamageNum = null;
-				int num = 0;
-				int i = 0;
-				for (int count = damageNumList.Count; i < count; i++)
-				{
-					if (!damageNumList[i].enable)
-					{
-						uIDamageNum = damageNumList[i];
-						num = i;
-						break;
-					}
-				}
-				if (uIDamageNum == null)
-				{
-					GameObject val = Object.Instantiate(m_damageNumObj);
-					if (val == null)
-					{
-						return;
-					}
-					Utility.Attach(base._transform, val.get_transform());
-					uIDamageNum = val.GetComponent<UIDamageNum>();
-					if (uIDamageNum == null)
-					{
-						Object.Destroy(val);
-						return;
-					}
-					damageNumList.Add(uIDamageNum);
-					num = damageNumList.Count - 1;
-				}
-				additionalGroupOffset = 0;
-				originalDamage = null;
-				int num2 = 0;
-				int num3 = 0;
-				while (num2 < damageNumList.Count)
-				{
-					if (num2 != num && damageNumList[num2].enable)
-					{
-						if (num3 > 10)
-						{
-							groupOffset = 0;
-							additionalGroupOffset = 0;
-							break;
-						}
-						uIDamageNum.get_transform().set_position(uIDamageNum.GetUIPosFromWorld(pos, groupOffset));
-						Vector3 localPosition = uIDamageNum.get_transform().get_localPosition();
-						Vector3 localPosition2 = damageNumList[num2].get_transform().get_localPosition();
-						if (Mathf.Abs(localPosition2.x - localPosition.x) < uIDamageNum.grid.cellWidth * (float)damageNumList[num2].DamageLength && Mathf.Abs(localPosition2.y - localPosition.y) < uIDamageNum.grid.cellHeight - uIDamageNum.grid.cellHeight / 4f)
-						{
-							groupOffset++;
-							additionalGroupOffset++;
-							num2 = 0;
-							num3++;
-							continue;
-						}
-					}
-					num2++;
-				}
-				originalDamage = uIDamageNum;
-				if (!uIDamageNum.Initialize(pos, damage, color, groupOffset))
-				{
-					return;
-				}
+				Object.Destroy(val);
+				return;
 			}
+			damageNumList.Add(uIDamageNum);
+			num = damageNumList.Count - 1;
+		}
+		groupOffset = CalcOffsetPosition(pos, uIDamageNum, groupOffset);
+		originalDamage = uIDamageNum;
+		if (uIDamageNum.Initialize(pos, damage, color, groupOffset))
+		{
 		}
 	}
 
-	private void CreateAdditionalDamage(Vector3 pos, int damage, UIDamageNum.DAMAGE_COLOR color, int groupOffet, UIDamageNum originalDamage, int effective)
+	private void CreateAdditionalDamage(Vector3 pos, int damage, UIDamageNum.DAMAGE_COLOR color, int groupOffset, UIDamageNum originalDamage, int effective)
 	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Expected O, but got Unknown
 		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Expected O, but got Unknown
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Expected O, but got Unknown
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Expected O, but got Unknown
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 		UIAdditionalDamageNum uIAdditionalDamageNum = null;
 		int i = 0;
 		for (int count = additionalDamageNumList.Count; i < count; i++)
@@ -180,11 +137,73 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 			}
 			additionalDamageNumList.Add(uIAdditionalDamageNum);
 		}
-		groupOffet += additionalGroupOffset;
-		if (!uIAdditionalDamageNum.Initialize(pos, damage, color, groupOffet, originalDamage, effective))
+		groupOffset = CalcOffsetPosition(pos, uIAdditionalDamageNum, groupOffset);
+		if (uIAdditionalDamageNum.Initialize(pos, damage, color, groupOffset, originalDamage, effective))
 		{
-			return;
 		}
+	}
+
+	private int CalcOffsetPosition(Vector3 pos, UIDamageNum damage_num, int orgGroupOffet)
+	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		for (int i = 0; i < 10; i++)
+		{
+			if (!isLabelOverlap(pos, damage_num, orgGroupOffet + i))
+			{
+				return orgGroupOffet + i;
+			}
+		}
+		return orgGroupOffet;
+	}
+
+	private bool isLabelOverlap(Vector3 pos, UIDamageNum damage_num, int groupOffset)
+	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		damage_num.get_transform().set_position(damage_num.GetUIPosFromWorld(pos, groupOffset));
+		Vector3 localPosition = damage_num.get_transform().get_localPosition();
+		for (int i = 0; i < damageNumList.Count; i++)
+		{
+			if (_isLabelOverlap(localPosition, damage_num, damageNumList[i]))
+			{
+				return true;
+			}
+		}
+		for (int j = 0; j < additionalDamageNumList.Count; j++)
+		{
+			if (_isLabelOverlap(localPosition, damage_num, additionalDamageNumList[j]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private bool _isLabelOverlap(Vector3 nextPosition, UIDamageNum damage_num, UIDamageNum damageNumLists)
+	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		if (damageNumLists == null || damage_num == null)
+		{
+			return false;
+		}
+		if (!damageNumLists.enable || damage_num == damageNumLists)
+		{
+			return false;
+		}
+		Vector3 localPosition = damageNumLists.get_transform().get_localPosition();
+		float num = Mathf.Abs(localPosition.x - nextPosition.x);
+		float num2 = Mathf.Abs(localPosition.y - nextPosition.y);
+		float num3 = 16f * (float)damageNumLists.DamageLength;
+		if (num < num3 && num2 < 15f)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public UIPlayerDamageNum CreatePlayerDamage(Character chara, int damage, UIPlayerDamageNum.DAMAGE_COLOR color)
@@ -194,7 +213,7 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 		{
 			return null;
 		}
-		if (!uIPlayerDamageNum.Initialize(chara, damage, color, true))
+		if (!uIPlayerDamageNum.Initialize(chara, damage, color))
 		{
 			return null;
 		}
@@ -208,7 +227,7 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 		{
 			return null;
 		}
-		if (!uIPlayerDamageNum.Initialize(chara, status, true))
+		if (!uIPlayerDamageNum.Initialize(chara, status))
 		{
 			return null;
 		}
@@ -217,13 +236,8 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 
 	public UIPlayerDamageNum CreatePlayerRecoverHp(Character chara, int damage, UIPlayerDamageNum.DAMAGE_COLOR color)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Expected O, but got Unknown
 		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Expected O, but got Unknown
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Expected O, but got Unknown
+		//IL_0075: Expected O, but got Unknown
 		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 		if (!this.get_gameObject().get_activeInHierarchy())
@@ -256,7 +270,7 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 			uIPlayerDamageNum.offset = OFFSET_RECOVER_NUM;
 			playerRecoverNumList.Add(uIPlayerDamageNum);
 		}
-		if (!uIPlayerDamageNum.Initialize(chara, damage, color, true))
+		if (!uIPlayerDamageNum.Initialize(chara, damage, color))
 		{
 			return null;
 		}
@@ -265,13 +279,8 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 
 	private UIPlayerDamageNum CreatePlayerDamageNum()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Expected O, but got Unknown
 		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Expected O, but got Unknown
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Expected O, but got Unknown
+		//IL_0077: Expected O, but got Unknown
 		if (!this.get_gameObject().get_activeInHierarchy())
 		{
 			return null;
@@ -307,13 +316,8 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 
 	public UIPlayerDamageNum CreateEnemyRecoverHp(Character chara, int damage, UIPlayerDamageNum.DAMAGE_COLOR color)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
+		//IL_0023: Expected O, but got Unknown
 		if (!this.get_gameObject().get_activeInHierarchy())
 		{
 			return null;
@@ -331,7 +335,7 @@ public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 			return null;
 		}
 		enemyRecoverNumList.Add(component);
-		if (!component.Initialize(chara, damage, color, false))
+		if (!component.Initialize(chara, damage, color, isAutoPlay: false))
 		{
 			return null;
 		}

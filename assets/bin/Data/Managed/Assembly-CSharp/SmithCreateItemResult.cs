@@ -25,4 +25,9 @@ public class SmithCreateItemResult : EquipResultBase
 		}
 		base.UpdateUI();
 	}
+
+	public void OnQuery_TO_SELECT()
+	{
+		TO_UNIQUE_OR_MAIN_STATUS();
+	}
 }

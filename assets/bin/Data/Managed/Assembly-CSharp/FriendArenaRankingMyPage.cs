@@ -80,7 +80,6 @@ public class FriendArenaRankingMyPage : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		eventData = (GameSection.GetEventData() as Network.EventData);
 		IsFinishRecieveDelivery = true;
 		if (eventData == null)
@@ -102,18 +101,18 @@ public class FriendArenaRankingMyPage : GameSection
 	{
 		while (!IsFinishRecieveDelivery)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		bool isFinishGetRecord = false;
 		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, eventData.eventId, delegate(bool b, ArenaUserRecordModel.Param result)
 		{
-			((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003CisFinishGetRecord_003E__0 = true;
-			((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.record = result;
-			((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.userRank = ((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.record.userRank;
+			isFinishGetRecord = true;
+			record = result;
+			userRank = record.userRank;
 		});
 		while (!isFinishGetRecord)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.Initialize();
 	}
@@ -145,42 +144,41 @@ public class FriendArenaRankingMyPage : GameSection
 		SetActive((Enum)UI.OBJ_NO_SCORE, !IsRankingJoin());
 		SetActive((Enum)UI.OBJ_SCORE, IsRankingJoin());
 		SetActive((Enum)UI.OBJ_MY_RANK, IsRankingJoin());
-		SetActive((Enum)UI.OBJ_NOT_EXIST, false);
+		SetActive((Enum)UI.OBJ_NOT_EXIST, is_visible: false);
 		if (!isExistArena)
 		{
-			SetActive((Enum)UI.OBJ_NO_SCORE, false);
-			SetActive((Enum)UI.OBJ_SCORE, false);
-			SetActive((Enum)UI.OBJ_MY_RANK, false);
-			SetActive((Enum)UI.OBJ_NOT_EXIST, true);
+			SetActive((Enum)UI.OBJ_NO_SCORE, is_visible: false);
+			SetActive((Enum)UI.OBJ_SCORE, is_visible: false);
+			SetActive((Enum)UI.OBJ_MY_RANK, is_visible: false);
+			SetActive((Enum)UI.OBJ_NOT_EXIST, is_visible: true);
+			return;
 		}
-		else if (!IsRankingJoin())
+		if (!IsRankingJoin())
 		{
 			SetLabelText((Enum)UI.LBL_NO_TOTAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 29u), ARENA_RANK.S.ToString()));
+			return;
 		}
-		else
+		UpdateRank();
+		int i = 0;
+		for (int count = record.clearMilliSecList.Count; i < count; i++)
 		{
-			UpdateRank();
-			int i = 0;
-			for (int count = record.clearMilliSecList.Count; i < count; i++)
+			Transform ctrl = GetCtrl(Groups[i]);
+			bool flag = QuestUtility.IsDefaultArenaTime(record.clearMilliSecList[i]);
+			string text = QuestUtility.CreateTimeStringByMilliSec(record.clearMilliSecList[i]);
+			SetActive(ctrl, UI.LBL_GROUP_TIME, !flag);
+			SetActive(ctrl, UI.LBL_TIME_DEFAULT, flag);
+			if (flag)
 			{
-				Transform ctrl = GetCtrl(Groups[i]);
-				bool flag = QuestUtility.IsDefaultArenaTime(record.clearMilliSecList[i]);
-				string text = QuestUtility.CreateTimeStringByMilliSec(record.clearMilliSecList[i]);
-				SetActive(ctrl, UI.LBL_GROUP_TIME, !flag);
-				SetActive(ctrl, UI.LBL_TIME_DEFAULT, flag);
-				if (flag)
-				{
-					SetLabelText(ctrl, UI.LBL_TIME_DEFAULT, text);
-				}
-				else
-				{
-					SetLabelText(ctrl, UI.LBL_GROUP_TIME, text);
-				}
+				SetLabelText(ctrl, UI.LBL_TIME_DEFAULT, text);
 			}
-			Transform ctrl2 = GetCtrl(UI.OBJ_TOTAL);
-			string text2 = QuestUtility.CreateTimeStringByMilliSec(record.totalMilliSec);
-			SetLabelText(ctrl2, UI.LBL_GROUP_TIME, text2);
+			else
+			{
+				SetLabelText(ctrl, UI.LBL_GROUP_TIME, text);
+			}
 		}
+		Transform ctrl2 = GetCtrl(UI.OBJ_TOTAL);
+		string text2 = QuestUtility.CreateTimeStringByMilliSec(record.totalMilliSec);
+		SetLabelText(ctrl2, UI.LBL_GROUP_TIME, text2);
 	}
 
 	private void UpdateRank()
@@ -189,29 +187,27 @@ public class FriendArenaRankingMyPage : GameSection
 		string text = num.ToString();
 		for (int i = 0; i < RankingNumUIs.Length; i++)
 		{
-			SetActive((Enum)RankingNumUIs[i], false);
+			SetActive((Enum)RankingNumUIs[i], is_visible: false);
 		}
 		if (num <= 0)
 		{
-			SetActive((Enum)UI.SPR_RANK, false);
-			SetActive((Enum)UI.SPR_OUT_OF_RANK, true);
+			SetActive((Enum)UI.SPR_RANK, is_visible: false);
+			SetActive((Enum)UI.SPR_OUT_OF_RANK, is_visible: true);
+			return;
 		}
-		else
+		SetActive((Enum)UI.SPR_RANK, is_visible: true);
+		SetActive((Enum)UI.SPR_OUT_OF_RANK, is_visible: false);
+		int num2 = (RankingNumUIs.Length - text.Length) / 2;
+		for (int j = 0; j < text.Length; j++)
 		{
-			SetActive((Enum)UI.SPR_RANK, true);
-			SetActive((Enum)UI.SPR_OUT_OF_RANK, false);
-			int num2 = (RankingNumUIs.Length - text.Length) / 2;
-			for (int j = 0; j < text.Length; j++)
+			int num3 = int.Parse(text[j].ToString());
+			if (j >= RankingNumUIs.Length)
 			{
-				int num3 = int.Parse(text[j].ToString());
-				if (j >= RankingNumUIs.Length)
-				{
-					break;
-				}
-				int num4 = j + num2;
-				SetSprite(GetCtrl(RankingNumUIs[num4]), RankingNumbers[num3]);
-				SetActive((Enum)RankingNumUIs[num4], true);
+				break;
 			}
+			int num4 = j + num2;
+			SetSprite(GetCtrl(RankingNumUIs[num4]), RankingNumbers[num3]);
+			SetActive((Enum)RankingNumUIs[num4], is_visible: true);
 		}
 	}
 

@@ -1,7 +1,6 @@
 package com.facebook.internal;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
@@ -19,6 +18,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+import android.view.autofill.AutofillManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import com.facebook.AccessToken;
@@ -28,10 +28,10 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphRequest.Callback;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
-import com.facebook.appevents.internal.Constants;
+import com.facebook.appevents.codeless.internal.Constants;
+import com.facebook.places.model.PlaceFields;
 import com.facebook.share.internal.ShareConstants;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
-import io.fabric.sdk.android.services.events.EventsFilesManager;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -39,7 +39,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -62,31 +62,16 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import p017io.fabric.sdk.android.services.events.EventsFilesManager;
 
 public final class Utility {
-    private static final String APPLICATION_FIELDS = "fields";
-    private static final String APP_SETTINGS_PREFS_KEY_FORMAT = "com.facebook.internal.APP_SETTINGS.%s";
-    private static final String APP_SETTINGS_PREFS_STORE = "com.facebook.internal.preferences.APP_SETTINGS";
-    private static final String APP_SETTING_ANDROID_SDK_ERROR_CATEGORIES = "android_sdk_error_categories";
-    private static final String APP_SETTING_APP_EVENTS_SESSION_TIMEOUT = "app_events_session_timeout";
-    private static final String APP_SETTING_CUSTOM_TABS_ENABLED = "gdpv4_chrome_custom_tabs_enabled";
-    private static final String APP_SETTING_DIALOG_CONFIGS = "android_dialog_configs";
-    private static final String[] APP_SETTING_FIELDS = new String[]{APP_SETTING_SUPPORTS_IMPLICIT_SDK_LOGGING, APP_SETTING_NUX_CONTENT, APP_SETTING_NUX_ENABLED, APP_SETTING_CUSTOM_TABS_ENABLED, APP_SETTING_DIALOG_CONFIGS, APP_SETTING_ANDROID_SDK_ERROR_CATEGORIES, APP_SETTING_APP_EVENTS_SESSION_TIMEOUT};
-    private static final String APP_SETTING_NUX_CONTENT = "gdpv4_nux_content";
-    private static final String APP_SETTING_NUX_ENABLED = "gdpv4_nux_enabled";
-    private static final String APP_SETTING_SUPPORTS_IMPLICIT_SDK_LOGGING = "supports_implicit_sdk_logging";
+    private static final String ARC_DEVICE_PATTERN = ".+_cheets|cheets_.+";
     public static final int DEFAULT_STREAM_BUFFER_SIZE = 8192;
-    private static final String DIALOG_CONFIG_DIALOG_NAME_FEATURE_NAME_SEPARATOR = "\\|";
-    private static final String DIALOG_CONFIG_NAME_KEY = "name";
-    private static final String DIALOG_CONFIG_URL_KEY = "url";
-    private static final String DIALOG_CONFIG_VERSIONS_KEY = "versions";
     private static final String EXTRA_APP_EVENTS_INFO_FORMAT_VERSION = "a2";
     private static final int GINGERBREAD_MR1 = 10;
     private static final String HASH_ALGORITHM_MD5 = "MD5";
@@ -99,8 +84,6 @@ public final class Utility {
     private static String carrierName = noCarrierConstant;
     private static String deviceTimeZoneName = "";
     private static String deviceTimezoneAbbreviation = "";
-    private static Map<String, FetchedAppSettings> fetchedAppSettings = new ConcurrentHashMap();
-    private static AtomicBoolean loadingSettings = new AtomicBoolean(false);
     private static final String noCarrierConstant = "NoCarrier";
     private static int numCPUCores = 0;
     private static long timestampOfLastCheck = -1;
@@ -110,140 +93,6 @@ public final class Utility {
         void onFailure(FacebookException facebookException);
 
         void onSuccess(JSONObject jSONObject);
-    }
-
-    /* renamed from: com.facebook.internal.Utility$3 */
-    static final class C04213 implements FilenameFilter {
-        C04213() {
-        }
-
-        public boolean accept(File file, String str) {
-            return Pattern.matches("cpu[0-9]+", str);
-        }
-    }
-
-    public static class DialogFeatureConfig {
-        private String dialogName;
-        private Uri fallbackUrl;
-        private String featureName;
-        private int[] featureVersionSpec;
-
-        private DialogFeatureConfig(String str, String str2, Uri uri, int[] iArr) {
-            this.dialogName = str;
-            this.featureName = str2;
-            this.fallbackUrl = uri;
-            this.featureVersionSpec = iArr;
-        }
-
-        private static DialogFeatureConfig parseDialogConfig(JSONObject jSONObject) {
-            Uri uri = null;
-            String optString = jSONObject.optString("name");
-            if (Utility.isNullOrEmpty(optString)) {
-                return null;
-            }
-            String[] split = optString.split(Utility.DIALOG_CONFIG_DIALOG_NAME_FEATURE_NAME_SEPARATOR);
-            if (split.length != 2) {
-                return null;
-            }
-            String str = split[0];
-            String str2 = split[1];
-            if (Utility.isNullOrEmpty(str) || Utility.isNullOrEmpty(str2)) {
-                return null;
-            }
-            optString = jSONObject.optString("url");
-            if (!Utility.isNullOrEmpty(optString)) {
-                uri = Uri.parse(optString);
-            }
-            return new DialogFeatureConfig(str, str2, uri, parseVersionSpec(jSONObject.optJSONArray(Utility.DIALOG_CONFIG_VERSIONS_KEY)));
-        }
-
-        private static int[] parseVersionSpec(JSONArray jSONArray) {
-            if (jSONArray == null) {
-                return null;
-            }
-            int length = jSONArray.length();
-            int[] iArr = new int[length];
-            for (int i = 0; i < length; i++) {
-                int optInt = jSONArray.optInt(i, -1);
-                if (optInt == -1) {
-                    String optString = jSONArray.optString(i);
-                    if (!Utility.isNullOrEmpty(optString)) {
-                        try {
-                            optInt = Integer.parseInt(optString);
-                        } catch (Exception e) {
-                            Utility.logd(Utility.LOG_TAG, e);
-                            optInt = -1;
-                        }
-                    }
-                }
-                iArr[i] = optInt;
-            }
-            return iArr;
-        }
-
-        public String getDialogName() {
-            return this.dialogName;
-        }
-
-        public Uri getFallbackUrl() {
-            return this.fallbackUrl;
-        }
-
-        public String getFeatureName() {
-            return this.featureName;
-        }
-
-        public int[] getVersionSpec() {
-            return this.featureVersionSpec;
-        }
-    }
-
-    public static class FetchedAppSettings {
-        private boolean customTabsEnabled;
-        private Map<String, Map<String, DialogFeatureConfig>> dialogConfigMap;
-        private FacebookRequestErrorClassification errorClassification;
-        private String nuxContent;
-        private boolean nuxEnabled;
-        private int sessionTimeoutInSeconds;
-        private boolean supportsImplicitLogging;
-
-        private FetchedAppSettings(boolean z, String str, boolean z2, boolean z3, int i, Map<String, Map<String, DialogFeatureConfig>> map, FacebookRequestErrorClassification facebookRequestErrorClassification) {
-            this.supportsImplicitLogging = z;
-            this.nuxContent = str;
-            this.nuxEnabled = z2;
-            this.customTabsEnabled = z3;
-            this.dialogConfigMap = map;
-            this.errorClassification = facebookRequestErrorClassification;
-            this.sessionTimeoutInSeconds = i;
-        }
-
-        public boolean getCustomTabsEnabled() {
-            return this.customTabsEnabled;
-        }
-
-        public Map<String, Map<String, DialogFeatureConfig>> getDialogConfigurations() {
-            return this.dialogConfigMap;
-        }
-
-        public FacebookRequestErrorClassification getErrorClassification() {
-            return this.errorClassification;
-        }
-
-        public String getNuxContent() {
-            return this.nuxContent;
-        }
-
-        public boolean getNuxEnabled() {
-            return this.nuxEnabled;
-        }
-
-        public int getSessionTimeoutInSeconds() {
-            return this.sessionTimeoutInSeconds;
-        }
-
-        public boolean supportsImplicitLogging() {
-            return this.supportsImplicitLogging;
-        }
     }
 
     public interface Mapper<T, K> {
@@ -277,18 +126,18 @@ public final class Utility {
     }
 
     public static <T> ArrayList<T> arrayList(T... tArr) {
-        ArrayList<T> arrayList = new ArrayList(tArr.length);
-        for (Object add : tArr) {
+        ArrayList<T> arrayList = new ArrayList<>(tArr.length);
+        for (T add : tArr) {
             arrayList.add(add);
         }
         return arrayList;
     }
 
     public static <T> List<T> asListNoNulls(T... tArr) {
-        List arrayList = new ArrayList();
-        for (Object obj : tArr) {
-            if (obj != null) {
-                arrayList.add(obj);
+        ArrayList arrayList = new ArrayList();
+        for (T t : tArr) {
+            if (t != null) {
+                arrayList.add(t);
             }
         }
         return arrayList;
@@ -300,7 +149,10 @@ public final class Utility {
             return profileInformation;
         }
         GraphResponse executeAndWait = getGraphMeRequestWithCache(str).executeAndWait();
-        return executeAndWait.getError() != null ? null : executeAndWait.getJSONObject();
+        if (executeAndWait.getError() != null) {
+            return null;
+        }
+        return executeAndWait.getJSONObject();
     }
 
     public static Uri buildUri(String str, String str2, Bundle bundle) {
@@ -363,11 +215,16 @@ public final class Utility {
     }
 
     static Map<String, Object> convertJSONObjectToHashMap(JSONObject jSONObject) {
-        Map hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         JSONArray names = jSONObject.names();
-        for (int i = 0; i < names.length(); i++) {
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 >= names.length()) {
+                return hashMap;
+            }
             try {
-                String string = names.getString(i);
+                String string = names.getString(i2);
                 Object obj = jSONObject.get(string);
                 if (obj instanceof JSONObject) {
                     obj = convertJSONObjectToHashMap((JSONObject) obj);
@@ -375,56 +232,53 @@ public final class Utility {
                 hashMap.put(string, obj);
             } catch (JSONException e) {
             }
+            i = i2 + 1;
         }
-        return hashMap;
     }
 
-    public static int copyAndCloseInputStream(InputStream inputStream, OutputStream outputStream) throws IOException {
-        Throwable th;
-        BufferedInputStream bufferedInputStream;
-        int i = 0;
-        try {
-            BufferedInputStream bufferedInputStream2 = new BufferedInputStream(inputStream);
-            try {
-                byte[] bArr = new byte[8192];
-                while (true) {
-                    int read = bufferedInputStream2.read(bArr);
-                    if (read == -1) {
-                        break;
-                    }
-                    outputStream.write(bArr, 0, read);
-                    i += read;
-                }
-                if (bufferedInputStream2 != null) {
-                    bufferedInputStream2.close();
-                }
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                return i;
-            } catch (Throwable th2) {
-                BufferedInputStream bufferedInputStream3 = bufferedInputStream2;
-                th = th2;
-                bufferedInputStream = bufferedInputStream3;
-                if (bufferedInputStream != null) {
-                    bufferedInputStream.close();
-                }
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                throw th;
-            }
-        } catch (Throwable th22) {
-            th = th22;
-            bufferedInputStream = null;
-            if (bufferedInputStream != null) {
-                bufferedInputStream.close();
-            }
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            throw th;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:18:0x0027  */
+    /* JADX WARNING: Removed duplicated region for block: B:20:0x002c  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static int copyAndCloseInputStream(java.io.InputStream r5, java.io.OutputStream r6) throws java.io.IOException {
+        /*
+            r0 = 0
+            r2 = 0
+            java.io.BufferedInputStream r1 = new java.io.BufferedInputStream     // Catch:{ all -> 0x0023 }
+            r1.<init>(r5)     // Catch:{ all -> 0x0023 }
+            r2 = 8192(0x2000, float:1.14794E-41)
+            byte[] r2 = new byte[r2]     // Catch:{ all -> 0x0030 }
+        L_0x000b:
+            int r3 = r1.read(r2)     // Catch:{ all -> 0x0030 }
+            r4 = -1
+            if (r3 == r4) goto L_0x0018
+            r4 = 0
+            r6.write(r2, r4, r3)     // Catch:{ all -> 0x0030 }
+            int r0 = r0 + r3
+            goto L_0x000b
+        L_0x0018:
+            if (r1 == 0) goto L_0x001d
+            r1.close()
+        L_0x001d:
+            if (r5 == 0) goto L_0x0022
+            r5.close()
+        L_0x0022:
+            return r0
+        L_0x0023:
+            r0 = move-exception
+            r1 = r2
+        L_0x0025:
+            if (r1 == 0) goto L_0x002a
+            r1.close()
+        L_0x002a:
+            if (r5 == 0) goto L_0x002f
+            r5.close()
+        L_0x002f:
+            throw r0
+        L_0x0030:
+            r0 = move-exception
+            goto L_0x0025
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.facebook.internal.Utility.copyAndCloseInputStream(java.io.InputStream, java.io.OutputStream):int");
     }
 
     public static void deleteDirectory(File file) {
@@ -455,13 +309,16 @@ public final class Utility {
         if (list == null) {
             return null;
         }
-        List<T> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (Object next : list) {
             if (predicate.apply(next)) {
                 arrayList.add(next);
             }
         }
-        return arrayList.size() != 0 ? arrayList : null;
+        if (arrayList.size() != 0) {
+            return arrayList;
+        }
+        return null;
     }
 
     public static String generateRandomString(int i) {
@@ -472,91 +329,65 @@ public final class Utility {
         return context == null ? "null" : context == context.getApplicationContext() ? "unknown" : context.getClass().getSimpleName();
     }
 
-    private static JSONObject getAppSettingsQueryResponse(String str) {
-        Bundle bundle = new Bundle();
-        bundle.putString("fields", TextUtils.join(",", APP_SETTING_FIELDS));
-        GraphRequest newGraphPathRequest = GraphRequest.newGraphPathRequest(null, str, null);
-        newGraphPathRequest.setSkipClientToken(true);
-        newGraphPathRequest.setParameters(bundle);
-        return newGraphPathRequest.executeAndWait().getJSONObject();
-    }
-
-    public static FetchedAppSettings getAppSettingsWithoutQuery(String str) {
-        return str != null ? (FetchedAppSettings) fetchedAppSettings.get(str) : null;
-    }
-
     public static Date getBundleLongAsDate(Bundle bundle, String str, Date date) {
+        long parseLong;
         if (bundle == null) {
             return null;
         }
-        long longValue;
         Object obj = bundle.get(str);
         if (obj instanceof Long) {
-            longValue = ((Long) obj).longValue();
+            parseLong = ((Long) obj).longValue();
         } else if (!(obj instanceof String)) {
             return null;
         } else {
             try {
-                longValue = Long.parseLong((String) obj);
+                parseLong = Long.parseLong((String) obj);
             } catch (NumberFormatException e) {
                 return null;
             }
         }
-        if (longValue == 0) {
+        if (parseLong == 0) {
             return new Date(Long.MAX_VALUE);
         }
-        return new Date((longValue * 1000) + date.getTime());
+        return new Date((parseLong * 1000) + date.getTime());
     }
 
     public static long getContentSize(Uri uri) {
-        Cursor query;
-        Throwable th;
+        Cursor cursor;
         try {
-            query = FacebookSdk.getApplicationContext().getContentResolver().query(uri, null, null, null, null);
+            cursor = FacebookSdk.getApplicationContext().getContentResolver().query(uri, null, null, null, null);
             try {
-                int columnIndex = query.getColumnIndex("_size");
-                query.moveToFirst();
-                long j = query.getLong(columnIndex);
-                if (query != null) {
-                    query.close();
+                int columnIndex = cursor.getColumnIndex("_size");
+                cursor.moveToFirst();
+                long j = cursor.getLong(columnIndex);
+                if (cursor != null) {
+                    cursor.close();
                 }
                 return j;
-            } catch (Throwable th2) {
-                th = th2;
-                if (query != null) {
-                    query.close();
-                }
-                throw th;
+            } catch (Throwable th) {
+                th = th;
             }
-        } catch (Throwable th3) {
-            th = th3;
-            query = null;
-            if (query != null) {
-                query.close();
+        } catch (Throwable th2) {
+            th = th2;
+            cursor = null;
+            if (cursor != null) {
+                cursor.close();
             }
             throw th;
         }
     }
 
-    public static DialogFeatureConfig getDialogFeatureConfig(String str, String str2, String str3) {
-        if (!isNullOrEmpty(str2)) {
-            if (isNullOrEmpty(str3)) {
-                return null;
-            }
-            FetchedAppSettings fetchedAppSettings = (FetchedAppSettings) fetchedAppSettings.get(str);
-            if (fetchedAppSettings != null) {
-                Map map = (Map) fetchedAppSettings.getDialogConfigurations().get(str2);
-                if (map != null) {
-                    return (DialogFeatureConfig) map.get(str3);
-                }
-            }
+    public static Locale getCurrentLocale() {
+        try {
+            return FacebookSdk.getApplicationContext().getResources().getConfiguration().locale;
+        } catch (Exception e) {
+            return Locale.getDefault();
         }
-        return null;
     }
 
     private static GraphRequest getGraphMeRequestWithCache(String str) {
         Bundle bundle = new Bundle();
-        bundle.putString("fields", "id,name,first_name,middle_name,last_name,link");
+        bundle.putString(GraphRequest.FIELDS_PARAM, "id,name,first_name,middle_name,last_name,link");
         bundle.putString("access_token", str);
         return new GraphRequest(null, "me", bundle, HttpMethod.GET, null);
     }
@@ -567,7 +398,7 @@ public final class Utility {
             graphMeRequestWithCacheCallback.onSuccess(profileInformation);
             return;
         }
-        Callback c04202 = new Callback() {
+        C06591 r0 = new Callback() {
             public void onCompleted(GraphResponse graphResponse) {
                 if (graphResponse.getError() != null) {
                     graphMeRequestWithCacheCallback.onFailure(graphResponse.getError().getException());
@@ -578,7 +409,7 @@ public final class Utility {
             }
         };
         GraphRequest graphMeRequestWithCache = getGraphMeRequestWithCache(str);
-        graphMeRequestWithCache.setCallback(c04202);
+        graphMeRequestWithCache.setCallback(r0);
         graphMeRequestWithCache.executeAsync();
     }
 
@@ -598,7 +429,7 @@ public final class Utility {
 
     public static Method getMethodQuietly(String str, String str2, Class<?>... clsArr) {
         try {
-            return getMethodQuietly(Class.forName(str), str2, (Class[]) clsArr);
+            return getMethodQuietly(Class.forName(str), str2, clsArr);
         } catch (ClassNotFoundException e) {
             return null;
         }
@@ -606,30 +437,33 @@ public final class Utility {
 
     public static Object getStringPropertyAsJSON(JSONObject jSONObject, String str, String str2) throws JSONException {
         Object opt = jSONObject.opt(str);
-        Object nextValue = (opt == null || !(opt instanceof String)) ? opt : new JSONTokener((String) opt).nextValue();
-        if (nextValue == null || (nextValue instanceof JSONObject) || (nextValue instanceof JSONArray)) {
-            return nextValue;
+        Object obj = (opt == null || !(opt instanceof String)) ? opt : new JSONTokener((String) opt).nextValue();
+        if (obj == null || (obj instanceof JSONObject) || (obj instanceof JSONArray)) {
+            return obj;
         }
         if (str2 != null) {
             JSONObject jSONObject2 = new JSONObject();
-            jSONObject2.putOpt(str2, nextValue);
+            jSONObject2.putOpt(str2, obj);
             return jSONObject2;
         }
         throw new FacebookException("Got an unexpected non-JSON object.");
     }
 
     public static String getUriString(Uri uri) {
-        return uri == null ? null : uri.toString();
+        if (uri == null) {
+            return null;
+        }
+        return uri.toString();
     }
 
     public static PermissionsPair handlePermissionResponse(JSONObject jSONObject) throws JSONException {
         JSONArray jSONArray = jSONObject.getJSONObject(NativeProtocol.RESULT_ARGS_PERMISSIONS).getJSONArray(ShareConstants.WEB_DIALOG_PARAM_DATA);
-        List arrayList = new ArrayList(jSONArray.length());
-        List arrayList2 = new ArrayList(jSONArray.length());
+        ArrayList arrayList = new ArrayList(jSONArray.length());
+        ArrayList arrayList2 = new ArrayList(jSONArray.length());
         for (int i = 0; i < jSONArray.length(); i++) {
             JSONObject optJSONObject = jSONArray.optJSONObject(i);
             String optString = optJSONObject.optString("permission");
-            if (!(optString == null || optString.equals("installed"))) {
+            if (optString != null && !optString.equals("installed")) {
                 String optString2 = optJSONObject.optString("status");
                 if (optString2 != null) {
                     if (optString2.equals("granted")) {
@@ -652,23 +486,26 @@ public final class Utility {
         }
         String optString = jSONObject.optString("id");
         String optString2 = jSONObject2.optString("id");
-        return (optString == null || optString2 == null) ? false : optString.equals(optString2);
+        if (optString == null || optString2 == null) {
+            return false;
+        }
+        return optString.equals(optString2);
     }
 
     private static String hashBytes(MessageDigest messageDigest, byte[] bArr) {
         messageDigest.update(bArr);
         byte[] digest = messageDigest.digest();
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (byte b : digest) {
-            stringBuilder.append(Integer.toHexString((b >> 4) & 15));
-            stringBuilder.append(Integer.toHexString((b >> 0) & 15));
+            sb.append(Integer.toHexString((b >> 4) & 15));
+            sb.append(Integer.toHexString((b >> 0) & 15));
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public static <T> HashSet<T> hashSet(T... tArr) {
-        HashSet<T> hashSet = new HashSet(tArr.length);
-        for (Object add : tArr) {
+        HashSet<T> hashSet = new HashSet<>(tArr.length);
+        for (T add : tArr) {
             hashSet.add(add);
         }
         return hashSet;
@@ -687,7 +524,7 @@ public final class Utility {
     }
 
     public static int[] intersectRanges(int[] iArr, int[] iArr2) {
-        int i = 0;
+        int i;
         if (iArr == null) {
             return iArr2;
         }
@@ -697,58 +534,77 @@ public final class Utility {
         int[] iArr3 = new int[(iArr.length + iArr2.length)];
         int i2 = 0;
         int i3 = 0;
-        while (i < iArr.length && i2 < iArr2.length) {
-            int i4 = iArr[i];
-            int i5 = iArr2[i2];
-            int i6 = i < iArr.length + -1 ? iArr[i + 1] : Integer.MAX_VALUE;
-            int i7 = i2 < iArr2.length + -1 ? iArr2[i2 + 1] : Integer.MAX_VALUE;
-            if (i4 < i5) {
-                if (i6 <= i5) {
-                    i += 2;
-                    i5 = Integer.MIN_VALUE;
-                    i4 = Integer.MAX_VALUE;
-                } else if (i6 > i7) {
-                    i2 += 2;
-                    i4 = i7;
-                } else {
-                    i += 2;
-                    i4 = i6;
-                }
-            } else if (i7 <= i4) {
-                i2 += 2;
-                i5 = Integer.MIN_VALUE;
-                i4 = Integer.MAX_VALUE;
-            } else if (i7 > i6) {
-                i += 2;
-                i5 = i4;
-                i4 = i6;
-            } else {
-                i2 += 2;
-                i5 = i4;
-                i4 = i7;
+        int i4 = 0;
+        while (true) {
+            if (i2 >= iArr.length || i3 >= iArr2.length) {
+                break;
             }
-            if (i5 != Integer.MIN_VALUE) {
-                i6 = i3 + 1;
-                iArr3[i3] = i5;
-                if (i4 == Integer.MAX_VALUE) {
-                    i3 = i6;
+            int i5 = iArr[i2];
+            int i6 = iArr2[i3];
+            int i7 = i2 < iArr.length + -1 ? iArr[i2 + 1] : Integer.MAX_VALUE;
+            int i8 = i3 < iArr2.length + -1 ? iArr2[i3 + 1] : Integer.MAX_VALUE;
+            if (i5 < i6) {
+                if (i7 <= i6) {
+                    i2 += 2;
+                    i6 = Integer.MIN_VALUE;
+                    i = i3;
+                    i7 = Integer.MAX_VALUE;
+                } else if (i7 > i8) {
+                    i = i3 + 2;
+                    i7 = i8;
+                } else {
+                    i2 += 2;
+                    i = i3;
+                }
+            } else if (i8 <= i5) {
+                i6 = Integer.MIN_VALUE;
+                i = i3 + 2;
+                i7 = Integer.MAX_VALUE;
+            } else if (i8 > i7) {
+                i2 += 2;
+                i6 = i5;
+                i = i3;
+            } else {
+                i6 = i5;
+                i = i3 + 2;
+                i7 = i8;
+            }
+            if (i6 != Integer.MIN_VALUE) {
+                int i9 = i4 + 1;
+                iArr3[i4] = i6;
+                if (i7 == Integer.MAX_VALUE) {
+                    i4 = i9;
                     break;
                 }
-                i3 = i6 + 1;
-                iArr3[i6] = i4;
+                i4 = i9 + 1;
+                iArr3[i9] = i7;
+                i3 = i;
+            } else {
+                i3 = i;
             }
         }
-        return Arrays.copyOf(iArr3, i3);
+        return Arrays.copyOf(iArr3, i4);
     }
 
     public static Object invokeMethodQuietly(Object obj, Method method, Object... objArr) {
-        Object obj2 = null;
+        boolean z = false;
         try {
-            obj2 = method.invoke(obj, objArr);
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e2) {
+            return method.invoke(obj, objArr);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            return z;
         }
-        return obj2;
+    }
+
+    public static boolean isAutofillAvailable(Context context) {
+        if (VERSION.SDK_INT < 26) {
+            return false;
+        }
+        AutofillManager autofillManager = (AutofillManager) context.getSystemService(AutofillManager.class);
+        return autofillManager != null && autofillManager.isAutofillSupported() && autofillManager.isEnabled();
+    }
+
+    public static boolean isChromeOS(Context context) {
+        return VERSION.SDK_INT >= 27 ? context.getPackageManager().hasSystemFeature("android.hardware.type.pc") : Build.DEVICE != null && Build.DEVICE.matches(ARC_DEVICE_PATTERN);
     }
 
     public static boolean isContentUri(Uri uri) {
@@ -756,7 +612,7 @@ public final class Utility {
     }
 
     public static boolean isCurrentAccessToken(AccessToken accessToken) {
-        return accessToken != null ? accessToken.equals(AccessToken.getCurrentAccessToken()) : false;
+        return accessToken != null && accessToken.equals(AccessToken.getCurrentAccessToken());
     }
 
     public static boolean isFileUri(Uri uri) {
@@ -774,23 +630,22 @@ public final class Utility {
     public static <T> boolean isSubset(Collection<T> collection, Collection<T> collection2) {
         if (collection2 == null || collection2.size() == 0) {
             return collection == null || collection.size() == 0;
-        } else {
-            HashSet hashSet = new HashSet(collection2);
-            for (T contains : collection) {
-                if (!hashSet.contains(contains)) {
-                    return false;
-                }
-            }
-            return true;
         }
+        HashSet hashSet = new HashSet(collection2);
+        for (T contains : collection) {
+            if (!hashSet.contains(contains)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean isWebUri(Uri uri) {
-        return uri != null && ("http".equalsIgnoreCase(uri.getScheme()) || URL_SCHEME.equalsIgnoreCase(uri.getScheme()));
+        return uri != null && ("http".equalsIgnoreCase(uri.getScheme()) || URL_SCHEME.equalsIgnoreCase(uri.getScheme()) || "fbstaging".equalsIgnoreCase(uri.getScheme()));
     }
 
     public static Set<String> jsonArrayToSet(JSONArray jSONArray) throws JSONException {
-        Set<String> hashSet = new HashSet();
+        HashSet hashSet = new HashSet();
         for (int i = 0; i < jSONArray.length(); i++) {
             hashSet.add(jSONArray.getString(i));
         }
@@ -798,47 +653,16 @@ public final class Utility {
     }
 
     public static List<String> jsonArrayToStringList(JSONArray jSONArray) throws JSONException {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (int i = 0; i < jSONArray.length(); i++) {
             arrayList.add(jSONArray.getString(i));
         }
         return arrayList;
     }
 
-    public static void loadAppSettingsAsync(final Context context, final String str) {
-        boolean compareAndSet = loadingSettings.compareAndSet(false, true);
-        if (!isNullOrEmpty(str) && !fetchedAppSettings.containsKey(str) && compareAndSet) {
-            final String format = String.format(APP_SETTINGS_PREFS_KEY_FORMAT, new Object[]{str});
-            FacebookSdk.getExecutor().execute(new Runnable() {
-                public void run() {
-                    JSONObject jSONObject;
-                    SharedPreferences sharedPreferences = context.getSharedPreferences(Utility.APP_SETTINGS_PREFS_STORE, 0);
-                    String string = sharedPreferences.getString(format, null);
-                    if (!Utility.isNullOrEmpty(string)) {
-                        try {
-                            jSONObject = new JSONObject(string);
-                        } catch (Exception e) {
-                            Utility.logd(Utility.LOG_TAG, e);
-                            jSONObject = null;
-                        }
-                        if (jSONObject != null) {
-                            Utility.parseAppSettingsFromJSON(str, jSONObject);
-                        }
-                    }
-                    jSONObject = Utility.getAppSettingsQueryResponse(str);
-                    if (jSONObject != null) {
-                        Utility.parseAppSettingsFromJSON(str, jSONObject);
-                        sharedPreferences.edit().putString(format, jSONObject.toString()).apply();
-                    }
-                    Utility.loadingSettings.set(false);
-                }
-            });
-        }
-    }
-
-    public static void logd(String str, Exception exception) {
-        if (FacebookSdk.isDebugEnabled() && str != null && exception != null) {
-            Log.d(str, exception.getClass().getSimpleName() + ": " + exception.getMessage());
+    public static void logd(String str, Exception exc) {
+        if (FacebookSdk.isDebugEnabled() && str != null && exc != null) {
+            Log.d(str, exc.getClass().getSimpleName() + ": " + exc.getMessage());
         }
     }
 
@@ -858,47 +682,25 @@ public final class Utility {
         if (list == null) {
             return null;
         }
-        List<K> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (T apply : list) {
             Object apply2 = mapper.apply(apply);
             if (apply2 != null) {
                 arrayList.add(apply2);
             }
         }
-        return arrayList.size() != 0 ? arrayList : null;
+        if (arrayList.size() != 0) {
+            return arrayList;
+        }
+        return null;
     }
 
     public static String md5hash(String str) {
-        return hashWithAlgorithm("MD5", str);
+        return hashWithAlgorithm(HASH_ALGORITHM_MD5, str);
     }
 
-    private static FetchedAppSettings parseAppSettingsFromJSON(String str, JSONObject jSONObject) {
-        JSONArray optJSONArray = jSONObject.optJSONArray(APP_SETTING_ANDROID_SDK_ERROR_CATEGORIES);
-        FetchedAppSettings fetchedAppSettings = new FetchedAppSettings(jSONObject.optBoolean(APP_SETTING_SUPPORTS_IMPLICIT_SDK_LOGGING, false), jSONObject.optString(APP_SETTING_NUX_CONTENT, ""), jSONObject.optBoolean(APP_SETTING_NUX_ENABLED, false), jSONObject.optBoolean(APP_SETTING_CUSTOM_TABS_ENABLED, false), jSONObject.optInt(APP_SETTING_APP_EVENTS_SESSION_TIMEOUT, Constants.getDefaultAppEventsSessionTimeoutInSeconds()), parseDialogConfigurations(jSONObject.optJSONObject(APP_SETTING_DIALOG_CONFIGS)), optJSONArray == null ? FacebookRequestErrorClassification.getDefaultErrorClassification() : FacebookRequestErrorClassification.createFromJSON(optJSONArray));
-        fetchedAppSettings.put(str, fetchedAppSettings);
-        return fetchedAppSettings;
-    }
-
-    private static Map<String, Map<String, DialogFeatureConfig>> parseDialogConfigurations(JSONObject jSONObject) {
-        Map hashMap = new HashMap();
-        if (jSONObject != null) {
-            JSONArray optJSONArray = jSONObject.optJSONArray(ShareConstants.WEB_DIALOG_PARAM_DATA);
-            if (optJSONArray != null) {
-                for (int i = 0; i < optJSONArray.length(); i++) {
-                    DialogFeatureConfig access$400 = DialogFeatureConfig.parseDialogConfig(optJSONArray.optJSONObject(i));
-                    if (access$400 != null) {
-                        String dialogName = access$400.getDialogName();
-                        Map map = (Map) hashMap.get(dialogName);
-                        if (map == null) {
-                            map = new HashMap();
-                            hashMap.put(dialogName, map);
-                        }
-                        map.put(access$400.getFeatureName(), access$400);
-                    }
-                }
-            }
-        }
-        return hashMap;
+    public static boolean mustFixWindowParamsForAutofill(Context context) {
+        return isAutofillAvailable(context);
     }
 
     public static Bundle parseUrlQueryString(String str) {
@@ -912,8 +714,8 @@ public final class Utility {
                     } else if (split2.length == 1) {
                         bundle.putString(URLDecoder.decode(split2[0], "UTF-8"), "");
                     }
-                } catch (Exception e) {
-                    logd(LOG_TAG, e);
+                } catch (UnsupportedEncodingException e) {
+                    logd(LOG_TAG, (Exception) e);
                 }
             }
         }
@@ -922,16 +724,16 @@ public final class Utility {
 
     public static void putCommaSeparatedStringList(Bundle bundle, String str, List<String> list) {
         if (list != null) {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             for (String append : list) {
-                stringBuilder.append(append);
-                stringBuilder.append(",");
+                sb.append(append);
+                sb.append(",");
             }
-            String append2 = "";
-            if (stringBuilder.length() > 0) {
-                append2 = stringBuilder.substring(0, stringBuilder.length() - 1);
+            String str2 = "";
+            if (sb.length() > 0) {
+                str2 = sb.substring(0, sb.length() - 1);
             }
-            bundle.putString(str, append2);
+            bundle.putString(str, str2);
         }
     }
 
@@ -957,11 +759,11 @@ public final class Utility {
         } else if (obj instanceof String) {
             bundle.putString(str, (String) obj);
         } else if (obj instanceof JSONArray) {
-            bundle.putString(str, ((JSONArray) obj).toString());
+            bundle.putString(str, obj.toString());
         } else if (!(obj instanceof JSONObject)) {
             return false;
         } else {
-            bundle.putString(str, ((JSONObject) obj).toString());
+            bundle.putString(str, obj.toString());
         }
         return true;
     }
@@ -978,54 +780,44 @@ public final class Utility {
         }
     }
 
-    public static FetchedAppSettings queryAppSettings(String str, boolean z) {
-        if (!z && fetchedAppSettings.containsKey(str)) {
-            return (FetchedAppSettings) fetchedAppSettings.get(str);
-        }
-        JSONObject appSettingsQueryResponse = getAppSettingsQueryResponse(str);
-        return appSettingsQueryResponse == null ? null : parseAppSettingsFromJSON(str, appSettingsQueryResponse);
-    }
-
     public static String readStreamToString(InputStream inputStream) throws IOException {
-        Closeable bufferedInputStream;
-        Closeable inputStreamReader;
-        Throwable th;
+        InputStreamReader inputStreamReader;
+        BufferedInputStream bufferedInputStream;
         try {
             bufferedInputStream = new BufferedInputStream(inputStream);
             try {
                 inputStreamReader = new InputStreamReader(bufferedInputStream);
                 try {
-                    StringBuilder stringBuilder = new StringBuilder();
+                    StringBuilder sb = new StringBuilder();
                     char[] cArr = new char[2048];
                     while (true) {
                         int read = inputStreamReader.read(cArr);
                         if (read != -1) {
-                            stringBuilder.append(cArr, 0, read);
+                            sb.append(cArr, 0, read);
                         } else {
-                            String stringBuilder2 = stringBuilder.toString();
+                            String sb2 = sb.toString();
                             closeQuietly(bufferedInputStream);
                             closeQuietly(inputStreamReader);
-                            return stringBuilder2;
+                            return sb2;
                         }
                     }
-                } catch (Throwable th2) {
-                    th = th2;
+                } catch (Throwable th) {
+                    th = th;
                     closeQuietly(bufferedInputStream);
                     closeQuietly(inputStreamReader);
                     throw th;
                 }
-            } catch (Throwable th3) {
-                th = th3;
+            } catch (Throwable th2) {
+                th = th2;
                 inputStreamReader = null;
                 closeQuietly(bufferedInputStream);
                 closeQuietly(inputStreamReader);
                 throw th;
             }
-        } catch (Throwable th32) {
-            bufferedInputStream = null;
-            Throwable th4 = th32;
+        } catch (Throwable th3) {
+            th = th3;
             inputStreamReader = null;
-            th = th4;
+            bufferedInputStream = null;
             closeQuietly(bufferedInputStream);
             closeQuietly(inputStreamReader);
             throw th;
@@ -1037,7 +829,7 @@ public final class Utility {
         if (readInt < 0) {
             return null;
         }
-        Map<String, String> hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         for (int i = 0; i < readInt; i++) {
             hashMap.put(parcel.readString(), parcel.readString());
         }
@@ -1060,7 +852,11 @@ public final class Utility {
             return numCPUCores;
         }
         try {
-            File[] listFiles = new File("/sys/devices/system/cpu/").listFiles(new C04213());
+            File[] listFiles = new File("/sys/devices/system/cpu/").listFiles(new FilenameFilter() {
+                public boolean accept(File file, String str) {
+                    return Pattern.matches("cpu[0-9]+", str);
+                }
+            });
             if (listFiles != null) {
                 numCPUCores = listFiles.length;
             }
@@ -1075,7 +871,7 @@ public final class Utility {
     private static void refreshCarrierName(Context context) {
         if (carrierName.equals(noCarrierConstant)) {
             try {
-                carrierName = ((TelephonyManager) context.getSystemService("phone")).getNetworkOperatorName();
+                carrierName = ((TelephonyManager) context.getSystemService(PlaceFields.PHONE)).getNetworkOperatorName();
             } catch (Exception e) {
             }
         }
@@ -1096,7 +892,7 @@ public final class Utility {
             TimeZone timeZone = TimeZone.getDefault();
             deviceTimezoneAbbreviation = timeZone.getDisplayName(timeZone.inDaylightTime(new Date()), 0);
             deviceTimeZoneName = timeZone.getID();
-        } catch (Exception e) {
+        } catch (AssertionError | Exception e) {
         }
     }
 
@@ -1137,21 +933,22 @@ public final class Utility {
     public static void setAppEventExtendedDeviceInfoParameters(JSONObject jSONObject, Context context) throws JSONException {
         Locale locale;
         int i;
+        int i2;
         JSONArray jSONArray = new JSONArray();
         jSONArray.put(EXTRA_APP_EVENTS_INFO_FORMAT_VERSION);
         refreshPeriodicExtendedDeviceInfo(context);
         String packageName = context.getPackageName();
-        int i2 = -1;
-        Object obj = "";
+        int i3 = -1;
+        String str = "";
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
-            i2 = packageInfo.versionCode;
-            obj = packageInfo.versionName;
+            i3 = packageInfo.versionCode;
+            str = packageInfo.versionName;
         } catch (NameNotFoundException e) {
         }
         jSONArray.put(packageName);
-        jSONArray.put(i2);
-        jSONArray.put(obj);
+        jSONArray.put(i3);
+        jSONArray.put(str);
         jSONArray.put(VERSION.RELEASE);
         jSONArray.put(Build.MODEL);
         try {
@@ -1194,7 +991,7 @@ public final class Utility {
         jSONArray.put(totalExternalStorageGB);
         jSONArray.put(availableExternalStorageGB);
         jSONArray.put(deviceTimeZoneName);
-        jSONObject.put("extinfo", jSONArray.toString());
+        jSONObject.put(Constants.EXTINFO, jSONArray.toString());
     }
 
     public static String sha1hash(String str) {
@@ -1208,15 +1005,27 @@ public final class Utility {
     public static boolean stringsEqualOrEmpty(String str, String str2) {
         boolean isEmpty = TextUtils.isEmpty(str);
         boolean isEmpty2 = TextUtils.isEmpty(str2);
-        return (isEmpty && isEmpty2) ? true : (isEmpty || isEmpty2) ? false : str.equals(str2);
+        if (isEmpty && isEmpty2) {
+            return true;
+        }
+        if (isEmpty || isEmpty2) {
+            return false;
+        }
+        return str.equals(str2);
     }
 
     public static JSONArray tryGetJSONArrayFromResponse(JSONObject jSONObject, String str) {
-        return jSONObject != null ? jSONObject.optJSONArray(str) : null;
+        if (jSONObject != null) {
+            return jSONObject.optJSONArray(str);
+        }
+        return null;
     }
 
     public static JSONObject tryGetJSONObjectFromResponse(JSONObject jSONObject, String str) {
-        return jSONObject != null ? jSONObject.optJSONObject(str) : null;
+        if (jSONObject != null) {
+            return jSONObject.optJSONObject(str);
+        }
+        return null;
     }
 
     public static <T> Collection<T> unmodifiableCollection(T... tArr) {

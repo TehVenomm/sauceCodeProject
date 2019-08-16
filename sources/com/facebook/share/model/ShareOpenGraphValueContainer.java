@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import com.facebook.share.model.ShareOpenGraphValueContainer;
+import com.facebook.share.model.ShareOpenGraphValueContainer.Builder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
@@ -12,7 +14,8 @@ public abstract class ShareOpenGraphValueContainer<P extends ShareOpenGraphValue
     private final Bundle bundle;
 
     public static abstract class Builder<P extends ShareOpenGraphValueContainer, E extends Builder> implements ShareModelBuilder<P, E> {
-        private Bundle bundle = new Bundle();
+        /* access modifiers changed from: private */
+        public Bundle bundle = new Bundle();
 
         public E putBoolean(String str, boolean z) {
             this.bundle.putBoolean(str, z);
@@ -151,7 +154,10 @@ public abstract class ShareOpenGraphValueContainer<P extends ShareOpenGraphValue
 
     public ShareOpenGraphObject getObject(String str) {
         Object obj = this.bundle.get(str);
-        return obj instanceof ShareOpenGraphObject ? (ShareOpenGraphObject) obj : null;
+        if (obj instanceof ShareOpenGraphObject) {
+            return (ShareOpenGraphObject) obj;
+        }
+        return null;
     }
 
     @Nullable
@@ -160,7 +166,7 @@ public abstract class ShareOpenGraphValueContainer<P extends ShareOpenGraphValue
         if (parcelableArrayList == null) {
             return null;
         }
-        ArrayList<ShareOpenGraphObject> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         Iterator it = parcelableArrayList.iterator();
         while (it.hasNext()) {
             Parcelable parcelable = (Parcelable) it.next();
@@ -174,7 +180,10 @@ public abstract class ShareOpenGraphValueContainer<P extends ShareOpenGraphValue
     @Nullable
     public SharePhoto getPhoto(String str) {
         Parcelable parcelable = this.bundle.getParcelable(str);
-        return parcelable instanceof SharePhoto ? (SharePhoto) parcelable : null;
+        if (parcelable instanceof SharePhoto) {
+            return (SharePhoto) parcelable;
+        }
+        return null;
     }
 
     @Nullable
@@ -183,7 +192,7 @@ public abstract class ShareOpenGraphValueContainer<P extends ShareOpenGraphValue
         if (parcelableArrayList == null) {
             return null;
         }
-        ArrayList<SharePhoto> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         Iterator it = parcelableArrayList.iterator();
         while (it.hasNext()) {
             Parcelable parcelable = (Parcelable) it.next();

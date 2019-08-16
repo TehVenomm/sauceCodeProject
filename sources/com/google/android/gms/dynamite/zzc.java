@@ -1,23 +1,26 @@
 package com.google.android.gms.dynamite;
 
 import android.content.Context;
-import com.google.android.gms.dynamite.DynamiteModule.zzd;
+import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zza;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.zzb;
 
-final class zzc implements zzd {
+final class zzc implements VersionPolicy {
     zzc() {
     }
 
-    public final zzj zza(Context context, String str, zzi zzi) throws com.google.android.gms.dynamite.DynamiteModule.zzc {
-        zzj zzj = new zzj();
-        zzj.zzgpp = zzi.zzae(context, str);
-        if (zzj.zzgpp != 0) {
-            zzj.zzgpr = -1;
+    public final zzb zza(Context context, String str, zza zza) throws LoadingException {
+        zzb zzb = new zzb();
+        zzb.zzir = zza.getLocalVersion(context, str);
+        if (zzb.zzir != 0) {
+            zzb.zzit = -1;
         } else {
-            zzj.zzgpq = zzi.zzb(context, str, true);
-            if (zzj.zzgpq != 0) {
-                zzj.zzgpr = 1;
+            zzb.zzis = zza.zza(context, str, true);
+            if (zzb.zzis != 0) {
+                zzb.zzit = 1;
             }
         }
-        return zzj;
+        return zzb;
     }
 }

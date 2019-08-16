@@ -20,7 +20,6 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 
 	protected override bool CheckTargetDead()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Enemy enemy = base.TargetObject as Enemy;
 		return enemy == null || enemy.isDead || !enemy.get_enabled() || !enemy.get_gameObject().get_activeInHierarchy();
 	}
@@ -29,7 +28,7 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 	{
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		float num = 3.40282347E+38f;
+		float num = float.MaxValue;
 		StageObject result = null;
 		int count = MonoBehaviourSingleton<StageObjectManager>.I.EnemyList.Count;
 		for (int i = 0; i < count; i++)

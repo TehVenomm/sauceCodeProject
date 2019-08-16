@@ -1,5 +1,6 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
+/* renamed from: android.support.v4.util.Pair */
 public class Pair<F, S> {
     public final F first;
     public final S second;
@@ -10,7 +11,7 @@ public class Pair<F, S> {
     }
 
     public static <A, B> Pair<A, B> create(A a, B b) {
-        return new Pair(a, b);
+        return new Pair<>(a, b);
     }
 
     private static boolean objectsEqual(Object obj, Object obj2) {

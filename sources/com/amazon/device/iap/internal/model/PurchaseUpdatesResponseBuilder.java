@@ -48,18 +48,18 @@ public class PurchaseUpdatesResponseBuilder {
         return this;
     }
 
-    public PurchaseUpdatesResponseBuilder setRequestId(RequestId requestId) {
-        this.requestId = requestId;
+    public PurchaseUpdatesResponseBuilder setRequestId(RequestId requestId2) {
+        this.requestId = requestId2;
         return this;
     }
 
-    public PurchaseUpdatesResponseBuilder setRequestStatus(RequestStatus requestStatus) {
-        this.requestStatus = requestStatus;
+    public PurchaseUpdatesResponseBuilder setRequestStatus(RequestStatus requestStatus2) {
+        this.requestStatus = requestStatus2;
         return this;
     }
 
-    public PurchaseUpdatesResponseBuilder setUserData(UserData userData) {
-        this.userData = userData;
+    public PurchaseUpdatesResponseBuilder setUserData(UserData userData2) {
+        this.userData = userData2;
         return this;
     }
 }

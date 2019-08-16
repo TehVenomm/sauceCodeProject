@@ -1,35 +1,15 @@
 package com.google.android.gms.games.internal;
 
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Parcel;
-import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.api.internal.BaseImplementation.ResultHolder;
+import com.google.android.gms.common.data.DataHolder;
+import com.google.android.gms.games.snapshot.Snapshots.CommitSnapshotResult;
 
-public final class zzm implements Creator<zzl> {
-    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        IBinder iBinder = null;
-        int zzd = zzb.zzd(parcel);
-        Bundle bundle = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 1:
-                    bundle = zzb.zzs(parcel, readInt);
-                    break;
-                case 2:
-                    iBinder = zzb.zzr(parcel, readInt);
-                    break;
-                default:
-                    zzb.zzb(parcel, readInt);
-                    break;
-            }
-        }
-        zzb.zzaf(parcel, zzd);
-        return new zzl(bundle, iBinder);
+final class zzm extends zzat<CommitSnapshotResult> {
+    zzm(ResultHolder resultHolder) {
+        super(resultHolder);
     }
 
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzl[i];
+    public final void zzah(DataHolder dataHolder) {
+        setResult(new zzh(dataHolder));
     }
 }

@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.ui;
+package net.gogame.gowrap.p019ui.dpro.p020ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,18 +11,19 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.gogame.gowrap.ui.dpro.C1155R;
-import net.gogame.gowrap.ui.dpro.model.leaderboard.LeaderboardEntry;
+import net.gogame.gowrap.p019ui.dpro.C1452R;
+import net.gogame.gowrap.p019ui.dpro.model.leaderboard.LeaderboardEntry;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.ui.RankingListAdapter */
 public class RankingListAdapter extends BaseAdapter {
-    private static final int[] BACKGROUND_COLORS = new int[]{0, -2147310171};
+    private static final int[] BACKGROUND_COLORS = {0, -2147310171};
     private static final String KEY_ENTRIES = "entries";
-    private static final int[] NAME_TEXT_COLORS = new int[]{-244890, -208061, -5477923, -16076881};
+    private static final int[] NAME_TEXT_COLORS = {-244890, -208061, -5477923, -16076881};
     private final Context context;
     private ArrayList<? extends LeaderboardEntry> entries;
 
-    public RankingListAdapter(Context context) {
-        this.context = context;
+    public RankingListAdapter(Context context2) {
+        this.context = context2;
     }
 
     public List<? extends LeaderboardEntry> getEntries() {
@@ -33,7 +34,7 @@ public class RankingListAdapter extends BaseAdapter {
         if (list instanceof ArrayList) {
             this.entries = (ArrayList) list;
         } else {
-            this.entries = new ArrayList(list);
+            this.entries = new ArrayList<>(list);
         }
         notifyDataSetChanged();
     }
@@ -65,15 +66,15 @@ public class RankingListAdapter extends BaseAdapter {
 
     public View getView(int i, LeaderboardEntry leaderboardEntry, View view, ViewGroup viewGroup) {
         if (view == null) {
-            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1155R.layout.net_gogame_gowrap_dpro_ranking_list_item, viewGroup, false);
+            view = ((LayoutInflater) this.context.getSystemService("layout_inflater")).inflate(C1452R.C1454layout.net_gogame_gowrap_dpro_ranking_list_item, viewGroup, false);
         }
         view.setBackgroundColor(BACKGROUND_COLORS[i % BACKGROUND_COLORS.length]);
-        TextView textView = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_position);
-        TextView textView2 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_name);
-        TextView textView3 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_title);
-        TextView textView4 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_hunter_id);
-        TextView textView5 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_level);
-        TextView textView6 = (TextView) view.findViewById(C1155R.id.net_gogame_gowrap_ranking_value);
+        TextView textView = (TextView) view.findViewById(C1452R.C1453id.net_gogame_gowrap_ranking_position);
+        TextView textView2 = (TextView) view.findViewById(C1452R.C1453id.net_gogame_gowrap_ranking_name);
+        TextView textView3 = (TextView) view.findViewById(C1452R.C1453id.net_gogame_gowrap_ranking_title);
+        TextView textView4 = (TextView) view.findViewById(C1452R.C1453id.net_gogame_gowrap_ranking_hunter_id);
+        TextView textView5 = (TextView) view.findViewById(C1452R.C1453id.net_gogame_gowrap_ranking_level);
+        TextView textView6 = (TextView) view.findViewById(C1452R.C1453id.net_gogame_gowrap_ranking_value);
         if (leaderboardEntry != null) {
             if (leaderboardEntry.getPosition() != null) {
                 textView.setText(String.format(Locale.getDefault(), "%,d", new Object[]{leaderboardEntry.getPosition()}));
@@ -100,7 +101,7 @@ public class RankingListAdapter extends BaseAdapter {
     }
 
     public Parcelable onSaveInstanceState() {
-        Parcelable bundle = new Bundle();
+        Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_ENTRIES, this.entries);
         return bundle;
     }

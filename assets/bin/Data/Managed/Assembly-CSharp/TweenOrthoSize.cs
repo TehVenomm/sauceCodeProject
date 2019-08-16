@@ -55,12 +55,12 @@ public class TweenOrthoSize : UITweener
 
 	public static TweenOrthoSize Begin(GameObject go, float duration, float to)
 	{
-		TweenOrthoSize tweenOrthoSize = UITweener.Begin<TweenOrthoSize>(go, duration, true);
+		TweenOrthoSize tweenOrthoSize = UITweener.Begin<TweenOrthoSize>(go, duration);
 		tweenOrthoSize.from = tweenOrthoSize.value;
 		tweenOrthoSize.to = to;
 		if (duration <= 0f)
 		{
-			tweenOrthoSize.Sample(1f, true);
+			tweenOrthoSize.Sample(1f, isFinished: true);
 			tweenOrthoSize.set_enabled(false);
 		}
 		return tweenOrthoSize;

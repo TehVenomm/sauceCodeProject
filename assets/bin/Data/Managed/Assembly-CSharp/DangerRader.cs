@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DangerRader
+public class DangerRader : MonoBehaviour
 {
 	public class ColliderRecord
 	{
@@ -26,9 +26,9 @@ public class DangerRader
 
 	public const float RADER_SPAN = 0.2f;
 
-	private const int RECORD_MAX = 20;
-
 	private SpanTimer triggerSpan = new SpanTimer(0.2f);
+
+	private const int RECORD_MAX = 20;
 
 	public LinkedList<ColliderRecord> records = new LinkedList<ColliderRecord>();
 
@@ -65,10 +65,6 @@ public class DangerRader
 
 	public static DangerRader Create(Brain brain, float radius)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
 		DangerRader componentInChildren = brain.get_gameObject().GetComponentInChildren<DangerRader>();
 		if (componentInChildren != null)
 		{
@@ -95,9 +91,7 @@ public class DangerRader
 
 	private void Awake()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		_rigidbody = this.GetComponent<Rigidbody>();
 		_collider = this.GetComponent<Collider>();
 		if (_collider == null)
@@ -119,7 +113,6 @@ public class DangerRader
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		brain = this.get_gameObject().GetComponentInParent<Brain>();
 	}
 
@@ -134,43 +127,34 @@ public class DangerRader
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(brain == null) && !(_collider == null) && _collider.get_enabled() && collider.get_isTrigger() && !(collider.get_gameObject() == this.get_gameObject()))
+		if (brain == null || _collider == null || !_collider.get_enabled() || !collider.get_isTrigger() || collider.get_gameObject() == this.get_gameObject())
 		{
-			StageObject stageObject = null;
-			BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
-			stageObject = ((!(component != null)) ? collider.get_gameObject().GetComponentInParent<StageObject>() : component.stageObject);
-			if (!(stageObject == null) && !(stageObject == brain.owner))
+			return;
+		}
+		StageObject stageObject = null;
+		BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
+		stageObject = ((!(component != null)) ? collider.get_gameObject().GetComponentInParent<StageObject>() : component.stageObject);
+		if (!(stageObject == null) && !(stageObject == brain.owner))
+		{
+			ColliderRecord colliderRecord = RecordCollider(collider, stageObject, component);
+			if (colliderRecord.isMove)
 			{
-				ColliderRecord colliderRecord = RecordCollider(collider, stageObject, component);
-				if (colliderRecord.isMove)
-				{
-					brain.HandleEvent(BRAIN_EVENT.BULLET_CATCH, component);
-				}
-				else
-				{
-					brain.HandleEvent(BRAIN_EVENT.COLLIDER_CATCH, stageObject);
-				}
+				brain.HandleEvent(BRAIN_EVENT.BULLET_CATCH, component);
+			}
+			else
+			{
+				brain.HandleEvent(BRAIN_EVENT.COLLIDER_CATCH, stageObject);
 			}
 		}
 	}
 
 	private ColliderRecord RecordCollider(Collider collider, StageObject obj, BulletObject bullet)
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Expected O, but got Unknown
-		//IL_014f: Expected O, but got Unknown
 		ColliderRecord colliderRecord = null;
 		if (records.Count >= 20)
 		{

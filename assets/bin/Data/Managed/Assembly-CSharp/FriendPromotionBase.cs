@@ -30,31 +30,28 @@ public class FriendPromotionBase : GameSection
 
 	public override void Initialize()
 	{
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 		FriendFollowLinkResult followLinkResult = MonoBehaviourSingleton<FriendManager>.I.followLinkResult;
 		if (followLinkResult == null)
 		{
 			base.Initialize();
+			return;
 		}
-		else
-		{
-			promotionInfo = followLinkResult.promotionInfo;
-			string text = base.sectionData.GetText("TITLE");
-			SetLabelText((Enum)UI.LBL_TITLE, text);
-			SetLabelText((Enum)UI.LBL_TITLE_SHADOW, text);
-			SetSuccessNum(promotionInfo);
-			SetReceivedNum(promotionInfo);
-			string text2 = base.sectionData.GetText("DETAIL");
-			SetLabelText((Enum)UI.LBL_DETAIL, text2);
-			bool isPromotionEvent = promotionInfo.isPromotionEvent;
-			SetActive((Enum)UI.OBJ_SNS_AREA, isPromotionEvent);
-			SetActive((Enum)UI.LBL_CANT_INVITE, !isPromotionEvent);
-			string message = followLinkResult.message;
-			linkMessage = string.Format(message, followLinkResult.link);
-			linkMessage = linkMessage.Replace("<BR>", "\n");
-			this.StartCoroutine(LoadTopBanner(promotionInfo.promotionBannerId));
-			base.Initialize();
-		}
+		promotionInfo = followLinkResult.promotionInfo;
+		string text = base.sectionData.GetText("TITLE");
+		SetLabelText((Enum)UI.LBL_TITLE, text);
+		SetLabelText((Enum)UI.LBL_TITLE_SHADOW, text);
+		SetSuccessNum(promotionInfo);
+		SetReceivedNum(promotionInfo);
+		string text2 = base.sectionData.GetText("DETAIL");
+		SetLabelText((Enum)UI.LBL_DETAIL, text2);
+		bool isPromotionEvent = promotionInfo.isPromotionEvent;
+		SetActive((Enum)UI.OBJ_SNS_AREA, isPromotionEvent);
+		SetActive((Enum)UI.LBL_CANT_INVITE, !isPromotionEvent);
+		string message = followLinkResult.message;
+		linkMessage = string.Format(message, followLinkResult.link);
+		linkMessage = linkMessage.Replace("<BR>", "\n");
+		this.StartCoroutine(LoadTopBanner(promotionInfo.promotionBannerId));
+		base.Initialize();
 	}
 
 	private void SetSuccessNum(PromotionInfo promotionInfo)
@@ -87,10 +84,10 @@ public class FriendPromotionBase : GameSection
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
 		string bannerName = ResourceName.GetFriendPromotionBannerImage(bannerId);
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, bannerName, false);
+		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, bannerName);
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		if (!(lo_image.loadedObject == null))
 		{

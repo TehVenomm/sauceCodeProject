@@ -6,6 +6,8 @@ public static class ResourceName
 
 	public const string CANNONBALL_RAPID_ATTACK_INFO_NAME = "cannonball_rapid";
 
+	public static readonly string CANNONBALL_SPECIAL_ATTACK_INFO_NAME = "cannonball_special";
+
 	public const string HEAL_ATTACK_INFO_NAME = "sk_heal_atk";
 
 	public const string HEAL_ATTACK_ZONE_INFO_NAME = "sk_heal_atk_zone";
@@ -14,15 +16,41 @@ public static class ResourceName
 
 	public const string ENEMY_SHADOW_SEALING_EFFECT_NAME = "ef_btl_wsk_bow_01_04";
 
+	public const string ENEMY_CONCUSSION_EFFECT_NAME = "ef_btl_enm_flinch_01";
+
 	public const string ENEMY_ELECTRIC_SHOCK_EFFECT_NAME = "ef_btl_enm_shock_01";
+
+	public const string ENEMY_SOIL_SHOCK_EFFECT_NAME = "ef_btl_enm_gravity_01";
 
 	public const string ENEMY_BURNING_EFFECT_NAME = "ef_btl_enm_fire_01";
 
 	public const string ENEMY_SPEED_DOWN_EFFECT_NAME = "ef_btl_pl_movedown_01";
 
+	public const string ENEMY_LIGHT_RING_EFFECT_NAME = "ef_btl_enm_bindring_01";
+
+	public const string ENEMY_EROSION_EFFECT_NAME = "ef_btl_enm_erosion_01";
+
+	public const string CHARACTER_STONE_EFFECT_NAME = "ef_btl_pl_stone_01";
+
+	public const string ENEMY_ACID_EFFECT_NAME = "ef_btl_enm_acid_01";
+
+	public const string ENEMY_CORRUPTION_EFFECT_NAME = "ef_btl_enm_corruption_01";
+
 	public const string ENEMY_BOSS_ENTRY_EXIT_EFFECT = "ef_btl_enemy_entry_01";
 
-	public static readonly string CANNONBALL_SPECIAL_ATTACK_INFO_NAME = "cannonball_special";
+	public const string ENEMY_SUMMON_EFFECT = "ef_btl_enm_summon_01";
+
+	public const string PLAYER_TELEPORTATION_ENTER_EFFECT = "ef_btl_sk_warp_02_01";
+
+	public const string PLAYER_TELEPORTATION_EXIT_EFFECT = "ef_btl_sk_warp_02_02";
+
+	public const string PLAYER_COUNTER_ATTACK_EFFECT = "ef_btl_ab_charge_01";
+
+	public const string ORACLE_OHS_PROTECTION_EFFECT = "ef_btl_wsk4_sword_dragon_veil";
+
+	public const string ORACLE_OHS_PROTECTION_DOUBLE_PROBABIRITY_EFFECT = "ef_btl_wsk4_sword_dragon_veil_re";
+
+	public const string ORACLE_OHS_BOOST_EFFECT_FORMAT = "ef_btl_wsk4_sword_02_{0:D2}";
 
 	public static string ToHash256String(this RESOURCE_CATEGORY category, byte hash)
 	{
@@ -37,7 +65,7 @@ public static class ResourceName
 	public static string ToAssetBundleName(this RESOURCE_CATEGORY category, string package_name = null)
 	{
 		string text = category.ToString();
-		if (ResourceDefine.types[(int)category] != ResourceManager.CATEGORY_TYPE.PACK)
+		if (ResourceDefine.types[(int)category] != ResourceManager.CATEGORY_TYPE.PACK && category != RESOURCE_CATEGORY.ASSETBUNDLEINFO)
 		{
 			text = text + "/" + package_name;
 		}
@@ -206,6 +234,11 @@ public static class ResourceName
 		return $"WEP{id / 1000:D2}_{id % 1000:D3}";
 	}
 
+	public static string GetPlayerAccessory(uint id)
+	{
+		return $"ACC_{id:D8}";
+	}
+
 	public static string GetPlayerAnim(int anim_id)
 	{
 		return $"PLC{anim_id:D2}_Anim";
@@ -318,8 +351,7 @@ public static class ResourceName
 		if (int.TryParse(s, out result))
 		{
 			result *= 10;
-			string text = stage_name.Substring(stage_name.Length - 1);
-			switch (text)
+			switch (stage_name.Substring(stage_name.Length - 1))
 			{
 			case "S":
 				result++;
@@ -363,6 +395,15 @@ public static class ResourceName
 			return $"IIC_{id:D8}";
 		}
 		return $"EIC_{id % 100000000:D8}{id / 100000000 - 1}";
+	}
+
+	public static string GetAccessoryIcon(int id)
+	{
+		if (id < 0)
+		{
+			return "AIC_00000000";
+		}
+		return $"AIC_{id:D8}";
 	}
 
 	public static string GetItemModel(int id)
@@ -440,6 +481,16 @@ public static class ResourceName
 		return $"STMP_{stamp_id:D8}";
 	}
 
+	public static string GetSymbolImageName(int stamp_id)
+	{
+		return $"SYMBOL_{stamp_id:D8}";
+	}
+
+	public static string GetSymbolFrameImageName(int stamp_id)
+	{
+		return $"SYMBOL_FRAME_{stamp_id:D8}";
+	}
+
 	public static string GetGatherPointModel(uint model_id)
 	{
 		return $"GAP_{model_id:D8}";
@@ -455,7 +506,7 @@ public static class ResourceName
 		return "CMN_healpoint01";
 	}
 
-	public static string GetFieldGimmickModel(FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE gimmickType)
+	public static string GetFieldGimmickModel(FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE gimmickType, int index)
 	{
 		switch (gimmickType)
 		{
@@ -469,6 +520,8 @@ public static class ResourceName
 			return "CMN_cannon03";
 		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CANNON_SPECIAL:
 			return "CMN_cannon04";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CANNON_FIELD:
+			return "CMN_cannon05";
 		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.BOMBROCK:
 			return "CMN_bombrock01";
 		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.SONAR:
@@ -477,6 +530,28 @@ public static class ResourceName
 			return "CMN_wavetarget01";
 		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.WAVE_TARGET2:
 			return "CMN_wavetarget02";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.WAVE_TARGET3:
+			return "CMN_wavetarget03";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.READ_STORY:
+			return "CMN_readstory01";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.FISHING:
+			return "CMN_fishing01";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CHAT:
+			return "CMN_chat01";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CANDYWOOD:
+			return "CMN_candy01";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_TURRET:
+			return $"CMN_turret{index + 1:D2}";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_BUFF_POINT:
+			return $"CMN_slowtrap{index + 1:D2}";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_DECOY:
+			return $"CMN_decoytrap{index + 1:D2}";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_EVOLVE_ITEM:
+			return $"CMN_itembag{index + 1:D2}";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_BOMB:
+			return $"CMN_timebomb{index + 1:D2}";
+		case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.QUEST:
+			return GetGatherPointModel((uint)index);
 		default:
 			return string.Empty;
 		}
@@ -492,14 +567,39 @@ public static class ResourceName
 		return "ef_btl_target_common_01";
 	}
 
+	public static string GetReadStoryTargetEffectName()
+	{
+		return "ef_btl_target_readstory_01";
+	}
+
 	public static string GetEventBanner(int banner_id)
 	{
 		return $"EBI_{banner_id:D8}";
 	}
 
+	public static string GetEventBanner(int banner_id, string suffix)
+	{
+		return $"EBI_{banner_id:D8}" + suffix;
+	}
+
+	public static string GetEventBannerVer2(int banner_id)
+	{
+		return $"EBI2_{banner_id:D8}";
+	}
+
+	public static string GetEventBannerVer2(int banner_id, string suffix)
+	{
+		return $"EBI2_{banner_id:D8}" + suffix;
+	}
+
 	public static string GetAreaBanner(int regionId)
 	{
 		return $"ABI_{regionId:D8}";
+	}
+
+	public static string GetCloseAreaBanner(int regionId)
+	{
+		return $"ABU_{regionId:D8}";
 	}
 
 	public static string GetHomeBannerImage(int banner_id)
@@ -582,6 +682,11 @@ public static class ResourceName
 		return $"PIG_{imageId:d8}";
 	}
 
+	public static string GetBannerImageName(int imageId)
+	{
+		return $"BNI_{imageId:d8}";
+	}
+
 	public static string GetPointShopBannerImageName(int imageId)
 	{
 		return $"PBI_{imageId:d8}";
@@ -627,6 +732,17 @@ public static class ResourceName
 		return $"ARIC_{(int)rank:d9}";
 	}
 
+	public static string GetSeriesArenaRankIconName(ARENA_RANK rank)
+	{
+		return $"HERO_ARIC_{(int)rank:d9}";
+	}
+
+	public static string GetSeriesArenaRankIconName(RARITY_TYPE rank)
+	{
+		int num = (int)(rank - 1);
+		return $"HERO_ARIC_{num:d9}";
+	}
+
 	public static string GetChapterImageName(int worldId)
 	{
 		if (worldId == 0)
@@ -657,5 +773,10 @@ public static class ResourceName
 			"sk",
 			"evolve"
 		};
+	}
+
+	public static string GetHomeBanner(int banner_id)
+	{
+		return $"HBA_{banner_id:D8}";
 	}
 }

@@ -165,13 +165,9 @@ public class BooleanUtils {
         if (str == null) {
             return null;
         }
-        char charAt;
-        char charAt2;
-        char charAt3;
-        char charAt4;
         switch (str.length()) {
             case 1:
-                charAt = str.charAt(0);
+                char charAt = str.charAt(0);
                 if (charAt == 'y' || charAt == 'Y' || charAt == 't' || charAt == 'T') {
                     return Boolean.TRUE;
                 }
@@ -180,41 +176,41 @@ public class BooleanUtils {
                 }
                 break;
             case 2:
-                charAt = str.charAt(0);
-                charAt2 = str.charAt(1);
-                if ((charAt == 'o' || charAt == 'O') && (charAt2 == 'n' || charAt2 == 'N')) {
+                char charAt2 = str.charAt(0);
+                char charAt3 = str.charAt(1);
+                if ((charAt2 == 'o' || charAt2 == 'O') && (charAt3 == 'n' || charAt3 == 'N')) {
                     return Boolean.TRUE;
                 }
-                if ((charAt == 'n' || charAt == 'N') && (charAt2 == 'o' || charAt2 == 'O')) {
+                if ((charAt2 == 'n' || charAt2 == 'N') && (charAt3 == 'o' || charAt3 == 'O')) {
                     return Boolean.FALSE;
                 }
                 break;
             case 3:
-                charAt = str.charAt(0);
-                charAt2 = str.charAt(1);
-                charAt3 = str.charAt(2);
-                if ((charAt == 'y' || charAt == 'Y') && ((charAt2 == 'e' || charAt2 == 'E') && (charAt3 == 's' || charAt3 == 'S'))) {
+                char charAt4 = str.charAt(0);
+                char charAt5 = str.charAt(1);
+                char charAt6 = str.charAt(2);
+                if ((charAt4 == 'y' || charAt4 == 'Y') && ((charAt5 == 'e' || charAt5 == 'E') && (charAt6 == 's' || charAt6 == 'S'))) {
                     return Boolean.TRUE;
                 }
-                if ((charAt == 'o' || charAt == 'O') && ((charAt2 == 'f' || charAt2 == 'F') && (charAt3 == 'f' || charAt3 == 'F'))) {
+                if ((charAt4 == 'o' || charAt4 == 'O') && ((charAt5 == 'f' || charAt5 == 'F') && (charAt6 == 'f' || charAt6 == 'F'))) {
                     return Boolean.FALSE;
                 }
                 break;
             case 4:
-                charAt = str.charAt(0);
-                charAt2 = str.charAt(1);
-                charAt3 = str.charAt(2);
-                charAt4 = str.charAt(3);
-                if ((charAt == 't' || charAt == 'T') && ((charAt2 == 'r' || charAt2 == 'R') && ((charAt3 == 'u' || charAt3 == 'U') && (charAt4 == 'e' || charAt4 == 'E')))) {
+                char charAt7 = str.charAt(0);
+                char charAt8 = str.charAt(1);
+                char charAt9 = str.charAt(2);
+                char charAt10 = str.charAt(3);
+                if ((charAt7 == 't' || charAt7 == 'T') && ((charAt8 == 'r' || charAt8 == 'R') && ((charAt9 == 'u' || charAt9 == 'U') && (charAt10 == 'e' || charAt10 == 'E')))) {
                     return Boolean.TRUE;
                 }
             case 5:
-                charAt = str.charAt(0);
-                charAt2 = str.charAt(1);
-                charAt3 = str.charAt(2);
-                charAt4 = str.charAt(3);
-                char charAt5 = str.charAt(4);
-                if ((charAt == 'f' || charAt == 'F') && ((charAt2 == 'a' || charAt2 == 'A') && ((charAt3 == 'l' || charAt3 == 'L') && ((charAt4 == 's' || charAt4 == 'S') && (charAt5 == 'e' || charAt5 == 'E'))))) {
+                char charAt11 = str.charAt(0);
+                char charAt12 = str.charAt(1);
+                char charAt13 = str.charAt(2);
+                char charAt14 = str.charAt(3);
+                char charAt15 = str.charAt(4);
+                if ((charAt11 == 'f' || charAt11 == 'F') && ((charAt12 == 'a' || charAt12 == 'A') && ((charAt13 == 'l' || charAt13 == 'L') && ((charAt14 == 's' || charAt14 == 'S') && (charAt15 == 'e' || charAt15 == 'E'))))) {
                     return Boolean.FALSE;
                 }
         }
@@ -334,7 +330,8 @@ public class BooleanUtils {
         }
     }
 
-    public static boolean or(boolean... zArr) {
+    /* renamed from: or */
+    public static boolean m1011or(boolean... zArr) {
         if (zArr == null) {
             throw new IllegalArgumentException("The Array must not be null");
         } else if (zArr.length == 0) {
@@ -349,14 +346,15 @@ public class BooleanUtils {
         }
     }
 
-    public static Boolean or(Boolean... boolArr) {
+    /* renamed from: or */
+    public static Boolean m1010or(Boolean... boolArr) {
         if (boolArr == null) {
             throw new IllegalArgumentException("The Array must not be null");
         } else if (boolArr.length == 0) {
             throw new IllegalArgumentException("Array is empty");
         } else {
             try {
-                return or(ArrayUtils.toPrimitive(boolArr)) ? Boolean.TRUE : Boolean.FALSE;
+                return m1011or(ArrayUtils.toPrimitive(boolArr)) ? Boolean.TRUE : Boolean.FALSE;
             } catch (NullPointerException e) {
                 throw new IllegalArgumentException("The array must not contain any null elements");
             }
@@ -364,16 +362,16 @@ public class BooleanUtils {
     }
 
     public static boolean xor(boolean... zArr) {
-        int i = 0;
         if (zArr == null) {
             throw new IllegalArgumentException("The Array must not be null");
         } else if (zArr.length == 0) {
             throw new IllegalArgumentException("Array is empty");
         } else {
+            int i = 0;
             boolean z = false;
             while (i < zArr.length) {
-                z ^= zArr[i];
                 i++;
+                z = zArr[i] ^ z;
             }
             return z;
         }

@@ -1,8 +1,10 @@
 package com.google.android.gms.games;
 
-import android.support.v4.view.PointerIconCompat;
+import android.support.p000v4.view.PointerIconCompat;
 import com.google.android.gms.common.api.Status;
+import java.util.Locale;
 
+@Deprecated
 public final class GamesStatusCodes {
     public static final int STATUS_ACHIEVEMENT_NOT_INCREMENTAL = 3002;
     public static final int STATUS_ACHIEVEMENT_UNKNOWN = 3001;
@@ -97,17 +99,21 @@ public final class GamesStatusCodes {
                 return "STATUS_AUTH_ERROR_HARD";
             case 1001:
                 return "STATUS_AUTH_ERROR_USER_RECOVERABLE";
-            case PointerIconCompat.TYPE_HAND /*1002*/:
+            case 1002:
                 return "STATUS_AUTH_ERROR_UNREGISTERED_CLIENT_ID";
             case PointerIconCompat.TYPE_HELP /*1003*/:
                 return "STATUS_AUTH_ERROR_API_ACCESS_DENIED";
+            case PointerIconCompat.TYPE_WAIT /*1004*/:
+                return "STATUS_AUTH_ERROR_ACCOUNT_NOT_USABLE";
+            case 1005:
+                return "STATUS_AUTH_ERROR_ACCOUNT_UNICORN";
             case 1500:
                 return "STATUS_PLAYER_OOB_REQUIRED";
             case 2000:
                 return "STATUS_REQUEST_UPDATE_PARTIAL_SUCCESS";
-            case 2001:
+            case STATUS_REQUEST_UPDATE_TOTAL_FAILURE /*2001*/:
                 return "STATUS_REQUEST_UPDATE_TOTAL_FAILURE";
-            case 2002:
+            case STATUS_REQUEST_TOO_MANY_RECIPIENTS /*2002*/:
                 return "STATUS_REQUEST_TOO_MANY_RECIPIENTS";
             case 3000:
                 return "STATUS_ACHIEVEMENT_UNLOCK_FAILURE";
@@ -135,7 +141,7 @@ public final class GamesStatusCodes {
                 return "STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER";
             case STATUS_MULTIPLAYER_ERROR_INVALID_MULTIPLAYER_TYPE /*6002*/:
                 return "STATUS_MULTIPLAYER_ERROR_INVALID_MULTIPLAYER_TYPE";
-            case STATUS_MULTIPLAYER_DISABLED /*6003*/:
+            case 6003:
                 return "STATUS_MULTIPLAYER_DISABLED";
             case STATUS_MATCH_ERROR_INVALID_PARTICIPANT_STATE /*6500*/:
                 return "STATUS_MATCH_ERROR_INVALID_PARTICIPANT_STATE";
@@ -151,15 +157,15 @@ public final class GamesStatusCodes {
                 return "STATUS_MATCH_NOT_FOUND";
             case STATUS_MATCH_ERROR_LOCALLY_MODIFIED /*6507*/:
                 return "STATUS_MATCH_ERROR_LOCALLY_MODIFIED";
-            case STATUS_REAL_TIME_CONNECTION_FAILED /*7000*/:
+            case 7000:
                 return "STATUS_REAL_TIME_CONNECTION_FAILED";
-            case STATUS_REAL_TIME_MESSAGE_SEND_FAILED /*7001*/:
+            case 7001:
                 return "STATUS_REAL_TIME_MESSAGE_SEND_FAILED";
             case STATUS_INVALID_REAL_TIME_ROOM_ID /*7002*/:
                 return "STATUS_INVALID_REAL_TIME_ROOM_ID";
             case STATUS_PARTICIPANT_NOT_CONNECTED /*7003*/:
                 return "STATUS_PARTICIPANT_NOT_CONNECTED";
-            case STATUS_REAL_TIME_ROOM_NOT_JOINED /*7004*/:
+            case 7004:
                 return "STATUS_REAL_TIME_ROOM_NOT_JOINED";
             case STATUS_REAL_TIME_INACTIVE_ROOM /*7005*/:
                 return "STATUS_REAL_TIME_INACTIVE_ROOM";
@@ -199,16 +205,8 @@ public final class GamesStatusCodes {
                 return "STATUS_VIDEO_RELEASE_TIMEOUT";
             case 9017:
                 return "STATUS_VIDEO_CAPTURE_VIDEO_PERMISSION_REQUIRED";
-            case 9100:
-                return "STATUS_VIDEO_NO_STREAMING_TARGET";
-            case 9101:
-                return "STATUS_YOUTUBE_LIVE_STREAM_NOT_ENABLED";
-            case 9103:
-                return "STATUS_YOUTUBE_LIVE_STREAM_GOOGLE_AUTH_ERROR";
             case 9200:
                 return "STATUS_VIDEO_MISSING_OVERLAY_PERMISSION";
-            case 9201:
-                return "STATUS_VIDEO_MISSING_HEADLESS_PERMISSION";
             case 10000:
                 return "STATUS_CLIENT_LOADING";
             case 10001:
@@ -216,11 +214,11 @@ public final class GamesStatusCodes {
             case GamesActivityResultCodes.RESULT_SIGN_IN_FAILED /*10002*/:
                 return "STATUS_CLIENT_HIDDEN";
             default:
-                return String.format("Status code (%d) not found!", new Object[]{Integer.valueOf(i)});
+                return String.format(Locale.US, "Status code (%d) not found!", new Object[]{Integer.valueOf(i)});
         }
     }
 
-    public static Status zzdb(int i) {
+    public static Status zza(int i) {
         return new Status(i, getStatusString(i));
     }
 }

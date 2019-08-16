@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Coop_Model_PlayerShotDecoyBullet : Coop_Model_ObjectBase
 {
+	public int skIndex;
+
 	public int decoyId;
 
 	public string bulletName;

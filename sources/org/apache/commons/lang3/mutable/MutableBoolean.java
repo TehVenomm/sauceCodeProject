@@ -7,6 +7,9 @@ public class MutableBoolean implements Mutable<Boolean>, Serializable, Comparabl
     private static final long serialVersionUID = -4830728138360036487L;
     private boolean value;
 
+    public MutableBoolean() {
+    }
+
     public MutableBoolean(boolean z) {
         this.value = z;
     }
@@ -52,10 +55,10 @@ public class MutableBoolean implements Mutable<Boolean>, Serializable, Comparabl
     }
 
     public boolean equals(Object obj) {
-        if ((obj instanceof MutableBoolean) && this.value == ((MutableBoolean) obj).booleanValue()) {
-            return true;
+        if (!(obj instanceof MutableBoolean) || this.value != ((MutableBoolean) obj).booleanValue()) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {

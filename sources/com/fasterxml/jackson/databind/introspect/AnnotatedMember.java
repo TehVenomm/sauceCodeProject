@@ -61,7 +61,8 @@ public abstract class AnnotatedMember extends Annotated implements Serializable 
         return this._annotations.annotations();
     }
 
-    protected AnnotationMap getAllAnnotations() {
+    /* access modifiers changed from: protected */
+    public AnnotationMap getAllAnnotations() {
         return this._annotations;
     }
 

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UIQuestLocationImage
+public class UIQuestLocationImage : MonoBehaviour
 {
 	private UITexture uiTexture;
 
@@ -23,7 +23,6 @@ public class UIQuestLocationImage
 
 	public static void Set(UITexture ui_texture, int qli_id, Action on_load_start, Action on_load_complete)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIQuestLocationImage uIQuestLocationImage = ui_texture.GetComponent<UIQuestLocationImage>();
 		if (uIQuestLocationImage == null)
 		{
@@ -34,7 +33,6 @@ public class UIQuestLocationImage
 
 	private void Load(UITexture ui_texture, int qli_id, Action on_load_start, Action on_load_complete)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		uiTexture = ui_texture;
 		id = qli_id;
 		onLoadStart = on_load_start;
@@ -50,47 +48,48 @@ public class UIQuestLocationImage
 			onLoadStart();
 		}
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_image = load_queue.Load(RESOURCE_CATEGORY.QUEST_LOCATION_IMAGE, ResourceName.GetQuestLocationImage(id), false);
+		LoadObject lo_image = load_queue.Load(RESOURCE_CATEGORY.QUEST_LOCATION_IMAGE, ResourceName.GetQuestLocationImage(id));
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		image = ResourceUtility.Realizes(lo_image.loadedObject, MonoBehaviourSingleton<StageManager>.I._transform, 5);
 		QuestLocationImage c = image.GetComponent<QuestLocationImage>();
-		if (!(c == null))
+		if (c == null)
 		{
-			int w = uiTexture.width;
-			int h = uiTexture.height;
-			UIRenderTexture.ToRealSize(ref w, ref h);
-			c.Init(w, h);
-			Camera cam = image.GetComponent<Camera>();
-			if (!(cam == null))
+			yield break;
+		}
+		int w = uiTexture.width;
+		int h = uiTexture.height;
+		UIRenderTexture.ToRealSize(ref w, ref h);
+		c.Init(w, h);
+		Camera cam = image.GetComponent<Camera>();
+		if (cam == null)
+		{
+			yield break;
+		}
+		RenderTexture tex = cam.get_targetTexture();
+		if (!(tex == null))
+		{
+			uiTexture.mainTexture = tex;
+			FloatInterpolator anim = new FloatInterpolator();
+			anim.Set(0.25f, 0f, 1f, Curves.easeLinear, 0f);
+			anim.Play();
+			while (anim.IsPlaying())
 			{
-				RenderTexture tex = cam.get_targetTexture();
-				if (!(tex == null))
-				{
-					uiTexture.mainTexture = tex;
-					FloatInterpolator anim = new FloatInterpolator();
-					anim.Set(0.25f, 0f, 1f, Curves.easeLinear, 0f, null);
-					anim.Play();
-					while (anim.IsPlaying())
-					{
-						yield return (object)null;
-						uiTexture.alpha = anim.Update();
-					}
-					if (onLoadComplete != null)
-					{
-						onLoadComplete();
-					}
-					coroutine = null;
-				}
+				yield return null;
+				uiTexture.alpha = anim.Update();
 			}
+			if (onLoadComplete != null)
+			{
+				onLoadComplete();
+			}
+			coroutine = null;
 		}
 	}
 
 	private void DeleteImage()
 	{
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		if (coroutine != null)
 		{
 			this.StopCoroutine(coroutine);
@@ -110,7 +109,6 @@ public class UIQuestLocationImage
 
 	private void OnEnable()
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		if (coroutine == null && image == null && uiTexture != null && id > -1)
 		{
 			this.StartCoroutine(coroutine = DoLoad());

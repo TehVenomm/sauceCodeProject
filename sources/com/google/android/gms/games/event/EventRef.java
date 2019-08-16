@@ -3,13 +3,12 @@ package com.google.android.gms.games.event;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayerRef;
-import com.google.firebase.analytics.FirebaseAnalytics.Param;
 
-public final class EventRef extends zzc implements Event {
+public final class EventRef extends DataBufferRef implements Event {
     EventRef(DataHolder dataHolder, int i) {
         super(dataHolder, i);
     }
@@ -31,7 +30,7 @@ public final class EventRef extends zzc implements Event {
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zza("description", charArrayBuffer);
+        copyToBuffer("description", charArrayBuffer);
     }
 
     public final String getEventId() {
@@ -43,11 +42,11 @@ public final class EventRef extends zzc implements Event {
     }
 
     public final void getFormattedValue(CharArrayBuffer charArrayBuffer) {
-        zza("formatted_value", charArrayBuffer);
+        copyToBuffer("formatted_value", charArrayBuffer);
     }
 
     public final Uri getIconImageUri() {
-        return zzfu("icon_image_uri");
+        return parseUri("icon_image_uri");
     }
 
     public final String getIconImageUrl() {
@@ -59,15 +58,15 @@ public final class EventRef extends zzc implements Event {
     }
 
     public final void getName(CharArrayBuffer charArrayBuffer) {
-        zza("name", charArrayBuffer);
+        copyToBuffer("name", charArrayBuffer);
     }
 
     public final Player getPlayer() {
-        return new PlayerRef(this.zzfkz, this.zzfqb);
+        return new PlayerRef(this.mDataHolder, this.mDataRow);
     }
 
     public final long getValue() {
-        return getLong(Param.VALUE);
+        return getLong("value");
     }
 
     public final int hashCode() {

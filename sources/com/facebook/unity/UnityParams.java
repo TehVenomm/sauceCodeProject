@@ -31,7 +31,7 @@ public class UnityParams {
         try {
             return new UnityParams(str);
         } catch (JSONException e) {
-            Log.e(FB.TAG, str2);
+            Log.e(C0849FB.TAG, str2);
             return null;
         }
     }
@@ -40,7 +40,7 @@ public class UnityParams {
         try {
             return this.json.getDouble(str);
         } catch (JSONException e) {
-            Log.e(FB.TAG, "cannot get double " + str + " from " + toString());
+            Log.e(C0849FB.TAG, "cannot get double " + str + " from " + toString());
             return 0.0d;
         }
     }
@@ -49,7 +49,7 @@ public class UnityParams {
         try {
             return new UnityParams(this.json.getJSONObject(str));
         } catch (JSONException e) {
-            Log.e(FB.TAG, "cannot get object " + str + " from " + toString());
+            Log.e(C0849FB.TAG, "cannot get object " + str + " from " + toString());
             return null;
         }
     }
@@ -58,7 +58,7 @@ public class UnityParams {
         try {
             return this.json.getString(str);
         } catch (JSONException e) {
-            Log.e(FB.TAG, "cannot get string " + str + " from " + toString());
+            Log.e(C0849FB.TAG, "cannot get string " + str + " from " + toString());
             return "";
         }
     }
@@ -84,15 +84,14 @@ public class UnityParams {
     }
 
     public Boolean hasString(String str) {
-        boolean z = has(str) && getString(str) != "";
-        return Boolean.valueOf(z);
+        return Boolean.valueOf(has(str) && getString(str) != "");
     }
 
     public void put(String str, Object obj) {
         try {
             this.json.put(str, obj);
         } catch (JSONException e) {
-            Log.e(FB.TAG, "couldn't add key " + str + " to " + toString());
+            Log.e(C0849FB.TAG, "couldn't add key " + str + " to " + toString());
         }
     }
 

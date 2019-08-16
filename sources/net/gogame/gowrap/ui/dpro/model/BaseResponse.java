@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model;
+package net.gogame.gowrap.p019ui.dpro.model;
 
 import android.util.JsonReader;
 import java.io.IOException;
@@ -6,17 +6,22 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.BaseResponse */
 public class BaseResponse extends BaseJsonObject {
     private static final String KEY_ERROR_MESSAGE = "errorMessage";
     private static final String KEY_STATUS_CODE = "statusCode";
     private String errorMessage;
     private Integer statusCode;
 
+    public BaseResponse() {
+    }
+
     public BaseResponse(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_STATUS_CODE)) {
             this.statusCode = JSONUtils.optInt(jsonReader);
             return true;

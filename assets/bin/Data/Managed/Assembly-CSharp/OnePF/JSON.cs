@@ -61,57 +61,54 @@ namespace OnePF
 					get
 					{
 						EatWhitespace();
-						if (json.Peek() != -1)
+						if (json.Peek() == -1)
 						{
-							switch (PeekChar)
+							return TOKEN.NONE;
+						}
+						switch (PeekChar)
+						{
+						case '{':
+							return TOKEN.CURLY_OPEN;
+						case '}':
+							json.Read();
+							return TOKEN.CURLY_CLOSE;
+						case '[':
+							return TOKEN.SQUARED_OPEN;
+						case ']':
+							json.Read();
+							return TOKEN.SQUARED_CLOSE;
+						case ',':
+							json.Read();
+							return TOKEN.COMMA;
+						case '"':
+							return TOKEN.STRING;
+						case ':':
+							return TOKEN.COLON;
+						case '-':
+						case '0':
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+							return TOKEN.NUMBER;
+						default:
+							switch (NextWord)
 							{
-							case '{':
-								return TOKEN.CURLY_OPEN;
-							case '}':
-								json.Read();
-								return TOKEN.CURLY_CLOSE;
-							case '[':
-								return TOKEN.SQUARED_OPEN;
-							case ']':
-								json.Read();
-								return TOKEN.SQUARED_CLOSE;
-							case ',':
-								json.Read();
-								return TOKEN.COMMA;
-							case '"':
-								return TOKEN.STRING;
-							case ':':
-								return TOKEN.COLON;
-							case '-':
-							case '0':
-							case '1':
-							case '2':
-							case '3':
-							case '4':
-							case '5':
-							case '6':
-							case '7':
-							case '8':
-							case '9':
-								return TOKEN.NUMBER;
+							case "false":
+								return TOKEN.FALSE;
+							case "true":
+								return TOKEN.TRUE;
+							case "null":
+								return TOKEN.NULL;
 							default:
-							{
-								string nextWord = NextWord;
-								switch (nextWord)
-								{
-								case "false":
-									return TOKEN.FALSE;
-								case "true":
-									return TOKEN.TRUE;
-								case "null":
-									return TOKEN.NULL;
-								default:
-									return TOKEN.NONE;
-								}
-							}
+								return TOKEN.NONE;
 							}
 						}
-						return TOKEN.NONE;
 					}
 				}
 
@@ -125,9 +122,6 @@ namespace OnePF
 					using (Parser parser = new Parser(jsonString))
 					{
 						return parser.ParseValue() as JSON;
-						IL_0018:
-						JSON result;
-						return result;
 					}
 				}
 
@@ -148,27 +142,23 @@ namespace OnePF
 						switch (NextToken)
 						{
 						case TOKEN.COMMA:
-							break;
+							continue;
 						case TOKEN.NONE:
 							return null;
 						case TOKEN.CURLY_CLOSE:
 							return jSON;
-						default:
+						}
+						string text = ParseString();
+						if (text == null)
 						{
-							string text = ParseString();
-							if (text == null)
-							{
-								return null;
-							}
-							if (NextToken != TOKEN.COLON)
-							{
-								return null;
-							}
-							json.Read();
-							dictionary[text] = ParseValue();
-							break;
+							return null;
 						}
+						if (NextToken != TOKEN.COLON)
+						{
+							return null;
 						}
+						json.Read();
+						dictionary[text] = ParseValue();
 					}
 				}
 
@@ -251,43 +241,41 @@ namespace OnePF
 							if (json.Peek() == -1)
 							{
 								flag = false;
+								break;
 							}
-							else
+							nextChar = NextChar;
+							switch (nextChar)
 							{
-								nextChar = NextChar;
-								switch (nextChar)
+							case '"':
+							case '/':
+							case '\\':
+								stringBuilder.Append(nextChar);
+								break;
+							case 'b':
+								stringBuilder.Append('\b');
+								break;
+							case 'f':
+								stringBuilder.Append('\f');
+								break;
+							case 'n':
+								stringBuilder.Append('\n');
+								break;
+							case 'r':
+								stringBuilder.Append('\r');
+								break;
+							case 't':
+								stringBuilder.Append('\t');
+								break;
+							case 'u':
+							{
+								StringBuilder stringBuilder2 = new StringBuilder();
+								for (int i = 0; i < 4; i++)
 								{
-								case '"':
-								case '/':
-								case '\\':
-									stringBuilder.Append(nextChar);
-									break;
-								case 'b':
-									stringBuilder.Append('\b');
-									break;
-								case 'f':
-									stringBuilder.Append('\f');
-									break;
-								case 'n':
-									stringBuilder.Append('\n');
-									break;
-								case 'r':
-									stringBuilder.Append('\r');
-									break;
-								case 't':
-									stringBuilder.Append('\t');
-									break;
-								case 'u':
-								{
-									StringBuilder stringBuilder2 = new StringBuilder();
-									for (int i = 0; i < 4; i++)
-									{
-										stringBuilder2.Append(NextChar);
-									}
-									stringBuilder.Append((char)Convert.ToInt32(stringBuilder2.ToString(), 16));
-									break;
+									stringBuilder2.Append(NextChar);
 								}
-								}
+								stringBuilder.Append((char)Convert.ToInt32(stringBuilder2.ToString(), 16));
+								break;
+							}
 							}
 							break;
 						default:
@@ -384,16 +372,29 @@ namespace OnePF
 				{
 					bool flag = true;
 					builder.Append('{');
-					foreach (object key in obj.Keys)
+					IEnumerator enumerator = obj.Keys.GetEnumerator();
+					try
 					{
-						if (!flag)
+						while (enumerator.MoveNext())
 						{
-							builder.Append(',');
+							object current = enumerator.Current;
+							if (!flag)
+							{
+								builder.Append(',');
+							}
+							SerializeString(current.ToString());
+							builder.Append(':');
+							SerializeValue(obj[current]);
+							flag = false;
 						}
-						SerializeString(key.ToString());
-						builder.Append(':');
-						SerializeValue(obj[key]);
-						flag = false;
+					}
+					finally
+					{
+						IDisposable disposable;
+						if ((disposable = (enumerator as IDisposable)) != null)
+						{
+							disposable.Dispose();
+						}
 					}
 					builder.Append('}');
 				}
@@ -402,14 +403,27 @@ namespace OnePF
 				{
 					builder.Append('[');
 					bool flag = true;
-					foreach (object item in anArray)
+					IEnumerator enumerator = anArray.GetEnumerator();
+					try
 					{
-						if (!flag)
+						while (enumerator.MoveNext())
 						{
-							builder.Append(',');
+							object current = enumerator.Current;
+							if (!flag)
+							{
+								builder.Append(',');
+							}
+							SerializeValue(current);
+							flag = false;
 						}
-						SerializeValue(item);
-						flag = false;
+					}
+					finally
+					{
+						IDisposable disposable;
+						if ((disposable = (enumerator as IDisposable)) != null)
+						{
+							disposable.Dispose();
+						}
 					}
 					builder.Append(']');
 				}
@@ -425,38 +439,34 @@ namespace OnePF
 						{
 						case '"':
 							builder.Append("\\\"");
-							break;
+							continue;
 						case '\\':
 							builder.Append("\\\\");
-							break;
+							continue;
 						case '\b':
 							builder.Append("\\b");
-							break;
+							continue;
 						case '\f':
 							builder.Append("\\f");
-							break;
+							continue;
 						case '\n':
 							builder.Append("\\n");
-							break;
+							continue;
 						case '\r':
 							builder.Append("\\r");
-							break;
+							continue;
 						case '\t':
 							builder.Append("\\t");
-							break;
-						default:
-						{
-							int num = Convert.ToInt32(c);
-							if (num >= 32 && num <= 126)
-							{
-								builder.Append(c);
-							}
-							else
-							{
-								builder.Append("\\u" + Convert.ToString(num, 16).PadLeft(4, '0'));
-							}
-							break;
+							continue;
 						}
+						int num = Convert.ToInt32(c);
+						if (num >= 32 && num <= 126)
+						{
+							builder.Append(c);
+						}
+						else
+						{
+							builder.Append("\\u" + Convert.ToString(num, 16).PadLeft(4, '0'));
 						}
 					}
 					builder.Append('"');
@@ -594,69 +604,6 @@ namespace OnePF
 			return (JSON)this[fieldName];
 		}
 
-		public T[] ToArray<T>(string fieldName)
-		{
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			if (fields.ContainsKey(fieldName) && fields[fieldName] is IEnumerable)
-			{
-				List<T> list = new List<T>();
-				foreach (object item in fields[fieldName] as IEnumerable)
-				{
-					if (list is List<string>)
-					{
-						(list as List<string>).Add(Convert.ToString(item));
-					}
-					else if (list is List<int>)
-					{
-						(list as List<int>).Add(Convert.ToInt32(item));
-					}
-					else if (list is List<float>)
-					{
-						(list as List<float>).Add(Convert.ToSingle(item));
-					}
-					else if (list is List<bool>)
-					{
-						(list as List<bool>).Add(Convert.ToBoolean(item));
-					}
-					else if (list is List<Vector2>)
-					{
-						(list as List<Vector2>).Add((JSON)item);
-					}
-					else if (list is List<Vector3>)
-					{
-						(list as List<Vector3>).Add((JSON)item);
-					}
-					else if (list is List<Rect>)
-					{
-						(list as List<Rect>).Add((JSON)item);
-					}
-					else if (list is List<Color>)
-					{
-						(list as List<Color>).Add((JSON)item);
-					}
-					else if (list is List<Color32>)
-					{
-						(list as List<Color32>).Add((JSON)item);
-					}
-					else if (list is List<Quaternion>)
-					{
-						(list as List<Quaternion>).Add((JSON)item);
-					}
-					else if (list is List<JSON>)
-					{
-						(list as List<JSON>).Add((JSON)item);
-					}
-				}
-				return list.ToArray();
-			}
-			return new T[0];
-		}
-
 		public static implicit operator Vector2(JSON value)
 		{
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
@@ -749,6 +696,82 @@ namespace OnePF
 			jSON["width"] = value.get_width();
 			jSON["height"] = value.get_height();
 			return jSON;
+		}
+
+		public T[] ToArray<T>(string fieldName)
+		{
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			if (fields.ContainsKey(fieldName) && fields[fieldName] is IEnumerable)
+			{
+				List<T> list = new List<T>();
+				IEnumerator enumerator = (fields[fieldName] as IEnumerable).GetEnumerator();
+				try
+				{
+					while (enumerator.MoveNext())
+					{
+						object current = enumerator.Current;
+						if (list is List<string>)
+						{
+							(list as List<string>).Add(Convert.ToString(current));
+						}
+						else if (list is List<int>)
+						{
+							(list as List<int>).Add(Convert.ToInt32(current));
+						}
+						else if (list is List<float>)
+						{
+							(list as List<float>).Add(Convert.ToSingle(current));
+						}
+						else if (list is List<bool>)
+						{
+							(list as List<bool>).Add(Convert.ToBoolean(current));
+						}
+						else if (list is List<Vector2>)
+						{
+							(list as List<Vector2>).Add((JSON)current);
+						}
+						else if (list is List<Vector3>)
+						{
+							(list as List<Vector3>).Add((JSON)current);
+						}
+						else if (list is List<Rect>)
+						{
+							(list as List<Rect>).Add((JSON)current);
+						}
+						else if (list is List<Color>)
+						{
+							(list as List<Color>).Add((JSON)current);
+						}
+						else if (list is List<Color32>)
+						{
+							(list as List<Color32>).Add((JSON)current);
+						}
+						else if (list is List<Quaternion>)
+						{
+							(list as List<Quaternion>).Add((JSON)current);
+						}
+						else if (list is List<JSON>)
+						{
+							(list as List<JSON>).Add((JSON)current);
+						}
+					}
+				}
+				finally
+				{
+					IDisposable disposable;
+					if ((disposable = (enumerator as IDisposable)) != null)
+					{
+						disposable.Dispose();
+					}
+				}
+				return list.ToArray();
+			}
+			return new T[0];
 		}
 	}
 }

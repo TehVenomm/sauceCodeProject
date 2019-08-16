@@ -2,27 +2,38 @@ package com.google.android.gms.games;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.games.internal.zzc;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.games.internal.zzd;
 
-public final class PlayerLevelInfo extends zzc {
-    public static final Creator<PlayerLevelInfo> CREATOR = new zzi();
-    private final long zzhde;
-    private final long zzhdf;
-    private final PlayerLevel zzhdg;
-    private final PlayerLevel zzhdh;
+@Class(creator = "PlayerLevelInfoCreator")
+@Reserved({1000})
+public final class PlayerLevelInfo extends zzd {
+    public static final Creator<PlayerLevelInfo> CREATOR = new zzar();
+    @Field(getter = "getCurrentXpTotal", mo13990id = 1)
+    private final long zzcu;
+    @Field(getter = "getLastLevelUpTimestamp", mo13990id = 2)
+    private final long zzcv;
+    @Field(getter = "getCurrentLevel", mo13990id = 3)
+    private final PlayerLevel zzcw;
+    @Field(getter = "getNextLevel", mo13990id = 4)
+    private final PlayerLevel zzcx;
 
-    public PlayerLevelInfo(long j, long j2, PlayerLevel playerLevel, PlayerLevel playerLevel2) {
-        zzbp.zzbg(j != -1);
-        zzbp.zzu(playerLevel);
-        zzbp.zzu(playerLevel2);
-        this.zzhde = j;
-        this.zzhdf = j2;
-        this.zzhdg = playerLevel;
-        this.zzhdh = playerLevel2;
+    @Constructor
+    public PlayerLevelInfo(@Param(mo13993id = 1) long j, @Param(mo13993id = 2) long j2, @Param(mo13993id = 3) PlayerLevel playerLevel, @Param(mo13993id = 4) PlayerLevel playerLevel2) {
+        Preconditions.checkState(j != -1);
+        Preconditions.checkNotNull(playerLevel);
+        Preconditions.checkNotNull(playerLevel2);
+        this.zzcu = j;
+        this.zzcv = j2;
+        this.zzcw = playerLevel;
+        this.zzcx = playerLevel2;
     }
 
     public final boolean equals(Object obj) {
@@ -33,39 +44,39 @@ public final class PlayerLevelInfo extends zzc {
             return true;
         }
         PlayerLevelInfo playerLevelInfo = (PlayerLevelInfo) obj;
-        return zzbf.equal(Long.valueOf(this.zzhde), Long.valueOf(playerLevelInfo.zzhde)) && zzbf.equal(Long.valueOf(this.zzhdf), Long.valueOf(playerLevelInfo.zzhdf)) && zzbf.equal(this.zzhdg, playerLevelInfo.zzhdg) && zzbf.equal(this.zzhdh, playerLevelInfo.zzhdh);
+        return Objects.equal(Long.valueOf(this.zzcu), Long.valueOf(playerLevelInfo.zzcu)) && Objects.equal(Long.valueOf(this.zzcv), Long.valueOf(playerLevelInfo.zzcv)) && Objects.equal(this.zzcw, playerLevelInfo.zzcw) && Objects.equal(this.zzcx, playerLevelInfo.zzcx);
     }
 
     public final PlayerLevel getCurrentLevel() {
-        return this.zzhdg;
+        return this.zzcw;
     }
 
     public final long getCurrentXpTotal() {
-        return this.zzhde;
+        return this.zzcu;
     }
 
     public final long getLastLevelUpTimestamp() {
-        return this.zzhdf;
+        return this.zzcv;
     }
 
     public final PlayerLevel getNextLevel() {
-        return this.zzhdh;
+        return this.zzcx;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Long.valueOf(this.zzhde), Long.valueOf(this.zzhdf), this.zzhdg, this.zzhdh});
+        return Objects.hashCode(Long.valueOf(this.zzcu), Long.valueOf(this.zzcv), this.zzcw, this.zzcx);
     }
 
     public final boolean isMaxLevel() {
-        return this.zzhdg.equals(this.zzhdh);
+        return this.zzcw.equals(this.zzcx);
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getCurrentXpTotal());
-        zzd.zza(parcel, 2, getLastLevelUpTimestamp());
-        zzd.zza(parcel, 3, getCurrentLevel(), i, false);
-        zzd.zza(parcel, 4, getNextLevel(), i, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeLong(parcel, 1, getCurrentXpTotal());
+        SafeParcelWriter.writeLong(parcel, 2, getLastLevelUpTimestamp());
+        SafeParcelWriter.writeParcelable(parcel, 3, getCurrentLevel(), i, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, getNextLevel(), i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

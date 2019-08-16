@@ -1,9 +1,10 @@
-package jp.colopl.libs;
+package p018jp.colopl.libs;
 
 import android.location.Location;
 import android.os.Bundle;
-import jp.colopl.util.LogUtil;
+import p018jp.colopl.util.LogUtil;
 
+/* renamed from: jp.colopl.libs.LocationExtras */
 public class LocationExtras {
     private static final float ACCURACY_THRESHOLD = 500.0f;
     public static final int NW_LOCATION_SOURCE_CACHED = 2;
@@ -19,6 +20,9 @@ public class LocationExtras {
     private static final String TAG = "LocationExtras";
     private int locationSource = 0;
     private int locationType = 0;
+
+    public LocationExtras() {
+    }
 
     public LocationExtras(Location location) {
         setLocation(location);
@@ -46,7 +50,7 @@ public class LocationExtras {
                         str2 = string;
                     }
                 }
-                LogUtil.m745v(TAG, "networkLocationSource = " + (str == null ? "" : str) + " networkLocationType = " + (str2 == null ? "" : str2));
+                LogUtil.m758v(TAG, "networkLocationSource = " + (str == null ? "" : str) + " networkLocationType = " + (str2 == null ? "" : str2));
                 if (str2 == null && str != null && str.equals(NW_LOCATION_SOURCE_SERVER_STRING) && location.hasAccuracy() && location.getAccuracy() < 500.0f) {
                     str2 = NW_LOCATION_TYPE_WIFI_STRING;
                 }

@@ -14,11 +14,15 @@ public class NewsFeed extends BaseJsonObject {
     private List<Article> articles;
     private List<Banner> banners;
 
+    public NewsFeed() {
+    }
+
     public NewsFeed(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_BANNERS)) {
             if (jsonReader.peek() == JsonToken.NULL) {
                 jsonReader.nextNull();

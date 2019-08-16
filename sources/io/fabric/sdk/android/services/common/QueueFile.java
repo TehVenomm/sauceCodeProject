@@ -1,6 +1,6 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
-import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.p000v4.media.session.PlaybackStateCompat;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,21 +12,20 @@ import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/* renamed from: io.fabric.sdk.android.services.common.QueueFile */
 public class QueueFile implements Closeable {
     static final int HEADER_LENGTH = 16;
     private static final int INITIAL_LENGTH = 4096;
     private static final Logger LOGGER = Logger.getLogger(QueueFile.class.getName());
-    private final byte[] buffer;
+    private final byte[] buffer = new byte[16];
     private int elementCount;
     int fileLength;
     private Element first;
     private Element last;
-    private final RandomAccessFile raf;
+    /* access modifiers changed from: private */
+    public final RandomAccessFile raf;
 
-    public interface ElementReader {
-        void read(InputStream inputStream, int i) throws IOException;
-    }
-
+    /* renamed from: io.fabric.sdk.android.services.common.QueueFile$Element */
     static class Element {
         static final int HEADER_LENGTH = 4;
         static final Element NULL = new Element(0, 0);
@@ -39,10 +38,11 @@ public class QueueFile implements Closeable {
         }
 
         public String toString() {
-            return getClass().getSimpleName() + "[" + "position = " + this.position + ", length = " + this.length + "]";
+            return getClass().getSimpleName() + "[position = " + this.position + ", length = " + this.length + "]";
         }
     }
 
+    /* renamed from: io.fabric.sdk.android.services.common.QueueFile$ElementInputStream */
     private final class ElementInputStream extends InputStream {
         private int position;
         private int remaining;
@@ -81,8 +81,12 @@ public class QueueFile implements Closeable {
         }
     }
 
+    /* renamed from: io.fabric.sdk.android.services.common.QueueFile$ElementReader */
+    public interface ElementReader {
+        void read(InputStream inputStream, int i) throws IOException;
+    }
+
     public QueueFile(File file) throws IOException {
-        this.buffer = new byte[16];
         if (!file.exists()) {
             initialize(file);
         }
@@ -91,7 +95,6 @@ public class QueueFile implements Closeable {
     }
 
     QueueFile(RandomAccessFile randomAccessFile) throws IOException {
-        this.buffer = new byte[16];
         this.raf = randomAccessFile;
         readHeader();
     }
@@ -106,19 +109,19 @@ public class QueueFile implements Closeable {
                 i3 <<= 1;
             } while (remainingBytes < i2);
             setLength(i3);
-            i2 = wrapPosition((this.last.position + 4) + this.last.length);
-            if (i2 < this.first.position) {
+            int wrapPosition = wrapPosition(this.last.position + 4 + this.last.length);
+            if (wrapPosition < this.first.position) {
                 FileChannel channel = this.raf.getChannel();
                 channel.position((long) this.fileLength);
-                int i4 = i2 - 4;
+                int i4 = wrapPosition - 4;
                 if (channel.transferTo(16, (long) i4, channel) != ((long) i4)) {
                     throw new AssertionError("Copied insufficient number of bytes!");
                 }
             }
             if (this.last.position < this.first.position) {
-                remainingBytes = (this.fileLength + this.last.position) - 16;
-                writeHeader(i3, this.elementCount, this.first.position, remainingBytes);
-                this.last = new Element(remainingBytes, this.last.length);
+                int i5 = (this.fileLength + this.last.position) - 16;
+                writeHeader(i3, this.elementCount, this.first.position, i5);
+                this.last = new Element(i5, this.last.length);
             } else {
                 writeHeader(i3, this.elementCount, this.first.position, this.last.position);
             }
@@ -126,6 +129,7 @@ public class QueueFile implements Closeable {
         }
     }
 
+    /* JADX INFO: finally extract failed */
     private static void initialize(File file) throws IOException {
         File file2 = new File(file.getPath() + ".tmp");
         RandomAccessFile open = open(file2);
@@ -135,15 +139,18 @@ public class QueueFile implements Closeable {
             byte[] bArr = new byte[16];
             writeInts(bArr, 4096, 0, 0, 0);
             open.write(bArr);
+            open.close();
             if (!file2.renameTo(file)) {
                 throw new IOException("Rename failed!");
             }
-        } finally {
+        } catch (Throwable th) {
             open.close();
+            throw th;
         }
     }
 
-    private static <T> T nonNull(T t, String str) {
+    /* access modifiers changed from: private */
+    public static <T> T nonNull(T t, String str) {
         if (t != null) {
             return t;
         }
@@ -177,14 +184,15 @@ public class QueueFile implements Closeable {
     }
 
     private static int readInt(byte[] bArr, int i) {
-        return ((((bArr[i] & 255) << 24) + ((bArr[i + 1] & 255) << 16)) + ((bArr[i + 2] & 255) << 8)) + (bArr[i + 3] & 255);
+        return ((bArr[i] & 255) << 24) + ((bArr[i + 1] & 255) << 16) + ((bArr[i + 2] & 255) << 8) + (bArr[i + 3] & 255);
     }
 
     private int remainingBytes() {
         return this.fileLength - usedBytes();
     }
 
-    private void ringRead(int i, byte[] bArr, int i2, int i3) throws IOException {
+    /* access modifiers changed from: private */
+    public void ringRead(int i, byte[] bArr, int i2, int i3) throws IOException {
         int wrapPosition = wrapPosition(i);
         if (wrapPosition + i3 <= this.fileLength) {
             this.raf.seek((long) wrapPosition);
@@ -217,7 +225,8 @@ public class QueueFile implements Closeable {
         this.raf.getChannel().force(true);
     }
 
-    private int wrapPosition(int i) {
+    /* access modifiers changed from: private */
+    public int wrapPosition(int i) {
         return i < this.fileLength ? i : (i + 16) - this.fileLength;
     }
 
@@ -236,12 +245,9 @@ public class QueueFile implements Closeable {
 
     private static void writeInts(byte[] bArr, int... iArr) {
         int i = 0;
-        int length = iArr.length;
-        int i2 = 0;
-        while (i < length) {
-            writeInt(bArr, i2, iArr[i]);
-            i2 += 4;
-            i++;
+        for (int writeInt : iArr) {
+            writeInt(bArr, i, writeInt);
+            i += 4;
         }
     }
 
@@ -257,7 +263,7 @@ public class QueueFile implements Closeable {
             }
             expandIfNecessary(i2);
             boolean isEmpty = isEmpty();
-            Element element = new Element(isEmpty ? 16 : wrapPosition((this.last.position + 4) + this.last.length), i2);
+            Element element = new Element(isEmpty ? 16 : wrapPosition(this.last.position + 4 + this.last.length), i2);
             writeInt(this.buffer, 0, i2);
             ringWrite(element.position, this.buffer, 0, 4);
             ringWrite(element.position + 4, bArr, i, i2);
@@ -295,7 +301,7 @@ public class QueueFile implements Closeable {
             for (int i2 = 0; i2 < this.elementCount; i2++) {
                 Element readElement = readElement(i);
                 elementReader.read(new ElementInputStream(readElement), readElement.length);
-                i = wrapPosition(readElement.length + (readElement.position + 4));
+                i = wrapPosition(readElement.length + readElement.position + 4);
             }
         }
     }
@@ -338,11 +344,10 @@ public class QueueFile implements Closeable {
         synchronized (this) {
             if (isEmpty()) {
                 throw new NoSuchElementException();
-            }
-            if (this.elementCount == 1) {
+            } else if (this.elementCount == 1) {
                 clear();
             } else {
-                int wrapPosition = wrapPosition((this.first.position + 4) + this.first.length);
+                int wrapPosition = wrapPosition(this.first.position + 4 + this.first.length);
                 ringRead(wrapPosition, this.buffer, 0, 4);
                 int readInt = readInt(this.buffer, 0);
                 writeHeader(this.fileLength, this.elementCount - 1, wrapPosition, this.last.position);
@@ -361,13 +366,13 @@ public class QueueFile implements Closeable {
     }
 
     public String toString() {
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getClass().getSimpleName()).append('[');
-        stringBuilder.append("fileLength=").append(this.fileLength);
-        stringBuilder.append(", size=").append(this.elementCount);
-        stringBuilder.append(", first=").append(this.first);
-        stringBuilder.append(", last=").append(this.last);
-        stringBuilder.append(", element lengths=[");
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append('[');
+        sb.append("fileLength=").append(this.fileLength);
+        sb.append(", size=").append(this.elementCount);
+        sb.append(", first=").append(this.first);
+        sb.append(", last=").append(this.last);
+        sb.append(", element lengths=[");
         try {
             forEach(new ElementReader() {
                 boolean first = true;
@@ -376,19 +381,22 @@ public class QueueFile implements Closeable {
                     if (this.first) {
                         this.first = false;
                     } else {
-                        stringBuilder.append(", ");
+                        sb.append(", ");
                     }
-                    stringBuilder.append(i);
+                    sb.append(i);
                 }
             });
-        } catch (Throwable e) {
+        } catch (IOException e) {
             LOGGER.log(Level.WARNING, "read error", e);
         }
-        stringBuilder.append("]]");
-        return stringBuilder.toString();
+        sb.append("]]");
+        return sb.toString();
     }
 
     public int usedBytes() {
-        return this.elementCount == 0 ? 16 : this.last.position >= this.first.position ? (((this.last.position - this.first.position) + 4) + this.last.length) + 16 : (((this.last.position + 4) + this.last.length) + this.fileLength) - this.first.position;
+        if (this.elementCount == 0) {
+            return 16;
+        }
+        return this.last.position >= this.first.position ? (this.last.position - this.first.position) + 4 + this.last.length + 16 : (((this.last.position + 4) + this.last.length) + this.fileLength) - this.first.position;
     }
 }

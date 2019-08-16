@@ -23,7 +23,6 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 
 	protected override void Awake()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		nameLabel.fontStyle = 2;
 		noticeObject.SetActive(false);
@@ -34,56 +33,59 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 	{
 		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<InGameProgress>.IsValid())
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || !MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
-			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!(self == null))
+			return;
+		}
+		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+		if (self == null)
+		{
+			return;
+		}
+		portalReq = null;
+		int i = 0;
+		for (int count = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList.Count; i < count; i++)
+		{
+			PortalObject portalObject = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList[i];
+			if (portalObject.isFull && portalObject.portalData.dstMapID != 0 && Vector3.Distance(portalObject._transform.get_position(), self._position) < 10f)
 			{
-				portalReq = null;
-				int i = 0;
-				for (int count = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList.Count; i < count; i++)
-				{
-					PortalObject portalObject = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList[i];
-					if (portalObject.isFull && portalObject.portalData.dstMapID != 0 && Vector3.Distance(portalObject._transform.get_position(), self._position) < 10f)
-					{
-						portalReq = portalObject;
-						break;
-					}
-				}
-				if (!(portal == portalReq) && !noticeTween.get_isActiveAndEnabled())
-				{
-					if (noticeTween.value == 0f)
-					{
-						if (portalReq != null)
-						{
-							if (string.IsNullOrEmpty(portalReq.portalData.placeText))
-							{
-								FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalReq.portalData.dstMapID);
-								if (fieldMapData == null)
-								{
-									return;
-								}
-								nameLabel.text = fieldMapData.mapName;
-							}
-							else
-							{
-								nameLabel.text = portalReq.portalData.placeText;
-							}
-							noticeObject.SetActive(true);
-							noticeTween.PlayForward();
-						}
-						else
-						{
-							noticeObject.SetActive(false);
-						}
-						portal = portalReq;
-					}
-					else
-					{
-						noticeTween.PlayReverse();
-					}
-				}
+				portalReq = portalObject;
+				break;
 			}
+		}
+		if (portal == portalReq || noticeTween.get_isActiveAndEnabled())
+		{
+			return;
+		}
+		if (noticeTween.value == 0f)
+		{
+			if (portalReq != null)
+			{
+				if (string.IsNullOrEmpty(portalReq.portalData.placeText))
+				{
+					FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalReq.portalData.dstMapID);
+					if (fieldMapData == null)
+					{
+						return;
+					}
+					nameLabel.text = fieldMapData.mapName;
+				}
+				else
+				{
+					nameLabel.text = portalReq.portalData.placeText;
+				}
+				noticeObject.SetActive(true);
+				noticeTween.PlayForward();
+			}
+			else
+			{
+				noticeObject.SetActive(false);
+			}
+			portal = portalReq;
+		}
+		else
+		{
+			noticeTween.PlayReverse();
 		}
 	}
 

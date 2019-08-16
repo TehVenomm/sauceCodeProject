@@ -1,8 +1,8 @@
 package com.github.droidfu.support;
 
 import android.text.TextUtils;
-import io.fabric.sdk.android.services.events.EventsFilesManager;
 import java.util.ArrayList;
+import p017io.fabric.sdk.android.services.events.EventsFilesManager;
 
 public class StringSupport {
     private static String[] splitByCharacterType(String str, boolean z) {
@@ -13,26 +13,26 @@ public class StringSupport {
         if (str.length() == 0) {
             return new String[0];
         }
-        char[] toCharArray = str.toCharArray();
+        char[] charArray = str.toCharArray();
         ArrayList arrayList = new ArrayList();
-        int type = Character.getType(toCharArray[0]);
-        for (int i2 = 1; i2 < toCharArray.length; i2++) {
-            int type2 = Character.getType(toCharArray[i2]);
+        int type = Character.getType(charArray[0]);
+        for (int i2 = 1; i2 < charArray.length; i2++) {
+            int type2 = Character.getType(charArray[i2]);
             if (type2 != type) {
                 if (z && type2 == 2 && type == 1) {
-                    type = i2 - 1;
-                    if (type != i) {
-                        arrayList.add(new String(toCharArray, i, type - i));
-                        i = type;
+                    int i3 = i2 - 1;
+                    if (i3 != i) {
+                        arrayList.add(new String(charArray, i, i3 - i));
+                        i = i3;
                     }
                 } else {
-                    arrayList.add(new String(toCharArray, i, i2 - i));
+                    arrayList.add(new String(charArray, i, i2 - i));
                     i = i2;
                 }
                 type = type2;
             }
         }
-        arrayList.add(new String(toCharArray, i, toCharArray.length - i));
+        arrayList.add(new String(charArray, i, charArray.length - i));
         return (String[]) arrayList.toArray(new String[arrayList.size()]);
     }
 

@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.concurrency.internal;
+package p017io.fabric.sdk.android.services.concurrency.internal;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -6,23 +6,24 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.internal.RetryThreadPoolExecutor */
 public class RetryThreadPoolExecutor extends ScheduledThreadPoolExecutor {
     private final Backoff backoff;
     private final RetryPolicy retryPolicy;
 
-    public RetryThreadPoolExecutor(int i, RetryPolicy retryPolicy, Backoff backoff) {
-        this(i, Executors.defaultThreadFactory(), retryPolicy, backoff);
+    public RetryThreadPoolExecutor(int i, RetryPolicy retryPolicy2, Backoff backoff2) {
+        this(i, Executors.defaultThreadFactory(), retryPolicy2, backoff2);
     }
 
-    public RetryThreadPoolExecutor(int i, ThreadFactory threadFactory, RetryPolicy retryPolicy, Backoff backoff) {
+    public RetryThreadPoolExecutor(int i, ThreadFactory threadFactory, RetryPolicy retryPolicy2, Backoff backoff2) {
         super(i, threadFactory);
-        if (retryPolicy == null) {
+        if (retryPolicy2 == null) {
             throw new NullPointerException("retry policy must not be null");
-        } else if (backoff == null) {
+        } else if (backoff2 == null) {
             throw new NullPointerException("backoff must not be null");
         } else {
-            this.retryPolicy = retryPolicy;
-            this.backoff = backoff;
+            this.retryPolicy = retryPolicy2;
+            this.backoff = backoff2;
         }
     }
 
@@ -30,7 +31,7 @@ public class RetryThreadPoolExecutor extends ScheduledThreadPoolExecutor {
         if (callable == null) {
             throw new NullPointerException();
         }
-        Object retryFuture = new RetryFuture(callable, new RetryState(this.backoff, this.retryPolicy), this);
+        RetryFuture retryFuture = new RetryFuture(callable, new RetryState(this.backoff, this.retryPolicy), this);
         execute(retryFuture);
         return retryFuture;
     }

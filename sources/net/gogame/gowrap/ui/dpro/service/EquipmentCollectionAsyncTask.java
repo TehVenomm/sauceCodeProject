@@ -1,10 +1,11 @@
-package net.gogame.gowrap.ui.dpro.service;
+package net.gogame.gowrap.p019ui.dpro.service;
 
 import android.os.AsyncTask;
 import android.util.Log;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.ui.dpro.model.equipmentcollection.EquipmentCollectionResponse;
+import net.gogame.gowrap.p019ui.dpro.model.equipmentcollection.EquipmentCollectionResponse;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.service.EquipmentCollectionAsyncTask */
 public class EquipmentCollectionAsyncTask extends AsyncTask<String, Void, EquipmentCollectionResponse> {
     private Exception exceptionToBeThrown;
     private final EquipmentCollectionService service;
@@ -17,20 +18,23 @@ public class EquipmentCollectionAsyncTask extends AsyncTask<String, Void, Equipm
         this.service = equipmentCollectionService;
     }
 
-    protected EquipmentCollectionResponse doInBackground(String... strArr) {
+    /* access modifiers changed from: protected */
+    public EquipmentCollectionResponse doInBackground(String... strArr) {
         EquipmentCollectionResponse equipmentCollectionResponse = null;
-        if (!(strArr == null || strArr.length == 0)) {
-            String str = strArr[0];
-            if (str != null) {
-                try {
-                    equipmentCollectionResponse = this.service.getEquipmentCollection(str);
-                } catch (Throwable e) {
-                    Log.e(Constants.TAG, "Exception", e);
-                    this.exceptionToBeThrown = e;
-                }
-            }
+        if (strArr == null || strArr.length == 0) {
+            return equipmentCollectionResponse;
         }
-        return equipmentCollectionResponse;
+        String str = strArr[0];
+        if (str == null) {
+            return equipmentCollectionResponse;
+        }
+        try {
+            return this.service.getEquipmentCollection(str);
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "Exception", e);
+            this.exceptionToBeThrown = e;
+            return equipmentCollectionResponse;
+        }
     }
 
     public Exception getExceptionToBeThrown() {

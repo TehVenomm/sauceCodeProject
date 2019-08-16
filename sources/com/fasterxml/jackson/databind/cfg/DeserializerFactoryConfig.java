@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.util.ArrayIterator;
 import java.io.Serializable;
 
 public class DeserializerFactoryConfig implements Serializable {
-    protected static final KeyDeserializers[] DEFAULT_KEY_DESERIALIZERS = new KeyDeserializers[]{new StdKeyDeserializers()};
+    protected static final KeyDeserializers[] DEFAULT_KEY_DESERIALIZERS = {new StdKeyDeserializers()};
     protected static final AbstractTypeResolver[] NO_ABSTRACT_TYPE_RESOLVERS = new AbstractTypeResolver[0];
     protected static final Deserializers[] NO_DESERIALIZERS = new Deserializers[0];
     protected static final BeanDeserializerModifier[] NO_MODIFIERS = new BeanDeserializerModifier[0];

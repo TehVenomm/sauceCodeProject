@@ -1,8 +1,11 @@
-package android.support.v4.provider;
+package android.support.p000v4.provider;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.RequiresApi;
 
+@RequiresApi(21)
+/* renamed from: android.support.v4.provider.TreeDocumentFile */
 class TreeDocumentFile extends DocumentFile {
     private Context mContext;
     private Uri mUri;
@@ -23,12 +26,18 @@ class TreeDocumentFile extends DocumentFile {
 
     public DocumentFile createDirectory(String str) {
         Uri createDirectory = DocumentsContractApi21.createDirectory(this.mContext, this.mUri, str);
-        return createDirectory != null ? new TreeDocumentFile(this, this.mContext, createDirectory) : null;
+        if (createDirectory != null) {
+            return new TreeDocumentFile(this, this.mContext, createDirectory);
+        }
+        return null;
     }
 
     public DocumentFile createFile(String str, String str2) {
         Uri createFile = DocumentsContractApi21.createFile(this.mContext, this.mUri, str, str2);
-        return createFile != null ? new TreeDocumentFile(this, this.mContext, createFile) : null;
+        if (createFile != null) {
+            return new TreeDocumentFile(this, this.mContext, createFile);
+        }
+        return null;
     }
 
     public boolean delete() {

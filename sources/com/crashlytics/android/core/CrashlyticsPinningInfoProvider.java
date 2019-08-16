@@ -1,7 +1,7 @@
 package com.crashlytics.android.core;
 
-import io.fabric.sdk.android.services.network.PinningInfoProvider;
 import java.io.InputStream;
+import p017io.fabric.sdk.android.services.network.PinningInfoProvider;
 
 class CrashlyticsPinningInfoProvider implements PinningInfoProvider {
     private final PinningInfoProvider pinningInfo;

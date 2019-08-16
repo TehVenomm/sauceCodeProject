@@ -6,7 +6,11 @@ import java.io.IOException;
 import java.io.Serializable;
 
 public abstract class BaseJsonObject implements Serializable {
-    protected abstract boolean doParse(JsonReader jsonReader, String str) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract boolean doParse(JsonReader jsonReader, String str) throws IOException;
+
+    public BaseJsonObject() {
+    }
 
     public BaseJsonObject(JsonReader jsonReader) throws IOException {
         if (jsonReader.peek() == JsonToken.BEGIN_OBJECT) {

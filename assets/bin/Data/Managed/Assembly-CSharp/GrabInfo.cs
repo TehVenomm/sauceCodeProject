@@ -25,6 +25,9 @@ public class GrabInfo
 	[Tooltip("掴み中のカメラまでの距離")]
 	public float cameraDistance;
 
+	[Tooltip("掴み中のカメラ移動速度")]
+	public float smoothMaxSpeed;
+
 	[Tooltip("弱点攻撃で解放するかどうか")]
 	public bool releaseByWeakHit;
 
@@ -45,6 +48,7 @@ public class GrabInfo
 		cameraLookAt = src.cameraLookAt;
 		toCameraDir = src.toCameraDir;
 		cameraDistance = src.cameraDistance;
+		smoothMaxSpeed = src.smoothMaxSpeed;
 		releaseByWeakHit = src.releaseByWeakHit;
 		releaseByWeaponWeakHit = src.releaseByWeaponWeakHit;
 		drainAttackId = src.drainAttackId;

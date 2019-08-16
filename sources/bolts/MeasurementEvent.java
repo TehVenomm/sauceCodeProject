@@ -56,23 +56,22 @@ public class MeasurementEvent {
         }
         for (String str2 : bundle.keySet()) {
             Object obj = bundle.get(str2);
-            String objectToJSONString;
             if (obj instanceof Bundle) {
-                for (String objectToJSONString2 : ((Bundle) obj).keySet()) {
-                    String objectToJSONString3 = objectToJSONString(((Bundle) obj).get(objectToJSONString2));
+                for (String str3 : ((Bundle) obj).keySet()) {
+                    String objectToJSONString = objectToJSONString(((Bundle) obj).get(str3));
                     if (str2.equals("referer_app_link")) {
-                        if (objectToJSONString2.equalsIgnoreCase("url")) {
-                            bundle2.putString("refererURL", objectToJSONString3);
-                        } else if (objectToJSONString2.equalsIgnoreCase(NativeProtocol.BRIDGE_ARG_APP_NAME_STRING)) {
-                            bundle2.putString("refererAppName", objectToJSONString3);
-                        } else if (objectToJSONString2.equalsIgnoreCase("package")) {
-                            bundle2.putString("sourceApplication", objectToJSONString3);
+                        if (str3.equalsIgnoreCase("url")) {
+                            bundle2.putString("refererURL", objectToJSONString);
+                        } else if (str3.equalsIgnoreCase(NativeProtocol.BRIDGE_ARG_APP_NAME_STRING)) {
+                            bundle2.putString("refererAppName", objectToJSONString);
+                        } else if (str3.equalsIgnoreCase("package")) {
+                            bundle2.putString("sourceApplication", objectToJSONString);
                         }
                     }
-                    bundle2.putString(str2 + Constants.URL_PATH_DELIMITER + objectToJSONString2, objectToJSONString3);
+                    bundle2.putString(str2 + Constants.URL_PATH_DELIMITER + str3, objectToJSONString);
                 }
             } else {
-                objectToJSONString2 = objectToJSONString(obj);
+                String objectToJSONString2 = objectToJSONString(obj);
                 if (str2.equals("target_url")) {
                     Uri parse = Uri.parse(objectToJSONString2);
                     bundle2.putString("targetURL", parse.toString());
@@ -117,37 +116,60 @@ public class MeasurementEvent {
         }
     }
 
-    static void sendBroadcastEvent(Context context, String str, Intent intent, Map<String, String> map) {
-        Bundle applinkLogData;
-        Bundle bundle = new Bundle();
-        if (intent != null) {
-            Bundle appLinkData = AppLinks.getAppLinkData(intent);
-            if (appLinkData != null) {
-                applinkLogData = getApplinkLogData(context, str, appLinkData, intent);
-                if (map != null) {
-                    for (String str2 : map.keySet()) {
-                        applinkLogData.putString(str2, (String) map.get(str2));
-                    }
-                }
-                new MeasurementEvent(context, str, applinkLogData).sendBroadcast();
-            }
-            Uri data = intent.getData();
-            if (data != null) {
-                bundle.putString("intentData", data.toString());
-            }
-            applinkLogData = intent.getExtras();
-            if (applinkLogData != null) {
-                for (String str3 : applinkLogData.keySet()) {
-                    bundle.putString(str3, objectToJSONString(applinkLogData.get(str3)));
-                }
-            }
-        }
-        applinkLogData = bundle;
-        if (map != null) {
-            for (String str22 : map.keySet()) {
-                applinkLogData.putString(str22, (String) map.get(str22));
-            }
-        }
-        new MeasurementEvent(context, str, applinkLogData).sendBroadcast();
+    /* JADX WARNING: Removed duplicated region for block: B:6:0x0014  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    static void sendBroadcastEvent(android.content.Context r5, java.lang.String r6, android.content.Intent r7, java.util.Map<java.lang.String, java.lang.String> r8) {
+        /*
+            android.os.Bundle r1 = new android.os.Bundle
+            r1.<init>()
+            if (r7 == 0) goto L_0x0071
+            android.os.Bundle r0 = bolts.AppLinks.getAppLinkData(r7)
+            if (r0 == 0) goto L_0x0033
+            android.os.Bundle r0 = getApplinkLogData(r5, r6, r0, r7)
+            r2 = r0
+        L_0x0012:
+            if (r8 == 0) goto L_0x0068
+            java.util.Set r0 = r8.keySet()
+            java.util.Iterator r3 = r0.iterator()
+        L_0x001c:
+            boolean r0 = r3.hasNext()
+            if (r0 == 0) goto L_0x0068
+            java.lang.Object r0 = r3.next()
+            r1 = r0
+            java.lang.String r1 = (java.lang.String) r1
+            java.lang.Object r0 = r8.get(r1)
+            java.lang.String r0 = (java.lang.String) r0
+            r2.putString(r1, r0)
+            goto L_0x001c
+        L_0x0033:
+            android.net.Uri r0 = r7.getData()
+            if (r0 == 0) goto L_0x0042
+            java.lang.String r2 = "intentData"
+            java.lang.String r0 = r0.toString()
+            r1.putString(r2, r0)
+        L_0x0042:
+            android.os.Bundle r2 = r7.getExtras()
+            if (r2 == 0) goto L_0x0071
+            java.util.Set r0 = r2.keySet()
+            java.util.Iterator r3 = r0.iterator()
+        L_0x0050:
+            boolean r0 = r3.hasNext()
+            if (r0 == 0) goto L_0x0071
+            java.lang.Object r0 = r3.next()
+            java.lang.String r0 = (java.lang.String) r0
+            java.lang.Object r4 = r2.get(r0)
+            java.lang.String r4 = objectToJSONString(r4)
+            r1.putString(r0, r4)
+            goto L_0x0050
+        L_0x0068:
+            bolts.MeasurementEvent r0 = new bolts.MeasurementEvent
+            r0.<init>(r5, r6, r2)
+            r0.sendBroadcast()
+            return
+        L_0x0071:
+            r2 = r1
+            goto L_0x0012
+        */
+        throw new UnsupportedOperationException("Method not decompiled: bolts.MeasurementEvent.sendBroadcastEvent(android.content.Context, java.lang.String, android.content.Intent, java.util.Map):void");
     }
 }

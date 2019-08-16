@@ -37,22 +37,23 @@ public class EnumMapDeserializer extends ContainerDeserializerBase<EnumMap<?, ?>
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
+        JsonDeserializer handleSecondaryContextualization;
         KeyDeserializer keyDeserializer = this._keyDeserializer;
         if (keyDeserializer == null) {
             keyDeserializer = deserializationContext.findKeyDeserializer(this._mapType.getKeyType(), beanProperty);
         }
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
+        JsonDeserializer<Object> jsonDeserializer = this._valueDeserializer;
         JavaType contentType = this._mapType.getContentType();
         if (jsonDeserializer == null) {
-            jsonDeserializer = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
+            handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
         } else {
-            jsonDeserializer = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, contentType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(jsonDeserializer, beanProperty, contentType);
         }
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         if (typeDeserializer != null) {
             typeDeserializer = typeDeserializer.forProperty(beanProperty);
         }
-        return withResolved(keyDeserializer, jsonDeserializer, typeDeserializer);
+        return withResolved(keyDeserializer, handleSecondaryContextualization, typeDeserializer);
     }
 
     public boolean isCachable() {
@@ -68,35 +69,35 @@ public class EnumMapDeserializer extends ContainerDeserializerBase<EnumMap<?, ?>
     }
 
     public EnumMap<?, ?> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Object deserializeWithType;
         if (jsonParser.getCurrentToken() != JsonToken.START_OBJECT) {
             return (EnumMap) _deserializeFromEmpty(jsonParser, deserializationContext);
         }
-        EnumMap<?, ?> constructMap = constructMap();
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
+        EnumMap constructMap = constructMap();
+        JsonDeserializer<Object> jsonDeserializer = this._valueDeserializer;
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         while (jsonParser.nextToken() == JsonToken.FIELD_NAME) {
             String currentName = jsonParser.getCurrentName();
             Enum enumR = (Enum) this._keyDeserializer.deserializeKey(currentName, deserializationContext);
             if (enumR != null) {
                 try {
-                    Object nullValue;
                     if (jsonParser.nextToken() == JsonToken.VALUE_NULL) {
-                        nullValue = jsonDeserializer.getNullValue(deserializationContext);
+                        deserializeWithType = jsonDeserializer.getNullValue(deserializationContext);
                     } else if (typeDeserializer == null) {
-                        nullValue = jsonDeserializer.deserialize(jsonParser, deserializationContext);
+                        deserializeWithType = jsonDeserializer.deserialize(jsonParser, deserializationContext);
                     } else {
-                        nullValue = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
+                        deserializeWithType = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
                     }
-                    constructMap.put(enumR, nullValue);
-                } catch (Throwable e) {
+                    constructMap.put(enumR, deserializeWithType);
+                } catch (Exception e) {
                     wrapAndThrow(e, constructMap, currentName);
                     return null;
                 }
-            } else if (deserializationContext.isEnabled(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)) {
+            } else if (!deserializationContext.isEnabled(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)) {
+                throw deserializationContext.weirdStringException(currentName, this._enumClass, "value not one of declared Enum instance names for " + this._mapType.getKeyType());
+            } else {
                 jsonParser.nextToken();
                 jsonParser.skipChildren();
-            } else {
-                throw deserializationContext.weirdStringException(currentName, this._enumClass, "value not one of declared Enum instance names for " + this._mapType.getKeyType());
             }
         }
         return constructMap;
@@ -106,7 +107,8 @@ public class EnumMapDeserializer extends ContainerDeserializerBase<EnumMap<?, ?>
         return typeDeserializer.deserializeTypedFromObject(jsonParser, deserializationContext);
     }
 
-    protected EnumMap<?, ?> constructMap() {
-        return new EnumMap(this._enumClass);
+    /* access modifiers changed from: protected */
+    public EnumMap<?, ?> constructMap() {
+        return new EnumMap<>(this._enumClass);
     }
 }

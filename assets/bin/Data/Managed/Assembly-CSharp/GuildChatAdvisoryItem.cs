@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class GuildChatAdvisoryItem
+public class GuildChatAdvisoryItem : MonoBehaviour
 {
 	public Transform close;
 

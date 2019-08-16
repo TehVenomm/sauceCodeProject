@@ -18,7 +18,7 @@ public class BulletControllerArrowSoul : BulletControllerBase
 
 	protected bool isLookTarget;
 
-	protected Transform target;
+	protected TargetPoint target;
 
 	protected Vector3 direction = Vector3.get_forward();
 
@@ -30,12 +30,12 @@ public class BulletControllerArrowSoul : BulletControllerBase
 
 	protected Vector3 puppetTargetPos;
 
-	public void SetTarget(Transform trans)
+	public void SetTarget(TargetPoint point)
 	{
-		target = trans;
+		target = point;
 	}
 
-	public Transform GetTarget()
+	public TargetPoint GetTarget()
 	{
 		return target;
 	}
@@ -81,7 +81,7 @@ public class BulletControllerArrowSoul : BulletControllerBase
 		int num2 = Random.Range(0, num - 1);
 		Vector3 val = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs[num2];
 		direction = rot * val;
-		object transform = (object)base._transform;
+		Transform transform = base._transform;
 		transform.set_position(transform.get_position() - direction * MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirVec);
 		base._transform.set_rotation(rot);
 		base._rigidbody.set_velocity(direction * speed0);
@@ -106,31 +106,32 @@ public class BulletControllerArrowSoul : BulletControllerBase
 		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null) || isPuppet)
+		if (target == null && !isPuppet)
 		{
-			base.timeCount += Time.get_deltaTime();
-			bool flag = _CalcSpeed();
-			_CalcAngle();
-			if (isLookTarget)
+			return;
+		}
+		base.timeCount += Time.get_deltaTime();
+		bool flag = _CalcSpeed();
+		_CalcAngle();
+		if (isLookTarget)
+		{
+			Vector3 val = ((!isPuppet) ? target.GetTargetPoint() : puppetTargetPos) - base._transform.get_position();
+			float num = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
+			if (num > ignoreAngle)
 			{
-				Vector3 val = ((!isPuppet) ? target.get_position() : puppetTargetPos) - base._transform.get_position();
-				float num = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
-				if (num > ignoreAngle)
+				float num2 = angularVelocity * Time.get_deltaTime() / num;
+				if (num2 > 1f)
 				{
-					float num2 = angularVelocity * Time.get_deltaTime() / num;
-					if (num2 > 1f)
-					{
-						num2 = 1f;
-					}
-					base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num2));
-					direction = base._transform.get_rotation() * Vector3.get_forward();
-					flag = true;
+					num2 = 1f;
 				}
+				base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num2));
+				direction = base._transform.get_rotation() * Vector3.get_forward();
+				flag = true;
 			}
-			if (flag)
-			{
-				base._rigidbody.set_velocity(direction * speed1);
-			}
+		}
+		if (flag)
+		{
+			base._rigidbody.set_velocity(direction * speed1);
 		}
 	}
 

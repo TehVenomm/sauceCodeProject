@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.webkit.WebView;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class FacebookWebFallbackDialog extends WebDialog {
@@ -13,19 +14,14 @@ public class FacebookWebFallbackDialog extends WebDialog {
     private static final String TAG = FacebookWebFallbackDialog.class.getName();
     private boolean waitingForDialogToClose;
 
-    /* renamed from: com.facebook.internal.FacebookWebFallbackDialog$1 */
-    class C04071 implements Runnable {
-        C04071() {
-        }
-
-        public void run() {
-            super.cancel();
-        }
-    }
-
-    public FacebookWebFallbackDialog(Context context, String str, String str2) {
+    private FacebookWebFallbackDialog(Context context, String str, String str2) {
         super(context, str);
         setExpectedRedirectUrl(str2);
+    }
+
+    public static FacebookWebFallbackDialog newInstance(Context context, String str, String str2) {
+        WebDialog.initDefaultTheme(context);
+        return new FacebookWebFallbackDialog(context, str, str2);
     }
 
     public void cancel() {
@@ -35,30 +31,35 @@ public class FacebookWebFallbackDialog extends WebDialog {
         } else if (!this.waitingForDialogToClose) {
             this.waitingForDialogToClose = true;
             webView.loadUrl("javascript:" + "(function() {  var event = document.createEvent('Event');  event.initEvent('fbPlatformDialogMustClose',true,true);  document.dispatchEvent(event);})();");
-            new Handler(Looper.getMainLooper()).postDelayed(new C04071(), 1500);
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                public void run() {
+                    FacebookWebFallbackDialog.super.cancel();
+                }
+            }, 1500);
         }
     }
 
-    protected Bundle parseResponseUri(String str) {
+    /* access modifiers changed from: protected */
+    public Bundle parseResponseUri(String str) {
         Bundle parseUrlQueryString = Utility.parseUrlQueryString(Uri.parse(str).getQuery());
         String string = parseUrlQueryString.getString(ServerProtocol.FALLBACK_DIALOG_PARAM_BRIDGE_ARGS);
         parseUrlQueryString.remove(ServerProtocol.FALLBACK_DIALOG_PARAM_BRIDGE_ARGS);
         if (!Utility.isNullOrEmpty(string)) {
             try {
                 parseUrlQueryString.putBundle(NativeProtocol.EXTRA_PROTOCOL_BRIDGE_ARGS, BundleJSONConverter.convertToBundle(new JSONObject(string)));
-            } catch (Throwable e) {
+            } catch (JSONException e) {
                 Utility.logd(TAG, "Unable to parse bridge_args JSON", e);
             }
         }
-        string = parseUrlQueryString.getString(ServerProtocol.FALLBACK_DIALOG_PARAM_METHOD_RESULTS);
+        String string2 = parseUrlQueryString.getString(ServerProtocol.FALLBACK_DIALOG_PARAM_METHOD_RESULTS);
         parseUrlQueryString.remove(ServerProtocol.FALLBACK_DIALOG_PARAM_METHOD_RESULTS);
-        if (!Utility.isNullOrEmpty(string)) {
-            if (Utility.isNullOrEmpty(string)) {
-                string = "{}";
+        if (!Utility.isNullOrEmpty(string2)) {
+            if (Utility.isNullOrEmpty(string2)) {
+                string2 = "{}";
             }
             try {
-                parseUrlQueryString.putBundle(NativeProtocol.EXTRA_PROTOCOL_METHOD_RESULTS, BundleJSONConverter.convertToBundle(new JSONObject(string)));
-            } catch (Throwable e2) {
+                parseUrlQueryString.putBundle(NativeProtocol.EXTRA_PROTOCOL_METHOD_RESULTS, BundleJSONConverter.convertToBundle(new JSONObject(string2)));
+            } catch (JSONException e2) {
                 Utility.logd(TAG, "Unable to parse bridge_args JSON", e2);
             }
         }

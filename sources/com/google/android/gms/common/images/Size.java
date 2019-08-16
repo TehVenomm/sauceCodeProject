@@ -3,12 +3,12 @@ package com.google.android.gms.common.images;
 import com.github.droidfu.support.DisplaySupport;
 
 public final class Size {
-    private final int zzakv;
-    private final int zzakw;
+    private final int zand;
+    private final int zane;
 
     public Size(int i, int i2) {
-        this.zzakv = i;
-        this.zzakw = i2;
+        this.zand = i;
+        this.zane = i2;
     }
 
     public static Size parseSize(String str) throws NumberFormatException {
@@ -20,16 +20,16 @@ public final class Size {
             indexOf = str.indexOf(DisplaySupport.SCREEN_DENSITY_LOW);
         }
         if (indexOf < 0) {
-            throw zzfw(str);
+            throw zah(str);
         }
         try {
             return new Size(Integer.parseInt(str.substring(0, indexOf)), Integer.parseInt(str.substring(indexOf + 1)));
         } catch (NumberFormatException e) {
-            throw zzfw(str);
+            throw zah(str);
         }
     }
 
-    private static NumberFormatException zzfw(String str) {
+    private static NumberFormatException zah(String str) {
         throw new NumberFormatException(new StringBuilder(String.valueOf(str).length() + 16).append("Invalid Size: \"").append(str).append("\"").toString());
     }
 
@@ -44,23 +44,23 @@ public final class Size {
             return false;
         }
         Size size = (Size) obj;
-        return this.zzakv == size.zzakv && this.zzakw == size.zzakw;
+        return this.zand == size.zand && this.zane == size.zane;
     }
 
     public final int getHeight() {
-        return this.zzakw;
+        return this.zane;
     }
 
     public final int getWidth() {
-        return this.zzakv;
+        return this.zand;
     }
 
     public final int hashCode() {
-        return this.zzakw ^ ((this.zzakv << 16) | (this.zzakv >>> 16));
+        return this.zane ^ ((this.zand << 16) | (this.zand >>> 16));
     }
 
     public final String toString() {
-        int i = this.zzakv;
-        return i + "x" + this.zzakw;
+        int i = this.zand;
+        return i + "x" + this.zane;
     }
 }

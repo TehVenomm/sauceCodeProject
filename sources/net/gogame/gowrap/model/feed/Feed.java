@@ -27,7 +27,9 @@ public class Feed implements Serializable {
         private static final String KEY_UPDATED_TIME = "updatedTime";
         private String articleLink;
         private Long createdTime;
-        private String id;
+
+        /* renamed from: id */
+        private String f1407id;
         private String link;
         private Integer mediaHeight;
         private String mediaPreview;
@@ -37,13 +39,16 @@ public class Feed implements Serializable {
         private String type;
         private Long updatedTime;
 
+        public Item() {
+        }
+
         public Item(JsonReader jsonReader) throws IOException {
             if (jsonReader.peek() == JsonToken.BEGIN_OBJECT) {
                 jsonReader.beginObject();
                 while (jsonReader.hasNext()) {
                     String nextName = jsonReader.nextName();
                     if (StringUtils.isEquals(nextName, "id")) {
-                        this.id = JSONUtils.optString(jsonReader);
+                        this.f1407id = JSONUtils.optString(jsonReader);
                     } else if (StringUtils.isEquals(nextName, KEY_CREATED_TIME)) {
                         this.createdTime = JSONUtils.optLong(jsonReader);
                     } else if (StringUtils.isEquals(nextName, KEY_UPDATED_TIME)) {
@@ -75,11 +80,11 @@ public class Feed implements Serializable {
         }
 
         public String getId() {
-            return this.id;
+            return this.f1407id;
         }
 
         public void setId(String str) {
-            this.id = str;
+            this.f1407id = str;
         }
 
         public Long getCreatedTime() {
@@ -161,6 +166,9 @@ public class Feed implements Serializable {
         public void setMessage(String str) {
             this.message = str;
         }
+    }
+
+    public Feed() {
     }
 
     public Feed(JsonReader jsonReader) throws IOException {

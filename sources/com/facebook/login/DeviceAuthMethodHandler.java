@@ -11,14 +11,7 @@ import java.util.Date;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 class DeviceAuthMethodHandler extends LoginMethodHandler {
-    public static final Creator<DeviceAuthMethodHandler> CREATOR = new C04341();
-    private static ScheduledThreadPoolExecutor backgroundExecutor;
-
-    /* renamed from: com.facebook.login.DeviceAuthMethodHandler$1 */
-    static final class C04341 implements Creator {
-        C04341() {
-        }
-
+    public static final Creator<DeviceAuthMethodHandler> CREATOR = new Creator() {
         public DeviceAuthMethodHandler createFromParcel(Parcel parcel) {
             return new DeviceAuthMethodHandler(parcel);
         }
@@ -26,7 +19,8 @@ class DeviceAuthMethodHandler extends LoginMethodHandler {
         public DeviceAuthMethodHandler[] newArray(int i) {
             return new DeviceAuthMethodHandler[i];
         }
-    }
+    };
+    private static ScheduledThreadPoolExecutor backgroundExecutor;
 
     protected DeviceAuthMethodHandler(Parcel parcel) {
         super(parcel);
@@ -37,32 +31,37 @@ class DeviceAuthMethodHandler extends LoginMethodHandler {
     }
 
     public static ScheduledThreadPoolExecutor getBackgroundExecutor() {
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
         synchronized (DeviceAuthMethodHandler.class) {
-            Class cls;
             try {
                 if (backgroundExecutor == null) {
-                    cls = true;
                     backgroundExecutor = new ScheduledThreadPoolExecutor(1);
                 }
-                ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = backgroundExecutor;
-                return scheduledThreadPoolExecutor;
+                scheduledThreadPoolExecutor = backgroundExecutor;
             } finally {
-                cls = DeviceAuthMethodHandler.class;
+                Class<DeviceAuthMethodHandler> cls = DeviceAuthMethodHandler.class;
             }
         }
+        return scheduledThreadPoolExecutor;
     }
 
     private void showDialog(Request request) {
-        DeviceAuthDialog deviceAuthDialog = new DeviceAuthDialog();
-        deviceAuthDialog.show(this.loginClient.getActivity().getSupportFragmentManager(), "login_with_facebook");
-        deviceAuthDialog.startLogin(request);
+        DeviceAuthDialog createDeviceAuthDialog = createDeviceAuthDialog();
+        createDeviceAuthDialog.show(this.loginClient.getActivity().getSupportFragmentManager(), "login_with_facebook");
+        createDeviceAuthDialog.startLogin(request);
+    }
+
+    /* access modifiers changed from: protected */
+    public DeviceAuthDialog createDeviceAuthDialog() {
+        return new DeviceAuthDialog();
     }
 
     public int describeContents() {
         return 0;
     }
 
-    String getNameForLogging() {
+    /* access modifiers changed from: 0000 */
+    public String getNameForLogging() {
         return "device_auth";
     }
 
@@ -70,15 +69,16 @@ class DeviceAuthMethodHandler extends LoginMethodHandler {
         this.loginClient.completeAndValidate(Result.createCancelResult(this.loginClient.getPendingRequest(), "User canceled log in."));
     }
 
-    public void onError(Exception exception) {
-        this.loginClient.completeAndValidate(Result.createErrorResult(this.loginClient.getPendingRequest(), null, exception.getMessage()));
+    public void onError(Exception exc) {
+        this.loginClient.completeAndValidate(Result.createErrorResult(this.loginClient.getPendingRequest(), null, exc.getMessage()));
     }
 
-    public void onSuccess(String str, String str2, String str3, Collection<String> collection, Collection<String> collection2, AccessTokenSource accessTokenSource, Date date, Date date2) {
-        this.loginClient.completeAndValidate(Result.createTokenResult(this.loginClient.getPendingRequest(), new AccessToken(str, str2, str3, collection, collection2, accessTokenSource, date, date2)));
+    public void onSuccess(String str, String str2, String str3, Collection<String> collection, Collection<String> collection2, AccessTokenSource accessTokenSource, Date date, Date date2, Date date3) {
+        this.loginClient.completeAndValidate(Result.createTokenResult(this.loginClient.getPendingRequest(), new AccessToken(str, str2, str3, collection, collection2, accessTokenSource, date, date2, date3)));
     }
 
-    boolean tryAuthorize(Request request) {
+    /* access modifiers changed from: 0000 */
+    public boolean tryAuthorize(Request request) {
         showDialog(request);
         return true;
     }

@@ -9,15 +9,18 @@ public class zzt extends zza<String> {
         super(str, i);
     }
 
-    protected final /* synthetic */ void zza(Bundle bundle, Object obj) {
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ void zza(Bundle bundle, Object obj) {
         bundle.putString(getName(), (String) obj);
     }
 
-    protected final /* synthetic */ Object zzc(DataHolder dataHolder, int i, int i2) {
-        return dataHolder.zzd(getName(), i, i2);
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ Object zzb(Bundle bundle) {
+        return bundle.getString(getName());
     }
 
-    protected final /* synthetic */ Object zzm(Bundle bundle) {
-        return bundle.getString(getName());
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ Object zzc(DataHolder dataHolder, int i, int i2) {
+        return dataHolder.getString(getName(), i, i2);
     }
 }

@@ -3,7 +3,6 @@ package net.gogame.gowrap.support;
 import android.os.Build.VERSION;
 import android.text.Html;
 import java.util.ArrayList;
-import java.util.List;
 
 public final class StringUtils {
     private StringUtils() {
@@ -25,8 +24,11 @@ public final class StringUtils {
             return null;
         }
         int i = 0;
-        List arrayList = new ArrayList();
-        while (i < str.length()) {
+        ArrayList arrayList = new ArrayList();
+        while (true) {
+            if (i >= str.length()) {
+                break;
+            }
             int indexOf = str.indexOf(str2, i);
             if (indexOf <= i) {
                 if (indexOf != i) {

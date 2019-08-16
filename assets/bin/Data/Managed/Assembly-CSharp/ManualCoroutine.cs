@@ -50,7 +50,6 @@ public class ManualCoroutine
 
 	public void Set(MonoBehaviour _mono, IEnumerator co)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		Clear();
 		mono = _mono;
 		instance = co;
@@ -76,18 +75,16 @@ public class ManualCoroutine
 		{
 			if (instance == null || !active || !mono.get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
+				continue;
 			}
-			else
+			current = this;
+			if (!instance.MoveNext())
 			{
-				current = this;
-				if (!instance.MoveNext())
-				{
-					break;
-				}
-				current = null;
-				yield return instance.Current;
+				break;
 			}
+			current = null;
+			yield return instance.Current;
 		}
 		if (callback != null)
 		{

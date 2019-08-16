@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class FieldMapTable : Singleton<FieldMapTable>
@@ -9,8 +10,6 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		public const uint NOT_CONECTING_REGION_ID = uint.MaxValue;
 
 		public const uint DEFAULT_ICON_ID = 0u;
-
-		public const string NT = "mapId,regionId,mapName,stageName,happenStageName,fieldGrade,fieldMode,eventId,jumpPortalId,bgmId,happenBgmId,linkQuestID,childRegionId,iconId,questIconId,fieldBuffId";
 
 		public uint mapID;
 
@@ -44,6 +43,16 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public uint fieldBuffId;
 
+		public Vector3 camOffsetPortraitPos = Vector3.get_zero();
+
+		public Vector3 camOffsetPortraitRot = Vector3.get_zero();
+
+		public Vector3 camOffsetLandscapePos = Vector3.get_zero();
+
+		public Vector3 camOffsetLandscapeRot = Vector3.get_zero();
+
+		public const string NT = "mapId,regionId,mapName,stageName,happenStageName,fieldGrade,fieldMode,eventId,jumpPortalId,bgmId,happenBgmId,linkQuestID,childRegionId,iconId,questIconId,fieldBuffId,camOffsetPortraitPos,camOffsetPortraitRot,camOffsetLandscapePos,camOffsetLandscapeRot";
+
 		public bool IsEventData => eventId != 0;
 
 		public bool hasChildRegion => childRegionId != uint.MaxValue;
@@ -66,6 +75,33 @@ public class FieldMapTable : Singleton<FieldMapTable>
 			csv_reader.Pop(ref data.iconId);
 			csv_reader.Pop(ref data.questIconId);
 			csv_reader.Pop(ref data.fieldBuffId);
+			string value = string.Empty;
+			csv_reader.Pop(ref value);
+			TryParseNonSplitStrToVector3(value, out data.camOffsetPortraitPos);
+			csv_reader.Pop(ref value);
+			TryParseNonSplitStrToVector3(value, out data.camOffsetPortraitRot);
+			csv_reader.Pop(ref value);
+			TryParseNonSplitStrToVector3(value, out data.camOffsetLandscapePos);
+			csv_reader.Pop(ref value);
+			TryParseNonSplitStrToVector3(value, out data.camOffsetLandscapeRot);
+			return true;
+		}
+
+		private static bool TryParseNonSplitStrToVector3(string str, out Vector3 vec)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			vec = Vector3.get_zero();
+			if (string.IsNullOrEmpty(str))
+			{
+				return false;
+			}
+			string[] array = str.Split(':');
+			if (array.Length < 3)
+			{
+				return false;
+			}
+			vec._002Ector(array[0].ToFloatOrDefault(), array[1].ToFloatOrDefault(), array[2].ToFloatOrDefault());
 			return true;
 		}
 
@@ -77,8 +113,6 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	public class PortalTableData
 	{
-		public const string NT = "portalId,linkPortalId,srcMapId,srcX,srcZ,dstMapId,dstX,dstZ,dstDir,mapX,mapY,dstQuestId,showDeliveryId,hideQuestId,appearQuestId,appearDeliveryId,travelMapId,openPriority,portalPoint,notAppearText,placeText,startAt,banEnemy,appearRegionId";
-
 		public uint portalID;
 
 		public uint srcMapID;
@@ -97,9 +131,9 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public float dstDir;
 
-		public float mapX = 3.40282347E+38f;
+		public float mapX = float.MaxValue;
 
-		public float mapY = 3.40282347E+38f;
+		public float mapY = float.MaxValue;
 
 		public uint dstQuestID;
 
@@ -126,6 +160,8 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		public uint banEnemy;
 
 		public uint appearRegionId;
+
+		public const string NT = "portalId,linkPortalId,srcMapId,srcX,srcZ,dstMapId,dstX,dstZ,dstDir,mapX,mapY,dstQuestId,showDeliveryId,hideQuestId,appearQuestId,appearDeliveryId,travelMapId,openPriority,portalPoint,notAppearText,placeText,startAt,banEnemy,appearRegionId";
 
 		public static bool cb(CSVReader csv_reader, PortalTableData data, ref uint key)
 		{
@@ -174,11 +210,17 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	public class EnemyPopTableData
 	{
-		public const string NT = "mapId,popX,popZ,popRadius,enemyId,enemyLv,popNumMin,popNumMax,popNumInit,popNumTotal,popTimeMin,popTimeMax,bossFlag,autoActivate,scountigRange,scoutingSight,scoutingAudibility,enemyPopType,escapeTime";
-
 		public uint mapID;
 
 		public float popX;
+
+		public bool enableRotY;
+
+		public float rotY;
+
+		public bool enablePopY;
+
+		public float popY;
 
 		public float popZ;
 
@@ -187,6 +229,8 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		public uint enemyID;
 
 		public uint enemyLv;
+
+		public int waveNo;
 
 		public int popNumMin;
 
@@ -200,6 +244,8 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public float popTimeMax;
 
+		public bool bigMonsterFlag;
+
 		public bool bossFlag;
 
 		public bool autoActivate;
@@ -210,31 +256,59 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public int escapeTime;
 
+		public float walkSpeedMin = 1f;
+
+		public float walkSpeedMax = 1f;
+
+		public bool enableWalkSpeed;
+
+		private Vector3 cachedPopBasePosition = Vector3.get_zero();
+
+		private bool isPopBasePositionCached;
+
+		public const string NT = "mapId,popX,rotY,popY,popZ,popRadius,enemyId,enemyLv,waveNo,popNumMin,popNumMax,popNumInit,popNumTotal,popTimeMin,popTimeMax,bigMonsterFlag,bossFlag,autoActivate,scountigRange,scoutingSight,scoutingAudibility,enemyPopType,escapeTime,walkSpeedMin,walkSpeedMax";
+
 		public static bool cb(CSVReader csv_reader, EnemyPopTableData data, ref uint key)
 		{
 			data.mapID = key;
 			csv_reader.Pop(ref data.popX);
+			if (csv_reader.Pop(ref data.rotY) == CSVReader.PopResult.SUCCESS)
+			{
+				data.enableRotY = true;
+			}
+			if (csv_reader.Pop(ref data.popY) == CSVReader.PopResult.SUCCESS)
+			{
+				data.enablePopY = true;
+			}
 			csv_reader.Pop(ref data.popZ);
 			csv_reader.Pop(ref data.popRadius);
 			csv_reader.Pop(ref data.enemyID);
 			csv_reader.Pop(ref data.enemyLv);
+			csv_reader.Pop(ref data.waveNo);
 			csv_reader.Pop(ref data.popNumMin);
 			csv_reader.Pop(ref data.popNumMax);
 			csv_reader.Pop(ref data.popNumInit);
 			csv_reader.Pop(ref data.popNumTotal);
 			csv_reader.Pop(ref data.popTimeMin);
 			csv_reader.Pop(ref data.popTimeMax);
+			csv_reader.Pop(ref data.bigMonsterFlag);
 			csv_reader.Pop(ref data.bossFlag);
 			csv_reader.Pop(ref data.autoActivate);
 			float value = 0f;
 			csv_reader.Pop(ref value);
 			data.scoutingParam.scountigRangeSqr = value * value;
 			csv_reader.Pop(ref value);
-			data.scoutingParam.scoutingSightCos = Mathf.Cos(0.0174532924f * value);
+			data.scoutingParam.scoutingSightCos = Mathf.Cos((float)Math.PI / 180f * value);
 			csv_reader.Pop(ref value);
 			data.scoutingParam.scoutingAudibilitySqr = value * value;
 			csv_reader.PopEnum(ref data.enemyPopType, ENEMY_POP_TYPE.NONE);
 			csv_reader.Pop(ref data.escapeTime);
+			CSVReader.PopResult a = csv_reader.Pop(ref data.walkSpeedMin);
+			CSVReader.PopResult a2 = csv_reader.Pop(ref data.walkSpeedMax);
+			if (a == CSVReader.PopResult.SUCCESS && a2 == CSVReader.PopResult.SUCCESS)
+			{
+				data.enableWalkSpeed = true;
+			}
 			return true;
 		}
 
@@ -242,11 +316,44 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		{
 			return Random.Range(popTimeMin, popTimeMax);
 		}
+
+		public float GenerateWalkSpeed()
+		{
+			if (!enableWalkSpeed)
+			{
+				return 1f;
+			}
+			if (walkSpeedMin < walkSpeedMax)
+			{
+				return Random.Range(walkSpeedMin, walkSpeedMax);
+			}
+			if (walkSpeedMin > walkSpeedMax)
+			{
+				return Random.Range(walkSpeedMax, walkSpeedMin);
+			}
+			return walkSpeedMin;
+		}
+
+		public Vector3 GeneratePopPosVec3()
+		{
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			if (!isPopBasePositionCached)
+			{
+				cachedPopBasePosition = new Vector3(popX, popY, popZ);
+			}
+			return cachedPopBasePosition;
+		}
 	}
 
 	public class GatherPointTableData
 	{
-		public const string NT = "pointId,pointMapId,pointX,pointZ,pointDir,viewId,gimmickType,value1";
+		public enum GatherType
+		{
+			Basic,
+			Growth
+		}
 
 		public uint pointID;
 
@@ -260,9 +367,17 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public uint viewID;
 
+		public uint maxNumRate;
+
+		public uint addNumRate;
+
+		public uint growthInterval;
+
 		public FieldGimmickPointTableData.GIMMICK_TYPE gimmickType;
 
 		public float value1;
+
+		public const string NT = "pointId,pointMapId,pointX,pointZ,pointDir,viewId,maxNumRate,addNumRate,growthInterval,gimmickType,value1";
 
 		public static bool cb(CSVReader csv_reader, GatherPointTableData data, ref uint key)
 		{
@@ -272,9 +387,21 @@ public class FieldMapTable : Singleton<FieldMapTable>
 			csv_reader.Pop(ref data.pointZ);
 			csv_reader.Pop(ref data.pointDir);
 			csv_reader.Pop(ref data.viewID);
+			csv_reader.Pop(ref data.maxNumRate);
+			csv_reader.Pop(ref data.addNumRate);
+			csv_reader.Pop(ref data.growthInterval);
 			csv_reader.Pop(ref data.gimmickType);
 			csv_reader.Pop(ref data.value1);
 			return true;
+		}
+
+		public static GatherType GetGatherType(GatherPointTableData data)
+		{
+			if (data != null && data.growthInterval != 0)
+			{
+				return GatherType.Growth;
+			}
+			return GatherType.Basic;
 		}
 
 		public FieldGimmickPointTableData CloneAsGimmickData()
@@ -293,8 +420,6 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	public class GatherPointViewTableData
 	{
-		public const string NT = "id,modelId,modelHideNodeName,gatherEffectName,colRadius,targetRadius,targetEffectName,targetEffectShift,targetEffectHeight,actStateName,toolModelName,toolNodeName,iconId,itemDetailText";
-
 		public uint viewID;
 
 		public uint modelID;
@@ -322,6 +447,8 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		public uint iconID;
 
 		public string itemDetailText;
+
+		public const string NT = "id,modelId,modelHideNodeName,gatherEffectName,colRadius,targetRadius,targetEffectName,targetEffectShift,targetEffectHeight,actStateName,toolModelName,toolNodeName,iconId,itemDetailText";
 
 		public static bool cb(CSVReader csv_reader, GatherPointViewTableData data, ref uint key)
 		{
@@ -357,10 +484,25 @@ public class FieldMapTable : Singleton<FieldMapTable>
 			CANNON_RAPID,
 			CANNON_SPECIAL,
 			WAVE_TARGET,
-			WAVE_TARGET2
+			WAVE_TARGET2,
+			CANNON_FIELD,
+			READ_STORY,
+			FISHING,
+			BINGO,
+			CHAT,
+			WAVE_TARGET3,
+			GENERATOR,
+			CANDYWOOD,
+			COOP_FISHING,
+			SUPPLY,
+			CARRIABLE_TURRET,
+			CARRIABLE_EVOLVE_ITEM,
+			CARRIABLE_DECOY,
+			CARRIABLE_BUFF_POINT,
+			PORTAL_GIMMICK,
+			CARRIABLE_BOMB,
+			QUEST
 		}
-
-		public const string NT = "pointId,gimmickType,pointMapId,pointX,pointZ,pointDir,value1,value2";
 
 		public uint pointID;
 
@@ -377,6 +519,8 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		public float value1;
 
 		public string value2 = string.Empty;
+
+		public const string NT = "pointId,gimmickType,pointMapId,pointX,pointZ,pointDir,value1,value2";
 
 		public static bool cb(CSVReader csv_reader, FieldGimmickPointTableData data, ref uint key)
 		{
@@ -408,8 +552,6 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public const float DEFAULT_LOOP_TIME = 4f;
 
-		public const string NT = "actionId,radius,start,duration,interval,reactionType,force,angle,loopTime";
-
 		public uint actionId;
 
 		public float radius = 1f;
@@ -427,6 +569,8 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		public float angle = 20f;
 
 		public float loopTime = 4f;
+
+		public const string NT = "actionId,radius,start,duration,interval,reactionType,force,angle,loopTime";
 
 		public static bool cb(CSVReader csv_reader, FieldGimmickActionTableData data, ref uint key)
 		{
@@ -463,19 +607,49 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	private UIntKeyTable<FieldGimmickActionTableData> fieldGimmickActionTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapTableData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapTableData> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<PortalTableData> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<PortalTableData> _003C_003Ef__mg_0024cache3;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyPopTableData> _003C_003Ef__mg_0024cache4;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyPopTableData> _003C_003Ef__mg_0024cache5;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<GatherPointTableData> _003C_003Ef__mg_0024cache6;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<GatherPointViewTableData> _003C_003Ef__mg_0024cache7;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<FieldGimmickPointTableData> _003C_003Ef__mg_0024cache8;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<FieldGimmickActionTableData> _003C_003Ef__mg_0024cache9;
+
 	public void CreateFieldMapTable(string csv_text)
 	{
-		fieldMapTable = TableUtility.CreateUIntKeyTable<FieldMapTableData>(csv_text, FieldMapTableData.cb, "mapId,regionId,mapName,stageName,happenStageName,fieldGrade,fieldMode,eventId,jumpPortalId,bgmId,happenBgmId,linkQuestID,childRegionId,iconId,questIconId,fieldBuffId", null);
+		fieldMapTable = TableUtility.CreateUIntKeyTable<FieldMapTableData>(csv_text, FieldMapTableData.cb, "mapId,regionId,mapName,stageName,happenStageName,fieldGrade,fieldMode,eventId,jumpPortalId,bgmId,happenBgmId,linkQuestID,childRegionId,iconId,questIconId,fieldBuffId,camOffsetPortraitPos,camOffsetPortraitRot,camOffsetLandscapePos,camOffsetLandscapeRot");
 	}
 
 	public void AddFieldMapTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(fieldMapTable, csv_text, FieldMapTableData.cb, "mapId,regionId,mapName,stageName,happenStageName,fieldGrade,fieldMode,eventId,jumpPortalId,bgmId,happenBgmId,linkQuestID,childRegionId,iconId,questIconId,fieldBuffId", null);
+		TableUtility.AddUIntKeyTable(fieldMapTable, csv_text, FieldMapTableData.cb, "mapId,regionId,mapName,stageName,happenStageName,fieldGrade,fieldMode,eventId,jumpPortalId,bgmId,happenBgmId,linkQuestID,childRegionId,iconId,questIconId,fieldBuffId,camOffsetPortraitPos,camOffsetPortraitRot,camOffsetLandscapePos,camOffsetLandscapeRot");
 	}
 
 	public void CreatePortalTable(string csv_text)
 	{
-		portalTable = TableUtility.CreateUIntKeyTable<PortalTableData>(csv_text, PortalTableData.cb, "portalId,linkPortalId,srcMapId,srcX,srcZ,dstMapId,dstX,dstZ,dstDir,mapX,mapY,dstQuestId,showDeliveryId,hideQuestId,appearQuestId,appearDeliveryId,travelMapId,openPriority,portalPoint,notAppearText,placeText,startAt,banEnemy,appearRegionId", null);
+		portalTable = TableUtility.CreateUIntKeyTable<PortalTableData>(csv_text, PortalTableData.cb, "portalId,linkPortalId,srcMapId,srcX,srcZ,dstMapId,dstX,dstZ,dstDir,mapX,mapY,dstQuestId,showDeliveryId,hideQuestId,appearQuestId,appearDeliveryId,travelMapId,openPriority,portalPoint,notAppearText,placeText,startAt,banEnemy,appearRegionId");
 		portalSrcMapIDTable = new UIntKeyTable<List<PortalTableData>>();
 		portalTable.ForEach(delegate(PortalTableData portalData)
 		{
@@ -492,7 +666,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	public void AddPortalTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(portalTable, csv_text, PortalTableData.cb, "portalId,linkPortalId,srcMapId,srcX,srcZ,dstMapId,dstX,dstZ,dstDir,mapX,mapY,dstQuestId,showDeliveryId,hideQuestId,appearQuestId,appearDeliveryId,travelMapId,openPriority,portalPoint,notAppearText,placeText,startAt,banEnemy,appearRegionId", null);
+		TableUtility.AddUIntKeyTable(portalTable, csv_text, PortalTableData.cb, "portalId,linkPortalId,srcMapId,srcX,srcZ,dstMapId,dstX,dstZ,dstDir,mapX,mapY,dstQuestId,showDeliveryId,hideQuestId,appearQuestId,appearDeliveryId,travelMapId,openPriority,portalPoint,notAppearText,placeText,startAt,banEnemy,appearRegionId");
 		portalSrcMapIDTable = new UIntKeyTable<List<PortalTableData>>();
 		portalTable.ForEach(delegate(PortalTableData portalData)
 		{
@@ -509,17 +683,17 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	public void CreateEnemyPopTable(string csv_text)
 	{
-		enemyPopTable = TableUtility.CreateUIntKeyListTable<EnemyPopTableData>(csv_text, EnemyPopTableData.cb, "mapId,popX,popZ,popRadius,enemyId,enemyLv,popNumMin,popNumMax,popNumInit,popNumTotal,popTimeMin,popTimeMax,bossFlag,autoActivate,scountigRange,scoutingSight,scoutingAudibility,enemyPopType,escapeTime");
+		enemyPopTable = TableUtility.CreateUIntKeyListTable<EnemyPopTableData>(csv_text, EnemyPopTableData.cb, "mapId,popX,rotY,popY,popZ,popRadius,enemyId,enemyLv,waveNo,popNumMin,popNumMax,popNumInit,popNumTotal,popTimeMin,popTimeMax,bigMonsterFlag,bossFlag,autoActivate,scountigRange,scoutingSight,scoutingAudibility,enemyPopType,escapeTime,walkSpeedMin,walkSpeedMax");
 	}
 
 	public void AddEnemyPopTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyListTable(enemyPopTable, csv_text, EnemyPopTableData.cb, "mapId,popX,popZ,popRadius,enemyId,enemyLv,popNumMin,popNumMax,popNumInit,popNumTotal,popTimeMin,popTimeMax,bossFlag,autoActivate,scountigRange,scoutingSight,scoutingAudibility,enemyPopType,escapeTime");
+		TableUtility.AddUIntKeyListTable(enemyPopTable, csv_text, EnemyPopTableData.cb, "mapId,popX,rotY,popY,popZ,popRadius,enemyId,enemyLv,waveNo,popNumMin,popNumMax,popNumInit,popNumTotal,popTimeMin,popTimeMax,bigMonsterFlag,bossFlag,autoActivate,scountigRange,scoutingSight,scoutingAudibility,enemyPopType,escapeTime,walkSpeedMin,walkSpeedMax");
 	}
 
 	public void CreateGatherPointTable(string csv_text)
 	{
-		gatherPointTable = TableUtility.CreateUIntKeyTable<GatherPointTableData>(csv_text, GatherPointTableData.cb, "pointId,pointMapId,pointX,pointZ,pointDir,viewId,gimmickType,value1", null);
+		gatherPointTable = TableUtility.CreateUIntKeyTable<GatherPointTableData>(csv_text, GatherPointTableData.cb, "pointId,pointMapId,pointX,pointZ,pointDir,viewId,maxNumRate,addNumRate,growthInterval,gimmickType,value1");
 		gatherPointMapIDTable = new UIntKeyTable<List<GatherPointTableData>>();
 		gatherPointTable.ForEach(delegate(GatherPointTableData pointData)
 		{
@@ -536,12 +710,12 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	public void CreateGatherPointViewTable(string csv_text)
 	{
-		gatherPointViewTable = TableUtility.CreateUIntKeyTable<GatherPointViewTableData>(csv_text, GatherPointViewTableData.cb, "id,modelId,modelHideNodeName,gatherEffectName,colRadius,targetRadius,targetEffectName,targetEffectShift,targetEffectHeight,actStateName,toolModelName,toolNodeName,iconId,itemDetailText", null);
+		gatherPointViewTable = TableUtility.CreateUIntKeyTable<GatherPointViewTableData>(csv_text, GatherPointViewTableData.cb, "id,modelId,modelHideNodeName,gatherEffectName,colRadius,targetRadius,targetEffectName,targetEffectShift,targetEffectHeight,actStateName,toolModelName,toolNodeName,iconId,itemDetailText");
 	}
 
 	public void CreateGimmickPointTable(string csv_text)
 	{
-		fieldGimmickPointTable = TableUtility.CreateUIntKeyTable<FieldGimmickPointTableData>(csv_text, FieldGimmickPointTableData.cb, "pointId,gimmickType,pointMapId,pointX,pointZ,pointDir,value1,value2", null);
+		fieldGimmickPointTable = TableUtility.CreateUIntKeyTable<FieldGimmickPointTableData>(csv_text, FieldGimmickPointTableData.cb, "pointId,gimmickType,pointMapId,pointX,pointZ,pointDir,value1,value2");
 		fieldGimmickPointMapIDTable = new UIntKeyTable<List<FieldGimmickPointTableData>>();
 		fieldGimmickPointTable.ForEach(delegate(FieldGimmickPointTableData pointData)
 		{
@@ -558,7 +732,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 	public void CreateGimmickActionTable(string csv_text)
 	{
-		fieldGimmickActionTable = TableUtility.CreateUIntKeyTable<FieldGimmickActionTableData>(csv_text, FieldGimmickActionTableData.cb, "actionId,radius,start,duration,interval,reactionType,force,angle,loopTime", null);
+		fieldGimmickActionTable = TableUtility.CreateUIntKeyTable<FieldGimmickActionTableData>(csv_text, FieldGimmickActionTableData.cb, "actionId,radius,start,duration,interval,reactionType,force,angle,loopTime");
 	}
 
 	public FieldMapTableData GetFieldMapData(uint id)

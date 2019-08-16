@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class UIExplorePlayerStatus
+public class UIExplorePlayerStatus : MonoBehaviour
 {
 	[SerializeField]
 	private UILabel nameLabel;
@@ -33,7 +33,6 @@ public class UIExplorePlayerStatus
 
 	public void Initialize(ExplorePlayerStatus playerStatus)
 	{
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 		if (this.playerStatus != playerStatus)
 		{
 			Clear();
@@ -45,12 +44,10 @@ public class UIExplorePlayerStatus
 		if (playerStatus.isInitialized)
 		{
 			OnInitializeStatus();
+			return;
 		}
-		else
-		{
-			playerStatus.onInitialize += OnInitializeStatus;
-			this.get_gameObject().SetActive(false);
-		}
+		playerStatus.onInitialize += OnInitializeStatus;
+		this.get_gameObject().SetActive(false);
 	}
 
 	private void Clear()
@@ -72,7 +69,6 @@ public class UIExplorePlayerStatus
 
 	private void OnInitializeStatus()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(true);
 		SetName();
 		UpdateHp();
@@ -92,7 +88,7 @@ public class UIExplorePlayerStatus
 
 	private void UpdateHp()
 	{
-		hpGauge.SetPercent((float)playerStatus.hp / (float)playerStatus.hpMax, true);
+		hpGauge.SetPercent((float)playerStatus.hp / (float)playerStatus.hpMax);
 	}
 
 	private void UpdateWeapon()
@@ -103,7 +99,6 @@ public class UIExplorePlayerStatus
 
 	private void UpdateStatusIcon()
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (statusIcon.HasActiveMultipleBuffIcon(playerStatus.buff, playerStatus.extraStatus))
 		{
 			if (rotateUpdate == null)
@@ -111,17 +106,15 @@ public class UIExplorePlayerStatus
 				rotateUpdate = RotateUpdateStatusIcon();
 				this.StartCoroutine(rotateUpdate);
 			}
+			return;
 		}
-		else
+		if (rotateUpdate != null)
 		{
-			if (rotateUpdate != null)
-			{
-				this.StopCoroutine(rotateUpdate);
-				rotateUpdate = null;
-			}
-			checkStatusType = 0;
-			statusIcon.RotatedUpdateStatusIcon(checkStatusType, playerStatus.buff, playerStatus.extraStatus);
+			this.StopCoroutine(rotateUpdate);
+			rotateUpdate = null;
 		}
+		checkStatusType = 0;
+		statusIcon.RotatedUpdateStatusIcon(checkStatusType, playerStatus.buff, playerStatus.extraStatus);
 	}
 
 	private IEnumerator RotateUpdateStatusIcon()
@@ -135,7 +128,7 @@ public class UIExplorePlayerStatus
 				checkStatusType++;
 				nextStatusIconRotate = statusIconRotationInterval;
 			}
-			yield return (object)null;
+			yield return null;
 		}
 	}
 }

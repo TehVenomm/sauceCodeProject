@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class EffectObject
+public class EffectObject : MonoBehaviour
 {
 	public static bool wait = true;
 
@@ -16,10 +16,10 @@ public class EffectObject
 	{
 		while (wait)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		EffectManager.GetEffect(effectName, this.get_transform());
-		yield return (object)null;
+		yield return null;
 		Object.DestroyImmediate(this);
 	}
 }

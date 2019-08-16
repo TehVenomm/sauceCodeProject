@@ -1,4 +1,6 @@
-public class AnimationDirectorProxy
+using UnityEngine;
+
+public class AnimationDirectorProxy : MonoBehaviour
 {
 	public AnimationDirectorProxy()
 		: this()

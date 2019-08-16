@@ -2,7 +2,7 @@ package com.google.android.gms.games.snapshot;
 
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
-import com.google.android.gms.drive.zzc;
+import com.google.android.gms.drive.Contents;
 import java.io.IOException;
 
 public interface SnapshotContents extends Parcelable {
@@ -18,5 +18,5 @@ public interface SnapshotContents extends Parcelable {
 
     boolean writeBytes(byte[] bArr);
 
-    zzc zzamq();
+    Contents zzds();
 }

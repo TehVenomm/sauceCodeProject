@@ -1,6 +1,5 @@
-package android.support.v4.media.session;
+package android.support.p000v4.media.session;
 
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -17,15 +16,19 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.os.ResultReceiver;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.media.session.MediaSessionCompatApi21 */
 class MediaSessionCompatApi21 {
+    static final String TAG = "MediaSessionCompatApi21";
 
-    interface Callback extends Callback {
+    /* renamed from: android.support.v4.media.session.MediaSessionCompatApi21$Callback */
+    interface Callback {
         void onCommand(String str, Bundle bundle, ResultReceiver resultReceiver);
 
         void onCustomAction(String str, Bundle bundle);
@@ -44,6 +47,12 @@ class MediaSessionCompatApi21 {
 
         void onRewind();
 
+        void onSeekTo(long j);
+
+        void onSetRating(Object obj);
+
+        void onSetRating(Object obj, Bundle bundle);
+
         void onSkipToNext();
 
         void onSkipToPrevious();
@@ -53,6 +62,7 @@ class MediaSessionCompatApi21 {
         void onStop();
     }
 
+    /* renamed from: android.support.v4.media.session.MediaSessionCompatApi21$CallbackProxy */
     static class CallbackProxy<T extends Callback> extends android.media.session.MediaSession.Callback {
         protected final T mCallback;
 
@@ -121,6 +131,7 @@ class MediaSessionCompatApi21 {
         }
     }
 
+    /* renamed from: android.support.v4.media.session.MediaSessionCompatApi21$QueueItem */
     static class QueueItem {
         QueueItem() {
         }
@@ -151,6 +162,20 @@ class MediaSessionCompatApi21 {
 
     public static Parcelable getSessionToken(Object obj) {
         return ((MediaSession) obj).getSessionToken();
+    }
+
+    public static boolean hasCallback(Object obj) {
+        try {
+            Field declaredField = obj.getClass().getDeclaredField("mCallback");
+            if (declaredField == null) {
+                return false;
+            }
+            declaredField.setAccessible(true);
+            return declaredField.get(obj) != null;
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            Log.w(TAG, "Failed to get mCallback object.");
+            return false;
+        }
     }
 
     public static boolean isActive(Object obj) {
@@ -208,7 +233,7 @@ class MediaSessionCompatApi21 {
             ((MediaSession) obj).setQueue(null);
             return;
         }
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         Iterator it = list.iterator();
         while (it.hasNext()) {
             arrayList.add((android.media.session.MediaSession.QueueItem) it.next());

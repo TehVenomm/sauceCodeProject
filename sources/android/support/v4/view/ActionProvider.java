@@ -1,4 +1,4 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
 import android.content.Context;
 import android.support.annotation.RestrictTo;
@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 
+/* renamed from: android.support.v4.view.ActionProvider */
 public abstract class ActionProvider {
     private static final String TAG = "ActionProvider(support)";
     private final Context mContext;
@@ -15,10 +16,12 @@ public abstract class ActionProvider {
     private VisibilityListener mVisibilityListener;
 
     @RestrictTo({Scope.LIBRARY_GROUP})
+    /* renamed from: android.support.v4.view.ActionProvider$SubUiVisibilityListener */
     public interface SubUiVisibilityListener {
         void onSubUiVisibilityChanged(boolean z);
     }
 
+    /* renamed from: android.support.v4.view.ActionProvider$VisibilityListener */
     public interface VisibilityListener {
         void onActionProviderVisibilityChanged(boolean z);
     }

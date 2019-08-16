@@ -6,7 +6,7 @@ public class State_BattleStart : State
 
 	public override void Process(StateMachine fsm, Brain brain)
 	{
-		if (!brain.owner.isLoading && brain.owner.actionID != (Character.ACTION_ID)21)
+		if (!brain.owner.isLoading && brain.owner.actionID != (Character.ACTION_ID)23)
 		{
 			fsm.ChangeState(STATE_TYPE.KILL_TARGET);
 		}

@@ -37,6 +37,12 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		set;
 	}
 
+	public int releaseRegionIdfromBoard
+	{
+		get;
+		set;
+	}
+
 	public int openNewFieldId
 	{
 		get;
@@ -114,16 +120,17 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
 		foreach (RegionTable.Data data2 in data)
 		{
-			if (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow()))
+			if (data2.HasStartAt() && data2.startAt > TimeManager.GetNow())
 			{
-				FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
-				foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
+				continue;
+			}
+			FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
+			foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
+			{
+				if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
 				{
-					if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
-					{
-						list.Add(fieldMapTableData.regionId);
-						break;
-					}
+					list.Add(fieldMapTableData.regionId);
+					break;
 				}
 			}
 		}
@@ -136,16 +143,17 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
 		foreach (RegionTable.Data data2 in data)
 		{
-			if (100 > data2.regionId && (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow())))
+			if (100 <= data2.regionId || (data2.HasStartAt() && data2.startAt > TimeManager.GetNow()))
 			{
-				FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
-				foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
+				continue;
+			}
+			FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
+			foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
+			{
+				if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
 				{
-					if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
-					{
-						list.Add(fieldMapTableData.regionId);
-						break;
-					}
+					list.Add(fieldMapTableData.regionId);
+					break;
 				}
 			}
 		}
@@ -158,16 +166,17 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
 		foreach (RegionTable.Data data2 in data)
 		{
-			if (100 > data2.regionId && type == data2.difficulty && (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow())))
+			if (100 <= data2.regionId || type != data2.difficulty || (data2.HasStartAt() && data2.startAt > TimeManager.GetNow()))
 			{
-				FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
-				foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
+				continue;
+			}
+			FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
+			foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
+			{
+				if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
 				{
-					if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
-					{
-						list.Add(fieldMapTableData.regionId);
-						break;
-					}
+					list.Add(fieldMapTableData.regionId);
+					break;
 				}
 			}
 		}
@@ -181,6 +190,20 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		foreach (RegionTable.Data data2 in data)
 		{
 			if (100 > data2.regionId && (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow())))
+			{
+				list.Add(data2.regionId);
+			}
+		}
+		return list.ToArray();
+	}
+
+	public uint[] GetValidRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE type)
+	{
+		List<uint> list = new List<uint>();
+		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
+		foreach (RegionTable.Data data2 in data)
+		{
+			if (100 > data2.regionId && (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow())) && type == data2.difficulty)
 			{
 				list.Add(data2.regionId);
 			}
@@ -347,7 +370,6 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		{
 			diff.update.ForEach(delegate(FieldPortal portal)
 			{
-				WorldMapManager worldMapManager = this;
 				FieldPortal fieldPortal = fieldPortalList.Find((FieldPortal f) => f.pId == portal.pId);
 				if (fieldPortal != null)
 				{
@@ -482,5 +504,22 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 			}
 		}
 		return false;
+	}
+
+	public bool NeedDirectionOpenRegion(int regionId)
+	{
+		if (regionId >= 100)
+		{
+			return false;
+		}
+		if (MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent())
+		{
+			return false;
+		}
+		if (IsShowedOpenRegion(regionId))
+		{
+			return false;
+		}
+		return true;
 	}
 }

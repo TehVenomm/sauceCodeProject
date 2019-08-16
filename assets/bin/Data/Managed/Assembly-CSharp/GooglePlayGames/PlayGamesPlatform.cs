@@ -13,7 +13,7 @@ using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
 {
-	public class PlayGamesPlatform
+	public class PlayGamesPlatform : ISocialPlatform
 	{
 		private static volatile PlayGamesPlatform sInstance;
 
@@ -148,11 +148,9 @@ namespace GooglePlayGames
 
 		public static PlayGamesPlatform Activate()
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
 			Logger.d("Activating PlayGamesPlatform.");
 			Social.set_Active(Instance);
-			Logger.d("PlayGamesPlatform activated: " + (object)Social.get_Active());
+			Logger.d("PlayGamesPlatform activated: " + Social.get_Active());
 			return Instance;
 		}
 
@@ -168,12 +166,12 @@ namespace GooglePlayGames
 
 		public void Authenticate(Action<bool> callback)
 		{
-			Authenticate(callback, false);
+			Authenticate(callback, silent: false);
 		}
 
 		public void Authenticate(Action<bool, string> callback)
 		{
-			Authenticate(callback, false);
+			Authenticate(callback, silent: false);
 		}
 
 		public void Authenticate(Action<bool> callback, bool silent)
@@ -196,12 +194,12 @@ namespace GooglePlayGames
 
 		public void Authenticate(ILocalUser unused, Action<bool> callback)
 		{
-			Authenticate(callback, false);
+			Authenticate(callback, silent: false);
 		}
 
 		public void Authenticate(ILocalUser unused, Action<bool, string> callback)
 		{
-			Authenticate(callback, false);
+			Authenticate(callback, silent: false);
 		}
 
 		public bool IsAuthenticated()
@@ -270,12 +268,10 @@ namespace GooglePlayGames
 			if (mClient != null && mClient.IsAuthenticated())
 			{
 				mClient.GetPlayerStats(callback);
+				return;
 			}
-			else
-			{
-				Logger.e("GetPlayerStats can only be called after authentication.");
-				callback(CommonStatusCodes.SignInRequired, new PlayerStats());
-			}
+			Logger.e("GetPlayerStats can only be called after authentication.");
+			callback(CommonStatusCodes.SignInRequired, new PlayerStats());
 		}
 
 		public Achievement GetAchievement(string achievementId)
@@ -313,66 +309,62 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("ReportProgress can only be called after authentication.");
-				callback?.Invoke(false);
+				callback?.Invoke(obj: false);
+				return;
+			}
+			Logger.d("ReportProgress, " + achievementID + ", " + progress);
+			achievementID = MapId(achievementID);
+			if (progress < 1E-06)
+			{
+				Logger.d("Progress 0.00 interpreted as request to reveal.");
+				mClient.RevealAchievement(achievementID, callback);
+				return;
+			}
+			bool flag = false;
+			int num = 0;
+			int num2 = 0;
+			Achievement achievement = mClient.GetAchievement(achievementID);
+			if (achievement == null)
+			{
+				Logger.w("Unable to locate achievement " + achievementID);
+				Logger.w("As a quick fix, assuming it's standard.");
+				flag = false;
 			}
 			else
 			{
-				Logger.d("ReportProgress, " + achievementID + ", " + progress);
-				achievementID = MapId(achievementID);
-				if (progress < 1E-06)
+				flag = achievement.IsIncremental;
+				num = achievement.CurrentSteps;
+				num2 = achievement.TotalSteps;
+				Logger.d("Achievement is " + ((!flag) ? "STANDARD" : "INCREMENTAL"));
+				if (flag)
 				{
-					Logger.d("Progress 0.00 interpreted as request to reveal.");
-					mClient.RevealAchievement(achievementID, callback);
+					Logger.d("Current steps: " + num + "/" + num2);
 				}
-				else
+			}
+			if (flag)
+			{
+				Logger.d("Progress " + progress + " interpreted as incremental target (approximate).");
+				if (progress >= 0.0 && progress <= 1.0)
 				{
-					bool flag = false;
-					int num = 0;
-					int num2 = 0;
-					Achievement achievement = mClient.GetAchievement(achievementID);
-					if (achievement == null)
-					{
-						Logger.w("Unable to locate achievement " + achievementID);
-						Logger.w("As a quick fix, assuming it's standard.");
-						flag = false;
-					}
-					else
-					{
-						flag = achievement.IsIncremental;
-						num = achievement.CurrentSteps;
-						num2 = achievement.TotalSteps;
-						Logger.d("Achievement is " + ((!flag) ? "STANDARD" : "INCREMENTAL"));
-						if (flag)
-						{
-							Logger.d("Current steps: " + num + "/" + num2);
-						}
-					}
-					if (flag)
-					{
-						Logger.d("Progress " + progress + " interpreted as incremental target (approximate).");
-						if (progress >= 0.0 && progress <= 1.0)
-						{
-							Logger.w("Progress " + progress + " is less than or equal to 1. You might be trying to use values in the range of [0,1], while values are expected to be within the range [0,100]. If you are using the latter, you can safely ignore this message.");
-						}
-						int num3 = (int)Math.Round(progress / 100.0 * (double)num2);
-						int num4 = num3 - num;
-						Logger.d("Target steps: " + num3 + ", cur steps:" + num);
-						Logger.d("Steps to increment: " + num4);
-						if (num4 >= 0)
-						{
-							mClient.IncrementAchievement(achievementID, num4, callback);
-						}
-					}
-					else if (progress >= 100.0)
-					{
-						Logger.d("Progress " + progress + " interpreted as UNLOCK.");
-						mClient.UnlockAchievement(achievementID, callback);
-					}
-					else
-					{
-						Logger.d("Progress " + progress + " not enough to unlock non-incremental achievement.");
-					}
+					Logger.w("Progress " + progress + " is less than or equal to 1. You might be trying to use values in the range of [0,1], while values are expected to be within the range [0,100]. If you are using the latter, you can safely ignore this message.");
 				}
+				int num3 = (int)Math.Round(progress / 100.0 * (double)num2);
+				int num4 = num3 - num;
+				Logger.d("Target steps: " + num3 + ", cur steps:" + num);
+				Logger.d("Steps to increment: " + num4);
+				if (num4 >= 0)
+				{
+					mClient.IncrementAchievement(achievementID, num4, callback);
+				}
+			}
+			else if (progress >= 100.0)
+			{
+				Logger.d("Progress " + progress + " interpreted as UNLOCK.");
+				mClient.UnlockAchievement(achievementID, callback);
+			}
+			else
+			{
+				Logger.d("Progress " + progress + " not enough to unlock non-incremental achievement.");
 			}
 		}
 
@@ -381,7 +373,7 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("UnlockAchievement can only be called after authentication.");
-				callback?.Invoke(false);
+				callback?.Invoke(obj: false);
 			}
 			else
 			{
@@ -396,7 +388,7 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("IncrementAchievement can only be called after authentication.");
-				callback?.Invoke(false);
+				callback?.Invoke(obj: false);
 			}
 			else
 			{
@@ -411,7 +403,7 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("SetStepsAtLeast can only be called after authentication.");
-				callback?.Invoke(false);
+				callback?.Invoke(obj: false);
 			}
 			else
 			{
@@ -476,7 +468,7 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("ReportScore can only be called after authentication.");
-				callback?.Invoke(false);
+				callback?.Invoke(obj: false);
 			}
 			else
 			{
@@ -491,7 +483,7 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("ReportScore can only be called after authentication.");
-				callback?.Invoke(false);
+				callback?.Invoke(obj: false);
 			}
 			else
 			{
@@ -550,12 +542,10 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("ShowAchievementsUI can only be called after authentication.");
+				return;
 			}
-			else
-			{
-				Logger.d("ShowAchievementsUI callback is " + callback);
-				mClient.ShowAchievementsUI(callback);
-			}
+			Logger.d("ShowAchievementsUI callback is " + callback);
+			mClient.ShowAchievementsUI(callback);
 		}
 
 		public void ShowLeaderboardUI()
@@ -607,7 +597,7 @@ namespace GooglePlayGames
 			if (!IsAuthenticated())
 			{
 				Logger.e("LoadScores can only be called after authentication.");
-				callback?.Invoke(false);
+				callback?.Invoke(obj: false);
 			}
 			else
 			{
@@ -620,7 +610,7 @@ namespace GooglePlayGames
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Expected I4, but got Unknown
+			//IL_0066: Expected I4, but got Unknown
 			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
@@ -632,48 +622,46 @@ namespace GooglePlayGames
 				Logger.e("LoadScores can only be called after authentication.");
 				if (callback != null)
 				{
-					callback(false);
+					callback(obj: false);
 				}
+				return;
+			}
+			TimeScope timeScope = board.get_timeScope();
+			LeaderboardTimeSpan timeSpan;
+			switch ((int)timeScope)
+			{
+			case 2:
+				timeSpan = LeaderboardTimeSpan.AllTime;
+				break;
+			case 1:
+				timeSpan = LeaderboardTimeSpan.Weekly;
+				break;
+			case 0:
+				timeSpan = LeaderboardTimeSpan.Daily;
+				break;
+			default:
+				timeSpan = LeaderboardTimeSpan.AllTime;
+				break;
+			}
+			((PlayGamesLeaderboard)board).loading = true;
+			Logger.d("LoadScores, board=" + board + " callback is " + callback);
+			IPlayGamesClient playGamesClient = mClient;
+			string id = board.get_id();
+			Range range = board.get_range();
+			int rowCount;
+			if (range.count > 0)
+			{
+				Range range2 = board.get_range();
+				rowCount = range2.count;
 			}
 			else
 			{
-				TimeScope timeScope = board.get_timeScope();
-				LeaderboardTimeSpan timeSpan;
-				switch ((int)timeScope)
-				{
-				case 2:
-					timeSpan = LeaderboardTimeSpan.AllTime;
-					break;
-				case 1:
-					timeSpan = LeaderboardTimeSpan.Weekly;
-					break;
-				case 0:
-					timeSpan = LeaderboardTimeSpan.Daily;
-					break;
-				default:
-					timeSpan = LeaderboardTimeSpan.AllTime;
-					break;
-				}
-				((PlayGamesLeaderboard)board).loading = true;
-				Logger.d("LoadScores, board=" + board + " callback is " + callback);
-				IPlayGamesClient playGamesClient = mClient;
-				string id = board.get_id();
-				Range range = board.get_range();
-				int rowCount;
-				if (range.count > 0)
-				{
-					Range range2 = board.get_range();
-					rowCount = range2.count;
-				}
-				else
-				{
-					rowCount = mClient.LeaderboardMaxResults();
-				}
-				playGamesClient.LoadScores(id, LeaderboardStart.PlayerCentered, rowCount, ((int)board.get_userScope() != 1) ? LeaderboardCollection.Public : LeaderboardCollection.Social, timeSpan, delegate(LeaderboardScoreData scoreData)
-				{
-					HandleLoadingScores((PlayGamesLeaderboard)board, scoreData, callback);
-				});
+				rowCount = mClient.LeaderboardMaxResults();
 			}
+			playGamesClient.LoadScores(id, LeaderboardStart.PlayerCentered, rowCount, ((int)board.get_userScope() != 1) ? LeaderboardCollection.Public : LeaderboardCollection.Social, timeSpan, delegate(LeaderboardScoreData scoreData)
+			{
+				HandleLoadingScores((PlayGamesLeaderboard)board, scoreData, callback);
+			});
 		}
 
 		public bool GetLoading(ILeaderboard board)

@@ -2,7 +2,6 @@ package com.squareup.picasso;
 
 import android.content.Context;
 import android.net.Uri;
-import com.google.android.gms.nearby.messages.Strategy;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.CacheControl;
 import com.squareup.okhttp.CacheControl.Builder;
@@ -50,7 +49,8 @@ public class OkHttpDownloader implements Downloader {
         this.client = okHttpClient;
     }
 
-    protected final OkHttpClient getClient() {
+    /* access modifiers changed from: protected */
+    public final OkHttpClient getClient() {
         return this.client;
     }
 
@@ -76,7 +76,7 @@ public class OkHttpDownloader implements Downloader {
         }
         com.squareup.okhttp.Response execute = this.client.newCall(url.build()).execute();
         int code = execute.code();
-        if (code >= Strategy.TTL_SECONDS_DEFAULT) {
+        if (code >= 300) {
             execute.body().close();
             throw new ResponseException(code + " " + execute.message(), i, code);
         }

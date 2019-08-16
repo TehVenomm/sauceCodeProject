@@ -52,7 +52,7 @@ public class FriendSearchID : ConfigName
 					input_text
 				});
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 }

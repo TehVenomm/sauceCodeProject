@@ -2,34 +2,34 @@ package com.google.android.gms.drive.events;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
+import android.support.annotation.NonNull;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import com.google.android.gms.drive.DriveSpace;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
-public final class zze extends zza {
+@Class(creator = "ChangesAvailableOptionsCreator")
+@Reserved({1})
+public final class zze extends AbstractSafeParcelable {
     public static final Creator<zze> CREATOR = new zzf();
-    private int zzdxt;
-    private int zzgeu;
-    private boolean zzgev;
-    private List<DriveSpace> zzgew;
-    private final Set<DriveSpace> zzgex;
+    @Field(mo13990id = 2)
+    private final int zzbu;
+    @Field(mo13990id = 3)
+    private final boolean zzbv;
+    @Field(mo13990id = 4)
+    private final List<DriveSpace> zzbw;
 
-    zze(int i, int i2, boolean z, List<DriveSpace> list) {
-        this(i, i2, z, list, list == null ? null : new HashSet(list));
-    }
-
-    private zze(int i, int i2, boolean z, List<DriveSpace> list, Set<DriveSpace> set) {
-        this.zzdxt = i;
-        this.zzgeu = i2;
-        this.zzgev = z;
-        this.zzgew = list;
-        this.zzgex = set;
+    @Constructor
+    zze(@Param(mo13993id = 2) int i, @Param(mo13993id = 3) boolean z, @Param(mo13993id = 4) @NonNull List<DriveSpace> list) {
+        this.zzbu = i;
+        this.zzbv = z;
+        this.zzbw = list;
     }
 
     public final boolean equals(Object obj) {
@@ -40,23 +40,18 @@ public final class zze extends zza {
             return true;
         }
         zze zze = (zze) obj;
-        return zzbf.equal(this.zzgex, zze.zzgex) && this.zzgeu == zze.zzgeu && this.zzgev == zze.zzgev;
+        return Objects.equal(this.zzbw, zze.zzbw) && this.zzbu == zze.zzbu && this.zzbv == zze.zzbv;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzgex, Integer.valueOf(this.zzgeu), Boolean.valueOf(this.zzgev)});
-    }
-
-    public final String toString() {
-        return String.format(Locale.US, "ChangesAvailableOptions[ChangesSizeLimit=%d, Repeats=%s, Spaces=%s]", new Object[]{Integer.valueOf(this.zzgeu), Boolean.valueOf(this.zzgev), this.zzgew});
+        return Objects.hashCode(this.zzbw, Integer.valueOf(this.zzbu), Boolean.valueOf(this.zzbv));
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.zzdxt);
-        zzd.zzc(parcel, 2, this.zzgeu);
-        zzd.zza(parcel, 3, this.zzgev);
-        zzd.zzc(parcel, 4, this.zzgew, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, this.zzbu);
+        SafeParcelWriter.writeBoolean(parcel, 3, this.zzbv);
+        SafeParcelWriter.writeTypedList(parcel, 4, this.zzbw, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -8,7 +8,7 @@ final class zza implements Creator<RealTimeMessage> {
     }
 
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        return new RealTimeMessage(parcel);
+        return new RealTimeMessage(parcel, null);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

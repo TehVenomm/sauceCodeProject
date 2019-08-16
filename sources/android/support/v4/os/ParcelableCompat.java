@@ -1,20 +1,27 @@
-package android.support.v4.os;
+package android.support.p000v4.p002os;
 
-import android.os.Build.VERSION;
 import android.os.Parcel;
+import android.os.Parcelable.ClassLoaderCreator;
 import android.os.Parcelable.Creator;
 
+@Deprecated
+/* renamed from: android.support.v4.os.ParcelableCompat */
 public final class ParcelableCompat {
 
-    static class CompatCreator<T> implements Creator<T> {
-        final ParcelableCompatCreatorCallbacks<T> mCallbacks;
+    /* renamed from: android.support.v4.os.ParcelableCompat$ParcelableCompatCreatorHoneycombMR2 */
+    static class ParcelableCompatCreatorHoneycombMR2<T> implements ClassLoaderCreator<T> {
+        private final ParcelableCompatCreatorCallbacks<T> mCallbacks;
 
-        public CompatCreator(ParcelableCompatCreatorCallbacks<T> parcelableCompatCreatorCallbacks) {
+        ParcelableCompatCreatorHoneycombMR2(ParcelableCompatCreatorCallbacks<T> parcelableCompatCreatorCallbacks) {
             this.mCallbacks = parcelableCompatCreatorCallbacks;
         }
 
         public T createFromParcel(Parcel parcel) {
             return this.mCallbacks.createFromParcel(parcel, null);
+        }
+
+        public T createFromParcel(Parcel parcel, ClassLoader classLoader) {
+            return this.mCallbacks.createFromParcel(parcel, classLoader);
         }
 
         public T[] newArray(int i) {
@@ -25,7 +32,8 @@ public final class ParcelableCompat {
     private ParcelableCompat() {
     }
 
+    @Deprecated
     public static <T> Creator<T> newCreator(ParcelableCompatCreatorCallbacks<T> parcelableCompatCreatorCallbacks) {
-        return VERSION.SDK_INT >= 13 ? ParcelableCompatCreatorHoneycombMR2Stub.instantiate(parcelableCompatCreatorCallbacks) : new CompatCreator(parcelableCompatCreatorCallbacks);
+        return new ParcelableCompatCreatorHoneycombMR2(parcelableCompatCreatorCallbacks);
     }
 }

@@ -4,121 +4,147 @@ import android.content.Context;
 import android.util.Log;
 import com.appsflyer.AppsFlyerLib;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CacheManager {
     public static final String AF_CACHE_DIR = "AFRequestCache";
     public static final int CACHE_MAX_SIZE = 40;
+
     /* renamed from: ॱ */
-    private static CacheManager f218 = new CacheManager();
+    private static CacheManager f239 = new CacheManager();
 
     public static CacheManager getInstance() {
-        return f218;
+        return f239;
     }
 
     private CacheManager() {
     }
 
-    public void cacheRequest(RequestCacheData requestCacheData, Context context) {
-        Writer outputStreamWriter;
-        Throwable th;
-        Throwable th2;
-        Writer writer = null;
-        try {
-            File file = new File(context.getFilesDir(), AF_CACHE_DIR);
-            if (file.exists()) {
-                File[] listFiles = file.listFiles();
-                if (listFiles == null || listFiles.length <= 40) {
-                    Log.i(AppsFlyerLib.LOG_TAG, "caching request...");
-                    File file2 = new File(new File(context.getFilesDir(), AF_CACHE_DIR), Long.toString(System.currentTimeMillis()));
-                    file2.createNewFile();
-                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file2.getPath(), true));
-                    try {
-                        outputStreamWriter.write("version=");
-                        outputStreamWriter.write(requestCacheData.getVersion());
-                        outputStreamWriter.write(10);
-                        outputStreamWriter.write("url=");
-                        outputStreamWriter.write(requestCacheData.getRequestURL());
-                        outputStreamWriter.write(10);
-                        outputStreamWriter.write("data=");
-                        outputStreamWriter.write(requestCacheData.getPostData());
-                        outputStreamWriter.write(10);
-                        outputStreamWriter.flush();
-                        try {
-                            outputStreamWriter.close();
-                            return;
-                        } catch (IOException e) {
-                            return;
-                        }
-                    } catch (Exception e2) {
-                        writer = outputStreamWriter;
-                        try {
-                            Log.i(AppsFlyerLib.LOG_TAG, "Could not cache request");
-                            if (writer != null) {
-                                try {
-                                    writer.close();
-                                } catch (IOException e3) {
-                                    return;
-                                }
-                            }
-                        } catch (Throwable th3) {
-                            th = th3;
-                            outputStreamWriter = writer;
-                            th2 = th;
-                            if (outputStreamWriter != null) {
-                                try {
-                                    outputStreamWriter.close();
-                                } catch (IOException e4) {
-                                }
-                            }
-                            throw th2;
-                        }
-                    } catch (Throwable th4) {
-                        th2 = th4;
-                        if (outputStreamWriter != null) {
-                            outputStreamWriter.close();
-                        }
-                        throw th2;
-                    }
-                }
-                Log.i(AppsFlyerLib.LOG_TAG, "reached cache limit, not caching request");
-                return;
-            }
-            file.mkdir();
-        } catch (Exception e5) {
-            Log.i(AppsFlyerLib.LOG_TAG, "Could not cache request");
-            if (writer != null) {
-                writer.close();
-            }
-        } catch (Throwable th32) {
-            th = th32;
-            outputStreamWriter = null;
-            th2 = th;
-            if (outputStreamWriter != null) {
-                outputStreamWriter.close();
-            }
-            throw th2;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:15:0x0033 A[SYNTHETIC, Splitter:B:15:0x0033] */
+    /* JADX WARNING: Removed duplicated region for block: B:30:0x00ad A[SYNTHETIC, Splitter:B:30:0x00ad] */
+    /* JADX WARNING: Removed duplicated region for block: B:41:? A[Catch:{ Exception -> 0x0029, all -> 0x00a8 }, RETURN, SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public void cacheRequest(com.appsflyer.cache.RequestCacheData r7, android.content.Context r8) {
+        /*
+            r6 = this;
+            r0 = 0
+            java.io.File r1 = new java.io.File     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.io.File r2 = r8.getFilesDir()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.lang.String r3 = "AFRequestCache"
+            r1.<init>(r2, r3)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            boolean r2 = r1.exists()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            if (r2 != 0) goto L_0x0016
+            r1.mkdir()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+        L_0x0015:
+            return
+        L_0x0016:
+            java.io.File[] r1 = r1.listFiles()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            if (r1 == 0) goto L_0x0039
+            int r1 = r1.length     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            r2 = 40
+            if (r1 <= r2) goto L_0x0039
+            java.lang.String r1 = "AppsFlyer_4.8.11"
+            java.lang.String r2 = "reached cache limit, not caching request"
+            android.util.Log.i(r1, r2)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            goto L_0x0015
+        L_0x0029:
+            r1 = move-exception
+        L_0x002a:
+            java.lang.String r1 = "AppsFlyer_4.8.11"
+            java.lang.String r2 = "Could not cache request"
+            android.util.Log.i(r1, r2)     // Catch:{ all -> 0x00b7 }
+            if (r0 == 0) goto L_0x0015
+            r0.close()     // Catch:{ IOException -> 0x0037 }
+            goto L_0x0015
+        L_0x0037:
+            r0 = move-exception
+            goto L_0x0015
+        L_0x0039:
+            java.lang.String r1 = "AppsFlyer_4.8.11"
+            java.lang.String r2 = "caching request..."
+            android.util.Log.i(r1, r2)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.io.File r2 = new java.io.File     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.io.File r1 = new java.io.File     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.io.File r3 = r8.getFilesDir()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.lang.String r4 = "AFRequestCache"
+            r1.<init>(r3, r4)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            long r4 = java.lang.System.currentTimeMillis()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.lang.String r3 = java.lang.Long.toString(r4)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            r2.<init>(r1, r3)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            r2.createNewFile()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.io.OutputStreamWriter r1 = new java.io.OutputStreamWriter     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.io.FileOutputStream r3 = new java.io.FileOutputStream     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.lang.String r2 = r2.getPath()     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            r4 = 1
+            r3.<init>(r2, r4)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            r1.<init>(r3)     // Catch:{ Exception -> 0x0029, all -> 0x00a8 }
+            java.lang.String r0 = "version="
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            java.lang.String r0 = r7.getVersion()     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r0 = 10
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            java.lang.String r0 = "url="
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            java.lang.String r0 = r7.getRequestURL()     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r0 = 10
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            java.lang.String r0 = "data="
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            java.lang.String r0 = r7.getPostData()     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r0 = 10
+            r1.write(r0)     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r1.flush()     // Catch:{ Exception -> 0x00bb, all -> 0x00b3 }
+            r1.close()     // Catch:{ IOException -> 0x00a5 }
+            goto L_0x0015
+        L_0x00a5:
+            r0 = move-exception
+            goto L_0x0015
+        L_0x00a8:
+            r1 = move-exception
+            r2 = r1
+            r3 = r0
+        L_0x00ab:
+            if (r3 == 0) goto L_0x00b0
+            r3.close()     // Catch:{ IOException -> 0x00b1 }
+        L_0x00b0:
+            throw r2
+        L_0x00b1:
+            r0 = move-exception
+            goto L_0x00b0
+        L_0x00b3:
+            r0 = move-exception
+            r2 = r0
+            r3 = r1
+            goto L_0x00ab
+        L_0x00b7:
+            r1 = move-exception
+            r2 = r1
+            r3 = r0
+            goto L_0x00ab
+        L_0x00bb:
+            r0 = move-exception
+            r0 = r1
+            goto L_0x002a
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.appsflyer.cache.CacheManager.cacheRequest(com.appsflyer.cache.RequestCacheData, android.content.Context):void");
     }
 
     public List<RequestCacheData> getCachedRequests(Context context) {
-        List<RequestCacheData> arrayList = new ArrayList();
+        File[] listFiles;
+        ArrayList arrayList = new ArrayList();
         try {
             File file = new File(context.getFilesDir(), AF_CACHE_DIR);
-            if (file.exists()) {
+            if (!file.exists()) {
+                file.mkdir();
+            } else {
                 for (File file2 : file.listFiles()) {
                     Log.i(AppsFlyerLib.LOG_TAG, new StringBuilder("Found cached request").append(file2.getName()).toString());
-                    arrayList.add(m285(file2));
+                    arrayList.add(m276(file2));
                 }
-            } else {
-                file.mkdir();
             }
         } catch (Exception e) {
             Log.i(AppsFlyerLib.LOG_TAG, "Could not cache request");
@@ -126,57 +152,61 @@ public class CacheManager {
         return arrayList;
     }
 
+    /* JADX WARNING: Removed duplicated region for block: B:10:0x0024 A[SYNTHETIC, Splitter:B:10:0x0024] */
+    /* JADX WARNING: Removed duplicated region for block: B:16:0x002d A[SYNTHETIC, Splitter:B:16:0x002d] */
     /* renamed from: ˎ */
-    private static RequestCacheData m285(File file) {
-        Reader reader;
-        Throwable th;
-        Reader fileReader;
-        try {
-            fileReader = new FileReader(file);
-            try {
-                char[] cArr = new char[((int) file.length())];
-                fileReader.read(cArr);
-                RequestCacheData requestCacheData = new RequestCacheData(cArr);
-                requestCacheData.setCacheKey(file.getName());
-                try {
-                    fileReader.close();
-                    return requestCacheData;
-                } catch (IOException e) {
-                    return requestCacheData;
-                }
-            } catch (Exception e2) {
-                reader = fileReader;
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e3) {
-                    }
-                }
-                return null;
-            } catch (Throwable th2) {
-                th = th2;
-                if (fileReader != null) {
-                    try {
-                        fileReader.close();
-                    } catch (IOException e4) {
-                    }
-                }
-                throw th;
-            }
-        } catch (Exception e5) {
-            reader = null;
-            if (reader != null) {
-                reader.close();
-            }
-            return null;
-        } catch (Throwable th3) {
-            th = th3;
-            fileReader = null;
-            if (fileReader != null) {
-                fileReader.close();
-            }
-            throw th;
-        }
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private static com.appsflyer.cache.RequestCacheData m276(java.io.File r6) {
+        /*
+            r1 = 0
+            java.io.FileReader r2 = new java.io.FileReader     // Catch:{ Exception -> 0x0020, all -> 0x0029 }
+            r2.<init>(r6)     // Catch:{ Exception -> 0x0020, all -> 0x0029 }
+            long r4 = r6.length()     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            int r0 = (int) r4     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            char[] r3 = new char[r0]     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            r2.read(r3)     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            com.appsflyer.cache.RequestCacheData r0 = new com.appsflyer.cache.RequestCacheData     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            r0.<init>(r3)     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            java.lang.String r3 = r6.getName()     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            r0.setCacheKey(r3)     // Catch:{ Exception -> 0x0039, all -> 0x0037 }
+            r2.close()     // Catch:{ IOException -> 0x0031 }
+        L_0x001f:
+            return r0
+        L_0x0020:
+            r0 = move-exception
+            r0 = r1
+        L_0x0022:
+            if (r0 == 0) goto L_0x0027
+            r0.close()     // Catch:{ IOException -> 0x0033 }
+        L_0x0027:
+            r0 = r1
+            goto L_0x001f
+        L_0x0029:
+            r0 = move-exception
+            r2 = r1
+        L_0x002b:
+            if (r2 == 0) goto L_0x0030
+            r2.close()     // Catch:{ IOException -> 0x0035 }
+        L_0x0030:
+            throw r0
+        L_0x0031:
+            r1 = move-exception
+            goto L_0x001f
+        L_0x0033:
+            r0 = move-exception
+            goto L_0x0027
+        L_0x0035:
+            r1 = move-exception
+            goto L_0x0030
+        L_0x0037:
+            r0 = move-exception
+            goto L_0x002b
+        L_0x0039:
+            r0 = move-exception
+            r0 = r2
+            goto L_0x0022
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.appsflyer.cache.CacheManager.m276(java.io.File):com.appsflyer.cache.RequestCacheData");
     }
 
     public void init(Context context) {
@@ -195,23 +225,24 @@ public class CacheManager {
         if (file.exists()) {
             try {
                 file.delete();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.i(AppsFlyerLib.LOG_TAG, new StringBuilder("Could not delete ").append(str).append(" from cache").toString(), e);
             }
         }
     }
 
     public void clearCache(Context context) {
+        File[] listFiles;
         try {
             File file = new File(context.getFilesDir(), AF_CACHE_DIR);
-            if (file.exists()) {
-                for (File file2 : file.listFiles()) {
-                    Log.i(AppsFlyerLib.LOG_TAG, new StringBuilder("Found cached request").append(file2.getName()).toString());
-                    deleteRequest(m285(file2).getCacheKey(), context);
-                }
+            if (!file.exists()) {
+                file.mkdir();
                 return;
             }
-            file.mkdir();
+            for (File file2 : file.listFiles()) {
+                Log.i(AppsFlyerLib.LOG_TAG, new StringBuilder("Found cached request").append(file2.getName()).toString());
+                deleteRequest(m276(file2).getCacheKey(), context);
+            }
         } catch (Exception e) {
             Log.i(AppsFlyerLib.LOG_TAG, "Could not cache request");
         }

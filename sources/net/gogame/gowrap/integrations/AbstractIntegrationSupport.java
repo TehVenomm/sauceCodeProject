@@ -13,21 +13,24 @@ public abstract class AbstractIntegrationSupport implements IntegrationSupport {
     public static final String DEFAULT_REWARDED_ZONE_ID = "defaultRewarded";
     public static final String DEFAULT_REWARD_ID = "DEFAULT";
     public static final int DEFAULT_REWARD_QUANTITY = -1;
-    private final String id;
+
+    /* renamed from: id */
+    private final String f1189id;
     private boolean initialized = false;
 
-    protected abstract void doInit(Activity activity, Config config, IntegrationContext integrationContext);
+    /* access modifiers changed from: protected */
+    public abstract void doInit(Activity activity, Config config, IntegrationContext integrationContext);
 
     public AbstractIntegrationSupport(String str) {
-        this.id = str;
+        this.f1189id = str;
     }
 
     public void init(Activity activity, Config config, IntegrationContext integrationContext) {
         if (!this.initialized) {
             try {
                 doInit(activity, config, integrationContext);
-            } catch (Throwable e) {
-                Log.e(Constants.TAG, "Error initializing " + this.id, e);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "Error initializing " + this.f1189id, e);
             } finally {
                 this.initialized = true;
             }
@@ -35,7 +38,7 @@ public abstract class AbstractIntegrationSupport implements IntegrationSupport {
     }
 
     public String getId() {
-        return this.id;
+        return this.f1189id;
     }
 
     public void onActivityCreated(Activity activity) {

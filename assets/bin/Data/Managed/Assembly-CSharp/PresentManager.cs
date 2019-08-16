@@ -91,6 +91,23 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 		}, string.Empty);
 	}
 
+	public void SendGetPresentTotalCount(Action<bool> call_back)
+	{
+		Protocol.Send(PresentGetTotalCountModel.URL, delegate(PresentGetTotalCountModel ret)
+		{
+			bool obj = false;
+			if (ret.Error == Error.None)
+			{
+				obj = true;
+				if (presentNum != ret.result.totalCount)
+				{
+					SetPresentNum(ret.result.totalCount);
+				}
+			}
+			call_back(obj);
+		}, string.Empty);
+	}
+
 	public void SendDebugAddPresent(int rewardType, int actionType, string comment, int num, int id, int p0, int p1, Action<bool> call_back)
 	{
 		DebugAddPresentModel.RequestSendForm requestSendForm = new DebugAddPresentModel.RequestSendForm();
@@ -137,7 +154,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 			}
 			else
 			{
-				call_back(false);
+				call_back(obj: false);
 			}
 		}, string.Empty);
 	}

@@ -41,12 +41,11 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	private void InitAnim()
 	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		int i = 0;
 		for (int num = animStart.Length; i < num; i++)
 		{
 			animStart[i].set_enabled(false);
-			animStart[i].Sample(1f, true);
+			animStart[i].Sample(1f, isFinished: true);
 		}
 		int j = 0;
 		for (int num2 = animEnd.Length; j < num2; j++)
@@ -79,7 +78,6 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	public void SetAnnounce(string messeage, string conditionTitle)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(true);
 		announceQueue.Add(messeage);
 		announceQueue.Add(conditionTitle);
@@ -87,9 +85,6 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	private bool PlayAnnounce()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 		if (!this.get_gameObject().get_activeInHierarchy())
 		{
 			this.get_gameObject().SetActive(false);
@@ -99,6 +94,7 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 		{
 			animRoot.SetActive(true);
 			label.text = announceQueue[0];
+			label.supportEncoding = true;
 			announceQueue.RemoveAt(0);
 			conditionLabel.text = announceQueue[0];
 			announceQueue.RemoveAt(0);
@@ -112,7 +108,6 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	private void FinishAnnounce()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (!PlayAnnounce())
 		{
 			animRoot.SetActive(false);
@@ -124,37 +119,37 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	protected IEnumerator Direction()
 	{
-		int i3 = 0;
-		for (int n3 = animEnd.Length; i3 < n3; i3++)
+		int m = 0;
+		for (int num = animEnd.Length; m < num; m++)
 		{
-			animEnd[i3].ResetToBeginning();
-		}
-		int i2 = 0;
-		for (int n2 = animStart.Length; i2 < n2; i2++)
-		{
-			animStart[i2].ResetToBeginning();
-			animStart[i2].PlayForward();
+			animEnd[m].ResetToBeginning();
 		}
 		int n = 0;
-		for (int m = animStart.Length; n < m; n++)
+		for (int num2 = animStart.Length; n < num2; n++)
 		{
-			while (animStart[n].get_enabled())
+			animStart[n].ResetToBeginning();
+			animStart[n].PlayForward();
+		}
+		int l = 0;
+		for (int k = animStart.Length; l < k; l++)
+		{
+			while (animStart[l].get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		yield return (object)new WaitForSeconds(dispTime);
-		int l = 0;
-		for (int k = animEnd.Length; l < k; l++)
+		int num3 = 0;
+		for (int num4 = animEnd.Length; num3 < num4; num3++)
 		{
-			animEnd[l].PlayForward();
+			animEnd[num3].PlayForward();
 		}
 		int j = 0;
 		for (int i = animEnd.Length; j < i; j++)
 		{
 			while (animEnd[j].get_enabled())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		FinishAnnounce();

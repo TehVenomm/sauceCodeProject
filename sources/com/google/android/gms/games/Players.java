@@ -5,12 +5,39 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Releasable;
 import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.internal.ShowFirstParty;
+import com.google.android.gms.common.util.VisibleForTesting;
+import com.google.android.gms.games.internal.player.StockProfileImage;
 
+@Deprecated
+@VisibleForTesting
 public interface Players {
     public static final String EXTRA_PLAYER_SEARCH_RESULTS = "player_search_results";
 
+    @Deprecated
     public interface LoadPlayersResult extends Releasable, Result {
         PlayerBuffer getPlayers();
+    }
+
+    @ShowFirstParty
+    public interface zza extends Result {
+        String zzh();
+
+        boolean zzk();
+
+        boolean zzp();
+
+        StockProfileImage zzq();
+
+        boolean zzr();
+
+        boolean zzs();
+
+        boolean zzt();
+
+        boolean zzu();
+
+        int zzv();
     }
 
     Intent getCompareProfileIntent(GoogleApiClient googleApiClient, Player player);
@@ -19,7 +46,6 @@ public interface Players {
 
     String getCurrentPlayerId(GoogleApiClient googleApiClient);
 
-    @Deprecated
     Intent getPlayerSearchIntent(GoogleApiClient googleApiClient);
 
     @Deprecated

@@ -14,7 +14,7 @@ public class XMLOutStream
 
 	public string Serialize()
 	{
-		return Serialize(false);
+		return Serialize(newlines: false);
 	}
 
 	public string Serialize(bool newlines)

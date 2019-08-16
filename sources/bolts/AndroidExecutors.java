@@ -39,13 +39,13 @@ final class AndroidExecutors {
     }
 
     public static ExecutorService newCachedThreadPool() {
-        ExecutorService threadPoolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 1, TimeUnit.SECONDS, new LinkedBlockingQueue());
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 1, TimeUnit.SECONDS, new LinkedBlockingQueue());
         allowCoreThreadTimeout(threadPoolExecutor, true);
         return threadPoolExecutor;
     }
 
     public static ExecutorService newCachedThreadPool(ThreadFactory threadFactory) {
-        ExecutorService threadPoolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 1, TimeUnit.SECONDS, new LinkedBlockingQueue(), threadFactory);
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 1, TimeUnit.SECONDS, new LinkedBlockingQueue(), threadFactory);
         allowCoreThreadTimeout(threadPoolExecutor, true);
         return threadPoolExecutor;
     }

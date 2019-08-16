@@ -62,7 +62,7 @@ namespace BestHTTP.Decompression.Crc
 		}
 
 		public CrcCalculatorStream(Stream stream)
-			: this(true, UnsetLengthLimit, stream, null)
+			: this(leaveOpen: true, UnsetLengthLimit, stream, null)
 		{
 		}
 
@@ -72,7 +72,7 @@ namespace BestHTTP.Decompression.Crc
 		}
 
 		public CrcCalculatorStream(Stream stream, long length)
-			: this(true, length, stream, null)
+			: this(leaveOpen: true, length, stream, null)
 		{
 			if (length < 0)
 			{
@@ -104,11 +104,6 @@ namespace BestHTTP.Decompression.Crc
 			_Crc32 = (crc32 ?? new CRC32());
 			_lengthLimit = length;
 			_leaveOpen = leaveOpen;
-		}
-
-		void IDisposable.Dispose()
-		{
-			Close();
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
@@ -156,6 +151,11 @@ namespace BestHTTP.Decompression.Crc
 		public override void SetLength(long value)
 		{
 			throw new NotSupportedException();
+		}
+
+		void IDisposable.Dispose()
+		{
+			Close();
 		}
 
 		public override void Close()

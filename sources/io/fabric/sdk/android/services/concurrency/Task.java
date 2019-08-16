@@ -1,5 +1,6 @@
-package io.fabric.sdk.android.services.concurrency;
+package p017io.fabric.sdk.android.services.concurrency;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.Task */
 public interface Task {
     Throwable getError();
 

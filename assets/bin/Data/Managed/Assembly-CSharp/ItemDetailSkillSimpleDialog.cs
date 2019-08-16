@@ -36,9 +36,9 @@ public class ItemDetailSkillSimpleDialog : ItemDetailSkillDialog
 
 	private void ForceInvisibleUIButtons()
 	{
-		SetActive((Enum)UI.BTN_CHANGE, false);
-		SetActive((Enum)UI.BTN_GROW, false);
-		SetActive((Enum)UI.BTN_SELL, false);
+		SetActive((Enum)UI.BTN_CHANGE, is_visible: false);
+		SetActive((Enum)UI.BTN_GROW, is_visible: false);
+		SetActive((Enum)UI.BTN_SELL, is_visible: false);
 	}
 
 	private void OnQuery_SECTION_BACK()

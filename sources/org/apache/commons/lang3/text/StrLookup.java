@@ -10,8 +10,8 @@ public abstract class StrLookup<V> {
     static class MapStrLookup<V> extends StrLookup<V> {
         private final Map<String, V> map;
 
-        MapStrLookup(Map<String, V> map) {
-            this.map = map;
+        MapStrLookup(Map<String, V> map2) {
+            this.map = map2;
         }
 
         public String lookup(String str) {

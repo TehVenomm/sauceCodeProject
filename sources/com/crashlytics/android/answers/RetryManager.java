@@ -1,17 +1,17 @@
 package com.crashlytics.android.answers;
 
-import io.fabric.sdk.android.services.concurrency.internal.RetryState;
+import p017io.fabric.sdk.android.services.concurrency.internal.RetryState;
 
 class RetryManager {
     private static final long NANOSECONDS_IN_MS = 1000000;
     long lastRetry;
     private RetryState retryState;
 
-    public RetryManager(RetryState retryState) {
-        if (retryState == null) {
+    public RetryManager(RetryState retryState2) {
+        if (retryState2 == null) {
             throw new NullPointerException("retryState must not be null");
         }
-        this.retryState = retryState;
+        this.retryState = retryState2;
     }
 
     public boolean canRetry(long j) {

@@ -10,6 +10,9 @@ public interface JsonObjectFormatVisitor extends JsonFormatVisitorWithSerializer
     public static class Base implements JsonObjectFormatVisitor {
         protected SerializerProvider _provider;
 
+        public Base() {
+        }
+
         public Base(SerializerProvider serializerProvider) {
             this._provider = serializerProvider;
         }

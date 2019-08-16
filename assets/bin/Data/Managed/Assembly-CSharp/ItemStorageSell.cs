@@ -18,11 +18,14 @@ public class ItemStorageSell : ItemStorageTop
 		BTN_SORT,
 		SPR_INVALID_SORT,
 		LBL_INVALID_SORT,
+		BTN_CHANGE,
+		SPR_INVALID_CHANGE,
 		TGL_TAB0,
 		TGL_TAB1,
 		TGL_TAB2,
 		TGL_TAB3,
 		TGL_TAB4,
+		TGL_TAB5,
 		OBJ_BTN_SELL_MODE,
 		OBJ_SELL_MODE_ROOT,
 		LBL_MAX_SELECT_NUM,
@@ -51,20 +54,24 @@ public class ItemStorageSell : ItemStorageTop
 		{
 			if (sortCompareData.IsFavorite())
 			{
-				GameSection.ChangeEvent("NOT_SELL_FAVORITE", null);
+				GameSection.ChangeEvent("NOT_SELL_FAVORITE");
 			}
-			else if (sortCompareData.IsEquipping())
+			else if (sortCompareData.IsHomeEquipping())
 			{
-				GameSection.ChangeEvent("NOT_SELL_EQUIPPING", null);
+				GameSection.ChangeEvent("NOT_SELL_EQUIPPING");
+			}
+			else if (sortCompareData.IsUniqueEquipping())
+			{
+				GameSection.ChangeEvent("NOT_SELL_UNIQUE_EQUIPPING");
 			}
 			else
 			{
-				GameSection.ChangeEvent("CAN_NOT_SELL", null);
+				GameSection.ChangeEvent("CAN_NOT_SELL");
 			}
 		}
 		else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && sortCompareData.GetTableID() == 10000000)
 		{
-			GameSection.ChangeEvent("NOT_SELL_DEFAULT_WEAPON", null);
+			GameSection.ChangeEvent("NOT_SELL_DEFAULT_WEAPON");
 		}
 		else if (tab == TAB_MODE.MATERIAL)
 		{
@@ -73,7 +80,7 @@ public class ItemStorageSell : ItemStorageTop
 		else
 		{
 			sellItemData.Add(inventories[(int)tab].datas[num]);
-			GameSection.ChangeEvent("EQUIP_SELECT", null);
+			GameSection.ChangeEvent("EQUIP_SELECT");
 			OnQuery_SELL();
 		}
 	}
@@ -86,9 +93,8 @@ public class ItemStorageSell : ItemStorageTop
 		}
 	}
 
-	private void InitializeCaption()
+	private new void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
@@ -101,7 +107,7 @@ public class ItemStorageSell : ItemStorageTop
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 

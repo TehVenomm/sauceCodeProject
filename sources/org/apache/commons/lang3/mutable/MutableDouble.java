@@ -4,6 +4,9 @@ public class MutableDouble extends Number implements Comparable<MutableDouble>, 
     private static final long serialVersionUID = 1587163916;
     private double value;
 
+    public MutableDouble() {
+    }
+
     public MutableDouble(double d) {
         this.value = d;
     }

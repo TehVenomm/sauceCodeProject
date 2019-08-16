@@ -3,10 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StatusBoostAnimator
+public class StatusBoostAnimator : MonoBehaviour
 {
-	private const int ANIM_TIME = 3;
-
 	private List<BoostStatus> enableBoostList = new List<BoostStatus>();
 
 	private List<BoostStatus> deleteBoostList = new List<BoostStatus>();
@@ -24,6 +22,8 @@ public class StatusBoostAnimator
 	private Action<BoostStatus> updateCallback;
 
 	private Action<BoostStatus> changeCallback;
+
+	private const int ANIM_TIME = 3;
 
 	private static readonly Color[] TEXT_RATE_COLOR = (Color[])new Color[5]
 	{
@@ -73,6 +73,16 @@ public class StatusBoostAnimator
 				enableBoostList.Add(boostStatus4);
 			}
 		}
+		BoostStatus boostStatus5 = MonoBehaviourSingleton<StatusManager>.I.GetBoostStatus(USE_ITEM_EFFECT_TYPE.NOVICE_DROP_UP);
+		if (boostStatus5 != null)
+		{
+			enableBoostList.Add(boostStatus5);
+		}
+		BoostStatus boostStatus6 = MonoBehaviourSingleton<StatusManager>.I.GetBoostStatus(USE_ITEM_EFFECT_TYPE.HAPPEN_QUEST_UP);
+		if (boostStatus6 != null)
+		{
+			enableBoostList.Add(boostStatus6);
+		}
 		USE_ITEM_EFFECT_TYPE uSE_ITEM_EFFECT_TYPE = boostDispType;
 		CreateAnimTable();
 		updateCallback = update_callback;
@@ -89,86 +99,86 @@ public class StatusBoostAnimator
 		if (count == 0)
 		{
 			boostDispType = USE_ITEM_EFFECT_TYPE.NONE;
+			return;
+		}
+		animTable = new int[count];
+		int index = 0;
+		enableBoostList.ForEach(delegate(BoostStatus boost)
+		{
+			animTable[index] = boost.type;
+			index++;
+		});
+		if (boostDispType == USE_ITEM_EFFECT_TYPE.NONE)
+		{
+			animIndex = 0;
 		}
 		else
 		{
-			animTable = new int[count];
-			int index = 0;
-			enableBoostList.ForEach(delegate(BoostStatus boost)
-			{
-				animTable[index] = boost.type;
-				index++;
-			});
-			if (boostDispType == USE_ITEM_EFFECT_TYPE.NONE)
-			{
-				animIndex = 0;
-			}
-			else
-			{
-				int num = enableBoostList.FindIndex((BoostStatus data) => data.type == (int)boostDispType);
-				animIndex = ((num != -1) ? num : 0);
-			}
-			boostDispType = (USE_ITEM_EFFECT_TYPE)animTable[animIndex];
+			int num = enableBoostList.FindIndex((BoostStatus data) => data.type == (int)boostDispType);
+			animIndex = ((num != -1) ? num : 0);
 		}
+		boostDispType = (USE_ITEM_EFFECT_TYPE)animTable[animIndex];
 	}
 
 	private void Update()
 	{
-		if (enableBoostList.Count > 0)
+		if (enableBoostList.Count <= 0)
 		{
-			DateTime now = TimeManager.GetNow();
-			bool flag = false;
-			if (time != now.Second)
+			return;
+		}
+		DateTime now = TimeManager.GetNow();
+		bool flag = false;
+		if (time == now.Second)
+		{
+			return;
+		}
+		time = now.Second;
+		int i = 0;
+		for (int count = enableBoostList.Count; i < count; i++)
+		{
+			BoostStatus boostStatus = enableBoostList[i];
+			if (!boostStatus.IsRemain())
 			{
-				time = now.Second;
-				int i = 0;
-				for (int count = enableBoostList.Count; i < count; i++)
+				deleteBoostList.Add(boostStatus);
+				if (boostDispType == (USE_ITEM_EFFECT_TYPE)boostStatus.type)
 				{
-					BoostStatus boostStatus = enableBoostList[i];
-					if (!boostStatus.IsRemain())
-					{
-						deleteBoostList.Add(boostStatus);
-						if (boostDispType == (USE_ITEM_EFFECT_TYPE)boostStatus.type)
-						{
-							flag = true;
-						}
-					}
-				}
-				bool flag2 = false;
-				if (deleteBoostList.Count > 0)
-				{
-					flag2 = true;
-					int j = 0;
-					for (int count2 = deleteBoostList.Count; j < count2; j++)
-					{
-						BoostStatus delete_boost = deleteBoostList[j];
-						enableBoostList.RemoveAll((BoostStatus data) => data.type == delete_boost.type);
-					}
-					deleteBoostList.Clear();
-				}
-				if (flag2)
-				{
-					CreateAnimTable();
-				}
-				if (enableBoostList.Count > 0)
-				{
-					updataCnt++;
-					if (flag || updataCnt >= 3)
-					{
-						ShowNextBoost(flag);
-						updataCnt = 0;
-					}
-					else
-					{
-						updateCallback(GetShowBoostStatus());
-					}
-				}
-				else
-				{
-					updataCnt = 0;
-					EndShowBoost();
+					flag = true;
 				}
 			}
+		}
+		bool flag2 = false;
+		if (deleteBoostList.Count > 0)
+		{
+			flag2 = true;
+			int j = 0;
+			for (int count2 = deleteBoostList.Count; j < count2; j++)
+			{
+				BoostStatus delete_boost = deleteBoostList[j];
+				enableBoostList.RemoveAll((BoostStatus data) => data.type == delete_boost.type);
+			}
+			deleteBoostList.Clear();
+		}
+		if (flag2)
+		{
+			CreateAnimTable();
+		}
+		if (enableBoostList.Count > 0)
+		{
+			updataCnt++;
+			if (flag || updataCnt >= 3)
+			{
+				ShowNextBoost(flag);
+				updataCnt = 0;
+			}
+			else
+			{
+				updateCallback(GetShowBoostStatus());
+			}
+		}
+		else
+		{
+			updataCnt = 0;
+			EndShowBoost();
 		}
 	}
 

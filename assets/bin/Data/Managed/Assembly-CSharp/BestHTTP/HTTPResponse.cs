@@ -119,7 +119,7 @@ namespace BestHTTP
 			get
 			{
 				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002d: Expected O, but got Unknown
+				//IL_0032: Expected O, but got Unknown
 				if (Data == null)
 				{
 					return null;
@@ -156,7 +156,6 @@ namespace BestHTTP
 					throw ex;
 				}
 				return false;
-				IL_0035:;
 			}
 			if (!baseRequest.DisableRetry && string.IsNullOrEmpty(empty))
 			{
@@ -313,9 +312,6 @@ namespace BestHTTP
 					num = stream.ReadByte();
 				}
 				return memoryStream.ToArray().AsciiToString().Trim();
-				IL_0045:
-				string result;
-				return result;
 			}
 		}
 
@@ -330,9 +326,6 @@ namespace BestHTTP
 					num = stream.ReadByte();
 				}
 				return memoryStream.ToArray().AsciiToString().Trim();
-				IL_004c:
-				string result;
-				return result;
 			}
 		}
 
@@ -429,7 +422,11 @@ namespace BestHTTP
 			streamToDecode.Seek(0L, SeekOrigin.Begin);
 			List<string> list = (!IsFromCache) ? GetHeaderValues("content-encoding") : null;
 			Stream stream = null;
-			if (list != null)
+			if (list == null)
+			{
+				stream = streamToDecode;
+			}
+			else
 			{
 				switch (list[0])
 				{
@@ -446,10 +443,6 @@ namespace BestHTTP
 					throw new NotSupportedException("Not supported encoding found: " + list[0]);
 				}
 			}
-			else
-			{
-				stream = streamToDecode;
-			}
 			using (MemoryStream memoryStream = new MemoryStream((int)streamToDecode.Length))
 			{
 				byte[] array = new byte[1024];
@@ -459,9 +452,6 @@ namespace BestHTTP
 					memoryStream.Write(array, 0, num);
 				}
 				return memoryStream.ToArray();
-				IL_0134:
-				byte[] result;
-				return result;
 			}
 		}
 
@@ -542,16 +532,13 @@ namespace BestHTTP
 		{
 			lock (SyncRoot)
 			{
-				if (streamedFragments != null && streamedFragments.Count != 0)
+				if (streamedFragments == null || streamedFragments.Count == 0)
 				{
-					List<byte[]> result = new List<byte[]>(streamedFragments);
-					streamedFragments.Clear();
-					return result;
+					return null;
 				}
-				return null;
-				IL_004d:
-				List<byte[]> result2;
-				return result2;
+				List<byte[]> result = new List<byte[]>(streamedFragments);
+				streamedFragments.Clear();
+				return result;
 			}
 		}
 
@@ -560,9 +547,6 @@ namespace BestHTTP
 			lock (SyncRoot)
 			{
 				return streamedFragments != null && streamedFragments.Count > 0;
-				IL_002f:
-				bool result;
-				return result;
 			}
 		}
 

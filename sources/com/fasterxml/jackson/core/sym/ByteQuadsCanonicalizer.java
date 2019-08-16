@@ -79,7 +79,7 @@ public final class ByteQuadsCanonicalizer {
             }
             i = i3;
         }
-        this._tableInfo = new AtomicReference(TableInfo.createInitial(i));
+        this._tableInfo = new AtomicReference<>(TableInfo.createInitial(i));
     }
 
     private ByteQuadsCanonicalizer(ByteQuadsCanonicalizer byteQuadsCanonicalizer, boolean z, int i, boolean z2, TableInfo tableInfo) {
@@ -152,23 +152,21 @@ public final class ByteQuadsCanonicalizer {
     }
 
     public int primaryCount() {
-        int i = this._secondaryStart;
-        int i2 = 0;
-        for (int i3 = 3; i3 < i; i3 += 4) {
+        int i = 0;
+        int i2 = this._secondaryStart;
+        for (int i3 = 3; i3 < i2; i3 += 4) {
             if (this._hashArea[i3] != 0) {
-                i2++;
+                i++;
             }
         }
-        return i2;
+        return i;
     }
 
     public int secondaryCount() {
-        int i = this._secondaryStart + 3;
+        int i = 0;
         int i2 = this._tertiaryStart;
-        int i3 = i;
-        i = 0;
-        for (int i4 = i3; i4 < i2; i4 += 4) {
-            if (this._hashArea[i4] != 0) {
+        for (int i3 = this._secondaryStart + 3; i3 < i2; i3 += 4) {
+            if (this._hashArea[i3] != 0) {
                 i++;
             }
         }
@@ -176,14 +174,14 @@ public final class ByteQuadsCanonicalizer {
     }
 
     public int tertiaryCount() {
-        int i = this._tertiaryStart + 3;
-        int i2 = this._hashSize + i;
-        int i3 = i;
-        i = 0;
-        for (int i4 = i3; i4 < i2; i4 += 4) {
-            if (this._hashArea[i4] != 0) {
+        int i = 0;
+        int i2 = this._tertiaryStart + 3;
+        int i3 = this._hashSize + i2;
+        while (i2 < i3) {
+            if (this._hashArea[i2] != 0) {
                 i++;
             }
+            i2 += 4;
         }
         return i;
     }
@@ -193,14 +191,14 @@ public final class ByteQuadsCanonicalizer {
     }
 
     public int totalCount() {
-        int i = this._hashSize << 3;
-        int i2 = 0;
-        for (int i3 = 3; i3 < i; i3 += 4) {
+        int i = 0;
+        int i2 = this._hashSize << 3;
+        for (int i3 = 3; i3 < i2; i3 += 4) {
             if (this._hashArea[i3] != 0) {
-                i2++;
+                i++;
             }
         }
-        return i2;
+        return i;
     }
 
     public String toString() {
@@ -208,8 +206,8 @@ public final class ByteQuadsCanonicalizer {
         int secondaryCount = secondaryCount();
         int tertiaryCount = tertiaryCount();
         int spilloverCount = spilloverCount();
-        int totalCount = totalCount();
-        return String.format("[%s: size=%d, hashSize=%d, %d/%d/%d/%d pri/sec/ter/spill (=%s), total:%d]", new Object[]{getClass().getName(), Integer.valueOf(this._count), Integer.valueOf(this._hashSize), Integer.valueOf(primaryCount), Integer.valueOf(secondaryCount), Integer.valueOf(tertiaryCount), Integer.valueOf(spilloverCount), Integer.valueOf(totalCount), Integer.valueOf(((primaryCount + secondaryCount) + tertiaryCount) + spilloverCount), Integer.valueOf(totalCount)});
+        int i = totalCount();
+        return String.format("[%s: size=%d, hashSize=%d, %d/%d/%d/%d pri/sec/ter/spill (=%s), total:%d]", new Object[]{getClass().getName(), Integer.valueOf(this._count), Integer.valueOf(this._hashSize), Integer.valueOf(primaryCount), Integer.valueOf(secondaryCount), Integer.valueOf(tertiaryCount), Integer.valueOf(spilloverCount), Integer.valueOf(i), Integer.valueOf(primaryCount + secondaryCount + tertiaryCount + spilloverCount), Integer.valueOf(i)});
     }
 
     public String findName(int i) {
@@ -223,13 +221,13 @@ public final class ByteQuadsCanonicalizer {
         } else if (i2 == 0) {
             return null;
         }
-        i2 = this._secondaryStart + ((_calcOffset >> 3) << 2);
-        int i3 = iArr[i2 + 3];
-        if (i3 == 1) {
-            if (iArr[i2] == i) {
-                return this._names[i2 >> 2];
+        int i3 = this._secondaryStart + ((_calcOffset >> 3) << 2);
+        int i4 = iArr[i3 + 3];
+        if (i4 == 1) {
+            if (iArr[i3] == i) {
+                return this._names[i3 >> 2];
             }
-        } else if (i3 == 0) {
+        } else if (i4 == 0) {
             return null;
         }
         return _findSecondary(_calcOffset, i);
@@ -246,13 +244,13 @@ public final class ByteQuadsCanonicalizer {
         } else if (i3 == 0) {
             return null;
         }
-        i3 = this._secondaryStart + ((_calcOffset >> 3) << 2);
-        int i4 = iArr[i3 + 3];
-        if (i4 == 2) {
-            if (i == iArr[i3] && i2 == iArr[i3 + 1]) {
-                return this._names[i3 >> 2];
+        int i4 = this._secondaryStart + ((_calcOffset >> 3) << 2);
+        int i5 = iArr[i4 + 3];
+        if (i5 == 2) {
+            if (i == iArr[i4] && i2 == iArr[i4 + 1]) {
+                return this._names[i4 >> 2];
             }
-        } else if (i4 == 0) {
+        } else if (i5 == 0) {
             return null;
         }
         return _findSecondary(_calcOffset, i, i2);
@@ -269,13 +267,13 @@ public final class ByteQuadsCanonicalizer {
         } else if (i4 == 0) {
             return null;
         }
-        i4 = this._secondaryStart + ((_calcOffset >> 3) << 2);
-        int i5 = iArr[i4 + 3];
-        if (i5 == 3) {
-            if (i == iArr[i4] && iArr[i4 + 1] == i2 && iArr[i4 + 2] == i3) {
-                return this._names[i4 >> 2];
+        int i5 = this._secondaryStart + ((_calcOffset >> 3) << 2);
+        int i6 = iArr[i5 + 3];
+        if (i6 == 3) {
+            if (i == iArr[i5] && iArr[i5 + 1] == i2 && iArr[i5 + 2] == i3) {
+                return this._names[i5 >> 2];
             }
-        } else if (i5 == 0) {
+        } else if (i6 == 0) {
             return null;
         }
         return _findSecondary(_calcOffset, i, i2, i3);
@@ -330,12 +328,10 @@ public final class ByteQuadsCanonicalizer {
             }
             i3 += 4;
         }
-        i3 = _spilloverStart();
-        while (i3 < this._spilloverEnd) {
-            if (i2 == iArr[i3] && 1 == iArr[i3 + 3]) {
-                return this._names[i3 >> 2];
+        for (int _spilloverStart = _spilloverStart(); _spilloverStart < this._spilloverEnd; _spilloverStart += 4) {
+            if (i2 == iArr[_spilloverStart] && 1 == iArr[_spilloverStart + 3]) {
+                return this._names[_spilloverStart >> 2];
             }
-            i3 += 4;
         }
         return null;
     }
@@ -354,12 +350,10 @@ public final class ByteQuadsCanonicalizer {
             }
             i4 += 4;
         }
-        i4 = _spilloverStart();
-        while (i4 < this._spilloverEnd) {
-            if (i2 == iArr[i4] && i3 == iArr[i4 + 1] && 2 == iArr[i4 + 3]) {
-                return this._names[i4 >> 2];
+        for (int _spilloverStart = _spilloverStart(); _spilloverStart < this._spilloverEnd; _spilloverStart += 4) {
+            if (i2 == iArr[_spilloverStart] && i3 == iArr[_spilloverStart + 1] && 2 == iArr[_spilloverStart + 3]) {
+                return this._names[_spilloverStart >> 2];
             }
-            i4 += 4;
         }
         return null;
     }
@@ -378,12 +372,10 @@ public final class ByteQuadsCanonicalizer {
             }
             i5 += 4;
         }
-        i5 = _spilloverStart();
-        while (i5 < this._spilloverEnd) {
-            if (i2 == iArr[i5] && i3 == iArr[i5 + 1] && i4 == iArr[i5 + 2] && 3 == iArr[i5 + 3]) {
-                return this._names[i5 >> 2];
+        for (int _spilloverStart = _spilloverStart(); _spilloverStart < this._spilloverEnd; _spilloverStart += 4) {
+            if (i2 == iArr[_spilloverStart] && i3 == iArr[_spilloverStart + 1] && i4 == iArr[_spilloverStart + 2] && 3 == iArr[_spilloverStart + 3]) {
+                return this._names[_spilloverStart >> 2];
             }
-            i5 += 4;
         }
         return null;
     }
@@ -402,110 +394,185 @@ public final class ByteQuadsCanonicalizer {
             }
             i4 += 4;
         }
-        i4 = _spilloverStart();
-        while (i4 < this._spilloverEnd) {
-            if (i2 == iArr2[i4] && i3 == iArr2[i4 + 3] && _verifyLongName(iArr, i3, iArr2[i4 + 1])) {
-                return this._names[i4 >> 2];
+        for (int _spilloverStart = _spilloverStart(); _spilloverStart < this._spilloverEnd; _spilloverStart += 4) {
+            if (i2 == iArr2[_spilloverStart] && i3 == iArr2[_spilloverStart + 3] && _verifyLongName(iArr, i3, iArr2[_spilloverStart + 1])) {
+                return this._names[_spilloverStart >> 2];
             }
-            i4 += 4;
         }
         return null;
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* JADX WARNING: Code restructure failed: missing block: B:10:0x002a, code lost:
+        if (r8[r0] != r5[r10]) goto L_?;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:11:0x002c, code lost:
+        r0 = r3;
+        r10 = r4;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:12:0x002e, code lost:
+        r3 = r0 + 1;
+        r4 = r10 + 1;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:13:0x0036, code lost:
+        if (r8[r0] != r5[r10]) goto L_?;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:14:0x0038, code lost:
+        r0 = r3;
+        r10 = r4;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:15:0x003a, code lost:
+        r3 = r0 + 1;
+        r4 = r10 + 1;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:16:0x0042, code lost:
+        if (r8[r0] != r5[r10]) goto L_?;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:17:0x0044, code lost:
+        r0 = r3 + 1;
+        r6 = r4 + 1;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:18:0x004c, code lost:
+        if (r8[r3] != r5[r4]) goto L_?;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:19:0x004e, code lost:
+        r3 = r0 + 1;
+        r4 = r6 + 1;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:20:0x0056, code lost:
+        if (r8[r0] != r5[r6]) goto L_?;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:21:0x0058, code lost:
+        r0 = r3 + 1;
+        r0 = r8[r3];
+        r3 = r4 + 1;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:22:0x0060, code lost:
+        if (r0 != r5[r4]) goto L_?;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:30:?, code lost:
+        return false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:31:?, code lost:
+        return false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:32:?, code lost:
+        return false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:33:?, code lost:
+        return false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:34:?, code lost:
+        return false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:35:?, code lost:
+        return false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:36:?, code lost:
+        return false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:37:?, code lost:
+        return true;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:6:0x0016, code lost:
+        r3 = r0 + 1;
+        r4 = r10 + 1;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:7:0x001e, code lost:
+        if (r8[r0] != r5[r10]) goto L_?;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:8:0x0020, code lost:
+        r0 = r3;
+        r10 = r4;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:9:0x0022, code lost:
+        r3 = r0 + 1;
+        r4 = r10 + 1;
+     */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     private boolean _verifyLongName(int[] r8, int r9, int r10) {
         /*
-        r7 = this;
-        r1 = 1;
-        r2 = 0;
-        r4 = r7._hashArea;
-        switch(r9) {
-            case 4: goto L_0x006a;
-            case 5: goto L_0x0068;
-            case 6: goto L_0x0066;
-            case 7: goto L_0x0064;
-            case 8: goto L_0x000c;
-            default: goto L_0x0007;
-        };
-    L_0x0007:
-        r2 = r7._verifyLongName2(r8, r9, r10);
-    L_0x000b:
-        return r2;
-    L_0x000c:
-        r3 = r8[r2];
-        r0 = r10 + 1;
-        r5 = r4[r10];
-        if (r3 != r5) goto L_0x000b;
-    L_0x0014:
-        r10 = r0;
-        r0 = r1;
-    L_0x0016:
-        r3 = r0 + 1;
-        r5 = r8[r0];
-        r0 = r10 + 1;
-        r6 = r4[r10];
-        if (r5 != r6) goto L_0x000b;
-    L_0x0020:
-        r10 = r0;
-        r0 = r3;
-    L_0x0022:
-        r3 = r0 + 1;
-        r5 = r8[r0];
-        r0 = r10 + 1;
-        r6 = r4[r10];
-        if (r5 != r6) goto L_0x000b;
-    L_0x002c:
-        r10 = r0;
-        r0 = r3;
-    L_0x002e:
-        r3 = r0 + 1;
-        r5 = r8[r0];
-        r0 = r10 + 1;
-        r6 = r4[r10];
-        if (r5 != r6) goto L_0x000b;
-    L_0x0038:
-        r10 = r0;
-        r0 = r3;
-    L_0x003a:
-        r3 = r0 + 1;
-        r0 = r8[r0];
-        r5 = r10 + 1;
-        r6 = r4[r10];
-        if (r0 != r6) goto L_0x000b;
-    L_0x0044:
-        r0 = r3 + 1;
-        r3 = r8[r3];
-        r6 = r5 + 1;
-        r5 = r4[r5];
-        if (r3 != r5) goto L_0x000b;
-    L_0x004e:
-        r3 = r0 + 1;
-        r0 = r8[r0];
-        r5 = r6 + 1;
-        r6 = r4[r6];
-        if (r0 != r6) goto L_0x000b;
-    L_0x0058:
-        r0 = r3 + 1;
-        r0 = r8[r3];
-        r3 = r5 + 1;
-        r3 = r4[r5];
-        if (r0 != r3) goto L_0x000b;
-    L_0x0062:
-        r2 = r1;
-        goto L_0x000b;
-    L_0x0064:
-        r0 = r2;
-        goto L_0x0016;
-    L_0x0066:
-        r0 = r2;
-        goto L_0x0022;
-    L_0x0068:
-        r0 = r2;
-        goto L_0x002e;
-    L_0x006a:
-        r0 = r2;
-        goto L_0x003a;
+            r7 = this;
+            r1 = 1
+            r2 = 0
+            int[] r5 = r7._hashArea
+            switch(r9) {
+                case 4: goto L_0x006a;
+                case 5: goto L_0x0068;
+                case 6: goto L_0x0066;
+                case 7: goto L_0x0064;
+                case 8: goto L_0x000c;
+                default: goto L_0x0007;
+            }
+        L_0x0007:
+            boolean r2 = r7._verifyLongName2(r8, r9, r10)
+        L_0x000b:
+            return r2
+        L_0x000c:
+            r0 = r8[r2]
+            int r3 = r10 + 1
+            r4 = r5[r10]
+            if (r0 != r4) goto L_0x000b
+            r0 = r1
+            r10 = r3
+        L_0x0016:
+            int r3 = r0 + 1
+            r0 = r8[r0]
+            int r4 = r10 + 1
+            r6 = r5[r10]
+            if (r0 != r6) goto L_0x000b
+            r0 = r3
+            r10 = r4
+        L_0x0022:
+            int r3 = r0 + 1
+            r0 = r8[r0]
+            int r4 = r10 + 1
+            r6 = r5[r10]
+            if (r0 != r6) goto L_0x000b
+            r0 = r3
+            r10 = r4
+        L_0x002e:
+            int r3 = r0 + 1
+            r0 = r8[r0]
+            int r4 = r10 + 1
+            r6 = r5[r10]
+            if (r0 != r6) goto L_0x000b
+            r0 = r3
+            r10 = r4
+        L_0x003a:
+            int r3 = r0 + 1
+            r0 = r8[r0]
+            int r4 = r10 + 1
+            r6 = r5[r10]
+            if (r0 != r6) goto L_0x000b
+            int r0 = r3 + 1
+            r3 = r8[r3]
+            int r6 = r4 + 1
+            r4 = r5[r4]
+            if (r3 != r4) goto L_0x000b
+            int r3 = r0 + 1
+            r0 = r8[r0]
+            int r4 = r6 + 1
+            r6 = r5[r6]
+            if (r0 != r6) goto L_0x000b
+            int r0 = r3 + 1
+            r0 = r8[r3]
+            int r3 = r4 + 1
+            r3 = r5[r4]
+            if (r0 != r3) goto L_0x000b
+            r2 = r1
+            goto L_0x000b
+        L_0x0064:
+            r0 = r2
+            goto L_0x0016
+        L_0x0066:
+            r0 = r2
+            goto L_0x0022
+        L_0x0068:
+            r0 = r2
+            goto L_0x002e
+        L_0x006a:
+            r0 = r2
+            goto L_0x003a
         */
         throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.sym.ByteQuadsCanonicalizer._verifyLongName(int[], int, int):boolean");
     }
@@ -514,16 +581,15 @@ public final class ByteQuadsCanonicalizer {
         int i3 = 0;
         while (true) {
             int i4 = i3 + 1;
-            int i5 = iArr[i3];
-            i3 = i2 + 1;
-            if (i5 != this._hashArea[i2]) {
+            int i5 = i2 + 1;
+            if (iArr[i3] != this._hashArea[i2]) {
                 return false;
             }
             if (i4 >= i) {
                 return true;
             }
-            i2 = i3;
             i3 = i4;
+            i2 = i5;
         }
     }
 
@@ -642,24 +708,24 @@ public final class ByteQuadsCanonicalizer {
         if (iArr[i2 + 3] == 0) {
             return i2;
         }
-        _calcOffset = ((_calcOffset >> (this._tertiaryShift + 2)) << this._tertiaryShift) + this._tertiaryStart;
-        i2 = (1 << this._tertiaryShift) + _calcOffset;
-        while (_calcOffset < i2) {
-            if (iArr[_calcOffset + 3] == 0) {
-                return _calcOffset;
+        int i3 = ((_calcOffset >> (this._tertiaryShift + 2)) << this._tertiaryShift) + this._tertiaryStart;
+        int i4 = (1 << this._tertiaryShift) + i3;
+        while (i3 < i4) {
+            if (iArr[i3 + 3] == 0) {
+                return i3;
             }
-            _calcOffset += 4;
+            i3 += 4;
         }
-        _calcOffset = this._spilloverEnd;
+        int i5 = this._spilloverEnd;
         this._spilloverEnd += 4;
         if (this._spilloverEnd < (this._hashSize << 3)) {
-            return _calcOffset;
+            return i5;
         }
         if (this._failOnDoS) {
             _reportTooManyCollisions();
         }
         this._needRehash = true;
-        return _calcOffset;
+        return i5;
     }
 
     private int _appendLongName(int[] iArr, int i) {
@@ -676,26 +742,26 @@ public final class ByteQuadsCanonicalizer {
 
     public int calcHash(int i) {
         int i2 = this._seed ^ i;
-        i2 += i2 >>> 16;
-        i2 ^= i2 << 3;
-        return i2 + (i2 >>> 12);
+        int i3 = i2 + (i2 >>> 16);
+        int i4 = i3 ^ (i3 << 3);
+        return i4 + (i4 >>> 12);
     }
 
     public int calcHash(int i, int i2) {
         int i3 = (i >>> 15) + i;
-        i3 = ((i3 ^ (i3 >>> 9)) + (i2 * 33)) ^ this._seed;
-        i3 += i3 >>> 16;
-        i3 ^= i3 >>> 4;
-        return i3 + (i3 << 3);
+        int i4 = ((i3 ^ (i3 >>> 9)) + (i2 * 33)) ^ this._seed;
+        int i5 = i4 + (i4 >>> 16);
+        int i6 = i5 ^ (i5 >>> 4);
+        return i6 + (i6 << 3);
     }
 
     public int calcHash(int i, int i2, int i3) {
         int i4 = this._seed ^ i;
-        i4 = (((i4 + (i4 >>> 9)) * MULT3) + i2) * 33;
-        i4 = (i4 + (i4 >>> 15)) ^ i3;
-        i4 += i4 >>> 4;
-        i4 += i4 >>> 15;
-        return i4 ^ (i4 << 9);
+        int i5 = (((i4 + (i4 >>> 9)) * 31) + i2) * 33;
+        int i6 = (i5 + (i5 >>> 15)) ^ i3;
+        int i7 = i6 + (i6 >>> 4);
+        int i8 = i7 + (i7 >>> 15);
+        return i8 ^ (i8 << 9);
     }
 
     public int calcHash(int[] iArr, int i) {
@@ -703,22 +769,22 @@ public final class ByteQuadsCanonicalizer {
             throw new IllegalArgumentException();
         }
         int i2 = iArr[0] ^ this._seed;
-        i2 = (i2 + (i2 >>> 9)) + iArr[1];
-        i2 = ((i2 + (i2 >>> 15)) * 33) ^ iArr[2];
-        int i3 = (i2 >>> 4) + i2;
-        for (i2 = 3; i2 < i; i2++) {
-            int i4 = iArr[i2];
-            i3 += i4 ^ (i4 >> 21);
+        int i3 = i2 + (i2 >>> 9) + iArr[1];
+        int i4 = ((i3 + (i3 >>> 15)) * 33) ^ iArr[2];
+        int i5 = (i4 >>> 4) + i4;
+        for (int i6 = 3; i6 < i; i6++) {
+            int i7 = iArr[i6];
+            i5 += i7 ^ (i7 >> 21);
         }
-        i2 = MULT2 * i3;
-        i2 += i2 >>> 19;
-        return i2 ^ (i2 << 5);
+        int i8 = MULT2 * i5;
+        int i9 = i8 + (i8 >>> 19);
+        return i9 ^ (i9 << 5);
     }
 
     private void rehash() {
         this._needRehash = false;
         this._hashShared = false;
-        Object obj = this._hashArea;
+        int[] iArr = this._hashArea;
         String[] strArr = this._names;
         int i = this._hashSize;
         int i2 = this._count;
@@ -728,48 +794,48 @@ public final class ByteQuadsCanonicalizer {
             nukeSymbols(true);
             return;
         }
-        this._hashArea = new int[((i << 3) + obj.length)];
+        this._hashArea = new int[((i << 3) + iArr.length)];
         this._hashSize = i3;
         this._secondaryStart = i3 << 2;
         this._tertiaryStart = this._secondaryStart + (this._secondaryStart >> 1);
         this._tertiaryShift = _calcTertiaryShift(i3);
         this._names = new String[(strArr.length << 1)];
         nukeSymbols(false);
-        int[] iArr = new int[16];
-        i3 = 0;
-        for (int i5 = 0; i5 < i4; i5 += 4) {
-            int i6 = obj[i5 + 3];
-            if (i6 != 0) {
-                i3++;
-                String str = strArr[i5 >> 2];
-                switch (i6) {
+        int[] iArr2 = new int[16];
+        int i5 = 0;
+        for (int i6 = 0; i6 < i4; i6 += 4) {
+            int i7 = iArr[i6 + 3];
+            if (i7 != 0) {
+                i5++;
+                String str = strArr[i6 >> 2];
+                switch (i7) {
                     case 1:
-                        iArr[0] = obj[i5];
-                        addName(str, iArr, 1);
+                        iArr2[0] = iArr[i6];
+                        addName(str, iArr2, 1);
                         break;
                     case 2:
-                        iArr[0] = obj[i5];
-                        iArr[1] = obj[i5 + 1];
-                        addName(str, iArr, 2);
+                        iArr2[0] = iArr[i6];
+                        iArr2[1] = iArr[i6 + 1];
+                        addName(str, iArr2, 2);
                         break;
                     case 3:
-                        iArr[0] = obj[i5];
-                        iArr[1] = obj[i5 + 1];
-                        iArr[2] = obj[i5 + 2];
-                        addName(str, iArr, 3);
+                        iArr2[0] = iArr[i6];
+                        iArr2[1] = iArr[i6 + 1];
+                        iArr2[2] = iArr[i6 + 2];
+                        addName(str, iArr2, 3);
                         break;
                     default:
-                        if (i6 > iArr.length) {
-                            iArr = new int[i6];
+                        if (i7 > iArr2.length) {
+                            iArr2 = new int[i7];
                         }
-                        System.arraycopy(obj, obj[i5 + 1], iArr, 0, i6);
-                        addName(str, iArr, i6);
+                        System.arraycopy(iArr, iArr[i6 + 1], iArr2, 0, i7);
+                        addName(str, iArr2, i7);
                         break;
                 }
             }
         }
-        if (i3 != i2) {
-            throw new IllegalStateException("Failed rehash(): old count=" + i2 + ", copyCount=" + i3);
+        if (i5 != i2) {
+            throw new IllegalStateException("Failed rehash(): old count=" + i2 + ", copyCount=" + i5);
         }
     }
 
@@ -788,7 +854,8 @@ public final class ByteQuadsCanonicalizer {
         return (i << 3) - i;
     }
 
-    protected void _reportTooManyCollisions() {
+    /* access modifiers changed from: protected */
+    public void _reportTooManyCollisions() {
         if (this._hashSize > 1024) {
             throw new IllegalStateException("Spill-over slots in symbol table with " + this._count + " entries, hash area of " + this._hashSize + " slots is now full (all " + (this._hashSize >> 3) + " slots -- suspect a DoS attack based on hash collisions." + " You can disable the check via `JsonFactory.Feature.FAIL_ON_SYMBOL_HASH_OVERFLOW`");
         }

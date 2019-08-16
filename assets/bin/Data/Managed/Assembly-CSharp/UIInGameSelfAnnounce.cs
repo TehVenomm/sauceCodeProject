@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIInGameSelfAnnounce
+public class UIInGameSelfAnnounce : MonoBehaviour
 {
 	[SerializeField]
 	protected UITweenCtrl tweenCtrl;
@@ -29,16 +29,16 @@ public class UIInGameSelfAnnounce
 
 	private void Awake()
 	{
-		SetVisible(false);
+		SetVisible(isVisible: false);
 	}
 
 	public void Play(Action callback = null)
 	{
 		if (!(tweenCtrl == null))
 		{
-			SetVisible(true);
+			SetVisible(isVisible: true);
 			tweenCtrl.Reset();
-			tweenCtrl.Play(true, delegate
+			tweenCtrl.Play(forward: true, delegate
 			{
 				isLockReq = true;
 				lockTimer = lockInterval;
@@ -46,7 +46,7 @@ public class UIInGameSelfAnnounce
 				{
 					callback();
 				}
-				SetVisible(false);
+				SetVisible(isVisible: false);
 			});
 			if (!isUnLock)
 			{
@@ -61,7 +61,7 @@ public class UIInGameSelfAnnounce
 	{
 		isLockReq = true;
 		lockTimer = lockInterval;
-		tweenCtrl.Skip(true);
+		tweenCtrl.Skip();
 	}
 
 	private void LateUpdate()

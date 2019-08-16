@@ -32,36 +32,51 @@ public class QuestResultFirstClearRewardDialog : ItemSellConfirm
 			reward_num++;
 		}
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (i < reward_num)
 			{
 				if (i < sell_data_ary.Length)
 				{
-					int enemy_icon_id = 0;
-					int enemy_icon_id2 = 0;
+					int num = 0;
+					int num2 = 0;
 					object itemData = sell_data_ary[i].GetItemData();
 					if (itemData is ItemSortData)
 					{
 						ItemSortData itemSortData = itemData as ItemSortData;
-						enemy_icon_id = itemSortData.itemData.tableData.enemyIconID;
-						enemy_icon_id2 = itemSortData.itemData.tableData.enemyIconID2;
+						num = itemSortData.itemData.tableData.enemyIconID;
+						num2 = itemSortData.itemData.tableData.enemyIconID2;
 					}
+					ITEM_ICON_TYPE iconType = sell_data_ary[i].GetIconType();
+					int iconID = sell_data_ary[i].GetIconID();
+					RARITY_TYPE? rarity = sell_data_ary[i].GetRarity();
+					ELEMENT_TYPE iconElement = sell_data_ary[i].GetIconElement();
+					EQUIPMENT_TYPE? iconMagiEnableType = sell_data_ary[i].GetIconMagiEnableType();
+					int num3 = sell_data_ary[i].GetNum();
+					string event_name = null;
+					int event_data = 0;
+					bool is_new = false;
+					int toggle_group = -1;
+					bool is_select = false;
+					string icon_under_text = null;
+					bool is_equipping = false;
+					int enemy_icon_id = num;
+					int enemy_icon_id2 = num2;
 					GET_TYPE getType = sell_data_ary[i].GetGetType();
-					ItemIcon itemIcon = ItemIcon.Create(sell_data_ary[i].GetIconType(), sell_data_ary[i].GetIconID(), sell_data_ary[i].GetRarity(), t, sell_data_ary[i].GetIconElement(), sell_data_ary[i].GetIconMagiEnableType(), sell_data_ary[i].GetNum(), null, 0, false, -1, false, null, false, enemy_icon_id, enemy_icon_id2, false, getType);
-					itemIcon.SetRewardBG(true);
-					SetMaterialInfo(itemIcon.transform, sell_data_ary[i].GetMaterialType(), sell_data_ary[i].GetTableID(), null);
+					ItemIcon itemIcon = ItemIcon.Create(iconType, iconID, rarity, t, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
+					itemIcon.SetRewardBG(is_visible: true);
+					SetMaterialInfo(itemIcon.transform, sell_data_ary[i].GetMaterialType(), sell_data_ary[i].GetTableID());
 				}
 				else
 				{
-					ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.CRYSTAL, 1u, t, crystalNum, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-					itemIcon2.SetRewardBG(true);
-					SetMaterialInfo(itemIcon2.transform, REWARD_TYPE.CRYSTAL, 0u, null);
+					ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.CRYSTAL, 1u, t, crystalNum);
+					itemIcon2.SetRewardBG(is_visible: true);
+					SetMaterialInfo(itemIcon2.transform, REWARD_TYPE.CRYSTAL, 0u);
 				}
 			}
 			else
 			{
-				SetActive(t, false);
+				SetActive(t, is_visible: false);
 			}
 		});
 	}

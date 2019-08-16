@@ -1,21 +1,19 @@
 package org.apache.commons.lang3;
 
-import android.support.v4.media.TransportMediator;
+import com.google.android.gms.games.Notifications;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Iterator;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class AnnotationUtils {
-    private static final ToStringStyle TO_STRING_STYLE = new C12661();
-
-    /* renamed from: org.apache.commons.lang3.AnnotationUtils$1 */
-    static class C12661 extends ToStringStyle {
+    private static final ToStringStyle TO_STRING_STYLE = new ToStringStyle() {
         private static final long serialVersionUID = 1;
 
-        C12661() {
+        {
             setDefaultFullDetail(true);
             setArrayContentDetail(true);
             setUseClassName(true);
@@ -28,25 +26,34 @@ public class AnnotationUtils {
             setArrayEnd("]");
         }
 
-        protected String getShortClassName(Class<?> cls) {
-            for (Class cls2 : ClassUtils.getAllInterfaces(cls)) {
+        /* access modifiers changed from: protected */
+        public String getShortClassName(Class<?> cls) {
+            Class cls2;
+            Iterator it = ClassUtils.getAllInterfaces(cls).iterator();
+            while (true) {
+                if (!it.hasNext()) {
+                    cls2 = null;
+                    break;
+                }
+                cls2 = (Class) it.next();
                 if (Annotation.class.isAssignableFrom(cls2)) {
                     break;
                 }
             }
-            Class cls22 = null;
-            return new StringBuilder(cls22 == null ? "" : cls22.getName()).insert(0, '@').toString();
+            return new StringBuilder(cls2 == null ? "" : cls2.getName()).insert(0, '@').toString();
         }
 
-        protected void appendDetail(StringBuffer stringBuffer, String str, Object obj) {
+        /* access modifiers changed from: protected */
+        public void appendDetail(StringBuffer stringBuffer, String str, Object obj) {
             if (obj instanceof Annotation) {
                 obj = AnnotationUtils.toString((Annotation) obj);
             }
             super.appendDetail(stringBuffer, str, obj);
         }
-    }
+    };
 
     public static boolean equals(Annotation annotation, Annotation annotation2) {
+        Method[] declaredMethods;
         if (annotation == annotation2) {
             return true;
         }
@@ -77,9 +84,9 @@ public class AnnotationUtils {
     }
 
     public static int hashCode(Annotation annotation) {
-        int i = 0;
         Method[] declaredMethods = annotation.annotationType().getDeclaredMethods();
         int length = declaredMethods.length;
+        int i = 0;
         int i2 = 0;
         while (i < length) {
             Method method = declaredMethods[i];
@@ -88,11 +95,11 @@ public class AnnotationUtils {
                 if (invoke == null) {
                     throw new IllegalStateException(String.format("Annotation method %s returned null", new Object[]{method}));
                 }
-                i2 += hashMember(method.getName(), invoke);
                 i++;
+                i2 = hashMember(method.getName(), invoke) + i2;
             } catch (RuntimeException e) {
                 throw e;
-            } catch (Throwable e2) {
+            } catch (Exception e2) {
                 throw new RuntimeException(e2);
             }
         }
@@ -100,6 +107,7 @@ public class AnnotationUtils {
     }
 
     public static String toString(Annotation annotation) {
+        Method[] declaredMethods;
         ToStringBuilder toStringBuilder = new ToStringBuilder(annotation, TO_STRING_STYLE);
         for (Method method : annotation.annotationType().getDeclaredMethods()) {
             if (method.getParameterTypes().length <= 0) {
@@ -107,7 +115,7 @@ public class AnnotationUtils {
                     toStringBuilder.append(method.getName(), method.invoke(annotation, new Object[0]));
                 } catch (RuntimeException e) {
                     throw e;
-                } catch (Throwable e2) {
+                } catch (Exception e2) {
                     throw new RuntimeException(e2);
                 }
             }
@@ -129,7 +137,7 @@ public class AnnotationUtils {
     }
 
     private static int hashMember(String str, Object obj) {
-        int hashCode = str.hashCode() * TransportMediator.KEYCODE_MEDIA_PAUSE;
+        int hashCode = str.hashCode() * Notifications.NOTIFICATION_TYPES_ALL;
         if (obj.getClass().isArray()) {
             return hashCode ^ arrayMemberHash(obj.getClass().getComponentType(), obj);
         }

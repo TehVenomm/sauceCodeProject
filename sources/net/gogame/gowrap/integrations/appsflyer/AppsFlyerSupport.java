@@ -17,11 +17,12 @@ import net.gogame.gowrap.integrations.IntegrationSupport.IntegrationContext;
 import net.gogame.gowrap.integrations.PurchaseDetails;
 import net.gogame.gowrap.support.AbstractPushTokenAsyncTask;
 import net.gogame.gowrap.support.ClassUtils;
+import net.gogame.gowrap.support.StringUtils;
 
 public class AppsFlyerSupport extends AbstractIntegrationSupport implements CanGetUid, CanSetGuid, CanTrackPurchaseDetails, CanTrackEvent {
     public static final String CONFIG_DEV_KEY = "devKey";
     public static final String CONFIG_EVENT_NAME_DELIMITER = "eventNameDelimiter";
-    public static final AppsFlyerSupport INSTANCE = new AppsFlyerSupport();
+    public static final String CONFIG_SENDER_ID = "senderId";
     private String eventNameDelimiter = AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER;
     private IntegrationContext integrationContext;
 
@@ -29,12 +30,13 @@ public class AppsFlyerSupport extends AbstractIntegrationSupport implements CanG
         private PushTokenAsyncTask() {
         }
 
-        protected void onPushTokenReceived(Context context, String str) throws Exception {
+        /* access modifiers changed from: protected */
+        public void onPushTokenReceived(Context context, String str) throws Exception {
             AppsFlyerLib.getInstance().updateServerUninstallToken(context, str);
         }
     }
 
-    private AppsFlyerSupport() {
+    public AppsFlyerSupport() {
         super("appsflyer");
     }
 
@@ -42,35 +44,40 @@ public class AppsFlyerSupport extends AbstractIntegrationSupport implements CanG
         return ClassUtils.hasClass("com.appsflyer.AppsFlyerLib");
     }
 
-    protected void doInit(Activity activity, Config config, IntegrationContext integrationContext) {
-        this.integrationContext = integrationContext;
+    /* access modifiers changed from: protected */
+    public void doInit(Activity activity, Config config, IntegrationContext integrationContext2) {
+        this.integrationContext = integrationContext2;
         String string = config.getString(CONFIG_DEV_KEY);
+        String trimToNull = StringUtils.trimToNull(config.getString(CONFIG_SENDER_ID));
         this.eventNameDelimiter = config.getString("eventNameDelimiter", AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
         AppsFlyerLib.getInstance().setCollectIMEI(false);
+        if (trimToNull != null) {
+            AppsFlyerLib.getInstance().enableUninstallTracking(trimToNull);
+        }
         AppsFlyerLib.getInstance().startTracking(activity.getApplication(), string);
-        trackEvent(AbstractIntegrationSupport.DEFAULT_REWARD_ID, "APP_LAUNCH");
+        trackEvent("DEFAULT", "APP_LAUNCH");
         new PushTokenAsyncTask().execute(new Context[]{activity});
     }
 
     public String getUid() {
-        if (isIntegrated()) {
-            return AppsFlyerLib.getInstance().getAppsFlyerUID(this.integrationContext.getCurrentActivity());
+        if (!isIntegrated()) {
+            return null;
         }
-        return null;
+        return AppsFlyerLib.getInstance().getAppsFlyerUID(this.integrationContext.getCurrentActivity());
     }
 
     public void setGuid(String str) {
         if (isIntegrated()) {
             AppsFlyerLib.getInstance().setCustomerUserId(str);
             if (str != null) {
-                trackEvent(AbstractIntegrationSupport.DEFAULT_REWARD_ID, "LOGIN");
+                trackEvent("DEFAULT", "LOGIN");
             }
         }
     }
 
     public void trackPurchase(PurchaseDetails purchaseDetails) {
         if (isIntegrated()) {
-            Map hashMap = new HashMap();
+            HashMap hashMap = new HashMap();
             if (purchaseDetails.getProductId() != null) {
                 hashMap.put(AFInAppEventParameterName.CONTENT_ID, purchaseDetails.getProductId());
             }
@@ -106,7 +113,7 @@ public class AppsFlyerSupport extends AbstractIntegrationSupport implements CanG
 
     public void trackEvent(String str, String str2, long j) {
         if (isIntegrated()) {
-            Map hashMap = new HashMap();
+            HashMap hashMap = new HashMap();
             hashMap.put(AFInAppEventParameterName.PARAM_1, Long.valueOf(j));
             AppsFlyerLib.getInstance().trackEvent(this.integrationContext.getCurrentActivity(), toEventName(str, str2), hashMap);
         }

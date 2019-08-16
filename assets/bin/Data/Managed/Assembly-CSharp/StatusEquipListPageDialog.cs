@@ -26,13 +26,12 @@ public class StatusEquipListPageDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)null;
+		yield return null;
 		base.Initialize();
 	}
 
@@ -109,24 +108,20 @@ public class StatusEquipListPageDialog : GameSection
 		int result = -1;
 		if (!int.TryParse(pageNo[0] + pageNo[1] + pageNo[2], out result))
 		{
-			GameSection.ChangeEvent("ERROR_NOT_NUMBER", null);
+			GameSection.ChangeEvent("ERROR_NOT_NUMBER");
+			return;
 		}
-		else
+		StatusEquipList statusEquipList = MonoBehaviourSingleton<GameSceneManager>.I.FindSection("StatusEquipList") as StatusEquipList;
+		if (statusEquipList != null)
 		{
-			StatusEquipList statusEquipList = MonoBehaviourSingleton<GameSceneManager>.I.FindSection("StatusEquipList") as StatusEquipList;
-			if (statusEquipList != null)
+			int maxPageNum = statusEquipList.GetMaxPageNum();
+			if (maxPageNum < result)
 			{
-				int maxPageNum = statusEquipList.GetMaxPageNum();
-				if (maxPageNum < result)
-				{
-					GameSection.ChangeEvent("OVER_NUMBER", null);
-				}
-				else
-				{
-					result = Mathf.Max(0, result - 1);
-					statusEquipList.UpdateUI(result);
-				}
+				GameSection.ChangeEvent("OVER_NUMBER");
+				return;
 			}
+			result = Mathf.Max(0, result - 1);
+			statusEquipList.UpdateUI(result);
 		}
 	}
 

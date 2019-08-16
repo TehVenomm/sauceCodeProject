@@ -21,11 +21,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.oms.AppstoreInAppBillingService;
 import org.onepf.oms.OpenIabHelper;
@@ -54,8 +54,8 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
     @Nullable
     private OnIabSetupFinishedListener setupListener;
 
-    public AmazonAppstoreBillingService(@NotNull Context context) {
-        this.context = context.getApplicationContext();
+    public AmazonAppstoreBillingService(@NotNull Context context2) {
+        this.context = context2.getApplicationContext();
     }
 
     private String generateOriginalJson(@NotNull PurchaseResponse purchaseResponse) {
@@ -77,9 +77,9 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
                 jSONObject.put(JSON_KEY_RECEIPT_ITEM_TYPE, productType.name());
             }
             jSONObject.put(JSON_KEY_RECEIPT_PURCHASE_TOKEN, receipt.getReceiptId());
-            Logger.m1001d("generateOriginalJson(): JSON\n", jSONObject);
-        } catch (Throwable e) {
-            Logger.m1003e("generateOriginalJson() failed to generate JSON", e);
+            Logger.m1026d("generateOriginalJson(): JSON\n", jSONObject);
+        } catch (JSONException e) {
+            Logger.m1028e("generateOriginalJson() failed to generate JSON", (Throwable) e);
         }
         return jSONObject.toString();
     }
@@ -95,14 +95,12 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
                 case CONSUMABLE:
                 case ENTITLED:
                     purchase.setItemType("inapp");
-                    Logger.m1001d("Add to inventory SKU: ", sku);
+                    Logger.m1026d("Add to inventory SKU: ", sku);
                     break;
                 case SUBSCRIPTION:
                     purchase.setItemType("subs");
                     purchase.setSku(SkuManager.getInstance().getSku(OpenIabHelper.NAME_AMAZON, sku));
-                    Logger.m1001d("Add subscription to inventory SKU: ", sku);
-                    break;
-                default:
+                    Logger.m1026d("Add subscription to inventory SKU: ", sku);
                     break;
             }
         }
@@ -113,8 +111,11 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
     private SkuDetails getSkuDetails(@NotNull Product product) {
         String sku = product.getSku();
         String str = product.getPrice().toString();
-        Logger.m1000d(String.format("Item: %s\n Type: %s\n SKU: %s\n Price: %s\n Description: %s\n", new Object[]{product.getTitle(), product.getProductType(), sku, str, product.getDescription()}));
-        return new SkuDetails(product.getProductType() == ProductType.SUBSCRIPTION ? "subs" : "inapp", SkuManager.getInstance().getSku(OpenIabHelper.NAME_AMAZON, sku), product.getTitle(), str, product.getDescription());
+        String title = product.getTitle();
+        String description = product.getDescription();
+        ProductType productType = product.getProductType();
+        Logger.m1025d(String.format("Item: %s\n Type: %s\n SKU: %s\n Price: %s\n Description: %s\n", new Object[]{title, productType, sku, str, description}));
+        return new SkuDetails(productType == ProductType.SUBSCRIPTION ? "subs" : "inapp", SkuManager.getInstance().getSku(OpenIabHelper.NAME_AMAZON, sku), title, str, description);
     }
 
     public void consume(Purchase purchase) {
@@ -136,8 +137,9 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
     }
 
     public void onProductDataResponse(@NotNull ProductDataResponse productDataResponse) {
-        Logger.m1001d("onItemDataResponse() reqStatus: ", productDataResponse.getRequestStatus(), ", reqId: ", productDataResponse.getRequestId());
-        switch (productDataResponse.getRequestStatus()) {
+        ProductDataResponse.RequestStatus requestStatus = productDataResponse.getRequestStatus();
+        Logger.m1026d("onItemDataResponse() reqStatus: ", requestStatus, ", reqId: ", productDataResponse.getRequestId());
+        switch (requestStatus) {
             case SUCCESSFUL:
                 Map productData = productDataResponse.getProductData();
                 for (String str : productData.keySet()) {
@@ -155,29 +157,31 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
         IabResult iabResult;
         RequestStatus requestStatus = purchaseResponse.getRequestStatus();
         RequestId requestId = purchaseResponse.getRequestId();
-        Logger.m1001d("onPurchaseResponse() PurchaseRequestStatus:", requestStatus, ", reqId: ", requestId);
+        Logger.m1026d("onPurchaseResponse() PurchaseRequestStatus:", requestStatus, ", reqId: ", requestId);
         String str = (String) this.requestSkuMap.remove(requestId);
         Receipt receipt = purchaseResponse.getReceipt();
         Purchase purchase = getPurchase(receipt);
         switch (requestStatus) {
             case SUCCESSFUL:
-                if (!purchaseResponse.getUserData().getUserId().equals(this.currentUserId)) {
-                    Logger.m1011w("onPurchaseResponse() Current UserId: ", this.currentUserId, ", purchase UserId: ", purchaseResponse.getUserData().getUserId());
+                String userId = purchaseResponse.getUserData().getUserId();
+                if (userId.equals(this.currentUserId)) {
+                    purchase.setOriginalJson(generateOriginalJson(purchaseResponse));
+                    purchase.setOrderId(requestId.toString());
+                    ProductType productType = receipt.getProductType();
+                    String sku = receipt.getSku();
+                    SkuManager instance = SkuManager.getInstance();
+                    if (productType != ProductType.SUBSCRIPTION) {
+                        str = sku;
+                    }
+                    purchase.setSku(instance.getSku(OpenIabHelper.NAME_AMAZON, str));
+                    purchase.setItemType(productType == ProductType.SUBSCRIPTION ? "subs" : "inapp");
+                    iabResult = new IabResult(0, "Success");
+                    break;
+                } else {
+                    Logger.m1036w("onPurchaseResponse() Current UserId: ", this.currentUserId, ", purchase UserId: ", userId);
                     iabResult = new IabResult(6, "Current UserId doesn't match purchase UserId");
                     break;
                 }
-                purchase.setOriginalJson(generateOriginalJson(purchaseResponse));
-                purchase.setOrderId(requestId.toString());
-                ProductType productType = receipt.getProductType();
-                String sku = receipt.getSku();
-                SkuManager instance = SkuManager.getInstance();
-                if (productType != ProductType.SUBSCRIPTION) {
-                    str = sku;
-                }
-                purchase.setSku(instance.getSku(OpenIabHelper.NAME_AMAZON, str));
-                purchase.setItemType(productType == ProductType.SUBSCRIPTION ? "subs" : "inapp");
-                iabResult = new IabResult(0, "Success");
-                break;
             case INVALID_SKU:
                 iabResult = new IabResult(4, "Invalid SKU");
                 break;
@@ -198,28 +202,31 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
         if (onIabPurchaseFinishedListener != null) {
             onIabPurchaseFinishedListener.onIabPurchaseFinished(iabResult, purchase);
         } else {
-            Logger.m1002e("Something went wrong: PurchaseFinishedListener is not found");
+            Logger.m1027e("Something went wrong: PurchaseFinishedListener is not found");
         }
     }
 
     public void onPurchaseUpdatesResponse(PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        Logger.m1001d("onPurchaseUpdatesResponse() reqStatus: ", purchaseUpdatesResponse.getRequestStatus(), "reqId: ", purchaseUpdatesResponse.getRequestId());
-        switch (purchaseUpdatesResponse.getRequestStatus()) {
+        PurchaseUpdatesResponse.RequestStatus requestStatus = purchaseUpdatesResponse.getRequestStatus();
+        Logger.m1026d("onPurchaseUpdatesResponse() reqStatus: ", requestStatus, "reqId: ", purchaseUpdatesResponse.getRequestId());
+        switch (requestStatus) {
             case SUCCESSFUL:
                 for (String erasePurchase : this.inventory.getAllOwnedSkus()) {
                     this.inventory.erasePurchase(erasePurchase);
                 }
-                if (!purchaseUpdatesResponse.getUserData().getUserId().equals(this.currentUserId)) {
-                    Logger.m1011w("onPurchaseUpdatesResponse() Current UserId: ", this.currentUserId, ", purchase UserId: ", purchaseUpdatesResponse.getUserData().getUserId());
+                String userId = purchaseUpdatesResponse.getUserData().getUserId();
+                if (!userId.equals(this.currentUserId)) {
+                    Logger.m1036w("onPurchaseUpdatesResponse() Current UserId: ", this.currentUserId, ", purchase UserId: ", userId);
                     break;
-                }
-                for (Receipt purchase : purchaseUpdatesResponse.getReceipts()) {
-                    this.inventory.addPurchase(getPurchase(purchase));
-                }
-                if (purchaseUpdatesResponse.hasMore()) {
-                    PurchasingService.getPurchaseUpdates(false);
-                    Logger.m1000d("Initiating Another Purchase Updates with offset: ");
-                    return;
+                } else {
+                    for (Receipt purchase : purchaseUpdatesResponse.getReceipts()) {
+                        this.inventory.addPurchase(getPurchase(purchase));
+                    }
+                    if (purchaseUpdatesResponse.hasMore()) {
+                        PurchasingService.getPurchaseUpdates(false);
+                        Logger.m1025d("Initiating Another Purchase Updates with offset: ");
+                        return;
+                    }
                 }
                 break;
         }
@@ -231,17 +238,18 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
 
     public void onUserDataResponse(UserDataResponse userDataResponse) {
         IabResult iabResult;
-        Logger.m1001d("onUserDataResponse() reqId: ", userDataResponse.getRequestId(), ", status: ", userDataResponse.getRequestStatus());
+        Logger.m1026d("onUserDataResponse() reqId: ", userDataResponse.getRequestId(), ", status: ", userDataResponse.getRequestStatus());
         switch (userDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
-                this.currentUserId = userDataResponse.getUserData().getUserId();
+                String userId = userDataResponse.getUserData().getUserId();
+                this.currentUserId = userId;
                 iabResult = new IabResult(0, "Setup successful.");
-                Logger.m1001d("Set current userId: ", r1);
+                Logger.m1026d("Set current userId: ", userId);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
                 iabResult = new IabResult(6, "Unable to get userId");
-                Logger.m1000d("onUserDataResponse() Unable to get user ID");
+                Logger.m1025d("onUserDataResponse() Unable to get user ID");
                 break;
             default:
                 iabResult = new IabResult(3, "Unknown response code");
@@ -254,14 +262,14 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
     }
 
     public Inventory queryInventory(boolean z, @Nullable List<String> list, @Nullable List<String> list2) {
-        Logger.m1001d("queryInventory() querySkuDetails: ", Boolean.valueOf(z), " moreItemSkus: ", list, " moreSubsSkus: ", list2);
+        Logger.m1026d("queryInventory() querySkuDetails: ", Boolean.valueOf(z), " moreItemSkus: ", list, " moreSubsSkus: ", list2);
         CountDownLatch countDownLatch = new CountDownLatch(1);
         this.inventoryLatchQueue.offer(countDownLatch);
         PurchasingService.getPurchaseUpdates(true);
         try {
             countDownLatch.await();
             if (z) {
-                Set<String> hashSet = new HashSet(this.inventory.getAllOwnedSkus());
+                HashSet<String> hashSet = new HashSet<>(this.inventory.getAllOwnedSkus());
                 if (list != null) {
                     hashSet.addAll(list);
                 }
@@ -269,25 +277,25 @@ public class AmazonAppstoreBillingService implements AppstoreInAppBillingService
                     hashSet.addAll(list2);
                 }
                 if (!hashSet.isEmpty()) {
-                    Set hashSet2 = new HashSet(hashSet.size());
+                    HashSet hashSet2 = new HashSet(hashSet.size());
                     for (String storeSku : hashSet) {
                         hashSet2.add(SkuManager.getInstance().getStoreSku(OpenIabHelper.NAME_AMAZON, storeSku));
                     }
-                    countDownLatch = new CountDownLatch(1);
-                    this.inventoryLatchQueue.offer(countDownLatch);
+                    CountDownLatch countDownLatch2 = new CountDownLatch(1);
+                    this.inventoryLatchQueue.offer(countDownLatch2);
                     PurchasingService.getProductData(hashSet2);
                     try {
-                        countDownLatch.await();
+                        countDownLatch2.await();
                     } catch (InterruptedException e) {
-                        Logger.m1009w("queryInventory() SkuDetails fetching interrupted");
+                        Logger.m1034w("queryInventory() SkuDetails fetching interrupted");
                         return null;
                     }
                 }
             }
-            Logger.m1001d("queryInventory() finished. Inventory size: ", Integer.valueOf(this.inventory.getAllOwnedSkus().size()));
+            Logger.m1026d("queryInventory() finished. Inventory size: ", Integer.valueOf(this.inventory.getAllOwnedSkus().size()));
             return this.inventory;
         } catch (InterruptedException e2) {
-            Logger.m1002e("queryInventory() await interrupted");
+            Logger.m1027e("queryInventory() await interrupted");
             return null;
         }
     }

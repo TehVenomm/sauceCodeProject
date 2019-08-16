@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public abstract class UIRect
+public abstract class UIRect : MonoBehaviour
 {
 	[Serializable]
 	public class AnchorPoint
@@ -76,16 +76,14 @@ public abstract class UIRect
 				Vector3[] sides = rect.GetSides(parent);
 				float num = Mathf.Lerp(sides[0].x, sides[2].x, relative);
 				absolute = Mathf.FloorToInt(localPos - num + 0.5f);
+				return;
 			}
-			else
+			Vector3 val = target.get_position();
+			if (parent != null)
 			{
-				Vector3 val = target.get_position();
-				if (parent != null)
-				{
-					val = parent.InverseTransformPoint(val);
-				}
-				absolute = Mathf.FloorToInt(localPos - val.x + 0.5f);
+				val = parent.InverseTransformPoint(val);
 			}
+			absolute = Mathf.FloorToInt(localPos - val.x + 0.5f);
 		}
 
 		public void SetVertical(Transform parent, float localPos)
@@ -100,16 +98,14 @@ public abstract class UIRect
 				Vector3[] sides = rect.GetSides(parent);
 				float num = Mathf.Lerp(sides[3].y, sides[1].y, relative);
 				absolute = Mathf.FloorToInt(localPos - num + 0.5f);
+				return;
 			}
-			else
+			Vector3 val = target.get_position();
+			if (parent != null)
 			{
-				Vector3 val = target.get_position();
-				if (parent != null)
-				{
-					val = parent.InverseTransformPoint(val);
-				}
-				absolute = Mathf.FloorToInt(localPos - val.y + 0.5f);
+				val = parent.InverseTransformPoint(val);
 			}
+			absolute = Mathf.FloorToInt(localPos - val.y + 0.5f);
 		}
 
 		public Vector3[] GetSides(Transform relativeTo)
@@ -189,8 +185,6 @@ public abstract class UIRect
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
 			if (mGo == null)
 			{
 				mGo = this.get_gameObject();
@@ -203,8 +197,6 @@ public abstract class UIRect
 	{
 		get
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
 			if (mTrans == null)
 			{
 				mTrans = this.get_transform();
@@ -237,8 +229,6 @@ public abstract class UIRect
 	{
 		get
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
 			if (!mParentFound)
 			{
 				mParentFound = true;
@@ -287,8 +277,6 @@ public abstract class UIRect
 	{
 		get
 		{
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
@@ -305,13 +293,13 @@ public abstract class UIRect
 			if (!mCam.get_orthographic())
 			{
 				Transform cachedTransform = this.cachedTransform;
-				Transform val = mCam.get_transform();
-				Plane val2 = default(Plane);
-				val2._002Ector(cachedTransform.get_rotation() * Vector3.get_back(), cachedTransform.get_position());
-				Ray val3 = default(Ray);
-				val3._002Ector(val.get_position(), val.get_rotation() * Vector3.get_forward());
+				Transform transform = mCam.get_transform();
+				Plane val = default(Plane);
+				val._002Ector(cachedTransform.get_rotation() * Vector3.get_back(), cachedTransform.get_position());
+				Ray val2 = default(Ray);
+				val2._002Ector(transform.get_position(), transform.get_rotation() * Vector3.get_forward());
 				float result = default(float);
-				if (val2.Raycast(val3, ref result))
+				if (val.Raycast(val2, ref result))
 				{
 					return result;
 				}
@@ -334,7 +322,7 @@ public abstract class UIRect
 		{
 			for (int i = 0; i < mChildren.size; i++)
 			{
-				mChildren.buffer[i].Invalidate(true);
+				mChildren.buffer[i].Invalidate(includeChildren: true);
 			}
 		}
 	}
@@ -534,7 +522,6 @@ public abstract class UIRect
 
 	public void SetAnchor(GameObject go)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		Transform target = (!(go != null)) ? null : go.get_transform();
 		leftAnchor.target = target;
 		rightAnchor.target = target;
@@ -546,7 +533,6 @@ public abstract class UIRect
 
 	public void SetAnchor(GameObject go, int left, int bottom, int right, int top)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		Transform target = (!(go != null)) ? null : go.get_transform();
 		leftAnchor.target = target;
 		rightAnchor.target = target;
@@ -589,7 +575,6 @@ public abstract class UIRect
 
 	private void FindCameraFor(AnchorPoint ap)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		if (ap.target == null || ap.rect != null)
 		{
 			ap.targetCam = null;
@@ -602,8 +587,6 @@ public abstract class UIRect
 
 	public virtual void ParentHasChanged()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
 		mParentFound = false;
 		UIRect uIRect = NGUITools.FindInParents<UIRect>(cachedTransform.get_parent());
 		if (mParent != uIRect)

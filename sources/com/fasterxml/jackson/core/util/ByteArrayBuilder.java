@@ -16,7 +16,7 @@ public final class ByteArrayBuilder extends OutputStream {
     private int _pastLen;
 
     public ByteArrayBuilder() {
-        this(null);
+        this((BufferRecycler) null);
     }
 
     public ByteArrayBuilder(BufferRecycler bufferRecycler) {
@@ -28,7 +28,7 @@ public final class ByteArrayBuilder extends OutputStream {
     }
 
     public ByteArrayBuilder(BufferRecycler bufferRecycler, int i) {
-        this._pastBlocks = new LinkedList();
+        this._pastBlocks = new LinkedList<>();
         this._bufferRecycler = bufferRecycler;
         this._currBlock = bufferRecycler == null ? new byte[i] : bufferRecycler.allocByteBuffer(2);
     }
@@ -65,10 +65,10 @@ public final class ByteArrayBuilder extends OutputStream {
             int i2 = this._currBlockPtr;
             this._currBlockPtr = i2 + 1;
             bArr[i2] = (byte) (i >> 8);
-            bArr = this._currBlock;
-            i2 = this._currBlockPtr;
-            this._currBlockPtr = i2 + 1;
-            bArr[i2] = (byte) i;
+            byte[] bArr2 = this._currBlock;
+            int i3 = this._currBlockPtr;
+            this._currBlockPtr = i3 + 1;
+            bArr2[i3] = (byte) i;
             return;
         }
         append(i >> 8);
@@ -81,14 +81,14 @@ public final class ByteArrayBuilder extends OutputStream {
             int i2 = this._currBlockPtr;
             this._currBlockPtr = i2 + 1;
             bArr[i2] = (byte) (i >> 16);
-            bArr = this._currBlock;
-            i2 = this._currBlockPtr;
-            this._currBlockPtr = i2 + 1;
-            bArr[i2] = (byte) (i >> 8);
-            bArr = this._currBlock;
-            i2 = this._currBlockPtr;
-            this._currBlockPtr = i2 + 1;
-            bArr[i2] = (byte) i;
+            byte[] bArr2 = this._currBlock;
+            int i3 = this._currBlockPtr;
+            this._currBlockPtr = i3 + 1;
+            bArr2[i3] = (byte) (i >> 8);
+            byte[] bArr3 = this._currBlock;
+            int i4 = this._currBlockPtr;
+            this._currBlockPtr = i4 + 1;
+            bArr3[i4] = (byte) i;
             return;
         }
         append(i >> 16);
@@ -101,16 +101,16 @@ public final class ByteArrayBuilder extends OutputStream {
         if (i == 0) {
             return NO_BYTES;
         }
-        Object obj = new byte[i];
+        byte[] bArr = new byte[i];
         Iterator it = this._pastBlocks.iterator();
         int i2 = 0;
         while (it.hasNext()) {
-            byte[] bArr = (byte[]) it.next();
-            int length = bArr.length;
-            System.arraycopy(bArr, 0, obj, i2, length);
+            byte[] bArr2 = (byte[]) it.next();
+            int length = bArr2.length;
+            System.arraycopy(bArr2, 0, bArr, i2, length);
             i2 += length;
         }
-        System.arraycopy(this._currBlock, 0, obj, i2, this._currBlockPtr);
+        System.arraycopy(this._currBlock, 0, bArr, i2, this._currBlockPtr);
         int i3 = this._currBlockPtr + i2;
         if (i3 != i) {
             throw new RuntimeException("Internal error: total len assumed to be " + i + ", copied " + i3 + " bytes");
@@ -118,7 +118,7 @@ public final class ByteArrayBuilder extends OutputStream {
         if (!this._pastBlocks.isEmpty()) {
             reset();
         }
-        return obj;
+        return bArr;
     }
 
     public byte[] resetAndGetFirstSegment() {

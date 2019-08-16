@@ -149,8 +149,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public object Get()
 	{
 		if (mProperty == null && mField == null && isValid)
@@ -171,8 +171,8 @@ public class PropertyReference
 		return null;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public bool Set(object value)
 	{
 		if (mProperty == null && mField == null && isValid)
@@ -201,7 +201,6 @@ public class PropertyReference
 			catch (Exception)
 			{
 				return false;
-				IL_00a6:;
 			}
 		}
 		if (!Convert(ref value))
@@ -227,8 +226,8 @@ public class PropertyReference
 		return false;
 	}
 
-	[DebuggerStepThrough]
 	[DebuggerHidden]
+	[DebuggerStepThrough]
 	private bool Cache()
 	{
 		if (mTarget != null && !string.IsNullOrEmpty(mName))

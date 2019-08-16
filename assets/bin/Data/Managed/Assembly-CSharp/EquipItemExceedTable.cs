@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 {
@@ -22,8 +23,6 @@ public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 			}
 		}
 
-		public const string NT = "rarity,type,eventId,exchangeItemId,exchangeMoney,exceedItemId0,exceedNum0_1,exceedNum0_2,exceedNum0_3,exceedNum0_4,exceedItemId1,exceedNum1_1,exceedNum1_2,exceedNum1_3,exceedNum1_4,exceedItemId2,exceedNum2_1,exceedNum2_2,exceedNum2_3,exceedNum2_4,exceedItemId3,exceedNum3_1,exceedNum3_2,exceedNum3_3,exceedNum3_4,exceedItemId4,exceedNum4_1,exceedNum4_2,exceedNum4_3,exceedNum4_4";
-
 		public RARITY_TYPE rarity;
 
 		public GET_TYPE getType;
@@ -35,6 +34,8 @@ public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 		public uint exchangeMoney;
 
 		public ExceedNeedItem[] exceed;
+
+		public const string NT = "rarity,type,eventId,exchangeItemId,exchangeMoney,exceedItemId0,exceedNum0_1,exceedNum0_2,exceedNum0_3,exceedNum0_4,exceedItemId1,exceedNum1_1,exceedNum1_2,exceedNum1_3,exceedNum1_4,exceedItemId2,exceedNum2_1,exceedNum2_2,exceedNum2_3,exceedNum2_4,exceedItemId3,exceedNum3_1,exceedNum3_2,exceedNum3_3,exceedNum3_4,exceedItemId4,exceedNum4_1,exceedNum4_2,exceedNum4_3,exceedNum4_4";
 
 		public EquipItemExceedData Clone()
 		{
@@ -50,7 +51,7 @@ public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 
 		public static uint cb_parse_first_key(string key_str)
 		{
-			return (uint)(int)Enum.Parse(typeof(RARITY_TYPE), key_str);
+			return (uint)(RARITY_TYPE)Enum.Parse(typeof(RARITY_TYPE), key_str);
 		}
 
 		public static string cb_second_key(CSVReader csv, int table_data_num)
@@ -101,15 +102,33 @@ public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 
 	private DoubleUIntKeyTable<EquipItemExceedData> tableData;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntParseKey _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedData> _003C_003Ef__mg_0024cache3;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache4;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntParseKey _003C_003Ef__mg_0024cache5;
+
 	public void CreateTable(string csv_text)
 	{
-		tableData = TableUtility.CreateDoubleUIntKeyTable<EquipItemExceedData>(csv_text, EquipItemExceedData.cb, "rarity,type,eventId,exchangeItemId,exchangeMoney,exceedItemId0,exceedNum0_1,exceedNum0_2,exceedNum0_3,exceedNum0_4,exceedItemId1,exceedNum1_1,exceedNum1_2,exceedNum1_3,exceedNum1_4,exceedItemId2,exceedNum2_1,exceedNum2_2,exceedNum2_3,exceedNum2_4,exceedItemId3,exceedNum3_1,exceedNum3_2,exceedNum3_3,exceedNum3_4,exceedItemId4,exceedNum4_1,exceedNum4_2,exceedNum4_3,exceedNum4_4", EquipItemExceedData.cb_second_key, EquipItemExceedData.cb_parse_first_key, null, null);
+		tableData = TableUtility.CreateDoubleUIntKeyTable<EquipItemExceedData>(csv_text, EquipItemExceedData.cb, "rarity,type,eventId,exchangeItemId,exchangeMoney,exceedItemId0,exceedNum0_1,exceedNum0_2,exceedNum0_3,exceedNum0_4,exceedItemId1,exceedNum1_1,exceedNum1_2,exceedNum1_3,exceedNum1_4,exceedItemId2,exceedNum2_1,exceedNum2_2,exceedNum2_3,exceedNum2_4,exceedItemId3,exceedNum3_1,exceedNum3_2,exceedNum3_3,exceedNum3_4,exceedItemId4,exceedNum4_1,exceedNum4_2,exceedNum4_3,exceedNum4_4", EquipItemExceedData.cb_second_key, EquipItemExceedData.cb_parse_first_key);
 		tableData.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(tableData, csv_text, EquipItemExceedData.cb, "rarity,type,eventId,exchangeItemId,exchangeMoney,exceedItemId0,exceedNum0_1,exceedNum0_2,exceedNum0_3,exceedNum0_4,exceedItemId1,exceedNum1_1,exceedNum1_2,exceedNum1_3,exceedNum1_4,exceedItemId2,exceedNum2_1,exceedNum2_2,exceedNum2_3,exceedNum2_4,exceedItemId3,exceedNum3_1,exceedNum3_2,exceedNum3_3,exceedNum3_4,exceedItemId4,exceedNum4_1,exceedNum4_2,exceedNum4_3,exceedNum4_4", EquipItemExceedData.cb_second_key, EquipItemExceedData.cb_parse_first_key, null);
+		TableUtility.AddDoubleUIntKeyTable(tableData, csv_text, EquipItemExceedData.cb, "rarity,type,eventId,exchangeItemId,exchangeMoney,exceedItemId0,exceedNum0_1,exceedNum0_2,exceedNum0_3,exceedNum0_4,exceedItemId1,exceedNum1_1,exceedNum1_2,exceedNum1_3,exceedNum1_4,exceedItemId2,exceedNum2_1,exceedNum2_2,exceedNum2_3,exceedNum2_4,exceedItemId3,exceedNum3_1,exceedNum3_2,exceedNum3_3,exceedNum3_4,exceedItemId4,exceedNum4_1,exceedNum4_2,exceedNum4_3,exceedNum4_4", EquipItemExceedData.cb_second_key, EquipItemExceedData.cb_parse_first_key);
 	}
 
 	public EquipItemExceedData GetEquipItemExceedData(RARITY_TYPE rarity, GET_TYPE getType, int eventId = 0)

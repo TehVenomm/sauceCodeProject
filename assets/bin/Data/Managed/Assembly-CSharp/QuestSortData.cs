@@ -137,52 +137,52 @@ public class QuestSortData : SortCompareData
 	{
 		int num = 0;
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)GetMainEnemyID());
-		if (enemyData != null)
+		if (enemyData == null)
 		{
-			switch (enemyData.type)
-			{
-			default:
-				return 1;
-			case ENEMY_TYPE.GORILLA:
-				return 1;
-			case ENEMY_TYPE.RABBIT:
-				return 2;
-			case ENEMY_TYPE.CHIMERA:
-				return 4;
-			case ENEMY_TYPE.WOLF:
-				return 8;
-			case ENEMY_TYPE.DRAGON:
-				return 16;
-			case ENEMY_TYPE.DRAKE:
-				return 32;
-			case ENEMY_TYPE.WYVERN:
-				return 64;
-			case ENEMY_TYPE.UNDEAD_KNIGHT:
-				return 128;
-			case ENEMY_TYPE.WRAITH:
-				return 256;
-			case ENEMY_TYPE.GIANT:
-				return 512;
-			case ENEMY_TYPE.GOLEM:
-				return 1024;
-			case ENEMY_TYPE.ELEMENTAL:
-				return 2048;
-			case ENEMY_TYPE.CHICKEN:
-				return 4096;
-			case ENEMY_TYPE.MUSHROOM:
-				return 8192;
-			case ENEMY_TYPE.COW:
-				return 16384;
-			case ENEMY_TYPE.FROG:
-				return 32768;
-			case ENEMY_TYPE.BAT:
-				return 65536;
-			case ENEMY_TYPE.SLIME:
-				return 131072;
-			case ENEMY_TYPE.SAHUAGIN:
-				return 262144;
-			}
+			return 0;
 		}
-		return 0;
+		switch (enemyData.type)
+		{
+		default:
+			return 1;
+		case ENEMY_TYPE.GORILLA:
+			return 1;
+		case ENEMY_TYPE.RABBIT:
+			return 2;
+		case ENEMY_TYPE.CHIMERA:
+			return 4;
+		case ENEMY_TYPE.WOLF:
+			return 8;
+		case ENEMY_TYPE.DRAGON:
+			return 16;
+		case ENEMY_TYPE.DRAKE:
+			return 32;
+		case ENEMY_TYPE.WYVERN:
+			return 64;
+		case ENEMY_TYPE.UNDEAD_KNIGHT:
+			return 128;
+		case ENEMY_TYPE.WRAITH:
+			return 256;
+		case ENEMY_TYPE.GIANT:
+			return 512;
+		case ENEMY_TYPE.GOLEM:
+			return 1024;
+		case ENEMY_TYPE.ELEMENTAL:
+			return 2048;
+		case ENEMY_TYPE.CHICKEN:
+			return 4096;
+		case ENEMY_TYPE.MUSHROOM:
+			return 8192;
+		case ENEMY_TYPE.COW:
+			return 16384;
+		case ENEMY_TYPE.FROG:
+			return 32768;
+		case ENEMY_TYPE.BAT:
+			return 65536;
+		case ENEMY_TYPE.SLIME:
+			return 131072;
+		case ENEMY_TYPE.SAHUAGIN:
+			return 262144;
+		}
 	}
 }

@@ -1,34 +1,70 @@
 using rhyme;
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
 public static class EeLSettings
 {
+	[CompilerGenerated]
+	private static ResourceLoadFunc _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static SoundFunc _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static InitFxFunc _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static QueryDestroyFxFunc _003C_003Ef__mg_0024cache3;
+
+	[CompilerGenerated]
+	private static GetShaderFunc _003C_003Ef__mg_0024cache4;
+
 	public unsafe static void Startup()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Expected O, but got Unknown
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Expected O, but got Unknown
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Expected O, but got Unknown
 		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		rymFXManager.ResourceLoadDelegate = new ResourceLoadFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		rymFXManager.PlaySoundDelegate = new SoundFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		rymFXManager.InitFxDelegate = new InitFxFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		rymFXManager.QueryDestroyFxDelegate = new QueryDestroyFxFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		//IL_007e: Expected O, but got Unknown
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Expected O, but got Unknown
+		if (_003C_003Ef__mg_0024cache0 == null)
+		{
+			_003C_003Ef__mg_0024cache0 = new ResourceLoadFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		rymFXManager.ResourceLoadDelegate = _003C_003Ef__mg_0024cache0;
+		if (_003C_003Ef__mg_0024cache1 == null)
+		{
+			_003C_003Ef__mg_0024cache1 = new SoundFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		rymFXManager.PlaySoundDelegate = _003C_003Ef__mg_0024cache1;
+		if (_003C_003Ef__mg_0024cache2 == null)
+		{
+			_003C_003Ef__mg_0024cache2 = new InitFxFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		rymFXManager.InitFxDelegate = _003C_003Ef__mg_0024cache2;
+		if (_003C_003Ef__mg_0024cache3 == null)
+		{
+			_003C_003Ef__mg_0024cache3 = new QueryDestroyFxFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		rymFXManager.QueryDestroyFxDelegate = _003C_003Ef__mg_0024cache3;
 		rymFXManager.MeshBounds = new Bounds(Vector3.get_zero(), new Vector3(100000f, 100000f, 100000f));
 		rymFXManager.EnableLog = false;
-		rymFXManager.GetShaderDelegate = new GetShaderFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		if (_003C_003Ef__mg_0024cache4 == null)
+		{
+			_003C_003Ef__mg_0024cache4 = new GetShaderFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		}
+		rymFXManager.GetShaderDelegate = _003C_003Ef__mg_0024cache4;
 		rymFXTrail.ComplementMode = 0;
 		rymFXManager.ClearPoolObjects();
 		rymTPool<rymXorShift>.Precreate(32);
@@ -109,84 +145,72 @@ public static class EeLSettings
 		rymFXManager.EnableMaterialCache = false;
 	}
 
-	private unsafe static void OnResourceLoad(ResourceLoadWork work)
+	private static void OnResourceLoad(ResourceLoadWork work)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		if (!(((IntPtr)(void*)work).fx == null))
+		if (work.fx == null)
 		{
-			ResourceLink component = ((IntPtr)(void*)work).fx.GetComponent<ResourceLink>();
-			if (component != null)
+			return;
+		}
+		ResourceLink component = work.fx.GetComponent<ResourceLink>();
+		if (component != null)
+		{
+			rymList<string> textureNameList = work.fx.GetTextureNameList();
+			if (textureNameList != null)
 			{
-				rymList<string> textureNameList = ((IntPtr)(void*)work).fx.GetTextureNameList();
-				if (textureNameList != null)
+				int i = 0;
+				for (int size = textureNameList.size; i < size; i++)
 				{
-					int i = 0;
-					for (int size = textureNameList.size; i < size; i++)
+					string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(textureNameList.get_Item(i));
+					if (!string.IsNullOrEmpty(fileNameWithoutExtension))
 					{
-						string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(textureNameList.get_Item(i));
-						if (!string.IsNullOrEmpty(fileNameWithoutExtension))
-						{
-							((IntPtr)(void*)work).textures[i] = component.Get<Texture>(fileNameWithoutExtension);
-						}
+						work.textures[i] = component.Get<Texture>(fileNameWithoutExtension);
 					}
 				}
-				else
-				{
-					Debug.LogWarning((object)((IntPtr)(void*)work).fx.get_name());
-				}
 			}
-			((IntPtr)(void*)work).fx.ResourceLoadComplete();
+			else
+			{
+				Debug.LogWarning((object)work.fx.get_name());
+			}
 		}
+		work.fx.ResourceLoadComplete();
 	}
 
 	private static void PlaySound(rymFX fx, rymFXSoundInfo info)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Expected O, but got Unknown
-		if (fx.get_enabled() && (!info.loop || !(info.audio_source != null)) && !string.IsNullOrEmpty(info.clip_name))
+		if (!fx.get_enabled() || (info.loop && info.audio_source != null) || string.IsNullOrEmpty(info.clip_name))
 		{
-			ResourceLink component = fx.GetComponent<ResourceLink>();
-			if (component != null)
+			return;
+		}
+		ResourceLink component = fx.GetComponent<ResourceLink>();
+		if (!(component != null))
+		{
+			return;
+		}
+		string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(info.clip_name);
+		AudioClip val = component.Get<AudioClip>(fileNameWithoutExtension);
+		if (val != null)
+		{
+			AudioObject audioObject = SoundManager.PlaySE(val, info.loop, fx.get__transform());
+			if (audioObject != null && info.loop)
 			{
-				string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(info.clip_name);
-				AudioClip val = component.Get<AudioClip>(fileNameWithoutExtension);
-				if (val != null)
+				EffectInfoComponent component2 = fx.GetComponent<EffectInfoComponent>();
+				if (component2 != null)
 				{
-					AudioObject audioObject = SoundManager.PlaySE(val, info.loop, fx.get__transform());
-					if (audioObject != null && info.loop)
-					{
-						EffectInfoComponent component2 = fx.GetComponent<EffectInfoComponent>();
-						if (component2 != null)
-						{
-							component2.SetLoopAudioObject(audioObject);
-						}
-					}
-				}
-				else
-				{
-					Log.Error(LOG.RESOURCE, "{0} is not found. ({1})", fileNameWithoutExtension, fx.get_name());
+					component2.SetLoopAudioObject(audioObject);
 				}
 			}
+		}
+		else
+		{
+			Log.Error(LOG.RESOURCE, "{0} is not found. ({1})", fileNameWithoutExtension, fx.get_name());
 		}
 	}
 
 	private static void InitFx(rymFX fx, bool binary)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		if (fx.get_gameObject().get_layer() != 5)
 		{
-			SceneSettingsManager.ApplyEffect(fx, false);
+			SceneSettingsManager.ApplyEffect(fx, force: false);
 		}
 	}
 
@@ -197,9 +221,7 @@ public static class EeLSettings
 
 	private static bool OnQueryDestroyFx(rymFX fx)
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		if (MonoBehaviourSingleton<EffectManager>.IsValid() && MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(fx.get_gameObject(), false))
+		if (MonoBehaviourSingleton<EffectManager>.IsValid() && MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(fx.get_gameObject(), no_stock_to_destroy: false))
 		{
 			return false;
 		}

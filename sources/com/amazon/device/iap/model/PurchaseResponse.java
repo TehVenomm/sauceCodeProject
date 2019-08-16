@@ -1,7 +1,7 @@
 package com.amazon.device.iap.model;
 
 import com.amazon.device.iap.internal.model.PurchaseResponseBuilder;
-import com.amazon.device.iap.internal.util.C0243d;
+import com.amazon.device.iap.internal.util.C0408d;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,16 +24,19 @@ public final class PurchaseResponse {
         NOT_SUPPORTED;
 
         public static RequestStatus safeValueOf(String str) {
-            return C0243d.m172a(str) ? null : "ALREADY_ENTITLED".equalsIgnoreCase(str) ? ALREADY_PURCHASED : valueOf(str.toUpperCase());
+            if (C0408d.m167a(str)) {
+                return null;
+            }
+            return "ALREADY_ENTITLED".equalsIgnoreCase(str) ? ALREADY_PURCHASED : valueOf(str.toUpperCase());
         }
     }
 
     public PurchaseResponse(PurchaseResponseBuilder purchaseResponseBuilder) {
-        C0243d.m169a(purchaseResponseBuilder.getRequestId(), REQUEST_ID);
-        C0243d.m169a(purchaseResponseBuilder.getRequestStatus(), REQUEST_STATUS);
+        C0408d.m164a((Object) purchaseResponseBuilder.getRequestId(), REQUEST_ID);
+        C0408d.m164a((Object) purchaseResponseBuilder.getRequestStatus(), REQUEST_STATUS);
         if (purchaseResponseBuilder.getRequestStatus() == RequestStatus.SUCCESSFUL) {
-            C0243d.m169a(purchaseResponseBuilder.getReceipt(), RECEIPT);
-            C0243d.m169a(purchaseResponseBuilder.getUserData(), USER_DATA);
+            C0408d.m164a((Object) purchaseResponseBuilder.getReceipt(), RECEIPT);
+            C0408d.m164a((Object) purchaseResponseBuilder.getUserData(), USER_DATA);
         }
         this.requestId = purchaseResponseBuilder.getRequestId();
         this.userData = purchaseResponseBuilder.getUserData();
@@ -67,9 +70,6 @@ public final class PurchaseResponse {
     }
 
     public String toString() {
-        String obj = super.toString();
-        RequestId requestId = this.requestId;
-        String requestStatus = this.requestStatus != null ? this.requestStatus.toString() : "null";
-        return String.format(TO_STRING_FORMAT, new Object[]{obj, requestId, requestStatus, this.userData, this.receipt});
+        return String.format(TO_STRING_FORMAT, new Object[]{super.toString(), this.requestId, this.requestStatus != null ? this.requestStatus.toString() : "null", this.userData, this.receipt});
     }
 }

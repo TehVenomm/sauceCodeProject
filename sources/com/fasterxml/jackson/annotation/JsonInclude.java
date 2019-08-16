@@ -45,7 +45,8 @@ public @interface JsonInclude {
             return EMPTY;
         }
 
-        protected Object readResolve() {
+        /* access modifiers changed from: protected */
+        public Object readResolve() {
             if (this._valueInclusion == Include.USE_DEFAULTS && this._contentInclusion == Include.USE_DEFAULTS) {
                 return EMPTY;
             }
@@ -53,23 +54,22 @@ public @interface JsonInclude {
         }
 
         public Value withOverrides(Value value) {
-            Object obj = 1;
+            boolean z = true;
             if (value == null || value == EMPTY) {
                 return this;
             }
             Include include = value._valueInclusion;
             Include include2 = value._contentInclusion;
-            Object obj2 = (include == this._valueInclusion || include == Include.USE_DEFAULTS) ? null : 1;
+            boolean z2 = (include == this._valueInclusion || include == Include.USE_DEFAULTS) ? false : true;
             if (include2 == this._contentInclusion || include2 == Include.USE_DEFAULTS) {
-                obj = null;
+                z = false;
             }
-            if (obj2 != null) {
-                if (obj == null) {
-                    return new Value(include, this._contentInclusion);
+            if (z2) {
+                if (z) {
+                    return new Value(include, include2);
                 }
-                this(include, include2);
-                return this;
-            } else if (obj != null) {
+                return new Value(include, this._contentInclusion);
+            } else if (z) {
                 return new Value(this._valueInclusion, include2);
             } else {
                 return this;

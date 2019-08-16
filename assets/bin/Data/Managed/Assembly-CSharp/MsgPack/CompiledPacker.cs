@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace MsgPack
@@ -65,6 +66,21 @@ namespace MsgPack
 			private static Dictionary<Type, IDictionary<string, int>> UnpackMemberMappings;
 
 			private static int _dynamicMethodIdx;
+
+			[CompilerGenerated]
+			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache0;
+
+			[CompilerGenerated]
+			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache1;
+
+			[CompilerGenerated]
+			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache2;
+
+			[CompilerGenerated]
+			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache3;
+
+			[CompilerGenerated]
+			private static Func<Type, IDictionary<string, int>> _003C_003Ef__mg_0024cache4;
 
 			static DynamicMethodPacker()
 			{
@@ -163,7 +179,7 @@ namespace MsgPack
 			private static DynamicMethod CreateDynamicMethod(Type returnType, Type[] parameterTypes)
 			{
 				string name = "_" + Interlocked.Increment(ref _dynamicMethodIdx).ToString();
-				return new DynamicMethod(name, returnType, parameterTypes, true);
+				return new DynamicMethod(name, returnType, parameterTypes, restrictedSkipVisibility: true);
 			}
 
 			internal static IDictionary<string, int> LookupMemberMapping(Type t)
@@ -195,6 +211,21 @@ namespace MsgPack
 
 			private static Dictionary<Type, IDictionary<string, int>> UnpackMemberMappings;
 
+			[CompilerGenerated]
+			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache0;
+
+			[CompilerGenerated]
+			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache1;
+
+			[CompilerGenerated]
+			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache2;
+
+			[CompilerGenerated]
+			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache3;
+
+			[CompilerGenerated]
+			private static Func<Type, IDictionary<string, int>> _003C_003Ef__mg_0024cache4;
+
 			static MethodBuilderPacker()
 			{
 				UnpackMemberMappings = new Dictionary<Type, IDictionary<string, int>>();
@@ -207,18 +238,18 @@ namespace MsgPack
 			protected override Action<MsgPackWriter, T> CreatePacker_Internal<T>()
 			{
 				CreatePackMethodBuilder(typeof(T), out TypeBuilder tb, out MethodBuilder mb);
-				_packMethods.Add(typeof(T), (MethodInfo)mb);
+				_packMethods.Add(typeof(T), mb);
 				CreatePacker(typeof(T), mb);
-				MethodInfo method = ToCallableMethodInfo(typeof(T), tb, true);
+				MethodInfo method = ToCallableMethodInfo(typeof(T), tb, isPacker: true);
 				return (Action<MsgPackWriter, T>)Delegate.CreateDelegate(typeof(Action<MsgPackWriter, T>), method);
 			}
 
 			protected override Func<MsgPackReader, T> CreateUnpacker_Internal<T>()
 			{
 				CreateUnpackMethodBuilder(typeof(T), out TypeBuilder tb, out MethodBuilder mb);
-				_unpackMethods.Add(typeof(T), (MethodInfo)mb);
+				_unpackMethods.Add(typeof(T), mb);
 				CreateUnpacker(typeof(T), mb);
-				MethodInfo method = ToCallableMethodInfo(typeof(T), tb, false);
+				MethodInfo method = ToCallableMethodInfo(typeof(T), tb, isPacker: false);
 				return (Func<MsgPackReader, T>)Delegate.CreateDelegate(typeof(Func<MsgPackReader, T>), method);
 			}
 
@@ -258,7 +289,7 @@ namespace MsgPack
 				CreatePackMethodBuilder(t, out TypeBuilder tb, out MethodBuilder mb);
 				_packMethods.Add(t, mb);
 				CreatePacker(t, mb);
-				return ToCallableMethodInfo(t, tb, true);
+				return ToCallableMethodInfo(t, tb, isPacker: true);
 			}
 
 			private MethodInfo LookupUnpackMethod(Type t)
@@ -270,7 +301,7 @@ namespace MsgPack
 				CreateUnpackMethodBuilder(t, out TypeBuilder tb, out MethodBuilder mb);
 				_unpackMethods.Add(t, mb);
 				CreateUnpacker(t, mb);
-				return ToCallableMethodInfo(t, tb, false);
+				return ToCallableMethodInfo(t, tb, isPacker: false);
 			}
 
 			private static string FormatMemberName(MemberInfo m)
@@ -354,7 +385,7 @@ namespace MsgPack
 				}
 				else
 				{
-					writer.Write(x, false);
+					writer.Write(x, highProbAscii: false);
 				}
 			}
 
@@ -487,20 +518,20 @@ namespace MsgPack
 
 		private PackerBase _packer;
 
+		static CompiledPacker()
+		{
+			_publicFieldPacker = new MethodBuilderPacker();
+			_allFieldPacker = new DynamicMethodPacker();
+		}
+
 		public CompiledPacker()
-			: this(false)
+			: this(packPrivateField: false)
 		{
 		}
 
 		public CompiledPacker(bool packPrivateField)
 		{
 			_packer = ((!packPrivateField) ? _publicFieldPacker : _allFieldPacker);
-		}
-
-		static CompiledPacker()
-		{
-			_publicFieldPacker = new MethodBuilderPacker();
-			_allFieldPacker = new DynamicMethodPacker();
 		}
 
 		public void Prepare<T>()
@@ -515,9 +546,6 @@ namespace MsgPack
 			{
 				Pack(memoryStream, o);
 				return memoryStream.ToArray();
-				IL_001a:
-				byte[] result;
-				return result;
 			}
 		}
 
@@ -536,9 +564,6 @@ namespace MsgPack
 			using (MemoryStream strm = new MemoryStream(buf, offset, size))
 			{
 				return Unpack<T>(strm);
-				IL_0016:
-				T result;
-				return result;
 			}
 		}
 
@@ -553,9 +578,6 @@ namespace MsgPack
 			{
 				Pack(memoryStream, o);
 				return memoryStream.ToArray();
-				IL_001a:
-				byte[] result;
-				return result;
 			}
 		}
 
@@ -574,9 +596,6 @@ namespace MsgPack
 			using (MemoryStream strm = new MemoryStream(buf, offset, size))
 			{
 				return Unpack(t, strm);
-				IL_0018:
-				object result;
-				return result;
 			}
 		}
 

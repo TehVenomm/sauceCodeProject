@@ -18,6 +18,8 @@ public class OnceInventoryModel : BaseModel
 		public List<QuestItem> questItem = new List<QuestItem>();
 
 		public List<AbilityItem> abilityItem = new List<AbilityItem>();
+
+		public List<Accessory> accessory = new List<Accessory>();
 	}
 
 	public class RequestSendForm
@@ -31,6 +33,8 @@ public class OnceInventoryModel : BaseModel
 		public int req_qi;
 
 		public int req_ai;
+
+		public int req_ac;
 	}
 
 	public static string URL = "ajax/once/inventory";

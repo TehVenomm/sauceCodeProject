@@ -1,9 +1,9 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/Orthographic Camera")]
-[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
-public class UIOrthoCamera
+[RequireComponent(typeof(Camera))]
+[AddComponentMenu("NGUI/UI/Orthographic Camera")]
+public class UIOrthoCamera : MonoBehaviour
 {
 	private Camera mCam;
 
@@ -16,8 +16,6 @@ public class UIOrthoCamera
 
 	private void Start()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
 		mCam = this.GetComponent<Camera>();
 		mTrans = this.get_transform();
 		mCam.set_orthographic(true);
@@ -29,8 +27,8 @@ public class UIOrthoCamera
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		Rect rect = mCam.get_rect();
 		float num = rect.get_yMin() * (float)Screen.get_height();
 		Rect rect2 = mCam.get_rect();

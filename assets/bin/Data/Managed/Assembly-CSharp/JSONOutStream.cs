@@ -66,81 +66,81 @@ public class JSONOutStream
 
 	public JSONOutStream Content(string tag, int value)
 	{
-		node.AddField(tag, new JSONNumberFieldValue((double)value));
+		node.AddField(tag, new JSONNumberFieldValue(value));
 		return this;
 	}
 
 	public JSONOutStream Content(int idx, int value)
 	{
-		node.AddField(idx, new JSONNumberFieldValue((double)value));
+		node.AddField(idx, new JSONNumberFieldValue(value));
 		return this;
 	}
 
 	public JSONOutStream Content(int value)
 	{
-		node.AddField(new JSONNumberFieldValue((double)value));
+		node.AddField(new JSONNumberFieldValue(value));
 		return this;
 	}
 
 	public JSONOutStream Content(string tag, XorInt value)
 	{
-		node.AddField(tag, new JSONNumberFieldValue((double)(int)value));
+		node.AddField(tag, new JSONNumberFieldValue((int)value));
 		return this;
 	}
 
 	public JSONOutStream Content(int idx, XorInt value)
 	{
-		node.AddField(idx, new JSONNumberFieldValue((double)(int)value));
+		node.AddField(idx, new JSONNumberFieldValue((int)value));
 		return this;
 	}
 
 	public JSONOutStream Content(XorInt value)
 	{
-		node.AddField(new JSONNumberFieldValue((double)(int)value));
+		node.AddField(new JSONNumberFieldValue((int)value));
 		return this;
 	}
 
 	public JSONOutStream Content(string tag, XorUInt value)
 	{
-		node.AddField(tag, new JSONNumberFieldValue((double)(uint)value));
+		node.AddField(tag, new JSONNumberFieldValue((uint)value));
 		return this;
 	}
 
 	public JSONOutStream Content(int idx, XorUInt value)
 	{
-		node.AddField(idx, new JSONNumberFieldValue((double)(uint)value));
+		node.AddField(idx, new JSONNumberFieldValue((uint)value));
 		return this;
 	}
 
 	public JSONOutStream Content(XorUInt value)
 	{
-		node.AddField(new JSONNumberFieldValue((double)(uint)value));
+		node.AddField(new JSONNumberFieldValue((uint)value));
 		return this;
 	}
 
 	public JSONOutStream Content(string tag, XorFloat value)
 	{
-		node.AddField(tag, new JSONNumberFieldValue((double)(float)value));
+		node.AddField(tag, new JSONNumberFieldValue((float)value));
 		return this;
 	}
 
 	public JSONOutStream Content(int idx, XorFloat value)
 	{
-		node.AddField(idx, new JSONNumberFieldValue((double)(float)value));
+		node.AddField(idx, new JSONNumberFieldValue((float)value));
 		return this;
 	}
 
 	public JSONOutStream Content(XorFloat value)
 	{
-		node.AddField(new JSONNumberFieldValue((double)(float)value));
+		node.AddField(new JSONNumberFieldValue((float)value));
 		return this;
 	}
 
 	public JSONOutStream Content(string tag, Vector2 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
 		node.AddField(tag, new JSONListFieldValue(list));
 		return this;
 	}
@@ -148,8 +148,8 @@ public class JSONOutStream
 	public JSONOutStream Content(int idx, Vector2 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
 		node.AddField(idx, new JSONListFieldValue(list));
 		return this;
 	}
@@ -157,8 +157,8 @@ public class JSONOutStream
 	public JSONOutStream Content(Vector2 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
 		node.AddField(new JSONListFieldValue(list));
 		return this;
 	}
@@ -166,9 +166,9 @@ public class JSONOutStream
 	public JSONOutStream Content(string tag, Vector3 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
 		node.AddField(tag, new JSONListFieldValue(list));
 		return this;
 	}
@@ -176,9 +176,9 @@ public class JSONOutStream
 	public JSONOutStream Content(int idx, Vector3 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
 		node.AddField(idx, new JSONListFieldValue(list));
 		return this;
 	}
@@ -186,9 +186,9 @@ public class JSONOutStream
 	public JSONOutStream Content(Vector3 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
 		node.AddField(new JSONListFieldValue(list));
 		return this;
 	}
@@ -196,10 +196,10 @@ public class JSONOutStream
 	public JSONOutStream Content(string tag, Vector4 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
-		list.Add(new JSONNumberFieldValue((double)value.w));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
+		list.Add(new JSONNumberFieldValue(value.w));
 		node.AddField(tag, new JSONListFieldValue(list));
 		return this;
 	}
@@ -207,10 +207,10 @@ public class JSONOutStream
 	public JSONOutStream Content(int idx, Vector4 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
-		list.Add(new JSONNumberFieldValue((double)value.w));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
+		list.Add(new JSONNumberFieldValue(value.w));
 		node.AddField(idx, new JSONListFieldValue(list));
 		return this;
 	}
@@ -218,10 +218,10 @@ public class JSONOutStream
 	public JSONOutStream Content(Vector4 value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
-		list.Add(new JSONNumberFieldValue((double)value.w));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
+		list.Add(new JSONNumberFieldValue(value.w));
 		node.AddField(new JSONListFieldValue(list));
 		return this;
 	}
@@ -229,10 +229,10 @@ public class JSONOutStream
 	public JSONOutStream Content(string tag, Quaternion value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
-		list.Add(new JSONNumberFieldValue((double)value.w));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
+		list.Add(new JSONNumberFieldValue(value.w));
 		node.AddField(tag, new JSONListFieldValue(list));
 		return this;
 	}
@@ -240,10 +240,10 @@ public class JSONOutStream
 	public JSONOutStream Content(int idx, Quaternion value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
-		list.Add(new JSONNumberFieldValue((double)value.w));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
+		list.Add(new JSONNumberFieldValue(value.w));
 		node.AddField(idx, new JSONListFieldValue(list));
 		return this;
 	}
@@ -251,10 +251,10 @@ public class JSONOutStream
 	public JSONOutStream Content(Quaternion value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.x));
-		list.Add(new JSONNumberFieldValue((double)value.y));
-		list.Add(new JSONNumberFieldValue((double)value.z));
-		list.Add(new JSONNumberFieldValue((double)value.w));
+		list.Add(new JSONNumberFieldValue(value.x));
+		list.Add(new JSONNumberFieldValue(value.y));
+		list.Add(new JSONNumberFieldValue(value.z));
+		list.Add(new JSONNumberFieldValue(value.w));
 		node.AddField(new JSONListFieldValue(list));
 		return this;
 	}
@@ -262,10 +262,10 @@ public class JSONOutStream
 	public JSONOutStream Content(string tag, Color value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.r));
-		list.Add(new JSONNumberFieldValue((double)value.g));
-		list.Add(new JSONNumberFieldValue((double)value.b));
-		list.Add(new JSONNumberFieldValue((double)value.a));
+		list.Add(new JSONNumberFieldValue(value.r));
+		list.Add(new JSONNumberFieldValue(value.g));
+		list.Add(new JSONNumberFieldValue(value.b));
+		list.Add(new JSONNumberFieldValue(value.a));
 		node.AddField(tag, new JSONListFieldValue(list));
 		return this;
 	}
@@ -273,10 +273,10 @@ public class JSONOutStream
 	public JSONOutStream Content(int idx, Color value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.r));
-		list.Add(new JSONNumberFieldValue((double)value.g));
-		list.Add(new JSONNumberFieldValue((double)value.b));
-		list.Add(new JSONNumberFieldValue((double)value.a));
+		list.Add(new JSONNumberFieldValue(value.r));
+		list.Add(new JSONNumberFieldValue(value.g));
+		list.Add(new JSONNumberFieldValue(value.b));
+		list.Add(new JSONNumberFieldValue(value.a));
 		node.AddField(idx, new JSONListFieldValue(list));
 		return this;
 	}
@@ -284,10 +284,10 @@ public class JSONOutStream
 	public JSONOutStream Content(Color value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.r));
-		list.Add(new JSONNumberFieldValue((double)value.g));
-		list.Add(new JSONNumberFieldValue((double)value.b));
-		list.Add(new JSONNumberFieldValue((double)value.a));
+		list.Add(new JSONNumberFieldValue(value.r));
+		list.Add(new JSONNumberFieldValue(value.g));
+		list.Add(new JSONNumberFieldValue(value.b));
+		list.Add(new JSONNumberFieldValue(value.a));
 		node.AddField(new JSONListFieldValue(list));
 		return this;
 	}
@@ -295,10 +295,10 @@ public class JSONOutStream
 	public JSONOutStream Content(string tag, Rect value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.get_x()));
-		list.Add(new JSONNumberFieldValue((double)value.get_y()));
-		list.Add(new JSONNumberFieldValue((double)value.get_width()));
-		list.Add(new JSONNumberFieldValue((double)value.get_height()));
+		list.Add(new JSONNumberFieldValue(value.get_x()));
+		list.Add(new JSONNumberFieldValue(value.get_y()));
+		list.Add(new JSONNumberFieldValue(value.get_width()));
+		list.Add(new JSONNumberFieldValue(value.get_height()));
 		node.AddField(tag, new JSONListFieldValue(list));
 		return this;
 	}
@@ -306,10 +306,10 @@ public class JSONOutStream
 	public JSONOutStream Content(int idx, Rect value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.get_x()));
-		list.Add(new JSONNumberFieldValue((double)value.get_y()));
-		list.Add(new JSONNumberFieldValue((double)value.get_width()));
-		list.Add(new JSONNumberFieldValue((double)value.get_height()));
+		list.Add(new JSONNumberFieldValue(value.get_x()));
+		list.Add(new JSONNumberFieldValue(value.get_y()));
+		list.Add(new JSONNumberFieldValue(value.get_width()));
+		list.Add(new JSONNumberFieldValue(value.get_height()));
 		node.AddField(idx, new JSONListFieldValue(list));
 		return this;
 	}
@@ -317,10 +317,10 @@ public class JSONOutStream
 	public JSONOutStream Content(Rect value)
 	{
 		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		list.Add(new JSONNumberFieldValue((double)value.get_x()));
-		list.Add(new JSONNumberFieldValue((double)value.get_y()));
-		list.Add(new JSONNumberFieldValue((double)value.get_width()));
-		list.Add(new JSONNumberFieldValue((double)value.get_height()));
+		list.Add(new JSONNumberFieldValue(value.get_x()));
+		list.Add(new JSONNumberFieldValue(value.get_y()));
+		list.Add(new JSONNumberFieldValue(value.get_width()));
+		list.Add(new JSONNumberFieldValue(value.get_height()));
 		node.AddField(new JSONListFieldValue(list));
 		return this;
 	}

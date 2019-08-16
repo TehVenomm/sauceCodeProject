@@ -10,7 +10,6 @@ import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,42 +17,42 @@ public class DiagnosticSupport {
     public static final int ANDROID_API_LEVEL;
 
     static {
-        int i;
+        int parseInt;
         try {
-            i = VERSION.class.getField("SDK_INT").getInt(null);
+            parseInt = VERSION.class.getField("SDK_INT").getInt(null);
         } catch (Exception e) {
-            i = Integer.parseInt(VERSION.SDK);
+            parseInt = Integer.parseInt(VERSION.SDK);
         }
-        ANDROID_API_LEVEL = i;
+        ANDROID_API_LEVEL = parseInt;
     }
 
-    public static String createDiagnosis(Activity activity, Exception exception) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Application version: " + getApplicationVersionString(activity) + StringUtils.LF);
-        stringBuilder.append("Device locale: " + Locale.getDefault().toString() + "\n\n");
-        stringBuilder.append("Android ID: " + getAndroidId(activity, "n/a"));
-        stringBuilder.append("PHONE SPECS\n");
-        stringBuilder.append("model: " + Build.MODEL + StringUtils.LF);
-        stringBuilder.append("brand: " + Build.BRAND + StringUtils.LF);
-        stringBuilder.append("product: " + Build.PRODUCT + StringUtils.LF);
-        stringBuilder.append("device: " + Build.DEVICE + "\n\n");
-        stringBuilder.append("PLATFORM INFO\n");
-        stringBuilder.append("Android " + VERSION.RELEASE + " " + Build.ID + " (build " + VERSION.INCREMENTAL + ")\n");
-        stringBuilder.append("build tags: " + Build.TAGS + StringUtils.LF);
-        stringBuilder.append("build type: " + Build.TYPE + "\n\n");
-        stringBuilder.append("SYSTEM SETTINGS\n");
+    public static String createDiagnosis(Activity activity, Exception exc) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Application version: " + getApplicationVersionString(activity) + StringUtils.f1199LF);
+        sb.append("Device locale: " + Locale.getDefault().toString() + "\n\n");
+        sb.append("Android ID: " + getAndroidId(activity, "n/a"));
+        sb.append("PHONE SPECS\n");
+        sb.append("model: " + Build.MODEL + StringUtils.f1199LF);
+        sb.append("brand: " + Build.BRAND + StringUtils.f1199LF);
+        sb.append("product: " + Build.PRODUCT + StringUtils.f1199LF);
+        sb.append("device: " + Build.DEVICE + "\n\n");
+        sb.append("PLATFORM INFO\n");
+        sb.append("Android " + VERSION.RELEASE + " " + Build.ID + " (build " + VERSION.INCREMENTAL + ")\n");
+        sb.append("build tags: " + Build.TAGS + StringUtils.f1199LF);
+        sb.append("build type: " + Build.TYPE + "\n\n");
+        sb.append("SYSTEM SETTINGS\n");
         ContentResolver contentResolver = activity.getContentResolver();
         try {
-            stringBuilder.append("network mode: " + (Secure.getInt(contentResolver, "wifi_on") == 0 ? "DATA" : "WIFI") + StringUtils.LF);
-            stringBuilder.append("HTTP proxy: " + Secure.getString(contentResolver, "http_proxy") + "\n\n");
+            sb.append("network mode: " + (Secure.getInt(contentResolver, "wifi_on") == 0 ? "DATA" : "WIFI") + StringUtils.f1199LF);
+            sb.append("HTTP proxy: " + Secure.getString(contentResolver, "http_proxy") + "\n\n");
         } catch (SettingNotFoundException e) {
             e.printStackTrace();
         }
-        stringBuilder.append("STACK TRACE FOLLOWS\n\n");
-        Writer stringWriter = new StringWriter();
-        exception.printStackTrace(new PrintWriter(stringWriter));
-        stringBuilder.append(stringWriter.toString());
-        return stringBuilder.toString();
+        sb.append("STACK TRACE FOLLOWS\n\n");
+        StringWriter stringWriter = new StringWriter();
+        exc.printStackTrace(new PrintWriter(stringWriter));
+        sb.append(stringWriter.toString());
+        return sb.toString();
     }
 
     public static String getAndroidId(Context context) {

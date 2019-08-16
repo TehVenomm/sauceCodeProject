@@ -2,17 +2,13 @@ package com.fasterxml.jackson.databind.deser;
 
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonFormat.Value;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.ObjectIdGenerator;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator;
-import com.fasterxml.jackson.annotation.ObjectIdResolver;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.BeanProperty.Std;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -31,7 +27,6 @@ import com.fasterxml.jackson.databind.deser.impl.ObjectIdReader;
 import com.fasterxml.jackson.databind.deser.impl.ObjectIdReferenceProperty;
 import com.fasterxml.jackson.databind.deser.impl.ObjectIdValueProperty;
 import com.fasterxml.jackson.databind.deser.impl.PropertyBasedCreator;
-import com.fasterxml.jackson.databind.deser.impl.PropertyBasedObjectIdGenerator;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId;
 import com.fasterxml.jackson.databind.deser.impl.TypeWrappedDeserializer;
 import com.fasterxml.jackson.databind.deser.impl.UnwrappedPropertyHandler;
@@ -39,14 +34,12 @@ import com.fasterxml.jackson.databind.deser.impl.ValueInjector;
 import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.exc.IgnoredPropertyException;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedWithParams;
 import com.fasterxml.jackson.databind.introspect.ObjectIdInfo;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.type.ClassKey;
 import com.fasterxml.jackson.databind.util.Annotations;
-import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.databind.util.Converter;
 import com.fasterxml.jackson.databind.util.NameTransformer;
@@ -88,9 +81,11 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
     protected final ValueInstantiator _valueInstantiator;
     protected boolean _vanillaProcessing;
 
-    protected abstract Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException;
+    /* access modifiers changed from: protected */
+    public abstract Object _deserializeUsingPropertyBased(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException;
 
-    protected abstract BeanDeserializerBase asArrayDeserializer();
+    /* access modifiers changed from: protected */
+    public abstract BeanDeserializerBase asArrayDeserializer();
 
     public abstract Object deserializeFromObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException;
 
@@ -114,8 +109,7 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         this._ignoreAllUnknown = z;
         this._anySetter = beanDeserializerBuilder.getAnySetter();
         List injectables = beanDeserializerBuilder.getInjectables();
-        ValueInjector[] valueInjectorArr = (injectables == null || injectables.isEmpty()) ? null : (ValueInjector[]) injectables.toArray(new ValueInjector[injectables.size()]);
-        this._injectables = valueInjectorArr;
+        this._injectables = (injectables == null || injectables.isEmpty()) ? null : (ValueInjector[]) injectables.toArray(new ValueInjector[injectables.size()]);
         this._objectIdReader = beanDeserializerBuilder.getObjectIdReader();
         if (this._unwrappedPropertyHandler != null || this._valueInstantiator.canCreateUsingDelegate() || this._valueInstantiator.canCreateFromObjectWith() || !this._valueInstantiator.canCreateUsingDefault()) {
             z3 = true;
@@ -169,8 +163,7 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         this._propertyBasedCreator = beanDeserializerBase._propertyBasedCreator;
         this._backRefs = beanDeserializerBase._backRefs;
         this._ignorableProps = beanDeserializerBase._ignorableProps;
-        boolean z = nameTransformer != null || beanDeserializerBase._ignoreAllUnknown;
-        this._ignoreAllUnknown = z;
+        this._ignoreAllUnknown = nameTransformer != null || beanDeserializerBase._ignoreAllUnknown;
         this._anySetter = beanDeserializerBase._anySetter;
         this._injectables = beanDeserializerBase._injectables;
         this._objectIdReader = beanDeserializerBase._objectIdReader;
@@ -238,121 +231,124 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
     }
 
     public void resolve(DeserializationContext deserializationContext) throws JsonMappingException {
-        SettableBeanProperty[] fromObjectArguments;
+        SettableBeanProperty[] settableBeanPropertyArr;
         Builder builder;
-        int i;
-        JavaType delegateType;
         boolean z;
-        UnwrappedPropertyHandler unwrappedPropertyHandler = null;
+        SettableBeanProperty settableBeanProperty;
+        Builder builder2;
+        UnwrappedPropertyHandler unwrappedPropertyHandler;
+        UnwrappedPropertyHandler unwrappedPropertyHandler2 = null;
         if (this._valueInstantiator.canCreateFromObjectWith()) {
-            fromObjectArguments = this._valueInstantiator.getFromObjectArguments(deserializationContext.getConfig());
+            settableBeanPropertyArr = this._valueInstantiator.getFromObjectArguments(deserializationContext.getConfig());
             builder = null;
-            for (SettableBeanProperty settableBeanProperty : fromObjectArguments) {
-                if (settableBeanProperty.hasValueTypeDeserializer()) {
-                    TypeDeserializer valueTypeDeserializer = settableBeanProperty.getValueTypeDeserializer();
-                    if (valueTypeDeserializer.getTypeInclusion() == As.EXTERNAL_PROPERTY) {
+            for (SettableBeanProperty settableBeanProperty2 : settableBeanPropertyArr) {
+                if (settableBeanProperty2.hasValueTypeDeserializer()) {
+                    TypeDeserializer valueTypeDeserializer = settableBeanProperty2.getValueTypeDeserializer();
+                    if (valueTypeDeserializer.getTypeInclusion() == C0861As.EXTERNAL_PROPERTY) {
                         if (builder == null) {
                             builder = new Builder();
                         }
-                        builder.addExternal(settableBeanProperty, valueTypeDeserializer);
+                        builder.addExternal(settableBeanProperty2, valueTypeDeserializer);
                     }
                 }
             }
         } else {
-            fromObjectArguments = null;
+            settableBeanPropertyArr = null;
             builder = null;
         }
         Iterator it = this._beanProperties.iterator();
-        Builder builder2 = builder;
+        Builder builder3 = builder;
         while (it.hasNext()) {
-            SettableBeanProperty withValueDeserializer;
-            SettableBeanProperty settableBeanProperty2 = (SettableBeanProperty) it.next();
-            JsonDeserializer valueDeserializer;
-            if (settableBeanProperty2.hasValueDeserializer()) {
-                valueDeserializer = settableBeanProperty2.getValueDeserializer();
-                JsonDeserializer handlePrimaryContextualization = deserializationContext.handlePrimaryContextualization(valueDeserializer, settableBeanProperty2, settableBeanProperty2.getType());
+            SettableBeanProperty settableBeanProperty3 = (SettableBeanProperty) it.next();
+            if (!settableBeanProperty3.hasValueDeserializer()) {
+                JsonDeserializer findConvertingDeserializer = findConvertingDeserializer(deserializationContext, settableBeanProperty3);
+                if (findConvertingDeserializer == null) {
+                    findConvertingDeserializer = findDeserializer(deserializationContext, settableBeanProperty3.getType(), settableBeanProperty3);
+                }
+                settableBeanProperty = settableBeanProperty3.withValueDeserializer(findConvertingDeserializer);
+            } else {
+                JsonDeserializer valueDeserializer = settableBeanProperty3.getValueDeserializer();
+                JsonDeserializer handlePrimaryContextualization = deserializationContext.handlePrimaryContextualization(valueDeserializer, settableBeanProperty3, settableBeanProperty3.getType());
                 if (handlePrimaryContextualization != valueDeserializer) {
-                    withValueDeserializer = settableBeanProperty2.withValueDeserializer(handlePrimaryContextualization);
+                    settableBeanProperty = settableBeanProperty3.withValueDeserializer(handlePrimaryContextualization);
                 } else {
-                    withValueDeserializer = settableBeanProperty2;
+                    settableBeanProperty = settableBeanProperty3;
                 }
-            } else {
-                valueDeserializer = findConvertingDeserializer(deserializationContext, settableBeanProperty2);
-                if (valueDeserializer == null) {
-                    valueDeserializer = findDeserializer(deserializationContext, settableBeanProperty2.getType(), settableBeanProperty2);
-                }
-                withValueDeserializer = settableBeanProperty2.withValueDeserializer(valueDeserializer);
             }
-            withValueDeserializer = _resolveManagedReferenceProperty(deserializationContext, withValueDeserializer);
-            if (!(withValueDeserializer instanceof ManagedReferenceProperty)) {
-                withValueDeserializer = _resolvedObjectIdProperty(deserializationContext, withValueDeserializer);
+            SettableBeanProperty _resolveManagedReferenceProperty = _resolveManagedReferenceProperty(deserializationContext, settableBeanProperty);
+            if (!(_resolveManagedReferenceProperty instanceof ManagedReferenceProperty)) {
+                _resolveManagedReferenceProperty = _resolvedObjectIdProperty(deserializationContext, _resolveManagedReferenceProperty);
             }
-            SettableBeanProperty _resolveUnwrappedProperty = _resolveUnwrappedProperty(deserializationContext, withValueDeserializer);
+            SettableBeanProperty _resolveUnwrappedProperty = _resolveUnwrappedProperty(deserializationContext, _resolveManagedReferenceProperty);
             if (_resolveUnwrappedProperty != null) {
-                UnwrappedPropertyHandler unwrappedPropertyHandler2;
-                if (unwrappedPropertyHandler == null) {
-                    unwrappedPropertyHandler2 = new UnwrappedPropertyHandler();
+                if (unwrappedPropertyHandler2 == null) {
+                    unwrappedPropertyHandler = new UnwrappedPropertyHandler();
                 } else {
-                    unwrappedPropertyHandler2 = unwrappedPropertyHandler;
+                    unwrappedPropertyHandler = unwrappedPropertyHandler2;
                 }
-                unwrappedPropertyHandler2.addProperty(_resolveUnwrappedProperty);
+                unwrappedPropertyHandler.addProperty(_resolveUnwrappedProperty);
                 this._beanProperties.remove(_resolveUnwrappedProperty);
-                unwrappedPropertyHandler = unwrappedPropertyHandler2;
+                unwrappedPropertyHandler2 = unwrappedPropertyHandler;
             } else {
-                _resolveUnwrappedProperty = _resolveInnerClassValuedProperty(deserializationContext, withValueDeserializer);
-                if (_resolveUnwrappedProperty != settableBeanProperty2) {
-                    this._beanProperties.replace(_resolveUnwrappedProperty);
-                    if (fromObjectArguments != null) {
-                        int length = fromObjectArguments.length;
-                        for (i = 0; i < length; i++) {
-                            if (fromObjectArguments[i] == settableBeanProperty2) {
-                                fromObjectArguments[i] = _resolveUnwrappedProperty;
+                SettableBeanProperty _resolveInnerClassValuedProperty = _resolveInnerClassValuedProperty(deserializationContext, _resolveManagedReferenceProperty);
+                if (_resolveInnerClassValuedProperty != settableBeanProperty3) {
+                    this._beanProperties.replace(_resolveInnerClassValuedProperty);
+                    if (settableBeanPropertyArr != null) {
+                        int length = settableBeanPropertyArr.length;
+                        int i = 0;
+                        while (true) {
+                            if (i >= length) {
                                 break;
+                            } else if (settableBeanPropertyArr[i] == settableBeanProperty3) {
+                                settableBeanPropertyArr[i] = _resolveInnerClassValuedProperty;
+                                break;
+                            } else {
+                                i++;
                             }
                         }
                     }
                 }
-                if (_resolveUnwrappedProperty.hasValueTypeDeserializer()) {
-                    TypeDeserializer valueTypeDeserializer2 = _resolveUnwrappedProperty.getValueTypeDeserializer();
-                    if (valueTypeDeserializer2.getTypeInclusion() == As.EXTERNAL_PROPERTY) {
-                        if (builder2 == null) {
-                            builder = new Builder();
+                if (_resolveInnerClassValuedProperty.hasValueTypeDeserializer()) {
+                    TypeDeserializer valueTypeDeserializer2 = _resolveInnerClassValuedProperty.getValueTypeDeserializer();
+                    if (valueTypeDeserializer2.getTypeInclusion() == C0861As.EXTERNAL_PROPERTY) {
+                        if (builder3 == null) {
+                            builder2 = new Builder();
                         } else {
-                            builder = builder2;
+                            builder2 = builder3;
                         }
-                        builder.addExternal(_resolveUnwrappedProperty, valueTypeDeserializer2);
-                        this._beanProperties.remove(_resolveUnwrappedProperty);
-                        builder2 = builder;
+                        builder2.addExternal(_resolveInnerClassValuedProperty, valueTypeDeserializer2);
+                        this._beanProperties.remove(_resolveInnerClassValuedProperty);
+                        builder3 = builder2;
                     }
                 }
             }
         }
-        if (!(this._anySetter == null || this._anySetter.hasValueDeserializer())) {
+        if (this._anySetter != null && !this._anySetter.hasValueDeserializer()) {
             this._anySetter = this._anySetter.withValueDeserializer(findDeserializer(deserializationContext, this._anySetter.getType(), this._anySetter.getProperty()));
         }
         if (this._valueInstantiator.canCreateUsingDelegate()) {
-            delegateType = this._valueInstantiator.getDelegateType(deserializationContext.getConfig());
+            JavaType delegateType = this._valueInstantiator.getDelegateType(deserializationContext.getConfig());
             if (delegateType == null) {
                 throw new IllegalArgumentException("Invalid delegate-creator definition for " + this._beanType + ": value instantiator (" + this._valueInstantiator.getClass().getName() + ") returned true for 'canCreateUsingDelegate()', but null for 'getDelegateType()'");
             }
             this._delegateDeserializer = _findDelegateDeserializer(deserializationContext, delegateType, this._valueInstantiator.getDelegateCreator());
         }
         if (this._valueInstantiator.canCreateUsingArrayDelegate()) {
-            delegateType = this._valueInstantiator.getArrayDelegateType(deserializationContext.getConfig());
-            if (delegateType == null) {
+            JavaType arrayDelegateType = this._valueInstantiator.getArrayDelegateType(deserializationContext.getConfig());
+            if (arrayDelegateType == null) {
                 throw new IllegalArgumentException("Invalid array-delegate-creator definition for " + this._beanType + ": value instantiator (" + this._valueInstantiator.getClass().getName() + ") returned true for 'canCreateUsingArrayDelegate()', but null for 'getArrayDelegateType()'");
             }
-            this._arrayDelegateDeserializer = _findDelegateDeserializer(deserializationContext, delegateType, this._valueInstantiator.getArrayDelegateCreator());
+            this._arrayDelegateDeserializer = _findDelegateDeserializer(deserializationContext, arrayDelegateType, this._valueInstantiator.getArrayDelegateCreator());
         }
-        if (fromObjectArguments != null) {
-            this._propertyBasedCreator = PropertyBasedCreator.construct(deserializationContext, this._valueInstantiator, fromObjectArguments);
+        if (settableBeanPropertyArr != null) {
+            this._propertyBasedCreator = PropertyBasedCreator.construct(deserializationContext, this._valueInstantiator, settableBeanPropertyArr);
         }
-        if (builder2 != null) {
-            this._externalTypeIdHandler = builder2.build();
+        if (builder3 != null) {
+            this._externalTypeIdHandler = builder3.build();
             this._nonStandardCreation = true;
         }
-        this._unwrappedPropertyHandler = unwrappedPropertyHandler;
-        if (unwrappedPropertyHandler != null) {
+        this._unwrappedPropertyHandler = unwrappedPropertyHandler2;
+        if (unwrappedPropertyHandler2 != null) {
             this._nonStandardCreation = true;
         }
         if (!this._vanillaProcessing || this._nonStandardCreation) {
@@ -364,19 +360,20 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
     }
 
     private JsonDeserializer<Object> _findDelegateDeserializer(DeserializationContext deserializationContext, JavaType javaType, AnnotatedWithParams annotatedWithParams) throws JsonMappingException {
-        BeanProperty std = new Std(TEMP_PROPERTY_NAME, javaType, null, this._classAnnotations, (AnnotatedMember) annotatedWithParams, PropertyMetadata.STD_OPTIONAL);
+        Std std = new Std(TEMP_PROPERTY_NAME, javaType, (PropertyName) null, this._classAnnotations, (AnnotatedMember) annotatedWithParams, PropertyMetadata.STD_OPTIONAL);
         TypeDeserializer typeDeserializer = (TypeDeserializer) javaType.getTypeHandler();
         if (typeDeserializer == null) {
             typeDeserializer = deserializationContext.getConfig().findTypeDeserializer(javaType);
         }
-        JsonDeserializer<Object> findDeserializer = findDeserializer(deserializationContext, javaType, std);
+        JsonDeserializer findDeserializer = findDeserializer(deserializationContext, javaType, std);
         if (typeDeserializer != null) {
             return new TypeWrappedDeserializer(typeDeserializer.forProperty(std), findDeserializer);
         }
         return findDeserializer;
     }
 
-    protected JsonDeserializer<Object> findConvertingDeserializer(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> findConvertingDeserializer(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) throws JsonMappingException {
         AnnotationIntrospector annotationIntrospector = deserializationContext.getAnnotationIntrospector();
         if (annotationIntrospector != null) {
             Object findDeserializationConverter = annotationIntrospector.findDeserializationConverter(settableBeanProperty.getMember());
@@ -389,72 +386,116 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         return null;
     }
 
-    public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
-        JsonDeserializer jsonDeserializer;
-        Shape shape;
-        ObjectIdReader objectIdReader = this._objectIdReader;
-        AnnotationIntrospector annotationIntrospector = deserializationContext.getAnnotationIntrospector();
-        Annotated member = (beanProperty == null || annotationIntrospector == null) ? null : beanProperty.getMember();
-        if (!(member == null || annotationIntrospector == null)) {
-            ObjectIdInfo findObjectIdInfo = annotationIntrospector.findObjectIdInfo(member);
-            if (findObjectIdInfo != null) {
-                SettableBeanProperty findProperty;
-                JavaType type;
-                ObjectIdGenerator propertyBasedObjectIdGenerator;
-                findObjectIdInfo = annotationIntrospector.findObjectReferenceInfo(member, findObjectIdInfo);
-                Class generatorType = findObjectIdInfo.getGeneratorType();
-                ObjectIdResolver objectIdResolverInstance = deserializationContext.objectIdResolverInstance(member, findObjectIdInfo);
-                if (generatorType == PropertyGenerator.class) {
-                    PropertyName propertyName = findObjectIdInfo.getPropertyName();
-                    findProperty = findProperty(propertyName);
-                    if (findProperty == null) {
-                        throw new IllegalArgumentException("Invalid Object Id definition for " + handledType().getName() + ": can not find property with name '" + propertyName + "'");
-                    }
-                    type = findProperty.getType();
-                    propertyBasedObjectIdGenerator = new PropertyBasedObjectIdGenerator(findObjectIdInfo.getScope());
-                } else {
-                    type = deserializationContext.getTypeFactory().findTypeParameters(deserializationContext.constructType(generatorType), ObjectIdGenerator.class)[0];
-                    propertyBasedObjectIdGenerator = deserializationContext.objectIdGeneratorInstance(member, findObjectIdInfo);
-                    findProperty = null;
-                }
-                objectIdReader = ObjectIdReader.construct(type, findObjectIdInfo.getPropertyName(), propertyBasedObjectIdGenerator, deserializationContext.findRootValueDeserializer(type), findProperty, objectIdResolverInstance);
-            }
-        }
-        if (objectIdReader == null || objectIdReader == this._objectIdReader) {
-            jsonDeserializer = this;
-        } else {
-            jsonDeserializer = withObjectIdReader(objectIdReader);
-        }
-        if (member != null) {
-            String[] findPropertiesToIgnore = annotationIntrospector.findPropertiesToIgnore(member, false);
-            if (!(findPropertiesToIgnore == null || findPropertiesToIgnore.length == 0)) {
-                jsonDeserializer = jsonDeserializer.withIgnorableProperties(ArrayBuilders.setAndArray(jsonDeserializer._ignorableProps, findPropertiesToIgnore));
-            }
-        }
-        if (member != null) {
-            Value findFormat = annotationIntrospector.findFormat(member);
-            if (findFormat != null) {
-                shape = findFormat.getShape();
-                if (shape == null) {
-                    shape = this._serializationShape;
-                }
-                if (shape != Shape.ARRAY) {
-                    return jsonDeserializer.asArrayDeserializer();
-                }
-                return jsonDeserializer;
-            }
-        }
-        shape = null;
-        if (shape == null) {
-            shape = this._serializationShape;
-        }
-        if (shape != Shape.ARRAY) {
-            return jsonDeserializer;
-        }
-        return jsonDeserializer.asArrayDeserializer();
+    /* JADX WARNING: Removed duplicated region for block: B:32:0x00af  */
+    /* JADX WARNING: Removed duplicated region for block: B:35:0x00b5  */
+    /* JADX WARNING: Removed duplicated region for block: B:37:0x00d0  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JsonDeserializer<?> createContextual(com.fasterxml.jackson.databind.DeserializationContext r11, com.fasterxml.jackson.databind.BeanProperty r12) throws com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r10 = this;
+            r9 = 0
+            r6 = 0
+            com.fasterxml.jackson.databind.deser.impl.ObjectIdReader r0 = r10._objectIdReader
+            com.fasterxml.jackson.databind.AnnotationIntrospector r8 = r11.getAnnotationIntrospector()
+            if (r12 == 0) goto L_0x000c
+            if (r8 != 0) goto L_0x0062
+        L_0x000c:
+            r7 = r6
+        L_0x000d:
+            if (r7 == 0) goto L_0x0081
+            if (r8 == 0) goto L_0x0081
+            com.fasterxml.jackson.databind.introspect.ObjectIdInfo r1 = r8.findObjectIdInfo(r7)
+            if (r1 == 0) goto L_0x0081
+            com.fasterxml.jackson.databind.introspect.ObjectIdInfo r1 = r8.findObjectReferenceInfo(r7, r1)
+            java.lang.Class r0 = r1.getGeneratorType()
+            com.fasterxml.jackson.annotation.ObjectIdResolver r5 = r11.objectIdResolverInstance(r7, r1)
+            java.lang.Class<com.fasterxml.jackson.annotation.ObjectIdGenerators$PropertyGenerator> r2 = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class
+            if (r0 != r2) goto L_0x00ba
+            com.fasterxml.jackson.databind.PropertyName r0 = r1.getPropertyName()
+            com.fasterxml.jackson.databind.deser.SettableBeanProperty r4 = r10.findProperty(r0)
+            if (r4 != 0) goto L_0x0068
+            java.lang.IllegalArgumentException r1 = new java.lang.IllegalArgumentException
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder
+            r2.<init>()
+            java.lang.String r3 = "Invalid Object Id definition for "
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.Class r3 = r10.handledType()
+            java.lang.String r3 = r3.getName()
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r3 = ": can not find property with name '"
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.StringBuilder r0 = r2.append(r0)
+            java.lang.String r2 = "'"
+            java.lang.StringBuilder r0 = r0.append(r2)
+            java.lang.String r0 = r0.toString()
+            r1.<init>(r0)
+            throw r1
+        L_0x0062:
+            com.fasterxml.jackson.databind.introspect.AnnotatedMember r1 = r12.getMember()
+            r7 = r1
+            goto L_0x000d
+        L_0x0068:
+            com.fasterxml.jackson.databind.JavaType r0 = r4.getType()
+            com.fasterxml.jackson.databind.deser.impl.PropertyBasedObjectIdGenerator r2 = new com.fasterxml.jackson.databind.deser.impl.PropertyBasedObjectIdGenerator
+            java.lang.Class r3 = r1.getScope()
+            r2.<init>(r3)
+        L_0x0075:
+            com.fasterxml.jackson.databind.JsonDeserializer r3 = r11.findRootValueDeserializer(r0)
+            com.fasterxml.jackson.databind.PropertyName r1 = r1.getPropertyName()
+            com.fasterxml.jackson.databind.deser.impl.ObjectIdReader r0 = com.fasterxml.jackson.databind.deser.impl.ObjectIdReader.construct(r0, r1, r2, r3, r4, r5)
+        L_0x0081:
+            if (r0 == 0) goto L_0x00d4
+            com.fasterxml.jackson.databind.deser.impl.ObjectIdReader r1 = r10._objectIdReader
+            if (r0 == r1) goto L_0x00d4
+            com.fasterxml.jackson.databind.deser.BeanDeserializerBase r1 = r10.withObjectIdReader(r0)
+        L_0x008b:
+            if (r7 == 0) goto L_0x00a0
+            java.lang.String[] r0 = r8.findPropertiesToIgnore(r7, r9)
+            if (r0 == 0) goto L_0x00a0
+            int r2 = r0.length
+            if (r2 == 0) goto L_0x00a0
+            java.util.HashSet<java.lang.String> r2 = r1._ignorableProps
+            java.util.HashSet r0 = com.fasterxml.jackson.databind.util.ArrayBuilders.setAndArray(r2, r0)
+            com.fasterxml.jackson.databind.deser.BeanDeserializerBase r1 = r1.withIgnorableProperties(r0)
+        L_0x00a0:
+            if (r7 == 0) goto L_0x00d2
+            com.fasterxml.jackson.annotation.JsonFormat$Value r0 = r8.findFormat(r7)
+            if (r0 == 0) goto L_0x00d2
+            com.fasterxml.jackson.annotation.JsonFormat$Shape r6 = r0.getShape()
+            r0 = r6
+        L_0x00ad:
+            if (r0 != 0) goto L_0x00b1
+            com.fasterxml.jackson.annotation.JsonFormat$Shape r0 = r10._serializationShape
+        L_0x00b1:
+            com.fasterxml.jackson.annotation.JsonFormat$Shape r2 = com.fasterxml.jackson.annotation.JsonFormat.Shape.ARRAY
+            if (r0 != r2) goto L_0x00d0
+            com.fasterxml.jackson.databind.deser.BeanDeserializerBase r0 = r1.asArrayDeserializer()
+        L_0x00b9:
+            return r0
+        L_0x00ba:
+            com.fasterxml.jackson.databind.JavaType r0 = r11.constructType(r0)
+            com.fasterxml.jackson.databind.type.TypeFactory r2 = r11.getTypeFactory()
+            java.lang.Class<com.fasterxml.jackson.annotation.ObjectIdGenerator> r3 = com.fasterxml.jackson.annotation.ObjectIdGenerator.class
+            com.fasterxml.jackson.databind.JavaType[] r0 = r2.findTypeParameters(r0, r3)
+            r0 = r0[r9]
+            com.fasterxml.jackson.annotation.ObjectIdGenerator r2 = r11.objectIdGeneratorInstance(r7, r1)
+            r4 = r6
+            goto L_0x0075
+        L_0x00d0:
+            r0 = r1
+            goto L_0x00b9
+        L_0x00d2:
+            r0 = r6
+            goto L_0x00ad
+        L_0x00d4:
+            r1 = r10
+            goto L_0x008b
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.deser.BeanDeserializerBase.createContextual(com.fasterxml.jackson.databind.DeserializationContext, com.fasterxml.jackson.databind.BeanProperty):com.fasterxml.jackson.databind.JsonDeserializer");
     }
 
-    protected SettableBeanProperty _resolveManagedReferenceProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
+    /* access modifiers changed from: protected */
+    public SettableBeanProperty _resolveManagedReferenceProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
         String managedReferenceName = settableBeanProperty.getManagedReferenceName();
         if (managedReferenceName == null) {
             return settableBeanProperty;
@@ -466,18 +507,20 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         JavaType javaType = this._beanType;
         JavaType type = findBackReference.getType();
         boolean isContainerType = settableBeanProperty.getType().isContainerType();
-        if (type.getRawClass().isAssignableFrom(javaType.getRawClass())) {
-            return new ManagedReferenceProperty(settableBeanProperty, managedReferenceName, findBackReference, this._classAnnotations, isContainerType);
+        if (!type.getRawClass().isAssignableFrom(javaType.getRawClass())) {
+            throw new IllegalArgumentException("Can not handle managed/back reference '" + managedReferenceName + "': back reference type (" + type.getRawClass().getName() + ") not compatible with managed type (" + javaType.getRawClass().getName() + ")");
         }
-        throw new IllegalArgumentException("Can not handle managed/back reference '" + managedReferenceName + "': back reference type (" + type.getRawClass().getName() + ") not compatible with managed type (" + javaType.getRawClass().getName() + ")");
+        return new ManagedReferenceProperty(settableBeanProperty, managedReferenceName, findBackReference, this._classAnnotations, isContainerType);
     }
 
-    protected SettableBeanProperty _resolvedObjectIdProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
+    /* access modifiers changed from: protected */
+    public SettableBeanProperty _resolvedObjectIdProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
         ObjectIdInfo objectIdInfo = settableBeanProperty.getObjectIdInfo();
         return (objectIdInfo == null && settableBeanProperty.getValueDeserializer().getObjectIdReader() == null) ? settableBeanProperty : new ObjectIdReferenceProperty(settableBeanProperty, objectIdInfo);
     }
 
-    protected SettableBeanProperty _resolveUnwrappedProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
+    /* access modifiers changed from: protected */
+    public SettableBeanProperty _resolveUnwrappedProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
         AnnotatedMember member = settableBeanProperty.getMember();
         if (member != null) {
             NameTransformer findUnwrappingNameTransformer = deserializationContext.getAnnotationIntrospector().findUnwrappingNameTransformer(member);
@@ -492,7 +535,9 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         return null;
     }
 
-    protected SettableBeanProperty _resolveInnerClassValuedProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
+    /* access modifiers changed from: protected */
+    public SettableBeanProperty _resolveInnerClassValuedProperty(DeserializationContext deserializationContext, SettableBeanProperty settableBeanProperty) {
+        Constructor[] constructors;
         JsonDeserializer valueDeserializer = settableBeanProperty.getValueDeserializer();
         if (!(valueDeserializer instanceof BeanDeserializerBase) || ((BeanDeserializerBase) valueDeserializer).getValueInstantiator().canCreateUsingDefault()) {
             return settableBeanProperty;
@@ -539,7 +584,7 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
     }
 
     public Collection<Object> getKnownPropertyNames() {
-        Collection arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         Iterator it = this._beanProperties.iterator();
         while (it.hasNext()) {
             arrayList.add(((SettableBeanProperty) it.next()).getName());
@@ -629,7 +674,8 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         return typeDeserializer.deserializeTypedFromObject(jsonParser, deserializationContext);
     }
 
-    protected Object _handleTypedObjectId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, Object obj2) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _handleTypedObjectId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, Object obj2) throws IOException {
         JsonDeserializer deserializer = this._objectIdReader.getDeserializer();
         if (deserializer.handledType() != obj2.getClass()) {
             obj2 = _convertObjectId(jsonParser, deserializationContext, obj2, deserializer);
@@ -642,7 +688,8 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         return obj;
     }
 
-    protected Object _convertObjectId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, JsonDeserializer<Object> jsonDeserializer) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _convertObjectId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, JsonDeserializer<Object> jsonDeserializer) throws IOException {
         TokenBuffer tokenBuffer = new TokenBuffer(jsonParser, deserializationContext);
         if (obj instanceof String) {
             tokenBuffer.writeString((String) obj);
@@ -658,11 +705,13 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         return jsonDeserializer.deserialize(asParser, deserializationContext);
     }
 
-    protected Object deserializeWithObjectId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeWithObjectId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         return deserializeFromObject(jsonParser, deserializationContext);
     }
 
-    protected Object deserializeFromObjectId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeFromObjectId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         Object readObjectReference = this._objectIdReader.readObjectReference(jsonParser, deserializationContext);
         ReadableObjectId findObjectId = deserializationContext.findObjectId(readObjectReference, this._objectIdReader.generator, this._objectIdReader.resolver);
         Object resolve = findObjectId.resolve();
@@ -672,7 +721,8 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         throw new UnresolvedForwardReference(jsonParser, "Could not resolve Object Id [" + readObjectReference + "] (for " + this._beanType + ").", jsonParser.getCurrentLocation(), findObjectId);
     }
 
-    protected Object deserializeFromObjectUsingNonDefault(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object deserializeFromObjectUsingNonDefault(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (this._delegateDeserializer != null) {
             return this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
         }
@@ -689,13 +739,12 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         if (this._objectIdReader != null) {
             return deserializeFromObjectId(jsonParser, deserializationContext);
         }
-        Object createUsingDelegate;
         switch (jsonParser.getNumberType()) {
             case INT:
                 if (this._delegateDeserializer == null || this._valueInstantiator.canCreateFromInt()) {
                     return this._valueInstantiator.createFromInt(deserializationContext, jsonParser.getIntValue());
                 }
-                createUsingDelegate = this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
+                Object createUsingDelegate = this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
                 if (this._injectables == null) {
                     return createUsingDelegate;
                 }
@@ -705,20 +754,20 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
                 if (this._delegateDeserializer == null || this._valueInstantiator.canCreateFromInt()) {
                     return this._valueInstantiator.createFromLong(deserializationContext, jsonParser.getLongValue());
                 }
-                createUsingDelegate = this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
+                Object createUsingDelegate2 = this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
                 if (this._injectables == null) {
-                    return createUsingDelegate;
+                    return createUsingDelegate2;
                 }
-                injectValues(deserializationContext, createUsingDelegate);
-                return createUsingDelegate;
+                injectValues(deserializationContext, createUsingDelegate2);
+                return createUsingDelegate2;
             default:
                 if (this._delegateDeserializer != null) {
-                    createUsingDelegate = this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
+                    Object createUsingDelegate3 = this._valueInstantiator.createUsingDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
                     if (this._injectables == null) {
-                        return createUsingDelegate;
+                        return createUsingDelegate3;
                     }
-                    injectValues(deserializationContext, createUsingDelegate);
-                    return createUsingDelegate;
+                    injectValues(deserializationContext, createUsingDelegate3);
+                    return createUsingDelegate3;
                 }
                 throw deserializationContext.instantiationException(handledType(), "no suitable creator method found to deserialize from JSON integer number");
         }
@@ -771,28 +820,27 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
     }
 
     public Object deserializeFromArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Object createUsingArrayDelegate;
         if (this._arrayDelegateDeserializer != null) {
             try {
-                createUsingArrayDelegate = this._valueInstantiator.createUsingArrayDelegate(deserializationContext, this._arrayDelegateDeserializer.deserialize(jsonParser, deserializationContext));
+                Object createUsingArrayDelegate = this._valueInstantiator.createUsingArrayDelegate(deserializationContext, this._arrayDelegateDeserializer.deserialize(jsonParser, deserializationContext));
                 if (this._injectables == null) {
                     return createUsingArrayDelegate;
                 }
                 injectValues(deserializationContext, createUsingArrayDelegate);
                 return createUsingArrayDelegate;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 wrapInstantiationProblem(e, deserializationContext);
             }
         }
         if (this._delegateDeserializer != null) {
             try {
-                createUsingArrayDelegate = this._valueInstantiator.createUsingArrayDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
+                Object createUsingArrayDelegate2 = this._valueInstantiator.createUsingArrayDelegate(deserializationContext, this._delegateDeserializer.deserialize(jsonParser, deserializationContext));
                 if (this._injectables == null) {
-                    return createUsingArrayDelegate;
+                    return createUsingArrayDelegate2;
                 }
-                injectValues(deserializationContext, createUsingArrayDelegate);
-                return createUsingArrayDelegate;
-            } catch (Throwable e2) {
+                injectValues(deserializationContext, createUsingArrayDelegate2);
+                return createUsingArrayDelegate2;
+            } catch (Exception e2) {
                 wrapInstantiationProblem(e2, deserializationContext);
             }
         }
@@ -800,9 +848,9 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
             if (jsonParser.nextToken() == JsonToken.END_ARRAY && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT)) {
                 return null;
             }
-            createUsingArrayDelegate = deserialize(jsonParser, deserializationContext);
+            Object deserialize = deserialize(jsonParser, deserializationContext);
             if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
-                return createUsingArrayDelegate;
+                return deserialize;
             }
             throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "Attempted to unwrap single value array for single '" + this._valueClass.getName() + "' value but there was more than a single value in the array");
         } else if (!deserializationContext.isEnabled(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT)) {
@@ -821,13 +869,15 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         return jsonParser.getEmbeddedObject();
     }
 
-    protected void injectValues(DeserializationContext deserializationContext, Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public void injectValues(DeserializationContext deserializationContext, Object obj) throws IOException {
         for (ValueInjector inject : this._injectables) {
             inject.inject(deserializationContext, obj);
         }
     }
 
-    protected Object handleUnknownProperties(DeserializationContext deserializationContext, Object obj, TokenBuffer tokenBuffer) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object handleUnknownProperties(DeserializationContext deserializationContext, Object obj, TokenBuffer tokenBuffer) throws IOException {
         tokenBuffer.writeEndObject();
         JsonParser asParser = tokenBuffer.asParser();
         while (asParser.nextToken() != JsonToken.END_OBJECT) {
@@ -838,21 +888,23 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         return obj;
     }
 
-    protected void handleUnknownVanilla(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public void handleUnknownVanilla(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, String str) throws IOException {
         if (this._ignorableProps != null && this._ignorableProps.contains(str)) {
             handleIgnoredProperty(jsonParser, deserializationContext, obj, str);
         } else if (this._anySetter != null) {
             try {
                 this._anySetter.deserializeAndSet(jsonParser, deserializationContext, obj, str);
-            } catch (Throwable e) {
-                wrapAndThrow(e, obj, str, deserializationContext);
+            } catch (Exception e) {
+                wrapAndThrow((Throwable) e, obj, str, deserializationContext);
             }
         } else {
             handleUnknownProperty(jsonParser, deserializationContext, obj, str);
         }
     }
 
-    protected void handleUnknownProperty(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public void handleUnknownProperty(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, String str) throws IOException {
         if (this._ignoreAllUnknown) {
             jsonParser.skipChildren();
             return;
@@ -863,42 +915,46 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         super.handleUnknownProperty(jsonParser, deserializationContext, obj, str);
     }
 
-    protected void handleIgnoredProperty(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public void handleIgnoredProperty(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, String str) throws IOException {
         if (deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)) {
             throw IgnoredPropertyException.from(jsonParser, obj, str, getKnownPropertyNames());
         }
         jsonParser.skipChildren();
     }
 
-    protected Object handlePolymorphic(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, TokenBuffer tokenBuffer) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object handlePolymorphic(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, TokenBuffer tokenBuffer) throws IOException {
+        Object obj2;
+        Object obj3;
         JsonDeserializer _findSubclassDeserializer = _findSubclassDeserializer(deserializationContext, obj, tokenBuffer);
-        Object deserialize;
         if (_findSubclassDeserializer != null) {
             if (tokenBuffer != null) {
                 tokenBuffer.writeEndObject();
                 JsonParser asParser = tokenBuffer.asParser();
                 asParser.nextToken();
-                deserialize = _findSubclassDeserializer.deserialize(asParser, deserializationContext, obj);
+                obj3 = _findSubclassDeserializer.deserialize(asParser, deserializationContext, obj);
             } else {
-                deserialize = obj;
+                obj3 = obj;
             }
             if (jsonParser != null) {
-                return _findSubclassDeserializer.deserialize(jsonParser, deserializationContext, deserialize);
+                return _findSubclassDeserializer.deserialize(jsonParser, deserializationContext, obj3);
             }
-            return deserialize;
+            return obj3;
         }
         if (tokenBuffer != null) {
-            deserialize = handleUnknownProperties(deserializationContext, obj, tokenBuffer);
+            obj2 = handleUnknownProperties(deserializationContext, obj, tokenBuffer);
         } else {
-            deserialize = obj;
+            obj2 = obj;
         }
         if (jsonParser != null) {
-            return deserialize(jsonParser, deserializationContext, deserialize);
+            return deserialize(jsonParser, deserializationContext, obj2);
         }
-        return deserialize;
+        return obj2;
     }
 
-    protected JsonDeserializer<Object> _findSubclassDeserializer(DeserializationContext deserializationContext, Object obj, TokenBuffer tokenBuffer) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _findSubclassDeserializer(DeserializationContext deserializationContext, Object obj, TokenBuffer tokenBuffer) throws IOException {
         JsonDeserializer<Object> jsonDeserializer;
         synchronized (this) {
             jsonDeserializer = this._subDeserializers == null ? null : (JsonDeserializer) this._subDeserializers.get(new ClassKey(obj.getClass()));
@@ -908,7 +964,7 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
             if (jsonDeserializer != null) {
                 synchronized (this) {
                     if (this._subDeserializers == null) {
-                        this._subDeserializers = new HashMap();
+                        this._subDeserializers = new HashMap<>();
                     }
                     this._subDeserializers.put(new ClassKey(obj.getClass()), jsonDeserializer);
                 }
@@ -934,18 +990,19 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         if (th2 instanceof Error) {
             throw ((Error) th2);
         }
-        Object obj = (deserializationContext == null || deserializationContext.isEnabled(DeserializationFeature.WRAP_EXCEPTIONS)) ? 1 : null;
+        boolean z = deserializationContext == null || deserializationContext.isEnabled(DeserializationFeature.WRAP_EXCEPTIONS);
         if (th2 instanceof IOException) {
-            if (obj == null || !(th2 instanceof JsonProcessingException)) {
+            if (!z || !(th2 instanceof JsonProcessingException)) {
                 throw ((IOException) th2);
             }
-        } else if (obj == null && (th2 instanceof RuntimeException)) {
+        } else if (!z && (th2 instanceof RuntimeException)) {
             throw ((RuntimeException) th2);
         }
         return th2;
     }
 
-    protected void wrapInstantiationProblem(Throwable th, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public void wrapInstantiationProblem(Throwable th, DeserializationContext deserializationContext) throws IOException {
         Throwable th2 = th;
         while ((th2 instanceof InvocationTargetException) && th2.getCause() != null) {
             th2 = th2.getCause();
@@ -953,13 +1010,13 @@ public abstract class BeanDeserializerBase extends StdDeserializer<Object> imple
         if (th2 instanceof Error) {
             throw ((Error) th2);
         }
-        Object obj = (deserializationContext == null || deserializationContext.isEnabled(DeserializationFeature.WRAP_EXCEPTIONS)) ? 1 : null;
+        boolean z = deserializationContext == null || deserializationContext.isEnabled(DeserializationFeature.WRAP_EXCEPTIONS);
         if (th2 instanceof IOException) {
             throw ((IOException) th2);
-        } else if (obj == null && (th2 instanceof RuntimeException)) {
-            throw ((RuntimeException) th2);
-        } else {
+        } else if (z || !(th2 instanceof RuntimeException)) {
             throw deserializationContext.instantiationException(this._beanType.getRawClass(), th2);
+        } else {
+            throw ((RuntimeException) th2);
         }
     }
 }

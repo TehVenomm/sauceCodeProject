@@ -42,7 +42,7 @@ public class CommonBanReasonDialog : CommonDialog
 
 	protected override void InitDialog(object data_object)
 	{
-		base.InitDialog(new Desc(TYPE.DEFAULT, string.Empty, null, null, null, null));
+		base.InitDialog(new Desc(TYPE.DEFAULT, string.Empty));
 		FriendCharaInfo friendCharaInfo = data_object as FriendCharaInfo;
 		SetLabelText(base._transform, UI.LBL_USER_KICK, $"{friendCharaInfo.name} will be kicked from your clan!");
 	}

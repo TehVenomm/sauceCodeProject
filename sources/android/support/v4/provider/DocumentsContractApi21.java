@@ -1,16 +1,16 @@
-package android.support.v4.provider;
+package android.support.p000v4.provider;
 
-import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import java.util.ArrayList;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.provider.DocumentsContractApi21 */
 class DocumentsContractApi21 {
     private static final String TAG = "DocumentFile";
 
@@ -33,42 +33,44 @@ class DocumentsContractApi21 {
     }
 
     public static Uri createFile(Context context, Uri uri, String str, String str2) {
-        return DocumentsContract.createDocument(context.getContentResolver(), uri, str, str2);
+        try {
+            return DocumentsContract.createDocument(context.getContentResolver(), uri, str, str2);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static Uri[] listFiles(Context context, Uri uri) {
-        Object e;
-        Throwable th;
+        Cursor cursor;
         ContentResolver contentResolver = context.getContentResolver();
         Uri buildChildDocumentsUriUsingTree = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getDocumentId(uri));
         ArrayList arrayList = new ArrayList();
-        AutoCloseable query;
         try {
-            query = contentResolver.query(buildChildDocumentsUriUsingTree, new String[]{"document_id"}, null, null, null);
-            while (query.moveToNext()) {
+            cursor = contentResolver.query(buildChildDocumentsUriUsingTree, new String[]{"document_id"}, null, null, null);
+            while (cursor.moveToNext()) {
                 try {
-                    arrayList.add(DocumentsContract.buildDocumentUriUsingTree(uri, query.getString(0)));
-                } catch (Exception e2) {
-                    e = e2;
+                    arrayList.add(DocumentsContract.buildDocumentUriUsingTree(uri, cursor.getString(0)));
+                } catch (Exception e) {
+                    e = e;
+                    try {
+                        Log.w(TAG, "Failed query: " + e);
+                        closeQuietly(cursor);
+                        return (Uri[]) arrayList.toArray(new Uri[arrayList.size()]);
+                    } catch (Throwable th) {
+                        th = th;
+                        closeQuietly(cursor);
+                        throw th;
+                    }
                 }
             }
-            closeQuietly(query);
-        } catch (Exception e3) {
-            e = e3;
-            query = null;
-            try {
-                Log.w(TAG, "Failed query: " + e);
-                closeQuietly(query);
-                return (Uri[]) arrayList.toArray(new Uri[arrayList.size()]);
-            } catch (Throwable th2) {
-                th = th2;
-                closeQuietly(query);
-                throw th;
-            }
-        } catch (Throwable th3) {
-            th = th3;
-            query = null;
-            closeQuietly(query);
+            closeQuietly(cursor);
+        } catch (Exception e2) {
+            e = e2;
+            cursor = null;
+        } catch (Throwable th2) {
+            th = th2;
+            cursor = null;
+            closeQuietly(cursor);
             throw th;
         }
         return (Uri[]) arrayList.toArray(new Uri[arrayList.size()]);
@@ -79,6 +81,10 @@ class DocumentsContractApi21 {
     }
 
     public static Uri renameTo(Context context, Uri uri, String str) {
-        return DocumentsContract.renameDocument(context.getContentResolver(), uri, str);
+        try {
+            return DocumentsContract.renameDocument(context.getContentResolver(), uri, str);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

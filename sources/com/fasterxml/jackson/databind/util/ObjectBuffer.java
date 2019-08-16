@@ -20,7 +20,7 @@ public final class ObjectBuffer {
     }
 
     public Object[] appendCompletedChunk(Object[] objArr) {
-        LinkedNode linkedNode = new LinkedNode(objArr, null);
+        LinkedNode<Object[]> linkedNode = new LinkedNode<>(objArr, null);
         if (this._head == null) {
             this._tail = linkedNode;
             this._head = linkedNode;
@@ -40,21 +40,21 @@ public final class ObjectBuffer {
 
     public Object[] completeAndClearBuffer(Object[] objArr, int i) {
         int i2 = this._size + i;
-        Object obj = new Object[i2];
-        _copyTo(obj, i2, objArr, i);
-        return obj;
+        Object[] objArr2 = new Object[i2];
+        _copyTo(objArr2, i2, objArr, i);
+        return objArr2;
     }
 
     public <T> T[] completeAndClearBuffer(Object[] objArr, int i, Class<T> cls) {
         int i2 = i + this._size;
-        Object[] objArr2 = (Object[]) Array.newInstance(cls, i2);
-        _copyTo(objArr2, i2, objArr, i);
+        T[] tArr = (Object[]) Array.newInstance(cls, i2);
+        _copyTo(tArr, i2, objArr, i);
         _reset();
-        return objArr2;
+        return tArr;
     }
 
     public void completeAndClearBuffer(Object[] objArr, int i, List<Object> list) {
-        for (LinkedNode linkedNode = this._head; linkedNode != null; linkedNode = linkedNode.next()) {
+        for (LinkedNode<Object[]> linkedNode = this._head; linkedNode != null; linkedNode = linkedNode.next()) {
             for (Object add : (Object[]) linkedNode.value()) {
                 list.add(add);
             }
@@ -65,14 +65,18 @@ public final class ObjectBuffer {
     }
 
     public int initialCapacity() {
-        return this._freeBuffer == null ? 0 : this._freeBuffer.length;
+        if (this._freeBuffer == null) {
+            return 0;
+        }
+        return this._freeBuffer.length;
     }
 
     public int bufferedSize() {
         return this._size;
     }
 
-    protected void _reset() {
+    /* access modifiers changed from: protected */
+    public void _reset() {
         if (this._tail != null) {
             this._freeBuffer = (Object[]) this._tail.value();
         }
@@ -81,9 +85,10 @@ public final class ObjectBuffer {
         this._size = 0;
     }
 
-    protected final void _copyTo(Object obj, int i, Object[] objArr, int i2) {
+    /* access modifiers changed from: protected */
+    public final void _copyTo(Object obj, int i, Object[] objArr, int i2) {
         int i3 = 0;
-        for (LinkedNode linkedNode = this._head; linkedNode != null; linkedNode = linkedNode.next()) {
+        for (LinkedNode<Object[]> linkedNode = this._head; linkedNode != null; linkedNode = linkedNode.next()) {
             Object[] objArr2 = (Object[]) linkedNode.value();
             int length = objArr2.length;
             System.arraycopy(objArr2, 0, obj, i3, length);

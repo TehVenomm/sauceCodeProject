@@ -16,7 +16,7 @@ public abstract class AbstractChatContext implements ChatContext {
         for (DataSetObserver onChanged : this.observers) {
             try {
                 onChanged.onChanged();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }
@@ -34,7 +34,8 @@ public abstract class AbstractChatContext implements ChatContext {
         this.imageMap.put(str, uri);
     }
 
-    protected Uri getImageUri(String str) {
+    /* access modifiers changed from: protected */
+    public Uri getImageUri(String str) {
         return (Uri) this.imageMap.get(str);
     }
 }

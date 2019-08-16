@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public final class FacebookRequestErrorClassification {
+    public static final int EC_APP_NOT_INSTALLED = 412;
     public static final int EC_APP_TOO_MANY_CALLS = 4;
     public static final int EC_INVALID_SESSION = 102;
     public static final int EC_INVALID_TOKEN = 190;
@@ -16,6 +17,8 @@ public final class FacebookRequestErrorClassification {
     public static final int EC_SERVICE_UNAVAILABLE = 2;
     public static final int EC_TOO_MANY_USER_ACTION_CALLS = 341;
     public static final int EC_USER_TOO_MANY_CALLS = 17;
+    public static final int ESC_APP_INACTIVE = 493;
+    public static final int ESC_APP_NOT_INSTALLED = 458;
     public static final String KEY_LOGIN_RECOVERABLE = "login_recoverable";
     public static final String KEY_NAME = "name";
     public static final String KEY_OTHER = "other";
@@ -28,25 +31,6 @@ public final class FacebookRequestErrorClassification {
     private final String otherRecoveryMessage;
     private final Map<Integer, Set<Integer>> transientErrors;
     private final String transientRecoveryMessage;
-
-    /* renamed from: com.facebook.internal.FacebookRequestErrorClassification$1 */
-    static final class C04041 extends HashMap<Integer, Set<Integer>> {
-        C04041() {
-            put(Integer.valueOf(2), null);
-            put(Integer.valueOf(4), null);
-            put(Integer.valueOf(9), null);
-            put(Integer.valueOf(17), null);
-            put(Integer.valueOf(FacebookRequestErrorClassification.EC_TOO_MANY_USER_ACTION_CALLS), null);
-        }
-    }
-
-    /* renamed from: com.facebook.internal.FacebookRequestErrorClassification$2 */
-    static final class C04052 extends HashMap<Integer, Set<Integer>> {
-        C04052() {
-            put(Integer.valueOf(102), null);
-            put(Integer.valueOf(FacebookRequestErrorClassification.EC_INVALID_TOKEN), null);
-        }
-    }
 
     FacebookRequestErrorClassification(Map<Integer, Set<Integer>> map, Map<Integer, Set<Integer>> map2, Map<Integer, Set<Integer>> map3, String str, String str2, String str3) {
         this.otherErrors = map;
@@ -63,10 +47,10 @@ public final class FacebookRequestErrorClassification {
         }
         Map map = null;
         Map map2 = null;
+        Map map3 = null;
         String str = null;
         String str2 = null;
         String str3 = null;
-        Map map3 = null;
         for (int i = 0; i < jSONArray.length(); i++) {
             JSONObject optJSONObject = jSONArray.optJSONObject(i);
             if (optJSONObject != null) {
@@ -74,64 +58,79 @@ public final class FacebookRequestErrorClassification {
                 if (optString != null) {
                     if (optString.equalsIgnoreCase(KEY_OTHER)) {
                         str = optJSONObject.optString(KEY_RECOVERY_MESSAGE, null);
-                        map3 = parseJSONDefinition(optJSONObject);
+                        map = parseJSONDefinition(optJSONObject);
                     } else if (optString.equalsIgnoreCase(KEY_TRANSIENT)) {
                         str2 = optJSONObject.optString(KEY_RECOVERY_MESSAGE, null);
-                        map = parseJSONDefinition(optJSONObject);
+                        map2 = parseJSONDefinition(optJSONObject);
                     } else if (optString.equalsIgnoreCase(KEY_LOGIN_RECOVERABLE)) {
                         str3 = optJSONObject.optString(KEY_RECOVERY_MESSAGE, null);
-                        map2 = parseJSONDefinition(optJSONObject);
+                        map3 = parseJSONDefinition(optJSONObject);
                     }
                 }
             }
         }
-        return new FacebookRequestErrorClassification(map3, map, map2, str, str2, str3);
+        return new FacebookRequestErrorClassification(map, map2, map3, str, str2, str3);
     }
 
     public static FacebookRequestErrorClassification getDefaultErrorClassification() {
+        FacebookRequestErrorClassification facebookRequestErrorClassification;
         synchronized (FacebookRequestErrorClassification.class) {
             try {
                 if (defaultInstance == null) {
                     defaultInstance = getDefaultErrorClassificationImpl();
                 }
-                FacebookRequestErrorClassification facebookRequestErrorClassification = defaultInstance;
-                return facebookRequestErrorClassification;
+                facebookRequestErrorClassification = defaultInstance;
             } finally {
-                Object obj = FacebookRequestErrorClassification.class;
+                Class<FacebookRequestErrorClassification> cls = FacebookRequestErrorClassification.class;
             }
         }
+        return facebookRequestErrorClassification;
     }
 
     private static FacebookRequestErrorClassification getDefaultErrorClassificationImpl() {
-        return new FacebookRequestErrorClassification(null, new C04041(), new C04052(), null, null, null);
+        return new FacebookRequestErrorClassification(null, new HashMap<Integer, Set<Integer>>() {
+            {
+                put(Integer.valueOf(2), null);
+                put(Integer.valueOf(4), null);
+                put(Integer.valueOf(9), null);
+                put(Integer.valueOf(17), null);
+                put(Integer.valueOf(FacebookRequestErrorClassification.EC_TOO_MANY_USER_ACTION_CALLS), null);
+            }
+        }, new HashMap<Integer, Set<Integer>>() {
+            {
+                put(Integer.valueOf(102), null);
+                put(Integer.valueOf(FacebookRequestErrorClassification.EC_INVALID_TOKEN), null);
+                put(Integer.valueOf(FacebookRequestErrorClassification.EC_APP_NOT_INSTALLED), null);
+            }
+        }, null, null, null);
     }
 
     private static Map<Integer, Set<Integer>> parseJSONDefinition(JSONObject jSONObject) {
+        HashSet hashSet;
         JSONArray optJSONArray = jSONObject.optJSONArray("items");
         if (optJSONArray.length() == 0) {
             return null;
         }
-        Map<Integer, Set<Integer>> hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         for (int i = 0; i < optJSONArray.length(); i++) {
             JSONObject optJSONObject = optJSONArray.optJSONObject(i);
             if (optJSONObject != null) {
                 int optInt = optJSONObject.optInt("code");
                 if (optInt != 0) {
-                    Object obj;
                     JSONArray optJSONArray2 = optJSONObject.optJSONArray("subcodes");
                     if (optJSONArray2 == null || optJSONArray2.length() <= 0) {
-                        obj = null;
+                        hashSet = null;
                     } else {
-                        Set hashSet = new HashSet();
+                        HashSet hashSet2 = new HashSet();
                         for (int i2 = 0; i2 < optJSONArray2.length(); i2++) {
                             int optInt2 = optJSONArray2.optInt(i2);
                             if (optInt2 != 0) {
-                                hashSet.add(Integer.valueOf(optInt2));
+                                hashSet2.add(Integer.valueOf(optInt2));
                             }
                         }
-                        obj = hashSet;
+                        hashSet = hashSet2;
                     }
-                    hashMap.put(Integer.valueOf(optInt), obj);
+                    hashMap.put(Integer.valueOf(optInt), hashSet);
                 }
             }
         }
@@ -142,22 +141,21 @@ public final class FacebookRequestErrorClassification {
         if (z) {
             return Category.TRANSIENT;
         }
-        Set set;
         if (this.otherErrors != null && this.otherErrors.containsKey(Integer.valueOf(i))) {
-            set = (Set) this.otherErrors.get(Integer.valueOf(i));
+            Set set = (Set) this.otherErrors.get(Integer.valueOf(i));
             if (set == null || set.contains(Integer.valueOf(i2))) {
                 return Category.OTHER;
             }
         }
         if (this.loginRecoverableErrors != null && this.loginRecoverableErrors.containsKey(Integer.valueOf(i))) {
-            set = (Set) this.loginRecoverableErrors.get(Integer.valueOf(i));
-            if (set == null || set.contains(Integer.valueOf(i2))) {
+            Set set2 = (Set) this.loginRecoverableErrors.get(Integer.valueOf(i));
+            if (set2 == null || set2.contains(Integer.valueOf(i2))) {
                 return Category.LOGIN_RECOVERABLE;
             }
         }
         if (this.transientErrors != null && this.transientErrors.containsKey(Integer.valueOf(i))) {
-            set = (Set) this.transientErrors.get(Integer.valueOf(i));
-            if (set == null || set.contains(Integer.valueOf(i2))) {
+            Set set3 = (Set) this.transientErrors.get(Integer.valueOf(i));
+            if (set3 == null || set3.contains(Integer.valueOf(i2))) {
                 return Category.TRANSIENT;
             }
         }

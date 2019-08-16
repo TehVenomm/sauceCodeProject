@@ -1,19 +1,15 @@
 package com.google.android.gms.nearby.messages.internal;
 
-import android.os.RemoteException;
-import com.google.android.gms.common.api.Api.zzb;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.nearby.messages.Message;
+import com.google.android.gms.common.api.internal.ListenerHolder;
 
-final class zzao extends zzav {
-    private /* synthetic */ Message zzjgf;
+final /* synthetic */ class zzao implements zzbd {
+    private final ListenerHolder zzhv;
 
-    zzao(zzak zzak, GoogleApiClient googleApiClient, Message message) {
-        this.zzjgf = message;
-        super(googleApiClient);
+    zzao(ListenerHolder listenerHolder) {
+        this.zzhv = listenerHolder;
     }
 
-    protected final /* synthetic */ void zza(zzb zzb) throws RemoteException {
-        ((zzah) zzb).zza(zzbbb(), zzaf.zza(this.zzjgf));
+    public final void zza(zzah zzah, ListenerHolder listenerHolder) {
+        zzah.zza(listenerHolder, this.zzhv);
     }
 }

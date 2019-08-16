@@ -23,7 +23,6 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 
 	public void StartBlur(float time = 1f, float strength = 0.25f, float delay = 0f)
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (!(blurFilter == null))
 		{
 			blurFilter.blurStrength = 0f;
@@ -34,7 +33,6 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 
 	public void StopBlur(float time, float delay = 0f)
 	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		if (!(blurFilter == null) && blurFilter.get_enabled())
 		{
 			if (time <= 0f)
@@ -70,7 +68,7 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 			{
 				float t = _time / time;
 				blurFilter.blurStrength = startStrength * (1f - t) + targetStrength * t;
-				yield return (object)null;
+				yield return null;
 			}
 			blurFilter.blurStrength = targetStrength;
 			onComplete?.Invoke();
@@ -86,7 +84,6 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 	public void StartTubulanceFilter(float power, Vector2 center, Action callback)
 	{
 		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(_StartTubulanceFilter(power, center, callback));
 	}
 
@@ -94,12 +91,10 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 	{
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		if (tubulanceCamera == null)
 		{
-			GameObject prefab = Resources.Load<GameObject>("Filter/TurbulanceFilterCamera");
-			tubulanceCamera = ResourceUtility.Instantiate<GameObject>(prefab);
+			GameObject obj = Resources.Load<GameObject>("Filter/TurbulanceFilterCamera");
+			tubulanceCamera = ResourceUtility.Instantiate<GameObject>(obj);
 		}
 		BlurAndTurbulanceFilter filter = tubulanceCamera.GetComponent<BlurAndTurbulanceFilter>();
 		float time = 0f;
@@ -110,7 +105,7 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 			filter.SetBlurPram(Mathf.Lerp(0f, power, blurT), center);
 			float turbulanceT = Mathf.Clamp01((time - 0.2f) / 1f);
 			filter.SetTurbulanceParam(Mathf.Lerp(0f, 0.15f, turbulanceT), Mathf.Lerp(1f, 1.4f, turbulanceT), Mathf.Lerp(0f, 1f, turbulanceT));
-			yield return (object)null;
+			yield return null;
 		}
 		callback?.Invoke();
 	}

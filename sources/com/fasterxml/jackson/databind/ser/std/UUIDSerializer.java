@@ -34,11 +34,11 @@ public class UUIDSerializer extends StdScalarSerializer<UUID> {
             cArr[13] = '-';
             _appendShort(i, cArr, 14);
             cArr[18] = '-';
-            mostSignificantBits = uuid.getLeastSignificantBits();
-            _appendShort((int) (mostSignificantBits >>> 48), cArr, 19);
+            long leastSignificantBits = uuid.getLeastSignificantBits();
+            _appendShort((int) (leastSignificantBits >>> 48), cArr, 19);
             cArr[23] = '-';
-            _appendShort((int) (mostSignificantBits >>> 32), cArr, 24);
-            _appendInt((int) mostSignificantBits, cArr, 28);
+            _appendShort((int) (leastSignificantBits >>> 32), cArr, 24);
+            _appendInt((int) leastSignificantBits, cArr, 28);
             jsonGenerator.writeString(cArr, 0, 36);
             return;
         }
@@ -54,9 +54,9 @@ public class UUIDSerializer extends StdScalarSerializer<UUID> {
         cArr[i2] = HEX_CHARS[(i >> 12) & 15];
         int i3 = i2 + 1;
         cArr[i3] = HEX_CHARS[(i >> 8) & 15];
-        i3++;
-        cArr[i3] = HEX_CHARS[(i >> 4) & 15];
-        cArr[i3 + 1] = HEX_CHARS[i & 15];
+        int i4 = i3 + 1;
+        cArr[i4] = HEX_CHARS[(i >> 4) & 15];
+        cArr[i4 + 1] = HEX_CHARS[i & 15];
     }
 
     private static final byte[] _asBytes(UUID uuid) {
@@ -74,8 +74,8 @@ public class UUIDSerializer extends StdScalarSerializer<UUID> {
         bArr[i2] = (byte) (i >> 24);
         int i3 = i2 + 1;
         bArr[i3] = (byte) (i >> 16);
-        i3++;
-        bArr[i3] = (byte) (i >> 8);
-        bArr[i3 + 1] = (byte) i;
+        int i4 = i3 + 1;
+        bArr[i4] = (byte) (i >> 8);
+        bArr[i4 + 1] = (byte) i;
     }
 }

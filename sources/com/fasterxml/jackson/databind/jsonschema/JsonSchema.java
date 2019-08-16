@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.databind.jsonschema;
 
-import com.facebook.share.internal.ShareConstants;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,8 +49,8 @@ public class JsonSchema {
     }
 
     public static JsonNode getDefaultSchemaNode() {
-        JsonNode objectNode = JsonNodeFactory.instance.objectNode();
-        objectNode.put(ShareConstants.MEDIA_TYPE, "any");
+        ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+        objectNode.put("type", "any");
         return objectNode;
     }
 }

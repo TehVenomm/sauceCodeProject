@@ -1,4 +1,6 @@
-public class SoundID
+using UnityEngine;
+
+public class SoundID : MonoBehaviour
 {
 	public enum AudioSettinID
 	{
@@ -47,7 +49,8 @@ public class SoundID
 		FIELD_NORMAL = 112,
 		FIELD_MYSTERIOUS = 113,
 		FIELD_PASSIONATE = 114,
-		LOUNGE = 153
+		LOUNGE = 153,
+		JACKPOT_WIN = 191
 	}
 
 	public enum ConfigID

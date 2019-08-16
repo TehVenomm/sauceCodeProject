@@ -2,7 +2,7 @@ package com.fasterxml.jackson.databind.ser.impl;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.core.p015io.SerializedString;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.PropertyName;
@@ -22,8 +22,8 @@ public final class ObjectIdWriter {
         this.alwaysAsId = z;
     }
 
-    public static ObjectIdWriter construct(JavaType javaType, PropertyName propertyName, ObjectIdGenerator<?> objectIdGenerator, boolean z) {
-        return construct(javaType, propertyName == null ? null : propertyName.getSimpleName(), (ObjectIdGenerator) objectIdGenerator, z);
+    public static ObjectIdWriter construct(JavaType javaType, PropertyName propertyName2, ObjectIdGenerator<?> objectIdGenerator, boolean z) {
+        return construct(javaType, propertyName2 == null ? null : propertyName2.getSimpleName(), objectIdGenerator, z);
     }
 
     @Deprecated

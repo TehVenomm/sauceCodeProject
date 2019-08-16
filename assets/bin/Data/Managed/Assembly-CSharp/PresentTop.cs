@@ -46,7 +46,7 @@ public class PresentTop : GameSection
 		SetActive((Enum)UI.BTN_ALL_DISABLE, !flag);
 		SetLabelText((Enum)UI.STR_ALL_DISABLE, base.sectionData.GetText("STR_ALL"));
 		SetActive((Enum)UI.STR_NON_LIST, !flag);
-		SetGrid(UI.GRD_LIST, "PresentListItem", count, false, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_LIST, "PresentListItem", count, reset: false, delegate(int i, Transform t, bool b)
 		{
 			Present present = MonoBehaviourSingleton<PresentManager>.I.presentData.presents[i];
 			SetLabelText(t, UI.LBL_NAME, present.name);
@@ -56,10 +56,10 @@ public class PresentTop : GameSection
 			SetLabelText(t, UI.LBL_EXPIRE, text);
 			SetLabelText(t, UI.LBL_TIME, present.timeInfo);
 			SetEvent(t, UI.BTN_SELECT, "SELECT", i);
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)present.type, (uint)present.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)present.type, (uint)present.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT));
 			if (itemIcon != null)
 			{
-				itemIcon.SetEnableCollider(false);
+				itemIcon.SetEnableCollider(is_enable: false);
 			}
 		});
 		int num = 1;
@@ -93,19 +93,19 @@ public class PresentTop : GameSection
 		{
 			if (is_on_query_event)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			}
 		});
 	}
 
 	private void OnQuery_PAGE_PREV()
 	{
-		MovePage(MonoBehaviourSingleton<PresentManager>.I.page - 1, true);
+		MovePage(MonoBehaviourSingleton<PresentManager>.I.page - 1);
 	}
 
 	private void OnQuery_PAGE_NEXT()
 	{
-		MovePage(MonoBehaviourSingleton<PresentManager>.I.page + 1, true);
+		MovePage(MonoBehaviourSingleton<PresentManager>.I.page + 1);
 	}
 
 	private void OnQuery_SELECT()
@@ -154,7 +154,7 @@ public class PresentTop : GameSection
 			if (is_success)
 			{
 				selectEventData[2] = num;
-				SoundManager.PlaySystemSE(SoundID.UISE.GET_PRIZE, 1f);
+				SoundManager.PlaySystemSE(SoundID.UISE.GET_PRIZE);
 			}
 			else
 			{
@@ -165,29 +165,29 @@ public class PresentTop : GameSection
 					is_resume = false;
 					break;
 				case Error.WRN_PRESENT_OVER_MONEY:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_MONEY", null);
+					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_MONEY");
 					break;
 				case Error.WRN_PRESENT_OVER_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_ITEM", null);
+					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_ITEM");
 					break;
 				case Error.WRN_PRESENT_OVER_EQUIP_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_EQUIP_ITEM", null);
+					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_EQUIP_ITEM");
 					break;
 				case Error.WRN_PRESENT_OVER_SKILL_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_SKILL_ITEM", null);
+					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_SKILL_ITEM");
 					break;
 				case Error.WRN_PRESENT_OVER_QUEST_ITEM:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_QUEST_ITEM", null);
+					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_QUEST_ITEM");
 					break;
 				case Error.WRN_PRESENT_OVER_EQUIP_AND_SKILL:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_EQUIP_AND_SKILL", null);
+					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_EQUIP_AND_SKILL");
 					break;
 				case Error.WRN_PRESENT_OVER_ETC:
-					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_ETC", null);
+					GameSection.ChangeStayEvent("WRN_PRESENT_OVER_ETC");
 					break;
 				}
 			}
-			GameSection.ResumeEvent(is_resume, null);
+			GameSection.ResumeEvent(is_resume);
 		});
 	}
 
@@ -246,7 +246,7 @@ public class PresentTop : GameSection
 
 	private void EXPAND_STORAGE()
 	{
-		DispatchEvent("EXPAND_STORAGE", null);
+		DispatchEvent("EXPAND_STORAGE");
 	}
 
 	private void OnQuery_CAUTION()
@@ -261,7 +261,7 @@ public class PresentTop : GameSection
 			int num = (MonoBehaviourSingleton<PresentManager>.I.presentNum > 0) ? ((MonoBehaviourSingleton<PresentManager>.I.presentNum - 1) / MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.LIST_NUM_PER_PAGE) : 0;
 			int page = Mathf.Min(num, MonoBehaviourSingleton<PresentManager>.I.page);
 			SetDirty(UI.GRD_LIST);
-			MovePage(page, false);
+			MovePage(page, is_on_query_event: false);
 		}
 		else if ((notify_flags & NOTIFY_FLAG.UPDATE_PRESENT_LIST) != (NOTIFY_FLAG)0L)
 		{

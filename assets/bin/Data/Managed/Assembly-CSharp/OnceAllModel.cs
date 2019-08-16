@@ -37,6 +37,10 @@ public class OnceAllModel : BaseModel
 		public int req_qi;
 
 		public int req_ai;
+
+		public int req_ac;
+
+		public string d;
 	}
 
 	public static string URL = "ajax/once/all";

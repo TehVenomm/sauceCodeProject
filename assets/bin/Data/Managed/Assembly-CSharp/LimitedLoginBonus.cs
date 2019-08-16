@@ -61,13 +61,11 @@ public class LimitedLoginBonus : GameSection
 		REQUEST_COMPLETE = 40000029
 	}
 
-	private const int BEGINNER_LOGIN_BONUS_ID = 6;
+	private static Color bgYellow = new Color(248f / 255f, 46f / 85f, 38f / 255f);
 
-	private static Color bgYellow = new Color(0.972549f, 0.5411765f, 0.149019614f);
+	private static Color bgRed = new Color(29f / 85f, 67f / 85f, 248f / 255f);
 
-	private static Color bgRed = new Color(0.34117648f, 0.7882353f, 0.972549f);
-
-	private static Color bgBlue = new Color(0.972549f, 0.34117648f, 0.3529412f);
+	private static Color bgBlue = new Color(248f / 255f, 29f / 85f, 0.3529412f);
 
 	private static float iconHeight = 112f;
 
@@ -90,6 +88,8 @@ public class LimitedLoginBonus : GameSection
 	private static float pickUpItemPosY = 150f;
 
 	private static float scrollStartHeight = -38f;
+
+	private const int BEGINNER_LOGIN_BONUS_ID = 6;
 
 	private Transform texModel_;
 
@@ -135,9 +135,6 @@ public class LimitedLoginBonus : GameSection
 
 	public override void Initialize()
 	{
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
 		glowModel_ = Utility.Find(base._transform, "LIB_00000003");
 		texModel_ = Utility.Find(base._transform, "TEX_MODEL");
 		texModelRenderTexture_ = UIModelRenderTexture.Get(texModel_);
@@ -145,8 +142,8 @@ public class LimitedLoginBonus : GameSection
 		texInnerModel_ = Utility.Find(base._transform, "TEX_INNER_MODEL");
 		texInnerModelRenderTexture_ = UIModelRenderTexture.Get(texInnerModel_);
 		texInnerModelTexture_ = texInnerModel_.GetComponent<UITexture>();
-		info = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfo", true);
-		infoDetail = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfoDetail", true);
+		info = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfo");
+		infoDetail = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfoDetail");
 		info.get_gameObject().SetActive(false);
 		infoDetail.get_gameObject().SetActive(false);
 		this.StartCoroutine(DoInitialize());
@@ -154,9 +151,6 @@ public class LimitedLoginBonus : GameSection
 
 	protected void OnQuery_RELEASE_ABILITY()
 	{
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 		if (!(infoDetail == null) && !(info == null))
 		{
 			if (isDetail)
@@ -180,10 +174,8 @@ public class LimitedLoginBonus : GameSection
 
 	protected void OnQuery_ABILITY_DATA_POPUP()
 	{
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		int index = (int)array[0];
 		string text = string.Empty;
@@ -242,23 +234,23 @@ public class LimitedLoginBonus : GameSection
 		lb = null;
 		if (GameSection.GetEventData() != null)
 		{
-			Protocol.Send<LoginBonusConfirmModel.RequestSendForm, LoginBonusConfirmModel>(post_data: new LoginBonusConfirmModel.RequestSendForm
+			Protocol.Send<LoginBonusConfirmModel.RequestSendForm, LoginBonusConfirmModel>(postData: new LoginBonusConfirmModel.RequestSendForm
 			{
 				loginBonusId = (int)GameSection.GetEventData()
-			}, url: LoginBonusConfirmModel.URL, call_back: (Action<LoginBonusConfirmModel>)delegate(LoginBonusConfirmModel ret)
+			}, url: LoginBonusConfirmModel.URL, callBack: (Action<LoginBonusConfirmModel>)delegate(LoginBonusConfirmModel ret)
 			{
 				if (ret.Error == Error.None)
 				{
 					if (ret != null && ret.result != null && ret.result.Count > 0)
 					{
-						((_003CDoInitialize_003Ec__Iterator8D)/*Error near IL_0071: stateMachine*/)._003C_003Ef__this.lb = ret.result[0];
+						lb = ret.result[0];
 					}
-					((_003CDoInitialize_003Ec__Iterator8D)/*Error near IL_0071: stateMachine*/)._003Cconnect_003E__0 = true;
+					connect = true;
 				}
-			}, get_param: string.Empty);
+			}, getParam: string.Empty);
 			while (!connect)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		if (!connect)
@@ -271,230 +263,205 @@ public class LimitedLoginBonus : GameSection
 			base.Initialize();
 			while (MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			GameSection.BackSection();
+			yield break;
+		}
+		arrayNow = 0;
+		int i = 0;
+		for (int count = lb.next.Count; i < count; i++)
+		{
+			if (lb.next[i].count == lb.nowCount)
+			{
+				arrayNow = i;
+				break;
+			}
+			if (lb.next[i].count > lb.nowCount)
+			{
+				arrayNow = i;
+				break;
+			}
+		}
+		int logbo_column_num = 1 + (lb.next.Count - 1) / 5;
+		int logbo_now_column = 1 + arrayNow / 5;
+		if (logbo_column_num > 3)
+		{
+			if (logbo_now_column > logbo_column_num - 2)
+			{
+				logbo_now_column = logbo_column_num - 2;
+			}
+			startScrPos = scrollStartHeight + iconHeight * (float)(logbo_now_column - 1);
+			isFirst = true;
 		}
 		else
 		{
-			arrayNow = 0;
-			int i = 0;
-			for (int count = lb.next.Count; i < count; i++)
-			{
-				if (lb.next[i].count == lb.nowCount)
-				{
-					arrayNow = i;
-					break;
-				}
-				if (lb.next[i].count > lb.nowCount)
-				{
-					arrayNow = i;
-					break;
-				}
-			}
-			int logbo_column_num = 1 + (lb.next.Count - 1) / 5;
-			int logbo_now_column = 1 + arrayNow / 5;
-			if (logbo_column_num > 3)
-			{
-				if (logbo_now_column > logbo_column_num - 2)
-				{
-					logbo_now_column = logbo_column_num - 2;
-				}
-				startScrPos = scrollStartHeight + iconHeight * (float)(logbo_now_column - 1);
-				isFirst = true;
-			}
-			else
-			{
-				isFirst = false;
-			}
-			SetPickUp();
-			float rotateSpeed = 35f;
-			if (pickUpReward.type == 5)
-			{
-				uint modelID3 = (uint)pickUpReward.itemId;
-				texModelRenderTexture_.InitSkillItem(texModelTexture_, modelID3, true, false, 45f);
-				texInnerModelRenderTexture_.InitSkillItemSymbol(texInnerModelTexture_, modelID3, true, 17f);
-				isModel = true;
-			}
-			else if (pickUpReward.type == 4)
-			{
-				SetRenderEquipModel((Enum)UI.TEX_MODEL, (uint)pickUpReward.itemId, -1, -1, pickUpReward.GetScale());
-				isModel = true;
-			}
-			else if (pickUpReward.type == 1 || pickUpReward.type == 2)
-			{
-				uint modelID = GetItemModelID((REWARD_TYPE)pickUpReward.type, pickUpReward.itemId);
-				texModelRenderTexture_.InitItem(texModelTexture_, modelID, true);
-				isModel = true;
-			}
-			else if (pickUpReward.type == 3 && IsDispItem3D(pickUpReward.itemId))
-			{
-				uint modelID2 = GetItemModelID((REWARD_TYPE)pickUpReward.type, pickUpReward.itemId);
-				texModelRenderTexture_.InitItem(texModelTexture_, modelID2, true);
-				isModel = true;
-			}
-			texModelRenderTexture_.SetRotateSpeed(rotateSpeed);
-			texInnerModelRenderTexture_.SetRotateSpeed(rotateSpeed);
-			LoadingQueue loadingQueue = new LoadingQueue(this);
-			string topImgName = ResourceName.GetLoginBonusTopImage(lb.loginBonusId);
-			topImageLoadObj = loadingQueue.Load(RESOURCE_CATEGORY.LOGINBONUS_IMAGE, topImgName, false);
-			if (loadingQueue.IsLoading())
-			{
-				yield return (object)loadingQueue.Wait();
-			}
-			base.Initialize();
+			isFirst = false;
 		}
+		SetPickUp();
+		float rotateSpeed = 35f;
+		if (pickUpReward.type == 14)
+		{
+			SetRenderAccessoryModel((Enum)UI.TEX_MODEL, (uint)pickUpReward.itemId, pickUpReward.GetScale(), rotation: true, light_rotation: false);
+			isModel = true;
+		}
+		else if (pickUpReward.type == 5)
+		{
+			uint itemId = (uint)pickUpReward.itemId;
+			texModelRenderTexture_.InitSkillItem(texModelTexture_, itemId, rotation: true, light_rotation: false, 45f);
+			texInnerModelRenderTexture_.InitSkillItemSymbol(texInnerModelTexture_, itemId, rotation: true, 17f);
+			isModel = true;
+		}
+		else if (pickUpReward.type == 4)
+		{
+			SetRenderEquipModel((Enum)UI.TEX_MODEL, (uint)pickUpReward.itemId, -1, -1, pickUpReward.GetScale());
+			isModel = true;
+		}
+		else if (pickUpReward.type == 1 || pickUpReward.type == 2)
+		{
+			uint itemModelID = GetItemModelID((REWARD_TYPE)pickUpReward.type, pickUpReward.itemId);
+			texModelRenderTexture_.InitItem(texModelTexture_, itemModelID);
+			isModel = true;
+		}
+		else if (pickUpReward.type == 3 && IsDispItem3D(pickUpReward.itemId))
+		{
+			uint itemModelID2 = GetItemModelID((REWARD_TYPE)pickUpReward.type, pickUpReward.itemId);
+			texModelRenderTexture_.InitItem(texModelTexture_, itemModelID2);
+			isModel = true;
+		}
+		texModelRenderTexture_.SetRotateSpeed(rotateSpeed);
+		texInnerModelRenderTexture_.SetRotateSpeed(rotateSpeed);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		string topImgName = ResourceName.GetLoginBonusTopImage(lb.loginBonusId);
+		topImageLoadObj = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.LOGINBONUS_IMAGE, topImgName);
+		if (loadingQueue.IsLoading())
+		{
+			yield return loadingQueue.Wait();
+		}
+		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
 		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0233: Unknown result type (might be due to invalid IL or missing references)
 		if (lb == null)
 		{
 			SetLabelText((Enum)UI.LBL_PICKUP, string.Empty);
 			SetLabelText((Enum)UI.LBL_PERIOD, string.Empty);
+			return;
 		}
-		else
+		if (topImageLoadObj != null)
 		{
-			if (topImageLoadObj != null)
+			Texture2D val = null;
+			val = (topImageLoadObj.loadedObject as Texture2D);
+			if (val != null)
 			{
-				Texture2D val = null;
-				val = (topImageLoadObj.loadedObject as Texture2D);
-				if (val != null)
+				Transform t2 = FindCtrl(base._transform, UI.TEX_LOGIN_BANNER);
+				SetActive(t2, is_visible: true);
+				SetTexture(t2, val);
+			}
+		}
+		if (!isModel)
+		{
+			FindCtrl(base._transform, UI.OBJ_DETAIL_ROOT).set_localPosition(new Vector3(pickUpPosX, pickUpItemPosY, 0f));
+			LoginBonus.LoginBonusReward loginBonusReward = pickUpReward;
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward.type, (uint)loginBonusReward.itemId, Utility.Find(base._transform, "OBJ_DETAIL_ROOT"));
+			itemIcon.transform.set_localScale(new Vector3(1.5f, 1.5f, 1.5f));
+		}
+		SetLabelText((Enum)UI.LBL_PERIOD, lb.period_announce);
+		SetLabelText((Enum)UI.LBL_LOGIN_DAYS, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 7u), lb.nowCount.ToString()));
+		FindCtrl(base._transform, UI.LBL_PICKUP).GetComponent<UILabel>().supportEncoding = true;
+		SetLabelText((Enum)UI.LBL_PICKUP, pickUpReward.pickUpText);
+		int count = lb.next.Count;
+		SetFrame(1 + (lb.next.Count - 1) / 5, lb.boardType);
+		touchAndReleaseList.Clear();
+		SetGrid(UI.GRD_BONUSLIST, "LimitedLoginBonusItem", count, reset: false, delegate(int i, Transform t, bool b)
+		{
+			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
+			bool flag = false;
+			LoginBonus.LoginBonusReward loginBonusReward2 = null;
+			loginBonusReward2 = lb.next[i].reward[0];
+			flag = loginBonusReward2.isGet;
+			if (arrayNow == i && lb.reward.Count > 0)
+			{
+				GameObject gameObject = FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject();
+				gameObject.SetActive(true);
+				EventDelegate.Set(gameObject.GetComponentInChildren<TweenScale>().onFinished, SetGetDialog);
+				FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(false);
+			}
+			else if (flag)
+			{
+				FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(true);
+			}
+			else
+			{
+				FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject().SetActive(false);
+			}
+			if (loginBonusReward2.isPickUp)
+			{
+				FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(true);
+				FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(true);
+				FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(false);
+				SetLabelText(t, UI.LBL_DAY_PICKUP, loginBonusReward2.day);
+			}
+			else if (loginBonusReward2.frameType != 0)
+			{
+				FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(true);
+				FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(true);
+				FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(false);
+				SetLabelText(t, UI.LBL_DAY_FINE, loginBonusReward2.day);
+			}
+			else
+			{
+				FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(true);
+				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(true);
+				SetLabelText(t, UI.LBL_DAY, loginBonusReward2.day);
+			}
+			SetLabelText(t, UI.LBL_ITEMNUM, "x" + loginBonusReward2.itemNum.ToString());
+			ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward2.type, (uint)loginBonusReward2.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT));
+			if (itemIcon2 != null)
+			{
+				itemIcon2.SetEnableCollider(is_enable: false);
+			}
+			if (flag)
+			{
+				UITexture[] componentsInChildren = itemIcon2.GetComponentsInChildren<UITexture>();
+				int j = 0;
+				for (int num = componentsInChildren.Length; j < num; j++)
 				{
-					Transform t2 = FindCtrl(base._transform, UI.TEX_LOGIN_BANNER);
-					SetActive(t2, true);
-					SetTexture(t2, val);
+					componentsInChildren[j].color = Color.get_gray();
+				}
+				UISprite[] componentsInChildren2 = itemIcon2.GetComponentsInChildren<UISprite>();
+				int k = 0;
+				for (int num2 = componentsInChildren2.Length; k < num2; k++)
+				{
+					componentsInChildren2[k].color = Color.get_gray();
 				}
 			}
-			if (!isModel)
-			{
-				FindCtrl(base._transform, UI.OBJ_DETAIL_ROOT).set_localPosition(new Vector3(pickUpPosX, pickUpItemPosY, 0f));
-				LoginBonus.LoginBonusReward loginBonusReward = pickUpReward;
-				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward.type, (uint)loginBonusReward.itemId, Utility.Find(base._transform, "OBJ_DETAIL_ROOT"), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				itemIcon.transform.set_localScale(new Vector3(1.5f, 1.5f, 1.5f));
-			}
-			SetLabelText((Enum)UI.LBL_PERIOD, lb.period_announce);
-			SetLabelText((Enum)UI.LBL_LOGIN_DAYS, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 7u), lb.nowCount.ToString()));
-			FindCtrl(base._transform, UI.LBL_PICKUP).GetComponent<UILabel>().supportEncoding = true;
-			SetLabelText((Enum)UI.LBL_PICKUP, pickUpReward.pickUpText);
-			int count = lb.next.Count;
-			SetFrame(1 + (lb.next.Count - 1) / 5, lb.boardType);
-			touchAndReleaseList.Clear();
-			SetGrid(UI.GRD_BONUSLIST, "LimitedLoginBonusItem", count, false, delegate(int i, Transform t, bool b)
-			{
-				//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005d: Expected O, but got Unknown
-				//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-				//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-				//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-				//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0311: Unknown result type (might be due to invalid IL or missing references)
-				//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
-				bool flag = false;
-				LoginBonus.LoginBonusReward loginBonusReward2 = null;
-				loginBonusReward2 = lb.next[i].reward[0];
-				flag = loginBonusReward2.isGet;
-				if (arrayNow == i && lb.reward.Count > 0)
-				{
-					GameObject val2 = FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject();
-					val2.SetActive(true);
-					EventDelegate.Set(val2.GetComponentInChildren<TweenScale>().onFinished, SetGetDialog);
-					FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(false);
-				}
-				else if (flag)
-				{
-					FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(true);
-				}
-				else
-				{
-					FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject().SetActive(false);
-				}
-				if (loginBonusReward2.isPickUp)
-				{
-					FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(true);
-					FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(true);
-					FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(false);
-					SetLabelText(t, UI.LBL_DAY_PICKUP, loginBonusReward2.day);
-				}
-				else if (loginBonusReward2.frameType != 0)
-				{
-					FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(true);
-					FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(true);
-					FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(false);
-					SetLabelText(t, UI.LBL_DAY_FINE, loginBonusReward2.day);
-				}
-				else
-				{
-					FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(true);
-					FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(false);
-					FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(true);
-					SetLabelText(t, UI.LBL_DAY, loginBonusReward2.day);
-				}
-				SetLabelText(t, UI.LBL_ITEMNUM, "x" + loginBonusReward2.itemNum.ToString());
-				ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward2.type, (uint)loginBonusReward2.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				if (itemIcon2 != null)
-				{
-					itemIcon2.SetEnableCollider(false);
-				}
-				if (flag)
-				{
-					UITexture[] componentsInChildren = itemIcon2.GetComponentsInChildren<UITexture>();
-					int j = 0;
-					for (int num = componentsInChildren.Length; j < num; j++)
-					{
-						componentsInChildren[j].color = Color.get_gray();
-					}
-					UISprite[] componentsInChildren2 = itemIcon2.GetComponentsInChildren<UISprite>();
-					int k = 0;
-					for (int num2 = componentsInChildren2.Length; k < num2; k++)
-					{
-						componentsInChildren2[k].color = Color.get_gray();
-					}
-				}
-				SetAbilityItemEvent(t, i, touchAndReleaseList);
-			});
-			if (isFirst)
-			{
-				Transform ctrl = GetCtrl(UI.SCR_BONUSLIST);
-				UIPanel component = ctrl.GetComponent<UIPanel>();
-				ctrl.get_transform().set_localPosition(new Vector3(0f, startScrPos, 0f));
-				component.clipOffset = new Vector2(0f, 0f - startScrPos);
-			}
+			SetAbilityItemEvent(t, i, touchAndReleaseList);
+		});
+		if (isFirst)
+		{
+			Transform ctrl = GetCtrl(UI.SCR_BONUSLIST);
+			UIPanel component = ctrl.GetComponent<UIPanel>();
+			ctrl.get_transform().set_localPosition(new Vector3(0f, startScrPos, 0f));
+			component.clipOffset = new Vector2(0f, 0f - startScrPos);
 		}
 	}
 
@@ -593,8 +560,7 @@ public class LimitedLoginBonus : GameSection
 
 	private void SetGetDialog()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		PlayAudio(AUDIO.REQUEST_COMPLETE, 1f, false);
+		PlayAudio(AUDIO.REQUEST_COMPLETE);
 		this.StartCoroutine("WaitGetDialog");
 	}
 
@@ -610,7 +576,6 @@ public class LimitedLoginBonus : GameSection
 
 	public void OnQuery_CLOSE()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (null != glowModel_)
 		{
 			glowModel_.get_gameObject().SetActive(false);
@@ -619,7 +584,7 @@ public class LimitedLoginBonus : GameSection
 		{
 			showedBLBP = true;
 			GameSection.StopEvent();
-			DispatchEvent("BEGINNER_LOGIN_BONUS_POP", null);
+			DispatchEvent("BEGINNER_LOGIN_BONUS_POP");
 		}
 		else
 		{

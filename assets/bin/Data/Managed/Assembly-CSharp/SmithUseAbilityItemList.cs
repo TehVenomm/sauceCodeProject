@@ -23,13 +23,13 @@ public class SmithUseAbilityItemList : GameSection
 		LBL_MAX_SELECT_NUM,
 		LBL_SELECT_NUM,
 		LBL_SORT,
-		TGL_ICON_ASC
+		TGL_ICON_ASC,
+		BTN_CHANGE
 	}
 
 	public enum SHOW_INVENTORY_MODE
 	{
-		MAIN_STATUS,
-		SMALL
+		MAIN_STATUS
 	}
 
 	private EquipItemInfo equipItemInfo;
@@ -75,8 +75,8 @@ public class SmithUseAbilityItemList : GameSection
 		SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, isSellMode);
 		SetLabelText((Enum)UI.LBL_MAX_HAVE_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxAbilityItem.ToString());
 		SetLabelText((Enum)UI.LBL_NOW_HAVE_NUM, inventory.datas.Length.ToString());
-		SetActive((Enum)UI.GRD_INVENTORY, false);
-		SetActive((Enum)UI.GRD_INVENTORY_SMALL, false);
+		SetActive((Enum)UI.GRD_INVENTORY, is_visible: false);
+		SetActive((Enum)UI.GRD_INVENTORY_SMALL, is_visible: false);
 		SetLabelText((Enum)UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
 		SetToggle((Enum)UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
 		if (isSellMode)
@@ -91,8 +91,8 @@ public class SmithUseAbilityItemList : GameSection
 			SetLabelText((Enum)UI.LBL_TOTAL, num.ToString());
 		}
 		UI currentInventoryRoot = GetCurrentInventoryRoot();
-		SetActive((Enum)currentInventoryRoot, true);
-		SetDynamicList((Enum)currentInventoryRoot, (string)null, inventory.datas.Length, false, (Func<int, bool>)delegate(int i)
+		SetActive((Enum)currentInventoryRoot, is_visible: true);
+		SetDynamicList((Enum)currentInventoryRoot, (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
 		{
 			SortCompareData sortCompareData = inventory.datas[i];
 			if (sortCompareData == null || !sortCompareData.IsPriority(inventory.sortSettings.orderTypeAsc))
@@ -102,8 +102,6 @@ public class SmithUseAbilityItemList : GameSection
 			return true;
 		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycre)
 		{
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 			SmithUseAbilityItemList smithUseAbilityItemList = this;
 			AbilityItemSortData abilityItem = inventory.datas[i] as AbilityItemSortData;
 			int num2 = sellItemData.FindIndex((AbilityItemSortData x) => x.GetUniqID() == abilityItem.GetUniqID());
@@ -137,7 +135,7 @@ public class SmithUseAbilityItemList : GameSection
 				SetEvent(itemIcon.transform, (!flag) ? "LESS_RARITY" : "SELECT_ITEM", abilityItem);
 			}
 		});
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, currentShowInventoryMode != SHOW_INVENTORY_MODE.SMALL);
+		SetActive((Enum)UI.BTN_CHANGE, is_visible: false);
 		UpdateAnchors();
 		base.UpdateUI();
 	}
@@ -153,17 +151,13 @@ public class SmithUseAbilityItemList : GameSection
 		bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(ITEM_ICON_TYPE.ABILITY_ITEM, item_data.GetUniqID());
 		MonoBehaviourSingleton<InventoryManager>.I.AddShowFragsAbilityItem(item_data.GetUniqID());
 		ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(item_data.GetTableID());
-		if (currentShowInventoryMode != SHOW_INVENTORY_MODE.SMALL)
-		{
-			return ItemIconDetail.CreateMaterialIcon(item_data.GetIconType(), item_data.GetIconID(), item_data.GetRarity(), itemData, true, parent, item_data.GetNum(), item_data.GetName(), "SELECT_ITEM", index, -1, false, is_new);
-		}
-		return ItemIconDetailSmall.CreateSmallMaterialIcon(item_data.GetIconType(), item_data.GetIconID(), item_data.GetRarity(), parent, item_data.GetNum(), item_data.GetName(), "SELECT_ITEM", index, -1, false, is_new, 0, 0, ItemIconDetail.ICON_STATUS.NONE);
+		return ItemIconDetail.CreateMaterialIcon(item_data.GetIconType(), item_data.GetIconID(), item_data.GetRarity(), itemData, is_show_main_status: true, parent, item_data.GetNum(), item_data.GetName(), "SELECT_ITEM", index, -1, is_select: false, is_new);
 	}
 
 	private void OnQuery_CHANGE_INVENTORY()
 	{
-		currentShowInventoryMode = ((currentShowInventoryMode == SHOW_INVENTORY_MODE.MAIN_STATUS) ? SHOW_INVENTORY_MODE.SMALL : SHOW_INVENTORY_MODE.MAIN_STATUS);
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, currentShowInventoryMode != SHOW_INVENTORY_MODE.SMALL);
+		currentShowInventoryMode = SHOW_INVENTORY_MODE.MAIN_STATUS;
+		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, value: true);
 		RefreshUI();
 	}
 
@@ -205,7 +199,7 @@ public class SmithUseAbilityItemList : GameSection
 	{
 		if (sellItemData.Count == 0)
 		{
-			GameSection.ChangeEvent("SELL_NOT_SELECT", null);
+			GameSection.ChangeEvent("SELL_NOT_SELECT");
 		}
 		else
 		{
@@ -238,7 +232,6 @@ public class SmithUseAbilityItemList : GameSection
 
 	private void InitializeCaption()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		SetLabelText(ctrl, UI.LBL_CAPTION, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 26u));
 		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
@@ -250,7 +243,7 @@ public class SmithUseAbilityItemList : GameSection
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 
@@ -275,13 +268,12 @@ public class SmithUseAbilityItemList : GameSection
 		}
 		else
 		{
-			GameSection.ChangeEvent("OVER_SELL_ITEM", null);
+			GameSection.ChangeEvent("OVER_SELL_ITEM");
 		}
 	}
 
 	private void RefreshSelectSell()
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		ItemIcon[] componentsInChildren = GetCtrl(GetCurrentInventoryRoot()).GetComponentsInChildren<ItemIcon>();
 		foreach (ItemIcon itemIcon in componentsInChildren)
 		{

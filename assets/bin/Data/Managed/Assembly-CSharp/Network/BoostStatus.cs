@@ -23,7 +23,7 @@ namespace Network
 		public string GetRemainTime()
 		{
 			TimeSpan restTime = endDate.CalcRemainTime();
-			return UIUtility.TimeFormat(restTime, false);
+			return UIUtility.TimeFormat(restTime);
 		}
 
 		public bool IsRemain()

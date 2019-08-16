@@ -48,24 +48,21 @@ public class CoopLocalServerStage
 
 	private void InitEnemyPop(List<CoopOfflineManager.EnemyPopParam> enemy_pop_params)
 	{
-		if (QuestManager.IsValidInGameWaveMatch())
+		if (QuestManager.IsValidInGameWaveMatch() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameSeriesArena())
 		{
-			MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
+			return;
 		}
-		else
+		enemyPops = new List<CoopLocalServerEnemyPop>();
+		int i = 0;
+		for (int count = enemy_pop_params.Count; i < count; i++)
 		{
-			enemyPops = new List<CoopLocalServerEnemyPop>();
-			int i = 0;
-			for (int count = enemy_pop_params.Count; i < count; i++)
+			FieldMapTable.EnemyPopTableData data = enemy_pop_params[i].data;
+			if (data != null && enemy_pop_params[i].data.enemyPopType == ENEMY_POP_TYPE.NONE)
 			{
-				FieldMapTable.EnemyPopTableData data = enemy_pop_params[i].data;
-				if (data != null && enemy_pop_params[i].data.enemyPopType == ENEMY_POP_TYPE.NONE)
-				{
-					int count2 = enemy_pop_params[i].count;
-					CoopLocalServerEnemyPop coopLocalServerEnemyPop = new CoopLocalServerEnemyPop();
-					coopLocalServerEnemyPop.Init(this, i, data, count2);
-					enemyPops.Add(coopLocalServerEnemyPop);
-				}
+				int count2 = enemy_pop_params[i].count;
+				CoopLocalServerEnemyPop coopLocalServerEnemyPop = new CoopLocalServerEnemyPop();
+				coopLocalServerEnemyPop.Init(this, i, data, count2);
+				enemyPops.Add(coopLocalServerEnemyPop);
 			}
 		}
 	}

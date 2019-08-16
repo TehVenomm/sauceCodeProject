@@ -5,6 +5,10 @@ using System.Text;
 
 public class Cipher
 {
+	public const string CRYPT_HASH_KEY = "$-5as;hgfm,vgs^*;fd@345-9zds3k5p";
+
+	public const string CRYPT_IV_128 = "8)&#$.Dtsf7%od;.";
+
 	public const string DEFAULT_NETWORKHASH = "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
 
 	public const string DEFAULT_IV_128 = "yCNBH$$rCNGvC+#f";
@@ -117,8 +121,6 @@ public class Cipher
 		{
 			Log.Error(LOG.NETWORK, "SHA256.ComputHash failed");
 			return null;
-			IL_003a:
-			return array;
 		}
 	}
 
@@ -134,8 +136,6 @@ public class Cipher
 		{
 			Log.Error(LOG.NETWORK, "SHA256.ComputHash failed");
 			return null;
-			IL_002e:
-			return array;
 		}
 	}
 
@@ -178,89 +178,83 @@ public class Cipher
 				return null;
 			}
 			array = binaryReader.ReadBytes(15);
-			if (CompareBytearrays(array, b))
+			if (!CompareBytearrays(array, b))
 			{
-				switch (binaryReader.ReadUInt16())
-				{
-				case 33027:
-					binaryReader.ReadByte();
-					break;
-				case 33283:
-					binaryReader.ReadInt16();
-					break;
-				default:
-					return null;
-				}
-				if (binaryReader.ReadByte() == 0)
-				{
-					switch (binaryReader.ReadUInt16())
-					{
-					case 33072:
-						binaryReader.ReadByte();
-						break;
-					case 33328:
-						binaryReader.ReadInt16();
-						break;
-					default:
-						return null;
-					}
-					num = binaryReader.ReadUInt16();
-					byte b3 = 0;
-					byte b4 = 0;
-					switch (num)
-					{
-					case 33026:
-						b3 = binaryReader.ReadByte();
-						break;
-					case 33282:
-						b4 = binaryReader.ReadByte();
-						b3 = binaryReader.ReadByte();
-						break;
-					default:
-						return null;
-					}
-					byte[] value = new byte[4]
-					{
-						b3,
-						b4,
-						0,
-						0
-					};
-					int num2 = BitConverter.ToInt32(value, 0);
-					byte b5 = binaryReader.ReadByte();
-					binaryReader.BaseStream.Seek(-1L, SeekOrigin.Current);
-					if (b5 == 0)
-					{
-						binaryReader.ReadByte();
-						num2--;
-					}
-					byte[] modulus = binaryReader.ReadBytes(num2);
-					if (binaryReader.ReadByte() == 2)
-					{
-						int count = binaryReader.ReadByte();
-						byte[] exponent = binaryReader.ReadBytes(count);
-						RSACryptoServiceProvider rSACryptoServiceProvider = new RSACryptoServiceProvider();
-						RSAParameters parameters = default(RSAParameters);
-						parameters.Modulus = modulus;
-						parameters.Exponent = exponent;
-						rSACryptoServiceProvider.ImportParameters(parameters);
-						return rSACryptoServiceProvider;
-					}
-					return null;
-				}
 				return null;
 			}
-			return null;
-			IL_021d:
-			RSACryptoServiceProvider result;
-			return result;
+			switch (binaryReader.ReadUInt16())
+			{
+			case 33027:
+				binaryReader.ReadByte();
+				break;
+			case 33283:
+				binaryReader.ReadInt16();
+				break;
+			default:
+				return null;
+			}
+			if (binaryReader.ReadByte() != 0)
+			{
+				return null;
+			}
+			switch (binaryReader.ReadUInt16())
+			{
+			case 33072:
+				binaryReader.ReadByte();
+				break;
+			case 33328:
+				binaryReader.ReadInt16();
+				break;
+			default:
+				return null;
+			}
+			num = binaryReader.ReadUInt16();
+			byte b3 = 0;
+			byte b4 = 0;
+			switch (num)
+			{
+			case 33026:
+				b3 = binaryReader.ReadByte();
+				break;
+			case 33282:
+				b4 = binaryReader.ReadByte();
+				b3 = binaryReader.ReadByte();
+				break;
+			default:
+				return null;
+			}
+			byte[] value = new byte[4]
+			{
+				b3,
+				b4,
+				0,
+				0
+			};
+			int num2 = BitConverter.ToInt32(value, 0);
+			byte b5 = binaryReader.ReadByte();
+			binaryReader.BaseStream.Seek(-1L, SeekOrigin.Current);
+			if (b5 == 0)
+			{
+				binaryReader.ReadByte();
+				num2--;
+			}
+			byte[] modulus = binaryReader.ReadBytes(num2);
+			if (binaryReader.ReadByte() != 2)
+			{
+				return null;
+			}
+			int count = binaryReader.ReadByte();
+			byte[] exponent = binaryReader.ReadBytes(count);
+			RSACryptoServiceProvider rSACryptoServiceProvider = new RSACryptoServiceProvider();
+			RSAParameters parameters = default(RSAParameters);
+			parameters.Modulus = modulus;
+			parameters.Exponent = exponent;
+			rSACryptoServiceProvider.ImportParameters(parameters);
+			return rSACryptoServiceProvider;
 		}
 		catch (Exception)
 		{
 			return null;
-			IL_022b:
-			RSACryptoServiceProvider result;
-			return result;
 		}
 		finally
 		{

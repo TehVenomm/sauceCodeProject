@@ -7,16 +7,16 @@ import com.google.android.gms.common.api.Status;
 
 public class GoogleSignInResult implements Result {
     private Status mStatus;
-    private GoogleSignInAccount zzecp;
+    private GoogleSignInAccount zzaz;
 
     public GoogleSignInResult(@Nullable GoogleSignInAccount googleSignInAccount, @NonNull Status status) {
-        this.zzecp = googleSignInAccount;
+        this.zzaz = googleSignInAccount;
         this.mStatus = status;
     }
 
     @Nullable
     public GoogleSignInAccount getSignInAccount() {
-        return this.zzecp;
+        return this.zzaz;
     }
 
     @NonNull

@@ -1,3 +1,4 @@
+using Network;
 using rhyme;
 using System;
 using System.Collections;
@@ -6,7 +7,7 @@ using UnityEngine;
 
 public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 {
-	public class Pool_List_CoopPacket
+	public class Pool_List_CoopPacket : rymTPool<List<CoopPacket>>
 	{
 	}
 
@@ -48,7 +49,6 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		packetReceiver = this.get_gameObject().AddComponent<CoopNetworkPacketReceiver>();
 	}
@@ -82,7 +82,6 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 	{
 		if (!Log.enabled)
 		{
-			return;
 		}
 	}
 
@@ -104,51 +103,47 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 
 	public void Connect(ConnectData conn_data, Action<bool> call_back)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
 	}
 
 	private IEnumerator RequestCoroutineConnect(ConnectData conn_data, Action<bool> call_back)
 	{
-		yield return (object)this.StartCoroutine(RequestCoroutineClose(1000, "Bye!", null));
+		yield return this.StartCoroutine(RequestCoroutineClose(1000));
 		if (string.IsNullOrEmpty(conn_data.path))
 		{
 			Logd("Connect fail. nothing connection path...");
-			call_back?.Invoke(false);
+			call_back?.Invoke(obj: false);
+			yield break;
 		}
-		else
+		if (conn_data.ports.Count == 0)
 		{
-			if (conn_data.ports.Count == 0)
-			{
-				Uri uri = new Uri(conn_data.path);
-				conn_data.ports.Add(uri.Port);
-			}
-			bool is_success = false;
-			foreach (int port in conn_data.ports)
-			{
-				float timeoutTimer = 15f;
-				string connectPath = GetRelayServerPath(conn_data.path, port);
-				Logd("Connect. path={0}", connectPath);
-				MonoBehaviourSingleton<KtbWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
-				while (!MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<KtbWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<KtbWebSocket>.CONNECTION_STATUS.ERROR)
-				{
-					timeoutTimer -= Time.get_deltaTime();
-					yield return (object)new WaitForEndOfFrame();
-				}
-				if (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
-				{
-					is_success = true;
-					RegisterPacketReceiveAction();
-					break;
-				}
-			}
-			call_back?.Invoke(is_success);
+			Uri uri = new Uri(conn_data.path);
+			conn_data.ports.Add(uri.Port);
 		}
+		bool is_success = false;
+		foreach (int port in conn_data.ports)
+		{
+			float timeoutTimer = 15f;
+			string connectPath = GetRelayServerPath(conn_data.path, port);
+			Logd("Connect. path={0}", connectPath);
+			MonoBehaviourSingleton<KtbWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
+			while (!MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<KtbWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<KtbWebSocket>.CONNECTION_STATUS.ERROR)
+			{
+				timeoutTimer -= Time.get_deltaTime();
+				yield return (object)new WaitForEndOfFrame();
+			}
+			if (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
+			{
+				is_success = true;
+				RegisterPacketReceiveAction();
+				break;
+			}
+		}
+		call_back?.Invoke(is_success);
 	}
 
 	public void Close(ushort code = 1000, string msg = "Bye!", Action call_back = null)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		Logd("Close.");
 		this.StartCoroutine(RequestCoroutineClose(code, msg, call_back));
 	}
@@ -174,21 +169,21 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		coop_Model_Register.token = conn_data.token;
 		Logd("Regist. roomId={0}, token={1}", conn_data.roomId, conn_data.token);
 		registerAck = null;
-		SendServer(coop_Model_Register, true, delegate(Coop_Model_ACK ack)
+		SendServer(coop_Model_Register, promise: true, delegate(Coop_Model_ACK ack)
 		{
 			bool obj = true;
 			registerAck = (ack as Coop_Model_RegisterACK);
 			if (ack == null || !ack.positive)
 			{
 				obj = false;
-				MonoBehaviourSingleton<KtbWebSocket>.I.Close(1000, "Bye!");
+				MonoBehaviourSingleton<KtbWebSocket>.I.Close(1000);
 			}
 			if (call_back != null)
 			{
 				call_back(obj);
 			}
 			return true;
-		}, null);
+		});
 	}
 
 	public void ConnectAndRegist(ConnectData conn_data, Action<bool, bool> call_back)
@@ -200,7 +195,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 			{
 				if (call_back != null)
 				{
-					call_back(is_connect, false);
+					call_back(is_connect, arg2: false);
 				}
 			}
 			else
@@ -221,26 +216,38 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 	{
 		Coop_Model_Disconnect coop_Model_Disconnect = new Coop_Model_Disconnect();
 		coop_Model_Disconnect.code = code;
-		SendServer(coop_Model_Disconnect, false, null, null);
+		SendServer(coop_Model_Disconnect, promise: false);
+	}
+
+	public void Standby()
+	{
+		Coop_Model_Standby model = new Coop_Model_Standby();
+		SendServer(model, promise: false);
+	}
+
+	public void Resume()
+	{
+		Coop_Model_Resume model = new Coop_Model_Resume();
+		SendServer(model, promise: false);
 	}
 
 	public void Alive()
 	{
 		Coop_Model_Alive model = new Coop_Model_Alive();
-		SendServer(model, false, null, null);
+		SendServer(model, promise: false);
 	}
 
 	public void RoomEntryClose(int reason)
 	{
 		Coop_Model_RoomEntryClose coop_Model_RoomEntryClose = new Coop_Model_RoomEntryClose();
 		coop_Model_RoomEntryClose.reason = reason;
-		SendServer(coop_Model_RoomEntryClose, false, null, null);
+		SendServer(coop_Model_RoomEntryClose, promise: false);
 	}
 
 	public void RoomStageRequest()
 	{
 		Coop_Model_RoomStageRequest model = new Coop_Model_RoomStageRequest();
-		SendServer(model, false, null, null);
+		SendServer(model, promise: false);
 	}
 
 	public void RoomStageChange(int questId, int idx)
@@ -248,13 +255,13 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		Coop_Model_RoomStageChange coop_Model_RoomStageChange = new Coop_Model_RoomStageChange();
 		coop_Model_RoomStageChange.qId = questId;
 		coop_Model_RoomStageChange.idx = idx;
-		SendServer(coop_Model_RoomStageChange, false, null, null);
+		SendServer(coop_Model_RoomStageChange, promise: false);
 	}
 
 	public void BattleStart()
 	{
 		Coop_Model_BattleStart model = new Coop_Model_BattleStart();
-		SendServer(model, false, null, null);
+		SendServer(model, promise: false);
 	}
 
 	public void EnemyAttack(int sid, int dmg)
@@ -262,7 +269,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		Coop_Model_EnemyAttack coop_Model_EnemyAttack = new Coop_Model_EnemyAttack();
 		coop_Model_EnemyAttack.sid = sid;
 		coop_Model_EnemyAttack.dmg = dmg;
-		SendServer(coop_Model_EnemyAttack, false, null, null);
+		SendServer(coop_Model_EnemyAttack, promise: false);
 	}
 
 	public void EnemyOut(int sid, Vector3 pos)
@@ -271,7 +278,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		coop_Model_EnemyOut.sid = sid;
 		coop_Model_EnemyOut.x = (int)pos.x;
 		coop_Model_EnemyOut.z = (int)pos.z;
-		SendServer(coop_Model_EnemyOut, false, null, null);
+		SendServer(coop_Model_EnemyOut, promise: false);
 	}
 
 	public void EnemyOutEscape(int sid, Vector3 pos)
@@ -281,14 +288,27 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		coop_Model_EnemyOut.x = (int)pos.x;
 		coop_Model_EnemyOut.z = (int)pos.z;
 		coop_Model_EnemyOut.isEscape = true;
-		SendServer(coop_Model_EnemyOut, false, null, null);
+		SendServer(coop_Model_EnemyOut, promise: false);
+	}
+
+	public void EnemyForcePop(PopSignatureInfo psig, Vector3 pos)
+	{
+		Coop_Model_EnemyForcePop coop_Model_EnemyForcePop = new Coop_Model_EnemyForcePop();
+		coop_Model_EnemyForcePop.psig = psig.signature;
+		coop_Model_EnemyForcePop.keyId = psig.popKeyId;
+		coop_Model_EnemyForcePop.eid = psig.enemyId;
+		coop_Model_EnemyForcePop.lv = psig.enemyLv;
+		coop_Model_EnemyForcePop.popType = psig.enemyPopType;
+		coop_Model_EnemyForcePop.x = pos.x;
+		coop_Model_EnemyForcePop.z = pos.z;
+		SendServer(coop_Model_EnemyForcePop, promise: false);
 	}
 
 	public void RewardGet(int rewardId)
 	{
 		Coop_Model_RewardGet coop_Model_RewardGet = new Coop_Model_RewardGet();
 		coop_Model_RewardGet.rewardId = rewardId;
-		SendServer(coop_Model_RewardGet, false, null, null);
+		SendServer(coop_Model_RewardGet, promise: false);
 	}
 
 	public void UpdateBoost()
@@ -299,20 +319,20 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 			coop_Model_UpdateBoost.expUpEnd = MonoBehaviourSingleton<StatusManager>.I.GetBoostStatusEndTimestamp(USE_ITEM_EFFECT_TYPE.EXP_UP);
 			coop_Model_UpdateBoost.moneyUpEnd = MonoBehaviourSingleton<StatusManager>.I.GetBoostStatusEndTimestamp(USE_ITEM_EFFECT_TYPE.MONEY_UP);
 			coop_Model_UpdateBoost.dropUpEnd = MonoBehaviourSingleton<StatusManager>.I.GetBoostStatusEndTimestamp(USE_ITEM_EFFECT_TYPE.DROP_UP);
+			coop_Model_UpdateBoost.happenQuestUpEnd = MonoBehaviourSingleton<StatusManager>.I.GetBoostStatusEndTimestamp(USE_ITEM_EFFECT_TYPE.HAPPEN_QUEST_UP);
 		}
-		SendServer(coop_Model_UpdateBoost, false, null, null);
+		SendServer(coop_Model_UpdateBoost, promise: false);
 	}
 
-	public void RoomTimeCheck(float elapsed_sec = 0)
+	public void RoomTimeCheck(float elapsed_sec = 0f)
 	{
 		Coop_Model_RoomTimeCheck coop_Model_RoomTimeCheck = new Coop_Model_RoomTimeCheck();
 		coop_Model_RoomTimeCheck.elapsedSec = (int)elapsed_sec;
-		SendServer(coop_Model_RoomTimeCheck, false, null, null);
+		SendServer(coop_Model_RoomTimeCheck, promise: false);
 	}
 
 	public void SyncSend()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (sendId > 0)
 		{
 			this.StartCoroutine(CoroutineSyncSend(sendId));
@@ -349,41 +369,41 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 
 	public int SendServer<T>(T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
 	{
-		if (!((CoopWebSocketSingleton<KtbWebSocket>)MonoBehaviourSingleton<KtbWebSocket>.I).IsConnected() && MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
+		if (!MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected() && MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
 		{
 			return MonoBehaviourSingleton<CoopOfflineManager>.I.Send(model, promise, onReceiveAck);
 		}
-		return Send(-1000, model, typeof(T), promise, onReceiveAck, onPreResend, false, false);
+		return Send(-1000, model, typeof(T), promise, onReceiveAck, onPreResend);
 	}
 
 	public int SendTo<T>(int to_client_id, T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
 	{
-		return Send(to_client_id, model, typeof(T), promise, onReceiveAck, onPreResend, false, false);
+		return Send(to_client_id, model, typeof(T), promise, onReceiveAck, onPreResend);
 	}
 
 	public int SendBroadcast<T>(T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
 	{
-		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend, false, false);
+		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend);
 	}
 
 	public int SendToInStage<T>(int to_client_id, T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
 	{
-		return Send(to_client_id, model, typeof(T), promise, onReceiveAck, onPreResend, true, false);
+		return Send(to_client_id, model, typeof(T), promise, onReceiveAck, onPreResend, is_stage: true);
 	}
 
 	public int SendToInBattle<T>(int to_client_id, T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
 	{
-		return Send(to_client_id, model, typeof(T), promise, onReceiveAck, onPreResend, true, true);
+		return Send(to_client_id, model, typeof(T), promise, onReceiveAck, onPreResend, is_stage: true, is_battle: true);
 	}
 
 	public int SendBroadcastInStage<T>(T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
 	{
-		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend, true, false);
+		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend, is_stage: true);
 	}
 
 	public int SendBroadcastInBattle<T>(T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
 	{
-		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend, true, true);
+		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend, is_stage: true, is_battle: true);
 	}
 
 	private void RegisterPacketReceiveAction()
@@ -406,7 +426,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		i3.CloseOccurred = (Action<ushort, string>)Delegate.Combine(i3.CloseOccurred, (Action<ushort, string>)delegate(ushort code, string msg)
 		{
 			Logd("CloseOccurred. code={0}, msg={1}", code, msg);
-			LoopBackRoomLeave(false);
+			LoopBackRoomLeave();
 			if (MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
 			{
 				MonoBehaviourSingleton<CoopOfflineManager>.I.Activate();
@@ -416,7 +436,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		i4.ErrorOccurred = (Action<Exception>)Delegate.Combine(i4.ErrorOccurred, (Action<Exception>)delegate(Exception ex)
 		{
 			Logd("ErrorOccurred. ex={0}", ex);
-			LoopBackRoomLeave(false);
+			LoopBackRoomLeave();
 			if (MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
 			{
 				MonoBehaviourSingleton<CoopOfflineManager>.I.Activate();
@@ -426,7 +446,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		i5.HeartbeatDisconnected = (Action)Delegate.Combine(i5.HeartbeatDisconnected, (Action)delegate
 		{
 			Logd("HeartbeatDisconnected.");
-			LoopBackRoomLeave(false);
+			LoopBackRoomLeave();
 		});
 	}
 
@@ -460,7 +480,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		coop_Model_RoomLeaved.token = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userToken;
 		coop_Model_RoomLeaved.stgid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId;
 		coop_Model_RoomLeaved.stghostid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
-		return CoopPacket.Create(coop_Model_RoomLeaved, -1000, -2000, false, -8989);
+		return CoopPacket.Create(coop_Model_RoomLeaved, -1000, -2000, promise: false, -8989);
 	}
 
 	public void LoopBackRoomLeave(bool is_force = false)

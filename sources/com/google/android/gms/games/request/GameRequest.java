@@ -3,11 +3,13 @@ package com.google.android.gms.games.request;
 import android.os.Parcelable;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.android.gms.common.data.Freezable;
+import com.google.android.gms.common.util.VisibleForTesting;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.Player;
 import java.util.List;
 
 @Deprecated
+@VisibleForTesting
 public interface GameRequest extends Parcelable, Freezable<GameRequest> {
     public static final int RECIPIENT_STATUS_ACCEPTED = 1;
     public static final int RECIPIENT_STATUS_PENDING = 0;

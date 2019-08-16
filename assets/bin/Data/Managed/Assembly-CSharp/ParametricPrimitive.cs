@@ -4,7 +4,7 @@ using UnityEngine;
 
 [Serializable]
 [ExecuteInEditMode]
-public abstract class ParametricPrimitive
+public abstract class ParametricPrimitive : MonoBehaviour
 {
 	public enum eAlign
 	{
@@ -57,7 +57,7 @@ public abstract class ParametricPrimitive
 	protected void Awake()
 	{
 		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		meshFilter = this.GetComponent<MeshFilter>();
 		mesh = new Mesh();
 		newVertices = new List<Vector3>();

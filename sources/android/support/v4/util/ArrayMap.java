@@ -1,53 +1,15 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/* renamed from: android.support.v4.util.ArrayMap */
 public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
     MapCollections<K, V> mCollections;
 
-    /* renamed from: android.support.v4.util.ArrayMap$1 */
-    class C01071 extends MapCollections<K, V> {
-        C01071() {
-        }
-
-        protected void colClear() {
-            ArrayMap.this.clear();
-        }
-
-        protected Object colGetEntry(int i, int i2) {
-            return ArrayMap.this.mArray[(i << 1) + i2];
-        }
-
-        protected Map<K, V> colGetMap() {
-            return ArrayMap.this;
-        }
-
-        protected int colGetSize() {
-            return ArrayMap.this.mSize;
-        }
-
-        protected int colIndexOfKey(Object obj) {
-            return ArrayMap.this.indexOfKey(obj);
-        }
-
-        protected int colIndexOfValue(Object obj) {
-            return ArrayMap.this.indexOfValue(obj);
-        }
-
-        protected void colPut(K k, V v) {
-            ArrayMap.this.put(k, v);
-        }
-
-        protected void colRemoveAt(int i) {
-            ArrayMap.this.removeAt(i);
-        }
-
-        protected V colSetValue(int i, V v) {
-            return ArrayMap.this.setValueAt(i, v);
-        }
+    public ArrayMap() {
     }
 
     public ArrayMap(int i) {
@@ -60,7 +22,52 @@ public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
 
     private MapCollections<K, V> getCollection() {
         if (this.mCollections == null) {
-            this.mCollections = new C01071();
+            this.mCollections = new MapCollections<K, V>() {
+                /* access modifiers changed from: protected */
+                public void colClear() {
+                    ArrayMap.this.clear();
+                }
+
+                /* access modifiers changed from: protected */
+                public Object colGetEntry(int i, int i2) {
+                    return ArrayMap.this.mArray[(i << 1) + i2];
+                }
+
+                /* access modifiers changed from: protected */
+                public Map<K, V> colGetMap() {
+                    return ArrayMap.this;
+                }
+
+                /* access modifiers changed from: protected */
+                public int colGetSize() {
+                    return ArrayMap.this.mSize;
+                }
+
+                /* access modifiers changed from: protected */
+                public int colIndexOfKey(Object obj) {
+                    return ArrayMap.this.indexOfKey(obj);
+                }
+
+                /* access modifiers changed from: protected */
+                public int colIndexOfValue(Object obj) {
+                    return ArrayMap.this.indexOfValue(obj);
+                }
+
+                /* access modifiers changed from: protected */
+                public void colPut(K k, V v) {
+                    ArrayMap.this.put(k, v);
+                }
+
+                /* access modifiers changed from: protected */
+                public void colRemoveAt(int i) {
+                    ArrayMap.this.removeAt(i);
+                }
+
+                /* access modifiers changed from: protected */
+                public V colSetValue(int i, V v) {
+                    return ArrayMap.this.setValueAt(i, v);
+                }
+            };
         }
         return this.mCollections;
     }

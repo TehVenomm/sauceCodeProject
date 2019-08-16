@@ -3,8 +3,8 @@ package com.facebook.appevents;
 import android.content.Context;
 import android.os.Bundle;
 import com.facebook.GraphRequest;
-import com.facebook.internal.AppEventsLoggerUtility;
-import com.facebook.internal.AppEventsLoggerUtility.GraphAPIActivityType;
+import com.facebook.appevents.internal.AppEventsLoggerUtility;
+import com.facebook.appevents.internal.AppEventsLoggerUtility.GraphAPIActivityType;
 import com.facebook.internal.AttributionIdentifiers;
 import com.facebook.internal.Utility;
 import java.util.ArrayList;
@@ -21,39 +21,29 @@ class SessionEventsState {
     private List<AppEvent> inFlightEvents = new ArrayList();
     private int numSkippedEventsDueToFullBuffer;
 
-    public SessionEventsState(AttributionIdentifiers attributionIdentifiers, String str) {
-        this.attributionIdentifiers = attributionIdentifiers;
+    public SessionEventsState(AttributionIdentifiers attributionIdentifiers2, String str) {
+        this.attributionIdentifiers = attributionIdentifiers2;
         this.anonymousAppDeviceGUID = str;
     }
 
-    private byte[] getStringAsByteArray(String str) {
-        byte[] bArr = null;
-        try {
-            bArr = str.getBytes("UTF-8");
-        } catch (Exception e) {
-            Utility.logd("Encoding exception: ", e);
-        }
-        return bArr;
-    }
-
     private void populateRequest(GraphRequest graphRequest, Context context, int i, JSONArray jSONArray, boolean z) {
-        JSONObject jSONObjectForGraphAPICall;
+        JSONObject jSONObject;
         try {
-            jSONObjectForGraphAPICall = AppEventsLoggerUtility.getJSONObjectForGraphAPICall(GraphAPIActivityType.CUSTOM_APP_EVENTS, this.attributionIdentifiers, this.anonymousAppDeviceGUID, z, context);
+            jSONObject = AppEventsLoggerUtility.getJSONObjectForGraphAPICall(GraphAPIActivityType.CUSTOM_APP_EVENTS, this.attributionIdentifiers, this.anonymousAppDeviceGUID, z, context);
             if (this.numSkippedEventsDueToFullBuffer > 0) {
-                jSONObjectForGraphAPICall.put("num_skipped_events", i);
+                jSONObject.put("num_skipped_events", i);
             }
         } catch (JSONException e) {
-            jSONObjectForGraphAPICall = new JSONObject();
+            jSONObject = new JSONObject();
         }
-        graphRequest.setGraphObject(jSONObjectForGraphAPICall);
+        graphRequest.setGraphObject(jSONObject);
         Bundle parameters = graphRequest.getParameters();
         if (parameters == null) {
             parameters = new Bundle();
         }
         String jSONArray2 = jSONArray.toString();
         if (jSONArray2 != null) {
-            parameters.putByteArray("custom_events_file", getStringAsByteArray(jSONArray2));
+            parameters.putString("custom_events", jSONArray2);
             graphRequest.setTag(jSONArray2);
         }
         graphRequest.setParameters(parameters);
@@ -109,7 +99,9 @@ class SessionEventsState {
             this.accumulatedEvents.clear();
             JSONArray jSONArray = new JSONArray();
             for (AppEvent appEvent : this.inFlightEvents) {
-                if (z || !appEvent.getIsImplicit()) {
+                if (!appEvent.isChecksumValid()) {
+                    Utility.logd("Event with invalid checksum: %s", appEvent.toString());
+                } else if (z || !appEvent.getIsImplicit()) {
                     jSONArray.put(appEvent.getJSONObject());
                 }
             }

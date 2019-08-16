@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HealAttackObject : IAttackCollider
+public class HealAttackObject : MonoBehaviour, IAttackCollider
 {
 	private Player m_player;
 
@@ -41,7 +41,7 @@ public class HealAttackObject : IAttackCollider
 	{
 		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		_Initialize(attacker, parent, pos, rot, height, attackLayer, (float)skillParam.healHp, skillParam.tableData.skillRange);
+		_Initialize(attacker, parent, pos, rot, height, attackLayer, skillParam.healHp, skillParam.tableData.skillRange);
 	}
 
 	public void Initialize(StageObject attacker, Transform parent, float healAtk, float radius)
@@ -53,26 +53,26 @@ public class HealAttackObject : IAttackCollider
 
 	private void _Initialize(StageObject attacker, Transform parent, Vector3 pos, Vector3 rot, float height, int attackLayer, float healAtk, float radius)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Expected O, but got Unknown
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 		m_player = (attacker as Player);
 		this.get_gameObject().set_layer(attackLayer);
-		AttackHitInfo attackHitInfo = m_player.FindAttackInfo(isDuplicate: this.isDuplicateAttackInfo, name: GetAttackInfoName(), fix_rate: true) as AttackHitInfo;
+		Player player = m_player;
+		string attackInfoName = GetAttackInfoName();
+		bool isDuplicateAttackInfo = this.isDuplicateAttackInfo;
+		AttackHitInfo attackHitInfo = player.FindAttackInfo(attackInfoName, fix_rate: true, isDuplicateAttackInfo) as AttackHitInfo;
 		attackHitInfo.atk.normal = healAtk;
 		m_attacker = attacker;
 		m_attackInfo = attackHitInfo;
-		Transform val = this.get_transform();
-		val.set_parent(parent);
-		val.set_localEulerAngles(rot);
-		val.set_localPosition(val.get_localRotation() * pos);
-		val.set_localScale(Vector3.get_one());
+		Transform transform = this.get_transform();
+		transform.set_parent(parent);
+		transform.set_localEulerAngles(rot);
+		transform.set_localPosition(transform.get_localRotation() * pos);
+		transform.set_localScale(Vector3.get_one());
 		m_capsule.set_direction(2);
 		m_capsule.set_radius(radius);
 		m_capsule.set_height(height);
@@ -82,14 +82,13 @@ public class HealAttackObject : IAttackCollider
 		m_timeCount = 0f;
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
-			m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_attackInfo, attacker, m_capsule, this, Player.ATTACK_MODE.NONE, null);
+			m_colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(m_attackInfo, attacker, m_capsule, this);
 			m_attackHitChecker = attacker.ReferenceAttackHitChecker();
 		}
 	}
 
 	public void Destroy()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (m_rigidBody != null)
 		{
 			m_rigidBody.Sleep();
@@ -99,8 +98,6 @@ public class HealAttackObject : IAttackCollider
 
 	protected void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		m_capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
 		m_rigidBody = this.get_gameObject().AddComponent<Rigidbody>();
 		m_rigidBody.set_useGravity(false);

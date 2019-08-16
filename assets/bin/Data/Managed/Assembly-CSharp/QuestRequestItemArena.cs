@@ -35,13 +35,15 @@ public class QuestRequestItemArena : QuestRequestItem
 		LBL_BEST_TIME,
 		SPR_BEST_TIME,
 		SPR_MAIN_REWARD,
-		OBJ_NEED
+		OBJ_NEED,
+		SPR_TYPE_DIFFICULTY
 	}
 
 	private ArenaTable.ArenaData arenaData;
 
 	public void SetupComplete(Transform t, DeliveryTable.DeliveryData info, ArenaUserRecordModel.Param record)
 	{
+		SetActive(t, UI.SPR_TYPE_DIFFICULTY, info.difficulty >= DIFFICULTY_MODE.HARD);
 		InitArenaData(info);
 		base.Setup(t, info);
 		SetBestTimeOrStamp(t, record);
@@ -49,8 +51,9 @@ public class QuestRequestItemArena : QuestRequestItem
 
 	public override void Setup(Transform t, DeliveryTable.DeliveryData info)
 	{
-		SetActive(t, UI.SPR_BEST_TIME, false);
-		SetActive(t, UI.LBL_BEST_TIME, false);
+		SetActive(t, UI.SPR_TYPE_DIFFICULTY, info.difficulty >= DIFFICULTY_MODE.HARD);
+		SetActive(t, UI.SPR_BEST_TIME, is_visible: false);
+		SetActive(t, UI.LBL_BEST_TIME, is_visible: false);
 		InitArenaData(info);
 		base.Setup(t, info);
 	}
@@ -81,18 +84,18 @@ public class QuestRequestItemArena : QuestRequestItem
 		if (arenaData.rank == ARENA_RANK.S)
 		{
 			string text = (record == null) ? QuestUtility.CreateTimeStringByMilliSec(QuestUtility.GetDefaultArenaTime()) : QuestUtility.CreateTimeStringByMilliSec(record.clearMilliSecList[(int)arenaData.group]);
-			SetActive(t, UI.SPR_BEST_TIME, true);
-			SetActive(t, UI.LBL_BEST_TIME, true);
+			SetActive(t, UI.SPR_BEST_TIME, is_visible: true);
+			SetActive(t, UI.LBL_BEST_TIME, is_visible: true);
 			SetLabelText(t, UI.LBL_BEST_TIME, text);
-			SetActive(t, UI.GRD_ICON_ROOT, false);
-			SetActive(t, UI.SPR_MAIN_REWARD, false);
-			SetActive(t, UI.OBJ_NEED, false);
+			SetActive(t, UI.GRD_ICON_ROOT, is_visible: false);
+			SetActive(t, UI.SPR_MAIN_REWARD, is_visible: false);
+			SetActive(t, UI.OBJ_NEED, is_visible: false);
 		}
 		else
 		{
-			SetActive(t, UI.SPR_BEST_TIME, false);
-			SetActive(t, UI.LBL_BEST_TIME, false);
-			SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
+			SetActive(t, UI.SPR_BEST_TIME, is_visible: false);
+			SetActive(t, UI.LBL_BEST_TIME, is_visible: false);
+			SetActive(t, UI.OBJ_REQUEST_COMPLETED, is_visible: true);
 		}
 	}
 }

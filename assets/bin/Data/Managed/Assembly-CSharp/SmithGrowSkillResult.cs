@@ -39,7 +39,12 @@ public class SmithGrowSkillResult : ItemDetailSkill
 		LBL_EXCEED_PREV,
 		LBL_EXCEED_NEXT,
 		SPR_BG_NORMAL,
-		SPR_BG_EXCEED
+		SPR_BG_EXCEED,
+		OBJ_ADD_EXCEED_2,
+		LBL_ADD_EXCEED_2,
+		LBL_EXCEED_PREV_2,
+		LBL_EXCEED_NEXT_2,
+		LBL_ADD_EXCEED_EXTRA
 	}
 
 	public enum AUDIO
@@ -54,8 +59,6 @@ public class SmithGrowSkillResult : ItemDetailSkill
 		GREAT
 	}
 
-	private const float DELAY_TIME = 0.3f;
-
 	protected SmithManager.ResultData resultData;
 
 	private bool isGreat;
@@ -64,11 +67,12 @@ public class SmithGrowSkillResult : ItemDetailSkill
 
 	private bool isPlayExceedAnimation;
 
+	private const float DELAY_TIME = 0.3f;
+
 	public override string overrideBackKeyEvent => "TO_SELECT";
 
 	public override void Initialize()
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		resultData = (SmithManager.ResultData)array[0];
 		isGreat = (bool)array[1];
@@ -93,7 +97,7 @@ public class SmithGrowSkillResult : ItemDetailSkill
 		string effectName = (!isGreat) ? normalEffectName : greatEffectName;
 		LoadingQueue load_queue = new LoadingQueue(this);
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
-		yield return (object)load_queue.Wait();
+		yield return load_queue.Wait();
 		Transform effect = EffectManager.GetUIEffect(effectName, GetCtrl(UI.TEX_MODEL), -1f, -2, GetCtrl(UI.TEX_MODEL).GetComponent<UIWidget>());
 		if (effect != null)
 		{
@@ -117,28 +121,32 @@ public class SmithGrowSkillResult : ItemDetailSkill
 		SetActive((Enum)UI.BTN_NEXT, flag);
 		SetActive((Enum)UI.BTN_NEXT_GRAY, !flag);
 		SetLabelText((Enum)UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("STR_NEXT"));
-		if (isExceed)
+		if (!isExceed)
 		{
-			if (resultData != null)
+			return;
+		}
+		if (resultData != null)
+		{
+			SetLabelText((Enum)UI.LBL_EXCEED_PREV, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
+			SetLabelText((Enum)UI.LBL_EXCEED_PREV_2, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
+		}
+		if (skillItemInfo != null)
+		{
+			int exceedCnt = skillItemInfo.exceedCnt;
+			SetLabelText((Enum)UI.LBL_EXCEED_NEXT, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
+			SetLabelText((Enum)UI.LBL_EXCEED_NEXT_2, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
+			ExceedSkillItemTable.ExceedSkillItemData exceedSkillItemData = Singleton<ExceedSkillItemTable>.I.GetExceedSkillItemData(exceedCnt);
+			if (exceedSkillItemData != null)
 			{
-				SetLabelText((Enum)UI.LBL_EXCEED_PREV, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
+				SetLabelText((Enum)UI.LBL_ADD_EXCEED, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
+				SetLabelText((Enum)UI.LBL_ADD_EXCEED_2, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
 			}
-			if (skillItemInfo != null)
-			{
-				int exceedCnt = skillItemInfo.exceedCnt;
-				SetLabelText((Enum)UI.LBL_EXCEED_NEXT, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
-				ExceedSkillItemTable.ExceedSkillItemData exceedSkillItemData = Singleton<ExceedSkillItemTable>.I.GetExceedSkillItemData(exceedCnt);
-				if (exceedSkillItemData != null)
-				{
-					SetLabelText((Enum)UI.LBL_ADD_EXCEED, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
-				}
-			}
+			SetLabelText((Enum)UI.LBL_ADD_EXCEED_EXTRA, skillItemInfo.GetExceedExtraText());
 		}
 	}
 
 	protected override void OnOpen()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (isPlayExceedAnimation)
 		{
 			this.StartCoroutine(DoPlayExceedAnimation());
@@ -149,9 +157,10 @@ public class SmithGrowSkillResult : ItemDetailSkill
 	private IEnumerator DoPlayExceedAnimation()
 	{
 		yield return (object)new WaitForSeconds(0.3f);
-		Transform effTrans = GetCtrl(UI.OBJ_ADD_EXCEED);
-		UITweenCtrl.Play(effTrans, true, null, false, 0);
-		UITweenCtrl.Play(effTrans, true, null, false, 1);
+		SkillItemInfo data = resultData.itemData as SkillItemInfo;
+		Transform effTrans = (data == null || data.GetExceedExtraText().IsNullOrWhiteSpace()) ? GetCtrl(UI.OBJ_ADD_EXCEED) : GetCtrl(UI.OBJ_ADD_EXCEED_2);
+		UITweenCtrl.Play(effTrans, forward: true, null, is_input_block: false);
+		UITweenCtrl.Play(effTrans, forward: true, null, is_input_block: false, 1);
 		SoundManager.PlayOneShotUISE(40000157);
 	}
 }

@@ -29,7 +29,7 @@ public class Goal_ActSkill : Goal
 		if (ev == BRAIN_EVENT.END_ACTION)
 		{
 			int num = (int)param;
-			Character.ACTION_ID aCTION_ID = (Character.ACTION_ID)20;
+			Character.ACTION_ID aCTION_ID = (Character.ACTION_ID)22;
 			if (num == (int)aCTION_ID)
 			{
 				SetStatus(STATUS.COMPLETED);

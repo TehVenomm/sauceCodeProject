@@ -132,16 +132,11 @@ public class StatusEnemyList : GameSection
 		orderby data.id
 		select data).ToList();
 		int num = 0;
-		using (List<EnemyCollectionTable.EnemyCollectionData>.Enumerator enumerator = currentRegionCollectionItems.GetEnumerator())
+		foreach (EnemyCollectionTable.EnemyCollectionData item in currentRegionCollectionItems)
 		{
-			EnemyCollectionTable.EnemyCollectionData item;
-			while (enumerator.MoveNext())
+			if (achievementCounter.Find((AchievementCounter x) => x.subType == item.id) != null)
 			{
-				item = enumerator.Current;
-				if (achievementCounter.Find((AchievementCounter x) => x.subType == item.id) != null)
-				{
-					num++;
-				}
+				num++;
 			}
 		}
 		SetLabelText((Enum)UI.LBL_CURRENT_NUM, $"{num}/{currentRegionCollectionItems.Count}");
@@ -195,10 +190,10 @@ public class StatusEnemyList : GameSection
 			int num = Mathf.Min(indexItems.Count, ONE_PAGE_EQUIP_NUM);
 			if (num > 0)
 			{
-				SetActive((Enum)targetType, true);
-				SetDynamicList((Enum)targetType, "EnemyCollectionIcon", num, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
+				SetActive((Enum)targetType, is_visible: true);
+				SetDynamicList((Enum)targetType, "EnemyCollectionIcon", num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
 				{
-					SetActive(t, true);
+					SetActive(t, is_visible: true);
 					bool flag = achievementCounter.Find((AchievementCounter x) => x.subType == indexItems[i].id) == null;
 					SetActive(t, UI.OBJ_UNKNOWN, flag);
 					SetActive(t, UI.TEX_ICON, !flag);
@@ -218,12 +213,12 @@ public class StatusEnemyList : GameSection
 			}
 			else
 			{
-				SetActive((Enum)targetType, false);
+				SetActive((Enum)targetType, is_visible: false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)targetType, false);
+			SetActive((Enum)targetType, is_visible: false);
 		}
 	}
 
@@ -238,9 +233,6 @@ public class StatusEnemyList : GameSection
 
 	private void ShowLevelPopup()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (popup == null)
 		{
 			popup = GetCtrl(UI.POP_TARGET_FIELD).GetComponentInChildren<UIScrollablePopupList>(true).get_transform();
@@ -253,7 +245,7 @@ public class StatusEnemyList : GameSection
 			{
 				array[i] = true;
 			}
-			UIScrollablePopupList.CreatePopup(popup, GetCtrl(UI.POP_TARGET_FIELD), 4, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, fields.ToArray(), array, popupIndex, delegate(int index)
+			UIScrollablePopupList.CreatePopup(popup, GetCtrl(UI.POP_TARGET_FIELD), 4, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, fields.ToArray(), array, popupIndex, delegate(int index)
 			{
 				popupIndex = index;
 				UpdateRegion();
@@ -264,7 +256,6 @@ public class StatusEnemyList : GameSection
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_2);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
@@ -277,7 +268,7 @@ public class StatusEnemyList : GameSection
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 }

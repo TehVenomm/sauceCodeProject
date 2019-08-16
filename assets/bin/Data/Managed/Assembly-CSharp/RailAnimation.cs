@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RailAnimation
+public class RailAnimation : MonoBehaviour
 {
 	public const string DEFAULT_RAIL_ANIM_NAME = "DefaultRailAnim";
 
@@ -71,7 +71,6 @@ public class RailAnimation
 
 	private void Awake()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		_animation = this.GetComponent<Animation>();
 		if (_animation == null)
 		{
@@ -100,27 +99,23 @@ public class RailAnimation
 				currentAnimState.set_enabled(true);
 				currentAnimState.set_weight(1f);
 			}
+			return;
 		}
-		else
+		changeInterp.Update();
+		currentAnimState.set_weight(changeInterp.Get());
+		nextAnimState.set_weight(1f - currentAnimState.get_weight());
+		if (!changeInterp.IsPlaying())
 		{
-			changeInterp.Update();
-			currentAnimState.set_weight(changeInterp.Get());
-			nextAnimState.set_weight(1f - currentAnimState.get_weight());
-			if (!changeInterp.IsPlaying())
-			{
-				currentAnimState.set_enabled(false);
-				currentAnimState.set_weight(0f);
-				currentAnimState = nextAnimState;
-				nextAnimState = null;
-				_rate = currentAnimState.get_time() / currentAnimState.get_length();
-			}
+			currentAnimState.set_enabled(false);
+			currentAnimState.set_weight(0f);
+			currentAnimState = nextAnimState;
+			nextAnimState = null;
+			_rate = currentAnimState.get_time() / currentAnimState.get_length();
 		}
 	}
 
 	public void AddRailAnimClip(AnimationClip anim_clip, string name)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
 		if (!(anim_clip == null))
 		{
 			_animation.AddClip(anim_clip, name);
@@ -142,8 +137,6 @@ public class RailAnimation
 
 	public void ChangeRail(string anim_clip_name, float time, float rate = -1f)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Expected O, but got Unknown
 		nextAnimState = _animation.get_Item(anim_clip_name);
 		if (!(nextAnimState == null) && !(nextAnimState == currentAnimState))
 		{
@@ -153,7 +146,7 @@ public class RailAnimation
 			{
 				nextAnimState.set_time(nextAnimState.get_length() * rate);
 			}
-			changeInterp.Set(time, currentAnimState.get_weight(), 0f, null, 0f, null);
+			changeInterp.Set(time, currentAnimState.get_weight(), 0f, null, 0f);
 			changeInterp.Play();
 		}
 	}

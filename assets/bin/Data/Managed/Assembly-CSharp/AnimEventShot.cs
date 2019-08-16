@@ -19,19 +19,24 @@ public class AnimEventShot : BulletObject
 
 	public TargetPoint targetPoint => _targetPoint;
 
-	public void SetArrowInfo(bool isAimBoss, bool isBossPierce)
+	public void SetArrowInfo(bool isAim, bool isBossPierce, bool isArrowRain = false)
 	{
 		isShotArrow = true;
-		isAimBossMode = isAimBoss;
+		isAimMode = isAim;
 		isBossPierceArrow = isBossPierce;
 		pierceArrowSec = 0f;
-		pierceArrowInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.pierceInterval;
+		if (isArrowRain)
+		{
+			pierceArrowInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowRainPierceDamageInterval;
+		}
+		else
+		{
+			pierceArrowInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.pierceInterval;
+		}
 	}
 
 	public static AnimEventShot Create(StageObject stage_object, AnimEventData.EventData data, AttackInfo atk_info, Vector3 offset)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
@@ -48,8 +53,6 @@ public class AnimEventShot : BulletObject
 		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
@@ -70,7 +73,7 @@ public class AnimEventShot : BulletObject
 		val2 = localToWorldMatrix.MultiplyPoint3x4(val2);
 		Quaternion val3 = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
 		val3 = ((data.intArgs[0] != 0) ? (stage_object.get_gameObject().get_transform().get_rotation() * val3) : (val.get_rotation() * val3));
-		return Create(stage_object, atk_info, val2, val3, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
+		return Create(stage_object, atk_info, val2, val3);
 	}
 
 	public static AnimEventShot CreateByExternalBulletData(BulletData exBulletData, StageObject stageObj, AttackInfo atkInfo, Vector3 pos, Quaternion rot, AtkAttribute exAtk = null, Player.ATTACK_MODE attackMode = Player.ATTACK_MODE.NONE, SkillInfo.SkillParam exSkillParam = null)
@@ -82,26 +85,22 @@ public class AnimEventShot : BulletObject
 			Log.Error("exBulletData is null !!");
 			return null;
 		}
-		return Create(stageObj, atkInfo, pos, rot, null, true, null, exBulletData, exAtk, attackMode, null, exSkillParam);
+		return Create(stageObj, atkInfo, pos, rot, null, isScaling: true, null, exBulletData, exAtk, attackMode, null, exSkillParam);
 	}
 
 	public static AnimEventShot CreateArrow(StageObject stage_object, AttackInfo atk_info, Vector3 pos, Quaternion rot, GameObject attach_object, bool isScaling, string change_effect, DamageDistanceTable.DamageDistanceData damageDistanceData)
 	{
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		return Create(stage_object, atk_info, pos, rot, attach_object, isScaling, change_effect, null, null, Player.ATTACK_MODE.NONE, damageDistanceData, null);
+		return Create(stage_object, atk_info, pos, rot, attach_object, isScaling, change_effect, null, null, Player.ATTACK_MODE.NONE, damageDistanceData);
 	}
 
 	public static AnimEventShot Create(StageObject stage_object, AttackInfo atk_info, Vector3 pos, Quaternion rot, GameObject attach_object = null, bool isScaling = true, string change_effect = null, BulletData exBulletData = null, AtkAttribute exAtk = null, Player.ATTACK_MODE attackMode = Player.ATTACK_MODE.NONE, DamageDistanceTable.DamageDistanceData damageDistanceData = null, SkillInfo.SkillParam exSkillParam = null)
 	{
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Expected O, but got Unknown
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 		BulletData bulletData = atk_info.bulletData;
 		if (exBulletData != null)
 		{
@@ -124,12 +123,16 @@ public class AnimEventShot : BulletObject
 			Log.Error("Failed to shoot bullet!! atk_info:" + ((atk_info == null) ? string.Empty : atk_info.name));
 			return null;
 		}
-		Transform val = Utility.CreateGameObject(bulletData.get_name(), MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+		if (MonoBehaviourSingleton<StageObjectManager>.I == null)
+		{
+			return null;
+		}
+		Transform val = Utility.CreateGameObject(bulletData.get_name(), MonoBehaviourSingleton<StageObjectManager>.I._transform);
 		AnimEventShot animEventShot = val.get_gameObject().AddComponent<AnimEventShot>();
 		if (isScaling)
 		{
-			Transform val2 = stage_object.get_gameObject().get_transform();
-			animEventShot.SetBaseScale(val2.get_lossyScale());
+			Transform transform = stage_object.get_gameObject().get_transform();
+			animEventShot.SetBaseScale(transform.get_lossyScale());
 		}
 		else
 		{
@@ -140,13 +143,12 @@ public class AnimEventShot : BulletObject
 		{
 			animEventShot.SetTargetPoint();
 		}
-		animEventShot.Shot(stage_object, atk_info, bulletData, pos, rot, change_effect, true, exAtk, attackMode, damageDistanceData, exSkillParam);
+		animEventShot.Shot(stage_object, atk_info, bulletData, pos, rot, change_effect, reference_attack: true, exAtk, attackMode, damageDistanceData, exSkillParam);
 		return animEventShot;
 	}
 
 	protected override void Awake()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		if (base._collider == null)
@@ -186,10 +188,7 @@ public class AnimEventShot : BulletObject
 
 	public void SetAttachObject(GameObject attach_object)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		attachObject = attach_object;
 		if (!(attach_object == null))
@@ -202,7 +201,6 @@ public class AnimEventShot : BulletObject
 
 	public void SetTargetPoint()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		_targetPoint = this.get_gameObject().AddComponent<TargetPoint>();
 		_targetPoint.isAimEnable = false;
 		_targetPoint.isTargetEnable = false;
@@ -211,16 +209,17 @@ public class AnimEventShot : BulletObject
 	protected override void Update()
 	{
 		base.Update();
-		if (!isDestroyed && isBossPierceArrow)
+		if (isDestroyed || !isBossPierceArrow)
 		{
-			pierceArrowSec += Time.get_deltaTime();
-			if (pierceArrowSec >= pierceArrowInterval)
+			return;
+		}
+		pierceArrowSec += Time.get_deltaTime();
+		if (pierceArrowSec >= pierceArrowInterval)
+		{
+			pierceArrowSec -= pierceArrowInterval;
+			if (!object.ReferenceEquals(attackHitChecker, null))
 			{
-				pierceArrowSec -= pierceArrowInterval;
-				if (!object.ReferenceEquals(attackHitChecker, null))
-				{
-					attackHitChecker.ClearAll();
-				}
+				attackHitChecker.ClearHitInfo(GetAttackInfo().name);
 			}
 		}
 	}

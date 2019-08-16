@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class RegionTable : Singleton<RegionTable>, IDataTable
 {
 	public class Data
 	{
-		public const uint NON_PARENT_ID = uint.MaxValue;
-
-		public const string NT = "regionId,name,iconId,x,y,z,w,h,mx,my,parentRegionId,eventId,difficulty,worldId,nextRegionId,startAt,groupId";
-
-		private const int TIME_DATA_LEN = 2;
-
 		public uint regionId;
 
 		public string regionName;
@@ -38,7 +33,13 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 
 		public int groupId;
 
+		public const uint NON_PARENT_ID = uint.MaxValue;
+
+		public const string NT = "regionId,name,iconId,x,y,z,w,h,mx,my,parentRegionId,eventId,difficulty,worldId,nextRegionId,startAt,groupId";
+
 		public static int EVENT_START_TIME_LEN = 3;
+
+		private const int TIME_DATA_LEN = 2;
 
 		public bool hasParentRegion()
 		{
@@ -90,9 +91,12 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 
 	private UIntKeyTable<Data> table;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		table = TableUtility.CreateUIntKeyTable<Data>(csv_text, Data.cb, "regionId,name,iconId,x,y,z,w,h,mx,my,parentRegionId,eventId,difficulty,worldId,nextRegionId,startAt,groupId", null);
+		table = TableUtility.CreateUIntKeyTable<Data>(csv_text, Data.cb, "regionId,name,iconId,x,y,z,w,h,mx,my,parentRegionId,eventId,difficulty,worldId,nextRegionId,startAt,groupId");
 	}
 
 	public Data GetData(uint id)

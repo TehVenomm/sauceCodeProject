@@ -26,9 +26,9 @@ public interface BetterActivity {
 
     AlertDialog newAlertDialog(int i, int i2);
 
-    AlertDialog newErrorHandlerDialog(int i, Exception exception);
+    AlertDialog newErrorHandlerDialog(int i, Exception exc);
 
-    AlertDialog newErrorHandlerDialog(Exception exception);
+    AlertDialog newErrorHandlerDialog(Exception exc);
 
     AlertDialog newInfoDialog(int i, int i2);
 

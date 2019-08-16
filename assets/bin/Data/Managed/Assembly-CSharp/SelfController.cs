@@ -17,7 +17,18 @@ public class SelfController : ControllerBase
 		SONAR,
 		WARP,
 		EVOLVE,
-		EVOLVE_SPECIAL
+		EVOLVE_SPECIAL,
+		READ_STORY,
+		THS_BURST_RELOAD,
+		GATHER_GIMMICK,
+		BINGO,
+		COOP_FISHING,
+		FLICK_ACTION,
+		CARRY,
+		PORTAL_GIMMICK,
+		QUEST_GIMMICK,
+		TELEPORT_AVOID,
+		RUSH_AVOID
 	}
 
 	public class Command
@@ -31,6 +42,8 @@ public class SelfController : ControllerBase
 		public bool isTouchOn;
 
 		public bool aimKeep;
+
+		public int MotionId = -1;
 
 		public int skillIndex = -1;
 
@@ -70,9 +83,9 @@ public class SelfController : ControllerBase
 
 	private FLICK_DIRECTION flickDirection = FLICK_DIRECTION.FRONT;
 
-	private static readonly float QUARTER_PI = 0.7853982f;
+	private static readonly float QUARTER_PI = (float)Math.PI / 4f;
 
-	private static readonly float THREE_QUARTER_PI = 2.3561945f;
+	private static readonly float THREE_QUARTER_PI = (float)Math.PI * 3f / 4f;
 
 	private Vector3 slideVerocity;
 
@@ -146,11 +159,11 @@ public class SelfController : ControllerBase
 				touchInfo = null;
 				enableTouch = false;
 				isInputtedTouch = false;
-				self.SetEnableTap(false);
+				self.SetEnableTap(enable: false);
 			}
-			if (self.isGuardWalk || self.actionID == (Character.ACTION_ID)18)
+			if (self.isGuardWalk || self.actionID == (Character.ACTION_ID)19)
 			{
-				self.ActIdle(true, -1f);
+				self.ActIdle(is_sync: true);
 			}
 			moveStickInfo = null;
 			lastActCommandType = COMMAND_TYPE.NONE;
@@ -192,25 +205,47 @@ public class SelfController : ControllerBase
 		case COMMAND_TYPE.AVOID:
 			return self.IsChangeableAction(Character.ACTION_ID.MAX);
 		case COMMAND_TYPE.SKILL:
-			return self.IsChangeableAction((Character.ACTION_ID)20);
+			if (CheckCommandWithSkillTableData(command))
+			{
+				return true;
+			}
+			return self.IsChangeableAction((Character.ACTION_ID)22);
 		case COMMAND_TYPE.SPECIAL_ACTION:
-			return self.IsChangeableAction((Character.ACTION_ID)31);
-		case COMMAND_TYPE.CHANGE_WEAPON:
-			return self.IsChangeableAction((Character.ACTION_ID)25);
-		case COMMAND_TYPE.GATHER:
-			return self.IsChangeableAction((Character.ACTION_ID)26);
-		case COMMAND_TYPE.CANNON_STANDBY:
-			return self.IsChangeableAction((Character.ACTION_ID)29);
-		case COMMAND_TYPE.CANNON_SHOT:
-			return self.IsChangeableAction((Character.ACTION_ID)30);
-		case COMMAND_TYPE.SONAR:
 			return self.IsChangeableAction((Character.ACTION_ID)33);
-		case COMMAND_TYPE.WARP:
-			return self.IsChangeableAction((Character.ACTION_ID)34);
-		case COMMAND_TYPE.EVOLVE:
+		case COMMAND_TYPE.CHANGE_WEAPON:
+			return self.IsChangeableAction((Character.ACTION_ID)27);
+		case COMMAND_TYPE.GATHER:
+			return self.IsChangeableAction((Character.ACTION_ID)28);
+		case COMMAND_TYPE.CANNON_STANDBY:
+			return self.IsChangeableAction((Character.ACTION_ID)31);
+		case COMMAND_TYPE.CANNON_SHOT:
+			return self.IsChangeableAction((Character.ACTION_ID)32);
+		case COMMAND_TYPE.SONAR:
 			return self.IsChangeableAction((Character.ACTION_ID)35);
-		case COMMAND_TYPE.EVOLVE_SPECIAL:
+		case COMMAND_TYPE.WARP:
 			return self.IsChangeableAction((Character.ACTION_ID)36);
+		case COMMAND_TYPE.EVOLVE:
+			return self.IsChangeableAction((Character.ACTION_ID)37);
+		case COMMAND_TYPE.EVOLVE_SPECIAL:
+			return self.IsChangeableAction((Character.ACTION_ID)38);
+		case COMMAND_TYPE.READ_STORY:
+			return self.IsChangeableAction((Character.ACTION_ID)39);
+		case COMMAND_TYPE.THS_BURST_RELOAD:
+			return self.IsChangeableAction(Character.ACTION_ID.ATTACK, command.MotionId);
+		case COMMAND_TYPE.GATHER_GIMMICK:
+			return self.IsChangeableAction((Character.ACTION_ID)40);
+		case COMMAND_TYPE.FLICK_ACTION:
+			return self.IsChangeableAction((Character.ACTION_ID)42);
+		case COMMAND_TYPE.COOP_FISHING:
+			return self.IsChangeableAction((Character.ACTION_ID)41);
+		case COMMAND_TYPE.CARRY:
+			return self.IsChangeableAction((Character.ACTION_ID)44);
+		case COMMAND_TYPE.TELEPORT_AVOID:
+			return self.IsChangeableAction((Character.ACTION_ID)46);
+		case COMMAND_TYPE.RUSH_AVOID:
+			return self.IsChangeableAction((Character.ACTION_ID)49);
+		case COMMAND_TYPE.QUEST_GIMMICK:
+			return self.IsChangeableAction((Character.ACTION_ID)28);
 		default:
 			return true;
 		}
@@ -218,40 +253,68 @@ public class SelfController : ControllerBase
 
 	public void ActCommand(Command command)
 	{
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0286: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0302: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0325: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0333: Unknown result type (might be due to invalid IL or missing references)
+		//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0360: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0365: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0372: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0377: Unknown result type (might be due to invalid IL or missing references)
+		//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0381: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0389: Unknown result type (might be due to invalid IL or missing references)
+		//IL_039c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_067e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0683: Unknown result type (might be due to invalid IL or missing references)
+		//IL_068f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0694: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0775: Unknown result type (might be due to invalid IL or missing references)
+		//IL_077a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_077e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0783: Unknown result type (might be due to invalid IL or missing references)
+		//IL_079e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0814: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0819: Unknown result type (might be due to invalid IL or missing references)
+		//IL_081d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0822: Unknown result type (might be due to invalid IL or missing references)
+		//IL_083d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_084a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_084f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_085c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0861: Unknown result type (might be due to invalid IL or missing references)
+		//IL_086c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0871: Unknown result type (might be due to invalid IL or missing references)
+		int num = 0;
+		string text = "Base Layer.";
 		switch (command.type)
 		{
 		case COMMAND_TYPE.ATTACK:
@@ -259,43 +322,66 @@ public class SelfController : ControllerBase
 			{
 				self.SetArrowAimKeep();
 			}
-			if (character is Player)
+			if (base.character is Player)
 			{
-				Player player = character as Player;
+				Player player = base.character as Player;
 				if (player != null && player.HitSpearSpecialAction)
 				{
-					character.ActAttack(10, true, false);
+					base.character.ActAttack(10, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
 					break;
 				}
 			}
-			if (!self.CheckAvoidAttack() && !self.ActSpAttackContinue() && !self.CheckAttackNext())
+			if (self.spearCtrl.IsEnableBurstCombo())
 			{
+				self.spearCtrl.ActAttackBurstCombo();
+			}
+			else
+			{
+				if (self.CheckAvoidAttack() || self.ActSpAttackContinue() || self.CheckAttackNext())
+				{
+					break;
+				}
 				if (self.IsAbleArrowSitShot())
 				{
 					if (self.IsActionFromAvoid())
 					{
-						self.ActAttack(98, true, false);
+						self.ActAttack(98, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
 					}
 					else
 					{
-						self.ActAttack(97, true, false);
+						self.ActAttack(97, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
 					}
+					break;
 				}
-				else
+				if (self.IsAbleArrowRainShot())
 				{
-					character.ActAttack(self.GetNormalAttackId(self.attackMode, self.spAttackType), true, false);
+					if (self.IsActionFromAvoid())
+					{
+						self.ActAttack(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowRainShotAttackId, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+					}
+					else
+					{
+						self.ActAttack(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowReloadRainShotAttackId, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+					}
+					break;
 				}
+				text = "Base Layer.";
+				num = self.GetNormalAttackId(self.attackMode, self.spAttackType, self.extraAttackType, out text);
+				Character character = base.character;
+				int id = num;
+				string motionLayerName = text;
+				character.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName, string.Empty);
 			}
 			break;
 		case COMMAND_TYPE.AVOID:
 		{
-			Transform cameraTransform2 = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 right2 = cameraTransform2.get_right();
-			Vector3 forward2 = cameraTransform2.get_forward();
-			forward2.y = 0f;
-			forward2.Normalize();
-			Vector3 val2 = this.get_transform().get_position() + (right2 * command.inputVec.x + forward2 * command.inputVec.y);
-			this.get_transform().LookAt(val2);
+			Transform cameraTransform4 = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+			Vector3 right4 = cameraTransform4.get_right();
+			Vector3 forward4 = cameraTransform4.get_forward();
+			forward4.y = 0f;
+			forward4.Normalize();
+			Vector3 val3 = this.get_transform().get_position() + (right4 * command.inputVec.x + forward4 * command.inputVec.y);
+			this.get_transform().LookAt(val3);
 			self.ActAvoid();
 			slideVerocity = Vector3.get_zero();
 			slideTimer = 0f;
@@ -303,13 +389,13 @@ public class SelfController : ControllerBase
 		}
 		case COMMAND_TYPE.WARP:
 		{
-			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 right = cameraTransform.get_right();
-			Vector3 forward = cameraTransform.get_forward();
-			forward.y = 0f;
-			forward.Normalize();
-			Vector3 val = this.get_transform().get_position() + (right * command.inputVec.x + forward * command.inputVec.y);
-			this.get_transform().LookAt(val);
+			Transform cameraTransform3 = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+			Vector3 right3 = cameraTransform3.get_right();
+			Vector3 forward3 = cameraTransform3.get_forward();
+			forward3.y = 0f;
+			forward3.Normalize();
+			Vector3 val2 = this.get_transform().get_position() + (right3 * command.inputVec.x + forward3 * command.inputVec.y);
+			this.get_transform().LookAt(val2);
 			self.ActWarp();
 			slideVerocity = Vector3.get_zero();
 			slideTimer = 0f;
@@ -319,13 +405,13 @@ public class SelfController : ControllerBase
 			self.ActSkillAction(command.skillIndex);
 			break;
 		case COMMAND_TYPE.SPECIAL_ACTION:
-			if (!self.pairSwordsCtrl.IsAbleToAlterSpAction())
+			if (self.CheckAttackMode(Player.ATTACK_MODE.PAIR_SWORDS) && !self.pairSwordsCtrl.IsAbleToAlterSpAction())
 			{
-				self.ActSpecialAction(false, false);
+				self.ActSpecialAction(start_effect: false, isSuccess: false);
 			}
-			else
+			else if (!self.CheckWeaponActionForSpAction())
 			{
-				self.ActSpecialAction(true, true);
+				self.ActSpecialAction();
 			}
 			break;
 		case COMMAND_TYPE.CHANGE_WEAPON:
@@ -368,6 +454,93 @@ public class SelfController : ControllerBase
 			break;
 		case COMMAND_TYPE.EVOLVE_SPECIAL:
 			self.ActEvolveSpecialAction();
+			break;
+		case COMMAND_TYPE.READ_STORY:
+			if (self.nearFieldGimmick == command.fieldGimmickObject)
+			{
+				self.ActReadStory(self.nearFieldGimmick.GetId());
+			}
+			break;
+		case COMMAND_TYPE.THS_BURST_RELOAD:
+		{
+			text = self.GetMotionLayerName(self.attackMode, self.spAttackType, command.MotionId);
+			Character character2 = base.character;
+			int id = command.MotionId;
+			string motionLayerName = text;
+			character2.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName, string.Empty);
+			break;
+		}
+		case COMMAND_TYPE.GATHER_GIMMICK:
+			if (self.nearFieldGimmick == command.fieldGimmickObject)
+			{
+				self.ActGatherGimmick(self.nearFieldGimmick.GetId());
+			}
+			break;
+		case COMMAND_TYPE.BINGO:
+			if (self.nearFieldGimmick == command.fieldGimmickObject)
+			{
+				self.ActBingo(self.nearFieldGimmick.GetId());
+			}
+			break;
+		case COMMAND_TYPE.FLICK_ACTION:
+			self.ActFlickAction(Vector2.op_Implicit(command.inputVec), isOriginal: true);
+			slideVerocity = Vector3.get_zero();
+			slideTimer = 0f;
+			break;
+		case COMMAND_TYPE.COOP_FISHING:
+			if (self.nearFieldGimmick == command.fieldGimmickObject)
+			{
+				self.ActCoopFishingStart(self.nearFieldGimmick.GetId());
+			}
+			break;
+		case COMMAND_TYPE.CARRY:
+			if (self.nearFieldGimmick != null)
+			{
+				InGameProgress.eFieldGimmick type = InGameProgress.eFieldGimmick.CarriableGimmick;
+				if (self.nearFieldGimmick is FieldSupplyGimmickObject)
+				{
+					type = InGameProgress.eFieldGimmick.SupplyGimmick;
+				}
+				self.ActCarry(type, self.nearFieldGimmick.GetId());
+			}
+			break;
+		case COMMAND_TYPE.PORTAL_GIMMICK:
+			if (self.nearFieldGimmick == command.fieldGimmickObject)
+			{
+				self.ActPortalGimmick(self.nearFieldGimmick.GetId());
+			}
+			break;
+		case COMMAND_TYPE.TELEPORT_AVOID:
+		{
+			Transform cameraTransform2 = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+			Vector3 right2 = cameraTransform2.get_right();
+			Vector3 forward2 = cameraTransform2.get_forward();
+			forward2.y = 0f;
+			forward2.Normalize();
+			Vector3 val = this.get_transform().get_position() + (right2 * command.inputVec.x + forward2 * command.inputVec.y);
+			this.get_transform().LookAt(val);
+			self.ActTeleportAvoid();
+			slideVerocity = Vector3.get_zero();
+			slideTimer = 0f;
+			break;
+		}
+		case COMMAND_TYPE.RUSH_AVOID:
+		{
+			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+			Vector3 right = cameraTransform.get_right();
+			Vector3 forward = cameraTransform.get_forward();
+			forward.y = 0f;
+			forward.Normalize();
+			self.ActRushAvoid(right * command.inputVec.x + forward * command.inputVec.y);
+			slideVerocity = Vector3.get_zero();
+			slideTimer = 0f;
+			break;
+		}
+		case COMMAND_TYPE.QUEST_GIMMICK:
+			if (self.nearFieldGimmick == command.fieldGimmickObject)
+			{
+				self.ActQuestGimmick(self.nearFieldGimmick.GetId());
+			}
 			break;
 		}
 		if (command.isTouchOn)
@@ -417,77 +590,195 @@ public class SelfController : ControllerBase
 
 	private void OnTap(InputManager.TouchInfo touch_info)
 	{
-		if (IsEnableControll() && !(character == null) && !character.isLoading)
+		if (!IsEnableControll() || character == null || character.isLoading)
 		{
-			if (self.isStunnedLoop)
+			return;
+		}
+		if (self.isStunnedLoop)
+		{
+			CancelInput();
+			self.ReduceStunnedTime();
+			return;
+		}
+		if (self.actionID == (Character.ACTION_ID)16)
+		{
+			CancelInput();
+			self.InputBlowClear();
+			return;
+		}
+		if (self.IsCarrying())
+		{
+			if (self.enableCancelToCarryPut)
 			{
-				CancelInput();
-				self.ReduceStunnedTime();
-			}
-			else if (self.actionID == (Character.ACTION_ID)15)
-			{
-				CancelInput();
-				self.InputBlowClear();
-			}
-			else if (self.targetFieldGimmickCannon != null && self.targetFieldGimmickCannon is IFieldGimmickCannon)
-			{
-				if (self.cannonState == Player.CANNON_STATE.READY)
+				if (self.nearFieldGimmick is FieldCarriableGimmickObject && self.carryingGimmickObject is FieldCarriableEvolveItemGimmickObject && (self.nearFieldGimmick as FieldCarriableGimmickObject).CanEvolve())
 				{
-					Command command = new Command();
-					command.type = COMMAND_TYPE.CANNON_SHOT;
-					command.fieldGimmickObject = self.targetFieldGimmickCannon;
-					SetCommand(command);
+					self.ActCarryPut(self.nearFieldGimmick.GetId());
+				}
+				else
+				{
+					self.ActCarryPut();
 				}
 			}
-			else
+			return;
+		}
+		if (self.targetFieldGimmickCannon != null && self.targetFieldGimmickCannon != null)
+		{
+			if (self.cannonState == Player.CANNON_STATE.READY)
 			{
-				if (self.nearFieldGimmick != null)
+				Command command = new Command();
+				command.type = COMMAND_TYPE.CANNON_SHOT;
+				command.fieldGimmickObject = self.targetFieldGimmickCannon;
+				SetCommand(command);
+			}
+			return;
+		}
+		if (self.nearFieldGimmick != null)
+		{
+			if (self.nearFieldGimmick is IFieldGimmickCannon)
+			{
+				IFieldGimmickCannon fieldGimmickCannon = self.nearFieldGimmick as IFieldGimmickCannon;
+				if (fieldGimmickCannon != null && !fieldGimmickCannon.IsUsing() && fieldGimmickCannon.IsAbleToUse() && self.cannonState == Player.CANNON_STATE.NONE)
 				{
-					if (self.nearFieldGimmick is IFieldGimmickCannon)
-					{
-						IFieldGimmickCannon fieldGimmickCannon = self.nearFieldGimmick as IFieldGimmickCannon;
-						if (fieldGimmickCannon != null && !fieldGimmickCannon.IsUsing() && fieldGimmickCannon.IsAbleToUse() && self.cannonState == Player.CANNON_STATE.NONE)
-						{
-							Command command2 = new Command();
-							command2.type = COMMAND_TYPE.CANNON_STANDBY;
-							command2.fieldGimmickObject = self.nearFieldGimmick;
-							SetCommand(command2);
-							return;
-						}
-					}
-					if (self.nearFieldGimmick is FieldSonarObject)
-					{
-						FieldSonarObject fieldSonarObject = self.nearFieldGimmick as FieldSonarObject;
-						if (fieldSonarObject != null)
-						{
-							Command command3 = new Command();
-							command3.type = COMMAND_TYPE.SONAR;
-							command3.fieldGimmickObject = self.nearFieldGimmick;
-							SetCommand(command3);
-							return;
-						}
-					}
-				}
-				if (self.cannonState == Player.CANNON_STATE.NONE)
-				{
-					self.SetFlickDirection(FLICK_DIRECTION.FRONT);
-					self.OnTap();
-					if (self.nearGatherPoint != null)
-					{
-						Command command4 = new Command();
-						command4.type = COMMAND_TYPE.GATHER;
-						command4.gatherPoint = self.nearGatherPoint;
-						SetCommand(command4);
-					}
-					InputAttack(false);
+					Command command2 = new Command();
+					command2.type = COMMAND_TYPE.CANNON_STANDBY;
+					command2.fieldGimmickObject = self.nearFieldGimmick;
+					SetCommand(command2);
+					return;
 				}
 			}
+			if (self.nearFieldGimmick is FieldSonarObject)
+			{
+				SetCommandForFieldGimmick<FieldSonarObject>(COMMAND_TYPE.SONAR);
+				return;
+			}
+			if (self.nearFieldGimmick is FieldReadStoryObject)
+			{
+				SetCommandForFieldGimmick<FieldReadStoryObject>(COMMAND_TYPE.READ_STORY);
+				return;
+			}
+			if (self.nearFieldGimmick is FieldChatGimmickObject)
+			{
+				FieldChatGimmickObject fieldChatGimmickObject = self.nearFieldGimmick as FieldChatGimmickObject;
+				if (fieldChatGimmickObject != null && fieldChatGimmickObject.StartChat())
+				{
+					return;
+				}
+			}
+			if (self.nearFieldGimmick is FieldGimmickCoopFishing && self.fishingCtrl != null && !self.fishingCtrl.IsFishing())
+			{
+				SetCommandForFieldGimmick<FieldGimmickCoopFishing>(COMMAND_TYPE.COOP_FISHING);
+				return;
+			}
+			if (self.nearFieldGimmick is FieldGatherGimmickObject)
+			{
+				FieldGatherGimmickObject fieldGatherGimmickObject = self.nearFieldGimmick as FieldGatherGimmickObject;
+				GATHER_GIMMICK_TYPE gatherGimmickType = fieldGatherGimmickObject.GetGatherGimmickType();
+				if ((gatherGimmickType == GATHER_GIMMICK_TYPE.FISHING || gatherGimmickType == GATHER_GIMMICK_TYPE.COOP_FISHING) && fieldGatherGimmickObject != null && fieldGatherGimmickObject.CanUse() && self.fishingCtrl != null && !self.fishingCtrl.IsFishing())
+				{
+					Command command3 = new Command();
+					command3.type = COMMAND_TYPE.GATHER_GIMMICK;
+					command3.fieldGimmickObject = self.nearFieldGimmick;
+					SetCommand(command3);
+					return;
+				}
+			}
+			if (self.nearFieldGimmick is FieldQuestGimmickObject)
+			{
+				FieldQuestGimmickObject fieldQuestGimmickObject = self.nearFieldGimmick as FieldQuestGimmickObject;
+				if (fieldQuestGimmickObject != null)
+				{
+					Command command4 = new Command();
+					command4.type = COMMAND_TYPE.QUEST_GIMMICK;
+					command4.fieldGimmickObject = self.nearFieldGimmick;
+					SetCommand(command4);
+					return;
+				}
+			}
+			if (self.nearFieldGimmick is FieldBingoObject)
+			{
+				SetCommandForFieldGimmick<FieldBingoObject>(COMMAND_TYPE.BINGO);
+				return;
+			}
+			if (self.nearFieldGimmick is FieldCarriableGimmickObject)
+			{
+				SetCommandForFieldGimmick<FieldCarriableGimmickObject>(COMMAND_TYPE.CARRY);
+				return;
+			}
+			if (self.nearFieldGimmick is FieldSupplyGimmickObject)
+			{
+				SetCommandForFieldGimmick<FieldSupplyGimmickObject>(COMMAND_TYPE.CARRY);
+				return;
+			}
+			if (self.nearFieldGimmick is FieldPortalGimmickObject)
+			{
+				SetCommandForFieldGimmick<FieldPortalGimmickObject>(COMMAND_TYPE.PORTAL_GIMMICK);
+				return;
+			}
+		}
+		if (self.cannonState != 0 || self.spearCtrl.IsInputedSpAttackContinue())
+		{
+			return;
+		}
+		if (self.fishingCtrl != null && self.fishingCtrl.IsFishing())
+		{
+			self.fishingCtrl.Tap();
+			return;
+		}
+		self.SetFlickDirection(FLICK_DIRECTION.FRONT);
+		self.OnTap();
+		if (self.nearGatherPoint != null)
+		{
+			Command command5 = new Command();
+			command5.type = COMMAND_TYPE.GATHER;
+			command5.gatherPoint = self.nearGatherPoint;
+			SetCommand(command5);
+		}
+		self.InputNextTrigger();
+		InputAttack();
+	}
+
+	private bool CheckCommandWithSkillTableData(Command command)
+	{
+		if (command.type != COMMAND_TYPE.SKILL)
+		{
+			return false;
+		}
+		if (self.actionID != Character.ACTION_ID.IDLE && self.actionID != Character.ACTION_ID.MOVE && self.actionID != Character.ACTION_ID.ATTACK && self.actionID != Character.ACTION_ID.MAX && self.actionID != (Character.ACTION_ID)36 && self.actionID != (Character.ACTION_ID)33 && self.actionID != (Character.ACTION_ID)37 && self.actionID != (Character.ACTION_ID)38 && self.actionID != (Character.ACTION_ID)42 && self.actionID != (Character.ACTION_ID)46 && self.actionID != (Character.ACTION_ID)49)
+		{
+			return false;
+		}
+		SkillInfo.SkillParam skillParam = self.GetSkillParam(command.skillIndex);
+		if (skillParam == null || !skillParam.isValid)
+		{
+			return false;
+		}
+		SkillItemTable.SkillItemData tableData = skillParam.tableData;
+		if (tableData == null)
+		{
+			return false;
+		}
+		if (tableData.isTeleportation)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private void SetCommandForFieldGimmick<T>(COMMAND_TYPE cmdType) where T : FieldGimmickObject
+	{
+		T val = self.nearFieldGimmick as T;
+		if (!(val == null))
+		{
+			Command command = new Command();
+			command.type = cmdType;
+			command.fieldGimmickObject = self.nearFieldGimmick;
+			SetCommand(command);
 		}
 	}
 
 	private void InputAttack(bool is_touch_on = false)
 	{
-		if (self.controllerInputCombo && character.actionID == Character.ACTION_ID.ATTACK)
+		if (self.controllerInputCombo && (character.actionID == Character.ACTION_ID.ATTACK || character.actionID == (Character.ACTION_ID)21 || (self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.BURST) && character.actionID == (Character.ACTION_ID)42)))
 		{
 			CancelInput();
 			if (self.InputAttackCombo())
@@ -514,63 +805,77 @@ public class SelfController : ControllerBase
 
 	private void OnLongTouch(InputManager.TouchInfo touch_info)
 	{
-		if (IsEnableControll() && character == null)
+		if (IsEnableControll() && !(character == null))
 		{
-			return;
 		}
 	}
 
 	private void OnFlick(Vector2 flick_vec)
 	{
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		if (IsEnableControll() && !(character == null) && !character.isLoading)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+		if (!IsEnableControll() || character == null || character.isLoading || self.IsCarrying())
 		{
-			if (self.isStunnedLoop)
+			return;
+		}
+		if (self.isStunnedLoop)
+		{
+			CancelInput();
+			self.ReduceStunnedTime();
+			return;
+		}
+		if (self.IsRestraint())
+		{
+			CancelInput();
+			self.ReduceRestraintTime();
+			return;
+		}
+		if (self.IsInkSplash())
+		{
+			self.ReduceInkSplashTime();
+		}
+		if (!self.spearCtrl.IsInputedSpAttackContinue() || self.enableCancelToAvoid)
+		{
+			self.SetArrowAimBossModeStartSign(flick_vec);
+			Command command = new Command();
+			if (self.CanSoulOneHandSwordFlickAction())
 			{
-				CancelInput();
-				self.ReduceStunnedTime();
+				SetFlickDirection(flick_vec);
+				self.SetFlickDirection(flickDirection);
+				command.type = COMMAND_TYPE.ATTACK;
 			}
-			else if (self.IsRestraint())
+			else if (self.CanFlickAction())
 			{
-				CancelInput();
-				self.ReduceRestraintTime();
+				command.type = COMMAND_TYPE.FLICK_ACTION;
+			}
+			else if (self.CanEvolveSpecialFlickAction())
+			{
+				command.type = COMMAND_TYPE.EVOLVE_SPECIAL;
+			}
+			else if (self.enabledTeleportAvoid)
+			{
+				command.type = COMMAND_TYPE.TELEPORT_AVOID;
+			}
+			else if (self.enabledRushAvoid)
+			{
+				command.type = COMMAND_TYPE.RUSH_AVOID;
+			}
+			else if (self.buffParam.IsEnableBuff(BuffParam.BUFFTYPE.WARP_BY_AVOID))
+			{
+				command.type = COMMAND_TYPE.WARP;
 			}
 			else
 			{
-				if (self.IsInkSplash())
-				{
-					self.ReduceInkSplashTime();
-				}
-				self.SetArrowAimBossModeStartSign(flick_vec);
-				Command command = new Command();
-				if (self.CanSoulOneHandSwordFlickAction())
-				{
-					SetFlickDirection(flick_vec);
-					self.SetFlickDirection(flickDirection);
-					command.type = COMMAND_TYPE.ATTACK;
-				}
-				else if (self.CanEvolveSpecialFlickAction())
-				{
-					command.type = COMMAND_TYPE.EVOLVE_SPECIAL;
-				}
-				else if (self.buffParam.IsEnableBuff(BuffParam.BUFFTYPE.WARP_BY_AVOID))
-				{
-					command.type = COMMAND_TYPE.WARP;
-				}
-				else
-				{
-					command.type = COMMAND_TYPE.AVOID;
-				}
-				command.inputVec = flick_vec;
-				SetCommand(command);
-				slideTimer = 0f;
-				slideVerocity = Vector3.get_zero();
+				command.type = COMMAND_TYPE.AVOID;
 			}
+			command.inputVec = flick_vec;
+			SetCommand(command);
+			slideTimer = 0f;
+			slideVerocity = Vector3.get_zero();
 		}
 	}
 
@@ -578,26 +883,15 @@ public class SelfController : ControllerBase
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		if (!(flick_vec == Vector2.get_zero()))
+		if (flick_vec == Vector2.get_zero())
 		{
-			float num = Mathf.Atan2(flick_vec.y, flick_vec.x);
-			float num2 = Mathf.Abs(num);
-			if (num > 0f)
-			{
-				if (num2 < QUARTER_PI)
-				{
-					flickDirection = FLICK_DIRECTION.RIGHT;
-				}
-				else if (num2 > THREE_QUARTER_PI)
-				{
-					flickDirection = FLICK_DIRECTION.LEFT;
-				}
-				else
-				{
-					flickDirection = FLICK_DIRECTION.FRONT;
-				}
-			}
-			else if (num2 < QUARTER_PI)
+			return;
+		}
+		float num = Mathf.Atan2(flick_vec.y, flick_vec.x);
+		float num2 = Mathf.Abs(num);
+		if (num > 0f)
+		{
+			if (num2 < QUARTER_PI)
 			{
 				flickDirection = FLICK_DIRECTION.RIGHT;
 			}
@@ -607,88 +901,107 @@ public class SelfController : ControllerBase
 			}
 			else
 			{
-				flickDirection = FLICK_DIRECTION.REAR;
+				flickDirection = FLICK_DIRECTION.FRONT;
 			}
+		}
+		else if (num2 < QUARTER_PI)
+		{
+			flickDirection = FLICK_DIRECTION.RIGHT;
+		}
+		else if (num2 > THREE_QUARTER_PI)
+		{
+			flickDirection = FLICK_DIRECTION.LEFT;
+		}
+		else
+		{
+			flickDirection = FLICK_DIRECTION.REAR;
 		}
 	}
 
 	private void OnTouchOff(InputManager.TouchInfo touch_info)
 	{
-		if (!IsEnableControll())
+		if (IsEnableControll())
 		{
-			return;
 		}
 	}
 
 	protected override void Update()
 	{
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0318: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0323: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0339: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0616: Unknown result type (might be due to invalid IL or missing references)
-		//IL_062c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0631: Unknown result type (might be due to invalid IL or missing references)
-		//IL_078c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0797: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0865: Unknown result type (might be due to invalid IL or missing references)
-		//IL_086a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
+		//IL_035b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0376: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0606: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0611: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0692: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_06f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08da: Unknown result type (might be due to invalid IL or missing references)
 		//IL_08f0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_08f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0937: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0940: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0950: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0955: Unknown result type (might be due to invalid IL or missing references)
-		//IL_095e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_096e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0973: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0978: Unknown result type (might be due to invalid IL or missing references)
-		//IL_097f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0988: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0998: Unknown result type (might be due to invalid IL or missing references)
-		//IL_099d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a01: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a03: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a4b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a5e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a63: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a75: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a7f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a99: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0aac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0aae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b69: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b6e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b79: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b7e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0bec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0bf1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c04: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_09ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a2a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a2f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a33: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a38: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a7a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a83: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a93: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0a98: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0aa1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ab1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ab6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0abb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ac2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0acb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0adb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ae0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0ae9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0af9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0afe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b03: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b21: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b2b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b3a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b44: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b46: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b73: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b7d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b8c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b96: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0b98: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0be0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0bf3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0bf8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0c0a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c0f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0c14: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c29: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0c2e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c60: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c65: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c80: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0c41: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0c43: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0d23: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0d2e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0d33: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0da1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0da6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0db9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0dbf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0dc4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0dc9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0dde: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0de3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e15: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e1a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0e35: Unknown result type (might be due to invalid IL or missing references)
 		InputManager.TouchInfo touchInfo = moveStickInfo;
 		moveStickInfo = null;
-		if ((self.actionID == (Character.ACTION_ID)19 || self.actionID == (Character.ACTION_ID)32) && isInputtedTouch)
+		if ((self.actionID == (Character.ACTION_ID)20 || self.actionID == (Character.ACTION_ID)34 || self.actionID == (Character.ACTION_ID)21) && isInputtedTouch)
 		{
 			checkTouch = true;
 		}
@@ -698,359 +1011,443 @@ public class SelfController : ControllerBase
 		}
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionType().IsDialog())
 		{
-			SetEnableControll(false, DISABLE_FLAG.INPUT_DISABLE);
+			SetEnableControll(enable: false, DISABLE_FLAG.INPUT_DISABLE);
 		}
 		else
 		{
-			SetEnableControll(true, DISABLE_FLAG.INPUT_DISABLE);
+			SetEnableControll(enable: true, DISABLE_FLAG.INPUT_DISABLE);
 		}
-		if (IsEnableControll() && !(character == null) && !character.isLoading)
+		if (!IsEnableControll() || character == null || character.isLoading)
 		{
-			base.Update();
-			InputManager i = MonoBehaviourSingleton<InputManager>.I;
-			InputManager.TouchInfo stickInfo = i.GetStickInfo();
-			if (stickInfo != null)
+			return;
+		}
+		base.Update();
+		InputManager i = MonoBehaviourSingleton<InputManager>.I;
+		InputManager.TouchInfo stickInfo = i.GetStickInfo();
+		if (stickInfo != null)
+		{
+			self.SetInputAxis(stickInfo.axis);
+		}
+		bool flag = false;
+		if (this.touchInfo != null)
+		{
+			bool activeAxis = this.touchInfo.activeAxis;
+			float num = 0.5f;
+			if (GameSaveData.instance != null)
 			{
-				self.SetInputAxis(stickInfo.axis);
+				num = GameSaveData.instance.touchInGameLong;
 			}
-			bool flag = false;
-			if (this.touchInfo != null)
+			float num2 = parameter.inputLongTouchTimeLow + (parameter.inputLongTouchTimeHigh - parameter.inputLongTouchTimeLow) * num;
+			if (!initTouch && !this.touchInfo.activeAxis && Time.get_time() - this.touchInfo.beginTime >= num2)
 			{
-				bool activeAxis = this.touchInfo.activeAxis;
-				float num = 0.5f;
-				if (GameSaveData.instance != null)
+				initTouch = true;
+				enableTouch = true;
+				touchAimAxisTime = -1f;
+				self.SetEnableTap(enable: true);
+				if (self.targetFieldGimmickCannon is FieldGimmickCannonSpecial)
 				{
-					num = GameSaveData.instance.touchInGameLong;
+					self.StartCannonCharge();
 				}
-				float num2 = parameter.inputLongTouchTimeLow + (parameter.inputLongTouchTimeHigh - parameter.inputLongTouchTimeLow) * num;
-				if (!initTouch && !this.touchInfo.activeAxis && Time.get_time() - this.touchInfo.beginTime >= num2)
+			}
+			else if (initTouch && checkTouch && (!this.touchInfo.activeAxis || self.attackMode == Player.ATTACK_MODE.ONE_HAND_SWORD))
+			{
+				enableTouch = true;
+				touchAimAxisTime = -1f;
+				self.SetEnableTap(enable: true);
+			}
+			checkTouch = false;
+			if (initTouch)
+			{
+				bool flag2 = false;
+				if (this.touchInfo.id == -1)
 				{
-					initTouch = true;
-					enableTouch = true;
-					touchAimAxisTime = -1f;
-					self.SetEnableTap(true);
-					if (self.targetFieldGimmickCannon is FieldGimmickCannonSpecial)
-					{
-						self.StartCannonCharge();
-					}
+					this.touchInfo = null;
+					enableTouch = false;
+					isInputtedTouch = false;
+					flag2 = true;
+					self.SetEnableTap(enable: false);
+					self.ResetCannonShotAimEuler();
 				}
-				else if (initTouch && checkTouch && (!this.touchInfo.activeAxis || self.attackMode == Player.ATTACK_MODE.ONE_HAND_SWORD))
+				if (self.IsCarrying())
 				{
-					enableTouch = true;
-					touchAimAxisTime = -1f;
-					self.SetEnableTap(true);
+					return;
 				}
-				checkTouch = false;
-				if (initTouch)
+				if (self.IsAbleMoveCannon())
 				{
-					bool flag2 = false;
-					if (this.touchInfo.id == -1)
+					if ((self.targetFieldGimmickCannon is FieldGimmickCannonRapid || self.targetFieldGimmickCannon is FieldGimmickCannonField) && !self.targetFieldGimmickCannon.IsCooling())
 					{
-						this.touchInfo = null;
-						enableTouch = false;
-						isInputtedTouch = false;
-						flag2 = true;
-						self.SetEnableTap(false);
-						self.ResetCannonShotAimEuler();
+						Command command = new Command();
+						command.type = COMMAND_TYPE.CANNON_SHOT;
+						command.fieldGimmickObject = self.targetFieldGimmickCannon;
+						SetCommand(command);
 					}
-					if (self.IsAbleMoveCannon())
+					if (this.touchInfo != null && this.touchInfo.activeAxis)
 					{
-						if (self.targetFieldGimmickCannon is FieldGimmickCannonRapid && !self.targetFieldGimmickCannon.IsCooling())
-						{
-							Command command = new Command();
-							command.type = COMMAND_TYPE.CANNON_SHOT;
-							command.fieldGimmickObject = self.targetFieldGimmickCannon;
-							SetCommand(command);
-						}
-						if (this.touchInfo != null && this.touchInfo.activeAxis)
-						{
-							self.UpdateCannonAimMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
-							slideTimer = 0f;
-							slideVerocity = Vector3.get_zero();
-						}
-						return;
+						self.UpdateCannonAimMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
+						slideTimer = 0f;
+						slideVerocity = Vector3.get_zero();
 					}
-					if (self.IsChargingCannon())
+					return;
+				}
+				if (self.IsChargingCannon() || self.IsEnableChangeActionByLongTap())
+				{
+					return;
+				}
+				bool flag3 = false;
+				bool flag4 = false;
+				bool flag5 = false;
+				bool flag6 = false;
+				if (MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.enable)
+				{
+					if (self.attackMode == Player.ATTACK_MODE.ARROW)
 					{
-						return;
-					}
-					bool flag3 = false;
-					bool flag4 = false;
-					bool flag5 = false;
-					if (MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.enable)
-					{
-						if (self.attackMode == Player.ATTACK_MODE.ARROW)
-						{
-							if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
-							{
-								flag3 = true;
-							}
-							else
-							{
-								flag4 = true;
-							}
-						}
-						else if (self.CheckAttackModeAndSpType(Player.ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT))
+						if (self.isArrowRainShot)
 						{
 							flag5 = true;
 						}
-					}
-					if (self.isGuardWalk || self.actionID == (Character.ACTION_ID)18 || self.actionID == (Character.ACTION_ID)19 || self.actionID == (Character.ACTION_ID)32)
-					{
-						flag = true;
-					}
-					if (flag3 || flag4 || flag5)
-					{
-						if (flag2)
+						else if (StageObjectManager.CanTargetBoss)
 						{
-							CancelInput();
+							flag3 = true;
 						}
 						else
 						{
-							if (enableTouch)
+							flag4 = true;
+						}
+					}
+					else if (self.CheckAttackModeAndSpType(Player.ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.HEAT))
+					{
+						flag6 = true;
+					}
+				}
+				if (self.isGuardWalk || self.actionID == (Character.ACTION_ID)19 || self.actionID == (Character.ACTION_ID)20 || self.actionID == (Character.ACTION_ID)34)
+				{
+					flag = true;
+				}
+				if (flag3 || flag4 || flag5 || flag6)
+				{
+					if (flag2)
+					{
+						CancelInput();
+					}
+					else
+					{
+						if (enableTouch)
+						{
+							Command command2 = new Command();
+							command2.type = (flag6 ? COMMAND_TYPE.SPECIAL_ACTION : COMMAND_TYPE.ATTACK);
+							command2.aimKeep = (MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.arrowAimBossSettings.enableAimKeep && flag3);
+							command2.isTouchOn = true;
+							SetCommand(command2);
+						}
+						if (self.isArrowAimable)
+						{
+							bool flag7 = false;
+							if (touchAimAxisTime >= 0f)
 							{
-								Command command2 = new Command();
-								command2.type = (flag5 ? COMMAND_TYPE.SPECIAL_ACTION : COMMAND_TYPE.ATTACK);
-								command2.aimKeep = (MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.arrowAimBossSettings.enableAimKeep && flag3);
-								command2.isTouchOn = true;
-								SetCommand(command2);
+								touchAimAxisTime += Time.get_deltaTime();
+								if (touchAimAxisTime >= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.aimDelayTime)
+								{
+									flag7 = true;
+								}
 							}
-							if (self.isArrowAimable)
+							if (activeAxis && this.touchInfo != null && this.touchInfo.axisNoLimit.get_magnitude() >= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.aimDragLength && touchAimAxisTime < 0f)
 							{
-								bool flag6 = false;
-								if (touchAimAxisTime >= 0f)
+								touchAimAxisTime = 0f;
+							}
+							if (flag3)
+							{
+								if (!self.isArrowAimBossMode)
 								{
-									touchAimAxisTime += Time.get_deltaTime();
-									if (touchAimAxisTime >= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.aimDelayTime)
+									if (MonoBehaviourSingleton<InGameCameraManager>.I.arrowCameraMode == 0)
 									{
-										flag6 = true;
-									}
-								}
-								if (activeAxis && this.touchInfo != null && this.touchInfo.axisNoLimit.get_magnitude() >= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.aimDragLength && touchAimAxisTime < 0f)
-								{
-									touchAimAxisTime = 0f;
-								}
-								if (flag3)
-								{
-									if (!self.isArrowAimBossMode)
-									{
-										if (MonoBehaviourSingleton<InGameCameraManager>.I.arrowCameraMode == 0)
+										if (flag7)
 										{
-											if (flag6)
-											{
-												self.SetArrowAimBossMode(true);
-											}
-										}
-										else
-										{
-											self.SetArrowAimBossMode(true);
+											self.SetArrowAimBossMode(enable: true);
 										}
 									}
-									if (self.isArrowAimBossMode && !self.isArrowAimEnd)
+									else
 									{
-										self.UpdateArrowAimBossMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
+										self.SetArrowAimBossMode(enable: true);
 									}
 								}
-								else
+								if (self.isArrowAimBossMode && !self.isArrowAimEnd)
 								{
-									if (!self.isArrowAimLesserMode && (flag6 || flag5))
-									{
-										self.SetArrowAimLesserMode(true);
-									}
-									if (self.isArrowAimLesserMode && !self.isArrowAimEnd)
-									{
-										self.UpdateArrowAimLesserMode(this.touchInfo.axisNoLimit);
-									}
+									self.UpdateArrowAimBossMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
+								}
+								if (self.isArrowAimLesserMode)
+								{
+									self.SetArrowAimLesserMode(enable: false);
+								}
+							}
+							else
+							{
+								if (!self.isArrowAimLesserMode && (flag7 || flag6))
+								{
+									self.SetArrowAimLesserMode(enable: true);
+								}
+								if (self.isArrowAimLesserMode && !self.isArrowAimEnd)
+								{
+									self.UpdateArrowAimLesserMode(this.touchInfo.axisNoLimit);
 								}
 							}
 						}
-						slideTimer = 0f;
-						slideVerocity = Vector3.get_zero();
+					}
+					slideTimer = 0f;
+					slideVerocity = Vector3.get_zero();
+					return;
+				}
+				if (self.enabledOraclePairSwordsSP && stickInfo != null)
+				{
+					self.targetingPointList.Clear();
+					Vector3 stickVec = GetStickVec(stickInfo.axis, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform);
+					character.SetLerpRotation(stickVec);
+					if (self.playerSender != null)
+					{
+						self.playerSender.OnSyncPosition();
+					}
+					return;
+				}
+				if (!activeAxis || isInputtedTouch || flag)
+				{
+					if (self.IsOnCannonMode())
+					{
+						self.ResetCannonShotAimEuler();
 						return;
 					}
-					if (!activeAxis || isInputtedTouch || flag)
+					if (flag2)
 					{
-						if (self.IsOnCannonMode())
-						{
-							self.ResetCannonShotAimEuler();
-							return;
-						}
-						if (flag2)
+						if (self.actionID != (Character.ACTION_ID)21)
 						{
 							CancelInput();
 							if (flag)
 							{
-								self.ActIdle((self.actionID != Character.ACTION_ID.MOVE) ? true : false, -1f);
+								self.ActIdle((self.actionID != Character.ACTION_ID.MOVE) ? true : false);
 							}
-							return;
-						}
-						if (enableTouch)
-						{
-							bool flag7 = false;
-							if (MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.enable && self.IsExistSpecialAction())
-							{
-								flag7 = true;
-							}
-							if (flag7)
-							{
-								if (!self.isActSpecialAction || (self.isActSpecialAction && !self.isControllable))
-								{
-									Command command3 = new Command();
-									command3.type = COMMAND_TYPE.SPECIAL_ACTION;
-									command3.isTouchOn = true;
-									SetCommand(command3);
-								}
-							}
-							else
-							{
-								InputAttack(true);
-							}
-							if (!flag)
-							{
-								return;
-							}
-						}
-					}
-				}
-				else
-				{
-					if (this.touchInfo.id > -1 && self.IsAbleMoveCannon())
-					{
-						if (this.touchInfo.activeAxis)
-						{
-							self.UpdateCannonAimMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
-							slideTimer = 0f;
-							slideVerocity = Vector3.get_zero();
 						}
 						return;
 					}
-					if (this.touchInfo.activeAxis || this.touchInfo.id == -1)
+					if (enableTouch)
 					{
-						this.touchInfo = null;
-						self.ResetCannonShotAimEuler();
-					}
-				}
-			}
-			if (!flag && nextCommand != null)
-			{
-				if (CheckCommand(nextCommand))
-				{
-					ActCommand(nextCommand);
-					nextCommand = null;
-					return;
-				}
-				if (nextCommand.deltaTime >= parameter.inputCommandValidTime[(int)nextCommand.type])
-				{
-					nextCommand = null;
-				}
-			}
-			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			bool flag8 = false;
-			if (stickInfo != null)
-			{
-				Vector2 axis = stickInfo.axis;
-				float magnitude = axis.get_magnitude();
-				float num3 = 0f;
-				if (flag)
-				{
-					num3 = parameter.guardMoveThreshold;
-				}
-				if (Time.get_time() - stickInfo.beginTime >= parameter.inputMoveStartTime)
-				{
-					if (touchInfo != stickInfo && IsCancelAble(null))
-					{
-						CancelInput();
-					}
-					moveStickInfo = stickInfo;
-					if (magnitude > num3 && self.IsChangeableAction(Character.ACTION_ID.MOVE))
-					{
-						Vector3 right = cameraTransform.get_right();
-						Vector3 forward = cameraTransform.get_forward();
-						forward.y = 0f;
-						forward.Normalize();
-						if (parameter.alwaysTopSpeed)
+						bool flag8 = false;
+						if (MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.enable && self.IsExistSpecialAction())
 						{
-							axis.Normalize();
+							flag8 = true;
 						}
-						Vector3 val = (!(self.actionTarget != null)) ? (right * axis.x * parameter.moveForwardSpeed + forward * axis.y * parameter.moveForwardSpeed) : (right * axis.x * parameter.moveSideSpeed + forward * axis.y * parameter.moveForwardSpeed);
-						if (flag)
+						if (flag8)
 						{
-							self.ActGuardWalk((!parameter.enableRootMotion) ? val : Vector3.get_zero(), parameter.guardMoveSyncSpeed, val.get_normalized());
-							val = forward;
+							bool flag9 = self.actionID == (Character.ACTION_ID)21;
+							if ((!self.isActSpecialAction || !self.isControllable) && !flag9)
+							{
+								Command command3 = new Command();
+								command3.type = COMMAND_TYPE.SPECIAL_ACTION;
+								if (self.CheckAttackModeAndSpType(Player.ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.ORACLE) && self.IsActionFromAvoid() && self.enableSpAttackContinue)
+								{
+									command3.type = COMMAND_TYPE.ATTACK;
+								}
+								command3.isTouchOn = true;
+								SetCommand(command3);
+							}
 						}
 						else
 						{
-							bool flag9 = parameter.enableRootMotion;
-							if (IsValidSlideProc())
-							{
-								flag9 = false;
-								slideSlowTimer += Time.get_deltaTime();
-								float num4 = Mathf.Clamp01(slideSlowTimer / GetParamNeedTimeToMaxTime());
-								val *= Mathf.Lerp(0f, 1f, num4);
-							}
-							Character.MOTION_ID motion_id = Character.MOTION_ID.WALK;
-							character.ActMoveVelocity((!flag9) ? val : Vector3.get_zero(), parameter.moveForwardSpeed, motion_id);
-							character.SetLerpRotation(val);
-							slideTimer = 0f;
-							slideVerocity = val;
+							InputAttack(is_touch_on: true);
 						}
-						InGameTutorialManager component = MonoBehaviourSingleton<AppMain>.I.GetComponent<InGameTutorialManager>();
-						if (val.get_sqrMagnitude() > 0f && component != null)
+						if (!flag)
 						{
-							component.TutorialMoveTime += Time.get_deltaTime();
+							return;
 						}
-						flag8 = true;
 					}
 				}
 			}
-			if (!flag8)
+			else
 			{
-				slideSlowTimer = 0f;
-				if (character.actionID == Character.ACTION_ID.MOVE)
+				if (this.touchInfo.id > -1 && self.IsAbleMoveCannon())
 				{
+					if (this.touchInfo.activeAxis)
+					{
+						self.UpdateCannonAimMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
+						slideTimer = 0f;
+						slideVerocity = Vector3.get_zero();
+					}
+					return;
+				}
+				if (this.touchInfo.activeAxis || this.touchInfo.id == -1)
+				{
+					this.touchInfo = null;
+					self.ResetCannonShotAimEuler();
+				}
+			}
+		}
+		if (!flag && nextCommand != null)
+		{
+			if (CheckCommand(nextCommand))
+			{
+				ActCommand(nextCommand);
+				nextCommand = null;
+				return;
+			}
+			if (nextCommand.deltaTime >= parameter.inputCommandValidTime[(int)nextCommand.type])
+			{
+				nextCommand = null;
+			}
+		}
+		Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+		bool flag10 = false;
+		if (stickInfo != null)
+		{
+			Vector2 axis = stickInfo.axis;
+			float magnitude = axis.get_magnitude();
+			float num3 = 0f;
+			if (flag)
+			{
+				num3 = parameter.guardMoveThreshold;
+			}
+			if (Time.get_time() - stickInfo.beginTime >= parameter.inputMoveStartTime)
+			{
+				if (touchInfo != stickInfo && IsCancelAble(null))
+				{
+					CancelInput();
+				}
+				moveStickInfo = stickInfo;
+				if (magnitude > num3 && self.IsChangeableAction(Character.ACTION_ID.MOVE))
+				{
+					Vector3 right = cameraTransform.get_right();
+					Vector3 forward = cameraTransform.get_forward();
+					forward.y = 0f;
+					forward.Normalize();
+					if (parameter.alwaysTopSpeed)
+					{
+						axis.Normalize();
+					}
+					Vector3 val = (!(self.actionTarget != null)) ? (right * axis.x * parameter.moveForwardSpeed + forward * axis.y * parameter.moveForwardSpeed) : (right * axis.x * parameter.moveSideSpeed + forward * axis.y * parameter.moveForwardSpeed);
 					if (flag)
 					{
-						self.ActSpecialAction(false, true);
+						self.ActGuardWalk((!parameter.enableRootMotion) ? val : Vector3.get_zero(), parameter.guardMoveSyncSpeed, val.get_normalized());
+						val = forward;
+					}
+					else if (self.IsCarrying())
+					{
+						self.ActCarryWalk((!parameter.enableRootMotion) ? val : Vector3.get_zero(), parameter.moveForwardSpeed, val.get_normalized());
+						val = forward;
 					}
 					else
 					{
-						character.ActIdle(false, -1f);
+						bool flag11 = parameter.enableRootMotion;
+						if (IsValidSlideProc())
+						{
+							flag11 = false;
+							slideSlowTimer += Time.get_deltaTime();
+							float num4 = Mathf.Clamp01(slideSlowTimer / GetParamNeedTimeToMaxTime());
+							val *= Mathf.Lerp(0f, 1f, num4);
+						}
+						Character.MOTION_ID motion_id = Character.MOTION_ID.WALK;
+						character.ActMoveVelocity((!flag11) ? val : Vector3.get_zero(), parameter.moveForwardSpeed, motion_id);
+						character.SetLerpRotation(val);
+						slideTimer = 0f;
+						slideVerocity = val;
 					}
+					InGameTutorialManager component = MonoBehaviourSingleton<AppMain>.I.GetComponent<InGameTutorialManager>();
+					if (val.get_sqrMagnitude() > 0f && component != null)
+					{
+						component.TutorialMoveTime += Time.get_deltaTime();
+					}
+					flag10 = true;
 				}
-				if (character.actionID == Character.ACTION_ID.MAX && !((Player)character).enableCancelToAttack)
+			}
+		}
+		if (!flag10)
+		{
+			slideSlowTimer = 0f;
+			if (character.actionID == Character.ACTION_ID.MOVE)
+			{
+				if (flag)
 				{
-					slideVerocity = this.get_transform().get_forward() * GetParamAvoidSpeed();
-					slideTimer = 0f;
+					self.ActSpecialAction(start_effect: false);
+				}
+				else if (self.IsCarrying())
+				{
+					self.ActCarryIdle();
 				}
 				else
 				{
-					float paramSlideTime = GetParamSlideTime();
-					if (IsValidSlideProc() && slideVerocity.get_sqrMagnitude() > 0.1f && slideTimer < paramSlideTime)
-					{
-						slideTimer += Time.get_deltaTime();
-						float num5 = slideTimer / paramSlideTime - 1f;
-						Vector3 val2 = -slideVerocity * (num5 * num5 * num5 + 1f) + slideVerocity;
-						character.ActMoveInertia(ref val2);
-					}
-					else
-					{
-						slideVerocity = Vector3.get_zero();
-						slideTimer = 0f;
-					}
+					character.ActIdle();
 				}
 			}
-			if (self.attackMode == Player.ATTACK_MODE.ARROW && moveStickInfo != null && moveStickInfo.axis != Vector2.get_zero())
+			if (character.actionID == Character.ACTION_ID.MAX && !((Player)character).enableCancelToAttack)
 			{
-				self.SetArrowAimBossModeStartSign(moveStickInfo.axis);
+				slideVerocity = this.get_transform().get_forward() * GetParamAvoidSpeed();
+				slideTimer = 0f;
+			}
+			else
+			{
+				float paramSlideTime = GetParamSlideTime();
+				if (IsValidSlideProc() && slideVerocity.get_sqrMagnitude() > 0.1f && slideTimer < paramSlideTime)
+				{
+					slideTimer += Time.get_deltaTime();
+					float num5 = slideTimer / paramSlideTime - 1f;
+					Vector3 val2 = -slideVerocity * (num5 * num5 * num5 + 1f) + slideVerocity;
+					character.ActMoveInertia(ref val2);
+				}
+				else
+				{
+					slideVerocity = Vector3.get_zero();
+					slideTimer = 0f;
+				}
 			}
 		}
+		if (self.attackMode == Player.ATTACK_MODE.ARROW && moveStickInfo != null && moveStickInfo.axis != Vector2.get_zero())
+		{
+			self.SetArrowAimBossModeStartSign(moveStickInfo.axis);
+		}
+	}
+
+	protected Vector3 GetStickVec(Vector2 stick_vec, Transform camera_transform)
+	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 right = camera_transform.get_right();
+		Vector3 forward = camera_transform.get_forward();
+		forward.y = 0f;
+		forward.Normalize();
+		if (parameter.alwaysTopSpeed)
+		{
+			stick_vec.Normalize();
+		}
+		if (self.actionTarget != null)
+		{
+			return right * stick_vec.x * parameter.moveSideSpeed + forward * stick_vec.y * parameter.moveForwardSpeed;
+		}
+		return right * stick_vec.x * parameter.moveForwardSpeed + forward * stick_vec.y * parameter.moveForwardSpeed;
 	}
 
 	private float GetParamNeedTimeToMaxTime()
 	{
 		if (character.IsHittingIceFloor())
 		{
-			return parameter.needTimeToMaxTimeOnIce;
+			return parameter.needTimeToMaxTimeOnIce * (1f - character.buffParam.GetPassiveFieldBuffResist(BuffParam.BUFFTYPE.SLIDE_ICE));
+		}
+		if (character.buffParam.IsValidFieldBuff(BuffParam.BUFFTYPE.SLIDE_ICE))
+		{
+			return debuffParam.slideIceParam.needTimeToMaxTime * (1f - character.buffParam.GetRatePassiveFieldBuffResist(BuffParam.BUFFTYPE.SLIDE_ICE));
 		}
 		return debuffParam.slideParam.needTimeToMaxTime;
 	}
@@ -1059,7 +1456,11 @@ public class SelfController : ControllerBase
 	{
 		if (character.IsHittingIceFloor())
 		{
-			return parameter.slideTime;
+			return parameter.slideTime * (1f - character.buffParam.GetPassiveFieldBuffResist(BuffParam.BUFFTYPE.SLIDE_ICE));
+		}
+		if (character.buffParam.IsValidFieldBuff(BuffParam.BUFFTYPE.SLIDE_ICE))
+		{
+			return debuffParam.slideIceParam.slideTime * (1f - character.buffParam.GetRatePassiveFieldBuffResist(BuffParam.BUFFTYPE.SLIDE_ICE));
 		}
 		return debuffParam.slideParam.slideTime;
 	}
@@ -1068,14 +1469,20 @@ public class SelfController : ControllerBase
 	{
 		if (character.IsHittingIceFloor())
 		{
-			return parameter.avoidSpeedOnIce;
+			return parameter.avoidSpeedOnIce * (1f - character.buffParam.GetPassiveFieldBuffResist(BuffParam.BUFFTYPE.SLIDE_ICE));
+		}
+		if (character.buffParam.IsValidFieldBuff(BuffParam.BUFFTYPE.SLIDE_ICE))
+		{
+			return debuffParam.slideIceParam.avoidSpeed * (1f - character.buffParam.GetRatePassiveFieldBuffResist(BuffParam.BUFFTYPE.SLIDE_ICE));
 		}
 		return debuffParam.slideParam.avoidSpeed;
 	}
 
 	private bool IsValidSlideProc()
 	{
-		return (character.IsHittingIceFloor() || character.IsValidBuff(BuffParam.BUFFTYPE.SLIDE)) && !character.isDead;
+		bool flag = character.IsHittingIceFloor() || character.IsValidBuff(BuffParam.BUFFTYPE.SLIDE) || character.buffParam.IsValidFieldBuff(BuffParam.BUFFTYPE.SLIDE_ICE);
+		bool flag2 = self.thsCtrl.IsActiveIai() || self.snatchCtrl.IsMove() || self.snatchCtrl.IsMoveLoop();
+		return flag && !flag2 && !character.isDead;
 	}
 
 	public bool OnSkillButtonPress(int skill_index)
@@ -1109,9 +1516,26 @@ public class SelfController : ControllerBase
 		{
 			return false;
 		}
+		if (self.IsCarrying() || self.actionID == (Character.ACTION_ID)44)
+		{
+			return false;
+		}
 		Command command = new Command();
 		command.type = COMMAND_TYPE.CHANGE_WEAPON;
 		command.weaponIndex = weapon_index;
+		SetCommand(command);
+		return true;
+	}
+
+	public bool OnReserveBurstReloadMotion()
+	{
+		if (nextCommand != null && nextCommand.type == COMMAND_TYPE.THS_BURST_RELOAD)
+		{
+			return false;
+		}
+		Command command = new Command();
+		command.type = COMMAND_TYPE.THS_BURST_RELOAD;
+		command.MotionId = self.playerParameter.twoHandSwordActionInfo.burstTHSInfo.FirstReloadActionAttackID;
 		SetCommand(command);
 		return true;
 	}
@@ -1124,7 +1548,8 @@ public class SelfController : ControllerBase
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetOffsetByPlayer();
-			MonoBehaviourSingleton<InGameCameraManager>.I.ClearStopCameraMode();
+			MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetPositionByPlayer();
+			MonoBehaviourSingleton<InGameCameraManager>.I.ClearCameraMode();
 		}
 	}
 }

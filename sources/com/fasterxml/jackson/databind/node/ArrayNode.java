@@ -28,7 +28,8 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
         this._children = list;
     }
 
-    protected JsonNode _at(JsonPointer jsonPointer) {
+    /* access modifiers changed from: protected */
+    public JsonNode _at(JsonPointer jsonPointer) {
         return get(jsonPointer.getMatchingIndex());
     }
 
@@ -91,8 +92,8 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
         if (arrayNode.size() != size) {
             return false;
         }
-        List list = this._children;
-        List list2 = arrayNode._children;
+        List<JsonNode> list = this._children;
+        List<JsonNode> list2 = arrayNode._children;
         for (int i = 0; i < size; i++) {
             if (!((JsonNode) list.get(i)).equals(comparator, (JsonNode) list2.get(i))) {
                 return false;
@@ -102,7 +103,7 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
     }
 
     public void serialize(JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        List list = this._children;
+        List<JsonNode> list = this._children;
         int size = list.size();
         jsonGenerator.writeStartArray(size);
         for (int i = 0; i < size; i++) {
@@ -126,7 +127,7 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
 
     public JsonNode findValue(String str) {
         for (JsonNode findValue : this._children) {
-            JsonNode findValue2 = findValue2.findValue(str);
+            JsonNode findValue2 = findValue.findValue(str);
             if (findValue2 != null) {
                 return findValue2;
             }
@@ -150,7 +151,7 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
 
     public ObjectNode findParent(String str) {
         for (JsonNode findParent : this._children) {
-            JsonNode findParent2 = findParent2.findParent(str);
+            JsonNode findParent2 = findParent.findParent(str);
             if (findParent2 != null) {
                 return (ObjectNode) findParent2;
             }
@@ -214,13 +215,13 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
     }
 
     public ArrayNode addArray() {
-        JsonNode arrayNode = arrayNode();
+        ArrayNode arrayNode = arrayNode();
         _add(arrayNode);
         return arrayNode;
     }
 
     public ObjectNode addObject() {
-        JsonNode objectNode = objectNode();
+        ObjectNode objectNode = objectNode();
         _add(objectNode);
         return objectNode;
     }
@@ -326,13 +327,13 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
     }
 
     public ArrayNode insertArray(int i) {
-        JsonNode arrayNode = arrayNode();
+        ArrayNode arrayNode = arrayNode();
         _insert(i, arrayNode);
         return arrayNode;
     }
 
     public ObjectNode insertObject(int i) {
-        JsonNode objectNode = objectNode();
+        ObjectNode objectNode = objectNode();
         _insert(i, objectNode);
         return objectNode;
     }
@@ -438,7 +439,8 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
         return this._children.equals(((ArrayNode) obj)._children);
     }
 
-    protected boolean _childrenEqual(ArrayNode arrayNode) {
+    /* access modifiers changed from: protected */
+    public boolean _childrenEqual(ArrayNode arrayNode) {
         return this._children.equals(arrayNode._children);
     }
 
@@ -447,25 +449,27 @@ public class ArrayNode extends ContainerNode<ArrayNode> {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder((size() << 4) + 16);
-        stringBuilder.append('[');
+        StringBuilder sb = new StringBuilder((size() << 4) + 16);
+        sb.append('[');
         int size = this._children.size();
         for (int i = 0; i < size; i++) {
             if (i > 0) {
-                stringBuilder.append(',');
+                sb.append(',');
             }
-            stringBuilder.append(((JsonNode) this._children.get(i)).toString());
+            sb.append(((JsonNode) this._children.get(i)).toString());
         }
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append(']');
+        return sb.toString();
     }
 
-    protected ArrayNode _add(JsonNode jsonNode) {
+    /* access modifiers changed from: protected */
+    public ArrayNode _add(JsonNode jsonNode) {
         this._children.add(jsonNode);
         return this;
     }
 
-    protected ArrayNode _insert(int i, JsonNode jsonNode) {
+    /* access modifiers changed from: protected */
+    public ArrayNode _insert(int i, JsonNode jsonNode) {
         if (i < 0) {
             this._children.add(0, jsonNode);
         } else if (i >= this._children.size()) {

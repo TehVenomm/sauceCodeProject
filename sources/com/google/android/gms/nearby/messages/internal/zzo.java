@@ -4,30 +4,30 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzee;
-import com.google.android.gms.internal.zzeg;
+import com.google.android.gms.internal.nearby.zza;
+import com.google.android.gms.internal.nearby.zzc;
 import java.util.List;
 
-public final class zzo extends zzee implements zzm {
+public final class zzo extends zza implements zzm {
     zzo(IBinder iBinder) {
         super(iBinder, "com.google.android.gms.nearby.messages.internal.IMessageListener");
     }
 
     public final void zza(zzaf zzaf) throws RemoteException {
-        Parcel zzax = zzax();
-        zzeg.zza(zzax, (Parcelable) zzaf);
-        zzc(1, zzax);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) zzaf);
+        transactOneway(1, obtainAndWriteInterfaceToken);
     }
 
-    public final void zzaf(List<Update> list) throws RemoteException {
-        Parcel zzax = zzax();
-        zzax.writeTypedList(list);
-        zzc(4, zzax);
+    public final void zza(List<Update> list) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        obtainAndWriteInterfaceToken.writeTypedList(list);
+        transactOneway(4, obtainAndWriteInterfaceToken);
     }
 
     public final void zzb(zzaf zzaf) throws RemoteException {
-        Parcel zzax = zzax();
-        zzeg.zza(zzax, (Parcelable) zzaf);
-        zzc(2, zzax);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) zzaf);
+        transactOneway(2, obtainAndWriteInterfaceToken);
     }
 }

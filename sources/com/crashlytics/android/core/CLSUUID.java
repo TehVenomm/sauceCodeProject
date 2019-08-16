@@ -1,25 +1,25 @@
 package com.crashlytics.android.core;
 
 import android.os.Process;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.common.IdManager;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.common.IdManager;
 
 class CLSUUID {
     private static String _clsId;
     private static final AtomicLong _sequenceNumber = new AtomicLong(0);
 
     public CLSUUID(IdManager idManager) {
-        r0 = new byte[10];
-        populateTime(r0);
-        populateSequenceNumber(r0);
-        populatePID(r0);
+        byte[] bArr = new byte[10];
+        populateTime(bArr);
+        populateSequenceNumber(bArr);
+        populatePID(bArr);
         String sha1 = CommonUtils.sha1(idManager.getAppInstallIdentifier());
-        String hexify = CommonUtils.hexify(r0);
+        String hexify = CommonUtils.hexify(bArr);
         _clsId = String.format(Locale.US, "%s-%s-%s-%s", new Object[]{hexify.substring(0, 12), hexify.substring(12, 16), hexify.subSequence(16, 20), sha1.substring(0, 12)}).toUpperCase(Locale.US);
     }
 

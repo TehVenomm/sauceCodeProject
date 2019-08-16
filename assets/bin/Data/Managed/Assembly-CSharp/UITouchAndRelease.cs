@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UITouchAndRelease
+public class UITouchAndRelease : MonoBehaviour
 {
 	private string touchEventName;
 
@@ -43,7 +43,7 @@ public class UITouchAndRelease
 	{
 		if (!isOver && touched)
 		{
-			Send(false);
+			Send(is_touch: false);
 		}
 	}
 
@@ -56,21 +56,19 @@ public class UITouchAndRelease
 	{
 		if (!AppMain.isApplicationQuit && touched)
 		{
-			Send(false);
+			Send(is_touch: false);
 		}
 	}
 
 	private void Send(bool is_touch)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Expected O, but got Unknown
 		if (touched != is_touch)
 		{
 			touched = is_touch;
 			string text = (!is_touch) ? releaseEventName : touchEventName;
 			if (!string.IsNullOrEmpty(text))
 			{
-				UIGameSceneEventSender.SendEvent("UITouchAndRelease", this.get_gameObject(), text, eventData, null);
+				UIGameSceneEventSender.SendEvent("UITouchAndRelease", this.get_gameObject(), text, eventData);
 			}
 		}
 	}

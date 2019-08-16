@@ -13,11 +13,14 @@ public class InappBaseProduct {
     String baseDescription;
     float basePrice;
     String baseTitle;
-    final HashMap<String, String> localeToDescriptionMap = new HashMap();
-    final HashMap<String, Float> localeToPrice = new HashMap();
-    final HashMap<String, String> localeToTitleMap = new HashMap();
+    final HashMap<String, String> localeToDescriptionMap = new HashMap<>();
+    final HashMap<String, Float> localeToPrice = new HashMap<>();
+    final HashMap<String, String> localeToTitleMap = new HashMap<>();
     String productId;
     boolean published;
+
+    public InappBaseProduct() {
+    }
 
     public InappBaseProduct(@NotNull InappBaseProduct inappBaseProduct) {
         this.published = inappBaseProduct.published;
@@ -71,9 +74,7 @@ public class InappBaseProduct {
     public String getPriceDetails() {
         Locale locale = Locale.getDefault();
         Float f = (Float) this.localeToPrice.get(locale.getCountry());
-        float floatValue = f != null ? f.floatValue() : this.basePrice;
-        String symbol = f != null ? Currency.getInstance(locale).getSymbol() : Currency.getInstance(Locale.US).getSymbol();
-        return String.format("%.2f %s", new Object[]{Float.valueOf(floatValue), symbol});
+        return String.format("%.2f %s", new Object[]{Float.valueOf(f != null ? f.floatValue() : this.basePrice), f != null ? Currency.getInstance(locale).getSymbol() : Currency.getInstance(Locale.US).getSymbol()});
     }
 
     public String getProductId() {
@@ -89,31 +90,32 @@ public class InappBaseProduct {
         return !TextUtils.isEmpty(str2) ? str2 : this.baseTitle;
     }
 
+    /* access modifiers changed from: protected */
     @NotNull
-    protected StringBuilder getValidateInfo() {
-        StringBuilder stringBuilder = new StringBuilder();
+    public StringBuilder getValidateInfo() {
+        StringBuilder sb = new StringBuilder();
         if (TextUtils.isEmpty(this.productId)) {
-            stringBuilder.append("product id is empty");
+            sb.append("product id is empty");
         }
         if (TextUtils.isEmpty(this.baseTitle)) {
-            if (stringBuilder.length() > 0) {
-                stringBuilder.append(", ");
+            if (sb.length() > 0) {
+                sb.append(", ");
             }
-            stringBuilder.append("base title is empty");
+            sb.append("base title is empty");
         }
         if (TextUtils.isEmpty(this.baseDescription)) {
-            if (stringBuilder.length() > 0) {
-                stringBuilder.append(", ");
+            if (sb.length() > 0) {
+                sb.append(", ");
             }
-            stringBuilder.append("base description is empty");
+            sb.append("base description is empty");
         }
         if (this.basePrice == 0.0f) {
-            if (stringBuilder.length() > 0) {
-                stringBuilder.append(", ");
+            if (sb.length() > 0) {
+                sb.append(", ");
             }
-            stringBuilder.append("base price is not defined");
+            sb.append("base price is not defined");
         }
-        return stringBuilder;
+        return sb;
     }
 
     public boolean isAutoFill() {

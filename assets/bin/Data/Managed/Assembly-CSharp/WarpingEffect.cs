@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class WarpingEffect
+public class WarpingEffect : MonoBehaviour
 {
 	[SerializeField]
 	protected UISprite sprite;

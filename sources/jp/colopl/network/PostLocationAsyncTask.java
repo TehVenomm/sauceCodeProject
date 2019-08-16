@@ -1,14 +1,15 @@
-package jp.colopl.network;
+package p018jp.colopl.network;
 
 import android.content.Context;
 import android.location.Location;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import jp.colopl.util.LocationUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import p018jp.colopl.util.LocationUtil;
 
+/* renamed from: jp.colopl.network.PostLocationAsyncTask */
 public class PostLocationAsyncTask extends PostLocationAsynTaskBase {
     PostLocationAsyncTaskDelegate mDelegate;
 
@@ -16,7 +17,8 @@ public class PostLocationAsyncTask extends PostLocationAsynTaskBase {
         super(context, str, hashMap);
     }
 
-    protected void after(Context context, String str) {
+    /* access modifiers changed from: protected */
+    public void after(Context context, String str) {
         this.mDelegate.onPostLocation(str);
     }
 
@@ -24,16 +26,18 @@ public class PostLocationAsyncTask extends PostLocationAsynTaskBase {
         return this.mDelegate;
     }
 
-    protected List<NameValuePair> getPostData() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<NameValuePair> getPostData() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(LocationUtil.getMostAccurateLocation(getLocations()));
         String encryptedLocations = LocationUtil.getEncryptedLocations(arrayList);
-        List<NameValuePair> arrayList2 = new ArrayList(1);
+        ArrayList arrayList2 = new ArrayList(1);
         arrayList2.add(new BasicNameValuePair("location", encryptedLocations));
         return arrayList2;
     }
 
-    protected void handleError(Context context, Exception exception) {
+    /* access modifiers changed from: protected */
+    public void handleError(Context context, Exception exc) {
         this.mDelegate.onPostLocation(null);
     }
 

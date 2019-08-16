@@ -26,6 +26,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@Deprecated
 public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result> {
     private static final int DEFAULT_REQUEST_CODE = RequestCodeOffset.AppInvite.toRequestCode();
     private static final String TAG = "AppInviteDialog";
@@ -36,7 +37,7 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         }
 
         public boolean canShow(AppInviteContent appInviteContent, boolean z) {
-            return AppInviteDialog.canShowNativeDialog();
+            return false;
         }
 
         public AppCall createAppCall(final AppInviteContent appInviteContent) {
@@ -55,11 +56,12 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         }
     }
 
+    @Deprecated
     public static final class Result {
         private final Bundle bundle;
 
-        public Result(Bundle bundle) {
-            this.bundle = bundle;
+        public Result(Bundle bundle2) {
+            this.bundle = bundle2;
         }
 
         public Bundle getData() {
@@ -73,7 +75,7 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         }
 
         public boolean canShow(AppInviteContent appInviteContent, boolean z) {
-            return AppInviteDialog.canShowWebFallback();
+            return false;
         }
 
         public AppCall createAppCall(AppInviteContent appInviteContent) {
@@ -83,15 +85,18 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         }
     }
 
+    @Deprecated
     public AppInviteDialog(Activity activity) {
         super(activity, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public AppInviteDialog(Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
-    public AppInviteDialog(android.support.v4.app.Fragment fragment) {
+    @Deprecated
+    public AppInviteDialog(android.support.p000v4.app.Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
@@ -99,19 +104,21 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         super(fragmentWrapper, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public static boolean canShow() {
-        return canShowNativeDialog() || canShowWebFallback();
+        return false;
     }
 
     private static boolean canShowNativeDialog() {
-        return DialogPresenter.canPresentNativeDialogWithFeature(getFeature());
+        return false;
     }
 
     private static boolean canShowWebFallback() {
-        return DialogPresenter.canPresentWebFallbackDialogWithFeature(getFeature());
+        return false;
     }
 
-    private static Bundle createParameters(AppInviteContent appInviteContent) {
+    /* access modifiers changed from: private */
+    public static Bundle createParameters(AppInviteContent appInviteContent) {
         Bundle bundle = new Bundle();
         bundle.putString(ShareConstants.APPLINK_URL, appInviteContent.getApplinkUrl());
         bundle.putString(ShareConstants.PREVIEW_IMAGE_URL, appInviteContent.getPreviewImageUrl());
@@ -120,7 +127,7 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         if (promotionCode == null) {
             promotionCode = "";
         }
-        Object promotionText = appInviteContent.getPromotionText();
+        String promotionText = appInviteContent.getPromotionText();
         if (!TextUtils.isEmpty(promotionText)) {
             try {
                 JSONObject jSONObject = new JSONObject();
@@ -136,19 +143,23 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         return bundle;
     }
 
-    private static DialogFeature getFeature() {
+    /* access modifiers changed from: private */
+    public static DialogFeature getFeature() {
         return AppInviteDialogFeature.APP_INVITES_DIALOG;
     }
 
+    @Deprecated
     public static void show(Activity activity, AppInviteContent appInviteContent) {
         new AppInviteDialog(activity).show(appInviteContent);
     }
 
+    @Deprecated
     public static void show(Fragment fragment, AppInviteContent appInviteContent) {
         show(new FragmentWrapper(fragment), appInviteContent);
     }
 
-    public static void show(android.support.v4.app.Fragment fragment, AppInviteContent appInviteContent) {
+    @Deprecated
+    public static void show(android.support.p000v4.app.Fragment fragment, AppInviteContent appInviteContent) {
         show(new FragmentWrapper(fragment), appInviteContent);
     }
 
@@ -156,19 +167,22 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         new AppInviteDialog(fragmentWrapper).show(appInviteContent);
     }
 
-    protected AppCall createBaseAppCall() {
+    /* access modifiers changed from: protected */
+    public AppCall createBaseAppCall() {
         return new AppCall(getRequestCode());
     }
 
-    protected List<ModeHandler> getOrderedModeHandlers() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<ModeHandler> getOrderedModeHandlers() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(new NativeHandler());
         arrayList.add(new WebFallbackHandler());
         return arrayList;
     }
 
-    protected void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
-        final ResultProcessor c05211 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
+    /* access modifiers changed from: protected */
+    public void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
+        final C08291 r0 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
             public void onSuccess(AppCall appCall, Bundle bundle) {
                 if ("cancel".equalsIgnoreCase(ShareInternalUtility.getNativeDialogCompletionGesture(bundle))) {
                     facebookCallback.onCancel();
@@ -179,8 +193,12 @@ public class AppInviteDialog extends FacebookDialogBase<AppInviteContent, Result
         };
         callbackManagerImpl.registerCallback(getRequestCode(), new Callback() {
             public boolean onActivityResult(int i, Intent intent) {
-                return ShareInternalUtility.handleActivityResult(AppInviteDialog.this.getRequestCode(), i, intent, c05211);
+                return ShareInternalUtility.handleActivityResult(AppInviteDialog.this.getRequestCode(), i, intent, r0);
             }
         });
+    }
+
+    @Deprecated
+    public void show(AppInviteContent appInviteContent) {
     }
 }

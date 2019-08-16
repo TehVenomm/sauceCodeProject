@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyColliderSettings
+public class EnemyColliderSettings : MonoBehaviour
 {
 	[Tooltip("対象collider")]
 	public Collider targetCollider;

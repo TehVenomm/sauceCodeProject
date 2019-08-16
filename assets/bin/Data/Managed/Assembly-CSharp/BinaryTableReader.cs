@@ -27,7 +27,7 @@ public class BinaryTableReader
 	public BinaryTableReader(byte[] bytes)
 	{
 		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
+		//IL_003e: Expected O, but got Unknown
 		MemoryStream memoryStream = new MemoryStream(bytes);
 		memoryStream.Seek(256L, SeekOrigin.Begin);
 		ZlibStream input = new ZlibStream((Stream)memoryStream, 1);
@@ -87,7 +87,7 @@ public class BinaryTableReader
 		return result;
 	}
 
-	public uint ReadUInt32(uint defaultValue = 0)
+	public uint ReadUInt32(uint defaultValue = 0u)
 	{
 		uint result;
 		if (currentPosition < rowSize)
@@ -102,7 +102,7 @@ public class BinaryTableReader
 		return result;
 	}
 
-	public float ReadSingle(float defaultValue = 0)
+	public float ReadSingle(float defaultValue = 0f)
 	{
 		float result;
 		if (currentPosition < rowSize)
@@ -179,7 +179,7 @@ public class BinaryTableReader
 		do
 		{
 			b = ReadByte(0);
-			num |= (b & 0x7F) << (num2 & 0x1F);
+			num |= (b & 0x7F) << num2;
 			num2 += 7;
 		}
 		while ((b & 0x80) != 0);

@@ -24,16 +24,14 @@ public class LoungeSettings : GameSection
 	{
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData == null)
 		{
-			GameSection.ChangeEvent("ERROR", null);
+			GameSection.ChangeEvent("ERROR");
+			return;
 		}
-		else
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool isSuccess)
 		{
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool isSuccess)
-			{
-				GameSection.ResumeEvent(isSuccess, null);
-			}, false);
-		}
+			GameSection.ResumeEvent(isSuccess);
+		});
 	}
 
 	private void OnQuery_EXIT()
@@ -43,7 +41,7 @@ public class LoungeSettings : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendLeave(delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 			});
 		}
 	}
@@ -52,7 +50,11 @@ public class LoungeSettings : GameSection
 	{
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData == null)
 		{
-			GameSection.ChangeEvent("ERROR", null);
+			GameSection.ChangeEvent("ERROR");
+		}
+		else if (MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount() >= MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.num + 1)
+		{
+			GameSection.ChangeEvent("MAX_MEMBER");
 		}
 	}
 
@@ -60,7 +62,7 @@ public class LoungeSettings : GameSection
 	{
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData == null)
 		{
-			GameSection.ChangeEvent("ERROR", null);
+			GameSection.ChangeEvent("ERROR");
 		}
 	}
 

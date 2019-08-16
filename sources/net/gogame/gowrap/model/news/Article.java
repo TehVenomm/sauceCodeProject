@@ -19,7 +19,9 @@ public class Article extends BaseJsonObject {
     private MarkupElement content;
     private Long dateTime;
     private Long endDateTime;
-    private long id;
+
+    /* renamed from: id */
+    private long f1408id;
     private Long startDateTime;
     private String title;
 
@@ -32,25 +34,30 @@ public class Article extends BaseJsonObject {
         TIPS
     }
 
+    public Article() {
+    }
+
     public Article(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
     private Category getCategory(String str) {
+        Category[] values;
         if (str == null) {
             return null;
         }
-        for (Category category : Category.values()) {
-            if (str.equalsIgnoreCase(category.name())) {
-                return category;
+        for (Category category2 : Category.values()) {
+            if (str.equalsIgnoreCase(category2.name())) {
+                return category2;
             }
         }
         return null;
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, "id")) {
-            this.id = jsonReader.nextLong();
+            this.f1408id = jsonReader.nextLong();
             return true;
         } else if (StringUtils.isEquals(str, KEY_START_DATE_TIME)) {
             this.startDateTime = JSONUtils.optLong(jsonReader);
@@ -81,11 +88,11 @@ public class Article extends BaseJsonObject {
     }
 
     public long getId() {
-        return this.id;
+        return this.f1408id;
     }
 
     public void setId(long j) {
-        this.id = j;
+        this.f1408id = j;
     }
 
     public Long getDateTime() {
@@ -116,8 +123,8 @@ public class Article extends BaseJsonObject {
         return this.category;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategory(Category category2) {
+        this.category = category2;
     }
 
     public String getTitle() {

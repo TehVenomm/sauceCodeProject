@@ -26,10 +26,6 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}
 	}
 
-	private const int RETRY_COUNT = 3;
-
-	private const float RETRY_TIMER = 5f;
-
 	private bool isChangeStarted;
 
 	private Coroutine afkCoroutine;
@@ -41,6 +37,10 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	};
 
 	private ChatLoungeConnection connection;
+
+	private const int RETRY_COUNT = 3;
+
+	private const float RETRY_TIMER = 5f;
 
 	private readonly TimeSpan AFK_KICK_TIME = TimeSpan.FromMinutes(30.0);
 
@@ -161,8 +161,6 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	protected override void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		this.get_gameObject().AddComponent<LoungeWebSocket>();
 		this.get_gameObject().AddComponent<LoungeNetworkManager>();
@@ -238,7 +236,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		SendInfo(delegate
 		{
 			isResume = false;
-		}, true);
+		}, force: true);
 	}
 
 	public void TryConnect(bool connect, bool regist)
@@ -248,7 +246,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			Lounge_Model_RoomJoined lounge_Model_RoomJoined = new Lounge_Model_RoomJoined();
 			lounge_Model_RoomJoined.id = 1005;
 			lounge_Model_RoomJoined.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomJoined, false, null, null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomJoined);
 			SetLoungeMemberesStatus();
 			AFKCheck();
 		}
@@ -303,7 +301,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	public bool IsUserInLounge(int user_id)
 	{
-		LoungeModel.SlotInfo slotInfoByUserId = GetSlotInfoByUserId(user_id);
+		PartyModel.SlotInfo slotInfoByUserId = GetSlotInfoByUserId(user_id);
 		return IsValidInLounge() && slotInfoByUserId != null && slotInfoByUserId.userInfo != null;
 	}
 
@@ -344,10 +342,10 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	public int GetSlotIndex(int user_id)
 	{
-		return (loungeData == null) ? (-1) : loungeData.slotInfos.FindIndex((LoungeModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
+		return (loungeData == null) ? (-1) : loungeData.slotInfos.FindIndex((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
 	}
 
-	public LoungeModel.SlotInfo GetSlotInfoByIndex(int idx)
+	public PartyModel.SlotInfo GetSlotInfoByIndex(int idx)
 	{
 		if (loungeData != null && idx < loungeData.slotInfos.Count)
 		{
@@ -356,7 +354,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		return null;
 	}
 
-	public LoungeModel.SlotInfo GetSlotInfoByUserId(int user_id)
+	public PartyModel.SlotInfo GetSlotInfoByUserId(int user_id)
 	{
 		int slotIndex = GetSlotIndex(user_id);
 		return (slotIndex < 0) ? null : GetSlotInfoByIndex(slotIndex);
@@ -401,7 +399,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		}
 		if (loungeData != null && loungeData.slotInfos != null)
 		{
-			loungeData.slotInfos.ForEach(delegate(LoungeModel.SlotInfo slot)
+			loungeData.slotInfos.ForEach(delegate(PartyModel.SlotInfo slot)
 			{
 				if (slot.userInfo != null && (my_userid == 0 || my_userid != slot.userInfo.userId))
 				{
@@ -434,7 +432,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	public void SendSearch(Action<bool, Error> call_back, bool saveSettings)
 	{
 		lounges = null;
-		SetSearchRequest(null);
+		SetSearchRequest();
 		LoungeSearchModel.RequestSendForm requestSendForm = new LoungeSearchModel.RequestSendForm();
 		requestSendForm.order = searchRequest.order;
 		requestSendForm.label = (int)searchRequest.label;
@@ -462,7 +460,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	public void SendSearchRandomMatching(Action<bool, Error> call_back)
 	{
 		ClearLounge();
-		SetSearchRequest(null);
+		SetSearchRequest();
 		LoungeModel.RequestSearchRandomMatching requestSearchRandomMatching = new LoungeModel.RequestSearchRandomMatching();
 		requestSearchRandomMatching.token = GenerateToken();
 		requestSearchRandomMatching.order = searchRequest.order;
@@ -676,53 +674,48 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (loungeData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		LoungeLeaveModel.RequestSendForm requestSendForm = new LoungeLeaveModel.RequestSendForm();
+		requestSendForm.id = loungeData.id;
+		if (followLoungeMember != null)
 		{
-			LoungeLeaveModel.RequestSendForm requestSendForm = new LoungeLeaveModel.RequestSendForm();
-			requestSendForm.id = loungeData.id;
-			if (followLoungeMember != null)
-			{
-				followLoungeMember.Clear();
-			}
-			Protocol.Send(LoungeLeaveModel.URL, requestSendForm, delegate(LoungeLeaveModel ret)
-			{
-				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-				bool obj = false;
-				Error error = ret.Error;
-				if (error == Error.None || error == Error.ERR_PARTY_NOT_FOUND_PARTY)
-				{
-					this.StartCoroutine(DoLeave(call_back, ret));
-				}
-				else
-				{
-					call_back(obj);
-				}
-			}, string.Empty);
+			followLoungeMember.Clear();
 		}
+		Protocol.Send(LoungeLeaveModel.URL, requestSendForm, delegate(LoungeLeaveModel ret)
+		{
+			bool obj = false;
+			Error error = ret.Error;
+			if (error == Error.None || error == Error.ERR_PARTY_NOT_FOUND_PARTY)
+			{
+				this.StartCoroutine(DoLeave(call_back, ret));
+			}
+			else
+			{
+				call_back(obj);
+			}
+		}, string.Empty);
 	}
 
 	public void SendEdit(LoungeModel.RequestEdit lounge_setting, Action<bool> call_back)
 	{
 		if (loungeData == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		lounge_setting.id = loungeData.id;
+		Protocol.Send(LoungeModel.RequestEdit.path, lounge_setting, delegate(LoungeModel ret)
 		{
-			lounge_setting.id = loungeData.id;
-			Protocol.Send(LoungeModel.RequestEdit.path, lounge_setting, delegate(LoungeModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					UpdateLounge(ret.result.lounge, ret.result.friend, ret.result.loungeServer, ret.result.inviteFriendInfo, ret.result.firstMetUserIds);
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
+				obj = true;
+				UpdateLounge(ret.result.lounge, ret.result.friend, ret.result.loungeServer, ret.result.inviteFriendInfo, ret.result.firstMetUserIds);
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	private IEnumerator DoLeave(Action<bool> call_back, LoungeLeaveModel ret)
@@ -738,8 +731,8 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 					id = 1005,
 					hostid = ret.result.lounge.ownerUserId
 				};
-				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(hostChange, false, null, null);
-				yield return (object)0;
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(hostChange);
+				yield return 0;
 			}
 			is_success = true;
 			Lounge_Model_RoomLeaved packet = new Lounge_Model_RoomLeaved
@@ -748,7 +741,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				token = GenerateToken(),
 				cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
 			};
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(packet, false, (Coop_Model_ACK ack) => true, null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(packet, promise: false, (Coop_Model_ACK ack) => true);
 			MonoBehaviourSingleton<ChatManager>.I.DestroyLoungeChat();
 			StopAFKCheck();
 			ClearLounge();
@@ -778,54 +771,50 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (loungeData == null)
 		{
-			call_back(false, null);
+			call_back(arg1: false, null);
+			return;
 		}
-		else
+		LoungeInviteListModel.RequestSendForm requestSendForm = new LoungeInviteListModel.RequestSendForm();
+		requestSendForm.id = loungeData.id;
+		Protocol.Send(LoungeInviteListModel.URL, requestSendForm, delegate(LoungeInviteListModel ret)
 		{
-			LoungeInviteListModel.RequestSendForm requestSendForm = new LoungeInviteListModel.RequestSendForm();
-			requestSendForm.id = loungeData.id;
-			Protocol.Send(LoungeInviteListModel.URL, requestSendForm, delegate(LoungeInviteListModel ret)
+			bool arg = false;
+			LoungeInviteCharaInfo[] arg2 = null;
+			if (ret.Error == Error.None)
 			{
-				bool arg = false;
-				LoungeInviteCharaInfo[] arg2 = null;
-				if (ret.Error == Error.None)
-				{
-					arg = true;
-					arg2 = ret.result.ToArray();
-				}
-				call_back(arg, arg2);
-			}, string.Empty);
-		}
+				arg = true;
+				arg2 = ret.result.ToArray();
+			}
+			call_back(arg, arg2);
+		}, string.Empty);
 	}
 
 	public void SendInvite(int[] userIds, Action<bool, int[]> call_back)
 	{
 		if (loungeData == null)
 		{
-			call_back(false, null);
+			call_back(arg1: false, null);
+			return;
 		}
-		else
+		LoungeInviteModel.RequestSendForm requestSendForm = new LoungeInviteModel.RequestSendForm();
+		requestSendForm.id = loungeData.id;
+		foreach (int item in userIds)
 		{
-			LoungeInviteModel.RequestSendForm requestSendForm = new LoungeInviteModel.RequestSendForm();
-			requestSendForm.id = loungeData.id;
-			foreach (int item in userIds)
-			{
-				requestSendForm.ids.Add(item);
-			}
-			Protocol.Send(LoungeInviteModel.URL, requestSendForm, delegate(LoungeInviteModel ret)
-			{
-				bool arg = false;
-				if (ret.Error == Error.None)
-				{
-					arg = true;
-					call_back(arg, ret.result.ToArray());
-				}
-				else
-				{
-					call_back(arg, null);
-				}
-			}, string.Empty);
+			requestSendForm.ids.Add(item);
 		}
+		Protocol.Send(LoungeInviteModel.URL, requestSendForm, delegate(LoungeInviteModel ret)
+		{
+			bool arg = false;
+			if (ret.Error == Error.None)
+			{
+				arg = true;
+				call_back(arg, ret.result.ToArray());
+			}
+			else
+			{
+				call_back(arg, null);
+			}
+		}, string.Empty);
 	}
 
 	public void SendInvitedLounge(Action<bool> call_back)
@@ -878,7 +867,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 					token = GenerateToken(),
 					cid = kickedUserId
 				};
-				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(model, false, null, null);
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(model);
 			}
 			call_back(flag);
 		}, string.Empty);
@@ -896,7 +885,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			{
 				if (ret.Error == Error.None)
 				{
-					LoungeModel.SlotInfo slotInfo = ret.result.lounge.slotInfos.Find((LoungeModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == kickedUserId);
+					PartyModel.SlotInfo slotInfo = ret.result.lounge.slotInfos.Find((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == kickedUserId);
 					if (slotInfo != null)
 					{
 						loungeMemberStatus[kickedUserId].UpdateLastExecTime(TimeManager.GetNow().ToUniversalTime());
@@ -910,7 +899,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 								id = 1005,
 								hostid = ret.result.lounge.ownerUserId
 							};
-							MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(model, false, null, null);
+							MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(model);
 						}
 						Lounge_Model_AFK_Kick model2 = new Lounge_Model_AFK_Kick
 						{
@@ -918,7 +907,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 							cid = kickedUserId,
 							token = GenerateToken()
 						};
-						MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(model2, false, null, null);
+						MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(model2);
 					}
 					UpdateLounge(ret.result.lounge, ret.result.friend, ret.result.loungeServer, ret.result.inviteFriendInfo, ret.result.firstMetUserIds);
 				}
@@ -946,7 +935,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			Lounge_Model_MemberLounge lounge_Model_MemberLounge = new Lounge_Model_MemberLounge();
 			lounge_Model_MemberLounge.id = 1005;
 			lounge_Model_MemberLounge.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberLounge, false, null, null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberLounge);
 		}
 	}
 
@@ -957,7 +946,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			Lounge_Model_MemberLounge lounge_Model_MemberLounge = new Lounge_Model_MemberLounge();
 			lounge_Model_MemberLounge.id = 1005;
 			lounge_Model_MemberLounge.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberLounge, false, null, null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberLounge);
 		}
 	}
 
@@ -976,7 +965,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				lounge_Model_MemberField.qid = (int)MonoBehaviourSingleton<PartyManager>.I.GetQuestId();
 				lounge_Model_MemberField.h = (MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId() == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
 			}
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberField, false, null, null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberField);
 		}
 	}
 
@@ -990,7 +979,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			int.TryParse(party.id, out lounge_Model_MemberQuest.pid);
 			lounge_Model_MemberQuest.qid = party.quest.questId;
 			lounge_Model_MemberQuest.h = (party.ownerUserId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberQuest, false, null, null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberQuest);
 		}
 	}
 
@@ -1002,7 +991,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			lounge_Model_MemberArena.id = 1005;
 			lounge_Model_MemberArena.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 			lounge_Model_MemberArena.aid = arenaId;
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberArena, false, null, null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_MemberArena);
 		}
 	}
 
@@ -1010,7 +999,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			LoungeModel.SlotInfo slotInfoByUserId = GetSlotInfoByUserId(userId);
+			PartyModel.SlotInfo slotInfoByUserId = GetSlotInfoByUserId(userId);
 			loungeData.slotInfos.Remove(slotInfoByUserId);
 		}
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
@@ -1033,7 +1022,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			if (QuestManager.IsValidInGame())
 			{
 				string text = StringTable.Get(STRING_CATEGORY.IN_GAME, 140u);
-				UIInGamePopupDialog.PushOpen(text, false, 1.4f);
+				UIInGamePopupDialog.PushOpen(text, is_important: false, 1.4f);
 			}
 			ClearLounge();
 			MonoBehaviourSingleton<ChatManager>.I.DestroyLoungeChat();
@@ -1072,11 +1061,11 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		LoungeNetworkManager.ConnectData webSockConnectData = GetWebSockConnectData();
 		if (webSockConnectData == null)
 		{
-			TryConnect(false, false);
+			TryConnect(connect: false, regist: false);
 		}
 		else if (!MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
 		{
-			TryConnect(false, false);
+			TryConnect(connect: false, regist: false);
 		}
 		else
 		{
@@ -1112,84 +1101,86 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	public void OnRecvMemberMoveLounge(int userId)
 	{
-		if (this.loungeMemberStatus != null)
+		if (this.loungeMemberStatus == null)
 		{
-			LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[userId];
-			LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
-			if (loungeMemberStatus != null)
-			{
-				loungeMemberStatus.ToLounge();
-				OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
-				if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
-				{
-					MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
-				}
-			}
-			AFKCheck();
+			return;
 		}
+		LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[userId];
+		LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+		if (loungeMemberStatus != null)
+		{
+			loungeMemberStatus.ToLounge();
+			OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
+			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+			{
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
+			}
+		}
+		AFKCheck();
 	}
 
 	public void OnRecvMemberMoveField(Lounge_Model_MemberField model)
 	{
-		if (this.loungeMemberStatus != null)
+		if (this.loungeMemberStatus == null)
 		{
-			LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[model.cid];
-			LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
-			if (loungeMemberStatus != null)
-			{
-				loungeMemberStatus.ToField(model.fid.ToString(), model.fmid, model.pid.ToString(), model.qid, model.h);
-				OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
-				if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
-				{
-					MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
-				}
-			}
-			AFKCheck();
+			return;
 		}
+		LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[model.cid];
+		LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+		if (loungeMemberStatus != null)
+		{
+			loungeMemberStatus.ToField(model.fid.ToString(), model.fmid, model.pid.ToString(), model.qid, model.h);
+			OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
+			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+			{
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
+			}
+		}
+		AFKCheck();
 	}
 
 	public void OnRecvMemberMoveQuest(Lounge_Model_MemberQuest model)
 	{
-		if (this.loungeMemberStatus != null)
+		if (this.loungeMemberStatus == null)
 		{
-			LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[model.cid];
-			LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
-			if (loungeMemberStatus != null)
-			{
-				loungeMemberStatus.ToQuest(model.pid.ToString(), model.qid, model.h);
-				OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
-				if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
-				{
-					MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
-				}
-			}
-			AFKCheck();
+			return;
 		}
+		LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[model.cid];
+		LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+		if (loungeMemberStatus != null)
+		{
+			loungeMemberStatus.ToQuest(model.pid.ToString(), model.qid, model.h);
+			OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
+			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+			{
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
+			}
+		}
+		AFKCheck();
 	}
 
 	public void OnRecvMemberMoveArena(Lounge_Model_MemberArena model)
 	{
-		if (this.loungeMemberStatus != null)
+		if (this.loungeMemberStatus == null)
 		{
-			LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[model.cid];
-			LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
-			loungeMemberStatus.ToArena(model.aid);
-			if (loungeMemberStatus != null)
-			{
-				OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
-				if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
-				{
-					MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
-				}
-			}
-			AFKCheck();
+			return;
 		}
+		LoungeMemberStatus loungeMemberStatus = this.loungeMemberStatus[model.cid];
+		LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+		loungeMemberStatus.ToArena(model.aid);
+		if (loungeMemberStatus != null)
+		{
+			OnChangeMemberStatus.SafeInvoke(loungeMemberStatus);
+			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+			{
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.MoveLoungeNotification(status, loungeMemberStatus);
+			}
+		}
+		AFKCheck();
 	}
 
 	private void AFKCheck()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
 		if (afkCoroutine != null)
 		{
 			this.StopCoroutine(afkCoroutine);
@@ -1199,40 +1190,42 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	private IEnumerator DoAFKCheck()
 	{
-		if (IsValidInLounge() && loungeMemberStatus != null)
+		if (!IsValidInLounge() || loungeMemberStatus == null)
 		{
-			List<LoungeMemberStatus> allMember = loungeMemberStatus.GetAll();
-			if (!allMember.IsNullOrEmpty() && (from x in allMember
-			where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-			select x).Any())
+			yield break;
+		}
+		List<LoungeMemberStatus> allMember = loungeMemberStatus.GetAll();
+		if (allMember.IsNullOrEmpty() || !(from x in allMember
+		where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
+		select x).Any())
+		{
+			yield break;
+		}
+		LoungeMemberStatus fastest = (from x in allMember
+		where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
+		where x.GetStatus() == LoungeMemberStatus.MEMBER_STATUS.LOUNGE
+		orderby x.lastExecTime
+		select x).FirstOrDefault();
+		if (fastest != null)
+		{
+			double waitTime = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
+			if (waitTime > 0.0)
 			{
-				LoungeMemberStatus fastest = (from x in allMember
-				where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-				where x.GetStatus() == LoungeMemberStatus.MEMBER_STATUS.LOUNGE
-				orderby x.lastExecTime
-				select x).FirstOrDefault();
-				if (fastest != null)
-				{
-					double waitTime = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
-					if (waitTime > 0.0)
-					{
-						yield return (object)new WaitForSeconds((float)waitTime);
-					}
-					bool wait = true;
-					Protocol.Force(delegate
-					{
-						((_003CDoAFKCheck_003Ec__Iterator209)/*Error near IL_01a6: stateMachine*/)._003C_003Ef__this.SendRoomPartyAFKKick(((_003CDoAFKCheck_003Ec__Iterator209)/*Error near IL_01a6: stateMachine*/)._003Cfastest_003E__1.userId, delegate
-						{
-							((_003CDoAFKCheck_003Ec__Iterator209)/*Error near IL_01a6: stateMachine*/)._003Cwait_003E__3 = false;
-						});
-					});
-					while (wait)
-					{
-						yield return (object)null;
-					}
-					AFKCheck();
-				}
+				yield return (object)new WaitForSeconds((float)waitTime);
 			}
+			bool wait = true;
+			Protocol.Force(delegate
+			{
+				SendRoomPartyAFKKick(fastest.userId, delegate
+				{
+					wait = false;
+				});
+			});
+			while (wait)
+			{
+				yield return null;
+			}
+			AFKCheck();
 		}
 	}
 
@@ -1265,38 +1258,36 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		if (!IsValidInLounge())
 		{
 			rallyInvite = new List<LoungeModel.SlotInfo>();
-			call_back(true);
+			call_back(obj: true);
+			return;
 		}
-		else
+		rallyInvite = null;
+		LoungeRallyListModel.RequestSendForm requestSendForm = new LoungeRallyListModel.RequestSendForm();
+		requestSendForm.id = loungeData.id;
+		Protocol.Send(LoungeRallyListModel.URL, requestSendForm, delegate(LoungeRallyListModel ret)
 		{
-			rallyInvite = null;
-			LoungeRallyListModel.RequestSendForm requestSendForm = new LoungeRallyListModel.RequestSendForm();
-			requestSendForm.id = loungeData.id;
-			Protocol.Send(LoungeRallyListModel.URL, requestSendForm, delegate(LoungeRallyListModel ret)
+			bool flag = false;
+			if (ret.Error == Error.None)
 			{
-				bool flag = false;
-				if (ret.Error == Error.None)
+				rallyInvite = ret.result.slotInfos;
+				flag = true;
+			}
+			if (rallyInvite == null)
+			{
+				rallyInvite = new List<LoungeModel.SlotInfo>();
+			}
+			if (flag && rallyInvite.Count > 0)
+			{
+				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool issuccess)
 				{
-					rallyInvite = ret.result.slotInfos;
-					flag = true;
-				}
-				if (rallyInvite == null)
-				{
-					rallyInvite = new List<LoungeModel.SlotInfo>();
-				}
-				if (flag && rallyInvite.Count > 0)
-				{
-					MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate(bool issuccess)
-					{
-						call_back(issuccess);
-					}, false);
-				}
-				else
-				{
-					call_back(flag);
-				}
-			}, string.Empty);
-		}
+					call_back(issuccess);
+				});
+			}
+			else
+			{
+				call_back(flag);
+			}
+		}, string.Empty);
 	}
 
 	public bool IsRallyUser(int userid)

@@ -80,9 +80,6 @@ namespace BestHTTP.Caching
 			lock (Library)
 			{
 				return Library.ContainsKey(uri);
-				IL_001d:
-				bool result;
-				return result;
 			}
 		}
 
@@ -216,7 +213,6 @@ namespace BestHTTP.Caching
 					{
 						DeleteEntity(uri);
 						throw ex;
-						IL_0065:;
 					}
 				}
 			}
@@ -233,17 +229,11 @@ namespace BestHTTP.Caching
 				try
 				{
 					return value.GetSaveStream(response);
-					IL_003e:
-					Stream result;
-					return result;
 				}
 				catch (Exception ex)
 				{
 					DeleteEntity(uri);
 					throw ex;
-					IL_004c:
-					Stream result;
-					return result;
 				}
 			}
 		}
@@ -350,9 +340,6 @@ namespace BestHTTP.Caching
 			lock (Library)
 			{
 				return Library.Count;
-				IL_0021:
-				int result;
-				return result;
 			}
 		}
 
@@ -378,7 +365,11 @@ namespace BestHTTP.Caching
 			if (library == null)
 			{
 				library = new Dictionary<Uri, HTTPCacheFileInfo>();
-				if (File.Exists(LibraryPath))
+				if (!File.Exists(LibraryPath))
+				{
+					DeleteUnusedFiles();
+				}
+				else
 				{
 					try
 					{
@@ -406,10 +397,6 @@ namespace BestHTTP.Caching
 					catch
 					{
 					}
-				}
-				else
-				{
-					DeleteUnusedFiles();
 				}
 			}
 		}

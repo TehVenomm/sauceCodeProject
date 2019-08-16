@@ -3,51 +3,61 @@ package com.google.android.gms.drive.query;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.text.TextUtils;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import com.google.android.gms.drive.metadata.SortableMetadataField;
 import com.google.android.gms.drive.query.internal.zzf;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class SortOrder extends zza {
+@Class(creator = "SortOrderCreator")
+@Reserved({1000})
+public class SortOrder extends AbstractSafeParcelable {
     public static final Creator<SortOrder> CREATOR = new zzc();
-    private List<zzf> zzgnd;
-    private boolean zzgne;
+    @Field(mo13990id = 1)
+    private final List<zzf> zzlg;
+    @Field(defaultValue = "false", mo13990id = 2)
+    private final boolean zzlh;
 
     public static class Builder {
-        private final List<zzf> zzgnd = new ArrayList();
-        private boolean zzgne = false;
+        private final List<zzf> zzlg = new ArrayList();
+        private boolean zzlh = false;
 
         public Builder addSortAscending(SortableMetadataField sortableMetadataField) {
-            this.zzgnd.add(new zzf(sortableMetadataField.getName(), true));
+            this.zzlg.add(new zzf(sortableMetadataField.getName(), true));
             return this;
         }
 
         public Builder addSortDescending(SortableMetadataField sortableMetadataField) {
-            this.zzgnd.add(new zzf(sortableMetadataField.getName(), false));
+            this.zzlg.add(new zzf(sortableMetadataField.getName(), false));
             return this;
         }
 
         public SortOrder build() {
-            return new SortOrder(this.zzgnd, false);
+            return new SortOrder(this.zzlg, false);
         }
     }
 
-    SortOrder(List<zzf> list, boolean z) {
-        this.zzgnd = list;
-        this.zzgne = z;
+    @Constructor
+    SortOrder(@Param(mo13993id = 1) List<zzf> list, @Param(mo13993id = 2) boolean z) {
+        this.zzlg = list;
+        this.zzlh = z;
     }
 
     public String toString() {
-        return String.format(Locale.US, "SortOrder[%s, %s]", new Object[]{TextUtils.join(",", this.zzgnd), Boolean.valueOf(this.zzgne)});
+        return String.format(Locale.US, "SortOrder[%s, %s]", new Object[]{TextUtils.join(",", this.zzlg), Boolean.valueOf(this.zzlh)});
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.zzgnd, false);
-        zzd.zza(parcel, 2, this.zzgne);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeTypedList(parcel, 1, this.zzlg, false);
+        SafeParcelWriter.writeBoolean(parcel, 2, this.zzlh);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

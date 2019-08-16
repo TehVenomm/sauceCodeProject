@@ -1,11 +1,10 @@
 using System;
+using System.Runtime.CompilerServices;
 
 public class AbilityTable : Singleton<AbilityTable>, IDataTable
 {
 	public class Ability
 	{
-		public const string NT = "abilityId,name,iconId,startDate,endDate,unlockEventId";
-
 		public uint id;
 
 		public string name;
@@ -17,6 +16,8 @@ public class AbilityTable : Singleton<AbilityTable>, IDataTable
 		public DateTime? endDate;
 
 		public int unlockEventId;
+
+		public const string NT = "abilityId,name,iconId,startDate,endDate,unlockEventId";
 
 		public static bool cb(CSVReader csv_reader, Ability data, ref uint key)
 		{
@@ -65,15 +66,21 @@ public class AbilityTable : Singleton<AbilityTable>, IDataTable
 
 	private UIntKeyTable<Ability> abilityTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Ability> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Ability> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		abilityTable = TableUtility.CreateUIntKeyTable<Ability>(csv_text, Ability.cb, "abilityId,name,iconId,startDate,endDate,unlockEventId", null);
+		abilityTable = TableUtility.CreateUIntKeyTable<Ability>(csv_text, Ability.cb, "abilityId,name,iconId,startDate,endDate,unlockEventId");
 		abilityTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(abilityTable, csv_text, Ability.cb, "abilityId,name,iconId,startDate,endDate,unlockEventId", null);
+		TableUtility.AddUIntKeyTable(abilityTable, csv_text, Ability.cb, "abilityId,name,iconId,startDate,endDate,unlockEventId");
 	}
 
 	public Ability GetAbility(uint id)

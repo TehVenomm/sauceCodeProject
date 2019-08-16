@@ -96,7 +96,8 @@ public class TokenFilter {
         return super.toString();
     }
 
-    protected boolean _includeScalar() {
+    /* access modifiers changed from: protected */
+    public boolean _includeScalar() {
         return true;
     }
 }

@@ -1,8 +1,9 @@
-package net.gogame.gowrap.ui.customtabs.browseractions;
+package net.gogame.gowrap.p019ui.customtabs.browseractions;
 
 import android.app.PendingIntent;
 import android.graphics.Bitmap;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.browseractions.BrowserActionItem */
 public class BrowserActionItem {
     private final PendingIntent mAction;
     private Bitmap mIcon;

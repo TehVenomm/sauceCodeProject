@@ -15,7 +15,11 @@ public class AdHitIdGenerator {
         this.adMobSdkInstalled = z;
     }
 
-    int getAdHitId() {
-        return !this.adMobSdkInstalled ? 0 : AdMobInfo.getInstance().generateAdHitId();
+    /* access modifiers changed from: 0000 */
+    public int getAdHitId() {
+        if (!this.adMobSdkInstalled) {
+            return 0;
+        }
+        return AdMobInfo.getInstance().generateAdHitId();
     }
 }

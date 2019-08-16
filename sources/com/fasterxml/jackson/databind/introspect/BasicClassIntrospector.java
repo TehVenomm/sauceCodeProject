@@ -22,7 +22,7 @@ public class BasicClassIntrospector extends ClassIntrospector implements Seriali
     @Deprecated
     public static final BasicClassIntrospector instance = new BasicClassIntrospector();
     private static final long serialVersionUID = 1;
-    protected final LRUMap<JavaType, BasicBeanDescription> _cachedFCA = new LRUMap(16, 64);
+    protected final LRUMap<JavaType, BasicBeanDescription> _cachedFCA = new LRUMap<>(16, 64);
 
     public BasicBeanDescription forSerialization(SerializationConfig serializationConfig, JavaType javaType, MixInResolver mixInResolver) {
         BasicBeanDescription _findStdTypeDesc = _findStdTypeDesc(javaType);
@@ -59,9 +59,9 @@ public class BasicClassIntrospector extends ClassIntrospector implements Seriali
         if (_findStdTypeDesc != null) {
             return _findStdTypeDesc;
         }
-        _findStdTypeDesc = _findStdJdkCollectionDesc(deserializationConfig, javaType);
-        if (_findStdTypeDesc != null) {
-            return _findStdTypeDesc;
+        BasicBeanDescription _findStdJdkCollectionDesc = _findStdJdkCollectionDesc(deserializationConfig, javaType);
+        if (_findStdJdkCollectionDesc != null) {
+            return _findStdJdkCollectionDesc;
         }
         return BasicBeanDescription.forDeserialization(collectProperties(deserializationConfig, javaType, mixInResolver, false, "set"));
     }
@@ -71,13 +71,13 @@ public class BasicClassIntrospector extends ClassIntrospector implements Seriali
         if (_findStdTypeDesc != null) {
             return _findStdTypeDesc;
         }
-        _findStdTypeDesc = (BasicBeanDescription) this._cachedFCA.get(javaType);
-        if (_findStdTypeDesc != null) {
-            return _findStdTypeDesc;
+        BasicBeanDescription basicBeanDescription = (BasicBeanDescription) this._cachedFCA.get(javaType);
+        if (basicBeanDescription != null) {
+            return basicBeanDescription;
         }
-        _findStdTypeDesc = BasicBeanDescription.forOtherUse(mapperConfig, javaType, AnnotatedClass.construct(javaType, mapperConfig, mixInResolver));
-        this._cachedFCA.put(javaType, _findStdTypeDesc);
-        return _findStdTypeDesc;
+        BasicBeanDescription forOtherUse = BasicBeanDescription.forOtherUse(mapperConfig, javaType, AnnotatedClass.construct(javaType, mapperConfig, mixInResolver));
+        this._cachedFCA.put(javaType, forOtherUse);
+        return forOtherUse;
     }
 
     public BasicBeanDescription forDirectClassAnnotations(MapperConfig<?> mapperConfig, JavaType javaType, MixInResolver mixInResolver) {
@@ -88,11 +88,13 @@ public class BasicClassIntrospector extends ClassIntrospector implements Seriali
         return _findStdTypeDesc;
     }
 
-    protected POJOPropertiesCollector collectProperties(MapperConfig<?> mapperConfig, JavaType javaType, MixInResolver mixInResolver, boolean z, String str) {
+    /* access modifiers changed from: protected */
+    public POJOPropertiesCollector collectProperties(MapperConfig<?> mapperConfig, JavaType javaType, MixInResolver mixInResolver, boolean z, String str) {
         return constructPropertyCollector(mapperConfig, AnnotatedClass.construct(javaType, mapperConfig, mixInResolver), javaType, z, str);
     }
 
-    protected POJOPropertiesCollector collectPropertiesWithBuilder(MapperConfig<?> mapperConfig, JavaType javaType, MixInResolver mixInResolver, boolean z) {
+    /* access modifiers changed from: protected */
+    public POJOPropertiesCollector collectPropertiesWithBuilder(MapperConfig<?> mapperConfig, JavaType javaType, MixInResolver mixInResolver, boolean z) {
         AnnotationIntrospector annotationIntrospector;
         Value value = null;
         if (mapperConfig.isAnnotationProcessingEnabled()) {
@@ -107,12 +109,14 @@ public class BasicClassIntrospector extends ClassIntrospector implements Seriali
         return constructPropertyCollector(mapperConfig, construct, javaType, z, value == null ? "with" : value.withPrefix);
     }
 
-    protected POJOPropertiesCollector constructPropertyCollector(MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass, JavaType javaType, boolean z, String str) {
+    /* access modifiers changed from: protected */
+    public POJOPropertiesCollector constructPropertyCollector(MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass, JavaType javaType, boolean z, String str) {
         return new POJOPropertiesCollector(mapperConfig, z, javaType, annotatedClass, str);
     }
 
-    protected BasicBeanDescription _findStdTypeDesc(JavaType javaType) {
-        Class rawClass = javaType.getRawClass();
+    /* access modifiers changed from: protected */
+    public BasicBeanDescription _findStdTypeDesc(JavaType javaType) {
+        Class<String> rawClass = javaType.getRawClass();
         if (rawClass.isPrimitive()) {
             if (rawClass == Boolean.TYPE) {
                 return BOOLEAN_DESC;
@@ -129,7 +133,8 @@ public class BasicClassIntrospector extends ClassIntrospector implements Seriali
         return null;
     }
 
-    protected boolean _isStdJDKCollection(JavaType javaType) {
+    /* access modifiers changed from: protected */
+    public boolean _isStdJDKCollection(JavaType javaType) {
         if (!javaType.isContainerType() || javaType.isArrayType()) {
             return false;
         }
@@ -147,7 +152,8 @@ public class BasicClassIntrospector extends ClassIntrospector implements Seriali
         return false;
     }
 
-    protected BasicBeanDescription _findStdJdkCollectionDesc(MapperConfig<?> mapperConfig, JavaType javaType) {
+    /* access modifiers changed from: protected */
+    public BasicBeanDescription _findStdJdkCollectionDesc(MapperConfig<?> mapperConfig, JavaType javaType) {
         if (_isStdJDKCollection(javaType)) {
             return BasicBeanDescription.forOtherUse(mapperConfig, javaType, AnnotatedClass.construct(javaType, mapperConfig));
         }

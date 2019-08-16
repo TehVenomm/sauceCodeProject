@@ -106,7 +106,7 @@ public static class Localization
 			}
 			localizationHasBeenSet = true;
 		}
-		if (LoadCSV(array, false))
+		if (LoadCSV(array))
 		{
 			return true;
 		}
@@ -309,31 +309,33 @@ public static class Localization
 
 	private static void AddCSV(BetterList<string> newValues, string[] newLanguages, Dictionary<string, int> languageIndices)
 	{
-		if (newValues.size >= 2)
+		if (newValues.size < 2)
 		{
-			string text = newValues[0];
-			if (!string.IsNullOrEmpty(text))
+			return;
+		}
+		string text = newValues[0];
+		if (string.IsNullOrEmpty(text))
+		{
+			return;
+		}
+		string[] value = ExtractStrings(newValues, newLanguages, languageIndices);
+		if (mDictionary.ContainsKey(text))
+		{
+			mDictionary[text] = value;
+			if (newLanguages == null)
 			{
-				string[] value = ExtractStrings(newValues, newLanguages, languageIndices);
-				if (mDictionary.ContainsKey(text))
-				{
-					mDictionary[text] = value;
-					if (newLanguages == null)
-					{
-						Debug.LogWarning((object)("Localization key '" + text + "' is already present"));
-					}
-				}
-				else
-				{
-					try
-					{
-						mDictionary.Add(text, value);
-					}
-					catch (Exception ex)
-					{
-						Debug.LogError((object)("Unable to add '" + text + "' to the Localization dictionary.\n" + ex.Message));
-					}
-				}
+				Debug.LogWarning((object)("Localization key '" + text + "' is already present"));
+			}
+		}
+		else
+		{
+			try
+			{
+				mDictionary.Add(text, value);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError((object)("Unable to add '" + text + "' to the Localization dictionary.\n" + ex.Message));
 			}
 		}
 	}

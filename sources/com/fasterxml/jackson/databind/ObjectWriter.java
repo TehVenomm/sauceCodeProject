@@ -14,9 +14,9 @@ import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.Versioned;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.SegmentedStringWriter;
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.core.p015io.CharacterEscapes;
+import com.fasterxml.jackson.core.p015io.SegmentedStringWriter;
+import com.fasterxml.jackson.core.p015io.SerializedString;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
@@ -60,26 +60,26 @@ public class ObjectWriter implements Versioned, Serializable {
         public final SerializableString rootValueSeparator;
         public final FormatSchema schema;
 
-        public GeneratorSettings(PrettyPrinter prettyPrinter, FormatSchema formatSchema, CharacterEscapes characterEscapes, SerializableString serializableString) {
-            this.prettyPrinter = prettyPrinter;
+        public GeneratorSettings(PrettyPrinter prettyPrinter2, FormatSchema formatSchema, CharacterEscapes characterEscapes2, SerializableString serializableString) {
+            this.prettyPrinter = prettyPrinter2;
             this.schema = formatSchema;
-            this.characterEscapes = characterEscapes;
+            this.characterEscapes = characterEscapes2;
             this.rootValueSeparator = serializableString;
         }
 
-        public GeneratorSettings with(PrettyPrinter prettyPrinter) {
-            if (prettyPrinter == null) {
-                prettyPrinter = ObjectWriter.NULL_PRETTY_PRINTER;
+        public GeneratorSettings with(PrettyPrinter prettyPrinter2) {
+            if (prettyPrinter2 == null) {
+                prettyPrinter2 = ObjectWriter.NULL_PRETTY_PRINTER;
             }
-            return prettyPrinter == this.prettyPrinter ? this : new GeneratorSettings(prettyPrinter, this.schema, this.characterEscapes, this.rootValueSeparator);
+            return prettyPrinter2 == this.prettyPrinter ? this : new GeneratorSettings(prettyPrinter2, this.schema, this.characterEscapes, this.rootValueSeparator);
         }
 
         public GeneratorSettings with(FormatSchema formatSchema) {
             return this.schema == formatSchema ? this : new GeneratorSettings(this.prettyPrinter, formatSchema, this.characterEscapes, this.rootValueSeparator);
         }
 
-        public GeneratorSettings with(CharacterEscapes characterEscapes) {
-            return this.characterEscapes == characterEscapes ? this : new GeneratorSettings(this.prettyPrinter, this.schema, characterEscapes, this.rootValueSeparator);
+        public GeneratorSettings with(CharacterEscapes characterEscapes2) {
+            return this.characterEscapes == characterEscapes2 ? this : new GeneratorSettings(this.prettyPrinter, this.schema, characterEscapes2, this.rootValueSeparator);
         }
 
         public GeneratorSettings withRootValueSeparator(String str) {
@@ -105,15 +105,15 @@ public class ObjectWriter implements Versioned, Serializable {
         }
 
         public void initialize(JsonGenerator jsonGenerator) {
-            PrettyPrinter prettyPrinter = this.prettyPrinter;
+            PrettyPrinter prettyPrinter2 = this.prettyPrinter;
             if (this.prettyPrinter != null) {
-                if (prettyPrinter == ObjectWriter.NULL_PRETTY_PRINTER) {
+                if (prettyPrinter2 == ObjectWriter.NULL_PRETTY_PRINTER) {
                     jsonGenerator.setPrettyPrinter(null);
                 } else {
-                    if (prettyPrinter instanceof Instantiatable) {
-                        prettyPrinter = (PrettyPrinter) ((Instantiatable) prettyPrinter).createInstance();
+                    if (prettyPrinter2 instanceof Instantiatable) {
+                        prettyPrinter2 = (PrettyPrinter) ((Instantiatable) prettyPrinter2).createInstance();
                     }
-                    jsonGenerator.setPrettyPrinter(prettyPrinter);
+                    jsonGenerator.setPrettyPrinter(prettyPrinter2);
                 }
             }
             if (this.characterEscapes != null) {
@@ -135,18 +135,18 @@ public class ObjectWriter implements Versioned, Serializable {
         private final TypeSerializer typeSerializer;
         private final JsonSerializer<Object> valueSerializer;
 
-        private Prefetch(JavaType javaType, JsonSerializer<Object> jsonSerializer, TypeSerializer typeSerializer) {
+        private Prefetch(JavaType javaType, JsonSerializer<Object> jsonSerializer, TypeSerializer typeSerializer2) {
             this.rootType = javaType;
             this.valueSerializer = jsonSerializer;
-            this.typeSerializer = typeSerializer;
+            this.typeSerializer = typeSerializer2;
         }
 
         public Prefetch forRootType(ObjectWriter objectWriter, JavaType javaType) {
-            Object obj = 1;
-            if (!(javaType == null || javaType.isJavaLangObject())) {
-                obj = null;
+            boolean z = true;
+            if (javaType != null && !javaType.isJavaLangObject()) {
+                z = false;
             }
-            if (obj != null) {
+            if (z) {
                 if (this.rootType == null || this.valueSerializer == null) {
                     return this;
                 }
@@ -156,7 +156,7 @@ public class ObjectWriter implements Versioned, Serializable {
             } else {
                 if (objectWriter.isEnabled(SerializationFeature.EAGER_SERIALIZER_FETCH)) {
                     try {
-                        JsonSerializer findTypedValueSerializer = objectWriter._serializerProvider().findTypedValueSerializer(javaType, true, null);
+                        JsonSerializer findTypedValueSerializer = objectWriter._serializerProvider().findTypedValueSerializer(javaType, true, (BeanProperty) null);
                         if (findTypedValueSerializer instanceof TypeWrappedSerializer) {
                             return new Prefetch(javaType, null, ((TypeWrappedSerializer) findTypedValueSerializer).typeSerializer());
                         }
@@ -253,19 +253,23 @@ public class ObjectWriter implements Versioned, Serializable {
         return PackageVersion.VERSION;
     }
 
-    protected ObjectWriter _new(ObjectWriter objectWriter, JsonFactory jsonFactory) {
+    /* access modifiers changed from: protected */
+    public ObjectWriter _new(ObjectWriter objectWriter, JsonFactory jsonFactory) {
         return new ObjectWriter(objectWriter, jsonFactory);
     }
 
-    protected ObjectWriter _new(ObjectWriter objectWriter, SerializationConfig serializationConfig) {
+    /* access modifiers changed from: protected */
+    public ObjectWriter _new(ObjectWriter objectWriter, SerializationConfig serializationConfig) {
         return new ObjectWriter(objectWriter, serializationConfig);
     }
 
-    protected ObjectWriter _new(GeneratorSettings generatorSettings, Prefetch prefetch) {
+    /* access modifiers changed from: protected */
+    public ObjectWriter _new(GeneratorSettings generatorSettings, Prefetch prefetch) {
         return new ObjectWriter(this, this._config, generatorSettings, prefetch);
     }
 
-    protected SequenceWriter _newSequenceWriter(boolean z, JsonGenerator jsonGenerator, boolean z2) throws IOException {
+    /* access modifiers changed from: protected */
+    public SequenceWriter _newSequenceWriter(boolean z, JsonGenerator jsonGenerator, boolean z2) throws IOException {
         _configureGenerator(jsonGenerator);
         return new SequenceWriter(_serializerProvider(), jsonGenerator, z2, this._prefetch).init(z);
     }
@@ -349,7 +353,7 @@ public class ObjectWriter implements Versioned, Serializable {
         if (cls == Object.class) {
             return forType((JavaType) null);
         }
-        return forType(this._config.constructType((Class) cls));
+        return forType(this._config.constructType(cls));
     }
 
     public ObjectWriter forType(TypeReference<?> typeReference) {
@@ -363,12 +367,12 @@ public class ObjectWriter implements Versioned, Serializable {
 
     @Deprecated
     public ObjectWriter withType(Class<?> cls) {
-        return forType((Class) cls);
+        return forType(cls);
     }
 
     @Deprecated
     public ObjectWriter withType(TypeReference<?> typeReference) {
-        return forType((TypeReference) typeReference);
+        return forType(typeReference);
     }
 
     public ObjectWriter with(DateFormat dateFormat) {
@@ -419,7 +423,7 @@ public class ObjectWriter implements Versioned, Serializable {
     }
 
     public ObjectWriter withView(Class<?> cls) {
-        SerializationConfig withView = this._config.withView((Class) cls);
+        SerializationConfig withView = this._config.withView(cls);
         return withView == this._config ? this : _new(this, withView);
     }
 
@@ -542,53 +546,65 @@ public class ObjectWriter implements Versioned, Serializable {
         return this._config.getAttributes();
     }
 
-    public void writeValue(JsonGenerator jsonGenerator, Object obj) throws IOException, JsonGenerationException, JsonMappingException {
-        Throwable th;
-        _configureGenerator(jsonGenerator);
-        if (this._config.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) && (obj instanceof Closeable)) {
-            Closeable closeable = (Closeable) obj;
-            Closeable closeable2;
-            try {
-                this._prefetch.serialize(jsonGenerator, obj, _serializerProvider());
-                if (this._config.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
-                    jsonGenerator.flush();
-                }
-                closeable2 = null;
-                try {
-                    closeable.close();
-                    if (closeable2 != null) {
-                        try {
-                            closeable2.close();
-                            return;
-                        } catch (IOException e) {
-                            return;
-                        }
-                    }
-                    return;
-                } catch (Throwable th2) {
-                    th = th2;
-                    if (closeable2 != null) {
-                        try {
-                            closeable2.close();
-                        } catch (IOException e2) {
-                        }
-                    }
-                    throw th;
-                }
-            } catch (Throwable th3) {
-                Throwable th4 = th3;
-                closeable2 = closeable;
-                th = th4;
-                if (closeable2 != null) {
-                    closeable2.close();
-                }
-                throw th;
-            }
-        }
-        this._prefetch.serialize(jsonGenerator, obj, _serializerProvider());
-        if (this._config.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
-            jsonGenerator.flush();
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:18:0x0038 A[SYNTHETIC, Splitter:B:18:0x0038] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public void writeValue(com.fasterxml.jackson.core.JsonGenerator r4, java.lang.Object r5) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException, com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r3 = this;
+            r3._configureGenerator(r4)
+            com.fasterxml.jackson.databind.SerializationConfig r0 = r3._config
+            com.fasterxml.jackson.databind.SerializationFeature r1 = com.fasterxml.jackson.databind.SerializationFeature.CLOSE_CLOSEABLE
+            boolean r0 = r0.isEnabled(r1)
+            if (r0 == 0) goto L_0x003c
+            boolean r0 = r5 instanceof java.io.Closeable
+            if (r0 == 0) goto L_0x003c
+            r0 = r5
+            java.io.Closeable r0 = (java.io.Closeable) r0
+            com.fasterxml.jackson.databind.ObjectWriter$Prefetch r1 = r3._prefetch     // Catch:{ all -> 0x0034 }
+            com.fasterxml.jackson.databind.ser.DefaultSerializerProvider r2 = r3._serializerProvider()     // Catch:{ all -> 0x0034 }
+            r1.serialize(r4, r5, r2)     // Catch:{ all -> 0x0034 }
+            com.fasterxml.jackson.databind.SerializationConfig r1 = r3._config     // Catch:{ all -> 0x0034 }
+            com.fasterxml.jackson.databind.SerializationFeature r2 = com.fasterxml.jackson.databind.SerializationFeature.FLUSH_AFTER_WRITE_VALUE     // Catch:{ all -> 0x0034 }
+            boolean r1 = r1.isEnabled(r2)     // Catch:{ all -> 0x0034 }
+            if (r1 == 0) goto L_0x002a
+            r4.flush()     // Catch:{ all -> 0x0034 }
+        L_0x002a:
+            r2 = 0
+            r0.close()     // Catch:{ all -> 0x0057 }
+            if (r2 == 0) goto L_0x0033
+            r2.close()     // Catch:{ IOException -> 0x0053 }
+        L_0x0033:
+            return
+        L_0x0034:
+            r1 = move-exception
+            r2 = r0
+        L_0x0036:
+            if (r2 == 0) goto L_0x003b
+            r2.close()     // Catch:{ IOException -> 0x0055 }
+        L_0x003b:
+            throw r1
+        L_0x003c:
+            com.fasterxml.jackson.databind.ObjectWriter$Prefetch r0 = r3._prefetch
+            com.fasterxml.jackson.databind.ser.DefaultSerializerProvider r1 = r3._serializerProvider()
+            r0.serialize(r4, r5, r1)
+            com.fasterxml.jackson.databind.SerializationConfig r0 = r3._config
+            com.fasterxml.jackson.databind.SerializationFeature r1 = com.fasterxml.jackson.databind.SerializationFeature.FLUSH_AFTER_WRITE_VALUE
+            boolean r0 = r0.isEnabled(r1)
+            if (r0 == 0) goto L_0x0033
+            r4.flush()
+            goto L_0x0033
+        L_0x0053:
+            r0 = move-exception
+            goto L_0x0033
+        L_0x0055:
+            r0 = move-exception
+            goto L_0x003b
+        L_0x0057:
+            r0 = move-exception
+            r1 = r0
+            goto L_0x0036
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ObjectWriter.writeValue(com.fasterxml.jackson.core.JsonGenerator, java.lang.Object):void");
     }
 
     public void writeValue(File file, Object obj) throws IOException, JsonGenerationException, JsonMappingException {
@@ -604,9 +620,9 @@ public class ObjectWriter implements Versioned, Serializable {
     }
 
     public String writeValueAsString(Object obj) throws JsonProcessingException {
-        Writer segmentedStringWriter = new SegmentedStringWriter(this._generatorFactory._getBufferRecycler());
+        SegmentedStringWriter segmentedStringWriter = new SegmentedStringWriter(this._generatorFactory._getBufferRecycler());
         try {
-            _configAndWriteValue(this._generatorFactory.createGenerator(segmentedStringWriter), obj);
+            _configAndWriteValue(this._generatorFactory.createGenerator((Writer) segmentedStringWriter), obj);
             return segmentedStringWriter.getAndClear();
         } catch (JsonProcessingException e) {
             throw e;
@@ -616,12 +632,12 @@ public class ObjectWriter implements Versioned, Serializable {
     }
 
     public byte[] writeValueAsBytes(Object obj) throws JsonProcessingException {
-        OutputStream byteArrayBuilder = new ByteArrayBuilder(this._generatorFactory._getBufferRecycler());
+        ByteArrayBuilder byteArrayBuilder = new ByteArrayBuilder(this._generatorFactory._getBufferRecycler());
         try {
-            _configAndWriteValue(this._generatorFactory.createGenerator(byteArrayBuilder, JsonEncoding.UTF8), obj);
-            byte[] toByteArray = byteArrayBuilder.toByteArray();
+            _configAndWriteValue(this._generatorFactory.createGenerator((OutputStream) byteArrayBuilder, JsonEncoding.UTF8), obj);
+            byte[] byteArray = byteArrayBuilder.toByteArray();
             byteArrayBuilder.release();
-            return toByteArray;
+            return byteArray;
         } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e2) {
@@ -637,7 +653,7 @@ public class ObjectWriter implements Versioned, Serializable {
     }
 
     public void acceptJsonFormatVisitor(Class<?> cls, JsonFormatVisitorWrapper jsonFormatVisitorWrapper) throws JsonMappingException {
-        acceptJsonFormatVisitor(this._config.constructType((Class) cls), jsonFormatVisitorWrapper);
+        acceptJsonFormatVisitor(this._config.constructType(cls), jsonFormatVisitorWrapper);
     }
 
     public boolean canSerialize(Class<?> cls) {
@@ -648,114 +664,109 @@ public class ObjectWriter implements Versioned, Serializable {
         return _serializerProvider().hasSerializerFor(cls, atomicReference);
     }
 
-    protected DefaultSerializerProvider _serializerProvider() {
+    /* access modifiers changed from: protected */
+    public DefaultSerializerProvider _serializerProvider() {
         return this._serializerProvider.createInstance(this._config, this._serializerFactory);
     }
 
-    protected void _verifySchemaType(FormatSchema formatSchema) {
+    /* access modifiers changed from: protected */
+    public void _verifySchemaType(FormatSchema formatSchema) {
         if (formatSchema != null && !this._generatorFactory.canUseSchema(formatSchema)) {
             throw new IllegalArgumentException("Can not use FormatSchema of type " + formatSchema.getClass().getName() + " for format " + this._generatorFactory.getFormatName());
         }
     }
 
-    protected final void _configAndWriteValue(JsonGenerator jsonGenerator, Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _configAndWriteValue(JsonGenerator jsonGenerator, Object obj) throws IOException {
         _configureGenerator(jsonGenerator);
-        if (this._config.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) && (obj instanceof Closeable)) {
-            _writeCloseable(jsonGenerator, obj);
-            return;
-        }
-        Object obj2 = null;
-        try {
-            this._prefetch.serialize(jsonGenerator, obj, _serializerProvider());
-            obj2 = 1;
-            jsonGenerator.close();
-        } catch (Throwable th) {
-            if (obj2 == null) {
-                jsonGenerator.disable(Feature.AUTO_CLOSE_JSON_CONTENT);
-                try {
-                    jsonGenerator.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    private final void _writeCloseable(JsonGenerator jsonGenerator, Object obj) throws IOException {
-        Throwable th;
-        Closeable closeable;
-        JsonGenerator jsonGenerator2 = null;
-        Closeable closeable2 = (Closeable) obj;
-        try {
-            Closeable closeable3;
-            this._prefetch.serialize(jsonGenerator, obj, _serializerProvider());
-            JsonGenerator jsonGenerator3 = null;
+        if (!this._config.isEnabled(SerializationFeature.CLOSE_CLOSEABLE) || !(obj instanceof Closeable)) {
+            boolean z = false;
             try {
+                this._prefetch.serialize(jsonGenerator, obj, _serializerProvider());
+                z = true;
                 jsonGenerator.close();
-                closeable3 = null;
-            } catch (Throwable th2) {
-                jsonGenerator = jsonGenerator2;
-                Closeable closeable4 = closeable2;
-                th = th2;
-                closeable = closeable4;
-                if (jsonGenerator != null) {
+            } catch (Throwable th) {
+                if (!z) {
                     jsonGenerator.disable(Feature.AUTO_CLOSE_JSON_CONTENT);
                     try {
                         jsonGenerator.close();
                     } catch (IOException e) {
                     }
                 }
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (IOException e2) {
-                    }
-                }
                 throw th;
             }
-            try {
-                closeable2.close();
-                if (jsonGenerator2 != null) {
-                    jsonGenerator2.disable(Feature.AUTO_CLOSE_JSON_CONTENT);
-                    try {
-                        jsonGenerator3.close();
-                    } catch (IOException e3) {
-                    }
-                }
-                if (jsonGenerator2 != null) {
-                    try {
-                        closeable3.close();
-                    } catch (IOException e4) {
-                    }
-                }
-            } catch (Throwable th3) {
-                th = th3;
-                Object obj2 = jsonGenerator2;
-                jsonGenerator = jsonGenerator2;
-                if (jsonGenerator != null) {
-                    jsonGenerator.disable(Feature.AUTO_CLOSE_JSON_CONTENT);
-                    jsonGenerator.close();
-                }
-                if (closeable != null) {
-                    closeable.close();
-                }
-                throw th;
-            }
-        } catch (Throwable th22) {
-            Throwable th4 = th22;
-            closeable = closeable2;
-            th = th4;
-            if (jsonGenerator != null) {
-                jsonGenerator.disable(Feature.AUTO_CLOSE_JSON_CONTENT);
-                jsonGenerator.close();
-            }
-            if (closeable != null) {
-                closeable.close();
-            }
-            throw th;
+        } else {
+            _writeCloseable(jsonGenerator, obj);
         }
     }
 
-    protected final void _configureGenerator(JsonGenerator jsonGenerator) {
+    /* JADX WARNING: Removed duplicated region for block: B:19:0x0029  */
+    /* JADX WARNING: Removed duplicated region for block: B:23:0x0033 A[SYNTHETIC, Splitter:B:23:0x0033] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private final void _writeCloseable(com.fasterxml.jackson.core.JsonGenerator r5, java.lang.Object r6) throws java.io.IOException {
+        /*
+            r4 = this;
+            r3 = 0
+            r0 = r6
+            java.io.Closeable r0 = (java.io.Closeable) r0
+            com.fasterxml.jackson.databind.ObjectWriter$Prefetch r1 = r4._prefetch     // Catch:{ all -> 0x0025 }
+            com.fasterxml.jackson.databind.ser.DefaultSerializerProvider r2 = r4._serializerProvider()     // Catch:{ all -> 0x0025 }
+            r1.serialize(r5, r6, r2)     // Catch:{ all -> 0x0025 }
+            r1 = 0
+            r5.close()     // Catch:{ all -> 0x003f }
+            r2 = 0
+            r0.close()     // Catch:{ all -> 0x0043 }
+            if (r3 == 0) goto L_0x001f
+            com.fasterxml.jackson.core.JsonGenerator$Feature r0 = com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT
+            r3.disable(r0)
+            r1.close()     // Catch:{ IOException -> 0x0037 }
+        L_0x001f:
+            if (r3 == 0) goto L_0x0024
+            r2.close()     // Catch:{ IOException -> 0x0039 }
+        L_0x0024:
+            return
+        L_0x0025:
+            r1 = move-exception
+            r2 = r0
+        L_0x0027:
+            if (r5 == 0) goto L_0x0031
+            com.fasterxml.jackson.core.JsonGenerator$Feature r0 = com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT
+            r5.disable(r0)
+            r5.close()     // Catch:{ IOException -> 0x003b }
+        L_0x0031:
+            if (r2 == 0) goto L_0x0036
+            r2.close()     // Catch:{ IOException -> 0x003d }
+        L_0x0036:
+            throw r1
+        L_0x0037:
+            r0 = move-exception
+            goto L_0x001f
+        L_0x0039:
+            r0 = move-exception
+            goto L_0x0024
+        L_0x003b:
+            r0 = move-exception
+            goto L_0x0031
+        L_0x003d:
+            r0 = move-exception
+            goto L_0x0036
+        L_0x003f:
+            r1 = move-exception
+            r2 = r0
+            r5 = r3
+            goto L_0x0027
+        L_0x0043:
+            r0 = move-exception
+            r1 = r0
+            r2 = r3
+            r5 = r3
+            goto L_0x0027
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ObjectWriter._writeCloseable(com.fasterxml.jackson.core.JsonGenerator, java.lang.Object):void");
+    }
+
+    /* access modifiers changed from: protected */
+    public final void _configureGenerator(JsonGenerator jsonGenerator) {
         this._config.initialize(jsonGenerator);
         this._generatorSettings.initialize(jsonGenerator);
     }

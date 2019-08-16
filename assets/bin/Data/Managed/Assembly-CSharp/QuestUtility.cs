@@ -14,11 +14,13 @@ public static class QuestUtility
 		ARENA_LIMIT.WEAPON_ARROW
 	};
 
-	private static readonly ARENA_LIMIT[] SpAttackTypeLimit = new ARENA_LIMIT[3]
+	private static readonly ARENA_LIMIT[] SpAttackTypeLimit = new ARENA_LIMIT[5]
 	{
 		ARENA_LIMIT.ACTION_TYPE_NORMAL,
 		ARENA_LIMIT.ACTION_TYPE_HEAT,
-		ARENA_LIMIT.ACTION_TYPE_SOUL
+		ARENA_LIMIT.ACTION_TYPE_SOUL,
+		ARENA_LIMIT.ACTION_TYPE_BURST,
+		ARENA_LIMIT.ACTION_TYPE_ORACLE
 	};
 
 	private static readonly ARENA_LIMIT[] WeaponNumTypeLimit = new ARENA_LIMIT[2]
@@ -88,6 +90,12 @@ public static class QuestUtility
 		return $"{num3:d2}:{num2:d2}.{milliSecond:d3}";
 	}
 
+	public static string CreateTimeStringByMilliSecSeriesArena(int milliSecond)
+	{
+		string text = CreateTimeStringByMilliSec(milliSecond);
+		return text.Remove(text.Length - 1);
+	}
+
 	public static bool IsDefaultArenaTime(int milliSecond)
 	{
 		if (milliSecond == GetDefaultArenaTime())
@@ -136,6 +144,10 @@ public static class QuestUtility
 			return SP_ATTACK_TYPE.HEAT;
 		case ARENA_LIMIT.ACTION_TYPE_SOUL:
 			return SP_ATTACK_TYPE.SOUL;
+		case ARENA_LIMIT.ACTION_TYPE_BURST:
+			return SP_ATTACK_TYPE.BURST;
+		case ARENA_LIMIT.ACTION_TYPE_ORACLE:
+			return SP_ATTACK_TYPE.ORACLE;
 		default:
 			return SP_ATTACK_TYPE.NONE;
 		}

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GooglePlayGames.OurUtils
 {
-	public class PlayGamesHelperObject
+	public class PlayGamesHelperObject : MonoBehaviour
 	{
 		private static PlayGamesHelperObject instance = null;
 
@@ -29,7 +29,7 @@ namespace GooglePlayGames.OurUtils
 		public static void CreateObject()
 		{
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Expected O, but got Unknown
+			//IL_0026: Expected O, but got Unknown
 			if (!(instance != null))
 			{
 				if (Application.get_isPlaying())
@@ -48,7 +48,6 @@ namespace GooglePlayGames.OurUtils
 
 		public void Awake()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			Object.DontDestroyOnLoad(this.get_gameObject());
 		}
 
@@ -66,7 +65,6 @@ namespace GooglePlayGames.OurUtils
 			{
 				RunOnGameThread(delegate
 				{
-					//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 					instance.StartCoroutine(action);
 				});
 			}

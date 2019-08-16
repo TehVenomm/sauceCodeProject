@@ -2,23 +2,34 @@ package com.google.android.gms.nearby.messages.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 import com.google.android.gms.nearby.messages.BleSignal;
-import java.util.Arrays;
 
-public final class zza extends com.google.android.gms.common.internal.safeparcel.zza implements BleSignal {
+@Class(creator = "BleSignalImplCreator")
+public final class zza extends AbstractSafeParcelable implements BleSignal {
     public static final Creator<zza> CREATOR = new zzb();
-    private int zzdxt;
-    private int zzjfn;
-    private int zzjfo;
+    @VersionField(mo13996id = 1)
+    private final int versionCode;
+    @Field(mo13990id = 2)
+    private final int zzhb;
+    @Field(mo13990id = 3)
+    private final int zzhc;
 
-    zza(int i, int i2, int i3) {
-        this.zzdxt = i;
-        this.zzjfn = i2;
+    @Constructor
+    zza(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) int i2, @Param(mo13993id = 3) int i3) {
+        this.versionCode = i;
+        this.zzhb = i2;
         if (-169 >= i3 || i3 >= 87) {
             i3 = Integer.MIN_VALUE;
         }
-        this.zzjfo = i3;
+        this.zzhc = i3;
     }
 
     public final boolean equals(Object obj) {
@@ -27,10 +38,7 @@ public final class zza extends com.google.android.gms.common.internal.safeparcel
                 return false;
             }
             BleSignal bleSignal = (BleSignal) obj;
-            if (this.zzjfn != bleSignal.getRssi()) {
-                return false;
-            }
-            if (this.zzjfo != bleSignal.getTxPower()) {
+            if (!(this.zzhb == bleSignal.getRssi() && this.zzhc == bleSignal.getTxPower())) {
                 return false;
             }
         }
@@ -38,27 +46,27 @@ public final class zza extends com.google.android.gms.common.internal.safeparcel
     }
 
     public final int getRssi() {
-        return this.zzjfn;
+        return this.zzhb;
     }
 
     public final int getTxPower() {
-        return this.zzjfo;
+        return this.zzhc;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzjfn), Integer.valueOf(this.zzjfo)});
+        return Objects.hashCode(Integer.valueOf(this.zzhb), Integer.valueOf(this.zzhc));
     }
 
     public final String toString() {
-        int i = this.zzjfn;
-        return "BleSignal{rssi=" + i + ", txPower=" + this.zzjfo + "}";
+        int i = this.zzhb;
+        return "BleSignal{rssi=" + i + ", txPower=" + this.zzhc + '}';
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.zzdxt);
-        zzd.zzc(parcel, 2, this.zzjfn);
-        zzd.zzc(parcel, 3, this.zzjfo);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.versionCode);
+        SafeParcelWriter.writeInt(parcel, 2, this.zzhb);
+        SafeParcelWriter.writeInt(parcel, 3, this.zzhc);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

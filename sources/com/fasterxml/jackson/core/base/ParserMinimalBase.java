@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.io.NumberInput;
+import com.fasterxml.jackson.core.p015io.NumberInput;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import java.io.IOException;
@@ -35,7 +35,8 @@ public abstract class ParserMinimalBase extends JsonParser {
     protected JsonToken _currToken;
     protected JsonToken _lastClearedToken;
 
-    protected abstract void _handleEOF() throws JsonParseException;
+    /* access modifiers changed from: protected */
+    public abstract void _handleEOF() throws JsonParseException;
 
     public abstract void close() throws IOException;
 
@@ -74,7 +75,10 @@ public abstract class ParserMinimalBase extends JsonParser {
 
     public int getCurrentTokenId() {
         JsonToken jsonToken = this._currToken;
-        return jsonToken == null ? 0 : jsonToken.id();
+        if (jsonToken == null) {
+            return 0;
+        }
+        return jsonToken.mo9113id();
     }
 
     public boolean hasCurrentToken() {
@@ -88,7 +92,7 @@ public abstract class ParserMinimalBase extends JsonParser {
                 return true;
             }
             return false;
-        } else if (jsonToken.id() != i) {
+        } else if (jsonToken.mo9113id() != i) {
             return false;
         } else {
             return true;
@@ -121,6 +125,7 @@ public abstract class ParserMinimalBase extends JsonParser {
             while (true) {
                 JsonToken nextToken = nextToken();
                 if (nextToken == null) {
+                    _handleEOF();
                     break;
                 } else if (nextToken.isStructStart()) {
                     i++;
@@ -133,7 +138,6 @@ public abstract class ParserMinimalBase extends JsonParser {
                     continue;
                 }
             }
-            _handleEOF();
         }
         return this;
     }
@@ -152,7 +156,7 @@ public abstract class ParserMinimalBase extends JsonParser {
     public boolean getValueAsBoolean(boolean z) throws IOException {
         JsonToken jsonToken = this._currToken;
         if (jsonToken != null) {
-            switch (jsonToken.id()) {
+            switch (jsonToken.mo9113id()) {
                 case 6:
                     String trim = getText().trim();
                     if (ServerProtocol.DIALOG_RETURN_SCOPES_TRUE.equals(trim)) {
@@ -202,7 +206,7 @@ public abstract class ParserMinimalBase extends JsonParser {
         if (jsonToken == null) {
             return i;
         }
-        switch (jsonToken.id()) {
+        switch (jsonToken.mo9113id()) {
             case 6:
                 String text = getText();
                 if (_hasTextualNull(text)) {
@@ -242,7 +246,7 @@ public abstract class ParserMinimalBase extends JsonParser {
         if (jsonToken == null) {
             return j;
         }
-        switch (jsonToken.id()) {
+        switch (jsonToken.mo9113id()) {
             case 6:
                 String text = getText();
                 if (_hasTextualNull(text)) {
@@ -270,7 +274,7 @@ public abstract class ParserMinimalBase extends JsonParser {
         if (jsonToken == null) {
             return d;
         }
-        switch (jsonToken.id()) {
+        switch (jsonToken.mo9113id()) {
             case 6:
                 String text = getText();
                 if (_hasTextualNull(text)) {
@@ -316,7 +320,8 @@ public abstract class ParserMinimalBase extends JsonParser {
         return (this._currToken == null || this._currToken == JsonToken.VALUE_NULL || !this._currToken.isScalarValue()) ? str : getText();
     }
 
-    protected void _decodeBase64(String str, ByteArrayBuilder byteArrayBuilder, Base64Variant base64Variant) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _decodeBase64(String str, ByteArrayBuilder byteArrayBuilder, Base64Variant base64Variant) throws IOException {
         try {
             base64Variant.decode(str, byteArrayBuilder);
         } catch (IllegalArgumentException e) {
@@ -324,11 +329,13 @@ public abstract class ParserMinimalBase extends JsonParser {
         }
     }
 
-    protected boolean _hasTextualNull(String str) {
+    /* access modifiers changed from: protected */
+    public boolean _hasTextualNull(String str) {
         return "null".equals(str);
     }
 
-    protected void _reportUnexpectedChar(int i, String str) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _reportUnexpectedChar(int i, String str) throws JsonParseException {
         if (i < 0) {
             _reportInvalidEOF();
         }
@@ -339,34 +346,41 @@ public abstract class ParserMinimalBase extends JsonParser {
         _reportError(str2);
     }
 
-    protected void _reportInvalidEOF() throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _reportInvalidEOF() throws JsonParseException {
         _reportInvalidEOF(" in " + this._currToken);
     }
 
-    protected void _reportInvalidEOF(String str) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _reportInvalidEOF(String str) throws JsonParseException {
         _reportError("Unexpected end-of-input" + str);
     }
 
-    protected void _reportInvalidEOFInValue() throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _reportInvalidEOFInValue() throws JsonParseException {
         _reportInvalidEOF(" in a value");
     }
 
-    protected void _reportMissingRootWS(int i) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _reportMissingRootWS(int i) throws JsonParseException {
         _reportUnexpectedChar(i, "Expected space separating root-level values");
     }
 
-    protected void _throwInvalidSpace(int i) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _throwInvalidSpace(int i) throws JsonParseException {
         _reportError("Illegal character (" + _getCharDesc((char) i) + "): only regular white space (\\r, \\n, \\t) is allowed between tokens");
     }
 
-    protected void _throwUnquotedSpace(int i, String str) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public void _throwUnquotedSpace(int i, String str) throws JsonParseException {
         if (!isEnabled(Feature.ALLOW_UNQUOTED_CONTROL_CHARS) || i > 32) {
             _reportError("Illegal unquoted character (" + _getCharDesc((char) i) + "): has to be escaped using backslash to be included in " + str);
         }
     }
 
-    protected char _handleUnrecognizedCharacterEscape(char c) throws JsonProcessingException {
-        if (!(isEnabled(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER) || (c == '\'' && isEnabled(Feature.ALLOW_SINGLE_QUOTES)))) {
+    /* access modifiers changed from: protected */
+    public char _handleUnrecognizedCharacterEscape(char c) throws JsonProcessingException {
+        if (!isEnabled(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER) && (c != '\'' || !isEnabled(Feature.ALLOW_SINGLE_QUOTES))) {
             _reportError("Unrecognized character escape " + _getCharDesc(c));
         }
         return c;
@@ -383,19 +397,23 @@ public abstract class ParserMinimalBase extends JsonParser {
         return "'" + c + "' (code " + i + ")";
     }
 
-    protected final void _reportError(String str) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public final void _reportError(String str) throws JsonParseException {
         throw _constructError(str);
     }
 
-    protected final void _wrapError(String str, Throwable th) throws JsonParseException {
+    /* access modifiers changed from: protected */
+    public final void _wrapError(String str, Throwable th) throws JsonParseException {
         throw _constructError(str, th);
     }
 
-    protected final void _throwInternal() {
+    /* access modifiers changed from: protected */
+    public final void _throwInternal() {
         VersionUtil.throwInternal();
     }
 
-    protected final JsonParseException _constructError(String str, Throwable th) {
+    /* access modifiers changed from: protected */
+    public final JsonParseException _constructError(String str, Throwable th) {
         return new JsonParseException((JsonParser) this, str, th);
     }
 
@@ -411,7 +429,7 @@ public abstract class ParserMinimalBase extends JsonParser {
     protected static String _ascii(byte[] bArr) {
         try {
             return new String(bArr, CharEncoding.US_ASCII);
-        } catch (Throwable e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

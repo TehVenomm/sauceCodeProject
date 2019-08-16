@@ -197,6 +197,7 @@ public class PointShopFilterBase : GameSection
 					case ITEM_TYPE.LITHOGRAPH:
 					case ITEM_TYPE.USE_ITEM:
 					case ITEM_TYPE.TICKET:
+					case ITEM_TYPE.FORTUNE_TICKET:
 						return false;
 					default:
 						return true;
@@ -341,6 +342,11 @@ public class PointShopFilterBase : GameSection
 					SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)item.itemId);
 					return skillItemData.rarity == rarity;
 				}
+				case 14:
+				{
+					AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData((uint)item.itemId);
+					return data.rarity == rarity;
+				}
 				default:
 					return false;
 				}
@@ -441,8 +447,6 @@ public class PointShopFilterBase : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0197: Expected O, but got Unknown
 		object[] array = GameSection.GetEventData() as object[];
 		Filter filter = array[0] as Filter;
 		if (filter == null)

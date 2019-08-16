@@ -6,9 +6,11 @@ import java.util.Iterator;
 public interface TreeNode {
     JsonToken asToken();
 
-    TreeNode at(JsonPointer jsonPointer);
+    /* renamed from: at */
+    TreeNode mo9158at(JsonPointer jsonPointer);
 
-    TreeNode at(String str) throws IllegalArgumentException;
+    /* renamed from: at */
+    TreeNode mo9159at(String str) throws IllegalArgumentException;
 
     Iterator<String> fieldNames();
 

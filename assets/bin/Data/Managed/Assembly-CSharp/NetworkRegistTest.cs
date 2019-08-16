@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class NetworkRegistTest
+public class NetworkRegistTest : MonoBehaviour
 {
 	public enum PROGRESS
 	{
@@ -139,12 +139,12 @@ public class NetworkRegistTest
 	{
 		if (userInfo != null && userInfo.id > 0)
 		{
-			MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(userInfo, 0);
+			MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(userInfo);
 		}
 	}
 
 	private void SetAccount(string uh)
 	{
-		MonoBehaviourSingleton<AccountManager>.I.SaveAccount(uh, null);
+		MonoBehaviourSingleton<AccountManager>.I.SaveAccount(uh);
 	}
 }

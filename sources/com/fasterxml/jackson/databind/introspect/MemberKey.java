@@ -46,7 +46,7 @@ public final class MemberKey {
         if (!this._name.equals(memberKey._name)) {
             return false;
         }
-        Class[] clsArr = memberKey._argTypes;
+        Class<?>[] clsArr = memberKey._argTypes;
         int length = this._argTypes.length;
         if (clsArr.length != length) {
             return false;

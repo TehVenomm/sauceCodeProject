@@ -28,7 +28,7 @@ public class StatusAvatarEquipSelect : StatusEquip
 	public override void Initialize()
 	{
 		object[] array = GameSection.GetEventData() as object[];
-		changeTargetType = (EQUIPMENT_TYPE)(int)array[0];
+		changeTargetType = (EQUIPMENT_TYPE)array[0];
 		equippingItem = (array[1] as EquipItemInfo);
 		base.selectEquipSetData = (array[2] as LocalEquipSetData);
 		EquipItem = equippingItem;
@@ -68,7 +68,7 @@ public class StatusAvatarEquipSelect : StatusEquip
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_STATUS_ROOT, false);
+		SetActive((Enum)UI.OBJ_STATUS_ROOT, is_visible: false);
 		base.UpdateUI();
 	}
 

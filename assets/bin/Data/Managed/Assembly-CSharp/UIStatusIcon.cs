@@ -76,6 +76,25 @@ public class UIStatusIcon
 		SKILL_CHARGE_WHEN_DAMAGED,
 		INVINCIBLE_LIGHT,
 		INVINCIBLE_DARK,
+		CANT_HEAL_HP,
+		BLIND,
+		INVINCIBLE_BADSTATUS,
+		SLIDE_ICE,
+		LIGHT_RING,
+		EROSION,
+		STONE,
+		SOIL_SHOCK,
+		CONCUSSION,
+		ATTACK_ALL,
+		BLEEDING,
+		INVINCIBLE_NORMAL,
+		INVINCIBLE_ALLELEMENT,
+		INVINCIBLE_ALL,
+		ACID,
+		DAMAGE_MOTION_STOP,
+		CORRUPTION,
+		STIGMATA,
+		CYCLONIC_THUNDERSTORM,
 		MAX
 	}
 
@@ -99,11 +118,14 @@ public class UIStatusIcon
 		}
 	}
 
-	public static readonly STATUS_TYPE[] NON_BUFF_STATUS = new STATUS_TYPE[3]
+	public static readonly STATUS_TYPE[] NON_BUFF_STATUS = new STATUS_TYPE[6]
 	{
 		STATUS_TYPE.PARALYZE,
 		STATUS_TYPE.FREEZE,
-		STATUS_TYPE.SHADOWSEALING
+		STATUS_TYPE.SHADOWSEALING,
+		STATUS_TYPE.LIGHT_RING,
+		STATUS_TYPE.CONCUSSION,
+		STATUS_TYPE.DAMAGE_MOTION_STOP
 	};
 
 	private readonly Color defaultTintColor = Color.get_white();
@@ -114,46 +136,45 @@ public class UIStatusIcon
 	protected IconInfo[] statusIcons;
 
 	[SerializeField]
-	protected string[] spriteNames = new string[69];
+	protected string[] spriteNames = new string[88];
 
 	public Character target;
 
 	public void UpDateStatusIcon()
 	{
 		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null))
+		if (target == null)
 		{
-			int num = statusIcons.Length;
-			int num2 = 0;
-			for (int i = 0; i < 69; i++)
+			return;
+		}
+		int num = statusIcons.Length;
+		int num2 = 0;
+		for (int i = 0; i < 88; i++)
+		{
+			if (CheckStatus((STATUS_TYPE)i, isFieldBuff: true) && _SetStatusIcon((STATUS_TYPE)i, num2, isFieldBuff: true) && ++num2 >= num)
 			{
-				if (CheckStatus((STATUS_TYPE)i, true) && _SetStatusIcon((STATUS_TYPE)i, num2, true) && ++num2 >= num)
-				{
-					break;
-				}
+				break;
 			}
-			for (int j = 0; j < 69; j++)
+		}
+		for (int j = 0; j < 88; j++)
+		{
+			if (CheckStatus((STATUS_TYPE)j) && _SetStatusIcon((STATUS_TYPE)j, num2, isFieldBuff: false) && ++num2 >= num)
 			{
-				if (CheckStatus((STATUS_TYPE)j, false) && _SetStatusIcon((STATUS_TYPE)j, num2, false) && ++num2 >= num)
-				{
-					break;
-				}
+				break;
 			}
-			for (int k = num2; k < num; k++)
-			{
-				statusIcons[k].isFieldBuff = false;
-				statusIcons[k].SetTweenEnable(false);
-				statusIcons[k].icon.color = defaultTintColor;
-				statusIcons[k].icon.get_gameObject().SetActive(false);
-			}
+		}
+		for (int k = num2; k < num; k++)
+		{
+			statusIcons[k].isFieldBuff = false;
+			statusIcons[k].SetTweenEnable(enable: false);
+			statusIcons[k].icon.color = defaultTintColor;
+			statusIcons[k].icon.get_gameObject().SetActive(false);
 		}
 	}
 
 	private bool _SetStatusIcon(STATUS_TYPE type, int index, bool isFieldBuff)
 	{
 		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		string iconSpriteNameByStatusType = GetIconSpriteNameByStatusType(type);
 		if (statusIcons[index].icon.atlas.GetSprite(iconSpriteNameByStatusType) == null)
 		{
@@ -168,21 +189,19 @@ public class UIStatusIcon
 
 	public int RotatedUpdateStatusIcon(int checkFirstStatus, BuffParam buffParam, List<int> nonBuff)
 	{
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		int result = checkFirstStatus;
 		int num = statusIcons.Length;
 		int num2 = 0;
-		for (int i = 0; i < 69; i++)
+		for (int i = 0; i < 88; i++)
 		{
 			if (num2 >= num)
 			{
 				break;
 			}
 			int num3 = i + checkFirstStatus;
-			if (num3 >= 69)
+			if (num3 >= 88)
 			{
-				num3 %= 69;
+				num3 %= 88;
 			}
 			if (CheckStatus((STATUS_TYPE)num3, buffParam, nonBuff))
 			{
@@ -205,19 +224,20 @@ public class UIStatusIcon
 	{
 		HashSet<string> hashSet = new HashSet<string>();
 		int num = 0;
-		for (int i = 0; i < 69; i++)
+		for (int i = 0; i < 88; i++)
 		{
-			if (CheckStatus((STATUS_TYPE)i, buffParam, nonBuff))
+			if (!CheckStatus((STATUS_TYPE)i, buffParam, nonBuff))
 			{
-				string iconSpriteNameByStatusType = GetIconSpriteNameByStatusType((STATUS_TYPE)i);
-				if (!string.IsNullOrEmpty(iconSpriteNameByStatusType) && !hashSet.Contains(iconSpriteNameByStatusType))
+				continue;
+			}
+			string iconSpriteNameByStatusType = GetIconSpriteNameByStatusType((STATUS_TYPE)i);
+			if (!string.IsNullOrEmpty(iconSpriteNameByStatusType) && !hashSet.Contains(iconSpriteNameByStatusType))
+			{
+				hashSet.Add(iconSpriteNameByStatusType);
+				num++;
+				if (num > 1)
 				{
-					hashSet.Add(iconSpriteNameByStatusType);
-					num++;
-					if (num > 1)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -239,6 +259,10 @@ public class UIStatusIcon
 			return character.IsFreeze() && !isFieldBuff;
 		case STATUS_TYPE.SHADOWSEALING:
 			return character.IsDebuffShadowSealing() && !isFieldBuff;
+		case STATUS_TYPE.LIGHT_RING:
+			return character.IsLightRing() && !isFieldBuff;
+		case STATUS_TYPE.CONCUSSION:
+			return character.IsConcussion() && !isFieldBuff;
 		default:
 			return CheckStatus(type, character.buffParam, isFieldBuff);
 		}
@@ -246,7 +270,7 @@ public class UIStatusIcon
 
 	public static bool CheckStatus(STATUS_TYPE type, BuffParam buffParam, List<int> nonBuffStatus)
 	{
-		return CheckStatus(type, buffParam, false) || (nonBuffStatus != null && CheckStatus(type, nonBuffStatus));
+		return CheckStatus(type, buffParam) || (nonBuffStatus != null && CheckStatus(type, nonBuffStatus));
 	}
 
 	private static bool CheckStatus(STATUS_TYPE type, List<int> nonBuffStatus)
@@ -260,12 +284,16 @@ public class UIStatusIcon
 		{
 		case STATUS_TYPE.POISON:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.POISON, isFieldBuff);
+		case STATUS_TYPE.BLEEDING:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.BLEEDING, isFieldBuff);
 		case STATUS_TYPE.BURNING:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.BURNING, isFieldBuff);
 		case STATUS_TYPE.DEADLY_POISON:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEADLY_POISON, isFieldBuff);
 		case STATUS_TYPE.INVINCIBLECOUNT:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INVINCIBLECOUNT, isFieldBuff);
+		case STATUS_TYPE.INVINCIBLE_BADSTATUS:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS, isFieldBuff);
 		case STATUS_TYPE.ATTACK_SPEED_UP:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_SPEED_UP, isFieldBuff);
 		case STATUS_TYPE.ATTACK_SPEED_DOWN:
@@ -290,6 +318,8 @@ public class UIStatusIcon
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_DARK, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_DARK, isFieldBuff);
 		case STATUS_TYPE.ATTACK_ALLELEMENT:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_ALLELEMENT, isFieldBuff);
+		case STATUS_TYPE.ATTACK_ALL:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_ALL, isFieldBuff);
 		case STATUS_TYPE.DEFENCE_NORMAL:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_NORMAL, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_NORMAL, isFieldBuff);
 		case STATUS_TYPE.DEFENCE_FIRE:
@@ -310,6 +340,8 @@ public class UIStatusIcon
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.REGENERATE, isFieldBuff);
 		case STATUS_TYPE.ELECTRIC_SHOCK:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ELECTRIC_SHOCK, isFieldBuff);
+		case STATUS_TYPE.SOIL_SHOCK:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SOIL_SHOCK, isFieldBuff);
 		case STATUS_TYPE.INK_SPLASH:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INK_SPLASH, isFieldBuff);
 		case STATUS_TYPE.POISON_DAMAGE_DOWN:
@@ -390,6 +422,30 @@ public class UIStatusIcon
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INVINCIBLE_LIGHT, isFieldBuff);
 		case STATUS_TYPE.INVINCIBLE_DARK:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INVINCIBLE_DARK, isFieldBuff);
+		case STATUS_TYPE.CANT_HEAL_HP:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.CANT_HEAL_HP, isFieldBuff);
+		case STATUS_TYPE.BLIND:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.BLIND, isFieldBuff);
+		case STATUS_TYPE.SLIDE_ICE:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SLIDE_ICE, isFieldBuff);
+		case STATUS_TYPE.EROSION:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.EROSION, isFieldBuff);
+		case STATUS_TYPE.STONE:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.STONE, isFieldBuff);
+		case STATUS_TYPE.INVINCIBLE_NORMAL:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INVINCIBLE_NORMAL, isFieldBuff);
+		case STATUS_TYPE.INVINCIBLE_ALLELEMENT:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INVINCIBLE_ALL_ELEMENT, isFieldBuff);
+		case STATUS_TYPE.INVINCIBLE_ALL:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.INVINCIBLE_ALL, isFieldBuff);
+		case STATUS_TYPE.ACID:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ACID, isFieldBuff);
+		case STATUS_TYPE.CORRUPTION:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.CORRUPTION, isFieldBuff);
+		case STATUS_TYPE.STIGMATA:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.STIGMATA, isFieldBuff);
+		case STATUS_TYPE.CYCLONIC_THUNDERSTORM:
+			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM, isFieldBuff);
 		default:
 			return false;
 		}
@@ -403,12 +459,15 @@ public class UIStatusIcon
 			return "Pala";
 		case STATUS_TYPE.POISON:
 			return "Poizon";
+		case STATUS_TYPE.BLEEDING:
+			return "Bleeding";
 		case STATUS_TYPE.BURNING:
 			return "Burn";
 		case STATUS_TYPE.DEADLY_POISON:
 			return "DeadlyPoison";
 		case STATUS_TYPE.INVINCIBLECOUNT:
-			return "Barrior";
+		case STATUS_TYPE.INVINCIBLE_BADSTATUS:
+			return string.Empty;
 		case STATUS_TYPE.ATTACK_SPEED_UP:
 			return "AtkSpeedUp";
 		case STATUS_TYPE.ATTACK_SPEED_DOWN:
@@ -427,6 +486,7 @@ public class UIStatusIcon
 		case STATUS_TYPE.ATTACK_ALLELEMENT:
 		case STATUS_TYPE.DAMAGE_UP_NORMAL:
 		case STATUS_TYPE.DAMAGE_UP_FROM_AVOID:
+		case STATUS_TYPE.ATTACK_ALL:
 			return "AtkUp";
 		case STATUS_TYPE.DEFENCE_NORMAL:
 		case STATUS_TYPE.DEFENCE_FIRE:
@@ -444,6 +504,8 @@ public class UIStatusIcon
 			return "Frozen";
 		case STATUS_TYPE.ELECTRIC_SHOCK:
 			return "ElectricShock";
+		case STATUS_TYPE.SOIL_SHOCK:
+			return "SoilShock";
 		case STATUS_TYPE.INK_SPLASH:
 			return "InkSplash";
 		case STATUS_TYPE.POISON_DAMAGE_DOWN:
@@ -513,6 +575,34 @@ public class UIStatusIcon
 			return "dmgOffLight";
 		case STATUS_TYPE.INVINCIBLE_DARK:
 			return "dmgOffDark";
+		case STATUS_TYPE.CANT_HEAL_HP:
+			return "CantHealHp";
+		case STATUS_TYPE.BLIND:
+			return "Blind";
+		case STATUS_TYPE.SLIDE_ICE:
+			return "Slide";
+		case STATUS_TYPE.LIGHT_RING:
+			return "LightRing";
+		case STATUS_TYPE.EROSION:
+			return "Erosion";
+		case STATUS_TYPE.STONE:
+			return "Stone";
+		case STATUS_TYPE.CONCUSSION:
+			return "Enemy_Stan";
+		case STATUS_TYPE.INVINCIBLE_NORMAL:
+			return "dmgOffNone";
+		case STATUS_TYPE.INVINCIBLE_ALLELEMENT:
+			return "dmgOffElementall";
+		case STATUS_TYPE.INVINCIBLE_ALL:
+			return "dmgOffAll";
+		case STATUS_TYPE.ACID:
+			return "Acid";
+		case STATUS_TYPE.CORRUPTION:
+			return "Corruption";
+		case STATUS_TYPE.STIGMATA:
+			return "Stigmata";
+		case STATUS_TYPE.CYCLONIC_THUNDERSTORM:
+			return "CyclonicThunderstorm";
 		default:
 			return string.Empty;
 		}

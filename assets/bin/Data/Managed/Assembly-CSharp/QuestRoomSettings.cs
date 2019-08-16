@@ -21,26 +21,26 @@ public class QuestRoomSettings : GameSection
 	public override void Initialize()
 	{
 		eventData = (GameSection.GetEventData() as object[]);
-		questType = (QUEST_TYPE)(int)eventData[0];
+		questType = (QUEST_TYPE)eventData[0];
 		if (MonoBehaviourSingleton<PartyManager>.I.partySetting != null)
 		{
 			PartyManager.PartySetting partySetting = MonoBehaviourSingleton<PartyManager>.I.partySetting;
-			setting = new PartyManager.PartySetting(partySetting.isLock, partySetting.level, partySetting.total, 0, 0);
+			setting = new PartyManager.PartySetting(partySetting.isLock, partySetting.level, partySetting.total);
 		}
 		else
 		{
-			setting = new PartyManager.PartySetting(true, 0, 0, 0, 0);
+			setting = new PartyManager.PartySetting(is_lock: true, 0, 0);
 		}
 		MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(null);
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 		{
-			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, true);
-			SetActive((Enum)UI.OBJ_LOCK, false);
+			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, is_visible: true);
+			SetActive((Enum)UI.OBJ_LOCK, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, false);
-			SetActive((Enum)UI.OBJ_LOCK, true);
+			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, is_visible: false);
+			SetActive((Enum)UI.OBJ_LOCK, is_visible: true);
 		}
 		base.Initialize();
 	}
@@ -55,14 +55,14 @@ public class QuestRoomSettings : GameSection
 	{
 		if (setting.level > 0)
 		{
-			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, false);
-			SetActive((Enum)UI.LBL_LEVEL, true);
+			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, is_visible: false);
+			SetActive((Enum)UI.LBL_LEVEL, is_visible: true);
 			SetLabelText((Enum)UI.LBL_LEVEL, setting.level.ToString());
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_LEVEL, false);
-			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, true);
+			SetActive((Enum)UI.LBL_LEVEL, is_visible: false);
+			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, is_visible: true);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class QuestRoomSettings : GameSection
 		QuestRoomSettingsOption component = base.GetComponent<QuestRoomSettingsOption>((Enum)UI.OBJ_OPTION);
 		if (component != null)
 		{
-			component.SetShowOption(true);
+			component.SetShowOption(is_enable: true);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class QuestRoomSettings : GameSection
 				{
 					MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 		else
@@ -112,7 +112,7 @@ public class QuestRoomSettings : GameSection
 				{
 					MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 	}
@@ -122,7 +122,7 @@ public class QuestRoomSettings : GameSection
 		GameSection.StayEvent();
 		CoopApp.EnterQuestOffline(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
 		{
-			GameSection.ResumeEvent(is_s, null);
+			GameSection.ResumeEvent(is_s);
 		});
 	}
 
@@ -130,15 +130,15 @@ public class QuestRoomSettings : GameSection
 	{
 		if (MonoBehaviourSingleton<PartyManager>.I.partySetting != null)
 		{
-			GameSection.ChangeEvent("ROOM", null);
+			GameSection.ChangeEvent("ROOM");
 		}
 		else if (questType == QUEST_TYPE.ORDER)
 		{
-			GameSection.ChangeEvent("TO_ORDER", null);
+			GameSection.ChangeEvent("TO_ORDER");
 		}
 		else
 		{
-			GameSection.ChangeEvent("TO_SELECT", null);
+			GameSection.ChangeEvent("TO_SELECT");
 		}
 	}
 

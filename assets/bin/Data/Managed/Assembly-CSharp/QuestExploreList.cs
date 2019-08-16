@@ -37,7 +37,6 @@ public class QuestExploreList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine("DoInitialize");
 	}
 
@@ -46,19 +45,19 @@ public class QuestExploreList : GameSection
 		bool is_recv_delivery = false;
 		MonoBehaviourSingleton<QuestManager>.I.SendGetExploreList(delegate
 		{
-			((_003CDoInitialize_003Ec__IteratorFC)/*Error near IL_0031: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
+			is_recv_delivery = true;
 		});
 		while (!is_recv_delivery)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		List<Network.EventData> allEventList = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
 		eventList = new List<Network.EventData>();
-		for (int k = 0; k < allEventList.Count; k++)
+		for (int i = 0; i < allEventList.Count; i++)
 		{
-			if (allEventList[k].eventType == 4)
+			if (allEventList[i].eventType == 4)
 			{
-				eventList.Add(allEventList[k]);
+				eventList.Add(allEventList[i]);
 			}
 		}
 		for (int j = 0; j < allEventList.Count; j++)
@@ -71,19 +70,19 @@ public class QuestExploreList : GameSection
 		RemoveEndedEvents();
 		LoadingQueue loadingQueue = new LoadingQueue(this);
 		bannerTable = new Dictionary<int, LoadObject>(eventList.Count);
-		for (int i = 0; i < eventList.Count; i++)
+		for (int k = 0; k < eventList.Count; k++)
 		{
-			Network.EventData e = eventList[i];
-			if (!bannerTable.ContainsKey(e.bannerId))
+			Network.EventData eventData = eventList[k];
+			if (!bannerTable.ContainsKey(eventData.bannerId))
 			{
-				string bannerImg = ResourceName.GetEventBanner(e.bannerId);
-				LoadObject obj = loadingQueue.Load(RESOURCE_CATEGORY.EVENT_ICON, bannerImg, false);
-				bannerTable.Add(e.bannerId, obj);
+				string eventBanner = ResourceName.GetEventBanner(eventData.bannerId);
+				LoadObject value = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_ICON, eventBanner);
+				bannerTable.Add(eventData.bannerId, value);
 			}
 		}
 		if (loadingQueue.IsLoading())
 		{
-			yield return (object)loadingQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		base.Initialize();
 	}
@@ -106,57 +105,55 @@ public class QuestExploreList : GameSection
 		RemoveEndedEvents();
 		if (eventList == null || eventList.Count == 0)
 		{
-			SetActive((Enum)UI.STR_EVENT_NON_LIST, true);
+			SetActive((Enum)UI.STR_EVENT_NON_LIST, is_visible: true);
+			return;
 		}
-		else
+		SetActive((Enum)UI.STR_EVENT_NON_LIST, is_visible: false);
+		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "QuestEventListSelectItem", eventList.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
-			SetActive((Enum)UI.STR_EVENT_NON_LIST, false);
-			SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "QuestEventListSelectItem", eventList.Count, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			Network.EventData eventData = eventList[i];
+			Texture2D val = null;
+			if (bannerTable.TryGetValue(eventData.bannerId, out LoadObject value))
 			{
-				Network.EventData eventData = eventList[i];
-				Texture2D val = null;
-				if (bannerTable.TryGetValue(eventData.bannerId, out LoadObject value))
+				val = (value.loadedObject as Texture2D);
+				if (val != null)
 				{
-					val = (value.loadedObject as Texture2D);
-					if (val != null)
-					{
-						Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
-						SetActive(t2, true);
-						SetTexture(t2, val);
-						SetActive(t, UI.LBL_NO_BANNER, false);
-					}
-					else
-					{
-						SetActive(t, UI.TEX_EVENT_BANNER, false);
-						SetActive(t, UI.LBL_NO_BANNER, true);
-						string name = eventData.name;
-						SetLabelText(t, UI.LBL_NO_BANNER, name);
-					}
-				}
-				if (!string.IsNullOrEmpty(eventData.endDate.date))
-				{
-					Transform t3 = FindCtrl(t, UI.LBL_LEFT);
-					SetActive(t3, true);
-					SetLabelText(t3, StringTable.Get(STRING_CATEGORY.TIME, 4u));
-					t3 = FindCtrl(t, UI.LBL_LEFT_TIME);
-					SetActive(t3, true);
-					SetLabelText(t3, UIUtility.TimeFormatWithUnit(eventData.GetRest()));
+					Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
+					SetActive(t2, is_visible: true);
+					SetTexture(t2, val);
+					SetActive(t, UI.LBL_NO_BANNER, is_visible: false);
 				}
 				else
 				{
-					SetActive(t, UI.LBL_LEFT, false);
-					SetActive(t, UI.LBL_LEFT_TIME, false);
+					SetActive(t, UI.TEX_EVENT_BANNER, is_visible: false);
+					SetActive(t, UI.LBL_NO_BANNER, is_visible: true);
+					string name = eventData.name;
+					SetLabelText(t, UI.LBL_NO_BANNER, name);
 				}
-				SetEvent(t, "SELECT_EXPLORE", eventData);
-				Version nativeVersionFromName = NetworkNative.getNativeVersionFromName();
-				bool flag = eventData.IsPlayableWith(nativeVersionFromName);
-				bool flag2 = IsClearedEvent(eventData) && flag;
-				bool is_visible = !flag2 && !eventData.readPrologueStory;
-				SetActive(t, UI.SPR_NEW, is_visible);
-				SetActive(t, UI.SPR_CLEARED, flag2);
-				SetBadge(FindCtrl(t, UI.TEX_EVENT_BANNER), MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(eventData.eventId), 1, 16, -3, false);
-			});
-		}
+			}
+			if (!string.IsNullOrEmpty(eventData.endDate.date))
+			{
+				Transform t3 = FindCtrl(t, UI.LBL_LEFT);
+				SetActive(t3, is_visible: true);
+				SetLabelText(t3, StringTable.Get(STRING_CATEGORY.TIME, 4u));
+				t3 = FindCtrl(t, UI.LBL_LEFT_TIME);
+				SetActive(t3, is_visible: true);
+				SetLabelText(t3, UIUtility.TimeFormatWithUnit(eventData.GetRest()));
+			}
+			else
+			{
+				SetActive(t, UI.LBL_LEFT, is_visible: false);
+				SetActive(t, UI.LBL_LEFT_TIME, is_visible: false);
+			}
+			SetEvent(t, "SELECT_EXPLORE", eventData);
+			Version nativeVersionFromName = NetworkNative.getNativeVersionFromName();
+			bool flag = eventData.IsPlayableWith(nativeVersionFromName);
+			bool flag2 = IsClearedEvent(eventData) && flag;
+			bool is_visible = !flag2 && !eventData.readPrologueStory;
+			SetActive(t, UI.SPR_NEW, is_visible);
+			SetActive(t, UI.SPR_CLEARED, flag2);
+			SetBadge(FindCtrl(t, UI.TEX_EVENT_BANNER), MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(eventData.eventId), 1, 16, -3);
+		});
 	}
 
 	private bool IsClearedEvent(Network.EventData eventData)
@@ -186,65 +183,62 @@ public class QuestExploreList : GameSection
 	private void OnQuery_SELECT_EXPLORE()
 	{
 		Network.EventData ev = GameSection.GetEventData() as Network.EventData;
-		if (ev != null)
+		if (ev == null)
 		{
-			if (ev.HasEndDate() && ev.GetRest() < 0)
+			return;
+		}
+		if (ev.HasEndDate() && ev.GetRest() < 0)
+		{
+			GameSection.ChangeEvent("SELECT_ENDED");
+			return;
+		}
+		Version nativeVersionFromName = NetworkNative.getNativeVersionFromName();
+		if (!ev.IsPlayableWith(nativeVersionFromName))
+		{
+			string event_data = string.Format(base.sectionData.GetText("REQUIRE_HIGHER_VERSION"), ev.minVersion);
+			GameSection.ChangeEvent("SELECT_VERSION", event_data);
+			return;
+		}
+		if (!ev.readPrologueStory)
+		{
+			GameSection.StayEvent();
+			MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(ev.eventId, delegate(bool success, Error error)
 			{
-				GameSection.ChangeEvent("SELECT_ENDED", null);
-			}
-			else
-			{
-				Version nativeVersionFromName = NetworkNative.getNativeVersionFromName();
-				if (!ev.IsPlayableWith(nativeVersionFromName))
+				if (success)
 				{
-					string event_data = string.Format(base.sectionData.GetText("REQUIRE_HIGHER_VERSION"), ev.minVersion);
-					GameSection.ChangeEvent("SELECT_VERSION", event_data);
-				}
-				else
-				{
-					if (!ev.readPrologueStory)
+					if (ev.prologueStoryId > 0)
 					{
-						GameSection.StayEvent();
-						MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(ev.eventId, delegate(bool success, Error error)
+						GameSceneTables.EventData eventData = base.sectionData.GetEventData("STORY");
+						if (eventData != null)
 						{
-							if (success)
+							string goingHomeEvent = GameSection.GetGoingHomeEvent();
+							EventData[] array = new EventData[3]
 							{
-								if (ev.prologueStoryId > 0)
-								{
-									GameSceneTables.EventData eventData = base.sectionData.GetEventData("STORY");
-									if (eventData != null)
-									{
-										string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
-										EventData[] array = new EventData[3]
-										{
-											new EventData(name, null),
-											new EventData("EXPLORE", null),
-											new EventData("SELECT_EXPLORE", ev.eventId)
-										};
-										GameSection.ChangeStayEvent("STORY", new object[4]
-										{
-											ev.prologueStoryId,
-											string.Empty,
-											string.Empty,
-											array
-										});
-									}
-								}
-								ev.readPrologueStory = true;
-							}
-							if (ev.eventType == 12)
+								new EventData(goingHomeEvent, null),
+								new EventData("EXPLORE", null),
+								new EventData("SELECT_EXPLORE", ev.eventId)
+							};
+							GameSection.ChangeStayEvent("STORY", new object[4]
 							{
-								GameSection.ChangeStayEvent("SELECT_RUSH", ev);
-							}
-							GameSection.ResumeEvent(true, null);
-						});
+								ev.prologueStoryId,
+								string.Empty,
+								string.Empty,
+								array
+							});
+						}
 					}
-					if (ev.eventType == 12)
-					{
-						GameSection.ChangeEvent("SELECT_RUSH", ev);
-					}
+					ev.readPrologueStory = true;
 				}
-			}
+				if (ev.eventType == 12)
+				{
+					GameSection.ChangeStayEvent("SELECT_RUSH", ev);
+				}
+				GameSection.ResumeEvent(is_resume: true);
+			});
+		}
+		if (ev.eventType == 12)
+		{
+			GameSection.ChangeEvent("SELECT_RUSH", ev);
 		}
 	}
 

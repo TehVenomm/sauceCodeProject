@@ -77,8 +77,8 @@ public class ServerStatus {
         return this.status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStatus(Status status2) {
+        this.status = status2;
     }
 
     public Map<String, LocalizedStatus> getLocales() {

@@ -2,7 +2,7 @@ package com.facebook.appevents;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.p000v4.content.LocalBroadcastManager;
 import android.util.Log;
 import com.facebook.FacebookRequestError;
 import com.facebook.FacebookSdk;
@@ -11,11 +11,10 @@ import com.facebook.GraphRequest.Callback;
 import com.facebook.GraphResponse;
 import com.facebook.LoggingBehavior;
 import com.facebook.appevents.AppEventsLogger.FlushBehavior;
+import com.facebook.internal.FetchedAppSettings;
+import com.facebook.internal.FetchedAppSettingsManager;
 import com.facebook.internal.Logger;
-import com.facebook.internal.Utility;
-import com.facebook.internal.Utility.FetchedAppSettings;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,34 +27,21 @@ class AppEventQueue {
     private static final int FLUSH_PERIOD_IN_SECONDS = 15;
     private static final int NUM_LOG_EVENTS_TO_TRY_TO_FLUSH_AFTER = 100;
     private static final String TAG = AppEventQueue.class.getName();
-    private static volatile AppEventCollection appEventCollection = new AppEventCollection();
-    private static final Runnable flushRunnable = new C03701();
-    private static ScheduledFuture scheduledFuture;
-    private static final ScheduledExecutorService singleThreadExecutor = Executors.newSingleThreadScheduledExecutor();
-
-    /* renamed from: com.facebook.appevents.AppEventQueue$1 */
-    static final class C03701 implements Runnable {
-        C03701() {
-        }
-
+    /* access modifiers changed from: private */
+    public static volatile AppEventCollection appEventCollection = new AppEventCollection();
+    /* access modifiers changed from: private */
+    public static final Runnable flushRunnable = new Runnable() {
         public void run() {
             AppEventQueue.scheduledFuture = null;
             if (AppEventsLogger.getFlushBehavior() != FlushBehavior.EXPLICIT_ONLY) {
                 AppEventQueue.flushAndWait(FlushReason.TIMER);
             }
         }
-    }
-
-    /* renamed from: com.facebook.appevents.AppEventQueue$2 */
-    static final class C03712 implements Runnable {
-        C03712() {
-        }
-
-        public void run() {
-            AppEventStore.persistEvents(AppEventQueue.appEventCollection);
-            AppEventQueue.appEventCollection = new AppEventCollection();
-        }
-    }
+    };
+    /* access modifiers changed from: private */
+    public static ScheduledFuture scheduledFuture;
+    /* access modifiers changed from: private */
+    public static final ScheduledExecutorService singleThreadExecutor = Executors.newSingleThreadScheduledExecutor();
 
     AppEventQueue() {
     }
@@ -74,8 +60,9 @@ class AppEventQueue {
     }
 
     private static GraphRequest buildRequestForSession(final AccessTokenAppIdPair accessTokenAppIdPair, final SessionEventsState sessionEventsState, boolean z, final FlushStatistics flushStatistics) {
-        FetchedAppSettings queryAppSettings = Utility.queryAppSettings(accessTokenAppIdPair.getApplicationId(), false);
-        final GraphRequest newPostRequest = GraphRequest.newPostRequest(null, String.format("%s/activities", new Object[]{r0}), null, null);
+        String applicationId = accessTokenAppIdPair.getApplicationId();
+        FetchedAppSettings queryAppSettings = FetchedAppSettingsManager.queryAppSettings(applicationId, false);
+        final GraphRequest newPostRequest = GraphRequest.newPostRequest(null, String.format("%s/activities", new Object[]{applicationId}), null, null);
         Bundle parameters = newPostRequest.getParameters();
         if (parameters == null) {
             parameters = new Bundle();
@@ -86,10 +73,7 @@ class AppEventQueue {
             parameters.putString("device_token", pushNotificationsRegistrationId);
         }
         newPostRequest.setParameters(parameters);
-        if (queryAppSettings == null) {
-            return null;
-        }
-        int populateRequest = sessionEventsState.populateRequest(newPostRequest, FacebookSdk.getApplicationContext(), queryAppSettings.supportsImplicitLogging(), z);
+        int populateRequest = sessionEventsState.populateRequest(newPostRequest, FacebookSdk.getApplicationContext(), queryAppSettings != null ? queryAppSettings.supportsImplicitLogging() : false, z);
         if (populateRequest == 0) {
             return null;
         }
@@ -120,7 +104,7 @@ class AppEventQueue {
                 intent.putExtra(AppEventsLogger.APP_EVENTS_EXTRA_FLUSH_RESULT, sendEventsToServer.result);
                 LocalBroadcastManager.getInstance(FacebookSdk.getApplicationContext()).sendBroadcast(intent);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             Log.w(TAG, "Caught unexpected exception while flushing app events: ", e);
         }
     }
@@ -129,30 +113,30 @@ class AppEventQueue {
         return appEventCollection.keySet();
     }
 
-    private static void handleResponse(final AccessTokenAppIdPair accessTokenAppIdPair, GraphRequest graphRequest, GraphResponse graphResponse, final SessionEventsState sessionEventsState, FlushStatistics flushStatistics) {
-        FlushResult flushResult;
-        FacebookRequestError error = graphResponse.getError();
-        String str = "Success";
-        FlushResult flushResult2 = FlushResult.SUCCESS;
+    /* access modifiers changed from: private */
+    public static void handleResponse(final AccessTokenAppIdPair accessTokenAppIdPair, GraphRequest graphRequest, GraphResponse graphResponse, final SessionEventsState sessionEventsState, FlushStatistics flushStatistics) {
+        String str;
         String str2;
+        FacebookRequestError error = graphResponse.getError();
+        String str3 = "Success";
+        FlushResult flushResult = FlushResult.SUCCESS;
         if (error == null) {
-            flushResult = flushResult2;
-            str2 = str;
+            str = str3;
         } else if (error.getErrorCode() == -1) {
             flushResult = FlushResult.NO_CONNECTIVITY;
-            Object obj = "Failed: No Connectivity";
+            str = "Failed: No Connectivity";
         } else {
-            str = String.format("Failed:\n  Response: %s\n  Error %s", new Object[]{graphResponse.toString(), error.toString()});
+            String format = String.format("Failed:\n  Response: %s\n  Error %s", new Object[]{graphResponse.toString(), error.toString()});
             flushResult = FlushResult.SERVER_ERROR;
-            str2 = str;
+            str = format;
         }
         if (FacebookSdk.isLoggingBehaviorEnabled(LoggingBehavior.APP_EVENTS)) {
             try {
-                str = new JSONArray((String) graphRequest.getTag()).toString(2);
+                str2 = new JSONArray((String) graphRequest.getTag()).toString(2);
             } catch (JSONException e) {
-                str = "<Can't encode events for debug logging>";
+                str2 = "<Can't encode events for debug logging>";
             }
-            Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Flush completed\nParams: %s\n  Result: %s\n  Events JSON: %s", graphRequest.getGraphObject().toString(), obj, str);
+            Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Flush completed\nParams: %s\n  Result: %s\n  Events JSON: %s", graphRequest.getGraphObject().toString(), str, str2);
         }
         sessionEventsState.clearInFlightAndStats(error != null);
         if (flushResult == FlushResult.NO_CONNECTIVITY) {
@@ -168,15 +152,20 @@ class AppEventQueue {
     }
 
     public static void persistToDisk() {
-        singleThreadExecutor.execute(new C03712());
+        singleThreadExecutor.execute(new Runnable() {
+            public void run() {
+                AppEventStore.persistEvents(AppEventQueue.appEventCollection);
+                AppEventQueue.appEventCollection = new AppEventCollection();
+            }
+        });
     }
 
-    private static FlushStatistics sendEventsToServer(FlushReason flushReason, AppEventCollection appEventCollection) {
+    private static FlushStatistics sendEventsToServer(FlushReason flushReason, AppEventCollection appEventCollection2) {
         FlushStatistics flushStatistics = new FlushStatistics();
         boolean limitEventAndDataUsage = FacebookSdk.getLimitEventAndDataUsage(FacebookSdk.getApplicationContext());
-        List<GraphRequest> arrayList = new ArrayList();
-        for (AccessTokenAppIdPair accessTokenAppIdPair : appEventCollection.keySet()) {
-            GraphRequest buildRequestForSession = buildRequestForSession(accessTokenAppIdPair, appEventCollection.get(accessTokenAppIdPair), limitEventAndDataUsage, flushStatistics);
+        ArrayList<GraphRequest> arrayList = new ArrayList<>();
+        for (AccessTokenAppIdPair accessTokenAppIdPair : appEventCollection2.keySet()) {
+            GraphRequest buildRequestForSession = buildRequestForSession(accessTokenAppIdPair, appEventCollection2.get(accessTokenAppIdPair), limitEventAndDataUsage, flushStatistics);
             if (buildRequestForSession != null) {
                 arrayList.add(buildRequestForSession);
             }
@@ -185,8 +174,8 @@ class AppEventQueue {
             return null;
         }
         Logger.log(LoggingBehavior.APP_EVENTS, TAG, "Flushing %d events due to %s.", Integer.valueOf(flushStatistics.numEvents), flushReason.toString());
-        for (GraphRequest buildRequestForSession2 : arrayList) {
-            buildRequestForSession2.executeAndWait();
+        for (GraphRequest executeAndWait : arrayList) {
+            executeAndWait.executeAndWait();
         }
         return flushStatistics;
     }

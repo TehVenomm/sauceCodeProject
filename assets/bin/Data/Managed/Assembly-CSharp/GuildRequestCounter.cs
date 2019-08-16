@@ -79,13 +79,13 @@ public class GuildRequestCounter : GameSection
 		}
 	}
 
-	private const float UPDATE_INTARVAL = 0.2f;
-
 	private QuestInfoData selectedQuestInfoData;
 
 	private int selectedQuestNum;
 
 	private List<GuildRequestPrefab> prefabCache = new List<GuildRequestPrefab>();
+
+	private const float UPDATE_INTARVAL = 0.2f;
 
 	private float timer;
 
@@ -93,7 +93,6 @@ public class GuildRequestCounter : GameSection
 
 	public override void Initialize()
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		selectedQuestInfoData = (GameSection.GetEventData() as QuestInfoData);
 		if (selectedQuestInfoData != null)
 		{
@@ -111,23 +110,23 @@ public class GuildRequestCounter : GameSection
 
 	private IEnumerator DoInitialize()
 	{
-		bool wait2 = true;
+		bool wait = true;
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator70)/*Error near IL_0031: stateMachine*/)._003Cwait_003E__0 = false;
+			wait = false;
 		});
-		while (wait2)
+		while (wait)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		wait2 = true;
+		wait = true;
 		SendGetChallengeInfo(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator70)/*Error near IL_0072: stateMachine*/)._003Cwait_003E__0 = false;
+			wait = false;
 		}, null);
-		while (wait2)
+		while (wait)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.Initialize();
 	}
@@ -146,21 +145,22 @@ public class GuildRequestCounter : GameSection
 		{
 			timer += Time.get_deltaTime();
 		}
-		if (!(timer < 0.2f))
+		if (timer < 0.2f)
 		{
-			timer = 0f;
-			for (int i = 0; i < prefabCache.Count; i++)
+			return;
+		}
+		timer = 0f;
+		for (int i = 0; i < prefabCache.Count; i++)
+		{
+			GuildRequestPrefab guildRequestPrefab = prefabCache[i];
+			UpdateHoundRemainTime(guildRequestPrefab.item, guildRequestPrefab.prefab);
+			UpdateQuestTimer(guildRequestPrefab.item, guildRequestPrefab.prefab);
+			UpdateBonusRemainTime(guildRequestPrefab.item, guildRequestPrefab.prefab);
+			if (guildRequestPrefab.IsHoundTimeupNow() || guildRequestPrefab.IsQuestEndNow())
 			{
-				GuildRequestPrefab guildRequestPrefab = prefabCache[i];
-				UpdateHoundRemainTime(guildRequestPrefab.item, guildRequestPrefab.prefab);
-				UpdateQuestTimer(guildRequestPrefab.item, guildRequestPrefab.prefab);
-				UpdateBonusRemainTime(guildRequestPrefab.item, guildRequestPrefab.prefab);
-				if (guildRequestPrefab.IsHoundTimeupNow() || guildRequestPrefab.IsQuestEndNow())
-				{
-					RefreshUI();
-				}
-				guildRequestPrefab.SetBeforeTime();
+				RefreshUI();
 			}
+			guildRequestPrefab.SetBeforeTime();
 		}
 	}
 
@@ -194,7 +194,7 @@ public class GuildRequestCounter : GameSection
 		ShowNonRequestList(count > 0);
 		prefabCache.Clear();
 		bool isExistEmployButton = false;
-		SetGrid(UI.GRD_REQUEST_HOUND, "GuildRequestItem", count, false, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_REQUEST_HOUND, "GuildRequestItem", count, reset: false, delegate(int i, Transform t, bool b)
 		{
 			GuildRequestItem guildRequestItem = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList[i];
 			prefabCache.Add(new GuildRequestPrefab(guildRequestItem, t));
@@ -266,18 +266,18 @@ public class GuildRequestCounter : GameSection
 
 	private void InitTimeupButton(GuildRequestItem item, int index, Transform parent, bool recycle)
 	{
-		SetActive(parent, UI.BTN_EMPLOY, false);
-		SetActive(parent, UI.BTN_HOUND_START, false);
-		SetActive(parent, UI.OBJ_QUEST_ROOT, true);
-		SetActive(parent, UI.PBR_GAUGE, true);
-		SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, false);
-		SetActive(parent, UI.LBL_BONUS_REMAIN_TIME, false);
-		SetActive(parent, UI.LBL_QUEST_CURRENT_POINT, true);
-		SetActive(parent, UI.BTN_COMPLETE, false);
-		SetActive(parent, UI.BTN_CANCEL, false);
-		SetActive(parent, UI.BTN_CONFIRM, true);
-		SetActive(parent, UI.OBJ_COMPLETE_ICON, false);
-		SetActive(parent, UI.OBJ_TIMEUP_ICON, true);
+		SetActive(parent, UI.BTN_EMPLOY, is_visible: false);
+		SetActive(parent, UI.BTN_HOUND_START, is_visible: false);
+		SetActive(parent, UI.OBJ_QUEST_ROOT, is_visible: true);
+		SetActive(parent, UI.PBR_GAUGE, is_visible: true);
+		SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, is_visible: false);
+		SetActive(parent, UI.LBL_BONUS_REMAIN_TIME, is_visible: false);
+		SetActive(parent, UI.LBL_QUEST_CURRENT_POINT, is_visible: true);
+		SetActive(parent, UI.BTN_COMPLETE, is_visible: false);
+		SetActive(parent, UI.BTN_CANCEL, is_visible: false);
+		SetActive(parent, UI.BTN_CONFIRM, is_visible: true);
+		SetActive(parent, UI.OBJ_COMPLETE_ICON, is_visible: false);
+		SetActive(parent, UI.OBJ_TIMEUP_ICON, is_visible: true);
 		SetEvent(FindCtrl(parent, UI.BTN_CONFIRM), "CONTINUE", item);
 		InitQuestButton(item, index, parent);
 		SetTimeupColor(item, parent);
@@ -286,33 +286,33 @@ public class GuildRequestCounter : GameSection
 
 	private void InitInactiveButton(GuildRequestItem item, int index, Transform parent, bool recycle)
 	{
-		SetActive(parent, UI.BTN_EMPLOY, false);
-		SetActive(parent, UI.BTN_HOUND_START, false);
-		SetActive(parent, UI.OBJ_QUEST_ROOT, false);
+		SetActive(parent, UI.BTN_EMPLOY, is_visible: false);
+		SetActive(parent, UI.BTN_HOUND_START, is_visible: false);
+		SetActive(parent, UI.OBJ_QUEST_ROOT, is_visible: false);
 	}
 
 	private void InitEmployButton(GuildRequestItem item, int index, Transform parent, bool recycle)
 	{
-		SetActive(parent, UI.BTN_EMPLOY, true);
-		SetActive(parent, UI.BTN_HOUND_START, false);
-		SetActive(parent, UI.OBJ_QUEST_ROOT, false);
+		SetActive(parent, UI.BTN_EMPLOY, is_visible: true);
+		SetActive(parent, UI.BTN_HOUND_START, is_visible: false);
+		SetActive(parent, UI.OBJ_QUEST_ROOT, is_visible: false);
 		SetEvent(FindCtrl(parent, UI.BTN_EMPLOY), "EMPLOY", item);
 	}
 
 	private void InitSortieingButton(GuildRequestItem item, int index, Transform parent, bool recycle)
 	{
-		SetActive(parent, UI.BTN_EMPLOY, false);
-		SetActive(parent, UI.BTN_HOUND_START, false);
-		SetActive(parent, UI.OBJ_QUEST_ROOT, true);
-		SetActive(parent, UI.PBR_GAUGE, true);
-		SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, true);
-		SetActive(parent, UI.LBL_BONUS_REMAIN_TIME, false);
-		SetActive(parent, UI.LBL_QUEST_CURRENT_POINT, true);
-		SetActive(parent, UI.BTN_COMPLETE, false);
-		SetActive(parent, UI.BTN_CANCEL, true);
-		SetActive(parent, UI.BTN_CONFIRM, false);
-		SetActive(parent, UI.OBJ_COMPLETE_ICON, false);
-		SetActive(parent, UI.OBJ_TIMEUP_ICON, false);
+		SetActive(parent, UI.BTN_EMPLOY, is_visible: false);
+		SetActive(parent, UI.BTN_HOUND_START, is_visible: false);
+		SetActive(parent, UI.OBJ_QUEST_ROOT, is_visible: true);
+		SetActive(parent, UI.PBR_GAUGE, is_visible: true);
+		SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, is_visible: true);
+		SetActive(parent, UI.LBL_BONUS_REMAIN_TIME, is_visible: false);
+		SetActive(parent, UI.LBL_QUEST_CURRENT_POINT, is_visible: true);
+		SetActive(parent, UI.BTN_COMPLETE, is_visible: false);
+		SetActive(parent, UI.BTN_CANCEL, is_visible: true);
+		SetActive(parent, UI.BTN_CONFIRM, is_visible: false);
+		SetActive(parent, UI.OBJ_COMPLETE_ICON, is_visible: false);
+		SetActive(parent, UI.OBJ_TIMEUP_ICON, is_visible: false);
 		SetEvent(FindCtrl(parent, UI.BTN_CANCEL), "CANCEL", item);
 		SetDefaultColor(item, parent);
 		InitQuestButton(item, index, parent);
@@ -321,18 +321,18 @@ public class GuildRequestCounter : GameSection
 
 	private void InitCompleteButton(GuildRequestItem item, int index, Transform parent, bool recycle)
 	{
-		SetActive(parent, UI.BTN_EMPLOY, false);
-		SetActive(parent, UI.BTN_HOUND_START, false);
-		SetActive(parent, UI.OBJ_QUEST_ROOT, true);
-		SetActive(parent, UI.PBR_GAUGE, false);
-		SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, false);
-		SetActive(parent, UI.LBL_BONUS_REMAIN_TIME, true);
-		SetActive(parent, UI.LBL_QUEST_CURRENT_POINT, false);
-		SetActive(parent, UI.BTN_COMPLETE, true);
-		SetActive(parent, UI.BTN_CANCEL, false);
-		SetActive(parent, UI.BTN_CONFIRM, false);
-		SetActive(parent, UI.OBJ_COMPLETE_ICON, true);
-		SetActive(parent, UI.OBJ_TIMEUP_ICON, false);
+		SetActive(parent, UI.BTN_EMPLOY, is_visible: false);
+		SetActive(parent, UI.BTN_HOUND_START, is_visible: false);
+		SetActive(parent, UI.OBJ_QUEST_ROOT, is_visible: true);
+		SetActive(parent, UI.PBR_GAUGE, is_visible: false);
+		SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, is_visible: false);
+		SetActive(parent, UI.LBL_BONUS_REMAIN_TIME, is_visible: true);
+		SetActive(parent, UI.LBL_QUEST_CURRENT_POINT, is_visible: false);
+		SetActive(parent, UI.BTN_COMPLETE, is_visible: true);
+		SetActive(parent, UI.BTN_CANCEL, is_visible: false);
+		SetActive(parent, UI.BTN_CONFIRM, is_visible: false);
+		SetActive(parent, UI.OBJ_COMPLETE_ICON, is_visible: true);
+		SetActive(parent, UI.OBJ_TIMEUP_ICON, is_visible: false);
 		SetEvent(FindCtrl(parent, UI.BTN_COMPLETE), "COMPLETE", item);
 		UpdateBonusRemainTime(item, parent);
 		SetDefaultColor(item, parent);
@@ -351,9 +351,9 @@ public class GuildRequestCounter : GameSection
 	{
 		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		SetActive(parent, UI.BTN_EMPLOY, false);
-		SetActive(parent, UI.BTN_HOUND_START, true);
-		SetActive(parent, UI.OBJ_QUEST_ROOT, false);
+		SetActive(parent, UI.BTN_EMPLOY, is_visible: false);
+		SetActive(parent, UI.BTN_HOUND_START, is_visible: true);
+		SetActive(parent, UI.OBJ_QUEST_ROOT, is_visible: false);
 		Transform val = FindCtrl(parent, UI.BTN_HOUND_START);
 		UIButton component = val.GetComponent<UIButton>();
 		if (IsOpenFromGachaQuest() && selectedQuestNum == 0)
@@ -380,8 +380,8 @@ public class GuildRequestCounter : GameSection
 	{
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)item.questId);
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
-		ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, questData.rarity, FindCtrl(parent, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-		itemIcon.SetEnableCollider(false);
+		ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, questData.rarity, FindCtrl(parent, UI.OBJ_ENEMY), enemyData.element);
+		itemIcon.SetEnableCollider(is_enable: false);
 		SetLabelText(parent, UI.LBL_QUEST_NAME, questData.questText);
 	}
 
@@ -428,14 +428,12 @@ public class GuildRequestCounter : GameSection
 		double totalSeconds = item.GetQuestRemainTime().TotalSeconds;
 		if (totalSeconds < 0.0)
 		{
-			SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, false);
+			SetActive(parent, UI.LBL_QUEST_REMAIN_TIME, is_visible: false);
+			return;
 		}
-		else
-		{
-			string format = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 11u);
-			string text = string.Format(format, UIUtility.TimeFormat((int)totalSeconds, true));
-			SetLabelText(parent, UI.LBL_QUEST_REMAIN_TIME, text);
-		}
+		string format = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 11u);
+		string text = string.Format(format, UIUtility.TimeFormat((int)totalSeconds, isHours: true));
+		SetLabelText(parent, UI.LBL_QUEST_REMAIN_TIME, text);
 	}
 
 	private void SetQuestPoint(GuildRequestItem item, Transform parent)
@@ -444,26 +442,24 @@ public class GuildRequestCounter : GameSection
 		if (totalSeconds < 0.0)
 		{
 			SetProgressValue(parent, UI.PBR_GAUGE, 1f);
+			return;
 		}
-		else
-		{
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)item.questId);
-			TimeSpan needTime = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTime(questData.rarity);
-			float value = (float)((needTime.TotalSeconds - totalSeconds) / needTime.TotalSeconds);
-			SetProgressValue(parent, UI.PBR_GAUGE, value);
-			int needPoint = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(questData.rarity);
-			int questRemainPoint = item.GetQuestRemainPoint();
-			int num = needPoint - questRemainPoint;
-			SetLabelText(parent, UI.LBL_QUEST_CURRENT_POINT, num + "/" + needPoint + "pt");
-		}
+		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)item.questId);
+		TimeSpan needTime = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTime(questData.rarity);
+		float value = (float)((needTime.TotalSeconds - totalSeconds) / needTime.TotalSeconds);
+		SetProgressValue(parent, UI.PBR_GAUGE, value);
+		int needPoint = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(questData.rarity);
+		int questRemainPoint = item.GetQuestRemainPoint();
+		int num = needPoint - questRemainPoint;
+		SetLabelText(parent, UI.LBL_QUEST_CURRENT_POINT, num + "/" + needPoint + "pt");
 	}
 
 	private void UpdateHoundRemainTime(GuildRequestItem item, Transform parent)
 	{
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
 		double totalSeconds = item.GetHoundRemainTime().TotalSeconds;
 		string empty = string.Empty;
 		Transform val = FindCtrl(parent, UI.LBL_HOUND_REMAIN_TIME);
@@ -474,14 +470,14 @@ public class GuildRequestCounter : GameSection
 			string arg = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, (uint)(16 + item.slotNo - 1));
 			if (totalSeconds < 0.0)
 			{
-				empty = string.Format(format, arg, UIUtility.TimeFormat(0, true));
+				empty = string.Format(format, arg, UIUtility.TimeFormat(0, isHours: true));
 				SetLabelText(val, empty);
 				SetColor(val, Color.get_yellow());
 				component.effectStyle = UILabel.Effect.None;
 			}
 			else
 			{
-				empty = string.Format(format, arg, UIUtility.TimeFormat((int)totalSeconds, true));
+				empty = string.Format(format, arg, UIUtility.TimeFormat((int)totalSeconds, isHours: true));
 				SetLabelText(val, empty);
 				SetColor(val, Color.get_yellow());
 				component.effectStyle = UILabel.Effect.None;
@@ -509,12 +505,12 @@ public class GuildRequestCounter : GameSection
 	{
 		if (isShow && MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData != null && MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Count == 0)
 		{
-			SetActive((Enum)UI.LBL_REQUEST_NON_LIST, true);
+			SetActive((Enum)UI.LBL_REQUEST_NON_LIST, is_visible: true);
 			SetLabelText((Enum)UI.LBL_REQUEST_NON_LIST, StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 100u));
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_REQUEST_NON_LIST, false);
+			SetActive((Enum)UI.LBL_REQUEST_NON_LIST, is_visible: false);
 		}
 	}
 
@@ -549,14 +545,14 @@ public class GuildRequestCounter : GameSection
 	private void OnQuery_GuildRequestEmploy_YES()
 	{
 		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
-		if (GameSection.CheckCrystal(selectedItem.crystalNum, 0, true))
+		if (GameSection.CheckCrystal(selectedItem.crystalNum))
 		{
 			string eventData = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 2u);
 			GameSection.SetEventData(eventData);
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestExtend(delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 			});
 		}
 	}
@@ -583,7 +579,7 @@ public class GuildRequestCounter : GameSection
 			SendGetChallengeInfo(delegate
 			{
 				UpdateSelectedQuestNum(1, selectedQuestId);
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 			}, null);
 		});
 	}
@@ -611,14 +607,14 @@ public class GuildRequestCounter : GameSection
 		{
 			if (!MonoBehaviourSingleton<QuestManager>.I.needRequestOrderQuestList)
 			{
-				GameSection.ResumeEvent(questCompleteData != null, null);
+				GameSection.ResumeEvent(questCompleteData != null);
 				GameSection.SetEventData(questCompleteData);
 			}
 			else
 			{
 				MonoBehaviourSingleton<QuestManager>.I.SendGetQuestList(delegate
 				{
-					GameSection.ResumeEvent(questCompleteData != null, null);
+					GameSection.ResumeEvent(questCompleteData != null);
 					GameSection.SetEventData(questCompleteData);
 				});
 			}
@@ -633,14 +629,14 @@ public class GuildRequestCounter : GameSection
 			MonoBehaviourSingleton<GuildRequestManager>.I.isCompleteMulti = true;
 			if (!MonoBehaviourSingleton<QuestManager>.I.needRequestOrderQuestList)
 			{
-				GameSection.ResumeEvent(questCompleteData != null, null);
+				GameSection.ResumeEvent(questCompleteData != null);
 				GameSection.SetEventData(questCompleteData);
 			}
 			else
 			{
 				MonoBehaviourSingleton<QuestManager>.I.SendGetQuestList(delegate
 				{
-					GameSection.ResumeEvent(questCompleteData != null, null);
+					GameSection.ResumeEvent(questCompleteData != null);
 					GameSection.SetEventData(questCompleteData);
 				});
 			}
@@ -689,7 +685,7 @@ public class GuildRequestCounter : GameSection
 			SendGetChallengeInfo(delegate
 			{
 				guildRequestCounter.UpdateSelectedQuestNum(-1, guildRequestCounter.selectedQuestInfoData.questData.tableData.questID);
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 			}, null);
 		});
 	}
@@ -698,7 +694,7 @@ public class GuildRequestCounter : GameSection
 	{
 		if (IsOpenFromGachaQuest())
 		{
-			GameSection.ChangeEvent("BACK_TO_QUEST_SELECT", null);
+			GameSection.ChangeEvent("BACK_TO_QUEST_SELECT");
 		}
 	}
 

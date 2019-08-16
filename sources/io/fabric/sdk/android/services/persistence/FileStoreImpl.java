@@ -1,13 +1,14 @@
-package io.fabric.sdk.android.services.persistence;
+package p017io.fabric.sdk.android.services.persistence;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build.VERSION;
 import android.os.Environment;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.Kit;
 import java.io.File;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.Kit;
 
+/* renamed from: io.fabric.sdk.android.services.persistence.FileStoreImpl */
 public class FileStoreImpl implements FileStore {
     private final String contentPath;
     private final Context context;
@@ -47,21 +48,23 @@ public class FileStoreImpl implements FileStore {
         return prepare(this.context.getFilesDir());
     }
 
-    boolean isExternalStorageAvailable() {
+    /* access modifiers changed from: 0000 */
+    public boolean isExternalStorageAvailable() {
         if ("mounted".equals(Environment.getExternalStorageState())) {
             return true;
         }
-        Fabric.getLogger().mo4302w("Fabric", "External Storage is not mounted and/or writable\nHave you declared android.permission.WRITE_EXTERNAL_STORAGE in the manifest?");
+        Fabric.getLogger().mo20982w(Fabric.TAG, "External Storage is not mounted and/or writable\nHave you declared android.permission.WRITE_EXTERNAL_STORAGE in the manifest?");
         return false;
     }
 
-    File prepare(File file) {
+    /* access modifiers changed from: 0000 */
+    public File prepare(File file) {
         if (file == null) {
-            Fabric.getLogger().mo4289d("Fabric", "Null File");
+            Fabric.getLogger().mo20969d(Fabric.TAG, "Null File");
         } else if (file.exists() || file.mkdirs()) {
             return file;
         } else {
-            Fabric.getLogger().mo4302w("Fabric", "Couldn't create file");
+            Fabric.getLogger().mo20982w(Fabric.TAG, "Couldn't create file");
         }
         return null;
     }

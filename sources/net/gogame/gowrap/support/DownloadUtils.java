@@ -3,7 +3,6 @@ package net.gogame.gowrap.support;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,8 +14,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.io.utils.FileUtils;
-import net.gogame.gowrap.io.utils.IOUtils;
+import net.gogame.gowrap.p021io.utils.FileUtils;
+import net.gogame.gowrap.p021io.utils.IOUtils;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
 
 public final class DownloadUtils {
 
@@ -24,12 +24,6 @@ public final class DownloadUtils {
         void onDownloadFailed();
 
         void onDownloadSucceeded();
-    }
-
-    public interface Target extends Closeable {
-        OutputStream getOutputStream() throws IOException;
-
-        void setEtag(String str) throws IOException;
     }
 
     public static class DownloadAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -42,78 +36,75 @@ public final class DownloadUtils {
         private final Target target;
         private final URL url;
 
-        public DownloadAsyncTask(Context context, URL url, Target target, boolean z, Callback callback) {
-            this.context = context;
-            this.url = url;
-            this.target = target;
+        public DownloadAsyncTask(Context context2, URL url2, Target target2, boolean z, Callback callback2) {
+            this.context = context2;
+            this.url = url2;
+            this.target = target2;
             this.checkEtag = z;
-            this.callback = callback;
+            this.callback = callback2;
         }
 
-        protected Void doInBackground(Void... voidArr) {
+        /* access modifiers changed from: protected */
+        public Void doInBackground(Void... voidArr) {
             Throwable th;
             HttpURLConnection httpURLConnection;
-            Throwable th2;
+            String str;
             OutputStream outputStream;
+            Throwable th2;
+            HttpURLConnection httpURLConnection2;
+            String str2;
             try {
-                HttpURLConnection httpURLConnection2;
-                String str = "Etag/" + this.url.toString();
+                String str3 = "Etag/" + this.url.toString();
                 if (this.checkEtag) {
                     Log.d(Constants.TAG, String.format("Checking if we need to download %s", new Object[]{this.url}));
-                    String preference = PreferenceUtils.getPreference(this.context, str);
+                    String preference = PreferenceUtils.getPreference(this.context, str3);
                     if (preference != null) {
                         try {
-                            httpURLConnection2 = (HttpURLConnection) this.url.openConnection();
+                            HttpURLConnection httpURLConnection3 = (HttpURLConnection) this.url.openConnection();
                             try {
-                                httpURLConnection2.setRequestMethod(HttpRequest.METHOD_HEAD);
-                                httpURLConnection2.setConnectTimeout(10000);
-                                httpURLConnection2.setReadTimeout(10000);
-                                HttpUtils.drainQuietly(httpURLConnection2);
-                                if (httpURLConnection2.getResponseCode() != 200) {
-                                    Log.w(Constants.TAG, String.format("%s: %d %s", new Object[]{this.url, Integer.valueOf(httpURLConnection2.getResponseCode()), httpURLConnection2.getResponseMessage()}));
-                                    if (httpURLConnection2 != null) {
-                                        httpURLConnection2.disconnect();
+                                httpURLConnection3.setRequestMethod(HttpRequest.METHOD_HEAD);
+                                httpURLConnection3.setConnectTimeout(10000);
+                                httpURLConnection3.setReadTimeout(10000);
+                                HttpUtils.drainQuietly(httpURLConnection3);
+                                if (httpURLConnection3.getResponseCode() != 200) {
+                                    Log.w(Constants.TAG, String.format("%s: %d %s", new Object[]{this.url, Integer.valueOf(httpURLConnection3.getResponseCode()), httpURLConnection3.getResponseMessage()}));
+                                    if (httpURLConnection3 != null) {
+                                        httpURLConnection3.disconnect();
                                     }
                                     return null;
                                 }
-                                Object obj;
-                                Map headerFields = httpURLConnection2.getHeaderFields();
+                                Map headerFields = httpURLConnection3.getHeaderFields();
                                 if (headerFields == null || headerFields.get(ETAG_HEADER_NAME) == null || ((List) headerFields.get(ETAG_HEADER_NAME)).isEmpty()) {
-                                    obj = null;
+                                    str2 = null;
                                 } else {
-                                    obj = (String) ((List) headerFields.get(ETAG_HEADER_NAME)).get(0);
+                                    str2 = (String) ((List) headerFields.get(ETAG_HEADER_NAME)).get(0);
                                 }
-                                if (obj == null) {
+                                if (str2 == null) {
                                     Log.w(Constants.TAG, String.format("Etag not found for %s", new Object[]{this.url}));
-                                } else if (preference.equals(obj)) {
+                                } else if (preference.equals(str2)) {
                                     Log.d(Constants.TAG, String.format("Local file is the same as the remote file: %s", new Object[]{this.url}));
                                     if (this.callback != null) {
                                         this.callback.onDownloadSucceeded();
                                     }
-                                    if (httpURLConnection2 != null) {
-                                        httpURLConnection2.disconnect();
+                                    if (httpURLConnection3 != null) {
+                                        httpURLConnection3.disconnect();
                                     }
                                     return null;
                                 }
-                                if (httpURLConnection2 != null) {
-                                    httpURLConnection2.disconnect();
+                                if (httpURLConnection3 != null) {
+                                    httpURLConnection3.disconnect();
                                 }
-                            } catch (Throwable e) {
+                            } catch (Exception e) {
                                 Log.e(Constants.TAG, "Exception", e);
-                            } catch (Throwable e2) {
-                                th = e2;
-                                httpURLConnection = httpURLConnection2;
-                                th2 = th;
-                                if (httpURLConnection != null) {
-                                    httpURLConnection.disconnect();
-                                }
-                                throw th2;
+                            } catch (Throwable th3) {
+                                th2 = th3;
+                                httpURLConnection2 = httpURLConnection3;
                             }
-                        } catch (Throwable th3) {
-                            th2 = th3;
-                            httpURLConnection = null;
-                            if (httpURLConnection != null) {
-                                httpURLConnection.disconnect();
+                        } catch (Throwable th4) {
+                            th2 = th4;
+                            httpURLConnection2 = null;
+                            if (httpURLConnection2 != null) {
+                                httpURLConnection2.disconnect();
                             }
                             throw th2;
                         }
@@ -121,33 +112,32 @@ public final class DownloadUtils {
                 }
                 Log.d(Constants.TAG, String.format("Downloading %s", new Object[]{this.url}));
                 try {
-                    httpURLConnection2 = (HttpURLConnection) this.url.openConnection();
+                    HttpURLConnection httpURLConnection4 = (HttpURLConnection) this.url.openConnection();
                     try {
-                        httpURLConnection2.setRequestMethod(HttpRequest.METHOD_GET);
-                        httpURLConnection2.setConnectTimeout(10000);
-                        httpURLConnection2.setReadTimeout(10000);
-                        if (httpURLConnection2.getResponseCode() != 200) {
-                            Log.w(Constants.TAG, String.format("%s: %d %s", new Object[]{this.url, Integer.valueOf(httpURLConnection2.getResponseCode()), httpURLConnection2.getResponseMessage()}));
-                            HttpUtils.drainQuietly(httpURLConnection2);
+                        httpURLConnection4.setRequestMethod(HttpRequest.METHOD_GET);
+                        httpURLConnection4.setConnectTimeout(10000);
+                        httpURLConnection4.setReadTimeout(10000);
+                        if (httpURLConnection4.getResponseCode() != 200) {
+                            Log.w(Constants.TAG, String.format("%s: %d %s", new Object[]{this.url, Integer.valueOf(httpURLConnection4.getResponseCode()), httpURLConnection4.getResponseMessage()}));
+                            HttpUtils.drainQuietly(httpURLConnection4);
                             if (this.callback != null) {
                                 this.callback.onDownloadFailed();
                             }
-                            if (httpURLConnection2 != null) {
-                                httpURLConnection2.disconnect();
+                            if (httpURLConnection4 != null) {
+                                httpURLConnection4.disconnect();
                             }
                             return null;
                         }
-                        String str2;
-                        Map headerFields2 = httpURLConnection2.getHeaderFields();
+                        Map headerFields2 = httpURLConnection4.getHeaderFields();
                         if (headerFields2 == null || headerFields2.get(ETAG_HEADER_NAME) == null || ((List) headerFields2.get(ETAG_HEADER_NAME)).isEmpty()) {
-                            str2 = null;
+                            str = null;
                         } else {
-                            str2 = (String) ((List) headerFields2.get(ETAG_HEADER_NAME)).get(0);
+                            str = (String) ((List) headerFields2.get(ETAG_HEADER_NAME)).get(0);
                         }
-                        if (str2 != null) {
-                            this.target.setEtag(str2);
+                        if (str != null) {
+                            this.target.setEtag(str);
                         }
-                        InputStream inputStream = httpURLConnection2.getInputStream();
+                        InputStream inputStream = httpURLConnection4.getInputStream();
                         try {
                             outputStream = this.target.getOutputStream();
                             IOUtils.copy(inputStream, outputStream);
@@ -155,49 +145,45 @@ public final class DownloadUtils {
                             this.target.close();
                             Log.d(Constants.TAG, String.format("Downloaded %s", new Object[]{this.url}));
                             if (this.checkEtag) {
-                                PreferenceUtils.setPreference(this.context, str, str2);
+                                PreferenceUtils.setPreference(this.context, str3, str);
                             }
                             if (this.callback != null) {
                                 try {
                                     this.callback.onDownloadSucceeded();
-                                } catch (Throwable e22) {
-                                    Log.e(Constants.TAG, "Exception", e22);
+                                } catch (Exception e2) {
+                                    Log.e(Constants.TAG, "Exception", e2);
                                 }
                             }
                             IOUtils.closeQuietly(inputStream);
-                            if (httpURLConnection2 != null) {
-                                httpURLConnection2.disconnect();
+                            if (httpURLConnection4 != null) {
+                                httpURLConnection4.disconnect();
                             }
                             return null;
-                        } catch (Throwable th4) {
+                        } catch (Throwable th5) {
                             IOUtils.closeQuietly(inputStream);
+                            throw th5;
                         }
-                    } catch (Throwable e222) {
-                        Log.e(Constants.TAG, "Exception", e222);
-                    } catch (Throwable e2222) {
-                        th = e2222;
-                        httpURLConnection = httpURLConnection2;
-                        th2 = th;
-                        if (httpURLConnection != null) {
-                            httpURLConnection.disconnect();
-                        }
-                        throw th2;
+                    } catch (Exception e3) {
+                        Log.e(Constants.TAG, "Exception", e3);
+                    } catch (Throwable th6) {
+                        th = th6;
+                        httpURLConnection = httpURLConnection4;
                     }
-                } catch (Throwable th5) {
-                    th2 = th5;
+                } catch (Throwable th7) {
+                    th = th7;
                     httpURLConnection = null;
                     if (httpURLConnection != null) {
                         httpURLConnection.disconnect();
                     }
-                    throw th2;
+                    throw th;
                 }
-            } catch (Throwable th22) {
-                Log.e(Constants.TAG, "Exception", th22);
+            } catch (Exception e4) {
+                Log.e(Constants.TAG, "Exception", e4);
                 if (this.callback != null) {
                     try {
                         this.callback.onDownloadFailed();
-                    } catch (Throwable th222) {
-                        Log.e(Constants.TAG, "Exception", th222);
+                    } catch (Exception e5) {
+                        Log.e(Constants.TAG, "Exception", e5);
                     }
                 }
             }
@@ -208,8 +194,8 @@ public final class DownloadUtils {
         private final File file;
         private File tempFile;
 
-        public FileTarget(File file) {
-            this.file = file;
+        public FileTarget(File file2) {
+            this.file = file2;
         }
 
         public void setEtag(String str) throws IOException {
@@ -231,6 +217,12 @@ public final class DownloadUtils {
                 this.tempFile = null;
             }
         }
+    }
+
+    public interface Target extends Closeable {
+        OutputStream getOutputStream() throws IOException;
+
+        void setEtag(String str) throws IOException;
     }
 
     private DownloadUtils() {

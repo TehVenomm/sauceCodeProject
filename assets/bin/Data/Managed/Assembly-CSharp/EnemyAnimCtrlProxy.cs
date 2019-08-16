@@ -1,4 +1,6 @@
-public class EnemyAnimCtrlProxy
+using UnityEngine;
+
+public class EnemyAnimCtrlProxy : MonoBehaviour
 {
 	public EnemyAnimCtrl enemyAnimCtrl;
 

@@ -29,7 +29,7 @@ public final class SetterlessProperty extends SettableBeanProperty {
     }
 
     protected SetterlessProperty(SetterlessProperty setterlessProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) setterlessProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) setterlessProperty, jsonDeserializer);
         this._annotated = setterlessProperty._annotated;
         this._getter = setterlessProperty._getter;
     }
@@ -45,7 +45,7 @@ public final class SetterlessProperty extends SettableBeanProperty {
     }
 
     public SetterlessProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new SetterlessProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new SetterlessProperty(this, jsonDeserializer);
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {

@@ -32,31 +32,34 @@ public abstract class PropertyBindingException extends JsonMappingException {
         if (str != null || this._propertyIds == null) {
             return str;
         }
-        StringBuilder stringBuilder = new StringBuilder(100);
+        StringBuilder sb = new StringBuilder(100);
         int size = this._propertyIds.size();
-        if (size == 1) {
-            stringBuilder.append(" (one known property: \"");
-            stringBuilder.append(String.valueOf(this._propertyIds.iterator().next()));
-            stringBuilder.append('\"');
-        } else {
-            stringBuilder.append(" (").append(size).append(" known properties: ");
+        if (size != 1) {
+            sb.append(" (").append(size).append(" known properties: ");
             Iterator it = this._propertyIds.iterator();
-            while (it.hasNext()) {
-                stringBuilder.append('\"');
-                stringBuilder.append(String.valueOf(it.next()));
-                stringBuilder.append('\"');
-                if (stringBuilder.length() > 1000) {
-                    stringBuilder.append(" [truncated]");
+            while (true) {
+                if (!it.hasNext()) {
+                    break;
+                }
+                sb.append('\"');
+                sb.append(String.valueOf(it.next()));
+                sb.append('\"');
+                if (sb.length() > 1000) {
+                    sb.append(" [truncated]");
                     break;
                 } else if (it.hasNext()) {
-                    stringBuilder.append(", ");
+                    sb.append(", ");
                 }
             }
+        } else {
+            sb.append(" (one known property: \"");
+            sb.append(String.valueOf(this._propertyIds.iterator().next()));
+            sb.append('\"');
         }
-        stringBuilder.append("])");
-        str = stringBuilder.toString();
-        this._propertiesAsString = str;
-        return str;
+        sb.append("])");
+        String sb2 = sb.toString();
+        this._propertiesAsString = sb2;
+        return sb2;
     }
 
     public Class<?> getReferringClass() {

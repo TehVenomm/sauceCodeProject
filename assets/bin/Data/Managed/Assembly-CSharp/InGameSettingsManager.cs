@@ -129,6 +129,8 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		public ArrowAimLesserSettings spearAimLesserSettings;
 
+		public ArrowAimLesserSettings arrowRainShotAimLesserSettings;
+
 		[Tooltip("氷の上で最高速度に到達するまでの時間")]
 		public float needTimeToMaxTimeOnIce = 2f;
 
@@ -236,6 +238,15 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("同期待機の最大時間（秒）")]
 		public float maxWaitSyncTime = 2f;
+
+		[Tooltip("ステ\u30fcジのコリジョンを高くする")]
+		public bool isRaiseStageCollider;
+
+		[Tooltip("高くする場合のサイズ")]
+		public float raiseStageColliderSizeY = 4f;
+
+		[Tooltip("高くする場合のオフセット")]
+		public float raiseStageColliderOffsetY;
 	}
 
 	[Serializable]
@@ -312,6 +323,9 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 			[Tooltip("weak:ヒ\u30fcル攻撃に対する倍率")]
 			public float weakRateHealAttack = 1.5f;
+
+			[Tooltip("weak:属性SPに対する倍率")]
+			public float weakRateElementSpAttack = 1.5f;
 
 			[Tooltip("タ\u30fcゲット箇所として無視する高さ")]
 			public float ignoreTargetHeight = 5f;
@@ -473,6 +487,15 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[Tooltip("[ヒ\u30fcト]ブ\u30fcスト中の属性防御係数")]
 			public float heatComboElementDefRate = 1f;
 
+			[Tooltip("[Soul] 長い場合の通常攻撃ID")]
+			public int Soul_LongAttackId = 15;
+
+			[Tooltip("[Soul] 長い場合の通常攻撃最終ID")]
+			public int Soul_LongAttackFinishId = 18;
+
+			[Tooltip("[Soul] 長い場合の特殊アクションID")]
+			public int Soul_LongSpAttackId = 95;
+
 			[Tooltip("[ソウル]歩く速度")]
 			public float soulWalkSpeed = 0.113f;
 
@@ -553,6 +576,169 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 			[Tooltip("[ソウル]刀舞モ\u30fcド ダメ\u30fcジでリセットするか")]
 			public float soulBoostWaitPacketSec = 60f;
+
+			[Tooltip("[Burst] バ\u30fcスト両手剣設定")]
+			public BurstTwoHandSwordActionInfo burstTHSInfo = new BurstTwoHandSwordActionInfo();
+
+			[Tooltip("[Oracle] オラクル両手剣設定")]
+			public OracleTwoHandSwordActionInfo oracleTHSInfo = new OracleTwoHandSwordActionInfo();
+		}
+
+		[Serializable]
+		public class BurstTwoHandSwordActionInfo
+		{
+			[Tooltip("[Burst] 基本攻撃のID")]
+			public int BaseAtkId = 70;
+
+			[Tooltip("[Burst] 基本攻撃02 のID")]
+			public int BaseAtkCombo02 = 71;
+
+			[Tooltip("[Burst] 基本攻撃03 のID")]
+			public int BaseAtkCombo03 = 72;
+
+			[Tooltip("[Burst] フルバ\u30fcスト動作のAttackID")]
+			public int FullBurstAttackID = 73;
+
+			[Tooltip("[Burst] 射撃構えのAttackID")]
+			public int ReadyForShotID = 74;
+
+			[Tooltip("[Burst] 初回射撃のAttackID")]
+			public int FirstShotAttackID = 75;
+
+			[Tooltip("[Burst] 連続射撃のAttackID")]
+			public int NextShotAttackID = 76;
+
+			[Tooltip("[Burst] 初回ReloadアクションのID")]
+			public int FirstReloadActionAttackID = 77;
+
+			[Tooltip("[Burst] 連続ReloadアクションのID")]
+			public int NextReloadActionAttackID = 78;
+
+			[Tooltip("[Burst] 兜割り(単発射撃へ接続可能)")]
+			public int BurstAvoidAttackID = 79;
+
+			[Tooltip("[Burst] 距離減衰の最小減衰距離")]
+			[SerializeField]
+			private float MinAttenuationDistance = 10f;
+
+			[Tooltip("[Burst] 距離減衰の最大減衰距離")]
+			[SerializeField]
+			private float MaxAttenuationDistance = 1000f;
+
+			[Tooltip("[Burst] 距離減衰の最小ダメ\u30fcジレ\u30fcト")]
+			[SerializeField]
+			private float MinAttenuationDmgRate = 0.01f;
+
+			[Tooltip("[Burst] 距離減衰の最大ダメ\u30fcジレ\u30fcト")]
+			[SerializeField]
+			private float MaxAttenuationDmgRate = 1f;
+
+			[Tooltip("[Burst] 距離減衰定義(X:正規化距離[0.0 1.0] Y:正規化ダメ\u30fcジ補正値[0.0 1.0]")]
+			[SerializeField]
+			private AnimationCurve AnimCurve = Curves.CreateEaseInCurve();
+
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
+			public float SingleShotBaseDmgRate = 1f;
+
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
+			public float SingleShotElementDmgRate = 2f;
+
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
+			public float FullBurstBaseDmgRate = 2f;
+
+			[Tooltip("[Burst] 射撃系の属性ダメ\u30fcジ倍率")]
+			[SerializeField]
+			public float FullBurstElementDmgRate = 4f;
+
+			[Tooltip("単発ショットのヒットエフェクト(属性差分あり")]
+			public string[] HitEffect_SingleShot;
+
+			[Tooltip("フルバ\u30fcストのヒットエフェクト(属性差分あり")]
+			public string[] HitEffect_FullBurst;
+
+			public float GetDistanceAttenuationRatio(float _distance)
+			{
+				if (_distance < 0f || AnimCurve == null)
+				{
+					return 0f;
+				}
+				if (_distance < MinAttenuationDistance)
+				{
+					return MaxAttenuationDmgRate;
+				}
+				if (_distance > MaxAttenuationDistance)
+				{
+					return MinAttenuationDmgRate;
+				}
+				float num = (_distance - MinAttenuationDistance) / (MaxAttenuationDistance - MinAttenuationDistance);
+				float num2 = Mathf.Round(AnimCurve.Evaluate(num) * 100f) / 100f;
+				return (MaxAttenuationDmgRate - MinAttenuationDmgRate) * num2 + MinAttenuationDmgRate;
+			}
+		}
+
+		[Serializable]
+		public class OracleTwoHandSwordActionInfo
+		{
+			[Serializable]
+			public class HorizontalSpinInfo
+			{
+				[Tooltip("回転速度倍率")]
+				public float spinSpeedRate;
+
+				[Tooltip("ダメ\u30fcジ倍率")]
+				public float damageRate;
+			}
+
+			[Tooltip("通常バ\u30fcニアエフェクト名")]
+			public string normalVernierEffectName;
+
+			[Tooltip("通常バ\u30fcニア点火時SEのID")]
+			public int normalVernierSeId = 20000012;
+
+			[Tooltip("各属性の最大バ\u30fcニアエフェクト名")]
+			public string[] maxVernierEffectNames;
+
+			[Tooltip("最大バ\u30fcニア点火時SEのID")]
+			public int maxVernierSeId = 10000098;
+
+			[Tooltip("他人のバ\u30fcニアエフェクトを表示するか")]
+			public bool isPlayOtherPlayerVernierEffect = true;
+
+			[Tooltip("SP攻撃(横回転)中のダメ\u30fcジアップ対象のAttackInfo名リスト")]
+			public string[] horizontalDamageUpAttackInfoNames;
+
+			[Tooltip("SP攻撃(横回転)追加回転の通常時の各段階情報")]
+			public HorizontalSpinInfo[] horizontalSpinInfoList;
+
+			[Tooltip("SP攻撃(横回転)追加回転の最大溜め時の初速倍率")]
+			public float horizontalMaxFirstSpeed = 2f;
+
+			[Tooltip("SP攻撃(横回転)追加回転の最大溜め時の各段階情報")]
+			public HorizontalSpinInfo[] horizontalMaxSpinInfoList;
+
+			[Tooltip("回転を継続するのに攻撃のHitが必要か")]
+			public bool needHitHorizontal = true;
+
+			[Tooltip("回転継続時に出血ダメ\u30fcジが発生するか")]
+			public bool isBleedingDamageOfHorizontalNext = true;
+
+			[Tooltip("溜め通常：無属性ダメ\u30fcジ倍率")]
+			public float chargeBaseDmgRate = 1f;
+
+			[Tooltip("溜め通常：属性ダメ\u30fcジ倍率")]
+			public float chargeElementDmgRate = 1f;
+
+			[Tooltip("溜め最大：無属性ダメ\u30fcジ倍率")]
+			public float maxChargeBaseDmgRate = 1f;
+
+			[Tooltip("溜め最大：属性ダメ\u30fcジ倍率")]
+			public float maxChargeElementDmgRate = 1f;
+
+			[Tooltip("脳震盪中の敵への属性ダメ\u30fcジ倍率")]
+			public float concussionEnemyElementDmgRate = 3f;
 		}
 
 		[Serializable]
@@ -668,6 +854,63 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 			[Tooltip("[Soul] 開始のSEを再生してから何秒後にル\u30fcプのSEを再生するか")]
 			public float Soul_TimeForPlayLoopSE;
+
+			[Tooltip("[Burst] 空中時にコライダ\u30fc移動するか")]
+			public bool Burst_IsUpdateAerialCollider = true;
+
+			[Tooltip("[Burst] 左武器合体時のPos")]
+			public Vector3 Burst_CombinePosition;
+
+			[Tooltip("[Burst] 左武器合体時の回転")]
+			public Vector3 Burst_CombineEuler;
+
+			[Tooltip("[Burst] 移動速度アップ倍率")]
+			public float Burst_MoveSpeedUpRate = 0.5f;
+
+			[Tooltip("[Burst] 回避速度アップ倍率")]
+			public float Burst_AvoidSpeedUpRate = 0.5f;
+
+			[Tooltip("[Burst] ゲ\u30fcジ減少値(毎秒)")]
+			public float Burst_BoostGaugeDecreasePerSecond = 65f;
+
+			[Tooltip("[Burst] ゲ\u30fcジ増加基礎値")]
+			public float Burst_BoostGaugeIncreaseBase = 20f;
+
+			[Tooltip("[Burst] ブ\u30fcスト中の攻撃速度")]
+			public float Burst_BoostAttackSpeedUpRate = 0.5f;
+
+			[Tooltip("[Burst] 両刃モ\u30fcドの属性ダメ\u30fcジアップ")]
+			public float Burst_CombineElementDamageUpRate = 0.5f;
+
+			[Tooltip("[Burst] ブ\u30fcスト中の地上コンボの属性ダメ\u30fcジアップ")]
+			public float Burst_BoostGroundSpElementDamageUpRate = 1f;
+
+			[Tooltip("[Burst] 両刃モ\u30fcド ヒットエフェクト")]
+			public string[] Burst_CombineHitEffect;
+
+			[Tooltip("[Burst] 両刃モ\u30fcド ヒットエフェクトスケ\u30fcル")]
+			public Vector3 Burst_CombineHitEffectScale;
+
+			[Tooltip("[Oracle] ゲ\u30fcジ上昇量(毎秒)")]
+			public float Oracle_SpGaugeIncreasePerSecond = 60f;
+
+			[Tooltip("[Oracle] ゲ\u30fcジ減少量(毎秒)")]
+			public float Oracle_SpGaugeDecreasePerSecond = 60f;
+
+			[Tooltip("[Oracle] ラッシュ攻撃減少量")]
+			public float Oracle_SpGaugeRushDecrease = 20f;
+
+			[Tooltip("[Oracle] ジャスト回避ゲ\u30fcジ回復割合")]
+			public float Oracle_JustAvoidGaugeIncreaseRate = 0.2f;
+
+			[Tooltip("[Oracle] ラッシュ攻撃属性ダメ\u30fcジ倍率")]
+			public float Oracle_RushElementDamageRate = 5f;
+
+			[Tooltip("[Oracle] SP攻撃属性ダメ\u30fcジ倍率")]
+			public float Oracle_SpElementDamageRate = 3f;
+
+			[Tooltip("[Oracle] ジャスト回避モ\u30fcションストップ時間")]
+			public float Oracle_JustAvoidMotionStopTime = 0.5f;
 		}
 
 		[Serializable]
@@ -717,6 +960,12 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 			[Tooltip("マ\u30fcカ\u30fcに当たった際、貫通継続するか")]
 			public bool isPierceAfterTarget = true;
+
+			[Tooltip("爆弾矢が爆発するまでの秒数")]
+			public float bombArrowCountSec = 10f;
+
+			[Tooltip("爆弾矢が即爆発するまでの刺せる回数")]
+			public int bombArrowMaxLevel = 3;
 
 			[Tooltip("[SOUL]発射インタ\u30fcバル")]
 			public float soulShotInterval = 0.05f;
@@ -777,6 +1026,92 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 			[Tooltip("[SOUL]ブ\u30fcスト中の属性ダメ\u30fcジアップ")]
 			public float soulBoostElementDamageRate = 10f;
+
+			[Tooltip("[BURST]爆弾矢爆発AttackInfoName")]
+			public string bombArrowAttackInfoName = "PLC05_attack_bomb_";
+
+			[Tooltip("[BURST]蒼穹撃ち: AttackId")]
+			public int arrowRainShotAttackId = 99;
+
+			[Tooltip("[BURST]蒼穹撃ち: リロ\u30fcドからのAttackId")]
+			public int arrowReloadRainShotAttackId = 96;
+
+			[Tooltip("[BURST]蒼穹撃ち：カ\u30fcソルエフェクト名")]
+			public string arrowRainShotAimLesserCursorEffectName = "ef_btl_arrow_marker_02";
+
+			[Tooltip("[BURST]バ\u30fcストゲ\u30fcジ上昇値リスト")]
+			public List<float> burstGaugeIncreaseValueList;
+
+			[Tooltip("[BUST]ブ\u30fcスト中ゲ\u30fcジ減少値(毎秒)")]
+			public float burstBoostGaugeDecreasePerSecond = 65f;
+
+			[Tooltip("[BURST]蒼穹撃ち: 落下する矢のAttackInfo名")]
+			public string arrowRainShotAttackInfoName = "PLC05_attack_99_arrow_rain";
+
+			[Tooltip("[BURST]爆弾矢爆発スケ\u30fcルリスト")]
+			public List<float> bombArrowBurstEffectScaleList = new List<float>();
+
+			[Tooltip("[BURST]ブ\u30fcスト中チャ\u30fcジMAX時通常撃ちエフェクト名")]
+			public string boostArrowChargeMaxEffectName = "ef_btl_wsk3_bow_shot_01_01";
+
+			[Tooltip("[BURST]ブ\u30fcスト中チャ\u30fcジMAX時通常撃ちAttackInfo名")]
+			public string boostArrowChargeMaxAttackInfoName = "PLC05_attack_03_boost";
+
+			[Tooltip("[BURST]爆発属性ダメ\u30fcジ倍率リスト")]
+			public List<float> arrowBombElementDamageRateList = new List<float>();
+
+			[Tooltip("[BURST]爆発矢が刺さったエフェクト名")]
+			public string bombArrowEffectName = "ef_btl_wsk3_bow_0";
+
+			[Tooltip("[BURST]蒼穹撃ち: ランダム角度分割幅")]
+			public float arrowRainAngleDivide = 30f;
+
+			[Tooltip("[BURST]蒼穹撃ち: ランダム距離分割幅")]
+			public float arrowRainLengthDivide = 1f;
+
+			[Tooltip("[BURST]蒼穹撃ち: 最大フレ\u30fcム間隔")]
+			public int arrowRainMaxFrameInterval = 3;
+
+			[Tooltip("[BURST]爆発SEIdリスト")]
+			public List<int> bombSEIdList = new List<int>();
+
+			[Tooltip("[BURST]蒼穹撃ち：ブ\u30fcスト爆発レベル")]
+			public int arrowRainBoostBombLevel = 1;
+
+			[Tooltip("[BURST]蒼穹撃ち: 爆発オフセットY")]
+			public float arrowRainBoostBombOffsetY = 1f;
+
+			[Tooltip("[BURST]爆発エフェクト名")]
+			public string bombEffectName = "ef_btl_bomb_arrow_burst_";
+
+			[Tooltip("[BURST]爆弾矢が刺さった時のSEIdリスト")]
+			public List<int> bombArrowSEIdList = new List<int>();
+
+			[Tooltip("[BURST]蒼穹撃ち: 貫通ダメ\u30fcジ間隔")]
+			public float arrowRainPierceDamageInterval = 0.01f;
+
+			[Tooltip("[BURST]ブ\u30fcストモ\u30fcド発動SEId")]
+			public int burstBoostModeSEId = 10000051;
+
+			[Tooltip("[BURST]爆発遅延秒数リスト")]
+			public List<float> bombDelayFrameList = new List<float>();
+
+			[Tooltip("[BURST]爆発オフセット位置リスト")]
+			public List<Vector3> bombOffsetPositionList = new List<Vector3>();
+
+			public string GetBombArrowEffectName(ELEMENT_TYPE type)
+			{
+				string str = bombArrowEffectName;
+				int num = (int)type;
+				return str + num.ToString();
+			}
+
+			public string GetBombEffectName(ELEMENT_TYPE type)
+			{
+				string str = bombEffectName;
+				int num = (int)type;
+				return str + num.ToString();
+			}
 		}
 
 		[Serializable]
@@ -880,11 +1215,197 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 			[Tooltip("[Soul] AnimCtrl突進ル\u30fcプタイムリミット")]
 			public float Soul_AnimStateTimeLimitForMoveLoop = 1f;
+
+			[Tooltip("[Heat] ヒ\u30fcト片手剣設定")]
+			public HeatOneHandSwordActionInfo heatOHSInfo = new HeatOneHandSwordActionInfo();
+
+			[Tooltip("[Soul] ソウル片手剣設定")]
+			public SoulOneHandSwordActionInfo soulOHSInfo = new SoulOneHandSwordActionInfo();
+
+			[Tooltip("[Burst] バ\u30fcスト片手剣設定")]
+			public BurstOneHandSwordActionInfo burstOHSInfo = new BurstOneHandSwordActionInfo();
+
+			[Tooltip("[Oracle] オラクル片手剣設定")]
+			public OracleOneHandSwordActionInfo oracleOHSInfo = new OracleOneHandSwordActionInfo();
+		}
+
+		[Serializable]
+		public class HeatOneHandSwordActionInfo
+		{
+			[Tooltip("[Heat] カウンタ\u30fc攻撃ID")]
+			public int counterAttackId = 98;
+
+			[Tooltip("[Heat] リベンジストライク攻撃ID")]
+			public int revengeStrikeAttackId = 92;
+		}
+
+		[Serializable]
+		public class SoulOneHandSwordActionInfo
+		{
+			[Tooltip("[Soul] 基本攻撃のID")]
+			public int BaseAtkId = 10;
+		}
+
+		[Serializable]
+		public class BurstOneHandSwordActionInfo
+		{
+			[Tooltip("[Burst]ジャストガ\u30fcドになる秒数")]
+			public float JustGuardValidSec = 0.66f;
+
+			[Tooltip("[Burst] 破迅突き 属性ヒットエフェクト")]
+			public string[] BoostElementHitEffect;
+
+			[Tooltip("[Burst]破迅突きによる属性ダメ\u30fcジ倍率")]
+			public float elementDamageRate = 2f;
+
+			[Tooltip("[Burst]ブ\u30fcストゲ\u30fcジの秒数")]
+			public float GaugeTime = 10f;
+
+			[Tooltip("[Burst]ブ\u30fcスト中の攻撃速度上昇倍率")]
+			public float boostAttackSpeedUpRate = 0.5f;
+
+			[Tooltip("[Burst]ブ\u30fcスト中の属性ダメ\u30fcジアップ")]
+			public float BoostElementDamageRate = 2f;
+
+			[Tooltip("[Burst] 基本攻撃のID")]
+			public int BaseAtkId = 18;
+
+			[Tooltip("[Burst] 回避攻撃（シ\u30fcルドタックル）のID")]
+			public int AvoidAttackID = 22;
+
+			[Tooltip("[Burst] 破迅突きのID")]
+			public int CounterAttackId = 93;
+		}
+
+		[Serializable]
+		public class OracleOneHandSwordActionInfo
+		{
+			[Serializable]
+			public class DragonEffect
+			{
+				[Tooltip("エフェクト名")]
+				public string name;
+
+				[Tooltip("エフェクトを再生するノ\u30fcド名")]
+				public string link;
+
+				[Tooltip("属性indexをファイル名末尾につけるか")]
+				public bool hasElementVariation;
+
+				public string GetEffectName(ELEMENT_TYPE e)
+				{
+					if (hasElementVariation)
+					{
+						return name + (int)e;
+					}
+					return name;
+				}
+			}
+
+			[Tooltip("[Oracle] 通常攻撃SPゲ\u30fcジ増加量")]
+			public float spGaugeIncreasingValue = 10f;
+
+			[Tooltip("[Oracle] ブ\u30fcストモ\u30fcド中通常攻撃SPゲ\u30fcジ増加量")]
+			public float spGaugeIncreasingValueWhileBoost = 3f;
+
+			[Tooltip("[Oracle] ブ\u30fcスト時間")]
+			public float spGaugeDecreasingValue = 10f;
+
+			[Tooltip("[Oracle] 通常コンボ開始AttackId")]
+			public int comboAttackId = 24;
+
+			[Tooltip("[Oracle] 竜撃AttackId")]
+			public int specialAttackId = 28;
+
+			[Tooltip("[Oracle] 回避攻撃")]
+			public int avoidAttackId = 30;
+
+			[Tooltip("[Oracle] 竜人エフェクトリスト")]
+			public DragonEffect[] dragonEffects;
+
+			[Tooltip("[Oracle] 竜人化中モ\u30fcション速度倍率加算値")]
+			public float boostMotionSpeedAdditionRate = 0.3f;
+
+			[Tooltip("[Oracle] 通常攻撃属性倍率")]
+			public float normalAttackElementDamageRate = 1f;
+
+			[Tooltip("[Oracle] 竜撃属性倍率")]
+			public float spAttackElementDamageRate = 3f;
+
+			[Tooltip("[Oracle] ブ\u30fcストモ\u30fcド中通常攻撃属性倍率")]
+			public float boostNormalAttackElementDamageRate = 1.5f;
+
+			[Tooltip("[Oracle] ブ\u30fcストモ\u30fcド中竜撃属性倍率")]
+			public float boostSpAttackElementDamageRate = 6f;
 		}
 
 		[Serializable]
 		public class SpearActionInfo
 		{
+			[Serializable]
+			public class Oracle
+			{
+				[Tooltip("コンボ開始AttackId")]
+				public int comboAttackId = 35;
+
+				[Tooltip("予約AttackId(コンボ開始からここまで)")]
+				public int reservedAttackId = 45;
+
+				[Tooltip("防御AttackId")]
+				public int guardAttackId = 39;
+
+				[Tooltip("防御中のダメ\u30fcジ割合")]
+				public float damageCutRateWhileGuard = 0.7f;
+
+				[Tooltip("ジャストガ\u30fcド中のダメ\u30fcジ割合")]
+				public float damageCutRateWhileJustGuard = 0.1f;
+
+				[Tooltip("攻撃時のSPチャ\u30fcジベ\u30fcス値")]
+				public float spChargingValue = 5f;
+
+				[Tooltip("回避攻撃Id")]
+				public int avoidAttackId = 40;
+
+				[Tooltip("オラクルSPチャ\u30fcジ完了後の属性ダメ\u30fcジ倍率")]
+				public float chargedSpElementDamageRate = 5f;
+
+				[Tooltip("オラクルSPチャ\u30fcジ完了前の属性ダメ\u30fcジ倍率")]
+				public float spElementDamageRate = 1f;
+
+				[Tooltip("根性ベ\u30fcス時間")]
+				public float gutsBaseTime = 2f;
+
+				[Tooltip("ストック消費１つに対しての根性時間")]
+				public float gutsTimePerStock = 1f;
+
+				[Tooltip("ストック全て溜めた時の属性ダメ\u30fcジ割合")]
+				public float elementDamageRateFullStocked = 2f;
+
+				[Tooltip("ストック全て溜めた時の攻撃速度割合")]
+				public float attackSpeedRateFullStocked = 1.5f;
+
+				[Tooltip("防御中にカットしたダメ\u30fcジをSPに変換する割合")]
+				public float damageConvertToSpRate = 5f;
+
+				[Tooltip("根性発動中の属性攻撃倍率")]
+				public float elementDamageRateWhileGuts = 4f;
+
+				[Tooltip("根性発動中の攻撃速度倍率")]
+				public float attackSpeedRateWhileGuts = 1.5f;
+
+				[Tooltip("根性発動SE")]
+				public int gutsSE = 10000074;
+
+				[Tooltip("最低ジャストガ\u30fcド判定時間")]
+				public float minJustGuardSec = 0.1f;
+
+				[Tooltip("最高ジャストガ\u30fcド判定時間")]
+				public float maxJustGuardSec = 1f;
+
+				[Tooltip("ストックMAXの時のSPチャ\u30fcジ時間の割合")]
+				public float spChargeTimeRateFullStocked = 0.8f;
+			}
+
 			[Tooltip("ヒ\u30fcト：歩く速度")]
 			public float heatWalkSpeed = 0.1f;
 
@@ -939,7 +1460,7 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			[Tooltip("ジャンプ：最小溜め時間")]
 			public float jumpChargeMinSec = 0.5f;
 
-			[Tooltip("ジャンプ：基礎溜め時間")]
+			[Tooltip("ジャンプ：最大溜め時SE")]
 			public int jumpChargeMaxSeId = 40000359;
 
 			[Tooltip("ジャンプ：降下開始高さ")]
@@ -986,6 +1507,168 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 			[Tooltip("ジャンプ：くるりんXZ制御終了時間")]
 			public float jumpRandingMoveEndTime = 1.3f;
+
+			[Tooltip("[Heat] 特殊アクション攻撃ID")]
+			public int Heat_SpAttackId = 97;
+
+			[Tooltip("[Soul] 移動速度")]
+			public float Soul_WalkSpeedUpRate = 0.1f;
+
+			[Tooltip("[Soul] 通常攻撃ID")]
+			public int Soul_AttackId = 14;
+
+			[Tooltip("[Soul] 特殊アクション攻撃ID")]
+			public int Soul_SpAttackId = 95;
+
+			[Tooltip("[Soul] 特殊アクション2撃目ID")]
+			public int Soul_SpAttackContinueId = 94;
+
+			[Tooltip("[Soul] 回避攻撃アクションID")]
+			public int Soul_AvoidAttackId = 23;
+
+			[Tooltip("[Soul] ゲ\u30fcジ上昇値")]
+			public float Soul_GaugeIncreaseValue = 100f;
+
+			[Tooltip("[Soul] ジャストタップ ゲ\u30fcジ上昇割合")]
+			public float Soul_JustTapGaugeRate = 1.5f;
+
+			[Tooltip("[Soul] 魔槍モ\u30fcド中 ゲ\u30fcジ上昇割合")]
+			public float Soul_BoostModeGaugeRate = 0.3f;
+
+			[Tooltip("[Soul] 魔槍モ\u30fcド中 ゲ\u30fcジ減少値 特殊アクション溜め中（毎秒）")]
+			public float Soul_BoostModeGaugeDecreasePerSecond = 100f;
+
+			[Tooltip("[Soul] 魔槍モ\u30fcド中 ゲ\u30fcジ減少値（毎秒）")]
+			public float Soul_BoostModeGaugeDecreasePerSecondOnSpActionCharging = 50f;
+
+			[Tooltip("[Soul] 魔槍モ\u30fcド中 ダメ\u30fcジアップ倍率")]
+			public float Soul_BoostElementDamageRate = 4f;
+
+			[Tooltip("[Soul] 特殊アクション最大溜め時エフェクトオフセット")]
+			public Vector3 Soul_SpAttackMaxChargeEffectOffsetPos = new Vector3(0f, 0f, -0.35f);
+
+			[Tooltip("[Soul] HP使用or回復に対応する攻撃ID")]
+			public int[] Soul_AttackIdsForSacrifice;
+
+			[Tooltip("[Soul] HP使用割合（%）")]
+			public int[] Soul_SacrificeHPPercents;
+
+			[Tooltip("[Soul] HP回復割合（%）")]
+			public int[] Soul_HealHPPercents;
+
+			[Tooltip("[Burst] バ\u30fcスト情報")]
+			public BurstSpearActionInfo burstSpearInfo = new BurstSpearActionInfo();
+
+			[Tooltip("オラクル槍パラメ\u30fcタ")]
+			public Oracle oracle = new Oracle();
+		}
+
+		[Serializable]
+		public class BurstSpearActionInfo
+		{
+			[Tooltip("[Burst] 基本攻撃ID")]
+			public int baseAtkId = 30;
+
+			[Tooltip("[Burst] 特殊アクション攻撃ID")]
+			public int spAtkId = 34;
+
+			[Tooltip("[Burst] ヒット後コンボの攻撃ID")]
+			public int hitComboAttackId = 33;
+
+			[Tooltip("[Burst] 回避攻撃ID")]
+			public int avoidAtkId = 20;
+
+			[Tooltip("[Burst] 回避距離アップ値")]
+			public float avoidSpeedUpRate = 0.2f;
+
+			[Tooltip("[Burst] 武器回転速度（最低値）")]
+			public float spinSpeedMin;
+
+			[Tooltip("[Burst] 武器回転速度（最高値）")]
+			public float spinSpeedMax = 100f;
+
+			[Tooltip("[Burst] 武器回転が最高速度に達するまでの時間（秒）")]
+			public float spinTimeToMaxSpeed = 2f;
+
+			[Tooltip("[Burst] ゲ\u30fcジ増加値（/秒）")]
+			public float gaugeIncreasePerSecond = 10f;
+
+			[Tooltip("[Burst] ゲ\u30fcジ減少値（特殊アクション時）（/秒）")]
+			public float gaugeDecreaseOnSpAttackPerSecond = 10f;
+
+			[Tooltip("[Burst] ゲ\u30fcジ減少値（武器回転時）（/秒）")]
+			public float gaugeDecreaseOnSpinPerSecond = 3f;
+
+			[Tooltip("[Burst] バリア内にいるときのダメ\u30fcジ軽減後割合（75%なら0.25）")]
+			public float inBarrierDamageRate = 0.25f;
+
+			[Tooltip("[Burst] 回転中の属性ダメ\u30fcジアップ倍率（倍）")]
+			public float spinElementDamageRate = 2f;
+
+			[Tooltip("[Burst] 最大速度で回転中の属性ダメ\u30fcジアップ倍率（倍）")]
+			public float spinElementDamageRateMax = 4f;
+
+			[Tooltip("[Burst] 回転中属性ヒットエフェクト")]
+			public string[] spinElementHitEffectNames;
+
+			[Tooltip("[Burst] 回転中属性ヒットエフェクトのスケ\u30fcル")]
+			public Vector3 spinElementHitEffectScale;
+
+			[Tooltip("[Burst] 回転エフェクト")]
+			public string[] spinEffectNames;
+
+			[Tooltip("[Burst] 槍投げ接地エフェクト")]
+			public string throwGroundEffectName;
+
+			[Tooltip("[Burst] 槍投げ接地中エフェクト")]
+			public string[] spinThrowGroundEffectNames;
+
+			[Tooltip("[Burst] 回転中SE")]
+			public int spinSeId;
+
+			[Tooltip("[Burst] 回転中SE（最大回転速度）")]
+			public int spinMaxSpeedSeId;
+		}
+
+		[Serializable]
+		public class BarrierBrokenReaction
+		{
+			[Tooltip("リアクションタイプ")]
+			public AttackHitInfo.ToPlayer.REACTION_TYPE reactionType = AttackHitInfo.ToPlayer.REACTION_TYPE.BLOW;
+
+			[Tooltip("リアクション時間")]
+			public float loopTime = 0.3f;
+
+			[Tooltip("吹き飛ばし力")]
+			public float blowForce = 100f;
+
+			[Tooltip("吹き飛ばし角度")]
+			public float blowAngle = 30f;
+
+			[Tooltip("無敵になる秒数")]
+			public float invincibleDuration = 0.3f;
+		}
+
+		[Serializable]
+		public class TeleportationInfo
+		{
+			[Serializable]
+			public class OffsetByWeaponAndAttack
+			{
+				public int attackMode;
+
+				public int attackID;
+
+				public float value;
+			}
+
+			[Tooltip("タ\u30fcゲットからどれだけ戻ったところを移動先とするか")]
+			public float offsetScalar = 1f;
+
+			[Tooltip("タ\u30fcゲットがなかったときに、ちょっとだけ進む距離")]
+			public float forwardScalar = 3f;
+
+			public OffsetByWeaponAndAttack[] offsetByWeaponAndAttack;
 		}
 
 		[Tooltip("武器情報")]
@@ -1005,6 +1688,15 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("救助可能秒数")]
 		public float[] rescueTimes;
+
+		[Tooltip("討伐隊救助可能回数")]
+		public int exploreRescureCount;
+
+		[Tooltip("討伐隊救助可能秒数")]
+		public float exploreRescureTime;
+
+		[Tooltip("バリア内での救助速度倍率")]
+		public float rescueSpeedRateInBarrier = 2.5f;
 
 		[Tooltip("魔石復活可能秒数")]
 		public float continueTime = 15f;
@@ -1087,6 +1779,10 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		[Tooltip("GetAnimatorSpeedの最大TimeRate")]
 		public float animatorSpeedMaxTimeRate = 0.9f;
 
+		[Tooltip("MaxDamageDownRate")]
+		[Range(0f, 1f)]
+		public float maxDamageDownRate = 0.6f;
+
 		[Tooltip("武器固有アクション情報")]
 		public SpecialActionInfo specialActionInfo;
 
@@ -1107,6 +1803,11 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("槍固有アクション情報")]
 		public SpearActionInfo spearActionInfo;
+
+		[Tooltip("バリアが壊れたときにとるリアクション")]
+		public BarrierBrokenReaction barrierBrokenReaction;
+
+		public TeleportationInfo teleportationInfo;
 
 		[NonSerialized]
 		public List<AttackInfos> weaponAttackInfoList = new List<AttackInfos>();
@@ -1225,6 +1926,12 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("AI基本待機時間")]
 		public float baseAfterWaitTime = 0.5f;
+
+		[Tooltip("Lv別AI待機時間の閾値配列")]
+		public float[] afterWaitTimeThresholdsByLv;
+
+		[Tooltip("Lv別AI待機時間の時間配列")]
+		public float[] afterWaitTimesByLv;
 
 		[Tooltip("押し合い速度（距離/s")]
 		public float jostleSpeed = 2f;
@@ -1489,6 +2196,27 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("自動復活可能回数")]
 		public int autoReviveMaxCount = 1;
+
+		[Tooltip("無効系のインタ\u30fcバル")]
+		public float invincibleInterval = 2f;
+
+		[Tooltip("デコイのヒットインタ\u30fcバル")]
+		public float decoyHitInterval = 2f;
+
+		[Tooltip("[SUBSTITUTE]高さ")]
+		public float substituteHeight = 1f;
+
+		[Tooltip("[SUBSTITUTE]追尾速さ")]
+		public float substituteLerpSpeed = 5f;
+
+		[Tooltip("[SUBSTITUTE]オフセット1")]
+		public float substituteOffset1 = 0.5f;
+
+		[Tooltip("[SUBSTITUTE]オフセット2")]
+		public float substituteOffset2 = 0.35f;
+
+		[Tooltip("強化バフ解除無効発動時の効果時間")]
+		public float invincibleBuffCancellationExpandTime = 2f;
 	}
 
 	[Serializable]
@@ -1503,6 +2231,9 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		[Tooltip("滑りデバフのパラメ\u30fcタ")]
 		public SlideParam slideParam;
 
+		[Tooltip("滑りデバフ（氷）のパラメ\u30fcタ")]
+		public SlideParam slideIceParam;
+
 		[Tooltip("沈黙デバフのパラメ\u30fcタ")]
 		public SilenceParam silenceParam;
 
@@ -1512,8 +2243,38 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		[Tooltip("攻撃速度減少デバフのパラメ\u30fcタ")]
 		public AttackSpeedDownParam attackSpeedDownParam;
 
+		[Tooltip("沈黙デバフのパラメ\u30fcタ")]
+		public CantHealHpParam cantHealHpParam;
+
+		[Tooltip("暗闇デバフのパラメ\u30fcタ")]
+		public BlindParam blindParam;
+
+		[Tooltip("石化デバフのパラメ\u30fcタ")]
+		public StoneParam stoneParam;
+
 		[Tooltip("バフ解除で無視するBUFFTYPE")]
 		public List<BuffParam.BUFFTYPE> ignoreBuffCancellation;
+
+		[Tooltip("光輪のパラメ\u30fcタ\u30fc")]
+		public LightRingParam lightRingParam;
+
+		[Tooltip("脳震盪のパラメ\u30fcタ\u30fc")]
+		public Concussion concussion;
+
+		[Tooltip("出血デバフのパラメ\u30fcタ")]
+		public BleedingParam bleedingParam;
+
+		[Tooltip("酸デバフのパラメ\u30fcタ")]
+		public AcidPatam acidParam;
+
+		[Tooltip("腐敗デバフのパラメ\u30fcタ")]
+		public CorruptionPatam corruptionParam;
+
+		[Tooltip("聖痕のパラメ\u30fcタ")]
+		public StigmataPatam stigmataParam;
+
+		[Tooltip("過雷デバフのパラメ\u30fcタ")]
+		public ThunderstormParam cyclonicThunderstormParam;
 	}
 
 	[Serializable]
@@ -1527,6 +2288,9 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("状態異常耐性があがるだけのBUFFTYPE")]
 		public List<BuffParam.BUFFTYPE> onlyResistDebuff;
+
+		[Tooltip("魔狂化時に矢が抜けるか")]
+		public bool isClearStuckArrow;
 	}
 
 	[Serializable]
@@ -1581,6 +2345,33 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 	}
 
 	[Serializable]
+	public class CantHealHpParam
+	{
+		[Tooltip("継続時間")]
+		public float duration = 20f;
+	}
+
+	[Serializable]
+	public class BlindParam
+	{
+		[Tooltip("継続時間")]
+		public float duration = 20f;
+	}
+
+	[Serializable]
+	public class StoneParam
+	{
+		[Tooltip("継続時間")]
+		public float duration = 30f;
+
+		[Tooltip("石化状態プレイヤ\u30fcのグレ\u30fcスケ\u30fcル（0だと黒）")]
+		public float grayScalePow = 0.5f;
+
+		[Tooltip("石化状態プレイヤ\u30fcのグレ\u30fcスケ\u30fcル加算レ\u30fcト（基本は1）")]
+		public float grayScaleRate = 1f;
+	}
+
+	[Serializable]
 	public class ShadowSealingParam
 	{
 		public float duration = 7f;
@@ -1594,6 +2385,8 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		public int loopSeId = 30000007;
 
 		public int endSeId = 30000028;
+
+		public bool isReactionDamage;
 	}
 
 	[Serializable]
@@ -1607,6 +2400,124 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("鈍敵エフェクトスケ\u30fcル")]
 		public float enemyEffectSize = 1.5f;
+	}
+
+	[Serializable]
+	public class LightRingParam
+	{
+		[Tooltip("継続時間")]
+		public float duration = 9f;
+
+		[Tooltip("光輪開始時のSE")]
+		public int startSeId;
+
+		[Tooltip("光輪中のSE")]
+		public int loopSeId;
+
+		[Tooltip("光輪終了時のSE")]
+		public int endSeId;
+	}
+
+	[Serializable]
+	public class Concussion
+	{
+		[Tooltip("継続時間")]
+		public float duration = 5f;
+
+		[Tooltip("耐性初期値")]
+		public float resistBase = 1000f;
+
+		[Tooltip("耐性上昇率")]
+		public float resistRate = 1.1f;
+
+		[Tooltip("開始時SEのID(0なら無し)")]
+		public int startSeId;
+
+		[Tooltip("ル\u30fcプSEのID(0なら無し)")]
+		public int loopSeId;
+
+		[Tooltip("終了時SEのID(0なら無し)")]
+		public int endSeId;
+	}
+
+	[Serializable]
+	public class BleedingParam
+	{
+		[Tooltip("基礎効果時間")]
+		public float duration = 20f;
+
+		[Tooltip("ダメ\u30fcジの")]
+		public float damageHpRate = 0.05f;
+
+		[Tooltip("片手剣で出血ダメ\u30fcジが入らないAtkIdリスト")]
+		public int[] ignoreOneHandSwordAtkIds;
+
+		[Tooltip("両手剣で出血ダメ\u30fcジが入らないAtkIdリスト")]
+		public int[] ignoreTwoHandSwordAtkIds;
+
+		[Tooltip("双剣で出血ダメ\u30fcジが入らないAtkIdリスト")]
+		public int[] ignorePairSwordAtkIds;
+
+		[Tooltip("槍で出血ダメ\u30fcジが入らないAtkIdリスト")]
+		public int[] ignoreSpearAtkIds;
+
+		[Tooltip("弓で出血ダメ\u30fcジが入らないAtkIdリスト")]
+		public int[] ignoreArrowAtkIds;
+
+		[Tooltip("出血エフェクト名")]
+		public string effectName = "ef_btl_pl_blood_01";
+
+		[Tooltip("出血エフェクトNode")]
+		public string effectNodeName = "Root";
+
+		[Tooltip("出血エフェクト座標")]
+		public Vector3 effectPosition = Vector3.get_zero();
+
+		[Tooltip("出血エフェクト回転")]
+		public Vector3 effectRotation = Vector3.get_zero();
+
+		[Tooltip("出血エフェクトサイズ")]
+		public float effectScale = 1.2f;
+	}
+
+	[Serializable]
+	public class AcidPatam
+	{
+		[Tooltip("継続時間")]
+		public float duration = 20f;
+
+		[Tooltip("ダメ\u30fcジ間隔")]
+		public float interval = 2f;
+
+		[Tooltip("ダメ\u30fcジ倍率")]
+		public float percent = 0.02f;
+	}
+
+	[Serializable]
+	public class CorruptionPatam
+	{
+		[Tooltip("継続時間")]
+		public float duration = 20f;
+
+		[Tooltip("ダメ\u30fcジ間隔")]
+		public float interval = 2f;
+
+		[Tooltip("ダメ\u30fcジ倍率")]
+		public float percent = 0.02f;
+	}
+
+	[Serializable]
+	public class StigmataPatam
+	{
+		[Tooltip("エフェクト名(敵専用)")]
+		public string effectName = "ef_btl_enm_corruption_01";
+	}
+
+	[Serializable]
+	public class ThunderstormParam
+	{
+		[Tooltip("エフェクト名(敵専用)")]
+		public string effectName = "ef_btl_enm_corruption_01";
 	}
 
 	[Serializable]
@@ -1634,20 +2545,44 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		[Tooltip("チュ\u30fcトリアルボスレベル")]
 		public int enemyLv = 1;
 
-		[Tooltip("一人で戦っている間の秒数、この秒数をすぎたら強制的にスキル説明")]
-		public float soloBattleTimeLimit = 20f;
-
-		[Tooltip("スキル打たずにこの時間が経過したら次のチュ\u30fcトリアルへ進む")]
-		public float skillWaitLimitTime = 20f;
-
-		[Tooltip("仲間と一緒い戦っている間の秒数")]
-		public float battleWithFriendTime = 35f;
-
 		[Tooltip("ボスの最小HPの割合(これ以下は減らない)")]
 		public float bossMinHpRate = 0.2f;
 
 		[Tooltip("ボス逃走開始HPの割合(bossMinHpRateより大きい値を設定すること)")]
 		public float bossEscapeHpRate = 0.5f;
+
+		[Tooltip("一人で戦っている間の秒数、この秒数をすぎたら強制的にスキル説明")]
+		public float soloBattleTimeLimit = 30f;
+
+		[Tooltip("スキル打たずにこの時間が経過したら次のチュ\u30fcトリアルへ進む")]
+		public float skillWaitLimitTime = 30f;
+
+		[Tooltip("仲間と一緒い戦っている間の秒数")]
+		public float battleWithFriendTime = 35f;
+
+		public float bossRefillHpRate = 0.25f;
+
+		public int[] botWeaponIds = new int[2]
+		{
+			20160111,
+			20260860
+		};
+
+		public int[] botSkillIds = new int[2]
+		{
+			100200100,
+			100200601
+		};
+
+		public float atkIncreaseRate = 0.1f;
+
+		public float deplayTimeNpcUseSkill = 6f;
+
+		public int deplayTimeNpcUseSkillOffset = 10;
+
+		public int bossMultiXHp = 5;
+
+		public float bossScale = 1.5f;
 	}
 
 	[Serializable]
@@ -1680,6 +2615,9 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("耐久物の名称")]
 		public string enduranceObjectName;
+
+		[Tooltip("迎撃戦ver2でのアラ\u30fcト開始残り時間")]
+		public float remainingTimeForAlert = 60f;
 	}
 
 	[Serializable]
@@ -1711,6 +2649,12 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("波動砲のカメラ切替ディレイ")]
 		public float delayChangeCameraForSpecial = 0.5f;
+
+		[Tooltip("フィ\u30fcルド砲のク\u30fcルタイム")]
+		public float coolTimeForField = 0.1f;
+
+		[Tooltip("フィ\u30fcルド砲の発射SEID")]
+		public int seIdForField = 10000094;
 	}
 
 	[Serializable]
@@ -1723,6 +2667,9 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 			Rate,
 			Constant
 		}
+
+		[Tooltip("WAVE_EVENTか")]
+		public bool isEvent;
 
 		[Tooltip("マギゲ\u30fcジ上昇タイプ")]
 		public eGaugeType skillGaugeType = eGaugeType.Rate;
@@ -1762,6 +2709,100 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 		[Tooltip("ホストリタイヤのディレイ")]
 		public float hostRetireDelay = 1f;
+
+		[Tooltip("コンテンツ防衛戦の場合カメラをあげる")]
+		public float cameraFieldOffsetY;
+	}
+
+	[Serializable]
+	public class FishingParam
+	{
+		[Tooltip("予兆開始時間（0:min, 1:max)")]
+		public float[] waitSec;
+
+		[Tooltip("予兆インタ\u30fcバル")]
+		public float omenInterval = 1f;
+
+		[Tooltip("最大予兆回数")]
+		public int maxOmenNum = 3;
+
+		[Tooltip("！がでてる時間")]
+		public float hookSec = 2f;
+
+		[Tooltip("Effect:予兆")]
+		public string[] omenEffect;
+
+		[Tooltip("Effect:ばちゃばちゃ")]
+		public string[] hookEffect;
+
+		[Tooltip("SE:水面に落ちる(ぽちゃん)")]
+		public int[] se0Id;
+
+		[Tooltip("SE:予兆(ばしゃ)")]
+		public int[] se1Id;
+
+		[Tooltip("SE:リ\u30fcル巻いてる(ばしゃばしゃ)LOOP")]
+		public int[] se2Id;
+
+		[Tooltip("SE:水面から引き上げる(ばしゃ\u30fcん)")]
+		public int[] se3Id;
+
+		[Tooltip("SE:！のSE")]
+		public int hookSeId = 40000013;
+
+		[Tooltip("SE:釣った(0:スカ、1:アイテム、2:魚、3:モンスタ\u30fc)")]
+		public int[] hitSeIds;
+
+		[Tooltip("通信モ\u30fcション：最低保証")]
+		public float sendMinSec = 0.5f;
+
+		[Tooltip("通信モ\u30fcション:釣った(0:スカ、1:アイテム、2:魚、3:モンスタ\u30fc)")]
+		public float[] sendSec;
+
+		[Tooltip("通信モ\u30fcション：冠タイプ(0:通常、1:銀、2:金")]
+		public float[] sendCrownTypeSec;
+
+		[Tooltip("通信モ\u30fcション：レアの時")]
+		public float sendRareSec = 1f;
+
+		[Tooltip("敵釣り時インフォメ\u30fcションディレイ")]
+		public float delayEnemyFishing = 5f;
+
+		[Tooltip("敵釣り時のアニメ\u30fcション時間")]
+		public float hitEnemyMoveSec = 0.5f;
+
+		[Tooltip("共釣りゲ\u30fcジの最大値")]
+		public float coopFishingGaugeMax = 100f;
+
+		[Tooltip("共釣りゲ\u30fcジの初期値")]
+		public float coopFishingGaugeInitial = 30f;
+
+		[Tooltip("共釣りゲ\u30fcジの減少値（/sec）")]
+		public float coopFishingGaugeDecreasePerSec = 10f;
+
+		[Tooltip("自分による共釣りゲ\u30fcジの増加量（/1タップ）")]
+		public float coopFishingGaugeIncreasePerTapBySelf = 4f;
+
+		[Tooltip("他人による共釣りゲ\u30fcジの増加量（/1タップ")]
+		public float coopFishingGaugeIncreasePerTapByOther = 3f;
+
+		[Tooltip("共釣りゲ\u30fcジの減少開始までの時間（最後の増加からの秒数）")]
+		public float coopFishingGaugeMarginSecToStartDecrease = 1f;
+
+		[Tooltip("共釣りゲ\u30fcジの赤になるまでの時間（最後の増加からの秒数）")]
+		public float coopFishingGaugeMarginToStartChangeRed = 1f;
+
+		[Tooltip("共釣りホストが出すスタンプID")]
+		public int coopFishingStampId = -1;
+
+		[Tooltip("共釣りホストがスタンプ出すインタ\u30fcバル")]
+		public float coopFishingStampRoutineSec = 5f;
+
+		[Tooltip("共釣りゲストが出すスタンプID")]
+		public int coopFishingGuestStampId = -1;
+
+		[Tooltip("共釣りゲストがスタンプ出すインタ\u30fcバル")]
+		public float coopFishingGuestStampRoutineSec = 5f;
 	}
 
 	public const float BASE_FIXED_DELTA_TIME = 0.02f;
@@ -1789,6 +2830,10 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 	public TargetMarker targetMarkerLesserEnemies;
 
 	public TargetMarker targetMarkerArrowAimLesser;
+
+	public TargetMarker targetMarkerArrowRainAimLesser;
+
+	public TargetMarker targetMarkerEnemyAssimilated;
 
 	public DropItem dropItem;
 
@@ -1831,4 +2876,13 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 	public CannonParam cannonParam;
 
 	public WaveMatchParam waveMatchParam;
+
+	public WaveMatchParam waveMatchEventParam;
+
+	public FishingParam fishingParam;
+
+	public WaveMatchParam GetWaveMatchParam()
+	{
+		return (!QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true)) ? waveMatchParam : waveMatchEventParam;
+	}
 }

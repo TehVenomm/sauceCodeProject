@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class ItemModelDisplayInfoEditor
+public class ItemModelDisplayInfoEditor : MonoBehaviour
 {
 	public GlobalSettingsManager globalSettingsManager;
 
@@ -47,63 +48,52 @@ public class ItemModelDisplayInfoEditor
 
 	private void LoadSettings(GlobalSettingsManager.UIModelRenderingParam.DisplayInfo info, Transform root)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Expected O, but got Unknown
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Expected O, but got Unknown
 		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		if (info != null && !(root == null))
+		if (info == null || root == null)
 		{
-			Transform val = root.Find("Pivot");
-			if (!(val == null))
+			return;
+		}
+		Transform val = root.Find("Pivot");
+		if (!(val == null))
+		{
+			root.set_localPosition(Vector3.get_zero());
+			root.set_localEulerAngles(Vector3.get_zero());
+			root.set_localScale(Vector3.get_one());
+			val.set_localPosition(new Vector3(0f, 0f, info.zFromCamera));
+			val.set_localEulerAngles(Vector3.get_zero());
+			val.set_localScale(Vector3.get_one());
+			Transform val2 = root.Find("Pivot/Model0");
+			Transform val3 = root.Find("Pivot/Model1");
+			if (val2 != null)
 			{
-				root.set_localPosition(Vector3.get_zero());
-				root.set_localEulerAngles(Vector3.get_zero());
-				root.set_localScale(Vector3.get_one());
-				val.set_localPosition(new Vector3(0f, 0f, info.zFromCamera));
-				val.set_localEulerAngles(Vector3.get_zero());
-				val.set_localScale(Vector3.get_one());
-				Transform val2 = root.Find("Pivot/Model0");
-				Transform val3 = root.Find("Pivot/Model1");
-				if (val2 != null)
-				{
-					val2.set_localPosition(info.mainPos);
-					val2.set_localEulerAngles(info.mainRot);
-					val2.set_localScale(Vector3.get_one());
-				}
-				if (val3 != null)
-				{
-					val3.set_localPosition(info.subPos);
-					val3.set_localEulerAngles(info.subRot);
-					val3.set_localScale(Vector3.get_one());
-				}
+				val2.set_localPosition(info.mainPos);
+				val2.set_localEulerAngles(info.mainRot);
+				val2.set_localScale(Vector3.get_one());
+			}
+			if (val3 != null)
+			{
+				val3.set_localPosition(info.subPos);
+				val3.set_localEulerAngles(info.subRot);
+				val3.set_localScale(Vector3.get_one());
 			}
 		}
 	}
 
 	private void SaveSettings(GlobalSettingsManager.UIModelRenderingParam.DisplayInfo info, Transform root)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
 		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Expected O, but got Unknown
 		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
@@ -116,30 +106,31 @@ public class ItemModelDisplayInfoEditor
 		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		if (info != null && !(root == null))
+		if (info == null || root == null)
 		{
-			Transform val = root.Find("Pivot");
-			if (!(val == null))
+			return;
+		}
+		Transform val = root.Find("Pivot");
+		if (!(val == null))
+		{
+			Vector3 localPosition = val.get_localPosition();
+			info.zFromCamera = localPosition.z;
+			Transform val2 = root.Find("Pivot/Model0");
+			Transform val3 = root.Find("Pivot/Model1");
+			if (val2 != null)
 			{
-				Vector3 localPosition = val.get_localPosition();
-				info.zFromCamera = localPosition.z;
-				Transform val2 = root.Find("Pivot/Model0");
-				Transform val3 = root.Find("Pivot/Model1");
-				if (val2 != null)
-				{
-					info.mainPos = val2.get_localPosition();
-					info.mainRot = val2.get_localEulerAngles();
-				}
-				if (val3 != null)
-				{
-					info.subPos = val3.get_localPosition();
-					info.subRot = val3.get_localEulerAngles();
-				}
-				else
-				{
-					info.subPos = Vector3.get_zero();
-					info.subRot = Vector3.get_zero();
-				}
+				info.mainPos = val2.get_localPosition();
+				info.mainRot = val2.get_localEulerAngles();
+			}
+			if (val3 != null)
+			{
+				info.subPos = val3.get_localPosition();
+				info.subRot = val3.get_localEulerAngles();
+			}
+			else
+			{
+				info.subPos = Vector3.get_zero();
+				info.subRot = Vector3.get_zero();
 			}
 		}
 	}
@@ -168,8 +159,6 @@ public class ItemModelDisplayInfoEditor
 
 	private void UpdateInfo(Transform root)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
 		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
@@ -178,56 +167,63 @@ public class ItemModelDisplayInfoEditor
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Expected O, but got Unknown
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Expected O, but got Unknown
+		if (root == null)
+		{
+			return;
+		}
+		Transform val = root.Find("Pivot");
 		if (!(root == null))
 		{
-			Transform val = root.Find("Pivot");
-			if (!(root == null))
+			root.set_localPosition(Vector3.get_zero());
+			root.set_localEulerAngles(Vector3.get_zero());
+			Vector3 localPosition = val.get_localPosition();
+			localPosition.x = 0f;
+			localPosition.y = 0f;
+			val.set_localPosition(localPosition);
+			Vector3 localEulerAngles = val.get_localEulerAngles();
+			localEulerAngles.x = 0f;
+			localEulerAngles.z = 0f;
+			if (pivotAutoRotate)
 			{
-				root.set_localPosition(Vector3.get_zero());
-				root.set_localEulerAngles(Vector3.get_zero());
-				Vector3 localPosition = val.get_localPosition();
-				localPosition.x = 0f;
-				localPosition.y = 0f;
-				val.set_localPosition(localPosition);
-				Vector3 localEulerAngles = val.get_localEulerAngles();
-				localEulerAngles.x = 0f;
-				localEulerAngles.z = 0f;
-				if (pivotAutoRotate)
-				{
-					localEulerAngles.y = (localEulerAngles.y + 5f) % 360f;
-				}
-				val.set_localEulerAngles(localEulerAngles);
-				UpdateModel(root.Find("Pivot/Model0"));
-				UpdateModel(root.Find("Pivot/Model1"));
+				localEulerAngles.y = (localEulerAngles.y + 5f) % 360f;
 			}
+			val.set_localEulerAngles(localEulerAngles);
+			UpdateModel(root.Find("Pivot/Model0"));
+			UpdateModel(root.Find("Pivot/Model1"));
 		}
 	}
 
 	private void UpdateModel(Transform model)
 	{
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
+		//IL_0025: Expected O, but got Unknown
 		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		if (!(model == null))
 		{
-			foreach (Transform item2 in model)
+			IEnumerator enumerator = model.GetEnumerator();
+			try
 			{
-				Transform val = item2;
-				val.set_localPosition(Vector3.get_zero());
-				val.set_localEulerAngles(Vector3.get_zero());
+				while (enumerator.MoveNext())
+				{
+					Transform val = enumerator.Current;
+					val.set_localPosition(Vector3.get_zero());
+					val.set_localEulerAngles(Vector3.get_zero());
+				}
+			}
+			finally
+			{
+				IDisposable disposable;
+				if ((disposable = (enumerator as IDisposable)) != null)
+				{
+					disposable.Dispose();
+				}
 			}
 		}
 	}
 
 	private void ResetPivotAngle(Transform root)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
 		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		if (!(root == null))
 		{

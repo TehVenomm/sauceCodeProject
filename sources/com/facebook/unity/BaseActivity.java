@@ -17,7 +17,8 @@ public abstract class BaseActivity extends Activity {
         finish();
     }
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         this.mCallbackManager = Factory.create();
         if (!FacebookSdk.isInitialized()) {

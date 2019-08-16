@@ -10,7 +10,7 @@ public abstract class StdScalarDeserializer<T> extends StdDeserializer<T> {
     private static final long serialVersionUID = 1;
 
     protected StdScalarDeserializer(Class<?> cls) {
-        super((Class) cls);
+        super(cls);
     }
 
     protected StdScalarDeserializer(JavaType javaType) {
@@ -18,7 +18,7 @@ public abstract class StdScalarDeserializer<T> extends StdDeserializer<T> {
     }
 
     protected StdScalarDeserializer(StdScalarDeserializer<?> stdScalarDeserializer) {
-        super((StdDeserializer) stdScalarDeserializer);
+        super((StdDeserializer<?>) stdScalarDeserializer);
     }
 
     public Object deserializeWithType(JsonParser jsonParser, DeserializationContext deserializationContext, TypeDeserializer typeDeserializer) throws IOException {

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.onepf.oms.AppstoreInAppBillingService;
 import org.onepf.oms.DefaultAppstore;
 import org.onepf.oms.OpenIabHelper;
+import org.onepf.oms.appstore.googleUtils.IabException;
 import org.onepf.oms.appstore.googleUtils.IabHelper.OnIabSetupFinishedListener;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 import org.onepf.oms.util.Logger;
@@ -19,27 +20,27 @@ public class FortumoStore extends DefaultAppstore {
     private Boolean isBillingAvailable;
     private boolean isNookDevice = isNookDevice();
 
-    public FortumoStore(@NotNull Context context) {
-        this.context = context.getApplicationContext();
+    public FortumoStore(@NotNull Context context2) {
+        this.context = context2.getApplicationContext();
     }
 
-    public static FortumoStore initFortumoStore(@NotNull Context context, final boolean z) {
-        final FortumoStore[] fortumoStoreArr = new FortumoStore[]{null};
-        final FortumoStore fortumoStore = new FortumoStore(context);
-        if (fortumoStore.isBillingAvailable(context.getPackageName())) {
+    public static FortumoStore initFortumoStore(@NotNull Context context2, final boolean z) {
+        final FortumoStore[] fortumoStoreArr = {null};
+        final FortumoStore fortumoStore = new FortumoStore(context2);
+        if (fortumoStore.isBillingAvailable(context2.getPackageName())) {
             final CountDownLatch countDownLatch = new CountDownLatch(1);
             fortumoStore.getInAppBillingService().startSetup(new OnIabSetupFinishedListener() {
                 public void onIabSetupFinished(@NotNull IabResult iabResult) {
                     if (iabResult.isSuccess()) {
                         if (z) {
                             try {
-                                if (fortumoStore.getInAppBillingService().queryInventory(false, null, null).getAllPurchases().isEmpty()) {
-                                    Logger.m1000d("Purchases not found");
-                                } else {
+                                if (!fortumoStore.getInAppBillingService().queryInventory(false, null, null).getAllPurchases().isEmpty()) {
                                     fortumoStoreArr[0] = fortumoStore;
+                                } else {
+                                    Logger.m1025d("Purchases not found");
                                 }
-                            } catch (Throwable e) {
-                                Logger.m1003e("Error while requesting purchases", e);
+                            } catch (IabException e) {
+                                Logger.m1028e("Error while requesting purchases", (Throwable) e);
                             }
                         } else {
                             fortumoStoreArr[0] = fortumoStore;
@@ -50,8 +51,8 @@ public class FortumoStore extends DefaultAppstore {
             });
             try {
                 countDownLatch.await();
-            } catch (Throwable e) {
-                Logger.m1003e("Setup was interrupted", e);
+            } catch (InterruptedException e) {
+                Logger.m1028e("Setup was interrupted", (Throwable) e);
             }
         }
         return fortumoStoreArr[0];
@@ -84,7 +85,7 @@ public class FortumoStore extends DefaultAppstore {
         }
         this.billingService = (FortumoBillingService) getInAppBillingService();
         this.isBillingAvailable = Boolean.valueOf(this.billingService.setupBilling(this.isNookDevice));
-        Logger.m1001d("isBillingAvailable: ", this.isBillingAvailable);
+        Logger.m1026d("isBillingAvailable: ", this.isBillingAvailable);
         return this.isBillingAvailable.booleanValue();
     }
 

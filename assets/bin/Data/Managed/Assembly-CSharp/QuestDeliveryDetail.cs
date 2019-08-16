@@ -3,6 +3,7 @@ using rhyme;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class QuestDeliveryDetail : GameSection
@@ -85,7 +86,15 @@ public class QuestDeliveryDetail : GameSection
 		BTN_JUMP_WORLDMAP,
 		BTN_WAVEMATCH_NEW,
 		BTN_WAVEMATCH_PASS,
-		BTN_WAVEMATCH_AUTO
+		BTN_WAVEMATCH_AUTO,
+		OBJ_CARNIVAL_ROOT,
+		LBL_POINT_CARNIVAL,
+		LBL_LIMIT_TIME,
+		OBJ_CLEAR_ICON_ROOT,
+		OBJ_CLEAR_REWARD,
+		BTN_CREATE_OFF,
+		SPR_TYPE_DIFFICULTY,
+		BTN_CHANGE_EQUIP
 	}
 
 	private enum AUDIO
@@ -107,7 +116,21 @@ public class QuestDeliveryDetail : GameSection
 		Storage,
 		PointShop,
 		WorldMap,
-		WaveRoom
+		WaveRoom,
+		seriesRoom,
+		orderRoom,
+		eventRoom
+	}
+
+	private enum SMITH_SECTION
+	{
+		INVALID,
+		EQUIP_GROW,
+		EQUIP_EXCEED,
+		EQUIP_EVOLVE,
+		EQUIP_CREATE,
+		MAGI_GROW,
+		CHANGE_ABILITY
 	}
 
 	private readonly string[] SPR_WINDOW_TYPE = new string[5]
@@ -150,6 +173,8 @@ public class QuestDeliveryDetail : GameSection
 
 	protected bool isNotice;
 
+	protected bool completeJumpButton;
+
 	private bool isQuestEnemy;
 
 	private uint targetQuestID;
@@ -157,6 +182,8 @@ public class QuestDeliveryDetail : GameSection
 	private uint targetMapID;
 
 	private int[] targetPortalID;
+
+	private bool hasDispedMessage;
 
 	public override IEnumerable<string> requireDataTable
 	{
@@ -169,6 +196,24 @@ public class QuestDeliveryDetail : GameSection
 	}
 
 	protected bool isComplete => competeReward != null;
+
+	private JumpButtonType GetJumpButtonTypeByQuestType(QUEST_TYPE questType)
+	{
+		switch (questType)
+		{
+		case QUEST_TYPE.WAVE:
+		case QUEST_TYPE.WAVE_STRATEGY:
+			return JumpButtonType.WaveRoom;
+		case QUEST_TYPE.SERIES:
+			return JumpButtonType.seriesRoom;
+		case QUEST_TYPE.ORDER:
+			return JumpButtonType.orderRoom;
+		case QUEST_TYPE.EVENT:
+			return JumpButtonType.eventRoom;
+		default:
+			return JumpButtonType.Invalid;
+		}
+	}
 
 	public override void Initialize()
 	{
@@ -186,6 +231,7 @@ public class QuestDeliveryDetail : GameSection
 		SetBaseFrame();
 		SetTargetFrame();
 		SetSubmissionFrame();
+		completeJumpButton = false;
 		base.Initialize();
 	}
 
@@ -193,7 +239,7 @@ public class QuestDeliveryDetail : GameSection
 	{
 		if (HomeTutorialManager.DoesTutorial() && !isInGameScene)
 		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep2_2", null);
+			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep2_2");
 		}
 	}
 
@@ -201,7 +247,7 @@ public class QuestDeliveryDetail : GameSection
 	{
 		if (!TutorialStep.HasAllTutorialCompleted() && !isInGameScene)
 		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep5_1", null);
+			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep5_1");
 		}
 	}
 
@@ -219,18 +265,72 @@ public class QuestDeliveryDetail : GameSection
 	{
 	}
 
+	protected virtual Enum GetBtnChangeEquipValue()
+	{
+		return UI.BTN_CHANGE_EQUIP;
+	}
+
+	protected virtual bool IsChangableEquip()
+	{
+		return false;
+	}
+
+	protected void AdjustBtnPosToChangableEquipUI1Btn()
+	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		Transform val = FindCtrl(baseRoot, GetBtnChangeEquipValue());
+		if (!(val == null))
+		{
+			val.set_localPosition(GetEquipBtnPos());
+			SetActive(baseRoot, GetBtnChangeEquipValue(), is_visible: true);
+		}
+	}
+
+	protected virtual Vector3 GetEquipBtnPos()
+	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		return new Vector3(170f, -340f, 0f);
+	}
+
+	private void AdjustBtnPositionToChangableEquipUI(JumpButtonType type)
+	{
+		if (isInGameScene || !IsChangableEquip())
+		{
+			SetActive(baseRoot, GetBtnChangeEquipValue(), is_visible: false);
+			return;
+		}
+		switch (type)
+		{
+		case JumpButtonType.Invalid:
+		case JumpButtonType.Complete:
+		case JumpButtonType.Gacha:
+		case JumpButtonType.Smith:
+		case JumpButtonType.Status:
+		case JumpButtonType.Storage:
+		case JumpButtonType.PointShop:
+		case JumpButtonType.WaveRoom:
+		case JumpButtonType.seriesRoom:
+		case JumpButtonType.orderRoom:
+		case JumpButtonType.eventRoom:
+			break;
+		case JumpButtonType.Map:
+		case JumpButtonType.Quest:
+		case JumpButtonType.WorldMap:
+			AdjustBtnPosToChangableEquipUI1Btn();
+			break;
+		}
+	}
+
 	protected void UpdateSubMissionButton()
 	{
 		uint questId = info.needs[0].questId;
 		if (questId == 0)
 		{
-			SetActive((Enum)UI.BTN_SUBMISSION, false);
+			SetActive((Enum)UI.BTN_SUBMISSION, is_visible: false);
+			return;
 		}
-		else
-		{
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
-			SetActive((Enum)UI.BTN_SUBMISSION, questData.IsMissionExist());
-		}
+		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
+		SetActive((Enum)UI.BTN_SUBMISSION, questData.IsMissionExist());
 	}
 
 	protected void UpdateSubMission()
@@ -265,54 +365,54 @@ public class QuestDeliveryDetail : GameSection
 			UI.SPR_CROWN_2,
 			UI.SPR_CROWN_3
 		};
-		if (info.needs.Length != 0)
+		if (info.needs.Length == 0)
 		{
-			uint questId = info.needs[0].questId;
-			if (questId != 0)
+			return;
+		}
+		uint questId = info.needs[0].questId;
+		if (questId == 0)
+		{
+			return;
+		}
+		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
+		if (!questData.IsMissionExist())
+		{
+			SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, is_visible: false);
+			return;
+		}
+		ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questId);
+		if (clearStatusQuestData == null)
+		{
+			SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, is_visible: true);
+			int i = 0;
+			for (int num = questData.missionID.Length; i < num; i++)
 			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
-				if (!questData.IsMissionExist())
+				uint num2 = questData.missionID[i];
+				SetActive(submissionFrame, array[i], num2 != 0);
+				SetActive(submissionFrame, array2[i], num2 != 0);
+				SetActive(submissionFrame, array3[i], num2 != 0);
+				if (num2 != 0)
 				{
-					SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, false);
+					SetActive(submissionFrame, array4[i], is_visible: false);
+					SetActive(submissionFrame, array5[i], is_visible: false);
+					QuestTable.MissionTableData missionData = Singleton<QuestTable>.I.GetMissionData(num2);
+					SetLabelText(submissionFrame, array3[i], missionData.missionText);
 				}
-				else
-				{
-					ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questId);
-					if (clearStatusQuestData == null)
-					{
-						SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, true);
-						int i = 0;
-						for (int num = questData.missionID.Length; i < num; i++)
-						{
-							uint num2 = questData.missionID[i];
-							SetActive(submissionFrame, array[i], num2 != 0);
-							SetActive(submissionFrame, array2[i], num2 != 0);
-							SetActive(submissionFrame, array3[i], num2 != 0);
-							if (num2 != 0)
-							{
-								SetActive(submissionFrame, array4[i], false);
-								SetActive(submissionFrame, array5[i], false);
-								QuestTable.MissionTableData missionData = Singleton<QuestTable>.I.GetMissionData(num2);
-								SetLabelText(submissionFrame, array3[i], missionData.missionText);
-							}
-						}
-					}
-					else
-					{
-						SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, true);
-						int j = 0;
-						for (int count = clearStatusQuestData.missionStatus.Count; j < count; j++)
-						{
-							CLEAR_STATUS cLEAR_STATUS = (CLEAR_STATUS)clearStatusQuestData.missionStatus[j];
-							SetActive(submissionFrame, array[j], questData.missionID[j] != 0);
-							SetActive(submissionFrame, array2[j], questData.missionID[j] != 0);
-							SetActive(submissionFrame, array4[j], cLEAR_STATUS >= CLEAR_STATUS.CLEAR);
-							SetActive(submissionFrame, array5[j], cLEAR_STATUS >= CLEAR_STATUS.CLEAR);
-							QuestTable.MissionTableData missionData2 = Singleton<QuestTable>.I.GetMissionData(questData.missionID[j]);
-							SetLabelText(submissionFrame, array3[j], missionData2.missionText);
-						}
-					}
-				}
+			}
+		}
+		else
+		{
+			SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, is_visible: true);
+			int j = 0;
+			for (int count = clearStatusQuestData.missionStatus.Count; j < count; j++)
+			{
+				CLEAR_STATUS cLEAR_STATUS = (CLEAR_STATUS)clearStatusQuestData.missionStatus[j];
+				SetActive(submissionFrame, array[j], questData.missionID[j] != 0);
+				SetActive(submissionFrame, array2[j], questData.missionID[j] != 0);
+				SetActive(submissionFrame, array4[j], cLEAR_STATUS >= CLEAR_STATUS.CLEAR);
+				SetActive(submissionFrame, array5[j], cLEAR_STATUS >= CLEAR_STATUS.CLEAR);
+				QuestTable.MissionTableData missionData2 = Singleton<QuestTable>.I.GetMissionData(questData.missionID[j]);
+				SetLabelText(submissionFrame, array3[j], missionData2.missionText);
 			}
 		}
 	}
@@ -325,22 +425,17 @@ public class QuestDeliveryDetail : GameSection
 			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 			if (enemyData != null)
 			{
-				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, FindCtrl(targetFrame, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
+				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, FindCtrl(targetFrame, UI.OBJ_ENEMY), enemyData.element);
 			}
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e4: Expected O, but got Unknown
-		//IL_05e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_065e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_067b: Unknown result type (might be due to invalid IL or missing references)
 		OpenTutorial();
 		UpdateTitle();
 		SetSprite(baseRoot, UI.SPR_WINDOW, SPR_WINDOW_TYPE[info.DeliveryTypeIndex()]);
@@ -361,8 +456,8 @@ public class QuestDeliveryDetail : GameSection
 		SetLabelText(root, UI.LBL_HAVE, (!isComplete) ? have.ToString() : need.ToString());
 		SetColor(root, UI.LBL_HAVE, (!isComplete) ? Color.get_red() : Color.get_white());
 		SetLabelText(root, UI.LBL_NEED, need.ToString());
-		SetLabelText(root, UI.LBL_NEED_ITEM_NAME, MonoBehaviourSingleton<DeliveryManager>.I.GetTargetItemName(deliveryID, 0u));
-		if (info.IsDefeatCondition(0u))
+		SetLabelText(root, UI.LBL_NEED_ITEM_NAME, MonoBehaviourSingleton<DeliveryManager>.I.GetTargetItemName(deliveryID));
+		if (info.IsDefeatCondition())
 		{
 			if (targetQuestID != 0)
 			{
@@ -372,8 +467,8 @@ public class QuestDeliveryDetail : GameSection
 				int j = 0;
 				for (int childCount = val.get_childCount(); j < childCount; j++)
 				{
-					Transform t2 = val.GetChild(j);
-					SetActive(t2, j <= value);
+					Transform child = val.GetChild(j);
+					SetActive(child, j <= value);
 				}
 				SetLabelText(root, UI.LBL_GET_PLACE, base.sectionData.GetText("GET_QUEST"));
 			}
@@ -387,7 +482,7 @@ public class QuestDeliveryDetail : GameSection
 		else
 		{
 			isQuestEnemy = false;
-			SetLabelText(root, UI.LBL_GET_PLACE, StringTable.Get(STRING_CATEGORY.DELIVERY_CONDITION_PLACE, (uint)info.GetConditionType(0u)));
+			SetLabelText(root, UI.LBL_GET_PLACE, StringTable.Get(STRING_CATEGORY.DELIVERY_CONDITION_PLACE, (uint)info.GetConditionType()));
 			SetLabelText(root, UI.LBL_ENEMY_NAME, enemy_name);
 		}
 		SetActive(root, UI.OBJ_DIFFICULTY_ROOT, isQuestEnemy);
@@ -395,18 +490,22 @@ public class QuestDeliveryDetail : GameSection
 		UpdateNPC(map_name, enemy_name);
 		if ((isComplete || isNotice) && !isCompletedEventDelivery)
 		{
-			SetActive((Enum)UI.OBJ_BACK, false);
-			SetActive((Enum)UI.BTN_CREATE, false);
-			SetActive((Enum)UI.BTN_JOIN, false);
-			SetActive((Enum)UI.BTN_MATCHING, false);
-			UpdateUIJumpButton(JumpButtonType.Complete);
+			SetActive((Enum)UI.OBJ_BACK, is_visible: false);
+			SetActive((Enum)UI.BTN_CREATE, is_visible: false);
+			SetActive((Enum)UI.BTN_JOIN, is_visible: false);
+			SetActive((Enum)UI.BTN_MATCHING, is_visible: false);
+			SetActive(GetBtnChangeEquipValue(), is_visible: false);
+			if (isNotice)
+			{
+				UpdateUIJumpButton(JumpButtonType.Complete);
+			}
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_BACK, true);
+			SetActive((Enum)UI.OBJ_BACK, is_visible: true);
 			bool flag2 = true;
 			bool flag3 = false;
-			if (info == null || info.IsDefeatCondition(0u) || targetMapID != 0)
+			if (info == null || info.IsDefeatCondition() || targetMapID != 0)
 			{
 				if (isQuestEnemy)
 				{
@@ -460,6 +559,10 @@ public class QuestDeliveryDetail : GameSection
 			{
 				flag2 = (info.GetDeliveryJumpType() != DeliveryTable.DELIVERY_JUMPTYPE.UNDEFINED);
 			}
+			if (info != null && info.subType == DELIVERY_SUB_TYPE.READ_STORY)
+			{
+				flag2 = false;
+			}
 			JumpButtonType jumpButtonType = JumpButtonType.Invalid;
 			if (flag2)
 			{
@@ -472,12 +575,12 @@ public class QuestDeliveryDetail : GameSection
 					if (info != null)
 					{
 						QuestTable.QuestTableData questData = info.GetQuestData();
-						if (questData != null && questData.questType == QUEST_TYPE.WAVE)
+						if (questData != null)
 						{
-							jumpButtonType = JumpButtonType.WaveRoom;
+							jumpButtonType = GetJumpButtonTypeByQuestType(questData.questType);
 						}
 					}
-					if (jumpButtonType != JumpButtonType.WaveRoom)
+					if (jumpButtonType != JumpButtonType.WaveRoom && jumpButtonType != JumpButtonType.seriesRoom && jumpButtonType != JumpButtonType.orderRoom && jumpButtonType != JumpButtonType.eventRoom)
 					{
 						jumpButtonType = ((!flag3) ? JumpButtonType.Quest : JumpButtonType.Map);
 					}
@@ -486,14 +589,15 @@ public class QuestDeliveryDetail : GameSection
 			}
 			else
 			{
-				SetActive(baseRoot, UI.BTN_JUMP_QUEST, false);
-				SetActive(baseRoot, UI.BTN_JUMP_MAP, false);
-				SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, false);
-				SetActive(baseRoot, UI.BTN_JUMP_INVALID, false);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, false);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, false);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, false);
-				SetActive(baseRoot, UI.BTN_COMPLETE, false);
+				SetActive(baseRoot, UI.BTN_JUMP_QUEST, is_visible: false);
+				SetActive(baseRoot, UI.BTN_JUMP_MAP, is_visible: false);
+				SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, is_visible: false);
+				SetActive(baseRoot, UI.BTN_JUMP_INVALID, is_visible: false);
+				SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, is_visible: false);
+				SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, is_visible: false);
+				SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, is_visible: false);
+				SetActive(baseRoot, UI.BTN_COMPLETE, is_visible: false);
+				SetActive(GetBtnChangeEquipValue(), is_visible: false);
 			}
 			if (flag3 && MonoBehaviourSingleton<FieldManager>.I.currentMapID != targetMapID)
 			{
@@ -506,9 +610,10 @@ public class QuestDeliveryDetail : GameSection
 		}
 		int money = 0;
 		int exp = 0;
+		int carnivalPoint = 0;
 		if (rewardData != null)
 		{
-			SetGrid(baseRoot, UI.GRD_REWARD, string.Empty, rewardData.Length, false, delegate(int i, Transform t, bool is_recycle)
+			SetGrid(baseRoot, UI.GRD_REWARD, string.Empty, rewardData.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 			{
 				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewardData[i].reward;
 				bool is_visible = false;
@@ -520,18 +625,27 @@ public class QuestDeliveryDetail : GameSection
 				{
 					exp += reward.num;
 				}
+				else if (reward.type == REWARD_TYPE.RANKING_POINT)
+				{
+					carnivalPoint += reward.num;
+				}
 				else
 				{
 					is_visible = true;
-					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, string.Empty, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
-					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id, null);
-					itemIcon.SetRewardBG(true);
+					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, string.Empty, 0, is_new: false, -1, is_select: false, null, is_equipping: false, disable_rarity_text: false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
+					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id);
+					itemIcon.SetRewardBG(is_visible: true);
 				}
 				SetActive(t, is_visible);
 			});
 		}
 		SetLabelText(baseRoot, UI.LBL_MONEY, money.ToString());
 		SetLabelText(baseRoot, UI.LBL_EXP, exp.ToString());
+		SetActive((Enum)UI.OBJ_CARNIVAL_ROOT, carnivalPoint > 0);
+		if (carnivalPoint > 0)
+		{
+			SetLabelText(baseRoot, UI.LBL_POINT_CARNIVAL, carnivalPoint.ToString());
+		}
 		SetActive(baseRoot, UI.OBJ_COMPLETE_ROOT, isComplete && !flag);
 		SetActive(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, isComplete);
 		if (isComplete)
@@ -564,7 +678,7 @@ public class QuestDeliveryDetail : GameSection
 			SetLabelText(baseRoot, UI.LBL_UNLOCK_PORTAL, text);
 			if (isCompletedEventDelivery)
 			{
-				SkipTween(baseRoot, UI.OBJ_COMPLETE_ROOT, true, 0);
+				SkipTween(baseRoot, UI.OBJ_COMPLETE_ROOT);
 			}
 			else
 			{
@@ -578,47 +692,55 @@ public class QuestDeliveryDetail : GameSection
 	{
 		while (GameSceneManager.isAutoEventSkip)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		string effectName = "ef_ui_portal_unlock_01";
 		if (is_unlock_portal)
 		{
 			LoadingQueue load_queue = new LoadingQueue(this);
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
-			yield return (object)load_queue.Wait();
-			ResetTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, 0);
+			yield return load_queue.Wait();
+			ResetTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT);
 		}
 		PlayCompleteTween(delegate
 		{
-			((_003CStartTweenCoroutine_003Ec__Iterator85)/*Error near IL_00c1: stateMachine*/)._003C_003Ef__this.OnEndCompletetween(((_003CStartTweenCoroutine_003Ec__Iterator85)/*Error near IL_00c1: stateMachine*/).is_unlock_portal, ((_003CStartTweenCoroutine_003Ec__Iterator85)/*Error near IL_00c1: stateMachine*/)._003CeffectName_003E__0);
+			OnEndCompletetween(is_unlock_portal, effectName);
 		});
 		CompleteTutorial();
 	}
 
 	private void PlayCompleteTween(EventDelegate.Callback callback)
 	{
-		ResetTween(baseRoot, UI.OBJ_COMPLETE_ROOT, 0);
-		PlayTween(baseRoot, UI.OBJ_COMPLETE_ROOT, true, delegate
+		ResetTween(baseRoot, UI.OBJ_COMPLETE_ROOT);
+		PlayTween(baseRoot, UI.OBJ_COMPLETE_ROOT, forward: true, delegate
 		{
-			PlayAudio(AUDIO.REQUEST_COMPLETE, 1f, false);
+			PlayAudio(AUDIO.REQUEST_COMPLETE);
 			callback();
-		}, false, 0);
+		}, is_input_block: false);
 	}
 
 	protected virtual void OnEndCompletetween(bool is_unlock_portal, string effectName)
 	{
+		completeJumpButton = true;
 		if (is_unlock_portal)
 		{
-			PlayUnlockPortalTween(effectName);
+			PlayUnlockPortalTween(effectName, delegate
+			{
+				UpdateUIJumpButton(JumpButtonType.Complete);
+				DispMessageEventOpen();
+			});
+			return;
 		}
+		UpdateUIJumpButton(JumpButtonType.Complete);
+		DispMessageEventOpen();
 	}
 
-	protected void PlayUnlockPortalTween(string effectName)
+	protected void PlayUnlockPortalTween(string effectName, Action callback)
 	{
 		Transform ctrl = GetCtrl(UI.OBJ_UNLOCK_PORTAL_ROOT);
 		if (ctrl != null)
 		{
-			Transform uIEffect = EffectManager.GetUIEffect(effectName, ctrl, -0.2f, 0, null);
+			Transform uIEffect = EffectManager.GetUIEffect(effectName, ctrl, -0.2f);
 			if (uIEffect != null)
 			{
 				rymFX component = uIEffect.GetComponent<rymFX>();
@@ -628,10 +750,36 @@ public class QuestDeliveryDetail : GameSection
 				}
 			}
 		}
-		PlayTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, true, delegate
+		PlayTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, forward: true, delegate
 		{
-			PlayAudio(AUDIO.UNLOCKE_PORTAL, 1f, true);
-		}, false, 0);
+			PlayAudio(AUDIO.UNLOCKE_PORTAL, 1f, as_jingle: true);
+			callback();
+		}, is_input_block: false);
+	}
+
+	protected void DispMessageEventOpen()
+	{
+		if (MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds != null && MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.Count != 0)
+		{
+			hasDispedMessage = true;
+			int releasedEventId = MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds[0];
+			MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.RemoveAt(0);
+			Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
+			where e.eventId == releasedEventId
+			select e).First();
+			if (eventData == null)
+			{
+				Debug.LogError((object)"イベント開放に関して、指定されたIDのイベントが存在しません");
+				DispMessageEventOpen();
+			}
+			else
+			{
+				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, string.Format(StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 4u), eventData.name)), delegate
+				{
+					DispMessageEventOpen();
+				});
+			}
+		}
 	}
 
 	protected virtual void UpdateTitle()
@@ -656,48 +804,54 @@ public class QuestDeliveryDetail : GameSection
 		if (!TutorialStep.HasFirstDeliveryCompleted())
 		{
 			GameSection.StopEvent();
-			DispatchEvent("TUTORIAL_TO_FIELD", null);
+			DispatchEvent("TUTORIAL_TO_FIELD");
+			return;
 		}
-		else
+		PlayAudio(AUDIO.GO_TO_FIELD);
+		if (isQuestEnemy)
 		{
-			PlayAudio(AUDIO.GO_TO_FIELD, 1f, false);
-			if (isQuestEnemy)
+			if (!isInGameScene)
 			{
-				if (!isInGameScene)
+				EventData[] autoEvents = new EventData[3]
 				{
-					EventData[] autoEvents = new EventData[3]
-					{
-						new EventData("[BACK]", null),
-						new EventData("TAB_QUEST", (uint)deliveryID),
-						new EventData("SELECT_QUEST", targetQuestID)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-				}
+					new EventData("[BACK]", null),
+					new EventData("TAB_QUEST", (uint)deliveryID),
+					new EventData("SELECT_QUEST", targetQuestID)
+				};
+				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 			}
-			else
-			{
-				FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(targetMapID);
-				if (fieldMapData == null || fieldMapData.jumpPortalID == 0)
-				{
-					Log.Error("QuestDeliveryDetail.JumpQuest() jumpPortalID is not found.");
-				}
-				else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
-				{
-					MonoBehaviourSingleton<WorldMapManager>.I.SetJumpPortalID(fieldMapData.jumpPortalID);
-					GameSection.StopEvent();
-					DispatchEvent("QUEST_TO_FIELD", null);
-				}
-				else if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.currentMapID != targetMapID)
-				{
-					MonoBehaviourSingleton<InGameProgress>.I.PortalNext(fieldMapData.jumpPortalID);
-				}
-			}
+			return;
+		}
+		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(targetMapID);
+		if (fieldMapData == null || fieldMapData.jumpPortalID == 0)
+		{
+			Log.Error("QuestDeliveryDetail.JumpQuest() jumpPortalID is not found.");
+		}
+		else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
+		{
+			MonoBehaviourSingleton<WorldMapManager>.I.SetJumpPortalID(fieldMapData.jumpPortalID);
+			GameSection.StopEvent();
+			DispatchEvent("QUEST_TO_FIELD");
+		}
+		else if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.currentMapID != targetMapID)
+		{
+			MonoBehaviourSingleton<InGameProgress>.I.PortalNext(fieldMapData.jumpPortalID);
 		}
 	}
 
 	protected void OnQuery_TO_SMITH()
 	{
-		ToSmith();
+		XorUInt targetId;
+		SMITH_SECTION smithSection = GetSmithSection(info, out targetId);
+		MonoBehaviourSingleton<StatusManager>.I.InitUniqueEquip();
+		if (smithSection == SMITH_SECTION.INVALID)
+		{
+			ToSmith();
+		}
+		else
+		{
+			ToSmith(smithSection, targetId);
+		}
 	}
 
 	protected void OnQuery_TO_STATUS()
@@ -720,59 +874,83 @@ public class QuestDeliveryDetail : GameSection
 		OnQuery_MAIN_MENU_QUEST();
 	}
 
+	public void OnQuery_PORTAL_RELEASE()
+	{
+		object eventData = GameSection.GetEventData();
+		if (eventData is List<uint>)
+		{
+			GameSaveData.instance.newReleasePortals = (eventData as List<uint>);
+		}
+		if (MonoBehaviourSingleton<DeliveryManager>.I.isNoticeNewDeliveryAtHomeScene)
+		{
+			MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame = new List<int>(MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene);
+			MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Clear();
+			MonoBehaviourSingleton<InGameProgress>.I.DeliveryAddCheck();
+		}
+		else
+		{
+			MonoBehaviourSingleton<DeliveryManager>.I.CheckAnnouncePortalOpen();
+		}
+	}
+
 	protected virtual void UpdateUIJumpButton(JumpButtonType type)
 	{
-		SetActive(baseRoot, UI.BTN_JUMP_QUEST, false);
-		SetActive(baseRoot, UI.BTN_JUMP_MAP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_INVALID, false);
-		SetActive(baseRoot, UI.BTN_COMPLETE, false);
-		SetActive(baseRoot, UI.BTN_JUMP_POINT_SHOP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_WORLDMAP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_SMITH, false);
-		SetActive(baseRoot, UI.BTN_JUMP_STATUS, false);
-		SetActive(baseRoot, UI.BTN_JUMP_STORAGE, false);
-		SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, false);
-		SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, false);
-		SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, false);
+		SetActive(baseRoot, UI.BTN_JUMP_QUEST, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_MAP, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_INVALID, is_visible: false);
+		SetActive(baseRoot, UI.BTN_COMPLETE, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_POINT_SHOP, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_WORLDMAP, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_SMITH, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_STATUS, is_visible: false);
+		SetActive(baseRoot, UI.BTN_JUMP_STORAGE, is_visible: false);
+		SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, is_visible: false);
+		SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, is_visible: false);
+		SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, is_visible: false);
+		SetActive(baseRoot, GetBtnChangeEquipValue(), is_visible: false);
+		AdjustBtnPositionToChangableEquipUI(type);
 		switch (type)
 		{
 		default:
-			SetActive(baseRoot, UI.BTN_JUMP_INVALID, true);
+			SetActive(baseRoot, UI.BTN_JUMP_INVALID, is_visible: true);
 			break;
 		case JumpButtonType.Complete:
-			SetActive(baseRoot, UI.BTN_COMPLETE, true);
+			SetActive(baseRoot, UI.BTN_COMPLETE, is_visible: true);
 			break;
 		case JumpButtonType.Map:
-			SetActive(baseRoot, UI.BTN_JUMP_MAP, true);
+			SetActive(baseRoot, UI.BTN_JUMP_MAP, is_visible: true);
 			break;
 		case JumpButtonType.Quest:
-			SetActive(baseRoot, UI.BTN_JUMP_QUEST, true);
+			SetActive(baseRoot, UI.BTN_JUMP_QUEST, is_visible: true);
 			break;
 		case JumpButtonType.Gacha:
-			SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, true);
+			SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, is_visible: true);
 			break;
 		case JumpButtonType.Smith:
-			SetActive(baseRoot, UI.BTN_JUMP_SMITH, true);
+			SetActive(baseRoot, UI.BTN_JUMP_SMITH, is_visible: true);
 			break;
 		case JumpButtonType.Status:
-			SetActive(baseRoot, UI.BTN_JUMP_STATUS, true);
+			SetActive(baseRoot, UI.BTN_JUMP_STATUS, is_visible: true);
 			break;
 		case JumpButtonType.Storage:
-			SetActive(baseRoot, UI.BTN_JUMP_STORAGE, true);
+			SetActive(baseRoot, UI.BTN_JUMP_STORAGE, is_visible: true);
 			break;
 		case JumpButtonType.PointShop:
-			SetActive(baseRoot, UI.BTN_JUMP_POINT_SHOP, true);
+			SetActive(baseRoot, UI.BTN_JUMP_POINT_SHOP, is_visible: true);
 			break;
 		case JumpButtonType.WorldMap:
-			SetActive(baseRoot, UI.BTN_JUMP_WORLDMAP, true);
+			SetActive(baseRoot, UI.BTN_JUMP_WORLDMAP, is_visible: true);
 			break;
 		case JumpButtonType.WaveRoom:
+		case JumpButtonType.seriesRoom:
+		case JumpButtonType.orderRoom:
+		case JumpButtonType.eventRoom:
 			if (!isInGameScene)
 			{
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, true);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, true);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, true);
+				SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, is_visible: true);
+				SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, is_visible: true);
+				SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, is_visible: true);
 			}
 			break;
 		}
@@ -809,46 +987,47 @@ public class QuestDeliveryDetail : GameSection
 			if (Singleton<TutorialMessageTable>.IsValid())
 			{
 				TutorialReadData readData2 = Singleton<TutorialMessageTable>.I.ReadData;
-				readData2.SetReadId(10003, true);
+				readData2.SetReadId(10003, hasRead: true);
 				readData2.Save();
 			}
 		}
 		if (flag2)
 		{
-			RequestEvent("DIRECT_REGION_TUTORIAL", null);
+			RequestEvent("DIRECT_REGION_TUTORIAL");
 		}
 		else
 		{
-			RequestEvent("DIRECT_REGION_QUEST", null);
+			RequestEvent("DIRECT_REGION_QUEST");
 		}
 	}
 
 	private IEnumerator SetPointShopGetPointUI()
 	{
-		if (pointShopGetPointData != null && pointShopGetPointData.Count > 0)
+		if (pointShopGetPointData == null || pointShopGetPointData.Count <= 0)
 		{
-			LoadingQueue queue = new LoadingQueue(this);
-			queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)pointShopGetPointData[0].pointShopId), false);
+			yield break;
+		}
+		LoadingQueue queue = new LoadingQueue(this);
+		queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)pointShopGetPointData[0].pointShopId));
+		if (queue.IsLoading())
+		{
+			yield return queue.Wait();
+		}
+		SetActive((Enum)UI.OBJ_NORMAL_ROOT, is_visible: true);
+		SetLabelText((Enum)UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[0].basePoint));
+		UITexture normalTex = GetCtrl(UI.TEX_NORMAL_ICON).GetComponent<UITexture>();
+		ResourceLoad.LoadPointIconImageTexture(normalTex, pointShopGetPointData[0].pointShopId);
+		if (pointShopGetPointData.Count >= 2)
+		{
+			queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)pointShopGetPointData[1].pointShopId));
 			if (queue.IsLoading())
 			{
-				yield return (object)queue.Wait();
+				yield return queue.Wait();
 			}
-			SetActive((Enum)UI.OBJ_NORMAL_ROOT, true);
-			SetLabelText((Enum)UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[0].basePoint));
-			UITexture normalTex = GetCtrl(UI.TEX_NORMAL_ICON).GetComponent<UITexture>();
-			ResourceLoad.LoadPointIconImageTexture(normalTex, pointShopGetPointData[0].pointShopId);
-			if (pointShopGetPointData.Count >= 2)
-			{
-				queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)pointShopGetPointData[1].pointShopId), false);
-				if (queue.IsLoading())
-				{
-					yield return (object)queue.Wait();
-				}
-				SetActive((Enum)UI.OBJ_EVENT_ROOT, true);
-				SetLabelText((Enum)UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[1].basePoint));
-				UITexture eventTex = GetCtrl(UI.TEX_EVENT_ICON).GetComponent<UITexture>();
-				ResourceLoad.LoadPointIconImageTexture(eventTex, pointShopGetPointData[1].pointShopId);
-			}
+			SetActive((Enum)UI.OBJ_EVENT_ROOT, is_visible: true);
+			SetLabelText((Enum)UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[1].basePoint));
+			UITexture eventTex = GetCtrl(UI.TEX_EVENT_ICON).GetComponent<UITexture>();
+			ResourceLoad.LoadPointIconImageTexture(eventTex, pointShopGetPointData[1].pointShopId);
 		}
 	}
 
@@ -876,7 +1055,7 @@ public class QuestDeliveryDetail : GameSection
 	protected void WaveMatchNew()
 	{
 		QuestTable.QuestTableData questData = info.GetQuestData();
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID);
 		GameSection.SetEventData(new object[1]
 		{
 			questData.questType
@@ -885,7 +1064,7 @@ public class QuestDeliveryDetail : GameSection
 
 	protected void WaveMatchPass()
 	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId);
 	}
 
 	protected void WaveMatchAuto()
@@ -896,13 +1075,12 @@ public class QuestDeliveryDetail : GameSection
 		});
 		GameSection.StayEvent();
 		int retryCount = 0;
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		PartyManager.PartySetting setting = new PartyManager.PartySetting(is_lock: false, 0, 0);
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			if (!is_success)
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 			else if (maxRetryCount > 0)
 			{
@@ -916,7 +1094,7 @@ public class QuestDeliveryDetail : GameSection
 			else
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 		});
 	}
@@ -924,33 +1102,32 @@ public class QuestDeliveryDetail : GameSection
 	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
 		yield return (object)new WaitForSeconds(time);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
+		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			if (!is_success)
 			{
-				GameSection.ResumeEvent(false, null);
+				GameSection.ResumeEvent(is_resume: false);
 			}
 			else if (maxRetryCount > 0)
 			{
-				if (((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).retryCount >= maxRetryCount)
+				if (retryCount >= maxRetryCount)
 				{
-					((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.WaveMatchCreate();
+					WaveMatchCreate();
 				}
 				else
 				{
-					((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).retryCount++;
-					((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.MatchAtRandom(((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).setting, ((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).retryCount, waitTime));
+					retryCount++;
+					this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 				}
 			}
 			else if (!isJoined)
 			{
-				((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.WaveMatchCreate();
+				WaveMatchCreate();
 			}
 			else
 			{
-				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).setting);
-				GameSection.ResumeEvent(true, null);
+				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+				GameSection.ResumeEvent(is_resume: true);
 			}
 		});
 	}
@@ -958,19 +1135,236 @@ public class QuestDeliveryDetail : GameSection
 	protected void WaveMatchCreate()
 	{
 		QuestTable.QuestTableData questData = info.GetQuestData();
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID);
 		GameSection.SetEventData(new object[1]
 		{
 			questData.questType
 		});
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
+		PartyManager.PartySetting setting = new PartyManager.PartySetting(is_lock: false, 0, 0);
 		MonoBehaviourSingleton<PartyManager>.I.SendCreate((int)questData.questID, setting, delegate(bool is_success)
 		{
 			if (is_success)
 			{
 				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
+	}
+
+	private void OnQuery_SECTION_BACK()
+	{
+		if (info != null && completeJumpButton)
+		{
+			if (info.GetUIType() == DeliveryTable.UIType.EVENT || info.GetUIType() == DeliveryTable.UIType.SUB_EVENT)
+			{
+				GameSection.StayEvent();
+				MonoBehaviourSingleton<DeliveryManager>.I.SendEventList(delegate
+				{
+					GameSection.ResumeEvent(is_resume: true);
+				});
+			}
+			else if (info.DeliveryTypeIndex() != 1)
+			{
+				GameSection.StayEvent();
+				MonoBehaviourSingleton<DeliveryManager>.I.SendEventNormalList(delegate
+				{
+					GameSection.ResumeEvent(is_resume: true);
+				});
+			}
+		}
+	}
+
+	private SMITH_SECTION GetSmithSection(DeliveryTable.DeliveryData _info, out XorUInt targetId)
+	{
+		targetId = 0u;
+		if (_info == null)
+		{
+			return SMITH_SECTION.INVALID;
+		}
+		SMITH_SECTION sMITH_SECTION = SMITH_SECTION.INVALID;
+		DeliveryTable.DeliveryData.NeedData[] needs = _info.needs;
+		int i = 0;
+		for (int num = needs.Length; i < num; i++)
+		{
+			DeliveryTable.DeliveryData.NeedData needData = needs[i];
+			switch (needData.conditionType)
+			{
+			case DELIVERY_CONDITION_TYPE.CHANGE_ABILITY:
+				targetId = needData.needId;
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)_info.id))
+				{
+					return SMITH_SECTION.CHANGE_ABILITY;
+				}
+				break;
+			case DELIVERY_CONDITION_TYPE.WEAPON_PROTECTOR_GROW:
+			case DELIVERY_CONDITION_TYPE.WEAPON_GROW:
+			case DELIVERY_CONDITION_TYPE.PROTECTOR_GROW:
+			case DELIVERY_CONDITION_TYPE.EQUIP_GROW_MAX_EQUIP_ID_OR:
+				targetId = needData.needId;
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)_info.id) && MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNumWithShadow(targetId) > 0)
+				{
+					return SMITH_SECTION.EQUIP_GROW;
+				}
+				break;
+			case DELIVERY_CONDITION_TYPE.EQUIP_EXCEED:
+				targetId = needData.needId;
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)_info.id) && MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNumWithShadow(targetId) > 0)
+				{
+					return SMITH_SECTION.EQUIP_EXCEED;
+				}
+				break;
+			case DELIVERY_CONDITION_TYPE.WEAPON_PROTECTOR_CREATE:
+			case DELIVERY_CONDITION_TYPE.WEAPON_CREATE:
+			case DELIVERY_CONDITION_TYPE.PROTECTOR_CREATE:
+				targetId = needData.needId;
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)_info.id))
+				{
+					return SMITH_SECTION.EQUIP_CREATE;
+				}
+				break;
+			case DELIVERY_CONDITION_TYPE.WEAPON_PROTECTOR_EVOLVE:
+			case DELIVERY_CONDITION_TYPE.WEAPON_EVOLVE:
+			case DELIVERY_CONDITION_TYPE.PROTECTOR_EVOLVE:
+				targetId = needData.needId;
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)_info.id) && MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNumWithShadow(targetId) > 0)
+				{
+					return SMITH_SECTION.EQUIP_EVOLVE;
+				}
+				break;
+			case DELIVERY_CONDITION_TYPE.MAGI_GROW:
+				targetId = needData.needId;
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)_info.id))
+				{
+					return SMITH_SECTION.MAGI_GROW;
+				}
+				break;
+			case DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID:
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)needData.needId.value))
+				{
+					DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData(needData.needId.value);
+					sMITH_SECTION = GetSmithSection(deliveryTableData, out targetId);
+					if (sMITH_SECTION != 0)
+					{
+						return sMITH_SECTION;
+					}
+				}
+				break;
+			default:
+				sMITH_SECTION = SMITH_SECTION.INVALID;
+				break;
+			}
+		}
+		return sMITH_SECTION;
+	}
+
+	private void ToSmith(SMITH_SECTION section, XorUInt targetId)
+	{
+		if ((uint)targetId == 0)
+		{
+			ToSmith();
+			return;
+		}
+		switch (section)
+		{
+		case SMITH_SECTION.EQUIP_GROW:
+		case SMITH_SECTION.EQUIP_EXCEED:
+		case SMITH_SECTION.EQUIP_EVOLVE:
+		{
+			EquipItemInfo growEquipItem = GetGrowEquipItem(section, targetId);
+			if (growEquipItem == null)
+			{
+				break;
+			}
+			SmithManager.SmithGrowData orCreateSmithData = GetOrCreateSmithData<SmithManager.SmithGrowData>();
+			orCreateSmithData.selectEquipData = growEquipItem;
+			if (growEquipItem.IsLevelMax() && growEquipItem.tableData.IsEvolve())
+			{
+				ChangeSmithScene("SmithEvolve");
+			}
+			else
+			{
+				ChangeSmithScene("SmithGrow");
+			}
+			return;
+		}
+		}
+		ToSmith();
+	}
+
+	private EquipItemInfo GetGrowEquipItem(SMITH_SECTION section, XorUInt targetId)
+	{
+		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = InventoryManager.INVENTORY_TYPE.ALL_EQUIP;
+		EquipItemInfo[] equipInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
+		EquipItemInfo[] array = Array.FindAll(equipInventoryClone, (EquipItemInfo e) => e.tableID == (uint)targetId || e.tableData.shadowEvolveEquipItemId == (uint)targetId);
+		Array.Sort(array, (EquipItemInfo a, EquipItemInfo b) => (b.uniqueID - a.uniqueID < 0) ? 1 : ((b.uniqueID - a.uniqueID != 0) ? (-1) : 0));
+		EquipItemInfo equipItemInfo = null;
+		switch (section)
+		{
+		case SMITH_SECTION.EQUIP_GROW:
+			foreach (EquipItemInfo equipItemInfo3 in array)
+			{
+				if (equipItemInfo == null || (equipItemInfo.IsLevelMax() && !equipItemInfo3.IsLevelMax()))
+				{
+					equipItemInfo = equipItemInfo3;
+				}
+			}
+			break;
+		case SMITH_SECTION.EQUIP_EXCEED:
+			foreach (EquipItemInfo equipItemInfo4 in array)
+			{
+				if (equipItemInfo == null || (equipItemInfo.IsExceedMax() && !equipItemInfo4.IsExceedMax()))
+				{
+					equipItemInfo = equipItemInfo4;
+				}
+			}
+			break;
+		case SMITH_SECTION.EQUIP_EVOLVE:
+			foreach (EquipItemInfo equipItemInfo2 in array)
+			{
+				if (equipItemInfo == null || (equipItemInfo.IsLevelAndEvolveMax() && !equipItemInfo2.IsLevelAndEvolveMax()))
+				{
+					equipItemInfo = equipItemInfo2;
+				}
+			}
+			break;
+		}
+		if (equipItemInfo != null && equipItemInfo.IsLevelAndEvolveMax() && equipItemInfo.IsExceedMax())
+		{
+			equipItemInfo = null;
+		}
+		return equipItemInfo;
+	}
+
+	private SortSettings CreateSortSettings()
+	{
+		SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
+		if (smithData.selectCreateEquipItemType < SortBase.TYPE.ARMOR || smithData.selectCreateEquipItemType == SortBase.TYPE.WEAPON_ALL)
+		{
+			if (smithData.selectCreateEquipItemType == SortBase.TYPE.WEAPON_ALL)
+			{
+				return SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_PICKUP_WEAPON, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM);
+			}
+			return SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_WEAPON, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM);
+		}
+		if (smithData.selectCreateEquipItemType == SortBase.TYPE.ARMOR_ALL)
+		{
+			return SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_PICKUP_ARMOR, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM);
+		}
+		return SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_ARMOR, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM);
+	}
+
+	private T GetOrCreateSmithData<T>() where T : SmithManager.SmithDataBase, new()
+	{
+		T val = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<T>();
+		if (val == null)
+		{
+			val = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<T>();
+		}
+		return val;
+	}
+
+	private void ChangeSmithScene(string to_section)
+	{
+		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Smith", to_section);
 	}
 }

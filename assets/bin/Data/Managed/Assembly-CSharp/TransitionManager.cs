@@ -57,7 +57,7 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 	{
 		while (!MonoBehaviourSingleton<UIManager>.IsValid() || MonoBehaviourSingleton<UIManager>.I.isLoading)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		faderPanel = MonoBehaviourSingleton<UIManager>.I.faderPanel;
 		faderTexture = MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.FADER).GetComponent<UITexture>();
@@ -73,7 +73,6 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	private void OnFaderTweenFinised()
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		if (Object.op_Implicit(faderTexture))
 		{
 			faderTexture.alpha = faderTweenAlpha.to;
@@ -87,7 +86,7 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	private IEnumerator DoFaderTweenFinised()
 	{
-		yield return (object)null;
+		yield return null;
 		isChanging = false;
 		if (!isOut)
 		{
@@ -100,7 +99,7 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 	private void OnEnd()
 	{
 		isTransing = false;
-		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, false);
+		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, is_disable: false);
 	}
 
 	private void FadeOut(Color color, float time, int depth)
@@ -127,7 +126,6 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	private void SetFade(float to, float time)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		faderTweenAlpha.from = faderTweenAlpha.to;
 		faderTweenAlpha.to = to;
 		faderTweenAlpha.get_gameObject().SetActive(true);
@@ -138,40 +136,38 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 
 	private void Begin(TYPE type)
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		if (isTransing)
 		{
 			Log.Error("transing now.");
+			return;
 		}
-		else
+		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, is_disable: true);
+		isOut = true;
+		isChanging = true;
+		isTransing = true;
+		currentType = type;
+		switch (type)
 		{
-			MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, true);
-			isOut = true;
-			isChanging = true;
-			isTransing = true;
-			currentType = type;
-			switch (type)
-			{
-			case TYPE.BLACK:
-				FadeOut(Color.get_black(), 0.15f, 4000);
-				break;
-			case TYPE.WHITE:
-				FadeOut(Color.get_white(), 0.25f, 4000);
-				break;
-			case TYPE.LOADING:
-				MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(true);
-				FadeOut(Color.get_black(), 0.25f, 4000);
-				break;
-			case TYPE.AUTO_EVENT:
-				FadeOut(Color.get_black(), 0.1f, 7000);
-				break;
-			}
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(true);
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(true);
+		case TYPE.BLACK:
+			FadeOut(Color.get_black(), 0.15f, 4000);
+			break;
+		case TYPE.WHITE:
+			FadeOut(Color.get_white(), 0.25f, 4000);
+			break;
+		case TYPE.LOADING:
+			MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(is_show: true);
+			FadeOut(Color.get_black(), 0.25f, 4000);
+			break;
+		case TYPE.AUTO_EVENT:
+			FadeOut(Color.get_black(), 0.1f, 7000);
+			break;
 		}
+		MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(is_show: true);
+		MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(isShow: true);
 	}
 
 	private void End()
@@ -179,40 +175,40 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 		if (isChanging)
 		{
 			Log.Error("changing now.");
+			return;
 		}
-		else
+		isOut = false;
+		isChanging = true;
+		switch (currentType)
 		{
-			isOut = false;
-			isChanging = true;
-			switch (currentType)
+		case TYPE.BLACK:
+			FadeIn(0.15f);
+			break;
+		case TYPE.WHITE:
+			FadeIn(0.25f);
+			break;
+		case TYPE.LOADING:
+			MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(is_show: false);
+			if (MonoBehaviourSingleton<UIManager>.I.isShowingGGTutorialMessage)
 			{
-			case TYPE.BLACK:
-				FadeIn(0.15f);
-				break;
-			case TYPE.WHITE:
-				FadeIn(0.25f);
-				break;
-			case TYPE.LOADING:
-				MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(false);
-				FadeIn(0.25f);
-				break;
-			case TYPE.AUTO_EVENT:
-				FadeIn(0.1f);
-				break;
+				MonoBehaviourSingleton<UIManager>.I.HideGGTutorialMessage();
 			}
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(false);
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(false);
-			if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.TRANSITION_END);
-			}
+			FadeIn(0.25f);
+			break;
+		case TYPE.AUTO_EVENT:
+			FadeIn(0.1f);
+			break;
+		}
+		MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(is_show: false);
+		MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(isShow: false);
+		if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.TRANSITION_END);
 		}
 	}
 
 	public Coroutine Out(TYPE type = TYPE.BLACK)
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
 		if (type == TYPE.NONE)
 		{
 			return null;
@@ -224,22 +220,20 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 	{
 		while (isChanging)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (!MonoBehaviourSingleton<TransitionManager>.I.isTransing)
 		{
 			MonoBehaviourSingleton<TransitionManager>.I.Begin(type);
 			while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 	}
 
 	public Coroutine In()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
 		if (currentType == TYPE.NONE)
 		{
 			return null;
@@ -251,14 +245,14 @@ public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 	{
 		while (isChanging)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
 		{
 			MonoBehaviourSingleton<TransitionManager>.I.End();
 			while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 	}

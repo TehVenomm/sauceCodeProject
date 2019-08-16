@@ -139,7 +139,6 @@ public class InGameQuestAcceptCounter : QuestAcceptCounter
 
 	private void Reposition(bool isPortrait)
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		UIScreenRotationHandler[] components = GetCtrl(UI.OBJ_FRAME).GetComponents<UIScreenRotationHandler>();
 		for (int i = 0; i < components.Length; i++)
 		{
@@ -156,8 +155,6 @@ public class InGameQuestAcceptCounter : QuestAcceptCounter
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (base.transferUI != null)
 		{
 			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();

@@ -3,6 +3,7 @@ package com.google.android.gms.games.snapshot;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.android.gms.common.data.Freezable;
 import com.google.android.gms.games.Game;
@@ -14,8 +15,10 @@ public interface SnapshotMetadata extends Parcelable, Freezable<SnapshotMetadata
 
     float getCoverImageAspectRatio();
 
+    @Nullable
     Uri getCoverImageUri();
 
+    @Nullable
     @KeepName
     @Deprecated
     String getCoverImageUrl();
@@ -24,6 +27,7 @@ public interface SnapshotMetadata extends Parcelable, Freezable<SnapshotMetadata
 
     void getDescription(CharArrayBuffer charArrayBuffer);
 
+    @Nullable
     String getDeviceName();
 
     Game getGame();

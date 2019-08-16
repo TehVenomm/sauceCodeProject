@@ -3,9 +3,9 @@ using System.Threading;
 
 public class XorInt
 {
-	private const int gens = 5;
-
 	private int key;
+
+	private const int gens = 5;
 
 	private static Random[] s_rnds = new Random[5]
 	{
@@ -62,6 +62,16 @@ public class XorInt
 		return x ^ key;
 	}
 
+	public static implicit operator int(XorInt xor)
+	{
+		return xor?.value ?? 0;
+	}
+
+	public static implicit operator XorInt(int val)
+	{
+		return new XorInt(val);
+	}
+
 	public override string ToString()
 	{
 		return value.ToString();
@@ -80,15 +90,5 @@ public class XorInt
 	public string ToString(string format, IFormatProvider provider)
 	{
 		return value.ToString(format, provider);
-	}
-
-	public static implicit operator int(XorInt xor)
-	{
-		return xor?.value ?? 0;
-	}
-
-	public static implicit operator XorInt(int val)
-	{
-		return new XorInt(val);
 	}
 }

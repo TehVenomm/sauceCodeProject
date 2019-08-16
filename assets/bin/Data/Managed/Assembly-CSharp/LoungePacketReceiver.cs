@@ -5,35 +5,36 @@ public class LoungePacketReceiver : PacketReceiver
 {
 	protected override void PacketUpdate()
 	{
-		if (!base.stopPacketUpdate)
+		if (base.stopPacketUpdate)
 		{
-			List<CoopPacket> list = rymTPool<List<CoopPacket>>.Get();
-			if (list.Capacity < base.packets.Count)
-			{
-				list.Capacity = base.packets.Count;
-			}
-			int i = 0;
-			for (int count = base.packets.Count; i < count; i++)
-			{
-				list.Add(base.packets[i]);
-			}
-			int j = 0;
-			for (int count2 = list.Count; j < count2; j++)
-			{
-				if (base.stopPacketUpdate)
-				{
-					break;
-				}
-				CoopPacket packet = list[j];
-				if (HandleCoopEvent(packet))
-				{
-					AddDeleteQueue(packet);
-				}
-			}
-			list.Clear();
-			rymTPool<List<CoopPacket>>.Release(ref list);
-			EraseUsedPacket();
+			return;
 		}
+		List<CoopPacket> list = rymTPool<List<CoopPacket>>.Get();
+		if (list.Capacity < base.packets.Count)
+		{
+			list.Capacity = base.packets.Count;
+		}
+		int i = 0;
+		for (int count = base.packets.Count; i < count; i++)
+		{
+			list.Add(base.packets[i]);
+		}
+		int j = 0;
+		for (int count2 = list.Count; j < count2; j++)
+		{
+			if (base.stopPacketUpdate)
+			{
+				break;
+			}
+			CoopPacket packet = list[j];
+			if (HandleCoopEvent(packet))
+			{
+				AddDeleteQueue(packet);
+			}
+		}
+		list.Clear();
+		rymTPool<List<CoopPacket>>.Release(ref list);
+		EraseUsedPacket();
 	}
 
 	protected override bool HandleCoopEvent(CoopPacket packet)

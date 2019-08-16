@@ -14,7 +14,6 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.SocketFactory;
 import org.apache.http.impl.DefaultHttpClientConnection;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
 
 class PipelinedRequester {
     private static final int RECEIVE_BUFFER_SIZE = 8192;
@@ -37,11 +36,11 @@ class PipelinedRequester {
         this(httpHost, new PlainSocketFactory());
     }
 
-    public PipelinedRequester(HttpHost httpHost, SocketFactory socketFactory) {
+    public PipelinedRequester(HttpHost httpHost, SocketFactory socketFactory2) {
         this.connection = new DefaultHttpClientConnection();
         this.canPipeline = true;
         this.host = httpHost;
-        this.socketFactory = socketFactory;
+        this.socketFactory = socketFactory2;
     }
 
     private void closeConnection() {
@@ -55,7 +54,7 @@ class PipelinedRequester {
 
     private void maybeOpenConnection() throws IOException {
         if (this.connection == null || !this.connection.isOpen()) {
-            HttpParams basicHttpParams = new BasicHttpParams();
+            BasicHttpParams basicHttpParams = new BasicHttpParams();
             Socket connectSocket = this.socketFactory.connectSocket(this.socketFactory.createSocket(), this.host.getHostName(), this.host.getPort(), null, 0, basicHttpParams);
             connectSocket.setReceiveBufferSize(8192);
             this.connection.bind(connectSocket, basicHttpParams);
@@ -72,8 +71,8 @@ class PipelinedRequester {
         closeConnection();
     }
 
-    public void installCallbacks(Callbacks callbacks) {
-        this.callbacks = callbacks;
+    public void installCallbacks(Callbacks callbacks2) {
+        this.callbacks = callbacks2;
     }
 
     public void sendRequests() throws IOException, HttpException {

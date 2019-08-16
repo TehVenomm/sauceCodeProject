@@ -1,20 +1,34 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletControllerBreakable : BulletControllerBase
 {
-	private const float IS_LAND_HIT_MARGIN = 1f;
+	private class HitTimerInfo
+	{
+		public string name;
+
+		public float timer;
+
+		public HitTimerInfo(string name, float timer)
+		{
+			this.name = name;
+			this.timer = timer;
+		}
+	}
 
 	private const float OFFSET_TARGET_HEIGHT = 1f;
 
 	private BulletData.BulletBreakable.MOVE_TYPE moveType;
 
-	private bool isBreak;
+	private List<HitTimerInfo> hitTimerInfoList = new List<HitTimerInfo>();
 
 	private int breakCount;
 
 	private int hitCounter;
 
 	private int ignoreLayerMask;
+
+	private int ignoreHitCountLayerMask;
 
 	private float homingLimit;
 
@@ -26,9 +40,13 @@ public class BulletControllerBreakable : BulletControllerBase
 
 	private float acceleration;
 
-	private StageObject homingTarget;
-
 	private int damageToEndurance;
+
+	private BulletData emissionBulletOnBroken;
+
+	private string emissionBulletAttackInfoName;
+
+	private bool enableEmissionBulletOnBroken => emissionBulletOnBroken != null;
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
@@ -40,6 +58,8 @@ public class BulletControllerBreakable : BulletControllerBase
 			moveType = bullet.dataBreakable.moveType;
 			hitCounter = 0;
 			breakCount = bullet.dataBreakable.breakCount;
+			emissionBulletOnBroken = bullet.dataBreakable.emissionBulletOnBroken;
+			emissionBulletAttackInfoName = bullet.dataBreakable.emissionBulletAttackInfoName;
 			if (bullet.dataBreakable.isIgnoreHitEnemyAttack)
 			{
 				ignoreLayerMask |= 40960;
@@ -51,10 +71,6 @@ public class BulletControllerBreakable : BulletControllerBase
 			if (bullet.dataBreakable.isIgnoreHitEnemyMove)
 			{
 				ignoreLayerMask |= 1024;
-			}
-			if (bullet.dataBreakable.isIgnoreHitAttackable)
-			{
-				ignoreLayerMask |= -2147483648;
 			}
 			if (bullet.dataBreakable.isIgnoreHitPlayerBody)
 			{
@@ -68,6 +84,11 @@ public class BulletControllerBreakable : BulletControllerBase
 			{
 				ignoreLayerMask |= 393728;
 			}
+			ignoreHitCountLayerMask = ignoreLayerMask;
+			if (bullet.dataBreakable.isIgnoreHitCountPlayerBody)
+			{
+				ignoreHitCountLayerMask |= 256;
+			}
 			homingLimit = bullet.dataToEndurance.limitAngel;
 			homingChangeStart = bullet.dataToEndurance.limitChangeStartTime;
 			homingChange = bullet.dataToEndurance.limitChangeAngel;
@@ -79,91 +100,96 @@ public class BulletControllerBreakable : BulletControllerBase
 
 	public override void Update()
 	{
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-		if (moveType != 0)
+		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		if (moveType == BulletData.BulletBreakable.MOVE_TYPE.NORMAL)
 		{
-			base.timeCount += Time.get_deltaTime();
-			if (!(homingTarget == null))
+			return;
+		}
+		base.timeCount += Time.get_deltaTime();
+		int i = 0;
+		for (int count = hitTimerInfoList.Count; i < count; i++)
+		{
+			hitTimerInfoList[i].timer -= Time.get_deltaTime();
+		}
+		hitTimerInfoList.RemoveAll((HitTimerInfo item) => item.timer <= 0f);
+		if (targetObject == null)
+		{
+			return;
+		}
+		float velocity = base.initialVelocity + acceleration * base.timeCount;
+		SetVelocity(velocity);
+		float num = homingLimit;
+		if (base.timeCount > homingChangeStart)
+		{
+			num -= homingChange * (base.timeCount - homingChangeStart);
+			if (num < 0f)
 			{
-				float velocity = base.initialVelocity + acceleration * base.timeCount;
-				SetVelocity(velocity);
-				float num = homingLimit;
-				if (base.timeCount > homingChangeStart)
-				{
-					num -= homingChange * (base.timeCount - homingChangeStart);
-					if (num < 0f)
-					{
-						num = 0f;
-					}
-				}
-				num *= Time.get_deltaTime();
-				Vector3 position = base._transform.get_position();
-				Vector3 position2 = homingTarget._transform.get_position();
-				if (hightLock)
-				{
-					position2.y = 0f;
-					position.y = 0f;
-				}
-				else
-				{
-					position2.y += 1f;
-				}
-				Vector3 val = position2 - position;
-				float num2 = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
-				if (num2 != 0f)
-				{
-					float num3 = num / num2;
-					if (num3 > 1f)
-					{
-						num3 = 1f;
-					}
-					base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num3));
-					Vector3 val2 = Vector3.get_forward();
-					val2 = base._transform.get_rotation() * val2;
-					val2 *= base.speed;
-					if (hightLock)
-					{
-						val2.y = 0f;
-					}
-					base._rigidbody.set_velocity(val2);
-				}
+				num = 0f;
 			}
+		}
+		num *= Time.get_deltaTime();
+		Vector3 position = base._transform.get_position();
+		Vector3 position2 = targetObject._transform.get_position();
+		if (hightLock)
+		{
+			position2.y = 0f;
+			position.y = 0f;
+		}
+		else
+		{
+			position2.y += 1f;
+		}
+		Vector3 val = position2 - position;
+		float num2 = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
+		if (num2 != 0f)
+		{
+			float num3 = num / num2;
+			if (num3 > 1f)
+			{
+				num3 = 1f;
+			}
+			base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num3));
+			Vector3 val2 = Vector3.get_forward();
+			val2 = base._transform.get_rotation() * val2;
+			val2 *= base.speed;
+			if (hightLock)
+			{
+				val2.y = 0f;
+			}
+			base._rigidbody.set_velocity(val2);
 		}
 	}
 
 	public override void OnShot()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().set_layer(31);
 	}
 
 	public override bool IsHit(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		if (((1 << collider.get_gameObject().get_layer()) & ignoreLayerMask) > 0)
 		{
 			return false;
@@ -173,17 +199,57 @@ public class BulletControllerBreakable : BulletControllerBase
 		{
 			return false;
 		}
+		AnimEventCollider.AtkColliderHiter atkHiter = collider.get_gameObject().GetComponent<AnimEventCollider.AtkColliderHiter>();
+		if (atkHiter != null)
+		{
+			return !hitTimerInfoList.Exists((HitTimerInfo item) => item.name == atkHiter.attackInfo.name);
+		}
 		return true;
+	}
+
+	public override void OnHit(Collider collider)
+	{
+		if (((1 << collider.get_gameObject().get_layer()) & ignoreHitCountLayerMask) > 0)
+		{
+			return;
+		}
+		hitCounter++;
+		AnimEventCollider.AtkColliderHiter atkHiter = collider.get_gameObject().GetComponent<AnimEventCollider.AtkColliderHiter>();
+		if (atkHiter != null && !hitTimerInfoList.Exists((HitTimerInfo item) => item.name == atkHiter.attackInfo.name))
+		{
+			AttackHitInfo attackHitInfo = atkHiter.attackInfo as AttackHitInfo;
+			if (attackHitInfo != null)
+			{
+				hitTimerInfoList.Add(new HitTimerInfo(attackHitInfo.name, attackHitInfo.hitIntervalTime));
+			}
+		}
+		if (enableEmissionBulletOnBroken && (collider.get_gameObject().get_layer() == 12 || collider.get_gameObject().get_layer() == 14) && IsBreak(collider))
+		{
+			CreateEmissionBulletOnBroken();
+		}
+	}
+
+	private void CreateEmissionBulletOnBroken()
+	{
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		AttackInfo attackInfo = fromObject.FindAttackInfo(emissionBulletAttackInfoName);
+		if (attackInfo == null)
+		{
+			attackInfo = bulletObject.GetAttackInfo();
+		}
+		if (attackInfo != null)
+		{
+			BulletData bulletData = emissionBulletOnBroken;
+			if (!(bulletData == null) && !(fromObject == null))
+			{
+				AnimEventShot.CreateByExternalBulletData(bulletData, fromObject, attackInfo, base._transform.get_position(), base._transform.get_rotation());
+			}
+		}
 	}
 
 	public override bool IsBreak(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		if (((1 << collider.get_gameObject().get_layer()) & ignoreLayerMask) > 0)
-		{
-			return false;
-		}
-		hitCounter++;
 		if (breakCount <= 0 || hitCounter >= breakCount)
 		{
 			return true;
@@ -212,15 +278,5 @@ public class BulletControllerBreakable : BulletControllerBase
 				MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(base._transform.get_position(), 1f, 0.2f);
 			}
 		}
-	}
-
-	public void SetTarget(StageObject obj)
-	{
-		homingTarget = obj;
-	}
-
-	public StageObject GetTarget()
-	{
-		return homingTarget;
 	}
 }

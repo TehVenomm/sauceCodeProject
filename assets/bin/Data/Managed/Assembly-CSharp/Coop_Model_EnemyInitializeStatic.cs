@@ -15,6 +15,7 @@ public static class Coop_Model_EnemyInitializeStatic
 				enemyRegionWork.isShieldDamage = regionWorkSyncData.isShieldDamage;
 				enemyRegionWork.isShieldCriticalDamage = regionWorkSyncData.isShieldCriticalDamage;
 				enemyRegionWork.shadowSealingData = regionWorkSyncData.shadowSealingData;
+				enemyRegionWork.bombArrowDataHistory = regionWorkSyncData.bombArrowDataHistory;
 			}
 		}
 	}

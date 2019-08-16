@@ -3,6 +3,7 @@ package com.fasterxml.jackson.databind.ser;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonInclude.Value;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.PropertyName;
@@ -18,7 +19,8 @@ import java.io.Serializable;
 public abstract class VirtualBeanPropertyWriter extends BeanPropertyWriter implements Serializable {
     private static final long serialVersionUID = 1;
 
-    protected abstract Object value(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws Exception;
+    /* access modifiers changed from: protected */
+    public abstract Object value(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws Exception;
 
     public abstract VirtualBeanPropertyWriter withConfig(MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass, BeanPropertyDefinition beanPropertyDefinition, JavaType javaType);
 
@@ -89,7 +91,7 @@ public abstract class VirtualBeanPropertyWriter extends BeanPropertyWriter imple
                 }
             }
             if (value != obj || !_handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
-                jsonGenerator.writeFieldName(this._name);
+                jsonGenerator.writeFieldName((SerializableString) this._name);
                 if (this._typeSerializer == null) {
                     jsonSerializer.serialize(value, jsonGenerator, serializerProvider);
                 } else {
@@ -97,7 +99,7 @@ public abstract class VirtualBeanPropertyWriter extends BeanPropertyWriter imple
                 }
             }
         } else if (this._nullSerializer != null) {
-            jsonGenerator.writeFieldName(this._name);
+            jsonGenerator.writeFieldName((SerializableString) this._name);
             this._nullSerializer.serialize(null, jsonGenerator, serializerProvider);
         }
     }
@@ -125,12 +127,13 @@ public abstract class VirtualBeanPropertyWriter extends BeanPropertyWriter imple
                     return;
                 }
             }
-            if (value != obj || !_handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
-                if (this._typeSerializer == null) {
-                    jsonSerializer.serialize(value, jsonGenerator, serializerProvider);
-                } else {
-                    jsonSerializer.serializeWithType(value, jsonGenerator, serializerProvider, this._typeSerializer);
-                }
+            if (value == obj && _handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
+                return;
+            }
+            if (this._typeSerializer == null) {
+                jsonSerializer.serialize(value, jsonGenerator, serializerProvider);
+            } else {
+                jsonSerializer.serializeWithType(value, jsonGenerator, serializerProvider, this._typeSerializer);
             }
         } else if (this._nullSerializer != null) {
             this._nullSerializer.serialize(null, jsonGenerator, serializerProvider);

@@ -23,8 +23,12 @@ public class CalendarSerializer extends DateTimeSerializerBase<Calendar> {
         return new CalendarSerializer(bool, dateFormat);
     }
 
-    protected long _timestamp(Calendar calendar) {
-        return calendar == null ? 0 : calendar.getTimeInMillis();
+    /* access modifiers changed from: protected */
+    public long _timestamp(Calendar calendar) {
+        if (calendar == null) {
+            return 0;
+        }
+        return calendar.getTimeInMillis();
     }
 
     public void serialize(Calendar calendar, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {

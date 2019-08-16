@@ -2,8 +2,6 @@ package com.fasterxml.jackson.databind.ser.std;
 
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonFormat.Value;
-import com.fasterxml.jackson.annotation.ObjectIdGenerator;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
@@ -14,11 +12,8 @@ import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.PropertyName;
-import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.ObjectIdInfo;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
@@ -35,7 +30,6 @@ import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
 import com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter;
-import com.fasterxml.jackson.databind.ser.impl.PropertyBasedObjectIdGenerator;
 import com.fasterxml.jackson.databind.ser.impl.WritableObjectId;
 import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import com.fasterxml.jackson.databind.util.Converter;
@@ -59,13 +53,15 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
     protected final Shape _serializationShape;
     protected final AnnotatedMember _typeId;
 
-    protected abstract BeanSerializerBase asArraySerializer();
+    /* access modifiers changed from: protected */
+    public abstract BeanSerializerBase asArraySerializer();
 
     public abstract void serialize(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException;
 
     public abstract BeanSerializerBase withFilterId(Object obj);
 
-    protected abstract BeanSerializerBase withIgnorals(String[] strArr);
+    /* access modifiers changed from: protected */
+    public abstract BeanSerializerBase withIgnorals(String[] strArr);
 
     public abstract BeanSerializerBase withObjectIdWriter(ObjectIdWriter objectIdWriter);
 
@@ -173,40 +169,40 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
     }
 
     public void resolve(SerializerProvider serializerProvider) throws JsonMappingException {
-        int i;
+        int length;
         if (this._filteredProps == null) {
-            i = 0;
+            length = 0;
         } else {
-            i = this._filteredProps.length;
+            length = this._filteredProps.length;
         }
-        int length = this._props.length;
-        for (int i2 = 0; i2 < length; i2++) {
-            BeanProperty beanProperty = this._props[i2];
-            if (!(beanProperty.willSuppressNulls() || beanProperty.hasNullSerializer())) {
-                JsonSerializer findNullValueSerializer = serializerProvider.findNullValueSerializer(beanProperty);
+        int length2 = this._props.length;
+        for (int i = 0; i < length2; i++) {
+            BeanPropertyWriter beanPropertyWriter = this._props[i];
+            if (!beanPropertyWriter.willSuppressNulls() && !beanPropertyWriter.hasNullSerializer()) {
+                JsonSerializer findNullValueSerializer = serializerProvider.findNullValueSerializer(beanPropertyWriter);
                 if (findNullValueSerializer != null) {
-                    beanProperty.assignNullSerializer(findNullValueSerializer);
-                    if (i2 < i) {
-                        BeanPropertyWriter beanPropertyWriter = this._filteredProps[i2];
-                        if (beanPropertyWriter != null) {
-                            beanPropertyWriter.assignNullSerializer(findNullValueSerializer);
+                    beanPropertyWriter.assignNullSerializer(findNullValueSerializer);
+                    if (i < length) {
+                        BeanPropertyWriter beanPropertyWriter2 = this._filteredProps[i];
+                        if (beanPropertyWriter2 != null) {
+                            beanPropertyWriter2.assignNullSerializer(findNullValueSerializer);
                         }
                     }
                 }
             }
-            if (!beanProperty.hasSerializer()) {
-                JsonSerializer findConvertingSerializer = findConvertingSerializer(serializerProvider, beanProperty);
+            if (!beanPropertyWriter.hasSerializer()) {
+                JsonSerializer findConvertingSerializer = findConvertingSerializer(serializerProvider, beanPropertyWriter);
                 if (findConvertingSerializer == null) {
-                    JavaType serializationType = beanProperty.getSerializationType();
+                    JavaType serializationType = beanPropertyWriter.getSerializationType();
                     if (serializationType == null) {
-                        serializationType = beanProperty.getType();
+                        serializationType = beanPropertyWriter.getType();
                         if (!serializationType.isFinal()) {
                             if (serializationType.isContainerType() || serializationType.containedTypeCount() > 0) {
-                                beanProperty.setNonTrivialBaseType(serializationType);
+                                beanPropertyWriter.setNonTrivialBaseType(serializationType);
                             }
                         }
                     }
-                    findConvertingSerializer = serializerProvider.findValueSerializer(serializationType, beanProperty);
+                    findConvertingSerializer = serializerProvider.findValueSerializer(serializationType, (BeanProperty) beanPropertyWriter);
                     if (serializationType.isContainerType()) {
                         TypeSerializer typeSerializer = (TypeSerializer) serializationType.getContentType().getTypeHandler();
                         if (typeSerializer != null && (findConvertingSerializer instanceof ContainerSerializer)) {
@@ -214,11 +210,11 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
                         }
                     }
                 }
-                beanProperty.assignSerializer(findConvertingSerializer);
-                if (i2 < i) {
-                    BeanPropertyWriter beanPropertyWriter2 = this._filteredProps[i2];
-                    if (beanPropertyWriter2 != null) {
-                        beanPropertyWriter2.assignSerializer(findConvertingSerializer);
+                beanPropertyWriter.assignSerializer(findConvertingSerializer);
+                if (i < length) {
+                    BeanPropertyWriter beanPropertyWriter3 = this._filteredProps[i];
+                    if (beanPropertyWriter3 != null) {
+                        beanPropertyWriter3.assignSerializer(findConvertingSerializer);
                     }
                 }
             }
@@ -228,13 +224,14 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
         }
     }
 
-    protected JsonSerializer<Object> findConvertingSerializer(SerializerProvider serializerProvider, BeanPropertyWriter beanPropertyWriter) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> findConvertingSerializer(SerializerProvider serializerProvider, BeanPropertyWriter beanPropertyWriter) throws JsonMappingException {
         JsonSerializer jsonSerializer = null;
         AnnotationIntrospector annotationIntrospector = serializerProvider.getAnnotationIntrospector();
         if (annotationIntrospector == null) {
             return null;
         }
-        Annotated member = beanPropertyWriter.getMember();
+        AnnotatedMember member = beanPropertyWriter.getMember();
         if (member == null) {
             return null;
         }
@@ -250,189 +247,193 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
         return new StdDelegatingSerializer(converterInstance, outputType, jsonSerializer);
     }
 
-    public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        Shape shape;
-        ObjectIdWriter objectIdWriter;
-        String[] findPropertiesToIgnore;
-        ObjectIdInfo findObjectIdInfo;
-        Type generatorType;
-        JavaType javaType;
-        String simpleName;
-        int length;
-        int i;
-        BeanPropertyWriter beanPropertyWriter;
-        Object findFilterId;
-        String[] strArr;
-        JsonSerializer<?> withObjectIdWriter;
-        JsonSerializer jsonSerializer;
-        Object obj = null;
-        AnnotationIntrospector annotationIntrospector = serializerProvider.getAnnotationIntrospector();
-        Annotated member = (beanProperty == null || annotationIntrospector == null) ? null : beanProperty.getMember();
-        SerializationConfig config = serializerProvider.getConfig();
-        if (member != null) {
-            Value findFormat = annotationIntrospector.findFormat(member);
-            if (findFormat != null) {
-                Shape shape2 = findFormat.getShape();
-                if (shape2 != this._serializationShape && this._handledType.isEnum()) {
-                    switch (shape2) {
-                        case STRING:
-                        case NUMBER:
-                        case NUMBER_INT:
-                            return serializerProvider.handlePrimaryContextualization(EnumSerializer.construct(this._handledType, serializerProvider.getConfig(), config.introspectClassAnnotations(this._handledType), findFormat), beanProperty);
-                    }
-                }
-                shape = shape2;
-                objectIdWriter = this._objectIdWriter;
-                if (member == null) {
-                    findPropertiesToIgnore = annotationIntrospector.findPropertiesToIgnore(member, true);
-                    findObjectIdInfo = annotationIntrospector.findObjectIdInfo(member);
-                    if (findObjectIdInfo == null) {
-                        findObjectIdInfo = annotationIntrospector.findObjectReferenceInfo(member, findObjectIdInfo);
-                        generatorType = findObjectIdInfo.getGeneratorType();
-                        javaType = serializerProvider.getTypeFactory().findTypeParameters(serializerProvider.constructType(generatorType), ObjectIdGenerator.class)[0];
-                        if (generatorType != PropertyGenerator.class) {
-                            simpleName = findObjectIdInfo.getPropertyName().getSimpleName();
-                            length = this._props.length;
-                            i = 0;
-                            while (i != length) {
-                                beanPropertyWriter = this._props[i];
-                                if (simpleName.equals(beanPropertyWriter.getName())) {
-                                    i++;
-                                } else {
-                                    if (i > 0) {
-                                        System.arraycopy(this._props, 0, this._props, 1, i);
-                                        this._props[0] = beanPropertyWriter;
-                                        if (this._filteredProps != null) {
-                                            BeanPropertyWriter beanPropertyWriter2 = this._filteredProps[i];
-                                            System.arraycopy(this._filteredProps, 0, this._filteredProps, 1, i);
-                                            this._filteredProps[0] = beanPropertyWriter2;
-                                        }
-                                    }
-                                    objectIdWriter = ObjectIdWriter.construct(beanPropertyWriter.getType(), (PropertyName) null, new PropertyBasedObjectIdGenerator(findObjectIdInfo, beanPropertyWriter), findObjectIdInfo.getAlwaysAsId());
-                                }
-                            }
-                            throw new IllegalArgumentException("Invalid Object Id definition for " + this._handledType.getName() + ": can not find property with name '" + simpleName + "'");
-                        }
-                        objectIdWriter = ObjectIdWriter.construct(javaType, findObjectIdInfo.getPropertyName(), serializerProvider.objectIdGeneratorInstance(member, findObjectIdInfo), findObjectIdInfo.getAlwaysAsId());
-                    } else if (objectIdWriter != null) {
-                        objectIdWriter = this._objectIdWriter.withAlwaysAsId(annotationIntrospector.findObjectReferenceInfo(member, new ObjectIdInfo(NAME_FOR_OBJECT_REF, null, null, null)).getAlwaysAsId());
-                    }
-                    findFilterId = annotationIntrospector.findFilterId(member);
-                    if (findFilterId != null || (this._propertyFilterId != null && findFilterId.equals(this._propertyFilterId))) {
-                        strArr = findPropertiesToIgnore;
-                    } else {
-                        obj = findFilterId;
-                        strArr = findPropertiesToIgnore;
-                    }
-                } else {
-                    strArr = null;
-                }
-                if (objectIdWriter != null) {
-                    objectIdWriter = objectIdWriter.withSerializer(serializerProvider.findValueSerializer(objectIdWriter.idType, beanProperty));
-                    if (objectIdWriter != this._objectIdWriter) {
-                        withObjectIdWriter = withObjectIdWriter(objectIdWriter);
-                        if (!(strArr == null || strArr.length == 0)) {
-                            withObjectIdWriter = withObjectIdWriter.withIgnorals(strArr);
-                        }
-                        if (obj != null) {
-                            withObjectIdWriter = withObjectIdWriter.withFilterId(obj);
-                        }
-                        if (shape == null) {
-                            shape = this._serializationShape;
-                        }
-                        if (shape != Shape.ARRAY) {
-                            return withObjectIdWriter.asArraySerializer();
-                        }
-                        return withObjectIdWriter;
-                    }
-                }
-                jsonSerializer = this;
-                withObjectIdWriter = withObjectIdWriter.withIgnorals(strArr);
-                if (obj != null) {
-                    withObjectIdWriter = withObjectIdWriter.withFilterId(obj);
-                }
-                if (shape == null) {
-                    shape = this._serializationShape;
-                }
-                if (shape != Shape.ARRAY) {
-                    return withObjectIdWriter;
-                }
-                return withObjectIdWriter.asArraySerializer();
+    /* JADX WARNING: Removed duplicated region for block: B:17:0x0038  */
+    /* JADX WARNING: Removed duplicated region for block: B:28:0x006d  */
+    /* JADX WARNING: Removed duplicated region for block: B:36:0x008a  */
+    /* JADX WARNING: Removed duplicated region for block: B:38:0x0090  */
+    /* JADX WARNING: Removed duplicated region for block: B:41:0x0096  */
+    /* JADX WARNING: Removed duplicated region for block: B:61:0x016f  */
+    /* JADX WARNING: Removed duplicated region for block: B:66:? A[RETURN, SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JsonSerializer<?> createContextual(com.fasterxml.jackson.databind.SerializerProvider r14, com.fasterxml.jackson.databind.BeanProperty r15) throws com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r13 = this;
+            r12 = 1
+            r5 = 0
+            r1 = 0
+            com.fasterxml.jackson.databind.AnnotationIntrospector r6 = r14.getAnnotationIntrospector()
+            if (r15 == 0) goto L_0x000b
+            if (r6 != 0) goto L_0x009b
+        L_0x000b:
+            r2 = r1
+        L_0x000c:
+            com.fasterxml.jackson.databind.SerializationConfig r3 = r14.getConfig()
+            if (r2 == 0) goto L_0x0173
+            com.fasterxml.jackson.annotation.JsonFormat$Value r4 = r6.findFormat(r2)
+            if (r4 == 0) goto L_0x0173
+            com.fasterxml.jackson.annotation.JsonFormat$Shape r0 = r4.getShape()
+            com.fasterxml.jackson.annotation.JsonFormat$Shape r7 = r13._serializationShape
+            if (r0 == r7) goto L_0x0033
+            java.lang.Class r7 = r13._handledType
+            boolean r7 = r7.isEnum()
+            if (r7 == 0) goto L_0x0033
+            int[] r7 = com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.C08901.$SwitchMap$com$fasterxml$jackson$annotation$JsonFormat$Shape
+            int r8 = r0.ordinal()
+            r7 = r7[r8]
+            switch(r7) {
+                case 1: goto L_0x00a2;
+                case 2: goto L_0x00a2;
+                case 3: goto L_0x00a2;
+                default: goto L_0x0033;
             }
-        }
-        shape = null;
-        objectIdWriter = this._objectIdWriter;
-        if (member == null) {
-            strArr = null;
-        } else {
-            findPropertiesToIgnore = annotationIntrospector.findPropertiesToIgnore(member, true);
-            findObjectIdInfo = annotationIntrospector.findObjectIdInfo(member);
-            if (findObjectIdInfo == null) {
-                findObjectIdInfo = annotationIntrospector.findObjectReferenceInfo(member, findObjectIdInfo);
-                generatorType = findObjectIdInfo.getGeneratorType();
-                javaType = serializerProvider.getTypeFactory().findTypeParameters(serializerProvider.constructType(generatorType), ObjectIdGenerator.class)[0];
-                if (generatorType != PropertyGenerator.class) {
-                    objectIdWriter = ObjectIdWriter.construct(javaType, findObjectIdInfo.getPropertyName(), serializerProvider.objectIdGeneratorInstance(member, findObjectIdInfo), findObjectIdInfo.getAlwaysAsId());
-                } else {
-                    simpleName = findObjectIdInfo.getPropertyName().getSimpleName();
-                    length = this._props.length;
-                    i = 0;
-                    while (i != length) {
-                        beanPropertyWriter = this._props[i];
-                        if (simpleName.equals(beanPropertyWriter.getName())) {
-                            i++;
-                        } else {
-                            if (i > 0) {
-                                System.arraycopy(this._props, 0, this._props, 1, i);
-                                this._props[0] = beanPropertyWriter;
-                                if (this._filteredProps != null) {
-                                    BeanPropertyWriter beanPropertyWriter22 = this._filteredProps[i];
-                                    System.arraycopy(this._filteredProps, 0, this._filteredProps, 1, i);
-                                    this._filteredProps[0] = beanPropertyWriter22;
-                                }
-                            }
-                            objectIdWriter = ObjectIdWriter.construct(beanPropertyWriter.getType(), (PropertyName) null, new PropertyBasedObjectIdGenerator(findObjectIdInfo, beanPropertyWriter), findObjectIdInfo.getAlwaysAsId());
-                        }
-                    }
-                    throw new IllegalArgumentException("Invalid Object Id definition for " + this._handledType.getName() + ": can not find property with name '" + simpleName + "'");
-                }
-            } else if (objectIdWriter != null) {
-                objectIdWriter = this._objectIdWriter.withAlwaysAsId(annotationIntrospector.findObjectReferenceInfo(member, new ObjectIdInfo(NAME_FOR_OBJECT_REF, null, null, null)).getAlwaysAsId());
-            }
-            findFilterId = annotationIntrospector.findFilterId(member);
-            if (findFilterId != null) {
-            }
-            strArr = findPropertiesToIgnore;
-        }
-        if (objectIdWriter != null) {
-            objectIdWriter = objectIdWriter.withSerializer(serializerProvider.findValueSerializer(objectIdWriter.idType, beanProperty));
-            if (objectIdWriter != this._objectIdWriter) {
-                withObjectIdWriter = withObjectIdWriter(objectIdWriter);
-                withObjectIdWriter = withObjectIdWriter.withIgnorals(strArr);
-                if (obj != null) {
-                    withObjectIdWriter = withObjectIdWriter.withFilterId(obj);
-                }
-                if (shape == null) {
-                    shape = this._serializationShape;
-                }
-                if (shape != Shape.ARRAY) {
-                    return withObjectIdWriter.asArraySerializer();
-                }
-                return withObjectIdWriter;
-            }
-        }
-        jsonSerializer = this;
-        withObjectIdWriter = withObjectIdWriter.withIgnorals(strArr);
-        if (obj != null) {
-            withObjectIdWriter = withObjectIdWriter.withFilterId(obj);
-        }
-        if (shape == null) {
-            shape = this._serializationShape;
-        }
-        if (shape != Shape.ARRAY) {
-            return withObjectIdWriter;
-        }
-        return withObjectIdWriter.asArraySerializer();
+        L_0x0033:
+            r3 = r0
+        L_0x0034:
+            com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter r0 = r13._objectIdWriter
+            if (r2 == 0) goto L_0x016f
+            java.lang.String[] r4 = r6.findPropertiesToIgnore(r2, r12)
+            com.fasterxml.jackson.databind.introspect.ObjectIdInfo r7 = r6.findObjectIdInfo(r2)
+            if (r7 != 0) goto L_0x00b7
+            if (r0 == 0) goto L_0x0059
+            com.fasterxml.jackson.databind.introspect.ObjectIdInfo r0 = new com.fasterxml.jackson.databind.introspect.ObjectIdInfo
+            com.fasterxml.jackson.databind.PropertyName r5 = NAME_FOR_OBJECT_REF
+            r0.<init>(r5, r1, r1, r1)
+            com.fasterxml.jackson.databind.introspect.ObjectIdInfo r0 = r6.findObjectReferenceInfo(r2, r0)
+            com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter r5 = r13._objectIdWriter
+            boolean r0 = r0.getAlwaysAsId()
+            com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter r0 = r5.withAlwaysAsId(r0)
+        L_0x0059:
+            java.lang.Object r2 = r6.findFilterId(r2)
+            if (r2 == 0) goto L_0x016c
+            java.lang.Object r5 = r13._propertyFilterId
+            if (r5 == 0) goto L_0x006b
+            java.lang.Object r5 = r13._propertyFilterId
+            boolean r5 = r2.equals(r5)
+            if (r5 != 0) goto L_0x016c
+        L_0x006b:
+            if (r0 == 0) goto L_0x0169
+            com.fasterxml.jackson.databind.JavaType r1 = r0.idType
+            com.fasterxml.jackson.databind.JsonSerializer r1 = r14.findValueSerializer(r1, r15)
+            com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter r0 = r0.withSerializer(r1)
+            com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter r1 = r13._objectIdWriter
+            if (r0 == r1) goto L_0x0169
+            com.fasterxml.jackson.databind.ser.std.BeanSerializerBase r0 = r13.withObjectIdWriter(r0)
+        L_0x007f:
+            if (r4 == 0) goto L_0x0088
+            int r1 = r4.length
+            if (r1 == 0) goto L_0x0088
+            com.fasterxml.jackson.databind.ser.std.BeanSerializerBase r0 = r0.withIgnorals(r4)
+        L_0x0088:
+            if (r2 == 0) goto L_0x008e
+            com.fasterxml.jackson.databind.ser.std.BeanSerializerBase r0 = r0.withFilterId(r2)
+        L_0x008e:
+            if (r3 != 0) goto L_0x0092
+            com.fasterxml.jackson.annotation.JsonFormat$Shape r3 = r13._serializationShape
+        L_0x0092:
+            com.fasterxml.jackson.annotation.JsonFormat$Shape r1 = com.fasterxml.jackson.annotation.JsonFormat.Shape.ARRAY
+            if (r3 != r1) goto L_0x009a
+            com.fasterxml.jackson.databind.ser.std.BeanSerializerBase r0 = r0.asArraySerializer()
+        L_0x009a:
+            return r0
+        L_0x009b:
+            com.fasterxml.jackson.databind.introspect.AnnotatedMember r0 = r15.getMember()
+            r2 = r0
+            goto L_0x000c
+        L_0x00a2:
+            java.lang.Class r0 = r13._handledType
+            com.fasterxml.jackson.databind.BeanDescription r0 = r3.introspectClassAnnotations(r0)
+            java.lang.Class r1 = r13._handledType
+            com.fasterxml.jackson.databind.SerializationConfig r2 = r14.getConfig()
+            com.fasterxml.jackson.databind.ser.std.EnumSerializer r0 = com.fasterxml.jackson.databind.ser.std.EnumSerializer.construct(r1, r2, r0, r4)
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r14.handlePrimaryContextualization(r0, r15)
+            goto L_0x009a
+        L_0x00b7:
+            com.fasterxml.jackson.databind.introspect.ObjectIdInfo r7 = r6.findObjectReferenceInfo(r2, r7)
+            java.lang.Class r0 = r7.getGeneratorType()
+            com.fasterxml.jackson.databind.JavaType r8 = r14.constructType(r0)
+            com.fasterxml.jackson.databind.type.TypeFactory r9 = r14.getTypeFactory()
+            java.lang.Class<com.fasterxml.jackson.annotation.ObjectIdGenerator> r10 = com.fasterxml.jackson.annotation.ObjectIdGenerator.class
+            com.fasterxml.jackson.databind.JavaType[] r8 = r9.findTypeParameters(r8, r10)
+            r8 = r8[r5]
+            java.lang.Class<com.fasterxml.jackson.annotation.ObjectIdGenerators$PropertyGenerator> r9 = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class
+            if (r0 != r9) goto L_0x0157
+            com.fasterxml.jackson.databind.PropertyName r0 = r7.getPropertyName()
+            java.lang.String r8 = r0.getSimpleName()
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r0 = r13._props
+            int r9 = r0.length
+            r0 = r5
+        L_0x00df:
+            if (r0 != r9) goto L_0x0110
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r2 = "Invalid Object Id definition for "
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.Class r2 = r13._handledType
+            java.lang.String r2 = r2.getName()
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r2 = ": can not find property with name '"
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.StringBuilder r1 = r1.append(r8)
+            java.lang.String r2 = "'"
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r1 = r1.toString()
+            r0.<init>(r1)
+            throw r0
+        L_0x0110:
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r10 = r13._props
+            r10 = r10[r0]
+            java.lang.String r11 = r10.getName()
+            boolean r11 = r8.equals(r11)
+            if (r11 == 0) goto L_0x0154
+            if (r0 <= 0) goto L_0x013e
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r8 = r13._props
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r9 = r13._props
+            java.lang.System.arraycopy(r8, r5, r9, r12, r0)
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r8 = r13._props
+            r8[r5] = r10
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r8 = r13._filteredProps
+            if (r8 == 0) goto L_0x013e
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r8 = r13._filteredProps
+            r8 = r8[r0]
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r9 = r13._filteredProps
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r11 = r13._filteredProps
+            java.lang.System.arraycopy(r9, r5, r11, r12, r0)
+            com.fasterxml.jackson.databind.ser.BeanPropertyWriter[] r0 = r13._filteredProps
+            r0[r5] = r8
+        L_0x013e:
+            com.fasterxml.jackson.databind.JavaType r5 = r10.getType()
+            com.fasterxml.jackson.databind.ser.impl.PropertyBasedObjectIdGenerator r8 = new com.fasterxml.jackson.databind.ser.impl.PropertyBasedObjectIdGenerator
+            r8.<init>(r7, r10)
+            r0 = r1
+            com.fasterxml.jackson.databind.PropertyName r0 = (com.fasterxml.jackson.databind.PropertyName) r0
+            boolean r7 = r7.getAlwaysAsId()
+            com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter r0 = com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter.construct(r5, r0, r8, r7)
+            goto L_0x0059
+        L_0x0154:
+            int r0 = r0 + 1
+            goto L_0x00df
+        L_0x0157:
+            com.fasterxml.jackson.annotation.ObjectIdGenerator r0 = r14.objectIdGeneratorInstance(r2, r7)
+            com.fasterxml.jackson.databind.PropertyName r5 = r7.getPropertyName()
+            boolean r7 = r7.getAlwaysAsId()
+            com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter r0 = com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter.construct(r8, r5, r0, r7)
+            goto L_0x0059
+        L_0x0169:
+            r0 = r13
+            goto L_0x007f
+        L_0x016c:
+            r2 = r1
+            goto L_0x006b
+        L_0x016f:
+            r2 = r1
+            r4 = r1
+            goto L_0x006b
+        L_0x0173:
+            r3 = r1
+            goto L_0x0034
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.createContextual(com.fasterxml.jackson.databind.SerializerProvider, com.fasterxml.jackson.databind.BeanProperty):com.fasterxml.jackson.databind.JsonSerializer");
     }
 
     public Iterator<PropertyWriter> properties() {
@@ -468,7 +469,8 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
         }
     }
 
-    protected final void _serializeWithObjectId(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, boolean z) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _serializeWithObjectId(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, boolean z) throws IOException {
         ObjectIdWriter objectIdWriter = this._objectIdWriter;
         WritableObjectId findObjectId = serializerProvider.findObjectId(obj, objectIdWriter.generator);
         if (!findObjectId.writeAsId(jsonGenerator, serializerProvider, objectIdWriter)) {
@@ -492,7 +494,8 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
         }
     }
 
-    protected final void _serializeWithObjectId(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _serializeWithObjectId(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {
         ObjectIdWriter objectIdWriter = this._objectIdWriter;
         WritableObjectId findObjectId = serializerProvider.findObjectId(obj, objectIdWriter.generator);
         if (!findObjectId.writeAsId(jsonGenerator, serializerProvider, objectIdWriter)) {
@@ -505,7 +508,8 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
         }
     }
 
-    protected void _serializeObjectId(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer, WritableObjectId writableObjectId) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _serializeObjectId(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer, WritableObjectId writableObjectId) throws IOException {
         ObjectIdWriter objectIdWriter = this._objectIdWriter;
         String _customTypeId = this._typeId == null ? null : _customTypeId(obj);
         if (_customTypeId == null) {
@@ -526,7 +530,8 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
         }
     }
 
-    protected final String _customTypeId(Object obj) {
+    /* access modifiers changed from: protected */
+    public final String _customTypeId(Object obj) {
         Object value = this._typeId.getValue(obj);
         if (value == null) {
             return "";
@@ -534,7 +539,8 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
         return value instanceof String ? (String) value : value.toString();
     }
 
-    protected void serializeFields(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    /* access modifiers changed from: protected */
+    public void serializeFields(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         BeanPropertyWriter[] beanPropertyWriterArr;
         if (this._filteredProps == null || serializerProvider.getActiveView() == null) {
             beanPropertyWriterArr = this._props;
@@ -554,16 +560,17 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
             if (this._anyGetterWriter != null) {
                 this._anyGetterWriter.getAndSerialize(obj, jsonGenerator, serializerProvider);
             }
-        } catch (Throwable e) {
-            wrapAndThrow(serializerProvider, e, obj, i == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[i].getName());
-        } catch (Throwable e2) {
-            JsonMappingException jsonMappingException = new JsonMappingException((Closeable) jsonGenerator, "Infinite recursion (StackOverflowError)", e2);
+        } catch (Exception e) {
+            wrapAndThrow(serializerProvider, (Throwable) e, obj, i == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[i].getName());
+        } catch (StackOverflowError e2) {
+            JsonMappingException jsonMappingException = new JsonMappingException((Closeable) jsonGenerator, "Infinite recursion (StackOverflowError)", (Throwable) e2);
             jsonMappingException.prependPath(new Reference(obj, i == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[i].getName()));
             throw jsonMappingException;
         }
     }
 
-    protected void serializeFieldsFiltered(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
+    /* access modifiers changed from: protected */
+    public void serializeFieldsFiltered(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
         BeanPropertyWriter[] beanPropertyWriterArr;
         if (this._filteredProps == null || serializerProvider.getActiveView() == null) {
             beanPropertyWriterArr = this._props;
@@ -575,23 +582,19 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
             serializeFields(obj, jsonGenerator, serializerProvider);
             return;
         }
-        int i = 0;
         try {
-            int length = beanPropertyWriterArr.length;
-            while (i < length) {
-                PropertyWriter propertyWriter = beanPropertyWriterArr[i];
-                if (propertyWriter != null) {
-                    findPropertyFilter.serializeAsField(obj, jsonGenerator, serializerProvider, propertyWriter);
+            for (BeanPropertyWriter beanPropertyWriter : beanPropertyWriterArr) {
+                if (beanPropertyWriter != null) {
+                    findPropertyFilter.serializeAsField(obj, jsonGenerator, serializerProvider, beanPropertyWriter);
                 }
-                i++;
             }
             if (this._anyGetterWriter != null) {
                 this._anyGetterWriter.getAndFilter(obj, jsonGenerator, serializerProvider, findPropertyFilter);
             }
-        } catch (Throwable e) {
-            wrapAndThrow(serializerProvider, e, obj, 0 == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[0].getName());
-        } catch (Throwable e2) {
-            JsonMappingException jsonMappingException = new JsonMappingException((Closeable) jsonGenerator, "Infinite recursion (StackOverflowError)", e2);
+        } catch (Exception e) {
+            wrapAndThrow(serializerProvider, (Throwable) e, obj, 0 == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[0].getName());
+        } catch (StackOverflowError e2) {
+            JsonMappingException jsonMappingException = new JsonMappingException((Closeable) jsonGenerator, "Infinite recursion (StackOverflowError)", (Throwable) e2);
             jsonMappingException.prependPath(new Reference(obj, 0 == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[0].getName()));
             throw jsonMappingException;
         }
@@ -599,26 +602,26 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
 
     @Deprecated
     public JsonNode getSchema(SerializerProvider serializerProvider, Type type) throws JsonMappingException {
-        PropertyFilter findPropertyFilter;
-        JsonNode createSchemaNode = createSchemaNode("object", true);
+        PropertyFilter propertyFilter;
+        ObjectNode createSchemaNode = createSchemaNode("object", true);
         JsonSerializableSchema jsonSerializableSchema = (JsonSerializableSchema) this._handledType.getAnnotation(JsonSerializableSchema.class);
         if (jsonSerializableSchema != null) {
-            String id = jsonSerializableSchema.id();
+            String id = jsonSerializableSchema.mo11568id();
             if (id != null && id.length() > 0) {
                 createSchemaNode.put("id", id);
             }
         }
         ObjectNode objectNode = createSchemaNode.objectNode();
         if (this._propertyFilterId != null) {
-            findPropertyFilter = findPropertyFilter(serializerProvider, this._propertyFilterId, null);
+            propertyFilter = findPropertyFilter(serializerProvider, this._propertyFilterId, null);
         } else {
-            findPropertyFilter = null;
+            propertyFilter = null;
         }
-        for (PropertyWriter propertyWriter : this._props) {
-            if (findPropertyFilter == null) {
-                propertyWriter.depositSchemaProperty(objectNode, serializerProvider);
+        for (BeanPropertyWriter beanPropertyWriter : this._props) {
+            if (propertyFilter == null) {
+                beanPropertyWriter.depositSchemaProperty(objectNode, serializerProvider);
             } else {
-                findPropertyFilter.depositSchemaProperty(propertyWriter, objectNode, serializerProvider);
+                propertyFilter.depositSchemaProperty((PropertyWriter) beanPropertyWriter, objectNode, serializerProvider);
             }
         }
         createSchemaNode.set("properties", objectNode);
@@ -626,33 +629,32 @@ public abstract class BeanSerializerBase extends StdSerializer<Object> implement
     }
 
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType) throws JsonMappingException {
-        Object obj = null;
+        BeanPropertyWriter[] beanPropertyWriterArr;
+        Class cls = null;
         int i = 0;
         if (jsonFormatVisitorWrapper != null) {
             JsonObjectFormatVisitor expectObjectFormat = jsonFormatVisitorWrapper.expectObjectFormat(javaType);
             if (expectObjectFormat != null) {
                 SerializerProvider provider = jsonFormatVisitorWrapper.getProvider();
-                int length;
                 if (this._propertyFilterId != null) {
                     PropertyFilter findPropertyFilter = findPropertyFilter(jsonFormatVisitorWrapper.getProvider(), this._propertyFilterId, null);
-                    length = this._props.length;
+                    int length = this._props.length;
                     while (i < length) {
-                        findPropertyFilter.depositSchemaProperty(this._props[i], expectObjectFormat, provider);
+                        findPropertyFilter.depositSchemaProperty((PropertyWriter) this._props[i], expectObjectFormat, provider);
                         i++;
                     }
                     return;
                 }
-                BeanPropertyWriter[] beanPropertyWriterArr;
                 if (!(this._filteredProps == null || provider == null)) {
-                    obj = provider.getActiveView();
+                    cls = provider.getActiveView();
                 }
-                if (obj != null) {
+                if (cls != null) {
                     beanPropertyWriterArr = this._filteredProps;
                 } else {
                     beanPropertyWriterArr = this._props;
                 }
-                length = beanPropertyWriterArr.length;
-                while (i < length) {
+                int length2 = beanPropertyWriterArr.length;
+                while (i < length2) {
                     BeanPropertyWriter beanPropertyWriter = beanPropertyWriterArr[i];
                     if (beanPropertyWriter != null) {
                         beanPropertyWriter.depositSchemaProperty(expectObjectFormat, provider);

@@ -13,6 +13,6 @@ namespace GooglePlayGames.BasicApi.Quests
 		Expired = 0x20,
 		EndingSoon = 0x40,
 		Failed = 0x80,
-		All = 0xFFFFFFFFFFFFFFFF
+		All = -1
 	}
 }

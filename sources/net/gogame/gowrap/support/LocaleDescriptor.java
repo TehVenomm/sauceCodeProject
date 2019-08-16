@@ -1,16 +1,18 @@
 package net.gogame.gowrap.support;
 
 public class LocaleDescriptor {
-    private final String id;
+
+    /* renamed from: id */
+    private final String f1190id;
     private final String name;
 
     public LocaleDescriptor(String str, String str2) {
-        this.id = str;
+        this.f1190id = str;
         this.name = str2;
     }
 
     public String getId() {
-        return this.id;
+        return this.f1190id;
     }
 
     public String getName() {

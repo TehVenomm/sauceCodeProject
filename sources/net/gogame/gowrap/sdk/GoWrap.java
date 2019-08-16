@@ -124,7 +124,7 @@ public final class GoWrap {
                 public void didCompleteRewardedAd(String str, int i) {
                     try {
                         goWrapDelegate.didCompleteRewardedAd(str, i);
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         Log.e("goWrap", "Exception", e);
                     }
                 }
@@ -134,7 +134,7 @@ public final class GoWrap {
                         if (goWrapDelegate instanceof GoWrapDelegateV2) {
                             ((GoWrapDelegateV2) goWrapDelegate).onCustomUrl(str);
                         }
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         Log.e("goWrap", "Exception", e);
                     }
                 }
@@ -144,7 +144,7 @@ public final class GoWrap {
                         if (goWrapDelegate instanceof GoWrapDelegateV2) {
                             ((GoWrapDelegateV2) goWrapDelegate).onMenuClosed();
                         }
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         Log.e("goWrap", "Exception", e);
                     }
                 }
@@ -154,7 +154,7 @@ public final class GoWrap {
                         if (goWrapDelegate instanceof GoWrapDelegateV2) {
                             ((GoWrapDelegateV2) goWrapDelegate).onMenuOpened();
                         }
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         Log.e("goWrap", "Exception", e);
                     }
                 }
@@ -164,7 +164,7 @@ public final class GoWrap {
                         if (goWrapDelegate instanceof GoWrapDelegateV2) {
                             ((GoWrapDelegateV2) goWrapDelegate).onOffersAvailable();
                         }
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         Log.e("goWrap", "Exception", e);
                     }
                 }
@@ -294,7 +294,7 @@ public final class GoWrap {
 
     public static void trackEvent(String str, String str2, Map<String, Object> map) {
         if (hasGoWrap()) {
-            goWrap.trackEvent(str, str2, (Map) map);
+            goWrap.trackEvent(str, str2, map);
             return;
         }
         Log.d("goWrap", String.format("trackEvent('%s', '%s', %s)", new Object[]{str, str2, map}));

@@ -56,22 +56,12 @@ class Dispatcher {
     final ExecutorService service;
     final Stats stats;
 
-    /* renamed from: com.squareup.picasso.Dispatcher$1 */
-    class C07191 implements Runnable {
-        C07191() {
-        }
-
-        public void run() {
-            Dispatcher.this.receiver.unregister();
-        }
-    }
-
     private static class DispatcherHandler extends Handler {
         private final Dispatcher dispatcher;
 
-        public DispatcherHandler(Looper looper, Dispatcher dispatcher) {
+        public DispatcherHandler(Looper looper, Dispatcher dispatcher2) {
             super(looper);
-            this.dispatcher = dispatcher;
+            this.dispatcher = dispatcher2;
         }
 
         public void handleMessage(final Message message) {
@@ -99,11 +89,11 @@ class Dispatcher {
                     this.dispatcher.performNetworkStateChange((NetworkInfo) message.obj);
                     return;
                 case 10:
-                    Dispatcher dispatcher = this.dispatcher;
+                    Dispatcher dispatcher2 = this.dispatcher;
                     if (message.arg1 != 1) {
                         z = false;
                     }
-                    dispatcher.performAirplaneModeChange(z);
+                    dispatcher2.performAirplaneModeChange(z);
                     return;
                 case 11:
                     this.dispatcher.performPauseTag(message.obj);
@@ -132,11 +122,12 @@ class Dispatcher {
         static final String EXTRA_AIRPLANE_STATE = "state";
         private final Dispatcher dispatcher;
 
-        NetworkBroadcastReceiver(Dispatcher dispatcher) {
-            this.dispatcher = dispatcher;
+        NetworkBroadcastReceiver(Dispatcher dispatcher2) {
+            this.dispatcher = dispatcher2;
         }
 
-        void register() {
+        /* access modifiers changed from: 0000 */
+        public void register() {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction("android.intent.action.AIRPLANE_MODE");
             if (this.dispatcher.scansNetworkChanges) {
@@ -145,7 +136,8 @@ class Dispatcher {
             this.dispatcher.context.registerReceiver(this, intentFilter);
         }
 
-        void unregister() {
+        /* access modifiers changed from: 0000 */
+        public void unregister() {
             this.dispatcher.context.unregisterReceiver(this);
         }
 
@@ -163,85 +155,101 @@ class Dispatcher {
         }
     }
 
-    Dispatcher(Context context, ExecutorService executorService, Handler handler, Downloader downloader, Cache cache, Stats stats) {
+    Dispatcher(Context context2, ExecutorService executorService, Handler handler2, Downloader downloader2, Cache cache2, Stats stats2) {
         this.dispatcherThread.start();
         Utils.flushStackLocalLeaks(this.dispatcherThread.getLooper());
-        this.context = context;
+        this.context = context2;
         this.service = executorService;
         this.hunterMap = new LinkedHashMap();
         this.failedActions = new WeakHashMap();
         this.pausedActions = new WeakHashMap();
         this.pausedTags = new HashSet();
         this.handler = new DispatcherHandler(this.dispatcherThread.getLooper(), this);
-        this.downloader = downloader;
-        this.mainThreadHandler = handler;
-        this.cache = cache;
-        this.stats = stats;
+        this.downloader = downloader2;
+        this.mainThreadHandler = handler2;
+        this.cache = cache2;
+        this.stats = stats2;
         this.batch = new ArrayList(4);
         this.airplaneMode = Utils.isAirplaneModeOn(this.context);
-        this.scansNetworkChanges = Utils.hasPermission(context, "android.permission.ACCESS_NETWORK_STATE");
+        this.scansNetworkChanges = Utils.hasPermission(context2, "android.permission.ACCESS_NETWORK_STATE");
         this.receiver = new NetworkBroadcastReceiver(this);
         this.receiver.register();
     }
 
-    void shutdown() {
+    /* access modifiers changed from: 0000 */
+    public void shutdown() {
         if (this.service instanceof PicassoExecutorService) {
             this.service.shutdown();
         }
         this.downloader.shutdown();
         this.dispatcherThread.quit();
-        Picasso.HANDLER.post(new C07191());
+        Picasso.HANDLER.post(new Runnable() {
+            public void run() {
+                Dispatcher.this.receiver.unregister();
+            }
+        });
     }
 
-    void dispatchSubmit(Action action) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchSubmit(Action action) {
         this.handler.sendMessage(this.handler.obtainMessage(1, action));
     }
 
-    void dispatchCancel(Action action) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchCancel(Action action) {
         this.handler.sendMessage(this.handler.obtainMessage(2, action));
     }
 
-    void dispatchPauseTag(Object obj) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchPauseTag(Object obj) {
         this.handler.sendMessage(this.handler.obtainMessage(11, obj));
     }
 
-    void dispatchResumeTag(Object obj) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchResumeTag(Object obj) {
         this.handler.sendMessage(this.handler.obtainMessage(12, obj));
     }
 
-    void dispatchComplete(BitmapHunter bitmapHunter) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchComplete(BitmapHunter bitmapHunter) {
         this.handler.sendMessage(this.handler.obtainMessage(4, bitmapHunter));
     }
 
-    void dispatchRetry(BitmapHunter bitmapHunter) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchRetry(BitmapHunter bitmapHunter) {
         this.handler.sendMessageDelayed(this.handler.obtainMessage(5, bitmapHunter), 500);
     }
 
-    void dispatchFailed(BitmapHunter bitmapHunter) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchFailed(BitmapHunter bitmapHunter) {
         this.handler.sendMessage(this.handler.obtainMessage(6, bitmapHunter));
     }
 
-    void dispatchNetworkStateChange(NetworkInfo networkInfo) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchNetworkStateChange(NetworkInfo networkInfo) {
         this.handler.sendMessage(this.handler.obtainMessage(9, networkInfo));
     }
 
-    void dispatchAirplaneModeChange(boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void dispatchAirplaneModeChange(boolean z) {
         int i;
-        Handler handler = this.handler;
         Handler handler2 = this.handler;
+        Handler handler3 = this.handler;
         if (z) {
             i = 1;
         } else {
             i = 0;
         }
-        handler.sendMessage(handler2.obtainMessage(10, i, 0));
+        handler2.sendMessage(handler3.obtainMessage(10, i, 0));
     }
 
-    void performSubmit(Action action) {
+    /* access modifiers changed from: 0000 */
+    public void performSubmit(Action action) {
         performSubmit(action, true);
     }
 
-    void performSubmit(Action action, boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void performSubmit(Action action, boolean z) {
         if (this.pausedTags.contains(action.getTag())) {
             this.pausedActions.put(action.getTarget(), action);
             if (action.getPicasso().loggingEnabled) {
@@ -254,7 +262,7 @@ class Dispatcher {
         if (bitmapHunter != null) {
             bitmapHunter.attach(action);
         } else if (!this.service.isShutdown()) {
-            Object forRequest = BitmapHunter.forRequest(action.getPicasso(), this, this.cache, this.stats, action);
+            BitmapHunter forRequest = BitmapHunter.forRequest(action.getPicasso(), this, this.cache, this.stats, action);
             forRequest.future = this.service.submit(forRequest);
             this.hunterMap.put(action.getKey(), forRequest);
             if (z) {
@@ -268,7 +276,8 @@ class Dispatcher {
         }
     }
 
-    void performCancel(Action action) {
+    /* access modifiers changed from: 0000 */
+    public void performCancel(Action action) {
         String key = action.getKey();
         BitmapHunter bitmapHunter = (BitmapHunter) this.hunterMap.get(key);
         if (bitmapHunter != null) {
@@ -292,7 +301,8 @@ class Dispatcher {
         }
     }
 
-    void performPauseTag(Object obj) {
+    /* access modifiers changed from: 0000 */
+    public void performPauseTag(Object obj) {
         if (this.pausedTags.add(obj)) {
             Iterator it = this.hunterMap.values().iterator();
             while (it.hasNext()) {
@@ -300,8 +310,8 @@ class Dispatcher {
                 boolean z = bitmapHunter.getPicasso().loggingEnabled;
                 Action action = bitmapHunter.getAction();
                 List actions = bitmapHunter.getActions();
-                Object obj2 = (actions == null || actions.isEmpty()) ? null : 1;
-                if (action != null || obj2 != null) {
+                boolean z2 = actions != null && !actions.isEmpty();
+                if (action != null || z2) {
                     if (action != null && action.getTag().equals(obj)) {
                         bitmapHunter.detach(action);
                         this.pausedActions.put(action.getTarget(), action);
@@ -309,7 +319,7 @@ class Dispatcher {
                             Utils.log(DISPATCHER_THREAD_NAME, "paused", action.request.logId(), "because tag '" + obj + "' was paused");
                         }
                     }
-                    if (obj2 != null) {
+                    if (z2) {
                         for (int size = actions.size() - 1; size >= 0; size--) {
                             Action action2 = (Action) actions.get(size);
                             if (action2.getTag().equals(obj)) {
@@ -332,44 +342,46 @@ class Dispatcher {
         }
     }
 
-    void performResumeTag(Object obj) {
+    /* access modifiers changed from: 0000 */
+    public void performResumeTag(Object obj) {
         if (this.pausedTags.remove(obj)) {
-            Object obj2 = null;
+            ArrayList arrayList = null;
             Iterator it = this.pausedActions.values().iterator();
             while (it.hasNext()) {
                 Action action = (Action) it.next();
                 if (action.getTag().equals(obj)) {
-                    if (obj2 == null) {
-                        obj2 = new ArrayList();
+                    if (arrayList == null) {
+                        arrayList = new ArrayList();
                     }
-                    obj2.add(action);
+                    arrayList.add(action);
                     it.remove();
                 }
             }
-            if (obj2 != null) {
-                this.mainThreadHandler.sendMessage(this.mainThreadHandler.obtainMessage(13, obj2));
+            if (arrayList != null) {
+                this.mainThreadHandler.sendMessage(this.mainThreadHandler.obtainMessage(13, arrayList));
             }
         }
     }
 
-    void performRetry(BitmapHunter bitmapHunter) {
+    /* access modifiers changed from: 0000 */
+    public void performRetry(BitmapHunter bitmapHunter) {
+        NetworkInfo networkInfo;
         boolean z = true;
         if (!bitmapHunter.isCancelled()) {
             if (this.service.isShutdown()) {
                 performError(bitmapHunter, false);
                 return;
             }
-            NetworkInfo activeNetworkInfo;
             if (this.scansNetworkChanges) {
-                activeNetworkInfo = ((ConnectivityManager) Utils.getService(this.context, "connectivity")).getActiveNetworkInfo();
+                networkInfo = ((ConnectivityManager) Utils.getService(this.context, "connectivity")).getActiveNetworkInfo();
             } else {
-                activeNetworkInfo = null;
+                networkInfo = null;
             }
-            boolean z2 = activeNetworkInfo != null && activeNetworkInfo.isConnected();
-            boolean shouldRetry = bitmapHunter.shouldRetry(this.airplaneMode, activeNetworkInfo);
+            boolean z2 = networkInfo != null && networkInfo.isConnected();
+            boolean shouldRetry = bitmapHunter.shouldRetry(this.airplaneMode, networkInfo);
             boolean supportsReplay = bitmapHunter.supportsReplay();
             if (!shouldRetry) {
-                if (!(this.scansNetworkChanges && supportsReplay)) {
+                if (!this.scansNetworkChanges || !supportsReplay) {
                     z = false;
                 }
                 performError(bitmapHunter, z);
@@ -393,7 +405,8 @@ class Dispatcher {
         }
     }
 
-    void performComplete(BitmapHunter bitmapHunter) {
+    /* access modifiers changed from: 0000 */
+    public void performComplete(BitmapHunter bitmapHunter) {
         if (MemoryPolicy.shouldWriteToMemoryCache(bitmapHunter.getMemoryPolicy())) {
             this.cache.set(bitmapHunter.getKey(), bitmapHunter.getResult());
         }
@@ -404,14 +417,16 @@ class Dispatcher {
         }
     }
 
-    void performBatchComplete() {
-        List arrayList = new ArrayList(this.batch);
+    /* access modifiers changed from: 0000 */
+    public void performBatchComplete() {
+        ArrayList arrayList = new ArrayList(this.batch);
         this.batch.clear();
         this.mainThreadHandler.sendMessage(this.mainThreadHandler.obtainMessage(8, arrayList));
         logBatch(arrayList);
     }
 
-    void performError(BitmapHunter bitmapHunter, boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void performError(BitmapHunter bitmapHunter, boolean z) {
         if (bitmapHunter.getPicasso().loggingEnabled) {
             Utils.log(DISPATCHER_THREAD_NAME, "batched", Utils.getLogIdsForHunter(bitmapHunter), "for error" + (z ? " (will replay)" : ""));
         }
@@ -419,11 +434,13 @@ class Dispatcher {
         batch(bitmapHunter);
     }
 
-    void performAirplaneModeChange(boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void performAirplaneModeChange(boolean z) {
         this.airplaneMode = z;
     }
 
-    void performNetworkStateChange(NetworkInfo networkInfo) {
+    /* access modifiers changed from: 0000 */
+    public void performNetworkStateChange(NetworkInfo networkInfo) {
         if (this.service instanceof PicassoExecutorService) {
             ((PicassoExecutorService) this.service).adjustThreadCount(networkInfo);
         }
@@ -479,14 +496,14 @@ class Dispatcher {
 
     private void logBatch(List<BitmapHunter> list) {
         if (list != null && !list.isEmpty() && ((BitmapHunter) list.get(0)).getPicasso().loggingEnabled) {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             for (BitmapHunter bitmapHunter : list) {
-                if (stringBuilder.length() > 0) {
-                    stringBuilder.append(", ");
+                if (sb.length() > 0) {
+                    sb.append(", ");
                 }
-                stringBuilder.append(Utils.getLogIdsForHunter(bitmapHunter));
+                sb.append(Utils.getLogIdsForHunter(bitmapHunter));
             }
-            Utils.log(DISPATCHER_THREAD_NAME, "delivered", stringBuilder.toString());
+            Utils.log(DISPATCHER_THREAD_NAME, "delivered", sb.toString());
         }
     }
 }

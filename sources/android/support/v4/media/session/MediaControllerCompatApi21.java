@@ -1,6 +1,5 @@
-package android.support.v4.media.session;
+package android.support.p000v4.media.session;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -17,13 +16,13 @@ import android.os.ResultReceiver;
 import android.support.annotation.RequiresApi;
 import android.view.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.media.session.MediaControllerCompatApi21 */
 class MediaControllerCompatApi21 {
 
+    /* renamed from: android.support.v4.media.session.MediaControllerCompatApi21$Callback */
     public interface Callback {
         void onAudioInfoChanged(int i, int i2, int i3, int i4, int i5);
 
@@ -42,6 +41,7 @@ class MediaControllerCompatApi21 {
         void onSessionEvent(String str, Bundle bundle);
     }
 
+    /* renamed from: android.support.v4.media.session.MediaControllerCompatApi21$CallbackProxy */
     static class CallbackProxy<T extends Callback> extends android.media.session.MediaController.Callback {
         protected final T mCallback;
 
@@ -82,6 +82,7 @@ class MediaControllerCompatApi21 {
         }
     }
 
+    /* renamed from: android.support.v4.media.session.MediaControllerCompatApi21$PlaybackInfo */
     public static class PlaybackInfo {
         private static final int FLAG_SCO = 4;
         private static final int STREAM_BLUETOOTH_SCO = 6;
@@ -119,11 +120,6 @@ class MediaControllerCompatApi21 {
                 return 6;
             }
             switch (audioAttributes.getUsage()) {
-                case 1:
-                case 11:
-                case 12:
-                case 14:
-                    return 3;
                 case 2:
                     return 0;
                 case 3:
@@ -146,6 +142,7 @@ class MediaControllerCompatApi21 {
         }
     }
 
+    /* renamed from: android.support.v4.media.session.MediaControllerCompatApi21$TransportControls */
     public static class TransportControls {
         public static void fastForward(Object obj) {
             ((android.media.session.MediaController.TransportControls) obj).fastForward();
@@ -248,8 +245,11 @@ class MediaControllerCompatApi21 {
     }
 
     public static List<Object> getQueue(Object obj) {
-        Collection queue = ((MediaController) obj).getQueue();
-        return queue == null ? null : new ArrayList(queue);
+        List queue = ((MediaController) obj).getQueue();
+        if (queue == null) {
+            return null;
+        }
+        return new ArrayList(queue);
     }
 
     public static CharSequence getQueueTitle(Object obj) {

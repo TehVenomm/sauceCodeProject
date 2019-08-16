@@ -24,73 +24,89 @@ abstract class Action<T> {
     static class RequestWeakReference<M> extends WeakReference<M> {
         final Action action;
 
-        public RequestWeakReference(Action action, M m, ReferenceQueue<? super M> referenceQueue) {
+        public RequestWeakReference(Action action2, M m, ReferenceQueue<? super M> referenceQueue) {
             super(m, referenceQueue);
-            this.action = action;
+            this.action = action2;
         }
     }
 
-    abstract void complete(Bitmap bitmap, LoadedFrom loadedFrom);
+    /* access modifiers changed from: 0000 */
+    public abstract void complete(Bitmap bitmap, LoadedFrom loadedFrom);
 
-    abstract void error();
+    /* access modifiers changed from: 0000 */
+    public abstract void error();
 
-    Action(Picasso picasso, T t, Request request, int i, int i2, int i3, Drawable drawable, String str, Object obj, boolean z) {
-        this.picasso = picasso;
-        this.request = request;
-        this.target = t == null ? null : new RequestWeakReference(this, t, picasso.referenceQueue);
+    Action(Picasso picasso2, T t, Request request2, int i, int i2, int i3, Drawable drawable, String str, Object obj, boolean z) {
+        this.picasso = picasso2;
+        this.request = request2;
+        this.target = t == null ? null : new RequestWeakReference(this, t, picasso2.referenceQueue);
         this.memoryPolicy = i;
         this.networkPolicy = i2;
         this.noFade = z;
         this.errorResId = i3;
         this.errorDrawable = drawable;
         this.key = str;
-        if (obj == null) {
-            Action action = this;
+        if (obj == 0) {
+            obj = this;
         }
         this.tag = obj;
     }
 
-    void cancel() {
+    /* access modifiers changed from: 0000 */
+    public void cancel() {
         this.cancelled = true;
     }
 
-    Request getRequest() {
+    /* access modifiers changed from: 0000 */
+    public Request getRequest() {
         return this.request;
     }
 
-    T getTarget() {
-        return this.target == null ? null : this.target.get();
+    /* access modifiers changed from: 0000 */
+    public T getTarget() {
+        if (this.target == null) {
+            return null;
+        }
+        return this.target.get();
     }
 
-    String getKey() {
+    /* access modifiers changed from: 0000 */
+    public String getKey() {
         return this.key;
     }
 
-    boolean isCancelled() {
+    /* access modifiers changed from: 0000 */
+    public boolean isCancelled() {
         return this.cancelled;
     }
 
-    boolean willReplay() {
+    /* access modifiers changed from: 0000 */
+    public boolean willReplay() {
         return this.willReplay;
     }
 
-    int getMemoryPolicy() {
+    /* access modifiers changed from: 0000 */
+    public int getMemoryPolicy() {
         return this.memoryPolicy;
     }
 
-    int getNetworkPolicy() {
+    /* access modifiers changed from: 0000 */
+    public int getNetworkPolicy() {
         return this.networkPolicy;
     }
 
-    Picasso getPicasso() {
+    /* access modifiers changed from: 0000 */
+    public Picasso getPicasso() {
         return this.picasso;
     }
 
-    Priority getPriority() {
+    /* access modifiers changed from: 0000 */
+    public Priority getPriority() {
         return this.request.priority;
     }
 
-    Object getTag() {
+    /* access modifiers changed from: 0000 */
+    public Object getTag() {
         return this.tag;
     }
 }

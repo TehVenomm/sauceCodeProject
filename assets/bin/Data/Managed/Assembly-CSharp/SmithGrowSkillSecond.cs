@@ -72,7 +72,6 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 	{
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		object[] array = GameSection.GetEventData() as object[];
 		skillItem = (array[0] as SkillItemInfo);
 		material = (array[1] as SkillItemInfo[]);
@@ -95,7 +94,7 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 			{
 				component2.tweens[i].ResetToBeginning();
 			}
-			component2.Play(true, null);
+			component2.Play();
 		}
 		isExceed = skillItem.IsLevelMax();
 		isSortTypeReset = isExceed;
@@ -119,42 +118,38 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 
 	public override void UpdateUI()
 	{
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Expected O, but got Unknown
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 		isExceed = skillItem.IsLevelMax();
 		MATERIAL_SELECT_MAX = ((!isExceed) ? 10 : 10);
 		SetFontStyle((Enum)UI.STR_TITLE_MATERIAL, 2);
 		SetFontStyle((Enum)UI.STR_TITLE_MONEY, 2);
 		if (detailBase != null)
 		{
-			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
+			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
 		}
 		UpdateMaterial();
 		Transform ctrl = GetCtrl(UI.GRD_MATERIAL);
 		while (ctrl.get_childCount() != 0)
 		{
-			Transform val = ctrl.GetChild(0);
-			val.set_parent(null);
-			val.get_gameObject().SetActive(false);
-			Object.Destroy(val.get_gameObject());
+			Transform child = ctrl.GetChild(0);
+			child.set_parent(null);
+			child.get_gameObject().SetActive(false);
+			Object.Destroy(child.get_gameObject());
 		}
 		int material_num = (material != null) ? material.Length : 0;
-		SetGrid(UI.GRD_MATERIAL, null, MATERIAL_SELECT_MAX, false, delegate(int index, Transform parent)
+		SetGrid(UI.GRD_MATERIAL, null, MATERIAL_SELECT_MAX, reset: false, delegate(int index, Transform parent)
 		{
 			if (index < material_num)
 			{
-				return Utility.CreateGameObject(index.ToString(), parent, -1);
+				return Utility.CreateGameObject(index.ToString(), parent);
 			}
-			return Realizes("SkillGrowSecondSelectItem", parent, true);
+			return Realizes("SkillGrowSecondSelectItem", parent);
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (i < material_num)
 			{
 				SkillItemInfo skillItemInfo = material[i];
 				SkillItemTable.SkillItemData tableData = skillItemInfo.tableData;
-				ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(tableData.type), tableData.iconID, tableData.rarity, t, tableData.skillAtkType, skillItemInfo.tableData.GetEnableEquipType(), -1, "SELECT", i, false, -1, false, null, skillItemInfo.isAttached, 0, 0, false, GET_TYPE.PAY);
+				ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(tableData.type), tableData.iconID, tableData.rarity, t, tableData.skillAtkType, skillItemInfo.tableData.GetEnableEquipType(), -1, "SELECT", i, is_new: false, -1, is_select: false, null, skillItemInfo.isAttached || skillItemInfo.isUniqueAttached, 0, 0, disable_rarity_text: false, GET_TYPE.PAY, tableData.GetAttackElementByIndex(1), isExceed && skillItem.tableData.id == tableData.id);
 				SetLongTouch(itemIcon.transform, "DETAIL", i);
 			}
 		});
@@ -166,13 +161,13 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 		}
 		if (material != null && material.Length > 0)
 		{
-			SetActive((Enum)UI.BTN_DECISION_ON, true);
-			SetActive((Enum)UI.BTN_DECISION_OFF, false);
+			SetActive((Enum)UI.BTN_DECISION_ON, is_visible: true);
+			SetActive((Enum)UI.BTN_DECISION_OFF, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_DECISION_ON, false);
-			SetActive((Enum)UI.BTN_DECISION_OFF, true);
+			SetActive((Enum)UI.BTN_DECISION_ON, is_visible: false);
+			SetActive((Enum)UI.BTN_DECISION_OFF, is_visible: true);
 		}
 		SetLabelText(text: (!isExceed) ? base.sectionData.GetText("CAPTION_GROW") : base.sectionData.GetText("CAPTION_EXCEED"), label_enum: UI.LBL_CAPTION);
 		SetActive((Enum)UI.SPR_BG_NORMAL, !isExceed);
@@ -186,8 +181,8 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 		SkillItemInfo skillItemInfo = new SkillItemInfo(0, (int)_ref.tableID, lv, exceed);
 		skillItemInfo.uniqueID = _ref.uniqueID;
 		skillItemInfo.exp = _ref.exp;
-		skillItemInfo.expPrev = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(skillItemInfo.tableData.baseNeedExp, skillItemInfo.growData.needExp, false);
-		skillItemInfo.expNext = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(skillItemInfo.tableData.baseNeedExp, skillItemInfo.nextGrowData.needExp, false);
+		skillItemInfo.expPrev = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(skillItemInfo.tableData.baseNeedExp, skillItemInfo.growData.needExp);
+		skillItemInfo.expNext = MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(skillItemInfo.tableData.baseNeedExp, skillItemInfo.nextGrowData.needExp);
 		skillItemInfo.exceedExp = _ref.exceedExp;
 		skillItemInfo.growCost = _ref.growCost;
 		return skillItemInfo;
@@ -195,8 +190,8 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 
 	private void UpdateMaterial()
 	{
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 		int num = (material != null) ? material.Length : 0;
 		SetLabelText((Enum)UI.LBL_SELECT_NUM, (MATERIAL_SELECT_MAX - num).ToString());
 		needGold = ((!isExceed) ? ((int)(skillItem.growCost * (float)num)) : 0);
@@ -210,8 +205,8 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 			SetColor((Enum)UI.LBL_GOLD, goldColor);
 		}
 		SetActive((Enum)UI.OBJ_GOLD, !isExceed);
-		SkillItemInfo skillItemInfo = ParamCopy(skillItem, false, false);
-		SkillItemInfo skillItemInfo2 = ParamCopy(skillItem, false, false);
+		SkillItemInfo skillItemInfo = ParamCopy(skillItem);
+		SkillItemInfo skillItemInfo2 = ParamCopy(skillItem);
 		if (material != null)
 		{
 			int i = 0;
@@ -219,26 +214,38 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 			{
 				if (isExceed)
 				{
-					if (!skillItemInfo2.IsMaxExceed())
+					if (skillItemInfo2.IsMaxExceed())
+					{
+						continue;
+					}
+					if (skillItem.tableData.id == material[i].tableData.id)
+					{
+						skillItemInfo2.exceedExp += material[i].giveSameSkillExceedExp;
+					}
+					else
 					{
 						skillItemInfo2.exceedExp += material[i].giveExceedExp;
-						while (skillItemInfo2.exceedExpNext <= skillItemInfo2.exceedExp)
+					}
+					while (skillItemInfo2.exceedExpNext <= skillItemInfo2.exceedExp)
+					{
+						skillItemInfo2 = ParamCopy(skillItemInfo2, isLevelUp: false, isExceedUp: true);
+						if (skillItemInfo2.IsMaxExceed())
 						{
-							skillItemInfo2 = ParamCopy(skillItemInfo2, false, true);
-							if (skillItemInfo2.IsMaxExceed())
-							{
-								skillItemInfo2.exceedExp = skillItemInfo2.expPrev;
-								break;
-							}
+							skillItemInfo2.exceedExp = skillItemInfo2.expPrev;
+							break;
 						}
 					}
 				}
-				else if (!skillItemInfo2.IsLevelMax() && material[i].level <= material[i].GetMaxLevel())
+				else
 				{
+					if (skillItemInfo2.IsLevelMax() || material[i].level > material[i].GetMaxLevel())
+					{
+						continue;
+					}
 					skillItemInfo2.exp += material[i].giveExp;
 					while (skillItemInfo2.expNext <= skillItemInfo2.exp)
 					{
-						skillItemInfo2 = ParamCopy(skillItemInfo2, true, false);
+						skillItemInfo2 = ParamCopy(skillItemInfo2, isLevelUp: true);
 						if (skillItemInfo2.IsLevelMax())
 						{
 							skillItemInfo2.exp = skillItemInfo2.expPrev;
@@ -265,10 +272,10 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 		SetLabelText(detailBase, UI.LBL_HP, skillItemInfo2.hp.ToString());
 		SetLabelText(detailBase, UI.LBL_SELL, needGold.ToString());
 		SetLabelText(detailBase, UI.STR_SELL, base.sectionData.GetText("STR_SELL"));
-		SetSupportEncoding(UI.LBL_DESCRIPTION, true);
-		SetSupportEncoding(UI.LBL_BASE_DESCRIPTION, true);
-		SetSupportEncoding(UI.LBL_NEXT_DESCRIPTION, true);
-		string explanationText = skillItemInfo.GetExplanationText(true);
+		SetSupportEncoding(UI.LBL_DESCRIPTION, isEnable: true);
+		SetSupportEncoding(UI.LBL_BASE_DESCRIPTION, isEnable: true);
+		SetSupportEncoding(UI.LBL_NEXT_DESCRIPTION, isEnable: true);
+		string explanationText = skillItemInfo.GetExplanationText(isShowExceed: true);
 		SetLabelText(detailBase, UI.LBL_DESCRIPTION, explanationText);
 		SetLabelText((Enum)UI.LBL_BASE_DESCRIPTION, explanationText);
 		SetLabelText((Enum)UI.LBL_NEXT_DESCRIPTION, skillItemInfo2.GetExplanationStatusUpText(base.sectionData.GetText("STR_STATUS_UP_FORMAT"), isExceed, skillItemInfo.exceedCnt > 0));
@@ -278,14 +285,14 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 			component.SetExceedMode();
 			float fill_amount = (float)(skillItem.exceedExp - skillItem.exceedExpPrev) / (float)(skillItem.exceedExpNext - skillItem.exceedExpPrev);
 			component.SetBaseGauge(skillItemInfo2.exceedCnt == skillItemInfo.exceedCnt, fill_amount);
-			SetProgressInt(detailBase, UI.PRG_EXP_BAR, skillItemInfo2.exceedExp, skillItemInfo2.exceedExpPrev, skillItemInfo2.exceedExpNext, null);
+			SetProgressInt(detailBase, UI.PRG_EXP_BAR, skillItemInfo2.exceedExp, skillItemInfo2.exceedExpPrev, skillItemInfo2.exceedExpNext);
 		}
 		else
 		{
 			float fill_amount2 = (float)(skillItem.exp - skillItem.expPrev) / (float)(skillItem.expNext - skillItem.expPrev);
 			component.SetGrowMode();
 			component.SetBaseGauge(skillItemInfo2.level == skillItemInfo.level, fill_amount2);
-			SetProgressInt(detailBase, UI.PRG_EXP_BAR, skillItemInfo2.exp, skillItemInfo2.expPrev, skillItemInfo2.expNext, null);
+			SetProgressInt(detailBase, UI.PRG_EXP_BAR, skillItemInfo2.exp, skillItemInfo2.expPrev, skillItemInfo2.expNext);
 		}
 		UpdateAnchors();
 	}
@@ -303,25 +310,25 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 	{
 		if (needGold > MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money)
 		{
-			GameSection.ChangeEvent("NOT_ENOUGH_MONEY", null);
+			GameSection.ChangeEvent("NOT_ENOUGH_MONEY");
+			return;
 		}
-		else if (material == null || material.Length <= 0)
+		if (material == null || material.Length <= 0)
 		{
-			GameSection.ChangeEvent("NOT_MATERIAL", null);
+			GameSection.ChangeEvent("NOT_MATERIAL");
+			return;
 		}
-		else if (skillItem.IsLevelMax() && !skillItem.IsExistNextExceed())
+		if (skillItem.IsLevelMax() && !skillItem.IsExistNextExceed())
 		{
-			GameSection.ChangeEvent("NOT_INCLUDE_EXCEED", null);
+			GameSection.ChangeEvent("NOT_INCLUDE_EXCEED");
+			return;
 		}
-		else
+		isNoticeSendGrow = true;
+		GameSection.SetEventData(new object[2]
 		{
-			isNoticeSendGrow = true;
-			GameSection.SetEventData(new object[2]
-			{
-				skillItem,
-				material
-			});
-		}
+			skillItem,
+			material
+		});
 	}
 
 	private void OnCloseDialog_SmithGrowSkillConfirm()
@@ -389,7 +396,7 @@ public class SmithGrowSkillSecond : ItemDetailSkill
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("SmithGrowSkillSelect"))
 		{
 			GameSection.StopEvent();
-			OnQuery_MAIN_MENU_STATUS();
+			TO_UNIQUE_OR_MAIN_STATUS();
 		}
 	}
 }

@@ -47,11 +47,13 @@ public class BeanAsArraySerializer extends BeanSerializerBase {
         return new BeanAsArraySerializer(this, this._objectIdWriter, obj);
     }
 
-    protected BeanAsArraySerializer withIgnorals(String[] strArr) {
+    /* access modifiers changed from: protected */
+    public BeanAsArraySerializer withIgnorals(String[] strArr) {
         return new BeanAsArraySerializer(this, strArr);
     }
 
-    protected BeanSerializerBase asArraySerializer() {
+    /* access modifiers changed from: protected */
+    public BeanSerializerBase asArraySerializer() {
         return this;
     }
 
@@ -75,14 +77,14 @@ public class BeanAsArraySerializer extends BeanSerializerBase {
     }
 
     public final void serialize(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED) && hasSingleElement(serializerProvider)) {
+        if (!serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED) || !hasSingleElement(serializerProvider)) {
+            jsonGenerator.writeStartArray();
+            jsonGenerator.setCurrentValue(obj);
             serializeAsArray(obj, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray();
-        jsonGenerator.setCurrentValue(obj);
         serializeAsArray(obj, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
     }
 
     private boolean hasSingleElement(SerializerProvider serializerProvider) {
@@ -95,7 +97,8 @@ public class BeanAsArraySerializer extends BeanSerializerBase {
         return beanPropertyWriterArr.length == 1;
     }
 
-    protected final void serializeAsArray(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void serializeAsArray(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         BeanPropertyWriter[] beanPropertyWriterArr;
         if (this._filteredProps == null || serializerProvider.getActiveView() == null) {
             beanPropertyWriterArr = this._props;
@@ -114,10 +117,10 @@ public class BeanAsArraySerializer extends BeanSerializerBase {
                 }
                 i++;
             }
-        } catch (Throwable e) {
-            wrapAndThrow(serializerProvider, e, obj, i == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[i].getName());
-        } catch (Throwable e2) {
-            JsonMappingException from = JsonMappingException.from(jsonGenerator, "Infinite recursion (StackOverflowError)", e2);
+        } catch (Exception e) {
+            wrapAndThrow(serializerProvider, (Throwable) e, obj, i == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[i].getName());
+        } catch (StackOverflowError e2) {
+            JsonMappingException from = JsonMappingException.from(jsonGenerator, "Infinite recursion (StackOverflowError)", (Throwable) e2);
             from.prependPath(new Reference(obj, i == beanPropertyWriterArr.length ? "[anySetter]" : beanPropertyWriterArr[i].getName()));
             throw from;
         }

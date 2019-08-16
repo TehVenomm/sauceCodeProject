@@ -27,12 +27,12 @@ final class PicassoDrawable extends BitmapDrawable {
     Drawable placeholder;
     long startTimeMillis;
 
-    static void setBitmap(ImageView imageView, Context context, Bitmap bitmap, LoadedFrom loadedFrom, boolean z, boolean z2) {
+    static void setBitmap(ImageView imageView, Context context, Bitmap bitmap, LoadedFrom loadedFrom2, boolean z, boolean z2) {
         Drawable drawable = imageView.getDrawable();
         if (drawable instanceof AnimationDrawable) {
             ((AnimationDrawable) drawable).stop();
         }
-        imageView.setImageDrawable(new PicassoDrawable(context, bitmap, drawable, loadedFrom, z, z2));
+        imageView.setImageDrawable(new PicassoDrawable(context, bitmap, drawable, loadedFrom2, z, z2));
     }
 
     static void setPlaceholder(ImageView imageView, Drawable drawable) {
@@ -42,13 +42,12 @@ final class PicassoDrawable extends BitmapDrawable {
         }
     }
 
-    PicassoDrawable(Context context, Bitmap bitmap, Drawable drawable, LoadedFrom loadedFrom, boolean z, boolean z2) {
+    PicassoDrawable(Context context, Bitmap bitmap, Drawable drawable, LoadedFrom loadedFrom2, boolean z, boolean z2) {
         super(context.getResources(), bitmap);
         this.debugging = z2;
         this.density = context.getResources().getDisplayMetrics().density;
-        this.loadedFrom = loadedFrom;
-        boolean z3 = (loadedFrom == LoadedFrom.MEMORY || z) ? false : true;
-        if (z3) {
+        this.loadedFrom = loadedFrom2;
+        if (loadedFrom2 != LoadedFrom.MEMORY && !z) {
             this.placeholder = drawable;
             this.animating = true;
             this.startTimeMillis = SystemClock.uptimeMillis();
@@ -56,7 +55,9 @@ final class PicassoDrawable extends BitmapDrawable {
     }
 
     public void draw(Canvas canvas) {
-        if (this.animating) {
+        if (!this.animating) {
+            super.draw(canvas);
+        } else {
             float uptimeMillis = ((float) (SystemClock.uptimeMillis() - this.startTimeMillis)) / FADE_DURATION;
             if (uptimeMillis >= 1.0f) {
                 this.animating = false;
@@ -73,8 +74,6 @@ final class PicassoDrawable extends BitmapDrawable {
                     invalidateSelf();
                 }
             }
-        } else {
-            super.draw(canvas);
         }
         if (this.debugging) {
             drawDebugIndicator(canvas);
@@ -96,7 +95,8 @@ final class PicassoDrawable extends BitmapDrawable {
         super.setColorFilter(colorFilter);
     }
 
-    protected void onBoundsChange(Rect rect) {
+    /* access modifiers changed from: protected */
+    public void onBoundsChange(Rect rect) {
         if (this.placeholder != null) {
             this.placeholder.setBounds(rect);
         }

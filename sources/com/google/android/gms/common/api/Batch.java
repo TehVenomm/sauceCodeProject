@@ -1,63 +1,75 @@
 package com.google.android.gms.common.api;
 
-import com.google.android.gms.common.api.internal.zzs;
+import com.google.android.gms.common.api.internal.BasePendingResult;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Batch extends zzs<BatchResult> {
-    private final Object mLock;
-    private int zzfge;
-    private boolean zzfgf;
-    private boolean zzfgg;
-    private final PendingResult<?>[] zzfgh;
+public final class Batch extends BasePendingResult<BatchResult> {
+    /* access modifiers changed from: private */
+    public final Object mLock;
+    /* access modifiers changed from: private */
+    public int zaaz;
+    /* access modifiers changed from: private */
+    public boolean zaba;
+    /* access modifiers changed from: private */
+    public boolean zabb;
+    /* access modifiers changed from: private */
+    public final PendingResult<?>[] zabc;
 
     public static final class Builder {
-        private GoogleApiClient zzeoz;
-        private List<PendingResult<?>> zzfgj = new ArrayList();
+        private List<PendingResult<?>> zabe = new ArrayList();
+        private GoogleApiClient zabf;
 
         public Builder(GoogleApiClient googleApiClient) {
-            this.zzeoz = googleApiClient;
+            this.zabf = googleApiClient;
         }
 
         public final <R extends Result> BatchResultToken<R> add(PendingResult<R> pendingResult) {
-            BatchResultToken<R> batchResultToken = new BatchResultToken(this.zzfgj.size());
-            this.zzfgj.add(pendingResult);
+            BatchResultToken<R> batchResultToken = new BatchResultToken<>(this.zabe.size());
+            this.zabe.add(pendingResult);
             return batchResultToken;
         }
 
         public final Batch build() {
-            return new Batch(this.zzfgj, this.zzeoz);
+            return new Batch(this.zabe, this.zabf, null);
         }
     }
 
     private Batch(List<PendingResult<?>> list, GoogleApiClient googleApiClient) {
         super(googleApiClient);
         this.mLock = new Object();
-        this.zzfge = list.size();
-        this.zzfgh = new PendingResult[this.zzfge];
+        this.zaaz = list.size();
+        this.zabc = new PendingResult[this.zaaz];
         if (list.isEmpty()) {
-            setResult(new BatchResult(Status.zzfhp, this.zzfgh));
+            setResult(new BatchResult(Status.RESULT_SUCCESS, this.zabc));
             return;
         }
-        for (int i = 0; i < list.size(); i++) {
-            PendingResult pendingResult = (PendingResult) list.get(i);
-            this.zzfgh[i] = pendingResult;
-            pendingResult.zza(new zzb(this));
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 < list.size()) {
+                PendingResult<?> pendingResult = (PendingResult) list.get(i2);
+                this.zabc[i2] = pendingResult;
+                pendingResult.addStatusListener(new zaa(this));
+                i = i2 + 1;
+            } else {
+                return;
+            }
         }
+    }
+
+    /* synthetic */ Batch(List list, GoogleApiClient googleApiClient, zaa zaa) {
+        this(list, googleApiClient);
     }
 
     public final void cancel() {
         super.cancel();
-        for (PendingResult cancel : this.zzfgh) {
+        for (PendingResult<?> cancel : this.zabc) {
             cancel.cancel();
         }
     }
 
     public final BatchResult createFailedResult(Status status) {
-        return new BatchResult(status, this.zzfgh);
-    }
-
-    public final /* synthetic */ Result zzb(Status status) {
-        return createFailedResult(status);
+        return new BatchResult(status, this.zabc);
     }
 }

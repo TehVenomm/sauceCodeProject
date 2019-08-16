@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class UIScreenRotationHandler
+public abstract class UIScreenRotationHandler : MonoBehaviour
 {
 	[SerializeField]
 	private bool autoInvoke;

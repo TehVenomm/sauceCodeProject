@@ -66,8 +66,6 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 
 	protected override void Awake()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
 		base.Awake();
 		if (!(window == null))
 		{
@@ -80,8 +78,7 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 
 	private void Update()
 	{
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		if (!(window == null) && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenDialog && openInfoList.Count > 0)
+		if (!(window == null) && (!MonoBehaviourSingleton<TransitionManager>.IsValid() || !MonoBehaviourSingleton<TransitionManager>.I.isTransing) && !isOpenDialog && openInfoList.Count > 0)
 		{
 			this.StartCoroutine(DoShowDialog(openInfoList[0]));
 			openInfoList.RemoveAt(0);
@@ -100,67 +97,68 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 		tweenCtrl.Reset();
 		windowTransform.set_parent(dialogInfo.link);
 		windowTransform.set_localPosition(Vector3.get_zero());
-		int n = 0;
-		for (int m = sprites.Length; n < m; n++)
+		int i = 0;
+		for (int num = sprites.Length; i < num; i++)
 		{
-			sprites[n].spriteName = dialogInfo.spritesNames[n];
+			sprites[i].spriteName = dialogInfo.spritesNames[i];
 		}
 		messageLabel.effectColor = dialogInfo.lineColor;
 		messageLabel.supportEncoding = true;
 		messageLabel.text = desc.text;
 		if (transitions != null)
 		{
-			int l = 0;
-			for (int k = transitions.Length; l < k; l++)
+			int j = 0;
+			for (int num2 = transitions.Length; j < num2; j++)
 			{
-				transitions[l].Open(null);
+				transitions[j].Open(null);
 			}
 		}
 		bool play_tween = true;
-		tweenCtrl.Play(true, delegate
+		tweenCtrl.Play(forward: true, delegate
 		{
-			((_003CDoShowDialog_003Ec__Iterator251)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
+			play_tween = false;
 		});
 		yield return (object)new WaitForSeconds(desc.showTime);
 		while (play_tween)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		yield return (object)new WaitForSeconds(desc.showTime);
 		if (transitions != null)
 		{
-			int j = 0;
-			for (int i = transitions.Length; j < i; j++)
+			int k = 0;
+			for (int num3 = transitions.Length; k < num3; k++)
 			{
-				transitions[j].Close(null);
+				transitions[k].Close(null);
 			}
 		}
-		yield return (object)this.StartCoroutine(DoWaitTransitions());
+		yield return this.StartCoroutine(DoWaitTransitions());
 		isOpenDialog = false;
 	}
 
 	private IEnumerator DoWaitTransitions()
 	{
-		if (transitions.Length > 0)
+		if (transitions.Length <= 0)
 		{
-			while (true)
+			yield break;
+		}
+		while (true)
+		{
+			bool busy = false;
+			int i = 0;
+			for (int num = transitions.Length; i < num; i++)
 			{
-				bool busy = false;
-				int j = 0;
-				for (int i = transitions.Length; j < i; j++)
+				if (transitions[i].isBusy)
 				{
-					if (transitions[j].isBusy)
-					{
-						busy = true;
-						break;
-					}
-				}
-				if (!busy)
-				{
+					busy = true;
 					break;
 				}
-				yield return (object)null;
 			}
+			if (!busy)
+			{
+				break;
+			}
+			yield return null;
 		}
 	}
 }

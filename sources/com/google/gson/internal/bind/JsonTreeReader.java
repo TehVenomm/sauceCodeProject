@@ -16,14 +16,7 @@ import java.util.Map.Entry;
 
 public final class JsonTreeReader extends JsonReader {
     private static final Object SENTINEL_CLOSED = new Object();
-    private static final Reader UNREADABLE_READER = new C06941();
-    private final List<Object> stack = new ArrayList();
-
-    /* renamed from: com.google.gson.internal.bind.JsonTreeReader$1 */
-    static final class C06941 extends Reader {
-        C06941() {
-        }
-
+    private static final Reader UNREADABLE_READER = new Reader() {
         public void close() throws IOException {
             throw new AssertionError();
         }
@@ -31,7 +24,8 @@ public final class JsonTreeReader extends JsonReader {
         public int read(char[] cArr, int i, int i2) throws IOException {
             throw new AssertionError();
         }
-    }
+    };
+    private final List<Object> stack = new ArrayList();
 
     public JsonTreeReader(JsonElement jsonElement) {
         super(UNREADABLE_READER);
@@ -93,7 +87,7 @@ public final class JsonTreeReader extends JsonReader {
         JsonToken peek = peek();
         if (peek == JsonToken.NUMBER || peek == JsonToken.STRING) {
             double asDouble = ((JsonPrimitive) peekStack()).getAsDouble();
-            if (isLenient() || !(Double.isNaN(asDouble) || Double.isInfinite(asDouble))) {
+            if (isLenient() || (!Double.isNaN(asDouble) && !Double.isInfinite(asDouble))) {
                 popStack();
                 return asDouble;
             }
@@ -152,13 +146,12 @@ public final class JsonTreeReader extends JsonReader {
             Iterator it = (Iterator) peekStack;
             if (!it.hasNext()) {
                 return z ? JsonToken.END_OBJECT : JsonToken.END_ARRAY;
-            } else {
-                if (z) {
-                    return JsonToken.NAME;
-                }
-                this.stack.add(it.next());
-                return peek();
             }
+            if (z) {
+                return JsonToken.NAME;
+            }
+            this.stack.add(it.next());
+            return peek();
         } else if (peekStack instanceof JsonObject) {
             return JsonToken.BEGIN_OBJECT;
         } else {

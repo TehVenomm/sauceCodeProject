@@ -5,13 +5,14 @@ import com.crashlytics.android.beta.Beta;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.crashlytics.android.core.CrashlyticsListener;
 import com.crashlytics.android.core.PinningInfoProvider;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.Kit;
-import io.fabric.sdk.android.KitGroup;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.Kit;
+import p017io.fabric.sdk.android.KitGroup;
+import p017io.fabric.sdk.android.services.common.DataCollectionArbiter;
 
 public class Crashlytics extends Kit<Void> implements KitGroup {
     public static final String TAG = "Crashlytics";
@@ -37,24 +38,24 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
             return builder;
         }
 
-        public Builder answers(Answers answers) {
-            if (answers == null) {
+        public Builder answers(Answers answers2) {
+            if (answers2 == null) {
                 throw new NullPointerException("Answers Kit must not be null.");
             } else if (this.answers != null) {
                 throw new IllegalStateException("Answers Kit already set.");
             } else {
-                this.answers = answers;
+                this.answers = answers2;
                 return this;
             }
         }
 
-        public Builder beta(Beta beta) {
-            if (beta == null) {
+        public Builder beta(Beta beta2) {
+            if (beta2 == null) {
                 throw new NullPointerException("Beta Kit must not be null.");
             } else if (this.beta != null) {
                 throw new IllegalStateException("Beta Kit already set.");
             } else {
-                this.beta = beta;
+                this.beta = beta2;
                 return this;
             }
         }
@@ -118,11 +119,11 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
         this(new Answers(), new Beta(), new CrashlyticsCore());
     }
 
-    Crashlytics(Answers answers, Beta beta, CrashlyticsCore crashlyticsCore) {
-        this.answers = answers;
-        this.beta = beta;
+    Crashlytics(Answers answers2, Beta beta2, CrashlyticsCore crashlyticsCore) {
+        this.answers = answers2;
+        this.beta = beta2;
         this.core = crashlyticsCore;
-        this.kits = Collections.unmodifiableCollection(Arrays.asList(new Kit[]{answers, beta, crashlyticsCore}));
+        this.kits = Collections.unmodifiableCollection(Arrays.asList(new Kit[]{answers2, beta2, crashlyticsCore}));
     }
 
     private static void checkInitialized() {
@@ -138,6 +139,11 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
     public static PinningInfoProvider getPinningInfoProvider() {
         checkInitialized();
         return getInstance().core.getPinningInfoProvider();
+    }
+
+    private static boolean isCrashlyticsCollectionEnabled() {
+        checkInitialized();
+        return DataCollectionArbiter.getInstance(getInstance().getContext()).isDataCollectionEnabled();
     }
 
     public static void log(int i, String str, String str2) {
@@ -158,6 +164,11 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
     public static void setBool(String str, boolean z) {
         checkInitialized();
         getInstance().core.setBool(str, z);
+    }
+
+    private static void setCrashlyticsCollectionEnabled(boolean z) {
+        checkInitialized();
+        DataCollectionArbiter.getInstance(getInstance().getContext()).setCrashlyticsDataCollectionEnabled(z);
     }
 
     public static void setDouble(String str, double d) {
@@ -182,7 +193,7 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
 
     @Deprecated
     public static void setPinningInfoProvider(PinningInfoProvider pinningInfoProvider) {
-        Fabric.getLogger().mo4302w(TAG, "Use of Crashlytics.setPinningInfoProvider is deprecated");
+        Fabric.getLogger().mo20982w(TAG, "Use of Crashlytics.setPinningInfoProvider is deprecated");
     }
 
     public static void setString(String str, String str2) {
@@ -209,13 +220,14 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
         this.core.crash();
     }
 
-    protected Void doInBackground() {
+    /* access modifiers changed from: protected */
+    public Void doInBackground() {
         return null;
     }
 
     @Deprecated
     public boolean getDebugMode() {
-        Fabric.getLogger().mo4302w(TAG, "Use of Crashlytics.getDebugMode is deprecated.");
+        Fabric.getLogger().mo20982w(TAG, "Use of Crashlytics.getDebugMode is deprecated.");
         getFabric();
         return Fabric.isDebuggable();
     }
@@ -229,12 +241,12 @@ public class Crashlytics extends Kit<Void> implements KitGroup {
     }
 
     public String getVersion() {
-        return "2.4.0.61";
+        return "2.9.9.32";
     }
 
     @Deprecated
     public void setDebugMode(boolean z) {
-        Fabric.getLogger().mo4302w(TAG, "Use of Crashlytics.setDebugMode is deprecated.");
+        Fabric.getLogger().mo20982w(TAG, "Use of Crashlytics.setDebugMode is deprecated.");
     }
 
     @Deprecated

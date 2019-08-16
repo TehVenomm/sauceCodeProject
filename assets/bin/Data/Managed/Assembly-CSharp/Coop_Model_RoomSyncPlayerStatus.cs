@@ -38,7 +38,7 @@ public class Coop_Model_RoomSyncPlayerStatus : Coop_Model_Base
 
 	public static bool StatusEnabled(Player self, UIStatusIcon.STATUS_TYPE status)
 	{
-		return UIStatusIcon.CheckStatus(status, self, false);
+		return UIStatusIcon.CheckStatus(status, self, isFieldBuff: false);
 	}
 
 	public override string ToString()

@@ -13,7 +13,7 @@ namespace BestHTTP.Extensions
 			StringBuilder stringBuilder = new StringBuilder(bytes.Length);
 			foreach (byte b in bytes)
 			{
-				stringBuilder.Append((char)((b > 127) ? 63 : ((int)b)));
+				stringBuilder.Append((char)((b > 127) ? 63 : b));
 			}
 			return stringBuilder.ToString();
 		}
@@ -70,69 +70,51 @@ namespace BestHTTP.Extensions
 
 		public static int ToInt32(this string str, int defaultValue = 0)
 		{
-			if (str != null)
+			if (str == null)
 			{
-				try
-				{
-					return int.Parse(str);
-					IL_0014:
-					int result;
-					return result;
-				}
-				catch
-				{
-					return defaultValue;
-					IL_0021:
-					int result;
-					return result;
-				}
+				return defaultValue;
 			}
-			return defaultValue;
+			try
+			{
+				return int.Parse(str);
+			}
+			catch
+			{
+				return defaultValue;
+			}
 		}
 
 		public static long ToInt64(this string str, long defaultValue = 0L)
 		{
-			if (str != null)
+			if (str == null)
 			{
-				try
-				{
-					return long.Parse(str);
-					IL_0014:
-					long result;
-					return result;
-				}
-				catch
-				{
-					return defaultValue;
-					IL_0021:
-					long result;
-					return result;
-				}
+				return defaultValue;
 			}
-			return defaultValue;
+			try
+			{
+				return long.Parse(str);
+			}
+			catch
+			{
+				return defaultValue;
+			}
 		}
 
 		public static DateTime ToDateTime(this string str, DateTime defaultValue = default(DateTime))
 		{
-			if (str != null)
+			if (str == null)
 			{
-				try
-				{
-					DateTime.TryParse(str, out defaultValue);
-					return defaultValue.ToUniversalTime();
-					IL_001e:
-					DateTime result;
-					return result;
-				}
-				catch
-				{
-					return defaultValue;
-					IL_002b:
-					DateTime result;
-					return result;
-				}
+				return defaultValue;
 			}
-			return defaultValue;
+			try
+			{
+				DateTime.TryParse(str, out defaultValue);
+				return defaultValue.ToUniversalTime();
+			}
+			catch
+			{
+				return defaultValue;
+			}
 		}
 
 		public static string ToStrOrEmpty(this string str)
@@ -193,13 +175,13 @@ namespace BestHTTP.Extensions
 			}
 			if (str[pos] == '"')
 			{
-				str.Read(ref pos, '"', false);
-				empty = str.Read(ref pos, '"', true);
-				str.Read(ref pos, ',', false);
+				str.Read(ref pos, '"', needResult: false);
+				empty = str.Read(ref pos, '"');
+				str.Read(ref pos, ',', needResult: false);
 			}
 			else
 			{
-				empty = str.Read(ref pos, ',', true);
+				empty = str.Read(ref pos, ',');
 			}
 			return empty;
 		}
@@ -243,7 +225,7 @@ namespace BestHTTP.Extensions
 			int pos = 0;
 			while (pos < str.Length)
 			{
-				string key = str.Read(ref pos, (char ch) => ch != '=' && ch != ',', true).TrimAndLower();
+				string key = str.Read(ref pos, (char ch) => ch != '=' && ch != ',').TrimAndLower();
 				KeyValuePair keyValuePair = new KeyValuePair(key);
 				if (str[pos - 1] == '=')
 				{
@@ -264,12 +246,12 @@ namespace BestHTTP.Extensions
 			int pos = 0;
 			while (pos < str.Length)
 			{
-				string key = str.Read(ref pos, (char ch) => ch != ',' && ch != ';', true).TrimAndLower();
+				string key = str.Read(ref pos, (char ch) => ch != ',' && ch != ';').TrimAndLower();
 				KeyValuePair keyValuePair = new KeyValuePair(key);
 				if (str[pos - 1] == ';')
 				{
-					str.Read(ref pos, '=', false);
-					keyValuePair.Value = str.Read(ref pos, ',', true);
+					str.Read(ref pos, '=', needResult: false);
+					keyValuePair.Value = str.Read(ref pos, ',');
 				}
 				list.Add(keyValuePair);
 			}

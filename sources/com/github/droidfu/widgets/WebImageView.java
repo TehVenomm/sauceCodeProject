@@ -6,8 +6,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.ProgressBar;
@@ -17,10 +16,14 @@ import com.github.droidfu.imageloader.ImageLoader;
 import com.github.droidfu.imageloader.ImageLoaderHandler;
 
 public class WebImageView extends ViewSwitcher {
-    private Drawable errorDrawable;
-    private String imageUrl;
-    private ImageView imageView;
-    private boolean isLoaded;
+    /* access modifiers changed from: private */
+    public Drawable errorDrawable;
+    /* access modifiers changed from: private */
+    public String imageUrl;
+    /* access modifiers changed from: private */
+    public ImageView imageView;
+    /* access modifiers changed from: private */
+    public boolean isLoaded;
     private ProgressBar loadingSpinner;
     private Drawable progressDrawable;
     private ScaleType scaleType = ScaleType.CENTER_CROP;
@@ -30,7 +33,8 @@ public class WebImageView extends ViewSwitcher {
             super(WebImageView.this.imageView, WebImageView.this.imageUrl, WebImageView.this.errorDrawable);
         }
 
-        protected boolean handleImageLoaded(Bitmap bitmap, Message message) {
+        /* access modifiers changed from: protected */
+        public boolean handleImageLoaded(Bitmap bitmap, Message message) {
             boolean handleImageLoaded = super.handleImageLoaded(bitmap, message);
             if (handleImageLoaded) {
                 WebImageView.this.isLoaded = true;
@@ -70,7 +74,7 @@ public class WebImageView extends ViewSwitcher {
     private void addImageView(Context context) {
         this.imageView = new ImageView(context);
         this.imageView.setScaleType(this.scaleType);
-        LayoutParams layoutParams = new FrameLayout.LayoutParams(-2, -2);
+        LayoutParams layoutParams = new LayoutParams(-2, -2);
         layoutParams.gravity = 17;
         addView(this.imageView, 1, layoutParams);
     }
@@ -86,7 +90,7 @@ public class WebImageView extends ViewSwitcher {
                 ((AnimationDrawable) this.progressDrawable).start();
             }
         }
-        LayoutParams layoutParams = new FrameLayout.LayoutParams(this.progressDrawable.getIntrinsicWidth(), this.progressDrawable.getIntrinsicHeight());
+        LayoutParams layoutParams = new LayoutParams(this.progressDrawable.getIntrinsicWidth(), this.progressDrawable.getIntrinsicHeight());
         layoutParams.gravity = 17;
         addView(this.loadingSpinner, 0, layoutParams);
     }
@@ -111,7 +115,7 @@ public class WebImageView extends ViewSwitcher {
         if (this.imageUrl == null) {
             throw new IllegalStateException("image URL is null; did you forget to set it for this view?");
         }
-        ImageLoader.start(this.imageUrl, new DefaultImageLoaderHandler());
+        ImageLoader.start(this.imageUrl, (ImageLoaderHandler) new DefaultImageLoaderHandler());
     }
 
     public void reset() {

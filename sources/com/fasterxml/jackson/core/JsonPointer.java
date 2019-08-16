@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.core;
 
 import com.appsflyer.share.Constants;
-import com.fasterxml.jackson.core.io.NumberInput;
+import com.fasterxml.jackson.core.p015io.NumberInput;
 
 public class JsonPointer {
     protected static final JsonPointer EMPTY = new JsonPointer();
@@ -163,8 +163,8 @@ public class JsonPointer {
         } else if (charAt > '9') {
             return -1;
         } else {
-            for (i = 1; i < length; i++) {
-                char charAt2 = str.charAt(i);
+            for (int i2 = 1; i2 < length; i2++) {
+                char charAt2 = str.charAt(i2);
                 if (charAt2 > '9' || charAt2 < '0') {
                     return -1;
                 }
@@ -195,31 +195,32 @@ public class JsonPointer {
 
     protected static JsonPointer _parseQuotedTail(String str, int i) {
         int length = str.length();
-        StringBuilder stringBuilder = new StringBuilder(Math.max(16, length));
+        StringBuilder sb = new StringBuilder(Math.max(16, length));
         if (i > 2) {
-            stringBuilder.append(str, 1, i - 1);
+            sb.append(str, 1, i - 1);
         }
         int i2 = i + 1;
-        _appendEscape(stringBuilder, str.charAt(i));
+        _appendEscape(sb, str.charAt(i));
         int i3 = i2;
         while (i3 < length) {
             char charAt = str.charAt(i3);
             if (charAt == '/') {
-                return new JsonPointer(str, stringBuilder.toString(), _parseTail(str.substring(i3)));
+                return new JsonPointer(str, sb.toString(), _parseTail(str.substring(i3)));
             }
             i3++;
             if (charAt != '~' || i3 >= length) {
-                stringBuilder.append(charAt);
+                sb.append(charAt);
             } else {
-                i2 = i3 + 1;
-                _appendEscape(stringBuilder, str.charAt(i3));
-                i3 = i2;
+                int i4 = i3 + 1;
+                _appendEscape(sb, str.charAt(i3));
+                i3 = i4;
             }
         }
-        return new JsonPointer(str, stringBuilder.toString(), EMPTY);
+        return new JsonPointer(str, sb.toString(), EMPTY);
     }
 
-    protected JsonPointer _constructHead() {
+    /* access modifiers changed from: protected */
+    public JsonPointer _constructHead() {
         JsonPointer last = last();
         if (last == this) {
             return EMPTY;
@@ -228,7 +229,8 @@ public class JsonPointer {
         return new JsonPointer(this._asString.substring(0, this._asString.length() - length), this._matchingPropertyName, this._matchingElementIndex, this._nextSegment._constructHead(length, last));
     }
 
-    protected JsonPointer _constructHead(int i, JsonPointer jsonPointer) {
+    /* access modifiers changed from: protected */
+    public JsonPointer _constructHead(int i, JsonPointer jsonPointer) {
         if (this == jsonPointer) {
             return EMPTY;
         }
@@ -237,14 +239,14 @@ public class JsonPointer {
         return new JsonPointer(str.substring(0, str.length() - i), this._matchingPropertyName, this._matchingElementIndex, jsonPointer2._constructHead(i, jsonPointer));
     }
 
-    private static void _appendEscape(StringBuilder stringBuilder, char c) {
+    private static void _appendEscape(StringBuilder sb, char c) {
         if (c == '0') {
             c = '~';
         } else if (c == '1') {
             c = '/';
         } else {
-            stringBuilder.append('~');
+            sb.append('~');
         }
-        stringBuilder.append(c);
+        sb.append(c);
     }
 }

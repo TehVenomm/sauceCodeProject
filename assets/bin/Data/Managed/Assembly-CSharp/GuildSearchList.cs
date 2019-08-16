@@ -25,14 +25,13 @@ public class GuildSearchList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<GuildManager>.I.ResetGuildSearchRequest();
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)this.StartCoroutine(Reload(null));
+		yield return this.StartCoroutine(Reload());
 		base.Initialize();
 	}
 
@@ -40,28 +39,28 @@ public class GuildSearchList : GameSection
 	{
 		if (!GuildManager.IsValidNotEmptyGuildList())
 		{
-			SetActive((Enum)UI.GRD_GUILD, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_GUILD, is_visible: false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			return;
 		}
-		else
+		guilds = MonoBehaviourSingleton<GuildManager>.I.guilds.ToArray();
+		SetActive((Enum)UI.GRD_GUILD, is_visible: true);
+		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetGrid(UI.GRD_GUILD, "GuildSearchListItem", guilds.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
-			guilds = MonoBehaviourSingleton<GuildManager>.I.guilds.ToArray();
-			SetActive((Enum)UI.GRD_GUILD, true);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_GUILD, "GuildSearchListItem", guilds.Length, true, delegate(int i, Transform t, bool is_recycle)
-			{
-				GuildSearchModel.GuildSearchInfo guildSearchInfo = guilds[i];
-				SetEvent(t, "INFO", guildSearchInfo.clanId);
-				SetGuildData(guilds[i], t);
-			});
-			base.UpdateUI();
-		}
+			GuildSearchModel.GuildSearchInfo guildSearchInfo = guilds[i];
+			SetEvent(t, "INFO", guildSearchInfo.clanId);
+			SetGuildData(guilds[i], t);
+		});
+		base.UpdateUI();
 	}
 
 	private void SetGuildData(GuildSearchModel.GuildSearchInfo guild, Transform t)
 	{
 		SetLabelText(t, UI.LBL_GUILD_NAME, string.Format(guild.name + " [{0}]", guild.tag));
-		SetLabelText(t, UI.LBL_LABEL, ((GuildManager.GUILD_TYPE)guild.privacy).ToString());
+		object label_enum = UI.LBL_LABEL;
+		GuildManager.GUILD_TYPE privacy = (GuildManager.GUILD_TYPE)guild.privacy;
+		SetLabelText(t, (Enum)label_enum, privacy.ToString());
 		SetLabelText(t, UI.LBL_HOST_LV, guild.level);
 		SetLabelText(t, UI.LBL_HOST_MEMBER_NUM, guild.currentMem + "/" + guild.memCap);
 		if (guild.emblem != null && guild.emblem.Length >= 3)
@@ -81,12 +80,11 @@ public class GuildSearchList : GameSection
 
 	private void OnQuery_RELOAD()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		MonoBehaviourSingleton<GuildManager>.I.mSearchKeywork = string.Empty;
 		GameSection.StayEvent();
 		this.StartCoroutine(Reload(delegate(bool b)
 		{
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b);
 		}));
 	}
 
@@ -105,11 +103,11 @@ public class GuildSearchList : GameSection
 		bool is_recv = false;
 		SendRequest(delegate
 		{
-			((_003CReload_003Ec__Iterator57)/*Error near IL_002e: stateMachine*/)._003Cis_recv_003E__0 = true;
+			is_recv = true;
 		}, cb);
 		while (!is_recv)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		SetDirty(UI.GRD_GUILD);
 		RefreshUI();
@@ -124,6 +122,6 @@ public class GuildSearchList : GameSection
 			{
 				cb(isSuccess);
 			}
-		}, false);
+		}, saveSettings: false);
 	}
 }

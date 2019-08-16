@@ -26,6 +26,14 @@ public class OnceStatusInfoModel : BaseModel
 		public List<int> selectedDegrees = new List<int>();
 
 		public List<int> unlockDegrees = new List<int>();
+
+		public List<AccessorySet> accessorySets = new List<AccessorySet>();
+
+		public UserClanData userClan = new UserClanData();
+
+		public List<EquipSetSimple> uniqueEquipSets = new List<EquipSetSimple>();
+
+		public List<AccessorySet> uniqueAccessorySets = new List<AccessorySet>();
 	}
 
 	public static string URL = "ajax/once/statusinfo";

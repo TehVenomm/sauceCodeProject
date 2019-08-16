@@ -2,6 +2,7 @@ package com.appsflyer;
 
 import com.facebook.share.internal.ShareConstants;
 import java.util.Map;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AppsFlyer2dXConversionCallback implements AppsFlyerConversionListener {
@@ -18,7 +19,7 @@ public class AppsFlyer2dXConversionCallback implements AppsFlyerConversionListen
     }
 
     public void onInstallConversionFailure(String str) {
-        m192("onAttributionFailure", str);
+        m187("onAttributionFailure", str);
     }
 
     public void onAppOpenAttribution(Map<String, String> map) {
@@ -26,32 +27,32 @@ public class AppsFlyer2dXConversionCallback implements AppsFlyerConversionListen
     }
 
     public void onAttributionFailure(String str) {
-        m192("onInstallConversionFailure", str);
+        m187("onInstallConversionFailure", str);
     }
 
     /* renamed from: ˋ */
-    private void m192(String str, String str2) {
+    private void m187(String str, String str2) {
         try {
             JSONObject jSONObject = new JSONObject();
             jSONObject.put("status", "failure");
             jSONObject.put(ShareConstants.WEB_DIALOG_PARAM_DATA, str2);
-            Object obj = -1;
+            char c = 65535;
             switch (str.hashCode()) {
                 case -1390007222:
                     if (str.equals("onAttributionFailure")) {
-                        obj = 1;
+                        c = 1;
                         break;
                     }
                     break;
                 case 1050716216:
                     if (str.equals("onInstallConversionFailure")) {
-                        obj = null;
+                        c = 0;
                         break;
                     }
                     break;
             }
-            switch (obj) {
-                case null:
+            switch (c) {
+                case 0:
                     onInstallConversionFailureNative(jSONObject);
                     return;
                 case 1:
@@ -60,7 +61,7 @@ public class AppsFlyer2dXConversionCallback implements AppsFlyerConversionListen
                 default:
                     return;
             }
-        } catch (Throwable e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         e.printStackTrace();

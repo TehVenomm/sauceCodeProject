@@ -30,7 +30,6 @@ public class StatusEquipList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		currentPageIndex = 0;
 		this.StartCoroutine(DoInitialize());
 	}
@@ -41,14 +40,14 @@ public class StatusEquipList : GameSection
 		Singleton<EquipItemTable>.I.CreateTableForEquipList();
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		obtainedNum = MonoBehaviourSingleton<AchievementManager>.I.GetEquipItemCollectionNum();
 		SetLabelText((Enum)UI.LBL_CURRENT_NUM, obtainedNum.ToString());
 		int totalEquipNum = Singleton<EquipItemTable>.I.GetEquipListCount();
 		SetLabelText((Enum)UI.LBL_MAX_NUM, totalEquipNum.ToString());
 		SetPageNumText(page_num: totalEquipNum, enum_lbl: UI.LBL_PAGE_MAX);
-		SetActive((Enum)UI.BTN_ENEMY_COLLECTION_LIST, true);
+		SetActive((Enum)UI.BTN_ENEMY_COLLECTION_LIST, is_visible: true);
 		InitializeCaption();
 		base.Initialize();
 	}
@@ -72,8 +71,8 @@ public class StatusEquipList : GameSection
 			return false;
 		}
 		currentPageIndex = pageIndex;
-		SkipTween((Enum)UI.SPR_SELECT_WEAPON, true, 0);
-		SkipTween((Enum)UI.SPR_SELECT_DEF, true, 0);
+		SkipTween((Enum)UI.SPR_SELECT_WEAPON, forward: true, 0);
+		SkipTween((Enum)UI.SPR_SELECT_DEF, forward: true, 0);
 		SetPageNumText((Enum)UI.LBL_PAGE_MAX, maxPageNum);
 		UpdateInventory();
 		UpdateAnchors();
@@ -110,9 +109,9 @@ public class StatusEquipList : GameSection
 		if (items != null)
 		{
 			SetPageNumText((Enum)UI.LBL_PAGE_NOW, currentPageIndex + 1);
-			SetDynamicList((Enum)UI.GRD_INVENTORY, string.Empty, items.Length, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
+			SetDynamicList((Enum)UI.GRD_INVENTORY, string.Empty, items.Length, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
 			{
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 				EquipItemTable.EquipItemData equipItemData = items[i];
 				EquipItemSortData equipItemSortData = new EquipItemSortData();
 				EquipItemInfo equipItemInfo = new EquipItemInfo();
@@ -172,7 +171,6 @@ public class StatusEquipList : GameSection
 
 	private void InitializeCaption()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_2);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
@@ -185,7 +183,7 @@ public class StatusEquipList : GameSection
 			{
 				component.tweens[i].ResetToBeginning();
 			}
-			component.Play(true, null);
+			component.Play();
 		}
 	}
 }

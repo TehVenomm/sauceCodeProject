@@ -30,7 +30,10 @@ public class TargetMarker
 		AIM_HEAT,
 		AIM_HEAT_CHARGE_MAX,
 		WEAK_CANNON,
-		AIM_SOUL
+		AIM_SOUL,
+		WEAK_ELEMENT_SP_ATTACK,
+		AIM_BURST,
+		AIM_BURST_CHARGE_MAX
 	}
 
 	public class UpdateParam
@@ -103,18 +106,14 @@ public class TargetMarker
 
 	public void UnableMarker()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Expected O, but got Unknown
 		effectType = EFFECT_TYPE.NONE;
 		if (effectTransform != null)
 		{
-			EffectManager.ReleaseEffect(effectTransform.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(effectTransform.get_gameObject());
 		}
 		if (multiLockTransform != null)
 		{
-			EffectManager.ReleaseEffect(multiLockTransform.get_gameObject(), true, false);
+			EffectManager.ReleaseEffect(multiLockTransform.get_gameObject());
 		}
 		effectTransform = null;
 		multiLockTransform = null;
@@ -123,20 +122,16 @@ public class TargetMarker
 
 	public bool UpdateMarker(UpdateParam param)
 	{
-		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Expected O, but got Unknown
-		//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0413: Unknown result type (might be due to invalid IL or missing references)
-		//IL_041a: Expected O, but got Unknown
-		//IL_0462: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0472: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0482: Unknown result type (might be due to invalid IL or missing references)
-		//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_050f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_051a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0546: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0556: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0566: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0571: Unknown result type (might be due to invalid IL or missing references)
 		if (param == null)
 		{
 			return false;
@@ -153,7 +148,8 @@ public class TargetMarker
 			break;
 		case Enemy.WEAK_STATE.WEAK_SP_ATTACK:
 		case Enemy.WEAK_STATE.WEAK_SP_DOWN_MAX:
-			eFFECT_TYPE = (EFFECT_TYPE)((!param.isAimMode || !param.targeting || param.weakSubParam == 5) ? (7 + param.weakSubParam - 1) : 0);
+		case Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK:
+			eFFECT_TYPE = (EFFECT_TYPE)((!param.isAimMode || !param.targeting || param.weakSubParam == 5) ? ((param.weakState != Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK) ? (7 + param.weakSubParam - 1) : 25) : 0);
 			break;
 		case Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK:
 			eFFECT_TYPE = EFFECT_TYPE.WEAK_ELEMENT_ATTACK;
@@ -184,6 +180,9 @@ public class TargetMarker
 			case SP_ATTACK_TYPE.HEAT:
 				eFFECT_TYPE = ((!param.isAimChargeMax) ? EFFECT_TYPE.AIM_HEAT : EFFECT_TYPE.AIM_HEAT_CHARGE_MAX);
 				break;
+			case SP_ATTACK_TYPE.BURST:
+				eFFECT_TYPE = ((!param.isAimChargeMax) ? EFFECT_TYPE.AIM_BURST : EFFECT_TYPE.AIM_BURST_CHARGE_MAX);
+				break;
 			default:
 				eFFECT_TYPE = ((!param.isAimChargeMax) ? EFFECT_TYPE.AIM : EFFECT_TYPE.AIM_CHARGE_MAX);
 				break;
@@ -194,7 +193,7 @@ public class TargetMarker
 		bool flag = false;
 		if (param.isAimArrow && param.spAttackType == SP_ATTACK_TYPE.SOUL)
 		{
-			if (eFFECT_TYPE != EFFECT_TYPE.WEAK && eFFECT_TYPE != EFFECT_TYPE.WEAK_SP_ARROW)
+			if (eFFECT_TYPE != EFFECT_TYPE.WEAK && eFFECT_TYPE != EFFECT_TYPE.WEAK_SP_ARROW && (eFFECT_TYPE != EFFECT_TYPE.WEAK_ELEMENT_SP_ATTACK || param.weakSubParam != 5))
 			{
 				eFFECT_TYPE = EFFECT_TYPE.NONE;
 			}
@@ -204,17 +203,22 @@ public class TargetMarker
 		{
 			if (effectTransform != null)
 			{
-				EffectManager.ReleaseEffect(effectTransform.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(effectTransform.get_gameObject());
 			}
 			effectTransform = null;
 		}
 		if (effectTransform == null && eFFECT_TYPE != EFFECT_TYPE.NONE && param.targetPoint.param.isShowRange)
 		{
 			string text = MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarkerSettings.effectNames[(int)eFFECT_TYPE];
-			EFFECT_TYPE eFFECT_TYPE2 = eFFECT_TYPE;
-			if (eFFECT_TYPE2 == EFFECT_TYPE.WEAK_ELEMENT_ATTACK || eFFECT_TYPE2 == EFFECT_TYPE.WEAK_ELEMENT_SKILL_ATTACK)
+			switch (eFFECT_TYPE)
 			{
+			case EFFECT_TYPE.WEAK_ELEMENT_ATTACK:
+			case EFFECT_TYPE.WEAK_ELEMENT_SKILL_ATTACK:
 				text = ((param.validElementType >= 0) ? (text + param.validElementType.ToString()) : string.Empty);
+				break;
+			case EFFECT_TYPE.WEAK_ELEMENT_SP_ATTACK:
+				text = string.Format(text, param.weakSubParam - 1, param.validElementType);
+				break;
 			}
 			if (!string.IsNullOrEmpty(text))
 			{
@@ -224,23 +228,23 @@ public class TargetMarker
 		}
 		if (param.playSign && param.targetPoint.param.isShowRange)
 		{
-			EFFECT_TYPE eFFECT_TYPE3 = EFFECT_TYPE.NONE;
+			EFFECT_TYPE eFFECT_TYPE2 = EFFECT_TYPE.NONE;
 			switch (param.weakState)
 			{
 			case Enemy.WEAK_STATE.WEAK:
-				eFFECT_TYPE3 = EFFECT_TYPE.WEAK_SIGN;
+				eFFECT_TYPE2 = EFFECT_TYPE.WEAK_SIGN;
 				break;
 			case Enemy.WEAK_STATE.DOWN:
-				eFFECT_TYPE3 = EFFECT_TYPE.DOWN_SIGN;
+				eFFECT_TYPE2 = EFFECT_TYPE.DOWN_SIGN;
 				break;
 			case Enemy.WEAK_STATE.WEAK_SP_ATTACK:
 			case Enemy.WEAK_STATE.WEAK_SP_DOWN_MAX:
-				eFFECT_TYPE3 = (EFFECT_TYPE)(12 + param.weakSubParam - 1);
+				eFFECT_TYPE2 = (EFFECT_TYPE)(12 + param.weakSubParam - 1);
 				break;
 			}
-			if (eFFECT_TYPE3 != EFFECT_TYPE.NONE)
+			if (eFFECT_TYPE2 != EFFECT_TYPE.NONE)
 			{
-				string text2 = MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarkerSettings.effectNames[(int)eFFECT_TYPE3];
+				string text2 = MonoBehaviourSingleton<InGameSettingsManager>.I.targetMarkerSettings.effectNames[(int)eFFECT_TYPE2];
 				if (!string.IsNullOrEmpty(text2))
 				{
 					Transform effect = EffectManager.GetEffect(text2, transform);
@@ -273,7 +277,7 @@ public class TargetMarker
 		{
 			if (multiLockTransform != null)
 			{
-				EffectManager.ReleaseEffect(multiLockTransform.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(multiLockTransform.get_gameObject());
 			}
 			multiLockTransform = null;
 			multiLock = null;
@@ -301,13 +305,13 @@ public class TargetMarker
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		if (effectTransform == null)

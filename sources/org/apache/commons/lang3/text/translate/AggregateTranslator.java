@@ -8,7 +8,7 @@ public class AggregateTranslator extends CharSequenceTranslator {
     private final CharSequenceTranslator[] translators;
 
     public AggregateTranslator(CharSequenceTranslator... charSequenceTranslatorArr) {
-        this.translators = (CharSequenceTranslator[]) ArrayUtils.clone((Object[]) charSequenceTranslatorArr);
+        this.translators = (CharSequenceTranslator[]) ArrayUtils.clone((T[]) charSequenceTranslatorArr);
     }
 
     public int translate(CharSequence charSequence, int i, Writer writer) throws IOException {

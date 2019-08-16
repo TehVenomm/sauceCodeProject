@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import com.facebook.internal.Validate;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 class AccessTokenCache {
     static final String CACHED_ACCESS_TOKEN_KEY = "com.facebook.AccessTokenManager.CachedAccessToken";
@@ -22,29 +21,61 @@ class AccessTokenCache {
     }
 
     public AccessTokenCache() {
-        this(FacebookSdk.getApplicationContext().getSharedPreferences("com.facebook.AccessTokenManager.SharedPreferences", 0), new SharedPreferencesTokenCachingStrategyFactory());
+        this(FacebookSdk.getApplicationContext().getSharedPreferences(AccessTokenManager.SHARED_PREFERENCES_NAME, 0), new SharedPreferencesTokenCachingStrategyFactory());
     }
 
-    AccessTokenCache(SharedPreferences sharedPreferences, SharedPreferencesTokenCachingStrategyFactory sharedPreferencesTokenCachingStrategyFactory) {
-        this.sharedPreferences = sharedPreferences;
+    AccessTokenCache(SharedPreferences sharedPreferences2, SharedPreferencesTokenCachingStrategyFactory sharedPreferencesTokenCachingStrategyFactory) {
+        this.sharedPreferences = sharedPreferences2;
         this.tokenCachingStrategyFactory = sharedPreferencesTokenCachingStrategyFactory;
     }
 
-    private AccessToken getCachedAccessToken() {
-        AccessToken accessToken = null;
-        String string = this.sharedPreferences.getString(CACHED_ACCESS_TOKEN_KEY, accessToken);
-        if (string != null) {
-            try {
-                accessToken = AccessToken.createFromJSONObject(new JSONObject(string));
-            } catch (JSONException e) {
-            }
-        }
-        return accessToken;
+    /* JADX WARNING: type inference failed for: r0v0, types: [com.facebook.AccessToken, java.lang.String] */
+    /* JADX WARNING: Multi-variable type inference failed. Error: jadx.core.utils.exceptions.JadxRuntimeException: No candidate types for var: r0v0, types: [com.facebook.AccessToken, java.lang.String]
+      assigns: [?[int, float, boolean, short, byte, char, OBJECT, ARRAY]]
+      uses: [java.lang.String, com.facebook.AccessToken]
+      mth insns count: 11
+    	at jadx.core.dex.visitors.typeinference.TypeSearch.fillTypeCandidates(TypeSearch.java:237)
+    	at java.base/java.util.ArrayList.forEach(ArrayList.java:1540)
+    	at jadx.core.dex.visitors.typeinference.TypeSearch.run(TypeSearch.java:53)
+    	at jadx.core.dex.visitors.typeinference.TypeInferenceVisitor.runMultiVariableSearch(TypeInferenceVisitor.java:99)
+    	at jadx.core.dex.visitors.typeinference.TypeInferenceVisitor.visit(TypeInferenceVisitor.java:92)
+    	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:27)
+    	at jadx.core.dex.visitors.DepthTraversal.lambda$visit$1(DepthTraversal.java:14)
+    	at java.base/java.util.ArrayList.forEach(ArrayList.java:1540)
+    	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:14)
+    	at jadx.core.ProcessClass.process(ProcessClass.java:30)
+    	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:311)
+    	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+    	at jadx.api.JadxDecompiler.lambda$appendSourcesSave$0(JadxDecompiler.java:217)
+     */
+    /* JADX WARNING: Unknown variable types count: 1 */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private com.facebook.AccessToken getCachedAccessToken() {
+        /*
+            r3 = this;
+            r0 = 0
+            android.content.SharedPreferences r1 = r3.sharedPreferences
+            java.lang.String r2 = "com.facebook.AccessTokenManager.CachedAccessToken"
+            java.lang.String r1 = r1.getString(r2, r0)
+            if (r1 == 0) goto L_0x0014
+            org.json.JSONObject r2 = new org.json.JSONObject     // Catch:{ JSONException -> 0x0015 }
+            r2.<init>(r1)     // Catch:{ JSONException -> 0x0015 }
+            com.facebook.AccessToken r0 = com.facebook.AccessToken.createFromJSONObject(r2)     // Catch:{ JSONException -> 0x0015 }
+        L_0x0014:
+            return r0
+        L_0x0015:
+            r1 = move-exception
+            goto L_0x0014
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.facebook.AccessTokenCache.getCachedAccessToken():com.facebook.AccessToken");
     }
 
     private AccessToken getLegacyAccessToken() {
         Bundle load = getTokenCachingStrategy().load();
-        return (load == null || !LegacyTokenHelper.hasTokenInformation(load)) ? null : AccessToken.createFromLegacyCache(load);
+        if (load == null || !LegacyTokenHelper.hasTokenInformation(load)) {
+            return null;
+        }
+        return AccessToken.createFromLegacyCache(load);
     }
 
     private LegacyTokenHelper getTokenCachingStrategy() {

@@ -46,7 +46,7 @@ public class RegionMapDescriptionHappenItem : UIBehaviour
 				text = enemyData.name;
 				text2 = quest.GetMainEnemyLv().ToString();
 			}
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, icon_id, null, FindCtrl(t, UI.OBJ_ENEMY), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, icon_id, null, FindCtrl(t, UI.OBJ_ENEMY));
 			itemIcon.SetDepth(7);
 			SetElementSprite(t, UI.SPR_ENM_ELEMENT, (int)enemyData.element);
 			SetActive(t, UI.SPR_ENM_ELEMENT, flag);
@@ -70,47 +70,43 @@ public class RegionMapDescriptionHappenItem : UIBehaviour
 		};
 		if (!quest.IsMissionExist())
 		{
-			SetActive(t, UI.OBJ_SUBMISSION_ROOT, false);
+			SetActive(t, UI.OBJ_SUBMISSION_ROOT, is_visible: false);
+			return;
 		}
-		else
+		SetActive(t, UI.OBJ_SUBMISSION_ROOT, is_visible: true);
+		ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(quest.questID);
+		if (clearStatusQuestData == null)
 		{
-			SetActive(t, UI.OBJ_SUBMISSION_ROOT, true);
-			ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(quest.questID);
-			if (clearStatusQuestData == null)
+			int i = 0;
+			for (int num = quest.missionID.Length; i < num; i++)
 			{
-				int i = 0;
-				for (int num = quest.missionID.Length; i < num; i++)
-				{
-					uint num2 = quest.missionID[i];
-					SetActive(t, array[i], num2 != 0);
-					SetSubMissionNotCleared(FindCtrl(t, array[i]), num2);
-				}
+				uint num2 = quest.missionID[i];
+				SetActive(t, array[i], num2 != 0);
+				SetSubMissionNotCleared(FindCtrl(t, array[i]), num2);
 			}
-			else
-			{
-				int j = 0;
-				for (int count = clearStatusQuestData.missionStatus.Count; j < count; j++)
-				{
-					uint num3 = quest.missionID[j];
-					SetActive(t, array[j], num3 != 0);
-					CLEAR_STATUS clearStatus = (CLEAR_STATUS)clearStatusQuestData.missionStatus[j];
-					SetSubMissionCleared(FindCtrl(t, array[j]), num3, clearStatus);
-				}
-			}
+			return;
+		}
+		int j = 0;
+		for (int count = clearStatusQuestData.missionStatus.Count; j < count; j++)
+		{
+			uint num3 = quest.missionID[j];
+			SetActive(t, array[j], num3 != 0);
+			CLEAR_STATUS clearStatus = (CLEAR_STATUS)clearStatusQuestData.missionStatus[j];
+			SetSubMissionCleared(FindCtrl(t, array[j]), num3, clearStatus);
 		}
 	}
 
 	private void SetSubMission(Transform parent, uint missionID, bool isCleared)
 	{
 		SetActive(parent, UI.SPR_MISSION_INFO_CROWN, isCleared);
-		SetActive(parent, UI.LBL_MISSION_INFO, true);
+		SetActive(parent, UI.LBL_MISSION_INFO, is_visible: true);
 		QuestTable.MissionTableData missionData = Singleton<QuestTable>.I.GetMissionData(missionID);
 		SetLabelText(parent, UI.LBL_MISSION_INFO, missionData.missionText);
 	}
 
 	private void SetSubMissionNotCleared(Transform parent, uint missionID)
 	{
-		SetSubMission(parent, missionID, false);
+		SetSubMission(parent, missionID, isCleared: false);
 	}
 
 	private void SetSubMissionCleared(Transform parent, uint missionID, CLEAR_STATUS clearStatus)
@@ -120,13 +116,11 @@ public class RegionMapDescriptionHappenItem : UIBehaviour
 
 	private Transform GetTransform()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		Transform val = base._transform;
-		if (val == null)
+		Transform transform = base._transform;
+		if (transform == null)
 		{
-			val = this.get_transform();
+			transform = this.get_transform();
 		}
-		return val;
+		return transform;
 	}
 }

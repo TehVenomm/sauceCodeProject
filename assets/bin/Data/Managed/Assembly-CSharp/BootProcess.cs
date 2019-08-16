@@ -1,15 +1,15 @@
 using System.Collections;
 using UnityEngine;
 
-public class BootProcess
+public class BootProcess : MonoBehaviour
 {
 	public const string STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
-
-	private const float ANALYTIC_TIMEOUT = 5f;
 
 	private bool isWaitGrantedPermission = true;
 
 	private bool isGrantedPermission;
+
+	private const float ANALYTIC_TIMEOUT = 5f;
 
 	private static bool isAnalytics = true;
 
@@ -87,7 +87,7 @@ public class BootProcess
 		NetworkNative.setHost(NetworkManager.APP_HOST);
 		isAnalytics = true;
 		NetworkNative.getAnalytics();
-		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(true);
+		MonoBehaviourSingleton<AppMain>.I.UpdateResolution(is_portrait: true);
 		MonoBehaviourSingleton<SoundManager>.I.UpdateConfigVolume();
 		if (MonoBehaviourSingleton<InGameManager>.IsValid())
 		{
@@ -97,23 +97,29 @@ public class BootProcess
 		{
 			MonoBehaviourSingleton<InputManager>.I.UpdateConfigInput();
 		}
-		Transform ui_root = ResourceUtility.Realizes(Resources.Load("UI/UI_Root"), MonoBehaviourSingleton<AppMain>.I._transform, -1);
+		Transform ui_root = ResourceUtility.Realizes(Resources.Load("UI/UI_Root"), MonoBehaviourSingleton<AppMain>.I._transform);
 		ui_root.get_gameObject().AddComponent<UIManager>();
-		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, true);
+		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, is_disable: true);
+		yield return null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<GameSceneManager>();
+		yield return null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<UserInfoManager>();
+		yield return null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<TransitionManager>();
+		yield return null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FBManager>();
+		yield return null;
 		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<NativeGameService>();
+		yield return null;
 		Singleton<StringTable>.Create();
-		Singleton<StringTable>.I.CreateTable(null);
+		Singleton<StringTable>.I.CreateTable();
 		MonoBehaviourSingleton<GameSceneManager>.I.Initialize();
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_sound_se_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "SETable", false);
-		LoadObject lo_audio_setting_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "AudioSettingTable", false);
+		LoadObject lo_sound_se_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "SETable");
+		LoadObject lo_audio_setting_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "AudioSettingTable");
 		while (load_queue.IsLoading() || !MonoBehaviourSingleton<GameSceneManager>.I.isInitialized)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		Singleton<SETable>.Create();
 		Singleton<SETable>.I.CreateTableFromInternal((lo_sound_se_table.loadedObject as TextAsset).get_text());
@@ -122,149 +128,146 @@ public class BootProcess
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
 			MonoBehaviourSingleton<SoundManager>.I.LoadParmanentAudioClip();
-			while (MonoBehaviourSingleton<SoundManager>.I.IsLoadingAudioClip())
-			{
-				yield return (object)null;
-			}
-		}
-		MonoBehaviourSingleton<ResourceManager>.I.SetURL(NetworkManager.IMG_HOST);
-		MonoBehaviourSingleton<GoGameResourceManager>.I.LoadVariantManifest();
-		while (MonoBehaviourSingleton<GoGameResourceManager>.I.isLoadingVariantManifest)
-		{
-			Debug.Log((object)"Waiting LoadingVariantManifest ");
-			yield return (object)null;
 		}
 		int reset = PlayerPrefs.GetInt("AppMain.Reset", 0);
 		if (reset != 0)
 		{
-			yield return (object)null;
+			yield return null;
 			MonoBehaviourSingleton<AppMain>.I.Reset((reset & 1) != 0, (reset & 2) != 0);
+			yield break;
 		}
-		else
+		float analyticTimeCount = 5f;
+		while (isAnalytics)
 		{
-			float analyticTimeCount = 5f;
-			while (isAnalytics)
+			analyticTimeCount -= Time.get_deltaTime();
+			if (analyticTimeCount < 0f)
 			{
-				analyticTimeCount -= Time.get_deltaTime();
-				if (analyticTimeCount < 0f)
+				int num = 200000;
+				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.Format(STRING_CATEGORY.COMMON_DIALOG, 1001u, num), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u)), delegate
 				{
-					int err_code = 200000;
-					MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.Format(STRING_CATEGORY.COMMON_DIALOG, 1001u, err_code), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u), null, null, null), delegate
-					{
-						MonoBehaviourSingleton<AppMain>.I.Reset();
-					}, true, err_code);
-					yield break;
-				}
-				yield return (object)null;
+					MonoBehaviourSingleton<AppMain>.I.Reset();
+				}, error: true, num);
+				yield break;
 			}
-			bool wait = true;
-			MonoBehaviourSingleton<AccountManager>.I.SendCheckRegister(analyticsString, delegate
+			yield return null;
+		}
+		bool wait = true;
+		MonoBehaviourSingleton<AccountManager>.I.SendCheckRegister(analyticsString, delegate
+		{
+			wait = false;
+		});
+		while (wait)
+		{
+			yield return null;
+		}
+		MonoBehaviourSingleton<ResourceManager>.I.cache.ClearObjectCaches(clearPreloaded: true);
+		MonoBehaviourSingleton<ResourceManager>.I.cache.ClearPackageCaches();
+		bool assetbundle_mode = isAssetBundleMode();
+		bool to_opening = IsOpening();
+		if (assetbundle_mode)
+		{
+			if (!CheckPermissions())
 			{
-				((_003CStart_003Ec__Iterator19)/*Error near IL_0495: stateMachine*/)._003Cwait_003E__7 = false;
-			});
-			while (wait)
-			{
-				yield return (object)null;
-			}
-			MonoBehaviourSingleton<ResourceManager>.I.cache.ClearObjectCaches(true);
-			MonoBehaviourSingleton<ResourceManager>.I.cache.ClearPackageCaches();
-			bool assetbundle_mode = isAssetBundleMode();
-			bool to_opening = IsOpening();
-			if (assetbundle_mode)
-			{
-				if (!CheckPermissions())
+				bool isFirstLoad = PlayerPrefs.GetInt("first_time_load_game_msg", 0) == 0;
+				AndroidPermissionsManager.ShouldShowRequestPermission("android.permission.WRITE_EXTERNAL_STORAGE");
+				PlayerPrefs.SetInt("first_time_load_game_msg", 1);
+				if (!isFirstLoad)
 				{
-					bool isFirstLoad = PlayerPrefs.GetInt("first_time_load_game_msg", 0) == 0;
-					AndroidPermissionsManager.ShouldShowRequestPermission("android.permission.WRITE_EXTERNAL_STORAGE");
-					PlayerPrefs.SetInt("first_time_load_game_msg", 1);
-					if (!isFirstLoad)
+					MonoBehaviourSingleton<UIManager>.I.loading.ShowChangePermissionMsg(isShow: true);
+					while (!CheckPermissions())
 					{
-						MonoBehaviourSingleton<UIManager>.I.loading.ShowChangePermissionMsg(true);
-						while (!CheckPermissions())
-						{
-							yield return (object)null;
-						}
+						yield return null;
 					}
-					else
+				}
+				else
+				{
+					MonoBehaviourSingleton<UIManager>.I.loading.ShowWellcomeMsg(isShow: true);
+					while (isWaitGrantedPermission)
 					{
-						MonoBehaviourSingleton<UIManager>.I.loading.ShowWellcomeMsg(true);
+						yield return null;
+					}
+					while (!isGrantedPermission)
+					{
+						isWaitGrantedPermission = true;
+						MonoBehaviourSingleton<UIManager>.I.loading.ShowDellyMsg(isShow: true);
+						MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(isShow: false);
 						while (isWaitGrantedPermission)
 						{
-							yield return (object)null;
+							yield return null;
 						}
-						while (!isGrantedPermission)
+						if (!isGrantedPermission && !AndroidPermissionsManager.ShouldShowRequestPermission("android.permission.WRITE_EXTERNAL_STORAGE"))
 						{
-							isWaitGrantedPermission = true;
-							MonoBehaviourSingleton<UIManager>.I.loading.ShowDellyMsg(true);
-							MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(false);
-							while (isWaitGrantedPermission)
+							MonoBehaviourSingleton<UIManager>.I.loading.HideAllPermissionMsg();
+							MonoBehaviourSingleton<UIManager>.I.loading.ShowChangePermissionMsg(isShow: true);
+							while (!CheckPermissions())
 							{
-								yield return (object)null;
+								yield return null;
 							}
-							if (!isGrantedPermission && !AndroidPermissionsManager.ShouldShowRequestPermission("android.permission.WRITE_EXTERNAL_STORAGE"))
-							{
-								MonoBehaviourSingleton<UIManager>.I.loading.HideAllPermissionMsg();
-								MonoBehaviourSingleton<UIManager>.I.loading.ShowChangePermissionMsg(true);
-								while (!CheckPermissions())
-								{
-									yield return (object)null;
-								}
-								isGrantedPermission = true;
-							}
+							isGrantedPermission = true;
 						}
 					}
-					MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(true);
-					MonoBehaviourSingleton<UIManager>.I.loading.HideAllTextMsg();
-					yield return (object)null;
 				}
-				else if (PlayerPrefs.GetInt("first_time_load_game_msg", 0) == 0)
-				{
-					PlayerPrefs.SetInt("first_time_load_game_msg", 1);
-					MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(true);
-				}
-				if (to_opening)
-				{
-					MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
-				}
-				MonoBehaviourSingleton<ResourceManager>.I.SetURL(NetworkManager.IMG_HOST);
-				MonoBehaviourSingleton<ResourceManager>.I.LoadManifest();
-				while (MonoBehaviourSingleton<ResourceManager>.I.isLoadingManifest)
-				{
-					yield return (object)null;
-				}
-				ResourceManager.internalMode = false;
-				load_queue.Load(RESOURCE_CATEGORY.SHADER, null, null, true);
-				load_queue.Load(RESOURCE_CATEGORY.UI_FONT, null, null, true);
-				ResourceManager.internalMode = true;
-				yield return (object)load_queue.Wait();
-				MonoBehaviourSingleton<ResourceManager>.I.cache.MarkSystemPackage(RESOURCE_CATEGORY.SHADER.ToAssetBundleName(null));
-				MonoBehaviourSingleton<ResourceManager>.I.cache.MarkSystemPackage(RESOURCE_CATEGORY.UI_FONT.ToAssetBundleName(null));
-				MonoBehaviourSingleton<ResourceManager>.I.cache.CacheShadersFromPackage(RESOURCE_CATEGORY.SHADER.ToAssetBundleName(null));
-				MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = true;
+				MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(isShow: true);
+				MonoBehaviourSingleton<UIManager>.I.loading.HideAllTextMsg();
+				yield return null;
 			}
-			NetworkNative.getNativeAsset();
-			if (MonoBehaviourSingleton<AccountManager>.I.sendAsset)
+			else if (PlayerPrefs.GetInt("first_time_load_game_msg", 0) == 0)
 			{
-				NetworkNative.getNativeiOSAsset();
+				PlayerPrefs.SetInt("first_time_load_game_msg", 1);
+				MonoBehaviourSingleton<UIManager>.I.loading.ShowEmptyFirstLoad(isShow: true);
 			}
 			if (to_opening)
 			{
-				Native.CheckReferrerSendToAppBrowser();
-				ResourceManager.internalMode = true;
-				ResourceManager.internalMode = false;
-				if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
-				{
-					ResourceManager.internalMode = true;
-				}
-				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<OpeningStartProcess>();
+				MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = false;
 			}
-			else
+			MonoBehaviourSingleton<ResourceManager>.I.SetURL(NetworkManager.IMG_HOST);
+			MonoBehaviourSingleton<GoGameResourceManager>.I.LoadVariantManifest();
+			while (MonoBehaviourSingleton<GoGameResourceManager>.I.isLoadingVariantManifest)
 			{
-				ResourceManager.internalMode = false;
-				MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
+				Debug.Log((object)"Waiting LoadingVariantManifest ");
+				yield return null;
 			}
-			Object.Destroy(this);
+			MonoBehaviourSingleton<ResourceManager>.I.LoadManifest();
+			while (MonoBehaviourSingleton<ResourceManager>.I.isLoadingManifest)
+			{
+				yield return null;
+			}
+			ResourceManager.internalMode = false;
+			load_queue.Load(RESOURCE_CATEGORY.SHADER, null, null, cache_package: true);
+			load_queue.Load(RESOURCE_CATEGORY.UI_FONT, null, null, cache_package: true);
+			ResourceManager.internalMode = true;
+			yield return load_queue.Wait();
+			MonoBehaviourSingleton<ResourceManager>.I.cache.MarkSystemPackage(RESOURCE_CATEGORY.SHADER.ToAssetBundleName());
+			MonoBehaviourSingleton<ResourceManager>.I.cache.MarkSystemPackage(RESOURCE_CATEGORY.UI_FONT.ToAssetBundleName());
+			MonoBehaviourSingleton<ResourceManager>.I.cache.CacheShadersFromPackage(RESOURCE_CATEGORY.SHADER.ToAssetBundleName());
+			MonoBehaviourSingleton<UIManager>.I.loading.downloadGaugeVisible = true;
 		}
+		NetworkNative.getNativeAsset();
+		if (MonoBehaviourSingleton<AccountManager>.I.sendAsset)
+		{
+			NetworkNative.getNativeiOSAsset();
+		}
+		if (MonoBehaviourSingleton<AccountManager>.I.appClose)
+		{
+			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<AppCloseProcess>();
+		}
+		else if (to_opening)
+		{
+			Native.CheckReferrerSendToAppBrowser();
+			ResourceManager.internalMode = true;
+			ResourceManager.internalMode = false;
+			if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
+			{
+				ResourceManager.internalMode = true;
+			}
+			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<OpeningStartProcess>();
+		}
+		else
+		{
+			ResourceManager.internalMode = false;
+			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoadingProcess>();
+		}
+		Object.Destroy(this);
 	}
 
 	public static void notifyFinishedAnalytics(string data)

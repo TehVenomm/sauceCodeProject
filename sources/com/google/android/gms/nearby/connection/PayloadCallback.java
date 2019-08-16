@@ -1,7 +1,9 @@
 package com.google.android.gms.nearby.connection;
 
-public abstract class PayloadCallback {
-    public abstract void onPayloadReceived(String str, Payload payload);
+import android.support.annotation.NonNull;
 
-    public abstract void onPayloadTransferUpdate(String str, PayloadTransferUpdate payloadTransferUpdate);
+public abstract class PayloadCallback {
+    public abstract void onPayloadReceived(@NonNull String str, @NonNull Payload payload);
+
+    public abstract void onPayloadTransferUpdate(@NonNull String str, @NonNull PayloadTransferUpdate payloadTransferUpdate);
 }

@@ -4,8 +4,10 @@ import android.database.CharArrayBuffer;
 import android.net.Uri;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.android.gms.common.data.Freezable;
+import com.google.android.gms.common.util.VisibleForTesting;
 import com.google.android.gms.games.Player;
 
+@VisibleForTesting
 public interface LeaderboardScore extends Freezable<LeaderboardScore> {
     public static final int LEADERBOARD_RANK_UNKNOWN = -1;
 

@@ -13,12 +13,13 @@ public class CharEncoding {
 
     public static boolean isSupported(String str) {
         boolean z = false;
-        if (str != null) {
-            try {
-                z = Charset.isSupported(str);
-            } catch (IllegalCharsetNameException e) {
-            }
+        if (str == null) {
+            return z;
         }
-        return z;
+        try {
+            return Charset.isSupported(str);
+        } catch (IllegalCharsetNameException e) {
+            return z;
+        }
     }
 }

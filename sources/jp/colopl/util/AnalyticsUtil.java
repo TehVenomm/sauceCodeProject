@@ -1,11 +1,12 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-import jp.colopl.config.Config;
-import jp.colopl.drapro.AppConsts;
+import p018jp.colopl.config.Config;
+import p018jp.colopl.drapro.AppConsts;
 
+/* renamed from: jp.colopl.util.AnalyticsUtil */
 public class AnalyticsUtil {
     public static int SCOPE_PAGE = 3;
     public static int SCOPE_SESSION = 2;

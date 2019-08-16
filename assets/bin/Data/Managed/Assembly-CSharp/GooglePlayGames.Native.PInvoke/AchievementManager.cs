@@ -4,6 +4,7 @@ using GooglePlayGames.OurUtils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -43,16 +44,11 @@ namespace GooglePlayGames.Native.PInvoke
 			}
 		}
 
-		internal class FetchAllResponse : BaseReferenceHolder, IEnumerable, IEnumerable<NativeAchievement>
+		internal class FetchAllResponse : BaseReferenceHolder, IEnumerable<NativeAchievement>, IEnumerable
 		{
 			internal FetchAllResponse(IntPtr selfPointer)
 				: base(selfPointer)
 			{
-			}
-
-			IEnumerator IEnumerable.GetEnumerator()
-			{
-				return GetEnumerator();
 			}
 
 			internal CommonErrorStatus.ResponseStatus Status()
@@ -79,6 +75,11 @@ namespace GooglePlayGames.Native.PInvoke
 				return PInvokeUtilities.ToEnumerator(GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_FetchAllResponse_GetData_Length(SelfPtr()), (UIntPtr index) => GetElement(index));
 			}
 
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
+
 			protected override void CallDispose(HandleRef selfPointer)
 			{
 				GooglePlayGames.Native.Cwrapper.AchievementManager.AchievementManager_FetchAllResponse_Dispose(selfPointer);
@@ -95,6 +96,21 @@ namespace GooglePlayGames.Native.PInvoke
 		}
 
 		private readonly GameServices mServices;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.AchievementManager.ShowAllUICallback _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchAllResponse> _003C_003Ef__mg_0024cache1;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.AchievementManager.FetchAllCallback _003C_003Ef__mg_0024cache2;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchResponse> _003C_003Ef__mg_0024cache3;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.AchievementManager.FetchCallback _003C_003Ef__mg_0024cache4;
 
 		internal AchievementManager(GameServices services)
 		{

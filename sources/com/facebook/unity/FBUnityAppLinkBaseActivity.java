@@ -10,17 +10,18 @@ public abstract class FBUnityAppLinkBaseActivity extends Activity {
         try {
             return Class.forName(getPackageManager().getLaunchIntentForPackage(getPackageName()).getComponent().getClassName());
         } catch (Exception e) {
-            Log.e(FB.TAG, "Unable to find Main Activity Class");
+            Log.e(C0849FB.TAG, "Unable to find Main Activity Class");
             return null;
         }
     }
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         requestWindowFeature(1);
-        Log.v(FB.TAG, "Saving deep link from deep linking activity");
-        FB.SetIntent(getIntent());
-        Log.v(FB.TAG, "Returning to main activity");
+        Log.v(C0849FB.TAG, "Saving deep link from deep linking activity");
+        C0849FB.SetIntent(getIntent());
+        Log.v(C0849FB.TAG, "Returning to main activity");
         startActivity(new Intent(this, getMainActivityClass()));
         finish();
     }

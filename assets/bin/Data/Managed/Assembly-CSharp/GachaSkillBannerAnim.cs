@@ -20,25 +20,23 @@ public class GachaSkillBannerAnim : UIBehaviour
 			{
 				Log.Error("index = " + anim_index);
 			}
+			return;
 		}
-		else
+		int i = 0;
+		for (int num = pattern.Length; i < num; i++)
 		{
-			int i = 0;
-			for (int num = pattern.Length; i < num; i++)
-			{
-				pattern[i].Finish();
-			}
-			GachaSkillBannerAnimPattern gachaSkillBannerAnimPattern = pattern[anim_index];
-			targetIndex = anim_index;
-			gachaSkillBannerAnimPattern.Init(targetIndex, table, tex, anim);
+			pattern[i].Finish();
 		}
+		GachaSkillBannerAnimPattern gachaSkillBannerAnimPattern = pattern[anim_index];
+		targetIndex = anim_index;
+		gachaSkillBannerAnimPattern.Init(targetIndex, table, tex, anim);
 	}
 
 	public void Entry(bool is_skip, EventDelegate.Callback end_callback)
 	{
 		if (pattern != null)
 		{
-			pattern[targetIndex].AnimStart(true, is_skip, end_callback);
+			pattern[targetIndex].AnimStart(is_entry: true, is_skip, end_callback);
 		}
 	}
 
@@ -46,7 +44,7 @@ public class GachaSkillBannerAnim : UIBehaviour
 	{
 		if (pattern != null)
 		{
-			pattern[targetIndex].AnimStart(false, false, end_callback);
+			pattern[targetIndex].AnimStart(is_entry: false, is_skip: false, end_callback);
 		}
 	}
 }

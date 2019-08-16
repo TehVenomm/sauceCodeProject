@@ -1,83 +1,112 @@
 package com.google.android.gms.tasks;
 
 import android.support.annotation.NonNull;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.annotation.concurrent.GuardedBy;
 
 public final class Tasks {
 
-    interface zzb extends OnFailureListener, OnSuccessListener<Object> {
-    }
-
-    static final class zza implements zzb {
-        private final CountDownLatch zzaop;
+    private static final class zza implements zzb {
+        private final CountDownLatch zzaf;
 
         private zza() {
-            this.zzaop = new CountDownLatch(1);
+            this.zzaf = new CountDownLatch(1);
+        }
+
+        /* synthetic */ zza(zzv zzv) {
+            this();
         }
 
         public final void await() throws InterruptedException {
-            this.zzaop.await();
+            this.zzaf.await();
         }
 
         public final boolean await(long j, TimeUnit timeUnit) throws InterruptedException {
-            return this.zzaop.await(j, timeUnit);
+            return this.zzaf.await(j, timeUnit);
         }
 
-        public final void onFailure(@NonNull Exception exception) {
-            this.zzaop.countDown();
+        public final void onCanceled() {
+            this.zzaf.countDown();
+        }
+
+        public final void onFailure(@NonNull Exception exc) {
+            this.zzaf.countDown();
         }
 
         public final void onSuccess(Object obj) {
-            this.zzaop.countDown();
+            this.zzaf.countDown();
         }
     }
 
-    static final class zzc implements zzb {
+    interface zzb extends OnCanceledListener, OnFailureListener, OnSuccessListener<Object> {
+    }
+
+    private static final class zzc implements zzb {
         private final Object mLock = new Object();
-        private final zzn<Void> zzkfw;
-        private Exception zzkgb;
-        private final int zzkgd;
-        private int zzkge;
-        private int zzkgf;
+        private final zzu<Void> zza;
+        @GuardedBy("mLock")
+        private Exception zzab;
+        private final int zzag;
+        @GuardedBy("mLock")
+        private int zzah;
+        @GuardedBy("mLock")
+        private int zzai;
+        @GuardedBy("mLock")
+        private int zzaj;
+        @GuardedBy("mLock")
+        private boolean zzak;
 
-        public zzc(int i, zzn<Void> zzn) {
-            this.zzkgd = i;
-            this.zzkfw = zzn;
+        public zzc(int i, zzu<Void> zzu) {
+            this.zzag = i;
+            this.zza = zzu;
         }
 
-        private final void zzbif() {
-            if (this.zzkge + this.zzkgf != this.zzkgd) {
+        @GuardedBy("mLock")
+        private final void zzf() {
+            if (this.zzah + this.zzai + this.zzaj != this.zzag) {
                 return;
             }
-            if (this.zzkgb == null) {
-                this.zzkfw.setResult(null);
-                return;
+            if (this.zzab != null) {
+                zzu<Void> zzu = this.zza;
+                int i = this.zzai;
+                zzu.setException(new ExecutionException(i + " out of " + this.zzag + " underlying tasks failed", this.zzab));
+            } else if (this.zzak) {
+                this.zza.zza();
+            } else {
+                this.zza.setResult(null);
             }
-            zzn zzn = this.zzkfw;
-            int i = this.zzkgf;
-            zzn.setException(new ExecutionException(i + " out of " + this.zzkgd + " underlying tasks failed", this.zzkgb));
         }
 
-        public final void onFailure(@NonNull Exception exception) {
+        public final void onCanceled() {
             synchronized (this.mLock) {
-                this.zzkgf++;
-                this.zzkgb = exception;
-                zzbif();
+                this.zzaj++;
+                this.zzak = true;
+                zzf();
+            }
+        }
+
+        public final void onFailure(@NonNull Exception exc) {
+            synchronized (this.mLock) {
+                this.zzai++;
+                this.zzab = exc;
+                zzf();
             }
         }
 
         public final void onSuccess(Object obj) {
             synchronized (this.mLock) {
-                this.zzkge++;
-                zzbif();
+                this.zzah++;
+                zzf();
             }
         }
     }
@@ -86,27 +115,27 @@ public final class Tasks {
     }
 
     public static <TResult> TResult await(@NonNull Task<TResult> task) throws ExecutionException, InterruptedException {
-        zzbp.zzgg("Must not be called on the main application thread");
-        zzbp.zzb((Object) task, (Object) "Task must not be null");
+        Preconditions.checkNotMainThread();
+        Preconditions.checkNotNull(task, "Task must not be null");
         if (task.isComplete()) {
             return zzb(task);
         }
-        Object zza = new zza();
-        zza(task, zza);
-        zza.await();
+        zza zza2 = new zza(null);
+        zza(task, zza2);
+        zza2.await();
         return zzb(task);
     }
 
     public static <TResult> TResult await(@NonNull Task<TResult> task, long j, @NonNull TimeUnit timeUnit) throws ExecutionException, InterruptedException, TimeoutException {
-        zzbp.zzgg("Must not be called on the main application thread");
-        zzbp.zzb((Object) task, (Object) "Task must not be null");
-        zzbp.zzb((Object) timeUnit, (Object) "TimeUnit must not be null");
+        Preconditions.checkNotMainThread();
+        Preconditions.checkNotNull(task, "Task must not be null");
+        Preconditions.checkNotNull(timeUnit, "TimeUnit must not be null");
         if (task.isComplete()) {
             return zzb(task);
         }
-        Object zza = new zza();
-        zza(task, zza);
-        if (zza.await(j, timeUnit)) {
+        zza zza2 = new zza(null);
+        zza(task, zza2);
+        if (zza2.await(j, timeUnit)) {
             return zzb(task);
         }
         throw new TimeoutException("Timed out waiting for Task");
@@ -117,23 +146,29 @@ public final class Tasks {
     }
 
     public static <TResult> Task<TResult> call(@NonNull Executor executor, @NonNull Callable<TResult> callable) {
-        zzbp.zzb((Object) executor, (Object) "Executor must not be null");
-        zzbp.zzb((Object) callable, (Object) "Callback must not be null");
-        Task zzn = new zzn();
-        executor.execute(new zzo(zzn, callable));
-        return zzn;
+        Preconditions.checkNotNull(executor, "Executor must not be null");
+        Preconditions.checkNotNull(callable, "Callback must not be null");
+        zzu zzu = new zzu();
+        executor.execute(new zzv(zzu, callable));
+        return zzu;
     }
 
-    public static <TResult> Task<TResult> forException(@NonNull Exception exception) {
-        Task zzn = new zzn();
-        zzn.setException(exception);
-        return zzn;
+    public static <TResult> Task<TResult> forCanceled() {
+        zzu zzu = new zzu();
+        zzu.zza();
+        return zzu;
     }
 
-    public static <TResult> Task<TResult> forResult(TResult tResult) {
-        Task zzn = new zzn();
-        zzn.setResult(tResult);
-        return zzn;
+    public static <TResult> Task<TResult> forException(@NonNull Exception exc) {
+        zzu zzu = new zzu();
+        zzu.setException(exc);
+        return zzu;
+    }
+
+    public static <TResult> Task<TResult> forResult(TResult tresult) {
+        zzu zzu = new zzu();
+        zzu.setResult(tresult);
+        return zzu;
     }
 
     public static Task<Void> whenAll(Collection<? extends Task<?>> collection) {
@@ -145,26 +180,46 @@ public final class Tasks {
                 throw new NullPointerException("null tasks are not accepted");
             }
         }
-        Task zzn = new zzn();
-        zzb zzc = new zzc(collection.size(), zzn);
-        for (Task task2 : collection) {
-            zza(task2, zzc);
+        zzu zzu = new zzu();
+        zzc zzc2 = new zzc(collection.size(), zzu);
+        for (Task zza2 : collection) {
+            zza(zza2, zzc2);
         }
-        return zzn;
+        return zzu;
     }
 
     public static Task<Void> whenAll(Task<?>... taskArr) {
-        return taskArr.length == 0 ? forResult(null) : whenAll(Arrays.asList(taskArr));
+        return taskArr.length == 0 ? forResult(null) : whenAll((Collection<? extends Task<?>>) Arrays.asList(taskArr));
     }
 
-    private static void zza(Task<?> task, zzb zzb) {
-        task.addOnSuccessListener(TaskExecutors.zzkfx, (OnSuccessListener) zzb);
-        task.addOnFailureListener(TaskExecutors.zzkfx, (OnFailureListener) zzb);
+    public static Task<List<Task<?>>> whenAllComplete(Collection<? extends Task<?>> collection) {
+        return whenAll(collection).continueWithTask(new zzx(collection));
+    }
+
+    public static Task<List<Task<?>>> whenAllComplete(Task<?>... taskArr) {
+        return whenAllComplete((Collection<? extends Task<?>>) Arrays.asList(taskArr));
+    }
+
+    public static <TResult> Task<List<TResult>> whenAllSuccess(Collection<? extends Task<?>> collection) {
+        return whenAll(collection).continueWith(new zzw(collection));
+    }
+
+    public static <TResult> Task<List<TResult>> whenAllSuccess(Task<?>... taskArr) {
+        return whenAllSuccess((Collection<? extends Task<?>>) Arrays.asList(taskArr));
+    }
+
+    private static void zza(Task<?> task, zzb zzb2) {
+        task.addOnSuccessListener(TaskExecutors.zzw, (OnSuccessListener<? super TResult>) zzb2);
+        task.addOnFailureListener(TaskExecutors.zzw, (OnFailureListener) zzb2);
+        task.addOnCanceledListener(TaskExecutors.zzw, (OnCanceledListener) zzb2);
     }
 
     private static <TResult> TResult zzb(Task<TResult> task) throws ExecutionException {
         if (task.isSuccessful()) {
             return task.getResult();
+        }
+        if (task.isCanceled()) {
+            throw new CancellationException("Task is already canceled");
         }
         throw new ExecutionException(task.getException());
     }

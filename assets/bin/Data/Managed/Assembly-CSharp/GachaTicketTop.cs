@@ -39,7 +39,7 @@ public class GachaTicketTop : GameSection
 	{
 		SetLabelText((Enum)UI.STR_TITLE, StringTable.Get(STRING_CATEGORY.COMMON, 103u));
 		SetLabelText((Enum)UI.STR_TITLE_REFLECT, StringTable.Get(STRING_CATEGORY.COMMON, 103u));
-		List<ItemInfo> itemList = MonoBehaviourSingleton<InventoryManager>.I.GetItemList((ItemInfo x) => x.tableData.type == ITEM_TYPE.TICKET, 0);
+		List<ItemInfo> itemList = MonoBehaviourSingleton<InventoryManager>.I.GetItemList((ItemInfo x) => x.tableData.type == ITEM_TYPE.TICKET);
 		ExpiredItem[] showList = GetItemList(itemList).ToArray();
 		GetCtrl(UI.LBL_CAUTION).GetComponent<UILabel>().supportEncoding = true;
 		string text = StringTable.Get(STRING_CATEGORY.SHOP, 14u);
@@ -73,7 +73,7 @@ public class GachaTicketTop : GameSection
 			ExpiredItem[] array = new ExpiredItem[num2];
 			Array.Copy(showList, num, array, 0, num2);
 			showList = array;
-			SetGrid(UI.GRD_LIST, "GachaTicketListItem", showList.Length, true, delegate(int i, Transform t, bool is_recycle)
+			SetGrid(UI.GRD_LIST, "GachaTicketListItem", showList.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 			{
 				ExpiredItem expiredItem = showList[i];
 				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)expiredItem.itemId);
@@ -114,6 +114,7 @@ public class GachaTicketTop : GameSection
 				}
 			}
 		}
+		list2.Sort((ExpiredItem a, ExpiredItem b) => a.expiredAt.CompareTo(b.expiredAt));
 		return list2;
 	}
 

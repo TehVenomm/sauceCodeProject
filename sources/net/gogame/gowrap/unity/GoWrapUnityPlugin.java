@@ -10,14 +10,7 @@ import org.json.JSONObject;
 public class GoWrapUnityPlugin {
     private static final GoWrapUnityPlugin INSTANCE = new GoWrapUnityPlugin();
     private static final String TAG = "goWrap-Unity";
-    private final GoWrapDelegateV2 delegate = new C12471();
-    private String gameObjectName = Constants.TAG;
-
-    /* renamed from: net.gogame.gowrap.unity.GoWrapUnityPlugin$1 */
-    class C12471 implements GoWrapDelegateV2 {
-        C12471() {
-        }
-
+    private final GoWrapDelegateV2 delegate = new GoWrapDelegateV2() {
         public void didCompleteRewardedAd(String str, int i) {
             if (GoWrapUnityPlugin.this.gameObjectName != null) {
                 try {
@@ -25,7 +18,7 @@ public class GoWrapUnityPlugin {
                     jSONObject.put("rewardId", str);
                     jSONObject.put("rewardQuantity", i);
                     UnityPlayer.UnitySendMessage(GoWrapUnityPlugin.this.gameObjectName, "handleAdsCompletedWithReward", jSONObject.toString());
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(GoWrapUnityPlugin.TAG, "Exception", e);
                 }
             }
@@ -35,7 +28,7 @@ public class GoWrapUnityPlugin {
             if (GoWrapUnityPlugin.this.gameObjectName != null) {
                 try {
                     UnityPlayer.UnitySendMessage(GoWrapUnityPlugin.this.gameObjectName, "handleOnCustomUrl", str);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(GoWrapUnityPlugin.TAG, "Exception", e);
                 }
             }
@@ -45,7 +38,7 @@ public class GoWrapUnityPlugin {
             if (GoWrapUnityPlugin.this.gameObjectName != null) {
                 try {
                     UnityPlayer.UnitySendMessage(GoWrapUnityPlugin.this.gameObjectName, "handleMenuClosed", new JSONObject().toString());
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(GoWrapUnityPlugin.TAG, "Exception", e);
                 }
             }
@@ -55,7 +48,7 @@ public class GoWrapUnityPlugin {
             if (GoWrapUnityPlugin.this.gameObjectName != null) {
                 try {
                     UnityPlayer.UnitySendMessage(GoWrapUnityPlugin.this.gameObjectName, "handleMenuOpened", new JSONObject().toString());
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(GoWrapUnityPlugin.TAG, "Exception", e);
                 }
             }
@@ -65,12 +58,14 @@ public class GoWrapUnityPlugin {
             if (GoWrapUnityPlugin.this.gameObjectName != null) {
                 try {
                     UnityPlayer.UnitySendMessage(GoWrapUnityPlugin.this.gameObjectName, "handleOnOffersAvailable", new JSONObject().toString());
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     Log.e(GoWrapUnityPlugin.TAG, "Exception", e);
                 }
             }
         }
-    }
+    };
+    /* access modifiers changed from: private */
+    public String gameObjectName = Constants.TAG;
 
     public static void initialize(String str) {
         INSTANCE.gameObjectName = str;

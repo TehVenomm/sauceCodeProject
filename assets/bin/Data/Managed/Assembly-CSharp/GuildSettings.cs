@@ -21,32 +21,32 @@ public class GuildSettings : GameSection
 		base.Initialize();
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			SetActive((Enum)UI.BTN_SETTING, true);
-			SetActive((Enum)UI.BTN_DELETE, true);
-			SetActive((Enum)UI.BTN_LEAVE, false);
+			SetActive((Enum)UI.BTN_SETTING, is_visible: true);
+			SetActive((Enum)UI.BTN_DELETE, is_visible: true);
+			SetActive((Enum)UI.BTN_LEAVE, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_SETTING, false);
-			SetActive((Enum)UI.BTN_DELETE, false);
-			SetActive((Enum)UI.BTN_LEAVE, true);
+			SetActive((Enum)UI.BTN_SETTING, is_visible: false);
+			SetActive((Enum)UI.BTN_DELETE, is_visible: false);
+			SetActive((Enum)UI.BTN_LEAVE, is_visible: true);
 		}
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData.privacy == 2)
 		{
 			if (MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				SetActive((Enum)UI.BTN_INVITE, true);
+				SetActive((Enum)UI.BTN_INVITE, is_visible: true);
 			}
 			else
 			{
-				SetActive((Enum)UI.BTN_INVITE, false);
+				SetActive((Enum)UI.BTN_INVITE, is_visible: false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_INVITE, true);
+			SetActive((Enum)UI.BTN_INVITE, is_visible: true);
 		}
-		SetActive((Enum)UI.SPR_BADGE, false);
+		SetActive((Enum)UI.SPR_BADGE, is_visible: false);
 		UpdateBadge();
 	}
 
@@ -83,7 +83,7 @@ public class GuildSettings : GameSection
 			{
 				MonoBehaviourSingleton<ChatManager>.I.DestroyClanChat();
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -95,9 +95,10 @@ public class GuildSettings : GameSection
 		{
 			if (is_success)
 			{
+				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.UPDATE_EQUIP_CHANGE);
 				MonoBehaviourSingleton<ChatManager>.I.DestroyClanChat();
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -108,11 +109,11 @@ public class GuildSettings : GameSection
 
 	private void OnQuery_LEAVE()
 	{
-		GameSection.SetEventData(new CommonDialog.Desc(CommonDialog.TYPE.DECLINE_COMFIRM, "message", null, null, null, null));
+		GameSection.SetEventData(new CommonDialog.Desc(CommonDialog.TYPE.DECLINE_COMFIRM, "message"));
 	}
 
 	private void OnQuery_DELETE()
 	{
-		GameSection.SetEventData(new CommonDialog.Desc(CommonDialog.TYPE.DECLINE_COMFIRM, "message", null, null, null, null));
+		GameSection.SetEventData(new CommonDialog.Desc(CommonDialog.TYPE.DECLINE_COMFIRM, "message"));
 	}
 }

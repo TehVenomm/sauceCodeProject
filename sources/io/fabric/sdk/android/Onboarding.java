@@ -1,26 +1,30 @@
-package io.fabric.sdk.android;
+package p017io.fabric.sdk.android;
 
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import com.facebook.appevents.AppEventsConstants;
-import io.fabric.sdk.android.services.common.ApiKey;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.common.DeliveryMechanism;
-import io.fabric.sdk.android.services.common.IdManager;
-import io.fabric.sdk.android.services.network.DefaultHttpRequestFactory;
-import io.fabric.sdk.android.services.network.HttpRequestFactory;
-import io.fabric.sdk.android.services.settings.AppRequestData;
-import io.fabric.sdk.android.services.settings.AppSettingsData;
-import io.fabric.sdk.android.services.settings.CreateAppSpiCall;
-import io.fabric.sdk.android.services.settings.IconRequest;
-import io.fabric.sdk.android.services.settings.Settings;
-import io.fabric.sdk.android.services.settings.SettingsData;
-import io.fabric.sdk.android.services.settings.UpdateAppSpiCall;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
+import p017io.fabric.sdk.android.services.common.ApiKey;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.common.DataCollectionArbiter;
+import p017io.fabric.sdk.android.services.common.DeliveryMechanism;
+import p017io.fabric.sdk.android.services.common.IdManager;
+import p017io.fabric.sdk.android.services.network.DefaultHttpRequestFactory;
+import p017io.fabric.sdk.android.services.network.HttpRequestFactory;
+import p017io.fabric.sdk.android.services.settings.AppRequestData;
+import p017io.fabric.sdk.android.services.settings.AppSettingsData;
+import p017io.fabric.sdk.android.services.settings.CreateAppSpiCall;
+import p017io.fabric.sdk.android.services.settings.IconRequest;
+import p017io.fabric.sdk.android.services.settings.Settings;
+import p017io.fabric.sdk.android.services.settings.SettingsData;
+import p017io.fabric.sdk.android.services.settings.UpdateAppSpiCall;
 
+/* renamed from: io.fabric.sdk.android.Onboarding */
 class Onboarding extends Kit<Boolean> {
     private static final String BINARY_BUILD_TYPE = "binary";
     static final String CRASHLYTICS_API_ENDPOINT = "com.crashlytics.ApiEndpoint";
@@ -42,7 +46,8 @@ class Onboarding extends Kit<Boolean> {
     }
 
     private AppRequestData buildAppRequest(IconRequest iconRequest, Collection<KitInfo> collection) {
-        return new AppRequestData(new ApiKey().getValue(getContext()), getIdManager().getAppIdentifier(), this.versionName, this.versionCode, CommonUtils.createInstanceIdFrom(CommonUtils.resolveBuildId(r0)), this.applicationLabel, DeliveryMechanism.determineFrom(this.installerPackageName).getId(), this.targetAndroidSdkVersion, AppEventsConstants.EVENT_PARAM_VALUE_NO, iconRequest, collection);
+        Context context = getContext();
+        return new AppRequestData(new ApiKey().getValue(context), getIdManager().getAppIdentifier(), this.versionName, this.versionCode, CommonUtils.createInstanceIdFrom(CommonUtils.resolveBuildId(context)), this.applicationLabel, DeliveryMechanism.determineFrom(this.installerPackageName).getId(), this.targetAndroidSdkVersion, AppEventsConstants.EVENT_PARAM_VALUE_NO, iconRequest, collection);
     }
 
     private boolean performAutoConfigure(String str, AppSettingsData appSettingsData, Collection<KitInfo> collection) {
@@ -50,7 +55,7 @@ class Onboarding extends Kit<Boolean> {
             if (performCreateApp(str, appSettingsData, collection)) {
                 return Settings.getInstance().loadSettingsSkippingCache();
             }
-            Fabric.getLogger().mo4292e("Fabric", "Failed to create app with Crashlytics service.", null);
+            Fabric.getLogger().mo20972e(Fabric.TAG, "Failed to create app with Crashlytics service.", null);
             return false;
         } else if (AppSettingsData.STATUS_CONFIGURED.equals(appSettingsData.status)) {
             return Settings.getInstance().loadSettingsSkippingCache();
@@ -58,8 +63,8 @@ class Onboarding extends Kit<Boolean> {
             if (!appSettingsData.updateRequired) {
                 return true;
             }
-            Fabric.getLogger().mo4289d("Fabric", "Server says an update is required - forcing a full App update.");
-            performUpdateApp(str, appSettingsData, (Collection) collection);
+            Fabric.getLogger().mo20969d(Fabric.TAG, "Server says an update is required - forcing a full App update.");
+            performUpdateApp(str, appSettingsData, collection);
             return true;
         }
     }
@@ -73,49 +78,52 @@ class Onboarding extends Kit<Boolean> {
     }
 
     private boolean performUpdateApp(String str, AppSettingsData appSettingsData, Collection<KitInfo> collection) {
-        return performUpdateApp(appSettingsData, IconRequest.build(getContext(), str), (Collection) collection);
+        return performUpdateApp(appSettingsData, IconRequest.build(getContext(), str), collection);
     }
 
     private SettingsData retrieveSettingsData() {
         try {
-            Settings.getInstance().initialize(this, this.idManager, this.requestFactory, this.versionCode, this.versionName, getOverridenSpiEndpoint()).loadSettingsData();
+            Settings.getInstance().initialize(this, this.idManager, this.requestFactory, this.versionCode, this.versionName, getOverridenSpiEndpoint(), DataCollectionArbiter.getInstance(getContext())).loadSettingsData();
             return Settings.getInstance().awaitSettingsData();
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Error dealing with settings", e);
+        } catch (Exception e) {
+            Fabric.getLogger().mo20972e(Fabric.TAG, "Error dealing with settings", e);
             return null;
         }
     }
 
-    protected Boolean doInBackground() {
-        boolean performAutoConfigure;
+    /* access modifiers changed from: protected */
+    public Boolean doInBackground() {
+        boolean z;
         String appIconHashOrNull = CommonUtils.getAppIconHashOrNull(getContext());
         SettingsData retrieveSettingsData = retrieveSettingsData();
         if (retrieveSettingsData != null) {
             try {
-                performAutoConfigure = performAutoConfigure(appIconHashOrNull, retrieveSettingsData.appData, mergeKits(this.kitsFinder != null ? (Map) this.kitsFinder.get() : new HashMap(), this.providedKits).values());
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Error performing auto configuration.", e);
-                performAutoConfigure = false;
+                z = performAutoConfigure(appIconHashOrNull, retrieveSettingsData.appData, mergeKits(this.kitsFinder != null ? (Map) this.kitsFinder.get() : new HashMap(), this.providedKits).values());
+            } catch (Exception e) {
+                Fabric.getLogger().mo20972e(Fabric.TAG, "Error performing auto configuration.", e);
+                z = false;
             }
         } else {
-            performAutoConfigure = false;
+            z = false;
         }
-        return Boolean.valueOf(performAutoConfigure);
+        return Boolean.valueOf(z);
     }
 
     public String getIdentifier() {
         return "io.fabric.sdk.android:fabric";
     }
 
-    String getOverridenSpiEndpoint() {
+    /* access modifiers changed from: 0000 */
+    public String getOverridenSpiEndpoint() {
         return CommonUtils.getStringsFileValue(getContext(), CRASHLYTICS_API_ENDPOINT);
     }
 
     public String getVersion() {
-        return "1.3.4.60";
+        return "1.4.8.32";
     }
 
-    Map<String, KitInfo> mergeKits(Map<String, KitInfo> map, Collection<Kit> collection) {
+    /* access modifiers changed from: 0000 */
+    public Map<String, KitInfo> mergeKits(Map<String, KitInfo> map, Collection<Kit> collection) {
         for (Kit kit : collection) {
             if (!map.containsKey(kit.getIdentifier())) {
                 map.put(kit.getIdentifier(), new KitInfo(kit.getIdentifier(), kit.getVersion(), BINARY_BUILD_TYPE));
@@ -124,7 +132,8 @@ class Onboarding extends Kit<Boolean> {
         return map;
     }
 
-    protected boolean onPreExecute() {
+    /* access modifiers changed from: protected */
+    public boolean onPreExecute() {
         try {
             this.installerPackageName = getIdManager().getInstallerPackageName();
             this.packageManager = getContext().getPackageManager();
@@ -135,8 +144,8 @@ class Onboarding extends Kit<Boolean> {
             this.applicationLabel = this.packageManager.getApplicationLabel(getContext().getApplicationInfo()).toString();
             this.targetAndroidSdkVersion = Integer.toString(getContext().getApplicationInfo().targetSdkVersion);
             return true;
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Failed init", e);
+        } catch (NameNotFoundException e) {
+            Fabric.getLogger().mo20972e(Fabric.TAG, "Failed init", e);
             return false;
         }
     }

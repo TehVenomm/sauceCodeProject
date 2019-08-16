@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("Dynamic Bone/Dynamic Bone")]
-public class DynamicBone
+public class DynamicBone : MonoBehaviour
 {
 	public enum FreezeAxis
 	{
@@ -151,12 +151,7 @@ public class DynamicBone
 
 	private void CheckDistance()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
@@ -165,19 +160,20 @@ public class DynamicBone
 		{
 			val = Camera.get_main().get_transform();
 		}
-		if (val != null)
+		if (!(val != null))
 		{
-			Vector3 val2 = val.get_position() - this.get_transform().get_position();
-			float sqrMagnitude = val2.get_sqrMagnitude();
-			bool flag = sqrMagnitude > m_DistanceToObject * m_DistanceToObject;
-			if (flag != m_DistantDisabled)
+			return;
+		}
+		Vector3 val2 = val.get_position() - this.get_transform().get_position();
+		float sqrMagnitude = val2.get_sqrMagnitude();
+		bool flag = sqrMagnitude > m_DistanceToObject * m_DistanceToObject;
+		if (flag != m_DistantDisabled)
+		{
+			if (!flag)
 			{
-				if (!flag)
-				{
-					ResetParticlesPosition();
-				}
-				m_DistantDisabled = flag;
+				ResetParticlesPosition();
 			}
+			m_DistantDisabled = flag;
 		}
 	}
 
@@ -208,31 +204,31 @@ public class DynamicBone
 
 	private void OnDrawGizmosSelected()
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() && !(m_Root == null))
+		if (!this.get_enabled() || m_Root == null)
 		{
-			if (Application.get_isEditor() && !Application.get_isPlaying() && this.get_transform().get_hasChanged())
+			return;
+		}
+		if (Application.get_isEditor() && !Application.get_isPlaying() && this.get_transform().get_hasChanged())
+		{
+			InitTransforms();
+			SetupParticles();
+		}
+		Gizmos.set_color(Color.get_white());
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			if (particle.m_ParentIndex >= 0)
 			{
-				InitTransforms();
-				SetupParticles();
+				Particle particle2 = m_Particles[particle.m_ParentIndex];
+				Gizmos.DrawLine(particle.m_Position, particle2.m_Position);
 			}
-			Gizmos.set_color(Color.get_white());
-			for (int i = 0; i < m_Particles.Count; i++)
+			if (particle.m_Radius > 0f)
 			{
-				Particle particle = m_Particles[i];
-				if (particle.m_ParentIndex >= 0)
-				{
-					Particle particle2 = m_Particles[particle.m_ParentIndex];
-					Gizmos.DrawLine(particle.m_Position, particle2.m_Position);
-				}
-				if (particle.m_Radius > 0f)
-				{
-					Gizmos.DrawWireSphere(particle.m_Position, particle.m_Radius * m_ObjectScale);
-				}
+				Gizmos.DrawWireSphere(particle.m_Position, particle.m_Radius * m_ObjectScale);
 			}
 		}
 	}
@@ -260,56 +256,54 @@ public class DynamicBone
 
 	private void UpdateDynamicBones(float t)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_Root == null))
+		if (m_Root == null)
 		{
-			Vector3 lossyScale = this.get_transform().get_lossyScale();
-			m_ObjectScale = Mathf.Abs(lossyScale.x);
-			m_ObjectMove = this.get_transform().get_position() - m_ObjectPrevPosition;
-			m_ObjectPrevPosition = this.get_transform().get_position();
-			int num = 1;
-			if (m_UpdateRate > 0f)
-			{
-				float num2 = 1f / m_UpdateRate;
-				m_Time += t;
-				num = 0;
-				while (m_Time >= num2)
-				{
-					m_Time -= num2;
-					if (++num >= 3)
-					{
-						m_Time = 0f;
-						break;
-					}
-				}
-			}
-			if (num > 0)
-			{
-				for (int i = 0; i < num; i++)
-				{
-					UpdateParticles1();
-					UpdateParticles2();
-					m_ObjectMove = Vector3.get_zero();
-				}
-			}
-			else
-			{
-				SkipUpdateParticles();
-			}
-			ApplyParticlesToTransforms();
+			return;
 		}
+		Vector3 lossyScale = this.get_transform().get_lossyScale();
+		m_ObjectScale = Mathf.Abs(lossyScale.x);
+		m_ObjectMove = this.get_transform().get_position() - m_ObjectPrevPosition;
+		m_ObjectPrevPosition = this.get_transform().get_position();
+		int num = 1;
+		if (m_UpdateRate > 0f)
+		{
+			float num2 = 1f / m_UpdateRate;
+			m_Time += t;
+			num = 0;
+			while (m_Time >= num2)
+			{
+				m_Time -= num2;
+				if (++num >= 3)
+				{
+					m_Time = 0f;
+					break;
+				}
+			}
+		}
+		if (num > 0)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				UpdateParticles1();
+				UpdateParticles2();
+				m_ObjectMove = Vector3.get_zero();
+			}
+		}
+		else
+		{
+			SkipUpdateParticles();
+		}
+		ApplyParticlesToTransforms();
 	}
 
 	private void SetupParticles()
@@ -317,62 +311,61 @@ public class DynamicBone
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		m_Particles.Clear();
-		if (!(m_Root == null))
+		if (m_Root == null)
 		{
-			m_LocalGravity = m_Root.InverseTransformDirection(m_Gravity);
-			Vector3 lossyScale = this.get_transform().get_lossyScale();
-			m_ObjectScale = lossyScale.x;
-			m_ObjectPrevPosition = this.get_transform().get_position();
-			m_ObjectMove = Vector3.get_zero();
-			m_BoneTotalLength = 0f;
-			AppendParticles(m_Root, -1, 0f);
-			for (int i = 0; i < m_Particles.Count; i++)
+			return;
+		}
+		m_LocalGravity = m_Root.InverseTransformDirection(m_Gravity);
+		Vector3 lossyScale = this.get_transform().get_lossyScale();
+		m_ObjectScale = lossyScale.x;
+		m_ObjectPrevPosition = this.get_transform().get_position();
+		m_ObjectMove = Vector3.get_zero();
+		m_BoneTotalLength = 0f;
+		AppendParticles(m_Root, -1, 0f);
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			particle.m_Damping = m_Damping;
+			particle.m_Elasticity = m_Elasticity;
+			particle.m_Stiffness = m_Stiffness;
+			particle.m_Inert = m_Inert;
+			particle.m_Radius = m_Radius;
+			if (m_BoneTotalLength > 0f)
 			{
-				Particle particle = m_Particles[i];
-				particle.m_Damping = m_Damping;
-				particle.m_Elasticity = m_Elasticity;
-				particle.m_Stiffness = m_Stiffness;
-				particle.m_Inert = m_Inert;
-				particle.m_Radius = m_Radius;
-				if (m_BoneTotalLength > 0f)
+				float num = particle.m_BoneLength / m_BoneTotalLength;
+				if (m_DampingDistrib != null && m_DampingDistrib.get_keys().Length > 0)
 				{
-					float num = particle.m_BoneLength / m_BoneTotalLength;
-					if (m_DampingDistrib != null && m_DampingDistrib.get_keys().Length > 0)
-					{
-						particle.m_Damping *= m_DampingDistrib.Evaluate(num);
-					}
-					if (m_ElasticityDistrib != null && m_ElasticityDistrib.get_keys().Length > 0)
-					{
-						particle.m_Elasticity *= m_ElasticityDistrib.Evaluate(num);
-					}
-					if (m_StiffnessDistrib != null && m_StiffnessDistrib.get_keys().Length > 0)
-					{
-						particle.m_Stiffness *= m_StiffnessDistrib.Evaluate(num);
-					}
-					if (m_InertDistrib != null && m_InertDistrib.get_keys().Length > 0)
-					{
-						particle.m_Inert *= m_InertDistrib.Evaluate(num);
-					}
-					if (m_RadiusDistrib != null && m_RadiusDistrib.get_keys().Length > 0)
-					{
-						particle.m_Radius *= m_RadiusDistrib.Evaluate(num);
-					}
+					particle.m_Damping *= m_DampingDistrib.Evaluate(num);
 				}
-				particle.m_Damping = Mathf.Clamp01(particle.m_Damping);
-				particle.m_Elasticity = Mathf.Clamp01(particle.m_Elasticity);
-				particle.m_Stiffness = Mathf.Clamp01(particle.m_Stiffness);
-				particle.m_Inert = Mathf.Clamp01(particle.m_Inert);
-				particle.m_Radius = Mathf.Max(particle.m_Radius, 0f);
+				if (m_ElasticityDistrib != null && m_ElasticityDistrib.get_keys().Length > 0)
+				{
+					particle.m_Elasticity *= m_ElasticityDistrib.Evaluate(num);
+				}
+				if (m_StiffnessDistrib != null && m_StiffnessDistrib.get_keys().Length > 0)
+				{
+					particle.m_Stiffness *= m_StiffnessDistrib.Evaluate(num);
+				}
+				if (m_InertDistrib != null && m_InertDistrib.get_keys().Length > 0)
+				{
+					particle.m_Inert *= m_InertDistrib.Evaluate(num);
+				}
+				if (m_RadiusDistrib != null && m_RadiusDistrib.get_keys().Length > 0)
+				{
+					particle.m_Radius *= m_RadiusDistrib.Evaluate(num);
+				}
 			}
+			particle.m_Damping = Mathf.Clamp01(particle.m_Damping);
+			particle.m_Elasticity = Mathf.Clamp01(particle.m_Elasticity);
+			particle.m_Stiffness = Mathf.Clamp01(particle.m_Stiffness);
+			particle.m_Inert = Mathf.Clamp01(particle.m_Inert);
+			particle.m_Radius = Mathf.Max(particle.m_Radius, 0f);
 		}
 	}
 
@@ -381,47 +374,41 @@ public class DynamicBone
 		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Expected O, but got Unknown
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020a: Expected O, but got Unknown
-		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_023b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0240: Unknown result type (might be due to invalid IL or missing references)
 		Particle particle = new Particle();
 		particle.m_Transform = b;
 		particle.m_ParentIndex = parentIndex;
@@ -437,10 +424,10 @@ public class DynamicBone
 			Transform transform = m_Particles[parentIndex].m_Transform;
 			if (m_EndLength > 0f)
 			{
-				Transform val2 = transform.get_parent();
-				if (val2 != null)
+				Transform parent = transform.get_parent();
+				if (parent != null)
 				{
-					particle.m_EndOffset = transform.InverseTransformPoint(transform.get_position() * 2f - val2.get_position()) * m_EndLength;
+					particle.m_EndOffset = transform.InverseTransformPoint(transform.get_position() * 2f - parent.get_position()) * m_EndLength;
 				}
 				else
 				{
@@ -463,32 +450,33 @@ public class DynamicBone
 		}
 		int count = m_Particles.Count;
 		m_Particles.Add(particle);
-		if (b != null)
+		if (!(b != null))
 		{
-			for (int i = 0; i < b.get_childCount(); i++)
+			return;
+		}
+		for (int i = 0; i < b.get_childCount(); i++)
+		{
+			bool flag = false;
+			if (m_Exclusions != null)
 			{
-				bool flag = false;
-				if (m_Exclusions != null)
+				for (int j = 0; j < m_Exclusions.Count; j++)
 				{
-					for (int j = 0; j < m_Exclusions.Count; j++)
+					Transform val2 = m_Exclusions[j];
+					if (val2 == b.GetChild(i))
 					{
-						Transform val3 = m_Exclusions[j];
-						if (val3 == b.GetChild(i))
-						{
-							flag = true;
-							break;
-						}
+						flag = true;
+						break;
 					}
 				}
-				if (!flag)
-				{
-					AppendParticles(b.GetChild(i), count, boneLength);
-				}
 			}
-			if (b.get_childCount() == 0 && (m_EndLength > 0f || m_EndOffset != Vector3.get_zero()))
+			if (!flag)
 			{
-				AppendParticles(null, count, boneLength);
+				AppendParticles(b.GetChild(i), count, boneLength);
 			}
+		}
+		if (b.get_childCount() == 0 && (m_EndLength > 0f || m_EndOffset != Vector3.get_zero()))
+		{
+			AppendParticles(null, count, boneLength);
 		}
 	}
 
@@ -522,7 +510,6 @@ public class DynamicBone
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < m_Particles.Count; i++)
@@ -531,12 +518,10 @@ public class DynamicBone
 			if (particle.m_Transform != null)
 			{
 				particle.m_Position = (particle.m_PrevPosition = particle.m_Transform.get_position());
+				continue;
 			}
-			else
-			{
-				Transform transform = m_Particles[particle.m_ParentIndex].m_Transform;
-				particle.m_Position = (particle.m_PrevPosition = transform.TransformPoint(particle.m_EndOffset));
-			}
+			Transform transform = m_Particles[particle.m_ParentIndex].m_Transform;
+			particle.m_Position = (particle.m_PrevPosition = transform.TransformPoint(particle.m_EndOffset));
 		}
 		m_ObjectPrevPosition = this.get_transform().get_position();
 	}
@@ -653,27 +638,27 @@ public class DynamicBone
 		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0255: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0289: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0301: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
+		//IL_030e: Unknown result type (might be due to invalid IL or missing references)
 		Plane val = default(Plane);
 		for (int i = 1; i < m_Particles.Count; i++)
 		{

@@ -12,8 +12,8 @@ import java.io.IOException;
 class ResourceRequestHandler extends RequestHandler {
     private final Context context;
 
-    ResourceRequestHandler(Context context) {
-        this.context = context;
+    ResourceRequestHandler(Context context2) {
+        this.context = context2;
     }
 
     public boolean canHandleRequest(Request request) {
@@ -29,10 +29,10 @@ class ResourceRequestHandler extends RequestHandler {
     }
 
     private static Bitmap decodeResource(Resources resources, int i, Request request) {
-        Options createBitmapOptions = RequestHandler.createBitmapOptions(request);
-        if (RequestHandler.requiresInSampleSize(createBitmapOptions)) {
+        Options createBitmapOptions = createBitmapOptions(request);
+        if (requiresInSampleSize(createBitmapOptions)) {
             BitmapFactory.decodeResource(resources, i, createBitmapOptions);
-            RequestHandler.calculateInSampleSize(request.targetWidth, request.targetHeight, createBitmapOptions, request);
+            calculateInSampleSize(request.targetWidth, request.targetHeight, createBitmapOptions, request);
         }
         return BitmapFactory.decodeResource(resources, i, createBitmapOptions);
     }

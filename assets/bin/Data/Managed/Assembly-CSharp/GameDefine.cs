@@ -4,9 +4,11 @@ using UnityEngine;
 
 public static class GameDefine
 {
-	public const int NAME_MAX_LENGTH = 12;
+	public const int NAME_MAX_LENGTH = 14;
 
 	public const string SYSTEM_INIT_NAME = "/colopl_rob";
+
+	public const string GG_SYSTEM_INIT_NAME = "DPRO Hunter ";
 
 	public const int COMMENT_MAX_LENGTH = 30;
 
@@ -46,11 +48,34 @@ public static class GameDefine
 
 	public const string LIMITED_WORD = "Valid till";
 
+	public static readonly int[] NOTIFY_QUEST_REMAIN_DAY = new int[3]
+	{
+		1,
+		3,
+		7
+	};
+
 	public const int SHOW_QUEST_REMAIN_LIMIT_DAY = 5;
 
 	public const int FAVORITE_STAMP_NUM = 10;
 
 	public const string FAVORITE_STAMP_KEY = "FAVORITE_STAMP_KEY";
+
+	public static readonly List<int> FAVORITE_STAMP_DEFAULT = new List<int>(10)
+	{
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		8,
+		9,
+		10
+	};
+
+	public static int GACHA_VIEW_PROBABILITY = 12;
 
 	public const string GACHA_BUTTON_NORAML1 = "BTN_GACHA_NORMAL1";
 
@@ -60,15 +85,35 @@ public static class GameDefine
 
 	public const string GACHA_BUTTON_VERSION = "_VER2";
 
+	public const string GACHA_BUTTON_FEVER_NEXT = "BTN_GACHA_FEVER_NEXT";
+
+	public const string GACHA_FEVER_RESULT = "_FEVER";
+
 	public const string SHOP_BUTTON_NORMAL1 = "BTN_SHOP_NORMAL1";
+
+	public static int POINT_SHOP_MAX_BUY_LIMIT = 99;
 
 	public const int QUEST_SHOW_NUM = 10;
 
+	public static int DEGREE_PART_COUNT = 4;
+
+	public static int DEGREE_WORD_CHANGE_LIST_COUNT = 20;
+
+	public static int DEGREE_FRAME_CHANGE_LIST_COUNT = 10;
+
+	public static int DEGREE_FRIEND_LIST_HEIGHT = 130;
+
 	public const int RUSH_EVENT_ID = 10004400;
+
+	public static int POINT_SHOP_LIST_COUNT = 10;
 
 	public const string GACHA_SEARCH_RAIRTY_KEY = "GACHA_SEARCH_RAIRTY_KEY";
 
 	public const string GACHA_SEARCH_ELEMENT_KEY = "GACHA_SEARCH_ELEMENT_KEY";
+
+	public const string GACHA_SEARCH_PRIORITY_CS_KEY = "GACHA_SEARCH_PRIORITY_CS_KEY";
+
+	public const string GACHA_SEARCH_PRIORITY_FS_KEY = "GACHA_SEARCH_PRIORITY_FS_KEY";
 
 	public const string GACHA_SEARCH_SPECIES_KEY = "GACHA_SEARCH_SPECIES_KEY";
 
@@ -118,6 +163,8 @@ public static class GameDefine
 
 	public const string RUSH_SEARCH_MIN_QUEST_ID_KEY = "RUSH_SEARCH_MIN_QUESTID_KEY";
 
+	public const string GATHER_ITEM_KEY_PREFIX = "gik_";
+
 	public const string NORMAL_HOME_THEME_NAME = "NORMAL";
 
 	public const int LOUNGE_CAPACITY = 8;
@@ -142,17 +189,29 @@ public static class GameDefine
 
 	public const int ELEMENT_NUM_WITH_NORMAL = 7;
 
+	public const float PLAYER_SP_ACTION_GAUGE_MAX = 1000f;
+
 	public const string SOUL_ENERGY_EFFECT_NAME = "ef_btl_soul_energy_01";
 
 	public const string THS_SOUL_BOOST_START_EFFECT_NAME = "ef_btl_wsk2_longsword_02_01";
 
 	public const string THS_SOUL_BOOST_LOOP_EFFECT_NAME = "ef_btl_wsk2_longsword_03_01";
 
+	public const string BURST_BOOST_LOOP_EFFECT_NAME = "ef_btl_wsk3_sword_aura_01";
+
+	public const string ORACLE_BOOST_LOOP_EFFECT_NAME = "ef_btl_wsk4_spear_aura";
+
 	public const string PAIR_SWORDS_HEAT_MODE_TRAIL_EFFECT_NAME = "ef_btl_wsk_twinsword_01_03";
 
 	public const string PAIR_SWORDS_HEAT_MODE_ATKUP_LEVELUP_EFFECT_NAME = "ef_btl_wsk_twinsword_01_04";
 
 	public const string PAIR_SWORDS_HEAT_MODE_ATKUP_LEVELMAX_EFFECT_NAME = "ef_btl_wsk_twinsword_01_05";
+
+	public const int PAIR_SWORDS_BURST_BOOST_SEID = 10000051;
+
+	public const int PAIR_SWORDS_BURST_COMBINE_SEID = 10000042;
+
+	public const string PAIR_SWORDS_BURST_COMBINE_EFFECT_NAME = "ef_btl_wsk3_twinsword_01_00";
 
 	public const int ONE_HAND_SWORD_JUSTGUARD_SEID = 10000042;
 
@@ -168,9 +227,13 @@ public static class GameDefine
 
 	public const string ARROW_SOUL_RIGHT_HAND_EFFECT_NAME = "ef_btl_wsk2_bow_01_01";
 
+	public const string ARROW_BUFF_BOMBARROW_EFFECT_NAME = "ef_btl_wsk_bow_01_03";
+
 	public const string SPEAR_JUMP_CURSOR_EFFECT_NAME = "ef_btl_target_e_01";
 
 	public const string SPEAR_JUMP_MAX_EFFECT_NAME = "ef_btl_wsk_spear_01_03";
+
+	public const string SPEAR_SOUL_SP_BLADE_EFFECT_NAME = "ef_btl_wsk2_spear_02_02";
 
 	public const string COMMON_CHARGE_EFFECT = "ef_btl_wsk_charge_loop_01";
 
@@ -182,7 +245,31 @@ public static class GameDefine
 
 	public const string RESURRECTION_RECEIVE_EFFECT_NAME = "ef_btl_sk_heal_04_03";
 
+	public const string HEAL_EFFECT_NAME_BASIS = "ef_btl_sk_heal_01";
+
+	public const string HEAL_EFFECT_NAME_ABSORB = "ef_btl_sk_heal_02";
+
+	public const string HEAL_EFFECT_NAME_HIT_ABSORB = "ef_btl_sk_drain_01_01";
+
+	public const string SKILL_CHARGE_ABOVE_EFFECT = "ef_btl_sk_magi_move_01_01";
+
+	public const string BUFF_SUBSTITUTE_EFFECT = "ef_btl_sk_magi_shikigami_01_02";
+
 	public const string HIT_ABSORB_EFFECT_NAME = "ef_btl_sk_drain_01_01";
+
+	public const string ORACLE_SPEAR_GUARD_EFFECT = "ef_btl_wsk4_spear_guard";
+
+	public const string ORACLE_SPEAR_STOCKED_EFFECT = "ef_btl_wsk4_spear_stock";
+
+	public const string ORACLE_PAIR_SWORDS_RUSH_EFFECT = "ef_btl_wsk4_twinsword_01";
+
+	public const string ORACLE_PAIR_SWORDS_RUSH_EFFECT_FORMAT = "ef_btl_wsk4_twinsword_01_{0:D2}";
+
+	public const string ORACLE_PAIR_SWORDS_RUSH_LOOP_EFFECT = "ef_btl_wsk4_twinsword_03";
+
+	public const string ORACLE_PAIR_SWORDS_JUST_AVOID = "ef_btl_wsk4_twinsword_04";
+
+	public const string ORACLE_PAIR_SWORDS_SP_EFFECT_FORMAT = "ef_btl_wsk4_twinsword_05_{0:D2}";
 
 	public const int UNKNOWN_ENEMY_ICON_ID = 10999;
 
@@ -199,6 +286,10 @@ public static class GameDefine
 	public const int ARENA_DISABLE_BANNER_ID = 10012201;
 
 	public const int ARENA_DISABLE_BG_ID = 10012200;
+
+	public const int SERIES_ARENA_ALLOWED_LEVEL = 100;
+
+	public const int SERIES_ARENA_DISABLE_BANNER_ID = 10012201;
 
 	public const string FCM_REGISTED = "fcm_registed";
 
@@ -220,40 +311,65 @@ public static class GameDefine
 
 	public const string SHOP_TOP_ADVERTISEMENT = "SHOP_TOP_ADVERTISEMENT";
 
-	public static readonly int[] NOTIFY_QUEST_REMAIN_DAY = new int[3]
-	{
-		1,
-		3,
-		7
-	};
+	public const string IS_SHOWED_RAID_BOSS_DIRECTION = "IS_SHOWED_RAID_BOSS_DIRECTION";
 
-	public static readonly List<int> FAVORITE_STAMP_DEFAULT = new List<int>(10)
-	{
-		1,
-		2,
-		3,
-		4,
-		5,
-		6,
-		7,
-		8,
-		9,
-		10
-	};
+	public const float PERCENT = 0.01f;
 
-	public static int GACHA_VIEW_PROBABILITY = 12;
+	public const int DEFAULT_EXCEEDABLE_NUM = 4;
 
-	public static int POINT_SHOP_MAX_BUY_LIMIT = 99;
+	public const string CLAN_SEARCH_NAME_KEY = "CLAN_SEARCH_NAME_KEY";
 
-	public static int DEGREE_PART_COUNT = 4;
+	public const string CLAN_SEARCH_JT_KEY = "CLAN_SEARCH_JT_KEY";
 
-	public static int DEGREE_WORD_CHANGE_LIST_COUNT = 20;
+	public const string CLAN_SEARCH_LBL_KEY = "CLAN_SEARCH_LBL_KEY";
 
-	public static int DEGREE_FRAME_CHANGE_LIST_COUNT = 10;
+	public const string CLAN_SEARCH_ISCF_KEY = "CLAN_SEARCH_ISCF_KEY";
 
-	public static int DEGREE_FRIEND_LIST_HEIGHT = 130;
+	public const int CLAN_NEED_LEVEL = 15;
 
-	public static int POINT_SHOP_LIST_COUNT = 10;
+	public const string CLAN_BOARD_READ_ID_KEY = "CLAN_BOARD_READ_ID_KEY";
+
+	public const int CLAN_BOARD_MAX_LENGTH = 256;
+
+	public const string CLAN_CHAT_READ_ID_KEY = "CLAN_CHAT_READ_ID_KEY";
+
+	public const string CLAN_LAST_ID_KEY = "CLAN_LAST_IDL_KEY";
+
+	public const string CLAN_LAST_LEVEL_KEY = "CLAN_LAST_LEVEL_KEY";
+
+	public const string CLAN_CHAT_LAST_READ_ID_KEY = "CLAN_CHAT_LAST_READ_ID_KEY";
+
+	public const string TUTORIAL_WEAPON_PREF_ARMOR = "Tut_Armor";
+
+	public const string TUTORIAL_WEAPON_PREF_ARM = "Tut_Arm";
+
+	public const string TUTORIAL_WEAPON_PREF_HEAD = "Tut_Head";
+
+	public const string TUTORIAL_WEAPON_PREF_LEG = "Tut_Leg";
+
+	public const string TUTORIAL_WEAPON_PREF_WEAPON = "Tut_Weapon";
+
+	public const string TUTORIAL_WEAPON_PREF_SEX = "Tut_Sex";
+
+	public const string TUTORIAL_WEAPON_PREF_WEAPON_TYPE = "Tut_Weapon_Type";
+
+	public const string TUTORIAL_PLAYER_NAME = "Tut_Name";
+
+	public static readonly string PLAYER_WEAPON_PARENT_NODE_RIGHT = "R_Wep";
+
+	public static readonly string EFFECT_STATE_NAME_LOOP_1 = "LOOP1";
+
+	public static readonly string EFFECT_STATE_NAME_LOOP_2 = "LOOP2";
+
+	public static readonly string SHADER_PROPERTY_NAME_GRAYSCALE_POWER = "_GrayScalePower";
+
+	public static readonly string SHADER_PROPERTY_NAME_GRAYSCALE_RATE = "_GrayScaleRate";
+
+	public static readonly int kShiftIndex = 1000;
+
+	public static readonly float kWaveStrategyLineWidth = 0.25f;
+
+	public const string BANNDER_ID = "BANNDER_ID";
 
 	public static bool ACTIVE_DEGREE => MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds != null && MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds.Count == DEGREE_PART_COUNT;
 
@@ -284,6 +400,8 @@ public static class GameDefine
 			return MAIN_SCENE.HOME;
 		case "LoungeScene":
 			return MAIN_SCENE.LOUNGE;
+		case "ClanScene":
+			return MAIN_SCENE.CLAN;
 		case "GuildScene":
 			return MAIN_SCENE.GUILD;
 		case "SmithScene":
@@ -336,6 +454,11 @@ public static class GameDefine
 		return rarity >= RARITY_TYPE.B;
 	}
 
+	public static bool IsRequiredAlertByRarity(RARITY_TYPE _rarity)
+	{
+		return _rarity >= RARITY_TYPE.SS;
+	}
+
 	public static bool IsRareLithograph(RARITY_TYPE rarity)
 	{
 		return rarity >= RARITY_TYPE.SS;
@@ -343,18 +466,21 @@ public static class GameDefine
 
 	public static bool IsFieldBossTreasureBox(int typeInt)
 	{
-		if (Enum.IsDefined(typeof(TREASURE_BOX_TYPE), typeInt))
+		if (!Enum.IsDefined(typeof(TREASURE_BOX_TYPE), typeInt))
 		{
-			switch (typeInt)
-			{
-			case 1:
-			case 2:
-			case 3:
-				return true;
-			default:
-				return false;
-			}
+			return false;
 		}
-		return false;
+		switch (typeInt)
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 5:
+		case 6:
+		case 7:
+			return true;
+		default:
+			return false;
+		}
 	}
 }

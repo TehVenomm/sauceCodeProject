@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.io.NumberOutput;
+import com.fasterxml.jackson.core.p015io.NumberOutput;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -78,11 +78,11 @@ public class ShortNode extends NumericNode {
     }
 
     public String asText() {
-        return NumberOutput.toString(this._value);
+        return NumberOutput.toString((int) this._value);
     }
 
     public boolean asBoolean(boolean z) {
-        return this._value != (short) 0;
+        return this._value != 0;
     }
 
     public final void serialize(JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {

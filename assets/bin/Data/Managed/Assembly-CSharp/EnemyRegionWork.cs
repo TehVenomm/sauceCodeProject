@@ -43,6 +43,10 @@ public class EnemyRegionWork
 
 	public Transform shadowSealingEffect;
 
+	public List<Enemy.BombArrowData> bombArrowDataHistory = new List<Enemy.BombArrowData>();
+
+	public Transform bombArrowEffect;
+
 	public bool IsValidDisplayTimer => displayTimer > 0f;
 
 	public void Initialize(Enemy.RegionInfo info, int parentRegionId, int _regionId)
@@ -116,6 +120,9 @@ public class EnemyRegionWork
 		case 10:
 			weakState = Enemy.WEAK_STATE.WEAK_CANNON;
 			break;
+		case 11:
+			weakState = Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK;
+			break;
 		}
 		if (attackMode != 0)
 		{
@@ -156,5 +163,27 @@ public class EnemyRegionWork
 		isBroke = regionWork.isBroke;
 		isShieldCriticalDamage = regionWork.isShieldCriticalDamage;
 		isShieldDamage = regionWork.isShieldDamage;
+	}
+
+	public bool IsBombArrowLevelMax()
+	{
+		return bombArrowDataHistory.Count >= MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombArrowMaxLevel;
+	}
+
+	public void StackBombArrow(Enemy.BombArrowData data)
+	{
+		if (!IsBombArrowLevelMax())
+		{
+			bombArrowDataHistory.Add(data);
+		}
+	}
+
+	public Enemy.BombArrowData GetBombArrowData()
+	{
+		if (bombArrowDataHistory.Count > 0)
+		{
+			return bombArrowDataHistory[bombArrowDataHistory.Count - 1];
+		}
+		return null;
 	}
 }

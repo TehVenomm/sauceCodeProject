@@ -33,103 +33,115 @@ public final class StringArrayDeserializer extends StdDeserializer<String[]> imp
     }
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
+        JsonDeserializer<String> handleSecondaryContextualization;
         JsonDeserializer findConvertingContentDeserializer = findConvertingContentDeserializer(deserializationContext, beanProperty, this._elementDeserializer);
         JavaType constructType = deserializationContext.constructType(String.class);
         if (findConvertingContentDeserializer == null) {
-            findConvertingContentDeserializer = deserializationContext.findContextualValueDeserializer(constructType, beanProperty);
+            handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(constructType, beanProperty);
         } else {
-            findConvertingContentDeserializer = deserializationContext.handleSecondaryContextualization(findConvertingContentDeserializer, beanProperty, constructType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(findConvertingContentDeserializer, beanProperty, constructType);
         }
         Boolean findFormatFeature = findFormatFeature(deserializationContext, beanProperty, String[].class, Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        if (findConvertingContentDeserializer != null && isDefaultDeserializer(findConvertingContentDeserializer)) {
-            findConvertingContentDeserializer = null;
+        if (handleSecondaryContextualization != null && isDefaultDeserializer(handleSecondaryContextualization)) {
+            handleSecondaryContextualization = null;
         }
-        if (this._elementDeserializer == findConvertingContentDeserializer && this._unwrapSingle == findFormatFeature) {
-            return this;
-        }
-        this(findConvertingContentDeserializer, findFormatFeature);
-        return this;
+        return (this._elementDeserializer == handleSecondaryContextualization && this._unwrapSingle == findFormatFeature) ? this : new StringArrayDeserializer(handleSecondaryContextualization, findFormatFeature);
     }
 
-    public String[] deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        if (!jsonParser.isExpectedStartArrayToken()) {
-            return handleNonArray(jsonParser, deserializationContext);
-        }
-        if (this._elementDeserializer != null) {
-            return _deserializeCustom(jsonParser, deserializationContext);
-        }
-        ObjectBuffer leaseObjectBuffer = deserializationContext.leaseObjectBuffer();
-        Object resetAndStart = leaseObjectBuffer.resetAndStart();
-        int i = 0;
-        while (true) {
-            String _parseString;
-            int i2;
-            String nextTextValue = jsonParser.nextTextValue();
-            if (nextTextValue == null) {
-                JsonToken currentToken = jsonParser.getCurrentToken();
-                if (currentToken == JsonToken.END_ARRAY) {
-                    String[] strArr = (String[]) leaseObjectBuffer.completeAndClearBuffer((Object[]) resetAndStart, i, String.class);
-                    deserializationContext.returnObjectBuffer(leaseObjectBuffer);
-                    return strArr;
-                }
-                try {
-                    if (currentToken != JsonToken.VALUE_NULL) {
-                        _parseString = _parseString(jsonParser, deserializationContext);
-                        if (i < resetAndStart.length) {
-                            resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
-                            i2 = 0;
-                        } else {
-                            i2 = i;
-                        }
-                        i = i2 + 1;
-                        resetAndStart[i2] = _parseString;
-                    }
-                } catch (Throwable e) {
-                    throw JsonMappingException.wrapWithPath(e, resetAndStart, i + leaseObjectBuffer.bufferedSize());
-                }
-            }
-            _parseString = nextTextValue;
-            if (i < resetAndStart.length) {
-                i2 = i;
-            } else {
-                resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
-                i2 = 0;
-            }
-            i = i2 + 1;
-            resetAndStart[i2] = _parseString;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:19:0x0044 A[Catch:{ Exception -> 0x004e }] */
+    /* JADX WARNING: Removed duplicated region for block: B:24:0x0059  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public java.lang.String[] deserialize(com.fasterxml.jackson.core.JsonParser r8, com.fasterxml.jackson.databind.DeserializationContext r9) throws java.io.IOException {
+        /*
+            r7 = this;
+            r3 = 0
+            boolean r0 = r8.isExpectedStartArrayToken()
+            if (r0 != 0) goto L_0x000c
+            java.lang.String[] r0 = r7.handleNonArray(r8, r9)
+        L_0x000b:
+            return r0
+        L_0x000c:
+            com.fasterxml.jackson.databind.JsonDeserializer<java.lang.String> r0 = r7._elementDeserializer
+            if (r0 == 0) goto L_0x0015
+            java.lang.String[] r0 = r7._deserializeCustom(r8, r9)
+            goto L_0x000b
+        L_0x0015:
+            com.fasterxml.jackson.databind.util.ObjectBuffer r5 = r9.leaseObjectBuffer()
+            java.lang.Object[] r2 = r5.resetAndStart()
+            r1 = r3
+        L_0x001e:
+            java.lang.String r0 = r8.nextTextValue()     // Catch:{ Exception -> 0x004e }
+            if (r0 != 0) goto L_0x005b
+            com.fasterxml.jackson.core.JsonToken r4 = r8.getCurrentToken()     // Catch:{ Exception -> 0x004e }
+            com.fasterxml.jackson.core.JsonToken r6 = com.fasterxml.jackson.core.JsonToken.END_ARRAY     // Catch:{ Exception -> 0x004e }
+            if (r4 != r6) goto L_0x0038
+            java.lang.Class<java.lang.String> r0 = java.lang.String.class
+            java.lang.Object[] r0 = r5.completeAndClearBuffer(r2, r1, r0)
+            java.lang.String[] r0 = (java.lang.String[]) r0
+            r9.returnObjectBuffer(r5)
+            goto L_0x000b
+        L_0x0038:
+            com.fasterxml.jackson.core.JsonToken r6 = com.fasterxml.jackson.core.JsonToken.VALUE_NULL     // Catch:{ Exception -> 0x004e }
+            if (r4 == r6) goto L_0x005b
+            java.lang.String r0 = r7._parseString(r8, r9)     // Catch:{ Exception -> 0x004e }
+            r4 = r0
+        L_0x0041:
+            int r0 = r2.length     // Catch:{ Exception -> 0x004e }
+            if (r1 < r0) goto L_0x0059
+            java.lang.Object[] r2 = r5.appendCompletedChunk(r2)     // Catch:{ Exception -> 0x004e }
+            r0 = r3
+        L_0x0049:
+            int r1 = r0 + 1
+            r2[r0] = r4     // Catch:{ Exception -> 0x004e }
+            goto L_0x001e
+        L_0x004e:
+            r0 = move-exception
+            int r3 = r5.bufferedSize()
+            int r1 = r1 + r3
+            com.fasterxml.jackson.databind.JsonMappingException r0 = com.fasterxml.jackson.databind.JsonMappingException.wrapWithPath(r0, r2, r1)
+            throw r0
+        L_0x0059:
+            r0 = r1
+            goto L_0x0049
+        L_0x005b:
+            r4 = r0
+            goto L_0x0041
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.deser.std.StringArrayDeserializer.deserialize(com.fasterxml.jackson.core.JsonParser, com.fasterxml.jackson.databind.DeserializationContext):java.lang.String[]");
     }
 
-    protected final String[] _deserializeCustom(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public final String[] _deserializeCustom(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        Object obj;
+        int i;
         ObjectBuffer leaseObjectBuffer = deserializationContext.leaseObjectBuffer();
         Object[] resetAndStart = leaseObjectBuffer.resetAndStart();
-        JsonDeserializer jsonDeserializer = this._elementDeserializer;
-        int i = 0;
+        JsonDeserializer<String> jsonDeserializer = this._elementDeserializer;
+        int i2 = 0;
         while (true) {
-            String str;
-            int i2;
-            if (jsonParser.nextTextValue() == null) {
-                JsonToken currentToken = jsonParser.getCurrentToken();
-                if (currentToken == JsonToken.END_ARRAY) {
-                    String[] strArr = (String[]) leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i, String.class);
-                    deserializationContext.returnObjectBuffer(leaseObjectBuffer);
-                    return strArr;
+            try {
+                if (jsonParser.nextTextValue() == null) {
+                    JsonToken currentToken = jsonParser.getCurrentToken();
+                    if (currentToken == JsonToken.END_ARRAY) {
+                        String[] strArr = (String[]) leaseObjectBuffer.completeAndClearBuffer(resetAndStart, i2, String.class);
+                        deserializationContext.returnObjectBuffer(leaseObjectBuffer);
+                        return strArr;
+                    }
+                    obj = currentToken == JsonToken.VALUE_NULL ? (String) jsonDeserializer.getNullValue(deserializationContext) : (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
+                } else {
+                    obj = (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
                 }
-                try {
-                    str = currentToken == JsonToken.VALUE_NULL ? (String) jsonDeserializer.getNullValue(deserializationContext) : (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
-                } catch (Throwable e) {
-                    throw JsonMappingException.wrapWithPath(e, (Object) String.class, i);
+                if (i2 >= resetAndStart.length) {
+                    i = 0;
+                    resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
+                } else {
+                    i = i2;
                 }
+                i2 = i + 1;
+                resetAndStart[i] = obj;
+            } catch (Exception e) {
+                throw JsonMappingException.wrapWithPath((Throwable) e, (Object) String.class, i2);
             }
-            str = (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
-            if (i >= resetAndStart.length) {
-                resetAndStart = leaseObjectBuffer.appendCompletedChunk(resetAndStart);
-                i2 = 0;
-            } else {
-                i2 = i;
-            }
-            i = i2 + 1;
-            resetAndStart[i2] = str;
         }
     }
 
@@ -138,15 +150,14 @@ public final class StringArrayDeserializer extends StdDeserializer<String[]> imp
     }
 
     private final String[] handleNonArray(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        String[] strArr = null;
-        int i = (this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY))) ? 1 : 0;
-        if (i != 0) {
-            String[] strArr2 = new String[1];
+        String str = null;
+        if (this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY))) {
+            String[] strArr = new String[1];
             if (!jsonParser.hasToken(JsonToken.VALUE_NULL)) {
-                strArr = _parseString(jsonParser, deserializationContext);
+                str = _parseString(jsonParser, deserializationContext);
             }
-            strArr2[0] = strArr;
-            return strArr2;
+            strArr[0] = str;
+            return strArr;
         } else if (jsonParser.hasToken(JsonToken.VALUE_STRING) && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT) && jsonParser.getText().length() == 0) {
             return null;
         } else {

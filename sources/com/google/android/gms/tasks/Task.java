@@ -7,6 +7,21 @@ import java.util.concurrent.Executor;
 
 public abstract class Task<TResult> {
     @NonNull
+    public Task<TResult> addOnCanceledListener(@NonNull Activity activity, @NonNull OnCanceledListener onCanceledListener) {
+        throw new UnsupportedOperationException("addOnCanceledListener is not implemented.");
+    }
+
+    @NonNull
+    public Task<TResult> addOnCanceledListener(@NonNull OnCanceledListener onCanceledListener) {
+        throw new UnsupportedOperationException("addOnCanceledListener is not implemented.");
+    }
+
+    @NonNull
+    public Task<TResult> addOnCanceledListener(@NonNull Executor executor, @NonNull OnCanceledListener onCanceledListener) {
+        throw new UnsupportedOperationException("addOnCanceledListener is not implemented");
+    }
+
+    @NonNull
     public Task<TResult> addOnCompleteListener(@NonNull Activity activity, @NonNull OnCompleteListener<TResult> onCompleteListener) {
         throw new UnsupportedOperationException("addOnCompleteListener is not implemented");
     }
@@ -62,11 +77,25 @@ public abstract class Task<TResult> {
     @Nullable
     public abstract Exception getException();
 
+    @Nullable
     public abstract TResult getResult();
 
+    @Nullable
     public abstract <X extends Throwable> TResult getResult(@NonNull Class<X> cls) throws Throwable;
+
+    public abstract boolean isCanceled();
 
     public abstract boolean isComplete();
 
     public abstract boolean isSuccessful();
+
+    @NonNull
+    public <TContinuationResult> Task<TContinuationResult> onSuccessTask(@NonNull SuccessContinuation<TResult, TContinuationResult> successContinuation) {
+        throw new UnsupportedOperationException("onSuccessTask is not implemented");
+    }
+
+    @NonNull
+    public <TContinuationResult> Task<TContinuationResult> onSuccessTask(@NonNull Executor executor, @NonNull SuccessContinuation<TResult, TContinuationResult> successContinuation) {
+        throw new UnsupportedOperationException("onSuccessTask is not implemented");
+    }
 }

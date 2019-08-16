@@ -30,18 +30,19 @@ public class MapLikeType extends TypeBase {
 
     @Deprecated
     public static MapLikeType construct(Class<?> cls, JavaType javaType, JavaType javaType2) {
-        TypeBindings emptyBindings;
+        TypeBindings typeBindings;
         TypeVariable[] typeParameters = cls.getTypeParameters();
         if (typeParameters == null || typeParameters.length != 2) {
-            emptyBindings = TypeBindings.emptyBindings();
+            typeBindings = TypeBindings.emptyBindings();
         } else {
-            emptyBindings = TypeBindings.create(cls, javaType, javaType2);
+            typeBindings = TypeBindings.create(cls, javaType, javaType2);
         }
-        return new MapLikeType(cls, emptyBindings, TypeBase._bogusSuperClass(cls), null, javaType, javaType2, null, null, false);
+        return new MapLikeType(cls, typeBindings, _bogusSuperClass(cls), null, javaType, javaType2, null, null, false);
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         return new MapLikeType(cls, this._bindings, this._superClass, this._superInterfaces, this._keyType, this._valueType, this._valueHandler, this._typeHandler, this._asStatic);
     }
 
@@ -83,17 +84,18 @@ public class MapLikeType extends TypeBase {
         return new MapLikeType(cls, typeBindings, javaType, javaTypeArr, this._keyType, this._valueType, this._valueHandler, this._typeHandler, this._asStatic);
     }
 
-    protected String buildCanonicalName() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this._class.getName());
+    /* access modifiers changed from: protected */
+    public String buildCanonicalName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this._class.getName());
         if (this._keyType != null) {
-            stringBuilder.append('<');
-            stringBuilder.append(this._keyType.toCanonical());
-            stringBuilder.append(',');
-            stringBuilder.append(this._valueType.toCanonical());
-            stringBuilder.append('>');
+            sb.append('<');
+            sb.append(this._keyType.toCanonical());
+            sb.append(',');
+            sb.append(this._valueType.toCanonical());
+            sb.append('>');
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public boolean isContainerType() {
@@ -120,17 +122,17 @@ public class MapLikeType extends TypeBase {
         return this._valueType.getTypeHandler();
     }
 
-    public StringBuilder getErasedSignature(StringBuilder stringBuilder) {
-        return TypeBase._classSignature(this._class, stringBuilder, true);
+    public StringBuilder getErasedSignature(StringBuilder sb) {
+        return _classSignature(this._class, sb, true);
     }
 
-    public StringBuilder getGenericSignature(StringBuilder stringBuilder) {
-        TypeBase._classSignature(this._class, stringBuilder, false);
-        stringBuilder.append('<');
-        this._keyType.getGenericSignature(stringBuilder);
-        this._valueType.getGenericSignature(stringBuilder);
-        stringBuilder.append(">;");
-        return stringBuilder;
+    public StringBuilder getGenericSignature(StringBuilder sb) {
+        _classSignature(this._class, sb, false);
+        sb.append('<');
+        this._keyType.getGenericSignature(sb);
+        this._valueType.getGenericSignature(sb);
+        sb.append(">;");
+        return sb;
     }
 
     public MapLikeType withKeyTypeHandler(Object obj) {
@@ -160,9 +162,9 @@ public class MapLikeType extends TypeBase {
             return false;
         }
         MapLikeType mapLikeType = (MapLikeType) obj;
-        if (this._class == mapLikeType._class && this._keyType.equals(mapLikeType._keyType) && this._valueType.equals(mapLikeType._valueType)) {
-            return true;
+        if (this._class != mapLikeType._class || !this._keyType.equals(mapLikeType._keyType) || !this._valueType.equals(mapLikeType._valueType)) {
+            return false;
         }
-        return false;
+        return true;
     }
 }

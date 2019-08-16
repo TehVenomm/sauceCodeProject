@@ -160,22 +160,12 @@ public class WeaponController
 		chargeRate = rate;
 	}
 
-	public bool IsLongAttack()
-	{
-		bool result = false;
-		if (brain.owner is Player)
-		{
-			result = (brain.owner as Player).isLongAttackMode;
-		}
-		return result;
-	}
-
 	public bool IsGuardAttack()
 	{
 		bool result = false;
 		if (brain.owner is Player)
 		{
-			result = (brain.owner as Player).isGuardAttackMode;
+			result = (brain.owner as Player).CheckAttackMode(Player.ATTACK_MODE.ONE_HAND_SWORD);
 		}
 		return result;
 	}

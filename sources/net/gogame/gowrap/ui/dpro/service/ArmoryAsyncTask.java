@@ -1,10 +1,11 @@
-package net.gogame.gowrap.ui.dpro.service;
+package net.gogame.gowrap.p019ui.dpro.service;
 
 import android.os.AsyncTask;
 import android.util.Log;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.ui.dpro.model.armory.ArmoryResponse;
+import net.gogame.gowrap.p019ui.dpro.model.armory.ArmoryResponse;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.service.ArmoryAsyncTask */
 public class ArmoryAsyncTask extends AsyncTask<String, Void, ArmoryResponse> {
     private Exception exceptionToBeThrown;
     private final ArmoryService service;
@@ -17,20 +18,23 @@ public class ArmoryAsyncTask extends AsyncTask<String, Void, ArmoryResponse> {
         this.service = armoryService;
     }
 
-    protected ArmoryResponse doInBackground(String... strArr) {
+    /* access modifiers changed from: protected */
+    public ArmoryResponse doInBackground(String... strArr) {
         ArmoryResponse armoryResponse = null;
-        if (!(strArr == null || strArr.length == 0)) {
-            String str = strArr[0];
-            if (str != null) {
-                try {
-                    armoryResponse = this.service.getArmory(str);
-                } catch (Throwable e) {
-                    Log.e(Constants.TAG, "Exception", e);
-                    this.exceptionToBeThrown = e;
-                }
-            }
+        if (strArr == null || strArr.length == 0) {
+            return armoryResponse;
         }
-        return armoryResponse;
+        String str = strArr[0];
+        if (str == null) {
+            return armoryResponse;
+        }
+        try {
+            return this.service.getArmory(str);
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "Exception", e);
+            this.exceptionToBeThrown = e;
+            return armoryResponse;
+        }
     }
 
     public Exception getExceptionToBeThrown() {

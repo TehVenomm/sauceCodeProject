@@ -48,12 +48,12 @@ public class IntentSupport {
     }
 
     public static Intent newMapsIntent(String str, String str2) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("geo:0,0?q=");
-        stringBuilder.append(Uri.encode(str));
-        stringBuilder.append(Uri.encode("(" + str2 + ")"));
-        stringBuilder.append("&hl=" + Locale.getDefault().getLanguage());
-        return new Intent("android.intent.action.VIEW", Uri.parse(stringBuilder.toString()));
+        StringBuilder sb = new StringBuilder();
+        sb.append("geo:0,0?q=");
+        sb.append(Uri.encode(str));
+        sb.append(Uri.encode("(" + str2 + ")"));
+        sb.append("&hl=" + Locale.getDefault().getLanguage());
+        return new Intent("android.intent.action.VIEW", Uri.parse(sb.toString()));
     }
 
     public static Intent newSelectPictureIntent() {

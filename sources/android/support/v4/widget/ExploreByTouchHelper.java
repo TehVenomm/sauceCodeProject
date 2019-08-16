@@ -1,65 +1,40 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.media.TransportMediator;
-import android.support.v4.util.SparseArrayCompat;
-import android.support.v4.view.AccessibilityDelegateCompat;
-import android.support.v4.view.KeyEventCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewParentCompat;
-import android.support.v4.view.accessibility.AccessibilityEventCompat;
-import android.support.v4.view.accessibility.AccessibilityManagerCompat;
-import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
-import android.support.v4.view.accessibility.AccessibilityNodeProviderCompat;
-import android.support.v4.view.accessibility.AccessibilityRecordCompat;
-import android.support.v4.widget.FocusStrategy.BoundsAdapter;
-import android.support.v4.widget.FocusStrategy.CollectionAdapter;
+import android.support.p000v4.util.SparseArrayCompat;
+import android.support.p000v4.view.AccessibilityDelegateCompat;
+import android.support.p000v4.view.ViewCompat;
+import android.support.p000v4.view.ViewParentCompat;
+import android.support.p000v4.view.accessibility.AccessibilityEventCompat;
+import android.support.p000v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.p000v4.view.accessibility.AccessibilityNodeProviderCompat;
+import android.support.p000v4.view.accessibility.AccessibilityRecordCompat;
+import android.support.p000v4.widget.FocusStrategy.BoundsAdapter;
+import android.support.p000v4.widget.FocusStrategy.CollectionAdapter;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
-import com.google.android.gms.nearby.messages.Strategy;
 import java.util.ArrayList;
 import java.util.List;
 
+/* renamed from: android.support.v4.widget.ExploreByTouchHelper */
 public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
     private static final String DEFAULT_CLASS_NAME = "android.view.View";
     public static final int HOST_ID = -1;
     public static final int INVALID_ID = Integer.MIN_VALUE;
-    private static final Rect INVALID_PARENT_BOUNDS = new Rect(Strategy.TTL_SECONDS_INFINITE, Strategy.TTL_SECONDS_INFINITE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-    private static final BoundsAdapter<AccessibilityNodeInfoCompat> NODE_ADAPTER = new C01401();
-    private static final CollectionAdapter<SparseArrayCompat<AccessibilityNodeInfoCompat>, AccessibilityNodeInfoCompat> SPARSE_VALUES_ADAPTER = new C01412();
-    private int mAccessibilityFocusedVirtualViewId = Integer.MIN_VALUE;
-    private final View mHost;
-    private int mHoveredVirtualViewId = Integer.MIN_VALUE;
-    private int mKeyboardFocusedVirtualViewId = Integer.MIN_VALUE;
-    private final AccessibilityManager mManager;
-    private MyNodeProvider mNodeProvider;
-    private final int[] mTempGlobalRect = new int[2];
-    private final Rect mTempParentRect = new Rect();
-    private final Rect mTempScreenRect = new Rect();
-    private final Rect mTempVisibleRect = new Rect();
-
-    /* renamed from: android.support.v4.widget.ExploreByTouchHelper$1 */
-    static final class C01401 implements BoundsAdapter<AccessibilityNodeInfoCompat> {
-        C01401() {
-        }
-
+    private static final Rect INVALID_PARENT_BOUNDS = new Rect(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+    private static final BoundsAdapter<AccessibilityNodeInfoCompat> NODE_ADAPTER = new BoundsAdapter<AccessibilityNodeInfoCompat>() {
         public void obtainBounds(AccessibilityNodeInfoCompat accessibilityNodeInfoCompat, Rect rect) {
             accessibilityNodeInfoCompat.getBoundsInParent(rect);
         }
-    }
-
-    /* renamed from: android.support.v4.widget.ExploreByTouchHelper$2 */
-    static final class C01412 implements CollectionAdapter<SparseArrayCompat<AccessibilityNodeInfoCompat>, AccessibilityNodeInfoCompat> {
-        C01412() {
-        }
-
+    };
+    private static final CollectionAdapter<SparseArrayCompat<AccessibilityNodeInfoCompat>, AccessibilityNodeInfoCompat> SPARSE_VALUES_ADAPTER = new CollectionAdapter<SparseArrayCompat<AccessibilityNodeInfoCompat>, AccessibilityNodeInfoCompat>() {
         public AccessibilityNodeInfoCompat get(SparseArrayCompat<AccessibilityNodeInfoCompat> sparseArrayCompat, int i) {
             return (AccessibilityNodeInfoCompat) sparseArrayCompat.valueAt(i);
         }
@@ -67,8 +42,21 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
         public int size(SparseArrayCompat<AccessibilityNodeInfoCompat> sparseArrayCompat) {
             return sparseArrayCompat.size();
         }
-    }
+    };
+    /* access modifiers changed from: private */
+    public int mAccessibilityFocusedVirtualViewId = Integer.MIN_VALUE;
+    private final View mHost;
+    private int mHoveredVirtualViewId = Integer.MIN_VALUE;
+    /* access modifiers changed from: private */
+    public int mKeyboardFocusedVirtualViewId = Integer.MIN_VALUE;
+    private final AccessibilityManager mManager;
+    private MyNodeProvider mNodeProvider;
+    private final int[] mTempGlobalRect = new int[2];
+    private final Rect mTempParentRect = new Rect();
+    private final Rect mTempScreenRect = new Rect();
+    private final Rect mTempVisibleRect = new Rect();
 
+    /* renamed from: android.support.v4.widget.ExploreByTouchHelper$MyNodeProvider */
     private class MyNodeProvider extends AccessibilityNodeProviderCompat {
         MyNodeProvider() {
         }
@@ -78,8 +66,11 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
         }
 
         public AccessibilityNodeInfoCompat findFocus(int i) {
-            int access$000 = i == 2 ? ExploreByTouchHelper.this.mAccessibilityFocusedVirtualViewId : ExploreByTouchHelper.this.mKeyboardFocusedVirtualViewId;
-            return access$000 == Integer.MIN_VALUE ? null : createAccessibilityNodeInfo(access$000);
+            int access$100 = i == 2 ? ExploreByTouchHelper.this.mAccessibilityFocusedVirtualViewId : ExploreByTouchHelper.this.mKeyboardFocusedVirtualViewId;
+            if (access$100 == Integer.MIN_VALUE) {
+                return null;
+            }
+            return createAccessibilityNodeInfo(access$100);
         }
 
         public boolean performAction(int i, int i2, Bundle bundle) {
@@ -124,27 +115,26 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
 
     private AccessibilityEvent createEventForChild(int i, int i2) {
         AccessibilityEvent obtain = AccessibilityEvent.obtain(i2);
-        AccessibilityRecordCompat asRecord = AccessibilityEventCompat.asRecord(obtain);
         AccessibilityNodeInfoCompat obtainAccessibilityNodeInfo = obtainAccessibilityNodeInfo(i);
-        asRecord.getText().add(obtainAccessibilityNodeInfo.getText());
-        asRecord.setContentDescription(obtainAccessibilityNodeInfo.getContentDescription());
-        asRecord.setScrollable(obtainAccessibilityNodeInfo.isScrollable());
-        asRecord.setPassword(obtainAccessibilityNodeInfo.isPassword());
-        asRecord.setEnabled(obtainAccessibilityNodeInfo.isEnabled());
-        asRecord.setChecked(obtainAccessibilityNodeInfo.isChecked());
+        obtain.getText().add(obtainAccessibilityNodeInfo.getText());
+        obtain.setContentDescription(obtainAccessibilityNodeInfo.getContentDescription());
+        obtain.setScrollable(obtainAccessibilityNodeInfo.isScrollable());
+        obtain.setPassword(obtainAccessibilityNodeInfo.isPassword());
+        obtain.setEnabled(obtainAccessibilityNodeInfo.isEnabled());
+        obtain.setChecked(obtainAccessibilityNodeInfo.isChecked());
         onPopulateEventForVirtualView(i, obtain);
-        if (obtain.getText().isEmpty() && obtain.getContentDescription() == null) {
-            throw new RuntimeException("Callbacks must add text or a content description in populateEventForVirtualViewId()");
+        if (!obtain.getText().isEmpty() || obtain.getContentDescription() != null) {
+            obtain.setClassName(obtainAccessibilityNodeInfo.getClassName());
+            AccessibilityRecordCompat.setSource(obtain, this.mHost, i);
+            obtain.setPackageName(this.mHost.getContext().getPackageName());
+            return obtain;
         }
-        asRecord.setClassName(obtainAccessibilityNodeInfo.getClassName());
-        asRecord.setSource(this.mHost, i);
-        obtain.setPackageName(this.mHost.getContext().getPackageName());
-        return obtain;
+        throw new RuntimeException("Callbacks must add text or a content description in populateEventForVirtualViewId()");
     }
 
     private AccessibilityEvent createEventForHost(int i) {
         AccessibilityEvent obtain = AccessibilityEvent.obtain(i);
-        ViewCompat.onInitializeAccessibilityEvent(this.mHost, obtain);
+        this.mHost.onInitializeAccessibilityEvent(obtain);
         return obtain;
     }
 
@@ -193,10 +183,10 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
                 obtain.getBoundsInParent(this.mTempScreenRect);
                 if (obtain.mParentVirtualDescendantId != -1) {
                     AccessibilityNodeInfoCompat obtain2 = AccessibilityNodeInfoCompat.obtain();
-                    for (actions = obtain.mParentVirtualDescendantId; actions != -1; actions = obtain2.mParentVirtualDescendantId) {
+                    for (int i2 = obtain.mParentVirtualDescendantId; i2 != -1; i2 = obtain2.mParentVirtualDescendantId) {
                         obtain2.setParent(this.mHost, -1);
                         obtain2.setBoundsInParent(INVALID_PARENT_BOUNDS);
-                        onPopulateNodeForVirtualView(actions, obtain2);
+                        onPopulateNodeForVirtualView(i2, obtain2);
                         obtain2.getBoundsInParent(this.mTempParentRect);
                         this.mTempScreenRect.offset(this.mTempParentRect.left, this.mTempParentRect.top);
                     }
@@ -206,10 +196,11 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
             }
             if (this.mHost.getLocalVisibleRect(this.mTempVisibleRect)) {
                 this.mTempVisibleRect.offset(this.mTempGlobalRect[0] - this.mHost.getScrollX(), this.mTempGlobalRect[1] - this.mHost.getScrollY());
-                this.mTempScreenRect.intersect(this.mTempVisibleRect);
-                obtain.setBoundsInScreen(this.mTempScreenRect);
-                if (isVisibleToUser(this.mTempScreenRect)) {
-                    obtain.setVisibleToUser(true);
+                if (this.mTempScreenRect.intersect(this.mTempVisibleRect)) {
+                    obtain.setBoundsInScreen(this.mTempScreenRect);
+                    if (isVisibleToUser(this.mTempScreenRect)) {
+                        obtain.setVisibleToUser(true);
+                    }
                 }
             }
             return obtain;
@@ -233,9 +224,9 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
     }
 
     private SparseArrayCompat<AccessibilityNodeInfoCompat> getAllNodes() {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         getVisibleVirtualViews(arrayList);
-        SparseArrayCompat<AccessibilityNodeInfoCompat> sparseArrayCompat = new SparseArrayCompat();
+        SparseArrayCompat<AccessibilityNodeInfoCompat> sparseArrayCompat = new SparseArrayCompat<>();
         for (int i = 0; i < arrayList.size(); i++) {
             sparseArrayCompat.put(i, createNodeForChild(i));
         }
@@ -259,7 +250,7 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
             case 66:
                 rect.set(-1, 0, -1, height);
                 break;
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 rect.set(0, -1, width, -1);
                 break;
             default:
@@ -275,15 +266,16 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
             }
             if (this.mHost.getWindowVisibility() == 0) {
                 ViewParent parent = this.mHost.getParent();
-                while (parent instanceof View) {
-                    View view = (View) parent;
-                    if (ViewCompat.getAlpha(view) <= 0.0f || view.getVisibility() != 0) {
-                        break;
+                while (true) {
+                    if (parent instanceof View) {
+                        View view = (View) parent;
+                        if (view.getAlpha() <= 0.0f || view.getVisibility() != 0) {
+                            break;
+                        }
+                        parent = view.getParent();
+                    } else if (parent != null) {
+                        return true;
                     }
-                    parent = view.getParent();
-                }
-                if (parent != null) {
-                    return true;
                 }
             }
         }
@@ -299,32 +291,28 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
             case 22:
                 return 66;
             default:
-                return TransportMediator.KEYCODE_MEDIA_RECORD;
+                return 130;
         }
     }
 
     private boolean moveFocus(int i, @Nullable Rect rect) {
-        Object obj;
+        AccessibilityNodeInfoCompat accessibilityNodeInfoCompat;
         boolean z = true;
         SparseArrayCompat allNodes = getAllNodes();
         int i2 = this.mKeyboardFocusedVirtualViewId;
-        if (i2 == Integer.MIN_VALUE) {
-            Object obj2 = null;
-        } else {
-            AccessibilityNodeInfoCompat accessibilityNodeInfoCompat = (AccessibilityNodeInfoCompat) allNodes.get(i2);
-        }
+        AccessibilityNodeInfoCompat accessibilityNodeInfoCompat2 = i2 == Integer.MIN_VALUE ? null : (AccessibilityNodeInfoCompat) allNodes.get(i2);
         switch (i) {
             case 1:
             case 2:
                 if (ViewCompat.getLayoutDirection(this.mHost) != 1) {
                     z = false;
                 }
-                obj = (AccessibilityNodeInfoCompat) FocusStrategy.findNextFocusInRelativeDirection(allNodes, SPARSE_VALUES_ADAPTER, NODE_ADAPTER, obj2, i, z, false);
+                accessibilityNodeInfoCompat = (AccessibilityNodeInfoCompat) FocusStrategy.findNextFocusInRelativeDirection(allNodes, SPARSE_VALUES_ADAPTER, NODE_ADAPTER, accessibilityNodeInfoCompat2, i, z, false);
                 break;
             case 17:
             case 33:
             case 66:
-            case TransportMediator.KEYCODE_MEDIA_RECORD /*130*/:
+            case 130:
                 Rect rect2 = new Rect();
                 if (this.mKeyboardFocusedVirtualViewId != Integer.MIN_VALUE) {
                     getBoundsInParent(this.mKeyboardFocusedVirtualViewId, rect2);
@@ -333,12 +321,12 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
                 } else {
                     guessPreviouslyFocusedRect(this.mHost, i, rect2);
                 }
-                AccessibilityNodeInfoCompat accessibilityNodeInfoCompat2 = (AccessibilityNodeInfoCompat) FocusStrategy.findNextFocusInAbsoluteDirection(allNodes, SPARSE_VALUES_ADAPTER, NODE_ADAPTER, obj2, rect2, i);
+                accessibilityNodeInfoCompat = (AccessibilityNodeInfoCompat) FocusStrategy.findNextFocusInAbsoluteDirection(allNodes, SPARSE_VALUES_ADAPTER, NODE_ADAPTER, accessibilityNodeInfoCompat2, rect2, i);
                 break;
             default:
                 throw new IllegalArgumentException("direction must be one of {FOCUS_FORWARD, FOCUS_BACKWARD, FOCUS_UP, FOCUS_DOWN, FOCUS_LEFT, FOCUS_RIGHT}.");
         }
-        return requestKeyboardFocusForVirtualView(obj == null ? Integer.MIN_VALUE : allNodes.keyAt(allNodes.indexOfValue(obj)));
+        return requestKeyboardFocusForVirtualView(accessibilityNodeInfoCompat == null ? Integer.MIN_VALUE : allNodes.keyAt(allNodes.indexOfValue(accessibilityNodeInfoCompat)));
     }
 
     private boolean performActionForChild(int i, int i2, Bundle bundle) {
@@ -361,7 +349,7 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
     }
 
     private boolean requestAccessibilityFocus(int i) {
-        if (!this.mManager.isEnabled() || !AccessibilityManagerCompat.isTouchExplorationEnabled(this.mManager) || this.mAccessibilityFocusedVirtualViewId == i) {
+        if (!this.mManager.isEnabled() || !this.mManager.isTouchExplorationEnabled() || this.mAccessibilityFocusedVirtualViewId == i) {
             return false;
         }
         if (this.mAccessibilityFocusedVirtualViewId != Integer.MIN_VALUE) {
@@ -393,7 +381,7 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
     }
 
     public final boolean dispatchHoverEvent(@NonNull MotionEvent motionEvent) {
-        if (!this.mManager.isEnabled() || !AccessibilityManagerCompat.isTouchExplorationEnabled(this.mManager)) {
+        if (!this.mManager.isEnabled() || !this.mManager.isTouchExplorationEnabled()) {
             return false;
         }
         switch (motionEvent.getAction()) {
@@ -414,7 +402,7 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
     }
 
     public final boolean dispatchKeyEvent(@NonNull KeyEvent keyEvent) {
-        boolean z = false;
+        int i = 0;
         if (keyEvent.getAction() == 1) {
             return false;
         }
@@ -424,26 +412,35 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
             case 20:
             case 21:
             case 22:
-                if (!KeyEventCompat.hasNoModifiers(keyEvent)) {
+                if (!keyEvent.hasNoModifiers()) {
                     return false;
                 }
                 int keyToDirection = keyToDirection(keyCode);
                 int repeatCount = keyEvent.getRepeatCount();
-                keyCode = 0;
-                while (keyCode < repeatCount + 1 && moveFocus(keyToDirection, null)) {
-                    keyCode++;
-                    z = true;
+                boolean z = false;
+                while (true) {
+                    int i2 = i;
+                    if (i2 < repeatCount + 1 && moveFocus(keyToDirection, null)) {
+                        i = i2 + 1;
+                        z = true;
+                    }
                 }
                 return z;
             case 23:
             case 66:
-                if (!KeyEventCompat.hasNoModifiers(keyEvent) || keyEvent.getRepeatCount() != 0) {
+                if (!keyEvent.hasNoModifiers() || keyEvent.getRepeatCount() != 0) {
                     return false;
                 }
                 clickKeyboardFocusedVirtualView();
                 return true;
             case 61:
-                return KeyEventCompat.hasNoModifiers(keyEvent) ? moveFocus(2, null) : KeyEventCompat.hasModifiers(keyEvent, 1) ? moveFocus(1, null) : false;
+                if (keyEvent.hasNoModifiers()) {
+                    return moveFocus(2, null);
+                }
+                if (keyEvent.hasModifiers(1)) {
+                    return moveFocus(1, null);
+                }
+                return false;
             default:
                 return false;
         }
@@ -469,9 +466,11 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
         return this.mKeyboardFocusedVirtualViewId;
     }
 
-    protected abstract int getVirtualViewAt(float f, float f2);
+    /* access modifiers changed from: protected */
+    public abstract int getVirtualViewAt(float f, float f2);
 
-    protected abstract void getVisibleVirtualViews(List<Integer> list);
+    /* access modifiers changed from: protected */
+    public abstract void getVisibleVirtualViews(List<Integer> list);
 
     public final void invalidateRoot() {
         invalidateVirtualView(-1, 1);
@@ -492,8 +491,9 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
         }
     }
 
+    /* access modifiers changed from: 0000 */
     @NonNull
-    AccessibilityNodeInfoCompat obtainAccessibilityNodeInfo(int i) {
+    public AccessibilityNodeInfoCompat obtainAccessibilityNodeInfo(int i) {
         return i == -1 ? createNodeForHost() : createNodeForChild(i);
     }
 
@@ -516,23 +516,30 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
         onPopulateNodeForHost(accessibilityNodeInfoCompat);
     }
 
-    protected abstract boolean onPerformActionForVirtualView(int i, int i2, Bundle bundle);
+    /* access modifiers changed from: protected */
+    public abstract boolean onPerformActionForVirtualView(int i, int i2, Bundle bundle);
 
-    protected void onPopulateEventForHost(AccessibilityEvent accessibilityEvent) {
+    /* access modifiers changed from: protected */
+    public void onPopulateEventForHost(AccessibilityEvent accessibilityEvent) {
     }
 
-    protected void onPopulateEventForVirtualView(int i, AccessibilityEvent accessibilityEvent) {
+    /* access modifiers changed from: protected */
+    public void onPopulateEventForVirtualView(int i, AccessibilityEvent accessibilityEvent) {
     }
 
-    protected void onPopulateNodeForHost(AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
+    /* access modifiers changed from: protected */
+    public void onPopulateNodeForHost(AccessibilityNodeInfoCompat accessibilityNodeInfoCompat) {
     }
 
-    protected abstract void onPopulateNodeForVirtualView(int i, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat);
+    /* access modifiers changed from: protected */
+    public abstract void onPopulateNodeForVirtualView(int i, AccessibilityNodeInfoCompat accessibilityNodeInfoCompat);
 
-    protected void onVirtualViewKeyboardFocusChanged(int i, boolean z) {
+    /* access modifiers changed from: protected */
+    public void onVirtualViewKeyboardFocusChanged(int i, boolean z) {
     }
 
-    boolean performAction(int i, int i2, Bundle bundle) {
+    /* access modifiers changed from: 0000 */
+    public boolean performAction(int i, int i2, Bundle bundle) {
         switch (i) {
             case -1:
                 return performActionForHost(i2, bundle);

@@ -4,6 +4,21 @@ using System.Collections.Generic;
 
 public abstract class SkillInfoBase : GameSection
 {
+	protected List<ItemIcon> m_generatedIconList = new List<ItemIcon>();
+
+	protected List<SortCompareData> m_newIconUpdateTargetList = new List<SortCompareData>();
+
+	protected override void OnClose()
+	{
+		UpdateNewIconInfo();
+		base.OnClose();
+	}
+
+	protected virtual int GetCurrentEquipSetNo()
+	{
+		return MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo();
+	}
+
 	protected SkillSlotUIData[] GetSkillSlotData(EquipItemInfo equip)
 	{
 		if (equip == null)
@@ -16,9 +31,17 @@ public abstract class SkillInfoBase : GameSection
 			return null;
 		}
 		SkillSlotUIData[] ui_slot_data = new SkillSlotUIData[maxSlot];
-		int currentSetNo = MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo();
+		int currentSetNo = GetCurrentEquipSetNo();
 		SkillItemInfo[] skillInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetSkillInventoryClone();
-		SkillItemInfo[] array = Array.FindAll(skillInventoryClone, (SkillItemInfo skill_item) => skill_item.equipSetSkill.Find((EquipSetSkillData skill) => skill.equipItemUniqId == equip.uniqueID && skill.equipSetNo == currentSetNo) != null);
+		SkillItemInfo[] array = Array.FindAll(skillInventoryClone, delegate(SkillItemInfo skill_item)
+		{
+			EquipSetSkillData equipSetSkillData2 = skill_item.equipSetSkill.Find((EquipSetSkillData skill) => skill.equipItemUniqId == equip.uniqueID && skill.equipSetNo == currentSetNo);
+			if (StatusManager.IsUnique())
+			{
+				return skill_item.uniqueEquipSetSkill.equipItemUniqId == equip.uniqueID;
+			}
+			return equipSetSkillData2 != null;
+		});
 		if (array != null && array.Length > maxSlot)
 		{
 			Log.Error("Attach Skill Num is Over Skill Slot Num");
@@ -29,6 +52,11 @@ public abstract class SkillInfoBase : GameSection
 			if (info != null)
 			{
 				EquipSetSkillData equipSetSkillData = info.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == currentSetNo);
+				if (StatusManager.IsUnique())
+				{
+					equipSetSkillData = info.uniqueEquipSetSkill;
+					equipSetSkillData = ((equipSetSkillData.equipItemUniqId != equip.uniqueID) ? null : equipSetSkillData);
+				}
 				if (equipSetSkillData != null)
 				{
 					int num2 = equipSetSkillData.equipSlotNo;
@@ -222,27 +250,69 @@ public abstract class SkillInfoBase : GameSection
 		for (int num = equipSet.item.Length; i < num; i++)
 		{
 			EquipItemInfo equipItemInfo = equipSet.item[i];
-			if (equipItemInfo != null)
+			if (equipItemInfo == null)
 			{
-				SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemInfo);
-				if (skillSlotData != null)
+				continue;
+			}
+			SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemInfo);
+			if (skillSlotData == null)
+			{
+				continue;
+			}
+			int j = 0;
+			for (int num2 = skillSlotData.Length; j < num2; j++)
+			{
+				SkillItemInfo itemData = skillSlotData[j].itemData;
+				requestSendForm.euids.Add(equipItemInfo.uniqueID.ToString());
+				requestSendForm.suids.Add((itemData == null) ? "0" : itemData.uniqueID.ToString());
+				int num3 = j;
+				if (equipItemInfo.IsExceedSkillSlot(num3))
 				{
-					int j = 0;
-					for (int num2 = skillSlotData.Length; j < num2; j++)
-					{
-						SkillItemInfo itemData = skillSlotData[j].itemData;
-						requestSendForm.euids.Add(equipItemInfo.uniqueID.ToString());
-						requestSendForm.suids.Add((itemData == null) ? "0" : itemData.uniqueID.ToString());
-						int num3 = j;
-						if (equipItemInfo.IsExceedSkillSlot(num3))
-						{
-							num3 = equipItemInfo.GetExceedSkillSlotNo(num3);
-						}
-						requestSendForm.slots.Add(num3);
-					}
+					num3 = equipItemInfo.GetExceedSkillSlotNo(num3);
 				}
+				requestSendForm.slots.Add(num3);
 			}
 		}
 		return requestSendForm;
+	}
+
+	protected void ObserveItemList()
+	{
+		if (m_generatedIconList != null && m_generatedIconList.Count >= 1)
+		{
+			int i = 0;
+			for (int count = m_generatedIconList.Count; i < count; i++)
+			{
+				ItemIcon icon = m_generatedIconList[i];
+				ObserveItemListNewIcon(icon);
+			}
+		}
+	}
+
+	protected void ObserveItemListNewIcon(ItemIcon _icon)
+	{
+		if (!(_icon == null) && _icon.InitData != null && _icon.IsVisbleNewIcon() && !m_newIconUpdateTargetList.Contains(_icon.InitData))
+		{
+			m_newIconUpdateTargetList.Add(_icon.InitData);
+		}
+	}
+
+	protected void UpdateNewIconInfo()
+	{
+		if (m_newIconUpdateTargetList.Count < 1)
+		{
+			return;
+		}
+		GameSaveData instance = GameSaveData.instance;
+		if (instance != null)
+		{
+			int i = 0;
+			for (int count = m_newIconUpdateTargetList.Count; i < count; i++)
+			{
+				SortCompareData sortCompareData = m_newIconUpdateTargetList[i];
+				instance.RemoveNewIconAndSave(sortCompareData.GetIconType(), sortCompareData.GetUniqID());
+			}
+			m_newIconUpdateTargetList.Clear();
+		}
 	}
 }

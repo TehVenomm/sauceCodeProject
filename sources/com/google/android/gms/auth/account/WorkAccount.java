@@ -4,18 +4,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.Api.AbstractClientBuilder;
 import com.google.android.gms.common.api.Api.ApiOptions.NoOptions;
-import com.google.android.gms.common.api.Api.zza;
-import com.google.android.gms.common.api.Api.zzf;
-import com.google.android.gms.internal.zzaqx;
-import com.google.android.gms.internal.zzarh;
+import com.google.android.gms.common.api.Api.ClientKey;
+import com.google.android.gms.internal.auth.zzh;
+import com.google.android.gms.internal.auth.zzr;
 
 public class WorkAccount {
-    public static final Api<NoOptions> API = new Api("WorkAccount.API", zzdwr, zzdwq);
+    public static final Api<NoOptions> API = new Api<>("WorkAccount.API", CLIENT_BUILDER, CLIENT_KEY);
+    private static final AbstractClientBuilder<zzr, NoOptions> CLIENT_BUILDER = new zzf();
+    private static final ClientKey<zzr> CLIENT_KEY = new ClientKey<>();
     @Deprecated
-    public static final WorkAccountApi WorkAccountApi = new zzaqx();
-    private static final zzf<zzarh> zzdwq = new zzf();
-    private static final zza<zzarh, NoOptions> zzdwr = new zzf();
+    public static final WorkAccountApi WorkAccountApi = new zzh();
 
     private WorkAccount() {
     }

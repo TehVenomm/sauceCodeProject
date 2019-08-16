@@ -7,7 +7,7 @@ public class AbilityAtkWeapon : AbilityAtkBase
 	public override void init(Player _player, string target, int val)
 	{
 		base.init(_player, target, val);
-		mode = (Player.ATTACK_MODE)(int)Enum.Parse(typeof(Player.ATTACK_MODE), target);
+		mode = (Player.ATTACK_MODE)Enum.Parse(typeof(Player.ATTACK_MODE), target);
 	}
 
 	public override AtkAttribute GetDamageRate(Character chara, AttackedHitStatusLocal status)
@@ -17,10 +17,10 @@ public class AbilityAtkWeapon : AbilityAtkBase
 		{
 			attackMode = status.attackMode;
 		}
-		if (attackMode != mode)
+		if (mode == Player.ATTACK_MODE.NONE || mode == attackMode)
 		{
-			return null;
+			return attr;
 		}
-		return attr;
+		return null;
 	}
 }

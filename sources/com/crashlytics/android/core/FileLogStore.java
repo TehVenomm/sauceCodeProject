@@ -7,5 +7,7 @@ interface FileLogStore {
 
     ByteString getLogAsByteString();
 
+    byte[] getLogAsBytes();
+
     void writeToLog(long j, String str);
 }

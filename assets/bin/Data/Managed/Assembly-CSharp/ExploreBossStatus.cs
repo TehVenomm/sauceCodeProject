@@ -6,6 +6,12 @@ public class ExploreBossStatus
 
 	public uint[] execAngryIds;
 
+	public XorInt coopEnemyId
+	{
+		get;
+		private set;
+	}
+
 	public XorInt hpMax
 	{
 		get;
@@ -25,6 +31,24 @@ public class ExploreBossStatus
 	}
 
 	public XorInt downCount
+	{
+		get;
+		private set;
+	}
+
+	public float concussionTotal
+	{
+		get;
+		private set;
+	}
+
+	public float concussionMax
+	{
+		get;
+		private set;
+	}
+
+	public float concussionExtend
 	{
 		get;
 		private set;
@@ -54,12 +78,28 @@ public class ExploreBossStatus
 		private set;
 	}
 
+	public int deadReviveCount
+	{
+		get;
+		private set;
+	}
+
+	public int recoveredHP
+	{
+		get;
+		private set;
+	}
+
 	public void UpdateStatus(Enemy enemy)
 	{
+		coopEnemyId = enemy.id;
 		hpMax = enemy.hpMax;
 		hp = enemy.hp;
 		barrierHp = enemy.BarrierHp;
 		downCount = enemy.downCount;
+		concussionTotal = enemy.concussionTotal;
+		concussionMax = enemy.concussionMax;
+		concussionExtend = enemy.concussionExtend;
 		CopyRegionWorks(enemy.regionWorks);
 		isDead = enemy.isDead;
 		shieldHp = enemy.ShieldHp;
@@ -69,14 +109,23 @@ public class ExploreBossStatus
 			execAngryIds = enemy.ExecAngryIDList.ToArray();
 		}
 		isMadMode = enemy.IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE);
+		deadReviveCount = enemy.deadReviveCount;
+		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+		{
+			recoveredHP = MonoBehaviourSingleton<InGameRecorder>.I.GetEnemyRecoveredHpById(enemy.id);
+		}
 	}
 
 	public void UpdateStatus(Coop_Model_RoomSyncExploreBoss boss)
 	{
+		coopEnemyId = boss.ceId;
 		hpMax = boss.hpm;
 		hp = boss.hp;
 		barrierHp = boss.bhp;
 		downCount = boss.downCount;
+		concussionTotal = boss.concussionTotal;
+		concussionMax = boss.concussionMax;
+		concussionExtend = boss.concussionExtend;
 		shieldHp = boss.shp;
 		regionWorks = new EnemyRegionWork[boss.rs.Length];
 		int i = 0;
@@ -89,6 +138,8 @@ public class ExploreBossStatus
 		nowAngryId = boss.angid;
 		execAngryIds = boss.eangids;
 		isMadMode = boss.isMM;
+		deadReviveCount = boss.deadReviveCount;
+		recoveredHP = boss.recoveredHP;
 	}
 
 	public void UpdateStatus(Coop_Model_RoomExploreBossDead model)
@@ -96,6 +147,9 @@ public class ExploreBossStatus
 		hp = 0;
 		isDead = true;
 		downCount = model.downCount;
+		concussionTotal = model.concussionTotal;
+		concussionMax = model.concussionMax;
+		concussionExtend = model.concussionExtend;
 		if (regionWorks == null)
 		{
 			int num = 0;

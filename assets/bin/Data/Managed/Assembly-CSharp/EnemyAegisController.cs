@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyAegisController
+public class EnemyAegisController : MonoBehaviour
 {
 	public class SetupParam
 	{
@@ -83,8 +83,6 @@ public class EnemyAegisController
 
 	public void Init(Enemy enemy)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
 		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (!object.ReferenceEquals(enemy, null))
 		{
@@ -113,7 +111,7 @@ public class EnemyAegisController
 			_setupParam.nodeName = ((data.stringArgs.Length <= 1) ? string.Empty : data.stringArgs[1]);
 			_setupParam.nowNum = _setupParam.maxNum;
 			_setupParam.nowHp = _setupParam.maxHp;
-			Setup(_setupParam, true);
+			Setup(_setupParam, announce: true);
 		}
 	}
 
@@ -122,9 +120,7 @@ public class EnemyAegisController
 		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Expected O, but got Unknown
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Expected O, but got Unknown
+		//IL_00f3: Expected O, but got Unknown
 		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
@@ -134,62 +130,63 @@ public class EnemyAegisController
 		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
 		_setupParam = param;
-		if (_setupParam.maxNum > 0)
+		if (_setupParam.maxNum <= 0)
 		{
-			for (int i = 0; i < aegisParams.Count; i++)
+			return;
+		}
+		for (int i = 0; i < aegisParams.Count; i++)
+		{
+			AegisParam aegisParam = aegisParams[i];
+			_ReleaseEffect(ref aegisParam.effect);
+		}
+		aegisParams.Clear();
+		Transform parent = owner.FindNode(_setupParam.nodeName);
+		cachedTransform.SetParent(parent);
+		cachedTransform.set_localPosition(Vector3.get_zero());
+		cachedTransform.set_localScale(Vector3.get_one());
+		float num = 360f / (float)_setupParam.maxNum;
+		float num2 = _setupParam.maxNum - _setupParam.nowNum;
+		bool flag = true;
+		for (int j = 0; j < _setupParam.maxNum; j++)
+		{
+			Transform val2;
+			if (effectParentList.Count <= j)
 			{
-				AegisParam aegisParam = aegisParams[i];
-				_ReleaseEffect(ref aegisParam.effect, true);
+				GameObject val = new GameObject("Child");
+				val2 = val.get_transform();
+				val2.SetParent(cachedTransform);
+				val2.set_localPosition(Vector3.get_zero());
+				val2.set_localScale(Vector3.get_one());
+				val2.set_localRotation(Quaternion.get_identity());
+				effectParentList.Add(val2);
 			}
-			aegisParams.Clear();
-			Transform val = owner.FindNode(_setupParam.nodeName);
-			cachedTransform.SetParent(val);
-			cachedTransform.set_localPosition(Vector3.get_zero());
-			cachedTransform.set_localScale(Vector3.get_one());
-			float num = 360f / (float)_setupParam.maxNum;
-			float num2 = (float)(_setupParam.maxNum - _setupParam.nowNum);
-			bool flag = true;
-			for (int j = 0; j < _setupParam.maxNum; j++)
+			else
 			{
-				Transform val3;
-				if (effectParentList.Count <= j)
-				{
-					GameObject val2 = new GameObject("Child");
-					val3 = val2.get_transform();
-					val3.SetParent(cachedTransform);
-					val3.set_localPosition(Vector3.get_zero());
-					val3.set_localScale(Vector3.get_one());
-					val3.set_localRotation(Quaternion.get_identity());
-					effectParentList.Add(val3);
-				}
-				else
-				{
-					val3 = effectParentList[j];
-				}
-				val3.set_localRotation(Quaternion.AngleAxis(num * (float)j, Vector3.get_up()));
-				if (!((float)j < num2))
-				{
-					AegisParam aegisParam2 = new AegisParam();
-					aegisParam2.hp = ((!flag) ? _setupParam.maxHp : _setupParam.nowHp);
-					aegisParam2.effect = EffectManager.GetEffect(_setupParam.effectName, val3);
-					aegisParam2.effect.set_localPosition(_setupParam.offset);
-					aegisParam2.effect.set_localScale(new Vector3(_setupParam.scale, _setupParam.scale, _setupParam.scale));
-					aegisParam2.effect.set_localRotation(Quaternion.get_identity());
-					aegisParams.Add(aegisParam2);
-					flag = false;
-				}
+				val2 = effectParentList[j];
 			}
-			isNeedUpdate = true;
-			_syncParam.nowNum = _setupParam.nowNum;
-			_syncParam.nowHp = _setupParam.nowHp;
-			_UpdateGaugeUI();
-			if (announce && MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+			val2.set_localRotation(Quaternion.AngleAxis(num * (float)j, Vector3.get_up()));
+			if (!((float)j < num2))
 			{
-				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(owner.enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 2u);
-				if (_setupParam.generateSeId > 0 && MonoBehaviourSingleton<SoundManager>.IsValid())
-				{
-					SoundManager.PlayOneShotSE(_setupParam.generateSeId, null, null);
-				}
+				AegisParam aegisParam2 = new AegisParam();
+				aegisParam2.hp = ((!flag) ? _setupParam.maxHp : _setupParam.nowHp);
+				aegisParam2.effect = EffectManager.GetEffect(_setupParam.effectName, val2);
+				aegisParam2.effect.set_localPosition(_setupParam.offset);
+				aegisParam2.effect.set_localScale(new Vector3(_setupParam.scale, _setupParam.scale, _setupParam.scale));
+				aegisParam2.effect.set_localRotation(Quaternion.get_identity());
+				aegisParams.Add(aegisParam2);
+				flag = false;
+			}
+		}
+		isNeedUpdate = true;
+		_syncParam.nowNum = _setupParam.nowNum;
+		_syncParam.nowHp = _setupParam.nowHp;
+		_UpdateGaugeUI();
+		if (announce && MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+		{
+			MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(owner.enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 2u);
+			if (_setupParam.generateSeId > 0 && MonoBehaviourSingleton<SoundManager>.IsValid())
+			{
+				SoundManager.PlayOneShotSE(_setupParam.generateSeId);
 			}
 		}
 	}
@@ -215,7 +212,7 @@ public class EnemyAegisController
 		aegisParam.hp -= damage;
 		if (aegisParam.hp <= 0)
 		{
-			_ReleaseEffect(ref aegisParam.effect, true);
+			_ReleaseEffect(ref aegisParam.effect);
 			aegisParams.RemoveAt(0);
 			_syncParam.nowNum = aegisParams.Count;
 			_syncParam.nowHp = ((_syncParam.nowNum != 0) ? aegisParams[0].hp : 0);
@@ -224,11 +221,11 @@ public class EnemyAegisController
 			{
 				if (_setupParam.allBreakSeId > 0 && !IsValid())
 				{
-					SoundManager.PlayOneShotSE(_setupParam.allBreakSeId, null, null);
+					SoundManager.PlayOneShotSE(_setupParam.allBreakSeId);
 				}
 				else if (_setupParam.breakSeId > 0)
 				{
-					SoundManager.PlayOneShotSE(_setupParam.breakSeId, null, null);
+					SoundManager.PlayOneShotSE(_setupParam.breakSeId);
 				}
 			}
 		}
@@ -250,44 +247,44 @@ public class EnemyAegisController
 
 	public void Sync(SyncParam sync)
 	{
-		if (sync.isChange && !_syncParam.Equal(sync))
+		if (!sync.isChange || _syncParam.Equal(sync))
 		{
-			int num = _syncParam.nowNum - sync.nowNum;
-			_syncParam.isChange = false;
-			_syncParam.nowNum = sync.nowNum;
-			_syncParam.nowHp = sync.nowHp;
-			for (int i = 0; i < num; i++)
+			return;
+		}
+		int num = _syncParam.nowNum - sync.nowNum;
+		_syncParam.isChange = false;
+		_syncParam.nowNum = sync.nowNum;
+		_syncParam.nowHp = sync.nowHp;
+		for (int i = 0; i < num; i++)
+		{
+			if (aegisParams.Count <= 0)
 			{
-				if (aegisParams.Count > 0)
+				continue;
+			}
+			_ReleaseEffect(ref aegisParams[0].effect);
+			aegisParams.RemoveAt(0);
+			_UpdateGaugeUI();
+			if (MonoBehaviourSingleton<SoundManager>.IsValid())
+			{
+				if (_setupParam.allBreakSeId > 0 && !IsValid())
 				{
-					_ReleaseEffect(ref aegisParams[0].effect, true);
-					aegisParams.RemoveAt(0);
-					_UpdateGaugeUI();
-					if (MonoBehaviourSingleton<SoundManager>.IsValid())
-					{
-						if (_setupParam.allBreakSeId > 0 && !IsValid())
-						{
-							SoundManager.PlayOneShotSE(_setupParam.allBreakSeId, null, null);
-						}
-						else if (_setupParam.breakSeId > 0)
-						{
-							SoundManager.PlayOneShotSE(_setupParam.breakSeId, null, null);
-						}
-					}
+					SoundManager.PlayOneShotSE(_setupParam.allBreakSeId);
+				}
+				else if (_setupParam.breakSeId > 0)
+				{
+					SoundManager.PlayOneShotSE(_setupParam.breakSeId);
 				}
 			}
-			if (aegisParams.Count > 0)
-			{
-				aegisParams[0].hp = sync.nowHp;
-			}
-			else
-			{
-				isNeedUpdate = false;
-				if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-				{
-					MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(owner.enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 3u);
-				}
-			}
+		}
+		if (aegisParams.Count > 0)
+		{
+			aegisParams[0].hp = sync.nowHp;
+			return;
+		}
+		isNeedUpdate = false;
+		if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+		{
+			MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(owner.enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 3u);
 		}
 	}
 
@@ -331,14 +328,13 @@ public class EnemyAegisController
 
 	private void OnDestroy()
 	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		_setupParam = null;
 		_syncParam = null;
 		isNeedUpdate = false;
 		for (int i = 0; i < aegisParams.Count; i++)
 		{
 			AegisParam aegisParam = aegisParams[i];
-			_ReleaseEffect(ref aegisParam.effect, true);
+			_ReleaseEffect(ref aegisParam.effect);
 		}
 		aegisParams.Clear();
 		aegisParams = null;
@@ -363,11 +359,9 @@ public class EnemyAegisController
 
 	private void _ReleaseEffect(ref Transform t, bool isPlayEndAnimation = true)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !object.ReferenceEquals(t, null))
 		{
-			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation, false);
+			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation);
 			t = null;
 		}
 	}

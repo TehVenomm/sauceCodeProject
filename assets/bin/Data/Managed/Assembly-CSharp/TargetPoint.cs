@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TargetPoint
+public class TargetPoint : MonoBehaviour
 {
 	public class Param
 	{
@@ -47,6 +47,9 @@ public class TargetPoint
 
 	[Tooltip("弓の狙い時有効")]
 	public bool isAimEnable = true;
+
+	[Tooltip("isAimEnableはfalseだけどArrowSpWeak表示したい")]
+	public bool isDispArrowSpWeak;
 
 	[Tooltip("継続ダメ\u30fcジエフェクトオフセット")]
 	public Vector3 bleedOffsetPos = Vector3.get_zero();
@@ -130,8 +133,6 @@ public class TargetPoint
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 	}
 
@@ -203,7 +204,7 @@ public class TargetPoint
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		Transform effect = EffectManager.GetEffect(effect_name, null);
+		Transform effect = EffectManager.GetEffect(effect_name);
 		if (effect != null)
 		{
 			effect.set_localScale(Vector3.get_one().Div(_transform.get_lossyScale()));

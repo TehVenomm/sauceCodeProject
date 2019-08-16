@@ -16,8 +16,6 @@ public class PuniConManager : MonoBehaviourSingleton<PuniConManager>
 
 	protected override void Awake()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		Camera val = (!MonoBehaviourSingleton<UIManager>.IsValid()) ? MonoBehaviourSingleton<AppMain>.I.mainCamera : MonoBehaviourSingleton<UIManager>.I.uiCamera;
@@ -53,17 +51,18 @@ public class PuniConManager : MonoBehaviourSingleton<PuniConManager>
 			punicon.Reset();
 			link_info = null;
 		}
-		if (link_info == null && !flag)
+		if (link_info != null || flag)
 		{
-			InputManager.TouchInfo activeInfo = MonoBehaviourSingleton<InputManager>.I.GetActiveInfo(true);
-			if (activeInfo != null)
+			return;
+		}
+		InputManager.TouchInfo activeInfo = MonoBehaviourSingleton<InputManager>.I.GetActiveInfo(check_enable: true);
+		if (activeInfo != null)
+		{
+			link_info = activeInfo;
+			punicon.SetStartPosition(Vector2.op_Implicit(link_info.beginPosition));
+			if (link_info.activeAxis)
 			{
-				link_info = activeInfo;
-				punicon.SetStartPosition(Vector2.op_Implicit(link_info.beginPosition));
-				if (link_info.activeAxis)
-				{
-					punicon.SetEndPosition(Vector2.op_Implicit(link_info.position));
-				}
+				punicon.SetEndPosition(Vector2.op_Implicit(link_info.position));
 			}
 		}
 	}

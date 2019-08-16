@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import net.gogame.gowrap.io.utils.IOUtils;
+import net.gogame.gowrap.p021io.utils.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,8 +23,7 @@ public final class JSONUtils {
     public static JSONObject read(File file) throws IOException, JSONException {
         InputStream newInputStream = IOUtils.newInputStream(file);
         try {
-            JSONObject read = read(newInputStream);
-            return read;
+            return read(newInputStream);
         } finally {
             IOUtils.closeQuietly(newInputStream);
         }
@@ -33,8 +32,7 @@ public final class JSONUtils {
     public static JSONObject assetRead(Context context, String str) throws IOException, JSONException {
         InputStream newInputStream = IOUtils.newInputStream(context, str);
         try {
-            JSONObject read = read(newInputStream);
-            return read;
+            return read(newInputStream);
         } finally {
             IOUtils.closeQuietly(newInputStream);
         }
@@ -80,10 +78,10 @@ public final class JSONUtils {
         if (optString == null) {
             return str2;
         }
-        optString = StringUtils.trimToNull(optString);
+        String trimToNull = StringUtils.trimToNull(optString);
         try {
-            URL url = new URL(optString);
-            return optString;
+            new URL(trimToNull);
+            return trimToNull;
         } catch (MalformedURLException e) {
             return str2;
         }

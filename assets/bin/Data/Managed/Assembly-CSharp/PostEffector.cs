@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PostEffector
+public class PostEffector : MonoBehaviour
 {
 	[SerializeField]
 	private FilterBase filter;

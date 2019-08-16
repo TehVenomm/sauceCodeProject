@@ -1,6 +1,5 @@
-package android.support.v4.media.session;
+package android.support.p000v4.media.session;
 
-import android.annotation.TargetApi;
 import android.media.session.PlaybackState;
 import android.media.session.PlaybackState.Builder;
 import android.media.session.PlaybackState.CustomAction;
@@ -9,8 +8,8 @@ import android.support.annotation.RequiresApi;
 import java.util.Iterator;
 import java.util.List;
 
-@TargetApi(22)
 @RequiresApi(22)
+/* renamed from: android.support.v4.media.session.PlaybackStateCompatApi22 */
 class PlaybackStateCompatApi22 {
     PlaybackStateCompatApi22() {
     }

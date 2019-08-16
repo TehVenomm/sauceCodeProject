@@ -1,8 +1,9 @@
-package net.gogame.gowrap.ui.utils;
+package net.gogame.gowrap.p019ui.utils;
 
 import android.view.View.MeasureSpec;
 import java.util.Locale;
 
+/* renamed from: net.gogame.gowrap.ui.utils.UIDebugUtils */
 public class UIDebugUtils {
     public static String getModeName(int i) {
         switch (i) {
@@ -18,8 +19,6 @@ public class UIDebugUtils {
     }
 
     public static String measureSpecToString(int i) {
-        int mode = MeasureSpec.getMode(i);
-        int size = MeasureSpec.getSize(i);
-        return String.format(Locale.ENGLISH, "%s %d", new Object[]{getModeName(mode), Integer.valueOf(size)});
+        return String.format(Locale.ENGLISH, "%s %d", new Object[]{getModeName(MeasureSpec.getMode(i)), Integer.valueOf(MeasureSpec.getSize(i))});
     }
 }

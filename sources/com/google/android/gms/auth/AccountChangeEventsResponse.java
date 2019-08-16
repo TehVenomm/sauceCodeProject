@@ -2,34 +2,43 @@ package com.google.android.gms.auth;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 import java.util.List;
 
-public class AccountChangeEventsResponse extends zza {
+@Class(creator = "AccountChangeEventsResponseCreator")
+public class AccountChangeEventsResponse extends AbstractSafeParcelable {
     public static final Creator<AccountChangeEventsResponse> CREATOR = new zzc();
-    private int mVersion;
-    private List<AccountChangeEvent> zzaom;
+    @VersionField(mo13996id = 1)
+    private final int zze;
+    @Field(mo13990id = 2)
+    private final List<AccountChangeEvent> zzl;
 
-    AccountChangeEventsResponse(int i, List<AccountChangeEvent> list) {
-        this.mVersion = i;
-        this.zzaom = (List) zzbp.zzu(list);
+    @Constructor
+    AccountChangeEventsResponse(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) List<AccountChangeEvent> list) {
+        this.zze = i;
+        this.zzl = (List) Preconditions.checkNotNull(list);
     }
 
     public AccountChangeEventsResponse(List<AccountChangeEvent> list) {
-        this.mVersion = 1;
-        this.zzaom = (List) zzbp.zzu(list);
+        this.zze = 1;
+        this.zzl = (List) Preconditions.checkNotNull(list);
     }
 
     public List<AccountChangeEvent> getEvents() {
-        return this.zzaom;
+        return this.zzl;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.mVersion);
-        zzd.zzc(parcel, 2, this.zzaom, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zze);
+        SafeParcelWriter.writeTypedList(parcel, 2, this.zzl, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

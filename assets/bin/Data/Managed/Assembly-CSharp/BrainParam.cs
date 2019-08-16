@@ -63,13 +63,13 @@ public class BrainParam
 
 	public class ScountingParam
 	{
-		public const int ACTIVATE_HATE_VALUE = 100;
-
 		public float scountigRangeSqr;
 
 		public float scoutingSightCos;
 
 		public float scoutingAudibilitySqr;
+
+		public const int ACTIVATE_HATE_VALUE = 100;
 
 		public bool IsScouted(Transform self, Transform target)
 		{

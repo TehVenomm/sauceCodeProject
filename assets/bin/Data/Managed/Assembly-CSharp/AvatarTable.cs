@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class AvatarTable : Singleton<AvatarTable>, IDataTable
@@ -17,8 +18,6 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 
 	public class AvatarData
 	{
-		public const string NT = "dataIndex,rawId,type,name,index,manHeadID,womanHeadID,manFaceID,womanFaceID,R,G,B,R2,G2,B2,defaultHasManHeadIndex,defaultHasWomanHeadIndex,defaultHasManFaceIndex,defaultHasWomanFaceIndex,defaultHasSkinColorIndex,dafaultHasHairColorIndex";
-
 		public uint id;
 
 		public int rawId;
@@ -57,6 +56,8 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 
 		public int defaultHasHairColorIndex = -1;
 
+		public const string NT = "dataIndex,rawId,type,name,index,manHeadID,womanHeadID,manFaceID,womanFaceID,R,G,B,R2,G2,B2,defaultHasManHeadIndex,defaultHasWomanHeadIndex,defaultHasManFaceIndex,defaultHasWomanFaceIndex,defaultHasSkinColorIndex,dafaultHasHairColorIndex";
+
 		public static bool cb(CSVReader csv_reader, AvatarData data, ref uint key)
 		{
 			csv_reader.Pop(ref data.rawId);
@@ -80,6 +81,12 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 	}
 
 	private UIntKeyTable<AvatarData> avatarTable;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<AvatarData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<AvatarData> _003C_003Ef__mg_0024cache1;
 
 	public int[] manHeadIDs
 	{
@@ -155,14 +162,14 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 
 	public void CreateTable(string csv_table)
 	{
-		avatarTable = TableUtility.CreateUIntKeyTable<AvatarData>(csv_table, AvatarData.cb, "dataIndex,rawId,type,name,index,manHeadID,womanHeadID,manFaceID,womanFaceID,R,G,B,R2,G2,B2,defaultHasManHeadIndex,defaultHasWomanHeadIndex,defaultHasManFaceIndex,defaultHasWomanFaceIndex,defaultHasSkinColorIndex,dafaultHasHairColorIndex", null);
+		avatarTable = TableUtility.CreateUIntKeyTable<AvatarData>(csv_table, AvatarData.cb, "dataIndex,rawId,type,name,index,manHeadID,womanHeadID,manFaceID,womanFaceID,R,G,B,R2,G2,B2,defaultHasManHeadIndex,defaultHasWomanHeadIndex,defaultHasManFaceIndex,defaultHasWomanFaceIndex,defaultHasSkinColorIndex,dafaultHasHairColorIndex");
 		avatarTable.TrimExcess();
 		ConvertTable();
 	}
 
 	public void AddTable(string csv_table)
 	{
-		TableUtility.AddUIntKeyTable(avatarTable, csv_table, AvatarData.cb, "dataIndex,rawId,type,name,index,manHeadID,womanHeadID,manFaceID,womanFaceID,R,G,B,R2,G2,B2,defaultHasManHeadIndex,defaultHasWomanHeadIndex,defaultHasManFaceIndex,defaultHasWomanFaceIndex,defaultHasSkinColorIndex,dafaultHasHairColorIndex", null);
+		TableUtility.AddUIntKeyTable(avatarTable, csv_table, AvatarData.cb, "dataIndex,rawId,type,name,index,manHeadID,womanHeadID,manFaceID,womanFaceID,R,G,B,R2,G2,B2,defaultHasManHeadIndex,defaultHasWomanHeadIndex,defaultHasManFaceIndex,defaultHasWomanFaceIndex,defaultHasSkinColorIndex,dafaultHasHairColorIndex");
 	}
 
 	public void ConvertTable()

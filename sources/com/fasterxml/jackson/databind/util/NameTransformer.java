@@ -55,13 +55,13 @@ public abstract class NameTransformer {
     }
 
     public static NameTransformer simpleTransformer(final String str, final String str2) {
-        Object obj = 1;
-        Object obj2 = (str == null || str.length() <= 0) ? null : 1;
+        boolean z = true;
+        boolean z2 = str != null && str.length() > 0;
         if (str2 == null || str2.length() <= 0) {
-            obj = null;
+            z = false;
         }
-        if (obj2 == null) {
-            return obj != null ? new NameTransformer() {
+        if (!z2) {
+            return z ? new NameTransformer() {
                 public String transform(String str) {
                     return str + str2;
                 }
@@ -77,45 +77,44 @@ public abstract class NameTransformer {
                     return "[SuffixTransformer('" + str2 + "')]";
                 }
             } : NOP;
-        } else {
-            if (obj != null) {
-                return new NameTransformer() {
-                    public String transform(String str) {
-                        return str + str + str2;
-                    }
-
-                    public String reverse(String str) {
-                        if (str.startsWith(str)) {
-                            String substring = str.substring(str.length());
-                            if (substring.endsWith(str2)) {
-                                return substring.substring(0, substring.length() - str2.length());
-                            }
-                        }
-                        return null;
-                    }
-
-                    public String toString() {
-                        return "[PreAndSuffixTransformer('" + str + "','" + str2 + "')]";
-                    }
-                };
-            }
+        }
+        if (z) {
             return new NameTransformer() {
                 public String transform(String str) {
-                    return str + str;
+                    return str + str + str2;
                 }
 
                 public String reverse(String str) {
                     if (str.startsWith(str)) {
-                        return str.substring(str.length());
+                        String substring = str.substring(str.length());
+                        if (substring.endsWith(str2)) {
+                            return substring.substring(0, substring.length() - str2.length());
+                        }
                     }
                     return null;
                 }
 
                 public String toString() {
-                    return "[PrefixTransformer('" + str + "')]";
+                    return "[PreAndSuffixTransformer('" + str + "','" + str2 + "')]";
                 }
             };
         }
+        return new NameTransformer() {
+            public String transform(String str) {
+                return str + str;
+            }
+
+            public String reverse(String str) {
+                if (str.startsWith(str)) {
+                    return str.substring(str.length());
+                }
+                return null;
+            }
+
+            public String toString() {
+                return "[PrefixTransformer('" + str + "')]";
+            }
+        };
     }
 
     public static NameTransformer chainedTransformer(NameTransformer nameTransformer, NameTransformer nameTransformer2) {

@@ -29,12 +29,12 @@ public class Goal_Prayer : Goal
 			SetStatus(STATUS.COMPLETED);
 			return status;
 		}
-		double num = (double)AIUtility.GetLengthWithBetweenObject(brain.owner, target);
+		double num = AIUtility.GetLengthWithBetweenObject(brain.owner, target);
 		if (num > (double)revival_range)
 		{
 			SetStatus(STATUS.COMPLETED);
 		}
-		if (!target.isDead)
+		if (!target.isDead && !target.IsStone())
 		{
 			SetStatus(STATUS.COMPLETED);
 		}

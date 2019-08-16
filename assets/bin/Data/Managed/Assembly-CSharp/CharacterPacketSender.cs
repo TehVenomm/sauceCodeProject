@@ -50,9 +50,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 				coop_Model_CharacterMoveVelocity.target_id = ((!(character.actionTarget != null)) ? (-1) : character.actionTarget.id);
 				if (base.enableSend && base.owner.IsOriginal())
 				{
-					SendBroadcast(coop_Model_CharacterMoveVelocity, false, null, null);
+					SendBroadcast(coop_Model_CharacterMoveVelocity);
 				}
-				StackActionHistory(coop_Model_CharacterMoveVelocity, true);
+				StackActionHistory(coop_Model_CharacterMoveVelocity, is_act_model: true);
 				actUpdateTimer = 0f;
 			}
 		}
@@ -69,7 +69,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 			Coop_Model_CharacterActionTarget coop_Model_CharacterActionTarget = new Coop_Model_CharacterActionTarget();
 			coop_Model_CharacterActionTarget.id = base.owner.id;
 			coop_Model_CharacterActionTarget.target_id = ((!(target != null)) ? (-1) : target.id);
-			SendBroadcast(coop_Model_CharacterActionTarget, false, null, null);
+			SendBroadcast(coop_Model_CharacterActionTarget);
 		}
 	}
 
@@ -84,9 +84,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterUpdateActionPosition.act_pos_f = character.actionPositionFlag;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterUpdateActionPosition, false, null, null);
+			SendBroadcast(coop_Model_CharacterUpdateActionPosition);
 		}
-		StackActionHistory(coop_Model_CharacterUpdateActionPosition, false);
+		StackActionHistory(coop_Model_CharacterUpdateActionPosition, is_act_model: false);
 	}
 
 	public virtual void OnUpdateDirection(string trigger)
@@ -122,9 +122,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		}
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterUpdateDirection, false, null, null);
+			SendBroadcast(coop_Model_CharacterUpdateDirection);
 		}
-		StackActionHistory(coop_Model_CharacterUpdateDirection, false);
+		StackActionHistory(coop_Model_CharacterUpdateDirection, is_act_model: false);
 	}
 
 	public virtual void OnPeriodicSyncActionPosition(Character.PeriodicSyncActionPositionInfo info)
@@ -134,9 +134,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterPeriodicSyncActionPosition.info = info;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterPeriodicSyncActionPosition, false, null, null);
+			SendBroadcast(coop_Model_CharacterPeriodicSyncActionPosition);
 		}
-		StackActionHistory(coop_Model_CharacterPeriodicSyncActionPosition, false);
+		StackActionHistory(coop_Model_CharacterPeriodicSyncActionPosition, is_act_model: false);
 	}
 
 	public virtual void OnActIdle(bool is_sync)
@@ -146,28 +146,30 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 			Coop_Model_CharacterIdle coop_Model_CharacterIdle = new Coop_Model_CharacterIdle();
 			coop_Model_CharacterIdle.id = base.owner.id;
 			coop_Model_CharacterIdle.SetSyncPosition(base.owner);
-			SendBroadcast(coop_Model_CharacterIdle, false, null, null);
+			SendBroadcast(coop_Model_CharacterIdle);
 		}
 		ClearActionHistory();
 	}
 
-	public virtual void OnActAttack(int id, bool sync_immediately, int syncRandomSeed = 0)
+	public virtual void OnActAttack(int id, bool sync_immediately, int syncRandomSeed = 0, string _motionLayerName = "", string _motionStateName = "")
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_CharacterAttack coop_Model_CharacterAttack = new Coop_Model_CharacterAttack();
 		coop_Model_CharacterAttack.id = base.owner.id;
 		coop_Model_CharacterAttack.SetSyncPosition(base.owner);
 		coop_Model_CharacterAttack.attack_id = id;
+		coop_Model_CharacterAttack.motionLayerName = _motionLayerName;
+		coop_Model_CharacterAttack.motionStateName = _motionStateName;
 		coop_Model_CharacterAttack.act_pos = character.actionPosition;
 		coop_Model_CharacterAttack.act_pos_f = character.actionPositionFlag;
 		coop_Model_CharacterAttack.sync_immediately = sync_immediately;
 		coop_Model_CharacterAttack.syncRandomSeed = syncRandomSeed;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterAttack, false, null, null);
+			SendBroadcast(coop_Model_CharacterAttack);
 		}
-		StackActionHistory(coop_Model_CharacterAttack, true);
+		StackActionHistory(coop_Model_CharacterAttack, is_act_model: true);
 	}
 
 	public virtual void OnActMoveVelocity(int motion_id)
@@ -187,9 +189,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterMoveToPosition.target_pos = target_pos;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterMoveToPosition, false, null, null);
+			SendBroadcast(coop_Model_CharacterMoveToPosition);
 		}
-		StackActionHistory(coop_Model_CharacterMoveToPosition, true);
+		StackActionHistory(coop_Model_CharacterMoveToPosition, is_act_model: true);
 	}
 
 	public virtual void OnActMoveHoming(float max_length)
@@ -204,9 +206,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterMoveHoming.max_length = max_length;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterMoveHoming, false, null, null);
+			SendBroadcast(coop_Model_CharacterMoveHoming);
 		}
-		StackActionHistory(coop_Model_CharacterMoveHoming, true);
+		StackActionHistory(coop_Model_CharacterMoveHoming, is_act_model: true);
 	}
 
 	public virtual void OnActMoveSideways(int moveAngleSign)
@@ -221,9 +223,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterMoveSideways.moveAngleSign = moveAngleSign;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterMoveSideways, false, null, null);
+			SendBroadcast(coop_Model_CharacterMoveSideways);
 		}
-		StackActionHistory(coop_Model_CharacterMoveSideways, true);
+		StackActionHistory(coop_Model_CharacterMoveSideways, is_act_model: true);
 	}
 
 	public virtual void OnActMovePoint(Vector3 targetPos)
@@ -236,9 +238,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterMovePoint.targetPos = targetPos;
 		if (this.get_enabled() && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterMovePoint, false, null, null);
+			SendBroadcast(coop_Model_CharacterMovePoint);
 		}
-		StackActionHistory(coop_Model_CharacterMovePoint, true);
+		StackActionHistory(coop_Model_CharacterMovePoint, is_act_model: true);
 	}
 
 	public void OnActMoveLookAt(Vector3 moveLookAtPos)
@@ -251,9 +253,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterMoveLookAt.moveLookAtPos = moveLookAtPos;
 		if (this.get_enabled() && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterMoveLookAt, false, null, null);
+			SendBroadcast(coop_Model_CharacterMoveLookAt);
 		}
-		StackActionHistory(coop_Model_CharacterMoveLookAt, true);
+		StackActionHistory(coop_Model_CharacterMoveLookAt, is_act_model: true);
 	}
 
 	public virtual void OnActRotate(float direction)
@@ -264,9 +266,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterRotate.target_dir = direction;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterRotate, false, null, null);
+			SendBroadcast(coop_Model_CharacterRotate);
 		}
-		StackActionHistory(coop_Model_CharacterRotate, true);
+		StackActionHistory(coop_Model_CharacterRotate, is_act_model: true);
 	}
 
 	public virtual void OnActRotateMotion(float direction)
@@ -277,9 +279,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterRotateMotion.target_dir = direction;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterRotateMotion, false, null, null);
+			SendBroadcast(coop_Model_CharacterRotateMotion);
 		}
-		StackActionHistory(coop_Model_CharacterRotateMotion, true);
+		StackActionHistory(coop_Model_CharacterRotateMotion, is_act_model: true);
 	}
 
 	public void OnReactionDelay(List<Character.DelayReactionInfo> reactionList)
@@ -290,9 +292,9 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterReactionDelay.reactionInfoList = reactionList;
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			SendBroadcast(coop_Model_CharacterReactionDelay, false, null, null);
+			SendBroadcast(coop_Model_CharacterReactionDelay);
 		}
-		StackActionHistory(coop_Model_CharacterReactionDelay, true);
+		StackActionHistory(coop_Model_CharacterReactionDelay, is_act_model: true);
 	}
 
 	public void OnSendContinusAttackSync(ContinusAttackParam.SyncParam syncParam)
@@ -302,7 +304,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 			Coop_Model_CharacterContinusAttackSync coop_Model_CharacterContinusAttackSync = new Coop_Model_CharacterContinusAttackSync();
 			coop_Model_CharacterContinusAttackSync.id = base.owner.id;
 			coop_Model_CharacterContinusAttackSync.sync_param = syncParam;
-			SendBroadcast(coop_Model_CharacterContinusAttackSync, false, null, null);
+			SendBroadcast(coop_Model_CharacterContinusAttackSync);
 		}
 	}
 
@@ -313,7 +315,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 			Coop_Model_CharacterBuffSync coop_Model_CharacterBuffSync = new Coop_Model_CharacterBuffSync();
 			coop_Model_CharacterBuffSync.id = base.owner.id;
 			coop_Model_CharacterBuffSync.sync_param = sync_param;
-			SendBroadcast(coop_Model_CharacterBuffSync, false, null, null);
+			SendBroadcast(coop_Model_CharacterBuffSync);
 		}
 	}
 
@@ -326,7 +328,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 			coop_Model_CharacterBuffReceive.type = (int)type;
 			coop_Model_CharacterBuffReceive.value = value;
 			coop_Model_CharacterBuffReceive.time = time;
-			SendTo(base.owner.coopClientId, coop_Model_CharacterBuffReceive, false, null, null);
+			SendTo(base.owner.coopClientId, coop_Model_CharacterBuffReceive);
 		}
 	}
 
@@ -341,7 +343,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 			coop_Model_CharacterBuffRoutine.fromObjectID = fromObjectID;
 			coop_Model_CharacterBuffRoutine.fromEquipIndex = fromEquipIndex;
 			coop_Model_CharacterBuffRoutine.fromSkillIndex = fromSkillIndex;
-			SendBroadcast(coop_Model_CharacterBuffRoutine, false, null, null);
+			SendBroadcast(coop_Model_CharacterBuffRoutine);
 		}
 	}
 
@@ -368,7 +370,7 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 				coop_Model_CharacterMoveVelocityEnd2.direction = eulerAngles.y;
 				coop_Model_CharacterMoveVelocityEnd.sync_speed = character.moveSyncSpeed;
 				coop_Model_CharacterMoveVelocityEnd.motion_id = moveMotion;
-				SendBroadcast(coop_Model_CharacterMoveVelocityEnd, false, null, null);
+				SendBroadcast(coop_Model_CharacterMoveVelocityEnd);
 			}
 			actUpdateTimer = 0f;
 			actUpdateSendFlag = false;
@@ -386,11 +388,12 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterReaction.blowForce = info.blowForce;
 		coop_Model_CharacterReaction.loopTime = info.loopTime;
 		coop_Model_CharacterReaction.targetId = info.targetId;
+		coop_Model_CharacterReaction.deadReviveCount = info.deadReviveCount;
 		if (isSync)
 		{
-			SendBroadcast(coop_Model_CharacterReaction, false, null, null);
+			SendBroadcast(coop_Model_CharacterReaction);
 		}
-		StackActionHistory(coop_Model_CharacterReaction, true);
+		StackActionHistory(coop_Model_CharacterReaction, is_act_model: true);
 	}
 
 	public void OnActDead()
@@ -400,8 +403,8 @@ public abstract class CharacterPacketSender : ObjectPacketSender
 		coop_Model_CharacterDead.SetSyncPosition(base.owner);
 		if (base.enableSend)
 		{
-			SendBroadcast(coop_Model_CharacterDead, true, null, null);
+			SendBroadcast(coop_Model_CharacterDead, promise: true);
 		}
-		StackActionHistory(coop_Model_CharacterDead, true);
+		StackActionHistory(coop_Model_CharacterDead, is_act_model: true);
 	}
 }

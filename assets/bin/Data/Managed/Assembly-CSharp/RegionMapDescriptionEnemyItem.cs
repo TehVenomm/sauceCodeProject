@@ -16,10 +16,10 @@ public class RegionMapDescriptionEnemyItem : QuestListFieldItem
 	{
 		SetUpEnemy(field_enemy_table);
 		Transform transform = GetTransform();
-		SetActive(transform, UI.LBL_FIELD_NAME, true);
+		SetActive(transform, UI.LBL_FIELD_NAME, is_visible: true);
 		SetLabelText(transform, UI.LBL_FIELD_NAME, "Lv." + level.ToString());
-		SetActive(transform, UI.OBJ_FIELD_ICON, false);
-		SetActive(transform, UI.TEX_FIELD_SUB, false);
-		SetActive(transform, UI.TEX_FIELD, false);
+		SetActive(transform, UI.OBJ_FIELD_ICON, is_visible: false);
+		SetActive(transform, UI.TEX_FIELD_SUB, is_visible: false);
+		SetActive(transform, UI.TEX_FIELD, is_visible: false);
 	}
 }

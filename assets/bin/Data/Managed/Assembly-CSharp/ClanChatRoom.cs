@@ -88,7 +88,7 @@ public class ClanChatRoom
 		{
 			if (this.connection.isEstablished)
 			{
-				this.connection.Disconnect(null);
+				this.connection.Disconnect();
 			}
 			connection.onJoin -= _OnJoin;
 			connection.onLeave -= _OnLeave;

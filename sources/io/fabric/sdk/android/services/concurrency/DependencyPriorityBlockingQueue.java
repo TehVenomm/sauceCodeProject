@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.concurrency;
+package p017io.fabric.sdk.android.services.concurrency;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -8,7 +8,11 @@ import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import p017io.fabric.sdk.android.services.concurrency.Dependency;
+import p017io.fabric.sdk.android.services.concurrency.PriorityProvider;
+import p017io.fabric.sdk.android.services.concurrency.Task;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.DependencyPriorityBlockingQueue */
 public class DependencyPriorityBlockingQueue<E extends Dependency & Task & PriorityProvider> extends PriorityBlockingQueue<E> {
     static final int PEEK = 1;
     static final int POLL = 2;
@@ -17,7 +21,8 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
     final Queue<E> blockedQueue = new LinkedList();
     private final ReentrantLock lock = new ReentrantLock();
 
-    boolean canProcess(E e) {
+    /* access modifiers changed from: 0000 */
+    public boolean canProcess(E e) {
         return e.areDependenciesMet();
     }
 
@@ -31,39 +36,39 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
         }
     }
 
-    <T> T[] concatenate(T[] tArr, T[] tArr2) {
+    /* access modifiers changed from: 0000 */
+    public <T> T[] concatenate(T[] tArr, T[] tArr2) {
         int length = tArr.length;
         int length2 = tArr2.length;
-        Object[] objArr = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length + length2);
-        System.arraycopy(tArr, 0, objArr, 0, length);
-        System.arraycopy(tArr2, 0, objArr, length, length2);
-        return objArr;
+        T[] tArr3 = (Object[]) Array.newInstance(tArr.getClass().getComponentType(), length + length2);
+        System.arraycopy(tArr, 0, tArr3, 0, length);
+        System.arraycopy(tArr2, 0, tArr3, length, length2);
+        return tArr3;
     }
 
     public boolean contains(Object obj) {
         try {
             this.lock.lock();
-            boolean z = super.contains(obj) || this.blockedQueue.contains(obj);
-            this.lock.unlock();
-            return z;
-        } catch (Throwable th) {
+            return super.contains(obj) || this.blockedQueue.contains(obj);
+        } finally {
             this.lock.unlock();
         }
     }
 
+    /* JADX INFO: finally extract failed */
     public int drainTo(Collection<? super E> collection) {
-        int size;
         try {
             this.lock.lock();
             int drainTo = super.drainTo(collection);
-            size = this.blockedQueue.size();
+            int size = this.blockedQueue.size();
             while (!this.blockedQueue.isEmpty()) {
                 collection.add(this.blockedQueue.poll());
             }
+            this.lock.unlock();
             return drainTo + size;
-        } finally {
-            size = this.lock;
-            size.unlock();
+        } catch (Throwable th) {
+            this.lock.unlock();
+            throw th;
         }
     }
 
@@ -75,14 +80,14 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
                 collection.add(this.blockedQueue.poll());
                 drainTo++;
             }
-            this.lock.unlock();
             return drainTo;
-        } catch (Throwable th) {
+        } finally {
             this.lock.unlock();
         }
     }
 
-    E get(int i, Long l, TimeUnit timeUnit) throws InterruptedException {
+    /* access modifiers changed from: 0000 */
+    public E get(int i, Long l, TimeUnit timeUnit) throws InterruptedException {
         E performOperation;
         while (true) {
             performOperation = performOperation(i, l, timeUnit);
@@ -94,29 +99,30 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
         return performOperation;
     }
 
-    boolean offerBlockedResult(int i, E e) {
+    /* access modifiers changed from: 0000 */
+    public boolean offerBlockedResult(int i, E e) {
         try {
             this.lock.lock();
             if (i == 1) {
                 super.remove(e);
             }
-            boolean offer = this.blockedQueue.offer(e);
-            return offer;
+            return this.blockedQueue.offer(e);
         } finally {
             this.lock.unlock();
         }
     }
 
     public E peek() {
-        E e = null;
+        boolean z = false;
         try {
-            e = get(1, null, null);
-        } catch (InterruptedException e2) {
+            return get(1, null, null);
+        } catch (InterruptedException e) {
+            return z;
         }
-        return e;
     }
 
-    E performOperation(int i, Long l, TimeUnit timeUnit) throws InterruptedException {
+    /* access modifiers changed from: 0000 */
+    public E performOperation(int i, Long l, TimeUnit timeUnit) throws InterruptedException {
         switch (i) {
             case 0:
                 return (Dependency) super.take();
@@ -132,12 +138,12 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
     }
 
     public E poll() {
-        E e = null;
+        boolean z = false;
         try {
-            e = get(2, null, null);
-        } catch (InterruptedException e2) {
+            return get(2, null, null);
+        } catch (InterruptedException e) {
+            return z;
         }
-        return e;
     }
 
     public E poll(long j, TimeUnit timeUnit) throws InterruptedException {
@@ -163,37 +169,37 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
     public boolean remove(Object obj) {
         try {
             this.lock.lock();
-            boolean z = super.remove(obj) || this.blockedQueue.remove(obj);
+            return super.remove(obj) || this.blockedQueue.remove(obj);
+        } finally {
             this.lock.unlock();
-            return z;
+        }
+    }
+
+    /* JADX INFO: finally extract failed */
+    public boolean removeAll(Collection<?> collection) {
+        try {
+            this.lock.lock();
+            boolean removeAll = super.removeAll(collection);
+            boolean removeAll2 = this.blockedQueue.removeAll(collection);
+            this.lock.unlock();
+            return removeAll | removeAll2;
         } catch (Throwable th) {
             this.lock.unlock();
+            throw th;
         }
     }
 
-    public boolean removeAll(Collection<?> collection) {
-        int removeAll;
-        try {
-            this.lock.lock();
-            int removeAll2 = super.removeAll(collection);
-            removeAll = this.blockedQueue.removeAll(collection);
-            return removeAll2 | removeAll;
-        } finally {
-            removeAll = this.lock;
-            removeAll.unlock();
-        }
-    }
-
+    /* JADX INFO: finally extract failed */
     public int size() {
-        int size;
         try {
             this.lock.lock();
-            int size2 = this.blockedQueue.size();
-            size = super.size();
-            return size2 + size;
-        } finally {
-            size = this.lock;
-            size.unlock();
+            int size = this.blockedQueue.size();
+            int size2 = super.size();
+            this.lock.unlock();
+            return size + size2;
+        } catch (Throwable th) {
+            this.lock.unlock();
+            throw th;
         }
     }
 
@@ -204,8 +210,7 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
     public Object[] toArray() {
         try {
             this.lock.lock();
-            Object[] concatenate = concatenate(super.toArray(), this.blockedQueue.toArray());
-            return concatenate;
+            return concatenate(super.toArray(), this.blockedQueue.toArray());
         } finally {
             this.lock.unlock();
         }
@@ -214,8 +219,7 @@ public class DependencyPriorityBlockingQueue<E extends Dependency & Task & Prior
     public <T> T[] toArray(T[] tArr) {
         try {
             this.lock.lock();
-            T[] concatenate = concatenate(super.toArray(tArr), this.blockedQueue.toArray(tArr));
-            return concatenate;
+            return concatenate(super.toArray(tArr), this.blockedQueue.toArray(tArr));
         } finally {
             this.lock.unlock();
         }

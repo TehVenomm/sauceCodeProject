@@ -2,120 +2,142 @@ package com.google.android.gms.drive.query;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.VisibleForTesting;
 import com.google.android.gms.drive.DriveSpace;
 import com.google.android.gms.drive.query.internal.zzr;
 import com.google.android.gms.drive.query.internal.zzt;
 import com.google.android.gms.drive.query.internal.zzx;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class Query extends zza {
+@Class(creator = "QueryCreator")
+@Reserved({1000})
+public class Query extends AbstractSafeParcelable {
     public static final Creator<Query> CREATOR = new zzb();
-    private List<DriveSpace> zzgew;
-    private final Set<DriveSpace> zzgex;
-    private zzr zzgmu;
-    private String zzgmv;
-    private SortOrder zzgmw;
-    final List<String> zzgmx;
-    final boolean zzgmy;
-    final boolean zzgmz;
+    @Field(mo13990id = 7)
+    private final List<DriveSpace> zzbw;
+    @Field(mo13990id = 1)
+    private final zzr zzkw;
+    @Field(mo13990id = 3)
+    private final String zzkx;
+    @Nullable
+    @Field(mo13990id = 4)
+    private final SortOrder zzky;
+    @Field(mo13990id = 5)
+    final List<String> zzkz;
+    @Field(mo13990id = 6)
+    final boolean zzla;
+    @Field(mo13990id = 8)
+    final boolean zzlb;
 
+    @VisibleForTesting
     public static class Builder {
-        private Set<DriveSpace> zzgex;
-        private String zzgmv;
-        private SortOrder zzgmw;
-        private List<String> zzgmx;
-        private boolean zzgmy;
-        private boolean zzgmz;
-        private final List<Filter> zzgna = new ArrayList();
+        private String zzkx;
+        private SortOrder zzky;
+        private List<String> zzkz = Collections.emptyList();
+        private boolean zzla;
+        private boolean zzlb;
+        private final List<Filter> zzlc = new ArrayList();
+        private Set<DriveSpace> zzld = Collections.emptySet();
 
-        public Builder(Query query) {
-            this.zzgna.add(query.getFilter());
-            this.zzgmv = query.getPageToken();
-            this.zzgmw = query.getSortOrder();
-            this.zzgmx = query.zzgmx;
-            this.zzgmy = query.zzgmy;
-            this.zzgex = query.zzanx();
-            this.zzgmz = query.zzgmz;
+        public Builder() {
         }
 
-        public Builder addFilter(Filter filter) {
+        public Builder(Query query) {
+            this.zzlc.add(query.getFilter());
+            this.zzkx = query.getPageToken();
+            this.zzky = query.getSortOrder();
+            this.zzkz = query.zzkz;
+            this.zzla = query.zzla;
+            query.zzba();
+            this.zzld = query.zzba();
+            this.zzlb = query.zzlb;
+        }
+
+        public Builder addFilter(@NonNull Filter filter) {
+            Preconditions.checkNotNull(filter, "Filter may not be null.");
             if (!(filter instanceof zzt)) {
-                this.zzgna.add(filter);
+                this.zzlc.add(filter);
             }
             return this;
         }
 
         public Query build() {
-            return new Query(new zzr(zzx.zzgoc, this.zzgna), this.zzgmv, this.zzgmw, this.zzgmx, this.zzgmy, this.zzgex, this.zzgmz);
+            return new Query(new zzr(zzx.zzmf, (Iterable<Filter>) this.zzlc), this.zzkx, this.zzky, this.zzkz, this.zzla, this.zzld, this.zzlb);
         }
 
         @Deprecated
         public Builder setPageToken(String str) {
-            this.zzgmv = str;
+            this.zzkx = str;
             return this;
         }
 
         public Builder setSortOrder(SortOrder sortOrder) {
-            this.zzgmw = sortOrder;
+            this.zzky = sortOrder;
             return this;
         }
     }
 
-    private Query(zzr zzr, String str, SortOrder sortOrder, List<String> list, boolean z, List<DriveSpace> list2, Set<DriveSpace> set, boolean z2) {
-        this.zzgmu = zzr;
-        this.zzgmv = str;
-        this.zzgmw = sortOrder;
-        this.zzgmx = list;
-        this.zzgmy = z;
-        this.zzgew = list2;
-        this.zzgex = set;
-        this.zzgmz = z2;
+    @Constructor
+    Query(@Param(mo13993id = 1) zzr zzr, @Param(mo13993id = 3) String str, @Nullable @Param(mo13993id = 4) SortOrder sortOrder, @Param(mo13993id = 5) @NonNull List<String> list, @Param(mo13993id = 6) boolean z, @Param(mo13993id = 7) @NonNull List<DriveSpace> list2, @Param(mo13993id = 8) boolean z2) {
+        this.zzkw = zzr;
+        this.zzkx = str;
+        this.zzky = sortOrder;
+        this.zzkz = list;
+        this.zzla = z;
+        this.zzbw = list2;
+        this.zzlb = z2;
     }
 
-    Query(zzr zzr, String str, SortOrder sortOrder, List<String> list, boolean z, List<DriveSpace> list2, boolean z2) {
-        this(zzr, str, sortOrder, (List) list, z, (List) list2, list2 == null ? null : new HashSet(list2), z2);
-    }
-
-    private Query(zzr zzr, String str, SortOrder sortOrder, List<String> list, boolean z, Set<DriveSpace> set, boolean z2) {
-        this(zzr, str, sortOrder, (List) list, z, set == null ? null : new ArrayList(set), (Set) set, z2);
+    private Query(zzr zzr, String str, SortOrder sortOrder, @NonNull List<String> list, boolean z, @NonNull Set<DriveSpace> set, boolean z2) {
+        this(zzr, str, sortOrder, list, z, (List<DriveSpace>) new ArrayList<DriveSpace>(set), z2);
     }
 
     public Filter getFilter() {
-        return this.zzgmu;
+        return this.zzkw;
     }
 
     @Deprecated
     public String getPageToken() {
-        return this.zzgmv;
+        return this.zzkx;
     }
 
+    @Nullable
     public SortOrder getSortOrder() {
-        return this.zzgmw;
+        return this.zzky;
     }
 
     public String toString() {
-        return String.format(Locale.US, "Query[%s,%s,PageToken=%s,Spaces=%s]", new Object[]{this.zzgmu, this.zzgmw, this.zzgmv, this.zzgew});
+        return String.format(Locale.US, "Query[%s,%s,PageToken=%s,Spaces=%s]", new Object[]{this.zzkw, this.zzky, this.zzkx, this.zzbw});
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.zzgmu, i, false);
-        zzd.zza(parcel, 3, this.zzgmv, false);
-        zzd.zza(parcel, 4, this.zzgmw, i, false);
-        zzd.zzb(parcel, 5, this.zzgmx, false);
-        zzd.zza(parcel, 6, this.zzgmy);
-        zzd.zzc(parcel, 7, this.zzgew, false);
-        zzd.zza(parcel, 8, this.zzgmz);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 1, this.zzkw, i, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzkx, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, this.zzky, i, false);
+        SafeParcelWriter.writeStringList(parcel, 5, this.zzkz, false);
+        SafeParcelWriter.writeBoolean(parcel, 6, this.zzla);
+        SafeParcelWriter.writeTypedList(parcel, 7, this.zzbw, false);
+        SafeParcelWriter.writeBoolean(parcel, 8, this.zzlb);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final Set<DriveSpace> zzanx() {
-        return this.zzgex;
+    public final Set<DriveSpace> zzba() {
+        return new HashSet(this.zzbw);
     }
 }

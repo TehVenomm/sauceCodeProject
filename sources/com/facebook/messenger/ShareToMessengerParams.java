@@ -16,7 +16,7 @@ public class ShareToMessengerParams {
     public final Uri uri;
 
     static {
-        Set hashSet = new HashSet();
+        HashSet hashSet = new HashSet();
         hashSet.add("image/*");
         hashSet.add("image/jpeg");
         hashSet.add("image/png");
@@ -27,15 +27,15 @@ public class ShareToMessengerParams {
         hashSet.add("audio/*");
         hashSet.add("audio/mpeg");
         VALID_MIME_TYPES = Collections.unmodifiableSet(hashSet);
-        hashSet = new HashSet();
-        hashSet.add(Param.CONTENT);
-        hashSet.add("android.resource");
-        hashSet.add("file");
-        VALID_URI_SCHEMES = Collections.unmodifiableSet(hashSet);
-        hashSet = new HashSet();
-        hashSet.add("http");
-        hashSet.add("https");
-        VALID_EXTERNAL_URI_SCHEMES = Collections.unmodifiableSet(hashSet);
+        HashSet hashSet2 = new HashSet();
+        hashSet2.add(Param.CONTENT);
+        hashSet2.add("android.resource");
+        hashSet2.add("file");
+        VALID_URI_SCHEMES = Collections.unmodifiableSet(hashSet2);
+        HashSet hashSet3 = new HashSet();
+        hashSet3.add("http");
+        hashSet3.add("https");
+        VALID_EXTERNAL_URI_SCHEMES = Collections.unmodifiableSet(hashSet3);
     }
 
     ShareToMessengerParams(ShareToMessengerParamsBuilder shareToMessengerParamsBuilder) {
@@ -56,7 +56,7 @@ public class ShareToMessengerParams {
         }
     }
 
-    public static ShareToMessengerParamsBuilder newBuilder(Uri uri, String str) {
-        return new ShareToMessengerParamsBuilder(uri, str);
+    public static ShareToMessengerParamsBuilder newBuilder(Uri uri2, String str) {
+        return new ShareToMessengerParamsBuilder(uri2, str);
     }
 }

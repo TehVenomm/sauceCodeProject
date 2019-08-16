@@ -9,7 +9,7 @@ public class QuestInvitationInGameButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween((Enum)UI.OBJ_TWEEN, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 		base.OnOpen();
 	}
 

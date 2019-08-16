@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Destroyer
+public class Destroyer : MonoBehaviour
 {
 	public float time;
 
@@ -28,7 +28,6 @@ public class Destroyer
 
 	public void DestroyGameObject()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		Object.Destroy(this.get_gameObject());
 	}
 }

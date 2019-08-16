@@ -3,6 +3,7 @@ using GooglePlayGames.Native.Cwrapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -12,20 +13,35 @@ namespace GooglePlayGames.Native.PInvoke
 	{
 		private static readonly string sServiceId = ReadServiceId();
 
+		[CompilerGenerated]
+		private static Func<IntPtr, NativeStartAdvertisingResult> _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, NativeConnectionRequest> _003C_003Ef__mg_0024cache1;
+
+		[CompilerGenerated]
+		private static NearbyConnectionTypes.StartAdvertisingCallback _003C_003Ef__mg_0024cache2;
+
+		[CompilerGenerated]
+		private static NearbyConnectionTypes.ConnectionRequestCallback _003C_003Ef__mg_0024cache3;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, NativeConnectionResponse> _003C_003Ef__mg_0024cache4;
+
+		[CompilerGenerated]
+		private static NearbyConnectionTypes.ConnectionResponseCallback _003C_003Ef__mg_0024cache5;
+
 		public string AppBundleId
 		{
 			get
 			{
 				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Expected O, but got Unknown
+				//IL_000b: Expected O, but got Unknown
 				AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 				try
 				{
 					AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
 					return @static.Call<string>("getPackageName", new object[0]);
-					IL_002e:
-					string result;
-					return result;
 				}
 				finally
 				{
@@ -138,7 +154,7 @@ namespace GooglePlayGames.Native.PInvoke
 		internal static string ReadServiceId()
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
+			//IL_0015: Expected O, but got Unknown
 			Debug.Log((object)"Initializing ServiceId property!!!!");
 			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 			try
@@ -160,9 +176,6 @@ namespace GooglePlayGames.Native.PInvoke
 					});
 					Debug.Log((object)("SystemId from Manifest: " + text2));
 					return text2;
-					IL_00ad:
-					string result;
-					return result;
 				}
 				finally
 				{

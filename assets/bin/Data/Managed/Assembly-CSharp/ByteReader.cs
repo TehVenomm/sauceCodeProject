@@ -46,7 +46,7 @@ public class ByteReader
 
 	public string ReadLine()
 	{
-		return ReadLine(true);
+		return ReadLine(skipEmptyLines: true);
 	}
 
 	public string ReadLine(bool skipEmptyLines)
@@ -65,12 +65,13 @@ public class ByteReader
 			int num4;
 			do
 			{
-				if (num2 >= num)
+				if (num2 < num)
 				{
-					num2++;
-					break;
+					num4 = mBuffer[num2++];
+					continue;
 				}
-				num4 = mBuffer[num2++];
+				num2++;
+				break;
 			}
 			while (num4 != 10 && num4 != 13);
 			string result = ReadLine(mBuffer, mOffset, num2 - mOffset - 1);
@@ -118,7 +119,7 @@ public class ByteReader
 		{
 			if (flag)
 			{
-				string text2 = ReadLine(false);
+				string text2 = ReadLine(skipEmptyLines: false);
 				if (text2 == null)
 				{
 					return null;
@@ -128,7 +129,7 @@ public class ByteReader
 			}
 			else
 			{
-				text = ReadLine(true);
+				text = ReadLine(skipEmptyLines: true);
 				if (text == null)
 				{
 					return null;

@@ -27,6 +27,7 @@ public final class ServerProtocol {
     public static final String DIALOG_PARAM_SSO_DEVICE = "sso";
     public static final String DIALOG_PARAM_STATE = "state";
     public static final String DIALOG_PATH = "dialog/";
+    public static final String DIALOG_REDIRECT_CHROME_OS_URI = "fbconnect://chrome_os_success";
     public static final String DIALOG_REDIRECT_URI = "fbconnect://success";
     public static final String DIALOG_REREQUEST_AUTH_TYPE = "rerequest";
     public static final String DIALOG_RESPONSE_TYPE_TOKEN_AND_SIGNED_REQUEST = "token,signed_request";
@@ -38,7 +39,7 @@ public final class ServerProtocol {
     public static final String FALLBACK_DIALOG_PARAM_METHOD_ARGS = "method_args";
     public static final String FALLBACK_DIALOG_PARAM_METHOD_RESULTS = "method_results";
     public static final String FALLBACK_DIALOG_PARAM_VERSION = "version";
-    public static final String GRAPH_API_VERSION = "v2.7";
+    private static final String GRAPH_API_VERSION = "v3.2";
     private static final String GRAPH_URL_FORMAT = "https://graph.%s";
     private static final String GRAPH_VIDEO_URL_FORMAT = "https://graph-video.%s";
     private static final String TAG = ServerProtocol.class.getName();
@@ -46,7 +47,7 @@ public final class ServerProtocol {
     public static final Collection<String> errorsProxyAuthDisabled = Utility.unmodifiableCollection("service_disabled", "AndroidAuthKillSwitchException");
     public static final Collection<String> errorsUserCanceled = Utility.unmodifiableCollection("access_denied", "OAuthAccessDeniedException");
 
-    public static final String getAPIVersion() {
+    public static final String getDefaultAPIVersion() {
         return GRAPH_API_VERSION;
     }
 

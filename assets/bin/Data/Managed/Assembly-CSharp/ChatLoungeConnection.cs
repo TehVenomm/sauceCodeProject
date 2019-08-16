@@ -14,6 +14,8 @@ public class ChatLoungeConnection : IChatConnection
 
 	public event ChatRoom.OnReceiveNotification onReceiveNotification;
 
+	public event ChatRoom.OnAfterSendUserMessage onAfterSendUserMessage;
+
 	public event ChatRoom.OnDisconnect onDisconnect;
 
 	public void Connect()
@@ -25,7 +27,7 @@ public class ChatLoungeConnection : IChatConnection
 	{
 		if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
 		{
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.Close(1000, "Bye!", null);
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.Close(1000);
 		}
 		established = false;
 		onFinished?.Invoke();
@@ -50,7 +52,7 @@ public class ChatLoungeConnection : IChatConnection
 		{
 			MonoBehaviourSingleton<LoungeNetworkManager>.I.ChatMessage(message);
 		}
-		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message);
+		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message, string.Empty);
 	}
 
 	public void SendStamp(int stampId)
@@ -59,30 +61,30 @@ public class ChatLoungeConnection : IChatConnection
 		{
 			MonoBehaviourSingleton<LoungeNetworkManager>.I.ChatStamp(stampId);
 		}
-		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId);
+		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId, string.Empty);
 	}
 
-	public void OnReceiveMessage(int userId, string userName, string message)
+	public void OnReceiveMessage(int userId, string userName, string message, string chatItemId = "")
 	{
 		if (isEstablished && this.onReceiveText != null)
 		{
-			this.onReceiveText(userId, userName, message);
+			this.onReceiveText(userId, userName, message, chatItemId);
 		}
 	}
 
-	public void OnReceiveStamp(int userId, string userName, int stampId)
+	public void OnReceiveStamp(int userId, string userName, int stampId, string chatItemId = "")
 	{
 		if (isEstablished && this.onReceiveStamp != null)
 		{
-			this.onReceiveStamp(userId, userName, stampId);
+			this.onReceiveStamp(userId, userName, stampId, chatItemId);
 		}
 	}
 
-	public void OnReceiveNotification(string message)
+	public void OnReceiveNotification(string message, string chatItemId = "")
 	{
 		if (isEstablished && this.onReceiveNotification != null)
 		{
-			this.onReceiveNotification(message);
+			this.onReceiveNotification(message, chatItemId);
 		}
 	}
 }

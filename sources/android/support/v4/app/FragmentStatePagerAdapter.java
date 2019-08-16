@@ -1,22 +1,23 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment.SavedState;
-import android.support.v4.view.PagerAdapter;
+import android.support.p000v4.app.Fragment.SavedState;
+import android.support.p000v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
 
+/* renamed from: android.support.v4.app.FragmentStatePagerAdapter */
 public abstract class FragmentStatePagerAdapter extends PagerAdapter {
     private static final boolean DEBUG = false;
-    private static final String TAG = "FragmentStatePagerAdapter";
+    private static final String TAG = "FragmentStatePagerAdapt";
     private FragmentTransaction mCurTransaction = null;
     private Fragment mCurrentPrimaryItem = null;
     private final FragmentManager mFragmentManager;
-    private ArrayList<Fragment> mFragments = new ArrayList();
-    private ArrayList<SavedState> mSavedState = new ArrayList();
+    private ArrayList<Fragment> mFragments = new ArrayList<>();
+    private ArrayList<SavedState> mSavedState = new ArrayList<>();
 
     public FragmentStatePagerAdapter(FragmentManager fragmentManager) {
         this.mFragmentManager = fragmentManager;
@@ -109,13 +110,16 @@ public abstract class FragmentStatePagerAdapter extends PagerAdapter {
         Bundle bundle = null;
         if (this.mSavedState.size() > 0) {
             bundle = new Bundle();
-            Parcelable[] parcelableArr = new SavedState[this.mSavedState.size()];
-            this.mSavedState.toArray(parcelableArr);
-            bundle.putParcelableArray("states", parcelableArr);
+            SavedState[] savedStateArr = new SavedState[this.mSavedState.size()];
+            this.mSavedState.toArray(savedStateArr);
+            bundle.putParcelableArray("states", savedStateArr);
         }
         int i = 0;
-        Bundle bundle2 = bundle;
-        while (i < this.mFragments.size()) {
+        while (true) {
+            Bundle bundle2 = bundle;
+            if (i >= this.mFragments.size()) {
+                return bundle2;
+            }
             Fragment fragment = (Fragment) this.mFragments.get(i);
             if (fragment != null && fragment.isAdded()) {
                 if (bundle2 == null) {
@@ -123,10 +127,9 @@ public abstract class FragmentStatePagerAdapter extends PagerAdapter {
                 }
                 this.mFragmentManager.putFragment(bundle2, "f" + i, fragment);
             }
+            bundle = bundle2;
             i++;
-            bundle2 = bundle2;
         }
-        return bundle2;
     }
 
     public void setPrimaryItem(ViewGroup viewGroup, int i, Object obj) {

@@ -27,7 +27,7 @@ final class DefaultDateTypeAdapter implements JsonSerializer<Date>, JsonDeserial
     }
 
     DefaultDateTypeAdapter(String str) {
-        this(new SimpleDateFormat(str, Locale.US), new SimpleDateFormat(str));
+        this((DateFormat) new SimpleDateFormat(str, Locale.US), (DateFormat) new SimpleDateFormat(str));
     }
 
     DefaultDateTypeAdapter(DateFormat dateFormat, DateFormat dateFormat2) {
@@ -43,14 +43,12 @@ final class DefaultDateTypeAdapter implements JsonSerializer<Date>, JsonDeserial
             try {
                 parse = this.localFormat.parse(jsonElement.getAsString());
             } catch (ParseException e) {
+                throw new JsonSyntaxException(jsonElement.getAsString(), e);
+            } catch (ParseException e2) {
                 try {
                     parse = this.enUsFormat.parse(jsonElement.getAsString());
-                } catch (ParseException e2) {
-                    try {
-                        parse = this.iso8601Format.parse(jsonElement.getAsString());
-                    } catch (Throwable e3) {
-                        throw new JsonSyntaxException(jsonElement.getAsString(), e3);
-                    }
+                } catch (ParseException e3) {
+                    parse = this.iso8601Format.parse(jsonElement.getAsString());
                 }
             }
         }
@@ -58,24 +56,24 @@ final class DefaultDateTypeAdapter implements JsonSerializer<Date>, JsonDeserial
     }
 
     public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        if (jsonElement instanceof JsonPrimitive) {
-            Date deserializeToDate = deserializeToDate(jsonElement);
-            if (type == Date.class) {
-                return deserializeToDate;
-            }
-            if (type == Timestamp.class) {
-                return new Timestamp(deserializeToDate.getTime());
-            }
-            if (type == java.sql.Date.class) {
-                return new java.sql.Date(deserializeToDate.getTime());
-            }
-            throw new IllegalArgumentException(getClass() + " cannot deserialize to " + type);
+        if (!(jsonElement instanceof JsonPrimitive)) {
+            throw new JsonParseException("The date should be a string value");
         }
-        throw new JsonParseException("The date should be a string value");
+        Date deserializeToDate = deserializeToDate(jsonElement);
+        if (type == Date.class) {
+            return deserializeToDate;
+        }
+        if (type == Timestamp.class) {
+            return new Timestamp(deserializeToDate.getTime());
+        }
+        if (type == java.sql.Date.class) {
+            return new java.sql.Date(deserializeToDate.getTime());
+        }
+        throw new IllegalArgumentException(getClass() + " cannot deserialize to " + type);
     }
 
     public JsonElement serialize(Date date, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonElement jsonPrimitive;
+        JsonPrimitive jsonPrimitive;
         synchronized (this.localFormat) {
             jsonPrimitive = new JsonPrimitive(this.enUsFormat.format(date));
         }
@@ -83,9 +81,9 @@ final class DefaultDateTypeAdapter implements JsonSerializer<Date>, JsonDeserial
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(DefaultDateTypeAdapter.class.getSimpleName());
-        stringBuilder.append('(').append(this.localFormat.getClass().getSimpleName()).append(')');
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(DefaultDateTypeAdapter.class.getSimpleName());
+        sb.append('(').append(this.localFormat.getClass().getSimpleName()).append(')');
+        return sb.toString();
     }
 }

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 {
-	private class Pool_InstantiateData
+	private class Pool_InstantiateData : rymTPool<InstantiateData>
 	{
 	}
 
-	private class Pool_StockData
+	private class Pool_StockData : rymTPool<StockData>
 	{
 	}
 
@@ -60,13 +60,13 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		}
 	}
 
-	private const int LIMIT_STOCK_COUNT = 1;
-
 	private BetterList<InstantiateData> requests = new BetterList<InstantiateData>();
 
 	private BetterList<StockData> stocks = new BetterList<StockData>();
 
 	private Transform inactiveRoot;
+
+	private const int LIMIT_STOCK_COUNT = 1;
 
 	public static bool isBusy
 	{
@@ -92,9 +92,8 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 
 	protected override void Awake()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		inactiveRoot = Utility.CreateGameObject("InactiveRoot", base._transform, -1);
+		inactiveRoot = Utility.CreateGameObject("InactiveRoot", base._transform);
 		inactiveRoot.get_gameObject().SetActive(false);
 		this.set_enabled(false);
 	}
@@ -127,7 +126,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 			data.stockData = null;
 			while (stocks.size >= 1)
 			{
-				RemoveStockAt(0, true);
+				RemoveStockAt(0, with_destroy: true);
 			}
 		}
 	}
@@ -148,7 +147,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 				{
 					return num;
 				}
-				RemoveStockAt(num, false);
+				RemoveStockAt(num, with_destroy: false);
 			}
 		}
 		return -1;
@@ -201,8 +200,7 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 	private static void DoInstantiate(ref InstantiateData data)
 	{
 		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Expected O, but got Unknown
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0063: Expected O, but got Unknown
 		if (data.master != null && data.callback != null)
 		{
 			if (data.isInactivateInstantiatedObject)
@@ -301,18 +299,16 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		StockData stockData = MonoBehaviourSingleton<InstantiateManager>.I.stocks.buffer[num];
 		Object instantiatedObject = stockData.instantiatedObject;
 		Object originalObject = stockData.originalObject;
-		MonoBehaviourSingleton<InstantiateManager>.I.RemoveStockAt(num, false);
+		MonoBehaviourSingleton<InstantiateManager>.I.RemoveStockAt(num, with_destroy: false);
 		if ((category == RESOURCE_CATEGORY.EFFECT_ACTION || category == RESOURCE_CATEGORY.EFFECT_UI) && originalObject != null)
 		{
-			RequestStock(category, originalObject, name, false);
+			RequestStock(category, originalObject, name, is_one: false);
 		}
 		return instantiatedObject;
 	}
 
 	public static Transform Realizes(ref GameObject inactive_inctance, Transform parent, int layer)
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Expected O, but got Unknown
 		if (inactive_inctance == null)
 		{
 			return null;
@@ -321,17 +317,17 @@ public class InstantiateManager : MonoBehaviourSingleton<InstantiateManager>
 		name = ResourceName.Normalize(name);
 		name = name.Replace("(Clone)", string.Empty);
 		inactive_inctance.set_name(name);
-		Transform val = inactive_inctance.get_transform();
+		Transform transform = inactive_inctance.get_transform();
 		if (parent != null)
 		{
-			Utility.Attach(parent, val);
+			Utility.Attach(parent, transform);
 		}
 		if (layer != -1)
 		{
-			Utility.SetLayerWithChildren(val, layer);
+			Utility.SetLayerWithChildren(transform, layer);
 		}
 		inactive_inctance.set_hideFlags(0);
 		inactive_inctance = null;
-		return val;
+		return transform;
 	}
 }

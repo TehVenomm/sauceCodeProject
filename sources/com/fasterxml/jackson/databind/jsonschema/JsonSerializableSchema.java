@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 public @interface JsonSerializableSchema {
     public static final String NO_VALUE = "##irrelevant";
 
-    String id() default "";
+    /* renamed from: id */
+    String mo11568id() default "";
 
     @Deprecated
     String schemaItemDefinition() default "##irrelevant";

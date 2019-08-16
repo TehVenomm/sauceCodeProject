@@ -57,41 +57,44 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 	public override void Initialize()
 	{
 		object[] array = GameSection.GetEventData() as object[];
-		tab = (ItemStorageTop.TAB_MODE)(int)array[0];
+		tab = (ItemStorageTop.TAB_MODE)array[0];
 		sellData = (array[1] as List<SortCompareData>);
 		if (array.Length > 2)
 		{
-			goBackTo = (GO_BACK)(int)array[2];
+			goBackTo = (GO_BACK)array[2];
 		}
 		base.isRareConfirm = false;
 		base.isEquipConfirm = false;
 		base.isExceedConfirm = false;
 		base.isExceedEquipmentConfirm = false;
-		sellData.ForEach(delegate(SortCompareData sort_data)
+		int i = 0;
+		for (int count = sellData.Count; i < count; i++)
 		{
-			if (!base.isRareConfirm || !base.isEquipConfirm || (!base.isExceedConfirm && !base.isExceedEquipmentConfirm))
+			SortCompareData sortCompareData = sellData[i];
+			if (base.isRareConfirm && base.isEquipConfirm && (base.isExceedConfirm || base.isExceedEquipmentConfirm))
 			{
-				if (!base.isRareConfirm && GameDefine.IsRare(sort_data.GetRarity()))
+				continue;
+			}
+			if (!base.isRareConfirm && GameDefine.IsRequiredAlertByRarity(sortCompareData.GetRarity()))
+			{
+				base.isRareConfirm = true;
+			}
+			if (!base.isEquipConfirm && sortCompareData.IsEquipping())
+			{
+				base.isEquipConfirm = true;
+			}
+			if (!base.isExceedConfirm && !base.isExceedEquipmentConfirm && sortCompareData.IsExceeded())
+			{
+				if (sortCompareData.GetMaterialType() == REWARD_TYPE.EQUIP_ITEM)
 				{
-					base.isRareConfirm = true;
+					base.isExceedEquipmentConfirm = true;
 				}
-				if (!base.isEquipConfirm && sort_data.IsEquipping())
+				else
 				{
-					base.isEquipConfirm = true;
-				}
-				if (!base.isExceedConfirm && !base.isExceedEquipmentConfirm && sort_data.IsExceeded())
-				{
-					if (sort_data.GetMaterialType() == REWARD_TYPE.EQUIP_ITEM)
-					{
-						base.isExceedEquipmentConfirm = true;
-					}
-					else
-					{
-						base.isExceedConfirm = true;
-					}
+					base.isExceedConfirm = true;
 				}
 			}
-		});
+		}
 		base.Initialize();
 	}
 
@@ -100,19 +103,19 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 		base.DrawIcon();
 		NeedMaterial[] reward_ary = CreateNeedMaterialAry();
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_REWARD_ICON, null, sELL_SELECT_MAX, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (i < reward_ary.Length)
 			{
 				NeedMaterial needMaterial = reward_ary[i];
-				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, needMaterial.itemID, t, needMaterial.num, "NONE", 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-				itemIcon.SetRewardBG(true);
+				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, needMaterial.itemID, t, needMaterial.num, "NONE");
+				itemIcon.SetRewardBG(is_visible: true);
 				Transform ctrl = GetCtrl(UI.GRD_REWARD_ICON);
 				SetMaterialInfo(itemIcon.transform, REWARD_TYPE.ITEM, needMaterial.itemID, ctrl);
 			}
 			else
 			{
-				SetActive(t, false);
+				SetActive(t, is_visible: false);
 			}
 		});
 		SetActive((Enum)UI.STR_NON_REWARD, reward_ary.Length == 0);
@@ -208,7 +211,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellEquipItem(uniqs, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 		else if (tab == ItemStorageTop.TAB_MODE.MATERIAL)
@@ -216,7 +219,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellItem(uniqs, nums, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 		else
@@ -224,7 +227,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellSkillItem(uniqs, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 	}
@@ -243,6 +246,6 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 
 	protected virtual void ChangeEventForGoBack()
 	{
-		GameSection.ChangeEvent(GameSceneEvent.current.eventName + "_" + goBackTo, null);
+		GameSection.ChangeEvent(GameSceneEvent.current.eventName + "_" + goBackTo);
 	}
 }

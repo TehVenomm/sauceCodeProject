@@ -1,6 +1,5 @@
 package org.apache.commons.lang3.time;
 
-import android.support.v4.view.MotionEventCompat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,29 +9,36 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 public class DurationFormatUtils {
+
     /* renamed from: H */
-    static final Object f1351H = "H";
+    static final Object f1426H = "H";
     public static final String ISO_EXTENDED_FORMAT_PATTERN = "'P'yyyy'Y'M'M'd'DT'H'H'm'M's.SSS'S'";
+
     /* renamed from: M */
-    static final Object f1352M = "M";
+    static final Object f1427M = "M";
+
     /* renamed from: S */
-    static final Object f1353S = "S";
+    static final Object f1428S = "S";
+
     /* renamed from: d */
-    static final Object f1354d = "d";
+    static final Object f1429d = "d";
+
     /* renamed from: m */
-    static final Object f1355m = "m";
+    static final Object f1430m = "m";
+
     /* renamed from: s */
-    static final Object f1356s = "s";
+    static final Object f1431s = "s";
+
     /* renamed from: y */
-    static final Object f1357y = "y";
+    static final Object f1432y = "y";
 
     static class Token {
         private int count;
         private final Object value;
 
         static boolean containsTokenWithValue(Token[] tokenArr, Object obj) {
-            for (Token value : tokenArr) {
-                if (value.getValue() == obj) {
+            for (Token value2 : tokenArr) {
+                if (value2.getValue() == obj) {
                     return true;
                 }
             }
@@ -49,15 +55,18 @@ public class DurationFormatUtils {
             this.count = i;
         }
 
-        void increment() {
+        /* access modifiers changed from: 0000 */
+        public void increment() {
             this.count++;
         }
 
-        int getCount() {
+        /* access modifiers changed from: 0000 */
+        public int getCount() {
             return this.count;
         }
 
-        Object getValue() {
+        /* access modifiers changed from: 0000 */
+        public Object getValue() {
             return this.value;
         }
 
@@ -110,19 +119,19 @@ public class DurationFormatUtils {
         long j4 = 0;
         long j5 = 0;
         long j6 = 0;
-        if (Token.containsTokenWithValue(lexx, f1354d)) {
+        if (Token.containsTokenWithValue(lexx, f1429d)) {
             j3 = j / DateUtils.MILLIS_PER_DAY;
             j -= DateUtils.MILLIS_PER_DAY * j3;
         }
-        if (Token.containsTokenWithValue(lexx, f1351H)) {
+        if (Token.containsTokenWithValue(lexx, f1426H)) {
             j4 = j / DateUtils.MILLIS_PER_HOUR;
             j -= DateUtils.MILLIS_PER_HOUR * j4;
         }
-        if (Token.containsTokenWithValue(lexx, f1355m)) {
+        if (Token.containsTokenWithValue(lexx, f1430m)) {
             j5 = j / 60000;
             j -= 60000 * j5;
         }
-        if (Token.containsTokenWithValue(lexx, f1356s)) {
+        if (Token.containsTokenWithValue(lexx, f1431s)) {
             j6 = j / 1000;
             j2 = j - (1000 * j6);
         } else {
@@ -132,15 +141,14 @@ public class DurationFormatUtils {
     }
 
     public static String formatDurationWords(long j, boolean z, boolean z2) {
-        String str;
         String formatDuration = formatDuration(j, "d' days 'H' hours 'm' minutes 's' seconds'");
         if (z) {
-            str = " " + formatDuration;
+            String str = " " + formatDuration;
             formatDuration = StringUtils.replaceOnce(str, " 0 days", "");
             if (formatDuration.length() != str.length()) {
-                str = StringUtils.replaceOnce(formatDuration, " 0 hours", "");
-                if (str.length() != formatDuration.length()) {
-                    formatDuration = StringUtils.replaceOnce(str, " 0 minutes", "");
+                String replaceOnce = StringUtils.replaceOnce(formatDuration, " 0 hours", "");
+                if (replaceOnce.length() != formatDuration.length()) {
+                    formatDuration = StringUtils.replaceOnce(replaceOnce, " 0 minutes", "");
                     if (formatDuration.length() != formatDuration.length()) {
                         formatDuration = StringUtils.replaceOnce(formatDuration, " 0 seconds", "");
                     }
@@ -153,16 +161,16 @@ public class DurationFormatUtils {
             }
         }
         if (z2) {
-            str = StringUtils.replaceOnce(formatDuration, " 0 seconds", "");
-            if (str.length() != formatDuration.length()) {
-                formatDuration = StringUtils.replaceOnce(str, " 0 minutes", "");
-                if (formatDuration.length() != str.length()) {
-                    str = StringUtils.replaceOnce(formatDuration, " 0 hours", "");
-                    if (str.length() != formatDuration.length()) {
-                        formatDuration = StringUtils.replaceOnce(str, " 0 days", "");
+            String replaceOnce2 = StringUtils.replaceOnce(formatDuration, " 0 seconds", "");
+            if (replaceOnce2.length() != formatDuration.length()) {
+                formatDuration = StringUtils.replaceOnce(replaceOnce2, " 0 minutes", "");
+                if (formatDuration.length() != replaceOnce2.length()) {
+                    String replaceOnce3 = StringUtils.replaceOnce(formatDuration, " 0 hours", "");
+                    if (replaceOnce3.length() != formatDuration.length()) {
+                        formatDuration = StringUtils.replaceOnce(replaceOnce3, " 0 days", "");
                     }
                 } else {
-                    formatDuration = str;
+                    formatDuration = replaceOnce2;
                 }
             }
         }
@@ -183,151 +191,156 @@ public class DurationFormatUtils {
         int i3;
         int i4;
         int i5;
+        int i6;
+        int i7;
+        int i8;
+        int i9;
+        int i10;
         Validate.isTrue(j <= j2, "startMillis must not be greater than endMillis", new Object[0]);
         Token[] lexx = lexx(str);
         Calendar instance = Calendar.getInstance(timeZone);
         instance.setTime(new Date(j));
         Calendar instance2 = Calendar.getInstance(timeZone);
         instance2.setTime(new Date(j2));
-        int i6 = instance2.get(14) - instance.get(14);
-        int i7 = instance2.get(13) - instance.get(13);
-        int i8 = instance2.get(12) - instance.get(12);
-        int i9 = instance2.get(11) - instance.get(11);
-        int i10 = instance2.get(5) - instance.get(5);
-        int i11 = instance2.get(2) - instance.get(2);
-        int i12 = instance2.get(1) - instance.get(1);
-        while (i6 < 0) {
-            i6 += 1000;
-            i7--;
+        int i11 = instance2.get(14) - instance.get(14);
+        int i12 = instance2.get(13) - instance.get(13);
+        int i13 = instance2.get(12) - instance.get(12);
+        int i14 = instance2.get(11) - instance.get(11);
+        int i15 = instance2.get(5) - instance.get(5);
+        int i16 = instance2.get(2) - instance.get(2);
+        int i17 = instance2.get(1) - instance.get(1);
+        while (i11 < 0) {
+            i11 += 1000;
+            i12--;
         }
-        while (i7 < 0) {
-            i7 += 60;
-            i8--;
+        while (i12 < 0) {
+            i12 += 60;
+            i13--;
         }
-        while (i8 < 0) {
-            i8 += 60;
-            i9--;
+        while (i13 < 0) {
+            i13 += 60;
+            i14--;
         }
-        while (i9 < 0) {
-            i9 += 24;
-            i10--;
+        while (i14 < 0) {
+            i14 += 24;
+            i15--;
         }
-        if (Token.containsTokenWithValue(lexx, f1352M)) {
-            int i13 = i11;
-            i11 = i10;
-            i10 = i13;
-            while (i11 < 0) {
-                i11 += instance.getActualMaximum(5);
-                i10--;
+        if (Token.containsTokenWithValue(lexx, f1427M)) {
+            int i18 = i15;
+            while (i18 < 0) {
+                i18 += instance.getActualMaximum(5);
+                i16--;
                 instance.add(2, 1);
             }
-            while (i10 < 0) {
-                i10 += 12;
-                i12--;
+            int i19 = i16;
+            while (i19 < 0) {
+                i19 += 12;
+                i17--;
             }
-            if (!(Token.containsTokenWithValue(lexx, f1357y) || i12 == 0)) {
-                while (i12 != 0) {
-                    i10 += i12 * 12;
-                    i12 = 0;
+            if (!Token.containsTokenWithValue(lexx, f1432y) && i17 != 0) {
+                while (i17 != 0) {
+                    i19 += i17 * 12;
+                    i17 = 0;
                 }
             }
+            i2 = i19;
+            i = i18;
         } else {
-            if (!Token.containsTokenWithValue(lexx, f1357y)) {
-                i12 = instance2.get(1);
-                if (i11 < 0) {
-                    i12--;
+            if (!Token.containsTokenWithValue(lexx, f1432y)) {
+                int i20 = instance2.get(1);
+                if (i16 < 0) {
+                    i20--;
                 }
-                while (instance.get(1) != i12) {
-                    i10 += instance.getActualMaximum(6) - instance.get(6);
+                while (instance.get(1) != i20) {
+                    int actualMaximum = i15 + (instance.getActualMaximum(6) - instance.get(6));
                     if ((instance instanceof GregorianCalendar) && instance.get(2) == 1 && instance.get(5) == 29) {
-                        i10++;
+                        actualMaximum++;
                     }
                     instance.add(1, 1);
-                    i10 += instance.get(6);
+                    i15 = actualMaximum + instance.get(6);
                 }
-                i12 = 0;
+                i17 = 0;
             }
             while (instance.get(2) != instance2.get(2)) {
-                i10 += instance.getActualMaximum(5);
+                i15 += instance.getActualMaximum(5);
                 instance.add(2, 1);
             }
-            i11 = i10;
-            i10 = 0;
-            while (i11 < 0) {
-                i11 += instance.getActualMaximum(5);
-                i10--;
+            int i21 = 0;
+            while (i15 < 0) {
+                i15 += instance.getActualMaximum(5);
+                i21--;
                 instance.add(2, 1);
             }
+            i2 = i21;
+            i = i15;
         }
-        int i14 = i10;
-        i10 = i11;
-        if (Token.containsTokenWithValue(lexx, f1354d)) {
-            i = i10;
-            i10 = i9;
-        } else {
-            i = 0;
-            i10 = i9 + (i10 * 24);
-        }
-        if (Token.containsTokenWithValue(lexx, f1351H)) {
-            i2 = i10;
-            i10 = i8;
-        } else {
-            i2 = 0;
-            i10 = i8 + (i10 * 60);
-        }
-        if (Token.containsTokenWithValue(lexx, f1355m)) {
-            i3 = i10;
-            i10 = i7;
-        } else {
+        if (!Token.containsTokenWithValue(lexx, f1429d)) {
+            i4 = (i * 24) + i14;
             i3 = 0;
-            i10 = i7 + (i10 * 60);
-        }
-        if (Token.containsTokenWithValue(lexx, f1356s)) {
-            i4 = i10;
-            i5 = i6;
         } else {
-            i4 = 0;
-            i5 = i6 + (i10 * 1000);
+            i3 = i;
+            i4 = i14;
         }
-        return format(lexx, (long) i12, (long) i14, (long) i, (long) i2, (long) i3, (long) i4, (long) i5, z);
+        if (!Token.containsTokenWithValue(lexx, f1426H)) {
+            i6 = i13 + (i4 * 60);
+            i5 = 0;
+        } else {
+            i5 = i4;
+            i6 = i13;
+        }
+        if (!Token.containsTokenWithValue(lexx, f1430m)) {
+            i8 = (i6 * 60) + i12;
+            i7 = 0;
+        } else {
+            i7 = i6;
+            i8 = i12;
+        }
+        if (!Token.containsTokenWithValue(lexx, f1431s)) {
+            i9 = 0;
+            i10 = i11 + (i8 * 1000);
+        } else {
+            i9 = i8;
+            i10 = i11;
+        }
+        return format(lexx, (long) i17, (long) i2, (long) i3, (long) i5, (long) i7, (long) i9, (long) i10, z);
     }
 
     static String format(Token[] tokenArr, long j, long j2, long j3, long j4, long j5, long j6, long j7, boolean z) {
-        StringBuilder stringBuilder = new StringBuilder();
-        Object obj = null;
+        StringBuilder sb = new StringBuilder();
+        boolean z2 = false;
         for (Token token : tokenArr) {
             Object value = token.getValue();
             int count = token.getCount();
             if (value instanceof StringBuilder) {
-                stringBuilder.append(value.toString());
-            } else if (value == f1357y) {
-                stringBuilder.append(paddedValue(j, z, count));
-                obj = null;
-            } else if (value == f1352M) {
-                stringBuilder.append(paddedValue(j2, z, count));
-                obj = null;
-            } else if (value == f1354d) {
-                stringBuilder.append(paddedValue(j3, z, count));
-                obj = null;
-            } else if (value == f1351H) {
-                stringBuilder.append(paddedValue(j4, z, count));
-                obj = null;
-            } else if (value == f1355m) {
-                stringBuilder.append(paddedValue(j5, z, count));
-                obj = null;
-            } else if (value == f1356s) {
-                stringBuilder.append(paddedValue(j6, z, count));
-                obj = 1;
-            } else if (value == f1353S) {
-                if (obj != null) {
-                    stringBuilder.append(paddedValue(j7, true, z ? Math.max(3, count) : 3));
+                sb.append(value.toString());
+            } else if (value == f1432y) {
+                sb.append(paddedValue(j, z, count));
+                z2 = false;
+            } else if (value == f1427M) {
+                sb.append(paddedValue(j2, z, count));
+                z2 = false;
+            } else if (value == f1429d) {
+                sb.append(paddedValue(j3, z, count));
+                z2 = false;
+            } else if (value == f1426H) {
+                sb.append(paddedValue(j4, z, count));
+                z2 = false;
+            } else if (value == f1430m) {
+                sb.append(paddedValue(j5, z, count));
+                z2 = false;
+            } else if (value == f1431s) {
+                sb.append(paddedValue(j6, z, count));
+                z2 = true;
+            } else if (value == f1428S) {
+                if (z2) {
+                    sb.append(paddedValue(j7, true, z ? Math.max(3, count) : 3));
                 } else {
-                    stringBuilder.append(paddedValue(j7, z, count));
+                    sb.append(paddedValue(j7, z, count));
                 }
-                obj = null;
+                z2 = false;
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private static String paddedValue(long j, boolean z, int i) {
@@ -336,71 +349,72 @@ public class DurationFormatUtils {
     }
 
     static Token[] lexx(String str) {
+        Object obj;
         ArrayList arrayList = new ArrayList(str.length());
         Token token = null;
-        StringBuilder stringBuilder = null;
-        Object obj = null;
+        StringBuilder sb = null;
+        boolean z = false;
         for (int i = 0; i < str.length(); i++) {
             char charAt = str.charAt(i);
-            if (obj == null || charAt == '\'') {
-                Object obj2;
+            if (!z || charAt == '\'') {
                 switch (charAt) {
-                    case MotionEventCompat.AXIS_GENERIC_8 /*39*/:
-                        if (obj == null) {
-                            stringBuilder = new StringBuilder();
-                            arrayList.add(new Token(stringBuilder));
-                            obj = 1;
-                            obj2 = null;
+                    case '\'':
+                        if (!z) {
+                            sb = new StringBuilder();
+                            arrayList.add(new Token(sb));
+                            z = true;
+                            obj = null;
+                            break;
+                        } else {
+                            obj = null;
+                            sb = null;
+                            z = false;
                             break;
                         }
-                        obj2 = null;
-                        stringBuilder = null;
-                        obj = null;
-                        break;
                     case 'H':
-                        obj2 = f1351H;
+                        obj = f1426H;
                         break;
                     case 'M':
-                        obj2 = f1352M;
+                        obj = f1427M;
                         break;
                     case 'S':
-                        obj2 = f1353S;
+                        obj = f1428S;
                         break;
                     case 'd':
-                        obj2 = f1354d;
+                        obj = f1429d;
                         break;
                     case 'm':
-                        obj2 = f1355m;
+                        obj = f1430m;
                         break;
                     case 's':
-                        obj2 = f1356s;
+                        obj = f1431s;
                         break;
                     case 'y':
-                        obj2 = f1357y;
+                        obj = f1432y;
                         break;
                     default:
-                        if (stringBuilder == null) {
-                            stringBuilder = new StringBuilder();
-                            arrayList.add(new Token(stringBuilder));
+                        if (sb == null) {
+                            sb = new StringBuilder();
+                            arrayList.add(new Token(sb));
                         }
-                        stringBuilder.append(charAt);
-                        obj2 = null;
+                        sb.append(charAt);
+                        obj = null;
                         break;
                 }
-                if (obj2 != null) {
-                    if (token == null || token.getValue() != obj2) {
-                        token = new Token(obj2);
+                if (obj != null) {
+                    if (token == null || token.getValue() != obj) {
+                        token = new Token(obj);
                         arrayList.add(token);
                     } else {
                         token.increment();
                     }
-                    stringBuilder = null;
+                    sb = null;
                 }
             } else {
-                stringBuilder.append(charAt);
+                sb.append(charAt);
             }
         }
-        if (obj == null) {
+        if (!z) {
             return (Token[]) arrayList.toArray(new Token[arrayList.size()]);
         }
         throw new IllegalArgumentException("Unmatched quote in format: " + str);

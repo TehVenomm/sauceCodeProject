@@ -4,13 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace BestHTTP.Decompression.Crc
 {
-	[ComVisible(true)]
 	[Guid("ebc25cf6-9120-4283-b972-0e5520d0000C")]
+	[ComVisible(true)]
 	[ClassInterface(ClassInterfaceType.AutoDispatch)]
 	internal class CRC32
 	{
-		private const int BUFFER_SIZE = 8192;
-
 		private uint dwPolynomial;
 
 		private long _TotalBytesRead;
@@ -19,6 +17,8 @@ namespace BestHTTP.Decompression.Crc
 
 		private uint[] crc32Table;
 
+		private const int BUFFER_SIZE = 8192;
+
 		private uint _register = uint.MaxValue;
 
 		public long TotalBytesRead => _TotalBytesRead;
@@ -26,7 +26,7 @@ namespace BestHTTP.Decompression.Crc
 		public int Crc32Result => (int)(~_register);
 
 		public CRC32()
-			: this(false)
+			: this(reverseBits: false)
 		{
 		}
 
@@ -203,42 +203,43 @@ namespace BestHTTP.Decompression.Crc
 		{
 			uint[] array = new uint[32];
 			uint[] array2 = new uint[32];
-			if (length != 0)
+			if (length == 0)
 			{
-				uint num = ~_register;
-				array2[0] = dwPolynomial;
-				uint num2 = 1u;
-				for (int i = 1; i < 32; i++)
-				{
-					array2[i] = num2;
-					num2 <<= 1;
-				}
-				gf2_matrix_square(array, array2);
-				gf2_matrix_square(array2, array);
-				uint num3 = (uint)length;
-				do
-				{
-					gf2_matrix_square(array, array2);
-					if ((num3 & 1) == 1)
-					{
-						num = gf2_matrix_times(array, num);
-					}
-					num3 >>= 1;
-					if (num3 == 0)
-					{
-						break;
-					}
-					gf2_matrix_square(array2, array);
-					if ((num3 & 1) == 1)
-					{
-						num = gf2_matrix_times(array2, num);
-					}
-					num3 >>= 1;
-				}
-				while (num3 != 0);
-				num = (uint)((int)num ^ crc);
-				_register = ~num;
+				return;
 			}
+			uint num = ~_register;
+			array2[0] = dwPolynomial;
+			uint num2 = 1u;
+			for (int i = 1; i < 32; i++)
+			{
+				array2[i] = num2;
+				num2 <<= 1;
+			}
+			gf2_matrix_square(array, array2);
+			gf2_matrix_square(array2, array);
+			uint num3 = (uint)length;
+			do
+			{
+				gf2_matrix_square(array, array2);
+				if ((num3 & 1) == 1)
+				{
+					num = gf2_matrix_times(array, num);
+				}
+				num3 >>= 1;
+				if (num3 == 0)
+				{
+					break;
+				}
+				gf2_matrix_square(array2, array);
+				if ((num3 & 1) == 1)
+				{
+					num = gf2_matrix_times(array2, num);
+				}
+				num3 >>= 1;
+			}
+			while (num3 != 0);
+			num = (uint)((int)num ^ crc);
+			_register = ~num;
 		}
 
 		public void Reset()

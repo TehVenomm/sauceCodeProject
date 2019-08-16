@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ColliderWeightCtl
+public class ColliderWeightCtl : MonoBehaviour
 {
 	public enum COLLIDER_TYPE
 	{
@@ -111,8 +111,8 @@ public class ColliderWeightCtl
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 center = diffCenter * currentWeight + startCenter;
 		switch (colliderType)
 		{

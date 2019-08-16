@@ -9,6 +9,6 @@ public final class GameBuffer extends AbstractDataBuffer<Game> {
     }
 
     public final Game get(int i) {
-        return new GameRef(this.zzfkz, i);
+        return new GameRef(this.mDataHolder, i);
     }
 }

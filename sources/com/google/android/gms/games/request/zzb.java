@@ -2,22 +2,23 @@ package com.google.android.gms.games.request;
 
 import android.os.Parcel;
 import com.facebook.share.internal.ShareConstants;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameRef;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayerRef;
+import com.google.android.gms.measurement.api.AppMeasurementSdk.ConditionalUserProperty;
 import java.util.ArrayList;
 import java.util.List;
 
 @Deprecated
-public final class zzb extends zzc implements GameRequest {
-    private final int zzhky;
+public final class zzb extends DataBufferRef implements GameRequest {
+    private final int zznx;
 
     public zzb(DataHolder dataHolder, int i, int i2) {
         super(dataHolder, i);
-        this.zzhky = i2;
+        this.zznx = i2;
     }
 
     public final int describeContents() {
@@ -33,7 +34,7 @@ public final class zzb extends zzc implements GameRequest {
     }
 
     public final long getCreationTimestamp() {
-        return getLong("creation_timestamp");
+        return getLong(ConditionalUserProperty.CREATION_TIMESTAMP);
     }
 
     public final byte[] getData() {
@@ -45,23 +46,23 @@ public final class zzb extends zzc implements GameRequest {
     }
 
     public final Game getGame() {
-        return new GameRef(this.zzfkz, this.zzfqb);
+        return new GameRef(this.mDataHolder, this.mDataRow);
     }
 
     public final int getRecipientStatus(String str) {
-        for (int i = this.zzfqb; i < this.zzfqb + this.zzhky; i++) {
-            int zzbw = this.zzfkz.zzbw(i);
-            if (this.zzfkz.zzd("recipient_external_player_id", i, zzbw).equals(str)) {
-                return this.zzfkz.zzc("recipient_status", i, zzbw);
+        for (int i = this.mDataRow; i < this.mDataRow + this.zznx; i++) {
+            int windowIndex = this.mDataHolder.getWindowIndex(i);
+            if (this.mDataHolder.getString("recipient_external_player_id", i, windowIndex).equals(str)) {
+                return this.mDataHolder.getInteger("recipient_status", i, windowIndex);
             }
         }
         return -1;
     }
 
     public final List<Player> getRecipients() {
-        List arrayList = new ArrayList(this.zzhky);
-        for (int i = 0; i < this.zzhky; i++) {
-            arrayList.add(new PlayerRef(this.zzfkz, this.zzfqb + i, "recipient_"));
+        ArrayList arrayList = new ArrayList(this.zznx);
+        for (int i = 0; i < this.zznx; i++) {
+            arrayList.add(new PlayerRef(this.mDataHolder, this.mDataRow + i, "recipient_"));
         }
         return arrayList;
     }
@@ -71,7 +72,7 @@ public final class zzb extends zzc implements GameRequest {
     }
 
     public final Player getSender() {
-        return new PlayerRef(this.zzfkz, this.zzfqb, "sender_");
+        return new PlayerRef(this.mDataHolder, getDataRow(), "sender_");
     }
 
     public final int getStatus() {
@@ -79,7 +80,7 @@ public final class zzb extends zzc implements GameRequest {
     }
 
     public final int getType() {
-        return getInteger(ShareConstants.MEDIA_TYPE);
+        return getInteger("type");
     }
 
     public final int hashCode() {

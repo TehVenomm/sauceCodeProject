@@ -10,7 +10,7 @@ public final class AnnotatedMethodMap implements Iterable<AnnotatedMethod> {
 
     public void add(AnnotatedMethod annotatedMethod) {
         if (this._methods == null) {
-            this._methods = new LinkedHashMap();
+            this._methods = new LinkedHashMap<>();
         }
         this._methods.put(new MemberKey(annotatedMethod.getAnnotated()), annotatedMethod);
     }
@@ -31,7 +31,10 @@ public final class AnnotatedMethodMap implements Iterable<AnnotatedMethod> {
     }
 
     public int size() {
-        return this._methods == null ? 0 : this._methods.size();
+        if (this._methods == null) {
+            return 0;
+        }
+        return this._methods.size();
     }
 
     public AnnotatedMethod find(String str, Class<?>[] clsArr) {

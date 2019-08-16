@@ -21,9 +21,9 @@ class NetworkRequestHandler extends RequestHandler {
         }
     }
 
-    public NetworkRequestHandler(Downloader downloader, Stats stats) {
-        this.downloader = downloader;
-        this.stats = stats;
+    public NetworkRequestHandler(Downloader downloader2, Stats stats2) {
+        this.downloader = downloader2;
+        this.stats = stats2;
     }
 
     public boolean canHandleRequest(Request request) {
@@ -55,15 +55,18 @@ class NetworkRequestHandler extends RequestHandler {
         return new Result(inputStream, loadedFrom);
     }
 
-    int getRetryCount() {
+    /* access modifiers changed from: 0000 */
+    public int getRetryCount() {
         return 2;
     }
 
-    boolean shouldRetry(boolean z, NetworkInfo networkInfo) {
+    /* access modifiers changed from: 0000 */
+    public boolean shouldRetry(boolean z, NetworkInfo networkInfo) {
         return networkInfo == null || networkInfo.isConnected();
     }
 
-    boolean supportsReplay() {
+    /* access modifiers changed from: 0000 */
+    public boolean supportsReplay() {
         return true;
     }
 }

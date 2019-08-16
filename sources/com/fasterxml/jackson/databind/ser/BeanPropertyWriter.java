@@ -3,7 +3,7 @@ package com.fasterxml.jackson.databind.ser;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.core.p015io.SerializedString;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -120,7 +120,7 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
         this._serializer = beanPropertyWriter._serializer;
         this._nullSerializer = beanPropertyWriter._nullSerializer;
         if (beanPropertyWriter._internalSettings != null) {
-            this._internalSettings = new HashMap(beanPropertyWriter._internalSettings);
+            this._internalSettings = new HashMap<>(beanPropertyWriter._internalSettings);
         }
         this._cfgSerializationType = beanPropertyWriter._cfgSerializationType;
         this._dynamicSerializers = beanPropertyWriter._dynamicSerializers;
@@ -143,7 +143,7 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
         this._serializer = beanPropertyWriter._serializer;
         this._nullSerializer = beanPropertyWriter._nullSerializer;
         if (beanPropertyWriter._internalSettings != null) {
-            this._internalSettings = new HashMap(beanPropertyWriter._internalSettings);
+            this._internalSettings = new HashMap<>(beanPropertyWriter._internalSettings);
         }
         this._cfgSerializationType = beanPropertyWriter._cfgSerializationType;
         this._dynamicSerializers = beanPropertyWriter._dynamicSerializers;
@@ -159,7 +159,8 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
         return transform.equals(this._name.toString()) ? this : _new(PropertyName.construct(transform));
     }
 
-    protected BeanPropertyWriter _new(PropertyName propertyName) {
+    /* access modifiers changed from: protected */
+    public BeanPropertyWriter _new(PropertyName propertyName) {
         return new BeanPropertyWriter(this, propertyName);
     }
 
@@ -191,7 +192,8 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
         this._nonTrivialBaseType = javaType;
     }
 
-    Object readResolve() {
+    /* access modifiers changed from: 0000 */
+    public Object readResolve() {
         if (this._member instanceof AnnotatedField) {
             this._accessorMethod = null;
             this._field = (Field) this._member.getMember();
@@ -222,28 +224,38 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {
-        return this._member == null ? null : this._member.getAnnotation(cls);
+        if (this._member == null) {
+            return null;
+        }
+        return this._member.getAnnotation(cls);
     }
 
     public <A extends Annotation> A getContextAnnotation(Class<A> cls) {
-        return this._contextAnnotations == null ? null : this._contextAnnotations.get(cls);
+        if (this._contextAnnotations == null) {
+            return null;
+        }
+        return this._contextAnnotations.get(cls);
     }
 
     public AnnotatedMember getMember() {
         return this._member;
     }
 
-    protected void _depositSchemaProperty(ObjectNode objectNode, JsonNode jsonNode) {
+    /* access modifiers changed from: protected */
+    public void _depositSchemaProperty(ObjectNode objectNode, JsonNode jsonNode) {
         objectNode.set(getName(), jsonNode);
     }
 
     public Object getInternalSetting(Object obj) {
-        return this._internalSettings == null ? null : this._internalSettings.get(obj);
+        if (this._internalSettings == null) {
+            return null;
+        }
+        return this._internalSettings.get(obj);
     }
 
     public Object setInternalSetting(Object obj, Object obj2) {
         if (this._internalSettings == null) {
-            this._internalSettings = new HashMap();
+            this._internalSettings = new HashMap<>();
         }
         return this._internalSettings.put(obj, obj2);
     }
@@ -300,7 +312,10 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
     }
 
     public Class<?> getRawSerializationType() {
-        return this._cfgSerializationType == null ? null : this._cfgSerializationType.getRawClass();
+        if (this._cfgSerializationType == null) {
+            return null;
+        }
+        return this._cfgSerializationType.getRawClass();
     }
 
     @Deprecated
@@ -330,16 +345,16 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
     }
 
     public void serializeAsField(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws Exception {
-        Object obj2;
+        Object invoke;
         if (this._accessorMethod == null) {
-            obj2 = this._field.get(obj);
+            invoke = this._field.get(obj);
         } else {
-            obj2 = this._accessorMethod.invoke(obj, new Object[0]);
+            invoke = this._accessorMethod.invoke(obj, new Object[0]);
         }
-        if (obj2 != null) {
-            JsonSerializer jsonSerializer = this._serializer;
+        if (invoke != null) {
+            JsonSerializer<Object> jsonSerializer = this._serializer;
             if (jsonSerializer == null) {
-                Class cls = obj2.getClass();
+                Class cls = invoke.getClass();
                 PropertySerializerMap propertySerializerMap = this._dynamicSerializers;
                 jsonSerializer = propertySerializerMap.serializerFor(cls);
                 if (jsonSerializer == null) {
@@ -348,23 +363,23 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
             }
             if (this._suppressableValue != null) {
                 if (MARKER_FOR_EMPTY == this._suppressableValue) {
-                    if (jsonSerializer.isEmpty(serializerProvider, obj2)) {
+                    if (jsonSerializer.isEmpty(serializerProvider, invoke)) {
                         return;
                     }
-                } else if (this._suppressableValue.equals(obj2)) {
+                } else if (this._suppressableValue.equals(invoke)) {
                     return;
                 }
             }
-            if (obj2 != obj || !_handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
-                jsonGenerator.writeFieldName(this._name);
+            if (invoke != obj || !_handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
+                jsonGenerator.writeFieldName((SerializableString) this._name);
                 if (this._typeSerializer == null) {
-                    jsonSerializer.serialize(obj2, jsonGenerator, serializerProvider);
+                    jsonSerializer.serialize(invoke, jsonGenerator, serializerProvider);
                 } else {
-                    jsonSerializer.serializeWithType(obj2, jsonGenerator, serializerProvider, this._typeSerializer);
+                    jsonSerializer.serializeWithType(invoke, jsonGenerator, serializerProvider, this._typeSerializer);
                 }
             }
         } else if (this._nullSerializer != null) {
-            jsonGenerator.writeFieldName(this._name);
+            jsonGenerator.writeFieldName((SerializableString) this._name);
             this._nullSerializer.serialize(null, jsonGenerator, serializerProvider);
         }
     }
@@ -378,7 +393,7 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
     public void serializeAsElement(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws Exception {
         Object invoke = this._accessorMethod == null ? this._field.get(obj) : this._accessorMethod.invoke(obj, new Object[0]);
         if (invoke != null) {
-            JsonSerializer jsonSerializer = this._serializer;
+            JsonSerializer<Object> jsonSerializer = this._serializer;
             if (jsonSerializer == null) {
                 Class cls = invoke.getClass();
                 PropertySerializerMap propertySerializerMap = this._dynamicSerializers;
@@ -398,12 +413,13 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
                     return;
                 }
             }
-            if (invoke != obj || !_handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
-                if (this._typeSerializer == null) {
-                    jsonSerializer.serialize(invoke, jsonGenerator, serializerProvider);
-                } else {
-                    jsonSerializer.serializeWithType(invoke, jsonGenerator, serializerProvider, this._typeSerializer);
-                }
+            if (invoke == obj && _handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
+                return;
+            }
+            if (this._typeSerializer == null) {
+                jsonSerializer.serialize(invoke, jsonGenerator, serializerProvider);
+            } else {
+                jsonSerializer.serializeWithType(invoke, jsonGenerator, serializerProvider, this._typeSerializer);
             }
         } else if (this._nullSerializer != null) {
             this._nullSerializer.serialize(null, jsonGenerator, serializerProvider);
@@ -433,7 +449,7 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
 
     @Deprecated
     public void depositSchemaProperty(ObjectNode objectNode, SerializerProvider serializerProvider) throws JsonMappingException {
-        JsonNode schema;
+        JsonNode defaultSchemaNode;
         JavaType serializationType = getSerializationType();
         Type type = serializationType == null ? getType() : serializationType.getRawClass();
         JsonSerializer serializer = getSerializer();
@@ -442,19 +458,20 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
         }
         boolean z = !isRequired();
         if (serializer instanceof SchemaAware) {
-            schema = ((SchemaAware) serializer).getSchema(serializerProvider, type, z);
+            defaultSchemaNode = ((SchemaAware) serializer).getSchema(serializerProvider, type, z);
         } else {
-            schema = JsonSchema.getDefaultSchemaNode();
+            defaultSchemaNode = JsonSchema.getDefaultSchemaNode();
         }
-        _depositSchemaProperty(objectNode, schema);
+        _depositSchemaProperty(objectNode, defaultSchemaNode);
     }
 
-    protected JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
         SerializerAndMapResult findAndAddPrimarySerializer;
         if (this._nonTrivialBaseType != null) {
             findAndAddPrimarySerializer = propertySerializerMap.findAndAddPrimarySerializer(serializerProvider.constructSpecializedType(this._nonTrivialBaseType, cls), serializerProvider, (BeanProperty) this);
         } else {
-            findAndAddPrimarySerializer = propertySerializerMap.findAndAddPrimarySerializer((Class) cls, serializerProvider, (BeanProperty) this);
+            findAndAddPrimarySerializer = propertySerializerMap.findAndAddPrimarySerializer(cls, serializerProvider, (BeanProperty) this);
         }
         if (propertySerializerMap != findAndAddPrimarySerializer.map) {
             this._dynamicSerializers = findAndAddPrimarySerializer.map;
@@ -466,7 +483,8 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
         return this._accessorMethod == null ? this._field.get(obj) : this._accessorMethod.invoke(obj, new Object[0]);
     }
 
-    protected boolean _handleSelfReference(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, JsonSerializer<?> jsonSerializer) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public boolean _handleSelfReference(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, JsonSerializer<?> jsonSerializer) throws JsonMappingException {
         if (!serializerProvider.isEnabled(SerializationFeature.FAIL_ON_SELF_REFERENCES) || jsonSerializer.usesObjectId() || !(jsonSerializer instanceof BeanSerializerBase)) {
             return false;
         }
@@ -474,21 +492,21 @@ public class BeanPropertyWriter extends PropertyWriter implements Serializable {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(40);
-        stringBuilder.append("property '").append(getName()).append("' (");
+        StringBuilder sb = new StringBuilder(40);
+        sb.append("property '").append(getName()).append("' (");
         if (this._accessorMethod != null) {
-            stringBuilder.append("via method ").append(this._accessorMethod.getDeclaringClass().getName()).append("#").append(this._accessorMethod.getName());
+            sb.append("via method ").append(this._accessorMethod.getDeclaringClass().getName()).append("#").append(this._accessorMethod.getName());
         } else if (this._field != null) {
-            stringBuilder.append("field \"").append(this._field.getDeclaringClass().getName()).append("#").append(this._field.getName());
+            sb.append("field \"").append(this._field.getDeclaringClass().getName()).append("#").append(this._field.getName());
         } else {
-            stringBuilder.append("virtual");
+            sb.append("virtual");
         }
         if (this._serializer == null) {
-            stringBuilder.append(", no static serializer");
+            sb.append(", no static serializer");
         } else {
-            stringBuilder.append(", static serializer of type " + this._serializer.getClass().getName());
+            sb.append(", static serializer of type " + this._serializer.getClass().getName());
         }
-        stringBuilder.append(')');
-        return stringBuilder.toString();
+        sb.append(')');
+        return sb.toString();
     }
 }

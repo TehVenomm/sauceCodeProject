@@ -1,7 +1,8 @@
 package com.fasterxml.jackson.databind.ser.impl;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.core.SerializableString;
+import com.fasterxml.jackson.core.p015io.SerializedString;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,7 +36,8 @@ public class UnwrappingBeanPropertyWriter extends BeanPropertyWriter implements 
         return _new(NameTransformer.chainedTransformer(nameTransformer, this._nameTransformer), new SerializedString(nameTransformer.transform(this._name.getValue())));
     }
 
-    protected UnwrappingBeanPropertyWriter _new(NameTransformer nameTransformer, SerializedString serializedString) {
+    /* access modifiers changed from: protected */
+    public UnwrappingBeanPropertyWriter _new(NameTransformer nameTransformer, SerializedString serializedString) {
         return new UnwrappingBeanPropertyWriter(this, nameTransformer, serializedString);
     }
 
@@ -66,7 +68,7 @@ public class UnwrappingBeanPropertyWriter extends BeanPropertyWriter implements 
             }
             if (obj2 != obj || !_handleSelfReference(obj, jsonGenerator, serializerProvider, jsonSerializer)) {
                 if (!jsonSerializer.isUnwrappingSerializer()) {
-                    jsonGenerator.writeFieldName(this._name);
+                    jsonGenerator.writeFieldName((SerializableString) this._name);
                 }
                 if (this._typeSerializer == null) {
                     jsonSerializer.serialize(obj2, jsonGenerator, serializerProvider);
@@ -78,16 +80,16 @@ public class UnwrappingBeanPropertyWriter extends BeanPropertyWriter implements 
     }
 
     public void assignSerializer(JsonSerializer<Object> jsonSerializer) {
+        NameTransformer nameTransformer;
         super.assignSerializer(jsonSerializer);
         if (this._serializer != null) {
-            NameTransformer chainedTransformer;
-            NameTransformer nameTransformer = this._nameTransformer;
+            NameTransformer nameTransformer2 = this._nameTransformer;
             if (this._serializer.isUnwrappingSerializer()) {
-                chainedTransformer = NameTransformer.chainedTransformer(nameTransformer, ((UnwrappingBeanSerializer) this._serializer)._nameTransformer);
+                nameTransformer = NameTransformer.chainedTransformer(nameTransformer2, ((UnwrappingBeanSerializer) this._serializer)._nameTransformer);
             } else {
-                chainedTransformer = nameTransformer;
+                nameTransformer = nameTransformer2;
             }
-            this._serializer = this._serializer.unwrappingSerializer(chainedTransformer);
+            this._serializer = this._serializer.unwrappingSerializer(nameTransformer);
         }
     }
 
@@ -104,7 +106,8 @@ public class UnwrappingBeanPropertyWriter extends BeanPropertyWriter implements 
         }
     }
 
-    protected void _depositSchemaProperty(ObjectNode objectNode, JsonNode jsonNode) {
+    /* access modifiers changed from: protected */
+    public void _depositSchemaProperty(ObjectNode objectNode, JsonNode jsonNode) {
         JsonNode jsonNode2 = jsonNode.get("properties");
         if (jsonNode2 != null) {
             Iterator fields = jsonNode2.fields();
@@ -119,21 +122,22 @@ public class UnwrappingBeanPropertyWriter extends BeanPropertyWriter implements 
         }
     }
 
-    protected JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
         JsonSerializer findValueSerializer;
-        NameTransformer chainedTransformer;
+        NameTransformer nameTransformer;
         if (this._nonTrivialBaseType != null) {
             findValueSerializer = serializerProvider.findValueSerializer(serializerProvider.constructSpecializedType(this._nonTrivialBaseType, cls), (BeanProperty) this);
         } else {
-            findValueSerializer = serializerProvider.findValueSerializer((Class) cls, (BeanProperty) this);
+            findValueSerializer = serializerProvider.findValueSerializer(cls, (BeanProperty) this);
         }
-        NameTransformer nameTransformer = this._nameTransformer;
+        NameTransformer nameTransformer2 = this._nameTransformer;
         if (findValueSerializer.isUnwrappingSerializer()) {
-            chainedTransformer = NameTransformer.chainedTransformer(nameTransformer, ((UnwrappingBeanSerializer) findValueSerializer)._nameTransformer);
+            nameTransformer = NameTransformer.chainedTransformer(nameTransformer2, ((UnwrappingBeanSerializer) findValueSerializer)._nameTransformer);
         } else {
-            chainedTransformer = nameTransformer;
+            nameTransformer = nameTransformer2;
         }
-        JsonSerializer<Object> unwrappingSerializer = findValueSerializer.unwrappingSerializer(chainedTransformer);
+        JsonSerializer<Object> unwrappingSerializer = findValueSerializer.unwrappingSerializer(nameTransformer);
         this._dynamicSerializers = this._dynamicSerializers.newWith(cls, unwrappingSerializer);
         return unwrappingSerializer;
     }

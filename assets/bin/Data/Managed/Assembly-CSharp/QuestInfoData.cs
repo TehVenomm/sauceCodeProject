@@ -143,13 +143,11 @@ public class QuestInfoData
 			if (questData.tableData.missionID[i] == 0)
 			{
 				missionData[i] = null;
+				continue;
 			}
-			else
-			{
-				CLEAR_STATUS state = (CLEAR_STATUS)((mission_clear_status == null) ? 1 : mission_clear_status[i]);
-				missionData[i] = new Mission(Singleton<QuestTable>.I.GetMissionData(questData.tableData.missionID[i]), state);
-				isExistMission = true;
-			}
+			CLEAR_STATUS state = (CLEAR_STATUS)((mission_clear_status == null) ? 1 : mission_clear_status[i]);
+			missionData[i] = new Mission(Singleton<QuestTable>.I.GetMissionData(questData.tableData.missionID[i]), state);
+			isExistMission = true;
 		}
 	}
 

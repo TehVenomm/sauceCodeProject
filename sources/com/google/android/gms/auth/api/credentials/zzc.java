@@ -1,45 +1,59 @@
 package com.google.android.gms.auth.api.credentials;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
+import java.util.List;
 
-public final class zzc implements Creator<CredentialPickerConfig> {
+public final class zzc implements Creator<Credential> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        boolean z = false;
-        int zzd = zzb.zzd(parcel);
-        boolean z2 = false;
-        boolean z3 = false;
-        int i = 0;
-        int i2 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        String str = null;
+        String str2 = null;
+        Uri uri = null;
+        List list = null;
+        String str3 = null;
+        String str4 = null;
+        String str5 = null;
+        String str6 = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    z = zzb.zzc(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 2:
-                    z2 = zzb.zzc(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    z3 = zzb.zzc(parcel, readInt);
+                    uri = (Uri) SafeParcelReader.createParcelable(parcel, readHeader, Uri.CREATOR);
                     break;
                 case 4:
-                    i2 = zzb.zzg(parcel, readInt);
+                    list = SafeParcelReader.createTypedList(parcel, readHeader, IdToken.CREATOR);
                     break;
-                case 1000:
-                    i = zzb.zzg(parcel, readInt);
+                case 5:
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 6:
+                    str4 = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 9:
+                    str5 = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 10:
+                    str6 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
-        return new CredentialPickerConfig(i, z, z2, z3, i2);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new Credential(str, str2, uri, list, str3, str4, str5, str6);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {
-        return new CredentialPickerConfig[i];
+        return new Credential[i];
     }
 }

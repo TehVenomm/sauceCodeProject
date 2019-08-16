@@ -50,7 +50,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 		{
 			return DateTime.Now;
 		}
-		return MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.Value.AddSeconds((double)MonoBehaviourSingleton<GoGameTimeManager>.I.elapsedTime);
+		return MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.Value.AddSeconds(MonoBehaviourSingleton<GoGameTimeManager>.I.elapsedTime);
 	}
 
 	public static void SetServerTime(string time)
@@ -119,5 +119,14 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 	public static DateTime CombineDateAndTime(DateTime date, DateTime time)
 	{
 		return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
+	}
+
+	public static bool HasValue()
+	{
+		if (!MonoBehaviourSingleton<GoGameTimeManager>.IsValid() || !MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.HasValue)
+		{
+			return false;
+		}
+		return true;
 	}
 }

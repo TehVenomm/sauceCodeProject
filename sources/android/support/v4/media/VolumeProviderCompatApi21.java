@@ -1,13 +1,13 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.media.VolumeProvider;
 import android.support.annotation.RequiresApi;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.media.VolumeProviderCompatApi21 */
 class VolumeProviderCompatApi21 {
 
+    /* renamed from: android.support.v4.media.VolumeProviderCompatApi21$Delegate */
     public interface Delegate {
         void onAdjustVolume(int i);
 

@@ -79,12 +79,12 @@ public class JsonMappingException extends JsonProcessingException {
         }
 
         public String toString() {
+            Class cls;
             if (this._asString == null) {
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                 if (this._from == null) {
-                    stringBuilder.append("UNKNOWN");
+                    sb.append("UNKNOWN");
                 } else {
-                    Class cls;
                     if (this._from instanceof Class) {
                         cls = (Class) this._from;
                     } else {
@@ -92,28 +92,29 @@ public class JsonMappingException extends JsonProcessingException {
                     }
                     String packageName = ClassUtil.getPackageName(cls);
                     if (packageName != null) {
-                        stringBuilder.append(packageName);
-                        stringBuilder.append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
+                        sb.append(packageName);
+                        sb.append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
                     }
-                    stringBuilder.append(cls.getSimpleName());
+                    sb.append(cls.getSimpleName());
                 }
-                stringBuilder.append('[');
+                sb.append('[');
                 if (this._fieldName != null) {
-                    stringBuilder.append('\"');
-                    stringBuilder.append(this._fieldName);
-                    stringBuilder.append('\"');
+                    sb.append('\"');
+                    sb.append(this._fieldName);
+                    sb.append('\"');
                 } else if (this._index >= 0) {
-                    stringBuilder.append(this._index);
+                    sb.append(this._index);
                 } else {
-                    stringBuilder.append('?');
+                    sb.append('?');
                 }
-                stringBuilder.append(']');
-                this._asString = stringBuilder.toString();
+                sb.append(']');
+                this._asString = sb.toString();
             }
             return this._asString;
         }
 
-        Object writeReplace() {
+        /* access modifiers changed from: 0000 */
+        public Object writeReplace() {
             return new Reference(this, toString(), null);
         }
     }
@@ -176,23 +177,23 @@ public class JsonMappingException extends JsonProcessingException {
     }
 
     public static JsonMappingException from(DeserializationContext deserializationContext, String str) {
-        return new JsonMappingException(deserializationContext.getParser(), str);
+        return new JsonMappingException((Closeable) deserializationContext.getParser(), str);
     }
 
     public static JsonMappingException from(DeserializationContext deserializationContext, String str, Throwable th) {
-        return new JsonMappingException(deserializationContext.getParser(), str, th);
+        return new JsonMappingException((Closeable) deserializationContext.getParser(), str, th);
     }
 
     public static JsonMappingException from(SerializerProvider serializerProvider, String str) {
-        return new JsonMappingException(null, str);
+        return new JsonMappingException((Closeable) null, str);
     }
 
     public static JsonMappingException from(SerializerProvider serializerProvider, String str, Throwable th) {
-        return new JsonMappingException(null, str, th);
+        return new JsonMappingException((Closeable) null, str, th);
     }
 
     public static JsonMappingException fromUnexpectedIOE(IOException iOException) {
-        return new JsonMappingException(null, String.format("Unexpected IOException (of type %s): %s", new Object[]{iOException.getClass().getName(), iOException.getMessage()}));
+        return new JsonMappingException((Closeable) null, String.format("Unexpected IOException (of type %s): %s", new Object[]{iOException.getClass().getName(), iOException.getMessage()}));
     }
 
     public static JsonMappingException wrapWithPath(Throwable th, Object obj, String str) {
@@ -204,11 +205,12 @@ public class JsonMappingException extends JsonProcessingException {
     }
 
     public static JsonMappingException wrapWithPath(Throwable th, Reference reference) {
+        String str;
+        Closeable closeable;
+        JsonMappingException jsonMappingException;
         if (th instanceof JsonMappingException) {
-            th = (JsonMappingException) th;
+            jsonMappingException = (JsonMappingException) th;
         } else {
-            String str;
-            Closeable closeable;
             String message = th.getMessage();
             if (message == null || message.length() == 0) {
                 str = "(was " + th.getClass().getName() + ")";
@@ -219,14 +221,14 @@ public class JsonMappingException extends JsonProcessingException {
                 Object processor = ((JsonProcessingException) th).getProcessor();
                 if (processor instanceof Closeable) {
                     closeable = (Closeable) processor;
-                    th = new JsonMappingException(closeable, str, th);
+                    jsonMappingException = new JsonMappingException(closeable, str, th);
                 }
             }
             closeable = null;
-            th = new JsonMappingException(closeable, str, th);
+            jsonMappingException = new JsonMappingException(closeable, str, th);
         }
-        th.prependPath(reference);
-        return th;
+        jsonMappingException.prependPath(reference);
+        return jsonMappingException;
     }
 
     public List<Reference> getPath() {
@@ -240,9 +242,9 @@ public class JsonMappingException extends JsonProcessingException {
         return getPathReference(new StringBuilder()).toString();
     }
 
-    public StringBuilder getPathReference(StringBuilder stringBuilder) {
-        _appendPathDesc(stringBuilder);
-        return stringBuilder;
+    public StringBuilder getPathReference(StringBuilder sb) {
+        _appendPathDesc(sb);
+        return sb;
     }
 
     public void prependPath(Object obj, String str) {
@@ -255,7 +257,7 @@ public class JsonMappingException extends JsonProcessingException {
 
     public void prependPath(Reference reference) {
         if (this._path == null) {
-            this._path = new LinkedList();
+            this._path = new LinkedList<>();
         }
         if (this._path.size() < 1000) {
             this._path.addFirst(reference);
@@ -270,29 +272,31 @@ public class JsonMappingException extends JsonProcessingException {
         return _buildMessage();
     }
 
-    protected String _buildMessage() {
+    /* access modifiers changed from: protected */
+    public String _buildMessage() {
         String message = super.getMessage();
         if (this._path == null) {
             return message;
         }
-        StringBuilder stringBuilder = message == null ? new StringBuilder() : new StringBuilder(message);
-        stringBuilder.append(" (through reference chain: ");
-        stringBuilder = getPathReference(stringBuilder);
-        stringBuilder.append(')');
-        return stringBuilder.toString();
+        StringBuilder sb = message == null ? new StringBuilder() : new StringBuilder(message);
+        sb.append(" (through reference chain: ");
+        StringBuilder pathReference = getPathReference(sb);
+        pathReference.append(')');
+        return pathReference.toString();
     }
 
     public String toString() {
         return getClass().getName() + ": " + getMessage();
     }
 
-    protected void _appendPathDesc(StringBuilder stringBuilder) {
+    /* access modifiers changed from: protected */
+    public void _appendPathDesc(StringBuilder sb) {
         if (this._path != null) {
             Iterator it = this._path.iterator();
             while (it.hasNext()) {
-                stringBuilder.append(((Reference) it.next()).toString());
+                sb.append(((Reference) it.next()).toString());
                 if (it.hasNext()) {
-                    stringBuilder.append("->");
+                    sb.append("->");
                 }
             }
         }

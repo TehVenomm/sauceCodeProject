@@ -35,18 +35,18 @@ public class StatusExchangeEntrance : GameSection
 	private void OnQuery_RARE()
 	{
 		MonoBehaviourSingleton<ItemExchangeManager>.I.SetExchangeType(EXCHANGE_TYPE.RARE);
-		GameSection.ChangeEvent("EXCHANGE", null);
+		GameSection.ChangeEvent("EXCHANGE");
 	}
 
 	private void OnQuery_NORMAL()
 	{
 		MonoBehaviourSingleton<ItemExchangeManager>.I.SetExchangeType(EXCHANGE_TYPE.NORMAL);
-		GameSection.ChangeEvent("EXCHANGE", null);
+		GameSection.ChangeEvent("EXCHANGE");
 	}
 
 	private void OnQuery_SELL()
 	{
 		MonoBehaviourSingleton<ItemExchangeManager>.I.SetExchangeType(EXCHANGE_TYPE.SELL);
-		GameSection.ChangeEvent("EXCHANGE", null);
+		GameSection.ChangeEvent("EXCHANGE");
 	}
 }

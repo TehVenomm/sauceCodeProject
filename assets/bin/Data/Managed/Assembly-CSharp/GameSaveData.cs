@@ -5,8 +5,6 @@ using System.Collections.Generic;
 [Serializable]
 public class GameSaveData
 {
-	private const int MAX_LOG = 50;
-
 	public int dataVersion;
 
 	public int testCount;
@@ -26,6 +24,8 @@ public class GameSaveData
 	public int languageOption;
 
 	public bool headName = true;
+
+	public bool canShowWheelFortune;
 
 	public string resetMarketTime = string.Empty;
 
@@ -49,7 +49,7 @@ public class GameSaveData
 
 	public bool defaultRepeatPartyOn = true;
 
-	public bool enableLandscape = true;
+	public bool enableLandscape = Native.GetDeviceAutoRotateSetting();
 
 	public bool enableMinimapEnemy;
 
@@ -75,6 +75,8 @@ public class GameSaveData
 
 	public int dayShowNewsNotification;
 
+	public bool isFinishTradingPostTutorial;
+
 	public List<LoginBonus> logInBonus;
 
 	public string showIAPAdsPop;
@@ -86,6 +88,8 @@ public class GameSaveData
 	public bool showUnlockQuestEvent;
 
 	public bool canPushTrackEquipTutorial;
+
+	public string showHomeBanners;
 
 	public long pushTrackTutorialBit;
 
@@ -109,11 +113,29 @@ public class GameSaveData
 
 	public List<string> abilityItems = new List<string>();
 
+	public List<string> accessoryItems = new List<string>();
+
+	public List<string> newClanScoutList = new List<string>();
+
 	public List<uint> newReleasePortals = new List<uint>();
 
 	public List<int> showedOpenRegionIds = new List<int>();
 
+	public int tutorialCompleteSeriesArena;
+
+	private const int MAX_LOG = 50;
+
 	public Dictionary<int, List<GuildMessage.ChatPostRequest>> chatLogs = new Dictionary<int, List<GuildMessage.ChatPostRequest>>();
+
+	public int MutualFollowerInviteListSortType;
+
+	public int MutualFollowerListSortType;
+
+	public int FollowListSortType;
+
+	public int FollowerListSortType;
+
+	public int ScreenShotUIFilterType = -1;
 
 	public static GameSaveData instance
 	{
@@ -194,41 +216,41 @@ public class GameSaveData
 
 	public void AddCheckedSmithCreateRecipe(int[] ids)
 	{
-		if (ids != null && ids.Length > 0)
+		if (ids == null || ids.Length <= 0)
 		{
-			int i = 0;
-			for (int num = ids.Length; i < num; i++)
+			return;
+		}
+		int i = 0;
+		for (int num = ids.Length; i < num; i++)
+		{
+			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)ids[i]);
+			if (equipItemData == null || equipItemData.obtained.flag < 0)
 			{
-				EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)ids[i]);
-				if (equipItemData != null && equipItemData.obtained.flag >= 0)
+				continue;
+			}
+			int sequenceNumber = equipItemData.obtained.GetSequenceNumber();
+			if (IsCheckSmithCreateRecipeBits(sequenceNumber))
+			{
+				continue;
+			}
+			int num2 = sequenceNumber / 32;
+			int num3 = 1 << sequenceNumber % 32;
+			int count = checkedSmithCreateRecipe.Count;
+			if (count <= num2)
+			{
+				int num4 = num2 - count;
+				int j = 0;
+				for (int num5 = num4; j < num5; j++)
 				{
-					int sequenceNumber = equipItemData.obtained.GetSequenceNumber();
-					if (!IsCheckSmithCreateRecipeBits(sequenceNumber))
-					{
-						int num2 = sequenceNumber / 32;
-						int num3 = 1 << sequenceNumber % 32;
-						int count = checkedSmithCreateRecipe.Count;
-						if (count <= num2)
-						{
-							int num4 = num2 - count;
-							int j = 0;
-							for (int num5 = num4; j < num5; j++)
-							{
-								checkedSmithCreateRecipe.Add(0);
-							}
-							checkedSmithCreateRecipe.Add(num3);
-						}
-						else
-						{
-							List<int> list;
-							List<int> list2 = list = checkedSmithCreateRecipe;
-							int index;
-							int index2 = index = num2;
-							index = list[index];
-							list2[index2] = (index | num3);
-						}
-					}
+					checkedSmithCreateRecipe.Add(0);
 				}
+				checkedSmithCreateRecipe.Add(num3);
+			}
+			else
+			{
+				List<int> list;
+				int index;
+				(list = checkedSmithCreateRecipe)[index = num2] = (list[index] | num3);
 			}
 		}
 	}
@@ -346,6 +368,13 @@ public class GameSaveData
 				return true;
 			}
 			break;
+		case ITEM_ICON_TYPE.ACCESSORY:
+			if (!accessoryItems.Contains(str_uniq_id))
+			{
+				accessoryItems.Add(str_uniq_id);
+				return true;
+			}
+			break;
 		}
 		return false;
 	}
@@ -399,6 +428,13 @@ public class GameSaveData
 			}
 			abilityItems.Remove(str_uniq_id);
 			break;
+		case ITEM_ICON_TYPE.ACCESSORY:
+			if (!accessoryItems.Contains(str_uniq_id))
+			{
+				return false;
+			}
+			accessoryItems.Remove(str_uniq_id);
+			break;
 		}
 		MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.REMOVE_NEW_ICON);
 		return true;
@@ -438,7 +474,21 @@ public class GameSaveData
 			return newQuestItems.Contains(str_uniq_id);
 		case ITEM_ICON_TYPE.ABILITY_ITEM:
 			return abilityItems.Contains(str_uniq_id);
+		case ITEM_ICON_TYPE.ACCESSORY:
+			return accessoryItems.Contains(str_uniq_id);
 		}
+	}
+
+	public bool isNewClanScout(string cId, int expiredAt)
+	{
+		string item = cId + ":" + expiredAt;
+		bool flag = !newClanScoutList.Contains(item);
+		if (flag)
+		{
+			newClanScoutList.Add(item);
+			Save();
+		}
+		return flag;
 	}
 
 	public bool isNewReleasePortal(uint id)
@@ -453,6 +503,22 @@ public class GameSaveData
 			showedOpenRegionIds.Add(id);
 			Save();
 		}
+	}
+
+	public bool IsTutorialSeriesArena()
+	{
+		if (tutorialCompleteSeriesArena == 0)
+		{
+			tutorialCompleteSeriesArena = 1;
+			Save();
+			return true;
+		}
+		return false;
+	}
+
+	public bool IsOpenUniqueStatus()
+	{
+		return tutorialCompleteSeriesArena == 1;
 	}
 
 	public void AddChatLog(int user_id, GuildMessage.ChatPostRequest req)
@@ -473,6 +539,36 @@ public class GameSaveData
 				req
 			});
 		}
+	}
+
+	public void SetMutualFollowerInviteListSortType(int _v)
+	{
+		MutualFollowerInviteListSortType = _v;
+		Save();
+	}
+
+	public void SetMutualFollowerListSortType(int _v)
+	{
+		MutualFollowerListSortType = _v;
+		Save();
+	}
+
+	public void SetFollowListSortType(int _v)
+	{
+		FollowListSortType = _v;
+		Save();
+	}
+
+	public void SetFollowerListSortType(int _v)
+	{
+		FollowerListSortType = _v;
+		Save();
+	}
+
+	public void SetScreenShotUIFilterType(int _v)
+	{
+		ScreenShotUIFilterType = _v;
+		Save();
 	}
 
 	public static void Load()

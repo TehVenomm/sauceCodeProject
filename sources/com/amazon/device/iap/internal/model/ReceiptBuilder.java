@@ -40,8 +40,8 @@ public class ReceiptBuilder {
         return this;
     }
 
-    public ReceiptBuilder setProductType(ProductType productType) {
-        this.productType = productType;
+    public ReceiptBuilder setProductType(ProductType productType2) {
+        this.productType = productType2;
         return this;
     }
 

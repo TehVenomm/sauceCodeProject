@@ -11,21 +11,19 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.sql.Date;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public final class SqlDateTypeAdapter extends TypeAdapter<Date> {
-    public static final TypeAdapterFactory FACTORY = new C06991();
-    private final DateFormat format = new SimpleDateFormat("MMM d, yyyy");
-
-    /* renamed from: com.google.gson.internal.bind.SqlDateTypeAdapter$1 */
-    static final class C06991 implements TypeAdapterFactory {
-        C06991() {
-        }
-
+    public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
         public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            return typeToken.getRawType() == Date.class ? new SqlDateTypeAdapter() : null;
+            if (typeToken.getRawType() == Date.class) {
+                return new SqlDateTypeAdapter();
+            }
+            return null;
         }
-    }
+    };
+    private final DateFormat format = new SimpleDateFormat("MMM d, yyyy");
 
     public Date read(JsonReader jsonReader) throws IOException {
         Date date;
@@ -36,8 +34,8 @@ public final class SqlDateTypeAdapter extends TypeAdapter<Date> {
             } else {
                 try {
                     date = new Date(this.format.parse(jsonReader.nextString()).getTime());
-                } catch (Throwable e) {
-                    throw new JsonSyntaxException(e);
+                } catch (ParseException e) {
+                    throw new JsonSyntaxException((Throwable) e);
                 }
             }
         }

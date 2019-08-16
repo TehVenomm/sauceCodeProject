@@ -168,51 +168,49 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 
 	private void Reposition(bool isPortrait)
 	{
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		if (!(base._transform == null))
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+		if (base._transform == null)
 		{
-			Transform val = Utility.Find(base._transform, "SCR_QUEST");
-			if (val != null)
-			{
-				UIPanel panel = val.GetComponent<UIPanel>();
-				if (panel != null)
-				{
-					if (isPortrait)
-					{
-						panel.clipRange = new Vector4(0f, 0f, 460f, 500f);
-					}
-					else
-					{
-						panel.clipRange = new Vector4(0f, 0f, 460f, 260f);
-					}
-				}
-				UIScrollView component = val.GetComponent<UIScrollView>();
-				if (component != null)
-				{
-					component.ResetPosition();
-					AppMain i = MonoBehaviourSingleton<AppMain>.I;
-					i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-					{
-						RefreshUI();
-						panel.Refresh();
-					});
-				}
-			}
-			UIScreenRotationHandler[] componentsInChildren = this.get_gameObject().GetComponentsInChildren<UIScreenRotationHandler>();
-			for (int j = 0; j < componentsInChildren.Length; j++)
-			{
-				componentsInChildren[j].InvokeRotate();
-			}
-			UpdateAnchors();
+			return;
 		}
+		Transform val = Utility.Find(base._transform, "SCR_QUEST");
+		if (val != null)
+		{
+			UIPanel panel = val.GetComponent<UIPanel>();
+			if (panel != null)
+			{
+				if (isPortrait)
+				{
+					panel.clipRange = new Vector4(0f, 0f, 460f, 500f);
+				}
+				else
+				{
+					panel.clipRange = new Vector4(0f, 0f, 460f, 260f);
+				}
+			}
+			UIScrollView component = val.GetComponent<UIScrollView>();
+			if (component != null)
+			{
+				component.ResetPosition();
+				AppMain i = MonoBehaviourSingleton<AppMain>.I;
+				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+				{
+					RefreshUI();
+					panel.Refresh();
+				});
+			}
+		}
+		UIScreenRotationHandler[] componentsInChildren = this.get_gameObject().GetComponentsInChildren<UIScreenRotationHandler>();
+		for (int j = 0; j < componentsInChildren.Length; j++)
+		{
+			componentsInChildren[j].InvokeRotate();
+		}
+		UpdateAnchors();
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (base.transferUI != null)
 		{
 			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();

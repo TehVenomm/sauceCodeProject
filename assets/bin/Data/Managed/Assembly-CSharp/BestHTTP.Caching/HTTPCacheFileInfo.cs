@@ -241,12 +241,9 @@ namespace BestHTTP.Caching
 			LastAccess = DateTime.UtcNow;
 			using (FileStream stream = new FileStream(GetPath(), FileMode.Open))
 			{
-				HTTPResponse hTTPResponse = new HTTPResponse(request, stream, request.UseStreaming, true);
+				HTTPResponse hTTPResponse = new HTTPResponse(request, stream, request.UseStreaming, isFromCache: true);
 				hTTPResponse.Receive(BodyLength);
 				return hTTPResponse;
-				IL_0048:
-				HTTPResponse result;
-				return result;
 			}
 		}
 

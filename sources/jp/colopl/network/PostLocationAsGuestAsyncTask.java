@@ -1,4 +1,4 @@
-package jp.colopl.network;
+package p018jp.colopl.network;
 
 import android.content.Context;
 import android.location.Location;
@@ -7,13 +7,14 @@ import com.appsflyer.AppsFlyerLib;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import jp.colopl.util.Crypto;
-import jp.colopl.util.LocationUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p018jp.colopl.util.Crypto;
+import p018jp.colopl.util.LocationUtil;
 
+/* renamed from: jp.colopl.network.PostLocationAsGuestAsyncTask */
 public class PostLocationAsGuestAsyncTask extends PostLocationAsynTaskBase {
     String mAid;
     PostLocationAsGuestAsyncTaskDelegate mDelegate;
@@ -29,17 +30,19 @@ public class PostLocationAsGuestAsyncTask extends PostLocationAsynTaskBase {
         this.mHash = str5;
     }
 
-    protected void after(Context context, String str) {
+    /* access modifiers changed from: protected */
+    public void after(Context context, String str) {
         if (this.mDelegate != null && !isCancelled()) {
             this.mDelegate.onPostLocationAsGuest(str);
         }
     }
 
-    protected List<NameValuePair> getPostData() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<NameValuePair> getPostData() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(LocationUtil.getMostAccurateLocation(getLocations()));
         String encryptedLocations = LocationUtil.getEncryptedLocations(arrayList);
-        List<NameValuePair> arrayList2 = new ArrayList(5);
+        ArrayList arrayList2 = new ArrayList(5);
         arrayList2.add(new BasicNameValuePair(AppsFlyerLib.ATTRIBUTION_ID_COLUMN_NAME, this.mAid));
         arrayList2.add(new BasicNameValuePair("puid", this.mGuid));
         arrayList2.add(new BasicNameValuePair("t", this.mTime));
@@ -48,18 +51,19 @@ public class PostLocationAsGuestAsyncTask extends PostLocationAsynTaskBase {
         return arrayList2;
     }
 
-    protected void handleError(Context context, Exception exception) {
+    /* access modifiers changed from: protected */
+    public void handleError(Context context, Exception exc) {
         if (this.mDelegate != null && !isCancelled()) {
             this.mDelegate.onPostLocationAsGuest(null);
         }
     }
 
-    protected String handleResponseInBackground(String str) {
-        JSONException e;
+    /* access modifiers changed from: protected */
+    public String handleResponseInBackground(String str) {
         if (TextUtils.isEmpty(str)) {
             return null;
         }
-        if (str.charAt(str.length() - 1) == '\n') {
+        if (str.charAt(str.length() - 1) == 10) {
             str = str.substring(0, str.length() - 1);
         }
         try {
@@ -70,20 +74,20 @@ public class PostLocationAsGuestAsyncTask extends PostLocationAsynTaskBase {
                         if (new JSONObject(decrypt).getJSONObject("status").getInt("code") != 100) {
                             return null;
                         }
-                    } catch (JSONException e2) {
-                        e = e2;
+                    } catch (JSONException e) {
+                        e = e;
                         e.printStackTrace();
                         return null;
                     }
-                } catch (JSONException e3) {
-                    e = e3;
+                } catch (JSONException e2) {
+                    e = e2;
                     e.printStackTrace();
                     return null;
                 }
             }
             return decrypt;
-        } catch (Exception e4) {
-            e4.printStackTrace();
+        } catch (Exception e3) {
+            e3.printStackTrace();
             return null;
         }
     }

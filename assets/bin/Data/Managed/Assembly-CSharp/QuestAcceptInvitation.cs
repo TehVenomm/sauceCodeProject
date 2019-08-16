@@ -136,7 +136,6 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	protected override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(GetInvitedList(onFinish, cb));
 	}
 
@@ -147,55 +146,45 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		bool rallySuccess_ = false;
 		bool guildInviteSuccess_ = false;
 		bool guildDonateInviteSuccess_ = false;
-		bool waitGetData5 = true;
+		bool waitGetData = true;
 		MonoBehaviourSingleton<PartyManager>.I.SendInvitedParty(delegate(bool partySuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_0060: stateMachine*/)._003CpartySuccess__003E__0 = partySuccess;
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_0060: stateMachine*/)._003CwaitGetData_003E__5 = false;
-		}, false);
-		while (waitGetData5)
+			partySuccess_ = partySuccess;
+			waitGetData = false;
+		});
+		while (waitGetData)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		waitGetData5 = true;
+		waitGetData = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInvitedLounge(delegate(bool loungeSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_00a1: stateMachine*/)._003CloungeSuccess__003E__1 = loungeSuccess;
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_00a1: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			loungeSuccess_ = loungeSuccess;
+			waitGetData = false;
 		});
-		while (waitGetData5)
+		while (waitGetData)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		waitGetData5 = true;
+		waitGetData = true;
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.GetRallyList(delegate(bool rallySuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_00e1: stateMachine*/)._003CrallySuccess__003E__2 = rallySuccess;
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_00e1: stateMachine*/)._003CwaitGetData_003E__5 = false;
+			rallySuccess_ = rallySuccess;
+			waitGetData = false;
 		});
-		while (waitGetData5)
+		while (waitGetData)
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		waitGetData5 = true;
-		MonoBehaviourSingleton<GuildManager>.I.SendInvitedGuild(delegate(bool guildSuccess)
-		{
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_0121: stateMachine*/)._003CguildInviteSuccess__003E__3 = guildSuccess;
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_0121: stateMachine*/)._003CwaitGetData_003E__5 = false;
-		}, false);
-		while (waitGetData5)
-		{
-			yield return (object)null;
-		}
-		waitGetData5 = true;
+		waitGetData = true;
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate(bool guildDonateInviteSuccess)
 		{
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_0162: stateMachine*/)._003CguildDonateInviteSuccess__003E__4 = guildDonateInviteSuccess;
-			((_003CGetInvitedList_003Ec__IteratorB5)/*Error near IL_0162: stateMachine*/)._003CwaitGetData_003E__5 = false;
-		}, false);
-		while (waitGetData5)
+			guildDonateInviteSuccess_ = guildDonateInviteSuccess;
+			waitGetData = false;
+		});
+		while (waitGetData)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		onFinish();
 		cb?.Invoke(partySuccess_ && loungeSuccess_ && rallySuccess_ && guildInviteSuccess_ && guildDonateInviteSuccess_);
@@ -206,34 +195,29 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		if (!PartyManager.IsValidNotEmptyList() && !GuildManager.IsValidNotEmptyInviteList() && !GuildManager.IsValidNotEmptyDonateInviteList())
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.ClearPartyInvite();
-			MonoBehaviourSingleton<UIManager>.I.invitationButton.Close(UITransition.TYPE.CLOSE);
-			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close(UITransition.TYPE.CLOSE);
+			MonoBehaviourSingleton<UIManager>.I.invitationButton.Close();
+			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Close();
 		}
 		if (!PartyManager.IsValidNotEmptyList() && !LoungeMatchingManager.IsValidNotEmptyList() && !LoungeMatchingManager.IsValidNotEmptyRallyList() && !GuildManager.IsValidNotEmptyInviteList() && !GuildManager.IsValidNotEmptyDonateInviteList())
 		{
-			SetActive((Enum)UI.GRD_QUEST, false);
-			SetActive((Enum)UI.TBL_QUEST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
+			SetActive((Enum)UI.TBL_QUEST, is_visible: false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			return;
 		}
-		else
-		{
-			parties = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-			lounges = MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges.ToArray();
-			rallyInvites = MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite.ToArray();
-			guildInvites = MonoBehaviourSingleton<GuildManager>.I.guildInviteList.ToArray();
-			guildDonateInvites = MonoBehaviourSingleton<GuildManager>.I.donateInviteList.ToArray();
-			SetActive((Enum)UI.TBL_QUEST, true);
-			SetActive((Enum)UI.GRD_QUEST, true);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			UpdateTable();
-		}
+		parties = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
+		lounges = MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges.ToArray();
+		rallyInvites = MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite.ToArray();
+		guildInvites = ((!MonoBehaviourSingleton<GuildManager>.IsValid() || MonoBehaviourSingleton<GuildManager>.I.guildInviteList == null) ? new GuildInvitedModel.GuildInvitedInfo[0] : MonoBehaviourSingleton<GuildManager>.I.guildInviteList.ToArray());
+		guildDonateInvites = MonoBehaviourSingleton<GuildManager>.I.donateInviteList.ToArray();
+		SetActive((Enum)UI.TBL_QUEST, is_visible: true);
+		SetActive((Enum)UI.GRD_QUEST, is_visible: true);
+		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		UpdateTable();
 	}
 
 	protected void UpdateTable()
 	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Expected O, but got Unknown
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 		int num = parties.Length;
 		int num2 = lounges.Length;
 		int num3 = rallyInvites.Length;
@@ -250,36 +234,36 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			int j = 0;
 			for (int childCount = ctrl.get_childCount(); j < childCount; j++)
 			{
-				Transform val = ctrl.GetChild(0);
-				val.set_parent(null);
-				Object.Destroy(val.get_gameObject());
+				Transform child = ctrl.GetChild(0);
+				child.set_parent(null);
+				Object.Destroy(child.get_gameObject());
 			}
 		}
-		SetTable(UI.TBL_QUEST, string.Empty, item_num, true, delegate(int i, Transform parent)
+		SetTable(UI.TBL_QUEST, string.Empty, item_num, reset: true, delegate(int i, Transform parent)
 		{
-			Transform val2 = null;
-			if (i < guildDonateInviteStartIndex)
+			Transform val = null;
+			if (i >= guildDonateInviteStartIndex)
 			{
-				if (i < guildInviteStartIndex)
-				{
-					if (i < rallyStartIndex)
-					{
-						if (i < partyStartIndex)
-						{
-							return Realizes("LoungeSearchListItem", parent, true);
-						}
-						return Realizes("QuestInvitationListItem", parent, true);
-					}
-					return Realizes("LoungeMemberListItem", parent, true);
-				}
-				return Realizes("GuildInvitedListItem", parent, true);
+				int index5 = i - guildDonateInviteStartIndex;
+				string prefab_name = InitGuildDonateInviteObject(index5);
+				return Realizes(prefab_name, parent);
 			}
-			int index5 = i - guildDonateInviteStartIndex;
-			string prefab_name = InitGuildDonateInviteObject(index5);
-			return Realizes(prefab_name, parent, true);
+			if (i >= guildInviteStartIndex)
+			{
+				return Realizes("GuildInvitedListItem", parent);
+			}
+			if (i >= rallyStartIndex)
+			{
+				return Realizes("LoungeMemberListItem", parent);
+			}
+			if (i >= partyStartIndex)
+			{
+				return Realizes("QuestInvitationListItem", parent);
+			}
+			return Realizes("LoungeSearchListItem", parent);
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
-			SetActive(t, true);
+			SetActive(t, is_visible: true);
 			if (i >= guildDonateInviteStartIndex)
 			{
 				int index = i - guildDonateInviteStartIndex;
@@ -330,7 +314,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		SetLabelText(t, UI.LBL_LABEL, text);
 		SetStamp(t, lounge.stampId);
 		int num = lounge.num + 1;
-		int num2 = lounge.slotInfos.Count((LoungeModel.SlotInfo slotInfo) => slotInfo != null && slotInfo.userInfo != null && slotInfo.userInfo.userId != lounge.ownerUserId);
+		int num2 = lounge.slotInfos.Count((PartyModel.SlotInfo slotInfo) => slotInfo != null && slotInfo.userInfo != null && slotInfo.userInfo.userId != lounge.ownerUserId);
 		for (int j = 0; j < 7; j++)
 		{
 			bool is_visible = j < num - 1;
@@ -345,26 +329,25 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		questTableData = ((parties[index].quest.explore == null) ? Singleton<QuestTable>.I.GetQuestData((uint)parties[index].quest.questId) : Singleton<QuestTable>.I.GetQuestData((uint)parties[index].quest.explore.mainQuestId));
 		if (questTableData == null)
 		{
-			SetActive(t, false);
+			SetActive(t, is_visible: false);
+			return;
+		}
+		UI uI = UI.OBJ_QUEST_INFO_ROOT;
+		if (questTableData.questType == QUEST_TYPE.ORDER)
+		{
+			uI = UI.OBJ_ORDER_QUEST_INFO_ROOT;
+			SetToggle(t, UI.OBJ_ORDER_QUEST_INFO_ROOT, value: true);
 		}
 		else
 		{
-			UI uI = UI.OBJ_QUEST_INFO_ROOT;
-			if (questTableData.questType == QUEST_TYPE.ORDER)
-			{
-				uI = UI.OBJ_ORDER_QUEST_INFO_ROOT;
-				SetToggle(t, UI.OBJ_ORDER_QUEST_INFO_ROOT, true);
-			}
-			else
-			{
-				SetToggle(t, UI.OBJ_ORDER_QUEST_INFO_ROOT, false);
-			}
-			SetEvent(t, "SELECT_ROOM", index);
-			Transform val = FindCtrl(t, uI);
-			SetEnemyIconGradeFrame(val, UI.SPR_ORDER_RARITY_FRAME, questTableData);
-			SetQuestData(questTableData, val);
-			SetPartyData(parties[index], t);
+			SetToggle(t, UI.OBJ_ORDER_QUEST_INFO_ROOT, value: false);
 		}
+		SetEvent(t, "SELECT_ROOM", index);
+		Transform val = FindCtrl(t, uI);
+		SetEnemyIconGradeFrame(val, UI.SPR_ORDER_RARITY_FRAME, questTableData);
+		SetQuestData(questTableData, val);
+		SetPartyData(parties[index], t);
+		SetMemberIcon(t, questTableData);
 	}
 
 	private void InitRally(int index, Transform t)
@@ -376,8 +359,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		CharaInfo userInfo = slotInfo.userInfo;
 		FollowLoungeMember followLoungeMember = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetFollowLoungeMember(userInfo.userId);
 		EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(index + 4);
-		otherEquipSetCalculator.SetEquipSet(slotInfo.userInfo.equipSet, false);
-		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(userInfo, false, true, false, true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), true, null);
+		otherEquipSetCalculator.SetEquipSet(slotInfo.userInfo.equipSet);
+		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(userInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		SetLabelText(t, UI.LBL_NAME, userInfo.name);
 		SetLabelText(t, UI.LBL_LEVEL, userInfo.level.ToString());
 		SetFollowStatus(t, userInfo.userId, followLoungeMember.following, followLoungeMember.follower);
@@ -385,7 +368,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		SetPlayingStatus(t, userInfo.userId);
 		SetActive(t, UI.SPR_ICON_FIRST_MET, MonoBehaviourSingleton<LoungeMatchingManager>.I.CheckFirstMet(userInfo.userId));
 		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(userInfo.selectedDegrees, false, delegate
+		component.Initialize(userInfo.selectedDegrees, isButton: false, delegate
 		{
 			RepositionTable();
 		});
@@ -397,8 +380,8 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
 		if (flag)
 		{
-			SetActive(t, UI.SPR_FOLLOW, false);
-			SetActive(t, UI.SPR_FOLLOWER, false);
+			SetActive(t, UI.SPR_FOLLOW, is_visible: false);
+			SetActive(t, UI.SPR_FOLLOWER, is_visible: false);
 		}
 		else
 		{
@@ -409,72 +392,66 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	private void SetPlayingStatus(Transform root, int userId)
 	{
-		SetActive(root, UI.OBJ_LOUNGE, false);
-		SetActive(root, UI.OBJ_FIELD, false);
-		SetActive(root, UI.OBJ_QUEST, false);
-		SetActive(root, UI.OBJ_ARENA, false);
+		SetActive(root, UI.OBJ_LOUNGE, is_visible: false);
+		SetActive(root, UI.OBJ_FIELD, is_visible: false);
+		SetActive(root, UI.OBJ_QUEST, is_visible: false);
+		SetActive(root, UI.OBJ_ARENA, is_visible: false);
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus == null)
 		{
-			SetActive(root, UI.OBJ_LOUNGE, true);
+			SetActive(root, UI.OBJ_LOUNGE, is_visible: true);
+			return;
 		}
-		else
+		LoungeMemberStatus loungeMemberStatus = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
+		if (loungeMemberStatus == null)
 		{
-			LoungeMemberStatus loungeMemberStatus = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
-			if (loungeMemberStatus != null)
+			SetActive(root, UI.OBJ_LOUNGE, is_visible: true);
+			return;
+		}
+		switch (loungeMemberStatus.GetStatus())
+		{
+		case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
+			SetActive(root, UI.OBJ_LOUNGE, is_visible: true);
+			break;
+		case LoungeMemberStatus.MEMBER_STATUS.QUEST:
+			SetQuestInfo(root, loungeMemberStatus.questId);
+			SetActive(root, UI.LBL_PLAYING_QUEST, is_visible: true);
+			SetActive(root, UI.LBL_PLAYING_READY, is_visible: false);
+			break;
+		case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
+			SetQuestInfo(root, loungeMemberStatus.questId);
+			SetActive(root, UI.LBL_PLAYING_QUEST, is_visible: false);
+			SetActive(root, UI.LBL_PLAYING_READY, is_visible: true);
+			break;
+		case LoungeMemberStatus.MEMBER_STATUS.FIELD:
+		{
+			SetActive(root, UI.OBJ_FIELD, is_visible: true);
+			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)loungeMemberStatus.fieldMapId);
+			if (fieldMapData == null)
 			{
-				switch (loungeMemberStatus.GetStatus())
-				{
-				case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
-					SetActive(root, UI.OBJ_LOUNGE, true);
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.QUEST:
-					SetQuestInfo(root, loungeMemberStatus.questId);
-					SetActive(root, UI.LBL_PLAYING_QUEST, true);
-					SetActive(root, UI.LBL_PLAYING_READY, false);
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
-					SetQuestInfo(root, loungeMemberStatus.questId);
-					SetActive(root, UI.LBL_PLAYING_QUEST, false);
-					SetActive(root, UI.LBL_PLAYING_READY, true);
-					break;
-				case LoungeMemberStatus.MEMBER_STATUS.FIELD:
-				{
-					SetActive(root, UI.OBJ_FIELD, true);
-					FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)loungeMemberStatus.fieldMapId);
-					if (fieldMapData == null)
-					{
-						SetLabelText(root, UI.LBL_AREA_NAME, string.Empty);
-					}
-					else
-					{
-						RegionTable.Data data = Singleton<RegionTable>.I.GetData(fieldMapData.regionId);
-						if (data == null)
-						{
-							SetLabelText(root, UI.LBL_AREA_NAME, fieldMapData.mapName);
-						}
-						else
-						{
-							SetLabelText(root, UI.LBL_AREA_NAME, data.regionName + " - " + fieldMapData.mapName);
-						}
-					}
-					break;
-				}
-				case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-					SetActive(root, UI.OBJ_ARENA, true);
-					SetActive(root, UI.LBL_PLAYING_ARENA, true);
-					break;
-				}
+				SetLabelText(root, UI.LBL_AREA_NAME, string.Empty);
+				break;
+			}
+			RegionTable.Data data = Singleton<RegionTable>.I.GetData(fieldMapData.regionId);
+			if (data == null)
+			{
+				SetLabelText(root, UI.LBL_AREA_NAME, fieldMapData.mapName);
 			}
 			else
 			{
-				SetActive(root, UI.OBJ_LOUNGE, true);
+				SetLabelText(root, UI.LBL_AREA_NAME, data.regionName + " - " + fieldMapData.mapName);
 			}
+			break;
+		}
+		case LoungeMemberStatus.MEMBER_STATUS.ARENA:
+			SetActive(root, UI.OBJ_ARENA, is_visible: true);
+			SetActive(root, UI.LBL_PLAYING_ARENA, is_visible: true);
+			break;
 		}
 	}
 
 	private void SetQuestInfo(Transform root, int questId)
 	{
-		SetActive(root, UI.OBJ_QUEST, true);
+		SetActive(root, UI.OBJ_QUEST, is_visible: true);
 		string questText = Singleton<QuestTable>.I.GetQuestData((uint)questId).questText;
 		SetLabelText(root, UI.LBL_QUEST_NAME, questText);
 	}
@@ -513,7 +490,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		double num = info.expired / 1000.0 - DateTimeToTimestampSeconds();
 		if (!(num < 1.0) && info.itemNum < info.quantity)
 		{
-			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
 			bool flag = info.itemNum >= info.quantity;
 			SetLabelText(t, UI.LBL_CHAT_MESSAGE, info.msg);
 			SetLabelText(t, UI.LBL_USER_NAME, info.nickName);
@@ -531,7 +508,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			}
 			else
 			{
-				SetButtonEnabled(t, UI.BTN_GIFT, false);
+				SetButtonEnabled(t, UI.BTN_GIFT, is_enabled: false);
 			}
 			Transform val = FindCtrl(t, UI.OBJ_MATERIAL_ICON);
 			Item item = new Item();
@@ -603,7 +580,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		case ITEM_ICON_TYPE.QUEST_ITEM:
 		{
 			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0L)
+			if (uniqID != 0)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
@@ -638,7 +615,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		}
 		else
 		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, false, null, false, enemy_icon_id, 0, false, GET_TYPE.PAY);
+			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
 		}
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), parent_scroll);
 	}
@@ -665,61 +642,59 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		if (fieldMapId == MonoBehaviourSingleton<FieldManager>.I.currentMapID)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)fieldMapId);
+		if (fieldMapData == null || fieldMapData.jumpPortalID == 0)
 		{
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)fieldMapId);
-			if (fieldMapData == null || fieldMapData.jumpPortalID == 0)
+			Log.Error("RegionMap.OnQuery_SELECT() jumpPortalID is not found.");
+		}
+		else if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(fieldMapData.jumpPortalID, check_dst_quest: false))
+		{
+			GameSection.StopEvent();
+		}
+		else if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapData))
+		{
+			DispatchEvent("CANT_JUMP");
+		}
+		else if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			if (QuestManager.IsValidInGame())
 			{
-				Log.Error("RegionMap.OnQuery_SELECT() jumpPortalID is not found.");
-			}
-			else if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(fieldMapData.jumpPortalID, false, true))
-			{
-				GameSection.StopEvent();
-			}
-			else if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapData))
-			{
-				DispatchEvent("CANT_JUMP", null);
-			}
-			else if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-			{
-				if (QuestManager.IsValidInGame())
-				{
-					MonoBehaviourSingleton<WorldMapManager>.I.SetJumpPortalID(fieldMapData.jumpPortalID);
-					MonoBehaviourSingleton<InGameManager>.I.isTransitionQuestToField = true;
-					MonoBehaviourSingleton<InGameProgress>.I.QuestToField(fieldMapData.jumpPortalID);
-				}
-				else
-				{
-					MonoBehaviourSingleton<InGameProgress>.I.PortalNext(fieldMapData.jumpPortalID);
-					MonoBehaviourSingleton<FieldManager>.I.useFastTravel = true;
-				}
+				MonoBehaviourSingleton<WorldMapManager>.I.SetJumpPortalID(fieldMapData.jumpPortalID);
+				MonoBehaviourSingleton<InGameManager>.I.isTransitionQuestToField = true;
+				MonoBehaviourSingleton<InGameProgress>.I.QuestToField(fieldMapData.jumpPortalID);
 			}
 			else
 			{
-				GameSection.StayEvent();
-				CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
-				{
-					if (!is_connect)
-					{
-						GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-						GameSection.ResumeEvent(true, null);
-						AppMain i = MonoBehaviourSingleton<AppMain>.I;
-						i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-						{
-							DispatchEvent("CLOSE", null);
-						});
-					}
-					else
-					{
-						GameSection.ResumeEvent(is_regist, null);
-						if (is_regist)
-						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-						}
-					}
-				});
+				MonoBehaviourSingleton<InGameProgress>.I.PortalNext(fieldMapData.jumpPortalID);
+				MonoBehaviourSingleton<FieldManager>.I.useFastTravel = true;
 			}
+		}
+		else
+		{
+			GameSection.StayEvent();
+			CoopApp.EnterField(fieldMapData.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
+			{
+				if (!is_connect)
+				{
+					GameSection.ChangeStayEvent("COOP_SERVER_INVALID");
+					GameSection.ResumeEvent(is_resume: true);
+					AppMain i = MonoBehaviourSingleton<AppMain>.I;
+					i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+					{
+						DispatchEvent("CLOSE");
+					});
+				}
+				else
+				{
+					GameSection.ResumeEvent(is_regist);
+					if (is_regist)
+					{
+						MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame");
+					}
+				}
+			});
 		}
 	}
 
@@ -739,7 +714,6 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	private void SetStamp(Transform root, int stampId)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
 		if (data != null)
 		{
@@ -750,16 +724,16 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 	private IEnumerator LoadStamp(Transform root, int stampId)
 	{
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId, false);
+		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId);
 		while (load_queue.IsLoading())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (lo_stamp.loadedObject != null)
 		{
-			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
-			SetActive(root, UI.OBJ_SYMBOL, true);
-			SetTexture(root, UI.TEX_STAMP, stamp);
+			Texture2D texture = lo_stamp.loadedObject as Texture2D;
+			SetActive(root, UI.OBJ_SYMBOL, is_visible: true);
+			SetTexture(root, UI.TEX_STAMP, texture);
 		}
 	}
 
@@ -806,7 +780,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendEntry(lounges[num].id, delegate(bool isSuccess)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 			});
 		}
 	}

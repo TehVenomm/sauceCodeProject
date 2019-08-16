@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Event System (UICamera)")]
 [RequireComponent(typeof(Camera))]
-public class UICamera
+public class UICamera : MonoBehaviour
 {
 	public enum ControlScheme
 	{
@@ -70,28 +71,6 @@ public class UICamera
 		UI_2D
 	}
 
-	private struct DepthEntry
-	{
-		public int depth;
-
-		public RaycastHit hit;
-
-		public Vector3 point;
-
-		public GameObject go;
-	}
-
-	public class Touch
-	{
-		public int fingerId;
-
-		public TouchPhase phase;
-
-		public Vector2 position;
-
-		public int tapCount;
-	}
-
 	public delegate bool GetKeyStateFunc(KeyCode key);
 
 	public delegate float GetAxisFunc(string name);
@@ -117,6 +96,28 @@ public class UICamera
 	public delegate void ObjectDelegate(GameObject go, GameObject obj);
 
 	public delegate void KeyCodeDelegate(GameObject go, KeyCode key);
+
+	private struct DepthEntry
+	{
+		public int depth;
+
+		public RaycastHit hit;
+
+		public Vector3 point;
+
+		public GameObject go;
+	}
+
+	public class Touch
+	{
+		public int fingerId;
+
+		public TouchPhase phase;
+
+		public Vector2 position;
+
+		public int tapCount;
+	}
 
 	public delegate int GetTouchCountCallback();
 
@@ -303,6 +304,21 @@ public class UICamera
 
 	public static GetTouchCallback GetInputTouch;
 
+	[CompilerGenerated]
+	private static BetterList<UICamera>.CompareFunc _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static GetKeyStateFunc _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static GetKeyStateFunc _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static GetKeyStateFunc _003C_003Ef__mg_0024cache3;
+
+	[CompilerGenerated]
+	private static GetAxisFunc _003C_003Ef__mg_0024cache4;
+
 	[Obsolete("Use new OnDragStart / OnDragOver / OnDragOut / OnDragEnd events instead")]
 	public bool stickyPress
 	{
@@ -344,8 +360,6 @@ public class UICamera
 	{
 		get
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Expected O, but got Unknown
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
@@ -423,29 +437,30 @@ public class UICamera
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			if (mCurrentKey != value)
+			if (mCurrentKey == value)
 			{
-				ControlScheme currentScheme = UICamera.currentScheme;
-				mCurrentKey = value;
-				ControlScheme currentScheme2 = UICamera.currentScheme;
-				if (currentScheme != currentScheme2)
+				return;
+			}
+			ControlScheme currentScheme = UICamera.currentScheme;
+			mCurrentKey = value;
+			ControlScheme currentScheme2 = UICamera.currentScheme;
+			if (currentScheme != currentScheme2)
+			{
+				HideTooltip();
+				if (currentScheme2 == ControlScheme.Mouse)
 				{
-					HideTooltip();
-					if (currentScheme2 == ControlScheme.Mouse)
-					{
-						Cursor.set_lockState(1);
-						Cursor.set_visible(true);
-					}
-					else
-					{
-						Cursor.set_visible(false);
-						Cursor.set_lockState(0);
-						mMouse[0].ignoreDelta = 2;
-					}
-					if (onSchemeChange != null)
-					{
-						onSchemeChange();
-					}
+					Cursor.set_lockState(1);
+					Cursor.set_visible(true);
+				}
+				else
+				{
+					Cursor.set_visible(false);
+					Cursor.set_lockState(0);
+					mMouse[0].ignoreDelta = 2;
+				}
+				if (onSchemeChange != null)
+				{
+					onSchemeChange();
 				}
 			}
 		}
@@ -535,64 +550,65 @@ public class UICamera
 		}
 		set
 		{
-			if (!(mHover == value))
+			if (mHover == value)
 			{
-				bool flag = false;
-				UICamera uICamera = current;
-				if (currentTouch == null)
+				return;
+			}
+			bool flag = false;
+			UICamera uICamera = current;
+			if (currentTouch == null)
+			{
+				flag = true;
+				currentTouchID = -100;
+				currentTouch = controller;
+			}
+			ShowTooltip(null);
+			if (Object.op_Implicit(mSelected) && currentScheme == ControlScheme.Controller)
+			{
+				Notify(mSelected, "OnSelect", false);
+				if (onSelect != null)
 				{
-					flag = true;
-					currentTouchID = -100;
-					currentTouch = controller;
+					onSelect(mSelected, state: false);
 				}
-				ShowTooltip(null);
-				if (Object.op_Implicit(mSelected) && currentScheme == ControlScheme.Controller)
+				mSelected = null;
+			}
+			if (Object.op_Implicit(mHover))
+			{
+				Notify(mHover, "OnHover", false);
+				if (onHover != null)
 				{
-					Notify(mSelected, "OnSelect", false);
-					if (onSelect != null)
-					{
-						onSelect(mSelected, false);
-					}
-					mSelected = null;
+					onHover(mHover, state: false);
 				}
-				if (Object.op_Implicit(mHover))
+			}
+			mHover = value;
+			currentTouch.clickNotification = ClickNotification.None;
+			if (Object.op_Implicit(mHover))
+			{
+				if (mHover != controller.current && mHover.GetComponent<UIKeyNavigation>() != null)
 				{
-					Notify(mHover, "OnHover", false);
-					if (onHover != null)
-					{
-						onHover(mHover, false);
-					}
-				}
-				mHover = value;
-				currentTouch.clickNotification = ClickNotification.None;
-				if (Object.op_Implicit(mHover))
-				{
-					if (mHover != controller.current && mHover.GetComponent<UIKeyNavigation>() != null)
-					{
-						controller.current = mHover;
-					}
-					if (flag)
-					{
-						UICamera uICamera2 = (!(mHover != null)) ? list[0] : FindCameraForLayer(mHover.get_layer());
-						if (uICamera2 != null)
-						{
-							current = uICamera2;
-							currentCamera = uICamera2.cachedCamera;
-						}
-					}
-					if (onHover != null)
-					{
-						onHover(mHover, true);
-					}
-					Notify(mHover, "OnHover", true);
+					controller.current = mHover;
 				}
 				if (flag)
 				{
-					current = uICamera;
-					currentCamera = ((!(uICamera != null)) ? null : uICamera.cachedCamera);
-					currentTouch = null;
-					currentTouchID = -100;
+					UICamera uICamera2 = (!(mHover != null)) ? list[0] : FindCameraForLayer(mHover.get_layer());
+					if (uICamera2 != null)
+					{
+						current = uICamera2;
+						currentCamera = uICamera2.cachedCamera;
+					}
 				}
+				if (onHover != null)
+				{
+					onHover(mHover, state: true);
+				}
+				Notify(mHover, "OnHover", true);
+			}
+			if (flag)
+			{
+				current = uICamera;
+				currentCamera = ((!(uICamera != null)) ? null : uICamera.cachedCamera);
+				currentTouch = null;
+				currentTouchID = -100;
 			}
 		}
 	}
@@ -601,10 +617,6 @@ public class UICamera
 	{
 		get
 		{
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Expected O, but got Unknown
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Expected O, but got Unknown
 			if (Object.op_Implicit(controller.current) && controller.current.get_activeInHierarchy())
 			{
 				return controller.current;
@@ -645,7 +657,7 @@ public class UICamera
 				Notify(controller.current, "OnHover", false);
 				if (onHover != null)
 				{
-					onHover(controller.current, false);
+					onHover(controller.current, state: false);
 				}
 				controller.current = null;
 			}
@@ -670,62 +682,60 @@ public class UICamera
 			{
 				hoveredObject = value;
 				controller.current = value;
+				return;
 			}
-			else
+			ShowTooltip(null);
+			bool flag = false;
+			UICamera uICamera = current;
+			if (currentTouch == null)
 			{
-				ShowTooltip(null);
-				bool flag = false;
-				UICamera uICamera = current;
-				if (currentTouch == null)
+				flag = true;
+				currentTouchID = -100;
+				currentTouch = controller;
+			}
+			mInputFocus = false;
+			if (Object.op_Implicit(mSelected))
+			{
+				Notify(mSelected, "OnSelect", false);
+				if (onSelect != null)
 				{
-					flag = true;
-					currentTouchID = -100;
-					currentTouch = controller;
+					onSelect(mSelected, state: false);
 				}
-				mInputFocus = false;
-				if (Object.op_Implicit(mSelected))
+			}
+			mSelected = value;
+			currentTouch.clickNotification = ClickNotification.None;
+			if (value != null)
+			{
+				UIKeyNavigation component = value.GetComponent<UIKeyNavigation>();
+				if (component != null)
 				{
-					Notify(mSelected, "OnSelect", false);
-					if (onSelect != null)
-					{
-						onSelect(mSelected, false);
-					}
+					controller.current = value;
 				}
-				mSelected = value;
-				currentTouch.clickNotification = ClickNotification.None;
-				if (value != null)
+			}
+			if (Object.op_Implicit(mSelected) && flag)
+			{
+				UICamera uICamera2 = (!(mSelected != null)) ? list[0] : FindCameraForLayer(mSelected.get_layer());
+				if (uICamera2 != null)
 				{
-					UIKeyNavigation component = value.GetComponent<UIKeyNavigation>();
-					if (component != null)
-					{
-						controller.current = value;
-					}
+					current = uICamera2;
+					currentCamera = uICamera2.cachedCamera;
 				}
-				if (Object.op_Implicit(mSelected) && flag)
+			}
+			if (Object.op_Implicit(mSelected))
+			{
+				mInputFocus = (mSelected.get_activeInHierarchy() && mSelected.GetComponent<UIInput>() != null);
+				if (onSelect != null)
 				{
-					UICamera uICamera2 = (!(mSelected != null)) ? list[0] : FindCameraForLayer(mSelected.get_layer());
-					if (uICamera2 != null)
-					{
-						current = uICamera2;
-						currentCamera = uICamera2.cachedCamera;
-					}
+					onSelect(mSelected, state: true);
 				}
-				if (Object.op_Implicit(mSelected))
-				{
-					mInputFocus = (mSelected.get_activeInHierarchy() && mSelected.GetComponent<UIInput>() != null);
-					if (onSelect != null)
-					{
-						onSelect(mSelected, true);
-					}
-					Notify(mSelected, "OnSelect", true);
-				}
-				if (flag)
-				{
-					current = uICamera;
-					currentCamera = ((!(uICamera != null)) ? null : uICamera.cachedCamera);
-					currentTouch = null;
-					currentTouchID = -100;
-				}
+				Notify(mSelected, "OnSelect", true);
+			}
+			if (flag)
+			{
+				current = uICamera;
+				currentCamera = ((!(uICamera != null)) ? null : uICamera.cachedCamera);
+				currentTouch = null;
+				currentTouchID = -100;
 			}
 		}
 	}
@@ -781,8 +791,6 @@ public class UICamera
 	{
 		get
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Expected O, but got Unknown
 			for (int i = 0; i < list.size; i++)
 			{
 				UICamera uICamera = list.buffer[i];
@@ -872,8 +880,6 @@ public class UICamera
 
 	private static Rigidbody FindRootRigidbody(Transform trans)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
 		while (trans != null)
 		{
 			if (trans.GetComponent<UIPanel>() != null)
@@ -892,8 +898,6 @@ public class UICamera
 
 	private static Rigidbody2D FindRootRigidbody2D(Transform trans)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
 		while (trans != null)
 		{
 			if (trans.GetComponent<UIPanel>() != null)
@@ -931,8 +935,6 @@ public class UICamera
 
 	public static bool Raycast(Vector3 inPos)
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
@@ -943,273 +945,256 @@ public class UICamera
 		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
 		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Expected O, but got Unknown
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Expected O, but got Unknown
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Expected O, but got Unknown
 		//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Expected O, but got Unknown
 		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0298: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cd: Expected O, but got Unknown
 		//IL_034c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0351: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0380: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d8: Expected O, but got Unknown
 		//IL_041c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0469: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0476: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0480: Expected O, but got Unknown
 		//IL_0492: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0497: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bd: Expected O, but got Unknown
 		//IL_04da: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04eb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04f0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0500: Expected O, but got Unknown
 		//IL_050e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0510: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051c: Expected O, but got Unknown
-		//IL_0531: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0536: Expected O, but got Unknown
-		//IL_054c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0551: Expected O, but got Unknown
 		//IL_056e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_057f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0584: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0589: Unknown result type (might be due to invalid IL or missing references)
 		//IL_058e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05b8: Expected O, but got Unknown
 		//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_066f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0674: Unknown result type (might be due to invalid IL or missing references)
-		//IL_073d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0742: Expected O, but got Unknown
 		//IL_077e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_07c3: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < list.size; i++)
 		{
 			UICamera uICamera = list.buffer[i];
-			if (uICamera.get_enabled() && NGUITools.GetActive(uICamera.get_gameObject()))
+			if (!uICamera.get_enabled() || !NGUITools.GetActive(uICamera.get_gameObject()))
 			{
-				currentCamera = uICamera.cachedCamera;
-				Vector3 val = currentCamera.ScreenToViewportPoint(inPos);
-				if (!float.IsNaN(val.x) && !float.IsNaN(val.y) && !(val.x < 0f) && !(val.x > 1f) && !(val.y < 0f) && !(val.y > 1f))
+				continue;
+			}
+			currentCamera = uICamera.cachedCamera;
+			Vector3 val = currentCamera.ScreenToViewportPoint(inPos);
+			if (float.IsNaN(val.x) || float.IsNaN(val.y) || val.x < 0f || val.x > 1f || val.y < 0f || val.y > 1f)
+			{
+				continue;
+			}
+			Ray val2 = currentCamera.ScreenPointToRay(inPos);
+			int num = currentCamera.get_cullingMask() & LayerMask.op_Implicit(uICamera.eventReceiverMask);
+			float num2 = (!(uICamera.rangeDistance > 0f)) ? (currentCamera.get_farClipPlane() - currentCamera.get_nearClipPlane()) : uICamera.rangeDistance;
+			if (uICamera.eventType == EventType.World_3D)
+			{
+				if (!Physics.Raycast(val2, ref lastHit, num2, num))
 				{
-					Ray val2 = currentCamera.ScreenPointToRay(inPos);
-					int num = currentCamera.get_cullingMask() & LayerMask.op_Implicit(uICamera.eventReceiverMask);
-					float num2 = (!(uICamera.rangeDistance > 0f)) ? (currentCamera.get_farClipPlane() - currentCamera.get_nearClipPlane()) : uICamera.rangeDistance;
-					if (uICamera.eventType == EventType.World_3D)
+					continue;
+				}
+				lastWorldPosition = lastHit.get_point();
+				mRayHitObject = lastHit.get_collider().get_gameObject();
+				if (!list[0].eventsGoToColliders)
+				{
+					Rigidbody val3 = FindRootRigidbody(mRayHitObject.get_transform());
+					if (val3 != null)
 					{
-						if (Physics.Raycast(val2, ref lastHit, num2, num))
+						mRayHitObject = val3.get_gameObject();
+					}
+				}
+				return true;
+			}
+			if (uICamera.eventType == EventType.UI_3D)
+			{
+				RaycastHit[] array = Physics.RaycastAll(val2, num2, num);
+				if (array.Length > 1)
+				{
+					for (int j = 0; j < array.Length; j++)
+					{
+						GameObject gameObject = array[j].get_collider().get_gameObject();
+						UIWidget component = gameObject.GetComponent<UIWidget>();
+						if (component != null)
 						{
-							lastWorldPosition = lastHit.get_point();
-							mRayHitObject = lastHit.get_collider().get_gameObject();
-							if (!list[0].eventsGoToColliders)
+							if (!component.isVisible || (component.hitCheck != null && !component.hitCheck(array[j].get_point())))
 							{
-								Rigidbody val3 = FindRootRigidbody(mRayHitObject.get_transform());
-								if (val3 != null)
-								{
-									mRayHitObject = val3.get_gameObject();
-								}
+								continue;
 							}
+						}
+						else
+						{
+							UIRect uIRect = NGUITools.FindInParents<UIRect>(gameObject);
+							if (uIRect != null && uIRect.finalAlpha < 0.001f)
+							{
+								continue;
+							}
+						}
+						mHit.depth = NGUITools.CalculateRaycastDepth(gameObject);
+						if (mHit.depth != int.MaxValue)
+						{
+							mHit.hit = array[j];
+							mHit.point = array[j].get_point();
+							mHit.go = array[j].get_collider().get_gameObject();
+							mHits.Add(mHit);
+						}
+					}
+					mHits.Sort((DepthEntry r1, DepthEntry r2) => r2.depth.CompareTo(r1.depth));
+					for (int k = 0; k < mHits.size; k++)
+					{
+						if (IsVisible(ref mHits.buffer[k]))
+						{
+							DepthEntry depthEntry = mHits[k];
+							lastHit = depthEntry.hit;
+							DepthEntry depthEntry2 = mHits[k];
+							mRayHitObject = depthEntry2.go;
+							DepthEntry depthEntry3 = mHits[k];
+							lastWorldPosition = depthEntry3.point;
+							mHits.Clear();
 							return true;
 						}
 					}
-					else if (uICamera.eventType == EventType.UI_3D)
+					mHits.Clear();
+				}
+				else
+				{
+					if (array.Length != 1)
 					{
-						RaycastHit[] array = Physics.RaycastAll(val2, num2, num);
-						if (array.Length > 1)
+						continue;
+					}
+					GameObject gameObject2 = array[0].get_collider().get_gameObject();
+					UIWidget component2 = gameObject2.GetComponent<UIWidget>();
+					if (component2 != null)
+					{
+						if (!component2.isVisible || (component2.hitCheck != null && !component2.hitCheck(array[0].get_point())))
 						{
-							for (int j = 0; j < array.Length; j++)
-							{
-								GameObject val4 = array[j].get_collider().get_gameObject();
-								UIWidget component = val4.GetComponent<UIWidget>();
-								if (component != null)
-								{
-									if (!component.isVisible || (component.hitCheck != null && !component.hitCheck(array[j].get_point())))
-									{
-										continue;
-									}
-								}
-								else
-								{
-									UIRect uIRect = NGUITools.FindInParents<UIRect>(val4);
-									if (uIRect != null && uIRect.finalAlpha < 0.001f)
-									{
-										continue;
-									}
-								}
-								mHit.depth = NGUITools.CalculateRaycastDepth(val4);
-								if (mHit.depth != 2147483647)
-								{
-									mHit.hit = array[j];
-									mHit.point = array[j].get_point();
-									mHit.go = array[j].get_collider().get_gameObject();
-									mHits.Add(mHit);
-								}
-							}
-							mHits.Sort((DepthEntry r1, DepthEntry r2) => r2.depth.CompareTo(r1.depth));
-							for (int k = 0; k < mHits.size; k++)
-							{
-								if (IsVisible(ref mHits.buffer[k]))
-								{
-									DepthEntry depthEntry = mHits[k];
-									lastHit = depthEntry.hit;
-									DepthEntry depthEntry2 = mHits[k];
-									mRayHitObject = depthEntry2.go;
-									DepthEntry depthEntry3 = mHits[k];
-									lastWorldPosition = depthEntry3.point;
-									mHits.Clear();
-									return true;
-								}
-							}
-							mHits.Clear();
-						}
-						else if (array.Length == 1)
-						{
-							GameObject val5 = array[0].get_collider().get_gameObject();
-							UIWidget component2 = val5.GetComponent<UIWidget>();
-							if (component2 != null)
-							{
-								if (!component2.isVisible || (component2.hitCheck != null && !component2.hitCheck(array[0].get_point())))
-								{
-									continue;
-								}
-							}
-							else
-							{
-								UIRect uIRect2 = NGUITools.FindInParents<UIRect>(val5);
-								if (uIRect2 != null && uIRect2.finalAlpha < 0.001f)
-								{
-									continue;
-								}
-							}
-							if (IsVisible(array[0].get_point(), array[0].get_collider().get_gameObject()))
-							{
-								lastHit = array[0];
-								lastWorldPosition = array[0].get_point();
-								mRayHitObject = lastHit.get_collider().get_gameObject();
-								return true;
-							}
+							continue;
 						}
 					}
-					else if (uICamera.eventType == EventType.World_2D)
+					else
 					{
-						if (m2DPlane.Raycast(val2, ref num2))
+						UIRect uIRect2 = NGUITools.FindInParents<UIRect>(gameObject2);
+						if (uIRect2 != null && uIRect2.finalAlpha < 0.001f)
 						{
-							Vector3 point = val2.GetPoint(num2);
-							Collider2D val6 = Physics2D.OverlapPoint(Vector2.op_Implicit(point), num);
-							if (Object.op_Implicit(val6))
-							{
-								lastWorldPosition = point;
-								mRayHitObject = val6.get_gameObject();
-								if (!uICamera.eventsGoToColliders)
-								{
-									Rigidbody2D val7 = FindRootRigidbody2D(mRayHitObject.get_transform());
-									if (val7 != null)
-									{
-										mRayHitObject = val7.get_gameObject();
-									}
-								}
-								return true;
-							}
+							continue;
 						}
 					}
-					else if (uICamera.eventType == EventType.UI_2D && m2DPlane.Raycast(val2, ref num2))
+					if (IsVisible(array[0].get_point(), array[0].get_collider().get_gameObject()))
 					{
-						lastWorldPosition = val2.GetPoint(num2);
-						Collider2D[] array2 = Physics2D.OverlapPointAll(Vector2.op_Implicit(lastWorldPosition), num);
-						if (array2.Length > 1)
+						lastHit = array[0];
+						lastWorldPosition = array[0].get_point();
+						mRayHitObject = lastHit.get_collider().get_gameObject();
+						return true;
+					}
+				}
+			}
+			else
+			{
+				if (uICamera.eventType == EventType.World_2D)
+				{
+					if (!m2DPlane.Raycast(val2, ref num2))
+					{
+						continue;
+					}
+					Vector3 point = val2.GetPoint(num2);
+					Collider2D val4 = Physics2D.OverlapPoint(Vector2.op_Implicit(point), num);
+					if (!Object.op_Implicit(val4))
+					{
+						continue;
+					}
+					lastWorldPosition = point;
+					mRayHitObject = val4.get_gameObject();
+					if (!uICamera.eventsGoToColliders)
+					{
+						Rigidbody2D val5 = FindRootRigidbody2D(mRayHitObject.get_transform());
+						if (val5 != null)
 						{
-							for (int l = 0; l < array2.Length; l++)
+							mRayHitObject = val5.get_gameObject();
+						}
+					}
+					return true;
+				}
+				if (uICamera.eventType != EventType.UI_2D || !m2DPlane.Raycast(val2, ref num2))
+				{
+					continue;
+				}
+				lastWorldPosition = val2.GetPoint(num2);
+				Collider2D[] array2 = Physics2D.OverlapPointAll(Vector2.op_Implicit(lastWorldPosition), num);
+				if (array2.Length > 1)
+				{
+					for (int l = 0; l < array2.Length; l++)
+					{
+						GameObject gameObject3 = array2[l].get_gameObject();
+						UIWidget component3 = gameObject3.GetComponent<UIWidget>();
+						if (component3 != null)
+						{
+							if (!component3.isVisible || (component3.hitCheck != null && !component3.hitCheck(lastWorldPosition)))
 							{
-								GameObject val8 = array2[l].get_gameObject();
-								UIWidget component3 = val8.GetComponent<UIWidget>();
-								if (component3 != null)
-								{
-									if (!component3.isVisible || (component3.hitCheck != null && !component3.hitCheck(lastWorldPosition)))
-									{
-										continue;
-									}
-								}
-								else
-								{
-									UIRect uIRect3 = NGUITools.FindInParents<UIRect>(val8);
-									if (uIRect3 != null && uIRect3.finalAlpha < 0.001f)
-									{
-										continue;
-									}
-								}
-								mHit.depth = NGUITools.CalculateRaycastDepth(val8);
-								if (mHit.depth != 2147483647)
-								{
-									mHit.go = val8;
-									mHit.point = lastWorldPosition;
-									mHits.Add(mHit);
-								}
+								continue;
 							}
-							mHits.Sort((DepthEntry r1, DepthEntry r2) => r2.depth.CompareTo(r1.depth));
-							for (int m = 0; m < mHits.size; m++)
+						}
+						else
+						{
+							UIRect uIRect3 = NGUITools.FindInParents<UIRect>(gameObject3);
+							if (uIRect3 != null && uIRect3.finalAlpha < 0.001f)
 							{
-								if (IsVisible(ref mHits.buffer[m]))
-								{
-									DepthEntry depthEntry4 = mHits[m];
-									mRayHitObject = depthEntry4.go;
-									mHits.Clear();
-									return true;
-								}
+								continue;
 							}
+						}
+						mHit.depth = NGUITools.CalculateRaycastDepth(gameObject3);
+						if (mHit.depth != int.MaxValue)
+						{
+							mHit.go = gameObject3;
+							mHit.point = lastWorldPosition;
+							mHits.Add(mHit);
+						}
+					}
+					mHits.Sort((DepthEntry r1, DepthEntry r2) => r2.depth.CompareTo(r1.depth));
+					for (int m = 0; m < mHits.size; m++)
+					{
+						if (IsVisible(ref mHits.buffer[m]))
+						{
+							DepthEntry depthEntry4 = mHits[m];
+							mRayHitObject = depthEntry4.go;
 							mHits.Clear();
+							return true;
 						}
-						else if (array2.Length == 1)
+					}
+					mHits.Clear();
+				}
+				else
+				{
+					if (array2.Length != 1)
+					{
+						continue;
+					}
+					GameObject gameObject4 = array2[0].get_gameObject();
+					UIWidget component4 = gameObject4.GetComponent<UIWidget>();
+					if (component4 != null)
+					{
+						if (!component4.isVisible || (component4.hitCheck != null && !component4.hitCheck(lastWorldPosition)))
 						{
-							GameObject val9 = array2[0].get_gameObject();
-							UIWidget component4 = val9.GetComponent<UIWidget>();
-							if (component4 != null)
-							{
-								if (!component4.isVisible || (component4.hitCheck != null && !component4.hitCheck(lastWorldPosition)))
-								{
-									continue;
-								}
-							}
-							else
-							{
-								UIRect uIRect4 = NGUITools.FindInParents<UIRect>(val9);
-								if (uIRect4 != null && uIRect4.finalAlpha < 0.001f)
-								{
-									continue;
-								}
-							}
-							if (IsVisible(lastWorldPosition, val9))
-							{
-								mRayHitObject = val9;
-								return true;
-							}
+							continue;
 						}
+					}
+					else
+					{
+						UIRect uIRect4 = NGUITools.FindInParents<UIRect>(gameObject4);
+						if (uIRect4 != null && uIRect4.finalAlpha < 0.001f)
+						{
+							continue;
+						}
+					}
+					if (IsVisible(lastWorldPosition, gameObject4))
+					{
+						mRayHitObject = gameObject4;
+						return true;
 					}
 				}
 			}
@@ -1343,24 +1328,23 @@ public class UICamera
 
 	public static void Notify(GameObject go, string funcName, object obj)
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
-		if (mNotifying <= 10)
+		if (mNotifying > 10)
 		{
-			if (currentScheme == ControlScheme.Controller && UIPopupList.isOpen && UIPopupList.current.source == go && UIPopupList.isOpen)
+			return;
+		}
+		if (currentScheme == ControlScheme.Controller && UIPopupList.isOpen && UIPopupList.current.source == go && UIPopupList.isOpen)
+		{
+			go = UIPopupList.current.get_gameObject();
+		}
+		if (Object.op_Implicit(go) && go.get_activeInHierarchy())
+		{
+			mNotifying++;
+			go.SendMessage(funcName, obj, 1);
+			if (mGenericHandler != null && mGenericHandler != go)
 			{
-				go = UIPopupList.current.get_gameObject();
+				mGenericHandler.SendMessage(funcName, obj, 1);
 			}
-			if (Object.op_Implicit(go) && go.get_activeInHierarchy())
-			{
-				mNotifying++;
-				go.SendMessage(funcName, obj, 1);
-				if (mGenericHandler != null && mGenericHandler != go)
-				{
-					mGenericHandler.SendMessage(funcName, obj, 1);
-				}
-				mNotifying--;
-			}
+			mNotifying--;
 		}
 	}
 
@@ -1401,15 +1385,16 @@ public class UICamera
 		int count = mTouchIDs.Count;
 		while (true)
 		{
-			if (num >= count)
+			if (num < count)
 			{
-				return;
+				if (mTouchIDs[num] == id)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			if (mTouchIDs[num] == id)
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		mTouchIDs.RemoveAt(num);
 		activeTouches.RemoveAt(num);
@@ -1452,104 +1437,96 @@ public class UICamera
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0017: Invalid comparison between Unknown and I4
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Expected O, but got Unknown
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Expected O, but got Unknown
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Expected O, but got Unknown
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Expected O, but got Unknown
 		if (eventType != 0 && (int)cachedCamera.get_transparencySortMode() != 2)
 		{
 			cachedCamera.set_transparencySortMode(2);
 		}
-		if (Application.get_isPlaying())
+		if (!Application.get_isPlaying())
 		{
-			if (fallThrough == null)
-			{
-				UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(this.get_gameObject());
-				if (uIRoot != null)
-				{
-					fallThrough = uIRoot.get_gameObject();
-				}
-				else
-				{
-					Transform val = this.get_transform();
-					fallThrough = ((!(val.get_parent() != null)) ? this.get_gameObject() : val.get_parent().get_gameObject());
-				}
-			}
-			cachedCamera.set_eventMask(0);
+			return;
 		}
+		if (fallThrough == null)
+		{
+			UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(this.get_gameObject());
+			if (uIRoot != null)
+			{
+				fallThrough = uIRoot.get_gameObject();
+			}
+			else
+			{
+				Transform transform = this.get_transform();
+				fallThrough = ((!(transform.get_parent() != null)) ? this.get_gameObject() : transform.get_parent().get_gameObject());
+			}
+		}
+		cachedCamera.set_eventMask(0);
 	}
 
 	private void Update()
 	{
-		if (handlesEvents)
+		if (!handlesEvents)
 		{
-			current = this;
-			NGUIDebug.debugRaycast = debug;
-			if (useTouch)
-			{
-				ProcessTouches();
-			}
-			else if (useMouse)
-			{
-				ProcessMouse();
-			}
-			if (onCustomInput != null)
-			{
-				onCustomInput();
-			}
-			if ((useKeyboard || useController) && !disableController)
-			{
-				ProcessOthers();
-			}
-			if (useMouse && mHover != null)
-			{
-				float num = string.IsNullOrEmpty(scrollAxisName) ? 0f : GetAxis(scrollAxisName);
-				if (num != 0f)
-				{
-					if (onScroll != null)
-					{
-						onScroll(mHover, num);
-					}
-					Notify(mHover, "OnScroll", num);
-				}
-				if (showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && (mTooltipTime < RealTime.time || GetKey(304) || GetKey(303)))
-				{
-					currentTouch = mMouse[0];
-					currentTouchID = -1;
-					ShowTooltip(mHover);
-				}
-			}
-			if (mTooltip != null && !NGUITools.GetActive(mTooltip))
-			{
-				ShowTooltip(null);
-			}
-			current = null;
-			currentTouchID = -100;
+			return;
 		}
+		current = this;
+		NGUIDebug.debugRaycast = debug;
+		if (useTouch)
+		{
+			ProcessTouches();
+		}
+		else if (useMouse)
+		{
+			ProcessMouse();
+		}
+		if (onCustomInput != null)
+		{
+			onCustomInput();
+		}
+		if ((useKeyboard || useController) && !disableController)
+		{
+			ProcessOthers();
+		}
+		if (useMouse && mHover != null)
+		{
+			float num = string.IsNullOrEmpty(scrollAxisName) ? 0f : GetAxis(scrollAxisName);
+			if (num != 0f)
+			{
+				if (onScroll != null)
+				{
+					onScroll(mHover, num);
+				}
+				Notify(mHover, "OnScroll", num);
+			}
+			if (showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && (mTooltipTime < RealTime.time || GetKey(304) || GetKey(303)))
+			{
+				currentTouch = mMouse[0];
+				currentTouchID = -1;
+				ShowTooltip(mHover);
+			}
+		}
+		if (mTooltip != null && !NGUITools.GetActive(mTooltip))
+		{
+			ShowTooltip(null);
+		}
+		current = null;
+		currentTouchID = -100;
 	}
 
 	private void LateUpdate()
 	{
-		if (handlesEvents)
+		if (!handlesEvents)
 		{
-			int width = Screen.get_width();
-			int height = Screen.get_height();
-			if (width != mWidth || height != mHeight)
+			return;
+		}
+		int width = Screen.get_width();
+		int height = Screen.get_height();
+		if (width != mWidth || height != mHeight)
+		{
+			mWidth = width;
+			mHeight = height;
+			UIRoot.Broadcast("UpdateAnchors");
+			if (onScreenResize != null)
 			{
-				mWidth = width;
-				mHeight = height;
-				UIRoot.Broadcast("UpdateAnchors");
-				if (onScreenResize != null)
-				{
-					onScreenResize();
-				}
+				onScreenResize();
 			}
 		}
 	}
@@ -1588,118 +1565,119 @@ public class UICamera
 				flag = true;
 			}
 		}
-		if (currentScheme != ControlScheme.Touch)
+		if (currentScheme == ControlScheme.Touch)
+		{
+			return;
+		}
+		currentTouch = mMouse[0];
+		Vector2 val = Vector2.op_Implicit(Input.get_mousePosition());
+		if (currentTouch.ignoreDelta == 0)
+		{
+			currentTouch.delta = val - currentTouch.pos;
+		}
+		else
+		{
+			currentTouch.ignoreDelta--;
+			currentTouch.delta.x = 0f;
+			currentTouch.delta.y = 0f;
+		}
+		float sqrMagnitude = currentTouch.delta.get_sqrMagnitude();
+		currentTouch.pos = val;
+		mLastPos = val;
+		bool flag3 = false;
+		if (currentScheme != 0)
+		{
+			if (sqrMagnitude < 0.001f)
+			{
+				return;
+			}
+			currentKey = 323;
+			flag3 = true;
+		}
+		else if (sqrMagnitude > 0.001f)
+		{
+			flag3 = true;
+		}
+		for (int j = 1; j < 3; j++)
+		{
+			mMouse[j].pos = currentTouch.pos;
+			mMouse[j].delta = currentTouch.delta;
+		}
+		if (flag || flag3 || mNextRaycast < RealTime.time)
+		{
+			mNextRaycast = RealTime.time + 0.02f;
+			Raycast(currentTouch);
+			for (int k = 0; k < 3; k++)
+			{
+				mMouse[k].current = currentTouch.current;
+			}
+		}
+		bool flag4 = currentTouch.last != currentTouch.current;
+		bool flag5 = currentTouch.pressed != null;
+		if (!flag5)
+		{
+			hoveredObject = currentTouch.current;
+		}
+		currentTouchID = -1;
+		if (flag4)
+		{
+			currentKey = 323;
+		}
+		if (!flag && flag3 && (!stickyTooltip || flag4))
+		{
+			if (mTooltipTime != 0f)
+			{
+				mTooltipTime = Time.get_unscaledTime() + tooltipDelay;
+			}
+			else if (mTooltip != null)
+			{
+				ShowTooltip(null);
+			}
+		}
+		if (flag3 && onMouseMove != null)
+		{
+			onMouseMove(currentTouch.delta);
+			currentTouch = null;
+		}
+		if (flag4 && (flag2 || (flag5 && !flag)))
+		{
+			hoveredObject = null;
+		}
+		for (int l = 0; l < 3; l++)
+		{
+			bool mouseButtonDown = Input.GetMouseButtonDown(l);
+			bool mouseButtonUp = Input.GetMouseButtonUp(l);
+			if (mouseButtonDown || mouseButtonUp)
+			{
+				currentKey = 323 + l;
+			}
+			currentTouch = mMouse[l];
+			currentTouchID = -1 - l;
+			currentKey = 323 + l;
+			if (mouseButtonDown)
+			{
+				currentTouch.pressedCam = currentCamera;
+				currentTouch.pressTime = RealTime.time;
+			}
+			else if (currentTouch.pressed != null)
+			{
+				currentCamera = currentTouch.pressedCam;
+			}
+			ProcessTouch(mouseButtonDown, mouseButtonUp);
+		}
+		if (!flag && flag4)
 		{
 			currentTouch = mMouse[0];
-			Vector2 val = Vector2.op_Implicit(Input.get_mousePosition());
-			if (currentTouch.ignoreDelta == 0)
-			{
-				currentTouch.delta = val - currentTouch.pos;
-			}
-			else
-			{
-				currentTouch.ignoreDelta--;
-				currentTouch.delta.x = 0f;
-				currentTouch.delta.y = 0f;
-			}
-			float sqrMagnitude = currentTouch.delta.get_sqrMagnitude();
-			currentTouch.pos = val;
-			mLastPos = val;
-			bool flag3 = false;
-			if (currentScheme != 0)
-			{
-				if (sqrMagnitude < 0.001f)
-				{
-					return;
-				}
-				currentKey = 323;
-				flag3 = true;
-			}
-			else if (sqrMagnitude > 0.001f)
-			{
-				flag3 = true;
-			}
-			for (int j = 1; j < 3; j++)
-			{
-				mMouse[j].pos = currentTouch.pos;
-				mMouse[j].delta = currentTouch.delta;
-			}
-			if (flag || flag3 || mNextRaycast < RealTime.time)
-			{
-				mNextRaycast = RealTime.time + 0.02f;
-				Raycast(currentTouch);
-				for (int k = 0; k < 3; k++)
-				{
-					mMouse[k].current = currentTouch.current;
-				}
-			}
-			bool flag4 = currentTouch.last != currentTouch.current;
-			bool flag5 = currentTouch.pressed != null;
-			if (!flag5)
-			{
-				hoveredObject = currentTouch.current;
-			}
+			mTooltipTime = RealTime.time + tooltipDelay;
 			currentTouchID = -1;
-			if (flag4)
-			{
-				currentKey = 323;
-			}
-			if (!flag && flag3 && (!stickyTooltip || flag4))
-			{
-				if (mTooltipTime != 0f)
-				{
-					mTooltipTime = Time.get_unscaledTime() + tooltipDelay;
-				}
-				else if (mTooltip != null)
-				{
-					ShowTooltip(null);
-				}
-			}
-			if (flag3 && onMouseMove != null)
-			{
-				onMouseMove(currentTouch.delta);
-				currentTouch = null;
-			}
-			if (flag4 && (flag2 || (flag5 && !flag)))
-			{
-				hoveredObject = null;
-			}
-			for (int l = 0; l < 3; l++)
-			{
-				bool mouseButtonDown = Input.GetMouseButtonDown(l);
-				bool mouseButtonUp = Input.GetMouseButtonUp(l);
-				if (mouseButtonDown || mouseButtonUp)
-				{
-					currentKey = 323 + l;
-				}
-				currentTouch = mMouse[l];
-				currentTouchID = -1 - l;
-				currentKey = 323 + l;
-				if (mouseButtonDown)
-				{
-					currentTouch.pressedCam = currentCamera;
-					currentTouch.pressTime = RealTime.time;
-				}
-				else if (currentTouch.pressed != null)
-				{
-					currentCamera = currentTouch.pressedCam;
-				}
-				ProcessTouch(mouseButtonDown, mouseButtonUp);
-			}
-			if (!flag && flag4)
-			{
-				currentTouch = mMouse[0];
-				mTooltipTime = RealTime.time + tooltipDelay;
-				currentTouchID = -1;
-				currentKey = 323;
-				hoveredObject = currentTouch.current;
-			}
-			currentTouch = null;
-			mMouse[0].last = mMouse[0].current;
-			for (int m = 1; m < 3; m++)
-			{
-				mMouse[m].last = mMouse[0].last;
-			}
+			currentKey = 323;
+			hoveredObject = currentTouch.current;
+		}
+		currentTouch = null;
+		mMouse[0].last = mMouse[0].current;
+		for (int m = 1; m < 3; m++)
+		{
+			mMouse[m].last = mMouse[0].last;
 		}
 	}
 
@@ -1750,7 +1728,7 @@ public class UICamera
 				tapCount = touch2.tapCount;
 			}
 			currentTouchID = ((!allowMultiTouch) ? 1 : fingerId);
-			currentTouch = GetTouch(currentTouchID, true);
+			currentTouch = GetTouch(currentTouchID, createIfMissing: true);
 			bool flag = (int)phase == 0 || currentTouch.touchBegan;
 			bool flag2 = (int)phase == 4 || (int)phase == 3;
 			currentTouch.touchBegan = false;
@@ -2049,7 +2027,7 @@ public class UICamera
 			currentTouch.pressStarted = true;
 			if (onPress != null && Object.op_Implicit(currentTouch.pressed))
 			{
-				onPress(currentTouch.pressed, false);
+				onPress(currentTouch.pressed, state: false);
 			}
 			Notify(currentTouch.pressed, "OnPress", false);
 			currentTouch.pressed = currentTouch.current;
@@ -2059,46 +2037,51 @@ public class UICamera
 			currentTouch.dragStarted = false;
 			if (onPress != null && Object.op_Implicit(currentTouch.pressed))
 			{
-				onPress(currentTouch.pressed, true);
+				onPress(currentTouch.pressed, state: true);
 			}
 			Notify(currentTouch.pressed, "OnPress", true);
 			if (mTooltip != null)
 			{
 				ShowTooltip(null);
 			}
-			if (mSelected != currentTouch.pressed)
+			if (!(mSelected != currentTouch.pressed))
 			{
-				mInputFocus = false;
-				if (Object.op_Implicit(mSelected))
+				return;
+			}
+			mInputFocus = false;
+			if (Object.op_Implicit(mSelected))
+			{
+				Notify(mSelected, "OnSelect", false);
+				if (onSelect != null)
 				{
-					Notify(mSelected, "OnSelect", false);
-					if (onSelect != null)
-					{
-						onSelect(mSelected, false);
-					}
-				}
-				mSelected = currentTouch.pressed;
-				if (currentTouch.pressed != null)
-				{
-					UIKeyNavigation component = currentTouch.pressed.GetComponent<UIKeyNavigation>();
-					if (component != null)
-					{
-						controller.current = currentTouch.pressed;
-					}
-				}
-				if (Object.op_Implicit(mSelected))
-				{
-					mInputFocus = (mSelected.get_activeInHierarchy() && mSelected.GetComponent<UIInput>() != null);
-					if (onSelect != null)
-					{
-						onSelect(mSelected, true);
-					}
-					Notify(mSelected, "OnSelect", true);
+					onSelect(mSelected, state: false);
 				}
 			}
+			mSelected = currentTouch.pressed;
+			if (currentTouch.pressed != null)
+			{
+				UIKeyNavigation component = currentTouch.pressed.GetComponent<UIKeyNavigation>();
+				if (component != null)
+				{
+					controller.current = currentTouch.pressed;
+				}
+			}
+			if (Object.op_Implicit(mSelected))
+			{
+				mInputFocus = (mSelected.get_activeInHierarchy() && mSelected.GetComponent<UIInput>() != null);
+				if (onSelect != null)
+				{
+					onSelect(mSelected, state: true);
+				}
+				Notify(mSelected, "OnSelect", true);
+			}
 		}
-		else if (currentTouch.pressed != null && (currentTouch.delta.get_sqrMagnitude() != 0f || currentTouch.current != currentTouch.last))
+		else
 		{
+			if (!(currentTouch.pressed != null) || (currentTouch.delta.get_sqrMagnitude() == 0f && !(currentTouch.current != currentTouch.last)))
+			{
+				return;
+			}
 			MouseOrTouch mouseOrTouch = currentTouch;
 			mouseOrTouch.totalDelta += currentTouch.delta;
 			float sqrMagnitude = currentTouch.totalDelta.get_sqrMagnitude();
@@ -2126,137 +2109,139 @@ public class UICamera
 				currentTouch.dragStarted = true;
 				currentTouch.delta = currentTouch.totalDelta;
 			}
-			if (currentTouch.dragStarted)
+			if (!currentTouch.dragStarted)
 			{
-				if (mTooltip != null)
+				return;
+			}
+			if (mTooltip != null)
+			{
+				ShowTooltip(null);
+			}
+			isDragging = true;
+			bool flag2 = currentTouch.clickNotification == ClickNotification.None;
+			if (flag)
+			{
+				if (onDragStart != null)
 				{
-					ShowTooltip(null);
+					onDragStart(currentTouch.dragged);
 				}
-				isDragging = true;
-				bool flag2 = currentTouch.clickNotification == ClickNotification.None;
-				if (flag)
+				Notify(currentTouch.dragged, "OnDragStart", null);
+				if (onDragOver != null)
 				{
-					if (onDragStart != null)
-					{
-						onDragStart(currentTouch.dragged);
-					}
-					Notify(currentTouch.dragged, "OnDragStart", null);
-					if (onDragOver != null)
-					{
-						onDragOver(currentTouch.last, currentTouch.dragged);
-					}
-					Notify(currentTouch.current, "OnDragOver", currentTouch.dragged);
+					onDragOver(currentTouch.last, currentTouch.dragged);
 				}
-				else if (currentTouch.last != currentTouch.current)
+				Notify(currentTouch.current, "OnDragOver", currentTouch.dragged);
+			}
+			else if (currentTouch.last != currentTouch.current)
+			{
+				if (onDragOut != null)
 				{
-					if (onDragOut != null)
-					{
-						onDragOut(currentTouch.last, currentTouch.dragged);
-					}
-					Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
-					if (onDragOver != null)
-					{
-						onDragOver(currentTouch.last, currentTouch.dragged);
-					}
-					Notify(currentTouch.current, "OnDragOver", currentTouch.dragged);
+					onDragOut(currentTouch.last, currentTouch.dragged);
 				}
-				if (onDrag != null)
+				Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
+				if (onDragOver != null)
 				{
-					onDrag(currentTouch.dragged, currentTouch.delta);
+					onDragOver(currentTouch.last, currentTouch.dragged);
 				}
-				Notify(currentTouch.dragged, "OnDrag", currentTouch.delta);
-				currentTouch.last = currentTouch.current;
-				isDragging = false;
-				if (flag2)
-				{
-					currentTouch.clickNotification = ClickNotification.None;
-				}
-				else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta && click < sqrMagnitude)
-				{
-					currentTouch.clickNotification = ClickNotification.None;
-				}
+				Notify(currentTouch.current, "OnDragOver", currentTouch.dragged);
+			}
+			if (onDrag != null)
+			{
+				onDrag(currentTouch.dragged, currentTouch.delta);
+			}
+			Notify(currentTouch.dragged, "OnDrag", currentTouch.delta);
+			currentTouch.last = currentTouch.current;
+			isDragging = false;
+			if (flag2)
+			{
+				currentTouch.clickNotification = ClickNotification.None;
+			}
+			else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta && click < sqrMagnitude)
+			{
+				currentTouch.clickNotification = ClickNotification.None;
 			}
 		}
 	}
 
 	private void ProcessRelease(bool isMouse, float drag)
 	{
-		if (currentTouch != null)
+		if (currentTouch == null)
 		{
-			currentTouch.pressStarted = false;
-			if (currentTouch.pressed != null)
+			return;
+		}
+		currentTouch.pressStarted = false;
+		if (currentTouch.pressed != null)
+		{
+			if (currentTouch.dragStarted)
 			{
-				if (currentTouch.dragStarted)
+				if (onDragOut != null)
 				{
-					if (onDragOut != null)
-					{
-						onDragOut(currentTouch.last, currentTouch.dragged);
-					}
-					Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
-					if (onDragEnd != null)
-					{
-						onDragEnd(currentTouch.dragged);
-					}
-					Notify(currentTouch.dragged, "OnDragEnd", null);
+					onDragOut(currentTouch.last, currentTouch.dragged);
 				}
-				if (onPress != null)
+				Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
+				if (onDragEnd != null)
 				{
-					onPress(currentTouch.pressed, false);
+					onDragEnd(currentTouch.dragged);
 				}
-				Notify(currentTouch.pressed, "OnPress", false);
-				if (isMouse && HasCollider(currentTouch.pressed))
+				Notify(currentTouch.dragged, "OnDragEnd", null);
+			}
+			if (onPress != null)
+			{
+				onPress(currentTouch.pressed, state: false);
+			}
+			Notify(currentTouch.pressed, "OnPress", false);
+			if (isMouse && HasCollider(currentTouch.pressed))
+			{
+				if (mHover == currentTouch.current)
 				{
-					if (mHover == currentTouch.current)
+					if (onHover != null)
 					{
-						if (onHover != null)
-						{
-							onHover(currentTouch.current, true);
-						}
-						Notify(currentTouch.current, "OnHover", true);
+						onHover(currentTouch.current, state: true);
 					}
-					else
-					{
-						hoveredObject = currentTouch.current;
-					}
+					Notify(currentTouch.current, "OnHover", true);
 				}
-				if (currentTouch.dragged == currentTouch.current || (currentScheme != ControlScheme.Controller && currentTouch.clickNotification != 0 && currentTouch.totalDelta.get_sqrMagnitude() < drag))
+				else
 				{
-					if (currentTouch.clickNotification != 0 && currentTouch.pressed == currentTouch.current)
-					{
-						ShowTooltip(null);
-						float time = RealTime.time;
-						if (TutorialMessage.IsActiveButton(currentTouch.pressed))
-						{
-							if (onClick != null)
-							{
-								onClick(currentTouch.pressed);
-							}
-							Notify(currentTouch.pressed, "OnClick", null);
-						}
-						if (currentTouch.clickTime + 0.35f > time)
-						{
-							if (onDoubleClick != null)
-							{
-								onDoubleClick(currentTouch.pressed);
-							}
-							Notify(currentTouch.pressed, "OnDoubleClick", null);
-						}
-						currentTouch.clickTime = time;
-					}
-				}
-				else if (currentTouch.dragStarted)
-				{
-					if (onDrop != null)
-					{
-						onDrop(currentTouch.current, currentTouch.dragged);
-					}
-					Notify(currentTouch.current, "OnDrop", currentTouch.dragged);
+					hoveredObject = currentTouch.current;
 				}
 			}
-			currentTouch.dragStarted = false;
-			currentTouch.pressed = null;
-			currentTouch.dragged = null;
+			if (currentTouch.dragged == currentTouch.current || (currentScheme != ControlScheme.Controller && currentTouch.clickNotification != 0 && currentTouch.totalDelta.get_sqrMagnitude() < drag))
+			{
+				if (currentTouch.clickNotification != 0 && currentTouch.pressed == currentTouch.current)
+				{
+					ShowTooltip(null);
+					float time = RealTime.time;
+					if (TutorialMessage.IsActiveButton(currentTouch.pressed))
+					{
+						if (onClick != null)
+						{
+							onClick(currentTouch.pressed);
+						}
+						Notify(currentTouch.pressed, "OnClick", null);
+					}
+					if (currentTouch.clickTime + 0.35f > time)
+					{
+						if (onDoubleClick != null)
+						{
+							onDoubleClick(currentTouch.pressed);
+						}
+						Notify(currentTouch.pressed, "OnDoubleClick", null);
+					}
+					currentTouch.clickTime = time;
+				}
+			}
+			else if (currentTouch.dragStarted)
+			{
+				if (onDrop != null)
+				{
+					onDrop(currentTouch.current, currentTouch.dragged);
+				}
+				Notify(currentTouch.current, "OnDrop", currentTouch.dragged);
+			}
 		}
+		currentTouch.dragStarted = false;
+		currentTouch.pressed = null;
+		currentTouch.dragged = null;
 	}
 
 	private bool HasCollider(GameObject go)
@@ -2321,7 +2306,7 @@ public class UICamera
 			{
 				if (onTooltip != null)
 				{
-					onTooltip(mTooltip, false);
+					onTooltip(mTooltip, state: false);
 				}
 				Notify(mTooltip, "OnTooltip", false);
 			}
@@ -2331,7 +2316,7 @@ public class UICamera
 			{
 				if (onTooltip != null)
 				{
-					onTooltip(mTooltip, true);
+					onTooltip(mTooltip, state: true);
 				}
 				Notify(mTooltip, "OnTooltip", true);
 			}

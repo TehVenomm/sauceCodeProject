@@ -1,4 +1,4 @@
-package net.gogame.gowrap.io.utils;
+package net.gogame.gowrap.p021io.utils;
 
 import android.content.Context;
 import java.io.File;
@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.zip.GZIPInputStream;
 
+/* renamed from: net.gogame.gowrap.io.utils.IOUtils */
 public final class IOUtils {
     private IOUtils() {
     }
@@ -66,13 +67,13 @@ public final class IOUtils {
 
     public static String toString(Reader reader) throws IOException {
         char[] cArr = new char[4096];
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         while (true) {
             int read = reader.read(cArr);
             if (read <= 0) {
-                return stringBuilder.toString();
+                return sb.toString();
             }
-            stringBuilder.append(cArr, 0, read);
+            sb.append(cArr, 0, read);
         }
     }
 
@@ -94,11 +95,27 @@ public final class IOUtils {
         InputStream inputStream = null;
         try {
             inputStream = context.getAssets().open(str);
-            String iOUtils = toString(inputStream, str2);
-            return iOUtils;
+            return toString(inputStream, str2);
         } finally {
             closeQuietly(inputStream);
         }
+    }
+
+    public static String assetToString(Context context, String[] strArr, String str) throws IOException {
+        IOException e = null;
+        int i = 0;
+        while (i < strArr.length) {
+            try {
+                return assetToString(context, strArr[i], str);
+            } catch (IOException e2) {
+                e = e2;
+                i++;
+            }
+        }
+        if (e != null) {
+            throw e;
+        }
+        throw new IOException("Could not load any of the specified assets");
     }
 
     public static InputStream newInputStream(File file) throws IOException {

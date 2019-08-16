@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 @JacksonStdImpl
 public class JsonValueSerializer extends StdSerializer<Object> implements ContextualSerializer, JsonFormatVisitable, SchemaAware {
@@ -33,7 +32,7 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
     protected final JsonSerializer<Object> _valueSerializer;
 
     public JsonValueSerializer(AnnotatedMethod annotatedMethod, JsonSerializer<?> jsonSerializer) {
-        this(annotatedMethod.getAnnotated(), (JsonSerializer) jsonSerializer);
+        this(annotatedMethod.getAnnotated(), jsonSerializer);
     }
 
     public JsonValueSerializer(Method method, JsonSerializer<?> jsonSerializer) {
@@ -61,7 +60,7 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
     }
 
     public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer jsonSerializer = this._valueSerializer;
+        JsonSerializer<Object> jsonSerializer = this._valueSerializer;
         if (jsonSerializer != null) {
             return withResolved(beanProperty, serializerProvider.handlePrimaryContextualization(jsonSerializer, beanProperty), this._forceTypeInformation);
         }
@@ -80,7 +79,7 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
                 serializerProvider.defaultSerializeNull(jsonGenerator);
                 return;
             }
-            JsonSerializer jsonSerializer = this._valueSerializer;
+            JsonSerializer<Object> jsonSerializer = this._valueSerializer;
             if (jsonSerializer == null) {
                 jsonSerializer = serializerProvider.findTypedValueSerializer(invoke.getClass(), true, this._property);
             }
@@ -88,14 +87,14 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
         } catch (IOException e) {
             throw e;
         } catch (Exception e2) {
-            Throwable e3 = e2;
-            while ((e3 instanceof InvocationTargetException) && e3.getCause() != null) {
-                e3 = e3.getCause();
+            e = e2;
+            while ((e instanceof InvocationTargetException) && e.getCause() != null) {
+                e = e.getCause();
             }
-            if (e3 instanceof Error) {
-                throw ((Error) e3);
+            if (e instanceof Error) {
+                throw ((Error) e);
             }
-            throw JsonMappingException.wrapWithPath(e3, obj, this._accessorMethod.getName() + "()");
+            throw JsonMappingException.wrapWithPath(e, obj, this._accessorMethod.getName() + "()");
         }
     }
 
@@ -106,7 +105,7 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
                 serializerProvider.defaultSerializeNull(jsonGenerator);
                 return;
             }
-            JsonSerializer jsonSerializer = this._valueSerializer;
+            JsonSerializer<Object> jsonSerializer = this._valueSerializer;
             if (jsonSerializer == null) {
                 jsonSerializer = serializerProvider.findValueSerializer(invoke.getClass(), this._property);
             } else if (this._forceTypeInformation) {
@@ -119,14 +118,14 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
         } catch (IOException e) {
             throw e;
         } catch (Exception e2) {
-            Throwable e3 = e2;
-            while ((e3 instanceof InvocationTargetException) && e3.getCause() != null) {
-                e3 = e3.getCause();
+            e = e2;
+            while ((e instanceof InvocationTargetException) && e.getCause() != null) {
+                e = e.getCause();
             }
-            if (e3 instanceof Error) {
-                throw ((Error) e3);
+            if (e instanceof Error) {
+                throw ((Error) e);
             }
-            throw JsonMappingException.wrapWithPath(e3, obj, this._accessorMethod.getName() + "()");
+            throw JsonMappingException.wrapWithPath(e, obj, this._accessorMethod.getName() + "()");
         }
     }
 
@@ -143,7 +142,7 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
             rawClass = this._accessorMethod.getDeclaringClass();
         }
         if (rawClass == null || !rawClass.isEnum() || !_acceptJsonFormatVisitorForEnum(jsonFormatVisitorWrapper, javaType, rawClass)) {
-            JsonSerializer jsonSerializer = this._valueSerializer;
+            JsonSerializer<Object> jsonSerializer = this._valueSerializer;
             if (jsonSerializer == null) {
                 if (javaType == null) {
                     if (this._property != null) {
@@ -163,11 +162,12 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
         }
     }
 
-    protected boolean _acceptJsonFormatVisitorForEnum(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, Class<?> cls) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public boolean _acceptJsonFormatVisitorForEnum(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, Class<?> cls) throws JsonMappingException {
         int i = 0;
         JsonStringFormatVisitor expectStringFormat = jsonFormatVisitorWrapper.expectStringFormat(javaType);
         if (expectStringFormat != null) {
-            Set linkedHashSet = new LinkedHashSet();
+            LinkedHashSet linkedHashSet = new LinkedHashSet();
             Object[] enumConstants = cls.getEnumConstants();
             int length = enumConstants.length;
             while (i < length) {
@@ -176,14 +176,14 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
                     linkedHashSet.add(String.valueOf(this._accessorMethod.invoke(obj, new Object[0])));
                     i++;
                 } catch (Exception e) {
-                    Throwable e2 = e;
-                    while ((e2 instanceof InvocationTargetException) && e2.getCause() != null) {
-                        e2 = e2.getCause();
+                    e = e;
+                    while ((e instanceof InvocationTargetException) && e.getCause() != null) {
+                        e = e.getCause();
                     }
-                    if (e2 instanceof Error) {
-                        throw ((Error) e2);
+                    if (e instanceof Error) {
+                        throw ((Error) e);
                     }
-                    throw JsonMappingException.wrapWithPath(e2, obj, this._accessorMethod.getName() + "()");
+                    throw JsonMappingException.wrapWithPath(e, obj, this._accessorMethod.getName() + "()");
                 }
             }
             expectStringFormat.enumTypes(linkedHashSet);
@@ -191,7 +191,8 @@ public class JsonValueSerializer extends StdSerializer<Object> implements Contex
         return true;
     }
 
-    protected boolean isNaturalTypeWithStdHandling(Class<?> cls, JsonSerializer<?> jsonSerializer) {
+    /* access modifiers changed from: protected */
+    public boolean isNaturalTypeWithStdHandling(Class<?> cls, JsonSerializer<?> jsonSerializer) {
         if (cls.isPrimitive()) {
             if (!(cls == Integer.TYPE || cls == Boolean.TYPE || cls == Double.TYPE)) {
                 return false;

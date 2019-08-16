@@ -7,6 +7,8 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 {
 	private int slotIndex;
 
+	private bool isPurgeBtn;
+
 	private bool is_not_enable_skill_type;
 
 	private bool isSelfSectionChange;
@@ -30,7 +32,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		SetVisibleEmptySkillType(isVisibleEmptySkill, slotIndex);
 		if (detailBase != null)
 		{
-			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, false);
+			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
 		}
 	}
 
@@ -61,7 +63,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 
 	protected override ItemStorageTop.SkillItemInventory CreateInventory()
 	{
-		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.SKILL_ITEM, equipItem.tableData.GetSkillSlot(equipItem.exceed)[slotIndex].slotType, false);
+		return new ItemStorageTop.SkillItemInventory(SortSettings.SETTINGS_TYPE.SKILL_ITEM, equipItem.tableData.GetSkillSlot(equipItem.exceed)[slotIndex].slotType);
 	}
 
 	protected override void UpdateInventoryUI()
@@ -76,15 +78,29 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			}
 		}
 		SetupEnableInventoryUI();
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length + 2, false, (Func<int, bool>)delegate(int i)
+		m_generatedIconList.Clear();
+		UpdateNewIconInfo();
+		int equipStartIndex = 1;
+		if (IsCreateAllRemove())
 		{
-			if (i == 0)
+			equipStartIndex++;
+		}
+		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length + 3, reset: false, (Func<int, bool>)delegate(int i)
+		{
+			switch (i)
 			{
-				return !isVisibleEmptySkill && find_index >= 0;
+			case 0:
+				return equipSkillItem != null;
+			case 1:
+				if (IsCreateAllRemove())
+				{
+					return true;
+				}
+				break;
 			}
 			bool flag = false;
 			bool flag2 = true;
-			int num2 = i - 1;
+			int num2 = i - equipStartIndex;
 			if (find_index >= 0)
 			{
 				if (num2 == 0)
@@ -111,28 +127,45 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			return flag2;
 		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
-			if (i == 0)
+			switch (i)
 			{
+			case 0:
 				if (!isVisibleEmptySkill)
 				{
 					CreateRemoveIcon(t, "SELECT", -1, 100, selectIndex == -1, base.sectionData.GetText("STR_DETACH"));
 				}
-			}
-			else
-			{
-				int num = i - 1;
-				if (find_index >= 0)
+				return;
+			case 1:
+				if (IsCreateAllRemove())
 				{
-					num = ((num != 0) ? (num - 1) : find_index);
+					if (!isVisibleEmptySkill)
+					{
+						CreateRemoveIcon(t, "SELECT", -2, 100, is_select: false, base.sectionData.GetText("STR_DETACH_ALL"));
+					}
+					return;
 				}
-				SetActive(t, true);
-				SortCompareData sortCompareData = inventory.datas[num];
-				SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
-				ITEM_ICON_TYPE iconType = sortCompareData.GetIconType();
-				bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, sortCompareData.GetUniqID());
-				ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, base.IsShowMainStatus, t, "SELECT", num, is_new, 100, selectIndex == num, skillItemInfo.IsCurrentEquipSetAttached, sortCompareData.IsExceeded(), false);
-				itemIcon.SetItemID(sortCompareData.GetTableID());
-				SetLongTouch(itemIcon.transform, "DETAIL", num);
+				break;
+			}
+			int num = i - equipStartIndex;
+			if (find_index >= 0)
+			{
+				num = ((num != 0) ? (num - 1) : find_index);
+			}
+			SetActive(t, is_visible: true);
+			SortCompareData sortCompareData = inventory.datas[num];
+			SkillItemInfo skill = sortCompareData.GetItemData() as SkillItemInfo;
+			ITEM_ICON_TYPE iconType = sortCompareData.GetIconType();
+			bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, sortCompareData.GetUniqID());
+			ItemIcon itemIcon = CreateItemIconDetail(iconType, sortCompareData.GetIconID(), sortCompareData.GetRarity(), sortCompareData as SkillItemSortData, base.IsShowMainStatus, t, "SELECT", num, is_new, 100, selectIndex == num, IsEquipSetAttached(skill), sortCompareData.IsExceeded());
+			itemIcon.SetItemID(sortCompareData.GetTableID());
+			SetLongTouch(itemIcon.transform, "DETAIL", num);
+			if (itemIcon != null && sortCompareData != null)
+			{
+				itemIcon.SetInitData(sortCompareData);
+			}
+			if (!m_generatedIconList.Contains(itemIcon))
+			{
+				m_generatedIconList.Add(itemIcon);
 			}
 		});
 	}
@@ -140,6 +173,20 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 	protected override int GetInventoryFirstIndex()
 	{
 		return -1;
+	}
+
+	private bool IsCreateAllRemove()
+	{
+		return !StatusManager.IsUnique();
+	}
+
+	private bool IsEquipSetAttached(SkillItemInfo skill)
+	{
+		if (StatusManager.IsUnique())
+		{
+			return skill.IsUniqueEquipSetAttached;
+		}
+		return skill.IsCurrentEquipSetAttached;
 	}
 
 	protected override void OnDecision()
@@ -152,63 +199,67 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			if (equipSkillItem == null)
 			{
 				GameSection.BackSection();
+				return;
+			}
+			GameSection.ChangeEvent("DETACH");
+			SendDetachEquipSkill();
+			return;
+		}
+		if (selectIndex == -2)
+		{
+			GameSection.ChangeEvent("DETACH_FROM_EVERY");
+			return;
+		}
+		SortCompareData sortCompareData = inventory.datas[selectIndex];
+		if (equipSkillItem != null && equipSkillItem.uniqueID == sortCompareData.GetUniqID())
+		{
+			GameSection.BackSection();
+			return;
+		}
+		EquipItemInfo equipItemInfo = null;
+		SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
+		if (IsEquipSetAttached(skillItemInfo))
+		{
+			List<EquipSetSkillData> equipSetSkill = skillItemInfo.equipSetSkill;
+			EquipSetSkillData equipSetSkillData = equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
+			if (StatusManager.IsUnique())
+			{
+				equipSetSkillData = skillItemInfo.uniqueEquipSetSkill;
+			}
+			equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equipSetSkillData.equipItemUniqId);
+		}
+		if (equipSkillItem != null)
+		{
+			if (!IsEquipSetAttached(skillItemInfo))
+			{
+				GameSection.ChangeEvent((!flag) ? "EQUIP" : "EQUIP_DETAIL");
+				CheckSendEquipSkill();
 			}
 			else
 			{
-				GameSection.ChangeEvent("DETACH", null);
-				SendDetachEquipSkill();
+				GameSection.ChangeEvent((!flag) ? "STEAL" : "STEAL_DETAIL", new object[5]
+				{
+					equipSkillItem.tableData.name,
+					equipSkillItem.level.ToString(),
+					equipItemInfo.tableData.name,
+					sortCompareData.GetName(),
+					sortCompareData.GetLevel().ToString()
+				});
 			}
+		}
+		else if (IsEquipSetAttached(skillItemInfo))
+		{
+			GameSection.ChangeEvent((!flag) ? "REPLACE" : "REPLACE_DETAIL", new object[3]
+			{
+				equipItemInfo.tableData.name,
+				sortCompareData.GetName(),
+				sortCompareData.GetLevel().ToString()
+			});
 		}
 		else
 		{
-			SortCompareData sortCompareData = inventory.datas[selectIndex];
-			if (equipSkillItem != null && equipSkillItem.uniqueID == sortCompareData.GetUniqID())
-			{
-				GameSection.BackSection();
-			}
-			else
-			{
-				EquipItemInfo equipItemInfo = null;
-				SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
-				if (skillItemInfo.IsCurrentEquipSetAttached)
-				{
-					EquipSetSkillData equipSetSkillData = skillItemInfo.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
-					equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equipSetSkillData.equipItemUniqId);
-				}
-				if (equipSkillItem != null)
-				{
-					if (!skillItemInfo.IsCurrentEquipSetAttached)
-					{
-						GameSection.ChangeEvent((!flag) ? "EQUIP" : "EQUIP_DETAIL", null);
-						CheckSendEquipSkill();
-					}
-					else
-					{
-						GameSection.ChangeEvent((!flag) ? "STEAL" : "STEAL_DETAIL", new object[5]
-						{
-							equipSkillItem.tableData.name,
-							equipSkillItem.level.ToString(),
-							equipItemInfo.tableData.name,
-							sortCompareData.GetName(),
-							sortCompareData.GetLevel().ToString()
-						});
-					}
-				}
-				else if (skillItemInfo.IsCurrentEquipSetAttached)
-				{
-					GameSection.ChangeEvent((!flag) ? "REPLACE" : "REPLACE_DETAIL", new object[3]
-					{
-						equipItemInfo.tableData.name,
-						sortCompareData.GetName(),
-						sortCompareData.GetLevel().ToString()
-					});
-				}
-				else
-				{
-					GameSection.ChangeEvent((!flag) ? "EQUIP" : "EQUIP_DETAIL", null);
-					CheckSendEquipSkill();
-				}
-			}
+			GameSection.ChangeEvent((!flag) ? "EQUIP" : "EQUIP_DETAIL");
+			CheckSendEquipSkill();
 		}
 	}
 
@@ -242,11 +293,10 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 
 	private void ToNotEnableSkillTypeConfirm()
 	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (is_not_enable_skill_type)
 		{
 			is_not_enable_skill_type = false;
-			GameSection.ChangeEvent("COME_BACK", null);
+			GameSection.ChangeEvent("COME_BACK");
 			Action action = delegate
 			{
 				SortCompareData sortCompareData = inventory.datas[selectIndex];
@@ -272,7 +322,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 	{
 		while (!MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("ItemDetailEquipSkillSelect") || MonoBehaviourSingleton<UIManager>.I.IsTransitioning() || MonoBehaviourSingleton<GameSceneManager>.I.isChangeing || !MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		call();
 	}
@@ -338,7 +388,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			{
 				isSelfSectionChange = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -361,7 +411,30 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			{
 				isSelfSectionChange = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
+		});
+	}
+
+	private void OnQuery_ItemDetailEquipSkillDetachConfirm_YES()
+	{
+		SendDetachEquipSkillAllFromEvery();
+	}
+
+	private void OnQuery_ItemDetailEquipSkillDetachResult_OK()
+	{
+		if (equipSkillItem == null)
+		{
+			GameSection.ChangeEvent("NOT_EQUIP");
+		}
+	}
+
+	private void SendDetachEquipSkillAllFromEvery()
+	{
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<StatusManager>.I.SendDetachAllSkillFromEvery(MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo(), delegate(bool is_success)
+		{
+			GameSection.ResumeEvent(is_success);
+			RefreshUI();
 		});
 	}
 

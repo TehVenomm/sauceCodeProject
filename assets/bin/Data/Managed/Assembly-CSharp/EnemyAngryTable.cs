@@ -1,11 +1,10 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 {
 	public class Data
 	{
-		public const string NT = "id,condition,value1,value2,value3,value4";
-
 		public uint id;
 
 		public ANGRY_CONDITION condition;
@@ -19,6 +18,8 @@ public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 		public int value4;
 
 		public uint actionID;
+
+		public const string NT = "id,condition,value1,value2,value3,value4";
 
 		public static bool cb(CSVReader csv_reader, Data data, ref uint key)
 		{
@@ -36,6 +37,12 @@ public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 
 	private UIntKeyTable<Data> dataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(TextAsset textasset)
 	{
 		CreateTable(textasset.get_text());
@@ -43,13 +50,13 @@ public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 
 	public void CreateTable(string text)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<Data>(text, Data.cb, "id,condition,value1,value2,value3,value4", null);
+		dataTable = TableUtility.CreateUIntKeyTable<Data>(text, Data.cb, "id,condition,value1,value2,value3,value4");
 		dataTable.TrimExcess();
 	}
 
 	public void AddTable(TextAsset textasset)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,condition,value1,value2,value3,value4", null);
+		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,condition,value1,value2,value3,value4");
 	}
 
 	public Data GetData(uint id)

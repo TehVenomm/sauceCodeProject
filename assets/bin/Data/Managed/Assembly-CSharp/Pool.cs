@@ -18,24 +18,24 @@ public class Pool<ABS_T> where ABS_T : Poolable
 
 	public T Alloc<T>() where T : Poolable, ABS_T, new()
 	{
-		Queue<ABS_T> queue = this.poolablesOfType.Get(GetKey<T>());
+		Queue<ABS_T> queue = poolablesOfType.Get(GetKey<T>());
 		if (queue == null)
 		{
 			queue = new Queue<ABS_T>();
-			this.poolablesOfType.Add(GetKey<T>(), queue);
+			poolablesOfType.Add(GetKey<T>(), queue);
 		}
-		T result = (T)null;
+		T val = (T)null;
 		if (queue.Count > 0)
 		{
-			result = (T)queue.Dequeue();
+			val = (T)queue.Dequeue();
 		}
 		else
 		{
-			result = new T();
-			result.OnAwake();
+			val = new T();
+			val.OnAwake();
 		}
-		result.OnInit();
-		return result;
+		val.OnInit();
+		return val;
 	}
 
 	public void Free(ABS_T poolable)
@@ -44,12 +44,10 @@ public class Pool<ABS_T> where ABS_T : Poolable
 		if (queue == null)
 		{
 			Debug.LogError((object)("Pool: not alloc poolable. poolable=" + poolable));
+			return;
 		}
-		else
-		{
-			poolable.OnFinal();
-			queue.Enqueue(poolable);
-		}
+		poolable.OnFinal();
+		queue.Enqueue(poolable);
 	}
 
 	public void Clear()

@@ -73,7 +73,9 @@ public abstract class EquipSelectBase : SmithEquipBase
 		BTN_WEAPON_4,
 		BTN_WEAPON_5,
 		OBJ_CAPTION_3,
-		LBL_CAPTION
+		LBL_CAPTION,
+		OBJ_ROOT,
+		LBL_NO_ITEM
 	}
 
 	protected SortCompareData[] localInventoryEquipData;
@@ -84,27 +86,24 @@ public abstract class EquipSelectBase : SmithEquipBase
 
 	protected UI InventoryUI;
 
-	protected UI[] switchInventoryAry = new UI[3]
+	protected UI[] switchInventoryAry = new UI[2]
 	{
 		UI.GRD_INVENTORY,
-		UI.GRD_INVENTORY,
-		UI.GRD_INVENTORY_SMALL
+		UI.GRD_INVENTORY
 	};
 
 	protected int inventoryUIIndex;
 
-	protected UI[] weaponInventoryAry = new UI[3]
+	protected UI[] weaponInventoryAry = new UI[2]
 	{
 		UI.GRD_INVENTORY,
-		UI.GRD_INVENTORY,
-		UI.GRD_INVENTORY_SMALL
+		UI.GRD_INVENTORY
 	};
 
-	protected UI[] defenseInventoryAry = new UI[3]
+	protected UI[] defenseInventoryAry = new UI[2]
 	{
 		UI.GRD_INVENTORY_DEF,
-		UI.GRD_INVENTORY_DEF,
-		UI.GRD_INVENTORY_SMALL_DEF
+		UI.GRD_INVENTORY_DEF
 	};
 
 	protected bool IsShowMainStatus => inventoryUIIndex == 0;
@@ -139,6 +138,11 @@ public abstract class EquipSelectBase : SmithEquipBase
 
 	protected virtual void InitLocalInventory()
 	{
+	}
+
+	protected virtual void Update()
+	{
+		ObserveItemList();
 	}
 
 	public override void UpdateUI()
@@ -212,56 +216,57 @@ public abstract class EquipSelectBase : SmithEquipBase
 	{
 		EquipItemInfo item = EquipItem;
 		EquipItemTable.EquipItemData equipItemData = (item == null) ? null : item.tableData;
-		if (item != null && equipItemData != null)
+		if (item == null || equipItemData == null)
 		{
-			SetLabelText((Enum)UI.LBL_NAME, equipItemData.name);
-			SetLabelEquipItemParam(item, GetCompareItemData());
-			SetActive((Enum)UI.SPR_IS_EVOLVE, item.tableData.IsEvolve());
-			SetSkillIconButton(UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", equipItemData, GetSkillSlotData(item), "SKILL_ICON_BUTTON", 0);
-			SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, item.tableData);
-			SetLabelText((Enum)UI.LBL_SELL, item.sellPrice.ToString());
-			if (item.ability != null && item.ability.Length > 0)
+			return;
+		}
+		SetLabelText((Enum)UI.LBL_NAME, equipItemData.name);
+		SetLabelEquipItemParam(item, GetCompareItemData());
+		SetActive((Enum)UI.SPR_IS_EVOLVE, item.tableData.IsEvolve());
+		SetSkillIconButton(UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", equipItemData, GetSkillSlotData(item));
+		SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, item.tableData);
+		SetLabelText((Enum)UI.LBL_SELL, item.sellPrice.ToString());
+		if (item.ability != null && item.ability.Length > 0)
+		{
+			bool empty_ability = true;
+			SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 			{
-				bool empty_ability = true;
-				SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length, false, delegate(int i, Transform t, bool is_recycle)
+				EquipItemAbility equipItemAbility = item.ability[i];
+				if (equipItemAbility.id == 0)
 				{
-					EquipItemAbility equipItemAbility = item.ability[i];
-					if (equipItemAbility.id == 0)
-					{
-						SetActive(t, false);
-					}
-					else
-					{
-						empty_ability = false;
-						SetActive(t, true);
-						if (item.IsFixedAbility(i))
-						{
-							SetActive(t, UI.OBJ_ABILITY, false);
-							SetActive(t, UI.OBJ_FIXEDABILITY, true);
-							SetLabelText(t, UI.LBL_FIXEDABILITY, equipItemAbility.GetName());
-							SetLabelText(t, UI.LBL_FIXEDABILITY_NUM, equipItemAbility.GetAP());
-						}
-						else
-						{
-							SetLabelText(t, UI.LBL_ABILITY, equipItemAbility.GetName());
-							SetLabelText(t, UI.LBL_ABILITY_NUM, equipItemAbility.GetAP());
-						}
-						SetEvent(t, "ABILITY", i);
-					}
-				});
-				if (empty_ability)
-				{
-					SetActive((Enum)UI.STR_NON_ABILITY, true);
+					SetActive(t, is_visible: false);
 				}
 				else
 				{
-					SetActive((Enum)UI.STR_NON_ABILITY, false);
+					empty_ability = false;
+					SetActive(t, is_visible: true);
+					if (item.IsFixedAbility(i))
+					{
+						SetActive(t, UI.OBJ_ABILITY, is_visible: false);
+						SetActive(t, UI.OBJ_FIXEDABILITY, is_visible: true);
+						SetLabelText(t, UI.LBL_FIXEDABILITY, equipItemAbility.GetName());
+						SetLabelText(t, UI.LBL_FIXEDABILITY_NUM, equipItemAbility.GetAP());
+					}
+					else
+					{
+						SetLabelText(t, UI.LBL_ABILITY, equipItemAbility.GetName());
+						SetLabelText(t, UI.LBL_ABILITY_NUM, equipItemAbility.GetAP());
+					}
+					SetEvent(t, "ABILITY", i);
 				}
+			});
+			if (empty_ability)
+			{
+				SetActive((Enum)UI.STR_NON_ABILITY, is_visible: true);
 			}
 			else
 			{
-				SetActive((Enum)UI.STR_NON_ABILITY, true);
+				SetActive((Enum)UI.STR_NON_ABILITY, is_visible: false);
 			}
+		}
+		else
+		{
+			SetActive((Enum)UI.STR_NON_ABILITY, is_visible: true);
 		}
 	}
 
@@ -271,7 +276,10 @@ public abstract class EquipSelectBase : SmithEquipBase
 		if (localInventoryEquipData != null)
 		{
 			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, false, (Func<int, bool>)delegate(int i)
+			m_generatedIconList.Clear();
+			UpdateNewIconInfo();
+			bool initItem = false;
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, reset: false, (Func<int, bool>)delegate(int i)
 			{
 				SortCompareData sortCompareData = localInventoryEquipData[i];
 				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
@@ -281,26 +289,39 @@ public abstract class EquipSelectBase : SmithEquipBase
 				return true;
 			}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
+				initItem = true;
 				uint tableID = localInventoryEquipData[i].GetTableID();
 				if (tableID == 0)
 				{
-					SetActive(t, false);
+					SetActive(t, is_visible: false);
 				}
 				else
 				{
-					SetActive(t, true);
+					SetActive(t, is_visible: true);
 					EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
 					EquipItemSortData equipItemSortData = localInventoryEquipData[i] as EquipItemSortData;
 					EquipItemInfo equip = equipItemSortData.GetItemData() as EquipItemInfo;
 					ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
 					bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
 					SkillSlotUIData[] skillSlotData = GetSkillSlotData(equip);
-					ItemIcon itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, IsShowMainStatus, t, "TRY_ON", i, equipItemSortData.GetIconStatus(), is_new, -1, false, -1);
+					ItemIcon itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, IsShowMainStatus, t, "TRY_ON", i, equipItemSortData.GetIconStatus(), is_new);
 					itemIcon.SetItemID(equipItemSortData.GetTableID());
-					itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), true);
+					itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), is_instant: true);
 					SetLongTouch(itemIcon.transform, "DETAIL", i);
+					itemIcon.SetInitData(equipItemSortData);
+					if (!m_generatedIconList.Contains(itemIcon))
+					{
+						m_generatedIconList.Add(itemIcon);
+					}
 				}
 			});
+			SetActive(base._transform, UI.LBL_NO_ITEM, !initItem);
+			SetLabelText(base._transform, UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
+		}
+		else
+		{
+			SetActive(base._transform, UI.LBL_NO_ITEM, is_visible: true);
+			SetLabelText(base._transform, UI.LBL_NO_ITEM, StringTable.Get(STRING_CATEGORY.COMMON, 19799u));
 		}
 	}
 
@@ -345,7 +366,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 	{
 		ItemDetailEquip.CURRENT_SECTION cURRENT_SECTION;
 		object obj;
-		if (smithType == SmithType.GROW || smithType == SmithType.EVOLVE || smithType == SmithType.ABILITY_CHANGE)
+		if (smithType == SmithType.GROW || smithType == SmithType.EVOLVE || smithType == SmithType.ABILITY_CHANGE || smithType == SmithType.REVERT_LITHOGRAPH)
 		{
 			cURRENT_SECTION = ItemDetailEquip.CURRENT_SECTION.SMITH_GROW;
 			obj = EquipItem;
@@ -375,7 +396,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 	{
 		int num = (int)GameSection.GetEventData();
 		EquipItemAbility equipItemAbility = null;
-		if (smithType == SmithType.GROW || smithType == SmithType.EVOLVE || smithType == SmithType.ABILITY_CHANGE)
+		if (smithType == SmithType.GROW || smithType == SmithType.EVOLVE || smithType == SmithType.ABILITY_CHANGE || smithType == SmithType.REVERT_LITHOGRAPH)
 		{
 			EquipItemInfo equipItem = EquipItem;
 			equipItemAbility = new EquipItemAbility(equipItem.ability[num].id, 0);
@@ -415,9 +436,9 @@ public abstract class EquipSelectBase : SmithEquipBase
 		int i = 0;
 		for (int num = switchInventoryAry.Length; i < num; i++)
 		{
-			SetActive((Enum)switchInventoryAry[i], false);
+			SetActive((Enum)switchInventoryAry[i], is_visible: false);
 		}
-		SetActive((Enum)switchInventoryAry[inventoryUIIndex], true);
+		SetActive((Enum)switchInventoryAry[inventoryUIIndex], is_visible: true);
 		InventoryUI = switchInventoryAry[inventoryUIIndex];
 		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, InventoryUI == UI.GRD_INVENTORY || InventoryUI == UI.GRD_INVENTORY_DEF);
 	}
@@ -432,7 +453,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 		RefreshUI();
 	}
 
-	protected ItemIcon CreateRemoveIcon(Transform parent = null, string event_name = null, int event_data = 0, int toggle_group = -1, bool is_select = false, string name = null)
+	protected virtual ItemIcon CreateRemoveIcon(Transform parent = null, string event_name = null, int event_data = 0, int toggle_group = -1, bool is_select = false, string name = null)
 	{
 		if (InventoryUI == UI.GRD_INVENTORY || InventoryUI == UI.GRD_INVENTORY_DEF)
 		{
@@ -455,7 +476,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 		bool registedIcon = MonoBehaviourSingleton<AchievementManager>.I.CheckEquipItemCollection(item_data.createData.equipTableData);
 		if (InventoryUI == UI.GRD_INVENTORY)
 		{
-			ItemIcon itemIcon = ItemIconDetail.CreateSmithCreateEquipDetailIcon(icon_type, icon_id, rarity, item_data, skill_slot_data, is_show_main_status, parent, event_name, event_data, icon_status, is_new, toggle_group, is_select, false, getType);
+			ItemIcon itemIcon = ItemIconDetail.CreateSmithCreateEquipDetailIcon(icon_type, icon_id, rarity, item_data, skill_slot_data, is_show_main_status, parent, event_name, event_data, icon_status, is_new, toggle_group, is_select, is_equipping: false, getType);
 			ItemIconDetail itemIconDetail = itemIcon as ItemIconDetail;
 			if (itemIconDetail != null)
 			{
@@ -463,7 +484,7 @@ public abstract class EquipSelectBase : SmithEquipBase
 			}
 			return itemIcon;
 		}
-		ItemIcon itemIcon2 = ItemIconDetailSmall.CreateSmithCreateEquipDetailIcon(icon_type, icon_id, rarity, item_data, parent, event_name, event_data, icon_status, is_new, toggle_group, is_select, false, getType);
+		ItemIcon itemIcon2 = ItemIconDetailSmall.CreateSmithCreateEquipDetailIcon(icon_type, icon_id, rarity, item_data, parent, event_name, event_data, icon_status, is_new, toggle_group, is_select, is_equipping: false, getType);
 		ItemIconDetailSmall itemIconDetailSmall = itemIcon2 as ItemIconDetailSmall;
 		if (itemIconDetailSmall != null)
 		{

@@ -9,6 +9,8 @@ namespace Network
 
 		public string price;
 
+		public double priceMicros;
+
 		public string name;
 
 		public string desc;

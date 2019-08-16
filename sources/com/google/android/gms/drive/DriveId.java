@@ -2,150 +2,152 @@ package com.google.android.gms.drive;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import android.support.annotation.Nullable;
 import android.util.Base64;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.internal.zzbjh;
-import com.google.android.gms.internal.zzbjm;
-import com.google.android.gms.internal.zzbjv;
-import com.google.android.gms.internal.zzbkc;
-import com.google.android.gms.internal.zzbnp;
-import com.google.android.gms.internal.zzbnq;
-import com.google.android.gms.internal.zzegn;
-import com.google.android.gms.internal.zzego;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import com.google.android.gms.common.util.VisibleForTesting;
+import com.google.android.gms.internal.drive.zzbn;
+import com.google.android.gms.internal.drive.zzbs;
+import com.google.android.gms.internal.drive.zzdp;
+import com.google.android.gms.internal.drive.zzhn;
+import com.google.android.gms.internal.drive.zzho;
+import com.google.android.gms.internal.drive.zziw;
+import com.google.android.gms.internal.drive.zzix;
 
-public class DriveId extends zza implements ReflectedParcelable {
-    public static final Creator<DriveId> CREATOR = new zzj();
+@Class(creator = "DriveIdCreator")
+@Reserved({1})
+public class DriveId extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<DriveId> CREATOR = new zzk();
     public static final int RESOURCE_TYPE_FILE = 0;
     public static final int RESOURCE_TYPE_FOLDER = 1;
     public static final int RESOURCE_TYPE_UNKNOWN = -1;
-    private long zzgcs;
-    private volatile String zzgcu = null;
-    private String zzgdj;
-    private long zzgdk;
-    private int zzgdl;
-    private volatile String zzgdm = null;
+    @Field(mo13990id = 2)
+    private final String zzab;
+    @Field(mo13990id = 3)
+    private final long zzac;
+    @Field(defaultValueUnchecked = "com.google.android.gms.drive.DriveId.RESOURCE_TYPE_UNKNOWN", mo13990id = 5)
+    private final int zzad;
+    private volatile String zzae = null;
+    @Field(mo13990id = 4)
+    private final long zzf;
+    private volatile String zzh = null;
 
-    public DriveId(String str, long j, long j2, int i) {
+    @Constructor
+    public DriveId(@Param(mo13993id = 2) String str, @Param(mo13993id = 3) long j, @Param(mo13993id = 4) long j2, @Param(mo13993id = 5) int i) {
         boolean z = false;
-        this.zzgdj = str;
-        zzbp.zzbh(!"".equals(str));
+        this.zzab = str;
+        Preconditions.checkArgument(!"".equals(str));
         if (!(str == null && j == -1)) {
             z = true;
         }
-        zzbp.zzbh(z);
-        this.zzgdk = j;
-        this.zzgcs = j2;
-        this.zzgdl = i;
+        Preconditions.checkArgument(z);
+        this.zzac = j;
+        this.zzf = j2;
+        this.zzad = i;
     }
 
     public static DriveId decodeFromString(String str) {
         boolean startsWith = str.startsWith("DriveId:");
         String valueOf = String.valueOf(str);
-        zzbp.zzb(startsWith, valueOf.length() != 0 ? "Invalid DriveId: ".concat(valueOf) : new String("Invalid DriveId: "));
-        return zzl(Base64.decode(str.substring(8), 10));
+        Preconditions.checkArgument(startsWith, valueOf.length() != 0 ? "Invalid DriveId: ".concat(valueOf) : new String("Invalid DriveId: "));
+        return zza(Base64.decode(str.substring(8), 10));
     }
 
-    public static DriveId zzgo(String str) {
-        zzbp.zzu(str);
+    @VisibleForTesting
+    public static DriveId zza(String str) {
+        Preconditions.checkNotNull(str);
         return new DriveId(str, -1, -1, -1);
     }
 
-    private static DriveId zzl(byte[] bArr) {
+    @VisibleForTesting
+    private static DriveId zza(byte[] bArr) {
         try {
-            zzbnp zzbnp = (zzbnp) zzego.zza(new zzbnp(), bArr);
-            return new DriveId("".equals(zzbnp.zzgkb) ? null : zzbnp.zzgkb, zzbnp.zzgkc, zzbnp.zzgjz, zzbnp.zzgkd);
-        } catch (zzegn e) {
+            zzhn zzhn = (zzhn) zzix.zza(new zzhn(), bArr, 0, bArr.length);
+            return new DriveId("".equals(zzhn.zzab) ? null : zzhn.zzab, zzhn.zzac, zzhn.zzf, zzhn.zzad);
+        } catch (zziw e) {
             throw new IllegalArgumentException();
         }
     }
 
     public DriveFile asDriveFile() {
-        if (this.zzgdl != 1) {
-            return new zzbjh(this);
+        if (this.zzad != 1) {
+            return new zzbn(this);
         }
         throw new IllegalStateException("This DriveId corresponds to a folder. Call asDriveFolder instead.");
     }
 
     public DriveFolder asDriveFolder() {
-        if (this.zzgdl != 0) {
-            return new zzbjm(this);
+        if (this.zzad != 0) {
+            return new zzbs(this);
         }
         throw new IllegalStateException("This DriveId corresponds to a file. Call asDriveFile instead.");
     }
 
     public DriveResource asDriveResource() {
-        return this.zzgdl == 1 ? asDriveFolder() : this.zzgdl == 0 ? asDriveFile() : new zzbkc(this);
+        return this.zzad == 1 ? asDriveFolder() : this.zzad == 0 ? asDriveFile() : new zzdp(this);
     }
 
     public final String encodeToString() {
-        if (this.zzgcu == null) {
-            zzego zzbnp = new zzbnp();
-            zzbnp.versionCode = 1;
-            zzbnp.zzgkb = this.zzgdj == null ? "" : this.zzgdj;
-            zzbnp.zzgkc = this.zzgdk;
-            zzbnp.zzgjz = this.zzgcs;
-            zzbnp.zzgkd = this.zzgdl;
-            String encodeToString = Base64.encodeToString(zzego.zzc(zzbnp), 10);
+        if (this.zzh == null) {
+            zzhn zzhn = new zzhn();
+            zzhn.versionCode = 1;
+            zzhn.zzab = this.zzab == null ? "" : this.zzab;
+            zzhn.zzac = this.zzac;
+            zzhn.zzf = this.zzf;
+            zzhn.zzad = this.zzad;
+            String encodeToString = Base64.encodeToString(zzix.zza((zzix) zzhn), 10);
             String valueOf = String.valueOf("DriveId:");
-            encodeToString = String.valueOf(encodeToString);
-            this.zzgcu = encodeToString.length() != 0 ? valueOf.concat(encodeToString) : new String(valueOf);
+            String valueOf2 = String.valueOf(encodeToString);
+            this.zzh = valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf);
         }
-        return this.zzgcu;
+        return this.zzh;
     }
 
     public boolean equals(Object obj) {
-        if (!(obj instanceof DriveId)) {
+        if (obj == null || obj.getClass() != DriveId.class) {
             return false;
         }
         DriveId driveId = (DriveId) obj;
-        if (driveId.zzgcs != this.zzgcs) {
-            return false;
+        if (driveId.zzf == this.zzf) {
+            return (driveId.zzac == -1 && this.zzac == -1) ? driveId.zzab.equals(this.zzab) : (this.zzab == null || driveId.zzab == null) ? driveId.zzac == this.zzac : driveId.zzac == this.zzac && driveId.zzab.equals(this.zzab);
         }
-        if (driveId.zzgdk == -1 && this.zzgdk == -1) {
-            return driveId.zzgdj.equals(this.zzgdj);
-        }
-        if (this.zzgdj == null || driveId.zzgdj == null) {
-            return driveId.zzgdk == this.zzgdk;
-        } else {
-            if (driveId.zzgdk != this.zzgdk) {
-                return false;
-            }
-            if (driveId.zzgdj.equals(this.zzgdj)) {
-                return true;
-            }
-            zzbjv.zzy("DriveId", "Unexpected unequal resourceId for same DriveId object.");
-            return false;
-        }
+        return false;
     }
 
+    @Nullable
     public String getResourceId() {
-        return this.zzgdj;
+        return this.zzab;
     }
 
     public int getResourceType() {
-        return this.zzgdl;
+        return this.zzad;
     }
 
     public int hashCode() {
-        if (this.zzgdk == -1) {
-            return this.zzgdj.hashCode();
+        if (this.zzac == -1) {
+            return this.zzab.hashCode();
         }
-        String valueOf = String.valueOf(String.valueOf(this.zzgcs));
-        String valueOf2 = String.valueOf(String.valueOf(this.zzgdk));
+        String valueOf = String.valueOf(String.valueOf(this.zzf));
+        String valueOf2 = String.valueOf(String.valueOf(this.zzac));
         return (valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf)).hashCode();
     }
 
     public final String toInvariantString() {
-        if (this.zzgdm == null) {
-            zzego zzbnq = new zzbnq();
-            zzbnq.zzgkc = this.zzgdk;
-            zzbnq.zzgjz = this.zzgcs;
-            this.zzgdm = Base64.encodeToString(zzego.zzc(zzbnq), 10);
+        if (this.zzae == null) {
+            zzho zzho = new zzho();
+            zzho.zzac = this.zzac;
+            zzho.zzf = this.zzf;
+            this.zzae = Base64.encodeToString(zzix.zza((zzix) zzho), 10);
         }
-        return this.zzgdm;
+        return this.zzae;
     }
 
     public String toString() {
@@ -153,11 +155,11 @@ public class DriveId extends zza implements ReflectedParcelable {
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzgdj, false);
-        zzd.zza(parcel, 3, this.zzgdk);
-        zzd.zza(parcel, 4, this.zzgcs);
-        zzd.zzc(parcel, 5, this.zzgdl);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.zzab, false);
+        SafeParcelWriter.writeLong(parcel, 3, this.zzac);
+        SafeParcelWriter.writeLong(parcel, 4, this.zzf);
+        SafeParcelWriter.writeInt(parcel, 5, this.zzad);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

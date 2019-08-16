@@ -4,13 +4,23 @@ import java.io.File;
 import java.util.Map;
 
 interface Report {
+
+    public enum Type {
+        JAVA,
+        NATIVE
+    }
+
     Map<String, String> getCustomHeaders();
 
     File getFile();
 
     String getFileName();
 
+    File[] getFiles();
+
     String getIdentifier();
 
-    boolean remove();
+    Type getType();
+
+    void remove();
 }

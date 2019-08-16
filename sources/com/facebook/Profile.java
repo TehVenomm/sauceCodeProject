@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.facebook.internal.ImageRequest;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Utility.GraphMeRequestWithCacheCallback;
@@ -13,42 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class Profile implements Parcelable {
-    public static final Creator<Profile> CREATOR = new C03622();
-    private static final String FIRST_NAME_KEY = "first_name";
-    private static final String ID_KEY = "id";
-    private static final String LAST_NAME_KEY = "last_name";
-    private static final String LINK_URI_KEY = "link_uri";
-    private static final String MIDDLE_NAME_KEY = "middle_name";
-    private static final String NAME_KEY = "name";
-    private final String firstName;
-    private final String id;
-    private final String lastName;
-    private final Uri linkUri;
-    private final String middleName;
-    private final String name;
-
-    /* renamed from: com.facebook.Profile$1 */
-    static final class C03611 implements GraphMeRequestWithCacheCallback {
-        C03611() {
-        }
-
-        public void onFailure(FacebookException facebookException) {
-        }
-
-        public void onSuccess(JSONObject jSONObject) {
-            String optString = jSONObject.optString("id");
-            if (optString != null) {
-                String optString2 = jSONObject.optString("link");
-                Profile.setCurrentProfile(new Profile(optString, jSONObject.optString(Profile.FIRST_NAME_KEY), jSONObject.optString(Profile.MIDDLE_NAME_KEY), jSONObject.optString(Profile.LAST_NAME_KEY), jSONObject.optString("name"), optString2 != null ? Uri.parse(optString2) : null));
-            }
-        }
-    }
-
-    /* renamed from: com.facebook.Profile$2 */
-    static final class C03622 implements Creator {
-        C03622() {
-        }
-
+    public static final Creator<Profile> CREATOR = new Creator<Profile>() {
         public Profile createFromParcel(Parcel parcel) {
             return new Profile(parcel);
         }
@@ -56,10 +22,32 @@ public final class Profile implements Parcelable {
         public Profile[] newArray(int i) {
             return new Profile[i];
         }
-    }
+    };
+    private static final String FIRST_NAME_KEY = "first_name";
+    private static final String ID_KEY = "id";
+    private static final String LAST_NAME_KEY = "last_name";
+    private static final String LINK_URI_KEY = "link_uri";
+    private static final String MIDDLE_NAME_KEY = "middle_name";
+    private static final String NAME_KEY = "name";
+    /* access modifiers changed from: private */
+    public static final String TAG = Profile.class.getSimpleName();
+    @Nullable
+    private final String firstName;
+    @Nullable
+
+    /* renamed from: id */
+    private final String f388id;
+    @Nullable
+    private final String lastName;
+    @Nullable
+    private final Uri linkUri;
+    @Nullable
+    private final String middleName;
+    @Nullable
+    private final String name;
 
     private Profile(Parcel parcel) {
-        this.id = parcel.readString();
+        this.f388id = parcel.readString();
         this.firstName = parcel.readString();
         this.middleName = parcel.readString();
         this.lastName = parcel.readString();
@@ -70,7 +58,7 @@ public final class Profile implements Parcelable {
 
     public Profile(String str, @Nullable String str2, @Nullable String str3, @Nullable String str4, @Nullable String str5, @Nullable Uri uri) {
         Validate.notNullOrEmpty(str, "id");
-        this.id = str;
+        this.f388id = str;
         this.firstName = str2;
         this.middleName = str3;
         this.lastName = str4;
@@ -80,7 +68,7 @@ public final class Profile implements Parcelable {
 
     Profile(JSONObject jSONObject) {
         Uri uri = null;
-        this.id = jSONObject.optString("id", null);
+        this.f388id = jSONObject.optString("id", null);
         this.firstName = jSONObject.optString(FIRST_NAME_KEY, null);
         this.middleName = jSONObject.optString(MIDDLE_NAME_KEY, null);
         this.lastName = jSONObject.optString(LAST_NAME_KEY, null);
@@ -94,10 +82,22 @@ public final class Profile implements Parcelable {
 
     public static void fetchProfileForCurrentAccessToken() {
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
-        if (currentAccessToken == null) {
+        if (!AccessToken.isCurrentAccessTokenActive()) {
             setCurrentProfile(null);
         } else {
-            Utility.getGraphMeRequestWithCacheAsync(currentAccessToken.getToken(), new C03611());
+            Utility.getGraphMeRequestWithCacheAsync(currentAccessToken.getToken(), new GraphMeRequestWithCacheCallback() {
+                public void onFailure(FacebookException facebookException) {
+                    Log.e(Profile.TAG, "Got unexpected exception: " + facebookException);
+                }
+
+                public void onSuccess(JSONObject jSONObject) {
+                    String optString = jSONObject.optString("id");
+                    if (optString != null) {
+                        String optString2 = jSONObject.optString("link");
+                        Profile.setCurrentProfile(new Profile(optString, jSONObject.optString(Profile.FIRST_NAME_KEY), jSONObject.optString(Profile.MIDDLE_NAME_KEY), jSONObject.optString(Profile.LAST_NAME_KEY), jSONObject.optString("name"), optString2 != null ? Uri.parse(optString2) : null));
+                    }
+                }
+            });
         }
     }
 
@@ -105,7 +105,7 @@ public final class Profile implements Parcelable {
         return ProfileManager.getInstance().getCurrentProfile();
     }
 
-    public static void setCurrentProfile(Profile profile) {
+    public static void setCurrentProfile(@Nullable Profile profile) {
         ProfileManager.getInstance().setCurrentProfile(profile);
     }
 
@@ -119,28 +119,27 @@ public final class Profile implements Parcelable {
                 return false;
             }
             Profile profile = (Profile) obj;
-            if (this.id.equals(profile.id) && this.firstName == null) {
-                if (profile.firstName != null) {
+            if (!this.f388id.equals(profile.f388id) || this.firstName != null) {
+                if (!this.firstName.equals(profile.firstName) || this.middleName != null) {
+                    if (!this.middleName.equals(profile.middleName) || this.lastName != null) {
+                        if (!this.lastName.equals(profile.lastName) || this.name != null) {
+                            if (!this.name.equals(profile.name) || this.linkUri != null) {
+                                return this.linkUri.equals(profile.linkUri);
+                            }
+                            if (profile.linkUri != null) {
+                                return false;
+                            }
+                        } else if (profile.name != null) {
+                            return false;
+                        }
+                    } else if (profile.lastName != null) {
+                        return false;
+                    }
+                } else if (profile.middleName != null) {
                     return false;
                 }
-            } else if (this.firstName.equals(profile.firstName) && this.middleName == null) {
-                if (profile.middleName != null) {
-                    return false;
-                }
-            } else if (this.middleName.equals(profile.middleName) && this.lastName == null) {
-                if (profile.lastName != null) {
-                    return false;
-                }
-            } else if (this.lastName.equals(profile.lastName) && this.name == null) {
-                if (profile.name != null) {
-                    return false;
-                }
-            } else if (!this.name.equals(profile.name) || this.linkUri != null) {
-                return this.linkUri.equals(profile.linkUri);
-            } else {
-                if (profile.linkUri != null) {
-                    return false;
-                }
+            } else if (profile.firstName != null) {
+                return false;
             }
         }
         return true;
@@ -151,7 +150,7 @@ public final class Profile implements Parcelable {
     }
 
     public String getId() {
-        return this.id;
+        return this.f388id;
     }
 
     public String getLastName() {
@@ -171,11 +170,11 @@ public final class Profile implements Parcelable {
     }
 
     public Uri getProfilePictureUri(int i, int i2) {
-        return ImageRequest.getProfilePictureUri(this.id, i, i2);
+        return ImageRequest.getProfilePictureUri(this.f388id, i, i2);
     }
 
     public int hashCode() {
-        int hashCode = this.id.hashCode() + 527;
+        int hashCode = this.f388id.hashCode() + 527;
         if (this.firstName != null) {
             hashCode = (hashCode * 31) + this.firstName.hashCode();
         }
@@ -191,10 +190,11 @@ public final class Profile implements Parcelable {
         return this.linkUri != null ? (hashCode * 31) + this.linkUri.hashCode() : hashCode;
     }
 
-    JSONObject toJSONObject() {
+    /* access modifiers changed from: 0000 */
+    public JSONObject toJSONObject() {
         JSONObject jSONObject = new JSONObject();
         try {
-            jSONObject.put("id", this.id);
+            jSONObject.put("id", this.f388id);
             jSONObject.put(FIRST_NAME_KEY, this.firstName);
             jSONObject.put(MIDDLE_NAME_KEY, this.middleName);
             jSONObject.put(LAST_NAME_KEY, this.lastName);
@@ -210,7 +210,7 @@ public final class Profile implements Parcelable {
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(this.id);
+        parcel.writeString(this.f388id);
         parcel.writeString(this.firstName);
         parcel.writeString(this.middleName);
         parcel.writeString(this.lastName);

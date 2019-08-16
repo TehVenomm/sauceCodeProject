@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Network
 {
@@ -8,6 +9,8 @@ namespace Network
 	{
 		public class Data
 		{
+			public int abilityItemLotId;
+
 			public string abilityType;
 
 			public int value;
@@ -15,6 +18,8 @@ namespace Network
 			public string target;
 
 			public string spTarget;
+
+			public string spAttackType;
 
 			public string format;
 		}
@@ -29,21 +34,22 @@ namespace Network
 
 		public override string ToString()
 		{
-			string empty = string.Empty;
-			empty = empty + uniqId + ",";
-			empty = empty + abilityItemId + ",";
-			empty = empty + equipItemUniqId + ",";
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.AppendFormat("{0},", uniqId);
+			stringBuilder.AppendFormat("{0},", abilityItemId);
+			stringBuilder.AppendFormat("{0},", equipItemUniqId);
 			int i = 0;
 			for (int count = data.Count; i < count; i++)
 			{
-				empty += "d(";
-				empty = empty + data[i].abilityType + ",";
-				empty = empty + data[i].value + ",";
-				empty = empty + data[i].target + ",";
-				empty = empty + data[i].spTarget + ",";
-				empty += "),";
+				stringBuilder.Append("d(");
+				stringBuilder.AppendFormat("{0},", data[i].abilityType);
+				stringBuilder.AppendFormat("{0},", data[i].value);
+				stringBuilder.AppendFormat("{0},", data[i].target);
+				stringBuilder.AppendFormat("{0},", data[i].spTarget);
+				stringBuilder.AppendFormat("{0},", data[i].spAttackType);
+				stringBuilder.Append("),");
 			}
-			return base.ToString() + empty;
+			return base.ToString() + stringBuilder.ToString();
 		}
 	}
 }

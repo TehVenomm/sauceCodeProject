@@ -13,14 +13,17 @@ public class BetterHttpResponseImpl implements BetterHttpResponse {
 
     public BetterHttpResponseImpl(HttpResponse httpResponse) throws IOException {
         this.response = httpResponse;
-        HttpEntity entity = httpResponse.getEntity();
-        if (entity != null) {
-            this.entity = new BufferedHttpEntity(entity);
+        HttpEntity entity2 = httpResponse.getEntity();
+        if (entity2 != null) {
+            this.entity = new BufferedHttpEntity(entity2);
         }
     }
 
     public String getHeader(String str) {
-        return !this.response.containsHeader(str) ? null : this.response.getFirstHeader(str).getValue();
+        if (!this.response.containsHeader(str)) {
+            return null;
+        }
+        return this.response.getFirstHeader(str).getValue();
     }
 
     public InputStream getResponseBody() throws IOException {

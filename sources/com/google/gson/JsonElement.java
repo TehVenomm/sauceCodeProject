@@ -4,12 +4,12 @@ import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public abstract class JsonElement {
-    abstract JsonElement deepCopy();
+    /* access modifiers changed from: 0000 */
+    public abstract JsonElement deepCopy();
 
     public BigDecimal getAsBigDecimal() {
         throw new UnsupportedOperationException(getClass().getSimpleName());
@@ -23,7 +23,8 @@ public abstract class JsonElement {
         throw new UnsupportedOperationException(getClass().getSimpleName());
     }
 
-    Boolean getAsBooleanWrapper() {
+    /* access modifiers changed from: 0000 */
+    public Boolean getAsBooleanWrapper() {
         throw new UnsupportedOperationException(getClass().getSimpleName());
     }
 
@@ -109,7 +110,7 @@ public abstract class JsonElement {
 
     public String toString() {
         try {
-            Writer stringWriter = new StringWriter();
+            StringWriter stringWriter = new StringWriter();
             JsonWriter jsonWriter = new JsonWriter(stringWriter);
             jsonWriter.setLenient(true);
             Streams.write(this, jsonWriter);

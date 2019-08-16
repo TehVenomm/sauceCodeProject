@@ -1,22 +1,12 @@
-package android.support.v4.media.session;
+package android.support.p000v4.media.session;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 
+/* renamed from: android.support.v4.media.session.ParcelableVolumeInfo */
 public class ParcelableVolumeInfo implements Parcelable {
-    public static final Creator<ParcelableVolumeInfo> CREATOR = new C00921();
-    public int audioStream;
-    public int controlType;
-    public int currentVolume;
-    public int maxVolume;
-    public int volumeType;
-
-    /* renamed from: android.support.v4.media.session.ParcelableVolumeInfo$1 */
-    static final class C00921 implements Creator<ParcelableVolumeInfo> {
-        C00921() {
-        }
-
+    public static final Creator<ParcelableVolumeInfo> CREATOR = new Creator<ParcelableVolumeInfo>() {
         public ParcelableVolumeInfo createFromParcel(Parcel parcel) {
             return new ParcelableVolumeInfo(parcel);
         }
@@ -24,7 +14,12 @@ public class ParcelableVolumeInfo implements Parcelable {
         public ParcelableVolumeInfo[] newArray(int i) {
             return new ParcelableVolumeInfo[i];
         }
-    }
+    };
+    public int audioStream;
+    public int controlType;
+    public int currentVolume;
+    public int maxVolume;
+    public int volumeType;
 
     public ParcelableVolumeInfo(int i, int i2, int i3, int i4, int i5) {
         this.volumeType = i;

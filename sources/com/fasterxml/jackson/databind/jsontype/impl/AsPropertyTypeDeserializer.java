@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.util.JsonParserSequence;
@@ -15,13 +15,13 @@ import java.io.IOException;
 
 public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer {
     private static final long serialVersionUID = 1;
-    protected final As _inclusion;
+    protected final C0861As _inclusion;
 
     public AsPropertyTypeDeserializer(JavaType javaType, TypeIdResolver typeIdResolver, String str, boolean z, Class<?> cls) {
-        this(javaType, typeIdResolver, str, z, cls, As.PROPERTY);
+        this(javaType, typeIdResolver, str, z, cls, C0861As.PROPERTY);
     }
 
-    public AsPropertyTypeDeserializer(JavaType javaType, TypeIdResolver typeIdResolver, String str, boolean z, Class<?> cls, As as) {
+    public AsPropertyTypeDeserializer(JavaType javaType, TypeIdResolver typeIdResolver, String str, boolean z, Class<?> cls, C0861As as) {
         super(javaType, typeIdResolver, str, z, cls);
         this._inclusion = as;
     }
@@ -35,11 +35,13 @@ public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer {
         return beanProperty == this._property ? this : new AsPropertyTypeDeserializer(this, beanProperty);
     }
 
-    public As getTypeInclusion() {
+    public C0861As getTypeInclusion() {
         return this._inclusion;
     }
 
     public Object deserializeTypedFromObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        TokenBuffer tokenBuffer;
+        TokenBuffer tokenBuffer2 = null;
         if (jsonParser.canReadTypeId()) {
             Object typeId = jsonParser.getTypeId();
             if (typeId != null) {
@@ -53,24 +55,27 @@ public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer {
             return _deserializeTypedUsingDefaultImpl(jsonParser, deserializationContext, null);
         }
         JsonToken jsonToken = currentToken;
-        TokenBuffer tokenBuffer = null;
         while (jsonToken == JsonToken.FIELD_NAME) {
             String currentName = jsonParser.getCurrentName();
             jsonParser.nextToken();
             if (currentName.equals(this._typePropertyName)) {
-                return _deserializeTypedForId(jsonParser, deserializationContext, tokenBuffer);
+                return _deserializeTypedForId(jsonParser, deserializationContext, tokenBuffer2);
             }
-            if (tokenBuffer == null) {
+            if (tokenBuffer2 == null) {
                 tokenBuffer = new TokenBuffer(jsonParser, deserializationContext);
+            } else {
+                tokenBuffer = tokenBuffer2;
             }
             tokenBuffer.writeFieldName(currentName);
             tokenBuffer.copyCurrentStructure(jsonParser);
             jsonToken = jsonParser.nextToken();
+            tokenBuffer2 = tokenBuffer;
         }
-        return _deserializeTypedUsingDefaultImpl(jsonParser, deserializationContext, tokenBuffer);
+        return _deserializeTypedUsingDefaultImpl(jsonParser, deserializationContext, tokenBuffer2);
     }
 
-    protected Object _deserializeTypedForId(JsonParser jsonParser, DeserializationContext deserializationContext, TokenBuffer tokenBuffer) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeTypedForId(JsonParser jsonParser, DeserializationContext deserializationContext, TokenBuffer tokenBuffer) throws IOException {
         String text = jsonParser.getText();
         JsonDeserializer _findDeserializer = _findDeserializer(deserializationContext, text);
         if (this._typeIdVisible) {
@@ -87,7 +92,8 @@ public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer {
         return _findDeserializer.deserialize(jsonParser, deserializationContext);
     }
 
-    protected Object _deserializeTypedUsingDefaultImpl(JsonParser jsonParser, DeserializationContext deserializationContext, TokenBuffer tokenBuffer) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeTypedUsingDefaultImpl(JsonParser jsonParser, DeserializationContext deserializationContext, TokenBuffer tokenBuffer) throws IOException {
         JsonDeserializer _findDefaultImplDeserializer = _findDefaultImplDeserializer(deserializationContext);
         if (_findDefaultImplDeserializer != null) {
             if (tokenBuffer != null) {

@@ -53,6 +53,8 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 			return constDefine.GUILD_REQUEST_NEED_POINT_S;
 		case RARITY_TYPE.SS:
 			return constDefine.GUILD_REQUEST_NEED_POINT_SS;
+		case RARITY_TYPE.SSS:
+			return constDefine.GUILD_REQUEST_NEED_POINT_SSS;
 		default:
 			return constDefine.GUILD_REQUEST_NEED_POINT_SS;
 		}
@@ -219,8 +221,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 					TimeSpan houndRemainTime = guildRequestItem.GetHoundRemainTime();
 					if (guildRequestItem.crystalNum <= 0 || !(questRemainTime.TotalSeconds > houndRemainTime.TotalSeconds))
 					{
-						DateTime item = DateTime.Now;
-						item = item.AddTicks(questRemainTime.Ticks);
+						DateTime item = DateTime.Now.AddTicks(questRemainTime.Ticks);
 						list.Add(item);
 					}
 				}
@@ -243,7 +244,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 	{
 		if (!PlayerPrefs.HasKey("LOCAL_PUSH_GUILD_REQUEST_KEY"))
 		{
-			SetLocalPushFlag(true);
+			SetLocalPushFlag(flag: true);
 			return true;
 		}
 		return PlayerPrefs.GetInt("LOCAL_PUSH_GUILD_REQUEST_KEY") == 1;
@@ -279,7 +280,6 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 		{
 			diff.update.ForEach(delegate(GuildRequestItem data)
 			{
-				GuildRequestManager guildRequestManager = this;
 				GuildRequestItem guildRequestItem = guildRequestData.guildRequestItemList.Find((GuildRequestItem list_data) => list_data.slotNo == data.slotNo);
 				guildRequestItem.slotNo = data.slotNo;
 				guildRequestItem.crystalNum = data.crystalNum;

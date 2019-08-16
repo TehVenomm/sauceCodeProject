@@ -3,20 +3,17 @@ package com.google.android.gms.games.multiplayer;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.games.PlayerEntity;
 
 public class zzc implements Creator<ParticipantEntity> {
-    public /* synthetic */ Object createFromParcel(Parcel parcel) {
-        return zzl(parcel);
-    }
-
     public /* synthetic */ Object[] newArray(int i) {
         return new ParticipantEntity[i];
     }
 
-    public ParticipantEntity zzl(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
+    /* renamed from: zzf */
+    public ParticipantEntity createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
         String str2 = null;
         Uri uri = null;
@@ -29,51 +26,51 @@ public class zzc implements Creator<ParticipantEntity> {
         ParticipantResult participantResult = null;
         String str4 = null;
         String str5 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 2:
-                    str2 = zzb.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    uri = (Uri) zzb.zza(parcel, readInt, Uri.CREATOR);
+                    uri = (Uri) SafeParcelReader.createParcelable(parcel, readHeader, Uri.CREATOR);
                     break;
                 case 4:
-                    uri2 = (Uri) zzb.zza(parcel, readInt, Uri.CREATOR);
+                    uri2 = (Uri) SafeParcelReader.createParcelable(parcel, readHeader, Uri.CREATOR);
                     break;
                 case 5:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 6:
-                    str3 = zzb.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 7:
-                    z = zzb.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 8:
-                    playerEntity = (PlayerEntity) zzb.zza(parcel, readInt, PlayerEntity.CREATOR);
+                    playerEntity = (PlayerEntity) SafeParcelReader.createParcelable(parcel, readHeader, PlayerEntity.CREATOR);
                     break;
                 case 9:
-                    i2 = zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 10:
-                    participantResult = (ParticipantResult) zzb.zza(parcel, readInt, ParticipantResult.CREATOR);
+                    participantResult = (ParticipantResult) SafeParcelReader.createParcelable(parcel, readHeader, ParticipantResult.CREATOR);
                     break;
                 case 11:
-                    str4 = zzb.zzq(parcel, readInt);
+                    str4 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 12:
-                    str5 = zzb.zzq(parcel, readInt);
+                    str5 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new ParticipantEntity(str, str2, uri, uri2, i, str3, z, playerEntity, i2, participantResult, str4, str5);
     }
 }

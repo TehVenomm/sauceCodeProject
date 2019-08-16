@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" android:background="#404040" android:padding="8dp" android:layout_width="match_parent" android:layout_height="match_parent">
-    <TextView android:textSize="24sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="match_parent" android:text="Hello, world!"/>
-    <net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel android:layout_width="match_parent" android:layout_height="match_parent" card_view:closeButton="@android:drawable/ic_menu_close_clear_cancel">
-        <LinearLayout android:background="#ffff00" android:padding="6dp" android:layout_width="match_parent" android:layout_height="match_parent">
-            <LinearLayout android:background="#0000ff" android:padding="6dp" android:layout_width="match_parent" android:layout_height="match_parent"/>
-        </LinearLayout>
-    </net.gogame.gowrap.ui.dpro.view.CustomTabbelPanel>
-</FrameLayout>

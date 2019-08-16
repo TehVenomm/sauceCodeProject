@@ -32,8 +32,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeId;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -86,30 +86,30 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class JacksonAnnotationIntrospector extends AnnotationIntrospector implements Serializable {
-    private static final Class<? extends Annotation>[] ANNOTATIONS_TO_INFER_DESER = new Class[]{JsonDeserialize.class, JsonView.class, JsonFormat.class, JsonTypeInfo.class, JsonUnwrapped.class, JsonBackReference.class, JsonManagedReference.class};
-    private static final Class<? extends Annotation>[] ANNOTATIONS_TO_INFER_SER = new Class[]{JsonSerialize.class, JsonView.class, JsonFormat.class, JsonTypeInfo.class, JsonRawValue.class, JsonUnwrapped.class, JsonBackReference.class, JsonManagedReference.class};
+    private static final Class<? extends Annotation>[] ANNOTATIONS_TO_INFER_DESER = ((Class[]) new Class[]{JsonDeserialize.class, JsonView.class, JsonFormat.class, JsonTypeInfo.class, JsonUnwrapped.class, JsonBackReference.class, JsonManagedReference.class});
+    private static final Class<? extends Annotation>[] ANNOTATIONS_TO_INFER_SER = ((Class[]) new Class[]{JsonSerialize.class, JsonView.class, JsonFormat.class, JsonTypeInfo.class, JsonRawValue.class, JsonUnwrapped.class, JsonBackReference.class, JsonManagedReference.class});
     private static final Java7Support _jdk7Helper;
     private static final long serialVersionUID = 1;
-    protected transient LRUMap<Class<?>, Boolean> _annotationsInside = new LRUMap(48, 48);
+    protected transient LRUMap<Class<?>, Boolean> _annotationsInside = new LRUMap<>(48, 48);
     protected boolean _cfgConstructorPropertiesImpliesCreator = true;
 
     private static class Java7Support {
         private final Class<?> _bogus = ConstructorProperties.class;
 
         public Java7Support() {
-            Class cls = Transient.class;
+            Class<Transient> cls = Transient.class;
         }
 
         public Boolean findTransient(Annotated annotated) {
-            Transient transientR = (Transient) annotated.getAnnotation(Transient.class);
-            if (transientR != null) {
-                return Boolean.valueOf(transientR.value());
+            Transient annotation = annotated.getAnnotation(Transient.class);
+            if (annotation != null) {
+                return Boolean.valueOf(annotation.value());
             }
             return null;
         }
 
         public Boolean hasCreatorAnnotation(Annotated annotated) {
-            if (((ConstructorProperties) annotated.getAnnotation(ConstructorProperties.class)) != null) {
+            if (annotated.getAnnotation(ConstructorProperties.class) != null) {
                 return Boolean.TRUE;
             }
             return null;
@@ -118,9 +118,9 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         public PropertyName findConstructorName(AnnotatedParameter annotatedParameter) {
             AnnotatedWithParams owner = annotatedParameter.getOwner();
             if (owner != null) {
-                ConstructorProperties constructorProperties = (ConstructorProperties) owner.getAnnotation(ConstructorProperties.class);
-                if (constructorProperties != null) {
-                    String[] value = constructorProperties.value();
+                ConstructorProperties annotation = owner.getAnnotation(ConstructorProperties.class);
+                if (annotation != null) {
+                    String[] value = annotation.value();
                     int index = annotatedParameter.getIndex();
                     if (index < value.length) {
                         return PropertyName.construct(value[index]);
@@ -146,9 +146,10 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         return PackageVersion.VERSION;
     }
 
-    protected Object readResolve() {
+    /* access modifiers changed from: protected */
+    public Object readResolve() {
         if (this._annotationsInside == null) {
-            this._annotationsInside = new LRUMap(48, 48);
+            this._annotationsInside = new LRUMap<>(48, 48);
         }
         return this;
     }
@@ -175,47 +176,44 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
                 JsonProperty jsonProperty = (JsonProperty) field.getAnnotation(JsonProperty.class);
                 if (jsonProperty != null) {
                     String value = jsonProperty.value();
-                    if (!(value == null || value.isEmpty())) {
+                    if (value != null && !value.isEmpty()) {
                         return value;
                     }
                 }
             }
-        } catch (SecurityException e) {
-        } catch (NoSuchFieldException e2) {
+        } catch (NoSuchFieldException | SecurityException e) {
         }
         return enumR.name();
     }
 
     public String[] findEnumValues(Class<?> cls, Enum<?>[] enumArr, String[] strArr) {
-        int length;
-        int i = 0;
-        HashMap hashMap = null;
+        Field[] declaredFields;
+        HashMap hashMap;
+        HashMap hashMap2 = null;
         for (Field field : ClassUtil.getDeclaredFields(cls)) {
             if (field.isEnumConstant()) {
                 JsonProperty jsonProperty = (JsonProperty) field.getAnnotation(JsonProperty.class);
                 if (jsonProperty != null) {
                     String value = jsonProperty.value();
                     if (!value.isEmpty()) {
-                        HashMap hashMap2;
-                        if (hashMap == null) {
-                            hashMap2 = new HashMap();
+                        if (hashMap2 == null) {
+                            hashMap = new HashMap();
                         } else {
-                            hashMap2 = hashMap;
+                            hashMap = hashMap2;
                         }
-                        hashMap2.put(field.getName(), value);
-                        hashMap = hashMap2;
+                        hashMap.put(field.getName(), value);
+                        hashMap2 = hashMap;
                     }
                 }
             }
         }
-        if (hashMap != null) {
-            length = enumArr.length;
-            while (i < length) {
-                String str = (String) hashMap.get(enumArr[i].name());
+        if (hashMap2 != null) {
+            int length = enumArr.length;
+            for (int i = 0; i < length; i++) {
+                String str = (String) hashMap2.get(enumArr[i].name());
                 if (str != null) {
                     strArr[i] = str;
                 }
-                i++;
             }
         }
         return strArr;
@@ -237,7 +235,10 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     @Deprecated
     public String[] findPropertiesToIgnore(Annotated annotated) {
         JsonIgnoreProperties jsonIgnoreProperties = (JsonIgnoreProperties) _findAnnotation(annotated, JsonIgnoreProperties.class);
-        return jsonIgnoreProperties == null ? null : jsonIgnoreProperties.value();
+        if (jsonIgnoreProperties == null) {
+            return null;
+        }
+        return jsonIgnoreProperties.value();
     }
 
     public String[] findPropertiesToIgnore(Annotated annotated, boolean z) {
@@ -257,12 +258,18 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public Boolean findIgnoreUnknownProperties(AnnotatedClass annotatedClass) {
         JsonIgnoreProperties jsonIgnoreProperties = (JsonIgnoreProperties) _findAnnotation(annotatedClass, JsonIgnoreProperties.class);
-        return jsonIgnoreProperties == null ? null : Boolean.valueOf(jsonIgnoreProperties.ignoreUnknown());
+        if (jsonIgnoreProperties == null) {
+            return null;
+        }
+        return Boolean.valueOf(jsonIgnoreProperties.ignoreUnknown());
     }
 
     public Boolean isIgnorableType(AnnotatedClass annotatedClass) {
         JsonIgnoreType jsonIgnoreType = (JsonIgnoreType) _findAnnotation(annotatedClass, JsonIgnoreType.class);
-        return jsonIgnoreType == null ? null : Boolean.valueOf(jsonIgnoreType.value());
+        if (jsonIgnoreType == null) {
+            return null;
+        }
+        return Boolean.valueOf(jsonIgnoreType.value());
     }
 
     public Object findFilterId(Annotated annotated) {
@@ -278,12 +285,18 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public Object findNamingStrategy(AnnotatedClass annotatedClass) {
         JsonNaming jsonNaming = (JsonNaming) _findAnnotation(annotatedClass, JsonNaming.class);
-        return jsonNaming == null ? null : jsonNaming.value();
+        if (jsonNaming == null) {
+            return null;
+        }
+        return jsonNaming.value();
     }
 
     public String findClassDescription(AnnotatedClass annotatedClass) {
         JsonClassDescription jsonClassDescription = (JsonClassDescription) _findAnnotation(annotatedClass, JsonClassDescription.class);
-        return jsonClassDescription == null ? null : jsonClassDescription.value();
+        if (jsonClassDescription == null) {
+            return null;
+        }
+        return jsonClassDescription.value();
     }
 
     public VisibilityChecker<?> findAutoDetectVisibility(AnnotatedClass annotatedClass, VisibilityChecker<?> visibilityChecker) {
@@ -293,7 +306,10 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public String findImplicitPropertyName(AnnotatedMember annotatedMember) {
         PropertyName _findConstructorName = _findConstructorName(annotatedMember);
-        return _findConstructorName == null ? null : _findConstructorName.getSimpleName();
+        if (_findConstructorName == null) {
+            return null;
+        }
+        return _findConstructorName.getSimpleName();
     }
 
     public boolean hasIgnoreMarker(AnnotatedMember annotatedMember) {
@@ -318,7 +334,10 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public String findPropertyDescription(Annotated annotated) {
         JsonPropertyDescription jsonPropertyDescription = (JsonPropertyDescription) _findAnnotation(annotated, JsonPropertyDescription.class);
-        return jsonPropertyDescription == null ? null : jsonPropertyDescription.value();
+        if (jsonPropertyDescription == null) {
+            return null;
+        }
+        return jsonPropertyDescription.value();
     }
 
     public Integer findPropertyIndex(Annotated annotated) {
@@ -346,7 +365,10 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public Value findFormat(Annotated annotated) {
         JsonFormat jsonFormat = (JsonFormat) _findAnnotation(annotated, JsonFormat.class);
-        return jsonFormat == null ? null : new Value(jsonFormat);
+        if (jsonFormat == null) {
+            return null;
+        }
+        return new Value(jsonFormat);
     }
 
     public ReferenceProperty findReferenceType(AnnotatedMember annotatedMember) {
@@ -374,7 +396,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         if (jacksonInject == null) {
             return null;
         }
-        Object value = jacksonInject.value();
+        String value = jacksonInject.value();
         if (value.length() != 0) {
             return value;
         }
@@ -390,12 +412,15 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public Class<?>[] findViews(Annotated annotated) {
         JsonView jsonView = (JsonView) _findAnnotation(annotated, JsonView.class);
-        return jsonView == null ? null : jsonView.value();
+        if (jsonView == null) {
+            return null;
+        }
+        return jsonView.value();
     }
 
     public AnnotatedMethod resolveSetterConflict(MapperConfig<?> mapperConfig, AnnotatedMethod annotatedMethod, AnnotatedMethod annotatedMethod2) {
-        Class rawParameterType = annotatedMethod.getRawParameterType(0);
-        Class rawParameterType2 = annotatedMethod2.getRawParameterType(0);
+        Class<String> rawParameterType = annotatedMethod.getRawParameterType(0);
+        Class<String> rawParameterType2 = annotatedMethod2.getRawParameterType(0);
         if (rawParameterType.isPrimitive()) {
             if (!rawParameterType2.isPrimitive()) {
                 return annotatedMethod;
@@ -437,7 +462,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
             return null;
         }
         Type[] value = jsonSubTypes.value();
-        List<NamedType> arrayList = new ArrayList(value.length);
+        ArrayList arrayList = new ArrayList(value.length);
         for (Type type : value) {
             arrayList.add(new NamedType(type.value(), type.name()));
         }
@@ -446,7 +471,10 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public String findTypeName(AnnotatedClass annotatedClass) {
         JsonTypeName jsonTypeName = (JsonTypeName) _findAnnotation(annotatedClass, JsonTypeName.class);
-        return jsonTypeName == null ? null : jsonTypeName.value();
+        if (jsonTypeName == null) {
+            return null;
+        }
+        return jsonTypeName.value();
     }
 
     public Boolean isTypeId(AnnotatedMember annotatedMember) {
@@ -472,7 +500,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public Object findSerializer(Annotated annotated) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
         if (jsonSerialize != null) {
-            Class using = jsonSerialize.using();
+            Class<JsonSerializer.None> using = jsonSerialize.using();
             if (using != JsonSerializer.None.class) {
                 return using;
             }
@@ -487,7 +515,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public Object findKeySerializer(Annotated annotated) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
         if (jsonSerialize != null) {
-            Class keyUsing = jsonSerialize.keyUsing();
+            Class<JsonSerializer.None> keyUsing = jsonSerialize.keyUsing();
             if (keyUsing != JsonSerializer.None.class) {
                 return keyUsing;
             }
@@ -498,7 +526,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public Object findContentSerializer(Annotated annotated) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
         if (jsonSerialize != null) {
-            Class contentUsing = jsonSerialize.contentUsing();
+            Class<JsonSerializer.None> contentUsing = jsonSerialize.contentUsing();
             if (contentUsing != JsonSerializer.None.class) {
                 return contentUsing;
             }
@@ -509,7 +537,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public Object findNullSerializer(Annotated annotated) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
         if (jsonSerialize != null) {
-            Class nullsUsing = jsonSerialize.nullsUsing();
+            Class<JsonSerializer.None> nullsUsing = jsonSerialize.nullsUsing();
             if (nullsUsing != JsonSerializer.None.class) {
                 return nullsUsing;
             }
@@ -584,39 +612,60 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     @Deprecated
     public Class<?> findSerializationType(Annotated annotated) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
-        return jsonSerialize == null ? null : _classIfExplicit(jsonSerialize.as());
+        if (jsonSerialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonSerialize.mo10592as());
     }
 
     @Deprecated
     public Class<?> findSerializationKeyType(Annotated annotated, JavaType javaType) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
-        return jsonSerialize == null ? null : _classIfExplicit(jsonSerialize.keyAs());
+        if (jsonSerialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonSerialize.keyAs());
     }
 
     @Deprecated
     public Class<?> findSerializationContentType(Annotated annotated, JavaType javaType) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
-        return jsonSerialize == null ? null : _classIfExplicit(jsonSerialize.contentAs());
+        if (jsonSerialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonSerialize.contentAs());
     }
 
     public Typing findSerializationTyping(Annotated annotated) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
-        return jsonSerialize == null ? null : jsonSerialize.typing();
+        if (jsonSerialize == null) {
+            return null;
+        }
+        return jsonSerialize.typing();
     }
 
     public Object findSerializationConverter(Annotated annotated) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotated, JsonSerialize.class);
-        return jsonSerialize == null ? null : _classIfExplicit(jsonSerialize.converter(), Converter.None.class);
+        if (jsonSerialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonSerialize.converter(), Converter.None.class);
     }
 
     public Object findSerializationContentConverter(AnnotatedMember annotatedMember) {
         JsonSerialize jsonSerialize = (JsonSerialize) _findAnnotation(annotatedMember, JsonSerialize.class);
-        return jsonSerialize == null ? null : _classIfExplicit(jsonSerialize.contentConverter(), Converter.None.class);
+        if (jsonSerialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonSerialize.contentConverter(), Converter.None.class);
     }
 
     public String[] findSerializationPropertyOrder(AnnotatedClass annotatedClass) {
         JsonPropertyOrder jsonPropertyOrder = (JsonPropertyOrder) _findAnnotation(annotatedClass, JsonPropertyOrder.class);
-        return jsonPropertyOrder == null ? null : jsonPropertyOrder.value();
+        if (jsonPropertyOrder == null) {
+            return null;
+        }
+        return jsonPropertyOrder.value();
     }
 
     public Boolean findSerializationSortAlphabetically(Annotated annotated) {
@@ -634,12 +683,11 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public void findAndAddVirtualProperties(MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass, List<BeanPropertyWriter> list) {
         JsonAppend jsonAppend = (JsonAppend) _findAnnotation(annotatedClass, JsonAppend.class);
         if (jsonAppend != null) {
-            int i;
             boolean prepend = jsonAppend.prepend();
             JavaType javaType = null;
             Attr[] attrs = jsonAppend.attrs();
             int length = attrs.length;
-            for (i = 0; i < length; i++) {
+            for (int i = 0; i < length; i++) {
                 if (javaType == null) {
                     javaType = mapperConfig.constructType(Object.class);
                 }
@@ -651,8 +699,8 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
                 }
             }
             Prop[] props = jsonAppend.props();
-            i = props.length;
-            for (int i2 = 0; i2 < i; i2++) {
+            int length2 = props.length;
+            for (int i2 = 0; i2 < length2; i2++) {
                 BeanPropertyWriter _constructVirtualProperty2 = _constructVirtualProperty(props[i2], mapperConfig, annotatedClass);
                 if (prepend) {
                     list.add(i2, _constructVirtualProperty2);
@@ -663,21 +711,23 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         }
     }
 
-    protected BeanPropertyWriter _constructVirtualProperty(Attr attr, MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass, JavaType javaType) {
+    /* access modifiers changed from: protected */
+    public BeanPropertyWriter _constructVirtualProperty(Attr attr, MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass, JavaType javaType) {
         PropertyMetadata propertyMetadata = attr.required() ? PropertyMetadata.STD_REQUIRED : PropertyMetadata.STD_OPTIONAL;
         String value = attr.value();
         PropertyName _propertyName = _propertyName(attr.propName(), attr.propNamespace());
         if (!_propertyName.hasSimpleName()) {
             _propertyName = PropertyName.construct(value);
         }
-        return AttributePropertyWriter.construct(value, SimpleBeanPropertyDefinition.construct((MapperConfig) mapperConfig, new VirtualAnnotatedMember(annotatedClass, annotatedClass.getRawType(), value, javaType.getRawClass()), _propertyName, propertyMetadata, attr.include()), annotatedClass.getAnnotations(), javaType);
+        return AttributePropertyWriter.construct(value, SimpleBeanPropertyDefinition.construct(mapperConfig, (AnnotatedMember) new VirtualAnnotatedMember(annotatedClass, annotatedClass.getRawType(), value, javaType.getRawClass()), _propertyName, propertyMetadata, attr.include()), annotatedClass.getAnnotations(), javaType);
     }
 
-    protected BeanPropertyWriter _constructVirtualProperty(Prop prop, MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass) {
+    /* access modifiers changed from: protected */
+    public BeanPropertyWriter _constructVirtualProperty(Prop prop, MapperConfig<?> mapperConfig, AnnotatedClass annotatedClass) {
         PropertyMetadata propertyMetadata = prop.required() ? PropertyMetadata.STD_REQUIRED : PropertyMetadata.STD_OPTIONAL;
         PropertyName _propertyName = _propertyName(prop.name(), prop.namespace());
         JavaType constructType = mapperConfig.constructType(prop.type());
-        BeanPropertyDefinition construct = SimpleBeanPropertyDefinition.construct((MapperConfig) mapperConfig, new VirtualAnnotatedMember(annotatedClass, annotatedClass.getRawType(), _propertyName.getSimpleName(), constructType.getRawClass()), _propertyName, propertyMetadata, prop.include());
+        SimpleBeanPropertyDefinition construct = SimpleBeanPropertyDefinition.construct(mapperConfig, (AnnotatedMember) new VirtualAnnotatedMember(annotatedClass, annotatedClass.getRawType(), _propertyName.getSimpleName(), constructType.getRawClass()), _propertyName, propertyMetadata, prop.include());
         Class value = prop.value();
         HandlerInstantiator handlerInstantiator = mapperConfig.getHandlerInstantiator();
         VirtualBeanPropertyWriter virtualPropertyWriterInstance = handlerInstantiator == null ? null : handlerInstantiator.virtualPropertyWriterInstance(mapperConfig, value);
@@ -710,7 +760,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public Object findDeserializer(Annotated annotated) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotated, JsonDeserialize.class);
         if (jsonDeserialize != null) {
-            Class using = jsonDeserialize.using();
+            Class<JsonDeserializer.None> using = jsonDeserialize.using();
             if (using != JsonDeserializer.None.class) {
                 return using;
             }
@@ -721,7 +771,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public Object findKeyDeserializer(Annotated annotated) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotated, JsonDeserialize.class);
         if (jsonDeserialize != null) {
-            Class keyUsing = jsonDeserialize.keyUsing();
+            Class<KeyDeserializer.None> keyUsing = jsonDeserialize.keyUsing();
             if (keyUsing != KeyDeserializer.None.class) {
                 return keyUsing;
             }
@@ -732,7 +782,7 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
     public Object findContentDeserializer(Annotated annotated) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotated, JsonDeserialize.class);
         if (jsonDeserialize != null) {
-            Class contentUsing = jsonDeserialize.contentUsing();
+            Class<JsonDeserializer.None> contentUsing = jsonDeserialize.contentUsing();
             if (contentUsing != JsonDeserializer.None.class) {
                 return contentUsing;
             }
@@ -742,45 +792,69 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public Object findDeserializationConverter(Annotated annotated) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotated, JsonDeserialize.class);
-        return jsonDeserialize == null ? null : _classIfExplicit(jsonDeserialize.converter(), Converter.None.class);
+        if (jsonDeserialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonDeserialize.converter(), Converter.None.class);
     }
 
     public Object findDeserializationContentConverter(AnnotatedMember annotatedMember) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotatedMember, JsonDeserialize.class);
-        return jsonDeserialize == null ? null : _classIfExplicit(jsonDeserialize.contentConverter(), Converter.None.class);
+        if (jsonDeserialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonDeserialize.contentConverter(), Converter.None.class);
     }
 
     @Deprecated
     public Class<?> findDeserializationContentType(Annotated annotated, JavaType javaType) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotated, JsonDeserialize.class);
-        return jsonDeserialize == null ? null : _classIfExplicit(jsonDeserialize.contentAs());
+        if (jsonDeserialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonDeserialize.contentAs());
     }
 
     @Deprecated
     public Class<?> findDeserializationType(Annotated annotated, JavaType javaType) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotated, JsonDeserialize.class);
-        return jsonDeserialize == null ? null : _classIfExplicit(jsonDeserialize.as());
+        if (jsonDeserialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonDeserialize.mo10580as());
     }
 
     @Deprecated
     public Class<?> findDeserializationKeyType(Annotated annotated, JavaType javaType) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotated, JsonDeserialize.class);
-        return jsonDeserialize == null ? null : _classIfExplicit(jsonDeserialize.keyAs());
+        if (jsonDeserialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonDeserialize.keyAs());
     }
 
     public Object findValueInstantiator(AnnotatedClass annotatedClass) {
         JsonValueInstantiator jsonValueInstantiator = (JsonValueInstantiator) _findAnnotation(annotatedClass, JsonValueInstantiator.class);
-        return jsonValueInstantiator == null ? null : jsonValueInstantiator.value();
+        if (jsonValueInstantiator == null) {
+            return null;
+        }
+        return jsonValueInstantiator.value();
     }
 
     public Class<?> findPOJOBuilder(AnnotatedClass annotatedClass) {
         JsonDeserialize jsonDeserialize = (JsonDeserialize) _findAnnotation(annotatedClass, JsonDeserialize.class);
-        return jsonDeserialize == null ? null : _classIfExplicit(jsonDeserialize.builder());
+        if (jsonDeserialize == null) {
+            return null;
+        }
+        return _classIfExplicit(jsonDeserialize.builder());
     }
 
     public JsonPOJOBuilder.Value findPOJOBuilderConfig(AnnotatedClass annotatedClass) {
         JsonPOJOBuilder jsonPOJOBuilder = (JsonPOJOBuilder) _findAnnotation(annotatedClass, JsonPOJOBuilder.class);
-        return jsonPOJOBuilder == null ? null : new JsonPOJOBuilder.Value(jsonPOJOBuilder);
+        if (jsonPOJOBuilder == null) {
+            return null;
+        }
+        return new JsonPOJOBuilder.Value(jsonPOJOBuilder);
     }
 
     public PropertyName findNameForDeserialization(Annotated annotated) {
@@ -825,10 +899,14 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
 
     public Mode findCreatorBinding(Annotated annotated) {
         JsonCreator jsonCreator = (JsonCreator) _findAnnotation(annotated, JsonCreator.class);
-        return jsonCreator == null ? null : jsonCreator.mode();
+        if (jsonCreator == null) {
+            return null;
+        }
+        return jsonCreator.mode();
     }
 
-    protected boolean _isIgnorable(Annotated annotated) {
+    /* access modifiers changed from: protected */
+    public boolean _isIgnorable(Annotated annotated) {
         JsonIgnore jsonIgnore = (JsonIgnore) _findAnnotation(annotated, JsonIgnore.class);
         if (jsonIgnore != null) {
             return jsonIgnore.value();
@@ -842,19 +920,25 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         return false;
     }
 
-    protected Class<?> _classIfExplicit(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public Class<?> _classIfExplicit(Class<?> cls) {
         if (cls == null || ClassUtil.isBogusClass(cls)) {
             return null;
         }
         return cls;
     }
 
-    protected Class<?> _classIfExplicit(Class<?> cls, Class<?> cls2) {
+    /* access modifiers changed from: protected */
+    public Class<?> _classIfExplicit(Class<?> cls, Class<?> cls2) {
         Class<?> _classIfExplicit = _classIfExplicit(cls);
-        return (_classIfExplicit == null || _classIfExplicit == cls2) ? null : _classIfExplicit;
+        if (_classIfExplicit == null || _classIfExplicit == cls2) {
+            return null;
+        }
+        return _classIfExplicit;
     }
 
-    protected PropertyName _propertyName(String str, String str2) {
+    /* access modifiers changed from: protected */
+    public PropertyName _propertyName(String str, String str2) {
         if (str.isEmpty()) {
             return PropertyName.USE_DEFAULT;
         }
@@ -864,7 +948,8 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         return PropertyName.construct(str, str2);
     }
 
-    protected PropertyName _findConstructorName(Annotated annotated) {
+    /* access modifiers changed from: protected */
+    public PropertyName _findConstructorName(Annotated annotated) {
         if (annotated instanceof AnnotatedParameter) {
             AnnotatedParameter annotatedParameter = (AnnotatedParameter) annotated;
             if (!(annotatedParameter.getOwner() == null || _jdk7Helper == null)) {
@@ -877,8 +962,9 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         return null;
     }
 
-    protected TypeResolverBuilder<?> _findTypeResolver(MapperConfig<?> mapperConfig, Annotated annotated, JavaType javaType) {
-        TypeResolverBuilder typeResolverBuilderInstance;
+    /* access modifiers changed from: protected */
+    public TypeResolverBuilder<?> _findTypeResolver(MapperConfig<?> mapperConfig, Annotated annotated, JavaType javaType) {
+        TypeResolverBuilder _constructStdTypeResolverBuilder;
         TypeIdResolver typeIdResolver = null;
         JsonTypeInfo jsonTypeInfo = (JsonTypeInfo) _findAnnotation(annotated, JsonTypeInfo.class);
         JsonTypeResolver jsonTypeResolver = (JsonTypeResolver) _findAnnotation(annotated, JsonTypeResolver.class);
@@ -886,14 +972,14 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
             if (jsonTypeInfo == null) {
                 return null;
             }
-            typeResolverBuilderInstance = mapperConfig.typeResolverBuilderInstance(annotated, jsonTypeResolver.value());
+            _constructStdTypeResolverBuilder = mapperConfig.typeResolverBuilderInstance(annotated, jsonTypeResolver.value());
         } else if (jsonTypeInfo == null) {
             return null;
         } else {
-            if (jsonTypeInfo.use() == Id.NONE) {
+            if (jsonTypeInfo.use() == C0862Id.NONE) {
                 return _constructNoTypeResolverBuilder();
             }
-            Object _constructStdTypeResolverBuilder = _constructStdTypeResolverBuilder();
+            _constructStdTypeResolverBuilder = _constructStdTypeResolverBuilder();
         }
         JsonTypeIdResolver jsonTypeIdResolver = (JsonTypeIdResolver) _findAnnotation(annotated, JsonTypeIdResolver.class);
         if (jsonTypeIdResolver != null) {
@@ -902,24 +988,26 @@ public class JacksonAnnotationIntrospector extends AnnotationIntrospector implem
         if (typeIdResolver != null) {
             typeIdResolver.init(javaType);
         }
-        typeResolverBuilderInstance = typeResolverBuilderInstance.init(jsonTypeInfo.use(), typeIdResolver);
-        As include = jsonTypeInfo.include();
-        if (include == As.EXTERNAL_PROPERTY && (annotated instanceof AnnotatedClass)) {
-            include = As.PROPERTY;
+        TypeResolverBuilder init = _constructStdTypeResolverBuilder.init(jsonTypeInfo.use(), typeIdResolver);
+        C0861As include = jsonTypeInfo.include();
+        if (include == C0861As.EXTERNAL_PROPERTY && (annotated instanceof AnnotatedClass)) {
+            include = C0861As.PROPERTY;
         }
-        TypeResolverBuilder typeProperty = typeResolverBuilderInstance.inclusion(include).typeProperty(jsonTypeInfo.property());
-        Class defaultImpl = jsonTypeInfo.defaultImpl();
-        if (!(defaultImpl == JsonTypeInfo.None.class || defaultImpl.isAnnotation())) {
+        TypeResolverBuilder typeProperty = init.inclusion(include).typeProperty(jsonTypeInfo.property());
+        Class<JsonTypeInfo.None> defaultImpl = jsonTypeInfo.defaultImpl();
+        if (defaultImpl != JsonTypeInfo.None.class && !defaultImpl.isAnnotation()) {
             typeProperty = typeProperty.defaultImpl(defaultImpl);
         }
         return typeProperty.typeIdVisibility(jsonTypeInfo.visible());
     }
 
-    protected StdTypeResolverBuilder _constructStdTypeResolverBuilder() {
+    /* access modifiers changed from: protected */
+    public StdTypeResolverBuilder _constructStdTypeResolverBuilder() {
         return new StdTypeResolverBuilder();
     }
 
-    protected StdTypeResolverBuilder _constructNoTypeResolverBuilder() {
+    /* access modifiers changed from: protected */
+    public StdTypeResolverBuilder _constructNoTypeResolverBuilder() {
         return StdTypeResolverBuilder.noTypeInfoBuilder();
     }
 }

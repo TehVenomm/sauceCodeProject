@@ -2,6 +2,7 @@ package com.google.android.gms.games.multiplayer.realtime;
 
 import java.util.List;
 
+@Deprecated
 public interface RoomStatusUpdateListener {
     void onConnectedToRoom(Room room);
 

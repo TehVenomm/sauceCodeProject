@@ -21,11 +21,13 @@ import org.onepf.oms.util.Logger;
 public class OpenAppstore extends DefaultAppstore {
     private final String appstoreName;
     public ComponentName componentName;
-    private Context context;
+    /* access modifiers changed from: private */
+    public Context context;
     @Nullable
     private AppstoreInAppBillingService mBillingService;
     private IOpenAppstore openAppstoreService;
-    private ServiceConnection serviceConn;
+    /* access modifiers changed from: private */
+    public ServiceConnection serviceConn;
 
     private static final class IOpenInAppBillingWrapper implements IInAppBillingService {
         private final IOpenInAppBillingService openStoreBilling;
@@ -59,26 +61,28 @@ public class OpenAppstore extends DefaultAppstore {
         }
     }
 
-    public OpenAppstore(@NotNull Context context, String str, IOpenAppstore iOpenAppstore, @Nullable Intent intent, String str2, ServiceConnection serviceConnection) {
-        this.context = context;
+    public OpenAppstore(@NotNull Context context2, String str, IOpenAppstore iOpenAppstore, @Nullable Intent intent, String str2, ServiceConnection serviceConnection) {
+        this.context = context2;
         this.appstoreName = str;
         this.openAppstoreService = iOpenAppstore;
         this.serviceConn = serviceConnection;
         if (intent != null) {
             final Intent intent2 = intent;
-            this.mBillingService = new IabHelper(context, str2, this) {
+            this.mBillingService = new IabHelper(context2, str2, this) {
                 public void dispose() {
                     super.dispose();
                     OpenAppstore.this.context.unbindService(OpenAppstore.this.serviceConn);
                 }
 
+                /* access modifiers changed from: protected */
                 @Nullable
-                protected IInAppBillingService getServiceFromBinder(IBinder iBinder) {
+                public IInAppBillingService getServiceFromBinder(IBinder iBinder) {
                     return new IOpenInAppBillingWrapper(Stub.asInterface(iBinder));
                 }
 
+                /* access modifiers changed from: protected */
                 @Nullable
-                protected Intent getServiceIntent() {
+                public Intent getServiceIntent() {
                     return intent2;
                 }
             };
@@ -88,8 +92,8 @@ public class OpenAppstore extends DefaultAppstore {
     public boolean areOutsideLinksAllowed() {
         try {
             return this.openAppstoreService.areOutsideLinksAllowed();
-        } catch (Throwable e) {
-            Logger.m1010w("RemoteException", e);
+        } catch (RemoteException e) {
+            Logger.m1035w("RemoteException", e);
             return false;
         }
     }
@@ -106,8 +110,8 @@ public class OpenAppstore extends DefaultAppstore {
     public int getPackageVersion(String str) {
         try {
             return this.openAppstoreService.getPackageVersion(str);
-        } catch (Throwable e) {
-            Logger.m1004e(e, "getPackageVersion() packageName: ", str);
+        } catch (RemoteException e) {
+            Logger.m1029e((Throwable) e, "getPackageVersion() packageName: ", str);
             return -1;
         }
     }
@@ -116,8 +120,8 @@ public class OpenAppstore extends DefaultAppstore {
     public Intent getProductPageIntent(String str) {
         try {
             return this.openAppstoreService.getProductPageIntent(str);
-        } catch (Throwable e) {
-            Logger.m1010w("RemoteException: ", e);
+        } catch (RemoteException e) {
+            Logger.m1035w("RemoteException: ", e);
             return null;
         }
     }
@@ -126,8 +130,8 @@ public class OpenAppstore extends DefaultAppstore {
     public Intent getRateItPageIntent(String str) {
         try {
             return this.openAppstoreService.getRateItPageIntent(str);
-        } catch (Throwable e) {
-            Logger.m1010w("RemoteException", e);
+        } catch (RemoteException e) {
+            Logger.m1035w("RemoteException", e);
             return null;
         }
     }
@@ -136,8 +140,8 @@ public class OpenAppstore extends DefaultAppstore {
     public Intent getSameDeveloperPageIntent(String str) {
         try {
             return this.openAppstoreService.getSameDeveloperPageIntent(str);
-        } catch (Throwable e) {
-            Logger.m1010w("RemoteException", e);
+        } catch (RemoteException e) {
+            Logger.m1035w("RemoteException", e);
             return null;
         }
     }
@@ -145,18 +149,18 @@ public class OpenAppstore extends DefaultAppstore {
     public boolean isBillingAvailable(String str) {
         boolean z = false;
         try {
-            z = this.openAppstoreService.isBillingAvailable(str);
-        } catch (Throwable e) {
-            Logger.m1004e(e, "isBillingAvailable() packageName: ", str);
+            return this.openAppstoreService.isBillingAvailable(str);
+        } catch (RemoteException e) {
+            Logger.m1029e((Throwable) e, "isBillingAvailable() packageName: ", str);
+            return z;
         }
-        return z;
     }
 
     public boolean isPackageInstaller(String str) {
         try {
             return this.openAppstoreService.isPackageInstaller(str);
-        } catch (Throwable e) {
-            Logger.m1010w("RemoteException: ", e);
+        } catch (RemoteException e) {
+            Logger.m1035w("RemoteException: ", e);
             return false;
         }
     }

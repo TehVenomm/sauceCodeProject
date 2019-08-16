@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 {
 	public class CreateEquipItemData
 	{
-		public const string NT = "createId,equipItemId,researchLv,pickupPriority,keyOrder,isKey_0,itemID_0,itemNum_0,isKey_1,itemID_1,itemNum_1,isKey_2,itemID_2,itemNum_2,isKey_3,itemID_3,itemNum_3,isKey_4,itemID_4,itemNum_4,isKey_5,itemID_5,itemNum_5,isKey_6,itemID_6,itemNum_6,isKey_7,itemID_7,itemNum_7,isKey_8,itemID_8,itemNum_8,isKey_9,itemID_9,itemNum_9,money";
-
 		public uint id;
 
 		public uint equipItemID;
@@ -20,6 +19,8 @@ public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 		public NeedMaterial[] needMaterial;
 
 		public XorInt needMoney = 0;
+
+		public const string NT = "createId,equipItemId,researchLv,pickupPriority,keyOrder,isKey_0,itemID_0,itemNum_0,isKey_1,itemID_1,itemNum_1,isKey_2,itemID_2,itemNum_2,isKey_3,itemID_3,itemNum_3,isKey_4,itemID_4,itemNum_4,isKey_5,itemID_5,itemNum_5,isKey_6,itemID_6,itemNum_6,isKey_7,itemID_7,itemNum_7,isKey_8,itemID_8,itemNum_8,isKey_9,itemID_9,itemNum_9,money";
 
 		public static bool cb(CSVReader csv_reader, CreateEquipItemData data, ref uint key)
 		{
@@ -50,15 +51,21 @@ public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 
 	private UIntKeyTable<CreateEquipItemData> tableData;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<CreateEquipItemData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<CreateEquipItemData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		tableData = TableUtility.CreateUIntKeyTable<CreateEquipItemData>(csv_text, CreateEquipItemData.cb, "createId,equipItemId,researchLv,pickupPriority,keyOrder,isKey_0,itemID_0,itemNum_0,isKey_1,itemID_1,itemNum_1,isKey_2,itemID_2,itemNum_2,isKey_3,itemID_3,itemNum_3,isKey_4,itemID_4,itemNum_4,isKey_5,itemID_5,itemNum_5,isKey_6,itemID_6,itemNum_6,isKey_7,itemID_7,itemNum_7,isKey_8,itemID_8,itemNum_8,isKey_9,itemID_9,itemNum_9,money", null);
+		tableData = TableUtility.CreateUIntKeyTable<CreateEquipItemData>(csv_text, CreateEquipItemData.cb, "createId,equipItemId,researchLv,pickupPriority,keyOrder,isKey_0,itemID_0,itemNum_0,isKey_1,itemID_1,itemNum_1,isKey_2,itemID_2,itemNum_2,isKey_3,itemID_3,itemNum_3,isKey_4,itemID_4,itemNum_4,isKey_5,itemID_5,itemNum_5,isKey_6,itemID_6,itemNum_6,isKey_7,itemID_7,itemNum_7,isKey_8,itemID_8,itemNum_8,isKey_9,itemID_9,itemNum_9,money");
 		tableData.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(tableData, csv_text, CreateEquipItemData.cb, "createId,equipItemId,researchLv,pickupPriority,keyOrder,isKey_0,itemID_0,itemNum_0,isKey_1,itemID_1,itemNum_1,isKey_2,itemID_2,itemNum_2,isKey_3,itemID_3,itemNum_3,isKey_4,itemID_4,itemNum_4,isKey_5,itemID_5,itemNum_5,isKey_6,itemID_6,itemNum_6,isKey_7,itemID_7,itemNum_7,isKey_8,itemID_8,itemNum_8,isKey_9,itemID_9,itemNum_9,money", null);
+		TableUtility.AddUIntKeyTable(tableData, csv_text, CreateEquipItemData.cb, "createId,equipItemId,researchLv,pickupPriority,keyOrder,isKey_0,itemID_0,itemNum_0,isKey_1,itemID_1,itemNum_1,isKey_2,itemID_2,itemNum_2,isKey_3,itemID_3,itemNum_3,isKey_4,itemID_4,itemNum_4,isKey_5,itemID_5,itemNum_5,isKey_6,itemID_6,itemNum_6,isKey_7,itemID_7,itemNum_7,isKey_8,itemID_8,itemNum_8,isKey_9,itemID_9,itemNum_9,money");
 	}
 
 	public CreateEquipItemData GetCreateEquipItemTableData(uint id)

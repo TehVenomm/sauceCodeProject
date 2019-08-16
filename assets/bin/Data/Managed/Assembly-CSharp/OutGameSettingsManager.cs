@@ -98,6 +98,8 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 
 			public string overrideComponentName;
 
+			public string wayPointName;
+
 			public Situation GetSituation()
 			{
 				if (selectSituationID < 0)
@@ -119,10 +121,6 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 		}
 
 		public string mainStage;
-
-		public float cameraDragRailRateCoef = -6f;
-
-		public float cameraRailRateEaseCoef = 0.9f;
 
 		public Vector3 selfInitPos;
 
@@ -178,6 +176,10 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 
 		public float gachaDecoIntervalTime;
 
+		public Vector3 defaultTargetPos = new Vector3(0f, 0f, 7f);
+
+		public Vector3 defaultCameraPos = Vector3.get_zero();
+
 		public float GetSelfCameraHeight()
 		{
 			return Mathf.Lerp(selfCameraHeightMin, selfCameraHeightMax, selfCameraZoomRate);
@@ -197,20 +199,21 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 				nPC.selectSituationID = -1;
 				int num2 = Random.Range(0, 100);
 				int num3 = 0;
-				if (nPC.enabled)
+				if (!nPC.enabled)
 				{
-					int j = 0;
-					for (int num4 = nPC.situations.Length; j < num4; j++)
+					continue;
+				}
+				int j = 0;
+				for (int num4 = nPC.situations.Length; j < num4; j++)
+				{
+					NPC.Situation situation = nPC.situations[j];
+					if (situation.enabled && situation.percent != 0)
 					{
-						NPC.Situation situation = nPC.situations[j];
-						if (situation.enabled && situation.percent != 0)
+						num3 += situation.percent;
+						if (num2 <= num3)
 						{
-							num3 += situation.percent;
-							if (num2 <= num3)
-							{
-								nPC.selectSituationID = j;
-								break;
-							}
+							nPC.selectSituationID = j;
+							break;
 						}
 					}
 				}
@@ -219,25 +222,27 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 			for (int num5 = npcs.Length; k < num5; k++)
 			{
 				NPC nPC2 = npcs[k];
-				if (nPC2.enabled)
+				if (!nPC2.enabled)
 				{
-					int l = 0;
-					for (int num6 = nPC2.situations.Length; l < num6; l++)
+					continue;
+				}
+				int l = 0;
+				for (int num6 = nPC2.situations.Length; l < num6; l++)
+				{
+					NPC.Situation situation2 = nPC2.situations[l];
+					if (!situation2.enabled || situation2.percent != 0 || string.IsNullOrEmpty(situation2.name))
 					{
-						NPC.Situation situation2 = nPC2.situations[l];
-						if (situation2.enabled && situation2.percent == 0 && !string.IsNullOrEmpty(situation2.name))
+						continue;
+					}
+					for (int m = 0; m < num5; m++)
+					{
+						if (m != k && npcs[m].enabled)
 						{
-							for (int m = 0; m < num5; m++)
+							NPC.Situation situation3 = npcs[m].GetSituation();
+							if (situation3 != null && situation3.enabled && !string.IsNullOrEmpty(situation3.name) && situation3.name == situation2.name)
 							{
-								if (m != k && npcs[m].enabled)
-								{
-									NPC.Situation situation3 = npcs[m].GetSituation();
-									if (situation3 != null && situation3.enabled && !string.IsNullOrEmpty(situation3.name) && situation3.name == situation2.name)
-									{
-										nPC2.selectSituationID = l;
-										break;
-									}
-								}
+								nPC2.selectSituationID = l;
+								break;
 							}
 						}
 					}
@@ -247,225 +252,24 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 	}
 
 	[Serializable]
-	public class LoungeScene
+	public class LoungeScene : HomeScene
 	{
-		[Serializable]
-		public class NPC : HomeScene.NPC
-		{
-			public string wayPointName;
-		}
-
-		public string mainStage;
-
 		public float moveSpeedRate = 1f;
 
 		public float sittingCameraEaseCoef;
 
 		public Vector3 waveSoundPoint;
 
-		public Vector3 selfInitPos;
-
-		public float selfInitRot;
-
-		public Vector3 selfInitStoryEndPos;
-
-		public float selfInitStoryEndRot;
-
-		public float selfCameraAngleY;
-
-		public float selfCameraTagetHeight;
-
-		public float selfCameraHeightMin;
-
-		public float selfCameraHeightMax;
-
-		public float selfCameraDistanceMin;
-
-		public float selfCameraDistanceMax;
-
-		public float selfCameraZoomRate;
-
-		public float selfCameraZoomCoef;
-
-		public Vector3 questCenterNPCPos;
-
-		public Vector3 questCenterNPCRot;
-
-		public float questCenterNPCFOV;
-
-		public Vector3 orderCenterNPCPos;
-
-		public Vector3 orderCenterNPCRot;
-
-		public float orderCenterNPCFOV;
-
 		public Vector3 boardCenterNPCPos;
 
 		public Vector3 boardCenterNPCRot;
 
 		public float boardCenterNPCFOV;
-
-		public float npc00StunCapability;
-
-		public NPC[] npcs;
-
-		public int linkFieldPortalID;
-
-		public AnimationCurve loginBonusMoveCureve;
-
-		public AnimationCurve loginBonusScaleCureve;
-
-		public string gachaDecoNewEffectName;
-
-		public string[] gachaDecoIconEffectNames;
-
-		public float gachaDecoIntervalTime;
-
-		public float GetSelfCameraHeight()
-		{
-			return Mathf.Lerp(selfCameraHeightMin, selfCameraHeightMax, selfCameraZoomRate);
-		}
-
-		public float GetSelfCameraDistance()
-		{
-			return Mathf.Lerp(selfCameraDistanceMin, selfCameraDistanceMax, selfCameraZoomRate);
-		}
-
-		public void SetupNPCSituations()
-		{
-			int i = 0;
-			for (int num = npcs.Length; i < num; i++)
-			{
-				NPC nPC = npcs[i];
-				nPC.selectSituationID = -1;
-				int num2 = Random.Range(0, 100);
-				int num3 = 0;
-				if (nPC.enabled)
-				{
-					int j = 0;
-					for (int num4 = nPC.situations.Length; j < num4; j++)
-					{
-						HomeScene.NPC.Situation situation = nPC.situations[j];
-						if (situation.enabled && situation.percent != 0)
-						{
-							num3 += situation.percent;
-							if (num2 <= num3)
-							{
-								nPC.selectSituationID = j;
-								break;
-							}
-						}
-					}
-				}
-			}
-			int k = 0;
-			for (int num5 = npcs.Length; k < num5; k++)
-			{
-				NPC nPC2 = npcs[k];
-				if (nPC2.enabled)
-				{
-					int l = 0;
-					for (int num6 = nPC2.situations.Length; l < num6; l++)
-					{
-						HomeScene.NPC.Situation situation2 = nPC2.situations[l];
-						if (situation2.enabled && situation2.percent == 0 && !string.IsNullOrEmpty(situation2.name))
-						{
-							for (int m = 0; m < num5; m++)
-							{
-								if (m != k && npcs[m].enabled)
-								{
-									HomeScene.NPC.Situation situation3 = npcs[m].GetSituation();
-									if (situation3 != null && situation3.enabled && !string.IsNullOrEmpty(situation3.name) && situation3.name == situation2.name)
-									{
-										nPC2.selectSituationID = l;
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	[Serializable]
-	public class GuildScene
+	public class ClanScene : LoungeScene
 	{
-		[Serializable]
-		public class NPC : HomeScene.NPC
-		{
-			public string wayPointName;
-		}
-
-		public string mainStage;
-
-		public Vector3 selfInitStoryEndPos;
-
-		public float selfInitStoryEndRot;
-
-		public Vector3 selfInitPos;
-
-		public float selfInitRot;
-
-		public NPC[] npcs;
-
-		public void SetupNPCSituations()
-		{
-			int i = 0;
-			for (int num = npcs.Length; i < num; i++)
-			{
-				NPC nPC = npcs[i];
-				nPC.selectSituationID = -1;
-				int num2 = Random.Range(0, 100);
-				int num3 = 0;
-				if (nPC.enabled)
-				{
-					int j = 0;
-					for (int num4 = nPC.situations.Length; j < num4; j++)
-					{
-						HomeScene.NPC.Situation situation = nPC.situations[j];
-						if (situation.enabled && situation.percent != 0)
-						{
-							num3 += situation.percent;
-							if (num2 <= num3)
-							{
-								nPC.selectSituationID = j;
-								break;
-							}
-						}
-					}
-				}
-			}
-			int k = 0;
-			for (int num5 = npcs.Length; k < num5; k++)
-			{
-				NPC nPC2 = npcs[k];
-				if (nPC2.enabled)
-				{
-					int l = 0;
-					for (int num6 = nPC2.situations.Length; l < num6; l++)
-					{
-						HomeScene.NPC.Situation situation2 = nPC2.situations[l];
-						if (situation2.enabled && situation2.percent == 0 && !string.IsNullOrEmpty(situation2.name))
-						{
-							for (int m = 0; m < num5; m++)
-							{
-								if (m != k && npcs[m].enabled)
-								{
-									HomeScene.NPC.Situation situation3 = npcs[m].GetSituation();
-									if (situation3 != null && situation3.enabled && !string.IsNullOrEmpty(situation3.name) && situation3.name == situation2.name)
-									{
-										nPC2.selectSituationID = l;
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	[Serializable]
@@ -539,6 +343,8 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 
 		public float playerScaleFemale = 0.97f;
 
+		public float playerFemaleCameraOffsetY = -20f;
+
 		public Vector3 smithNPCPos;
 
 		public Vector3 smithNPCRot;
@@ -592,6 +398,8 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 	public class SmithScene
 	{
 		public string createStage;
+
+		public string createUniqueStage;
 
 		public float createCameraFieldOfView;
 
@@ -691,6 +499,8 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 
 		public string QuestReamGachaStage;
 
+		public string QuestFeverGachaStage = "GA001D_03";
+
 		[CustomArray("typeName")]
 		public EnemyDisplayInfo[] enemyDisplayInfos;
 	}
@@ -766,6 +576,8 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 	public HomeScene homeScene;
 
 	public LoungeScene loungeScene;
+
+	public ClanScene clanScene;
 
 	public QuestMap questMap;
 

@@ -13,10 +13,6 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		END_POS
 	}
 
-	private const int WAIT_COUNT = 3;
-
-	private const int LEVELUP_SE = 40000017;
-
 	[SerializeField]
 	private UILabel m_upStatusLevel;
 
@@ -25,6 +21,10 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 
 	[SerializeField]
 	private List<UILabel> m_upTitleList;
+
+	private const int WAIT_COUNT = 3;
+
+	private const int LEVELUP_SE = 40000017;
 
 	private string m_lvupTextFormat = string.Empty;
 
@@ -49,6 +49,8 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 	private Coroutine m_coroutine;
 
 	private AudioClip m_AudioClip;
+
+	private bool m_isPlaying;
 
 	public void GetNowStatus()
 	{
@@ -90,16 +92,21 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		return false;
 	}
 
+	public bool IsPlaying()
+	{
+		return m_isPlaying;
+	}
+
 	public void PlayLevelUp()
 	{
 		SetNewParameter();
-		PlayLevelUpInner(false, null);
+		PlayLevelUpInner();
 	}
 
 	public void PlayLevelUpForce(Action callback = null)
 	{
 		SetNewParameter();
-		PlayLevelUpInner(true, callback);
+		PlayLevelUpInner(forcePlay: true, callback);
 	}
 
 	public void SkipAnim()
@@ -109,7 +116,6 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 
 	private void StoreAudioClip()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		string sE = ResourceName.GetSE(40000017);
 		if (!string.IsNullOrEmpty(sE))
 		{
@@ -125,7 +131,7 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 	{
 		if (m_AudioClip != null)
 		{
-			SoundManager.PlayOneshotJingle(m_AudioClip, 40000017, null, null);
+			SoundManager.PlayOneshotJingle(m_AudioClip, 40000017);
 		}
 	}
 
@@ -205,6 +211,10 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		{
 			return true;
 		}
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "ClanScene" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "ClanTop")
+		{
+			return true;
+		}
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "InGameMain")
 		{
 			return true;
@@ -214,29 +224,26 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 
 	private void PlayLevelUpInner(bool forcePlay = false, Action callback = null)
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Expected O, but got Unknown
-		if (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.IsRush())
+		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.IsRush())
 		{
-			if (!forcePlay && !IsPlay())
-			{
-				if (m_coroutine == null)
-				{
-					m_coroutine = this.StartCoroutine("DelayPlay");
-				}
-			}
-			else
-			{
-				if (forcePlay && m_coroutine != null)
-				{
-					this.StopCoroutine(m_coroutine);
-					m_coroutine = null;
-				}
-				Play(callback);
-				PlayAudioLevelUp();
-				GetNowStatus();
-			}
+			return;
 		}
+		if (!forcePlay && !IsPlay())
+		{
+			if (m_coroutine == null)
+			{
+				m_coroutine = this.StartCoroutine("DelayPlay");
+			}
+			return;
+		}
+		if (forcePlay && m_coroutine != null)
+		{
+			this.StopCoroutine(m_coroutine);
+			m_coroutine = null;
+		}
+		Play(callback);
+		PlayAudioLevelUp();
+		GetNowStatus();
 	}
 
 	private IEnumerator DelayPlay()
@@ -245,9 +252,13 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		while (!IsPlay() || waitCount < 3)
 		{
 			waitCount = (IsPlay() ? (waitCount + 1) : 0);
-			yield return (object)null;
+			yield return null;
 		}
-		Play(null);
+		m_isPlaying = true;
+		Play(delegate
+		{
+			m_isPlaying = false;
+		});
 		PlayAudioLevelUp();
 		m_coroutine = null;
 		GetNowStatus();

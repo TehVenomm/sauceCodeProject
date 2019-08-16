@@ -29,14 +29,14 @@ public abstract class ContextAttributes {
         }
 
         public ContextAttributes withSharedAttribute(Object obj, Object obj2) {
-            Map hashMap;
+            Map _copy;
             if (this == EMPTY) {
-                hashMap = new HashMap(8);
+                _copy = new HashMap(8);
             } else {
-                hashMap = _copy(this._shared);
+                _copy = _copy(this._shared);
             }
-            hashMap.put(obj, obj2);
-            return new Impl(hashMap);
+            _copy.put(obj, obj2);
+            return new Impl(_copy);
         }
 
         public ContextAttributes withSharedAttributes(Map<?, ?> map) {
@@ -52,8 +52,7 @@ public abstract class ContextAttributes {
             }
             Map _copy = _copy(this._shared);
             _copy.remove(obj);
-            this(_copy);
-            return this;
+            return new Impl(_copy);
         }
 
         public Object getAttribute(Object obj) {
@@ -87,8 +86,9 @@ public abstract class ContextAttributes {
             return this;
         }
 
-        protected ContextAttributes nonSharedInstance(Object obj, Object obj2) {
-            Map hashMap = new HashMap();
+        /* access modifiers changed from: protected */
+        public ContextAttributes nonSharedInstance(Object obj, Object obj2) {
+            HashMap hashMap = new HashMap();
             if (obj2 == null) {
                 obj2 = NULL_SURROGATE;
             }

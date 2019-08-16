@@ -11,7 +11,7 @@ public class InGameScene : GameSection
 		}
 		if (MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
-			MonoBehaviourSingleton<UIManager>.I.mainChat.Open(UITransition.TYPE.OPEN);
+			MonoBehaviourSingleton<UIManager>.I.mainChat.Open();
 		}
 	}
 

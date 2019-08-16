@@ -11,19 +11,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class TypeFactory implements Serializable {
@@ -53,7 +44,7 @@ public final class TypeFactory implements Serializable {
     protected final LRUMap<Class<?>, JavaType> _typeCache;
 
     private TypeFactory() {
-        this._typeCache = new LRUMap(16, 100);
+        this._typeCache = new LRUMap<>(16, 100);
         this._parser = new TypeParser(this);
         this._modifiers = null;
         this._classLoader = null;
@@ -64,7 +55,7 @@ public final class TypeFactory implements Serializable {
     }
 
     protected TypeFactory(TypeParser typeParser, TypeModifier[] typeModifierArr, ClassLoader classLoader) {
-        this._typeCache = new LRUMap(16, 100);
+        this._typeCache = new LRUMap<>(16, 100);
         this._parser = typeParser.withFactory(this);
         this._modifiers = typeModifierArr;
         this._classLoader = classLoader;
@@ -107,67 +98,50 @@ public final class TypeFactory implements Serializable {
         return defaultInstance().constructType(type).getRawClass();
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public java.lang.Class<?> findClass(java.lang.String r4) throws java.lang.ClassNotFoundException {
-        /*
-        r3 = this;
-        r0 = 46;
-        r0 = r4.indexOf(r0);
-        if (r0 >= 0) goto L_0x000f;
-    L_0x0008:
-        r0 = r3._findPrimitive(r4);
-        if (r0 == 0) goto L_0x000f;
-    L_0x000e:
-        return r0;
-    L_0x000f:
-        r0 = 0;
-        r1 = r3.getClassLoader();
-        if (r1 != 0) goto L_0x001e;
-    L_0x0016:
-        r1 = java.lang.Thread.currentThread();
-        r1 = r1.getContextClassLoader();
-    L_0x001e:
-        if (r1 == 0) goto L_0x002b;
-    L_0x0020:
-        r0 = 1;
-        r0 = r3.classForName(r4, r0, r1);	 Catch:{ Exception -> 0x0026 }
-        goto L_0x000e;
-    L_0x0026:
-        r0 = move-exception;
-        r0 = com.fasterxml.jackson.databind.util.ClassUtil.getRootCause(r0);
-    L_0x002b:
-        r0 = r3.classForName(r4);	 Catch:{ Exception -> 0x0030 }
-        goto L_0x000e;
-    L_0x0030:
-        r1 = move-exception;
-        if (r0 != 0) goto L_0x0037;
-    L_0x0033:
-        r0 = com.fasterxml.jackson.databind.util.ClassUtil.getRootCause(r1);
-    L_0x0037:
-        r1 = r0 instanceof java.lang.RuntimeException;
-        if (r1 == 0) goto L_0x003e;
-    L_0x003b:
-        r0 = (java.lang.RuntimeException) r0;
-        throw r0;
-    L_0x003e:
-        r1 = new java.lang.ClassNotFoundException;
-        r2 = r0.getMessage();
-        r1.<init>(r2, r0);
-        throw r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.type.TypeFactory.findClass(java.lang.String):java.lang.Class<?>");
+    public Class<?> findClass(String str) throws ClassNotFoundException {
+        if (str.indexOf(46) < 0) {
+            Class<?> _findPrimitive = _findPrimitive(str);
+            if (_findPrimitive != null) {
+                return _findPrimitive;
+            }
+        }
+        Throwable th = null;
+        ClassLoader classLoader = getClassLoader();
+        if (classLoader == null) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
+        if (classLoader != null) {
+            try {
+                return classForName(str, true, classLoader);
+            } catch (Exception e) {
+                th = ClassUtil.getRootCause(e);
+            }
+        }
+        try {
+            return classForName(str);
+        } catch (Exception e2) {
+            if (th == null) {
+                th = ClassUtil.getRootCause(e2);
+            }
+            if (th instanceof RuntimeException) {
+                throw ((RuntimeException) th);
+            }
+            throw new ClassNotFoundException(th.getMessage(), th);
+        }
     }
 
-    protected Class<?> classForName(String str, boolean z, ClassLoader classLoader) throws ClassNotFoundException {
+    /* access modifiers changed from: protected */
+    public Class<?> classForName(String str, boolean z, ClassLoader classLoader) throws ClassNotFoundException {
         return Class.forName(str, true, classLoader);
     }
 
-    protected Class<?> classForName(String str) throws ClassNotFoundException {
+    /* access modifiers changed from: protected */
+    public Class<?> classForName(String str) throws ClassNotFoundException {
         return Class.forName(str);
     }
 
-    protected Class<?> _findPrimitive(String str) {
+    /* access modifiers changed from: protected */
+    public Class<?> _findPrimitive(String str) {
         if ("int".equals(str)) {
             return Integer.TYPE;
         }
@@ -198,63 +172,127 @@ public final class TypeFactory implements Serializable {
         return null;
     }
 
-    public JavaType constructSpecializedType(JavaType javaType, Class<?> cls) {
-        Class<?> rawClass = javaType.getRawClass();
-        if (rawClass == cls) {
-            return javaType;
-        }
-        JavaType _fromClass;
-        if (rawClass == Object.class) {
-            _fromClass = _fromClass(null, cls, TypeBindings.emptyBindings());
-        } else if (!rawClass.isAssignableFrom(cls)) {
-            throw new IllegalArgumentException(String.format("Class %s not subtype of %s", new Object[]{cls.getName(), javaType}));
-        } else if (javaType.getBindings().isEmpty()) {
-            _fromClass = _fromClass(null, cls, TypeBindings.emptyBindings());
-        } else {
-            if (javaType.isContainerType()) {
-                if (javaType.isMapLikeType()) {
-                    if (cls == HashMap.class || cls == LinkedHashMap.class || cls == EnumMap.class || cls == TreeMap.class) {
-                        _fromClass = _fromClass(null, cls, TypeBindings.create(cls, javaType.getKeyType(), javaType.getContentType()));
-                    }
-                } else if (javaType.isCollectionLikeType()) {
-                    if (cls == ArrayList.class || cls == LinkedList.class || cls == HashSet.class || cls == TreeSet.class) {
-                        _fromClass = _fromClass(null, cls, TypeBindings.create((Class) cls, javaType.getContentType()));
-                    } else if (rawClass == EnumSet.class) {
-                        return javaType;
-                    }
-                }
-            }
-            int length = cls.getTypeParameters().length;
-            if (length == 0) {
-                _fromClass = _fromClass(null, cls, TypeBindings.emptyBindings());
-            } else {
-                if (javaType.isInterface()) {
-                    _fromClass = javaType.refine(cls, TypeBindings.emptyBindings(), null, new JavaType[]{javaType});
-                } else {
-                    _fromClass = javaType.refine(cls, TypeBindings.emptyBindings(), javaType, NO_TYPES);
-                }
-                if (_fromClass == null) {
-                    TypeBindings create;
-                    if (javaType.containedTypeCount() == length) {
-                        if (length == 1) {
-                            create = TypeBindings.create((Class) cls, javaType.containedType(0));
-                        } else if (length == 2) {
-                            create = TypeBindings.create(cls, javaType.containedType(0), javaType.containedType(1));
-                        }
-                        if (create == null) {
-                            create = TypeBindings.emptyBindings();
-                        }
-                        _fromClass = _fromClass(null, cls, create);
-                    }
-                    create = null;
-                    if (create == null) {
-                        create = TypeBindings.emptyBindings();
-                    }
-                    _fromClass = _fromClass(null, cls, create);
-                }
-            }
-        }
-        return _fromClass;
+    /* JADX WARNING: Removed duplicated region for block: B:51:0x00d3  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JavaType constructSpecializedType(com.fasterxml.jackson.databind.JavaType r8, java.lang.Class<?> r9) {
+        /*
+            r7 = this;
+            r6 = 2
+            r5 = 1
+            r4 = 0
+            r1 = 0
+            java.lang.Class r0 = r8.getRawClass()
+            if (r0 != r9) goto L_0x000b
+        L_0x000a:
+            return r8
+        L_0x000b:
+            java.lang.Class<java.lang.Object> r2 = java.lang.Object.class
+            if (r0 != r2) goto L_0x0019
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.emptyBindings()
+            com.fasterxml.jackson.databind.JavaType r0 = r7._fromClass(r1, r9, r0)
+        L_0x0017:
+            r8 = r0
+            goto L_0x000a
+        L_0x0019:
+            boolean r2 = r0.isAssignableFrom(r9)
+            if (r2 != 0) goto L_0x0035
+            java.lang.IllegalArgumentException r0 = new java.lang.IllegalArgumentException
+            java.lang.String r1 = "Class %s not subtype of %s"
+            java.lang.Object[] r2 = new java.lang.Object[r6]
+            java.lang.String r3 = r9.getName()
+            r2[r4] = r3
+            r2[r5] = r8
+            java.lang.String r1 = java.lang.String.format(r1, r2)
+            r0.<init>(r1)
+            throw r0
+        L_0x0035:
+            com.fasterxml.jackson.databind.type.TypeBindings r2 = r8.getBindings()
+            boolean r2 = r2.isEmpty()
+            if (r2 == 0) goto L_0x0048
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.emptyBindings()
+            com.fasterxml.jackson.databind.JavaType r0 = r7._fromClass(r1, r9, r0)
+            goto L_0x0017
+        L_0x0048:
+            boolean r2 = r8.isContainerType()
+            if (r2 == 0) goto L_0x009c
+            boolean r2 = r8.isMapLikeType()
+            if (r2 == 0) goto L_0x0075
+            java.lang.Class<java.util.HashMap> r0 = java.util.HashMap.class
+            if (r9 == r0) goto L_0x0064
+            java.lang.Class<java.util.LinkedHashMap> r0 = java.util.LinkedHashMap.class
+            if (r9 == r0) goto L_0x0064
+            java.lang.Class<java.util.EnumMap> r0 = java.util.EnumMap.class
+            if (r9 == r0) goto L_0x0064
+            java.lang.Class<java.util.TreeMap> r0 = java.util.TreeMap.class
+            if (r9 != r0) goto L_0x009c
+        L_0x0064:
+            com.fasterxml.jackson.databind.JavaType r0 = r8.getKeyType()
+            com.fasterxml.jackson.databind.JavaType r2 = r8.getContentType()
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.create(r9, r0, r2)
+            com.fasterxml.jackson.databind.JavaType r0 = r7._fromClass(r1, r9, r0)
+            goto L_0x0017
+        L_0x0075:
+            boolean r2 = r8.isCollectionLikeType()
+            if (r2 == 0) goto L_0x009c
+            java.lang.Class<java.util.ArrayList> r2 = java.util.ArrayList.class
+            if (r9 == r2) goto L_0x008b
+            java.lang.Class<java.util.LinkedList> r2 = java.util.LinkedList.class
+            if (r9 == r2) goto L_0x008b
+            java.lang.Class<java.util.HashSet> r2 = java.util.HashSet.class
+            if (r9 == r2) goto L_0x008b
+            java.lang.Class<java.util.TreeSet> r2 = java.util.TreeSet.class
+            if (r9 != r2) goto L_0x0098
+        L_0x008b:
+            com.fasterxml.jackson.databind.JavaType r0 = r8.getContentType()
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.create(r9, r0)
+            com.fasterxml.jackson.databind.JavaType r0 = r7._fromClass(r1, r9, r0)
+            goto L_0x0017
+        L_0x0098:
+            java.lang.Class<java.util.EnumSet> r2 = java.util.EnumSet.class
+            if (r0 == r2) goto L_0x000a
+        L_0x009c:
+            java.lang.reflect.TypeVariable[] r0 = r9.getTypeParameters()
+            int r2 = r0.length
+            if (r2 != 0) goto L_0x00ad
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.emptyBindings()
+            com.fasterxml.jackson.databind.JavaType r0 = r7._fromClass(r1, r9, r0)
+            goto L_0x0017
+        L_0x00ad:
+            boolean r0 = r8.isInterface()
+            if (r0 == 0) goto L_0x00dd
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.emptyBindings()
+            com.fasterxml.jackson.databind.JavaType[] r3 = new com.fasterxml.jackson.databind.JavaType[r5]
+            r3[r4] = r8
+            com.fasterxml.jackson.databind.JavaType r0 = r8.refine(r9, r0, r1, r3)
+        L_0x00bf:
+            if (r0 != 0) goto L_0x0017
+            int r0 = r8.containedTypeCount()
+            if (r0 != r2) goto L_0x00f7
+            if (r2 != r5) goto L_0x00e8
+            com.fasterxml.jackson.databind.JavaType r0 = r8.containedType(r4)
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.create(r9, r0)
+        L_0x00d1:
+            if (r0 != 0) goto L_0x00d7
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.emptyBindings()
+        L_0x00d7:
+            com.fasterxml.jackson.databind.JavaType r0 = r7._fromClass(r1, r9, r0)
+            goto L_0x0017
+        L_0x00dd:
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.emptyBindings()
+            com.fasterxml.jackson.databind.JavaType[] r3 = NO_TYPES
+            com.fasterxml.jackson.databind.JavaType r0 = r8.refine(r9, r0, r8, r3)
+            goto L_0x00bf
+        L_0x00e8:
+            if (r2 != r6) goto L_0x00f7
+            com.fasterxml.jackson.databind.JavaType r0 = r8.containedType(r4)
+            com.fasterxml.jackson.databind.JavaType r2 = r8.containedType(r5)
+            com.fasterxml.jackson.databind.type.TypeBindings r0 = com.fasterxml.jackson.databind.type.TypeBindings.create(r9, r0, r2)
+            goto L_0x00d1
+        L_0x00f7:
+            r0 = r1
+            goto L_0x00d1
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.type.TypeFactory.constructSpecializedType(com.fasterxml.jackson.databind.JavaType, java.lang.Class):com.fasterxml.jackson.databind.JavaType");
     }
 
     public JavaType constructGeneralizedType(JavaType javaType, Class<?> cls) {
@@ -266,10 +304,10 @@ public final class TypeFactory implements Serializable {
         if (findSuperType != null) {
             return findSuperType;
         }
-        if (cls.isAssignableFrom(rawClass)) {
-            throw new IllegalArgumentException(String.format("Internal error: class %s not included as super-type for %s", new Object[]{cls.getName(), javaType}));
+        if (!cls.isAssignableFrom(rawClass)) {
+            throw new IllegalArgumentException(String.format("Class %s not a super-type of %s", new Object[]{cls.getName(), javaType}));
         }
-        throw new IllegalArgumentException(String.format("Class %s not a super-type of %s", new Object[]{cls.getName(), javaType}));
+        throw new IllegalArgumentException(String.format("Internal error: class %s not included as super-type for %s", new Object[]{cls.getName(), javaType}));
     }
 
     public JavaType constructFromCanonical(String str) throws IllegalArgumentException {
@@ -286,12 +324,12 @@ public final class TypeFactory implements Serializable {
 
     @Deprecated
     public JavaType[] findTypeParameters(Class<?> cls, Class<?> cls2, TypeBindings typeBindings) {
-        return findTypeParameters(constructType((Type) cls, typeBindings), (Class) cls2);
+        return findTypeParameters(constructType((Type) cls, typeBindings), cls2);
     }
 
     @Deprecated
     public JavaType[] findTypeParameters(Class<?> cls, Class<?> cls2) {
-        return findTypeParameters(constructType((Type) cls), (Class) cls2);
+        return findTypeParameters(constructType((Type) cls), cls2);
     }
 
     public JavaType moreSpecificType(JavaType javaType, JavaType javaType2) {
@@ -340,19 +378,19 @@ public final class TypeFactory implements Serializable {
     }
 
     public CollectionType constructCollectionType(Class<? extends Collection> cls, Class<?> cls2) {
-        return constructCollectionType((Class) cls, _fromClass(null, cls2, EMPTY_BINDINGS));
+        return constructCollectionType(cls, _fromClass(null, cls2, EMPTY_BINDINGS));
     }
 
     public CollectionType constructCollectionType(Class<? extends Collection> cls, JavaType javaType) {
-        return (CollectionType) _fromClass(null, cls, TypeBindings.create((Class) cls, javaType));
+        return (CollectionType) _fromClass(null, cls, TypeBindings.create(cls, javaType));
     }
 
     public CollectionLikeType constructCollectionLikeType(Class<?> cls, Class<?> cls2) {
-        return constructCollectionLikeType((Class) cls, _fromClass(null, cls2, EMPTY_BINDINGS));
+        return constructCollectionLikeType(cls, _fromClass(null, cls2, EMPTY_BINDINGS));
     }
 
     public CollectionLikeType constructCollectionLikeType(Class<?> cls, JavaType javaType) {
-        JavaType _fromClass = _fromClass(null, cls, TypeBindings.createIfNeeded((Class) cls, javaType));
+        JavaType _fromClass = _fromClass(null, cls, TypeBindings.createIfNeeded(cls, javaType));
         if (_fromClass instanceof CollectionLikeType) {
             return (CollectionLikeType) _fromClass;
         }
@@ -360,28 +398,30 @@ public final class TypeFactory implements Serializable {
     }
 
     public MapType constructMapType(Class<? extends Map> cls, Class<?> cls2, Class<?> cls3) {
+        JavaType _fromClass;
         JavaType javaType;
-        JavaType javaType2;
         if (cls == Properties.class) {
-            javaType = CORE_TYPE_STRING;
-            javaType2 = javaType;
+            JavaType javaType2 = CORE_TYPE_STRING;
+            _fromClass = javaType2;
+            javaType = javaType2;
         } else {
-            javaType2 = _fromClass(null, cls2, EMPTY_BINDINGS);
-            javaType = _fromClass(null, cls3, EMPTY_BINDINGS);
+            JavaType _fromClass2 = _fromClass(null, cls2, EMPTY_BINDINGS);
+            _fromClass = _fromClass(null, cls3, EMPTY_BINDINGS);
+            javaType = _fromClass2;
         }
-        return constructMapType((Class) cls, javaType2, javaType);
+        return constructMapType(cls, javaType, _fromClass);
     }
 
     public MapType constructMapType(Class<? extends Map> cls, JavaType javaType, JavaType javaType2) {
-        return (MapType) _fromClass(null, cls, TypeBindings.create((Class) cls, new JavaType[]{javaType, javaType2}));
+        return (MapType) _fromClass(null, cls, TypeBindings.create(cls, new JavaType[]{javaType, javaType2}));
     }
 
     public MapLikeType constructMapLikeType(Class<?> cls, Class<?> cls2, Class<?> cls3) {
-        return constructMapLikeType((Class) cls, _fromClass(null, cls2, EMPTY_BINDINGS), _fromClass(null, cls3, EMPTY_BINDINGS));
+        return constructMapLikeType(cls, _fromClass(null, cls2, EMPTY_BINDINGS), _fromClass(null, cls3, EMPTY_BINDINGS));
     }
 
     public MapLikeType constructMapLikeType(Class<?> cls, JavaType javaType, JavaType javaType2) {
-        JavaType _fromClass = _fromClass(null, cls, TypeBindings.createIfNeeded((Class) cls, new JavaType[]{javaType, javaType2}));
+        JavaType _fromClass = _fromClass(null, cls, TypeBindings.createIfNeeded(cls, new JavaType[]{javaType, javaType2}));
         if (_fromClass instanceof MapLikeType) {
             return (MapLikeType) _fromClass;
         }
@@ -389,7 +429,7 @@ public final class TypeFactory implements Serializable {
     }
 
     public JavaType constructSimpleType(Class<?> cls, JavaType[] javaTypeArr) {
-        return _fromClass(null, cls, TypeBindings.create((Class) cls, javaTypeArr));
+        return _fromClass(null, cls, TypeBindings.create(cls, javaTypeArr));
     }
 
     @Deprecated
@@ -411,49 +451,51 @@ public final class TypeFactory implements Serializable {
         for (int i = 0; i < length; i++) {
             javaTypeArr[i] = _fromClass(null, clsArr[i], null);
         }
-        return constructParametricType((Class) cls, javaTypeArr);
+        return constructParametricType(cls, javaTypeArr);
     }
 
     public JavaType constructParametricType(Class<?> cls, JavaType... javaTypeArr) {
-        return _fromClass(null, cls, TypeBindings.create((Class) cls, javaTypeArr));
+        return _fromClass(null, cls, TypeBindings.create(cls, javaTypeArr));
     }
 
     public JavaType constructParametrizedType(Class<?> cls, Class<?> cls2, JavaType... javaTypeArr) {
-        return constructParametricType((Class) cls, javaTypeArr);
+        return constructParametricType(cls, javaTypeArr);
     }
 
     public JavaType constructParametrizedType(Class<?> cls, Class<?> cls2, Class<?>... clsArr) {
-        return constructParametricType((Class) cls, (Class[]) clsArr);
+        return constructParametricType(cls, clsArr);
     }
 
     public CollectionType constructRawCollectionType(Class<? extends Collection> cls) {
-        return constructCollectionType((Class) cls, unknownType());
+        return constructCollectionType(cls, unknownType());
     }
 
     public CollectionLikeType constructRawCollectionLikeType(Class<?> cls) {
-        return constructCollectionLikeType((Class) cls, unknownType());
+        return constructCollectionLikeType(cls, unknownType());
     }
 
     public MapType constructRawMapType(Class<? extends Map> cls) {
-        return constructMapType((Class) cls, unknownType(), unknownType());
+        return constructMapType(cls, unknownType(), unknownType());
     }
 
     public MapLikeType constructRawMapLikeType(Class<?> cls) {
-        return constructMapLikeType((Class) cls, unknownType(), unknownType());
+        return constructMapLikeType(cls, unknownType(), unknownType());
     }
 
     private JavaType _mapType(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
         JavaType javaType2;
         JavaType javaType3;
         if (cls == Properties.class) {
-            javaType2 = CORE_TYPE_STRING;
-            javaType3 = javaType2;
+            SimpleType simpleType = CORE_TYPE_STRING;
+            javaType2 = simpleType;
+            javaType3 = simpleType;
         } else {
             List typeParameters = typeBindings.getTypeParameters();
             switch (typeParameters.size()) {
                 case 0:
-                    javaType2 = _unknownType();
-                    javaType3 = javaType2;
+                    JavaType _unknownType = _unknownType();
+                    javaType2 = _unknownType;
+                    javaType3 = _unknownType;
                     break;
                 case 2:
                     javaType2 = (JavaType) typeParameters.get(1);
@@ -467,32 +509,33 @@ public final class TypeFactory implements Serializable {
     }
 
     private JavaType _collectionType(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
-        JavaType _unknownType;
+        JavaType javaType2;
         List typeParameters = typeBindings.getTypeParameters();
         if (typeParameters.isEmpty()) {
-            _unknownType = _unknownType();
+            javaType2 = _unknownType();
         } else if (typeParameters.size() == 1) {
-            _unknownType = (JavaType) typeParameters.get(0);
+            javaType2 = (JavaType) typeParameters.get(0);
         } else {
             throw new IllegalArgumentException("Strange Collection type " + cls.getName() + ": can not determine type parameters");
         }
-        return CollectionType.construct(cls, typeBindings, javaType, javaTypeArr, _unknownType);
+        return CollectionType.construct(cls, typeBindings, javaType, javaTypeArr, javaType2);
     }
 
     private JavaType _referenceType(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
-        JavaType _unknownType;
+        JavaType javaType2;
         List typeParameters = typeBindings.getTypeParameters();
         if (typeParameters.isEmpty()) {
-            _unknownType = _unknownType();
+            javaType2 = _unknownType();
         } else if (typeParameters.size() == 1) {
-            _unknownType = (JavaType) typeParameters.get(0);
+            javaType2 = (JavaType) typeParameters.get(0);
         } else {
             throw new IllegalArgumentException("Strange Reference type " + cls.getName() + ": can not determine type parameters");
         }
-        return ReferenceType.construct(cls, typeBindings, javaType, javaTypeArr, _unknownType);
+        return ReferenceType.construct(cls, typeBindings, javaType, javaTypeArr, javaType2);
     }
 
-    protected JavaType _constructSimple(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
+    /* access modifiers changed from: protected */
+    public JavaType _constructSimple(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
         if (typeBindings.isEmpty()) {
             JavaType _findWellKnownSimple = _findWellKnownSimple(cls);
             if (_findWellKnownSimple != null) {
@@ -502,15 +545,18 @@ public final class TypeFactory implements Serializable {
         return _newSimpleType(cls, typeBindings, javaType, javaTypeArr);
     }
 
-    protected JavaType _newSimpleType(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
+    /* access modifiers changed from: protected */
+    public JavaType _newSimpleType(Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
         return new SimpleType(cls, typeBindings, javaType, javaTypeArr);
     }
 
-    protected JavaType _unknownType() {
+    /* access modifiers changed from: protected */
+    public JavaType _unknownType() {
         return CORE_TYPE_OBJECT;
     }
 
-    protected JavaType _findWellKnownSimple(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public JavaType _findWellKnownSimple(Class<?> cls) {
         if (cls.isPrimitive()) {
             if (cls == CLS_BOOL) {
                 return CORE_TYPE_BOOL;
@@ -531,27 +577,28 @@ public final class TypeFactory implements Serializable {
         return null;
     }
 
-    protected JavaType _fromAny(ClassStack classStack, Type type, TypeBindings typeBindings) {
-        JavaType _fromClass;
+    /* access modifiers changed from: protected */
+    public JavaType _fromAny(ClassStack classStack, Type type, TypeBindings typeBindings) {
+        JavaType _fromWildcard;
         if (type instanceof Class) {
-            _fromClass = _fromClass(classStack, (Class) type, EMPTY_BINDINGS);
+            _fromWildcard = _fromClass(classStack, (Class) type, EMPTY_BINDINGS);
         } else if (type instanceof ParameterizedType) {
-            _fromClass = _fromParamType(classStack, (ParameterizedType) type, typeBindings);
+            _fromWildcard = _fromParamType(classStack, (ParameterizedType) type, typeBindings);
         } else if (type instanceof JavaType) {
             return (JavaType) type;
         } else {
             if (type instanceof GenericArrayType) {
-                _fromClass = _fromArrayType(classStack, (GenericArrayType) type, typeBindings);
+                _fromWildcard = _fromArrayType(classStack, (GenericArrayType) type, typeBindings);
             } else if (type instanceof TypeVariable) {
-                _fromClass = _fromVariable(classStack, (TypeVariable) type, typeBindings);
+                _fromWildcard = _fromVariable(classStack, (TypeVariable) type, typeBindings);
             } else if (type instanceof WildcardType) {
-                _fromClass = _fromWildcard(classStack, (WildcardType) type, typeBindings);
+                _fromWildcard = _fromWildcard(classStack, (WildcardType) type, typeBindings);
             } else {
                 throw new IllegalArgumentException("Unrecognized Type: " + (type == null ? "[null]" : type.toString()));
             }
         }
         if (this._modifiers != null) {
-            TypeBindings bindings = _fromClass.getBindings();
+            TypeBindings bindings = _fromWildcard.getBindings();
             if (bindings == null) {
                 bindings = EMPTY_BINDINGS;
             }
@@ -559,79 +606,83 @@ public final class TypeFactory implements Serializable {
             int length = typeModifierArr.length;
             int i = 0;
             while (i < length) {
-                JavaType modifyType = typeModifierArr[i].modifyType(_fromClass, type, bindings, this);
+                TypeModifier typeModifier = typeModifierArr[i];
+                JavaType modifyType = typeModifier.modifyType(_fromWildcard, type, bindings, this);
                 if (modifyType == null) {
-                    throw new IllegalStateException(String.format("TypeModifier %s (of type %s) return null for type %s", new Object[]{r7, r7.getClass().getName(), _fromClass}));
+                    throw new IllegalStateException(String.format("TypeModifier %s (of type %s) return null for type %s", new Object[]{typeModifier, typeModifier.getClass().getName(), _fromWildcard}));
                 }
                 i++;
-                _fromClass = modifyType;
+                _fromWildcard = modifyType;
             }
         }
-        return _fromClass;
+        return _fromWildcard;
     }
 
-    protected JavaType _fromClass(ClassStack classStack, Class<?> cls, TypeBindings typeBindings) {
+    /* access modifiers changed from: protected */
+    public JavaType _fromClass(ClassStack classStack, Class<?> cls, TypeBindings typeBindings) {
+        boolean z;
+        ClassStack child;
+        JavaType _resolveSuperClass;
+        JavaType[] _resolveSuperInterfaces;
+        JavaType javaType;
         JavaType _findWellKnownSimple = _findWellKnownSimple(cls);
         if (_findWellKnownSimple != null) {
             return _findWellKnownSimple;
         }
-        Object obj;
-        ClassStack classStack2;
         if (typeBindings == null || typeBindings.isEmpty()) {
-            obj = 1;
+            z = true;
         } else {
-            obj = null;
+            z = false;
         }
-        if (obj != null) {
+        if (z) {
             _findWellKnownSimple = (JavaType) this._typeCache.get(cls);
             if (_findWellKnownSimple != null) {
                 return _findWellKnownSimple;
             }
         }
-        JavaType javaType = _findWellKnownSimple;
+        JavaType javaType2 = _findWellKnownSimple;
         if (classStack == null) {
-            classStack2 = new ClassStack(cls);
+            child = new ClassStack(cls);
         } else {
             ClassStack find = classStack.find(cls);
             if (find != null) {
-                _findWellKnownSimple = new ResolvedRecursiveType(cls, EMPTY_BINDINGS);
-                find.addSelfReference(_findWellKnownSimple);
-                return _findWellKnownSimple;
+                ResolvedRecursiveType resolvedRecursiveType = new ResolvedRecursiveType(cls, EMPTY_BINDINGS);
+                find.addSelfReference(resolvedRecursiveType);
+                return resolvedRecursiveType;
             }
-            classStack2 = classStack.child(cls);
+            child = classStack.child(cls);
         }
         if (cls.isArray()) {
-            _findWellKnownSimple = ArrayType.construct(_fromAny(classStack2, cls.getComponentType(), typeBindings), typeBindings);
+            javaType = ArrayType.construct(_fromAny(child, cls.getComponentType(), typeBindings), typeBindings);
         } else {
-            JavaType javaType2;
-            JavaType[] _resolveSuperInterfaces;
             if (cls.isInterface()) {
-                javaType2 = null;
-                _resolveSuperInterfaces = _resolveSuperInterfaces(classStack2, cls, typeBindings);
+                _resolveSuperClass = null;
+                _resolveSuperInterfaces = _resolveSuperInterfaces(child, cls, typeBindings);
             } else {
-                javaType2 = _resolveSuperClass(classStack2, cls, typeBindings);
-                _resolveSuperInterfaces = _resolveSuperInterfaces(classStack2, cls, typeBindings);
+                _resolveSuperClass = _resolveSuperClass(child, cls, typeBindings);
+                _resolveSuperInterfaces = _resolveSuperInterfaces(child, cls, typeBindings);
             }
-            _findWellKnownSimple = cls == Properties.class ? MapType.construct(cls, typeBindings, javaType2, _resolveSuperInterfaces, CORE_TYPE_STRING, CORE_TYPE_STRING) : javaType2 != null ? javaType2.refine(cls, typeBindings, javaType2, _resolveSuperInterfaces) : javaType;
-            if (_findWellKnownSimple == null) {
-                _findWellKnownSimple = _fromWellKnownClass(classStack2, cls, typeBindings, javaType2, _resolveSuperInterfaces);
-                if (_findWellKnownSimple == null) {
-                    _findWellKnownSimple = _fromWellKnownInterface(classStack2, cls, typeBindings, javaType2, _resolveSuperInterfaces);
-                    if (_findWellKnownSimple == null) {
-                        _findWellKnownSimple = _newSimpleType(cls, typeBindings, javaType2, _resolveSuperInterfaces);
+            javaType = cls == Properties.class ? MapType.construct(cls, typeBindings, _resolveSuperClass, _resolveSuperInterfaces, CORE_TYPE_STRING, CORE_TYPE_STRING) : _resolveSuperClass != null ? _resolveSuperClass.refine(cls, typeBindings, _resolveSuperClass, _resolveSuperInterfaces) : javaType2;
+            if (javaType == null) {
+                javaType = _fromWellKnownClass(child, cls, typeBindings, _resolveSuperClass, _resolveSuperInterfaces);
+                if (javaType == null) {
+                    javaType = _fromWellKnownInterface(child, cls, typeBindings, _resolveSuperClass, _resolveSuperInterfaces);
+                    if (javaType == null) {
+                        javaType = _newSimpleType(cls, typeBindings, _resolveSuperClass, _resolveSuperInterfaces);
                     }
                 }
             }
         }
-        classStack2.resolveSelfReferences(_findWellKnownSimple);
-        if (obj == null) {
-            return _findWellKnownSimple;
+        child.resolveSelfReferences(javaType);
+        if (!z) {
+            return javaType;
         }
-        this._typeCache.putIfAbsent(cls, _findWellKnownSimple);
-        return _findWellKnownSimple;
+        this._typeCache.putIfAbsent(cls, javaType);
+        return javaType;
     }
 
-    protected JavaType _resolveSuperClass(ClassStack classStack, Class<?> cls, TypeBindings typeBindings) {
+    /* access modifiers changed from: protected */
+    public JavaType _resolveSuperClass(ClassStack classStack, Class<?> cls, TypeBindings typeBindings) {
         Type genericSuperclass = ClassUtil.getGenericSuperclass(cls);
         if (genericSuperclass == null) {
             return null;
@@ -639,7 +690,8 @@ public final class TypeFactory implements Serializable {
         return _fromAny(classStack, genericSuperclass, typeBindings);
     }
 
-    protected JavaType[] _resolveSuperInterfaces(ClassStack classStack, Class<?> cls, TypeBindings typeBindings) {
+    /* access modifiers changed from: protected */
+    public JavaType[] _resolveSuperInterfaces(ClassStack classStack, Class<?> cls, TypeBindings typeBindings) {
         Type[] genericInterfaces = ClassUtil.getGenericInterfaces(cls);
         if (genericInterfaces == null || genericInterfaces.length == 0) {
             return NO_TYPES;
@@ -652,7 +704,8 @@ public final class TypeFactory implements Serializable {
         return javaTypeArr;
     }
 
-    protected JavaType _fromWellKnownClass(ClassStack classStack, Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
+    /* access modifiers changed from: protected */
+    public JavaType _fromWellKnownClass(ClassStack classStack, Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
         if (cls == Map.class) {
             return _mapType(cls, typeBindings, javaType, javaTypeArr);
         }
@@ -665,9 +718,10 @@ public final class TypeFactory implements Serializable {
         return null;
     }
 
-    protected JavaType _fromWellKnownInterface(ClassStack classStack, Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
+    /* access modifiers changed from: protected */
+    public JavaType _fromWellKnownInterface(ClassStack classStack, Class<?> cls, TypeBindings typeBindings, JavaType javaType, JavaType[] javaTypeArr) {
         for (JavaType refine : javaTypeArr) {
-            JavaType refine2 = refine2.refine(cls, typeBindings, javaType, javaTypeArr);
+            JavaType refine2 = refine.refine(cls, typeBindings, javaType, javaTypeArr);
             if (refine2 != null) {
                 return refine2;
             }
@@ -675,9 +729,10 @@ public final class TypeFactory implements Serializable {
         return null;
     }
 
-    protected JavaType _fromParamType(ClassStack classStack, ParameterizedType parameterizedType, TypeBindings typeBindings) {
-        int i = 0;
-        Class cls = (Class) parameterizedType.getRawType();
+    /* access modifiers changed from: protected */
+    public JavaType _fromParamType(ClassStack classStack, ParameterizedType parameterizedType, TypeBindings typeBindings) {
+        TypeBindings create;
+        Class<?> cls = (Class) parameterizedType.getRawType();
         if (cls == CLS_ENUM) {
             return CORE_TYPE_ENUM;
         }
@@ -687,27 +742,27 @@ public final class TypeFactory implements Serializable {
         if (cls == CLS_CLASS) {
             return CORE_TYPE_CLASS;
         }
-        TypeBindings typeBindings2;
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         int length = actualTypeArguments == null ? 0 : actualTypeArguments.length;
         if (length == 0) {
-            typeBindings2 = EMPTY_BINDINGS;
+            create = EMPTY_BINDINGS;
         } else {
             JavaType[] javaTypeArr = new JavaType[length];
-            while (i < length) {
+            for (int i = 0; i < length; i++) {
                 javaTypeArr[i] = _fromAny(classStack, actualTypeArguments[i], typeBindings);
-                i++;
             }
-            typeBindings2 = TypeBindings.create(cls, javaTypeArr);
+            create = TypeBindings.create(cls, javaTypeArr);
         }
-        return _fromClass(classStack, cls, typeBindings2);
+        return _fromClass(classStack, cls, create);
     }
 
-    protected JavaType _fromArrayType(ClassStack classStack, GenericArrayType genericArrayType, TypeBindings typeBindings) {
+    /* access modifiers changed from: protected */
+    public JavaType _fromArrayType(ClassStack classStack, GenericArrayType genericArrayType, TypeBindings typeBindings) {
         return ArrayType.construct(_fromAny(classStack, genericArrayType.getGenericComponentType(), typeBindings), typeBindings);
     }
 
-    protected JavaType _fromVariable(ClassStack classStack, TypeVariable<?> typeVariable, TypeBindings typeBindings) {
+    /* access modifiers changed from: protected */
+    public JavaType _fromVariable(ClassStack classStack, TypeVariable<?> typeVariable, TypeBindings typeBindings) {
         String name = typeVariable.getName();
         JavaType findBoundType = typeBindings.findBoundType(name);
         if (findBoundType != null) {
@@ -719,7 +774,8 @@ public final class TypeFactory implements Serializable {
         return _fromAny(classStack, typeVariable.getBounds()[0], typeBindings.withUnboundVariable(name));
     }
 
-    protected JavaType _fromWildcard(ClassStack classStack, WildcardType wildcardType, TypeBindings typeBindings) {
+    /* access modifiers changed from: protected */
+    public JavaType _fromWildcard(ClassStack classStack, WildcardType wildcardType, TypeBindings typeBindings) {
         return _fromAny(classStack, wildcardType.getUpperBounds()[0], typeBindings);
     }
 }

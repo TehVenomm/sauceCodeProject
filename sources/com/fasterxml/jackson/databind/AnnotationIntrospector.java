@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.NameTransformer;
+import java.io.Closeable;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -278,8 +279,8 @@ public abstract class AnnotationIntrospector implements Versioned, Serializable 
 
     public JavaType refineSerializationType(MapperConfig<?> mapperConfig, Annotated annotated, JavaType javaType) throws JsonMappingException {
         JavaType javaType2;
-        JavaType keyType;
-        Class findSerializationKeyType;
+        JavaType constructSpecializedType;
+        JavaType constructGeneralizedType;
         TypeFactory typeFactory = mapperConfig.getTypeFactory();
         Class findSerializationType = findSerializationType(annotated);
         if (findSerializationType == null) {
@@ -289,51 +290,51 @@ public abstract class AnnotationIntrospector implements Versioned, Serializable 
         } else {
             try {
                 javaType2 = typeFactory.constructGeneralizedType(javaType, findSerializationType);
-            } catch (Throwable e) {
-                throw new JsonMappingException(null, String.format("Failed to widen type %s with annotation (value %s), from '%s': %s", new Object[]{javaType, findSerializationType.getName(), annotated.getName(), e.getMessage()}), e);
+            } catch (IllegalArgumentException e) {
+                throw new JsonMappingException((Closeable) null, String.format("Failed to widen type %s with annotation (value %s), from '%s': %s", new Object[]{javaType, findSerializationType.getName(), annotated.getName(), e.getMessage()}), (Throwable) e);
             }
         }
         if (javaType2.isMapLikeType()) {
-            keyType = javaType2.getKeyType();
-            findSerializationKeyType = findSerializationKeyType(annotated, keyType);
+            JavaType keyType = javaType2.getKeyType();
+            Class findSerializationKeyType = findSerializationKeyType(annotated, keyType);
             if (findSerializationKeyType != null) {
                 if (keyType.hasRawClass(findSerializationKeyType)) {
-                    keyType = keyType.withStaticTyping();
+                    constructGeneralizedType = keyType.withStaticTyping();
                 } else {
                     try {
-                        keyType = typeFactory.constructGeneralizedType(keyType, findSerializationKeyType);
-                    } catch (Throwable e2) {
-                        throw new JsonMappingException(null, String.format("Failed to widen key type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findSerializationKeyType.getName(), annotated.getName(), e2.getMessage()}), e2);
+                        constructGeneralizedType = typeFactory.constructGeneralizedType(keyType, findSerializationKeyType);
+                    } catch (IllegalArgumentException e2) {
+                        throw new JsonMappingException((Closeable) null, String.format("Failed to widen key type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findSerializationKeyType.getName(), annotated.getName(), e2.getMessage()}), (Throwable) e2);
                     }
                 }
-                javaType2 = ((MapLikeType) javaType2).withKeyType(keyType);
+                javaType2 = ((MapLikeType) javaType2).withKeyType(constructGeneralizedType);
             }
         }
-        keyType = javaType2.getContentType();
-        if (keyType == null) {
+        JavaType contentType = javaType2.getContentType();
+        if (contentType == null) {
             return javaType2;
         }
-        findSerializationKeyType = findSerializationContentType(annotated, keyType);
-        if (findSerializationKeyType == null) {
+        Class findSerializationContentType = findSerializationContentType(annotated, contentType);
+        if (findSerializationContentType == null) {
             return javaType2;
         }
-        if (keyType.hasRawClass(findSerializationKeyType)) {
-            keyType = keyType.withStaticTyping();
+        if (contentType.hasRawClass(findSerializationContentType)) {
+            constructSpecializedType = contentType.withStaticTyping();
         } else {
-            Class rawClass = keyType.getRawClass();
+            Class rawClass = contentType.getRawClass();
             try {
-                if (findSerializationKeyType.isAssignableFrom(rawClass)) {
-                    keyType = typeFactory.constructGeneralizedType(keyType, findSerializationKeyType);
-                } else if (rawClass.isAssignableFrom(findSerializationKeyType)) {
-                    keyType = typeFactory.constructSpecializedType(keyType, findSerializationKeyType);
+                if (findSerializationContentType.isAssignableFrom(rawClass)) {
+                    constructSpecializedType = typeFactory.constructGeneralizedType(contentType, findSerializationContentType);
+                } else if (rawClass.isAssignableFrom(findSerializationContentType)) {
+                    constructSpecializedType = typeFactory.constructSpecializedType(contentType, findSerializationContentType);
                 } else {
-                    throw new JsonMappingException(null, String.format("Can not refine serialization content type %s into %s; types not related", new Object[]{keyType, findSerializationKeyType.getName()}));
+                    throw new JsonMappingException((Closeable) null, String.format("Can not refine serialization content type %s into %s; types not related", new Object[]{contentType, findSerializationContentType.getName()}));
                 }
-            } catch (Throwable e22) {
-                throw new JsonMappingException(null, String.format("Internal error: failed to refine value type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findSerializationKeyType.getName(), annotated.getName(), e22.getMessage()}), e22);
+            } catch (IllegalArgumentException e3) {
+                throw new JsonMappingException((Closeable) null, String.format("Internal error: failed to refine value type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findSerializationContentType.getName(), annotated.getName(), e3.getMessage()}), (Throwable) e3);
             }
         }
-        return javaType2.withContentType(keyType);
+        return javaType2.withContentType(constructSpecializedType);
     }
 
     public String[] findSerializationPropertyOrder(AnnotatedClass annotatedClass) {
@@ -391,8 +392,6 @@ public abstract class AnnotationIntrospector implements Versioned, Serializable 
 
     public JavaType refineDeserializationType(MapperConfig<?> mapperConfig, Annotated annotated, JavaType javaType) throws JsonMappingException {
         JavaType javaType2;
-        JavaType keyType;
-        Class findDeserializationKeyType;
         TypeFactory typeFactory = mapperConfig.getTypeFactory();
         Class findDeserializationType = findDeserializationType(annotated, javaType);
         if (findDeserializationType == null || javaType.hasRawClass(findDeserializationType)) {
@@ -400,33 +399,34 @@ public abstract class AnnotationIntrospector implements Versioned, Serializable 
         } else {
             try {
                 javaType2 = typeFactory.constructSpecializedType(javaType, findDeserializationType);
-            } catch (Throwable e) {
-                throw new JsonMappingException(null, String.format("Failed to narrow type %s with annotation (value %s), from '%s': %s", new Object[]{javaType, findDeserializationType.getName(), annotated.getName(), e.getMessage()}), e);
+            } catch (IllegalArgumentException e) {
+                throw new JsonMappingException((Closeable) null, String.format("Failed to narrow type %s with annotation (value %s), from '%s': %s", new Object[]{javaType, findDeserializationType.getName(), annotated.getName(), e.getMessage()}), (Throwable) e);
             }
         }
         if (javaType2.isMapLikeType()) {
-            keyType = javaType2.getKeyType();
-            findDeserializationKeyType = findDeserializationKeyType(annotated, keyType);
+            JavaType keyType = javaType2.getKeyType();
+            Class findDeserializationKeyType = findDeserializationKeyType(annotated, keyType);
             if (findDeserializationKeyType != null) {
                 try {
                     javaType2 = ((MapLikeType) javaType2).withKeyType(typeFactory.constructSpecializedType(keyType, findDeserializationKeyType));
-                } catch (Throwable e2) {
-                    throw new JsonMappingException(null, String.format("Failed to narrow key type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findDeserializationKeyType.getName(), annotated.getName(), e2.getMessage()}), e2);
+                } catch (IllegalArgumentException e2) {
+                    throw new JsonMappingException((Closeable) null, String.format("Failed to narrow key type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findDeserializationKeyType.getName(), annotated.getName(), e2.getMessage()}), (Throwable) e2);
                 }
             }
         }
-        keyType = javaType2.getContentType();
-        if (keyType != null) {
-            findDeserializationKeyType = findDeserializationContentType(annotated, keyType);
-            if (findDeserializationKeyType != null) {
-                try {
-                    javaType2 = javaType2.withContentType(typeFactory.constructSpecializedType(keyType, findDeserializationKeyType));
-                } catch (Throwable e22) {
-                    throw new JsonMappingException(null, String.format("Failed to narrow value type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findDeserializationKeyType.getName(), annotated.getName(), e22.getMessage()}), e22);
-                }
-            }
+        JavaType contentType = javaType2.getContentType();
+        if (contentType == null) {
+            return javaType2;
         }
-        return javaType2;
+        Class findDeserializationContentType = findDeserializationContentType(annotated, contentType);
+        if (findDeserializationContentType == null) {
+            return javaType2;
+        }
+        try {
+            return javaType2.withContentType(typeFactory.constructSpecializedType(contentType, findDeserializationContentType));
+        } catch (IllegalArgumentException e3) {
+            throw new JsonMappingException((Closeable) null, String.format("Failed to narrow value type of %s with concrete-type annotation (value %s), from '%s': %s", new Object[]{javaType2, findDeserializationContentType.getName(), annotated.getName(), e3.getMessage()}), (Throwable) e3);
+        }
     }
 
     @Deprecated
@@ -476,15 +476,18 @@ public abstract class AnnotationIntrospector implements Versioned, Serializable 
         return null;
     }
 
-    protected <A extends Annotation> A _findAnnotation(Annotated annotated, Class<A> cls) {
+    /* access modifiers changed from: protected */
+    public <A extends Annotation> A _findAnnotation(Annotated annotated, Class<A> cls) {
         return annotated.getAnnotation(cls);
     }
 
-    protected boolean _hasAnnotation(Annotated annotated, Class<? extends Annotation> cls) {
+    /* access modifiers changed from: protected */
+    public boolean _hasAnnotation(Annotated annotated, Class<? extends Annotation> cls) {
         return annotated.hasAnnotation(cls);
     }
 
-    protected boolean _hasOneOf(Annotated annotated, Class<? extends Annotation>[] clsArr) {
+    /* access modifiers changed from: protected */
+    public boolean _hasOneOf(Annotated annotated, Class<? extends Annotation>[] clsArr) {
         return annotated.hasOneOf(clsArr);
     }
 }

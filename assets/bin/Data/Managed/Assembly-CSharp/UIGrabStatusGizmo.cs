@@ -19,8 +19,6 @@ public class UIGrabStatusGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			_targetEnemy = value;
 			if (_targetEnemy != null)
 			{
@@ -42,8 +40,6 @@ public class UIGrabStatusGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			_targetPoint = value;
 			if (_targetPoint != null)
 			{
@@ -74,49 +70,49 @@ public class UIGrabStatusGizmo : UIStatusGizmoBase
 		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		if (!(targetEnemy == null) && !(this.targetPoint == null))
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		if (targetEnemy == null || this.targetPoint == null)
 		{
-			Vector3 targetPoint = this.targetPoint.GetTargetPoint();
-			targetPoint.y += -1f;
-			Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(targetPoint);
-			screenZ = val.z;
-			if (val.z < 0f)
+			return;
+		}
+		Vector3 targetPoint = this.targetPoint.GetTargetPoint();
+		targetPoint.y += -1f;
+		Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(targetPoint);
+		screenZ = val.z;
+		if (val.z < 0f)
+		{
+			val *= -1f;
+		}
+		val.z = 0f;
+		Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
+		Vector3 val3 = transform.get_position() - val2;
+		if (val3.get_sqrMagnitude() >= 2E-05f)
+		{
+			transform.set_position(val2);
+		}
+		if (!(gaugeUI != null))
+		{
+			return;
+		}
+		if (targetEnemy.IsValidGrabHp)
+		{
+			if (!gaugeUI.get_isActiveAndEnabled())
 			{
-				val *= -1f;
+				gaugeUI.get_gameObject().SetActive(true);
 			}
-			val.z = 0f;
-			Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-			Vector3 val3 = transform.get_position() - val2;
-			if (val3.get_sqrMagnitude() >= 2E-05f)
+			float num = (float)(int)targetEnemy.GrabHp / (float)(int)targetEnemy.GrabHpMax;
+			if (num < 0f)
 			{
-				transform.set_position(val2);
+				num = 0f;
 			}
-			if (gaugeUI != null)
+			if (gaugeUI.nowPercent != num)
 			{
-				if (targetEnemy.IsValidGrabHp)
-				{
-					if (!gaugeUI.get_isActiveAndEnabled())
-					{
-						gaugeUI.get_gameObject().SetActive(true);
-					}
-					float num = (float)(int)targetEnemy.GrabHp / (float)(int)targetEnemy.GrabHpMax;
-					if (num < 0f)
-					{
-						num = 0f;
-					}
-					if (gaugeUI.nowPercent != num)
-					{
-						gaugeUI.SetPercent(num, true);
-					}
-				}
-				else if (gaugeUI.get_isActiveAndEnabled())
-				{
-					gaugeUI.get_gameObject().SetActive(false);
-				}
+				gaugeUI.SetPercent(num);
 			}
+		}
+		else if (gaugeUI.get_isActiveAndEnabled())
+		{
+			gaugeUI.get_gameObject().SetActive(false);
 		}
 	}
 }

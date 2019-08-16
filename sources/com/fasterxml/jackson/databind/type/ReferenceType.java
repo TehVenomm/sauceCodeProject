@@ -75,16 +75,18 @@ public class ReferenceType extends SimpleType {
         return new ReferenceType(cls, this._bindings, javaType, javaTypeArr, this._referencedType, this._valueHandler, this._typeHandler, this._asStatic);
     }
 
-    protected String buildCanonicalName() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this._class.getName());
-        stringBuilder.append('<');
-        stringBuilder.append(this._referencedType.toCanonical());
-        return stringBuilder.toString();
+    /* access modifiers changed from: protected */
+    public String buildCanonicalName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this._class.getName());
+        sb.append('<');
+        sb.append(this._referencedType.toCanonical());
+        return sb.toString();
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         return new ReferenceType(cls, this._bindings, this._superClass, this._superInterfaces, this._referencedType, this._valueHandler, this._typeHandler, this._asStatic);
     }
 
@@ -100,14 +102,14 @@ public class ReferenceType extends SimpleType {
         return true;
     }
 
-    public StringBuilder getErasedSignature(StringBuilder stringBuilder) {
-        return TypeBase._classSignature(this._class, stringBuilder, true);
+    public StringBuilder getErasedSignature(StringBuilder sb) {
+        return _classSignature(this._class, sb, true);
     }
 
-    public StringBuilder getGenericSignature(StringBuilder stringBuilder) {
-        TypeBase._classSignature(this._class, stringBuilder, false);
-        stringBuilder.append('<');
-        StringBuilder genericSignature = this._referencedType.getGenericSignature(stringBuilder);
+    public StringBuilder getGenericSignature(StringBuilder sb) {
+        _classSignature(this._class, sb, false);
+        sb.append('<');
+        StringBuilder genericSignature = this._referencedType.getGenericSignature(sb);
         genericSignature.append(">;");
         return genericSignature;
     }

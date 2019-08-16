@@ -26,6 +26,10 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public float downAddWeak;
 
+	public bool isForceDown;
+
+	public float concussionAdd;
+
 	public bool isArrowBleed;
 
 	public int arrowBleedDamage;
@@ -50,6 +54,8 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public float downTotal;
 
+	public float concussionTotal;
+
 	public BadStatus badStatusTotal = new BadStatus();
 
 	public float damageHpRate;
@@ -68,7 +74,11 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 
 	public bool isShadowSealing;
 
+	public bool isArrowBomb;
+
 	public EnemyAegisController.SyncParam aegisParam = new EnemyAegisController.SyncParam();
+
+	public int deadReviveCount;
 
 	public Coop_Model_ObjectAttackedHitFix()
 	{
@@ -114,10 +124,10 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 	{
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
 		attackInfoName = status.attackInfo.name;
 		attackInfoRate = status.attackInfo.rateInfoRate;
 		fromObjectID = status.fromObjectID;
@@ -133,6 +143,8 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 		damage = status.damage;
 		downAddBase = status.downAddBase;
 		downAddWeak = status.downAddWeak;
+		isForceDown = status.isForceDown;
+		concussionAdd = status.concussionAdd;
 		isArrowBleed = status.isArrowBleed;
 		arrowBleedDamage = status.arrowBleedDamage;
 		arrowBurstDamage = status.arrowBurstDamage;
@@ -145,6 +157,7 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 		reactionType = status.reactionType;
 		blowForce = status.blowForce;
 		downTotal = status.downTotal;
+		concussionTotal = status.concussionTotal;
 		badStatusTotal.Copy(status.badStatusTotal);
 		damageHpRate = status.damageHpRate;
 		arrowBleedSkipFirst = status.arrowBleedSkipFirst;
@@ -155,22 +168,24 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 		afterGrabHp = status.afterGrabHp;
 		isShadowSealing = status.isShadowSealing;
 		aegisParam.Copy(status.aegisParam);
+		deadReviveCount = status.deadReviveCount;
+		isArrowBomb = status.isArrowBomb;
 	}
 
 	public void CopyAttackedHitStatus(out AttackedHitStatusFix status)
 	{
 		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
 		AttackedHitStatus attackedHitStatus = new AttackedHitStatus();
 		attackedHitStatus.fromObjectID = fromObjectID;
 		attackedHitStatus.fromObject = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(fromObjectID);
 		if (attackedHitStatus.fromObject != null && !attackedHitStatus.fromObject.isLoading)
 		{
-			attackedHitStatus.attackInfo = (attackedHitStatus.fromObject.FindAttackInfoExternal(attackInfoName, true, attackInfoRate) as AttackHitInfo);
+			attackedHitStatus.attackInfo = (attackedHitStatus.fromObject.FindAttackInfoExternal(attackInfoName, fix_rate: true, attackInfoRate) as AttackHitInfo);
 		}
 		if (attackedHitStatus.attackInfo == null)
 		{
@@ -188,6 +203,8 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 		attackedHitStatus.damage = damage;
 		attackedHitStatus.downAddBase = downAddBase;
 		attackedHitStatus.downAddWeak = downAddWeak;
+		attackedHitStatus.isForceDown = isForceDown;
+		attackedHitStatus.concussionAdd = concussionAdd;
 		attackedHitStatus.isArrowBleed = isArrowBleed;
 		attackedHitStatus.arrowBleedDamage = arrowBleedDamage;
 		attackedHitStatus.arrowBurstDamage = arrowBurstDamage;
@@ -200,6 +217,7 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 		attackedHitStatus.reactionType = reactionType;
 		attackedHitStatus.blowForce = blowForce;
 		attackedHitStatus.downTotal = downTotal;
+		attackedHitStatus.concussionTotal = concussionTotal;
 		attackedHitStatus.badStatusTotal.Copy(badStatusTotal);
 		attackedHitStatus.damageHpRate = damageHpRate;
 		attackedHitStatus.arrowBleedSkipFirst = arrowBleedSkipFirst;
@@ -209,7 +227,9 @@ public class Coop_Model_ObjectAttackedHitFix : Coop_Model_ObjectBase
 		attackedHitStatus.shieldHp = afterShieldHp;
 		attackedHitStatus.grabHp = afterGrabHp;
 		attackedHitStatus.isShadowSealing = isShadowSealing;
+		attackedHitStatus.isArrowBomb = isArrowBomb;
 		attackedHitStatus.aegisParam.Copy(aegisParam);
+		attackedHitStatus.deadReviveCount = deadReviveCount;
 		status = new AttackedHitStatusFix(attackedHitStatus);
 	}
 }

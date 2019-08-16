@@ -3,39 +3,59 @@ package com.google.android.gms.games.internal.experience;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
+import com.google.android.apps.common.proguard.UsedByReflection;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameEntity;
-import com.google.android.gms.games.internal.zzc;
-import java.util.Arrays;
+import com.google.android.gms.games.internal.zzd;
 
-public final class ExperienceEventEntity extends zzc implements ExperienceEvent {
+@UsedByReflection("GamesClientImpl.java")
+@Class(creator = "ExperienceEventEntityCreator")
+@Reserved({1000})
+public final class ExperienceEventEntity extends zzd implements ExperienceEvent {
     public static final Creator<ExperienceEventEntity> CREATOR = new zza();
-    private final int zzeda;
-    private final Uri zzhbd;
-    private final String zzhbo;
-    private final String zzhiv;
-    private final GameEntity zzhiw;
-    private final String zzhix;
-    private final String zzhiy;
-    private final long zzhiz;
-    private final long zzhja;
-    private final long zzhjb;
-    private final int zzhjc;
+    @Field(getter = "getType", mo13990id = 10)
+    private final int type;
+    @Field(getter = "getIconImageUrl", mo13990id = 5)
+    private final String zzac;
+    @Field(getter = "getExperienceId", mo13990id = 1)
+    private final String zzlo;
+    @Field(getter = "getGame", mo13990id = 2)
+    private final GameEntity zzlp;
+    @Field(getter = "getDisplayTitle", mo13990id = 3)
+    private final String zzlq;
+    @Field(getter = "getDisplayDescription", mo13990id = 4)
+    private final String zzlr;
+    @Field(getter = "getCreatedTimestamp", mo13990id = 7)
+    private final long zzls;
+    @Field(getter = "getXpEarned", mo13990id = 8)
+    private final long zzlt;
+    @Field(getter = "getCurrentXp", mo13990id = 9)
+    private final long zzlu;
+    @Field(getter = "getNewLevel", mo13990id = 11)
+    private final int zzlv;
+    @Field(getter = "getIconImageUri", mo13990id = 6)
+    private final Uri zzr;
 
-    ExperienceEventEntity(String str, GameEntity gameEntity, String str2, String str3, String str4, Uri uri, long j, long j2, long j3, int i, int i2) {
-        this.zzhiv = str;
-        this.zzhiw = gameEntity;
-        this.zzhix = str2;
-        this.zzhiy = str3;
-        this.zzhbo = str4;
-        this.zzhbd = uri;
-        this.zzhiz = j;
-        this.zzhja = j2;
-        this.zzhjb = j3;
-        this.zzeda = i;
-        this.zzhjc = i2;
+    @Constructor
+    ExperienceEventEntity(@Param(mo13993id = 1) String str, @Param(mo13993id = 2) GameEntity gameEntity, @Param(mo13993id = 3) String str2, @Param(mo13993id = 4) String str3, @Param(mo13993id = 5) String str4, @Param(mo13993id = 6) Uri uri, @Param(mo13993id = 7) long j, @Param(mo13993id = 8) long j2, @Param(mo13993id = 9) long j3, @Param(mo13993id = 10) int i, @Param(mo13993id = 11) int i2) {
+        this.zzlo = str;
+        this.zzlp = gameEntity;
+        this.zzlq = str2;
+        this.zzlr = str3;
+        this.zzac = str4;
+        this.zzr = uri;
+        this.zzls = j;
+        this.zzlt = j2;
+        this.zzlu = j3;
+        this.type = i;
+        this.zzlv = i2;
     }
 
     public final boolean equals(Object obj) {
@@ -44,7 +64,7 @@ public final class ExperienceEventEntity extends zzc implements ExperienceEvent 
                 return true;
             }
             ExperienceEvent experienceEvent = (ExperienceEvent) obj;
-            if (zzbf.equal(experienceEvent.zzarb(), zzarb()) && zzbf.equal(experienceEvent.getGame(), getGame()) && zzbf.equal(experienceEvent.zzarc(), zzarc()) && zzbf.equal(experienceEvent.zzard(), zzard()) && zzbf.equal(experienceEvent.getIconImageUrl(), getIconImageUrl()) && zzbf.equal(experienceEvent.getIconImageUri(), getIconImageUri()) && zzbf.equal(Long.valueOf(experienceEvent.zzare()), Long.valueOf(zzare())) && zzbf.equal(Long.valueOf(experienceEvent.zzarf()), Long.valueOf(zzarf())) && zzbf.equal(Long.valueOf(experienceEvent.zzarg()), Long.valueOf(zzarg())) && zzbf.equal(Integer.valueOf(experienceEvent.getType()), Integer.valueOf(getType())) && zzbf.equal(Integer.valueOf(experienceEvent.zzarh()), Integer.valueOf(zzarh()))) {
+            if (Objects.equal(experienceEvent.zzcu(), zzcu()) && Objects.equal(experienceEvent.getGame(), getGame()) && Objects.equal(experienceEvent.zzcv(), zzcv()) && Objects.equal(experienceEvent.zzcw(), zzcw()) && Objects.equal(experienceEvent.getIconImageUrl(), getIconImageUrl()) && Objects.equal(experienceEvent.getIconImageUri(), getIconImageUri()) && Objects.equal(Long.valueOf(experienceEvent.zzcx()), Long.valueOf(zzcx())) && Objects.equal(Long.valueOf(experienceEvent.zzcy()), Long.valueOf(zzcy())) && Objects.equal(Long.valueOf(experienceEvent.zzcz()), Long.valueOf(zzcz())) && Objects.equal(Integer.valueOf(experienceEvent.getType()), Integer.valueOf(getType())) && Objects.equal(Integer.valueOf(experienceEvent.zzda()), Integer.valueOf(zzda()))) {
                 return true;
             }
         }
@@ -59,23 +79,23 @@ public final class ExperienceEventEntity extends zzc implements ExperienceEvent 
     }
 
     public final Game getGame() {
-        return this.zzhiw;
+        return this.zzlp;
     }
 
     public final Uri getIconImageUri() {
-        return this.zzhbd;
+        return this.zzr;
     }
 
     public final String getIconImageUrl() {
-        return this.zzhbo;
+        return this.zzac;
     }
 
     public final int getType() {
-        return this.zzeda;
+        return this.type;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{zzarb(), getGame(), zzarc(), zzard(), getIconImageUrl(), getIconImageUri(), Long.valueOf(zzare()), Long.valueOf(zzarf()), Long.valueOf(zzarg()), Integer.valueOf(getType()), Integer.valueOf(zzarh())});
+        return Objects.hashCode(zzcu(), getGame(), zzcv(), zzcw(), getIconImageUrl(), getIconImageUri(), Long.valueOf(zzcx()), Long.valueOf(zzcy()), Long.valueOf(zzcz()), Integer.valueOf(getType()), Integer.valueOf(zzda()));
     }
 
     public final boolean isDataValid() {
@@ -83,50 +103,50 @@ public final class ExperienceEventEntity extends zzc implements ExperienceEvent 
     }
 
     public final String toString() {
-        return zzbf.zzt(this).zzg("ExperienceId", zzarb()).zzg("Game", getGame()).zzg("DisplayTitle", zzarc()).zzg("DisplayDescription", zzard()).zzg("IconImageUrl", getIconImageUrl()).zzg("IconImageUri", getIconImageUri()).zzg("CreatedTimestamp", Long.valueOf(zzare())).zzg("XpEarned", Long.valueOf(zzarf())).zzg("CurrentXp", Long.valueOf(zzarg())).zzg("Type", Integer.valueOf(getType())).zzg("NewLevel", Integer.valueOf(zzarh())).toString();
+        return Objects.toStringHelper(this).add("ExperienceId", zzcu()).add("Game", getGame()).add("DisplayTitle", zzcv()).add("DisplayDescription", zzcw()).add("IconImageUrl", getIconImageUrl()).add("IconImageUri", getIconImageUri()).add("CreatedTimestamp", Long.valueOf(zzcx())).add("XpEarned", Long.valueOf(zzcy())).add("CurrentXp", Long.valueOf(zzcz())).add("Type", Integer.valueOf(getType())).add("NewLevel", Integer.valueOf(zzda())).toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.zzhiv, false);
-        zzd.zza(parcel, 2, this.zzhiw, i, false);
-        zzd.zza(parcel, 3, this.zzhix, false);
-        zzd.zza(parcel, 4, this.zzhiy, false);
-        zzd.zza(parcel, 5, getIconImageUrl(), false);
-        zzd.zza(parcel, 6, this.zzhbd, i, false);
-        zzd.zza(parcel, 7, this.zzhiz);
-        zzd.zza(parcel, 8, this.zzhja);
-        zzd.zza(parcel, 9, this.zzhjb);
-        zzd.zzc(parcel, 10, this.zzeda);
-        zzd.zzc(parcel, 11, this.zzhjc);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, this.zzlo, false);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.zzlp, i, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzlq, false);
+        SafeParcelWriter.writeString(parcel, 4, this.zzlr, false);
+        SafeParcelWriter.writeString(parcel, 5, getIconImageUrl(), false);
+        SafeParcelWriter.writeParcelable(parcel, 6, this.zzr, i, false);
+        SafeParcelWriter.writeLong(parcel, 7, this.zzls);
+        SafeParcelWriter.writeLong(parcel, 8, this.zzlt);
+        SafeParcelWriter.writeLong(parcel, 9, this.zzlu);
+        SafeParcelWriter.writeInt(parcel, 10, this.type);
+        SafeParcelWriter.writeInt(parcel, 11, this.zzlv);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final String zzarb() {
-        return this.zzhiv;
+    public final String zzcu() {
+        return this.zzlo;
     }
 
-    public final String zzarc() {
-        return this.zzhix;
+    public final String zzcv() {
+        return this.zzlq;
     }
 
-    public final String zzard() {
-        return this.zzhiy;
+    public final String zzcw() {
+        return this.zzlr;
     }
 
-    public final long zzare() {
-        return this.zzhiz;
+    public final long zzcx() {
+        return this.zzls;
     }
 
-    public final long zzarf() {
-        return this.zzhja;
+    public final long zzcy() {
+        return this.zzlt;
     }
 
-    public final long zzarg() {
-        return this.zzhjb;
+    public final long zzcz() {
+        return this.zzlu;
     }
 
-    public final int zzarh() {
-        return this.zzhjc;
+    public final int zzda() {
+        return this.zzlv;
     }
 }

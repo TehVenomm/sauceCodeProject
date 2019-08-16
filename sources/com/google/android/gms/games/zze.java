@@ -1,16 +1,14 @@
 package com.google.android.gms.games;
 
-import android.os.RemoteException;
-import com.google.android.gms.common.api.Api.zzb;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.games.internal.GamesClientImpl;
+import android.support.annotation.NonNull;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.games.internal.zzbn;
 
-final class zze extends zzd {
-    zze(GoogleApiClient googleApiClient) {
-        super(googleApiClient);
+final class zze implements zzbn {
+    zze() {
     }
 
-    protected final /* synthetic */ void zza(zzb zzb) throws RemoteException {
-        ((GamesClientImpl) zzb).zzg(this);
+    public final boolean zza(@NonNull Status status) {
+        return status.isSuccess() || status.getStatusCode() == 3003;
     }
 }

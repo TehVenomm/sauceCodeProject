@@ -39,8 +39,8 @@ class ContactsPhotoRequestHandler extends RequestHandler {
         matcher.addURI("com.android.contacts", "display_photo/#", 4);
     }
 
-    ContactsPhotoRequestHandler(Context context) {
-        this.context = context;
+    ContactsPhotoRequestHandler(Context context2) {
+        this.context = context2;
     }
 
     public boolean canHandleRequest(Request request) {
@@ -50,7 +50,10 @@ class ContactsPhotoRequestHandler extends RequestHandler {
 
     public Result load(Request request, int i) throws IOException {
         InputStream inputStream = getInputStream(request);
-        return inputStream != null ? new Result(inputStream, LoadedFrom.DISK) : null;
+        if (inputStream != null) {
+            return new Result(inputStream, LoadedFrom.DISK);
+        }
+        return null;
     }
 
     private InputStream getInputStream(Request request) throws IOException {

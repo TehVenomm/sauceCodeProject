@@ -39,12 +39,32 @@ namespace Network
 
 		public int jump;
 
+		public int soulOneHandSword;
+
 		public int soulTwoHandSword;
 
-		public int soulOneHandSword;
+		public int soulSpear;
 
 		public int soulPairSwords;
 
 		public int soulArrow;
+
+		public int burstOneHandSword;
+
+		public int thsFullBurst;
+
+		public int burstPairSwords;
+
+		public int burstSpear;
+
+		public int burstArrow;
+
+		public int concussion;
+
+		public int oracleOneHandSword;
+
+		public int oracleSpear;
+
+		public int oraclePairSwords;
 	}
 }

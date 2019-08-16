@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Wrap Content Filter")]
-public class UIWrapContentFilter
+public class UIWrapContentFilter : MonoBehaviour
 {
 	public delegate void OnInitializeItem(GameObject go, int wrapIndex, int realIndex);
 
@@ -32,6 +33,18 @@ public class UIWrapContentFilter
 	private bool mFirstTime = true;
 
 	private List<Transform> mChildren = new List<Transform>();
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static Comparison<Transform> _003C_003Ef__mg_0024cache3;
 
 	public string filter
 	{
@@ -80,8 +93,6 @@ public class UIWrapContentFilter
 	[ContextMenu("Sort Based on Scroll Movement")]
 	public void SortBasedOnScrollMovement()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Expected O, but got Unknown
 		if (CacheScrollView())
 		{
 			mChildren.Clear();
@@ -104,8 +115,6 @@ public class UIWrapContentFilter
 	[ContextMenu("Sort Alphabetically")]
 	public void SortAlphabetically()
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Expected O, but got Unknown
 		if (CacheScrollView())
 		{
 			if (!mScroll.get_enabled())
@@ -124,13 +133,6 @@ public class UIWrapContentFilter
 
 	public void FilterList(string filterName = null)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Expected O, but got Unknown
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		mChildren.Clear();
 		for (int i = 0; i < mTrans.get_childCount(); i++)
 		{
@@ -140,9 +142,9 @@ public class UIWrapContentFilter
 			}
 			else if (FilterItemFunc != null && FilterItemFunc(i, filterName))
 			{
-				Transform val = mTrans.GetChild(i);
-				val.get_gameObject().SetActive(true);
-				mChildren.Add(val);
+				Transform child = mTrans.GetChild(i);
+				child.get_gameObject().SetActive(true);
+				mChildren.Add(child);
 			}
 			else
 			{
@@ -156,10 +158,6 @@ public class UIWrapContentFilter
 
 	protected bool CacheScrollView()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
 		mTrans = this.get_transform();
 		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
 		mScroll = mPanel.GetComponent<UIScrollView>();
@@ -214,20 +212,12 @@ public class UIWrapContentFilter
 		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0159: Expected O, but got Unknown
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017d: Expected O, but got Unknown
 		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
 		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0250: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0255: Expected O, but got Unknown
-		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0279: Expected O, but got Unknown
 		float num = (float)(itemSize * mChildren.Count) * 0.5f;
 		Vector3[] worldCorners = mPanel.worldCorners;
 		for (int i = 0; i < 4; i++)
@@ -262,36 +252,34 @@ public class UIWrapContentFilter
 					num5 = num6 + (x - localPosition2.x);
 					if (!UICamera.IsPressed(val3.get_gameObject()))
 					{
-						NGUITools.SetActive(val3.get_gameObject(), num5 > num3 && num5 < num4, false);
+						NGUITools.SetActive(val3.get_gameObject(), num5 > num3 && num5 < num4, compatibilityMode: false);
 					}
 				}
 			}
+			return;
 		}
-		else
+		float num7 = worldCorners[0].y - (float)itemSize;
+		float num8 = worldCorners[2].y + (float)itemSize;
+		int k = 0;
+		for (int count2 = mChildren.Count; k < count2; k++)
 		{
-			float num7 = worldCorners[0].y - (float)itemSize;
-			float num8 = worldCorners[2].y + (float)itemSize;
-			int k = 0;
-			for (int count2 = mChildren.Count; k < count2; k++)
+			Transform val4 = mChildren[k];
+			Vector3 localPosition3 = val4.get_localPosition();
+			float num9 = localPosition3.y - val2.y;
+			if (mFirstTime)
 			{
-				Transform val4 = mChildren[k];
-				Vector3 localPosition3 = val4.get_localPosition();
-				float num9 = localPosition3.y - val2.y;
-				if (mFirstTime)
+				UpdateItem(val4, k);
+			}
+			if (cullContent)
+			{
+				float num10 = num9;
+				Vector2 clipOffset2 = mPanel.clipOffset;
+				float y = clipOffset2.y;
+				Vector3 localPosition4 = mTrans.get_localPosition();
+				num9 = num10 + (y - localPosition4.y);
+				if (!UICamera.IsPressed(val4.get_gameObject()))
 				{
-					UpdateItem(val4, k);
-				}
-				if (cullContent)
-				{
-					float num10 = num9;
-					Vector2 clipOffset2 = mPanel.clipOffset;
-					float y = clipOffset2.y;
-					Vector3 localPosition4 = mTrans.get_localPosition();
-					num9 = num10 + (y - localPosition4.y);
-					if (!UICamera.IsPressed(val4.get_gameObject()))
-					{
-						NGUITools.SetActive(val4.get_gameObject(), num9 > num7 && num9 < num8, false);
-					}
+					NGUITools.SetActive(val4.get_gameObject(), num9 > num7 && num9 < num8, compatibilityMode: false);
 				}
 			}
 		}
@@ -315,8 +303,6 @@ public class UIWrapContentFilter
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Expected O, but got Unknown
 		if (onInitializeItem != null)
 		{
 			int num;

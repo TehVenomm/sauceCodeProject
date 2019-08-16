@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.databind.jsonFormatVisitors;
 
 import com.facebook.internal.AnalyticsEvents;
+import com.facebook.places.model.PlaceFields;
 import com.facebook.share.internal.ShareConstants;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -12,7 +13,7 @@ public enum JsonValueFormat {
     HOST_NAME("host-name"),
     IP_ADDRESS("ip-address"),
     IPV6("ipv6"),
-    PHONE("phone"),
+    PHONE(PlaceFields.PHONE),
     REGEX("regex"),
     STYLE(AnalyticsEvents.PARAMETER_LIKE_VIEW_STYLE),
     TIME("time"),

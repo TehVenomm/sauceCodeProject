@@ -26,7 +26,6 @@ public class AccountConflict : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -57,7 +56,7 @@ public class AccountConflict : GameSection
 		LoadObject lo_gold = loadQueue.LoadItemIcon(ResourceName.GetItemIcon(2));
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		SetTexture(local, UI.TEX_GEM, lo_gem.loadedObject as Texture);
 		SetTexture(local, UI.TEX_GOLD, lo_gold.loadedObject as Texture);
@@ -75,7 +74,7 @@ public class AccountConflict : GameSection
 			{
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.FACEBOOK_LOGIN);
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 		});
 	}
 
@@ -89,7 +88,7 @@ public class AccountConflict : GameSection
 				MenuReset.needClearCache = true;
 				MenuReset.needPredownload = true;
 			}
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 		});
 	}
 
@@ -103,7 +102,7 @@ public class AccountConflict : GameSection
 		if (_accountChangeSuccess && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
 		{
 			_accountChangeSuccess = false;
-			RequestEvent("CURRENT_DATA", null);
+			RequestEvent("CURRENT_DATA");
 			GameSection.BackSection();
 		}
 	}

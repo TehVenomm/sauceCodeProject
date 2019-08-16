@@ -1,20 +1,31 @@
 package com.google.firebase.iid;
 
+import android.content.BroadcastReceiver.PendingResult;
 import android.content.Intent;
-import android.util.Log;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
-final class zze implements Runnable {
-    private /* synthetic */ Intent val$intent;
-    private /* synthetic */ zzd zzmim;
+final class zze {
+    final Intent intent;
+    private boolean zzaa = false;
+    private final ScheduledFuture<?> zzab;
+    private final PendingResult zzz;
 
-    zze(zzd zzd, Intent intent) {
-        this.zzmim = zzd;
-        this.val$intent = intent;
+    zze(Intent intent2, PendingResult pendingResult, ScheduledExecutorService scheduledExecutorService) {
+        this.intent = intent2;
+        this.zzz = pendingResult;
+        this.zzab = scheduledExecutorService.schedule(new zzd(this, intent2), 9000, TimeUnit.MILLISECONDS);
     }
 
-    public final void run() {
-        String action = this.val$intent.getAction();
-        Log.w("EnhancedIntentService", new StringBuilder(String.valueOf(action).length() + 61).append("Service took too long to process intent: ").append(action).append(" App may get closed.").toString());
-        this.zzmim.finish();
+    /* access modifiers changed from: 0000 */
+    public final void finish() {
+        synchronized (this) {
+            if (!this.zzaa) {
+                this.zzz.finish();
+                this.zzab.cancel(false);
+                this.zzaa = true;
+            }
+        }
     }
 }

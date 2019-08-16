@@ -5,59 +5,60 @@ import android.app.job.JobParameters;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.MainThread;
-import android.support.v4.content.WakefulBroadcastReceiver;
-import com.google.android.gms.internal.zzcez;
-import com.google.android.gms.internal.zzcfc;
+import com.google.android.gms.measurement.internal.zzit;
+import com.google.android.gms.measurement.internal.zzix;
 
-public final class AppMeasurementService extends Service implements zzcfc {
-    private zzcez zzikm;
+public final class AppMeasurementService extends Service implements zzix {
+    private zzit<AppMeasurementService> zzm;
 
-    private final zzcez zzats() {
-        if (this.zzikm == null) {
-            this.zzikm = new zzcez(this);
+    private final zzit<AppMeasurementService> zze() {
+        if (this.zzm == null) {
+            this.zzm = new zzit<>(this);
         }
-        return this.zzikm;
-    }
-
-    public final boolean callServiceStopSelfResult(int i) {
-        return stopSelfResult(i);
+        return this.zzm;
     }
 
     @MainThread
     public final IBinder onBind(Intent intent) {
-        return zzats().onBind(intent);
+        return zze().onBind(intent);
     }
 
     @MainThread
     public final void onCreate() {
         super.onCreate();
-        zzats().onCreate();
+        zze().onCreate();
     }
 
     @MainThread
     public final void onDestroy() {
-        zzats().onDestroy();
+        zze().onDestroy();
         super.onDestroy();
     }
 
     @MainThread
     public final void onRebind(Intent intent) {
-        zzats().onRebind(intent);
+        zze().onRebind(intent);
     }
 
     @MainThread
     public final int onStartCommand(Intent intent, int i, int i2) {
-        zzats().onStartCommand(intent, i, i2);
-        WakefulBroadcastReceiver.completeWakefulIntent(intent);
-        return 2;
+        return zze().onStartCommand(intent, i, i2);
     }
 
     @MainThread
     public final boolean onUnbind(Intent intent) {
-        return zzats().onUnbind(intent);
+        return zze().onUnbind(intent);
     }
 
     public final void zza(JobParameters jobParameters, boolean z) {
         throw new UnsupportedOperationException();
+    }
+
+    public final void zza(Intent intent) {
+        AppMeasurementReceiver.completeWakefulIntent(intent);
+    }
+
+    public final boolean zza(int i) {
+        return stopSelfResult(i);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class SETable : Singleton<SETable>, IDataTable
@@ -6,8 +7,6 @@ public class SETable : Singleton<SETable>, IDataTable
 	[Serializable]
 	public class Data
 	{
-		public const string NT = "id,priority,intervalLimit,volumeOffset,randomPitch,dopplerLevel,minDistance,maxDistance,limitNum,cullingType";
-
 		public uint id;
 
 		public uint priority;
@@ -31,6 +30,8 @@ public class SETable : Singleton<SETable>, IDataTable
 		public uint cullingType;
 
 		public AudioControlGroup.CullingTypes CullingType;
+
+		public const string NT = "id,priority,intervalLimit,volumeOffset,randomPitch,dopplerLevel,minDistance,maxDistance,limitNum,cullingType";
 
 		public static bool cb(CSVReader csvReader, Data data, ref uint key)
 		{
@@ -62,6 +63,9 @@ public class SETable : Singleton<SETable>, IDataTable
 
 	public UIntKeyTable<Data> seTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTableFromInternal(string encrypted_csv_text)
 	{
 		string csv_text = DataTableManager.Decrypt(encrypted_csv_text);
@@ -70,7 +74,7 @@ public class SETable : Singleton<SETable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		seTable = TableUtility.CreateUIntKeyTable<Data>(csv_text, Data.cb, "id,priority,intervalLimit,volumeOffset,randomPitch,dopplerLevel,minDistance,maxDistance,limitNum,cullingType", null);
+		seTable = TableUtility.CreateUIntKeyTable<Data>(csv_text, Data.cb, "id,priority,intervalLimit,volumeOffset,randomPitch,dopplerLevel,minDistance,maxDistance,limitNum,cullingType");
 		seTable.TrimExcess();
 	}
 

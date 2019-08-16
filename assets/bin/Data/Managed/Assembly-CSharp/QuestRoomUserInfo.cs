@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class QuestRoomUserInfo
+public class QuestRoomUserInfo : MonoBehaviour
 {
 	private delegate bool TypeCondition(EQUIPMENT_TYPE type);
 
@@ -28,9 +28,15 @@ public class QuestRoomUserInfo
 
 	public void LoadModel(int index, CharaInfo user_info)
 	{
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 		if (user_info == null)
 		{
 			if (index <= 3 && index >= 0)
@@ -40,79 +46,99 @@ public class QuestRoomUserInfo
 			DeleteModel();
 			userIndex = -1;
 			userInfo = null;
+			return;
 		}
-		else
+		userIndex = index;
+		userInfo = user_info;
+		if (index <= 3)
 		{
-			userIndex = index;
-			userInfo = user_info;
-			if (index <= 3)
+			UITexture componentInChildren = this.GetComponentInChildren<UITexture>();
+			if (MonoBehaviourSingleton<OutGameSettingsManager>.I.questSelect.isRightDepthForward)
 			{
-				UITexture componentInChildren = this.GetComponentInChildren<UITexture>();
-				if (MonoBehaviourSingleton<OutGameSettingsManager>.I.questSelect.isRightDepthForward)
-				{
-					componentInChildren.depth = index;
-				}
-				else
-				{
-					componentInChildren.depth = 3 - index;
-				}
-				renderTexture = UIRenderTexture.Get(componentInChildren, -1f, false, -1);
-				renderTexture.nearClipPlane = 4f;
-				model = Utility.CreateGameObject("PlayerModel", renderTexture.modelTransform, -1);
-				model.set_localPosition(new Vector3(0f, -1.1f, 8f));
-				model.set_eulerAngles(new Vector3(0f, 180f, 0f));
-				this.StartCoroutine(Loading());
+				componentInChildren.depth = index;
 			}
+			else
+			{
+				componentInChildren.depth = 3 - index;
+			}
+			renderTexture = UIRenderTexture.Get(componentInChildren);
+			renderTexture.nearClipPlane = 4f;
+			if (userInfo.sex == 1 && renderTexture.modelTransform != null && MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerFemaleCameraOffsetY != 0f)
+			{
+				Transform modelTransform = renderTexture.modelTransform;
+				Vector3 localPosition = renderTexture.modelTransform.get_localPosition();
+				float x = localPosition.x;
+				Vector3 localPosition2 = renderTexture.modelTransform.get_localPosition();
+				float num = localPosition2.y + MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerFemaleCameraOffsetY;
+				Vector3 localPosition3 = renderTexture.modelTransform.get_localPosition();
+				modelTransform.set_localPosition(new Vector3(x, num, localPosition3.z));
+			}
+			model = Utility.CreateGameObject("PlayerModel", renderTexture.modelTransform);
+			model.set_localPosition(new Vector3(0f, -1.1f, 8f));
+			model.set_eulerAngles(new Vector3(0f, 180f, 0f));
+			this.StartCoroutine(Loading());
 		}
 	}
 
 	private IEnumerator Loading()
 	{
 		renderTexture.enableTexture = false;
-		if (userInfo != null && userIndex >= 0)
+		if (userInfo == null || userIndex < 0)
 		{
-			bool is_owner = userInfo.userId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
-			foreach (Transform item in model)
+			yield break;
+		}
+		bool is_owner = userInfo.userId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
+		IEnumerator enumerator = model.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
 			{
-				Transform t = item;
-				Object.Destroy(t.get_gameObject());
+				Transform val = enumerator.Current;
+				Object.Destroy(val.get_gameObject());
 			}
-			PlayerLoadInfo load_info = new PlayerLoadInfo();
-			load_info.Apply(userInfo, true, true, true, true);
-			bool wait = true;
-			loader = model.get_gameObject().AddComponent<PlayerLoader>();
-			loader.StartLoad(load_info, renderTexture.renderLayer, 90, false, false, false, false, false, false, true, true, SHADER_TYPE.UI, delegate
+		}
+		finally
+		{
+			IDisposable disposable;
+			IDisposable disposable2 = disposable = (enumerator as IDisposable);
+			if (disposable != null)
 			{
-				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-				((_003CLoading_003Ec__Iterator105)/*Error near IL_0168: stateMachine*/)._003Cwait_003E__4 = false;
-				float num = (((_003CLoading_003Ec__Iterator105)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.userInfo.sex != 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale;
-				((_003CLoading_003Ec__Iterator105)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().set_localScale(((_003CLoading_003Ec__Iterator105)/*Error near IL_0168: stateMachine*/)._003C_003Ef__this.loader.get_transform().get_localScale().Mul(new Vector3(num, num, num)));
-			}, true, -1);
-			int voice_id = -1;
-			if (!is_owner)
-			{
-				voice_id = loader.GetVoiceId(ACTION_VOICE_EX_ID.ALLIVE_01);
-				LoadingQueue lo_queue = new LoadingQueue(this);
-				lo_queue.CacheActionVoice(voice_id, null);
-				while (lo_queue.IsLoading())
-				{
-					yield return (object)null;
-				}
+				disposable2.Dispose();
 			}
-			while (wait)
+		}
+		PlayerLoadInfo load_info = new PlayerLoadInfo();
+		load_info.Apply(userInfo, need_weapon: true, need_helm: true, need_leg: true, is_priority_visual_equip: true);
+		bool wait = true;
+		loader = model.get_gameObject().AddComponent<PlayerLoader>();
+		loader.StartLoad(load_info, renderTexture.renderLayer, 90, need_anim_event: false, need_foot_stamp: false, need_shadow: false, enable_light_probes: false, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.UI, delegate
+		{
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			wait = false;
+			float num = (userInfo.sex != 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale;
+			loader.get_transform().set_localScale(loader.get_transform().get_localScale().Mul(new Vector3(num, num, num)));
+		});
+		int voice_id = -1;
+		if (!is_owner)
+		{
+			voice_id = loader.GetVoiceId(ACTION_VOICE_EX_ID.ALLIVE_01);
+			LoadingQueue lo_queue = new LoadingQueue(this);
+			lo_queue.CacheActionVoice(voice_id);
+			while (lo_queue.IsLoading())
 			{
-				yield return (object)null;
+				yield return null;
 			}
-			animCtrl = PlayerAnimCtrl.Get(loader.animator, PlayerAnimCtrl.battleAnims[load_info.weaponModelID / 1000], null, OnAnimChange, OnAnimEnd);
-			renderTexture.enableTexture = true;
-			if (voice_id > 0)
-			{
-				SoundManager.PlayActionVoice(voice_id, 1f, 0u, null, null);
-			}
+		}
+		while (wait)
+		{
+			yield return null;
+		}
+		animCtrl = PlayerAnimCtrl.Get(loader.animator, PlayerAnimCtrl.battleAnims[load_info.weaponModelID / 1000], null, OnAnimChange, OnAnimEnd);
+		renderTexture.enableTexture = true;
+		if (voice_id > 0)
+		{
+			SoundManager.PlayActionVoice(voice_id);
 		}
 	}
 
@@ -120,14 +146,12 @@ public class QuestRoomUserInfo
 	{
 		if (!(animCtrl == null))
 		{
-			animCtrl.Play(anim, false);
+			animCtrl.Play(anim);
 		}
 	}
 
 	private void OnAnimChange(PlayerAnimCtrl anim_ctrl, PLCA anim)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null))
 		{
 			bool active = anim_ctrl.IsPlaying(PlayerAnimCtrl.battleAnims);
@@ -152,6 +176,10 @@ public class QuestRoomUserInfo
 
 	public bool IsAllSameEquip(CharaInfo new_info)
 	{
+		if (userInfo != null && new_info != null && !userInfo.isEqualAccessory(new_info.accessory))
+		{
+			return false;
+		}
 		if (IsSameEquipItemID(new_info, (EQUIPMENT_TYPE type) => type < EQUIPMENT_TYPE.ARMOR) && IsSameEquipItemID(new_info, (EQUIPMENT_TYPE type) => type == EQUIPMENT_TYPE.ARMOR) && IsSameEquipItemID(new_info, (EQUIPMENT_TYPE type) => type == EQUIPMENT_TYPE.HELM) && IsSameEquipItemID(new_info, (EQUIPMENT_TYPE type) => type == EQUIPMENT_TYPE.ARM) && IsSameEquipItemID(new_info, (EQUIPMENT_TYPE type) => type == EQUIPMENT_TYPE.LEG))
 		{
 			return true;
@@ -190,7 +218,7 @@ public class QuestRoomUserInfo
 
 	private bool IsSameEquipItemID(CharaInfo new_info, TypeCondition condition)
 	{
-		return GetEquipItemID(condition, null) == GetEquipItemID(condition, new_info);
+		return GetEquipItemID(condition) == GetEquipItemID(condition, new_info);
 	}
 
 	private void OnDisable()
@@ -200,7 +228,6 @@ public class QuestRoomUserInfo
 
 	public void DeleteModel()
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		if (!AppMain.isApplicationQuit)
 		{
 			if (renderTexture != null)
@@ -220,7 +247,6 @@ public class QuestRoomUserInfo
 
 	public void SetOnEmotion(RoomEmotion.OnEmotion on_emotion, Action anim_end_callback, UIChatItem[] target)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		RoomEmotion roomEmotion = this.GetComponent<RoomEmotion>();
 		if (roomEmotion == null)
 		{

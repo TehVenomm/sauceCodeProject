@@ -1,5 +1,6 @@
-package jp.colopl.iab;
+package p018jp.colopl.iab;
 
+/* renamed from: jp.colopl.iab.IabException */
 public class IabException extends Exception {
     IabResult mResult;
 
@@ -7,16 +8,16 @@ public class IabException extends Exception {
         this(new IabResult(i, str));
     }
 
-    public IabException(int i, String str, Exception exception) {
-        this(new IabResult(i, str), exception);
+    public IabException(int i, String str, Exception exc) {
+        this(new IabResult(i, str), exc);
     }
 
     public IabException(IabResult iabResult) {
-        this(iabResult, null);
+        this(iabResult, (Exception) null);
     }
 
-    public IabException(IabResult iabResult, Exception exception) {
-        super(iabResult.getMessage(), exception);
+    public IabException(IabResult iabResult, Exception exc) {
+        super(iabResult.getMessage(), exc);
         this.mResult = iabResult;
     }
 

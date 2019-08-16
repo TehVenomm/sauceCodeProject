@@ -1,173 +1,73 @@
 package com.crashlytics.android.core;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.content.pm.PackageInfo;
-import android.view.View;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.util.Log;
 import com.appsflyer.share.Constants;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.core.internal.CrashEventDataProvider;
-import com.crashlytics.android.core.internal.models.SessionEventData;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.Kit;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.common.Crash.FatalException;
-import io.fabric.sdk.android.services.common.Crash.LoggedException;
-import io.fabric.sdk.android.services.common.ExecutorUtils;
-import io.fabric.sdk.android.services.common.IdManager;
-import io.fabric.sdk.android.services.concurrency.DependsOn;
-import io.fabric.sdk.android.services.concurrency.Priority;
-import io.fabric.sdk.android.services.concurrency.PriorityCallable;
-import io.fabric.sdk.android.services.concurrency.Task;
-import io.fabric.sdk.android.services.network.DefaultHttpRequestFactory;
-import io.fabric.sdk.android.services.network.HttpMethod;
-import io.fabric.sdk.android.services.network.HttpRequest;
-import io.fabric.sdk.android.services.network.HttpRequestFactory;
-import io.fabric.sdk.android.services.network.PinningInfoProvider;
-import io.fabric.sdk.android.services.persistence.FileStoreImpl;
-import io.fabric.sdk.android.services.persistence.PreferenceStore;
-import io.fabric.sdk.android.services.persistence.PreferenceStoreImpl;
-import io.fabric.sdk.android.services.settings.PromptSettingsData;
-import io.fabric.sdk.android.services.settings.SessionSettingsData;
-import io.fabric.sdk.android.services.settings.Settings;
-import io.fabric.sdk.android.services.settings.Settings.SettingsAccess;
-import io.fabric.sdk.android.services.settings.SettingsData;
-import java.io.File;
+import com.crashlytics.android.answers.AppMeasurementEventLogger;
+import com.crashlytics.android.answers.EventLogger;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import javax.net.ssl.HttpsURLConnection;
+import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.Kit;
+import p017io.fabric.sdk.android.services.common.ApiKey;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.common.DataCollectionArbiter;
+import p017io.fabric.sdk.android.services.common.ExecutorUtils;
+import p017io.fabric.sdk.android.services.common.FirebaseInfo;
+import p017io.fabric.sdk.android.services.common.IdManager;
+import p017io.fabric.sdk.android.services.concurrency.DependsOn;
+import p017io.fabric.sdk.android.services.concurrency.Priority;
+import p017io.fabric.sdk.android.services.concurrency.PriorityCallable;
+import p017io.fabric.sdk.android.services.concurrency.Task;
+import p017io.fabric.sdk.android.services.concurrency.UnmetDependencyException;
+import p017io.fabric.sdk.android.services.network.DefaultHttpRequestFactory;
+import p017io.fabric.sdk.android.services.network.HttpMethod;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
+import p017io.fabric.sdk.android.services.network.HttpRequestFactory;
+import p017io.fabric.sdk.android.services.persistence.FileStoreImpl;
+import p017io.fabric.sdk.android.services.persistence.PreferenceStoreImpl;
+import p017io.fabric.sdk.android.services.settings.Settings;
+import p017io.fabric.sdk.android.services.settings.SettingsData;
 
-@DependsOn({CrashEventDataProvider.class})
+@DependsOn({CrashlyticsNdkDataProvider.class})
 public class CrashlyticsCore extends Kit<Void> {
     static final float CLS_DEFAULT_PROCESS_DELAY = 1.0f;
-    static final String COLLECT_CUSTOM_KEYS = "com.crashlytics.CollectCustomKeys";
-    static final String COLLECT_CUSTOM_LOGS = "com.crashlytics.CollectCustomLogs";
-    static final String CRASHLYTICS_API_ENDPOINT = "com.crashlytics.ApiEndpoint";
     static final String CRASHLYTICS_REQUIRE_BUILD_ID = "com.crashlytics.RequireBuildId";
     static final boolean CRASHLYTICS_REQUIRE_BUILD_ID_DEFAULT = true;
+    static final String CRASH_MARKER_FILE_NAME = "crash_marker";
     static final int DEFAULT_MAIN_HANDLER_TIMEOUT_SEC = 4;
     private static final String INITIALIZATION_MARKER_FILE_NAME = "initialization_marker";
     static final int MAX_ATTRIBUTES = 64;
     static final int MAX_ATTRIBUTE_SIZE = 1024;
-    private static final String PREF_ALWAYS_SEND_REPORTS_KEY = "always_send_reports_opt_in";
-    private static final boolean SHOULD_PROMPT_BEFORE_SENDING_REPORTS_DEFAULT = false;
-    public static final String TAG = "Fabric";
+    private static final String MISSING_BUILD_ID_MSG = "The Crashlytics build ID is missing. This occurs when Crashlytics tooling is absent from your app's build configuration. Please review Crashlytics onboarding instructions and ensure you have a valid Crashlytics account.";
+    private static final String PREFERENCE_STORE_NAME = "com.crashlytics.android.core.CrashlyticsCore";
+    public static final String TAG = "CrashlyticsCore";
     private final ConcurrentHashMap<String, String> attributes;
-    private String buildId;
+    private CrashlyticsBackgroundWorker backgroundWorker;
+    private CrashlyticsController controller;
+    private CrashlyticsFileMarker crashMarker;
+    private CrashlyticsNdkDataProvider crashlyticsNdkDataProvider;
     private float delay;
     private boolean disabled;
-    private CrashlyticsExecutorServiceWrapper executorServiceWrapper;
-    private CrashEventDataProvider externalCrashEventDataProvider;
-    private CrashlyticsUncaughtExceptionHandler handler;
     private HttpRequestFactory httpRequestFactory;
-    private File initializationMarkerFile;
-    private String installerPackageName;
+    /* access modifiers changed from: private */
+    public CrashlyticsFileMarker initializationMarker;
     private CrashlyticsListener listener;
-    private String packageName;
     private final PinningInfoProvider pinningInfo;
     private final long startTime;
     private String userEmail;
     private String userId;
     private String userName;
-    private String versionCode;
-    private String versionName;
-
-    /* renamed from: com.crashlytics.android.core.CrashlyticsCore$1 */
-    class C03091 extends PriorityCallable<Void> {
-        C03091() {
-        }
-
-        public Void call() throws Exception {
-            return CrashlyticsCore.this.doInBackground();
-        }
-
-        public Priority getPriority() {
-            return Priority.IMMEDIATE;
-        }
-    }
-
-    /* renamed from: com.crashlytics.android.core.CrashlyticsCore$2 */
-    class C03102 implements Callable<Void> {
-        C03102() {
-        }
-
-        public Void call() throws Exception {
-            CrashlyticsCore.this.initializationMarkerFile.createNewFile();
-            Fabric.getLogger().mo4289d("Fabric", "Initialization marker file created.");
-            return null;
-        }
-    }
-
-    /* renamed from: com.crashlytics.android.core.CrashlyticsCore$3 */
-    class C03113 implements Callable<Boolean> {
-        C03113() {
-        }
-
-        public Boolean call() throws Exception {
-            try {
-                boolean delete = CrashlyticsCore.this.initializationMarkerFile.delete();
-                Fabric.getLogger().mo4289d("Fabric", "Initialization marker file removed: " + delete);
-                return Boolean.valueOf(delete);
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Problem encountered deleting Crashlytics initialization marker.", e);
-                return Boolean.valueOf(false);
-            }
-        }
-    }
-
-    /* renamed from: com.crashlytics.android.core.CrashlyticsCore$4 */
-    class C03124 implements Callable<Boolean> {
-        C03124() {
-        }
-
-        public Boolean call() throws Exception {
-            return Boolean.valueOf(CrashlyticsCore.this.initializationMarkerFile.exists());
-        }
-    }
-
-    /* renamed from: com.crashlytics.android.core.CrashlyticsCore$5 */
-    class C03135 implements SettingsAccess<Boolean> {
-        C03135() {
-        }
-
-        public Boolean usingSettings(SettingsData settingsData) {
-            boolean z = false;
-            if (!settingsData.featuresData.promptEnabled) {
-                return Boolean.valueOf(false);
-            }
-            if (!CrashlyticsCore.this.shouldSendReportsWithoutPrompting()) {
-                z = true;
-            }
-            return Boolean.valueOf(z);
-        }
-    }
-
-    /* renamed from: com.crashlytics.android.core.CrashlyticsCore$6 */
-    class C03146 implements SettingsAccess<Boolean> {
-        C03146() {
-        }
-
-        public Boolean usingSettings(SettingsData settingsData) {
-            boolean z = true;
-            Activity currentActivity = CrashlyticsCore.this.getFabric().getCurrentActivity();
-            if (!(currentActivity == null || currentActivity.isFinishing() || !CrashlyticsCore.this.shouldPromptUserBeforeSendingCrashReports())) {
-                z = CrashlyticsCore.this.getSendDecisionFromUser(currentActivity, settingsData.promptData);
-            }
-            return Boolean.valueOf(z);
-        }
-    }
 
     public static class Builder {
         private float delay = -1.0f;
@@ -210,41 +110,40 @@ public class CrashlyticsCore extends Kit<Void> {
         }
 
         @Deprecated
-        public Builder pinningInfo(PinningInfoProvider pinningInfoProvider) {
-            if (pinningInfoProvider == null) {
+        public Builder pinningInfo(PinningInfoProvider pinningInfoProvider2) {
+            if (pinningInfoProvider2 == null) {
                 throw new IllegalArgumentException("pinningInfoProvider must not be null.");
             } else if (this.pinningInfoProvider != null) {
                 throw new IllegalStateException("pinningInfoProvider already set.");
             } else {
-                this.pinningInfoProvider = pinningInfoProvider;
+                this.pinningInfoProvider = pinningInfoProvider2;
                 return this;
             }
         }
     }
 
-    private class OptInLatch {
-        private final CountDownLatch latch;
-        private boolean send;
+    private static final class CrashMarkerCheck implements Callable<Boolean> {
+        private final CrashlyticsFileMarker crashMarker;
 
-        private OptInLatch() {
-            this.send = false;
-            this.latch = new CountDownLatch(1);
+        public CrashMarkerCheck(CrashlyticsFileMarker crashlyticsFileMarker) {
+            this.crashMarker = crashlyticsFileMarker;
         }
 
-        void await() {
-            try {
-                this.latch.await();
-            } catch (InterruptedException e) {
+        public Boolean call() throws Exception {
+            if (!this.crashMarker.isPresent()) {
+                return Boolean.FALSE;
             }
+            Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Found previous crash marker.");
+            this.crashMarker.remove();
+            return Boolean.TRUE;
+        }
+    }
+
+    private static final class NoOpListener implements CrashlyticsListener {
+        private NoOpListener() {
         }
 
-        boolean getOptIn() {
-            return this.send;
-        }
-
-        void setOptIn(boolean z) {
-            this.send = z;
-            this.latch.countDown();
+        public void crashlyticsDidDetectCrashDuringPreviousExecution() {
         }
     }
 
@@ -260,49 +159,66 @@ public class CrashlyticsCore extends Kit<Void> {
         this.userId = null;
         this.userEmail = null;
         this.userName = null;
-        this.attributes = new ConcurrentHashMap();
-        this.startTime = System.currentTimeMillis();
         this.delay = f;
+        if (crashlyticsListener == null) {
+            crashlyticsListener = new NoOpListener();
+        }
         this.listener = crashlyticsListener;
         this.pinningInfo = pinningInfoProvider;
         this.disabled = z;
-        this.executorServiceWrapper = new CrashlyticsExecutorServiceWrapper(executorService);
+        this.backgroundWorker = new CrashlyticsBackgroundWorker(executorService);
+        this.attributes = new ConcurrentHashMap<>();
+        this.startTime = System.currentTimeMillis();
     }
 
-    private int dipsToPixels(float f, int i) {
-        return (int) (((float) i) * f);
+    private void checkForPreviousCrash() {
+        if (Boolean.TRUE.equals((Boolean) this.backgroundWorker.submitAndWait(new CrashMarkerCheck(this.crashMarker)))) {
+            try {
+                this.listener.crashlyticsDidDetectCrashDuringPreviousExecution();
+            } catch (Exception e) {
+                Fabric.getLogger().mo20972e(TAG, "Exception thrown by CrashlyticsListener while notifying of previous crash.", e);
+            }
+        }
     }
 
     private void doLog(int i, String str, String str2) {
         if (!this.disabled && ensureFabricWithCalled("prior to logging messages.")) {
-            this.handler.writeToLog(System.currentTimeMillis() - this.startTime, formatLogMessage(i, str, str2));
+            this.controller.writeToLog(System.currentTimeMillis() - this.startTime, formatLogMessage(i, str, str2));
         }
     }
 
     private static boolean ensureFabricWithCalled(String str) {
         CrashlyticsCore instance = getInstance();
-        if (instance != null && instance.handler != null) {
+        if (instance != null && instance.controller != null) {
             return true;
         }
-        Fabric.getLogger().mo4292e("Fabric", "Crashlytics must be initialized by calling Fabric.with(Context) " + str, null);
+        Fabric.getLogger().mo20972e(TAG, "Crashlytics must be initialized by calling Fabric.with(Context) " + str, null);
         return false;
     }
 
     private void finishInitSynchronously() {
-        Callable c03091 = new C03091();
+        C05191 r1 = new PriorityCallable<Void>() {
+            public Void call() throws Exception {
+                return CrashlyticsCore.this.doInBackground();
+            }
+
+            public Priority getPriority() {
+                return Priority.IMMEDIATE;
+            }
+        };
         for (Task addDependency : getDependencies()) {
-            c03091.addDependency(addDependency);
+            r1.addDependency(addDependency);
         }
-        Future submit = getFabric().getExecutorService().submit(c03091);
-        Fabric.getLogger().mo4289d("Fabric", "Crashlytics detected incomplete initialization on previous app launch. Will initialize synchronously.");
+        Future submit = getFabric().getExecutorService().submit(r1);
+        Fabric.getLogger().mo20969d(TAG, "Crashlytics detected incomplete initialization on previous app launch. Will initialize synchronously.");
         try {
             submit.get(4, TimeUnit.SECONDS);
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Crashlytics was interrupted during initialization.", e);
-        } catch (Throwable e2) {
-            Fabric.getLogger().mo4292e("Fabric", "Problem encountered during Crashlytics initialization.", e2);
-        } catch (Throwable e22) {
-            Fabric.getLogger().mo4292e("Fabric", "Crashlytics timed out during initialization.", e22);
+        } catch (InterruptedException e) {
+            Fabric.getLogger().mo20972e(TAG, "Crashlytics was interrupted during initialization.", e);
+        } catch (ExecutionException e2) {
+            Fabric.getLogger().mo20972e(TAG, "Problem encountered during Crashlytics initialization.", e2);
+        } catch (TimeoutException e3) {
+            Fabric.getLogger().mo20972e(TAG, "Crashlytics timed out during initialization.", e3);
         }
     }
 
@@ -314,91 +230,33 @@ public class CrashlyticsCore extends Kit<Void> {
         return (CrashlyticsCore) Fabric.getKit(CrashlyticsCore.class);
     }
 
-    private boolean getSendDecisionFromUser(Activity activity, PromptSettingsData promptSettingsData) {
-        final DialogStringResolver dialogStringResolver = new DialogStringResolver(activity, promptSettingsData);
-        final OptInLatch optInLatch = new OptInLatch();
-        final Activity activity2 = activity;
-        final PromptSettingsData promptSettingsData2 = promptSettingsData;
-        activity.runOnUiThread(new Runnable() {
-
-            /* renamed from: com.crashlytics.android.core.CrashlyticsCore$7$1 */
-            class C03151 implements OnClickListener {
-                C03151() {
-                }
-
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    optInLatch.setOptIn(true);
-                    dialogInterface.dismiss();
-                }
-            }
-
-            /* renamed from: com.crashlytics.android.core.CrashlyticsCore$7$2 */
-            class C03162 implements OnClickListener {
-                C03162() {
-                }
-
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    optInLatch.setOptIn(false);
-                    dialogInterface.dismiss();
-                }
-            }
-
-            /* renamed from: com.crashlytics.android.core.CrashlyticsCore$7$3 */
-            class C03173 implements OnClickListener {
-                C03173() {
-                }
-
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    CrashlyticsCore.this.setShouldSendUserReportsWithoutPrompting(true);
-                    optInLatch.setOptIn(true);
-                    dialogInterface.dismiss();
-                }
-            }
-
-            public void run() {
-                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity2);
-                OnClickListener c03151 = new C03151();
-                float f = activity2.getResources().getDisplayMetrics().density;
-                int access$300 = CrashlyticsCore.this.dipsToPixels(f, 5);
-                View textView = new TextView(activity2);
-                textView.setAutoLinkMask(15);
-                textView.setText(dialogStringResolver.getMessage());
-                textView.setTextAppearance(activity2, 16973892);
-                textView.setPadding(access$300, access$300, access$300, access$300);
-                textView.setFocusable(false);
-                View scrollView = new ScrollView(activity2);
-                scrollView.setPadding(CrashlyticsCore.this.dipsToPixels(f, 14), CrashlyticsCore.this.dipsToPixels(f, 2), CrashlyticsCore.this.dipsToPixels(f, 10), CrashlyticsCore.this.dipsToPixels(f, 12));
-                scrollView.addView(textView);
-                builder.setView(scrollView).setTitle(dialogStringResolver.getTitle()).setCancelable(false).setNeutralButton(dialogStringResolver.getSendButtonTitle(), c03151);
-                if (promptSettingsData2.showCancelButton) {
-                    builder.setNegativeButton(dialogStringResolver.getCancelButtonTitle(), new C03162());
-                }
-                if (promptSettingsData2.showAlwaysSendButton) {
-                    builder.setPositiveButton(dialogStringResolver.getAlwaysSendButtonTitle(), new C03173());
-                }
-                builder.show();
-            }
-        });
-        Fabric.getLogger().mo4289d("Fabric", "Waiting for user opt-in.");
-        optInLatch.await();
-        return optInLatch.getOptIn();
-    }
-
-    private boolean isRequiringBuildId(Context context) {
-        return CommonUtils.getBooleanResourceValue(context, CRASHLYTICS_REQUIRE_BUILD_ID, true);
-    }
-
-    static void recordFatalExceptionEvent(String str) {
-        Answers answers = (Answers) Fabric.getKit(Answers.class);
-        if (answers != null) {
-            answers.onException(new FatalException(str));
-        }
-    }
-
-    static void recordLoggedExceptionEvent(String str) {
-        Answers answers = (Answers) Fabric.getKit(Answers.class);
-        if (answers != null) {
-            answers.onException(new LoggedException(str));
+    static boolean isBuildIdValid(String str, boolean z) {
+        if (!z) {
+            Fabric.getLogger().mo20969d(TAG, "Configured not to require a build ID.");
+            return true;
+        } else if (!CommonUtils.isNullOrEmpty(str)) {
+            return true;
+        } else {
+            Log.e(TAG, AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
+            Log.e(TAG, ".     |  | ");
+            Log.e(TAG, ".     |  |");
+            Log.e(TAG, ".     |  |");
+            Log.e(TAG, ".   \\ |  | /");
+            Log.e(TAG, ".    \\    /");
+            Log.e(TAG, ".     \\  /");
+            Log.e(TAG, ".      \\/");
+            Log.e(TAG, AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
+            Log.e(TAG, MISSING_BUILD_ID_MSG);
+            Log.e(TAG, AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
+            Log.e(TAG, ".      /\\");
+            Log.e(TAG, ".     /  \\");
+            Log.e(TAG, ".    /    \\");
+            Log.e(TAG, ".   / |  | \\");
+            Log.e(TAG, ".     |  |");
+            Log.e(TAG, ".     |  |");
+            Log.e(TAG, ".     |  |");
+            Log.e(TAG, AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
+            return false;
         }
     }
 
@@ -406,177 +264,120 @@ public class CrashlyticsCore extends Kit<Void> {
         if (str == null) {
             return str;
         }
-        str = str.trim();
-        return str.length() > 1024 ? str.substring(0, 1024) : str;
-    }
-
-    private void setAndValidateKitProperties(Context context, String str) {
-        PinningInfoProvider crashlyticsPinningInfoProvider = this.pinningInfo != null ? new CrashlyticsPinningInfoProvider(this.pinningInfo) : null;
-        this.httpRequestFactory = new DefaultHttpRequestFactory(Fabric.getLogger());
-        this.httpRequestFactory.setPinningInfoProvider(crashlyticsPinningInfoProvider);
-        try {
-            this.packageName = context.getPackageName();
-            this.installerPackageName = getIdManager().getInstallerPackageName();
-            Fabric.getLogger().mo4289d("Fabric", "Installer package name is: " + this.installerPackageName);
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(this.packageName, 0);
-            this.versionCode = Integer.toString(packageInfo.versionCode);
-            this.versionName = packageInfo.versionName == null ? IdManager.DEFAULT_VERSION_NAME : packageInfo.versionName;
-            this.buildId = CommonUtils.resolveBuildId(context);
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Error setting up app properties", e);
-        }
-        getIdManager().getBluetoothMacAddress();
-        getBuildIdValidator(this.buildId, isRequiringBuildId(context)).validate(str, this.packageName);
-    }
-
-    boolean canSendWithUserApproval() {
-        return ((Boolean) Settings.getInstance().withSettings(new C03146(), Boolean.valueOf(true))).booleanValue();
+        String trim = str.trim();
+        return trim.length() > 1024 ? trim.substring(0, 1024) : trim;
     }
 
     public void crash() {
         new CrashTest().indexOutOfBounds();
     }
 
-    boolean didPreviousInitializationComplete() {
-        return ((Boolean) this.executorServiceWrapper.executeSyncLoggingException(new C03124())).booleanValue();
+    /* access modifiers changed from: 0000 */
+    public void createCrashMarker() {
+        this.crashMarker.create();
     }
 
-    protected Void doInBackground() {
-        Throwable e;
-        Object obj = 1;
-        Object obj2 = null;
+    /* access modifiers changed from: 0000 */
+    public boolean didPreviousInitializationFail() {
+        return this.initializationMarker.isPresent();
+    }
+
+    /* access modifiers changed from: protected */
+    public Void doInBackground() {
         markInitializationStarted();
-        this.handler.cleanInvalidTempFiles();
+        this.controller.cleanInvalidTempFiles();
         try {
+            this.controller.registerDevicePowerStateListener();
             SettingsData awaitSettingsData = Settings.getInstance().awaitSettingsData();
             if (awaitSettingsData == null) {
-                Fabric.getLogger().mo4302w("Fabric", "Received null settings, skipping initialization!");
-                markInitializationComplete();
-                return null;
-            }
-            if (awaitSettingsData.featuresData.collectReports) {
-                try {
-                    this.handler.finalizeSessions();
-                    CreateReportSpiCall createReportSpiCall = getCreateReportSpiCall(awaitSettingsData);
-                    if (createReportSpiCall != null) {
-                        new ReportUploader(createReportSpiCall).uploadReports(this.delay);
-                    } else {
-                        Fabric.getLogger().mo4302w("Fabric", "Unable to create a call to upload reports.");
-                    }
-                } catch (Exception e2) {
-                    e = e2;
-                    obj = null;
-                    Fabric.getLogger().mo4292e("Fabric", "Error dealing with settings", e);
-                    obj2 = obj;
-                    if (obj2 != null) {
-                        try {
-                            Fabric.getLogger().mo4289d("Fabric", "Crash reporting disabled.");
-                        } catch (Throwable e3) {
-                            Fabric.getLogger().mo4292e("Fabric", "Problem encountered during Crashlytics initialization.", e3);
-                        } finally {
-                            markInitializationComplete();
-                        }
-                    }
+                Fabric.getLogger().mo20982w(TAG, "Received null settings, skipping report submission!");
+            } else {
+                this.controller.registerAnalyticsEventListener(awaitSettingsData);
+                if (!awaitSettingsData.featuresData.collectReports) {
+                    Fabric.getLogger().mo20969d(TAG, "Collection of crash reports disabled in Crashlytics settings.");
                     markInitializationComplete();
-                    return null;
+                } else if (!DataCollectionArbiter.getInstance(getContext()).isDataCollectionEnabled()) {
+                    Fabric.getLogger().mo20969d(TAG, "Automatic collection of crash reports disabled by Firebase settings.");
+                    markInitializationComplete();
+                } else {
+                    CrashlyticsNdkData nativeCrashData = getNativeCrashData();
+                    if (nativeCrashData != null && !this.controller.finalizeNativeReport(nativeCrashData)) {
+                        Fabric.getLogger().mo20969d(TAG, "Could not finalize previous NDK sessions.");
+                    }
+                    if (!this.controller.finalizeSessions(awaitSettingsData.sessionData)) {
+                        Fabric.getLogger().mo20969d(TAG, "Could not finalize previous sessions.");
+                    }
+                    this.controller.submitAllReports(this.delay, awaitSettingsData);
+                    markInitializationComplete();
                 }
             }
-            int i = 1;
-            if (obj2 != null) {
-                Fabric.getLogger().mo4289d("Fabric", "Crash reporting disabled.");
-            }
+        } catch (Exception e) {
+            Fabric.getLogger().mo20972e(TAG, "Crashlytics encountered a problem during asynchronous initialization.", e);
+        } finally {
             markInitializationComplete();
-            return null;
-        } catch (Exception e4) {
-            e3 = e4;
-            Fabric.getLogger().mo4292e("Fabric", "Error dealing with settings", e3);
-            obj2 = obj;
-            if (obj2 != null) {
-                Fabric.getLogger().mo4289d("Fabric", "Crash reporting disabled.");
-            }
-            markInitializationComplete();
-            return null;
         }
+        return null;
     }
 
-    Map<String, String> getAttributes() {
+    /* access modifiers changed from: 0000 */
+    public Map<String, String> getAttributes() {
         return Collections.unmodifiableMap(this.attributes);
     }
 
-    String getBuildId() {
-        return this.buildId;
-    }
-
-    BuildIdValidator getBuildIdValidator(String str, boolean z) {
-        return new BuildIdValidator(str, z);
-    }
-
-    CreateReportSpiCall getCreateReportSpiCall(SettingsData settingsData) {
-        return settingsData != null ? new DefaultCreateReportSpiCall(this, getOverridenSpiEndpoint(), settingsData.appData.reportsUrl, this.httpRequestFactory) : null;
-    }
-
-    SessionEventData getExternalCrashEventData() {
-        return this.externalCrashEventDataProvider != null ? this.externalCrashEventDataProvider.getCrashEventData() : null;
-    }
-
-    CrashlyticsUncaughtExceptionHandler getHandler() {
-        return this.handler;
+    /* access modifiers changed from: 0000 */
+    public CrashlyticsController getController() {
+        return this.controller;
     }
 
     public String getIdentifier() {
         return "com.crashlytics.sdk.android.crashlytics-core";
     }
 
-    String getInstallerPackageName() {
-        return this.installerPackageName;
-    }
-
-    String getOverridenSpiEndpoint() {
-        return CommonUtils.getStringsFileValue(getContext(), CRASHLYTICS_API_ENDPOINT);
-    }
-
-    String getPackageName() {
-        return this.packageName;
+    /* access modifiers changed from: 0000 */
+    public CrashlyticsNdkData getNativeCrashData() {
+        if (this.crashlyticsNdkDataProvider != null) {
+            return this.crashlyticsNdkDataProvider.getCrashlyticsNdkData();
+        }
+        return null;
     }
 
     public PinningInfoProvider getPinningInfoProvider() {
-        return !this.disabled ? this.pinningInfo : null;
+        if (!this.disabled) {
+            return this.pinningInfo;
+        }
+        return null;
     }
 
-    File getSdkDirectory() {
-        return new FileStoreImpl(this).getFilesDir();
+    /* access modifiers changed from: 0000 */
+    public String getUserEmail() {
+        if (getIdManager().canCollectUserIds()) {
+            return this.userEmail;
+        }
+        return null;
     }
 
-    SessionSettingsData getSessionSettingsData() {
-        SettingsData awaitSettingsData = Settings.getInstance().awaitSettingsData();
-        return awaitSettingsData == null ? null : awaitSettingsData.sessionData;
+    /* access modifiers changed from: 0000 */
+    public String getUserIdentifier() {
+        if (getIdManager().canCollectUserIds()) {
+            return this.userId;
+        }
+        return null;
     }
 
-    String getUserEmail() {
-        return getIdManager().canCollectUserIds() ? this.userEmail : null;
-    }
-
-    String getUserIdentifier() {
-        return getIdManager().canCollectUserIds() ? this.userId : null;
-    }
-
-    String getUserName() {
-        return getIdManager().canCollectUserIds() ? this.userName : null;
+    /* access modifiers changed from: 0000 */
+    public String getUserName() {
+        if (getIdManager().canCollectUserIds()) {
+            return this.userName;
+        }
+        return null;
     }
 
     public String getVersion() {
-        return "2.3.3.61";
+        return "2.6.8.32";
     }
 
-    String getVersionCode() {
-        return this.versionCode;
-    }
-
-    String getVersionName() {
-        return this.versionName;
-    }
-
-    boolean internalVerifyPinning(URL url) {
+    /* access modifiers changed from: 0000 */
+    public boolean internalVerifyPinning(URL url) {
         if (getPinningInfoProvider() == null) {
             return false;
         }
@@ -592,7 +393,7 @@ public class CrashlyticsCore extends Kit<Void> {
     }
 
     public void log(String str) {
-        doLog(3, "Fabric", str);
+        doLog(3, TAG, str);
     }
 
     public void logException(Throwable th) {
@@ -600,138 +401,105 @@ public class CrashlyticsCore extends Kit<Void> {
             return;
         }
         if (th == null) {
-            Fabric.getLogger().log(5, "Fabric", "Crashlytics is ignoring a request to log a null exception.");
+            Fabric.getLogger().log(5, TAG, "Crashlytics is ignoring a request to log a null exception.");
         } else {
-            this.handler.writeNonFatalException(Thread.currentThread(), th);
+            this.controller.writeNonFatalException(Thread.currentThread(), th);
         }
     }
 
-    void markInitializationComplete() {
-        this.executorServiceWrapper.executeAsync(new C03113());
+    /* access modifiers changed from: 0000 */
+    public void markInitializationComplete() {
+        this.backgroundWorker.submit((Callable<T>) new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                try {
+                    boolean remove = CrashlyticsCore.this.initializationMarker.remove();
+                    Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Initialization marker file removed: " + remove);
+                    return Boolean.valueOf(remove);
+                } catch (Exception e) {
+                    Fabric.getLogger().mo20972e(CrashlyticsCore.TAG, "Problem encountered deleting Crashlytics initialization marker.", e);
+                    return Boolean.valueOf(false);
+                }
+            }
+        });
     }
 
-    void markInitializationStarted() {
-        this.executorServiceWrapper.executeSyncLoggingException(new C03102());
+    /* access modifiers changed from: 0000 */
+    public void markInitializationStarted() {
+        this.backgroundWorker.submitAndWait(new Callable<Void>() {
+            public Void call() throws Exception {
+                CrashlyticsCore.this.initializationMarker.create();
+                Fabric.getLogger().mo20969d(CrashlyticsCore.TAG, "Initialization marker file created.");
+                return null;
+            }
+        });
     }
 
-    protected boolean onPreExecute() {
+    /* access modifiers changed from: protected */
+    public boolean onPreExecute() {
         return onPreExecute(super.getContext());
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    boolean onPreExecute(android.content.Context r9) {
-        /*
-        r8 = this;
-        r7 = 0;
-        r0 = r8.disabled;
-        if (r0 == 0) goto L_0x0007;
-    L_0x0005:
-        r0 = r7;
-    L_0x0006:
-        return r0;
-    L_0x0007:
-        r0 = new io.fabric.sdk.android.services.common.ApiKey;
-        r0.<init>();
-        r0 = r0.getValue(r9);
-        if (r0 != 0) goto L_0x0014;
-    L_0x0012:
-        r0 = r7;
-        goto L_0x0006;
-    L_0x0014:
-        r1 = io.fabric.sdk.android.Fabric.getLogger();
-        r2 = "Fabric";
-        r3 = new java.lang.StringBuilder;
-        r3.<init>();
-        r4 = "Initializing Crashlytics ";
-        r3 = r3.append(r4);
-        r4 = r8.getVersion();
-        r3 = r3.append(r4);
-        r3 = r3.toString();
-        r1.mo4294i(r2, r3);
-        r1 = new java.io.File;
-        r2 = r8.getSdkDirectory();
-        r3 = "initialization_marker";
-        r1.<init>(r2, r3);
-        r8.initializationMarkerFile = r1;
-        r8.setAndValidateKitProperties(r9, r0);	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
-        r5 = new com.crashlytics.android.core.SessionDataWriter;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r0 = r8.getContext();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r1 = r8.buildId;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r2 = r8.getPackageName();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r5.<init>(r0, r1, r2);	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r0 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r1 = "Fabric";
-        r2 = "Installing exception handler...";
-        r0.mo4289d(r1, r2);	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r0 = new com.crashlytics.android.core.CrashlyticsUncaughtExceptionHandler;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r1 = java.lang.Thread.getDefaultUncaughtExceptionHandler();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r2 = r8.listener;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r3 = r8.executorServiceWrapper;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r4 = r8.getIdManager();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r6 = r8;
-        r0.<init>(r1, r2, r3, r4, r5, r6);	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r8.handler = r0;	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r1 = r8.didPreviousInitializationComplete();	 Catch:{ Exception -> 0x0099, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r0 = r8.handler;	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r0.ensureOpenSessionExists();	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r0 = r8.handler;	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
-        java.lang.Thread.setDefaultUncaughtExceptionHandler(r0);	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r0 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
-        r2 = "Fabric";
-        r3 = "Successfully installed exception handler.";
-        r0.mo4289d(r2, r3);	 Catch:{ Exception -> 0x00c0, CrashlyticsMissingDependencyException -> 0x00a7 }
-    L_0x008b:
-        if (r1 == 0) goto L_0x00ae;
-    L_0x008d:
-        r0 = io.fabric.sdk.android.services.common.CommonUtils.canTryConnection(r9);	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
-        if (r0 == 0) goto L_0x00ae;
-    L_0x0093:
-        r8.finishInitSynchronously();	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
-        r0 = r7;
-        goto L_0x0006;
-    L_0x0099:
-        r0 = move-exception;
-        r1 = r7;
-    L_0x009b:
-        r2 = io.fabric.sdk.android.Fabric.getLogger();	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
-        r3 = "Fabric";
-        r4 = "There was a problem installing the exception handler.";
-        r2.mo4292e(r3, r4, r0);	 Catch:{ CrashlyticsMissingDependencyException -> 0x00a7, Exception -> 0x00b1 }
-        goto L_0x008b;
-    L_0x00a7:
-        r0 = move-exception;
-        r1 = new io.fabric.sdk.android.services.concurrency.UnmetDependencyException;
-        r1.<init>(r0);
-        throw r1;
-    L_0x00ae:
-        r0 = 1;
-        goto L_0x0006;
-    L_0x00b1:
-        r0 = move-exception;
-        r1 = io.fabric.sdk.android.Fabric.getLogger();
-        r2 = "Fabric";
-        r3 = "Crashlytics was not started due to an exception during initialization";
-        r1.mo4292e(r2, r3, r0);
-        r0 = r7;
-        goto L_0x0006;
-    L_0x00c0:
-        r0 = move-exception;
-        goto L_0x009b;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.crashlytics.android.core.CrashlyticsCore.onPreExecute(android.content.Context):boolean");
+    /* access modifiers changed from: 0000 */
+    public boolean onPreExecute(Context context) {
+        if (!DataCollectionArbiter.getInstance(context).isDataCollectionEnabled()) {
+            Fabric.getLogger().mo20969d(TAG, "Crashlytics is disabled, because data collection is disabled by Firebase.");
+            this.disabled = true;
+        }
+        if (this.disabled) {
+            return false;
+        }
+        String value = new ApiKey().getValue(context);
+        if (value == null) {
+            return false;
+        }
+        String resolveBuildId = CommonUtils.resolveBuildId(context);
+        if (!isBuildIdValid(resolveBuildId, CommonUtils.getBooleanResourceValue(context, CRASHLYTICS_REQUIRE_BUILD_ID, true))) {
+            throw new UnmetDependencyException(MISSING_BUILD_ID_MSG);
+        }
+        try {
+            Fabric.getLogger().mo20974i(TAG, "Initializing Crashlytics " + getVersion());
+            FileStoreImpl fileStoreImpl = new FileStoreImpl(this);
+            this.crashMarker = new CrashlyticsFileMarker(CRASH_MARKER_FILE_NAME, fileStoreImpl);
+            this.initializationMarker = new CrashlyticsFileMarker(INITIALIZATION_MARKER_FILE_NAME, fileStoreImpl);
+            PreferenceManager create = PreferenceManager.create(new PreferenceStoreImpl(getContext(), PREFERENCE_STORE_NAME), this);
+            CrashlyticsPinningInfoProvider crashlyticsPinningInfoProvider = this.pinningInfo != null ? new CrashlyticsPinningInfoProvider(this.pinningInfo) : null;
+            this.httpRequestFactory = new DefaultHttpRequestFactory(Fabric.getLogger());
+            this.httpRequestFactory.setPinningInfoProvider(crashlyticsPinningInfoProvider);
+            IdManager idManager = getIdManager();
+            AppData create2 = AppData.create(context, idManager, value, resolveBuildId);
+            ResourceUnityVersionProvider resourceUnityVersionProvider = new ResourceUnityVersionProvider(context, new ManifestUnityVersionProvider(context, create2.packageName));
+            DefaultAppMeasurementEventListenerRegistrar defaultAppMeasurementEventListenerRegistrar = new DefaultAppMeasurementEventListenerRegistrar(this);
+            EventLogger eventLogger = AppMeasurementEventLogger.getEventLogger(context);
+            Fabric.getLogger().mo20969d(TAG, "Installer package name is: " + create2.installerPackageName);
+            this.controller = new CrashlyticsController(this, this.backgroundWorker, this.httpRequestFactory, idManager, create, fileStoreImpl, create2, resourceUnityVersionProvider, defaultAppMeasurementEventListenerRegistrar, eventLogger);
+            boolean didPreviousInitializationFail = didPreviousInitializationFail();
+            checkForPreviousCrash();
+            this.controller.enableExceptionHandling(Thread.getDefaultUncaughtExceptionHandler(), new FirebaseInfo().isFirebaseCrashlyticsEnabled(context));
+            if (!didPreviousInitializationFail || !CommonUtils.canTryConnection(context)) {
+                Fabric.getLogger().mo20969d(TAG, "Exception handling initialization successful");
+                return true;
+            }
+            Fabric.getLogger().mo20969d(TAG, "Crashlytics did not finish previous background initialization. Initializing synchronously.");
+            finishInitSynchronously();
+            return false;
+        } catch (Exception e) {
+            Fabric.getLogger().mo20972e(TAG, "Crashlytics was not started due to an exception during initialization", e);
+            this.controller = null;
+            return false;
+        }
     }
 
     public void setBool(String str, boolean z) {
         setString(str, Boolean.toString(z));
     }
 
-    public void setDouble(String str, double d) {
-        setString(str, Double.toString(d));
+    /* access modifiers changed from: 0000 */
+    public void setCrashlyticsNdkDataProvider(CrashlyticsNdkDataProvider crashlyticsNdkDataProvider2) {
+        this.crashlyticsNdkDataProvider = crashlyticsNdkDataProvider2;
     }
 
-    void setExternalCrashEventDataProvider(CrashEventDataProvider crashEventDataProvider) {
-        this.externalCrashEventDataProvider = crashEventDataProvider;
+    public void setDouble(String str, double d) {
+        setString(str, Double.toString(d));
     }
 
     public void setFloat(String str, float f) {
@@ -745,7 +513,7 @@ public class CrashlyticsCore extends Kit<Void> {
     @Deprecated
     public void setListener(CrashlyticsListener crashlyticsListener) {
         synchronized (this) {
-            Fabric.getLogger().mo4302w("Fabric", "Use of setListener is deprecated.");
+            Fabric.getLogger().mo20982w(TAG, "Use of setListener is deprecated.");
             if (crashlyticsListener == null) {
                 throw new IllegalArgumentException("listener must not be null.");
             }
@@ -757,64 +525,53 @@ public class CrashlyticsCore extends Kit<Void> {
         setString(str, Long.toString(j));
     }
 
-    @SuppressLint({"CommitPrefEdits"})
-    void setShouldSendUserReportsWithoutPrompting(boolean z) {
-        PreferenceStore preferenceStoreImpl = new PreferenceStoreImpl(this);
-        preferenceStoreImpl.save(preferenceStoreImpl.edit().putBoolean(PREF_ALWAYS_SEND_REPORTS_KEY, z));
-    }
-
     public void setString(String str, String str2) {
-        if (!this.disabled) {
-            if (str != null) {
-                String sanitizeAttribute = sanitizeAttribute(str);
-                if (this.attributes.size() < 64 || this.attributes.containsKey(sanitizeAttribute)) {
-                    this.attributes.put(sanitizeAttribute, str2 == null ? "" : sanitizeAttribute(str2));
-                    this.handler.cacheKeyData(this.attributes);
-                    return;
-                }
-                Fabric.getLogger().mo4289d("Fabric", "Exceeded maximum number of custom attributes (64)");
-            } else if (getContext() == null || !CommonUtils.isAppDebuggable(getContext())) {
-                Fabric.getLogger().mo4292e("Fabric", "Attempting to set custom attribute with null key, ignoring.", null);
-            } else {
-                throw new IllegalArgumentException("Custom attribute key must not be null.");
-            }
+        if (this.disabled || !ensureFabricWithCalled("prior to setting keys.")) {
+            return;
         }
+        if (str == null) {
+            Context context = getContext();
+            if (context == null || !CommonUtils.isAppDebuggable(context)) {
+                Fabric.getLogger().mo20972e(TAG, "Attempting to set custom attribute with null key, ignoring.", null);
+                return;
+            }
+            throw new IllegalArgumentException("Custom attribute key must not be null.");
+        }
+        String sanitizeAttribute = sanitizeAttribute(str);
+        if (this.attributes.size() < 64 || this.attributes.containsKey(sanitizeAttribute)) {
+            this.attributes.put(sanitizeAttribute, str2 == null ? "" : sanitizeAttribute(str2));
+            this.controller.cacheKeyData(this.attributes);
+            return;
+        }
+        Fabric.getLogger().mo20969d(TAG, "Exceeded maximum number of custom attributes (64)");
     }
 
     public void setUserEmail(String str) {
-        if (!this.disabled) {
+        if (!this.disabled && ensureFabricWithCalled("prior to setting user data.")) {
             this.userEmail = sanitizeAttribute(str);
-            this.handler.cacheUserData(this.userId, this.userName, this.userEmail);
+            this.controller.cacheUserData(this.userId, this.userName, this.userEmail);
         }
     }
 
     public void setUserIdentifier(String str) {
-        if (!this.disabled) {
+        if (!this.disabled && ensureFabricWithCalled("prior to setting user data.")) {
             this.userId = sanitizeAttribute(str);
-            this.handler.cacheUserData(this.userId, this.userName, this.userEmail);
+            this.controller.cacheUserData(this.userId, this.userName, this.userEmail);
         }
     }
 
     public void setUserName(String str) {
-        if (!this.disabled) {
+        if (!this.disabled && ensureFabricWithCalled("prior to setting user data.")) {
             this.userName = sanitizeAttribute(str);
-            this.handler.cacheUserData(this.userId, this.userName, this.userEmail);
+            this.controller.cacheUserData(this.userId, this.userName, this.userEmail);
         }
-    }
-
-    boolean shouldPromptUserBeforeSendingCrashReports() {
-        return ((Boolean) Settings.getInstance().withSettings(new C03135(), Boolean.valueOf(false))).booleanValue();
-    }
-
-    boolean shouldSendReportsWithoutPrompting() {
-        return new PreferenceStoreImpl(this).get().getBoolean(PREF_ALWAYS_SEND_REPORTS_KEY, false);
     }
 
     public boolean verifyPinning(URL url) {
         try {
             return internalVerifyPinning(url);
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not verify SSL pinning", e);
+        } catch (Exception e) {
+            Fabric.getLogger().mo20972e(TAG, "Could not verify SSL pinning", e);
             return false;
         }
     }

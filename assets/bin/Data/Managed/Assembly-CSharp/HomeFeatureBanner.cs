@@ -2,7 +2,7 @@ using Network;
 using System.Collections;
 using UnityEngine;
 
-public class HomeFeatureBanner
+public class HomeFeatureBanner : MonoBehaviour
 {
 	private string MODEL_FORMAT = "NPC011_{0:000}";
 
@@ -69,7 +69,6 @@ public class HomeFeatureBanner
 
 	private void Load(int variation, int bannerId)
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 		isLoading = true;
 		this.StartCoroutine(_Load(variation, bannerId));
 	}
@@ -83,23 +82,23 @@ public class HomeFeatureBanner
 		bool loadTex = currentBannerId != bannerId;
 		if (loadModel)
 		{
-			lo_model = lo.Load(RESOURCE_CATEGORY.NPC_MODEL, string.Format(MODEL_FORMAT, variation), false);
+			lo_model = lo.Load(RESOURCE_CATEGORY.NPC_MODEL, string.Format(MODEL_FORMAT, variation));
 		}
 		if (loadTex)
 		{
-			lo_tex = lo.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetHomePointSHopBannerImageName(bannerId), false);
+			lo_tex = lo.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetHomePointSHopBannerImageName(bannerId));
 		}
 		if (lo.IsLoading())
 		{
-			yield return (object)lo.Wait();
+			yield return lo.Wait();
 		}
 		if (loadModel)
 		{
-			GameObject model = Object.Instantiate(lo_model.loadedObject) as GameObject;
-			modelTransform = model.get_transform();
-			bannerMaterial = FindBannerMaterial(model);
+			GameObject val = Object.Instantiate(lo_model.loadedObject) as GameObject;
+			modelTransform = val.get_transform();
+			bannerMaterial = FindBannerMaterial(val);
 			Reposition();
-			SetTouchEvent(model);
+			SetTouchEvent(val);
 			currentVariation = variation;
 		}
 		if (loadTex)
@@ -116,17 +115,14 @@ public class HomeFeatureBanner
 	private void SetTouchEvent(GameObject go)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Expected O, but got Unknown
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		GameObject val = new GameObject("BANNER_TOUCH_EVENT");
-		Transform val2 = val.get_transform();
-		val2.set_parent(go.get_transform());
-		val2.set_localPosition(Vector3.get_zero());
-		val2.set_localRotation(Quaternion.get_identity());
+		Transform transform = val.get_transform();
+		transform.set_parent(go.get_transform());
+		transform.set_localPosition(Vector3.get_zero());
+		transform.set_localRotation(Quaternion.get_identity());
 		SetCollider(val);
 		touchEvent = val.AddComponent<HomeStageTouchEvent>();
 	}

@@ -32,7 +32,7 @@ public class InappSubscriptionProduct extends InappBaseProduct {
 
     public void validateItem() {
         StringBuilder validateInfo = getValidateInfo();
-        if (TextUtils.isEmpty(this.period) || !(this.period.equals(ONE_MONTH) || this.period.equals(ONE_YEAR))) {
+        if (TextUtils.isEmpty(this.period) || (!this.period.equals(ONE_MONTH) && !this.period.equals(ONE_YEAR))) {
             if (validateInfo.length() > 0) {
                 validateInfo.append(", ");
             }

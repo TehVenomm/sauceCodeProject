@@ -49,7 +49,6 @@ public class ProfileTop : GameSection
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && !(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "ProfileTop"))
 		{
@@ -59,7 +58,6 @@ public class ProfileTop : GameSection
 
 	private void OnDrag(GameObject obj, Vector2 move)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && !(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "ProfileTop"))
@@ -70,7 +68,6 @@ public class ProfileTop : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -88,7 +85,7 @@ public class ProfileTop : GameSection
 		PlayerLoadInfo load_info = new PlayerLoadInfo();
 		load_info.SetupLoadInfo(equip_set, 0uL, visual_armor, visual_helm, visual_arm, visual_leg, is_show_helm);
 		OutGameSettingsManager.ProfileScene param = MonoBehaviourSingleton<OutGameSettingsManager>.I.profileScene;
-		UIRenderTexture rt = InitRenderTexture(UI.TEX_MODEL, param.cameraFieldOfView, false);
+		UIRenderTexture rt = InitRenderTexture(UI.TEX_MODEL, param.cameraFieldOfView);
 		if (!object.ReferenceEquals(rt, null))
 		{
 			rt.nearClipPlane = param.nearClip;
@@ -96,8 +93,8 @@ public class ProfileTop : GameSection
 		EnableRenderTexture(UI.TEX_MODEL);
 		SetRenderPlayerModel((Enum)UI.TEX_MODEL, load_info, PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), param.playerPos, new Vector3(0f, param.playerRot, 0f), is_show_helm, (Action<PlayerLoader>)delegate(PlayerLoader x)
 		{
-			((_003CDoInitialize_003Ec__IteratorF4)/*Error near IL_01e7: stateMachine*/)._003C_003Ef__this.playerLoader = x;
-			((_003CDoInitialize_003Ec__IteratorF4)/*Error near IL_01e7: stateMachine*/)._003Cwait_003E__0 = false;
+			playerLoader = x;
+			wait = false;
 		});
 		if (eventListener == null)
 		{
@@ -107,15 +104,15 @@ public class ProfileTop : GameSection
 		}
 		while (wait)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		SetSupportEncoding(base._transform, UI.LBL_NAME, true);
-		SetLabelText((Enum)UI.LBL_NAME, Utility.GetNameWithColoredClanTag(string.Empty, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, true, true));
+		SetSupportEncoding(base._transform, UI.LBL_NAME, isEnable: true);
+		SetLabelText((Enum)UI.LBL_NAME, Utility.GetNameWithColoredClanTag(string.Empty, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, own: true, isSameTeam: true));
 		SetLabelText((Enum)UI.LBL_USER_ID, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.code);
 		SetLabelText((Enum)UI.LBL_COMMENT, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.comment);
 		SetLabelText((Enum)UI.LBL_LEVEL, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level.ToString());
@@ -123,10 +120,8 @@ public class ProfileTop : GameSection
 		SetActive((Enum)UI.BTN_DEGREE, GameDefine.ACTIVE_DEGREE);
 		if (GameDefine.ACTIVE_DEGREE)
 		{
-			degree.Initialize(MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds, false, delegate
+			degree.Initialize(MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds, isButton: false, delegate
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				degree.get_gameObject().SetActive(false);
 				degree.get_gameObject().SetActive(true);
 			});
@@ -150,8 +145,6 @@ public class ProfileTop : GameSection
 
 	protected override void OnDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (uiTexture != null)
 		{
 			Object.Destroy(uiTexture.get_gameObject());
@@ -194,7 +187,7 @@ public class ProfileTop : GameSection
 
 	private void OnQuery_SECTION_BACK()
 	{
-		Close(UITransition.TYPE.CLOSE);
+		Close();
 	}
 
 	private void OnQuery_LOGIN_FB()
@@ -214,7 +207,7 @@ public class ProfileTop : GameSection
 				}
 				else
 				{
-					GameSection.ResumeEvent(success, null);
+					GameSection.ResumeEvent(success);
 				}
 			});
 		}
@@ -231,9 +224,9 @@ public class ProfileTop : GameSection
 					if (success)
 					{
 						MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.FACEBOOK_LOGIN);
-						GameSection.ChangeStayEvent("ACCOUNT_LOGIN", null);
+						GameSection.ChangeStayEvent("ACCOUNT_LOGIN");
 					}
-					GameSection.ResumeEvent(success, null);
+					GameSection.ResumeEvent(success);
 				});
 			}
 			else
@@ -243,14 +236,14 @@ public class ProfileTop : GameSection
 					GameSection.ChangeStayEvent("ACCOUNT_CONFLICT", ret.existInfo);
 					success = true;
 				}
-				GameSection.ResumeEvent(success, null);
+				GameSection.ResumeEvent(success);
 			}
 		});
 	}
 
 	private void OnQuery_DISCONNECT_FB()
 	{
-		GameSection.ChangeEvent("ACCOUNT_UNBIND_CONFIRM", null);
+		GameSection.ChangeEvent("ACCOUNT_UNBIND_CONFIRM");
 	}
 
 	private void OnQuery_COPY_CLIPBOARD()
@@ -275,12 +268,12 @@ public class ProfileTop : GameSection
 					{
 						MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.FACEBOOK_LOGIN);
 					}
-					GameSection.ResumeEvent(success, null);
+					GameSection.ResumeEvent(success);
 				});
 			}
 			else
 			{
-				GameSection.ResumeEvent(fb_success, null);
+				GameSection.ResumeEvent(fb_success);
 			}
 		});
 	}

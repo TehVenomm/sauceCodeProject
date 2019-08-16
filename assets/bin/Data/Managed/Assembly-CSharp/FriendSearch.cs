@@ -17,9 +17,12 @@ public class FriendSearch : FollowListBase
 		GRD_LIST,
 		TEX_MODEL,
 		STR_NON_LIST,
+		GRD_FOLLOW_ARROW,
+		OBJ_FOLLOW,
 		SPR_FOLLOW,
 		SPR_FOLLOWER,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		OBJ_COMMENT,
 		LBL_COMMENT,
 		LBL_LAST_LOGIN,
@@ -84,7 +87,7 @@ public class FriendSearch : FollowListBase
 		{
 			SetDirty(UI.GRD_LIST);
 			RefreshUI();
-			GameSection.ResumeEvent(b, null);
+			GameSection.ResumeEvent(b);
 		});
 	}
 
@@ -95,7 +98,7 @@ public class FriendSearch : FollowListBase
 		case SEARCH_TYPE.NAME:
 			if (string.IsNullOrEmpty(searchName))
 			{
-				callback(false);
+				callback(obj: false);
 			}
 			else
 			{
@@ -114,7 +117,7 @@ public class FriendSearch : FollowListBase
 		case SEARCH_TYPE.ID:
 			if (string.IsNullOrEmpty(searchID))
 			{
-				callback(false);
+				callback(obj: false);
 			}
 			else
 			{
@@ -158,26 +161,27 @@ public class FriendSearch : FollowListBase
 	private void OnCloseSearchDialog()
 	{
 		object[] array = GameSection.GetEventData() as object[];
-		if (array != null)
+		if (array == null)
 		{
-			searchType = tmpSearchType;
-			if ((bool)array[0])
+			return;
+		}
+		searchType = tmpSearchType;
+		if ((bool)array[0])
+		{
+			int nowPage = (int)array[1];
+			FriendSearchResult friendSearchResult = array[2] as FriendSearchResult;
+			recvList = ChangeData(friendSearchResult.search);
+			pageNumMax = friendSearchResult.pageNumMax;
+			base.nowPage = nowPage;
+			if (searchType == SEARCH_TYPE.ID)
 			{
-				int nowPage = (int)array[1];
-				FriendSearchResult friendSearchResult = array[2] as FriendSearchResult;
-				recvList = ChangeData(friendSearchResult.search);
-				pageNumMax = friendSearchResult.pageNumMax;
-				base.nowPage = nowPage;
-				if (searchType == SEARCH_TYPE.ID)
-				{
-					searchID = (array[3] as string);
-				}
-				else if (searchType == SEARCH_TYPE.NAME)
-				{
-					searchName = (array[3] as string);
-				}
-				RefreshUI();
+				searchID = (array[3] as string);
 			}
+			else if (searchType == SEARCH_TYPE.NAME)
+			{
+				searchName = (array[3] as string);
+			}
+			RefreshUI();
 		}
 	}
 

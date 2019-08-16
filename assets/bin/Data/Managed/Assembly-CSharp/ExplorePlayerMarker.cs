@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ExplorePlayerMarker
+public class ExplorePlayerMarker : MonoBehaviour
 {
 	[SerializeField]
 	private Vector3[] offsets = (Vector3[])new Vector3[4];
@@ -19,7 +19,6 @@ public class ExplorePlayerMarker
 
 	public void SetIndex(int idx)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		if (!(null == sprite_) && 0 <= idx && 4 > idx)
 		{

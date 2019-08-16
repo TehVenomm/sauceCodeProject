@@ -1,9 +1,12 @@
 package com.zopim.android.sdk.data;
 
 import android.util.Log;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zopim.android.sdk.model.Department;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,15 +44,15 @@ public class LivechatDepartmentsPath extends Path<LinkedHashMap<String, Departme
                     } else {
                         ObjectMapper mapper = this.PARSER.getMapper();
                         JsonNode valueToTree = mapper.valueToTree(department);
-                        department = (Department) ((LinkedHashMap) this.mData).get(str);
-                        if (department == null) {
+                        Department department2 = (Department) ((LinkedHashMap) this.mData).get(str);
+                        if (department2 == null) {
                             ((LinkedHashMap) this.mData).remove(str);
                         } else {
                             try {
-                                ((LinkedHashMap) this.mData).put(str, (Department) mapper.readerForUpdating(department).readValue(valueToTree));
-                            } catch (Throwable e) {
+                                ((LinkedHashMap) this.mData).put(str, (Department) mapper.readerForUpdating(department2).readValue(valueToTree));
+                            } catch (JsonProcessingException e) {
                                 Log.w(TAG, "Failed to process json. Department could not be updated.", e);
-                            } catch (Throwable e2) {
+                            } catch (IOException e2) {
                                 Log.w(TAG, "IO error. Department could not be updated.", e2);
                             }
                         }
@@ -57,8 +60,8 @@ public class LivechatDepartmentsPath extends Path<LinkedHashMap<String, Departme
                 } else if (department != null) {
                     try {
                         ((LinkedHashMap) this.mData).put(str, department);
-                    } catch (Throwable e22) {
-                        Log.w(TAG, "Failed to process json. Department could not be created.", e22);
+                    } catch (Exception e3) {
+                        Log.w(TAG, "Failed to process json. Department could not be created.", e3);
                     }
                 } else {
                     continue;
@@ -68,21 +71,23 @@ public class LivechatDepartmentsPath extends Path<LinkedHashMap<String, Departme
         }
     }
 
-    void clear() {
+    /* access modifiers changed from: 0000 */
+    public void clear() {
         if (this.mData != null) {
             ((LinkedHashMap) this.mData).clear();
         }
     }
 
     public LinkedHashMap<String, Department> getData() {
-        return this.mData != null ? new LinkedHashMap((Map) this.mData) : new LinkedHashMap();
+        return this.mData != null ? new LinkedHashMap((Map) this.mData) : new LinkedHashMap<>();
     }
 
-    void update(String str) {
+    /* access modifiers changed from: 0000 */
+    public void update(String str) {
         if (isClearRequired(str)) {
             clear();
         } else if (!str.isEmpty()) {
-            updateInternal((LinkedHashMap) this.PARSER.parse(str, new C0867e(this)));
+            updateInternal((LinkedHashMap) this.PARSER.parse(str, (TypeReference<T>) new C1236e<T>(this)));
         }
     }
 }

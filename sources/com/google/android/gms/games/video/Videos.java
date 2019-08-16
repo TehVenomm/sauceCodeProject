@@ -5,30 +5,31 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Result;
 
+@Deprecated
 public interface Videos {
     public static final int CAPTURE_OVERLAY_STATE_CAPTURE_STARTED = 2;
     public static final int CAPTURE_OVERLAY_STATE_CAPTURE_STOPPED = 3;
     public static final int CAPTURE_OVERLAY_STATE_DISMISSED = 4;
     public static final int CAPTURE_OVERLAY_STATE_SHOWN = 1;
 
-    public interface CaptureStreamingUrlResult extends Result {
-        String getUrl();
-    }
-
+    @Deprecated
     public interface CaptureAvailableResult extends Result {
         boolean isAvailable();
     }
 
+    @Deprecated
     public interface CaptureCapabilitiesResult extends Result {
         VideoCapabilities getCapabilities();
     }
 
-    public interface CaptureStateResult extends Result {
-        CaptureState getCaptureState();
-    }
-
+    @Deprecated
     public interface CaptureOverlayStateListener {
         void onCaptureOverlayStateChanged(int i);
+    }
+
+    @Deprecated
+    public interface CaptureStateResult extends Result {
+        CaptureState getCaptureState();
     }
 
     PendingResult<CaptureCapabilitiesResult> getCaptureCapabilities(GoogleApiClient googleApiClient);

@@ -1,5 +1,6 @@
-package android.support.v7.cardview;
+package android.support.p003v7.cardview;
 
+/* renamed from: android.support.v7.cardview.BuildConfig */
 public final class BuildConfig {
     public static final String APPLICATION_ID = "android.support.v7.cardview";
     public static final String BUILD_TYPE = "release";

@@ -40,7 +40,6 @@ public class UIChatButtonBase : MonoBehaviourSingleton<UIChatButtonBase>
 
 	private void OnPress(bool pressed)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (!pressed)
 		{
 			chat(chatID);

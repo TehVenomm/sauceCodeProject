@@ -1,6 +1,5 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +13,10 @@ import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.StyleRes;
 import android.view.LayoutInflater;
 import android.view.View;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
+/* renamed from: android.support.v4.app.DialogFragment */
 public class DialogFragment extends Fragment implements OnCancelListener, OnDismissListener {
     private static final String SAVED_BACK_STACK_ID = "android:backStackId";
     private static final String SAVED_CANCELABLE = "android:cancelable";
@@ -36,6 +38,12 @@ public class DialogFragment extends Fragment implements OnCancelListener, OnDism
     int mTheme = 0;
     boolean mViewDestroyed;
 
+    @RestrictTo({Scope.LIBRARY_GROUP})
+    @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.app.DialogFragment$DialogStyle */
+    private @interface DialogStyle {
+    }
+
     public void dismiss() {
         dismissInternal(false);
     }
@@ -44,7 +52,8 @@ public class DialogFragment extends Fragment implements OnCancelListener, OnDism
         dismissInternal(true);
     }
 
-    void dismissInternal(boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void dismissInternal(boolean z) {
         if (!this.mDismissed) {
             this.mDismissed = true;
             this.mShownByMe = false;
@@ -72,19 +81,6 @@ public class DialogFragment extends Fragment implements OnCancelListener, OnDism
         return this.mDialog;
     }
 
-    @RestrictTo({Scope.LIBRARY_GROUP})
-    public LayoutInflater getLayoutInflater(Bundle bundle) {
-        if (!this.mShowsDialog) {
-            return super.getLayoutInflater(bundle);
-        }
-        this.mDialog = onCreateDialog(bundle);
-        if (this.mDialog == null) {
-            return (LayoutInflater) this.mHost.getContext().getSystemService("layout_inflater");
-        }
-        setupDialog(this.mDialog, this.mStyle);
-        return (LayoutInflater) this.mDialog.getContext().getSystemService("layout_inflater");
-    }
-
     public boolean getShowsDialog() {
         return this.mShowsDialog;
     }
@@ -108,7 +104,7 @@ public class DialogFragment extends Fragment implements OnCancelListener, OnDism
                 }
                 this.mDialog.setContentView(view);
             }
-            Activity activity = getActivity();
+            FragmentActivity activity = getActivity();
             if (activity != null) {
                 this.mDialog.setOwnerActivity(activity);
             }
@@ -171,6 +167,18 @@ public class DialogFragment extends Fragment implements OnCancelListener, OnDism
         if (!this.mViewDestroyed) {
             dismissInternal(true);
         }
+    }
+
+    public LayoutInflater onGetLayoutInflater(Bundle bundle) {
+        if (!this.mShowsDialog) {
+            return super.onGetLayoutInflater(bundle);
+        }
+        this.mDialog = onCreateDialog(bundle);
+        if (this.mDialog == null) {
+            return (LayoutInflater) this.mHost.getContext().getSystemService("layout_inflater");
+        }
+        setupDialog(this.mDialog, this.mStyle);
+        return (LayoutInflater) this.mDialog.getContext().getSystemService("layout_inflater");
     }
 
     public void onSaveInstanceState(Bundle bundle) {

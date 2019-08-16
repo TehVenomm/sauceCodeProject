@@ -8,11 +8,9 @@ public abstract class zzb<T> extends zza<Collection<T>> {
         super(str, collection, collection2, i);
     }
 
-    protected /* synthetic */ Object zzc(DataHolder dataHolder, int i, int i2) {
-        return zzd(dataHolder, i, i2);
-    }
-
-    protected Collection<T> zzd(DataHolder dataHolder, int i, int i2) {
+    /* access modifiers changed from: protected */
+    /* renamed from: zzd */
+    public Collection<T> zzc(DataHolder dataHolder, int i, int i2) {
         throw new UnsupportedOperationException("Cannot read collections from a dataHolder.");
     }
 }

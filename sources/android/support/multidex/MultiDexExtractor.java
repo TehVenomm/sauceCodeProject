@@ -6,7 +6,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.os.Build.VERSION;
 import android.util.Log;
-import com.facebook.GraphResponse;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -14,6 +13,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ final class MultiDexExtractor {
         } else {
             try {
                 performExtractions = loadExistingExtractions(context, file2, file);
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 Log.w(TAG, "Failed to reload existing extracted secondary dex files, falling back to fresh extraction", e);
                 performExtractions = performExtractions(file2, file);
                 putStoredApkInfo(context, getTimeStamp(file2), zipCrc, performExtractions.size() + 1);
@@ -66,20 +66,20 @@ final class MultiDexExtractor {
         Log.i(TAG, "loading existing secondary dex files");
         String str = file.getName() + EXTRACTED_NAME_EXT;
         int i = getMultiDexPreferences(context).getInt(KEY_DEX_NUMBER, 1);
-        List<File> arrayList = new ArrayList(i);
+        ArrayList arrayList = new ArrayList(i);
         int i2 = 2;
         while (i2 <= i) {
             File file3 = new File(file2, str + i2 + EXTRACTED_SUFFIX);
             if (file3.isFile()) {
                 arrayList.add(file3);
-                if (verifyZipFile(file3)) {
-                    i2++;
-                } else {
+                if (!verifyZipFile(file3)) {
                     Log.i(TAG, "Invalid zip file: " + file3);
                     throw new IOException("Invalid ZIP file.");
                 }
+                i2++;
+            } else {
+                throw new IOException("Missing extracted secondary dex file '" + file3.getPath() + "'");
             }
-            throw new IOException("Missing extracted secondary dex file '" + file3.getPath() + "'");
         }
         return arrayList;
     }
@@ -108,7 +108,7 @@ final class MultiDexExtractor {
     private static List<File> performExtractions(File file, File file2) throws IOException {
         String str = file.getName() + EXTRACTED_NAME_EXT;
         prepareDexDir(file2, str);
-        List<File> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         ZipFile zipFile = new ZipFile(file);
         try {
             ZipEntry entry = zipFile.getEntry(DEX_PREFIX + 2 + DEX_SUFFIX);
@@ -120,35 +120,36 @@ final class MultiDexExtractor {
                 boolean z = false;
                 int i2 = 0;
                 while (i2 < 3 && !z) {
-                    int i3 = i2 + 1;
+                    i2++;
                     extract(zipFile, entry, file3, str);
                     boolean verifyZipFile = verifyZipFile(file3);
-                    Log.i(TAG, "Extraction " + (verifyZipFile ? GraphResponse.SUCCESS_KEY : "failed") + " - length " + file3.getAbsolutePath() + ": " + file3.length());
+                    Log.i(TAG, "Extraction " + (verifyZipFile ? "success" : "failed") + " - length " + file3.getAbsolutePath() + ": " + file3.length());
                     if (!verifyZipFile) {
                         file3.delete();
                         if (file3.exists()) {
                             Log.w(TAG, "Failed to delete corrupted secondary dex '" + file3.getPath() + "'");
                             z = verifyZipFile;
-                            i2 = i3;
                         }
                     }
                     z = verifyZipFile;
-                    i2 = i3;
                 }
-                if (z) {
-                    i2 = i + 1;
-                    entry = zipFile.getEntry(DEX_PREFIX + i2 + DEX_SUFFIX);
-                    i = i2;
-                } else {
+                if (!z) {
                     throw new IOException("Could not create zip file " + file3.getAbsolutePath() + " for secondary dex (" + i + ")");
                 }
+                int i3 = i + 1;
+                entry = zipFile.getEntry(DEX_PREFIX + i3 + DEX_SUFFIX);
+                i = i3;
+            }
+            try {
+            } catch (IOException e) {
+                Log.w(TAG, "Failed to close resource", e);
             }
             return arrayList;
         } finally {
             try {
                 zipFile.close();
-            } catch (Throwable e) {
-                Log.w(TAG, "Failed to close resource", e);
+            } catch (IOException e2) {
+                Log.w(TAG, "Failed to close resource", e2);
             }
         }
     }
@@ -179,10 +180,10 @@ final class MultiDexExtractor {
         }
         for (File file2 : listFiles) {
             Log.i(TAG, "Trying to delete old file " + file2.getPath() + " of size " + file2.length());
-            if (file2.delete()) {
-                Log.i(TAG, "Deleted old file " + file2.getPath());
-            } else {
+            if (!file2.delete()) {
                 Log.w(TAG, "Failed to delete old file " + file2.getPath());
+            } else {
+                Log.i(TAG, "Deleted old file " + file2.getPath());
             }
         }
     }
@@ -201,10 +202,10 @@ final class MultiDexExtractor {
     }
 
     private static void extract(ZipFile zipFile, ZipEntry zipEntry, File file, String str) throws IOException, FileNotFoundException {
-        Closeable inputStream = zipFile.getInputStream(zipEntry);
+        ZipOutputStream zipOutputStream;
+        InputStream inputStream = zipFile.getInputStream(zipEntry);
         File createTempFile = File.createTempFile(str, EXTRACTED_SUFFIX, file.getParentFile());
         Log.i(TAG, "Extracting " + createTempFile.getPath());
-        ZipOutputStream zipOutputStream;
         try {
             zipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(createTempFile)));
             ZipEntry zipEntry2 = new ZipEntry("classes.dex");
@@ -217,68 +218,78 @@ final class MultiDexExtractor {
             zipOutputStream.closeEntry();
             zipOutputStream.close();
             Log.i(TAG, "Renaming to " + file.getPath());
-            if (createTempFile.renameTo(file)) {
-                closeQuietly(inputStream);
-                createTempFile.delete();
-                return;
+            if (!createTempFile.renameTo(file)) {
+                throw new IOException("Failed to rename \"" + createTempFile.getAbsolutePath() + "\" to \"" + file.getAbsolutePath() + "\"");
             }
-            throw new IOException("Failed to rename \"" + createTempFile.getAbsolutePath() + "\" to \"" + file.getAbsolutePath() + "\"");
+            closeQuietly(inputStream);
+            createTempFile.delete();
         } catch (Throwable th) {
             closeQuietly(inputStream);
             createTempFile.delete();
+            throw th;
         }
     }
 
-    /* JADX WARNING: inconsistent code. */
+    /* JADX WARNING: Code restructure failed: missing block: B:10:0x0029, code lost:
+        r0 = move-exception;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:11:0x002a, code lost:
+        android.util.Log.w(TAG, "File " + r4.getAbsolutePath() + " is not a valid zip file.", r0);
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:8:?, code lost:
+        android.util.Log.w(TAG, "Failed to close zip file: " + r4.getAbsolutePath());
+     */
+    /* JADX WARNING: Failed to process nested try/catch */
+    /* JADX WARNING: Removed duplicated region for block: B:10:0x0029 A[ExcHandler: ZipException (r0v1 'e' java.util.zip.ZipException A[CUSTOM_DECLARE]), Splitter:B:0:0x0000] */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     static boolean verifyZipFile(java.io.File r4) {
         /*
-        r0 = new java.util.zip.ZipFile;	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        r0.<init>(r4);	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        r0.close();	 Catch:{ IOException -> 0x000a, ZipException -> 0x0029 }
-        r0 = 1;
-    L_0x0009:
-        return r0;
-    L_0x000a:
-        r0 = move-exception;
-        r0 = "MultiDex";
-        r1 = new java.lang.StringBuilder;	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        r1.<init>();	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        r2 = "Failed to close zip file: ";
-        r1 = r1.append(r2);	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        r2 = r4.getAbsolutePath();	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        r1 = r1.append(r2);	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        r1 = r1.toString();	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-        android.util.Log.w(r0, r1);	 Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
-    L_0x0027:
-        r0 = 0;
-        goto L_0x0009;
-    L_0x0029:
-        r0 = move-exception;
-        r1 = "MultiDex";
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = "File ";
-        r2 = r2.append(r3);
-        r3 = r4.getAbsolutePath();
-        r2 = r2.append(r3);
-        r3 = " is not a valid zip file.";
-        r2 = r2.append(r3);
-        r2 = r2.toString();
-        android.util.Log.w(r1, r2, r0);
-        goto L_0x0027;
-    L_0x004d:
-        r0 = move-exception;
-        r1 = "MultiDex";
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = "Got an IOException trying to open zip file: ";
-        r2 = r2.append(r3);
-        r3 = r4.getAbsolutePath();
-        r2 = r2.append(r3);
-        r2 = r2.toString();
-        android.util.Log.w(r1, r2, r0);
-        goto L_0x0027;
+            java.util.zip.ZipFile r0 = new java.util.zip.ZipFile     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            r0.<init>(r4)     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            r0.close()     // Catch:{ IOException -> 0x000a, ZipException -> 0x0029 }
+            r0 = 1
+        L_0x0009:
+            return r0
+        L_0x000a:
+            r0 = move-exception
+            java.lang.String r0 = "MultiDex"
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            r1.<init>()     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            java.lang.String r2 = "Failed to close zip file: "
+            java.lang.StringBuilder r1 = r1.append(r2)     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            java.lang.String r2 = r4.getAbsolutePath()     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            java.lang.StringBuilder r1 = r1.append(r2)     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            java.lang.String r1 = r1.toString()     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+            android.util.Log.w(r0, r1)     // Catch:{ ZipException -> 0x0029, IOException -> 0x004d }
+        L_0x0027:
+            r0 = 0
+            goto L_0x0009
+        L_0x0029:
+            r0 = move-exception
+            java.lang.String r1 = "MultiDex"
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder
+            r2.<init>()
+            java.lang.String r3 = "File "
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r3 = r4.getAbsolutePath()
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r3 = " is not a valid zip file."
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r2 = r2.toString()
+            android.util.Log.w(r1, r2, r0)
+            goto L_0x0027
+        L_0x004d:
+            r0 = move-exception
+            java.lang.String r1 = "MultiDex"
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder
+            r2.<init>()
+            java.lang.String r3 = "Got an IOException trying to open zip file: "
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r3 = r4.getAbsolutePath()
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r2 = r2.toString()
+            android.util.Log.w(r1, r2, r0)
+            goto L_0x0027
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.multidex.MultiDexExtractor.verifyZipFile(java.io.File):boolean");
     }
@@ -286,7 +297,7 @@ final class MultiDexExtractor {
     private static void closeQuietly(Closeable closeable) {
         try {
             closeable.close();
-        } catch (Throwable e) {
+        } catch (IOException e) {
             Log.w(TAG, "Failed to close resource", e);
         }
     }
@@ -304,8 +315,7 @@ final class MultiDexExtractor {
             try {
                 sApplyMethod.invoke(editor, new Object[0]);
                 return;
-            } catch (InvocationTargetException e) {
-            } catch (IllegalAccessException e2) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
             }
         }
         editor.commit();

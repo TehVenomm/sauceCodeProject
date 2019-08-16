@@ -3,13 +3,13 @@ using UnityEngine;
 [RequireComponent(typeof(UIGameSceneEventSender))]
 public class UIButtonRepeater : UILongTouch
 {
-	private const float FAST_MODE_PUSH_TIME = -1f;
-
 	public float firstInterval = 0.15f;
 
 	public float interval = 0.05f;
 
 	public float shortInterval = 0.025f;
+
+	private const float FAST_MODE_PUSH_TIME = -1f;
 
 	private float pushTime;
 
@@ -40,11 +40,9 @@ public class UIButtonRepeater : UILongTouch
 
 	protected override void _SendEvent()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (CheckSendTime())
 		{
-			UIGameSceneEventSender.SendEvent("UIButtonRepeater", this.get_gameObject(), eventName, eventData, null);
+			UIGameSceneEventSender.SendEvent("UIButtonRepeater", this.get_gameObject(), eventName, eventData);
 		}
 	}
 

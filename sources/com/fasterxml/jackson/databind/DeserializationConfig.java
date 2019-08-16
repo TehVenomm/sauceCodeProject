@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.cfg.BaseSettings;
 import com.fasterxml.jackson.databind.cfg.ContextAttributes;
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.cfg.MapperConfigBase;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
@@ -45,7 +44,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
 
     public DeserializationConfig(BaseSettings baseSettings, SubtypeResolver subtypeResolver, SimpleMixInResolver simpleMixInResolver, RootNameLookup rootNameLookup) {
         super(baseSettings, subtypeResolver, simpleMixInResolver, rootNameLookup);
-        this._deserFeatures = MapperConfig.collectFeatureDefaults(DeserializationFeature.class);
+        this._deserFeatures = collectFeatureDefaults(DeserializationFeature.class);
         this._nodeFactory = JsonNodeFactory.instance;
         this._problemHandlers = null;
         this._parserFeatures = 0;
@@ -55,7 +54,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     private DeserializationConfig(DeserializationConfig deserializationConfig, int i, int i2, int i3, int i4, int i5, int i6) {
-        super((MapperConfigBase) deserializationConfig, i);
+        super((MapperConfigBase<CFG, T>) deserializationConfig, i);
         this._deserFeatures = i2;
         this._nodeFactory = deserializationConfig._nodeFactory;
         this._problemHandlers = deserializationConfig._problemHandlers;
@@ -66,7 +65,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     private DeserializationConfig(DeserializationConfig deserializationConfig, SubtypeResolver subtypeResolver) {
-        super((MapperConfigBase) deserializationConfig, subtypeResolver);
+        super((MapperConfigBase<CFG, T>) deserializationConfig, subtypeResolver);
         this._deserFeatures = deserializationConfig._deserFeatures;
         this._nodeFactory = deserializationConfig._nodeFactory;
         this._problemHandlers = deserializationConfig._problemHandlers;
@@ -77,7 +76,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     private DeserializationConfig(DeserializationConfig deserializationConfig, BaseSettings baseSettings) {
-        super((MapperConfigBase) deserializationConfig, baseSettings);
+        super((MapperConfigBase<CFG, T>) deserializationConfig, baseSettings);
         this._deserFeatures = deserializationConfig._deserFeatures;
         this._nodeFactory = deserializationConfig._nodeFactory;
         this._problemHandlers = deserializationConfig._problemHandlers;
@@ -110,7 +109,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     private DeserializationConfig(DeserializationConfig deserializationConfig, PropertyName propertyName) {
-        super((MapperConfigBase) deserializationConfig, propertyName);
+        super((MapperConfigBase<CFG, T>) deserializationConfig, propertyName);
         this._deserFeatures = deserializationConfig._deserFeatures;
         this._problemHandlers = deserializationConfig._problemHandlers;
         this._nodeFactory = deserializationConfig._nodeFactory;
@@ -121,7 +120,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     private DeserializationConfig(DeserializationConfig deserializationConfig, Class<?> cls) {
-        super((MapperConfigBase) deserializationConfig, (Class) cls);
+        super((MapperConfigBase<CFG, T>) deserializationConfig, cls);
         this._deserFeatures = deserializationConfig._deserFeatures;
         this._problemHandlers = deserializationConfig._problemHandlers;
         this._nodeFactory = deserializationConfig._nodeFactory;
@@ -132,7 +131,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     protected DeserializationConfig(DeserializationConfig deserializationConfig, ContextAttributes contextAttributes) {
-        super((MapperConfigBase) deserializationConfig, contextAttributes);
+        super((MapperConfigBase<CFG, T>) deserializationConfig, contextAttributes);
         this._deserFeatures = deserializationConfig._deserFeatures;
         this._problemHandlers = deserializationConfig._problemHandlers;
         this._nodeFactory = deserializationConfig._nodeFactory;
@@ -143,7 +142,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     protected DeserializationConfig(DeserializationConfig deserializationConfig, SimpleMixInResolver simpleMixInResolver) {
-        super((MapperConfigBase) deserializationConfig, simpleMixInResolver);
+        super((MapperConfigBase<CFG, T>) deserializationConfig, simpleMixInResolver);
         this._deserFeatures = deserializationConfig._deserFeatures;
         this._problemHandlers = deserializationConfig._problemHandlers;
         this._nodeFactory = deserializationConfig._nodeFactory;
@@ -164,7 +163,8 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         this._formatReadFeaturesToChange = deserializationConfig._formatReadFeaturesToChange;
     }
 
-    protected BaseSettings getBaseSettings() {
+    /* access modifiers changed from: protected */
+    public BaseSettings getBaseSettings() {
         return this._base;
     }
 
@@ -173,7 +173,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         for (MapperFeature mask : mapperFeatureArr) {
             i |= mask.getMask();
         }
-        return i == this._mapperFeatures ? this : new DeserializationConfig(this, i, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (i == this._mapperFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, i, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig without(MapperFeature... mapperFeatureArr) {
@@ -181,7 +184,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         for (MapperFeature mask : mapperFeatureArr) {
             i &= mask.getMask() ^ -1;
         }
-        return i == this._mapperFeatures ? this : new DeserializationConfig(this, i, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (i == this._mapperFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, i, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig with(MapperFeature mapperFeature, boolean z) {
@@ -191,7 +197,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         } else {
             mask = this._mapperFeatures & (mapperFeature.getMask() ^ -1);
         }
-        return mask == this._mapperFeatures ? this : new DeserializationConfig(this, mask, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (mask == this._mapperFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, mask, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig with(ClassIntrospector classIntrospector) {
@@ -254,7 +263,7 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     public DeserializationConfig withView(Class<?> cls) {
-        return this._view == cls ? this : new DeserializationConfig(this, (Class) cls);
+        return this._view == cls ? this : new DeserializationConfig(this, cls);
     }
 
     public DeserializationConfig with(Locale locale) {
@@ -279,7 +288,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
 
     public DeserializationConfig with(DeserializationFeature deserializationFeature) {
         int mask = this._deserFeatures | deserializationFeature.getMask();
-        return mask == this._deserFeatures ? this : new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (mask == this._deserFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig with(DeserializationFeature deserializationFeature, DeserializationFeature... deserializationFeatureArr) {
@@ -287,7 +299,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         for (DeserializationFeature mask2 : deserializationFeatureArr) {
             mask |= mask2.getMask();
         }
-        return mask == this._deserFeatures ? this : new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (mask == this._deserFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig withFeatures(DeserializationFeature... deserializationFeatureArr) {
@@ -295,12 +310,18 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         for (DeserializationFeature mask : deserializationFeatureArr) {
             i |= mask.getMask();
         }
-        return i == this._deserFeatures ? this : new DeserializationConfig(this, this._mapperFeatures, i, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (i == this._deserFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, i, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig without(DeserializationFeature deserializationFeature) {
         int mask = this._deserFeatures & (deserializationFeature.getMask() ^ -1);
-        return mask == this._deserFeatures ? this : new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (mask == this._deserFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig without(DeserializationFeature deserializationFeature, DeserializationFeature... deserializationFeatureArr) {
@@ -308,7 +329,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         for (DeserializationFeature mask2 : deserializationFeatureArr) {
             mask &= mask2.getMask() ^ -1;
         }
-        return mask == this._deserFeatures ? this : new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (mask == this._deserFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, mask, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig withoutFeatures(DeserializationFeature... deserializationFeatureArr) {
@@ -316,13 +340,19 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         for (DeserializationFeature mask : deserializationFeatureArr) {
             i &= mask.getMask() ^ -1;
         }
-        return i == this._deserFeatures ? this : new DeserializationConfig(this, this._mapperFeatures, i, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (i == this._deserFeatures) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, i, this._parserFeatures, this._parserFeaturesToChange, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig with(Feature feature) {
         int mask = this._parserFeatures | feature.getMask();
         int mask2 = this._parserFeaturesToChange | feature.getMask();
-        return (this._parserFeatures == mask && this._parserFeaturesToChange == mask2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, mask, mask2, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (this._parserFeatures == mask && this._parserFeaturesToChange == mask2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, mask, mask2, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig withFeatures(Feature... featureArr) {
@@ -333,13 +363,19 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
             i |= mask2;
             i2 |= mask2;
         }
-        return (this._parserFeatures == i && this._parserFeaturesToChange == i2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, i, i2, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (this._parserFeatures == i && this._parserFeaturesToChange == i2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, i, i2, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig without(Feature feature) {
         int mask = this._parserFeatures & (feature.getMask() ^ -1);
         int mask2 = this._parserFeaturesToChange | feature.getMask();
-        return (this._parserFeatures == mask && this._parserFeaturesToChange == mask2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, mask, mask2, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (this._parserFeatures == mask && this._parserFeaturesToChange == mask2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, mask, mask2, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig withoutFeatures(Feature... featureArr) {
@@ -350,13 +386,19 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
             i &= mask2 ^ -1;
             i2 |= mask2;
         }
-        return (this._parserFeatures == i && this._parserFeaturesToChange == i2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, i, i2, this._formatReadFeatures, this._formatReadFeaturesToChange);
+        if (this._parserFeatures == i && this._parserFeaturesToChange == i2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, i, i2, this._formatReadFeatures, this._formatReadFeaturesToChange);
     }
 
     public DeserializationConfig with(FormatFeature formatFeature) {
         int mask = this._formatReadFeatures | formatFeature.getMask();
         int mask2 = this._formatReadFeaturesToChange | formatFeature.getMask();
-        return (this._formatReadFeatures == mask && this._formatReadFeaturesToChange == mask2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, mask, mask2);
+        if (this._formatReadFeatures == mask && this._formatReadFeaturesToChange == mask2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, mask, mask2);
     }
 
     public DeserializationConfig withFeatures(FormatFeature... formatFeatureArr) {
@@ -367,13 +409,19 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
             i |= mask2;
             i2 |= mask2;
         }
-        return (this._formatReadFeatures == i && this._formatReadFeaturesToChange == i2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, i, i2);
+        if (this._formatReadFeatures == i && this._formatReadFeaturesToChange == i2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, i, i2);
     }
 
     public DeserializationConfig without(FormatFeature formatFeature) {
         int mask = this._formatReadFeatures & (formatFeature.getMask() ^ -1);
         int mask2 = this._formatReadFeaturesToChange | formatFeature.getMask();
-        return (this._formatReadFeatures == mask && this._formatReadFeaturesToChange == mask2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, mask, mask2);
+        if (this._formatReadFeatures == mask && this._formatReadFeaturesToChange == mask2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, mask, mask2);
     }
 
     public DeserializationConfig withoutFeatures(FormatFeature... formatFeatureArr) {
@@ -384,7 +432,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
             i &= mask2 ^ -1;
             i2 |= mask2;
         }
-        return (this._formatReadFeatures == i && this._formatReadFeaturesToChange == i2) ? this : new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, i, i2);
+        if (this._formatReadFeatures == i && this._formatReadFeaturesToChange == i2) {
+            return this;
+        }
+        return new DeserializationConfig(this, this._mapperFeatures, this._deserFeatures, this._parserFeatures, this._parserFeaturesToChange, i, i2);
     }
 
     public DeserializationConfig with(JsonNodeFactory jsonNodeFactory) {
@@ -392,11 +443,11 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     }
 
     public DeserializationConfig withHandler(DeserializationProblemHandler deserializationProblemHandler) {
-        return LinkedNode.contains(this._problemHandlers, deserializationProblemHandler) ? this : new DeserializationConfig(this, new LinkedNode(deserializationProblemHandler, this._problemHandlers));
+        return LinkedNode.contains(this._problemHandlers, deserializationProblemHandler) ? this : new DeserializationConfig(this, new LinkedNode<>(deserializationProblemHandler, this._problemHandlers));
     }
 
     public DeserializationConfig withNoProblemHandlers() {
-        return this._problemHandlers == null ? this : new DeserializationConfig(this, (LinkedNode) null);
+        return this._problemHandlers == null ? this : new DeserializationConfig(this, null);
     }
 
     public void initialize(JsonParser jsonParser) {
@@ -431,10 +482,10 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
         if (!isEnabled(MapperFeature.AUTO_DETECT_CREATORS)) {
             defaultVisibilityChecker = defaultVisibilityChecker.withCreatorVisibility(Visibility.NONE);
         }
-        if (isEnabled(MapperFeature.AUTO_DETECT_FIELDS)) {
-            return defaultVisibilityChecker;
+        if (!isEnabled(MapperFeature.AUTO_DETECT_FIELDS)) {
+            return defaultVisibilityChecker.withFieldVisibility(Visibility.NONE);
         }
-        return defaultVisibilityChecker.withFieldVisibility(Visibility.NONE);
+        return defaultVisibilityChecker;
     }
 
     public Value getDefaultPropertyInclusion() {
@@ -452,9 +503,8 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     public boolean useRootWrapping() {
         if (this._rootName != null) {
             return !this._rootName.isEmpty();
-        } else {
-            return isEnabled(DeserializationFeature.UNWRAP_ROOT_VALUE);
         }
+        return isEnabled(DeserializationFeature.UNWRAP_ROOT_VALUE);
     }
 
     public final boolean isEnabled(DeserializationFeature deserializationFeature) {
@@ -464,9 +514,8 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
     public final boolean isEnabled(Feature feature, JsonFactory jsonFactory) {
         if ((feature.getMask() & this._parserFeaturesToChange) != 0) {
             return (this._parserFeatures & feature.getMask()) != 0;
-        } else {
-            return jsonFactory.isEnabled(feature);
         }
+        return jsonFactory.isEnabled(feature);
     }
 
     public final boolean hasDeserializationFeatures(int i) {
@@ -510,8 +559,9 @@ public final class DeserializationConfig extends MapperConfigBase<Deserializatio
             if (findTypeResolver == null) {
                 return null;
             }
+        } else {
+            collection = getSubtypeResolver().collectAndResolveSubtypesByTypeId(this, classInfo);
         }
-        collection = getSubtypeResolver().collectAndResolveSubtypesByTypeId(this, classInfo);
         return findTypeResolver.buildTypeDeserializer(this, javaType, collection);
     }
 }

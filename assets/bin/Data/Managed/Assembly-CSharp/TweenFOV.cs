@@ -55,12 +55,12 @@ public class TweenFOV : UITweener
 
 	public static TweenFOV Begin(GameObject go, float duration, float to)
 	{
-		TweenFOV tweenFOV = UITweener.Begin<TweenFOV>(go, duration, true);
+		TweenFOV tweenFOV = UITweener.Begin<TweenFOV>(go, duration);
 		tweenFOV.from = tweenFOV.value;
 		tweenFOV.to = to;
 		if (duration <= 0f)
 		{
-			tweenFOV.Sample(1f, true);
+			tweenFOV.Sample(1f, isFinished: true);
 			tweenFOV.set_enabled(false);
 		}
 		return tweenFOV;

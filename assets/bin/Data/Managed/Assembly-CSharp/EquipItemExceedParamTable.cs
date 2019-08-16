@@ -1,5 +1,6 @@
 using Network;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 public class EquipItemExceedParamTable : Singleton<EquipItemExceedParamTable>, IDataTable
@@ -77,8 +78,6 @@ public class EquipItemExceedParamTable : Singleton<EquipItemExceedParamTable>, I
 
 	public class EquipItemExceedParam : EquipItemExceedParamBase
 	{
-		public const string NT = "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint";
-
 		public uint exceedId;
 
 		public uint cnt;
@@ -88,6 +87,8 @@ public class EquipItemExceedParamTable : Singleton<EquipItemExceedParamTable>, I
 		public EquipItem.Ability ability;
 
 		private string paramName;
+
+		public const string NT = "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint";
 
 		public EquipItemExceedParam()
 		{
@@ -213,15 +214,21 @@ public class EquipItemExceedParamTable : Singleton<EquipItemExceedParamTable>, I
 
 	private DoubleUIntKeyTable<EquipItemExceedParam> tableData;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedParam> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedParam> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		tableData = TableUtility.CreateDoubleUIntKeyTable<EquipItemExceedParam>(csv_text, EquipItemExceedParam.cb, "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", null, null, null, null);
+		tableData = TableUtility.CreateDoubleUIntKeyTable<EquipItemExceedParam>(csv_text, EquipItemExceedParam.cb, "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", null);
 		tableData.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(tableData, csv_text, EquipItemExceedParam.cb, "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", null, null, null);
+		TableUtility.AddDoubleUIntKeyTable(tableData, csv_text, EquipItemExceedParam.cb, "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", null);
 	}
 
 	public EquipItemExceedParam GetEquipItemExceedParam(uint exceedId, uint exceedCnt)

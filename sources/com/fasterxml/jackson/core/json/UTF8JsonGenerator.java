@@ -1,18 +1,16 @@
 package com.fasterxml.jackson.core.json;
 
-import android.support.v4.media.TransportMediator;
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
-import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.base.GeneratorBase;
-import com.fasterxml.jackson.core.io.CharTypes;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.io.NumberOutput;
+import com.fasterxml.jackson.core.p015io.CharTypes;
+import com.fasterxml.jackson.core.p015io.CharacterEscapes;
+import com.fasterxml.jackson.core.p015io.IOContext;
+import com.fasterxml.jackson.core.p015io.NumberOutput;
 import com.github.droidfu.support.DisplaySupport;
+import com.google.android.gms.games.Notifications;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,21 +18,21 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class UTF8JsonGenerator extends JsonGeneratorImpl {
-    private static final byte BYTE_0 = (byte) 48;
-    private static final byte BYTE_BACKSLASH = (byte) 92;
-    private static final byte BYTE_COLON = (byte) 58;
-    private static final byte BYTE_COMMA = (byte) 44;
-    private static final byte BYTE_LBRACKET = (byte) 91;
-    private static final byte BYTE_LCURLY = (byte) 123;
-    private static final byte BYTE_QUOTE = (byte) 34;
-    private static final byte BYTE_RBRACKET = (byte) 93;
-    private static final byte BYTE_RCURLY = (byte) 125;
-    private static final byte BYTE_u = (byte) 117;
-    private static final byte[] FALSE_BYTES = new byte[]{(byte) 102, (byte) 97, (byte) 108, (byte) 115, (byte) 101};
+    private static final byte BYTE_0 = 48;
+    private static final byte BYTE_BACKSLASH = 92;
+    private static final byte BYTE_COLON = 58;
+    private static final byte BYTE_COMMA = 44;
+    private static final byte BYTE_LBRACKET = 91;
+    private static final byte BYTE_LCURLY = 123;
+    private static final byte BYTE_QUOTE = 34;
+    private static final byte BYTE_RBRACKET = 93;
+    private static final byte BYTE_RCURLY = 125;
+    private static final byte BYTE_u = 117;
+    private static final byte[] FALSE_BYTES = {102, 97, 108, 115, 101};
     private static final byte[] HEX_CHARS = CharTypes.copyHexBytes();
     private static final int MAX_BYTES_TO_BUFFER = 512;
-    private static final byte[] NULL_BYTES = new byte[]{(byte) 110, BYTE_u, (byte) 108, (byte) 108};
-    private static final byte[] TRUE_BYTES = new byte[]{(byte) 116, (byte) 114, BYTE_u, (byte) 101};
+    private static final byte[] NULL_BYTES = {110, BYTE_u, 108, 108};
+    private static final byte[] TRUE_BYTES = {116, 114, BYTE_u, 101};
     protected boolean _bufferRecyclable;
     protected char[] _charBuffer;
     protected final int _charBufferLength;
@@ -55,7 +53,7 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         this._charBuffer = iOContext.allocConcatBuffer();
         this._charBufferLength = this._charBuffer.length;
         if (isEnabled(Feature.ESCAPE_NON_ASCII)) {
-            setHighestNonEscapedChar(TransportMediator.KEYCODE_MEDIA_PAUSE);
+            setHighestNonEscapedChar(Notifications.NOTIFICATION_TYPES_ALL);
         }
     }
 
@@ -101,8 +99,8 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
             _writeStringSegments(str, false);
             return;
         }
-        writeFieldName = str.length();
-        if (writeFieldName > this._charBufferLength) {
+        int length = str.length();
+        if (length > this._charBufferLength) {
             _writeStringSegments(str, true);
             return;
         }
@@ -113,21 +111,21 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int i2 = this._outputTail;
         this._outputTail = i2 + 1;
         bArr2[i2] = BYTE_QUOTE;
-        if (writeFieldName <= this._outputMaxContiguous) {
-            if (this._outputTail + writeFieldName > this._outputEnd) {
+        if (length <= this._outputMaxContiguous) {
+            if (this._outputTail + length > this._outputEnd) {
                 _flushBuffer();
             }
-            _writeStringSegment(str, 0, writeFieldName);
+            _writeStringSegment(str, 0, length);
         } else {
-            _writeStringSegments(str, 0, writeFieldName);
+            _writeStringSegments(str, 0, length);
         }
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        bArr[i] = BYTE_QUOTE;
+        byte[] bArr3 = this._outputBuffer;
+        int i3 = this._outputTail;
+        this._outputTail = i3 + 1;
+        bArr3[i3] = BYTE_QUOTE;
     }
 
     public void writeFieldName(SerializableString serializableString) throws IOException {
@@ -155,23 +153,23 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        bArr[i] = BYTE_QUOTE;
-        writeFieldName = serializableString.appendQuotedUTF8(this._outputBuffer, this._outputTail);
-        if (writeFieldName < 0) {
+        byte[] bArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        bArr2[i2] = BYTE_QUOTE;
+        int appendQuotedUTF8 = serializableString.appendQuotedUTF8(this._outputBuffer, this._outputTail);
+        if (appendQuotedUTF8 < 0) {
             _writeBytes(serializableString.asQuotedUTF8());
         } else {
-            this._outputTail = writeFieldName + this._outputTail;
+            this._outputTail = appendQuotedUTF8 + this._outputTail;
         }
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        bArr[i] = BYTE_QUOTE;
+        byte[] bArr3 = this._outputBuffer;
+        int i3 = this._outputTail;
+        this._outputTail = i3 + 1;
+        bArr3[i3] = BYTE_QUOTE;
     }
 
     private final void _writeUnq(SerializableString serializableString) throws IOException {
@@ -251,7 +249,8 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         this._writeContext = this._writeContext.clearAndGetParent();
     }
 
-    protected final void _writePPFieldName(String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _writePPFieldName(String str) throws IOException {
         int writeFieldName = this._writeContext.writeFieldName(str);
         if (writeFieldName == 4) {
             _reportError("Can not write a field name, expecting a value");
@@ -265,8 +264,8 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
             _writeStringSegments(str, false);
             return;
         }
-        writeFieldName = str.length();
-        if (writeFieldName > this._charBufferLength) {
+        int length = str.length();
+        if (length > this._charBufferLength) {
             _writeStringSegments(str, true);
             return;
         }
@@ -277,14 +276,14 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int i = this._outputTail;
         this._outputTail = i + 1;
         bArr[i] = BYTE_QUOTE;
-        str.getChars(0, writeFieldName, this._charBuffer, 0);
-        if (writeFieldName <= this._outputMaxContiguous) {
-            if (this._outputTail + writeFieldName > this._outputEnd) {
+        str.getChars(0, length, this._charBuffer, 0);
+        if (length <= this._outputMaxContiguous) {
+            if (this._outputTail + length > this._outputEnd) {
                 _flushBuffer();
             }
-            _writeStringSegment(this._charBuffer, 0, writeFieldName);
+            _writeStringSegment(this._charBuffer, 0, length);
         } else {
-            _writeStringSegments(this._charBuffer, 0, writeFieldName);
+            _writeStringSegments(this._charBuffer, 0, length);
         }
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
@@ -295,8 +294,9 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         bArr2[i2] = BYTE_QUOTE;
     }
 
-    protected final void _writePPFieldName(SerializableString serializableString) throws IOException {
-        Object obj = 1;
+    /* access modifiers changed from: protected */
+    public final void _writePPFieldName(SerializableString serializableString) throws IOException {
+        boolean z = true;
         int writeFieldName = this._writeContext.writeFieldName(serializableString.getValue());
         if (writeFieldName == 4) {
             _reportError("Can not write a field name, expecting a value");
@@ -307,9 +307,9 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
             this._cfgPrettyPrinter.beforeObjectEntries(this);
         }
         if (this._cfgUnqNames) {
-            obj = null;
+            z = false;
         }
-        if (obj != null) {
+        if (z) {
             if (this._outputTail >= this._outputEnd) {
                 _flushBuffer();
             }
@@ -319,14 +319,14 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
             bArr[i] = BYTE_QUOTE;
         }
         _writeBytes(serializableString.asQuotedUTF8());
-        if (obj != null) {
+        if (z) {
             if (this._outputTail >= this._outputEnd) {
                 _flushBuffer();
             }
             byte[] bArr2 = this._outputBuffer;
-            writeFieldName = this._outputTail;
-            this._outputTail = writeFieldName + 1;
-            bArr2[writeFieldName] = BYTE_QUOTE;
+            int i2 = this._outputTail;
+            this._outputTail = i2 + 1;
+            bArr2[i2] = BYTE_QUOTE;
         }
     }
 
@@ -378,10 +378,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr = this._outputBuffer;
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        bArr[i3] = BYTE_QUOTE;
+        byte[] bArr2 = this._outputBuffer;
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        bArr2[i4] = BYTE_QUOTE;
     }
 
     public final void writeString(SerializableString serializableString) throws IOException {
@@ -402,10 +402,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        bArr[i] = BYTE_QUOTE;
+        byte[] bArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        bArr2[i2] = BYTE_QUOTE;
     }
 
     public void writeRawUTF8String(byte[] bArr, int i, int i2) throws IOException {
@@ -421,10 +421,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr2 = this._outputBuffer;
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        bArr2[i3] = BYTE_QUOTE;
+        byte[] bArr3 = this._outputBuffer;
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        bArr3[i4] = BYTE_QUOTE;
     }
 
     public void writeUTF8String(byte[] bArr, int i, int i2) throws IOException {
@@ -444,10 +444,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr2 = this._outputBuffer;
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        bArr2[i3] = BYTE_QUOTE;
+        byte[] bArr3 = this._outputBuffer;
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        bArr3[i4] = BYTE_QUOTE;
     }
 
     public void writeRaw(String str) throws IOException, JsonGenerationException {
@@ -496,48 +496,90 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         }
     }
 
-    public final void writeRaw(char[] cArr, int i, int i2) throws IOException, JsonGenerationException {
-        int i3 = (i2 + i2) + i2;
-        if (this._outputTail + i3 > this._outputEnd) {
-            if (this._outputEnd < i3) {
-                _writeSegmentedRaw(cArr, i, i2);
-                return;
-            }
-            _flushBuffer();
-        }
-        int i4 = i2 + i;
-        i3 = i;
-        while (i3 < i4) {
-            while (true) {
-                char c = cArr[i3];
-                if (c > '') {
-                    break;
-                }
-                byte[] bArr = this._outputBuffer;
-                int i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr[i5] = (byte) c;
-                i3++;
-                if (i3 >= i4) {
-                    return;
-                }
-            }
-            int i6 = i3 + 1;
-            char c2 = cArr[i3];
-            if (c2 < 'ࠀ') {
-                bArr = this._outputBuffer;
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr[i5] = (byte) ((c2 >> 6) | 192);
-                bArr = this._outputBuffer;
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr[i5] = (byte) ((c2 & 63) | 128);
-                i3 = i6;
-            } else {
-                i3 = _outputRawMultiByteChar(c2, cArr, i6, i4);
-            }
-        }
+    /* JADX WARNING: Code restructure failed: missing block: B:10:0x0020, code lost:
+        r1 = r0 + 1;
+        r0 = r7[r0];
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:11:0x0026, code lost:
+        if (r0 >= 2048) goto L_0x0058;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:12:0x0028, code lost:
+        r3 = r6._outputBuffer;
+        r4 = r6._outputTail;
+        r6._outputTail = r4 + 1;
+        r3[r4] = (byte) ((r0 >> 6) | 192);
+        r3 = r6._outputBuffer;
+        r4 = r6._outputTail;
+        r6._outputTail = r4 + 1;
+        r3[r4] = (byte) ((r0 & '?') | 128);
+        r0 = r1;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:15:0x0058, code lost:
+        r0 = _outputRawMultiByteChar(r0, r7, r1, r2);
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public final void writeRaw(char[] r7, int r8, int r9) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
+        /*
+            r6 = this;
+            int r0 = r9 + r9
+            int r0 = r0 + r9
+            int r1 = r6._outputTail
+            int r1 = r1 + r0
+            int r2 = r6._outputEnd
+            if (r1 <= r2) goto L_0x0015
+            int r1 = r6._outputEnd
+            if (r1 >= r0) goto L_0x0012
+            r6._writeSegmentedRaw(r7, r8, r9)
+        L_0x0011:
+            return
+        L_0x0012:
+            r6._flushBuffer()
+        L_0x0015:
+            int r2 = r9 + r8
+            r0 = r8
+        L_0x0018:
+            if (r0 >= r2) goto L_0x0011
+        L_0x001a:
+            char r1 = r7[r0]
+            r3 = 127(0x7f, float:1.78E-43)
+            if (r1 <= r3) goto L_0x0048
+            int r1 = r0 + 1
+            char r0 = r7[r0]
+            r3 = 2048(0x800, float:2.87E-42)
+            if (r0 >= r3) goto L_0x0058
+            byte[] r3 = r6._outputBuffer
+            int r4 = r6._outputTail
+            int r5 = r4 + 1
+            r6._outputTail = r5
+            int r5 = r0 >> 6
+            r5 = r5 | 192(0xc0, float:2.69E-43)
+            byte r5 = (byte) r5
+            r3[r4] = r5
+            byte[] r3 = r6._outputBuffer
+            int r4 = r6._outputTail
+            int r5 = r4 + 1
+            r6._outputTail = r5
+            r0 = r0 & 63
+            r0 = r0 | 128(0x80, float:1.794E-43)
+            byte r0 = (byte) r0
+            r3[r4] = r0
+            r0 = r1
+            goto L_0x0018
+        L_0x0048:
+            byte[] r3 = r6._outputBuffer
+            int r4 = r6._outputTail
+            int r5 = r4 + 1
+            r6._outputTail = r5
+            byte r1 = (byte) r1
+            r3[r4] = r1
+            int r0 = r0 + 1
+            if (r0 < r2) goto L_0x001a
+            goto L_0x0011
+        L_0x0058:
+            int r0 = r6._outputRawMultiByteChar(r0, r7, r1, r2)
+            goto L_0x0018
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.UTF8JsonGenerator.writeRaw(char[], int, int):void");
     }
 
     public void writeRaw(char c) throws IOException, JsonGenerationException {
@@ -545,61 +587,105 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
             _flushBuffer();
         }
         byte[] bArr = this._outputBuffer;
-        int i;
-        if (c <= '') {
-            i = this._outputTail;
+        if (c <= 127) {
+            int i = this._outputTail;
             this._outputTail = i + 1;
             bArr[i] = (byte) c;
-        } else if (c < 'ࠀ') {
-            i = this._outputTail;
-            this._outputTail = i + 1;
-            bArr[i] = (byte) ((c >> 6) | 192);
-            i = this._outputTail;
-            this._outputTail = i + 1;
-            bArr[i] = (byte) ((c & 63) | 128);
+        } else if (c < 2048) {
+            int i2 = this._outputTail;
+            this._outputTail = i2 + 1;
+            bArr[i2] = (byte) ((c >> 6) | 192);
+            int i3 = this._outputTail;
+            this._outputTail = i3 + 1;
+            bArr[i3] = (byte) ((c & '?') | 128);
         } else {
             _outputRawMultiByteChar(c, null, 0, 0);
         }
     }
 
-    private final void _writeSegmentedRaw(char[] cArr, int i, int i2) throws IOException, JsonGenerationException {
-        int i3 = this._outputEnd;
-        byte[] bArr = this._outputBuffer;
-        int i4 = i;
-        while (i4 < i2) {
-            while (true) {
-                char c = cArr[i4];
-                if (c >= '') {
-                    break;
-                }
-                if (this._outputTail >= i3) {
-                    _flushBuffer();
-                }
-                int i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr[i5] = (byte) c;
-                i4++;
-                if (i4 >= i2) {
-                    return;
-                }
-            }
-            if (this._outputTail + 3 >= this._outputEnd) {
-                _flushBuffer();
-            }
-            int i6 = i4 + 1;
-            char c2 = cArr[i4];
-            if (c2 < 'ࠀ') {
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr[i5] = (byte) ((c2 >> 6) | 192);
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr[i5] = (byte) ((c2 & 63) | 128);
-                i4 = i6;
-            } else {
-                i4 = _outputRawMultiByteChar(c2, cArr, i6, i2);
-            }
-        }
+    /* JADX WARNING: Code restructure failed: missing block: B:15:0x0051, code lost:
+        r0 = _outputRawMultiByteChar(r0, r7, r1, r9);
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:5:0x0013, code lost:
+        if ((r6._outputTail + 3) < r6._outputEnd) goto L_0x0018;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:6:0x0015, code lost:
+        _flushBuffer();
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:7:0x0018, code lost:
+        r1 = r0 + 1;
+        r0 = r7[r0];
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:8:0x001e, code lost:
+        if (r0 >= 2048) goto L_0x0051;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:9:0x0020, code lost:
+        r4 = r6._outputTail;
+        r6._outputTail = r4 + 1;
+        r3[r4] = (byte) ((r0 >> 6) | 192);
+        r4 = r6._outputTail;
+        r6._outputTail = r4 + 1;
+        r3[r4] = (byte) ((r0 & '?') | 128);
+        r0 = r1;
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private final void _writeSegmentedRaw(char[] r7, int r8, int r9) throws java.io.IOException, com.fasterxml.jackson.core.JsonGenerationException {
+        /*
+            r6 = this;
+            int r2 = r6._outputEnd
+            byte[] r3 = r6._outputBuffer
+            r0 = r8
+        L_0x0005:
+            if (r0 >= r9) goto L_0x0050
+        L_0x0007:
+            char r1 = r7[r0]
+            r4 = 128(0x80, float:1.794E-43)
+            if (r1 < r4) goto L_0x003c
+            int r1 = r6._outputTail
+            int r1 = r1 + 3
+            int r4 = r6._outputEnd
+            if (r1 < r4) goto L_0x0018
+            r6._flushBuffer()
+        L_0x0018:
+            int r1 = r0 + 1
+            char r0 = r7[r0]
+            r4 = 2048(0x800, float:2.87E-42)
+            if (r0 >= r4) goto L_0x0051
+            int r4 = r6._outputTail
+            int r5 = r4 + 1
+            r6._outputTail = r5
+            int r5 = r0 >> 6
+            r5 = r5 | 192(0xc0, float:2.69E-43)
+            byte r5 = (byte) r5
+            r3[r4] = r5
+            int r4 = r6._outputTail
+            int r5 = r4 + 1
+            r6._outputTail = r5
+            r0 = r0 & 63
+            r0 = r0 | 128(0x80, float:1.794E-43)
+            byte r0 = (byte) r0
+            r3[r4] = r0
+            r0 = r1
+            goto L_0x0005
+        L_0x003c:
+            int r4 = r6._outputTail
+            if (r4 < r2) goto L_0x0043
+            r6._flushBuffer()
+        L_0x0043:
+            int r4 = r6._outputTail
+            int r5 = r4 + 1
+            r6._outputTail = r5
+            byte r1 = (byte) r1
+            r3[r4] = r1
+            int r0 = r0 + 1
+            if (r0 < r9) goto L_0x0007
+        L_0x0050:
+            return
+        L_0x0051:
+            int r0 = r6._outputRawMultiByteChar(r0, r7, r1, r9)
+            goto L_0x0005
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.core.json.UTF8JsonGenerator._writeSegmentedRaw(char[], int, int):void");
     }
 
     public void writeBinary(Base64Variant base64Variant, byte[] bArr, int i, int i2) throws IOException, JsonGenerationException {
@@ -615,10 +701,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr2 = this._outputBuffer;
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        bArr2[i3] = BYTE_QUOTE;
+        byte[] bArr3 = this._outputBuffer;
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        bArr3[i4] = BYTE_QUOTE;
     }
 
     public int writeBinary(Base64Variant base64Variant, InputStream inputStream, int i) throws IOException, JsonGenerationException {
@@ -636,6 +722,7 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
                 i = _writeBinary(base64Variant, inputStream, allocBase64Buffer);
             } catch (Throwable th) {
                 this._ioContext.releaseBase64Buffer(allocBase64Buffer);
+                throw th;
             }
         } else {
             int _writeBinary = _writeBinary(base64Variant, inputStream, allocBase64Buffer, i);
@@ -647,10 +734,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr = this._outputBuffer;
-        i2 = this._outputTail;
-        this._outputTail = i2 + 1;
-        bArr[i2] = BYTE_QUOTE;
+        byte[] bArr2 = this._outputBuffer;
+        int i3 = this._outputTail;
+        this._outputTail = i3 + 1;
+        bArr2[i3] = BYTE_QUOTE;
         return i;
     }
 
@@ -675,10 +762,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         this._outputTail = i + 1;
         bArr[i] = BYTE_QUOTE;
         this._outputTail = NumberOutput.outputInt((int) s, this._outputBuffer, this._outputTail);
-        bArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        bArr[i] = BYTE_QUOTE;
+        byte[] bArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        bArr2[i2] = BYTE_QUOTE;
     }
 
     public void writeNumber(int i) throws IOException {
@@ -702,10 +789,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         this._outputTail = i2 + 1;
         bArr[i2] = BYTE_QUOTE;
         this._outputTail = NumberOutput.outputInt(i, this._outputBuffer, this._outputTail);
-        bArr = this._outputBuffer;
-        i2 = this._outputTail;
-        this._outputTail = i2 + 1;
-        bArr[i2] = BYTE_QUOTE;
+        byte[] bArr2 = this._outputBuffer;
+        int i3 = this._outputTail;
+        this._outputTail = i3 + 1;
+        bArr2[i3] = BYTE_QUOTE;
     }
 
     public void writeNumber(long j) throws IOException {
@@ -729,10 +816,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         this._outputTail = i + 1;
         bArr[i] = BYTE_QUOTE;
         this._outputTail = NumberOutput.outputLong(j, this._outputBuffer, this._outputTail);
-        bArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        bArr[i] = BYTE_QUOTE;
+        byte[] bArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        bArr2[i2] = BYTE_QUOTE;
     }
 
     public void writeNumber(BigInteger bigInteger) throws IOException {
@@ -798,10 +885,10 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail >= this._outputEnd) {
             _flushBuffer();
         }
-        bArr = this._outputBuffer;
-        i = this._outputTail;
-        this._outputTail = i + 1;
-        bArr[i] = BYTE_QUOTE;
+        byte[] bArr2 = this._outputBuffer;
+        int i2 = this._outputTail;
+        this._outputTail = i2 + 1;
+        bArr2[i2] = BYTE_QUOTE;
     }
 
     public void writeBoolean(boolean z) throws IOException {
@@ -809,9 +896,9 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (this._outputTail + 5 >= this._outputEnd) {
             _flushBuffer();
         }
-        Object obj = z ? TRUE_BYTES : FALSE_BYTES;
-        int length = obj.length;
-        System.arraycopy(obj, 0, this._outputBuffer, this._outputTail, length);
+        byte[] bArr = z ? TRUE_BYTES : FALSE_BYTES;
+        int length = bArr.length;
+        System.arraycopy(bArr, 0, this._outputBuffer, this._outputTail, length);
         this._outputTail += length;
     }
 
@@ -820,13 +907,14 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         _writeNull();
     }
 
-    protected final void _verifyValueWrite(String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _verifyValueWrite(String str) throws IOException {
+        byte b;
         int writeValue = this._writeContext.writeValue();
         if (writeValue == 5) {
             _reportError("Can not " + str + ", expecting field name");
         }
         if (this._cfgPrettyPrinter == null) {
-            byte b;
             switch (writeValue) {
                 case 1:
                     b = BYTE_COMMA;
@@ -857,7 +945,8 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         _verifyPrettyValueWrite(str, writeValue);
     }
 
-    protected final void _verifyPrettyValueWrite(String str, int i) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _verifyPrettyValueWrite(String str, int i) throws IOException {
         switch (i) {
             case 0:
                 if (this._writeContext.inArray()) {
@@ -895,7 +984,7 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         super.close();
         if (this._outputBuffer != null && isEnabled(Feature.AUTO_CLOSE_JSON_CONTENT)) {
             while (true) {
-                JsonStreamContext outputContext = getOutputContext();
+                JsonWriteContext outputContext = getOutputContext();
                 if (!outputContext.inArray()) {
                     if (!outputContext.inObject()) {
                         break;
@@ -918,7 +1007,8 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         _releaseBuffers();
     }
 
-    protected void _releaseBuffers() {
+    /* access modifiers changed from: protected */
+    public void _releaseBuffers() {
         byte[] bArr = this._outputBuffer;
         if (bArr != null && this._bufferRecyclable) {
             this._outputBuffer = null;
@@ -957,35 +1047,34 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
     }
 
     private final void _writeStringSegments(String str, boolean z) throws IOException {
-        int i;
         if (z) {
             if (this._outputTail >= this._outputEnd) {
                 _flushBuffer();
             }
             byte[] bArr = this._outputBuffer;
-            i = this._outputTail;
+            int i = this._outputTail;
             this._outputTail = i + 1;
             bArr[i] = BYTE_QUOTE;
         }
-        i = str.length();
+        int length = str.length();
         int i2 = 0;
-        while (i > 0) {
-            int min = Math.min(this._outputMaxContiguous, i);
+        while (length > 0) {
+            int min = Math.min(this._outputMaxContiguous, length);
             if (this._outputTail + min > this._outputEnd) {
                 _flushBuffer();
             }
             _writeStringSegment(str, i2, min);
             i2 += min;
-            i -= min;
+            length -= min;
         }
         if (z) {
             if (this._outputTail >= this._outputEnd) {
                 _flushBuffer();
             }
-            bArr = this._outputBuffer;
-            i = this._outputTail;
-            this._outputTail = i + 1;
-            bArr[i] = BYTE_QUOTE;
+            byte[] bArr2 = this._outputBuffer;
+            int i3 = this._outputTail;
+            this._outputTail = i3 + 1;
+            bArr2[i3] = BYTE_QUOTE;
         }
     }
 
@@ -1020,7 +1109,7 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int[] iArr = this._outputEscapes;
         while (i < i3) {
             char c = cArr[i];
-            if (c > '' || iArr[c] != 0) {
+            if (c > 127 || iArr[c] != 0) {
                 break;
             }
             int i5 = i4 + 1;
@@ -1048,7 +1137,7 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int[] iArr = this._outputEscapes;
         while (i < i3) {
             char charAt = str.charAt(i);
-            if (charAt > '' || iArr[charAt] != 0) {
+            if (charAt > 127 || iArr[charAt] != 0) {
                 break;
             }
             int i5 = i4 + 1;
@@ -1079,29 +1168,28 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         while (i < i2) {
             int i4 = i + 1;
             char c = cArr[i];
-            int i5;
-            if (c > '') {
-                if (c <= '߿') {
-                    i5 = i3 + 1;
+            if (c > 127) {
+                if (c <= 2047) {
+                    int i5 = i3 + 1;
                     bArr[i3] = (byte) ((c >> 6) | 192);
                     i3 = i5 + 1;
-                    bArr[i5] = (byte) ((c & 63) | 128);
+                    bArr[i5] = (byte) ((c & '?') | 128);
                 } else {
                     i3 = _outputMultiByteChar(c, i3);
                 }
                 i = i4;
             } else if (iArr[c] == 0) {
-                i5 = i3 + 1;
+                int i6 = i3 + 1;
                 bArr[i3] = (byte) c;
-                i3 = i5;
+                i3 = i6;
                 i = i4;
             } else {
-                i5 = iArr[c];
-                if (i5 > 0) {
-                    int i6 = i3 + 1;
+                int i7 = iArr[c];
+                if (i7 > 0) {
+                    int i8 = i3 + 1;
                     bArr[i3] = BYTE_BACKSLASH;
-                    i3 = i6 + 1;
-                    bArr[i6] = (byte) i5;
+                    i3 = i8 + 1;
+                    bArr[i8] = (byte) i7;
                     i = i4;
                 } else {
                     i3 = _writeGenericEscape(c, i3);
@@ -1122,29 +1210,28 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         while (i < i2) {
             int i4 = i + 1;
             char charAt = str.charAt(i);
-            int i5;
-            if (charAt > '') {
-                if (charAt <= '߿') {
-                    i5 = i3 + 1;
+            if (charAt > 127) {
+                if (charAt <= 2047) {
+                    int i5 = i3 + 1;
                     bArr[i3] = (byte) ((charAt >> 6) | 192);
                     i3 = i5 + 1;
-                    bArr[i5] = (byte) ((charAt & 63) | 128);
+                    bArr[i5] = (byte) ((charAt & '?') | 128);
                 } else {
                     i3 = _outputMultiByteChar(charAt, i3);
                 }
                 i = i4;
             } else if (iArr[charAt] == 0) {
-                i5 = i3 + 1;
+                int i6 = i3 + 1;
                 bArr[i3] = (byte) charAt;
-                i3 = i5;
+                i3 = i6;
                 i = i4;
             } else {
-                i5 = iArr[charAt];
-                if (i5 > 0) {
-                    int i6 = i3 + 1;
+                int i7 = iArr[charAt];
+                if (i7 > 0) {
+                    int i8 = i3 + 1;
                     bArr[i3] = BYTE_BACKSLASH;
-                    i3 = i6 + 1;
-                    bArr[i6] = (byte) i5;
+                    i3 = i8 + 1;
+                    bArr[i8] = (byte) i7;
                     i = i4;
                 } else {
                     i3 = _writeGenericEscape(charAt, i3);
@@ -1162,43 +1249,42 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int i3 = this._outputTail;
         byte[] bArr = this._outputBuffer;
         int[] iArr = this._outputEscapes;
-        char c = this._maximumNonEscapedChar;
+        int i4 = this._maximumNonEscapedChar;
         while (i < i2) {
-            int i4 = i + 1;
-            char c2 = cArr[i];
-            int i5;
-            if (c2 <= '') {
-                if (iArr[c2] == 0) {
-                    i5 = i3 + 1;
-                    bArr[i3] = (byte) c2;
-                    i3 = i5;
-                    i = i4;
+            int i5 = i + 1;
+            char c = cArr[i];
+            if (c <= 127) {
+                if (iArr[c] == 0) {
+                    int i6 = i3 + 1;
+                    bArr[i3] = (byte) c;
+                    i3 = i6;
+                    i = i5;
                 } else {
-                    i5 = iArr[c2];
-                    if (i5 > 0) {
-                        int i6 = i3 + 1;
+                    int i7 = iArr[c];
+                    if (i7 > 0) {
+                        int i8 = i3 + 1;
                         bArr[i3] = BYTE_BACKSLASH;
-                        i3 = i6 + 1;
-                        bArr[i6] = (byte) i5;
-                        i = i4;
+                        i3 = i8 + 1;
+                        bArr[i8] = (byte) i7;
+                        i = i5;
                     } else {
-                        i3 = _writeGenericEscape(c2, i3);
-                        i = i4;
+                        i3 = _writeGenericEscape(c, i3);
+                        i = i5;
                     }
                 }
-            } else if (c2 > c) {
-                i3 = _writeGenericEscape(c2, i3);
-                i = i4;
+            } else if (c > i4) {
+                i3 = _writeGenericEscape(c, i3);
+                i = i5;
             } else {
-                if (c2 <= '߿') {
-                    i5 = i3 + 1;
-                    bArr[i3] = (byte) ((c2 >> 6) | 192);
-                    i3 = i5 + 1;
-                    bArr[i5] = (byte) ((c2 & 63) | 128);
+                if (c <= 2047) {
+                    int i9 = i3 + 1;
+                    bArr[i3] = (byte) ((c >> 6) | 192);
+                    i3 = i9 + 1;
+                    bArr[i9] = (byte) ((c & '?') | 128);
                 } else {
-                    i3 = _outputMultiByteChar(c2, i3);
+                    i3 = _outputMultiByteChar(c, i3);
                 }
-                i = i4;
+                i = i5;
             }
         }
         this._outputTail = i3;
@@ -1211,43 +1297,42 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int i3 = this._outputTail;
         byte[] bArr = this._outputBuffer;
         int[] iArr = this._outputEscapes;
-        char c = this._maximumNonEscapedChar;
+        int i4 = this._maximumNonEscapedChar;
         while (i < i2) {
-            int i4 = i + 1;
+            int i5 = i + 1;
             char charAt = str.charAt(i);
-            int i5;
-            if (charAt <= '') {
+            if (charAt <= 127) {
                 if (iArr[charAt] == 0) {
-                    i5 = i3 + 1;
+                    int i6 = i3 + 1;
                     bArr[i3] = (byte) charAt;
-                    i3 = i5;
-                    i = i4;
+                    i3 = i6;
+                    i = i5;
                 } else {
-                    i5 = iArr[charAt];
-                    if (i5 > 0) {
-                        int i6 = i3 + 1;
+                    int i7 = iArr[charAt];
+                    if (i7 > 0) {
+                        int i8 = i3 + 1;
                         bArr[i3] = BYTE_BACKSLASH;
-                        i3 = i6 + 1;
-                        bArr[i6] = (byte) i5;
-                        i = i4;
+                        i3 = i8 + 1;
+                        bArr[i8] = (byte) i7;
+                        i = i5;
                     } else {
                         i3 = _writeGenericEscape(charAt, i3);
-                        i = i4;
+                        i = i5;
                     }
                 }
-            } else if (charAt > c) {
+            } else if (charAt > i4) {
                 i3 = _writeGenericEscape(charAt, i3);
-                i = i4;
+                i = i5;
             } else {
-                if (charAt <= '߿') {
-                    i5 = i3 + 1;
+                if (charAt <= 2047) {
+                    int i9 = i3 + 1;
                     bArr[i3] = (byte) ((charAt >> 6) | 192);
-                    i3 = i5 + 1;
-                    bArr[i5] = (byte) ((charAt & 63) | 128);
+                    i3 = i9 + 1;
+                    bArr[i9] = (byte) ((charAt & '?') | 128);
                 } else {
                     i3 = _outputMultiByteChar(charAt, i3);
                 }
-                i = i4;
+                i = i5;
             }
         }
         this._outputTail = i3;
@@ -1260,57 +1345,55 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int i3 = this._outputTail;
         byte[] bArr = this._outputBuffer;
         int[] iArr = this._outputEscapes;
-        char c = this._maximumNonEscapedChar <= 0 ? '￿' : this._maximumNonEscapedChar;
+        int i4 = this._maximumNonEscapedChar <= 0 ? 65535 : this._maximumNonEscapedChar;
         CharacterEscapes characterEscapes = this._characterEscapes;
         while (i < i2) {
-            int i4 = i + 1;
-            char c2 = cArr[i];
-            int i5;
-            SerializableString escapeSequence;
-            if (c2 <= '') {
-                if (iArr[c2] == 0) {
-                    i5 = i3 + 1;
-                    bArr[i3] = (byte) c2;
-                    i3 = i5;
-                    i = i4;
+            int i5 = i + 1;
+            char c = cArr[i];
+            if (c <= 127) {
+                if (iArr[c] == 0) {
+                    int i6 = i3 + 1;
+                    bArr[i3] = (byte) c;
+                    i3 = i6;
+                    i = i5;
                 } else {
-                    i5 = iArr[c2];
-                    if (i5 > 0) {
-                        int i6 = i3 + 1;
+                    int i7 = iArr[c];
+                    if (i7 > 0) {
+                        int i8 = i3 + 1;
                         bArr[i3] = BYTE_BACKSLASH;
-                        i3 = i6 + 1;
-                        bArr[i6] = (byte) i5;
-                        i = i4;
-                    } else if (i5 == -2) {
-                        escapeSequence = characterEscapes.getEscapeSequence(c2);
+                        i3 = i8 + 1;
+                        bArr[i8] = (byte) i7;
+                        i = i5;
+                    } else if (i7 == -2) {
+                        SerializableString escapeSequence = characterEscapes.getEscapeSequence(c);
                         if (escapeSequence == null) {
-                            _reportError("Invalid custom escape definitions; custom escape not found for character code 0x" + Integer.toHexString(c2) + ", although was supposed to have one");
+                            _reportError("Invalid custom escape definitions; custom escape not found for character code 0x" + Integer.toHexString(c) + ", although was supposed to have one");
                         }
-                        i3 = _writeCustomEscape(bArr, i3, escapeSequence, i2 - i4);
-                        i = i4;
+                        i3 = _writeCustomEscape(bArr, i3, escapeSequence, i2 - i5);
+                        i = i5;
                     } else {
-                        i3 = _writeGenericEscape(c2, i3);
-                        i = i4;
+                        i3 = _writeGenericEscape(c, i3);
+                        i = i5;
                     }
                 }
-            } else if (c2 > c) {
-                i3 = _writeGenericEscape(c2, i3);
-                i = i4;
+            } else if (c > i4) {
+                i3 = _writeGenericEscape(c, i3);
+                i = i5;
             } else {
-                escapeSequence = characterEscapes.getEscapeSequence(c2);
-                if (escapeSequence != null) {
-                    i3 = _writeCustomEscape(bArr, i3, escapeSequence, i2 - i4);
-                    i = i4;
+                SerializableString escapeSequence2 = characterEscapes.getEscapeSequence(c);
+                if (escapeSequence2 != null) {
+                    i3 = _writeCustomEscape(bArr, i3, escapeSequence2, i2 - i5);
+                    i = i5;
                 } else {
-                    if (c2 <= '߿') {
-                        i5 = i3 + 1;
-                        bArr[i3] = (byte) ((c2 >> 6) | 192);
-                        i3 = i5 + 1;
-                        bArr[i5] = (byte) ((c2 & 63) | 128);
+                    if (c <= 2047) {
+                        int i9 = i3 + 1;
+                        bArr[i3] = (byte) ((c >> 6) | 192);
+                        i3 = i9 + 1;
+                        bArr[i9] = (byte) ((c & '?') | 128);
                     } else {
-                        i3 = _outputMultiByteChar(c2, i3);
+                        i3 = _outputMultiByteChar(c, i3);
                     }
-                    i = i4;
+                    i = i5;
                 }
             }
         }
@@ -1324,57 +1407,55 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int i3 = this._outputTail;
         byte[] bArr = this._outputBuffer;
         int[] iArr = this._outputEscapes;
-        char c = this._maximumNonEscapedChar <= 0 ? '￿' : this._maximumNonEscapedChar;
+        int i4 = this._maximumNonEscapedChar <= 0 ? 65535 : this._maximumNonEscapedChar;
         CharacterEscapes characterEscapes = this._characterEscapes;
         while (i < i2) {
-            int i4 = i + 1;
+            int i5 = i + 1;
             char charAt = str.charAt(i);
-            int i5;
-            SerializableString escapeSequence;
-            if (charAt <= '') {
+            if (charAt <= 127) {
                 if (iArr[charAt] == 0) {
-                    i5 = i3 + 1;
+                    int i6 = i3 + 1;
                     bArr[i3] = (byte) charAt;
-                    i3 = i5;
-                    i = i4;
+                    i3 = i6;
+                    i = i5;
                 } else {
-                    i5 = iArr[charAt];
-                    if (i5 > 0) {
-                        int i6 = i3 + 1;
+                    int i7 = iArr[charAt];
+                    if (i7 > 0) {
+                        int i8 = i3 + 1;
                         bArr[i3] = BYTE_BACKSLASH;
-                        i3 = i6 + 1;
-                        bArr[i6] = (byte) i5;
-                        i = i4;
-                    } else if (i5 == -2) {
-                        escapeSequence = characterEscapes.getEscapeSequence(charAt);
+                        i3 = i8 + 1;
+                        bArr[i8] = (byte) i7;
+                        i = i5;
+                    } else if (i7 == -2) {
+                        SerializableString escapeSequence = characterEscapes.getEscapeSequence(charAt);
                         if (escapeSequence == null) {
                             _reportError("Invalid custom escape definitions; custom escape not found for character code 0x" + Integer.toHexString(charAt) + ", although was supposed to have one");
                         }
-                        i3 = _writeCustomEscape(bArr, i3, escapeSequence, i2 - i4);
-                        i = i4;
+                        i3 = _writeCustomEscape(bArr, i3, escapeSequence, i2 - i5);
+                        i = i5;
                     } else {
                         i3 = _writeGenericEscape(charAt, i3);
-                        i = i4;
+                        i = i5;
                     }
                 }
-            } else if (charAt > c) {
+            } else if (charAt > i4) {
                 i3 = _writeGenericEscape(charAt, i3);
-                i = i4;
+                i = i5;
             } else {
-                escapeSequence = characterEscapes.getEscapeSequence(charAt);
-                if (escapeSequence != null) {
-                    i3 = _writeCustomEscape(bArr, i3, escapeSequence, i2 - i4);
-                    i = i4;
+                SerializableString escapeSequence2 = characterEscapes.getEscapeSequence(charAt);
+                if (escapeSequence2 != null) {
+                    i3 = _writeCustomEscape(bArr, i3, escapeSequence2, i2 - i5);
+                    i = i5;
                 } else {
-                    if (charAt <= '߿') {
-                        i5 = i3 + 1;
+                    if (charAt <= 2047) {
+                        int i9 = i3 + 1;
                         bArr[i3] = (byte) ((charAt >> 6) | 192);
-                        i3 = i5 + 1;
-                        bArr[i5] = (byte) ((charAt & 63) | 128);
+                        i3 = i9 + 1;
+                        bArr[i9] = (byte) ((charAt & '?') | 128);
                     } else {
                         i3 = _outputMultiByteChar(charAt, i3);
                     }
-                    i = i4;
+                    i = i5;
                 }
             }
         }
@@ -1382,7 +1463,7 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
     }
 
     private final int _writeCustomEscape(byte[] bArr, int i, SerializableString serializableString, int i2) throws IOException, JsonGenerationException {
-        Object asUnquotedUTF8 = serializableString.asUnquotedUTF8();
+        byte[] asUnquotedUTF8 = serializableString.asUnquotedUTF8();
         int length = asUnquotedUTF8.length;
         if (length > 6) {
             return _handleLongCustomEscape(bArr, i, this._outputEnd, asUnquotedUTF8, i2);
@@ -1397,13 +1478,13 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         if (i + length > i2) {
             this._outputTail = i;
             _flushBuffer();
-            i4 = this._outputTail;
+            int i5 = this._outputTail;
             if (length > bArr.length) {
                 this._outputStream.write(bArr2, 0, length);
-                return i4;
+                return i5;
             }
-            System.arraycopy(bArr2, 0, bArr, i4, length);
-            i4 += length;
+            System.arraycopy(bArr2, 0, bArr, i5, length);
+            i4 = i5 + length;
         } else {
             i4 = i;
         }
@@ -1430,7 +1511,7 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         while (i4 < i3) {
             int i5 = i4 + 1;
             byte b = bArr[i4];
-            if (b < (byte) 0 || iArr[b] == 0) {
+            if (b < 0 || iArr[b] == 0) {
                 i4 = i5;
             } else {
                 _writeUTF8Segment2(bArr, i, i2);
@@ -1445,40 +1526,41 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
     }
 
     private final void _writeUTF8Segment2(byte[] bArr, int i, int i2) throws IOException, JsonGenerationException {
-        int i3 = this._outputTail;
-        if ((i2 * 6) + i3 > this._outputEnd) {
+        int i3;
+        int i4 = this._outputTail;
+        if ((i2 * 6) + i4 > this._outputEnd) {
             _flushBuffer();
-            i3 = this._outputTail;
+            i4 = this._outputTail;
         }
         byte[] bArr2 = this._outputBuffer;
         int[] iArr = this._outputEscapes;
-        int i4 = i2 + i;
-        while (i < i4) {
-            int i5 = i + 1;
+        int i5 = i2 + i;
+        while (i < i5) {
+            int i6 = i + 1;
             byte b = bArr[i];
-            int i6;
-            if (b < (byte) 0 || iArr[b] == 0) {
-                i6 = i3 + 1;
+            if (b < 0 || iArr[b] == 0) {
+                int i7 = i3 + 1;
                 bArr2[i3] = b;
-                i3 = i6;
-                i = i5;
+                i3 = i7;
+                i = i6;
             } else {
-                i6 = iArr[b];
-                if (i6 > 0) {
-                    int i7 = i3 + 1;
+                int i8 = iArr[b];
+                if (i8 > 0) {
+                    int i9 = i3 + 1;
                     bArr2[i3] = BYTE_BACKSLASH;
-                    i3 = i7 + 1;
-                    bArr2[i7] = (byte) i6;
+                    i3 = i9 + 1;
+                    bArr2[i9] = (byte) i8;
                 } else {
                     i3 = _writeGenericEscape(b, i3);
                 }
-                i = i5;
+                i = i6;
             }
         }
         this._outputTail = i3;
     }
 
-    protected final void _writeBinary(Base64Variant base64Variant, byte[] bArr, int i, int i2) throws IOException, JsonGenerationException {
+    /* access modifiers changed from: protected */
+    public final void _writeBinary(Base64Variant base64Variant, byte[] bArr, int i, int i2) throws IOException, JsonGenerationException {
         int i3 = i2 - 3;
         int i4 = this._outputEnd - 6;
         int maxLineLength = base64Variant.getMaxLineLength() >> 2;
@@ -1490,191 +1572,193 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
             int i6 = bArr[i] << 8;
             int i7 = i5 + 1;
             i = i7 + 1;
-            this._outputTail = base64Variant.encodeBase64Chunk((((bArr[i5] & 255) | i6) << 8) | (bArr[i7] & 255), this._outputBuffer, this._outputTail);
+            this._outputTail = base64Variant.encodeBase64Chunk((int) (((bArr[i5] & 255) | i6) << 8) | (bArr[i7] & 255), this._outputBuffer, this._outputTail);
             maxLineLength--;
             if (maxLineLength <= 0) {
                 byte[] bArr2 = this._outputBuffer;
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr2[i5] = BYTE_BACKSLASH;
-                bArr2 = this._outputBuffer;
-                i5 = this._outputTail;
-                this._outputTail = i5 + 1;
-                bArr2[i5] = (byte) 110;
+                int i8 = this._outputTail;
+                this._outputTail = i8 + 1;
+                bArr2[i8] = BYTE_BACKSLASH;
+                byte[] bArr3 = this._outputBuffer;
+                int i9 = this._outputTail;
+                this._outputTail = i9 + 1;
+                bArr3[i9] = 110;
                 maxLineLength = base64Variant.getMaxLineLength() >> 2;
             }
         }
-        i3 = i2 - i;
-        if (i3 > 0) {
+        int i10 = i2 - i;
+        if (i10 > 0) {
             if (this._outputTail > i4) {
                 _flushBuffer();
             }
-            i4 = i + 1;
-            maxLineLength = bArr[i] << 16;
-            if (i3 == 2) {
-                i5 = i4 + 1;
-                maxLineLength |= (bArr[i4] & 255) << 8;
+            int i11 = i + 1;
+            int i12 = bArr[i] << 16;
+            if (i10 == 2) {
+                int i13 = i11 + 1;
+                i12 |= (bArr[i11] & 255) << 8;
             }
-            this._outputTail = base64Variant.encodeBase64Partial(maxLineLength, i3, this._outputBuffer, this._outputTail);
+            this._outputTail = base64Variant.encodeBase64Partial(i12, i10, this._outputBuffer, this._outputTail);
         }
     }
 
-    protected final int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr, int i) throws IOException, JsonGenerationException {
-        int i2 = 0;
-        int i3 = 0;
-        int i4 = -3;
-        int i5 = this._outputEnd - 6;
-        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
-        int i6 = i;
-        while (i6 > 2) {
-            if (i2 > i4) {
-                i3 = _readMore(inputStream, bArr, i2, i3, i6);
-                i2 = 0;
-                if (i3 < 3) {
-                    break;
-                }
-                i4 = i3 - 3;
-            }
-            if (this._outputTail > i5) {
-                _flushBuffer();
-            }
-            int i7 = i2 + 1;
-            int i8 = bArr[i2] << 8;
-            int i9 = i7 + 1;
-            i2 = i9 + 1;
-            i6 -= 3;
-            this._outputTail = base64Variant.encodeBase64Chunk((((bArr[i7] & 255) | i8) << 8) | (bArr[i9] & 255), this._outputBuffer, this._outputTail);
-            i7 = maxLineLength - 1;
-            if (i7 <= 0) {
-                byte[] bArr2 = this._outputBuffer;
-                i8 = this._outputTail;
-                this._outputTail = i8 + 1;
-                bArr2[i8] = BYTE_BACKSLASH;
-                bArr2 = this._outputBuffer;
-                i8 = this._outputTail;
-                this._outputTail = i8 + 1;
-                bArr2[i8] = (byte) 110;
-                i7 = base64Variant.getMaxLineLength() >> 2;
-            }
-            maxLineLength = i7;
-        }
-        if (i6 <= 0) {
-            return i6;
-        }
-        i4 = _readMore(inputStream, bArr, i2, i3, i6);
-        if (i4 <= 0) {
-            return i6;
-        }
-        if (this._outputTail > i5) {
-            _flushBuffer();
-        }
-        i7 = bArr[0] << 16;
-        if (1 < i4) {
-            i7 |= (bArr[1] & 255) << 8;
-            i4 = 2;
-        } else {
-            i4 = 1;
-        }
-        this._outputTail = base64Variant.encodeBase64Partial(i7, i4, this._outputBuffer, this._outputTail);
-        return i6 - i4;
-    }
-
-    protected final int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr) throws IOException, JsonGenerationException {
-        int i = -3;
-        int i2 = this._outputEnd - 6;
-        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
+    /* access modifiers changed from: protected */
+    public final int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr, int i) throws IOException, JsonGenerationException {
+        int i2;
         int i3 = 0;
         int i4 = 0;
-        int i5 = 0;
-        while (true) {
-            if (i5 > i) {
-                i4 = _readMore(inputStream, bArr, i5, i4, bArr.length);
+        int i5 = -3;
+        int i6 = this._outputEnd - 6;
+        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
+        int i7 = i;
+        while (i7 > 2) {
+            if (i3 > i5) {
+                i4 = _readMore(inputStream, bArr, i3, i4, i7);
+                i3 = 0;
                 if (i4 < 3) {
                     break;
                 }
-                i = i4 - 3;
-                i5 = 0;
+                i5 = i4 - 3;
             }
-            if (this._outputTail > i2) {
+            if (this._outputTail > i6) {
                 _flushBuffer();
             }
-            int i6 = i5 + 1;
-            int i7 = bArr[i5] << 8;
-            int i8 = i6 + 1;
-            i5 = i8 + 1;
-            i3 += 3;
-            this._outputTail = base64Variant.encodeBase64Chunk((((bArr[i6] & 255) | i7) << 8) | (bArr[i8] & 255), this._outputBuffer, this._outputTail);
-            i6 = maxLineLength - 1;
-            if (i6 <= 0) {
+            int i8 = i3 + 1;
+            int i9 = bArr[i3] << 8;
+            int i10 = i8 + 1;
+            i3 = i10 + 1;
+            i7 -= 3;
+            this._outputTail = base64Variant.encodeBase64Chunk((int) (((bArr[i8] & 255) | i9) << 8) | (bArr[i10] & 255), this._outputBuffer, this._outputTail);
+            int i11 = maxLineLength - 1;
+            if (i11 <= 0) {
                 byte[] bArr2 = this._outputBuffer;
-                i7 = this._outputTail;
-                this._outputTail = i7 + 1;
-                bArr2[i7] = BYTE_BACKSLASH;
-                bArr2 = this._outputBuffer;
-                i7 = this._outputTail;
-                this._outputTail = i7 + 1;
-                bArr2[i7] = (byte) 110;
-                i6 = base64Variant.getMaxLineLength() >> 2;
+                int i12 = this._outputTail;
+                this._outputTail = i12 + 1;
+                bArr2[i12] = BYTE_BACKSLASH;
+                byte[] bArr3 = this._outputBuffer;
+                int i13 = this._outputTail;
+                this._outputTail = i13 + 1;
+                bArr3[i13] = 110;
+                i11 = base64Variant.getMaxLineLength() >> 2;
             }
-            maxLineLength = i6;
+            maxLineLength = i11;
         }
-        if (0 >= i4) {
-            return i3;
+        if (i7 <= 0) {
+            return i7;
         }
-        if (this._outputTail > i2) {
+        int _readMore = _readMore(inputStream, bArr, i3, i4, i7);
+        if (_readMore <= 0) {
+            return i7;
+        }
+        if (this._outputTail > i6) {
             _flushBuffer();
         }
-        i = bArr[0] << 16;
-        if (1 < i4) {
-            i6 = ((bArr[1] & 255) << 8) | i;
+        int i14 = bArr[0] << 16;
+        if (1 < _readMore) {
+            i14 |= (bArr[1] & 255) << 8;
+            i2 = 2;
+        } else {
+            i2 = 1;
+        }
+        this._outputTail = base64Variant.encodeBase64Partial(i14, i2, this._outputBuffer, this._outputTail);
+        return i7 - i2;
+    }
+
+    /* access modifiers changed from: protected */
+    public final int _writeBinary(Base64Variant base64Variant, InputStream inputStream, byte[] bArr) throws IOException, JsonGenerationException {
+        int i;
+        int i2 = -3;
+        int i3 = this._outputEnd - 6;
+        int maxLineLength = base64Variant.getMaxLineLength() >> 2;
+        int i4 = 0;
+        int i5 = 0;
+        int i6 = 0;
+        while (true) {
+            if (i6 > i2) {
+                i5 = _readMore(inputStream, bArr, i6, i5, bArr.length);
+                if (i5 < 3) {
+                    break;
+                }
+                i2 = i5 - 3;
+                i6 = 0;
+            }
+            if (this._outputTail > i3) {
+                _flushBuffer();
+            }
+            int i7 = i6 + 1;
+            int i8 = bArr[i6] << 8;
+            int i9 = i7 + 1;
+            i6 = i9 + 1;
+            i4 += 3;
+            this._outputTail = base64Variant.encodeBase64Chunk((int) (((bArr[i7] & 255) | i8) << 8) | (bArr[i9] & 255), this._outputBuffer, this._outputTail);
+            int i10 = maxLineLength - 1;
+            if (i10 <= 0) {
+                byte[] bArr2 = this._outputBuffer;
+                int i11 = this._outputTail;
+                this._outputTail = i11 + 1;
+                bArr2[i11] = BYTE_BACKSLASH;
+                byte[] bArr3 = this._outputBuffer;
+                int i12 = this._outputTail;
+                this._outputTail = i12 + 1;
+                bArr3[i12] = 110;
+                i10 = base64Variant.getMaxLineLength() >> 2;
+            }
+            maxLineLength = i10;
+        }
+        if (0 >= i5) {
+            return i4;
+        }
+        if (this._outputTail > i3) {
+            _flushBuffer();
+        }
+        int i13 = bArr[0] << 16;
+        if (1 < i5) {
+            i13 |= (bArr[1] & 255) << 8;
             i = 2;
         } else {
-            i6 = i;
             i = 1;
         }
-        i7 = i3 + i;
-        this._outputTail = base64Variant.encodeBase64Partial(i6, i, this._outputBuffer, this._outputTail);
-        return i7;
+        int i14 = i4 + i;
+        this._outputTail = base64Variant.encodeBase64Partial(i13, i, this._outputBuffer, this._outputTail);
+        return i14;
     }
 
     private final int _readMore(InputStream inputStream, byte[] bArr, int i, int i2, int i3) throws IOException {
-        int i4;
-        int i5 = 0;
+        int i4 = 0;
         while (i < i2) {
-            i4 = i5 + 1;
+            int i5 = i4 + 1;
             int i6 = i + 1;
-            bArr[i5] = bArr[i];
-            i5 = i4;
+            bArr[i4] = bArr[i];
+            i4 = i5;
             i = i6;
         }
-        i4 = Math.min(i3, bArr.length);
+        int min = Math.min(i3, bArr.length);
         do {
-            i6 = i4 - i5;
-            if (i6 != 0) {
-                i6 = inputStream.read(bArr, i5, i6);
-                if (i6 < 0) {
+            int i7 = min - i4;
+            if (i7 != 0) {
+                int read = inputStream.read(bArr, i4, i7);
+                if (read < 0) {
                     break;
                 }
-                i5 += i6;
+                i4 += read;
             } else {
                 break;
             }
-        } while (i5 < 3);
-        return i5;
+        } while (i4 < 3);
+        return i4;
     }
 
     private final int _outputRawMultiByteChar(int i, char[] cArr, int i2, int i3) throws IOException {
-        if (i < GeneratorBase.SURR1_FIRST || i > GeneratorBase.SURR2_LAST) {
+        if (i < 55296 || i > 57343) {
             byte[] bArr = this._outputBuffer;
             int i4 = this._outputTail;
             this._outputTail = i4 + 1;
             bArr[i4] = (byte) ((i >> 12) | 224);
-            i4 = this._outputTail;
-            this._outputTail = i4 + 1;
-            bArr[i4] = (byte) (((i >> 6) & 63) | 128);
-            i4 = this._outputTail;
-            this._outputTail = i4 + 1;
-            bArr[i4] = (byte) ((i & 63) | 128);
+            int i5 = this._outputTail;
+            this._outputTail = i5 + 1;
+            bArr[i5] = (byte) (((i >> 6) & 63) | 128);
+            int i6 = this._outputTail;
+            this._outputTail = i6 + 1;
+            bArr[i6] = (byte) ((i & 63) | 128);
             return i2;
         }
         if (i2 >= i3 || cArr == null) {
@@ -1684,7 +1768,8 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         return i2 + 1;
     }
 
-    protected final void _outputSurrogates(int i, int i2) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _outputSurrogates(int i, int i2) throws IOException {
         int _decodeSurrogate = _decodeSurrogate(i, i2);
         if (this._outputTail + 4 > this._outputEnd) {
             _flushBuffer();
@@ -1693,41 +1778,41 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
         int i3 = this._outputTail;
         this._outputTail = i3 + 1;
         bArr[i3] = (byte) ((_decodeSurrogate >> 18) | DisplaySupport.SCREEN_DENSITY_HIGH);
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        bArr[i3] = (byte) (((_decodeSurrogate >> 12) & 63) | 128);
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        bArr[i3] = (byte) (((_decodeSurrogate >> 6) & 63) | 128);
-        i3 = this._outputTail;
-        this._outputTail = i3 + 1;
-        bArr[i3] = (byte) ((_decodeSurrogate & 63) | 128);
+        int i4 = this._outputTail;
+        this._outputTail = i4 + 1;
+        bArr[i4] = (byte) (((_decodeSurrogate >> 12) & 63) | 128);
+        int i5 = this._outputTail;
+        this._outputTail = i5 + 1;
+        bArr[i5] = (byte) (((_decodeSurrogate >> 6) & 63) | 128);
+        int i6 = this._outputTail;
+        this._outputTail = i6 + 1;
+        bArr[i6] = (byte) ((_decodeSurrogate & 63) | 128);
     }
 
     private final int _outputMultiByteChar(int i, int i2) throws IOException {
         byte[] bArr = this._outputBuffer;
-        if (i < GeneratorBase.SURR1_FIRST || i > GeneratorBase.SURR2_LAST) {
+        if (i < 55296 || i > 57343) {
             int i3 = i2 + 1;
             bArr[i2] = (byte) ((i >> 12) | 224);
             int i4 = i3 + 1;
             bArr[i3] = (byte) (((i >> 6) & 63) | 128);
-            i3 = i4 + 1;
+            int i5 = i4 + 1;
             bArr[i4] = (byte) ((i & 63) | 128);
-            return i3;
+            return i5;
         }
-        i3 = i2 + 1;
+        int i6 = i2 + 1;
         bArr[i2] = BYTE_BACKSLASH;
-        i4 = i3 + 1;
-        bArr[i3] = BYTE_u;
-        i3 = i4 + 1;
-        bArr[i4] = HEX_CHARS[(i >> 12) & 15];
-        i4 = i3 + 1;
-        bArr[i3] = HEX_CHARS[(i >> 8) & 15];
-        int i5 = i4 + 1;
-        bArr[i4] = HEX_CHARS[(i >> 4) & 15];
-        i3 = i5 + 1;
-        bArr[i5] = HEX_CHARS[i & 15];
-        return i3;
+        int i7 = i6 + 1;
+        bArr[i6] = BYTE_u;
+        int i8 = i7 + 1;
+        bArr[i7] = HEX_CHARS[(i >> 12) & 15];
+        int i9 = i8 + 1;
+        bArr[i8] = HEX_CHARS[(i >> 8) & 15];
+        int i10 = i9 + 1;
+        bArr[i9] = HEX_CHARS[(i >> 4) & 15];
+        int i11 = i10 + 1;
+        bArr[i10] = HEX_CHARS[i & 15];
+        return i11;
     }
 
     private final void _writeNull() throws IOException {
@@ -1739,33 +1824,34 @@ public class UTF8JsonGenerator extends JsonGeneratorImpl {
     }
 
     private int _writeGenericEscape(int i, int i2) throws IOException {
+        int i3;
         byte[] bArr = this._outputBuffer;
-        int i3 = i2 + 1;
+        int i4 = i2 + 1;
         bArr[i2] = BYTE_BACKSLASH;
-        int i4 = i3 + 1;
-        bArr[i3] = BYTE_u;
-        int i5;
+        int i5 = i4 + 1;
+        bArr[i4] = BYTE_u;
         if (i > 255) {
-            i5 = (i >> 8) & 255;
-            int i6 = i4 + 1;
-            bArr[i4] = HEX_CHARS[i5 >> 4];
-            i3 = i6 + 1;
-            bArr[i6] = HEX_CHARS[i5 & 15];
+            int i6 = (i >> 8) & 255;
+            int i7 = i5 + 1;
+            bArr[i5] = HEX_CHARS[i6 >> 4];
+            i3 = i7 + 1;
+            bArr[i7] = HEX_CHARS[i6 & 15];
             i &= 255;
         } else {
-            i5 = i4 + 1;
-            bArr[i4] = BYTE_0;
-            i3 = i5 + 1;
+            int i8 = i5 + 1;
             bArr[i5] = BYTE_0;
+            i3 = i8 + 1;
+            bArr[i8] = BYTE_0;
         }
-        i4 = i3 + 1;
+        int i9 = i3 + 1;
         bArr[i3] = HEX_CHARS[i >> 4];
-        i3 = i4 + 1;
-        bArr[i4] = HEX_CHARS[i & 15];
-        return i3;
+        int i10 = i9 + 1;
+        bArr[i9] = HEX_CHARS[i & 15];
+        return i10;
     }
 
-    protected final void _flushBuffer() throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _flushBuffer() throws IOException {
         int i = this._outputTail;
         if (i > 0) {
             this._outputTail = 0;

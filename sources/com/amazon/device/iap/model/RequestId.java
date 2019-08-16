@@ -3,21 +3,13 @@ package com.amazon.device.iap.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
-import com.amazon.device.iap.internal.util.C0243d;
+import com.amazon.device.iap.internal.util.C0408d;
 import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class RequestId implements Parcelable {
-    public static final Creator<RequestId> CREATOR = new C02461();
-    private static final String ENCODED_ID = "encodedId";
-    private final String encodedId;
-
-    /* renamed from: com.amazon.device.iap.model.RequestId$1 */
-    static final class C02461 implements Creator<RequestId> {
-        C02461() {
-        }
-
+    public static final Creator<RequestId> CREATOR = new Creator<RequestId>() {
         public RequestId createFromParcel(Parcel parcel) {
             return new RequestId(parcel);
         }
@@ -25,7 +17,9 @@ public final class RequestId implements Parcelable {
         public RequestId[] newArray(int i) {
             return new RequestId[i];
         }
-    }
+    };
+    private static final String ENCODED_ID = "encodedId";
+    private final String encodedId;
 
     public RequestId() {
         this.encodedId = UUID.randomUUID().toString();
@@ -36,7 +30,7 @@ public final class RequestId implements Parcelable {
     }
 
     private RequestId(String str) {
-        C0243d.m169a((Object) str, ENCODED_ID);
+        C0408d.m164a((Object) str, ENCODED_ID);
         this.encodedId = str;
     }
 
@@ -49,7 +43,10 @@ public final class RequestId implements Parcelable {
     }
 
     public boolean equals(Object obj) {
-        return (obj == null || getClass() != obj.getClass()) ? false : this.encodedId.equals(((RequestId) obj).encodedId);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        return this.encodedId.equals(((RequestId) obj).encodedId);
     }
 
     public int hashCode() {

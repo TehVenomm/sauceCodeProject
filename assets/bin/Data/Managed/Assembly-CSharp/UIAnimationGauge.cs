@@ -6,8 +6,6 @@ public class UIAnimationGauge : UIHGauge
 
 	private void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
 		_mat = this.GetComponent<MeshRenderer>().get_material();
 	}
 

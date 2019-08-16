@@ -16,10 +16,15 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 		}
 	}
 
+	protected override SortBase.DIALOG_TYPE GetDialogType(bool isWeapon)
+	{
+		return (!isWeapon) ? SortBase.DIALOG_TYPE.TYPE_FILTERABLE_ARMOR : SortBase.DIALOG_TYPE.TYPE_FILTERABLE_WEAPON;
+	}
+
 	public override void Initialize()
 	{
 		object[] array = GameSection.GetEventData() as object[];
-		smithType = (SmithType)(int)array[0];
+		smithType = (SmithType)array[0];
 		GameSection.SetEventData(array[1]);
 		base.Initialize();
 		GameSection.SetEventData(null);
@@ -29,12 +34,8 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), false);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), false);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), is_visible: false);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), is_visible: false);
 		if (MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>() == null)
 		{
 			MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
@@ -52,7 +53,7 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 		object eventData = GameSection.GetEventData();
 		if (eventData is SmithType)
 		{
-			SmithType smithType = (SmithType)(int)eventData;
+			SmithType smithType = (SmithType)eventData;
 			if (base.smithType != smithType)
 			{
 				base.smithType = smithType;
@@ -60,24 +61,26 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 			}
 		}
 		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-		if (smithData != null)
+		if (smithData == null)
 		{
-			ulong uniqueID = smithData.selectEquipData.uniqueID;
-			int i = 0;
-			for (int num = localInventoryEquipData.Length; i < num; i++)
+			return;
+		}
+		ulong uniqueID = smithData.selectEquipData.uniqueID;
+		int i = 0;
+		for (int num = localInventoryEquipData.Length; i < num; i++)
+		{
+			if (uniqueID == localInventoryEquipData[i].GetUniqID())
 			{
-				if (uniqueID == localInventoryEquipData[i].GetUniqID())
-				{
-					localInventoryEquipData[i].SetItem(smithData.selectEquipData);
-				}
+				localInventoryEquipData[i].SetItem(smithData.selectEquipData);
 			}
 		}
 	}
 
 	protected override void InitSort()
 	{
-		SortBase.DIALOG_TYPE dialog_type = (!MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(base.selectInventoryType)) ? SortBase.DIALOG_TYPE.ARMOR : SortBase.DIALOG_TYPE.WEAPON;
-		sortSettings = SortSettings.CreateMemSortSettings(dialog_type, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
+		bool isWeapon = MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(base.selectInventoryType);
+		SortBase.DIALOG_TYPE dialogType = GetDialogType(isWeapon);
+		sortSettings = SortSettings.CreateMemSortSettings(dialogType, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
 	}
 
 	protected override void InitLocalInventory()
@@ -85,7 +88,7 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = base.selectInventoryType;
 		MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
 		selectInventoryIndex = -1;
-		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
+		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortWithPayCheckData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
 	}
 
 	protected override bool sorting()
@@ -137,24 +140,25 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 	protected override void OnQuery_TRY_ON()
 	{
 		bool flag = GameSceneEvent.current.eventName == "TRY_ON";
-		if (localInventoryEquipData != null && localInventoryEquipData.Length != 0)
+		if (localInventoryEquipData == null || localInventoryEquipData.Length == 0)
 		{
-			selectInventoryIndex = (int)GameSection.GetEventData();
-			SortCompareData sortCompareData = localInventoryEquipData[selectInventoryIndex];
-			if (sortCompareData != null)
+			return;
+		}
+		selectInventoryIndex = (int)GameSection.GetEventData();
+		SortCompareData sortCompareData = localInventoryEquipData[selectInventoryIndex];
+		if (sortCompareData != null)
+		{
+			ulong uniqID = sortCompareData.GetUniqID();
+			if (uniqID != 0)
 			{
-				ulong uniqID = sortCompareData.GetUniqID();
-				if (uniqID != 0L)
-				{
-					SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-					smithData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
-				}
-				base.OnQuery_TRY_ON();
-				if (flag)
-				{
-					GameSection.ChangeEvent("SELECT_ITEM", null);
-					OnQuery_SELECT_ITEM();
-				}
+				SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
+				smithData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
+			}
+			base.OnQuery_TRY_ON();
+			if (flag)
+			{
+				GameSection.ChangeEvent("SELECT_ITEM");
+				OnQuery_SELECT_ITEM();
 			}
 		}
 	}
@@ -164,28 +168,24 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 		if (localInventoryEquipData == null || localInventoryEquipData.Length == 0)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
+		if (smithData == null)
 		{
-			SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-			if (smithData == null)
+			GameSection.StopEvent();
+			return;
+		}
+		EquipItemInfo selectEquipData = smithData.selectEquipData;
+		if (selectEquipData.IsLevelMax())
+		{
+			if (selectEquipData.tableData.IsEvolve())
 			{
-				GameSection.StopEvent();
+				GameSection.ChangeEvent("EVOLVE");
 			}
-			else
+			else if (selectEquipData.IsExceedMax() && !selectEquipData.tableData.IsShadow())
 			{
-				EquipItemInfo selectEquipData = smithData.selectEquipData;
-				if (selectEquipData.IsLevelMax())
-				{
-					if (selectEquipData.tableData.IsEvolve())
-					{
-						GameSection.ChangeEvent("EVOLVE", null);
-					}
-					else if (selectEquipData.IsExceedMax() && !selectEquipData.tableData.IsShadow())
-					{
-						GameSection.ChangeEvent("ALREADY_LV_MAX", null);
-					}
-				}
+				GameSection.ChangeEvent("ALREADY_LV_MAX");
 			}
 		}
 	}
@@ -197,17 +197,15 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 		if (sortCompareData == null)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		ulong uniqID = sortCompareData.GetUniqID();
+		if (uniqID != 0)
 		{
-			ulong uniqID = sortCompareData.GetUniqID();
-			if (uniqID != 0L)
-			{
-				SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-				smithData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
-			}
-			base.OnQueryDetail();
+			SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
+			smithData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
 		}
+		base.OnQueryDetail();
 	}
 
 	public override void OnNotify(NOTIFY_FLAG notify_flags)

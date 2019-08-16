@@ -8,14 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class SharePhotoContent extends ShareContent<SharePhotoContent, Builder> {
-    public static final Creator<SharePhotoContent> CREATOR = new C05181();
-    private final List<SharePhoto> photos;
-
-    /* renamed from: com.facebook.share.model.SharePhotoContent$1 */
-    static final class C05181 implements Creator<SharePhotoContent> {
-        C05181() {
-        }
-
+    public static final Creator<SharePhotoContent> CREATOR = new Creator<SharePhotoContent>() {
         public SharePhotoContent createFromParcel(Parcel parcel) {
             return new SharePhotoContent(parcel);
         }
@@ -23,10 +16,12 @@ public final class SharePhotoContent extends ShareContent<SharePhotoContent, Bui
         public SharePhotoContent[] newArray(int i) {
             return new SharePhotoContent[i];
         }
-    }
+    };
+    private final List<SharePhoto> photos;
 
     public static class Builder extends com.facebook.share.model.ShareContent.Builder<SharePhotoContent, Builder> {
-        private final List<SharePhoto> photos = new ArrayList();
+        /* access modifiers changed from: private */
+        public final List<SharePhoto> photos = new ArrayList();
 
         public Builder addPhoto(@Nullable SharePhoto sharePhoto) {
             if (sharePhoto != null) {
@@ -45,11 +40,11 @@ public final class SharePhotoContent extends ShareContent<SharePhotoContent, Bui
         }
 
         public SharePhotoContent build() {
-            return new SharePhotoContent();
+            return new SharePhotoContent(this);
         }
 
         public Builder readFrom(SharePhotoContent sharePhotoContent) {
-            return sharePhotoContent == null ? this : ((Builder) super.readFrom((ShareContent) sharePhotoContent)).addPhotos(sharePhotoContent.getPhotos());
+            return sharePhotoContent == null ? this : ((Builder) super.readFrom(sharePhotoContent)).addPhotos(sharePhotoContent.getPhotos());
         }
 
         public Builder setPhotos(@Nullable List<SharePhoto> list) {

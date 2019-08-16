@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class RenderTargetSetter
+public class RenderTargetSetter : MonoBehaviour
 {
 	[Serializable]
 	public class TextureSetInfo
@@ -31,8 +31,6 @@ public class RenderTargetSetter
 
 	private void OnDestroy()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
 		renderTexture = null;
 		if (grabCommand != null)
 		{
@@ -42,32 +40,34 @@ public class RenderTargetSetter
 
 	private IEnumerator Start()
 	{
-		if (infos != null)
+		if (infos == null)
 		{
-			while (!MonoBehaviourSingleton<AppMain>.IsValid() || MonoBehaviourSingleton<AppMain>.I.mainCamera == null)
+			yield break;
+		}
+		while (!MonoBehaviourSingleton<AppMain>.IsValid() || MonoBehaviourSingleton<AppMain>.I.mainCamera == null)
+		{
+			yield return null;
+		}
+		grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().GetComponent<GrabCommand>();
+		if (grabCommand == null)
+		{
+			grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().AddComponent<GrabCommand>();
+			grabCommand.ApplyCommandBuffer(cameraEvent);
+		}
+		renderTexture = grabCommand.useRenderTexture(this.get_gameObject());
+		for (int i = 0; i < infos.Length; i++)
+		{
+			if (infos[i].targetRenderer == null || string.IsNullOrEmpty(infos[i].texturePropertyName))
 			{
-				yield return (object)null;
+				continue;
 			}
-			grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().GetComponent<GrabCommand>();
-			if (grabCommand == null)
+			TextureSetInfo textureSetInfo = infos[i];
+			Renderer targetRenderer = textureSetInfo.targetRenderer;
+			for (int j = 0; j < targetRenderer.get_sharedMaterials().Length; j++)
 			{
-				grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().AddComponent<GrabCommand>();
-				grabCommand.ApplyCommandBuffer(cameraEvent);
-			}
-			renderTexture = grabCommand.useRenderTexture(this.get_gameObject());
-			for (int j = 0; j < infos.Length; j++)
-			{
-				if (!(infos[j].targetRenderer == null) && !string.IsNullOrEmpty(infos[j].texturePropertyName))
+				if (targetRenderer.get_sharedMaterials()[j].HasProperty(textureSetInfo.texturePropertyName))
 				{
-					TextureSetInfo info = infos[j];
-					Renderer renderer = info.targetRenderer;
-					for (int i = 0; i < renderer.get_sharedMaterials().Length; i++)
-					{
-						if (renderer.get_sharedMaterials()[i].HasProperty(info.texturePropertyName))
-						{
-							renderer.get_sharedMaterials()[i].SetTexture(info.texturePropertyName, renderTexture);
-						}
-					}
+					targetRenderer.get_sharedMaterials()[j].SetTexture(textureSetInfo.texturePropertyName, renderTexture);
 				}
 			}
 		}

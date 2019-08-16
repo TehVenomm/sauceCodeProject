@@ -10,31 +10,19 @@ import net.gogame.gowrap.Constants;
 
 public class BannerHelper {
     private final Activity activity;
-    private final int gravity;
-    private ViewGroup parentLayout;
-    private PopupWindow popupWindow;
-    private final View view;
+    /* access modifiers changed from: private */
+    public final int gravity;
+    /* access modifiers changed from: private */
+    public ViewGroup parentLayout;
+    /* access modifiers changed from: private */
+    public PopupWindow popupWindow;
+    /* access modifiers changed from: private */
+    public final View view;
 
-    /* renamed from: net.gogame.gowrap.wrapper.BannerHelper$1 */
-    class C12481 implements Runnable {
-        C12481() {
-        }
-
-        public void run() {
-            try {
-                BannerHelper.this.popupWindow = new PopupWindow(BannerHelper.this.view, -2, -2, false);
-                BannerHelper.this.popupWindow.setClippingEnabled(false);
-                BannerHelper.this.popupWindow.showAtLocation(BannerHelper.this.parentLayout, BannerHelper.this.gravity, 0, 0);
-            } catch (Throwable e) {
-                Log.e(Constants.TAG, "Exception", e);
-            }
-        }
-    }
-
-    public BannerHelper(Activity activity, int i, View view) {
-        this.activity = activity;
+    public BannerHelper(Activity activity2, int i, View view2) {
+        this.activity = activity2;
         this.gravity = i;
-        this.view = view;
+        this.view = view2;
     }
 
     public boolean show() {
@@ -51,7 +39,17 @@ public class BannerHelper {
             }
             this.parentLayout = (ViewGroup) rootView;
         }
-        new Handler(this.activity.getMainLooper()).post(new C12481());
+        new Handler(this.activity.getMainLooper()).post(new Runnable() {
+            public void run() {
+                try {
+                    BannerHelper.this.popupWindow = new PopupWindow(BannerHelper.this.view, -2, -2, false);
+                    BannerHelper.this.popupWindow.setClippingEnabled(false);
+                    BannerHelper.this.popupWindow.showAtLocation(BannerHelper.this.parentLayout, BannerHelper.this.gravity, 0, 0);
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "Exception", e);
+                }
+            }
+        });
         return true;
     }
 

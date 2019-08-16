@@ -2,29 +2,28 @@ package com.google.android.gms.nearby.connection;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
-import java.util.List;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzc implements Creator<AppMetadata> {
+public final class zzc implements Creator<AppIdentifier> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
-        List list = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        String str = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    list = zzb.zzc(parcel, readInt, AppIdentifier.CREATOR);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
-        return new AppMetadata(list);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new AppIdentifier(str);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {
-        return new AppMetadata[i];
+        return new AppIdentifier[i];
     }
 }

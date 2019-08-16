@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class TextTalk
+public class TextTalk : MonoBehaviour
 {
-	private const float CONST_BREAK_TIME = 1f;
-
-	private const float DEFAULT_NUM_PER_SEC = 30f;
-
 	private bool isStart;
 
 	private UILabel lbl;
@@ -36,6 +32,10 @@ public class TextTalk
 	private bool isPause;
 
 	private float breakTime;
+
+	private const float CONST_BREAK_TIME = 1f;
+
+	private const float DEFAULT_NUM_PER_SEC = 30f;
 
 	private Action pageEndCallback;
 
@@ -100,7 +100,7 @@ public class TextTalk
 			}
 			else
 			{
-				textAnimTime = (float)text[textIndex].Length;
+				textAnimTime = text[textIndex].Length;
 			}
 		}
 	}
@@ -136,65 +136,67 @@ public class TextTalk
 
 	private void Update()
 	{
-		if (isStart && !(lbl == null) && text != null && text.Length != 0 && !isComplete && !isPause)
+		if (!isStart || lbl == null || text == null || text.Length == 0 || isComplete || isPause)
 		{
-			float num = Time.get_deltaTime();
+			return;
+		}
+		float num = Time.get_deltaTime();
+		if (breakTime > 0f)
+		{
+			breakTime -= num;
 			if (breakTime > 0f)
 			{
-				breakTime -= num;
-				if (breakTime > 0f)
-				{
-					return;
-				}
-				num = 0f - breakTime;
+				return;
 			}
-			textAnimTime += num;
-			int num2 = (int)(textAnimTime * speed);
-			if (num2 > textCount)
+			num = 0f - breakTime;
+		}
+		textAnimTime += num;
+		int num2 = (int)(textAnimTime * speed);
+		if (num2 <= textCount)
+		{
+			return;
+		}
+		while (num2 > textCount)
+		{
+			if (textCount >= text[textIndex].Length)
 			{
-				while (num2 > textCount)
+				if (textIndex == text.Length - 1)
 				{
-					if (textCount >= text[textIndex].Length)
+					textAnimTime = 0f;
+					if (page < textList.Count)
 					{
-						if (textIndex == text.Length - 1)
-						{
-							textAnimTime = 0f;
-							if (page < textList.Count)
-							{
-								isPause = true;
-							}
-							else
-							{
-								isComplete = true;
-							}
-							if (pageEndCallback != null)
-							{
-								pageEndCallback();
-							}
-						}
-						else
-						{
-							sb.AppendLine();
-							textCount = 0;
-							textAnimTime = 0f;
-							textIndex++;
-							breakTime = 1f;
-						}
-						break;
+						isPause = true;
 					}
-					int num3 = textCount;
-					textCount = analyzer.Analyze(text[textIndex], textIndex, textCount);
-					if (!analyzer.IsFindTag())
+					else
 					{
-						sb.Append(text[textIndex][textCount++]);
+						isComplete = true;
 					}
-					else if (tagCallback != null)
+					if (pageEndCallback != null)
 					{
-						tagCallback(analyzer.findTag, analyzer.findTagText);
+						pageEndCallback();
 					}
 				}
-				lbl.text = sb.ToString();
+				else
+				{
+					sb.AppendLine();
+					textCount = 0;
+					textAnimTime = 0f;
+					textIndex++;
+					breakTime = 1f;
+				}
+				break;
+			}
+			int num3 = textCount;
+			textCount = analyzer.Analyze(text[textIndex], textIndex, textCount);
+			if (!analyzer.IsFindTag())
+			{
+				sb.Append(text[textIndex][textCount++]);
+			}
+			else if (tagCallback != null)
+			{
+				tagCallback(analyzer.findTag, analyzer.findTagText);
 			}
 		}
+		lbl.text = sb.ToString();
 	}
 }

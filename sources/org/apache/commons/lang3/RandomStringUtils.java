@@ -1,8 +1,7 @@
 package org.apache.commons.lang3;
 
-import android.support.v4.media.TransportMediator;
 import com.fasterxml.jackson.core.base.GeneratorBase;
-import com.google.android.gms.nearby.messages.Strategy;
+import com.google.android.gms.games.Notifications;
 import java.util.Random;
 
 public class RandomStringUtils {
@@ -13,7 +12,7 @@ public class RandomStringUtils {
     }
 
     public static String randomAscii(int i) {
-        return random(i, 32, TransportMediator.KEYCODE_MEDIA_PAUSE, false, false);
+        return random(i, 32, Notifications.NOTIFICATION_TYPES_ALL, false, false);
     }
 
     public static String randomAlphabetic(int i) {
@@ -41,6 +40,7 @@ public class RandomStringUtils {
     }
 
     public static String random(int i, int i2, int i3, boolean z, boolean z2, char[] cArr, Random random) {
+        char c;
         if (i == 0) {
             return "";
         }
@@ -54,7 +54,7 @@ public class RandomStringUtils {
                     i3 = 123;
                     i2 = 32;
                 } else {
-                    i3 = Strategy.TTL_SECONDS_INFINITE;
+                    i3 = Integer.MAX_VALUE;
                 }
             } else if (i3 <= i2) {
                 throw new IllegalArgumentException("Parameter end (" + i3 + ") must be greater than start (" + i2 + ")");
@@ -66,18 +66,17 @@ public class RandomStringUtils {
                 if (i == 0) {
                     return new String(cArr2);
                 }
-                char nextInt;
                 if (cArr == null) {
-                    nextInt = (char) (random.nextInt(i4) + i2);
+                    c = (char) (random.nextInt(i4) + i2);
                 } else {
-                    nextInt = cArr[random.nextInt(i4) + i2];
+                    c = cArr[random.nextInt(i4) + i2];
                 }
-                if (!(z && Character.isLetter(nextInt)) && (!(z2 && Character.isDigit(nextInt)) && (z || z2))) {
+                if ((!z || !Character.isLetter(c)) && ((!z2 || !Character.isDigit(c)) && (z || z2))) {
                     i5++;
-                } else if (nextInt < '?' || nextInt > '?') {
-                    if (nextInt < '?' || nextInt > '?') {
-                        if (nextInt < '?' || nextInt > '?') {
-                            cArr2[i5] = nextInt;
+                } else if (c < 56320 || c > 57343) {
+                    if (c < 55296 || c > 56191) {
+                        if (c < 56192 || c > 56319) {
+                            cArr2[i5] = c;
                         } else {
                             i5++;
                         }
@@ -86,12 +85,12 @@ public class RandomStringUtils {
                     } else {
                         cArr2[i5] = (char) (random.nextInt(128) + GeneratorBase.SURR2_FIRST);
                         i5--;
-                        cArr2[i5] = nextInt;
+                        cArr2[i5] = c;
                     }
                 } else if (i5 == 0) {
                     i5++;
                 } else {
-                    cArr2[i5] = nextInt;
+                    cArr2[i5] = c;
                     i5--;
                     cArr2[i5] = (char) (random.nextInt(128) + GeneratorBase.SURR1_FIRST);
                 }

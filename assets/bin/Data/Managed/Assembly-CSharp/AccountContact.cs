@@ -51,12 +51,12 @@ public class AccountContact : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_ADDRESS, string.Empty, 255, (EventDelegate.Callback)InputCallback);
-		SetInput((Enum)UI.IPT_SECRET_ANSER, string.Empty, 45, (EventDelegate.Callback)InputCallback);
-		SetInput((Enum)UI.IPT_USER_NAME, string.Empty, 12, (EventDelegate.Callback)InputCallback);
-		SetInput((Enum)UI.IPT_USER_RANK, string.Empty, 12, (EventDelegate.Callback)InputCallback);
+		SetInput(UI.IPT_ADDRESS, string.Empty, 255, InputCallback);
+		SetInput(UI.IPT_SECRET_ANSER, string.Empty, 45, InputCallback);
+		SetInput(UI.IPT_USER_NAME, string.Empty, 14, InputCallback);
+		SetInput(UI.IPT_USER_RANK, string.Empty, 14, InputCallback);
 		UpdateTargetAddressText();
-		SetActive((Enum)UI.OBJ_SECRET_QUESTION, true);
+		SetActive((Enum)UI.OBJ_SECRET_QUESTION, is_visible: true);
 		secretQuestionIndex = 0;
 		SetPopupListText((Enum)UI.POP_SECRET_QUESTION, secreteQuestion, secretQuestionIndex);
 		SetPopupListOnChange((Enum)UI.POP_SECRET_QUESTION, (Enum)UI.LBL_SECRET_QUESTION, (EventDelegate.Callback)delegate
@@ -77,7 +77,7 @@ public class AccountContact : GameSection
 
 	private void InputCallback()
 	{
-		bool flag = CheckInputData(false);
+		bool flag = CheckInputData();
 		SetActive((Enum)UI.BTN_OK, flag);
 		SetActive((Enum)UI.BTN_INVALID, !flag);
 	}
@@ -98,17 +98,17 @@ public class AccountContact : GameSection
 		}
 		if (text.Length < 6)
 		{
-			CheckChangeEvent(is_send_event, "ADDRESS_TOO_SHORT", null);
+			CheckChangeEvent(is_send_event, "ADDRESS_TOO_SHORT");
 			return false;
 		}
 		if (text.Length > 255)
 		{
-			CheckChangeEvent(is_send_event, "ADDRESS_TOO_LONG", null);
+			CheckChangeEvent(is_send_event, "ADDRESS_TOO_LONG");
 			return false;
 		}
 		if (!isSelectedSecretQuestion)
 		{
-			CheckChangeEvent(is_send_event, "NON_SELECT_SECRET_QUESTION", null);
+			CheckChangeEvent(is_send_event, "NON_SELECT_SECRET_QUESTION");
 			return false;
 		}
 		if (string.IsNullOrEmpty(text2))
@@ -121,7 +121,7 @@ public class AccountContact : GameSection
 		}
 		if (text2.Length > 45)
 		{
-			CheckChangeEvent(is_send_event, "SECRET_QUESTION_TOO_LONG", null);
+			CheckChangeEvent(is_send_event, "SECRET_QUESTION_TOO_LONG");
 			return false;
 		}
 		if (string.IsNullOrEmpty(text3))
@@ -132,9 +132,9 @@ public class AccountContact : GameSection
 			});
 			return false;
 		}
-		if (text3.Length > 12)
+		if (text3.Length > 14)
 		{
-			CheckChangeEvent(is_send_event, "NAME_TOO_LONG", null);
+			CheckChangeEvent(is_send_event, "NAME_TOO_LONG");
 			return false;
 		}
 		if (string.IsNullOrEmpty(text4))
@@ -153,9 +153,9 @@ public class AccountContact : GameSection
 			});
 			return false;
 		}
-		if (text4.Length > 12)
+		if (text4.Length > 14)
 		{
-			CheckChangeEvent(is_send_event, "RANK_TOO_LONG", null);
+			CheckChangeEvent(is_send_event, "RANK_TOO_LONG");
 			return false;
 		}
 		return true;
@@ -171,7 +171,7 @@ public class AccountContact : GameSection
 
 	private void OnQuery_CONTACT()
 	{
-		if (CheckInputData(true))
+		if (CheckInputData(is_send_event: true))
 		{
 			string text = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text;
 			string text2 = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text;

@@ -1,4 +1,4 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
@@ -32,31 +32,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import jp.colopl.config.Config;
-import jp.colopl.drapro.ColoplDepositHelper.PostDepositFinishedListener;
-import jp.colopl.drapro.ColoplDepositHelper.PostDepositResult;
-import jp.colopl.drapro.ColoplDepositHelper.PrepareDepositFinishedListener;
-import jp.colopl.drapro.ColoplDepositHelper.PrepareResult;
-import jp.colopl.gcm.RegistrarHelper;
-import jp.colopl.iab.IabBroadcastReceiver;
-import jp.colopl.iab.IabBroadcastReceiver.IabBroadcastListener;
-import jp.colopl.iab.IabException;
-import jp.colopl.iab.IabHelper;
-import jp.colopl.iab.IabHelper.OnConsumeFinishedListener;
-import jp.colopl.iab.IabHelper.OnIabPurchaseFinishedListener;
-import jp.colopl.iab.IabHelper.OnIabSetupFinishedListener;
-import jp.colopl.iab.IabHelper.QueryInventoryFinishedListener;
-import jp.colopl.iab.IabResult;
-import jp.colopl.iab.Inventory;
-import jp.colopl.iab.Purchase;
-import jp.colopl.util.Util;
 import net.gogame.gowrap.Bootstrap;
 import net.gogame.gowrap.Constants;
+import p018jp.colopl.config.Config;
+import p018jp.colopl.drapro.ColoplDepositHelper.PostDepositFinishedListener;
+import p018jp.colopl.drapro.ColoplDepositHelper.PostDepositResult;
+import p018jp.colopl.drapro.ColoplDepositHelper.PrepareDepositFinishedListener;
+import p018jp.colopl.drapro.ColoplDepositHelper.PrepareResult;
+import p018jp.colopl.gcm.RegistrarHelper;
+import p018jp.colopl.iab.IabBroadcastReceiver;
+import p018jp.colopl.iab.IabBroadcastReceiver.IabBroadcastListener;
+import p018jp.colopl.iab.IabException;
+import p018jp.colopl.iab.IabHelper;
+import p018jp.colopl.iab.IabHelper.OnConsumeFinishedListener;
+import p018jp.colopl.iab.IabHelper.OnIabPurchaseFinishedListener;
+import p018jp.colopl.iab.IabHelper.OnIabSetupFinishedListener;
+import p018jp.colopl.iab.IabHelper.QueryInventoryFinishedListener;
+import p018jp.colopl.iab.IabResult;
+import p018jp.colopl.iab.Inventory;
+import p018jp.colopl.iab.Purchase;
+import p018jp.colopl.util.Util;
 
+/* renamed from: jp.colopl.drapro.StartActivity */
 public class StartActivity extends Activity {
     public static final int AFFILIATE_BROWSER_REQUEST_CODE = 556677;
     private static final String HOST = "gogame.net";
-    private static int IABV3_API_RETRY_LIMIT = 3;
+    /* access modifiers changed from: private */
+    public static int IABV3_API_RETRY_LIMIT = 3;
     private static final long LONG_PRESS_TIME = 200;
     private static final String SCHEME = "gogamedrapro";
     private static final List<String> SCHEME_ALLOWED_PREFS_KEY_LIST;
@@ -68,160 +70,18 @@ public class StartActivity extends Activity {
     private static long timer = 0;
     private final String ALREADY_SIGNIN_KEY = "have_ever_signin";
     private Config config;
-    private int consumptionRetry = 0;
-    private int depositRetry = 0;
+    /* access modifiers changed from: private */
+    public int consumptionRetry = 0;
+    /* access modifiers changed from: private */
+    public int depositRetry = 0;
     private Handler handler = new Handler();
-    private IabHelper mBillingHelper = null;
+    /* access modifiers changed from: private */
+    public IabHelper mBillingHelper = null;
     private boolean mBillingRunning = false;
     IabBroadcastReceiver mBroadcastReceiver;
-    private ColoplDepositHelper mColoDepositHelper = null;
-    OnConsumeFinishedListener mConsumeFinishedListener = new C09877();
-    PostDepositFinishedListener mDepositPostListener = new PostDepositFinishedListener() {
-        public void onPostDepositFinished(final PostDepositResult postDepositResult) {
-            Util.dLog("StartActivity", "Resultcode:" + postDepositResult.getStatusCode());
-            if (postDepositResult.getSuccess() && postDepositResult.isValidStatusCode()) {
-                CharSequence format;
-                StartActivity.this.depositRetry = 0;
-                if (AppConsts.getProductNameById(postDepositResult.getPurchasedSku(), StartActivity.this) != null) {
-                    format = String.format(StartActivity.this.getString(StartActivity.this.getResources().getIdentifier("notification_purchase_item", "string", StartActivity.this.getPackageName())), new Object[]{r0});
-                } else {
-                    format = StartActivity.this.getString(StartActivity.this.getResources().getIdentifier("notification_purchase_item_default", "string", StartActivity.this.getPackageName()));
-                }
-                Toast.makeText(StartActivity.this, format, 1).show();
-                UnityPlayer.UnitySendMessage("ShopReceiver", "buyItem", postDepositResult.getResultData());
-                try {
-                    InAppBillingHelper.trackPurtraceData(postDepositResult.getPurchasedSku(), postDepositResult.getPurchase().getOriginalJson(), postDepositResult.getPurchase().getSignature());
-                } catch (IabException e) {
-                    e.printStackTrace();
-                }
-                StartActivity.this.finishBillingRunning();
-            } else if (postDepositResult.getSuccess() && postDepositResult.isAlreadyCancelled()) {
-                AppConsts.getProductNameById(postDepositResult.getPurchasedSku(), StartActivity.this);
-                Toast.makeText(StartActivity.this, StartActivity.this.getString(StartActivity.this.getResources().getIdentifier("notification_purchase_already_cancelled", "string", StartActivity.this.getPackageName())), 1).show();
-                StartActivity.this.finishBillingRunning();
-            } else {
-                StartActivity.this.depositRetry = StartActivity.this.depositRetry + 1;
-                Util.eLog("StartActivity", "[IABV3] Post deposit failed. retrying... : " + StartActivity.this.depositRetry);
-                if (StartActivity.this.depositRetry >= StartActivity.IABV3_API_RETRY_LIMIT || postDepositResult.getPurchase() == null) {
-                    StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("network_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("network_error_occurred", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
-                    StartActivity.this.finishBillingRunning();
-                    return;
-                }
-                new Handler().post(new Runnable() {
-                    public void run() {
-                        StartActivity.this.mColoDepositHelper.postDepositAsync(postDepositResult.getPurchase(), StartActivity.this.mDepositPostListener);
-                    }
-                });
-            }
-        }
-    };
-    PrepareDepositFinishedListener mDepositPrepareListener = new C09909();
-    QueryInventoryFinishedListener mGotInventoryListener = new C09846();
-    ProgressDialog mProgressDialog = null;
-    OnIabPurchaseFinishedListener mPurchaseFinishedListener = new C09898();
-    ArrayList<Purchase> mPurchaseList = new ArrayList();
-    ArrayList<Purchase> mUndepositedPurcahseList = new ArrayList();
-    protected UnityPlayer mUnityPlayer;
-    private WakeLock mWakeLock;
-    private TextView purchaseStatusText;
-
-    /* renamed from: jp.colopl.drapro.StartActivity$1 */
-    class C09791 implements IabBroadcastListener {
-        C09791() {
-        }
-
-        public void receivedBroadcast() {
-            Util.eLog("PromoCode", "Receive API Code !!!!!!!!!!");
-            UnityPlayer.UnitySendMessage("ShopReceiver", "promoteCheck", "");
-        }
-    }
-
-    /* renamed from: jp.colopl.drapro.StartActivity$2 */
-    class C09802 implements OnIabSetupFinishedListener {
-        C09802() {
-        }
-
-        public void onIabSetupFinished(IabResult iabResult) {
-            if (!iabResult.isSuccess()) {
-                Util.eLog("StartActivity", "[IABV3] initBilling problem : " + iabResult);
-            }
-        }
-    }
-
-    /* renamed from: jp.colopl.drapro.StartActivity$3 */
-    class C09813 implements Runnable {
-        C09813() {
-        }
-
-        public void run() {
-            StartActivity.this.checkInventory();
-        }
-    }
-
-    /* renamed from: jp.colopl.drapro.StartActivity$6 */
-    class C09846 implements QueryInventoryFinishedListener {
-        C09846() {
-        }
-
-        public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
-            Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished");
-            if (iabResult.isFailure()) {
-                Util.eLog("StartActivity", "[IABV3] onQueryInventoryFinished problem : " + iabResult);
-                StartActivity.this.finishBillingRunning();
-                return;
-            }
-            int i;
-            Purchase purchase;
-            Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished success");
-            StartActivity.this.mPurchaseList.clear();
-            List<Purchase> allPurchases = inventory.getAllPurchases();
-            if (allPurchases == null || allPurchases.size() <= 0) {
-                i = 0;
-            } else {
-                String string = StartActivity.this.getResources().getString(StartActivity.this.getResources().getIdentifier("promo_tag", "string", StartActivity.this.getPackageName()));
-                i = 0;
-                for (Purchase purchase2 : allPurchases) {
-                    if (purchase2.getSku().indexOf(string) != -1) {
-                        Util.eLog("StartActivity", "Skip Promotion Item");
-                    } else if (StartActivity.verifyDeveloperPayload(purchase2)) {
-                        Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished verifyDeveloperPayload inventoryList success " + purchase2.toLog());
-                        i = 1;
-                        StartActivity.this.mPurchaseList.add(purchase2);
-                    }
-                }
-            }
-            StartActivity.this.mUndepositedPurcahseList.clear();
-            ArrayList undepositedPurchase = StartActivity.this.mColoDepositHelper.getUndepositedPurchase();
-            if (undepositedPurchase != null && undepositedPurchase.size() > 0) {
-                Iterator it = undepositedPurchase.iterator();
-                while (it.hasNext()) {
-                    purchase2 = (Purchase) it.next();
-                    if (StartActivity.verifyDeveloperPayload(purchase2)) {
-                        Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished verifyDeveloperPayload mUndepositedPurcahseList success " + purchase2.toLog());
-                        StartActivity.this.mUndepositedPurcahseList.add(purchase2);
-                    }
-                }
-            }
-            String productNameById;
-            if (StartActivity.this.mUndepositedPurcahseList.size() > 0) {
-                productNameById = AppConsts.getProductNameById(((Purchase) StartActivity.this.mUndepositedPurcahseList.get(0)).getSku(), StartActivity.this);
-                Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished mUndepositedPurcahseList productName " + productNameById);
-                StartActivity.this.showDepositDialog(productNameById);
-            } else if (i != 0) {
-                productNameById = inventory.getSkuDetails(((Purchase) StartActivity.this.mPurchaseList.get(0)).getSku()).getTitle();
-                Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished mPurchaseList productName " + productNameById);
-                StartActivity.this.showConsumeDialog(productNameById);
-            } else {
-                StartActivity.this.mColoDepositHelper.prepareDepositAsync(InAppBillingHelper.getProductId(), StartActivity.this.mDepositPrepareListener);
-            }
-        }
-    }
-
-    /* renamed from: jp.colopl.drapro.StartActivity$7 */
-    class C09877 implements OnConsumeFinishedListener {
-        C09877() {
-        }
-
+    /* access modifiers changed from: private */
+    public ColoplDepositHelper mColoDepositHelper = null;
+    OnConsumeFinishedListener mConsumeFinishedListener = new OnConsumeFinishedListener() {
         public void onConsumeFinished(final Purchase purchase, IabResult iabResult) {
             if (iabResult.isSuccess()) {
                 StartActivity.this.consumptionRetry = 0;
@@ -252,39 +112,48 @@ public class StartActivity extends Activity {
                 }
             });
         }
-    }
-
-    /* renamed from: jp.colopl.drapro.StartActivity$8 */
-    class C09898 implements OnIabPurchaseFinishedListener {
-        C09898() {
-        }
-
-        public void onIabPurchaseFinished(IabResult iabResult, final Purchase purchase) {
-            Util.dLog("StartActivity", "[IABV3] Purchase finished: " + iabResult + ", purchase: " + purchase);
-            if (iabResult.isCancel()) {
-                StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("payment_cancel_title", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("payment_cancel_message", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
+    };
+    PostDepositFinishedListener mDepositPostListener = new PostDepositFinishedListener() {
+        public void onPostDepositFinished(final PostDepositResult postDepositResult) {
+            String string;
+            Util.dLog("StartActivity", "Resultcode:" + postDepositResult.getStatusCode());
+            if (postDepositResult.getSuccess() && postDepositResult.isValidStatusCode()) {
+                StartActivity.this.depositRetry = 0;
+                String productNameById = AppConsts.getProductNameById(postDepositResult.getPurchasedSku(), StartActivity.this);
+                if (productNameById != null) {
+                    string = String.format(StartActivity.this.getString(StartActivity.this.getResources().getIdentifier("notification_purchase_item", "string", StartActivity.this.getPackageName())), new Object[]{productNameById});
+                } else {
+                    string = StartActivity.this.getString(StartActivity.this.getResources().getIdentifier("notification_purchase_item_default", "string", StartActivity.this.getPackageName()));
+                }
+                Toast.makeText(StartActivity.this, string, 1).show();
+                UnityPlayer.UnitySendMessage("ShopReceiver", "buyItem", postDepositResult.getResultData());
+                try {
+                    InAppBillingHelper.trackPurtraceData(postDepositResult.getPurchasedSku(), postDepositResult.getPurchase().getOriginalJson(), postDepositResult.getPurchase().getSignature());
+                } catch (IabException e) {
+                    e.printStackTrace();
+                }
                 StartActivity.this.finishBillingRunning();
-            } else if (iabResult.isFailure()) {
-                StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("network_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("network_purchase_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
-                StartActivity.this.finishBillingRunning();
-            } else if (StartActivity.verifyDeveloperPayload(purchase)) {
+            } else if (!postDepositResult.getSuccess() || !postDepositResult.isAlreadyCancelled()) {
+                StartActivity.this.depositRetry = StartActivity.this.depositRetry + 1;
+                Util.eLog("StartActivity", "[IABV3] Post deposit failed. retrying... : " + StartActivity.this.depositRetry);
+                if (StartActivity.this.depositRetry >= StartActivity.IABV3_API_RETRY_LIMIT || postDepositResult.getPurchase() == null) {
+                    StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("network_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("network_error_occurred", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
+                    StartActivity.this.finishBillingRunning();
+                    return;
+                }
                 new Handler().post(new Runnable() {
                     public void run() {
-                        StartActivity.this.mBillingHelper.consumeAsync(purchase, StartActivity.this.mConsumeFinishedListener);
+                        StartActivity.this.mColoDepositHelper.postDepositAsync(postDepositResult.getPurchase(), StartActivity.this.mDepositPostListener);
                     }
                 });
             } else {
-                StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("network_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("network_purchase_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
+                AppConsts.getProductNameById(postDepositResult.getPurchasedSku(), StartActivity.this);
+                Toast.makeText(StartActivity.this, StartActivity.this.getString(StartActivity.this.getResources().getIdentifier("notification_purchase_already_cancelled", "string", StartActivity.this.getPackageName())), 1).show();
                 StartActivity.this.finishBillingRunning();
             }
         }
-    }
-
-    /* renamed from: jp.colopl.drapro.StartActivity$9 */
-    class C09909 implements PrepareDepositFinishedListener {
-        C09909() {
-        }
-
+    };
+    PrepareDepositFinishedListener mDepositPrepareListener = new PrepareDepositFinishedListener() {
         public void onPrepareDepositFinished(PrepareResult prepareResult) {
             if (prepareResult.getSuccess()) {
                 StartActivity.this.mBillingHelper.launchPurchaseFlow(StartActivity.this, prepareResult.getItemId(), "inapp", 10001, StartActivity.this.mPurchaseFinishedListener, prepareResult.getPayload(), InAppBillingHelper.userIdHash);
@@ -294,10 +163,89 @@ public class StartActivity extends Activity {
             StartActivity.this.showSimpleDialog(prepareResult.getErrorTitle(), prepareResult.getErrorMessage(), StartActivity.this.getResources().getIdentifier("ok", "string", StartActivity.this.getPackageName()));
             StartActivity.this.finishBillingRunning();
         }
-    }
+    };
+    QueryInventoryFinishedListener mGotInventoryListener = new QueryInventoryFinishedListener() {
+        public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
+            boolean z;
+            Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished");
+            if (iabResult.isFailure()) {
+                Util.eLog("StartActivity", "[IABV3] onQueryInventoryFinished problem : " + iabResult);
+                StartActivity.this.finishBillingRunning();
+                return;
+            }
+            Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished success");
+            StartActivity.this.mPurchaseList.clear();
+            List<Purchase> allPurchases = inventory.getAllPurchases();
+            if (allPurchases == null || allPurchases.size() <= 0) {
+                z = false;
+            } else {
+                String string = StartActivity.this.getResources().getString(StartActivity.this.getResources().getIdentifier("promo_tag", "string", StartActivity.this.getPackageName()));
+                z = false;
+                for (Purchase purchase : allPurchases) {
+                    if (purchase.getSku().indexOf(string) != -1) {
+                        Util.eLog("StartActivity", "Skip Promotion Item");
+                    } else if (StartActivity.verifyDeveloperPayload(purchase)) {
+                        Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished verifyDeveloperPayload inventoryList success " + purchase.toLog());
+                        z = true;
+                        StartActivity.this.mPurchaseList.add(purchase);
+                    }
+                }
+            }
+            StartActivity.this.mUndepositedPurcahseList.clear();
+            ArrayList undepositedPurchase = StartActivity.this.mColoDepositHelper.getUndepositedPurchase();
+            if (undepositedPurchase != null && undepositedPurchase.size() > 0) {
+                Iterator it = undepositedPurchase.iterator();
+                while (it.hasNext()) {
+                    Purchase purchase2 = (Purchase) it.next();
+                    if (StartActivity.verifyDeveloperPayload(purchase2)) {
+                        Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished verifyDeveloperPayload mUndepositedPurcahseList success " + purchase2.toLog());
+                        StartActivity.this.mUndepositedPurcahseList.add(purchase2);
+                    }
+                }
+            }
+            if (StartActivity.this.mUndepositedPurcahseList.size() > 0) {
+                String productNameById = AppConsts.getProductNameById(((Purchase) StartActivity.this.mUndepositedPurcahseList.get(0)).getSku(), StartActivity.this);
+                Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished mUndepositedPurcahseList productName " + productNameById);
+                StartActivity.this.showDepositDialog(productNameById);
+            } else if (z) {
+                String title = inventory.getSkuDetails(((Purchase) StartActivity.this.mPurchaseList.get(0)).getSku()).getTitle();
+                Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished mPurchaseList productName " + title);
+                StartActivity.this.showConsumeDialog(title);
+            } else {
+                StartActivity.this.mColoDepositHelper.prepareDepositAsync(InAppBillingHelper.getProductId(), StartActivity.this.mDepositPrepareListener);
+            }
+        }
+    };
+    ProgressDialog mProgressDialog = null;
+    OnIabPurchaseFinishedListener mPurchaseFinishedListener = new OnIabPurchaseFinishedListener() {
+        public void onIabPurchaseFinished(IabResult iabResult, final Purchase purchase) {
+            Util.dLog("StartActivity", "[IABV3] Purchase finished: " + iabResult + ", purchase: " + purchase);
+            if (iabResult.isCancel()) {
+                StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("payment_cancel_title", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("payment_cancel_message", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
+                StartActivity.this.finishBillingRunning();
+            } else if (iabResult.isFailure()) {
+                StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("network_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("network_purchase_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
+                StartActivity.this.finishBillingRunning();
+            } else if (!StartActivity.verifyDeveloperPayload(purchase)) {
+                StartActivity.this.showSimpleDialog(StartActivity.this.getResources().getIdentifier("network_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("network_purchase_error", "string", StartActivity.this.getPackageName()), StartActivity.this.getResources().getIdentifier("dialog_button_ok", "string", StartActivity.this.getPackageName()));
+                StartActivity.this.finishBillingRunning();
+            } else {
+                new Handler().post(new Runnable() {
+                    public void run() {
+                        StartActivity.this.mBillingHelper.consumeAsync(purchase, StartActivity.this.mConsumeFinishedListener);
+                    }
+                });
+            }
+        }
+    };
+    ArrayList<Purchase> mPurchaseList = new ArrayList<>();
+    ArrayList<Purchase> mUndepositedPurcahseList = new ArrayList<>();
+    protected UnityPlayer mUnityPlayer;
+    private WakeLock mWakeLock;
+    private TextView purchaseStatusText;
 
     static {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         arrayList.add("im");
         arrayList.add("fc");
         arrayList.add("il");
@@ -317,7 +265,8 @@ public class StartActivity extends Activity {
         }
     }
 
-    private void finishBillingRunning() {
+    /* access modifiers changed from: private */
+    public void finishBillingRunning() {
         dismissProgressDialog2();
         UnityPlayer.UnitySendMessage("ShopReceiver", "buyItem", "");
         this.mBillingRunning = false;
@@ -335,7 +284,13 @@ public class StartActivity extends Activity {
         this.consumptionRetry = 0;
         this.depositRetry = 0;
         this.mBillingRunning = false;
-        this.mBillingHelper.startSetup(new C09802());
+        this.mBillingHelper.startSetup(new OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult iabResult) {
+                if (!iabResult.isSuccess()) {
+                    Util.eLog("StartActivity", "[IABV3] initBilling problem : " + iabResult);
+                }
+            }
+        });
     }
 
     private void initPromoCodeReceiver() {
@@ -343,7 +298,12 @@ public class StartActivity extends Activity {
         Intent intent = new Intent("com.android.vending.billing.PURCHASES_UPDATED");
         intent.setPackage(getPackageName());
         sendBroadcast(intent);
-        this.mBroadcastReceiver = new IabBroadcastReceiver(new C09791());
+        this.mBroadcastReceiver = new IabBroadcastReceiver(new IabBroadcastListener() {
+            public void receivedBroadcast() {
+                Util.eLog("PromoCode", "Receive API Code !!!!!!!!!!");
+                UnityPlayer.UnitySendMessage("ShopReceiver", "promoteCheck", "");
+            }
+        });
         registerReceiver(this.mBroadcastReceiver, new IntentFilter("com.android.vending.billing.PURCHASES_UPDATED"));
     }
 
@@ -366,40 +326,39 @@ public class StartActivity extends Activity {
 
     private void setSchemeParameterToPlayerPrefs() {
         Util.dLog("StartActivity", "intent action name: " + getIntent().getAction());
-        if ("android.intent.action.VIEW".equals(getIntent().getAction())) {
-            Uri data = getIntent().getData();
-            if (data == null) {
-                Util.dLog("StartActivity", "intent data is null");
-                return;
-            }
-            Util.dLog("StartActivity", "url=" + data.toString());
-            String scheme = data.getScheme();
-            String host = data.getHost();
-            if (scheme.equals(SCHEME) && host.endsWith(HOST)) {
-                Util.dLog("StartActivity", "Start SetSchemeParameter");
-                scheme = data.getQueryParameter(SCHEME_PLAYER_PREFS_KEY_FOR_KEY);
-                host = data.getQueryParameter(SCHEME_PLAYER_PREFS_KEY_FOR_VALUE);
-                Bundle extras = getIntent().getExtras();
-                if (extras == null) {
-                    extras = new Bundle();
-                } else if (extras.getInt(host, 0) == 1) {
-                    Util.dLog("StartActivity", "Stop SetSchemeParameter : Used Key");
-                    return;
-                }
-                extras.putInt(host, 1);
-                getIntent().putExtras(extras);
-                if (scheme != null && !scheme.isEmpty() && host != null && !host.isEmpty() && SCHEME_ALLOWED_PREFS_KEY_LIST.contains(scheme)) {
-                    savePlayerPrefs(scheme, host);
-                    return;
-                }
-                return;
-            }
+        if (!"android.intent.action.VIEW".equals(getIntent().getAction())) {
+            Util.dLog("StartActivity", "intent action is null");
             return;
         }
-        Util.dLog("StartActivity", "intent action is null");
+        Uri data = getIntent().getData();
+        if (data == null) {
+            Util.dLog("StartActivity", "intent data is null");
+            return;
+        }
+        Util.dLog("StartActivity", "url=" + data.toString());
+        String scheme = data.getScheme();
+        String host = data.getHost();
+        if (scheme.equals(SCHEME) && host.endsWith(HOST)) {
+            Util.dLog("StartActivity", "Start SetSchemeParameter");
+            String queryParameter = data.getQueryParameter(SCHEME_PLAYER_PREFS_KEY_FOR_KEY);
+            String queryParameter2 = data.getQueryParameter(SCHEME_PLAYER_PREFS_KEY_FOR_VALUE);
+            Bundle extras = getIntent().getExtras();
+            if (extras == null) {
+                extras = new Bundle();
+            } else if (extras.getInt(queryParameter2, 0) == 1) {
+                Util.dLog("StartActivity", "Stop SetSchemeParameter : Used Key");
+                return;
+            }
+            extras.putInt(queryParameter2, 1);
+            getIntent().putExtras(extras);
+            if (queryParameter != null && !queryParameter.isEmpty() && queryParameter2 != null && !queryParameter2.isEmpty() && SCHEME_ALLOWED_PREFS_KEY_LIST.contains(queryParameter)) {
+                savePlayerPrefs(queryParameter, queryParameter2);
+            }
+        }
     }
 
-    private void showSimpleDialog(int i, int i2, int i3) {
+    /* access modifiers changed from: private */
+    public void showSimpleDialog(int i, int i2, int i3) {
         new Builder(this).setTitle(i).setMessage(i2).setPositiveButton(i3, null).create().show();
     }
 
@@ -446,7 +405,8 @@ public class StartActivity extends Activity {
         return keyEvent.getAction() == 2 ? this.mUnityPlayer.injectEvent(keyEvent) : super.dispatchKeyEvent(keyEvent);
     }
 
-    protected Config getConfig() {
+    /* access modifiers changed from: protected */
+    public Config getConfig() {
         return ((ColoplApplication) getApplication()).getConfig();
     }
 
@@ -455,7 +415,11 @@ public class StartActivity extends Activity {
             this.mBillingRunning = true;
             this.consumptionRetry = 0;
             this.depositRetry = 0;
-            runOnUiThread(new C09813());
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    StartActivity.this.checkInventory();
+                }
+            });
         }
     }
 
@@ -463,11 +427,12 @@ public class StartActivity extends Activity {
         return false;
     }
 
-    protected void onActivityResult(int i, int i2, Intent intent) {
-        if (this.mBillingHelper.handleActivityResult(i, i2, intent)) {
-            Util.dLog("StartActivity", "onActivityResult handled by IABUtil.");
-        } else {
+    /* access modifiers changed from: protected */
+    public void onActivityResult(int i, int i2, Intent intent) {
+        if (!this.mBillingHelper.handleActivityResult(i, i2, intent)) {
             super.onActivityResult(i, i2, intent);
+        } else {
+            Util.dLog("StartActivity", "onActivityResult handled by IABUtil.");
         }
     }
 
@@ -476,7 +441,8 @@ public class StartActivity extends Activity {
         this.mUnityPlayer.configurationChanged(configuration);
     }
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         requestWindowFeature(1);
         if (this.mUnityPlayer != null) {
             this.mUnityPlayer.quit();
@@ -520,12 +486,13 @@ public class StartActivity extends Activity {
         RegistrarHelper.init(this);
         try {
             Bootstrap.init(this);
-        } catch (Throwable e3) {
+        } catch (Exception e3) {
             Log.e(Constants.TAG, "Exception", e3);
         }
     }
 
-    protected void onDestroy() {
+    /* access modifiers changed from: protected */
+    public void onDestroy() {
         unregisterReceiver(this.mBroadcastReceiver);
         ReleaseWakeLock();
         disposeBilling();
@@ -562,7 +529,8 @@ public class StartActivity extends Activity {
         return i == 4 ? this.mUnityPlayer.onKeyUp(i, keyEvent) : super.onKeyUp(i, keyEvent);
     }
 
-    protected void onNewIntent(Intent intent) {
+    /* access modifiers changed from: protected */
+    public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Intent intent2 = new Intent(this, MessageForwardingService.class);
         intent2.setAction(MessageForwardingService.ACTION_REMOTE_INTENT);
@@ -571,14 +539,16 @@ public class StartActivity extends Activity {
         setIntent(intent);
     }
 
-    protected void onPause() {
+    /* access modifiers changed from: protected */
+    public void onPause() {
         ReleaseWakeLock();
         super.onPause();
         this.mUnityPlayer.pause();
         AnalyticsHelper.dispatch();
     }
 
-    protected void onResume() {
+    /* access modifiers changed from: protected */
+    public void onResume() {
         super.onResume();
         setSchemeParameterToPlayerPrefs();
         try {
@@ -590,7 +560,8 @@ public class StartActivity extends Activity {
         AcquireWakeLock();
     }
 
-    protected void onStart() {
+    /* access modifiers changed from: protected */
+    public void onStart() {
         super.onStart();
         try {
             this.mUnityPlayer.resume();
@@ -601,7 +572,8 @@ public class StartActivity extends Activity {
         AcquireWakeLock();
     }
 
-    protected void onStop() {
+    /* access modifiers changed from: protected */
+    public void onStop() {
         ReleaseWakeLock();
         super.onStop();
     }
@@ -623,8 +595,9 @@ public class StartActivity extends Activity {
         this.mBillingRunning = true;
         this.consumptionRetry = 0;
         this.depositRetry = 0;
-        final QueryInventoryFinishedListener c09824 = new QueryInventoryFinishedListener() {
+        final C13194 r0 = new QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult iabResult, Inventory inventory) {
+                boolean z;
                 Util.dLog("StartActivity", "[IABV3] onQueryInventoryFinished");
                 if (iabResult.isFailure()) {
                     if (z) {
@@ -633,28 +606,25 @@ public class StartActivity extends Activity {
                     StartActivity.this.finishBillingRunning();
                     return;
                 }
-                boolean z;
-                Iterator it;
-                Purchase purchase;
                 StartActivity.this.mPurchaseList.clear();
                 List<Purchase> allPurchases = inventory.getAllPurchases();
                 if (allPurchases == null || allPurchases.size() <= 0) {
                     z = false;
                 } else {
                     z = false;
-                    for (Purchase purchase2 : allPurchases) {
-                        if (StartActivity.verifyDeveloperPayload(purchase2)) {
+                    for (Purchase purchase : allPurchases) {
+                        if (StartActivity.verifyDeveloperPayload(purchase)) {
                             z = true;
-                            StartActivity.this.mPurchaseList.add(purchase2);
+                            StartActivity.this.mPurchaseList.add(purchase);
                         }
                     }
                 }
                 StartActivity.this.mUndepositedPurcahseList.clear();
                 ArrayList undepositedPurchase = StartActivity.this.mColoDepositHelper.getUndepositedPurchase();
                 if (undepositedPurchase != null && undepositedPurchase.size() > 0) {
-                    it = undepositedPurchase.iterator();
+                    Iterator it = undepositedPurchase.iterator();
                     while (it.hasNext()) {
-                        purchase2 = (Purchase) it.next();
+                        Purchase purchase2 = (Purchase) it.next();
                         if (StartActivity.verifyDeveloperPayload(purchase2)) {
                             StartActivity.this.mUndepositedPurcahseList.add(purchase2);
                         }
@@ -678,13 +648,13 @@ public class StartActivity extends Activity {
             this.handler.post(new Runnable() {
                 public void run() {
                     StartActivity.this.showProgressDialog2(0, StartActivity.this.getResources().getIdentifier("payment_checking_inventory", "string", StartActivity.this.getPackageName()));
-                    StartActivity.this.mBillingHelper.queryInventoryAsync(c09824);
+                    StartActivity.this.mBillingHelper.queryInventoryAsync(r0);
                 }
             });
             return;
         }
         Util.dLog("StartActivity", "[IABV3] restoreInventory start querying inventory");
-        this.mBillingHelper.queryInventoryAsync(c09824);
+        this.mBillingHelper.queryInventoryAsync(r0);
     }
 
     public void showAchievementsList() {
@@ -693,7 +663,7 @@ public class StartActivity extends Activity {
     public void showConsumeDialog(String str) {
         int identifier = getResources().getIdentifier("dialog_message_terms_recovery", "string", getPackageName());
         int identifier2 = getResources().getIdentifier("dialog_title_terms_recovery", "string", getPackageName());
-        CharSequence format = String.format(getString(identifier), new Object[]{str});
+        String format = String.format(getString(identifier), new Object[]{str});
         Builder builder = new Builder(this);
         builder.setTitle(identifier2);
         builder.setMessage(format);
@@ -733,7 +703,7 @@ public class StartActivity extends Activity {
     public void showDepositDialog(String str) {
         int identifier = getResources().getIdentifier("dialog_message_terms_recovery", "string", getPackageName());
         int identifier2 = getResources().getIdentifier("dialog_title_terms_recovery", "string", getPackageName());
-        CharSequence format = String.format(getString(identifier), new Object[]{str});
+        String format = String.format(getString(identifier), new Object[]{str});
         Builder builder = new Builder(this);
         builder.setTitle(identifier2);
         builder.setMessage(format);

@@ -1,6 +1,5 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.media.browse.MediaBrowser.MediaItem;
@@ -14,16 +13,11 @@ import android.support.annotation.RequiresApi;
 import java.util.ArrayList;
 import java.util.List;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi21 */
 class MediaBrowserServiceCompatApi21 {
 
-    public interface ServiceCompatProxy {
-        BrowserRoot onGetRoot(String str, int i, Bundle bundle);
-
-        void onLoadChildren(String str, ResultWrapper<List<Parcel>> resultWrapper);
-    }
-
+    /* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi21$BrowserRoot */
     static class BrowserRoot {
         final Bundle mExtras;
         final String mRootId;
@@ -34,6 +28,7 @@ class MediaBrowserServiceCompatApi21 {
         }
     }
 
+    /* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi21$MediaBrowserServiceAdaptor */
     static class MediaBrowserServiceAdaptor extends MediaBrowserService {
         final ServiceCompatProxy mServiceProxy;
 
@@ -43,8 +38,11 @@ class MediaBrowserServiceCompatApi21 {
         }
 
         public android.service.media.MediaBrowserService.BrowserRoot onGetRoot(String str, int i, Bundle bundle) {
-            BrowserRoot onGetRoot = this.mServiceProxy.onGetRoot(str, i, bundle);
-            return onGetRoot == null ? null : new android.service.media.MediaBrowserService.BrowserRoot(onGetRoot.mRootId, onGetRoot.mExtras);
+            BrowserRoot onGetRoot = this.mServiceProxy.onGetRoot(str, i, bundle == null ? null : new Bundle(bundle));
+            if (onGetRoot == null) {
+                return null;
+            }
+            return new android.service.media.MediaBrowserService.BrowserRoot(onGetRoot.mRootId, onGetRoot.mExtras);
         }
 
         public void onLoadChildren(String str, Result<List<MediaItem>> result) {
@@ -52,6 +50,7 @@ class MediaBrowserServiceCompatApi21 {
         }
     }
 
+    /* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi21$ResultWrapper */
     static class ResultWrapper<T> {
         Result mResultObj;
 
@@ -63,11 +62,12 @@ class MediaBrowserServiceCompatApi21 {
             this.mResultObj.detach();
         }
 
-        List<MediaItem> parcelListToItemList(List<Parcel> list) {
+        /* access modifiers changed from: 0000 */
+        public List<MediaItem> parcelListToItemList(List<Parcel> list) {
             if (list == null) {
                 return null;
             }
-            List<MediaItem> arrayList = new ArrayList();
+            ArrayList arrayList = new ArrayList();
             for (Parcel parcel : list) {
                 parcel.setDataPosition(0);
                 arrayList.add(MediaItem.CREATOR.createFromParcel(parcel));
@@ -88,6 +88,13 @@ class MediaBrowserServiceCompatApi21 {
                 this.mResultObj.sendResult(null);
             }
         }
+    }
+
+    /* renamed from: android.support.v4.media.MediaBrowserServiceCompatApi21$ServiceCompatProxy */
+    public interface ServiceCompatProxy {
+        BrowserRoot onGetRoot(String str, int i, Bundle bundle);
+
+        void onLoadChildren(String str, ResultWrapper<List<Parcel>> resultWrapper);
     }
 
     MediaBrowserServiceCompatApi21() {

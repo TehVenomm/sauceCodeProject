@@ -54,7 +54,7 @@ public class SmithSelectEquipSort : SortBase
 
 	public override void UpdateUI()
 	{
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 		int num;
 		switch (sortOrder.dialogType)
 		{
@@ -65,31 +65,31 @@ public class SmithSelectEquipSort : SortBase
 			num = 41436;
 			break;
 		}
-		UI? nullable = null;
+		UI? uI = null;
 		int i = 0;
 		for (int num2 = requirementButton.Length; i < num2; i++)
 		{
-			UI? nullable2 = requirementButton[i];
-			if (nullable2.HasValue)
+			UI? uI2 = requirementButton[i];
+			if (uI2.HasValue)
 			{
 				int num3 = 1 << i;
 				if ((num3 & num) != 0)
 				{
 					bool value = sortOrder.requirement == (SORT_REQUIREMENT)num3;
-					SetEvent((Enum)requirementButton[i], "REQUIREMENT", num3);
-					SetToggle((Enum)requirementButton[i], value);
-					nullable = requirementButton[i];
+					SetEvent((Enum)(object)requirementButton[i], "REQUIREMENT", num3);
+					SetToggle((Enum)(object)requirementButton[i], value);
+					uI = requirementButton[i];
 				}
 				else
 				{
-					SetActive((Enum)requirementButton[i], false);
+					SetActive((Enum)(object)requirementButton[i], is_visible: false);
 				}
 			}
 		}
-		if (nullable.HasValue)
+		if (uI.HasValue)
 		{
 			base.GetComponent<UIGrid>((Enum)UI.GRD_REQUIREMENT).Reposition();
-			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).set_position(GetCtrl(nullable).get_position());
+			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).set_position(GetCtrl((Enum)(object)uI).get_position());
 		}
 		int j = 0;
 		for (int num4 = ascButton.Length; j < num4; j++)

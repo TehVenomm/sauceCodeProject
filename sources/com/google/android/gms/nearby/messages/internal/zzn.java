@@ -2,27 +2,26 @@ package com.google.android.gms.nearby.messages.internal;
 
 import android.os.Parcel;
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzef;
-import com.google.android.gms.internal.zzeg;
+import com.google.android.gms.internal.nearby.zzb;
+import com.google.android.gms.internal.nearby.zzc;
+import java.util.List;
 
-public abstract class zzn extends zzef implements zzm {
+public abstract class zzn extends zzb implements zzm {
     public zzn() {
-        attachInterface(this, "com.google.android.gms.nearby.messages.internal.IMessageListener");
+        super("com.google.android.gms.nearby.messages.internal.IMessageListener");
     }
 
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        if (zza(i, parcel, parcel2, i2)) {
-            return true;
-        }
+    /* access modifiers changed from: protected */
+    public final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         switch (i) {
             case 1:
-                zza((zzaf) zzeg.zza(parcel, zzaf.CREATOR));
+                zza((zzaf) zzc.zza(parcel, zzaf.CREATOR));
                 break;
             case 2:
-                zzb((zzaf) zzeg.zza(parcel, zzaf.CREATOR));
+                zzb((zzaf) zzc.zza(parcel, zzaf.CREATOR));
                 break;
             case 4:
-                zzaf(parcel.createTypedArrayList(Update.CREATOR));
+                zza((List<Update>) parcel.createTypedArrayList(Update.CREATOR));
                 break;
             default:
                 return false;

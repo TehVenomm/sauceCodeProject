@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -11,8 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
+import android.content.res.Resources.NotFoundException;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -25,9 +24,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import com.google.firebase.analytics.FirebaseAnalytics.Param;
-import io.fabric.sdk.android.Fabric;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
@@ -36,8 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,9 +45,10 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import jp.colopl.drapro.LocalNotificationAlarmReceiver;
+import p017io.fabric.sdk.android.Fabric;
+import p018jp.colopl.drapro.LocalNotificationAlarmReceiver;
 
+/* renamed from: io.fabric.sdk.android.services.common.CommonUtils */
 public class CommonUtils {
     static final int BYTES_IN_A_GIGABYTE = 1073741824;
     static final int BYTES_IN_A_KILOBYTE = 1024;
@@ -65,13 +63,14 @@ public class CommonUtils {
     public static final int DEVICE_STATE_ISSIMULATOR = 1;
     public static final int DEVICE_STATE_JAILBROKEN = 2;
     public static final int DEVICE_STATE_VENDORINTERNAL = 16;
-    static final String ENCRYPTION_AES = "AES/ECB/PKCS7Padding";
     static final String FABRIC_BUILD_ID = "io.fabric.android.build_id";
-    public static final Comparator<File> FILE_MODIFIED_COMPARATOR = new C09181();
+    public static final Comparator<File> FILE_MODIFIED_COMPARATOR = new Comparator<File>() {
+        public int compare(File file, File file2) {
+            return (int) (file.lastModified() - file2.lastModified());
+        }
+    };
     public static final String GOOGLE_SDK = "google_sdk";
-    private static final char[] HEX_VALUES = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    private static final boolean LOGGING_DISABLED_DEFAULT = false;
-    private static final String LOGGING_DISABLED_KEY = "com.crashlytics.SilenceCrashlyticsLogCat";
+    private static final char[] HEX_VALUES = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final String LOG_PRIORITY_NAME_ASSERT = "A";
     private static final String LOG_PRIORITY_NAME_DEBUG = "D";
     private static final String LOG_PRIORITY_NAME_ERROR = "E";
@@ -79,24 +78,15 @@ public class CommonUtils {
     private static final String LOG_PRIORITY_NAME_UNKNOWN = "?";
     private static final String LOG_PRIORITY_NAME_VERBOSE = "V";
     private static final String LOG_PRIORITY_NAME_WARN = "W";
-    public static final String MD5_INSTANCE = "MD5";
     public static final String SDK = "sdk";
     public static final String SHA1_INSTANCE = "SHA-1";
+    public static final String SHA256_INSTANCE = "SHA-256";
     private static final long UNCALCULATED_TOTAL_RAM = -1;
+    static final String UNITY_EDITOR_VERSION = "com.google.firebase.crashlytics.unity_version";
     private static Boolean clsTrace = null;
-    private static Boolean loggingEnabled = null;
     private static long totalRamInBytes = -1;
 
-    /* renamed from: io.fabric.sdk.android.services.common.CommonUtils$1 */
-    static final class C09181 implements Comparator<File> {
-        C09181() {
-        }
-
-        public int compare(File file, File file2) {
-            return (int) (file.lastModified() - file2.lastModified());
-        }
-    }
-
+    /* renamed from: io.fabric.sdk.android.services.common.CommonUtils$Architecture */
     enum Architecture {
         X86_32,
         X86_64,
@@ -115,16 +105,17 @@ public class CommonUtils {
             matcher = new HashMap(4);
             matcher.put("armeabi-v7a", ARMV7);
             matcher.put("armeabi", ARMV6);
+            matcher.put("arm64-v8a", ARM64);
             matcher.put("x86", X86_32);
         }
 
         static Architecture getValue() {
-            Object obj = Build.CPU_ABI;
-            if (TextUtils.isEmpty(obj)) {
-                Fabric.getLogger().mo4289d("Fabric", "Architecture#getValue()::Build.CPU_ABI returned null or empty");
+            String str = Build.CPU_ABI;
+            if (TextUtils.isEmpty(str)) {
+                Fabric.getLogger().mo20969d(Fabric.TAG, "Architecture#getValue()::Build.CPU_ABI returned null or empty");
                 return UNKNOWN;
             }
-            Architecture architecture = (Architecture) matcher.get(obj.toLowerCase(Locale.US));
+            Architecture architecture = (Architecture) matcher.get(str.toLowerCase(Locale.US));
             return architecture == null ? UNKNOWN : architecture;
         }
     }
@@ -141,6 +132,7 @@ public class CommonUtils {
         return (((long) statFs.getBlockCount()) * blockSize) - (((long) statFs.getAvailableBlocks()) * blockSize);
     }
 
+    @SuppressLint({"MissingPermission"})
     public static boolean canTryConnection(Context context) {
         if (!checkPermission(context, "android.permission.ACCESS_NETWORK_STATE")) {
             return true;
@@ -157,8 +149,8 @@ public class CommonUtils {
         if (closeable != null) {
             try {
                 closeable.close();
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", str, e);
+            } catch (IOException e) {
+                Fabric.getLogger().mo20972e(Fabric.TAG, str, e);
             }
         }
     }
@@ -189,20 +181,9 @@ public class CommonUtils {
         }
     }
 
-    @SuppressLint({"GetInstance"})
+    @Deprecated
     public static Cipher createCipher(int i, String str) throws InvalidKeyException {
-        if (str.length() < 32) {
-            throw new InvalidKeyException("Key must be at least 32 bytes.");
-        }
-        Key secretKeySpec = new SecretKeySpec(str.getBytes(), 0, 32, ENCRYPTION_AES);
-        try {
-            Cipher instance = Cipher.getInstance(ENCRYPTION_AES);
-            instance.init(i, secretKeySpec);
-            return instance;
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not create Cipher for AES/ECB/PKCS7Padding - should never happen.", e);
-            throw new RuntimeException(e);
-        }
+        throw new InvalidKeyException("This method is deprecated");
     }
 
     public static String createInstanceIdFrom(String... strArr) {
@@ -210,20 +191,20 @@ public class CommonUtils {
             if (strArr.length == 0) {
                 return null;
             }
-            List<String> arrayList = new ArrayList();
+            ArrayList<String> arrayList = new ArrayList<>();
             for (String str : strArr) {
                 if (str != null) {
                     arrayList.add(str.replace("-", "").toLowerCase(Locale.US));
                 }
             }
             Collections.sort(arrayList);
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             for (String append : arrayList) {
-                stringBuilder.append(append);
+                sb.append(append);
             }
-            String append2 = stringBuilder.toString();
-            if (append2.length() > 0) {
-                return sha1(append2);
+            String sb2 = sb.toString();
+            if (sb2.length() > 0) {
+                return sha1(sb2);
             }
         }
         return null;
@@ -239,47 +220,52 @@ public class CommonUtils {
     }
 
     public static String extractFieldFromSystemFile(File file, String str) {
-        Closeable bufferedReader;
-        Throwable e;
+        BufferedReader bufferedReader;
         Throwable th;
         String str2 = null;
         if (file.exists()) {
             try {
-                String[] split;
                 bufferedReader = new BufferedReader(new FileReader(file), 1024);
                 while (true) {
                     try {
-                        CharSequence readLine = bufferedReader.readLine();
+                        String readLine = bufferedReader.readLine();
                         if (readLine == null) {
                             break;
                         }
-                        split = Pattern.compile("\\s*:\\s*").split(readLine, 2);
+                        String[] split = Pattern.compile("\\s*:\\s*").split(readLine, 2);
                         if (split.length > 1 && split[0].equals(str)) {
+                            str2 = split[1];
                             break;
                         }
-                    } catch (Exception e2) {
-                        e = e2;
-                    } catch (Throwable th2) {
-                        th = th2;
+                    } catch (Exception e) {
+                        e = e;
+                        try {
+                            Fabric.getLogger().mo20972e(Fabric.TAG, "Error parsing " + file, e);
+                            closeOrLog(bufferedReader, "Failed to close system file reader.");
+                            return str2;
+                        } catch (Throwable th2) {
+                            th = th2;
+                            th = th;
+                            closeOrLog(bufferedReader, "Failed to close system file reader.");
+                            throw th;
+                        }
+                    } catch (Throwable th3) {
+                        th = th3;
+                        closeOrLog(bufferedReader, "Failed to close system file reader.");
+                        throw th;
                     }
                 }
-                str2 = split[1];
                 closeOrLog(bufferedReader, "Failed to close system file reader.");
-            } catch (Exception e3) {
-                e = e3;
+            } catch (Exception e2) {
+                e = e2;
                 bufferedReader = null;
-                try {
-                    Fabric.getLogger().mo4292e("Fabric", "Error parsing " + file, e);
-                    closeOrLog(bufferedReader, "Failed to close system file reader.");
-                    return str2;
-                } catch (Throwable th3) {
-                    th = th3;
-                    closeOrLog(bufferedReader, "Failed to close system file reader.");
-                    throw th;
-                }
-            } catch (Throwable e4) {
+                Fabric.getLogger().mo20972e(Fabric.TAG, "Error parsing " + file, e);
+                closeOrLog(bufferedReader, "Failed to close system file reader.");
+                return str2;
+            } catch (Throwable th4) {
+                th = th4;
                 bufferedReader = null;
-                th = e4;
+                th = th;
                 closeOrLog(bufferedReader, "Failed to close system file reader.");
                 throw th;
             }
@@ -310,50 +296,45 @@ public class CommonUtils {
         if (flushable != null) {
             try {
                 flushable.flush();
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", str, e);
+            } catch (IOException e) {
+                Fabric.getLogger().mo20972e(Fabric.TAG, str, e);
             }
         }
     }
 
     public static String getAppIconHashOrNull(Context context) {
-        Closeable openRawResource;
-        Throwable e;
-        Throwable th;
+        InputStream inputStream;
         String str = null;
         try {
-            openRawResource = context.getResources().openRawResource(getAppIconResourceId(context));
+            inputStream = context.getResources().openRawResource(getAppIconResourceId(context));
             try {
-                String sha1 = sha1((InputStream) openRawResource);
+                String sha1 = sha1(inputStream);
                 if (!isNullOrEmpty(sha1)) {
                     str = sha1;
                 }
-                closeOrLog(openRawResource, "Failed to close icon input stream.");
-            } catch (Exception e2) {
-                e = e2;
-                try {
-                    Fabric.getLogger().mo4292e("Fabric", "Could not calculate hash for app icon.", e);
-                    closeOrLog(openRawResource, "Failed to close icon input stream.");
-                    return str;
-                } catch (Throwable th2) {
-                    th = th2;
-                    closeOrLog(openRawResource, "Failed to close icon input stream.");
-                    throw th;
-                }
+                closeOrLog(inputStream, "Failed to close icon input stream.");
+            } catch (Exception e) {
+                e = e;
             }
-        } catch (Exception e3) {
-            e = e3;
-            openRawResource = null;
-            Fabric.getLogger().mo4292e("Fabric", "Could not calculate hash for app icon.", e);
-            closeOrLog(openRawResource, "Failed to close icon input stream.");
-            return str;
-        } catch (Throwable e4) {
-            openRawResource = null;
-            th = e4;
-            closeOrLog(openRawResource, "Failed to close icon input stream.");
+        } catch (Exception e2) {
+            e = e2;
+            inputStream = null;
+        } catch (Throwable th) {
+            th = th;
+            inputStream = null;
+            closeOrLog(inputStream, "Failed to close icon input stream.");
             throw th;
         }
         return str;
+        try {
+            Fabric.getLogger().mo20982w(Fabric.TAG, "Could not calculate hash for app icon:" + e.getMessage());
+            closeOrLog(inputStream, "Failed to close icon input stream.");
+            return str;
+        } catch (Throwable th2) {
+            th = th2;
+            closeOrLog(inputStream, "Failed to close icon input stream.");
+            throw th;
+        }
     }
 
     public static int getAppIconResourceId(Context context) {
@@ -372,20 +353,23 @@ public class CommonUtils {
         return null;
     }
 
-    public static float getBatteryLevel(Context context) {
+    public static Float getBatteryLevel(Context context) {
         Intent registerReceiver = context.registerReceiver(null, new IntentFilter("android.intent.action.BATTERY_CHANGED"));
-        return ((float) registerReceiver.getIntExtra(Param.LEVEL, -1)) / ((float) registerReceiver.getIntExtra("scale", -1));
+        if (registerReceiver == null) {
+            return null;
+        }
+        return Float.valueOf(((float) registerReceiver.getIntExtra(Param.LEVEL, -1)) / ((float) registerReceiver.getIntExtra("scale", -1)));
     }
 
     public static int getBatteryVelocity(Context context, boolean z) {
-        float batteryLevel = getBatteryLevel(context);
-        return !z ? 1 : (!z || ((double) batteryLevel) < 99.0d) ? (!z || ((double) batteryLevel) >= 99.0d) ? 0 : 2 : 3;
-    }
-
-    public static byte[] getBitmapBytes(Bitmap bitmap) {
-        OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(CompressFormat.PNG, 100, byteArrayOutputStream);
-        return byteArrayOutputStream.toByteArray();
+        Float batteryLevel = getBatteryLevel(context);
+        if (!z || batteryLevel == null) {
+            return 1;
+        }
+        if (((double) batteryLevel.floatValue()) >= 99.0d) {
+            return 3;
+        }
+        return ((double) batteryLevel.floatValue()) < 99.0d ? 2 : 0;
     }
 
     public static boolean getBooleanResourceValue(Context context, String str, boolean z) {
@@ -420,12 +404,19 @@ public class CommonUtils {
     }
 
     public static boolean getProximitySensorEnabled(Context context) {
-        return (isEmulator(context) || ((SensorManager) context.getSystemService("sensor")).getDefaultSensor(8) == null) ? false : true;
+        return !isEmulator(context) && ((SensorManager) context.getSystemService("sensor")).getDefaultSensor(8) != null;
     }
 
     public static String getResourcePackageName(Context context) {
         int i = context.getApplicationContext().getApplicationInfo().icon;
-        return i > 0 ? context.getResources().getResourcePackageName(i) : context.getPackageName();
+        if (i <= 0) {
+            return context.getPackageName();
+        }
+        try {
+            return context.getResources().getResourcePackageName(i);
+        } catch (NotFoundException e) {
+            return context.getPackageName();
+        }
     }
 
     public static int getResourcesIdentifier(Context context, String str, String str2) {
@@ -443,33 +434,35 @@ public class CommonUtils {
 
     public static long getTotalRamInBytes() {
         long j;
+        long j2;
+        String upperCase;
         synchronized (CommonUtils.class) {
-            String toUpperCase;
             try {
                 if (totalRamInBytes == -1) {
-                    Object extractFieldFromSystemFile = extractFieldFromSystemFile(new File("/proc/meminfo"), "MemTotal");
-                    if (TextUtils.isEmpty(extractFieldFromSystemFile)) {
-                        j = 0;
-                    } else {
-                        toUpperCase = extractFieldFromSystemFile.toUpperCase(Locale.US);
-                        if (toUpperCase.endsWith("KB")) {
-                            j = convertMemInfoToBytes(toUpperCase, "KB", 1024);
-                        } else if (toUpperCase.endsWith("MB")) {
-                            j = convertMemInfoToBytes(toUpperCase, "MB", 1048576);
-                        } else if (toUpperCase.endsWith("GB")) {
-                            j = convertMemInfoToBytes(toUpperCase, "GB", BYTES_IN_A_GIGABYTE);
+                    String extractFieldFromSystemFile = extractFieldFromSystemFile(new File("/proc/meminfo"), "MemTotal");
+                    if (!TextUtils.isEmpty(extractFieldFromSystemFile)) {
+                        upperCase = extractFieldFromSystemFile.toUpperCase(Locale.US);
+                        if (upperCase.endsWith("KB")) {
+                            j2 = convertMemInfoToBytes(upperCase, "KB", 1024);
+                        } else if (upperCase.endsWith("MB")) {
+                            j2 = convertMemInfoToBytes(upperCase, "MB", 1048576);
+                        } else if (upperCase.endsWith("GB")) {
+                            j2 = convertMemInfoToBytes(upperCase, "GB", BYTES_IN_A_GIGABYTE);
                         } else {
-                            Fabric.getLogger().mo4289d("Fabric", "Unexpected meminfo format while computing RAM: " + toUpperCase);
-                            j = 0;
+                            Fabric.getLogger().mo20969d(Fabric.TAG, "Unexpected meminfo format while computing RAM: " + upperCase);
+                            j2 = 0;
                         }
+                    } else {
+                        j2 = 0;
                     }
-                    totalRamInBytes = j;
+                    totalRamInBytes = j2;
                 }
-            } catch (Throwable e) {
-                Fabric.getLogger().mo4292e("Fabric", "Unexpected meminfo format while computing RAM: " + toUpperCase, e);
-                j = 0;
+            } catch (NumberFormatException e) {
+                Fabric.getLogger().mo20972e(Fabric.TAG, "Unexpected meminfo format while computing RAM: " + upperCase, e);
+                j2 = 0;
             } catch (Throwable th) {
-                Class cls = CommonUtils.class;
+                Class<CommonUtils> cls = CommonUtils.class;
+                throw th;
             }
             j = totalRamInBytes;
         }
@@ -478,7 +471,7 @@ public class CommonUtils {
 
     private static String hash(InputStream inputStream, String str) {
         try {
-            MessageDigest instance = MessageDigest.getInstance(SHA1_INSTANCE);
+            MessageDigest instance = MessageDigest.getInstance(str);
             byte[] bArr = new byte[1024];
             while (true) {
                 int read = inputStream.read(bArr);
@@ -487,8 +480,8 @@ public class CommonUtils {
                 }
                 instance.update(bArr, 0, read);
             }
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not calculate hash for app icon.", e);
+        } catch (Exception e) {
+            Fabric.getLogger().mo20972e(Fabric.TAG, "Could not calculate hash for app icon.", e);
             return "";
         }
     }
@@ -502,8 +495,8 @@ public class CommonUtils {
             MessageDigest instance = MessageDigest.getInstance(str);
             instance.update(bArr);
             return hexify(instance.digest());
-        } catch (Throwable e) {
-            Fabric.getLogger().mo4292e("Fabric", "Could not create hashing algorithm: " + str + ", returning empty string.", e);
+        } catch (NoSuchAlgorithmException e) {
+            Fabric.getLogger().mo20972e(Fabric.TAG, "Could not create hashing algorithm: " + str + ", returning empty string.", e);
             return "";
         }
     }
@@ -511,9 +504,9 @@ public class CommonUtils {
     public static String hexify(byte[] bArr) {
         char[] cArr = new char[(bArr.length * 2)];
         for (int i = 0; i < bArr.length; i++) {
-            int i2 = bArr[i] & 255;
-            cArr[i * 2] = (char) HEX_VALUES[i2 >>> 4];
-            cArr[(i * 2) + 1] = (char) HEX_VALUES[i2 & 15];
+            byte b = bArr[i] & 255;
+            cArr[i * 2] = (char) HEX_VALUES[b >>> 4];
+            cArr[(i * 2) + 1] = (char) HEX_VALUES[b & 15];
         }
         return new String(cArr);
     }
@@ -544,15 +537,9 @@ public class CommonUtils {
         return "sdk".equals(Build.PRODUCT) || GOOGLE_SDK.equals(Build.PRODUCT) || Secure.getString(context.getContentResolver(), "android_id") == null;
     }
 
+    @Deprecated
     public static boolean isLoggingEnabled(Context context) {
-        boolean z = false;
-        if (loggingEnabled == null) {
-            if (!getBooleanResourceValue(context, LOGGING_DISABLED_KEY, false)) {
-                z = true;
-            }
-            loggingEnabled = Boolean.valueOf(z);
-        }
-        return loggingEnabled.booleanValue();
+        return false;
     }
 
     public static boolean isNullOrEmpty(String str) {
@@ -570,19 +557,19 @@ public class CommonUtils {
 
     public static void logControlled(Context context, int i, String str, String str2) {
         if (isClsTrace(context)) {
-            Fabric.getLogger().log(i, "Fabric", str2);
+            Fabric.getLogger().log(i, Fabric.TAG, str2);
         }
     }
 
     public static void logControlled(Context context, String str) {
         if (isClsTrace(context)) {
-            Fabric.getLogger().mo4289d("Fabric", str);
+            Fabric.getLogger().mo20969d(Fabric.TAG, str);
         }
     }
 
     public static void logControlledError(Context context, String str, Throwable th) {
         if (isClsTrace(context)) {
-            Fabric.getLogger().mo4291e("Fabric", str);
+            Fabric.getLogger().mo20971e(Fabric.TAG, str);
         }
     }
 
@@ -590,14 +577,14 @@ public class CommonUtils {
         if (Fabric.isDebuggable()) {
             throw new IllegalArgumentException(str2);
         }
-        Fabric.getLogger().mo4302w(str, str2);
+        Fabric.getLogger().mo20982w(str, str2);
     }
 
     public static void logOrThrowIllegalStateException(String str, String str2) {
         if (Fabric.isDebuggable()) {
             throw new IllegalStateException(str2);
         }
-        Fabric.getLogger().mo4302w(str, str2);
+        Fabric.getLogger().mo20982w(str, str2);
     }
 
     public static String logPriorityToString(int i) {
@@ -617,14 +604,6 @@ public class CommonUtils {
             default:
                 return LOG_PRIORITY_NAME_UNKNOWN;
         }
-    }
-
-    public static String md5(String str) {
-        return hash(str, MD5_INSTANCE);
-    }
-
-    public static String md5(byte[] bArr) {
-        return hash(bArr, MD5_INSTANCE);
     }
 
     public static void openKeyboard(Context context, View view) {
@@ -650,7 +629,17 @@ public class CommonUtils {
             return null;
         }
         String string = context.getResources().getString(resourcesIdentifier);
-        Fabric.getLogger().mo4289d("Fabric", "Build ID is: " + string);
+        Fabric.getLogger().mo20969d(Fabric.TAG, "Build ID is: " + string);
+        return string;
+    }
+
+    public static String resolveUnityEditorVersion(Context context) {
+        int resourcesIdentifier = getResourcesIdentifier(context, UNITY_EDITOR_VERSION, "string");
+        if (resourcesIdentifier == 0) {
+            return null;
+        }
+        String string = context.getResources().getString(resourcesIdentifier);
+        Fabric.getLogger().mo20969d(Fabric.TAG, "Unity Editor version is: " + string);
         return string;
     }
 
@@ -662,8 +651,8 @@ public class CommonUtils {
         return hash(str, SHA1_INSTANCE);
     }
 
-    public static String sha1(byte[] bArr) {
-        return hash(bArr, SHA1_INSTANCE);
+    public static String sha256(String str) {
+        return hash(str, SHA256_INSTANCE);
     }
 
     public static String streamToString(InputStream inputStream) throws IOException {
@@ -672,6 +661,12 @@ public class CommonUtils {
     }
 
     public static boolean stringsEqualIncludingNull(String str, String str2) {
-        return str == str2 ? true : str != null ? str.equals(str2) : false;
+        if (str == str2) {
+            return true;
+        }
+        if (str != null) {
+            return str.equals(str2);
+        }
+        return false;
     }
 }

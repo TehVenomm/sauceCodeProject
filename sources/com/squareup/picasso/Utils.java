@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.ThreadFactory;
-import jp.colopl.drapro.LocalNotificationAlarmReceiver;
 import org.apache.commons.lang3.CharEncoding;
+import p018jp.colopl.drapro.LocalNotificationAlarmReceiver;
 
 final class Utils {
     static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 15000;
@@ -115,14 +115,14 @@ final class Utils {
     }
 
     static int getBitmapBytes(Bitmap bitmap) {
-        int byteCount;
+        int rowBytes;
         if (VERSION.SDK_INT >= 12) {
-            byteCount = BitmapHoneycombMR1.getByteCount(bitmap);
+            rowBytes = BitmapHoneycombMR1.getByteCount(bitmap);
         } else {
-            byteCount = bitmap.getRowBytes() * bitmap.getHeight();
+            rowBytes = bitmap.getRowBytes() * bitmap.getHeight();
         }
-        if (byteCount >= 0) {
-            return byteCount;
+        if (rowBytes >= 0) {
+            return rowBytes;
         }
         throw new IllegalStateException("Negative size: " + bitmap);
     }
@@ -155,22 +155,22 @@ final class Utils {
     }
 
     static String getLogIdsForHunter(BitmapHunter bitmapHunter, String str) {
-        StringBuilder stringBuilder = new StringBuilder(str);
+        StringBuilder sb = new StringBuilder(str);
         Action action = bitmapHunter.getAction();
         if (action != null) {
-            stringBuilder.append(action.request.logId());
+            sb.append(action.request.logId());
         }
         List actions = bitmapHunter.getActions();
         if (actions != null) {
             int size = actions.size();
             for (int i = 0; i < size; i++) {
                 if (i > 0 || action != null) {
-                    stringBuilder.append(", ");
+                    sb.append(", ");
                 }
-                stringBuilder.append(((Action) actions.get(i)).request.logId());
+                sb.append(((Action) actions.get(i)).request.logId());
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     static void log(String str, String str2, String str3) {
@@ -187,43 +187,43 @@ final class Utils {
         return createKey;
     }
 
-    static String createKey(Request request, StringBuilder stringBuilder) {
+    static String createKey(Request request, StringBuilder sb) {
         if (request.stableKey != null) {
-            stringBuilder.ensureCapacity(request.stableKey.length() + 50);
-            stringBuilder.append(request.stableKey);
+            sb.ensureCapacity(request.stableKey.length() + 50);
+            sb.append(request.stableKey);
         } else if (request.uri != null) {
             String uri = request.uri.toString();
-            stringBuilder.ensureCapacity(uri.length() + 50);
-            stringBuilder.append(uri);
+            sb.ensureCapacity(uri.length() + 50);
+            sb.append(uri);
         } else {
-            stringBuilder.ensureCapacity(50);
-            stringBuilder.append(request.resourceId);
+            sb.ensureCapacity(50);
+            sb.append(request.resourceId);
         }
-        stringBuilder.append('\n');
+        sb.append(10);
         if (request.rotationDegrees != 0.0f) {
-            stringBuilder.append("rotation:").append(request.rotationDegrees);
+            sb.append("rotation:").append(request.rotationDegrees);
             if (request.hasRotationPivot) {
-                stringBuilder.append('@').append(request.rotationPivotX).append('x').append(request.rotationPivotY);
+                sb.append('@').append(request.rotationPivotX).append('x').append(request.rotationPivotY);
             }
-            stringBuilder.append('\n');
+            sb.append(10);
         }
         if (request.hasSize()) {
-            stringBuilder.append("resize:").append(request.targetWidth).append('x').append(request.targetHeight);
-            stringBuilder.append('\n');
+            sb.append("resize:").append(request.targetWidth).append('x').append(request.targetHeight);
+            sb.append(10);
         }
         if (request.centerCrop) {
-            stringBuilder.append("centerCrop").append('\n');
+            sb.append("centerCrop").append(10);
         } else if (request.centerInside) {
-            stringBuilder.append("centerInside").append('\n');
+            sb.append("centerInside").append(10);
         }
         if (request.transformations != null) {
             int size = request.transformations.size();
             for (int i = 0; i < size; i++) {
-                stringBuilder.append(((Transformation) request.transformations.get(i)).key());
-                stringBuilder.append('\n');
+                sb.append(((Transformation) request.transformations.get(i)).key());
+                sb.append(10);
             }
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     static void closeQuietly(InputStream inputStream) {
@@ -248,7 +248,7 @@ final class Utils {
             return false;
         }
         try {
-            if (!("CONDITIONAL_CACHE".equals(split[0]) && Integer.parseInt(split[1]) == 304)) {
+            if (!"CONDITIONAL_CACHE".equals(split[0]) || Integer.parseInt(split[1]) != 304) {
                 z = false;
             }
             return z;
@@ -275,22 +275,22 @@ final class Utils {
     }
 
     static long calculateDiskCacheSize(File file) {
-        long blockSize;
+        long j;
         try {
             StatFs statFs = new StatFs(file.getAbsolutePath());
-            blockSize = (((long) statFs.getBlockSize()) * ((long) statFs.getBlockCount())) / 50;
+            j = (((long) statFs.getBlockSize()) * ((long) statFs.getBlockCount())) / 50;
         } catch (IllegalArgumentException e) {
-            blockSize = 5242880;
+            j = 5242880;
         }
-        return Math.max(Math.min(blockSize, 52428800), 5242880);
+        return Math.max(Math.min(j, 52428800), 5242880);
     }
 
     static int calculateMemoryCacheSize(Context context) {
         int i;
         ActivityManager activityManager = (ActivityManager) getService(context, LocalNotificationAlarmReceiver.EXTRA_ACTIVITY);
-        Object obj = (context.getApplicationInfo().flags & 1048576) != 0 ? 1 : null;
+        boolean z = (context.getApplicationInfo().flags & 1048576) != 0;
         int memoryClass = activityManager.getMemoryClass();
-        if (obj == null || VERSION.SDK_INT < 11) {
+        if (!z || VERSION.SDK_INT < 11) {
             i = memoryClass;
         } else {
             i = ActivityManagerHoneycomb.getLargeMemoryClass(activityManager);
@@ -331,10 +331,10 @@ final class Utils {
 
     static boolean isWebPFile(InputStream inputStream) throws IOException {
         byte[] bArr = new byte[12];
-        if (inputStream.read(bArr, 0, 12) == 12 && WEBP_FILE_HEADER_RIFF.equals(new String(bArr, 0, 4, CharEncoding.US_ASCII)) && WEBP_FILE_HEADER_WEBP.equals(new String(bArr, 8, 4, CharEncoding.US_ASCII))) {
-            return true;
+        if (inputStream.read(bArr, 0, 12) != 12 || !WEBP_FILE_HEADER_RIFF.equals(new String(bArr, 0, 4, CharEncoding.US_ASCII)) || !WEBP_FILE_HEADER_WEBP.equals(new String(bArr, 8, 4, CharEncoding.US_ASCII))) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     static int getResourceId(Resources resources, Request request) throws FileNotFoundException {
@@ -377,11 +377,11 @@ final class Utils {
     }
 
     static void flushStackLocalLeaks(Looper looper) {
-        Handler c07271 = new Handler(looper) {
+        C10621 r0 = new Handler(looper) {
             public void handleMessage(Message message) {
                 sendMessageDelayed(obtainMessage(), 1000);
             }
         };
-        c07271.sendMessageDelayed(c07271.obtainMessage(), 1000);
+        r0.sendMessageDelayed(r0.obtainMessage(), 1000);
     }
 }

@@ -18,6 +18,8 @@ public class CoopLocalServerEnemy
 
 	public bool bossFlag => owner.data.bossFlag;
 
+	public bool bigMonsterFlag => owner.data.bigMonsterFlag;
+
 	public CoopLocalServerEnemy(CoopLocalServerEnemyPop epop, float pop_time)
 	{
 		owner = epop;

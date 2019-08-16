@@ -8,76 +8,135 @@ import com.appsflyer.AppsFlyerProperties;
 import com.appsflyer.ServerConfigHandler;
 import com.appsflyer.ServerParameters;
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CrossPromotionHelper {
 
     /* renamed from: com.appsflyer.share.CrossPromotionHelper$b */
-    static class C0293b extends AsyncTask<String, Void, Void> {
+    static class C0462b extends AsyncTask<String, Void, Void> {
+
         /* renamed from: ˊ */
-        private boolean f303;
+        private boolean f324;
+
         /* renamed from: ˎ */
-        private WeakReference<Context> f304;
+        private WeakReference<Context> f325;
+
         /* renamed from: ॱ */
-        private C0294c f305;
+        private C0463c f326;
 
-        protected final /* synthetic */ Object doInBackground(Object[] objArr) {
-            return m355((String[]) objArr);
+        C0462b(C0463c cVar, Context context, boolean z) {
+            this.f326 = cVar;
+            this.f325 = new WeakReference<>(context);
+            this.f324 = z;
         }
 
-        C0293b(C0294c c0294c, Context context, boolean z) {
-            this.f305 = c0294c;
-            this.f304 = new WeakReference(context);
-            this.f303 = z;
-        }
-
+        /* access modifiers changed from: private */
+        /* JADX WARNING: Removed duplicated region for block: B:35:0x00a5  */
         /* renamed from: ˊ */
-        private Void m355(String... strArr) {
-            HttpURLConnection httpURLConnection;
-            Throwable th;
-            HttpURLConnection httpURLConnection2 = null;
-            if (!this.f303) {
-                try {
-                    String str = strArr[0];
-                    HttpURLConnection httpURLConnection3 = (HttpURLConnection) new URL(str).openConnection();
-                    try {
-                        httpURLConnection3.setConnectTimeout(10000);
-                        httpURLConnection3.setInstanceFollowRedirects(false);
-                        int responseCode = httpURLConnection3.getResponseCode();
-                        if (responseCode == 200) {
-                            AFLogger.afInfoLog("Cross promotion impressions success: ".concat(String.valueOf(str)), false);
-                        } else if (responseCode == 301 || responseCode == 302) {
-                            AFLogger.afInfoLog("Cross promotion redirection success: ".concat(String.valueOf(str)), false);
-                            if (!(this.f305 == null || this.f304.get() == null)) {
-                                this.f305.m362(httpURLConnection3.getHeaderField("Location"));
-                                this.f305.m361((Context) this.f304.get());
-                            }
-                        } else {
-                            AFLogger.afInfoLog(new StringBuilder("call to ").append(str).append(" failed: ").append(responseCode).toString());
-                        }
-                        if (httpURLConnection3 != null) {
-                            httpURLConnection3.disconnect();
-                        }
-                    } catch (Throwable th2) {
-                        httpURLConnection2 = httpURLConnection3;
-                        th = th2;
-                        if (httpURLConnection2 != null) {
-                            httpURLConnection2.disconnect();
-                        }
-                        throw th;
-                    }
-                } catch (Throwable th3) {
-                    th = th3;
-                    if (httpURLConnection2 != null) {
-                        httpURLConnection2.disconnect();
-                    }
-                    throw th;
-                }
-            }
-            return null;
+        /* Code decompiled incorrectly, please refer to instructions dump. */
+        public java.lang.Void doInBackground(java.lang.String... r7) {
+            /*
+                r6 = this;
+                r3 = 0
+                boolean r0 = r6.f324
+                if (r0 == 0) goto L_0x0006
+            L_0x0005:
+                return r3
+            L_0x0006:
+                r0 = 0
+                r1 = r7[r0]     // Catch:{ Throwable -> 0x00b0, all -> 0x00a9 }
+                java.net.URL r0 = new java.net.URL     // Catch:{ Throwable -> 0x00b0, all -> 0x00a9 }
+                r0.<init>(r1)     // Catch:{ Throwable -> 0x00b0, all -> 0x00a9 }
+                java.net.URLConnection r0 = r0.openConnection()     // Catch:{ Throwable -> 0x00b0, all -> 0x00a9 }
+                java.net.HttpURLConnection r0 = (java.net.HttpURLConnection) r0     // Catch:{ Throwable -> 0x00b0, all -> 0x00a9 }
+                r2 = 10000(0x2710, float:1.4013E-41)
+                r0.setConnectTimeout(r2)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                r2 = 0
+                r0.setInstanceFollowRedirects(r2)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                int r2 = r0.getResponseCode()     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                r4 = 200(0xc8, float:2.8E-43)
+                if (r2 != r4) goto L_0x0039
+                java.lang.String r2 = "Cross promotion impressions success: "
+                java.lang.String r1 = java.lang.String.valueOf(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.String r1 = r2.concat(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                r2 = 0
+                com.appsflyer.AFLogger.afInfoLog(r1, r2)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+            L_0x0033:
+                if (r0 == 0) goto L_0x0005
+                r0.disconnect()
+                goto L_0x0005
+            L_0x0039:
+                r4 = 301(0x12d, float:4.22E-43)
+                if (r2 == r4) goto L_0x0041
+                r4 = 302(0x12e, float:4.23E-43)
+                if (r2 != r4) goto L_0x0084
+            L_0x0041:
+                java.lang.String r2 = "Cross promotion redirection success: "
+                java.lang.String r1 = java.lang.String.valueOf(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.String r1 = r2.concat(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                r2 = 0
+                com.appsflyer.AFLogger.afInfoLog(r1, r2)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                com.appsflyer.share.c r1 = r6.f326     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                if (r1 == 0) goto L_0x0033
+                java.lang.ref.WeakReference<android.content.Context> r1 = r6.f325     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.Object r1 = r1.get()     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                if (r1 == 0) goto L_0x0033
+                java.lang.String r1 = "Location"
+                java.lang.String r1 = r0.getHeaderField(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                com.appsflyer.share.c r2 = r6.f326     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                r2.mo6632(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                com.appsflyer.share.c r2 = r6.f326     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.ref.WeakReference<android.content.Context> r1 = r6.f325     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.Object r1 = r1.get()     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                android.content.Context r1 = (android.content.Context) r1     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                r2.mo6631(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                goto L_0x0033
+            L_0x0074:
+                r1 = move-exception
+                r2 = r0
+            L_0x0076:
+                java.lang.String r0 = r1.getMessage()     // Catch:{ all -> 0x00ac }
+                r4 = 1
+                com.appsflyer.AFLogger.afErrorLog(r0, r1, r4)     // Catch:{ all -> 0x00ac }
+                if (r2 == 0) goto L_0x0005
+                r2.disconnect()
+                goto L_0x0005
+            L_0x0084:
+                java.lang.StringBuilder r4 = new java.lang.StringBuilder     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.String r5 = "call to "
+                r4.<init>(r5)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.StringBuilder r1 = r4.append(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.String r4 = " failed: "
+                java.lang.StringBuilder r1 = r1.append(r4)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.StringBuilder r1 = r1.append(r2)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                java.lang.String r1 = r1.toString()     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                com.appsflyer.AFLogger.afInfoLog(r1)     // Catch:{ Throwable -> 0x0074, all -> 0x00a1 }
+                goto L_0x0033
+            L_0x00a1:
+                r1 = move-exception
+                r3 = r0
+            L_0x00a3:
+                if (r3 == 0) goto L_0x00a8
+                r3.disconnect()
+            L_0x00a8:
+                throw r1
+            L_0x00a9:
+                r0 = move-exception
+                r1 = r0
+                goto L_0x00a3
+            L_0x00ac:
+                r0 = move-exception
+                r1 = r0
+                r3 = r2
+                goto L_0x00a3
+            L_0x00b0:
+                r0 = move-exception
+                r1 = r0
+                r2 = r3
+                goto L_0x0076
+            */
+            throw new UnsupportedOperationException("Method not decompiled: com.appsflyer.share.CrossPromotionHelper.C0462b.doInBackground(java.lang.String[]):java.lang.Void");
         }
     }
 
@@ -86,18 +145,18 @@ public class CrossPromotionHelper {
     }
 
     public static void trackAndOpenStore(Context context, String str, String str2, Map<String, String> map) {
-        LinkGenerator ˎ = m356(context, str, str2, map, ServerConfigHandler.getUrl(Constants.BASE_URL_APP_APPSFLYER_COM));
+        LinkGenerator r0 = m350(context, str, str2, map, ServerConfigHandler.getUrl(Constants.BASE_URL_APP_APPSFLYER_COM));
         if (AppsFlyerProperties.getInstance().getBoolean(AppsFlyerProperties.AF_WAITFOR_CUSTOMERID, false)) {
             AFLogger.afInfoLog("CustomerUserId not set, track And Open Store is disabled", true);
             return;
         }
-        Map hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         if (map != null) {
             hashMap.putAll(map);
         }
         hashMap.put("af_campaign", str2);
         AppsFlyerLib.getInstance().trackEvent(context, "af_cross_promotion", hashMap);
-        new C0293b(new C0294c(), context, AppsFlyerLib.getInstance().isTrackingStopped()).execute(new String[]{ˎ.generateLink()});
+        new C0462b(new C0463c(), context, AppsFlyerLib.getInstance().isTrackingStopped()).execute(new String[]{r0.generateLink()});
     }
 
     public static void trackCrossPromoteImpression(Context context, String str, String str2) {
@@ -105,14 +164,14 @@ public class CrossPromotionHelper {
             AFLogger.afInfoLog("CustomerUserId not set, Promote Impression is disabled", true);
             return;
         }
-        LinkGenerator ˎ = m356(context, str, str2, null, ServerConfigHandler.getUrl("https://impression.%s"));
-        new C0293b(null, null, AppsFlyerLib.getInstance().isTrackingStopped()).execute(new String[]{ˎ.generateLink()});
+        LinkGenerator r0 = m350(context, str, str2, null, ServerConfigHandler.getUrl("https://impression.%s"));
+        new C0462b(null, null, AppsFlyerLib.getInstance().isTrackingStopped()).execute(new String[]{r0.generateLink()});
     }
 
     /* renamed from: ˎ */
-    private static LinkGenerator m356(Context context, String str, String str2, Map<String, String> map, String str3) {
+    private static LinkGenerator m350(Context context, String str, String str2, Map<String, String> map, String str3) {
         LinkGenerator linkGenerator = new LinkGenerator("af_cross_promotion");
-        linkGenerator.m359(str3).m360(str).addParameter(Constants.URL_SITE_ID, context.getPackageName());
+        linkGenerator.mo6629(str3).mo6630(str).addParameter(Constants.URL_SITE_ID, context.getPackageName());
         if (str2 != null) {
             linkGenerator.setCampaign(str2);
         }

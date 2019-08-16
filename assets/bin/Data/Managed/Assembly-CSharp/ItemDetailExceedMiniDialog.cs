@@ -34,6 +34,6 @@ public class ItemDetailExceedMiniDialog : ItemDetailExceedDialog
 
 	public override void UpdateUI()
 	{
-		UpdateBonusDetail(false);
+		UpdateBonusDetail(changeNextColor: false);
 	}
 }

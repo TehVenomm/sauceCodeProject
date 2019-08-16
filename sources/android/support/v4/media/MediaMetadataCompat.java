@@ -1,4 +1,4 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,16 +9,26 @@ import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.util.ArrayMap;
+import android.support.p000v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
+/* renamed from: android.support.v4.media.MediaMetadataCompat */
 public final class MediaMetadataCompat implements Parcelable {
-    public static final Creator<MediaMetadataCompat> CREATOR = new C00721();
-    static final ArrayMap<String, Integer> METADATA_KEYS_TYPE = new ArrayMap();
+    public static final Creator<MediaMetadataCompat> CREATOR = new Creator<MediaMetadataCompat>() {
+        public MediaMetadataCompat createFromParcel(Parcel parcel) {
+            return new MediaMetadataCompat(parcel);
+        }
+
+        public MediaMetadataCompat[] newArray(int i) {
+            return new MediaMetadataCompat[i];
+        }
+    };
+    static final ArrayMap<String, Integer> METADATA_KEYS_TYPE = new ArrayMap<>();
+    public static final String METADATA_KEY_ADVERTISEMENT = "android.media.metadata.ADVERTISEMENT";
     public static final String METADATA_KEY_ALBUM = "android.media.metadata.ALBUM";
     public static final String METADATA_KEY_ALBUM_ART = "android.media.metadata.ALBUM_ART";
     public static final String METADATA_KEY_ALBUM_ARTIST = "android.media.metadata.ALBUM_ARTIST";
@@ -37,6 +47,7 @@ public final class MediaMetadataCompat implements Parcelable {
     public static final String METADATA_KEY_DISPLAY_ICON_URI = "android.media.metadata.DISPLAY_ICON_URI";
     public static final String METADATA_KEY_DISPLAY_SUBTITLE = "android.media.metadata.DISPLAY_SUBTITLE";
     public static final String METADATA_KEY_DISPLAY_TITLE = "android.media.metadata.DISPLAY_TITLE";
+    public static final String METADATA_KEY_DOWNLOAD_STATUS = "android.media.metadata.DOWNLOAD_STATUS";
     public static final String METADATA_KEY_DURATION = "android.media.metadata.DURATION";
     public static final String METADATA_KEY_GENRE = "android.media.metadata.GENRE";
     public static final String METADATA_KEY_MEDIA_ID = "android.media.metadata.MEDIA_ID";
@@ -52,33 +63,21 @@ public final class MediaMetadataCompat implements Parcelable {
     static final int METADATA_TYPE_LONG = 0;
     static final int METADATA_TYPE_RATING = 3;
     static final int METADATA_TYPE_TEXT = 1;
-    private static final String[] PREFERRED_BITMAP_ORDER = new String[]{METADATA_KEY_DISPLAY_ICON, METADATA_KEY_ART, METADATA_KEY_ALBUM_ART};
-    private static final String[] PREFERRED_DESCRIPTION_ORDER = new String[]{METADATA_KEY_TITLE, METADATA_KEY_ARTIST, METADATA_KEY_ALBUM, METADATA_KEY_ALBUM_ARTIST, METADATA_KEY_WRITER, METADATA_KEY_AUTHOR, METADATA_KEY_COMPOSER};
-    private static final String[] PREFERRED_URI_ORDER = new String[]{METADATA_KEY_DISPLAY_ICON_URI, METADATA_KEY_ART_URI, METADATA_KEY_ALBUM_ART_URI};
+    private static final String[] PREFERRED_BITMAP_ORDER = {METADATA_KEY_DISPLAY_ICON, METADATA_KEY_ART, METADATA_KEY_ALBUM_ART};
+    private static final String[] PREFERRED_DESCRIPTION_ORDER = {METADATA_KEY_TITLE, METADATA_KEY_ARTIST, METADATA_KEY_ALBUM, METADATA_KEY_ALBUM_ARTIST, METADATA_KEY_WRITER, METADATA_KEY_AUTHOR, METADATA_KEY_COMPOSER};
+    private static final String[] PREFERRED_URI_ORDER = {METADATA_KEY_DISPLAY_ICON_URI, METADATA_KEY_ART_URI, METADATA_KEY_ALBUM_ART_URI};
     private static final String TAG = "MediaMetadata";
     final Bundle mBundle;
     private MediaDescriptionCompat mDescription;
     private Object mMetadataObj;
 
-    /* renamed from: android.support.v4.media.MediaMetadataCompat$1 */
-    static final class C00721 implements Creator<MediaMetadataCompat> {
-        C00721() {
-        }
-
-        public MediaMetadataCompat createFromParcel(Parcel parcel) {
-            return new MediaMetadataCompat(parcel);
-        }
-
-        public MediaMetadataCompat[] newArray(int i) {
-            return new MediaMetadataCompat[i];
-        }
-    }
-
     @RestrictTo({Scope.LIBRARY_GROUP})
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.media.MediaMetadataCompat$BitmapKey */
     public @interface BitmapKey {
     }
 
+    /* renamed from: android.support.v4.media.MediaMetadataCompat$Builder */
     public static final class Builder {
         private final Bundle mBundle;
 
@@ -95,12 +94,10 @@ public final class MediaMetadataCompat implements Parcelable {
             this(mediaMetadataCompat);
             for (String str : this.mBundle.keySet()) {
                 Object obj = this.mBundle.get(str);
-                if (obj != null && (obj instanceof Bitmap)) {
+                if (obj instanceof Bitmap) {
                     Bitmap bitmap = (Bitmap) obj;
                     if (bitmap.getHeight() > i || bitmap.getWidth() > i) {
                         putBitmap(str, scaleBitmap(bitmap, i));
-                    } else if (VERSION.SDK_INT >= 14 && (str.equals(MediaMetadataCompat.METADATA_KEY_ART) || str.equals(MediaMetadataCompat.METADATA_KEY_ALBUM_ART))) {
-                        putBitmap(str, bitmap.copy(bitmap.getConfig(), false));
                     }
                 }
             }
@@ -108,8 +105,8 @@ public final class MediaMetadataCompat implements Parcelable {
 
         private Bitmap scaleBitmap(Bitmap bitmap, int i) {
             float f = (float) i;
-            f = Math.min(f / ((float) bitmap.getWidth()), f / ((float) bitmap.getHeight()));
-            return Bitmap.createScaledBitmap(bitmap, (int) (f * ((float) bitmap.getWidth())), (int) (((float) bitmap.getHeight()) * f), true);
+            float min = Math.min(f / ((float) bitmap.getWidth()), f / ((float) bitmap.getHeight()));
+            return Bitmap.createScaledBitmap(bitmap, (int) (min * ((float) bitmap.getWidth())), (int) (((float) bitmap.getHeight()) * min), true);
         }
 
         public MediaMetadataCompat build() {
@@ -163,16 +160,19 @@ public final class MediaMetadataCompat implements Parcelable {
 
     @RestrictTo({Scope.LIBRARY_GROUP})
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.media.MediaMetadataCompat$LongKey */
     public @interface LongKey {
     }
 
     @RestrictTo({Scope.LIBRARY_GROUP})
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.media.MediaMetadataCompat$RatingKey */
     public @interface RatingKey {
     }
 
     @RestrictTo({Scope.LIBRARY_GROUP})
     @Retention(RetentionPolicy.SOURCE)
+    /* renamed from: android.support.v4.media.MediaMetadataCompat$TextKey */
     public @interface TextKey {
     }
 
@@ -206,6 +206,8 @@ public final class MediaMetadataCompat implements Parcelable {
         METADATA_KEYS_TYPE.put(METADATA_KEY_MEDIA_ID, Integer.valueOf(1));
         METADATA_KEYS_TYPE.put(METADATA_KEY_BT_FOLDER_TYPE, Integer.valueOf(0));
         METADATA_KEYS_TYPE.put(METADATA_KEY_MEDIA_URI, Integer.valueOf(1));
+        METADATA_KEYS_TYPE.put(METADATA_KEY_ADVERTISEMENT, Integer.valueOf(0));
+        METADATA_KEYS_TYPE.put(METADATA_KEY_DOWNLOAD_STATUS, Integer.valueOf(0));
     }
 
     MediaMetadataCompat(Bundle bundle) {
@@ -240,7 +242,7 @@ public final class MediaMetadataCompat implements Parcelable {
     public Bitmap getBitmap(String str) {
         try {
             return (Bitmap) this.mBundle.getParcelable(str);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             Log.w(TAG, "Failed to retrieve a key as Bitmap.", e);
             return null;
         }
@@ -251,20 +253,22 @@ public final class MediaMetadataCompat implements Parcelable {
     }
 
     public MediaDescriptionCompat getDescription() {
-        Uri uri = null;
+        Bitmap bitmap;
+        Uri uri;
+        Uri uri2 = null;
         if (this.mDescription != null) {
             return this.mDescription;
         }
-        int i;
-        Bitmap bitmap;
-        Object string;
-        Uri parse;
-        String string2 = getString(METADATA_KEY_MEDIA_ID);
+        String string = getString(METADATA_KEY_MEDIA_ID);
         CharSequence[] charSequenceArr = new CharSequence[3];
         CharSequence text = getText(METADATA_KEY_DISPLAY_TITLE);
-        if (TextUtils.isEmpty(text)) {
+        if (!TextUtils.isEmpty(text)) {
+            charSequenceArr[0] = text;
+            charSequenceArr[1] = getText(METADATA_KEY_DISPLAY_SUBTITLE);
+            charSequenceArr[2] = getText(METADATA_KEY_DISPLAY_DESCRIPTION);
+        } else {
+            int i = 0;
             int i2 = 0;
-            i = 0;
             while (i < charSequenceArr.length && i2 < PREFERRED_DESCRIPTION_ORDER.length) {
                 CharSequence text2 = getText(PREFERRED_DESCRIPTION_ORDER[i2]);
                 if (!TextUtils.isEmpty(text2)) {
@@ -273,41 +277,52 @@ public final class MediaMetadataCompat implements Parcelable {
                 }
                 i2++;
             }
-        } else {
-            charSequenceArr[0] = text;
-            charSequenceArr[1] = getText(METADATA_KEY_DISPLAY_SUBTITLE);
-            charSequenceArr[2] = getText(METADATA_KEY_DISPLAY_DESCRIPTION);
         }
-        for (String bitmap2 : PREFERRED_BITMAP_ORDER) {
-            bitmap = getBitmap(bitmap2);
+        int i3 = 0;
+        while (true) {
+            if (i3 >= PREFERRED_BITMAP_ORDER.length) {
+                bitmap = null;
+                break;
+            }
+            bitmap = getBitmap(PREFERRED_BITMAP_ORDER[i3]);
             if (bitmap != null) {
                 break;
             }
+            i3++;
         }
-        bitmap = null;
-        for (String string3 : PREFERRED_URI_ORDER) {
-            string = getString(string3);
-            if (!TextUtils.isEmpty(string)) {
-                parse = Uri.parse(string);
+        int i4 = 0;
+        while (true) {
+            if (i4 >= PREFERRED_URI_ORDER.length) {
+                uri = null;
                 break;
             }
+            String string2 = getString(PREFERRED_URI_ORDER[i4]);
+            if (!TextUtils.isEmpty(string2)) {
+                uri = Uri.parse(string2);
+                break;
+            }
+            i4++;
         }
-        parse = null;
-        string = getString(METADATA_KEY_MEDIA_URI);
-        if (!TextUtils.isEmpty(string)) {
-            uri = Uri.parse(string);
+        String string3 = getString(METADATA_KEY_MEDIA_URI);
+        if (!TextUtils.isEmpty(string3)) {
+            uri2 = Uri.parse(string3);
         }
-        android.support.v4.media.MediaDescriptionCompat.Builder builder = new android.support.v4.media.MediaDescriptionCompat.Builder();
-        builder.setMediaId(string2);
+        android.support.p000v4.media.MediaDescriptionCompat.Builder builder = new android.support.p000v4.media.MediaDescriptionCompat.Builder();
+        builder.setMediaId(string);
         builder.setTitle(charSequenceArr[0]);
         builder.setSubtitle(charSequenceArr[1]);
         builder.setDescription(charSequenceArr[2]);
         builder.setIconBitmap(bitmap);
-        builder.setIconUri(parse);
-        builder.setMediaUri(uri);
+        builder.setIconUri(uri);
+        builder.setMediaUri(uri2);
+        Bundle bundle = new Bundle();
         if (this.mBundle.containsKey(METADATA_KEY_BT_FOLDER_TYPE)) {
-            Bundle bundle = new Bundle();
             bundle.putLong(MediaDescriptionCompat.EXTRA_BT_FOLDER_TYPE, getLong(METADATA_KEY_BT_FOLDER_TYPE));
+        }
+        if (this.mBundle.containsKey(METADATA_KEY_DOWNLOAD_STATUS)) {
+            bundle.putLong(MediaDescriptionCompat.EXTRA_DOWNLOAD_STATUS, getLong(METADATA_KEY_DOWNLOAD_STATUS));
+        }
+        if (!bundle.isEmpty()) {
             builder.setExtras(bundle);
         }
         this.mDescription = builder.build();
@@ -319,21 +334,20 @@ public final class MediaMetadataCompat implements Parcelable {
     }
 
     public Object getMediaMetadata() {
-        if (this.mMetadataObj != null || VERSION.SDK_INT < 21) {
-            return this.mMetadataObj;
+        if (this.mMetadataObj == null && VERSION.SDK_INT >= 21) {
+            Parcel obtain = Parcel.obtain();
+            writeToParcel(obtain, 0);
+            obtain.setDataPosition(0);
+            this.mMetadataObj = MediaMetadataCompatApi21.createFromParcel(obtain);
+            obtain.recycle();
         }
-        Parcel obtain = Parcel.obtain();
-        writeToParcel(obtain, 0);
-        obtain.setDataPosition(0);
-        this.mMetadataObj = MediaMetadataCompatApi21.createFromParcel(obtain);
-        obtain.recycle();
         return this.mMetadataObj;
     }
 
     public RatingCompat getRating(String str) {
         try {
             return VERSION.SDK_INT >= 19 ? RatingCompat.fromRating(this.mBundle.getParcelable(str)) : (RatingCompat) this.mBundle.getParcelable(str);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             Log.w(TAG, "Failed to retrieve a key as Rating.", e);
             return null;
         }
@@ -341,7 +355,10 @@ public final class MediaMetadataCompat implements Parcelable {
 
     public String getString(String str) {
         CharSequence charSequence = this.mBundle.getCharSequence(str);
-        return charSequence != null ? charSequence.toString() : null;
+        if (charSequence != null) {
+            return charSequence.toString();
+        }
+        return null;
     }
 
     public CharSequence getText(String str) {

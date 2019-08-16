@@ -1,26 +1,28 @@
-package io.fabric.sdk.android.services.persistence;
+package p017io.fabric.sdk.android.services.persistence;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build.VERSION;
-import io.fabric.sdk.android.Kit;
+import p017io.fabric.sdk.android.Kit;
 
+/* renamed from: io.fabric.sdk.android.services.persistence.PreferenceStoreImpl */
 public class PreferenceStoreImpl implements PreferenceStore {
     private final Context context;
     private final String preferenceName;
     private final SharedPreferences sharedPreferences;
 
-    public PreferenceStoreImpl(Context context, String str) {
-        if (context == null) {
+    public PreferenceStoreImpl(Context context2, String str) {
+        if (context2 == null) {
             throw new IllegalStateException("Cannot get directory before context has been set. Call Fabric.with() first");
         }
-        this.context = context;
+        this.context = context2;
         this.preferenceName = str;
         this.sharedPreferences = this.context.getSharedPreferences(this.preferenceName, 0);
     }
 
+    @Deprecated
     public PreferenceStoreImpl(Kit kit) {
         this(kit.getContext(), kit.getClass().getName());
     }

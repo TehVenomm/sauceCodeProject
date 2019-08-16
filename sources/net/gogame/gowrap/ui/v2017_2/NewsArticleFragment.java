@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.v2017_2;
+package net.gogame.gowrap.p019ui.v2017_2;
 
 import android.app.Fragment;
 import android.graphics.drawable.Drawable;
@@ -17,37 +17,31 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.facebook.share.internal.MessengerShareContentUtility;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import jp.colopl.drapro.LocalNotificationAlarmReceiver;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 import net.gogame.gowrap.Constants;
 import net.gogame.gowrap.GoWrapImpl;
 import net.gogame.gowrap.model.news.Article;
 import net.gogame.gowrap.model.news.MarkupElement;
 import net.gogame.gowrap.model.news.MarkupElement.TextStyle;
+import net.gogame.gowrap.p019ui.UIContext;
+import net.gogame.gowrap.p019ui.download.ImageViewTarget;
+import net.gogame.gowrap.p019ui.utils.DisplayUtils;
+import net.gogame.gowrap.p019ui.utils.ExternalAppLauncher;
 import net.gogame.gowrap.support.DownloadManager.Listener;
 import net.gogame.gowrap.support.DownloadManager.Request.Builder;
 import net.gogame.gowrap.support.StringUtils;
-import net.gogame.gowrap.ui.UIContext;
-import net.gogame.gowrap.ui.download.ImageViewTarget;
-import net.gogame.gowrap.ui.utils.DisplayUtils;
-import net.gogame.gowrap.ui.utils.ExternalAppLauncher;
+import p018jp.colopl.drapro.LocalNotificationAlarmReceiver;
 
+/* renamed from: net.gogame.gowrap.ui.v2017_2.NewsArticleFragment */
 public class NewsArticleFragment extends Fragment {
     private static final String KEY_ARTICLE = "article";
     private Article article;
     private LinearLayout articleContainer;
     private TextView dateTimeTextView;
-    private Listener downloadManagerListener = new C12271();
-    private ProgressBar progressBar;
-    private UIContext uiContext;
-
-    /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsArticleFragment$1 */
-    class C12271 implements Listener {
-        C12271() {
-        }
-
+    private Listener downloadManagerListener = new Listener() {
         public void onDownloadsStarted() {
             if (NewsArticleFragment.this.progressBar != null) {
                 NewsArticleFragment.this.progressBar.setVisibility(0);
@@ -59,8 +53,12 @@ public class NewsArticleFragment extends Fragment {
                 NewsArticleFragment.this.progressBar.setVisibility(8);
             }
         }
-    }
+    };
+    /* access modifiers changed from: private */
+    public ProgressBar progressBar;
+    private UIContext uiContext;
 
+    /* renamed from: net.gogame.gowrap.ui.v2017_2.NewsArticleFragment$ClickableURLSpan */
     private class ClickableURLSpan extends ClickableSpan {
         private final String url;
 
@@ -73,10 +71,10 @@ public class NewsArticleFragment extends Fragment {
         }
     }
 
-    public static NewsArticleFragment create(Article article) {
+    public static NewsArticleFragment create(Article article2) {
         NewsArticleFragment newsArticleFragment = new NewsArticleFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_ARTICLE, article);
+        bundle.putSerializable(KEY_ARTICLE, article2);
         newsArticleFragment.setArguments(bundle);
         return newsArticleFragment;
     }
@@ -88,11 +86,11 @@ public class NewsArticleFragment extends Fragment {
         if (getArguments() != null) {
             this.article = (Article) getArguments().getSerializable(KEY_ARTICLE);
         }
-        View inflate = layoutInflater.inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article, viewGroup, false);
-        this.articleContainer = (LinearLayout) inflate.findViewById(C1110R.id.net_gogame_gowrap_news_article_container);
-        this.dateTimeTextView = (TextView) inflate.findViewById(C1110R.id.net_gogame_gowrap_news_article_timestamp);
+        View inflate = layoutInflater.inflate(C1423R.C1425layout.net_gogame_gowrap_v2017_2_fragment_news_article, viewGroup, false);
+        this.articleContainer = (LinearLayout) inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_news_article_container);
+        this.dateTimeTextView = (TextView) inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_news_article_timestamp);
         populate();
-        this.progressBar = (ProgressBar) inflate.findViewById(C1110R.id.net_gogame_gowrap_progress_indicator);
+        this.progressBar = (ProgressBar) inflate.findViewById(C1423R.C1424id.net_gogame_gowrap_progress_indicator);
         return inflate;
     }
 
@@ -121,7 +119,7 @@ public class NewsArticleFragment extends Fragment {
                     if (markupElement != null) {
                         if (StringUtils.isEquals(markupElement.getType(), "paragraph")) {
                             populateParagraph(markupElement);
-                        } else if (StringUtils.isEquals(markupElement.getType(), "image")) {
+                        } else if (StringUtils.isEquals(markupElement.getType(), MessengerShareContentUtility.MEDIA_IMAGE)) {
                             populateImage(markupElement);
                         } else if (StringUtils.isEquals(markupElement.getType(), "button")) {
                             populateButton(markupElement);
@@ -134,12 +132,9 @@ public class NewsArticleFragment extends Fragment {
         }
     }
 
-    private LayoutInflater getLayoutInflater() {
-        return (LayoutInflater) getActivity().getSystemService("layout_inflater");
-    }
-
     private void populateParagraph(MarkupElement markupElement) {
-        TextView textView = (TextView) getLayoutInflater().inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_paragraph, this.articleContainer, false);
+        int i;
+        TextView textView = (TextView) ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(C1423R.C1425layout.net_gogame_gowrap_v2017_2_fragment_news_article_paragraph, this.articleContainer, false);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         this.articleContainer.addView(textView);
         StringBuffer stringBuffer = new StringBuffer();
@@ -160,55 +155,47 @@ public class NewsArticleFragment extends Fragment {
                 }
             }
         }
-        CharSequence spannableString = new SpannableString(stringBuffer.toString());
+        SpannableString spannableString = new SpannableString(stringBuffer.toString());
         if (markupElement.getChildren() != null) {
-            int i = 0;
             int i2 = 0;
-            for (MarkupElement markupElement22 : markupElement.getChildren()) {
-                int i3;
-                if (markupElement22 != null) {
-                    if (StringUtils.isEquals(markupElement22.getType(), "text")) {
-                        if (markupElement22.getText() != null) {
-                            i = markupElement22.getText().length() + i2;
+            int i3 = 0;
+            for (MarkupElement markupElement3 : markupElement.getChildren()) {
+                if (markupElement3 != null) {
+                    if (StringUtils.isEquals(markupElement3.getType(), "text")) {
+                        if (markupElement3.getText() != null) {
+                            i = markupElement3.getText().length() + i3;
                         }
-                        if (markupElement22.getTextStyles() != null) {
+                        if (markupElement3.getTextStyles() != null) {
                             int i4 = 0;
-                            for (TextStyle textStyle : markupElement22.getTextStyles()) {
+                            for (TextStyle textStyle : markupElement3.getTextStyles()) {
                                 if (textStyle != null) {
                                     switch (textStyle) {
                                         case BOLD:
-                                            i3 = i4 | 1;
+                                            i4 |= 1;
                                             break;
                                         case ITALIC:
-                                            i3 = i4 | 2;
+                                            i4 |= 2;
                                             break;
                                     }
                                 }
-                                i3 = i4;
-                                i4 = i3;
+                                i4 = i4;
                             }
-                            spannableString.setSpan(new StyleSpan(i4), i2, i, 17);
-                            i3 = i;
-                            i = i3;
-                            i2 = i3;
+                            spannableString.setSpan(new StyleSpan(i4), i3, i, 17);
                         }
-                    } else if (StringUtils.isEquals(markupElement22.getType(), "link")) {
-                        if (markupElement22.getText() != null) {
-                            i = markupElement22.getText().length() + i2;
+                    } else if (StringUtils.isEquals(markupElement3.getType(), "link")) {
+                        if (markupElement3.getText() != null) {
+                            i = markupElement3.getText().length() + i3;
                         } else {
-                            i = markupElement22.getLink().length() + i2;
+                            i = markupElement3.getLink().length() + i3;
                         }
-                        spannableString.setSpan(new ClickableURLSpan(markupElement22.getLink()), i2, i, 17);
-                        i3 = i;
-                        i = i3;
-                        i2 = i3;
+                        spannableString.setSpan(new ClickableURLSpan(markupElement3.getLink()), i3, i, 17);
                     } else {
-                        Log.w(Constants.TAG, "Unexpected element " + markupElement22.getType());
+                        Log.w(Constants.TAG, "Unexpected element " + markupElement3.getType());
                     }
                 }
-                i3 = i;
-                i = i3;
-                i2 = i3;
+                int i5 = i;
+                i2 = i5;
+                i3 = i5;
             }
         }
         textView.setText(spannableString);
@@ -216,7 +203,7 @@ public class NewsArticleFragment extends Fragment {
 
     private void populateImage(MarkupElement markupElement) {
         if (markupElement.getSrc() != null) {
-            ImageView imageView = (ImageView) getLayoutInflater().inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_image, this.articleContainer, false);
+            ImageView imageView = (ImageView) ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(C1423R.C1425layout.net_gogame_gowrap_v2017_2_fragment_news_article_image, this.articleContainer, false);
             this.articleContainer.addView(imageView);
             if (this.uiContext != null) {
                 this.uiContext.getDownloadManager().download(Builder.newBuilder(markupElement.getSrc()).into(new ImageViewTarget(imageView)));
@@ -225,13 +212,13 @@ public class NewsArticleFragment extends Fragment {
     }
 
     private void populateButton(MarkupElement markupElement) {
-        Button button = (Button) getLayoutInflater().inflate(C1110R.layout.net_gogame_gowrap_v2017_2_fragment_news_article_button, this.articleContainer, false);
+        Button button = (Button) ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(C1423R.C1425layout.net_gogame_gowrap_v2017_2_fragment_news_article_button, this.articleContainer, false);
         this.articleContainer.addView(button);
         if (markupElement.getStyle() != null) {
             try {
                 int parseInt = Integer.parseInt(markupElement.getStyle());
                 DisplayUtils.setLevel(button.getBackground(), parseInt);
-                Drawable drawable = getActivity().getResources().getDrawable(C1110R.drawable.net_gogame_gowrap_news_article_button_icon);
+                Drawable drawable = getActivity().getResources().getDrawable(C1423R.C1427drawable.net_gogame_gowrap_news_article_button_icon);
                 DisplayUtils.setLevel(drawable, parseInt);
                 button.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
                 button.setCompoundDrawablePadding(DisplayUtils.pxFromDp(getActivity(), 8.0f));
@@ -247,13 +234,14 @@ public class NewsArticleFragment extends Fragment {
         });
     }
 
-    private void launchUrl(String str) {
+    /* access modifiers changed from: private */
+    public void launchUrl(String str) {
         if (str != null) {
             try {
                 if (!GoWrapImpl.INSTANCE.handleCustomUri(str)) {
                     ExternalAppLauncher.openUrlInExternalBrowser(getActivity(), str);
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 Log.e(Constants.TAG, "Exception", e);
             }
         }

@@ -1,7 +1,8 @@
-package io.fabric.sdk.android.services.events;
+package p017io.fabric.sdk.android.services.events;
 
 import java.io.IOException;
 
+/* renamed from: io.fabric.sdk.android.services.events.FileRollOverManager */
 public interface FileRollOverManager {
     void cancelTimeBasedFileRollOver();
 

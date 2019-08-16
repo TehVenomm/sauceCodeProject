@@ -9,21 +9,15 @@ import java.io.IOException;
 class ClsFileOutputStream extends FileOutputStream {
     public static final String IN_PROGRESS_SESSION_FILE_EXTENSION = ".cls_temp";
     public static final String SESSION_FILE_EXTENSION = ".cls";
-    public static final FilenameFilter TEMP_FILENAME_FILTER = new C03071();
+    public static final FilenameFilter TEMP_FILENAME_FILTER = new FilenameFilter() {
+        public boolean accept(File file, String str) {
+            return str.endsWith(ClsFileOutputStream.IN_PROGRESS_SESSION_FILE_EXTENSION);
+        }
+    };
     private boolean closed;
     private File complete;
     private File inProgress;
     private final String root;
-
-    /* renamed from: com.crashlytics.android.core.ClsFileOutputStream$1 */
-    static final class C03071 implements FilenameFilter {
-        C03071() {
-        }
-
-        public boolean accept(File file, String str) {
-            return str.endsWith(ClsFileOutputStream.IN_PROGRESS_SESSION_FILE_EXTENSION);
-        }
-    }
 
     public ClsFileOutputStream(File file, String str) throws FileNotFoundException {
         super(new File(file, str + IN_PROGRESS_SESSION_FILE_EXTENSION));

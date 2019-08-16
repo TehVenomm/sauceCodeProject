@@ -13,7 +13,7 @@ public class CharSet implements Serializable {
     public static final CharSet ASCII_ALPHA_UPPER = new CharSet("A-Z");
     public static final CharSet ASCII_NUMERIC = new CharSet("0-9");
     protected static final Map<String, CharSet> COMMON = Collections.synchronizedMap(new HashMap());
-    public static final CharSet EMPTY = new CharSet((String) null);
+    public static final CharSet EMPTY = new CharSet(null);
     private static final long serialVersionUID = 5947847346149275958L;
     private final Set<CharRange> set = Collections.synchronizedSet(new HashSet());
 
@@ -46,7 +46,8 @@ public class CharSet implements Serializable {
         }
     }
 
-    protected void add(String str) {
+    /* access modifiers changed from: protected */
+    public void add(String str) {
         if (str != null) {
             int length = str.length();
             int i = 0;
@@ -59,7 +60,7 @@ public class CharSet implements Serializable {
                     this.set.add(CharRange.isIn(str.charAt(i), str.charAt(i + 2)));
                     i += 3;
                 } else if (i2 < 2 || str.charAt(i) != '^') {
-                    this.set.add(CharRange.is(str.charAt(i)));
+                    this.set.add(CharRange.m1012is(str.charAt(i)));
                     i++;
                 } else {
                     this.set.add(CharRange.isNot(str.charAt(i + 1)));
@@ -69,7 +70,8 @@ public class CharSet implements Serializable {
         }
     }
 
-    CharRange[] getCharRanges() {
+    /* access modifiers changed from: 0000 */
+    public CharRange[] getCharRanges() {
         return (CharRange[]) this.set.toArray(new CharRange[this.set.size()]);
     }
 

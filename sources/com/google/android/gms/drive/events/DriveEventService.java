@@ -7,68 +7,90 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import com.google.android.gms.common.util.zzv;
-import com.google.android.gms.internal.zzbjv;
-import com.google.android.gms.internal.zzblg;
-import com.google.android.gms.internal.zzblw;
+import com.google.android.gms.common.internal.GmsLogger;
+import com.google.android.gms.common.util.UidVerifier;
+import com.google.android.gms.common.util.VisibleForTesting;
+import com.google.android.gms.internal.drive.zzet;
+import com.google.android.gms.internal.drive.zzfj;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.concurrent.GuardedBy;
 
 public class DriveEventService extends Service implements ChangeListener, CompletionListener, zzd, zzi {
     public static final String ACTION_HANDLE_EVENT = "com.google.android.gms.drive.events.HANDLE_EVENT";
-    private final String mName;
-    private CountDownLatch zzgfg;
-    zza zzgfh;
-    boolean zzgfi;
-    private int zzgfj;
+    /* access modifiers changed from: private */
+    public static final GmsLogger zzbx = new GmsLogger("DriveEventService", "");
+    private final String name;
+    /* access modifiers changed from: private */
+    @GuardedBy("this")
+    public CountDownLatch zzch;
+    @GuardedBy("this")
+    @VisibleForTesting
+    zza zzci;
+    @GuardedBy("this")
+    boolean zzcj;
+    @VisibleForTesting
+    private int zzck;
 
-    final class zza extends Handler {
-        private /* synthetic */ DriveEventService zzgfl;
+    static final class zza extends Handler {
+        private final WeakReference<DriveEventService> zzcn;
 
-        zza(DriveEventService driveEventService) {
-            this.zzgfl = driveEventService;
+        private zza(DriveEventService driveEventService) {
+            this.zzcn = new WeakReference<>(driveEventService);
         }
 
-        private final Message zzane() {
+        /* synthetic */ zza(DriveEventService driveEventService, zzh zzh) {
+            this(driveEventService);
+        }
+
+        /* access modifiers changed from: private */
+        public final Message zzb(zzfj zzfj) {
+            return obtainMessage(1, zzfj);
+        }
+
+        /* access modifiers changed from: private */
+        public final Message zzx() {
             return obtainMessage(2);
         }
 
-        private final Message zzb(zzblw zzblw) {
-            return obtainMessage(1, zzblw);
-        }
-
         public final void handleMessage(Message message) {
-            zzbjv.zzx("DriveEventService", "handleMessage message type:" + message.what);
             switch (message.what) {
                 case 1:
-                    this.zzgfl.zza((zzblw) message.obj);
-                    return;
+                    DriveEventService driveEventService = (DriveEventService) this.zzcn.get();
+                    if (driveEventService != null) {
+                        driveEventService.zza((zzfj) message.obj);
+                        return;
+                    } else {
+                        getLooper().quit();
+                        return;
+                    }
                 case 2:
                     getLooper().quit();
                     return;
                 default:
-                    zzbjv.zzy("DriveEventService", "Unexpected message type:" + message.what);
+                    DriveEventService.zzbx.wfmt("DriveEventService", "Unexpected message type: %s", Integer.valueOf(message.what));
                     return;
             }
         }
     }
 
-    final class zzb extends zzblg {
-        private /* synthetic */ DriveEventService zzgfl;
-
-        zzb(DriveEventService driveEventService) {
-            this.zzgfl = driveEventService;
+    @VisibleForTesting
+    final class zzb extends zzet {
+        private zzb() {
         }
 
-        public final void zzc(zzblw zzblw) throws RemoteException {
-            synchronized (this.zzgfl) {
-                String valueOf = String.valueOf(zzblw);
-                zzbjv.zzx("DriveEventService", new StringBuilder(String.valueOf(valueOf).length() + 9).append("onEvent: ").append(valueOf).toString());
-                this.zzgfl.zzand();
-                if (this.zzgfl.zzgfh != null) {
-                    this.zzgfl.zzgfh.sendMessage(this.zzgfl.zzgfh.zzb(zzblw));
+        /* synthetic */ zzb(DriveEventService driveEventService, zzh zzh) {
+            this();
+        }
+
+        public final void zzc(zzfj zzfj) throws RemoteException {
+            synchronized (DriveEventService.this) {
+                DriveEventService.this.zzv();
+                if (DriveEventService.this.zzci != null) {
+                    DriveEventService.this.zzci.sendMessage(DriveEventService.this.zzci.zzb(zzfj));
                 } else {
-                    zzbjv.zzz("DriveEventService", "Receiving event before initialize is completed.");
+                    DriveEventService.zzbx.mo13928e("DriveEventService", "Receiving event before initialize is completed.");
                 }
             }
         }
@@ -79,115 +101,99 @@ public class DriveEventService extends Service implements ChangeListener, Comple
     }
 
     protected DriveEventService(String str) {
-        this.zzgfi = false;
-        this.zzgfj = -1;
-        this.mName = str;
+        this.zzcj = false;
+        this.zzck = -1;
+        this.name = str;
     }
 
-    private final void zza(zzblw zzblw) {
-        String str;
-        String valueOf;
-        DriveEvent zzann = zzblw.zzann();
-        String valueOf2 = String.valueOf(zzann);
-        zzbjv.zzx("DriveEventService", new StringBuilder(String.valueOf(valueOf2).length() + 20).append("handleEventMessage: ").append(valueOf2).toString());
+    /* access modifiers changed from: private */
+    public final void zza(zzfj zzfj) {
+        DriveEvent zzak = zzfj.zzak();
         try {
-            switch (zzann.getType()) {
+            switch (zzak.getType()) {
                 case 1:
-                    onChange((ChangeEvent) zzann);
+                    onChange((ChangeEvent) zzak);
                     return;
                 case 2:
-                    onCompletion((CompletionEvent) zzann);
+                    onCompletion((CompletionEvent) zzak);
                     return;
                 case 4:
-                    zza((zzb) zzann);
+                    zza((zzb) zzak);
                     return;
                 case 7:
-                    zzr zzr = (zzr) zzann;
-                    str = this.mName;
-                    valueOf2 = String.valueOf(zzr);
-                    zzbjv.zzy(str, new StringBuilder(String.valueOf(valueOf2).length() + 32).append("Unhandled transfer state event: ").append(valueOf2).toString());
+                    zzbx.wfmt("DriveEventService", "Unhandled transfer state event in %s: %s", this.name, (zzv) zzak);
                     return;
                 default:
-                    valueOf2 = this.mName;
-                    str = String.valueOf(zzann);
-                    zzbjv.zzy(valueOf2, new StringBuilder(String.valueOf(str).length() + 17).append("Unhandled event: ").append(str).toString());
+                    zzbx.wfmt("DriveEventService", "Unhandled event: %s", zzak);
                     return;
             }
-        } catch (Throwable e) {
-            str = this.mName;
-            valueOf = String.valueOf(zzann);
-            zzbjv.zza(str, e, new StringBuilder(String.valueOf(valueOf).length() + 22).append("Error handling event: ").append(valueOf).toString());
+        } catch (Exception e) {
+            zzbx.mo13929e("DriveEventService", String.format("Error handling event in %s", new Object[]{this.name}), e);
         }
-        str = this.mName;
-        valueOf = String.valueOf(zzann);
-        zzbjv.zza(str, e, new StringBuilder(String.valueOf(valueOf).length() + 22).append("Error handling event: ").append(valueOf).toString());
+        zzbx.mo13929e("DriveEventService", String.format("Error handling event in %s", new Object[]{this.name}), e);
     }
 
-    private final void zzand() throws SecurityException {
+    /* access modifiers changed from: private */
+    public final void zzv() throws SecurityException {
         int callingUid = getCallingUid();
-        if (callingUid != this.zzgfj) {
-            if (zzv.zzf(this, callingUid)) {
-                this.zzgfj = callingUid;
+        if (callingUid != this.zzck) {
+            if (UidVerifier.isGooglePlayServicesUid(this, callingUid)) {
+                this.zzck = callingUid;
                 return;
             }
             throw new SecurityException("Caller is not GooglePlayServices");
         }
     }
 
-    protected int getCallingUid() {
+    /* access modifiers changed from: protected */
+    @VisibleForTesting
+    public int getCallingUid() {
         return Binder.getCallingUid();
     }
 
     public final IBinder onBind(Intent intent) {
-        IBinder asBinder;
+        IBinder iBinder = null;
         synchronized (this) {
             if (ACTION_HANDLE_EVENT.equals(intent.getAction())) {
-                if (this.zzgfh == null && !this.zzgfi) {
-                    this.zzgfi = true;
+                if (this.zzci == null && !this.zzcj) {
+                    this.zzcj = true;
                     CountDownLatch countDownLatch = new CountDownLatch(1);
-                    this.zzgfg = new CountDownLatch(1);
+                    this.zzch = new CountDownLatch(1);
                     new zzh(this, countDownLatch).start();
                     try {
                         if (!countDownLatch.await(5000, TimeUnit.MILLISECONDS)) {
-                            zzbjv.zzz("DriveEventService", "Failed to synchronously initialize event handler.");
+                            zzbx.mo13928e("DriveEventService", "Failed to synchronously initialize event handler.");
                         }
-                    } catch (Throwable e) {
+                    } catch (InterruptedException e) {
                         throw new RuntimeException("Unable to start event handler", e);
                     }
                 }
-                asBinder = new zzb(this).asBinder();
-            } else {
-                asBinder = null;
+                iBinder = new zzb(this, null).asBinder();
             }
         }
-        return asBinder;
+        return iBinder;
     }
 
     public void onChange(ChangeEvent changeEvent) {
-        String str = this.mName;
-        String valueOf = String.valueOf(changeEvent);
-        zzbjv.zzy(str, new StringBuilder(String.valueOf(valueOf).length() + 24).append("Unhandled change event: ").append(valueOf).toString());
+        zzbx.wfmt("DriveEventService", "Unhandled change event in %s: %s", this.name, changeEvent);
     }
 
     public void onCompletion(CompletionEvent completionEvent) {
-        String str = this.mName;
-        String valueOf = String.valueOf(completionEvent);
-        zzbjv.zzy(str, new StringBuilder(String.valueOf(valueOf).length() + 28).append("Unhandled completion event: ").append(valueOf).toString());
+        zzbx.wfmt("DriveEventService", "Unhandled completion event in %s: %s", this.name, completionEvent);
     }
 
     public void onDestroy() {
         synchronized (this) {
-            zzbjv.zzx("DriveEventService", "onDestroy");
-            if (this.zzgfh != null) {
-                this.zzgfh.sendMessage(this.zzgfh.zzane());
-                this.zzgfh = null;
+            if (this.zzci != null) {
+                this.zzci.sendMessage(this.zzci.zzx());
+                this.zzci = null;
                 try {
-                    if (!this.zzgfg.await(5000, TimeUnit.MILLISECONDS)) {
-                        zzbjv.zzy("DriveEventService", "Failed to synchronously quit event handler. Will quit itself");
+                    if (!this.zzch.await(5000, TimeUnit.MILLISECONDS)) {
+                        zzbx.mo13937w("DriveEventService", "Failed to synchronously quit event handler. Will quit itself");
                     }
                 } catch (InterruptedException e) {
                 }
-                this.zzgfg = null;
+                this.zzch = null;
             }
             super.onDestroy();
         }
@@ -197,9 +203,7 @@ public class DriveEventService extends Service implements ChangeListener, Comple
         return true;
     }
 
-    public final void zza(zzb zzb) {
-        String str = this.mName;
-        String valueOf = String.valueOf(zzb);
-        zzbjv.zzy(str, new StringBuilder(String.valueOf(valueOf).length() + 35).append("Unhandled changes available event: ").append(valueOf).toString());
+    public final void zza(zzb zzb2) {
+        zzbx.wfmt("DriveEventService", "Unhandled changes available event in %s: %s", this.name, zzb2);
     }
 }

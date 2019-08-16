@@ -4,43 +4,64 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class CredentialRequest extends zza {
-    public static final Creator<CredentialRequest> CREATOR = new zze();
-    private int zzdxt;
-    private final boolean zzeam;
-    private final String[] zzean;
-    private final CredentialPickerConfig zzeao;
-    private final CredentialPickerConfig zzeap;
-    private final boolean zzeaq;
-    private final String zzear;
-    private final String zzeas;
-    private final boolean zzeat;
+@Class(creator = "CredentialRequestCreator")
+public final class CredentialRequest extends AbstractSafeParcelable {
+    public static final Creator<CredentialRequest> CREATOR = new zzg();
+    @Field(getter = "getAccountTypes", mo13990id = 2)
+    private final String[] zzaa;
+    @Field(getter = "getCredentialPickerConfig", mo13990id = 3)
+    private final CredentialPickerConfig zzab;
+    @Field(getter = "getCredentialHintPickerConfig", mo13990id = 4)
+    private final CredentialPickerConfig zzac;
+    @Field(getter = "isIdTokenRequested", mo13990id = 5)
+    private final boolean zzad;
+    @Field(getter = "getServerClientId", mo13990id = 6)
+    private final String zzae;
+    @Field(getter = "getIdTokenNonce", mo13990id = 7)
+    private final String zzaf;
+    @Field(getter = "getRequireUserMediation", mo13990id = 8)
+    private final boolean zzag;
+    @Field(mo13990id = 1000)
+    private final int zzu;
+    @Field(getter = "isPasswordLoginSupported", mo13990id = 1)
+    private final boolean zzz;
 
     public static final class Builder {
-        private boolean zzeam;
-        private String[] zzean;
-        private CredentialPickerConfig zzeao;
-        private CredentialPickerConfig zzeap;
-        private boolean zzeaq = false;
+        /* access modifiers changed from: private */
+        public String[] zzaa;
+        /* access modifiers changed from: private */
+        public CredentialPickerConfig zzab;
+        /* access modifiers changed from: private */
+        public CredentialPickerConfig zzac;
+        /* access modifiers changed from: private */
+        public boolean zzad = false;
+        /* access modifiers changed from: private */
         @Nullable
-        private String zzear = null;
+        public String zzae = null;
+        /* access modifiers changed from: private */
         @Nullable
-        private String zzeas;
-        private boolean zzeat = false;
+        public String zzaf;
+        private boolean zzag = false;
+        /* access modifiers changed from: private */
+        public boolean zzz;
 
         public final CredentialRequest build() {
-            if (this.zzean == null) {
-                this.zzean = new String[0];
+            if (this.zzaa == null) {
+                this.zzaa = new String[0];
             }
-            if (this.zzeam || this.zzean.length != 0) {
-                return new CredentialRequest();
+            if (this.zzz || this.zzaa.length != 0) {
+                return new CredentialRequest(this);
             }
             throw new IllegalStateException("At least one authentication method must be specified");
         }
@@ -49,37 +70,37 @@ public final class CredentialRequest extends zza {
             if (strArr == null) {
                 strArr = new String[0];
             }
-            this.zzean = strArr;
+            this.zzaa = strArr;
             return this;
         }
 
         public final Builder setCredentialHintPickerConfig(CredentialPickerConfig credentialPickerConfig) {
-            this.zzeap = credentialPickerConfig;
+            this.zzac = credentialPickerConfig;
             return this;
         }
 
         public final Builder setCredentialPickerConfig(CredentialPickerConfig credentialPickerConfig) {
-            this.zzeao = credentialPickerConfig;
+            this.zzab = credentialPickerConfig;
             return this;
         }
 
         public final Builder setIdTokenNonce(@Nullable String str) {
-            this.zzeas = str;
+            this.zzaf = str;
             return this;
         }
 
         public final Builder setIdTokenRequested(boolean z) {
-            this.zzeaq = z;
+            this.zzad = z;
             return this;
         }
 
         public final Builder setPasswordLoginSupported(boolean z) {
-            this.zzeam = z;
+            this.zzz = z;
             return this;
         }
 
         public final Builder setServerClientId(@Nullable String str) {
-            this.zzear = str;
+            this.zzae = str;
             return this;
         }
 
@@ -89,62 +110,63 @@ public final class CredentialRequest extends zza {
         }
     }
 
-    CredentialRequest(int i, boolean z, String[] strArr, CredentialPickerConfig credentialPickerConfig, CredentialPickerConfig credentialPickerConfig2, boolean z2, String str, String str2, boolean z3) {
-        this.zzdxt = i;
-        this.zzeam = z;
-        this.zzean = (String[]) zzbp.zzu(strArr);
+    @Constructor
+    CredentialRequest(@Param(mo13993id = 1000) int i, @Param(mo13993id = 1) boolean z, @Param(mo13993id = 2) String[] strArr, @Param(mo13993id = 3) CredentialPickerConfig credentialPickerConfig, @Param(mo13993id = 4) CredentialPickerConfig credentialPickerConfig2, @Param(mo13993id = 5) boolean z2, @Param(mo13993id = 6) String str, @Param(mo13993id = 7) String str2, @Param(mo13993id = 8) boolean z3) {
+        this.zzu = i;
+        this.zzz = z;
+        this.zzaa = (String[]) Preconditions.checkNotNull(strArr);
         if (credentialPickerConfig == null) {
             credentialPickerConfig = new com.google.android.gms.auth.api.credentials.CredentialPickerConfig.Builder().build();
         }
-        this.zzeao = credentialPickerConfig;
+        this.zzab = credentialPickerConfig;
         if (credentialPickerConfig2 == null) {
             credentialPickerConfig2 = new com.google.android.gms.auth.api.credentials.CredentialPickerConfig.Builder().build();
         }
-        this.zzeap = credentialPickerConfig2;
+        this.zzac = credentialPickerConfig2;
         if (i < 3) {
-            this.zzeaq = true;
-            this.zzear = null;
-            this.zzeas = null;
+            this.zzad = true;
+            this.zzae = null;
+            this.zzaf = null;
         } else {
-            this.zzeaq = z2;
-            this.zzear = str;
-            this.zzeas = str2;
+            this.zzad = z2;
+            this.zzae = str;
+            this.zzaf = str2;
         }
-        this.zzeat = z3;
+        this.zzag = z3;
     }
 
     private CredentialRequest(Builder builder) {
-        this(4, builder.zzeam, builder.zzean, builder.zzeao, builder.zzeap, builder.zzeaq, builder.zzear, builder.zzeas, false);
+        this(4, builder.zzz, builder.zzaa, builder.zzab, builder.zzac, builder.zzad, builder.zzae, builder.zzaf, false);
     }
 
     @NonNull
     public final String[] getAccountTypes() {
-        return this.zzean;
+        return this.zzaa;
     }
 
     @NonNull
     public final Set<String> getAccountTypesSet() {
-        return new HashSet(Arrays.asList(this.zzean));
+        return new HashSet(Arrays.asList(this.zzaa));
     }
 
     @NonNull
     public final CredentialPickerConfig getCredentialHintPickerConfig() {
-        return this.zzeap;
+        return this.zzac;
     }
 
     @NonNull
     public final CredentialPickerConfig getCredentialPickerConfig() {
-        return this.zzeao;
+        return this.zzab;
     }
 
     @Nullable
     public final String getIdTokenNonce() {
-        return this.zzeas;
+        return this.zzaf;
     }
 
     @Nullable
     public final String getServerClientId() {
-        return this.zzear;
+        return this.zzae;
     }
 
     @Deprecated
@@ -153,24 +175,24 @@ public final class CredentialRequest extends zza {
     }
 
     public final boolean isIdTokenRequested() {
-        return this.zzeaq;
+        return this.zzad;
     }
 
     public final boolean isPasswordLoginSupported() {
-        return this.zzeam;
+        return this.zzz;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, isPasswordLoginSupported());
-        zzd.zza(parcel, 2, getAccountTypes(), false);
-        zzd.zza(parcel, 3, getCredentialPickerConfig(), i, false);
-        zzd.zza(parcel, 4, getCredentialHintPickerConfig(), i, false);
-        zzd.zza(parcel, 5, isIdTokenRequested());
-        zzd.zza(parcel, 6, getServerClientId(), false);
-        zzd.zza(parcel, 7, getIdTokenNonce(), false);
-        zzd.zzc(parcel, 1000, this.zzdxt);
-        zzd.zza(parcel, 8, this.zzeat);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeBoolean(parcel, 1, isPasswordLoginSupported());
+        SafeParcelWriter.writeStringArray(parcel, 2, getAccountTypes(), false);
+        SafeParcelWriter.writeParcelable(parcel, 3, getCredentialPickerConfig(), i, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, getCredentialHintPickerConfig(), i, false);
+        SafeParcelWriter.writeBoolean(parcel, 5, isIdTokenRequested());
+        SafeParcelWriter.writeString(parcel, 6, getServerClientId(), false);
+        SafeParcelWriter.writeString(parcel, 7, getIdTokenNonce(), false);
+        SafeParcelWriter.writeInt(parcel, 1000, this.zzu);
+        SafeParcelWriter.writeBoolean(parcel, 8, this.zzag);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -9,14 +9,34 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.Size;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.internal.zzcco;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.util.DefaultClock;
+import com.google.android.gms.internal.measurement.zzx;
+import com.google.android.gms.internal.measurement.zzz;
+import com.google.android.gms.measurement.internal.zzfj;
+import com.google.android.gms.measurement.internal.zzhi;
+import com.google.android.gms.measurement.internal.zzr;
 import com.google.android.gms.tasks.Task;
-import io.fabric.sdk.android.services.settings.SettingsJsonConstants;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.iid.FirebaseInstanceId;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import p017io.fabric.sdk.android.services.settings.SettingsJsonConstants;
 
-@Keep
 public final class FirebaseAnalytics {
-    private final zzcco zzikb;
+    private static volatile FirebaseAnalytics zzabt;
+    /* access modifiers changed from: private */
+    public final zzz zzabu;
+    private String zzabv;
+    private long zzabw;
+    private final Object zzabx;
+    private ExecutorService zzad;
+    /* access modifiers changed from: private */
+    public final zzfj zzj;
+    /* access modifiers changed from: private */
+    public final boolean zzl;
 
     public static class Event {
         public static final String ADD_PAYMENT_INFO = "add_payment_info";
@@ -30,6 +50,8 @@ public final class FirebaseAnalytics {
         public static final String ECOMMERCE_PURCHASE = "ecommerce_purchase";
         public static final String GENERATE_LEAD = "generate_lead";
         public static final String JOIN_GROUP = "join_group";
+        public static final String LEVEL_END = "level_end";
+        public static final String LEVEL_START = "level_start";
         public static final String LEVEL_UP = "level_up";
         public static final String LOGIN = "login";
         public static final String POST_SCORE = "post_score";
@@ -70,6 +92,7 @@ public final class FirebaseAnalytics {
         public static final String CURRENCY = "currency";
         public static final String DESTINATION = "destination";
         public static final String END_DATE = "end_date";
+        public static final String EXTEND_SESSION = "extend_session";
         public static final String FLIGHT_NUMBER = "flight_number";
         public static final String GROUP_ID = "group_id";
         public static final String INDEX = "index";
@@ -81,8 +104,10 @@ public final class FirebaseAnalytics {
         public static final String ITEM_NAME = "item_name";
         public static final String ITEM_VARIANT = "item_variant";
         public static final String LEVEL = "level";
+        public static final String LEVEL_NAME = "level_name";
         public static final String LOCATION = "location";
         public static final String MEDIUM = "medium";
+        public static final String METHOD = "method";
         public static final String NUMBER_OF_NIGHTS = "number_of_nights";
         public static final String NUMBER_OF_PASSENGERS = "number_of_passengers";
         public static final String NUMBER_OF_ROOMS = "number_of_rooms";
@@ -92,9 +117,11 @@ public final class FirebaseAnalytics {
         public static final String SCORE = "score";
         public static final String SEARCH_TERM = "search_term";
         public static final String SHIPPING = "shipping";
+        @Deprecated
         public static final String SIGN_UP_METHOD = "sign_up_method";
         public static final String SOURCE = "source";
         public static final String START_DATE = "start_date";
+        public static final String SUCCESS = "success";
         public static final String TAX = "tax";
         public static final String TERM = "term";
         public static final String TRANSACTION_ID = "transaction_id";
@@ -107,54 +134,187 @@ public final class FirebaseAnalytics {
     }
 
     public static class UserProperty {
+        public static final String ALLOW_AD_PERSONALIZATION_SIGNALS = "allow_personalized_ads";
         public static final String SIGN_UP_METHOD = "sign_up_method";
 
         protected UserProperty() {
         }
     }
 
-    public FirebaseAnalytics(zzcco zzcco) {
-        zzbp.zzu(zzcco);
-        this.zzikb = zzcco;
+    private FirebaseAnalytics(zzz zzz) {
+        Preconditions.checkNotNull(zzz);
+        this.zzj = null;
+        this.zzabu = zzz;
+        this.zzl = true;
+        this.zzabx = new Object();
+    }
+
+    private FirebaseAnalytics(zzfj zzfj) {
+        Preconditions.checkNotNull(zzfj);
+        this.zzj = zzfj;
+        this.zzabu = null;
+        this.zzl = false;
+        this.zzabx = new Object();
     }
 
     @Keep
     @RequiresPermission(allOf = {"android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE", "android.permission.WAKE_LOCK"})
-    public static FirebaseAnalytics getInstance(Context context) {
-        return zzcco.zzdm(context).zzayy();
+    @NonNull
+    public static FirebaseAnalytics getInstance(@NonNull Context context) {
+        if (zzabt == null) {
+            synchronized (FirebaseAnalytics.class) {
+                try {
+                    if (zzabt == null) {
+                        if (zzz.zzf(context)) {
+                            zzabt = new FirebaseAnalytics(zzz.zza(context));
+                        } else {
+                            zzabt = new FirebaseAnalytics(zzfj.zza(context, (zzx) null));
+                        }
+                    }
+                } finally {
+                    Class<FirebaseAnalytics> cls = FirebaseAnalytics.class;
+                }
+            }
+        }
+        return zzabt;
     }
 
+    @Keep
+    public static zzhi getScionFrontendApiImplementation(Context context, Bundle bundle) {
+        if (!zzz.zzf(context)) {
+            return null;
+        }
+        zzz zza = zzz.zza(context, (String) null, (String) null, (String) null, bundle);
+        if (zza != null) {
+            return new zza(zza);
+        }
+        return null;
+    }
+
+    /* access modifiers changed from: private */
+    public final void zzbg(String str) {
+        synchronized (this.zzabx) {
+            this.zzabv = str;
+            if (this.zzl) {
+                this.zzabw = DefaultClock.getInstance().elapsedRealtime();
+            } else {
+                this.zzabw = this.zzj.zzx().elapsedRealtime();
+            }
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public final String zzi() {
+        String str;
+        synchronized (this.zzabx) {
+            str = Math.abs((this.zzl ? DefaultClock.getInstance().elapsedRealtime() : this.zzj.zzx().elapsedRealtime()) - this.zzabw) < 1000 ? this.zzabv : null;
+        }
+        return str;
+    }
+
+    private final ExecutorService zzrq() {
+        ExecutorService executorService;
+        synchronized (FirebaseAnalytics.class) {
+            try {
+                if (this.zzad == null) {
+                    this.zzad = new ThreadPoolExecutor(0, 1, 30, TimeUnit.SECONDS, new ArrayBlockingQueue(100));
+                }
+                executorService = this.zzad;
+            } finally {
+                Class<FirebaseAnalytics> cls = FirebaseAnalytics.class;
+            }
+        }
+        return executorService;
+    }
+
+    @NonNull
     public final Task<String> getAppInstanceId() {
-        return this.zzikb.zzaty().getAppInstanceId();
+        try {
+            String zzi = zzi();
+            return zzi != null ? Tasks.forResult(zzi) : Tasks.call(zzrq(), new zzb(this));
+        } catch (Exception e) {
+            Exception exc = e;
+            if (this.zzl) {
+                this.zzabu.zza(5, "Failed to schedule task for getAppInstanceId", (Object) null, (Object) null, (Object) null);
+            } else {
+                this.zzj.zzab().zzgn().zzao("Failed to schedule task for getAppInstanceId");
+            }
+            return Tasks.forException(exc);
+        }
     }
 
-    public final void logEvent(@Size(max = 40, min = 1) @NonNull String str, Bundle bundle) {
-        this.zzikb.zzayx().logEvent(str, bundle);
+    @Keep
+    public final String getFirebaseInstanceId() {
+        return FirebaseInstanceId.getInstance().getId();
+    }
+
+    public final void logEvent(@Size(max = 40, min = 1) @NonNull String str, @Nullable Bundle bundle) {
+        if (this.zzl) {
+            this.zzabu.logEvent(str, bundle);
+        } else {
+            this.zzj.zzq().zza(SettingsJsonConstants.APP_KEY, str, bundle, true);
+        }
+    }
+
+    public final void resetAnalyticsData() {
+        zzbg(null);
+        if (this.zzl) {
+            this.zzabu.resetAnalyticsData();
+        } else {
+            this.zzj.zzq().resetAnalyticsData(this.zzj.zzx().currentTimeMillis());
+        }
     }
 
     public final void setAnalyticsCollectionEnabled(boolean z) {
-        this.zzikb.zzayx().setMeasurementEnabled(z);
+        if (this.zzl) {
+            this.zzabu.setMeasurementEnabled(z);
+        } else {
+            this.zzj.zzq().setMeasurementEnabled(z);
+        }
     }
 
     @Keep
     @MainThread
     public final void setCurrentScreen(@NonNull Activity activity, @Nullable @Size(max = 36, min = 1) String str, @Nullable @Size(max = 36, min = 1) String str2) {
-        this.zzikb.zzauc().setCurrentScreen(activity, str, str2);
+        if (this.zzl) {
+            this.zzabu.setCurrentScreen(activity, str, str2);
+        } else if (!zzr.isMainThread()) {
+            this.zzj.zzab().zzgn().zzao("setCurrentScreen must be called from the main thread");
+        } else {
+            this.zzj.zzt().setCurrentScreen(activity, str, str2);
+        }
     }
 
+    @Deprecated
     public final void setMinimumSessionDuration(long j) {
-        this.zzikb.zzayx().setMinimumSessionDuration(j);
+        if (this.zzl) {
+            this.zzabu.setMinimumSessionDuration(j);
+        } else {
+            this.zzj.zzq().setMinimumSessionDuration(j);
+        }
     }
 
     public final void setSessionTimeoutDuration(long j) {
-        this.zzikb.zzayx().setSessionTimeoutDuration(j);
+        if (this.zzl) {
+            this.zzabu.setSessionTimeoutDuration(j);
+        } else {
+            this.zzj.zzq().setSessionTimeoutDuration(j);
+        }
     }
 
-    public final void setUserId(String str) {
-        this.zzikb.zzayx().setUserPropertyInternal(SettingsJsonConstants.APP_KEY, "_id", str);
+    public final void setUserId(@Nullable String str) {
+        if (this.zzl) {
+            this.zzabu.setUserId(str);
+        } else {
+            this.zzj.zzq().zzb(SettingsJsonConstants.APP_KEY, "_id", (Object) str, true);
+        }
     }
 
     public final void setUserProperty(@Size(max = 24, min = 1) @NonNull String str, @Nullable @Size(max = 36) String str2) {
-        this.zzikb.zzayx().setUserProperty(str, str2);
+        if (this.zzl) {
+            this.zzabu.setUserProperty(str, str2);
+        } else {
+            this.zzj.zzq().zzb(SettingsJsonConstants.APP_KEY, str, (Object) str2, false);
+        }
     }
 }

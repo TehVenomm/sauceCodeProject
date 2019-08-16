@@ -1,13 +1,13 @@
 using System;
 using UnityEngine;
 
-public class PlayerAnimCtrl
+public class PlayerAnimCtrl : MonoBehaviour
 {
-	public const string BASE_LAYER = "Base Layer.";
-
 	public static string[] animStateNames;
 
 	public static int[] animStateHashs;
+
+	public const string BASE_LAYER = "Base Layer.";
 
 	public static readonly PLCA[] idleAnims_m = new PLCA[3]
 	{
@@ -111,7 +111,6 @@ public class PlayerAnimCtrl
 
 	public static PlayerAnimCtrl Get(Animator _animator, PLCA default_anim, Action<PlayerAnimCtrl, PLCA> on_play = null, Action<PlayerAnimCtrl, PLCA> on_change = null, Action<PlayerAnimCtrl, PLCA> on_end = null)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		if (_animator == null)
 		{
 			return null;
@@ -128,7 +127,7 @@ public class PlayerAnimCtrl
 		playerAnimCtrl.onEnd = on_end;
 		playerAnimCtrl.transitionDuration = 0.1f;
 		playerAnimCtrl.defaultAnim = default_anim;
-		playerAnimCtrl.Play(default_anim, true);
+		playerAnimCtrl.Play(default_anim, instant: true);
 		return playerAnimCtrl;
 	}
 
@@ -172,42 +171,42 @@ public class PlayerAnimCtrl
 
 	private void UpdateAnim()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animator == null) && !(animator.get_runtimeAnimatorController() == null))
+		if (animator == null || animator.get_runtimeAnimatorController() == null)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-			AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
-			int num = animStateHashs[56];
-			if (currentAnimatorStateInfo.get_fullPathHash() == num || nextAnimatorStateInfo.get_fullPathHash() == num)
+			return;
+		}
+		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+		AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
+		int num = animStateHashs[68];
+		if (currentAnimatorStateInfo.get_fullPathHash() == num || nextAnimatorStateInfo.get_fullPathHash() == num)
+		{
+			PLCA playingAnim;
+			if (lastAnimHash == 0)
 			{
-				PLCA playingAnim;
-				if (lastAnimHash == 0)
-				{
-					playingAnim = this.playingAnim;
-					Play(defaultAnim, false);
-				}
-				else
-				{
-					playingAnim = lastPlayingAnim;
-					Play(this.playingAnim, false);
-				}
-				if (onEnd != null)
-				{
-					onEnd(this, playingAnim);
-				}
+				playingAnim = this.playingAnim;
+				Play(defaultAnim);
 			}
-			num = animStateHashs[(int)this.playingAnim];
-			if (currentAnimatorStateInfo.get_fullPathHash() != num && nextAnimatorStateInfo.get_fullPathHash() != num && currentAnimatorStateInfo.get_fullPathHash() != viaAnimHash && (loopAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != loopAnimHash && nextAnimatorStateInfo.get_fullPathHash() != loopAnimHash)) && (lastAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != lastAnimHash && nextAnimatorStateInfo.get_fullPathHash() != lastAnimHash)))
+			else
 			{
-				PlayAnimator(this.playingAnim, false);
-				if (onChange != null)
-				{
-					onChange(this, this.playingAnim);
-				}
+				playingAnim = lastPlayingAnim;
+				Play(this.playingAnim);
+			}
+			if (onEnd != null)
+			{
+				onEnd(this, playingAnim);
+			}
+		}
+		num = animStateHashs[(int)this.playingAnim];
+		if (currentAnimatorStateInfo.get_fullPathHash() != num && nextAnimatorStateInfo.get_fullPathHash() != num && currentAnimatorStateInfo.get_fullPathHash() != viaAnimHash && (loopAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != loopAnimHash && nextAnimatorStateInfo.get_fullPathHash() != loopAnimHash)) && (lastAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != lastAnimHash && nextAnimatorStateInfo.get_fullPathHash() != lastAnimHash)))
+		{
+			PlayAnimator(this.playingAnim);
+			if (onChange != null)
+			{
+				onChange(this, this.playingAnim);
 			}
 		}
 	}
@@ -242,48 +241,46 @@ public class PlayerAnimCtrl
 		if (playingAnim == anim)
 		{
 			lastAnimHash = 0;
+			return;
 		}
-		else
+		if (instant)
 		{
-			if (instant)
+			PlayAnimator(anim, instant);
+		}
+		else if (loopAnimHash != 0 && endAnimHash != 0)
+		{
+			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+			AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
+			if (currentAnimatorStateInfo.get_fullPathHash() == loopAnimHash || nextAnimatorStateInfo.get_fullPathHash() == loopAnimHash)
 			{
-				PlayAnimator(anim, instant);
+				animator.CrossFade(endAnimHash, transitionDuration, 0);
+				lastAnimHash = endAnimHash;
+				lastPlayingAnim = playingAnim;
 			}
-			else if (loopAnimHash != 0 && endAnimHash != 0)
+		}
+		string str = animStateNames[(int)anim];
+		viaAnimHash = Animator.StringToHash("Base Layer." + str + "_VIA");
+		if (!animator.HasState(0, viaAnimHash))
+		{
+			viaAnimHash = 0;
+		}
+		loopAnimHash = Animator.StringToHash("Base Layer." + str + "_LOOP");
+		if (!animator.HasState(0, loopAnimHash))
+		{
+			loopAnimHash = 0;
+		}
+		if (loopAnimHash != 0)
+		{
+			endAnimHash = Animator.StringToHash("Base Layer." + str + "_END");
+			if (!animator.HasState(0, endAnimHash))
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-				AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == loopAnimHash || nextAnimatorStateInfo.get_fullPathHash() == loopAnimHash)
-				{
-					animator.CrossFade(endAnimHash, transitionDuration, 0);
-					lastAnimHash = endAnimHash;
-					lastPlayingAnim = playingAnim;
-				}
+				endAnimHash = 0;
 			}
-			string str = animStateNames[(int)anim];
-			viaAnimHash = Animator.StringToHash("Base Layer." + str + "_VIA");
-			if (!animator.HasState(0, viaAnimHash))
-			{
-				viaAnimHash = 0;
-			}
-			loopAnimHash = Animator.StringToHash("Base Layer." + str + "_LOOP");
-			if (!animator.HasState(0, loopAnimHash))
-			{
-				loopAnimHash = 0;
-			}
-			if (loopAnimHash != 0)
-			{
-				endAnimHash = Animator.StringToHash("Base Layer." + str + "_END");
-				if (!animator.HasState(0, endAnimHash))
-				{
-					endAnimHash = 0;
-				}
-			}
-			playingAnim = anim;
-			if (onPlay != null)
-			{
-				onPlay(this, anim);
-			}
+		}
+		playingAnim = anim;
+		if (onPlay != null)
+		{
+			onPlay(this, anim);
 		}
 	}
 

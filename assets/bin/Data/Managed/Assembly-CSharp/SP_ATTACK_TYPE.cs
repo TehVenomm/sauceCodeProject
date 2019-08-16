@@ -2,5 +2,7 @@ public enum SP_ATTACK_TYPE
 {
 	NONE,
 	HEAT,
-	SOUL
+	SOUL,
+	BURST,
+	ORACLE
 }

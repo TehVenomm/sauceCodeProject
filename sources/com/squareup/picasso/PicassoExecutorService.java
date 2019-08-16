@@ -30,7 +30,8 @@ class PicassoExecutorService extends ThreadPoolExecutor {
         super(3, 3, 0, TimeUnit.MILLISECONDS, new PriorityBlockingQueue(), new PicassoThreadFactory());
     }
 
-    void adjustThreadCount(NetworkInfo networkInfo) {
+    /* access modifiers changed from: 0000 */
+    public void adjustThreadCount(NetworkInfo networkInfo) {
         if (networkInfo == null || !networkInfo.isConnectedOrConnecting()) {
             setThreadCount(3);
             return;
@@ -75,7 +76,7 @@ class PicassoExecutorService extends ThreadPoolExecutor {
     }
 
     public Future<?> submit(Runnable runnable) {
-        Object picassoFutureTask = new PicassoFutureTask((BitmapHunter) runnable);
+        PicassoFutureTask picassoFutureTask = new PicassoFutureTask((BitmapHunter) runnable);
         execute(picassoFutureTask);
         return picassoFutureTask;
     }

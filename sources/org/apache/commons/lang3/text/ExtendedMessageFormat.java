@@ -1,6 +1,5 @@
 package org.apache.commons.lang3.text;
 
-import android.support.v4.view.MotionEventCompat;
 import java.text.Format;
 import java.text.MessageFormat;
 import java.text.ParsePosition;
@@ -48,47 +47,48 @@ public class ExtendedMessageFormat extends MessageFormat {
     }
 
     public final void applyPattern(String str) {
+        String str2;
+        Format format;
+        boolean z;
+        boolean z2;
         int i = 0;
         if (this.registry == null) {
             super.applyPattern(str);
             this.toPattern = super.toPattern();
             return;
         }
-        Object arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         ArrayList arrayList2 = new ArrayList();
-        StringBuilder stringBuilder = new StringBuilder(str.length());
+        StringBuilder sb = new StringBuilder(str.length());
         ParsePosition parsePosition = new ParsePosition(0);
-        char[] toCharArray = str.toCharArray();
+        char[] charArray = str.toCharArray();
         int i2 = 0;
         while (parsePosition.getIndex() < str.length()) {
-            switch (toCharArray[parsePosition.getIndex()]) {
-                case MotionEventCompat.AXIS_GENERIC_8 /*39*/:
-                    appendQuotedString(str, parsePosition, stringBuilder);
+            switch (charArray[parsePosition.getIndex()]) {
+                case '\'':
+                    appendQuotedString(str, parsePosition, sb);
                     continue;
                 case '{':
-                    Object parseFormatDescription;
-                    Object format;
-                    boolean z;
                     int i3 = i2 + 1;
                     seekNonWs(str, parsePosition);
                     int index = parsePosition.getIndex();
-                    stringBuilder.append(START_FE).append(readArgumentIndex(str, next(parsePosition)));
+                    sb.append(START_FE).append(readArgumentIndex(str, next(parsePosition)));
                     seekNonWs(str, parsePosition);
-                    if (toCharArray[parsePosition.getIndex()] == START_FMT) {
-                        parseFormatDescription = parseFormatDescription(str, next(parsePosition));
-                        format = getFormat(parseFormatDescription);
+                    if (charArray[parsePosition.getIndex()] == ',') {
+                        str2 = parseFormatDescription(str, next(parsePosition));
+                        format = getFormat(str2);
                         if (format == null) {
-                            stringBuilder.append(START_FMT).append(parseFormatDescription);
+                            sb.append(START_FMT).append(str2);
                         }
                     } else {
-                        parseFormatDescription = null;
+                        str2 = null;
                         format = null;
                     }
                     arrayList.add(format);
                     if (format == null) {
-                        parseFormatDescription = null;
+                        str2 = null;
                     }
-                    arrayList2.add(parseFormatDescription);
+                    arrayList2.add(str2);
                     if (arrayList.size() == i3) {
                         z = true;
                     } else {
@@ -96,21 +96,22 @@ public class ExtendedMessageFormat extends MessageFormat {
                     }
                     Validate.isTrue(z);
                     if (arrayList2.size() == i3) {
-                        z = true;
+                        z2 = true;
                     } else {
-                        z = false;
+                        z2 = false;
                     }
-                    Validate.isTrue(z);
-                    if (toCharArray[parsePosition.getIndex()] == END_FE) {
+                    Validate.isTrue(z2);
+                    if (charArray[parsePosition.getIndex()] == '}') {
                         i2 = i3;
                         break;
+                    } else {
+                        throw new IllegalArgumentException("Unreadable format element at position " + index);
                     }
-                    throw new IllegalArgumentException("Unreadable format element at position " + index);
             }
-            stringBuilder.append(toCharArray[parsePosition.getIndex()]);
+            sb.append(charArray[parsePosition.getIndex()]);
             next(parsePosition);
         }
-        super.applyPattern(stringBuilder.toString());
+        super.applyPattern(sb.toString());
         this.toPattern = insertFormats(super.toPattern(), arrayList2);
         if (containsElements(arrayList)) {
             Format[] formats = getFormats();
@@ -166,24 +167,25 @@ public class ExtendedMessageFormat extends MessageFormat {
     }
 
     public int hashCode() {
-        return (((super.hashCode() * HASH_SEED) + ObjectUtils.hashCode(this.registry)) * HASH_SEED) + ObjectUtils.hashCode(this.toPattern);
+        return (((super.hashCode() * 31) + ObjectUtils.hashCode(this.registry)) * 31) + ObjectUtils.hashCode(this.toPattern);
     }
 
     private Format getFormat(String str) {
+        String str2;
         if (this.registry == null) {
             return null;
         }
-        String trim;
         int indexOf = str.indexOf(44);
         if (indexOf > 0) {
-            str = str.substring(0, indexOf).trim();
-            trim = str.substring(indexOf + 1).trim();
+            String trim = str.substring(0, indexOf).trim();
+            str2 = str.substring(indexOf + 1).trim();
+            str = trim;
         } else {
-            trim = null;
+            str2 = null;
         }
         FormatFactory formatFactory = (FormatFactory) this.registry.get(str);
         if (formatFactory != null) {
-            return formatFactory.getFormat(str, trim, getLocale());
+            return formatFactory.getFormat(str, str2, getLocale());
         }
         return null;
     }
@@ -191,34 +193,34 @@ public class ExtendedMessageFormat extends MessageFormat {
     private int readArgumentIndex(String str, ParsePosition parsePosition) {
         int index = parsePosition.getIndex();
         seekNonWs(str, parsePosition);
-        StringBuilder stringBuilder = new StringBuilder();
-        Object obj = null;
-        while (obj == null && parsePosition.getIndex() < str.length()) {
+        StringBuilder sb = new StringBuilder();
+        boolean z = false;
+        while (!z && parsePosition.getIndex() < str.length()) {
             char charAt = str.charAt(parsePosition.getIndex());
             if (Character.isWhitespace(charAt)) {
                 seekNonWs(str, parsePosition);
                 charAt = str.charAt(parsePosition.getIndex());
-                if (!(charAt == START_FMT || charAt == END_FE)) {
-                    obj = 1;
+                if (!(charAt == ',' || charAt == '}')) {
+                    z = true;
                     next(parsePosition);
                 }
             }
             char c = charAt;
-            if ((c == START_FMT || c == END_FE) && stringBuilder.length() > 0) {
+            if ((c == ',' || c == '}') && sb.length() > 0) {
                 try {
-                    return Integer.parseInt(stringBuilder.toString());
+                    return Integer.parseInt(sb.toString());
                 } catch (NumberFormatException e) {
                 }
             }
-            if (Character.isDigit(c)) {
-                obj = null;
+            if (!Character.isDigit(c)) {
+                z = true;
             } else {
-                obj = 1;
+                z = false;
             }
-            stringBuilder.append(c);
+            sb.append(c);
             next(parsePosition);
         }
-        if (obj != null) {
+        if (z) {
             throw new IllegalArgumentException("Invalid format argument index at position " + index + ": " + str.substring(index, parsePosition.getIndex()));
         }
         throw new IllegalArgumentException("Unterminated format element at position " + index);
@@ -231,7 +233,7 @@ public class ExtendedMessageFormat extends MessageFormat {
         int i = 1;
         while (parsePosition.getIndex() < str.length()) {
             switch (str.charAt(parsePosition.getIndex())) {
-                case MotionEventCompat.AXIS_GENERIC_8 /*39*/:
+                case '\'':
                     getQuotedString(str, parsePosition);
                     break;
                 case '{':
@@ -241,10 +243,9 @@ public class ExtendedMessageFormat extends MessageFormat {
                     i--;
                     if (i != 0) {
                         break;
+                    } else {
+                        return str.substring(index2, parsePosition.getIndex());
                     }
-                    return str.substring(index2, parsePosition.getIndex());
-                default:
-                    break;
             }
             next(parsePosition);
         }
@@ -256,43 +257,44 @@ public class ExtendedMessageFormat extends MessageFormat {
         if (!containsElements(arrayList)) {
             return str;
         }
-        StringBuilder stringBuilder = new StringBuilder(str.length() * 2);
+        StringBuilder sb = new StringBuilder(str.length() * 2);
         ParsePosition parsePosition = new ParsePosition(0);
         int i2 = -1;
         while (parsePosition.getIndex() < str.length()) {
             char charAt = str.charAt(parsePosition.getIndex());
             switch (charAt) {
-                case MotionEventCompat.AXIS_GENERIC_8 /*39*/:
-                    appendQuotedString(str, parsePosition, stringBuilder);
+                case '\'':
+                    appendQuotedString(str, parsePosition, sb);
                     continue;
                 case '{':
                     int i3 = i + 1;
-                    stringBuilder.append(START_FE).append(readArgumentIndex(str, next(parsePosition)));
+                    sb.append(START_FE).append(readArgumentIndex(str, next(parsePosition)));
                     if (i3 != 1) {
                         i = i3;
                         break;
+                    } else {
+                        i2++;
+                        String str2 = (String) arrayList.get(i2);
+                        if (str2 != null) {
+                            sb.append(START_FMT).append(str2);
+                        }
+                        i = i3;
+                        continue;
                     }
-                    i2++;
-                    String str2 = (String) arrayList.get(i2);
-                    if (str2 != null) {
-                        stringBuilder.append(START_FMT).append(str2);
-                    }
-                    i = i3;
-                    continue;
                 case '}':
                     i--;
                     break;
             }
-            stringBuilder.append(charAt);
+            sb.append(charAt);
             next(parsePosition);
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private void seekNonWs(String str, ParsePosition parsePosition) {
-        char[] toCharArray = str.toCharArray();
+        char[] charArray = str.toCharArray();
         do {
-            int isMatch = StrMatcher.splitMatcher().isMatch(toCharArray, parsePosition.getIndex());
+            int isMatch = StrMatcher.splitMatcher().isMatch(charArray, parsePosition.getIndex());
             parsePosition.setIndex(parsePosition.getIndex() + isMatch);
             if (isMatch <= 0) {
                 return;
@@ -305,20 +307,23 @@ public class ExtendedMessageFormat extends MessageFormat {
         return parsePosition;
     }
 
-    private StringBuilder appendQuotedString(String str, ParsePosition parsePosition, StringBuilder stringBuilder) {
-        if ($assertionsDisabled || str.toCharArray()[parsePosition.getIndex()] == QUOTE) {
-            if (stringBuilder != null) {
-                stringBuilder.append(QUOTE);
+    private StringBuilder appendQuotedString(String str, ParsePosition parsePosition, StringBuilder sb) {
+        if ($assertionsDisabled || str.toCharArray()[parsePosition.getIndex()] == '\'') {
+            if (sb != null) {
+                sb.append(QUOTE);
             }
             next(parsePosition);
             int index = parsePosition.getIndex();
-            char[] toCharArray = str.toCharArray();
+            char[] charArray = str.toCharArray();
             int index2 = parsePosition.getIndex();
             while (index2 < str.length()) {
-                switch (toCharArray[parsePosition.getIndex()]) {
-                    case MotionEventCompat.AXIS_GENERIC_8 /*39*/:
+                switch (charArray[parsePosition.getIndex()]) {
+                    case '\'':
                         next(parsePosition);
-                        return stringBuilder == null ? null : stringBuilder.append(toCharArray, index, parsePosition.getIndex() - index);
+                        if (sb == null) {
+                            return null;
+                        }
+                        return sb.append(charArray, index, parsePosition.getIndex() - index);
                     default:
                         next(parsePosition);
                         index2++;

@@ -45,10 +45,8 @@ public class ShopGachaEquipListTop : GameSection
 		object[] array = (object[])GameSection.GetEventData();
 		uint materialID = (uint)array[0];
 		CreateEquipItemTable.CreateEquipItemData[] equipItems = Singleton<CreateEquipItemTable>.I.GetSortedCreateEquipItemsByPart(materialID);
-		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, false, delegate(int i, Transform t, bool b)
+		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, reset: false, delegate(int i, Transform t, bool b)
 		{
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Expected O, but got Unknown
 			CreateEquipItemTable.CreateEquipItemData createEquipItemData = equipItems[i];
 			uint equipItemID = createEquipItemData.equipItemID;
 			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipItemID);
@@ -80,7 +78,7 @@ public class ShopGachaEquipListTop : GameSection
 	private void SetItemIcon(uint itemID, Transform trans, UI target)
 	{
 		ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(itemID);
-		ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.ITEM, itemData.iconID, itemData.rarity, FindCtrl(trans, target), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, itemData.enemyIconID, itemData.enemyIconID2, false, GET_TYPE.PAY);
+		ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.ITEM, itemData.iconID, itemData.rarity, FindCtrl(trans, target), ELEMENT_TYPE.MAX, null, -1, null, 0, is_new: false, -1, is_select: false, null, is_equipping: false, itemData.enemyIconID, itemData.enemyIconID2);
 		if (itemIcon != null)
 		{
 			SetMaterialInfo(itemIcon.transform, REWARD_TYPE.ITEM, itemData.id, GetCtrl(UI.PNL_MATERIAL_INFO));
@@ -89,8 +87,8 @@ public class ShopGachaEquipListTop : GameSection
 
 	private IEnumerator LoadEquipModel(Transform t, Enum _enum, uint item_id)
 	{
-		yield return (object)null;
-		SetRenderEquipModel(t, _enum, item_id, -1, -1, 1f);
+		yield return null;
+		SetRenderEquipModel(t, _enum, item_id);
 	}
 
 	public void OnQuery_GACHA_DETAIL_MAX_PARAM_FROM_NEWS()
@@ -102,18 +100,16 @@ public class ShopGachaEquipListTop : GameSection
 		if (num2 >= sortedCreateEquipItemsByPart.Length || num2 <= -1)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
+		CreateEquipItemTable.CreateEquipItemData createEquipItemData = sortedCreateEquipItemsByPart[num2];
+		uint equipItemID = createEquipItemData.equipItemID;
+		EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipItemID);
+		GameSection.ChangeEvent("DETAIL_MAX_PARAM", new object[3]
 		{
-			CreateEquipItemTable.CreateEquipItemData createEquipItemData = sortedCreateEquipItemsByPart[num2];
-			uint equipItemID = createEquipItemData.equipItemID;
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipItemID);
-			GameSection.ChangeEvent("DETAIL_MAX_PARAM", new object[3]
-			{
-				ItemDetailEquip.CURRENT_SECTION.GACHA_EQUIP_PREVIEW,
-				equipItemData,
-				num
-			});
-		}
+			ItemDetailEquip.CURRENT_SECTION.GACHA_EQUIP_PREVIEW,
+			equipItemData,
+			num
+		});
 	}
 }

@@ -1,12 +1,11 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 {
 	public class GrowSkillItemData
 	{
-		public const string NT = "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd";
-
 		public uint id;
 
 		public int lv;
@@ -39,13 +38,19 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 
 		public GrowRate castTime;
 
+		public GrowRate castTime2;
+
 		public GrowRate useGauge;
 
-		public static bool cb(CSVReader csv_reader, GrowSkillItemData data, ref uint key1, ref uint key2)
+		public GrowRate useGauge2;
+
+		public const string NT = "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd,useGauge2Rate,useGauge2Add";
+
+		public static bool cb(CSVReader csv_reader, GrowSkillItemData data, ref uint key1, ref uint key2, ref uint key3)
 		{
 			data.id = key1;
 			data.lv = (int)key2;
-			csv_reader.Pop(ref data.exceedCnt);
+			data.exceedCnt = (int)key3;
 			data.needExp = new GrowRate();
 			csv_reader.Pop(ref data.needExp.rate);
 			csv_reader.Pop(ref data.needExp.add);
@@ -111,22 +116,29 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 				data.useGauge.rate = 100;
 			}
 			csv_reader.Pop(ref data.useGauge.add);
+			data.useGauge2 = new GrowRate();
+			csv_reader.Pop(ref data.useGauge2.rate);
+			if ((int)data.useGauge2.rate <= 0)
+			{
+				data.useGauge2.rate = 100;
+			}
+			csv_reader.Pop(ref data.useGauge2.add);
 			return true;
 		}
 
 		public int GetGrowParamAtk(int base_atk)
 		{
-			return GetGrowResultValue(base_atk, atk, false);
+			return GetGrowResultValue(base_atk, atk);
 		}
 
 		public int GetGrowParamDef(int base_def)
 		{
-			return GetGrowResultValue(base_def, def, false);
+			return GetGrowResultValue(base_def, def);
 		}
 
 		public int GetGrowParamHp(int base_hp)
 		{
-			return GetGrowResultValue(base_hp, hp, false);
+			return GetGrowResultValue(base_hp, hp);
 		}
 
 		public int[] GetGrowParamElemAtk(int[] base_elem_atk)
@@ -137,7 +149,7 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 			for (int num2 = num; i < num2; i++)
 			{
 				array[i] = 0;
-				array[i] = GetGrowResultValue(base_elem_atk[i], elemAtk[i], true);
+				array[i] = GetGrowResultValue(base_elem_atk[i], elemAtk[i], is_element: true);
 			}
 			return array;
 		}
@@ -150,54 +162,64 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 			for (int num2 = num; i < num2; i++)
 			{
 				array[i] = 0;
-				array[i] = GetGrowResultValue(base_elem_def[i], elemDef[i], true);
+				array[i] = GetGrowResultValue(base_elem_def[i], elemDef[i], is_element: true);
 			}
 			return array;
 		}
 
 		public int GetGrowParamNeedExp(int base_need_exp)
 		{
-			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_need_exp, needExp, false);
+			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_need_exp, needExp);
 		}
 
 		public int GetGrowParamGiveExp(int base_give_exp)
 		{
-			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_give_exp, giveExp, false);
+			return MonoBehaviourSingleton<SmithManager>.I.GetGrowResultValue(base_give_exp, giveExp);
 		}
 
 		public int GetGrowParamSkillAtk(int base_atk)
 		{
-			return GetGrowResultValue(base_atk, skillAtk, false);
+			return GetGrowResultValue(base_atk, skillAtk);
 		}
 
 		public int GetGrowParamSkillAtkRate(int base_atkrate)
 		{
-			return GetGrowResultValue(base_atkrate, skillAtkRate, false);
+			return GetGrowResultValue(base_atkrate, skillAtkRate);
 		}
 
 		public int GetGrowParamHealHp(int base_heal)
 		{
-			return GetGrowResultValue(base_heal, heal, false);
+			return GetGrowResultValue(base_heal, heal);
 		}
 
 		public int GetGrowParamSupprtValue(int[] base_supprtvalue, int index)
 		{
-			return GetGrowResultValue(base_supprtvalue[index], supprtValue[index], false);
+			return GetGrowResultValue(base_supprtvalue[index], supprtValue[index]);
 		}
 
 		public float GetGrowParamSupprtTime(float[] base_supprttime, int index)
 		{
-			return GetGrowResultValue(base_supprttime[index], supprtTime[index], false);
+			return GetGrowResultValue(base_supprttime[index], supprtTime[index]);
 		}
 
 		public float GetGrowParamCastTimeRate()
 		{
-			return (float)(100 - GetGrowResultValue(100, castTime, false)) / 100f;
+			return (float)(100 - GetGrowResultValue(100, castTime)) / 100f;
+		}
+
+		public float GetGrowParamCastTime2Rate()
+		{
+			return (float)(100 - GetGrowResultValue(100, castTime2)) / 100f;
 		}
 
 		public int GetGrowParamUseGauge(int base_useGauge)
 		{
-			return GetGrowResultValue(base_useGauge, useGauge, false);
+			return GetGrowResultValue(base_useGauge, useGauge);
+		}
+
+		public int GetGrowParamUseGauge2(int base_useGauge2)
+		{
+			return GetGrowResultValue(base_useGauge2, useGauge2);
 		}
 
 		public int GetGrowResultValue(int base_value, GrowRate rate_data, bool is_element = false)
@@ -212,57 +234,73 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 
 		public int GetGrowResultSupportValue(int base_value, int index)
 		{
-			return GetGrowResultValue(base_value, supprtValue[index], false);
+			return GetGrowResultValue(base_value, supprtValue[index]);
 		}
 	}
 
-	private DoubleUIntKeyTable<GrowSkillItemData> growSkillItemTable;
+	private TripleUIntKeyTable<GrowSkillItemData> growSkillItemTable;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackTripleUIntKeyReadCSV<GrowSkillItemData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackTripleUIntKeyReadCSV<GrowSkillItemData> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackTripleUIntKeyReadCSV<GrowSkillItemData> _003C_003Ef__mg_0024cache2;
 
 	public void CreateTable(string csv_text)
 	{
-		growSkillItemTable = TableUtility.CreateDoubleUIntKeyTable<GrowSkillItemData>(csv_text, GrowSkillItemData.cb, "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd", null, null, null, null);
+		growSkillItemTable = TableUtility.CreateTripleUIntKeyTable<GrowSkillItemData>(csv_text, GrowSkillItemData.cb, "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd,useGauge2Rate,useGauge2Add");
 	}
 
 	public void CreateTable(string csv_text, TableUtility.Progress progress)
 	{
-		growSkillItemTable = TableUtility.CreateDoubleUIntKeyTable<GrowSkillItemData>(csv_text, GrowSkillItemData.cb, "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd", null, null, null, progress);
+		growSkillItemTable = TableUtility.CreateTripleUIntKeyTable<GrowSkillItemData>(csv_text, GrowSkillItemData.cb, "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd,useGauge2Rate,useGauge2Add");
 		growSkillItemTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(growSkillItemTable, csv_text, GrowSkillItemData.cb, "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd", null, null, null);
+		TableUtility.AddTripleUIntKeyTable(growSkillItemTable, csv_text, GrowSkillItemData.cb, "growId,level,exceedCnt,needExpRate,needExpAdd,giveExpRate,giveExpAdd,atkRate,atkAdd,defRate,defAdd,hpRate,hpAdd,fireAtkRate,fireAtkAdd,waterAtkRate,waterAtkAdd,thunderAtkRate,thunderAtkAdd,earthAtkRate,earthAtkAdd,lightAtkRate,lightAtkAdd,darkAtkRate,darkAtkAdd,fireDefRate,fireDefAdd,waterDefRate,waterDefAdd,thunderDefRate,thunderDefAdd,earthDefRate,earthDefAdd,lightDefRate,lightDefAdd,darkDefRate,darkDefAdd,skillAtkRate,skillAtkAdd,skillAtkRateRate,skillAtkRateAdd,healRate,healAdd,supportValueRate1,supportValueAdd1,supportTimeRate1,supportTimeAdd1,supportValueRate2,supportValueAdd2,supportTimeRate2,supportTimeAdd2,supportValueRate3,supportValueAdd3,supportTimeRate3,supportTimeAdd3,castTimeRate,castTimeAdd,useGaugeRate,useGaugeAdd,useGauge2Rate,useGauge2Add");
 	}
 
-	public GrowSkillItemData GetGrowSkillItemData(uint skill_grow_id, int level)
+	public GrowSkillItemData GetGrowSkillItemData(uint skill_grow_id, int level, int exceedCnt)
 	{
 		if (growSkillItemTable == null)
 		{
 			return null;
 		}
-		UIntKeyTable<GrowSkillItemData> uIntKeyTable = growSkillItemTable.Get(skill_grow_id);
+		UIntKeyTable<UIntKeyTable<GrowSkillItemData>> uIntKeyTable = growSkillItemTable.Get(skill_grow_id);
 		if (uIntKeyTable == null)
 		{
-			Log.Error("GrowSkillTable is NULL :: grow id = " + skill_grow_id + " Lv = " + level);
+			Log.Error("GrowSkillTable is NULL :: grow id = " + skill_grow_id + " Lv = " + level + " Ex = " + exceedCnt);
 			return null;
 		}
-		GrowSkillItemData growSkillItemData = uIntKeyTable.Get((uint)level);
-		if (growSkillItemData != null)
+		UIntKeyTable<GrowSkillItemData> uIntKeyTable2 = uIntKeyTable.Get((uint)level);
+		if (uIntKeyTable2 != null)
 		{
-			return growSkillItemData;
+			GrowSkillItemData growSkillItemData = uIntKeyTable2.Get((uint)exceedCnt);
+			if (growSkillItemData != null)
+			{
+				return growSkillItemData;
+			}
 		}
 		GrowSkillItemData under = null;
 		GrowSkillItemData over = null;
-		uIntKeyTable.ForEach(delegate(GrowSkillItemData data)
+		uIntKeyTable.ForEach(delegate(UIntKeyTable<GrowSkillItemData> table)
 		{
-			if (data.lv > level && (over == null || data.lv < over.lv))
+			table.ForEach(delegate(GrowSkillItemData data)
 			{
-				over = data;
-			}
-			if (data.lv <= level && (under == null || data.lv > under.lv))
-			{
-				under = data;
-			}
+				if ((data.lv > level || (data.lv >= level && data.exceedCnt > exceedCnt)) && (over == null || data.lv < over.lv))
+				{
+					over = data;
+				}
+				if (data.lv <= level && data.exceedCnt <= exceedCnt && (under == null || data.lv > under.lv || data.exceedCnt > under.exceedCnt))
+				{
+					under = data;
+				}
+			});
 		});
 		if (under != null && over == null)
 		{
@@ -272,11 +310,12 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 		{
 			return null;
 		}
-		float num = (float)(level - under.lv) / (float)(over.lv - under.lv);
+		float num = 0f;
+		num = ((under.lv != over.lv || under.exceedCnt >= over.exceedCnt) ? ((float)(level - under.lv) / (float)(over.lv - under.lv)) : ((float)(exceedCnt - under.exceedCnt) / (float)(over.exceedCnt - under.exceedCnt)));
 		GrowSkillItemData growSkillItemData2 = new GrowSkillItemData();
 		growSkillItemData2.id = skill_grow_id;
 		growSkillItemData2.lv = level;
-		growSkillItemData2.exceedCnt = Mathf.FloorToInt(Mathf.Lerp((float)under.exceedCnt, (float)over.exceedCnt, num));
+		growSkillItemData2.exceedCnt = exceedCnt;
 		growSkillItemData2.needExp = new GrowRate();
 		growSkillItemData2.needExp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.needExp.rate, (float)(int)over.needExp.rate, num));
 		growSkillItemData2.needExp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.needExp.add, (float)(int)over.needExp.add, num));
@@ -324,7 +363,7 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 			growSkillItemData2.supprtValue[k].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtValue[k].add, (float)(int)over.supprtValue[k].add, num));
 			growSkillItemData2.supprtTime[k] = new GrowRateFloat();
 			growSkillItemData2.supprtTime[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.supprtTime[k].rate, (float)(int)over.supprtTime[k].rate, num));
-			growSkillItemData2.supprtTime[k].add = (float)Mathf.FloorToInt(Mathf.Lerp((float)under.supprtTime[k].add, (float)over.supprtTime[k].add, num));
+			growSkillItemData2.supprtTime[k].add = Mathf.FloorToInt(Mathf.Lerp((float)under.supprtTime[k].add, (float)over.supprtTime[k].add, num));
 		}
 		growSkillItemData2.castTime = new GrowRate();
 		growSkillItemData2.castTime.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.castTime.rate, (float)(int)over.castTime.rate, num));
@@ -332,24 +371,29 @@ public class GrowSkillItemTable : Singleton<GrowSkillItemTable>, IDataTable
 		growSkillItemData2.useGauge = new GrowRate();
 		growSkillItemData2.useGauge.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge.rate, (float)(int)over.useGauge.rate, num));
 		growSkillItemData2.useGauge.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge.add, (float)(int)over.useGauge.add, num));
+		growSkillItemData2.useGauge2 = new GrowRate();
+		growSkillItemData2.useGauge2.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge2.rate, (float)(int)over.useGauge2.rate, num));
+		growSkillItemData2.useGauge2.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.useGauge2.add, (float)(int)over.useGauge2.add, num));
 		return growSkillItemData2;
 	}
 
 	public GrowSkillItemData[] GetGrowSkillItemDataAry(uint skill_grow_id)
 	{
-		if (growSkillItemTable == null)
+		if (growSkillItemTable != null)
 		{
-			return null;
+			List<GrowSkillItemData> list = new List<GrowSkillItemData>();
+			growSkillItemTable.Get(skill_grow_id).ForEach(delegate(UIntKeyTable<GrowSkillItemData> table)
+			{
+				table.ForEach(delegate(GrowSkillItemData o)
+				{
+					list.Add(o);
+				});
+			});
+			if (!list.IsNullOrEmpty())
+			{
+				return list.ToArray();
+			}
 		}
-		List<GrowSkillItemData> list = new List<GrowSkillItemData>();
-		growSkillItemTable.Get(skill_grow_id).ForEach(delegate(GrowSkillItemData grow_table)
-		{
-			list.Add(grow_table);
-		});
-		if (list.Count == 0)
-		{
-			return null;
-		}
-		return list.ToArray();
+		return null;
 	}
 }

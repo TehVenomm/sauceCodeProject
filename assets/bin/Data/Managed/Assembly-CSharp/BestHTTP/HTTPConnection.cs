@@ -202,11 +202,13 @@ namespace BestHTTP
 		private void Connect()
 		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Expected O, but got Unknown
+			//IL_0022: Expected O, but got Unknown
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Expected O, but got Unknown
+			//IL_008a: Expected O, but got Unknown
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Expected O, but got Unknown
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Expected O, but got Unknown
 			Uri currentUri = CurrentRequest.CurrentUri;
 			if (Client == null)
 			{
@@ -216,37 +218,36 @@ namespace BestHTTP
 			{
 				Client.Connect(currentUri.Host, currentUri.Port);
 			}
-			if (Stream == null)
+			if (Stream != null)
 			{
-				if (HTTPProtocolFactory.IsSecureProtocol(CurrentRequest.Uri))
+				return;
+			}
+			if (HTTPProtocolFactory.IsSecureProtocol(CurrentRequest.Uri))
+			{
+				if (CurrentRequest.UseAlternateSSL)
 				{
-					if (CurrentRequest.UseAlternateSSL)
-					{
-						TlsProtocolHandler val = new TlsProtocolHandler(Client.GetStream());
-						val.Connect(new LegacyTlsClient(new AlwaysValidVerifyer()));
-						Stream = val.get_Stream();
-					}
-					else
-					{
-						SslStream sslStream = new SslStream(Client.GetStream(), false, (object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors errors) => true);
-						if (!sslStream.IsAuthenticated)
-						{
-							sslStream.AuthenticateAsClient(currentUri.Host);
-						}
-						Stream = sslStream;
-					}
+					TlsProtocolHandler val = new TlsProtocolHandler(Client.GetStream());
+					val.Connect(new LegacyTlsClient(new AlwaysValidVerifyer()));
+					Stream = val.get_Stream();
+					return;
 				}
-				else
+				SslStream sslStream = new SslStream(Client.GetStream(), leaveInnerStreamOpen: false, (object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors errors) => true);
+				if (!sslStream.IsAuthenticated)
 				{
-					Stream = Client.GetStream();
+					sslStream.AuthenticateAsClient(currentUri.Host);
 				}
+				Stream = sslStream;
+			}
+			else
+			{
+				Stream = Client.GetStream();
 			}
 		}
 
 		private bool Receive()
 		{
-			CurrentRequest.Response = HTTPProtocolFactory.Get(HTTPProtocolFactory.GetProtocolFromUri(CurrentRequest.CurrentUri), CurrentRequest, Stream, CurrentRequest.UseStreaming, false);
-			if (!CurrentRequest.Response.Receive(-1))
+			CurrentRequest.Response = HTTPProtocolFactory.Get(HTTPProtocolFactory.GetProtocolFromUri(CurrentRequest.CurrentUri), CurrentRequest, Stream, CurrentRequest.UseStreaming, isFromCache: false);
+			if (!CurrentRequest.Response.Receive())
 			{
 				CurrentRequest.Response = null;
 				return false;

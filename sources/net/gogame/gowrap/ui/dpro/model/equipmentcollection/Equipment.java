@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.equipmentcollection;
+package net.gogame.gowrap.p019ui.dpro.model.equipmentcollection;
 
 import android.util.JsonReader;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.equipmentcollection.Equipment */
 public class Equipment extends BaseJsonObject {
     private static final String KEY_ELEMENT = "element";
     private static final String KEY_ICON_ID = "iconId";
@@ -15,18 +16,24 @@ public class Equipment extends BaseJsonObject {
     private static final String KEY_RARITY = "rarity";
     private Integer element;
     private Long iconId;
-    private Long id;
+
+    /* renamed from: id */
+    private Long f1419id;
     private String name;
     private Long points;
     private Integer rarity;
+
+    public Equipment() {
+    }
 
     public Equipment(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, "id")) {
-            this.id = JSONUtils.optLong(jsonReader);
+            this.f1419id = JSONUtils.optLong(jsonReader);
             return true;
         } else if (StringUtils.isEquals(str, "name")) {
             this.name = JSONUtils.optString(jsonReader);
@@ -49,11 +56,11 @@ public class Equipment extends BaseJsonObject {
     }
 
     public Long getId() {
-        return this.id;
+        return this.f1419id;
     }
 
     public void setId(Long l) {
-        this.id = l;
+        this.f1419id = l;
     }
 
     public String getName() {

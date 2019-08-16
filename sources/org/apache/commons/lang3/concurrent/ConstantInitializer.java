@@ -19,7 +19,10 @@ public class ConstantInitializer<T> implements ConcurrentInitializer<T> {
     }
 
     public int hashCode() {
-        return getObject() != null ? getObject().hashCode() : 0;
+        if (getObject() != null) {
+            return getObject().hashCode();
+        }
+        return 0;
     }
 
     public boolean equals(Object obj) {

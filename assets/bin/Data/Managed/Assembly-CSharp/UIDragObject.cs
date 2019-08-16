@@ -2,7 +2,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Drag Object")]
-public class UIDragObject
+public class UIDragObject : MonoBehaviour
 {
 	public enum DragEffect
 	{
@@ -28,8 +28,8 @@ public class UIDragObject
 	[SerializeField]
 	protected Vector3 scale = new Vector3(1f, 1f, 0f);
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private float scrollWheelFactor;
 
 	private Plane mPlane;
@@ -109,9 +109,6 @@ public class UIDragObject
 
 	private void FindPanel()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		panelRegion = ((!(target != null)) ? null : UIPanel.Find(target.get_transform().get_parent()));
 		if (panelRegion == null)
 		{
@@ -156,10 +153,6 @@ public class UIDragObject
 
 	private void OnPress(bool pressed)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Expected O, but got Unknown
 		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
@@ -167,48 +160,48 @@ public class UIDragObject
 		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		if (UICamera.currentTouchID != -2 && UICamera.currentTouchID != -3)
+		if (UICamera.currentTouchID == -2 || UICamera.currentTouchID == -3)
 		{
-			float timeScale = Time.get_timeScale();
-			if ((!(timeScale < 0.01f) || timeScale == 0f) && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && target != null)
+			return;
+		}
+		float timeScale = Time.get_timeScale();
+		if ((timeScale < 0.01f && timeScale != 0f) || !this.get_enabled() || !NGUITools.GetActive(this.get_gameObject()) || !(target != null))
+		{
+			return;
+		}
+		if (pressed)
+		{
+			if (!mPressed)
 			{
-				if (pressed)
+				mTouchID = UICamera.currentTouchID;
+				mPressed = true;
+				mStarted = false;
+				CancelMovement();
+				if (restrictWithinPanel && panelRegion == null)
 				{
-					if (!mPressed)
-					{
-						mTouchID = UICamera.currentTouchID;
-						mPressed = true;
-						mStarted = false;
-						CancelMovement();
-						if (restrictWithinPanel && panelRegion == null)
-						{
-							FindPanel();
-						}
-						if (restrictWithinPanel)
-						{
-							UpdateBounds();
-						}
-						CancelSpring();
-						Transform val = UICamera.currentCamera.get_transform();
-						mPlane = new Plane(((!(panelRegion != null)) ? val.get_rotation() : panelRegion.cachedTransform.get_rotation()) * Vector3.get_back(), UICamera.lastWorldPosition);
-					}
+					FindPanel();
 				}
-				else if (mPressed && mTouchID == UICamera.currentTouchID)
+				if (restrictWithinPanel)
 				{
-					mPressed = false;
-					if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring && panelRegion.ConstrainTargetToBounds(target, ref mBounds, false))
-					{
-						CancelMovement();
-					}
+					UpdateBounds();
 				}
+				CancelSpring();
+				Transform transform = UICamera.currentCamera.get_transform();
+				mPlane = new Plane(((!(panelRegion != null)) ? transform.get_rotation() : panelRegion.cachedTransform.get_rotation()) * Vector3.get_back(), UICamera.lastWorldPosition);
+			}
+		}
+		else if (mPressed && mTouchID == UICamera.currentTouchID)
+		{
+			mPressed = false;
+			if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring && panelRegion.ConstrainTargetToBounds(target, ref mBounds, immediate: false))
+			{
+				CancelMovement();
 			}
 		}
 	}
 
 	private void OnDrag(Vector2 delta)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
 		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
@@ -246,41 +239,43 @@ public class UIDragObject
 		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		if (mPressed && mTouchID == UICamera.currentTouchID && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && target != null)
+		if (!mPressed || mTouchID != UICamera.currentTouchID || !this.get_enabled() || !NGUITools.GetActive(this.get_gameObject()) || !(target != null))
 		{
-			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
-			Ray val = UICamera.currentCamera.ScreenPointToRay(Vector2.op_Implicit(UICamera.currentTouch.pos));
-			float num = 0f;
-			if (mPlane.Raycast(val, ref num))
+			return;
+		}
+		UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
+		Ray val = UICamera.currentCamera.ScreenPointToRay(Vector2.op_Implicit(UICamera.currentTouch.pos));
+		float num = 0f;
+		if (!mPlane.Raycast(val, ref num))
+		{
+			return;
+		}
+		Vector3 point = val.GetPoint(num);
+		Vector3 val2 = point - mLastPos;
+		mLastPos = point;
+		if (!mStarted)
+		{
+			mStarted = true;
+			val2 = Vector3.get_zero();
+		}
+		if (val2.x != 0f || val2.y != 0f)
+		{
+			val2 = target.InverseTransformDirection(val2);
+			val2.Scale(scale);
+			val2 = target.TransformDirection(val2);
+		}
+		if (dragEffect != 0)
+		{
+			mMomentum = Vector3.Lerp(mMomentum, mMomentum + val2 * (0.01f * momentumAmount), 0.67f);
+		}
+		Vector3 localPosition = target.get_localPosition();
+		Move(val2);
+		if (restrictWithinPanel)
+		{
+			mBounds.set_center(mBounds.get_center() + (target.get_localPosition() - localPosition));
+			if (dragEffect != DragEffect.MomentumAndSpring && panelRegion.ConstrainTargetToBounds(target, ref mBounds, immediate: true))
 			{
-				Vector3 point = val.GetPoint(num);
-				Vector3 val2 = point - mLastPos;
-				mLastPos = point;
-				if (!mStarted)
-				{
-					mStarted = true;
-					val2 = Vector3.get_zero();
-				}
-				if (val2.x != 0f || val2.y != 0f)
-				{
-					val2 = target.InverseTransformDirection(val2);
-					val2.Scale(scale);
-					val2 = target.TransformDirection(val2);
-				}
-				if (dragEffect != 0)
-				{
-					mMomentum = Vector3.Lerp(mMomentum, mMomentum + val2 * (0.01f * momentumAmount), 0.67f);
-				}
-				Vector3 localPosition = target.get_localPosition();
-				Move(val2);
-				if (restrictWithinPanel)
-				{
-					mBounds.set_center(mBounds.get_center() + (target.get_localPosition() - localPosition));
-					if (dragEffect != DragEffect.MomentumAndSpring && panelRegion.ConstrainTargetToBounds(target, ref mBounds, true))
-					{
-						CancelMovement();
-					}
-				}
+				CancelMovement();
 			}
 		}
 	}
@@ -309,7 +304,7 @@ public class UIDragObject
 			UIScrollView component = panelRegion.GetComponent<UIScrollView>();
 			if (component != null)
 			{
-				component.UpdateScrollbars(true);
+				component.UpdateScrollbars(recalculateBounds: true);
 			}
 		}
 		else
@@ -332,43 +327,45 @@ public class UIDragObject
 		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null))
+		if (target == null)
 		{
-			float deltaTime = RealTime.deltaTime;
-			mMomentum -= mScroll;
-			mScroll = NGUIMath.SpringLerp(mScroll, Vector3.get_zero(), 20f, deltaTime);
-			if (!(mMomentum.get_magnitude() < 0.0001f))
+			return;
+		}
+		float deltaTime = RealTime.deltaTime;
+		mMomentum -= mScroll;
+		mScroll = NGUIMath.SpringLerp(mScroll, Vector3.get_zero(), 20f, deltaTime);
+		if (mMomentum.get_magnitude() < 0.0001f)
+		{
+			return;
+		}
+		if (!mPressed)
+		{
+			if (panelRegion == null)
 			{
-				if (!mPressed)
+				FindPanel();
+			}
+			Move(NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime));
+			if (restrictWithinPanel && panelRegion != null)
+			{
+				UpdateBounds();
+				if (panelRegion.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
 				{
-					if (panelRegion == null)
-					{
-						FindPanel();
-					}
-					Move(NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime));
-					if (restrictWithinPanel && panelRegion != null)
-					{
-						UpdateBounds();
-						if (panelRegion.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
-						{
-							CancelMovement();
-						}
-						else
-						{
-							CancelSpring();
-						}
-					}
-					NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime);
-					if (mMomentum.get_magnitude() < 0.0001f)
-					{
-						CancelMovement();
-					}
+					CancelMovement();
 				}
 				else
 				{
-					NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime);
+					CancelSpring();
 				}
 			}
+			NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime);
+			if (mMomentum.get_magnitude() < 0.0001f)
+			{
+				CancelMovement();
+			}
+		}
+		else
+		{
+			NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime);
 		}
 	}
 
@@ -387,9 +384,9 @@ public class UIDragObject
 		if (target != null)
 		{
 			Vector3 localPosition = target.get_localPosition();
-			localPosition.x = (float)Mathf.RoundToInt(localPosition.x);
-			localPosition.y = (float)Mathf.RoundToInt(localPosition.y);
-			localPosition.z = (float)Mathf.RoundToInt(localPosition.z);
+			localPosition.x = Mathf.RoundToInt(localPosition.x);
+			localPosition.y = Mathf.RoundToInt(localPosition.y);
+			localPosition.z = Mathf.RoundToInt(localPosition.z);
 			target.set_localPosition(localPosition);
 		}
 		mTargetPos = ((!(target != null)) ? Vector3.get_zero() : target.get_position());
@@ -408,8 +405,6 @@ public class UIDragObject
 
 	private void OnScroll(float delta)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)

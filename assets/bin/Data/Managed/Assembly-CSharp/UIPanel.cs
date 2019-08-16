@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -116,17 +117,26 @@ public class UIPanel : UIRect
 
 	private bool mForced;
 
+	[CompilerGenerated]
+	private static Comparison<UIPanel> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static Comparison<UIPanel> _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static Comparison<UIWidget> _003C_003Ef__mg_0024cache2;
+
 	public static int nextUnusedDepth
 	{
 		get
 		{
-			int num = -2147483648;
+			int num = int.MinValue;
 			int i = 0;
 			for (int count = list.Count; i < count; i++)
 			{
 				num = Mathf.Max(num, list[i].depth);
 			}
-			return (num != -2147483648) ? (num + 1) : 0;
+			return (num != int.MinValue) ? (num + 1) : 0;
 		}
 	}
 
@@ -466,8 +476,6 @@ public class UIPanel : UIRect
 			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
@@ -634,8 +642,6 @@ public class UIPanel : UIRect
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Expected O, but got Unknown
 		int num = Mathf.FloorToInt(width + 0.5f);
 		int num2 = Mathf.FloorToInt(height + 0.5f);
 		num = num >> 1 << 1;
@@ -772,19 +778,17 @@ public class UIPanel : UIRect
 			if ((uIPanel.mClipping == UIDrawCall.Clipping.None || uIPanel.mClipping == UIDrawCall.Clipping.ConstrainButDontClip) && !w.hideIfOffScreen)
 			{
 				uIPanel = uIPanel.mParentPanel;
+				continue;
 			}
-			else
+			if (array == null)
 			{
-				if (array == null)
-				{
-					array = w.worldCorners;
-				}
-				if (!uIPanel.IsVisible(array[0], array[1], array[2], array[3]))
-				{
-					return false;
-				}
-				uIPanel = uIPanel.mParentPanel;
+				array = w.worldCorners;
 			}
+			if (!uIPanel.IsVisible(array[0], array[1], array[2], array[3]))
+			{
+				return false;
+			}
+			uIPanel = uIPanel.mParentPanel;
 		}
 		return true;
 	}
@@ -829,15 +833,11 @@ public class UIPanel : UIRect
 		{
 			drawCalls[i].isDirty = true;
 		}
-		Invalidate(true);
+		Invalidate(includeChildren: true);
 	}
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001f: Invalid comparison between Unknown and I4
 		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
@@ -857,12 +857,8 @@ public class UIPanel : UIRect
 
 	private void FindParent()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
-		Transform val = base.cachedTransform.get_parent();
-		mParentPanel = ((!(val != null)) ? null : NGUITools.FindInParents<UIPanel>(val.get_gameObject()));
+		Transform parent = base.cachedTransform.get_parent();
+		mParentPanel = ((!(parent != null)) ? null : NGUITools.FindInParents<UIPanel>(parent.get_gameObject()));
 	}
 
 	public override void ParentHasChanged()
@@ -888,27 +884,27 @@ public class UIPanel : UIRect
 
 	protected override void OnInit()
 	{
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		if (!list.Contains(this))
+		if (list.Contains(this))
 		{
-			base.OnInit();
-			FindParent();
-			if (this.GetComponent<Rigidbody>() == null && mParentPanel == null)
-			{
-				UICamera uICamera = (!(base.anchorCamera != null)) ? null : mCam.GetComponent<UICamera>();
-				if (uICamera != null && (uICamera.eventType == UICamera.EventType.UI_3D || uICamera.eventType == UICamera.EventType.World_3D))
-				{
-					Rigidbody val = this.get_gameObject().AddComponent<Rigidbody>();
-					val.set_isKinematic(true);
-					val.set_useGravity(false);
-				}
-			}
-			mRebuild = true;
-			mAlphaFrameID = -1;
-			mMatrixFrame = -1;
-			list.Add(this);
-			list.Sort(CompareFunc);
+			return;
 		}
+		base.OnInit();
+		FindParent();
+		if (this.GetComponent<Rigidbody>() == null && mParentPanel == null)
+		{
+			UICamera uICamera = (!(base.anchorCamera != null)) ? null : mCam.GetComponent<UICamera>();
+			if (uICamera != null && (uICamera.eventType == UICamera.EventType.UI_3D || uICamera.eventType == UICamera.EventType.World_3D))
+			{
+				Rigidbody val = this.get_gameObject().AddComponent<Rigidbody>();
+				val.set_isKinematic(true);
+				val.set_useGravity(false);
+			}
+		}
+		mRebuild = true;
+		mAlphaFrameID = -1;
+		mMatrixFrame = -1;
+		list.Add(this);
+		list.Sort(CompareFunc);
 	}
 
 	protected override void OnDisable()
@@ -958,8 +954,6 @@ public class UIPanel : UIRect
 
 	protected override void OnAnchor()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
 		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
@@ -977,164 +971,166 @@ public class UIPanel : UIRect
 		//IL_0473: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0478: Unknown result type (might be due to invalid IL or missing references)
 		//IL_058f: Unknown result type (might be due to invalid IL or missing references)
-		if (mClipping != 0)
+		if (mClipping == UIDrawCall.Clipping.None)
 		{
-			Transform cachedTransform = base.cachedTransform;
-			Transform val = cachedTransform.get_parent();
-			Vector2 viewSize = GetViewSize();
-			Vector2 val2 = Vector2.op_Implicit(cachedTransform.get_localPosition());
-			float num;
-			float num2;
-			float num3;
-			float num4;
-			if (leftAnchor.target == bottomAnchor.target && leftAnchor.target == rightAnchor.target && leftAnchor.target == topAnchor.target)
+			return;
+		}
+		Transform cachedTransform = base.cachedTransform;
+		Transform parent = cachedTransform.get_parent();
+		Vector2 viewSize = GetViewSize();
+		Vector2 val = Vector2.op_Implicit(cachedTransform.get_localPosition());
+		float num;
+		float num2;
+		float num3;
+		float num4;
+		if (leftAnchor.target == bottomAnchor.target && leftAnchor.target == rightAnchor.target && leftAnchor.target == topAnchor.target)
+		{
+			Vector3[] sides = leftAnchor.GetSides(parent);
+			if (sides != null)
 			{
-				Vector3[] sides = leftAnchor.GetSides(val);
-				if (sides != null)
+				num = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
+				num2 = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + (float)rightAnchor.absolute;
+				num3 = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + (float)bottomAnchor.absolute;
+				num4 = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + (float)topAnchor.absolute;
+			}
+			else
+			{
+				Vector2 val2 = Vector2.op_Implicit(GetLocalPos(leftAnchor, parent));
+				num = val2.x + (float)leftAnchor.absolute;
+				num3 = val2.y + (float)bottomAnchor.absolute;
+				num2 = val2.x + (float)rightAnchor.absolute;
+				num4 = val2.y + (float)topAnchor.absolute;
+			}
+		}
+		else
+		{
+			if (Object.op_Implicit(leftAnchor.target))
+			{
+				Vector3[] sides2 = leftAnchor.GetSides(parent);
+				if (sides2 != null)
 				{
-					num = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
-					num2 = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + (float)rightAnchor.absolute;
-					num3 = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + (float)bottomAnchor.absolute;
-					num4 = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + (float)topAnchor.absolute;
+					num = NGUIMath.Lerp(sides2[0].x, sides2[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
 				}
 				else
 				{
-					Vector2 val3 = Vector2.op_Implicit(GetLocalPos(leftAnchor, val));
-					num = val3.x + (float)leftAnchor.absolute;
-					num3 = val3.y + (float)bottomAnchor.absolute;
-					num2 = val3.x + (float)rightAnchor.absolute;
-					num4 = val3.y + (float)topAnchor.absolute;
+					Vector3 localPos = GetLocalPos(leftAnchor, parent);
+					num = localPos.x + (float)leftAnchor.absolute;
 				}
 			}
 			else
 			{
-				if (Object.op_Implicit(leftAnchor.target))
-				{
-					Vector3[] sides2 = leftAnchor.GetSides(val);
-					if (sides2 != null)
-					{
-						num = NGUIMath.Lerp(sides2[0].x, sides2[2].x, leftAnchor.relative) + (float)leftAnchor.absolute;
-					}
-					else
-					{
-						Vector3 localPos = GetLocalPos(leftAnchor, val);
-						num = localPos.x + (float)leftAnchor.absolute;
-					}
-				}
-				else
-				{
-					num = mClipRange.x - 0.5f * viewSize.x;
-				}
-				if (Object.op_Implicit(rightAnchor.target))
-				{
-					Vector3[] sides3 = rightAnchor.GetSides(val);
-					if (sides3 != null)
-					{
-						num2 = NGUIMath.Lerp(sides3[0].x, sides3[2].x, rightAnchor.relative) + (float)rightAnchor.absolute;
-					}
-					else
-					{
-						Vector3 localPos2 = GetLocalPos(rightAnchor, val);
-						num2 = localPos2.x + (float)rightAnchor.absolute;
-					}
-				}
-				else
-				{
-					num2 = mClipRange.x + 0.5f * viewSize.x;
-				}
-				if (Object.op_Implicit(bottomAnchor.target))
-				{
-					Vector3[] sides4 = bottomAnchor.GetSides(val);
-					if (sides4 != null)
-					{
-						num3 = NGUIMath.Lerp(sides4[3].y, sides4[1].y, bottomAnchor.relative) + (float)bottomAnchor.absolute;
-					}
-					else
-					{
-						Vector3 localPos3 = GetLocalPos(bottomAnchor, val);
-						num3 = localPos3.y + (float)bottomAnchor.absolute;
-					}
-				}
-				else
-				{
-					num3 = mClipRange.y - 0.5f * viewSize.y;
-				}
-				if (Object.op_Implicit(topAnchor.target))
-				{
-					Vector3[] sides5 = topAnchor.GetSides(val);
-					if (sides5 != null)
-					{
-						num4 = NGUIMath.Lerp(sides5[3].y, sides5[1].y, topAnchor.relative) + (float)topAnchor.absolute;
-					}
-					else
-					{
-						Vector3 localPos4 = GetLocalPos(topAnchor, val);
-						num4 = localPos4.y + (float)topAnchor.absolute;
-					}
-				}
-				else
-				{
-					num4 = mClipRange.y + 0.5f * viewSize.y;
-				}
+				num = mClipRange.x - 0.5f * viewSize.x;
 			}
-			num -= val2.x + mClipOffset.x;
-			num2 -= val2.x + mClipOffset.x;
-			num3 -= val2.y + mClipOffset.y;
-			num4 -= val2.y + mClipOffset.y;
-			float num5 = Mathf.Lerp(num, num2, 0.5f);
-			float num6 = Mathf.Lerp(num3, num4, 0.5f);
-			float num7 = num2 - num;
-			float num8 = num4 - num3;
-			float num9 = Mathf.Max(2f, mClipSoftness.x);
-			float num10 = Mathf.Max(2f, mClipSoftness.y);
-			if (num7 < num9)
+			if (Object.op_Implicit(rightAnchor.target))
 			{
-				num7 = num9;
+				Vector3[] sides3 = rightAnchor.GetSides(parent);
+				if (sides3 != null)
+				{
+					num2 = NGUIMath.Lerp(sides3[0].x, sides3[2].x, rightAnchor.relative) + (float)rightAnchor.absolute;
+				}
+				else
+				{
+					Vector3 localPos2 = GetLocalPos(rightAnchor, parent);
+					num2 = localPos2.x + (float)rightAnchor.absolute;
+				}
 			}
-			if (num8 < num10)
+			else
 			{
-				num8 = num10;
+				num2 = mClipRange.x + 0.5f * viewSize.x;
 			}
-			baseClipRegion = new Vector4(num5, num6, num7, num8);
+			if (Object.op_Implicit(bottomAnchor.target))
+			{
+				Vector3[] sides4 = bottomAnchor.GetSides(parent);
+				if (sides4 != null)
+				{
+					num3 = NGUIMath.Lerp(sides4[3].y, sides4[1].y, bottomAnchor.relative) + (float)bottomAnchor.absolute;
+				}
+				else
+				{
+					Vector3 localPos3 = GetLocalPos(bottomAnchor, parent);
+					num3 = localPos3.y + (float)bottomAnchor.absolute;
+				}
+			}
+			else
+			{
+				num3 = mClipRange.y - 0.5f * viewSize.y;
+			}
+			if (Object.op_Implicit(topAnchor.target))
+			{
+				Vector3[] sides5 = topAnchor.GetSides(parent);
+				if (sides5 != null)
+				{
+					num4 = NGUIMath.Lerp(sides5[3].y, sides5[1].y, topAnchor.relative) + (float)topAnchor.absolute;
+				}
+				else
+				{
+					Vector3 localPos4 = GetLocalPos(topAnchor, parent);
+					num4 = localPos4.y + (float)topAnchor.absolute;
+				}
+			}
+			else
+			{
+				num4 = mClipRange.y + 0.5f * viewSize.y;
+			}
 		}
+		num -= val.x + mClipOffset.x;
+		num2 -= val.x + mClipOffset.x;
+		num3 -= val.y + mClipOffset.y;
+		num4 -= val.y + mClipOffset.y;
+		float num5 = Mathf.Lerp(num, num2, 0.5f);
+		float num6 = Mathf.Lerp(num3, num4, 0.5f);
+		float num7 = num2 - num;
+		float num8 = num4 - num3;
+		float num9 = Mathf.Max(2f, mClipSoftness.x);
+		float num10 = Mathf.Max(2f, mClipSoftness.y);
+		if (num7 < num9)
+		{
+			num7 = num9;
+		}
+		if (num8 < num10)
+		{
+			num8 = num10;
+		}
+		baseClipRegion = new Vector4(num5, num6, num7, num8);
 	}
 
 	private void LateUpdate()
 	{
-		if (mUpdateFrame != Time.get_frameCount())
+		if (mUpdateFrame == Time.get_frameCount())
 		{
-			mUpdateFrame = Time.get_frameCount();
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
+			return;
+		}
+		mUpdateFrame = Time.get_frameCount();
+		int i = 0;
+		for (int count = list.Count; i < count; i++)
+		{
+			list[i].UpdateSelf();
+		}
+		int num = 3000;
+		int j = 0;
+		for (int count2 = list.Count; j < count2; j++)
+		{
+			UIPanel uIPanel = list[j];
+			if (uIPanel.renderQueue == RenderQueue.Automatic)
 			{
-				list[i].UpdateSelf();
+				uIPanel.startingRenderQueue = num;
+				uIPanel.UpdateDrawCalls();
+				num += uIPanel.drawCalls.Count;
 			}
-			int num = 3000;
-			int j = 0;
-			for (int count2 = list.Count; j < count2; j++)
+			else if (uIPanel.renderQueue == RenderQueue.StartAt)
 			{
-				UIPanel uIPanel = list[j];
-				if (uIPanel.renderQueue == RenderQueue.Automatic)
+				uIPanel.UpdateDrawCalls();
+				if (uIPanel.drawCalls.Count != 0)
 				{
-					uIPanel.startingRenderQueue = num;
-					uIPanel.UpdateDrawCalls();
-					num += uIPanel.drawCalls.Count;
+					num = Mathf.Max(num, uIPanel.startingRenderQueue + uIPanel.drawCalls.Count);
 				}
-				else if (uIPanel.renderQueue == RenderQueue.StartAt)
+			}
+			else
+			{
+				uIPanel.UpdateDrawCalls();
+				if (uIPanel.drawCalls.Count != 0)
 				{
-					uIPanel.UpdateDrawCalls();
-					if (uIPanel.drawCalls.Count != 0)
-					{
-						num = Mathf.Max(num, uIPanel.startingRenderQueue + uIPanel.drawCalls.Count);
-					}
-				}
-				else
-				{
-					uIPanel.UpdateDrawCalls();
-					if (uIPanel.drawCalls.Count != 0)
-					{
-						num = Mathf.Max(num, uIPanel.startingRenderQueue + 1);
-					}
+					num = Mathf.Max(num, uIPanel.startingRenderQueue + 1);
 				}
 			}
 		}
@@ -1223,47 +1219,48 @@ public class UIPanel : UIRect
 					val2 = mainTexture;
 					val3 = shader;
 				}
-				if (val != null || val3 != null || val2 != null)
+				if (!(val != null) && !(val3 != null) && !(val2 != null))
 				{
-					if (uIDrawCall == null)
+					continue;
+				}
+				if (uIDrawCall == null)
+				{
+					uIDrawCall = UIDrawCall.Create(this, val, val2, val3);
+					uIDrawCall.depthStart = uIWidget.depth;
+					uIDrawCall.depthEnd = uIDrawCall.depthStart;
+					uIDrawCall.panel = this;
+				}
+				else
+				{
+					int depth = uIWidget.depth;
+					if (depth < uIDrawCall.depthStart)
 					{
-						uIDrawCall = UIDrawCall.Create(this, val, val2, val3);
-						uIDrawCall.depthStart = uIWidget.depth;
-						uIDrawCall.depthEnd = uIDrawCall.depthStart;
-						uIDrawCall.panel = this;
+						uIDrawCall.depthStart = depth;
+					}
+					if (depth > uIDrawCall.depthEnd)
+					{
+						uIDrawCall.depthEnd = depth;
+					}
+				}
+				uIWidget.drawCall = uIDrawCall;
+				num++;
+				if (generateNormals)
+				{
+					uIWidget.WriteToBuffers(uIDrawCall.verts, uIDrawCall.uvs, uIDrawCall.cols, uIDrawCall.norms, uIDrawCall.tans);
+				}
+				else
+				{
+					uIWidget.WriteToBuffers(uIDrawCall.verts, uIDrawCall.uvs, uIDrawCall.cols, null, null);
+				}
+				if (uIWidget.mOnRender != null)
+				{
+					if (mOnRender == null)
+					{
+						mOnRender = uIWidget.mOnRender;
 					}
 					else
 					{
-						int depth = uIWidget.depth;
-						if (depth < uIDrawCall.depthStart)
-						{
-							uIDrawCall.depthStart = depth;
-						}
-						if (depth > uIDrawCall.depthEnd)
-						{
-							uIDrawCall.depthEnd = depth;
-						}
-					}
-					uIWidget.drawCall = uIDrawCall;
-					num++;
-					if (generateNormals)
-					{
-						uIWidget.WriteToBuffers(uIDrawCall.verts, uIDrawCall.uvs, uIDrawCall.cols, uIDrawCall.norms, uIDrawCall.tans);
-					}
-					else
-					{
-						uIWidget.WriteToBuffers(uIDrawCall.verts, uIDrawCall.uvs, uIDrawCall.cols, null, null);
-					}
-					if (uIWidget.mOnRender != null)
-					{
-						if (mOnRender == null)
-						{
-							mOnRender = uIWidget.mOnRender;
-						}
-						else
-						{
-							mOnRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(mOnRender, uIWidget.mOnRender);
-						}
+						mOnRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(mOnRender, uIWidget.mOnRender);
 					}
 				}
 			}
@@ -1294,41 +1291,39 @@ public class UIPanel : UIRect
 				if (uIWidget == null)
 				{
 					widgets.RemoveAt(num2);
+					continue;
 				}
-				else
+				if (uIWidget.drawCall == dc)
 				{
-					if (uIWidget.drawCall == dc)
+					if (uIWidget.isVisible && uIWidget.hasVertices)
 					{
-						if (uIWidget.isVisible && uIWidget.hasVertices)
+						num++;
+						if (generateNormals)
 						{
-							num++;
-							if (generateNormals)
-							{
-								uIWidget.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans);
-							}
-							else
-							{
-								uIWidget.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null);
-							}
-							if (uIWidget.mOnRender != null)
-							{
-								if (mOnRender == null)
-								{
-									mOnRender = uIWidget.mOnRender;
-								}
-								else
-								{
-									mOnRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(mOnRender, uIWidget.mOnRender);
-								}
-							}
+							uIWidget.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans);
 						}
 						else
 						{
-							uIWidget.drawCall = null;
+							uIWidget.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null);
+						}
+						if (uIWidget.mOnRender != null)
+						{
+							if (mOnRender == null)
+							{
+								mOnRender = uIWidget.mOnRender;
+							}
+							else
+							{
+								mOnRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(mOnRender, uIWidget.mOnRender);
+							}
 						}
 					}
-					num2++;
+					else
+					{
+						uIWidget.drawCall = null;
+					}
 				}
+				num2++;
 			}
 			if (dc.verts.size != 0)
 			{
@@ -1347,8 +1342,6 @@ public class UIPanel : UIRect
 		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Expected O, but got Unknown
 		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
 		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
@@ -1372,8 +1365,10 @@ public class UIPanel : UIRect
 		if (clipping != 0)
 		{
 			drawCallClipRange = finalClipRegion;
-			drawCallClipRange.z *= 0.5f;
-			drawCallClipRange.w *= 0.5f;
+			ref Vector4 reference = ref drawCallClipRange;
+			reference.z *= 0.5f;
+			ref Vector4 reference2 = ref drawCallClipRange;
+			reference2.w *= 0.5f;
 		}
 		else
 		{
@@ -1391,28 +1386,30 @@ public class UIPanel : UIRect
 		}
 		if (halfPixelOffset)
 		{
-			drawCallClipRange.x -= 0.5f;
-			drawCallClipRange.y += 0.5f;
+			ref Vector4 reference3 = ref drawCallClipRange;
+			reference3.x -= 0.5f;
+			ref Vector4 reference4 = ref drawCallClipRange;
+			reference4.y += 0.5f;
 		}
-		Vector3 val2;
+		Vector3 val;
 		if (usedForUI)
 		{
-			Transform val = base.cachedTransform.get_parent();
-			val2 = base.cachedTransform.get_localPosition();
+			Transform parent = base.cachedTransform.get_parent();
+			val = base.cachedTransform.get_localPosition();
 			if (clipping != 0)
 			{
-				val2.x = (float)Mathf.RoundToInt(val2.x);
-				val2.y = (float)Mathf.RoundToInt(val2.y);
+				val.x = Mathf.RoundToInt(val.x);
+				val.y = Mathf.RoundToInt(val.y);
 			}
-			if (val != null)
+			if (parent != null)
 			{
-				val2 = val.TransformPoint(val2);
+				val = parent.TransformPoint(val);
 			}
-			val2 += drawCallOffset;
+			val += drawCallOffset;
 		}
 		else
 		{
-			val2 = cachedTransform.get_position();
+			val = cachedTransform.get_position();
 		}
 		Quaternion rotation = cachedTransform.get_rotation();
 		Vector3 lossyScale = cachedTransform.get_lossyScale();
@@ -1420,7 +1417,7 @@ public class UIPanel : UIRect
 		{
 			UIDrawCall uIDrawCall = drawCalls[i];
 			Transform cachedTransform2 = uIDrawCall.cachedTransform;
-			cachedTransform2.set_position(val2);
+			cachedTransform2.set_position(val);
 			cachedTransform2.set_rotation(rotation);
 			cachedTransform2.set_localScale(lossyScale);
 			uIDrawCall.renderQueue = ((renderQueue != RenderQueue.Explicit) ? (startingRenderQueue + i) : startingRenderQueue);
@@ -1432,25 +1429,24 @@ public class UIPanel : UIRect
 
 	private void UpdateLayers()
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		if (mLayer != base.cachedGameObject.get_layer())
+		if (mLayer == base.cachedGameObject.get_layer())
 		{
-			mLayer = mGo.get_layer();
-			int i = 0;
-			for (int count = widgets.Count; i < count; i++)
+			return;
+		}
+		mLayer = mGo.get_layer();
+		int i = 0;
+		for (int count = widgets.Count; i < count; i++)
+		{
+			UIWidget uIWidget = widgets[i];
+			if (Object.op_Implicit(uIWidget) && uIWidget.parent == this)
 			{
-				UIWidget uIWidget = widgets[i];
-				if (Object.op_Implicit(uIWidget) && uIWidget.parent == this)
-				{
-					uIWidget.get_gameObject().set_layer(mLayer);
-				}
+				uIWidget.get_gameObject().set_layer(mLayer);
 			}
-			ResetAnchors();
-			for (int j = 0; j < drawCalls.Count; j++)
-			{
-				drawCalls[j].get_gameObject().set_layer(mLayer);
-			}
+		}
+		ResetAnchors();
+		for (int j = 0; j < drawCalls.Count; j++)
+		{
+			drawCalls[j].get_gameObject().set_layer(mLayer);
 		}
 	}
 
@@ -1480,27 +1476,29 @@ public class UIPanel : UIRect
 		for (int count = widgets.Count; j < count; j++)
 		{
 			UIWidget uIWidget = widgets[j];
-			if (uIWidget.panel == this && uIWidget.get_enabled())
+			if (!(uIWidget.panel == this) || !uIWidget.get_enabled())
 			{
-				if (uIWidget.UpdateTransform(frameCount) || mResized)
+				continue;
+			}
+			if (uIWidget.UpdateTransform(frameCount) || mResized)
+			{
+				bool visibleByAlpha = flag2 || uIWidget.CalculateCumulativeAlpha(frameCount) > 0.001f;
+				uIWidget.UpdateVisibility(visibleByAlpha, flag2 || (!hasCumulativeClipping && !uIWidget.hideIfOffScreen) || IsVisible(uIWidget));
+			}
+			if (!uIWidget.UpdateGeometry(frameCount))
+			{
+				continue;
+			}
+			flag = true;
+			if (!mRebuild)
+			{
+				if (uIWidget.drawCall != null)
 				{
-					bool visibleByAlpha = flag2 || uIWidget.CalculateCumulativeAlpha(frameCount) > 0.001f;
-					uIWidget.UpdateVisibility(visibleByAlpha, flag2 || (!hasCumulativeClipping && !uIWidget.hideIfOffScreen) || IsVisible(uIWidget));
+					uIWidget.drawCall.isDirty = true;
 				}
-				if (uIWidget.UpdateGeometry(frameCount))
+				else
 				{
-					flag = true;
-					if (!mRebuild)
-					{
-						if (uIWidget.drawCall != null)
-						{
-							uIWidget.drawCall.isDirty = true;
-						}
-						else
-						{
-							FindDrawCall(uIWidget);
-						}
-					}
+					FindDrawCall(uIWidget);
 				}
 			}
 		}
@@ -1519,28 +1517,29 @@ public class UIPanel : UIRect
 		for (int i = 0; i < drawCalls.Count; i++)
 		{
 			UIDrawCall uIDrawCall = drawCalls[i];
-			int num = (i != 0) ? (drawCalls[i - 1].depthEnd + 1) : (-2147483648);
-			int num2 = (i + 1 != drawCalls.Count) ? (drawCalls[i + 1].depthStart - 1) : 2147483647;
-			if (num <= depth && num2 >= depth)
+			int num = (i != 0) ? (drawCalls[i - 1].depthEnd + 1) : int.MinValue;
+			int num2 = (i + 1 != drawCalls.Count) ? (drawCalls[i + 1].depthStart - 1) : int.MaxValue;
+			if (num > depth || num2 < depth)
 			{
-				if (uIDrawCall.baseMaterial == material && uIDrawCall.mainTexture == mainTexture)
-				{
-					if (w.isVisible)
-					{
-						w.drawCall = uIDrawCall;
-						if (w.hasVertices)
-						{
-							uIDrawCall.isDirty = true;
-						}
-						return uIDrawCall;
-					}
-				}
-				else
-				{
-					mRebuild = true;
-				}
-				return null;
+				continue;
 			}
+			if (uIDrawCall.baseMaterial == material && uIDrawCall.mainTexture == mainTexture)
+			{
+				if (w.isVisible)
+				{
+					w.drawCall = uIDrawCall;
+					if (w.hasVertices)
+					{
+						uIDrawCall.isDirty = true;
+					}
+					return uIDrawCall;
+				}
+			}
+			else
+			{
+				mRebuild = true;
+			}
+			return null;
 		}
 		mRebuild = true;
 		return null;
@@ -1567,11 +1566,12 @@ public class UIPanel : UIRect
 			int num = widgets.Count;
 			while (num > 0)
 			{
-				if (UIWidget.PanelCompareFunc(w, widgets[--num]) != -1)
+				if (UIWidget.PanelCompareFunc(w, widgets[--num]) == -1)
 				{
-					widgets.Insert(num + 1, w);
-					break;
+					continue;
 				}
+				widgets.Insert(num + 1, w);
+				break;
 			}
 		}
 		FindDrawCall(w);
@@ -1662,11 +1662,9 @@ public class UIPanel : UIRect
 		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Expected O, but got Unknown
 		Vector3 val = targetBounds.get_min();
 		Vector3 val2 = targetBounds.get_max();
 		float num = 1f;
@@ -1717,7 +1715,7 @@ public class UIPanel : UIRect
 
 	public static UIPanel Find(Transform trans)
 	{
-		return Find(trans, false, -1);
+		return Find(trans, createIfMissing: false, -1);
 	}
 
 	public static UIPanel Find(Transform trans, bool createIfMissing)
@@ -1727,9 +1725,6 @@ public class UIPanel : UIRect
 
 	public static UIPanel Find(Transform trans, bool createIfMissing, int layer)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		UIPanel uIPanel = NGUITools.FindInParents<UIPanel>(trans);
 		if (uIPanel != null)
 		{
@@ -1739,7 +1734,7 @@ public class UIPanel : UIRect
 		{
 			trans = trans.get_parent();
 		}
-		return (!createIfMissing) ? null : NGUITools.CreateUI(trans, false, layer);
+		return (!createIfMissing) ? null : NGUITools.CreateUI(trans, advanced3D: false, layer);
 	}
 
 	public Vector2 GetWindowSize()

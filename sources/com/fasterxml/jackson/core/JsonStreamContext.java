@@ -44,7 +44,10 @@ public abstract class JsonStreamContext {
     }
 
     public final int getCurrentIndex() {
-        return this._index < 0 ? 0 : this._index;
+        if (this._index < 0) {
+            return 0;
+        }
+        return this._index;
     }
 
     public Object getCurrentValue() {

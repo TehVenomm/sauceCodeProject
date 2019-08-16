@@ -15,8 +15,9 @@ abstract class RemoteViewsAction extends Action<RemoteViewsTarget> {
     static class AppWidgetAction extends RemoteViewsAction {
         private final int[] appWidgetIds;
 
-        /* bridge */ /* synthetic */ Object getTarget() {
-            return super.getTarget();
+        /* access modifiers changed from: 0000 */
+        public /* bridge */ /* synthetic */ Object getTarget() {
+            return RemoteViewsAction.super.getTarget();
         }
 
         AppWidgetAction(Picasso picasso, Request request, RemoteViews remoteViews, int i, int[] iArr, int i2, int i3, String str, Object obj, int i4) {
@@ -24,7 +25,8 @@ abstract class RemoteViewsAction extends Action<RemoteViewsTarget> {
             this.appWidgetIds = iArr;
         }
 
-        void update() {
+        /* access modifiers changed from: 0000 */
+        public void update() {
             AppWidgetManager.getInstance(this.picasso.context).updateAppWidget(this.appWidgetIds, this.remoteViews);
         }
     }
@@ -33,17 +35,19 @@ abstract class RemoteViewsAction extends Action<RemoteViewsTarget> {
         private final Notification notification;
         private final int notificationId;
 
-        /* bridge */ /* synthetic */ Object getTarget() {
-            return super.getTarget();
+        /* access modifiers changed from: 0000 */
+        public /* bridge */ /* synthetic */ Object getTarget() {
+            return RemoteViewsAction.super.getTarget();
         }
 
-        NotificationAction(Picasso picasso, Request request, RemoteViews remoteViews, int i, int i2, Notification notification, int i3, int i4, String str, Object obj, int i5) {
+        NotificationAction(Picasso picasso, Request request, RemoteViews remoteViews, int i, int i2, Notification notification2, int i3, int i4, String str, Object obj, int i5) {
             super(picasso, request, remoteViews, i, i5, i3, i4, obj, str);
             this.notificationId = i2;
-            this.notification = notification;
+            this.notification = notification2;
         }
 
-        void update() {
+        /* access modifiers changed from: 0000 */
+        public void update() {
             ((NotificationManager) Utils.getService(this.picasso.context, "notification")).notify(this.notificationId, this.notification);
         }
     }
@@ -52,8 +56,8 @@ abstract class RemoteViewsAction extends Action<RemoteViewsTarget> {
         final RemoteViews remoteViews;
         final int viewId;
 
-        RemoteViewsTarget(RemoteViews remoteViews, int i) {
-            this.remoteViews = remoteViews;
+        RemoteViewsTarget(RemoteViews remoteViews2, int i) {
+            this.remoteViews = remoteViews2;
             this.viewId = i;
         }
 
@@ -65,10 +69,10 @@ abstract class RemoteViewsAction extends Action<RemoteViewsTarget> {
                 return false;
             }
             RemoteViewsTarget remoteViewsTarget = (RemoteViewsTarget) obj;
-            if (this.viewId == remoteViewsTarget.viewId && this.remoteViews.equals(remoteViewsTarget.remoteViews)) {
-                return true;
+            if (this.viewId != remoteViewsTarget.viewId || !this.remoteViews.equals(remoteViewsTarget.remoteViews)) {
+                return false;
             }
-            return false;
+            return true;
         }
 
         public int hashCode() {
@@ -76,15 +80,17 @@ abstract class RemoteViewsAction extends Action<RemoteViewsTarget> {
         }
     }
 
-    abstract void update();
+    /* access modifiers changed from: 0000 */
+    public abstract void update();
 
-    RemoteViewsAction(Picasso picasso, Request request, RemoteViews remoteViews, int i, int i2, int i3, int i4, Object obj, String str) {
+    RemoteViewsAction(Picasso picasso, Request request, RemoteViews remoteViews2, int i, int i2, int i3, int i4, Object obj, String str) {
         super(picasso, null, request, i3, i4, i2, null, str, obj, false);
-        this.remoteViews = remoteViews;
+        this.remoteViews = remoteViews2;
         this.viewId = i;
     }
 
-    void complete(Bitmap bitmap, LoadedFrom loadedFrom) {
+    /* access modifiers changed from: 0000 */
+    public void complete(Bitmap bitmap, LoadedFrom loadedFrom) {
         this.remoteViews.setImageViewBitmap(this.viewId, bitmap);
         update();
     }
@@ -95,14 +101,16 @@ abstract class RemoteViewsAction extends Action<RemoteViewsTarget> {
         }
     }
 
-    RemoteViewsTarget getTarget() {
+    /* access modifiers changed from: 0000 */
+    public RemoteViewsTarget getTarget() {
         if (this.target == null) {
             this.target = new RemoteViewsTarget(this.remoteViews, this.viewId);
         }
         return this.target;
     }
 
-    void setImageResource(int i) {
+    /* access modifiers changed from: 0000 */
+    public void setImageResource(int i) {
         this.remoteViews.setImageViewResource(this.viewId, i);
         update();
     }

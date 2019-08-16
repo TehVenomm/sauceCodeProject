@@ -54,7 +54,8 @@ public class RawValue implements JsonSerializable {
         }
     }
 
-    protected void _serialize(JsonGenerator jsonGenerator) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _serialize(JsonGenerator jsonGenerator) throws IOException {
         if (this._value instanceof SerializableString) {
             jsonGenerator.writeRawValue((SerializableString) this._value);
         } else {
@@ -80,7 +81,10 @@ public class RawValue implements JsonSerializable {
     }
 
     public int hashCode() {
-        return this._value == null ? 0 : this._value.hashCode();
+        if (this._value == null) {
+            return 0;
+        }
+        return this._value.hashCode();
     }
 
     public String toString() {

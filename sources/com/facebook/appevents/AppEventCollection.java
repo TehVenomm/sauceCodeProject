@@ -4,10 +4,11 @@ import android.content.Context;
 import com.facebook.FacebookSdk;
 import com.facebook.internal.AttributionIdentifiers;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
 
 class AppEventCollection {
-    private final HashMap<AccessTokenAppIdPair, SessionEventsState> stateMap = new HashMap();
+    private final HashMap<AccessTokenAppIdPair, SessionEventsState> stateMap = new HashMap<>();
 
     private SessionEventsState getSessionEventsState(AccessTokenAppIdPair accessTokenAppIdPair) {
         SessionEventsState sessionEventsState;
@@ -52,9 +53,13 @@ class AppEventCollection {
     public int getEventCount() {
         int i;
         synchronized (this) {
-            i = 0;
-            for (SessionEventsState accumulatedEventCount : this.stateMap.values()) {
-                i = accumulatedEventCount.getAccumulatedEventCount() + i;
+            int i2 = 0;
+            Iterator it = this.stateMap.values().iterator();
+            while (true) {
+                i = i2;
+                if (it.hasNext()) {
+                    i2 = ((SessionEventsState) it.next()).getAccumulatedEventCount() + i;
+                }
             }
         }
         return i;

@@ -16,7 +16,8 @@ public abstract class ValueNode extends BaseJsonNode {
     protected ValueNode() {
     }
 
-    protected JsonNode _at(JsonPointer jsonPointer) {
+    /* access modifiers changed from: protected */
+    public JsonNode _at(JsonPointer jsonPointer) {
         return MissingNode.getInstance();
     }
 

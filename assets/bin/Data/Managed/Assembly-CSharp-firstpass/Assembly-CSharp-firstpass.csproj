@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{E002874B-86ED-4225-9E8E-0266E5C8951C}</ProjectGuid>
+    <ProjectGuid>{A5A2A4E9-99CD-44C2-906D-2419513665BD}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
+    <LangVersion>7.3</LangVersion>
     <AssemblyName>Assembly-CSharp-firstpass</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <WarningLevel>4</WarningLevel>
@@ -28,14 +29,15 @@
   <ItemGroup>
     <Reference Include="UnityEngine" />
     <Reference Include="System.Core">
-      <HintPath>C:\Users\Braz\Desktop\github source proj\1.2.9\assets\bin\Data\Managed\System.Core.dll</HintPath>
+      <HintPath>C:\WINDOWS\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\System.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
-      <HintPath>C:\Users\Braz\Desktop\github source proj\1.2.9\assets\bin\Data\Managed\System.dll</HintPath>
+      <HintPath>C:\WINDOWS\assembly\GAC_MSIL\System\2.0.0.0__b77a5c561934e089\System.dll</HintPath>
     </Reference>
     <Reference Include="rym_fx_unity5" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EdgeInsets.cs" />
     <Compile Include="eel\EeL_btl_arrow_01.cs" />
     <Compile Include="eel\EeL_btl_arrow_02.cs" />
     <Compile Include="eel\EeL_btl_arrow_marker_01.cs" />
@@ -535,6 +537,7 @@
     <Compile Include="eel\EeL_gacha_magi_01_02.cs" />
     <Compile Include="eel\EeL_gacha_magi_01_03.cs" />
     <Compile Include="eel\EeL_gacha_magi_02_01.cs" />
+    <Compile Include="eel\Eel_gacha_magi_02_01_nnt_test.cs" />
     <Compile Include="eel\EeL_gacha_magi_03_01.cs" />
     <Compile Include="eel\EeL_gacha_magi_04_01.cs" />
     <Compile Include="eel\EeL_gacha_quest_end_01.cs" />
@@ -632,7 +635,52 @@
     <Compile Include="gogame\JSONObject.cs" />
     <Compile Include="gogame\JSONObjectEnumer.cs" />
     <Compile Include="gogame\VipStatus.cs" />
+    <Compile Include="NativeShare.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScreenSafeArea.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\AAMode.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Antialiasing.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Bloom.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\BloomAndFlares.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\BloomOptimized.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\BloomScreenBlendMode.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Blur.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\BlurOptimized.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\CameraMotionBlur.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ColorCorrectionCurves.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ColorCorrectionLookup.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ColorCorrectionRamp.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ContrastEnhance.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ContrastStretch.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\CreaseShading.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\DepthOfField.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\DepthOfFieldDeprecated.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\EdgeDetection.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Fisheye.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\GlobalFog.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Grayscale.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\HDRBloomMode.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ImageEffectBase.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ImageEffects.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\LensflareStyle34.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\MotionBlur.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\NoiseAndGrain.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\NoiseAndScratches.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\PostEffectsBase.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\PostEffectsHelper.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Quads.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ScreenOverlay.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ScreenSpaceAmbientObscurance.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\ScreenSpaceAmbientOcclusion.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\SepiaTone.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\SunShafts.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\TiltShift.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Tonemapping.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Triangles.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\TweakMode34.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Twirl.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\VignetteAndChromaticAberration.cs" />
+    <Compile Include="UnityStandardAssets.ImageEffects\Vortex.cs" />
     <Compile Include="WebViewObject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

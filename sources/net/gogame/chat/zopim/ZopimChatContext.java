@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.support.v4.app.FragmentActivity;
+import android.support.p000v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -40,103 +40,39 @@ public class ZopimChatContext extends AbstractChatContext {
     private final FragmentActivity activity;
     private String agentNick = "";
     private final AgentTypingEntry agentTypingEntry = new AgentTypingEntry(false);
-    private Map<String, Agent> agents;
-    private final AgentsObserver agentsObserver = new C10172();
+    /* access modifiers changed from: private */
+    public Map<String, Agent> agents;
+    private final AgentsObserver agentsObserver = new AgentsObserver() {
+        public void update(Map<String, Agent> map) {
+            ZopimChatContext.this.doNotifyDataSetChanged();
+        }
+    };
     private final BroadcastReceiver broadcastReceiver = new ChatTimeoutReceiver();
     private ChatApi chat;
-    private List<ChatLog> chatLogList = new ArrayList();
-    private final ChatLogObserver chatLogObserver = new C10183();
-    private final ConnectionObserver connectionObserver = new C10161();
-    private List<Boolean> profileIconToShowList = new ArrayList();
+    /* access modifiers changed from: private */
+    public List<ChatLog> chatLogList = new ArrayList();
+    private final ChatLogObserver chatLogObserver = new ChatLogObserver() {
+        public void update(LinkedHashMap<String, ChatLog> linkedHashMap) {
+            ZopimChatContext.this.doNotifyDataSetChanged();
+        }
+    };
+    private final ConnectionObserver connectionObserver = new ConnectionObserver() {
+        public void update(Connection connection) {
+        }
+    };
+    /* access modifiers changed from: private */
+    public List<Boolean> profileIconToShowList = new ArrayList();
     private final List<File> queuedFiles = new ArrayList();
     private final SessionConfig sessionConfig;
     private final UIContext uiContext;
     private final ChatAdapterViewFactory viewFactory;
 
-    /* renamed from: net.gogame.chat.zopim.ZopimChatContext$1 */
-    class C10161 extends ConnectionObserver {
-        C10161() {
-        }
-
-        public void update(Connection connection) {
-        }
-    }
-
-    /* renamed from: net.gogame.chat.zopim.ZopimChatContext$2 */
-    class C10172 extends AgentsObserver {
-        C10172() {
-        }
-
-        public void update(Map<String, Agent> map) {
-            ZopimChatContext.this.doNotifyDataSetChanged();
-        }
-    }
-
-    /* renamed from: net.gogame.chat.zopim.ZopimChatContext$3 */
-    class C10183 extends ChatLogObserver {
-        C10183() {
-        }
-
-        public void update(LinkedHashMap<String, ChatLog> linkedHashMap) {
-            ZopimChatContext.this.doNotifyDataSetChanged();
-        }
-    }
-
-    /* renamed from: net.gogame.chat.zopim.ZopimChatContext$4 */
-    class C10194 implements Runnable {
-        C10194() {
-        }
-
-        public void run() {
-            List arrayList = new ArrayList();
-            List arrayList2 = new ArrayList();
-            boolean z = true;
-            for (String str : ZopimChat.getDataSource().getChatLog().keySet()) {
-                boolean z2;
-                ChatLog chatLog = (ChatLog) ZopimChat.getDataSource().getChatLog().get(str);
-                arrayList.add(chatLog);
-                if (z) {
-                    arrayList2.add(Boolean.valueOf(true));
-                } else {
-                    arrayList2.add(Boolean.valueOf(false));
-                }
-                if (chatLog.getType() == Type.CHAT_MSG_AGENT) {
-                    z2 = false;
-                } else {
-                    z2 = true;
-                }
-                z = z2;
-            }
-            ZopimChatContext.this.chatLogList = arrayList;
-            ZopimChatContext.this.profileIconToShowList = arrayList2;
-            ZopimChatContext.this.agents = ZopimChat.getDataSource().getAgents();
-            ZopimChatContext.this.notifyDataSetChanged();
-        }
-    }
-
-    /* renamed from: net.gogame.chat.zopim.ZopimChatContext$5 */
-    class C10205 implements OptionListener {
-        C10205() {
-        }
-
-        public void onOptionSelected(Option option) {
-            ZopimChatContext.this.send(option.getLabel());
-        }
-    }
-
-    /* renamed from: net.gogame.chat.zopim.ZopimChatContext$6 */
-    class C10216 implements RatingListener {
-        C10216() {
-        }
-
-        public void onRatingChanged(Rating rating) {
-            ZopimChatContext.this.send(rating);
-        }
-    }
-
     public class ChatTimeoutReceiver extends BroadcastReceiver {
+        public ChatTimeoutReceiver() {
+        }
+
         public void onReceive(Context context, Intent intent) {
-            if (intent != null && !ChatSession.ACTION_CHAT_SESSION_TIMEOUT.equals(intent.getAction())) {
+            if (intent == null || ChatSession.ACTION_CHAT_SESSION_TIMEOUT.equals(intent.getAction())) {
             }
         }
     }
@@ -144,8 +80,8 @@ public class ZopimChatContext extends AbstractChatContext {
     public static class ZopimOption implements Option {
         private final ChatLog.Option option;
 
-        public ZopimOption(ChatLog.Option option) {
-            this.option = option;
+        public ZopimOption(ChatLog.Option option2) {
+            this.option = option2;
         }
 
         public String getLabel() {
@@ -157,30 +93,57 @@ public class ZopimChatContext extends AbstractChatContext {
         }
     }
 
-    public ZopimChatContext(FragmentActivity fragmentActivity, SessionConfig sessionConfig, ChatAdapterViewFactory chatAdapterViewFactory, UIContext uIContext) {
+    public ZopimChatContext(FragmentActivity fragmentActivity, SessionConfig sessionConfig2, ChatAdapterViewFactory chatAdapterViewFactory, UIContext uIContext) {
         this.activity = fragmentActivity;
-        this.sessionConfig = sessionConfig;
+        this.sessionConfig = sessionConfig2;
         this.viewFactory = chatAdapterViewFactory;
         this.uiContext = uIContext;
     }
 
-    private void doNotifyDataSetChanged() {
-        this.activity.runOnUiThread(new C10194());
+    /* access modifiers changed from: private */
+    public void doNotifyDataSetChanged() {
+        this.activity.runOnUiThread(new Runnable() {
+            public void run() {
+                boolean z;
+                ArrayList arrayList = new ArrayList();
+                ArrayList arrayList2 = new ArrayList();
+                boolean z2 = true;
+                for (String str : ZopimChat.getDataSource().getChatLog().keySet()) {
+                    ChatLog chatLog = (ChatLog) ZopimChat.getDataSource().getChatLog().get(str);
+                    arrayList.add(chatLog);
+                    if (z2) {
+                        arrayList2.add(Boolean.valueOf(true));
+                    } else {
+                        arrayList2.add(Boolean.valueOf(false));
+                    }
+                    if (chatLog.getType() == Type.CHAT_MSG_AGENT) {
+                        z = false;
+                    } else {
+                        z = true;
+                    }
+                    z2 = z;
+                }
+                ZopimChatContext.this.chatLogList = arrayList;
+                ZopimChatContext.this.profileIconToShowList = arrayList2;
+                ZopimChatContext.this.agents = ZopimChat.getDataSource().getAgents();
+                ZopimChatContext.this.notifyDataSetChanged();
+            }
+        });
     }
 
     public void start() {
-        if (hasSession) {
-            this.chat = ZopimChat.resume(this.activity);
-        } else {
+        if (!hasSession) {
             this.chat = this.sessionConfig.build(this.activity);
             hasSession = true;
+        } else {
+            this.chat = ZopimChat.resume(this.activity);
         }
         this.uiContext.registerReceiver(this.broadcastReceiver, new IntentFilter(ChatSession.ACTION_CHAT_SESSION_TIMEOUT));
         ZopimChat.getDataSource().addConnectionObserver(this.connectionObserver);
         ZopimChat.getDataSource().addAgentsObserver(this.agentsObserver);
         ZopimChat.getDataSource().addChatLogObserver(this.chatLogObserver);
         doNotifyDataSetChanged();
-        List<File> arrayList = new ArrayList(this.queuedFiles);
+        ArrayList<File> arrayList = new ArrayList<>(this.queuedFiles);
         this.queuedFiles.clear();
         for (File send : arrayList) {
             send(send);
@@ -274,7 +237,11 @@ public class ZopimChatContext extends AbstractChatContext {
                     }
                     return this.viewFactory.getAgentAttachmentView(view, viewGroup, booleanValue, displayName, str, chatLog.getAttachment().getUrl().toString(), chatLog.getAttachment().getThumbnail().toString());
                 } else if (chatLog.getOptions() != null && chatLog.getOptions().length > 0) {
-                    return this.viewFactory.getAgentOptionsView(view, viewGroup, booleanValue, displayName, str, chatLog.getMessage(), toOptions(chatLog.getOptions()), new C10205());
+                    return this.viewFactory.getAgentOptionsView(view, viewGroup, booleanValue, displayName, str, chatLog.getMessage(), toOptions(chatLog.getOptions()), new OptionListener() {
+                        public void onOptionSelected(Option option) {
+                            ZopimChatContext.this.send(option.getLabel());
+                        }
+                    });
                 } else if (chatLog.getMessage() == null) {
                     return this.viewFactory.getEmptyView(view, viewGroup);
                 } else {
@@ -302,7 +269,11 @@ public class ZopimChatContext extends AbstractChatContext {
                 }
                 return this.viewFactory.getVisitorMessageView(view, viewGroup, String.format("%s sent", new Object[]{chatLog.getFileName()}));
             case CHAT_RATING:
-                return this.viewFactory.getRatingView(view, viewGroup, toRating(chatLog.getRating()), new C10216());
+                return this.viewFactory.getRatingView(view, viewGroup, toRating(chatLog.getRating()), new RatingListener() {
+                    public void onRatingChanged(Rating rating) {
+                        ZopimChatContext.this.send(rating);
+                    }
+                });
             case UNKNOWN:
                 log(chatLog);
                 return this.viewFactory.getEmptyView(view, viewGroup);
@@ -313,7 +284,7 @@ public class ZopimChatContext extends AbstractChatContext {
     }
 
     private List<Option> toOptions(ChatLog.Option[] optionArr) {
-        List<Option> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (ChatLog.Option zopimOption : optionArr) {
             arrayList.add(new ZopimOption(zopimOption));
         }

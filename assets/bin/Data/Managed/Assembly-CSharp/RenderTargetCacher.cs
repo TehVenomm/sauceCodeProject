@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class RenderTargetCacher
+public class RenderTargetCacher : MonoBehaviour
 {
 	[SerializeField]
 	private RenderTexture renderTexture;
@@ -41,8 +41,6 @@ public class RenderTargetCacher
 
 	private void CreateTexture()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
 		if (!(renderTexture != null))
 		{
 			renderTexture = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height());
@@ -67,24 +65,25 @@ public class RenderTargetCacher
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001e: Invalid comparison between Unknown and I4
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		if (!(cam == null))
+		if (cam == null)
 		{
-			if ((int)cam.get_clearFlags() == 2)
+			return;
+		}
+		if ((int)cam.get_clearFlags() == 2)
+		{
+			GL.Clear(true, true, Color.get_black());
+		}
+		if (!(renderTexture == null))
+		{
+			if (renderTexture.get_width() != Screen.get_width() || renderTexture.get_height() != Screen.get_height())
 			{
-				GL.Clear(true, true, Color.get_black());
+				renderTexture.Release();
+				renderTexture = null;
+				CreateTexture();
 			}
-			if (!(renderTexture == null))
+			if (renderTexture != null)
 			{
-				if (renderTexture.get_width() != Screen.get_width() || renderTexture.get_height() != Screen.get_height())
-				{
-					renderTexture.Release();
-					renderTexture = null;
-					CreateTexture();
-				}
-				if (renderTexture != null)
-				{
-					renderTexture.DiscardContents();
-				}
+				renderTexture.DiscardContents();
 			}
 		}
 	}

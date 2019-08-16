@@ -96,8 +96,8 @@ public class RegionMapDescriptionDetailDelivery : InGameDeliveryDetailBase
 	{
 		if (base.isComplete)
 		{
-			SetActive(baseRoot, UI.BTN_COMPLETE, true);
-			SetActive(baseRoot, UI.BTN_JUMP_QUEST, false);
+			SetActive(baseRoot, UI.BTN_COMPLETE, is_visible: true);
+			SetActive(baseRoot, UI.BTN_JUMP_QUEST, is_visible: false);
 		}
 		else
 		{

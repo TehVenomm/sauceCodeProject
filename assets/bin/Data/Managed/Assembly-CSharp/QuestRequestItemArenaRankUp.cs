@@ -40,8 +40,8 @@ public class QuestRequestItemArenaRankUp : QuestRequestItem
 
 	public override void Setup(Transform t, DeliveryTable.DeliveryData info)
 	{
-		SetActive(t, UI.SPR_BEST_TIME, false);
-		SetActive(t, UI.LBL_BEST_TIME, false);
+		SetActive(t, UI.SPR_BEST_TIME, is_visible: false);
+		SetActive(t, UI.LBL_BEST_TIME, is_visible: false);
 		InitArenaData(info);
 		base.Setup(t, info);
 	}

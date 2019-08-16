@@ -31,6 +31,7 @@ public class StdKeySerializers {
         }
 
         public void serialize(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+            String name;
             switch (this._typeId) {
                 case 1:
                     serializerProvider.defaultSerializeDateKey((Date) obj, jsonGenerator);
@@ -42,13 +43,12 @@ public class StdKeySerializers {
                     jsonGenerator.writeFieldName(((Class) obj).getName());
                     return;
                 case 4:
-                    String obj2;
                     if (serializerProvider.isEnabled(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)) {
-                        obj2 = obj.toString();
+                        name = obj.toString();
                     } else {
-                        obj2 = ((Enum) obj).name();
+                        name = ((Enum) obj).name();
                     }
-                    jsonGenerator.writeFieldName(obj2);
+                    jsonGenerator.writeFieldName(name);
                     return;
                 default:
                     jsonGenerator.writeFieldName(obj.toString());
@@ -64,7 +64,8 @@ public class StdKeySerializers {
             super(String.class, false);
         }
 
-        Object readResolve() {
+        /* access modifiers changed from: 0000 */
+        public Object readResolve() {
             this._dynamicSerializers = PropertySerializerMap.emptyForProperties();
             return this;
         }
@@ -79,7 +80,8 @@ public class StdKeySerializers {
             serializerFor.serialize(obj, jsonGenerator, serializerProvider);
         }
 
-        protected JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
+        /* access modifiers changed from: protected */
+        public JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
             SerializerAndMapResult findAndAddKeySerializer = propertySerializerMap.findAndAddKeySerializer(cls, serializerProvider, null);
             if (propertySerializerMap != findAndAddKeySerializer.map) {
                 this._dynamicSerializers = findAndAddKeySerializer.map;
@@ -123,7 +125,10 @@ public class StdKeySerializers {
         if (cls == UUID.class) {
             return new Default(5, cls);
         }
-        return z ? DEFAULT_KEY_SERIALIZER : null;
+        if (z) {
+            return DEFAULT_KEY_SERIALIZER;
+        }
+        return null;
     }
 
     public static JsonSerializer<Object> getFallbackKeySerializer(SerializationConfig serializationConfig, Class<?> cls) {

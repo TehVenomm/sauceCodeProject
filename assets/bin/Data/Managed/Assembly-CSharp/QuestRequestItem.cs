@@ -47,13 +47,13 @@ public class QuestRequestItem : UIBehaviour
 
 	public virtual void Setup(Transform t, DeliveryTable.DeliveryData info)
 	{
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_040b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0430: Unknown result type (might be due to invalid IL or missing references)
 		SetIcon(t, info);
 		SetDeliveryName(t, info);
 		bool is_visible = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)info.id);
 		SetActive(t, UI.OBJ_REQUEST_OK, is_visible);
-		SetActive(t, UI.OBJ_REQUEST_COMPLETED, false);
+		SetActive(t, UI.OBJ_REQUEST_COMPLETED, is_visible: false);
 		MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryDataAllNeeds((int)info.id, out int have, out int need, out string item_name, out string limit_time);
 		SetLabelText(t, UI.LBL_HAVE, have.ToString());
 		SetLabelText(t, UI.LBL_NEED, need.ToString());
@@ -97,7 +97,10 @@ public class QuestRequestItem : UIBehaviour
 			DeliveryRewardTable.DeliveryRewardData[] array = deliveryRewardTableData;
 			foreach (DeliveryRewardTable.DeliveryRewardData deliveryRewardData in array)
 			{
-				list.Add(deliveryRewardData.reward);
+				if (deliveryRewardData.reward.type != REWARD_TYPE.RANKING_POINT)
+				{
+					list.Add(deliveryRewardData.reward);
+				}
 			}
 		}
 		List<PointShopGetPointTable.Data> fromDeiliveryId = Singleton<PointShopGetPointTable>.I.GetFromDeiliveryId(info.id);
@@ -132,10 +135,10 @@ public class QuestRequestItem : UIBehaviour
 				if (flag)
 				{
 					DeliveryRewardTable.DeliveryRewardData.Reward reward2 = list[j];
-					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward2.type, reward2.item_id, FindCtrl(t, array2[j]), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST);
+					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward2.type, reward2.item_id, FindCtrl(t, array2[j]), -1, null, 0, is_new: false, -1, is_select: false, null, is_equipping: false, disable_rarity_text: false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST);
 					if (itemIcon != null)
 					{
-						itemIcon.SetEnableCollider(false);
+						itemIcon.SetEnableCollider(is_enable: false);
 					}
 				}
 			}
@@ -159,7 +162,7 @@ public class QuestRequestItem : UIBehaviour
 		}
 		else
 		{
-			SetActive(t, UI.OBJ_LEVEL_LIMIT, false);
+			SetActive(t, UI.OBJ_LEVEL_LIMIT, is_visible: false);
 		}
 		UIGrid component2 = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_ICON_ROOT);
 		if (component2 != null)
@@ -181,7 +184,14 @@ public class QuestRequestItem : UIBehaviour
 	protected virtual void SetIcon(Transform t, DeliveryTable.DeliveryData info)
 	{
 		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData((int)info.npcID);
-		SetNPCIcon(t, UI.TEX_NPC, nPCData.npcModelID, false);
+		if (info.id == 99140101)
+		{
+			SetNPCIcon(t, UI.TEX_NPC, 999);
+		}
+		else
+		{
+			SetNPCIcon(t, UI.TEX_NPC, nPCData.npcModelID);
+		}
 	}
 
 	protected virtual void SetDeliveryName(Transform t, DeliveryTable.DeliveryData info)

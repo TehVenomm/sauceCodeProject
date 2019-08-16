@@ -64,11 +64,11 @@ public class HomeAppReviewAppealDialogBase : GameSection
 		{
 			if (i < starValue)
 			{
-				SetStarVisualActive(i, true);
+				SetStarVisualActive(i, active: true);
 			}
 			else
 			{
-				SetStarVisualActive(i, false);
+				SetStarVisualActive(i, active: false);
 			}
 		}
 	}
@@ -94,7 +94,7 @@ public class HomeAppReviewAppealDialogBase : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendAppReviewInfo(starValue, replyAction, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 			callback.SafeInvoke();
 		});
 	}

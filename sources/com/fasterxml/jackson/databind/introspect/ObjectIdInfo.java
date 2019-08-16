@@ -18,27 +18,35 @@ public class ObjectIdInfo {
 
     @Deprecated
     public ObjectIdInfo(PropertyName propertyName, Class<?> cls, Class<? extends ObjectIdGenerator<?>> cls2) {
-        this(propertyName, (Class) cls, (Class) cls2, false);
+        this(propertyName, cls, cls2, false);
     }
 
     @Deprecated
     public ObjectIdInfo(String str, Class<?> cls, Class<? extends ObjectIdGenerator<?>> cls2) {
-        this(new PropertyName(str), (Class) cls, (Class) cls2, false);
+        this(new PropertyName(str), cls, cls2, false);
     }
 
     protected ObjectIdInfo(PropertyName propertyName, Class<?> cls, Class<? extends ObjectIdGenerator<?>> cls2, boolean z) {
         this(propertyName, cls, cls2, z, SimpleObjectIdResolver.class);
     }
 
-    protected ObjectIdInfo(PropertyName propertyName, Class<?> cls, Class<? extends ObjectIdGenerator<?>> cls2, boolean z, Class<? extends ObjectIdResolver> cls3) {
-        this._propertyName = propertyName;
-        this._scope = cls;
-        this._generator = cls2;
-        this._alwaysAsId = z;
-        if (cls3 == null) {
-            cls3 = SimpleObjectIdResolver.class;
-        }
-        this._resolver = cls3;
+    /* JADX WARNING: Incorrect type for immutable var: ssa=java.lang.Class<? extends com.fasterxml.jackson.annotation.ObjectIdResolver>, code=java.lang.Class, for r5v0, types: [java.lang.Class<? extends com.fasterxml.jackson.annotation.ObjectIdResolver>, java.lang.Class] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    protected ObjectIdInfo(com.fasterxml.jackson.databind.PropertyName r1, java.lang.Class<?> r2, java.lang.Class<? extends com.fasterxml.jackson.annotation.ObjectIdGenerator<?>> r3, boolean r4, java.lang.Class r5) {
+        /*
+            r0 = this;
+            r0.<init>()
+            r0._propertyName = r1
+            r0._scope = r2
+            r0._generator = r3
+            r0._alwaysAsId = r4
+            if (r5 != 0) goto L_0x000f
+            java.lang.Class<com.fasterxml.jackson.annotation.SimpleObjectIdResolver> r5 = com.fasterxml.jackson.annotation.SimpleObjectIdResolver.class
+        L_0x000f:
+            r0._resolver = r5
+            return
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.introspect.ObjectIdInfo.<init>(com.fasterxml.jackson.databind.PropertyName, java.lang.Class, java.lang.Class, boolean, java.lang.Class):void");
     }
 
     public ObjectIdInfo withAlwaysAsId(boolean z) {

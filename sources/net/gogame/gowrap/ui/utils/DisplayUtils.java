@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.utils;
+package net.gogame.gowrap.p019ui.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,12 +6,15 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
 import android.os.Build.VERSION;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import net.gogame.gowrap.Constants;
 
+/* renamed from: net.gogame.gowrap.ui.utils.DisplayUtils */
 public final class DisplayUtils {
     private DisplayUtils() {
     }
@@ -50,29 +53,28 @@ public final class DisplayUtils {
     }
 
     public static int getScreenOrientation(Activity activity) {
+        boolean z;
         int i = 1;
         if (VERSION.SDK_INT >= 13) {
-            int i2;
             Display defaultDisplay = activity.getWindowManager().getDefaultDisplay();
             int rotation = defaultDisplay.getRotation();
             Point point = new Point();
             defaultDisplay.getSize(point);
-            int i3 = point.x > point.y ? 1 : 0;
+            boolean z2 = point.x > point.y;
             if (rotation == 1 || rotation == 3) {
-                i2 = 1;
+                z = true;
             } else {
-                i2 = 0;
+                z = false;
             }
-            if (i2 != 0) {
-                if (i3 == 0) {
+            if (z) {
+                if (!z2) {
                     return rotation == 1 ? 9 : 1;
-                } else {
-                    if (rotation == 1) {
-                        return 0;
-                    }
-                    return 8;
                 }
-            } else if (i3 == 0) {
+                if (rotation == 1) {
+                    return 0;
+                }
+                return 8;
+            } else if (!z2) {
                 if (rotation != 0) {
                     i = 9;
                 }
@@ -90,7 +92,11 @@ public final class DisplayUtils {
     }
 
     public static void lockOrientation(Activity activity) {
-        activity.setRequestedOrientation(getScreenOrientation(activity));
+        try {
+            activity.setRequestedOrientation(getScreenOrientation(activity));
+        } catch (Throwable th) {
+            Log.e(Constants.TAG, "Exception", th);
+        }
     }
 
     public static void hideSoftKeyboard(Activity activity) {

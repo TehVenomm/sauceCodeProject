@@ -2,7 +2,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Internal/Spring Panel")]
-public class SpringPanel
+public class SpringPanel : MonoBehaviour
 {
 	public delegate void OnFinished();
 
@@ -29,8 +29,6 @@ public class SpringPanel
 
 	private void Start()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		mPanel = this.GetComponent<UIPanel>();
 		mDrag = this.GetComponent<UIScrollView>();
 		mTrans = this.get_transform();
@@ -82,7 +80,7 @@ public class SpringPanel
 		mPanel.clipOffset = clipOffset;
 		if (mDrag != null)
 		{
-			mDrag.UpdateScrollbars(false);
+			mDrag.UpdateScrollbars(recalculateBounds: false);
 		}
 		if (flag && onFinished != null)
 		{

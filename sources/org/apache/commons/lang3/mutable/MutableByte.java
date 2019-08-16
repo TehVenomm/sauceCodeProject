@@ -6,6 +6,9 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
     private static final long serialVersionUID = -1585823265;
     private byte value;
 
+    public MutableByte() {
+    }
+
     public MutableByte(byte b) {
         this.value = b;
     }
@@ -79,10 +82,10 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
     }
 
     public boolean equals(Object obj) {
-        if ((obj instanceof MutableByte) && this.value == ((MutableByte) obj).byteValue()) {
-            return true;
+        if (!(obj instanceof MutableByte) || this.value != ((MutableByte) obj).byteValue()) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public int hashCode() {

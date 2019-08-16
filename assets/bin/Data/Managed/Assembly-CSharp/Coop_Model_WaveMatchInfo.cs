@@ -8,6 +8,8 @@ public class Coop_Model_WaveMatchInfo : Coop_Model_Base
 
 	public int isFinal;
 
+	public int finalNo;
+
 	public Coop_Model_WaveMatchInfo()
 	{
 		base.packetType = PACKET_TYPE.WAVEMATCH_INFO;
@@ -20,6 +22,7 @@ public class Coop_Model_WaveMatchInfo : Coop_Model_Base
 		empty = empty + ",popGuardSec=" + popGuardSec;
 		empty = empty + ",intervalSec=" + intervalSec;
 		empty = empty + ",isFinal=" + isFinal;
+		empty = empty + ",isFinal=" + finalNo;
 		return base.ToString() + empty;
 	}
 }

@@ -1,0 +1,7 @@
+public enum GATHER_GIMMICK_TYPE
+{
+	NONE,
+	FISHING,
+	COOP_FISHING,
+	SUPPLY
+}

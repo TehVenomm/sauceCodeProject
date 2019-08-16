@@ -14,11 +14,16 @@ public class BasicThreadFactory implements ThreadFactory {
     private final ThreadFactory wrappedFactory;
 
     public static class Builder implements org.apache.commons.lang3.builder.Builder<BasicThreadFactory> {
-        private Boolean daemonFlag;
-        private UncaughtExceptionHandler exceptionHandler;
-        private String namingPattern;
-        private Integer priority;
-        private ThreadFactory wrappedFactory;
+        /* access modifiers changed from: private */
+        public Boolean daemonFlag;
+        /* access modifiers changed from: private */
+        public UncaughtExceptionHandler exceptionHandler;
+        /* access modifiers changed from: private */
+        public String namingPattern;
+        /* access modifiers changed from: private */
+        public Integer priority;
+        /* access modifiers changed from: private */
+        public ThreadFactory wrappedFactory;
 
         public Builder wrappedFactory(ThreadFactory threadFactory) {
             if (threadFactory == null) {
@@ -63,7 +68,7 @@ public class BasicThreadFactory implements ThreadFactory {
         }
 
         public BasicThreadFactory build() {
-            BasicThreadFactory basicThreadFactory = new BasicThreadFactory();
+            BasicThreadFactory basicThreadFactory = new BasicThreadFactory(this);
             reset();
             return basicThreadFactory;
         }

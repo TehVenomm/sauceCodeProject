@@ -29,12 +29,8 @@ public class InGameItem : GameSection
 			int event_data = (int)data[2];
 			bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(ITEM_ICON_TYPE.ITEM, sortCompareData.GetUniqID());
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(sortCompareData.GetTableID());
-			ItemStorageTop.SHOW_INVENTORY_MODE sHOW_INVENTORY_MODE = (ItemStorageTop.SHOW_INVENTORY_MODE)(int)data[3];
-			if (sHOW_INVENTORY_MODE != ItemStorageTop.SHOW_INVENTORY_MODE.SMALL)
-			{
-				return ItemIconDetail.CreateMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), itemData, sHOW_INVENTORY_MODE == ItemStorageTop.SHOW_INVENTORY_MODE.MAIN_STATUS, parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, false, is_new);
-			}
-			return ItemIconDetailSmall.CreateSmallMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, false, is_new, 0, 0, ItemIconDetail.ICON_STATUS.NONE);
+			ItemStorageTop.SHOW_INVENTORY_MODE sHOW_INVENTORY_MODE = (ItemStorageTop.SHOW_INVENTORY_MODE)data[3];
+			return ItemIconDetail.CreateMaterialIcon(sortCompareData.GetIconType(), sortCompareData.GetIconID(), sortCompareData.GetRarity(), itemData, sHOW_INVENTORY_MODE == ItemStorageTop.SHOW_INVENTORY_MODE.MAIN_STATUS, parent, sortCompareData.GetNum(), sortCompareData.GetName(), "SELECT", event_data, -1, is_select: false, is_new);
 		}
 	}
 
@@ -52,7 +48,7 @@ public class InGameItem : GameSection
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 			isInActiveRotate = true;
 		}
-		PlayTween((Enum)UI.OBJ_CAPTION_3, true, (EventDelegate.Callback)null, false, 0);
+		PlayTween((Enum)UI.OBJ_CAPTION_3, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 	}
 
 	public override void Exit()
@@ -68,9 +64,9 @@ public class InGameItem : GameSection
 	{
 		UpdateAnchors();
 		base.UpdateUI();
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, showInventoryMode != ItemStorageTop.SHOW_INVENTORY_MODE.SMALL);
+		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, value: true);
 		inventory = new InGameUseItemInventory();
-		SetDynamicList((Enum)SelectListTarget(showInventoryMode), (string)null, inventory.datas.Length, false, (Func<int, bool>)delegate(int i)
+		SetDynamicList((Enum)SelectListTarget(showInventoryMode), (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
 		{
 			SortCompareData sortCompareData2 = inventory.datas[i];
 			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
@@ -127,8 +123,6 @@ public class InGameItem : GameSection
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (base.transferUI != null)
 		{
 			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
@@ -145,15 +139,9 @@ public class InGameItem : GameSection
 
 	private UI SelectListTarget(ItemStorageTop.SHOW_INVENTORY_MODE show_detail_icon)
 	{
-		if (show_detail_icon != ItemStorageTop.SHOW_INVENTORY_MODE.SMALL)
-		{
-			SetActive((Enum)UI.GRD_INVENTORY, true);
-			SetActive((Enum)UI.GRD_INVENTORY_SMALL, false);
-			return UI.GRD_INVENTORY;
-		}
-		SetActive((Enum)UI.GRD_INVENTORY, false);
-		SetActive((Enum)UI.GRD_INVENTORY_SMALL, true);
-		return UI.GRD_INVENTORY_SMALL;
+		SetActive((Enum)UI.GRD_INVENTORY, is_visible: true);
+		SetActive((Enum)UI.GRD_INVENTORY_SMALL, is_visible: false);
+		return UI.GRD_INVENTORY;
 	}
 
 	public override void OnNotify(NOTIFY_FLAG flags)
@@ -168,7 +156,7 @@ public class InGameItem : GameSection
 
 	private void OnQuery_CHANGE_INVENTORY()
 	{
-		showInventoryMode = ((showInventoryMode != ItemStorageTop.SHOW_INVENTORY_MODE.SMALL) ? (showInventoryMode + 1) : ItemStorageTop.SHOW_INVENTORY_MODE.MAIN_STATUS);
+		showInventoryMode = ((showInventoryMode + 1 != ItemStorageTop.SHOW_INVENTORY_MODE.MAX) ? (showInventoryMode + 1) : ItemStorageTop.SHOW_INVENTORY_MODE.MAIN_STATUS);
 		SetDirty(UI.GRD_INVENTORY);
 		SetDirty(UI.GRD_INVENTORY_SMALL);
 		RefreshUI();
@@ -185,7 +173,7 @@ public class InGameItem : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<ShopManager>.I.SendGetShop(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

@@ -45,6 +45,8 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 	[SerializeField]
 	protected GameObject CutInFinalObj;
 
+	private InGameSettingsManager.WaveMatchParam wmSetting;
+
 	private Coop_Model_WaveMatchInfo wmInfo;
 
 	private eState state;
@@ -53,16 +55,21 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 
 	private int lastInteger;
 
+	private bool isShowWave;
+
 	private int dispDispSec = 3;
+
+	private bool isEvent;
 
 	protected override float GetDispSec()
 	{
-		return (float)dispDispSec;
+		return dispDispSec;
 	}
 
 	public void Announce(Coop_Model_WaveMatchInfo info)
 	{
 		wmInfo = info;
+		isEvent = QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true);
 		CutInAnim[0].set_enabled(false);
 		CutInAnim[0].ResetToBeginning();
 		CutInAnim[1].set_enabled(false);
@@ -79,6 +86,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		{
 			StartAnnounce();
 		}
+		MonoBehaviourSingleton<InGameProgress>.I.SetWaveMatchWave(info.no);
 	}
 
 	private void Update()
@@ -95,6 +103,11 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 			UpdateCutIn();
 			break;
 		}
+		if (MonoBehaviourSingleton<UIQuestInfoWaveMatch>.IsValid() && isShowWave)
+		{
+			bool isFinal = wmInfo.isFinal > 0;
+			MonoBehaviourSingleton<UIQuestInfoWaveMatch>.I.SetWaveNow(wmInfo.no, wmInfo.finalNo, isFinal);
+		}
 	}
 
 	private void StartAnnounce()
@@ -104,7 +117,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		{
 			timeLabel.text = InGameProgress.GetTimeToStringMMSS(wmInfo.popGuardSec);
 			lastInteger = wmInfo.popGuardSec;
-			countSec = (float)wmInfo.popGuardSec;
+			countSec = wmInfo.popGuardSec;
 			state = eState.Announce;
 		}
 	}
@@ -150,7 +163,11 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 	private void StartCutIn()
 	{
 		bool flag = wmInfo.isFinal > 0;
-		SoundManager.PlayOneshotJingle(MonoBehaviourSingleton<InGameSettingsManager>.I.waveMatchParam.waveJingleId, null, null);
+		if (wmSetting == null)
+		{
+			wmSetting = MonoBehaviourSingleton<InGameSettingsManager>.I.GetWaveMatchParam();
+		}
+		SoundManager.PlayOneshotJingle(wmSetting.waveJingleId);
 		panelChange.UnLock();
 		CutInAnim[0].set_enabled(true);
 		CutInAnim[0].PlayForward();
@@ -167,7 +184,12 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		countSec = 2f;
 		if (MonoBehaviourSingleton<UIQuestInfoWaveMatch>.IsValid())
 		{
-			MonoBehaviourSingleton<UIQuestInfoWaveMatch>.I.SetWaveNow(wmInfo.no, flag);
+			isShowWave = true;
+			MonoBehaviourSingleton<UIQuestInfoWaveMatch>.I.SetWaveNow(wmInfo.no, wmInfo.finalNo, flag);
+		}
+		if (isEvent && MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		{
+			MonoBehaviourSingleton<StageObjectManager>.I.self.CheckWaveMatchAutoRevive();
 		}
 		state = eState.CutIn;
 	}

@@ -1,10 +1,17 @@
 package com.google.android.gms.dynamite;
 
-import android.content.Context;
-import com.google.android.gms.dynamite.DynamiteModule.zzc;
+import android.os.IInterface;
+import android.os.RemoteException;
+import com.google.android.gms.dynamic.IObjectWrapper;
 
-public interface zzi {
-    int zzae(Context context, String str);
+public interface zzi extends IInterface {
+    int zza(IObjectWrapper iObjectWrapper, String str, boolean z) throws RemoteException;
 
-    int zzb(Context context, String str, boolean z) throws zzc;
+    IObjectWrapper zza(IObjectWrapper iObjectWrapper, String str, int i) throws RemoteException;
+
+    int zzak() throws RemoteException;
+
+    int zzb(IObjectWrapper iObjectWrapper, String str, boolean z) throws RemoteException;
+
+    IObjectWrapper zzb(IObjectWrapper iObjectWrapper, String str, int i) throws RemoteException;
 }

@@ -6,8 +6,9 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class AFLogger {
+
     /* renamed from: ˎ */
-    private static long f122 = System.currentTimeMillis();
+    private static long f139 = System.currentTimeMillis();
 
     public enum LogLevel {
         NONE(0),
@@ -17,15 +18,16 @@ public class AFLogger {
         DEBUG(4),
         VERBOSE(5);
         
+
         /* renamed from: ˏ */
-        private int f121;
+        private int f141;
 
         private LogLevel(int i) {
-            this.f121 = i;
+            this.f141 = i;
         }
 
         public final int getLevel() {
-            return this.f121;
+            return this.f141;
         }
     }
 
@@ -37,28 +39,28 @@ public class AFLogger {
             z2 = false;
         }
         if (z2) {
-            Log.i(AppsFlyerLib.LOG_TAG, m188(str, false));
+            Log.i(AppsFlyerLib.LOG_TAG, m183(str, false));
         }
         if (z) {
-            C0300y.m378().m388("I", m188(str, true));
+            C0469y.m373().mo6642("I", m183(str, true));
         }
     }
 
     public static void resetDeltaTime() {
-        f122 = System.currentTimeMillis();
+        f139 = System.currentTimeMillis();
     }
 
     @NonNull
     /* renamed from: ˋ */
-    private static String m188(String str, boolean z) {
+    private static String m183(String str, boolean z) {
         if (z || LogLevel.VERBOSE.getLevel() == AppsFlyerProperties.getInstance().getInt("logLevel", LogLevel.NONE.getLevel())) {
-            return new StringBuilder("(").append(m189(System.currentTimeMillis() - f122)).append(") ").append(str).toString();
+            return new StringBuilder("(").append(m184(System.currentTimeMillis() - f139)).append(") ").append(str).toString();
         }
         return str;
     }
 
     /* renamed from: ॱ */
-    private static void m191(String str, Throwable th, boolean z) {
+    private static void m186(String str, Throwable th, boolean z) {
         boolean z2;
         if (LogLevel.ERROR.getLevel() <= AppsFlyerProperties.getInstance().getInt("logLevel", LogLevel.NONE.getLevel())) {
             z2 = true;
@@ -66,9 +68,9 @@ public class AFLogger {
             z2 = false;
         }
         if (z2 && z) {
-            Log.e(AppsFlyerLib.LOG_TAG, m188(str, false), th);
+            Log.e(AppsFlyerLib.LOG_TAG, m183(str, false), th);
         }
-        C0300y.m378().m395(th);
+        C0469y.m373().mo6649(th);
     }
 
     public static void afRDLog(String str) {
@@ -79,9 +81,9 @@ public class AFLogger {
             z = false;
         }
         if (z) {
-            Log.v(AppsFlyerLib.LOG_TAG, m188(str, false));
+            Log.v(AppsFlyerLib.LOG_TAG, m183(str, false));
         }
-        C0300y.m378().m388("V", m188(str, true));
+        C0469y.m373().mo6642("V", m183(str, true));
     }
 
     public static void afInfoLog(String str) {
@@ -89,27 +91,29 @@ public class AFLogger {
     }
 
     public static void afErrorLog(String str, Throwable th) {
-        m191(str, th, false);
+        m186(str, th, false);
     }
 
     public static void afErrorLog(String str, Throwable th, boolean z) {
-        m191(str, th, z);
+        m186(str, th, z);
     }
 
     /* renamed from: ˎ */
-    private static String m189(long j) {
-        long toMillis = j - TimeUnit.HOURS.toMillis(TimeUnit.MILLISECONDS.toHours(j));
-        toMillis -= TimeUnit.MINUTES.toMillis(TimeUnit.MILLISECONDS.toMinutes(toMillis));
-        toMillis = TimeUnit.MILLISECONDS.toMillis(toMillis - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(toMillis)));
-        return String.format(Locale.getDefault(), "%02d:%02d:%02d:%03d", new Object[]{Long.valueOf(r0), Long.valueOf(r4), Long.valueOf(r6), Long.valueOf(toMillis)});
+    private static String m184(long j) {
+        long hours = TimeUnit.MILLISECONDS.toHours(j);
+        long millis = j - TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        long millis2 = millis - TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis2);
+        return String.format(Locale.getDefault(), "%02d:%02d:%02d:%03d", new Object[]{Long.valueOf(hours), Long.valueOf(minutes), Long.valueOf(seconds), Long.valueOf(TimeUnit.MILLISECONDS.toMillis(millis2 - TimeUnit.SECONDS.toMillis(seconds)))});
     }
 
     /* renamed from: ˎ */
-    static void m190(String str) {
+    static void m185(String str) {
         if (!AppsFlyerProperties.getInstance().isLogsDisabledCompletely()) {
-            Log.d(AppsFlyerLib.LOG_TAG, m188(str, false));
+            Log.d(AppsFlyerLib.LOG_TAG, m183(str, false));
         }
-        C0300y.m378().m388("F", str);
+        C0469y.m373().mo6642("F", str);
     }
 
     public static void afDebugLog(String str) {
@@ -120,9 +124,9 @@ public class AFLogger {
             z = false;
         }
         if (z) {
-            Log.d(AppsFlyerLib.LOG_TAG, m188(str, false));
+            Log.d(AppsFlyerLib.LOG_TAG, m183(str, false));
         }
-        C0300y.m378().m388("D", m188(str, true));
+        C0469y.m373().mo6642("D", m183(str, true));
     }
 
     public static void afWarnLog(String str) {
@@ -133,8 +137,8 @@ public class AFLogger {
             z = false;
         }
         if (z) {
-            Log.w(AppsFlyerLib.LOG_TAG, m188(str, false));
+            Log.w(AppsFlyerLib.LOG_TAG, m183(str, false));
         }
-        C0300y.m378().m388("W", m188(str, true));
+        C0469y.m373().mo6642("W", m183(str, true));
     }
 }

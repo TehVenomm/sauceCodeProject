@@ -10,21 +10,19 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 import net.gogame.gowrap.Constants;
-import net.gogame.gowrap.InternalConstants;
 import net.gogame.gowrap.integrations.core.Wrapper;
 
 public class LocaleManager {
     private final Context context;
     private final List<LocaleDescriptor> supportedLocaleDescriptors;
 
-    public LocaleManager(Context context) {
-        this.context = context;
-        String[] stringArray = context.getResources().getStringArray(C1110R.array.language_values);
-        String[] stringArray2 = context.getResources().getStringArray(C1110R.array.languages);
-        Map linkedHashMap = new LinkedHashMap();
+    public LocaleManager(Context context2) {
+        this.context = context2;
+        String[] stringArray = context2.getResources().getStringArray(C1423R.array.language_values);
+        String[] stringArray2 = context2.getResources().getStringArray(C1423R.array.languages);
+        LinkedHashMap linkedHashMap = new LinkedHashMap();
         for (int i = 0; i < stringArray.length; i++) {
             String str = stringArray[i];
             String str2 = null;
@@ -33,13 +31,13 @@ public class LocaleManager {
             }
             linkedHashMap.put(str, new LocaleDescriptor(str, str2));
         }
-        List supportedLocales = Wrapper.INSTANCE.getSupportedLocales();
+        List<String> supportedLocales = Wrapper.INSTANCE.getSupportedLocales();
         if (supportedLocales == null) {
             supportedLocales = Arrays.asList(stringArray);
         }
         this.supportedLocaleDescriptors = new ArrayList();
-        if (r0 != null) {
-            for (String str3 : r0) {
+        if (supportedLocales != null) {
+            for (String str3 : supportedLocales) {
                 LocaleDescriptor localeDescriptor = (LocaleDescriptor) linkedHashMap.get(str3);
                 if (localeDescriptor != null) {
                     this.supportedLocaleDescriptors.add(localeDescriptor);
@@ -71,12 +69,18 @@ public class LocaleManager {
     }
 
     public int getSupportedLocaleDescriptorIndex(String str) {
-        if (!(str == null || this.supportedLocaleDescriptors == null)) {
-            for (int i = 0; i < this.supportedLocaleDescriptors.size(); i++) {
-                LocaleDescriptor localeDescriptor = (LocaleDescriptor) this.supportedLocaleDescriptors.get(i);
-                if (localeDescriptor != null && StringUtils.isEquals(localeDescriptor.getId(), str)) {
-                    return i;
+        if (str != null && this.supportedLocaleDescriptors != null) {
+            int i = 0;
+            while (true) {
+                int i2 = i;
+                if (i2 >= this.supportedLocaleDescriptors.size()) {
+                    break;
                 }
+                LocaleDescriptor localeDescriptor = (LocaleDescriptor) this.supportedLocaleDescriptors.get(i2);
+                if (localeDescriptor != null && StringUtils.isEquals(localeDescriptor.getId(), str)) {
+                    return i2;
+                }
+                i = i2 + 1;
             }
         }
         return -1;
@@ -86,10 +90,10 @@ public class LocaleManager {
         Locale locale;
         Wrapper.INSTANCE.setCurrentLocale(this.context, str);
         Wrapper.INSTANCE.readConfiguration(this.context);
-        if (str.equals(InternalConstants.DEFAULT_LOCALE)) {
+        if (str.equals("default")) {
             locale = Locale.ENGLISH;
         } else {
-            List arrayList = new ArrayList();
+            ArrayList arrayList = new ArrayList();
             int i = 0;
             while (true) {
                 int indexOf = str.indexOf(95, i);

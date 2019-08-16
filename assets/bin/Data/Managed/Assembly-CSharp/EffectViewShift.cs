@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectViewShift
+public class EffectViewShift : MonoBehaviour
 {
 	public float shiftValue = -0.25f;
 
@@ -17,8 +17,6 @@ public class EffectViewShift
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		_transform = this.get_transform();
@@ -55,10 +53,6 @@ public class EffectViewShift
 
 	private void UpdateTargetCamera()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<AppMain>.IsValid())
 		{
 			if (AppMain.isInitialized)

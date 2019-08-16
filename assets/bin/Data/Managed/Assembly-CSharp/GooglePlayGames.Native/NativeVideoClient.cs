@@ -84,7 +84,7 @@ namespace GooglePlayGames.Native
 				ResponseStatus arg = ConversionUtils.ConvertResponseStatus(response.GetStatus());
 				if (!response.RequestSucceeded())
 				{
-					callback(arg, false);
+					callback(arg, arg2: false);
 				}
 				else
 				{

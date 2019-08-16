@@ -1,21 +1,31 @@
 package com.google.firebase.iid;
 
+import android.os.Binder;
+import android.os.Process;
 import android.util.Log;
 
-final class zzg implements Runnable {
-    private /* synthetic */ zzd zzmio;
-    private /* synthetic */ zzf zzmip;
+public final class zzg extends Binder {
+    /* access modifiers changed from: private */
+    public final zzc zzae;
 
-    zzg(zzf zzf, zzd zzd) {
-        this.zzmip = zzf;
-        this.zzmio = zzd;
+    zzg(zzc zzc) {
+        this.zzae = zzc;
     }
 
-    public final void run() {
-        if (Log.isLoggable("EnhancedIntentService", 3)) {
-            Log.d("EnhancedIntentService", "bg processing of the intent starting now");
+    public final void zza(zze zze) {
+        if (Binder.getCallingUid() != Process.myUid()) {
+            throw new SecurityException("Binding only allowed within app");
         }
-        this.zzmip.zzmin.handleIntent(this.zzmio.intent);
-        this.zzmio.finish();
+        if (Log.isLoggable("EnhancedIntentService", 3)) {
+            Log.d("EnhancedIntentService", "service received new intent via bind strategy");
+        }
+        if (this.zzae.zzc(zze.intent)) {
+            zze.finish();
+            return;
+        }
+        if (Log.isLoggable("EnhancedIntentService", 3)) {
+            Log.d("EnhancedIntentService", "intent being queued for bg execution");
+        }
+        this.zzae.zzt.execute(new zzf(this, zze));
     }
 }

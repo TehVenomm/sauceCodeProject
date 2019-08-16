@@ -3,6 +3,7 @@ using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -253,6 +254,42 @@ namespace GooglePlayGames.Native.PInvoke
 		}
 
 		private readonly GameServices mServices;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchResponse> _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.QuestManager.FetchCallback _003C_003Ef__mg_0024cache1;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, FetchListResponse> _003C_003Ef__mg_0024cache2;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.QuestManager.FetchListCallback _003C_003Ef__mg_0024cache3;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, QuestUIResponse> _003C_003Ef__mg_0024cache4;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.QuestManager.QuestUICallback _003C_003Ef__mg_0024cache5;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, QuestUIResponse> _003C_003Ef__mg_0024cache6;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.QuestManager.QuestUICallback _003C_003Ef__mg_0024cache7;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, AcceptResponse> _003C_003Ef__mg_0024cache8;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.QuestManager.AcceptCallback _003C_003Ef__mg_0024cache9;
+
+		[CompilerGenerated]
+		private static Func<IntPtr, ClaimMilestoneResponse> _003C_003Ef__mg_0024cacheA;
+
+		[CompilerGenerated]
+		private static GooglePlayGames.Native.Cwrapper.QuestManager.ClaimMilestoneCallback _003C_003Ef__mg_0024cacheB;
 
 		internal QuestManager(GameServices services)
 		{

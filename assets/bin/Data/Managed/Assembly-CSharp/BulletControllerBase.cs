@@ -1,10 +1,20 @@
 using UnityEngine;
 
-public class BulletControllerBase
+public class BulletControllerBase : MonoBehaviour
 {
 	protected BulletObject bulletObject;
 
+	protected StageObject fromObject;
+
+	protected StageObject targetObject;
+
 	public Transform _transform
+	{
+		get;
+		protected set;
+	}
+
+	public Vector3 _position
 	{
 		get;
 		protected set;
@@ -56,13 +66,23 @@ public class BulletControllerBase
 		bulletObject = b;
 	}
 
+	public virtual void RegisterFromObject(StageObject obj)
+	{
+		fromObject = obj;
+	}
+
+	public virtual void RegisterTargetObject(StageObject obj)
+	{
+		targetObject = obj;
+	}
+
 	protected virtual void Awake()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
+		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		timeCount = 0f;
 		bulletSkillInfoParam = null;
 		_transform = this.get_transform();
+		_position = this.get_transform().get_position();
 		_rigidbody = this.GetComponent<Rigidbody>();
 		_collider = this.GetComponent<Collider>();
 	}
@@ -92,6 +112,14 @@ public class BulletControllerBase
 		_transform.set_position(pos);
 		_transform.LookAt(pos + forward);
 		_rigidbody.set_velocity(forward);
+	}
+
+	public virtual void PostInitialize()
+	{
+	}
+
+	public virtual void DestroyBulletObject()
+	{
 	}
 
 	public virtual void Update()

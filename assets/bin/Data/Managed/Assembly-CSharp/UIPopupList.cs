@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Popup List")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/Popup List")]
 public class UIPopupList : UIWidgetContainer
 {
 	public enum Position
@@ -24,13 +24,13 @@ public class UIPopupList : UIWidgetContainer
 
 	public delegate void LegacyEvent(string val);
 
-	private const float animSpeed = 0.15f;
-
 	public static UIPopupList current;
 
 	private static GameObject mChild;
 
 	private static float mFadeOutComplete;
+
+	private const float animSpeed = 0.15f;
 
 	public UIAtlas atlas;
 
@@ -60,7 +60,7 @@ public class UIPopupList : UIWidgetContainer
 
 	public Color backgroundColor = Color.get_white();
 
-	public Color highlightColor = new Color(0.882352948f, 0.784313738f, 0.5882353f, 1f);
+	public Color highlightColor = new Color(0.882352948f, 40f / 51f, 0.5882353f, 1f);
 
 	public bool isAnimated = true;
 
@@ -70,8 +70,8 @@ public class UIPopupList : UIWidgetContainer
 
 	public List<EventDelegate> onChange = new List<EventDelegate>();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string mSelectedItem;
 
 	[HideInInspector]
@@ -86,12 +86,12 @@ public class UIPopupList : UIWidgetContainer
 	[SerializeField]
 	private UISprite mHighlight;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UILabel mHighlightedLabel;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<UILabel> mLabelList = new List<UILabel>();
 
 	[HideInInspector]
@@ -112,8 +112,8 @@ public class UIPopupList : UIWidgetContainer
 	[SerializeField]
 	private string functionName = "OnSelectionChange";
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float textScale;
 
 	[HideInInspector]
@@ -398,32 +398,31 @@ public class UIPopupList : UIWidgetContainer
 	{
 		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Expected O, but got Unknown
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		if (mHighlight != null)
+		if (!(mHighlight != null))
 		{
-			mHighlightedLabel = lbl;
-			UISpriteData atlasSprite = mHighlight.GetAtlasSprite();
-			if (atlasSprite != null)
+			return;
+		}
+		mHighlightedLabel = lbl;
+		UISpriteData atlasSprite = mHighlight.GetAtlasSprite();
+		if (atlasSprite == null)
+		{
+			return;
+		}
+		Vector3 highlightPosition = GetHighlightPosition();
+		if (!instant && isAnimated)
+		{
+			TweenPosition.Begin(mHighlight.get_gameObject(), 0.1f, highlightPosition).method = UITweener.Method.EaseOut;
+			if (!mTweening)
 			{
-				Vector3 highlightPosition = GetHighlightPosition();
-				if (!instant && isAnimated)
-				{
-					TweenPosition.Begin(mHighlight.get_gameObject(), 0.1f, highlightPosition).method = UITweener.Method.EaseOut;
-					if (!mTweening)
-					{
-						mTweening = true;
-						this.StartCoroutine("UpdateTweenPosition");
-					}
-				}
-				else
-				{
-					mHighlight.cachedTransform.set_localPosition(highlightPosition);
-				}
+				mTweening = true;
+				this.StartCoroutine("UpdateTweenPosition");
 			}
+		}
+		else
+		{
+			mHighlight.cachedTransform.set_localPosition(highlightPosition);
 		}
 	}
 
@@ -457,7 +456,7 @@ public class UIPopupList : UIWidgetContainer
 			while (tp != null && tp.get_enabled())
 			{
 				tp.to = GetHighlightPosition();
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		mTweening = false;
@@ -468,29 +467,30 @@ public class UIPopupList : UIWidgetContainer
 		if (isOver)
 		{
 			UILabel component = go.GetComponent<UILabel>();
-			Highlight(component, false);
+			Highlight(component, instant: false);
 		}
 	}
 
 	private void OnItemPress(GameObject go, bool isPressed)
 	{
-		if (isPressed)
+		if (!isPressed)
 		{
-			Select(go.GetComponent<UILabel>(), true);
-			UIEventListener component = go.GetComponent<UIEventListener>();
-			value = (component.parameter as string);
-			UIPlaySound[] components = this.GetComponents<UIPlaySound>();
-			int i = 0;
-			for (int num = components.Length; i < num; i++)
-			{
-				UIPlaySound uIPlaySound = components[i];
-				if (uIPlaySound.trigger == UIPlaySound.Trigger.OnClick)
-				{
-					NGUITools.PlaySound(uIPlaySound.audioClip, uIPlaySound.volume, 1f);
-				}
-			}
-			CloseSelf();
+			return;
 		}
+		Select(go.GetComponent<UILabel>(), instant: true);
+		UIEventListener component = go.GetComponent<UIEventListener>();
+		value = (component.parameter as string);
+		UIPlaySound[] components = this.GetComponents<UIPlaySound>();
+		int i = 0;
+		for (int num = components.Length; i < num; i++)
+		{
+			UIPlaySound uIPlaySound = components[i];
+			if (uIPlaySound.trigger == UIPlaySound.Trigger.OnClick)
+			{
+				NGUITools.PlaySound(uIPlaySound.audioClip, uIPlaySound.volume, 1f);
+			}
+		}
+		CloseSelf();
 	}
 
 	private void Select(UILabel lbl, bool instant)
@@ -504,24 +504,25 @@ public class UIPopupList : UIWidgetContainer
 		//IL_003c: Invalid comparison between Unknown and I4
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006a: Invalid comparison between Unknown and I4
-		if (this.get_enabled() && current == this)
+		if (!this.get_enabled() || !(current == this))
 		{
-			int num = mLabelList.IndexOf(mHighlightedLabel);
-			if (num == -1)
+			return;
+		}
+		int num = mLabelList.IndexOf(mHighlightedLabel);
+		if (num == -1)
+		{
+			num = 0;
+		}
+		if ((int)key == 273)
+		{
+			if (num > 0)
 			{
-				num = 0;
+				Select(mLabelList[--num], instant: false);
 			}
-			if ((int)key == 273)
-			{
-				if (num > 0)
-				{
-					Select(mLabelList[--num], false);
-				}
-			}
-			else if ((int)key == 274 && num + 1 < mLabelList.Count)
-			{
-				Select(mLabelList[++num], false);
-			}
+		}
+		else if ((int)key == 274 && num + 1 < mLabelList.Count)
+		{
+			Select(mLabelList[++num], instant: false);
 		}
 	}
 
@@ -533,7 +534,7 @@ public class UIPopupList : UIWidgetContainer
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		if (this.get_enabled() && current == this && (key == UICamera.current.cancelKey0 || key == UICamera.current.cancelKey1))
 		{
-			OnSelect(false);
+			OnSelect(isSelected: false);
 		}
 	}
 
@@ -563,44 +564,43 @@ public class UIPopupList : UIWidgetContainer
 	{
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Expected O, but got Unknown
-		if (mChild != null && current == this)
+		if (!(mChild != null) || !(current == this))
 		{
-			this.StopCoroutine("CloseIfUnselected");
-			mSelection = null;
-			mLabelList.Clear();
-			if (isAnimated)
-			{
-				UIWidget[] componentsInChildren = mChild.GetComponentsInChildren<UIWidget>();
-				int i = 0;
-				for (int num = componentsInChildren.Length; i < num; i++)
-				{
-					UIWidget uIWidget = componentsInChildren[i];
-					Color color = uIWidget.color;
-					color.a = 0f;
-					TweenColor.Begin(uIWidget.get_gameObject(), 0.15f, color).method = UITweener.Method.EaseOut;
-				}
-				Collider[] componentsInChildren2 = mChild.GetComponentsInChildren<Collider>();
-				int j = 0;
-				for (int num2 = componentsInChildren2.Length; j < num2; j++)
-				{
-					componentsInChildren2[j].set_enabled(false);
-				}
-				Object.Destroy(mChild, 0.15f);
-				mFadeOutComplete = Time.get_unscaledTime() + Mathf.Max(0.1f, 0.15f);
-			}
-			else
-			{
-				Object.Destroy(mChild);
-				mFadeOutComplete = Time.get_unscaledTime() + 0.1f;
-			}
-			mBackground = null;
-			mHighlight = null;
-			mChild = null;
-			current = null;
+			return;
 		}
+		this.StopCoroutine("CloseIfUnselected");
+		mSelection = null;
+		mLabelList.Clear();
+		if (isAnimated)
+		{
+			UIWidget[] componentsInChildren = mChild.GetComponentsInChildren<UIWidget>();
+			int i = 0;
+			for (int num = componentsInChildren.Length; i < num; i++)
+			{
+				UIWidget uIWidget = componentsInChildren[i];
+				Color color = uIWidget.color;
+				color.a = 0f;
+				TweenColor.Begin(uIWidget.get_gameObject(), 0.15f, color).method = UITweener.Method.EaseOut;
+			}
+			Collider[] componentsInChildren2 = mChild.GetComponentsInChildren<Collider>();
+			int j = 0;
+			for (int num2 = componentsInChildren2.Length; j < num2; j++)
+			{
+				componentsInChildren2[j].set_enabled(false);
+			}
+			Object.Destroy(mChild, 0.15f);
+			mFadeOutComplete = Time.get_unscaledTime() + Mathf.Max(0.1f, 0.15f);
+		}
+		else
+		{
+			Object.Destroy(mChild);
+			mFadeOutComplete = Time.get_unscaledTime() + 0.1f;
+		}
+		mBackground = null;
+		mHighlight = null;
+		mChild = null;
+		current = null;
 	}
 
 	private void AnimateColor(UIWidget widget)
@@ -608,9 +608,7 @@ public class UIPopupList : UIWidgetContainer
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Expected O, but got Unknown
 		Color color = widget.color;
 		widget.color = new Color(color.r, color.g, color.b, 0f);
 		TweenColor.Begin(widget.get_gameObject(), 0.15f, color).method = UITweener.Method.EaseOut;
@@ -624,36 +622,32 @@ public class UIPopupList : UIWidgetContainer
 		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Expected O, but got Unknown
 		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 localPosition = widget.cachedTransform.get_localPosition();
 		Vector3 localPosition2 = (!placeAbove) ? new Vector3(localPosition.x, 0f, localPosition.z) : new Vector3(localPosition.x, bottom, localPosition.z);
 		widget.cachedTransform.set_localPosition(localPosition2);
-		GameObject go = widget.get_gameObject();
-		TweenPosition.Begin(go, 0.15f, localPosition).method = UITweener.Method.EaseOut;
+		GameObject gameObject = widget.get_gameObject();
+		TweenPosition.Begin(gameObject, 0.15f, localPosition).method = UITweener.Method.EaseOut;
 	}
 
 	private void AnimateScale(UIWidget widget, bool placeAbove, float bottom)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
 		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		GameObject go = widget.get_gameObject();
+		GameObject gameObject = widget.get_gameObject();
 		Transform cachedTransform = widget.cachedTransform;
 		float num = (float)activeFontSize * activeFontScale + mBgBorder * 2f;
 		cachedTransform.set_localScale(new Vector3(1f, num / (float)widget.height, 1f));
-		TweenScale.Begin(go, 0.15f, Vector3.get_one()).method = UITweener.Method.EaseOut;
+		TweenScale.Begin(gameObject, 0.15f, Vector3.get_one()).method = UITweener.Method.EaseOut;
 		if (placeAbove)
 		{
 			Vector3 localPosition = cachedTransform.get_localPosition();
 			cachedTransform.set_localPosition(new Vector3(localPosition.x, localPosition.y - (float)widget.height + num, localPosition.z));
-			TweenPosition.Begin(go, 0.15f, localPosition).method = UITweener.Method.EaseOut;
+			TweenPosition.Begin(gameObject, 0.15f, localPosition).method = UITweener.Method.EaseOut;
 		}
 	}
 
@@ -665,21 +659,20 @@ public class UIPopupList : UIWidgetContainer
 
 	private void OnClick()
 	{
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Expected O, but got Unknown
-		if (mOpenFrame != Time.get_frameCount())
+		if (mOpenFrame == Time.get_frameCount())
 		{
-			if (mChild == null)
+			return;
+		}
+		if (mChild == null)
+		{
+			if (openOn != OpenOn.DoubleClick && openOn != OpenOn.Manual && (openOn != OpenOn.RightClick || UICamera.currentTouchID == -2))
 			{
-				if (openOn != OpenOn.DoubleClick && openOn != OpenOn.Manual && (openOn != OpenOn.RightClick || UICamera.currentTouchID == -2))
-				{
-					Show();
-				}
+				Show();
 			}
-			else if (mHighlightedLabel != null)
-			{
-				OnItemPress(mHighlightedLabel.get_gameObject(), true);
-			}
+		}
+		else if (mHighlightedLabel != null)
+		{
+			OnItemPress(mHighlightedLabel.get_gameObject(), isPressed: true);
 		}
 	}
 
@@ -695,7 +688,7 @@ public class UIPopupList : UIWidgetContainer
 	{
 		do
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		while (!(UICamera.selectedObject != mSelection));
 		CloseSelf();
@@ -703,17 +696,8 @@ public class UIPopupList : UIWidgetContainer
 
 	public void Show()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Expected O, but got Unknown
 		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Expected O, but got Unknown
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Expected O, but got Unknown
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Expected O, but got Unknown
 		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
@@ -726,8 +710,6 @@ public class UIPopupList : UIWidgetContainer
 		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b3: Expected O, but got Unknown
 		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
@@ -737,64 +719,55 @@ public class UIPopupList : UIWidgetContainer
 		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0233: Expected O, but got Unknown
 		//IL_0244: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0254: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
 		//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0410: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0453: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046f: Expected O, but got Unknown
-		//IL_0580: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0585: Expected O, but got Unknown
-		//IL_05ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_074d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_074e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0400: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0405: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0416: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0459: Unknown result type (might be due to invalid IL or missing references)
+		//IL_045e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0753: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0865: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08d0: Expected O, but got Unknown
-		//IL_08ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0754: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0759: Unknown result type (might be due to invalid IL or missing references)
+		//IL_086b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_08f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08f1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_08f6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0902: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0905: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0906: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0903: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0908: Unknown result type (might be due to invalid IL or missing references)
 		//IL_090b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_090e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_090f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_090c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0911: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0914: Unknown result type (might be due to invalid IL or missing references)
-		//IL_091b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_091c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0915: Unknown result type (might be due to invalid IL or missing references)
+		//IL_091a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0921: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0922: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0927: Unknown result type (might be due to invalid IL or missing references)
-		//IL_092c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_092f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0934: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0936: Unknown result type (might be due to invalid IL or missing references)
-		//IL_093b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0963: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0928: Unknown result type (might be due to invalid IL or missing references)
+		//IL_092d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0932: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0935: Unknown result type (might be due to invalid IL or missing references)
+		//IL_093a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_093c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0941: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0969: Unknown result type (might be due to invalid IL or missing references)
 		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && mChild == null && atlas != null && isValid && items.Count > 0)
 		{
 			mLabelList.Clear();
@@ -805,205 +778,204 @@ public class UIPopupList : UIWidgetContainer
 			if (source == null)
 			{
 				Debug.LogError((object)"Popup list needs a source object...");
+				return;
+			}
+			mOpenFrame = Time.get_frameCount();
+			if (mPanel == null)
+			{
+				mPanel = UIPanel.Find(this.get_transform());
+				if (mPanel == null)
+				{
+					return;
+				}
+			}
+			mChild = new GameObject("Drop-down List");
+			mChild.set_layer(this.get_gameObject().get_layer());
+			current = this;
+			Transform transform = mChild.get_transform();
+			transform.set_parent(mPanel.cachedTransform);
+			Vector3 val;
+			Vector3 val2;
+			Vector3 val3;
+			if (openOn == OpenOn.Manual && mSelection != this.get_gameObject())
+			{
+				val = Vector2.op_Implicit(UICamera.lastEventPosition);
+				val2 = mPanel.cachedTransform.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(val));
+				val3 = val2;
+				transform.set_localPosition(val2);
+				val = transform.get_position();
 			}
 			else
 			{
-				mOpenFrame = Time.get_frameCount();
-				if (mPanel == null)
+				Bounds val4 = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, this.get_transform(), considerInactive: false, considerChildren: false);
+				val2 = val4.get_min();
+				val3 = val4.get_max();
+				transform.set_localPosition(val2);
+				val = transform.get_position();
+			}
+			this.StartCoroutine("CloseIfUnselected");
+			transform.set_localRotation(Quaternion.get_identity());
+			transform.set_localScale(Vector3.get_one());
+			mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite);
+			mBackground.pivot = UIWidget.Pivot.TopLeft;
+			mBackground.depth = NGUITools.CalculateNextDepth(mPanel.get_gameObject());
+			mBackground.color = backgroundColor;
+			Vector4 border = mBackground.border;
+			mBgBorder = border.y;
+			mBackground.cachedTransform.set_localPosition(new Vector3(0f, border.y, 0f));
+			mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite);
+			mHighlight.pivot = UIWidget.Pivot.TopLeft;
+			mHighlight.color = highlightColor;
+			UISpriteData atlasSprite = mHighlight.GetAtlasSprite();
+			if (atlasSprite == null)
+			{
+				return;
+			}
+			float num = atlasSprite.borderTop;
+			float num2 = activeFontSize;
+			float activeFontScale = this.activeFontScale;
+			float num3 = num2 * activeFontScale;
+			float num4 = 0f;
+			float num5 = 0f - padding.y;
+			List<UILabel> list = new List<UILabel>();
+			if (!items.Contains(mSelectedItem))
+			{
+				mSelectedItem = null;
+			}
+			int i = 0;
+			for (int count = items.Count; i < count; i++)
+			{
+				string text = items[i];
+				UILabel uILabel = NGUITools.AddWidget<UILabel>(mChild);
+				uILabel.set_name(i.ToString());
+				uILabel.pivot = UIWidget.Pivot.TopLeft;
+				uILabel.bitmapFont = bitmapFont;
+				uILabel.trueTypeFont = trueTypeFont;
+				uILabel.fontSize = fontSize;
+				uILabel.fontStyle = fontStyle;
+				uILabel.text = ((!isLocalized) ? text : Localization.Get(text));
+				uILabel.color = textColor;
+				Transform cachedTransform = uILabel.cachedTransform;
+				float num6 = border.x + padding.x;
+				Vector2 pivotOffset = uILabel.pivotOffset;
+				cachedTransform.set_localPosition(new Vector3(num6 - pivotOffset.x, num5, -1f));
+				uILabel.overflowMethod = UILabel.Overflow.ResizeFreely;
+				uILabel.alignment = alignment;
+				list.Add(uILabel);
+				num5 -= num3;
+				num5 -= padding.y;
+				float num7 = num4;
+				Vector2 printedSize = uILabel.printedSize;
+				num4 = Mathf.Max(num7, printedSize.x);
+				UIEventListener uIEventListener = UIEventListener.Get(uILabel.get_gameObject());
+				uIEventListener.onHover = OnItemHover;
+				uIEventListener.onPress = OnItemPress;
+				uIEventListener.parameter = text;
+				if (mSelectedItem == text || (i == 0 && string.IsNullOrEmpty(mSelectedItem)))
 				{
-					mPanel = UIPanel.Find(this.get_transform());
-					if (mPanel == null)
-					{
-						return;
-					}
+					Highlight(uILabel, instant: true);
 				}
-				mChild = new GameObject("Drop-down List");
-				mChild.set_layer(this.get_gameObject().get_layer());
-				current = this;
-				Transform val = mChild.get_transform();
-				val.set_parent(mPanel.cachedTransform);
-				Vector3 val2;
-				Vector3 val3;
-				Vector3 val4;
-				if (openOn == OpenOn.Manual && mSelection != this.get_gameObject())
+				mLabelList.Add(uILabel);
+			}
+			num4 = Mathf.Max(num4, val3.x - val2.x - (border.x + padding.x) * 2f);
+			float num8 = num4;
+			Vector3 val5 = default(Vector3);
+			val5._002Ector(num8 * 0.5f, (0f - num3) * 0.5f, 0f);
+			Vector3 val6 = default(Vector3);
+			val6._002Ector(num8, num3 + padding.y, 1f);
+			int j = 0;
+			for (int count2 = list.Count; j < count2; j++)
+			{
+				UILabel uILabel2 = list[j];
+				NGUITools.AddWidgetCollider(uILabel2.get_gameObject());
+				uILabel2.autoResizeBoxCollider = false;
+				BoxCollider component = uILabel2.GetComponent<BoxCollider>();
+				if (component != null)
 				{
-					val2 = Vector2.op_Implicit(UICamera.lastEventPosition);
-					val3 = mPanel.cachedTransform.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(val2));
-					val4 = val3;
-					val.set_localPosition(val3);
-					val2 = val.get_position();
+					Vector3 center = component.get_center();
+					val5.z = center.z;
+					component.set_center(val5);
+					component.set_size(val6);
 				}
 				else
 				{
-					Bounds val5 = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, this.get_transform(), false, false);
-					val3 = val5.get_min();
-					val4 = val5.get_max();
-					val.set_localPosition(val3);
-					val2 = val.get_position();
-				}
-				this.StartCoroutine("CloseIfUnselected");
-				val.set_localRotation(Quaternion.get_identity());
-				val.set_localScale(Vector3.get_one());
-				mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite);
-				mBackground.pivot = UIWidget.Pivot.TopLeft;
-				mBackground.depth = NGUITools.CalculateNextDepth(mPanel.get_gameObject());
-				mBackground.color = backgroundColor;
-				Vector4 border = mBackground.border;
-				mBgBorder = border.y;
-				mBackground.cachedTransform.set_localPosition(new Vector3(0f, border.y, 0f));
-				mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite);
-				mHighlight.pivot = UIWidget.Pivot.TopLeft;
-				mHighlight.color = highlightColor;
-				UISpriteData atlasSprite = mHighlight.GetAtlasSprite();
-				if (atlasSprite != null)
-				{
-					float num = (float)atlasSprite.borderTop;
-					float num2 = (float)activeFontSize;
-					float activeFontScale = this.activeFontScale;
-					float num3 = num2 * activeFontScale;
-					float num4 = 0f;
-					float num5 = 0f - padding.y;
-					List<UILabel> list = new List<UILabel>();
-					if (!items.Contains(mSelectedItem))
-					{
-						mSelectedItem = null;
-					}
-					int i = 0;
-					for (int count = items.Count; i < count; i++)
-					{
-						string text = items[i];
-						UILabel uILabel = NGUITools.AddWidget<UILabel>(mChild);
-						uILabel.set_name(i.ToString());
-						uILabel.pivot = UIWidget.Pivot.TopLeft;
-						uILabel.bitmapFont = bitmapFont;
-						uILabel.trueTypeFont = trueTypeFont;
-						uILabel.fontSize = fontSize;
-						uILabel.fontStyle = fontStyle;
-						uILabel.text = ((!isLocalized) ? text : Localization.Get(text));
-						uILabel.color = textColor;
-						object cachedTransform = (object)uILabel.cachedTransform;
-						float num6 = border.x + padding.x;
-						Vector2 pivotOffset = uILabel.pivotOffset;
-						cachedTransform.set_localPosition(new Vector3(num6 - pivotOffset.x, num5, -1f));
-						uILabel.overflowMethod = UILabel.Overflow.ResizeFreely;
-						uILabel.alignment = alignment;
-						list.Add(uILabel);
-						num5 -= num3;
-						num5 -= padding.y;
-						float num7 = num4;
-						Vector2 printedSize = uILabel.printedSize;
-						num4 = Mathf.Max(num7, printedSize.x);
-						UIEventListener uIEventListener = UIEventListener.Get(uILabel.get_gameObject());
-						uIEventListener.onHover = OnItemHover;
-						uIEventListener.onPress = OnItemPress;
-						uIEventListener.parameter = text;
-						if (mSelectedItem == text || (i == 0 && string.IsNullOrEmpty(mSelectedItem)))
-						{
-							Highlight(uILabel, true);
-						}
-						mLabelList.Add(uILabel);
-					}
-					num4 = Mathf.Max(num4, val4.x - val3.x - (border.x + padding.x) * 2f);
-					float num8 = num4;
-					Vector3 val6 = default(Vector3);
-					val6._002Ector(num8 * 0.5f, (0f - num3) * 0.5f, 0f);
-					Vector3 val7 = default(Vector3);
-					val7._002Ector(num8, num3 + padding.y, 1f);
-					int j = 0;
-					for (int count2 = list.Count; j < count2; j++)
-					{
-						UILabel uILabel2 = list[j];
-						NGUITools.AddWidgetCollider(uILabel2.get_gameObject());
-						uILabel2.autoResizeBoxCollider = false;
-						BoxCollider component = uILabel2.GetComponent<BoxCollider>();
-						if (component != null)
-						{
-							Vector3 center = component.get_center();
-							val6.z = center.z;
-							component.set_center(val6);
-							component.set_size(val7);
-						}
-						else
-						{
-							BoxCollider2D component2 = uILabel2.GetComponent<BoxCollider2D>();
-							component2.set_offset(Vector2.op_Implicit(val6));
-							component2.set_size(Vector2.op_Implicit(val7));
-						}
-					}
-					int width = Mathf.RoundToInt(num4);
-					num4 += (border.x + padding.x) * 2f;
-					num5 -= border.y;
-					mBackground.width = Mathf.RoundToInt(num4);
-					mBackground.height = Mathf.RoundToInt(0f - num5 + border.y);
-					int k = 0;
-					for (int count3 = list.Count; k < count3; k++)
-					{
-						UILabel uILabel3 = list[k];
-						uILabel3.overflowMethod = UILabel.Overflow.ShrinkContent;
-						uILabel3.width = width;
-					}
-					float num9 = 2f * atlas.pixelSize;
-					float num10 = num4 - (border.x + padding.x) * 2f + (float)atlasSprite.borderLeft * num9;
-					float num11 = num3 + num * num9;
-					mHighlight.width = Mathf.RoundToInt(num10);
-					mHighlight.height = Mathf.RoundToInt(num11);
-					bool flag = position == Position.Above;
-					if (position == Position.Auto)
-					{
-						UICamera uICamera = UICamera.FindCameraForLayer(mSelection.get_layer());
-						if (uICamera != null)
-						{
-							Vector3 val8 = uICamera.cachedCamera.WorldToViewportPoint(val2);
-							flag = (val8.y < 0.5f);
-						}
-					}
-					if (isAnimated)
-					{
-						AnimateColor(mBackground);
-						if (Time.get_timeScale() == 0f || Time.get_timeScale() >= 0.1f)
-						{
-							float bottom = num5 + num3;
-							Animate(mHighlight, flag, bottom);
-							int l = 0;
-							for (int count4 = list.Count; l < count4; l++)
-							{
-								Animate(list[l], flag, bottom);
-							}
-							AnimateScale(mBackground, flag, bottom);
-						}
-					}
-					if (flag)
-					{
-						val3.y = val4.y - border.y;
-						val4.y = val3.y + (float)mBackground.height;
-						val4.x = val3.x + (float)mBackground.width;
-						val.set_localPosition(new Vector3(val3.x, val4.y - border.y, val3.z));
-					}
-					else
-					{
-						val4.y = val3.y + border.y;
-						val3.y = val4.y - (float)mBackground.height;
-						val4.x = val3.x + (float)mBackground.width;
-					}
-					Transform val9 = mPanel.cachedTransform.get_parent();
-					if (val9 != null)
-					{
-						val3 = mPanel.cachedTransform.TransformPoint(val3);
-						val4 = mPanel.cachedTransform.TransformPoint(val4);
-						val3 = val9.InverseTransformPoint(val3);
-						val4 = val9.InverseTransformPoint(val4);
-					}
-					Vector3 val10 = mPanel.CalculateConstrainOffset(Vector2.op_Implicit(val3), Vector2.op_Implicit(val4));
-					val2 = val.get_localPosition() + val10;
-					val2.x = Mathf.Round(val2.x);
-					val2.y = Mathf.Round(val2.y);
-					val.set_localPosition(val2);
+					BoxCollider2D component2 = uILabel2.GetComponent<BoxCollider2D>();
+					component2.set_offset(Vector2.op_Implicit(val5));
+					component2.set_size(Vector2.op_Implicit(val6));
 				}
 			}
+			int width = Mathf.RoundToInt(num4);
+			num4 += (border.x + padding.x) * 2f;
+			num5 -= border.y;
+			mBackground.width = Mathf.RoundToInt(num4);
+			mBackground.height = Mathf.RoundToInt(0f - num5 + border.y);
+			int k = 0;
+			for (int count3 = list.Count; k < count3; k++)
+			{
+				UILabel uILabel3 = list[k];
+				uILabel3.overflowMethod = UILabel.Overflow.ShrinkContent;
+				uILabel3.width = width;
+			}
+			float num9 = 2f * atlas.pixelSize;
+			float num10 = num4 - (border.x + padding.x) * 2f + (float)atlasSprite.borderLeft * num9;
+			float num11 = num3 + num * num9;
+			mHighlight.width = Mathf.RoundToInt(num10);
+			mHighlight.height = Mathf.RoundToInt(num11);
+			bool flag = position == Position.Above;
+			if (position == Position.Auto)
+			{
+				UICamera uICamera = UICamera.FindCameraForLayer(mSelection.get_layer());
+				if (uICamera != null)
+				{
+					Vector3 val7 = uICamera.cachedCamera.WorldToViewportPoint(val);
+					flag = (val7.y < 0.5f);
+				}
+			}
+			if (isAnimated)
+			{
+				AnimateColor(mBackground);
+				if (Time.get_timeScale() == 0f || Time.get_timeScale() >= 0.1f)
+				{
+					float bottom = num5 + num3;
+					Animate(mHighlight, flag, bottom);
+					int l = 0;
+					for (int count4 = list.Count; l < count4; l++)
+					{
+						Animate(list[l], flag, bottom);
+					}
+					AnimateScale(mBackground, flag, bottom);
+				}
+			}
+			if (flag)
+			{
+				val2.y = val3.y - border.y;
+				val3.y = val2.y + (float)mBackground.height;
+				val3.x = val2.x + (float)mBackground.width;
+				transform.set_localPosition(new Vector3(val2.x, val3.y - border.y, val2.z));
+			}
+			else
+			{
+				val3.y = val2.y + border.y;
+				val2.y = val3.y - (float)mBackground.height;
+				val3.x = val2.x + (float)mBackground.width;
+			}
+			Transform parent = mPanel.cachedTransform.get_parent();
+			if (parent != null)
+			{
+				val2 = mPanel.cachedTransform.TransformPoint(val2);
+				val3 = mPanel.cachedTransform.TransformPoint(val3);
+				val2 = parent.InverseTransformPoint(val2);
+				val3 = parent.InverseTransformPoint(val3);
+			}
+			Vector3 val8 = mPanel.CalculateConstrainOffset(Vector2.op_Implicit(val2), Vector2.op_Implicit(val3));
+			val = transform.get_localPosition() + val8;
+			val.x = Mathf.Round(val.x);
+			val.y = Mathf.Round(val.y);
+			transform.set_localPosition(val);
 		}
 		else
 		{
-			OnSelect(false);
+			OnSelect(isSelected: false);
 		}
 	}
 }

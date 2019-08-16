@@ -14,10 +14,10 @@ class DeferredRequestCreator implements OnPreDrawListener {
         this(requestCreator, imageView, null);
     }
 
-    DeferredRequestCreator(RequestCreator requestCreator, ImageView imageView, Callback callback) {
+    DeferredRequestCreator(RequestCreator requestCreator, ImageView imageView, Callback callback2) {
         this.creator = requestCreator;
-        this.target = new WeakReference(imageView);
-        this.callback = callback;
+        this.target = new WeakReference<>(imageView);
+        this.callback = callback2;
         imageView.getViewTreeObserver().addOnPreDrawListener(this);
     }
 
@@ -37,7 +37,8 @@ class DeferredRequestCreator implements OnPreDrawListener {
         return true;
     }
 
-    void cancel() {
+    /* access modifiers changed from: 0000 */
+    public void cancel() {
         this.callback = null;
         ImageView imageView = (ImageView) this.target.get();
         if (imageView != null) {

@@ -11,11 +11,11 @@ public class AppInfo {
     public static String getApplicationName(Context context) {
         String str = getChatSdkName() + " user";
         try {
-            str = context.getString(context.getApplicationInfo().labelRes);
+            return context.getString(context.getApplicationInfo().labelRes);
         } catch (NotFoundException e) {
             Log.w(TAG, "Can not find application name, will return default");
+            return str;
         }
-        return str;
     }
 
     public static String getApplicationVersionName(Context context) {

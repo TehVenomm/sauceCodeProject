@@ -1,4 +1,4 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.content.Context;
 import android.database.ContentObserver;
@@ -14,6 +14,7 @@ import android.widget.Filter;
 import android.widget.FilterQueryProvider;
 import android.widget.Filterable;
 
+/* renamed from: android.support.v4.widget.CursorAdapter */
 public abstract class CursorAdapter extends BaseAdapter implements Filterable, CursorFilterClient {
     @Deprecated
     public static final int FLAG_AUTO_REQUERY = 1;
@@ -37,6 +38,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable, C
     @RestrictTo({Scope.LIBRARY_GROUP})
     protected int mRowIDColumn;
 
+    /* renamed from: android.support.v4.widget.CursorAdapter$ChangeObserver */
     private class ChangeObserver extends ContentObserver {
         ChangeObserver() {
             super(new Handler());
@@ -51,6 +53,7 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable, C
         }
     }
 
+    /* renamed from: android.support.v4.widget.CursorAdapter$MyDataSetObserver */
     private class MyDataSetObserver extends DataSetObserver {
         MyDataSetObserver() {
         }
@@ -93,7 +96,10 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable, C
     }
 
     public int getCount() {
-        return (!this.mDataValid || this.mCursor == null) ? 0 : this.mCursor.getCount();
+        if (!this.mDataValid || this.mCursor == null) {
+            return 0;
+        }
+        return this.mCursor.getCount();
     }
 
     public Cursor getCursor() {
@@ -132,20 +138,23 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable, C
     }
 
     public long getItemId(int i) {
-        return (this.mDataValid && this.mCursor != null && this.mCursor.moveToPosition(i)) ? this.mCursor.getLong(this.mRowIDColumn) : 0;
+        if (!this.mDataValid || this.mCursor == null || !this.mCursor.moveToPosition(i)) {
+            return 0;
+        }
+        return this.mCursor.getLong(this.mRowIDColumn);
     }
 
     public View getView(int i, View view, ViewGroup viewGroup) {
         if (!this.mDataValid) {
             throw new IllegalStateException("this should only be called when the cursor is valid");
-        } else if (this.mCursor.moveToPosition(i)) {
+        } else if (!this.mCursor.moveToPosition(i)) {
+            throw new IllegalStateException("couldn't move cursor to position " + i);
+        } else {
             if (view == null) {
                 view = newView(this.mContext, this.mCursor, viewGroup);
             }
             bindView(view, this.mContext, this.mCursor);
             return view;
-        } else {
-            throw new IllegalStateException("couldn't move cursor to position " + i);
         }
     }
 
@@ -153,7 +162,8 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable, C
         return true;
     }
 
-    void init(Context context, Cursor cursor, int i) {
+    /* access modifiers changed from: 0000 */
+    public void init(Context context, Cursor cursor, int i) {
         boolean z = false;
         if ((i & 1) == 1) {
             i |= 2;
@@ -185,8 +195,9 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable, C
         }
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected void init(Context context, Cursor cursor, boolean z) {
+    public void init(Context context, Cursor cursor, boolean z) {
         init(context, cursor, z ? 1 : 2);
     }
 
@@ -196,7 +207,8 @@ public abstract class CursorAdapter extends BaseAdapter implements Filterable, C
 
     public abstract View newView(Context context, Cursor cursor, ViewGroup viewGroup);
 
-    protected void onContentChanged() {
+    /* access modifiers changed from: protected */
+    public void onContentChanged() {
         if (this.mAutoRequery && this.mCursor != null && !this.mCursor.isClosed()) {
             this.mDataValid = this.mCursor.requery();
         }

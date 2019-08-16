@@ -55,32 +55,35 @@ public class CannonballAttackObject : AttackColliderObject
 
 	protected override void OnTriggerEnter(Collider collider)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		hitLayer = collider.get_gameObject().get_layer();
-		if (((1 << hitLayer) & ignoreLayerMask) == 0)
+		if (((1 << hitLayer) & ignoreLayerMask) != 0)
 		{
-			if (hitLayer == 11)
+			return;
+		}
+		if (hitLayer == 11)
+		{
+			hitEnemy = collider.get_gameObject().GetComponent<Enemy>();
+		}
+		else if (hitLayer == 31)
+		{
+			EscapePointObject component = collider.get_gameObject().GetComponent<EscapePointObject>();
+			if (component != null)
 			{
-				hitEnemy = collider.get_gameObject().GetComponent<Enemy>();
+				return;
 			}
-			else if (hitLayer == 31)
+			BarrierBulletObject component2 = collider.get_gameObject().GetComponent<BarrierBulletObject>();
+			if (component2 != null)
 			{
-				EscapePointObject component = collider.get_gameObject().GetComponent<EscapePointObject>();
-				if (component != null)
-				{
-					return;
-				}
+				return;
 			}
-			isHit = true;
-			base.OnTriggerEnter(collider);
-			DeactivateOwnCollider();
-			Destroy();
-			if (owner != null)
-			{
-				owner.OnHit();
-			}
+		}
+		isHit = true;
+		base.OnTriggerEnter(collider);
+		DeactivateOwnCollider();
+		Destroy();
+		if (owner != null)
+		{
+			owner.OnHit();
 		}
 	}
 }

@@ -23,8 +23,6 @@ public class EquipModelTable : Singleton<EquipModelTable>, IDataTable
 
 	public class Data
 	{
-		public const float Z_UNIT = 0.0001f;
-
 		public int hairMode = 1;
 
 		public int flags = 15;
@@ -32,6 +30,8 @@ public class EquipModelTable : Singleton<EquipModelTable>, IDataTable
 		public byte bodyDraw;
 
 		public byte highTex;
+
+		public const float Z_UNIT = 0.0001f;
 
 		public bool needFace => (flags & 1) != 0;
 
@@ -71,7 +71,7 @@ public class EquipModelTable : Singleton<EquipModelTable>, IDataTable
 	public void CreateTable(string csv_text)
 	{
 		table = new UIntKeyTable<Data>();
-		CSVReader cSVReader = new CSVReader(csv_text, "type,id,face,hair,body,zbias,helm,arm,leg,hitex", false);
+		CSVReader cSVReader = new CSVReader(csv_text, "type,id,face,hair,body,zbias,helm,arm,leg,hitex");
 		TYPE tYPE = TYPE.WEP;
 		while (cSVReader.NextLine())
 		{

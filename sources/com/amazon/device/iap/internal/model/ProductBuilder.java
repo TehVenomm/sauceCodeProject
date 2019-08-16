@@ -49,8 +49,8 @@ public class ProductBuilder {
         return this;
     }
 
-    public ProductBuilder setProductType(ProductType productType) {
-        this.productType = productType;
+    public ProductBuilder setProductType(ProductType productType2) {
+        this.productType = productType2;
         return this;
     }
 

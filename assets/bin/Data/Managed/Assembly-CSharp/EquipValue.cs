@@ -105,7 +105,7 @@ public class EquipValue
 		for (int count = item.sIds.Count; l < count; l++)
 		{
 			SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)item.sIds[l]);
-			GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, item.sLvs[l]);
+			GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, item.sLvs[l], item.GetSkillExceed(l));
 			constHp += growSkillItemData.GetGrowParamHp(skillItemData.baseHp);
 			constAtks[0] += growSkillItemData.GetGrowParamAtk(skillItemData.baseAtk);
 			constDefs[0] += growSkillItemData.GetGrowParamDef(skillItemData.baseDef);
@@ -116,15 +116,16 @@ public class EquipValue
 				constAtks[m + 1] += growParamElemAtk2[m];
 				constTols[m] += growParamElemDef2[m];
 			}
-			if (skillItemData.IsPassive())
+			if (!skillItemData.IsPassive())
 			{
-				int n = 0;
-				for (int num = skillItemData.supportType.Length; n < num; n++)
+				continue;
+			}
+			int n = 0;
+			for (int num = skillItemData.supportType.Length; n < num; n++)
+			{
+				if (skillItemData.supportType[n] != BuffParam.BUFFTYPE.NONE)
 				{
-					if (skillItemData.supportType[n] != BuffParam.BUFFTYPE.NONE)
-					{
-						skillSupport.Add(new SkillSupport(skillItemData.supportPassiveEqType[n], skillItemData.supportType[n], growSkillItemData.GetGrowParamSupprtValue(skillItemData.supportValue, n), skillItemData.supportPassiveSpAttackType));
-					}
+					skillSupport.Add(new SkillSupport(skillItemData.supportPassiveEqType[n], skillItemData.supportType[n], growSkillItemData.GetGrowParamSupprtValue(skillItemData.supportValue, n), skillItemData.supportPassiveSpAttackType));
 				}
 			}
 		}
@@ -136,11 +137,8 @@ public class EquipValue
 			if (this.ability.ContainsKey(num3))
 			{
 				Dictionary<int, int> dictionary;
-				Dictionary<int, int> dictionary2 = dictionary = this.ability;
 				int key;
-				int key2 = key = num3;
-				key = dictionary[key];
-				dictionary2[key2] = key + num4;
+				(dictionary = this.ability)[key = num3] = dictionary[key] + num4;
 			}
 			else
 			{
@@ -153,37 +151,32 @@ public class EquipValue
 			EquipItem.Ability ability = data.fixedAbility[num5];
 			if (this.ability.ContainsKey(ability.id))
 			{
-				Dictionary<int, int> dictionary3;
-				Dictionary<int, int> dictionary4 = dictionary3 = this.ability;
-				int key;
-				int key3 = key = ability.id;
-				key = dictionary3[key];
-				dictionary4[key3] = key + ability.pt;
+				Dictionary<int, int> dictionary;
+				int id;
+				(dictionary = this.ability)[id = ability.id] = dictionary[id] + ability.pt;
 			}
 			else
 			{
 				this.ability.Add(ability.id, ability.pt);
 			}
 		}
-		if (!object.ReferenceEquals(exceedParam, null))
+		if (object.ReferenceEquals(exceedParam, null))
 		{
-			int num7 = 0;
-			for (int num8 = exceedParam.ability.Length; num7 < num8; num7++)
+			return;
+		}
+		int num7 = 0;
+		for (int num8 = exceedParam.ability.Length; num7 < num8; num7++)
+		{
+			EquipItem.Ability ability2 = exceedParam.ability[num7];
+			if (this.ability.ContainsKey(ability2.id))
 			{
-				EquipItem.Ability ability2 = exceedParam.ability[num7];
-				if (this.ability.ContainsKey(ability2.id))
-				{
-					Dictionary<int, int> dictionary5;
-					Dictionary<int, int> dictionary6 = dictionary5 = this.ability;
-					int key;
-					int key4 = key = ability2.id;
-					key = dictionary5[key];
-					dictionary6[key4] = key + ability2.pt;
-				}
-				else
-				{
-					this.ability.Add(ability2.id, ability2.pt);
-				}
+				Dictionary<int, int> dictionary;
+				int id2;
+				(dictionary = this.ability)[id2 = ability2.id] = dictionary[id2] + ability2.pt;
+			}
+			else
+			{
+				this.ability.Add(ability2.id, ability2.pt);
 			}
 		}
 	}

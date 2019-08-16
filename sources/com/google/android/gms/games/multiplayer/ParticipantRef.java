@@ -3,17 +3,17 @@ package com.google.android.gms.games.multiplayer;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayerRef;
 
-public final class ParticipantRef extends zzc implements Participant {
-    private final PlayerRef zzhmj;
+public final class ParticipantRef extends DataBufferRef implements Participant {
+    private final PlayerRef zzpl;
 
     public ParticipantRef(DataHolder dataHolder, int i) {
         super(dataHolder, i);
-        this.zzhmj = new PlayerRef(dataHolder, i);
+        this.zzpl = new PlayerRef(dataHolder, i);
     }
 
     public final int describeContents() {
@@ -33,31 +33,31 @@ public final class ParticipantRef extends zzc implements Participant {
     }
 
     public final String getDisplayName() {
-        return zzfv("external_player_id") ? getString("default_display_name") : this.zzhmj.getDisplayName();
+        return hasNull("external_player_id") ? getString("default_display_name") : this.zzpl.getDisplayName();
     }
 
     public final void getDisplayName(CharArrayBuffer charArrayBuffer) {
-        if (zzfv("external_player_id")) {
-            zza("default_display_name", charArrayBuffer);
+        if (hasNull("external_player_id")) {
+            copyToBuffer("default_display_name", charArrayBuffer);
         } else {
-            this.zzhmj.getDisplayName(charArrayBuffer);
+            this.zzpl.getDisplayName(charArrayBuffer);
         }
     }
 
     public final Uri getHiResImageUri() {
-        return zzfv("external_player_id") ? zzfu("default_display_hi_res_image_uri") : this.zzhmj.getHiResImageUri();
+        return hasNull("external_player_id") ? parseUri("default_display_hi_res_image_uri") : this.zzpl.getHiResImageUri();
     }
 
     public final String getHiResImageUrl() {
-        return zzfv("external_player_id") ? getString("default_display_hi_res_image_url") : this.zzhmj.getHiResImageUrl();
+        return hasNull("external_player_id") ? getString("default_display_hi_res_image_url") : this.zzpl.getHiResImageUrl();
     }
 
     public final Uri getIconImageUri() {
-        return zzfv("external_player_id") ? zzfu("default_display_image_uri") : this.zzhmj.getIconImageUri();
+        return hasNull("external_player_id") ? parseUri("default_display_image_uri") : this.zzpl.getIconImageUri();
     }
 
     public final String getIconImageUrl() {
-        return zzfv("external_player_id") ? getString("default_display_image_url") : this.zzhmj.getIconImageUrl();
+        return hasNull("external_player_id") ? getString("default_display_image_url") : this.zzpl.getIconImageUrl();
     }
 
     public final String getParticipantId() {
@@ -65,11 +65,14 @@ public final class ParticipantRef extends zzc implements Participant {
     }
 
     public final Player getPlayer() {
-        return zzfv("external_player_id") ? null : this.zzhmj;
+        if (hasNull("external_player_id")) {
+            return null;
+        }
+        return this.zzpl;
     }
 
     public final ParticipantResult getResult() {
-        if (zzfv("result_type")) {
+        if (hasNull("result_type")) {
             return null;
         }
         return new ParticipantResult(getParticipantId(), getInteger("result_type"), getInteger("placing"));
@@ -80,7 +83,7 @@ public final class ParticipantRef extends zzc implements Participant {
     }
 
     public final int hashCode() {
-        return ParticipantEntity.zza(this);
+        return ParticipantEntity.zza((Participant) this);
     }
 
     public final boolean isConnectedToRoom() {
@@ -95,7 +98,7 @@ public final class ParticipantRef extends zzc implements Participant {
         ((ParticipantEntity) ((Participant) freeze())).writeToParcel(parcel, i);
     }
 
-    public final String zzaru() {
+    public final String zzdn() {
         return getString("client_address");
     }
 }

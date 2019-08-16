@@ -28,7 +28,8 @@ public class ArrayBlockingQueueDeserializer extends CollectionDeserializer {
         super(arrayBlockingQueueDeserializer);
     }
 
-    protected ArrayBlockingQueueDeserializer withResolved(JsonDeserializer<?> jsonDeserializer, JsonDeserializer<?> jsonDeserializer2, TypeDeserializer typeDeserializer, Boolean bool) {
+    /* access modifiers changed from: protected */
+    public ArrayBlockingQueueDeserializer withResolved(JsonDeserializer<?> jsonDeserializer, JsonDeserializer<?> jsonDeserializer2, TypeDeserializer typeDeserializer, Boolean bool) {
         if (jsonDeserializer == this._delegateDeserializer && jsonDeserializer2 == this._valueDeserializer && typeDeserializer == this._valueTypeDeserializer && this._unwrapSingle == bool) {
             return this;
         }
@@ -49,10 +50,11 @@ public class ArrayBlockingQueueDeserializer extends CollectionDeserializer {
     }
 
     public Collection<Object> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, Collection<Object> collection) throws IOException {
+        Object deserializeWithType;
         if (!jsonParser.isExpectedStartArrayToken()) {
             return handleNonArray(jsonParser, deserializationContext, new ArrayBlockingQueue(1));
         }
-        Object arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         JsonDeserializer jsonDeserializer = this._valueDeserializer;
         TypeDeserializer typeDeserializer = this._valueTypeDeserializer;
         while (true) {
@@ -61,17 +63,16 @@ public class ArrayBlockingQueueDeserializer extends CollectionDeserializer {
                 if (nextToken == JsonToken.END_ARRAY) {
                     break;
                 }
-                Object nullValue;
                 if (nextToken == JsonToken.VALUE_NULL) {
-                    nullValue = jsonDeserializer.getNullValue(deserializationContext);
+                    deserializeWithType = jsonDeserializer.getNullValue(deserializationContext);
                 } else if (typeDeserializer == null) {
-                    nullValue = jsonDeserializer.deserialize(jsonParser, deserializationContext);
+                    deserializeWithType = jsonDeserializer.deserialize(jsonParser, deserializationContext);
                 } else {
-                    nullValue = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
+                    deserializeWithType = jsonDeserializer.deserializeWithType(jsonParser, deserializationContext, typeDeserializer);
                 }
-                arrayList.add(nullValue);
-            } catch (Throwable e) {
-                throw JsonMappingException.wrapWithPath(e, arrayList, arrayList.size());
+                arrayList.add(deserializeWithType);
+            } catch (Exception e) {
+                throw JsonMappingException.wrapWithPath((Throwable) e, (Object) arrayList, arrayList.size());
             }
         }
         if (collection == null) {

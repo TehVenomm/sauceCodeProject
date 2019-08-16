@@ -10,11 +10,13 @@ public abstract class zzm<T extends ReflectedParcelable> extends zza<T> {
         super(str, collection, collection2, i);
     }
 
-    protected final /* synthetic */ void zza(Bundle bundle, Object obj) {
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ void zza(Bundle bundle, Object obj) {
         bundle.putParcelable(getName(), (ReflectedParcelable) obj);
     }
 
-    protected final /* synthetic */ Object zzm(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public final /* synthetic */ Object zzb(Bundle bundle) {
         return (ReflectedParcelable) bundle.getParcelable(getName());
     }
 }

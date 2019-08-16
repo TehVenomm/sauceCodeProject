@@ -82,9 +82,14 @@ public class TaskChecker : BattleCheckerBase
 		taskCount.death++;
 	}
 
-	public void OnSoulOneHandSword()
+	public void OnJustGuard()
 	{
-		taskCount.soulOneHandSword++;
+		taskCount.justGuard++;
+	}
+
+	protected override void OnRevengeBurst(int damage)
+	{
+		taskCount.revengeBurst++;
 	}
 
 	protected override void OnHeatTwoHandSword(int damage)
@@ -92,14 +97,34 @@ public class TaskChecker : BattleCheckerBase
 		taskCount.heatTwoHandSword++;
 	}
 
-	public void OnSoulTwoHandSword()
+	public void OnJump()
 	{
-		taskCount.soulTwoHandSword++;
+		taskCount.jump++;
 	}
 
 	public void OnHeatPairSwords()
 	{
 		taskCount.heatPairSwords++;
+	}
+
+	public void OnShadowSealing()
+	{
+		taskCount.shadowSealing++;
+	}
+
+	public void OnSoulOneHandSword()
+	{
+		taskCount.soulOneHandSword++;
+	}
+
+	public void OnSoulTwoHandSword()
+	{
+		taskCount.soulTwoHandSword++;
+	}
+
+	public void OnSoulSpear()
+	{
+		taskCount.soulSpear++;
 	}
 
 	public void OnSoulPairSwords()
@@ -112,23 +137,48 @@ public class TaskChecker : BattleCheckerBase
 		taskCount.soulArrow++;
 	}
 
-	protected override void OnRevengeBurst(int damage)
+	protected override void OnBurstOneHandSword(int damage)
 	{
-		taskCount.revengeBurst++;
+		taskCount.burstOneHandSword++;
 	}
 
-	public void OnJustGuard()
+	public void OnBurstTwoHandSword()
 	{
-		taskCount.justGuard++;
+		taskCount.thsFullBurst++;
 	}
 
-	public void OnShadowSealing()
+	public void OnBurstPairSwords()
 	{
-		taskCount.shadowSealing++;
+		taskCount.burstPairSwords++;
 	}
 
-	public void OnJump()
+	public void OnBurstSpear()
 	{
-		taskCount.jump++;
+		taskCount.burstSpear++;
+	}
+
+	public void OnBurstArrow()
+	{
+		taskCount.burstArrow++;
+	}
+
+	public void OnConcussion()
+	{
+		taskCount.concussion++;
+	}
+
+	public void OnOracleOneHandSword()
+	{
+		taskCount.oracleOneHandSword++;
+	}
+
+	public void OnOracleSpear()
+	{
+		taskCount.oracleSpear++;
+	}
+
+	public void OnOraclePairSwords()
+	{
+		taskCount.oraclePairSwords++;
 	}
 }

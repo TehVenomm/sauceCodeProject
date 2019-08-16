@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class MappingIterator<T> implements Iterator<T>, Closeable {
-    protected static final MappingIterator<?> EMPTY_ITERATOR = new MappingIterator(null, null, null, null, false, null);
+    protected static final MappingIterator<?> EMPTY_ITERATOR = new MappingIterator<>(null, null, null, null, false, null);
     protected static final int STATE_CLOSED = 0;
     protected static final int STATE_HAS_VALUE = 3;
     protected static final int STATE_MAY_HAVE_VALUE = 2;
@@ -45,13 +45,13 @@ public class MappingIterator<T> implements Iterator<T>, Closeable {
             return;
         }
         JsonStreamContext parsingContext = jsonParser.getParsingContext();
-        if (z && jsonParser.isExpectedStartArrayToken()) {
-            jsonParser.clearCurrentToken();
-        } else {
+        if (!z || !jsonParser.isExpectedStartArrayToken()) {
             JsonToken currentToken = jsonParser.getCurrentToken();
             if (currentToken == JsonToken.START_OBJECT || currentToken == JsonToken.START_ARRAY) {
                 parsingContext = parsingContext.getParent();
             }
+        } else {
+            jsonParser.clearCurrentToken();
         }
         this._seqContext = parsingContext;
         this._state = 2;
@@ -76,7 +76,7 @@ public class MappingIterator<T> implements Iterator<T>, Closeable {
             return nextValue();
         } catch (JsonMappingException e) {
             throw new RuntimeJsonMappingException(e.getMessage(), e);
-        } catch (Throwable e2) {
+        } catch (IOException e2) {
             throw new RuntimeException(e2.getMessage(), e2);
         }
     }
@@ -122,6 +122,7 @@ public class MappingIterator<T> implements Iterator<T>, Closeable {
     }
 
     public T nextValue() throws IOException {
+        T t;
         switch (this._state) {
             case 0:
                 return _throwNoSuchElement();
@@ -132,25 +133,24 @@ public class MappingIterator<T> implements Iterator<T>, Closeable {
                 }
                 break;
         }
+        int i = 1;
         try {
-            T deserialize;
             if (this._updatedValue == null) {
-                deserialize = this._deserializer.deserialize(this._parser, this._context);
+                t = this._deserializer.deserialize(this._parser, this._context);
             } else {
                 this._deserializer.deserialize(this._parser, this._context, this._updatedValue);
-                deserialize = this._updatedValue;
+                t = this._updatedValue;
             }
-            this._state = 2;
-            this._parser.clearCurrentToken();
-            return deserialize;
-        } catch (Throwable th) {
-            this._state = 1;
+            i = 2;
+            return t;
+        } finally {
+            this._state = i;
             this._parser.clearCurrentToken();
         }
     }
 
     public List<T> readAll() throws IOException {
-        return readAll(new ArrayList());
+        return readAll((L) new ArrayList());
     }
 
     public <L extends List<? super T>> L readAll(L l) throws IOException {
@@ -179,34 +179,59 @@ public class MappingIterator<T> implements Iterator<T>, Closeable {
         return this._parser.getCurrentLocation();
     }
 
-    protected void _resync() throws IOException {
-        JsonParser jsonParser = this._parser;
-        if (jsonParser.getParsingContext() != this._seqContext) {
-            while (true) {
-                JsonToken nextToken = jsonParser.nextToken();
-                if (nextToken == JsonToken.END_ARRAY || nextToken == JsonToken.END_OBJECT) {
-                    if (jsonParser.getParsingContext() == this._seqContext) {
-                        jsonParser.clearCurrentToken();
-                        return;
-                    }
-                } else if (nextToken == JsonToken.START_ARRAY || nextToken == JsonToken.START_OBJECT) {
-                    jsonParser.skipChildren();
-                } else if (nextToken == null) {
-                    return;
-                }
-            }
-        }
+    /* access modifiers changed from: protected */
+    /* JADX WARNING: CFG modification limit reached, blocks count: 121 */
+    /* JADX WARNING: Code restructure failed: missing block: B:15:0x002e, code lost:
+        if (r1 != null) goto L_0x0016;
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public void _resync() throws java.io.IOException {
+        /*
+            r3 = this;
+            com.fasterxml.jackson.core.JsonParser r0 = r3._parser
+            com.fasterxml.jackson.core.JsonStreamContext r1 = r0.getParsingContext()
+            com.fasterxml.jackson.core.JsonStreamContext r2 = r3._seqContext
+            if (r1 != r2) goto L_0x0016
+        L_0x000a:
+            return
+        L_0x000b:
+            com.fasterxml.jackson.core.JsonToken r2 = com.fasterxml.jackson.core.JsonToken.START_ARRAY
+            if (r1 == r2) goto L_0x0013
+            com.fasterxml.jackson.core.JsonToken r2 = com.fasterxml.jackson.core.JsonToken.START_OBJECT
+            if (r1 != r2) goto L_0x002e
+        L_0x0013:
+            r0.skipChildren()
+        L_0x0016:
+            com.fasterxml.jackson.core.JsonToken r1 = r0.nextToken()
+            com.fasterxml.jackson.core.JsonToken r2 = com.fasterxml.jackson.core.JsonToken.END_ARRAY
+            if (r1 == r2) goto L_0x0022
+            com.fasterxml.jackson.core.JsonToken r2 = com.fasterxml.jackson.core.JsonToken.END_OBJECT
+            if (r1 != r2) goto L_0x000b
+        L_0x0022:
+            com.fasterxml.jackson.core.JsonStreamContext r1 = r0.getParsingContext()
+            com.fasterxml.jackson.core.JsonStreamContext r2 = r3._seqContext
+            if (r1 != r2) goto L_0x0016
+            r0.clearCurrentToken()
+            goto L_0x000a
+        L_0x002e:
+            if (r1 != 0) goto L_0x0016
+            goto L_0x000a
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.MappingIterator._resync():void");
     }
 
-    protected <R> R _throwNoSuchElement() {
+    /* access modifiers changed from: protected */
+    public <R> R _throwNoSuchElement() {
         throw new NoSuchElementException();
     }
 
-    protected <R> R _handleMappingException(JsonMappingException jsonMappingException) {
+    /* access modifiers changed from: protected */
+    public <R> R _handleMappingException(JsonMappingException jsonMappingException) {
         throw new RuntimeJsonMappingException(jsonMappingException.getMessage(), jsonMappingException);
     }
 
-    protected <R> R _handleIOException(IOException iOException) {
+    /* access modifiers changed from: protected */
+    public <R> R _handleIOException(IOException iOException) {
         throw new RuntimeException(iOException.getMessage(), iOException);
     }
 }

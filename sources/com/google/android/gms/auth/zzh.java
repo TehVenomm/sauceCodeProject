@@ -4,17 +4,17 @@ import android.accounts.Account;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzei;
+import com.google.android.gms.internal.auth.zzf;
 import java.io.IOException;
 
-final class zzh implements zzi<Bundle> {
-    private /* synthetic */ Account zzdxn;
+final class zzh implements zzj<Bundle> {
+    private final /* synthetic */ Account zzo;
 
     zzh(Account account) {
-        this.zzdxn = account;
+        this.zzo = account;
     }
 
-    public final /* synthetic */ Object zzaa(IBinder iBinder) throws RemoteException, IOException, GoogleAuthException {
-        return (Bundle) zzd.zzl(zzei.zza(iBinder).zza(this.zzdxn));
+    public final /* synthetic */ Object zzb(IBinder iBinder) throws RemoteException, IOException, GoogleAuthException {
+        return (Bundle) zzd.zza(zzf.zza(iBinder).zza(this.zzo));
     }
 }

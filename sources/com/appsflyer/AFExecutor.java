@@ -11,61 +11,65 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class AFExecutor {
+
     /* renamed from: ˏ */
-    private static AFExecutor f111;
+    private static AFExecutor f130;
+
     /* renamed from: ˊ */
-    private ScheduledExecutorService f112;
+    private ScheduledExecutorService f131;
+
     /* renamed from: ˎ */
-    private Executor f113;
+    private Executor f132;
+
     /* renamed from: ॱ */
-    private Executor f114;
+    private Executor f133;
 
     private AFExecutor() {
     }
 
     public static AFExecutor getInstance() {
-        if (f111 == null) {
-            f111 = new AFExecutor();
+        if (f130 == null) {
+            f130 = new AFExecutor();
         }
-        return f111;
+        return f130;
     }
 
     public Executor getSerialExecutor() {
-        if (this.f113 == null) {
+        if (this.f132 == null) {
             if (VERSION.SDK_INT < 11) {
                 return Executors.newSingleThreadExecutor();
             }
-            this.f113 = AsyncTask.SERIAL_EXECUTOR;
+            this.f132 = AsyncTask.SERIAL_EXECUTOR;
         }
-        return this.f113;
+        return this.f132;
     }
 
     public Executor getThreadPoolExecutor() {
-        Object obj = (this.f114 == null || ((this.f114 instanceof ThreadPoolExecutor) && (((ThreadPoolExecutor) this.f114).isShutdown() || ((ThreadPoolExecutor) this.f114).isTerminated() || ((ThreadPoolExecutor) this.f114).isTerminating()))) ? 1 : null;
-        if (obj != null) {
+        if (this.f133 == null || ((this.f133 instanceof ThreadPoolExecutor) && (((ThreadPoolExecutor) this.f133).isShutdown() || ((ThreadPoolExecutor) this.f133).isTerminated() || ((ThreadPoolExecutor) this.f133).isTerminating()))) {
             if (VERSION.SDK_INT < 11) {
                 return Executors.newSingleThreadExecutor();
             }
-            this.f114 = Executors.newFixedThreadPool(2);
+            this.f133 = Executors.newFixedThreadPool(2);
         }
-        return this.f114;
+        return this.f133;
     }
 
+    /* access modifiers changed from: 0000 */
     /* renamed from: ॱ */
-    final ScheduledThreadPoolExecutor m179() {
-        Object obj = (this.f112 == null || this.f112.isShutdown() || this.f112.isTerminated()) ? 1 : null;
-        if (obj != null) {
-            this.f112 = Executors.newScheduledThreadPool(2);
+    public final ScheduledThreadPoolExecutor mo6409() {
+        if (this.f131 == null || this.f131.isShutdown() || this.f131.isTerminated()) {
+            this.f131 = Executors.newScheduledThreadPool(2);
         }
-        return (ScheduledThreadPoolExecutor) this.f112;
+        return (ScheduledThreadPoolExecutor) this.f131;
     }
 
+    /* access modifiers changed from: 0000 */
     /* renamed from: ˋ */
-    final void m178() {
+    public final void mo6408() {
         try {
-            m177(this.f112);
-            if (this.f114 instanceof ThreadPoolExecutor) {
-                m177((ThreadPoolExecutor) this.f114);
+            m172(this.f131);
+            if (this.f133 instanceof ThreadPoolExecutor) {
+                m172((ThreadPoolExecutor) this.f133);
             }
         } catch (Throwable th) {
             AFLogger.afErrorLog("failed to stop Executors", th);
@@ -73,18 +77,27 @@ public class AFExecutor {
     }
 
     /* renamed from: ˊ */
-    private static void m177(ExecutorService executorService) {
+    private static void m172(ExecutorService executorService) {
         try {
             AFLogger.afRDLog("shut downing executor ...");
             executorService.shutdown();
             executorService.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            AFLogger.afRDLog("InterruptedException!!!");
-        } finally {
             if (!executorService.isTerminated()) {
                 AFLogger.afRDLog("killing non-finished tasks");
             }
             executorService.shutdownNow();
+        } catch (InterruptedException e) {
+            AFLogger.afRDLog("InterruptedException!!!");
+            if (!executorService.isTerminated()) {
+                AFLogger.afRDLog("killing non-finished tasks");
+            }
+            executorService.shutdownNow();
+        } catch (Throwable th) {
+            if (!executorService.isTerminated()) {
+                AFLogger.afRDLog("killing non-finished tasks");
+            }
+            executorService.shutdownNow();
+            throw th;
         }
     }
 }

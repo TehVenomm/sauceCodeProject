@@ -35,12 +35,12 @@ public class PropertyMetadata implements Serializable {
     public static PropertyMetadata construct(boolean z, String str, Integer num, String str2) {
         if (str == null && num == null && str2 == null) {
             return z ? STD_REQUIRED : STD_OPTIONAL;
-        } else {
-            return new PropertyMetadata(Boolean.valueOf(z), str, num, str2);
         }
+        return new PropertyMetadata(Boolean.valueOf(z), str, num, str2);
     }
 
-    protected Object readResolve() {
+    /* access modifiers changed from: protected */
+    public Object readResolve() {
         if (this._description != null || this._index != null || this._defaultValue != null) {
             return this;
         }

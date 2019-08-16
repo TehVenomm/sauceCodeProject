@@ -10,7 +10,7 @@ public class AbilityAtkEnemyType : AbilityAtkBase
 		type = ENEMY_TYPE.NONE;
 		if (Enum.IsDefined(typeof(ENEMY_TYPE), target))
 		{
-			type = (ENEMY_TYPE)(int)Enum.Parse(typeof(ENEMY_TYPE), target);
+			type = (ENEMY_TYPE)Enum.Parse(typeof(ENEMY_TYPE), target);
 		}
 	}
 

@@ -1,12 +1,13 @@
-package android.support.v4.content;
+package android.support.p000v4.content;
 
 import android.content.Context;
 import android.database.ContentObserver;
 import android.os.Handler;
-import android.support.v4.util.DebugUtils;
+import android.support.p000v4.util.DebugUtils;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
+/* renamed from: android.support.v4.content.Loader */
 public class Loader<D> {
     boolean mAbandoned = false;
     boolean mContentChanged = false;
@@ -18,14 +19,7 @@ public class Loader<D> {
     boolean mReset = true;
     boolean mStarted = false;
 
-    public interface OnLoadCompleteListener<D> {
-        void onLoadComplete(Loader<D> loader, D d);
-    }
-
-    public interface OnLoadCanceledListener<D> {
-        void onLoadCanceled(Loader<D> loader);
-    }
-
+    /* renamed from: android.support.v4.content.Loader$ForceLoadContentObserver */
     public final class ForceLoadContentObserver extends ContentObserver {
         public ForceLoadContentObserver() {
             super(new Handler());
@@ -38,6 +32,16 @@ public class Loader<D> {
         public void onChange(boolean z) {
             Loader.this.onContentChanged();
         }
+    }
+
+    /* renamed from: android.support.v4.content.Loader$OnLoadCanceledListener */
+    public interface OnLoadCanceledListener<D> {
+        void onLoadCanceled(Loader<D> loader);
+    }
+
+    /* renamed from: android.support.v4.content.Loader$OnLoadCompleteListener */
+    public interface OnLoadCompleteListener<D> {
+        void onLoadComplete(Loader<D> loader, D d);
     }
 
     public Loader(Context context) {
@@ -58,10 +62,10 @@ public class Loader<D> {
     }
 
     public String dataToString(D d) {
-        StringBuilder stringBuilder = new StringBuilder(64);
-        DebugUtils.buildShortClassTag(d, stringBuilder);
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(64);
+        DebugUtils.buildShortClassTag(d, sb);
+        sb.append("}");
+        return sb.toString();
     }
 
     public void deliverCancellation() {
@@ -124,10 +128,12 @@ public class Loader<D> {
         return this.mStarted;
     }
 
-    protected void onAbandon() {
+    /* access modifiers changed from: protected */
+    public void onAbandon() {
     }
 
-    protected boolean onCancelLoad() {
+    /* access modifiers changed from: protected */
+    public boolean onCancelLoad() {
         return false;
     }
 
@@ -139,16 +145,20 @@ public class Loader<D> {
         }
     }
 
-    protected void onForceLoad() {
+    /* access modifiers changed from: protected */
+    public void onForceLoad() {
     }
 
-    protected void onReset() {
+    /* access modifiers changed from: protected */
+    public void onReset() {
     }
 
-    protected void onStartLoading() {
+    /* access modifiers changed from: protected */
+    public void onStartLoading() {
     }
 
-    protected void onStopLoading() {
+    /* access modifiers changed from: protected */
+    public void onStopLoading() {
     }
 
     public void registerListener(int i, OnLoadCompleteListener<D> onLoadCompleteListener) {
@@ -201,12 +211,12 @@ public class Loader<D> {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(64);
-        DebugUtils.buildShortClassTag(this, stringBuilder);
-        stringBuilder.append(" id=");
-        stringBuilder.append(this.mId);
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(64);
+        DebugUtils.buildShortClassTag(this, sb);
+        sb.append(" id=");
+        sb.append(this.mId);
+        sb.append("}");
+        return sb.toString();
     }
 
     public void unregisterListener(OnLoadCompleteListener<D> onLoadCompleteListener) {

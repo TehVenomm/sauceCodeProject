@@ -1,0 +1,8 @@
+public enum WAVEMATCH_ITEM_TYPE
+{
+	NONE,
+	HEAL_HP,
+	HEAL_SKILL,
+	CLOCK,
+	BOMB
+}

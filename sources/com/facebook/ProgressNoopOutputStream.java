@@ -16,7 +16,8 @@ class ProgressNoopOutputStream extends OutputStream implements RequestOutputStre
         this.callbackHandler = handler;
     }
 
-    void addProgress(long j) {
+    /* access modifiers changed from: 0000 */
+    public void addProgress(long j) {
         if (this.currentRequestProgress == null) {
             this.currentRequestProgress = new RequestProgress(this.callbackHandler, this.currentRequest);
             this.progressMap.put(this.currentRequest, this.currentRequestProgress);
@@ -25,11 +26,13 @@ class ProgressNoopOutputStream extends OutputStream implements RequestOutputStre
         this.batchMax = (int) (((long) this.batchMax) + j);
     }
 
-    int getMaxProgress() {
+    /* access modifiers changed from: 0000 */
+    public int getMaxProgress() {
         return this.batchMax;
     }
 
-    Map<GraphRequest, RequestProgress> getProgressMap() {
+    /* access modifiers changed from: 0000 */
+    public Map<GraphRequest, RequestProgress> getProgressMap() {
         return this.progressMap;
     }
 

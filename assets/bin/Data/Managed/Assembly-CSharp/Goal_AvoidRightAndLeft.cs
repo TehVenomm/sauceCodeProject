@@ -11,16 +11,14 @@ public class Goal_AvoidRightAndLeft : GoalComposite
 		if (!(brain.owner is Player))
 		{
 			SetStatus(STATUS.COMPLETED);
+			return;
 		}
-		else
+		PLACE pLACE = (!Utility.Coin()) ? PLACE.RIGHT : PLACE.LEFT;
+		if (!brain.moveCtrl.CanPlaceAvoid(pLACE))
 		{
-			PLACE pLACE = (!Utility.Coin()) ? PLACE.RIGHT : PLACE.LEFT;
-			if (!brain.moveCtrl.CanPlaceAvoid(pLACE))
-			{
-				pLACE = ((pLACE == PLACE.LEFT) ? PLACE.RIGHT : PLACE.LEFT);
-			}
-			AddSubGoal<Goal_Avoid>().SetPlace(pLACE);
+			pLACE = ((pLACE == PLACE.LEFT) ? PLACE.RIGHT : PLACE.LEFT);
 		}
+		AddSubGoal<Goal_Avoid>().SetPlace(pLACE);
 	}
 
 	protected override STATUS Process(Brain brain)

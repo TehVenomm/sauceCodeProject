@@ -1,4 +1,6 @@
-public class yoshida
+using UnityEngine;
+
+public class yoshida : MonoBehaviour
 {
 	public InputManager inputMgr;
 

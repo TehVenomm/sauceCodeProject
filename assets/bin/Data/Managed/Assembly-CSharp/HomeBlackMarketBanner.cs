@@ -1,3 +1,9 @@
-public class HomeBlackMarketBanner : GameSection
+public class HomeBlackMarketBanner : BaseBanner
 {
+	private enum UI
+	{
+		BANNER
+	}
+
+	public override string overrideBackKeyEvent => "CLOSE";
 }

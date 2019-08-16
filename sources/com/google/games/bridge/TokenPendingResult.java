@@ -3,7 +3,6 @@ package com.google.games.bridge;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -15,11 +14,11 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
     private ResultCallback<? super TokenResult> resultCallback;
 
     private ResultCallback<? super TokenResult> getCallback() {
-        ResultCallback<? super TokenResult> resultCallback;
+        ResultCallback<? super TokenResult> resultCallback2;
         synchronized (this) {
-            resultCallback = this.resultCallback;
+            resultCallback2 = this.resultCallback;
         }
-        return resultCallback;
+        return resultCallback2;
     }
 
     private TokenResult getResult() {
@@ -30,9 +29,9 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         return tokenResult;
     }
 
-    private void setCallback(ResultCallback<? super TokenResult> resultCallback) {
+    private void setCallback(ResultCallback<? super TokenResult> resultCallback2) {
         synchronized (this) {
-            this.resultCallback = resultCallback;
+            this.resultCallback = resultCallback2;
         }
     }
 
@@ -94,15 +93,15 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         this.result.setIdToken(str);
     }
 
-    public void setResultCallback(@NonNull ResultCallback<? super TokenResult> resultCallback) {
+    public void setResultCallback(@NonNull ResultCallback<? super TokenResult> resultCallback2) {
         if (this.latch.getCount() == 0) {
-            resultCallback.onResult(getResult());
+            resultCallback2.onResult(getResult());
         } else {
-            setCallback(resultCallback);
+            setCallback(resultCallback2);
         }
     }
 
-    public void setResultCallback(@NonNull ResultCallback<? super TokenResult> resultCallback, long j, @NonNull TimeUnit timeUnit) {
+    public void setResultCallback(@NonNull ResultCallback<? super TokenResult> resultCallback2, long j, @NonNull TimeUnit timeUnit) {
         try {
             if (!this.latch.await(j, timeUnit)) {
                 setResult(null, null, null, 15);
@@ -110,17 +109,17 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         } catch (InterruptedException e) {
             setResult(null, null, null, 14);
         }
-        resultCallback.onResult(getResult());
+        resultCallback2.onResult(getResult());
     }
 
     public void setStatus(int i) {
         this.result.setStatus(i);
         this.latch.countDown();
         ResultCallback callback = getCallback();
-        Result result = getResult();
+        TokenResult result2 = getResult();
         if (callback != null) {
-            Log.d(TAG, " Calling onResult for callback: " + callback + " result: " + result);
-            getCallback().onResult(result);
+            Log.d(TAG, " Calling onResult for callback: " + callback + " result: " + result2);
+            getCallback().onResult(result2);
         }
     }
 }

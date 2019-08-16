@@ -18,11 +18,11 @@ public final class IndexedListSerializer extends AsArraySerializerBase<List<?>> 
     private static final long serialVersionUID = 1;
 
     public IndexedListSerializer(JavaType javaType, boolean z, TypeSerializer typeSerializer, JsonSerializer<Object> jsonSerializer) {
-        super(List.class, javaType, z, typeSerializer, (JsonSerializer) jsonSerializer);
+        super(List.class, javaType, z, typeSerializer, jsonSerializer);
     }
 
     public IndexedListSerializer(IndexedListSerializer indexedListSerializer, BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool) {
-        super((AsArraySerializerBase) indexedListSerializer, beanProperty, typeSerializer, (JsonSerializer) jsonSerializer, bool);
+        super((AsArraySerializerBase<?>) indexedListSerializer, beanProperty, typeSerializer, jsonSerializer, bool);
     }
 
     public IndexedListSerializer withResolved(BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool) {
@@ -43,13 +43,13 @@ public final class IndexedListSerializer extends AsArraySerializerBase<List<?>> 
 
     public final void serialize(List<?> list, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         int size = list.size();
-        if (size == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
-            serializeContents((List) list, jsonGenerator, serializerProvider);
+        if (size != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+            jsonGenerator.writeStartArray(size);
+            serializeContents(list, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray(size);
-        serializeContents((List) list, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
+        serializeContents(list, jsonGenerator, serializerProvider);
     }
 
     public void serializeContents(List<?> list, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -71,22 +71,19 @@ public final class IndexedListSerializer extends AsArraySerializerBase<List<?>> 
                             Class cls = obj.getClass();
                             JsonSerializer serializerFor = propertySerializerMap.serializerFor(cls);
                             if (serializerFor == null) {
-                                JsonSerializer _findAndAddDynamic;
                                 if (this._elementType.hasGenericTypes()) {
-                                    _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap, serializerProvider.constructSpecializedType(this._elementType, cls), serializerProvider);
+                                    serializerFor = _findAndAddDynamic(propertySerializerMap, serializerProvider.constructSpecializedType(this._elementType, cls), serializerProvider);
                                 } else {
-                                    _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap, cls, serializerProvider);
+                                    serializerFor = _findAndAddDynamic(propertySerializerMap, cls, serializerProvider);
                                 }
-                                JsonSerializer jsonSerializer = _findAndAddDynamic;
                                 propertySerializerMap = this._dynamicSerializers;
-                                serializerFor = jsonSerializer;
                             }
                             serializerFor.serialize(obj, jsonGenerator, serializerProvider);
                         }
                         i++;
                     }
-                } catch (Throwable e) {
-                    wrapAndThrow(serializerProvider, e, (Object) list, i);
+                } catch (Exception e) {
+                    wrapAndThrow(serializerProvider, (Throwable) e, (Object) list, i);
                 }
             }
         }
@@ -101,8 +98,8 @@ public final class IndexedListSerializer extends AsArraySerializerBase<List<?>> 
                 if (obj == null) {
                     try {
                         serializerProvider.defaultSerializeNull(jsonGenerator);
-                    } catch (Throwable e) {
-                        wrapAndThrow(serializerProvider, e, (Object) list, i);
+                    } catch (Exception e) {
+                        wrapAndThrow(serializerProvider, (Throwable) e, (Object) list, i);
                     }
                 } else if (typeSerializer == null) {
                     jsonSerializer.serialize(obj, jsonGenerator, serializerProvider);
@@ -128,22 +125,19 @@ public final class IndexedListSerializer extends AsArraySerializerBase<List<?>> 
                         Class cls = obj.getClass();
                         JsonSerializer serializerFor = propertySerializerMap.serializerFor(cls);
                         if (serializerFor == null) {
-                            JsonSerializer _findAndAddDynamic;
                             if (this._elementType.hasGenericTypes()) {
-                                _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap, serializerProvider.constructSpecializedType(this._elementType, cls), serializerProvider);
+                                serializerFor = _findAndAddDynamic(propertySerializerMap, serializerProvider.constructSpecializedType(this._elementType, cls), serializerProvider);
                             } else {
-                                _findAndAddDynamic = _findAndAddDynamic(propertySerializerMap, cls, serializerProvider);
+                                serializerFor = _findAndAddDynamic(propertySerializerMap, cls, serializerProvider);
                             }
-                            JsonSerializer jsonSerializer = _findAndAddDynamic;
                             propertySerializerMap = this._dynamicSerializers;
-                            serializerFor = jsonSerializer;
                         }
                         serializerFor.serializeWithType(obj, jsonGenerator, serializerProvider, typeSerializer);
                     }
                     i++;
                 }
-            } catch (Throwable e) {
-                wrapAndThrow(serializerProvider, e, (Object) list, i);
+            } catch (Exception e) {
+                wrapAndThrow(serializerProvider, (Throwable) e, (Object) list, i);
             }
         }
     }

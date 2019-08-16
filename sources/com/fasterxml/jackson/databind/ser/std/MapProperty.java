@@ -49,11 +49,17 @@ public class MapProperty extends PropertyWriter {
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {
-        return this._property == null ? null : this._property.getAnnotation(cls);
+        if (this._property == null) {
+            return null;
+        }
+        return this._property.getAnnotation(cls);
     }
 
     public <A extends Annotation> A getContextAnnotation(Class<A> cls) {
-        return this._property == null ? null : this._property.getContextAnnotation(cls);
+        if (this._property == null) {
+            return null;
+        }
+        return this._property.getContextAnnotation(cls);
     }
 
     public void serializeAsField(Object obj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -98,10 +104,16 @@ public class MapProperty extends PropertyWriter {
     }
 
     public PropertyName getWrapperName() {
-        return this._property == null ? null : this._property.getWrapperName();
+        if (this._property == null) {
+            return null;
+        }
+        return this._property.getWrapperName();
     }
 
     public AnnotatedMember getMember() {
-        return this._property == null ? null : this._property.getMember();
+        if (this._property == null) {
+            return null;
+        }
+        return this._property.getMember();
     }
 }

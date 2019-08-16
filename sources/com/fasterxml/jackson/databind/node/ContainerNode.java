@@ -2,6 +2,7 @@ package com.fasterxml.jackson.databind.node;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ContainerNode;
 import com.fasterxml.jackson.databind.util.RawValue;
 import java.math.BigDecimal;
 import java.math.BigInteger;

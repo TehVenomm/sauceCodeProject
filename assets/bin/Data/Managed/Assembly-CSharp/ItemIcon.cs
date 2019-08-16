@@ -1,8 +1,7 @@
-using Network;
 using System;
 using UnityEngine;
 
-public class ItemIcon
+public class ItemIcon : MonoBehaviour
 {
 	public class ItemIconCreateParam
 	{
@@ -47,24 +46,9 @@ public class ItemIcon
 	{
 		DEFAULT,
 		REWARD_DELIVERY_DETAIL,
-		REWARD_DELIVERY_LIST
+		REWARD_DELIVERY_LIST,
+		SERIES_ARENA
 	}
-
-	private const int ICON_SIZE = 64;
-
-	private const int QUEST_ICON_SIZE = 104;
-
-	private const int ICON_FRAME_SIZE = 120;
-
-	private const int QUEST_ICON_FRAME_SIZE = 148;
-
-	private const int QUEST_ICON_SIZE_REWARD = 78;
-
-	private const int QUEST_ICON_FRAME_SIZE_REWARD = 112;
-
-	private const int QUEST_ICON_SIZE_REWARD_LIST = 72;
-
-	private const int QUEST_ICON_FRAME_SIZE_REWARD_LIST = 116;
 
 	protected static readonly string SPR_TYPE_ATK = "EquipStatusATK_W";
 
@@ -89,7 +73,7 @@ public class ItemIcon
 		"EquipIconFrame_A",
 		"EquipIconFrame_S",
 		"EquipIconFrame_SS",
-		"EquipIconFrame_SS"
+		"EquipIconFrame_SSS"
 	};
 
 	private static readonly string[] ITEM_ICON_MONSTER_RARITY_FRAME_SPRITE = new string[7]
@@ -113,7 +97,7 @@ public class ItemIcon
 		"RarityText_A",
 		"RarityText_S",
 		"RarityText_SS",
-		"RarityText_SS"
+		"RarityText_SSS"
 	};
 
 	public static readonly string[] ITEM_ICON_ITEM_RARITY_ICON_EVENT_SPRITE = new string[7]
@@ -194,6 +178,8 @@ public class ItemIcon
 
 	public UISprite iconTypeSprite;
 
+	public UISprite iconTypeSpriteSub;
+
 	public UISprite rarityFrame;
 
 	public UISprite rarityTextIcon;
@@ -214,15 +200,45 @@ public class ItemIcon
 
 	public UISprite equipGrowLimitBG;
 
+	public UISprite wheelNumBackBG;
+
+	public UISprite sameSkillExceedExp;
+
+	public UISprite sameSkillExceedExpUp;
+
 	private int itemID;
 
 	private ulong UniqID;
+
+	private int itemNumber;
+
+	protected SortCompareData m_initData;
 
 	private Texture frameTexture;
 
 	private bool isVisible = true;
 
 	public Action onIconLoaded;
+
+	private const int ICON_SIZE = 64;
+
+	private const int QUEST_ICON_SIZE = 104;
+
+	private const int ICON_FRAME_SIZE = 120;
+
+	private const int QUEST_ICON_FRAME_SIZE = 148;
+
+	private const int QUEST_ICON_SIZE_REWARD = 78;
+
+	private const int QUEST_ICON_FRAME_SIZE_REWARD = 112;
+
+	private const int QUEST_ICON_SIZE_REWARD_LIST = 72;
+
+	private const int QUEST_ICON_FRAME_SIZE_REWARD_LIST = 116;
+
+	private const int SERIES_ARENA_ICON_SIZE = 228;
+
+	private const int SERIES_ARENA_FRAME_SIZE = 298;
 
 	private QUEST_ICON_SIZE_TYPE questIconSizeType;
 
@@ -237,6 +253,10 @@ public class ItemIcon
 	public int GetItemID => itemID;
 
 	public ulong GetUniqID => UniqID;
+
+	public int GetItemNumber => itemNumber;
+
+	public SortCompareData InitData => m_initData;
 
 	public Transform _transform
 	{
@@ -253,7 +273,7 @@ public class ItemIcon
 
 	public static ItemIcon Create(ItemIconCreateParam param)
 	{
-		return CreateIcon<ItemIcon>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconPrefab, param.icon_type, param.icon_id, param.rarity, param.parent, param.element, param.magi_enable_equip_type, param.num, param.event_name, param.event_data, param.is_new, param.toggle_group, param.is_select, param.icon_under_text, param.is_equipping, param.enemy_icon_id, param.enemy_icon_id2, param.disable_rarity_text, param.questIconSizeType, GET_TYPE.PAY);
+		return CreateIcon<ItemIcon>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconPrefab, param.icon_type, param.icon_id, param.rarity, param.parent, param.element, param.magi_enable_equip_type, param.num, param.event_name, param.event_data, param.is_new, param.toggle_group, param.is_select, param.icon_under_text, param.is_equipping, param.enemy_icon_id, param.enemy_icon_id2, param.disable_rarity_text, param.questIconSizeType);
 	}
 
 	public static ItemIcon CreateEquipItemIconByEquipItemInfo(EquipItemInfo equipItemInfo, int sex, Transform parent, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, bool disable_rarity_text = false)
@@ -263,23 +283,33 @@ public class ItemIcon
 
 	public static T CreateEquipIconByEquipItemInfo<T>(Object prefab, EquipItemInfo equipItemInfo, int sex, Transform parent, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, bool disable_rarity_text = false) where T : ItemIcon
 	{
-		ITEM_ICON_TYPE icon_type = ITEM_ICON_TYPE.NONE;
-		RARITY_TYPE? rarity = null;
-		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-		int icon_id = -1;
+		ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
+		RARITY_TYPE? rARITY_TYPE = null;
+		ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
+		int num2 = -1;
 		string empty = string.Empty;
 		GET_TYPE gET_TYPE = GET_TYPE.NONE;
-		if (equipItemInfo != null && ((ItemInfoBase<EquipItem>)equipItemInfo).tableID != 0 && equipItemInfo.tableData != null)
+		if (equipItemInfo != null && equipItemInfo.tableID != 0 && equipItemInfo.tableData != null)
 		{
 			EquipItemTable.EquipItemData tableData = equipItemInfo.tableData;
-			icon_type = GetItemIconType(tableData.type);
-			rarity = tableData.rarity;
-			element = equipItemInfo.GetTargetElementPriorityToTable();
-			icon_id = tableData.GetIconID(sex);
+			iTEM_ICON_TYPE = GetItemIconType(tableData.type);
+			rARITY_TYPE = tableData.rarity;
+			eLEMENT_TYPE = equipItemInfo.GetTargetElementPriorityToTable();
+			num2 = tableData.GetIconID(sex);
 			gET_TYPE = tableData.getType;
 		}
+		ITEM_ICON_TYPE icon_type = iTEM_ICON_TYPE;
+		int icon_id = num2;
+		RARITY_TYPE? rarity = rARITY_TYPE;
+		ELEMENT_TYPE element = eLEMENT_TYPE;
+		bool is_new2 = is_new;
+		bool is_select2 = is_select;
+		bool is_equipping2 = is_equipping;
+		int enemy_icon_id = 0;
+		int enemy_icon_id2 = 0;
+		bool disable_rarity_text2 = disable_rarity_text;
 		GET_TYPE getType = gET_TYPE;
-		return CreateIcon<T>(prefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, 0, 0, disable_rarity_text, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		return CreateIcon<T>(prefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new2, toggle_group, is_select2, icon_under_text, is_equipping2, enemy_icon_id, enemy_icon_id2, disable_rarity_text2, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 	}
 
 	public static ItemIcon CreateEquipItemIconByEquipItemTable(EquipItemTable.EquipItemData equipItemTableData, int sex, Transform parent, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, bool disable_rarity_text = false)
@@ -289,61 +319,69 @@ public class ItemIcon
 
 	private static T CreateEquipIconByEquipItemTable<T>(Object prefab, EquipItemTable.EquipItemData equipItemTableData, int sex, Transform parent, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, bool disable_rarity_text = false) where T : ItemIcon
 	{
-		ITEM_ICON_TYPE icon_type = ITEM_ICON_TYPE.NONE;
-		RARITY_TYPE? rarity = null;
-		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-		int icon_id = -1;
+		ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
+		RARITY_TYPE? rARITY_TYPE = null;
+		ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
+		int num2 = -1;
 		string empty = string.Empty;
 		GET_TYPE gET_TYPE = GET_TYPE.NONE;
 		if (equipItemTableData != null)
 		{
-			icon_type = GetItemIconType(equipItemTableData.type);
-			rarity = equipItemTableData.rarity;
-			element = equipItemTableData.GetTargetElementPriorityToTable();
-			icon_id = equipItemTableData.GetIconID(sex);
+			iTEM_ICON_TYPE = GetItemIconType(equipItemTableData.type);
+			rARITY_TYPE = equipItemTableData.rarity;
+			eLEMENT_TYPE = equipItemTableData.GetTargetElementPriorityToTable();
+			num2 = equipItemTableData.GetIconID(sex);
 			gET_TYPE = equipItemTableData.getType;
 		}
+		ITEM_ICON_TYPE icon_type = iTEM_ICON_TYPE;
+		int icon_id = num2;
+		RARITY_TYPE? rarity = rARITY_TYPE;
+		ELEMENT_TYPE element = eLEMENT_TYPE;
+		bool is_new2 = is_new;
+		bool is_select2 = is_select;
+		bool is_equipping2 = is_equipping;
+		int enemy_icon_id = 0;
+		int enemy_icon_id2 = 0;
+		bool disable_rarity_text2 = disable_rarity_text;
 		GET_TYPE getType = gET_TYPE;
-		return CreateIcon<T>(prefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, 0, 0, disable_rarity_text, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		return CreateIcon<T>(prefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new2, toggle_group, is_select2, icon_under_text, is_equipping2, enemy_icon_id, enemy_icon_id2, disable_rarity_text2, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 	}
 
 	public static ItemIcon CreateRewardItemIcon(REWARD_TYPE rewardType, uint itemId, Transform parent, int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, bool disable_rarity_text = false, QUEST_ICON_SIZE_TYPE questIconSizeType = QUEST_ICON_SIZE_TYPE.DEFAULT)
 	{
-		GetIconShowData(rewardType, itemId, out int icon_id, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? rarity, out ELEMENT_TYPE element, out EQUIPMENT_TYPE? magi_enable_icon_type, out int enemy_icon_id, out int enemy_icon_id2, out GET_TYPE getType, 0);
-		return CreateIcon<ItemIcon>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconPrefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text, questIconSizeType, getType);
+		GetIconShowData(rewardType, itemId, out int icon_id, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? rarity, out ELEMENT_TYPE element, out ELEMENT_TYPE element2, out EQUIPMENT_TYPE? magi_enable_icon_type, out int enemy_icon_id, out int enemy_icon_id2, out GET_TYPE getType);
+		return CreateIcon<ItemIcon>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconPrefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text, questIconSizeType, getType, element2);
 	}
 
-	public static ItemIcon Create(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent, ELEMENT_TYPE element = ELEMENT_TYPE.MAX, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, int enemy_icon_id = 0, int enemy_icon_id2 = 0, bool disable_rarity_text = false, GET_TYPE getType = GET_TYPE.PAY)
+	public static ItemIconDetail CreateAccessoryIcon(Object prefab, int _iconId, RARITY_TYPE _rarity, Transform _parent, string _eventName, int _eventData, bool _isNew, bool _isEquipping, GET_TYPE _getType)
 	{
-		return CreateIcon<ItemIcon>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconPrefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		ITEM_ICON_TYPE icon_type = ITEM_ICON_TYPE.ACCESSORY;
+		RARITY_TYPE? rarity = _rarity;
+		bool is_new = _isNew;
+		return CreateIcon<ItemIconDetail>(prefab, icon_type, _iconId, rarity, _parent, ELEMENT_TYPE.MAX, null, -1, _eventName, _eventData, is_new, -1, is_select: false, null, _isEquipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, _getType);
 	}
 
-	protected static T CreateIcon<T>(Object prefab, ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent = null, ELEMENT_TYPE element = ELEMENT_TYPE.MAX, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, int enemy_icon_id = 0, int enemy_icon_id2 = 0, bool disable_rarity_text = false, QUEST_ICON_SIZE_TYPE questIconSizeType = QUEST_ICON_SIZE_TYPE.DEFAULT, GET_TYPE getType = GET_TYPE.PAY) where T : ItemIcon
+	public static ItemIcon Create(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent, ELEMENT_TYPE element = ELEMENT_TYPE.MAX, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, int enemy_icon_id = 0, int enemy_icon_id2 = 0, bool disable_rarity_text = false, GET_TYPE getType = GET_TYPE.PAY, ELEMENT_TYPE element2 = ELEMENT_TYPE.MAX, bool isSameSkillExceed = false)
+	{
+		return CreateIcon<ItemIcon>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconPrefab, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text, QUEST_ICON_SIZE_TYPE.DEFAULT, getType, element2, isSameSkillExceed);
+	}
+
+	protected static T CreateIcon<T>(Object prefab, ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent = null, ELEMENT_TYPE element = ELEMENT_TYPE.MAX, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, int enemy_icon_id = 0, int enemy_icon_id2 = 0, bool disable_rarity_text = false, QUEST_ICON_SIZE_TYPE questIconSizeType = QUEST_ICON_SIZE_TYPE.DEFAULT, GET_TYPE getType = GET_TYPE.PAY, ELEMENT_TYPE element2 = ELEMENT_TYPE.MAX, bool isSameSKillExceed = false) where T : ItemIcon
 	{
 		T val = parent.GetComponentInChildren<T>();
 		if (val == null)
 		{
-			Transform val2 = ResourceUtility.Realizes(prefab, parent, -1);
+			Transform val2 = ResourceUtility.Realizes(prefab, parent);
 			val = val2.GetComponent<T>();
 			val._transform = val2;
 		}
-		val.SetEquipGrowLimitBG(false);
-		_Create(val, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text, questIconSizeType, getType);
+		val.SetEquipGrowLimitBG(active: false);
+		_Create(val, icon_type, icon_id, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text, questIconSizeType, getType, element2, isSameSKillExceed);
 		return val;
 	}
 
-	protected static void _Create(ItemIcon item_icon, ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent, ELEMENT_TYPE element, EQUIPMENT_TYPE? magi_enable_icon_type, int num, string event_name, int event_data, bool is_new, int toggle_group, bool is_select, string icon_under_text, bool is_equipping, int enemy_icon_id, int enemy_icon_id2, bool disable_rarity_text, QUEST_ICON_SIZE_TYPE questIconSizeType, GET_TYPE getType)
+	protected static void _Create(ItemIcon item_icon, ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, Transform parent, ELEMENT_TYPE element, EQUIPMENT_TYPE? magi_enable_icon_type, int num, string event_name, int event_data, bool is_new, int toggle_group, bool is_select, string icon_under_text, bool is_equipping, int enemy_icon_id, int enemy_icon_id2, bool disable_rarity_text, QUEST_ICON_SIZE_TYPE questIconSizeType, GET_TYPE getType, ELEMENT_TYPE element2, bool isSameSkillExceed)
 	{
-		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0527: Unknown result type (might be due to invalid IL or missing references)
 		if (icon_id == 24019000)
 		{
 			icon_type = ITEM_ICON_TYPE.SKILL_GROW;
@@ -367,6 +405,7 @@ public class ItemIcon
 			item_icon.VisibleIcon(item_icon.isVisible, !string.IsNullOrEmpty(event_name));
 			item_icon.bg.set_enabled(iconBGID >= 0);
 			SetupElementIcon(item_icon, icon_type, element);
+			SetupElementIconSub(item_icon, icon_type, element2);
 			item_icon.SetRarity(icon_type, rarity, disable_rarity_text, getType);
 			item_icon.enemyIconID = enemy_icon_id;
 			item_icon.enemyIconItem.mainTexture = null;
@@ -414,6 +453,10 @@ public class ItemIcon
 			item_icon.frameTexture = null;
 			item_icon.bg.mainTexture = item_icon.emptyTexture;
 			item_icon.iconTypeSprite.set_enabled(false);
+			if (item_icon.iconTypeSpriteSub != null)
+			{
+				item_icon.iconTypeSpriteSub.set_enabled(false);
+			}
 			item_icon.rarityFrame.set_enabled(false);
 			item_icon.rarityTextIcon.set_enabled(false);
 			item_icon.enemyIconItem.mainTexture = null;
@@ -426,6 +469,7 @@ public class ItemIcon
 		{
 			num = 1;
 		}
+		item_icon.SetItemNumber(num);
 		item_icon.label.text = "×" + num.ToString();
 		item_icon.label.get_gameObject().SetActive(num > 1);
 		if (!string.IsNullOrEmpty(event_name))
@@ -485,28 +529,50 @@ public class ItemIcon
 			item_icon.newIcon.get_gameObject().SetActive(false);
 		}
 		item_icon.SetSkillEnableEquipIcon(magi_enable_icon_type);
-		item_icon.SetRewardBG(false);
+		item_icon.SetRewardBG(is_visible: false);
+		if (item_icon.sameSkillExceedExp != null)
+		{
+			item_icon.sameSkillExceedExp.get_gameObject().SetActive(isSameSkillExceed);
+		}
+		if (item_icon.sameSkillExceedExpUp != null)
+		{
+			item_icon.sameSkillExceedExpUp.get_gameObject().SetActive(isSameSkillExceed && !is_equipping);
+		}
 	}
 
 	protected static void SetupElementIcon(ItemIcon _itemIcon, ITEM_ICON_TYPE _iconType, ELEMENT_TYPE _element)
 	{
 		if (!(_itemIcon == null) && !(_itemIcon.iconTypeSprite == null))
 		{
-			UISprite uISprite = _itemIcon.iconTypeSprite;
+			_SetupElementIcon(_itemIcon, _iconType, _element, _itemIcon.iconTypeSprite);
+		}
+	}
+
+	protected static void SetupElementIconSub(ItemIcon _itemIcon, ITEM_ICON_TYPE _iconType, ELEMENT_TYPE _element)
+	{
+		if (!(_itemIcon == null) && !(_itemIcon.iconTypeSpriteSub == null))
+		{
+			_SetupElementIcon(_itemIcon, _iconType, _element, _itemIcon.iconTypeSpriteSub);
+		}
+	}
+
+	private static void _SetupElementIcon(ItemIcon _itemIcon, ITEM_ICON_TYPE _iconType, ELEMENT_TYPE _element, UISprite sprite)
+	{
+		if (!(sprite == null))
+		{
 			string text = GetIconElementSpriteName(_element);
 			if (_iconType == ITEM_ICON_TYPE.UNKNOWN)
 			{
 				text = string.Empty;
 			}
-			uISprite.spriteName = text;
+			sprite.spriteName = text;
 			if (string.IsNullOrEmpty(text))
 			{
-				uISprite.set_enabled(false);
+				sprite.set_enabled(false);
+				return;
 			}
-			else
-			{
-				uISprite.set_enabled(_itemIcon.isVisible);
-			}
+			sprite.get_gameObject().SetActive(_itemIcon.get_gameObject().get_activeSelf());
+			sprite.set_enabled(_itemIcon.isVisible);
 		}
 	}
 
@@ -614,7 +680,11 @@ public class ItemIcon
 	public static int GetIconBGID(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity)
 	{
 		int num;
-		if (!icon_type.IsEquip())
+		if (icon_type.IsEquip())
+		{
+			num = (Singleton<EquipItemTable>.I.GetEquipItemData((uint)EquipItemTable.GetIdFromIconId(icon_id))?.spAttackType.GetItemIconBGId() ?? 90000100);
+		}
+		else
 		{
 			switch (icon_type)
 			{
@@ -626,6 +696,7 @@ public class ItemIcon
 				break;
 			case ITEM_ICON_TYPE.ITEM:
 			case ITEM_ICON_TYPE.ABILITY_ITEM:
+			case ITEM_ICON_TYPE.ACCESSORY:
 				num = 90000101;
 				if (rarity.HasValue && (int)rarity.Value < EQUIP_ITEM_RARITY_BG_ID.Length)
 				{
@@ -658,19 +729,16 @@ public class ItemIcon
 				break;
 			}
 		}
-		else
-		{
-			num = (Singleton<EquipItemTable>.I.GetEquipItemData((uint)EquipItemTable.GetIdFromIconId(icon_id))?.spAttackType.GetItemIconBGId() ?? 90000100);
-		}
 		return num;
 	}
 
-	public static void GetIconShowData(REWARD_TYPE reward_type, uint id, out int icon_id, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? rarity, out ELEMENT_TYPE element, out EQUIPMENT_TYPE? magi_enable_icon_type, out int enemy_icon_id, out int enemy_icon_id2, out GET_TYPE getType, int exceed_cnt = 0)
+	public static void GetIconShowData(REWARD_TYPE reward_type, uint id, out int icon_id, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? rarity, out ELEMENT_TYPE element, out ELEMENT_TYPE element2, out EQUIPMENT_TYPE? magi_enable_icon_type, out int enemy_icon_id, out int enemy_icon_id2, out GET_TYPE getType, int exceed_cnt = 0)
 	{
 		icon_type = ITEM_ICON_TYPE.NONE;
 		icon_id = -1;
 		rarity = null;
 		element = ELEMENT_TYPE.MAX;
+		element2 = ELEMENT_TYPE.MAX;
 		magi_enable_icon_type = null;
 		enemy_icon_id = 0;
 		enemy_icon_id2 = 0;
@@ -723,6 +791,10 @@ public class ItemIcon
 				icon_id = skillItemData.iconID;
 				rarity = skillItemData.rarity;
 				element = skillItemData.skillAtkType;
+				if (skillItemData.GetAttackElementNum() > 1)
+				{
+					element2 = skillItemData.GetAttackElementByIndex(1);
+				}
 				magi_enable_icon_type = skillItemData.GetEnableEquipType();
 			}
 			break;
@@ -757,6 +829,18 @@ public class ItemIcon
 			icon_type = ITEM_ICON_TYPE.POINT_SHOP_ICON;
 			icon_id = (int)id;
 			break;
+		case REWARD_TYPE.ACCESSORY:
+		{
+			AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData(id);
+			if (data != null)
+			{
+				icon_type = ITEM_ICON_TYPE.ACCESSORY;
+				icon_id = (int)id;
+				rarity = data.rarity;
+				getType = data.getType;
+			}
+			break;
+		}
 		}
 	}
 
@@ -775,6 +859,16 @@ public class ItemIcon
 		UniqID = id;
 	}
 
+	public void SetItemNumber(int num)
+	{
+		itemNumber = num;
+	}
+
+	public void SetInitData(SortCompareData _data)
+	{
+		m_initData = _data;
+	}
+
 	private void LoadIconTexture(ITEM_ICON_TYPE icon_type, int icon_id)
 	{
 		iconID = icon_id;
@@ -785,61 +879,69 @@ public class ItemIcon
 			icon.set_enabled(false);
 			break;
 		case ITEM_ICON_TYPE.COMMON:
+		{
 			icon.mainTexture = null;
 			if (icon_id <= 0)
 			{
 				icon.set_enabled(false);
+				break;
 			}
-			else
+			ResourceLoad.ItemIconLoadCommonTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _icon_id)
 			{
-				ResourceLoad.ItemIconLoadCommonTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _icon_id)
+				if (iconID == _icon_id)
 				{
-					if (iconID == _icon_id)
-					{
-						icon.mainTexture = _tex;
-						OnIconLoaded();
-					}
-				});
-				icon.depth = rarityFrame.depth - 1;
-				UITexture uITexture5 = icon;
-				int num = 64;
-				icon.height = num;
-				uITexture5.width = num;
-				UISprite uISprite5 = rarityFrame;
-				num = 120;
-				rarityFrame.height = num;
-				uISprite5.width = num;
-				iconTypeSprite.depth = rarityFrame.depth + 1;
+					icon.mainTexture = _tex;
+					OnIconLoaded();
+				}
+			});
+			icon.depth = rarityFrame.depth - 1;
+			UITexture uITexture4 = icon;
+			int num = 64;
+			icon.height = num;
+			uITexture4.width = num;
+			UISprite uISprite4 = rarityFrame;
+			num = 120;
+			rarityFrame.height = num;
+			uISprite4.width = num;
+			iconTypeSprite.depth = rarityFrame.depth + 2;
+			if (iconTypeSpriteSub != null)
+			{
+				iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.STAMP:
+		{
 			icon.mainTexture = null;
 			if (icon_id <= 0)
 			{
 				icon.set_enabled(false);
+				break;
 			}
-			else
+			ResourceLoad.ItemIconLoadStampTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _icon_id)
 			{
-				ResourceLoad.ItemIconLoadStampTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _icon_id)
+				if (iconID == _icon_id)
 				{
-					if (iconID == _icon_id)
-					{
-						icon.mainTexture = _tex;
-						OnIconLoaded();
-					}
-				});
-				icon.depth = rarityFrame.depth - 1;
-				UITexture uITexture3 = icon;
-				int num = 64;
-				icon.height = num;
-				uITexture3.width = num;
-				UISprite uISprite3 = rarityFrame;
-				num = 120;
-				rarityFrame.height = num;
-				uISprite3.width = num;
-				iconTypeSprite.depth = rarityFrame.depth + 1;
+					icon.mainTexture = _tex;
+					OnIconLoaded();
+				}
+			});
+			icon.depth = rarityFrame.depth - 1;
+			UITexture uITexture6 = icon;
+			int num = 64;
+			icon.height = num;
+			uITexture6.width = num;
+			UISprite uISprite6 = rarityFrame;
+			num = 120;
+			rarityFrame.height = num;
+			uISprite6.width = num;
+			iconTypeSprite.depth = rarityFrame.depth + 2;
+			if (iconTypeSpriteSub != null)
+			{
+				iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.QUEST_ITEM:
 		{
 			icon.mainTexture = null;
@@ -853,103 +955,149 @@ public class ItemIcon
 			});
 			icon.depth = rarityFrame.depth + 1;
 			SetQuestIconItemSize(questIconSizeType, out int monsterIconSize, out int rarityFrameSize);
-			UITexture uITexture2 = icon;
+			UITexture uITexture3 = icon;
 			int num = monsterIconSize;
 			icon.height = num;
-			uITexture2.width = num;
-			UISprite uISprite2 = rarityFrame;
+			uITexture3.width = num;
+			UISprite uISprite3 = rarityFrame;
 			num = rarityFrameSize;
 			rarityFrame.height = num;
-			uISprite2.width = num;
-			iconTypeSprite.depth = icon.depth + 1;
+			uISprite3.width = num;
+			iconTypeSprite.depth = icon.depth + 2;
+			if (iconTypeSpriteSub != null)
+			{
+				iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
+			}
 			break;
 		}
 		case ITEM_ICON_TYPE.DEGREE:
+		{
 			icon.mainTexture = null;
 			if (icon_id <= 0)
 			{
 				icon.set_enabled(false);
+				break;
 			}
-			else
+			DegreeTable.DegreeData data = Singleton<DegreeTable>.I.GetData((uint)icon_id);
+			if (data == null)
 			{
-				DegreeTable.DegreeData data = Singleton<DegreeTable>.I.GetData((uint)icon_id);
-				if (data == null)
-				{
-					icon.set_enabled(false);
-				}
-				else
-				{
-					ResourceLoad.ItemIconLoadDegreeIconTexture(this, data.type, delegate(ItemIcon _item_icon, Texture _tex, DEGREE_TYPE _type_id)
-					{
-						icon.mainTexture = _tex;
-						OnIconLoaded();
-					});
-					icon.depth = rarityFrame.depth - 1;
-					UITexture uITexture6 = icon;
-					int num = 64;
-					icon.height = num;
-					uITexture6.width = num;
-					UISprite uISprite6 = rarityFrame;
-					num = 120;
-					rarityFrame.height = num;
-					uISprite6.width = num;
-					iconTypeSprite.depth = rarityFrame.depth + 1;
-				}
+				icon.set_enabled(false);
+				break;
+			}
+			ResourceLoad.ItemIconLoadDegreeIconTexture(this, data.type, delegate(ItemIcon _item_icon, Texture _tex, DEGREE_TYPE _type_id)
+			{
+				icon.mainTexture = _tex;
+				OnIconLoaded();
+			});
+			icon.depth = rarityFrame.depth - 1;
+			UITexture uITexture7 = icon;
+			int num = 64;
+			icon.height = num;
+			uITexture7.width = num;
+			UISprite uISprite7 = rarityFrame;
+			num = 120;
+			rarityFrame.height = num;
+			uISprite7.width = num;
+			iconTypeSprite.depth = rarityFrame.depth + 2;
+			if (iconTypeSpriteSub != null)
+			{
+				iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.POINT_SHOP_ICON:
+		{
 			icon.mainTexture = null;
 			if (icon_id <= 0)
 			{
 				icon.set_enabled(false);
+				break;
 			}
-			else
+			ResourceLoad.ItemIconLoadPointShopPointIconTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _type_id)
 			{
-				ResourceLoad.ItemIconLoadPointShopPointIconTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _type_id)
+				icon.mainTexture = _tex;
+				OnIconLoaded();
+			});
+			icon.depth = rarityFrame.depth - 1;
+			UITexture uITexture2 = icon;
+			int num = 64;
+			icon.height = num;
+			uITexture2.width = num;
+			UISprite uISprite2 = rarityFrame;
+			num = 120;
+			rarityFrame.height = num;
+			uISprite2.width = num;
+			iconTypeSprite.depth = rarityFrame.depth + 2;
+			if (iconTypeSpriteSub != null)
+			{
+				iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
+			}
+			break;
+		}
+		case ITEM_ICON_TYPE.ACCESSORY:
+		{
+			icon.mainTexture = null;
+			if (icon_id <= 0)
+			{
+				icon.set_enabled(false);
+				break;
+			}
+			ResourceLoad.ItemIconLoadAccessoryIconTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _icon_id)
+			{
+				if (iconID == _icon_id)
 				{
 					icon.mainTexture = _tex;
 					OnIconLoaded();
-				});
-				icon.depth = rarityFrame.depth - 1;
-				UITexture uITexture4 = icon;
-				int num = 64;
-				icon.height = num;
-				uITexture4.width = num;
-				UISprite uISprite4 = rarityFrame;
-				num = 120;
-				rarityFrame.height = num;
-				uISprite4.width = num;
-				iconTypeSprite.depth = rarityFrame.depth + 1;
+				}
+			});
+			icon.depth = rarityFrame.depth - 1;
+			UITexture uITexture5 = icon;
+			int num = 64;
+			icon.height = num;
+			uITexture5.width = num;
+			UISprite uISprite5 = rarityFrame;
+			num = 120;
+			rarityFrame.height = num;
+			uISprite5.width = num;
+			iconTypeSprite.depth = rarityFrame.depth + 2;
+			if (iconTypeSpriteSub != null)
+			{
+				iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
 			}
 			break;
+		}
 		default:
+		{
 			icon.mainTexture = null;
 			if (icon_id <= 0)
 			{
 				icon.set_enabled(false);
+				break;
 			}
-			else
+			ResourceLoad.ItemIconLoadItemIconTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _icon_id)
 			{
-				ResourceLoad.ItemIconLoadItemIconTexture(this, icon_id, delegate(ItemIcon _item_icon, Texture _tex, int _icon_id)
+				if (iconID == _icon_id)
 				{
-					if (iconID == _icon_id)
-					{
-						icon.mainTexture = _tex;
-						OnIconLoaded();
-					}
-				});
-				icon.depth = rarityFrame.depth - 1;
-				UITexture uITexture = icon;
-				int num = 64;
-				icon.height = num;
-				uITexture.width = num;
-				UISprite uISprite = rarityFrame;
-				num = 120;
-				rarityFrame.height = num;
-				uISprite.width = num;
-				iconTypeSprite.depth = rarityFrame.depth + 1;
+					icon.mainTexture = _tex;
+					OnIconLoaded();
+				}
+			});
+			icon.depth = rarityFrame.depth - 1;
+			UITexture uITexture = icon;
+			int num = 64;
+			icon.height = num;
+			uITexture.width = num;
+			UISprite uISprite = rarityFrame;
+			num = 120;
+			rarityFrame.height = num;
+			uISprite.width = num;
+			iconTypeSprite.depth = rarityFrame.depth + 2;
+			if (iconTypeSpriteSub != null)
+			{
+				iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
 			}
 			break;
+		}
 		}
 	}
 
@@ -1065,70 +1213,74 @@ public class ItemIcon
 
 	public void SetRarity(ITEM_ICON_TYPE icon_type, RARITY_TYPE? rarity_type, bool disable_text, GET_TYPE getType)
 	{
+		string spriteName = (ITEM_ICON_EQUIP_RARITY_FRAME_SPRITE == null || ITEM_ICON_EQUIP_RARITY_FRAME_SPRITE.Length <= 0) ? "EquipIconFrame_CD" : ITEM_ICON_EQUIP_RARITY_FRAME_SPRITE[0];
 		if (!rarity_type.HasValue && icon_type != ITEM_ICON_TYPE.QUEST_ITEM)
 		{
-			rarityFrame.spriteName = string.Empty;
-			rarityFrame.set_enabled(false);
+			rarityFrame.set_enabled(true);
+			rarityFrame.spriteName = spriteName;
 			rarityTextIcon.spriteName = string.Empty;
 			rarityTextIcon.set_enabled(false);
+			return;
 		}
-		else
+		int num = (int)(rarity_type.HasValue ? rarity_type.Value : RARITY_TYPE.D);
+		rarityFrame.set_enabled(true);
+		rarityTextIcon.set_enabled(true);
+		switch (icon_type)
 		{
-			int num = (int)(rarity_type.HasValue ? rarity_type.Value : RARITY_TYPE.D);
-			rarityFrame.set_enabled(true);
-			rarityTextIcon.set_enabled(true);
-			switch (icon_type)
+		default:
+			rarityFrame.set_enabled(isVisible);
+			rarityFrame.spriteName = ITEM_ICON_EQUIP_RARITY_FRAME_SPRITE[num];
+			UIBehaviour.SetRarityColorType(num, rarityFrame);
+			rarityTextIcon.set_enabled(!disable_text && isVisible);
+			rarityTextIcon.spriteName = GetRarityTextSpriteName(rarity_type, getType);
+			break;
+		case ITEM_ICON_TYPE.USE_ITEM:
+			rarityFrame.set_enabled(false);
+			rarityTextIcon.set_enabled(false);
+			break;
+		case ITEM_ICON_TYPE.QUEST_ITEM:
+			if (rarity_type.HasValue)
 			{
-			default:
 				rarityFrame.set_enabled(isVisible);
-				rarityFrame.spriteName = ITEM_ICON_EQUIP_RARITY_FRAME_SPRITE[num];
+				rarityFrame.spriteName = ITEM_ICON_MONSTER_RARITY_FRAME_SPRITE[num];
 				UIBehaviour.SetRarityColorType(num, rarityFrame);
 				rarityTextIcon.set_enabled(!disable_text && isVisible);
 				rarityTextIcon.spriteName = GetRarityTextSpriteName(rarity_type, getType);
-				break;
-			case ITEM_ICON_TYPE.USE_ITEM:
-				rarityFrame.set_enabled(false);
-				rarityTextIcon.set_enabled(false);
-				break;
-			case ITEM_ICON_TYPE.QUEST_ITEM:
-				if (rarity_type.HasValue)
-				{
-					rarityFrame.set_enabled(isVisible);
-					rarityFrame.spriteName = ITEM_ICON_MONSTER_RARITY_FRAME_SPRITE[num];
-					UIBehaviour.SetRarityColorType(num, rarityFrame);
-					rarityTextIcon.set_enabled(!disable_text && isVisible);
-					rarityTextIcon.spriteName = GetRarityTextSpriteName(rarity_type, getType);
-				}
-				else
-				{
-					rarityFrame.spriteName = ITEM_ICON_MONSTER_NORMAL_FRAME_SPRITE;
-					rarityFrame.set_enabled(isVisible);
-					UIBehaviour.SetRarityColorType(num, rarityFrame);
-					rarityTextIcon.spriteName = string.Empty;
-					rarityTextIcon.set_enabled(false);
-				}
-				break;
-			case ITEM_ICON_TYPE.SKILL_ATTACK:
-			case ITEM_ICON_TYPE.SKILL_SUPPORT:
-			case ITEM_ICON_TYPE.SKILL_HEAL:
-			case ITEM_ICON_TYPE.SKILL_PASSIVE:
-			case ITEM_ICON_TYPE.SKILL_GROW:
+			}
+			else
 			{
-				int num2 = (int)(icon_type - 10);
+				rarityFrame.spriteName = ITEM_ICON_MONSTER_NORMAL_FRAME_SPRITE;
 				rarityFrame.set_enabled(isVisible);
-				rarityFrame.spriteName = ITEM_ICON_SKILL_FRAME[num2] + ITEM_ICON_RARITY[num];
-				UIBehaviour.SetRarityColorType(num, rarityFrame);
-				rarityTextIcon.set_enabled(!disable_text && isVisible);
-				rarityTextIcon.spriteName = GetRarityTextSpriteName(rarity_type, getType);
-				break;
-			}
-			case ITEM_ICON_TYPE.UNKNOWN:
-				rarityFrame.set_enabled(false);
+				UIBehaviour.SetRarityColorType(-1, rarityFrame);
+				rarityTextIcon.spriteName = string.Empty;
 				rarityTextIcon.set_enabled(false);
-				break;
 			}
-			ChangeRarityFrameAtlus(rarity_type);
+			break;
+		case ITEM_ICON_TYPE.SKILL_ATTACK:
+		case ITEM_ICON_TYPE.SKILL_SUPPORT:
+		case ITEM_ICON_TYPE.SKILL_HEAL:
+		case ITEM_ICON_TYPE.SKILL_PASSIVE:
+		case ITEM_ICON_TYPE.SKILL_GROW:
+		{
+			int num2 = (int)(icon_type - 10);
+			rarityFrame.set_enabled(isVisible);
+			rarityFrame.spriteName = ITEM_ICON_SKILL_FRAME[num2] + ITEM_ICON_RARITY[num];
+			UIBehaviour.SetRarityColorType(num, rarityFrame);
+			rarityTextIcon.set_enabled(!disable_text && isVisible);
+			rarityTextIcon.spriteName = GetRarityTextSpriteName(rarity_type, getType);
+			break;
 		}
+		case ITEM_ICON_TYPE.UNKNOWN:
+			rarityFrame.set_enabled(false);
+			rarityTextIcon.set_enabled(false);
+			break;
+		}
+		if (!rarityFrame.get_enabled() && !rarityTextIcon.get_enabled())
+		{
+			rarityFrame.set_enabled(true);
+			rarityFrame.spriteName = spriteName;
+		}
+		ChangeRarityFrameAtlus(rarity_type);
 	}
 
 	public static string GetRarityTextSpriteName(RARITY_TYPE? rarityType, GET_TYPE getType)
@@ -1173,30 +1325,21 @@ public class ItemIcon
 
 	private void SetSkillEnableEquipIcon(EQUIPMENT_TYPE? type)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Expected O, but got Unknown
 		if (!(skillEnableEquipTypeIcon == null))
 		{
 			skillEnableEquipTypeIcon.get_gameObject().SetActive(type.HasValue);
 			if (type.HasValue)
 			{
-				UIBehaviour.SetSkillEquipIconKind(skillEnableEquipTypeIcon.get_transform(), type.Value, true);
+				UIBehaviour.SetSkillEquipIconKind(skillEnableEquipTypeIcon.get_transform(), type.Value, is_enable: true);
 			}
 		}
 	}
 
 	public void SetRewardBG(bool is_visible)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		if (rewardBG == null)
 		{
-			Transform val = this.get_gameObject().get_transform().FindChild("SPR_REWARD_BG");
+			Transform val = this.get_gameObject().get_transform().Find("SPR_REWARD_BG");
 			if (val != null)
 			{
 				rewardBG = val.GetComponent<UISprite>();
@@ -1235,7 +1378,6 @@ public class ItemIcon
 
 	public void SetFavoriteIcon(bool is_favorite)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (!(favoriteSprite == null))
 		{
 			favoriteSprite.get_gameObject().SetActive(is_favorite);
@@ -1248,18 +1390,19 @@ public class ItemIcon
 
 	public void SetEquipGrowLimitBG(bool active)
 	{
-		if (Object.op_Implicit(equipGrowLimitBG))
+		if (!Object.op_Implicit(equipGrowLimitBG))
 		{
-			equipGrowLimitBG.set_enabled(active);
-			UITweener[] components = equipGrowLimitBG.GetComponents<UITweener>();
-			int i = 0;
-			for (int num = components.Length; i < num; i++)
+			return;
+		}
+		equipGrowLimitBG.set_enabled(active);
+		UITweener[] components = equipGrowLimitBG.GetComponents<UITweener>();
+		int i = 0;
+		for (int num = components.Length; i < num; i++)
+		{
+			UITweener uITweener = components[i];
+			if (Object.op_Implicit(uITweener))
 			{
-				UITweener uITweener = components[i];
-				if (Object.op_Implicit(uITweener))
-				{
-					uITweener.set_enabled(active);
-				}
+				uITweener.set_enabled(active);
 			}
 		}
 	}
@@ -1304,7 +1447,11 @@ public class ItemIcon
 	{
 		icon.depth = depth - 1;
 		rarityFrame.depth = depth;
-		iconTypeSprite.depth = depth + 1;
+		iconTypeSprite.depth = depth + 2;
+		if (iconTypeSpriteSub != null)
+		{
+			iconTypeSpriteSub.depth = iconTypeSprite.depth - 1;
+		}
 	}
 
 	public virtual void SetGrayout(bool isActive)
@@ -1329,6 +1476,113 @@ public class ItemIcon
 			monsterIconSize = 72;
 			rarityFrameSize = 116;
 			break;
+		case QUEST_ICON_SIZE_TYPE.SERIES_ARENA:
+			monsterIconSize = 228;
+			rarityFrameSize = 298;
+			break;
 		}
+	}
+
+	public Transform CloneIcon()
+	{
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		if (icon == null)
+		{
+			return null;
+		}
+		Transform val = ResourceUtility.Realizes(icon.get_gameObject());
+		if (val != null)
+		{
+			val.set_localPosition(Vector3.get_zero());
+			val.set_localRotation(Quaternion.get_identity());
+			val.set_localScale(Vector3.get_one());
+		}
+		return val;
+	}
+
+	public bool IsVisbleNewIcon()
+	{
+		if (newIcon == null)
+		{
+			return false;
+		}
+		return isVisible && newIcon.get_enabled() && newIcon.isVisible;
+	}
+
+	public void SetJackpotIcon()
+	{
+		button.set_enabled(false);
+		label.set_enabled(false);
+		bg.set_enabled(false);
+		iconTypeSprite.set_enabled(false);
+		rarityFrame.set_enabled(false);
+		rarityTextIcon.set_enabled(false);
+		newIcon.set_enabled(false);
+		if (rewardBG != null)
+		{
+			rewardBG.set_enabled(false);
+		}
+		enemyIconItem.set_enabled(false);
+		if (!object.ReferenceEquals(enemyIconItem2, null))
+		{
+			enemyIconItem2.set_enabled(false);
+		}
+		skillEnableEquipTypeIcon.set_enabled(false);
+	}
+
+	public void SetSpinLogIcon()
+	{
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		transform.set_localScale(new Vector3(0.4f, 0.4f, 1f));
+		label.get_gameObject().SetActive(itemNumber > 1);
+		label.set_enabled(true);
+		label.get_transform().set_localPosition(new Vector3(5f, -20f));
+	}
+
+	public void SetSpinUserLogIcon()
+	{
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		transform.set_localScale(Vector2.op_Implicit(new Vector2(0.9f, 0.9f)));
+		label.get_gameObject().SetActive(itemNumber > 1);
+		if (wheelNumBackBG != null)
+		{
+			wheelNumBackBG.get_gameObject().SetActive(itemNumber > 1);
+		}
+		label.set_enabled(true);
+		label.get_transform().set_localPosition(new Vector3(0f, -27f));
+		label.alignment = NGUIText.Alignment.Center;
+	}
+
+	public void SetSpinMachineItem()
+	{
+		icon.depth = 4;
+		SetJackpotIcon();
+	}
+
+	public void SetSpinMachineSkillItem()
+	{
+		icon.depth = 4;
+		bg.depth = 3;
+		rarityFrame.depth = 2;
+		rarityTextIcon.depth = 4;
+		button.set_enabled(false);
+		label.set_enabled(false);
+		iconTypeSprite.set_enabled(false);
+		newIcon.set_enabled(false);
+		if (rewardBG != null)
+		{
+			rewardBG.set_enabled(false);
+		}
+		enemyIconItem.set_enabled(false);
+		if (!object.ReferenceEquals(enemyIconItem2, null))
+		{
+			enemyIconItem2.set_enabled(false);
+		}
+		skillEnableEquipTypeIcon.set_enabled(false);
 	}
 }

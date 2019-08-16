@@ -114,7 +114,7 @@ public class ItemDetailLithographSellConfirm : ItemStorageSellConfirm
 			{
 				item.GetRarity().ToString()
 			});
-			GameSection.ChangeEvent("INCLUDE_RARE_CONFIRM", null);
+			GameSection.ChangeEvent("INCLUDE_RARE_CONFIRM");
 		}
 		else
 		{
@@ -130,12 +130,12 @@ public class ItemDetailLithographSellConfirm : ItemStorageSellConfirm
 		list2.Add(num);
 		if (num >= item.GetNum())
 		{
-			GameSection.ChangeEvent("CLOSE_DETAIL", null);
+			GameSection.ChangeEvent("CLOSE_DETAIL");
 		}
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellItem(list, list2, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 

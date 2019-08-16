@@ -8,8 +8,8 @@ public class LoginResult {
     private final Set<String> recentlyDeniedPermissions;
     private final Set<String> recentlyGrantedPermissions;
 
-    public LoginResult(AccessToken accessToken, Set<String> set, Set<String> set2) {
-        this.accessToken = accessToken;
+    public LoginResult(AccessToken accessToken2, Set<String> set, Set<String> set2) {
+        this.accessToken = accessToken2;
         this.recentlyGrantedPermissions = set;
         this.recentlyDeniedPermissions = set2;
     }

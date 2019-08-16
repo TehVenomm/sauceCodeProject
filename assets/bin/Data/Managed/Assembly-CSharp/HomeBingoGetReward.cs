@@ -69,7 +69,7 @@ public class HomeBingoGetReward : GameSection
 		if (rewards != null && rewards.Length > 0)
 		{
 			int exp = 0;
-			SetGrid(UI.GRD_REWARD, string.Empty, rewards.Length, false, delegate(int index, Transform t, bool is_recycle)
+			SetGrid(UI.GRD_REWARD, string.Empty, rewards.Length, reset: false, delegate(int index, Transform t, bool is_recycle)
 			{
 				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewards[index].reward;
 				bool is_visible = false;
@@ -80,9 +80,9 @@ public class HomeBingoGetReward : GameSection
 				else
 				{
 					is_visible = true;
-					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
-					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id, null);
-					itemIcon.SetRewardBG(true);
+					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, null, 0, is_new: false, -1, is_select: false, null, is_equipping: false, disable_rarity_text: false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
+					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id);
+					itemIcon.SetRewardBG(is_visible: true);
 				}
 				SetActive(t, is_visible);
 			});
@@ -91,7 +91,6 @@ public class HomeBingoGetReward : GameSection
 
 	private void OnQuery_CLOSE()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (null != glowModel_)
 		{
 			glowModel_.get_gameObject().SetActive(false);

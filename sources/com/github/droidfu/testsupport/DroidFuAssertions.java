@@ -26,12 +26,12 @@ public class DroidFuAssertions {
         int i = instance.get(1);
         int i2 = instance2.get(1);
         assertEquals("expected year to be " + i + ", but was " + i2, Integer.valueOf(i), Integer.valueOf(i2));
-        i = instance.get(2);
-        i2 = instance2.get(2);
-        assertEquals("expected month to be " + i + ", but was " + i2, Integer.valueOf(i), Integer.valueOf(i2));
-        int i3 = instance.get(5);
-        int i4 = instance2.get(5);
-        assertEquals("expected day to be " + i3 + ", but was " + i4, Integer.valueOf(i3), Integer.valueOf(i4));
+        int i3 = instance.get(2);
+        int i4 = instance2.get(2);
+        assertEquals("expected month to be " + i3 + ", but was " + i4, Integer.valueOf(i3), Integer.valueOf(i4));
+        int i5 = instance.get(5);
+        int i6 = instance2.get(5);
+        assertEquals("expected day to be " + i5 + ", but was " + i6, Integer.valueOf(i5), Integer.valueOf(i6));
     }
 
     public static <E> void assertEqualElements(Collection<E> collection, Collection<E> collection2) {
@@ -56,12 +56,12 @@ public class DroidFuAssertions {
         int i = instance.get(11);
         int i2 = instance2.get(11);
         assertEquals("expected hour to be " + i + ", but was " + i2, Integer.valueOf(i), Integer.valueOf(i2));
-        i = instance.get(12);
-        i2 = instance2.get(12);
-        assertEquals("expected minute to be " + i + ", but was " + i2, Integer.valueOf(i), Integer.valueOf(i2));
-        int i3 = instance.get(13);
-        int i4 = instance2.get(13);
-        assertEquals("expected second to be " + i3 + ", but was " + i4, Integer.valueOf(i3), Integer.valueOf(i4));
+        int i3 = instance.get(12);
+        int i4 = instance2.get(12);
+        assertEquals("expected minute to be " + i3 + ", but was " + i4, Integer.valueOf(i3), Integer.valueOf(i4));
+        int i5 = instance.get(13);
+        int i6 = instance2.get(13);
+        assertEquals("expected second to be " + i5 + ", but was " + i6, Integer.valueOf(i5), Integer.valueOf(i6));
     }
 
     private static void assertTrue(String str, boolean z) {

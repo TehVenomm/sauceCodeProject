@@ -56,7 +56,7 @@ public class SmithGrowSkillConfirm : GameSection
 			{
 				isRareConfirm = true;
 			}
-			if (!isEquipConfirm && material[j].isAttached)
+			if (!isEquipConfirm && (material[j].isAttached || material[j].isUniqueAttached))
 			{
 				isEquipConfirm = true;
 			}
@@ -94,10 +94,10 @@ public class SmithGrowSkillConfirm : GameSection
 		{
 			SetLabelText((Enum)UI.LBL_MONEY, total.ToString());
 		}
-		SetGrid(UI.GRD_MATERIAL, null, material.Length, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_MATERIAL, null, material.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			SkillItemInfo skillItemInfo = material[i];
-			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(skillItemInfo.tableData.type), skillItemInfo.tableData.iconID, skillItemInfo.tableData.rarity, t, ELEMENT_TYPE.MAX, skillItemInfo.tableData.GetEnableEquipType(), -1, "DETAIL", i, false, -1, false, null, skillItemInfo.isAttached, 0, 0, false, GET_TYPE.PAY);
+			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(skillItemInfo.tableData.type), skillItemInfo.tableData.iconID, skillItemInfo.tableData.rarity, t, ELEMENT_TYPE.MAX, skillItemInfo.tableData.GetEnableEquipType(), -1, "DETAIL", i, is_new: false, -1, is_select: false, null, skillItemInfo.isAttached || skillItemInfo.isUniqueAttached);
 			Transform ctrl = GetCtrl(UI.PNL_MATERIAL_INFO);
 			SetMaterialInfo(itemIcon.transform, REWARD_TYPE.SKILL_ITEM, skillItemInfo.tableID, ctrl);
 		});
@@ -138,7 +138,7 @@ public class SmithGrowSkillConfirm : GameSection
 						SmithManager.ResultData resultData2 = new SmithManager.ResultData
 						{
 							itemData = ret_skill_item,
-							beforeRarity = baseSkill.tableData.rarity,
+							beforeRarity = (int)baseSkill.tableData.rarity,
 							beforeMaxLevel = baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
 							beforeExceedCnt = baseSkill.exceedCnt,
 							beforeLevel = baseSkill.level,
@@ -157,11 +157,11 @@ public class SmithGrowSkillConfirm : GameSection
 							isExceed
 						});
 						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-						GameSection.ResumeEvent(true, null);
+						GameSection.ResumeEvent(is_resume: true);
 					}
 					else
 					{
-						GameSection.ResumeEvent(false, null);
+						GameSection.ResumeEvent(is_resume: false);
 					}
 				});
 			}
@@ -174,7 +174,7 @@ public class SmithGrowSkillConfirm : GameSection
 						SmithManager.ResultData resultData = new SmithManager.ResultData
 						{
 							itemData = ret_skill_item,
-							beforeRarity = baseSkill.tableData.rarity,
+							beforeRarity = (int)baseSkill.tableData.rarity,
 							beforeMaxLevel = baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
 							beforeExceedCnt = baseSkill.exceedCnt,
 							beforeLevel = baseSkill.level,
@@ -193,11 +193,11 @@ public class SmithGrowSkillConfirm : GameSection
 							isExceed
 						});
 						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-						GameSection.ResumeEvent(true, null);
+						GameSection.ResumeEvent(is_resume: true);
 					}
 					else
 					{
-						GameSection.ResumeEvent(false, null);
+						GameSection.ResumeEvent(is_resume: false);
 					}
 				});
 			}

@@ -70,8 +70,6 @@ public class QuestResultPointEvent : GameSection
 
 	private enum AUDIO
 	{
-		COUNTUP = 40000012,
-		GET_REWARD = 40000155,
 		RESULT = 40000049,
 		TITLE_LOGO = 40000227,
 		CATEGORY = 40000228,
@@ -80,19 +78,13 @@ public class QuestResultPointEvent : GameSection
 		START_BONUS_TIME = 40000268
 	}
 
-	private const string BOOST_BONUS_NAME = "ブ\u30fcストポイント";
-
-	private const string TITLE_LOGO_NAME_FORMAT = "ef_ui_pointresult_{0:D8}";
-
-	private const float COUNT_ANIM_SPEED = 4f;
-
-	private const float FADE_SPEED = 5f;
-
 	private State pointResultState;
 
 	private bool stateInitialized;
 
 	private PointEventCurrentData currentData;
+
+	private const string BOOST_BONUS_NAME = "ブ\u30fcストポイント";
 
 	private int boostPoint;
 
@@ -126,6 +118,10 @@ public class QuestResultPointEvent : GameSection
 		UI.OBJ_LINE4
 	};
 
+	private const string TITLE_LOGO_NAME_FORMAT = "ef_ui_pointresult";
+
+	private const float COUNT_ANIM_SPEED = 4f;
+
 	private List<PointEventCurrentData.Reward> rewardList = new List<PointEventCurrentData.Reward>();
 
 	private List<GameObject> rewardObjects = new List<GameObject>();
@@ -135,6 +131,8 @@ public class QuestResultPointEvent : GameSection
 	private Transform bannerCtrl;
 
 	private MeshRenderer[] bannerMeshRenderers;
+
+	private const float FADE_SPEED = 5f;
 
 	private readonly string[] SPR_RANKING_NUMBER = new string[10]
 	{
@@ -172,11 +170,10 @@ public class QuestResultPointEvent : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		currentData = (GameSection.GetEventData() as PointEventCurrentData);
-		SetActive((Enum)UI.OBJ_REWARD_ROOT, false);
-		SetActive((Enum)UI.OBJ_RANKING_ROOT, false);
-		SetActive((Enum)UI.OBJ_BONUS_ROOT, false);
+		SetActive((Enum)UI.OBJ_REWARD_ROOT, is_visible: false);
+		SetActive((Enum)UI.OBJ_RANKING_ROOT, is_visible: false);
+		SetActive((Enum)UI.OBJ_BONUS_ROOT, is_visible: false);
 		bannerCtrl = GetCtrl(UI.TXT_BANNER);
 		this.StartCoroutine(DoInitalize());
 	}
@@ -184,17 +181,35 @@ public class QuestResultPointEvent : GameSection
 	private IEnumerator DoInitalize()
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		loadQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, $"ef_ui_pointresult_{currentData.eventId:D8}");
+		loadQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_pointresult");
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
-		SetVisibleWidgetEffect(UI.TXT_BANNER, $"ef_ui_pointresult_{currentData.eventId:D8}");
+		SetVisibleWidgetEffect(UI.TXT_BANNER, "ef_ui_pointresult");
 		UIVisibleWidgetEffect visibleWidget = bannerCtrl.GetComponent<UIVisibleWidgetEffect>();
 		visibleWidget.SetRendererQueue(4000);
 		PlayAudio(AUDIO.TITLE_LOGO);
-		ResourceLoad.LoadEventBannerResultTexture(GetCtrl(UI.SPR_LOGO).GetComponent<UITexture>(), (uint)currentData.eventId);
-		ResourceLoad.LoadEventBannerResultBGTexture(GetCtrl(UI.SPR_LOGO_BG).GetComponent<UITexture>(), (uint)currentData.eventId);
+		int eventId = -1;
+		if (currentData != null)
+		{
+			eventId = currentData.eventId;
+			string questEventBannerResult = ResourceName.GetQuestEventBannerResult(eventId);
+			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null)
+			{
+				eventId = 10017100;
+			}
+			else
+			{
+				Hash128 assetBundleHash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BANNER_RESULT.ToAssetBundleName(questEventBannerResult));
+				if (!assetBundleHash.get_isValid())
+				{
+					eventId = 10017100;
+				}
+			}
+		}
+		ResourceLoad.LoadEventBannerResultTexture(GetCtrl(UI.SPR_LOGO).GetComponent<UITexture>(), (uint)eventId);
+		ResourceLoad.LoadEventBannerResultBGTexture(GetCtrl(UI.SPR_LOGO_BG).GetComponent<UITexture>(), (uint)eventId);
 		TweenAlpha logoBGAlpha = GetCtrl(UI.SPR_LOGO_BG).GetComponent<TweenAlpha>();
 		if (logoBGAlpha != null)
 		{
@@ -206,23 +221,16 @@ public class QuestResultPointEvent : GameSection
 
 	private void Update()
 	{
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0209: Unknown result type (might be due to invalid IL or missing references)
 		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
 		switch (pointResultState)
@@ -260,7 +268,7 @@ public class QuestResultPointEvent : GameSection
 					{
 						bannerCtrl.set_position(GetCtrl(UI.OBJ_REWARD_POS).get_position());
 						bannerCtrl.set_localScale(GetCtrl(UI.OBJ_REWARD_POS).get_localScale());
-						SetActive((Enum)UI.SPR_LOGO_BG, false);
+						SetActive((Enum)UI.SPR_LOGO_BG, is_visible: false);
 						this.StartCoroutine(WaitTiming(2f));
 						pointResultState = State.REWARD;
 						stateInitialized = false;
@@ -274,41 +282,44 @@ public class QuestResultPointEvent : GameSection
 			break;
 		}
 		case State.REWARD:
-			if (!stateInitialized)
+		{
+			if (stateInitialized)
 			{
-				int num2 = 0;
-				for (int j = 0; j < bannerMeshRenderers.Length; j++)
+				break;
+			}
+			int num2 = 0;
+			for (int j = 0; j < bannerMeshRenderers.Length; j++)
+			{
+				Color color3 = bannerMeshRenderers[j].get_material().get_color();
+				color3.a = Mathf.Min(1f, color3.a + 5f * Time.get_deltaTime());
+				bannerMeshRenderers[j].get_material().set_color(color3);
+				Color color4 = bannerMeshRenderers[j].get_material().get_color();
+				if (color4.a >= 1f)
 				{
-					Color color3 = bannerMeshRenderers[j].get_material().get_color();
-					color3.a = Mathf.Min(1f, color3.a + 5f * Time.get_deltaTime());
-					bannerMeshRenderers[j].get_material().set_color(color3);
-					Color color4 = bannerMeshRenderers[j].get_material().get_color();
-					if (color4.a >= 1f)
+					num2++;
+				}
+				if (j == bannerMeshRenderers.Length - 1)
+				{
+					if (num2 == bannerMeshRenderers.Length)
 					{
-						num2++;
+						SetActive((Enum)UI.OBJ_REWARD_ROOT, is_visible: true);
+						stateInitialized = true;
+						SetRewardUI();
 					}
-					if (j == bannerMeshRenderers.Length - 1)
+					else
 					{
-						if (num2 == bannerMeshRenderers.Length)
-						{
-							SetActive((Enum)UI.OBJ_REWARD_ROOT, true);
-							stateInitialized = true;
-							SetRewardUI();
-						}
-						else
-						{
-							num2 = 0;
-						}
+						num2 = 0;
 					}
 				}
 			}
 			break;
+		}
 		case State.BONUS:
 			if (!stateInitialized)
 			{
-				SetActive((Enum)UI.OBJ_REWARD_ROOT, false);
-				SetActive((Enum)UI.OBJ_BONUS_ROOT, true);
-				SetActive((Enum)UI.TXT_BANNER, false);
+				SetActive((Enum)UI.OBJ_REWARD_ROOT, is_visible: false);
+				SetActive((Enum)UI.OBJ_BONUS_ROOT, is_visible: true);
+				SetActive((Enum)UI.TXT_BANNER, is_visible: false);
 				SetBonusUI();
 				stateInitialized = true;
 			}
@@ -316,10 +327,10 @@ public class QuestResultPointEvent : GameSection
 		case State.RANKING:
 			if (!stateInitialized)
 			{
-				SetActive((Enum)UI.OBJ_REWARD_ROOT, false);
-				SetActive((Enum)UI.OBJ_BONUS_ROOT, false);
-				SetActive((Enum)UI.OBJ_RANKING_ROOT, true);
-				SetActive((Enum)UI.TXT_BANNER, false);
+				SetActive((Enum)UI.OBJ_REWARD_ROOT, is_visible: false);
+				SetActive((Enum)UI.OBJ_BONUS_ROOT, is_visible: false);
+				SetActive((Enum)UI.OBJ_RANKING_ROOT, is_visible: true);
+				SetActive((Enum)UI.TXT_BANNER, is_visible: false);
 				SetRankingUI();
 				stateInitialized = true;
 			}
@@ -330,11 +341,9 @@ public class QuestResultPointEvent : GameSection
 	private void SetRewardUI()
 	{
 		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Expected O, but got Unknown
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Expected O, but got Unknown
 		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		SetActive((Enum)UI.BTN_OK, false);
+		SetActive((Enum)UI.BTN_OK, is_visible: false);
 		InitTween((Enum)UI.OBJ_GET_EXP_ROOT);
 		InitTween((Enum)UI.OBJ_TOTAL_EXP_ROOT);
 		InitTween((Enum)UI.OBJ_NEXT_REWARD_ROOT);
@@ -344,17 +353,29 @@ public class QuestResultPointEvent : GameSection
 		if (MonoBehaviourSingleton<GuildRequestManager>.IsValid() && MonoBehaviourSingleton<GuildRequestManager>.I.isCompleteMulti)
 		{
 			Transform ctrl = GetCtrl(UI.OBJ_POINT_DETAIL);
-			foreach (Transform item in ctrl)
+			IEnumerator enumerator = ctrl.GetEnumerator();
+			try
 			{
-				Transform val = item;
-				val.get_gameObject().SetActive(false);
+				while (enumerator.MoveNext())
+				{
+					Transform val = enumerator.Current;
+					val.get_gameObject().SetActive(false);
+				}
+			}
+			finally
+			{
+				IDisposable disposable;
+				if ((disposable = (enumerator as IDisposable)) != null)
+				{
+					disposable.Dispose();
+				}
 			}
 		}
 		else
 		{
 			SetLabelText((Enum)UI.LBL_QUEST_NAME, MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestName());
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID());
-			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY), ELEMENT_TYPE.MAX, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
+			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID(0));
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY));
 		}
 		int num = 0;
 		int num2 = 0;
@@ -392,77 +413,78 @@ public class QuestResultPointEvent : GameSection
 		int getPoint = currentData.pointRankingData.getPoint;
 		int userPoint = currentData.pointRankingData.userPoint;
 		int totalPoint = userPoint + getPoint;
+		bool wait = true;
 		PlayAudio(AUDIO.CATEGORY);
-		bool wait6 = true;
+		wait = true;
 		SetLabelText((Enum)UI.LBL_GET_POINT, "0");
-		PlayTween((Enum)UI.OBJ_GET_EXP_ROOT, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_GET_EXP_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CGetPointAnimation_003Ec__Iterator114)/*Error near IL_00db: stateMachine*/)._003Cwait_003E__3 = false;
-		}, true, 0);
-		while (wait6)
+			wait = false;
+		}, is_input_block: true, 0);
+		while (wait)
 		{
 			if (skipRequest)
 			{
-				SkipTween((Enum)UI.OBJ_GET_EXP_ROOT, true, 0);
-				wait6 = false;
+				SkipTween((Enum)UI.OBJ_GET_EXP_ROOT, forward: true, 0);
+				wait = false;
 			}
-			yield return (object)0;
+			yield return 0;
 		}
-		yield return (object)this.StartCoroutine(CountUpAnimation(0f, getPoint - boostPoint, UI.LBL_GET_POINT));
+		yield return this.StartCoroutine(CountUpAnimation(0f, getPoint - boostPoint, UI.LBL_GET_POINT));
 		if (boostPoint > 0)
 		{
 			SetLabelText((Enum)UI.LBL_BONUS_RATE, "x" + boostRate.ToString());
-			wait6 = true;
-			PlayTween((Enum)UI.OBJ_BONUS_TIME_ROOT, true, (EventDelegate.Callback)delegate
+			wait = true;
+			PlayTween((Enum)UI.OBJ_BONUS_TIME_ROOT, forward: true, (EventDelegate.Callback)delegate
 			{
-				((_003CGetPointAnimation_003Ec__Iterator114)/*Error near IL_01d2: stateMachine*/)._003Cwait_003E__3 = false;
-			}, true, 0);
-			while (wait6)
+				wait = false;
+			}, is_input_block: true, 0);
+			while (wait)
 			{
 				if (skipRequest)
 				{
-					SkipTween((Enum)UI.OBJ_BONUS_TIME_ROOT, true, 0);
-					wait6 = false;
+					SkipTween((Enum)UI.OBJ_BONUS_TIME_ROOT, forward: true, 0);
+					wait = false;
 				}
-				yield return (object)0;
+				yield return 0;
 			}
 			PlayAudio(AUDIO.RESULT);
 			if (!skipRequest)
 			{
-				yield return (object)this.StartCoroutine(WaitTiming(1.2f));
+				yield return this.StartCoroutine(WaitTiming(1.2f));
 			}
-			yield return (object)this.StartCoroutine(CountUpAnimation((float)(getPoint - boostPoint), getPoint, UI.LBL_GET_POINT));
+			yield return this.StartCoroutine(CountUpAnimation(getPoint - boostPoint, getPoint, UI.LBL_GET_POINT));
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_BONUS_TIME_ROOT, false);
+			SetActive((Enum)UI.OBJ_BONUS_TIME_ROOT, is_visible: false);
 		}
 		PlayAudio(AUDIO.CATEGORY);
-		wait6 = true;
+		wait = true;
 		SetLabelText((Enum)UI.LBL_TOTAL_POINT, userPoint.ToString("N0"));
-		PlayTween((Enum)UI.OBJ_TOTAL_EXP_ROOT, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_TOTAL_EXP_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CGetPointAnimation_003Ec__Iterator114)/*Error near IL_0324: stateMachine*/)._003Cwait_003E__3 = false;
-		}, true, 0);
-		while (wait6)
+			wait = false;
+		}, is_input_block: true, 0);
+		while (wait)
 		{
 			if (skipRequest)
 			{
-				SkipTween((Enum)UI.OBJ_TOTAL_EXP_ROOT, true, 0);
-				wait6 = false;
+				SkipTween((Enum)UI.OBJ_TOTAL_EXP_ROOT, forward: true, 0);
+				wait = false;
 			}
-			yield return (object)0;
+			yield return 0;
 		}
-		yield return (object)this.StartCoroutine(CountUpAnimation((float)userPoint, totalPoint, UI.LBL_TOTAL_POINT));
+		yield return this.StartCoroutine(CountUpAnimation(userPoint, totalPoint, UI.LBL_TOTAL_POINT));
 		int lastGetRewardsPoint = 0;
 		if (currentData.pointRankingData.getReward.Count > 0)
 		{
-			for (int m = 0; m < currentData.pointRankingData.getReward.Count; m++)
+			for (int j = 0; j < currentData.pointRankingData.getReward.Count; j++)
 			{
-				PointEventCurrentData.PointRewardData currentNextData = currentData.pointRankingData.getReward[m];
-				for (int j = 0; j < currentNextData.reward.Count; j++)
+				PointEventCurrentData.PointRewardData currentNextData = currentData.pointRankingData.getReward[j];
+				for (int k = 0; k < currentNextData.reward.Count; k++)
 				{
-					rewardList.Add(currentNextData.reward[j]);
+					rewardList.Add(currentNextData.reward[k]);
 				}
 			}
 			if (rewardList.Count > 0)
@@ -473,35 +495,35 @@ public class QuestResultPointEvent : GameSection
 					rewardObjects[l].SetActive(false);
 				}
 			}
-			for (int k = 0; k < currentData.pointRankingData.getReward.Count; k++)
+			for (int i = 0; i < currentData.pointRankingData.getReward.Count; i++)
 			{
-				PointEventCurrentData.PointRewardData currentNextData = currentData.pointRankingData.getReward[k];
+				PointEventCurrentData.PointRewardData currentNextData = currentData.pointRankingData.getReward[i];
 				SetNextItemIcon(currentNextData.reward);
-				wait6 = true;
+				wait = true;
 				ResetTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, 0);
-				int currentPoint = currentNextData.point - lastGetRewardsPoint;
-				SetLabelText((Enum)UI.LBL_NEXT_POINT, currentPoint.ToString("N0"));
-				PlayTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, true, (EventDelegate.Callback)delegate
+				int currentPoint2 = currentNextData.point - lastGetRewardsPoint;
+				SetLabelText((Enum)UI.LBL_NEXT_POINT, currentPoint2.ToString("N0"));
+				PlayTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, forward: true, (EventDelegate.Callback)delegate
 				{
-					((_003CGetPointAnimation_003Ec__Iterator114)/*Error near IL_05ca: stateMachine*/)._003Cwait_003E__3 = false;
-				}, true, 0);
+					wait = false;
+				}, is_input_block: true, 0);
 				if (!skipRequest)
 				{
 					PlayAudio(AUDIO.CATEGORY);
 				}
-				while (wait6)
+				while (wait)
 				{
 					if (skipRequest)
 					{
-						SkipTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, true, 0);
-						wait6 = false;
+						SkipTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, forward: true, 0);
+						wait = false;
 					}
-					yield return (object)0;
+					yield return 0;
 				}
-				yield return (object)this.StartCoroutine(CountDownAnimation((float)currentPoint, 0, UI.LBL_NEXT_POINT));
+				yield return this.StartCoroutine(CountDownAnimation(currentPoint2, 0, UI.LBL_NEXT_POINT));
 				if (!skipRequest)
 				{
-					yield return (object)this.StartCoroutine(WaitTiming(0.5f));
+					yield return this.StartCoroutine(WaitTiming(0.5f));
 				}
 				lastGetRewardsPoint = currentNextData.point;
 			}
@@ -509,86 +531,76 @@ public class QuestResultPointEvent : GameSection
 		if (currentData.pointRankingData.nextReward != null)
 		{
 			SetNextItemIcon(currentData.pointRankingData.nextReward.reward);
-			wait6 = true;
+			wait = true;
 			ResetTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, 0);
-			int currentPoint2 = currentData.pointRankingData.nextReward.point - lastGetRewardsPoint;
-			SetLabelText((Enum)UI.LBL_NEXT_POINT, currentPoint2.ToString("N0"));
-			PlayTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, true, (EventDelegate.Callback)delegate
+			int currentPoint = currentData.pointRankingData.nextReward.point - lastGetRewardsPoint;
+			SetLabelText((Enum)UI.LBL_NEXT_POINT, currentPoint.ToString("N0"));
+			PlayTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, forward: true, (EventDelegate.Callback)delegate
 			{
-				((_003CGetPointAnimation_003Ec__Iterator114)/*Error near IL_07b0: stateMachine*/)._003Cwait_003E__3 = false;
-			}, true, 0);
+				wait = false;
+			}, is_input_block: true, 0);
 			PlayAudio(AUDIO.CATEGORY);
-			while (wait6)
+			while (wait)
 			{
 				if (skipRequest)
 				{
-					SkipTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, true, 0);
-					wait6 = false;
+					SkipTween((Enum)UI.OBJ_NEXT_REWARD_ROOT, forward: true, 0);
+					wait = false;
 				}
-				yield return (object)0;
+				yield return 0;
 			}
-			yield return (object)this.StartCoroutine(CountDownAnimation(targetPoint: currentData.pointRankingData.nextReward.point - totalPoint, currentPoint: (float)currentPoint2, targetUI: UI.LBL_NEXT_POINT));
+			yield return this.StartCoroutine(CountDownAnimation(targetPoint: currentData.pointRankingData.nextReward.point - totalPoint, currentPoint: currentPoint, targetUI: UI.LBL_NEXT_POINT));
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, false);
+			SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, is_visible: false);
 		}
 		if (rewardObjects.Count > 0)
 		{
-			wait6 = true;
+			wait = true;
 			ResetTween((Enum)UI.OBJ_GET_REWARD_ROOT, 0);
-			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, (EventDelegate.Callback)delegate
+			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, forward: true, (EventDelegate.Callback)delegate
 			{
-				((_003CGetPointAnimation_003Ec__Iterator114)/*Error near IL_08d7: stateMachine*/)._003Cwait_003E__3 = false;
-			}, true, 0);
+				wait = false;
+			}, is_input_block: true, 0);
 			PlayAudio(AUDIO.POINTREWARD);
-			while (wait6)
+			while (wait)
 			{
 				if (skipRequest)
 				{
-					SkipTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, 0);
-					wait6 = false;
+					SkipTween((Enum)UI.OBJ_GET_REWARD_ROOT, forward: true, 0);
+					wait = false;
 				}
-				yield return (object)0;
+				yield return 0;
 			}
-			for (int i = 0; i < rewardObjects.Count; i++)
+			for (int m = 0; m < rewardObjects.Count; m++)
 			{
-				rewardObjects[i].SetActive(true);
-				TweenAlpha alpha = rewardObjects[i].GetComponent<TweenAlpha>();
-				if (!(alpha == null))
+				rewardObjects[m].SetActive(true);
+				TweenAlpha component = rewardObjects[m].GetComponent<TweenAlpha>();
+				if (!(component == null))
 				{
-					alpha.ResetToBeginning();
-					alpha.PlayForward();
+					component.ResetToBeginning();
+					component.PlayForward();
 				}
 			}
 		}
-		SetActive((Enum)UI.BTN_OK, true);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
+		SetActive((Enum)UI.BTN_OK, is_visible: true);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
 	}
 
 	private void SetNextItemIcon(List<PointEventCurrentData.Reward> reward)
 	{
-		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList((Enum)UI.OBJ_NEXT_REWARD_ITEM_ICON_ROOT, "ItemIcon", reward.Count, reset: true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
 			PointEventCurrentData.Reward reward2 = reward[i];
-			ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward2.type, (uint)reward2.itemId, t, reward2.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward2.type, (uint)reward2.itemId, t, reward2.num);
 		});
 	}
 
 	private void SetAllRewardItem(List<PointEventCurrentData.Reward> rewardList)
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Expected O, but got Unknown
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Expected O, but got Unknown
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Expected O, but got Unknown
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_ITEM_ROOT);
 		for (int j = 0; j < rewardList.Count; j++)
 		{
@@ -597,27 +609,23 @@ public class QuestResultPointEvent : GameSection
 				Transform val = Utility.FindChild(ctrl, "itemNum");
 				val.GetComponent<UILabel>().text = "×" + rewardList[j].num;
 				rewardObjects.Add(ctrl.get_gameObject());
+				continue;
 			}
-			else
-			{
-				GameObject val2 = Object.Instantiate<GameObject>(ctrl.get_gameObject());
-				val2.get_transform().set_parent(ctrl.get_parent());
-				val2.get_transform().set_localPosition(ctrl.get_localPosition());
-				val2.get_transform().set_localScale(ctrl.get_localScale());
-				Transform val3 = Utility.FindChild(val2.get_transform(), "itemNum");
-				val3.GetComponent<UILabel>().text = "×" + rewardList[j].num;
-				rewardObjects.Add(val2);
-			}
+			GameObject val2 = Object.Instantiate<GameObject>(ctrl.get_gameObject());
+			val2.get_transform().set_parent(ctrl.get_parent());
+			val2.get_transform().set_localPosition(ctrl.get_localPosition());
+			val2.get_transform().set_localScale(ctrl.get_localScale());
+			Transform val3 = Utility.FindChild(val2.get_transform(), "itemNum");
+			val3.GetComponent<UILabel>().text = "×" + rewardList[j].num;
+			rewardObjects.Add(val2);
 		}
-		SetDynamicList((Enum)UI.GRD_ANIM_ITEM_ROOT, "ItemIcon", rewardList.Count, true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList((Enum)UI.GRD_ANIM_ITEM_ROOT, "ItemIcon", rewardList.Count, reset: true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Expected O, but got Unknown
 			PointEventCurrentData.Reward reward = rewardList[i];
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, t.get_parent(), reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, t.get_parent(), reward.num);
 			if (itemIcon != null)
 			{
-				itemIcon.SetEnableCollider(false);
+				itemIcon.SetEnableCollider(is_enable: false);
 			}
 		});
 	}
@@ -628,8 +636,8 @@ public class QuestResultPointEvent : GameSection
 		{
 			SetLabelText((Enum)bonusNames[bonusIndex], bonusName);
 			SetLabelText((Enum)bonusPoints[bonusIndex], "+" + point.ToString("N0"));
-			SetActive((Enum)bonusRoots[bonusIndex], true);
-			SetActive((Enum)bonusLines[bonusIndex], true);
+			SetActive((Enum)bonusRoots[bonusIndex], is_visible: true);
+			SetActive((Enum)bonusLines[bonusIndex], is_visible: true);
 		}
 	}
 
@@ -637,10 +645,10 @@ public class QuestResultPointEvent : GameSection
 	{
 		while (currentPoint < (float)targetPoint)
 		{
-			yield return (object)0;
+			yield return 0;
 			if (skipRequest)
 			{
-				currentPoint = (float)targetPoint;
+				currentPoint = targetPoint;
 			}
 			int before = Mathf.FloorToInt(currentPoint);
 			float addingPoint = Mathf.Max(((float)targetPoint - currentPoint) * CountDownCube(Time.get_deltaTime() * 4f), 1f);
@@ -658,10 +666,10 @@ public class QuestResultPointEvent : GameSection
 	{
 		while (currentPoint > (float)targetPoint)
 		{
-			yield return (object)0;
+			yield return 0;
 			if (skipRequest)
 			{
-				currentPoint = (float)targetPoint;
+				currentPoint = targetPoint;
 			}
 			int before = Mathf.FloorToInt(currentPoint);
 			float addingPoint = Mathf.Min(((float)targetPoint - currentPoint) * CountDownCube(Time.get_deltaTime() * 4f), -1f);
@@ -677,26 +685,21 @@ public class QuestResultPointEvent : GameSection
 
 	private void SetBonusUI()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		InitTween((Enum)UI.OBJ_BONUS_ANIM_ROOT);
 		this.StartCoroutine(StartBonusAnimation());
 	}
 
 	private IEnumerator StartBonusAnimation()
 	{
-		SoundManager.PlayOneshotJingle(40000268, null, null);
-		PlayTween((Enum)UI.OBJ_BONUS_ANIM_ROOT, true, (EventDelegate.Callback)null, true, 0);
-		yield return (object)this.StartCoroutine(WaitTiming(2.8f));
+		SoundManager.PlayOneshotJingle(40000268);
+		PlayTween((Enum)UI.OBJ_BONUS_ANIM_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
+		yield return this.StartCoroutine(WaitTiming(2.8f));
 		ChangeToRankingState();
 	}
 
 	private void SetRankingUI()
 	{
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Expected O, but got Unknown
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, true);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: true);
 		PointEventCurrentData.PointResultData pointRankingData = currentData.pointRankingData;
 		SetLabelText((Enum)UI.LBL_RANKING_TOTAL_POINT, (pointRankingData.userPoint + pointRankingData.getPoint).ToString("N0"));
 		SetLabelText((Enum)UI.LBL_PASS_NUM, Mathf.Max(0, pointRankingData.beforeRank - pointRankingData.afterRank).ToString("N0") + "人抜き");
@@ -738,79 +741,79 @@ public class QuestResultPointEvent : GameSection
 	private IEnumerator StartRankingAnimation()
 	{
 		PlayAudio(AUDIO.CATEGORY);
-		bool wait2 = true;
-		PlayTween((Enum)UI.OBJ_RANKING_ANIM_ROOT, true, (EventDelegate.Callback)delegate
+		bool wait = true;
+		PlayTween((Enum)UI.OBJ_RANKING_ANIM_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CStartRankingAnimation_003Ec__Iterator118)/*Error near IL_0056: stateMachine*/)._003Cwait_003E__0 = false;
-		}, true, 0);
-		while (wait2)
+			wait = false;
+		}, is_input_block: true, 0);
+		while (wait)
 		{
 			if (skipRequest)
 			{
-				SkipTween((Enum)UI.OBJ_RANKING_ROOT, true, 0);
-				wait2 = false;
+				SkipTween((Enum)UI.OBJ_RANKING_ROOT, forward: true, 0);
+				wait = false;
 			}
-			yield return (object)0;
+			yield return 0;
 		}
 		if (!skipRequest)
 		{
-			yield return (object)this.StartCoroutine(WaitTiming(1f));
+			yield return this.StartCoroutine(WaitTiming(1f));
 		}
 		int currentRank = currentData.pointRankingData.beforeRank;
 		int targetRank = currentData.pointRankingData.afterRank;
 		if (currentRank > targetRank)
 		{
-			yield return (object)this.StartCoroutine(CountSpriteAnimation((float)currentRank, targetRank));
+			yield return this.StartCoroutine(CountSpriteAnimation(currentRank, targetRank));
 			int passRank = currentRank - targetRank;
-			Transform originPosNumber = GetCtrl(UI.SPR_POSITION_PASS);
+			Transform ctrl = GetCtrl(UI.SPR_POSITION_PASS);
 			passPositionNumbers = new List<GameObject>();
-			passPositionNumbers.Add(originPosNumber.get_gameObject());
+			passPositionNumbers.Add(ctrl.get_gameObject());
 			for (int i = 0; i < passRank.ToString().Length - 1; i++)
 			{
-				GameObject posObj = Object.Instantiate<GameObject>(originPosNumber.get_gameObject());
-				posObj.get_transform().set_parent(originPosNumber.get_parent());
-				posObj.get_transform().set_localPosition(originPosNumber.get_localPosition());
-				posObj.get_transform().set_localScale(originPosNumber.get_localScale());
-				passPositionNumbers.Add(posObj);
+				GameObject val = Object.Instantiate<GameObject>(ctrl.get_gameObject());
+				val.get_transform().set_parent(ctrl.get_parent());
+				val.get_transform().set_localPosition(ctrl.get_localPosition());
+				val.get_transform().set_localScale(ctrl.get_localScale());
+				passPositionNumbers.Add(val);
 			}
 			SetSpritePassNumber(passRank, passPositionNumbers);
 			GetCtrl(UI.GRD_POSITION_PASS).GetComponent<UIGrid>().Reposition();
-			Transform passText = GetCtrl(UI.SPR_PASS_TEXT);
-			Vector3 lastPassNumberPos = passPositionNumbers[passPositionNumbers.Count - 1].get_transform().get_localPosition();
-			passText.GetComponent<TweenPosition>().to.x = lastPassNumberPos.x + 41f;
+			Transform ctrl2 = GetCtrl(UI.SPR_PASS_TEXT);
+			Vector3 localPosition = passPositionNumbers[passPositionNumbers.Count - 1].get_transform().get_localPosition();
+			ctrl2.GetComponent<TweenPosition>().to.x = localPosition.x + 41f;
 			InitTween((Enum)UI.OBJ_PASS_ANIM_ROOT);
 			if (!skipRequest)
 			{
-				yield return (object)this.StartCoroutine(WaitTiming(0.6f));
+				yield return this.StartCoroutine(WaitTiming(0.6f));
 			}
 			PlayAudio(AUDIO.RESULT);
-			wait2 = true;
-			PlayTween((Enum)UI.OBJ_PASS_ANIM_ROOT, true, (EventDelegate.Callback)delegate
+			wait = true;
+			PlayTween((Enum)UI.OBJ_PASS_ANIM_ROOT, forward: true, (EventDelegate.Callback)delegate
 			{
-				((_003CStartRankingAnimation_003Ec__Iterator118)/*Error near IL_039b: stateMachine*/)._003Cwait_003E__0 = false;
-			}, true, 0);
-			while (wait2)
+				wait = false;
+			}, is_input_block: true, 0);
+			while (wait)
 			{
 				if (skipRequest)
 				{
-					SkipTween((Enum)UI.OBJ_PASS_ANIM_ROOT, true, 0);
-					wait2 = false;
+					SkipTween((Enum)UI.OBJ_PASS_ANIM_ROOT, forward: true, 0);
+					wait = false;
 				}
-				yield return (object)0;
+				yield return 0;
 			}
 		}
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
-		SetActive((Enum)UI.BTN_END_OK, true);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
+		SetActive((Enum)UI.BTN_END_OK, is_visible: true);
 	}
 
 	private IEnumerator CountSpriteAnimation(float currentRank, int targetRank)
 	{
 		while (currentRank > (float)targetRank)
 		{
-			yield return (object)0;
+			yield return 0;
 			if (skipRequest)
 			{
-				currentRank = (float)targetRank;
+				currentRank = targetRank;
 			}
 			int before = Mathf.FloorToInt(currentRank);
 			float addingRank = Mathf.Min(((float)targetRank - currentRank) * CountDownCube(Time.get_deltaTime() * 4f), -1f);
@@ -827,9 +830,6 @@ public class QuestResultPointEvent : GameSection
 
 	private void SetSpriteNumber(int value)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Expected O, but got Unknown
 		string text = value.ToString();
 		if (beforeDigits == 0)
 		{
@@ -853,8 +853,6 @@ public class QuestResultPointEvent : GameSection
 
 	private void SetSpritePassNumber(int value, List<GameObject> numbers)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Expected O, but got Unknown
 		string text = value.ToString();
 		for (int i = 0; i < text.Length; i++)
 		{
@@ -883,13 +881,11 @@ public class QuestResultPointEvent : GameSection
 		if (currentData.pointRankingData.beforeRank < 0 || currentData.pointRankingData.afterRank < 0)
 		{
 			GameSection.BackSection();
+			return;
 		}
-		else
-		{
-			stateInitialized = false;
-			skipRequest = false;
-			pointResultState = State.RANKING;
-		}
+		stateInitialized = false;
+		skipRequest = false;
+		pointResultState = State.RANKING;
 	}
 
 	private void OnQuery_SKIP()

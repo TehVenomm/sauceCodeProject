@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FilterBase
+public class FilterBase : MonoBehaviour
 {
 	[SerializeField]
 	private RenderTargetCacher cacher;

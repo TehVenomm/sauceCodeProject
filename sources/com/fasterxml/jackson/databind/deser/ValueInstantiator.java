@@ -121,7 +121,8 @@ public abstract class ValueInstantiator {
         return null;
     }
 
-    protected Object _createFromStringFallbacks(DeserializationContext deserializationContext, String str) throws IOException, JsonProcessingException {
+    /* access modifiers changed from: protected */
+    public Object _createFromStringFallbacks(DeserializationContext deserializationContext, String str) throws IOException, JsonProcessingException {
         if (canCreateFromBoolean()) {
             String trim = str.trim();
             if (ServerProtocol.DIALOG_RETURN_SCOPES_TRUE.equals(trim)) {

@@ -106,6 +106,7 @@ public class QuestResultTop : GameSection
 		OBJ_CONGRATULATIONS_ROOT,
 		OBJ_CONGRATULATIONS,
 		OBJ_CONGRATULATIONS_PARTICLE,
+		SHADOW,
 		LBL_BOSS_NAME,
 		TBL_GUILD_REQUEST_RESULT,
 		OBJ_BONUS_POINT_SHOP,
@@ -158,24 +159,6 @@ public class QuestResultTop : GameSection
 		FIRST_CLEAR_REWARD
 	}
 
-	protected const float ANIM_INDEX_STEP_TIME = 0.4f;
-
-	private const float ICON_SCROLL_VALUE = -1.38f;
-
-	private const float ICON_SCROLL_VALUE_2 = -1.5f;
-
-	protected const int DROP_ITEM_LIST_NUM_X = 5;
-
-	protected const int DROP_ITEM_LIST_MIN_Y = 1;
-
-	protected const int DROP_ITEM_LIST_MIN = 5;
-
-	protected const string NORMAL_DROP_EFF_NAME = "ef_ui_dropitem_silver_01";
-
-	protected const string RARE_DROP_EFF_NAME = "ef_ui_dropitem_gold_01";
-
-	protected const string BREAK_DROP_EFF_NAME = "ef_ui_dropitem_red_01";
-
 	protected SortCompareData[] dropItemIconData;
 
 	private UI dropItemGRD = UI.GRD_DROP_ITEM;
@@ -206,11 +189,29 @@ public class QuestResultTop : GameSection
 
 	private string lvupTextFormat = string.Empty;
 
-	private int[] missionNewClear;
+	protected int[] missionNewClear;
 
-	private bool isValidMissionNewClearAnim;
+	protected bool isValidMissionNewClearAnim;
+
+	protected const float ANIM_INDEX_STEP_TIME = 0.4f;
+
+	private const float ICON_SCROLL_VALUE = -1.38f;
+
+	private const float ICON_SCROLL_VALUE_2 = -1.5f;
 
 	protected float animScrollValue = -1.38f;
+
+	protected const int DROP_ITEM_LIST_NUM_X = 5;
+
+	protected const int DROP_ITEM_LIST_MIN_Y = 1;
+
+	protected const int DROP_ITEM_LIST_MIN = 5;
+
+	protected const string NORMAL_DROP_EFF_NAME = "ef_ui_dropitem_silver_01";
+
+	protected const string RARE_DROP_EFF_NAME = "ef_ui_dropitem_gold_01";
+
+	protected const string BREAK_DROP_EFF_NAME = "ef_ui_dropitem_red_01";
 
 	protected QuestCompleteReward dropReward;
 
@@ -230,13 +231,13 @@ public class QuestResultTop : GameSection
 
 	protected Action pointEventCallback;
 
-	private QuestCompleteReward missionReward;
+	protected QuestCompleteReward missionReward;
 
-	private QuestCompleteReward missionCompleteReward;
+	protected QuestCompleteReward missionCompleteReward;
 
-	private bool isOpenedMissionClearDialog;
+	protected bool isOpenedMissionClearDialog;
 
-	private Action missionClearRewardCallback;
+	protected Action missionClearRewardCallback;
 
 	protected QuestCompleteReward followReward;
 
@@ -281,7 +282,7 @@ public class QuestResultTop : GameSection
 		}
 	}
 
-	private bool isNeedOpenMissionClearDialog
+	protected bool isNeedOpenMissionClearDialog
 	{
 		get
 		{
@@ -339,7 +340,7 @@ public class QuestResultTop : GameSection
 			}
 			bool result = false;
 			QuestCompleteReward first = MonoBehaviourSingleton<QuestManager>.I.compData.reward.first;
-			if (first.money > 0 || first.crystal > 0 || first.exp > 0 || first.item.Count > 0 || first.equipItem.Count > 0 || first.skillItem.Count > 0)
+			if (first.money > 0 || first.crystal > 0 || first.exp > 0 || first.item.Count > 0 || first.equipItem.Count > 0 || first.skillItem.Count > 0 || first.accessoryItem.Count > 0)
 			{
 				result = true;
 			}
@@ -349,13 +350,15 @@ public class QuestResultTop : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return (object)null;
+		yield return (object)new WaitForEndOfFrame();
+		yield return MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(need_gc_collect: true);
+		yield return (object)new WaitForEndOfFrame();
+		yield return (object)new WaitForEndOfFrame();
 		InitReward();
 		LoadingQueue load_queue = new LoadingQueue(this);
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_dropitem_silver_01");
@@ -366,13 +369,15 @@ public class QuestResultTop : GameSection
 		{
 			foreach (PointShopResultData pointShopResultDatum in pointShopResultData)
 			{
-				load_queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(pointShopResultDatum.pointShopId), false);
+				load_queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(pointShopResultDatum.pointShopId));
 			}
 		}
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
+		GC.Collect();
+		MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(active: false);
 		base.Initialize();
 		if (MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest && MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id != MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId())
 		{
@@ -416,19 +421,23 @@ public class QuestResultTop : GameSection
 				}
 			}
 			List<SortCompareData> list = new List<SortCompareData>();
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, order.item, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, order.equipItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, order.skillItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.item, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.equipItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.skillItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.questItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakReward.item, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakReward.equipItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakReward.skillItem, REWARD_CATEGORY.DROP);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, order.item);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, order.equipItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, order.skillItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, order.accessoryItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.item);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.equipItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.skillItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.questItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, dropReward.accessoryItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakReward.item);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakReward.equipItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakReward.skillItem);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakReward.accessoryItem);
 			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakPartsReward.item, REWARD_CATEGORY.BREAK);
 			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakPartsReward.equipItem, REWARD_CATEGORY.BREAK);
 			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakPartsReward.skillItem, REWARD_CATEGORY.BREAK);
+			start_ary_index = ResultUtility.SetDropData(list, start_ary_index, breakPartsReward.accessoryItem, REWARD_CATEGORY.BREAK);
 			list.Sort((SortCompareData l, SortCompareData r) => r.GetSortValueQuestResult() - l.GetSortValueQuestResult());
 			dropItemIconData = list.ToArray();
 			dropItemNum = dropItemIconData.Length;
@@ -472,12 +481,11 @@ public class QuestResultTop : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0765: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0783: Unknown result type (might be due to invalid IL or missing references)
+		//IL_07a7: Unknown result type (might be due to invalid IL or missing references)
 		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
 		SetHeight((Enum)UI.BTN_SKIP_IN_SCROLL, dropLineNum * 100);
 		SetHeight((Enum)UI.BTN_SKIP_IN_SCROLL_2, dropLineNum * 100);
-		SetActive((Enum)UI.BTN_NEXT, false);
+		SetActive((Enum)UI.BTN_NEXT, is_visible: false);
 		SetFontStyle((Enum)UI.STR_TITLE_EXP, 2);
 		SetFontStyle((Enum)UI.STR_TITLE_MISSION, 2);
 		SetFontStyle((Enum)UI.STR_TITLE_REWARD, 2);
@@ -490,6 +498,16 @@ public class QuestResultTop : GameSection
 		int before_level = playerRecord.beforeLevel;
 		SetLabelText((Enum)UI.LBL_PLAYER_LV, before_level.ToString());
 		InitDeactive((Enum)UI.LBL_PLAYER_LVUP);
+		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+		{
+			UIVirtualScreen componentInChildren = this.GetComponentInChildren<UIVirtualScreen>();
+			UIWidget component = GetCtrl(UI.SHADOW).GetComponent<UIWidget>();
+			if (componentInChildren != null && component != null)
+			{
+				component.width = (int)componentInChildren.ScreenWidthFull;
+				component.height = (int)componentInChildren.ScreenHeightFull;
+			}
+		}
 		SetProgressValue((Enum)UI.PBR_EXP, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.ExpProgress01);
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
 		SetLabelText((Enum)UI.LBL_QUEST_NAME, questData.questText);
@@ -538,51 +556,50 @@ public class QuestResultTop : GameSection
 			{
 				bool flag = array[j] != null;
 				SetActive((Enum)array2[j], flag);
-				if (flag)
+				if (!flag)
 				{
-					SetLabelText((Enum)array3[j], array[j].tableData.missionText);
-					bool flag2 = missionNewClear != null && missionNewClear[j] > 0;
-					bool flag3 = array[j].state >= CLEAR_STATUS.CLEAR || flag2;
+					continue;
+				}
+				SetLabelText((Enum)array3[j], array[j].tableData.missionText);
+				bool flag2 = missionNewClear != null && missionNewClear[j] > 0;
+				bool flag3 = array[j].state >= CLEAR_STATUS.CLEAR || flag2;
+				if (flag2)
+				{
+					isValidMissionNewClearAnim = true;
+				}
+				if (missionPointData != null)
+				{
+					SetActive((Enum)array6[j], is_visible: true);
+					SetActive((Enum)array7[j], is_visible: false);
+					SetActive((Enum)array4[j], is_visible: false);
+					SetActive((Enum)array5[j], is_visible: false);
+					UITexture component2 = GetCtrl(array6[j]).GetComponent<UITexture>();
 					if (flag2)
 					{
-						isValidMissionNewClearAnim = true;
-					}
-					if (missionPointData != null)
-					{
-						SetActive((Enum)array6[j], true);
-						SetActive((Enum)array7[j], false);
-						SetActive((Enum)array4[j], false);
-						SetActive((Enum)array5[j], false);
-						UITexture component = GetCtrl(array6[j]).GetComponent<UITexture>();
-						if (flag2)
-						{
-							ResourceLoad.LoadPointIconImageTexture(component, (uint)missionPointData.pointShopId);
-						}
-						else
-						{
-							ResourceLoad.LoadGrayPointIconImageTexture(component, (uint)missionPointData.pointShopId);
-						}
+						ResourceLoad.LoadPointIconImageTexture(component2, (uint)missionPointData.pointShopId);
 					}
 					else
 					{
-						SetActive((Enum)array6[j], false);
-						SetActive((Enum)array7[j], true);
-						if (flag2)
-						{
-							SetActive((Enum)array4[j], true);
-							SetActive((Enum)array5[j], false);
-						}
-						else if (flag3)
-						{
-							SetActive((Enum)array4[j], false);
-							SetActive((Enum)array5[j], true);
-						}
-						else
-						{
-							SetActive((Enum)array4[j], false);
-							SetActive((Enum)array5[j], false);
-						}
+						ResourceLoad.LoadGrayPointIconImageTexture(component2, (uint)missionPointData.pointShopId);
 					}
+					continue;
+				}
+				SetActive((Enum)array6[j], is_visible: false);
+				SetActive((Enum)array7[j], is_visible: true);
+				if (flag2)
+				{
+					SetActive((Enum)array4[j], is_visible: true);
+					SetActive((Enum)array5[j], is_visible: false);
+				}
+				else if (flag3)
+				{
+					SetActive((Enum)array4[j], is_visible: false);
+					SetActive((Enum)array5[j], is_visible: true);
+				}
+				else
+				{
+					SetActive((Enum)array4[j], is_visible: false);
+					SetActive((Enum)array5[j], is_visible: false);
 				}
 			}
 		}
@@ -590,7 +607,7 @@ public class QuestResultTop : GameSection
 		{
 			for (int k = 0; k < 3; k++)
 			{
-				SetActive((Enum)array2[k], false);
+				SetActive((Enum)array2[k], is_visible: false);
 			}
 		}
 		int num = 0;
@@ -614,53 +631,53 @@ public class QuestResultTop : GameSection
 		dropItemGRD = ((!is_mission_visible) ? UI.GRD_DROP_ITEM_2 : UI.GRD_DROP_ITEM);
 		dropItemSCR = ((!is_mission_visible) ? UI.OBJ_SCROLL_VIEW_2 : UI.OBJ_SCROLL_VIEW);
 		animScrollValue = ((!is_mission_visible) ? (-1.5f) : (-1.38f));
-		SetGrid(dropItemGRD, null, dropItemIconData.Length, true, delegate(int i, Transform o, bool is_recycle)
+		SetGrid(dropItemGRD, null, dropItemIconData.Length, reset: true, delegate(int i, Transform o, bool is_recycle)
 		{
 			ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-			RARITY_TYPE? rarity = null;
-			ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-			EQUIPMENT_TYPE? magi_enable_icon_type = null;
-			int icon_id = -1;
+			RARITY_TYPE? rARITY_TYPE = null;
+			ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
+			EQUIPMENT_TYPE? eQUIPMENT_TYPE = null;
 			int num6 = -1;
+			int num7 = -1;
 			if (i < dropItemIconData.Length && dropItemIconData[i] != null)
 			{
 				iTEM_ICON_TYPE = dropItemIconData[i].GetIconType();
-				icon_id = dropItemIconData[i].GetIconID();
-				rarity = dropItemIconData[i].GetRarity();
-				element = dropItemIconData[i].GetIconElement();
-				magi_enable_icon_type = dropItemIconData[i].GetIconMagiEnableType();
-				num6 = dropItemIconData[i].GetNum();
-				if (num6 == 1)
+				num6 = dropItemIconData[i].GetIconID();
+				rARITY_TYPE = dropItemIconData[i].GetRarity();
+				eLEMENT_TYPE = dropItemIconData[i].GetIconElement();
+				eQUIPMENT_TYPE = dropItemIconData[i].GetIconMagiEnableType();
+				num7 = dropItemIconData[i].GetNum();
+				if (num7 == 1)
 				{
-					num6 = -1;
+					num7 = -1;
 				}
 			}
-			bool is_new = false;
+			bool flag5 = false;
 			switch (iTEM_ICON_TYPE)
 			{
 			case ITEM_ICON_TYPE.ITEM:
 			case ITEM_ICON_TYPE.QUEST_ITEM:
 			{
 				ulong uniqID = dropItemIconData[i].GetUniqID();
-				if (uniqID != 0L)
+				if (uniqID != 0)
 				{
-					is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, dropItemIconData[i].GetUniqID());
+					flag5 = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, dropItemIconData[i].GetUniqID());
 				}
 				break;
 			}
 			default:
-				is_new = true;
+				flag5 = true;
 				break;
 			case ITEM_ICON_TYPE.NONE:
 				break;
 			}
-			int enemy_icon_id = 0;
-			int enemy_icon_id2 = 0;
+			int num8 = 0;
+			int num9 = 0;
 			if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 			{
 				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(dropItemIconData[i].GetTableID());
-				enemy_icon_id = itemData.enemyIconID;
-				enemy_icon_id2 = itemData.enemyIconID2;
+				num8 = itemData.enemyIconID;
+				num9 = itemData.enemyIconID2;
 			}
 			ItemIcon itemIcon = null;
 			if (dropItemIconData[i].GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
@@ -669,25 +686,39 @@ public class QuestResultTop : GameSection
 				{
 					icon_type = dropItemIconData[i].GetIconType(),
 					icon_id = dropItemIconData[i].GetIconID(),
-					rarity = new RARITY_TYPE?(dropItemIconData[i].GetRarity()),
+					rarity = dropItemIconData[i].GetRarity(),
 					parent = o,
 					element = dropItemIconData[i].GetIconElement(),
 					magi_enable_equip_type = dropItemIconData[i].GetIconMagiEnableType(),
 					num = dropItemIconData[i].GetNum(),
-					enemy_icon_id = enemy_icon_id,
-					enemy_icon_id2 = enemy_icon_id2,
+					enemy_icon_id = num8,
+					enemy_icon_id2 = num9,
 					questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
 				});
 			}
 			else
 			{
+				ITEM_ICON_TYPE icon_type = iTEM_ICON_TYPE;
+				int icon_id = num6;
+				RARITY_TYPE? rarity = rARITY_TYPE;
+				ELEMENT_TYPE element = eLEMENT_TYPE;
+				EQUIPMENT_TYPE? magi_enable_icon_type = eQUIPMENT_TYPE;
+				int num10 = num7;
+				string event_name = "DROP";
+				bool is_new = flag5;
+				int toggle_group = -1;
+				bool is_select = false;
+				string icon_under_text = null;
+				bool is_equipping = false;
+				int enemy_icon_id = num8;
+				int enemy_icon_id2 = num9;
 				GET_TYPE getType = dropItemIconData[i].GetGetType();
-				itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, o, element, magi_enable_icon_type, num6, "DROP", i, is_new, -1, false, null, false, enemy_icon_id, enemy_icon_id2, false, getType);
+				itemIcon = ItemIcon.Create(icon_type, icon_id, rarity, o, element, magi_enable_icon_type, num10, event_name, i, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
 			}
-			itemIcon.SetRewardBG(true);
+			itemIcon.SetRewardBG(is_visible: true);
 			itemIcon.SetRewardCategoryInfo(dropItemIconData[i].GetCategory());
 			SetMaterialInfo(itemIcon.transform, dropItemIconData[i].GetMaterialType(), dropItemIconData[i].GetTableID(), GetCtrl((!is_mission_visible) ? UI.PNL_MATERIAL_INFO_2 : UI.PNL_MATERIAL_INFO));
-			Transform val = SetPrefab(o, "QuestResultDropIconOpener", true);
+			Transform val = SetPrefab(o, "QuestResultDropIconOpener");
 			QuestResultDropIconOpener.Info info2 = new QuestResultDropIconOpener.Info
 			{
 				IsRare = ResultUtility.IsRare(dropItemIconData[i]),
@@ -711,10 +742,10 @@ public class QuestResultTop : GameSection
 		{
 			if (string.IsNullOrEmpty(lvupTextFormat))
 			{
-				UILabel component2 = base.GetComponent<UILabel>((Enum)UI.LBL_LVUP_NUM);
-				if (component2 != null)
+				UILabel component3 = base.GetComponent<UILabel>((Enum)UI.LBL_LVUP_NUM);
+				if (component3 != null)
 				{
-					lvupTextFormat = component2.text;
+					lvupTextFormat = component3.text;
 				}
 			}
 			if (GameSaveData.instance.lvupMessageFlag != 1)
@@ -726,7 +757,7 @@ public class QuestResultTop : GameSection
 		expGauge = base.GetComponent<ResultExpGaugeCtrl>((Enum)UI.OBJ_RESULT_EXP_GAUGE_CTRL);
 		expGauge.InitDirection(delegate(ResultExpGaugeCtrl gauge)
 		{
-			gauge.getExp = (float)exp;
+			gauge.getExp = exp;
 			gauge.startExp = (float)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.Exp - gauge.getExp;
 			gauge.nowLevel = before_level;
 			gauge.remainLevelUpCnt = (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level - before_level;
@@ -788,24 +819,45 @@ public class QuestResultTop : GameSection
 		SetActive((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, flag4);
 		if (flag4)
 		{
-			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, string.Empty, pointNumber, true, delegate(int i, Transform parent)
+			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, string.Empty, pointNumber, reset: true, delegate(int i, Transform parent)
 			{
 				if (pointShopObjNames.Count == 0)
 				{
-					return Realizes("QuestResultPointShop", parent, true);
+					return Realizes("QuestResultPointShop", parent);
 				}
 				int num4 = -(i - pointNumber) - 1;
 				if (num4 >= 0 && num4 < pointShopObjNames.Count)
 				{
 					string prefab_name = pointShopObjNames[-(i - pointNumber) - 1];
-					return Realizes(prefab_name, parent, true);
+					return Realizes(prefab_name, parent);
 				}
-				return Realizes("QuestResultPointShop", parent, true);
+				return Realizes("QuestResultPointShop", parent);
 			}, delegate(int i, Transform t, bool b)
 			{
-				ResetTween(t, 0);
+				ResetTween(t);
 				int num2 = -(i - pointNumber) - 1;
-				if (pointShopObjNames.Count <= 0 || num2 < 0 || num2 >= pointShopObjNames.Count)
+				if (pointShopObjNames.Count > 0 && num2 >= 0 && num2 < pointShopObjNames.Count)
+				{
+					string text = pointShopObjNames[num2];
+					if (text != null)
+					{
+						if (!(text == "QuestResultExplorePoint"))
+						{
+							if (text == "QuestResultGuildRequestPoint")
+							{
+								SetLabelText(t, UI.LBL_GUILD_REQUEST_GET_POINT, guildPoint.ToString());
+							}
+						}
+						else
+						{
+							int getPoint = exploreResultData.pointRankingData.getPoint;
+							int num3 = getPoint + exploreResultData.pointRankingData.userPoint;
+							SetLabelText(t, UI.LBL_EXPLORE_GET_POINT, string.Format("+" + StringTable.Get(STRING_CATEGORY.EXPLORE, 0u), getPoint));
+							SetLabelText(t, UI.LBL_EXPLORE_TOTAL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.EXPLORE, 0u), num3));
+						}
+					}
+				}
+				else
 				{
 					PointShopResultData pointShopResultData = this.pointShopResultData[i];
 					SetActive(t, UI.OBJ_NORMAL_POINT_SHOP_ROOT, !pointShopResultData.isEvent);
@@ -813,33 +865,16 @@ public class QuestResultTop : GameSection
 					{
 						SetLabelText(t, UI.LBL_NORMAL_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
 						SetLabelText(t, UI.LBL_NORMAL_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-						UITexture component3 = FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>();
-						ResourceLoad.LoadPointIconImageTexture(component3, (uint)pointShopResultData.pointShopId);
+						UITexture component4 = FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>();
+						ResourceLoad.LoadPointIconImageTexture(component4, (uint)pointShopResultData.pointShopId);
 					}
 					SetActive(t, UI.OBJ_EVENT_POINT_SHOP_ROOT, pointShopResultData.isEvent);
 					if (pointShopResultData.isEvent)
 					{
 						SetLabelText(t, UI.LBL_EVENT_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
 						SetLabelText(t, UI.LBL_EVENT_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-						UITexture component4 = FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>();
-						ResourceLoad.LoadPointIconImageTexture(component4, (uint)pointShopResultData.pointShopId);
-					}
-				}
-				else
-				{
-					switch (pointShopObjNames[num2])
-					{
-					case "QuestResultExplorePoint":
-					{
-						int getPoint = exploreResultData.pointRankingData.getPoint;
-						int num3 = getPoint + exploreResultData.pointRankingData.userPoint;
-						SetLabelText(t, UI.LBL_EXPLORE_GET_POINT, string.Format("+" + StringTable.Get(STRING_CATEGORY.EXPLORE, 0u), getPoint));
-						SetLabelText(t, UI.LBL_EXPLORE_TOTAL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.EXPLORE, 0u), num3));
-						break;
-					}
-					case "QuestResultGuildRequestPoint":
-						SetLabelText(t, UI.LBL_GUILD_REQUEST_GET_POINT, guildPoint.ToString());
-						break;
+						UITexture component5 = FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>();
+						ResourceLoad.LoadPointIconImageTexture(component5, (uint)pointShopResultData.pointShopId);
 					}
 				}
 			});
@@ -856,13 +891,13 @@ public class QuestResultTop : GameSection
 		PlayAudio(AUDIO.ADVENT);
 		animState = RESULT_ANIM_STATE.EXP_GAUGE;
 		bool wait = true;
-		PlayTween((Enum)UI.OBJ_GET_EXP_ROOT, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_GET_EXP_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
-			((_003CResultAnim1_003Ec__Iterator6)/*Error near IL_0055: stateMachine*/)._003Cwait_003E__0 = false;
-		}, false, 0);
+			wait = false;
+		}, is_input_block: false, 0);
 		while (wait)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (is_wait)
 		{
@@ -888,84 +923,97 @@ public class QuestResultTop : GameSection
 	{
 		if (!isValidMissionNewClearAnim)
 		{
-			PlayTween((Enum)UI.OBJ_MISSION_ROOT, true, (EventDelegate.Callback)delegate
+			PlayTween((Enum)UI.OBJ_MISSION_ROOT, forward: true, (EventDelegate.Callback)delegate
 			{
 				if (callback != null)
 				{
 					callback();
 				}
-			}, true, 0);
+			}, is_input_block: true, 0);
+			return;
 		}
-		else
+		PlayTween((Enum)UI.OBJ_MISSION_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween((Enum)UI.OBJ_MISSION_NEW_CLEAR_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
-			PlayTween((Enum)UI.OBJ_MISSION_ROOT, true, (EventDelegate.Callback)null, false, 0);
-			PlayTween((Enum)UI.OBJ_MISSION_NEW_CLEAR_ROOT, true, (EventDelegate.Callback)delegate
+			if (callback != null)
 			{
-				if (callback != null)
-				{
-					callback();
-				}
-			}, false, 0);
-		}
+				callback();
+			}
+		}, is_input_block: false, 0);
 	}
 
 	protected virtual void TreasureStart()
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
+		//IL_0062: Expected O, but got Unknown
 		animState = RESULT_ANIM_STATE.TREASURE;
 		PlayAudio(AUDIO.MONEY);
 		PlayAudio(AUDIO.MONEY_WH);
 		PlayAudio(AUDIO.ACHIEVEMENT);
 		if (pointShopResultData.Count > 0)
 		{
-			foreach (Transform item in GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).get_transform())
+			IEnumerator enumerator = GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).get_transform().GetEnumerator();
+			try
 			{
-				Transform t = item;
-				PlayTween(t, true, null, true, 0);
+				while (enumerator.MoveNext())
+				{
+					Transform t = enumerator.Current;
+					PlayTween(t);
+				}
+			}
+			finally
+			{
+				IDisposable disposable;
+				if ((disposable = (enumerator as IDisposable)) != null)
+				{
+					disposable.Dispose();
+				}
 			}
 		}
-		PlayTween((Enum)UI.OBJ_TREASURE_ROOT, true, (EventDelegate.Callback)delegate
+		PlayTween((Enum)UI.OBJ_TREASURE_ROOT, forward: true, (EventDelegate.Callback)delegate
 		{
 			startDropDirection = true;
-		}, false, 0);
+		}, is_input_block: false, 0);
 	}
 
 	protected virtual void ResultItemAnimation()
 	{
-		if (startDropDirection)
+		if (!startDropDirection)
 		{
-			if (animationEnd && animState < RESULT_ANIM_STATE.END)
+			return;
+		}
+		if (animationEnd && animState < RESULT_ANIM_STATE.END)
+		{
+			AnimationEnd();
+		}
+		else
+		{
+			if (animationEnd || IsOpenGetRareItem())
+			{
+				return;
+			}
+			animTimer += Time.get_deltaTime();
+			if (!(animTimer > 0.4f))
+			{
+				return;
+			}
+			animIndex++;
+			animTimer = 0f;
+			VisibleItemIcon(animIndex);
+			int num = animIndex + 1;
+			if (num >= dropItemNum)
 			{
 				AnimationEnd();
+				return;
 			}
-			else if (!animationEnd && !IsOpenGetRareItem())
+			bool flag = false;
+			if (MonoBehaviourSingleton<QuestManager>.IsValid())
 			{
-				animTimer += Time.get_deltaTime();
-				if (animTimer > 0.4f)
-				{
-					animIndex++;
-					animTimer = 0f;
-					VisibleItemIcon(animIndex, false);
-					int num = animIndex + 1;
-					if (num >= dropItemNum)
-					{
-						AnimationEnd();
-					}
-					else
-					{
-						bool flag = false;
-						if (MonoBehaviourSingleton<QuestManager>.IsValid())
-						{
-							flag = MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-						}
-						if (!flag && num >= 5 && num % 5 == 0)
-						{
-							SetScroll((Enum)dropItemSCR, animScrollValue);
-						}
-					}
-				}
+				flag = MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
+			}
+			if (!flag && num >= 5 && num % 5 == 0)
+			{
+				SetScroll((Enum)dropItemSCR, animScrollValue);
 			}
 		}
 	}
@@ -992,34 +1040,33 @@ public class QuestResultTop : GameSection
 		is_open_get_rare_item = false;
 	}
 
-	private void VisibleItemIcon(int index, bool is_skip = false)
+	protected void VisibleItemIcon(int index, bool is_skip = false)
 	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		if (index < dropItemIconData.Length && dropItemIconData[index] != null && dropItemIconData[index].GetTableID() != 0)
+		if (index >= dropItemIconData.Length || dropItemIconData[index] == null || dropItemIconData[index].GetTableID() == 0)
 		{
-			Transform child = GetChild((Enum)dropItemGRD, index);
-			if (!(child == null))
-			{
-				QuestResultDropIconOpener componentInChildren = child.get_gameObject().GetComponentInChildren<QuestResultDropIconOpener>();
-				if (!(componentInChildren == null))
-				{
-					PlayAudio(AUDIO.DROPITEM);
-					componentInChildren.StartEffect(is_skip);
-				}
-			}
+			return;
 		}
-	}
-
-	protected void OpenedIconEndEff(int index)
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		Transform child = GetChild((Enum)dropItemGRD, index);
 		if (!(child == null))
 		{
 			QuestResultDropIconOpener componentInChildren = child.get_gameObject().GetComponentInChildren<QuestResultDropIconOpener>();
 			if (!(componentInChildren == null))
 			{
-				componentInChildren.StartEffect(true);
+				PlayAudio(AUDIO.DROPITEM);
+				componentInChildren.StartEffect(is_skip);
+			}
+		}
+	}
+
+	protected void OpenedIconEndEff(int index)
+	{
+		Transform child = GetChild((Enum)dropItemGRD, index);
+		if (!(child == null))
+		{
+			QuestResultDropIconOpener componentInChildren = child.get_gameObject().GetComponentInChildren<QuestResultDropIconOpener>();
+			if (!(componentInChildren == null))
+			{
+				componentInChildren.StartEffect(is_skip: true);
 			}
 		}
 	}
@@ -1051,8 +1098,6 @@ public class QuestResultTop : GameSection
 
 	protected virtual void VisibleEndButton()
 	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest)
 		{
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId())
@@ -1071,47 +1116,48 @@ public class QuestResultTop : GameSection
 		{
 			SetActive((Enum)UI.BTN_NEXT, animationEnd);
 		}
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, false);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL_2, false);
-		DispatchEvent("RESULT_TUTORIAL", null);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
+		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, is_visible: false);
+		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL_2, is_visible: false);
+		DispatchEvent("RESULT_TUTORIAL");
 	}
 
 	protected void AnimSkip()
 	{
-		if (!animationEnd)
+		if (animationEnd)
 		{
-			if (animIndex < 0)
-			{
-				animIndex = 0;
-			}
-			for (int i = 0; i < dropItemIconData.Length; i++)
-			{
-				if (i < animIndex)
-				{
-					OpenedIconEndEff(i);
-				}
-				else
-				{
-					VisibleItemIcon(i, true);
-				}
-			}
-			if (dropLineNum > 1)
-			{
-				bool flag = false;
-				if (MonoBehaviourSingleton<QuestManager>.IsValid())
-				{
-					flag = MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-				}
-				if (!flag)
-				{
-					SetScroll((Enum)dropItemSCR, -100f);
-				}
-			}
-			animIndex = dropItemIconData.Length - 1;
-			AnimationEnd();
-			animTimer = 0f;
+			return;
 		}
+		if (animIndex < 0)
+		{
+			animIndex = 0;
+		}
+		for (int i = 0; i < dropItemIconData.Length; i++)
+		{
+			if (i < animIndex)
+			{
+				OpenedIconEndEff(i);
+			}
+			else
+			{
+				VisibleItemIcon(i, is_skip: true);
+			}
+		}
+		if (dropLineNum > 1)
+		{
+			bool flag = false;
+			if (MonoBehaviourSingleton<QuestManager>.IsValid())
+			{
+				flag = MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
+			}
+			if (!flag)
+			{
+				SetScroll((Enum)dropItemSCR, -100f);
+			}
+		}
+		animIndex = dropItemIconData.Length - 1;
+		AnimationEnd();
+		animTimer = 0f;
 	}
 
 	private void OnQuery_SKIP()
@@ -1121,7 +1167,7 @@ public class QuestResultTop : GameSection
 			switch (animState)
 			{
 			case RESULT_ANIM_STATE.EXP_GAUGE:
-				SkipTween((Enum)UI.OBJ_GET_EXP_ROOT, true, 0);
+				SkipTween((Enum)UI.OBJ_GET_EXP_ROOT, forward: true, 0);
 				expGauge.Skip();
 				break;
 			case RESULT_ANIM_STATE.LVUP:
@@ -1129,12 +1175,12 @@ public class QuestResultTop : GameSection
 				break;
 			case RESULT_ANIM_STATE.MISSION:
 				animState = RESULT_ANIM_STATE.MISSION_REWARD;
-				SkipTween((Enum)UI.OBJ_MISSION_ROOT, true, 0);
-				SkipTween((Enum)UI.OBJ_MISSION_NEW_CLEAR_ROOT, true, 0);
+				SkipTween((Enum)UI.OBJ_MISSION_ROOT, forward: true, 0);
+				SkipTween((Enum)UI.OBJ_MISSION_NEW_CLEAR_ROOT, forward: true, 0);
 				break;
 			case RESULT_ANIM_STATE.TREASURE:
-				SkipTween((Enum)UI.OBJ_TREASURE_ROOT, true, 0);
-				SkipTween((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, true, 0);
+				SkipTween((Enum)UI.OBJ_TREASURE_ROOT, forward: true, 0);
+				SkipTween((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, forward: true, 0);
 				AnimSkip();
 				break;
 			}
@@ -1169,58 +1215,56 @@ public class QuestResultTop : GameSection
 			return REWARD_TYPE.COMMON;
 		case ITEM_ICON_TYPE.STAMP:
 			return REWARD_TYPE.STAMP;
+		case ITEM_ICON_TYPE.ACCESSORY:
+			return REWARD_TYPE.ACCESSORY;
 		}
 	}
 
 	protected void OpenDropSell(Action callback)
 	{
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 		if (!isNeedOpenDropSellDialog)
 		{
 			callback?.Invoke();
+			return;
 		}
-		else
+		dropSellCallback = callback;
+		int total_sell = 0;
+		List<SortCompareData> list = new List<SortCompareData>();
+		List<QuestCompleteReward.SellItem> sell = MonoBehaviourSingleton<QuestManager>.I.compData.reward.sell;
+		sell.ForEach(delegate(QuestCompleteReward.SellItem data)
 		{
-			dropSellCallback = callback;
-			int total_sell = 0;
-			List<SortCompareData> list = new List<SortCompareData>();
-			List<QuestCompleteReward.SellItem> sell = MonoBehaviourSingleton<QuestManager>.I.compData.reward.sell;
-			sell.ForEach(delegate(QuestCompleteReward.SellItem data)
-			{
-				ItemSortData itemSortData = new ItemSortData();
-				ItemInfo itemInfo = new ItemInfo();
-				itemInfo.tableID = (uint)data.itemId;
-				itemInfo.tableData = Singleton<ItemTable>.I.GetItemData(itemInfo.tableID);
-				itemInfo.num = data.num;
-				itemSortData.SetItem(itemInfo);
-				list.Add(itemSortData);
-				total_sell += data.price;
-			});
-			if (!IsExecuteNowSceneEvent(GetSceneName()))
-			{
-				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
-				{
-					DispatchEvent("DROP_SELL", new object[2]
-					{
-						list,
-						total_sell
-					});
-				}));
-			}
-			else
+			ItemSortData itemSortData = new ItemSortData();
+			ItemInfo itemInfo = new ItemInfo();
+			itemInfo.tableID = (uint)data.itemId;
+			itemInfo.tableData = Singleton<ItemTable>.I.GetItemData(itemInfo.tableID);
+			itemInfo.num = data.num;
+			itemSortData.SetItem(itemInfo);
+			list.Add(itemSortData);
+			total_sell += data.price;
+		});
+		if (!IsExecuteNowSceneEvent(GetSceneName()))
+		{
+			this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
 			{
 				DispatchEvent("DROP_SELL", new object[2]
 				{
 					list,
 					total_sell
 				});
-			}
+			}));
+		}
+		else
+		{
+			DispatchEvent("DROP_SELL", new object[2]
+			{
+				list,
+				total_sell
+			});
 		}
 	}
 
 	protected void OnCloseDialog_QuestResultDropSellConfirm()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (dropSellCallback != null)
 		{
 			this.StartCoroutine(OnCloseDropSellClearCoroutine());
@@ -1231,7 +1275,7 @@ public class QuestResultTop : GameSection
 	{
 		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (dropSellCallback != null)
 		{
@@ -1241,31 +1285,35 @@ public class QuestResultTop : GameSection
 
 	protected void OpenPointEvent(Action callback)
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!isNeedPointResult)
 		{
 			callback?.Invoke();
+			return;
+		}
+		pointEventCallback = callback;
+		if (!IsExecuteNowSceneEvent(GetSceneName()))
+		{
+			this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
+			{
+				DispatchEvent("CARNIVAL_POINT", MonoBehaviourSingleton<QuestManager>.I.compData.pointEvent[0]);
+			}));
 		}
 		else
 		{
-			pointEventCallback = callback;
-			if (!IsExecuteNowSceneEvent(GetSceneName()))
-			{
-				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
-				{
-					DispatchEvent("POINT_EVENT_RESULT", MonoBehaviourSingleton<QuestManager>.I.compData.pointEvent[0]);
-				}));
-			}
-			else
-			{
-				DispatchEvent("POINT_EVENT_RESULT", MonoBehaviourSingleton<QuestManager>.I.compData.pointEvent[0]);
-			}
+			DispatchEvent("CARNIVAL_POINT", MonoBehaviourSingleton<QuestManager>.I.compData.pointEvent[0]);
 		}
 	}
 
 	protected void OnCloseDialog_QuestResultPointEvent()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		if (pointEventCallback != null)
+		{
+			this.StartCoroutine(OnCloseQuestResultPointEventClearCoroutine());
+		}
+	}
+
+	protected void OnCloseDialog_CarnivalResultPoint()
+	{
 		if (pointEventCallback != null)
 		{
 			this.StartCoroutine(OnCloseQuestResultPointEventClearCoroutine());
@@ -1276,7 +1324,7 @@ public class QuestResultTop : GameSection
 	{
 		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (pointEventCallback != null)
 		{
@@ -1286,103 +1334,98 @@ public class QuestResultTop : GameSection
 
 	private void OpenMissionClearRewardDialog(Action end_callback)
 	{
-		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = animState == RESULT_ANIM_STATE.MISSION || animState == RESULT_ANIM_STATE.END;
 		if (!isNeedOpenMissionClearDialog || !flag || isOpenedMissionClearDialog)
 		{
 			end_callback?.Invoke();
+			return;
+		}
+		QuestCompleteReward questCompleteReward = null;
+		PointShopResultData missionPoint = null;
+		bool isCompleteReward = false;
+		if (missionPointData != null || missionReward != null)
+		{
+			if (missionReward != null)
+			{
+				questCompleteReward = missionReward;
+				missionReward = null;
+			}
+			if (missionPointData != null)
+			{
+				missionPoint = missionPointData;
+				missionPointData = null;
+			}
 		}
 		else
 		{
-			QuestCompleteReward questCompleteReward = null;
-			PointShopResultData missionPoint = null;
-			bool isCompleteReward = false;
-			if (missionPointData != null || missionReward != null)
+			if (missionCompleteReward == null)
 			{
-				if (missionReward != null)
-				{
-					questCompleteReward = missionReward;
-					missionReward = null;
-				}
-				if (missionPointData != null)
-				{
-					missionPoint = missionPointData;
-					missionPointData = null;
-				}
-			}
-			else
-			{
-				if (missionCompleteReward == null)
-				{
-					isOpenedMissionClearDialog = true;
-					if (animState < RESULT_ANIM_STATE.END)
-					{
-						animState = RESULT_ANIM_STATE.MISSION_REWARD;
-					}
-					end_callback?.Invoke();
-					return;
-				}
-				questCompleteReward = missionCompleteReward;
-				missionCompleteReward = null;
-				isCompleteReward = true;
+				isOpenedMissionClearDialog = true;
 				if (animState < RESULT_ANIM_STATE.END)
 				{
 					animState = RESULT_ANIM_STATE.MISSION_REWARD;
 				}
-			}
-			List<SortCompareData> tmp = new List<SortCompareData>();
-			int num = 0;
-			int gold = questCompleteReward?.money ?? 0;
-			int crystal = questCompleteReward?.crystal ?? 0;
-			if (questCompleteReward != null)
-			{
-				num = ResultUtility.SetDropData(tmp, num, questCompleteReward.item, REWARD_CATEGORY.DROP);
-				num = ResultUtility.SetDropData(tmp, num, questCompleteReward.equipItem, REWARD_CATEGORY.DROP);
-				num = ResultUtility.SetDropData(tmp, num, questCompleteReward.skillItem, REWARD_CATEGORY.DROP);
-			}
-			if (num == 0 && crystal == 0 && missionPoint == null)
-			{
 				end_callback?.Invoke();
+				return;
 			}
-			else
+			questCompleteReward = missionCompleteReward;
+			missionCompleteReward = null;
+			isCompleteReward = true;
+			if (animState < RESULT_ANIM_STATE.END)
 			{
-				missionClearRewardCallback = end_callback;
-				if (missionPoint == null)
-				{
-					missionPoint = new PointShopResultData();
-				}
-				if (!IsExecuteNowSceneEvent(GetSceneName()))
-				{
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
-					{
-						DispatchEvent("MISSION_CLEAR_REWARD", new object[5]
-						{
-							tmp,
-							gold,
-							crystal,
-							isCompleteReward,
-							missionPoint
-						});
-					}));
-				}
-				else
-				{
-					DispatchEvent("MISSION_CLEAR_REWARD", new object[5]
-					{
-						tmp,
-						gold,
-						crystal,
-						isCompleteReward,
-						missionPoint
-					});
-				}
+				animState = RESULT_ANIM_STATE.MISSION_REWARD;
 			}
+		}
+		List<SortCompareData> tmp = new List<SortCompareData>();
+		int num = 0;
+		int gold = questCompleteReward?.money ?? 0;
+		int crystal = questCompleteReward?.crystal ?? 0;
+		if (questCompleteReward != null)
+		{
+			num = ResultUtility.SetDropData(tmp, num, questCompleteReward.item);
+			num = ResultUtility.SetDropData(tmp, num, questCompleteReward.equipItem);
+			num = ResultUtility.SetDropData(tmp, num, questCompleteReward.skillItem);
+			num = ResultUtility.SetDropData(tmp, num, questCompleteReward.accessoryItem);
+		}
+		if (num == 0 && crystal == 0 && missionPoint == null)
+		{
+			end_callback?.Invoke();
+			return;
+		}
+		missionClearRewardCallback = end_callback;
+		if (missionPoint == null)
+		{
+			missionPoint = new PointShopResultData();
+		}
+		if (!IsExecuteNowSceneEvent(GetSceneName()))
+		{
+			this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
+			{
+				DispatchEvent("MISSION_CLEAR_REWARD", new object[5]
+				{
+					tmp,
+					gold,
+					crystal,
+					isCompleteReward,
+					missionPoint
+				});
+			}));
+		}
+		else
+		{
+			DispatchEvent("MISSION_CLEAR_REWARD", new object[5]
+			{
+				tmp,
+				gold,
+				crystal,
+				isCompleteReward,
+				missionPoint
+			});
 		}
 	}
 
 	private void OnCloseDialog_QuestResultMissionClearRewardDialog()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (missionClearRewardCallback != null)
 		{
 			this.StartCoroutine(OnCloseMissionClearCoroutine());
@@ -1393,14 +1436,13 @@ public class QuestResultTop : GameSection
 	{
 		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		OpenMissionClearRewardDialog(missionClearRewardCallback);
 	}
 
 	private void OpenMutualFollowBonusDialog(Action end_callback)
 	{
-		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = animState == RESULT_ANIM_STATE.FOLLOW_BONUS || animState == RESULT_ANIM_STATE.END;
 		if (!isNeedOpenFollowBonusDialog || !flag)
 		{
@@ -1415,29 +1457,19 @@ public class QuestResultTop : GameSection
 			int gold = questCompleteReward.money;
 			int crystal = questCompleteReward.crystal;
 			int exp = questCompleteReward.exp;
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.item, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.equipItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.skillItem, REWARD_CATEGORY.DROP);
-			if (ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.questItem, REWARD_CATEGORY.DROP) == 0 && crystal == 0 && gold == 0 && exp == 0)
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.item);
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.equipItem);
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.skillItem);
+			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.questItem);
+			if (ResultUtility.SetDropData(tmp, start_ary_index, questCompleteReward.accessoryItem) == 0 && crystal == 0 && gold == 0 && exp == 0)
 			{
 				end_callback?.Invoke();
+				return;
 			}
-			else
+			followBonusCallback = end_callback;
+			if (!IsExecuteNowSceneEvent(GetSceneName()))
 			{
-				followBonusCallback = end_callback;
-				if (!IsExecuteNowSceneEvent(GetSceneName()))
-				{
-					this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
-					{
-						DispatchEvent("MUTUAL_FOLLOW_BONUS", new object[3]
-						{
-							tmp,
-							gold,
-							crystal
-						});
-					}));
-				}
-				else
+				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
 				{
 					DispatchEvent("MUTUAL_FOLLOW_BONUS", new object[3]
 					{
@@ -1445,7 +1477,16 @@ public class QuestResultTop : GameSection
 						gold,
 						crystal
 					});
-				}
+				}));
+			}
+			else
+			{
+				DispatchEvent("MUTUAL_FOLLOW_BONUS", new object[3]
+				{
+					tmp,
+					gold,
+					crystal
+				});
 			}
 		}
 		else
@@ -1460,7 +1501,6 @@ public class QuestResultTop : GameSection
 
 	protected void OnCloseDialog_QuestResultMutualFollowBonusDialog()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (followBonusCallback != null)
 		{
 			this.StartCoroutine(OnCloseFollowBonusCoroutine());
@@ -1471,12 +1511,12 @@ public class QuestResultTop : GameSection
 	{
 		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		OpenMutualFollowBonusDialog(followBonusCallback);
 	}
 
-	private void OpenAllEventRewardDialog(Action endCallback)
+	protected void OpenAllEventRewardDialog(Action endCallback)
 	{
 		eventRewardIndex = 0;
 		eventRewardList = new List<QuestCompleteReward>();
@@ -1535,20 +1575,27 @@ public class QuestResultTop : GameSection
 				}
 			}
 		}
+		for (int num6 = 0; num6 < eventReward.accessoryItem.Count; num6++)
+		{
+			for (int num7 = 0; num7 < eventRewardTitles.Count; num7++)
+			{
+				if (eventRewardTitles[num7] == eventReward.accessoryItem[num6].rewardTitle)
+				{
+					eventRewardList[num7].accessoryItem.Add(eventReward.accessoryItem[num6]);
+				}
+			}
+		}
 		if (eventRewardList.Count == 0)
 		{
 			endCallback();
+			return;
 		}
-		else
-		{
-			OpenEventRewardDialog(eventRewardList[eventRewardIndex], eventRewardTitles[eventRewardIndex], endCallback);
-			eventRewardIndex++;
-		}
+		OpenEventRewardDialog(eventRewardList[eventRewardIndex], eventRewardTitles[eventRewardIndex], endCallback);
+		eventRewardIndex++;
 	}
 
 	protected void OpenEventRewardDialog(QuestCompleteReward reward, string title, Action end_callback)
 	{
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 		List<SortCompareData> tmp = new List<SortCompareData>();
 		int start_ary_index = 0;
 		int gold = 0;
@@ -1558,30 +1605,19 @@ public class QuestResultTop : GameSection
 			gold += reward.eventPrice[i].gold;
 			crystal += reward.eventPrice[i].crystal;
 		}
-		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, reward.item, REWARD_CATEGORY.DROP);
-		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, reward.equipItem, REWARD_CATEGORY.DROP);
-		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, reward.skillItem, REWARD_CATEGORY.DROP);
-		if (ResultUtility.SetDropData(tmp, start_ary_index, reward.questItem, REWARD_CATEGORY.DROP) == 0 && gold == 0 && crystal == 0)
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, reward.item);
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, reward.equipItem);
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, reward.skillItem);
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, reward.questItem);
+		if (ResultUtility.SetDropData(tmp, start_ary_index, reward.accessoryItem) == 0 && gold == 0 && crystal == 0)
 		{
 			end_callback?.Invoke();
+			return;
 		}
-		else
+		eventRewardCallback = end_callback;
+		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			eventRewardCallback = end_callback;
-			if (!IsExecuteNowSceneEvent(GetSceneName()))
-			{
-				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
-				{
-					DispatchEvent("EVENT_REWARD", new object[4]
-					{
-						tmp,
-						gold,
-						crystal,
-						title
-					});
-				}));
-			}
-			else
+			this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
 			{
 				DispatchEvent("EVENT_REWARD", new object[4]
 				{
@@ -1590,13 +1626,22 @@ public class QuestResultTop : GameSection
 					crystal,
 					title
 				});
-			}
+			}));
+		}
+		else
+		{
+			DispatchEvent("EVENT_REWARD", new object[4]
+			{
+				tmp,
+				gold,
+				crystal,
+				title
+			});
 		}
 	}
 
 	protected void OnCloseDialog_QuestResultEventRewardDialog()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (eventRewardCallback != null)
 		{
 			this.StartCoroutine(OnCloseEventRewardCoroutine());
@@ -1607,17 +1652,15 @@ public class QuestResultTop : GameSection
 	{
 		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (eventRewardIndex > eventRewardList.Count - 1)
 		{
 			eventRewardCallback();
+			yield break;
 		}
-		else
-		{
-			OpenEventRewardDialog(eventRewardList[eventRewardIndex], eventRewardTitles[eventRewardIndex], eventRewardCallback);
-			eventRewardIndex++;
-		}
+		OpenEventRewardDialog(eventRewardList[eventRewardIndex], eventRewardTitles[eventRewardIndex], eventRewardCallback);
+		eventRewardIndex++;
 	}
 
 	private QuestCompleteReward CreateExploreReward()
@@ -1695,6 +1738,15 @@ public class QuestResultTop : GameSection
 				questCompleteReward.questItem.Add(questItem);
 				break;
 			}
+			case 14:
+			{
+				QuestCompleteReward.AccessoryItem accessoryItem = new QuestCompleteReward.AccessoryItem();
+				accessoryItem.rewardTitle = rewardTitle;
+				accessoryItem.accessoryId = list[j].itemId;
+				accessoryItem.num = list[j].num;
+				questCompleteReward.accessoryItem.Add(accessoryItem);
+				break;
+			}
 			}
 		}
 		return questCompleteReward;
@@ -1702,36 +1754,25 @@ public class QuestResultTop : GameSection
 
 	protected void OpenFirstClearRewardDialog(Action callback)
 	{
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 		if (!isNeedOpenFirstClearDialog)
 		{
 			callback?.Invoke();
+			return;
 		}
-		else
+		animState = RESULT_ANIM_STATE.FIRST_CLEAR_REWARD;
+		firstClearRewardCallback = callback;
+		QuestCompleteReward first = MonoBehaviourSingleton<QuestManager>.I.compData.reward.first;
+		List<SortCompareData> tmp = new List<SortCompareData>();
+		int start_ary_index = 0;
+		int gold = first.money;
+		int crystal = first.crystal;
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.item);
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.equipItem);
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.skillItem);
+		start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.accessoryItem);
+		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			animState = RESULT_ANIM_STATE.FIRST_CLEAR_REWARD;
-			firstClearRewardCallback = callback;
-			QuestCompleteReward first = MonoBehaviourSingleton<QuestManager>.I.compData.reward.first;
-			List<SortCompareData> tmp = new List<SortCompareData>();
-			int start_ary_index = 0;
-			int gold = first.money;
-			int crystal = first.crystal;
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.item, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.equipItem, REWARD_CATEGORY.DROP);
-			start_ary_index = ResultUtility.SetDropData(tmp, start_ary_index, first.skillItem, REWARD_CATEGORY.DROP);
-			if (!IsExecuteNowSceneEvent(GetSceneName()))
-			{
-				this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
-				{
-					DispatchEvent("FIRST_CLEAR_REWARD", new object[3]
-					{
-						tmp,
-						gold,
-						crystal
-					});
-				}));
-			}
-			else
+			this.StartCoroutine(ExecEndDialogEvent(GetSceneName(), delegate
 			{
 				DispatchEvent("FIRST_CLEAR_REWARD", new object[3]
 				{
@@ -1739,13 +1780,21 @@ public class QuestResultTop : GameSection
 					gold,
 					crystal
 				});
-			}
+			}));
+		}
+		else
+		{
+			DispatchEvent("FIRST_CLEAR_REWARD", new object[3]
+			{
+				tmp,
+				gold,
+				crystal
+			});
 		}
 	}
 
 	protected void OnCloseDialog_QuestResultFirstClearRewardDialog()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (firstClearRewardCallback != null)
 		{
 			this.StartCoroutine(OnCloseFirstClearCoroutine());
@@ -1756,7 +1805,7 @@ public class QuestResultTop : GameSection
 	{
 		if (!IsExecuteNowSceneEvent(GetSceneName()))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (firstClearRewardCallback != null)
 		{
@@ -1777,7 +1826,7 @@ public class QuestResultTop : GameSection
 	{
 		if (!IsExecuteNowSceneEvent(section_name))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		callback();
 	}
@@ -1796,17 +1845,17 @@ public class QuestResultTop : GameSection
 	{
 		this.StopCoroutine("AutoJoinParty");
 		this.StopCoroutine("WaitForHost");
-		DispatchEvent("FRIEND", null);
+		DispatchEvent("FRIEND");
 	}
 
 	protected void OnQuery_END_HUNT()
 	{
 		this.StopCoroutine("WaitForRepeatHunt");
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(false, delegate(bool is_success)
+		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(isOn: false, delegate(bool is_success)
 		{
-			GameSection.ChangeStayEvent("FRIEND", null);
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ChangeStayEvent("FRIEND");
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -1831,23 +1880,23 @@ public class QuestResultTop : GameSection
 			SetLabelText(text: $"Wait For Host({wait}s)", label_enum: UI.LBL_WAIT_FOR_HOST);
 			yield return (object)new WaitForSeconds(1f);
 		}
-		yield return (object)null;
+		yield return null;
 		SetLabelText((Enum)UI.LBL_WAIT_FOR_HOST, "Wait For Host...");
 		canEnterParty = true;
 	}
 
 	private IEnumerator AutoJoinParty()
 	{
-		bool wait3 = true;
-		bool waitGetData2 = false;
+		bool wait = true;
+		bool waitGetData = false;
 		while (MonoBehaviourSingleton<PartyManager>.I.repeatPartyStatus == 0)
 		{
-			if (!waitGetData2)
+			if (!waitGetData)
 			{
-				waitGetData2 = true;
+				waitGetData = true;
 				MonoBehaviourSingleton<PartyManager>.I.SendGetNextParty(delegate
 				{
-					((_003CAutoJoinParty_003Ec__IteratorF)/*Error near IL_005f: stateMachine*/)._003CwaitGetData_003E__1 = false;
+					waitGetData = false;
 				});
 			}
 			else
@@ -1855,85 +1904,86 @@ public class QuestResultTop : GameSection
 				yield return (object)new WaitForSeconds(2f);
 			}
 		}
-		if (MonoBehaviourSingleton<PartyManager>.I.repeatPartyStatus >= 0)
+		if (MonoBehaviourSingleton<PartyManager>.I.repeatPartyStatus < 0)
 		{
-			MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<PartyManager>.I.partyData.id, false, delegate
+			yield break;
+		}
+		MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<PartyManager>.I.partyData.id, isLoungeBoard: false, delegate
+		{
+			wait = false;
+		});
+		while (wait)
+		{
+			yield return null;
+		}
+		wait = true;
+		MonoBehaviourSingleton<PartyManager>.I.SendReady(enable_ready: true, delegate
+		{
+			wait = false;
+		});
+		while (wait)
+		{
+			yield return null;
+		}
+		wait = true;
+		waitGetData = false;
+		while (wait)
+		{
+			if (!waitGetData)
 			{
-				((_003CAutoJoinParty_003Ec__IteratorF)/*Error near IL_00ca: stateMachine*/)._003Cwait_003E__0 = false;
-			});
-			while (wait3)
-			{
-				yield return (object)null;
-			}
-			wait3 = true;
-			MonoBehaviourSingleton<PartyManager>.I.SendReady(true, delegate
-			{
-				((_003CAutoJoinParty_003Ec__IteratorF)/*Error near IL_010b: stateMachine*/)._003Cwait_003E__0 = false;
-			});
-			while (wait3)
-			{
-				yield return (object)null;
-			}
-			wait3 = true;
-			waitGetData2 = false;
-			while (wait3)
-			{
-				if (!waitGetData2)
+				waitGetData = true;
+				MonoBehaviourSingleton<PartyManager>.I.SendInfo(delegate
 				{
-					waitGetData2 = true;
-					MonoBehaviourSingleton<PartyManager>.I.SendInfo(delegate
+					waitGetData = false;
+					if (PartyManager.IsValidInParty())
 					{
-						((_003CAutoJoinParty_003Ec__IteratorF)/*Error near IL_0169: stateMachine*/)._003CwaitGetData_003E__1 = false;
-						if (PartyManager.IsValidInParty())
+						if (MonoBehaviourSingleton<PartyManager>.I.partyData.status == 100)
 						{
-							if (MonoBehaviourSingleton<PartyManager>.I.partyData.status == 100)
-							{
-								((_003CAutoJoinParty_003Ec__IteratorF)/*Error near IL_0169: stateMachine*/)._003Cwait_003E__0 = false;
-							}
-							else if (!MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest)
-							{
-								((_003CAutoJoinParty_003Ec__IteratorF)/*Error near IL_0169: stateMachine*/)._003Cwait_003E__0 = false;
-							}
+							wait = false;
 						}
-						else
+						else if (!MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest)
 						{
-							((_003CAutoJoinParty_003Ec__IteratorF)/*Error near IL_0169: stateMachine*/)._003Cwait_003E__0 = false;
+							wait = false;
 						}
-					});
-					yield return (object)null;
-				}
-				else
-				{
-					yield return (object)new WaitForSeconds(2f);
-				}
-			}
-			while (!canEnterParty)
-			{
-				if (!PartyManager.IsValidInParty())
-				{
-					canEnterParty = true;
-				}
-				else if (MonoBehaviourSingleton<PartyManager>.I.partyData.status != 100 && !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest)
-				{
-					canEnterParty = true;
-				}
-				yield return (object)null;
-			}
-			if (PartyManager.IsValidInParty())
-			{
-				if (MonoBehaviourSingleton<PartyManager>.I.partyData.status == 100)
-				{
-					EnterPartyQuest();
-				}
-				else if (!MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest)
-				{
-					DispatchEvent("HOST_LEFT", null);
-				}
+					}
+					else
+					{
+						wait = false;
+					}
+				});
+				yield return null;
 			}
 			else
 			{
-				DispatchEvent("HOST_LEFT", null);
+				yield return (object)new WaitForSeconds(2f);
 			}
+		}
+		while (!canEnterParty)
+		{
+			if (!PartyManager.IsValidInParty())
+			{
+				canEnterParty = true;
+			}
+			else if (MonoBehaviourSingleton<PartyManager>.I.partyData.status != 100 && !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest)
+			{
+				canEnterParty = true;
+			}
+			yield return null;
+		}
+		if (PartyManager.IsValidInParty())
+		{
+			if (MonoBehaviourSingleton<PartyManager>.I.partyData.status == 100)
+			{
+				EnterPartyQuest();
+			}
+			else if (!MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest)
+			{
+				DispatchEvent("HOST_LEFT");
+			}
+		}
+		else
+		{
+			DispatchEvent("HOST_LEFT");
 		}
 	}
 
@@ -1945,7 +1995,7 @@ public class QuestResultTop : GameSection
 			yield return (object)new WaitForSeconds(1f);
 		}
 		SetLabelText((Enum)UI.LBL_BTN_REPEAT_HUNT, "Repeat(0s)");
-		yield return (object)null;
+		yield return null;
 		QuestTable.QuestTableData table = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<PartyManager>.I.GetQuestId());
 		bool free_join = true;
 		if (table.questType == QUEST_TYPE.EVENT)

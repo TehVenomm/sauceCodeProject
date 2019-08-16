@@ -2,7 +2,7 @@ package com.fasterxml.jackson.core.format;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.MergedStream;
+import com.fasterxml.jackson.core.p015io.MergedStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

@@ -12,8 +12,6 @@ public class AudioObject : DisableNotifyMonoBehaviour
 		STOP
 	}
 
-	private const int MIN_FADEOUT_FRAMECOUNT = 4;
-
 	public Transform parentObject;
 
 	private AudioSource audioSource;
@@ -21,6 +19,8 @@ public class AudioObject : DisableNotifyMonoBehaviour
 	private bool needParent;
 
 	private float fadeoutVolume;
+
+	private const int MIN_FADEOUT_FRAMECOUNT = 4;
 
 	private AudioControlGroup m_masterGroup;
 
@@ -73,12 +73,9 @@ public class AudioObject : DisableNotifyMonoBehaviour
 			return null;
 		}
 		AudioObject audioObject = AudioObjectPool.Borrow();
-		if (!(audioObject == null))
+		if (audioObject == null)
 		{
-			goto IL_0020;
 		}
-		goto IL_0020;
-		IL_0020:
 		audioObject._transform.set_parent(MonoBehaviourSingleton<SoundManager>.I._transform);
 		audioObject.m_masterGroup = controlGroup;
 		audioObject.m_IsSpatialSound = is3DSound;
@@ -210,7 +207,7 @@ public class AudioObject : DisableNotifyMonoBehaviour
 		{
 			if (audioSource.get_loop())
 			{
-				Stop(0);
+				Stop();
 			}
 			parentObject = null;
 			needParent = false;
@@ -227,7 +224,7 @@ public class AudioObject : DisableNotifyMonoBehaviour
 			}
 			else if (audioSource.get_loop())
 			{
-				Stop(0);
+				Stop();
 				needParent = false;
 			}
 		}

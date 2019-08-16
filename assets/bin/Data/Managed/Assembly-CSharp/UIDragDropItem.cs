@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Drag and Drop Item")]
-public class UIDragDropItem
+public class UIDragDropItem : MonoBehaviour
 {
 	public enum Restriction
 	{
@@ -71,10 +71,6 @@ public class UIDragDropItem
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		mTrans = this.get_transform();
 		mCollider = this.get_gameObject().GetComponent<Collider>();
 		mCollider2D = this.get_gameObject().GetComponent<Collider2D>();
@@ -100,22 +96,23 @@ public class UIDragDropItem
 
 	protected virtual void OnPress(bool isPressed)
 	{
-		if (interactable && UICamera.currentTouchID != -2 && UICamera.currentTouchID != -3)
+		if (!interactable || UICamera.currentTouchID == -2 || UICamera.currentTouchID == -3)
 		{
-			if (isPressed)
+			return;
+		}
+		if (isPressed)
+		{
+			if (!mPressed)
 			{
-				if (!mPressed)
-				{
-					mTouch = UICamera.currentTouch;
-					mDragStartTime = RealTime.time + pressAndHoldDelay;
-					mPressed = true;
-				}
+				mTouch = UICamera.currentTouch;
+				mDragStartTime = RealTime.time + pressAndHoldDelay;
+				mPressed = true;
 			}
-			else if (mPressed && mTouch == UICamera.currentTouch)
-			{
-				mPressed = false;
-				mTouch = null;
-			}
+		}
+		else if (mPressed && mTouch == UICamera.currentTouch)
+		{
+			mPressed = false;
+			mTouch = null;
 		}
 	}
 
@@ -133,98 +130,83 @@ public class UIDragDropItem
 		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		if (interactable && this.get_enabled() && mTouch == UICamera.currentTouch)
+		if (!interactable || !this.get_enabled() || mTouch != UICamera.currentTouch)
 		{
-			if (restriction != 0)
+			return;
+		}
+		if (restriction != 0)
+		{
+			if (restriction == Restriction.Horizontal)
 			{
-				if (restriction == Restriction.Horizontal)
-				{
-					Vector2 totalDelta = mTouch.totalDelta;
-					if (Mathf.Abs(totalDelta.x) < Mathf.Abs(totalDelta.y))
-					{
-						return;
-					}
-				}
-				else if (restriction == Restriction.Vertical)
-				{
-					Vector2 totalDelta2 = mTouch.totalDelta;
-					if (Mathf.Abs(totalDelta2.x) > Mathf.Abs(totalDelta2.y))
-					{
-						return;
-					}
-				}
-				else if (restriction == Restriction.PressAndHold)
+				Vector2 totalDelta = mTouch.totalDelta;
+				if (Mathf.Abs(totalDelta.x) < Mathf.Abs(totalDelta.y))
 				{
 					return;
 				}
 			}
-			StartDragging();
+			else if (restriction == Restriction.Vertical)
+			{
+				Vector2 totalDelta2 = mTouch.totalDelta;
+				if (Mathf.Abs(totalDelta2.x) > Mathf.Abs(totalDelta2.y))
+				{
+					return;
+				}
+			}
+			else if (restriction == Restriction.PressAndHold)
+			{
+				return;
+			}
 		}
+		StartDragging();
 	}
 
 	public virtual void StartDragging()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Expected O, but got Unknown
-		//IL_003f: Expected O, but got Unknown
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Expected O, but got Unknown
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Expected O, but got Unknown
-		if (interactable && !mDragging)
+		if (!interactable || mDragging)
 		{
-			if (cloneOnDrag)
+			return;
+		}
+		if (cloneOnDrag)
+		{
+			mPressed = false;
+			GameObject val = NGUITools.AddChild(this.get_transform().get_parent().get_gameObject(), this.get_gameObject());
+			val.get_transform().set_localPosition(this.get_transform().get_localPosition());
+			val.get_transform().set_localRotation(this.get_transform().get_localRotation());
+			val.get_transform().set_localScale(this.get_transform().get_localScale());
+			UIButtonColor component = val.GetComponent<UIButtonColor>();
+			if (component != null)
 			{
-				mPressed = false;
-				GameObject val = NGUITools.AddChild(this.get_transform().get_parent().get_gameObject(), this.get_gameObject());
-				val.get_transform().set_localPosition(this.get_transform().get_localPosition());
-				val.get_transform().set_localRotation(this.get_transform().get_localRotation());
-				val.get_transform().set_localScale(this.get_transform().get_localScale());
-				UIButtonColor component = val.GetComponent<UIButtonColor>();
-				if (component != null)
-				{
-					component.defaultColor = this.GetComponent<UIButtonColor>().defaultColor;
-				}
-				if (mTouch != null && mTouch.pressed == this.get_gameObject())
-				{
-					mTouch.current = val;
-					mTouch.pressed = val;
-					mTouch.dragged = val;
-					mTouch.last = val;
-				}
-				UIDragDropItem component2 = val.GetComponent<UIDragDropItem>();
-				component2.mTouch = mTouch;
-				component2.mPressed = true;
-				component2.mDragging = true;
-				component2.Start();
-				component2.OnDragDropStart();
-				if (UICamera.currentTouch == null)
-				{
-					UICamera.currentTouch = mTouch;
-				}
-				mTouch = null;
-				UICamera.Notify(this.get_gameObject(), "OnPress", false);
-				UICamera.Notify(this.get_gameObject(), "OnHover", false);
+				component.defaultColor = this.GetComponent<UIButtonColor>().defaultColor;
 			}
-			else
+			if (mTouch != null && mTouch.pressed == this.get_gameObject())
 			{
-				mDragging = true;
-				OnDragDropStart();
+				mTouch.current = val;
+				mTouch.pressed = val;
+				mTouch.dragged = val;
+				mTouch.last = val;
 			}
+			UIDragDropItem component2 = val.GetComponent<UIDragDropItem>();
+			component2.mTouch = mTouch;
+			component2.mPressed = true;
+			component2.mDragging = true;
+			component2.Start();
+			component2.OnDragDropStart();
+			if (UICamera.currentTouch == null)
+			{
+				UICamera.currentTouch = mTouch;
+			}
+			mTouch = null;
+			UICamera.Notify(this.get_gameObject(), "OnPress", false);
+			UICamera.Notify(this.get_gameObject(), "OnHover", false);
+		}
+		else
+		{
+			mDragging = true;
+			OnDragDropStart();
 		}
 	}
 
@@ -257,13 +239,9 @@ public class UIDragDropItem
 
 	protected virtual void OnDragDropStart()
 	{
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Expected O, but got Unknown
 		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
 		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Expected O, but got Unknown
 		if (!draggedItems.Contains(this))
 		{
 			draggedItems.Add(this);
@@ -328,17 +306,9 @@ public class UIDragDropItem
 
 	protected virtual void OnDragDropRelease(GameObject surface)
 	{
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Expected O, but got Unknown
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Expected O, but got Unknown
-		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Expected O, but got Unknown
 		if (!cloneOnDrag)
 		{
 			if (mButton != null)
@@ -356,7 +326,7 @@ public class UIDragDropItem
 			UIDragDropContainer uIDragDropContainer = (!Object.op_Implicit(surface)) ? null : NGUITools.FindInParents<UIDragDropContainer>(surface);
 			if (uIDragDropContainer != null)
 			{
-				mTrans.set_parent((!(uIDragDropContainer.reparentTarget != null)) ? ((object)uIDragDropContainer.get_transform()) : ((object)uIDragDropContainer.reparentTarget));
+				mTrans.set_parent((!(uIDragDropContainer.reparentTarget != null)) ? uIDragDropContainer.get_transform() : uIDragDropContainer.reparentTarget);
 				Vector3 localPosition = mTrans.get_localPosition();
 				localPosition.z = 0f;
 				mTrans.set_localPosition(localPosition);

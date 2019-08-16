@@ -34,15 +34,16 @@ public class JsonParserSequence extends JsonParserDelegate {
         return new JsonParserSequence(new JsonParser[]{jsonParser, jsonParser2});
     }
 
-    protected void addFlattenedActiveParsers(List<JsonParser> list) {
+    /* access modifiers changed from: protected */
+    public void addFlattenedActiveParsers(List<JsonParser> list) {
         int i = this._nextParser - 1;
         int length = this._parsers.length;
         for (int i2 = i; i2 < length; i2++) {
-            Object obj = this._parsers[i2];
-            if (obj instanceof JsonParserSequence) {
-                ((JsonParserSequence) obj).addFlattenedActiveParsers(list);
+            JsonParser jsonParser = this._parsers[i2];
+            if (jsonParser instanceof JsonParserSequence) {
+                ((JsonParserSequence) jsonParser).addFlattenedActiveParsers(list);
             } else {
-                list.add(obj);
+                list.add(jsonParser);
             }
         }
     }
@@ -59,9 +60,9 @@ public class JsonParserSequence extends JsonParserDelegate {
             return nextToken;
         }
         while (switchToNext()) {
-            nextToken = this.delegate.nextToken();
-            if (nextToken != null) {
-                return nextToken;
+            JsonToken nextToken2 = this.delegate.nextToken();
+            if (nextToken2 != null) {
+                return nextToken2;
             }
         }
         return null;
@@ -71,7 +72,8 @@ public class JsonParserSequence extends JsonParserDelegate {
         return this._parsers.length;
     }
 
-    protected boolean switchToNext() {
+    /* access modifiers changed from: protected */
+    public boolean switchToNext() {
         if (this._nextParser >= this._parsers.length) {
             return false;
         }

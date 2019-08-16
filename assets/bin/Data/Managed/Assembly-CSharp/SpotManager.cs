@@ -67,10 +67,7 @@ public class SpotManager
 
 		public void SetIconSprite(string iconObjectName, Texture2D icon, int iconWidth, int iconHeight)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Expected O, but got Unknown
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = _transform.FindChild(iconObjectName);
+			Transform val = _transform.Find(iconObjectName);
 			if (!(val == null))
 			{
 				UITexture component = val.get_gameObject().GetComponent<UITexture>();
@@ -85,45 +82,36 @@ public class SpotManager
 
 		public void ReleaseRegion(string name, Texture2D icon, string eventName)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Expected O, but got Unknown
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Expected O, but got Unknown
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = _transform.FindChild("LBL_NAME");
+			Transform val = _transform.Find("LBL_NAME");
 			if (val != null)
 			{
 				UILabel component = val.GetComponent<UILabel>();
 				component.text = name;
 			}
-			Transform val2 = _transform.FindChild("SPR_ICON");
-			if (!(val2 == null))
+			Transform val2 = _transform.Find("SPR_ICON");
+			if (val2 == null)
 			{
-				UITexture component2 = val2.get_gameObject().GetComponent<UITexture>();
-				if (!(component2 == null))
+				return;
+			}
+			UITexture component2 = val2.get_gameObject().GetComponent<UITexture>();
+			if (!(component2 == null))
+			{
+				component2.mainTexture = icon;
+				UIGameSceneEventSender component3 = _transform.Find("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
+				if (string.IsNullOrEmpty(eventName))
 				{
-					component2.mainTexture = icon;
-					UIGameSceneEventSender component3 = _transform.FindChild("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
-					if (string.IsNullOrEmpty(eventName))
-					{
-						Object.Destroy(component3.get_gameObject());
-					}
-					else
-					{
-						component3.eventName = eventName;
-					}
+					Object.Destroy(component3.get_gameObject());
+				}
+				else
+				{
+					component3.eventName = eventName;
 				}
 			}
 		}
 
 		public void UpdateDeliveryTargetMarker(bool isExistDelivery)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Expected O, but got Unknown
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = _transform.FindChild("SPR_DELIVERY_TARGET");
+			Transform val = _transform.Find("SPR_DELIVERY_TARGET");
 			if (val != null)
 			{
 				val.get_gameObject().SetActive(isExistDelivery);
@@ -159,7 +147,7 @@ public class SpotManager
 	{
 		if (spotRootTransform == null)
 		{
-			spotRootTransform = ResourceUtility.Realizes(spotRootPrehab, t, -1);
+			spotRootTransform = ResourceUtility.Realizes(spotRootPrehab, t);
 		}
 		else if (t != null)
 		{
@@ -175,7 +163,6 @@ public class SpotManager
 
 	public void ClearAllSpot()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < spots.Count; i++)
 		{
 			if (spots[i] != null)
@@ -191,7 +178,7 @@ public class SpotManager
 	{
 		if (spotRootTransform == null)
 		{
-			spotRootTransform = ResourceUtility.Realizes(spotRootPrehab, MonoBehaviourSingleton<UIManager>.I.uiRootTransform, -1);
+			spotRootTransform = ResourceUtility.Realizes(spotRootPrehab, MonoBehaviourSingleton<UIManager>.I.uiRootTransform);
 		}
 	}
 
@@ -199,53 +186,6 @@ public class SpotManager
 	{
 		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Expected O, but got Unknown
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Expected O, but got Unknown
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Expected O, but got Unknown
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Expected O, but got Unknown
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Expected O, but got Unknown
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Expected O, but got Unknown
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Expected O, but got Unknown
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Expected O, but got Unknown
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Expected O, but got Unknown
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Expected O, but got Unknown
-		//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Expected O, but got Unknown
-		//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Expected O, but got Unknown
-		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d1: Expected O, but got Unknown
-		//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fb: Expected O, but got Unknown
-		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0323: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0328: Expected O, but got Unknown
-		//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036a: Unknown result type (might be due to invalid IL or missing references)
 		CreateSpotRoot();
 		Spot spot = new Spot();
 		spot.id = id;
@@ -253,104 +193,110 @@ public class SpotManager
 		spot.type = icon;
 		spot.mapNo = mapNo;
 		spot._transform = ResourceUtility.Realizes(spotPrefab, spotRootTransform, 5);
-		Transform val = spot._transform.FindChild("LBL_NAME");
+		Transform val = spot._transform.Find("LBL_NAME");
 		if (val != null)
 		{
 			UILabel component = val.GetComponent<UILabel>();
 			component.text = name;
 			component.get_gameObject().SetActive(icon != ICON_TYPE.NOT_OPENED);
+			Transform val2 = val.Find("SPR_NAME_BASE");
+			if (val2 != null)
+			{
+				UITexture component2 = val2.GetComponent<UITexture>();
+				component2.width = component.width + 45;
+			}
 		}
 		if (mapNo > 0)
 		{
-			val = spot._transform.FindChild("LBL_LOCATION_NUMBER");
+			val = spot._transform.Find("LBL_LOCATION_NUMBER");
 			if (val != null)
 			{
 				val.get_gameObject().SetActive(true);
-				UILabel component2 = val.get_gameObject().GetComponent<UILabel>();
-				component2.text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 25u) + mapNo.ToString();
+				UILabel component3 = val.get_gameObject().GetComponent<UILabel>();
+				component3.text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 25u) + mapNo.ToString();
 			}
 		}
-		val = spot._transform.FindChild("SPR_TWN_NEW");
+		val = spot._transform.Find("SPR_TWN_NEW");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(isNew);
 		}
-		val = spot._transform.FindChild("SPR_ICON_NEW");
+		val = spot._transform.Find("SPR_ICON_NEW");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(icon == ICON_TYPE.NEW);
 		}
-		val = spot._transform.FindChild("SPR_ICON_CLEARED");
+		val = spot._transform.Find("SPR_ICON_CLEARED");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(icon == ICON_TYPE.CLEARED);
 		}
-		val = spot._transform.FindChild("SPR_ICON_HOME");
+		val = spot._transform.Find("SPR_ICON_HOME");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(icon == ICON_TYPE.HOME);
 		}
-		val = spot._transform.FindChild("SPR_ICON_NOT_OPENED");
+		val = spot._transform.Find("SPR_ICON_NOT_OPENED");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(icon == ICON_TYPE.NOT_OPENED);
 		}
-		val = spot._transform.FindChild("SPR_ICON_HARD");
+		val = spot._transform.Find("SPR_ICON_HARD");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(icon == ICON_TYPE.HARD || icon == ICON_TYPE.HARD_NEW);
 			if (icon == ICON_TYPE.HARD)
 			{
-				Transform val2 = val.FindChild("DODAIADD");
-				if (null != val2)
+				Transform val3 = val.Find("DODAIADD");
+				if (null != val3)
 				{
-					val2.get_gameObject().SetActive(false);
+					val3.get_gameObject().SetActive(false);
 				}
 			}
 		}
-		val = spot._transform.FindChild("OBJ_NEW_PORTAL");
+		val = spot._transform.Find("OBJ_NEW_PORTAL");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(canUnlockNewPortal);
 		}
-		val = spot._transform.FindChild("OBJ_POP_PORTAL");
+		val = spot._transform.Find("OBJ_POP_PORTAL");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(viewEnemyPopBallon);
 		}
-		val = spot._transform.FindChild("SPR_ICON_DUNGEON");
+		val = spot._transform.Find("SPR_ICON_DUNGEON");
 		if (val != null)
 		{
-			UITexture component3 = val.GetComponent<UITexture>();
-			if (component3 != null && dungeon_icon != null && icon == ICON_TYPE.CHILD_REGION)
+			UITexture component4 = val.GetComponent<UITexture>();
+			if (component4 != null && dungeon_icon != null && icon == ICON_TYPE.CHILD_REGION)
 			{
-				component3.mainTexture = dungeon_icon;
+				component4.mainTexture = dungeon_icon;
 			}
 		}
-		val = spot._transform.FindChild("SPR_DELIVERY_TARGET");
+		val = spot._transform.Find("SPR_DELIVERY_TARGET");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(isExistDelivery);
 		}
-		val = spot._transform.FindChild("SPR_SUBMISSION_CLEARED");
+		val = spot._transform.Find("SPR_SUBMISSION_CLEARED");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(happenQuestCondition == HAPPEN_CONDITION.ALL_CLEAR);
 		}
-		val = spot._transform.FindChild("SPR_SUBMISSION_NOT_CLEARED");
+		val = spot._transform.Find("SPR_SUBMISSION_NOT_CLEARED");
 		if (val != null)
 		{
 			val.get_gameObject().SetActive(happenQuestCondition == HAPPEN_CONDITION.NOT_CLEAR);
 		}
-		UIGameSceneEventSender component4 = spot._transform.FindChild("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
+		UIGameSceneEventSender component5 = spot._transform.Find("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
 		if (string.IsNullOrEmpty(event_name))
 		{
-			Object.Destroy(component4.get_gameObject());
+			Object.Destroy(component5.get_gameObject());
 		}
 		else
 		{
-			component4.eventName = event_name;
-			component4.eventData = _event;
+			component5.eventName = event_name;
+			component5.eventData = _event;
 		}
 		spots.Add(spot);
 		return spot;

@@ -47,7 +47,7 @@ public class ExplorePlayerStatus
 			{
 				return ELEMENT_TYPE.MAX;
 			}
-			return (ELEMENT_TYPE)weaponEquipItemData.GetElemAtkType(null);
+			return (ELEMENT_TYPE)weaponEquipItemData.GetElemAtkType();
 		}
 	}
 
@@ -116,62 +116,62 @@ public class ExplorePlayerStatus
 			{
 				this.onUpdateBuff();
 			}
+			return;
 		}
-		else
+		int num = 0;
+		while (true)
 		{
-			int num = 0;
-			while (true)
+			if (num < list.Count)
 			{
-				if (num >= list.Count)
-				{
-					return;
-				}
 				int item = list[num];
 				if (!status.exst.Contains(item))
 				{
 					break;
 				}
 				num++;
+				continue;
 			}
-			if (this.onUpdateBuff != null)
-			{
-				this.onUpdateBuff();
-			}
+			return;
+		}
+		if (this.onUpdateBuff != null)
+		{
+			this.onUpdateBuff();
 		}
 	}
 
 	public void SyncFromPlayer(Player player)
 	{
-		if (Object.op_Implicit(player) && player.isInitialized)
+		if (!Object.op_Implicit(player) || !player.isInitialized)
 		{
-			UpdatePlayerStatus(player.hp, player.buffParam.CreateSyncParam(BuffParam.BUFFTYPE.NONE), player.weaponData.eId);
-			List<int> list = null;
-			for (int i = 0; i < UIStatusIcon.NON_BUFF_STATUS.Length; i++)
+			return;
+		}
+		UpdatePlayerStatus(player.hp, player.buffParam.CreateSyncParam(), player.weaponData.eId);
+		List<int> list = null;
+		for (int i = 0; i < UIStatusIcon.NON_BUFF_STATUS.Length; i++)
+		{
+			UIStatusIcon.STATUS_TYPE sTATUS_TYPE = UIStatusIcon.NON_BUFF_STATUS[i];
+			if (Coop_Model_RoomSyncPlayerStatus.StatusEnabled(player, sTATUS_TYPE))
 			{
-				UIStatusIcon.STATUS_TYPE sTATUS_TYPE = UIStatusIcon.NON_BUFF_STATUS[i];
-				if (Coop_Model_RoomSyncPlayerStatus.StatusEnabled(player, sTATUS_TYPE))
+				if (!extraStatus.Contains((int)sTATUS_TYPE))
 				{
-					if (!extraStatus.Contains((int)sTATUS_TYPE))
+					if (list == null)
 					{
-						if (list == null)
-						{
-							list = new List<int>();
-						}
-						list.Add((int)sTATUS_TYPE);
+						list = new List<int>();
 					}
-				}
-				else if (extraStatus.Contains((int)sTATUS_TYPE) && list == null)
-				{
-					list = new List<int>();
+					list.Add((int)sTATUS_TYPE);
 				}
 			}
-			if (list != null)
+			else if (extraStatus.Contains((int)sTATUS_TYPE) && list == null)
 			{
-				extraStatus = list;
-				if (this.onUpdateBuff != null)
-				{
-					this.onUpdateBuff();
-				}
+				list = new List<int>();
+			}
+		}
+		if (list != null)
+		{
+			extraStatus = list;
+			if (this.onUpdateBuff != null)
+			{
+				this.onUpdateBuff();
 			}
 		}
 	}
@@ -234,7 +234,7 @@ public class ExplorePlayerStatus
 		playerRecord.isSelf = isSelf;
 		playerRecord.charaInfo = charaInfo;
 		playerRecord.beforeLevel = charaInfo.level;
-		playerRecord.playerLoadInfo = PlayerLoadInfo.FromCharaInfo(charaInfo, true, true, true, false);
+		playerRecord.playerLoadInfo = PlayerLoadInfo.FromCharaInfo(charaInfo, need_weapon: true, need_helm: true, need_leg: true, is_priority_visual_equip: false);
 		playerRecord.animID = playerRecord.playerLoadInfo.weaponModelID / 1000;
 		playerRecord.givenTotalDamage = givenTotalDamage;
 		return playerRecord;

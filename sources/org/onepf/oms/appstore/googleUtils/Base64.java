@@ -1,20 +1,18 @@
 package org.onepf.oms.appstore.googleUtils;
 
-import android.support.v4.media.TransportMediator;
-import com.google.android.gms.nearby.messages.Strategy;
 import org.jetbrains.annotations.NotNull;
 
 public class Base64 {
-    private static final byte[] ALPHABET = new byte[]{(byte) 65, (byte) 66, (byte) 67, (byte) 68, (byte) 69, (byte) 70, (byte) 71, (byte) 72, (byte) 73, (byte) 74, (byte) 75, (byte) 76, (byte) 77, (byte) 78, (byte) 79, (byte) 80, (byte) 81, (byte) 82, (byte) 83, (byte) 84, (byte) 85, (byte) 86, (byte) 87, (byte) 88, (byte) 89, (byte) 90, (byte) 97, (byte) 98, (byte) 99, (byte) 100, (byte) 101, (byte) 102, (byte) 103, (byte) 104, (byte) 105, (byte) 106, (byte) 107, (byte) 108, (byte) 109, (byte) 110, (byte) 111, (byte) 112, (byte) 113, (byte) 114, (byte) 115, (byte) 116, (byte) 117, (byte) 118, (byte) 119, (byte) 120, (byte) 121, (byte) 122, (byte) 48, (byte) 49, (byte) 50, (byte) 51, (byte) 52, (byte) 53, (byte) 54, (byte) 55, (byte) 56, (byte) 57, (byte) 43, (byte) 47};
-    private static final byte[] DECODABET = new byte[]{(byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, WHITE_SPACE_ENC, WHITE_SPACE_ENC, (byte) -9, (byte) -9, WHITE_SPACE_ENC, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, WHITE_SPACE_ENC, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) 62, (byte) -9, (byte) -9, (byte) -9, (byte) 63, (byte) 52, (byte) 53, (byte) 54, (byte) 55, (byte) 56, (byte) 57, (byte) 58, (byte) 59, (byte) 60, EQUALS_SIGN, (byte) -9, (byte) -9, (byte) -9, EQUALS_SIGN_ENC, (byte) -9, (byte) -9, (byte) -9, (byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, NEW_LINE, (byte) 11, (byte) 12, (byte) 13, (byte) 14, (byte) 15, (byte) 16, (byte) 17, (byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 22, (byte) 23, (byte) 24, (byte) 25, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) 26, (byte) 27, (byte) 28, (byte) 29, (byte) 30, (byte) 31, (byte) 32, (byte) 33, (byte) 34, (byte) 35, (byte) 36, (byte) 37, (byte) 38, (byte) 39, (byte) 40, (byte) 41, (byte) 42, (byte) 43, (byte) 44, (byte) 45, (byte) 46, (byte) 47, (byte) 48, (byte) 49, (byte) 50, (byte) 51, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9};
+    private static final byte[] ALPHABET = {65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 47};
+    private static final byte[] DECODABET = {-9, -9, -9, -9, -9, -9, -9, -9, -9, WHITE_SPACE_ENC, WHITE_SPACE_ENC, -9, -9, WHITE_SPACE_ENC, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, WHITE_SPACE_ENC, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, 62, -9, -9, -9, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, EQUALS_SIGN, -9, -9, -9, EQUALS_SIGN_ENC, -9, -9, -9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, NEW_LINE, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -9, -9, -9, -9, -9, -9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -9, -9, -9, -9, -9};
     public static final boolean DECODE = false;
     public static final boolean ENCODE = true;
-    private static final byte EQUALS_SIGN = (byte) 61;
-    private static final byte EQUALS_SIGN_ENC = (byte) -1;
-    private static final byte NEW_LINE = (byte) 10;
-    private static final byte[] WEBSAFE_ALPHABET = new byte[]{(byte) 65, (byte) 66, (byte) 67, (byte) 68, (byte) 69, (byte) 70, (byte) 71, (byte) 72, (byte) 73, (byte) 74, (byte) 75, (byte) 76, (byte) 77, (byte) 78, (byte) 79, (byte) 80, (byte) 81, (byte) 82, (byte) 83, (byte) 84, (byte) 85, (byte) 86, (byte) 87, (byte) 88, (byte) 89, (byte) 90, (byte) 97, (byte) 98, (byte) 99, (byte) 100, (byte) 101, (byte) 102, (byte) 103, (byte) 104, (byte) 105, (byte) 106, (byte) 107, (byte) 108, (byte) 109, (byte) 110, (byte) 111, (byte) 112, (byte) 113, (byte) 114, (byte) 115, (byte) 116, (byte) 117, (byte) 118, (byte) 119, (byte) 120, (byte) 121, (byte) 122, (byte) 48, (byte) 49, (byte) 50, (byte) 51, (byte) 52, (byte) 53, (byte) 54, (byte) 55, (byte) 56, (byte) 57, (byte) 45, (byte) 95};
-    private static final byte[] WEBSAFE_DECODABET = new byte[]{(byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, WHITE_SPACE_ENC, WHITE_SPACE_ENC, (byte) -9, (byte) -9, WHITE_SPACE_ENC, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, WHITE_SPACE_ENC, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) 62, (byte) -9, (byte) -9, (byte) 52, (byte) 53, (byte) 54, (byte) 55, (byte) 56, (byte) 57, (byte) 58, (byte) 59, (byte) 60, EQUALS_SIGN, (byte) -9, (byte) -9, (byte) -9, EQUALS_SIGN_ENC, (byte) -9, (byte) -9, (byte) -9, (byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, NEW_LINE, (byte) 11, (byte) 12, (byte) 13, (byte) 14, (byte) 15, (byte) 16, (byte) 17, (byte) 18, (byte) 19, (byte) 20, (byte) 21, (byte) 22, (byte) 23, (byte) 24, (byte) 25, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) 63, (byte) -9, (byte) 26, (byte) 27, (byte) 28, (byte) 29, (byte) 30, (byte) 31, (byte) 32, (byte) 33, (byte) 34, (byte) 35, (byte) 36, (byte) 37, (byte) 38, (byte) 39, (byte) 40, (byte) 41, (byte) 42, (byte) 43, (byte) 44, (byte) 45, (byte) 46, (byte) 47, (byte) 48, (byte) 49, (byte) 50, (byte) 51, (byte) -9, (byte) -9, (byte) -9, (byte) -9, (byte) -9};
-    private static final byte WHITE_SPACE_ENC = (byte) -5;
+    private static final byte EQUALS_SIGN = 61;
+    private static final byte EQUALS_SIGN_ENC = -1;
+    private static final byte NEW_LINE = 10;
+    private static final byte[] WEBSAFE_ALPHABET = {65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 45, 95};
+    private static final byte[] WEBSAFE_DECODABET = {-9, -9, -9, -9, -9, -9, -9, -9, -9, WHITE_SPACE_ENC, WHITE_SPACE_ENC, -9, -9, WHITE_SPACE_ENC, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, WHITE_SPACE_ENC, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, 62, -9, -9, 52, 53, 54, 55, 56, 57, 58, 59, 60, EQUALS_SIGN, -9, -9, -9, EQUALS_SIGN_ENC, -9, -9, -9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, NEW_LINE, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -9, -9, -9, -9, 63, -9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -9, -9, -9, -9, -9};
+    private static final byte WHITE_SPACE_ENC = -5;
 
     private Base64() {
     }
@@ -37,82 +35,71 @@ public class Base64 {
 
     @NotNull
     public static byte[] decode(byte[] bArr, int i, int i2, byte[] bArr2) throws Base64DecoderException {
-        Object obj;
-        Object obj2 = new byte[(((i2 * 3) / 4) + 2)];
-        byte[] bArr3 = new byte[4];
-        int i3 = 0;
+        int i3;
+        byte[] bArr3 = new byte[(((i2 * 3) / 4) + 2)];
+        byte[] bArr4 = new byte[4];
         int i4 = 0;
         int i5 = 0;
-        while (i3 < i2) {
-            byte b = (byte) (bArr[i3 + i] & TransportMediator.KEYCODE_MEDIA_PAUSE);
+        int i6 = 0;
+        while (true) {
+            if (i4 >= i2) {
+                break;
+            }
+            byte b = (byte) (bArr[i4 + i] & Byte.MAX_VALUE);
             byte b2 = bArr2[b];
-            if (b2 >= WHITE_SPACE_ENC) {
-                int i6;
-                if (b2 < EQUALS_SIGN_ENC) {
-                    i6 = i5;
-                } else if (b == EQUALS_SIGN) {
-                    i6 = i2 - i3;
-                    b = (byte) (bArr[(i2 - 1) + i] & TransportMediator.KEYCODE_MEDIA_PAUSE);
-                    if (i5 == 0 || i5 == 1) {
-                        throw new Base64DecoderException("invalid padding byte '=' at byte offset " + i3);
-                    } else if ((i5 != 3 || i6 <= 2) && (i5 != 4 || i6 <= 1)) {
-                        if (!(b == EQUALS_SIGN || b == NEW_LINE)) {
-                            throw new Base64DecoderException("encoded value has invalid trailing byte");
-                        }
-                        if (i5 != 0) {
-                            if (i5 != 1) {
-                                throw new Base64DecoderException("single trailing character at offset " + (i2 - 1));
-                            }
-                            bArr3[i5] = (byte) 61;
-                            i4 += decode4to3(bArr3, 0, obj2, i4, bArr2);
-                        }
-                        obj = new byte[i4];
-                        System.arraycopy(obj2, 0, obj, 0, i4);
-                        return obj;
-                    } else {
-                        throw new Base64DecoderException("padding byte '=' falsely signals end of encoded value at offset " + i3);
+            if (b2 >= -5) {
+                if (b2 < -1) {
+                    i3 = i6;
+                } else if (b == 61) {
+                    int i7 = i2 - i4;
+                    byte b3 = (byte) (bArr[(i2 - 1) + i] & Byte.MAX_VALUE);
+                    if (i6 == 0 || i6 == 1) {
+                        throw new Base64DecoderException("invalid padding byte '=' at byte offset " + i4);
+                    } else if ((i6 == 3 && i7 > 2) || (i6 == 4 && i7 > 1)) {
+                        throw new Base64DecoderException("padding byte '=' falsely signals end of encoded value at offset " + i4);
+                    } else if (b3 != 61 && b3 != 10) {
+                        throw new Base64DecoderException("encoded value has invalid trailing byte");
                     }
                 } else {
-                    i6 = i5 + 1;
-                    bArr3[i5] = (byte) b;
-                    if (i6 == 4) {
-                        i4 += decode4to3(bArr3, 0, obj2, i4, bArr2);
-                        i6 = 0;
+                    i3 = i6 + 1;
+                    bArr4[i6] = (byte) b;
+                    if (i3 == 4) {
+                        i5 += decode4to3(bArr4, 0, bArr3, i5, bArr2);
+                        i3 = 0;
                     }
                 }
-                i3++;
-                i5 = i6;
+                i4++;
+                i6 = i3;
             } else {
-                throw new Base64DecoderException("Bad Base64 input character at " + i3 + ": " + bArr[i3 + i] + "(decimal)");
+                throw new Base64DecoderException("Bad Base64 input character at " + i4 + ": " + bArr[i4 + i] + "(decimal)");
             }
         }
-        if (i5 != 0) {
-            if (i5 != 1) {
-                bArr3[i5] = (byte) 61;
-                i4 += decode4to3(bArr3, 0, obj2, i4, bArr2);
-            } else {
+        if (i6 != 0) {
+            if (i6 == 1) {
                 throw new Base64DecoderException("single trailing character at offset " + (i2 - 1));
             }
+            bArr4[i6] = (byte) 61;
+            i5 += decode4to3(bArr4, 0, bArr3, i5, bArr2);
         }
-        obj = new byte[i4];
-        System.arraycopy(obj2, 0, obj, 0, i4);
-        return obj;
+        byte[] bArr5 = new byte[i5];
+        System.arraycopy(bArr3, 0, bArr5, 0, i5);
+        return bArr5;
     }
 
     private static int decode4to3(byte[] bArr, int i, byte[] bArr2, int i2, byte[] bArr3) {
-        if (bArr[i + 2] == EQUALS_SIGN) {
+        if (bArr[i + 2] == 61) {
             bArr2[i2] = (byte) ((byte) ((((bArr3[bArr[i]] << 24) >>> 6) | ((bArr3[bArr[i + 1]] << 24) >>> 12)) >>> 16));
             return 1;
-        } else if (bArr[i + 3] == EQUALS_SIGN) {
-            r0 = (((bArr3[bArr[i]] << 24) >>> 6) | ((bArr3[bArr[i + 1]] << 24) >>> 12)) | ((bArr3[bArr[i + 2]] << 24) >>> 18);
-            bArr2[i2] = (byte) ((byte) (r0 >>> 16));
-            bArr2[i2 + 1] = (byte) ((byte) (r0 >>> 8));
+        } else if (bArr[i + 3] == 61) {
+            int i3 = ((bArr3[bArr[i]] << 24) >>> 6) | ((bArr3[bArr[i + 1]] << 24) >>> 12) | ((bArr3[bArr[i + 2]] << 24) >>> 18);
+            bArr2[i2] = (byte) ((byte) (i3 >>> 16));
+            bArr2[i2 + 1] = (byte) ((byte) (i3 >>> 8));
             return 2;
         } else {
-            r0 = ((((bArr3[bArr[i]] << 24) >>> 6) | ((bArr3[bArr[i + 1]] << 24) >>> 12)) | ((bArr3[bArr[i + 2]] << 24) >>> 18)) | ((bArr3[bArr[i + 3]] << 24) >>> 24);
-            bArr2[i2] = (byte) ((byte) (r0 >> 16));
-            bArr2[i2 + 1] = (byte) ((byte) (r0 >> 8));
-            bArr2[i2 + 2] = (byte) ((byte) r0);
+            int i4 = ((bArr3[bArr[i]] << 24) >>> 6) | ((bArr3[bArr[i + 1]] << 24) >>> 12) | ((bArr3[bArr[i + 2]] << 24) >>> 18) | ((bArr3[bArr[i + 3]] << 24) >>> 24);
+            bArr2[i2] = (byte) ((byte) (i4 >> 16));
+            bArr2[i2 + 1] = (byte) ((byte) (i4 >> 8));
+            bArr2[i2 + 2] = (byte) ((byte) i4);
             return 3;
         }
     }
@@ -140,9 +127,9 @@ public class Base64 {
 
     @NotNull
     public static String encode(byte[] bArr, int i, int i2, byte[] bArr2, boolean z) {
-        byte[] encode = encode(bArr, i, i2, bArr2, (int) Strategy.TTL_SECONDS_INFINITE);
+        byte[] encode = encode(bArr, i, i2, bArr2, Integer.MAX_VALUE);
         int length = encode.length;
-        while (!z && length > 0 && encode[length - 1] == EQUALS_SIGN) {
+        while (!z && length > 0 && encode[length - 1] == 61) {
             length--;
         }
         return new String(encode, 0, length);
@@ -156,26 +143,26 @@ public class Base64 {
         int i6 = 0;
         int i7 = 0;
         while (i5 < i2 - 2) {
-            i4 = (((bArr[i5 + i] << 24) >>> 8) | ((bArr[(i5 + 1) + i] << 24) >>> 16)) | ((bArr[(i5 + 2) + i] << 24) >>> 24);
-            bArr3[i7] = (byte) bArr2[i4 >>> 18];
-            bArr3[i7 + 1] = (byte) bArr2[(i4 >>> 12) & 63];
-            bArr3[i7 + 2] = (byte) bArr2[(i4 >>> 6) & 63];
-            bArr3[i7 + 3] = (byte) bArr2[i4 & 63];
-            i4 = i6 + 4;
-            if (i4 == i3) {
+            int i8 = ((bArr[i5 + i] << 24) >>> 8) | ((bArr[(i5 + 1) + i] << 24) >>> 16) | ((bArr[(i5 + 2) + i] << 24) >>> 24);
+            bArr3[i7] = (byte) bArr2[i8 >>> 18];
+            bArr3[i7 + 1] = (byte) bArr2[(i8 >>> 12) & 63];
+            bArr3[i7 + 2] = (byte) bArr2[(i8 >>> 6) & 63];
+            bArr3[i7 + 3] = (byte) bArr2[i8 & 63];
+            int i9 = i6 + 4;
+            if (i9 == i3) {
                 bArr3[i7 + 4] = (byte) 10;
                 i7++;
-                i4 = 0;
+                i9 = 0;
             }
             i5 += 3;
             i7 += 4;
-            i6 = i4;
+            i6 = i9;
         }
         if (i5 < i2) {
             encode3to4(bArr, i5 + i, i2 - i5, bArr3, i7, bArr2);
             if (i6 + 4 == i3) {
                 bArr3[i7 + 4] = (byte) 10;
-                i4 = i7 + 1;
+                int i10 = i7 + 1;
             }
         }
         return bArr3;
@@ -188,25 +175,25 @@ public class Base64 {
         if (i2 > 2) {
             i4 = (bArr[i + 2] << 24) >>> 24;
         }
-        i4 |= i6 | i5;
+        int i7 = i4 | i6 | i5;
         switch (i2) {
             case 1:
-                bArr2[i3] = (byte) bArr3[i4 >>> 18];
-                bArr2[i3 + 1] = (byte) bArr3[(i4 >>> 12) & 63];
+                bArr2[i3] = (byte) bArr3[i7 >>> 18];
+                bArr2[i3 + 1] = (byte) bArr3[(i7 >>> 12) & 63];
                 bArr2[i3 + 2] = (byte) 61;
                 bArr2[i3 + 3] = (byte) 61;
                 break;
             case 2:
-                bArr2[i3] = (byte) bArr3[i4 >>> 18];
-                bArr2[i3 + 1] = (byte) bArr3[(i4 >>> 12) & 63];
-                bArr2[i3 + 2] = (byte) bArr3[(i4 >>> 6) & 63];
+                bArr2[i3] = (byte) bArr3[i7 >>> 18];
+                bArr2[i3 + 1] = (byte) bArr3[(i7 >>> 12) & 63];
+                bArr2[i3 + 2] = (byte) bArr3[(i7 >>> 6) & 63];
                 bArr2[i3 + 3] = (byte) 61;
                 break;
             case 3:
-                bArr2[i3] = (byte) bArr3[i4 >>> 18];
-                bArr2[i3 + 1] = (byte) bArr3[(i4 >>> 12) & 63];
-                bArr2[i3 + 2] = (byte) bArr3[(i4 >>> 6) & 63];
-                bArr2[i3 + 3] = (byte) bArr3[i4 & 63];
+                bArr2[i3] = (byte) bArr3[i7 >>> 18];
+                bArr2[i3 + 1] = (byte) bArr3[(i7 >>> 12) & 63];
+                bArr2[i3 + 2] = (byte) bArr3[(i7 >>> 6) & 63];
+                bArr2[i3 + 3] = (byte) bArr3[i7 & 63];
                 break;
         }
         return bArr2;

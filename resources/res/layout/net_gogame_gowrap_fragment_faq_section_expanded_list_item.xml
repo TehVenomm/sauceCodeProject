@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:colopl="http://schemas.android.com/apk/res/REMOVED_APPID" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_expandablelistview_expanded_group_container">
-        <TextView android:id="@+id/net_gogame_gowrap_faq_section_name" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/net_gogame_gowrap_expandablelistview_expanded_group_text_appearance"/>
-    </LinearLayout>
-</LinearLayout>

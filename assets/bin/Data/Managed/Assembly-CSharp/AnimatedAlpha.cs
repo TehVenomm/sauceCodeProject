@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class AnimatedAlpha
+public class AnimatedAlpha : MonoBehaviour
 {
 	[Range(0f, 1f)]
 	public float alpha = 1f;

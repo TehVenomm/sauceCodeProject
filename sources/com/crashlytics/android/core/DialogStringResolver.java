@@ -1,8 +1,8 @@
 package com.crashlytics.android.core;
 
 import android.content.Context;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.settings.PromptSettingsData;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.settings.PromptSettingsData;
 
 class DialogStringResolver {
     private static final String PROMPT_MESSAGE_RES_NAME = "com.crashlytics.CrashSubmissionPromptMessage";
@@ -13,8 +13,8 @@ class DialogStringResolver {
     private final Context context;
     private final PromptSettingsData promptData;
 
-    public DialogStringResolver(Context context, PromptSettingsData promptSettingsData) {
-        this.context = context;
+    public DialogStringResolver(Context context2, PromptSettingsData promptSettingsData) {
+        this.context = context2;
         this.promptData = promptSettingsData;
     }
 

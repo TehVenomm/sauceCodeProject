@@ -50,11 +50,16 @@ public class GameSection : UIBehaviour
 		UPDATE_ABILITY_ITEM_INVENTORY = 0x8000000000,
 		UPDATE_ABILITY_ITEM_CHANGE = 0x10000000000,
 		UPDATE_GUILD_REQUEST = 0x200,
-		FACEBOOK_LOGIN = 0x40000000000,
-		UPDATE_RALLY_INVITE = 0x80000000000,
-		UPDATE_GUILD_LIST = 0x100000000000,
-		RESET_DARK_MARKET = 0x200000000000,
-		UPDATE_DARK_MARKET = 0x400000000000
+		UPDATE_ACCESSORY_INVENTORY = 0x400,
+		UPDATE_CLAN_APPLY_REQUEST = 0x800,
+		FACEBOOK_LOGIN = 0x100000000000,
+		UPDATE_RALLY_INVITE = 0x200000000000,
+		UPDATE_GUILD_LIST = 0x400000000000,
+		UPDATE_DARK_MARKET = 0x800000000000,
+		RESET_DARK_MARKET = 0x1000000000000,
+		UPDATE_TRADING_POST = 0x2000000000000,
+		UPDATE_TRADING_POST_ITEM_DETAIL = 0x4000000000000,
+		UPDATE_CLAN_SCOUT_REQUEST = 0x1000
 	}
 
 	private static object[] expandStorageEventData;
@@ -135,9 +140,7 @@ public class GameSection : UIBehaviour
 
 	protected void DispatchEvent(string event_name, object event_data = null)
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSection", this.get_gameObject(), event_name, event_data, null, true);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSection", this.get_gameObject(), event_name, event_data);
 	}
 
 	protected void RequestEvent(string event_name, object event_data = null)
@@ -196,20 +199,18 @@ public class GameSection : UIBehaviour
 		GameSceneEvent.PopStay();
 	}
 
-	protected static void ResumeEvent(bool is_resume, object userData = null)
+	protected static void ResumeEvent(bool is_resume, object userData = null, bool is_send_query = false)
 	{
 		if (is_resume)
 		{
-			GameSceneEvent.Resume(userData);
+			GameSceneEvent.Resume(userData, is_send_query);
+			return;
 		}
-		else
+		GameSceneEvent.Cancel();
+		GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
+		if (currentSection != null && currentSection.isClose)
 		{
-			GameSceneEvent.Cancel();
-			GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-			if (currentSection != null && currentSection.isClose)
-			{
-				currentSection.Open(UITransition.TYPE.OPEN);
-			}
+			currentSection.Open();
 		}
 	}
 
@@ -235,7 +236,7 @@ public class GameSection : UIBehaviour
 		}
 		else
 		{
-			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == requiredItemId, 1, false);
+			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == requiredItemId, 1);
 			if (price_num <= itemNum)
 			{
 				return true;
@@ -243,30 +244,29 @@ public class GameSection : UIBehaviour
 		}
 		if (change_event_name)
 		{
-			ChangeEvent("NOT_ENOUGTH", null);
+			ChangeEvent("NOT_ENOUGTH");
 		}
 		return false;
 	}
 
 	public void LoadRequireDataTable()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		isLoadedRequireDataTable = false;
 		this.StartCoroutine(WaitDataTable());
 	}
 
 	protected IEnumerator WaitDataTable()
 	{
-		foreach (string item in requireDataTable)
+		foreach (string dataTable in requireDataTable)
 		{
 			while (!MonoBehaviourSingleton<DataTableManager>.IsValid())
 			{
-				yield return (object)null;
+				yield return null;
 			}
-			MonoBehaviourSingleton<DataTableManager>.I.ChangePriorityTop(item);
-			while (MonoBehaviourSingleton<DataTableManager>.I.IsLoading(item))
+			MonoBehaviourSingleton<DataTableManager>.I.ChangePriorityTop(dataTable);
+			while (MonoBehaviourSingleton<DataTableManager>.I.IsLoading(dataTable))
 			{
-				yield return (object)null;
+				yield return null;
 			}
 		}
 		isLoadedRequireDataTable = true;
@@ -274,7 +274,6 @@ public class GameSection : UIBehaviour
 
 	protected void DoWaitProtocolBusyFinish(Action callback)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(WaitProtocolBusyFinish(callback));
 	}
 
@@ -282,7 +281,7 @@ public class GameSection : UIBehaviour
 	{
 		while (Protocol.isBusy)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		callback?.Invoke();
 	}
@@ -292,13 +291,27 @@ public class GameSection : UIBehaviour
 		StayEvent();
 		MonoBehaviourSingleton<ShopManager>.I.SendGetShop(delegate(bool is_success)
 		{
-			ResumeEvent(is_success, null);
+			ResumeEvent(is_success);
 		});
 	}
 
 	private void ChangeScene(string to_scene, string to_section = null)
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene(to_scene, to_section, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene(to_scene, to_section);
+	}
+
+	public static string GetGoingHomeEvent()
+	{
+		string result = "MAIN_MENU_HOME";
+		if (LoungeMatchingManager.IsValidInLounge())
+		{
+			result = "MAIN_MENU_LOUNGE";
+		}
+		else if (ClanMatchingManager.IsValidInClan())
+		{
+			result = "MAIN_MENU_CLAN";
+		}
+		return result;
 	}
 
 	private void OnQuery_MAIN_MENU_HOME()
@@ -313,7 +326,7 @@ public class GameSection : UIBehaviour
 
 	protected void OnQuery_MAIN_MENU_CLAN()
 	{
-		ChangeScene("Guild", "GuildTop");
+		ChangeScene("Clan", "ClanTop");
 	}
 
 	protected void OnQuery_MAIN_MENU_STATUS()
@@ -321,10 +334,27 @@ public class GameSection : UIBehaviour
 		ChangeScene("Status", "StatusTop");
 	}
 
+	protected void OnQuery_MAIN_MENU_UNIQUE_STATUS()
+	{
+		ChangeScene("UniqueStatus", "UniqueStatusTop");
+	}
+
+	protected void TO_UNIQUE_OR_MAIN_STATUS()
+	{
+		if (StatusManager.IsUnique())
+		{
+			OnQuery_MAIN_MENU_UNIQUE_STATUS();
+		}
+		else
+		{
+			OnQuery_MAIN_MENU_STATUS();
+		}
+	}
+
 	private void OnQuery_MAIN_MENU_STUDIO()
 	{
 		MonoBehaviourSingleton<GameSceneManager>.I.ClearHistory();
-		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
+		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge() || MonoBehaviourSingleton<ClanMatchingManager>.I.IsInClan())
 		{
 			SendToStuido();
 		}
@@ -338,7 +368,7 @@ public class GameSection : UIBehaviour
 
 	private void OnQuery_MAIN_MENU_SHOP()
 	{
-		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
+		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge() || MonoBehaviourSingleton<ClanMatchingManager>.I.IsInClan())
 		{
 			SendToShop();
 		}
@@ -347,7 +377,7 @@ public class GameSection : UIBehaviour
 
 	private void OnQuery_MAIN_MENU_GACHA()
 	{
-		ChangeScene("Gacha", null);
+		ChangeScene("Gacha");
 	}
 
 	private void OnQuery_MAIN_MENU_GATHER()
@@ -360,15 +390,13 @@ public class GameSection : UIBehaviour
 		if (MonoBehaviourSingleton<UIManager>.I.Find("MenuTop") != null)
 		{
 			MonoBehaviourSingleton<GameSceneManager>.I.ChangeSectionBack();
+			return;
 		}
-		else
+		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
-			if (MonoBehaviourSingleton<InputManager>.IsValid())
-			{
-				MonoBehaviourSingleton<InputManager>.I.Untouch();
-			}
-			ChangeScene("Menu", "MenuTop");
+			MonoBehaviourSingleton<InputManager>.I.Untouch();
 		}
+		ChangeScene("Menu", "MenuTop");
 	}
 
 	private void OnQuery_CHAT_AGE_CONFIRM()
@@ -385,7 +413,7 @@ public class GameSection : UIBehaviour
 		lounge_Model_RoomAction.id = 1005;
 		lounge_Model_RoomAction.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		lounge_Model_RoomAction.aid = 5;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction, false, null, null);
+		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction);
 	}
 
 	private void SendToShop()
@@ -394,7 +422,7 @@ public class GameSection : UIBehaviour
 		lounge_Model_RoomAction.id = 1005;
 		lounge_Model_RoomAction.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		lounge_Model_RoomAction.aid = 4;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction, false, null, null);
+		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction);
 	}
 
 	protected virtual void OnQuery_QUEST_ROOM_IN_GAME()
@@ -404,49 +432,47 @@ public class GameSection : UIBehaviour
 		if (table == null || !flag)
 		{
 			StopEvent();
+			return;
 		}
-		else
+		bool is_free_join = true;
+		if (table.questType == QUEST_TYPE.EVENT)
 		{
-			bool is_free_join = true;
-			if (table.questType == QUEST_TYPE.EVENT)
-			{
-				is_free_join = !MonoBehaviourSingleton<PartyManager>.I.IsPayingQuest();
-			}
-			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(table.questID, is_free_join);
-			StayEvent();
-			CoopApp.EnterPartyQuest(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
-			{
-				bool is_resume = is_s;
-				if (is_r)
-				{
-					if (is_s)
-					{
-						QuestRoomObserver.OffObserve();
-					}
-				}
-				else if (!is_c && table.questType != QUEST_TYPE.ORDER)
-				{
-					ChangeStayEvent("COOP_SERVER_INVALID", null);
-					is_resume = true;
-				}
-				ResumeEvent(is_resume, null);
-			});
+			is_free_join = !MonoBehaviourSingleton<PartyManager>.I.IsPayingQuest();
 		}
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(table.questID, is_free_join);
+		StayEvent();
+		CoopApp.EnterPartyQuest(delegate(bool is_m, bool is_c, bool is_r, bool is_s)
+		{
+			bool is_resume = is_s;
+			if (is_r)
+			{
+				if (is_s)
+				{
+					QuestRoomObserver.OffObserve();
+				}
+			}
+			else if (!is_c && table.questType != QUEST_TYPE.ORDER)
+			{
+				ChangeStayEvent("COOP_SERVER_INVALID");
+				is_resume = true;
+			}
+			ResumeEvent(is_resume);
+		});
 	}
 
 	public void OnQuery_IN_GAME_FIELD()
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
+		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame");
 	}
 
 	public void OnQuery_QUEST_TO_FIELD()
 	{
-		_OnQuery_FIELD(true);
+		_OnQuery_FIELD(fromQuest: true);
 	}
 
 	public void OnQuery_TUTORIAL_TO_FIELD()
 	{
-		_OnQuery_FIELD(false);
+		_OnQuery_FIELD(fromQuest: false);
 	}
 
 	protected void _OnQuery_FIELD(bool fromQuest)
@@ -462,28 +488,26 @@ public class GameSection : UIBehaviour
 		{
 			eventType = WorldMapOpenNewField.EVENT_TYPE.ONLY_CAMERA_MOVE;
 		}
-		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portal_id, false, true))
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portal_id, check_dst_quest: false))
 		{
 			StopEvent();
+			return;
 		}
-		else
+		WorldMapOpenNewField.SectionEventData eventData = new WorldMapOpenNewField.SectionEventData(eventType, ENEMY_TYPE.BAT);
+		SetEventData(eventData);
+		StayEvent();
+		CoopApp.EnterField(portal_id, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
 		{
-			WorldMapOpenNewField.SectionEventData eventData = new WorldMapOpenNewField.SectionEventData(eventType, ENEMY_TYPE.BAT);
-			SetEventData(eventData);
-			StayEvent();
-			CoopApp.EnterField(portal_id, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
+			if (!is_connect)
 			{
-				if (!is_connect)
-				{
-					ChangeStayEvent("COOP_SERVER_INVALID", null);
-					ResumeEvent(true, null);
-				}
-				else
-				{
-					ResumeEvent(is_regist, null);
-				}
-			});
-		}
+				ChangeStayEvent("COOP_SERVER_INVALID");
+				ResumeEvent(is_resume: true);
+			}
+			else
+			{
+				ResumeEvent(is_regist);
+			}
+		});
 	}
 
 	private void OnQuery_APP_VERSION_RESTRICTION()
@@ -529,7 +553,7 @@ public class GameSection : UIBehaviour
 	protected virtual void OnQuery_GachaConfirm_YES()
 	{
 		int price_num = (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId <= 0) ? MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum : MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum;
-		if (CheckCrystal(price_num, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId, true))
+		if (CheckCrystal(price_num, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId))
 		{
 			StayEvent();
 			DoGacha(delegate(Error ret)
@@ -539,16 +563,16 @@ public class GameSection : UIBehaviour
 				case Error.None:
 					if (MonoBehaviourSingleton<GachaManager>.I.selectGachaType == GACHA_TYPE.QUEST)
 					{
-						ChangeStayEvent("YES_QUEST", null);
+						ChangeStayEvent("YES_QUEST");
 					}
-					ResumeEvent(true, null);
+					ResumeEvent(is_resume: true);
 					break;
 				case Error.ERR_CRYSTAL_NOT_ENOUGH:
-					ChangeStayEvent("NOT_ENOUGTH", null);
-					ResumeEvent(true, null);
+					ChangeStayEvent("NOT_ENOUGTH");
+					ResumeEvent(is_resume: true);
 					break;
 				default:
-					ResumeEvent(false, null);
+					ResumeEvent(is_resume: false);
 					break;
 				}
 			});
@@ -557,12 +581,12 @@ public class GameSection : UIBehaviour
 
 	protected void DoGacha(Action<Error> callback)
 	{
-		MonoBehaviourSingleton<GachaManager>.I.SendGachaGacha(MonoBehaviourSingleton<GachaManager>.I.selectGacha.gachaId, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId, MonoBehaviourSingleton<GachaManager>.I.selectGacha.productId, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.guaranteeCampaignId, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.campaignType, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.remainCount, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.userCount, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.hasFreeGachaReward, callback);
+		MonoBehaviourSingleton<GachaManager>.I.SendGachaGacha(MonoBehaviourSingleton<GachaManager>.I.selectGacha.gachaId, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId, MonoBehaviourSingleton<GachaManager>.I.selectGacha.productId, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.guaranteeCampaignId, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.campaignType, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.remainCount, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.userCount, MonoBehaviourSingleton<GachaManager>.I.selectGachaGuarantee.hasFreeGachaReward, MonoBehaviourSingleton<GachaManager>.I.selectGacha.seriesId, callback);
 	}
 
 	public void OnQuery_BANNER_GACHA()
 	{
-		GACHA_TYPE gACHA_TYPE = (GACHA_TYPE)(int)GetEventData();
+		GACHA_TYPE gACHA_TYPE = (GACHA_TYPE)GetEventData();
 		EventData[] autoEvents = (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP)) ? new EventData[1]
 		{
 			new EventData("MAIN_MENU_SHOP", null)
@@ -658,22 +682,20 @@ public class GameSection : UIBehaviour
 		if (userStatus.maxEquipItem == constDefine.INVENTORY_EXTEND_EQUIP_ITEM_MAX && userStatus.maxSkillItem == constDefine.INVENTORY_EXTEND_SKILL_ITEM_MAX)
 		{
 			ChangeScene("ItemStorage", "ItemStorageNotExpandMessage");
+			return;
 		}
-		else
+		int num = Mathf.Min(userStatus.maxEquipItem + constDefine.INVENTORY_EXTEND_EQUIP_ITEM, constDefine.INVENTORY_EXTEND_EQUIP_ITEM_MAX);
+		int num2 = Mathf.Min(userStatus.maxSkillItem + constDefine.INVENTORY_EXTEND_SKILL_ITEM, constDefine.INVENTORY_EXTEND_SKILL_ITEM_MAX);
+		expandStorageEventData = new object[5]
 		{
-			int num = Mathf.Min(userStatus.maxEquipItem + constDefine.INVENTORY_EXTEND_EQUIP_ITEM, constDefine.INVENTORY_EXTEND_EQUIP_ITEM_MAX);
-			int num2 = Mathf.Min(userStatus.maxSkillItem + constDefine.INVENTORY_EXTEND_SKILL_ITEM, constDefine.INVENTORY_EXTEND_SKILL_ITEM_MAX);
-			expandStorageEventData = new object[5]
-			{
-				constDefine.INVENTORY_EXTEND_USE_CRYSTAL,
-				userStatus.maxEquipItem,
-				num,
-				userStatus.maxSkillItem,
-				num2
-			};
-			SetEventData(expandStorageEventData);
-			ChangeScene("ItemStorage", "ItemStorageExpandConfirm");
-		}
+			constDefine.INVENTORY_EXTEND_USE_CRYSTAL,
+			userStatus.maxEquipItem,
+			num,
+			userStatus.maxSkillItem,
+			num2
+		};
+		SetEventData(expandStorageEventData);
+		ChangeScene("ItemStorage", "ItemStorageExpandConfirm");
 	}
 
 	private void OnQuery_ItemStorageExpandConfirm_YES()
@@ -683,13 +705,13 @@ public class GameSection : UIBehaviour
 			Log.Error(LOG.OUTGAME, "EXPAND_STORAGE data is NULL");
 			StopEvent();
 		}
-		else if (CheckCrystal((int)expandStorageEventData[0], 0, true))
+		else if (CheckCrystal((int)expandStorageEventData[0]))
 		{
 			SetEventData(expandStorageEventData);
 			StayEvent();
 			MonoBehaviourSingleton<InventoryManager>.I.SendInventoryExtend(delegate(bool is_success)
 			{
-				ResumeEvent(is_success, null);
+				ResumeEvent(is_success);
 			});
 		}
 	}
@@ -732,16 +754,36 @@ public class GameSection : UIBehaviour
 			MonoBehaviourSingleton<GameSceneManager>.I.RemoveHistory(base.sectionData.sectionName);
 			ChangeScene("Lounge", "HomePointShop");
 		}
+		else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "ClanScene")
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.RemoveHistory(base.sectionData.sectionName);
+			ChangeScene("Clan", "HomePointShop");
+		}
 		else
 		{
-			string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+			string goingHomeEvent = GetGoingHomeEvent();
 			EventData[] autoEvents = new EventData[2]
 			{
-				new EventData(name),
+				new EventData(goingHomeEvent),
 				new EventData("POINT_SHOP")
 			};
 			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 		}
+	}
+
+	public void ToSeriesArena()
+	{
+		string goingHomeEvent = GetGoingHomeEvent();
+		List<EventData> list = new List<EventData>();
+		int currentSeriesArenaId = MonoBehaviourSingleton<QuestManager>.I.currentSeriesArenaId;
+		list.Add(new EventData(goingHomeEvent));
+		list.Add(new EventData("EVENT_COUNTER"));
+		list.Add(new EventData("SELECT_SERIES_ARENA"));
+		if (currentSeriesArenaId > 0)
+		{
+			list.Add(new EventData("SELECT_SERIES_ARENA", MonoBehaviourSingleton<QuestManager>.I.currentSeriesArenaId));
+		}
+		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(list.ToArray());
 	}
 
 	public void ToGachaQuest()
@@ -754,10 +796,19 @@ public class GameSection : UIBehaviour
 		{
 			ChangeScene("Lounge", "QuestAcceptSearchListSelect");
 		}
+		else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "ClanScene")
+		{
+			ChangeScene("Clan", "QuestAcceptSearchListSelect");
+		}
 		else if (LoungeMatchingManager.IsValidInLounge())
 		{
 			OnQuery_MAIN_MENU_LOUNGE();
 			MonoBehaviourSingleton<LoungeManager>.I.IsJumpToGacha = true;
+		}
+		else if (ClanMatchingManager.IsValidInClan())
+		{
+			OnQuery_MAIN_MENU_CLAN();
+			MonoBehaviourSingleton<HomeManager>.I.IsJumpToGacha = true;
 		}
 		else
 		{
@@ -769,15 +820,65 @@ public class GameSection : UIBehaviour
 	private void OnQuery_SCREENSHOT_SHARING()
 	{
 		MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("share_screenshot", "Social");
-		MonoBehaviourSingleton<NativeShare>.I.ShareScreenshotWithText();
+		MonoBehaviourSingleton<GGNativeShare>.I.ShareScreenshotWithText();
 		if (PlayerPrefs.GetInt("share_screenshot", -1) != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
 			StayEvent();
 			Protocol.Send<ScreenshotSharingModel>(ScreenshotSharingModel.URL, delegate
 			{
-				ResumeEvent(true, null);
+				ResumeEvent(is_resume: true);
 				PlayerPrefs.SetInt("share_screenshot", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
 			}, string.Empty);
 		}
+	}
+
+	public void OnQuery_FORCE_MOVETO_HOME()
+	{
+		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home", string.Empty);
+	}
+
+	public void OnQuery_FORCE_MOVETO_LOUNGE()
+	{
+		string roomPass = GetEventData() as string;
+		StayEvent();
+		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData != null)
+		{
+			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendLeave(delegate
+			{
+				MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(roomPass, delegate(bool isSucceed, Error error)
+				{
+					if (isSucceed)
+					{
+						MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", string.Empty);
+					}
+					ResumeEvent(is_resume: true);
+				});
+			});
+		}
+		else
+		{
+			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(roomPass, delegate(bool isSucceed, Error error)
+			{
+				if (isSucceed)
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", string.Empty);
+				}
+				ResumeEvent(is_resume: true);
+			});
+		}
+	}
+
+	public bool ContainsHistory(string sceneName, string sectionName)
+	{
+		GameSectionHistory.HistoryData[] array = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().ToArray();
+		GameSectionHistory.HistoryData[] array2 = array;
+		foreach (GameSectionHistory.HistoryData historyData in array2)
+		{
+			if (historyData.sceneName == sceneName && historyData.sectionName == sectionName)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

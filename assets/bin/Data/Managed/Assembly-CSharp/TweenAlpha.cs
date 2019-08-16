@@ -97,8 +97,6 @@ public class TweenAlpha : UITweener
 
 	private void Cache()
 	{
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Expected O, but got Unknown
 		mCached = true;
 		mRect = this.GetComponent<UIRect>();
 		mSr = this.GetComponent<SpriteRenderer>();
@@ -123,12 +121,12 @@ public class TweenAlpha : UITweener
 
 	public static TweenAlpha Begin(GameObject go, float duration, float alpha)
 	{
-		TweenAlpha tweenAlpha = UITweener.Begin<TweenAlpha>(go, duration, true);
+		TweenAlpha tweenAlpha = UITweener.Begin<TweenAlpha>(go, duration);
 		tweenAlpha.from = tweenAlpha.value;
 		tweenAlpha.to = alpha;
 		if (duration <= 0f)
 		{
-			tweenAlpha.Sample(1f, true);
+			tweenAlpha.Sample(1f, isFinished: true);
 			tweenAlpha.set_enabled(false);
 		}
 		return tweenAlpha;

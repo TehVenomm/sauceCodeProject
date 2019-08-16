@@ -1,6 +1,5 @@
 package com.facebook.share.internal;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +9,8 @@ import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import android.support.p000v4.app.DialogFragment;
+import android.support.p000v4.app.FragmentActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,13 +19,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.facebook.AccessToken;
-import com.facebook.C0365R;
 import com.facebook.FacebookRequestError;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequest.Callback;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.facebook.common.C0618R;
+import com.facebook.devicerequests.internal.DeviceRequestsHelper;
 import com.facebook.internal.Validate;
 import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareLinkContent;
@@ -38,69 +40,20 @@ import org.json.JSONObject;
 
 public class DeviceShareDialogFragment extends DialogFragment {
     private static final String DEVICE_SHARE_ENDPOINT = "device/share";
+    private static final String EXTRA_ERROR = "error";
     private static final String REQUEST_STATE_KEY = "request_state";
     public static final String TAG = "DeviceShareDialogFragment";
     private static ScheduledThreadPoolExecutor backgroundExecutor;
     private volatile ScheduledFuture codeExpiredFuture;
     private TextView confirmationCode;
     private volatile RequestState currentRequestState;
-    private Dialog dialog;
+    /* access modifiers changed from: private */
+    public Dialog dialog;
     private ProgressBar progressBar;
     private ShareContent shareContent;
 
-    /* renamed from: com.facebook.share.internal.DeviceShareDialogFragment$1 */
-    class C04711 implements OnClickListener {
-        C04711() {
-        }
-
-        public void onClick(View view) {
-            DeviceShareDialogFragment.this.dialog.dismiss();
-        }
-    }
-
-    /* renamed from: com.facebook.share.internal.DeviceShareDialogFragment$2 */
-    class C04722 implements Callback {
-        C04722() {
-        }
-
-        public void onCompleted(GraphResponse graphResponse) {
-            FacebookRequestError error = graphResponse.getError();
-            if (error != null) {
-                DeviceShareDialogFragment.this.finishActivityWithError(error);
-                return;
-            }
-            JSONObject jSONObject = graphResponse.getJSONObject();
-            RequestState requestState = new RequestState();
-            try {
-                requestState.setUserCode(jSONObject.getString("user_code"));
-                requestState.setExpiresIn(jSONObject.getLong(AccessToken.EXPIRES_IN_KEY));
-                DeviceShareDialogFragment.this.setCurrentRequestState(requestState);
-            } catch (JSONException e) {
-                DeviceShareDialogFragment.this.finishActivityWithError(new FacebookRequestError(0, "", "Malformed server response"));
-            }
-        }
-    }
-
-    /* renamed from: com.facebook.share.internal.DeviceShareDialogFragment$3 */
-    class C04733 implements Runnable {
-        C04733() {
-        }
-
-        public void run() {
-            DeviceShareDialogFragment.this.dialog.dismiss();
-        }
-    }
-
     private static class RequestState implements Parcelable {
-        public static final Creator<RequestState> CREATOR = new C04741();
-        private long expiresIn;
-        private String userCode;
-
-        /* renamed from: com.facebook.share.internal.DeviceShareDialogFragment$RequestState$1 */
-        static final class C04741 implements Creator<RequestState> {
-            C04741() {
-            }
-
+        public static final Creator<RequestState> CREATOR = new Creator<RequestState>() {
             public RequestState createFromParcel(Parcel parcel) {
                 return new RequestState(parcel);
             }
@@ -108,7 +61,9 @@ public class DeviceShareDialogFragment extends DialogFragment {
             public RequestState[] newArray(int i) {
                 return new RequestState[i];
             }
-        }
+        };
+        private long expiresIn;
+        private String userCode;
 
         RequestState() {
         }
@@ -151,14 +106,22 @@ public class DeviceShareDialogFragment extends DialogFragment {
     }
 
     private void finishActivity(int i, Intent intent) {
+        if (this.currentRequestState != null) {
+            DeviceRequestsHelper.cleanUpAdvertisementService(this.currentRequestState.getUserCode());
+        }
+        FacebookRequestError facebookRequestError = (FacebookRequestError) intent.getParcelableExtra("error");
+        if (facebookRequestError != null) {
+            Toast.makeText(getContext(), facebookRequestError.getErrorMessage(), 0).show();
+        }
         if (isAdded()) {
-            Activity activity = getActivity();
+            FragmentActivity activity = getActivity();
             activity.setResult(i, intent);
             activity.finish();
         }
     }
 
-    private void finishActivityWithError(FacebookRequestError facebookRequestError) {
+    /* access modifiers changed from: private */
+    public void finishActivityWithError(FacebookRequestError facebookRequestError) {
         detach();
         Intent intent = new Intent();
         intent.putExtra("error", facebookRequestError);
@@ -166,40 +129,44 @@ public class DeviceShareDialogFragment extends DialogFragment {
     }
 
     private static ScheduledThreadPoolExecutor getBackgroundExecutor() {
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
         synchronized (DeviceShareDialogFragment.class) {
-            Class cls;
             try {
                 if (backgroundExecutor == null) {
-                    cls = true;
                     backgroundExecutor = new ScheduledThreadPoolExecutor(1);
                 }
-                ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = backgroundExecutor;
-                return scheduledThreadPoolExecutor;
+                scheduledThreadPoolExecutor = backgroundExecutor;
             } finally {
-                cls = DeviceShareDialogFragment.class;
+                Class<DeviceShareDialogFragment> cls = DeviceShareDialogFragment.class;
             }
         }
+        return scheduledThreadPoolExecutor;
     }
 
     private Bundle getGraphParametersForShareContent() {
-        ShareContent shareContent = this.shareContent;
-        if (shareContent != null) {
-            if (shareContent instanceof ShareLinkContent) {
-                return WebDialogParameters.create((ShareLinkContent) shareContent);
+        ShareContent shareContent2 = this.shareContent;
+        if (shareContent2 != null) {
+            if (shareContent2 instanceof ShareLinkContent) {
+                return WebDialogParameters.create((ShareLinkContent) shareContent2);
             }
-            if (shareContent instanceof ShareOpenGraphContent) {
-                return WebDialogParameters.create((ShareOpenGraphContent) shareContent);
+            if (shareContent2 instanceof ShareOpenGraphContent) {
+                return WebDialogParameters.create((ShareOpenGraphContent) shareContent2);
             }
         }
         return null;
     }
 
-    private void setCurrentRequestState(RequestState requestState) {
+    /* access modifiers changed from: private */
+    public void setCurrentRequestState(RequestState requestState) {
         this.currentRequestState = requestState;
         this.confirmationCode.setText(requestState.getUserCode());
         this.confirmationCode.setVisibility(0);
         this.progressBar.setVisibility(8);
-        this.codeExpiredFuture = getBackgroundExecutor().schedule(new C04733(), requestState.getExpiresIn(), TimeUnit.SECONDS);
+        this.codeExpiredFuture = getBackgroundExecutor().schedule(new Runnable() {
+            public void run() {
+                DeviceShareDialogFragment.this.dialog.dismiss();
+            }
+        }, requestState.getExpiresIn(), TimeUnit.SECONDS);
     }
 
     private void startShare() {
@@ -208,18 +175,39 @@ public class DeviceShareDialogFragment extends DialogFragment {
             finishActivityWithError(new FacebookRequestError(0, "", "Failed to get share content"));
         }
         graphParametersForShareContent.putString("access_token", Validate.hasAppID() + "|" + Validate.hasClientToken());
-        new GraphRequest(null, DEVICE_SHARE_ENDPOINT, graphParametersForShareContent, HttpMethod.POST, new C04722()).executeAsync();
+        graphParametersForShareContent.putString(DeviceRequestsHelper.DEVICE_INFO_PARAM, DeviceRequestsHelper.getDeviceInfo());
+        new GraphRequest(null, DEVICE_SHARE_ENDPOINT, graphParametersForShareContent, HttpMethod.POST, new Callback() {
+            public void onCompleted(GraphResponse graphResponse) {
+                FacebookRequestError error = graphResponse.getError();
+                if (error != null) {
+                    DeviceShareDialogFragment.this.finishActivityWithError(error);
+                    return;
+                }
+                JSONObject jSONObject = graphResponse.getJSONObject();
+                RequestState requestState = new RequestState();
+                try {
+                    requestState.setUserCode(jSONObject.getString("user_code"));
+                    requestState.setExpiresIn(jSONObject.getLong(AccessToken.EXPIRES_IN_KEY));
+                    DeviceShareDialogFragment.this.setCurrentRequestState(requestState);
+                } catch (JSONException e) {
+                    DeviceShareDialogFragment.this.finishActivityWithError(new FacebookRequestError(0, "", "Malformed server response"));
+                }
+            }
+        }).executeAsync();
     }
 
     @NonNull
     public Dialog onCreateDialog(Bundle bundle) {
-        this.dialog = new Dialog(getActivity(), C0365R.style.com_facebook_auth_dialog);
-        View inflate = getActivity().getLayoutInflater().inflate(C0365R.layout.com_facebook_device_auth_dialog_fragment, null);
-        this.progressBar = (ProgressBar) inflate.findViewById(C0365R.id.progress_bar);
-        this.confirmationCode = (TextView) inflate.findViewById(C0365R.id.confirmation_code);
-        ((Button) inflate.findViewById(C0365R.id.cancel_button)).setOnClickListener(new C04711());
-        ((TextView) inflate.findViewById(C0365R.id.com_facebook_device_auth_instructions)).setText(Html.fromHtml(getString(C0365R.string.com_facebook_device_auth_instructions)));
-        ((TextView) inflate.findViewById(C0365R.id.com_facebook_device_dialog_title)).setText(getString(C0365R.string.com_facebook_share_button_text));
+        this.dialog = new Dialog(getActivity(), C0618R.style.com_facebook_auth_dialog);
+        View inflate = getActivity().getLayoutInflater().inflate(C0618R.C0622layout.com_facebook_device_auth_dialog_fragment, null);
+        this.progressBar = (ProgressBar) inflate.findViewById(C0618R.C0621id.progress_bar);
+        this.confirmationCode = (TextView) inflate.findViewById(C0618R.C0621id.confirmation_code);
+        ((Button) inflate.findViewById(C0618R.C0621id.cancel_button)).setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                DeviceShareDialogFragment.this.dialog.dismiss();
+            }
+        });
+        ((TextView) inflate.findViewById(C0618R.C0621id.com_facebook_device_auth_instructions)).setText(Html.fromHtml(getString(C0618R.string.com_facebook_device_auth_instructions)));
         this.dialog.setContentView(inflate);
         startShare();
         return this.dialog;
@@ -252,7 +240,7 @@ public class DeviceShareDialogFragment extends DialogFragment {
         }
     }
 
-    public void setShareContent(ShareContent shareContent) {
-        this.shareContent = shareContent;
+    public void setShareContent(ShareContent shareContent2) {
+        this.shareContent = shareContent2;
     }
 }

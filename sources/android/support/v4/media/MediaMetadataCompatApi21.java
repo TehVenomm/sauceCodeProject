@@ -1,6 +1,5 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.media.Rating;
@@ -8,10 +7,11 @@ import android.os.Parcel;
 import android.support.annotation.RequiresApi;
 import java.util.Set;
 
-@TargetApi(21)
 @RequiresApi(21)
+/* renamed from: android.support.v4.media.MediaMetadataCompatApi21 */
 class MediaMetadataCompatApi21 {
 
+    /* renamed from: android.support.v4.media.MediaMetadataCompatApi21$Builder */
     public static class Builder {
         public static Object build(Object obj) {
             return ((android.media.MediaMetadata.Builder) obj).build();

@@ -11,13 +11,13 @@ public class InheritanceUtils {
             return 0;
         }
         Class superclass = cls.getSuperclass();
-        int toInteger = BooleanUtils.toInteger(cls2.equals(superclass));
-        if (toInteger == 1) {
-            return toInteger;
+        int integer = BooleanUtils.toInteger(cls2.equals(superclass));
+        if (integer == 1) {
+            return integer;
         }
-        toInteger += distance(superclass, cls2);
-        if (toInteger > 0) {
-            return toInteger + 1;
+        int distance = integer + distance(superclass, cls2);
+        if (distance > 0) {
+            return distance + 1;
         }
         return -1;
     }

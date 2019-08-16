@@ -15,14 +15,14 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 	{
 		Init();
 		int display_rarity = 0;
-		SetLinkCamera(true);
+		SetLinkCamera(is_link: true);
 		int enemy_id = 0;
 		EnemyTable.EnemyData enemy_data = null;
-		if (MonoBehaviourSingleton<GachaManager>.I.gachaResult != null)
+		if (MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult() != null)
 		{
-			GachaResult.GachaReward reward = MonoBehaviourSingleton<GachaManager>.I.gachaResult.reward[0];
-			uint reward_quest_id = (uint)reward.itemId;
-			QuestTable.QuestTableData quest_data = Singleton<QuestTable>.I.GetQuestData(reward_quest_id);
+			GachaResult.GachaReward reward = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward[0];
+			uint itemId = (uint)reward.itemId;
+			QuestTable.QuestTableData quest_data = Singleton<QuestTable>.I.GetQuestData(itemId);
 			if (quest_data != null)
 			{
 				enemy_data = Singleton<EnemyTable>.I.GetEnemyData((uint)quest_data.GetMainEnemyID());
@@ -52,7 +52,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 			enemy_loader = LoadEnemy(enemyPosition, modelID, displayAnimID, displayScale, enemy_data.baseEffectName, enemy_data.baseEffectNode);
 			while (enemy_loader.isLoading)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			enemy_loader.ApplyGachaDisplayScaleToParentNode();
 			CheckAndReplaceShader(enemy_loader);
@@ -60,7 +60,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		}
 		while (npc_loader.isLoading)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		LoadingQueue lo_queue = new LoadingQueue(this);
 		CacheAudio(lo_queue);
@@ -70,11 +70,11 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		}
 		while (lo_queue.IsLoading())
 		{
-			yield return (object)null;
+			yield return null;
 		}
-		PlayerAnimCtrl npc_anim = PlayerAnimCtrl.Get(npc_loader.animator, PLCA.IDLE_01, null, null, null);
+		PlayerAnimCtrl npc_anim = PlayerAnimCtrl.Get(npc_loader.animator, PLCA.IDLE_01);
 		CreateNPCEffect(npc_loader.model);
-		yield return (object)null;
+		yield return null;
 		stageAnimator.set_cullingMode(0);
 		stageAnimator.Rebind();
 		targetRarity = MonoBehaviourSingleton<GachaManager>.I.GetMaxRarity().ToRarityExpressionID() + 1;
@@ -83,47 +83,47 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 			targetRarity = 4;
 		}
 		stageAnimator.Play("StageAnim_Main");
-		Play("MainAnim_Start", null, 0f);
+		Play("MainAnim_Start");
 		PlayEffect(startEffectPrefabs[0]);
-		npc_anim.Play(PLCA.QUEST_GACHA, true);
+		npc_anim.Play(PLCA.QUEST_GACHA, instant: true);
 		bool rankup3 = UpdateDisplayRarity(ref display_rarity);
 		PlayAudio(AUDIO.OPENING_01);
 		while (Step(0.5f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayAudio(AUDIO.OPENING_02);
 		PlayAudio(AUDIO.OPENING_03);
 		while (Step(1.4f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayAudio(AUDIO.OPENING_04);
 		while (Step(2.6f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayAudio(AUDIO.DOOR_01);
 		while (Step(3.2f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayAudio(AUDIO.DOOR_02);
 		while (Step(3.38f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayAudio(AUDIO.MAGI_INTRO_01);
 		while (Step(6.5f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		npc_loader.get_gameObject().SetActive(false);
 		PlayMeteorEffect(display_rarity);
 		PlayAudio(AUDIO.METEOR_01);
 		while (Step(7.5f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayMagicEffect(display_rarity, rankup3);
 		PlayMagicAudio(display_rarity);
@@ -131,7 +131,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		PlayMeteorEffect(display_rarity);
 		while (Step(8.5f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayMagicEffect(display_rarity, rankup3);
 		PlayMagicAudio(display_rarity);
@@ -140,13 +140,13 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		PlayAudio(AUDIO.METEOR_02);
 		while (Step(9.5f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		PlayMagicEffect(display_rarity, rankup3);
 		PlayMagicAudio(display_rarity);
 		while (Step(10.5f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (enemy_loader != null)
 		{
@@ -156,34 +156,34 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		{
 			PlayEnemyAnimation(enemy_loader, "Base Layer.GACHA_SINGLE");
 		}
-		Play("MainAnim_End", null, 0f);
+		Play("MainAnim_End");
 		UpdateDisplayRarity(ref display_rarity);
 		PlayEndEffect(display_rarity);
 		RARITY_TYPE rarity = MonoBehaviourSingleton<GachaManager>.I.GetMaxRarity();
-		PlayAppearAudio(rarity, false);
+		PlayAppearAudio(rarity, is_short: false);
 		if (enemy_data != null)
 		{
-			PlayEnemyAudio(enemy_data, false);
+			PlayEnemyAudio(enemy_data);
 		}
 		while (Step(11.5f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		while (Step(13f))
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		if (skip)
 		{
 			while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			PlayEnemyAnimation(enemy_loader, "Base Layer.IDLE");
 			Time.set_timeScale(1f);
 			if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
 			{
-				yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
+				yield return MonoBehaviourSingleton<TransitionManager>.I.In();
 			}
 		}
 		else

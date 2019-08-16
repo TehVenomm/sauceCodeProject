@@ -6,11 +6,17 @@ public interface IFieldGimmickCannon : IFieldGimmickObject
 
 	Transform GetCannonTransform();
 
+	Transform GetBaseTransform();
+
+	Vector3 GetBaseTransformForward();
+
 	bool IsUsing();
 
 	bool IsAbleToUse();
 
 	bool IsCooling();
+
+	bool IsAimCamera();
 
 	void OnBoard(Player player);
 
@@ -18,7 +24,7 @@ public interface IFieldGimmickCannon : IFieldGimmickObject
 
 	void Shot();
 
-	void UpdateTargetMarker(bool isNear);
+	new void UpdateTargetMarker(bool isNear);
 
 	void ApplyCannonVector(Vector3 cannonVec);
 }

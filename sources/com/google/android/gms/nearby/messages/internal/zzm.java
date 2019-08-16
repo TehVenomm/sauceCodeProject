@@ -7,7 +7,7 @@ import java.util.List;
 public interface zzm extends IInterface {
     void zza(zzaf zzaf) throws RemoteException;
 
-    void zzaf(List<Update> list) throws RemoteException;
+    void zza(List<Update> list) throws RemoteException;
 
     void zzb(zzaf zzaf) throws RemoteException;
 }

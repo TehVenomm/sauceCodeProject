@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.cpr;
+package net.gogame.gowrap.p019ui.cpr;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,11 +13,14 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import java.util.Map;
 
+/* renamed from: net.gogame.gowrap.ui.cpr.VideoEnabledWebView */
 public class VideoEnabledWebView extends WebView {
     private boolean addedJavascriptInterface = false;
     private final GestureDetector gestureDetector = new GestureDetector(new CustomGestureDetector());
-    private VideoEnabledWebChromeClient videoEnabledWebChromeClient;
+    /* access modifiers changed from: private */
+    public VideoEnabledWebChromeClient videoEnabledWebChromeClient;
 
+    /* renamed from: net.gogame.gowrap.ui.cpr.VideoEnabledWebView$CustomGestureDetector */
     private class CustomGestureDetector extends SimpleOnGestureListener {
         private CustomGestureDetector() {
         }
@@ -27,24 +30,21 @@ public class VideoEnabledWebView extends WebView {
         }
     }
 
+    /* renamed from: net.gogame.gowrap.ui.cpr.VideoEnabledWebView$JavascriptInterface */
     public class JavascriptInterface {
-
-        /* renamed from: net.gogame.gowrap.ui.cpr.VideoEnabledWebView$JavascriptInterface$1 */
-        class C11371 implements Runnable {
-            C11371() {
-            }
-
-            public void run() {
-                if (VideoEnabledWebView.this.videoEnabledWebChromeClient != null) {
-                    VideoEnabledWebView.this.videoEnabledWebChromeClient.onHideCustomView();
-                }
-            }
+        public JavascriptInterface() {
         }
 
         @android.webkit.JavascriptInterface
         public void notifyVideoEnd() {
             Log.d("___", "GOT IT");
-            new Handler(Looper.getMainLooper()).post(new C11371());
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                public void run() {
+                    if (VideoEnabledWebView.this.videoEnabledWebChromeClient != null) {
+                        VideoEnabledWebView.this.videoEnabledWebChromeClient.onHideCustomView();
+                    }
+                }
+            });
         }
     }
 

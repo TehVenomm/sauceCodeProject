@@ -31,7 +31,7 @@ public class NetworkNative
 	public static GoogleAccountInfo getGoogleAccounts()
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
+		//IL_001b: Expected O, but got Unknown
 		GoogleAccountInfo result = new GoogleAccountInfo();
 		try
 		{
@@ -51,10 +51,16 @@ public class NetworkNative
 		}
 	}
 
+	public static string getAppStr()
+	{
+		string empty = string.Empty;
+		return AppMain.appStr;
+	}
+
 	public static string getUniqueDeviceId()
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
+		//IL_001b: Expected O, but got Unknown
 		string result = "TestDevice";
 		try
 		{
@@ -74,24 +80,13 @@ public class NetworkNative
 
 	public static void createRegistrationId()
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass("jp.colopl.gcm.RegistrarHelper");
-			val.CallStatic("CreateRegistrationId", new object[0]);
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-		}
 		MonoBehaviourSingleton<FCMManager>.I.StartRegist();
 	}
 
 	public static int getNativeVersionCode()
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		int result = 1;
 		try
 		{
@@ -109,7 +104,7 @@ public class NetworkNative
 	public static string getNativeVersionName()
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
+		//IL_001b: Expected O, but got Unknown
 		string result = "1.0.29";
 		try
 		{
@@ -137,7 +132,7 @@ public class NetworkNative
 	public static bool isRazerPhone()
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		bool result = false;
 		try
 		{
@@ -155,7 +150,7 @@ public class NetworkNative
 	public static string getSystemPropertys(string key)
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
+		//IL_001b: Expected O, but got Unknown
 		string result = "--";
 		try
 		{
@@ -186,7 +181,7 @@ public class NetworkNative
 	public static int getNativeAsset()
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		int result = 1;
 		try
 		{
@@ -211,7 +206,7 @@ public class NetworkNative
 	public static int getAnalytics()
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		int result = 1;
 		try
 		{
@@ -229,7 +224,7 @@ public class NetworkNative
 	public static void setSidToken(string token)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
@@ -247,7 +242,7 @@ public class NetworkNative
 	public static void setHost(string host)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
@@ -265,7 +260,7 @@ public class NetworkNative
 	public static void setCookieToken(string token)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
+		//IL_000b: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass("jp.colopl.libs.Cookie");
@@ -283,7 +278,7 @@ public class NetworkNative
 	public static string getDefaultUserAgent()
 	{
 		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
+		//IL_001b: Expected O, but got Unknown
 		string result = string.Empty;
 		try
 		{

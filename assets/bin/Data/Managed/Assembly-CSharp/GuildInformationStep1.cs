@@ -45,15 +45,15 @@ public class GuildInformationStep1 : GameSection
 		GuildStatisticInfo _info = null;
 		MonoBehaviourSingleton<GuildManager>.I.SendRequestStatistic(clanID, delegate(bool success, GuildStatisticInfo info)
 		{
-			((_003CGetClanStatistic_003Ec__Iterator4C)/*Error near IL_003a: stateMachine*/)._003Cfinish_get_statistic_003E__0 = true;
+			finish_get_statistic = true;
 			if (success)
 			{
-				((_003CGetClanStatistic_003Ec__Iterator4C)/*Error near IL_003a: stateMachine*/)._003C_info_003E__1 = info;
+				_info = info;
 			}
 		});
 		while (!finish_get_statistic)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		MonoBehaviourSingleton<GuildManager>.I.CreateAddedGuildRequestParam(_info);
 		mCreateRequest = MonoBehaviourSingleton<GuildManager>.I.GetCreateGuildRequestParam();
@@ -66,20 +66,20 @@ public class GuildInformationStep1 : GameSection
 		{
 			mCreateRequest.SetGuildName(string.Empty);
 		}
-		SetInput((Enum)UI.IPT_NAME, mCreateRequest.GuildName, 30, (EventDelegate.Callback)OnChangeGuildName);
+		SetInput(UI.IPT_NAME, mCreateRequest.GuildName, 30, OnChangeGuildName);
 		if (string.IsNullOrEmpty(mCreateRequest.GuildTag))
 		{
 			mCreateRequest.SetGuildTag(string.Empty);
 		}
-		SetInput((Enum)UI.IPT_TAG, mCreateRequest.GuildTag, 4, (EventDelegate.Callback)OnChangeGuildTag);
+		SetInput(UI.IPT_TAG, mCreateRequest.GuildTag, 4, OnChangeGuildTag);
 		if (string.IsNullOrEmpty(mCreateRequest.GuildDescribe))
 		{
 			mCreateRequest.SetGuildDescribe(string.Empty);
 		}
-		SetInput((Enum)UI.IPT_DESCRIBE, mCreateRequest.GuildDescribe, 256, (EventDelegate.Callback)OnChangeGuildDescribe);
+		SetInput(UI.IPT_DESCRIBE, mCreateRequest.GuildDescribe, 256, OnChangeGuildDescribe);
 		UpdateEmblems();
 		SetTouchAndRelease((Enum)UI.BTN_INFO, "TAG_INFO_SHOW", "TAG_INFO_HIDE", (object)null);
-		SetActive((Enum)UI.SPR_TAG, false);
+		SetActive((Enum)UI.SPR_TAG, is_visible: false);
 		bool flag = MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanId != -1;
 		SetActive((Enum)UI.BTN_NEXT, !flag);
 		SetActive((Enum)UI.BTN_NEXT_UPDATE, flag);
@@ -87,24 +87,22 @@ public class GuildInformationStep1 : GameSection
 
 	protected virtual void OnChangeGuildName()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		if (!FindCtrl(base._transform, UI.LBL_INPUT).get_gameObject().get_activeInHierarchy())
 		{
-			SetActive((Enum)UI.LBL_INPUT, true);
+			SetActive((Enum)UI.LBL_INPUT, is_visible: true);
 		}
 		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
 		if (string.IsNullOrEmpty(inputValue))
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_NAME, true);
+			SetActive((Enum)UI.LBL_DEFAULT_INPUT_NAME, is_visible: true);
 			if (FindCtrl(base._transform, UI.IPT_NAME).get_gameObject().get_activeInHierarchy())
 			{
-				SetActive((Enum)UI.LBL_INPUT, false);
+				SetActive((Enum)UI.LBL_INPUT, is_visible: false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_NAME, false);
+			SetActive((Enum)UI.LBL_DEFAULT_INPUT_NAME, is_visible: false);
 		}
 		mCreateRequest.SetGuildName(inputValue);
 	}
@@ -122,11 +120,11 @@ public class GuildInformationStep1 : GameSection
 		string inputValue = GetInputValue((Enum)UI.IPT_DESCRIBE);
 		if (string.IsNullOrEmpty(inputValue))
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_DESCRIBE, true);
+			SetActive((Enum)UI.LBL_DEFAULT_INPUT_DESCRIBE, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_DESCRIBE, false);
+			SetActive((Enum)UI.LBL_DEFAULT_INPUT_DESCRIBE, is_visible: false);
 		}
 		inputValue = inputValue.Replace("\n", "\\n");
 		mCreateRequest.SetGuildDescribe(inputValue);
@@ -153,17 +151,17 @@ public class GuildInformationStep1 : GameSection
 
 	private void OnQuery_TAG_INFO_SHOW()
 	{
-		SetActive((Enum)UI.SPR_TAG, true);
+		SetActive((Enum)UI.SPR_TAG, is_visible: true);
 	}
 
 	private void OnQuery_TAG_INFO_HIDE()
 	{
-		SetActive((Enum)UI.SPR_TAG, false);
+		SetActive((Enum)UI.SPR_TAG, is_visible: false);
 	}
 
 	private void OnQuery_RANDOM_EMBLEM()
 	{
-		int[] array = GuildItemManager.I.RandomEmblem(true);
+		int[] array = GuildItemManager.I.RandomEmblem(isFree: true);
 		mCreateRequest.SetEmblemID(0, array[0]);
 		mCreateRequest.SetEmblemID(1, array[1]);
 		mCreateRequest.SetEmblemID(2, array[2]);
@@ -174,7 +172,7 @@ public class GuildInformationStep1 : GameSection
 	{
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanId != -1)
 		{
-			GameSection.ChangeEvent("CLOSE_UPDATE", null);
+			GameSection.ChangeEvent("CLOSE_UPDATE");
 		}
 	}
 
@@ -183,23 +181,23 @@ public class GuildInformationStep1 : GameSection
 		MonoBehaviourSingleton<GuildManager>.I.SetGuildChangeData(mCreateRequest);
 		if (string.IsNullOrEmpty(mCreateRequest.GuildName))
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your Clan name", null, null, null, null), delegate
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your Clan name"), delegate
 			{
-			}, false, 0);
+			});
 			GameSection.StopEvent();
 		}
 		else if (string.IsNullOrEmpty(mCreateRequest.GuildTag))
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your Clan tag. This will be added to your Hunter name as a prefix.", null, null, null, null), delegate
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your Clan tag. This will be added to your Hunter name as a prefix."), delegate
 			{
-			}, false, 0);
+			});
 			GameSection.StopEvent();
 		}
 		else if (string.IsNullOrEmpty(mCreateRequest.GuildDescribe))
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, " Please enter your Clan description. You can give an introduction, share your motto, or list rules.", null, null, null, null), delegate
+			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, " Please enter your Clan description. You can give an introduction, share your motto, or list rules."), delegate
 			{
-			}, false, 0);
+			});
 			GameSection.StopEvent();
 		}
 		else
@@ -207,7 +205,7 @@ public class GuildInformationStep1 : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<GuildManager>.I.SendCheckClanSetting((MonoBehaviourSingleton<GuildManager>.I.guildData != null) ? MonoBehaviourSingleton<GuildManager>.I.guildData.clanId : 0, mCreateRequest.GuildName, mCreateRequest.GuildTag, mCreateRequest.GuildDescribe, delegate(bool isSuccess, Error error)
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 			});
 		}
 	}

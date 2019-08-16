@@ -21,7 +21,7 @@ public class DOMSerializer extends StdSerializer<Node> {
         super(Node.class);
         try {
             this._domImpl = (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation("LS");
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Could not instantiate DOMImplementationRegistry: " + e.getMessage(), e);
         }
     }

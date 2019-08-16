@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SimplePingPongAlpha
+public class SimplePingPongAlpha : MonoBehaviour
 {
 	private enum eState
 	{
@@ -60,7 +60,6 @@ public class SimplePingPongAlpha
 
 	public void Play(bool startDefaultValue)
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.None)
 		{
 			Initialize();
@@ -80,31 +79,35 @@ public class SimplePingPongAlpha
 
 	private void Update()
 	{
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		if (state != 0 && state != eState.Idle)
+		if (state == eState.None || state == eState.Idle)
 		{
-			float value = addValue * Time.get_deltaTime();
-			if (state == eState.Forward)
+			return;
+		}
+		float value = addValue * Time.get_deltaTime();
+		if (state == eState.Forward)
+		{
+			if (AddValue(value))
 			{
-				if (AddValue(value))
-				{
-					state = eState.Back;
-				}
+				state = eState.Back;
 			}
-			else if (state == eState.Back && SubValue(value))
+		}
+		else
+		{
+			if (state != eState.Back || !SubValue(value))
 			{
-				if (++nowCount >= endCount)
+				return;
+			}
+			if (++nowCount >= endCount)
+			{
+				if (endDisable)
 				{
-					if (endDisable)
-					{
-						target.get_gameObject().SetActive(false);
-					}
-					state = eState.Idle;
+					target.get_gameObject().SetActive(false);
 				}
-				else
-				{
-					state = eState.Forward;
-				}
+				state = eState.Idle;
+			}
+			else
+			{
+				state = eState.Forward;
 			}
 		}
 	}
@@ -120,7 +123,8 @@ public class SimplePingPongAlpha
 	{
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
-		color.a += value;
+		ref Color reference = ref color;
+		reference.a += value;
 		if (color.a >= to)
 		{
 			color.a = to;
@@ -134,7 +138,8 @@ public class SimplePingPongAlpha
 	{
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
-		color.a -= value;
+		ref Color reference = ref color;
+		reference.a -= value;
 		if (color.a <= from)
 		{
 			color.a = from;

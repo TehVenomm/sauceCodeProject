@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-public class AttackUndead
+public class AttackUndead : MonoBehaviour
 {
 	private enum Function
 	{
@@ -63,8 +64,6 @@ public class AttackUndead
 
 	public void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
 	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Expected O, but got Unknown
 		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
@@ -74,14 +73,10 @@ public class AttackUndead
 		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Expected O, but got Unknown
 		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Expected O, but got Unknown
 		m_attacker = attacker;
 		m_atkInfo = atkInfo;
 		AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
@@ -94,7 +89,7 @@ public class AttackUndead
 		m_aliveTimer = bulletData.data.appearTime;
 		m_moveSpeed = bulletData.data.speed;
 		BulletData.BulletUndead dataUndead = bulletData.dataUndead;
-		m_aimAngleSpeed = dataUndead.lookAtAngle * 0.0174532924f;
+		m_aimAngleSpeed = dataUndead.lookAtAngle * ((float)Math.PI / 180f);
 		m_undeadData = dataUndead;
 		m_isDeleted = false;
 		m_cachedTransform = this.get_transform();
@@ -132,124 +127,121 @@ public class AttackUndead
 
 	private void FuncMain()
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_isDeleted)
+		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0289: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+		if (m_isDeleted)
 		{
-			m_aliveTimer -= Time.get_deltaTime();
-			if (m_aliveTimer <= 0f)
+			return;
+		}
+		m_aliveTimer -= Time.get_deltaTime();
+		if (m_aliveTimer <= 0f)
+		{
+			RequestDestroy();
+			return;
+		}
+		if (m_targetObject == null)
+		{
+			RequestDestroy();
+			return;
+		}
+		Vector3 position = m_targetObject.get_transform().get_position();
+		switch (m_state)
+		{
+		case State.TRACKING:
+		{
+			position.y = m_undeadData.floatingHeight;
+			Vector3 val3 = position - m_cachedTransform.get_position();
+			Vector3 normalized2 = val3.get_normalized();
+			Vector3 val4 = m_cachedTransform.get_position() + normalized2 * m_moveSpeed * Time.get_deltaTime();
+			val4._002Ector(val4.x, val4.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef, val4.z);
+			m_cachedTransform.set_position(val4);
+			position.y = 0f;
+			val4.y = 0f;
+			if (Vector3.Distance(position, val4) <= m_undeadData.attackRange)
 			{
-				RequestDestroy();
+				m_attackIntervalTimer = m_undeadData.attackInterval;
+				ForwardState();
 			}
-			else if (m_targetObject == null)
+			break;
+		}
+		case State.ATTACK:
+		{
+			Vector3 val = m_cachedTransform.get_position();
+			position.y = 0f;
+			val.y = 0f;
+			if (Vector3.Distance(position, val) < 0.05f)
 			{
-				RequestDestroy();
+				val = m_cachedTransform.get_position();
+				val._002Ector(val.x, val.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef * 0.3f, val.z);
 			}
 			else
 			{
-				Vector3 position = m_targetObject.get_transform().get_position();
-				switch (m_state)
+				position.y = m_undeadData.floatingHeight;
+				Vector3 val2 = position - m_cachedTransform.get_position();
+				Vector3 normalized = val2.get_normalized();
+				val = m_cachedTransform.get_position() + normalized * m_moveSpeed * Time.get_deltaTime();
+				val._002Ector(val.x, val.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef, val.z);
+			}
+			m_cachedTransform.set_position(val);
+			position.y = 0f;
+			val.y = 0f;
+			if (Vector3.Distance(position, val) > m_undeadData.attackRange)
+			{
+				BackState();
+				break;
+			}
+			m_attackIntervalTimer -= Time.get_deltaTime();
+			if (!(m_attackIntervalTimer > 0f))
+			{
+				m_attackIntervalTimer = m_undeadData.attackInterval;
+				Player player = m_targetObject as Player;
+				if (player == null || player.isDead)
 				{
-				case State.TRACKING:
-				{
-					position.y = m_undeadData.floatingHeight;
-					Vector3 val3 = position - m_cachedTransform.get_position();
-					Vector3 normalized2 = val3.get_normalized();
-					Vector3 val4 = m_cachedTransform.get_position() + normalized2 * m_moveSpeed * Time.get_deltaTime();
-					val4._002Ector(val4.x, val4.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef, val4.z);
-					m_cachedTransform.set_position(val4);
-					position.y = 0f;
-					val4.y = 0f;
-					if (Vector3.Distance(position, val4) <= m_undeadData.attackRange)
-					{
-						m_attackIntervalTimer = m_undeadData.attackInterval;
-						ForwardState();
-					}
-					break;
+					RequestDestroy();
 				}
-				case State.ATTACK:
+				else
 				{
-					Vector3 val = m_cachedTransform.get_position();
-					position.y = 0f;
-					val.y = 0f;
-					if (Vector3.Distance(position, val) < 0.05f)
-					{
-						val = m_cachedTransform.get_position();
-						val._002Ector(val.x, val.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef * 0.3f, val.z);
-					}
-					else
-					{
-						position.y = m_undeadData.floatingHeight;
-						Vector3 val2 = position - m_cachedTransform.get_position();
-						Vector3 normalized = val2.get_normalized();
-						val = m_cachedTransform.get_position() + normalized * m_moveSpeed * Time.get_deltaTime();
-						val._002Ector(val.x, val.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef, val.z);
-					}
-					m_cachedTransform.set_position(val);
-					position.y = 0f;
-					val.y = 0f;
-					if (Vector3.Distance(position, val) > m_undeadData.attackRange)
-					{
-						BackState();
-					}
-					else
-					{
-						m_attackIntervalTimer -= Time.get_deltaTime();
-						if (!(m_attackIntervalTimer > 0f))
-						{
-							m_attackIntervalTimer = m_undeadData.attackInterval;
-							Player player = m_targetObject as Player;
-							if (player == null || player.isDead)
-							{
-								RequestDestroy();
-							}
-							else
-							{
-								CreateBullet();
-							}
-						}
-					}
-					break;
-				}
+					CreateBullet();
 				}
 			}
+			break;
+		}
 		}
 	}
 
@@ -277,7 +269,7 @@ public class AttackUndead
 		}
 		Quaternion rotation = m_cachedTransform.get_rotation();
 		Vector3 position = m_cachedTransform.get_position();
-		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataUndead.closeBullet, m_attacker, m_atkInfo, position, rotation, null, Player.ATTACK_MODE.NONE, null);
+		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataUndead.closeBullet, m_attacker, m_atkInfo, position, rotation);
 		if (animEventShot == null)
 		{
 			Log.Error("Failed to create AnimEventShot for Undead!!");
@@ -339,27 +331,26 @@ public class AttackUndead
 
 	public void RequestDestroy()
 	{
-		if (m_func != Function.DELETE && !m_isDeleted)
+		if (m_func == Function.DELETE || m_isDeleted)
 		{
-			RequestFunction(Function.DELETE);
-			if (m_effectAnimator == null)
-			{
-				Destroy();
-			}
-			else
-			{
-				m_effectDeleteAnimHash = Animator.StringToHash("END");
-				if (m_effectAnimator.HasState(0, m_effectDeleteAnimHash))
-				{
-					m_effectAnimator.Play(m_effectDeleteAnimHash, 0, 0f);
-					m_effectAnimator.Update(0f);
-				}
-				else
-				{
-					Debug.LogWarning((object)"Not found delete animation!!");
-					Destroy();
-				}
-			}
+			return;
+		}
+		RequestFunction(Function.DELETE);
+		if (m_effectAnimator == null)
+		{
+			Destroy();
+			return;
+		}
+		m_effectDeleteAnimHash = Animator.StringToHash("END");
+		if (m_effectAnimator.HasState(0, m_effectDeleteAnimHash))
+		{
+			m_effectAnimator.Play(m_effectDeleteAnimHash, 0, 0f);
+			m_effectAnimator.Update(0f);
+		}
+		else
+		{
+			Debug.LogWarning((object)"Not found delete animation!!");
+			Destroy();
 		}
 	}
 
@@ -370,19 +361,19 @@ public class AttackUndead
 		switch (m_state)
 		{
 		case State.TRACKING:
+		{
 			if (m_effectAnimator == null)
 			{
 				ForwardState();
+				break;
 			}
-			else
+			AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
+			if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
-				{
-					ForwardState();
-				}
+				ForwardState();
 			}
 			break;
+		}
 		case State.ATTACK:
 			Destroy();
 			ForwardState();
@@ -394,28 +385,28 @@ public class AttackUndead
 	{
 		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_isDeleted)
+		if (m_isDeleted)
 		{
-			m_isDeleted = true;
-			if (!string.IsNullOrEmpty(m_landHitEffectName))
-			{
-				Transform effect = EffectManager.GetEffect(m_landHitEffectName, null);
-				if (effect != null)
-				{
-					effect.set_position(m_cachedTransform.get_position());
-					effect.set_rotation(m_cachedTransform.get_rotation());
-				}
-			}
-			Object.Destroy(this.get_gameObject());
+			return;
 		}
+		m_isDeleted = true;
+		if (!string.IsNullOrEmpty(m_landHitEffectName))
+		{
+			Transform effect = EffectManager.GetEffect(m_landHitEffectName);
+			if (effect != null)
+			{
+				effect.set_position(m_cachedTransform.get_position());
+				effect.set_rotation(m_cachedTransform.get_rotation());
+			}
+		}
+		Object.Destroy(this.get_gameObject());
 	}
 
 	private void OnDestroy()
 	{
 		if (m_effectObj != null)
 		{
-			EffectManager.ReleaseEffect(m_effectObj, true, false);
+			EffectManager.ReleaseEffect(m_effectObj);
 			m_effectObj = null;
 		}
 	}

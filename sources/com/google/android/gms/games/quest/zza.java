@@ -2,44 +2,44 @@ package com.google.android.gms.games.quest;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zza implements Creator<MilestoneEntity> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        long j = 0;
-        String str = null;
-        int zzd = zzb.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
+        String str = null;
         byte[] bArr = null;
         String str2 = null;
+        long j = 0;
         long j2 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 2:
-                    j = zzb.zzi(parcel, readInt);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 3:
-                    j2 = zzb.zzi(parcel, readInt);
+                    j2 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 4:
-                    bArr = zzb.zzt(parcel, readInt);
+                    bArr = SafeParcelReader.createByteArray(parcel, readHeader);
                     break;
                 case 5:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 6:
-                    str2 = zzb.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new MilestoneEntity(str, j, j2, bArr, i, str2);
     }
 

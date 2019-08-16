@@ -16,8 +16,8 @@ public class AgeConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_AD, string.Empty, 4, (EventDelegate.Callback)null);
-		SetInput((Enum)UI.IPT_MONTH, string.Empty, 2, (EventDelegate.Callback)null);
+		SetInput(UI.IPT_AD, string.Empty, 4);
+		SetInput(UI.IPT_MONTH, string.Empty, 2);
 	}
 
 	private void OnQuery_OK()
@@ -33,14 +33,14 @@ public class AgeConfirm : GameSection
 			{
 				if (!is_success)
 				{
-					GameSection.ChangeStayEvent("ERROR", null);
+					GameSection.ChangeStayEvent("ERROR");
 				}
-				GameSection.ResumeEvent(true, null);
+				GameSection.ResumeEvent(is_resume: true);
 			});
 		}
 		else
 		{
-			GameSection.ChangeEvent("ERROR", null);
+			GameSection.ChangeEvent("ERROR");
 		}
 	}
 
@@ -50,7 +50,7 @@ public class AgeConfirm : GameSection
 		if (historyList.Count > 1)
 		{
 			int count = historyList.Count;
-			GameSection.ChangeEvent("WARNING_" + historyList[count - 2].sceneName.ToUpper(), null);
+			GameSection.ChangeEvent("WARNING_" + historyList[count - 2].sceneName.ToUpper());
 		}
 	}
 }

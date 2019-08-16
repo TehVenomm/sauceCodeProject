@@ -1,6 +1,7 @@
 package com.google.android.gms.common.data;
 
 import android.os.Bundle;
+import com.google.android.gms.common.annotation.KeepForSdk;
 import com.google.android.gms.common.api.Releasable;
 import java.util.Iterator;
 
@@ -12,6 +13,9 @@ public interface DataBuffer<T> extends Releasable, Iterable<T> {
 
     int getCount();
 
+    @KeepForSdk
+    Bundle getMetadata();
+
     @Deprecated
     boolean isClosed();
 
@@ -20,6 +24,4 @@ public interface DataBuffer<T> extends Releasable, Iterable<T> {
     void release();
 
     Iterator<T> singleRefIterator();
-
-    Bundle zzafh();
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimEventData
+public class AnimEventData : ScriptableObject
 {
 	[Serializable]
 	public class EventData
@@ -72,10 +72,22 @@ public class AnimEventData
 	{
 		public string name;
 
+		public string layerName = "Base Layer.";
+
 		public EventData[] events;
 
 		[NonSerialized]
 		public bool initIDs;
+
+		public string GetAnimName()
+		{
+			return layerName + name;
+		}
+
+		public string GetUniqueName()
+		{
+			return layerName.Substring("Base Layer.".Length) + name;
+		}
 	}
 
 	[Serializable]
@@ -113,7 +125,7 @@ public class AnimEventData
 		}
 	}
 
-	protected const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
+	public const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
 
 	public const float FIRST_EXECUTE_TIME = float.MinValue;
 
@@ -130,11 +142,6 @@ public class AnimEventData
 
 	public ResidentEffectData[] residentEffectDataList;
 
-	public AnimEventData()
-		: this()
-	{
-	}
-
 	static AnimEventData()
 	{
 		string[] names = Enum.GetNames(typeof(AnimEventFormat.ID));
@@ -148,27 +155,33 @@ public class AnimEventData
 		names = null;
 	}
 
+	public AnimEventData()
+		: this()
+	{
+	}
+
 	public void Initialize()
 	{
 		int num = animations.Length;
 		int[] array = hashs;
-		if (array == null || array.Length < num)
+		if (array != null && array.Length >= num)
 		{
-			array = (hashs = new int[num]);
-			for (int i = 0; i < num; i++)
+			return;
+		}
+		array = (hashs = new int[num]);
+		for (int i = 0; i < num; i++)
+		{
+			array[i] = Animator.StringToHash(animations[i].GetAnimName());
+			AnimData animData = animations[i];
+			EventData[] events = animations[i].events;
+			if (!animData.initIDs)
 			{
-				array[i] = Animator.StringToHash("Base Layer." + animations[i].name);
-				AnimData animData = animations[i];
-				EventData[] events = animations[i].events;
-				if (!animData.initIDs)
+				int j = 0;
+				for (int num2 = events.Length; j < num2; j++)
 				{
-					int j = 0;
-					for (int num2 = events.Length; j < num2; j++)
-					{
-						events[j].id = StringToID(events[j].name);
-					}
-					animData.initIDs = true;
+					events[j].id = StringToID(events[j].name);
 				}
+				animData.initIDs = true;
 			}
 		}
 	}
@@ -186,26 +199,27 @@ public class AnimEventData
 			array = (hashs = new int[num]);
 			for (int i = 0; i < num; i++)
 			{
-				array[i] = Animator.StringToHash("Base Layer." + animations[i].name);
+				array[i] = Animator.StringToHash(animations[i].GetAnimName());
 			}
 		}
 		for (int j = 0; j < num; j++)
 		{
-			if (array[j] == hash)
+			if (array[j] != hash)
 			{
-				AnimData animData = animations[j];
-				EventData[] events = animations[j].events;
-				if (!animData.initIDs)
-				{
-					int k = 0;
-					for (int num2 = events.Length; k < num2; k++)
-					{
-						events[k].id = StringToID(events[k].name);
-					}
-					animData.initIDs = true;
-				}
-				return events;
+				continue;
 			}
+			AnimData animData = animations[j];
+			EventData[] events = animations[j].events;
+			if (!animData.initIDs)
+			{
+				int k = 0;
+				for (int num2 = events.Length; k < num2; k++)
+				{
+					events[k].id = StringToID(events[k].name);
+				}
+				animData.initIDs = true;
+			}
+			return events;
 		}
 		return null;
 	}

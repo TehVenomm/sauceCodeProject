@@ -1,3 +1,5 @@
+using System;
+
 public class QuestAcceptDeliveryDetail : QuestDeliveryDetail
 {
 	protected new enum UI
@@ -70,7 +72,13 @@ public class QuestAcceptDeliveryDetail : QuestDeliveryDetail
 		TEX_EVENT_ICON,
 		BTN_CREATE,
 		BTN_JOIN,
-		BTN_MATCHING
+		BTN_MATCHING,
+		BTN_CHANGE_EQUIP
+	}
+
+	protected override Enum GetBtnChangeEquipValue()
+	{
+		return UI.BTN_CHANGE_EQUIP;
 	}
 
 	public override void Initialize()
@@ -106,5 +114,22 @@ public class QuestAcceptDeliveryDetail : QuestDeliveryDetail
 	public void OnQuery_WAVEMATCH_AUTO()
 	{
 		WaveMatchAuto();
+	}
+
+	protected override bool IsChangableEquip()
+	{
+		switch (info.type)
+		{
+		default:
+			return false;
+		case DELIVERY_TYPE.DAILY:
+		case DELIVERY_TYPE.STORY:
+		case DELIVERY_TYPE.ONCE:
+		case DELIVERY_TYPE.WEEKLY:
+		case DELIVERY_TYPE.EVENT:
+		case DELIVERY_TYPE.SUB_EVENT:
+		case DELIVERY_TYPE.ETC:
+			return true;
+		}
 	}
 }

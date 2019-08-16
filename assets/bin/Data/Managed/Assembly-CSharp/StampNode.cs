@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class StampNode
+public class StampNode : MonoBehaviour
 {
 	[Serializable]
 	public class StampTrigger
@@ -40,8 +40,6 @@ public class StampNode
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)

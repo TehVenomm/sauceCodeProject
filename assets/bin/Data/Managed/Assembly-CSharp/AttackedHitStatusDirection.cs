@@ -92,6 +92,18 @@ public class AttackedHitStatusDirection
 		}
 	}
 
+	public bool isDamageRegionOnly
+	{
+		get
+		{
+			return origin.isDamageRegionOnly;
+		}
+		set
+		{
+			origin.isDamageRegionOnly = value;
+		}
+	}
+
 	public Enemy.WEAK_STATE weakState
 	{
 		get

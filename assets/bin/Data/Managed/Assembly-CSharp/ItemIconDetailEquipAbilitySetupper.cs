@@ -4,7 +4,6 @@ public class ItemIconDetailEquipAbilitySetupper : ItemIconDetailEquipSetupper
 {
 	public override void Set(object[] data)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		base.Set((object[])null);
 		SkillSlotUIData[] slot_data = data[1] as SkillSlotUIData[];
 		bool is_show_main_status = (bool)data[2];
@@ -31,7 +30,7 @@ public class ItemIconDetailEquipAbilitySetupper : ItemIconDetailEquipSetupper
 		bool flag = item.tableData.IsWeapon();
 		if (flag)
 		{
-			SetElement(item.GetTargetElement(), item.elemAtk, true);
+			SetElement(item.GetTargetElement(), item.elemAtk, isWeapon: true);
 		}
 		else
 		{
@@ -40,39 +39,37 @@ public class ItemIconDetailEquipAbilitySetupper : ItemIconDetailEquipSetupper
 			{
 				num = Mathf.FloorToInt((float)num * 0.1f);
 			}
-			SetElement(item.GetTargetElement(), num, false);
+			SetElement(item.GetTargetElement(), num, isWeapon: false);
 		}
 		if (is_show_main_status)
 		{
 			infoRootAry[1].SetActive(true);
 			infoRootAry[2].SetActive(false);
-			SetVisibleBG(true);
+			SetVisibleBG(is_visible: true);
 			SetName(item.tableData.name);
 			SetLevel(item.level, item.tableData.maxLv, item.tableData.IsVisual());
 			SetEquipValue(flag, (!flag) ? item.def : item.atk);
+			return;
 		}
-		else
+		infoRootAry[1].SetActive(false);
+		infoRootAry[2].SetActive(true);
+		SetVisibleBG(is_visible: true);
+		SetName(item.tableData.name);
+		bool enabled = true;
+		EquipItemAbility[] ability = item.ability;
+		objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
+		int i = 0;
+		for (int count = Temporary.uiLabelList.Count; i < count; i++)
 		{
-			infoRootAry[1].SetActive(false);
-			infoRootAry[2].SetActive(true);
-			SetVisibleBG(true);
-			SetName(item.tableData.name);
-			bool enabled = true;
-			EquipItemAbility[] ability = item.ability;
-			objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
-			int i = 0;
-			for (int count = Temporary.uiLabelList.Count; i < count; i++)
+			UILabel uILabel = Temporary.uiLabelList[i];
+			uILabel.set_enabled(i < ability.Length && ability[i].id != 0 && ability[i].ap > 0);
+			if (uILabel.get_enabled())
 			{
-				UILabel uILabel = Temporary.uiLabelList[i];
-				uILabel.set_enabled(i < ability.Length && ability[i].id != 0 && ability[i].ap > 0);
-				if (uILabel.get_enabled())
-				{
-					uILabel.text = ability[i].GetNameAndAP();
-					enabled = false;
-				}
+				uILabel.text = ability[i].GetNameAndAP();
+				enabled = false;
 			}
-			Temporary.uiLabelList.Clear();
-			lblNonAbility.set_enabled(enabled);
 		}
+		Temporary.uiLabelList.Clear();
+		lblNonAbility.set_enabled(enabled);
 	}
 }

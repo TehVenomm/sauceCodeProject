@@ -127,7 +127,7 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		{
 			if (!mHp.HasValue)
 			{
-				mHp = ((level <= 1) ? ((int)tableData.baseHp + (int)exceedParam.hp) : GetGrowParamHp(false));
+				mHp = ((level <= 1) ? ((int)tableData.baseHp + (int)exceedParam.hp) : GetGrowParamHp());
 			}
 			return mHp.Value;
 		}
@@ -172,7 +172,7 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		{
 			uniqId = "0",
 			equipItemId = home_chara_equip_data.eId,
-			level = (XorInt)home_chara_equip_data.lv,
+			level = home_chara_equip_data.lv,
 			exceed = home_chara_equip_data.exceed,
 			price = 0,
 			is_locked = 0,
@@ -192,6 +192,32 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		SetValue(equipItem);
 	}
 
+	public EquipItemInfo(uint id)
+	{
+		EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(id);
+		EquipItem equipItem = new EquipItem
+		{
+			uniqId = "0",
+			equipItemId = (int)id,
+			level = equipItemData.maxLv,
+			exceed = 4,
+			price = 0,
+			is_locked = 0,
+			ability = new List<EquipItem.Ability>()
+		};
+		int i = 0;
+		for (int num = equipItemData.fixedAbility.Length; i < num; i++)
+		{
+			EquipItem.Ability item = new EquipItem.Ability
+			{
+				id = equipItemData.fixedAbility[i].id,
+				pt = 1
+			};
+			equipItem.ability.Add(item);
+		}
+		SetValue(equipItem);
+	}
+
 	public override void SetValue(EquipItem recv_data)
 	{
 		ulong.TryParse(recv_data.uniqId, out ulong result);
@@ -205,41 +231,39 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		if (tableData == null)
 		{
 			Log.Error(LOG.RESOURCE, "table = null");
+			return;
 		}
-		else
+		exceedParam = tableData.GetExceedParam((uint)recv_data.exceed);
+		if (exceedParam == null)
 		{
-			exceedParam = tableData.GetExceedParam((uint)recv_data.exceed);
-			if (exceedParam == null)
-			{
-				exceedParam = new EquipItemExceedParamTable.EquipItemExceedParamAll();
-			}
-			int cnt = 0;
-			int num = 0;
-			if (exceedParam != null && exceedParam.ability.Length > 0)
-			{
-				num += exceedParam.ability.Length;
-			}
-			ability = new EquipItemAbility[recv_data.ability.Count + GetFixedAbilityCount() + num];
-			for (int i = 0; i < tableData.fixedAbility.Length; i++)
-			{
-				if (!tableData.fixedAbility[i].vr)
-				{
-					ability[++cnt] = new EquipItemAbility((uint)tableData.fixedAbility[i].id, tableData.fixedAbility[i].pt);
-				}
-			}
-			recv_data.ability.ForEach(delegate(EquipItem.Ability a)
-			{
-				ability[++cnt] = new EquipItemAbility((uint)a.id, a.pt);
-			});
-			if (num > 0)
-			{
-				for (int j = 0; j < num; j++)
-				{
-					ability[++cnt] = new EquipItemAbility((uint)exceedParam.ability[j].id, exceedParam.ability[j].pt);
-				}
-			}
-			abilityItem = recv_data.abilityItem;
+			exceedParam = new EquipItemExceedParamTable.EquipItemExceedParamAll();
 		}
+		int cnt = 0;
+		int num = 0;
+		if (exceedParam != null && exceedParam.ability.Length > 0)
+		{
+			num += exceedParam.ability.Length;
+		}
+		ability = new EquipItemAbility[recv_data.ability.Count + GetFixedAbilityCount() + num];
+		for (int i = 0; i < tableData.fixedAbility.Length; i++)
+		{
+			if (!tableData.fixedAbility[i].vr)
+			{
+				ability[++cnt] = new EquipItemAbility((uint)tableData.fixedAbility[i].id, tableData.fixedAbility[i].pt);
+			}
+		}
+		recv_data.ability.ForEach(delegate(EquipItem.Ability a)
+		{
+			ability[++cnt] = new EquipItemAbility((uint)a.id, a.pt);
+		});
+		if (num > 0)
+		{
+			for (int j = 0; j < num; j++)
+			{
+				ability[++cnt] = new EquipItemAbility((uint)exceedParam.ability[j].id, exceedParam.ability[j].pt);
+			}
+		}
+		abilityItem = recv_data.abilityItem;
 	}
 
 	public void SetDefaultData()
@@ -263,8 +287,8 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		List<int> list = new List<int>();
 		if (level > 1)
 		{
-			list.Add(GetGrowParamAtk(false));
-			int[] growParamElemAtk = GetGrowParamElemAtk(false);
+			list.Add(GetGrowParamAtk());
+			int[] growParamElemAtk = GetGrowParamElemAtk();
 			int i = 0;
 			for (int num = tableData.atkElement.Length; i < num; i++)
 			{
@@ -288,8 +312,8 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		List<int> list = new List<int>();
 		if (level > 1)
 		{
-			list.Add(GetGrowParamDef(false));
-			int[] growParamElemDef = GetGrowParamElemDef(false);
+			list.Add(GetGrowParamDef());
+			int[] growParamElemDef = GetGrowParamElemDef();
 			int i = 0;
 			for (int num = tableData.defElement.Length; i < num; i++)
 			{
@@ -338,7 +362,7 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 
 	public int GetElemAtkType()
 	{
-		return (level != 1) ? tableData.GetElemType(GetGrowParamElemAtk(false)) : tableData.GetElemAtkType((exceedParam == null) ? null : exceedParam.atkElement);
+		return (level != 1) ? tableData.GetElemType(GetGrowParamElemAtk()) : tableData.GetElemAtkType((exceedParam == null) ? null : exceedParam.atkElement);
 	}
 
 	public int GetElemAtkTypePriorityToTable()
@@ -352,7 +376,7 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 
 	public int GetElemDefType()
 	{
-		return (level != 1) ? tableData.GetElemType(GetGrowParamElemDef(false)) : tableData.GetElemDefType((exceedParam == null) ? null : exceedParam.defElement);
+		return (level != 1) ? tableData.GetElemType(GetGrowParamElemDef()) : tableData.GetElemDefType((exceedParam == null) ? null : exceedParam.defElement);
 	}
 
 	public int GetElemDefTypePriorityToTable()
@@ -540,6 +564,41 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		return skill_info;
 	}
 
+	public SkillItemInfo GetUniqueSkillItem(int index)
+	{
+		if (GetMaxSlot() <= index)
+		{
+			Log.Warning("GetUniqueSkillItem :: index out of bounds :: uniqID = " + base.uniqueID + " : tableID = " + base.tableID);
+			return null;
+		}
+		SkillItemInfo[] skillInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetSkillInventoryClone();
+		SkillItemInfo skill_info = null;
+		Array.ForEach(skillInventoryClone, delegate(SkillItemInfo skill_item)
+		{
+			if (skill_info == null)
+			{
+				bool flag = false;
+				EquipSetSkillData uniqueEquipSetSkill = skill_item.uniqueEquipSetSkill;
+				if (uniqueEquipSetSkill != null && uniqueEquipSetSkill.equipItemUniqId == base.uniqueID)
+				{
+					if (uniqueEquipSetSkill.equipSlotNo == index)
+					{
+						flag = true;
+					}
+					else if (uniqueEquipSetSkill.equipSlotNo == GetExceedSkillSlotNo(index))
+					{
+						flag = true;
+					}
+				}
+				if (flag)
+				{
+					skill_info = skill_item;
+				}
+			}
+		});
+		return skill_info;
+	}
+
 	public AbilityItemInfo GetAbilityItem()
 	{
 		List<AbilityItemInfo> all = MonoBehaviourSingleton<InventoryManager>.I.abilityItemInventory.GetAll();
@@ -595,18 +654,19 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		for (int maxSlot = GetMaxSlot(); j < maxSlot; j++)
 		{
 			SkillItemInfo skillItem = GetSkillItem(j);
-			if (skillItem != null)
+			if (skillItem == null)
 			{
-				GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItem.tableData.growID, skillItem.level);
-				if (growSkillItemData != null)
+				continue;
+			}
+			GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItem.tableData.growID, skillItem.level, skillItem.exceedCnt);
+			if (growSkillItemData != null)
+			{
+				hp += skillItem.hp;
+				int k = 0;
+				for (int num = 7; k < num; k++)
 				{
-					hp += skillItem.hp;
-					int k = 0;
-					for (int num = 7; k < num; k++)
-					{
-						atk[k] += skillItem.atkList[k];
-						def[k] += skillItem.defList[k];
-					}
+					atk[k] += skillItem.atkList[k];
+					def[k] += skillItem.defList[k];
 				}
 			}
 		}
@@ -753,14 +813,15 @@ public class EquipItemInfo : ItemInfoBase<EquipItem>
 		for (int i = 0; i < ability.Length; i++)
 		{
 			AbilityDataTable.AbilityData abilityData = Singleton<AbilityDataTable>.I.GetAbilityData(ability[i].id, ability[i].ap);
-			if (abilityData != null)
+			if (abilityData == null)
 			{
-				for (int j = 0; j < abilityData.info.Length; j++)
+				continue;
+			}
+			for (int j = 0; j < abilityData.info.Length; j++)
+			{
+				if (abilityData.info[j].IsNeedUpdate())
 				{
-					if (abilityData.info[j].IsNeedUpdate())
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}

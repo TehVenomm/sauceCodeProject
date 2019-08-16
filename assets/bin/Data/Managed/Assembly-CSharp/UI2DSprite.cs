@@ -1,32 +1,32 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/NGUI Unity2D Sprite")]
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/NGUI Unity2D Sprite")]
 public class UI2DSprite : UIBasicSprite
 {
 	[HideInInspector]
 	[SerializeField]
 	private Sprite mSprite;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Material mMat;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Shader mShader;
 
 	[HideInInspector]
 	[SerializeField]
 	private Vector4 mBorder = Vector4.get_zero();
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool mFixedAspect;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private float mPixelSize = 1f;
 
 	public Sprite nextSprite;
@@ -74,10 +74,6 @@ public class UI2DSprite : UIBasicSprite
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
 			if (mMat != null)
 			{
 				return mMat.get_shader();
@@ -107,10 +103,6 @@ public class UI2DSprite : UIBasicSprite
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
 			if (mSprite != null)
 			{
 				return mSprite.get_texture();
@@ -277,10 +269,10 @@ public class UI2DSprite : UIBasicSprite
 	{
 		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
@@ -295,8 +287,8 @@ public class UI2DSprite : UIBasicSprite
 		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
 		if (nextSprite != null)
 		{
 			if (nextSprite != mSprite)
@@ -306,47 +298,48 @@ public class UI2DSprite : UIBasicSprite
 			nextSprite = null;
 		}
 		base.OnUpdate();
-		if (mFixedAspect)
+		if (!mFixedAspect)
 		{
-			Texture mainTexture = this.mainTexture;
-			if (mainTexture != null)
+			return;
+		}
+		Texture mainTexture = this.mainTexture;
+		if (mainTexture != null)
+		{
+			Rect rect = mSprite.get_rect();
+			int num = Mathf.RoundToInt(rect.get_width());
+			Rect rect2 = mSprite.get_rect();
+			int num2 = Mathf.RoundToInt(rect2.get_height());
+			Vector2 textureRectOffset = mSprite.get_textureRectOffset();
+			int num3 = Mathf.RoundToInt(textureRectOffset.x);
+			Vector2 textureRectOffset2 = mSprite.get_textureRectOffset();
+			int num4 = Mathf.RoundToInt(textureRectOffset2.y);
+			Rect rect3 = mSprite.get_rect();
+			float width = rect3.get_width();
+			Rect textureRect = mSprite.get_textureRect();
+			float num5 = width - textureRect.get_width();
+			Vector2 textureRectOffset3 = mSprite.get_textureRectOffset();
+			int num6 = Mathf.RoundToInt(num5 - textureRectOffset3.x);
+			Rect rect4 = mSprite.get_rect();
+			float height = rect4.get_height();
+			Rect textureRect2 = mSprite.get_textureRect();
+			float num7 = height - textureRect2.get_height();
+			Vector2 textureRectOffset4 = mSprite.get_textureRectOffset();
+			int num8 = Mathf.RoundToInt(num7 - textureRectOffset4.y);
+			num += num3 + num6;
+			num2 += num8 + num4;
+			float num9 = mWidth;
+			float num10 = mHeight;
+			float num11 = num9 / num10;
+			float num12 = (float)num / (float)num2;
+			if (num12 < num11)
 			{
-				Rect rect = mSprite.get_rect();
-				int num = Mathf.RoundToInt(rect.get_width());
-				Rect rect2 = mSprite.get_rect();
-				int num2 = Mathf.RoundToInt(rect2.get_height());
-				Vector2 textureRectOffset = mSprite.get_textureRectOffset();
-				int num3 = Mathf.RoundToInt(textureRectOffset.x);
-				Vector2 textureRectOffset2 = mSprite.get_textureRectOffset();
-				int num4 = Mathf.RoundToInt(textureRectOffset2.y);
-				Rect rect3 = mSprite.get_rect();
-				float width = rect3.get_width();
-				Rect textureRect = mSprite.get_textureRect();
-				float num5 = width - textureRect.get_width();
-				Vector2 textureRectOffset3 = mSprite.get_textureRectOffset();
-				int num6 = Mathf.RoundToInt(num5 - textureRectOffset3.x);
-				Rect rect4 = mSprite.get_rect();
-				float height = rect4.get_height();
-				Rect textureRect2 = mSprite.get_textureRect();
-				float num7 = height - textureRect2.get_height();
-				Vector2 textureRectOffset4 = mSprite.get_textureRectOffset();
-				int num8 = Mathf.RoundToInt(num7 - textureRectOffset4.y);
-				num += num3 + num6;
-				num2 += num8 + num4;
-				float num9 = (float)mWidth;
-				float num10 = (float)mHeight;
-				float num11 = num9 / num10;
-				float num12 = (float)num / (float)num2;
-				if (num12 < num11)
-				{
-					float num13 = (num9 - num10 * num12) / num9 * 0.5f;
-					base.drawRegion = new Vector4(num13, 0f, 1f - num13, 1f);
-				}
-				else
-				{
-					float num14 = (num10 - num9 / num12) / num10 * 0.5f;
-					base.drawRegion = new Vector4(0f, num14, 1f, 1f - num14);
-				}
+				float num13 = (num9 - num10 * num12) / num9 * 0.5f;
+				base.drawRegion = new Vector4(num13, 0f, 1f - num13, 1f);
+			}
+			else
+			{
+				float num14 = (num10 - num9 / num12) / num10 * 0.5f;
+				base.drawRegion = new Vector4(0f, num14, 1f, 1f - num14);
 			}
 		}
 	}
@@ -356,25 +349,26 @@ public class UI2DSprite : UIBasicSprite
 		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		base.MakePixelPerfect();
-		if (mType != Type.Tiled)
+		if (mType == Type.Tiled)
 		{
-			Texture mainTexture = this.mainTexture;
-			if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !base.hasBorder) && mainTexture != null)
+			return;
+		}
+		Texture mainTexture = this.mainTexture;
+		if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !base.hasBorder) && mainTexture != null)
+		{
+			Rect rect = mSprite.get_rect();
+			int num = Mathf.RoundToInt(rect.get_width());
+			int num2 = Mathf.RoundToInt(rect.get_height());
+			if ((num & 1) == 1)
 			{
-				Rect rect = mSprite.get_rect();
-				int num = Mathf.RoundToInt(rect.get_width());
-				int num2 = Mathf.RoundToInt(rect.get_height());
-				if ((num & 1) == 1)
-				{
-					num++;
-				}
-				if ((num2 & 1) == 1)
-				{
-					num2++;
-				}
-				base.width = num;
-				base.height = num2;
+				num++;
 			}
+			if ((num2 & 1) == 1)
+			{
+				num2++;
+			}
+			base.width = num;
+			base.height = num2;
 		}
 	}
 

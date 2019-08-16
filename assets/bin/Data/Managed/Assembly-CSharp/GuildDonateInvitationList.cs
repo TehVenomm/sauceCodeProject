@@ -28,7 +28,6 @@ public class GuildDonateInvitationList : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoInitialize());
 	}
 
@@ -37,12 +36,12 @@ public class GuildDonateInvitationList : GameSection
 		bool finish_donate_list = false;
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator31)/*Error near IL_002d: stateMachine*/)._003Cfinish_donate_list_003E__0 = true;
-			((_003CDoInitialize_003Ec__Iterator31)/*Error near IL_002d: stateMachine*/)._003C_003Ef__this._donateList = MonoBehaviourSingleton<GuildManager>.I.donateInviteList;
-		}, false);
+			finish_donate_list = true;
+			_donateList = MonoBehaviourSingleton<GuildManager>.I.donateInviteList;
+		});
 		while (!finish_donate_list)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		base.Initialize();
 	}
@@ -50,11 +49,11 @@ public class GuildDonateInvitationList : GameSection
 	public override void UpdateUI()
 	{
 		SetActive((Enum)UI.STR_NON_LIST, _donateList.Count <= 0);
-		SetTable(UI.TBL_QUEST, "GuildDonateInvitationListItem", _donateList.Count, true, (int i, Transform t) => null, delegate(int i, Transform t, bool b)
+		SetTable(UI.TBL_QUEST, "GuildDonateInvitationListItem", _donateList.Count, reset: true, (int i, Transform t) => null, delegate(int i, Transform t, bool b)
 		{
 			GuildDonateInvitationList guildDonateInvitationList = this;
 			DonateInvitationInfo info = _donateList[i];
-			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1, false);
+			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
 			bool flag = info.itemNum >= info.quantity;
 			SetActive(t, UI.OBJ_FULL, flag);
 			SetActive(t, UI.OBJ_NORMAL, !flag);
@@ -74,7 +73,7 @@ public class GuildDonateInvitationList : GameSection
 			}
 			else
 			{
-				SetButtonEnabled(t, UI.BTN_GIFT, false);
+				SetButtonEnabled(t, UI.BTN_GIFT, is_enabled: false);
 			}
 			Transform ctrl = GetCtrl(UI.OBJ_MATERIAL_ICON);
 			ItemInfo item = ItemInfo.CreateItemInfo(new Item
@@ -95,9 +94,9 @@ public class GuildDonateInvitationList : GameSection
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvitationList(delegate
 		{
 			_donateList = MonoBehaviourSingleton<GuildManager>.I.donateInviteList;
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
 			RefreshUI();
-		}, false);
+		});
 	}
 
 	private void SetItemIcon(Transform holder, ItemSortData data, Transform parent_scroll)
@@ -128,7 +127,7 @@ public class GuildDonateInvitationList : GameSection
 		case ITEM_ICON_TYPE.QUEST_ITEM:
 		{
 			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0L)
+			if (uniqID != 0)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
@@ -163,7 +162,7 @@ public class GuildDonateInvitationList : GameSection
 		}
 		else
 		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, false, null, false, enemy_icon_id, 0, false, GET_TYPE.PAY);
+			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
 		}
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), parent_scroll);
 	}

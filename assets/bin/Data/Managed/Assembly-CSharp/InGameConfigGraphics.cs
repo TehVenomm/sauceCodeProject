@@ -55,8 +55,6 @@ public class InGameConfigGraphics : ConfigGraphics
 
 	private void OnScreenRotate(bool isPortrait)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (base.transferUI != null)
 		{
 			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
@@ -86,25 +84,25 @@ public class InGameConfigGraphics : ConfigGraphics
 	protected override void OnQuery_AUTO_ROTATION_ON()
 	{
 		base.OnQuery_AUTO_ROTATION_ON();
-		GameSceneGlobalSettings.SetOrientation(true);
+		GameSceneGlobalSettings.SetOrientation(ingame: true);
 	}
 
 	protected override void OnQuery_AUTO_ROTATION_OFF()
 	{
 		base.OnQuery_AUTO_ROTATION_OFF();
-		GameSceneGlobalSettings.SetOrientation(true);
+		GameSceneGlobalSettings.SetOrientation(ingame: true);
 	}
 
 	protected override void OnQuery_MINIMAP_ENEMY_ON()
 	{
 		base.OnQuery_MINIMAP_ENEMY_ON();
-		RefreshEnemyMiniMap(true);
+		RefreshEnemyMiniMap(is_enable: true);
 	}
 
 	protected override void OnQuery_MINIMAP_ENEMY_OFF()
 	{
 		base.OnQuery_MINIMAP_ENEMY_OFF();
-		RefreshEnemyMiniMap(false);
+		RefreshEnemyMiniMap(is_enable: false);
 	}
 
 	private void RefreshEnemyMiniMap(bool is_enable)

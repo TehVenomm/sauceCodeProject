@@ -112,8 +112,8 @@ public class LoungeSearchSettings : LoungeConditionSettings
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendSearch(delegate(bool is_success, Error err)
 		{
-			GameSection.ResumeEvent(is_success, null);
-		}, true);
+			GameSection.ResumeEvent(is_success);
+		}, saveSettings: true);
 	}
 
 	private void OnQuery_MATCHING()
@@ -135,9 +135,9 @@ public class LoungeSearchSettings : LoungeConditionSettings
 		{
 			if (!is_success)
 			{
-				GameSection.ChangeStayEvent("NOT_FOUND_MATCHING_LOUNGE", null);
+				GameSection.ChangeStayEvent("NOT_FOUND_MATCHING_LOUNGE");
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 }

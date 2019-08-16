@@ -7,8 +7,9 @@ final class zzh extends PathClassLoader {
         super(str, classLoader);
     }
 
-    protected final Class<?> loadClass(String str, boolean z) throws ClassNotFoundException {
-        if (!(str.startsWith("java.") || str.startsWith("android."))) {
+    /* access modifiers changed from: protected */
+    public final Class<?> loadClass(String str, boolean z) throws ClassNotFoundException {
+        if (!str.startsWith("java.") && !str.startsWith("android.")) {
             try {
                 return findClass(str);
             } catch (ClassNotFoundException e) {

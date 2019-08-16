@@ -37,6 +37,8 @@ namespace Network
 
 		public int eSetNo;
 
+		public int ueSetNo;
+
 		public int titleId;
 
 		public int maxFollow;

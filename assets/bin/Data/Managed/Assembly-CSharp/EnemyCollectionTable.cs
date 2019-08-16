@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 [Obsolete]
 public class EnemyCollectionTable : Singleton<EnemyCollectionTable>, IDataTable
 {
 	public class EnemyCollectionData
 	{
-		public const string NT = "id,enemySpeciesId,name,regionId,collectionType,flavorText";
-
 		public uint id;
 
 		public uint enemySpeciesId;
@@ -19,6 +18,8 @@ public class EnemyCollectionTable : Singleton<EnemyCollectionTable>, IDataTable
 		public COLLECTION_TYPE collectionType;
 
 		public string flavorText;
+
+		public const string NT = "id,enemySpeciesId,name,regionId,collectionType,flavorText";
 
 		public static bool cb(CSVReader csv_reader, EnemyCollectionData data, ref uint key)
 		{
@@ -34,15 +35,21 @@ public class EnemyCollectionTable : Singleton<EnemyCollectionTable>, IDataTable
 
 	private UIntKeyTable<EnemyCollectionData> enemyCollectionTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyCollectionData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<EnemyCollectionData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		enemyCollectionTable = TableUtility.CreateUIntKeyTable<EnemyCollectionData>(csv_text, EnemyCollectionData.cb, "id,enemySpeciesId,name,regionId,collectionType,flavorText", null);
+		enemyCollectionTable = TableUtility.CreateUIntKeyTable<EnemyCollectionData>(csv_text, EnemyCollectionData.cb, "id,enemySpeciesId,name,regionId,collectionType,flavorText");
 		enemyCollectionTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(enemyCollectionTable, csv_text, EnemyCollectionData.cb, "id,enemySpeciesId,name,regionId,collectionType,flavorText", null);
+		TableUtility.AddUIntKeyTable(enemyCollectionTable, csv_text, EnemyCollectionData.cb, "id,enemySpeciesId,name,regionId,collectionType,flavorText");
 	}
 
 	public EnemyCollectionData GetEnemyCollectionData(uint id)

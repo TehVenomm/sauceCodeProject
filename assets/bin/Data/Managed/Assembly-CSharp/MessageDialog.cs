@@ -11,11 +11,11 @@ public class MessageDialog : CommonDialog
 		if (text == null)
 		{
 			string[] texts = GetTexts(data_object as object[], message_category);
-			base.InitDialog(new Desc(TYPE.OK, (texts.Length <= 0) ? string.Empty : texts[0], (texts.Length <= 1) ? string.Empty : texts[1], null, null, null));
+			base.InitDialog(new Desc(TYPE.OK, (texts.Length <= 0) ? string.Empty : texts[0], (texts.Length <= 1) ? string.Empty : texts[1]));
 		}
 		else
 		{
-			base.InitDialog(new Desc(TYPE.OK, text, null, null, null, null));
+			base.InitDialog(new Desc(TYPE.OK, text));
 		}
 	}
 }

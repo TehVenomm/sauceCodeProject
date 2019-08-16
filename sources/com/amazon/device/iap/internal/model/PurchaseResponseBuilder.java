@@ -32,23 +32,23 @@ public class PurchaseResponseBuilder {
         return this.userData;
     }
 
-    public PurchaseResponseBuilder setReceipt(Receipt receipt) {
-        this.receipt = receipt;
+    public PurchaseResponseBuilder setReceipt(Receipt receipt2) {
+        this.receipt = receipt2;
         return this;
     }
 
-    public PurchaseResponseBuilder setRequestId(RequestId requestId) {
-        this.requestId = requestId;
+    public PurchaseResponseBuilder setRequestId(RequestId requestId2) {
+        this.requestId = requestId2;
         return this;
     }
 
-    public PurchaseResponseBuilder setRequestStatus(RequestStatus requestStatus) {
-        this.requestStatus = requestStatus;
+    public PurchaseResponseBuilder setRequestStatus(RequestStatus requestStatus2) {
+        this.requestStatus = requestStatus2;
         return this;
     }
 
-    public PurchaseResponseBuilder setUserData(UserData userData) {
-        this.userData = userData;
+    public PurchaseResponseBuilder setUserData(UserData userData2) {
+        this.userData = userData2;
         return this;
     }
 }

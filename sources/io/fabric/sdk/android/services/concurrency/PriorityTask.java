@@ -1,4 +1,4 @@
-package io.fabric.sdk.android.services.concurrency;
+package p017io.fabric.sdk.android.services.concurrency;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.PriorityTask */
 public class PriorityTask implements Dependency<Task>, PriorityProvider, Task {
     private final List<Task> dependencies = new ArrayList();
     private final AtomicBoolean hasRun = new AtomicBoolean(false);
-    private final AtomicReference<Throwable> throwable = new AtomicReference(null);
+    private final AtomicReference<Throwable> throwable = new AtomicReference<>(null);
 
     public static boolean isProperDelegate(Object obj) {
         try {

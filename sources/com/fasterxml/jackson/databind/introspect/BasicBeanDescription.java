@@ -76,7 +76,8 @@ public class BasicBeanDescription extends BeanDescription {
         return new BasicBeanDescription(mapperConfig, javaType, annotatedClass, Collections.emptyList());
     }
 
-    protected List<BeanPropertyDefinition> _properties() {
+    /* access modifiers changed from: protected */
+    public List<BeanPropertyDefinition> _properties() {
         if (this._properties == null) {
             this._properties = this._propCollector.getProperties();
         }
@@ -128,7 +129,10 @@ public class BasicBeanDescription extends BeanDescription {
     }
 
     public AnnotatedMethod findJsonValueMethod() {
-        return this._propCollector == null ? null : this._propCollector.getJsonValueMethod();
+        if (this._propCollector == null) {
+            return null;
+        }
+        return this._propCollector.getJsonValueMethod();
     }
 
     public Set<String> getIgnoredPropertyNames() {
@@ -164,19 +168,19 @@ public class BasicBeanDescription extends BeanDescription {
     }
 
     public AnnotatedMethod findAnySetter() throws IllegalArgumentException {
-        AnnotatedMethod annotatedMethod;
+        AnnotatedMethod anySetterMethod;
         if (this._propCollector == null) {
-            annotatedMethod = null;
+            anySetterMethod = null;
         } else {
-            annotatedMethod = this._propCollector.getAnySetterMethod();
+            anySetterMethod = this._propCollector.getAnySetterMethod();
         }
-        if (annotatedMethod != null) {
-            Class rawParameterType = annotatedMethod.getRawParameterType(0);
+        if (anySetterMethod != null) {
+            Class<Object> rawParameterType = anySetterMethod.getRawParameterType(0);
             if (!(rawParameterType == String.class || rawParameterType == Object.class)) {
-                throw new IllegalArgumentException("Invalid 'any-setter' annotation on method " + annotatedMethod.getName() + "(): first argument not of type String or Object, but " + rawParameterType.getName());
+                throw new IllegalArgumentException("Invalid 'any-setter' annotation on method " + anySetterMethod.getName() + "(): first argument not of type String or Object, but " + rawParameterType.getName());
             }
         }
-        return annotatedMethod;
+        return anySetterMethod;
     }
 
     public Map<Object, AnnotatedMember> findInjectables() {
@@ -201,16 +205,16 @@ public class BasicBeanDescription extends BeanDescription {
         try {
             return defaultConstructor.getAnnotated().newInstance(new Object[0]);
         } catch (Exception e) {
-            Throwable e2 = e;
-            while (e2.getCause() != null) {
-                e2 = e2.getCause();
+            e = e;
+            while (e.getCause() != null) {
+                e = e.getCause();
             }
-            if (e2 instanceof Error) {
-                throw ((Error) e2);
-            } else if (e2 instanceof RuntimeException) {
-                throw ((RuntimeException) e2);
+            if (e instanceof Error) {
+                throw ((Error) e);
+            } else if (e instanceof RuntimeException) {
+                throw ((RuntimeException) e);
             } else {
-                throw new IllegalArgumentException("Failed to instantiate bean of type " + this._classInfo.getAnnotated().getName() + ": (" + e2.getClass().getName() + ") " + e2.getMessage(), e2);
+                throw new IllegalArgumentException("Failed to instantiate bean of type " + this._classInfo.getAnnotated().getName() + ": (" + e.getClass().getName() + ") " + e.getMessage(), e);
             }
         }
     }
@@ -249,42 +253,42 @@ public class BasicBeanDescription extends BeanDescription {
     }
 
     public AnnotatedMember findAnyGetter() throws IllegalArgumentException {
-        AnnotatedMember annotatedMember;
+        AnnotatedMember anyGetter;
         if (this._propCollector == null) {
-            annotatedMember = null;
+            anyGetter = null;
         } else {
-            annotatedMember = this._propCollector.getAnyGetter();
+            anyGetter = this._propCollector.getAnyGetter();
         }
-        if (annotatedMember != null) {
-            if (!Map.class.isAssignableFrom(annotatedMember.getRawType())) {
-                throw new IllegalArgumentException("Invalid 'any-getter' annotation on method " + annotatedMember.getName() + "(): return type is not instance of java.util.Map");
+        if (anyGetter != null) {
+            if (!Map.class.isAssignableFrom(anyGetter.getRawType())) {
+                throw new IllegalArgumentException("Invalid 'any-getter' annotation on method " + anyGetter.getName() + "(): return type is not instance of java.util.Map");
             }
         }
-        return annotatedMember;
+        return anyGetter;
     }
 
     public Map<String, AnnotatedMember> findBackReferenceProperties() {
-        Map<String, AnnotatedMember> map = null;
+        HashMap hashMap;
+        HashMap hashMap2 = null;
         for (BeanPropertyDefinition mutator : _properties()) {
             AnnotatedMember mutator2 = mutator.getMutator();
             if (mutator2 != null) {
                 ReferenceProperty findReferenceType = this._annotationIntrospector.findReferenceType(mutator2);
                 if (findReferenceType != null && findReferenceType.isBackReference()) {
-                    HashMap hashMap;
-                    if (map == null) {
+                    if (hashMap2 == null) {
                         hashMap = new HashMap();
                     } else {
-                        Map map2 = map;
+                        hashMap = hashMap2;
                     }
                     String name = findReferenceType.getName();
                     if (hashMap.put(name, mutator2) != null) {
                         throw new IllegalArgumentException("Multiple back-reference properties with name '" + name + "'");
                     }
-                    map = hashMap;
+                    hashMap2 = hashMap;
                 }
             }
         }
-        return map;
+        return hashMap2;
     }
 
     public List<AnnotatedMethod> getFactoryMethods() {
@@ -320,7 +324,7 @@ public class BasicBeanDescription extends BeanDescription {
         for (AnnotatedMethod annotatedMethod : this._classInfo.getStaticMethods()) {
             if (isFactoryMethod(annotatedMethod)) {
                 Class rawParameterType = annotatedMethod.getRawParameterType(0);
-                for (Class isAssignableFrom : clsArr) {
+                for (Class<?> isAssignableFrom : clsArr) {
                     if (rawParameterType.isAssignableFrom(isAssignableFrom)) {
                         return annotatedMethod.getAnnotated();
                     }
@@ -331,7 +335,8 @@ public class BasicBeanDescription extends BeanDescription {
         return null;
     }
 
-    protected boolean isFactoryMethod(AnnotatedMethod annotatedMethod) {
+    /* access modifiers changed from: protected */
+    public boolean isFactoryMethod(AnnotatedMethod annotatedMethod) {
         if (!getBeanClass().isAssignableFrom(annotatedMethod.getRawReturnType())) {
             return false;
         }
@@ -345,7 +350,7 @@ public class BasicBeanDescription extends BeanDescription {
         if (!"fromString".equals(name) || 1 != annotatedMethod.getParameterCount()) {
             return false;
         }
-        Class rawParameterType = annotatedMethod.getRawParameterType(0);
+        Class<String> rawParameterType = annotatedMethod.getRawParameterType(0);
         if (rawParameterType == String.class || CharSequence.class.isAssignableFrom(rawParameterType)) {
             return true;
         }
@@ -358,7 +363,7 @@ public class BasicBeanDescription extends BeanDescription {
         if (findCreatorParameterNames.isEmpty()) {
             return Collections.emptyList();
         }
-        List<String> arrayList = new ArrayList(findCreatorParameterNames.size());
+        ArrayList arrayList = new ArrayList(findCreatorParameterNames.size());
         for (PropertyName simpleName : findCreatorParameterNames) {
             arrayList.add(simpleName.getSimpleName());
         }
@@ -367,30 +372,29 @@ public class BasicBeanDescription extends BeanDescription {
 
     @Deprecated
     public List<PropertyName> findCreatorParameterNames() {
-        int i = 1;
-        int i2 = 0;
-        while (i2 < 2) {
-            for (AnnotatedWithParams annotatedWithParams : i2 == 0 ? getConstructors() : getFactoryMethods()) {
+        int i = 0;
+        while (i < 2) {
+            for (AnnotatedWithParams annotatedWithParams : i == 0 ? getConstructors() : getFactoryMethods()) {
                 int parameterCount = annotatedWithParams.getParameterCount();
                 if (parameterCount >= 1) {
                     PropertyName _findCreatorPropertyName = _findCreatorPropertyName(annotatedWithParams.getParameter(0));
-                    if (!(_findCreatorPropertyName == null || _findCreatorPropertyName.isEmpty())) {
-                        List<PropertyName> arrayList = new ArrayList();
+                    if (_findCreatorPropertyName != null && !_findCreatorPropertyName.isEmpty()) {
+                        ArrayList arrayList = new ArrayList();
                         arrayList.add(_findCreatorPropertyName);
-                        while (i < parameterCount) {
-                            arrayList.add(_findCreatorPropertyName(annotatedWithParams.getParameter(i)));
-                            i++;
+                        for (int i2 = 1; i2 < parameterCount; i2++) {
+                            arrayList.add(_findCreatorPropertyName(annotatedWithParams.getParameter(i2)));
                         }
                         return arrayList;
                     }
                 }
             }
-            i2++;
+            i++;
         }
         return Collections.emptyList();
     }
 
-    protected PropertyName _findCreatorPropertyName(AnnotatedParameter annotatedParameter) {
+    /* access modifiers changed from: protected */
+    public PropertyName _findCreatorPropertyName(AnnotatedParameter annotatedParameter) {
         PropertyName findNameForDeserialization = this._annotationIntrospector.findNameForDeserialization(annotatedParameter);
         if (findNameForDeserialization != null && !findNameForDeserialization.isEmpty()) {
             return findNameForDeserialization;
@@ -403,11 +407,17 @@ public class BasicBeanDescription extends BeanDescription {
     }
 
     public Class<?> findPOJOBuilder() {
-        return this._annotationIntrospector == null ? null : this._annotationIntrospector.findPOJOBuilder(this._classInfo);
+        if (this._annotationIntrospector == null) {
+            return null;
+        }
+        return this._annotationIntrospector.findPOJOBuilder(this._classInfo);
     }
 
     public JsonPOJOBuilder.Value findPOJOBuilderConfig() {
-        return this._annotationIntrospector == null ? null : this._annotationIntrospector.findPOJOBuilderConfig(this._classInfo);
+        if (this._annotationIntrospector == null) {
+            return null;
+        }
+        return this._annotationIntrospector.findPOJOBuilderConfig(this._classInfo);
     }
 
     public Converter<Object, Object> findDeserializationConverter() {
@@ -418,12 +428,15 @@ public class BasicBeanDescription extends BeanDescription {
     }
 
     public String findClassDescription() {
-        return this._annotationIntrospector == null ? null : this._annotationIntrospector.findClassDescription(this._classInfo);
+        if (this._annotationIntrospector == null) {
+            return null;
+        }
+        return this._annotationIntrospector.findClassDescription(this._classInfo);
     }
 
     @Deprecated
     public LinkedHashMap<String, AnnotatedField> _findPropertyFields(Collection<String> collection, boolean z) {
-        LinkedHashMap<String, AnnotatedField> linkedHashMap = new LinkedHashMap();
+        LinkedHashMap<String, AnnotatedField> linkedHashMap = new LinkedHashMap<>();
         for (BeanPropertyDefinition beanPropertyDefinition : _properties()) {
             AnnotatedField field = beanPropertyDefinition.getField();
             if (field != null) {
@@ -444,23 +457,23 @@ public class BasicBeanDescription extends BeanDescription {
         if (obj instanceof Converter) {
             return (Converter) obj;
         }
-        if (obj instanceof Class) {
-            Class cls = (Class) obj;
-            if (cls == None.class || ClassUtil.isBogusClass(cls)) {
-                return null;
-            }
-            if (Converter.class.isAssignableFrom(cls)) {
-                HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
-                if (handlerInstantiator != null) {
-                    converter = handlerInstantiator.converterInstance(this._config, this._classInfo, cls);
-                }
-                if (converter == null) {
-                    converter = (Converter) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
-                }
-                return converter;
-            }
+        if (!(obj instanceof Class)) {
+            throw new IllegalStateException("AnnotationIntrospector returned Converter definition of type " + obj.getClass().getName() + "; expected type Converter or Class<Converter> instead");
+        }
+        Class<None> cls = (Class) obj;
+        if (cls == None.class || ClassUtil.isBogusClass(cls)) {
+            return null;
+        }
+        if (!Converter.class.isAssignableFrom(cls)) {
             throw new IllegalStateException("AnnotationIntrospector returned Class " + cls.getName() + "; expected Class<Converter>");
         }
-        throw new IllegalStateException("AnnotationIntrospector returned Converter definition of type " + obj.getClass().getName() + "; expected type Converter or Class<Converter> instead");
+        HandlerInstantiator handlerInstantiator = this._config.getHandlerInstantiator();
+        if (handlerInstantiator != null) {
+            converter = handlerInstantiator.converterInstance(this._config, this._classInfo, cls);
+        }
+        if (converter == null) {
+            converter = (Converter) ClassUtil.createInstance(cls, this._config.canOverrideAccessModifiers());
+        }
+        return converter;
     }
 }

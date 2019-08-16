@@ -1,22 +1,23 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.media.browse.MediaBrowser;
 import android.media.browse.MediaBrowser.MediaItem;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
-@TargetApi(23)
 @RequiresApi(23)
+/* renamed from: android.support.v4.media.MediaBrowserCompatApi23 */
 class MediaBrowserCompatApi23 {
 
+    /* renamed from: android.support.v4.media.MediaBrowserCompatApi23$ItemCallback */
     interface ItemCallback {
         void onError(@NonNull String str);
 
         void onItemLoaded(Parcel parcel);
     }
 
+    /* renamed from: android.support.v4.media.MediaBrowserCompatApi23$ItemCallbackProxy */
     static class ItemCallbackProxy<T extends ItemCallback> extends android.media.browse.MediaBrowser.ItemCallback {
         protected final T mItemCallback;
 
@@ -29,6 +30,10 @@ class MediaBrowserCompatApi23 {
         }
 
         public void onItemLoaded(MediaItem mediaItem) {
+            if (mediaItem == null) {
+                this.mItemCallback.onItemLoaded(null);
+                return;
+            }
             Parcel obtain = Parcel.obtain();
             mediaItem.writeToParcel(obtain, 0);
             this.mItemCallback.onItemLoaded(obtain);

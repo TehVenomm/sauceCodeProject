@@ -8,7 +8,7 @@ public class Coop_Model_PlayerWarp : Coop_Model_ObjectSyncPositionBase
 	public override bool IsHandleable(StageObject owner)
 	{
 		Character character = owner as Character;
-		if (!character.IsChangeableAction((Character.ACTION_ID)34))
+		if (!character.IsChangeableAction((Character.ACTION_ID)36))
 		{
 			return false;
 		}

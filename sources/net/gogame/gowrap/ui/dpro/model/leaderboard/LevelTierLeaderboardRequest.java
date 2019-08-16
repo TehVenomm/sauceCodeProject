@@ -1,9 +1,13 @@
-package net.gogame.gowrap.ui.dpro.model.leaderboard;
+package net.gogame.gowrap.p019ui.dpro.model.leaderboard;
 
-import net.gogame.gowrap.ui.dpro.model.PageRequest;
+import net.gogame.gowrap.p019ui.dpro.model.PageRequest;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.leaderboard.LevelTierLeaderboardRequest */
 public class LevelTierLeaderboardRequest extends PageRequest implements LeaderboardRequest {
     private Integer levelTier;
+
+    public LevelTierLeaderboardRequest() {
+    }
 
     public LevelTierLeaderboardRequest(int i, int i2) {
         super(i, i2);

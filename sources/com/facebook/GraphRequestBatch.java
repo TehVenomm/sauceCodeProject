@@ -13,7 +13,9 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
     private String batchApplicationId;
     private Handler callbackHandler;
     private List<Callback> callbacks;
-    private final String id;
+
+    /* renamed from: id */
+    private final String f387id;
     private List<GraphRequest> requests;
     private int timeoutInMilliseconds;
 
@@ -28,7 +30,7 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
     public GraphRequestBatch() {
         this.requests = new ArrayList();
         this.timeoutInMilliseconds = 0;
-        this.id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
+        this.f387id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
         this.callbacks = new ArrayList();
         this.requests = new ArrayList();
     }
@@ -36,7 +38,7 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
     public GraphRequestBatch(GraphRequestBatch graphRequestBatch) {
         this.requests = new ArrayList();
         this.timeoutInMilliseconds = 0;
-        this.id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
+        this.f387id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
         this.callbacks = new ArrayList();
         this.requests = new ArrayList(graphRequestBatch);
         this.callbackHandler = graphRequestBatch.callbackHandler;
@@ -47,7 +49,7 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
     public GraphRequestBatch(Collection<GraphRequest> collection) {
         this.requests = new ArrayList();
         this.timeoutInMilliseconds = 0;
-        this.id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
+        this.f387id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
         this.callbacks = new ArrayList();
         this.requests = new ArrayList(collection);
     }
@@ -55,7 +57,7 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
     public GraphRequestBatch(GraphRequest... graphRequestArr) {
         this.requests = new ArrayList();
         this.timeoutInMilliseconds = 0;
-        this.id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
+        this.f387id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
         this.callbacks = new ArrayList();
         this.requests = Arrays.asList(graphRequestArr);
     }
@@ -82,7 +84,8 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
         return executeAndWaitImpl();
     }
 
-    List<GraphResponse> executeAndWaitImpl() {
+    /* access modifiers changed from: 0000 */
+    public List<GraphResponse> executeAndWaitImpl() {
         return GraphRequest.executeBatchAndWait(this);
     }
 
@@ -90,7 +93,8 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
         return executeAsyncImpl();
     }
 
-    GraphRequestAsyncTask executeAsyncImpl() {
+    /* access modifiers changed from: 0000 */
+    public GraphRequestAsyncTask executeAsyncImpl() {
         return GraphRequest.executeBatchAsync(this);
     }
 
@@ -102,19 +106,23 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
         return this.batchApplicationId;
     }
 
-    final Handler getCallbackHandler() {
+    /* access modifiers changed from: 0000 */
+    public final Handler getCallbackHandler() {
         return this.callbackHandler;
     }
 
-    final List<Callback> getCallbacks() {
+    /* access modifiers changed from: 0000 */
+    public final List<Callback> getCallbacks() {
         return this.callbacks;
     }
 
-    final String getId() {
-        return this.id;
+    /* access modifiers changed from: 0000 */
+    public final String getId() {
+        return this.f387id;
     }
 
-    final List<GraphRequest> getRequests() {
+    /* access modifiers changed from: 0000 */
+    public final List<GraphRequest> getRequests() {
         return this.requests;
     }
 
@@ -138,7 +146,8 @@ public class GraphRequestBatch extends AbstractList<GraphRequest> {
         this.batchApplicationId = str;
     }
 
-    final void setCallbackHandler(Handler handler) {
+    /* access modifiers changed from: 0000 */
+    public final void setCallbackHandler(Handler handler) {
         this.callbackHandler = handler;
     }
 

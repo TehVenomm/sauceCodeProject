@@ -93,7 +93,8 @@ public class TypeBindings implements Serializable {
         return EMPTY;
     }
 
-    protected Object readResolve() {
+    /* access modifiers changed from: protected */
+    public Object readResolve() {
         if (this._names == null || this._names.length == 0) {
             return EMPTY;
         }
@@ -101,39 +102,35 @@ public class TypeBindings implements Serializable {
     }
 
     public static TypeBindings create(Class<?> cls, List<JavaType> list) {
-        JavaType[] javaTypeArr = (list == null || list.isEmpty()) ? NO_TYPES : (JavaType[]) list.toArray(new JavaType[list.size()]);
-        return create((Class) cls, javaTypeArr);
+        return create(cls, (list == null || list.isEmpty()) ? NO_TYPES : (JavaType[]) list.toArray(new JavaType[list.size()]));
     }
 
     public static TypeBindings create(Class<?> cls, JavaType[] javaTypeArr) {
         String[] strArr;
-        int i = 0;
-        if (javaTypeArr != null) {
+        String str;
+        if (javaTypeArr == null) {
+            javaTypeArr = NO_TYPES;
+        } else {
             switch (javaTypeArr.length) {
                 case 1:
-                    return create((Class) cls, javaTypeArr[0]);
+                    return create(cls, javaTypeArr[0]);
                 case 2:
                     return create(cls, javaTypeArr[0], javaTypeArr[1]);
-                default:
-                    break;
             }
         }
-        javaTypeArr = NO_TYPES;
         TypeVariable[] typeParameters = cls.getTypeParameters();
         if (typeParameters == null || typeParameters.length == 0) {
             strArr = NO_STRINGS;
         } else {
             int length = typeParameters.length;
             strArr = new String[length];
-            while (i < length) {
+            for (int i = 0; i < length; i++) {
                 strArr[i] = typeParameters[i].getName();
-                i++;
             }
         }
         if (strArr.length == javaTypeArr.length) {
             return new TypeBindings(strArr, javaTypeArr, null);
         }
-        String str;
         StringBuilder append = new StringBuilder().append("Can not create TypeBindings for class ").append(cls.getName()).append(" with ").append(javaTypeArr.length).append(" type parameter");
         if (javaTypeArr.length == 1) {
             str = "";
@@ -200,9 +197,8 @@ public class TypeBindings implements Serializable {
     }
 
     public JavaType findBoundType(String str) {
-        int i = 0;
         int length = this._names.length;
-        while (i < length) {
+        for (int i = 0; i < length; i++) {
             if (str.equals(this._names[i])) {
                 JavaType javaType = this._types[i];
                 if (!(javaType instanceof ResolvedRecursiveType)) {
@@ -210,8 +206,6 @@ public class TypeBindings implements Serializable {
                 }
                 JavaType selfReferencedType = ((ResolvedRecursiveType) javaType).getSelfReferencedType();
                 return selfReferencedType != null ? selfReferencedType : javaType;
-            } else {
-                i++;
             }
         }
         return null;
@@ -263,17 +257,17 @@ public class TypeBindings implements Serializable {
         if (this._types.length == 0) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('<');
+        StringBuilder sb = new StringBuilder();
+        sb.append('<');
         int length = this._types.length;
         for (int i = 0; i < length; i++) {
             if (i > 0) {
-                stringBuilder.append(',');
+                sb.append(',');
             }
-            stringBuilder.append(this._types[i].getGenericSignature());
+            sb.append(this._types[i].getGenericSignature());
         }
-        stringBuilder.append('>');
-        return stringBuilder.toString();
+        sb.append('>');
+        return sb.toString();
     }
 
     public int hashCode() {
@@ -301,7 +295,8 @@ public class TypeBindings implements Serializable {
         return true;
     }
 
-    protected JavaType[] typeParameterArray() {
+    /* access modifiers changed from: protected */
+    public JavaType[] typeParameterArray() {
         return this._types;
     }
 }

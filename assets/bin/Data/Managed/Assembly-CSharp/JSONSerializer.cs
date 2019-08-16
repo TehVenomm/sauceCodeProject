@@ -36,7 +36,7 @@ public static class JSONSerializer
 
 	private static string GetName(FieldInfo fi)
 	{
-		FormerlySerializedAsAttribute val = fi.GetCustomAttributes(typeof(FormerlySerializedAsAttribute), false).FirstOrDefault() as FormerlySerializedAsAttribute;
+		FormerlySerializedAsAttribute val = fi.GetCustomAttributes(typeof(FormerlySerializedAsAttribute), inherit: false).FirstOrDefault() as FormerlySerializedAsAttribute;
 		if (val == null)
 		{
 			return fi.Name;
@@ -51,8 +51,8 @@ public static class JSONSerializer
 		{
 			if (!f.IsPublic)
 			{
-				string typeName = f.FieldType.ToString();
-				if (typeName != "XorInt" && typeName != "XorUInt" && typeName != "XorFloat")
+				string a = f.FieldType.ToString();
+				if (a != "XorInt" && a != "XorUInt" && a != "XorFloat")
 				{
 					continue;
 				}
@@ -63,11 +63,11 @@ public static class JSONSerializer
 
 	private static void SerializeObject(JSONOutStream stream, Type type, object message)
 	{
-		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0292: Unknown result type (might be due to invalid IL or missing references)
 		MethodInfo method = type.GetMethod("ToJSON");
 		if (method != null)
 		{
@@ -75,171 +75,165 @@ public static class JSONSerializer
 			{
 				stream
 			});
+			return;
 		}
-		else
+		IEnumerable<FieldInfo> targetFields = GetTargetFields(type);
+		foreach (FieldInfo item in targetFields)
 		{
-			IEnumerable<FieldInfo> targetFields = GetTargetFields(type);
-			foreach (FieldInfo item in targetFields)
+			switch (item.FieldType.ToString())
 			{
-				switch (item.FieldType.ToString())
+			case "System.String":
+				stream.Content(GetName(item), (string)item.GetValue(message));
+				break;
+			case "System.Single":
+				stream.Content(GetName(item), (XorFloat)(float)item.GetValue(message));
+				break;
+			case "System.Double":
+				stream.Content(GetName(item), (double)item.GetValue(message));
+				break;
+			case "System.Int32":
+				stream.Content(GetName(item), (int)item.GetValue(message));
+				break;
+			case "System.Boolean":
+				stream.Content(GetName(item), (bool)item.GetValue(message));
+				break;
+			case "UnityEngine.Vector3":
+				stream.Content(GetName(item), (Vector3)item.GetValue(message));
+				break;
+			case "UnityEngine.Quaternion":
+				stream.Content(GetName(item), (Quaternion)item.GetValue(message));
+				break;
+			case "UnityEngine.Color":
+				stream.Content(GetName(item), (Color)item.GetValue(message));
+				break;
+			case "UnityEngine.Rect":
+				stream.Content(GetName(item), (Rect)item.GetValue(message));
+				break;
+			case "UnityEngine.Vector2":
+				stream.Content(GetName(item), (Vector2)item.GetValue(message));
+				break;
+			case "XorInt":
+				stream.Content(GetName(item), item.GetValue(message) as XorInt);
+				break;
+			case "XorUInt":
+				stream.Content(GetName(item), item.GetValue(message) as XorUInt);
+				break;
+			case "XorFloat":
+				stream.Content(GetName(item), item.GetValue(message) as XorFloat);
+				break;
+			default:
+				if (item.FieldType.IsEnum)
 				{
-				case "System.String":
-					stream.Content(GetName(item), (string)item.GetValue(message));
-					break;
-				case "System.Single":
-					stream.Content(GetName(item), (XorFloat)(float)item.GetValue(message));
-					break;
-				case "System.Double":
-					stream.Content(GetName(item), (double)item.GetValue(message));
-					break;
-				case "System.Int32":
-					stream.Content(GetName(item), (int)item.GetValue(message));
-					break;
-				case "System.Boolean":
-					stream.Content(GetName(item), (bool)item.GetValue(message));
-					break;
-				case "UnityEngine.Vector3":
-					stream.Content(GetName(item), (Vector3)item.GetValue(message));
-					break;
-				case "UnityEngine.Quaternion":
-					stream.Content(GetName(item), (Quaternion)item.GetValue(message));
-					break;
-				case "UnityEngine.Color":
-					stream.Content(GetName(item), (Color)item.GetValue(message));
-					break;
-				case "UnityEngine.Rect":
-					stream.Content(GetName(item), (Rect)item.GetValue(message));
-					break;
-				case "UnityEngine.Vector2":
-					stream.Content(GetName(item), (Vector2)item.GetValue(message));
-					break;
-				case "XorInt":
-					stream.Content(GetName(item), item.GetValue(message) as XorInt);
-					break;
-				case "XorUInt":
-					stream.Content(GetName(item), item.GetValue(message) as XorUInt);
-					break;
-				case "XorFloat":
-					stream.Content(GetName(item), item.GetValue(message) as XorFloat);
-					break;
-				default:
-					if (item.FieldType.IsEnum)
-					{
-						stream.Content(GetName(item), item.GetValue(message).ToString());
-					}
-					else if (item.FieldType.IsGenericType)
-					{
-						Type type2 = item.FieldType.GetGenericArguments()[0];
-						Type typeFromHandle = typeof(List<>);
-						Type type3 = typeFromHandle.MakeGenericType(type2);
-						PropertyInfo property = type3.GetProperty("Count");
-						PropertyInfo property2 = type3.GetProperty("Item");
-						int num = (int)property.GetValue(item.GetValue(message), new object[0]);
-						stream.List(GetName(item));
-						for (int i = 0; i < num; i++)
-						{
-							object value = property2.GetValue(item.GetValue(message), new object[1]
-							{
-								i
-							});
-							SerializeListElement(stream, type2, value, i);
-						}
-						stream.End();
-					}
-					else if (item.FieldType.IsArray)
-					{
-						object[] array = ToObjectArray((IEnumerable)item.GetValue(message));
-						Type type4 = Type.GetTypeArray(array)[0];
-						stream.List(GetName(item));
-						for (int j = 0; j < array.Length; j++)
-						{
-							object message2 = array[j];
-							SerializeListElement(stream, type4, message2, j);
-						}
-						stream.End();
-					}
-					else
-					{
-						stream.Start(GetName(item));
-						SerializeObject(stream, item.FieldType, item.GetValue(message));
-						stream.End();
-					}
-					break;
+					stream.Content(GetName(item), item.GetValue(message).ToString());
 				}
+				else if (item.FieldType.IsGenericType)
+				{
+					Type type2 = item.FieldType.GetGenericArguments()[0];
+					Type typeFromHandle = typeof(List<>);
+					Type type3 = typeFromHandle.MakeGenericType(type2);
+					PropertyInfo property = type3.GetProperty("Count");
+					PropertyInfo property2 = type3.GetProperty("Item");
+					int num = (int)property.GetValue(item.GetValue(message), new object[0]);
+					stream.List(GetName(item));
+					for (int i = 0; i < num; i++)
+					{
+						object value = property2.GetValue(item.GetValue(message), new object[1]
+						{
+							i
+						});
+						SerializeListElement(stream, type2, value, i);
+					}
+					stream.End();
+				}
+				else if (item.FieldType.IsArray)
+				{
+					object[] array = ToObjectArray((IEnumerable)item.GetValue(message));
+					Type type4 = Type.GetTypeArray(array)[0];
+					stream.List(GetName(item));
+					for (int j = 0; j < array.Length; j++)
+					{
+						object message2 = array[j];
+						SerializeListElement(stream, type4, message2, j);
+					}
+					stream.End();
+				}
+				else
+				{
+					stream.Start(GetName(item));
+					SerializeObject(stream, item.FieldType, item.GetValue(message));
+					stream.End();
+				}
+				break;
 			}
 		}
 	}
 
 	private static void SerializeListElement(JSONOutStream stream, Type type, object message, int i)
 	{
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-		if (!type.IsEnum)
-		{
-			switch (type.ToString())
-			{
-			case "System.String":
-				stream.Content(i, (string)message);
-				break;
-			case "System.Single":
-				stream.Content(i, (XorFloat)(float)message);
-				break;
-			case "System.Double":
-				stream.Content(i, (double)message);
-				break;
-			case "System.Int32":
-				stream.Content(i, (int)message);
-				break;
-			case "System.Boolean":
-				stream.Content(i, (bool)message);
-				break;
-			case "UnityEngine.Vector3":
-				stream.Content(i, (Vector3)message);
-				break;
-			case "UnityEngine.Quaternion":
-				stream.Content(i, (Quaternion)message);
-				break;
-			case "UnityEngine.Color":
-				stream.Content(i, (Color)message);
-				break;
-			case "UnityEngine.Rect":
-				stream.Content(i, (Rect)message);
-				break;
-			case "UnityEngine.Vector2":
-				stream.Content(i, (Vector2)message);
-				break;
-			case "XorInt":
-				stream.Content(i, new XorInt((int)message));
-				break;
-			case "XorUInt":
-				stream.Content(i, new XorUInt((uint)message));
-				break;
-			case "XorFloat":
-				stream.Content(i, new XorFloat((float)message));
-				break;
-			default:
-				stream.Start(i);
-				SerializeObject(stream, type, message);
-				stream.End();
-				break;
-			}
-		}
-		else
+		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+		if (type.IsEnum)
 		{
 			stream.Content(i, (int)message);
+			return;
 		}
+		switch (type.ToString())
+		{
+		case "System.String":
+			stream.Content(i, (string)message);
+			return;
+		case "System.Single":
+			stream.Content(i, (XorFloat)(float)message);
+			return;
+		case "System.Double":
+			stream.Content(i, (double)message);
+			return;
+		case "System.Int32":
+			stream.Content(i, (int)message);
+			return;
+		case "System.Boolean":
+			stream.Content(i, (bool)message);
+			return;
+		case "UnityEngine.Vector3":
+			stream.Content(i, (Vector3)message);
+			return;
+		case "UnityEngine.Quaternion":
+			stream.Content(i, (Quaternion)message);
+			return;
+		case "UnityEngine.Color":
+			stream.Content(i, (Color)message);
+			return;
+		case "UnityEngine.Rect":
+			stream.Content(i, (Rect)message);
+			return;
+		case "UnityEngine.Vector2":
+			stream.Content(i, (Vector2)message);
+			return;
+		case "XorInt":
+			stream.Content(i, new XorInt((int)message));
+			return;
+		case "XorUInt":
+			stream.Content(i, new XorUInt((uint)message));
+			return;
+		case "XorFloat":
+			stream.Content(i, new XorFloat((float)message));
+			return;
+		}
+		stream.Start(i);
+		SerializeObject(stream, type, message);
+		stream.End();
 	}
 
 	private static object DeserializeObject(JSONInStream stream, Type type)
 	{
-		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0361: Unknown result type (might be due to invalid IL or missing references)
 		MethodInfo method = type.GetMethod("FromJSON");
 		if (method != null)
 		{
@@ -406,72 +400,85 @@ public static class JSONSerializer
 	private static object[] ToObjectArray(IEnumerable enumerableObject)
 	{
 		List<object> list = new List<object>();
-		foreach (object item in enumerableObject)
+		IEnumerator enumerator = enumerableObject.GetEnumerator();
+		try
 		{
-			list.Add(item);
+			while (enumerator.MoveNext())
+			{
+				object current = enumerator.Current;
+				list.Add(current);
+			}
+		}
+		finally
+		{
+			IDisposable disposable;
+			if ((disposable = (enumerator as IDisposable)) != null)
+			{
+				disposable.Dispose();
+			}
 		}
 		return list.ToArray();
 	}
 
 	private static object DeserializeListElement(JSONInStream stream, Type type)
 	{
-		//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-		if (!type.IsEnum)
+		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+		if (type.IsEnum)
 		{
-			switch (type.ToString())
-			{
-			case "System.String":
-				stream.Content(0, out string value13);
-				return value13;
-			case "System.Single":
-				stream.Content(0, out float value12);
-				return value12;
-			case "System.Double":
-				stream.Content(0, out double value11);
-				return value11;
-			case "System.Int32":
-				stream.Content(0, out int value10);
-				return value10;
-			case "System.Boolean":
-				stream.Content(0, out bool value9);
-				return value9;
-			case "UnityEngine.Vector3":
-				stream.Content(0, out Vector3 value8);
-				return value8;
-			case "UnityEngine.Quaternion":
-				stream.Content(0, out Quaternion value7);
-				return value7;
-			case "UnityEngine.Color":
-				stream.Content(0, out Color value6);
-				return value6;
-			case "UnityEngine.Rect":
-				stream.Content(0, out Rect value5);
-				return value5;
-			case "UnityEngine.Vector2":
-				stream.Content(0, out Vector2 value4);
-				return value4;
-			case "XorInt":
-				stream.Content(0, out XorInt value3);
-				return value3;
-			case "XorUInt":
-				stream.Content(0, out XorUInt value2);
-				return value2;
-			case "XorFloat":
-				stream.Content(0, out XorFloat value);
-				return value;
-			default:
-			{
-				object result = DeserializeObject(stream, type);
-				stream.End();
-				return result;
-			}
-			}
+			stream.Content(0, out int value);
+			return Enum.Parse(type, value.ToString());
 		}
-		stream.Content(0, out int value14);
-		return Enum.Parse(type, value14.ToString());
+		switch (type.ToString())
+		{
+		case "System.String":
+			stream.Content(0, out string value14);
+			return value14;
+		case "System.Single":
+			stream.Content(0, out float value13);
+			return value13;
+		case "System.Double":
+			stream.Content(0, out double value12);
+			return value12;
+		case "System.Int32":
+			stream.Content(0, out int value11);
+			return value11;
+		case "System.Boolean":
+			stream.Content(0, out bool value10);
+			return value10;
+		case "UnityEngine.Vector3":
+			stream.Content(0, out Vector3 value9);
+			return value9;
+		case "UnityEngine.Quaternion":
+			stream.Content(0, out Quaternion value8);
+			return value8;
+		case "UnityEngine.Color":
+			stream.Content(0, out Color value7);
+			return value7;
+		case "UnityEngine.Rect":
+			stream.Content(0, out Rect value6);
+			return value6;
+		case "UnityEngine.Vector2":
+			stream.Content(0, out Vector2 value5);
+			return value5;
+		case "XorInt":
+			stream.Content(0, out XorInt value4);
+			return value4;
+		case "XorUInt":
+			stream.Content(0, out XorUInt value3);
+			return value3;
+		case "XorFloat":
+			stream.Content(0, out XorFloat value2);
+			return value2;
+		default:
+		{
+			object result = DeserializeObject(stream, type);
+			stream.End();
+			return result;
+		}
+		}
 	}
 }

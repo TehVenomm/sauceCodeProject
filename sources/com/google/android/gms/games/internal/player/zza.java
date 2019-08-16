@@ -5,15 +5,15 @@ import android.os.Parcelable;
 import com.google.android.gms.common.data.Freezable;
 
 public interface zza extends Parcelable, Freezable<zza> {
-    String zzari();
+    String zzdb();
 
-    String zzarj();
+    String zzdc();
 
-    long zzark();
+    long zzdd();
 
-    Uri zzarl();
+    Uri zzde();
 
-    Uri zzarm();
+    Uri zzdf();
 
-    Uri zzarn();
+    Uri zzdg();
 }

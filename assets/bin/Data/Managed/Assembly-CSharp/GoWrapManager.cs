@@ -1,5 +1,6 @@
 using gogame;
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,6 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 {
 	private void Start()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		GoWrap.INSTANCE.setDelegate(this);
 		GoWrap.INSTANCE.initGoWrap(this.get_name());
 		this.get_gameObject().AddComponent<GoWrapComponent>();
@@ -57,6 +57,28 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 				GameSaveData.instance.SetPushedTrackTutorialBit(stepName);
 			}
 		}
+	}
+
+	public void SendStatusTracking(TRACK_TUTORIAL_STEP_BIT _stepName, string _category, Dictionary<string, object> dictionary = null, Action<bool> call_back = null)
+	{
+		Protocol.Force(delegate
+		{
+			Debug.LogWarning((object)"SendStatusTracking Called!");
+			AnalyticTrackingPointModel.RequestSendForm postData = new AnalyticTrackingPointModel.RequestSendForm
+			{
+				name = _stepName.ToString(),
+				category = _category
+			};
+			Protocol.SendAsync(AnalyticTrackingPointModel.URL, postData, delegate(AnalyticTrackingPointModel ret)
+			{
+				bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
+				if (call_back != null)
+				{
+					call_back(obj);
+				}
+				Debug.LogWarning((object)"SendStatusTracking Bit Success!");
+			}, string.Empty);
+		});
 	}
 
 	public void trackEvent(string name, string category)

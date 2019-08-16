@@ -6,12 +6,15 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.Versioned;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 public class VersionUtil {
     private static final Pattern V_SEP = Pattern.compile("[-_./;:]");
-    private final Version _v;
+
+    /* renamed from: _v */
+    private final Version f424_v;
 
     protected VersionUtil() {
         Version version = null;
@@ -23,11 +26,11 @@ public class VersionUtil {
         if (version == null) {
             version = Version.unknownVersion();
         }
-        this._v = version;
+        this.f424_v = version;
     }
 
     public Version version() {
-        return this._v;
+        return this.f424_v;
     }
 
     public static Version versionFor(Class<?> cls) {
@@ -36,8 +39,8 @@ public class VersionUtil {
     }
 
     public static Version packageVersionFor(Class<?> cls) {
-        Class cls2;
         Version version;
+        Class cls2;
         try {
             cls2 = Class.forName(cls.getPackage().getName() + ".PackageVersion", true, cls.getClassLoader());
             version = ((Versioned) cls2.newInstance()).version();
@@ -51,16 +54,13 @@ public class VersionUtil {
 
     @Deprecated
     public static Version mavenVersionFor(ClassLoader classLoader, String str, String str2) {
-        Closeable resourceAsStream = classLoader.getResourceAsStream("META-INF/maven/" + str.replaceAll("\\.", Constants.URL_PATH_DELIMITER) + Constants.URL_PATH_DELIMITER + str2 + "/pom.properties");
+        InputStream resourceAsStream = classLoader.getResourceAsStream("META-INF/maven/" + str.replaceAll("\\.", Constants.URL_PATH_DELIMITER) + Constants.URL_PATH_DELIMITER + str2 + "/pom.properties");
         if (resourceAsStream != null) {
-            Version parseVersion;
             try {
                 Properties properties = new Properties();
                 properties.load(resourceAsStream);
-                parseVersion = parseVersion(properties.getProperty(ServerProtocol.FALLBACK_DIALOG_PARAM_VERSION), properties.getProperty("groupId"), properties.getProperty("artifactId"));
-                return parseVersion;
+                return parseVersion(properties.getProperty(ServerProtocol.FALLBACK_DIALOG_PARAM_VERSION), properties.getProperty("groupId"), properties.getProperty("artifactId"));
             } catch (IOException e) {
-                parseVersion = e;
             } finally {
                 _close(resourceAsStream);
             }
@@ -71,31 +71,31 @@ public class VersionUtil {
     public static Version parseVersion(String str, String str2, String str3) {
         int i = 0;
         if (str != null) {
-            CharSequence trim = str.trim();
+            String trim = str.trim();
             if (trim.length() > 0) {
                 String[] split = V_SEP.split(trim);
                 int parseVersionPart = parseVersionPart(split[0]);
-                int parseVersionPart2 = split.length > 1 ? parseVersionPart(split[1]) : 0;
+                int i2 = split.length > 1 ? parseVersionPart(split[1]) : 0;
                 if (split.length > 2) {
                     i = parseVersionPart(split[2]);
                 }
-                return new Version(parseVersionPart, parseVersionPart2, i, split.length > 3 ? split[3] : null, str2, str3);
+                return new Version(parseVersionPart, i2, i, split.length > 3 ? split[3] : null, str2, str3);
             }
         }
         return Version.unknownVersion();
     }
 
     protected static int parseVersionPart(String str) {
-        int i = 0;
         int length = str.length();
+        int i = 0;
         int i2 = 0;
         while (i < length) {
             char charAt = str.charAt(i);
             if (charAt > '9' || charAt < '0') {
                 break;
             }
-            i2 = (i2 * 10) + (charAt - 48);
             i++;
+            i2 = (charAt - '0') + (i2 * 10);
         }
         return i2;
     }

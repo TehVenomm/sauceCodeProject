@@ -10,7 +10,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class EqualsBuilder implements Builder<Boolean> {
-    private static final ThreadLocal<Set<Pair<IDKey, IDKey>>> REGISTRY = new ThreadLocal();
+    private static final ThreadLocal<Set<Pair<IDKey, IDKey>>> REGISTRY = new ThreadLocal<>();
     private boolean isEquals = true;
 
     static Set<Pair<IDKey, IDKey>> getRegistry() {
@@ -18,13 +18,13 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     static Pair<IDKey, IDKey> getRegisterPair(Object obj, Object obj2) {
-        return Pair.of(new IDKey(obj), new IDKey(obj2));
+        return Pair.m1019of(new IDKey(obj), new IDKey(obj2));
     }
 
     static boolean isRegistered(Object obj, Object obj2) {
         Set registry = getRegistry();
         Pair registerPair = getRegisterPair(obj, obj2);
-        return registry != null && (registry.contains(registerPair) || registry.contains(Pair.of(registerPair.getLeft(), registerPair.getRight())));
+        return registry != null && (registry.contains(registerPair) || registry.contains(Pair.m1019of(registerPair.getLeft(), registerPair.getRight())));
     }
 
     static void register(Object obj, Object obj2) {
@@ -41,8 +41,8 @@ public class EqualsBuilder implements Builder<Boolean> {
         if (registry != null) {
             registry.remove(getRegisterPair(obj, obj2));
             synchronized (EqualsBuilder.class) {
-                registry = getRegistry();
-                if (registry != null && registry.isEmpty()) {
+                Set registry2 = getRegistry();
+                if (registry2 != null && registry2.isEmpty()) {
                     REGISTRY.remove();
                 }
             }
@@ -50,7 +50,7 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public static boolean reflectionEquals(Object obj, Object obj2, Collection<String> collection) {
-        return reflectionEquals(obj, obj2, ReflectionToStringBuilder.toNoNullStringArray((Collection) collection));
+        return reflectionEquals(obj, obj2, ReflectionToStringBuilder.toNoNullStringArray(collection));
     }
 
     public static boolean reflectionEquals(Object obj, Object obj2, String... strArr) {
@@ -102,11 +102,11 @@ public class EqualsBuilder implements Builder<Boolean> {
         if (!isRegistered(obj, obj2)) {
             try {
                 register(obj, obj2);
-                AccessibleObject[] declaredFields = cls.getDeclaredFields();
+                Field[] declaredFields = cls.getDeclaredFields();
                 AccessibleObject.setAccessible(declaredFields, true);
                 for (int i = 0; i < declaredFields.length && equalsBuilder.isEquals; i++) {
                     Field field = declaredFields[i];
-                    if (!ArrayUtils.contains((Object[]) strArr, field.getName()) && field.getName().indexOf(36) == -1 && ((z || !Modifier.isTransient(field.getModifiers())) && !Modifier.isStatic(field.getModifiers()))) {
+                    if (!ArrayUtils.contains((Object[]) strArr, (Object) field.getName()) && field.getName().indexOf(36) == -1 && ((z || !Modifier.isTransient(field.getModifiers())) && !Modifier.isStatic(field.getModifiers()))) {
                         equalsBuilder.append(field.get(obj), field.get(obj2));
                     }
                 }
@@ -115,6 +115,7 @@ public class EqualsBuilder implements Builder<Boolean> {
                 throw new InternalError("Unexpected IllegalAccessException");
             } catch (Throwable th) {
                 unregister(obj, obj2);
+                throw th;
             }
         }
     }
@@ -208,16 +209,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(Object[] objArr, Object[] objArr2) {
-        int i = 0;
         if (this.isEquals && objArr != objArr2) {
             if (objArr == null || objArr2 == null) {
                 setEquals(false);
             } else if (objArr.length != objArr2.length) {
                 setEquals(false);
             } else {
-                while (i < objArr.length && this.isEquals) {
+                for (int i = 0; i < objArr.length && this.isEquals; i++) {
                     append(objArr[i], objArr2[i]);
-                    i++;
                 }
             }
         }
@@ -225,16 +224,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(long[] jArr, long[] jArr2) {
-        int i = 0;
         if (this.isEquals && jArr != jArr2) {
             if (jArr == null || jArr2 == null) {
                 setEquals(false);
             } else if (jArr.length != jArr2.length) {
                 setEquals(false);
             } else {
-                while (i < jArr.length && this.isEquals) {
+                for (int i = 0; i < jArr.length && this.isEquals; i++) {
                     append(jArr[i], jArr2[i]);
-                    i++;
                 }
             }
         }
@@ -242,16 +239,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(int[] iArr, int[] iArr2) {
-        int i = 0;
         if (this.isEquals && iArr != iArr2) {
             if (iArr == null || iArr2 == null) {
                 setEquals(false);
             } else if (iArr.length != iArr2.length) {
                 setEquals(false);
             } else {
-                while (i < iArr.length && this.isEquals) {
+                for (int i = 0; i < iArr.length && this.isEquals; i++) {
                     append(iArr[i], iArr2[i]);
-                    i++;
                 }
             }
         }
@@ -259,16 +254,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(short[] sArr, short[] sArr2) {
-        int i = 0;
         if (this.isEquals && sArr != sArr2) {
             if (sArr == null || sArr2 == null) {
                 setEquals(false);
             } else if (sArr.length != sArr2.length) {
                 setEquals(false);
             } else {
-                while (i < sArr.length && this.isEquals) {
+                for (int i = 0; i < sArr.length && this.isEquals; i++) {
                     append(sArr[i], sArr2[i]);
-                    i++;
                 }
             }
         }
@@ -276,16 +269,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(char[] cArr, char[] cArr2) {
-        int i = 0;
         if (this.isEquals && cArr != cArr2) {
             if (cArr == null || cArr2 == null) {
                 setEquals(false);
             } else if (cArr.length != cArr2.length) {
                 setEquals(false);
             } else {
-                while (i < cArr.length && this.isEquals) {
+                for (int i = 0; i < cArr.length && this.isEquals; i++) {
                     append(cArr[i], cArr2[i]);
-                    i++;
                 }
             }
         }
@@ -293,16 +284,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(byte[] bArr, byte[] bArr2) {
-        int i = 0;
         if (this.isEquals && bArr != bArr2) {
             if (bArr == null || bArr2 == null) {
                 setEquals(false);
             } else if (bArr.length != bArr2.length) {
                 setEquals(false);
             } else {
-                while (i < bArr.length && this.isEquals) {
+                for (int i = 0; i < bArr.length && this.isEquals; i++) {
                     append(bArr[i], bArr2[i]);
-                    i++;
                 }
             }
         }
@@ -310,16 +299,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(double[] dArr, double[] dArr2) {
-        int i = 0;
         if (this.isEquals && dArr != dArr2) {
             if (dArr == null || dArr2 == null) {
                 setEquals(false);
             } else if (dArr.length != dArr2.length) {
                 setEquals(false);
             } else {
-                while (i < dArr.length && this.isEquals) {
+                for (int i = 0; i < dArr.length && this.isEquals; i++) {
                     append(dArr[i], dArr2[i]);
-                    i++;
                 }
             }
         }
@@ -327,16 +314,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(float[] fArr, float[] fArr2) {
-        int i = 0;
         if (this.isEquals && fArr != fArr2) {
             if (fArr == null || fArr2 == null) {
                 setEquals(false);
             } else if (fArr.length != fArr2.length) {
                 setEquals(false);
             } else {
-                while (i < fArr.length && this.isEquals) {
+                for (int i = 0; i < fArr.length && this.isEquals; i++) {
                     append(fArr[i], fArr2[i]);
-                    i++;
                 }
             }
         }
@@ -344,16 +329,14 @@ public class EqualsBuilder implements Builder<Boolean> {
     }
 
     public EqualsBuilder append(boolean[] zArr, boolean[] zArr2) {
-        int i = 0;
         if (this.isEquals && zArr != zArr2) {
             if (zArr == null || zArr2 == null) {
                 setEquals(false);
             } else if (zArr.length != zArr2.length) {
                 setEquals(false);
             } else {
-                while (i < zArr.length && this.isEquals) {
+                for (int i = 0; i < zArr.length && this.isEquals; i++) {
                     append(zArr[i], zArr2[i]);
-                    i++;
                 }
             }
         }
@@ -368,7 +351,8 @@ public class EqualsBuilder implements Builder<Boolean> {
         return Boolean.valueOf(isEquals());
     }
 
-    protected void setEquals(boolean z) {
+    /* access modifiers changed from: protected */
+    public void setEquals(boolean z) {
         this.isEquals = z;
     }
 

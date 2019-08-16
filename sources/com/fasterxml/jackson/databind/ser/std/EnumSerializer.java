@@ -18,12 +18,12 @@ import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.util.EnumValues;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 @JacksonStdImpl
 public class EnumSerializer extends StdScalarSerializer<Enum<?>> implements ContextualSerializer {
@@ -79,7 +79,7 @@ public class EnumSerializer extends StdScalarSerializer<Enum<?>> implements Cont
         if (_serializeAsIndex(serializerProvider)) {
             return createSchemaNode("integer", true);
         }
-        JsonNode createSchemaNode = createSchemaNode("string", true);
+        ObjectNode createSchemaNode = createSchemaNode("string", true);
         if (type != null && serializerProvider.constructType(type).isEnumType()) {
             ArrayNode putArray = createSchemaNode.putArray("enum");
             for (SerializableString value : this._values.values()) {
@@ -97,7 +97,7 @@ public class EnumSerializer extends StdScalarSerializer<Enum<?>> implements Cont
         }
         JsonStringFormatVisitor expectStringFormat = jsonFormatVisitorWrapper.expectStringFormat(javaType);
         if (expectStringFormat != null) {
-            Set linkedHashSet = new LinkedHashSet();
+            LinkedHashSet linkedHashSet = new LinkedHashSet();
             if (provider == null || !provider.isEnabled(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)) {
                 for (SerializableString value : this._values.values()) {
                     linkedHashSet.add(value.getValue());
@@ -111,7 +111,8 @@ public class EnumSerializer extends StdScalarSerializer<Enum<?>> implements Cont
         }
     }
 
-    protected final boolean _serializeAsIndex(SerializerProvider serializerProvider) {
+    /* access modifiers changed from: protected */
+    public final boolean _serializeAsIndex(SerializerProvider serializerProvider) {
         if (this._serializeAsIndex != null) {
             return this._serializeAsIndex.booleanValue();
         }

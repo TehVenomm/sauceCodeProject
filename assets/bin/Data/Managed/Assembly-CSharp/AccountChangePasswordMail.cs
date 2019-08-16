@@ -13,14 +13,14 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_NEW_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
-		SetInput((Enum)UI.IPT_CONFIRM_NEW_PASSWORD, string.Empty, 255, (EventDelegate.Callback)InputCallBack);
+		SetInput(UI.IPT_PASSWORD, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_NEW_PASSWORD, string.Empty, 255, InputCallBack);
+		SetInput(UI.IPT_CONFIRM_NEW_PASSWORD, string.Empty, 255, InputCallBack);
 	}
 
 	private void InputCallBack()
 	{
-		bool flag = CheckRegistData(false);
+		bool flag = CheckRegistData();
 		SetActive((Enum)UI.BTN_OK, flag);
 		SetActive((Enum)UI.BTN_INVALID, !flag);
 	}
@@ -48,17 +48,17 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 		}
 		if (inputText2.Length < 8)
 		{
-			CheckChangeEvent(is_send_event, "PASSWORD_TOO_SHORT", null);
+			CheckChangeEvent(is_send_event, "PASSWORD_TOO_SHORT");
 			return false;
 		}
 		if (inputText2 != inputText3)
 		{
-			CheckChangeEvent(is_send_event, "CONFIRM_PASSWORD_NOT_MATCH", null);
+			CheckChangeEvent(is_send_event, "CONFIRM_PASSWORD_NOT_MATCH");
 			return false;
 		}
 		if (inputText2.Length > 255)
 		{
-			CheckChangeEvent(is_send_event, "PASSWORD_TOO_LONG", null);
+			CheckChangeEvent(is_send_event, "PASSWORD_TOO_LONG");
 			return false;
 		}
 		return true;
@@ -74,7 +74,7 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 
 	private void OnQuery_OK()
 	{
-		if (CheckRegistData(true))
+		if (CheckRegistData(is_send_event: true))
 		{
 			string inputText = GetInputText(UI.IPT_PASSWORD);
 			string inputText2 = GetInputText(UI.IPT_NEW_PASSWORD);
@@ -82,7 +82,7 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<AccountManager>.I.SendRegistChangePasswordRob(inputText, inputText2, inputText3, delegate(bool is_success)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 	}

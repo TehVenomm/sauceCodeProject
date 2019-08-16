@@ -1,4 +1,4 @@
-package android.support.v4.provider;
+package android.support.p000v4.provider;
 
 import android.net.Uri;
 import android.util.Log;
@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
 
+/* renamed from: android.support.v4.provider.RawDocumentFile */
 class RawDocumentFile extends DocumentFile {
     private File mFile;
 
@@ -54,7 +55,10 @@ class RawDocumentFile extends DocumentFile {
 
     public DocumentFile createDirectory(String str) {
         File file = new File(this.mFile, str);
-        return (file.isDirectory() || file.mkdir()) ? new RawDocumentFile(this, file) : null;
+        if (file.isDirectory() || file.mkdir()) {
+            return new RawDocumentFile(this, file);
+        }
+        return null;
     }
 
     public DocumentFile createFile(String str, String str2) {
@@ -86,7 +90,10 @@ class RawDocumentFile extends DocumentFile {
     }
 
     public String getType() {
-        return this.mFile.isDirectory() ? null : getTypeForName(this.mFile.getName());
+        if (this.mFile.isDirectory()) {
+            return null;
+        }
+        return getTypeForName(this.mFile.getName());
     }
 
     public Uri getUri() {

@@ -1,8 +1,9 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.util.JsonParserSequence;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -29,8 +30,8 @@ public class AsWrapperTypeDeserializer extends TypeDeserializerBase implements S
         return beanProperty == this._property ? this : new AsWrapperTypeDeserializer(this, beanProperty);
     }
 
-    public As getTypeInclusion() {
-        return As.WRAPPER_OBJECT;
+    public C0861As getTypeInclusion() {
+        return C0861As.WRAPPER_OBJECT;
     }
 
     public Object deserializeTypedFromObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
@@ -49,10 +50,10 @@ public class AsWrapperTypeDeserializer extends TypeDeserializerBase implements S
         return _deserialize(jsonParser, deserializationContext);
     }
 
-    protected Object _deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Object typeId;
+    /* access modifiers changed from: protected */
+    public Object _deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         if (jsonParser.canReadTypeId()) {
-            typeId = jsonParser.getTypeId();
+            Object typeId = jsonParser.getTypeId();
             if (typeId != null) {
                 return _deserializeWithNativeTypeId(jsonParser, deserializationContext, typeId);
             }
@@ -69,16 +70,16 @@ public class AsWrapperTypeDeserializer extends TypeDeserializerBase implements S
         JsonDeserializer _findDeserializer = _findDeserializer(deserializationContext, text);
         jsonParser.nextToken();
         if (this._typeIdVisible && jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
-            TokenBuffer tokenBuffer = new TokenBuffer(null, false);
+            TokenBuffer tokenBuffer = new TokenBuffer((ObjectCodec) null, false);
             tokenBuffer.writeStartObject();
             tokenBuffer.writeFieldName(this._typePropertyName);
             tokenBuffer.writeString(text);
             jsonParser = JsonParserSequence.createFlattened(tokenBuffer.asParser(jsonParser), jsonParser);
             jsonParser.nextToken();
         }
-        typeId = _findDeserializer.deserialize(jsonParser, deserializationContext);
+        Object deserialize = _findDeserializer.deserialize(jsonParser, deserializationContext);
         if (jsonParser.nextToken() == JsonToken.END_OBJECT) {
-            return typeId;
+            return deserialize;
         }
         throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_OBJECT, "expected closing END_OBJECT after type information and deserialized value");
     }

@@ -179,13 +179,13 @@ public abstract class SerializerProvider extends DatabindContext {
     }
 
     public JsonSerializer<Object> findValueSerializer(Class<?> cls, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer untypedValueSerializer = this._knownSerializers.untypedValueSerializer((Class) cls);
+        JsonSerializer untypedValueSerializer = this._knownSerializers.untypedValueSerializer(cls);
         if (untypedValueSerializer == null) {
-            untypedValueSerializer = this._serializerCache.untypedValueSerializer((Class) cls);
+            untypedValueSerializer = this._serializerCache.untypedValueSerializer(cls);
             if (untypedValueSerializer == null) {
-                untypedValueSerializer = this._serializerCache.untypedValueSerializer(this._config.constructType((Class) cls));
+                untypedValueSerializer = this._serializerCache.untypedValueSerializer(this._config.constructType(cls));
                 if (untypedValueSerializer == null) {
-                    untypedValueSerializer = _createAndCacheUntypedSerializer((Class) cls);
+                    untypedValueSerializer = _createAndCacheUntypedSerializer(cls);
                     if (untypedValueSerializer == null) {
                         return getUnknownTypeSerializer(cls);
                     }
@@ -210,23 +210,23 @@ public abstract class SerializerProvider extends DatabindContext {
     }
 
     public JsonSerializer<Object> findValueSerializer(Class<?> cls) throws JsonMappingException {
-        JsonSerializer<Object> untypedValueSerializer = this._knownSerializers.untypedValueSerializer((Class) cls);
+        JsonSerializer<Object> untypedValueSerializer = this._knownSerializers.untypedValueSerializer(cls);
         if (untypedValueSerializer != null) {
             return untypedValueSerializer;
         }
-        untypedValueSerializer = this._serializerCache.untypedValueSerializer((Class) cls);
-        if (untypedValueSerializer != null) {
-            return untypedValueSerializer;
+        JsonSerializer<Object> untypedValueSerializer2 = this._serializerCache.untypedValueSerializer(cls);
+        if (untypedValueSerializer2 != null) {
+            return untypedValueSerializer2;
         }
-        untypedValueSerializer = this._serializerCache.untypedValueSerializer(this._config.constructType((Class) cls));
-        if (untypedValueSerializer != null) {
-            return untypedValueSerializer;
+        JsonSerializer<Object> untypedValueSerializer3 = this._serializerCache.untypedValueSerializer(this._config.constructType(cls));
+        if (untypedValueSerializer3 != null) {
+            return untypedValueSerializer3;
         }
-        untypedValueSerializer = _createAndCacheUntypedSerializer((Class) cls);
-        if (untypedValueSerializer == null) {
+        JsonSerializer<Object> _createAndCacheUntypedSerializer = _createAndCacheUntypedSerializer(cls);
+        if (_createAndCacheUntypedSerializer == null) {
             return getUnknownTypeSerializer(cls);
         }
-        return untypedValueSerializer;
+        return _createAndCacheUntypedSerializer;
     }
 
     public JsonSerializer<Object> findValueSerializer(JavaType javaType) throws JsonMappingException {
@@ -234,15 +234,15 @@ public abstract class SerializerProvider extends DatabindContext {
         if (untypedValueSerializer != null) {
             return untypedValueSerializer;
         }
-        untypedValueSerializer = this._serializerCache.untypedValueSerializer(javaType);
-        if (untypedValueSerializer != null) {
-            return untypedValueSerializer;
+        JsonSerializer<Object> untypedValueSerializer2 = this._serializerCache.untypedValueSerializer(javaType);
+        if (untypedValueSerializer2 != null) {
+            return untypedValueSerializer2;
         }
-        untypedValueSerializer = _createAndCacheUntypedSerializer(javaType);
-        if (untypedValueSerializer == null) {
+        JsonSerializer<Object> _createAndCacheUntypedSerializer = _createAndCacheUntypedSerializer(javaType);
+        if (_createAndCacheUntypedSerializer == null) {
             return getUnknownTypeSerializer(javaType.getRawClass());
         }
-        return untypedValueSerializer;
+        return _createAndCacheUntypedSerializer;
     }
 
     public JsonSerializer<Object> findPrimaryPropertySerializer(JavaType javaType, BeanProperty beanProperty) throws JsonMappingException {
@@ -260,13 +260,13 @@ public abstract class SerializerProvider extends DatabindContext {
     }
 
     public JsonSerializer<Object> findPrimaryPropertySerializer(Class<?> cls, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer untypedValueSerializer = this._knownSerializers.untypedValueSerializer((Class) cls);
+        JsonSerializer untypedValueSerializer = this._knownSerializers.untypedValueSerializer(cls);
         if (untypedValueSerializer == null) {
-            untypedValueSerializer = this._serializerCache.untypedValueSerializer((Class) cls);
+            untypedValueSerializer = this._serializerCache.untypedValueSerializer(cls);
             if (untypedValueSerializer == null) {
-                untypedValueSerializer = this._serializerCache.untypedValueSerializer(this._config.constructType((Class) cls));
+                untypedValueSerializer = this._serializerCache.untypedValueSerializer(this._config.constructType(cls));
                 if (untypedValueSerializer == null) {
-                    untypedValueSerializer = _createAndCacheUntypedSerializer((Class) cls);
+                    untypedValueSerializer = _createAndCacheUntypedSerializer(cls);
                     if (untypedValueSerializer == null) {
                         return getUnknownTypeSerializer(cls);
                     }
@@ -277,19 +277,19 @@ public abstract class SerializerProvider extends DatabindContext {
     }
 
     public JsonSerializer<Object> findTypedValueSerializer(Class<?> cls, boolean z, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer<Object> typedValueSerializer = this._knownSerializers.typedValueSerializer((Class) cls);
+        JsonSerializer<Object> typedValueSerializer = this._knownSerializers.typedValueSerializer(cls);
         if (typedValueSerializer == null) {
-            typedValueSerializer = this._serializerCache.typedValueSerializer((Class) cls);
+            typedValueSerializer = this._serializerCache.typedValueSerializer(cls);
             if (typedValueSerializer == null) {
-                JsonSerializer<Object> findValueSerializer = findValueSerializer((Class) cls, beanProperty);
-                TypeSerializer createTypeSerializer = this._serializerFactory.createTypeSerializer(this._config, this._config.constructType((Class) cls));
+                JsonSerializer<Object> findValueSerializer = findValueSerializer(cls, beanProperty);
+                TypeSerializer createTypeSerializer = this._serializerFactory.createTypeSerializer(this._config, this._config.constructType(cls));
                 if (createTypeSerializer != null) {
-                    typedValueSerializer = new TypeWrappedSerializer(createTypeSerializer.forProperty(beanProperty), findValueSerializer);
+                    typedValueSerializer = new TypeWrappedSerializer<>(createTypeSerializer.forProperty(beanProperty), findValueSerializer);
                 } else {
                     typedValueSerializer = findValueSerializer;
                 }
                 if (z) {
-                    this._serializerCache.addTypedSerializer((Class) cls, r0);
+                    this._serializerCache.addTypedSerializer(cls, typedValueSerializer);
                 }
             }
         }
@@ -304,12 +304,12 @@ public abstract class SerializerProvider extends DatabindContext {
                 JsonSerializer<Object> findValueSerializer = findValueSerializer(javaType, beanProperty);
                 TypeSerializer createTypeSerializer = this._serializerFactory.createTypeSerializer(this._config, javaType);
                 if (createTypeSerializer != null) {
-                    typedValueSerializer = new TypeWrappedSerializer(createTypeSerializer.forProperty(beanProperty), findValueSerializer);
+                    typedValueSerializer = new TypeWrappedSerializer<>(createTypeSerializer.forProperty(beanProperty), findValueSerializer);
                 } else {
                     typedValueSerializer = findValueSerializer;
                 }
                 if (z) {
-                    this._serializerCache.addTypedSerializer(javaType, r0);
+                    this._serializerCache.addTypedSerializer(javaType, typedValueSerializer);
                 }
             }
         }
@@ -325,7 +325,7 @@ public abstract class SerializerProvider extends DatabindContext {
     }
 
     public JsonSerializer<Object> findKeySerializer(Class<?> cls, BeanProperty beanProperty) throws JsonMappingException {
-        return findKeySerializer(this._config.constructType((Class) cls), beanProperty);
+        return findKeySerializer(this._config.constructType(cls), beanProperty);
     }
 
     public JsonSerializer<Object> getDefaultNullKeySerializer() {
@@ -355,10 +355,10 @@ public abstract class SerializerProvider extends DatabindContext {
         if (jsonSerializer == this._unknownTypeSerializer || jsonSerializer == null) {
             return true;
         }
-        if (isEnabled(SerializationFeature.FAIL_ON_EMPTY_BEANS) && jsonSerializer.getClass() == UnknownSerializer.class) {
-            return true;
+        if (!isEnabled(SerializationFeature.FAIL_ON_EMPTY_BEANS) || jsonSerializer.getClass() != UnknownSerializer.class) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public JsonSerializer<?> handlePrimaryContextualization(JsonSerializer<?> jsonSerializer, BeanProperty beanProperty) throws JsonMappingException {
@@ -377,7 +377,7 @@ public abstract class SerializerProvider extends DatabindContext {
 
     public final void defaultSerializeValue(Object obj, JsonGenerator jsonGenerator) throws IOException {
         if (obj != null) {
-            findTypedValueSerializer(obj.getClass(), true, null).serialize(obj, jsonGenerator, this);
+            findTypedValueSerializer(obj.getClass(), true, (BeanProperty) null).serialize(obj, jsonGenerator, this);
         } else if (this._stdNullValueSerializer) {
             jsonGenerator.writeNull();
         } else {
@@ -388,7 +388,7 @@ public abstract class SerializerProvider extends DatabindContext {
     public final void defaultSerializeField(String str, Object obj, JsonGenerator jsonGenerator) throws IOException {
         jsonGenerator.writeFieldName(str);
         if (obj != null) {
-            findTypedValueSerializer(obj.getClass(), true, null).serialize(obj, jsonGenerator, this);
+            findTypedValueSerializer(obj.getClass(), true, (BeanProperty) null).serialize(obj, jsonGenerator, this);
         } else if (this._stdNullValueSerializer) {
             jsonGenerator.writeNull();
         } else {
@@ -443,18 +443,20 @@ public abstract class SerializerProvider extends DatabindContext {
         return JsonMappingException.from(this, str);
     }
 
-    protected void _reportIncompatibleRootType(Object obj, JavaType javaType) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _reportIncompatibleRootType(Object obj, JavaType javaType) throws IOException {
         if (!javaType.isPrimitive() || !ClassUtil.wrapperType(javaType.getRawClass()).isAssignableFrom(obj.getClass())) {
             throw JsonMappingException.from(this, "Incompatible types: declared root type (" + javaType + ") vs " + obj.getClass().getName());
         }
     }
 
-    protected JsonSerializer<Object> _findExplicitUntypedSerializer(Class<?> cls) throws JsonMappingException {
-        JsonSerializer<Object> untypedValueSerializer = this._knownSerializers.untypedValueSerializer((Class) cls);
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _findExplicitUntypedSerializer(Class<?> cls) throws JsonMappingException {
+        JsonSerializer<Object> untypedValueSerializer = this._knownSerializers.untypedValueSerializer(cls);
         if (untypedValueSerializer == null) {
-            untypedValueSerializer = this._serializerCache.untypedValueSerializer((Class) cls);
+            untypedValueSerializer = this._serializerCache.untypedValueSerializer(cls);
             if (untypedValueSerializer == null) {
-                untypedValueSerializer = _createAndCacheUntypedSerializer((Class) cls);
+                untypedValueSerializer = _createAndCacheUntypedSerializer(cls);
             }
         }
         if (isUnknownTypeSerializer(untypedValueSerializer)) {
@@ -463,32 +465,35 @@ public abstract class SerializerProvider extends DatabindContext {
         return untypedValueSerializer;
     }
 
-    protected JsonSerializer<Object> _createAndCacheUntypedSerializer(Class<?> cls) throws JsonMappingException {
-        JavaType constructType = this._config.constructType((Class) cls);
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _createAndCacheUntypedSerializer(Class<?> cls) throws JsonMappingException {
+        JavaType constructType = this._config.constructType(cls);
         try {
             JsonSerializer<Object> _createUntypedSerializer = _createUntypedSerializer(constructType);
             if (_createUntypedSerializer != null) {
                 this._serializerCache.addAndResolveNonTypedSerializer(cls, constructType, _createUntypedSerializer, this);
             }
             return _createUntypedSerializer;
-        } catch (Throwable e) {
-            throw JsonMappingException.from(this, e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw JsonMappingException.from(this, e.getMessage(), (Throwable) e);
         }
     }
 
-    protected JsonSerializer<Object> _createAndCacheUntypedSerializer(JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _createAndCacheUntypedSerializer(JavaType javaType) throws JsonMappingException {
         try {
-            JsonSerializer _createUntypedSerializer = _createUntypedSerializer(javaType);
+            JsonSerializer<Object> _createUntypedSerializer = _createUntypedSerializer(javaType);
             if (_createUntypedSerializer != null) {
                 this._serializerCache.addAndResolveNonTypedSerializer(javaType, _createUntypedSerializer, this);
             }
             return _createUntypedSerializer;
-        } catch (Throwable e) {
-            throw JsonMappingException.from(this, e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw JsonMappingException.from(this, e.getMessage(), (Throwable) e);
         }
     }
 
-    protected JsonSerializer<Object> _createUntypedSerializer(JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _createUntypedSerializer(JavaType javaType) throws JsonMappingException {
         JsonSerializer<Object> createSerializer;
         synchronized (this._serializerCache) {
             createSerializer = this._serializerFactory.createSerializer(this, javaType);
@@ -496,21 +501,24 @@ public abstract class SerializerProvider extends DatabindContext {
         return createSerializer;
     }
 
-    protected JsonSerializer<Object> _handleContextualResolvable(JsonSerializer<?> jsonSerializer, BeanProperty beanProperty) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _handleContextualResolvable(JsonSerializer<?> jsonSerializer, BeanProperty beanProperty) throws JsonMappingException {
         if (jsonSerializer instanceof ResolvableSerializer) {
             ((ResolvableSerializer) jsonSerializer).resolve(this);
         }
         return handleSecondaryContextualization(jsonSerializer, beanProperty);
     }
 
-    protected JsonSerializer<Object> _handleResolvable(JsonSerializer<?> jsonSerializer) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<Object> _handleResolvable(JsonSerializer<?> jsonSerializer) throws JsonMappingException {
         if (jsonSerializer instanceof ResolvableSerializer) {
             ((ResolvableSerializer) jsonSerializer).resolve(this);
         }
         return jsonSerializer;
     }
 
-    protected final DateFormat _dateFormat() {
+    /* access modifiers changed from: protected */
+    public final DateFormat _dateFormat() {
         if (this._dateFormat != null) {
             return this._dateFormat;
         }

@@ -4,8 +4,6 @@ public static class ResourceUtility
 {
 	public static Shader FindShader(string shader_name)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
 		Shader val = Shader.Find(shader_name);
 		if (val == null && MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
@@ -22,8 +20,6 @@ public static class ResourceUtility
 
 	public static Transform Realizes(Object obj, int layer = -1)
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Expected O, but got Unknown
 		GameObject val = obj as GameObject;
 		if (val == null)
 		{
@@ -34,12 +30,12 @@ public static class ResourceUtility
 		name = ResourceName.Normalize(name);
 		name = name.Replace("(Clone)", string.Empty);
 		val2.set_name(name);
-		Transform val3 = val2.get_transform();
+		Transform transform = val2.get_transform();
 		if (layer != -1)
 		{
-			Utility.SetLayerWithChildren(val3, layer);
+			Utility.SetLayerWithChildren(transform, layer);
 		}
-		return val3;
+		return transform;
 	}
 
 	public static Transform Realizes(Object obj, Transform parent, int layer = -1)

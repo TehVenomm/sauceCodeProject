@@ -75,13 +75,13 @@ final class ByteString {
         for (ByteString size : list) {
             i = size.size() + i;
         }
-        Object obj = new byte[i];
-        i = 0;
-        for (ByteString size2 : list) {
-            System.arraycopy(size2.bytes, 0, obj, i, size2.size());
-            i = size2.size() + i;
+        byte[] bArr = new byte[i];
+        int i2 = 0;
+        for (ByteString byteString : list) {
+            System.arraycopy(byteString.bytes, 0, bArr, i2, byteString.size());
+            i2 = byteString.size() + i2;
         }
-        return new ByteString(obj);
+        return new ByteString(bArr);
     }
 
     public static ByteString copyFrom(byte[] bArr) {
@@ -89,15 +89,15 @@ final class ByteString {
     }
 
     public static ByteString copyFrom(byte[] bArr, int i, int i2) {
-        Object obj = new byte[i2];
-        System.arraycopy(bArr, i, obj, 0, i2);
-        return new ByteString(obj);
+        byte[] bArr2 = new byte[i2];
+        System.arraycopy(bArr, i, bArr2, 0, i2);
+        return new ByteString(bArr2);
     }
 
     public static ByteString copyFromUtf8(String str) {
         try {
             return new ByteString(str.getBytes("UTF-8"));
-        } catch (Throwable e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("UTF-8 not supported.", e);
         }
     }
@@ -161,12 +161,9 @@ final class ByteString {
         if (i == 0) {
             byte[] bArr = this.bytes;
             int length = this.bytes.length;
-            int i2 = 0;
             i = length;
-            while (i2 < length) {
-                int i3 = bArr[i2] + (i * 31);
-                i2++;
-                i = i3;
+            for (int i2 = 0; i2 < length; i2++) {
+                i = (i * 31) + bArr[i2];
             }
             if (i == 0) {
                 i = 1;
@@ -190,9 +187,9 @@ final class ByteString {
 
     public byte[] toByteArray() {
         int length = this.bytes.length;
-        Object obj = new byte[length];
-        System.arraycopy(this.bytes, 0, obj, 0, length);
-        return obj;
+        byte[] bArr = new byte[length];
+        System.arraycopy(this.bytes, 0, bArr, 0, length);
+        return bArr;
     }
 
     public String toString(String str) throws UnsupportedEncodingException {
@@ -202,7 +199,7 @@ final class ByteString {
     public String toStringUtf8() {
         try {
             return new String(this.bytes, "UTF-8");
-        } catch (Throwable e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("UTF-8 not supported?", e);
         }
     }

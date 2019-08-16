@@ -28,11 +28,11 @@ public abstract class ObjectQueue<T> implements Closeable, Iterable<T> {
     public abstract int size();
 
     public static <T> ObjectQueue<T> create(File file, Converter<T> converter) throws IOException {
-        return new C1103a(file, converter);
+        return new C1669a(file, converter);
     }
 
     public static <T> ObjectQueue<T> createInMemory() {
-        return new C1105b();
+        return new C1672b();
     }
 
     public boolean isEmpty() {
@@ -41,7 +41,7 @@ public abstract class ObjectQueue<T> implements Closeable, Iterable<T> {
 
     public List<T> peek(int i) throws IOException {
         int min = Math.min(i, size());
-        List arrayList = new ArrayList(min);
+        ArrayList arrayList = new ArrayList(min);
         Iterator it = iterator();
         for (int i2 = 0; i2 < min; i2++) {
             arrayList.add(it.next());

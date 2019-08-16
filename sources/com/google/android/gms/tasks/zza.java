@@ -1,24 +1,23 @@
 package com.google.android.gms.tasks;
 
 import android.support.annotation.NonNull;
-import java.util.concurrent.Executor;
 
-final class zza<TResult, TContinuationResult> implements zzk<TResult> {
-    private final Executor zzjqg;
-    private final Continuation<TResult, TContinuationResult> zzkfj;
-    private final zzn<TContinuationResult> zzkfk;
+final class zza extends CancellationToken {
+    private final zzu<Void> zza = new zzu<>();
 
-    public zza(@NonNull Executor executor, @NonNull Continuation<TResult, TContinuationResult> continuation, @NonNull zzn<TContinuationResult> zzn) {
-        this.zzjqg = executor;
-        this.zzkfj = continuation;
-        this.zzkfk = zzn;
+    zza() {
     }
 
     public final void cancel() {
-        throw new UnsupportedOperationException();
+        this.zza.trySetResult(null);
     }
 
-    public final void onComplete(@NonNull Task<TResult> task) {
-        this.zzjqg.execute(new zzb(this, task));
+    public final boolean isCancellationRequested() {
+        return this.zza.isComplete();
+    }
+
+    public final CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
+        this.zza.addOnSuccessListener(new zzb(this, onTokenCanceledListener));
+        return this;
     }
 }

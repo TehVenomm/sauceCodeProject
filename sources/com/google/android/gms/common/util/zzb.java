@@ -1,17 +1,14 @@
 package com.google.android.gms.common.util;
 
-import android.util.Base64;
+import java.util.regex.Pattern;
 
 public final class zzb {
-    public static String encode(byte[] bArr) {
-        return bArr == null ? null : Base64.encodeToString(bArr, 0);
-    }
+    private static Pattern zzgx = null;
 
-    public static String zzj(byte[] bArr) {
-        return bArr == null ? null : Base64.encodeToString(bArr, 10);
-    }
-
-    public static String zzk(byte[] bArr) {
-        return bArr == null ? null : Base64.encodeToString(bArr, 11);
+    public static int zzc(int i) {
+        if (i == -1) {
+            return -1;
+        }
+        return i / 1000;
     }
 }

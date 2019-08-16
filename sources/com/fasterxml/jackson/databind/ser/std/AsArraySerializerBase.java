@@ -1,27 +1,19 @@
 package com.fasterxml.jackson.databind.ser.std;
 
-import com.fasterxml.jackson.annotation.JsonFormat.Feature;
-import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
-import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
-import com.fasterxml.jackson.databind.jsonschema.SchemaAware;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.ContainerSerializer;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap;
 import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap.SerializerAndMapResult;
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 public abstract class AsArraySerializerBase<T> extends ContainerSerializer<T> implements ContextualSerializer {
     protected PropertySerializerMap _dynamicSerializers;
@@ -32,7 +24,8 @@ public abstract class AsArraySerializerBase<T> extends ContainerSerializer<T> im
     protected final Boolean _unwrapSingle;
     protected final TypeSerializer _valueTypeSerializer;
 
-    protected abstract void serializeContents(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException;
+    /* access modifiers changed from: protected */
+    public abstract void serializeContents(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException;
 
     public abstract AsArraySerializerBase<T> withResolved(BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool);
 
@@ -68,7 +61,7 @@ public abstract class AsArraySerializerBase<T> extends ContainerSerializer<T> im
     }
 
     protected AsArraySerializerBase(AsArraySerializerBase<?> asArraySerializerBase, BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool) {
-        super((ContainerSerializer) asArraySerializerBase);
+        super((ContainerSerializer<?>) asArraySerializerBase);
         this._elementType = asArraySerializerBase._elementType;
         this._staticTyping = asArraySerializerBase._staticTyping;
         this._valueTypeSerializer = typeSerializer;
@@ -80,7 +73,7 @@ public abstract class AsArraySerializerBase<T> extends ContainerSerializer<T> im
 
     @Deprecated
     protected AsArraySerializerBase(AsArraySerializerBase<?> asArraySerializerBase, BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer) {
-        this((AsArraySerializerBase) asArraySerializerBase, beanProperty, typeSerializer, (JsonSerializer) jsonSerializer, asArraySerializerBase._unwrapSingle);
+        this(asArraySerializerBase, beanProperty, typeSerializer, jsonSerializer, asArraySerializerBase._unwrapSingle);
     }
 
     @Deprecated
@@ -88,51 +81,79 @@ public abstract class AsArraySerializerBase<T> extends ContainerSerializer<T> im
         return withResolved(beanProperty, typeSerializer, jsonSerializer, this._unwrapSingle);
     }
 
-    public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        TypeSerializer forProperty;
-        JsonSerializer serializerInstance;
-        Boolean bool = null;
-        TypeSerializer typeSerializer = this._valueTypeSerializer;
-        if (typeSerializer != null) {
-            forProperty = typeSerializer.forProperty(beanProperty);
-        } else {
-            forProperty = typeSerializer;
-        }
-        if (beanProperty != null) {
-            Value findPropertyFormat;
-            AnnotationIntrospector annotationIntrospector = serializerProvider.getAnnotationIntrospector();
-            Annotated member = beanProperty.getMember();
-            if (member != null) {
-                Object findContentSerializer = annotationIntrospector.findContentSerializer(member);
-                if (findContentSerializer != null) {
-                    serializerInstance = serializerProvider.serializerInstance(member, findContentSerializer);
-                    findPropertyFormat = beanProperty.findPropertyFormat(serializerProvider.getConfig(), this._handledType);
-                    if (findPropertyFormat != null) {
-                        bool = findPropertyFormat.getFeature(Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
-                    }
-                }
-            }
-            serializerInstance = null;
-            findPropertyFormat = beanProperty.findPropertyFormat(serializerProvider.getConfig(), this._handledType);
-            if (findPropertyFormat != null) {
-                bool = findPropertyFormat.getFeature(Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
-            }
-        } else {
-            serializerInstance = null;
-        }
-        if (serializerInstance == null) {
-            serializerInstance = this._elementSerializer;
-        }
-        serializerInstance = findConvertingContentSerializer(serializerProvider, beanProperty, serializerInstance);
-        if (serializerInstance != null) {
-            serializerInstance = serializerProvider.handleSecondaryContextualization(serializerInstance, beanProperty);
-        } else if (!(this._elementType == null || !this._staticTyping || this._elementType.isJavaLangObject())) {
-            serializerInstance = serializerProvider.findValueSerializer(this._elementType, beanProperty);
-        }
-        if (serializerInstance == this._elementSerializer && beanProperty == this._property && this._valueTypeSerializer == forProperty && this._unwrapSingle == bool) {
-            return this;
-        }
-        return withResolved(beanProperty, forProperty, serializerInstance, bool);
+    /* JADX WARNING: Removed duplicated region for block: B:11:0x002c  */
+    /* JADX WARNING: Removed duplicated region for block: B:33:0x006d  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JsonSerializer<?> createContextual(com.fasterxml.jackson.databind.SerializerProvider r6, com.fasterxml.jackson.databind.BeanProperty r7) throws com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r5 = this;
+            r1 = 0
+            com.fasterxml.jackson.databind.jsontype.TypeSerializer r0 = r5._valueTypeSerializer
+            if (r0 == 0) goto L_0x0074
+            com.fasterxml.jackson.databind.jsontype.TypeSerializer r0 = r0.forProperty(r7)
+            r3 = r0
+        L_0x000a:
+            if (r7 == 0) goto L_0x0071
+            com.fasterxml.jackson.databind.AnnotationIntrospector r0 = r6.getAnnotationIntrospector()
+            com.fasterxml.jackson.databind.introspect.AnnotatedMember r2 = r7.getMember()
+            if (r2 == 0) goto L_0x006f
+            java.lang.Object r0 = r0.findContentSerializer(r2)
+            if (r0 == 0) goto L_0x006f
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r6.serializerInstance(r2, r0)
+        L_0x0020:
+            com.fasterxml.jackson.databind.SerializationConfig r2 = r6.getConfig()
+            java.lang.Class r4 = r5._handledType
+            com.fasterxml.jackson.annotation.JsonFormat$Value r2 = r7.findPropertyFormat(r2, r4)
+            if (r2 == 0) goto L_0x006d
+            com.fasterxml.jackson.annotation.JsonFormat$Feature r1 = com.fasterxml.jackson.annotation.JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED
+            java.lang.Boolean r1 = r2.getFeature(r1)
+            r2 = r1
+        L_0x0033:
+            if (r0 != 0) goto L_0x0037
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r0 = r5._elementSerializer
+        L_0x0037:
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r5.findConvertingContentSerializer(r6, r7, r0)
+            if (r0 != 0) goto L_0x0068
+            com.fasterxml.jackson.databind.JavaType r1 = r5._elementType
+            if (r1 == 0) goto L_0x0053
+            boolean r1 = r5._staticTyping
+            if (r1 == 0) goto L_0x0053
+            com.fasterxml.jackson.databind.JavaType r1 = r5._elementType
+            boolean r1 = r1.isJavaLangObject()
+            if (r1 != 0) goto L_0x0053
+            com.fasterxml.jackson.databind.JavaType r0 = r5._elementType
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r6.findValueSerializer(r0, r7)
+        L_0x0053:
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r1 = r5._elementSerializer
+            if (r0 != r1) goto L_0x0063
+            com.fasterxml.jackson.databind.BeanProperty r1 = r5._property
+            if (r7 != r1) goto L_0x0063
+            com.fasterxml.jackson.databind.jsontype.TypeSerializer r1 = r5._valueTypeSerializer
+            if (r1 != r3) goto L_0x0063
+            java.lang.Boolean r1 = r5._unwrapSingle
+            if (r1 == r2) goto L_0x0067
+        L_0x0063:
+            com.fasterxml.jackson.databind.ser.std.AsArraySerializerBase r5 = r5.withResolved(r7, r3, r0, r2)
+        L_0x0067:
+            return r5
+        L_0x0068:
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r6.handleSecondaryContextualization(r0, r7)
+            goto L_0x0053
+        L_0x006d:
+            r2 = r1
+            goto L_0x0033
+        L_0x006f:
+            r0 = r1
+            goto L_0x0020
+        L_0x0071:
+            r2 = r1
+            r0 = r1
+            goto L_0x0033
+        L_0x0074:
+            r3 = r0
+            goto L_0x000a
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.std.AsArraySerializerBase.createContextual(com.fasterxml.jackson.databind.SerializerProvider, com.fasterxml.jackson.databind.BeanProperty):com.fasterxml.jackson.databind.JsonSerializer");
     }
 
     public JavaType getContentType() {
@@ -144,14 +165,14 @@ public abstract class AsArraySerializerBase<T> extends ContainerSerializer<T> im
     }
 
     public void serialize(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED) && hasSingleElement(t)) {
+        if (!serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED) || !hasSingleElement(t)) {
+            jsonGenerator.writeStartArray();
+            jsonGenerator.setCurrentValue(t);
             serializeContents(t, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray();
-        jsonGenerator.setCurrentValue(t);
         serializeContents(t, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
     }
 
     public void serializeWithType(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException {
@@ -161,47 +182,60 @@ public abstract class AsArraySerializerBase<T> extends ContainerSerializer<T> im
         typeSerializer.writeTypeSuffixForArray(t, jsonGenerator);
     }
 
-    public JsonNode getSchema(SerializerProvider serializerProvider, Type type) throws JsonMappingException {
-        JsonNode createSchemaNode = createSchemaNode("array", true);
-        JavaType javaType = this._elementType;
-        if (javaType != null) {
-            JsonNode schema;
-            if (javaType.getRawClass() != Object.class) {
-                JsonSerializer findValueSerializer = serializerProvider.findValueSerializer(javaType, this._property);
-                if (findValueSerializer instanceof SchemaAware) {
-                    schema = ((SchemaAware) findValueSerializer).getSchema(serializerProvider, null);
-                    if (schema == null) {
-                        schema = JsonSchema.getDefaultSchemaNode();
-                    }
-                    createSchemaNode.set("items", schema);
-                }
-            }
-            schema = null;
-            if (schema == null) {
-                schema = JsonSchema.getDefaultSchemaNode();
-            }
-            createSchemaNode.set("items", schema);
-        }
-        return createSchemaNode;
+    /* JADX WARNING: Removed duplicated region for block: B:8:0x0026  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JsonNode getSchema(com.fasterxml.jackson.databind.SerializerProvider r6, java.lang.reflect.Type r7) throws com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r5 = this;
+            r1 = 0
+            java.lang.String r0 = "array"
+            r2 = 1
+            com.fasterxml.jackson.databind.node.ObjectNode r2 = r5.createSchemaNode(r0, r2)
+            com.fasterxml.jackson.databind.JavaType r0 = r5._elementType
+            if (r0 == 0) goto L_0x002f
+            java.lang.Class r3 = r0.getRawClass()
+            java.lang.Class<java.lang.Object> r4 = java.lang.Object.class
+            if (r3 == r4) goto L_0x0030
+            com.fasterxml.jackson.databind.BeanProperty r3 = r5._property
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r6.findValueSerializer(r0, r3)
+            boolean r3 = r0 instanceof com.fasterxml.jackson.databind.jsonschema.SchemaAware
+            if (r3 == 0) goto L_0x0030
+            com.fasterxml.jackson.databind.jsonschema.SchemaAware r0 = (com.fasterxml.jackson.databind.jsonschema.SchemaAware) r0
+            com.fasterxml.jackson.databind.JsonNode r0 = r0.getSchema(r6, r1)
+        L_0x0024:
+            if (r0 != 0) goto L_0x002a
+            com.fasterxml.jackson.databind.JsonNode r0 = com.fasterxml.jackson.databind.jsonschema.JsonSchema.getDefaultSchemaNode()
+        L_0x002a:
+            java.lang.String r1 = "items"
+            r2.set(r1, r0)
+        L_0x002f:
+            return r2
+        L_0x0030:
+            r0 = r1
+            goto L_0x0024
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.std.AsArraySerializerBase.getSchema(com.fasterxml.jackson.databind.SerializerProvider, java.lang.reflect.Type):com.fasterxml.jackson.databind.JsonNode");
     }
 
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType) throws JsonMappingException {
-        JsonSerializer jsonSerializer = this._elementSerializer;
+        JsonSerializer<Object> jsonSerializer = this._elementSerializer;
         if (jsonSerializer == null) {
             jsonSerializer = jsonFormatVisitorWrapper.getProvider().findValueSerializer(this._elementType, this._property);
         }
         visitArrayFormat(jsonFormatVisitorWrapper, javaType, jsonSerializer, this._elementType);
     }
 
-    protected final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
-        SerializerAndMapResult findAndAddSecondarySerializer = propertySerializerMap.findAndAddSecondarySerializer((Class) cls, serializerProvider, this._property);
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
+        SerializerAndMapResult findAndAddSecondarySerializer = propertySerializerMap.findAndAddSecondarySerializer(cls, serializerProvider, this._property);
         if (propertySerializerMap != findAndAddSecondarySerializer.map) {
             this._dynamicSerializers = findAndAddSecondarySerializer.map;
         }
         return findAndAddSecondarySerializer.serializer;
     }
 
-    protected final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, JavaType javaType, SerializerProvider serializerProvider) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public final JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap propertySerializerMap, JavaType javaType, SerializerProvider serializerProvider) throws JsonMappingException {
         SerializerAndMapResult findAndAddSecondarySerializer = propertySerializerMap.findAndAddSecondarySerializer(javaType, serializerProvider, this._property);
         if (propertySerializerMap != findAndAddSecondarySerializer.map) {
             this._dynamicSerializers = findAndAddSecondarySerializer.map;

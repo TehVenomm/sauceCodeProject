@@ -4,6 +4,8 @@ namespace BestHTTP.Decompression.Zlib
 {
 	internal sealed class DeflateManager
 	{
+		internal delegate BlockState CompressFunc(FlushType flush);
+
 		internal class Config
 		{
 			internal int GoodLength;
@@ -49,8 +51,6 @@ namespace BestHTTP.Decompression.Zlib
 				return Table[(int)level];
 			}
 		}
-
-		internal delegate BlockState CompressFunc(FlushType flush);
 
 		private static readonly int MEM_LEVEL_MAX = 9;
 
@@ -321,45 +321,46 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				int num6 = num2;
 				num2 = tree[(i + 1) * 2 + 1];
-				if (++num3 >= num4 || num6 != num2)
+				if (++num3 < num4 && num6 == num2)
 				{
-					if (num3 < num5)
+					continue;
+				}
+				if (num3 < num5)
+				{
+					bl_tree[num6 * 2] = (short)(bl_tree[num6 * 2] + num3);
+				}
+				else if (num6 != 0)
+				{
+					if (num6 != num)
 					{
-						bl_tree[num6 * 2] = (short)(bl_tree[num6 * 2] + num3);
+						bl_tree[num6 * 2]++;
 					}
-					else if (num6 != 0)
-					{
-						if (num6 != num)
-						{
-							bl_tree[num6 * 2]++;
-						}
-						bl_tree[InternalConstants.REP_3_6 * 2]++;
-					}
-					else if (num3 <= 10)
-					{
-						bl_tree[InternalConstants.REPZ_3_10 * 2]++;
-					}
-					else
-					{
-						bl_tree[InternalConstants.REPZ_11_138 * 2]++;
-					}
-					num3 = 0;
-					num = num6;
-					if (num2 == 0)
-					{
-						num4 = 138;
-						num5 = 3;
-					}
-					else if (num6 == num2)
-					{
-						num4 = 6;
-						num5 = 3;
-					}
-					else
-					{
-						num4 = 7;
-						num5 = 4;
-					}
+					bl_tree[InternalConstants.REP_3_6 * 2]++;
+				}
+				else if (num3 <= 10)
+				{
+					bl_tree[InternalConstants.REPZ_3_10 * 2]++;
+				}
+				else
+				{
+					bl_tree[InternalConstants.REPZ_11_138 * 2]++;
+				}
+				num3 = 0;
+				num = num6;
+				if (num2 == 0)
+				{
+					num4 = 138;
+					num5 = 3;
+				}
+				else if (num6 == num2)
+				{
+					num4 = 6;
+					num5 = 3;
+				}
+				else
+				{
+					num4 = 7;
+					num5 = 4;
 				}
 			}
 		}
@@ -407,53 +408,54 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				int num6 = num2;
 				num2 = tree[(i + 1) * 2 + 1];
-				if (++num3 >= num4 || num6 != num2)
+				if (++num3 < num4 && num6 == num2)
 				{
-					if (num3 < num5)
+					continue;
+				}
+				if (num3 < num5)
+				{
+					do
 					{
-						do
-						{
-							send_code(num6, bl_tree);
-						}
-						while (--num3 != 0);
+						send_code(num6, bl_tree);
 					}
-					else if (num6 != 0)
+					while (--num3 != 0);
+				}
+				else if (num6 != 0)
+				{
+					if (num6 != num)
 					{
-						if (num6 != num)
-						{
-							send_code(num6, bl_tree);
-							num3--;
-						}
-						send_code(InternalConstants.REP_3_6, bl_tree);
-						send_bits(num3 - 3, 2);
+						send_code(num6, bl_tree);
+						num3--;
 					}
-					else if (num3 <= 10)
-					{
-						send_code(InternalConstants.REPZ_3_10, bl_tree);
-						send_bits(num3 - 3, 3);
-					}
-					else
-					{
-						send_code(InternalConstants.REPZ_11_138, bl_tree);
-						send_bits(num3 - 11, 7);
-					}
-					num3 = 0;
-					num = num6;
-					if (num2 == 0)
-					{
-						num4 = 138;
-						num5 = 3;
-					}
-					else if (num6 == num2)
-					{
-						num4 = 6;
-						num5 = 3;
-					}
-					else
-					{
-						num4 = 7;
-						num5 = 4;
-					}
+					send_code(InternalConstants.REP_3_6, bl_tree);
+					send_bits(num3 - 3, 2);
+				}
+				else if (num3 <= 10)
+				{
+					send_code(InternalConstants.REPZ_3_10, bl_tree);
+					send_bits(num3 - 3, 3);
+				}
+				else
+				{
+					send_code(InternalConstants.REPZ_11_138, bl_tree);
+					send_bits(num3 - 11, 7);
+				}
+				num3 = 0;
+				num = num6;
+				if (num2 == 0)
+				{
+					num4 = 138;
+					num5 = 3;
+				}
+				else if (num6 == num2)
+				{
+					num4 = 6;
+					num5 = 3;
+				}
+				else
+				{
+					num4 = 7;
+					num5 = 4;
 				}
 			}
 		}
@@ -549,26 +551,24 @@ namespace BestHTTP.Decompression.Zlib
 					if (num3 == 0)
 					{
 						send_code(num4, ltree);
+						continue;
 					}
-					else
+					int num5 = Tree.LengthCode[num4];
+					send_code(num5 + InternalConstants.LITERALS + 1, ltree);
+					int num6 = Tree.ExtraLengthBits[num5];
+					if (num6 != 0)
 					{
-						int num5 = Tree.LengthCode[num4];
-						send_code(num5 + InternalConstants.LITERALS + 1, ltree);
-						int num6 = Tree.ExtraLengthBits[num5];
-						if (num6 != 0)
-						{
-							num4 -= Tree.LengthBase[num5];
-							send_bits(num4, num6);
-						}
-						num3--;
-						num5 = Tree.DistanceCode(num3);
-						send_code(num5, dtree);
-						num6 = Tree.ExtraDistanceBits[num5];
-						if (num6 != 0)
-						{
-							num3 -= Tree.DistanceBase[num5];
-							send_bits(num3, num6);
-						}
+						num4 -= Tree.LengthBase[num5];
+						send_bits(num4, num6);
+					}
+					num3--;
+					num5 = Tree.DistanceCode(num3);
+					send_code(num5, dtree);
+					num6 = Tree.ExtraDistanceBits[num5];
+					if (num6 != 0)
+					{
+						num3 -= Tree.DistanceBase[num5];
+						send_bits(num3, num6);
 					}
 				}
 				while (num < last_lit);
@@ -678,7 +678,7 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					lookahead = strstart - num2;
 					strstart = num2;
-					flush_block_only(false);
+					flush_block_only(eof: false);
 					if (_codec.AvailableBytesOut == 0)
 					{
 						return BlockState.NeedMore;
@@ -686,7 +686,7 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				if (strstart - block_start >= w_size - MIN_LOOKAHEAD)
 				{
-					flush_block_only(false);
+					flush_block_only(eof: false);
 					if (_codec.AvailableBytesOut == 0)
 					{
 						return BlockState.NeedMore;
@@ -704,7 +704,7 @@ namespace BestHTTP.Decompression.Zlib
 		internal void _tr_stored_block(int buf, int stored_len, bool eof)
 		{
 			send_bits((STORED_BLOCK << 1) + (eof ? 1 : 0), 3);
-			copy_block(buf, stored_len, true);
+			copy_block(buf, stored_len, header: true);
 		}
 
 		internal void _tr_flush_block(int buf, int stored_len, bool eof)
@@ -831,7 +831,7 @@ namespace BestHTTP.Decompression.Zlib
 					prev[strstart & w_mask] = head[ins_h];
 					head[ins_h] = (short)strstart;
 				}
-				if (num != 0L && ((strstart - num) & 0xFFFF) <= w_size - MIN_LOOKAHEAD && compressionStrategy != CompressionStrategy.HuffmanOnly)
+				if ((long)num != 0 && ((strstart - num) & 0xFFFF) <= w_size - MIN_LOOKAHEAD && compressionStrategy != CompressionStrategy.HuffmanOnly)
 				{
 					match_length = longest_match(num);
 				}
@@ -870,7 +870,7 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				if (flag)
 				{
-					flush_block_only(false);
+					flush_block_only(eof: false);
 					if (_codec.AvailableBytesOut == 0)
 					{
 						return BlockState.NeedMore;
@@ -949,7 +949,7 @@ namespace BestHTTP.Decompression.Zlib
 					strstart++;
 					if (flag)
 					{
-						flush_block_only(false);
+						flush_block_only(eof: false);
 						if (_codec.AvailableBytesOut == 0)
 						{
 							return BlockState.NeedMore;
@@ -960,7 +960,7 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					if (_tr_tally(0, window[strstart - 1] & 0xFF))
 					{
-						flush_block_only(false);
+						flush_block_only(eof: false);
 					}
 					strstart++;
 					lookahead--;
@@ -1015,26 +1015,27 @@ namespace BestHTTP.Decompression.Zlib
 			do
 			{
 				int num7 = cur_match;
-				if (window[num7 + num3] == b2 && window[num7 + num3 - 1] == b && window[num7] == window[num2] && window[++num7] == window[num2 + 1])
+				if (window[num7 + num3] != b2 || window[num7 + num3 - 1] != b || window[num7] != window[num2] || window[++num7] != window[num2 + 1])
 				{
-					num2 += 2;
-					num7++;
-					while (window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && num2 < num6)
+					continue;
+				}
+				num2 += 2;
+				num7++;
+				while (window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && window[++num2] == window[++num7] && num2 < num6)
+				{
+				}
+				int num8 = MAX_MATCH - (num6 - num2);
+				num2 = num6 - MAX_MATCH;
+				if (num8 > num3)
+				{
+					match_start = cur_match;
+					num3 = num8;
+					if (num8 >= niceLength)
 					{
+						break;
 					}
-					int num8 = MAX_MATCH - (num6 - num2);
-					num2 = num6 - MAX_MATCH;
-					if (num8 > num3)
-					{
-						match_start = cur_match;
-						num3 = num8;
-						if (num8 >= niceLength)
-						{
-							break;
-						}
-						b = window[num2 + num3 - 1];
-						b2 = window[num2 + num3];
-					}
+					b = window[num2 + num3 - 1];
+					b2 = window[num2 + num3];
 				}
 			}
 			while ((cur_match = (prev[cur_match & num5] & 0xFFFF)) > num4 && --num != 0);
@@ -1142,7 +1143,7 @@ namespace BestHTTP.Decompression.Zlib
 			if (compressionLevel != level)
 			{
 				Config config = Config.Lookup(level);
-				if (config.Flavor != this.config.Flavor && _codec.TotalBytesIn != 0L)
+				if (config.Flavor != this.config.Flavor && _codec.TotalBytesIn != 0)
 				{
 					result = _codec.Deflate(FlushType.Partial);
 				}
@@ -1267,7 +1268,7 @@ namespace BestHTTP.Decompression.Zlib
 					}
 					else
 					{
-						_tr_stored_block(0, 0, false);
+						_tr_stored_block(0, 0, eof: false);
 						if (flush == FlushType.Full)
 						{
 							for (int i = 0; i < hash_size; i++)

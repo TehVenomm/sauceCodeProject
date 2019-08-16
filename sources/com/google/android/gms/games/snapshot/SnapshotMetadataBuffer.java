@@ -9,6 +9,6 @@ public final class SnapshotMetadataBuffer extends AbstractDataBuffer<SnapshotMet
     }
 
     public final SnapshotMetadata get(int i) {
-        return new SnapshotMetadataRef(this.zzfkz, i);
+        return new SnapshotMetadataRef(this.mDataHolder, i);
     }
 }

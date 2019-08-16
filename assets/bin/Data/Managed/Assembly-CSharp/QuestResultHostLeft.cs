@@ -8,9 +8,9 @@ public class QuestResultHostLeft : GameSection
 		MonoBehaviourSingleton<ChatManager>.I.SwitchRoomChatConnectionToCoopConnection();
 		Action<bool> call_back = delegate
 		{
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		};
-		MonoBehaviourSingleton<CoopApp>.I.LeaveWithParty(call_back, true, false);
+		MonoBehaviourSingleton<CoopApp>.I.LeaveWithParty(call_back, toHome: true);
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();

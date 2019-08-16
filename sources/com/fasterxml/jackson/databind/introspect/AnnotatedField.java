@@ -69,7 +69,7 @@ public final class AnnotatedField extends AnnotatedMember implements Serializabl
     public void setValue(Object obj, Object obj2) throws IllegalArgumentException {
         try {
             this._field.set(obj, obj2);
-        } catch (Throwable e) {
+        } catch (IllegalAccessException e) {
             throw new IllegalArgumentException("Failed to setValue() for field " + getFullName() + ": " + e.getMessage(), e);
         }
     }
@@ -77,7 +77,7 @@ public final class AnnotatedField extends AnnotatedMember implements Serializabl
     public Object getValue(Object obj) throws IllegalArgumentException {
         try {
             return this._field.get(obj);
-        } catch (Throwable e) {
+        } catch (IllegalAccessException e) {
             throw new IllegalArgumentException("Failed to getValue() for field " + getFullName() + ": " + e.getMessage(), e);
         }
     }
@@ -115,14 +115,16 @@ public final class AnnotatedField extends AnnotatedMember implements Serializabl
         return "[field " + getFullName() + "]";
     }
 
-    Object writeReplace() {
+    /* access modifiers changed from: 0000 */
+    public Object writeReplace() {
         return new AnnotatedField(new Serialization(this._field));
     }
 
-    Object readResolve() {
-        Class cls = this._serialization.clazz;
+    /* access modifiers changed from: 0000 */
+    public Object readResolve() {
+        Class<?> cls = this._serialization.clazz;
         try {
-            Object declaredField = cls.getDeclaredField(this._serialization.name);
+            Field declaredField = cls.getDeclaredField(this._serialization.name);
             if (!declaredField.isAccessible()) {
                 ClassUtil.checkAndFixAccess(declaredField, false);
             }

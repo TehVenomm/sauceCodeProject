@@ -22,7 +22,7 @@ public final class AppInfo {
     }
 
     public static String getAppLabel(Context context) {
-        CharSequence applicationLabel;
+        Object packageName;
         PackageManager packageManager = context.getPackageManager();
         ApplicationInfo applicationInfo = null;
         try {
@@ -30,10 +30,10 @@ public final class AppInfo {
         } catch (NameNotFoundException e) {
         }
         if (applicationInfo != null) {
-            applicationLabel = packageManager.getApplicationLabel(applicationInfo);
+            packageName = packageManager.getApplicationLabel(applicationInfo);
         } else {
-            applicationLabel = context.getApplicationContext().getPackageName();
+            packageName = context.getApplicationContext().getPackageName();
         }
-        return (String) applicationLabel;
+        return (String) packageName;
     }
 }

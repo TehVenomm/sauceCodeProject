@@ -142,17 +142,17 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		{
 			int num = 0;
 			int equipmentTypeIndex = UIBehaviour.GetEquipmentTypeIndex(type);
-			if (!Singleton<EquipItemTable>.I.IsWeapon(type))
+			if (Singleton<EquipItemTable>.I.IsWeapon(type))
 			{
-				if (!Singleton<EquipItemTable>.I.IsVisual(type))
-				{
-					equipmentTypeIndex -= 5;
-					return defenseBadgeNum[equipmentTypeIndex];
-				}
+				return weaponsBadgeNum[equipmentTypeIndex];
+			}
+			if (Singleton<EquipItemTable>.I.IsVisual(type))
+			{
 				equipmentTypeIndex -= 5;
 				return visualBadgeNum[equipmentTypeIndex];
 			}
-			return weaponsBadgeNum[equipmentTypeIndex];
+			equipmentTypeIndex -= 5;
+			return defenseBadgeNum[equipmentTypeIndex];
 		}
 
 		public int GetPickupBadgeNum(bool is_weapon)
@@ -313,25 +313,27 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 
 	public void UpdateLocalInventoryItem(EquipItemInfo item)
 	{
-		if (item != null && item.uniqueID != 0L && item.tableID != 0 && localInventoryEquipData != null && localInventoryEquipData.Length != 0 && localInventoryEquipData[0] is EquipItemInfo)
+		if (item == null || item.uniqueID == 0 || item.tableID == 0 || localInventoryEquipData == null || localInventoryEquipData.Length == 0 || !(localInventoryEquipData[0] is EquipItemInfo))
 		{
-			int num = 0;
-			int num2 = localInventoryEquipData.Length;
-			while (true)
+			return;
+		}
+		int num = 0;
+		int num2 = localInventoryEquipData.Length;
+		while (true)
+		{
+			if (num < num2)
 			{
-				if (num >= num2)
-				{
-					return;
-				}
 				EquipItemInfo equipItemInfo = localInventoryEquipData[num] as EquipItemInfo;
 				if (equipItemInfo != null && equipItemInfo.uniqueID == item.uniqueID)
 				{
 					break;
 				}
 				num++;
+				continue;
 			}
-			localInventoryEquipData[num] = item;
+			return;
 		}
+		localInventoryEquipData[num] = item;
 	}
 
 	public void InitSmithData()
@@ -462,43 +464,44 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 
 	public void CreateBadgeData(bool is_force = false)
 	{
-		if (smithBadgeData == null || is_force)
+		if (smithBadgeData != null && !is_force)
 		{
-			smithBadgeData = new SmithBadgeData();
-			EQUIPMENT_TYPE[] array = (EQUIPMENT_TYPE[])Enum.GetValues(typeof(EQUIPMENT_TYPE));
-			int i = 0;
-			for (int num = array.Length; i < num; i++)
+			return;
+		}
+		smithBadgeData = new SmithBadgeData();
+		EQUIPMENT_TYPE[] array = (EQUIPMENT_TYPE[])Enum.GetValues(typeof(EQUIPMENT_TYPE));
+		int i = 0;
+		for (int num = array.Length; i < num; i++)
+		{
+			EQUIPMENT_TYPE type = array[i];
+			SmithCreateItemInfo[] createEquipItemDataAry = Singleton<CreateEquipItemTable>.I.GetCreateEquipItemDataAry(type);
+			if (createEquipItemDataAry != null && createEquipItemDataAry.Length > 0)
 			{
-				EQUIPMENT_TYPE type = array[i];
-				SmithCreateItemInfo[] createEquipItemDataAry = Singleton<CreateEquipItemTable>.I.GetCreateEquipItemDataAry(type);
-				if (createEquipItemDataAry != null && createEquipItemDataAry.Length > 0)
+				int j = 0;
+				for (int num2 = createEquipItemDataAry.Length; j < num2; j++)
 				{
-					int j = 0;
-					for (int num2 = createEquipItemDataAry.Length; j < num2; j++)
-					{
-						SmithCreateItemInfo create_info = createEquipItemDataAry[j];
-						CheckAndAddSmithBadge(create_info, false);
-					}
+					SmithCreateItemInfo create_info = createEquipItemDataAry[j];
+					CheckAndAddSmithBadge(create_info);
 				}
 			}
-			smithBadgeData.DebugShowCount();
-			SmithCreateItemInfo[] pickupItemAry = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.WEAPON_ALL);
-			int k = 0;
-			for (int num3 = pickupItemAry.Length; k < num3; k++)
-			{
-				SmithCreateItemInfo create_info2 = pickupItemAry[k];
-				CheckAndAddSmithBadge(create_info2, true);
-			}
-			smithBadgeData.DebugShowCount();
-			SmithCreateItemInfo[] pickupItemAry2 = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.ARMOR_ALL);
-			int l = 0;
-			for (int num4 = pickupItemAry2.Length; l < num4; l++)
-			{
-				SmithCreateItemInfo create_info3 = pickupItemAry2[l];
-				CheckAndAddSmithBadge(create_info3, true);
-			}
-			smithBadgeData.DebugShowCount();
 		}
+		smithBadgeData.DebugShowCount();
+		SmithCreateItemInfo[] pickupItemAry = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.WEAPON_ALL);
+		int k = 0;
+		for (int num3 = pickupItemAry.Length; k < num3; k++)
+		{
+			SmithCreateItemInfo create_info2 = pickupItemAry[k];
+			CheckAndAddSmithBadge(create_info2, is_pickup: true);
+		}
+		smithBadgeData.DebugShowCount();
+		SmithCreateItemInfo[] pickupItemAry2 = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.ARMOR_ALL);
+		int l = 0;
+		for (int num4 = pickupItemAry2.Length; l < num4; l++)
+		{
+			SmithCreateItemInfo create_info3 = pickupItemAry2[l];
+			CheckAndAddSmithBadge(create_info3, is_pickup: true);
+		}
+		smithBadgeData.DebugShowCount();
 	}
 
 	public bool NeedSmithBadge(SmithCreateItemInfo create_info, bool is_pickup = false)
@@ -530,74 +533,74 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 	private void CheckAndAddSmithBadge(SmithCreateItemInfo create_info, bool is_pickup = false)
 	{
 		int id = (int)create_info.equipTableData.id;
-		if (NeedSmithBadge(create_info, is_pickup))
+		if (!NeedSmithBadge(create_info, is_pickup))
 		{
-			if (create_info.equipTableData.IsWeapon())
+			return;
+		}
+		if (create_info.equipTableData.IsWeapon())
+		{
+			int equipmentTypeIndex = UIBehaviour.GetEquipmentTypeIndex(create_info.equipTableData.type);
+			if (is_pickup)
 			{
-				int equipmentTypeIndex = UIBehaviour.GetEquipmentTypeIndex(create_info.equipTableData.type);
-				if (is_pickup)
+				if (smithBadgeData.pickupBadgeIds[0] == null)
 				{
-					if (smithBadgeData.pickupBadgeIds[0] == null)
-					{
-						smithBadgeData.pickupBadgeIds[0] = new List<int>();
-					}
-					smithBadgeData.pickupBadgeIds[0].Add(id);
-					smithBadgeData.pickupBadgeNum[0]++;
+					smithBadgeData.pickupBadgeIds[0] = new List<int>();
 				}
-				else
-				{
-					if (smithBadgeData.weaponsBadgeIds[equipmentTypeIndex] == null)
-					{
-						smithBadgeData.weaponsBadgeIds[equipmentTypeIndex] = new List<int>();
-					}
-					smithBadgeData.weaponsBadgeIds[equipmentTypeIndex].Add(id);
-					smithBadgeData.weaponsBadgeNum[equipmentTypeIndex]++;
-				}
-			}
-			else if (create_info.equipTableData.IsVisual())
-			{
-				int num = UIBehaviour.GetEquipmentTypeIndex(create_info.equipTableData.type) - 5;
-				if (is_pickup)
-				{
-					if (smithBadgeData.pickupBadgeIds[1] == null)
-					{
-						smithBadgeData.pickupBadgeIds[1] = new List<int>();
-					}
-					smithBadgeData.pickupBadgeIds[1].Add(id);
-					smithBadgeData.pickupBadgeNum[1]++;
-				}
-				else
-				{
-					if (smithBadgeData.visualBadgeIds[num] == null)
-					{
-						smithBadgeData.visualBadgeIds[num] = new List<int>();
-					}
-					smithBadgeData.visualBadgeIds[num].Add(id);
-					smithBadgeData.visualBadgeNum[num]++;
-				}
+				smithBadgeData.pickupBadgeIds[0].Add(id);
+				smithBadgeData.pickupBadgeNum[0]++;
 			}
 			else
 			{
-				int num2 = UIBehaviour.GetEquipmentTypeIndex(create_info.equipTableData.type) - 5;
-				if (is_pickup)
+				if (smithBadgeData.weaponsBadgeIds[equipmentTypeIndex] == null)
 				{
-					if (smithBadgeData.pickupBadgeIds[1] == null)
-					{
-						smithBadgeData.pickupBadgeIds[1] = new List<int>();
-					}
-					smithBadgeData.pickupBadgeIds[1].Add(id);
-					smithBadgeData.pickupBadgeNum[1]++;
+					smithBadgeData.weaponsBadgeIds[equipmentTypeIndex] = new List<int>();
 				}
-				else
-				{
-					if (smithBadgeData.defenseBadgeIds[num2] == null)
-					{
-						smithBadgeData.defenseBadgeIds[num2] = new List<int>();
-					}
-					smithBadgeData.defenseBadgeIds[num2].Add(id);
-					smithBadgeData.defenseBadgeNum[num2]++;
-				}
+				smithBadgeData.weaponsBadgeIds[equipmentTypeIndex].Add(id);
+				smithBadgeData.weaponsBadgeNum[equipmentTypeIndex]++;
 			}
+			return;
+		}
+		if (create_info.equipTableData.IsVisual())
+		{
+			int num = UIBehaviour.GetEquipmentTypeIndex(create_info.equipTableData.type) - 5;
+			if (is_pickup)
+			{
+				if (smithBadgeData.pickupBadgeIds[1] == null)
+				{
+					smithBadgeData.pickupBadgeIds[1] = new List<int>();
+				}
+				smithBadgeData.pickupBadgeIds[1].Add(id);
+				smithBadgeData.pickupBadgeNum[1]++;
+			}
+			else
+			{
+				if (smithBadgeData.visualBadgeIds[num] == null)
+				{
+					smithBadgeData.visualBadgeIds[num] = new List<int>();
+				}
+				smithBadgeData.visualBadgeIds[num].Add(id);
+				smithBadgeData.visualBadgeNum[num]++;
+			}
+			return;
+		}
+		int num2 = UIBehaviour.GetEquipmentTypeIndex(create_info.equipTableData.type) - 5;
+		if (is_pickup)
+		{
+			if (smithBadgeData.pickupBadgeIds[1] == null)
+			{
+				smithBadgeData.pickupBadgeIds[1] = new List<int>();
+			}
+			smithBadgeData.pickupBadgeIds[1].Add(id);
+			smithBadgeData.pickupBadgeNum[1]++;
+		}
+		else
+		{
+			if (smithBadgeData.defenseBadgeIds[num2] == null)
+			{
+				smithBadgeData.defenseBadgeIds[num2] = new List<int>();
+			}
+			smithBadgeData.defenseBadgeIds[num2].Add(id);
+			smithBadgeData.defenseBadgeNum[num2]++;
 		}
 	}
 
@@ -698,9 +701,24 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 			if (ret.Error == Error.None)
 			{
 				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uid);
-				if (equipItemInfo != null && MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo, -1))
+				if (equipItemInfo != null)
 				{
-					MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo))
+					{
+						MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					}
+					MonoBehaviourSingleton<StatusManager>.I.UpdateUniqueEquip(equipItemInfo);
+					if (ret.result.maxGrowCount == 1 && equipItemInfo.IsLevelMax())
+					{
+						Dictionary<string, object> values = new Dictionary<string, object>
+						{
+							{
+								"rarity",
+								equipItemInfo.tableData.rarity
+							}
+						};
+						MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("first_maxenhance", "GamePlay", values);
+					}
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_GROW);
 			}
@@ -727,13 +745,25 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uid);
 				if (equipItemInfo != null)
 				{
-					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo, -1))
+					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo))
 					{
 						MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
 					}
+					MonoBehaviourSingleton<StatusManager>.I.UpdateUniqueEquip(equipItemInfo);
 					if (GameSaveData.instance.AddNewItem(ItemIcon.GetItemIconType(equipItemInfo.tableData.type), equipItemInfo.uniqueID.ToString()))
 					{
 						GameSaveData.Save();
+					}
+					if (ret.result.evolveCount == 1)
+					{
+						Dictionary<string, object> values = new Dictionary<string, object>
+						{
+							{
+								"rarity",
+								equipItemInfo.tableData.rarity
+							}
+						};
+						MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("first_evolve", "GamePlay", values);
 					}
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_EVOLVE);
@@ -755,10 +785,11 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uid);
 				if (equipItemInfo != null)
 				{
-					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo, -1))
+					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo))
 					{
 						MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
 					}
+					MonoBehaviourSingleton<StatusManager>.I.UpdateUniqueEquip(equipItemInfo);
 					if (GameSaveData.instance.AddNewItem(ItemIcon.GetItemIconType(equipItemInfo.tableData.type), equipItemInfo.uniqueID.ToString()))
 					{
 						GameSaveData.Save();
@@ -781,9 +812,13 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 			if (ret.Error == Error.None)
 			{
 				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uid);
-				if (equipItemInfo != null && MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo, -1))
+				if (equipItemInfo != null)
 				{
-					MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo))
+					{
+						MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					}
+					MonoBehaviourSingleton<StatusManager>.I.UpdateUniqueEquip(equipItemInfo);
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_GROW);
 			}
@@ -801,9 +836,13 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 			if (ret.Error == Error.None)
 			{
 				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(euid);
-				if (equipItemInfo != null && MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo, -1))
+				if (equipItemInfo != null)
 				{
-					MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo))
+					{
+						MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					}
+					MonoBehaviourSingleton<StatusManager>.I.UpdateUniqueEquip(equipItemInfo);
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_ABILITY);
 			}
@@ -822,9 +861,13 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 			if (ret.Error == Error.None)
 			{
 				equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equipUniqueId);
-				if (equipItemInfo != null && MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo, -1))
+				if (equipItemInfo != null)
 				{
-					MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					if (MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipItemInfo))
+					{
+						MonoBehaviourSingleton<StatusManager>.I.UpdateEquip(equipItemInfo);
+					}
+					MonoBehaviourSingleton<StatusManager>.I.UpdateUniqueEquip(equipItemInfo);
 				}
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_ABILITY);
 			}
@@ -949,28 +992,51 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		}, string.Empty);
 	}
 
+	public void SendRevertLithograph(ulong euid, Action<bool> call_back)
+	{
+		SmithRestoreModel.RequestSendForm requestSendForm = new SmithRestoreModel.RequestSendForm();
+		requestSendForm.euid = euid.ToString();
+		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
+		Protocol.Send(SmithRestoreModel.URL, requestSendForm, delegate(InventorySellEquipModel ret)
+		{
+			bool obj = false;
+			if (ret.Error == Error.None)
+			{
+				obj = true;
+			}
+			call_back(obj);
+		}, string.Empty);
+	}
+
+	public void BackSection()
+	{
+		GameSceneEvent.Cancel();
+		if (StatusManager.IsUnique())
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("UniqueStatus", "UniqueStatusToSmith");
+		}
+		else
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Status", "StatusToSmith");
+		}
+	}
+
 	public void CheckSmithSectionBlur(string scene_name, string section_name, GameSceneTables.SectionData section_data)
 	{
-		if (!section_data.type.IsDialog())
+		if (section_data == null || section_data.type.IsDialog())
 		{
-			switch (section_name)
+			return;
+		}
+		if (section_name != null && (section_name == "SmithGrowItemSelect" || section_name == "SmithGrow" || section_name == "SmithCreateItemSelect" || section_name == "SmithCreateItem"))
+		{
+			if (MonoBehaviourSingleton<FilterManager>.IsValid() && !MonoBehaviourSingleton<FilterManager>.I.IsEnabledBlur())
 			{
-			case "SmithGrowItemSelect":
-			case "SmithGrow":
-			case "SmithCreateItemSelect":
-			case "SmithCreateItem":
-				if (MonoBehaviourSingleton<FilterManager>.IsValid() && !MonoBehaviourSingleton<FilterManager>.I.IsEnabledBlur())
-				{
-					EnableSmithBlur();
-				}
-				break;
-			default:
-				if (MonoBehaviourSingleton<FilterManager>.IsValid() && MonoBehaviourSingleton<FilterManager>.I.IsEnabledBlur() && section_name != "StatusToSmith")
-				{
-					DisableSmithBlur(scene_name != "SmithScene");
-				}
-				break;
+				EnableSmithBlur();
 			}
+		}
+		else if (MonoBehaviourSingleton<FilterManager>.IsValid() && MonoBehaviourSingleton<FilterManager>.I.IsEnabledBlur() && section_name != "StatusToSmith")
+		{
+			DisableSmithBlur(scene_name != "SmithScene");
 		}
 	}
 

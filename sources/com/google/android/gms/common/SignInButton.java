@@ -7,11 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
-import com.google.android.gms.C0603R;
+import com.google.android.gms.base.C0922R;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.common.internal.zzbw;
-import com.google.android.gms.common.internal.zzbx;
-import com.google.android.gms.dynamic.zzq;
+import com.google.android.gms.common.internal.SignInButtonCreator;
+import com.google.android.gms.common.internal.SignInButtonImpl;
+import com.google.android.gms.dynamic.RemoteCreator.RemoteCreatorException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -24,8 +24,8 @@ public final class SignInButton extends FrameLayout implements OnClickListener {
     public static final int SIZE_WIDE = 1;
     private int mColor;
     private int mSize;
-    private View zzffx;
-    private OnClickListener zzffy;
+    private View zaas;
+    private OnClickListener zaat;
 
     @Retention(RetentionPolicy.SOURCE)
     public @interface ButtonSize {
@@ -43,22 +43,25 @@ public final class SignInButton extends FrameLayout implements OnClickListener {
         this(context, attributeSet, 0);
     }
 
+    /* JADX INFO: finally extract failed */
     public SignInButton(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
-        this.zzffy = null;
-        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C0603R.styleable.SignInButton, 0, 0);
+        this.zaat = null;
+        TypedArray obtainStyledAttributes = context.getTheme().obtainStyledAttributes(attributeSet, C0922R.styleable.SignInButton, 0, 0);
         try {
-            this.mSize = obtainStyledAttributes.getInt(C0603R.styleable.SignInButton_buttonSize, 0);
-            this.mColor = obtainStyledAttributes.getInt(C0603R.styleable.SignInButton_colorScheme, 2);
-            setStyle(this.mSize, this.mColor);
-        } finally {
+            this.mSize = obtainStyledAttributes.getInt(C0922R.styleable.SignInButton_buttonSize, 0);
+            this.mColor = obtainStyledAttributes.getInt(C0922R.styleable.SignInButton_colorScheme, 2);
             obtainStyledAttributes.recycle();
+            setStyle(this.mSize, this.mColor);
+        } catch (Throwable th) {
+            obtainStyledAttributes.recycle();
+            throw th;
         }
     }
 
     public final void onClick(View view) {
-        if (this.zzffy != null && view == this.zzffx) {
-            this.zzffy.onClick(this);
+        if (this.zaat != null && view == this.zaas) {
+            this.zaat.onClick(this);
         }
     }
 
@@ -68,13 +71,13 @@ public final class SignInButton extends FrameLayout implements OnClickListener {
 
     public final void setEnabled(boolean z) {
         super.setEnabled(z);
-        this.zzffx.setEnabled(z);
+        this.zaas.setEnabled(z);
     }
 
     public final void setOnClickListener(OnClickListener onClickListener) {
-        this.zzffy = onClickListener;
-        if (this.zzffx != null) {
-            this.zzffx.setOnClickListener(this);
+        this.zaat = onClickListener;
+        if (this.zaas != null) {
+            this.zaas.setOnClickListener(this);
         }
     }
 
@@ -91,22 +94,22 @@ public final class SignInButton extends FrameLayout implements OnClickListener {
         this.mSize = i;
         this.mColor = i2;
         Context context = getContext();
-        if (this.zzffx != null) {
-            removeView(this.zzffx);
+        if (this.zaas != null) {
+            removeView(this.zaas);
         }
         try {
-            this.zzffx = zzbw.zzc(context, this.mSize, this.mColor);
-        } catch (zzq e) {
+            this.zaas = SignInButtonCreator.createView(context, this.mSize, this.mColor);
+        } catch (RemoteCreatorException e) {
             Log.w("SignInButton", "Sign in button not found, using placeholder instead");
             int i3 = this.mSize;
             int i4 = this.mColor;
-            View zzbx = new zzbx(context);
-            zzbx.zza(context.getResources(), i3, i4);
-            this.zzffx = zzbx;
+            SignInButtonImpl signInButtonImpl = new SignInButtonImpl(context);
+            signInButtonImpl.configure(context.getResources(), i3, i4);
+            this.zaas = signInButtonImpl;
         }
-        addView(this.zzffx);
-        this.zzffx.setEnabled(isEnabled());
-        this.zzffx.setOnClickListener(this);
+        addView(this.zaas);
+        this.zaas.setEnabled(isEnabled());
+        this.zaas.setOnClickListener(this);
     }
 
     @Deprecated

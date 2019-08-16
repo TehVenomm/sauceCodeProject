@@ -2,17 +2,17 @@ package com.fasterxml.jackson.core;
 
 import com.fasterxml.jackson.core.format.InputAccessor;
 import com.fasterxml.jackson.core.format.MatchStrength;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.io.InputDecorator;
-import com.fasterxml.jackson.core.io.OutputDecorator;
-import com.fasterxml.jackson.core.io.SerializedString;
-import com.fasterxml.jackson.core.io.UTF8Writer;
 import com.fasterxml.jackson.core.json.ByteSourceJsonBootstrapper;
 import com.fasterxml.jackson.core.json.PackageVersion;
 import com.fasterxml.jackson.core.json.ReaderBasedJsonParser;
 import com.fasterxml.jackson.core.json.UTF8JsonGenerator;
 import com.fasterxml.jackson.core.json.WriterBasedJsonGenerator;
+import com.fasterxml.jackson.core.p015io.CharacterEscapes;
+import com.fasterxml.jackson.core.p015io.IOContext;
+import com.fasterxml.jackson.core.p015io.InputDecorator;
+import com.fasterxml.jackson.core.p015io.OutputDecorator;
+import com.fasterxml.jackson.core.p015io.SerializedString;
+import com.fasterxml.jackson.core.p015io.UTF8Writer;
 import com.fasterxml.jackson.core.sym.ByteQuadsCanonicalizer;
 import com.fasterxml.jackson.core.sym.CharsToNameCanonicalizer;
 import com.fasterxml.jackson.core.util.BufferRecycler;
@@ -38,7 +38,7 @@ public class JsonFactory implements Versioned, Serializable {
     protected static final int DEFAULT_PARSER_FEATURE_FLAGS = com.fasterxml.jackson.core.JsonParser.Feature.collectDefaults();
     private static final SerializableString DEFAULT_ROOT_VALUE_SEPARATOR = DefaultPrettyPrinter.DEFAULT_ROOT_VALUE_SEPARATOR;
     public static final String FORMAT_NAME_JSON = "JSON";
-    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal();
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
     private static final long serialVersionUID = 1;
     protected final transient ByteQuadsCanonicalizer _byteSymbolCanonicalizer;
     protected CharacterEscapes _characterEscapes;
@@ -60,6 +60,7 @@ public class JsonFactory implements Versioned, Serializable {
         private final boolean _defaultState;
 
         public static int collectDefaults() {
+            Feature[] values;
             int i = 0;
             for (Feature feature : values()) {
                 if (feature.enabledByDefault()) {
@@ -122,13 +123,15 @@ public class JsonFactory implements Versioned, Serializable {
         return new JsonFactory(this, null);
     }
 
-    protected void _checkInvalidCopy(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public void _checkInvalidCopy(Class<?> cls) {
         if (getClass() != cls) {
             throw new IllegalStateException("Failed copy(): " + getClass().getName() + " (version: " + version() + ") does not override copy(); it has to");
         }
     }
 
-    protected Object readResolve() {
+    /* access modifiers changed from: protected */
+    public Object readResolve() {
         return new JsonFactory(this, this._objectCodec);
     }
 
@@ -175,7 +178,8 @@ public class JsonFactory implements Versioned, Serializable {
         return false;
     }
 
-    protected MatchStrength hasJSONFormat(InputAccessor inputAccessor) throws IOException {
+    /* access modifiers changed from: protected */
+    public MatchStrength hasJSONFormat(InputAccessor inputAccessor) throws IOException {
         return ByteSourceJsonBootstrapper.hasJSONFormat(inputAccessor);
     }
 
@@ -270,7 +274,10 @@ public class JsonFactory implements Versioned, Serializable {
     }
 
     public String getRootValueSeparator() {
-        return this._rootValueSeparator == null ? null : this._rootValueSeparator.getValue();
+        if (this._rootValueSeparator == null) {
+            return null;
+        }
+        return this._rootValueSeparator.getValue();
     }
 
     public JsonFactory setCodec(ObjectCodec objectCodec) {
@@ -284,7 +291,7 @@ public class JsonFactory implements Versioned, Serializable {
 
     public JsonParser createParser(File file) throws IOException, JsonParseException {
         IOContext _createContext = _createContext(file, true);
-        return _createParser(_decorate(new FileInputStream(file), _createContext), _createContext);
+        return _createParser(_decorate((InputStream) new FileInputStream(file), _createContext), _createContext);
     }
 
     public JsonParser createParser(URL url) throws IOException, JsonParseException {
@@ -327,7 +334,7 @@ public class JsonFactory implements Versioned, Serializable {
     public JsonParser createParser(String str) throws IOException, JsonParseException {
         int length = str.length();
         if (this._inputDecorator != null || length > 32768 || !canUseCharArrays()) {
-            return createParser(new StringReader(str));
+            return createParser((Reader) new StringReader(str));
         }
         IOContext _createContext = _createContext(str, true);
         char[] allocTokenBuffer = _createContext.allocTokenBuffer(length);
@@ -341,7 +348,7 @@ public class JsonFactory implements Versioned, Serializable {
 
     public JsonParser createParser(char[] cArr, int i, int i2) throws IOException {
         if (this._inputDecorator != null) {
-            return createParser(new CharArrayReader(cArr, i, i2));
+            return createParser((Reader) new CharArrayReader(cArr, i, i2));
         }
         return _createParser(cArr, i, i2, _createContext(cArr, true), false);
     }
@@ -400,11 +407,11 @@ public class JsonFactory implements Versioned, Serializable {
     }
 
     public JsonGenerator createGenerator(File file, JsonEncoding jsonEncoding) throws IOException {
-        OutputStream fileOutputStream = new FileOutputStream(file);
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
         IOContext _createContext = _createContext(fileOutputStream, true);
         _createContext.setEncoding(jsonEncoding);
         if (jsonEncoding == JsonEncoding.UTF8) {
-            return _createUTF8Generator(_decorate(fileOutputStream, _createContext), _createContext);
+            return _createUTF8Generator(_decorate((OutputStream) fileOutputStream, _createContext), _createContext);
         }
         return _createGenerator(_decorate(_createWriter(fileOutputStream, jsonEncoding, _createContext), _createContext), _createContext);
     }
@@ -424,24 +431,29 @@ public class JsonFactory implements Versioned, Serializable {
         return createGenerator(outputStream, JsonEncoding.UTF8);
     }
 
-    protected JsonParser _createParser(InputStream inputStream, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonParser _createParser(InputStream inputStream, IOContext iOContext) throws IOException {
         return new ByteSourceJsonBootstrapper(iOContext, inputStream).constructParser(this._parserFeatures, this._objectCodec, this._byteSymbolCanonicalizer, this._rootCharSymbols, this._factoryFeatures);
     }
 
-    protected JsonParser _createParser(Reader reader, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonParser _createParser(Reader reader, IOContext iOContext) throws IOException {
         return new ReaderBasedJsonParser(iOContext, this._parserFeatures, reader, this._objectCodec, this._rootCharSymbols.makeChild(this._factoryFeatures));
     }
 
-    protected JsonParser _createParser(char[] cArr, int i, int i2, IOContext iOContext, boolean z) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonParser _createParser(char[] cArr, int i, int i2, IOContext iOContext, boolean z) throws IOException {
         return new ReaderBasedJsonParser(iOContext, this._parserFeatures, null, this._objectCodec, this._rootCharSymbols.makeChild(this._factoryFeatures), cArr, i, i + i2, z);
     }
 
-    protected JsonParser _createParser(byte[] bArr, int i, int i2, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public JsonParser _createParser(byte[] bArr, int i, int i2, IOContext iOContext) throws IOException {
         return new ByteSourceJsonBootstrapper(iOContext, bArr, i, i2).constructParser(this._parserFeatures, this._objectCodec, this._byteSymbolCanonicalizer, this._rootCharSymbols, this._factoryFeatures);
     }
 
-    protected JsonGenerator _createGenerator(Writer writer, IOContext iOContext) throws IOException {
-        JsonGenerator writerBasedJsonGenerator = new WriterBasedJsonGenerator(iOContext, this._generatorFeatures, this._objectCodec, writer);
+    /* access modifiers changed from: protected */
+    public JsonGenerator _createGenerator(Writer writer, IOContext iOContext) throws IOException {
+        WriterBasedJsonGenerator writerBasedJsonGenerator = new WriterBasedJsonGenerator(iOContext, this._generatorFeatures, this._objectCodec, writer);
         if (this._characterEscapes != null) {
             writerBasedJsonGenerator.setCharacterEscapes(this._characterEscapes);
         }
@@ -452,8 +464,9 @@ public class JsonFactory implements Versioned, Serializable {
         return writerBasedJsonGenerator;
     }
 
-    protected JsonGenerator _createUTF8Generator(OutputStream outputStream, IOContext iOContext) throws IOException {
-        JsonGenerator uTF8JsonGenerator = new UTF8JsonGenerator(iOContext, this._generatorFeatures, this._objectCodec, outputStream);
+    /* access modifiers changed from: protected */
+    public JsonGenerator _createUTF8Generator(OutputStream outputStream, IOContext iOContext) throws IOException {
+        UTF8JsonGenerator uTF8JsonGenerator = new UTF8JsonGenerator(iOContext, this._generatorFeatures, this._objectCodec, outputStream);
         if (this._characterEscapes != null) {
             uTF8JsonGenerator.setCharacterEscapes(this._characterEscapes);
         }
@@ -464,14 +477,16 @@ public class JsonFactory implements Versioned, Serializable {
         return uTF8JsonGenerator;
     }
 
-    protected Writer _createWriter(OutputStream outputStream, JsonEncoding jsonEncoding, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Writer _createWriter(OutputStream outputStream, JsonEncoding jsonEncoding, IOContext iOContext) throws IOException {
         if (jsonEncoding == JsonEncoding.UTF8) {
             return new UTF8Writer(iOContext, outputStream);
         }
         return new OutputStreamWriter(outputStream, jsonEncoding.getJavaName());
     }
 
-    protected final InputStream _decorate(InputStream inputStream, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public final InputStream _decorate(InputStream inputStream, IOContext iOContext) throws IOException {
         if (this._inputDecorator == null) {
             return inputStream;
         }
@@ -482,7 +497,8 @@ public class JsonFactory implements Versioned, Serializable {
         return inputStream;
     }
 
-    protected final Reader _decorate(Reader reader, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Reader _decorate(Reader reader, IOContext iOContext) throws IOException {
         if (this._inputDecorator == null) {
             return reader;
         }
@@ -493,7 +509,8 @@ public class JsonFactory implements Versioned, Serializable {
         return reader;
     }
 
-    protected final OutputStream _decorate(OutputStream outputStream, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public final OutputStream _decorate(OutputStream outputStream, IOContext iOContext) throws IOException {
         if (this._outputDecorator == null) {
             return outputStream;
         }
@@ -504,7 +521,8 @@ public class JsonFactory implements Versioned, Serializable {
         return outputStream;
     }
 
-    protected final Writer _decorate(Writer writer, IOContext iOContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Writer _decorate(Writer writer, IOContext iOContext) throws IOException {
         if (this._outputDecorator == null) {
             return writer;
         }
@@ -524,16 +542,18 @@ public class JsonFactory implements Versioned, Serializable {
         if (bufferRecycler != null) {
             return bufferRecycler;
         }
-        bufferRecycler = new BufferRecycler();
-        _recyclerRef.set(new SoftReference(bufferRecycler));
-        return bufferRecycler;
+        BufferRecycler bufferRecycler2 = new BufferRecycler();
+        _recyclerRef.set(new SoftReference(bufferRecycler2));
+        return bufferRecycler2;
     }
 
-    protected IOContext _createContext(Object obj, boolean z) {
+    /* access modifiers changed from: protected */
+    public IOContext _createContext(Object obj, boolean z) {
         return new IOContext(_getBufferRecycler(), obj, z);
     }
 
-    protected InputStream _optimizedStreamFromURL(URL url) throws IOException {
+    /* access modifiers changed from: protected */
+    public InputStream _optimizedStreamFromURL(URL url) throws IOException {
         if ("file".equals(url.getProtocol())) {
             String host = url.getHost();
             if ((host == null || host.length() == 0) && url.getPath().indexOf(37) < 0) {

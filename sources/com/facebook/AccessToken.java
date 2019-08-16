@@ -26,8 +26,17 @@ import org.onepf.oms.appstore.AmazonAppstoreBillingService;
 public final class AccessToken implements Parcelable {
     public static final String ACCESS_TOKEN_KEY = "access_token";
     private static final String APPLICATION_ID_KEY = "application_id";
-    public static final Creator<AccessToken> CREATOR = new C03412();
+    public static final Creator<AccessToken> CREATOR = new Creator() {
+        public AccessToken createFromParcel(Parcel parcel) {
+            return new AccessToken(parcel);
+        }
+
+        public AccessToken[] newArray(int i) {
+            return new AccessToken[i];
+        }
+    };
     private static final int CURRENT_JSON_FORMAT = 1;
+    public static final String DATA_ACCESS_EXPIRATION_TIME = "data_access_expiration_time";
     private static final String DECLINED_PERMISSIONS_KEY = "declined_permissions";
     private static final AccessTokenSource DEFAULT_ACCESS_TOKEN_SOURCE = AccessTokenSource.FACEBOOK_APPLICATION_WEB;
     private static final Date DEFAULT_EXPIRATION_TIME = MAX_DATE;
@@ -42,6 +51,7 @@ public final class AccessToken implements Parcelable {
     public static final String USER_ID_KEY = "user_id";
     private static final String VERSION_KEY = "version";
     private final String applicationId;
+    private final Date dataAccessExpirationTime;
     private final Set<String> declinedPermissions;
     private final Date expires;
     private final Date lastRefresh;
@@ -49,20 +59,6 @@ public final class AccessToken implements Parcelable {
     private final AccessTokenSource source;
     private final String token;
     private final String userId;
-
-    /* renamed from: com.facebook.AccessToken$2 */
-    static final class C03412 implements Creator {
-        C03412() {
-        }
-
-        public AccessToken createFromParcel(Parcel parcel) {
-            return new AccessToken(parcel);
-        }
-
-        public AccessToken[] newArray(int i) {
-            return new AccessToken[i];
-        }
-    }
 
     public interface AccessTokenCreationCallback {
         void onError(FacebookException facebookException);
@@ -78,7 +74,7 @@ public final class AccessToken implements Parcelable {
 
     AccessToken(Parcel parcel) {
         this.expires = new Date(parcel.readLong());
-        Collection arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         parcel.readStringList(arrayList);
         this.permissions = Collections.unmodifiableSet(new HashSet(arrayList));
         arrayList.clear();
@@ -89,9 +85,10 @@ public final class AccessToken implements Parcelable {
         this.lastRefresh = new Date(parcel.readLong());
         this.applicationId = parcel.readString();
         this.userId = parcel.readString();
+        this.dataAccessExpirationTime = new Date(parcel.readLong());
     }
 
-    public AccessToken(String str, String str2, String str3, @Nullable Collection<String> collection, @Nullable Collection<String> collection2, @Nullable AccessTokenSource accessTokenSource, @Nullable Date date, @Nullable Date date2) {
+    public AccessToken(String str, String str2, String str3, @Nullable Collection<String> collection, @Nullable Collection<String> collection2, @Nullable AccessTokenSource accessTokenSource, @Nullable Date date, @Nullable Date date2, @Nullable Date date3) {
         Validate.notNullOrEmpty(str, "accessToken");
         Validate.notNullOrEmpty(str2, "applicationId");
         Validate.notNullOrEmpty(str3, AmazonAppstoreBillingService.JSON_KEY_USER_ID);
@@ -112,27 +109,37 @@ public final class AccessToken implements Parcelable {
         this.lastRefresh = date2;
         this.applicationId = str2;
         this.userId = str3;
+        if (date3 == null || date3.getTime() == 0) {
+            date3 = DEFAULT_EXPIRATION_TIME;
+        }
+        this.dataAccessExpirationTime = date3;
     }
 
-    private void appendPermissions(StringBuilder stringBuilder) {
-        stringBuilder.append(" permissions:");
+    private void appendPermissions(StringBuilder sb) {
+        sb.append(" permissions:");
         if (this.permissions == null) {
-            stringBuilder.append("null");
+            sb.append("null");
             return;
         }
-        stringBuilder.append("[");
-        stringBuilder.append(TextUtils.join(", ", this.permissions));
-        stringBuilder.append("]");
+        sb.append("[");
+        sb.append(TextUtils.join(", ", this.permissions));
+        sb.append("]");
     }
 
-    private static AccessToken createFromBundle(List<String> list, Bundle bundle, AccessTokenSource accessTokenSource, Date date, String str) {
+    static AccessToken createExpired(AccessToken accessToken) {
+        return new AccessToken(accessToken.token, accessToken.applicationId, accessToken.getUserId(), accessToken.getPermissions(), accessToken.getDeclinedPermissions(), accessToken.source, new Date(), new Date(), accessToken.dataAccessExpirationTime);
+    }
+
+    /* access modifiers changed from: private */
+    public static AccessToken createFromBundle(List<String> list, Bundle bundle, AccessTokenSource accessTokenSource, Date date, String str) {
         String string = bundle.getString("access_token");
         Date bundleLongAsDate = Utility.getBundleLongAsDate(bundle, EXPIRES_IN_KEY, date);
         String string2 = bundle.getString(USER_ID_KEY);
+        Date bundleLongAsDate2 = Utility.getBundleLongAsDate(bundle, DATA_ACCESS_EXPIRATION_TIME, new Date(0));
         if (Utility.isNullOrEmpty(string) || bundleLongAsDate == null) {
             return null;
         }
-        return new AccessToken(string, str, string2, list, null, accessTokenSource, bundleLongAsDate, new Date());
+        return new AccessToken(string, str, string2, list, null, accessTokenSource, bundleLongAsDate, new Date(), bundleLongAsDate2);
     }
 
     static AccessToken createFromJSONObject(JSONObject jSONObject) throws JSONException {
@@ -144,19 +151,20 @@ public final class AccessToken implements Parcelable {
         JSONArray jSONArray = jSONObject.getJSONArray("permissions");
         JSONArray jSONArray2 = jSONObject.getJSONArray(DECLINED_PERMISSIONS_KEY);
         Date date2 = new Date(jSONObject.getLong(LAST_REFRESH_KEY));
-        return new AccessToken(string, jSONObject.getString(APPLICATION_ID_KEY), jSONObject.getString(USER_ID_KEY), Utility.jsonArrayToStringList(jSONArray), Utility.jsonArrayToStringList(jSONArray2), AccessTokenSource.valueOf(jSONObject.getString("source")), date, date2);
+        AccessTokenSource valueOf = AccessTokenSource.valueOf(jSONObject.getString("source"));
+        return new AccessToken(string, jSONObject.getString(APPLICATION_ID_KEY), jSONObject.getString(USER_ID_KEY), Utility.jsonArrayToStringList(jSONArray), Utility.jsonArrayToStringList(jSONArray2), valueOf, date, date2, new Date(jSONObject.getLong(DATA_ACCESS_EXPIRATION_TIME)));
     }
 
     static AccessToken createFromLegacyCache(Bundle bundle) {
-        Collection permissionsFromBundle = getPermissionsFromBundle(bundle, LegacyTokenHelper.PERMISSIONS_KEY);
-        Collection permissionsFromBundle2 = getPermissionsFromBundle(bundle, LegacyTokenHelper.DECLINED_PERMISSIONS_KEY);
-        String applicationId = LegacyTokenHelper.getApplicationId(bundle);
-        if (Utility.isNullOrEmpty(applicationId)) {
-            applicationId = FacebookSdk.getApplicationId();
+        List permissionsFromBundle = getPermissionsFromBundle(bundle, LegacyTokenHelper.PERMISSIONS_KEY);
+        List permissionsFromBundle2 = getPermissionsFromBundle(bundle, LegacyTokenHelper.DECLINED_PERMISSIONS_KEY);
+        String applicationId2 = LegacyTokenHelper.getApplicationId(bundle);
+        if (Utility.isNullOrEmpty(applicationId2)) {
+            applicationId2 = FacebookSdk.getApplicationId();
         }
-        String token = LegacyTokenHelper.getToken(bundle);
+        String token2 = LegacyTokenHelper.getToken(bundle);
         try {
-            return new AccessToken(token, applicationId, Utility.awaitGetGraphMeRequestWithCache(token).getString("id"), permissionsFromBundle, permissionsFromBundle2, LegacyTokenHelper.getSource(bundle), LegacyTokenHelper.getDate(bundle, LegacyTokenHelper.EXPIRATION_DATE_KEY), LegacyTokenHelper.getDate(bundle, LegacyTokenHelper.LAST_REFRESH_DATE_KEY));
+            return new AccessToken(token2, applicationId2, Utility.awaitGetGraphMeRequestWithCache(token2).getString("id"), permissionsFromBundle, permissionsFromBundle2, LegacyTokenHelper.getSource(bundle), LegacyTokenHelper.getDate(bundle, LegacyTokenHelper.EXPIRATION_DATE_KEY), LegacyTokenHelper.getDate(bundle, LegacyTokenHelper.LAST_REFRESH_DATE_KEY), null);
         } catch (JSONException e) {
             return null;
         }
@@ -200,9 +208,19 @@ public final class AccessToken implements Parcelable {
         if (accessToken.source == AccessTokenSource.FACEBOOK_APPLICATION_WEB || accessToken.source == AccessTokenSource.FACEBOOK_APPLICATION_NATIVE || accessToken.source == AccessTokenSource.FACEBOOK_APPLICATION_SERVICE) {
             Date bundleLongAsDate = Utility.getBundleLongAsDate(bundle, EXPIRES_IN_KEY, new Date(0));
             String string = bundle.getString("access_token");
-            return Utility.isNullOrEmpty(string) ? null : new AccessToken(string, accessToken.applicationId, accessToken.getUserId(), accessToken.getPermissions(), accessToken.getDeclinedPermissions(), accessToken.source, bundleLongAsDate, new Date());
-        } else {
-            throw new FacebookException("Invalid token source: " + accessToken.source);
+            Date bundleLongAsDate2 = Utility.getBundleLongAsDate(bundle, DATA_ACCESS_EXPIRATION_TIME, new Date(0));
+            if (Utility.isNullOrEmpty(string)) {
+                return null;
+            }
+            return new AccessToken(string, accessToken.applicationId, accessToken.getUserId(), accessToken.getPermissions(), accessToken.getDeclinedPermissions(), accessToken.source, bundleLongAsDate, new Date(), bundleLongAsDate2);
+        }
+        throw new FacebookException("Invalid token source: " + accessToken.source);
+    }
+
+    static void expireCurrentAccessToken() {
+        AccessToken currentAccessToken = AccessTokenManager.getInstance().getCurrentAccessToken();
+        if (currentAccessToken != null) {
+            setCurrentAccessToken(createExpired(currentAccessToken));
         }
     }
 
@@ -211,8 +229,18 @@ public final class AccessToken implements Parcelable {
     }
 
     static List<String> getPermissionsFromBundle(Bundle bundle, String str) {
-        Collection stringArrayList = bundle.getStringArrayList(str);
+        ArrayList stringArrayList = bundle.getStringArrayList(str);
         return stringArrayList == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList(stringArrayList));
+    }
+
+    public static boolean isCurrentAccessTokenActive() {
+        AccessToken currentAccessToken = AccessTokenManager.getInstance().getCurrentAccessToken();
+        return currentAccessToken != null && !currentAccessToken.isExpired();
+    }
+
+    public static boolean isDataAccessActive() {
+        AccessToken currentAccessToken = AccessTokenManager.getInstance().getCurrentAccessToken();
+        return currentAccessToken != null && !currentAccessToken.isDataAccessExpired();
     }
 
     public static void refreshCurrentAccessTokenAsync() {
@@ -251,7 +279,7 @@ public final class AccessToken implements Parcelable {
             } else if (!this.applicationId.equals(accessToken.applicationId)) {
                 return false;
             }
-            if (!this.userId.equals(accessToken.userId)) {
+            if (!this.userId.equals(accessToken.userId) || !this.dataAccessExpirationTime.equals(accessToken.dataAccessExpirationTime)) {
                 return false;
             }
         }
@@ -260,6 +288,10 @@ public final class AccessToken implements Parcelable {
 
     public String getApplicationId() {
         return this.applicationId;
+    }
+
+    public Date getDataAccessExpirationTime() {
+        return this.dataAccessExpirationTime;
     }
 
     public Set<String> getDeclinedPermissions() {
@@ -296,14 +328,19 @@ public final class AccessToken implements Parcelable {
         int hashCode3 = this.declinedPermissions.hashCode();
         int hashCode4 = this.token.hashCode();
         int hashCode5 = this.source.hashCode();
-        return (((this.applicationId == null ? 0 : this.applicationId.hashCode()) + ((((((((((((hashCode + 527) * 31) + hashCode2) * 31) + hashCode3) * 31) + hashCode4) * 31) + hashCode5) * 31) + this.lastRefresh.hashCode()) * 31)) * 31) + this.userId.hashCode();
+        return (((((this.applicationId == null ? 0 : this.applicationId.hashCode()) + ((((((((((((hashCode + 527) * 31) + hashCode2) * 31) + hashCode3) * 31) + hashCode4) * 31) + hashCode5) * 31) + this.lastRefresh.hashCode()) * 31)) * 31) + this.userId.hashCode()) * 31) + this.dataAccessExpirationTime.hashCode();
+    }
+
+    public boolean isDataAccessExpired() {
+        return new Date().after(this.dataAccessExpirationTime);
     }
 
     public boolean isExpired() {
         return new Date().after(this.expires);
     }
 
-    JSONObject toJSONObject() throws JSONException {
+    /* access modifiers changed from: 0000 */
+    public JSONObject toJSONObject() throws JSONException {
         JSONObject jSONObject = new JSONObject();
         jSONObject.put("version", 1);
         jSONObject.put(TOKEN_KEY, this.token);
@@ -314,16 +351,17 @@ public final class AccessToken implements Parcelable {
         jSONObject.put("source", this.source.name());
         jSONObject.put(APPLICATION_ID_KEY, this.applicationId);
         jSONObject.put(USER_ID_KEY, this.userId);
+        jSONObject.put(DATA_ACCESS_EXPIRATION_TIME, this.dataAccessExpirationTime.getTime());
         return jSONObject;
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{AccessToken");
-        stringBuilder.append(" token:").append(tokenToString());
-        appendPermissions(stringBuilder);
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("{AccessToken");
+        sb.append(" token:").append(tokenToString());
+        appendPermissions(sb);
+        sb.append("}");
+        return sb.toString();
     }
 
     public void writeToParcel(Parcel parcel, int i) {
@@ -335,5 +373,6 @@ public final class AccessToken implements Parcelable {
         parcel.writeLong(this.lastRefresh.getTime());
         parcel.writeString(this.applicationId);
         parcel.writeString(this.userId);
+        parcel.writeLong(this.dataAccessExpirationTime.getTime());
     }
 }

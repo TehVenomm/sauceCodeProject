@@ -6,13 +6,13 @@ import android.os.RemoteException;
 public interface zzs extends IInterface {
     void zza(SubscribeRequest subscribeRequest) throws RemoteException;
 
-    void zza(zzax zzax) throws RemoteException;
+    void zza(zzbz zzbz) throws RemoteException;
 
-    void zza(zzaz zzaz) throws RemoteException;
+    void zza(zzcb zzcb) throws RemoteException;
 
-    void zza(zzbc zzbc) throws RemoteException;
+    void zza(zzce zzce) throws RemoteException;
 
-    void zza(zzbe zzbe) throws RemoteException;
+    void zza(zzcg zzcg) throws RemoteException;
 
     void zza(zzh zzh) throws RemoteException;
 

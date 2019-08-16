@@ -1,21 +1,23 @@
-package android.support.v4.view;
+package android.support.p000v4.view;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 
+/* renamed from: android.support.v4.view.NestedScrollingParent */
 public interface NestedScrollingParent {
     int getNestedScrollAxes();
 
-    boolean onNestedFling(View view, float f, float f2, boolean z);
+    boolean onNestedFling(@NonNull View view, float f, float f2, boolean z);
 
-    boolean onNestedPreFling(View view, float f, float f2);
+    boolean onNestedPreFling(@NonNull View view, float f, float f2);
 
-    void onNestedPreScroll(View view, int i, int i2, int[] iArr);
+    void onNestedPreScroll(@NonNull View view, int i, int i2, @NonNull int[] iArr);
 
-    void onNestedScroll(View view, int i, int i2, int i3, int i4);
+    void onNestedScroll(@NonNull View view, int i, int i2, int i3, int i4);
 
-    void onNestedScrollAccepted(View view, View view2, int i);
+    void onNestedScrollAccepted(@NonNull View view, @NonNull View view2, int i);
 
-    boolean onStartNestedScroll(View view, View view2, int i);
+    boolean onStartNestedScroll(@NonNull View view, @NonNull View view2, int i);
 
-    void onStopNestedScroll(View view);
+    void onStopNestedScroll(@NonNull View view);
 }

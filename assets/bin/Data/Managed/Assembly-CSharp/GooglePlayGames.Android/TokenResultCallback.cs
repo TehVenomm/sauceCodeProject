@@ -22,7 +22,7 @@ namespace GooglePlayGames.Android
 
 		public string toString()
 		{
-			return ToString();
+			return ((object)this).ToString();
 		}
 	}
 }

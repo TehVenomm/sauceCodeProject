@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.leaderboard;
+package net.gogame.gowrap.p019ui.dpro.model.leaderboard;
 
 import android.util.JsonReader;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.leaderboard.LeaderboardEntry */
 public abstract class LeaderboardEntry extends BaseJsonObject {
     private static final String KEY_HUNTER_ID = "hunterId";
     private static final String KEY_OFFSET = "offset";
@@ -28,11 +29,15 @@ public abstract class LeaderboardEntry extends BaseJsonObject {
 
     public abstract void setValue(Long l);
 
+    public LeaderboardEntry() {
+    }
+
     public LeaderboardEntry(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_OFFSET)) {
             this.offset = JSONUtils.optLong(jsonReader);
             return true;

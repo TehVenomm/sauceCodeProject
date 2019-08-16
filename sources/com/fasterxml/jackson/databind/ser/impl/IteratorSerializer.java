@@ -20,7 +20,7 @@ public class IteratorSerializer extends AsArraySerializerBase<Iterator<?>> {
     }
 
     public IteratorSerializer(IteratorSerializer iteratorSerializer, BeanProperty beanProperty, TypeSerializer typeSerializer, JsonSerializer<?> jsonSerializer, Boolean bool) {
-        super((AsArraySerializerBase) iteratorSerializer, beanProperty, typeSerializer, (JsonSerializer) jsonSerializer, bool);
+        super((AsArraySerializerBase<?>) iteratorSerializer, beanProperty, typeSerializer, jsonSerializer, bool);
     }
 
     public boolean isEmpty(SerializerProvider serializerProvider, Iterator<?> it) {
@@ -40,40 +40,47 @@ public class IteratorSerializer extends AsArraySerializerBase<Iterator<?>> {
     }
 
     public final void serialize(Iterator<?> it, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE) && hasSingleElement((Iterator) it)) {
-            serializeContents((Iterator) it, jsonGenerator, serializerProvider);
+        if (((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE) || !hasSingleElement(it)) {
+            jsonGenerator.writeStartArray();
+            serializeContents(it, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray();
-        serializeContents((Iterator) it, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
+        serializeContents(it, jsonGenerator, serializerProvider);
     }
 
     public void serializeContents(Iterator<?> it, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        Class cls = null;
+        JsonSerializer jsonSerializer;
         if (it.hasNext()) {
             TypeSerializer typeSerializer = this._valueTypeSerializer;
-            JsonSerializer jsonSerializer = null;
+            Class cls = null;
+            JsonSerializer jsonSerializer2 = null;
             do {
                 Object next = it.next();
                 if (next == null) {
                     serializerProvider.defaultSerializeNull(jsonGenerator);
                 } else {
-                    JsonSerializer jsonSerializer2 = this._elementSerializer;
-                    if (jsonSerializer2 == null) {
+                    JsonSerializer jsonSerializer3 = this._elementSerializer;
+                    if (jsonSerializer3 == null) {
                         Class cls2 = next.getClass();
                         if (cls2 == cls) {
-                            jsonSerializer2 = jsonSerializer;
+                            jsonSerializer3 = jsonSerializer2;
+                            jsonSerializer = jsonSerializer2;
                         } else {
-                            jsonSerializer = serializerProvider.findValueSerializer(cls2, this._property);
+                            JsonSerializer findValueSerializer = serializerProvider.findValueSerializer(cls2, this._property);
+                            jsonSerializer3 = findValueSerializer;
                             cls = cls2;
-                            jsonSerializer2 = jsonSerializer;
+                            jsonSerializer = findValueSerializer;
                         }
+                    } else {
+                        jsonSerializer = jsonSerializer2;
                     }
                     if (typeSerializer == null) {
-                        jsonSerializer2.serialize(next, jsonGenerator, serializerProvider);
+                        jsonSerializer3.serialize(next, jsonGenerator, serializerProvider);
+                        jsonSerializer2 = jsonSerializer;
                     } else {
-                        jsonSerializer2.serializeWithType(next, jsonGenerator, serializerProvider, typeSerializer);
+                        jsonSerializer3.serializeWithType(next, jsonGenerator, serializerProvider, typeSerializer);
+                        jsonSerializer2 = jsonSerializer;
                     }
                 }
             } while (it.hasNext());

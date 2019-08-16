@@ -35,8 +35,8 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
             }
         }
 
-        public void setCachedModel(CachedModel cachedModel) {
-            this.cachedModel = cachedModel;
+        public void setCachedModel(CachedModel cachedModel2) {
+            this.cachedModel = cachedModel2;
         }
 
         public void writeToParcel(Parcel parcel, int i) {
@@ -81,7 +81,8 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
         return cachedModel2;
     }
 
-    protected CachedModel readValueFromDisk(File file) throws IOException {
+    /* access modifiers changed from: protected */
+    public CachedModel readValueFromDisk(File file) throws IOException {
         byte[] bArr = new byte[((int) file.length())];
         BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
         bufferedInputStream.read(bArr);
@@ -107,7 +108,8 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
         }
     }
 
-    protected void writeValueToDisk(File file, CachedModel cachedModel) throws IOException {
+    /* access modifiers changed from: protected */
+    public void writeValueToDisk(File file, CachedModel cachedModel) throws IOException {
         DescribedCachedModel describedCachedModel = new DescribedCachedModel();
         describedCachedModel.setCachedModel(cachedModel);
         Parcel obtain = Parcel.obtain();

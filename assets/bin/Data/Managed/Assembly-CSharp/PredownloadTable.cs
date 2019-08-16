@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class PredownloadTable
+public class PredownloadTable : ScriptableObject
 {
 	[Serializable]
 	public class Data
@@ -24,6 +25,8 @@ public class PredownloadTable
 	public List<Data> preloadDatas;
 
 	public List<Data> autoDatas;
+
+	public List<Data> inGameDatas;
 
 	public List<Data> manualDatas;
 

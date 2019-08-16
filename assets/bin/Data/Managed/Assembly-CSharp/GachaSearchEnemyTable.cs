@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 public class GachaSearchEnemyTable : Singleton<GachaSearchEnemyTable>, IDataTable
 {
 	public class GachaSearchEnemyData
 	{
-		public const string NT = "id,name,bRare,aRare,sRare,ssRare,sssRare,fire,water,thunder,soil,light,dark,none,sortPriority,startAt";
-
 		public int id;
 
 		public string name;
@@ -40,6 +39,8 @@ public class GachaSearchEnemyTable : Singleton<GachaSearchEnemyTable>, IDataTabl
 
 		public DateTime startAt;
 
+		public const string NT = "id,name,bRare,aRare,sRare,ssRare,sssRare,fire,water,thunder,soil,light,dark,none,sortPriority,startAt";
+
 		public static bool cb(CSVReader csv_reader, GachaSearchEnemyData data, ref uint key)
 		{
 			data.id = (int)key;
@@ -69,9 +70,12 @@ public class GachaSearchEnemyTable : Singleton<GachaSearchEnemyTable>, IDataTabl
 
 	private UIntKeyTable<GachaSearchEnemyData> gachaSearchEnemyDataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<GachaSearchEnemyData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		gachaSearchEnemyDataTable = TableUtility.CreateUIntKeyTable<GachaSearchEnemyData>(csv_text, GachaSearchEnemyData.cb, "id,name,bRare,aRare,sRare,ssRare,sssRare,fire,water,thunder,soil,light,dark,none,sortPriority,startAt", null);
+		gachaSearchEnemyDataTable = TableUtility.CreateUIntKeyTable<GachaSearchEnemyData>(csv_text, GachaSearchEnemyData.cb, "id,name,bRare,aRare,sRare,ssRare,sssRare,fire,water,thunder,soil,light,dark,none,sortPriority,startAt");
 		gachaSearchEnemyDataTable.TrimExcess();
 	}
 

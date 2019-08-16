@@ -1,30 +1,19 @@
 package com.google.android.gms.nearby.messages.internal;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Result;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.api.internal.zzcj;
-import com.google.android.gms.common.api.internal.zzm;
-import com.google.android.gms.common.api.internal.zzn;
-import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.common.api.internal.ListenerHolder;
 
-abstract class zzav extends zzm<Status, zzah> {
-    private final zzcj<zzn<Status>> zzjgj;
+final class zzav extends zzbe {
+    private final /* synthetic */ ListenerHolder zzhz;
+    private final /* synthetic */ zzak zzia;
 
-    public zzav(GoogleApiClient googleApiClient) {
-        super(Nearby.MESSAGES_API, googleApiClient);
-        this.zzjgj = googleApiClient.zzp(this);
+    zzav(zzak zzak, ListenerHolder listenerHolder, ListenerHolder listenerHolder2) {
+        this.zzia = zzak;
+        this.zzhz = listenerHolder2;
+        super(listenerHolder);
     }
 
-    public final /* bridge */ /* synthetic */ void setResult(Object obj) {
-        super.setResult((Status) obj);
-    }
-
-    public final /* synthetic */ Result zzb(Status status) {
-        return status;
-    }
-
-    final zzcj<zzn<Status>> zzbbb() {
-        return this.zzjgj;
+    public final void onExpired() {
+        this.zzia.doUnregisterEventListener(this.zzhz.getListenerKey());
+        super.onExpired();
     }
 }

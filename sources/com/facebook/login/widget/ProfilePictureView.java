@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
@@ -13,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import com.facebook.C0365R;
 import com.facebook.FacebookException;
 import com.facebook.LoggingBehavior;
 import com.facebook.internal.ImageDownloader;
@@ -23,6 +23,7 @@ import com.facebook.internal.ImageRequest.Callback;
 import com.facebook.internal.ImageResponse;
 import com.facebook.internal.Logger;
 import com.facebook.internal.Utility;
+import com.facebook.login.C0691R;
 
 public class ProfilePictureView extends FrameLayout {
     private static final String BITMAP_HEIGHT_KEY = "ProfilePictureView_height";
@@ -51,16 +52,6 @@ public class ProfilePictureView extends FrameLayout {
     private int queryHeight = 0;
     private int queryWidth = 0;
 
-    /* renamed from: com.facebook.login.widget.ProfilePictureView$1 */
-    class C04561 implements Callback {
-        C04561() {
-        }
-
-        public void onCompleted(ImageResponse imageResponse) {
-            ProfilePictureView.this.processResponse(imageResponse);
-        }
-    }
-
     public interface OnErrorListener {
         void onError(FacebookException facebookException);
     }
@@ -86,20 +77,21 @@ public class ProfilePictureView extends FrameLayout {
         int i;
         switch (this.presetSizeType) {
             case LARGE /*-4*/:
-                i = C0365R.dimen.com_facebook_profilepictureview_preset_size_large;
+                i = C0691R.dimen.com_facebook_profilepictureview_preset_size_large;
                 break;
             case -3:
-                i = C0365R.dimen.com_facebook_profilepictureview_preset_size_normal;
+                i = C0691R.dimen.com_facebook_profilepictureview_preset_size_normal;
                 break;
             case -2:
-                i = C0365R.dimen.com_facebook_profilepictureview_preset_size_small;
+                i = C0691R.dimen.com_facebook_profilepictureview_preset_size_small;
                 break;
             case -1:
                 if (z) {
-                    i = C0365R.dimen.com_facebook_profilepictureview_preset_size_normal;
+                    i = C0691R.dimen.com_facebook_profilepictureview_preset_size_normal;
                     break;
+                } else {
+                    return 0;
                 }
-                return 0;
             default:
                 return 0;
         }
@@ -115,21 +107,22 @@ public class ProfilePictureView extends FrameLayout {
     }
 
     private void parseAttributes(AttributeSet attributeSet) {
-        TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, C0365R.styleable.com_facebook_profile_picture_view);
-        setPresetSize(obtainStyledAttributes.getInt(C0365R.styleable.com_facebook_profile_picture_view_com_facebook_preset_size, -1));
-        this.isCropped = obtainStyledAttributes.getBoolean(C0365R.styleable.com_facebook_profile_picture_view_com_facebook_is_cropped, true);
+        TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attributeSet, C0691R.styleable.com_facebook_profile_picture_view);
+        setPresetSize(obtainStyledAttributes.getInt(C0691R.styleable.com_facebook_profile_picture_view_com_facebook_preset_size, -1));
+        this.isCropped = obtainStyledAttributes.getBoolean(C0691R.styleable.com_facebook_profile_picture_view_com_facebook_is_cropped, true);
         obtainStyledAttributes.recycle();
     }
 
-    private void processResponse(ImageResponse imageResponse) {
+    /* access modifiers changed from: private */
+    public void processResponse(ImageResponse imageResponse) {
         if (imageResponse.getRequest() == this.lastRequest) {
             this.lastRequest = null;
             Bitmap bitmap = imageResponse.getBitmap();
-            Throwable error = imageResponse.getError();
+            Exception error = imageResponse.getError();
             if (error != null) {
-                OnErrorListener onErrorListener = this.onErrorListener;
-                if (onErrorListener != null) {
-                    onErrorListener.onError(new FacebookException("Error in downloading profile picture for profileId: " + getProfileId(), error));
+                OnErrorListener onErrorListener2 = this.onErrorListener;
+                if (onErrorListener2 != null) {
+                    onErrorListener2.onError(new FacebookException("Error in downloading profile picture for profileId: " + getProfileId(), (Throwable) error));
                 } else {
                     Logger.log(LoggingBehavior.REQUESTS, 6, TAG, error.toString());
                 }
@@ -152,7 +145,11 @@ public class ProfilePictureView extends FrameLayout {
     }
 
     private void sendImageRequest(boolean z) {
-        ImageRequest build = new Builder(getContext(), ImageRequest.getProfilePictureUri(this.profileId, this.queryWidth, this.queryHeight)).setAllowCachedRedirects(z).setCallerTag(this).setCallback(new C04561()).build();
+        ImageRequest build = new Builder(getContext(), ImageRequest.getProfilePictureUri(this.profileId, this.queryWidth, this.queryHeight)).setAllowCachedRedirects(z).setCallerTag(this).setCallback(new Callback() {
+            public void onCompleted(ImageResponse imageResponse) {
+                ProfilePictureView.this.processResponse(imageResponse);
+            }
+        }).build();
         if (this.lastRequest != null) {
             ImageDownloader.cancelRequest(this.lastRequest);
         }
@@ -165,7 +162,7 @@ public class ProfilePictureView extends FrameLayout {
             ImageDownloader.cancelRequest(this.lastRequest);
         }
         if (this.customizedDefaultProfilePicture == null) {
-            setImageBitmap(BitmapFactory.decodeResource(getResources(), isCropped() ? C0365R.drawable.com_facebook_profile_picture_blank_square : C0365R.drawable.com_facebook_profile_picture_blank_portrait));
+            setImageBitmap(BitmapFactory.decodeResource(getResources(), isCropped() ? C0691R.C0693drawable.com_facebook_profile_picture_blank_square : C0691R.C0693drawable.com_facebook_profile_picture_blank_portrait));
             return;
         }
         updateImageQueryParameters();
@@ -180,29 +177,32 @@ public class ProfilePictureView extends FrameLayout {
     }
 
     private boolean updateImageQueryParameters() {
+        int i;
         boolean z = false;
         int height = getHeight();
         int width = getWidth();
         if (width >= 1 && height >= 1) {
             int presetSizeInPixels = getPresetSizeInPixels(false);
             if (presetSizeInPixels != 0) {
+                height = presetSizeInPixels;
                 width = presetSizeInPixels;
+            }
+            if (width > height) {
+                i = isCropped() ? height : 0;
+            } else if (isCropped()) {
+                height = width;
+                i = width;
             } else {
-                presetSizeInPixels = width;
-                width = height;
+                height = 0;
+                i = width;
             }
-            if (presetSizeInPixels <= width) {
-                width = isCropped() ? presetSizeInPixels : 0;
-            } else {
-                presetSizeInPixels = isCropped() ? width : 0;
-            }
-            if (presetSizeInPixels != this.queryWidth) {
+            if (i != this.queryWidth) {
                 z = true;
-            } else if (width != this.queryHeight) {
+            } else if (height != this.queryHeight) {
                 z = true;
             }
-            this.queryWidth = presetSizeInPixels;
-            this.queryHeight = width;
+            this.queryWidth = i;
+            this.queryHeight = height;
         }
         return z;
     }
@@ -223,18 +223,20 @@ public class ProfilePictureView extends FrameLayout {
         return this.isCropped;
     }
 
-    protected void onDetachedFromWindow() {
+    /* access modifiers changed from: protected */
+    public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         this.lastRequest = null;
     }
 
-    protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
+    /* access modifiers changed from: protected */
+    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
         super.onLayout(z, i, i2, i3, i4);
         refreshImage(false);
     }
 
-    protected void onMeasure(int i, int i2) {
-        int i3;
+    /* access modifiers changed from: protected */
+    public void onMeasure(int i, int i2) {
         ViewGroup.LayoutParams layoutParams = getLayoutParams();
         boolean z = false;
         int size = MeasureSpec.getSize(i2);
@@ -244,23 +246,21 @@ public class ProfilePictureView extends FrameLayout {
             i2 = MeasureSpec.makeMeasureSpec(size, 1073741824);
             z = true;
         }
-        if (MeasureSpec.getMode(i) == 1073741824 || layoutParams.width != -2) {
-            i3 = size2;
-        } else {
-            int presetSizeInPixels = getPresetSizeInPixels(true);
-            i = MeasureSpec.makeMeasureSpec(presetSizeInPixels, 1073741824);
-            i3 = presetSizeInPixels;
+        if (MeasureSpec.getMode(i) != 1073741824 && layoutParams.width == -2) {
+            size2 = getPresetSizeInPixels(true);
+            i = MeasureSpec.makeMeasureSpec(size2, 1073741824);
             z = true;
         }
         if (z) {
-            setMeasuredDimension(i3, size);
+            setMeasuredDimension(size2, size);
             measureChildren(i, i2);
             return;
         }
         super.onMeasure(i, i2);
     }
 
-    protected void onRestoreInstanceState(Parcelable parcelable) {
+    /* access modifiers changed from: protected */
+    public void onRestoreInstanceState(Parcelable parcelable) {
         if (parcelable.getClass() != Bundle.class) {
             super.onRestoreInstanceState(parcelable);
             return;
@@ -272,20 +272,17 @@ public class ProfilePictureView extends FrameLayout {
         this.isCropped = bundle.getBoolean(IS_CROPPED_KEY);
         this.queryWidth = bundle.getInt(BITMAP_WIDTH_KEY);
         this.queryHeight = bundle.getInt(BITMAP_HEIGHT_KEY);
-        setImageBitmap((Bitmap) bundle.getParcelable(BITMAP_KEY));
-        if (bundle.getBoolean(PENDING_REFRESH_KEY)) {
-            refreshImage(true);
-        }
+        refreshImage(true);
     }
 
-    protected Parcelable onSaveInstanceState() {
+    /* access modifiers changed from: protected */
+    public Parcelable onSaveInstanceState() {
         Parcelable onSaveInstanceState = super.onSaveInstanceState();
-        Parcelable bundle = new Bundle();
+        Bundle bundle = new Bundle();
         bundle.putParcelable(SUPER_STATE_KEY, onSaveInstanceState);
         bundle.putString(PROFILE_ID_KEY, this.profileId);
         bundle.putInt(PRESET_SIZE_KEY, this.presetSizeType);
         bundle.putBoolean(IS_CROPPED_KEY, this.isCropped);
-        bundle.putParcelable(BITMAP_KEY, this.imageContents);
         bundle.putInt(BITMAP_WIDTH_KEY, this.queryWidth);
         bundle.putInt(BITMAP_HEIGHT_KEY, this.queryHeight);
         bundle.putBoolean(PENDING_REFRESH_KEY, this.lastRequest != null);
@@ -301,8 +298,8 @@ public class ProfilePictureView extends FrameLayout {
         this.customizedDefaultProfilePicture = bitmap;
     }
 
-    public final void setOnErrorListener(OnErrorListener onErrorListener) {
-        this.onErrorListener = onErrorListener;
+    public final void setOnErrorListener(OnErrorListener onErrorListener2) {
+        this.onErrorListener = onErrorListener2;
     }
 
     public final void setPresetSize(int i) {
@@ -319,7 +316,7 @@ public class ProfilePictureView extends FrameLayout {
         }
     }
 
-    public final void setProfileId(String str) {
+    public final void setProfileId(@Nullable String str) {
         boolean z = false;
         if (Utility.isNullOrEmpty(this.profileId) || !this.profileId.equalsIgnoreCase(str)) {
             setBlankProfilePicture();

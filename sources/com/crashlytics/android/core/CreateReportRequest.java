@@ -4,8 +4,8 @@ class CreateReportRequest {
     public final String apiKey;
     public final Report report;
 
-    public CreateReportRequest(String str, Report report) {
+    public CreateReportRequest(String str, Report report2) {
         this.apiKey = str;
-        this.report = report;
+        this.report = report2;
     }
 }

@@ -1,6 +1,9 @@
 package net.gogame.gowrap.inbox;
 
 public class MessageStateManagerException extends Exception {
+    public MessageStateManagerException() {
+    }
+
     public MessageStateManagerException(String str) {
         super(str);
     }

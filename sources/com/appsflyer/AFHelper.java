@@ -21,7 +21,7 @@ public class AFHelper {
         JSONObject jSONObject = new JSONObject();
         for (Entry entry : map.entrySet()) {
             try {
-                jSONObject.put((String) entry.getKey(), m180(entry.getValue()));
+                jSONObject.put((String) entry.getKey(), m175(entry.getValue()));
             } catch (JSONException e) {
             }
         }
@@ -29,7 +29,7 @@ public class AFHelper {
     }
 
     /* renamed from: ˏ */
-    private static Object m180(Object obj) {
+    private static Object m175(Object obj) {
         if (obj == null) {
             return JSONObject.NULL;
         }
@@ -37,20 +37,19 @@ public class AFHelper {
             return obj;
         }
         try {
-            JSONArray jSONArray;
             if (obj instanceof Collection) {
-                jSONArray = new JSONArray();
-                for (Object ˏ : (Collection) obj) {
-                    jSONArray.put(m180(ˏ));
+                JSONArray jSONArray = new JSONArray();
+                for (Object r2 : (Collection) obj) {
+                    jSONArray.put(m175(r2));
                 }
                 return jSONArray;
             } else if (obj.getClass().isArray()) {
                 int length = Array.getLength(obj);
-                jSONArray = new JSONArray();
+                JSONArray jSONArray2 = new JSONArray();
                 for (int i = 0; i < length; i++) {
-                    jSONArray.put(m180(Array.get(obj, i)));
+                    jSONArray2.put(m175(Array.get(obj, i)));
                 }
-                return jSONArray;
+                return jSONArray2;
             } else if (obj instanceof Map) {
                 return toJsonObject((Map) obj);
             } else {

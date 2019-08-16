@@ -25,51 +25,50 @@ public class AttackContinuationColliderProcessor : AttackColliderProcessor
 
 	public override void OnTriggerEnter(Collider to_collider)
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		base.OnTriggerEnter(to_collider);
-		if (!(base.fromCollider == null) && !(base.fromObject == null) && base.fromCollider.get_enabled() && !to_collider.get_isTrigger() && !(to_collider.get_gameObject() == base.fromCollider.get_gameObject()))
+		if (base.fromCollider == null || base.fromObject == null || !base.fromCollider.get_enabled() || to_collider.get_gameObject() == base.fromCollider.get_gameObject())
 		{
-			StageObject componentInParent = to_collider.get_gameObject().GetComponentInParent<StageObject>();
-			if (!(componentInParent == null) && !(componentInParent == base.fromObject))
+			return;
+		}
+		StageObject componentInParent = to_collider.get_gameObject().GetComponentInParent<StageObject>();
+		if (!(componentInParent == null))
+		{
+			float time = 0f;
+			if (base.colliderInterface != null)
 			{
-				float time = 0f;
-				if (base.colliderInterface != null)
-				{
-					time = base.colliderInterface.GetTime();
-				}
-				if (componentInParent.OnContinuationEnter(attackContinuationInfo, base.fromObject, base.fromCollider, time))
-				{
-					enterList.Add(componentInParent);
-				}
+				time = base.colliderInterface.GetTime();
+			}
+			if (componentInParent.OnContinuationEnter(attackContinuationInfo, base.fromObject, base.fromCollider, time))
+			{
+				enterList.Add(componentInParent);
 			}
 		}
 	}
 
 	public override void OnTriggerExit(Collider to_collider)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.OnTriggerExit(to_collider);
 		StageObject componentInParent = to_collider.get_gameObject().GetComponentInParent<StageObject>();
-		if (!(componentInParent == null))
+		if (componentInParent == null)
 		{
-			int num = 0;
-			int count = enterList.Count;
-			while (true)
+			return;
+		}
+		int num = 0;
+		int count = enterList.Count;
+		while (true)
+		{
+			if (num < count)
 			{
-				if (num >= count)
-				{
-					return;
-				}
 				if (enterList[num] == componentInParent)
 				{
 					break;
 				}
 				num++;
+				continue;
 			}
-			componentInParent.OnContinuationExit(attackContinuationInfo, base.fromCollider);
-			enterList.RemoveAt(num);
+			return;
 		}
+		componentInParent.OnContinuationExit(attackContinuationInfo, base.fromCollider);
+		enterList.RemoveAt(num);
 	}
 }

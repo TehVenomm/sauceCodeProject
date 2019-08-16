@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ItemIconDetailSetuperBase
+public class ItemIconDetailSetuperBase : MonoBehaviour
 {
 	[SerializeField]
 	private UISprite spBG;
@@ -41,7 +41,6 @@ public class ItemIconDetailSetuperBase
 		{
 			Array.ForEach(inActiveRootAry, delegate(GameObject obj)
 			{
-				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				if (obj != null)
 				{
 					obj.get_gameObject().SetActive(false);
@@ -60,7 +59,7 @@ public class ItemIconDetailSetuperBase
 		spBG.set_enabled(is_visible);
 	}
 
-	public void SetupSelectNumberSprite(int select_number)
+	public virtual void SetupSelectNumberSprite(int select_number)
 	{
 		if (!(selectSP == null))
 		{

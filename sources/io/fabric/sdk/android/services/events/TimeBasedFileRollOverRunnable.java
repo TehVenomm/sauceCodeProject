@@ -1,15 +1,16 @@
-package io.fabric.sdk.android.services.events;
+package p017io.fabric.sdk.android.services.events;
 
 import android.content.Context;
-import io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
 
+/* renamed from: io.fabric.sdk.android.services.events.TimeBasedFileRollOverRunnable */
 public class TimeBasedFileRollOverRunnable implements Runnable {
     private final Context context;
     private final FileRollOverManager fileRollOverManager;
 
-    public TimeBasedFileRollOverRunnable(Context context, FileRollOverManager fileRollOverManager) {
-        this.context = context;
-        this.fileRollOverManager = fileRollOverManager;
+    public TimeBasedFileRollOverRunnable(Context context2, FileRollOverManager fileRollOverManager2) {
+        this.context = context2;
+        this.fileRollOverManager = fileRollOverManager2;
     }
 
     public void run() {
@@ -18,7 +19,7 @@ public class TimeBasedFileRollOverRunnable implements Runnable {
             if (!this.fileRollOverManager.rollFileOver()) {
                 this.fileRollOverManager.cancelTimeBasedFileRollOver();
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             CommonUtils.logControlledError(this.context, "Failed to roll over file", e);
         }
     }

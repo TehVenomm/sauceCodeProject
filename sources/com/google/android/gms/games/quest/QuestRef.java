@@ -3,21 +3,23 @@ package com.google.android.gms.games.quest;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
+import com.google.android.gms.common.util.VisibleForTesting;
 import com.google.android.gms.games.Game;
 import com.google.android.gms.games.GameRef;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class QuestRef extends zzc implements Quest {
-    private final Game zzhkx;
-    private final int zzhky;
+@VisibleForTesting
+public final class QuestRef extends DataBufferRef implements Quest {
+    private final Game zznw;
+    private final int zznx;
 
     QuestRef(DataHolder dataHolder, int i, int i2) {
         super(dataHolder, i);
-        this.zzhkx = new GameRef(dataHolder, i);
-        this.zzhky = i2;
+        this.zznw = new GameRef(dataHolder, i);
+        this.zznx = i2;
     }
 
     public final int describeContents() {
@@ -37,7 +39,7 @@ public final class QuestRef extends zzc implements Quest {
     }
 
     public final Uri getBannerImageUri() {
-        return zzfu("quest_banner_image_uri");
+        return parseUri("quest_banner_image_uri");
     }
 
     public final String getBannerImageUrl() {
@@ -45,7 +47,7 @@ public final class QuestRef extends zzc implements Quest {
     }
 
     public final Milestone getCurrentMilestone() {
-        return (Milestone) zzarw().get(0);
+        return (Milestone) zzdq().get(0);
     }
 
     public final String getDescription() {
@@ -53,7 +55,7 @@ public final class QuestRef extends zzc implements Quest {
     }
 
     public final void getDescription(CharArrayBuffer charArrayBuffer) {
-        zza("quest_description", charArrayBuffer);
+        copyToBuffer("quest_description", charArrayBuffer);
     }
 
     public final long getEndTimestamp() {
@@ -61,11 +63,11 @@ public final class QuestRef extends zzc implements Quest {
     }
 
     public final Game getGame() {
-        return this.zzhkx;
+        return this.zznw;
     }
 
     public final Uri getIconImageUri() {
-        return zzfu("quest_icon_image_uri");
+        return parseUri("quest_icon_image_uri");
     }
 
     public final String getIconImageUrl() {
@@ -81,7 +83,7 @@ public final class QuestRef extends zzc implements Quest {
     }
 
     public final void getName(CharArrayBuffer charArrayBuffer) {
-        zza("quest_name", charArrayBuffer);
+        copyToBuffer("quest_name", charArrayBuffer);
     }
 
     public final String getQuestId() {
@@ -116,15 +118,15 @@ public final class QuestRef extends zzc implements Quest {
         ((QuestEntity) ((Quest) freeze())).writeToParcel(parcel, i);
     }
 
-    public final List<Milestone> zzarw() {
-        List arrayList = new ArrayList(this.zzhky);
-        for (int i = 0; i < this.zzhky; i++) {
-            arrayList.add(new zzb(this.zzfkz, this.zzfqb + i));
+    public final List<Milestone> zzdq() {
+        ArrayList arrayList = new ArrayList(this.zznx);
+        for (int i = 0; i < this.zznx; i++) {
+            arrayList.add(new zzb(this.mDataHolder, this.mDataRow + i));
         }
         return arrayList;
     }
 
-    public final long zzarx() {
+    public final long zzdr() {
         return getLong("notification_ts");
     }
 }

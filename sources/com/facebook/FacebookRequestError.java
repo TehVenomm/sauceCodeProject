@@ -4,8 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import com.facebook.internal.FacebookRequestErrorClassification;
+import com.facebook.internal.FetchedAppSettings;
+import com.facebook.internal.FetchedAppSettingsManager;
 import com.facebook.internal.Utility;
-import com.facebook.internal.Utility.FetchedAppSettings;
 import java.net.HttpURLConnection;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +14,15 @@ import org.json.JSONObject;
 public final class FacebookRequestError implements Parcelable {
     private static final String BODY_KEY = "body";
     private static final String CODE_KEY = "code";
-    public static final Creator<FacebookRequestError> CREATOR = new C03481();
+    public static final Creator<FacebookRequestError> CREATOR = new Creator<FacebookRequestError>() {
+        public FacebookRequestError createFromParcel(Parcel parcel) {
+            return new FacebookRequestError(parcel);
+        }
+
+        public FacebookRequestError[] newArray(int i) {
+            return new FacebookRequestError[i];
+        }
+    };
     private static final String ERROR_CODE_FIELD_KEY = "code";
     private static final String ERROR_CODE_KEY = "error_code";
     private static final String ERROR_IS_TRANSIENT_KEY = "is_transient";
@@ -43,20 +52,6 @@ public final class FacebookRequestError implements Parcelable {
     private final int requestStatusCode;
     private final int subErrorCode;
 
-    /* renamed from: com.facebook.FacebookRequestError$1 */
-    static final class C03481 implements Creator<FacebookRequestError> {
-        C03481() {
-        }
-
-        public FacebookRequestError createFromParcel(Parcel parcel) {
-            return new FacebookRequestError(parcel);
-        }
-
-        public FacebookRequestError[] newArray(int i) {
-            return new FacebookRequestError[i];
-        }
-    }
-
     public enum Category {
         LOGIN_RECOVERABLE,
         OTHER,
@@ -72,7 +67,8 @@ public final class FacebookRequestError implements Parcelable {
             this.end = i2;
         }
 
-        boolean contains(int i) {
+        /* access modifiers changed from: 0000 */
+        public boolean contains(int i) {
             return this.start <= i && i <= this.end;
         }
     }
@@ -89,15 +85,15 @@ public final class FacebookRequestError implements Parcelable {
         this.connection = httpURLConnection;
         this.errorUserTitle = str3;
         this.errorUserMessage = str4;
-        Object obj2 = null;
+        boolean z2 = false;
         if (facebookException != null) {
             this.exception = facebookException;
-            obj2 = 1;
+            z2 = true;
         } else {
             this.exception = new FacebookServiceException(this, str2);
         }
         FacebookRequestErrorClassification errorClassification = getErrorClassification();
-        this.category = obj2 != null ? Category.OTHER : errorClassification.classify(i2, i3, z);
+        this.category = z2 ? Category.OTHER : errorClassification.classify(i2, i3, z);
         this.errorRecoveryMessage = errorClassification.getRecoveryMessage(this.category);
     }
 
@@ -109,8 +105,8 @@ public final class FacebookRequestError implements Parcelable {
         this(parcel.readInt(), parcel.readInt(), parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString(), false, null, null, null, null, null);
     }
 
-    FacebookRequestError(HttpURLConnection httpURLConnection, Exception exception) {
-        this(-1, -1, -1, null, null, null, null, false, null, null, null, httpURLConnection, exception instanceof FacebookException ? (FacebookException) exception : new FacebookException((Throwable) exception));
+    FacebookRequestError(HttpURLConnection httpURLConnection, Exception exc) {
+        this(-1, -1, -1, null, null, null, null, false, null, null, null, httpURLConnection, exc instanceof FacebookException ? (FacebookException) exc : new FacebookException((Throwable) exc));
     }
 
     static FacebookRequestError checkResponseAndCreateError(JSONObject jSONObject, Object obj, HttpURLConnection httpURLConnection) {
@@ -127,7 +123,7 @@ public final class FacebookRequestError implements Parcelable {
                     boolean z = false;
                     int i2 = -1;
                     int i3 = -1;
-                    Object obj2 = null;
+                    boolean z2 = false;
                     if (jSONObject2.has("error")) {
                         JSONObject jSONObject3 = (JSONObject) Utility.getStringPropertyAsJSON(jSONObject2, "error", null);
                         str = jSONObject3.optString("type", null);
@@ -137,15 +133,15 @@ public final class FacebookRequestError implements Parcelable {
                         str3 = jSONObject3.optString(ERROR_USER_MSG_KEY, null);
                         str4 = jSONObject3.optString(ERROR_USER_TITLE_KEY, null);
                         z = jSONObject3.optBoolean(ERROR_IS_TRANSIENT_KEY, false);
-                        obj2 = 1;
+                        z2 = true;
                     } else if (jSONObject2.has("error_code") || jSONObject2.has(ERROR_MSG_KEY) || jSONObject2.has(ERROR_REASON_KEY)) {
                         str = jSONObject2.optString(ERROR_REASON_KEY, null);
                         str2 = jSONObject2.optString(ERROR_MSG_KEY, null);
                         i2 = jSONObject2.optInt("error_code", -1);
                         i3 = jSONObject2.optInt("error_subcode", -1);
-                        obj2 = 1;
+                        z2 = true;
                     }
-                    if (obj2 != null) {
+                    if (z2) {
                         return new FacebookRequestError(i, i2, i3, str, str2, str4, str3, z, jSONObject2, jSONObject, obj, httpURLConnection, null);
                     }
                 }
@@ -159,16 +155,16 @@ public final class FacebookRequestError implements Parcelable {
     }
 
     static FacebookRequestErrorClassification getErrorClassification() {
-        FacebookRequestErrorClassification defaultErrorClassification;
+        FacebookRequestErrorClassification errorClassification;
         synchronized (FacebookRequestError.class) {
             try {
-                FetchedAppSettings appSettingsWithoutQuery = Utility.getAppSettingsWithoutQuery(FacebookSdk.getApplicationId());
-                defaultErrorClassification = appSettingsWithoutQuery == null ? FacebookRequestErrorClassification.getDefaultErrorClassification() : appSettingsWithoutQuery.getErrorClassification();
-            } catch (Throwable th) {
-                Class cls = FacebookRequestError.class;
+                FetchedAppSettings appSettingsWithoutQuery = FetchedAppSettingsManager.getAppSettingsWithoutQuery(FacebookSdk.getApplicationId());
+                errorClassification = appSettingsWithoutQuery == null ? FacebookRequestErrorClassification.getDefaultErrorClassification() : appSettingsWithoutQuery.getErrorClassification();
+            } finally {
+                Class<FacebookRequestError> cls = FacebookRequestError.class;
             }
         }
-        return defaultErrorClassification;
+        return errorClassification;
     }
 
     public int describeContents() {
@@ -232,7 +228,7 @@ public final class FacebookRequestError implements Parcelable {
     }
 
     public String toString() {
-        return "{HttpStatus: " + this.requestStatusCode + ", errorCode: " + this.errorCode + ", errorType: " + this.errorType + ", errorMessage: " + getErrorMessage() + "}";
+        return "{HttpStatus: " + this.requestStatusCode + ", errorCode: " + this.errorCode + ", subErrorCode: " + this.subErrorCode + ", errorType: " + this.errorType + ", errorMessage: " + getErrorMessage() + "}";
     }
 
     public void writeToParcel(Parcel parcel, int i) {

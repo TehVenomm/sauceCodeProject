@@ -2,23 +2,33 @@ package com.google.android.gms.drive.events;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import com.google.android.gms.drive.DriveId;
 import java.util.Locale;
 
-public final class ChangeEvent extends zza implements ResourceEvent {
+@Class(creator = "ChangeEventCreator")
+@Reserved({1})
+public final class ChangeEvent extends AbstractSafeParcelable implements ResourceEvent {
     public static final Creator<ChangeEvent> CREATOR = new zza();
-    private DriveId zzgcx;
-    private int zzges;
+    @Field(mo13990id = 3)
+    private final int zzbs;
+    @Field(mo13990id = 2)
+    private final DriveId zzk;
 
-    public ChangeEvent(DriveId driveId, int i) {
-        this.zzgcx = driveId;
-        this.zzges = i;
+    @Constructor
+    public ChangeEvent(@Param(mo13993id = 2) DriveId driveId, @Param(mo13993id = 3) int i) {
+        this.zzk = driveId;
+        this.zzbs = i;
     }
 
     public final DriveId getDriveId() {
-        return this.zzgcx;
+        return this.zzk;
     }
 
     public final int getType() {
@@ -26,25 +36,25 @@ public final class ChangeEvent extends zza implements ResourceEvent {
     }
 
     public final boolean hasBeenDeleted() {
-        return (this.zzges & 4) != 0;
+        return (this.zzbs & 4) != 0;
     }
 
     public final boolean hasContentChanged() {
-        return (this.zzges & 2) != 0;
+        return (this.zzbs & 2) != 0;
     }
 
     public final boolean hasMetadataChanged() {
-        return (this.zzges & 1) != 0;
+        return (this.zzbs & 1) != 0;
     }
 
     public final String toString() {
-        return String.format(Locale.US, "ChangeEvent [id=%s,changeFlags=%x]", new Object[]{this.zzgcx, Integer.valueOf(this.zzges)});
+        return String.format(Locale.US, "ChangeEvent [id=%s,changeFlags=%x]", new Object[]{this.zzk, Integer.valueOf(this.zzbs)});
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzgcx, i, false);
-        zzd.zzc(parcel, 3, this.zzges);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.zzk, i, false);
+        SafeParcelWriter.writeInt(parcel, 3, this.zzbs);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

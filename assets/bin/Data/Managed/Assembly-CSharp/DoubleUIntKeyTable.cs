@@ -14,7 +14,7 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 		UIntKeyTable<T> uIntKeyTable = Get(key1);
 		if (uIntKeyTable == null)
 		{
-			uIntKeyTable = new UIntKeyTable<T>(false);
+			uIntKeyTable = new UIntKeyTable<T>(useHashDivision: false);
 			Add(key1, uIntKeyTable);
 		}
 		uIntKeyTable.Add(key2, value);
@@ -62,19 +62,20 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 
 	public override void TrimExcess()
 	{
-		if (lists != null)
+		if (lists == null)
 		{
-			for (int i = 0; i < lists.Length; i++)
+			return;
+		}
+		for (int i = 0; i < lists.Length; i++)
+		{
+			List<Item> list = lists[i];
+			if (list != null)
 			{
-				List<Item> list = lists[i];
-				if (list != null)
+				list.ForEach(delegate(Item item)
 				{
-					list.ForEach(delegate(Item item)
-					{
-						(item.value as UIntKeyTableBase)?.TrimExcess();
-					});
-					list.TrimExcess();
-				}
+					(item.value as UIntKeyTableBase)?.TrimExcess();
+				});
+				list.TrimExcess();
 			}
 		}
 	}

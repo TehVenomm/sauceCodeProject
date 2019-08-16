@@ -15,4 +15,10 @@ public interface IFieldGimmickObject
 	string GetObjectName();
 
 	float GetTargetRadius();
+
+	float GetTargetSqrRadius();
+
+	void UpdateTargetMarker(bool isNear);
+
+	bool IsSearchableNearest();
 }

@@ -1,9 +1,10 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.app.Activity;
 import android.content.Context;
-import jp.colopl.util.Util;
+import p018jp.colopl.util.Util;
 
+/* renamed from: jp.colopl.drapro.AppConsts */
 public final class AppConsts {
     public static final String GATrackingID = "drapro";
     public static final String SHOPITEM_PREFIX = "net.gogame.dragon.";
@@ -34,11 +35,11 @@ public final class AppConsts {
         while (i < itemCodeId.length) {
             try {
                 if (itemCodeId[i].equalsIgnoreCase(str)) {
-                    StringBuilder stringBuilder = new StringBuilder();
+                    StringBuilder sb = new StringBuilder();
                     if (activity == null) {
                         z = true;
                     }
-                    Util.dLog(null, stringBuilder.append(z).append("  ").append(str).toString());
+                    Util.dLog(null, sb.append(z).append("  ").append(str).toString());
                     return itemNameId[i];
                 }
                 i++;

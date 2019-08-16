@@ -20,6 +20,8 @@ public class PartyModel : BaseModel
 		public int repeatPartyStatus;
 
 		public int repeatStatus;
+
+		public bool repeatFeatureEnable;
 	}
 
 	public class RandomMatchingInfo
@@ -53,6 +55,8 @@ public class PartyModel : BaseModel
 		public QuestInfo quest;
 
 		public List<SlotInfo> slotInfos;
+
+		public int iconBit;
 
 		public bool isRepeat;
 	}
@@ -172,6 +176,10 @@ public class PartyModel : BaseModel
 		public int enemySpecies;
 
 		public int questTypeBit;
+
+		public int isFs;
+
+		public int isCs;
 	}
 
 	public class RequestSearchRushRandomMatching

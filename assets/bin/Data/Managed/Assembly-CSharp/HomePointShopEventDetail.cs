@@ -31,7 +31,6 @@ public class HomePointShopEventDetail : GameSection
 
 	public override void Initialize()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		data = (GameSection.GetEventData() as PointShop);
 		currentPage = 1;
 		this.StartCoroutine(DoInitialize());
@@ -40,11 +39,11 @@ public class HomePointShopEventDetail : GameSection
 	private IEnumerator DoInitialize()
 	{
 		LoadingQueue loadingQueue = new LoadingQueue(this);
-		loadingQueue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(data.pointShopId), false);
-		loadingQueue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointSHopBGImageName(data.pointShopId), false);
+		loadingQueue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName(data.pointShopId));
+		loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.COMMON, ResourceName.GetPointSHopBGImageName(data.pointShopId));
 		if (loadingQueue.IsLoading())
 		{
-			yield return (object)loadingQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		base.Initialize();
 	}
@@ -75,23 +74,24 @@ public class HomePointShopEventDetail : GameSection
 		SetLabelText((Enum)UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
 		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
 		int item_num = Mathf.Min(GameDefine.POINT_SHOP_LIST_COUNT, currentPointShopItem.Count - (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT);
-		SetGrid(UI.GRD_LIST, "PointShopListItem", item_num, true, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_LIST, "PointShopListItem", item_num, reset: true, delegate(int i, Transform t, bool b)
 		{
 			int index = i + (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT;
+			PointShopItem pointShopItem = currentPointShopItem[index];
 			object event_data = new object[3]
 			{
-				currentPointShopItem[index],
+				pointShopItem,
 				data,
 				new Action<PointShopItem, int>(OnBuy)
 			};
 			SetEvent(t, "CONFIRM_BUY", event_data);
 			PointShopItemList component = t.GetComponent<PointShopItemList>();
-			component.SetUp(currentPointShopItem[index], (uint)data.pointShopId, currentPointShopItem[index].needPoint <= data.userPoint);
+			component.SetUp(pointShopItem, (uint)data.pointShopId, pointShopItem.needPoint <= data.userPoint);
 			int num = -1;
-			REWARD_TYPE type = (REWARD_TYPE)currentPointShopItem[index].type;
+			REWARD_TYPE type = (REWARD_TYPE)pointShopItem.type;
 			if (type == REWARD_TYPE.ITEM)
 			{
-				num = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum((uint)currentPointShopItem[index].itemId);
+				num = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum((uint)pointShopItem.itemId);
 			}
 			SetLabelText(t, UI.LBL_HAVE, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 6u), num.ToString()));
 			SetActive(t, UI.LBL_HAVE, num >= 0);
@@ -105,7 +105,7 @@ public class HomePointShopEventDetail : GameSection
 		PointShop pointShop = array[1] as PointShop;
 		if (pointShop.userPoint < pointShopItem.needPoint)
 		{
-			GameSection.ChangeEvent("SHORTAGE_POINT", null);
+			GameSection.ChangeEvent("SHORTAGE_POINT");
 		}
 	}
 
@@ -133,7 +133,7 @@ public class HomePointShopEventDetail : GameSection
 				data.userPoint -= item.needPoint * num;
 				RefreshUI();
 			}
-			GameSection.ResumeEvent(result != null && result.Error == Error.None, null);
+			GameSection.ResumeEvent(result != null && result.Error == Error.None);
 		}, string.Empty);
 	}
 

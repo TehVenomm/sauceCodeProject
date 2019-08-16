@@ -75,28 +75,27 @@ public class UIGeometry
 		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		if (mRtpVerts != null && mRtpVerts.size > 0)
+		if (mRtpVerts == null || mRtpVerts.size <= 0)
 		{
-			if (n == null)
+			return;
+		}
+		if (n == null)
+		{
+			for (int i = 0; i < mRtpVerts.size; i++)
 			{
-				for (int i = 0; i < mRtpVerts.size; i++)
-				{
-					v.Add(mRtpVerts.buffer[i]);
-					u.Add(uvs.buffer[i]);
-					c.Add(cols.buffer[i]);
-				}
+				v.Add(mRtpVerts.buffer[i]);
+				u.Add(uvs.buffer[i]);
+				c.Add(cols.buffer[i]);
 			}
-			else
-			{
-				for (int j = 0; j < mRtpVerts.size; j++)
-				{
-					v.Add(mRtpVerts.buffer[j]);
-					u.Add(uvs.buffer[j]);
-					c.Add(cols.buffer[j]);
-					n.Add(mRtpNormal);
-					t.Add(mRtpTan);
-				}
-			}
+			return;
+		}
+		for (int j = 0; j < mRtpVerts.size; j++)
+		{
+			v.Add(mRtpVerts.buffer[j]);
+			u.Add(uvs.buffer[j]);
+			c.Add(cols.buffer[j]);
+			n.Add(mRtpNormal);
+			t.Add(mRtpTan);
 		}
 	}
 }

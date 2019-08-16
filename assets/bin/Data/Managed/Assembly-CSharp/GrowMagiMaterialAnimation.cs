@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GrowMagiMaterialAnimation
+public class GrowMagiMaterialAnimation : MonoBehaviour
 {
 	[SerializeField]
 	public float rotate = 5f;
@@ -21,7 +21,6 @@ public class GrowMagiMaterialAnimation
 
 	private void Update()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_transform().Rotate(0f, rotate, 0f);
 	}
 }

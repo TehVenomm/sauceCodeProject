@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyParam
+public class EnemyParam : MonoBehaviour
 {
 	public StageObject.StampInfo[] stampInfos;
 
@@ -55,6 +55,9 @@ public class EnemyParam
 	[Tooltip("UI高さ")]
 	public float uiHeight = 2f;
 
+	[Tooltip("UI表示距離")]
+	public float uiShowDistance;
+
 	[Tooltip("麻痺耐性")]
 	public float paralyzeMax = 100f;
 
@@ -63,6 +66,12 @@ public class EnemyParam
 
 	[Tooltip("凍結耐性")]
 	public float freezeMax = 100f;
+
+	[Tooltip("光輪耐性")]
+	public float lightRingMax = 100f;
+
+	[Tooltip("光輪高さoffset")]
+	public float lightRingHeightOffset;
 
 	[Tooltip("しばり拘束時間減少割合")]
 	public float shadowSealingBindResist = 1f;
@@ -151,6 +160,25 @@ public class EnemyParam
 	[Tooltip("魔狂化になるLv")]
 	public int madModeLvThreshold;
 
+	[Tooltip("拘束/凍結のダメ\u30fcジモ\u30fcション指定割合(0.0〜1.0)")]
+	public float stopMotionByDebuffNormalizedTime = -1f;
+
+	[Tooltip("死から復活する回数")]
+	public int deadReviveCountMax;
+
+	[Tooltip("強制MovePoint実行フラグ")]
+	public bool forceActMovePoint;
+
+	[Header("エフェクトサイズ計算別調整")]
+	[Tooltip("バフ系(凍結,腐敗等)のエフェクト大きさ調整(0の場合は無視する")]
+	public float effectFreezeRadiusRate;
+
+	[Tooltip("シャドウシ\u30fcリング/コンカッションのエフェクト大きさ調整(0の場合は無視する")]
+	public float effectShadowSealingRadiusRate;
+
+	[Tooltip("光輪のエフェクト大きさ調整(0の場合は無視する)")]
+	public float effectLightRingRadiusRate;
+
 	public EnemyParam()
 		: this()
 	{
@@ -158,8 +186,6 @@ public class EnemyParam
 
 	public void SetParam(Enemy targetEnemy)
 	{
-		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
 		targetEnemy.SetResidentEffectSetting(residentEffectSetting);
 		targetEnemy.SetAttackInfos(Utility.CreateMergedArray((AttackInfo[])attackHitInfos, (AttackInfo[])attackContinuationInfos));
 		targetEnemy.convertAttackInfos = Utility.CreateMergedArray((AttackInfo[])convertAttackHitInfos, (AttackInfo[])convertAttackContinuationInfos);
@@ -177,9 +203,15 @@ public class EnemyParam
 		targetEnemy.downHeal = downHeal;
 		targetEnemy.bodyRadius = bodyRadius;
 		targetEnemy.uiHeight = uiHeight;
+		targetEnemy.uiShowDistance = uiShowDistance;
+		targetEnemy.effectShadowSealingRadiusRate = effectShadowSealingRadiusRate;
+		targetEnemy.effectLightRingRadiusRate = effectLightRingRadiusRate;
+		targetEnemy.effectFreezeRadiusRate = effectFreezeRadiusRate;
 		targetEnemy.badStatusMax.paralyze = paralyzeMax;
 		targetEnemy.badStatusMax.poison = poisonMax;
 		targetEnemy.badStatusMax.freeze = freezeMax;
+		targetEnemy.badStatusMax.lightRing = lightRingMax;
+		targetEnemy.lightRingHeightOffset = lightRingHeightOffset;
 		targetEnemy.badStatusBase.Copy(targetEnemy.badStatusMax);
 		targetEnemy.baseHitMaterialName = baseHitMaterialName;
 		targetEnemy.brainParam = brainParam;
@@ -209,6 +241,9 @@ public class EnemyParam
 		targetEnemy.converteElementToleranceTable = converteElementToleranceTable;
 		targetEnemy.madModeHpThreshold = madModeHpThreshold;
 		targetEnemy.madModeLvThreshold = madModeLvThreshold;
+		targetEnemy.deadReviveCountMax = deadReviveCountMax;
+		targetEnemy.forceActMovePoint = forceActMovePoint;
+		targetEnemy.stopMotionByDebuffNormalizedTime = stopMotionByDebuffNormalizedTime;
 		if (stampInfos != null && stampInfos.Length > 0)
 		{
 			CharacterStampCtrl characterStampCtrl = this.get_gameObject().GetComponent<CharacterStampCtrl>();
@@ -216,7 +251,7 @@ public class EnemyParam
 			{
 				characterStampCtrl = this.get_gameObject().AddComponent<CharacterStampCtrl>();
 			}
-			characterStampCtrl.Init(stampInfos, targetEnemy, false);
+			characterStampCtrl.Init(stampInfos, targetEnemy);
 		}
 	}
 }

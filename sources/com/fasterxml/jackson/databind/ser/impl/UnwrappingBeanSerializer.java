@@ -51,11 +51,13 @@ public class UnwrappingBeanSerializer extends BeanSerializerBase implements Seri
         return new UnwrappingBeanSerializer(this, this._objectIdWriter, obj);
     }
 
-    protected BeanSerializerBase withIgnorals(String[] strArr) {
+    /* access modifiers changed from: protected */
+    public BeanSerializerBase withIgnorals(String[] strArr) {
         return new UnwrappingBeanSerializer(this, strArr);
     }
 
-    protected BeanSerializerBase asArraySerializer() {
+    /* access modifiers changed from: protected */
+    public BeanSerializerBase asArraySerializer() {
         return this;
     }
 

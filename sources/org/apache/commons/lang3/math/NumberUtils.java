@@ -1,19 +1,17 @@
 package org.apache.commons.lang3.math;
 
 import com.facebook.appevents.AppEventsConstants;
-import com.google.android.gms.games.quest.Quests;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 public class NumberUtils {
-    public static final Byte BYTE_MINUS_ONE = Byte.valueOf((byte) -1);
-    public static final Byte BYTE_ONE = Byte.valueOf((byte) 1);
-    public static final Byte BYTE_ZERO = Byte.valueOf((byte) 0);
+    public static final Byte BYTE_MINUS_ONE = Byte.valueOf(-1);
+    public static final Byte BYTE_ONE = Byte.valueOf(1);
+    public static final Byte BYTE_ZERO = Byte.valueOf(0);
     public static final Double DOUBLE_MINUS_ONE = Double.valueOf(-1.0d);
     public static final Double DOUBLE_ONE = Double.valueOf(1.0d);
     public static final Double DOUBLE_ZERO = Double.valueOf(0.0d);
@@ -26,22 +24,23 @@ public class NumberUtils {
     public static final Long LONG_MINUS_ONE = Long.valueOf(-1);
     public static final Long LONG_ONE = Long.valueOf(1);
     public static final Long LONG_ZERO = Long.valueOf(0);
-    public static final Short SHORT_MINUS_ONE = Short.valueOf((short) -1);
-    public static final Short SHORT_ONE = Short.valueOf((short) 1);
-    public static final Short SHORT_ZERO = Short.valueOf((short) 0);
+    public static final Short SHORT_MINUS_ONE = Short.valueOf(-1);
+    public static final Short SHORT_ONE = Short.valueOf(1);
+    public static final Short SHORT_ZERO = Short.valueOf(0);
 
     public static int toInt(String str) {
         return toInt(str, 0);
     }
 
     public static int toInt(String str, int i) {
-        if (str != null) {
-            try {
-                i = Integer.parseInt(str);
-            } catch (NumberFormatException e) {
-            }
+        if (str == null) {
+            return i;
         }
-        return i;
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return i;
+        }
     }
 
     public static long toLong(String str) {
@@ -49,13 +48,14 @@ public class NumberUtils {
     }
 
     public static long toLong(String str, long j) {
-        if (str != null) {
-            try {
-                j = Long.parseLong(str);
-            } catch (NumberFormatException e) {
-            }
+        if (str == null) {
+            return j;
         }
-        return j;
+        try {
+            return Long.parseLong(str);
+        } catch (NumberFormatException e) {
+            return j;
+        }
     }
 
     public static float toFloat(String str) {
@@ -63,13 +63,14 @@ public class NumberUtils {
     }
 
     public static float toFloat(String str, float f) {
-        if (str != null) {
-            try {
-                f = Float.parseFloat(str);
-            } catch (NumberFormatException e) {
-            }
+        if (str == null) {
+            return f;
         }
-        return f;
+        try {
+            return Float.parseFloat(str);
+        } catch (NumberFormatException e) {
+            return f;
+        }
     }
 
     public static double toDouble(String str) {
@@ -77,115 +78,133 @@ public class NumberUtils {
     }
 
     public static double toDouble(String str, double d) {
-        if (str != null) {
-            try {
-                d = Double.parseDouble(str);
-            } catch (NumberFormatException e) {
-            }
+        if (str == null) {
+            return d;
         }
-        return d;
+        try {
+            return Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return d;
+        }
     }
 
     public static byte toByte(String str) {
-        return toByte(str, (byte) 0);
+        return toByte(str, 0);
     }
 
     public static byte toByte(String str, byte b) {
-        if (str != null) {
-            try {
-                b = Byte.parseByte(str);
-            } catch (NumberFormatException e) {
-            }
+        if (str == null) {
+            return b;
         }
-        return b;
+        try {
+            return Byte.parseByte(str);
+        } catch (NumberFormatException e) {
+            return b;
+        }
     }
 
     public static short toShort(String str) {
-        return toShort(str, (short) 0);
+        return toShort(str, 0);
     }
 
     public static short toShort(String str, short s) {
-        if (str != null) {
-            try {
-                s = Short.parseShort(str);
-            } catch (NumberFormatException e) {
-            }
+        if (str == null) {
+            return s;
         }
-        return s;
+        try {
+            return Short.parseShort(str);
+        } catch (NumberFormatException e) {
+            return s;
+        }
     }
 
     public static Number createNumber(String str) throws NumberFormatException {
-        String str2 = null;
-        int i = 0;
+        int i;
+        String mantissa;
+        int i2;
+        String str2;
+        String str3;
+        String substring;
+        char c;
+        String str4 = null;
+        char c2 = 0;
         if (str == null) {
             return null;
         }
         if (StringUtils.isBlank(str)) {
             throw new NumberFormatException("A blank string is not a valid number");
         }
-        int length;
-        for (String str3 : new String[]{"0x", "0X", "-0x", "-0X", "#", "-#"}) {
-            if (str.startsWith(str3)) {
-                length = str3.length() + 0;
+        String[] strArr = {"0x", "0X", "-0x", "-0X", "#", "-#"};
+        int length = strArr.length;
+        int i3 = 0;
+        while (true) {
+            if (i3 >= length) {
+                i = 0;
                 break;
             }
+            String str5 = strArr[i3];
+            if (str.startsWith(str5)) {
+                i = 0 + str5.length();
+                break;
+            }
+            i3++;
         }
-        length = 0;
-        int i2;
-        if (length > 0) {
-            i2 = length;
-            while (length < str.length()) {
-                char charAt = str.charAt(length);
-                if (charAt != '0') {
+        if (i > 0) {
+            int i4 = i;
+            int i5 = i;
+            while (true) {
+                if (i4 >= str.length()) {
+                    c = c2;
                     break;
                 }
-                i2++;
-                length++;
+                c = str.charAt(i4);
+                if (c != '0') {
+                    break;
+                }
+                i5++;
+                i4++;
+                c2 = c;
             }
-            length = str.length() - i2;
-            if (length > 16 || (length == 16 && r1 > '7')) {
+            int length2 = str.length() - i5;
+            if (length2 > 16 || (length2 == 16 && c > '7')) {
                 return createBigInteger(str);
             }
-            if (length > 8 || (length == 8 && r1 > '7')) {
+            if (length2 > 8 || (length2 == 8 && c > '7')) {
                 return createLong(str);
             }
             return createInteger(str);
         }
-        String mantissa;
-        String str4;
-        char charAt2 = str.charAt(str.length() - 1);
-        i2 = str.indexOf(46);
-        int indexOf = (str.indexOf(Quests.SELECT_COMPLETED_UNCLAIMED) + str.indexOf(69)) + 1;
-        String substring;
-        if (i2 > -1) {
-            if (indexOf <= -1) {
-                substring = str.substring(i2 + 1);
-            } else if (indexOf < i2 || indexOf > str.length()) {
+        char charAt = str.charAt(str.length() - 1);
+        int indexOf = str.indexOf(46);
+        int indexOf2 = str.indexOf(101) + str.indexOf(69) + 1;
+        if (indexOf > -1) {
+            if (indexOf2 <= -1) {
+                substring = str.substring(indexOf + 1);
+            } else if (indexOf2 < indexOf || indexOf2 > str.length()) {
                 throw new NumberFormatException(str + " is not a valid number.");
             } else {
-                substring = str.substring(i2 + 1, indexOf);
+                substring = str.substring(indexOf + 1, indexOf2);
             }
-            mantissa = getMantissa(str, i2);
-            str4 = substring;
-            length = substring.length();
+            str3 = getMantissa(str, indexOf);
+            i2 = substring.length();
+            str2 = substring;
         } else {
-            if (indexOf <= -1) {
-                substring = getMantissa(str);
-            } else if (indexOf > str.length()) {
+            if (indexOf2 <= -1) {
+                mantissa = getMantissa(str);
+            } else if (indexOf2 > str.length()) {
                 throw new NumberFormatException(str + " is not a valid number.");
             } else {
-                substring = getMantissa(str, indexOf);
+                mantissa = getMantissa(str, indexOf2);
             }
-            str4 = null;
-            mantissa = substring;
-            length = 0;
+            i2 = 0;
+            str2 = null;
+            str3 = mantissa;
         }
-        Number createFloat;
-        if (Character.isDigit(charAt2) || charAt2 == ClassUtils.PACKAGE_SEPARATOR_CHAR) {
-            if (indexOf > -1 && indexOf < str.length() - 1) {
-                str2 = str.substring(indexOf + 1, str.length());
+        if (Character.isDigit(charAt) || charAt == '.') {
+            if (indexOf2 > -1 && indexOf2 < str.length() - 1) {
+                str4 = str.substring(indexOf2 + 1, str.length());
             }
-            if (str4 == null && r3 == null) {
+            if (str2 == null && str4 == null) {
                 try {
                     return createInteger(str);
                 } catch (NumberFormatException e) {
@@ -195,72 +214,75 @@ public class NumberUtils {
                         return createBigInteger(str);
                     }
                 }
-            }
-            if (isAllZeros(mantissa) && isAllZeros(r3)) {
-                i = 1;
-            }
-            if (length <= 7) {
-                try {
-                    createFloat = createFloat(str);
-                    if (!(createFloat.isInfinite() || (createFloat.floatValue() == 0.0f && r1 == 0))) {
-                        return createFloat;
-                    }
-                } catch (NumberFormatException e3) {
+            } else {
+                if (isAllZeros(str3) && isAllZeros(str4)) {
+                    c2 = 1;
                 }
-            }
-            if (length <= 16) {
-                try {
-                    createFloat = createDouble(str);
-                    if (!(createFloat.isInfinite() || (createFloat.doubleValue() == 0.0d && r1 == 0))) {
-                        return createFloat;
-                    }
-                } catch (NumberFormatException e4) {
-                }
-            }
-            return createBigDecimal(str);
-        }
-        if (indexOf > -1 && indexOf < str.length() - 1) {
-            str2 = str.substring(indexOf + 1, str.length() - 1);
-        }
-        String substring2 = str.substring(0, str.length() - 1);
-        length = (isAllZeros(mantissa) && isAllZeros(str2)) ? 1 : 0;
-        switch (charAt2) {
-            case 'D':
-            case 'd':
-                break;
-            case 'F':
-            case 'f':
-                try {
-                    createFloat = createFloat(substring2);
-                    if (!(createFloat.isInfinite() || (createFloat.floatValue() == 0.0f && length == 0))) {
-                        return createFloat;
-                    }
-                } catch (NumberFormatException e5) {
-                    break;
-                }
-            case 'L':
-            case 'l':
-                if (str4 == null && str2 == null && ((substring2.charAt(0) == '-' && isDigits(substring2.substring(1))) || isDigits(substring2))) {
+                if (i2 <= 7) {
                     try {
-                        return createLong(substring2);
-                    } catch (NumberFormatException e6) {
-                        return createBigInteger(substring2);
+                        Float createFloat = createFloat(str);
+                        if (!createFloat.isInfinite() && !(createFloat.floatValue() == 0.0f && c2 == 0)) {
+                            return createFloat;
+                        }
+                    } catch (NumberFormatException e3) {
                     }
                 }
-                throw new NumberFormatException(str + " is not a valid number.");
-        }
-        try {
-            createFloat = createDouble(substring2);
-            if (!(createFloat.isInfinite() || (((double) createFloat.floatValue()) == 0.0d && length == 0))) {
-                return createFloat;
+                if (i2 <= 16) {
+                    try {
+                        Double createDouble = createDouble(str);
+                        if (!createDouble.isInfinite() && !(createDouble.doubleValue() == 0.0d && c2 == 0)) {
+                            return createDouble;
+                        }
+                    } catch (NumberFormatException e4) {
+                    }
+                }
+                return createBigDecimal(str);
             }
-        } catch (NumberFormatException e7) {
+        } else {
+            if (indexOf2 > -1 && indexOf2 < str.length() - 1) {
+                str4 = str.substring(indexOf2 + 1, str.length() - 1);
+            }
+            String substring2 = str.substring(0, str.length() - 1);
+            boolean z = isAllZeros(str3) && isAllZeros(str4);
+            switch (charAt) {
+                case 'D':
+                case 'd':
+                    break;
+                case 'F':
+                case 'f':
+                    try {
+                        Float createFloat2 = createFloat(substring2);
+                        if (!createFloat2.isInfinite() && (createFloat2.floatValue() != 0.0f || z)) {
+                            return createFloat2;
+                        }
+                    } catch (NumberFormatException e5) {
+                        break;
+                    }
+                case 'L':
+                case 'l':
+                    if (str2 == null && str4 == null && ((substring2.charAt(0) == '-' && isDigits(substring2.substring(1))) || isDigits(substring2))) {
+                        try {
+                            return createLong(substring2);
+                        } catch (NumberFormatException e6) {
+                            return createBigInteger(substring2);
+                        }
+                    } else {
+                        throw new NumberFormatException(str + " is not a valid number.");
+                    }
+            }
+            try {
+                Double createDouble2 = createDouble(substring2);
+                if (!createDouble2.isInfinite() && (((double) createDouble2.floatValue()) != 0.0d || z)) {
+                    return createDouble2;
+                }
+            } catch (NumberFormatException e7) {
+            }
+            try {
+                return createBigDecimal(substring2);
+            } catch (NumberFormatException e8) {
+            }
         }
-        try {
-            return createBigDecimal(substring2);
-        } catch (NumberFormatException e8) {
-            throw new NumberFormatException(str + " is not a valid number.");
-        }
+        throw new NumberFormatException(str + " is not a valid number.");
     }
 
     private static String getMantissa(String str) {
@@ -268,14 +290,14 @@ public class NumberUtils {
     }
 
     private static String getMantissa(String str, int i) {
-        int i2;
+        boolean z;
         char charAt = str.charAt(0);
         if (charAt == '-' || charAt == '+') {
-            i2 = 1;
+            z = true;
         } else {
-            i2 = 0;
+            z = false;
         }
-        return i2 != 0 ? str.substring(1, i) : str.substring(0, i);
+        return z ? str.substring(1, i) : str.substring(0, i);
     }
 
     private static boolean isAllZeros(String str) {
@@ -322,32 +344,33 @@ public class NumberUtils {
     }
 
     public static BigInteger createBigInteger(String str) {
-        int i = 1;
-        int i2 = 0;
+        boolean z;
+        int i;
+        int i2;
         if (str == null) {
             return null;
         }
-        int i3;
         if (str.startsWith("-")) {
-            i2 = 1;
+            z = true;
+            i = 1;
         } else {
+            z = false;
             i = 0;
         }
-        if (str.startsWith("0x", i2) || str.startsWith("0X", i2)) {
-            i3 = i2 + 2;
+        if (str.startsWith("0x", i) || str.startsWith("0X", i)) {
+            i += 2;
             i2 = 16;
-        } else if (str.startsWith("#", i2)) {
-            i3 = i2 + 1;
+        } else if (str.startsWith("#", i)) {
+            i++;
             i2 = 16;
-        } else if (!str.startsWith(AppEventsConstants.EVENT_PARAM_VALUE_NO, i2) || str.length() <= i2 + 1) {
-            i3 = i2;
+        } else if (!str.startsWith(AppEventsConstants.EVENT_PARAM_VALUE_NO, i) || str.length() <= i + 1) {
             i2 = 10;
         } else {
-            i3 = i2 + 1;
             i2 = 8;
+            i++;
         }
-        BigInteger bigInteger = new BigInteger(str.substring(i3), i2);
-        if (i != 0) {
+        BigInteger bigInteger = new BigInteger(str.substring(i), i2);
+        if (z) {
             return bigInteger.negate();
         }
         return bigInteger;
@@ -511,10 +534,10 @@ public class NumberUtils {
     }
 
     private static void validateArray(Object obj) {
+        boolean z;
         if (obj == null) {
             throw new IllegalArgumentException("The Array must not be null");
         }
-        boolean z;
         if (Array.getLength(obj) != 0) {
             z = true;
         } else {
@@ -636,87 +659,84 @@ public class NumberUtils {
         if (StringUtils.isEmpty(str)) {
             return false;
         }
-        char[] toCharArray = str.toCharArray();
-        int length = toCharArray.length;
-        int i = toCharArray[0] == '-' ? 1 : 0;
-        if (length > i + 1 && toCharArray[i] == '0') {
-            if (toCharArray[i + 1] == 'x' || toCharArray[i + 1] == 'X') {
-                i += 2;
-                if (i == length) {
+        char[] charArray = str.toCharArray();
+        int length = charArray.length;
+        int i = charArray[0] == '-' ? 1 : 0;
+        if (length > i + 1 && charArray[i] == '0') {
+            if (charArray[i + 1] == 'x' || charArray[i + 1] == 'X') {
+                int i2 = i + 2;
+                if (i2 == length) {
                     return false;
                 }
-                while (i < toCharArray.length) {
-                    if ((toCharArray[i] < '0' || toCharArray[i] > '9') && ((toCharArray[i] < 'a' || toCharArray[i] > 'f') && (toCharArray[i] < 'A' || toCharArray[i] > 'F'))) {
+                while (i2 < charArray.length) {
+                    if ((charArray[i2] < '0' || charArray[i2] > '9') && ((charArray[i2] < 'a' || charArray[i2] > 'f') && (charArray[i2] < 'A' || charArray[i2] > 'F'))) {
                         return false;
                     }
-                    i++;
+                    i2++;
                 }
                 return true;
-            } else if (Character.isDigit(toCharArray[i + 1])) {
-                i++;
-                while (i < toCharArray.length) {
-                    if (toCharArray[i] < '0' || toCharArray[i] > '7') {
+            } else if (Character.isDigit(charArray[i + 1])) {
+                for (int i3 = i + 1; i3 < charArray.length; i3++) {
+                    if (charArray[i3] < '0' || charArray[i3] > '7') {
                         return false;
                     }
-                    i++;
                 }
                 return true;
             }
         }
-        int i2 = length - 1;
-        int i3 = i;
+        int i4 = length - 1;
         boolean z2 = false;
         boolean z3 = false;
         boolean z4 = false;
         boolean z5 = false;
         while (true) {
-            if (i3 < i2 || (i3 < i2 + 1 && z2 && !z5)) {
-                if (toCharArray[i3] >= '0' && toCharArray[i3] <= '9') {
-                    z5 = true;
-                    z2 = false;
-                } else if (toCharArray[i3] == ClassUtils.PACKAGE_SEPARATOR_CHAR) {
-                    if (z3 || z4) {
+            if (i < i4 || (i < i4 + 1 && z3 && !z2)) {
+                if (charArray[i] >= '0' && charArray[i] <= '9') {
+                    z2 = true;
+                    z3 = false;
+                } else if (charArray[i] == '.') {
+                    if (z4 || z5) {
+                        return false;
+                    }
+                    z4 = true;
+                } else if (charArray[i] == 'e' || charArray[i] == 'E') {
+                    if (z5 || !z2) {
                         return false;
                     }
                     z3 = true;
-                } else if (toCharArray[i3] == 'e' || toCharArray[i3] == 'E') {
-                    if (z4 || !z5) {
-                        return false;
-                    }
-                    z2 = true;
-                    z4 = true;
-                } else if ((toCharArray[i3] != '+' && toCharArray[i3] != '-') || !z2) {
+                    z5 = true;
+                } else if ((charArray[i] != '+' && charArray[i] != '-') || !z3) {
                     return false;
                 } else {
-                    z5 = false;
                     z2 = false;
+                    z3 = false;
                 }
-                i3++;
+                i++;
             }
         }
-        if (i3 >= toCharArray.length) {
-            if (z2 || !z5) {
+        if (i >= charArray.length) {
+            if (z3 || !z2) {
                 z = false;
             }
             return z;
-        } else if (toCharArray[i3] >= '0' && toCharArray[i3] <= '9') {
+        } else if (charArray[i] >= '0' && charArray[i] <= '9') {
             return true;
         } else {
-            if (toCharArray[i3] == 'e' || toCharArray[i3] == 'E') {
+            if (charArray[i] == 'e' || charArray[i] == 'E') {
                 return false;
             }
-            if (toCharArray[i3] == ClassUtils.PACKAGE_SEPARATOR_CHAR) {
-                if (z3 || z4) {
+            if (charArray[i] == '.') {
+                if (z4 || z5) {
                     return false;
                 }
-                return z5;
-            } else if (!z2 && (toCharArray[i3] == 'd' || toCharArray[i3] == 'D' || toCharArray[i3] == 'f' || toCharArray[i3] == 'F')) {
-                return z5;
+                return z2;
+            } else if (!z3 && (charArray[i] == 'd' || charArray[i] == 'D' || charArray[i] == 'f' || charArray[i] == 'F')) {
+                return z2;
             } else {
-                if (toCharArray[i3] != 'l' && toCharArray[i3] != 'L') {
+                if (charArray[i] != 'l' && charArray[i] != 'L') {
                     return false;
                 }
-                if (!z5 || z4 || z3) {
+                if (!z2 || z5 || z4) {
                     z = false;
                 }
                 return z;

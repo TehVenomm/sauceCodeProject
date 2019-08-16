@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIModel
+public class UIModel : MonoBehaviour
 {
-	private const float OffSetX = 5000f;
-
 	private static List<Transform> _models;
+
+	private const float OffSetX = 5000f;
 
 	private Transform model;
 
@@ -33,7 +33,6 @@ public class UIModel
 
 	public static UIModel Get(Transform t)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		UIModel uIModel = t.GetComponent<UIModel>();
 		if (uIModel == null)
 		{
@@ -44,7 +43,6 @@ public class UIModel
 
 	private void OnDisable()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (model != null)
 		{
 			model.get_gameObject().SetActive(false);
@@ -53,7 +51,6 @@ public class UIModel
 
 	private void OnEnable()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (model != null)
 		{
 			model.get_gameObject().SetActive(true);
@@ -71,15 +68,11 @@ public class UIModel
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 	}
 
 	public void Init(string resource_name)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		if (model != null)
 		{
 			model.get_gameObject().SetActive(true);
@@ -92,7 +85,6 @@ public class UIModel
 
 	public void Remove()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		if (model != null)
 		{
 			models.Remove(model);
@@ -103,7 +95,6 @@ public class UIModel
 
 	public void SetActive(bool active)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (model != null)
 		{
 			model.get_gameObject().SetActive(active);
@@ -115,8 +106,8 @@ public class UIModel
 		isLoading = true;
 		LoadingQueue load_queue = new LoadingQueue(this);
 		LoadObject load_object = load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.COMMON, resource_name);
-		yield return (object)load_queue.Wait();
-		model = load_object.Realizes(MonoBehaviourSingleton<AppMain>.I._transform, -1);
+		yield return load_queue.Wait();
+		model = load_object.Realizes(MonoBehaviourSingleton<AppMain>.I._transform);
 		if (model != null)
 		{
 			models.Add(model);
@@ -127,7 +118,6 @@ public class UIModel
 
 	private void OnDestroy()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		if (model != null)
 		{
 			models.Remove(model);

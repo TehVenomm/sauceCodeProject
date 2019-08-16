@@ -25,7 +25,8 @@ public class AbstractDeserializer extends JsonDeserializer<Object> implements Se
 
     public AbstractDeserializer(BeanDeserializerBuilder beanDeserializerBuilder, BeanDescription beanDescription, Map<String, SettableBeanProperty> map) {
         boolean z;
-        boolean z2 = false;
+        boolean z2;
+        boolean z3 = false;
         this._baseType = beanDescription.getType();
         this._objectIdReader = beanDeserializerBuilder.getObjectIdReader();
         this._backRefProperties = map;
@@ -38,20 +39,21 @@ public class AbstractDeserializer extends JsonDeserializer<Object> implements Se
         }
         this._acceptBoolean = z;
         if (rawClass == Integer.TYPE || rawClass.isAssignableFrom(Integer.class)) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this._acceptInt = z;
-        if (rawClass == Double.TYPE || rawClass.isAssignableFrom(Double.class)) {
             z2 = true;
+        } else {
+            z2 = false;
         }
-        this._acceptDouble = z2;
+        this._acceptInt = z2;
+        if (rawClass == Double.TYPE || rawClass.isAssignableFrom(Double.class)) {
+            z3 = true;
+        }
+        this._acceptDouble = z3;
     }
 
     protected AbstractDeserializer(BeanDescription beanDescription) {
         boolean z;
-        boolean z2 = false;
+        boolean z2;
+        boolean z3 = false;
         this._baseType = beanDescription.getType();
         this._objectIdReader = null;
         this._backRefProperties = null;
@@ -64,15 +66,15 @@ public class AbstractDeserializer extends JsonDeserializer<Object> implements Se
         }
         this._acceptBoolean = z;
         if (rawClass == Integer.TYPE || rawClass.isAssignableFrom(Integer.class)) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this._acceptInt = z;
-        if (rawClass == Double.TYPE || rawClass.isAssignableFrom(Double.class)) {
             z2 = true;
+        } else {
+            z2 = false;
         }
-        this._acceptDouble = z2;
+        this._acceptInt = z2;
+        if (rawClass == Double.TYPE || rawClass.isAssignableFrom(Double.class)) {
+            z3 = true;
+        }
+        this._acceptDouble = z3;
     }
 
     public static AbstractDeserializer constructForNonPOJO(BeanDescription beanDescription) {
@@ -92,7 +94,10 @@ public class AbstractDeserializer extends JsonDeserializer<Object> implements Se
     }
 
     public SettableBeanProperty findBackReference(String str) {
-        return this._backRefProperties == null ? null : (SettableBeanProperty) this._backRefProperties.get(str);
+        if (this._backRefProperties == null) {
+            return null;
+        }
+        return (SettableBeanProperty) this._backRefProperties.get(str);
     }
 
     public Object deserializeWithType(JsonParser jsonParser, DeserializationContext deserializationContext, TypeDeserializer typeDeserializer) throws IOException {
@@ -118,7 +123,8 @@ public class AbstractDeserializer extends JsonDeserializer<Object> implements Se
         throw deserializationContext.instantiationException(this._baseType.getRawClass(), "abstract types either need to be mapped to concrete types, have custom deserializer, or be instantiated with additional type information");
     }
 
-    protected Object _deserializeIfNatural(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeIfNatural(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         switch (jsonParser.getCurrentTokenId()) {
             case 6:
                 if (this._acceptString) {
@@ -149,7 +155,8 @@ public class AbstractDeserializer extends JsonDeserializer<Object> implements Se
         return null;
     }
 
-    protected Object _deserializeFromObjectId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public Object _deserializeFromObjectId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         Object readObjectReference = this._objectIdReader.readObjectReference(jsonParser, deserializationContext);
         ReadableObjectId findObjectId = deserializationContext.findObjectId(readObjectReference, this._objectIdReader.generator, this._objectIdReader.resolver);
         Object resolve = findObjectId.resolve();

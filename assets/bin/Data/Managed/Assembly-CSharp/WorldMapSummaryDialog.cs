@@ -66,24 +66,24 @@ public class WorldMapSummaryDialog : GameSection
 		if (currentPage == 1)
 		{
 			bool flag = currentPage < maxPage;
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, false);
+			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, is_visible: false);
 			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, flag);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, true);
+			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, is_visible: true);
 			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, !flag);
 		}
 		else if (currentPage >= maxPage)
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, true);
+			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, is_visible: true);
+			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, is_visible: false);
+			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, is_visible: false);
+			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, true);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, false);
+			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, is_visible: true);
+			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, is_visible: true);
+			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, is_visible: false);
+			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, is_visible: false);
 		}
 	}
 

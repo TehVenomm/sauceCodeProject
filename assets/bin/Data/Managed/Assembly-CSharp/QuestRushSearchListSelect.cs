@@ -19,8 +19,11 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 		LBL_NPC_MESSAGE,
 		LBL_QUEST_NAME,
 		STR_NON_LIST,
-		TEX_RUSH_IMAGE
+		TEX_RUSH_IMAGE,
+		SPR_TYPE_DIFFICULTY
 	}
+
+	private const string LIST_ITEM_PREFAB_NAME = "QuestRushSearchListSelectItem";
 
 	private QuestRushSearchRoomCondition.RushSearchRequestParam defaultParam;
 
@@ -41,10 +44,10 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 			{
 				if (err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
 				{
-					GameSection.ChangeStayEvent("NOT_FOUND_QUEST", null);
+					GameSection.ChangeStayEvent("NOT_FOUND_QUEST");
 					if (cb != null)
 					{
-						cb(true);
+						cb(obj: true);
 					}
 				}
 			}
@@ -52,7 +55,7 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 			{
 				cb(is_success);
 			}
-		}, false);
+		}, saveSettings: false);
 	}
 
 	protected override void ResetSearchRequest()
@@ -76,37 +79,56 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 	{
 		if (!PartyManager.IsValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_QUEST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			return;
 		}
-		else
+		PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
+		SetActive((Enum)UI.GRD_QUEST, is_visible: true);
+		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetGrid(UI.GRD_QUEST, "QuestRushSearchListSelectItem", partys.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
-			PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-			SetActive((Enum)UI.GRD_QUEST, true);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestRushSearchListSelectItem", partys.Length, false, delegate(int i, Transform t, bool is_recycle)
+			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
+			if (questData == null)
 			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
-				if (questData == null)
-				{
-					SetActive(t, false);
-				}
-				else
-				{
-					SetEvent(t, "SELECT_ROOM", i);
-					SetQuestData(questData, t);
-					SetPartyData(partys[i], t);
-				}
-			});
-			base.UpdateUI();
-		}
+				SetActive(t, is_visible: false);
+			}
+			else
+			{
+				SetEvent(t, "SELECT_ROOM", i);
+				SetQuestData(questData, t);
+				SetPartyData(partys[i], t);
+				SetDeliveryData(questData.questID, t);
+				SetStatusIconInfo(partys[i], t);
+				SetMemberIcon(t, questData);
+			}
+		});
+		base.UpdateUI();
 	}
 
 	protected override void SetQuestData(QuestTable.QuestTableData questData, Transform t)
 	{
 		SetLabelText(t, UI.LBL_QUEST_NAME, questData.questText);
+		if (questData.userNumLimit < 4)
+		{
+			SetActive(t, UI.TGL_MEMBER_3, is_visible: false);
+		}
+		if (questData.userNumLimit < 3)
+		{
+			SetActive(t, UI.TGL_MEMBER_2, is_visible: false);
+		}
+		if (questData.userNumLimit < 2)
+		{
+			SetActive(t, UI.TGL_MEMBER_1, is_visible: false);
+		}
 		UITexture component = FindCtrl(t, UI.TEX_RUSH_IMAGE).GetComponent<UITexture>();
 		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)questData.rushIconId));
+	}
+
+	private void SetDeliveryData(uint questId, Transform t)
+	{
+		DeliveryTable.DeliveryData deliveryTableDataFromQuestId = Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(questId);
+		SetActive(t, UI.SPR_TYPE_DIFFICULTY, (deliveryTableDataFromQuestId != null && deliveryTableDataFromQuestId.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 
 	private void OnCloseDialog_QuestRushSearchRoomCondition()

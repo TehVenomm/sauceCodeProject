@@ -23,8 +23,12 @@ public class DateSerializer extends DateTimeSerializerBase<Date> {
         return new DateSerializer(bool, dateFormat);
     }
 
-    protected long _timestamp(Date date) {
-        return date == null ? 0 : date.getTime();
+    /* access modifiers changed from: protected */
+    public long _timestamp(Date date) {
+        if (date == null) {
+            return 0;
+        }
+        return date.getTime();
     }
 
     public void serialize(Date date, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CoopStagePacketSender
+public class CoopStagePacketSender : MonoBehaviour
 {
 	private CoopStage coopStage
 	{
@@ -16,7 +16,6 @@ public class CoopStagePacketSender
 
 	protected virtual void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		coopStage = this.get_gameObject().GetComponent<CoopStage>();
 	}
 
@@ -42,41 +41,42 @@ public class CoopStagePacketSender
 		{
 			coop_Model_StageRequest.series_index = (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex;
 		}
-		Send(coop_Model_StageRequest, true, to_client_id, null, null);
+		Send(coop_Model_StageRequest, promise: true, to_client_id);
 	}
 
 	public void SendStagePlayerPop(Player player, int to_client_id = 0)
 	{
-		if (!(player == null))
+		if (player == null)
 		{
-			if (player.IsCoopNone())
-			{
-				player.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
-			}
-			Coop_Model_StagePlayerPop coop_Model_StagePlayerPop = new Coop_Model_StagePlayerPop();
-			coop_Model_StagePlayerPop.id = 1002;
-			coop_Model_StagePlayerPop.sid = player.id;
-			coop_Model_StagePlayerPop.isSelf = (player is Self);
-			NonPlayer nonPlayer = player as NonPlayer;
-			if (player.createInfo != null)
-			{
-				if (nonPlayer == null)
-				{
-					coop_Model_StagePlayerPop.charaInfo = player.createInfo.charaInfo;
-				}
-				coop_Model_StagePlayerPop.extentionInfo = player.createInfo.extentionInfo;
-			}
-			coop_Model_StagePlayerPop.transferInfo = player.CreateTransferInfo();
-			Send(coop_Model_StagePlayerPop, true, to_client_id, null, null);
+			return;
 		}
+		if (player.IsCoopNone())
+		{
+			player.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
+		}
+		Coop_Model_StagePlayerPop coop_Model_StagePlayerPop = new Coop_Model_StagePlayerPop();
+		coop_Model_StagePlayerPop.id = 1002;
+		coop_Model_StagePlayerPop.sid = player.id;
+		coop_Model_StagePlayerPop.isSelf = (player is Self);
+		NonPlayer nonPlayer = player as NonPlayer;
+		if (player.createInfo != null)
+		{
+			if (nonPlayer == null)
+			{
+				coop_Model_StagePlayerPop.charaInfo = player.createInfo.charaInfo;
+			}
+			coop_Model_StagePlayerPop.extentionInfo = player.createInfo.extentionInfo;
+		}
+		coop_Model_StagePlayerPop.transferInfo = player.CreateTransferInfo();
+		Send(coop_Model_StagePlayerPop, promise: true, to_client_id);
 	}
 
 	public void SendStageInfo(int to_client_id = 0)
 	{
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_StageInfo model = new Coop_Model_StageInfo();
 		model.id = 1002;
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -86,12 +86,12 @@ public class CoopStagePacketSender
 		if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<CoopManager>.I.coopStage.GetIsInFieldEnemyBossBattle())
 		{
 			model.isInFieldEnemyBossBattle = true;
+			model.isInFieldFishingEnemyBattle = MonoBehaviourSingleton<CoopManager>.I.coopStage.GetisInFieldFishingEnemyBattle();
 		}
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.gimmickList.ForEach(delegate(StageObject o)
 			{
-				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 				if (o.IsCoopNone())
 				{
 					o.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
@@ -103,6 +103,22 @@ public class CoopStagePacketSender
 				};
 				model.gimmicks.Add(item);
 			});
+			MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmicksObjs(InGameProgress.eFieldGimmick.CarriableGimmick).ForEach(delegate(IFieldGimmickObject gimmick)
+			{
+				FieldCarriableGimmickObject fieldCarriableGimmickObject = gimmick as FieldCarriableGimmickObject;
+				if (!(fieldCarriableGimmickObject == null))
+				{
+					model.carriableGimmickInfos.Add(fieldCarriableGimmickObject.GetCarriableGimmickInfo());
+				}
+			});
+			MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmicksObjs(InGameProgress.eFieldGimmick.SupplyGimmick).ForEach(delegate(IFieldGimmickObject gimmick)
+			{
+				FieldSupplyGimmickObject fieldSupplyGimmickObject = gimmick as FieldSupplyGimmickObject;
+				if (!(fieldSupplyGimmickObject == null))
+				{
+					model.supplyGimmickInfos.Add(fieldSupplyGimmickObject.GetSupplyGimmickInfo());
+				}
+			});
 			model.enemyPos = Vector3.get_zero();
 			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 			{
@@ -113,11 +129,38 @@ public class CoopStagePacketSender
 		{
 			model.rushLimitTime = MonoBehaviourSingleton<InGameProgress>.I.limitTime;
 		}
-		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopStage.GetIsInFieldEnemyBossBattle())
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopStage.HasFieldEnemyBossLimitTime())
 		{
 			model.rushLimitTime = MonoBehaviourSingleton<InGameProgress>.I.limitTime;
 		}
-		Send(model, true, to_client_id, null, delegate(Coop_Model_Base send_model)
+		if (QuestManager.IsValidInGameWaveMatch())
+		{
+			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+			{
+				model.rushLimitTime = MonoBehaviourSingleton<InGameProgress>.I.limitTime;
+			}
+			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+			{
+				int i = 0;
+				for (int count = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList.Count; i < count; i++)
+				{
+					FieldWaveTargetObject fieldWaveTargetObject = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i] as FieldWaveTargetObject;
+					if (!(fieldWaveTargetObject == null))
+					{
+						Coop_Model_StageInfo.WaveTargetInfo waveTargetInfo = new Coop_Model_StageInfo.WaveTargetInfo();
+						waveTargetInfo.id = fieldWaveTargetObject.id;
+						waveTargetInfo.hp = fieldWaveTargetObject.nowHp;
+						model.waveTargets.Add(waveTargetInfo);
+						fieldWaveTargetObject.SetOwner(isOwner: true);
+					}
+				}
+			}
+		}
+		if (QuestManager.IsValidInGameWaveStrategy())
+		{
+			coopStage.SetFirstWaveMatchInfoForStageInfo(ref model);
+		}
+		Send(model, promise: true, to_client_id, null, delegate(Coop_Model_Base send_model)
 		{
 			Coop_Model_StageInfo coop_Model_StageInfo = send_model as Coop_Model_StageInfo;
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -128,12 +171,23 @@ public class CoopStagePacketSender
 		});
 	}
 
+	public void SendObjectInfo(StageObject _stgObj, StageObject.COOP_MODE_TYPE _type, int _to_client_id = 0)
+	{
+		if (!(_stgObj == null))
+		{
+			Coop_Model_StageObjectInfo coop_Model_StageObjectInfo = new Coop_Model_StageObjectInfo();
+			coop_Model_StageObjectInfo.StageObjectID = _stgObj.id;
+			coop_Model_StageObjectInfo.CoopModeType = _type;
+			Send(coop_Model_StageObjectInfo, promise: true, _to_client_id);
+		}
+	}
+
 	public void SendStageResponseEnd(CoopStage.STAGE_REQUEST_ERROR error_id = CoopStage.STAGE_REQUEST_ERROR.NONE, int to_client_id = 0)
 	{
 		Coop_Model_StageResponseEnd coop_Model_StageResponseEnd = new Coop_Model_StageResponseEnd();
 		coop_Model_StageResponseEnd.id = 1002;
 		coop_Model_StageResponseEnd.error_id = (int)error_id;
-		Send(coop_Model_StageResponseEnd, true, to_client_id, null, null);
+		Send(coop_Model_StageResponseEnd, promise: true, to_client_id);
 	}
 
 	public void SendStageQuestClose(bool is_succeed)
@@ -141,14 +195,29 @@ public class CoopStagePacketSender
 		Coop_Model_StageQuestClose coop_Model_StageQuestClose = new Coop_Model_StageQuestClose();
 		coop_Model_StageQuestClose.id = 1002;
 		coop_Model_StageQuestClose.is_succeed = is_succeed;
-		Send(coop_Model_StageQuestClose, true, 0, null, null);
+		Send(coop_Model_StageQuestClose);
 	}
 
 	public void SendStageTimeup()
 	{
 		Coop_Model_StageTimeup coop_Model_StageTimeup = new Coop_Model_StageTimeup();
 		coop_Model_StageTimeup.id = 1002;
-		Send(coop_Model_StageTimeup, true, 0, null, null);
+		Send(coop_Model_StageTimeup);
+	}
+
+	public void SendStageSyncTimeRequest()
+	{
+		Coop_Model_StageSyncTimeRequest coop_Model_StageSyncTimeRequest = new Coop_Model_StageSyncTimeRequest();
+		coop_Model_StageSyncTimeRequest.id = 1002;
+		Send(coop_Model_StageSyncTimeRequest, promise: false);
+	}
+
+	public void SendStageSyncTime(float elapsedTime, int toClientId)
+	{
+		Coop_Model_StageSyncTime coop_Model_StageSyncTime = new Coop_Model_StageSyncTime();
+		coop_Model_StageSyncTime.id = 1002;
+		coop_Model_StageSyncTime.elapsedTime = elapsedTime;
+		Send(coop_Model_StageSyncTime, promise: false, toClientId);
 	}
 
 	public void SendStageChat(int chara_id, int chat_id)
@@ -157,7 +226,7 @@ public class CoopStagePacketSender
 		coop_Model_StageChat.id = 1002;
 		coop_Model_StageChat.chara_id = chara_id;
 		coop_Model_StageChat.chat_id = chat_id;
-		Send(coop_Model_StageChat, false, 0, null, null);
+		Send(coop_Model_StageChat, promise: false);
 	}
 
 	public void SendChatMessage(int chara_id, string message)
@@ -171,7 +240,7 @@ public class CoopStagePacketSender
 		{
 			coop_Model_StageChatMessage.user_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		}
-		Send(coop_Model_StageChatMessage, false, 0, null, null);
+		Send(coop_Model_StageChatMessage, promise: false);
 	}
 
 	public void SendChatStamp(int chara_id, int stamp_id)
@@ -185,7 +254,7 @@ public class CoopStagePacketSender
 		{
 			coop_Model_StageChatStamp.user_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
 		}
-		Send(coop_Model_StageChatStamp, false, 0, null, null);
+		Send(coop_Model_StageChatStamp, promise: false);
 	}
 
 	public void SendRequestPop(int to_client_id, bool is_player, bool is_self, bool promise = false)
@@ -194,7 +263,7 @@ public class CoopStagePacketSender
 		coop_Model_StageRequestPop.id = 1002;
 		coop_Model_StageRequestPop.isPlayer = is_player;
 		coop_Model_StageRequestPop.isSelf = is_self;
-		Send(coop_Model_StageRequestPop, promise, to_client_id, null, null);
+		Send(coop_Model_StageRequestPop, promise, to_client_id);
 	}
 
 	public void SendSyncPlayerRecord(InGameRecorder.PlayerRecordSyncHost record, int to_client_id, bool promise, Func<Coop_Model_Base, bool> onPreResend = null)
@@ -202,7 +271,9 @@ public class CoopStagePacketSender
 		Coop_Model_StageSyncPlayerRecord coop_Model_StageSyncPlayerRecord = new Coop_Model_StageSyncPlayerRecord();
 		coop_Model_StageSyncPlayerRecord.id = 1002;
 		coop_Model_StageSyncPlayerRecord.rec = record;
-		Send(coop_Model_StageSyncPlayerRecord, promise, to_client_id, null, onPreResend);
+		Coop_Model_StageSyncPlayerRecord model = coop_Model_StageSyncPlayerRecord;
+		bool promise2 = promise;
+		Send(model, promise2, to_client_id, null, onPreResend);
 	}
 
 	public void SendEnemyBossEscape(int sid, bool promise)
@@ -210,20 +281,28 @@ public class CoopStagePacketSender
 		Coop_Model_EnemyBossEscape coop_Model_EnemyBossEscape = new Coop_Model_EnemyBossEscape();
 		coop_Model_EnemyBossEscape.sid = sid;
 		coop_Model_EnemyBossEscape.id = 1002;
-		Send(coop_Model_EnemyBossEscape, promise, 0, null, null);
+		Send(coop_Model_EnemyBossEscape, promise);
 	}
 
 	public void SendEnemyBossAliveRequest()
 	{
 		Coop_Model_EnemyBossAliveRequest coop_Model_EnemyBossAliveRequest = new Coop_Model_EnemyBossAliveRequest();
 		coop_Model_EnemyBossAliveRequest.id = 1002;
-		Send(coop_Model_EnemyBossAliveRequest, false, 0, null, null);
+		Send(coop_Model_EnemyBossAliveRequest, promise: false);
 	}
 
 	public void SendEnemyBossAliveRequested(int toClientId)
 	{
 		Coop_Model_EnemyBossAliveRequested coop_Model_EnemyBossAliveRequested = new Coop_Model_EnemyBossAliveRequested();
 		coop_Model_EnemyBossAliveRequested.id = 1002;
-		Send(coop_Model_EnemyBossAliveRequested, false, toClientId, null, null);
+		Send(coop_Model_EnemyBossAliveRequested, promise: false, toClientId);
+	}
+
+	public void OnActiveSupply(int pointId)
+	{
+		Coop_Model_ActiveSupply coop_Model_ActiveSupply = new Coop_Model_ActiveSupply();
+		coop_Model_ActiveSupply.id = 1002;
+		coop_Model_ActiveSupply.pointId = pointId;
+		Send(coop_Model_ActiveSupply);
 	}
 }

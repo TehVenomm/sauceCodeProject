@@ -4,7 +4,6 @@ import android.util.Log;
 import com.github.droidfu.cachefu.HttpResponseCache;
 import com.github.droidfu.http.CachedHttpResponse.ResponseData;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.AbstractHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 public abstract class BetterHttpRequestBase implements BetterHttpRequest, ResponseHandler<BetterHttpResponse> {
@@ -50,7 +48,7 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest, Respon
     public BetterHttpResponse handleResponse(HttpResponse httpResponse) throws IOException {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         if (this.expectedStatusCodes == null || this.expectedStatusCodes.isEmpty() || this.expectedStatusCodes.contains(Integer.valueOf(statusCode))) {
-            BetterHttpResponse betterHttpResponseImpl = new BetterHttpResponseImpl(httpResponse);
+            BetterHttpResponseImpl betterHttpResponseImpl = new BetterHttpResponseImpl(httpResponse);
             HttpResponseCache responseCache = BetterHttp.getResponseCache();
             if (responseCache != null) {
                 responseCache.put(getRequestUrl(), new ResponseData(statusCode, betterHttpResponseImpl.getResponseBodyAsBytes()));
@@ -71,42 +69,80 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest, Respon
         return this;
     }
 
-    public BetterHttpResponse send() throws ConnectException {
-        BetterHttpRequestRetryHandler betterHttpRequestRetryHandler = new BetterHttpRequestRetryHandler(this.maxRetries);
-        this.httpClient.setHttpRequestRetryHandler(betterHttpRequestRetryHandler);
-        HttpContext basicHttpContext = new BasicHttpContext();
-        boolean z = true;
-        Throwable th = null;
-        while (z) {
-            try {
-                BetterHttpResponse betterHttpResponse = (BetterHttpResponse) this.httpClient.execute(this.request, this, basicHttpContext);
-                if (this.oldTimeout != BetterHttp.getSocketTimeout()) {
-                    BetterHttp.setSocketTimeout(this.oldTimeout);
-                }
-                return betterHttpResponse;
-            } catch (IOException e) {
-                th = e;
-                z = retryRequest(betterHttpRequestRetryHandler, th, basicHttpContext);
-                if (this.oldTimeout != BetterHttp.getSocketTimeout()) {
-                    BetterHttp.setSocketTimeout(this.oldTimeout);
-                }
-            } catch (NullPointerException e2) {
-                th = new IOException("NPE in HttpClient" + e2.getMessage());
-                z = retryRequest(betterHttpRequestRetryHandler, th, basicHttpContext);
-                if (this.oldTimeout != BetterHttp.getSocketTimeout()) {
-                    BetterHttp.setSocketTimeout(this.oldTimeout);
-                }
-            } catch (Throwable th2) {
-                th = th2;
-            }
-        }
-        ConnectException connectException = new ConnectException();
-        connectException.initCause(th);
-        throw connectException;
-        if (this.oldTimeout != BetterHttp.getSocketTimeout()) {
-            BetterHttp.setSocketTimeout(this.oldTimeout);
-        }
-        throw th;
+    /* JADX WARNING: Removed duplicated region for block: B:28:0x007e  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.github.droidfu.http.BetterHttpResponse send() throws java.net.ConnectException {
+        /*
+            r6 = this;
+            com.github.droidfu.http.BetterHttpRequestRetryHandler r2 = new com.github.droidfu.http.BetterHttpRequestRetryHandler
+            int r0 = r6.maxRetries
+            r2.<init>(r0)
+            org.apache.http.impl.client.AbstractHttpClient r0 = r6.httpClient
+            r0.setHttpRequestRetryHandler(r2)
+            org.apache.http.protocol.BasicHttpContext r3 = new org.apache.http.protocol.BasicHttpContext
+            r3.<init>()
+            r1 = 1
+            r0 = 0
+        L_0x0013:
+            if (r1 != 0) goto L_0x001e
+            java.net.ConnectException r1 = new java.net.ConnectException
+            r1.<init>()
+            r1.initCause(r0)
+            throw r1
+        L_0x001e:
+            org.apache.http.impl.client.AbstractHttpClient r0 = r6.httpClient     // Catch:{ IOException -> 0x0036, NullPointerException -> 0x0049 }
+            org.apache.http.client.methods.HttpUriRequest r1 = r6.request     // Catch:{ IOException -> 0x0036, NullPointerException -> 0x0049 }
+            java.lang.Object r0 = r0.execute(r1, r6, r3)     // Catch:{ IOException -> 0x0036, NullPointerException -> 0x0049 }
+            com.github.droidfu.http.BetterHttpResponse r0 = (com.github.droidfu.http.BetterHttpResponse) r0     // Catch:{ IOException -> 0x0036, NullPointerException -> 0x0049 }
+            int r1 = r6.oldTimeout
+            int r2 = com.github.droidfu.http.BetterHttp.getSocketTimeout()
+            if (r1 == r2) goto L_0x0035
+            int r1 = r6.oldTimeout
+            com.github.droidfu.http.BetterHttp.setSocketTimeout(r1)
+        L_0x0035:
+            return r0
+        L_0x0036:
+            r0 = move-exception
+            boolean r1 = r6.retryRequest(r2, r0, r3)     // Catch:{ all -> 0x0075 }
+            int r4 = r6.oldTimeout
+            int r5 = com.github.droidfu.http.BetterHttp.getSocketTimeout()
+            if (r4 == r5) goto L_0x0013
+            int r4 = r6.oldTimeout
+            com.github.droidfu.http.BetterHttp.setSocketTimeout(r4)
+            goto L_0x0013
+        L_0x0049:
+            r0 = move-exception
+            r1 = r0
+            java.lang.StringBuilder r4 = new java.lang.StringBuilder     // Catch:{ all -> 0x0084 }
+            java.lang.String r0 = "NPE in HttpClient"
+            r4.<init>(r0)     // Catch:{ all -> 0x0084 }
+            java.io.IOException r0 = new java.io.IOException     // Catch:{ all -> 0x0084 }
+            java.lang.String r1 = r1.getMessage()     // Catch:{ all -> 0x0084 }
+            java.lang.StringBuilder r1 = r4.append(r1)     // Catch:{ all -> 0x0084 }
+            java.lang.String r1 = r1.toString()     // Catch:{ all -> 0x0084 }
+            r0.<init>(r1)     // Catch:{ all -> 0x0084 }
+            boolean r1 = r6.retryRequest(r2, r0, r3)     // Catch:{ all -> 0x0075 }
+            int r4 = r6.oldTimeout
+            int r5 = com.github.droidfu.http.BetterHttp.getSocketTimeout()
+            if (r4 == r5) goto L_0x0013
+            int r4 = r6.oldTimeout
+            com.github.droidfu.http.BetterHttp.setSocketTimeout(r4)
+            goto L_0x0013
+        L_0x0075:
+            r0 = move-exception
+        L_0x0076:
+            int r1 = r6.oldTimeout
+            int r2 = com.github.droidfu.http.BetterHttp.getSocketTimeout()
+            if (r1 == r2) goto L_0x0083
+            int r1 = r6.oldTimeout
+            com.github.droidfu.http.BetterHttp.setSocketTimeout(r1)
+        L_0x0083:
+            throw r0
+        L_0x0084:
+            r0 = move-exception
+            goto L_0x0076
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.github.droidfu.http.BetterHttpRequestBase.send():com.github.droidfu.http.BetterHttpResponse");
     }
 
     public HttpUriRequest unwrap() {

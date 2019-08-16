@@ -13,6 +13,7 @@ public class ItemDetailTop : GameSection
 		BTN_DETAIL_SELL,
 		STR_BTN_SELL,
 		STR_BTN_SELL_D,
+		BTN_SEARCH_TP,
 		OBJ_ICON_ROOT,
 		LBL_NAME,
 		LBL_SELL,
@@ -92,7 +93,8 @@ public class ItemDetailTop : GameSection
 			GachaQuest,
 			ChallengeQuest,
 			PointShop,
-			GuildRequest
+			GuildRequest,
+			TradingPostQuest
 		}
 
 		public TYPE type;
@@ -123,8 +125,6 @@ public class ItemDetailTop : GameSection
 		}
 	}
 
-	private const int RECOMMEND_ITEM_MAX = 3;
-
 	private SortCompareData data;
 
 	private Transform detailBase;
@@ -152,6 +152,8 @@ public class ItemDetailTop : GameSection
 		UI.OBJ_TOP_CROWN3,
 		UI.SPR_CROWN_3
 	};
+
+	private const int RECOMMEND_ITEM_MAX = 3;
 
 	private List<ItemDestination> m_ItemDestinations = new List<ItemDestination>();
 
@@ -199,7 +201,6 @@ public class ItemDetailTop : GameSection
 		requestForm.itemId = itemId.ToString();
 		Protocol.Send("ajax/datatable/itemtoquest", requestForm, delegate(ItemToQuestTableModel res)
 		{
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 			if (res.Error == Error.None)
 			{
 				Singleton<ItemToQuestTable>.I.AddTableFromAPI(data.GetTableID(), res.result.questIds);
@@ -211,6 +212,10 @@ public class ItemDetailTop : GameSection
 				{
 					GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.ABILITY_ITEM, data.GetUniqID());
 				}
+				else if (data is AccessorySortData)
+				{
+					GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.ACCESSORY, data.GetUniqID());
+				}
 				this.StartCoroutine(SendGetInfos());
 			}
 		}, string.Empty);
@@ -221,24 +226,24 @@ public class ItemDetailTop : GameSection
 		bool isFinishChallengeInfo = false;
 		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(delegate
 		{
-			((_003CSendGetInfos_003Ec__Iterator5B)/*Error near IL_0039: stateMachine*/)._003CisFinishChallengeInfo_003E__0 = true;
+			isFinishChallengeInfo = true;
 		});
 		if (!isFinishChallengeInfo)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		bool isFinishSendPointShop = false;
 		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendGetPointShops(delegate(bool isSuccess, List<PointShop> resultList)
 		{
 			if (isSuccess)
 			{
-				((_003CSendGetInfos_003Ec__Iterator5B)/*Error near IL_0079: stateMachine*/)._003C_003Ef__this.pointShopList = resultList;
-				((_003CSendGetInfos_003Ec__Iterator5B)/*Error near IL_0079: stateMachine*/)._003CisFinishSendPointShop_003E__1 = true;
+				pointShopList = resultList;
+				isFinishSendPointShop = true;
 			}
 		});
 		if (!isFinishSendPointShop)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		bool isRecvQuest = false;
 		QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam sendParam = new QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam
@@ -247,194 +252,178 @@ public class ItemDetailTop : GameSection
 		};
 		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(sendParam, delegate
 		{
-			((_003CSendGetInfos_003Ec__Iterator5B)/*Error near IL_00e4: stateMachine*/)._003CisRecvQuest_003E__2 = true;
-		}, false);
+			isRecvQuest = true;
+		}, isSave: false);
 		while (!isRecvQuest)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		CreateDestinationList();
-		if (GetNeedNum().HasValue && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId != -1)
-		{
-			bool isRecvDonateFobbidList = false;
-			MonoBehaviourSingleton<GuildManager>.I.SendDonateFobbidenList(delegate(bool success, List<int> list)
-			{
-				((_003CSendGetInfos_003Ec__Iterator5B)/*Error near IL_015d: stateMachine*/)._003CisRecvDonateFobbidList_003E__4 = true;
-				if (!list.Contains((int)((_003CSendGetInfos_003Ec__Iterator5B)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.data.GetTableID()))
-				{
-					((_003CSendGetInfos_003Ec__Iterator5B)/*Error near IL_015d: stateMachine*/)._003C_003Ef__this.m_ItemDestinations.Insert(0, new ItemDestination
-					{
-						type = ItemDestination.TYPE.GuildRequest
-					});
-				}
-			});
-			while (!isRecvDonateFobbidList)
-			{
-				yield return (object)null;
-			}
-		}
 		base.Initialize();
 	}
 
 	private void CreateDestinationList()
 	{
-		if (data != null)
+		if (data == null)
 		{
-			uint tableID = data.GetTableID();
-			m_ItemDestinations.Clear();
-			int num = 0;
-			ItemToQuestTable.RecommendQuestData recommendQuest = Singleton<ItemToQuestTable>.I.GetRecommendQuest(tableID);
-			if (recommendQuest != null)
+			return;
+		}
+		uint tableID = data.GetTableID();
+		m_ItemDestinations.Clear();
+		int num = 0;
+		ItemToQuestTable.RecommendQuestData recommendQuest = Singleton<ItemToQuestTable>.I.GetRecommendQuest(tableID);
+		if (recommendQuest != null)
+		{
+			QuestTable.QuestTableData[] recommendData = recommendQuest.recommendData;
+			foreach (QuestTable.QuestTableData questTableData in recommendData)
 			{
-				QuestTable.QuestTableData[] recommendData = recommendQuest.recommendData;
-				foreach (QuestTable.QuestTableData questTableData in recommendData)
+				if (questTableData != null)
 				{
-					if (questTableData != null)
+					m_ItemDestinations.Add(new ItemDestination
 					{
-						m_ItemDestinations.Add(new ItemDestination
-						{
-							type = ItemDestination.TYPE.AdmissionQuest,
-							quest = questTableData
-						});
-					}
+						type = ItemDestination.TYPE.AdmissionQuest,
+						quest = questTableData
+					});
 				}
 			}
-			num = 3;
-			if (num > 0)
+		}
+		num = 3;
+		if (num > 0)
+		{
+			QuestTable.QuestTableData[] happenQuestTableFromItemID = Singleton<ItemToQuestTable>.I.GetHappenQuestTableFromItemID(tableID);
+			if (happenQuestTableFromItemID != null)
 			{
-				QuestTable.QuestTableData[] happenQuestTableFromItemID = Singleton<ItemToQuestTable>.I.GetHappenQuestTableFromItemID(tableID);
-				if (happenQuestTableFromItemID != null)
+				List<ItemDestination> list = new List<ItemDestination>();
+				List<ItemDestination> list2 = new List<ItemDestination>();
+				QuestTable.QuestTableData[] array = happenQuestTableFromItemID;
+				foreach (QuestTable.QuestTableData questTableData2 in array)
 				{
-					List<ItemDestination> list = new List<ItemDestination>();
-					List<ItemDestination> list2 = new List<ItemDestination>();
-					QuestTable.QuestTableData[] array = happenQuestTableFromItemID;
-					foreach (QuestTable.QuestTableData questTableData2 in array)
+					FieldMapTable.FieldMapTableData[] fieldMapTableFromQuestIdWithClosedField = Singleton<QuestToFieldTable>.I.GetFieldMapTableFromQuestIdWithClosedField(questTableData2.questID);
+					if (fieldMapTableFromQuestIdWithClosedField == null)
 					{
-						FieldMapTable.FieldMapTableData[] fieldMapTableFromQuestIdWithClosedField = Singleton<QuestToFieldTable>.I.GetFieldMapTableFromQuestIdWithClosedField(questTableData2.questID);
-						if (fieldMapTableFromQuestIdWithClosedField != null)
+						continue;
+					}
+					FieldMapTable.FieldMapTableData[] array2 = fieldMapTableFromQuestIdWithClosedField;
+					foreach (FieldMapTable.FieldMapTableData fieldMapTableData in array2)
+					{
+						if (Singleton<ItemToFieldTable>.I.IsOpenMap(fieldMapTableData))
 						{
-							FieldMapTable.FieldMapTableData[] array2 = fieldMapTableFromQuestIdWithClosedField;
-							foreach (FieldMapTable.FieldMapTableData fieldMapTableData in array2)
+							list2.Add(new ItemDestination
 							{
-								if (Singleton<ItemToFieldTable>.I.IsOpenMap(fieldMapTableData))
-								{
-									list2.Add(new ItemDestination
-									{
-										type = ItemDestination.TYPE.HappenField,
-										quest = questTableData2,
-										field = fieldMapTableData
-									});
-								}
-								else
-								{
-									list.Add(new ItemDestination
-									{
-										type = ItemDestination.TYPE.HappenFieldUnknown,
-										quest = questTableData2,
-										field = fieldMapTableData
-									});
-								}
-							}
+								type = ItemDestination.TYPE.HappenField,
+								quest = questTableData2,
+								field = fieldMapTableData
+							});
 						}
-					}
-					list2.AddRange(list);
-					int num2 = Mathf.Min(list2.Count, num);
-					for (int l = 0; l < num2; l++)
-					{
-						m_ItemDestinations.Add(list2[l]);
-					}
-				}
-			}
-			if (m_ItemDestinations.Count < 1)
-			{
-				num = 3;
-				QuestTable.QuestTableData[] distinctQuestFromItemID = Singleton<ItemToQuestTable>.I.GetDistinctQuestFromItemID(tableID, QUEST_TYPE.ORDER);
-				if (distinctQuestFromItemID != null)
-				{
-					int num3 = Mathf.Min(num, distinctQuestFromItemID.Length);
-					for (int m = 0; m < num3; m++)
-					{
-						QuestTable.QuestTableData questTableData3 = distinctQuestFromItemID[m];
-						if (questTableData3 != null)
+						else
 						{
-							m_ItemDestinations.Add(new ItemDestination
+							list.Add(new ItemDestination
 							{
-								type = ItemDestination.TYPE.DeniedQuest,
-								quest = questTableData3
+								type = ItemDestination.TYPE.HappenFieldUnknown,
+								quest = questTableData2,
+								field = fieldMapTableData
 							});
 						}
 					}
 				}
-			}
-			num = 3;
-			int num4 = 0;
-			if (num > 0)
-			{
-				ItemToFieldTable.RecommendFieldData recommendField = Singleton<ItemToFieldTable>.I.GetRecommendField(tableID, num, true);
-				if (recommendField != null && recommendField.dropFieldData != null)
+				list2.AddRange(list);
+				int num2 = Mathf.Min(list2.Count, num);
+				for (int l = 0; l < num2; l++)
 				{
-					ItemToFieldTable.ItemDetailToFieldData[] dropFieldData = recommendField.dropFieldData;
-					foreach (ItemToFieldTable.ItemDetailToFieldData itemDetailToFieldData in dropFieldData)
-					{
-						m_ItemDestinations.Add(new ItemDestination
-						{
-							type = ItemDestination.TYPE.DropField,
-							recommend_field = itemDetailToFieldData,
-							field = itemDetailToFieldData.mapData
-						});
-						num4++;
-					}
+					m_ItemDestinations.Add(list2[l]);
 				}
-			}
-			num = ((num4 <= 0) ? 3 : 0);
-			if (num > 0)
-			{
-				ItemToFieldTable.CandidateField[] candidateField = Singleton<ItemToFieldTable>.I.GetCandidateField(tableID, num, true);
-				if (candidateField != null)
-				{
-					ItemToFieldTable.CandidateField[] array3 = candidateField;
-					foreach (ItemToFieldTable.CandidateField candidateField2 in array3)
-					{
-						m_ItemDestinations.Add(new ItemDestination
-						{
-							type = ItemDestination.TYPE.DropFieldUnknown,
-							enemy_id = candidateField2.enemyId,
-							field = candidateField2.mapData
-						});
-					}
-				}
-			}
-			AddPointShopIfNeed();
-			if (IsItemBossMaterial(tableID))
-			{
-				int num6 = 0;
-				int count = m_ItemDestinations.Count;
-				EnemyTable.EnemyData enemyData;
-				while (true)
-				{
-					if (num6 >= count)
-					{
-						return;
-					}
-					ItemDestination itemDestination = m_ItemDestinations[num6];
-					if (itemDestination != null)
-					{
-						enemyData = SearchEnemyData(itemDestination.quest);
-						if (enemyData != null)
-						{
-							break;
-						}
-					}
-					num6++;
-				}
-				AddChallengeQuestIfNeed(enemyData);
-				m_ItemDestinations.Insert(0, new ItemDestination
-				{
-					type = ItemDestination.TYPE.GachaQuest,
-					enemy_species = enemyData.enemySpecies
-				});
 			}
 		}
+		if (m_ItemDestinations.Count < 1)
+		{
+			num = 3;
+			QuestTable.QuestTableData[] distinctQuestFromItemID = Singleton<ItemToQuestTable>.I.GetDistinctQuestFromItemID(tableID, QUEST_TYPE.ORDER);
+			if (distinctQuestFromItemID != null)
+			{
+				int num3 = Mathf.Min(num, distinctQuestFromItemID.Length);
+				for (int m = 0; m < num3; m++)
+				{
+					QuestTable.QuestTableData questTableData3 = distinctQuestFromItemID[m];
+					if (questTableData3 != null)
+					{
+						m_ItemDestinations.Add(new ItemDestination
+						{
+							type = ItemDestination.TYPE.DeniedQuest,
+							quest = questTableData3
+						});
+					}
+				}
+			}
+		}
+		num = 3;
+		int num4 = 0;
+		if (num > 0)
+		{
+			ItemToFieldTable.RecommendFieldData recommendField = Singleton<ItemToFieldTable>.I.GetRecommendField(tableID, num, isExcludeNotPlayable: true);
+			if (recommendField != null && recommendField.dropFieldData != null)
+			{
+				ItemToFieldTable.ItemDetailToFieldData[] dropFieldData = recommendField.dropFieldData;
+				foreach (ItemToFieldTable.ItemDetailToFieldData itemDetailToFieldData in dropFieldData)
+				{
+					m_ItemDestinations.Add(new ItemDestination
+					{
+						type = ItemDestination.TYPE.DropField,
+						recommend_field = itemDetailToFieldData,
+						field = itemDetailToFieldData.mapData
+					});
+					num4++;
+				}
+			}
+		}
+		num = ((num4 <= 0) ? 3 : 0);
+		if (num > 0)
+		{
+			ItemToFieldTable.CandidateField[] candidateField = Singleton<ItemToFieldTable>.I.GetCandidateField(tableID, num, isExcludeNotPlayable: true);
+			if (candidateField != null)
+			{
+				ItemToFieldTable.CandidateField[] array3 = candidateField;
+				foreach (ItemToFieldTable.CandidateField candidateField2 in array3)
+				{
+					m_ItemDestinations.Add(new ItemDestination
+					{
+						type = ItemDestination.TYPE.DropFieldUnknown,
+						enemy_id = candidateField2.enemyId,
+						field = candidateField2.mapData
+					});
+				}
+			}
+		}
+		AddPointShopIfNeed();
+		if (!IsItemBossMaterial(tableID))
+		{
+			return;
+		}
+		int num6 = 0;
+		int count = m_ItemDestinations.Count;
+		EnemyTable.EnemyData enemyData;
+		while (true)
+		{
+			if (num6 >= count)
+			{
+				return;
+			}
+			ItemDestination itemDestination = m_ItemDestinations[num6];
+			if (itemDestination != null)
+			{
+				enemyData = SearchEnemyData(itemDestination.quest);
+				if (enemyData != null)
+				{
+					break;
+				}
+			}
+			num6++;
+		}
+		AddChallengeQuestIfNeed(enemyData);
+		m_ItemDestinations.Insert(0, new ItemDestination
+		{
+			type = ItemDestination.TYPE.GachaQuest,
+			enemy_species = enemyData.enemySpecies
+		});
 	}
 
 	private int GetQuestNum(QuestTable.QuestTableData q)
@@ -462,16 +451,17 @@ public class ItemDetailTop : GameSection
 		int count = challengeList.Count;
 		while (true)
 		{
-			if (num >= count)
+			if (num < count)
 			{
-				return;
+				EnemyTable.EnemyData enemyData2 = SearchEnemyData(Singleton<QuestTable>.I.GetQuestData((uint)challengeList[num].questId));
+				if (enemyData2.enemySpecies == enemyData.enemySpecies)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			EnemyTable.EnemyData enemyData2 = SearchEnemyData(Singleton<QuestTable>.I.GetQuestData((uint)challengeList[num].questId));
-			if (enemyData2.enemySpecies == enemyData.enemySpecies)
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		m_ItemDestinations.Insert(0, new ItemDestination
 		{
@@ -542,14 +532,11 @@ public class ItemDetailTop : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0282: Expected O, but got Unknown
-		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
 		string key = "TEXT_BTN_SELL";
 		SetLabelText((Enum)UI.STR_BTN_SELL, base.sectionData.GetText(key));
 		SetLabelText((Enum)UI.STR_BTN_SELL_D, base.sectionData.GetText(key));
-		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailBase", true);
-		SetActive((Enum)UI.OBJ_SCROLL_BAR, true);
+		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailBase");
+		SetActive((Enum)UI.OBJ_SCROLL_BAR, is_visible: true);
 		if (detailBase != null)
 		{
 			SetFontStyle(detailBase, UI.STR_TITLE, 2);
@@ -574,9 +561,25 @@ public class ItemDetailTop : GameSection
 			}
 			num = itemData.enemyIconID;
 			num2 = itemData.enemyIconID2;
+			ITEM_ICON_TYPE iconType = data.GetIconType();
+			int iconID = data.GetIconID();
+			RARITY_TYPE? rarity = data.GetRarity();
+			Transform parent = FindCtrl(detailBase, UI.OBJ_ICON_ROOT);
+			ELEMENT_TYPE iconElement = data.GetIconElement();
+			EQUIPMENT_TYPE? iconMagiEnableType = data.GetIconMagiEnableType();
+			int num3 = -1;
+			string event_name = null;
+			int event_data = 0;
+			bool is_new = false;
+			int toggle_group = -1;
+			bool is_select = false;
+			string icon_under_text = null;
+			bool is_equipping = false;
+			int enemy_icon_id = num;
+			int enemy_icon_id2 = num2;
 			GET_TYPE getType = data.GetGetType();
-			ItemIcon itemIcon = ItemIcon.Create(data.GetIconType(), data.GetIconID(), data.GetRarity(), FindCtrl(detailBase, UI.OBJ_ICON_ROOT), data.GetIconElement(), data.GetIconMagiEnableType(), -1, null, 0, false, -1, false, null, false, num, num2, false, getType);
-			itemIcon.SetEnableCollider(false);
+			ItemIcon itemIcon = ItemIcon.Create(iconType, iconID, rarity, parent, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
+			itemIcon.SetEnableCollider(is_enable: false);
 			int count = m_ItemDestinations.Count;
 			Transform ctrl = GetCtrl(UI.GRD_HOWTO);
 			if (Object.op_Implicit(ctrl))
@@ -584,27 +587,27 @@ public class ItemDetailTop : GameSection
 				int i = 0;
 				for (int childCount = ctrl.get_childCount(); i < childCount; i++)
 				{
-					Transform val = ctrl.GetChild(0);
-					val.set_parent(null);
-					Object.Destroy(val.get_gameObject());
+					Transform child = ctrl.GetChild(0);
+					child.set_parent(null);
+					Object.Destroy(child.get_gameObject());
 				}
 			}
-			SetTable(detailBase, UI.GRD_HOWTO, "QuestListItem", count, true, CreateListItem, UpdateListItem);
+			SetTable(detailBase, UI.GRD_HOWTO, "QuestListItem", count, reset: true, CreateListItem, UpdateListItem);
 			bool is_visible = m_ItemDestinations.Count < 1;
 			SetActive(detailBase, UI.STR_NOT_HOWTO, is_visible);
 			string empty = string.Empty;
 			int id = 2;
-			RARITY_TYPE rARITY_TYPE = RARITY_TYPE.A;
+			RARITY_TYPE rarity2 = RARITY_TYPE.A;
 			if (itemData.type == ITEM_TYPE.LAPIS)
 			{
-				rARITY_TYPE = itemData.rarity;
-				id = ((!Singleton<EquipItemExceedTable>.I.IsFreeLapis(rARITY_TYPE, itemData.id, itemData.eventId)) ? 1 : 0);
+				rarity2 = itemData.rarity;
+				id = ((!Singleton<EquipItemExceedTable>.I.IsFreeLapis(rarity2, itemData.id, itemData.eventId)) ? 1 : 0);
 				if (Singleton<LimitedEquipItemExceedTable>.I.IsLimitedLapis(itemData.id))
 				{
 					id = 8;
 				}
 			}
-			empty = string.Format(StringTable.Get(STRING_CATEGORY.ITEM_DETAIL, (uint)id), rARITY_TYPE.ToString());
+			empty = string.Format(StringTable.Get(STRING_CATEGORY.ITEM_DETAIL, (uint)id), rarity2.ToString());
 			SetLabelText(detailBase, UI.STR_NOT_HOWTO, empty);
 			SetActive(detailBase, UI.SPR_NEED, GetNeedNum().HasValue);
 			if (GetNeedNum().HasValue)
@@ -612,7 +615,8 @@ public class ItemDetailTop : GameSection
 				UIBehaviour.SetMaterialNumText(FindCtrl(detailBase, UI.LBL_HAVE_NUM), FindCtrl(detailBase, UI.LBL_NEED_NUM), data.GetNum(), GetNeedNum().Value);
 			}
 		}
-		SetActive((Enum)UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetActive((Enum)UI.BTN_DETAIL_SELL, CanSell() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetActive((Enum)UI.BTN_SEARCH_TP, is_visible: false);
 	}
 
 	private Transform CreateListItem(int index, Transform t)
@@ -623,323 +627,383 @@ public class ItemDetailTop : GameSection
 		}
 		if (m_ItemDestinations[index].type == ItemDestination.TYPE.AdmissionQuest && m_ItemDestinations[index].quest.questType == QUEST_TYPE.ORDER)
 		{
-			return Realizes("QuestListOrderItem", t, true);
+			return Realizes("QuestListOrderItem", t);
+		}
+		if (m_ItemDestinations[index].type == ItemDestination.TYPE.AdmissionQuest && m_ItemDestinations[index].quest.questType == QUEST_TYPE.SERIES_ARENA)
+		{
+			return Realizes("QuestListSeriesArena", t);
+		}
+		if (m_ItemDestinations[index].type == ItemDestination.TYPE.AdmissionQuest && m_ItemDestinations[index].quest.questType == QUEST_TYPE.WAVE && m_ItemDestinations[index].quest.questType == QUEST_TYPE.WAVE_STRATEGY && m_ItemDestinations[index].quest.questType == QUEST_TYPE.SERIES && m_ItemDestinations[index].quest.questType == QUEST_TYPE.EVENT)
+		{
+			return Realizes("QuestListFieldItem", t);
 		}
 		if (m_ItemDestinations[index].type == ItemDestination.TYPE.DeniedQuest)
 		{
-			return Realizes("QuestListOrderItem", t, true);
+			return Realizes("QuestListOrderItem", t);
 		}
 		if (m_ItemDestinations[index].type == ItemDestination.TYPE.GachaQuest)
 		{
-			return Realizes("QuestListGachaQuestItem", t, true);
+			return Realizes("QuestListGachaQuestItem", t);
 		}
 		if (m_ItemDestinations[index].type == ItemDestination.TYPE.ChallengeQuest)
 		{
-			return Realizes("QuestListChallengeGotoItem", t, true);
+			return Realizes("QuestListChallengeGotoItem", t);
 		}
 		if (m_ItemDestinations[index].type == ItemDestination.TYPE.PointShop)
 		{
-			return Realizes("ItemDetailPointShopItem", t, true);
+			return Realizes("ItemDetailPointShopItem", t);
 		}
 		if (m_ItemDestinations[index].type == ItemDestination.TYPE.GuildRequest)
 		{
-			return Realizes("QuestListGuildRequestItem", t, true);
+			return Realizes("QuestListGuildRequestItem", t);
 		}
-		return Realizes("QuestListFieldItem", t, true);
+		if (m_ItemDestinations[index].type == ItemDestination.TYPE.TradingPostQuest)
+		{
+			return Realizes("QuestListSearchTradingPostItem", t);
+		}
+		return Realizes("QuestListFieldItem", t);
 	}
 
 	private void UpdateListItem(int i, Transform t, bool is_recycle)
 	{
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		SetActive(t, UI.TEX_FIELD_SUB, false);
-		if (i < m_ItemDestinations.Count)
+		SetActive(t, UI.TEX_FIELD_SUB, is_visible: false);
+		if (i >= m_ItemDestinations.Count)
 		{
-			ItemDestination itemDestination = m_ItemDestinations[i];
-			switch (itemDestination.type)
+			return;
+		}
+		ItemDestination itemDestination = m_ItemDestinations[i];
+		switch (itemDestination.type)
+		{
+		case ItemDestination.TYPE.Unknown:
+			break;
+		case ItemDestination.TYPE.DropField:
+		{
+			ItemToFieldTable.ItemDetailToFieldData recommend_field = itemDestination.recommend_field;
+			ItemToFieldTable.ItemDetailToFieldEnemyData itemDetailToFieldEnemyData = recommend_field as ItemToFieldTable.ItemDetailToFieldEnemyData;
+			ItemToFieldTable.ItemDetailToFieldPointData itemDetailToFieldPointData = recommend_field as ItemToFieldTable.ItemDetailToFieldPointData;
+			if (itemDetailToFieldEnemyData == null && itemDetailToFieldPointData == null)
 			{
-			case ItemDestination.TYPE.Unknown:
-				break;
-			case ItemDestination.TYPE.DropField:
-			{
-				ItemToFieldTable.ItemDetailToFieldData recommend_field = itemDestination.recommend_field;
-				ItemToFieldTable.ItemDetailToFieldEnemyData itemDetailToFieldEnemyData = recommend_field as ItemToFieldTable.ItemDetailToFieldEnemyData;
-				ItemToFieldTable.ItemDetailToFieldPointData itemDetailToFieldPointData = recommend_field as ItemToFieldTable.ItemDetailToFieldPointData;
-				if (itemDetailToFieldEnemyData == null && itemDetailToFieldPointData == null)
-				{
-					SetActive(t, false);
-				}
-				else
-				{
-					SetActive(t, true);
-					QuestListFieldItem questListFieldItem = t.GetComponent<QuestListFieldItem>();
-					if (questListFieldItem == null)
-					{
-						questListFieldItem = t.get_gameObject().AddComponent<QuestListFieldItem>();
-					}
-					questListFieldItem.InitUI();
-					if (itemDetailToFieldEnemyData != null)
-					{
-						EnemyTable.EnemyData enemyData3 = Singleton<EnemyTable>.I.GetEnemyData(itemDetailToFieldEnemyData.enemyID[0]);
-						questListFieldItem.SetUpFieldEnemy(enemyData3, recommend_field);
-					}
-					else if (itemDetailToFieldPointData != null)
-					{
-						string text3 = base.sectionData.GetText("STR_GATHER_FIELD_NAME");
-						string field_name = string.Format(text3, recommend_field.mapData.mapName);
-						questListFieldItem.SetUpGather(field_name, itemDetailToFieldPointData);
-					}
-					SetEvent(t, "JUMP_FIELD", i);
-				}
+				SetActive(t, is_visible: false);
 				break;
 			}
-			case ItemDestination.TYPE.DropFieldUnknown:
+			SetActive(t, is_visible: true);
+			QuestListFieldItem questListFieldItem = t.GetComponent<QuestListFieldItem>();
+			if (questListFieldItem == null)
 			{
-				SetActive(t, UI.OBJ_FIELD_ICON, true);
-				uint enemy_id = itemDestination.enemy_id;
-				EnemyTable.EnemyData enemyData4 = Singleton<EnemyTable>.I.GetEnemyData(enemy_id);
-				if (enemyData4 != null)
-				{
-					SetActive(t, UI.OBJ_ENEMY, true);
-					SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, enemyData4.name);
-					int iconId3 = enemyData4.iconId;
-					ItemIcon itemIcon3 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId3, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData4.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-					itemIcon3.SetEnableCollider(false);
-					SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData4.element != ELEMENT_TYPE.MAX);
-					SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData4.element);
-					SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData4.weakElement);
-					SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData4.weakElement == ELEMENT_TYPE.MAX);
-					if (itemDestination.field != null)
-					{
-						FieldMapTable.FieldMapTableData field2 = itemDestination.field;
-						SetLabelText(t, UI.LBL_FIELD_NAME, field2.mapName);
-						UITexture component2 = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
-						ResourceLoad.LoadFieldIconTexture(component2, field2);
-					}
-				}
-				SetEvent(t, "UNKNOWN_RECOMMEND", 0);
-				break;
+				questListFieldItem = t.get_gameObject().AddComponent<QuestListFieldItem>();
 			}
-			case ItemDestination.TYPE.HappenField:
+			questListFieldItem.InitUI();
+			if (itemDetailToFieldEnemyData != null)
 			{
-				int mainEnemyID = itemDestination.quest.GetMainEnemyID();
-				FieldMapTable.FieldMapTableData field = itemDestination.field;
-				EnemyTable.EnemyData enemyData2 = Singleton<EnemyTable>.I.GetEnemyData((uint)mainEnemyID);
-				SetActive(t, UI.OBJ_ENEMY, true);
+				EnemyTable.EnemyData enemyData6 = Singleton<EnemyTable>.I.GetEnemyData(itemDetailToFieldEnemyData.enemyID[0]);
+				questListFieldItem.SetUpFieldEnemy(enemyData6, recommend_field);
+			}
+			else if (itemDetailToFieldPointData != null)
+			{
+				string text5 = base.sectionData.GetText("STR_GATHER_FIELD_NAME");
+				string field_name = string.Format(text5, recommend_field.mapData.mapName);
+				questListFieldItem.SetUpGather(field_name, itemDetailToFieldPointData);
+			}
+			SetEvent(t, "JUMP_FIELD", i);
+			break;
+		}
+		case ItemDestination.TYPE.DropFieldUnknown:
+		{
+			SetActive(t, UI.OBJ_FIELD_ICON, is_visible: true);
+			uint enemy_id = itemDestination.enemy_id;
+			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData(enemy_id);
+			if (enemyData != null)
+			{
+				SetActive(t, UI.OBJ_ENEMY, is_visible: true);
+				SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, enemyData.name);
+				int iconId = enemyData.iconId;
+				ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+				itemIcon.SetEnableCollider(is_enable: false);
+				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
+				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
+				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+				SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+				if (itemDestination.field != null)
+				{
+					FieldMapTable.FieldMapTableData field = itemDestination.field;
+					SetLabelText(t, UI.LBL_FIELD_NAME, field.mapName);
+					UITexture component = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
+					ResourceLoad.LoadFieldIconTexture(component, field);
+				}
+			}
+			SetEvent(t, "UNKNOWN_RECOMMEND", 0);
+			break;
+		}
+		case ItemDestination.TYPE.HappenField:
+		{
+			int mainEnemyID2 = itemDestination.quest.GetMainEnemyID();
+			FieldMapTable.FieldMapTableData field3 = itemDestination.field;
+			EnemyTable.EnemyData enemyData3 = Singleton<EnemyTable>.I.GetEnemyData((uint)mainEnemyID2);
+			SetActive(t, UI.OBJ_ENEMY, is_visible: true);
+			string text3 = base.sectionData.GetText("HAPPEN_BOSS");
+			string text4 = $"{text3}{enemyData3.name}";
+			SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, text4);
+			SetLabelText(t, UI.LBL_FIELD_NAME, field3.mapName);
+			if (enemyData3 != null)
+			{
+				int iconId3 = enemyData3.iconId;
+				ItemIcon itemIcon3 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId3, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData3.element);
+				itemIcon3.SetEnableCollider(is_enable: false);
+			}
+			UITexture component3 = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
+			ResourceLoad.LoadFieldIconTexture(component3, field3);
+			SetEvent(t, "JUMP_FIELD", i);
+			break;
+		}
+		case ItemDestination.TYPE.HappenFieldUnknown:
+		{
+			SetActive(t, UI.OBJ_FIELD_ICON, is_visible: true);
+			int mainEnemyID = itemDestination.quest.GetMainEnemyID();
+			EnemyTable.EnemyData enemyData2 = Singleton<EnemyTable>.I.GetEnemyData((uint)mainEnemyID);
+			if (enemyData2 != null)
+			{
+				SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 				string text = base.sectionData.GetText("HAPPEN_BOSS");
 				string text2 = $"{text}{enemyData2.name}";
 				SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, text2);
-				SetLabelText(t, UI.LBL_FIELD_NAME, field.mapName);
-				if (enemyData2 != null)
-				{
-					int iconId2 = enemyData2.iconId;
-					ItemIcon itemIcon2 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId2, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData2.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-					itemIcon2.SetEnableCollider(false);
-				}
-				UITexture component = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
-				ResourceLoad.LoadFieldIconTexture(component, field);
-				SetEvent(t, "JUMP_FIELD", i);
-				break;
+				int iconId2 = enemyData2.iconId;
+				ItemIcon itemIcon2 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId2, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData2.element);
+				itemIcon2.SetEnableCollider(is_enable: false);
+				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData2.element != ELEMENT_TYPE.MAX);
+				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData2.element);
+				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData2.weakElement);
+				SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData2.weakElement == ELEMENT_TYPE.MAX);
+				FieldMapTable.FieldMapTableData field2 = itemDestination.field;
+				SetLabelText(t, UI.LBL_FIELD_NAME, field2.mapName);
+				UITexture component2 = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
+				ResourceLoad.LoadFieldIconTexture(component2, field2);
 			}
-			case ItemDestination.TYPE.HappenFieldUnknown:
+			SetEvent(t, "UNKNOWN_RECOMMEND", 0);
+			break;
+		}
+		case ItemDestination.TYPE.AdmissionQuest:
+			if (itemDestination.quest.questType == QUEST_TYPE.ORDER)
 			{
-				SetActive(t, UI.OBJ_FIELD_ICON, true);
-				int mainEnemyID3 = itemDestination.quest.GetMainEnemyID();
-				EnemyTable.EnemyData enemyData7 = Singleton<EnemyTable>.I.GetEnemyData((uint)mainEnemyID3);
-				if (enemyData7 != null)
-				{
-					SetActive(t, UI.OBJ_ENEMY, true);
-					string text4 = base.sectionData.GetText("HAPPEN_BOSS");
-					string text5 = $"{text4}{enemyData7.name}";
-					SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, text5);
-					int iconId5 = enemyData7.iconId;
-					ItemIcon itemIcon5 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId5, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData7.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-					itemIcon5.SetEnableCollider(false);
-					SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData7.element != ELEMENT_TYPE.MAX);
-					SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData7.element);
-					SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData7.weakElement);
-					SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData7.weakElement == ELEMENT_TYPE.MAX);
-					FieldMapTable.FieldMapTableData field3 = itemDestination.field;
-					SetLabelText(t, UI.LBL_FIELD_NAME, field3.mapName);
-					UITexture component3 = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
-					ResourceLoad.LoadFieldIconTexture(component3, field3);
-				}
-				SetEvent(t, "UNKNOWN_RECOMMEND", 0);
-				break;
+				UpdateJumpQuestButton(i, t, itemDestination);
 			}
-			case ItemDestination.TYPE.AdmissionQuest:
+			else if (itemDestination.quest.questType == QUEST_TYPE.SERIES_ARENA)
 			{
-				QuestTable.QuestTableData table = itemDestination.quest;
-				if (table == null)
-				{
-					SetActive(t, false);
-				}
-				else
-				{
-					SetActive(t, true);
-					if (table.questType == QUEST_TYPE.ORDER)
-					{
-						int questNum = GetQuestNum(table);
-						SetLabelText(t, UI.LBL_ORDER_NUM, questNum.ToString());
-					}
-					SetActive(t, UI.OBJ_ICON, false);
-					SetLabelText(t, UI.LBL_QUEST_TYPE, table.questType.ToString());
-					SetLabelText(t, UI.LBL_QUEST_NUM, string.Empty);
-					SetLabelText(t, UI.LBL_QUEST_NAME, table.questText);
-					ClearStatusQuest clearStatusQuest = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest _status) => _status.questId == table.questID);
-					if (clearStatusQuest == null || table.missionID == null || table.missionID.Length == 0)
-					{
-						int j = 0;
-						for (int num = 3; j < num; j++)
-						{
-							int num2 = j * 2;
-							SetActive(t, mission[num2], false);
-							SetActive(t, mission[num2 + 1], false);
-						}
-					}
-					else
-					{
-						int k = 0;
-						for (int num3 = 3; k < num3; k++)
-						{
-							int num4 = k * 2;
-							SetActive(t, mission[num4], k < table.missionID.Length);
-							SetActive(t, mission[num4 + 1], clearStatusQuest.missionStatus[k] >= 3);
-						}
-					}
-					int l = 0;
-					for (int num5 = difficult.Length; l < num5; l++)
-					{
-						SetActive(t, difficult[l], l <= (int)table.difficulty);
-					}
-					EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)table.GetMainEnemyID());
-					if (enemyData != null)
-					{
-						SetActive(t, UI.OBJ_ENEMY, true);
-						int iconId = enemyData.iconId;
-						RARITY_TYPE? rarity = (table.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(table.rarity);
-						ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-						itemIcon.SetEnableCollider(false);
-						SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
-						SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
-						SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-						SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
-					}
-					else
-					{
-						SetActive(t, UI.OBJ_ENEMY, false);
-						SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
-						SetActive(t, UI.STR_NON_WEAK_ELEMENT, true);
-					}
-					ResetTween(t, UI.TWN_DIFFICULT_STAR, 0);
-					PlayTween(t, UI.TWN_DIFFICULT_STAR, true, null, false, 0);
-					SetEvent(t, "JUMP_QUEST", i);
-				}
-				break;
+				UpdateJumpSeriesArenaButton(i, t, itemDestination);
 			}
-			case ItemDestination.TYPE.DeniedQuest:
+			else
 			{
-				QuestTable.QuestTableData quest = itemDestination.quest;
-				if (quest == null)
-				{
-					SetActive(t, false);
-				}
-				else
-				{
-					SetActive(t, true);
-					SetLabelText(t, UI.LBL_ORDER_NUM, 0.ToString());
-					SetActive(t, UI.OBJ_ICON, false);
-					SetLabelText(t, UI.LBL_QUEST_TYPE, quest.questType.ToString());
-					SetLabelText(t, UI.LBL_QUEST_NUM, string.Empty);
-					uint mainEnemyID2 = (uint)quest.GetMainEnemyID();
-					EnemyTable.EnemyData enemyData5 = Singleton<EnemyTable>.I.GetEnemyData(mainEnemyID2);
-					if (enemyData5 != null)
-					{
-						SetLabelText(t, UI.LBL_QUEST_NAME, enemyData5.name);
-					}
-					else
-					{
-						SetLabelText(t, UI.LBL_QUEST_NAME, quest.questText);
-					}
-					int m = 0;
-					for (int num6 = 3; m < num6; m++)
-					{
-						int num7 = m * 2;
-						SetActive(t, mission[num7], false);
-						SetActive(t, mission[num7 + 1], false);
-					}
-					int n = 0;
-					for (int num8 = difficult.Length; n < num8; n++)
-					{
-						SetActive(t, difficult[n], false);
-					}
-					EnemyTable.EnemyData enemyData6 = Singleton<EnemyTable>.I.GetEnemyData((uint)quest.GetMainEnemyID());
-					if (enemyData6 != null)
-					{
-						SetActive(t, UI.OBJ_ENEMY, true);
-						int iconId4 = enemyData6.iconId;
-						RARITY_TYPE? rarity2 = (quest.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(quest.rarity);
-						ItemIcon itemIcon4 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId4, rarity2, FindCtrl(t, UI.OBJ_ENEMY), enemyData6.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-						itemIcon4.SetEnableCollider(false);
-						SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData6.element != ELEMENT_TYPE.MAX);
-						SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData6.element);
-						SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData6.weakElement);
-						SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData6.weakElement == ELEMENT_TYPE.MAX);
-					}
-					else
-					{
-						SetActive(t, UI.OBJ_ENEMY, false);
-						SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
-						SetActive(t, UI.STR_NON_WEAK_ELEMENT, true);
-					}
-					SetEvent(t, "ORDER_NOT_HAVE", i);
-				}
+				UpdateJumpEventButton(i, t, itemDestination);
+			}
+			break;
+		case ItemDestination.TYPE.DeniedQuest:
+		{
+			QuestTable.QuestTableData quest = itemDestination.quest;
+			if (quest == null)
+			{
+				SetActive(t, is_visible: false);
 				break;
 			}
-			case ItemDestination.TYPE.GachaQuest:
-				SetEvent(t, "JUMP_GACHA_QUEST", i);
-				break;
-			case ItemDestination.TYPE.ChallengeQuest:
-				UpdateGridListItemChallenge(i, t);
-				break;
-			case ItemDestination.TYPE.PointShop:
-				UpdateListItemPointShop(i, t, m_ItemDestinations[i].pointShopData);
-				break;
-			case ItemDestination.TYPE.GuildRequest:
-				if (MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem != null && MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem.Length >= 3)
-				{
-					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[0]));
-					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[1]));
-					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[2]));
-				}
-				else
-				{
-					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, string.Empty);
-					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, string.Empty);
-					SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, string.Empty);
-				}
-				SetEvent(t, "OPEN_SEND_DIALOG", null);
-				break;
+			SetActive(t, is_visible: true);
+			SetLabelText(t, UI.LBL_ORDER_NUM, 0.ToString());
+			SetActive(t, UI.OBJ_ICON, is_visible: false);
+			SetLabelText(t, UI.LBL_QUEST_TYPE, quest.questType.ToString());
+			SetLabelText(t, UI.LBL_QUEST_NUM, string.Empty);
+			uint mainEnemyID3 = (uint)quest.GetMainEnemyID();
+			EnemyTable.EnemyData enemyData4 = Singleton<EnemyTable>.I.GetEnemyData(mainEnemyID3);
+			if (enemyData4 != null)
+			{
+				SetLabelText(t, UI.LBL_QUEST_NAME, enemyData4.name);
+			}
+			else
+			{
+				SetLabelText(t, UI.LBL_QUEST_NAME, quest.questText);
+			}
+			int j = 0;
+			for (int num = 3; j < num; j++)
+			{
+				int num2 = j * 2;
+				SetActive(t, mission[num2], is_visible: false);
+				SetActive(t, mission[num2 + 1], is_visible: false);
+			}
+			int k = 0;
+			for (int num3 = difficult.Length; k < num3; k++)
+			{
+				SetActive(t, difficult[k], is_visible: false);
+			}
+			EnemyTable.EnemyData enemyData5 = Singleton<EnemyTable>.I.GetEnemyData((uint)quest.GetMainEnemyID());
+			if (enemyData5 != null)
+			{
+				SetActive(t, UI.OBJ_ENEMY, is_visible: true);
+				int iconId4 = enemyData5.iconId;
+				RARITY_TYPE? rarity = (quest.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(quest.rarity);
+				ItemIcon itemIcon4 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId4, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData5.element);
+				itemIcon4.SetEnableCollider(is_enable: false);
+				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData5.element != ELEMENT_TYPE.MAX);
+				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData5.element);
+				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData5.weakElement);
+				SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData5.weakElement == ELEMENT_TYPE.MAX);
+			}
+			else
+			{
+				SetActive(t, UI.OBJ_ENEMY, is_visible: false);
+				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
+				SetActive(t, UI.STR_NON_WEAK_ELEMENT, is_visible: true);
+			}
+			SetEvent(t, "ORDER_NOT_HAVE", i);
+			break;
+		}
+		case ItemDestination.TYPE.GachaQuest:
+			SetEvent(t, "JUMP_GACHA_QUEST", i);
+			break;
+		case ItemDestination.TYPE.ChallengeQuest:
+			UpdateGridListItemChallenge(i, t);
+			break;
+		case ItemDestination.TYPE.PointShop:
+			UpdateListItemPointShop(i, t, m_ItemDestinations[i].pointShopData);
+			break;
+		case ItemDestination.TYPE.GuildRequest:
+			if (MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem != null && MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem.Length >= 3)
+			{
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[0]));
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[1]));
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[2]));
+			}
+			else
+			{
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, string.Empty);
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, string.Empty);
+				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, string.Empty);
+			}
+			SetEvent(t, "OPEN_SEND_DIALOG", null);
+			break;
+		case ItemDestination.TYPE.TradingPostQuest:
+			SetEvent(t, "SEARCH_IN_TP", i);
+			break;
+		}
+	}
+
+	private void UpdateJumpQuestButton(int i, Transform t, ItemDestination destination)
+	{
+		QuestTable.QuestTableData table = destination.quest;
+		if (table == null)
+		{
+			SetActive(t, is_visible: false);
+			return;
+		}
+		SetActive(t, is_visible: true);
+		if (table.questType == QUEST_TYPE.ORDER)
+		{
+			int questNum = GetQuestNum(table);
+			SetLabelText(t, UI.LBL_ORDER_NUM, questNum.ToString());
+		}
+		SetActive(t, UI.OBJ_ICON, is_visible: false);
+		SetLabelText(t, UI.LBL_QUEST_TYPE, table.questType.ToString());
+		SetLabelText(t, UI.LBL_QUEST_NUM, string.Empty);
+		SetLabelText(t, UI.LBL_QUEST_NAME, table.questText);
+		ClearStatusQuest clearStatusQuest = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest _status) => _status.questId == table.questID);
+		if (clearStatusQuest == null || table.missionID == null || table.missionID.Length == 0)
+		{
+			int j = 0;
+			for (int num = 3; j < num; j++)
+			{
+				int num2 = j * 2;
+				SetActive(t, mission[num2], is_visible: false);
+				SetActive(t, mission[num2 + 1], is_visible: false);
 			}
 		}
+		else
+		{
+			int k = 0;
+			for (int num3 = 3; k < num3; k++)
+			{
+				int num4 = k * 2;
+				SetActive(t, mission[num4], k < table.missionID.Length);
+				SetActive(t, mission[num4 + 1], clearStatusQuest.missionStatus[k] >= 3);
+			}
+		}
+		int l = 0;
+		for (int num5 = difficult.Length; l < num5; l++)
+		{
+			SetActive(t, difficult[l], l <= (int)table.difficulty);
+		}
+		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)table.GetMainEnemyID());
+		if (enemyData != null)
+		{
+			SetActive(t, UI.OBJ_ENEMY, is_visible: true);
+			int iconId = enemyData.iconId;
+			RARITY_TYPE? rarity = (table.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(table.rarity);
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+			itemIcon.SetEnableCollider(is_enable: false);
+			SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
+			SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
+			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+			SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+		}
+		else
+		{
+			SetActive(t, UI.OBJ_ENEMY, is_visible: false);
+			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
+			SetActive(t, UI.STR_NON_WEAK_ELEMENT, is_visible: true);
+		}
+		ResetTween(t, UI.TWN_DIFFICULT_STAR);
+		PlayTween(t, UI.TWN_DIFFICULT_STAR, forward: true, null, is_input_block: false);
+		SetEvent(t, "JUMP_QUEST", i);
+	}
+
+	private void UpdateJumpSeriesArenaButton(int i, Transform t, ItemDestination destination)
+	{
+		ItemDetailSeriesArena component = t.GetComponent<ItemDetailSeriesArena>();
+		component.SetUpItem(t);
+		SetEvent(t, "SERIES_ARENA", i);
+	}
+
+	private void UpdateJumpEventButton(int i, Transform t, ItemDestination destination)
+	{
+		int mainEnemyID = destination.quest.GetMainEnemyID();
+		DeliveryTable.DeliveryData deliveryData = Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(destination.quest.questID);
+		if (deliveryData == null)
+		{
+			SetActive(t, is_visible: false);
+			return;
+		}
+		Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
+		where e.eventId == deliveryData.eventID
+		select e).FirstOrDefault();
+		if (eventData == null)
+		{
+			SetActive(t, is_visible: false);
+			return;
+		}
+		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)mainEnemyID);
+		SetActive(t, UI.OBJ_ENEMY, is_visible: true);
+		SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, enemyData.name);
+		string text = $"{eventData.name} / {deliveryData.name}";
+		SetLabelText(t, UI.LBL_FIELD_NAME, text);
+		if (enemyData != null)
+		{
+			int iconId = enemyData.iconId;
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+			itemIcon.SetEnableCollider(is_enable: false);
+		}
+		UITexture component = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
+		SetEvent(t, "JUMP_EVENT", i);
 	}
 
 	private void UpdateGridListItemChallenge(int i, Transform t)
 	{
 		if (!MonoBehaviourSingleton<PartyManager>.IsValid() || MonoBehaviourSingleton<PartyManager>.I.challengeInfo == null)
 		{
-			SetActive(t, false);
+			SetActive(t, is_visible: false);
+			return;
 		}
-		else
-		{
-			SetActive(t, true);
-			SetEvent(t, "JUMP_CHALLENGE_QUEST", i);
-			SetActive(t, UI.OBJ_CHALLENGE_ON, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsSatisfy());
-			SetActive(t, UI.OBJ_CHALLENGE_OFF, !MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsSatisfy());
-			SetLabelText(t, UI.LBL_CHALLENGE_ON_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
-			SetLabelText(t, UI.LBL_CHALLENGE_OFF_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
-			SetSupportEncoding(UI.LBL_CHALLENGE_ON_MESSAGE, true);
-			SetSupportEncoding(UI.LBL_CHALLENGE_OFF_MESSAGE, true);
-		}
+		SetActive(t, is_visible: true);
+		SetEvent(t, "JUMP_CHALLENGE_QUEST", i);
+		SetActive(t, UI.OBJ_CHALLENGE_ON, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsSatisfy());
+		SetActive(t, UI.OBJ_CHALLENGE_OFF, !MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsSatisfy());
+		SetLabelText(t, UI.LBL_CHALLENGE_ON_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
+		SetLabelText(t, UI.LBL_CHALLENGE_OFF_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
+		SetSupportEncoding(UI.LBL_CHALLENGE_ON_MESSAGE, isEnable: true);
+		SetSupportEncoding(UI.LBL_CHALLENGE_OFF_MESSAGE, isEnable: true);
 	}
 
 	private void UpdateListItemPointShop(int i, Transform t, PointShopData pointShopData)
@@ -953,7 +1017,7 @@ public class ItemDetailTop : GameSection
 	protected virtual void SetPointShopIcon(Transform t)
 	{
 		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(1);
-		SetNPCIcon(t, UI.TEX_NPC, nPCData.npcModelID, false);
+		SetNPCIcon(t, UI.TEX_NPC, nPCData.npcModelID);
 	}
 
 	private void OnBuy(PointShopItem item, int num)
@@ -968,35 +1032,38 @@ public class ItemDetailTop : GameSection
 				m_ItemDestinations.Remove(selectedPointShopDestination);
 			}
 			RefreshUI();
-			GameSection.ResumeEvent(isSuccess, null);
+			GameSection.ResumeEvent(isSuccess);
 		});
 	}
 
 	protected void OnQuery_JUMP_QUEST()
 	{
 		int num = (int)GameSection.GetEventData();
-		if (m_ItemDestinations != null && m_ItemDestinations.Count > num)
+		if (m_ItemDestinations == null || m_ItemDestinations.Count <= num)
 		{
-			ItemDestination itemDestination = m_ItemDestinations[num];
-			if (itemDestination.type == ItemDestination.TYPE.AdmissionQuest)
+			return;
+		}
+		ItemDestination itemDestination = m_ItemDestinations[num];
+		if (itemDestination.type != ItemDestination.TYPE.AdmissionQuest)
+		{
+			return;
+		}
+		QuestTable.QuestTableData quest = itemDestination.quest;
+		if (quest == null)
+		{
+			return;
+		}
+		if (quest.questType == QUEST_TYPE.ORDER)
+		{
+			QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(quest.questID);
+			if (questItem == null || questItem.infoData == null || questItem.infoData.questData.num == 0)
 			{
-				QuestTable.QuestTableData quest = itemDestination.quest;
-				if (quest != null)
-				{
-					if (quest.questType == QUEST_TYPE.ORDER)
-					{
-						QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(quest.questID);
-						if (questItem == null || questItem.infoData == null || questItem.infoData.questData.num == 0)
-						{
-							GameSection.ChangeEvent("ORDER_NOT_HAVE", null);
-							return;
-						}
-					}
-					jumpQuest = quest;
-					GameSection.ChangeEvent("JUMP_QUEST_CONFIRM", null);
-				}
+				GameSection.ChangeEvent("ORDER_NOT_HAVE");
+				return;
 			}
 		}
+		jumpQuest = quest;
+		GameSection.ChangeEvent("JUMP_QUEST_CONFIRM");
 	}
 
 	protected void OnQuery_ItemDetailJumpQuestConfirm_NO()
@@ -1013,10 +1080,10 @@ public class ItemDetailTop : GameSection
 			QUEST_TYPE questType = questTableData.questType;
 			if (questType == QUEST_TYPE.ORDER)
 			{
-				string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+				string goingHomeEvent = GameSection.GetGoingHomeEvent();
 				array = new EventData[4]
 				{
-					new EventData(name, null),
+					new EventData(goingHomeEvent, null),
 					new EventData("GACHA_QUEST_COUNTER", null),
 					new EventData("TO_GACHA_QUEST_COUNTER", null),
 					new EventData("SELECT_ORDER_FROM_ITEM_DETAIL", questTableData.questID)
@@ -1043,7 +1110,7 @@ public class ItemDetailTop : GameSection
 			if (itemDestination != null && itemDestination.type == ItemDestination.TYPE.GachaQuest)
 			{
 				searchEnemySpecies = itemDestination.enemy_species;
-				GameSection.ChangeEvent("JUMP_GACHA_QUEST_CONFIRM", null);
+				GameSection.ChangeEvent("JUMP_GACHA_QUEST_CONFIRM");
 			}
 		}
 	}
@@ -1057,10 +1124,10 @@ public class ItemDetailTop : GameSection
 	{
 		if (searchEnemySpecies != 0)
 		{
-			string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+			string goingHomeEvent = GameSection.GetGoingHomeEvent();
 			EventData[] autoEvents = new EventData[4]
 			{
-				new EventData(name, null),
+				new EventData(goingHomeEvent, null),
 				new EventData("GACHA_QUEST_COUNTER", null),
 				new EventData("CONDITION", null),
 				new EventData("SPECIES_SEARCH_REQUEST", searchEnemySpecies)
@@ -1070,51 +1137,89 @@ public class ItemDetailTop : GameSection
 		}
 	}
 
+	protected void OnQuery_JUMP_EVENT()
+	{
+		int num = (int)GameSection.GetEventData();
+		if (num < m_ItemDestinations.Count)
+		{
+			ItemDestination destination = m_ItemDestinations[num];
+			List<Network.EventData> list = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
+			Network.EventData eventData = list.Find((Network.EventData e) => e.eventId == destination.quest.eventId);
+			DeliveryTable.DeliveryData deliveryTableDataFromQuestId = Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(destination.quest.questID);
+			string goingHomeEvent = GameSection.GetGoingHomeEvent();
+			jump_event_list_datas = new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("EVENT_COUNTER", null),
+				new EventData("SELECT", destination.quest.eventId)
+			};
+			GameSection.ChangeEvent("JUMP_EVENT_NORMAL_CONFIRM");
+		}
+	}
+
+	protected void OnQuery_SERIES_ARENA()
+	{
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentSeriesArenaId(0);
+		ToSeriesArena();
+	}
+
 	protected void OnQuery_JUMP_FIELD()
 	{
 		jump_event_list_datas = null;
 		int num = (int)GameSection.GetEventData();
-		if (num < m_ItemDestinations.Count)
+		if (num >= m_ItemDestinations.Count)
 		{
-			ItemDestination itemDestination = m_ItemDestinations[num];
-			if (itemDestination.type == ItemDestination.TYPE.DropField || itemDestination.type == ItemDestination.TYPE.HappenField)
+			return;
+		}
+		ItemDestination itemDestination = m_ItemDestinations[num];
+		if (itemDestination.type == ItemDestination.TYPE.DropField || itemDestination.type == ItemDestination.TYPE.HappenField)
+		{
+			FieldMapTable.FieldMapTableData table = itemDestination.field;
+			if (table == null)
 			{
-				FieldMapTable.FieldMapTableData field = itemDestination.field;
-				if (field == null)
+				return;
+			}
+			if (table.IsEventData)
+			{
+				List<Network.EventData> list = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
+				Network.EventData eventData = list.Find((Network.EventData e) => e.eventId == table.eventId);
+				string goingHomeEvent = GameSection.GetGoingHomeEvent();
+				if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(table.mapID) && eventData.readPrologueStory)
 				{
-					return;
-				}
-				if (field.IsEventData)
-				{
-					List<Network.EventData> list = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
-					list.RemoveAll((Network.EventData e) => e.HasEndDate() && e.GetRest() < 0);
-					string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
-					jump_event_list_datas = new EventData[3]
-					{
-						new EventData(name, null),
-						new EventData("EVENT_COUNTER", null),
-						new EventData("SELECT", field.eventId)
-					};
-					GameSection.ChangeEvent("JUMP_EVENT_CONFIRM", null);
-					return;
-				}
-				if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(field.mapID))
-				{
-					if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(field.jumpPortalID, false, true))
+					if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(table.jumpPortalID, check_dst_quest: false))
 					{
 						GameSection.StopEvent();
+						return;
 					}
-					else
+					jumpField = table;
+					GameSection.ChangeEvent("JUMP_FIELD_CONFIRM");
+				}
+				else
+				{
+					jump_event_list_datas = new EventData[3]
 					{
-						jumpField = field;
-						GameSection.ChangeEvent("JUMP_FIELD_CONFIRM", null);
-					}
+						new EventData(goingHomeEvent, null),
+						new EventData("EVENT_COUNTER", null),
+						new EventData("SELECT", table.eventId)
+					};
+					GameSection.ChangeEvent("JUMP_EVENT_CONFIRM");
+				}
+				return;
+			}
+			if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(table.mapID))
+			{
+				if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(table.jumpPortalID, check_dst_quest: false))
+				{
+					GameSection.StopEvent();
 					return;
 				}
+				jumpField = table;
+				GameSection.ChangeEvent("JUMP_FIELD_CONFIRM");
+				return;
 			}
-			jumpField = null;
-			GameSection.ChangeEvent("CAN_NOT_JUMP_FIELD", null);
 		}
+		jumpField = null;
+		GameSection.ChangeEvent("CAN_NOT_JUMP_FIELD");
 	}
 
 	protected void OnQuery_ItemDetailJumpFieldConfirm_YES()
@@ -1122,16 +1227,16 @@ public class ItemDetailTop : GameSection
 		GameSection.StayEvent();
 		CoopApp.EnterField(jumpField.jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
 		{
-			jumpField = null;
 			if (!is_connect)
 			{
-				GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-				GameSection.ResumeEvent(true, null);
+				GameSection.ChangeStayEvent("COOP_SERVER_INVALID");
+				GameSection.ResumeEvent(is_resume: true);
 			}
 			else
 			{
-				GameSection.ChangeStayEvent("TO_FIELD", null);
-				GameSection.ResumeEvent(is_regist, null);
+				jumpField = null;
+				GameSection.ChangeStayEvent("TO_FIELD");
+				GameSection.ResumeEvent(is_regist);
 			}
 		});
 	}
@@ -1154,28 +1259,41 @@ public class ItemDetailTop : GameSection
 		jump_event_list_datas = null;
 	}
 
+	protected void OnQuery_ItemDetailJumpEventNormalConfirm_YES()
+	{
+		if (jump_event_list_datas != null)
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(jump_event_list_datas);
+		}
+	}
+
+	protected void OnQuery_ItemDetailJumpEventNormalConfirm_NO()
+	{
+		jump_event_list_datas = null;
+	}
+
 	protected void OnQuery_JUMP_CHALLENGE_QUEST()
 	{
 		int num = (int)GameSection.GetEventData();
-		if (m_ItemDestinations != null && m_ItemDestinations.Count > num)
+		if (m_ItemDestinations == null || m_ItemDestinations.Count <= num)
 		{
-			ItemDestination itemDestination = m_ItemDestinations[num];
-			if (itemDestination != null && itemDestination.type == ItemDestination.TYPE.ChallengeQuest && MonoBehaviourSingleton<PartyManager>.IsValid())
+			return;
+		}
+		ItemDestination itemDestination = m_ItemDestinations[num];
+		if (itemDestination != null && itemDestination.type == ItemDestination.TYPE.ChallengeQuest && MonoBehaviourSingleton<PartyManager>.IsValid())
+		{
+			if (!MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsSatisfy())
 			{
-				if (!MonoBehaviourSingleton<PartyManager>.I.challengeInfo.IsSatisfy())
-				{
-					GameSection.ChangeEvent("NO_SATISFY", null);
-				}
-				else if (MonoBehaviourSingleton<PartyManager>.I.challengeInfo.num == 0)
-				{
-					GameSection.ChangeEvent("NUM_ZERO", null);
-				}
-				else
-				{
-					searchEnemySpecies = itemDestination.enemy_species;
-					GameSection.ChangeEvent("JUMP_CHALLENGE_QUEST_CONFIRM", null);
-				}
+				GameSection.ChangeEvent("NO_SATISFY");
+				return;
 			}
+			if (MonoBehaviourSingleton<PartyManager>.I.challengeInfo.num == 0)
+			{
+				GameSection.ChangeEvent("NUM_ZERO");
+				return;
+			}
+			searchEnemySpecies = itemDestination.enemy_species;
+			GameSection.ChangeEvent("JUMP_CHALLENGE_QUEST_CONFIRM");
 		}
 	}
 
@@ -1188,10 +1306,10 @@ public class ItemDetailTop : GameSection
 	{
 		if (searchEnemySpecies != 0)
 		{
-			string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
+			string goingHomeEvent = GameSection.GetGoingHomeEvent();
 			EventData[] autoEvents = new EventData[4]
 			{
-				new EventData(name, null),
+				new EventData(goingHomeEvent, null),
 				new EventData("CHALLENGE_COUNTER", null),
 				new EventData("CONDITION", null),
 				new EventData("SPECIES_SEARCH_REQUEST", searchEnemySpecies)
@@ -1215,7 +1333,7 @@ public class ItemDetailTop : GameSection
 		GameSection.SetEventData(eventData);
 		if (selectedPointShopdata.shop.userPoint < selectedPointShopdata.item.needPoint)
 		{
-			GameSection.ChangeEvent("SHORTAGE_POINT", null);
+			GameSection.ChangeEvent("SHORTAGE_POINT");
 		}
 	}
 
@@ -1223,7 +1341,7 @@ public class ItemDetailTop : GameSection
 	{
 		if (!CanSell())
 		{
-			GameSection.ChangeEvent("NOT_SELL", null);
+			GameSection.ChangeEvent("NOT_SELL");
 		}
 		GameSection.SetEventData(data);
 	}
@@ -1268,7 +1386,6 @@ public class ItemDetailTop : GameSection
 
 	private void OnCloseDialog_GuildDonateSendDialog()
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		string s = GameSection.GetEventData() as string;
 		try
 		{
@@ -1289,10 +1406,10 @@ public class ItemDetailTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{
-			GameSection.ResumeEvent(success, null);
+			GameSection.ResumeEvent(success);
 			if (success)
 			{
-				((_003CCRSendDonateRequest_003Ec__Iterator5C)/*Error near IL_0077: stateMachine*/)._003C_003Ef__this.backSection = true;
+				backSection = true;
 			}
 		});
 	}

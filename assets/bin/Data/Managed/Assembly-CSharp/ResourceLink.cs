@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ResourceLink
+public class ResourceLink : MonoBehaviour
 {
 	public Object[] objects;
 

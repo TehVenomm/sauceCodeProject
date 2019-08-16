@@ -12,13 +12,15 @@ public abstract class Annotated {
 
     public abstract boolean equals(Object obj);
 
-    protected abstract AnnotationMap getAllAnnotations();
+    /* access modifiers changed from: protected */
+    public abstract AnnotationMap getAllAnnotations();
 
     public abstract AnnotatedElement getAnnotated();
 
     public abstract <A extends Annotation> A getAnnotation(Class<A> cls);
 
-    protected abstract int getModifiers();
+    /* access modifiers changed from: protected */
+    public abstract int getModifiers();
 
     public abstract String getName();
 

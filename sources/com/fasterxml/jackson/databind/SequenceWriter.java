@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ser.impl.TypeWrappedSerializer;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import java.util.Collection;
 
 public class SequenceWriter implements Versioned, Closeable, Flushable {
     protected final boolean _cfgCloseCloseable = this._config.isEnabled(SerializationFeature.CLOSE_CLOSEABLE);
@@ -56,7 +55,7 @@ public class SequenceWriter implements Versioned, Closeable, Flushable {
         } else if (this._cfgCloseCloseable && (obj instanceof Closeable)) {
             return _writeCloseableValue(obj);
         } else {
-            JsonSerializer jsonSerializer = this._rootSerializer;
+            JsonSerializer<Object> jsonSerializer = this._rootSerializer;
             if (jsonSerializer == null) {
                 Class cls = obj.getClass();
                 jsonSerializer = this._dynamicSerializers.serializerFor(cls);
@@ -100,11 +99,22 @@ public class SequenceWriter implements Versioned, Closeable, Flushable {
         return this;
     }
 
-    public <C extends Collection<?>> SequenceWriter writeAll(C c) throws IOException {
-        for (Object write : c) {
-            write(write);
-        }
-        return this;
+    /* JADX WARNING: Incorrect type for immutable var: ssa=C, code=C<java.lang.Object>, for r3v0, types: [C, C<java.lang.Object>, java.util.Collection] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public <C extends java.util.Collection<?>> com.fasterxml.jackson.databind.SequenceWriter writeAll(C<java.lang.Object> r3) throws java.io.IOException {
+        /*
+            r2 = this;
+            java.util.Iterator r0 = r3.iterator()
+        L_0x0004:
+            boolean r1 = r0.hasNext()
+            if (r1 == 0) goto L_0x0012
+            java.lang.Object r1 = r0.next()
+            r2.write(r1)
+            goto L_0x0004
+        L_0x0012:
+            return r2
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.SequenceWriter.writeAll(java.util.Collection):com.fasterxml.jackson.databind.SequenceWriter");
     }
 
     public SequenceWriter writeAll(Iterable<?> iterable) throws IOException {
@@ -133,117 +143,129 @@ public class SequenceWriter implements Versioned, Closeable, Flushable {
         }
     }
 
-    protected SequenceWriter _writeCloseableValue(Object obj) throws IOException {
-        Throwable th;
-        Closeable closeable = null;
-        Closeable closeable2 = (Closeable) obj;
-        try {
-            JsonSerializer jsonSerializer = this._rootSerializer;
-            if (jsonSerializer == null) {
-                Class cls = obj.getClass();
-                jsonSerializer = this._dynamicSerializers.serializerFor(cls);
-                if (jsonSerializer == null) {
-                    jsonSerializer = _findAndAddDynamic(cls);
-                }
-            }
-            this._provider.serializeValue(this._generator, obj, null, jsonSerializer);
-            if (this._cfgFlush) {
-                this._generator.flush();
-            }
-            Closeable closeable3 = null;
-            try {
-                closeable2.close();
-                if (null != null) {
-                    try {
-                        closeable3.close();
-                    } catch (IOException e) {
-                    }
-                }
-                return this;
-            } catch (Throwable th2) {
-                th = th2;
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (IOException e2) {
-                    }
-                }
-                throw th;
-            }
-        } catch (Throwable th3) {
-            Throwable th4 = th3;
-            closeable = closeable2;
-            th = th4;
-            if (closeable != null) {
-                closeable.close();
-            }
-            throw th;
-        }
+    /* access modifiers changed from: protected */
+    /* JADX WARNING: Removed duplicated region for block: B:20:0x0037 A[SYNTHETIC, Splitter:B:20:0x0037] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.SequenceWriter _writeCloseableValue(java.lang.Object r7) throws java.io.IOException {
+        /*
+            r6 = this;
+            r2 = 0
+            r0 = r7
+            java.io.Closeable r0 = (java.io.Closeable) r0
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r1 = r6._rootSerializer     // Catch:{ all -> 0x0033 }
+            if (r1 != 0) goto L_0x0018
+            java.lang.Class r3 = r7.getClass()     // Catch:{ all -> 0x0033 }
+            com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap r1 = r6._dynamicSerializers     // Catch:{ all -> 0x0033 }
+            com.fasterxml.jackson.databind.JsonSerializer r1 = r1.serializerFor(r3)     // Catch:{ all -> 0x0033 }
+            if (r1 != 0) goto L_0x0018
+            com.fasterxml.jackson.databind.JsonSerializer r1 = r6._findAndAddDynamic(r3)     // Catch:{ all -> 0x0033 }
+        L_0x0018:
+            com.fasterxml.jackson.databind.ser.DefaultSerializerProvider r3 = r6._provider     // Catch:{ all -> 0x0033 }
+            com.fasterxml.jackson.core.JsonGenerator r4 = r6._generator     // Catch:{ all -> 0x0033 }
+            r5 = 0
+            r3.serializeValue(r4, r7, r5, r1)     // Catch:{ all -> 0x0033 }
+            boolean r1 = r6._cfgFlush     // Catch:{ all -> 0x0033 }
+            if (r1 == 0) goto L_0x0029
+            com.fasterxml.jackson.core.JsonGenerator r1 = r6._generator     // Catch:{ all -> 0x0033 }
+            r1.flush()     // Catch:{ all -> 0x0033 }
+        L_0x0029:
+            r1 = 0
+            r0.close()     // Catch:{ all -> 0x003f }
+            if (r2 == 0) goto L_0x0032
+            r1.close()     // Catch:{ IOException -> 0x003b }
+        L_0x0032:
+            return r6
+        L_0x0033:
+            r1 = move-exception
+            r2 = r0
+        L_0x0035:
+            if (r2 == 0) goto L_0x003a
+            r2.close()     // Catch:{ IOException -> 0x003d }
+        L_0x003a:
+            throw r1
+        L_0x003b:
+            r0 = move-exception
+            goto L_0x0032
+        L_0x003d:
+            r0 = move-exception
+            goto L_0x003a
+        L_0x003f:
+            r0 = move-exception
+            r1 = r0
+            goto L_0x0035
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.SequenceWriter._writeCloseableValue(java.lang.Object):com.fasterxml.jackson.databind.SequenceWriter");
     }
 
-    protected SequenceWriter _writeCloseableValue(Object obj, JavaType javaType) throws IOException {
-        Closeable closeable;
-        Throwable th;
-        Closeable closeable2 = (Closeable) obj;
-        try {
-            JsonSerializer serializerFor = this._dynamicSerializers.serializerFor(javaType.getRawClass());
-            if (serializerFor == null) {
-                serializerFor = _findAndAddDynamic(javaType);
-            }
-            this._provider.serializeValue(this._generator, obj, javaType, serializerFor);
-            if (this._cfgFlush) {
-                this._generator.flush();
-            }
-            closeable = null;
-            try {
-                closeable2.close();
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (IOException e) {
-                    }
-                }
-                return this;
-            } catch (Throwable th2) {
-                th = th2;
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (IOException e2) {
-                    }
-                }
-                throw th;
-            }
-        } catch (Throwable th3) {
-            Throwable th4 = th3;
-            closeable = closeable2;
-            th = th4;
-            if (closeable != null) {
-                closeable.close();
-            }
-            throw th;
-        }
+    /* access modifiers changed from: protected */
+    /* JADX WARNING: Removed duplicated region for block: B:18:0x0031 A[SYNTHETIC, Splitter:B:18:0x0031] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.SequenceWriter _writeCloseableValue(java.lang.Object r5, com.fasterxml.jackson.databind.JavaType r6) throws java.io.IOException {
+        /*
+            r4 = this;
+            r0 = r5
+            java.io.Closeable r0 = (java.io.Closeable) r0
+            com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap r1 = r4._dynamicSerializers     // Catch:{ all -> 0x002d }
+            java.lang.Class r2 = r6.getRawClass()     // Catch:{ all -> 0x002d }
+            com.fasterxml.jackson.databind.JsonSerializer r1 = r1.serializerFor(r2)     // Catch:{ all -> 0x002d }
+            if (r1 != 0) goto L_0x0013
+            com.fasterxml.jackson.databind.JsonSerializer r1 = r4._findAndAddDynamic(r6)     // Catch:{ all -> 0x002d }
+        L_0x0013:
+            com.fasterxml.jackson.databind.ser.DefaultSerializerProvider r2 = r4._provider     // Catch:{ all -> 0x002d }
+            com.fasterxml.jackson.core.JsonGenerator r3 = r4._generator     // Catch:{ all -> 0x002d }
+            r2.serializeValue(r3, r5, r6, r1)     // Catch:{ all -> 0x002d }
+            boolean r1 = r4._cfgFlush     // Catch:{ all -> 0x002d }
+            if (r1 == 0) goto L_0x0023
+            com.fasterxml.jackson.core.JsonGenerator r1 = r4._generator     // Catch:{ all -> 0x002d }
+            r1.flush()     // Catch:{ all -> 0x002d }
+        L_0x0023:
+            r2 = 0
+            r0.close()     // Catch:{ all -> 0x0039 }
+            if (r2 == 0) goto L_0x002c
+            r2.close()     // Catch:{ IOException -> 0x0035 }
+        L_0x002c:
+            return r4
+        L_0x002d:
+            r1 = move-exception
+            r2 = r0
+        L_0x002f:
+            if (r2 == 0) goto L_0x0034
+            r2.close()     // Catch:{ IOException -> 0x0037 }
+        L_0x0034:
+            throw r1
+        L_0x0035:
+            r0 = move-exception
+            goto L_0x002c
+        L_0x0037:
+            r0 = move-exception
+            goto L_0x0034
+        L_0x0039:
+            r0 = move-exception
+            r1 = r0
+            goto L_0x002f
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.SequenceWriter._writeCloseableValue(java.lang.Object, com.fasterxml.jackson.databind.JavaType):com.fasterxml.jackson.databind.SequenceWriter");
     }
 
     private final JsonSerializer<Object> _findAndAddDynamic(Class<?> cls) throws JsonMappingException {
-        SerializerAndMapResult findAndAddRootValueSerializer;
+        SerializerAndMapResult addSerializer;
         if (this._typeSerializer == null) {
-            findAndAddRootValueSerializer = this._dynamicSerializers.findAndAddRootValueSerializer((Class) cls, this._provider);
+            addSerializer = this._dynamicSerializers.findAndAddRootValueSerializer(cls, (SerializerProvider) this._provider);
         } else {
-            findAndAddRootValueSerializer = this._dynamicSerializers.addSerializer((Class) cls, new TypeWrappedSerializer(this._typeSerializer, this._provider.findValueSerializer((Class) cls, null)));
+            addSerializer = this._dynamicSerializers.addSerializer(cls, (JsonSerializer<Object>) new TypeWrappedSerializer<Object>(this._typeSerializer, this._provider.findValueSerializer(cls, (BeanProperty) null)));
         }
-        this._dynamicSerializers = findAndAddRootValueSerializer.map;
-        return findAndAddRootValueSerializer.serializer;
+        this._dynamicSerializers = addSerializer.map;
+        return addSerializer.serializer;
     }
 
     private final JsonSerializer<Object> _findAndAddDynamic(JavaType javaType) throws JsonMappingException {
-        SerializerAndMapResult findAndAddRootValueSerializer;
+        SerializerAndMapResult addSerializer;
         if (this._typeSerializer == null) {
-            findAndAddRootValueSerializer = this._dynamicSerializers.findAndAddRootValueSerializer(javaType, this._provider);
+            addSerializer = this._dynamicSerializers.findAndAddRootValueSerializer(javaType, (SerializerProvider) this._provider);
         } else {
-            findAndAddRootValueSerializer = this._dynamicSerializers.addSerializer(javaType, new TypeWrappedSerializer(this._typeSerializer, this._provider.findValueSerializer(javaType, null)));
+            addSerializer = this._dynamicSerializers.addSerializer(javaType, (JsonSerializer<Object>) new TypeWrappedSerializer<Object>(this._typeSerializer, this._provider.findValueSerializer(javaType, (BeanProperty) null)));
         }
-        this._dynamicSerializers = findAndAddRootValueSerializer.map;
-        return findAndAddRootValueSerializer.serializer;
+        this._dynamicSerializers = addSerializer.map;
+        return addSerializer.serializer;
     }
 }

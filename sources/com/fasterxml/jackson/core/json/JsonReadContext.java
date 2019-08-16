@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonStreamContext;
-import com.fasterxml.jackson.core.io.CharTypes;
+import com.fasterxml.jackson.core.p015io.CharTypes;
 
 public final class JsonReadContext extends JsonStreamContext {
     protected JsonReadContext _child;
@@ -27,7 +27,8 @@ public final class JsonReadContext extends JsonStreamContext {
         this._index = -1;
     }
 
-    protected void reset(int i, int i2, int i3) {
+    /* access modifiers changed from: protected */
+    public void reset(int i, int i2, int i3) {
         this._type = i;
         this._index = -1;
         this._lineNr = i2;
@@ -61,15 +62,15 @@ public final class JsonReadContext extends JsonStreamContext {
     }
 
     public JsonReadContext createChildArrayContext(int i, int i2) {
+        DupDetector child;
         JsonReadContext jsonReadContext = this._child;
         if (jsonReadContext == null) {
-            DupDetector dupDetector;
             if (this._dups == null) {
-                dupDetector = null;
+                child = null;
             } else {
-                dupDetector = this._dups.child();
+                child = this._dups.child();
             }
-            jsonReadContext = new JsonReadContext(this, dupDetector, 1, i, i2);
+            jsonReadContext = new JsonReadContext(this, child, 1, i, i2);
             this._child = jsonReadContext;
         } else {
             jsonReadContext.reset(1, i, i2);
@@ -78,15 +79,15 @@ public final class JsonReadContext extends JsonStreamContext {
     }
 
     public JsonReadContext createChildObjectContext(int i, int i2) {
+        DupDetector child;
         JsonReadContext jsonReadContext = this._child;
         if (jsonReadContext == null) {
-            DupDetector dupDetector;
             if (this._dups == null) {
-                dupDetector = null;
+                child = null;
             } else {
-                dupDetector = this._dups.child();
+                child = this._dups.child();
             }
-            jsonReadContext = new JsonReadContext(this, dupDetector, 2, i, i2);
+            jsonReadContext = new JsonReadContext(this, child, 2, i, i2);
             this._child = jsonReadContext;
         } else {
             jsonReadContext.reset(2, i, i2);
@@ -136,28 +137,28 @@ public final class JsonReadContext extends JsonStreamContext {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(64);
+        StringBuilder sb = new StringBuilder(64);
         switch (this._type) {
             case 0:
-                stringBuilder.append(Constants.URL_PATH_DELIMITER);
+                sb.append(Constants.URL_PATH_DELIMITER);
                 break;
             case 1:
-                stringBuilder.append('[');
-                stringBuilder.append(getCurrentIndex());
-                stringBuilder.append(']');
+                sb.append('[');
+                sb.append(getCurrentIndex());
+                sb.append(']');
                 break;
             case 2:
-                stringBuilder.append('{');
+                sb.append('{');
                 if (this._currentName != null) {
-                    stringBuilder.append('\"');
-                    CharTypes.appendQuoted(stringBuilder, this._currentName);
-                    stringBuilder.append('\"');
+                    sb.append('\"');
+                    CharTypes.appendQuoted(sb, this._currentName);
+                    sb.append('\"');
                 } else {
-                    stringBuilder.append('?');
+                    sb.append('?');
                 }
-                stringBuilder.append('}');
+                sb.append('}');
                 break;
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 }

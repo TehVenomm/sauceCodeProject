@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RegionRoot
+public class RegionRoot : MonoBehaviour
 {
 	[Tooltip("部位ID")]
 	public int regionID = 1;
@@ -28,16 +28,14 @@ public class RegionRoot
 		{
 			regionIDArray = new int[1];
 			regionIDArray[0] = regionID;
+			return;
 		}
-		else
+		regionIDArray = new int[subRegionIDs.Length + 1];
+		regionIDArray[0] = regionID;
+		int i = 0;
+		for (int num = subRegionIDs.Length; i < num; i++)
 		{
-			regionIDArray = new int[subRegionIDs.Length + 1];
-			regionIDArray[0] = regionID;
-			int i = 0;
-			for (int num = subRegionIDs.Length; i < num; i++)
-			{
-				regionIDArray[i + 1] = subRegionIDs[i];
-			}
+			regionIDArray[i + 1] = subRegionIDs[i];
 		}
 	}
 }

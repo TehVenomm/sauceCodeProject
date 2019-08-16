@@ -35,8 +35,8 @@ public class HomeAppReviewAppealDialog : HomeAppReviewAppealDialogBase
 		if (starValue == 0)
 		{
 			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce("Received: " + itemString, string.Empty);
-			SetEnableYesButton(false);
-			yesButton.UpdateColor(true);
+			SetEnableYesButton(isEnable: false);
+			yesButton.UpdateColor(instant: true);
 		}
 		base.UpdateUI();
 	}
@@ -56,13 +56,13 @@ public class HomeAppReviewAppealDialog : HomeAppReviewAppealDialogBase
 	protected override void OnQuery_NO()
 	{
 		int replyAction = 0;
-		SendInfo(replyAction, null);
+		SendInfo(replyAction);
 	}
 
 	private void OnQuery_STAR()
 	{
 		starValue = (int)GameSection.GetEventData() + 1;
-		SetEnableYesButton(true);
+		SetEnableYesButton(isEnable: true);
 		UpdateStarUI();
 		GameSection.StopEvent();
 	}

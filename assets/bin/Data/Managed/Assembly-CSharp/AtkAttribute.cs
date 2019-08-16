@@ -208,6 +208,48 @@ public class AtkAttribute
 		return result;
 	}
 
+	public ELEMENT_TYPE GetAntiElementType()
+	{
+		ELEMENT_TYPE result = ELEMENT_TYPE.MAX;
+		float num = 1f;
+		if (normal < num)
+		{
+			result = ELEMENT_TYPE.MAX;
+			num = normal;
+		}
+		if (fire < num)
+		{
+			result = ELEMENT_TYPE.FIRE;
+			num = fire;
+		}
+		if (water < num)
+		{
+			result = ELEMENT_TYPE.WATER;
+			num = water;
+		}
+		if (thunder < num)
+		{
+			result = ELEMENT_TYPE.THUNDER;
+			num = thunder;
+		}
+		if (soil < num)
+		{
+			result = ELEMENT_TYPE.SOIL;
+			num = soil;
+		}
+		if (light < num)
+		{
+			result = ELEMENT_TYPE.LIGHT;
+			num = light;
+		}
+		if (dark < num)
+		{
+			result = ELEMENT_TYPE.DARK;
+			num = dark;
+		}
+		return result;
+	}
+
 	public void AddElementValueWithCheck(float targetValue)
 	{
 		if (fire > 0f)
@@ -238,6 +280,17 @@ public class AtkAttribute
 
 	public void AddElementOnly(float targetValue)
 	{
+		fire += targetValue;
+		water += targetValue;
+		thunder += targetValue;
+		soil += targetValue;
+		light += targetValue;
+		dark += targetValue;
+	}
+
+	public void AddAll(float targetValue)
+	{
+		normal += targetValue;
 		fire += targetValue;
 		water += targetValue;
 		thunder += targetValue;
@@ -322,6 +375,16 @@ public class AtkAttribute
 		}
 	}
 
+	public void SetTargetElemetAll(float val)
+	{
+		SetTargetElement(ELEMENT_TYPE.FIRE, val);
+		SetTargetElement(ELEMENT_TYPE.WATER, val);
+		SetTargetElement(ELEMENT_TYPE.THUNDER, val);
+		SetTargetElement(ELEMENT_TYPE.SOIL, val);
+		SetTargetElement(ELEMENT_TYPE.LIGHT, val);
+		SetTargetElement(ELEMENT_TYPE.DARK, val);
+	}
+
 	public void SetTargetElement(ELEMENT_TYPE type, float val)
 	{
 		switch (type)
@@ -387,11 +450,7 @@ public class AtkAttribute
 			{
 				for (int j = 0; j < 6; j++)
 				{
-					int[,] elementToleranceScrollTable = ElementToleranceScrollTable;
-					int num2 = i;
-					int num3 = j;
-					int changeElement = convTable[i].GetChangeElement(j);
-					elementToleranceScrollTable[num2, num3] = changeElement;
+					ElementToleranceScrollTable[i, j] = convTable[i].GetChangeElement(j);
 				}
 			}
 		}
@@ -456,20 +515,37 @@ public class AtkAttribute
 		if (scroll < 0 || scroll >= length)
 		{
 			Log.Error("scroll is out of range!! ");
+			return;
 		}
-		else
+		int i = 0;
+		for (int num = 6; i < num; i++)
 		{
-			int i = 0;
-			for (int num = 6; i < num; i++)
-			{
-				int num2 = ElementToleranceScrollTable[scroll, i];
-				SetTargetElement((ELEMENT_TYPE)i, baseElementTolerances[num2]);
-			}
+			int num2 = ElementToleranceScrollTable[scroll, i];
+			SetTargetElement((ELEMENT_TYPE)i, baseElementTolerances[num2]);
 		}
 	}
 
 	public override string ToString()
 	{
 		return $"[AtkAttribute] normal:{normal} fire:{fire} water:{water} thunder:{thunder} soil:{soil} light:{light} dark:{dark}";
+	}
+
+	public string ToShortString()
+	{
+		string empty = string.Empty;
+		string text = empty;
+		empty = text + "n:" + normal + " ";
+		text = empty;
+		empty = text + "f:" + fire + " ";
+		text = empty;
+		empty = text + "w:" + water + " ";
+		text = empty;
+		empty = text + "t:" + thunder + " ";
+		text = empty;
+		empty = text + "s:" + soil + " ";
+		text = empty;
+		empty = text + "l:" + light + " ";
+		text = empty;
+		return text + "d:" + dark + " ";
 	}
 }

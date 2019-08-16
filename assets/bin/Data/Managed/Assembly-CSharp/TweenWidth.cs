@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Tween/Tween Width")]
 [RequireComponent(typeof(UIWidget))]
+[AddComponentMenu("NGUI/Tween/Tween Width")]
 public class TweenWidth : UITweener
 {
 	public int from = 100;
@@ -54,34 +54,31 @@ public class TweenWidth : UITweener
 
 	protected override void OnUpdate(float factor, bool isFinished)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
 		value = Mathf.RoundToInt((float)from * (1f - factor) + (float)to * factor);
-		if (updateTable)
+		if (!updateTable)
 		{
+			return;
+		}
+		if (mTable == null)
+		{
+			mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
 			if (mTable == null)
 			{
-				mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
-				if (mTable == null)
-				{
-					updateTable = false;
-					return;
-				}
+				updateTable = false;
+				return;
 			}
-			mTable.repositionNow = true;
 		}
+		mTable.repositionNow = true;
 	}
 
 	public static TweenWidth Begin(UIWidget widget, float duration, int width)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Expected O, but got Unknown
-		TweenWidth tweenWidth = UITweener.Begin<TweenWidth>(widget.get_gameObject(), duration, true);
+		TweenWidth tweenWidth = UITweener.Begin<TweenWidth>(widget.get_gameObject(), duration);
 		tweenWidth.from = widget.width;
 		tweenWidth.to = width;
 		if (duration <= 0f)
 		{
-			tweenWidth.Sample(1f, true);
+			tweenWidth.Sample(1f, isFinished: true);
 			tweenWidth.set_enabled(false);
 		}
 		return tweenWidth;

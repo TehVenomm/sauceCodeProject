@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
@@ -15,8 +15,8 @@ public class AsExistingPropertyTypeSerializer extends AsPropertyTypeSerializer {
         return this._property == beanProperty ? this : new AsExistingPropertyTypeSerializer(this._idResolver, beanProperty, this._typePropertyName);
     }
 
-    public As getTypeInclusion() {
-        return As.EXISTING_PROPERTY;
+    public C0861As getTypeInclusion() {
+        return C0861As.EXISTING_PROPERTY;
     }
 
     public void writeTypePrefixForObject(Object obj, JsonGenerator jsonGenerator) throws IOException {

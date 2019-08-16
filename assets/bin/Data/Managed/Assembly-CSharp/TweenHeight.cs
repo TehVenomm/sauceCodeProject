@@ -54,34 +54,31 @@ public class TweenHeight : UITweener
 
 	protected override void OnUpdate(float factor, bool isFinished)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
 		value = Mathf.RoundToInt((float)from * (1f - factor) + (float)to * factor);
-		if (updateTable)
+		if (!updateTable)
 		{
+			return;
+		}
+		if (mTable == null)
+		{
+			mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
 			if (mTable == null)
 			{
-				mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
-				if (mTable == null)
-				{
-					updateTable = false;
-					return;
-				}
+				updateTable = false;
+				return;
 			}
-			mTable.repositionNow = true;
 		}
+		mTable.repositionNow = true;
 	}
 
 	public static TweenHeight Begin(UIWidget widget, float duration, int height)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Expected O, but got Unknown
-		TweenHeight tweenHeight = UITweener.Begin<TweenHeight>(widget.get_gameObject(), duration, true);
+		TweenHeight tweenHeight = UITweener.Begin<TweenHeight>(widget.get_gameObject(), duration);
 		tweenHeight.from = widget.height;
 		tweenHeight.to = height;
 		if (duration <= 0f)
 		{
-			tweenHeight.Sample(1f, true);
+			tweenHeight.Sample(1f, isFinished: true);
 			tweenHeight.set_enabled(false);
 		}
 		return tweenHeight;

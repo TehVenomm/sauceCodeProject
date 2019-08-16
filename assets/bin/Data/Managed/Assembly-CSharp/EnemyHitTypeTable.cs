@@ -1,14 +1,15 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyHitTypeTable : Singleton<EnemyHitTypeTable>, IDataTable
 {
 	public class TypeData
 	{
-		public const string NT = "name,base_effect,fire_effect,water_effect,thunder_effect,soil_effect,light_effect,dark_effect";
-
 		public string baseEffectName;
 
 		public string[] elementEffectNames = new string[6];
+
+		public const string NT = "name,base_effect,fire_effect,water_effect,thunder_effect,soil_effect,light_effect,dark_effect";
 
 		public static bool cb(CSVReader csv, TypeData data, ref string key)
 		{
@@ -20,6 +21,9 @@ public class EnemyHitTypeTable : Singleton<EnemyHitTypeTable>, IDataTable
 			return true;
 		}
 	}
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackStringKeyReadCSV<TypeData> _003C_003Ef__mg_0024cache0;
 
 	public StringKeyTable<TypeData> dataTable
 	{

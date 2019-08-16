@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -10,6 +10,7 @@ import android.os.RemoteException;
 import android.widget.RemoteViews;
 import java.util.List;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsSession */
 public final class CustomTabsSession {
     private static final String TAG = "CustomTabsSession";
     private final ICustomTabsCallback mCallback;
@@ -37,10 +38,10 @@ public final class CustomTabsSession {
 
     public boolean setActionButton(Bitmap bitmap, String str) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(CustomTabsIntent.KEY_ICON, bitmap);
-        bundle.putString(CustomTabsIntent.KEY_DESCRIPTION, str);
+        bundle.putParcelable("android.support.customtabs.customaction.ICON", bitmap);
+        bundle.putString("android.support.customtabs.customaction.DESCRIPTION", str);
         Bundle bundle2 = new Bundle();
-        bundle2.putBundle(CustomTabsIntent.EXTRA_ACTION_BUTTON_BUNDLE, bundle);
+        bundle2.putBundle("android.support.customtabs.extra.ACTION_BUTTON_BUNDLE", bundle);
         try {
             return this.mService.updateVisuals(this.mCallback, bundle2);
         } catch (RemoteException e) {
@@ -50,9 +51,9 @@ public final class CustomTabsSession {
 
     public boolean setSecondaryToolbarViews(RemoteViews remoteViews, int[] iArr, PendingIntent pendingIntent) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(CustomTabsIntent.EXTRA_REMOTEVIEWS, remoteViews);
-        bundle.putIntArray(CustomTabsIntent.EXTRA_REMOTEVIEWS_VIEW_IDS, iArr);
-        bundle.putParcelable(CustomTabsIntent.EXTRA_REMOTEVIEWS_PENDINGINTENT, pendingIntent);
+        bundle.putParcelable("android.support.customtabs.extra.EXTRA_REMOTEVIEWS", remoteViews);
+        bundle.putIntArray("android.support.customtabs.extra.EXTRA_REMOTEVIEWS_VIEW_IDS", iArr);
+        bundle.putParcelable("android.support.customtabs.extra.EXTRA_REMOTEVIEWS_PENDINGINTENT", pendingIntent);
         try {
             return this.mService.updateVisuals(this.mCallback, bundle);
         } catch (RemoteException e) {
@@ -63,11 +64,11 @@ public final class CustomTabsSession {
     @Deprecated
     public boolean setToolbarItem(int i, Bitmap bitmap, String str) {
         Bundle bundle = new Bundle();
-        bundle.putInt(CustomTabsIntent.KEY_ID, i);
-        bundle.putParcelable(CustomTabsIntent.KEY_ICON, bitmap);
-        bundle.putString(CustomTabsIntent.KEY_DESCRIPTION, str);
+        bundle.putInt("android.support.customtabs.customaction.ID", i);
+        bundle.putParcelable("android.support.customtabs.customaction.ICON", bitmap);
+        bundle.putString("android.support.customtabs.customaction.DESCRIPTION", str);
         Bundle bundle2 = new Bundle();
-        bundle2.putBundle(CustomTabsIntent.EXTRA_ACTION_BUTTON_BUNDLE, bundle);
+        bundle2.putBundle("android.support.customtabs.extra.ACTION_BUTTON_BUNDLE", bundle);
         try {
             return this.mService.updateVisuals(this.mCallback, bundle2);
         } catch (RemoteException e) {
@@ -84,33 +85,36 @@ public final class CustomTabsSession {
     }
 
     public int postMessage(String str, Bundle bundle) {
-        int postMessage;
+        int i;
         synchronized (this.mLock) {
             try {
-                postMessage = this.mService.postMessage(this.mCallback, str, bundle);
+                i = this.mService.postMessage(this.mCallback, str, bundle);
             } catch (RemoteException e) {
-                postMessage = -2;
+                i = -2;
             }
         }
-        return postMessage;
+        return i;
     }
 
     public boolean validateRelationship(int i, Uri uri, Bundle bundle) {
         boolean z = false;
-        if (i >= 1 && i <= 2) {
-            try {
-                z = this.mService.validateRelationship(this.mCallback, i, uri, bundle);
-            } catch (RemoteException e) {
-            }
+        if (i < 1 || i > 2) {
+            return z;
         }
-        return z;
+        try {
+            return this.mService.validateRelationship(this.mCallback, i, uri, bundle);
+        } catch (RemoteException e) {
+            return z;
+        }
     }
 
-    IBinder getBinder() {
+    /* access modifiers changed from: 0000 */
+    public IBinder getBinder() {
         return this.mCallback.asBinder();
     }
 
-    ComponentName getComponentName() {
+    /* access modifiers changed from: 0000 */
+    public ComponentName getComponentName() {
         return this.mComponentName;
     }
 }

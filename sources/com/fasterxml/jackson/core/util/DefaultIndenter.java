@@ -15,13 +15,13 @@ public class DefaultIndenter extends NopIndenter {
     private final char[] indents;
 
     static {
-        String property;
+        String str;
         try {
-            property = System.getProperty("line.separator");
+            str = System.getProperty("line.separator");
         } catch (Throwable th) {
-            property = StringUtils.LF;
+            str = StringUtils.f1199LF;
         }
-        SYS_LF = property;
+        SYS_LF = str;
     }
 
     public DefaultIndenter() {

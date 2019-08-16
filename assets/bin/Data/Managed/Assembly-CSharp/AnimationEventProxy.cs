@@ -1,4 +1,6 @@
-public class AnimationEventProxy
+using UnityEngine;
+
+public class AnimationEventProxy : MonoBehaviour
 {
 	public interface IEvent
 	{

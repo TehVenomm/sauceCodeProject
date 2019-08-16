@@ -15,9 +15,9 @@ public class UIButtonColor : UIWidgetContainer
 
 	public GameObject tweenTarget;
 
-	public Color hover = new Color(0.882352948f, 0.784313738f, 0.5882353f, 1f);
+	public Color hover = new Color(0.882352948f, 40f / 51f, 0.5882353f, 1f);
 
-	public Color pressed = new Color(0.7176471f, 0.6392157f, 0.482352942f, 1f);
+	public Color pressed = new Color(61f / 85f, 163f / 255f, 41f / 85f, 1f);
 
 	public Color disabledColor = Color.get_grey();
 
@@ -46,7 +46,7 @@ public class UIButtonColor : UIWidgetContainer
 		}
 		set
 		{
-			SetState(value, false);
+			SetState(value, instant: false);
 		}
 	}
 
@@ -72,7 +72,7 @@ public class UIButtonColor : UIWidgetContainer
 			mDefaultColor = value;
 			State state = mState;
 			mState = State.Disabled;
-			SetState(state, false);
+			SetState(state, instant: false);
 		}
 	}
 
@@ -110,21 +110,17 @@ public class UIButtonColor : UIWidgetContainer
 		}
 		if (!isEnabled)
 		{
-			SetState(State.Disabled, true);
+			SetState(State.Disabled, instant: true);
 		}
 	}
 
 	protected virtual void OnInit()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
@@ -147,37 +143,35 @@ public class UIButtonColor : UIWidgetContainer
 			mDefaultColor = mWidget.color;
 			mStartingColor = mDefaultColor;
 		}
-		else if (tweenTarget != null)
+		else
 		{
+			if (!(tweenTarget != null))
+			{
+				return;
+			}
 			Renderer component = tweenTarget.GetComponent<Renderer>();
 			if (component != null)
 			{
 				mDefaultColor = ((!Application.get_isPlaying()) ? component.get_sharedMaterial().get_color() : component.get_material().get_color());
 				mStartingColor = mDefaultColor;
+				return;
+			}
+			Light component2 = tweenTarget.GetComponent<Light>();
+			if (component2 != null)
+			{
+				mDefaultColor = component2.get_color();
+				mStartingColor = mDefaultColor;
 			}
 			else
 			{
-				Light component2 = tweenTarget.GetComponent<Light>();
-				if (component2 != null)
-				{
-					mDefaultColor = component2.get_color();
-					mStartingColor = mDefaultColor;
-				}
-				else
-				{
-					tweenTarget = null;
-					mInitDone = false;
-				}
+				tweenTarget = null;
+				mInitDone = false;
 			}
 		}
 	}
 
 	protected virtual void OnEnable()
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (mInitDone)
 		{
 			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
@@ -186,11 +180,11 @@ public class UIButtonColor : UIWidgetContainer
 		{
 			if (UICamera.currentTouch.pressed == this.get_gameObject())
 			{
-				OnPress(true);
+				OnPress(isPressed: true);
 			}
 			else if (UICamera.currentTouch.current == this.get_gameObject())
 			{
-				OnHover(true);
+				OnHover(isOver: true);
 			}
 		}
 	}
@@ -200,7 +194,7 @@ public class UIButtonColor : UIWidgetContainer
 		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		if (mInitDone && tweenTarget != null)
 		{
-			SetState(State.Normal, true);
+			SetState(State.Normal, instant: true);
 			TweenColor component = tweenTarget.GetComponent<TweenColor>();
 			if (component != null)
 			{
@@ -220,47 +214,47 @@ public class UIButtonColor : UIWidgetContainer
 			}
 			if (tweenTarget != null)
 			{
-				SetState(isOver ? State.Hover : State.Normal, false);
+				SetState(isOver ? State.Hover : State.Normal, instant: false);
 			}
 		}
 	}
 
 	protected virtual void OnPress(bool isPressed)
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		if (isEnabled && UICamera.currentTouch != null)
+		if (!isEnabled || UICamera.currentTouch == null)
 		{
-			if (!mInitDone)
+			return;
+		}
+		if (!mInitDone)
+		{
+			OnInit();
+		}
+		if (!(tweenTarget != null))
+		{
+			return;
+		}
+		if (isPressed)
+		{
+			SetState(State.Pressed, instant: false);
+		}
+		else if (UICamera.currentTouch.current == this.get_gameObject())
+		{
+			if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
 			{
-				OnInit();
+				SetState(State.Hover, instant: false);
 			}
-			if (tweenTarget != null)
+			else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse && UICamera.hoveredObject == this.get_gameObject())
 			{
-				if (isPressed)
-				{
-					SetState(State.Pressed, false);
-				}
-				else if (UICamera.currentTouch.current == this.get_gameObject())
-				{
-					if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
-					{
-						SetState(State.Hover, false);
-					}
-					else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse && UICamera.hoveredObject == this.get_gameObject())
-					{
-						SetState(State.Hover, false);
-					}
-					else
-					{
-						SetState(State.Normal, false);
-					}
-				}
-				else
-				{
-					SetState(State.Normal, false);
-				}
+				SetState(State.Hover, instant: false);
 			}
+			else
+			{
+				SetState(State.Normal, instant: false);
+			}
+		}
+		else
+		{
+			SetState(State.Normal, instant: false);
 		}
 	}
 
@@ -274,7 +268,7 @@ public class UIButtonColor : UIWidgetContainer
 			}
 			if (tweenTarget != null)
 			{
-				SetState(State.Pressed, false);
+				SetState(State.Pressed, instant: false);
 			}
 		}
 	}
@@ -289,7 +283,7 @@ public class UIButtonColor : UIWidgetContainer
 			}
 			if (tweenTarget != null)
 			{
-				SetState(State.Normal, false);
+				SetState(State.Normal, instant: false);
 			}
 		}
 	}

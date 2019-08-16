@@ -30,11 +30,15 @@ public class MarkupElement extends BaseJsonObject {
         ITALIC
     }
 
+    public MarkupElement() {
+    }
+
     public MarkupElement(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, "type")) {
             this.type = JSONUtils.optString(jsonReader);
             return true;

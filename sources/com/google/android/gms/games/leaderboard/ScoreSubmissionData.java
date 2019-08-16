@@ -1,18 +1,18 @@
 package com.google.android.gms.games.leaderboard;
 
+import android.util.SparseArray;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbh;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.internal.zzbvh;
-import java.util.HashMap;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Objects.ToStringHelper;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.internal.games.zzeg;
 
 public final class ScoreSubmissionData {
-    private static final String[] zzhks = new String[]{"leaderboardId", "playerId", "timeSpan", "hasResult", "rawScore", "formattedScore", "newBest", "scoreTag"};
-    private String zzezq;
-    private int zzezx;
-    private String zzhku;
-    private HashMap<Integer, Result> zzhlz = new HashMap();
+    private static final String[] zznr = {"leaderboardId", "playerId", "timeSpan", "hasResult", "rawScore", "formattedScore", "newBest", "scoreTag"};
+    private int statusCode;
+    private String zzbz;
+    private String zznt;
+    private SparseArray<Result> zzox = new SparseArray<>();
 
     public static final class Result {
         public final String formattedScore;
@@ -28,45 +28,50 @@ public final class ScoreSubmissionData {
         }
 
         public final String toString() {
-            return zzbf.zzt(this).zzg("RawScore", Long.valueOf(this.rawScore)).zzg("FormattedScore", this.formattedScore).zzg("ScoreTag", this.scoreTag).zzg("NewBest", Boolean.valueOf(this.newBest)).toString();
+            return Objects.toStringHelper(this).add("RawScore", Long.valueOf(this.rawScore)).add("FormattedScore", this.formattedScore).add("ScoreTag", this.scoreTag).add("NewBest", Boolean.valueOf(this.newBest)).toString();
         }
     }
 
     public ScoreSubmissionData(DataHolder dataHolder) {
-        this.zzezx = dataHolder.getStatusCode();
+        this.statusCode = dataHolder.getStatusCode();
         int count = dataHolder.getCount();
-        zzbp.zzbh(count == 3);
+        Preconditions.checkArgument(count == 3);
         for (int i = 0; i < count; i++) {
-            int zzbw = dataHolder.zzbw(i);
+            int windowIndex = dataHolder.getWindowIndex(i);
             if (i == 0) {
-                this.zzhku = dataHolder.zzd("leaderboardId", i, zzbw);
-                this.zzezq = dataHolder.zzd("playerId", i, zzbw);
+                this.zznt = dataHolder.getString("leaderboardId", i, windowIndex);
+                this.zzbz = dataHolder.getString("playerId", i, windowIndex);
             }
-            if (dataHolder.zze("hasResult", i, zzbw)) {
-                this.zzhlz.put(Integer.valueOf(dataHolder.zzc("timeSpan", i, zzbw)), new Result(dataHolder.zzb("rawScore", i, zzbw), dataHolder.zzd("formattedScore", i, zzbw), dataHolder.zzd("scoreTag", i, zzbw), dataHolder.zze("newBest", i, zzbw)));
+            if (dataHolder.getBoolean("hasResult", i, windowIndex)) {
+                this.zzox.put(dataHolder.getInteger("timeSpan", i, windowIndex), new Result(dataHolder.getLong("rawScore", i, windowIndex), dataHolder.getString("formattedScore", i, windowIndex), dataHolder.getString("scoreTag", i, windowIndex), dataHolder.getBoolean("newBest", i, windowIndex)));
             }
         }
     }
 
     public final String getLeaderboardId() {
-        return this.zzhku;
+        return this.zznt;
     }
 
     public final String getPlayerId() {
-        return this.zzezq;
+        return this.zzbz;
     }
 
     public final Result getScoreResult(int i) {
-        return (Result) this.zzhlz.get(Integer.valueOf(i));
+        return (Result) this.zzox.get(i);
     }
 
     public final String toString() {
-        zzbh zzg = zzbf.zzt(this).zzg("PlayerId", this.zzezq).zzg("StatusCode", Integer.valueOf(this.zzezx));
-        for (int i = 0; i < 3; i++) {
-            Result result = (Result) this.zzhlz.get(Integer.valueOf(i));
-            zzg.zzg("TimesSpan", zzbvh.zzdf(i));
-            zzg.zzg("Result", result == null ? "null" : result.toString());
+        ToStringHelper add = Objects.toStringHelper(this).add("PlayerId", this.zzbz).add("StatusCode", Integer.valueOf(this.statusCode));
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 >= 3) {
+                return add.toString();
+            }
+            Result result = (Result) this.zzox.get(i2);
+            add.add("TimesSpan", zzeg.zzn(i2));
+            add.add("Result", result == null ? "null" : result.toString());
+            i = i2 + 1;
         }
-        return zzg.toString();
     }
 }

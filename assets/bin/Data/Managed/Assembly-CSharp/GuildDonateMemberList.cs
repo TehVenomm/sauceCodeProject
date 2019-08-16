@@ -64,7 +64,7 @@ public class GuildDonateMemberList : GuildMemberList
 
 	protected override void SetListItem(int i, Transform t, string event_name, FriendCharaInfo member)
 	{
-		SetActive(t, UI.OBJ_OFFLINE_MASK, false);
+		SetActive(t, UI.OBJ_OFFLINE_MASK, is_visible: false);
 		bool flag = _invitedList.Contains(member.userId);
 		SetActive(t, UI.OBJ_SELECTED, flag);
 		SetButtonEnabled(t, !flag);
@@ -86,18 +86,15 @@ public class GuildDonateMemberList : GuildMemberList
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateInvite(_info.id, member.userId, delegate(bool success)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Expected O, but got Unknown
 			if (success)
 			{
 				Transform ctrl = GetCtrl(UI.GRD_LIST);
-				Transform val = ctrl.GetChild(index).GetChild(0);
-				SetActive(val, UI.OBJ_SELECTED, true);
-				SetButtonEnabled(val, false);
+				Transform child = ctrl.GetChild(index).GetChild(0);
+				SetActive(child, UI.OBJ_SELECTED, is_visible: true);
+				SetButtonEnabled(child, is_enabled: false);
 				_invitedList.Remove(member.userId);
 			}
-			GameSection.ResumeEvent(false, null);
+			GameSection.ResumeEvent(is_resume: false);
 		});
 	}
 

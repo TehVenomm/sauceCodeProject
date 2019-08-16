@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.net.Uri;
 import android.os.Binder;
@@ -8,8 +8,10 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.ICustomTabsCallback */
 public interface ICustomTabsCallback extends IInterface {
 
+    /* renamed from: net.gogame.gowrap.ui.customtabs.ICustomTabsCallback$Stub */
     public static abstract class Stub extends Binder implements ICustomTabsCallback {
         private static final String DESCRIPTOR = "net.gogame.gowrap.ui.customtabs.ICustomTabsCallback";
         static final int TRANSACTION_extraCallback = 3;
@@ -18,6 +20,7 @@ public interface ICustomTabsCallback extends IInterface {
         static final int TRANSACTION_onPostMessage = 5;
         static final int TRANSACTION_onRelationshipValidationResult = 6;
 
+        /* renamed from: net.gogame.gowrap.ui.customtabs.ICustomTabsCallback$Stub$Proxy */
         private static class Proxy implements ICustomTabsCallback {
             private IBinder mRemote;
 
@@ -164,55 +167,59 @@ public interface ICustomTabsCallback extends IInterface {
         }
 
         public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+            Uri uri;
             Bundle bundle;
-            String readString;
+            Bundle bundle2;
+            Bundle bundle3;
+            Bundle bundle4;
+            Bundle bundle5;
+            String str = DESCRIPTOR;
             switch (i) {
                 case 2:
-                    parcel.enforceInterface(DESCRIPTOR);
+                    parcel.enforceInterface(str);
                     int readInt = parcel.readInt();
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle5 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle5 = null;
                     }
-                    onNavigationEvent(readInt, bundle);
+                    onNavigationEvent(readInt, bundle5);
                     parcel2.writeNoException();
                     return true;
                 case 3:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    readString = parcel.readString();
+                    parcel.enforceInterface(str);
+                    String readString = parcel.readString();
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle4 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle4 = null;
                     }
-                    extraCallback(readString, bundle);
+                    extraCallback(readString, bundle4);
                     parcel2.writeNoException();
                     return true;
                 case 4:
-                    parcel.enforceInterface(DESCRIPTOR);
+                    parcel.enforceInterface(str);
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle3 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle3 = null;
                     }
-                    onMessageChannelReady(bundle);
+                    onMessageChannelReady(bundle3);
                     parcel2.writeNoException();
                     return true;
                 case 5:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    readString = parcel.readString();
+                    parcel.enforceInterface(str);
+                    String readString2 = parcel.readString();
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle2 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle2 = null;
                     }
-                    onPostMessage(readString, bundle);
+                    onPostMessage(readString2, bundle2);
                     parcel2.writeNoException();
                     return true;
                 case 6:
-                    Uri uri;
-                    parcel.enforceInterface(DESCRIPTOR);
+                    parcel.enforceInterface(str);
                     int readInt2 = parcel.readInt();
                     if (parcel.readInt() != 0) {
                         uri = (Uri) Uri.CREATOR.createFromParcel(parcel);
@@ -229,7 +236,7 @@ public interface ICustomTabsCallback extends IInterface {
                     parcel2.writeNoException();
                     return true;
                 case 1598968902:
-                    parcel2.writeString(DESCRIPTOR);
+                    parcel2.writeString(str);
                     return true;
                 default:
                     return super.onTransact(i, parcel, parcel2, i2);

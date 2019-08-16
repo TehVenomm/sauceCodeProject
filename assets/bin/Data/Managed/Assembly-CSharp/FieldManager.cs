@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class FieldManager : MonoBehaviourSingleton<FieldManager>
 {
@@ -30,19 +31,29 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		public int portalPointToIndex = -1;
 	}
 
-	public const uint NUMBERTOP_MAPID_EVENT = 2u;
-
-	public const uint NUMBERTOP_MAPID_QUEST = 3u;
-
-	public const uint TUTORIAL_FIELD_ID_0 = 10000100u;
-
-	public const uint TUTORIAL_FIELD_ID_1 = 10000101u;
-
 	private int lastMapId;
 
 	private CurrentFieldData current = new CurrentFieldData();
 
+	private Vector3 cameraOffsetPortraitPos = Vector3.get_zero();
+
+	private Quaternion cameraOffsetPortraitRot = Quaternion.get_identity();
+
+	private Vector3 cameraOffsetLandscapePos = Vector3.get_zero();
+
+	private Quaternion cameraOffsetLandscapeRot = Quaternion.get_identity();
+
 	public List<int> fieldGatherPointIdList = new List<int>();
+
+	public List<GatherGrowthInfo> fieldGatherGrowthList = new List<GatherGrowthInfo>();
+
+	public const uint NUMBERTOP_MAPID_EVENT = 2u;
+
+	public const uint NUMBERTOP_MAPID_QUEST = 3u;
+
+	public const uint TUTORIAL_FIELD_ID_0 = 10000101u;
+
+	public const uint TUTORIAL_FIELD_ID_1 = 10000101u;
 
 	public FieldModel.Param fieldData
 	{
@@ -56,13 +67,19 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		private set;
 	}
 
+	public string noticeText
+	{
+		get;
+		private set;
+	}
+
 	public uint currentMapID => current.fieldTransitionInfo.mapID;
 
 	public uint currentPortalID => current.fieldTransitionInfo.portalID;
 
 	public FieldMapTable.FieldMapTableData currentMapData => current.mapData;
 
-	public uint currentFieldBuffId => (!object.ReferenceEquals(current.mapData, null)) ? current.mapData.fieldBuffId : 0;
+	public uint currentFieldBuffId => (!object.ReferenceEquals(current.mapData, null)) ? current.mapData.fieldBuffId : 0u;
 
 	public float currentStartMapX => current.fieldTransitionInfo.mapX;
 
@@ -76,17 +93,56 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 
 	public List<int> currentFieldPointIdList => fieldGatherPointIdList;
 
+	public List<GatherGrowthInfo> currentFieldGatherGrowthList => fieldGatherGrowthList;
+
+	public Vector3 cameraOffsetPos_Vec
+	{
+		get
+		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+			{
+				return cameraOffsetLandscapePos;
+			}
+			return cameraOffsetPortraitPos;
+		}
+	}
+
+	public Quaternion cameraOffsetRot_Quat
+	{
+		get
+		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+			{
+				return cameraOffsetLandscapeRot;
+			}
+			return cameraOffsetPortraitRot;
+		}
+	}
+
 	public bool useFastTravel
 	{
 		get;
 		set;
 	}
 
-	public bool isTutorialField => currentPortalID == 10000100 || currentPortalID == 10000101;
+	public bool isTutorialField => currentPortalID == 10000101 || currentPortalID == 10000101;
 
 	public FieldManager()
 	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		fieldData = new FieldModel.Param();
+		noticeText = string.Empty;
 	}
 
 	public static bool IsValidInField()
@@ -120,6 +176,19 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 	public static bool IsValidInTutorial()
 	{
 		return MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.isTutorialField;
+	}
+
+	public bool IsEnabledStandby()
+	{
+		if (fieldData == null || fieldData.field == null)
+		{
+			return false;
+		}
+		if (fieldData.field.enableStandby == 0)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	private string GetHappenStageName()
@@ -192,12 +261,10 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		if (portalData == null)
 		{
 			Log.Error(LOG.INGAME, "FieldManager.SetCurrentPortalID() portal data is none. portal_id : {0}", portal_id);
+			return;
 		}
-		else
-		{
-			SetCurrentFieldMapID(portalData.dstMapID, portalData.dstX, portalData.dstZ, portalData.dstDir);
-			current.fieldTransitionInfo.portalID = portal_id;
-		}
+		SetCurrentFieldMapID(portalData.dstMapID, portalData.dstX, portalData.dstZ, portalData.dstDir);
+		current.fieldTransitionInfo.portalID = portal_id;
 	}
 
 	public void SetCurrentFieldMapPortalID(uint portal_id, float map_x, float map_z, float map_dir)
@@ -210,6 +277,28 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 
 	public void SetCurrentFieldMapID(uint map_id, float map_x, float map_z, float map_dir)
 	{
+		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
 		current = new CurrentFieldData();
 		current.fieldTransitionInfo.portalID = 0u;
 		current.fieldTransitionInfo.mapID = map_id;
@@ -219,10 +308,16 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		if (current.fieldTransitionInfo.mapID != 0)
 		{
 			current.mapData = Singleton<FieldMapTable>.I.GetFieldMapData(current.fieldTransitionInfo.mapID);
+			cameraOffsetPortraitPos = current.mapData.camOffsetPortraitPos;
+			cameraOffsetPortraitRot = Quaternion.Euler(current.mapData.camOffsetPortraitRot);
+			cameraOffsetLandscapePos = current.mapData.camOffsetLandscapePos;
+			cameraOffsetLandscapeRot = Quaternion.Euler(current.mapData.camOffsetLandscapeRot);
 		}
 		else
 		{
 			current.mapData = null;
+			cameraOffsetPortraitPos = (cameraOffsetLandscapePos = Vector3.get_zero());
+			cameraOffsetPortraitRot = (cameraOffsetLandscapeRot = Quaternion.get_identity());
 		}
 		current.isValidBoss = false;
 		List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(currentMapID);
@@ -247,7 +342,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		int num = current.fieldPortalInfoList.Count;
 		current.portalPointToIndex = -1;
 		int num2 = 0;
-		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID(mapId, true);
+		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID(mapId, do_sort: true);
 		if (portalListByMapID != null)
 		{
 			num2 = portalListByMapID.Count;
@@ -333,14 +428,14 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		_ResetPortalPointToIndex(current.portalPointToIndex);
 		if (QuestManager.IsValidExplore())
 		{
-			_ResetPortalPointToIndex(0);
+			_ResetPortalPointToIndex();
 		}
 		return true;
 	}
 
 	public void ResetPortalPointToIndex()
 	{
-		_ResetPortalPointToIndex(0);
+		_ResetPortalPointToIndex();
 	}
 
 	private int _ResetPortalPointToIndex(int startIndex = 0)
@@ -397,7 +492,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 					fieldPortalInfo.fieldPortal = fieldPortal;
 				}
 			}
-			_ResetPortalPointToIndex(0);
+			_ResetPortalPointToIndex();
 		}
 	}
 
@@ -461,7 +556,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		return Guid.NewGuid().ToString().Replace("-", string.Empty);
 	}
 
-	public void SendMatching(int portalId, uint deliveryId, Action<bool> call_back)
+	public void SendMatching(int portalId, uint deliveryId, int _toUserId, Action<bool> call_back)
 	{
 		fieldData.field = null;
 		FieldModel.RequestMatching requestMatching = new FieldModel.RequestMatching();
@@ -469,7 +564,9 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		requestMatching.dId = (int)deliveryId;
 		requestMatching.token = GenerateToken();
 		requestMatching.prevId = lastMapId;
+		requestMatching.toUserId = _toUserId;
 		fieldGatherPointIdList.Clear();
+		fieldGatherGrowthList.Clear();
 		Protocol.Send(FieldModel.RequestMatching.path, requestMatching, delegate(FieldModel ret)
 		{
 			bool obj = false;
@@ -478,8 +575,20 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 			{
 				obj = true;
 				lastMapId = ret.result.field.mapId;
-				fieldGatherPointIdList = ret.result.gather;
-				UpdateFieldData(ret.result, true);
+				if (ret.result.gather != null)
+				{
+					fieldGatherPointIdList = ret.result.gather;
+				}
+				if (ret.result.growth != null)
+				{
+					fieldGatherGrowthList = ret.result.growth;
+				}
+				if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss != null)
+				{
+					MonoBehaviourSingleton<UIManager>.I.knockDownRaidBoss.SetRaidBossHp(ret.result.raidBossHp);
+				}
+				noticeText = ret.result.noticeText;
+				UpdateFieldData(ret.result);
 				Dirty();
 			}
 			call_back(obj);
@@ -500,7 +609,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 			{
 				obj = true;
 				SetCurrentFieldMapID((uint)ret.result.field.mapId, 0f, 0f, 0f);
-				UpdateFieldData(ret.result, true);
+				UpdateFieldData(ret.result);
 				Dirty();
 			}
 			call_back(obj);
@@ -533,7 +642,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 			{
 				obj = true;
 				SetCurrentFieldMapID((uint)ret.result.field.mapId, 0f, 0f, 0f);
-				UpdateFieldData(ret.result, true);
+				UpdateFieldData(ret.result);
 				Dirty();
 			}
 			call_back(obj);
@@ -554,7 +663,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 			{
 				obj = true;
 				SetCurrentFieldMapID((uint)ret.result.field.mapId, 0f, 0f, 0f);
-				UpdateFieldData(ret.result, true);
+				UpdateFieldData(ret.result);
 				Dirty();
 			}
 			call_back(obj);
@@ -565,7 +674,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 	{
 		if (fieldData.field == null)
 		{
-			call_back(false);
+			call_back(obj: false);
 		}
 		else
 		{
@@ -575,7 +684,7 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 				if (ret.Error == Error.None)
 				{
 					obj = true;
-					UpdateFieldData(ret.result, false);
+					UpdateFieldData(ret.result, is_user_collection_init: false);
 					Dirty();
 				}
 				call_back(obj);
@@ -587,42 +696,40 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 	{
 		if (fieldData.field == null)
 		{
-			call_back(false);
+			call_back(obj: false);
+			return;
 		}
-		else
+		FieldLeaveModel.RequestSendForm requestSendForm = new FieldLeaveModel.RequestSendForm();
+		requestSendForm.toHome = 0;
+		requestSendForm.retire = 0;
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
 		{
-			FieldLeaveModel.RequestSendForm requestSendForm = new FieldLeaveModel.RequestSendForm();
-			requestSendForm.toHome = 0;
-			requestSendForm.retire = 0;
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
-			{
-				requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
-				MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
-			}
-			if (toHome)
-			{
-				requestSendForm.toHome = 1;
-			}
-			if (retire)
-			{
-				requestSendForm.retire = 1;
-			}
-			Protocol.Send(FieldLeaveModel.URL, requestSendForm, delegate(FieldLeaveModel ret)
-			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					if (toHome)
-					{
-						lastMapId = 0;
-					}
-					fieldData.field = null;
-					Dirty();
-				}
-				call_back(obj);
-			}, string.Empty);
+			requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
+			MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
 		}
+		if (toHome)
+		{
+			requestSendForm.toHome = 1;
+		}
+		if (retire)
+		{
+			requestSendForm.retire = 1;
+		}
+		Protocol.Send(FieldLeaveModel.URL, requestSendForm, delegate(FieldLeaveModel ret)
+		{
+			bool obj = false;
+			if (ret.Error == Error.None)
+			{
+				obj = true;
+				if (toHome)
+				{
+					lastMapId = 0;
+				}
+				fieldData.field = null;
+				Dirty();
+			}
+			call_back(obj);
+		}, string.Empty);
 	}
 
 	public void SendFieldDrop(FieldDropModel.RequestSendForm send, Action<bool> call_back)
@@ -669,6 +776,31 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		}, string.Empty);
 	}
 
+	public void SendFieldGatherGimmick(int lotId, int time, int isPop, Action<bool, FieldFishModel.Param> call_back)
+	{
+		FieldFishModel.RequestSendForm requestSendForm = new FieldFishModel.RequestSendForm();
+		requestSendForm.lotId = lotId;
+		requestSendForm.time = time;
+		requestSendForm.isPop = isPop;
+		Protocol.Send(FieldFishModel.URL, requestSendForm, delegate(FieldFishModel ret)
+		{
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(arg, ret.result);
+		}, string.Empty);
+	}
+
+	public void SendFieldFishBossComplete(int ownerUserId, int isSuccess, Action<bool, FieldGatherRewardList> call_back)
+	{
+		FieldFishBossCompleteModel.RequestSendForm requestSendForm = new FieldFishBossCompleteModel.RequestSendForm();
+		requestSendForm.ownerUserId = ownerUserId;
+		requestSendForm.isSuccess = isSuccess;
+		Protocol.Send(FieldFishBossCompleteModel.URL, requestSendForm, delegate(FieldFishBossCompleteModel ret)
+		{
+			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
+			call_back(arg, ret.result.reward);
+		}, string.Empty);
+	}
+
 	public void SendFieldQuestOpenPortal(int portalId, Action<bool, Error> call_back)
 	{
 		FieldQuestOpenPortalModel.RequestSendForm requestSendForm = new FieldQuestOpenPortalModel.RequestSendForm();
@@ -685,12 +817,17 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		FieldQuestMapChangeModel.RequestSendForm requestSendForm = new FieldQuestMapChangeModel.RequestSendForm();
 		requestSendForm.mapId = mapId;
 		fieldGatherPointIdList.Clear();
+		fieldGatherGrowthList.Clear();
 		Protocol.Send(FieldQuestMapChangeModel.URL, requestSendForm, delegate(FieldQuestMapChangeModel ret)
 		{
 			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
 			if (flag && ret.result.gather != null)
 			{
 				fieldGatherPointIdList = ret.result.gather;
+				if (ret.result.growth != null)
+				{
+					fieldGatherGrowthList = ret.result.growth;
+				}
 				if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 				{
 					MonoBehaviourSingleton<InGameProgress>.I.CheckGatherPointList();
@@ -802,6 +939,10 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		{
 			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portal.dstMapID);
 			if (fieldMapData == null)
+			{
+				return false;
+			}
+			if (MonoBehaviourSingleton<WorldMapManager>.I.releasedRegionIds == null)
 			{
 				return false;
 			}
@@ -953,47 +1094,48 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 
 	public void OnDiff(BaseModelDiff.DiffFieldPortal diff)
 	{
-		if (!QuestManager.IsValidExplore())
+		if (QuestManager.IsValidExplore())
 		{
-			bool flag = false;
-			if (Utility.IsExist(diff.add))
+			return;
+		}
+		bool flag = false;
+		if (Utility.IsExist(diff.add))
+		{
+			int i = 0;
+			for (int count = diff.add.Count; i < count; i++)
 			{
-				int i = 0;
-				for (int count = diff.add.Count; i < count; i++)
+				FieldMapPortalInfo fieldMapPortalInfo = current.fieldPortalInfoList.Find((FieldMapPortalInfo p) => p.IsValid() && p.portalData.portalID == diff.add[i].pId);
+				if (fieldMapPortalInfo != null)
 				{
-					FieldMapPortalInfo fieldMapPortalInfo = current.fieldPortalInfoList.Find((FieldMapPortalInfo p) => p.IsValid() && p.portalData.portalID == diff.add[i].pId);
-					if (fieldMapPortalInfo != null)
-					{
-						fieldMapPortalInfo.fieldPortal = diff.add[i];
-						flag |= fieldMapPortalInfo.IsFull();
-					}
+					fieldMapPortalInfo.fieldPortal = diff.add[i];
+					flag |= fieldMapPortalInfo.IsFull();
 				}
 			}
-			if (Utility.IsExist(diff.update))
+		}
+		if (Utility.IsExist(diff.update))
+		{
+			int j = 0;
+			for (int count2 = diff.update.Count; j < count2; j++)
 			{
-				int j = 0;
-				for (int count2 = diff.update.Count; j < count2; j++)
+				FieldMapPortalInfo fieldMapPortalInfo2 = current.fieldPortalInfoList.Find((FieldMapPortalInfo p) => p.IsValid() && p.portalData.portalID == diff.update[j].pId);
+				if (fieldMapPortalInfo2 != null)
 				{
-					FieldMapPortalInfo fieldMapPortalInfo2 = current.fieldPortalInfoList.Find((FieldMapPortalInfo p) => p.IsValid() && p.portalData.portalID == diff.update[j].pId);
-					if (fieldMapPortalInfo2 != null)
+					if (fieldMapPortalInfo2.fieldPortal != null)
 					{
-						if (fieldMapPortalInfo2.fieldPortal != null)
-						{
-							fieldMapPortalInfo2.fieldPortal.used = diff.update[j].used;
-							fieldMapPortalInfo2.fieldPortal.point = diff.update[j].point;
-						}
-						else
-						{
-							fieldMapPortalInfo2.fieldPortal = MonoBehaviourSingleton<WorldMapManager>.I.GetFieldPortal(diff.update[j].pId);
-						}
-						flag |= fieldMapPortalInfo2.IsFull();
+						fieldMapPortalInfo2.fieldPortal.used = diff.update[j].used;
+						fieldMapPortalInfo2.fieldPortal.point = diff.update[j].point;
 					}
+					else
+					{
+						fieldMapPortalInfo2.fieldPortal = MonoBehaviourSingleton<WorldMapManager>.I.GetFieldPortal(diff.update[j].pId);
+					}
+					flag |= fieldMapPortalInfo2.IsFull();
 				}
 			}
-			if (flag)
-			{
-				_ResetPortalPointToIndex(0);
-			}
+		}
+		if (flag)
+		{
+			_ResetPortalPointToIndex();
 		}
 	}
 
@@ -1024,6 +1166,48 @@ public class FieldManager : MonoBehaviourSingleton<FieldManager>
 		if (flag && MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameProgress>.I.CheckGatherPointList();
+		}
+	}
+
+	public void OnDiff(BaseModelDiff.DiffFieldGatherGrowth diff)
+	{
+		bool flag = false;
+		if (Utility.IsExist(diff.add))
+		{
+			int i = 0;
+			for (int count = diff.add.Count; i < count; i++)
+			{
+				if (!fieldGatherGrowthList.Contains(diff.add[i]))
+				{
+					fieldGatherGrowthList.Add(diff.add[i]);
+					flag = true;
+				}
+			}
+		}
+		if (Utility.IsExist(diff.del))
+		{
+			int j = 0;
+			for (int count2 = diff.del.Count; j < count2; j++)
+			{
+				fieldGatherGrowthList.Remove(diff.del[j]);
+				flag = true;
+			}
+		}
+		if (flag && MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			MonoBehaviourSingleton<InGameProgress>.I.CheckGatherPointList();
+		}
+	}
+
+	public void MatchingNotice()
+	{
+		if (!string.IsNullOrEmpty(noticeText))
+		{
+			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+			{
+				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestTextAnnounce(noticeText);
+			}
+			noticeText = string.Empty;
 		}
 	}
 }

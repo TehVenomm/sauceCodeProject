@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Trail
+public class Trail : MonoBehaviour
 {
-	private class Pool_List_Point
+	private class Pool_List_Point : rymTPool<List<Point>>
 	{
 	}
 
-	private class Pool_Point
+	private class Pool_Point : rymTPool<Point>
 	{
 	}
 
@@ -103,9 +103,9 @@ public class Trail
 
 	private bool dirty;
 
-	private Vector3 lastBeginPos = new Vector3(3.40282347E+38f, 3.40282347E+38f, 3.40282347E+38f);
+	private Vector3 lastBeginPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 
-	private Vector3 lastEndPos = new Vector3(3.40282347E+38f, 3.40282347E+38f, 3.40282347E+38f);
+	private Vector3 lastEndPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 
 	private int pauseStep;
 
@@ -169,9 +169,9 @@ public class Trail
 	private void Start()
 	{
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Expected O, but got Unknown
+		//IL_0044: Expected O, but got Unknown
 		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Expected O, but got Unknown
+		//IL_0060: Expected O, but got Unknown
 		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
@@ -209,7 +209,7 @@ public class Trail
 			int num4 = 0;
 			for (int j = 0; j < num2; j += 6)
 			{
-				triangles[j] = 0 + num4;
+				triangles[j] = num4;
 				triangles[j + 1] = 1 + num4;
 				triangles[j + 2] = 2 + num4;
 				triangles[j + 3] = 1 + num4;
@@ -290,16 +290,14 @@ public class Trail
 		ClearPointList();
 		prevPoint1 = null;
 		prevPoint2 = null;
-		lastBeginPos = new Vector3(3.40282347E+38f, 3.40282347E+38f, 3.40282347E+38f);
-		lastEndPos = new Vector3(3.40282347E+38f, 3.40282347E+38f, 3.40282347E+38f);
+		lastBeginPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+		lastEndPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 		autoDelete = false;
 		pauseStep = 0;
 	}
 
 	public void Reset()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 		Clear();
 	}
@@ -345,8 +343,6 @@ public class Trail
 
 	private void UpdateTrail(float dt)
 	{
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 		if (pauseStep > 0)
 		{
 			if (pauseStep == 2)
@@ -356,49 +352,51 @@ public class Trail
 			pauseStep = 2;
 		}
 		time += dt;
-		if (!(time < delayTime))
+		if (time < delayTime)
 		{
-			while (pointList.Count != 0)
+			return;
+		}
+		while (pointList.Count != 0)
+		{
+			Point point = pointList[0];
+			if (time < point.time + life)
 			{
-				Point point = pointList[0];
-				if (time < point.time + life)
-				{
-					break;
-				}
-				if (point == prevPoint2)
-				{
-					prevPoint2 = null;
-				}
-				else if (point == prevPoint1)
-				{
-					prevPoint1 = null;
-				}
-				pointList.RemoveAt(0);
-				rymTPool<Point>.Release(ref point);
-				dirty = true;
+				break;
 			}
-			if (autoDelete)
+			if (point == prevPoint2)
 			{
-				if ((deleteTime > 0f && time >= deleteTime + timeForDelete) || pointList.Count == 0)
+				prevPoint2 = null;
+			}
+			else if (point == prevPoint1)
+			{
+				prevPoint1 = null;
+			}
+			pointList.RemoveAt(0);
+			rymTPool<Point>.Release(ref point);
+			dirty = true;
+		}
+		if (autoDelete)
+		{
+			if ((!(deleteTime > 0f) || !(time >= deleteTime + timeForDelete)) && pointList.Count != 0)
+			{
+				return;
+			}
+			_transform = null;
+			if (onQueryDestroy != null)
+			{
+				if (onQueryDestroy(this))
 				{
-					_transform = null;
-					if (onQueryDestroy != null)
-					{
-						if (onQueryDestroy(this))
-						{
-							Object.DestroyImmediate(this.get_gameObject());
-						}
-					}
-					else
-					{
-						Object.DestroyImmediate(this.get_gameObject());
-					}
+					Object.DestroyImmediate(this.get_gameObject());
 				}
 			}
-			else if (emit)
+			else
 			{
-				Emit();
+				Object.DestroyImmediate(this.get_gameObject());
 			}
+		}
+		else if (emit)
+		{
+			Emit();
 		}
 	}
 
@@ -659,90 +657,90 @@ public class Trail
 		//IL_041c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0429: Unknown result type (might be due to invalid IL or missing references)
 		//IL_042e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_043a: Unknown result type (might be due to invalid IL or missing references)
 		Vector3[] array = vertices;
 		Vector2[] array2 = uvs;
-		if (pointList.Count >= 2)
+		if (pointList.Count < 2)
 		{
-			if (dirty || billboard)
+			return;
+		}
+		if (dirty || billboard)
+		{
+			int num = 0;
+			float num2 = pointList[0].time;
+			float num3 = pointList[pointList.Count - 1].time - num2;
+			float num4 = 1f / num3;
+			Point point = null;
+			int i = 0;
+			if (!billboard)
 			{
-				int num = 0;
-				float num2 = pointList[0].time;
-				float num3 = pointList[pointList.Count - 1].time - num2;
-				float num4 = 1f / num3;
-				Point point = null;
-				int i = 0;
-				if (!billboard)
+				while (num < pointList.Count)
 				{
-					while (num < pointList.Count)
-					{
-						point = pointList[num];
-						array[i] = point.beginPos;
-						array[i + 1] = point.endPos;
-						array2[i].x = (array2[i + 1].x = 1f - (point.time - num2) * num4);
-						num++;
-						i += 2;
-					}
-				}
-				else
-				{
-					float num5 = width * 0.5f;
-					Vector3 lossyScale = _transform.get_lossyScale();
-					if (lossyScale != Vector3.get_one())
-					{
-						num5 *= (lossyScale.x + lossyScale.y + lossyScale.z) * 0.333333343f;
-					}
-					int num6 = num + 1;
-					Point point2 = null;
-					Vector3 position = targetCameraTransform.get_position();
-					Vector3 val = Vector3.get_zero();
-					while (num6 < pointList.Count)
-					{
-						point = pointList[num];
-						point2 = pointList[num6];
-						Vector3 val2 = Vector3.Cross(position - point.centerPos, point2.centerPos - point.centerPos);
-						val = val2.get_normalized();
-						array[i] = point.centerPos - val * num5;
-						array[i + 1] = point.centerPos + val * num5;
-						array2[i].x = (array2[i + 1].x = 1f - (point.time - num2) * num4);
-						num++;
-						num6++;
-						i += 2;
-					}
-					array[i] = point2.centerPos - val * num5;
-					array[i + 1] = point2.centerPos + val * num5;
-					array2[i].x = (array2[i + 1].x = 1f - (point2.time - num2) * num4);
+					point = pointList[num];
+					array[i] = point.beginPos;
+					array[i + 1] = point.endPos;
+					array2[i].x = (array2[i + 1].x = 1f - (point.time - num2) * num4);
+					num++;
 					i += 2;
 				}
-				Vector3 val3 = array[i - 2];
-				for (int num7 = array.Length; i < num7; i += 2)
-				{
-					array[i] = (array[i + 1] = val3);
-				}
-				mesh.set_vertices(array);
-				mesh.set_uv(array2);
-				dirty = false;
 			}
-			if (deleteTime > 0f)
+			else
 			{
-				float num8 = (time - deleteTime) / timeForDelete;
-				if (num8 > 1f)
+				float num5 = width * 0.5f;
+				Vector3 lossyScale = _transform.get_lossyScale();
+				if (lossyScale != Vector3.get_one())
 				{
-					num8 = 1f;
+					num5 *= (lossyScale.x + lossyScale.y + lossyScale.z) * 0.333333343f;
 				}
-				Color val4 = Color.Lerp(color, colorForDelete, num8);
-				Color[] array3 = colors;
-				int j = 0;
-				for (int num9 = array.Length; j < num9; j += 2)
+				int num6 = num + 1;
+				Point point2 = null;
+				Vector3 position = targetCameraTransform.get_position();
+				Vector3 val = Vector3.get_zero();
+				while (num6 < pointList.Count)
 				{
-					array3[j] = (array3[j + 1] = val4);
+					point = pointList[num];
+					point2 = pointList[num6];
+					Vector3 val2 = Vector3.Cross(position - point.centerPos, point2.centerPos - point.centerPos);
+					val = val2.get_normalized();
+					array[i] = point.centerPos - val * num5;
+					array[i + 1] = point.centerPos + val * num5;
+					array2[i].x = (array2[i + 1].x = 1f - (point.time - num2) * num4);
+					num++;
+					num6++;
+					i += 2;
 				}
-				mesh.set_colors(array3);
+				array[i] = point2.centerPos - val * num5;
+				array[i + 1] = point2.centerPos + val * num5;
+				array2[i].x = (array2[i + 1].x = 1f - (point2.time - num2) * num4);
+				i += 2;
 			}
-			Bounds val5 = bounds;
-			val5.set_center(_transform.get_position());
-			mesh.set_bounds(val5);
-			Graphics.DrawMesh(mesh, Vector3.get_zero(), Quaternion.get_identity(), material, this.get_gameObject().get_layer());
+			Vector3 val3 = array[i - 2];
+			for (int num7 = array.Length; i < num7; i += 2)
+			{
+				array[i] = (array[i + 1] = val3);
+			}
+			mesh.set_vertices(array);
+			mesh.set_uv(array2);
+			dirty = false;
 		}
+		if (deleteTime > 0f)
+		{
+			float num8 = (time - deleteTime) / timeForDelete;
+			if (num8 > 1f)
+			{
+				num8 = 1f;
+			}
+			Color val4 = Color.Lerp(color, colorForDelete, num8);
+			Color[] array3 = colors;
+			int j = 0;
+			for (int num9 = array.Length; j < num9; j += 2)
+			{
+				array3[j] = (array3[j + 1] = val4);
+			}
+			mesh.set_colors(array3);
+		}
+		Bounds val5 = bounds;
+		val5.set_center(_transform.get_position());
+		mesh.set_bounds(val5);
+		Graphics.DrawMesh(mesh, Vector3.get_zero(), Quaternion.get_identity(), material, this.get_gameObject().get_layer());
 	}
 }

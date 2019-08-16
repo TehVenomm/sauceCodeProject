@@ -89,11 +89,11 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 
 	private const string FACEBOOK_FRIEND_PLAYERPREF_KEY = "fb_friend_key";
 
-	private const float LOGOUT_TIMEOUT = 5f;
-
 	private Action<bool, string> OnActionCallback;
 
 	private bool isActionExecuting;
+
+	private const float LOGOUT_TIMEOUT = 5f;
 
 	public bool isInitialized => FB.get_IsInitialized();
 
@@ -116,19 +116,17 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 	protected unsafe override void Awake()
 	{
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
+		//IL_002c: Expected O, but got Unknown
 		if (FB.get_IsInitialized())
 		{
 			FB.ActivateApp();
+			return;
 		}
-		else
+		if (_003C_003Ef__am_0024cache0 == null)
 		{
-			if (_003C_003Ef__am_0024cache4 == null)
-			{
-				_003C_003Ef__am_0024cache4 = new InitDelegate((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			FB.Init(_003C_003Ef__am_0024cache4, null, (string)null);
+			_003C_003Ef__am_0024cache0 = new InitDelegate((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
 		}
+		FB.Init(_003C_003Ef__am_0024cache0, null, (string)null);
 	}
 
 	private bool CheckAndSetActionExecuting()
@@ -138,7 +136,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 			Log.Error(LOG.SOCIAL, "isActionExecuting is currently true!");
 			return false;
 		}
-		SetActionExecutingFlag(true);
+		SetActionExecutingFlag(is_enable: true);
 		return true;
 	}
 
@@ -186,7 +184,6 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 
 	public void Logout(Action<bool, string> callback = null)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		if (CheckAndSetActionExecuting())
 		{
 			OnActionCallback = callback;
@@ -202,14 +199,15 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 		while (FB.get_IsLoggedIn())
 		{
 			timecount += Time.get_deltaTime();
-			if (!(timecount < 5f))
+			if (timecount < 5f)
 			{
-				success = false;
-				break;
+				yield return null;
+				continue;
 			}
-			yield return (object)null;
+			success = false;
+			break;
 		}
-		SetActionExecutingFlag(false);
+		SetActionExecutingFlag(is_enable: false);
 		if (OnActionCallback != null)
 		{
 			OnActionCallback(success, null);
@@ -227,7 +225,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 			}
 			catch
 			{
-				SetActionExecutingFlag(false);
+				SetActionExecutingFlag(is_enable: false);
 			}
 		}
 	}
@@ -243,7 +241,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 			}
 			catch
 			{
-				SetActionExecutingFlag(false);
+				SetActionExecutingFlag(is_enable: false);
 			}
 		}
 	}
@@ -259,7 +257,7 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 			}
 			catch (Exception)
 			{
-				SetActionExecutingFlag(false);
+				SetActionExecutingFlag(is_enable: false);
 			}
 		}
 	}
@@ -292,16 +290,16 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 					try
 					{
 						invitableFriendInfo = JsonUtility.FromJson<InvitableFriendInfo>(data);
-						callback(true);
+						callback(obj: true);
 					}
 					catch (Exception)
 					{
-						callback(false);
+						callback(obj: false);
 					}
 				}
 				else
 				{
-					callback(false);
+					callback(obj: false);
 				}
 			};
 			FB.API("/me/invitable_friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
@@ -319,16 +317,16 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 					try
 					{
 						friendInfo = JsonUtility.FromJson<FriendInfo>(data);
-						callback(true);
+						callback(obj: true);
 					}
 					catch (Exception)
 					{
-						callback(false);
+						callback(obj: false);
 					}
 				}
 				else
 				{
-					callback(false);
+					callback(obj: false);
 				}
 			};
 			FB.API("/me/friends?fields=id,name,picture&pretty=0&limit=5000", 0, new FacebookDelegate<IGraphResult>((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/), (IDictionary<string, string>)null);
@@ -337,30 +335,30 @@ public class FBManager : MonoBehaviourSingleton<FBManager>
 
 	private void _OnActionComplete(IResult result)
 	{
-		SetActionExecutingFlag(false);
+		SetActionExecutingFlag(is_enable: false);
 		if (OnActionCallback == null)
 		{
 			Log.Warning(LOG.SOCIAL, "OnActionCallback is null => do nothing!");
 		}
 		else if (result == null)
 		{
-			OnActionCallback(false, null);
+			OnActionCallback(arg1: false, null);
 		}
 		else if (!string.IsNullOrEmpty(result.get_Error()))
 		{
-			OnActionCallback(false, result.get_Error());
+			OnActionCallback(arg1: false, result.get_Error());
 		}
 		else if (result.get_Cancelled())
 		{
-			OnActionCallback(false, result.get_RawResult());
+			OnActionCallback(arg1: false, result.get_RawResult());
 		}
 		else if (!string.IsNullOrEmpty(result.get_RawResult()))
 		{
-			OnActionCallback(true, result.get_RawResult());
+			OnActionCallback(arg1: true, result.get_RawResult());
 		}
 		else
 		{
-			OnActionCallback(false, null);
+			OnActionCallback(arg1: false, null);
 		}
 	}
 }

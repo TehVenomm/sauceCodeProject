@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -13,8 +13,8 @@ public class ClassNameIdResolver extends TypeIdResolverBase {
         super(javaType, typeFactory);
     }
 
-    public Id getMechanism() {
-        return Id.CLASS;
+    public C0862Id getMechanism() {
+        return C0862Id.CLASS;
     }
 
     public void registerSubtype(Class<?> cls, String str) {
@@ -37,7 +37,8 @@ public class ClassNameIdResolver extends TypeIdResolverBase {
         return _typeFromId(str, databindContext.getTypeFactory());
     }
 
-    protected JavaType _typeFromId(String str, TypeFactory typeFactory) {
+    /* access modifiers changed from: protected */
+    public JavaType _typeFromId(String str, TypeFactory typeFactory) {
         if (str.indexOf(60) > 0) {
             return typeFactory.constructFromCanonical(str);
         }
@@ -45,12 +46,13 @@ public class ClassNameIdResolver extends TypeIdResolverBase {
             return typeFactory.constructSpecializedType(this._baseType, typeFactory.findClass(str));
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Invalid type id '" + str + "' (for id type 'Id.class'): no such class found");
-        } catch (Throwable e2) {
+        } catch (Exception e2) {
             throw new IllegalArgumentException("Invalid type id '" + str + "' (for id type 'Id.class'): " + e2.getMessage(), e2);
         }
     }
 
-    protected final String _idFrom(Object obj, Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public final String _idFrom(Object obj, Class<?> cls) {
         if (Enum.class.isAssignableFrom(cls) && !cls.isEnum()) {
             cls = cls.getSuperclass();
         }

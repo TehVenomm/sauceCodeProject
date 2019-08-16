@@ -12,8 +12,8 @@ public class ConfigPPON : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_PW, string.Empty, 4, (EventDelegate.Callback)OnInputChange);
-		SetInput((Enum)UI.IPT_PW_CONFIRM, string.Empty, 4, (EventDelegate.Callback)OnInputChange);
+		SetInput(UI.IPT_PW, string.Empty, 4, OnInputChange);
+		SetInput(UI.IPT_PW_CONFIRM, string.Empty, 4, OnInputChange);
 	}
 
 	private void OnInputChange()
@@ -33,7 +33,7 @@ public class ConfigPPON : GameSection
 					(int)ret
 				});
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 }

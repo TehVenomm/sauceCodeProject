@@ -3,7 +3,7 @@ package com.zopim.android.sdk.chatlog;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.Fragment;
+import android.support.p000v4.app.Fragment;
 import android.util.Log;
 import com.zopim.android.sdk.api.ZopimChat;
 import com.zopim.android.sdk.data.observers.ConnectionObserver;
@@ -11,8 +11,9 @@ import com.zopim.android.sdk.model.Connection;
 
 public class ConnectionFragment extends Fragment {
     private static final String LOG_TAG = ConnectionFragment.class.getSimpleName();
-    ConnectionObserver mConnectionObserver = new C0854u(this);
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    ConnectionObserver mConnectionObserver = new C1223u(this);
+    /* access modifiers changed from: private */
+    public Handler mHandler = new Handler(Looper.getMainLooper());
     private ConnectionListener mListener;
 
     public interface ConnectionListener {
@@ -21,12 +22,13 @@ public class ConnectionFragment extends Fragment {
         void onDisconnected();
     }
 
-    private void updateConnection(Connection connection) {
+    /* access modifiers changed from: private */
+    public void updateConnection(Connection connection) {
         if (connection == null) {
             Log.w(LOG_TAG, "Connection must not be null. Can not update visibility.");
             return;
         }
-        switch (C0857w.f838a[connection.getStatus().ordinal()]) {
+        switch (C1226w.f882a[connection.getStatus().ordinal()]) {
             case 1:
             case 2:
             case 3:

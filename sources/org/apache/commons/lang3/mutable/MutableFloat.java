@@ -4,6 +4,9 @@ public class MutableFloat extends Number implements Comparable<MutableFloat>, Mu
     private static final long serialVersionUID = 5787169186L;
     private float value;
 
+    public MutableFloat() {
+    }
+
     public MutableFloat(float f) {
         this.value = f;
     }

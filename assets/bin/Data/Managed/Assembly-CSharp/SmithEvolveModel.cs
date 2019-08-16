@@ -11,5 +11,12 @@ public class SmithEvolveModel : BaseModel
 		public List<string> meids;
 	}
 
+	public class Param
+	{
+		public int evolveCount;
+	}
+
 	public static string URL = "ajax/smith/evolve";
+
+	public Param result = new Param();
 }

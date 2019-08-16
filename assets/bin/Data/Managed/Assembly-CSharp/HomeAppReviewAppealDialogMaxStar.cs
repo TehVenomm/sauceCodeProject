@@ -37,6 +37,6 @@ public class HomeAppReviewAppealDialogMaxStar : HomeAppReviewAppealDialogBase
 	protected override void OnQuery_NO()
 	{
 		int replyAction = 4;
-		SendInfo(replyAction, null);
+		SendInfo(replyAction);
 	}
 }

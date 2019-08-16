@@ -9,7 +9,7 @@ public class MissionCheckBadStatus : MissionCheckBase
 
 	public override void OnDamage(AttackedHitStatusFix status, Character to_obj)
 	{
-		if (!(to_obj as Self == null) && (status.badStatusTotal.paralyze > 0f || status.badStatusTotal.poison > 0f || status.badStatusTotal.burning > 0f || status.badStatusTotal.speedDown > 0f || status.badStatusTotal.attackSpeedDown > 0f))
+		if (!(to_obj as Self == null) && (status.badStatusTotal.paralyze > 0f || status.badStatusTotal.poison > 0f || status.badStatusTotal.burning > 0f || status.badStatusTotal.speedDown > 0f || status.badStatusTotal.attackSpeedDown > 0f || (double)status.badStatusTotal.freeze > 0.0 || status.badStatusTotal.lightRing > 0f || status.badStatusTotal.stone > 0f))
 		{
 			badStatusCount++;
 		}

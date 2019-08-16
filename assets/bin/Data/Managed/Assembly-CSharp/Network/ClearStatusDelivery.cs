@@ -12,7 +12,7 @@ namespace Network
 
 		public List<int> needCount = new List<int>();
 
-		public int GetNeedCount(uint idx = 0)
+		public int GetNeedCount(uint idx = 0u)
 		{
 			if (idx >= needCount.Count)
 			{

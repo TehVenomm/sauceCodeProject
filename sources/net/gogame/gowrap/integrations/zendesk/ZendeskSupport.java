@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import net.gogame.gowrap.Constants;
@@ -12,7 +13,7 @@ import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
 import net.gogame.gowrap.integrations.Config;
 import net.gogame.gowrap.integrations.IntegrationSupport.IntegrationContext;
 import net.gogame.gowrap.integrations.core.CoreSupport;
-import net.gogame.gowrap.io.utils.FileUtils;
+import net.gogame.gowrap.p021io.utils.FileUtils;
 import net.gogame.gowrap.support.DownloadUtils;
 import net.gogame.gowrap.support.DownloadUtils.FileTarget;
 
@@ -27,7 +28,8 @@ public class ZendeskSupport extends AbstractIntegrationSupport {
         return true;
     }
 
-    protected void doInit(Activity activity, Config config, IntegrationContext integrationContext) {
+    /* access modifiers changed from: protected */
+    public void doInit(Activity activity, Config config, IntegrationContext integrationContext) {
         if (CoreSupport.INSTANCE.getAppId() == null) {
             Log.w(Constants.TAG, "App ID not set");
         }
@@ -41,7 +43,7 @@ public class ZendeskSupport extends AbstractIntegrationSupport {
                 Log.d(Constants.TAG, "Initialized faq.json.gz");
             } catch (FileNotFoundException e) {
                 Log.w(Constants.TAG, "Could not copy pre-packaged FAQ file (not found): net/gogame/gowrap/faq.json");
-            } catch (Throwable e2) {
+            } catch (IOException e2) {
                 Log.e(Constants.TAG, "Could not copy pre-packaged FAQ file", e2);
             }
         } else {

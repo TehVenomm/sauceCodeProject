@@ -22,16 +22,16 @@ public class MenuTop : GameSection
 
 	public override void UpdateUI()
 	{
-		SetBadge((Enum)UI.INFO, GameSaveData.instance.IsShowNewsNotification() ? 1 : 0, 3, -4, -4, false);
-		SetBadge((Enum)UI.PRESENT_BTN, MonoBehaviourSingleton<PresentManager>.I.presentNum, 3, -4, -4, false);
-		SetBadge((Enum)UI.FRIEND, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, 3, -4, -4, false);
+		SetBadge((Enum)UI.INFO, GameSaveData.instance.IsShowNewsNotification() ? 1 : 0, 3, -4, -4, is_scale_normalize: false);
+		SetBadge((Enum)UI.PRESENT_BTN, MonoBehaviourSingleton<PresentManager>.I.presentNum, 3, -4, -4, is_scale_normalize: false);
+		SetBadge((Enum)UI.FRIEND, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, 3, -4, -4, is_scale_normalize: false);
 	}
 
 	public void OnQuery_FRIEND()
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "FriendScene")
 		{
-			GameSection.ChangeEvent("[BACK]", null);
+			GameSection.ChangeEvent("[BACK]");
 		}
 	}
 
@@ -39,7 +39,7 @@ public class MenuTop : GameSection
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "ProfileScene")
 		{
-			GameSection.ChangeEvent("[BACK]", null);
+			GameSection.ChangeEvent("[BACK]");
 		}
 	}
 
@@ -48,7 +48,7 @@ public class MenuTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<PresentManager>.I.SendGetPresent(0, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -57,7 +57,7 @@ public class MenuTop : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendGetFollowLink(delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 

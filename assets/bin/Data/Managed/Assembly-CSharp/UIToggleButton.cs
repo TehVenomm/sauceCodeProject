@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public class UIToggleButton
+public class UIToggleButton : MonoBehaviour
 {
 	public UIButton activeButton;
 
@@ -17,8 +18,6 @@ public class UIToggleButton
 
 	public void Initialize()
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 		if (!(activeButton == null) && !(inactiveButton == null))
 		{
 			EventDelegate item = new EventDelegate(OnChange);
@@ -33,8 +32,6 @@ public class UIToggleButton
 
 	public void Change()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		isActive = !isActive;
 		if (activeButton != null)
 		{
@@ -53,6 +50,6 @@ public class UIToggleButton
 		{
 			onChanged(isActive);
 		}
-		SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
 	}
 }

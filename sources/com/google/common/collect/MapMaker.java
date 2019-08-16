@@ -19,26 +19,8 @@ import java.util.concurrent.TimeUnit;
 import net.gogame.gowrap.integrations.AbstractIntegrationSupport;
 
 public final class MapMaker {
-    private static final ValueReference<Object, Object> COMPUTING = new C06391();
-    private final Builder builder = new Builder();
-    private long expirationNanos = 0;
-    private Strength keyStrength = Strength.STRONG;
-    private boolean useCustomMap;
-    private Strength valueStrength = Strength.STRONG;
-
-    private interface ValueReference<K, V> {
-        ValueReference<K, V> copyFor(ReferenceEntry<K, V> referenceEntry);
-
-        V get();
-
-        V waitForValue() throws InterruptedException;
-    }
-
-    /* renamed from: com.google.common.collect.MapMaker$1 */
-    class C06391 implements ValueReference<Object, Object> {
-        C06391() {
-        }
-
+    /* access modifiers changed from: private */
+    public static final ValueReference<Object, Object> COMPUTING = new ValueReference<Object, Object>() {
         public ValueReference<Object, Object> copyFor(ReferenceEntry<Object, Object> referenceEntry) {
             throw new AssertionError();
         }
@@ -50,14 +32,24 @@ public final class MapMaker {
         public Object waitForValue() {
             throw new AssertionError();
         }
-    }
+    };
+    /* access modifiers changed from: private */
+    public final Builder builder = new Builder();
+    /* access modifiers changed from: private */
+    public long expirationNanos = 0;
+    /* access modifiers changed from: private */
+    public Strength keyStrength = Strength.STRONG;
+    private boolean useCustomMap;
+    /* access modifiers changed from: private */
+    public Strength valueStrength = Strength.STRONG;
 
     private static class ComputationExceptionReference<K, V> implements ValueReference<K, V> {
+
         /* renamed from: t */
-        final Throwable f371t;
+        final Throwable f437t;
 
         ComputationExceptionReference(Throwable th) {
-            this.f371t = th;
+            this.f437t = th;
         }
 
         public ValueReference<K, V> copyFor(ReferenceEntry<K, V> referenceEntry) {
@@ -69,61 +61,7 @@ public final class MapMaker {
         }
 
         public V waitForValue() {
-            throw new AsynchronousComputationException(this.f371t);
-        }
-    }
-
-    private interface ReferenceEntry<K, V> {
-        int getHash();
-
-        K getKey();
-
-        ReferenceEntry<K, V> getNext();
-
-        ValueReference<K, V> getValueReference();
-
-        void setValueReference(ValueReference<K, V> valueReference);
-
-        void valueReclaimed();
-    }
-
-    private static class SoftEntry<K, V> extends FinalizableSoftReference<K> implements ReferenceEntry<K, V> {
-        final int hash;
-        final Internals<K, V, ReferenceEntry<K, V>> internals;
-        volatile ValueReference<K, V> valueReference = MapMaker.computing();
-
-        SoftEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i) {
-            super(k, QueueHolder.queue);
-            this.internals = internals;
-            this.hash = i;
-        }
-
-        public void finalizeReferent() {
-            this.internals.removeEntry(this);
-        }
-
-        public int getHash() {
-            return this.hash;
-        }
-
-        public K getKey() {
-            return get();
-        }
-
-        public ReferenceEntry<K, V> getNext() {
-            return null;
-        }
-
-        public ValueReference<K, V> getValueReference() {
-            return this.valueReference;
-        }
-
-        public void setValueReference(ValueReference<K, V> valueReference) {
-            this.valueReference = valueReference;
-        }
-
-        public void valueReclaimed() {
-            this.internals.removeEntry(this, null);
+            throw new AsynchronousComputationException(this.f437t);
         }
     }
 
@@ -140,43 +78,6 @@ public final class MapMaker {
         }
     }
 
-    private static class StrongEntry<K, V> implements ReferenceEntry<K, V> {
-        final int hash;
-        final Internals<K, V, ReferenceEntry<K, V>> internals;
-        final K key;
-        volatile ValueReference<K, V> valueReference = MapMaker.computing();
-
-        StrongEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i) {
-            this.internals = internals;
-            this.key = k;
-            this.hash = i;
-        }
-
-        public int getHash() {
-            return this.hash;
-        }
-
-        public K getKey() {
-            return this.key;
-        }
-
-        public ReferenceEntry<K, V> getNext() {
-            return null;
-        }
-
-        public ValueReference<K, V> getValueReference() {
-            return this.valueReference;
-        }
-
-        public void setValueReference(ValueReference<K, V> valueReference) {
-            this.valueReference = valueReference;
-        }
-
-        public void valueReclaimed() {
-            this.internals.removeEntry(this, null);
-        }
-    }
-
     private static class LinkedStrongEntry<K, V> extends StrongEntry<K, V> {
         final ReferenceEntry<K, V> next;
 
@@ -187,46 +88,6 @@ public final class MapMaker {
 
         public ReferenceEntry<K, V> getNext() {
             return this.next;
-        }
-    }
-
-    private static class WeakEntry<K, V> extends FinalizableWeakReference<K> implements ReferenceEntry<K, V> {
-        final int hash;
-        final Internals<K, V, ReferenceEntry<K, V>> internals;
-        volatile ValueReference<K, V> valueReference = MapMaker.computing();
-
-        WeakEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i) {
-            super(k, QueueHolder.queue);
-            this.internals = internals;
-            this.hash = i;
-        }
-
-        public void finalizeReferent() {
-            this.internals.removeEntry(this);
-        }
-
-        public int getHash() {
-            return this.hash;
-        }
-
-        public K getKey() {
-            return get();
-        }
-
-        public ReferenceEntry<K, V> getNext() {
-            return null;
-        }
-
-        public ValueReference<K, V> getValueReference() {
-            return this.valueReference;
-        }
-
-        public void setValueReference(ValueReference<K, V> valueReference) {
-            this.valueReference = valueReference;
-        }
-
-        public void valueReclaimed() {
-            this.internals.removeEntry(this, null);
         }
     }
 
@@ -267,6 +128,60 @@ public final class MapMaker {
         static final FinalizableReferenceQueue queue = new FinalizableReferenceQueue();
 
         private QueueHolder() {
+        }
+    }
+
+    private interface ReferenceEntry<K, V> {
+        int getHash();
+
+        K getKey();
+
+        ReferenceEntry<K, V> getNext();
+
+        ValueReference<K, V> getValueReference();
+
+        void setValueReference(ValueReference<K, V> valueReference);
+
+        void valueReclaimed();
+    }
+
+    private static class SoftEntry<K, V> extends FinalizableSoftReference<K> implements ReferenceEntry<K, V> {
+        final int hash;
+        final Internals<K, V, ReferenceEntry<K, V>> internals;
+        volatile ValueReference<K, V> valueReference = MapMaker.computing();
+
+        SoftEntry(Internals<K, V, ReferenceEntry<K, V>> internals2, K k, int i) {
+            super(k, QueueHolder.queue);
+            this.internals = internals2;
+            this.hash = i;
+        }
+
+        public void finalizeReferent() {
+            this.internals.removeEntry(this);
+        }
+
+        public int getHash() {
+            return this.hash;
+        }
+
+        public K getKey() {
+            return get();
+        }
+
+        public ReferenceEntry<K, V> getNext() {
+            return null;
+        }
+
+        public ValueReference<K, V> getValueReference() {
+            return this.valueReference;
+        }
+
+        public void setValueReference(ValueReference<K, V> valueReference2) {
+            this.valueReference = valueReference2;
+        }
+
+        public void valueReclaimed() {
+            this.internals.removeEntry(this, null);
         }
     }
 
@@ -338,10 +253,12 @@ public final class MapMaker {
                     return this.original.getValueReference().get();
                 } catch (Throwable th) {
                     removeEntry();
+                    throw th;
                 }
             }
 
-            void removeEntry() {
+            /* access modifiers changed from: 0000 */
+            public void removeEntry() {
                 StrategyImpl.this.internals.removeEntry(this.newEntry);
             }
 
@@ -350,6 +267,7 @@ public final class MapMaker {
                     return StrategyImpl.this.waitForValue(this.original);
                 } catch (Throwable th) {
                     removeEntry();
+                    throw th;
                 }
             }
         }
@@ -390,33 +308,33 @@ public final class MapMaker {
 
         public V compute(K k, ReferenceEntry<K, V> referenceEntry, Function<? super K, ? extends V> function) {
             try {
-                Object apply = function.apply(k);
+                V apply = function.apply(k);
                 if (apply == null) {
                     String str = function + " returned null for key " + k + AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER;
                     setValueReference(referenceEntry, new NullOutputExceptionReference(str));
                     throw new NullOutputException(str);
                 }
-                setValue((ReferenceEntry) referenceEntry, apply);
+                setValue(referenceEntry, apply);
                 return apply;
             } catch (ComputationException e) {
                 setValueReference(referenceEntry, new ComputationExceptionReference(e.getCause()));
                 throw e;
             } catch (Throwable th) {
                 setValueReference(referenceEntry, new ComputationExceptionReference(th));
-                ComputationException computationException = new ComputationException(th);
+                throw new ComputationException(th);
             }
         }
 
         public ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2) {
             ValueReference valueReference = referenceEntry.getValueReference();
             if (valueReference == MapMaker.COMPUTING) {
-                ReferenceEntry<K, V> newEntry = newEntry((Object) k, referenceEntry.getHash(), (ReferenceEntry) referenceEntry2);
+                ReferenceEntry<K, V> newEntry = newEntry(k, referenceEntry.getHash(), referenceEntry2);
                 newEntry.setValueReference(new FutureValueReference(referenceEntry, newEntry));
                 return newEntry;
             }
-            newEntry = newEntry((Object) k, referenceEntry.getHash(), (ReferenceEntry) referenceEntry2);
-            newEntry.setValueReference(valueReference.copyFor(newEntry));
-            return newEntry;
+            ReferenceEntry<K, V> newEntry2 = newEntry(k, referenceEntry.getHash(), referenceEntry2);
+            newEntry2.setValueReference(valueReference.copyFor(newEntry2));
+            return newEntry2;
         }
 
         public boolean equalKeys(K k, Object obj) {
@@ -451,7 +369,8 @@ public final class MapMaker {
             return this.keyStrength.newEntry(this.internals, k, i, referenceEntry);
         }
 
-        void scheduleRemoval(K k, V v) {
+        /* access modifiers changed from: 0000 */
+        public void scheduleRemoval(K k, V v) {
             final WeakReference weakReference = new WeakReference(k);
             final WeakReference weakReference2 = new WeakReference(v);
             ExpirationTimer.instance.schedule(new TimerTask() {
@@ -464,8 +383,8 @@ public final class MapMaker {
             }, TimeUnit.NANOSECONDS.toMillis(this.expirationNanos));
         }
 
-        public void setInternals(Internals<K, V, ReferenceEntry<K, V>> internals) {
-            this.internals = internals;
+        public void setInternals(Internals<K, V, ReferenceEntry<K, V>> internals2) {
+            this.internals = internals2;
         }
 
         public void setValue(ReferenceEntry<K, V> referenceEntry, V v) {
@@ -475,10 +394,11 @@ public final class MapMaker {
             }
         }
 
-        void setValueReference(ReferenceEntry<K, V> referenceEntry, ValueReference<K, V> valueReference) {
-            Object obj = referenceEntry.getValueReference() == MapMaker.COMPUTING ? 1 : null;
+        /* access modifiers changed from: 0000 */
+        public void setValueReference(ReferenceEntry<K, V> referenceEntry, ValueReference<K, V> valueReference) {
+            boolean z = referenceEntry.getValueReference() == MapMaker.COMPUTING;
             referenceEntry.setValueReference(valueReference);
-            if (obj != null) {
+            if (z) {
                 synchronized (referenceEntry) {
                     referenceEntry.notifyAll();
                 }
@@ -504,81 +424,138 @@ public final class MapMaker {
 
     private enum Strength {
         WEAK {
-            <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2) {
                 WeakEntry weakEntry = (WeakEntry) referenceEntry;
                 return referenceEntry2 == null ? new WeakEntry(weakEntry.internals, k, weakEntry.hash) : new LinkedWeakEntry(weakEntry.internals, k, weakEntry.hash, referenceEntry2);
             }
 
-            boolean equal(Object obj, Object obj2) {
+            /* access modifiers changed from: 0000 */
+            public boolean equal(Object obj, Object obj2) {
                 return obj == obj2;
             }
 
-            int hash(Object obj) {
+            /* access modifiers changed from: 0000 */
+            public int hash(Object obj) {
                 return System.identityHashCode(obj);
             }
 
-            <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry) {
                 return referenceEntry == null ? new WeakEntry(internals, k, i) : new LinkedWeakEntry(internals, k, i, referenceEntry);
             }
 
-            <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v) {
                 return new WeakValueReference(v, referenceEntry);
             }
         },
         SOFT {
-            <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2) {
                 SoftEntry softEntry = (SoftEntry) referenceEntry;
                 return referenceEntry2 == null ? new SoftEntry(softEntry.internals, k, softEntry.hash) : new LinkedSoftEntry(softEntry.internals, k, softEntry.hash, referenceEntry2);
             }
 
-            boolean equal(Object obj, Object obj2) {
+            /* access modifiers changed from: 0000 */
+            public boolean equal(Object obj, Object obj2) {
                 return obj == obj2;
             }
 
-            int hash(Object obj) {
+            /* access modifiers changed from: 0000 */
+            public int hash(Object obj) {
                 return System.identityHashCode(obj);
             }
 
-            <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry) {
                 return referenceEntry == null ? new SoftEntry(internals, k, i) : new LinkedSoftEntry(internals, k, i, referenceEntry);
             }
 
-            <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v) {
                 return new SoftValueReference(v, referenceEntry);
             }
         },
         STRONG {
-            <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2) {
                 StrongEntry strongEntry = (StrongEntry) referenceEntry;
                 return referenceEntry2 == null ? new StrongEntry(strongEntry.internals, k, strongEntry.hash) : new LinkedStrongEntry(strongEntry.internals, k, strongEntry.hash, referenceEntry2);
             }
 
-            boolean equal(Object obj, Object obj2) {
+            /* access modifiers changed from: 0000 */
+            public boolean equal(Object obj, Object obj2) {
                 return obj.equals(obj2);
             }
 
-            int hash(Object obj) {
+            /* access modifiers changed from: 0000 */
+            public int hash(Object obj) {
                 return obj.hashCode();
             }
 
-            <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry) {
                 return referenceEntry == null ? new StrongEntry(internals, k, i) : new LinkedStrongEntry(internals, k, i, referenceEntry);
             }
 
-            <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v) {
+            /* access modifiers changed from: 0000 */
+            public <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v) {
                 return new StrongValueReference(v);
             }
         };
 
-        abstract <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2);
+        /* access modifiers changed from: 0000 */
+        public abstract <K, V> ReferenceEntry<K, V> copyEntry(K k, ReferenceEntry<K, V> referenceEntry, ReferenceEntry<K, V> referenceEntry2);
 
-        abstract boolean equal(Object obj, Object obj2);
+        /* access modifiers changed from: 0000 */
+        public abstract boolean equal(Object obj, Object obj2);
 
-        abstract int hash(Object obj);
+        /* access modifiers changed from: 0000 */
+        public abstract int hash(Object obj);
 
-        abstract <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry);
+        /* access modifiers changed from: 0000 */
+        public abstract <K, V> ReferenceEntry<K, V> newEntry(Internals<K, V, ReferenceEntry<K, V>> internals, K k, int i, ReferenceEntry<K, V> referenceEntry);
 
-        abstract <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v);
+        /* access modifiers changed from: 0000 */
+        public abstract <K, V> ValueReference<K, V> referenceValue(ReferenceEntry<K, V> referenceEntry, V v);
+    }
+
+    private static class StrongEntry<K, V> implements ReferenceEntry<K, V> {
+        final int hash;
+        final Internals<K, V, ReferenceEntry<K, V>> internals;
+        final K key;
+        volatile ValueReference<K, V> valueReference = MapMaker.computing();
+
+        StrongEntry(Internals<K, V, ReferenceEntry<K, V>> internals2, K k, int i) {
+            this.internals = internals2;
+            this.key = k;
+            this.hash = i;
+        }
+
+        public int getHash() {
+            return this.hash;
+        }
+
+        public K getKey() {
+            return this.key;
+        }
+
+        public ReferenceEntry<K, V> getNext() {
+            return null;
+        }
+
+        public ValueReference<K, V> getValueReference() {
+            return this.valueReference;
+        }
+
+        public void setValueReference(ValueReference<K, V> valueReference2) {
+            this.valueReference = valueReference2;
+        }
+
+        public void valueReclaimed() {
+            this.internals.removeEntry(this, null);
+        }
     }
 
     private static class StrongValueReference<K, V> implements ValueReference<K, V> {
@@ -598,6 +575,54 @@ public final class MapMaker {
 
         public V waitForValue() {
             return get();
+        }
+    }
+
+    private interface ValueReference<K, V> {
+        ValueReference<K, V> copyFor(ReferenceEntry<K, V> referenceEntry);
+
+        V get();
+
+        V waitForValue() throws InterruptedException;
+    }
+
+    private static class WeakEntry<K, V> extends FinalizableWeakReference<K> implements ReferenceEntry<K, V> {
+        final int hash;
+        final Internals<K, V, ReferenceEntry<K, V>> internals;
+        volatile ValueReference<K, V> valueReference = MapMaker.computing();
+
+        WeakEntry(Internals<K, V, ReferenceEntry<K, V>> internals2, K k, int i) {
+            super(k, QueueHolder.queue);
+            this.internals = internals2;
+            this.hash = i;
+        }
+
+        public void finalizeReferent() {
+            this.internals.removeEntry(this);
+        }
+
+        public int getHash() {
+            return this.hash;
+        }
+
+        public K getKey() {
+            return get();
+        }
+
+        public ReferenceEntry<K, V> getNext() {
+            return null;
+        }
+
+        public ValueReference<K, V> getValueReference() {
+            return this.valueReference;
+        }
+
+        public void setValueReference(ValueReference<K, V> valueReference2) {
+            this.valueReference = valueReference2;
+        }
+
+        public void valueReclaimed() {
+            this.internals.removeEntry(this, null);
         }
     }
 
@@ -622,7 +647,8 @@ public final class MapMaker {
         }
     }
 
-    private static <K, V> ValueReference<K, V> computing() {
+    /* access modifiers changed from: private */
+    public static <K, V> ValueReference<K, V> computing() {
         return COMPUTING;
     }
 

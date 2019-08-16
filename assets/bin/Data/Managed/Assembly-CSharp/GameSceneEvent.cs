@@ -57,12 +57,10 @@ public class GameSceneEvent
 		if (stay != null)
 		{
 			Log.Error(LOG.GAMESCENE, "ERR :: GameSceneEvent Is Already Staying");
+			return;
 		}
-		else
-		{
-			stay = new GameSceneEvent(current);
-			ResetCurrent();
-		}
+		stay = new GameSceneEvent(current);
+		ResetCurrent();
 	}
 
 	public static bool IsStay()
@@ -70,7 +68,7 @@ public class GameSceneEvent
 		return stay != null;
 	}
 
-	public static void Resume(object userData = null)
+	public static void Resume(object userData = null, bool is_send_query = false)
 	{
 		if (stay != null && MonoBehaviourSingleton<GameSceneManager>.IsValid())
 		{
@@ -80,7 +78,7 @@ public class GameSceneEvent
 			{
 				current.userData = userData;
 			}
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSceneEvent.Resume", current.sender, current.eventName, current.userData, null, false);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSceneEvent.Resume", current.sender, current.eventName, current.userData, null, is_send_query);
 		}
 	}
 

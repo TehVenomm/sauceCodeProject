@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.core.p015io.SerializedString;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector.MixInResolver;
@@ -83,22 +84,22 @@ public abstract class MapperConfig<T extends MapperConfig<T>> implements MixInRe
     }
 
     public static <F extends Enum<F> & ConfigFeature> int collectFeatureDefaults(Class<F> cls) {
+        int i;
         Enum[] enumArr = (Enum[]) cls.getEnumConstants();
         int length = enumArr.length;
-        int i = 0;
         int i2 = 0;
-        while (i < length) {
-            int mask;
-            Enum enumR = enumArr[i];
+        int i3 = 0;
+        while (i2 < length) {
+            Enum enumR = enumArr[i2];
             if (((ConfigFeature) enumR).enabledByDefault()) {
-                mask = ((ConfigFeature) enumR).getMask() | i2;
+                i = ((ConfigFeature) enumR).getMask() | i3;
             } else {
-                mask = i2;
+                i = i3;
             }
-            i++;
-            i2 = mask;
+            i2++;
+            i3 = i;
         }
-        return i2;
+        return i3;
     }
 
     public final boolean isEnabled(MapperFeature mapperFeature) {
@@ -166,11 +167,11 @@ public abstract class MapperConfig<T extends MapperConfig<T>> implements MixInRe
     }
 
     public BeanDescription introspectClassAnnotations(Class<?> cls) {
-        return introspectClassAnnotations(constructType((Class) cls));
+        return introspectClassAnnotations(constructType(cls));
     }
 
     public BeanDescription introspectDirectClassAnnotations(Class<?> cls) {
-        return introspectDirectClassAnnotations(constructType((Class) cls));
+        return introspectDirectClassAnnotations(constructType(cls));
     }
 
     public final DateFormat getDateFormat() {

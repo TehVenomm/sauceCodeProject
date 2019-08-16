@@ -39,55 +39,79 @@ public class ConfigLanguage : GameSection
 
 	private void OnQuery_LANG_EN()
 	{
-		GameSaveData.instance.languageOption = 0;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 0)
+		{
+			GameSaveData.instance.languageOption = 0;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void OnQuery_LANG_FR()
 	{
-		GameSaveData.instance.languageOption = 1;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 1)
+		{
+			GameSaveData.instance.languageOption = 1;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void OnQuery_LANG_GE()
 	{
-		GameSaveData.instance.languageOption = 2;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 2)
+		{
+			GameSaveData.instance.languageOption = 2;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void OnQuery_LANG_IT()
 	{
-		GameSaveData.instance.languageOption = 3;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 3)
+		{
+			GameSaveData.instance.languageOption = 3;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void OnQuery_LANG_PO()
 	{
-		GameSaveData.instance.languageOption = 4;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 4)
+		{
+			GameSaveData.instance.languageOption = 4;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void OnQuery_LANG_TH()
 	{
-		GameSaveData.instance.languageOption = 5;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 5)
+		{
+			GameSaveData.instance.languageOption = 5;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void OnQuery_LANG_VN()
 	{
-		GameSaveData.instance.languageOption = 6;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 6)
+		{
+			GameSaveData.instance.languageOption = 6;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void OnQuery_LANG_ES()
 	{
-		GameSaveData.instance.languageOption = 7;
-		ClearCacheAndReturnToTitle();
+		if (GameSaveData.instance.languageOption != 7)
+		{
+			GameSaveData.instance.languageOption = 7;
+			ClearCacheAndReturnToTitle();
+		}
 	}
 
 	private void ClearCacheAndReturnToTitle()
 	{
 		UpdateUI();
-		MonoBehaviourSingleton<AppMain>.I.Reset(false, false);
+		MonoBehaviourSingleton<AppMain>.I.Reset(need_clear_cache: false, need_predownload: false);
 	}
 }

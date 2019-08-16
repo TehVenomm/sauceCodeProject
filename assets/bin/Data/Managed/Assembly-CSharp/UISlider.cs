@@ -24,8 +24,8 @@ public class UISlider : UIProgressBar
 	[SerializeField]
 	private Direction direction = Direction.Upgraded;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	protected bool mInverted;
 
 	public bool isColliderEnabled
@@ -90,11 +90,6 @@ public class UISlider : UIProgressBar
 
 	protected override void OnStart()
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Expected O, but got Unknown
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Expected O, but got Unknown
 		GameObject go = (!(mBG != null) || (!(mBG.GetComponent<Collider>() != null) && !(mBG.GetComponent<Collider2D>() != null))) ? this.get_gameObject() : mBG.get_gameObject();
 		UIEventListener uIEventListener = UIEventListener.Get(go);
 		UIEventListener uIEventListener2 = uIEventListener;

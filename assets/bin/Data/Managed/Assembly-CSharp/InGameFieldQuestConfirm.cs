@@ -88,96 +88,98 @@ public class InGameFieldQuestConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
 		Desc desc = GameSection.GetEventData() as Desc;
-		if (desc != null)
+		if (desc == null)
 		{
-			QuestTable.QuestTableData questData = desc.questData;
-			if (questData != null)
+			return;
+		}
+		QuestTable.QuestTableData questData = desc.questData;
+		if (questData == null)
+		{
+			return;
+		}
+		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
+		if (enemyData == null)
+		{
+			return;
+		}
+		int mainEnemyLv = questData.GetMainEnemyLv();
+		SetLabelText((Enum)UI.LBL_NAME, enemyData.name);
+		SetLabelText((Enum)UI.NUM_LV, mainEnemyLv.ToString());
+		SetElementSprite((Enum)UI.STR_ELEM, (int)enemyData.weakElement);
+		if (enemyData.weakElement != ELEMENT_TYPE.MAX)
+		{
+			SetActive((Enum)UI.STR_WEAK_NONE, is_visible: false);
+		}
+		int num = (int)(questData.limitTime / 60f);
+		int num2 = (int)(questData.limitTime % 60f);
+		SetLabelText((Enum)UI.NUM_TIMER, $"{num:D2}:{num2:D2}");
+		UI[] array = new UI[10]
+		{
+			UI.OBJ_DIFFICULT_STAR_1,
+			UI.OBJ_DIFFICULT_STAR_2,
+			UI.OBJ_DIFFICULT_STAR_3,
+			UI.OBJ_DIFFICULT_STAR_4,
+			UI.OBJ_DIFFICULT_STAR_5,
+			UI.OBJ_DIFFICULT_STAR_6,
+			UI.OBJ_DIFFICULT_STAR_7,
+			UI.OBJ_DIFFICULT_STAR_8,
+			UI.OBJ_DIFFICULT_STAR_9,
+			UI.OBJ_DIFFICULT_STAR_10
+		};
+		int num3 = (int)(questData.difficulty + 1);
+		int i = 0;
+		for (int num4 = array.Length; i < num4; i++)
+		{
+			SetActive((Enum)array[i], i < num3);
+		}
+		PlayTween((Enum)UI.TWN_DIFFICULT_STAR, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		QuestInfoData.Mission[] array2 = QuestInfoData.CreateMissionData(questData);
+		if (array2 != null)
+		{
+			GetCtrl(UI.MISSION).get_gameObject().SetActive(true);
+			UI[] array3 = new UI[3]
 			{
-				EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
-				if (enemyData != null)
-				{
-					int mainEnemyLv = questData.GetMainEnemyLv();
-					SetLabelText((Enum)UI.LBL_NAME, enemyData.name);
-					SetLabelText((Enum)UI.NUM_LV, mainEnemyLv.ToString());
-					SetElementSprite((Enum)UI.STR_ELEM, (int)enemyData.weakElement);
-					if (enemyData.weakElement != ELEMENT_TYPE.MAX)
-					{
-						SetActive((Enum)UI.STR_WEAK_NONE, false);
-					}
-					int num = (int)(questData.limitTime / 60f);
-					int num2 = (int)(questData.limitTime % 60f);
-					SetLabelText((Enum)UI.NUM_TIMER, $"{num:D2}:{num2:D2}");
-					UI[] array = new UI[10]
-					{
-						UI.OBJ_DIFFICULT_STAR_1,
-						UI.OBJ_DIFFICULT_STAR_2,
-						UI.OBJ_DIFFICULT_STAR_3,
-						UI.OBJ_DIFFICULT_STAR_4,
-						UI.OBJ_DIFFICULT_STAR_5,
-						UI.OBJ_DIFFICULT_STAR_6,
-						UI.OBJ_DIFFICULT_STAR_7,
-						UI.OBJ_DIFFICULT_STAR_8,
-						UI.OBJ_DIFFICULT_STAR_9,
-						UI.OBJ_DIFFICULT_STAR_10
-					};
-					int num3 = (int)(questData.difficulty + 1);
-					int i = 0;
-					for (int num4 = array.Length; i < num4; i++)
-					{
-						SetActive((Enum)array[i], i < num3);
-					}
-					PlayTween((Enum)UI.TWN_DIFFICULT_STAR, true, (EventDelegate.Callback)null, false, 0);
-					QuestInfoData.Mission[] array2 = QuestInfoData.CreateMissionData(questData);
-					if (array2 != null)
-					{
-						GetCtrl(UI.MISSION).get_gameObject().SetActive(true);
-						UI[] array3 = new UI[3]
-						{
-							UI.MISSION_LABEL_01,
-							UI.MISSION_LABEL_02,
-							UI.MISSION_LABEL_03
-						};
-						UI[] array4 = new UI[3]
-						{
-							UI.MISSION_CROWN_ON_01,
-							UI.MISSION_CROWN_ON_02,
-							UI.MISSION_CROWN_ON_03
-						};
-						UI[] array5 = new UI[3]
-						{
-							UI.MISSION_CROWN_OFF_01,
-							UI.MISSION_CROWN_OFF_02,
-							UI.MISSION_CROWN_OFF_03
-						};
-						int num5 = Mathf.Min(array2.Length, 3);
-						for (int j = 0; j < num5; j++)
-						{
-							QuestInfoData.Mission mission = array2[j];
-							SetActive((Enum)array4[j], CLEAR_STATUS.CLEAR == mission.state);
-							SetActive((Enum)array5[j], CLEAR_STATUS.CLEAR != mission.state);
-							SetLabelText((Enum)array3[j], mission.tableData.missionText);
-						}
-					}
-					if (desc.reward != null)
-					{
-						Array.Sort(desc.reward, (QuestInfoData.Quest.Reward l, QuestInfoData.Quest.Reward r) => l.priority - r.priority);
-					}
-					SetFontStyle((Enum)UI.LBL_NAME, 2);
-					SetFontStyle((Enum)UI.NUM_LV, 2);
-					SetFontStyle((Enum)UI.LBL_LV, 2);
-					countAnimStep = 0;
-					timeLimit = MonoBehaviourSingleton<InGameSettingsManager>.I.happenQuestDirection.confirmUITime;
-					prevTime = -1;
-					isAnswer = false;
-					Update();
-					UpdateAnchors();
-					PlayTween((Enum)UI.OBJ_FRAME, true, (EventDelegate.Callback)null, true, 0);
-					PlayTween((Enum)UI.COUNT_ANIM_0, true, (EventDelegate.Callback)null, false, 0);
-				}
+				UI.MISSION_LABEL_01,
+				UI.MISSION_LABEL_02,
+				UI.MISSION_LABEL_03
+			};
+			UI[] array4 = new UI[3]
+			{
+				UI.MISSION_CROWN_ON_01,
+				UI.MISSION_CROWN_ON_02,
+				UI.MISSION_CROWN_ON_03
+			};
+			UI[] array5 = new UI[3]
+			{
+				UI.MISSION_CROWN_OFF_01,
+				UI.MISSION_CROWN_OFF_02,
+				UI.MISSION_CROWN_OFF_03
+			};
+			int num5 = Mathf.Min(array2.Length, 3);
+			for (int j = 0; j < num5; j++)
+			{
+				QuestInfoData.Mission mission = array2[j];
+				SetActive((Enum)array4[j], CLEAR_STATUS.CLEAR == mission.state);
+				SetActive((Enum)array5[j], CLEAR_STATUS.CLEAR != mission.state);
+				SetLabelText((Enum)array3[j], mission.tableData.missionText);
 			}
 		}
+		if (desc.reward != null)
+		{
+			Array.Sort(desc.reward, (QuestInfoData.Quest.Reward l, QuestInfoData.Quest.Reward r) => l.priority - r.priority);
+		}
+		SetFontStyle((Enum)UI.LBL_NAME, 2);
+		SetFontStyle((Enum)UI.NUM_LV, 2);
+		SetFontStyle((Enum)UI.LBL_LV, 2);
+		countAnimStep = 0;
+		timeLimit = MonoBehaviourSingleton<InGameSettingsManager>.I.happenQuestDirection.confirmUITime;
+		prevTime = -1;
+		isAnswer = false;
+		Update();
+		UpdateAnchors();
+		PlayTween((Enum)UI.OBJ_FRAME, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
+		PlayTween((Enum)UI.COUNT_ANIM_0, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 	}
 
 	public override void Exit()
@@ -191,59 +193,60 @@ public class InGameFieldQuestConfirm : GameSection
 
 	private void Update()
 	{
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		if (!isAnswer)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		if (isAnswer)
 		{
-			timeLimit -= Time.get_deltaTime();
-			if (timeLimit <= 0f)
-			{
-				timeLimit = 0f;
-			}
-			int num = (int)timeLimit;
-			if (timeLimit > 0f && timeLimit - (float)num > 0f)
-			{
-				num++;
-			}
-			switch (countAnimStep)
-			{
-			case 0:
-				if (num < 10)
-				{
-					ResetTween((Enum)UI.COUNT_ANIM_0, 0);
-					PlayTween((Enum)UI.COUNT_ANIM_1, true, (EventDelegate.Callback)null, false, 0);
-					countAnimStep++;
-				}
-				break;
-			case 1:
-				if (num < 6)
-				{
-					ResetTween((Enum)UI.COUNT_ANIM_1, 0);
-					PlayTween((Enum)UI.COUNT_ANIM_2, true, (EventDelegate.Callback)null, false, 0);
-					SetColor((Enum)UI.LBL_TIME, Color.get_red());
-					countAnimStep++;
-				}
-				break;
-			case 2:
-				if (prevTime != num)
-				{
-					ResetTween((Enum)UI.COUNT_ANIM_2, 0);
-					PlayTween((Enum)UI.COUNT_ANIM_2, true, (EventDelegate.Callback)null, false, 0);
-				}
-				break;
-			}
-			if (prevTime != num)
-			{
-				SetLabelText((Enum)UI.LBL_TIME, num.ToString());
-				prevTime = num;
-			}
-			if (!(timeLimit > 0f) && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<InGameProgress>.I.endHappenQuestDirection)
+			return;
+		}
+		timeLimit -= Time.get_deltaTime();
+		if (timeLimit <= 0f)
+		{
+			timeLimit = 0f;
+		}
+		int num = (int)timeLimit;
+		if (timeLimit > 0f && timeLimit - (float)num > 0f)
+		{
+			num++;
+		}
+		switch (countAnimStep)
+		{
+		case 0:
+			if (num < 10)
 			{
 				ResetTween((Enum)UI.COUNT_ANIM_0, 0);
-				ResetTween((Enum)UI.COUNT_ANIM_1, 0);
-				ResetTween((Enum)UI.COUNT_ANIM_2, 0);
-				OnQuery_YES();
-				MonoBehaviourSingleton<GameSceneManager>.I.ChangeSectionBack();
+				PlayTween((Enum)UI.COUNT_ANIM_1, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+				countAnimStep++;
 			}
+			break;
+		case 1:
+			if (num < 6)
+			{
+				ResetTween((Enum)UI.COUNT_ANIM_1, 0);
+				PlayTween((Enum)UI.COUNT_ANIM_2, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+				SetColor((Enum)UI.LBL_TIME, Color.get_red());
+				countAnimStep++;
+			}
+			break;
+		case 2:
+			if (prevTime != num)
+			{
+				ResetTween((Enum)UI.COUNT_ANIM_2, 0);
+				PlayTween((Enum)UI.COUNT_ANIM_2, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+			}
+			break;
+		}
+		if (prevTime != num)
+		{
+			SetLabelText((Enum)UI.LBL_TIME, num.ToString());
+			prevTime = num;
+		}
+		if (!(timeLimit > 0f) && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<InGameProgress>.I.endHappenQuestDirection)
+		{
+			ResetTween((Enum)UI.COUNT_ANIM_0, 0);
+			ResetTween((Enum)UI.COUNT_ANIM_1, 0);
+			ResetTween((Enum)UI.COUNT_ANIM_2, 0);
+			OnQuery_YES();
+			MonoBehaviourSingleton<GameSceneManager>.I.ChangeSectionBack();
 		}
 	}
 
@@ -308,7 +311,7 @@ public class InGameFieldQuestConfirm : GameSection
 	{
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
-			MonoBehaviourSingleton<InGameProgress>.I.OnFieldQuestConfirm(true);
+			MonoBehaviourSingleton<InGameProgress>.I.OnFieldQuestConfirm(is_yes: true);
 		}
 		isAnswer = true;
 	}
@@ -317,7 +320,7 @@ public class InGameFieldQuestConfirm : GameSection
 	{
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
-			MonoBehaviourSingleton<InGameProgress>.I.OnFieldQuestConfirm(false);
+			MonoBehaviourSingleton<InGameProgress>.I.OnFieldQuestConfirm(is_yes: false);
 		}
 		isAnswer = true;
 	}

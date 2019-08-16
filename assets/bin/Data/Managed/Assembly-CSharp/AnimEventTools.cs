@@ -1,4 +1,6 @@
-public class AnimEventTools
+using UnityEngine;
+
+public class AnimEventTools : MonoBehaviour
 {
 	public enum TOOL_MODE
 	{

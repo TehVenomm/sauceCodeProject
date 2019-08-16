@@ -14,7 +14,6 @@ public class MutualFollowFBConnectDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(LoadTopBanner());
 		base.Initialize();
 	}
@@ -22,14 +21,14 @@ public class MutualFollowFBConnectDialog : GameSection
 	private IEnumerator LoadTopBanner()
 	{
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001", false);
+		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001");
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
 		if (lo_image.loadedObject == null)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		Texture bannerImg = lo_image.loadedObject as Texture;
 		Transform banner = GetCtrl(UI.SPR_MUTUAL_FOLLOW_BANNER);
@@ -54,7 +53,7 @@ public class MutualFollowFBConnectDialog : GameSection
 				}
 				else
 				{
-					GameSection.ResumeEvent(success, null);
+					GameSection.ResumeEvent(success);
 				}
 			});
 		}
@@ -66,7 +65,7 @@ public class MutualFollowFBConnectDialog : GameSection
 		{
 			if (success)
 			{
-				GameSection.ResumeEvent(success, null);
+				GameSection.ResumeEvent(success);
 			}
 			else
 			{
@@ -75,7 +74,7 @@ public class MutualFollowFBConnectDialog : GameSection
 					GameSection.ChangeStayEvent("ACCOUNT_CONFLICT", ret.existInfo);
 					success = true;
 				}
-				GameSection.ResumeEvent(success, null);
+				GameSection.ResumeEvent(success);
 			}
 		});
 	}

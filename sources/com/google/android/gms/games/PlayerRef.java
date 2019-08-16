@@ -3,16 +3,16 @@ package com.google.android.gms.games;
 import android.database.CharArrayBuffer;
 import android.net.Uri;
 import android.os.Parcel;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.games.internal.player.zza;
+import com.google.android.gms.games.internal.player.zzc;
 import com.google.android.gms.games.internal.player.zzd;
-import com.google.android.gms.games.internal.player.zze;
 
-public final class PlayerRef extends zzc implements Player {
-    private final PlayerLevelInfo zzhcr;
-    private final zze zzhdi;
-    private final zzd zzhdj;
+public final class PlayerRef extends DataBufferRef implements Player {
+    private final PlayerLevelInfo zzcf;
+    private final zzd zzcy;
+    private final zzc zzcz;
 
     public PlayerRef(DataHolder dataHolder, int i) {
         this(dataHolder, i, null);
@@ -20,17 +20,16 @@ public final class PlayerRef extends zzc implements Player {
 
     public PlayerRef(DataHolder dataHolder, int i, String str) {
         super(dataHolder, i);
-        this.zzhdi = new zze(str);
-        this.zzhdj = new zzd(dataHolder, i, this.zzhdi);
-        Object obj = (zzfv(this.zzhdi.zzhjs) || getLong(this.zzhdi.zzhjs) == -1) ? null : 1;
-        if (obj != null) {
-            int integer = getInteger(this.zzhdi.zzhjt);
-            int integer2 = getInteger(this.zzhdi.zzhjw);
-            PlayerLevel playerLevel = new PlayerLevel(integer, getLong(this.zzhdi.zzhju), getLong(this.zzhdi.zzhjv));
-            this.zzhcr = new PlayerLevelInfo(getLong(this.zzhdi.zzhjs), getLong(this.zzhdi.zzhjy), playerLevel, integer != integer2 ? new PlayerLevel(integer2, getLong(this.zzhdi.zzhjv), getLong(this.zzhdi.zzhjx)) : playerLevel);
+        this.zzcy = new zzd(str);
+        this.zzcz = new zzc(dataHolder, i, this.zzcy);
+        if (!hasNull(this.zzcy.zzml) && getLong(this.zzcy.zzml) != -1) {
+            int integer = getInteger(this.zzcy.zzmm);
+            int integer2 = getInteger(this.zzcy.zzmp);
+            PlayerLevel playerLevel = new PlayerLevel(integer, getLong(this.zzcy.zzmn), getLong(this.zzcy.zzmo));
+            this.zzcf = new PlayerLevelInfo(getLong(this.zzcy.zzml), getLong(this.zzcy.zzmr), playerLevel, integer != integer2 ? new PlayerLevel(integer2, getLong(this.zzcy.zzmo), getLong(this.zzcy.zzmq)) : playerLevel);
             return;
         }
-        this.zzhcr = null;
+        this.zzcf = null;
     }
 
     public final int describeContents() {
@@ -46,71 +45,74 @@ public final class PlayerRef extends zzc implements Player {
     }
 
     public final Uri getBannerImageLandscapeUri() {
-        return zzfu(this.zzhdi.zzhkj);
+        return parseUri(this.zzcy.zznb);
     }
 
     public final String getBannerImageLandscapeUrl() {
-        return getString(this.zzhdi.zzhkk);
+        return getString(this.zzcy.zznc);
     }
 
     public final Uri getBannerImagePortraitUri() {
-        return zzfu(this.zzhdi.zzhkl);
+        return parseUri(this.zzcy.zznd);
     }
 
     public final String getBannerImagePortraitUrl() {
-        return getString(this.zzhdi.zzhkm);
+        return getString(this.zzcy.zzne);
     }
 
     public final String getDisplayName() {
-        return getString(this.zzhdi.zzhjk);
+        return getString(this.zzcy.zzmd);
     }
 
     public final void getDisplayName(CharArrayBuffer charArrayBuffer) {
-        zza(this.zzhdi.zzhjk, charArrayBuffer);
+        copyToBuffer(this.zzcy.zzmd, charArrayBuffer);
     }
 
     public final Uri getHiResImageUri() {
-        return zzfu(this.zzhdi.zzhjn);
+        return parseUri(this.zzcy.zzmg);
     }
 
     public final String getHiResImageUrl() {
-        return getString(this.zzhdi.zzhjo);
+        return getString(this.zzcy.zzmh);
     }
 
     public final Uri getIconImageUri() {
-        return zzfu(this.zzhdi.zzhjl);
+        return parseUri(this.zzcy.zzme);
     }
 
     public final String getIconImageUrl() {
-        return getString(this.zzhdi.zzhjm);
+        return getString(this.zzcy.zzmf);
     }
 
     public final long getLastPlayedWithTimestamp() {
-        return (!zzft(this.zzhdi.zzhjr) || zzfv(this.zzhdi.zzhjr)) ? -1 : getLong(this.zzhdi.zzhjr);
+        if (!hasColumn(this.zzcy.zzmk) || hasNull(this.zzcy.zzmk)) {
+            return -1;
+        }
+        return getLong(this.zzcy.zzmk);
     }
 
     public final PlayerLevelInfo getLevelInfo() {
-        return this.zzhcr;
+        return this.zzcf;
     }
 
     public final String getName() {
-        return getString(this.zzhdi.name);
+        return getString(this.zzcy.name);
     }
 
     public final String getPlayerId() {
-        return getString(this.zzhdi.zzhjj);
+        return getString(this.zzcy.zzmc);
     }
 
     public final long getRetrievedTimestamp() {
-        return getLong(this.zzhdi.zzhjp);
+        return getLong(this.zzcy.zzmi);
     }
 
     public final String getTitle() {
-        return getString(this.zzhdi.title);
+        return getString(this.zzcy.zzcd);
     }
 
     public final void getTitle(CharArrayBuffer charArrayBuffer) {
-        zza(this.zzhdi.title, charArrayBuffer);
+        copyToBuffer(this.zzcy.zzcd, charArrayBuffer);
     }
 
     public final boolean hasHiResImage() {
@@ -122,11 +124,11 @@ public final class PlayerRef extends zzc implements Player {
     }
 
     public final int hashCode() {
-        return PlayerEntity.zza(this);
+        return PlayerEntity.zza((Player) this);
     }
 
     public final boolean isMuted() {
-        return getBoolean(this.zzhdi.zzhkp);
+        return getBoolean(this.zzcy.zznh);
     }
 
     public final String toString() {
@@ -137,31 +139,38 @@ public final class PlayerRef extends zzc implements Player {
         ((PlayerEntity) ((Player) freeze())).writeToParcel(parcel, i);
     }
 
-    public final String zzapm() {
-        return getString(this.zzhdi.zzhki);
+    public final String zzh() {
+        return getString(this.zzcy.zzci);
     }
 
-    public final boolean zzapn() {
-        return getBoolean(this.zzhdi.zzhkh);
+    public final boolean zzi() {
+        return getBoolean(this.zzcy.zzna);
     }
 
-    public final int zzapo() {
-        return getInteger(this.zzhdi.zzhjq);
+    public final int zzj() {
+        return getInteger(this.zzcy.zzmj);
     }
 
-    public final boolean zzapp() {
-        return getBoolean(this.zzhdi.zzhka);
+    public final boolean zzk() {
+        return getBoolean(this.zzcy.zzmt);
     }
 
-    public final zza zzapq() {
-        return zzfv(this.zzhdi.zzhkb) ? null : this.zzhdj;
+    public final zza zzl() {
+        if (hasNull(this.zzcy.zzmu)) {
+            return null;
+        }
+        return this.zzcz;
     }
 
-    public final int zzapr() {
-        return getInteger(this.zzhdi.zzhkn);
+    public final int zzm() {
+        return getInteger(this.zzcy.zznf);
     }
 
-    public final long zzaps() {
-        return getLong(this.zzhdi.zzhko);
+    public final long zzn() {
+        return getLong(this.zzcy.zzng);
+    }
+
+    public final long zzo() {
+        return getLong(this.zzcy.zzni);
     }
 }

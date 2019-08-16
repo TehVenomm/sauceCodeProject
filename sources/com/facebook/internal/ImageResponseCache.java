@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
 
 class ImageResponseCache {
     static final String TAG = ImageResponseCache.class.getSimpleName();
-    private static volatile FileLruCache imageCache;
+    private static FileLruCache imageCache;
 
     private static class BufferedHttpInputStream extends BufferedInputStream {
         HttpURLConnection connection;
@@ -39,46 +39,44 @@ class ImageResponseCache {
     }
 
     static FileLruCache getCache(Context context) throws IOException {
+        FileLruCache fileLruCache;
         synchronized (ImageResponseCache.class) {
-            Class cls;
             try {
                 if (imageCache == null) {
-                    cls = TAG;
-                    imageCache = new FileLruCache(cls, new Limits());
+                    imageCache = new FileLruCache(TAG, new Limits());
                 }
-                FileLruCache fileLruCache = imageCache;
-                return fileLruCache;
+                fileLruCache = imageCache;
             } finally {
-                cls = ImageResponseCache.class;
+                Class<ImageResponseCache> cls = ImageResponseCache.class;
             }
         }
+        return fileLruCache;
     }
 
     static InputStream getCachedImageStream(Uri uri, Context context) {
         InputStream inputStream = null;
-        if (uri != null && isCDNURL(uri)) {
-            try {
-                inputStream = getCache(context).get(uri.toString());
-            } catch (IOException e) {
-                Logger.log(LoggingBehavior.CACHE, 5, TAG, e.toString());
-            }
+        if (uri == null || !isCDNURL(uri)) {
+            return inputStream;
         }
-        return inputStream;
+        try {
+            return getCache(context).get(uri.toString());
+        } catch (IOException e) {
+            Logger.log(LoggingBehavior.CACHE, 5, TAG, e.toString());
+            return inputStream;
+        }
     }
 
     static InputStream interceptAndCacheImageStream(Context context, HttpURLConnection httpURLConnection) throws IOException {
-        InputStream inputStream = null;
-        if (httpURLConnection.getResponseCode() == 200) {
-            Uri parse = Uri.parse(httpURLConnection.getURL().toString());
-            inputStream = httpURLConnection.getInputStream();
-            try {
-                if (isCDNURL(parse)) {
-                    inputStream = getCache(context).interceptAndPut(parse.toString(), new BufferedHttpInputStream(inputStream, httpURLConnection));
-                }
-            } catch (IOException e) {
-            }
+        if (httpURLConnection.getResponseCode() != 200) {
+            return null;
         }
-        return inputStream;
+        Uri parse = Uri.parse(httpURLConnection.getURL().toString());
+        InputStream inputStream = httpURLConnection.getInputStream();
+        try {
+            return isCDNURL(parse) ? getCache(context).interceptAndPut(parse.toString(), new BufferedHttpInputStream(inputStream, httpURLConnection)) : inputStream;
+        } catch (IOException e) {
+            return inputStream;
+        }
     }
 
     private static boolean isCDNURL(Uri uri) {

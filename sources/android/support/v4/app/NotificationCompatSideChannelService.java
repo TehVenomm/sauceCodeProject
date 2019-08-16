@@ -1,4 +1,4 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.app.Notification;
 import android.app.Service;
@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.os.Build.VERSION;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.app.INotificationSideChannel.Stub;
+import android.support.p000v4.app.INotificationSideChannel.Stub;
 
+/* renamed from: android.support.v4.app.NotificationCompatSideChannelService */
 public abstract class NotificationCompatSideChannelService extends Service {
 
+    /* renamed from: android.support.v4.app.NotificationCompatSideChannelService$NotificationSideChannelStub */
     private class NotificationSideChannelStub extends Stub {
         NotificationSideChannelStub() {
         }
@@ -49,7 +51,8 @@ public abstract class NotificationCompatSideChannelService extends Service {
 
     public abstract void cancelAll(String str);
 
-    void checkPermission(int i, String str) {
+    /* access modifiers changed from: 0000 */
+    public void checkPermission(int i, String str) {
         String[] packagesForUid = getPackageManager().getPackagesForUid(i);
         int length = packagesForUid.length;
         int i2 = 0;
@@ -66,6 +69,9 @@ public abstract class NotificationCompatSideChannelService extends Service {
     public abstract void notify(String str, int i, String str2, Notification notification);
 
     public IBinder onBind(Intent intent) {
-        return (!intent.getAction().equals(NotificationManagerCompat.ACTION_BIND_SIDE_CHANNEL) || VERSION.SDK_INT > 19) ? null : new NotificationSideChannelStub();
+        if (!intent.getAction().equals(NotificationManagerCompat.ACTION_BIND_SIDE_CHANNEL) || VERSION.SDK_INT > 19) {
+            return null;
+        }
+        return new NotificationSideChannelStub();
     }
 }

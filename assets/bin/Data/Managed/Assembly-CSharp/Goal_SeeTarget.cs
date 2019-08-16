@@ -16,48 +16,45 @@ public class Goal_SeeTarget : GoalComposite
 		if (!brain.targetCtrl.IsAliveTarget())
 		{
 			SetStatus(STATUS.COMPLETED);
+			return;
 		}
-		else if (brain.targetCtrl.IsAttackableTarget() && brain.moveCtrl.CanBackAvoid())
+		if (brain.targetCtrl.IsAttackableTarget() && brain.moveCtrl.CanBackAvoid())
 		{
 			AddSubGoal<Goal_Avoid>().SetPlace(PLACE.BACK);
+			return;
 		}
-		else
+		float range = brain.weaponCtrl.GetAttackReach() * 2f;
+		brain.moveCtrl.ChangeStopRange(range);
+		if (!brain.targetCtrl.IsArrivalTarget())
 		{
-			float range = brain.weaponCtrl.GetAttackReach() * 2f;
-			brain.moveCtrl.ChangeStopRange(range);
-			if (!brain.targetCtrl.IsArrivalTarget())
+			AddSubGoal<Goal_GoToTarget>();
+			return;
+		}
+		Vector3 targetPosition = brain.targetCtrl.GetTargetPosition();
+		bool flag = false;
+		if (Utility.Dice100(80))
+		{
+			if (Utility.Coin())
 			{
-				AddSubGoal<Goal_GoToTarget>();
+				PLACE place = (!Utility.Coin()) ? PLACE.RIGHT : PLACE.LEFT;
+				AddSubGoal<Goal_MoveToAround>().SetParam(place, targetPosition, 3f);
+			}
+			else if (brain.moveCtrl.CanRightAvoid() || brain.moveCtrl.CanLeftAvoid())
+			{
+				AddSubGoal<Goal_AvoidRightAndLeft>();
 			}
 			else
 			{
-				Vector3 targetPosition = brain.targetCtrl.GetTargetPosition();
-				bool flag = false;
-				if (Utility.Dice100(80))
-				{
-					if (Utility.Coin())
-					{
-						PLACE place = (!Utility.Coin()) ? PLACE.RIGHT : PLACE.LEFT;
-						AddSubGoal<Goal_MoveToAround>().SetParam(place, targetPosition, 3f);
-					}
-					else if (brain.moveCtrl.CanRightAvoid() || brain.moveCtrl.CanLeftAvoid())
-					{
-						AddSubGoal<Goal_AvoidRightAndLeft>();
-					}
-					else
-					{
-						flag = true;
-					}
-				}
-				else
-				{
-					flag = true;
-				}
-				if (flag)
-				{
-					AddSubGoal<Goal_Stop>().SetGiveupTime(1f);
-				}
+				flag = true;
 			}
+		}
+		else
+		{
+			flag = true;
+		}
+		if (flag)
+		{
+			AddSubGoal<Goal_Stop>().SetGiveupTime(1f);
 		}
 	}
 

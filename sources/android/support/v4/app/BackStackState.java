@@ -1,4 +1,4 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,26 +7,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 
+/* renamed from: android.support.v4.app.BackStackState */
 final class BackStackState implements Parcelable {
-    public static final Creator<BackStackState> CREATOR = new C00131();
-    final boolean mAllowOptimization;
-    final int mBreadCrumbShortTitleRes;
-    final CharSequence mBreadCrumbShortTitleText;
-    final int mBreadCrumbTitleRes;
-    final CharSequence mBreadCrumbTitleText;
-    final int mIndex;
-    final String mName;
-    final int[] mOps;
-    final ArrayList<String> mSharedElementSourceNames;
-    final ArrayList<String> mSharedElementTargetNames;
-    final int mTransition;
-    final int mTransitionStyle;
-
-    /* renamed from: android.support.v4.app.BackStackState$1 */
-    static final class C00131 implements Creator<BackStackState> {
-        C00131() {
-        }
-
+    public static final Creator<BackStackState> CREATOR = new Creator<BackStackState>() {
         public BackStackState createFromParcel(Parcel parcel) {
             return new BackStackState(parcel);
         }
@@ -34,7 +17,19 @@ final class BackStackState implements Parcelable {
         public BackStackState[] newArray(int i) {
             return new BackStackState[i];
         }
-    }
+    };
+    final int mBreadCrumbShortTitleRes;
+    final CharSequence mBreadCrumbShortTitleText;
+    final int mBreadCrumbTitleRes;
+    final CharSequence mBreadCrumbTitleText;
+    final int mIndex;
+    final String mName;
+    final int[] mOps;
+    final boolean mReorderingAllowed;
+    final ArrayList<String> mSharedElementSourceNames;
+    final ArrayList<String> mSharedElementTargetNames;
+    final int mTransition;
+    final int mTransitionStyle;
 
     public BackStackState(Parcel parcel) {
         this.mOps = parcel.createIntArray();
@@ -48,43 +43,42 @@ final class BackStackState implements Parcelable {
         this.mBreadCrumbShortTitleText = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
         this.mSharedElementSourceNames = parcel.createStringArrayList();
         this.mSharedElementTargetNames = parcel.createStringArrayList();
-        this.mAllowOptimization = parcel.readInt() != 0;
+        this.mReorderingAllowed = parcel.readInt() != 0;
     }
 
     public BackStackState(BackStackRecord backStackRecord) {
         int size = backStackRecord.mOps.size();
         this.mOps = new int[(size * 6)];
-        if (backStackRecord.mAddToBackStack) {
-            int i = 0;
-            for (int i2 = 0; i2 < size; i2++) {
-                Op op = (Op) backStackRecord.mOps.get(i2);
-                int i3 = i + 1;
-                this.mOps[i] = op.cmd;
-                int i4 = i3 + 1;
-                this.mOps[i3] = op.fragment != null ? op.fragment.mIndex : -1;
-                int i5 = i4 + 1;
-                this.mOps[i4] = op.enterAnim;
-                i3 = i5 + 1;
-                this.mOps[i5] = op.exitAnim;
-                i5 = i3 + 1;
-                this.mOps[i3] = op.popEnterAnim;
-                i = i5 + 1;
-                this.mOps[i5] = op.popExitAnim;
-            }
-            this.mTransition = backStackRecord.mTransition;
-            this.mTransitionStyle = backStackRecord.mTransitionStyle;
-            this.mName = backStackRecord.mName;
-            this.mIndex = backStackRecord.mIndex;
-            this.mBreadCrumbTitleRes = backStackRecord.mBreadCrumbTitleRes;
-            this.mBreadCrumbTitleText = backStackRecord.mBreadCrumbTitleText;
-            this.mBreadCrumbShortTitleRes = backStackRecord.mBreadCrumbShortTitleRes;
-            this.mBreadCrumbShortTitleText = backStackRecord.mBreadCrumbShortTitleText;
-            this.mSharedElementSourceNames = backStackRecord.mSharedElementSourceNames;
-            this.mSharedElementTargetNames = backStackRecord.mSharedElementTargetNames;
-            this.mAllowOptimization = backStackRecord.mAllowOptimization;
-            return;
+        if (!backStackRecord.mAddToBackStack) {
+            throw new IllegalStateException("Not on back stack");
         }
-        throw new IllegalStateException("Not on back stack");
+        int i = 0;
+        for (int i2 = 0; i2 < size; i2++) {
+            C0065Op op = (C0065Op) backStackRecord.mOps.get(i2);
+            int i3 = i + 1;
+            this.mOps[i] = op.cmd;
+            int i4 = i3 + 1;
+            this.mOps[i3] = op.fragment != null ? op.fragment.mIndex : -1;
+            int i5 = i4 + 1;
+            this.mOps[i4] = op.enterAnim;
+            int i6 = i5 + 1;
+            this.mOps[i5] = op.exitAnim;
+            int i7 = i6 + 1;
+            this.mOps[i6] = op.popEnterAnim;
+            i = i7 + 1;
+            this.mOps[i7] = op.popExitAnim;
+        }
+        this.mTransition = backStackRecord.mTransition;
+        this.mTransitionStyle = backStackRecord.mTransitionStyle;
+        this.mName = backStackRecord.mName;
+        this.mIndex = backStackRecord.mIndex;
+        this.mBreadCrumbTitleRes = backStackRecord.mBreadCrumbTitleRes;
+        this.mBreadCrumbTitleText = backStackRecord.mBreadCrumbTitleText;
+        this.mBreadCrumbShortTitleRes = backStackRecord.mBreadCrumbShortTitleRes;
+        this.mBreadCrumbShortTitleText = backStackRecord.mBreadCrumbShortTitleText;
+        this.mSharedElementSourceNames = backStackRecord.mSharedElementSourceNames;
+        this.mSharedElementTargetNames = backStackRecord.mSharedElementTargetNames;
+        this.mReorderingAllowed = backStackRecord.mReorderingAllowed;
     }
 
     public int describeContents() {
@@ -95,49 +89,53 @@ final class BackStackState implements Parcelable {
         int i = 0;
         BackStackRecord backStackRecord = new BackStackRecord(fragmentManagerImpl);
         int i2 = 0;
-        while (i < this.mOps.length) {
-            Op op = new Op();
-            int i3 = i + 1;
-            op.cmd = this.mOps[i];
-            if (FragmentManagerImpl.DEBUG) {
-                Log.v("FragmentManager", "Instantiate " + backStackRecord + " op #" + i2 + " base fragment #" + this.mOps[i3]);
-            }
-            int i4 = i3 + 1;
-            i = this.mOps[i3];
-            if (i >= 0) {
-                op.fragment = (Fragment) fragmentManagerImpl.mActive.get(i);
+        while (true) {
+            int i3 = i;
+            if (i2 < this.mOps.length) {
+                C0065Op op = new C0065Op();
+                int i4 = i2 + 1;
+                op.cmd = this.mOps[i2];
+                if (FragmentManagerImpl.DEBUG) {
+                    Log.v("FragmentManager", "Instantiate " + backStackRecord + " op #" + i3 + " base fragment #" + this.mOps[i4]);
+                }
+                int i5 = i4 + 1;
+                int i6 = this.mOps[i4];
+                if (i6 >= 0) {
+                    op.fragment = (Fragment) fragmentManagerImpl.mActive.get(i6);
+                } else {
+                    op.fragment = null;
+                }
+                int i7 = i5 + 1;
+                op.enterAnim = this.mOps[i5];
+                int i8 = i7 + 1;
+                op.exitAnim = this.mOps[i7];
+                int i9 = i8 + 1;
+                op.popEnterAnim = this.mOps[i8];
+                i2 = i9 + 1;
+                op.popExitAnim = this.mOps[i9];
+                backStackRecord.mEnterAnim = op.enterAnim;
+                backStackRecord.mExitAnim = op.exitAnim;
+                backStackRecord.mPopEnterAnim = op.popEnterAnim;
+                backStackRecord.mPopExitAnim = op.popExitAnim;
+                backStackRecord.addOp(op);
+                i = i3 + 1;
             } else {
-                op.fragment = null;
+                backStackRecord.mTransition = this.mTransition;
+                backStackRecord.mTransitionStyle = this.mTransitionStyle;
+                backStackRecord.mName = this.mName;
+                backStackRecord.mIndex = this.mIndex;
+                backStackRecord.mAddToBackStack = true;
+                backStackRecord.mBreadCrumbTitleRes = this.mBreadCrumbTitleRes;
+                backStackRecord.mBreadCrumbTitleText = this.mBreadCrumbTitleText;
+                backStackRecord.mBreadCrumbShortTitleRes = this.mBreadCrumbShortTitleRes;
+                backStackRecord.mBreadCrumbShortTitleText = this.mBreadCrumbShortTitleText;
+                backStackRecord.mSharedElementSourceNames = this.mSharedElementSourceNames;
+                backStackRecord.mSharedElementTargetNames = this.mSharedElementTargetNames;
+                backStackRecord.mReorderingAllowed = this.mReorderingAllowed;
+                backStackRecord.bumpBackStackNesting(1);
+                return backStackRecord;
             }
-            i3 = i4 + 1;
-            op.enterAnim = this.mOps[i4];
-            i4 = i3 + 1;
-            op.exitAnim = this.mOps[i3];
-            i3 = i4 + 1;
-            op.popEnterAnim = this.mOps[i4];
-            i = i3 + 1;
-            op.popExitAnim = this.mOps[i3];
-            backStackRecord.mEnterAnim = op.enterAnim;
-            backStackRecord.mExitAnim = op.exitAnim;
-            backStackRecord.mPopEnterAnim = op.popEnterAnim;
-            backStackRecord.mPopExitAnim = op.popExitAnim;
-            backStackRecord.addOp(op);
-            i2++;
         }
-        backStackRecord.mTransition = this.mTransition;
-        backStackRecord.mTransitionStyle = this.mTransitionStyle;
-        backStackRecord.mName = this.mName;
-        backStackRecord.mIndex = this.mIndex;
-        backStackRecord.mAddToBackStack = true;
-        backStackRecord.mBreadCrumbTitleRes = this.mBreadCrumbTitleRes;
-        backStackRecord.mBreadCrumbTitleText = this.mBreadCrumbTitleText;
-        backStackRecord.mBreadCrumbShortTitleRes = this.mBreadCrumbShortTitleRes;
-        backStackRecord.mBreadCrumbShortTitleText = this.mBreadCrumbShortTitleText;
-        backStackRecord.mSharedElementSourceNames = this.mSharedElementSourceNames;
-        backStackRecord.mSharedElementTargetNames = this.mSharedElementTargetNames;
-        backStackRecord.mAllowOptimization = this.mAllowOptimization;
-        backStackRecord.bumpBackStackNesting(1);
-        return backStackRecord;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
@@ -153,7 +151,7 @@ final class BackStackState implements Parcelable {
         TextUtils.writeToParcel(this.mBreadCrumbShortTitleText, parcel, 0);
         parcel.writeStringList(this.mSharedElementSourceNames);
         parcel.writeStringList(this.mSharedElementTargetNames);
-        if (this.mAllowOptimization) {
+        if (this.mReorderingAllowed) {
             i2 = 1;
         }
         parcel.writeInt(i2);

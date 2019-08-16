@@ -2,14 +2,14 @@ using Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 {
 	public class ItemToQuestData
 	{
-		public const string NT = "itemId,questId";
-
 		public uint itemId;
 
 		public uint questId;
@@ -17,6 +17,8 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 		public int grade;
 
 		private uint key2;
+
+		public const string NT = "itemId,questId";
 
 		public static bool cb(CSVReader csv_reader, ItemToQuestData data, ref uint key1, ref uint key2)
 		{
@@ -40,7 +42,7 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 		{
 			itemId = key1;
 			this.key2 = key2;
-			questId = reader.ReadUInt32(0u);
+			questId = reader.ReadUInt32();
 		}
 
 		public void LoadFromAPI(uint iId, uint qId, uint k2)
@@ -99,13 +101,31 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 		NOT_SELECT_TYPE = -6
 	}
 
+	private DoubleUIntKeyTable<ItemToQuestData> itemToQuestTable;
+
 	private const int CHOICE_NUM = 2;
 
-	private DoubleUIntKeyTable<ItemToQuestData> itemToQuestTable;
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<ItemToQuestData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<ItemToQuestData> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<ItemToQuestData> _003C_003Ef__mg_0024cache4;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache5;
 
 	public static DoubleUIntKeyTable<ItemToQuestData> CreateTableCSV(string csv_text)
 	{
-		return TableUtility.CreateDoubleUIntKeyTable<ItemToQuestData>(csv_text, ItemToQuestData.cb, "itemId,questId", ItemToQuestData.CBSecondKey, null, null, null);
+		return TableUtility.CreateDoubleUIntKeyTable<ItemToQuestData>(csv_text, ItemToQuestData.cb, "itemId,questId", ItemToQuestData.CBSecondKey);
 	}
 
 	public void CreateTable(string csv_text)
@@ -120,7 +140,7 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(itemToQuestTable, csv_text, ItemToQuestData.cb, "itemId,questId", ItemToQuestData.CBSecondKey, null, null);
+		TableUtility.AddDoubleUIntKeyTable(itemToQuestTable, csv_text, ItemToQuestData.cb, "itemId,questId", ItemToQuestData.CBSecondKey);
 	}
 
 	public static DoubleUIntKeyTable<ItemToQuestData> CreateTableBinary(byte[] bytes)
@@ -129,7 +149,7 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 		BinaryTableReader binaryTableReader = new BinaryTableReader(bytes);
 		while (binaryTableReader.MoveNext())
 		{
-			uint key = binaryTableReader.ReadUInt32(0u);
+			uint key = binaryTableReader.ReadUInt32();
 			uint key2 = 0u;
 			UIntKeyTable<ItemToQuestData> uIntKeyTable = doubleUIntKeyTable.Get(key);
 			if (uIntKeyTable != null)
@@ -184,7 +204,7 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 
 	public QuestTable.QuestTableData[] GetQuestTableFromItemID(uint item_id)
 	{
-		return _GetQuestTableFromItemID(item_id, null);
+		return _GetQuestTableFromItemID(item_id);
 	}
 
 	public uint[] GetCandidateEnemies(uint item_id, int trim_count = -1)
@@ -284,7 +304,7 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 		{
 			array[i] = null;
 		}
-		RecommendQuestData recommendQuestData = new RecommendQuestData(array, false);
+		RecommendQuestData recommendQuestData = new RecommendQuestData(array, need_unknown: false);
 		QuestTable.QuestTableData[] questTableFromItemID = GetQuestTableFromItemID(item_id);
 		if (questTableFromItemID == null)
 		{
@@ -301,16 +321,29 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 		Array.ForEach(questTableFromItemID, delegate(QuestTable.QuestTableData data)
 		{
 			bool find_unknown_quest2 = false;
-			switch (data.questType)
+			QUEST_TYPE questType = data.questType;
+			switch (questType)
 			{
 			default:
 				return;
+			case QUEST_TYPE.SERIES_ARENA:
+			{
+				DeliveryTable.DeliveryData deliveryData = Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(data.questID);
+				Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
+				where e.eventId == deliveryData.eventID
+				select e).FirstOrDefault();
+				if (eventData != null)
+				{
+					UpdateRecommendQuestPriority(A, data, is_order: false, out find_unknown_quest2);
+				}
+				break;
+			}
 			case QUEST_TYPE.NORMAL:
 			case QUEST_TYPE.EVENT:
-				UpdateRecommendQuestPriority(A, data, false, out find_unknown_quest2);
+				UpdateRecommendQuestPriority(A, data, is_order: false, out find_unknown_quest2);
 				break;
 			case QUEST_TYPE.ORDER:
-				UpdateRecommendQuestPriority(B, data, true, out find_unknown_quest2);
+				UpdateRecommendQuestPriority(B, data, is_order: true, out find_unknown_quest2);
 				break;
 			}
 			if (find_unknown_quest2)
@@ -352,39 +385,37 @@ public class ItemToQuestTable : Singleton<ItemToQuestTable>, IDataTable
 		if (!is_order && !IsOpenedQuest(_table))
 		{
 			find_unknown_quest = true;
+			return;
 		}
-		else
+		if (is_order)
 		{
-			if (is_order)
+			QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(_table.questID);
+			if (questItem == null)
 			{
-				QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(_table.questID);
-				if (questItem == null)
-				{
-					return;
-				}
-				int questNum = QuestTable.GetQuestNum(questItem);
-				if (questNum <= 0)
-				{
-					return;
-				}
+				return;
 			}
-			for (int i = 0; i < 2; i++)
+			int questNum = QuestTable.GetQuestNum(questItem);
+			if (questNum <= 0)
 			{
-				if (quest_table[i] == null)
-				{
-					quest_table[i] = _table;
-					if (i != 0)
-					{
-						SortRecommendQuest(quest_table, _table, is_order);
-					}
-					return;
-				}
+				return;
 			}
-			int num = 1;
-			if (IsSelectPriorityQuestInfo(quest_table[num], _table))
+		}
+		for (int i = 0; i < 2; i++)
+		{
+			if (quest_table[i] == null)
 			{
-				SortRecommendQuest(quest_table, _table, is_order);
+				quest_table[i] = _table;
+				if (i != 0)
+				{
+					SortRecommendQuest(quest_table, _table, is_order);
+				}
+				return;
 			}
+		}
+		int num = 1;
+		if (IsSelectPriorityQuestInfo(quest_table[num], _table))
+		{
+			SortRecommendQuest(quest_table, _table, is_order);
 		}
 	}
 

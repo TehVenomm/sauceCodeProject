@@ -10,15 +10,24 @@ public class OpinionBox : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput((Enum)UI.IPT_TEXT, string.Empty, 511, (EventDelegate.Callback)null);
+		SetInput(UI.IPT_TEXT, string.Empty, 511);
 	}
 
 	protected virtual void OnQuery_SEND()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<UserInfoManager>.I.SendOpinionMessage(GetInputValue((Enum)UI.IPT_TEXT), delegate(bool is_success)
+		string text = GetInputValue((Enum)UI.IPT_TEXT);
+		if (text.IsNullOrWhiteSpace())
 		{
-			GameSection.ResumeEvent(is_success, null);
+			text = text.Trim();
+		}
+		if (!string.IsNullOrEmpty(text))
+		{
+			text = text.Replace("\n", "\\n");
+		}
+		MonoBehaviourSingleton<UserInfoManager>.I.SendOpinionMessage(text, delegate(bool is_success)
+		{
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

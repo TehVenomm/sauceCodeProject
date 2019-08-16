@@ -10,11 +10,12 @@ public abstract class ShareMedia implements ShareModel {
     private final Bundle params;
 
     public static abstract class Builder<M extends ShareMedia, B extends Builder> implements ShareModelBuilder<M, B> {
-        private Bundle params = new Bundle();
+        /* access modifiers changed from: private */
+        public Bundle params = new Bundle();
 
         static List<ShareMedia> readListFrom(Parcel parcel) {
             Parcelable[] readParcelableArray = parcel.readParcelableArray(ShareMedia.class.getClassLoader());
-            List<ShareMedia> arrayList = new ArrayList(readParcelableArray.length);
+            ArrayList arrayList = new ArrayList(readParcelableArray.length);
             for (Parcelable parcelable : readParcelableArray) {
                 arrayList.add((ShareMedia) parcelable);
             }

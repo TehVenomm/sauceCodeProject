@@ -57,92 +57,92 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(boolean z) {
-        this.style.append(this.buffer, null, z);
+        this.style.append(this.buffer, (String) null, z);
         return this;
     }
 
     public ToStringBuilder append(boolean[] zArr) {
-        this.style.append(this.buffer, null, zArr, null);
+        this.style.append(this.buffer, (String) null, zArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(byte b) {
-        this.style.append(this.buffer, null, b);
+        this.style.append(this.buffer, (String) null, b);
         return this;
     }
 
     public ToStringBuilder append(byte[] bArr) {
-        this.style.append(this.buffer, null, bArr, null);
+        this.style.append(this.buffer, (String) null, bArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(char c) {
-        this.style.append(this.buffer, null, c);
+        this.style.append(this.buffer, (String) null, c);
         return this;
     }
 
     public ToStringBuilder append(char[] cArr) {
-        this.style.append(this.buffer, null, cArr, null);
+        this.style.append(this.buffer, (String) null, cArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(double d) {
-        this.style.append(this.buffer, null, d);
+        this.style.append(this.buffer, (String) null, d);
         return this;
     }
 
     public ToStringBuilder append(double[] dArr) {
-        this.style.append(this.buffer, null, dArr, null);
+        this.style.append(this.buffer, (String) null, dArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(float f) {
-        this.style.append(this.buffer, null, f);
+        this.style.append(this.buffer, (String) null, f);
         return this;
     }
 
     public ToStringBuilder append(float[] fArr) {
-        this.style.append(this.buffer, null, fArr, null);
+        this.style.append(this.buffer, (String) null, fArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(int i) {
-        this.style.append(this.buffer, null, i);
+        this.style.append(this.buffer, (String) null, i);
         return this;
     }
 
     public ToStringBuilder append(int[] iArr) {
-        this.style.append(this.buffer, null, iArr, null);
+        this.style.append(this.buffer, (String) null, iArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(long j) {
-        this.style.append(this.buffer, null, j);
+        this.style.append(this.buffer, (String) null, j);
         return this;
     }
 
     public ToStringBuilder append(long[] jArr) {
-        this.style.append(this.buffer, null, jArr, null);
+        this.style.append(this.buffer, (String) null, jArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(Object obj) {
-        this.style.append(this.buffer, null, obj, null);
+        this.style.append(this.buffer, (String) null, obj, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(Object[] objArr) {
-        this.style.append(this.buffer, null, objArr, null);
+        this.style.append(this.buffer, (String) null, objArr, (Boolean) null);
         return this;
     }
 
     public ToStringBuilder append(short s) {
-        this.style.append(this.buffer, null, s);
+        this.style.append(this.buffer, (String) null, s);
         return this;
     }
 
     public ToStringBuilder append(short[] sArr) {
-        this.style.append(this.buffer, null, sArr, null);
+        this.style.append(this.buffer, (String) null, sArr, (Boolean) null);
         return this;
     }
 
@@ -152,7 +152,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, boolean[] zArr) {
-        this.style.append(this.buffer, str, zArr, null);
+        this.style.append(this.buffer, str, zArr, (Boolean) null);
         return this;
     }
 
@@ -167,7 +167,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, byte[] bArr) {
-        this.style.append(this.buffer, str, bArr, null);
+        this.style.append(this.buffer, str, bArr, (Boolean) null);
         return this;
     }
 
@@ -182,7 +182,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, char[] cArr) {
-        this.style.append(this.buffer, str, cArr, null);
+        this.style.append(this.buffer, str, cArr, (Boolean) null);
         return this;
     }
 
@@ -197,7 +197,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, double[] dArr) {
-        this.style.append(this.buffer, str, dArr, null);
+        this.style.append(this.buffer, str, dArr, (Boolean) null);
         return this;
     }
 
@@ -212,7 +212,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, float[] fArr) {
-        this.style.append(this.buffer, str, fArr, null);
+        this.style.append(this.buffer, str, fArr, (Boolean) null);
         return this;
     }
 
@@ -227,7 +227,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, int[] iArr) {
-        this.style.append(this.buffer, str, iArr, null);
+        this.style.append(this.buffer, str, iArr, (Boolean) null);
         return this;
     }
 
@@ -242,7 +242,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, long[] jArr) {
-        this.style.append(this.buffer, str, jArr, null);
+        this.style.append(this.buffer, str, jArr, (Boolean) null);
         return this;
     }
 
@@ -252,7 +252,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, Object obj) {
-        this.style.append(this.buffer, str, obj, null);
+        this.style.append(this.buffer, str, obj, (Boolean) null);
         return this;
     }
 
@@ -262,7 +262,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, Object[] objArr) {
-        this.style.append(this.buffer, str, objArr, null);
+        this.style.append(this.buffer, str, objArr, (Boolean) null);
         return this;
     }
 
@@ -277,7 +277,7 @@ public class ToStringBuilder implements Builder<String> {
     }
 
     public ToStringBuilder append(String str, short[] sArr) {
-        this.style.append(this.buffer, str, sArr, null);
+        this.style.append(this.buffer, str, sArr, (Boolean) null);
         return this;
     }
 

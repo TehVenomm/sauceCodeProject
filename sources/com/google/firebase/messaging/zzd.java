@@ -1,103 +1,120 @@
 package com.google.firebase.messaging;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Base64;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.Nullable;
+import android.support.p000v4.media.session.PlaybackStateCompat;
+import android.text.TextUtils;
 import android.util.Log;
-import com.facebook.appevents.AppEventsConstants;
-import com.google.android.gms.measurement.AppMeasurement;
-import com.google.android.gms.measurement.AppMeasurement.UserProperty;
-import com.google.firebase.analytics.FirebaseAnalytics.Param;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.internal.firebase_messaging.zzj;
+import com.google.android.gms.internal.firebase_messaging.zzk;
+import com.google.android.gms.internal.firebase_messaging.zzn;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.Executor;
 
-final class zzd {
-    private static void zzb(Context context, String str, Intent intent) {
-        Bundle bundle = new Bundle();
-        String stringExtra = intent.getStringExtra("google.c.a.c_id");
-        if (stringExtra != null) {
-            bundle.putString("_nmid", stringExtra);
-        }
-        stringExtra = intent.getStringExtra("google.c.a.c_l");
-        if (stringExtra != null) {
-            bundle.putString("_nmn", stringExtra);
-        }
-        stringExtra = intent.getStringExtra("from");
-        if (stringExtra == null || !stringExtra.startsWith("/topics/")) {
-            stringExtra = null;
-        }
-        if (stringExtra != null) {
-            bundle.putString("_nt", stringExtra);
-        }
-        try {
-            bundle.putInt("_nmt", Integer.valueOf(intent.getStringExtra("google.c.a.ts")).intValue());
-        } catch (Throwable e) {
-            Log.w("FirebaseMessaging", "Error while parsing timestamp in GCM event", e);
-        }
-        if (intent.hasExtra("google.c.a.udt")) {
+final class zzd implements Closeable {
+    private final URL url;
+    @Nullable
+    private Task<Bitmap> zzea;
+    @Nullable
+    private volatile InputStream zzeb;
+
+    private zzd(URL url2) {
+        this.url = url2;
+    }
+
+    private static /* synthetic */ void zza(Throwable th, InputStream inputStream) {
+        if (th != null) {
             try {
-                bundle.putInt("_ndt", Integer.valueOf(intent.getStringExtra("google.c.a.udt")).intValue());
-            } catch (Throwable e2) {
-                Log.w("FirebaseMessaging", "Error while parsing use_device_time in GCM event", e2);
+                inputStream.close();
+            } catch (Throwable th2) {
+                zzn.zza(th, th2);
             }
-        }
-        if (Log.isLoggable("FirebaseMessaging", 3)) {
-            stringExtra = String.valueOf(bundle);
-            Log.d("FirebaseMessaging", new StringBuilder((String.valueOf(str).length() + 22) + String.valueOf(stringExtra).length()).append("Sending event=").append(str).append(" params=").append(stringExtra).toString());
-        }
-        AppMeasurement zzct = zzct(context);
-        if (zzct != null) {
-            zzct.logEventInternal(AppMeasurement.FCM_ORIGIN, str, bundle);
         } else {
-            Log.w("FirebaseMessaging", "Unable to log event: analytics library is missing");
+            inputStream.close();
         }
     }
 
-    private static AppMeasurement zzct(Context context) {
+    @Nullable
+    public static zzd zzo(String str) {
+        if (TextUtils.isEmpty(str)) {
+            return null;
+        }
         try {
-            return AppMeasurement.getInstance(context);
-        } catch (NoClassDefFoundError e) {
+            return new zzd(new URL(str));
+        } catch (MalformedURLException e) {
+            String valueOf = String.valueOf(str);
+            Log.w("FirebaseMessaging", valueOf.length() != 0 ? "Not downloading image, bad URL: ".concat(valueOf) : new String("Not downloading image, bad URL: "));
             return null;
         }
     }
 
-    public static void zzg(Context context, Intent intent) {
-        String stringExtra = intent.getStringExtra("google.c.a.abt");
-        if (stringExtra != null) {
-            zzc.zza(context, AppMeasurement.FCM_ORIGIN, Base64.decode(stringExtra, 0), new zzb(), 1);
-        }
-        zzb(context, "_nr", intent);
+    public final void close() {
+        zzk.zza(this.zzeb);
     }
 
-    public static void zzh(Context context, Intent intent) {
-        if (intent != null) {
-            if (AppEventsConstants.EVENT_PARAM_VALUE_YES.equals(intent.getStringExtra("google.c.a.tc"))) {
-                AppMeasurement zzct = zzct(context);
-                if (Log.isLoggable("FirebaseMessaging", 3)) {
-                    Log.d("FirebaseMessaging", "Received event with track-conversion=true. Setting user property and reengagement event");
+    public final Task<Bitmap> getTask() {
+        return (Task) Preconditions.checkNotNull(this.zzea);
+    }
+
+    public final void zza(Executor executor) {
+        this.zzea = Tasks.call(executor, new zze(this));
+    }
+
+    public final Bitmap zzat() throws IOException {
+        Throwable th;
+        Throwable th2;
+        Throwable th3;
+        Throwable th4 = null;
+        String valueOf = String.valueOf(this.url);
+        Log.i("FirebaseMessaging", new StringBuilder(String.valueOf(valueOf).length() + 22).append("Starting download of: ").append(valueOf).toString());
+        try {
+            InputStream inputStream = this.url.openConnection().getInputStream();
+            try {
+                InputStream zza = zzj.zza(inputStream, PlaybackStateCompat.ACTION_SET_CAPTIONING_ENABLED);
+                try {
+                    this.zzeb = inputStream;
+                    Bitmap decodeStream = BitmapFactory.decodeStream(zza);
+                    if (decodeStream == null) {
+                        String valueOf2 = String.valueOf(this.url);
+                        String sb = new StringBuilder(String.valueOf(valueOf2).length() + 24).append("Failed to decode image: ").append(valueOf2).toString();
+                        Log.w("FirebaseMessaging", sb);
+                        throw new IOException(sb);
+                    }
+                    if (Log.isLoggable("FirebaseMessaging", 3)) {
+                        String valueOf3 = String.valueOf(this.url);
+                        Log.d("FirebaseMessaging", new StringBuilder(String.valueOf(valueOf3).length() + 31).append("Successfully downloaded image: ").append(valueOf3).toString());
+                    }
+                    zza(null, zza);
+                    if (inputStream != null) {
+                        zza(null, inputStream);
+                    }
+                    return decodeStream;
+                } catch (Throwable th5) {
+                    th3 = th5;
+                    th2 = r0;
                 }
-                if (zzct != null) {
-                    String stringExtra = intent.getStringExtra("google.c.a.c_id");
-                    zzct.setUserPropertyInternal(AppMeasurement.FCM_ORIGIN, UserProperty.FIREBASE_LAST_NOTIFICATION, stringExtra);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("source", "Firebase");
-                    bundle.putString(Param.MEDIUM, "notification");
-                    bundle.putString(Param.CAMPAIGN, stringExtra);
-                    zzct.logEventInternal(AppMeasurement.FCM_ORIGIN, "_cmp", bundle);
-                } else {
-                    Log.w("FirebaseMessaging", "Unable to set user property for conversion tracking:  analytics library is missing");
+                zza(th2, zza);
+                throw th3;
+                if (inputStream != null) {
+                    zza(th4, inputStream);
                 }
-            } else if (Log.isLoggable("FirebaseMessaging", 3)) {
-                Log.d("FirebaseMessaging", "Received event with track-conversion=false. Do not set user property");
+                throw th;
+            } catch (Throwable th6) {
+                th = th6;
+                th4 = r0;
             }
+        } catch (IOException e) {
+            String valueOf4 = String.valueOf(this.url);
+            Log.w("FirebaseMessaging", new StringBuilder(String.valueOf(valueOf4).length() + 26).append("Failed to download image: ").append(valueOf4).toString());
+            throw e;
         }
-        zzb(context, "_no", intent);
-    }
-
-    public static void zzi(Context context, Intent intent) {
-        zzb(context, "_nd", intent);
-    }
-
-    public static void zzj(Context context, Intent intent) {
-        zzb(context, "_nf", intent);
     }
 }

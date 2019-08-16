@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectSizeCtrl
+public class EffectSizeCtrl : MonoBehaviour
 {
 	private class ParticleInfo
 	{
@@ -42,8 +42,6 @@ public class EffectSizeCtrl
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		_transform = this.get_transform();
 	}
 
@@ -90,26 +88,27 @@ public class EffectSizeCtrl
 	{
 		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		if (!isWorking && sec != 0f)
+		if (isWorking || sec == 0f)
 		{
-			this.particleInfo.Clear();
-			int i = 0;
-			for (int num = particles.Length; i < num; i++)
-			{
-				ParticleSystemRenderer component = particles[i].GetComponent<ParticleSystemRenderer>();
-				if (!object.ReferenceEquals(component, null))
-				{
-					ParticleInfo particleInfo = new ParticleInfo();
-					particleInfo.psr = component;
-					particleInfo.firstLength = component.get_lengthScale();
-					this.particleInfo.Add(particleInfo);
-				}
-			}
-			Vector3 localScale = _transform.get_localScale();
-			firstScale = localScale.x;
-			execSec = 0f;
-			targetSec = sec;
-			isWorking = true;
+			return;
 		}
+		this.particleInfo.Clear();
+		int i = 0;
+		for (int num = particles.Length; i < num; i++)
+		{
+			ParticleSystemRenderer component = particles[i].GetComponent<ParticleSystemRenderer>();
+			if (!object.ReferenceEquals(component, null))
+			{
+				ParticleInfo particleInfo = new ParticleInfo();
+				particleInfo.psr = component;
+				particleInfo.firstLength = component.get_lengthScale();
+				this.particleInfo.Add(particleInfo);
+			}
+		}
+		Vector3 localScale = _transform.get_localScale();
+		firstScale = localScale.x;
+		execSec = 0f;
+		targetSec = sec;
+		isWorking = true;
 	}
 }

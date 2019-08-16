@@ -1,4 +1,4 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,6 +12,7 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 
+/* renamed from: android.support.v4.media.MediaDescriptionCompat */
 public final class MediaDescriptionCompat implements Parcelable {
     public static final long BT_FOLDER_TYPE_ALBUMS = 2;
     public static final long BT_FOLDER_TYPE_ARTISTS = 3;
@@ -20,12 +21,24 @@ public final class MediaDescriptionCompat implements Parcelable {
     public static final long BT_FOLDER_TYPE_PLAYLISTS = 5;
     public static final long BT_FOLDER_TYPE_TITLES = 1;
     public static final long BT_FOLDER_TYPE_YEARS = 6;
-    public static final Creator<MediaDescriptionCompat> CREATOR = new C00711();
+    public static final Creator<MediaDescriptionCompat> CREATOR = new Creator<MediaDescriptionCompat>() {
+        public MediaDescriptionCompat createFromParcel(Parcel parcel) {
+            return VERSION.SDK_INT < 21 ? new MediaDescriptionCompat(parcel) : MediaDescriptionCompat.fromMediaDescription(MediaDescriptionCompatApi21.fromParcel(parcel));
+        }
+
+        public MediaDescriptionCompat[] newArray(int i) {
+            return new MediaDescriptionCompat[i];
+        }
+    };
     @RestrictTo({Scope.LIBRARY_GROUP})
     public static final String DESCRIPTION_KEY_MEDIA_URI = "android.support.v4.media.description.MEDIA_URI";
     @RestrictTo({Scope.LIBRARY_GROUP})
     public static final String DESCRIPTION_KEY_NULL_BUNDLE_FLAG = "android.support.v4.media.description.NULL_BUNDLE_FLAG";
     public static final String EXTRA_BT_FOLDER_TYPE = "android.media.extra.BT_FOLDER_TYPE";
+    public static final String EXTRA_DOWNLOAD_STATUS = "android.media.extra.DOWNLOAD_STATUS";
+    public static final long STATUS_DOWNLOADED = 2;
+    public static final long STATUS_DOWNLOADING = 1;
+    public static final long STATUS_NOT_DOWNLOADED = 0;
     private final CharSequence mDescription;
     private Object mDescriptionObj;
     private final Bundle mExtras;
@@ -36,20 +49,7 @@ public final class MediaDescriptionCompat implements Parcelable {
     private final CharSequence mSubtitle;
     private final CharSequence mTitle;
 
-    /* renamed from: android.support.v4.media.MediaDescriptionCompat$1 */
-    static final class C00711 implements Creator<MediaDescriptionCompat> {
-        C00711() {
-        }
-
-        public MediaDescriptionCompat createFromParcel(Parcel parcel) {
-            return VERSION.SDK_INT < 21 ? new MediaDescriptionCompat(parcel) : MediaDescriptionCompat.fromMediaDescription(MediaDescriptionCompatApi21.fromParcel(parcel));
-        }
-
-        public MediaDescriptionCompat[] newArray(int i) {
-            return new MediaDescriptionCompat[i];
-        }
-    }
-
+    /* renamed from: android.support.v4.media.MediaDescriptionCompat$Builder */
     public static final class Builder {
         private CharSequence mDescription;
         private Bundle mExtras;
@@ -129,10 +129,7 @@ public final class MediaDescriptionCompat implements Parcelable {
 
     public static MediaDescriptionCompat fromMediaDescription(Object obj) {
         Bundle bundle = null;
-        if (obj == null) {
-            return null;
-        }
-        if (VERSION.SDK_INT < 21) {
+        if (obj == null || VERSION.SDK_INT < 21) {
             return null;
         }
         Builder builder = new Builder();
@@ -146,7 +143,7 @@ public final class MediaDescriptionCompat implements Parcelable {
         Uri uri = extras == null ? null : (Uri) extras.getParcelable(DESCRIPTION_KEY_MEDIA_URI);
         if (uri == null) {
             bundle = extras;
-        } else if (!(extras.containsKey(DESCRIPTION_KEY_NULL_BUNDLE_FLAG) && extras.size() == 2)) {
+        } else if (!extras.containsKey(DESCRIPTION_KEY_NULL_BUNDLE_FLAG) || extras.size() != 2) {
             extras.remove(DESCRIPTION_KEY_MEDIA_URI);
             extras.remove(DESCRIPTION_KEY_NULL_BUNDLE_FLAG);
             bundle = extras;

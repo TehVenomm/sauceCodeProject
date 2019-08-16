@@ -14,25 +14,27 @@ import org.onepf.oms.appstore.googleUtils.IabException;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 
 public class GoGameStore implements GoPayInAppBillingServiceExt, Appstore {
+
     /* renamed from: a */
-    private final GoPayInAppBillingService f990a;
+    private final GoPayInAppBillingService f1221a;
+
     /* renamed from: b */
-    private final Context f991b;
+    private final Context f1222b;
 
     @Deprecated
     public GoGameStore(@NotNull Context context, @NotNull String str, @NotNull String str2, @NotNull String str3) {
-        this.f991b = context;
-        this.f990a = new GoPayInAppBillingService(context, str, str2, null, str3);
+        this.f1222b = context;
+        this.f1221a = new GoPayInAppBillingService(context, str, str2, null, str3);
     }
 
     public GoGameStore(@NotNull Context context, @NotNull String str, @NotNull String str2, @NotNull String str3, @NotNull String str4) {
-        this.f991b = context;
-        this.f990a = new GoPayInAppBillingService(context, str, str2, str4, str3);
+        this.f1222b = context;
+        this.f1221a = new GoPayInAppBillingService(context, str, str2, str4, str3);
     }
 
     public GoGameStore(@NotNull Context context, @NotNull String str, @NotNull String str2, @NotNull String str3, @NotNull String str4, @NotNull String str5) {
         this(context, str, str2, str3, str4);
-        this.f990a.setGameLanguage(str5);
+        this.f1221a.setGameLanguage(str5);
     }
 
     @Deprecated
@@ -66,7 +68,7 @@ public class GoGameStore implements GoPayInAppBillingServiceExt, Appstore {
 
     @Nullable
     public AppstoreInAppBillingService getInAppBillingService() {
-        return this.f990a;
+        return this.f1221a;
     }
 
     public int getPackageVersion(String str) {

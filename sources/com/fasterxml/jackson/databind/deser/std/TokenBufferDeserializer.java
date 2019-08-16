@@ -18,7 +18,8 @@ public class TokenBufferDeserializer extends StdScalarDeserializer<TokenBuffer> 
         return createBufferInstance(jsonParser).deserialize(jsonParser, deserializationContext);
     }
 
-    protected TokenBuffer createBufferInstance(JsonParser jsonParser) {
+    /* access modifiers changed from: protected */
+    public TokenBuffer createBufferInstance(JsonParser jsonParser) {
         return new TokenBuffer(jsonParser);
     }
 }

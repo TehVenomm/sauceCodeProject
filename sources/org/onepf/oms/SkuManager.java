@@ -63,7 +63,10 @@ public class SkuManager {
             throw SkuMappingException.newInstance(2);
         }
         Map map = (Map) this.sku2storeSkuMappings.get(str);
-        return map == null ? null : Collections.unmodifiableList(new ArrayList(map.values()));
+        if (map == null) {
+            return null;
+        }
+        return Collections.unmodifiableList(new ArrayList(map.values()));
     }
 
     @NotNull
@@ -73,8 +76,9 @@ public class SkuManager {
         if (map == null || !map.containsKey(str2)) {
             return str2;
         }
-        Logger.m1001d("getSku() restore sku from storeSku: ", str2, " -> ", (String) map.get(str2));
-        return (String) map.get(str2);
+        String str3 = (String) map.get(str2);
+        Logger.m1026d("getSku() restore sku from storeSku: ", str2, " -> ", str3);
+        return str3;
     }
 
     @NotNull
@@ -88,8 +92,9 @@ public class SkuManager {
             if (map == null || !map.containsKey(str2)) {
                 return str2;
             }
-            Logger.m1001d("getStoreSku() using mapping for sku: ", str2, " -> ", (String) map.get(str2));
-            return (String) map.get(str2);
+            String str3 = (String) map.get(str2);
+            Logger.m1026d("getStoreSku() using mapping for sku: ", str2, " -> ", str3);
+            return str3;
         }
     }
 
@@ -107,15 +112,15 @@ public class SkuManager {
         } else {
             map = map2;
         }
-        map2 = (Map) this.storeSku2skuMappings.get(str2);
-        if (map2 == null) {
-            map2 = new HashMap();
-            this.storeSku2skuMappings.put(str2, map2);
-        } else if (map2.get(str3) != null) {
-            throw new SkuMappingException("Ambiguous SKU mapping. You try to map sku: " + str + " -> storeSku: " + str3 + ", that is already mapped to sku: " + ((String) map2.get(str3)));
+        Map map3 = (Map) this.storeSku2skuMappings.get(str2);
+        if (map3 == null) {
+            map3 = new HashMap();
+            this.storeSku2skuMappings.put(str2, map3);
+        } else if (map3.get(str3) != null) {
+            throw new SkuMappingException("Ambiguous SKU mapping. You try to map sku: " + str + " -> storeSku: " + str3 + ", that is already mapped to sku: " + ((String) map3.get(str3)));
         }
         map.put(str, str3);
-        map2.put(str3, str);
+        map3.put(str3, str);
         return this;
     }
 

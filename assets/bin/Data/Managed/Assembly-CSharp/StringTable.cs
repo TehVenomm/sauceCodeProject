@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class StringTable : Singleton<StringTable>, IDataTable
 {
+	public static readonly string STRING_DATA_TABLE = "StringTable";
+
 	public const string ERROR_TEXT = "ERR::STRING_NOT_FOUND";
 
 	public const string NT = "category,id,strJP";
-
-	public static readonly string STRING_DATA_TABLE = "StringTable";
 
 	public StringKeyTable<UIntKeyTable<string>> stringKeyTable
 	{
@@ -113,7 +113,8 @@ public class StringTable : Singleton<StringTable>, IDataTable
 		{
 			return GetErrorCodeText(0u);
 		}
-		return uIntKeyTable.Get(id);
+		string text = uIntKeyTable.Get(id);
+		return (text != null) ? text : "ERR::STRING_NOT_FOUND";
 	}
 
 	public static string GetErrorMessage(uint id)
@@ -163,7 +164,7 @@ public class StringTable : Singleton<StringTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		CreateTable(csv_text, false);
+		CreateTable(csv_text, encrypted: false);
 	}
 
 	public void CreateTable(string csv_text, bool encrypted)

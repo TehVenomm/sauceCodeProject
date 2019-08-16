@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FieldGimmickObject : IFieldGimmickObject
+public class FieldGimmickObject : MonoBehaviour, IFieldGimmickObject
 {
 	protected int m_id;
 
@@ -26,7 +26,6 @@ public class FieldGimmickObject : IFieldGimmickObject
 		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		if (pointData == null)
 		{
 			return null;
@@ -44,23 +43,69 @@ public class FieldGimmickObject : IFieldGimmickObject
 		return fieldGimmickObject;
 	}
 
-	public static void CacheResources(LoadingQueue loadQueue, FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE type, string[] effectNameList, int[] seIdList)
+	public static uint ConvertModelIndexToKey(FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE type, int index)
 	{
-		if (MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable.Get((uint)type) == null)
+		return (uint)(index * GameDefine.kShiftIndex + type);
+	}
+
+	public static void CacheResources(LoadingQueue loadQueue, FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE type, string[] effectNameList, int[] seIdList, int[] modelIndexes)
+	{
+		foreach (int num in modelIndexes)
 		{
-			string fieldGimmickModel = ResourceName.GetFieldGimmickModel(type);
-			if (!string.IsNullOrEmpty(fieldGimmickModel))
+			uint key;
+			string text;
+			switch (type)
 			{
-				MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable.Add((uint)type, loadQueue.Load(RESOURCE_CATEGORY.STAGE_GIMMICK, fieldGimmickModel, false));
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CANNON_FIELD:
+				key = FieldGimmickCannonField.ConvertModelIndexToKey(num);
+				text = FieldGimmickCannonField.ConvertModelIndexToName(num);
+				break;
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.WAVE_TARGET3:
+				key = FieldWaveTargetObject.ConvertModelIndexToKey(num);
+				text = FieldWaveTargetObject.ConvertModelIndexToName(num);
+				break;
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.FISHING:
+				key = (uint)type;
+				text = FieldFishingGimmickObject.ConvertModelIndexToName(num);
+				break;
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.SUPPLY:
+				key = FieldSupplyGimmickObject.ConvertModelIndexToKey(num);
+				text = FieldSupplyGimmickObject.ConvertModelIndexToName(num);
+				break;
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_TURRET:
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_EVOLVE_ITEM:
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_DECOY:
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_BUFF_POINT:
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.CARRIABLE_BOMB:
+				key = ConvertModelIndexToKey(type, num);
+				text = ResourceName.GetFieldGimmickModel(type, num);
+				break;
+			case FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.QUEST:
+				key = ConvertModelIndexToKey(type, num);
+				text = ResourceName.GetFieldGimmickModel(type, num);
+				break;
+			default:
+				key = (uint)type;
+				text = ResourceName.GetFieldGimmickModel(type, num);
+				break;
 			}
-			foreach (string name in effectNameList)
+			if (MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable.Get(key) == null && !string.IsNullOrEmpty(text))
 			{
-				loadQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, name);
+				RESOURCE_CATEGORY category = RESOURCE_CATEGORY.STAGE_GIMMICK;
+				if (type == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.QUEST)
+				{
+					category = RESOURCE_CATEGORY.INGAME_GATHER_POINT;
+				}
+				MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable.Add(key, loadQueue.Load(category, text));
 			}
-			foreach (int se_id in seIdList)
-			{
-				loadQueue.CacheSE(se_id, null);
-			}
+		}
+		foreach (string name in effectNameList)
+		{
+			loadQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, name);
+		}
+		foreach (int se_id in seIdList)
+		{
+			loadQueue.CacheSE(se_id);
 		}
 	}
 
@@ -69,12 +114,22 @@ public class FieldGimmickObject : IFieldGimmickObject
 		m_pointData = pointData;
 		m_id = (int)m_pointData.pointID;
 		m_gimmickType = m_pointData.gimmickType;
+		ParseParam(pointData.value2);
+		CreateModel();
+	}
+
+	protected virtual void ParseParam(string value2)
+	{
+	}
+
+	protected virtual void CreateModel()
+	{
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable != null)
 		{
 			LoadObject loadObject = MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable.Get((uint)m_gimmickType);
 			if (loadObject != null)
 			{
-				modelTrans = ResourceUtility.Realizes(loadObject.loadedObject, m_transform, -1);
+				modelTrans = ResourceUtility.Realizes(loadObject.loadedObject, m_transform);
 			}
 		}
 	}
@@ -91,7 +146,6 @@ public class FieldGimmickObject : IFieldGimmickObject
 
 	public virtual void RequestDestroy()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		Object.Destroy(this.get_gameObject());
 	}
 
@@ -119,11 +173,22 @@ public class FieldGimmickObject : IFieldGimmickObject
 		return 2f;
 	}
 
+	public virtual float GetTargetSqrRadius()
+	{
+		return 4f;
+	}
+
+	public virtual void UpdateTargetMarker(bool isNear)
+	{
+	}
+
+	public virtual bool IsSearchableNearest()
+	{
+		return true;
+	}
+
 	protected virtual void Awake()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Expected O, but got Unknown
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		Utility.SetLayerWithChildren(this.get_transform(), 19);
 		SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();

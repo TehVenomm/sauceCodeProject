@@ -10,6 +10,7 @@ public final class ConnectionsStatusCodes extends CommonStatusCodes {
     public static final int MISSING_PERMISSION_BLUETOOTH_ADMIN = 8031;
     public static final int MISSING_PERMISSION_CHANGE_WIFI_STATE = 8033;
     public static final int MISSING_PERMISSION_RECORD_AUDIO = 8035;
+    @Deprecated
     public static final int MISSING_SETTING_LOCATION_MUST_BE_ON = 8025;
     public static final int STATUS_ALREADY_ADVERTISING = 8001;
     public static final int STATUS_ALREADY_CONNECTED_TO_ENDPOINT = 8003;
@@ -58,6 +59,8 @@ public final class ConnectionsStatusCodes extends CommonStatusCodes {
                 return "STATUS_ENDPOINT_IO_ERROR";
             case STATUS_PAYLOAD_IO_ERROR /*8013*/:
                 return "STATUS_PAYLOAD_IO_ERROR";
+            case 8014:
+                return "STATUS_PAYLOAD_UNKNOWN";
             case MISSING_SETTING_LOCATION_MUST_BE_ON /*8025*/:
                 return "MISSING_SETTING_LOCATION_MUST_BE_ON";
             case MISSING_PERMISSION_BLUETOOTH /*8030*/:
@@ -70,6 +73,8 @@ public final class ConnectionsStatusCodes extends CommonStatusCodes {
                 return "MISSING_PERMISSION_CHANGE_WIFI_STATE";
             case MISSING_PERMISSION_ACCESS_COARSE_LOCATION /*8034*/:
                 return "MISSING_PERMISSION_ACCESS_COARSE_LOCATION";
+            case MISSING_PERMISSION_RECORD_AUDIO /*8035*/:
+                return "MISSING_PERMISSION_RECORD_AUDIO";
             case API_CONNECTION_FAILED_ALREADY_IN_USE /*8050*/:
                 return "API_CONNECTION_FAILED_ALREADY_IN_USE";
             default:

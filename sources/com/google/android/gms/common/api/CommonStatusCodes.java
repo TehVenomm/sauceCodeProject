@@ -1,11 +1,12 @@
 package com.google.android.gms.common.api;
 
 import android.support.annotation.NonNull;
+import com.google.android.gms.common.annotation.KeepForSdk;
 
+@KeepForSdk
 public class CommonStatusCodes {
     public static final int API_NOT_CONNECTED = 17;
     public static final int CANCELED = 16;
-    public static final int DEAD_CLIENT = 18;
     public static final int DEVELOPER_ERROR = 10;
     public static final int ERROR = 13;
     public static final int INTERNAL_ERROR = 8;
@@ -22,6 +23,7 @@ public class CommonStatusCodes {
     public static final int SUCCESS_CACHE = -1;
     public static final int TIMEOUT = 15;
 
+    @KeepForSdk
     protected CommonStatusCodes() {
     }
 

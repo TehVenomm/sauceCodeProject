@@ -1,25 +1,29 @@
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 {
 	public class ExceedSkillItemData
 	{
-		public const string NT = "id,exceedCnt,useGaugeRate,startAt";
-
 		public int id;
 
 		public int exceedCnt;
 
 		public int useGaugeRate;
 
+		public int useGaugeRate2;
+
 		public DateTime startAt;
+
+		public const string NT = "id,exceedCnt,useGaugeRate,useGaugeRate2,startAt";
 
 		public static bool cb(CSVReader csv_reader, ExceedSkillItemData data, ref uint key)
 		{
 			data.id = (int)key;
 			csv_reader.Pop(ref data.exceedCnt);
 			csv_reader.Pop(ref data.useGaugeRate);
+			csv_reader.Pop(ref data.useGaugeRate2);
 			string value = string.Empty;
 			csv_reader.Pop(ref value);
 			if (!string.IsNullOrEmpty(value))
@@ -38,6 +42,15 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 			return (int)((float)(baseValue * useGaugeRate) * 0.01f);
 		}
 
+		public int GetExceedUseGauge2(int baseValue)
+		{
+			if (useGaugeRate2 == 0)
+			{
+				return baseValue;
+			}
+			return (int)((float)(baseValue * useGaugeRate2) * 0.01f);
+		}
+
 		public int GetDecreaseUseGaugePercent()
 		{
 			return 100 - useGaugeRate;
@@ -52,11 +65,16 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 
 	private int[] basePoints;
 
+	private float[] sameSkillPointRates;
+
 	private float[] skillExceedRate;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<ExceedSkillItemData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{
-		exceedSkillItemTable = TableUtility.CreateUIntKeyTable<ExceedSkillItemData>(csv_text, ExceedSkillItemData.cb, "id,exceedCnt,useGaugeRate,startAt", null);
+		exceedSkillItemTable = TableUtility.CreateUIntKeyTable<ExceedSkillItemData>(csv_text, ExceedSkillItemData.cb, "id,exceedCnt,useGaugeRate,useGaugeRate2,startAt");
 		exceedSkillItemTable.TrimExcess();
 	}
 
@@ -132,14 +150,25 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 	public void SetConst()
 	{
 		ServerConstDefine constDefine = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine;
-		basePoints = new int[6]
+		basePoints = new int[7]
 		{
 			0,
 			constDefine.SKILL_EXCEED_POINT_RARITY_C,
 			constDefine.SKILL_EXCEED_POINT_RARITY_B,
 			constDefine.SKILL_EXCEED_POINT_RARITY_A,
 			constDefine.SKILL_EXCEED_POINT_RARITY_S,
-			constDefine.SKILL_EXCEED_POINT_RARITY_SS
+			constDefine.SKILL_EXCEED_POINT_RARITY_SS,
+			constDefine.SKILL_EXCEED_POINT_RARITY_SSS
+		};
+		sameSkillPointRates = new float[7]
+		{
+			1f,
+			constDefine.SKILL_EXCEED_SAME_RATE_C,
+			constDefine.SKILL_EXCEED_SAME_RATE_B,
+			constDefine.SKILL_EXCEED_SAME_RATE_A,
+			constDefine.SKILL_EXCEED_SAME_RATE_S,
+			constDefine.SKILL_EXCEED_SAME_RATE_SS,
+			constDefine.SKILL_EXCEED_SAME_RATE_SSS
 		};
 		skillExceedRate = new float[11]
 		{
@@ -169,6 +198,20 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 			return 0;
 		}
 		return basePoints[(int)type];
+	}
+
+	public float GetExceedRaritySamePointRate(RARITY_TYPE type)
+	{
+		if (sameSkillPointRates == null)
+		{
+			SetConst();
+		}
+		if ((int)type > sameSkillPointRates.Length - 1)
+		{
+			Debug.LogError((object)"not define \"sameSkillPointRates\" in ExceedSkillItemTable");
+			return 1f;
+		}
+		return sameSkillPointRates[(int)type];
 	}
 
 	private float GetExceedRate(int exceedCnt)

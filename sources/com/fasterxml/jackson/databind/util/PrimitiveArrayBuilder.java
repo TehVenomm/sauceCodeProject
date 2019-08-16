@@ -40,7 +40,8 @@ public abstract class PrimitiveArrayBuilder<T> {
         }
     }
 
-    protected abstract T _constructArray(int i);
+    /* access modifiers changed from: protected */
+    public abstract T _constructArray(int i);
 
     protected PrimitiveArrayBuilder() {
     }
@@ -56,7 +57,7 @@ public abstract class PrimitiveArrayBuilder<T> {
 
     public final T appendCompletedChunk(T t, int i) {
         int i2;
-        Node node = new Node(t, i);
+        Node<T> node = new Node<>(t, i);
         if (this._bufferHead == null) {
             this._bufferTail = node;
             this._bufferHead = node;
@@ -77,7 +78,7 @@ public abstract class PrimitiveArrayBuilder<T> {
         int i2 = i + this._bufferedEntryCount;
         T _constructArray = _constructArray(i2);
         int i3 = 0;
-        for (Node node = this._bufferHead; node != null; node = node.next()) {
+        for (Node<T> node = this._bufferHead; node != null; node = node.next()) {
             i3 = node.copyData(_constructArray, i3);
         }
         System.arraycopy(t, 0, _constructArray, i3, i);
@@ -88,7 +89,8 @@ public abstract class PrimitiveArrayBuilder<T> {
         throw new IllegalStateException("Should have gotten " + i2 + " entries, got " + i4);
     }
 
-    protected void _reset() {
+    /* access modifiers changed from: protected */
+    public void _reset() {
         if (this._bufferTail != null) {
             this._freeBuffer = this._bufferTail.getData();
         }

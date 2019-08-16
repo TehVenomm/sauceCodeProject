@@ -17,23 +17,20 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public final class DateTypeAdapter extends TypeAdapter<Date> {
-    public static final TypeAdapterFactory FACTORY = new C06931();
+    public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+            if (typeToken.getRawType() == Date.class) {
+                return new DateTypeAdapter();
+            }
+            return null;
+        }
+    };
     private final DateFormat enUsFormat = DateFormat.getDateTimeInstance(2, 2, Locale.US);
     private final DateFormat iso8601Format = buildIso8601Format();
     private final DateFormat localFormat = DateFormat.getDateTimeInstance(2, 2);
 
-    /* renamed from: com.google.gson.internal.bind.DateTypeAdapter$1 */
-    static final class C06931 implements TypeAdapterFactory {
-        C06931() {
-        }
-
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-            return typeToken.getRawType() == Date.class ? new DateTypeAdapter() : null;
-        }
-    }
-
     private static DateFormat buildIso8601Format() {
-        DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return simpleDateFormat;
     }
@@ -49,7 +46,7 @@ public final class DateTypeAdapter extends TypeAdapter<Date> {
                 } catch (ParseException e2) {
                     try {
                         parse = this.iso8601Format.parse(str);
-                    } catch (Throwable e3) {
+                    } catch (ParseException e3) {
                         throw new JsonSyntaxException(str, e3);
                     }
                 }

@@ -35,7 +35,15 @@ public class BaseModel
 
 	public int tableManifestVersion;
 
+	public bool usageLimitMode;
+
 	public int infoError;
+
+	public bool appClose;
+
+	public string closedNotice = string.Empty;
+
+	public bool openRefundForm;
 
 	public XorInt vm = new XorInt(1);
 
@@ -57,12 +65,9 @@ public class BaseModel
 
 	public void Apply()
 	{
-		if (tutorial < 0)
+		if (tutorial >= 0)
 		{
-			goto IL_000c;
 		}
-		goto IL_000c;
-		IL_000c:
 		if (assetManifestVersion > 0 && MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ResourceManager>.I.manifestVersion = assetManifestVersion;
@@ -86,6 +91,13 @@ public class BaseModel
 		if (!string.IsNullOrEmpty(currentTime) && MonoBehaviourSingleton<TimeManager>.IsValid())
 		{
 			TimeManager.SetServerTime(currentTime);
+		}
+		if (MonoBehaviourSingleton<AccountManager>.IsValid())
+		{
+			MonoBehaviourSingleton<AccountManager>.I.appClose = appClose;
+			MonoBehaviourSingleton<AccountManager>.I.usageLimitMode = false;
+			MonoBehaviourSingleton<AccountManager>.I.closedNotice = closedNotice;
+			MonoBehaviourSingleton<AccountManager>.I.openRefundForm = openRefundForm;
 		}
 	}
 }

@@ -16,7 +16,7 @@ public class YesNoCloseDialog : CommonDialog
 		string[] msgs = data_object as string[];
 		SetupLabelText(msgs);
 		AutoUILayout();
-		SoundManager.PlaySystemSE(openingSound, 1f);
+		SoundManager.PlaySystemSE(openingSound);
 	}
 
 	protected void SetupLabelText(string[] _msgs)
@@ -24,7 +24,7 @@ public class YesNoCloseDialog : CommonDialog
 		string[] array = _msgs;
 		if (array == null || array.Length < 1)
 		{
-			array = GetTexts(_msgs, STRING_CATEGORY.COMMON_DIALOG);
+			array = GetTexts(_msgs);
 		}
 		int num = array.Length;
 		string text = (num <= 0) ? string.Empty : array[0];
@@ -59,7 +59,7 @@ public class YesNoCloseDialog : CommonDialog
 		{
 			int num = height - 100;
 			int height2 = GetHeight(UI.BG);
-			float num2 = (float)num;
+			float num2 = num;
 			Vector3 localScale = ctrl.get_localScale();
 			int height3 = height2 + (int)(num2 / localScale.y);
 			SetHeight((Enum)UI.BG, height3);

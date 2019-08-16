@@ -1,19 +1,24 @@
-package net.gogame.gowrap.ui.dpro.model.equipmentcollection;
+package net.gogame.gowrap.p019ui.dpro.model.equipmentcollection;
 
 import android.util.JsonReader;
 import java.io.IOException;
+import net.gogame.gowrap.p019ui.dpro.model.BaseResponse;
 import net.gogame.gowrap.support.StringUtils;
-import net.gogame.gowrap.ui.dpro.model.BaseResponse;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.equipmentcollection.EquipmentCollectionResponse */
 public class EquipmentCollectionResponse extends BaseResponse {
     private static final String KEY_EQUIPMENT_COLLECTION = "equipmentCollection";
     private EquipmentCollection equipmentCollection;
+
+    public EquipmentCollectionResponse() {
+    }
 
     public EquipmentCollectionResponse(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (!StringUtils.isEquals(str, KEY_EQUIPMENT_COLLECTION)) {
             return super.doParse(jsonReader, str);
         }
@@ -25,7 +30,7 @@ public class EquipmentCollectionResponse extends BaseResponse {
         return this.equipmentCollection;
     }
 
-    public void setEquipmentCollection(EquipmentCollection equipmentCollection) {
-        this.equipmentCollection = equipmentCollection;
+    public void setEquipmentCollection(EquipmentCollection equipmentCollection2) {
+        this.equipmentCollection = equipmentCollection2;
     }
 }

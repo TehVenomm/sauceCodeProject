@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.armory;
+package net.gogame.gowrap.p019ui.dpro.model.armory;
 
 import android.util.JsonReader;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.armory.Stats */
 public class Stats extends BaseJsonObject {
     private static final String KEY_ATK = "atk";
     private static final String KEY_DARK_ATK = "darkAtk";
@@ -30,7 +31,9 @@ public class Stats extends BaseJsonObject {
     private Long earthDef;
     private Long fireAtk;
     private Long fireDef;
-    private Long hp;
+
+    /* renamed from: hp */
+    private Long f1418hp;
     private Long iceAtk;
     private Long iceDef;
     private Long lightAtk;
@@ -38,11 +41,15 @@ public class Stats extends BaseJsonObject {
     private Long windAtk;
     private Long windDef;
 
+    public Stats() {
+    }
+
     public Stats(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_ATK)) {
             this.atk = JSONUtils.optLong(jsonReader);
             return true;
@@ -50,7 +57,7 @@ public class Stats extends BaseJsonObject {
             this.def = JSONUtils.optLong(jsonReader);
             return true;
         } else if (StringUtils.isEquals(str, KEY_HP)) {
-            this.hp = JSONUtils.optLong(jsonReader);
+            this.f1418hp = JSONUtils.optLong(jsonReader);
             return true;
         } else if (StringUtils.isEquals(str, KEY_FIRE_ATK)) {
             this.fireAtk = JSONUtils.optLong(jsonReader);
@@ -110,11 +117,11 @@ public class Stats extends BaseJsonObject {
     }
 
     public Long getHp() {
-        return this.hp;
+        return this.f1418hp;
     }
 
     public void setHp(Long l) {
-        this.hp = l;
+        this.f1418hp = l;
     }
 
     public Long getFireAtk() {

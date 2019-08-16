@@ -3,6 +3,7 @@ package com.fasterxml.jackson.databind.introspect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;

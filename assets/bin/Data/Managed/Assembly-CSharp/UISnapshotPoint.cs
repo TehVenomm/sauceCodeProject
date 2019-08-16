@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Internal/Snapshot Point")]
 [ExecuteInEditMode]
-public class UISnapshotPoint
+[AddComponentMenu("NGUI/Internal/Snapshot Point")]
+public class UISnapshotPoint : MonoBehaviour
 {
 	public bool isOrthographic = true;
 

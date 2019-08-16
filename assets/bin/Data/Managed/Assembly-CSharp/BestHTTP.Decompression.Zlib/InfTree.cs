@@ -28,8 +28,6 @@ namespace BestHTTP.Decompression.Zlib
 
 		internal const int fixed_bd = 5;
 
-		internal const int BMAX = 15;
-
 		internal static readonly int[] fixed_tl = new int[1536]
 		{
 			96,
@@ -1808,6 +1806,8 @@ namespace BestHTTP.Decompression.Zlib
 			13
 		};
 
+		internal const int BMAX = 15;
+
 		internal int[] hn;
 
 		internal int[] v;
@@ -1990,21 +1990,14 @@ namespace BestHTTP.Decompression.Zlib
 			initWorkArea(19);
 			hn[0] = 0;
 			int num = huft_build(c, 0, 19, 19, null, null, tb, bb, hp, hn, v);
-			switch (num)
+			if (num == -3)
 			{
-			case -3:
 				z.Message = "oversubscribed dynamic bit lengths tree";
-				break;
-			default:
-				if (bb[0] != 0)
-				{
-					break;
-				}
-				goto case -5;
-			case -5:
+			}
+			else if (num == -5 || bb[0] == 0)
+			{
 				z.Message = "incomplete dynamic bit lengths tree";
 				num = -3;
-				break;
 			}
 			return num;
 		}
@@ -2074,21 +2067,19 @@ namespace BestHTTP.Decompression.Zlib
 				r = new int[3];
 				u = new int[15];
 				x = new int[16];
+				return;
 			}
-			else
+			if (v.Length < vsize)
 			{
-				if (v.Length < vsize)
-				{
-					v = new int[vsize];
-				}
-				Array.Clear(v, 0, vsize);
-				Array.Clear(c, 0, 16);
-				r[0] = 0;
-				r[1] = 0;
-				r[2] = 0;
-				Array.Clear(u, 0, 15);
-				Array.Clear(x, 0, 16);
+				v = new int[vsize];
 			}
+			Array.Clear(v, 0, vsize);
+			Array.Clear(c, 0, 16);
+			r[0] = 0;
+			r[1] = 0;
+			r[2] = 0;
+			Array.Clear(u, 0, 15);
+			Array.Clear(x, 0, 16);
 		}
 	}
 }

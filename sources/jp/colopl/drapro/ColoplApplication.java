@@ -1,7 +1,6 @@
-package jp.colopl.drapro;
+package p018jp.colopl.drapro;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.Signature;
 import android.graphics.Picture;
 import android.location.Location;
@@ -20,24 +19,25 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
+import com.facebook.places.model.PlaceFields;
 import com.github.droidfu.DroidFuApplication;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.services.common.CommonUtils;
 import java.util.HashMap;
 import java.util.List;
-import jp.colopl.api.docomo.DoCoMoAPI;
-import jp.colopl.api.docomo.DoCoMoAsyncTask;
-import jp.colopl.api.docomo.DoCoMoAsyncTaskDelegate;
-import jp.colopl.api.docomo.DoCoMoLocationInfo;
-import jp.colopl.config.Config;
-import jp.colopl.libs.ColoplCellLocationListener;
-import jp.colopl.libs.ColoplCellLocationListenerCallback;
-import jp.colopl.libs.LocationExtras;
-import jp.colopl.util.AnalyticsUtil;
-import jp.colopl.util.LocationUtil;
-import jp.colopl.util.LogUtil;
-import jp.colopl.util.Util;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p018jp.colopl.api.docomo.DoCoMoAPI;
+import p018jp.colopl.api.docomo.DoCoMoAsyncTask;
+import p018jp.colopl.api.docomo.DoCoMoAsyncTaskDelegate;
+import p018jp.colopl.api.docomo.DoCoMoLocationInfo;
+import p018jp.colopl.config.Config;
+import p018jp.colopl.libs.ColoplCellLocationListener;
+import p018jp.colopl.libs.ColoplCellLocationListenerCallback;
+import p018jp.colopl.util.AnalyticsUtil;
+import p018jp.colopl.util.LocationUtil;
+import p018jp.colopl.util.LogUtil;
+import p018jp.colopl.util.Util;
 
+/* renamed from: jp.colopl.drapro.ColoplApplication */
 public class ColoplApplication extends DroidFuApplication implements LocationListener, ColoplCellLocationListenerCallback, DoCoMoAsyncTaskDelegate {
     public static final float ACCURACY_FOR_FIRST_CACHED_WIFI_LOCATION = 500.0f;
     static final String ACTION_CHANGED_LOCATION = "jp.colopl.action.CHANGED_LOCATION";
@@ -82,7 +82,7 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
     private Location latestCellBasedLocation;
     private Location latestLocation;
     private LocationManager locationManager;
-    private HashMap<String, Location> locations = new HashMap();
+    private HashMap<String, Location> locations = new HashMap<>();
     private AnalyticsUtil mAnalytics;
     private float maxAccuracy = Float.MAX_VALUE;
     private String maxAccuracyProvider;
@@ -155,7 +155,8 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
         return Secure.getInt(getContentResolver(), "mock_location", 0) == 1;
     }
 
-    protected void attachBaseContext(Context context) {
+    /* access modifiers changed from: protected */
+    public void attachBaseContext(Context context) {
         super.attachBaseContext(context);
         MultiDex.install(this);
     }
@@ -225,11 +226,11 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
     }
 
     public boolean isCarrierDoCoMo() {
-        return ((TelephonyManager) getSystemService("phone")).getNetworkOperatorName().toUpperCase().indexOf("DOCOMO") != -1;
+        return ((TelephonyManager) getSystemService(PlaceFields.PHONE)).getNetworkOperatorName().toUpperCase().indexOf("DOCOMO") != -1;
     }
 
     public boolean isCarrierSoftBank() {
-        return ((TelephonyManager) getSystemService("phone")).getNetworkOperatorName().toUpperCase().indexOf("SOFTBANK") != -1;
+        return ((TelephonyManager) getSystemService(PlaceFields.PHONE)).getNetworkOperatorName().toUpperCase().indexOf("SOFTBANK") != -1;
     }
 
     public boolean isFirstLaunch() {
@@ -254,21 +255,17 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
     }
 
     public boolean isReleaseBuild() {
-        int i = 0;
         if (isRelease != null) {
             return isRelease.booleanValue();
         }
         isRelease = Boolean.valueOf(false);
         try {
-            Signature[] signatureArr = getPackageManager().getPackageInfo(getPackageName(), 64).signatures;
-            int length = signatureArr.length;
-            while (i < length) {
-                if (signatureArr[i].hashCode() == HASH_OF_SIG_RELEASE) {
+            for (Signature hashCode : getPackageManager().getPackageInfo(getPackageName(), 64).signatures) {
+                if (hashCode.hashCode() == HASH_OF_SIG_RELEASE) {
                     isRelease = Boolean.valueOf(true);
                 }
-                i++;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             Log.w("Exception thrown when detecting if app is signed by a release keystore.", e);
             isRelease = Boolean.valueOf(true);
         }
@@ -306,118 +303,178 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
         }
     }
 
-    public void onLocationChanged(Location location) {
-        boolean equals;
-        boolean equals2;
-        boolean isCellbasedLocation;
-        boolean z;
-        Object obj;
-        boolean z2 = true;
-        boolean z3 = false;
-        LogUtil.m745v(TAG, "onLocationChanged = " + location.toString());
-        String provider = location.getProvider();
-        if (provider != null) {
-            equals = provider.equals("gps");
-            equals2 = provider.equals("network");
-            isCellbasedLocation = LocationUtil.isCellbasedLocation(location);
-        } else {
-            isCellbasedLocation = false;
-            equals = false;
-            equals2 = false;
-        }
-        LocationExtras locationExtras = new LocationExtras();
-        if (equals2) {
-            locationExtras.setLocation(location);
-            if (this.firstNetworkLocation == null) {
-                if (locationExtras.getLocationSource() == 2 && locationExtras.getLocationType() == 2 && location.hasAccuracy() && location.getAccuracy() < 500.0f) {
-                    location.setAccuracy(500.0f);
-                    LogUtil.m745v(TAG, "First Cached/Wifi Location. set Accuracyt to 500.0");
-                    z = true;
-                } else {
-                    z = false;
-                }
-                LogUtil.m745v(TAG, "First Network Location");
-                this.firstNetworkLocation = location;
-                if (isCellbasedLocation) {
-                    LogUtil.m745v(TAG, "Cell based location (*" + this.receiveCdmaCellLocationCount + ")");
-                    this.latestCellBasedLocation = location;
-                    z2 = false;
-                } else if (equals) {
-                    LogUtil.m745v(TAG, "Force To Update");
-                    LogUtil.m745v(TAG, "Available Location");
-                } else if (equals2) {
-                    z2 = false;
-                } else if (this.previousNWLocation == null && LocationUtil.isSameLatLon(location, this.previousNWLocation, false)) {
-                    this.sameLocationCount++;
-                    if (this.sameLocationCount < 3 || this.latestCellBasedLocation == null) {
-                        LogUtil.m745v(TAG, "Same location count up (" + this.sameLocationCount + ")");
-                        return;
-                    } else {
-                        LogUtil.m745v(TAG, "Same location. Use CellBasedLocation");
-                        obj = this.latestCellBasedLocation;
-                    }
-                } else {
-                    if (location == this.firstNetworkLocation) {
-                        LogUtil.m745v(TAG, "Through Update Check");
-                        isCellbasedLocation = true;
-                    } else {
-                        isCellbasedLocation = false;
-                    }
-                    this.sameLocationCount = 0;
-                    this.previousNWLocation = location;
-                    LogUtil.m745v(TAG, "Available Location");
-                    z2 = false;
-                    z3 = isCellbasedLocation;
-                }
-                if (updateLocation(obj, z2, z3)) {
-                    LogUtil.m745v(TAG, "Update Location");
-                    this.locations.put(provider, obj);
-                    Intent intent = new Intent(ACTION_CHANGED_LOCATION);
-                    intent.putExtra("location", obj);
-                    intent.putExtra(UPDATE_LOCATION_KEY_FORCE_TO_UPDATE, z2);
-                    intent.putExtra(UPDATE_LOCATION_KEY_DOUBTFUL_LOCATION, z);
-                    intent.putExtra(UPDATE_LOCATION_KEY_ADOPT_LATTER_LOCATION, z3);
-                    sendBroadcast(intent);
-                    this.latestLocation = obj;
-                }
-            }
-        }
-        z = false;
-        if (isCellbasedLocation) {
-            LogUtil.m745v(TAG, "Cell based location (*" + this.receiveCdmaCellLocationCount + ")");
-            this.latestCellBasedLocation = location;
-            z2 = false;
-        } else if (equals) {
-            LogUtil.m745v(TAG, "Force To Update");
-            LogUtil.m745v(TAG, "Available Location");
-        } else if (equals2) {
-            z2 = false;
-        } else {
-            if (this.previousNWLocation == null) {
-            }
-            if (location == this.firstNetworkLocation) {
-                isCellbasedLocation = false;
-            } else {
-                LogUtil.m745v(TAG, "Through Update Check");
-                isCellbasedLocation = true;
-            }
-            this.sameLocationCount = 0;
-            this.previousNWLocation = location;
-            LogUtil.m745v(TAG, "Available Location");
-            z2 = false;
-            z3 = isCellbasedLocation;
-        }
-        if (updateLocation(obj, z2, z3)) {
-            LogUtil.m745v(TAG, "Update Location");
-            this.locations.put(provider, obj);
-            Intent intent2 = new Intent(ACTION_CHANGED_LOCATION);
-            intent2.putExtra("location", obj);
-            intent2.putExtra(UPDATE_LOCATION_KEY_FORCE_TO_UPDATE, z2);
-            intent2.putExtra(UPDATE_LOCATION_KEY_DOUBTFUL_LOCATION, z);
-            intent2.putExtra(UPDATE_LOCATION_KEY_ADOPT_LATTER_LOCATION, z3);
-            sendBroadcast(intent2);
-            this.latestLocation = obj;
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:18:0x0075  */
+    /* JADX WARNING: Removed duplicated region for block: B:21:0x009f  */
+    /* JADX WARNING: Removed duplicated region for block: B:22:0x00cc  */
+    /* JADX WARNING: Removed duplicated region for block: B:45:? A[RETURN, SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public void onLocationChanged(android.location.Location r11) {
+        /*
+            r10 = this;
+            r9 = 2
+            r8 = 1140457472(0x43fa0000, float:500.0)
+            r5 = 1
+            r1 = 0
+            java.lang.String r0 = "ColoplApplication"
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder
+            r2.<init>()
+            java.lang.String r3 = "onLocationChanged = "
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r3 = r11.toString()
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r2 = r2.toString()
+            p018jp.colopl.util.LogUtil.m758v(r0, r2)
+            java.lang.String r6 = r11.getProvider()
+            if (r6 == 0) goto L_0x014d
+            java.lang.String r0 = "gps"
+            boolean r0 = r6.equals(r0)
+            java.lang.String r2 = "network"
+            boolean r3 = r6.equals(r2)
+            boolean r2 = p018jp.colopl.util.LocationUtil.isCellbasedLocation(r11)
+        L_0x0037:
+            jp.colopl.libs.LocationExtras r4 = new jp.colopl.libs.LocationExtras
+            r4.<init>()
+            if (r3 == 0) goto L_0x014a
+            r4.setLocation(r11)
+            android.location.Location r7 = r10.firstNetworkLocation
+            if (r7 != 0) goto L_0x014a
+            int r7 = r4.getLocationSource()
+            if (r7 != r9) goto L_0x0147
+            int r4 = r4.getLocationType()
+            if (r4 != r9) goto L_0x0147
+            boolean r4 = r11.hasAccuracy()
+            if (r4 == 0) goto L_0x0147
+            float r4 = r11.getAccuracy()
+            int r4 = (r4 > r8 ? 1 : (r4 == r8 ? 0 : -1))
+            if (r4 >= 0) goto L_0x0147
+            r11.setAccuracy(r8)
+            java.lang.String r4 = "ColoplApplication"
+            java.lang.String r7 = "First Cached/Wifi Location. set Accuracyt to 500.0"
+            p018jp.colopl.util.LogUtil.m758v(r4, r7)
+            r4 = r5
+        L_0x006a:
+            java.lang.String r7 = "ColoplApplication"
+            java.lang.String r8 = "First Network Location"
+            p018jp.colopl.util.LogUtil.m758v(r7, r8)
+            r10.firstNetworkLocation = r11
+        L_0x0073:
+            if (r2 == 0) goto L_0x00cc
+            java.lang.String r0 = "ColoplApplication"
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder
+            r2.<init>()
+            java.lang.String r3 = "Cell based location (*"
+            java.lang.StringBuilder r2 = r2.append(r3)
+            int r3 = r10.receiveCdmaCellLocationCount
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r3 = ")"
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r2 = r2.toString()
+            p018jp.colopl.util.LogUtil.m758v(r0, r2)
+            r10.latestCellBasedLocation = r11
+            r0 = r1
+            r5 = r1
+        L_0x0099:
+            boolean r1 = r10.updateLocation(r11, r5, r0)
+            if (r1 == 0) goto L_0x00cb
+            java.lang.String r1 = "ColoplApplication"
+            java.lang.String r2 = "Update Location"
+            p018jp.colopl.util.LogUtil.m758v(r1, r2)
+            java.util.HashMap<java.lang.String, android.location.Location> r1 = r10.locations
+            r1.put(r6, r11)
+            android.content.Intent r1 = new android.content.Intent
+            java.lang.String r2 = "jp.colopl.action.CHANGED_LOCATION"
+            r1.<init>(r2)
+            java.lang.String r2 = "location"
+            r1.putExtra(r2, r11)
+            java.lang.String r2 = "force"
+            r1.putExtra(r2, r5)
+            java.lang.String r2 = "doubt"
+            r1.putExtra(r2, r4)
+            java.lang.String r2 = "adopt"
+            r1.putExtra(r2, r0)
+            r10.sendBroadcast(r1)
+            r10.latestLocation = r11
+        L_0x00cb:
+            return
+        L_0x00cc:
+            if (r0 == 0) goto L_0x00de
+            java.lang.String r0 = "ColoplApplication"
+            java.lang.String r2 = "Force To Update"
+            p018jp.colopl.util.LogUtil.m758v(r0, r2)
+            java.lang.String r0 = "ColoplApplication"
+            java.lang.String r2 = "Available Location"
+            p018jp.colopl.util.LogUtil.m758v(r0, r2)
+            r0 = r1
+            goto L_0x0099
+        L_0x00de:
+            if (r3 == 0) goto L_0x0143
+            android.location.Location r0 = r10.previousNWLocation
+            if (r0 == 0) goto L_0x0127
+            android.location.Location r0 = r10.previousNWLocation
+            boolean r0 = p018jp.colopl.util.LocationUtil.isSameLatLon(r11, r0, r1)
+            if (r0 == 0) goto L_0x0127
+            int r0 = r10.sameLocationCount
+            int r0 = r0 + 1
+            r10.sameLocationCount = r0
+            int r0 = r10.sameLocationCount
+            r2 = 3
+            if (r0 < r2) goto L_0x0106
+            android.location.Location r0 = r10.latestCellBasedLocation
+            if (r0 == 0) goto L_0x0106
+            java.lang.String r0 = "ColoplApplication"
+            java.lang.String r2 = "Same location. Use CellBasedLocation"
+            p018jp.colopl.util.LogUtil.m758v(r0, r2)
+            android.location.Location r11 = r10.latestCellBasedLocation
+            r0 = r1
+            goto L_0x0099
+        L_0x0106:
+            java.lang.String r0 = "ColoplApplication"
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r2 = "Same location count up ("
+            java.lang.StringBuilder r1 = r1.append(r2)
+            int r2 = r10.sameLocationCount
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r2 = ")"
+            java.lang.StringBuilder r1 = r1.append(r2)
+            java.lang.String r1 = r1.toString()
+            p018jp.colopl.util.LogUtil.m758v(r0, r1)
+            goto L_0x00cb
+        L_0x0127:
+            android.location.Location r0 = r10.firstNetworkLocation
+            if (r11 == r0) goto L_0x0141
+            java.lang.String r0 = "ColoplApplication"
+            java.lang.String r2 = "Through Update Check"
+            p018jp.colopl.util.LogUtil.m758v(r0, r2)
+            r0 = r5
+        L_0x0133:
+            r10.sameLocationCount = r1
+            r10.previousNWLocation = r11
+            java.lang.String r2 = "ColoplApplication"
+            java.lang.String r3 = "Available Location"
+            p018jp.colopl.util.LogUtil.m758v(r2, r3)
+            r5 = r1
+            goto L_0x0099
+        L_0x0141:
+            r0 = r1
+            goto L_0x0133
+        L_0x0143:
+            r0 = r1
+            r5 = r1
+            goto L_0x0099
+        L_0x0147:
+            r4 = r1
+            goto L_0x006a
+        L_0x014a:
+            r4 = r1
+            goto L_0x0073
+        L_0x014d:
+            r0 = r1
+            r2 = r1
+            r3 = r1
+            goto L_0x0037
+        */
+        throw new UnsupportedOperationException("Method not decompiled: p018jp.colopl.drapro.ColoplApplication.onLocationChanged(android.location.Location):void");
     }
 
     public void onProviderDisabled(String str) {
@@ -428,9 +485,8 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
 
     public void onStatusChanged(String str, int i, Bundle bundle) {
         if (str.equals("network")) {
-            if (i == 0 || i != 1) {
-            }
-        } else if (i == 0) {
+        }
+        if (i != 0 && i == 1) {
         }
     }
 
@@ -493,7 +549,7 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
     }
 
     public int startLocationMeasurement() {
-        boolean z = true;
+        int i = 1;
         if (allowMockLocation()) {
             Toast.makeText(this, getResources().getIdentifier("mock_location_not_allowed", "string", getPackageName()), 1).show();
             this.maxAccuracy = Float.MAX_VALUE;
@@ -508,11 +564,11 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
             }
         } else if (!isAnyLocationProviderEnabled()) {
             if (isAvailableDoCoMoAPI()) {
-                z = true;
+                i = 3;
             } else if (!isAUDevice()) {
                 return -1;
             } else {
-                z = true;
+                i = 2;
             }
         }
         this.maxAccuracy = Float.MAX_VALUE;
@@ -529,8 +585,8 @@ public class ColoplApplication extends DroidFuApplication implements LocationLis
         this.receiveCdmaCellLocationCount = 0;
         ColoplCellLocationListener.startListenCellLocationChange(this, getColoplCellLocationListener());
         requestDoCoMoLocationInfo();
-        LogUtil.m745v(TAG, "----- startLocationMeasurement -----");
-        return z;
+        LogUtil.m758v(TAG, "----- startLocationMeasurement -----");
+        return i;
     }
 
     public void stopLocationMeasurement(boolean z) {

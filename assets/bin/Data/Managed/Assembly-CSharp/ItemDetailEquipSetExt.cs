@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class ItemDetailEquipSetExt : GameSection
 {
@@ -42,8 +43,24 @@ public class ItemDetailEquipSetExt : GameSection
 		int num2 = 0;
 		num = itemInfo.tableData.enemyIconID;
 		num2 = itemInfo.tableData.enemyIconID2;
+		ITEM_ICON_TYPE iconType = data.GetIconType();
+		int iconID = data.GetIconID();
+		RARITY_TYPE? rarity = data.GetRarity();
+		Transform ctrl = GetCtrl(UI.OBJ_ICON_ROOT);
+		ELEMENT_TYPE iconElement = data.GetIconElement();
+		EQUIPMENT_TYPE? iconMagiEnableType = data.GetIconMagiEnableType();
+		int num3 = -1;
+		string event_name = null;
+		int event_data = 0;
+		bool is_new = false;
+		int toggle_group = -1;
+		bool is_select = false;
+		string icon_under_text = null;
+		bool is_equipping = false;
+		int enemy_icon_id = num;
+		int enemy_icon_id2 = num2;
 		GET_TYPE getType = data.GetGetType();
-		ItemIcon.Create(data.GetIconType(), data.GetIconID(), data.GetRarity(), GetCtrl(UI.OBJ_ICON_ROOT), data.GetIconElement(), data.GetIconMagiEnableType(), -1, null, 0, false, -1, false, null, false, num, num2, false, getType);
+		ItemIcon.Create(iconType, iconID, rarity, ctrl, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
 	}
 
 	public void OnQuery_USE()
@@ -52,21 +69,19 @@ public class ItemDetailEquipSetExt : GameSection
 		ServerConstDefine constDefine = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine;
 		if (MonoBehaviourSingleton<StatusManager>.I.EquipSetNum() >= constDefine.EQUIP_SET_EXT_MAX)
 		{
-			GameSection.ChangeEvent("OVER", null);
+			GameSection.ChangeEvent("OVER");
+			return;
 		}
-		else
+		int num = MonoBehaviourSingleton<StatusManager>.I.EquipSetNum();
+		int num2 = num + constDefine.INVENTORY_EXTEND_EQUIP_SET;
+		equipSetExtEventData = new object[3]
 		{
-			int num = MonoBehaviourSingleton<StatusManager>.I.EquipSetNum();
-			int num2 = num + constDefine.INVENTORY_EXTEND_EQUIP_SET;
-			equipSetExtEventData = new object[3]
-			{
-				data.GetName(),
-				num.ToString(),
-				num2.ToString()
-			};
-			GameSection.SetEventData(equipSetExtEventData);
-			GameSection.ChangeEvent("EXTEND", null);
-		}
+			data.GetName(),
+			num.ToString(),
+			num2.ToString()
+		};
+		GameSection.SetEventData(equipSetExtEventData);
+		GameSection.ChangeEvent("EXTEND");
 	}
 
 	protected void OnQuery_ItemDetailEquipSetExtConfirm_YES()
@@ -90,7 +105,7 @@ public class ItemDetailEquipSetExt : GameSection
 					}
 					MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(NOTIFY_FLAG.UPDATE_EQUIP_SET_INFO);
 				}
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 	}
@@ -99,7 +114,7 @@ public class ItemDetailEquipSetExt : GameSection
 	{
 		if (!CanSell())
 		{
-			GameSection.ChangeEvent("NOT_SELL", null);
+			GameSection.ChangeEvent("NOT_SELL");
 		}
 		GameSection.SetEventData(data);
 	}

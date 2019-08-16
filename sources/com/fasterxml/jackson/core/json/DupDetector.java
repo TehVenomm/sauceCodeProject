@@ -59,7 +59,7 @@ public class DupDetector {
                 return true;
             } else {
                 if (this._seen == null) {
-                    this._seen = new HashSet(16);
+                    this._seen = new HashSet<>(16);
                     this._seen.add(this._firstName);
                     this._seen.add(this._secondName);
                 }

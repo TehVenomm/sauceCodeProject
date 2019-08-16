@@ -5,10 +5,11 @@ import java.lang.reflect.TypeVariable;
 import org.apache.commons.lang3.Validate;
 
 public abstract class TypeLiteral<T> implements Typed<T> {
+
     /* renamed from: T */
-    private static final TypeVariable<Class<TypeLiteral>> f1350T = TypeLiteral.class.getTypeParameters()[0];
+    private static final TypeVariable<Class<TypeLiteral>> f1424T = TypeLiteral.class.getTypeParameters()[0];
     private final String toString = String.format("%s<%s>", new Object[]{TypeLiteral.class.getSimpleName(), TypeUtils.toString(this.value)});
-    public final Type value = ((Type) Validate.notNull(TypeUtils.getTypeArguments(getClass(), TypeLiteral.class).get(f1350T), "%s does not assign type parameter %s", getClass(), TypeUtils.toLongString(f1350T)));
+    public final Type value = ((Type) Validate.notNull(TypeUtils.getTypeArguments(getClass(), TypeLiteral.class).get(f1424T), "%s does not assign type parameter %s", getClass(), TypeUtils.toLongString(f1424T)));
 
     protected TypeLiteral() {
     }

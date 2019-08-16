@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/UI/Tooltip")]
-public class UITooltip
+public class UITooltip : MonoBehaviour
 {
 	protected static UITooltip mInstance;
 
@@ -51,11 +51,8 @@ public class UITooltip
 
 	protected virtual void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		mTrans = this.get_transform();
 		mWidgets = this.GetComponentsInChildren<UIWidget>();
 		mPos = mTrans.get_localPosition();
@@ -127,8 +124,6 @@ public class UITooltip
 		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Expected O, but got Unknown
 		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
@@ -138,7 +133,6 @@ public class UITooltip
 		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0287: Unknown result type (might be due to invalid IL or missing references)
@@ -152,17 +146,21 @@ public class UITooltip
 			mTooltip = UICamera.tooltipObject;
 			text.text = tooltipText;
 			mPos = Vector2.op_Implicit(UICamera.lastEventPosition);
-			Transform val = text.get_transform();
-			Vector3 localPosition = val.get_localPosition();
-			Vector3 localScale = val.get_localScale();
+			Transform transform = text.get_transform();
+			Vector3 localPosition = transform.get_localPosition();
+			Vector3 localScale = transform.get_localScale();
 			mSize = Vector2.op_Implicit(text.printedSize);
-			mSize.x *= localScale.x;
-			mSize.y *= localScale.y;
+			ref Vector3 reference = ref mSize;
+			reference.x *= localScale.x;
+			ref Vector3 reference2 = ref mSize;
+			reference2.y *= localScale.y;
 			if (background != null)
 			{
 				Vector4 border = background.border;
-				mSize.x += border.x + border.z + (localPosition.x - border.x) * 2f;
-				mSize.y += border.y + border.w + (0f - localPosition.y - border.y) * 2f;
+				ref Vector3 reference3 = ref mSize;
+				reference3.x += border.x + border.z + (localPosition.x - border.x) * 2f;
+				ref Vector3 reference4 = ref mSize;
+				reference4.y += border.y + border.w + (0f - localPosition.y - border.y) * 2f;
 				background.width = Mathf.RoundToInt(mSize.x);
 				background.height = Mathf.RoundToInt(mSize.y);
 			}
@@ -174,10 +172,10 @@ public class UITooltip
 				Vector3 lossyScale = mTrans.get_parent().get_lossyScale();
 				float num = orthographicSize / lossyScale.y;
 				float num2 = (float)Screen.get_height() * 0.5f / num;
-				Vector2 val2 = default(Vector2);
-				val2._002Ector(num2 * mSize.x / (float)Screen.get_width(), num2 * mSize.y / (float)Screen.get_height());
-				mPos.x = Mathf.Min(mPos.x, 1f - val2.x);
-				mPos.y = Mathf.Max(mPos.y, val2.y);
+				Vector2 val = default(Vector2);
+				val._002Ector(num2 * mSize.x / (float)Screen.get_width(), num2 * mSize.y / (float)Screen.get_height());
+				mPos.x = Mathf.Min(mPos.x, 1f - val.x);
+				mPos.y = Mathf.Max(mPos.y, val.y);
 				mTrans.set_position(uiCamera.ViewportToWorldPoint(mPos));
 				mPos = mTrans.get_localPosition();
 				mPos.x = Mathf.Round(mPos.x);
@@ -194,8 +192,10 @@ public class UITooltip
 				{
 					mPos.y = mSize.y;
 				}
-				mPos.x -= (float)Screen.get_width() * 0.5f;
-				mPos.y -= (float)Screen.get_height() * 0.5f;
+				ref Vector3 reference5 = ref mPos;
+				reference5.x -= (float)Screen.get_width() * 0.5f;
+				ref Vector3 reference6 = ref mPos;
+				reference6.y -= (float)Screen.get_height() * 0.5f;
 			}
 		}
 		else

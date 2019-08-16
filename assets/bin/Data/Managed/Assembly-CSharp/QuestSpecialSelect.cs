@@ -151,7 +151,10 @@ public class QuestSpecialSelect : GameSection
 		SPR_NEW_AREA,
 		GRD_AREA,
 		OBJ_DELIVERY_BAR,
-		OBJ_AREA_BAR
+		OBJ_AREA_BAR,
+		LBL_DELIVERY_NUM,
+		LBL_DELIVERY_REST,
+		SCR_AREA
 	}
 
 	public enum SHOW_MODE
@@ -169,25 +172,24 @@ public class QuestSpecialSelect : GameSection
 
 		public bool cleared;
 
-		public AreaQuestInfo(RegionTable.Data data, Texture2D tex, bool cleared)
+		public bool opened;
+
+		public AreaQuestInfo(RegionTable.Data data, Texture2D tex, bool cleared, bool opened)
 		{
 			regionData = data;
 			bannerTex = tex;
 			this.cleared = cleared;
+			this.opened = opened;
 		}
 	}
+
+	protected SHOW_MODE showMode;
 
 	private const string SPR_QUEST_TAB_TEXT = "QuestTabBtnText";
 
 	private const string SPR_QUEST_TAB_ICON = "QuestTabBtnIcon";
 
 	private const string SPR_QUEST_TAB_BASE = "QuestTabBtnBase";
-
-	private const string spriteTabName_ON = "PickeShopBtn_Green_on";
-
-	private const string spriteTabName_OFF = "PickeShopBtn_Normal_off";
-
-	protected SHOW_MODE showMode;
 
 	private readonly string[] SPR_INDEX = new string[3]
 	{
@@ -225,6 +227,10 @@ public class QuestSpecialSelect : GameSection
 		"RequestPlate_Hard",
 		"RequestPlate_SubEvent"
 	};
+
+	private const string spriteTabName_ON = "PickeShopBtn_Green_on";
+
+	private const string spriteTabName_OFF = "PickeShopBtn_Normal_off";
 
 	private QuestInfoData[] questInfo;
 
@@ -282,6 +288,10 @@ public class QuestSpecialSelect : GameSection
 
 	private uint[] openRegionIds;
 
+	private uint[] validRegionIds;
+
+	protected int releaseRegionId = -1;
+
 	protected bool changeToDeliveryClearEvent;
 
 	public override IEnumerable<string> requireDataTable
@@ -295,7 +305,6 @@ public class QuestSpecialSelect : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		isInGameScene = (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene");
 		this.StartCoroutine(DoInitialize());
 	}
@@ -310,22 +319,30 @@ public class QuestSpecialSelect : GameSection
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_complete");
 			MonoBehaviourSingleton<QuestManager>.I.SendGetDeliveryList(delegate
 			{
-				((_003CDoInitialize_003Ec__IteratorB2)/*Error near IL_007a: stateMachine*/)._003Cis_recv_delivery_003E__1 = true;
+				is_recv_delivery = true;
 			});
 			while (!is_recv_delivery)
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.QUEST, SortSettings.SETTINGS_TYPE.ORDER_QUEST);
 			InitQuestInfoData();
 			if (load_queue.IsLoading())
 			{
-				yield return (object)load_queue.Wait();
+				yield return load_queue.Wait();
 			}
 		}
 		GetDeliveryList();
-		string tab = GameSection.GetEventData() as string;
-		switch (tab)
+		bool is_recv_delivery2 = false;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendEventNormalList(delegate
+		{
+			is_recv_delivery2 = true;
+		});
+		while (!is_recv_delivery2)
+		{
+			yield return null;
+		}
+		switch (GameSection.GetEventData() as string)
 		{
 		case "DAILY":
 			selectedTab = UI.BTN_TAB_DAILY;
@@ -341,15 +358,25 @@ public class QuestSpecialSelect : GameSection
 			break;
 		}
 		openRegionIds = MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE.NORMAL);
-		Array.Reverse(openRegionIds);
-		for (int i = 0; i < openRegionIds.Length; i++)
+		validRegionIds = MonoBehaviourSingleton<WorldMapManager>.I.GetValidRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE.NORMAL);
+		Array.Reverse(validRegionIds);
+		for (int i = 0; i < validRegionIds.Length; i++)
 		{
-			int regionId = (int)openRegionIds[i];
-			string bannerName = ResourceName.GetAreaBanner(regionId);
-			LoadObject bannerObj = load_queue.Load(RESOURCE_CATEGORY.AREA_BANNER, bannerName, false);
+			int regionId = (int)validRegionIds[i];
+			LoadObject bannerObj;
+			if (MonoBehaviourSingleton<WorldMapManager>.I.IsOpenRegion((uint)regionId))
+			{
+				string bannerName2 = ResourceName.GetAreaBanner(regionId);
+				bannerObj = load_queue.Load(RESOURCE_CATEGORY.AREA_BANNER, bannerName2);
+			}
+			else
+			{
+				string bannerName2 = ResourceName.GetCloseAreaBanner(regionId);
+				bannerObj = load_queue.Load(RESOURCE_CATEGORY.AREA_BANNER_CLOSE, bannerName2);
+			}
 			if (load_queue.IsLoading())
 			{
-				yield return (object)load_queue.Wait();
+				yield return load_queue.Wait();
 			}
 			Texture2D bannerTex = bannerObj.loadedObject as Texture2D;
 			areaBanners.Add(bannerTex);
@@ -416,10 +443,10 @@ public class QuestSpecialSelect : GameSection
 		{
 			ShowSelectUI();
 			UpdateAnchors();
-			SetBadge((Enum)UI.BTN_EVENT, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(), 1, 24, -10, true);
-			SetBadge((Enum)UI.BTN_TAB_NORMAL, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(TAB_TYPES[0]), 3, -10, -10, true);
-			SetBadge((Enum)UI.BTN_TAB_DAILY, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(TAB_TYPES[1]), 3, -10, -10, true);
-			SetBadge((Enum)UI.BTN_TAB_WEEKLY, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(TAB_TYPES[2]), 3, -10, -10, true);
+			SetBadge((Enum)UI.BTN_EVENT, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(), 1, 24, -10, is_scale_normalize: true);
+			SetBadge((Enum)UI.BTN_TAB_NORMAL, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(TAB_TYPES[0]), 3, -10, -10, is_scale_normalize: true);
+			SetBadge((Enum)UI.BTN_TAB_DAILY, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(TAB_TYPES[1]), 3, -10, -10, is_scale_normalize: true);
+			SetBadge((Enum)UI.BTN_TAB_WEEKLY, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(TAB_TYPES[2]), 3, -10, -10, is_scale_normalize: true);
 			SetNew(UI.BTN_TAB_DAILY, GameSaveData.instance.IsRecommendedDailyDeliveryCheck());
 			SetNew(UI.BTN_TAB_WEEKLY, GameSaveData.instance.IsRecommendedWeeklyDeliveryCheck());
 		}
@@ -434,13 +461,12 @@ public class QuestSpecialSelect : GameSection
 	{
 		if (!isInGameScene && HomeTutorialManager.DoesTutorial())
 		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep2_1", null);
+			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep2_1");
 		}
 	}
 
 	protected void SetupDeliveryListItem(Transform t, DeliveryTable.DeliveryData info)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		QuestRequestItem questRequestItem = t.GetComponent<QuestRequestItem>();
 		if (questRequestItem == null)
 		{
@@ -467,20 +493,20 @@ public class QuestSpecialSelect : GameSection
 		SetActive((Enum)UI.OBJ_DELIVERY_ROOT, showMode == SHOW_MODE.DELIVERY);
 		SetActive((Enum)UI.OBJ_QUEST_ROOT, showMode == SHOW_MODE.QUEST);
 		SetActive((Enum)UI.OBJ_ORDER_ROOT, showMode == SHOW_MODE.ORDER);
-		SetButtonSprite((Enum)UI.BTN_DELIVERY, "QuestTabBtnBase" + SPR_ON_OFF[num2], true);
+		SetButtonSprite((Enum)UI.BTN_DELIVERY, "QuestTabBtnBase" + SPR_ON_OFF[num2], with_press: true);
 		SetSprite((Enum)UI.SPR_DELIVERY_TEXT, "QuestTabBtnText" + SPR_INDEX[0] + SPR_ON_OFF[num2]);
 		SetSprite((Enum)UI.SPR_DELIVERY_ICON, "QuestTabBtnIcon" + SPR_INDEX[0] + SPR_ON_OFF[num2]);
-		SetButtonSprite((Enum)UI.BTN_QUEST, "QuestTabBtnBase" + SPR_ON_OFF[num3], true);
+		SetButtonSprite((Enum)UI.BTN_QUEST, "QuestTabBtnBase" + SPR_ON_OFF[num3], with_press: true);
 		SetSprite((Enum)UI.SPR_QUEST_TEXT, "QuestTabBtnText" + SPR_INDEX[1] + SPR_ON_OFF[num3]);
 		SetSprite((Enum)UI.SPR_QUEST_ICON, "QuestTabBtnIcon" + SPR_INDEX[1] + SPR_ON_OFF[num3]);
-		SetButtonSprite((Enum)UI.BTN_ORDER, "QuestTabBtnBase" + SPR_ON_OFF[num4], true);
+		SetButtonSprite((Enum)UI.BTN_ORDER, "QuestTabBtnBase" + SPR_ON_OFF[num4], with_press: true);
 		SetSprite((Enum)UI.SPR_ORDER_TEXT, "QuestTabBtnText" + SPR_INDEX[2] + SPR_ON_OFF[num4]);
 		SetSprite((Enum)UI.SPR_ORDER_ICON, "QuestTabBtnIcon" + SPR_INDEX[2] + SPR_ON_OFF[num4]);
 		if (!TutorialStep.HasQuestSpecialUnlocked())
 		{
-			SetButtonEnabled((Enum)UI.BTN_QUEST, false);
-			SetButtonEnabled((Enum)UI.BTN_ORDER, false);
-			SetActive((Enum)UI.BTN_EVENT, false);
+			SetButtonEnabled((Enum)UI.BTN_QUEST, is_enabled: false);
+			SetButtonEnabled((Enum)UI.BTN_ORDER, is_enabled: false);
+			SetActive((Enum)UI.BTN_EVENT, is_visible: false);
 		}
 		if (!isInGameScene)
 		{
@@ -493,9 +519,12 @@ public class QuestSpecialSelect : GameSection
 			SetActive((Enum)UI.SPR_TAB_NORMAL, UI.BTN_TAB_NORMAL == selectedTab);
 			SetActive((Enum)UI.SPR_TAB_DAILY, UI.BTN_TAB_DAILY == selectedTab);
 			SetActive((Enum)UI.SPR_TAB_WEEKLY, UI.BTN_TAB_WEEKLY == selectedTab);
-			SetButtonSprite((Enum)UI.BTN_TAB_NORMAL, (selectedTab != UI.BTN_TAB_NORMAL) ? "PickeShopBtn_Normal_off" : "PickeShopBtn_Green_on", false);
-			SetButtonSprite((Enum)UI.BTN_TAB_DAILY, (selectedTab != UI.BTN_TAB_DAILY) ? "PickeShopBtn_Normal_off" : "PickeShopBtn_Green_on", false);
-			SetButtonSprite((Enum)UI.BTN_TAB_WEEKLY, (selectedTab != UI.BTN_TAB_WEEKLY) ? "PickeShopBtn_Normal_off" : "PickeShopBtn_Green_on", false);
+			SetButtonSprite((Enum)UI.BTN_TAB_NORMAL, (selectedTab != UI.BTN_TAB_NORMAL) ? "PickeShopBtn_Normal_off" : "PickeShopBtn_Green_on", with_press: false);
+			SetButtonSprite((Enum)UI.BTN_TAB_DAILY, (selectedTab != UI.BTN_TAB_DAILY) ? "PickeShopBtn_Normal_off" : "PickeShopBtn_Green_on", with_press: false);
+			SetButtonSprite((Enum)UI.BTN_TAB_WEEKLY, (selectedTab != UI.BTN_TAB_WEEKLY) ? "PickeShopBtn_Normal_off" : "PickeShopBtn_Green_on", with_press: false);
+			GetCtrl(UI.BTN_TAB_NORMAL).get_gameObject().GetComponent<BoxCollider>().set_enabled(UI.BTN_TAB_NORMAL != selectedTab);
+			GetCtrl(UI.BTN_TAB_DAILY).get_gameObject().GetComponent<BoxCollider>().set_enabled(UI.BTN_TAB_DAILY != selectedTab);
+			GetCtrl(UI.BTN_TAB_WEEKLY).get_gameObject().GetComponent<BoxCollider>().set_enabled(UI.BTN_TAB_WEEKLY != selectedTab);
 			SetNPCMessage(selectedTab);
 			switch (selectedTab)
 			{
@@ -527,90 +556,88 @@ public class QuestSpecialSelect : GameSection
 			}
 			if (questItemAry == null || questItemAry.Length == 0)
 			{
-				SetActive((Enum)UI.BTN_SORT, false);
-				SetActive((Enum)UI.GRD_ORDER_QUEST, false);
-				SetActive((Enum)UI.STR_ORDER_NON_LIST, true);
+				SetActive((Enum)UI.BTN_SORT, is_visible: false);
+				SetActive((Enum)UI.GRD_ORDER_QUEST, is_visible: false);
+				SetActive((Enum)UI.STR_ORDER_NON_LIST, is_visible: true);
+				return;
 			}
-			else
+			questSortData = sortSettings.CreateSortAry<QuestItemInfo, QuestSortData>(questItemAry);
+			SetActive((Enum)UI.GRD_ORDER_QUEST, is_visible: true);
+			SetActive((Enum)UI.STR_ORDER_NON_LIST, is_visible: false);
+			SetActive((Enum)UI.BTN_SORT, is_visible: true);
+			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetToggle((Enum)UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
+			SetDynamicList((Enum)UI.GRD_ORDER_QUEST, "QuestListOrderItem", questSortData.Length, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
-				questSortData = sortSettings.CreateSortAry<QuestItemInfo, QuestSortData>(questItemAry);
-				SetActive((Enum)UI.GRD_ORDER_QUEST, true);
-				SetActive((Enum)UI.STR_ORDER_NON_LIST, false);
-				SetActive((Enum)UI.BTN_SORT, true);
-				SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-				SetToggle((Enum)UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
-				SetDynamicList((Enum)UI.GRD_ORDER_QUEST, "QuestListOrderItem", questSortData.Length, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+				QuestSpecialSelect questSpecialSelect2 = this;
+				SetActive(t, is_visible: true);
+				SetEvent(t, "SELECT_ORDER", i);
+				QuestInfoData info2 = this.questSortData[i].itemData.infoData;
+				int num9 = (int)(info2.questData.tableData.difficulty + 1);
+				int l = 0;
+				for (int num10 = difficult.Length; l < num10; l++)
 				{
-					QuestSpecialSelect questSpecialSelect2 = this;
-					SetActive(t, true);
-					SetEvent(t, "SELECT_ORDER", i);
-					QuestInfoData info2 = this.questSortData[i].itemData.infoData;
-					int num9 = (int)(info2.questData.tableData.difficulty + 1);
-					int l = 0;
-					for (int num10 = difficult.Length; l < num10; l++)
-					{
-						SetActive(t, difficult[l], l < num9);
-					}
-					if (!is_recycle)
-					{
-						ResetTween(t, UI.TWN_DIFFICULT_STAR, 0);
-						PlayTween(t, UI.TWN_DIFFICULT_STAR, true, null, false, 0);
-					}
-					EnemyTable.EnemyData enemyData2 = Singleton<EnemyTable>.I.GetEnemyData((uint)info2.questData.tableData.GetMainEnemyID());
-					QuestSortData questSortData = this.questSortData[i];
-					ItemIcon itemIcon2 = ItemIcon.Create(questSortData.GetIconType(), questSortData.GetIconID(), questSortData.GetRarity(), FindCtrl(t, UI.OBJ_ENEMY), questSortData.GetIconElement(), null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-					itemIcon2.SetEnableCollider(false);
-					SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData2.element != ELEMENT_TYPE.MAX);
-					SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData2.element);
-					SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData2.weakElement);
-					SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData2.weakElement == ELEMENT_TYPE.MAX);
-					SetLabelText(t, UI.LBL_QUEST_NAME, info2.questData.tableData.questText);
-					int num11 = 1;
-					ClearStatusQuest clearStatusQuest2 = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest data) => info2.questData.tableData.questID == data.questId);
-					if (clearStatusQuest2 != null)
-					{
-						num11 = clearStatusQuest2.questStatus;
-					}
-					int value2 = i + 100;
-					SetToggleGroup(t, UI.OBJ_ICON_NEW, value2);
-					SetToggleGroup(t, UI.OBJ_ICON_CLEARED, value2);
-					SetToggleGroup(t, UI.OBJ_ICON_COMPLETE, value2);
-					switch (num11)
-					{
-					default:
-						SetToggle(t, UI.OBJ_ICON_NEW, false);
-						SetToggle(t, UI.OBJ_ICON_CLEARED, false);
-						SetToggle(t, UI.OBJ_ICON_COMPLETE, false);
-						break;
-					case 1:
-						SetToggle(t, UI.OBJ_ICON_NEW, true);
-						SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_NEW, "ef_ui_questselect_new");
-						break;
-					case 3:
-						SetToggle(t, UI.OBJ_ICON_CLEARED, true);
-						break;
-					case 4:
-						SetToggle(t, UI.OBJ_ICON_COMPLETE, true);
-						SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_COMPLETE, "ef_ui_questselect_complete");
-						break;
-					}
-					SetLabelText(t, UI.LBL_ORDER_NUM, info2.questData.num.ToString());
-					SetActive(t, UI.LBL_REMAIN, false);
-				});
-			}
+					SetActive(t, difficult[l], l < num9);
+				}
+				if (!is_recycle)
+				{
+					ResetTween(t, UI.TWN_DIFFICULT_STAR);
+					PlayTween(t, UI.TWN_DIFFICULT_STAR, forward: true, null, is_input_block: false);
+				}
+				EnemyTable.EnemyData enemyData2 = Singleton<EnemyTable>.I.GetEnemyData((uint)info2.questData.tableData.GetMainEnemyID());
+				QuestSortData questSortData = this.questSortData[i];
+				ItemIcon itemIcon2 = ItemIcon.Create(questSortData.GetIconType(), questSortData.GetIconID(), questSortData.GetRarity(), FindCtrl(t, UI.OBJ_ENEMY), questSortData.GetIconElement());
+				itemIcon2.SetEnableCollider(is_enable: false);
+				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData2.element != ELEMENT_TYPE.MAX);
+				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData2.element);
+				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData2.weakElement);
+				SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData2.weakElement == ELEMENT_TYPE.MAX);
+				SetLabelText(t, UI.LBL_QUEST_NAME, info2.questData.tableData.questText);
+				int num11 = 1;
+				ClearStatusQuest clearStatusQuest2 = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest data) => info2.questData.tableData.questID == data.questId);
+				if (clearStatusQuest2 != null)
+				{
+					num11 = clearStatusQuest2.questStatus;
+				}
+				int value2 = i + 100;
+				SetToggleGroup(t, UI.OBJ_ICON_NEW, value2);
+				SetToggleGroup(t, UI.OBJ_ICON_CLEARED, value2);
+				SetToggleGroup(t, UI.OBJ_ICON_COMPLETE, value2);
+				switch (num11)
+				{
+				default:
+					SetToggle(t, UI.OBJ_ICON_NEW, value: false);
+					SetToggle(t, UI.OBJ_ICON_CLEARED, value: false);
+					SetToggle(t, UI.OBJ_ICON_COMPLETE, value: false);
+					break;
+				case 1:
+					SetToggle(t, UI.OBJ_ICON_NEW, value: true);
+					SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_NEW, "ef_ui_questselect_new");
+					break;
+				case 3:
+					SetToggle(t, UI.OBJ_ICON_CLEARED, value: true);
+					break;
+				case 4:
+					SetToggle(t, UI.OBJ_ICON_COMPLETE, value: true);
+					SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_COMPLETE, "ef_ui_questselect_complete");
+					break;
+				}
+				SetLabelText(t, UI.LBL_ORDER_NUM, info2.questData.num.ToString());
+				SetActive(t, UI.LBL_REMAIN, is_visible: false);
+			});
 		}
 		else if (showMode == SHOW_MODE.QUEST)
 		{
 			if (questInfo == null || questInfo.Length == 0)
 			{
-				SetActive((Enum)UI.GRD_QUEST, false);
-				SetActive((Enum)UI.STR_QUEST_NON_LIST, true);
+				SetActive((Enum)UI.GRD_QUEST, is_visible: false);
+				SetActive((Enum)UI.STR_QUEST_NON_LIST, is_visible: true);
 			}
 			else
 			{
-				SetActive((Enum)UI.STR_QUEST_NON_LIST, false);
-				SetActive((Enum)UI.GRD_QUEST, true);
-				SetDynamicList((Enum)UI.GRD_QUEST, "QuestListItem", questInfo.Length, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+				SetActive((Enum)UI.STR_QUEST_NON_LIST, is_visible: false);
+				SetActive((Enum)UI.GRD_QUEST, is_visible: true);
+				SetDynamicList((Enum)UI.GRD_QUEST, "QuestListItem", questInfo.Length, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 				{
 					QuestSpecialSelect questSpecialSelect = this;
 					SetEvent(t, "SELECT_QUEST", i);
@@ -623,17 +650,17 @@ public class QuestSpecialSelect : GameSection
 					}
 					if (!is_recycle)
 					{
-						ResetTween(t, UI.TWN_DIFFICULT_STAR, 0);
-						PlayTween(t, UI.TWN_DIFFICULT_STAR, true, null, false, 0);
+						ResetTween(t, UI.TWN_DIFFICULT_STAR);
+						PlayTween(t, UI.TWN_DIFFICULT_STAR, forward: true, null, is_input_block: false);
 					}
 					EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)info.questData.tableData.GetMainEnemyID());
 					if (enemyData != null)
 					{
-						SetActive(t, UI.OBJ_ENEMY, true);
+						SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 						int iconId = enemyData.iconId;
 						RARITY_TYPE? rarity = (info.questData.tableData.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(info.questData.tableData.rarity);
-						ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-						itemIcon.SetEnableCollider(false);
+						ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+						itemIcon.SetEnableCollider(is_enable: false);
 						SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 						SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 						SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -641,19 +668,19 @@ public class QuestSpecialSelect : GameSection
 					}
 					else
 					{
-						SetActive(t, UI.OBJ_ENEMY, false);
+						SetActive(t, UI.OBJ_ENEMY, is_visible: false);
 						SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
-						SetActive(t, UI.STR_NON_WEAK_ELEMENT, true);
+						SetActive(t, UI.STR_NON_WEAK_ELEMENT, is_visible: true);
 					}
 					SetLabelText(t, UI.LBL_QUEST_NUM, string.Empty);
 					SetLabelText(t, UI.LBL_QUEST_NAME, info.questData.tableData.questText);
 					if (!info.isExistMission)
 					{
-						SetActive(t, UI.OBJ_MISSION_INFO_ROOT, false);
+						SetActive(t, UI.OBJ_MISSION_INFO_ROOT, is_visible: false);
 					}
 					else
 					{
-						SetActive(t, UI.OBJ_MISSION_INFO_ROOT, true);
+						SetActive(t, UI.OBJ_MISSION_INFO_ROOT, is_visible: true);
 						int k = 0;
 						for (int num7 = info.missionData.Length; k < num7; k++)
 						{
@@ -677,19 +704,19 @@ public class QuestSpecialSelect : GameSection
 					switch (num8)
 					{
 					default:
-						SetToggle(t, UI.OBJ_ICON_NEW, false);
-						SetToggle(t, UI.OBJ_ICON_CLEARED, false);
-						SetToggle(t, UI.OBJ_ICON_COMPLETE, false);
+						SetToggle(t, UI.OBJ_ICON_NEW, value: false);
+						SetToggle(t, UI.OBJ_ICON_CLEARED, value: false);
+						SetToggle(t, UI.OBJ_ICON_COMPLETE, value: false);
 						break;
 					case 1:
-						SetToggle(t, UI.OBJ_ICON_NEW, true);
+						SetToggle(t, UI.OBJ_ICON_NEW, value: true);
 						SetVisibleWidgetEffect(UI.SCR_NORMAL_QUEST, t, UI.SPR_ICON_NEW, "ef_ui_questselect_new");
 						break;
 					case 3:
-						SetToggle(t, UI.OBJ_ICON_CLEARED, true);
+						SetToggle(t, UI.OBJ_ICON_CLEARED, value: true);
 						break;
 					case 4:
-						SetToggle(t, UI.OBJ_ICON_COMPLETE, true);
+						SetToggle(t, UI.OBJ_ICON_COMPLETE, value: true);
 						SetVisibleWidgetEffect(UI.SCR_NORMAL_QUEST, t, UI.SPR_ICON_COMPLETE, "ef_ui_questselect_complete");
 						break;
 					}
@@ -702,66 +729,130 @@ public class QuestSpecialSelect : GameSection
 	{
 		if (selectedTab == UI.BTN_TAB_NORMAL && openRegionIds.Length >= 2)
 		{
-			SetActive((Enum)UI.OBJ_DELIVERY_BAR, false);
-			SetActive((Enum)UI.GRD_DELIVERY, false);
-			SetActive((Enum)UI.LBL_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_AREA, true);
-			SetActive((Enum)UI.OBJ_AREA_BAR, true);
+			SetActive((Enum)UI.OBJ_DELIVERY_BAR, is_visible: false);
+			SetActive((Enum)UI.GRD_DELIVERY, is_visible: false);
+			SetActive((Enum)UI.LBL_DELIVERY_NON_LIST, is_visible: false);
+			SetActive((Enum)UI.GRD_AREA, is_visible: true);
+			SetActive((Enum)UI.OBJ_AREA_BAR, is_visible: true);
 			RegionTable.Data data = null;
 			List<AreaQuestInfo> areaInfos = new List<AreaQuestInfo>();
-			List<AreaQuestInfo> list2 = new List<AreaQuestInfo>();
-			for (int j = 0; j < openRegionIds.Length; j++)
+			for (int j = 0; j < validRegionIds.Length; j++)
 			{
-				data = Singleton<RegionTable>.I.GetData(openRegionIds[j]);
-				if (!IsCleardRegion(data))
+				bool flag = MonoBehaviourSingleton<WorldMapManager>.I.IsOpenRegion(validRegionIds[j]);
+				data = Singleton<RegionTable>.I.GetData(validRegionIds[j]);
+				if (!flag)
 				{
-					areaInfos.Add(new AreaQuestInfo(data, areaBanners[j], false));
+					areaInfos.Add(new AreaQuestInfo(data, areaBanners[j], cleared: false, flag));
+					continue;
 				}
-				else
-				{
-					list2.Add(new AreaQuestInfo(data, areaBanners[j], true));
-				}
+				bool cleared = IsCleardRegion(data);
+				areaInfos.Add(new AreaQuestInfo(data, areaBanners[j], cleared, flag));
 			}
-			areaInfos.AddRange(list2);
-			SetDynamicList((Enum)UI.GRD_AREA, "QuestAreaListItem", areaInfos.Count, true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetDynamicList((Enum)UI.GRD_AREA, "QuestAreaListItem", areaInfos.Count, reset: true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
 				AreaQuestInfo areaQuestInfo = areaInfos[i];
 				Texture2D bannerTex = areaQuestInfo.bannerTex;
 				if (bannerTex != null)
 				{
 					Transform t2 = FindCtrl(t, UI.TEX_AREA_BANNER);
-					SetActive(t2, true);
+					SetActive(t2, is_visible: true);
 					SetTexture(t2, bannerTex);
 				}
-				AreaQuestInfo areaQuestInfo2 = areaInfos[i];
-				RegionTable.Data regionData = areaQuestInfo2.regionData;
-				SetEvent(t, "SELECT_AREA", (int)regionData.regionId);
+				RegionTable.Data regionData = areaQuestInfo.regionData;
+				if (areaQuestInfo.opened)
+				{
+					SetEvent(t, "SELECT_AREA", (int)regionData.regionId);
+				}
+				else
+				{
+					SetEvent(t, "SELECT_CLOSE_AREA", (int)regionData.regionId);
+				}
 				int completableRegionDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableRegionDeliveryNum((int)regionData.regionId, regionData.groupId);
-				SetBadge(FindCtrl(t, UI.TEX_AREA_BANNER), completableRegionDeliveryNum, 3, -16, -3, false);
-				QuestSpecialSelect questSpecialSelect = this;
-				object ctrl_enum = UI.SPR_CLEARED_AREA;
-				AreaQuestInfo areaQuestInfo3 = areaInfos[i];
-				questSpecialSelect.SetActive(t, (Enum)ctrl_enum, areaQuestInfo3.cleared);
+				SetBadge(FindCtrl(t, UI.TEX_AREA_BANNER), completableRegionDeliveryNum, 3, -16, -3);
+				SetActive(t, UI.SPR_CLEARED_AREA, areaQuestInfo.cleared);
+				bool is_visible = false;
+				if (areaQuestInfo.opened)
+				{
+					EventNormalListData eventNormalListData = null;
+					RegionTable.Data data2 = Singleton<RegionTable>.I.GetData(regionData.groupId, REGION_DIFFICULTY_TYPE.HARD);
+					eventNormalListData = ((data2 == null || !MonoBehaviourSingleton<WorldMapManager>.I.IsOpenRegion(data2.regionId)) ? MonoBehaviourSingleton<DeliveryManager>.I.GetEventNormalListData((int)regionData.regionId) : MonoBehaviourSingleton<DeliveryManager>.I.GetEventNormalListData((int)data2.regionId));
+					if (eventNormalListData != null)
+					{
+						if (eventNormalListData.numerator >= eventNormalListData.denominator)
+						{
+							SetLabelText(t, UI.LBL_DELIVERY_NUM, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 43u)));
+						}
+						else
+						{
+							SetLabelText(t, UI.LBL_DELIVERY_NUM, $"{eventNormalListData.denominator - eventNormalListData.numerator} Missions Left");
+						}
+						is_visible = true;
+					}
+				}
+				SetActive(t, UI.LBL_DELIVERY_NUM, is_visible);
 			});
 			isDeliveryGridReset = false;
+			RepositionAreaGrid();
 		}
 		else if (list != null)
 		{
-			SetActive((Enum)UI.OBJ_AREA_BAR, false);
-			SetActive((Enum)UI.GRD_AREA, false);
+			SetActive((Enum)UI.OBJ_AREA_BAR, is_visible: false);
+			SetActive((Enum)UI.GRD_AREA, is_visible: false);
 			SetActive((Enum)UI.GRD_DELIVERY, list.Length > 0);
 			SetActive((Enum)UI.LBL_DELIVERY_NON_LIST, list.Length == 0);
-			SetActive((Enum)UI.OBJ_DELIVERY_BAR, true);
+			SetActive((Enum)UI.OBJ_DELIVERY_BAR, is_visible: true);
 			SetDynamicList((Enum)UI.GRD_DELIVERY, "QuestRequestItem", list.Length, isDeliveryGridReset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
 			{
-				SetActive(t, true);
+				SetActive(t, is_visible: true);
 				int num = Array.FindIndex(deliveryInfo, (Delivery d) => d.uId == list[i].uId);
-				SetEvent(t, "SELECT_DELIVERY", num);
 				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryInfo[num].dId);
+				if (deliveryTableData.subType == DELIVERY_SUB_TYPE.READ_STORY)
+				{
+					SetEvent(t, "READ_STORY", num);
+				}
+				else
+				{
+					SetEvent(t, "SELECT_DELIVERY", num);
+				}
 				SetupDeliveryListItem(t, deliveryTableData);
 			});
 			isDeliveryGridReset = false;
 			ShowNonDeliveryList();
+		}
+	}
+
+	private void RepositionAreaGrid()
+	{
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		UIScrollView component = GetCtrl(UI.SCR_AREA).GetComponent<UIScrollView>();
+		UIPanel component2 = GetCtrl(UI.SCR_AREA).GetComponent<UIPanel>();
+		uint num = openRegionIds[openRegionIds.Length - 1];
+		int num2 = -1;
+		int i = 0;
+		for (int num3 = validRegionIds.Length; i < num3; i++)
+		{
+			if (num == validRegionIds[i])
+			{
+				num2 = i;
+				break;
+			}
+		}
+		if (num2 > -1 && num2 > 3)
+		{
+			int num4 = validRegionIds.Length;
+			float num5 = (float)num2 / (float)num4;
+			if (num5 >= 0.6f)
+			{
+				num2 += 2;
+				num5 = (float)num2 / (float)num4;
+			}
+			component.SetDragAmount(0.5f, num5, updateScrollbars: true);
+			Vector2 clipOffset = component2.clipOffset;
+			component.get_transform().set_localPosition(Vector2.op_Implicit(-clipOffset));
 		}
 	}
 
@@ -800,14 +891,14 @@ public class QuestSpecialSelect : GameSection
 		case UI.BTN_TAB_DAILY:
 			if (dailyDeliveryInfo != null && dailyDeliveryInfo.Length == 0)
 			{
-				TimeSpan span2 = TimeSpan.FromSeconds((double)MonoBehaviourSingleton<DeliveryManager>.I.dailyUpdateRemainTime);
+				TimeSpan span2 = TimeSpan.FromSeconds(MonoBehaviourSingleton<DeliveryManager>.I.dailyUpdateRemainTime);
 				SetLabelText((Enum)UI.LBL_DELIVERY_NON_LIST, string.Format(StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 101u), GetRemainTimeText(span2)));
 			}
 			break;
 		case UI.BTN_TAB_WEEKLY:
 			if (weeklyDeliveryInfo != null && weeklyDeliveryInfo.Length == 0)
 			{
-				TimeSpan span = TimeSpan.FromSeconds((double)MonoBehaviourSingleton<DeliveryManager>.I.weeklyUpdateRemainTime);
+				TimeSpan span = TimeSpan.FromSeconds(MonoBehaviourSingleton<DeliveryManager>.I.weeklyUpdateRemainTime);
 				SetLabelText((Enum)UI.LBL_DELIVERY_NON_LIST, string.Format(StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 102u), GetRemainTimeText(span)));
 			}
 			break;
@@ -848,7 +939,7 @@ public class QuestSpecialSelect : GameSection
 			SetDirty(UI.GRD_AREA);
 			ChangeToggle(SHOW_MODE.DELIVERY);
 			ResetTween((Enum)UI.BTN_DELIVERY, 0);
-			PlayTween((Enum)UI.BTN_DELIVERY, true, (EventDelegate.Callback)null, false, 0);
+			PlayTween((Enum)UI.BTN_DELIVERY, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 		}
 	}
 
@@ -859,7 +950,7 @@ public class QuestSpecialSelect : GameSection
 			SetDirty(UI.GRD_ORDER_QUEST);
 			ChangeToggle(SHOW_MODE.ORDER);
 			ResetTween((Enum)UI.BTN_ORDER, 0);
-			PlayTween((Enum)UI.BTN_ORDER, true, (EventDelegate.Callback)null, false, 0);
+			PlayTween((Enum)UI.BTN_ORDER, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 		}
 	}
 
@@ -870,7 +961,7 @@ public class QuestSpecialSelect : GameSection
 			SetDirty(UI.GRD_QUEST);
 			ChangeToggle(SHOW_MODE.QUEST);
 			ResetTween((Enum)UI.BTN_QUEST, 0);
-			PlayTween((Enum)UI.BTN_QUEST, true, (EventDelegate.Callback)null, false, 0);
+			PlayTween((Enum)UI.BTN_QUEST, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
 			if (GameSection.GetEventData() != null)
 			{
 				MonoBehaviourSingleton<QuestManager>.I.currentDeliveryId = (uint)GameSection.GetEventData();
@@ -889,7 +980,7 @@ public class QuestSpecialSelect : GameSection
 		SetNPCMessage(selectedTab);
 		RemoveRecommend();
 		changeToDeliveryClearEvent = false;
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(0u, true);
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(0u);
 		MonoBehaviourSingleton<QuestManager>.I.currentDeliveryId = 0u;
 		base.OnOpen();
 	}
@@ -902,36 +993,37 @@ public class QuestSpecialSelect : GameSection
 
 	private void SetNPCMessage(UI tab)
 	{
-		if (!isInGameScene)
+		if (isInGameScene)
 		{
-			string str = string.Empty;
-			switch (tab)
-			{
-			case UI.BTN_TAB_NORMAL:
-				str = ((!MonoBehaviourSingleton<DeliveryManager>.I.IsExistDelivery(TAB_TYPES[0])) ? "_COMPLETE" : string.Empty);
-				break;
-			case UI.BTN_TAB_DAILY:
-				str = ((!MonoBehaviourSingleton<DeliveryManager>.I.IsExistDelivery(TAB_TYPES[1])) ? "_COMPLETE" : "_DAILY");
-				break;
-			case UI.BTN_TAB_WEEKLY:
-				str = ((!MonoBehaviourSingleton<DeliveryManager>.I.IsExistDelivery(TAB_TYPES[2])) ? "_COMPLETE" : "_WEEKLY");
-				break;
-			}
-			NPCMessageTable.Section section = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + str + "_TEXT");
-			if (section != null)
-			{
-				NPCMessageTable.Message nPCMessage = section.GetNPCMessage();
-				if (nPCMessage != null)
-				{
-					npcText = nPCMessage.GetReplaceText();
-				}
-			}
-			else
-			{
-				npcText = base.sectionData.GetText("NPC_MESSAGE_" + Random.Range(0, 3));
-			}
-			SetLabelText((Enum)UI.LBL_NPC_MESSAGE, npcText);
+			return;
 		}
+		string str = string.Empty;
+		switch (tab)
+		{
+		case UI.BTN_TAB_NORMAL:
+			str = ((!MonoBehaviourSingleton<DeliveryManager>.I.IsExistDelivery(TAB_TYPES[0])) ? "_COMPLETE" : string.Empty);
+			break;
+		case UI.BTN_TAB_DAILY:
+			str = ((!MonoBehaviourSingleton<DeliveryManager>.I.IsExistDelivery(TAB_TYPES[1])) ? "_COMPLETE" : "_DAILY");
+			break;
+		case UI.BTN_TAB_WEEKLY:
+			str = ((!MonoBehaviourSingleton<DeliveryManager>.I.IsExistDelivery(TAB_TYPES[2])) ? "_COMPLETE" : "_WEEKLY");
+			break;
+		}
+		NPCMessageTable.Section section = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + str + "_TEXT");
+		if (section != null)
+		{
+			NPCMessageTable.Message nPCMessage = section.GetNPCMessage();
+			if (nPCMessage != null)
+			{
+				npcText = nPCMessage.GetReplaceText();
+			}
+		}
+		else
+		{
+			npcText = base.sectionData.GetText("NPC_MESSAGE_" + Random.Range(0, 3));
+		}
+		SetLabelText((Enum)UI.LBL_NPC_MESSAGE, npcText);
 	}
 
 	protected virtual void RemoveRecommend()
@@ -966,12 +1058,10 @@ public class QuestSpecialSelect : GameSection
 		if (num < 0 || num >= questSortData.Length)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
-		{
-			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questSortData[num].GetTableID(), true);
-			GameSection.SetEventData(questSortData[num].itemData.infoData);
-		}
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questSortData[num].GetTableID());
+		GameSection.SetEventData(questSortData[num].itemData.infoData);
 	}
 
 	public void OnQuery_SELECT_DELIVERY()
@@ -991,9 +1081,9 @@ public class QuestSpecialSelect : GameSection
 		}
 		if (is_enough_material)
 		{
-			if (isInGameScene && deliveryTableData.IsInvalidClearIngame())
+			if (!TutorialStep.HasFirstDeliveryCompleted() && isInGameScene)
 			{
-				GameSection.ChangeEvent("DELIVERY_ITEM_COMPLETE", null);
+				GameSection.ChangeEvent("DELIVERY_ITEM_COMPLETE");
 			}
 			else if (isInGameScene)
 			{
@@ -1034,7 +1124,36 @@ public class QuestSpecialSelect : GameSection
 		}
 	}
 
-	private void SendDeliveryComplete(int index, int delivery_id, bool is_enough_material, bool is_happen_quest)
+	public void OnQuery_READ_STORY()
+	{
+		int num = (int)GameSection.GetEventData();
+		bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[num].dId);
+		int dId = deliveryInfo[num].dId;
+		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)dId);
+		if (flag)
+		{
+			GameSection.StayEvent();
+			SendDeliveryComplete(num, dId, flag, is_happen_quest: false);
+		}
+		else
+		{
+			string goingHomeEvent = GameSection.GetGoingHomeEvent();
+			EventData[] array = new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("COMPLETE_READ_STORY", (int)deliveryTableData.readScriptId)
+			};
+			GameSection.SetEventData(new object[4]
+			{
+				(int)deliveryTableData.readScriptId,
+				string.Empty,
+				string.Empty,
+				array
+			});
+		}
+	}
+
+	protected void SendDeliveryComplete(int index, int delivery_id, bool is_enough_material, bool is_happen_quest)
 	{
 		DeliveryTable.DeliveryData table = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryInfo[index].dId);
 		changeToDeliveryClearEvent = true;
@@ -1081,13 +1200,38 @@ public class QuestSpecialSelect : GameSection
 						delivery_id,
 						recv_reward
 					});
+					if (isInGameScene)
+					{
+						is_success = false;
+						List<int> list = new List<int>(MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame);
+						for (int j = 0; j < list.Count; j++)
+						{
+							int item = list[j];
+							if (!MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Contains(item))
+							{
+								MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Add(item);
+							}
+						}
+						EventData[] requestEventData = new EventData[2]
+						{
+							new EventData("STORY_DELIVERY_REWARD", new object[2]
+							{
+								delivery_id,
+								recv_reward
+							}),
+							new EventData("PORTAL_RELEASE", GameSaveData.instance.newReleasePortals)
+						};
+						GameSaveData.instance.newReleasePortals = new List<uint>();
+						MonoBehaviourSingleton<InGameProgress>.I.FieldReadStory((int)table.clearEventID, isSend: true, requestEventData);
+						MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame.Clear();
+					}
 				}
 			}
 			else
 			{
 				changeToDeliveryClearEvent = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -1097,12 +1241,10 @@ public class QuestSpecialSelect : GameSection
 		if (num < 0 || num >= questInfo.Length)
 		{
 			GameSection.StopEvent();
+			return;
 		}
-		else
-		{
-			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questInfo[num].questData.tableData.questID, true);
-			GameSection.SetEventData(questInfo[num]);
-		}
+		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questInfo[num].questData.tableData.questID);
+		GameSection.SetEventData(questInfo[num]);
 	}
 
 	private void OnQuery_QuestAcceptDeliveryItemComplete_YES()
@@ -1111,6 +1253,11 @@ public class QuestSpecialSelect : GameSection
 	}
 
 	private void OnQuery_InGameQuestAcceptDeliveryItemComplete_YES()
+	{
+		BackHome();
+	}
+
+	private void OnQuery_InGameQuestBackHome_YES()
 	{
 		BackHome();
 	}
@@ -1151,7 +1298,7 @@ public class QuestSpecialSelect : GameSection
 
 	protected virtual void GetDeliveryList()
 	{
-		deliveryInfo = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(true);
+		deliveryInfo = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList();
 		List<Delivery> list = new List<Delivery>();
 		int i = 0;
 		for (int num = deliveryInfo.Length; i < num; i++)
@@ -1308,18 +1455,58 @@ public class QuestSpecialSelect : GameSection
 	{
 		switch (old_select)
 		{
-		case UI.BTN_TAB_NORMAL:
-			break;
 		case UI.BTN_TAB_DAILY:
-			SetNew(UI.BTN_TAB_DAILY, false);
+			SetNew(UI.BTN_TAB_DAILY, is_visible: false);
 			GameSaveData.instance.recommendedDailyDeliveryCheck = 0;
 			GameSaveData.Save();
 			break;
 		case UI.BTN_TAB_WEEKLY:
-			SetNew(UI.BTN_TAB_WEEKLY, false);
+			SetNew(UI.BTN_TAB_WEEKLY, is_visible: false);
 			GameSaveData.instance.recommendedWeeklyDeliveryCheck = 0;
 			GameSaveData.Save();
 			break;
+		}
+	}
+
+	private void OnQuery_SELECT_CLOSE_AREA()
+	{
+		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.WORLD_MAP))
+		{
+			GameSection.ChangeEvent("WORLD_MAP_TUTORIAL");
+			return;
+		}
+		releaseRegionId = (int)GameSection.GetEventData();
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<WorldMapManager>.I.SendRegionCrystalNum(releaseRegionId, delegate(bool isSuccess, string campainText)
+		{
+			GameSection.ResumeEvent(isSuccess, new object[2]
+			{
+				MonoBehaviourSingleton<WorldMapManager>.I.releaseCrystalNum.ToString(),
+				campainText
+			});
+		});
+	}
+
+	private void OnQuery_QuestAcceptReleaseRegionDialog_YES()
+	{
+		if (releaseRegionId >= 0)
+		{
+			string goingHomeEvent = GameSection.GetGoingHomeEvent();
+			EventData[] auto_event_data = new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("QUEST", null)
+			};
+			GameSection.StayEvent();
+			MonoBehaviourSingleton<WorldMapManager>.I.SendRegionOpen(releaseRegionId, delegate(bool isSuccess)
+			{
+				GameSection.ResumeEvent(isSuccess);
+				if (isSuccess)
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(auto_event_data);
+					MonoBehaviourSingleton<WorldMapManager>.I.releaseRegionIdfromBoard = releaseRegionId;
+				}
+			});
 		}
 	}
 }

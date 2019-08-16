@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MiniMapIcon
+public class MiniMapIcon : MonoBehaviour
 {
 	[SerializeField]
 	protected UISprite icon;
@@ -20,8 +20,6 @@ public class MiniMapIcon
 		}
 		set
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			if (_isOver != value)
 			{
 				icon.get_gameObject().SetActive(!value);
@@ -53,10 +51,6 @@ public class MiniMapIcon
 
 	private void Awake()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
 		icon.get_gameObject().SetActive(true);
 		if (overIcon != null)
 		{
@@ -67,7 +61,6 @@ public class MiniMapIcon
 
 	public virtual void Initialize(MonoBehaviour root_object)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(false);
 		isInitialized = true;
 	}
@@ -86,14 +79,12 @@ public class MiniMapIcon
 
 	public void UpdateIcon(float center_x, float center_y, float scaling, float ui_radius)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 		if (!(target == null))

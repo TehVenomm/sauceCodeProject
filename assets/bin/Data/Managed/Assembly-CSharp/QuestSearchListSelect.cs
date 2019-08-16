@@ -61,8 +61,11 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 		LBL_CHALLENGE_NOT_CLEAR,
 		SPR_ICON_DEFENSE_BATTLE,
 		LBL_RECRUTING_MEMBERS,
-		SPR_ICON_WAVE_MATCH
+		SPR_ICON_WAVE_MATCH,
+		SPR_ICON_SERIES_OF_BATTLES
 	}
+
+	private const string LIST_ITEM_PREFAB_NAME = "QuestSearchListSelectItem";
 
 	protected override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
@@ -73,10 +76,10 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 			{
 				if (err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
 				{
-					GameSection.ChangeStayEvent("NOT_FOUND_QUEST", null);
+					GameSection.ChangeStayEvent("NOT_FOUND_QUEST");
 					if (cb != null)
 					{
-						cb(true);
+						cb(obj: true);
 					}
 				}
 			}
@@ -84,7 +87,7 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 			{
 				cb(is_success);
 			}
-		}, false);
+		}, saveSettings: false);
 	}
 
 	protected override void ResetSearchRequest()
@@ -143,45 +146,44 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 		}
 		SetLabelText((Enum)UI.LBL_CONDITION_A, text);
 		SetLabelText((Enum)UI.LBL_CONDITION_B, text2);
-		SetActive((Enum)UI.SPR_CONDITION_DIFFICULTY, false);
-		SetActive((Enum)UI.STR_NO_CONDITION, true);
+		SetActive((Enum)UI.SPR_CONDITION_DIFFICULTY, is_visible: false);
+		SetActive((Enum)UI.STR_NO_CONDITION, is_visible: true);
 		bool is_visible = MonoBehaviourSingleton<PartyManager>.I.challengeInfo.NotClaer();
 		SetActive((Enum)UI.SPR_CHALLENGE_NOT_CLEAR, is_visible);
 		SetFontStyle((Enum)UI.LBL_CHALLENGE_NOT_CLEAR, 1);
 		SetNpcMessage();
 		if (!PartyManager.IsValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_QUEST, false);
-			SetActive((Enum)UI.STR_NON_LIST, true);
+			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
+			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			return;
 		}
-		else
+		PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
+		SetActive((Enum)UI.GRD_QUEST, is_visible: true);
+		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", partys.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
-			PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-			SetActive((Enum)UI.GRD_QUEST, true);
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", partys.Length, false, delegate(int i, Transform t, bool is_recycle)
+			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
+			if (questData == null)
 			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
-				if (questData == null)
+				SetActive(t, is_visible: false);
+			}
+			else
+			{
+				SetEvent(t, "SELECT_ROOM", i);
+				SetQuestData(questData, t);
+				if (IsPlateChangeQuestType(questData.questType))
 				{
-					SetActive(t, false);
+					SetGateData(partys[i], t, questData.questType);
 				}
 				else
 				{
-					SetEvent(t, "SELECT_ROOM", i);
-					SetQuestData(questData, t);
-					if (questData.questType == QUEST_TYPE.GATE || questData.questType == QUEST_TYPE.DEFENSE || questData.questType == QUEST_TYPE.WAVE)
-					{
-						SetGateData(partys[i], t, questData.questType);
-					}
-					else
-					{
-						SetPartyData(partys[i], t);
-					}
+					SetPartyData(partys[i], t);
 				}
-			});
-			base.UpdateUI();
-		}
+				SetStatusIconInfo(partys[i], t);
+			}
+		});
+		base.UpdateUI();
 	}
 
 	protected void SetGateData(PartyModel.Party party, Transform t, QUEST_TYPE type)
@@ -205,43 +207,16 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 
 	protected override void SetQuestData(QuestTable.QuestTableData questData, Transform t)
 	{
-		//IL_0277: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0345: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-		UI[] array = new UI[10]
-		{
-			UI.OBJ_DIFFICULT_STAR_1,
-			UI.OBJ_DIFFICULT_STAR_2,
-			UI.OBJ_DIFFICULT_STAR_3,
-			UI.OBJ_DIFFICULT_STAR_4,
-			UI.OBJ_DIFFICULT_STAR_5,
-			UI.OBJ_DIFFICULT_STAR_6,
-			UI.OBJ_DIFFICULT_STAR_7,
-			UI.OBJ_DIFFICULT_STAR_8,
-			UI.OBJ_DIFFICULT_STAR_9,
-			UI.OBJ_DIFFICULT_STAR_10
-		};
-		int num = (int)(questData.difficulty + 1);
-		int i = 0;
-		for (int num2 = array.Length; i < num2; i++)
-		{
-			SetActive(t, array[i], i < num);
-		}
-		ResetTween(t, UI.TWN_DIFFICULT_STAR, 0);
-		PlayTween(t, UI.TWN_DIFFICULT_STAR, true, null, false, 0);
-		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
+		ResetTween(t, UI.TWN_DIFFICULT_STAR);
+		PlayTween(t, UI.TWN_DIFFICULT_STAR, forward: true, null, is_input_block: false);
+		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetEnemyIdByIndex(0));
 		if (enemyData != null)
 		{
-			SetActive(t, UI.OBJ_ENEMY, true);
+			SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 			int iconId = enemyData.iconId;
 			RARITY_TYPE? rarity = (questData.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(questData.rarity);
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-			itemIcon.SetEnableCollider(false);
+			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+			itemIcon.SetEnableCollider(is_enable: false);
 			SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 			SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -249,28 +224,30 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 		}
 		else
 		{
-			SetActive(t, UI.OBJ_ENEMY, false);
+			SetActive(t, UI.OBJ_ENEMY, is_visible: false);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
-			SetActive(t, UI.STR_NON_WEAK_ELEMENT, true);
+			SetActive(t, UI.STR_NON_WEAK_ELEMENT, is_visible: true);
 		}
 		Transform val = FindCtrl(t, UI.SPR_ICON_DOUBLE);
 		Transform val2 = FindCtrl(t, UI.SPR_ICON_DEFENSE_BATTLE);
-		Transform val3 = FindCtrl(t, UI.LBL_RECRUTING_MEMBERS);
-		Transform val4 = FindCtrl(t, UI.SPR_ICON_WAVE_MATCH);
-		Transform val5 = FindCtrl(t, UI.SPR_WINDOW_BASE);
-		if (val5 != null)
+		Transform val3 = FindCtrl(t, UI.SPR_ICON_SERIES_OF_BATTLES);
+		Transform val4 = FindCtrl(t, UI.LBL_RECRUTING_MEMBERS);
+		Transform val5 = FindCtrl(t, UI.SPR_ICON_WAVE_MATCH);
+		Transform val6 = FindCtrl(t, UI.SPR_WINDOW_BASE);
+		if (val6 != null)
 		{
-			UISprite component = val5.GetComponent<UISprite>();
-			Transform val6 = FindCtrl(t, UI.OBJ_SEARCH_INFO_ROOT);
-			UISprite component2 = val6.GetComponent<UISprite>();
-			if (questData.questType == QUEST_TYPE.GATE || questData.questType == QUEST_TYPE.DEFENSE || questData.questType == QUEST_TYPE.WAVE)
+			UISprite component = val6.GetComponent<UISprite>();
+			Transform val7 = FindCtrl(t, UI.OBJ_SEARCH_INFO_ROOT);
+			UISprite component2 = val7.GetComponent<UISprite>();
+			if (IsPlateChangeQuestType(questData.questType))
 			{
 				component.spriteName = "QuestListPlateO";
 				component2.spriteName = "SearchAdWindowO";
 				val.get_gameObject().SetActive(true);
 				val2.get_gameObject().SetActive(questData.questType == QUEST_TYPE.DEFENSE);
-				val4.get_gameObject().SetActive(questData.questType == QUEST_TYPE.WAVE);
-				val3.get_gameObject().SetActive(questData.questType == QUEST_TYPE.DEFENSE || questData.questType == QUEST_TYPE.WAVE);
+				val5.get_gameObject().SetActive(questData.questType == QUEST_TYPE.WAVE || questData.questType == QUEST_TYPE.WAVE_STRATEGY);
+				val3.get_gameObject().SetActive(questData.questType == QUEST_TYPE.SERIES);
+				val4.get_gameObject().SetActive(IsReqrutingMembersQuestType(questData.questType));
 				string format = StringTable.Get(STRING_CATEGORY.GATE_QUEST_NAME, 0u);
 				string text = string.Empty;
 				if (enemyData != null)
@@ -286,8 +263,9 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 				component2.spriteName = "SearchAdWindow";
 				val.get_gameObject().SetActive(false);
 				val2.get_gameObject().SetActive(false);
-				val4.get_gameObject().SetActive(false);
+				val5.get_gameObject().SetActive(false);
 				val3.get_gameObject().SetActive(false);
+				val4.get_gameObject().SetActive(false);
 				SetLabelText(t, UI.LBL_QUEST_NAME, questData.questText);
 				SetLabelText(t, UI.LBL_QUEST_NUM, string.Format(base.sectionData.GetText("QUEST_NUMBER"), questData.locationNumber, questData.questNumber));
 			}
@@ -297,6 +275,25 @@ public class QuestSearchListSelect : QuestSearchListSelectBase
 			SetLabelText(t, UI.LBL_QUEST_NAME, questData.questText);
 			SetLabelText(t, UI.LBL_QUEST_NUM, string.Format(base.sectionData.GetText("QUEST_NUMBER"), questData.locationNumber, questData.questNumber));
 		}
+		SetMemberIcon(t, questData);
+	}
+
+	private bool IsPlateChangeQuestType(QUEST_TYPE questType)
+	{
+		if (questType == QUEST_TYPE.GATE || questType == QUEST_TYPE.DEFENSE || questType == QUEST_TYPE.WAVE || questType == QUEST_TYPE.WAVE_STRATEGY || questType == QUEST_TYPE.SERIES)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private bool IsReqrutingMembersQuestType(QUEST_TYPE questType)
+	{
+		if (questType == QUEST_TYPE.DEFENSE || questType == QUEST_TYPE.WAVE || questType == QUEST_TYPE.WAVE_STRATEGY || questType == QUEST_TYPE.SERIES)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	private void OnCloseDialog_QuestSearchRoomCondition()

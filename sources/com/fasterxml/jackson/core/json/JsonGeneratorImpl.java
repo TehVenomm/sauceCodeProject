@@ -1,17 +1,17 @@
 package com.fasterxml.jackson.core.json;
 
-import android.support.v4.media.TransportMediator;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.base.GeneratorBase;
-import com.fasterxml.jackson.core.io.CharTypes;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.core.p015io.CharTypes;
+import com.fasterxml.jackson.core.p015io.CharacterEscapes;
+import com.fasterxml.jackson.core.p015io.IOContext;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.core.util.VersionUtil;
+import com.google.android.gms.games.Notifications;
 import java.io.IOException;
 
 public abstract class JsonGeneratorImpl extends GeneratorBase {
@@ -27,7 +27,7 @@ public abstract class JsonGeneratorImpl extends GeneratorBase {
         super(i, objectCodec);
         this._ioContext = iOContext;
         if (Feature.ESCAPE_NON_ASCII.enabledIn(i)) {
-            this._maximumNonEscapedChar = TransportMediator.KEYCODE_MEDIA_PAUSE;
+            this._maximumNonEscapedChar = Notifications.NOTIFICATION_TYPES_ALL;
         }
         this._cfgUnqNames = !Feature.QUOTE_FIELD_NAMES.enabledIn(i);
     }
@@ -48,7 +48,8 @@ public abstract class JsonGeneratorImpl extends GeneratorBase {
         return this;
     }
 
-    protected void _checkStdFeatureChanges(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void _checkStdFeatureChanges(int i, int i2) {
         super._checkStdFeatureChanges(i, i2);
         this._cfgUnqNames = !Feature.QUOTE_FIELD_NAMES.enabledIn(i);
     }

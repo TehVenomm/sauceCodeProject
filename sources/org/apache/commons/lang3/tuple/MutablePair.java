@@ -5,8 +5,12 @@ public class MutablePair<L, R> extends Pair<L, R> {
     public L left;
     public R right;
 
-    public static <L, R> MutablePair<L, R> of(L l, R r) {
-        return new MutablePair(l, r);
+    /* renamed from: of */
+    public static <L, R> MutablePair<L, R> m1017of(L l, R r) {
+        return new MutablePair<>(l, r);
+    }
+
+    public MutablePair() {
     }
 
     public MutablePair(L l, R r) {
@@ -31,8 +35,8 @@ public class MutablePair<L, R> extends Pair<L, R> {
     }
 
     public R setValue(R r) {
-        R right = getRight();
+        R right2 = getRight();
         setRight(r);
-        return right;
+        return right2;
     }
 }

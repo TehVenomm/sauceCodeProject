@@ -16,7 +16,7 @@ public enum SdkCache {
     }
 
     public void deleteCache(Context context) {
-        Logger.m564v(LOG_TAG, "Clearing cached files");
+        Logger.m577v(LOG_TAG, "Clearing cached files");
         if (context == null) {
             Log.w(LOG_TAG, "Context must not be null. File cache will not be deleted.");
         }

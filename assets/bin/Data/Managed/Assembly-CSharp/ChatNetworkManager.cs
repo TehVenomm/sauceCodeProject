@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 {
-	private class Pool_List_ChatPacket
+	private class Pool_List_ChatPacket : rymTPool<List<ChatPacket>>
 	{
 	}
 
@@ -37,7 +37,6 @@ public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 
 	protected override void Awake()
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		packetReceiver = this.get_gameObject().AddComponent<ChatPacketReceiver>();
 	}
@@ -50,7 +49,6 @@ public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 	{
 		if (!Log.enabled)
 		{
-			return;
 		}
 	}
 

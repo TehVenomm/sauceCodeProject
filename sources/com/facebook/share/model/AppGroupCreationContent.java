@@ -4,16 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 
 public final class AppGroupCreationContent implements ShareModel {
-    public static final Creator<AppGroupCreationContent> CREATOR = new C05081();
-    private final String description;
-    private final String name;
-    private AppGroupPrivacy privacy;
-
-    /* renamed from: com.facebook.share.model.AppGroupCreationContent$1 */
-    static final class C05081 implements Creator<AppGroupCreationContent> {
-        C05081() {
-        }
-
+    public static final Creator<AppGroupCreationContent> CREATOR = new Creator<AppGroupCreationContent>() {
         public AppGroupCreationContent createFromParcel(Parcel parcel) {
             return new AppGroupCreationContent(parcel);
         }
@@ -21,7 +12,10 @@ public final class AppGroupCreationContent implements ShareModel {
         public AppGroupCreationContent[] newArray(int i) {
             return new AppGroupCreationContent[i];
         }
-    }
+    };
+    private final String description;
+    private final String name;
+    private AppGroupPrivacy privacy;
 
     public enum AppGroupPrivacy {
         Open,
@@ -29,12 +23,15 @@ public final class AppGroupCreationContent implements ShareModel {
     }
 
     public static class Builder implements ShareModelBuilder<AppGroupCreationContent, Builder> {
-        private String description;
-        private String name;
-        private AppGroupPrivacy privacy;
+        /* access modifiers changed from: private */
+        public String description;
+        /* access modifiers changed from: private */
+        public String name;
+        /* access modifiers changed from: private */
+        public AppGroupPrivacy privacy;
 
         public AppGroupCreationContent build() {
-            return new AppGroupCreationContent();
+            return new AppGroupCreationContent(this);
         }
 
         public Builder readFrom(AppGroupCreationContent appGroupCreationContent) {

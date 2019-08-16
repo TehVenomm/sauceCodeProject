@@ -17,7 +17,7 @@ public class UIFieldBossInfo : MonoBehaviourSingleton<UIFieldBossInfo>
 	{
 		if (!active)
 		{
-			SetActive(false);
+			SetActive(isActive: false);
 		}
 	}
 
@@ -36,19 +36,18 @@ public class UIFieldBossInfo : MonoBehaviourSingleton<UIFieldBossInfo>
 
 	public void SetActive(bool isActive)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		active = isActive;
 		this.get_gameObject().SetActive(isActive);
 	}
 
 	public void FadeIn(float delay, float duration, Action onComplete)
 	{
-		SetActive(true);
+		SetActive(isActive: true);
 	}
 
 	public void FadeOut(float delay, float duration, Action onComplete)
 	{
-		SetActive(false);
+		SetActive(isActive: false);
 	}
 
 	private IEnumerator DoFade(float delay, float duration, float start, float end, Action onComplete)

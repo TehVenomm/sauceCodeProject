@@ -1,19 +1,23 @@
 package com.google.android.gms.nearby.messages.internal;
 
-import android.os.RemoteException;
-import com.google.android.gms.common.api.Api.zzb;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.internal.zzcj;
+import android.content.Context;
+import android.os.Looper;
+import com.google.android.gms.common.api.Api.AbstractClientBuilder;
+import com.google.android.gms.common.api.Api.Client;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.internal.ClientSettings;
+import com.google.android.gms.nearby.messages.MessagesOptions;
 
-final class zzau extends zzav {
-    private /* synthetic */ zzcj zzjge;
-
-    zzau(zzak zzak, GoogleApiClient googleApiClient, zzcj zzcj) {
-        this.zzjge = zzcj;
-        super(googleApiClient);
+final class zzau extends AbstractClientBuilder<zzah, MessagesOptions> {
+    zzau() {
     }
 
-    protected final /* synthetic */ void zza(zzb zzb) throws RemoteException {
-        ((zzah) zzb).zzb(zzbbb(), this.zzjge);
+    public final /* synthetic */ Client buildClient(Context context, Looper looper, ClientSettings clientSettings, Object obj, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener) {
+        return new zzah(context, looper, connectionCallbacks, onConnectionFailedListener, clientSettings, (MessagesOptions) obj);
+    }
+
+    public final int getPriority() {
+        return Integer.MAX_VALUE;
     }
 }

@@ -5,22 +5,30 @@ import android.os.Parcelable;
 import java.io.IOException;
 
 public abstract class CachedModel implements Parcelable {
-    private String id;
+
+    /* renamed from: id */
+    private String f432id;
     private long transactionId = Long.MIN_VALUE;
+
+    public CachedModel() {
+    }
 
     public CachedModel(Parcel parcel) throws IOException {
         readFromParcel(parcel);
     }
 
     public CachedModel(String str) {
-        this.id = str;
+        this.f432id = str;
     }
 
     public static CachedModel find(ModelCache modelCache, String str, Class<? extends CachedModel> cls) {
         try {
             CachedModel cachedModel = (CachedModel) cls.newInstance();
             cachedModel.setId(str);
-            return cachedModel.reload(modelCache) ? cachedModel : null;
+            if (cachedModel.reload(modelCache)) {
+                return cachedModel;
+            }
+            return null;
         } catch (Exception e) {
             return null;
         }
@@ -33,15 +41,18 @@ public abstract class CachedModel implements Parcelable {
     }
 
     public String getId() {
-        return this.id;
+        return this.f432id;
     }
 
     public String getKey() {
-        return this.id == null ? null : createKey(this.id);
+        if (this.f432id == null) {
+            return null;
+        }
+        return createKey(this.f432id);
     }
 
     public void readFromParcel(Parcel parcel) throws IOException {
-        this.id = parcel.readString();
+        this.f432id = parcel.readString();
         this.transactionId = parcel.readLong();
     }
 
@@ -63,7 +74,8 @@ public abstract class CachedModel implements Parcelable {
         return save(modelCache, getKey());
     }
 
-    protected boolean save(ModelCache modelCache, String str) {
+    /* access modifiers changed from: protected */
+    public boolean save(ModelCache modelCache, String str) {
         if (modelCache == null || str == null) {
             return false;
         }
@@ -72,15 +84,16 @@ public abstract class CachedModel implements Parcelable {
     }
 
     public void setId(String str) {
-        this.id = str;
+        this.f432id = str;
     }
 
-    void setTransactionId(long j) {
+    /* access modifiers changed from: 0000 */
+    public void setTransactionId(long j) {
         this.transactionId = j;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(this.id);
+        parcel.writeString(this.f432id);
         parcel.writeLong(this.transactionId);
     }
 }

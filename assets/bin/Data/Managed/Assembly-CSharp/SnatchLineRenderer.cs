@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SnatchLineRenderer
+public class SnatchLineRenderer : MonoBehaviour
 {
 	private LineRenderer lineRenderer;
 
@@ -11,7 +11,7 @@ public class SnatchLineRenderer
 
 	private void Start()
 	{
-		Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
+		Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform);
 		if (!(val == null))
 		{
 			lineRenderer = val.GetComponent<LineRenderer>();
@@ -24,7 +24,6 @@ public class SnatchLineRenderer
 
 	private void OnDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (lineRenderer != null)
 		{
 			Object.Destroy(lineRenderer.get_gameObject());

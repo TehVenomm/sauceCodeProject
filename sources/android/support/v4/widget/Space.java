@@ -1,11 +1,13 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.MeasureSpec;
 
+/* renamed from: android.support.v4.widget.Space */
 public class Space extends View {
     public Space(Context context) {
         this(context, null);
@@ -35,10 +37,12 @@ public class Space extends View {
         }
     }
 
+    @SuppressLint({"MissingSuperCall"})
     public void draw(Canvas canvas) {
     }
 
-    protected void onMeasure(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void onMeasure(int i, int i2) {
         setMeasuredDimension(getDefaultSize2(getSuggestedMinimumWidth(), i), getDefaultSize2(getSuggestedMinimumHeight(), i2));
     }
 }

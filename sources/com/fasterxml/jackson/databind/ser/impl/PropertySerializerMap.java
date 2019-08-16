@@ -143,7 +143,7 @@ public abstract class PropertySerializerMap {
     }
 
     public final SerializerAndMapResult findAndAddPrimarySerializer(Class<?> cls, SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer findPrimaryPropertySerializer = serializerProvider.findPrimaryPropertySerializer((Class) cls, beanProperty);
+        JsonSerializer findPrimaryPropertySerializer = serializerProvider.findPrimaryPropertySerializer(cls, beanProperty);
         return new SerializerAndMapResult(findPrimaryPropertySerializer, newWith(cls, findPrimaryPropertySerializer));
     }
 
@@ -153,7 +153,7 @@ public abstract class PropertySerializerMap {
     }
 
     public final SerializerAndMapResult findAndAddSecondarySerializer(Class<?> cls, SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer findValueSerializer = serializerProvider.findValueSerializer((Class) cls, beanProperty);
+        JsonSerializer findValueSerializer = serializerProvider.findValueSerializer(cls, beanProperty);
         return new SerializerAndMapResult(findValueSerializer, newWith(cls, findValueSerializer));
     }
 
@@ -163,17 +163,17 @@ public abstract class PropertySerializerMap {
     }
 
     public final SerializerAndMapResult findAndAddRootValueSerializer(Class<?> cls, SerializerProvider serializerProvider) throws JsonMappingException {
-        JsonSerializer findTypedValueSerializer = serializerProvider.findTypedValueSerializer((Class) cls, false, null);
+        JsonSerializer findTypedValueSerializer = serializerProvider.findTypedValueSerializer(cls, false, (BeanProperty) null);
         return new SerializerAndMapResult(findTypedValueSerializer, newWith(cls, findTypedValueSerializer));
     }
 
     public final SerializerAndMapResult findAndAddRootValueSerializer(JavaType javaType, SerializerProvider serializerProvider) throws JsonMappingException {
-        JsonSerializer findTypedValueSerializer = serializerProvider.findTypedValueSerializer(javaType, false, null);
+        JsonSerializer findTypedValueSerializer = serializerProvider.findTypedValueSerializer(javaType, false, (BeanProperty) null);
         return new SerializerAndMapResult(findTypedValueSerializer, newWith(javaType.getRawClass(), findTypedValueSerializer));
     }
 
     public final SerializerAndMapResult findAndAddKeySerializer(Class<?> cls, SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer findKeySerializer = serializerProvider.findKeySerializer((Class) cls, beanProperty);
+        JsonSerializer findKeySerializer = serializerProvider.findKeySerializer(cls, beanProperty);
         return new SerializerAndMapResult(findKeySerializer, newWith(cls, findKeySerializer));
     }
 

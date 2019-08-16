@@ -16,7 +16,6 @@ import com.fasterxml.jackson.core.util.Instantiatable;
 import com.fasterxml.jackson.databind.cfg.BaseSettings;
 import com.fasterxml.jackson.databind.cfg.ContextAttributes;
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.cfg.MapperConfigBase;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector;
 import com.fasterxml.jackson.databind.introspect.SimpleMixInResolver;
@@ -46,7 +45,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
 
     public SerializationConfig(BaseSettings baseSettings, SubtypeResolver subtypeResolver, SimpleMixInResolver simpleMixInResolver, RootNameLookup rootNameLookup) {
         super(baseSettings, subtypeResolver, simpleMixInResolver, rootNameLookup);
-        this._serFeatures = MapperConfig.collectFeatureDefaults(SerializationFeature.class);
+        this._serFeatures = collectFeatureDefaults(SerializationFeature.class);
         this._filterProvider = null;
         this._defaultPrettyPrinter = DEFAULT_PRETTY_PRINTER;
         this._generatorFeatures = 0;
@@ -57,7 +56,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     private SerializationConfig(SerializationConfig serializationConfig, SubtypeResolver subtypeResolver) {
-        super((MapperConfigBase) serializationConfig, subtypeResolver);
+        super((MapperConfigBase<CFG, T>) serializationConfig, subtypeResolver);
         this._serFeatures = serializationConfig._serFeatures;
         this._serializationInclusion = serializationConfig._serializationInclusion;
         this._filterProvider = serializationConfig._filterProvider;
@@ -69,7 +68,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     private SerializationConfig(SerializationConfig serializationConfig, int i, int i2, int i3, int i4, int i5, int i6) {
-        super((MapperConfigBase) serializationConfig, i);
+        super((MapperConfigBase<CFG, T>) serializationConfig, i);
         this._serFeatures = i2;
         this._serializationInclusion = serializationConfig._serializationInclusion;
         this._filterProvider = serializationConfig._filterProvider;
@@ -81,7 +80,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     private SerializationConfig(SerializationConfig serializationConfig, BaseSettings baseSettings) {
-        super((MapperConfigBase) serializationConfig, baseSettings);
+        super((MapperConfigBase<CFG, T>) serializationConfig, baseSettings);
         this._serFeatures = serializationConfig._serFeatures;
         this._serializationInclusion = serializationConfig._serializationInclusion;
         this._filterProvider = serializationConfig._filterProvider;
@@ -105,7 +104,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     private SerializationConfig(SerializationConfig serializationConfig, Class<?> cls) {
-        super((MapperConfigBase) serializationConfig, (Class) cls);
+        super((MapperConfigBase<CFG, T>) serializationConfig, cls);
         this._serFeatures = serializationConfig._serFeatures;
         this._serializationInclusion = serializationConfig._serializationInclusion;
         this._filterProvider = serializationConfig._filterProvider;
@@ -129,7 +128,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     private SerializationConfig(SerializationConfig serializationConfig, PropertyName propertyName) {
-        super((MapperConfigBase) serializationConfig, propertyName);
+        super((MapperConfigBase<CFG, T>) serializationConfig, propertyName);
         this._serFeatures = serializationConfig._serFeatures;
         this._serializationInclusion = serializationConfig._serializationInclusion;
         this._filterProvider = serializationConfig._filterProvider;
@@ -141,7 +140,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     protected SerializationConfig(SerializationConfig serializationConfig, ContextAttributes contextAttributes) {
-        super((MapperConfigBase) serializationConfig, contextAttributes);
+        super((MapperConfigBase<CFG, T>) serializationConfig, contextAttributes);
         this._serFeatures = serializationConfig._serFeatures;
         this._serializationInclusion = serializationConfig._serializationInclusion;
         this._filterProvider = serializationConfig._filterProvider;
@@ -153,7 +152,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     protected SerializationConfig(SerializationConfig serializationConfig, SimpleMixInResolver simpleMixInResolver) {
-        super((MapperConfigBase) serializationConfig, simpleMixInResolver);
+        super((MapperConfigBase<CFG, T>) serializationConfig, simpleMixInResolver);
         this._serFeatures = serializationConfig._serFeatures;
         this._serializationInclusion = serializationConfig._serializationInclusion;
         this._filterProvider = serializationConfig._filterProvider;
@@ -193,7 +192,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         for (MapperFeature mask : mapperFeatureArr) {
             i |= mask.getMask();
         }
-        return i == this._mapperFeatures ? this : new SerializationConfig(this, i, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (i == this._mapperFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, i, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig without(MapperFeature... mapperFeatureArr) {
@@ -201,7 +203,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         for (MapperFeature mask : mapperFeatureArr) {
             i &= mask.getMask() ^ -1;
         }
-        return i == this._mapperFeatures ? this : new SerializationConfig(this, i, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (i == this._mapperFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, i, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig with(MapperFeature mapperFeature, boolean z) {
@@ -211,7 +216,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         } else {
             mask = this._mapperFeatures & (mapperFeature.getMask() ^ -1);
         }
-        return mask == this._mapperFeatures ? this : new SerializationConfig(this, mask, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (mask == this._mapperFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, mask, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig with(AnnotationIntrospector annotationIntrospector) {
@@ -270,7 +278,7 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     }
 
     public SerializationConfig withView(Class<?> cls) {
-        return this._view == cls ? this : new SerializationConfig(this, (Class) cls);
+        return this._view == cls ? this : new SerializationConfig(this, cls);
     }
 
     public SerializationConfig with(VisibilityChecker<?> visibilityChecker) {
@@ -303,7 +311,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
 
     public SerializationConfig with(SerializationFeature serializationFeature) {
         int mask = this._serFeatures | serializationFeature.getMask();
-        return mask == this._serFeatures ? this : new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (mask == this._serFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig with(SerializationFeature serializationFeature, SerializationFeature... serializationFeatureArr) {
@@ -311,7 +322,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         for (SerializationFeature mask2 : serializationFeatureArr) {
             mask |= mask2.getMask();
         }
-        return mask == this._serFeatures ? this : new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (mask == this._serFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig withFeatures(SerializationFeature... serializationFeatureArr) {
@@ -319,12 +333,18 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         for (SerializationFeature mask : serializationFeatureArr) {
             i |= mask.getMask();
         }
-        return i == this._serFeatures ? this : new SerializationConfig(this, this._mapperFeatures, i, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (i == this._serFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, i, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig without(SerializationFeature serializationFeature) {
         int mask = this._serFeatures & (serializationFeature.getMask() ^ -1);
-        return mask == this._serFeatures ? this : new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (mask == this._serFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig without(SerializationFeature serializationFeature, SerializationFeature... serializationFeatureArr) {
@@ -332,7 +352,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         for (SerializationFeature mask2 : serializationFeatureArr) {
             mask &= mask2.getMask() ^ -1;
         }
-        return mask == this._serFeatures ? this : new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (mask == this._serFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, mask, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig withoutFeatures(SerializationFeature... serializationFeatureArr) {
@@ -340,13 +363,19 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         for (SerializationFeature mask : serializationFeatureArr) {
             i &= mask.getMask() ^ -1;
         }
-        return i == this._serFeatures ? this : new SerializationConfig(this, this._mapperFeatures, i, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (i == this._serFeatures) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, i, this._generatorFeatures, this._generatorFeaturesToChange, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig with(Feature feature) {
         int mask = this._generatorFeatures | feature.getMask();
         int mask2 = this._generatorFeaturesToChange | feature.getMask();
-        return (this._generatorFeatures == mask && this._generatorFeaturesToChange == mask2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, mask, mask2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (this._generatorFeatures == mask && this._generatorFeaturesToChange == mask2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, mask, mask2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig withFeatures(Feature... featureArr) {
@@ -357,13 +386,19 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
             i |= mask2;
             i2 |= mask2;
         }
-        return (this._generatorFeatures == i && this._generatorFeaturesToChange == i2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, i, i2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (this._generatorFeatures == i && this._generatorFeaturesToChange == i2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, i, i2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig without(Feature feature) {
         int mask = this._generatorFeatures & (feature.getMask() ^ -1);
         int mask2 = this._generatorFeaturesToChange | feature.getMask();
-        return (this._generatorFeatures == mask && this._generatorFeaturesToChange == mask2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, mask, mask2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (this._generatorFeatures == mask && this._generatorFeaturesToChange == mask2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, mask, mask2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig withoutFeatures(Feature... featureArr) {
@@ -374,13 +409,19 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
             i &= mask2 ^ -1;
             i2 |= mask2;
         }
-        return (this._generatorFeatures == i && this._generatorFeaturesToChange == i2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, i, i2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
+        if (this._generatorFeatures == i && this._generatorFeaturesToChange == i2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, i, i2, this._formatWriteFeatures, this._formatWriteFeaturesToChange);
     }
 
     public SerializationConfig with(FormatFeature formatFeature) {
         int mask = this._formatWriteFeatures | formatFeature.getMask();
         int mask2 = this._formatWriteFeaturesToChange | formatFeature.getMask();
-        return (this._formatWriteFeatures == mask && this._formatWriteFeaturesToChange == mask2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, mask, mask2);
+        if (this._formatWriteFeatures == mask && this._formatWriteFeaturesToChange == mask2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, mask, mask2);
     }
 
     public SerializationConfig withFeatures(FormatFeature... formatFeatureArr) {
@@ -391,13 +432,19 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
             i |= mask2;
             i2 |= mask2;
         }
-        return (this._formatWriteFeatures == i && this._formatWriteFeaturesToChange == i2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, i, i2);
+        if (this._formatWriteFeatures == i && this._formatWriteFeaturesToChange == i2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, i, i2);
     }
 
     public SerializationConfig without(FormatFeature formatFeature) {
         int mask = this._formatWriteFeatures & (formatFeature.getMask() ^ -1);
         int mask2 = this._formatWriteFeaturesToChange | formatFeature.getMask();
-        return (this._formatWriteFeatures == mask && this._formatWriteFeaturesToChange == mask2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, mask, mask2);
+        if (this._formatWriteFeatures == mask && this._formatWriteFeaturesToChange == mask2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, mask, mask2);
     }
 
     public SerializationConfig withoutFeatures(FormatFeature... formatFeatureArr) {
@@ -408,7 +455,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
             i &= mask2 ^ -1;
             i2 |= mask2;
         }
-        return (this._formatWriteFeatures == i && this._formatWriteFeaturesToChange == i2) ? this : new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, i, i2);
+        if (this._formatWriteFeatures == i && this._formatWriteFeaturesToChange == i2) {
+            return this;
+        }
+        return new SerializationConfig(this, this._mapperFeatures, this._serFeatures, this._generatorFeatures, this._generatorFeaturesToChange, i, i2);
     }
 
     public SerializationConfig withFilters(FilterProvider filterProvider) {
@@ -482,10 +532,10 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
         if (!isEnabled(MapperFeature.AUTO_DETECT_IS_GETTERS)) {
             defaultVisibilityChecker = defaultVisibilityChecker.withIsGetterVisibility(Visibility.NONE);
         }
-        if (isEnabled(MapperFeature.AUTO_DETECT_FIELDS)) {
-            return defaultVisibilityChecker;
+        if (!isEnabled(MapperFeature.AUTO_DETECT_FIELDS)) {
+            return defaultVisibilityChecker.withFieldVisibility(Visibility.NONE);
         }
-        return defaultVisibilityChecker.withFieldVisibility(Visibility.NONE);
+        return defaultVisibilityChecker;
     }
 
     @Deprecated
@@ -509,9 +559,8 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     public boolean useRootWrapping() {
         if (this._rootName != null) {
             return !this._rootName.isEmpty();
-        } else {
-            return isEnabled(SerializationFeature.WRAP_ROOT_VALUE);
         }
+        return isEnabled(SerializationFeature.WRAP_ROOT_VALUE);
     }
 
     public final boolean isEnabled(SerializationFeature serializationFeature) {
@@ -521,9 +570,8 @@ public final class SerializationConfig extends MapperConfigBase<SerializationFea
     public final boolean isEnabled(Feature feature, JsonFactory jsonFactory) {
         if ((feature.getMask() & this._generatorFeaturesToChange) != 0) {
             return (this._generatorFeatures & feature.getMask()) != 0;
-        } else {
-            return jsonFactory.isEnabled(feature);
         }
+        return jsonFactory.isEnabled(feature);
     }
 
     public final boolean hasSerializationFeatures(int i) {

@@ -1,10 +1,11 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.os.Parcelable;
-import android.support.v4.view.PagerAdapter;
+import android.support.p000v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
+/* renamed from: android.support.v4.app.FragmentPagerAdapter */
 public abstract class FragmentPagerAdapter extends PagerAdapter {
     private static final boolean DEBUG = false;
     private static final String TAG = "FragmentPagerAdapter";

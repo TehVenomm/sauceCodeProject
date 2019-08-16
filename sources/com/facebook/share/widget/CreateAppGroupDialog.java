@@ -19,19 +19,23 @@ import com.facebook.share.model.AppGroupCreationContent;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class CreateAppGroupDialog extends FacebookDialogBase<AppGroupCreationContent, Result> {
     private static final int DEFAULT_REQUEST_CODE = RequestCodeOffset.AppGroupCreate.toRequestCode();
     private static final String GAME_GROUP_CREATION_DIALOG = "game_group_create";
 
+    @Deprecated
     public static final class Result {
-        private final String id;
+
+        /* renamed from: id */
+        private final String f401id;
 
         private Result(String str) {
-            this.id = str;
+            this.f401id = str;
         }
 
         public String getId() {
-            return this.id;
+            return this.f401id;
         }
     }
 
@@ -51,15 +55,18 @@ public class CreateAppGroupDialog extends FacebookDialogBase<AppGroupCreationCon
         }
     }
 
+    @Deprecated
     public CreateAppGroupDialog(Activity activity) {
         super(activity, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public CreateAppGroupDialog(Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
-    public CreateAppGroupDialog(android.support.v4.app.Fragment fragment) {
+    @Deprecated
+    public CreateAppGroupDialog(android.support.p000v4.app.Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
@@ -67,19 +74,23 @@ public class CreateAppGroupDialog extends FacebookDialogBase<AppGroupCreationCon
         super(fragmentWrapper, DEFAULT_REQUEST_CODE);
     }
 
+    @Deprecated
     public static boolean canShow() {
         return true;
     }
 
+    @Deprecated
     public static void show(Activity activity, AppGroupCreationContent appGroupCreationContent) {
         new CreateAppGroupDialog(activity).show(appGroupCreationContent);
     }
 
+    @Deprecated
     public static void show(Fragment fragment, AppGroupCreationContent appGroupCreationContent) {
         show(new FragmentWrapper(fragment), appGroupCreationContent);
     }
 
-    public static void show(android.support.v4.app.Fragment fragment, AppGroupCreationContent appGroupCreationContent) {
+    @Deprecated
+    public static void show(android.support.p000v4.app.Fragment fragment, AppGroupCreationContent appGroupCreationContent) {
         show(new FragmentWrapper(fragment), appGroupCreationContent);
     }
 
@@ -87,25 +98,28 @@ public class CreateAppGroupDialog extends FacebookDialogBase<AppGroupCreationCon
         new CreateAppGroupDialog(fragmentWrapper).show(appGroupCreationContent);
     }
 
-    protected AppCall createBaseAppCall() {
+    /* access modifiers changed from: protected */
+    public AppCall createBaseAppCall() {
         return new AppCall(getRequestCode());
     }
 
-    protected List<ModeHandler> getOrderedModeHandlers() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<ModeHandler> getOrderedModeHandlers() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(new WebHandler());
         return arrayList;
     }
 
-    protected void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
-        final ResultProcessor c05241 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
+    /* access modifiers changed from: protected */
+    public void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, final FacebookCallback<Result> facebookCallback) {
+        final C08321 r0 = facebookCallback == null ? null : new ResultProcessor(facebookCallback) {
             public void onSuccess(AppCall appCall, Bundle bundle) {
                 facebookCallback.onSuccess(new Result(bundle.getString("id")));
             }
         };
         callbackManagerImpl.registerCallback(getRequestCode(), new Callback() {
             public boolean onActivityResult(int i, Intent intent) {
-                return ShareInternalUtility.handleActivityResult(CreateAppGroupDialog.this.getRequestCode(), i, intent, c05241);
+                return ShareInternalUtility.handleActivityResult(CreateAppGroupDialog.this.getRequestCode(), i, intent, r0);
             }
         });
     }

@@ -1,13 +1,13 @@
 package com.fasterxml.jackson.databind.jsontype;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 
 public interface TypeIdResolver {
     String getDescForKnownTypeIds();
 
-    Id getMechanism();
+    C0862Id getMechanism();
 
     String idFromBaseType();
 

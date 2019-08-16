@@ -4,43 +4,67 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 
-public final class IdToken extends zza implements ReflectedParcelable {
-    public static final Creator<IdToken> CREATOR = new zzh();
+@Class(creator = "IdTokenCreator")
+@Reserved({1000})
+public final class IdToken extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<IdToken> CREATOR = new zzk();
+    @Field(getter = "getIdToken", mo13990id = 2)
     @NonNull
-    private final String zzdzs;
+    private final String zzak;
+    @Field(getter = "getAccountType", mo13990id = 1)
     @NonNull
-    private final String zzeax;
+    private final String zzr;
 
-    public IdToken(@NonNull String str, @NonNull String str2) {
+    @Constructor
+    public IdToken(@Param(mo13993id = 1) @NonNull String str, @Param(mo13993id = 2) @NonNull String str2) {
         boolean z = true;
-        zzbp.zzb(!TextUtils.isEmpty(str), (Object) "account type string cannot be null or empty");
+        Preconditions.checkArgument(!TextUtils.isEmpty(str), "account type string cannot be null or empty");
         if (TextUtils.isEmpty(str2)) {
             z = false;
         }
-        zzbp.zzb(z, (Object) "id token string cannot be null or empty");
-        this.zzdzs = str;
-        this.zzeax = str2;
+        Preconditions.checkArgument(z, "id token string cannot be null or empty");
+        this.zzr = str;
+        this.zzak = str2;
+    }
+
+    public final boolean equals(Object obj) {
+        if (this != obj) {
+            if (!(obj instanceof IdToken)) {
+                return false;
+            }
+            IdToken idToken = (IdToken) obj;
+            if (!Objects.equal(this.zzr, idToken.zzr) || !Objects.equal(this.zzak, idToken.zzak)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @NonNull
     public final String getAccountType() {
-        return this.zzdzs;
+        return this.zzr;
     }
 
     @NonNull
     public final String getIdToken() {
-        return this.zzeax;
+        return this.zzak;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getAccountType(), false);
-        zzd.zza(parcel, 2, getIdToken(), false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 1, getAccountType(), false);
+        SafeParcelWriter.writeString(parcel, 2, getIdToken(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

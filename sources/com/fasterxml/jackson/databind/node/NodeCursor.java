@@ -16,7 +16,7 @@ abstract class NodeCursor extends JsonStreamContext {
         protected JsonNode _currentNode;
 
         public /* bridge */ /* synthetic */ JsonStreamContext getParent() {
-            return super.getParent();
+            return NodeCursor.super.getParent();
         }
 
         public ArrayCursor(JsonNode jsonNode, NodeCursor nodeCursor) {
@@ -25,12 +25,12 @@ abstract class NodeCursor extends JsonStreamContext {
         }
 
         public JsonToken nextToken() {
-            if (this._contents.hasNext()) {
-                this._currentNode = (JsonNode) this._contents.next();
-                return this._currentNode.asToken();
+            if (!this._contents.hasNext()) {
+                this._currentNode = null;
+                return null;
             }
-            this._currentNode = null;
-            return null;
+            this._currentNode = (JsonNode) this._contents.next();
+            return this._currentNode.asToken();
         }
 
         public JsonToken nextValue() {
@@ -56,7 +56,7 @@ abstract class NodeCursor extends JsonStreamContext {
         protected boolean _needEntry = true;
 
         public /* bridge */ /* synthetic */ JsonStreamContext getParent() {
-            return super.getParent();
+            return NodeCursor.super.getParent();
         }
 
         public ObjectCursor(JsonNode jsonNode, NodeCursor nodeCursor) {
@@ -68,15 +68,15 @@ abstract class NodeCursor extends JsonStreamContext {
             if (!this._needEntry) {
                 this._needEntry = true;
                 return ((JsonNode) this._current.getValue()).asToken();
-            } else if (this._contents.hasNext()) {
+            } else if (!this._contents.hasNext()) {
+                this._currentName = null;
+                this._current = null;
+                return null;
+            } else {
                 this._needEntry = false;
                 this._current = (Entry) this._contents.next();
                 this._currentName = this._current == null ? null : (String) this._current.getKey();
                 return JsonToken.FIELD_NAME;
-            } else {
-                this._currentName = null;
-                this._current = null;
-                return null;
             }
         }
 
@@ -93,7 +93,10 @@ abstract class NodeCursor extends JsonStreamContext {
         }
 
         public JsonNode currentNode() {
-            return this._current == null ? null : (JsonNode) this._current.getValue();
+            if (this._current == null) {
+                return null;
+            }
+            return (JsonNode) this._current.getValue();
         }
 
         public boolean currentHasChildren() {
@@ -106,7 +109,7 @@ abstract class NodeCursor extends JsonStreamContext {
         protected JsonNode _node;
 
         public /* bridge */ /* synthetic */ JsonStreamContext getParent() {
-            return super.getParent();
+            return NodeCursor.super.getParent();
         }
 
         public RootCursor(JsonNode jsonNode, NodeCursor nodeCursor) {
@@ -118,12 +121,12 @@ abstract class NodeCursor extends JsonStreamContext {
         }
 
         public JsonToken nextToken() {
-            if (this._done) {
-                this._node = null;
-                return null;
+            if (!this._done) {
+                this._done = true;
+                return this._node.asToken();
             }
-            this._done = true;
-            return this._node.asToken();
+            this._node = null;
+            return null;
         }
 
         public JsonToken nextValue() {

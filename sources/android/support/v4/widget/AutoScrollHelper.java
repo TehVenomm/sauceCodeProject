@@ -1,9 +1,8 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
 import android.content.res.Resources;
 import android.os.SystemClock;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
+import android.support.p000v4.view.ViewCompat;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +12,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 
+/* renamed from: android.support.v4.widget.AutoScrollHelper */
 public abstract class AutoScrollHelper implements OnTouchListener {
     private static final int DEFAULT_ACTIVATION_DELAY = ViewConfiguration.getTapTimeout();
     private static final int DEFAULT_EDGE_TYPE = 1;
@@ -38,17 +38,18 @@ public abstract class AutoScrollHelper implements OnTouchListener {
     private int mEdgeType;
     private boolean mEnabled;
     private boolean mExclusive;
-    private float[] mMaximumEdges = new float[]{Float.MAX_VALUE, Float.MAX_VALUE};
-    private float[] mMaximumVelocity = new float[]{Float.MAX_VALUE, Float.MAX_VALUE};
-    private float[] mMinimumVelocity = new float[]{0.0f, 0.0f};
+    private float[] mMaximumEdges = {Float.MAX_VALUE, Float.MAX_VALUE};
+    private float[] mMaximumVelocity = {Float.MAX_VALUE, Float.MAX_VALUE};
+    private float[] mMinimumVelocity = {0.0f, 0.0f};
     boolean mNeedsCancel;
     boolean mNeedsReset;
-    private float[] mRelativeEdges = new float[]{0.0f, 0.0f};
-    private float[] mRelativeVelocity = new float[]{0.0f, 0.0f};
+    private float[] mRelativeEdges = {0.0f, 0.0f};
+    private float[] mRelativeVelocity = {0.0f, 0.0f};
     private Runnable mRunnable;
     final ClampedScroller mScroller = new ClampedScroller();
     final View mTarget;
 
+    /* renamed from: android.support.v4.widget.AutoScrollHelper$ClampedScroller */
     private static class ClampedScroller {
         private long mDeltaTime = 0;
         private int mDeltaX = 0;
@@ -78,7 +79,7 @@ public abstract class AutoScrollHelper implements OnTouchListener {
         }
 
         private float interpolateValue(float f) {
-            return ((-4.0f * f) * f) + (4.0f * f);
+            return (-4.0f * f * f) + (4.0f * f);
         }
 
         public void computeScrollDelta() {
@@ -89,8 +90,8 @@ public abstract class AutoScrollHelper implements OnTouchListener {
             float interpolateValue = interpolateValue(getValueAt(currentAnimationTimeMillis));
             long j = currentAnimationTimeMillis - this.mDeltaTime;
             this.mDeltaTime = currentAnimationTimeMillis;
-            this.mDeltaX = (int) ((((float) j) * interpolateValue) * this.mTargetVelocityX);
-            this.mDeltaY = (int) ((((float) j) * interpolateValue) * this.mTargetVelocityY);
+            this.mDeltaX = (int) (((float) j) * interpolateValue * this.mTargetVelocityX);
+            this.mDeltaY = (int) (((float) j) * interpolateValue * this.mTargetVelocityY);
         }
 
         public int getDeltaX() {
@@ -143,6 +144,7 @@ public abstract class AutoScrollHelper implements OnTouchListener {
         }
     }
 
+    /* renamed from: android.support.v4.widget.AutoScrollHelper$ScrollAnimationRunnable */
     private class ScrollAnimationRunnable implements Runnable {
         ScrollAnimationRunnable() {
         }
@@ -193,8 +195,8 @@ public abstract class AutoScrollHelper implements OnTouchListener {
         float f4 = this.mRelativeVelocity[i];
         float f5 = this.mMinimumVelocity[i];
         float f6 = this.mMaximumVelocity[i];
-        f4 *= f3;
-        return edgeValue > 0.0f ? constrain(edgeValue * f4, f5, f6) : -constrain((-edgeValue) * f4, f5, f6);
+        float f7 = f4 * f3;
+        return edgeValue > 0.0f ? constrain(edgeValue * f7, f5, f6) : -constrain((-edgeValue) * f7, f5, f6);
     }
 
     static float constrain(float f, float f2, float f3) {
@@ -212,26 +214,38 @@ public abstract class AutoScrollHelper implements OnTouchListener {
         switch (this.mEdgeType) {
             case 0:
             case 1:
-                return f < f2 ? f >= 0.0f ? DEFAULT_RELATIVE_VELOCITY - (f / f2) : (this.mAnimating && this.mEdgeType == 1) ? DEFAULT_RELATIVE_VELOCITY : 0.0f : 0.0f;
+                if (f >= f2) {
+                    return 0.0f;
+                }
+                if (f >= 0.0f) {
+                    return DEFAULT_RELATIVE_VELOCITY - (f / f2);
+                }
+                if (!this.mAnimating || this.mEdgeType != 1) {
+                    return 0.0f;
+                }
+                return DEFAULT_RELATIVE_VELOCITY;
             case 2:
-                return f < 0.0f ? f / (-f2) : 0.0f;
+                if (f < 0.0f) {
+                    return f / (-f2);
+                }
+                return 0.0f;
             default:
                 return 0.0f;
         }
     }
 
     private float getEdgeValue(float f, float f2, float f3, float f4) {
-        float f5;
+        float interpolation;
         float constrain = constrain(f * f2, 0.0f, f3);
-        constrain = constrainEdgeValue(f2 - f4, constrain) - constrainEdgeValue(f4, constrain);
-        if (constrain < 0.0f) {
-            f5 = -this.mEdgeInterpolator.getInterpolation(-constrain);
-        } else if (constrain <= 0.0f) {
+        float constrainEdgeValue = constrainEdgeValue(f2 - f4, constrain) - constrainEdgeValue(f4, constrain);
+        if (constrainEdgeValue < 0.0f) {
+            interpolation = -this.mEdgeInterpolator.getInterpolation(-constrainEdgeValue);
+        } else if (constrainEdgeValue <= 0.0f) {
             return 0.0f;
         } else {
-            f5 = this.mEdgeInterpolator.getInterpolation(constrain);
+            interpolation = this.mEdgeInterpolator.getInterpolation(constrainEdgeValue);
         }
-        return constrain(f5, -1.0f, (float) DEFAULT_RELATIVE_VELOCITY);
+        return constrain(interpolation, -1.0f, (float) DEFAULT_RELATIVE_VELOCITY);
     }
 
     private void requestStop() {
@@ -260,7 +274,8 @@ public abstract class AutoScrollHelper implements OnTouchListener {
 
     public abstract boolean canTargetScrollVertically(int i);
 
-    void cancelTargetTouch() {
+    /* access modifiers changed from: 0000 */
+    public void cancelTargetTouch() {
         long uptimeMillis = SystemClock.uptimeMillis();
         MotionEvent obtain = MotionEvent.obtain(uptimeMillis, uptimeMillis, 3, 0.0f, 0.0f, 0);
         this.mTarget.onTouchEvent(obtain);
@@ -279,7 +294,7 @@ public abstract class AutoScrollHelper implements OnTouchListener {
         if (!this.mEnabled) {
             return false;
         }
-        switch (MotionEventCompat.getActionMasked(motionEvent)) {
+        switch (motionEvent.getActionMasked()) {
             case 0:
                 this.mNeedsCancel = true;
                 this.mAlreadyDelayed = false;
@@ -363,7 +378,8 @@ public abstract class AutoScrollHelper implements OnTouchListener {
         return this;
     }
 
-    boolean shouldAnimate() {
+    /* access modifiers changed from: 0000 */
+    public boolean shouldAnimate() {
         ClampedScroller clampedScroller = this.mScroller;
         int verticalDirection = clampedScroller.getVerticalDirection();
         int horizontalDirection = clampedScroller.getHorizontalDirection();

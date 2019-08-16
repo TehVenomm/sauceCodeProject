@@ -5,28 +5,31 @@ import com.google.android.gms.common.api.Api.ApiOptions.Optional;
 
 public class MessagesOptions implements Optional {
     @Nullable
-    public final String zzjdz;
-    public final boolean zzjea;
-    public final int zzjeb;
-    public final String zzjec;
+    public final String zzff;
+    public final boolean zzfg;
+    public final int zzfh;
+    public final String zzfi;
+    public final String zzfj;
 
     public static class Builder {
-        private int zzjed = -1;
+        /* access modifiers changed from: private */
+        public int zzfh = -1;
 
         public MessagesOptions build() {
-            return new MessagesOptions();
+            return new MessagesOptions(this);
         }
 
         public Builder setPermissions(int i) {
-            this.zzjed = i;
+            this.zzfh = i;
             return this;
         }
     }
 
     private MessagesOptions(Builder builder) {
-        this.zzjdz = null;
-        this.zzjea = false;
-        this.zzjeb = builder.zzjed;
-        this.zzjec = null;
+        this.zzff = null;
+        this.zzfg = false;
+        this.zzfh = builder.zzfh;
+        this.zzfi = null;
+        this.zzfj = null;
     }
 }

@@ -1,19 +1,20 @@
-package android.support.v4.content;
+package android.support.p000v4.content;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.content.Loader.ForceLoadContentObserver;
-import android.support.v4.os.CancellationSignal;
-import android.support.v4.os.OperationCanceledException;
+import android.support.p000v4.content.Loader.ForceLoadContentObserver;
+import android.support.p000v4.p002os.CancellationSignal;
+import android.support.p000v4.p002os.OperationCanceledException;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
+/* renamed from: android.support.v4.content.CursorLoader */
 public class CursorLoader extends AsyncTaskLoader<Cursor> {
     CancellationSignal mCancellationSignal;
     Cursor mCursor;
-    final ForceLoadContentObserver mObserver = new ForceLoadContentObserver();
+    final ForceLoadContentObserver mObserver = new ForceLoadContentObserver<>();
     String[] mProjection;
     String mSelection;
     String[] mSelectionArgs;
@@ -126,6 +127,7 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
         } catch (Throwable th) {
             synchronized (this) {
                 this.mCancellationSignal = null;
+                throw th;
             }
         }
     }
@@ -136,16 +138,18 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
         }
     }
 
-    protected void onReset() {
+    /* access modifiers changed from: protected */
+    public void onReset() {
         super.onReset();
         onStopLoading();
-        if (!(this.mCursor == null || this.mCursor.isClosed())) {
+        if (this.mCursor != null && !this.mCursor.isClosed()) {
             this.mCursor.close();
         }
         this.mCursor = null;
     }
 
-    protected void onStartLoading() {
+    /* access modifiers changed from: protected */
+    public void onStartLoading() {
         if (this.mCursor != null) {
             deliverResult(this.mCursor);
         }
@@ -154,7 +158,8 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
         }
     }
 
-    protected void onStopLoading() {
+    /* access modifiers changed from: protected */
+    public void onStopLoading() {
         cancelLoad();
     }
 

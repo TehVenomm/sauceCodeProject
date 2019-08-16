@@ -4,19 +4,10 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 public final class ShareLinkContent extends ShareContent<ShareLinkContent, Builder> {
-    public static final Creator<ShareLinkContent> CREATOR = new C05121();
-    private final String contentDescription;
-    private final String contentTitle;
-    private final Uri imageUrl;
-    private final String quote;
-
-    /* renamed from: com.facebook.share.model.ShareLinkContent$1 */
-    static final class C05121 implements Creator<ShareLinkContent> {
-        C05121() {
-        }
-
+    public static final Creator<ShareLinkContent> CREATOR = new Creator<ShareLinkContent>() {
         public ShareLinkContent createFromParcel(Parcel parcel) {
             return new ShareLinkContent(parcel);
         }
@@ -24,34 +15,52 @@ public final class ShareLinkContent extends ShareContent<ShareLinkContent, Build
         public ShareLinkContent[] newArray(int i) {
             return new ShareLinkContent[i];
         }
-    }
+    };
+    @Deprecated
+    private final String contentDescription;
+    @Deprecated
+    private final String contentTitle;
+    @Deprecated
+    private final Uri imageUrl;
+    private final String quote;
 
     public static final class Builder extends com.facebook.share.model.ShareContent.Builder<ShareLinkContent, Builder> {
-        private String contentDescription;
-        private String contentTitle;
-        private Uri imageUrl;
-        private String quote;
+        static final String TAG = Builder.class.getSimpleName();
+        /* access modifiers changed from: private */
+        @Deprecated
+        public String contentDescription;
+        /* access modifiers changed from: private */
+        @Deprecated
+        public String contentTitle;
+        /* access modifiers changed from: private */
+        @Deprecated
+        public Uri imageUrl;
+        /* access modifiers changed from: private */
+        public String quote;
 
         public ShareLinkContent build() {
-            return new ShareLinkContent();
+            return new ShareLinkContent(this);
         }
 
         public Builder readFrom(ShareLinkContent shareLinkContent) {
-            return shareLinkContent == null ? this : ((Builder) super.readFrom((ShareContent) shareLinkContent)).setContentDescription(shareLinkContent.getContentDescription()).setImageUrl(shareLinkContent.getImageUrl()).setContentTitle(shareLinkContent.getContentTitle()).setQuote(shareLinkContent.getQuote());
+            return shareLinkContent == null ? this : ((Builder) super.readFrom(shareLinkContent)).setContentDescription(shareLinkContent.getContentDescription()).setImageUrl(shareLinkContent.getImageUrl()).setContentTitle(shareLinkContent.getContentTitle()).setQuote(shareLinkContent.getQuote());
         }
 
+        @Deprecated
         public Builder setContentDescription(@Nullable String str) {
-            this.contentDescription = str;
+            Log.w(TAG, "This method does nothing. ContentDescription is deprecated in Graph API 2.9.");
             return this;
         }
 
+        @Deprecated
         public Builder setContentTitle(@Nullable String str) {
-            this.contentTitle = str;
+            Log.w(TAG, "This method does nothing. ContentTitle is deprecated in Graph API 2.9.");
             return this;
         }
 
+        @Deprecated
         public Builder setImageUrl(@Nullable Uri uri) {
-            this.imageUrl = uri;
+            Log.w(TAG, "This method does nothing. ImageUrl is deprecated in Graph API 2.9.");
             return this;
         }
 
@@ -81,16 +90,19 @@ public final class ShareLinkContent extends ShareContent<ShareLinkContent, Build
         return 0;
     }
 
+    @Deprecated
     public String getContentDescription() {
         return this.contentDescription;
     }
 
     @Nullable
+    @Deprecated
     public String getContentTitle() {
         return this.contentTitle;
     }
 
     @Nullable
+    @Deprecated
     public Uri getImageUrl() {
         return this.imageUrl;
     }

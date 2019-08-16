@@ -2,58 +2,170 @@ package com.google.firebase.iid;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Bundle;
+import android.content.pm.ResolveInfo;
+import android.os.Build.VERSION;
+import android.os.Looper;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.support.v4.util.ArrayMap;
-import android.util.Base64;
 import android.util.Log;
+import com.google.android.gms.common.util.VisibleForTesting;
+import com.google.android.gms.common.util.concurrent.NamedThreadFactory;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.DataCollectionDefaultChange;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.events.EventHandler;
+import com.google.firebase.events.Subscriber;
+import com.google.firebase.platforminfo.UserAgentPublisher;
 import java.io.IOException;
-import java.security.KeyPair;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import javax.annotation.concurrent.GuardedBy;
 
 public class FirebaseInstanceId {
-    private static Map<String, FirebaseInstanceId> zzhtf = new ArrayMap();
-    private static zzk zzmiw;
-    private final FirebaseApp zzmix;
-    private final zzj zzmiy;
-    private final String zzmiz;
+    private static final long zzaq = TimeUnit.HOURS.toSeconds(8);
+    private static zzav zzar;
+    @GuardedBy("FirebaseInstanceId.class")
+    @VisibleForTesting
+    private static ScheduledExecutorService zzas;
+    private final Executor zzat;
+    /* access modifiers changed from: private */
+    public final FirebaseApp zzau;
+    private final zzan zzav;
+    private MessagingChannel zzaw;
+    private final zzaq zzax;
+    private final zzaz zzay;
+    @GuardedBy("this")
+    private boolean zzaz;
+    private final zza zzba;
 
-    private FirebaseInstanceId(FirebaseApp firebaseApp, zzj zzj) {
-        String str = null;
-        this.zzmix = firebaseApp;
-        this.zzmiy = zzj;
-        String gcmSenderId = this.zzmix.getOptions().getGcmSenderId();
-        if (gcmSenderId == null) {
-            gcmSenderId = this.zzmix.getOptions().getApplicationId();
-            if (gcmSenderId.startsWith("1:")) {
-                String[] split = gcmSenderId.split(":");
-                if (split.length >= 2) {
-                    gcmSenderId = split[1];
-                    if (gcmSenderId.isEmpty()) {
-                    }
-                }
-                this.zzmiz = str;
-                if (this.zzmiz != null) {
-                    throw new IllegalStateException("IID failing to initialize, FirebaseApp is missing project ID");
-                }
-                FirebaseInstanceIdService.zza(this.zzmix.getApplicationContext(), this);
-                return;
+    private final class zza {
+        private final boolean zzbg = zzu();
+        private final Subscriber zzbh;
+        @Nullable
+        @GuardedBy("this")
+        private EventHandler<DataCollectionDefaultChange> zzbi;
+        @Nullable
+        @GuardedBy("this")
+        private Boolean zzbj = zzt();
+
+        zza(Subscriber subscriber) {
+            this.zzbh = subscriber;
+            if (this.zzbj == null && this.zzbg) {
+                this.zzbi = new zzq(this);
+                subscriber.subscribe(DataCollectionDefaultChange.class, this.zzbi);
             }
         }
-        str = gcmSenderId;
-        this.zzmiz = str;
-        if (this.zzmiz != null) {
-            FirebaseInstanceIdService.zza(this.zzmix.getApplicationContext(), this);
-            return;
+
+        @Nullable
+        private final Boolean zzt() {
+            Context applicationContext = FirebaseInstanceId.this.zzau.getApplicationContext();
+            SharedPreferences sharedPreferences = applicationContext.getSharedPreferences("com.google.firebase.messaging", 0);
+            if (sharedPreferences.contains("auto_init")) {
+                return Boolean.valueOf(sharedPreferences.getBoolean("auto_init", false));
+            }
+            try {
+                PackageManager packageManager = applicationContext.getPackageManager();
+                if (packageManager != null) {
+                    ApplicationInfo applicationInfo = packageManager.getApplicationInfo(applicationContext.getPackageName(), 128);
+                    if (!(applicationInfo == null || applicationInfo.metaData == null || !applicationInfo.metaData.containsKey("firebase_messaging_auto_init_enabled"))) {
+                        return Boolean.valueOf(applicationInfo.metaData.getBoolean("firebase_messaging_auto_init_enabled"));
+                    }
+                }
+            } catch (NameNotFoundException e) {
+            }
+            return null;
         }
-        throw new IllegalStateException("IID failing to initialize, FirebaseApp is missing project ID");
+
+        private final boolean zzu() {
+            try {
+                Class.forName("com.google.firebase.messaging.FirebaseMessaging");
+                return true;
+            } catch (ClassNotFoundException e) {
+                Context applicationContext = FirebaseInstanceId.this.zzau.getApplicationContext();
+                Intent intent = new Intent("com.google.firebase.MESSAGING_EVENT");
+                intent.setPackage(applicationContext.getPackageName());
+                ResolveInfo resolveService = applicationContext.getPackageManager().resolveService(intent, 0);
+                return (resolveService == null || resolveService.serviceInfo == null) ? false : true;
+            }
+        }
+
+        /* access modifiers changed from: 0000 */
+        public final boolean isEnabled() {
+            boolean z;
+            synchronized (this) {
+                z = this.zzbj != null ? this.zzbj.booleanValue() : this.zzbg && FirebaseInstanceId.this.zzau.isDataCollectionDefaultEnabled();
+            }
+            return z;
+        }
+
+        /* access modifiers changed from: 0000 */
+        public final void setEnabled(boolean z) {
+            synchronized (this) {
+                if (this.zzbi != null) {
+                    this.zzbh.unsubscribe(DataCollectionDefaultChange.class, this.zzbi);
+                    this.zzbi = null;
+                }
+                Editor edit = FirebaseInstanceId.this.zzau.getApplicationContext().getSharedPreferences("com.google.firebase.messaging", 0).edit();
+                edit.putBoolean("auto_init", z);
+                edit.apply();
+                if (z) {
+                    FirebaseInstanceId.this.zzh();
+                }
+                this.zzbj = Boolean.valueOf(z);
+            }
+        }
+    }
+
+    FirebaseInstanceId(FirebaseApp firebaseApp, Subscriber subscriber, UserAgentPublisher userAgentPublisher) {
+        this(firebaseApp, new zzan(firebaseApp.getApplicationContext()), zzh.zze(), zzh.zze(), subscriber, userAgentPublisher);
+    }
+
+    private FirebaseInstanceId(FirebaseApp firebaseApp, zzan zzan, Executor executor, Executor executor2, Subscriber subscriber, UserAgentPublisher userAgentPublisher) {
+        this.zzaz = false;
+        if (zzan.zza(firebaseApp) == null) {
+            throw new IllegalStateException("FirebaseInstanceId failed to initialize, FirebaseApp is missing project ID");
+        }
+        synchronized (FirebaseInstanceId.class) {
+            try {
+                if (zzar == null) {
+                    zzar = new zzav(firebaseApp.getApplicationContext());
+                }
+            } finally {
+                while (true) {
+                    Class<FirebaseInstanceId> cls = FirebaseInstanceId.class;
+                }
+            }
+        }
+        this.zzau = firebaseApp;
+        this.zzav = zzan;
+        if (this.zzaw == null) {
+            MessagingChannel messagingChannel = (MessagingChannel) firebaseApp.get(MessagingChannel.class);
+            if (messagingChannel == null || !messagingChannel.isAvailable()) {
+                this.zzaw = new zzs(firebaseApp, zzan, executor, userAgentPublisher);
+            } else {
+                this.zzaw = messagingChannel;
+            }
+        }
+        this.zzaw = this.zzaw;
+        this.zzat = executor2;
+        this.zzay = new zzaz(zzar);
+        this.zzba = new zza(subscriber);
+        this.zzax = new zzaq(executor);
+        if (this.zzba.isEnabled()) {
+            zzh();
+        }
     }
 
     public static FirebaseInstanceId getInstance() {
@@ -62,166 +174,250 @@ public class FirebaseInstanceId {
 
     @Keep
     public static FirebaseInstanceId getInstance(@NonNull FirebaseApp firebaseApp) {
-        FirebaseInstanceId firebaseInstanceId;
-        synchronized (FirebaseInstanceId.class) {
-            try {
-                firebaseInstanceId = (FirebaseInstanceId) zzhtf.get(firebaseApp.getOptions().getApplicationId());
-                if (firebaseInstanceId == null) {
-                    zzj zza = zzj.zza(firebaseApp.getApplicationContext(), null);
-                    if (zzmiw == null) {
-                        zzmiw = new zzk(zzj.zzbyl());
-                    }
-                    firebaseInstanceId = new FirebaseInstanceId(firebaseApp, zza);
-                    zzhtf.put(firebaseApp.getOptions().getApplicationId(), firebaseInstanceId);
-                }
-            } catch (Throwable th) {
-                Class cls = FirebaseInstanceId.class;
+        return (FirebaseInstanceId) firebaseApp.get(FirebaseInstanceId.class);
+    }
+
+    private final void startSync() {
+        synchronized (this) {
+            if (!this.zzaz) {
+                zza(0);
             }
         }
-        return firebaseInstanceId;
     }
 
-    static String zza(KeyPair keyPair) {
+    private final Task<InstanceIdResult> zza(String str, String str2) {
+        return Tasks.forResult(null).continueWithTask(this.zzat, new zzo(this, str, zzd(str2)));
+    }
+
+    private final <T> T zza(Task<T> task) throws IOException {
         try {
-            byte[] digest = MessageDigest.getInstance("SHA1").digest(keyPair.getPublic().getEncoded());
-            digest[0] = (byte) ((byte) ((digest[0] & 15) + 112));
-            return Base64.encodeToString(digest, 0, 8, 11);
-        } catch (NoSuchAlgorithmException e) {
-            Log.w("FirebaseInstanceId", "Unexpected error, device missing required alghorithms");
-            return null;
+            return Tasks.await(task, 30000, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException e) {
+            ExecutionException executionException = e;
+            Throwable cause = executionException.getCause();
+            if (cause instanceof IOException) {
+                if ("INSTANCE_ID_RESET".equals(cause.getMessage())) {
+                    zzn();
+                }
+                throw ((IOException) cause);
+            } else if (cause instanceof RuntimeException) {
+                throw ((RuntimeException) cause);
+            } else {
+                throw new IOException(executionException);
+            }
+        } catch (InterruptedException | TimeoutException e2) {
+            throw new IOException("SERVICE_NOT_AVAILABLE");
         }
     }
 
-    static void zza(Context context, zzr zzr) {
-        zzr.zzasu();
-        Intent intent = new Intent();
-        intent.putExtra("CMD", "RST");
-        zzq.zzbyp().zze(context, intent);
-    }
-
-    private final void zzab(Bundle bundle) {
-        bundle.putString("gmp_app_id", this.zzmix.getOptions().getApplicationId());
-    }
-
-    static int zzap(Context context, String str) {
-        int i = 0;
-        try {
-            return context.getPackageManager().getPackageInfo(str, 0).versionCode;
-        } catch (NameNotFoundException e) {
-            String valueOf = String.valueOf(e);
-            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 23).append("Failed to find package ").append(valueOf).toString());
-            return i;
+    static void zza(Runnable runnable, long j) {
+        synchronized (FirebaseInstanceId.class) {
+            try {
+                if (zzas == null) {
+                    zzas = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("FirebaseInstanceId"));
+                }
+                zzas.schedule(runnable, j, TimeUnit.SECONDS);
+            } finally {
+                Class<FirebaseInstanceId> cls = FirebaseInstanceId.class;
+            }
         }
     }
 
-    static zzk zzbyk() {
-        return zzmiw;
+    @Nullable
+    @VisibleForTesting
+    private static zzay zzb(String str, String str2) {
+        return zzar.zzb("", str, str2);
     }
 
-    static String zzde(Context context) {
-        try {
-            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (NameNotFoundException e) {
-            String valueOf = String.valueOf(e);
-            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 38).append("Never happens: can't find own package ").append(valueOf).toString());
-            return null;
+    private static String zzd(String str) {
+        return (str.isEmpty() || str.equalsIgnoreCase("fcm") || str.equalsIgnoreCase("gcm")) ? "*" : str;
+    }
+
+    /* access modifiers changed from: private */
+    public final void zzh() {
+        zzay zzk = zzk();
+        if (zzr() || zza(zzk) || this.zzay.zzao()) {
+            startSync();
         }
     }
 
-    static int zzei(Context context) {
-        return zzap(context, context.getPackageName());
+    private static String zzj() {
+        return zzan.zza(zzar.zzg("").getKeyPair());
     }
 
-    static void zzej(Context context) {
-        Intent intent = new Intent();
-        intent.putExtra("CMD", "SYNC");
-        zzq.zzbyp().zze(context, intent);
+    static boolean zzm() {
+        return Log.isLoggable("FirebaseInstanceId", 3) || (VERSION.SDK_INT == 23 && Log.isLoggable("FirebaseInstanceId", 3));
     }
 
-    static String zzm(byte[] bArr) {
-        return Base64.encodeToString(bArr, 11);
-    }
-
+    @WorkerThread
     public void deleteInstanceId() throws IOException {
-        this.zzmiy.zza("*", "*", null);
-        this.zzmiy.zzasq();
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            throw new IOException("MAIN_THREAD");
+        }
+        zza(this.zzaw.deleteInstanceId(zzj()));
+        zzn();
     }
 
     @WorkerThread
     public void deleteToken(String str, String str2) throws IOException {
-        Bundle bundle = new Bundle();
-        zzab(bundle);
-        this.zzmiy.zza(str, str2, bundle);
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            throw new IOException("MAIN_THREAD");
+        }
+        String zzd = zzd(str2);
+        zza(this.zzaw.deleteToken(zzj(), zzay.zzb(zzb(str, zzd)), str, zzd));
+        zzar.zzc("", str, zzd);
     }
 
     public long getCreationTime() {
-        return this.zzmiy.getCreationTime();
+        return zzar.zzg("").getCreationTime();
     }
 
+    @WorkerThread
     public String getId() {
-        return zza(this.zzmiy.zzasp());
+        zzh();
+        return zzj();
+    }
+
+    @NonNull
+    public Task<InstanceIdResult> getInstanceId() {
+        return zza(zzan.zza(this.zzau), "*");
     }
 
     @Nullable
+    @Deprecated
     public String getToken() {
-        zzs zzbyi = zzbyi();
-        if (zzbyi == null || zzbyi.zzqa(zzj.zzhtl)) {
-            FirebaseInstanceIdService.zzel(this.zzmix.getApplicationContext());
+        zzay zzk = zzk();
+        if (this.zzaw.needsRefresh() || zza(zzk)) {
+            startSync();
         }
-        return zzbyi != null ? zzbyi.zzkmz : null;
+        return zzay.zzb(zzk);
     }
 
     @WorkerThread
     public String getToken(String str, String str2) throws IOException {
-        Bundle bundle = new Bundle();
-        zzab(bundle);
-        return this.zzmiy.getToken(str, str2, bundle);
+        if (Looper.getMainLooper() != Looper.myLooper()) {
+            return ((InstanceIdResult) zza(zza(str, str2))).getToken();
+        }
+        throw new IOException("MAIN_THREAD");
     }
 
+    public final Task<Void> zza(String str) {
+        Task<Void> zza2;
+        synchronized (this) {
+            zza2 = this.zzay.zza(str);
+            startSync();
+        }
+        return zza2;
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final /* synthetic */ Task zza(String str, String str2, Task task) throws Exception {
+        String zzj = zzj();
+        zzay zzb = zzb(str, str2);
+        if (!this.zzaw.needsRefresh() && !zza(zzb)) {
+            return Tasks.forResult(new zzx(zzj, zzb.zzbv));
+        }
+        return this.zzax.zza(str, str2, new zzn(this, zzj, zzay.zzb(zzb), str, str2));
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final /* synthetic */ Task zza(String str, String str2, String str3, String str4) {
+        return this.zzaw.getToken(str, str2, str3, str4).onSuccessTask(this.zzat, new zzp(this, str3, str4, str));
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final void zza(long j) {
+        synchronized (this) {
+            zza((Runnable) new zzax(this, this.zzav, this.zzay, Math.min(Math.max(30, j << 1), zzaq)), j);
+            this.zzaz = true;
+        }
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final void zza(boolean z) {
+        synchronized (this) {
+            this.zzaz = z;
+        }
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final boolean zza(@Nullable zzay zzay2) {
+        return zzay2 == null || zzay2.zzj(this.zzav.zzad());
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final /* synthetic */ Task zzb(String str, String str2, String str3, String str4) throws Exception {
+        zzar.zza("", str, str2, str4, this.zzav.zzad());
+        return Tasks.forResult(new zzx(str3, str4));
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final void zzb(String str) throws IOException {
+        zzay zzk = zzk();
+        if (zza(zzk)) {
+            throw new IOException("token not available");
+        }
+        zza(this.zzaw.subscribeToTopic(zzj(), zzk.zzbv, str));
+    }
+
+    @VisibleForTesting
+    public final void zzb(boolean z) {
+        this.zzba.setEnabled(z);
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final void zzc(String str) throws IOException {
+        zzay zzk = zzk();
+        if (zza(zzk)) {
+            throw new IOException("token not available");
+        }
+        zza(this.zzaw.unsubscribeFromTopic(zzj(), zzk.zzbv, str));
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final FirebaseApp zzi() {
+        return this.zzau;
+    }
+
+    /* access modifiers changed from: 0000 */
     @Nullable
-    final zzs zzbyi() {
-        return zzj.zzbyl().zzo("", this.zzmiz, "*");
+    public final zzay zzk() {
+        return zzb(zzan.zza(this.zzau), "*");
     }
 
-    final String zzbyj() throws IOException {
-        return getToken(this.zzmiz, "*");
+    /* access modifiers changed from: 0000 */
+    public final String zzl() throws IOException {
+        return getToken(zzan.zza(this.zzau), "*");
     }
 
-    public final void zzpq(String str) {
-        zzmiw.zzpq(str);
-        FirebaseInstanceIdService.zzel(this.zzmix.getApplicationContext());
-    }
-
-    final void zzpr(String str) throws IOException {
-        zzs zzbyi = zzbyi();
-        if (zzbyi == null || zzbyi.zzqa(zzj.zzhtl)) {
-            throw new IOException("token not available");
+    /* access modifiers changed from: 0000 */
+    public final void zzn() {
+        synchronized (this) {
+            zzar.zzaj();
+            if (this.zzba.isEnabled()) {
+                startSync();
+            }
         }
-        Bundle bundle = new Bundle();
-        String valueOf = String.valueOf("/topics/");
-        String valueOf2 = String.valueOf(str);
-        bundle.putString("gcm.topic", valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
-        String str2 = zzbyi.zzkmz;
-        valueOf = String.valueOf("/topics/");
-        valueOf2 = String.valueOf(str);
-        valueOf2 = valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf);
-        zzab(bundle);
-        this.zzmiy.zzb(str2, valueOf2, bundle);
     }
 
-    final void zzps(String str) throws IOException {
-        zzs zzbyi = zzbyi();
-        if (zzbyi == null || zzbyi.zzqa(zzj.zzhtl)) {
-            throw new IOException("token not available");
-        }
-        Bundle bundle = new Bundle();
-        String valueOf = String.valueOf("/topics/");
-        String valueOf2 = String.valueOf(str);
-        bundle.putString("gcm.topic", valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
-        zzj zzj = this.zzmiy;
-        String str2 = zzbyi.zzkmz;
-        String valueOf3 = String.valueOf("/topics/");
-        valueOf2 = String.valueOf(str);
-        zzj.zza(str2, valueOf2.length() != 0 ? valueOf3.concat(valueOf2) : new String(valueOf3), bundle);
+    /* access modifiers changed from: 0000 */
+    public final boolean zzo() {
+        return this.zzaw.isAvailable();
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final void zzp() {
+        zzar.zzh("");
+        startSync();
+    }
+
+    @VisibleForTesting
+    public final boolean zzq() {
+        return this.zzba.isEnabled();
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final boolean zzr() {
+        return this.zzaw.needsRefresh();
     }
 }

@@ -1,22 +1,23 @@
 package com.google.firebase.iid;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
+import com.google.android.gms.tasks.Task;
 
-final class zzn extends BroadcastReceiver {
-    private /* synthetic */ zzl zzmjk;
+final /* synthetic */ class zzn implements zzar {
+    private final FirebaseInstanceId zzbb;
+    private final String zzbc;
+    private final String zzbd;
+    private final String zzbe;
+    private final String zzbf;
 
-    zzn(zzl zzl) {
-        this.zzmjk = zzl;
+    zzn(FirebaseInstanceId firebaseInstanceId, String str, String str2, String str3, String str4) {
+        this.zzbb = firebaseInstanceId;
+        this.zzbc = str;
+        this.zzbd = str2;
+        this.zzbe = str3;
+        this.zzbf = str4;
     }
 
-    public final void onReceive(Context context, Intent intent) {
-        if (Log.isLoggable("InstanceID/Rpc", 3)) {
-            String valueOf = String.valueOf(intent.getExtras());
-            Log.d("InstanceID/Rpc", new StringBuilder(String.valueOf(valueOf).length() + 44).append("Received GSF callback via dynamic receiver: ").append(valueOf).toString());
-        }
-        this.zzmjk.zzi(intent);
+    public final Task zzs() {
+        return this.zzbb.zza(this.zzbc, this.zzbd, this.zzbe, this.zzbf);
     }
 }

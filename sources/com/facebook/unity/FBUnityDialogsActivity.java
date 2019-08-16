@@ -10,7 +10,6 @@ import com.facebook.share.Sharer.Result;
 import com.facebook.share.model.ShareContent;
 import com.facebook.share.widget.ShareDialog;
 import com.facebook.share.widget.ShareDialog.Mode;
-import java.io.Serializable;
 import java.util.Locale;
 
 public class FBUnityDialogsActivity extends BaseActivity {
@@ -19,7 +18,8 @@ public class FBUnityDialogsActivity extends BaseActivity {
     public static final String SHARE_DIALOG_PARAMS = "share_dialog_params";
     private static String TAG = FBUnityDialogsActivity.class.getName();
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         Bundle bundleExtra;
         ShareContent build;
         super.onCreate(bundle);
@@ -37,7 +37,7 @@ public class FBUnityDialogsActivity extends BaseActivity {
         }
         ShareDialog shareDialog = new ShareDialog((Activity) this);
         final UnityMessage unityMessage = new UnityMessage("OnShareLinkComplete");
-        Serializable string = bundleExtra.getString(Constants.CALLBACK_ID_KEY);
+        String string = bundleExtra.getString(Constants.CALLBACK_ID_KEY);
         if (string != null) {
             unityMessage.put(Constants.CALLBACK_ID_KEY, string);
         }

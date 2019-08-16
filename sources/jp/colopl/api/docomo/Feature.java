@@ -1,7 +1,8 @@
-package jp.colopl.api.docomo;
+package p018jp.colopl.api.docomo;
 
 import android.location.Location;
 
+/* renamed from: jp.colopl.api.docomo.Feature */
 public class Feature {
     private String address;
     private String adrCode;
@@ -34,13 +35,13 @@ public class Feature {
     }
 
     public Location getLocation() {
-        double latitude = getLatitude();
-        double longitude = getLongitude();
-        long time = getTime();
+        double latitude2 = getLatitude();
+        double longitude2 = getLongitude();
+        long time2 = getTime();
         Location location = new Location(DoCoMoAPI.PSEUDO_NAME_AS_LOCATION_PROVIDER);
-        location.setLatitude(latitude);
-        location.setLongitude(longitude);
-        location.setTime(time);
+        location.setLatitude(latitude2);
+        location.setLongitude(longitude2);
+        location.setTime(time2);
         location.setAccuracy(250.0f);
         return location;
     }

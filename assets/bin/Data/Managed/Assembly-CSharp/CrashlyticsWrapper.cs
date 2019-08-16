@@ -9,7 +9,7 @@ public class CrashlyticsWrapper
 		get
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Expected O, but got Unknown
+			//IL_0019: Expected O, but got Unknown
 			if (cl == null)
 			{
 				cl = new AndroidJavaClass("com.crashlytics.android.Crashlytics");
@@ -69,7 +69,7 @@ public class CrashlyticsWrapper
 	public static void ReportException(string report)
 	{
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
+		//IL_0024: Expected O, but got Unknown
 		report = (report ?? string.Empty);
 		AndroidJavaObject val = new AndroidJavaObject("java.lang.Exception", new object[1]
 		{

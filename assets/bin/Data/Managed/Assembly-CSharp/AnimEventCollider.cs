@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimEventCollider
 {
-	public class AtkColliderHiter : IAttackCollider
+	public class AtkColliderHiter : MonoBehaviour, IAttackCollider
 	{
 		protected enum COLLIDER_INFO
 		{
@@ -85,7 +86,6 @@ public class AnimEventCollider
 
 		protected void Awake()
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
 		}
 
@@ -96,53 +96,46 @@ public class AnimEventCollider
 
 		private void FixedUpdate()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			if (!isReleased)
+			if (isReleased)
 			{
-				if (isUpdateFixTrans)
+				return;
+			}
+			if (isUpdateFixTrans)
+			{
+				this.get_transform().set_position(fixPos);
+				this.get_transform().set_rotation(fixRot);
+			}
+			if ((colliderInfo & COLLIDER_INFO.RESERVE_RELEASE) != 0 && (colliderInfo & COLLIDER_INFO.FIXED_UPDATE) != 0)
+			{
+				enabledCollider = false;
+			}
+			if (!enabledCollider)
+			{
+				if (colliderProcessor != null && !colliderProcessor.IsBusy())
 				{
-					this.get_transform().set_position(fixPos);
-					this.get_transform().set_rotation(fixRot);
+					colliderProcessor.OnDestroy();
+					colliderProcessor = null;
 				}
-				if ((colliderInfo & COLLIDER_INFO.RESERVE_RELEASE) != 0 && (colliderInfo & COLLIDER_INFO.FIXED_UPDATE) != 0)
+				if (colliderProcessor == null)
 				{
-					enabledCollider = false;
+					colliderInfo |= COLLIDER_INFO.RELEASED;
 				}
-				if (!enabledCollider)
-				{
-					if (colliderProcessor != null && !colliderProcessor.IsBusy())
-					{
-						colliderProcessor.OnDestroy();
-						colliderProcessor = null;
-					}
-					if (colliderProcessor == null)
-					{
-						colliderInfo |= COLLIDER_INFO.RELEASED;
-					}
-				}
-				if (checkFixedUpdate)
-				{
-					colliderInfo |= COLLIDER_INFO.FIXED_UPDATE;
-				}
+			}
+			if (checkFixedUpdate)
+			{
+				colliderInfo |= COLLIDER_INFO.FIXED_UPDATE;
 			}
 		}
 
 		public void SetColliderInfo(StageObject _stageObject, Transform parent, AttackInfo info, Vector3 pos, Vector3 rot, float radius, float height)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			stageObject = _stageObject;
@@ -163,9 +156,24 @@ public class AnimEventCollider
 			colliderInfo = COLLIDER_INFO.NONE;
 			if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 			{
-				colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(attackInfo, stageObject, capsule, this, Player.ATTACK_MODE.NONE, null);
+				colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(attackInfo, stageObject, capsule, this);
 				attackHitChecker = stageObject.ReferenceAttackHitChecker();
 			}
+			AttackContinuationInfo attackContinuationInfo = attackInfo as AttackContinuationInfo;
+			if (attackContinuationInfo != null && attackContinuationInfo.disableUpdateFixTrans)
+			{
+				isUpdateFixTrans = false;
+			}
+		}
+
+		public void ForceUpdateCurrentTransformInfo()
+		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			fixPos = this.get_transform().get_position();
+			fixRot = this.get_transform().get_rotation();
 		}
 
 		public void ReserveRelease()
@@ -296,14 +304,11 @@ public class AnimEventCollider
 
 	public bool Initialize(StageObject stgObj, AnimEventData.EventData data, AttackInfo atkInfo)
 	{
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Expected O, but got Unknown
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Expected O, but got Unknown
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		if (data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE && data.id != AnimEventFormat.ID.CONTINUS_ATTACK)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Expected O, but got Unknown
+		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		if (data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE && data.id != AnimEventFormat.ID.CONTINUS_ATTACK && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE_MULTI)
 		{
 			return false;
 		}
@@ -355,5 +360,47 @@ public class AnimEventCollider
 		colliderHiter = null;
 		Object.Destroy(gameObject);
 		gameObject = null;
+	}
+
+	public void InitTransformSettings(StageObject stgObj, AnimEventData.EventData _eventData)
+	{
+		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+		if (!(stgObj == null) && !(colliderHiter == null) && _eventData != null && _eventData.intArgs != null && _eventData.floatArgs != null && _eventData.id == AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE_MULTI && _eventData.intArgs.Length >= 2)
+		{
+			Vector3 val = default(Vector3);
+			val._002Ector(_eventData.floatArgs[8], _eventData.floatArgs[9], _eventData.floatArgs[10]);
+			AnimEventFormat.MULTI_COL_GENERATE_CONDITION mULTI_COL_GENERATE_CONDITION = (AnimEventFormat.MULTI_COL_GENERATE_CONDITION)_eventData.intArgs[0];
+			if (mULTI_COL_GENERATE_CONDITION == AnimEventFormat.MULTI_COL_GENERATE_CONDITION.IN_CORN)
+			{
+				float num = Random.Range(0f - val.x, val.x);
+				float num2 = Random.Range(0f - val.y, val.y);
+				float num3 = Random.Range(0f, 360f) * ((float)Math.PI / 180f);
+				Vector3 right = stgObj.get_transform().get_right();
+				Vector3 up = stgObj.get_transform().get_up();
+				Transform transform = colliderHiter.get_transform();
+				transform.set_position(transform.get_position() + (num * Mathf.Cos(num3) * right + num2 * Mathf.Sin(num3) * up));
+				colliderHiter.get_transform().LookAt(stgObj.get_transform().get_position());
+				colliderHiter.ForceUpdateCurrentTransformInfo();
+			}
+		}
+	}
+
+	public void OverwriteObjectLayer(int _layer)
+	{
+		if (!(colliderHiter == null))
+		{
+			colliderHiter.get_gameObject().set_layer(_layer);
+		}
 	}
 }

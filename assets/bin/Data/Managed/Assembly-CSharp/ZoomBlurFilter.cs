@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class ZoomBlurFilter
+public class ZoomBlurFilter : MonoBehaviour
 {
 	[SerializeField]
 	private Material blurMaterial;
@@ -54,15 +54,13 @@ public class ZoomBlurFilter
 
 	public void CacheRenderTarget(Action onComplete, bool reqWithFilter = false)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		chacheTarget = true;
 		onCompleteChecheTarget = onComplete;
-		GameObject val = MonoBehaviourSingleton<UIManager>.I.uiCamera.get_gameObject();
-		cacher = val.GetComponent<RenderTargetCacher>();
+		GameObject gameObject = MonoBehaviourSingleton<UIManager>.I.uiCamera.get_gameObject();
+		cacher = gameObject.GetComponent<RenderTargetCacher>();
 		if (null == cacher)
 		{
-			cacher = val.AddComponent<RenderTargetCacher>();
+			cacher = gameObject.AddComponent<RenderTargetCacher>();
 		}
 		requestBlitFilterTexture = reqWithFilter;
 	}
@@ -70,7 +68,7 @@ public class ZoomBlurFilter
 	private void Awake()
 	{
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		blurMaterial = new Material(ResourceUtility.FindShader("mobile/Custom/ImageEffect/RadialBlurFilter"));
 		Restore();
 	}
@@ -140,11 +138,7 @@ public class ZoomBlurFilter
 	{
 		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
 		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Expected O, but got Unknown
 		RenderTextureFormat val = 4;
 		_filteredTexture = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height(), 0, val);
 		_cachedTexture = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height(), 0, val);
@@ -153,7 +147,6 @@ public class ZoomBlurFilter
 	public void StartBlurFilter(float powerStart, float powerEnd, float duration, Vector2 blurCenter, Action onComplete)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(BlurFilterImpl(powerStart, powerEnd, duration, blurCenter, onComplete));
 	}
 
@@ -161,15 +154,13 @@ public class ZoomBlurFilter
 	{
 		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		float timer = 0f;
 		while (timer < duration)
 		{
 			timer += Time.get_deltaTime();
 			float currentPower = Mathf.Lerp(powerStart, powerEnd, timer / duration);
 			SetBlurPram(currentPower, blurCenter);
-			yield return (object)null;
+			yield return null;
 		}
 		onComplete?.Invoke();
 	}

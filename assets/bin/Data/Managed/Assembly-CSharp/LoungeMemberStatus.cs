@@ -65,7 +65,7 @@ public class LoungeMemberStatus
 		UpdateLastExecTime(TimeManager.GetNow().ToUniversalTime());
 	}
 
-	public LoungeMemberStatus(LoungeModel.SlotInfo info)
+	public LoungeMemberStatus(PartyModel.SlotInfo info)
 		: this(info.userInfo.userId)
 	{
 	}

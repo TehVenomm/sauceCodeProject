@@ -21,9 +21,9 @@ public class ObjectIdReader implements Serializable {
     public final PropertyName propertyName;
     public final ObjectIdResolver resolver;
 
-    protected ObjectIdReader(JavaType javaType, PropertyName propertyName, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty, ObjectIdResolver objectIdResolver) {
+    protected ObjectIdReader(JavaType javaType, PropertyName propertyName2, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty, ObjectIdResolver objectIdResolver) {
         this._idType = javaType;
-        this.propertyName = propertyName;
+        this.propertyName = propertyName2;
         this.generator = objectIdGenerator;
         this.resolver = objectIdResolver;
         this._deserializer = jsonDeserializer;
@@ -31,17 +31,17 @@ public class ObjectIdReader implements Serializable {
     }
 
     @Deprecated
-    protected ObjectIdReader(JavaType javaType, PropertyName propertyName, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty) {
-        this(javaType, propertyName, objectIdGenerator, jsonDeserializer, settableBeanProperty, new SimpleObjectIdResolver());
+    protected ObjectIdReader(JavaType javaType, PropertyName propertyName2, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty) {
+        this(javaType, propertyName2, objectIdGenerator, jsonDeserializer, settableBeanProperty, new SimpleObjectIdResolver());
     }
 
-    public static ObjectIdReader construct(JavaType javaType, PropertyName propertyName, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty, ObjectIdResolver objectIdResolver) {
-        return new ObjectIdReader(javaType, propertyName, objectIdGenerator, jsonDeserializer, settableBeanProperty, objectIdResolver);
+    public static ObjectIdReader construct(JavaType javaType, PropertyName propertyName2, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty, ObjectIdResolver objectIdResolver) {
+        return new ObjectIdReader(javaType, propertyName2, objectIdGenerator, jsonDeserializer, settableBeanProperty, objectIdResolver);
     }
 
     @Deprecated
-    public static ObjectIdReader construct(JavaType javaType, PropertyName propertyName, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty) {
-        return construct(javaType, propertyName, objectIdGenerator, jsonDeserializer, settableBeanProperty, new SimpleObjectIdResolver());
+    public static ObjectIdReader construct(JavaType javaType, PropertyName propertyName2, ObjectIdGenerator<?> objectIdGenerator, JsonDeserializer<?> jsonDeserializer, SettableBeanProperty settableBeanProperty) {
+        return construct(javaType, propertyName2, objectIdGenerator, jsonDeserializer, settableBeanProperty, new SimpleObjectIdResolver());
     }
 
     public JsonDeserializer<Object> getDeserializer() {

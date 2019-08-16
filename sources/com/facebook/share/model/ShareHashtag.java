@@ -4,14 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 
 public class ShareHashtag implements ShareModel {
-    public static final Creator<ShareHashtag> CREATOR = new C05111();
-    private final String hashtag;
-
-    /* renamed from: com.facebook.share.model.ShareHashtag$1 */
-    static final class C05111 implements Creator<ShareHashtag> {
-        C05111() {
-        }
-
+    public static final Creator<ShareHashtag> CREATOR = new Creator<ShareHashtag>() {
         public ShareHashtag createFromParcel(Parcel parcel) {
             return new ShareHashtag(parcel);
         }
@@ -19,20 +12,23 @@ public class ShareHashtag implements ShareModel {
         public ShareHashtag[] newArray(int i) {
             return new ShareHashtag[i];
         }
-    }
+    };
+    private final String hashtag;
 
     public static class Builder implements ShareModelBuilder<ShareHashtag, Builder> {
-        private String hashtag;
+        /* access modifiers changed from: private */
+        public String hashtag;
 
         public ShareHashtag build() {
-            return new ShareHashtag();
+            return new ShareHashtag(this);
         }
 
         public String getHashtag() {
             return this.hashtag;
         }
 
-        Builder readFrom(Parcel parcel) {
+        /* access modifiers changed from: 0000 */
+        public Builder readFrom(Parcel parcel) {
             return readFrom((ShareHashtag) parcel.readParcelable(ShareHashtag.class.getClassLoader()));
         }
 

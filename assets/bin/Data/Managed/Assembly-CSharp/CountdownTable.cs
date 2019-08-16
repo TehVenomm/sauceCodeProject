@@ -1,11 +1,10 @@
 using System;
+using System.Runtime.CompilerServices;
 
 public class CountdownTable : Singleton<CountdownTable>, IDataTable
 {
 	public class CountdownData
 	{
-		public const string NT = "id,imageID,startAt,endAt";
-
 		public int id;
 
 		public int imageID;
@@ -13,6 +12,8 @@ public class CountdownTable : Singleton<CountdownTable>, IDataTable
 		public DateTime startAt;
 
 		public DateTime endAt;
+
+		public const string NT = "id,imageID,startAt,endAt";
 
 		public static bool cb(CSVReader csv_reader, CountdownData data, ref uint key)
 		{
@@ -36,9 +37,12 @@ public class CountdownTable : Singleton<CountdownTable>, IDataTable
 
 	private UIntKeyTable<CountdownData> countdownDataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<CountdownData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		countdownDataTable = TableUtility.CreateUIntKeyTable<CountdownData>(csv_text, CountdownData.cb, "id,imageID,startAt,endAt", null);
+		countdownDataTable = TableUtility.CreateUIntKeyTable<CountdownData>(csv_text, CountdownData.cb, "id,imageID,startAt,endAt");
 		countdownDataTable.TrimExcess();
 	}
 

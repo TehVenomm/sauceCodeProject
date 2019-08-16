@@ -1,4 +1,4 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/* renamed from: android.support.v4.app.ListFragment */
 public class ListFragment extends Fragment {
     static final int INTERNAL_EMPTY_ID = 16711681;
     static final int INTERNAL_LIST_CONTAINER_ID = 16711683;
@@ -28,30 +29,18 @@ public class ListFragment extends Fragment {
     ListView mList;
     View mListContainer;
     boolean mListShown;
-    private final OnItemClickListener mOnClickListener = new C00362();
-    View mProgressContainer;
-    private final Runnable mRequestFocus = new C00351();
-    TextView mStandardEmptyView;
-
-    /* renamed from: android.support.v4.app.ListFragment$1 */
-    class C00351 implements Runnable {
-        C00351() {
-        }
-
-        public void run() {
-            ListFragment.this.mList.focusableViewAvailable(ListFragment.this.mList);
-        }
-    }
-
-    /* renamed from: android.support.v4.app.ListFragment$2 */
-    class C00362 implements OnItemClickListener {
-        C00362() {
-        }
-
+    private final OnItemClickListener mOnClickListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
             ListFragment.this.onListItemClick((ListView) adapterView, view, i, j);
         }
-    }
+    };
+    View mProgressContainer;
+    private final Runnable mRequestFocus = new Runnable() {
+        public void run() {
+            ListFragment.this.mList.focusableViewAvailable(ListFragment.this.mList);
+        }
+    };
+    TextView mStandardEmptyView;
 
     private void ensureList() {
         if (this.mList == null) {
@@ -70,16 +59,16 @@ public class ListFragment extends Fragment {
                 }
                 this.mProgressContainer = view.findViewById(INTERNAL_PROGRESS_CONTAINER_ID);
                 this.mListContainer = view.findViewById(INTERNAL_LIST_CONTAINER_ID);
-                view = view.findViewById(16908298);
-                if (view instanceof ListView) {
-                    this.mList = (ListView) view;
+                View findViewById = view.findViewById(16908298);
+                if (findViewById instanceof ListView) {
+                    this.mList = (ListView) findViewById;
                     if (this.mEmptyView != null) {
                         this.mList.setEmptyView(this.mEmptyView);
                     } else if (this.mEmptyText != null) {
                         this.mStandardEmptyView.setText(this.mEmptyText);
                         this.mList.setEmptyView(this.mStandardEmptyView);
                     }
-                } else if (view == null) {
+                } else if (findViewById == null) {
                     throw new RuntimeException("Your content must have a ListView whose id attribute is 'android.R.id.list'");
                 } else {
                     throw new RuntimeException("Content has view with id attribute 'android.R.id.list' that is not a ListView class");
@@ -149,25 +138,25 @@ public class ListFragment extends Fragment {
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
         Context context = getContext();
-        View frameLayout = new FrameLayout(context);
-        View linearLayout = new LinearLayout(context);
+        FrameLayout frameLayout = new FrameLayout(context);
+        LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setId(INTERNAL_PROGRESS_CONTAINER_ID);
         linearLayout.setOrientation(1);
         linearLayout.setVisibility(8);
         linearLayout.setGravity(17);
         linearLayout.addView(new ProgressBar(context, null, 16842874), new LayoutParams(-2, -2));
         frameLayout.addView(linearLayout, new LayoutParams(-1, -1));
-        linearLayout = new FrameLayout(context);
-        linearLayout.setId(INTERNAL_LIST_CONTAINER_ID);
-        View textView = new TextView(context);
+        FrameLayout frameLayout2 = new FrameLayout(context);
+        frameLayout2.setId(INTERNAL_LIST_CONTAINER_ID);
+        TextView textView = new TextView(context);
         textView.setId(INTERNAL_EMPTY_ID);
         textView.setGravity(17);
-        linearLayout.addView(textView, new LayoutParams(-1, -1));
-        textView = new ListView(context);
-        textView.setId(16908298);
-        textView.setDrawSelectorOnTop(false);
-        linearLayout.addView(textView, new LayoutParams(-1, -1));
-        frameLayout.addView(linearLayout, new LayoutParams(-1, -1));
+        frameLayout2.addView(textView, new LayoutParams(-1, -1));
+        ListView listView = new ListView(context);
+        listView.setId(16908298);
+        listView.setDrawSelectorOnTop(false);
+        frameLayout2.addView(listView, new LayoutParams(-1, -1));
+        frameLayout.addView(frameLayout2, new LayoutParams(-1, -1));
         frameLayout.setLayoutParams(new LayoutParams(-1, -1));
         return frameLayout;
     }

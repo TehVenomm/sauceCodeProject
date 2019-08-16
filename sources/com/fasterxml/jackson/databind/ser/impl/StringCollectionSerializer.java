@@ -32,27 +32,29 @@ public class StringCollectionSerializer extends StaticListSerializerBase<Collect
         return new StringCollectionSerializer(this, jsonSerializer, bool);
     }
 
-    protected JsonNode contentSchema() {
+    /* access modifiers changed from: protected */
+    public JsonNode contentSchema() {
         return createSchemaNode("string", true);
     }
 
-    protected void acceptContentVisitor(JsonArrayFormatVisitor jsonArrayFormatVisitor) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void acceptContentVisitor(JsonArrayFormatVisitor jsonArrayFormatVisitor) throws JsonMappingException {
         jsonArrayFormatVisitor.itemsFormat(JsonFormatTypes.STRING);
     }
 
     public void serialize(Collection<String> collection, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         int size = collection.size();
-        if (size == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
-            _serializeUnwrapped(collection, jsonGenerator, serializerProvider);
+        if (size != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+            jsonGenerator.writeStartArray(size);
+            if (this._serializer == null) {
+                serializeContents(collection, jsonGenerator, serializerProvider);
+            } else {
+                serializeUsingCustom(collection, jsonGenerator, serializerProvider);
+            }
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray(size);
-        if (this._serializer == null) {
-            serializeContents(collection, jsonGenerator, serializerProvider);
-        } else {
-            serializeUsingCustom(collection, jsonGenerator, serializerProvider);
-        }
-        jsonGenerator.writeEndArray();
+        _serializeUnwrapped(collection, jsonGenerator, serializerProvider);
     }
 
     private final void _serializeUnwrapped(Collection<String> collection, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -74,25 +76,25 @@ public class StringCollectionSerializer extends StaticListSerializerBase<Collect
     }
 
     private final void serializeContents(Collection<String> collection, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
+        int i;
         if (this._serializer != null) {
             serializeUsingCustom(collection, jsonGenerator, serializerProvider);
             return;
         }
-        int i = 0;
+        int i2 = 0;
         for (String str : collection) {
-            int i2;
             if (str == null) {
                 try {
                     serializerProvider.defaultSerializeNull(jsonGenerator);
-                } catch (Throwable e) {
-                    wrapAndThrow(serializerProvider, e, (Object) collection, i);
-                    i2 = i;
+                } catch (Exception e) {
+                    wrapAndThrow(serializerProvider, (Throwable) e, (Object) collection, i2);
+                    i = i2;
                 }
             } else {
                 jsonGenerator.writeString(str);
             }
-            i2 = i + 1;
-            i = i2;
+            i = i2 + 1;
+            i2 = i;
         }
     }
 
@@ -102,8 +104,8 @@ public class StringCollectionSerializer extends StaticListSerializerBase<Collect
             if (str == null) {
                 try {
                     serializerProvider.defaultSerializeNull(jsonGenerator);
-                } catch (Throwable e) {
-                    wrapAndThrow(serializerProvider, e, (Object) collection, 0);
+                } catch (Exception e) {
+                    wrapAndThrow(serializerProvider, (Throwable) e, (Object) collection, 0);
                 }
             } else {
                 jsonSerializer.serialize(str, jsonGenerator, serializerProvider);

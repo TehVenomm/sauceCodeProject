@@ -1,17 +1,20 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
+/* renamed from: android.support.v4.util.MapCollections */
 abstract class MapCollections<K, V> {
     EntrySet mEntrySet;
     KeySet mKeySet;
     ValuesCollection mValues;
 
+    /* renamed from: android.support.v4.util.MapCollections$ArrayIterator */
     final class ArrayIterator<T> implements Iterator<T> {
         boolean mCanRemove = false;
         int mIndex;
@@ -28,6 +31,9 @@ abstract class MapCollections<K, V> {
         }
 
         public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             T colGetEntry = MapCollections.this.colGetEntry(this.mIndex, this.mOffset);
             this.mIndex++;
             this.mCanRemove = true;
@@ -35,17 +41,17 @@ abstract class MapCollections<K, V> {
         }
 
         public void remove() {
-            if (this.mCanRemove) {
-                this.mIndex--;
-                this.mSize--;
-                this.mCanRemove = false;
-                MapCollections.this.colRemoveAt(this.mIndex);
-                return;
+            if (!this.mCanRemove) {
+                throw new IllegalStateException();
             }
-            throw new IllegalStateException();
+            this.mIndex--;
+            this.mSize--;
+            this.mCanRemove = false;
+            MapCollections.this.colRemoveAt(this.mIndex);
         }
     }
 
+    /* renamed from: android.support.v4.util.MapCollections$EntrySet */
     final class EntrySet implements Set<Entry<K, V>> {
         EntrySet() {
         }
@@ -72,7 +78,10 @@ abstract class MapCollections<K, V> {
             }
             Entry entry = (Entry) obj;
             int colIndexOfKey = MapCollections.this.colIndexOfKey(entry.getKey());
-            return colIndexOfKey >= 0 ? ContainerHelpers.equal(MapCollections.this.colGetEntry(colIndexOfKey, 1), entry.getValue()) : false;
+            if (colIndexOfKey >= 0) {
+                return ContainerHelpers.equal(MapCollections.this.colGetEntry(colIndexOfKey, 1), entry.getValue());
+            }
+            return false;
         }
 
         public boolean containsAll(Collection<?> collection) {
@@ -131,6 +140,7 @@ abstract class MapCollections<K, V> {
         }
     }
 
+    /* renamed from: android.support.v4.util.MapCollections$KeySet */
     final class KeySet implements Set<K> {
         KeySet() {
         }
@@ -161,11 +171,9 @@ abstract class MapCollections<K, V> {
 
         public int hashCode() {
             int i = 0;
-            int colGetSize = MapCollections.this.colGetSize() - 1;
-            while (colGetSize >= 0) {
+            for (int colGetSize = MapCollections.this.colGetSize() - 1; colGetSize >= 0; colGetSize--) {
                 Object colGetEntry = MapCollections.this.colGetEntry(colGetSize, 0);
-                colGetSize--;
-                i = (colGetEntry == null ? 0 : colGetEntry.hashCode()) + i;
+                i += colGetEntry == null ? 0 : colGetEntry.hashCode();
             }
             return i;
         }
@@ -208,6 +216,7 @@ abstract class MapCollections<K, V> {
         }
     }
 
+    /* renamed from: android.support.v4.util.MapCollections$MapIterator */
     final class MapIterator implements Iterator<Entry<K, V>>, Entry<K, V> {
         int mEnd;
         boolean mEntryValid = false;
@@ -249,33 +258,35 @@ abstract class MapCollections<K, V> {
 
         public final int hashCode() {
             int i = 0;
-            if (this.mEntryValid) {
-                Object colGetEntry = MapCollections.this.colGetEntry(this.mIndex, 0);
-                Object colGetEntry2 = MapCollections.this.colGetEntry(this.mIndex, 1);
-                int hashCode = colGetEntry == null ? 0 : colGetEntry.hashCode();
-                if (colGetEntry2 != null) {
-                    i = colGetEntry2.hashCode();
-                }
-                return i ^ hashCode;
+            if (!this.mEntryValid) {
+                throw new IllegalStateException("This container does not support retaining Map.Entry objects");
             }
-            throw new IllegalStateException("This container does not support retaining Map.Entry objects");
+            Object colGetEntry = MapCollections.this.colGetEntry(this.mIndex, 0);
+            Object colGetEntry2 = MapCollections.this.colGetEntry(this.mIndex, 1);
+            int hashCode = colGetEntry == null ? 0 : colGetEntry.hashCode();
+            if (colGetEntry2 != null) {
+                i = colGetEntry2.hashCode();
+            }
+            return i ^ hashCode;
         }
 
         public Entry<K, V> next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             this.mIndex++;
             this.mEntryValid = true;
             return this;
         }
 
         public void remove() {
-            if (this.mEntryValid) {
-                MapCollections.this.colRemoveAt(this.mIndex);
-                this.mIndex--;
-                this.mEnd--;
-                this.mEntryValid = false;
-                return;
+            if (!this.mEntryValid) {
+                throw new IllegalStateException();
             }
-            throw new IllegalStateException();
+            MapCollections.this.colRemoveAt(this.mIndex);
+            this.mIndex--;
+            this.mEnd--;
+            this.mEntryValid = false;
         }
 
         public V setValue(V v) {
@@ -290,6 +301,7 @@ abstract class MapCollections<K, V> {
         }
     }
 
+    /* renamed from: android.support.v4.util.MapCollections$ValuesCollection */
     final class ValuesCollection implements Collection<V> {
         ValuesCollection() {
         }
@@ -337,14 +349,14 @@ abstract class MapCollections<K, V> {
         }
 
         public boolean removeAll(Collection<?> collection) {
-            boolean z = false;
             int colGetSize = MapCollections.this.colGetSize();
+            boolean z = false;
             int i = 0;
             while (i < colGetSize) {
                 if (collection.contains(MapCollections.this.colGetEntry(i, 1))) {
                     MapCollections.this.colRemoveAt(i);
-                    colGetSize--;
                     i--;
+                    colGetSize--;
                     z = true;
                 }
                 i++;
@@ -353,14 +365,14 @@ abstract class MapCollections<K, V> {
         }
 
         public boolean retainAll(Collection<?> collection) {
-            boolean z = false;
             int colGetSize = MapCollections.this.colGetSize();
+            boolean z = false;
             int i = 0;
             while (i < colGetSize) {
                 if (!collection.contains(MapCollections.this.colGetEntry(i, 1))) {
                     MapCollections.this.colRemoveAt(i);
-                    colGetSize--;
                     i--;
+                    colGetSize--;
                     z = true;
                 }
                 i++;
@@ -403,13 +415,11 @@ abstract class MapCollections<K, V> {
         }
         Set set2 = (Set) obj;
         try {
-            if (!(set.size() == set2.size() && set.containsAll(set2))) {
+            if (set.size() != set2.size() || !set.containsAll(set2)) {
                 z = false;
             }
             return z;
-        } catch (NullPointerException e) {
-            return false;
-        } catch (ClassCastException e2) {
+        } catch (ClassCastException | NullPointerException e) {
             return false;
         }
     }
@@ -433,41 +443,50 @@ abstract class MapCollections<K, V> {
         return size != map.size();
     }
 
-    protected abstract void colClear();
+    /* access modifiers changed from: protected */
+    public abstract void colClear();
 
-    protected abstract Object colGetEntry(int i, int i2);
+    /* access modifiers changed from: protected */
+    public abstract Object colGetEntry(int i, int i2);
 
-    protected abstract Map<K, V> colGetMap();
+    /* access modifiers changed from: protected */
+    public abstract Map<K, V> colGetMap();
 
-    protected abstract int colGetSize();
+    /* access modifiers changed from: protected */
+    public abstract int colGetSize();
 
-    protected abstract int colIndexOfKey(Object obj);
+    /* access modifiers changed from: protected */
+    public abstract int colIndexOfKey(Object obj);
 
-    protected abstract int colIndexOfValue(Object obj);
+    /* access modifiers changed from: protected */
+    public abstract int colIndexOfValue(Object obj);
 
-    protected abstract void colPut(K k, V v);
+    /* access modifiers changed from: protected */
+    public abstract void colPut(K k, V v);
 
-    protected abstract void colRemoveAt(int i);
+    /* access modifiers changed from: protected */
+    public abstract void colRemoveAt(int i);
 
-    protected abstract V colSetValue(int i, V v);
+    /* access modifiers changed from: protected */
+    public abstract V colSetValue(int i, V v);
 
     public Set<Entry<K, V>> getEntrySet() {
         if (this.mEntrySet == null) {
-            this.mEntrySet = new EntrySet();
+            this.mEntrySet = new EntrySet<>();
         }
         return this.mEntrySet;
     }
 
     public Set<K> getKeySet() {
         if (this.mKeySet == null) {
-            this.mKeySet = new KeySet();
+            this.mKeySet = new KeySet<>();
         }
         return this.mKeySet;
     }
 
     public Collection<V> getValues() {
         if (this.mValues == null) {
-            this.mValues = new ValuesCollection();
+            this.mValues = new ValuesCollection<>();
         }
         return this.mValues;
     }

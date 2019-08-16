@@ -5,7 +5,7 @@ import android.os.IInterface;
 import android.os.RemoteException;
 
 public interface zza extends IInterface {
-    void zzao(boolean z) throws RemoteException;
+    void zza(boolean z) throws RemoteException;
 
-    void zzd(Account account) throws RemoteException;
+    void zzc(Account account) throws RemoteException;
 }

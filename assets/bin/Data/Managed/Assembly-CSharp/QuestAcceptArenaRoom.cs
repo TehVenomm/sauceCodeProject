@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,7 +40,9 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		BTN_START,
 		BTN_NG,
 		LBL_LIMIT,
-		LBL_CONDITION
+		LBL_CONDITION,
+		SPR_TYPE_DIFFICULTY,
+		BTN_START_DISABLE
 	}
 
 	private ArenaTable.ArenaData arenaData;
@@ -59,6 +62,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		base.Initialize();
 		arenaData = Singleton<ArenaTable>.I.GetArenaData(MonoBehaviourSingleton<QuestManager>.I.currentArenaId);
 		deliveryData = (GameSection.GetEventData() as DeliveryTable.DeliveryData);
+		this.StartCoroutine(StartPredownload());
 	}
 
 	public override void UpdateUI()
@@ -69,6 +73,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		UpdateLimitText();
 		UpdateConditionText();
 		UpdateStartButton();
+		SetDifficultySprite();
 	}
 
 	private void UpdateTopBar()
@@ -96,7 +101,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		if (arenaData != null)
 		{
 			List<QuestTable.QuestTableData> questDataArray = arenaData.GetQuestDataArray();
-			SetTable(UI.TBL_LIST, "QuestArenaRoomEnemyListItem", questDataArray.Count, false, delegate(int i, Transform t, bool b)
+			SetTable(UI.TBL_LIST, "QuestArenaRoomEnemyListItem", questDataArray.Count, reset: false, delegate(int i, Transform t, bool b)
 			{
 				InitEnemyItem(i, t, b, questDataArray[i]);
 			});
@@ -110,8 +115,8 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		{
 			SetLabelText(t, UI.LBL_ENEMY_LEVEL, StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, arenaData.level));
 			SetLabelText(t, UI.LBL_ENEMY_NAME, enemyData.name);
-			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(questData.questType), enemyData.iconId, questData.rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-			itemIcon.SetEnableCollider(false);
+			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(questData.questType), enemyData.iconId, questData.rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+			itemIcon.SetEnableCollider(is_enable: false);
 			SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 			SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -146,7 +151,128 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		GameSection.StayEvent();
 		CoopApp.EnterArenaQuestOffline(delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
 		{
-			GameSection.ResumeEvent(isStart, null);
+			GameSection.ResumeEvent(isStart);
 		});
+	}
+
+	private void SetDifficultySprite()
+	{
+		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryData != null && deliveryData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+	}
+
+	private IEnumerator StartPredownload()
+	{
+		yield return null;
+		List<ResourceInfo> list = new List<ResourceInfo>();
+		List<QuestTable.QuestTableData> questDataArray = arenaData.GetQuestDataArray();
+		if (questDataArray.IsNullOrEmpty())
+		{
+			yield break;
+		}
+		for (int i = 0; i < questDataArray.Count; i++)
+		{
+			uint mapId = questDataArray[i].mapId;
+			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(mapId);
+			if (fieldMapData == null)
+			{
+				yield break;
+			}
+			string text = fieldMapData.stageName;
+			if (string.IsNullOrEmpty(text))
+			{
+				text = "ST011D_01";
+			}
+			StageTable.StageData data = Singleton<StageTable>.I.GetData(text);
+			if (data == null)
+			{
+				yield break;
+			}
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SCENE, data.scene));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SKY, data.sky));
+			if (!string.IsNullOrEmpty(data.cameraLinkEffect))
+			{
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffect));
+			}
+			if (!string.IsNullOrEmpty(data.cameraLinkEffectY0))
+			{
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffectY0));
+			}
+			if (!string.IsNullOrEmpty(data.rootEffect))
+			{
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.rootEffect));
+			}
+			for (int j = 0; j < 8; j++)
+			{
+				if (!string.IsNullOrEmpty(data.useEffects[j]))
+				{
+					list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.useEffects[j]));
+				}
+			}
+			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questDataArray[i].enemyID[0]);
+			int modelId = enemyData.modelId;
+			string enemyBody = ResourceName.GetEnemyBody(modelId);
+			string enemyMaterial = ResourceName.GetEnemyMaterial(modelId);
+			string enemyAnim = ResourceName.GetEnemyAnim(enemyData.animId);
+			if (!string.IsNullOrEmpty(enemyBody))
+			{
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MODEL, enemyBody));
+			}
+			if (!string.IsNullOrEmpty(enemyMaterial))
+			{
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MATERIAL, enemyBody));
+			}
+			if (!string.IsNullOrEmpty(enemyAnim))
+			{
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_ANIM, enemyAnim));
+			}
+			if (!string.IsNullOrEmpty(enemyData.baseEffectName))
+			{
+				list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, enemyData.baseEffectName));
+			}
+		}
+		if (list.Find((ResourceInfo x) => !MonoBehaviourSingleton<ResourceManager>.I.IsCached(x.category, x.packageName)) == null)
+		{
+			yield break;
+		}
+		List<string> assetNames = new List<string>();
+		foreach (ResourceInfo item2 in list)
+		{
+			if (!string.IsNullOrEmpty(item2.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item2.category, item2.packageName))
+			{
+				assetNames.Add(item2.category.ToAssetBundleName(item2.packageName));
+			}
+		}
+		SetActive((Enum)UI.BTN_START_DISABLE, is_visible: true);
+		SetActive((Enum)UI.BTN_START, is_visible: false);
+		yield return ResourceSizeInfo.Init();
+		string act = null;
+		yield return ResourceSizeInfo.OpenConfirmDialog(ResourceSizeInfo.GetAssetsSizeMB(assetNames.ToArray()), 3002u, CommonDialog.TYPE.YES_NO, delegate(string str)
+		{
+			act = str;
+		});
+		if (act == "NO")
+		{
+			while (MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
+			{
+				yield return null;
+			}
+			DispatchEvent("[BACK]");
+		}
+		else
+		{
+			LoadingQueue loadQueue = new LoadingQueue(this);
+			foreach (ResourceInfo item in list)
+			{
+				if (!string.IsNullOrEmpty(item.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item.category, item.packageName))
+				{
+					ResourceManager.downloadOnly = true;
+					loadQueue.Load(item.category, item.packageName, null);
+					ResourceManager.downloadOnly = false;
+					yield return loadQueue.Wait();
+				}
+			}
+			SetActive((Enum)UI.BTN_START_DISABLE, is_visible: false);
+			SetActive((Enum)UI.BTN_START, is_visible: true);
+		}
 	}
 }

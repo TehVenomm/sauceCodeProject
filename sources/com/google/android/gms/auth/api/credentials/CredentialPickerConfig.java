@@ -3,42 +3,55 @@ package com.google.android.gms.auth.api.credentials;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public final class CredentialPickerConfig extends zza implements ReflectedParcelable {
-    public static final Creator<CredentialPickerConfig> CREATOR = new zzc();
+@Class(creator = "CredentialPickerConfigCreator")
+public final class CredentialPickerConfig extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<CredentialPickerConfig> CREATOR = new zze();
+    @Field(getter = "shouldShowCancelButton", mo13990id = 2)
     private final boolean mShowCancelButton;
-    private int zzdxt;
-    private final boolean zzeai;
+    @Field(mo13990id = 1000)
+    private final int zzu;
+    @Field(getter = "shouldShowAddAccountButton", mo13990id = 1)
+    private final boolean zzv;
+    @Field(getter = "isForNewAccount", mo13990id = 3)
     @Deprecated
-    private final boolean zzeaj;
-    private final int zzeak;
+    private final boolean zzw;
+    @Field(getter = "getPromptInternalId", mo13990id = 4)
+    private final int zzx;
 
     public static class Builder {
-        private boolean mShowCancelButton = true;
-        private boolean zzeai = false;
-        private int zzeal = 1;
+        /* access modifiers changed from: private */
+        public boolean mShowCancelButton = true;
+        /* access modifiers changed from: private */
+        public boolean zzv = false;
+        /* access modifiers changed from: private */
+        public int zzy = 1;
 
         public CredentialPickerConfig build() {
-            return new CredentialPickerConfig();
+            return new CredentialPickerConfig(this);
         }
 
         @Deprecated
         public Builder setForNewAccount(boolean z) {
-            this.zzeal = z ? 3 : 1;
+            this.zzy = z ? 3 : 1;
             return this;
         }
 
         public Builder setPrompt(int i) {
-            this.zzeal = i;
+            this.zzy = i;
             return this;
         }
 
         public Builder setShowAddAccountButton(boolean z) {
-            this.zzeai = z;
+            this.zzv = z;
             return this;
         }
 
@@ -55,38 +68,39 @@ public final class CredentialPickerConfig extends zza implements ReflectedParcel
         public static final int SIGN_UP = 3;
     }
 
-    CredentialPickerConfig(int i, boolean z, boolean z2, boolean z3, int i2) {
+    @Constructor
+    CredentialPickerConfig(@Param(mo13993id = 1000) int i, @Param(mo13993id = 1) boolean z, @Param(mo13993id = 2) boolean z2, @Param(mo13993id = 3) boolean z3, @Param(mo13993id = 4) int i2) {
         int i3 = 3;
         boolean z4 = true;
-        this.zzdxt = i;
-        this.zzeai = z;
+        this.zzu = i;
+        this.zzv = z;
         this.mShowCancelButton = z2;
         if (i < 2) {
-            this.zzeaj = z3;
+            this.zzw = z3;
             if (!z3) {
                 i3 = 1;
             }
-            this.zzeak = i3;
+            this.zzx = i3;
             return;
         }
         if (i2 != 3) {
             z4 = false;
         }
-        this.zzeaj = z4;
-        this.zzeak = i2;
+        this.zzw = z4;
+        this.zzx = i2;
     }
 
     private CredentialPickerConfig(Builder builder) {
-        this(2, builder.zzeai, builder.mShowCancelButton, false, builder.zzeal);
+        this(2, builder.zzv, builder.mShowCancelButton, false, builder.zzy);
     }
 
     @Deprecated
     public final boolean isForNewAccount() {
-        return this.zzeak == 3;
+        return this.zzx == 3;
     }
 
     public final boolean shouldShowAddAccountButton() {
-        return this.zzeai;
+        return this.zzv;
     }
 
     public final boolean shouldShowCancelButton() {
@@ -94,12 +108,12 @@ public final class CredentialPickerConfig extends zza implements ReflectedParcel
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, shouldShowAddAccountButton());
-        zzd.zza(parcel, 2, shouldShowCancelButton());
-        zzd.zza(parcel, 3, isForNewAccount());
-        zzd.zzc(parcel, 4, this.zzeak);
-        zzd.zzc(parcel, 1000, this.zzdxt);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeBoolean(parcel, 1, shouldShowAddAccountButton());
+        SafeParcelWriter.writeBoolean(parcel, 2, shouldShowCancelButton());
+        SafeParcelWriter.writeBoolean(parcel, 3, isForNewAccount());
+        SafeParcelWriter.writeInt(parcel, 4, this.zzx);
+        SafeParcelWriter.writeInt(parcel, 1000, this.zzu);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

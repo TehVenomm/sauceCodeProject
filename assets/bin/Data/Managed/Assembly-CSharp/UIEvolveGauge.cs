@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-public class UIEvolveGauge
+public class UIEvolveGauge : MonoBehaviour
 {
 	public GameObject longTouchTarget;
 
@@ -29,12 +30,8 @@ public class UIEvolveGauge
 
 	protected void Awake()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Expected O, but got Unknown
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		UILongTouch.Set(longTouchTarget, "EVOLVE", null);
-		UITouchAndRelease.Set(longTouchTarget, "EVOLVE_TOUCH", null, null);
+		UILongTouch.Set(longTouchTarget, "EVOLVE");
+		UITouchAndRelease.Set(longTouchTarget, "EVOLVE_TOUCH");
 		effectTrans = EffectManager.GetUIEffect("ef_ui_skillgauge_blue_01", gauge.get_transform().get_parent(), 0f, 1, gauge);
 		if (!object.ReferenceEquals(effectTrans, null))
 		{
@@ -69,7 +66,6 @@ public class UIEvolveGauge
 
 	public void EnableEvolveIcon(bool isEnable)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		weaponIcon.set_enabled(!isEnable);
 		evolveIcon.get_gameObject().SetActive(isEnable);
 	}
@@ -78,12 +74,11 @@ public class UIEvolveGauge
 	{
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		if (!object.ReferenceEquals(effectTrans, null))
 		{
 			float num = -28f + 60f * rate;
 			effectTrans.set_localPosition(new Vector3(-4f, num, 0f));
-			float num2 = 0.85f * Mathf.Sin(rate * 3.14159274f) + 0.2f;
+			float num2 = 0.85f * Mathf.Sin(rate * (float)Math.PI) + 0.2f;
 			if (num2 >= 0.8f)
 			{
 				num2 = 0.8f;

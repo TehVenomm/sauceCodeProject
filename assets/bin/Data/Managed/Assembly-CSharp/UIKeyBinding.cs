@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Key Binding")]
-public class UIKeyBinding
+public class UIKeyBinding : MonoBehaviour
 {
 	public enum Action
 	{
@@ -130,65 +130,58 @@ public class UIKeyBinding
 		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Expected O, but got Unknown
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Expected O, but got Unknown
-		if (!UICamera.inputHasFocus && (int)keyCode != 0 && IsModifierActive())
+		if (UICamera.inputHasFocus || (int)keyCode == 0 || !IsModifierActive())
 		{
-			bool flag = UICamera.GetKeyDown(keyCode);
-			bool flag2 = UICamera.GetKeyUp(keyCode);
+			return;
+		}
+		bool flag = UICamera.GetKeyDown(keyCode);
+		bool flag2 = UICamera.GetKeyUp(keyCode);
+		if (flag)
+		{
+			mPress = true;
+		}
+		if (action == Action.PressAndClick || action == Action.All)
+		{
 			if (flag)
 			{
-				mPress = true;
+				UICamera.currentKey = keyCode;
+				OnBindingPress(pressed: true);
 			}
-			if (action == Action.PressAndClick || action == Action.All)
+			if (mPress && flag2)
 			{
-				if (flag)
-				{
-					UICamera.currentKey = keyCode;
-					OnBindingPress(true);
-				}
-				if (mPress && flag2)
-				{
-					UICamera.currentKey = keyCode;
-					OnBindingPress(false);
-					OnBindingClick();
-				}
+				UICamera.currentKey = keyCode;
+				OnBindingPress(pressed: false);
+				OnBindingClick();
 			}
-			if ((action == Action.Select || action == Action.All) && flag2)
+		}
+		if ((action == Action.Select || action == Action.All) && flag2)
+		{
+			if (mIsInput)
 			{
-				if (mIsInput)
+				if (!mIgnoreUp && !UICamera.inputHasFocus && mPress)
 				{
-					if (!mIgnoreUp && !UICamera.inputHasFocus && mPress)
-					{
-						UICamera.selectedObject = this.get_gameObject();
-					}
-					mIgnoreUp = false;
+					UICamera.selectedObject = this.get_gameObject();
 				}
-				else if (mPress)
-				{
-					UICamera.hoveredObject = this.get_gameObject();
-				}
+				mIgnoreUp = false;
 			}
-			if (flag2)
+			else if (mPress)
 			{
-				mPress = false;
+				UICamera.hoveredObject = this.get_gameObject();
 			}
+		}
+		if (flag2)
+		{
+			mPress = false;
 		}
 	}
 
 	protected virtual void OnBindingPress(bool pressed)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
 		UICamera.Notify(this.get_gameObject(), "OnPress", pressed);
 	}
 
 	protected virtual void OnBindingClick()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
 		UICamera.Notify(this.get_gameObject(), "OnClick", null);
 	}
 }

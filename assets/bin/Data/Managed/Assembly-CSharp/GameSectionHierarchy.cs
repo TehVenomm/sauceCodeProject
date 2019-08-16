@@ -30,7 +30,6 @@ public class GameSectionHierarchy
 
 	public void DestroyHierarchy(HierarchyData hierarchy_data)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		int type = (int)hierarchy_data.data.type;
 		if (typedDatas[type] == hierarchy_data)
 		{
@@ -103,10 +102,6 @@ public class GameSectionHierarchy
 
 	public GameSection CreateSection(GameSceneTables.SectionData section_data, LoadObject[] use_objects)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Expected O, but got Unknown
 		GameSection gameSection = null;
 		HierarchyData last = GetLast();
 		Transform parent = (last != null) ? last.section._transform : MonoBehaviourSingleton<UIManager>.I.uiCamera.get_transform();
@@ -121,56 +116,57 @@ public class GameSectionHierarchy
 		for (int num = use_objects.Length; i < num; i++)
 		{
 			LoadObject loadObject = use_objects[i];
-			if (loadObject != null)
+			if (loadObject == null)
 			{
-				GameObject val = loadObject.loadedObject as GameObject;
-				if (val != null)
+				continue;
+			}
+			GameObject val = loadObject.loadedObject as GameObject;
+			if (!(val != null))
+			{
+				continue;
+			}
+			if (val.GetComponent<UIVirtualScreen>() != null)
+			{
+				Type type = null;
+				if (gameSection == null)
 				{
-					if (val.GetComponent<UIVirtualScreen>() != null)
-					{
-						Type type = null;
-						if (gameSection == null)
-						{
-							type = Type.GetType(section_data.sectionName);
-						}
-						UIBehaviour uIBehaviour = UIManager.CreatePrefabUI(val, loadObject.PopInstantiatedGameObject(), type, false, parent, GetPrefabUIDepth(section_data.type), section_data);
-						if (gameSection == null && section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
-						{
-							gameSection = (uIBehaviour.get_gameObject().AddComponent(Type.GetType(section_data.typeParams[0])) as GameSection);
-							parent = gameSection._transform;
-						}
-						else if (gameSection == null && type != null)
-						{
-							gameSection = (uIBehaviour.GetComponent<UIBehaviour>() as GameSection);
-							parent = gameSection._transform;
-						}
-						else
-						{
-							if (gameSection == null)
-							{
-								gameSection = (uIBehaviour.GetComponent<UIBehaviour>() as GameSection);
-							}
-							if (gameSection == null)
-							{
-								gameSection = (Utility.CreateGameObjectAndComponent(section_data.sectionName, parent, 5) as GameSection);
-								gameSection.baseDepth = GetPrefabUIDepth(section_data.type);
-								parent = gameSection._transform;
-							}
-							if (section_data.type != GAME_SECTION_TYPE.COMMON_DIALOG)
-							{
-								uIBehaviour.Open(UITransition.TYPE.OPEN);
-							}
-						}
-					}
-					else if (gameSection != null)
-					{
-						gameSection.AddPrefab(val, loadObject.PopInstantiatedGameObject());
-					}
-					else
-					{
-						Log.Warning(LOG.GAMESCENE, "[{0}] is not used.", val.get_name());
-					}
+					type = Type.GetType(section_data.sectionName);
 				}
+				UIBehaviour uIBehaviour = UIManager.CreatePrefabUI(val, loadObject.PopInstantiatedGameObject(), type, initVisible: false, parent, GetPrefabUIDepth(section_data.type), section_data);
+				if (gameSection == null && section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
+				{
+					gameSection = (uIBehaviour.get_gameObject().AddComponent(Type.GetType(section_data.typeParams[0])) as GameSection);
+					parent = gameSection._transform;
+					continue;
+				}
+				if (gameSection == null && type != null)
+				{
+					gameSection = (uIBehaviour.GetComponent<UIBehaviour>() as GameSection);
+					parent = gameSection._transform;
+					continue;
+				}
+				if (gameSection == null)
+				{
+					gameSection = (uIBehaviour.GetComponent<UIBehaviour>() as GameSection);
+				}
+				if (gameSection == null)
+				{
+					gameSection = (Utility.CreateGameObjectAndComponent(section_data.sectionName, parent, 5) as GameSection);
+					gameSection.baseDepth = GetPrefabUIDepth(section_data.type);
+					parent = gameSection._transform;
+				}
+				if (section_data.type != GAME_SECTION_TYPE.COMMON_DIALOG)
+				{
+					uIBehaviour.Open();
+				}
+			}
+			else if (gameSection != null)
+			{
+				gameSection.AddPrefab(val, loadObject.PopInstantiatedGameObject());
+			}
+			else
+			{
+				Log.Warning(LOG.GAMESCENE, "[{0}] is not used.", val.get_name());
 			}
 		}
 		if (gameSection == null)
@@ -216,7 +212,7 @@ public class GameSectionHierarchy
 	public int GetDialogDialogBlockerDepth(GameSceneTables.SectionData new_section_data)
 	{
 		HierarchyData hierarchyData = null;
-		if (new_section_data != (GameSceneTables.SectionData)null && new_section_data.type.IsDialog())
+		if (new_section_data != null && new_section_data.type.IsDialog())
 		{
 			hierarchyData = Find(new_section_data);
 			if (hierarchyData != null)

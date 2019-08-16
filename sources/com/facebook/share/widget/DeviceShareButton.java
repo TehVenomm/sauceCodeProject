@@ -4,13 +4,13 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
-import com.facebook.C0365R;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookButtonBase;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookSdk;
 import com.facebook.internal.AnalyticsEvents;
 import com.facebook.internal.CallbackManagerImpl.RequestCodeOffset;
+import com.facebook.share.C0741R;
 import com.facebook.share.DeviceShareDialog;
 import com.facebook.share.DeviceShareDialog.Result;
 import com.facebook.share.model.ShareContent;
@@ -20,17 +20,6 @@ public final class DeviceShareButton extends FacebookButtonBase {
     private boolean enabledExplicitlySet;
     private int requestCode;
     private ShareContent shareContent;
-
-    /* renamed from: com.facebook.share.widget.DeviceShareButton$1 */
-    class C05261 implements OnClickListener {
-        C05261() {
-        }
-
-        public void onClick(View view) {
-            DeviceShareButton.this.callExternalOnClickListener(view);
-            DeviceShareButton.this.getDialog().show(DeviceShareButton.this.getShareContent());
-        }
-    }
 
     public DeviceShareButton(Context context) {
         this(context, null, 0);
@@ -53,7 +42,8 @@ public final class DeviceShareButton extends FacebookButtonBase {
         return new DeviceShareDialog(getActivity()).canShow(getShareContent());
     }
 
-    private DeviceShareDialog getDialog() {
+    /* access modifiers changed from: private */
+    public DeviceShareDialog getDialog() {
         if (this.dialog != null) {
             return this.dialog;
         }
@@ -79,17 +69,20 @@ public final class DeviceShareButton extends FacebookButtonBase {
         this.requestCode = i;
     }
 
-    protected void configureButton(Context context, AttributeSet attributeSet, int i, int i2) {
+    /* access modifiers changed from: protected */
+    public void configureButton(Context context, AttributeSet attributeSet, int i, int i2) {
         super.configureButton(context, attributeSet, i, i2);
         setInternalOnClickListener(getShareOnClickListener());
     }
 
-    protected int getDefaultRequestCode() {
+    /* access modifiers changed from: protected */
+    public int getDefaultRequestCode() {
         return RequestCodeOffset.Share.toRequestCode();
     }
 
-    protected int getDefaultStyleResource() {
-        return C0365R.style.com_facebook_button_share;
+    /* access modifiers changed from: protected */
+    public int getDefaultStyleResource() {
+        return C0741R.style.com_facebook_button_share;
     }
 
     public int getRequestCode() {
@@ -100,8 +93,14 @@ public final class DeviceShareButton extends FacebookButtonBase {
         return this.shareContent;
     }
 
-    protected OnClickListener getShareOnClickListener() {
-        return new C05261();
+    /* access modifiers changed from: protected */
+    public OnClickListener getShareOnClickListener() {
+        return new OnClickListener() {
+            public void onClick(View view) {
+                DeviceShareButton.this.callExternalOnClickListener(view);
+                DeviceShareButton.this.getDialog().show(DeviceShareButton.this.getShareContent());
+            }
+        };
     }
 
     public void registerCallback(CallbackManager callbackManager, FacebookCallback<Result> facebookCallback) {
@@ -118,8 +117,8 @@ public final class DeviceShareButton extends FacebookButtonBase {
         this.enabledExplicitlySet = true;
     }
 
-    public void setShareContent(ShareContent shareContent) {
-        this.shareContent = shareContent;
+    public void setShareContent(ShareContent shareContent2) {
+        this.shareContent = shareContent2;
         if (!this.enabledExplicitlySet) {
             internalSetEnabled(canShare());
         }

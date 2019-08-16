@@ -38,7 +38,8 @@ public final class StringCollectionDeserializer extends ContainerDeserializerBas
         this._unwrapSingle = bool;
     }
 
-    protected StringCollectionDeserializer withResolved(JsonDeserializer<?> jsonDeserializer, JsonDeserializer<?> jsonDeserializer2, Boolean bool) {
+    /* access modifiers changed from: protected */
+    public StringCollectionDeserializer withResolved(JsonDeserializer<?> jsonDeserializer, JsonDeserializer<?> jsonDeserializer2, Boolean bool) {
         return (this._unwrapSingle == bool && this._valueDeserializer == jsonDeserializer2 && this._delegateDeserializer == jsonDeserializer) ? this : new StringCollectionDeserializer(this._collectionType, this._valueInstantiator, jsonDeserializer, jsonDeserializer2, bool);
     }
 
@@ -48,25 +49,26 @@ public final class StringCollectionDeserializer extends ContainerDeserializerBas
 
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
         JsonDeserializer jsonDeserializer;
+        JsonDeserializer handleSecondaryContextualization;
         JsonDeserializer jsonDeserializer2 = null;
         if (this._valueInstantiator == null || this._valueInstantiator.getDelegateCreator() == null) {
             jsonDeserializer = null;
         } else {
             jsonDeserializer = findDeserializer(deserializationContext, this._valueInstantiator.getDelegateType(deserializationContext.getConfig()), beanProperty);
         }
-        JsonDeserializer jsonDeserializer3 = this._valueDeserializer;
+        JsonDeserializer<String> jsonDeserializer3 = this._valueDeserializer;
         JavaType contentType = this._collectionType.getContentType();
         if (jsonDeserializer3 == null) {
-            jsonDeserializer3 = findConvertingContentDeserializer(deserializationContext, beanProperty, jsonDeserializer3);
-            if (jsonDeserializer3 == null) {
-                jsonDeserializer3 = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
+            handleSecondaryContextualization = findConvertingContentDeserializer(deserializationContext, beanProperty, jsonDeserializer3);
+            if (handleSecondaryContextualization == null) {
+                handleSecondaryContextualization = deserializationContext.findContextualValueDeserializer(contentType, beanProperty);
             }
         } else {
-            jsonDeserializer3 = deserializationContext.handleSecondaryContextualization(jsonDeserializer3, beanProperty, contentType);
+            handleSecondaryContextualization = deserializationContext.handleSecondaryContextualization(jsonDeserializer3, beanProperty, contentType);
         }
         Boolean findFormatFeature = findFormatFeature(deserializationContext, beanProperty, Collection.class, Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        if (!isDefaultDeserializer(jsonDeserializer3)) {
-            jsonDeserializer2 = jsonDeserializer3;
+        if (!isDefaultDeserializer(handleSecondaryContextualization)) {
+            jsonDeserializer2 = handleSecondaryContextualization;
         }
         return withResolved(jsonDeserializer, jsonDeserializer2, findFormatFeature);
     }
@@ -95,7 +97,7 @@ public final class StringCollectionDeserializer extends ContainerDeserializerBas
         }
         while (true) {
             try {
-                Object nextTextValue = jsonParser.nextTextValue();
+                String nextTextValue = jsonParser.nextTextValue();
                 if (nextTextValue != null) {
                     collection.add(nextTextValue);
                 } else {
@@ -108,30 +110,25 @@ public final class StringCollectionDeserializer extends ContainerDeserializerBas
                     }
                     collection.add(nextTextValue);
                 }
-            } catch (Throwable e) {
-                throw JsonMappingException.wrapWithPath(e, (Object) collection, collection.size());
+            } catch (Exception e) {
+                throw JsonMappingException.wrapWithPath((Throwable) e, (Object) collection, collection.size());
             }
         }
     }
 
     private Collection<String> deserializeUsingCustom(JsonParser jsonParser, DeserializationContext deserializationContext, Collection<String> collection, JsonDeserializer<String> jsonDeserializer) throws IOException {
+        Object deserialize;
         while (true) {
-            Object obj;
-            String str;
             if (jsonParser.nextTextValue() == null) {
                 JsonToken currentToken = jsonParser.getCurrentToken();
                 if (currentToken == JsonToken.END_ARRAY) {
                     return collection;
                 }
-                if (currentToken == JsonToken.VALUE_NULL) {
-                    obj = (String) jsonDeserializer.getNullValue(deserializationContext);
-                } else {
-                    str = (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
-                }
+                deserialize = currentToken == JsonToken.VALUE_NULL ? jsonDeserializer.getNullValue(deserializationContext) : jsonDeserializer.deserialize(jsonParser, deserializationContext);
             } else {
-                str = (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
+                deserialize = jsonDeserializer.deserialize(jsonParser, deserializationContext);
             }
-            collection.add(obj);
+            collection.add((String) deserialize);
         }
     }
 
@@ -140,24 +137,12 @@ public final class StringCollectionDeserializer extends ContainerDeserializerBas
     }
 
     private final Collection<String> handleNonArray(JsonParser jsonParser, DeserializationContext deserializationContext, Collection<String> collection) throws IOException {
-        Object obj = (this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY))) ? 1 : null;
-        if (obj == null) {
+        if (!(this._unwrapSingle == Boolean.TRUE || (this._unwrapSingle == null && deserializationContext.isEnabled(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)))) {
             throw deserializationContext.mappingException(this._collectionType.getRawClass());
         }
-        JsonDeserializer jsonDeserializer = this._valueDeserializer;
-        String str;
-        if (jsonParser.getCurrentToken() == JsonToken.VALUE_NULL) {
-            if (jsonDeserializer == null) {
-                obj = null;
-            } else {
-                str = (String) jsonDeserializer.getNullValue(deserializationContext);
-            }
-        } else if (jsonDeserializer == null) {
-            obj = _parseString(jsonParser, deserializationContext);
-        } else {
-            str = (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
-        }
-        collection.add(obj);
+        JsonDeserializer<String> jsonDeserializer = this._valueDeserializer;
+        String str = jsonParser.getCurrentToken() == JsonToken.VALUE_NULL ? jsonDeserializer == null ? null : (String) jsonDeserializer.getNullValue(deserializationContext) : jsonDeserializer == null ? _parseString(jsonParser, deserializationContext) : (String) jsonDeserializer.deserialize(jsonParser, deserializationContext);
+        collection.add(str);
         return collection;
     }
 }

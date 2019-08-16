@@ -2,34 +2,47 @@ package com.google.android.gms.auth.api.signin;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
+import javax.annotation.Nullable;
 
-public class SignInAccount extends zza implements ReflectedParcelable {
-    public static final Creator<SignInAccount> CREATOR = new zze();
+@Class(creator = "SignInAccountCreator")
+@Reserved({1})
+public class SignInAccount extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<SignInAccount> CREATOR = new zzd();
+    @Field(defaultValue = "", mo13990id = 4)
     @Deprecated
-    private String zzdnd;
+    private String zzba;
+    @Field(getter = "getGoogleSignInAccount", mo13990id = 7)
+    private GoogleSignInAccount zzbb;
+    @Field(defaultValue = "", mo13990id = 8)
     @Deprecated
-    private String zzebx;
-    private GoogleSignInAccount zzecq;
+    private String zzbc;
 
-    SignInAccount(String str, GoogleSignInAccount googleSignInAccount, String str2) {
-        this.zzecq = googleSignInAccount;
-        this.zzebx = zzbp.zzh(str, "8.3 and 8.4 SDKs require non-null email");
-        this.zzdnd = zzbp.zzh(str2, "8.3 and 8.4 SDKs require non-null userId");
+    @Constructor
+    SignInAccount(@Param(mo13993id = 4) String str, @Param(mo13993id = 7) GoogleSignInAccount googleSignInAccount, @Param(mo13993id = 8) String str2) {
+        this.zzbb = googleSignInAccount;
+        this.zzba = Preconditions.checkNotEmpty(str, "8.3 and 8.4 SDKs require non-null email");
+        this.zzbc = Preconditions.checkNotEmpty(str2, "8.3 and 8.4 SDKs require non-null userId");
+    }
+
+    @Nullable
+    public final GoogleSignInAccount getGoogleSignInAccount() {
+        return this.zzbb;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 4, this.zzebx, false);
-        zzd.zza(parcel, 7, this.zzecq, i, false);
-        zzd.zza(parcel, 8, this.zzdnd, false);
-        zzd.zzai(parcel, zze);
-    }
-
-    public final GoogleSignInAccount zzaah() {
-        return this.zzecq;
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 4, this.zzba, false);
+        SafeParcelWriter.writeParcelable(parcel, 7, this.zzbb, i, false);
+        SafeParcelWriter.writeString(parcel, 8, this.zzbc, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

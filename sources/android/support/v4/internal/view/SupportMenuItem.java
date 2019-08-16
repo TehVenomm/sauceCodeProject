@@ -1,13 +1,15 @@
-package android.support.v4.internal.view;
+package android.support.p000v4.internal.view;
 
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff.Mode;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.view.ActionProvider;
-import android.support.v4.view.MenuItemCompat.OnActionExpandListener;
+import android.support.p000v4.view.ActionProvider;
 import android.view.MenuItem;
 import android.view.View;
 
 @RestrictTo({Scope.LIBRARY_GROUP})
+/* renamed from: android.support.v4.internal.view.SupportMenuItem */
 public interface SupportMenuItem extends MenuItem {
     public static final int SHOW_AS_ACTION_ALWAYS = 2;
     public static final int SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW = 8;
@@ -21,7 +23,19 @@ public interface SupportMenuItem extends MenuItem {
 
     View getActionView();
 
+    int getAlphabeticModifiers();
+
+    CharSequence getContentDescription();
+
+    ColorStateList getIconTintList();
+
+    Mode getIconTintMode();
+
+    int getNumericModifiers();
+
     ActionProvider getSupportActionProvider();
+
+    CharSequence getTooltipText();
 
     boolean isActionViewExpanded();
 
@@ -29,11 +43,23 @@ public interface SupportMenuItem extends MenuItem {
 
     MenuItem setActionView(View view);
 
+    MenuItem setAlphabeticShortcut(char c, int i);
+
+    SupportMenuItem setContentDescription(CharSequence charSequence);
+
+    MenuItem setIconTintList(ColorStateList colorStateList);
+
+    MenuItem setIconTintMode(Mode mode);
+
+    MenuItem setNumericShortcut(char c, int i);
+
+    MenuItem setShortcut(char c, char c2, int i, int i2);
+
     void setShowAsAction(int i);
 
     MenuItem setShowAsActionFlags(int i);
 
     SupportMenuItem setSupportActionProvider(ActionProvider actionProvider);
 
-    SupportMenuItem setSupportOnActionExpandListener(OnActionExpandListener onActionExpandListener);
+    SupportMenuItem setTooltipText(CharSequence charSequence);
 }

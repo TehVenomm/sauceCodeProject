@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.databind.util.EnumResolver;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 public class StdKeyDeserializers implements KeyDeserializers, Serializable {
     private static final long serialVersionUID = 1;
@@ -30,21 +32,21 @@ public class StdKeyDeserializers implements KeyDeserializers, Serializable {
 
     public static KeyDeserializer findStringBasedKeyDeserializer(DeserializationConfig deserializationConfig, JavaType javaType) {
         BeanDescription introspect = deserializationConfig.introspect(javaType);
-        Object findSingleArgConstructor = introspect.findSingleArgConstructor(String.class);
+        Constructor findSingleArgConstructor = introspect.findSingleArgConstructor(String.class);
         if (findSingleArgConstructor != null) {
             if (deserializationConfig.canOverrideAccessModifiers()) {
                 ClassUtil.checkAndFixAccess(findSingleArgConstructor, deserializationConfig.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
             }
             return new StringCtorKeyDeserializer(findSingleArgConstructor);
         }
-        findSingleArgConstructor = introspect.findFactoryMethod(String.class);
-        if (findSingleArgConstructor == null) {
+        Method findFactoryMethod = introspect.findFactoryMethod(String.class);
+        if (findFactoryMethod == null) {
             return null;
         }
         if (deserializationConfig.canOverrideAccessModifiers()) {
-            ClassUtil.checkAndFixAccess(findSingleArgConstructor, deserializationConfig.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
+            ClassUtil.checkAndFixAccess(findFactoryMethod, deserializationConfig.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
         }
-        return new StringFactoryKeyDeserializer(findSingleArgConstructor);
+        return new StringFactoryKeyDeserializer(findFactoryMethod);
     }
 
     public KeyDeserializer findKeyDeserializer(JavaType javaType, DeserializationConfig deserializationConfig, BeanDescription beanDescription) throws JsonMappingException {

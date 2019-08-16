@@ -10,12 +10,12 @@ public class GuildRequestAcceptSelect : QuestAcceptSelect
 	{
 		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_PARTY, false);
-		SetActive((Enum)UI.TWN_DIFFICULT_STAR, false);
+		SetActive((Enum)UI.BTN_PARTY, is_visible: false);
+		SetActive((Enum)UI.TWN_DIFFICULT_STAR, is_visible: false);
 		GetCtrl(UI.BTN_GUILD_REQUEST).set_localPosition(new Vector3(0f, 0f, 0f));
 		SetLabelText((Enum)UI.LBL_LIMIT_TIME, "--:--");
 		RARITY_TYPE rarity = questInfo.questData.tableData.rarity;
-		SetActive((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, true);
+		SetActive((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, is_visible: true);
 		string format = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 6u);
 		string text = string.Format(format, MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(rarity), MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(rarity));
 		SetLabelText((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, text);
@@ -41,10 +41,9 @@ public class GuildRequestAcceptSelect : QuestAcceptSelect
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestStart(questInfo, !flag, delegate(bool isSuccess)
 		{
-			GuildRequestAcceptSelect guildRequestAcceptSelect = this;
 			SendGetChallengeInfo(delegate
 			{
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 			}, null);
 		});
 	}

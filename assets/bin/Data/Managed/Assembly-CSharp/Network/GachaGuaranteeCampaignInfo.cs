@@ -73,7 +73,7 @@ namespace Network
 			{
 				return buttonImg;
 			}
-			if (IsStepUp())
+			if (IsChangeableButtonAndOpenInfo())
 			{
 				return buttonImg;
 			}
@@ -87,7 +87,7 @@ namespace Network
 
 		public int GetImageCount()
 		{
-			if (IsStepUp())
+			if (IsStepUp() || IsFever())
 			{
 				return GetStep();
 			}
@@ -122,6 +122,21 @@ namespace Network
 		public bool IsStepUp()
 		{
 			return campaignType == 2;
+		}
+
+		public bool IsFever()
+		{
+			return campaignType == 3;
+		}
+
+		public bool IsStepUpWithPresent()
+		{
+			return campaignType == 4;
+		}
+
+		public bool IsChangeableButtonAndOpenInfo()
+		{
+			return IsStepUp() || IsFever() || IsStepUpWithPresent();
 		}
 	}
 }

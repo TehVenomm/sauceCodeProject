@@ -1,9 +1,7 @@
 package org.apache.commons.lang3;
 
-import io.fabric.sdk.android.services.events.EventsFilesManager;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -11,20 +9,23 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import p017io.fabric.sdk.android.services.events.EventsFilesManager;
 
 public class LocaleUtils {
     private static final ConcurrentMap<String, List<Locale>> cCountriesByLanguage = new ConcurrentHashMap();
     private static final ConcurrentMap<String, List<Locale>> cLanguagesByCountry = new ConcurrentHashMap();
 
     static class SyncAvoid {
-        private static final List<Locale> AVAILABLE_LOCALE_LIST;
-        private static final Set<Locale> AVAILABLE_LOCALE_SET;
+        /* access modifiers changed from: private */
+        public static final List<Locale> AVAILABLE_LOCALE_LIST;
+        /* access modifiers changed from: private */
+        public static final Set<Locale> AVAILABLE_LOCALE_SET;
 
         SyncAvoid() {
         }
 
         static {
-            Collection arrayList = new ArrayList(Arrays.asList(Locale.getAvailableLocales()));
+            ArrayList arrayList = new ArrayList(Arrays.asList(Locale.getAvailableLocales()));
             AVAILABLE_LOCALE_LIST = Collections.unmodifiableList(arrayList);
             AVAILABLE_LOCALE_SET = Collections.unmodifiableSet(new HashSet(arrayList));
         }
@@ -88,7 +89,7 @@ public class LocaleUtils {
     }
 
     public static List<Locale> localeLookupList(Locale locale, Locale locale2) {
-        List arrayList = new ArrayList(4);
+        ArrayList arrayList = new ArrayList(4);
         if (locale != null) {
             arrayList.add(locale);
             if (locale.getVariant().length() > 0) {
@@ -124,16 +125,22 @@ public class LocaleUtils {
         if (list != null) {
             return list;
         }
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         List availableLocaleList = availableLocaleList();
-        for (int i = 0; i < availableLocaleList.size(); i++) {
-            Locale locale = (Locale) availableLocaleList.get(i);
-            if (str.equals(locale.getCountry()) && locale.getVariant().isEmpty()) {
-                arrayList.add(locale);
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 < availableLocaleList.size()) {
+                Locale locale = (Locale) availableLocaleList.get(i2);
+                if (str.equals(locale.getCountry()) && locale.getVariant().isEmpty()) {
+                    arrayList.add(locale);
+                }
+                i = i2 + 1;
+            } else {
+                cLanguagesByCountry.putIfAbsent(str, Collections.unmodifiableList(arrayList));
+                return (List) cLanguagesByCountry.get(str);
             }
         }
-        cLanguagesByCountry.putIfAbsent(str, Collections.unmodifiableList(arrayList));
-        return (List) cLanguagesByCountry.get(str);
     }
 
     public static List<Locale> countriesByLanguage(String str) {
@@ -144,15 +151,21 @@ public class LocaleUtils {
         if (list != null) {
             return list;
         }
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         List availableLocaleList = availableLocaleList();
-        for (int i = 0; i < availableLocaleList.size(); i++) {
-            Locale locale = (Locale) availableLocaleList.get(i);
-            if (str.equals(locale.getLanguage()) && locale.getCountry().length() != 0 && locale.getVariant().isEmpty()) {
-                arrayList.add(locale);
+        int i = 0;
+        while (true) {
+            int i2 = i;
+            if (i2 < availableLocaleList.size()) {
+                Locale locale = (Locale) availableLocaleList.get(i2);
+                if (str.equals(locale.getLanguage()) && locale.getCountry().length() != 0 && locale.getVariant().isEmpty()) {
+                    arrayList.add(locale);
+                }
+                i = i2 + 1;
+            } else {
+                cCountriesByLanguage.putIfAbsent(str, Collections.unmodifiableList(arrayList));
+                return (List) cCountriesByLanguage.get(str);
             }
         }
-        cCountriesByLanguage.putIfAbsent(str, Collections.unmodifiableList(arrayList));
-        return (List) cCountriesByLanguage.get(str);
     }
 }

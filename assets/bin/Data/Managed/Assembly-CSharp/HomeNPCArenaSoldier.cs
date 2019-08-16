@@ -15,14 +15,13 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 
 	protected override void PlayNearAnim(HomeNPCCharacter npc)
 	{
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<UserInfoManager>.I.isArenaOpen)
 		{
-			animCtrl.Play(npc.nearAnim, false);
+			animCtrl.Play(npc.nearAnim);
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking && animCtrl.playingAnim == PLCA.IDLE_01 && isTurned)
 		{
-			animCtrl.Play(PLCA.THROUGH_BOW, false);
+			animCtrl.Play(PLCA.THROUGH_BOW);
 		}
 		else if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 50)
 		{
@@ -34,13 +33,13 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 		}
 		else
 		{
-			animCtrl.Play(npc.nearAnim, false);
+			animCtrl.Play(npc.nearAnim);
 		}
 	}
 
 	private IEnumerator PlayThroughTurn()
 	{
-		animCtrl.Play(PLCA.THROUGH_TURN, false);
+		animCtrl.Play(PLCA.THROUGH_TURN);
 		int turnSign = (base.npcInfo.scaleX > 0f) ? 1 : (-1);
 		Vector3 eulerAngles = base._transform.get_eulerAngles();
 		float beforeTurnRot = eulerAngles.y;
@@ -53,7 +52,7 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 			}
 			float rotateY = beforeTurnRot + rotatedDegree * (float)turnSign;
 			base._transform.set_rotation(Quaternion.Euler(0f, rotateY, 0f));
-			yield return (object)null;
+			yield return null;
 		}
 	}
 }

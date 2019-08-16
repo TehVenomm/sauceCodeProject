@@ -55,7 +55,10 @@ class SessionInfo {
     }
 
     public long getDiskRestoreTime() {
-        return this.diskRestoreTime == null ? 0 : this.diskRestoreTime.longValue();
+        if (this.diskRestoreTime == null) {
+            return 0;
+        }
+        return this.diskRestoreTime.longValue();
     }
 
     public int getInterruptionCount() {
@@ -71,7 +74,10 @@ class SessionInfo {
     }
 
     public long getSessionLength() {
-        return (this.sessionStartTime == null || this.sessionLastEventTime == null) ? 0 : this.sessionLastEventTime.longValue() - this.sessionStartTime.longValue();
+        if (this.sessionStartTime == null || this.sessionLastEventTime == null) {
+            return 0;
+        }
+        return this.sessionLastEventTime.longValue() - this.sessionStartTime.longValue();
     }
 
     public Long getSessionStartTime() {
@@ -90,12 +96,8 @@ class SessionInfo {
         this.sessionLastEventTime = l;
     }
 
-    public void setSessionStartTime(Long l) {
-        this.sessionStartTime = l;
-    }
-
-    public void setSourceApplicationInfo(SourceApplicationInfo sourceApplicationInfo) {
-        this.sourceApplicationInfo = sourceApplicationInfo;
+    public void setSourceApplicationInfo(SourceApplicationInfo sourceApplicationInfo2) {
+        this.sourceApplicationInfo = sourceApplicationInfo2;
     }
 
     public void writeSessionToDisk() {

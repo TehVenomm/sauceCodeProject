@@ -31,7 +31,7 @@ public final class GsonBuilder {
     private int timeStyle = 2;
 
     private void addTypeAdaptersForDate(String str, int i, int i2, List<TypeAdapterFactory> list) {
-        Object defaultDateTypeAdapter;
+        DefaultDateTypeAdapter defaultDateTypeAdapter;
         if (str != null && !"".equals(str.trim())) {
             defaultDateTypeAdapter = new DefaultDateTypeAdapter(str);
         } else if (i != 2 && i2 != 2) {
@@ -55,7 +55,7 @@ public final class GsonBuilder {
     }
 
     public Gson create() {
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         arrayList.addAll(this.factories);
         Collections.reverse(arrayList);
         arrayList.addAll(this.hierarchyFactories);
@@ -94,8 +94,7 @@ public final class GsonBuilder {
     }
 
     public GsonBuilder registerTypeAdapter(Type type, Object obj) {
-        boolean z = (obj instanceof JsonSerializer) || (obj instanceof JsonDeserializer) || (obj instanceof InstanceCreator) || (obj instanceof TypeAdapter);
-        C$Gson$Preconditions.checkArgument(z);
+        C$Gson$Preconditions.checkArgument((obj instanceof JsonSerializer) || (obj instanceof JsonDeserializer) || (obj instanceof InstanceCreator) || (obj instanceof TypeAdapter));
         if (obj instanceof InstanceCreator) {
             this.instanceCreators.put(type, (InstanceCreator) obj);
         }
@@ -114,8 +113,7 @@ public final class GsonBuilder {
     }
 
     public GsonBuilder registerTypeHierarchyAdapter(Class<?> cls, Object obj) {
-        boolean z = (obj instanceof JsonSerializer) || (obj instanceof JsonDeserializer) || (obj instanceof TypeAdapter);
-        C$Gson$Preconditions.checkArgument(z);
+        C$Gson$Preconditions.checkArgument((obj instanceof JsonSerializer) || (obj instanceof JsonDeserializer) || (obj instanceof TypeAdapter));
         if ((obj instanceof JsonDeserializer) || (obj instanceof JsonSerializer)) {
             this.hierarchyFactories.add(0, TreeTypeAdapter.newTypeHierarchyFactory(cls, obj));
         }
@@ -160,8 +158,8 @@ public final class GsonBuilder {
         return this;
     }
 
-    public GsonBuilder setFieldNamingPolicy(FieldNamingPolicy fieldNamingPolicy) {
-        this.fieldNamingPolicy = fieldNamingPolicy;
+    public GsonBuilder setFieldNamingPolicy(FieldNamingPolicy fieldNamingPolicy2) {
+        this.fieldNamingPolicy = fieldNamingPolicy2;
         return this;
     }
 
@@ -170,8 +168,8 @@ public final class GsonBuilder {
         return this;
     }
 
-    public GsonBuilder setLongSerializationPolicy(LongSerializationPolicy longSerializationPolicy) {
-        this.longSerializationPolicy = longSerializationPolicy;
+    public GsonBuilder setLongSerializationPolicy(LongSerializationPolicy longSerializationPolicy2) {
+        this.longSerializationPolicy = longSerializationPolicy2;
         return this;
     }
 

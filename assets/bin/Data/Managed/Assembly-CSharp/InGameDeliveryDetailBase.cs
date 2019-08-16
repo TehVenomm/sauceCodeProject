@@ -110,17 +110,17 @@ public class InGameDeliveryDetailBase : QuestDeliveryDetail
 		{
 			if (is_portrait)
 			{
-				SetActive((Enum)UI.CHARA_ALL, true);
-				SetActive((Enum)UI.PORTRAIT_BACK, true);
-				SetActive((Enum)UI.LANDSCAPE_BACK, false);
+				SetActive((Enum)UI.CHARA_ALL, is_visible: true);
+				SetActive((Enum)UI.PORTRAIT_BACK, is_visible: true);
+				SetActive((Enum)UI.LANDSCAPE_BACK, is_visible: false);
 				GetCtrl(UI.SPR_WINDOW).set_localPosition(GetCtrl(UI.PORTRAIT_WINDOW).get_localPosition());
 				SetHeight((Enum)UI.SPR_WINDOW, GetHeight(UI.PORTRAIT_WINDOW));
 			}
 			else
 			{
-				SetActive((Enum)UI.CHARA_ALL, false);
-				SetActive((Enum)UI.PORTRAIT_BACK, false);
-				SetActive((Enum)UI.LANDSCAPE_BACK, true);
+				SetActive((Enum)UI.CHARA_ALL, is_visible: false);
+				SetActive((Enum)UI.PORTRAIT_BACK, is_visible: false);
+				SetActive((Enum)UI.LANDSCAPE_BACK, is_visible: true);
 				GetCtrl(UI.SPR_WINDOW).set_localPosition(GetCtrl(UI.LANDSCAPE_WINDOW).get_localPosition());
 				SetHeight((Enum)UI.SPR_WINDOW, GetHeight(UI.LANDSCAPE_WINDOW));
 			}

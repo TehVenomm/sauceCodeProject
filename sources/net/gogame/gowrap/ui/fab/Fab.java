@@ -1,10 +1,12 @@
-package net.gogame.gowrap.ui.fab;
+package net.gogame.gowrap.p019ui.fab;
 
 import android.app.Activity;
 import android.view.MotionEvent;
 
+/* renamed from: net.gogame.gowrap.ui.fab.Fab */
 public interface Fab {
 
+    /* renamed from: net.gogame.gowrap.ui.fab.Fab$ClickListener */
     public interface ClickListener {
         void onClick(Fab fab, MotionEvent motionEvent);
     }

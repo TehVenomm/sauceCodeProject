@@ -26,10 +26,9 @@ public final class StringDeserializer extends StdScalarDeserializer<String> {
             return jsonParser.getText();
         }
         JsonToken currentToken = jsonParser.getCurrentToken();
-        String _parseString;
         if (currentToken == JsonToken.START_ARRAY && deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
             jsonParser.nextToken();
-            _parseString = _parseString(jsonParser, deserializationContext);
+            String _parseString = _parseString(jsonParser, deserializationContext);
             if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
                 return _parseString;
             }
@@ -44,9 +43,9 @@ public final class StringDeserializer extends StdScalarDeserializer<String> {
             }
             return embeddedObject.toString();
         } else {
-            _parseString = jsonParser.getValueAsString();
-            if (_parseString != null) {
-                return _parseString;
+            String valueAsString = jsonParser.getValueAsString();
+            if (valueAsString != null) {
+                return valueAsString;
             }
             throw deserializationContext.mappingException(this._valueClass, jsonParser.getCurrentToken());
         }

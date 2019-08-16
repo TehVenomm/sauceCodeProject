@@ -3,19 +3,23 @@ package com.appsflyer.cache;
 import java.util.Scanner;
 
 public class RequestCacheData {
+
     /* renamed from: ˊ */
-    private String f219;
+    private String f240;
+
     /* renamed from: ˎ */
-    private String f220;
+    private String f241;
+
     /* renamed from: ˏ */
-    private String f221;
+    private String f242;
+
     /* renamed from: ॱ */
-    private String f222;
+    private String f243;
 
     public RequestCacheData(String str, String str2, String str3) {
-        this.f220 = str;
-        this.f222 = str2;
-        this.f219 = str3;
+        this.f241 = str;
+        this.f243 = str2;
+        this.f240 = str3;
     }
 
     public RequestCacheData(char[] cArr) {
@@ -23,45 +27,45 @@ public class RequestCacheData {
         while (scanner.hasNextLine()) {
             String nextLine = scanner.nextLine();
             if (nextLine.startsWith("url=")) {
-                this.f220 = nextLine.substring(4).trim();
+                this.f241 = nextLine.substring(4).trim();
             } else if (nextLine.startsWith("version=")) {
-                this.f219 = nextLine.substring(8).trim();
+                this.f240 = nextLine.substring(8).trim();
             } else if (nextLine.startsWith("data=")) {
-                this.f222 = nextLine.substring(5).trim();
+                this.f243 = nextLine.substring(5).trim();
             }
         }
         scanner.close();
     }
 
     public String getVersion() {
-        return this.f219;
+        return this.f240;
     }
 
     public void setVersion(String str) {
-        this.f219 = str;
+        this.f240 = str;
     }
 
     public String getPostData() {
-        return this.f222;
+        return this.f243;
     }
 
     public void setPostData(String str) {
-        this.f222 = str;
+        this.f243 = str;
     }
 
     public String getRequestURL() {
-        return this.f220;
+        return this.f241;
     }
 
     public void setRequestURL(String str) {
-        this.f220 = str;
+        this.f241 = str;
     }
 
     public String getCacheKey() {
-        return this.f221;
+        return this.f242;
     }
 
     public void setCacheKey(String str) {
-        this.f221 = str;
+        this.f242 = str;
     }
 }

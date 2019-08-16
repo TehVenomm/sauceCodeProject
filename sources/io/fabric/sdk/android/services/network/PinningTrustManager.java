@@ -1,6 +1,5 @@
-package io.fabric.sdk.android.services.network;
+package p017io.fabric.sdk.android.services.network;
 
-import io.fabric.sdk.android.Fabric;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -15,8 +14,11 @@ import java.util.Set;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import p017io.fabric.sdk.android.Fabric;
 
+/* renamed from: io.fabric.sdk.android.services.network.PinningTrustManager */
 class PinningTrustManager implements X509TrustManager {
+    private static final X509Certificate[] NO_ISSUERS = new X509Certificate[0];
     private static final long PIN_FRESHNESS_DURATION_MILLIS = 15552000000L;
     private final Set<X509Certificate> cache = Collections.synchronizedSet(new HashSet());
     private final long pinCreationTimeMillis;
@@ -24,9 +26,9 @@ class PinningTrustManager implements X509TrustManager {
     private final SystemKeyStore systemKeyStore;
     private final TrustManager[] systemTrustManagers;
 
-    public PinningTrustManager(SystemKeyStore systemKeyStore, PinningInfoProvider pinningInfoProvider) {
-        this.systemTrustManagers = initializeSystemTrustManagers(systemKeyStore);
-        this.systemKeyStore = systemKeyStore;
+    public PinningTrustManager(SystemKeyStore systemKeyStore2, PinningInfoProvider pinningInfoProvider) {
+        this.systemTrustManagers = initializeSystemTrustManagers(systemKeyStore2);
+        this.systemKeyStore = systemKeyStore2;
         this.pinCreationTimeMillis = pinningInfoProvider.getPinCreationTimeInMillis();
         for (String hexStringToByteArray : pinningInfoProvider.getPins()) {
             this.pins.add(hexStringToByteArray(hexStringToByteArray));
@@ -47,7 +49,7 @@ class PinningTrustManager implements X509TrustManager {
             }
             throw new CertificateException("No valid pins found in chain!");
         }
-        Fabric.getLogger().mo4302w("Fabric", "Certificate pins are stale, (" + (System.currentTimeMillis() - this.pinCreationTimeMillis) + " millis vs " + PIN_FRESHNESS_DURATION_MILLIS + " millis) " + "falling back to system trust.");
+        Fabric.getLogger().mo20982w(Fabric.TAG, "Certificate pins are stale, (" + (System.currentTimeMillis() - this.pinCreationTimeMillis) + " millis vs " + PIN_FRESHNESS_DURATION_MILLIS + " millis) falling back to system trust.");
     }
 
     private void checkSystemTrust(X509Certificate[] x509CertificateArr, String str) throws CertificateException {
@@ -65,10 +67,10 @@ class PinningTrustManager implements X509TrustManager {
         return bArr;
     }
 
-    private TrustManager[] initializeSystemTrustManagers(SystemKeyStore systemKeyStore) {
+    private TrustManager[] initializeSystemTrustManagers(SystemKeyStore systemKeyStore2) {
         try {
             TrustManagerFactory instance = TrustManagerFactory.getInstance("X509");
-            instance.init(systemKeyStore.trustStore);
+            instance.init(systemKeyStore2.trustStore);
             return instance.getTrustManagers();
         } catch (NoSuchAlgorithmException e) {
             throw new AssertionError(e);
@@ -86,7 +88,7 @@ class PinningTrustManager implements X509TrustManager {
                 }
             }
             return false;
-        } catch (Throwable e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new CertificateException(e);
         }
     }
@@ -104,6 +106,6 @@ class PinningTrustManager implements X509TrustManager {
     }
 
     public X509Certificate[] getAcceptedIssuers() {
-        return null;
+        return NO_ISSUERS;
     }
 }

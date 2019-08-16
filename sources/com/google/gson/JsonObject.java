@@ -5,18 +5,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public final class JsonObject extends JsonElement {
-    private final LinkedTreeMap<String, JsonElement> members = new LinkedTreeMap();
+    private final LinkedTreeMap<String, JsonElement> members = new LinkedTreeMap<>();
 
     private JsonElement createJsonElement(Object obj) {
         return obj == null ? JsonNull.INSTANCE : new JsonPrimitive(obj);
     }
 
     public void add(String str, JsonElement jsonElement) {
-        Object obj;
         if (jsonElement == null) {
-            obj = JsonNull.INSTANCE;
+            jsonElement = JsonNull.INSTANCE;
         }
-        this.members.put(str, obj);
+        this.members.put(str, jsonElement);
     }
 
     public void addProperty(String str, Boolean bool) {
@@ -35,7 +34,8 @@ public final class JsonObject extends JsonElement {
         add(str, createJsonElement(str2));
     }
 
-    JsonObject deepCopy() {
+    /* access modifiers changed from: 0000 */
+    public JsonObject deepCopy() {
         JsonObject jsonObject = new JsonObject();
         for (Entry entry : this.members.entrySet()) {
             jsonObject.add((String) entry.getKey(), ((JsonElement) entry.getValue()).deepCopy());

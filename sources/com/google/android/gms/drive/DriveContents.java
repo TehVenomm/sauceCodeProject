@@ -1,6 +1,7 @@
 package com.google.android.gms.drive;
 
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
@@ -9,10 +10,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface DriveContents {
-    PendingResult<Status> commit(GoogleApiClient googleApiClient, MetadataChangeSet metadataChangeSet);
+    @Deprecated
+    PendingResult<Status> commit(GoogleApiClient googleApiClient, @Nullable MetadataChangeSet metadataChangeSet);
 
-    PendingResult<Status> commit(GoogleApiClient googleApiClient, MetadataChangeSet metadataChangeSet, ExecutionOptions executionOptions);
+    @Deprecated
+    PendingResult<Status> commit(GoogleApiClient googleApiClient, @Nullable MetadataChangeSet metadataChangeSet, @Nullable ExecutionOptions executionOptions);
 
+    @Deprecated
     void discard(GoogleApiClient googleApiClient);
 
     DriveId getDriveId();
@@ -25,11 +29,12 @@ public interface DriveContents {
 
     ParcelFileDescriptor getParcelFileDescriptor();
 
+    @Deprecated
     PendingResult<DriveContentsResult> reopenForWrite(GoogleApiClient googleApiClient);
 
-    zzc zzamq();
+    Contents zzh();
 
-    void zzamr();
+    void zzi();
 
-    boolean zzams();
+    boolean zzj();
 }

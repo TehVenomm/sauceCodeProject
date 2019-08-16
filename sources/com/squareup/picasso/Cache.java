@@ -3,13 +3,7 @@ package com.squareup.picasso;
 import android.graphics.Bitmap;
 
 public interface Cache {
-    public static final Cache NONE = new C07181();
-
-    /* renamed from: com.squareup.picasso.Cache$1 */
-    static class C07181 implements Cache {
-        C07181() {
-        }
-
+    public static final Cache NONE = new Cache() {
         public Bitmap get(String str) {
             return null;
         }
@@ -30,7 +24,7 @@ public interface Cache {
 
         public void clearKeyUri(String str) {
         }
-    }
+    };
 
     void clear();
 

@@ -21,22 +21,18 @@ public class UIQuestInfoArena : MonoBehaviourSingleton<UIQuestInfoArena>
 
 	private void Start()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsArena())
 		{
 			this.get_gameObject().SetActive(false);
+			return;
 		}
-		else
-		{
-			this.get_gameObject().SetActive(true);
-			m_inGameMgr = MonoBehaviourSingleton<InGameManager>.I;
-			m_inGameProgress = MonoBehaviourSingleton<InGameProgress>.I;
-			waveMax.text = $"/{m_inGameMgr.GetArenaWaveMax()}";
-			m_wave = m_inGameMgr.GetCurrentArenaWaveNum();
-			SetWaveNow(m_wave);
-			m_isTimeAttack = m_inGameMgr.IsArenaTimeAttack();
-		}
+		this.get_gameObject().SetActive(true);
+		m_inGameMgr = MonoBehaviourSingleton<InGameManager>.I;
+		m_inGameProgress = MonoBehaviourSingleton<InGameProgress>.I;
+		waveMax.text = $"/{m_inGameMgr.GetArenaWaveMax()}";
+		m_wave = m_inGameMgr.GetCurrentArenaWaveNum();
+		SetWaveNow(m_wave);
+		m_isTimeAttack = m_inGameMgr.IsArenaTimeAttack();
 	}
 
 	private void LateUpdate()

@@ -5,7 +5,15 @@ import android.os.Parcelable.Creator;
 import com.facebook.share.model.ShareContent;
 
 public class ShareFeedContent extends ShareContent<ShareFeedContent, Builder> {
-    public static final Creator<ShareFeedContent> CREATOR = new C04931();
+    public static final Creator<ShareFeedContent> CREATOR = new Creator<ShareFeedContent>() {
+        public ShareFeedContent createFromParcel(Parcel parcel) {
+            return new ShareFeedContent(parcel);
+        }
+
+        public ShareFeedContent[] newArray(int i) {
+            return new ShareFeedContent[i];
+        }
+    };
     private final String link;
     private final String linkCaption;
     private final String linkDescription;
@@ -14,35 +22,28 @@ public class ShareFeedContent extends ShareContent<ShareFeedContent, Builder> {
     private final String picture;
     private final String toId;
 
-    /* renamed from: com.facebook.share.internal.ShareFeedContent$1 */
-    static final class C04931 implements Creator<ShareFeedContent> {
-        C04931() {
-        }
-
-        public ShareFeedContent createFromParcel(Parcel parcel) {
-            return new ShareFeedContent(parcel);
-        }
-
-        public ShareFeedContent[] newArray(int i) {
-            return new ShareFeedContent[i];
-        }
-    }
-
     public static final class Builder extends com.facebook.share.model.ShareContent.Builder<ShareFeedContent, Builder> {
-        private String link;
-        private String linkCaption;
-        private String linkDescription;
-        private String linkName;
-        private String mediaSource;
-        private String picture;
-        private String toId;
+        /* access modifiers changed from: private */
+        public String link;
+        /* access modifiers changed from: private */
+        public String linkCaption;
+        /* access modifiers changed from: private */
+        public String linkDescription;
+        /* access modifiers changed from: private */
+        public String linkName;
+        /* access modifiers changed from: private */
+        public String mediaSource;
+        /* access modifiers changed from: private */
+        public String picture;
+        /* access modifiers changed from: private */
+        public String toId;
 
         public ShareFeedContent build() {
-            return new ShareFeedContent();
+            return new ShareFeedContent(this);
         }
 
         public Builder readFrom(ShareFeedContent shareFeedContent) {
-            return shareFeedContent == null ? this : ((Builder) super.readFrom((ShareContent) shareFeedContent)).setToId(shareFeedContent.getToId()).setLink(shareFeedContent.getLink()).setLinkName(shareFeedContent.getLinkName()).setLinkCaption(shareFeedContent.getLinkCaption()).setLinkDescription(shareFeedContent.getLinkDescription()).setPicture(shareFeedContent.getPicture()).setMediaSource(shareFeedContent.getMediaSource());
+            return shareFeedContent == null ? this : ((Builder) super.readFrom(shareFeedContent)).setToId(shareFeedContent.getToId()).setLink(shareFeedContent.getLink()).setLinkName(shareFeedContent.getLinkName()).setLinkCaption(shareFeedContent.getLinkCaption()).setLinkDescription(shareFeedContent.getLinkDescription()).setPicture(shareFeedContent.getPicture()).setMediaSource(shareFeedContent.getMediaSource());
         }
 
         public Builder setLink(String str) {

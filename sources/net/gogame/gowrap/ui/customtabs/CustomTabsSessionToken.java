@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -6,18 +6,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub;
+import net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsSessionToken */
 public class CustomTabsSessionToken {
     private static final String TAG = "CustomTabsSessionToken";
-    private final CustomTabsCallback mCallback = new C11491();
-    private final ICustomTabsCallback mCallbackBinder;
-
-    /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsSessionToken$1 */
-    class C11491 extends CustomTabsCallback {
-        C11491() {
-        }
-
+    private final CustomTabsCallback mCallback = new CustomTabsCallback() {
         public void onNavigationEvent(int i, Bundle bundle) {
             try {
                 CustomTabsSessionToken.this.mCallbackBinder.onNavigationEvent(i, bundle);
@@ -57,8 +51,11 @@ public class CustomTabsSessionToken {
                 Log.e(CustomTabsSessionToken.TAG, "RemoteException during ICustomTabsCallback transaction");
             }
         }
-    }
+    };
+    /* access modifiers changed from: private */
+    public final ICustomTabsCallback mCallbackBinder;
 
+    /* renamed from: net.gogame.gowrap.ui.customtabs.CustomTabsSessionToken$DummyCallback */
     static class DummyCallback extends Stub {
         DummyCallback() {
         }
@@ -84,7 +81,7 @@ public class CustomTabsSessionToken {
     }
 
     public static CustomTabsSessionToken getSessionTokenFromIntent(Intent intent) {
-        IBinder binder = intent.getExtras().getBinder(CustomTabsIntent.EXTRA_SESSION);
+        IBinder binder = intent.getExtras().getBinder("android.support.customtabs.extra.SESSION");
         if (binder == null) {
             return null;
         }
@@ -99,7 +96,8 @@ public class CustomTabsSessionToken {
         this.mCallbackBinder = iCustomTabsCallback;
     }
 
-    IBinder getCallbackBinder() {
+    /* access modifiers changed from: 0000 */
+    public IBinder getCallbackBinder() {
         return this.mCallbackBinder.asBinder();
     }
 
@@ -108,10 +106,10 @@ public class CustomTabsSessionToken {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof CustomTabsSessionToken) {
-            return ((CustomTabsSessionToken) obj).getCallbackBinder().equals(this.mCallbackBinder.asBinder());
+        if (!(obj instanceof CustomTabsSessionToken)) {
+            return false;
         }
-        return false;
+        return ((CustomTabsSessionToken) obj).getCallbackBinder().equals(this.mCallbackBinder.asBinder());
     }
 
     public CustomTabsCallback getCallback() {

@@ -2,30 +2,31 @@ package com.google.android.gms.tasks;
 
 import android.support.annotation.NonNull;
 import java.util.concurrent.Executor;
+import javax.annotation.concurrent.GuardedBy;
 
-final class zzi<TResult> implements zzk<TResult> {
-    private final Object mLock = new Object();
-    private final Executor zzjqg;
-    private OnSuccessListener<? super TResult> zzkfs;
+final class zzi<TResult> implements zzq<TResult> {
+    /* access modifiers changed from: private */
+    public final Object mLock = new Object();
+    private final Executor zzd;
+    /* access modifiers changed from: private */
+    @GuardedBy("mLock")
+    public OnCompleteListener<TResult> zzl;
 
-    public zzi(@NonNull Executor executor, @NonNull OnSuccessListener<? super TResult> onSuccessListener) {
-        this.zzjqg = executor;
-        this.zzkfs = onSuccessListener;
+    public zzi(@NonNull Executor executor, @NonNull OnCompleteListener<TResult> onCompleteListener) {
+        this.zzd = executor;
+        this.zzl = onCompleteListener;
     }
 
     public final void cancel() {
         synchronized (this.mLock) {
-            this.zzkfs = null;
+            this.zzl = null;
         }
     }
 
     public final void onComplete(@NonNull Task<TResult> task) {
-        if (task.isSuccessful()) {
-            synchronized (this.mLock) {
-                if (this.zzkfs == null) {
-                    return;
-                }
-                this.zzjqg.execute(new zzj(this, task));
+        synchronized (this.mLock) {
+            if (this.zzl != null) {
+                this.zzd.execute(new zzj(this, task));
             }
         }
     }

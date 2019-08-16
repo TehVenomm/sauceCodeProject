@@ -6,31 +6,31 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import com.google.android.gms.common.api.Api.ApiOptions.NoOptions;
 import com.google.android.gms.common.api.GoogleApi;
-import com.google.android.gms.common.api.GoogleApi.zza;
-import com.google.android.gms.common.internal.zzbi;
-import com.google.android.gms.internal.zzaqx;
+import com.google.android.gms.common.api.GoogleApi.Settings;
+import com.google.android.gms.common.internal.PendingResultUtil;
+import com.google.android.gms.internal.auth.zzh;
 import com.google.android.gms.tasks.Task;
 
 public class WorkAccountClient extends GoogleApi<NoOptions> {
-    private final WorkAccountApi zzdxz = new zzaqx();
+    private final WorkAccountApi zzac = new zzh();
 
     WorkAccountClient(@NonNull Activity activity) {
-        super(activity, WorkAccount.API, null, zza.zzfgq);
+        super(activity, WorkAccount.API, null, Settings.DEFAULT_SETTINGS);
     }
 
     WorkAccountClient(@NonNull Context context) {
-        super(context, WorkAccount.API, null, zza.zzfgq);
+        super(context, WorkAccount.API, null, Settings.DEFAULT_SETTINGS);
     }
 
     public Task<Account> addWorkAccount(String str) {
-        return zzbi.zza(this.zzdxz.addWorkAccount(zzafk(), str), new zzg(this));
+        return PendingResultUtil.toTask(this.zzac.addWorkAccount(asGoogleApiClient(), str), new zzg(this));
     }
 
     public Task<Void> removeWorkAccount(Account account) {
-        return zzbi.zzb(this.zzdxz.removeWorkAccount(zzafk(), account));
+        return PendingResultUtil.toVoidTask(this.zzac.removeWorkAccount(asGoogleApiClient(), account));
     }
 
     public Task<Void> setWorkAuthenticatorEnabled(boolean z) {
-        return zzbi.zzb(this.zzdxz.setWorkAuthenticatorEnabledWithResult(zzafk(), z));
+        return PendingResultUtil.toVoidTask(this.zzac.setWorkAuthenticatorEnabledWithResult(asGoogleApiClient(), z));
     }
 }

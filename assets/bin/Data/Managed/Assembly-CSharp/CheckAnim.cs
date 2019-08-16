@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CheckAnim
+public class CheckAnim : MonoBehaviour
 {
 	public Animation m_Target;
 

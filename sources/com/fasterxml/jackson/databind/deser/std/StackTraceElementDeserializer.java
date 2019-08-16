@@ -43,15 +43,15 @@ public class StackTraceElementDeserializer extends StdScalarDeserializer<StackTr
                     handleUnknownProperty(jsonParser, deserializationContext, this._valueClass, currentName);
                 }
             }
-        } else if (currentToken == JsonToken.START_ARRAY && deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
+        } else if (currentToken != JsonToken.START_ARRAY || !deserializationContext.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
+            throw deserializationContext.mappingException(this._valueClass, currentToken);
+        } else {
             jsonParser.nextToken();
             StackTraceElement deserialize = deserialize(jsonParser, deserializationContext);
             if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
                 return deserialize;
             }
             throw deserializationContext.wrongTokenException(jsonParser, JsonToken.END_ARRAY, "Attempted to unwrap single value array for single 'java.lang.StackTraceElement' value but there was more than a single value in the array");
-        } else {
-            throw deserializationContext.mappingException(this._valueClass, currentToken);
         }
     }
 }

@@ -15,7 +15,7 @@ public class GuildSearchSettings : GameSection
 	public override void Initialize()
 	{
 		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(mSearchKeywork));
-		SetInput((Enum)UI.IPT_NAME, mSearchKeywork, 16, (EventDelegate.Callback)OnChangeKeywork);
+		SetInput(UI.IPT_NAME, mSearchKeywork, 16, OnChangeKeywork);
 		base.Initialize();
 	}
 
@@ -25,8 +25,8 @@ public class GuildSearchSettings : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendSearch(delegate(bool is_success, Error err)
 		{
-			GameSection.ResumeEvent(is_success, null);
-		}, true);
+			GameSection.ResumeEvent(is_success);
+		}, saveSettings: true);
 	}
 
 	protected void OnChangeKeywork()

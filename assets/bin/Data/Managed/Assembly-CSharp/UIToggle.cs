@@ -31,24 +31,24 @@ public class UIToggle : UIWidgetContainer
 
 	public Validate validator;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private UISprite checkSprite;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Animation checkAnimation;
 
 	[HideInInspector]
 	[SerializeField]
 	private GameObject eventReceiver;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private string functionName = "OnActivate";
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private bool startsChecked;
 
 	private bool mIsActive = true;
@@ -174,84 +174,87 @@ public class UIToggle : UIWidgetContainer
 
 	public void Set(bool state)
 	{
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Expected O, but got Unknown
-		if (validator == null || validator(state))
+		if (validator != null && !validator(state))
 		{
-			if (!mStarted)
+			return;
+		}
+		if (!mStarted)
+		{
+			mIsActive = state;
+			startsActive = state;
+			if (activeSprite != null)
 			{
-				mIsActive = state;
-				startsActive = state;
-				if (activeSprite != null)
-				{
-					activeSprite.alpha = ((!state) ? 0f : 1f);
-				}
+				activeSprite.alpha = ((!state) ? 0f : 1f);
 			}
-			else if (mIsActive != state)
+		}
+		else
+		{
+			if (mIsActive == state)
 			{
-				if (group != 0 && state)
+				return;
+			}
+			if (group != 0 && state)
+			{
+				int num = 0;
+				int size = list.size;
+				while (num < size)
 				{
-					int num = 0;
-					int size = list.size;
-					while (num < size)
+					UIToggle uIToggle = list[num];
+					if (uIToggle != this && uIToggle.group == group)
 					{
-						UIToggle uIToggle = list[num];
-						if (uIToggle != this && uIToggle.group == group)
-						{
-							uIToggle.Set(false);
-						}
-						if (list.size != size)
-						{
-							size = list.size;
-							num = 0;
-						}
-						else
-						{
-							num++;
-						}
+						uIToggle.Set(state: false);
 					}
-				}
-				mIsActive = state;
-				if (activeSprite != null)
-				{
-					if (instantTween || !NGUITools.GetActive(this))
+					if (list.size != size)
 					{
-						activeSprite.alpha = ((!mIsActive) ? 0f : 1f);
+						size = list.size;
+						num = 0;
 					}
 					else
 					{
-						TweenAlpha.Begin(activeSprite.get_gameObject(), 0.15f, (!mIsActive) ? 0f : 1f);
+						num++;
 					}
 				}
-				if (current == null)
+			}
+			mIsActive = state;
+			if (activeSprite != null)
+			{
+				if (instantTween || !NGUITools.GetActive(this))
 				{
-					UIToggle uIToggle2 = current;
-					current = this;
-					if (EventDelegate.IsValid(onChange))
-					{
-						EventDelegate.Execute(onChange);
-					}
-					else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
-					{
-						eventReceiver.SendMessage(functionName, (object)mIsActive, 1);
-					}
-					current = uIToggle2;
+					activeSprite.alpha = ((!mIsActive) ? 0f : 1f);
 				}
-				if (animator != null)
+				else
 				{
-					ActiveAnimation activeAnimation = ActiveAnimation.Play(animator, null, state ? Direction.Forward : Direction.Reverse, EnableCondition.IgnoreDisabledState, DisableCondition.DoNotDisable);
-					if (activeAnimation != null && (instantTween || !NGUITools.GetActive(this)))
-					{
-						activeAnimation.Finish();
-					}
+					TweenAlpha.Begin(activeSprite.get_gameObject(), 0.15f, (!mIsActive) ? 0f : 1f);
 				}
-				else if (this.activeAnimation != null)
+			}
+			if (current == null)
+			{
+				UIToggle uIToggle2 = current;
+				current = this;
+				if (EventDelegate.IsValid(onChange))
 				{
-					ActiveAnimation activeAnimation2 = ActiveAnimation.Play(this.activeAnimation, null, state ? Direction.Forward : Direction.Reverse, EnableCondition.IgnoreDisabledState, DisableCondition.DoNotDisable);
-					if (activeAnimation2 != null && (instantTween || !NGUITools.GetActive(this)))
-					{
-						activeAnimation2.Finish();
-					}
+					EventDelegate.Execute(onChange);
+				}
+				else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+				{
+					eventReceiver.SendMessage(functionName, (object)mIsActive, 1);
+				}
+				current = uIToggle2;
+			}
+			if (animator != null)
+			{
+				ActiveAnimation activeAnimation = ActiveAnimation.Play(animator, null, state ? Direction.Forward : Direction.Reverse, EnableCondition.IgnoreDisabledState, DisableCondition.DoNotDisable);
+				if (activeAnimation != null && (instantTween || !NGUITools.GetActive(this)))
+				{
+					activeAnimation.Finish();
+				}
+			}
+			else if (this.activeAnimation != null)
+			{
+				ActiveAnimation activeAnimation2 = ActiveAnimation.Play(this.activeAnimation, null, state ? Direction.Forward : Direction.Reverse, EnableCondition.IgnoreDisabledState, DisableCondition.DoNotDisable);
+				if (activeAnimation2 != null && (instantTween || !NGUITools.GetActive(this)))
+				{
+					activeAnimation2.Finish();
 				}
 			}
 		}

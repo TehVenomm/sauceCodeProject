@@ -29,7 +29,7 @@ public class ConfigName : GameSection
 	protected virtual void SetBeforeText()
 	{
 		before_text = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name;
-		inputMaxLength = 12;
+		inputMaxLength = 14;
 	}
 
 	public override void Initialize()
@@ -44,7 +44,7 @@ public class ConfigName : GameSection
 		SetActive((Enum)UI.SPR_TITLE_CHANGE_COMMENT, sectionType == SECTION_TYPE.CHANGE_COMMENT);
 		SetActive((Enum)UI.SPR_TITLE_SEARCH_NAME, sectionType == SECTION_TYPE.SEARCH_NAME);
 		SetActive((Enum)UI.SPR_TITLE_SEARCH_ID, sectionType == SECTION_TYPE.SEARCH_ID);
-		SetInput((Enum)UI.IPT_TEXT, before_text, inputMaxLength, (EventDelegate.Callback)UpdateButton);
+		SetInput(UI.IPT_TEXT, before_text, inputMaxLength, UpdateButton);
 	}
 
 	private void UpdateButton()
@@ -59,7 +59,7 @@ public class ConfigName : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.SendChangeName(inputValue, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 }

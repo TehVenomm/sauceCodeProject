@@ -1,25 +1,13 @@
 package com.google.android.gms.tasks;
 
-final class zzb implements Runnable {
-    private /* synthetic */ Task zzkfl;
-    private /* synthetic */ zza zzkfm;
+final class zzb implements OnSuccessListener<Void> {
+    private final /* synthetic */ OnTokenCanceledListener zzb;
 
-    zzb(zza zza, Task task) {
-        this.zzkfm = zza;
-        this.zzkfl = task;
+    zzb(zza zza, OnTokenCanceledListener onTokenCanceledListener) {
+        this.zzb = onTokenCanceledListener;
     }
 
-    public final void run() {
-        try {
-            this.zzkfm.zzkfk.setResult(this.zzkfm.zzkfj.then(this.zzkfl));
-        } catch (Exception e) {
-            if (e.getCause() instanceof Exception) {
-                this.zzkfm.zzkfk.setException((Exception) e.getCause());
-            } else {
-                this.zzkfm.zzkfk.setException(e);
-            }
-        } catch (Exception e2) {
-            this.zzkfm.zzkfk.setException(e2);
-        }
+    public final /* synthetic */ void onSuccess(Object obj) {
+        this.zzb.onCanceled();
     }
 }

@@ -14,79 +14,61 @@ public class BulletControllerHoming : BulletControllerBase
 
 	protected float acceleration;
 
-	protected StageObject homingTarget;
-
 	public override void Update()
 	{
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
-		if (!(homingTarget == null))
+		if (targetObject == null)
 		{
-			float velocity = base.initialVelocity + acceleration * base.timeCount;
-			SetVelocity(velocity);
-			float num = homingLimit;
-			if (base.timeCount > homingChangeStart)
+			return;
+		}
+		float velocity = base.initialVelocity + acceleration * base.timeCount;
+		SetVelocity(velocity);
+		float num = homingLimit;
+		if (base.timeCount > homingChangeStart)
+		{
+			num -= homingChange * (base.timeCount - homingChangeStart);
+			if (num < 0f)
 			{
-				num -= homingChange * (base.timeCount - homingChangeStart);
-				if (num < 0f)
-				{
-					num = 0f;
-				}
+				num = 0f;
 			}
-			num *= Time.get_deltaTime();
-			Vector3 position = base._transform.get_position();
-			Vector3 position2 = homingTarget._transform.get_position();
+		}
+		num *= Time.get_deltaTime();
+		Vector3 targetPos = GetTargetPos();
+		float num2 = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), targetPos));
+		if (num2 != 0f)
+		{
+			float num3 = num / num2;
+			if (num3 > 1f)
+			{
+				num3 = 1f;
+			}
+			base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(targetPos), num3));
+			Vector3 val = Vector3.get_forward();
+			val = base._transform.get_rotation() * val;
+			val *= base.speed;
 			if (hightLock)
 			{
-				position2.y = 0f;
-				position.y = 0f;
+				val.y = 0f;
 			}
-			else
-			{
-				position2.y += 1f;
-			}
-			Vector3 val = position2 - position;
-			float num2 = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
-			if (num2 != 0f)
-			{
-				float num3 = num / num2;
-				if (num3 > 1f)
-				{
-					num3 = 1f;
-				}
-				base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num3));
-				Vector3 val2 = Vector3.get_forward();
-				val2 = base._transform.get_rotation() * val2;
-				val2 *= base.speed;
-				if (hightLock)
-				{
-					val2.y = 0f;
-				}
-				base._rigidbody.set_velocity(val2);
-			}
+			base._rigidbody.set_velocity(val);
 		}
 	}
 
@@ -107,13 +89,26 @@ public class BulletControllerHoming : BulletControllerBase
 		acceleration = _data.acceleration;
 	}
 
-	public void SetTarget(StageObject obj)
+	protected virtual Vector3 GetTargetPos()
 	{
-		homingTarget = obj;
-	}
-
-	public StageObject GetTarget()
-	{
-		return homingTarget;
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 position = base._transform.get_position();
+		Vector3 position2 = targetObject._transform.get_position();
+		if (hightLock)
+		{
+			position2.y = 0f;
+			position.y = 0f;
+		}
+		else
+		{
+			position2.y += 1f;
+		}
+		return position2 - position;
 	}
 }

@@ -1,7 +1,8 @@
 using BestHTTP.WebSocket;
 using System;
+using UnityEngine;
 
-public class PingWebSocket
+public class PingWebSocket : MonoBehaviour
 {
 	private const float HEARTBEAT_TIMEOUT = 5f;
 

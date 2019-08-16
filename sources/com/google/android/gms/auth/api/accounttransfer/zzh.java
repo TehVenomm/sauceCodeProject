@@ -1,14 +1,14 @@
 package com.google.android.gms.auth.api.accounttransfer;
 
 final class zzh extends zza<DeviceMetaData> {
-    private /* synthetic */ zzg zzdyz;
+    private final /* synthetic */ zzg zzas;
 
     zzh(zzg zzg, zzb zzb) {
-        this.zzdyz = zzg;
+        this.zzas = zzg;
         super(zzb);
     }
 
     public final void zza(DeviceMetaData deviceMetaData) {
-        this.zzdyz.setResult(deviceMetaData);
+        this.zzas.setResult(deviceMetaData);
     }
 }

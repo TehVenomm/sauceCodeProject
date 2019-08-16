@@ -8,17 +8,17 @@ import java.io.Serializable;
 
 public class RootNameLookup implements Serializable {
     private static final long serialVersionUID = 1;
-    protected transient LRUMap<ClassKey, PropertyName> _rootNames = new LRUMap(20, 200);
+    protected transient LRUMap<ClassKey, PropertyName> _rootNames = new LRUMap<>(20, 200);
 
     public PropertyName findRootName(JavaType javaType, MapperConfig<?> mapperConfig) {
-        return findRootName(javaType.getRawClass(), (MapperConfig) mapperConfig);
+        return findRootName(javaType.getRawClass(), mapperConfig);
     }
 
     public PropertyName findRootName(Class<?> cls, MapperConfig<?> mapperConfig) {
         ClassKey classKey = new ClassKey(cls);
         PropertyName propertyName = (PropertyName) this._rootNames.get(classKey);
         if (propertyName == null) {
-            propertyName = mapperConfig.getAnnotationIntrospector().findRootName(mapperConfig.introspectClassAnnotations((Class) cls).getClassInfo());
+            propertyName = mapperConfig.getAnnotationIntrospector().findRootName(mapperConfig.introspectClassAnnotations(cls).getClassInfo());
             if (propertyName == null || !propertyName.hasSimpleName()) {
                 propertyName = PropertyName.construct(cls.getSimpleName());
             }
@@ -27,7 +27,8 @@ public class RootNameLookup implements Serializable {
         return propertyName;
     }
 
-    protected Object readResolve() {
+    /* access modifiers changed from: protected */
+    public Object readResolve() {
         return new RootNameLookup();
     }
 }

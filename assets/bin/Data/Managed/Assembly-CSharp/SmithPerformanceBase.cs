@@ -15,58 +15,58 @@ public class SmithPerformanceBase : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(false);
+			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(active: false);
 		}
 		object obj = resultData = GameSection.GetEventData();
-		SetToggle((Enum)UI.TGL_DIRECTION, true);
+		SetToggle((Enum)UI.TGL_DIRECTION, value: true);
 		this.StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		LoadingQueue loadingQueue = new LoadingQueue(this);
-		LoadObject lo_direction = loadingQueue.Load(RESOURCE_CATEGORY.UI, "SmithEquipDirection", false);
-		int wait2 = 0;
-		wait2++;
-		NPCTable.NPCData npcData4 = Singleton<NPCTable>.I.GetNPCData(4);
+		LoadObject lo_direction = loadingQueue.Load(RESOURCE_CATEGORY.UI, "SmithEquipDirection");
+		int wait = 0;
+		wait++;
+		int npcId = (!StatusManager.IsUnique()) ? 4 : 36;
+		NPCTable.NPCData npcData4 = Singleton<NPCTable>.I.GetNPCData(npcId);
 		GameObject npcRoot4 = new GameObject("NPC");
-		npcData4.LoadModel(npcRoot4, false, true, delegate
+		npcData4.LoadModel(npcRoot4, need_shadow: false, enable_light_probe: true, delegate
 		{
-			((_003CDoInitialize_003Ec__Iterator133)/*Error near IL_0093: stateMachine*/)._003Cwait_003E__2--;
-		}, false);
+			wait--;
+		}, useSpecialModel: false);
 		GameObject npcRoot3 = null;
 		if (this is SmithAbilityChangePerformance || this is SmithAbilityItemPerformance)
 		{
-			wait2++;
-			NPCTable.NPCData npcData3 = Singleton<NPCTable>.I.GetNPCData(3);
+			wait++;
+			NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(3);
 			npcRoot3 = new GameObject("NPC003");
-			npcData3.LoadModel(npcRoot3, false, true, delegate
+			nPCData.LoadModel(npcRoot3, need_shadow: false, enable_light_probe: true, delegate
 			{
-				((_003CDoInitialize_003Ec__Iterator133)/*Error near IL_011c: stateMachine*/)._003Cwait_003E__2--;
-			}, false);
+				wait--;
+			}, useSpecialModel: false);
 		}
 		int[] seIds2 = (int[])Enum.GetValues(typeof(SmithEquipDirector.AUDIO));
 		int[] array = seIds2;
-		foreach (int seId in array)
+		foreach (int se_id in array)
 		{
-			loadingQueue.CacheSE(seId, null);
+			loadingQueue.CacheSE(se_id);
 		}
 		seIds2 = (int[])Enum.GetValues(typeof(EquipResultBase.AUDIO));
 		int[] array2 = seIds2;
-		foreach (int seId2 in array2)
+		foreach (int se_id2 in array2)
 		{
-			loadingQueue.CacheSE(seId2, null);
+			loadingQueue.CacheSE(se_id2);
 		}
-		yield return (object)loadingQueue.Wait();
-		while (wait2 > 0)
+		yield return loadingQueue.Wait();
+		while (wait > 0)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		Object directionObject = lo_direction.loadedObject;
-		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject, -1);
+		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject);
 		director = directionTransform.GetComponent<SmithEquipDirector>();
 		director.SetNPC004(npcRoot4);
 		director.SetNPC003(npcRoot3);
@@ -83,7 +83,7 @@ public class SmithPerformanceBase : GameSection
 		base.Exit();
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(true);
+			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(active: true);
 		}
 	}
 
@@ -98,24 +98,23 @@ public class SmithPerformanceBase : GameSection
 
 	protected virtual void OnEndDirection()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoEnd());
 	}
 
 	protected void EndDirectionUI()
 	{
-		SetToggle((Enum)UI.TGL_DIRECTION, false);
+		SetToggle((Enum)UI.TGL_DIRECTION, value: false);
 	}
 
 	private IEnumerator DoEnd()
 	{
-		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
+		yield return MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetSmithCharacterActivateFlag(true);
+			MonoBehaviourSingleton<StatusStageManager>.I.SetEnableSmithCharacterActivate(active: true);
 		}
 		EndDirectionUI();
-		DispatchEvent("SKIP", null);
+		DispatchEvent("SKIP");
 		if (Object.op_Implicit(director))
 		{
 			director.Reset();
@@ -125,7 +124,6 @@ public class SmithPerformanceBase : GameSection
 
 	protected override void OnDestroy()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		if (Object.op_Implicit(director))
 		{
 			director.Reset();
@@ -133,7 +131,7 @@ public class SmithPerformanceBase : GameSection
 		}
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(true);
+			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(active: true);
 		}
 		base.OnDestroy();
 	}

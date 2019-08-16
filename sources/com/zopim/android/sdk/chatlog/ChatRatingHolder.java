@@ -7,36 +7,53 @@ import android.view.View.OnClickListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import com.zopim.android.sdk.C0785R;
+import com.zopim.android.sdk.C1122R;
 import com.zopim.android.sdk.model.ChatLog.Rating;
 
 final class ChatRatingHolder extends ViewHolder {
+
     /* renamed from: e */
-    private static final String f718e = ChatRatingHolder.class.getSimpleName();
+    private static final String f762e = ChatRatingHolder.class.getSimpleName();
+
     /* renamed from: a */
-    OnClickListener f719a = new C0848o(this);
+    OnClickListener f763a = new C1217o(this);
+
     /* renamed from: b */
-    OnClickListener f720b = new C0849p(this);
+    OnClickListener f764b = new C1218p(this);
+
     /* renamed from: c */
-    OnClickListener f721c = new C0850q(this);
+    OnClickListener f765c = new C1219q(this);
+
     /* renamed from: d */
-    OnClickListener f722d = new C0851r(this);
+    OnClickListener f766d = new C1220r(this);
+    /* access modifiers changed from: private */
+
     /* renamed from: f */
-    private RadioGroup f723f;
+    public RadioGroup f767f;
+
     /* renamed from: g */
-    private RadioButton f724g;
+    private RadioButton f768g;
+
     /* renamed from: h */
-    private RadioButton f725h;
+    private RadioButton f769h;
+
     /* renamed from: i */
-    private View f726i;
+    private View f770i;
+
     /* renamed from: j */
-    private View f727j;
+    private View f771j;
+    /* access modifiers changed from: private */
+
     /* renamed from: k */
-    private Listener f728k;
+    public Listener f772k;
+    /* access modifiers changed from: private */
+
     /* renamed from: l */
-    private TextView f729l;
+    public TextView f773l;
+    /* access modifiers changed from: private */
+
     /* renamed from: m */
-    private C0853t f730m;
+    public C1222t f774m;
 
     public interface Listener {
         void onRating(Rating rating);
@@ -44,55 +61,55 @@ final class ChatRatingHolder extends ViewHolder {
 
     public ChatRatingHolder(View view, Listener listener) {
         super(view);
-        this.f723f = (RadioGroup) view.findViewById(C0785R.id.rating_button_group);
-        this.f724g = (RadioButton) view.findViewById(C0785R.id.positive_button);
-        this.f725h = (RadioButton) view.findViewById(C0785R.id.negative_button);
-        this.f726i = view.findViewById(C0785R.id.add_comment_button);
-        this.f727j = view.findViewById(C0785R.id.edit_comment_button);
-        this.f729l = (TextView) view.findViewById(C0785R.id.comment_message);
-        this.f724g.setOnClickListener(this.f719a);
-        this.f725h.setOnClickListener(this.f720b);
-        this.f726i.setOnClickListener(this.f721c);
-        this.f727j.setOnClickListener(this.f722d);
-        this.f728k = listener;
+        this.f767f = (RadioGroup) view.findViewById(C1122R.C1125id.rating_button_group);
+        this.f768g = (RadioButton) view.findViewById(C1122R.C1125id.positive_button);
+        this.f769h = (RadioButton) view.findViewById(C1122R.C1125id.negative_button);
+        this.f770i = view.findViewById(C1122R.C1125id.add_comment_button);
+        this.f771j = view.findViewById(C1122R.C1125id.edit_comment_button);
+        this.f773l = (TextView) view.findViewById(C1122R.C1125id.comment_message);
+        this.f768g.setOnClickListener(this.f763a);
+        this.f769h.setOnClickListener(this.f764b);
+        this.f770i.setOnClickListener(this.f765c);
+        this.f771j.setOnClickListener(this.f766d);
+        this.f772k = listener;
     }
 
     /* renamed from: a */
-    public void m661a(C0853t c0853t) {
+    public void mo20709a(C1222t tVar) {
         boolean z = true;
-        if (c0853t == null) {
-            Log.e(f718e, "Item must not be null");
+        if (tVar == null) {
+            Log.e(f762e, "Item must not be null");
             return;
         }
-        this.f730m = c0853t;
-        switch (C0852s.f830a[c0853t.f831a.ordinal()]) {
+        this.f774m = tVar;
+        switch (C1221s.f874a[tVar.f875a.ordinal()]) {
             case 1:
-                this.f724g.setChecked(true);
-                this.f725h.setChecked(false);
-                this.f726i.setVisibility(0);
+                this.f768g.setChecked(true);
+                this.f769h.setChecked(false);
+                this.f770i.setVisibility(0);
                 break;
             case 2:
-                this.f724g.setChecked(false);
-                this.f725h.setChecked(true);
-                this.f726i.setVisibility(0);
+                this.f768g.setChecked(false);
+                this.f769h.setChecked(true);
+                this.f770i.setVisibility(0);
                 break;
             default:
-                this.f724g.setChecked(false);
-                this.f725h.setChecked(false);
-                this.f726i.setVisibility(4);
+                this.f768g.setChecked(false);
+                this.f769h.setChecked(false);
+                this.f770i.setVisibility(4);
                 break;
         }
-        if (c0853t.f832b == null || c0853t.f832b.isEmpty()) {
+        if (tVar.f876b == null || tVar.f876b.isEmpty()) {
             z = false;
         }
         if (z) {
-            this.f726i.setVisibility(8);
-            this.f727j.setVisibility(0);
-            this.f729l.setVisibility(0);
-            this.f729l.setText(c0853t.f832b);
+            this.f770i.setVisibility(8);
+            this.f771j.setVisibility(0);
+            this.f773l.setVisibility(0);
+            this.f773l.setText(tVar.f876b);
             return;
         }
-        this.f727j.setVisibility(8);
-        this.f729l.setVisibility(8);
+        this.f771j.setVisibility(8);
+        this.f773l.setVisibility(8);
     }
 }

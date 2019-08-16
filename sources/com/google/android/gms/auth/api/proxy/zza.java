@@ -3,44 +3,44 @@ package com.google.android.gms.auth.api.proxy;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zza implements Creator<ProxyRequest> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int i = 0;
-        String str = null;
-        int zzd = zzb.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         long j = 0;
+        String str = null;
         byte[] bArr = null;
         Bundle bundle = null;
+        int i = 0;
         int i2 = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 2:
-                    i2 = zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    j = zzb.zzi(parcel, readInt);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 4:
-                    bArr = zzb.zzt(parcel, readInt);
+                    bArr = SafeParcelReader.createByteArray(parcel, readHeader);
                     break;
                 case 5:
-                    bundle = zzb.zzs(parcel, readInt);
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
                     break;
                 case 1000:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new ProxyRequest(i, str, i2, j, bArr, bundle);
     }
 

@@ -58,15 +58,15 @@ public class UnresolvedForwardReference extends JsonMappingException {
         if (this._unresolvedIds == null) {
             return message;
         }
-        StringBuilder stringBuilder = new StringBuilder(message);
+        StringBuilder sb = new StringBuilder(message);
         Iterator it = this._unresolvedIds.iterator();
         while (it.hasNext()) {
-            stringBuilder.append(((UnresolvedId) it.next()).toString());
+            sb.append(((UnresolvedId) it.next()).toString());
             if (it.hasNext()) {
-                stringBuilder.append(", ");
+                sb.append(", ");
             }
         }
-        stringBuilder.append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
-        return stringBuilder.toString();
+        sb.append(ClassUtils.PACKAGE_SEPARATOR_CHAR);
+        return sb.toString();
     }
 }

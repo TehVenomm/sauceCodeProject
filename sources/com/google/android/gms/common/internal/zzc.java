@@ -1,27 +1,35 @@
 package com.google.android.gms.common.internal;
 
-import android.os.Looper;
-import android.util.Log;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable.Creator;
+import com.google.android.gms.common.Feature;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzc {
-    public static void zzbg(boolean z) {
-        if (!z) {
-            throw new IllegalStateException();
+public final class zzc implements Creator<zzb> {
+    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        Feature[] featureArr = null;
+        Bundle bundle = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 1:
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
+                    break;
+                case 2:
+                    featureArr = (Feature[]) SafeParcelReader.createTypedArray(parcel, readHeader, Feature.CREATOR);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
+            }
         }
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new zzb(bundle, featureArr);
     }
 
-    public static void zzfx(String str) {
-        if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
-            String valueOf = String.valueOf(Thread.currentThread());
-            String valueOf2 = String.valueOf(Looper.getMainLooper().getThread());
-            Log.e("Asserts", new StringBuilder((String.valueOf(valueOf).length() + 57) + String.valueOf(valueOf2).length()).append("checkMainThread: current thread ").append(valueOf).append(" IS NOT the main thread ").append(valueOf2).append("!").toString());
-            throw new IllegalStateException(str);
-        }
-    }
-
-    public static void zzr(Object obj) {
-        if (obj == null) {
-            throw new IllegalArgumentException("null reference");
-        }
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new zzb[i];
     }
 }

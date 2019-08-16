@@ -44,7 +44,7 @@ public class UINameInput : UIInput
 	public void CreateCaret(bool is_enable)
 	{
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
+		//IL_0020: Expected O, but got Unknown
 		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (mBlankTex == null)
 		{
@@ -65,7 +65,7 @@ public class UINameInput : UIInput
 			mCaret.mainTexture = mBlankTex;
 			mCaret.fillGeometry = false;
 			mCaret.pivot = label.pivot;
-			((UIRect)mCaret).SetAnchor(label.cachedTransform);
+			mCaret.SetAnchor(label.cachedTransform);
 		}
 		mCaret.set_enabled(is_enable);
 		InActiveName();

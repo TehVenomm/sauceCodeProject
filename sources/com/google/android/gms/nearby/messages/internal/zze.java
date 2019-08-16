@@ -3,30 +3,43 @@ package com.google.android.gms.nearby.messages.internal;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.NonNull;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 import com.google.android.gms.nearby.messages.Distance;
-import java.util.Arrays;
 import java.util.Locale;
 
-public final class zze extends zza implements Distance {
+@Class(creator = "DistanceImplCreator")
+public final class zze extends AbstractSafeParcelable implements Distance {
     public static final Creator<zze> CREATOR = new zzf();
-    private int accuracy;
-    private int zzdxt;
-    private double zzjfu;
+    @Field(mo13990id = 2)
+    private final int accuracy;
+    @VersionField(mo13996id = 1)
+    private final int versionCode;
+    @Field(mo13990id = 3)
+    private final double zzhg;
 
     public zze(int i, double d) {
         this(1, 1, Double.NaN);
     }
 
-    zze(int i, int i2, double d) {
-        this.zzdxt = i;
+    @Constructor
+    zze(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) int i2, @Param(mo13993id = 3) double d) {
+        this.versionCode = i;
         this.accuracy = i2;
-        this.zzjfu = d;
+        this.zzhg = d;
     }
 
     public final int compareTo(@NonNull Distance distance) {
-        return (Double.isNaN(getMeters()) && Double.isNaN(distance.getMeters())) ? 0 : Double.compare(getMeters(), distance.getMeters());
+        if (!Double.isNaN(getMeters()) || !Double.isNaN(distance.getMeters())) {
+            return Double.compare(getMeters(), distance.getMeters());
+        }
+        return 0;
     }
 
     public final boolean equals(Object obj) {
@@ -34,11 +47,8 @@ public final class zze extends zza implements Distance {
             if (!(obj instanceof zze)) {
                 return false;
             }
-            Distance distance = (zze) obj;
-            if (getAccuracy() != distance.getAccuracy()) {
-                return false;
-            }
-            if (compareTo(distance) != 0) {
+            zze zze = (zze) obj;
+            if (!(getAccuracy() == zze.getAccuracy() && compareTo((Distance) zze) == 0)) {
                 return false;
             }
         }
@@ -50,17 +60,17 @@ public final class zze extends zza implements Distance {
     }
 
     public final double getMeters() {
-        return this.zzjfu;
+        return this.zzhg;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(getAccuracy()), Double.valueOf(getMeters())});
+        return Objects.hashCode(Integer.valueOf(getAccuracy()), Double.valueOf(getMeters()));
     }
 
     public final String toString() {
         String str;
         Locale locale = Locale.US;
-        double d = this.zzjfu;
+        double d = this.zzhg;
         switch (this.accuracy) {
             case 1:
                 str = "LOW";
@@ -73,10 +83,10 @@ public final class zze extends zza implements Distance {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.zzdxt);
-        zzd.zzc(parcel, 2, this.accuracy);
-        zzd.zza(parcel, 3, this.zzjfu);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.versionCode);
+        SafeParcelWriter.writeInt(parcel, 2, this.accuracy);
+        SafeParcelWriter.writeDouble(parcel, 3, this.zzhg);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

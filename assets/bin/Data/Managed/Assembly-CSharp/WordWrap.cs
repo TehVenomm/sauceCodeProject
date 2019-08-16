@@ -58,31 +58,32 @@ public static class WordWrap
 		for (int i = 0; i < array.Length; i++)
 		{
 			string text2 = array[i];
-			if (text2.Length != 0)
+			if (text2.Length == 0)
 			{
-				string value = text2[0].ToString();
-				if (text.Length > 0 && SuppressionHead.IndexOf(value) >= 0)
-				{
-					text = text.Insert(text.Length - 1, "\n");
-					for (int j = i; j < array.Length; j++)
-					{
-						text += array[j];
-					}
-					break;
-				}
-				string value2 = text2[text2.Length - 1].ToString();
-				if (SuppressionTail.IndexOf(value2) >= 0)
-				{
-					text2 = text2.Insert(text2.Length - 1, "\n");
-					text += text2;
-					for (int k = i + 1; k < array.Length; k++)
-					{
-						text += array[k];
-					}
-					break;
-				}
-				text += text2;
+				continue;
 			}
+			string value = text2[0].ToString();
+			if (text.Length > 0 && SuppressionHead.IndexOf(value) >= 0)
+			{
+				text = text.Insert(text.Length - 1, "\n");
+				for (int j = i; j < array.Length; j++)
+				{
+					text += array[j];
+				}
+				break;
+			}
+			string value2 = text2[text2.Length - 1].ToString();
+			if (SuppressionTail.IndexOf(value2) >= 0)
+			{
+				text2 = text2.Insert(text2.Length - 1, "\n");
+				text += text2;
+				for (int k = i + 1; k < array.Length; k++)
+				{
+					text += array[k];
+				}
+				break;
+			}
+			text += text2;
 		}
 		return text;
 	}

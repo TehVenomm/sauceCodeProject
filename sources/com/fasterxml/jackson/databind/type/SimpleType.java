@@ -45,36 +45,37 @@ public class SimpleType extends TypeBase {
         }
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         if (this._class == cls) {
             return this;
         }
-        if (this._class.isAssignableFrom(cls)) {
-            Class superclass = cls.getSuperclass();
-            if (superclass == this._class) {
-                return new SimpleType(cls, this._bindings, this, this._superInterfaces, this._valueHandler, this._typeHandler, this._asStatic);
-            } else if (superclass == null || !this._class.isAssignableFrom(superclass)) {
-                Class[] interfaces = cls.getInterfaces();
-                int length = interfaces.length;
-                int i = 0;
-                while (i < length) {
-                    Class cls2 = interfaces[i];
-                    if (cls2 == this._class) {
-                        return new SimpleType(cls, this._bindings, null, new JavaType[]{this}, this._valueHandler, this._typeHandler, this._asStatic);
-                    } else if (this._class.isAssignableFrom(cls2)) {
-                        JavaType _narrow = _narrow(cls2);
-                        return new SimpleType(cls, this._bindings, null, new JavaType[]{_narrow}, this._valueHandler, this._typeHandler, this._asStatic);
-                    } else {
-                        i++;
-                    }
-                }
-                throw new IllegalArgumentException("Internal error: Can not resolve sub-type for Class " + cls.getName() + " to " + this._class.getName());
-            } else {
-                return new SimpleType(cls, this._bindings, _narrow(superclass), null, this._valueHandler, this._typeHandler, this._asStatic);
-            }
+        if (!this._class.isAssignableFrom(cls)) {
+            return new SimpleType(cls, this._bindings, this, this._superInterfaces, this._valueHandler, this._typeHandler, this._asStatic);
         }
-        return new SimpleType(cls, this._bindings, this, this._superInterfaces, this._valueHandler, this._typeHandler, this._asStatic);
+        Class superclass = cls.getSuperclass();
+        if (superclass == this._class) {
+            return new SimpleType(cls, this._bindings, this, this._superInterfaces, this._valueHandler, this._typeHandler, this._asStatic);
+        } else if (superclass == null || !this._class.isAssignableFrom(superclass)) {
+            Class[] interfaces = cls.getInterfaces();
+            int length = interfaces.length;
+            int i = 0;
+            while (i < length) {
+                Class cls2 = interfaces[i];
+                if (cls2 == this._class) {
+                    return new SimpleType(cls, this._bindings, null, new JavaType[]{this}, this._valueHandler, this._typeHandler, this._asStatic);
+                } else if (this._class.isAssignableFrom(cls2)) {
+                    JavaType _narrow = _narrow(cls2);
+                    return new SimpleType(cls, this._bindings, null, new JavaType[]{_narrow}, this._valueHandler, this._typeHandler, this._asStatic);
+                } else {
+                    i++;
+                }
+            }
+            throw new IllegalArgumentException("Internal error: Can not resolve sub-type for Class " + cls.getName() + " to " + this._class.getName());
+        } else {
+            return new SimpleType(cls, this._bindings, _narrow(superclass), null, this._valueHandler, this._typeHandler, this._asStatic);
+        }
     }
 
     public JavaType withContentType(JavaType javaType) {
@@ -111,46 +112,45 @@ public class SimpleType extends TypeBase {
         return null;
     }
 
-    protected String buildCanonicalName() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this._class.getName());
+    /* access modifiers changed from: protected */
+    public String buildCanonicalName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this._class.getName());
         int size = this._bindings.size();
         if (size > 0) {
-            stringBuilder.append('<');
+            sb.append('<');
             for (int i = 0; i < size; i++) {
                 JavaType containedType = containedType(i);
                 if (i > 0) {
-                    stringBuilder.append(',');
+                    sb.append(',');
                 }
-                stringBuilder.append(containedType.toCanonical());
+                sb.append(containedType.toCanonical());
             }
-            stringBuilder.append('>');
+            sb.append('>');
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     public boolean isContainerType() {
         return false;
     }
 
-    public StringBuilder getErasedSignature(StringBuilder stringBuilder) {
-        return TypeBase._classSignature(this._class, stringBuilder, true);
+    public StringBuilder getErasedSignature(StringBuilder sb) {
+        return _classSignature(this._class, sb, true);
     }
 
-    public StringBuilder getGenericSignature(StringBuilder stringBuilder) {
-        int i = 0;
-        TypeBase._classSignature(this._class, stringBuilder, false);
+    public StringBuilder getGenericSignature(StringBuilder sb) {
+        _classSignature(this._class, sb, false);
         int size = this._bindings.size();
         if (size > 0) {
-            stringBuilder.append('<');
-            while (i < size) {
-                stringBuilder = containedType(i).getGenericSignature(stringBuilder);
-                i++;
+            sb.append('<');
+            for (int i = 0; i < size; i++) {
+                sb = containedType(i).getGenericSignature(sb);
             }
-            stringBuilder.append('>');
+            sb.append('>');
         }
-        stringBuilder.append(';');
-        return stringBuilder;
+        sb.append(';');
+        return sb;
     }
 
     private static JavaType _buildSuperClass(Class<?> cls, TypeBindings typeBindings) {
@@ -164,9 +164,9 @@ public class SimpleType extends TypeBase {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(40);
-        stringBuilder.append("[simple type, class ").append(buildCanonicalName()).append(']');
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(40);
+        sb.append("[simple type, class ").append(buildCanonicalName()).append(']');
+        return sb.toString();
     }
 
     public boolean equals(Object obj) {

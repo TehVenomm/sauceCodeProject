@@ -52,7 +52,7 @@ public class AnyGetterWriter {
 
     public void resolve(SerializerProvider serializerProvider) throws JsonMappingException {
         if (this._serializer instanceof ContextualSerializer) {
-            JsonSerializer handlePrimaryContextualization = serializerProvider.handlePrimaryContextualization(this._serializer, this._property);
+            JsonSerializer<Object> handlePrimaryContextualization = serializerProvider.handlePrimaryContextualization(this._serializer, this._property);
             this._serializer = handlePrimaryContextualization;
             if (handlePrimaryContextualization instanceof MapSerializer) {
                 this._mapSerializer = (MapSerializer) handlePrimaryContextualization;

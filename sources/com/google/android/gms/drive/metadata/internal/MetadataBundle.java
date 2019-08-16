@@ -4,70 +4,79 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import android.support.annotation.Nullable;
 import com.google.android.gms.common.data.BitmapTeleporter;
+import com.google.android.gms.common.internal.GmsLogger;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved;
 import com.google.android.gms.drive.metadata.MetadataField;
-import com.google.android.gms.internal.zzbjv;
-import com.google.android.gms.internal.zzbnr;
+import com.google.android.gms.internal.drive.zzhp;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 
-public final class MetadataBundle extends zza implements ReflectedParcelable {
+@Class(creator = "MetadataBundleCreator")
+@Reserved({1})
+public final class MetadataBundle extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<MetadataBundle> CREATOR = new zzj();
-    private Bundle zzgkp;
+    private static final GmsLogger zzbx = new GmsLogger("MetadataBundle", "");
+    @Field(mo13990id = 2)
+    private final Bundle zzir;
 
-    MetadataBundle(Bundle bundle) {
-        this.zzgkp = (Bundle) zzbp.zzu(bundle);
-        this.zzgkp.setClassLoader(getClass().getClassLoader());
-        List arrayList = new ArrayList();
-        for (String str : this.zzgkp.keySet()) {
-            String str2;
-            if (zzf.zzgr(str2) == null) {
-                arrayList.add(str2);
-                str2 = String.valueOf(str2);
-                zzbjv.zzy("MetadataBundle", str2.length() != 0 ? "Ignored unknown metadata field in bundle: ".concat(str2) : new String("Ignored unknown metadata field in bundle: "));
+    @Constructor
+    MetadataBundle(@Param(mo13993id = 2) Bundle bundle) {
+        int i = 0;
+        this.zzir = (Bundle) Preconditions.checkNotNull(bundle);
+        this.zzir.setClassLoader(getClass().getClassLoader());
+        ArrayList arrayList = new ArrayList();
+        for (String str : this.zzir.keySet()) {
+            if (zzf.zzd(str) == null) {
+                arrayList.add(str);
+                zzbx.wfmt("MetadataBundle", "Ignored unknown metadata field in bundle: %s", str);
             }
         }
-        ArrayList arrayList2 = (ArrayList) arrayList;
+        ArrayList arrayList2 = arrayList;
         int size = arrayList2.size();
-        int i = 0;
         while (i < size) {
             Object obj = arrayList2.get(i);
             i++;
-            this.zzgkp.remove((String) obj);
+            this.zzir.remove((String) obj);
         }
     }
 
-    public static MetadataBundle zzant() {
-        return new MetadataBundle(new Bundle());
+    public static <T> MetadataBundle zza(MetadataField<T> metadataField, T t) {
+        MetadataBundle zzaw = zzaw();
+        zzaw.zzb(metadataField, t);
+        return zzaw;
     }
 
-    public static <T> MetadataBundle zzb(MetadataField<T> metadataField, T t) {
-        MetadataBundle zzant = zzant();
-        zzant.zzc(metadataField, t);
-        return zzant;
+    public static MetadataBundle zzaw() {
+        return new MetadataBundle(new Bundle());
     }
 
     public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof MetadataBundle)) {
+        if (obj == null || obj.getClass() != getClass()) {
             return false;
         }
         MetadataBundle metadataBundle = (MetadataBundle) obj;
-        Set<String> keySet = this.zzgkp.keySet();
-        if (!keySet.equals(metadataBundle.zzgkp.keySet())) {
+        Set<String> keySet = this.zzir.keySet();
+        if (!keySet.equals(metadataBundle.zzir.keySet())) {
             return false;
         }
         for (String str : keySet) {
-            if (!zzbf.equal(this.zzgkp.get(str), metadataBundle.zzgkp.get(str))) {
+            if (!Objects.equal(this.zzir.get(str), metadataBundle.zzir.get(str))) {
                 return false;
             }
         }
@@ -75,57 +84,64 @@ public final class MetadataBundle extends zza implements ReflectedParcelable {
     }
 
     public final int hashCode() {
+        Iterator it = this.zzir.keySet().iterator();
         int i = 1;
-        for (String str : this.zzgkp.keySet()) {
-            i = this.zzgkp.get(str).hashCode() + (i * 31);
+        while (true) {
+            int i2 = i;
+            if (!it.hasNext()) {
+                return i2;
+            }
+            i = this.zzir.get((String) it.next()).hashCode() + (i2 * 31);
         }
-        return i;
-    }
-
-    public final void setContext(Context context) {
-        BitmapTeleporter bitmapTeleporter = (BitmapTeleporter) zza(zzbnr.zzgly);
-        if (bitmapTeleporter != null) {
-            bitmapTeleporter.zzc(context.getCacheDir());
-        }
-    }
-
-    public final String toString() {
-        String valueOf = String.valueOf(this.zzgkp);
-        return new StringBuilder(String.valueOf(valueOf).length() + 24).append("MetadataBundle [values=").append(valueOf).append("]").toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 2, this.zzgkp, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeBundle(parcel, 2, this.zzir, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
+    @Nullable
     public final <T> T zza(MetadataField<T> metadataField) {
-        return metadataField.zzl(this.zzgkp);
+        return metadataField.zza(this.zzir);
     }
 
-    public final MetadataBundle zzanu() {
-        return new MetadataBundle(new Bundle(this.zzgkp));
+    public final void zza(Context context) {
+        BitmapTeleporter bitmapTeleporter = (BitmapTeleporter) zza(zzhp.zzka);
+        if (bitmapTeleporter != null) {
+            bitmapTeleporter.setTempDir(context.getCacheDir());
+        }
     }
 
-    public final Set<MetadataField<?>> zzanv() {
-        Set<MetadataField<?>> hashSet = new HashSet();
-        for (String zzgr : this.zzgkp.keySet()) {
-            hashSet.add(zzf.zzgr(zzgr));
+    public final MetadataBundle zzax() {
+        return new MetadataBundle(new Bundle(this.zzir));
+    }
+
+    public final Set<MetadataField<?>> zzay() {
+        HashSet hashSet = new HashSet();
+        for (String zzd : this.zzir.keySet()) {
+            hashSet.add(zzf.zzd(zzd));
         }
         return hashSet;
     }
 
-    public final <T> void zzc(MetadataField<T> metadataField, T t) {
-        if (zzf.zzgr(metadataField.getName()) == null) {
+    public final <T> void zzb(MetadataField<T> metadataField, T t) {
+        if (zzf.zzd(metadataField.getName()) == null) {
             String valueOf = String.valueOf(metadataField.getName());
             throw new IllegalArgumentException(valueOf.length() != 0 ? "Unregistered field: ".concat(valueOf) : new String("Unregistered field: "));
         } else {
-            metadataField.zza(t, this.zzgkp);
+            metadataField.zza(t, this.zzir);
         }
     }
 
-    public final boolean zzc(MetadataField<?> metadataField) {
-        return this.zzgkp.containsKey(metadataField.getName());
+    @Nullable
+    public final <T> T zzc(MetadataField<T> metadataField) {
+        T zza = zza(metadataField);
+        this.zzir.remove(metadataField.getName());
+        return zza;
+    }
+
+    public final boolean zzd(MetadataField<?> metadataField) {
+        return this.zzir.containsKey(metadataField.getName());
     }
 }

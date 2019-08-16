@@ -1,14 +1,15 @@
-package net.gogame.gowrap.ui.fab;
+package net.gogame.gowrap.p019ui.fab;
 
 import android.app.Activity;
 import android.view.MotionEvent;
 import java.util.HashMap;
 import java.util.Map;
 import net.gogame.gowrap.integrations.core.Wrapper;
-import net.gogame.gowrap.ui.ActivityHelper;
-import net.gogame.gowrap.ui.DialogStartMenuManager;
-import net.gogame.gowrap.ui.fab.Fab.ClickListener;
+import net.gogame.gowrap.p019ui.ActivityHelper;
+import net.gogame.gowrap.p019ui.DialogStartMenuManager;
+import net.gogame.gowrap.p019ui.fab.Fab.ClickListener;
 
+/* renamed from: net.gogame.gowrap.ui.fab.FabManager */
 public class FabManager {
     private static final Map<Activity, Fab> fabMap = new HashMap();
 
@@ -18,7 +19,7 @@ public class FabManager {
 
     public static void onCreate(final Activity activity) {
         if (((Fab) fabMap.get(activity)) == null) {
-            Fab popupWindowFab = new PopupWindowFab(false, false);
+            PopupWindowFab popupWindowFab = new PopupWindowFab(false, false);
             popupWindowFab.setClickListener(new ClickListener() {
                 public void onClick(Fab fab, MotionEvent motionEvent) {
                     FabManager.showMenu(activity);

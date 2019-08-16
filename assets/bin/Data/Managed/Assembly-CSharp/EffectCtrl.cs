@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class EffectCtrl
+public class EffectCtrl : MonoBehaviour
 {
-	[Tooltip("ル\u30fcプエフェクトかどうか")]
 	[Header("-- Effect Settings --")]
+	[Tooltip("ル\u30fcプエフェクトかどうか")]
 	public bool loop;
 
 	[Tooltip("管理対象のParticleSystemの配列")]
@@ -15,8 +15,8 @@ public class EffectCtrl
 	[Tooltip("管理対象のAnimator\n空の場合はこのGameObjectにアタッチされたAnimatorが使用される")]
 	public Animator animator;
 
-	[Tooltip("ル\u30fcプを抜ける時にパ\u30fcティクルを停止するかどうか")]
 	[Header("-- Loop End Behaviour --")]
+	[Tooltip("ル\u30fcプを抜ける時にパ\u30fcティクルを停止するかどうか")]
 	public bool stopParticle = true;
 
 	[Tooltip("ル\u30fcプを抜ける時にAnimatorのENDを再生するかどうか")]
@@ -25,8 +25,8 @@ public class EffectCtrl
 	[Tooltip("AnimatorのENDを再生する時のクロスフェ\u30fcド時間（秒）")]
 	public float crossFadeTimeToEND = 0.1f;
 
-	[Tooltip("指定時間を待ってから削除（秒）\n0に設定すると待たない")]
 	[Header("-- Wait Destroy --")]
+	[Tooltip("指定時間を待ってから削除（秒）\n0に設定すると待たない")]
 	public float waitTime = 0.2f;
 
 	[Tooltip("パ\u30fcティクルが全て消えてから削除")]
@@ -35,8 +35,8 @@ public class EffectCtrl
 	[Tooltip("アニメが最後まで再生されてから削除")]
 	public bool waitAnimationPlaying = true;
 
-	[Tooltip("同時に再生される可能性のあるAudioClip")]
 	[Header("-- Audio Destroy --")]
+	[Tooltip("同時に再生される可能性のあるAudioClip")]
 	public AudioClip attachedAudioClip;
 
 	[Tooltip("同時に再生される可能性のあるAudioClipのSE設定ID")]
@@ -67,8 +67,6 @@ public class EffectCtrl
 
 	private void Awake()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
 		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		_transform = this.get_transform();
@@ -112,43 +110,44 @@ public class EffectCtrl
 	{
 		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		if (!loop || loopEnd)
+		if (loop && !loopEnd)
 		{
-			if (waitTime > 0f)
-			{
-				timer += Time.get_deltaTime();
-				if (timer < waitTime)
-				{
-					return;
-				}
-			}
-			if (waitParticlePlaying)
-			{
-				int i = 0;
-				for (int num = particles.Length; i < num; i++)
-				{
-					ParticleSystem val = particles[i];
-					if (val != null && val.get_isPlaying())
-					{
-						val.Stop(true);
-						return;
-					}
-				}
-			}
-			if (waitAnimationPlaying && animator != null)
-			{
-				if (animator.IsInTransition(0))
-				{
-					return;
-				}
-				AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-				if (!currentAnimatorStateInfo.get_loop() && currentAnimatorStateInfo.get_normalizedTime() < 1f)
-				{
-					return;
-				}
-			}
-			DestroyGameObject();
+			return;
 		}
+		if (waitTime > 0f)
+		{
+			timer += Time.get_deltaTime();
+			if (timer < waitTime)
+			{
+				return;
+			}
+		}
+		if (waitParticlePlaying)
+		{
+			int i = 0;
+			for (int num = particles.Length; i < num; i++)
+			{
+				ParticleSystem val = particles[i];
+				if (val != null && val.get_isPlaying())
+				{
+					val.Stop(true);
+					return;
+				}
+			}
+		}
+		if (waitAnimationPlaying && animator != null)
+		{
+			if (animator.IsInTransition(0))
+			{
+				return;
+			}
+			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+			if (!currentAnimatorStateInfo.get_loop() && currentAnimatorStateInfo.get_normalizedTime() < 1f)
+			{
+				return;
+			}
+		}
+		DestroyGameObject();
 	}
 
 	public void EndLoop(bool isPlayEndAnimation = true)
@@ -214,48 +213,47 @@ public class EffectCtrl
 
 	public void Pause(bool pause)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		if (isPause != pause)
+		if (isPause == pause)
 		{
-			if (pause)
+			return;
+		}
+		if (pause)
+		{
+			if (!this.get_gameObject().get_activeInHierarchy())
 			{
-				if (this.get_gameObject().get_activeInHierarchy())
-				{
-					if (!object.ReferenceEquals(animator, null))
-					{
-						AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-						int shortNameHash = currentAnimatorStateInfo.get_shortNameHash();
-						if (shortNameHash == 0)
-						{
-							return;
-						}
-						pauseStateHash = shortNameHash;
-						animator.Stop();
-					}
-					this.get_gameObject().SetActive(false);
-					isPause = true;
-				}
+				return;
 			}
-			else
+			if (!object.ReferenceEquals(animator, null))
 			{
-				this.get_gameObject().SetActive(true);
-				if (!object.ReferenceEquals(animator, null))
+				AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+				int shortNameHash = currentAnimatorStateInfo.get_shortNameHash();
+				if (shortNameHash == 0)
 				{
-					animator.Play(pauseStateHash);
-					pauseStateHash = 0;
+					return;
 				}
-				isPause = false;
+				pauseStateHash = shortNameHash;
+				animator.set_enabled(false);
 			}
+			this.get_gameObject().SetActive(false);
+			isPause = true;
+		}
+		else
+		{
+			this.get_gameObject().SetActive(true);
+			if (!object.ReferenceEquals(animator, null))
+			{
+				animator.set_enabled(true);
+				animator.Play(pauseStateHash);
+				pauseStateHash = 0;
+			}
+			isPause = false;
 		}
 	}
 
 	public void SetRenderQueue(int renderQueue)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (particles != null)
 		{
 			if (particles.Length == 0)
@@ -297,18 +295,23 @@ public class EffectCtrl
 
 	public void DestroyGameObject()
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		if (!MonoBehaviourSingleton<EffectManager>.IsValid() || !MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(this.get_gameObject(), false))
+		if (!(this.get_gameObject() == null) && (!MonoBehaviourSingleton<EffectManager>.IsValid() || !MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(this.get_gameObject(), no_stock_to_destroy: false)))
 		{
 			Object.Destroy(this.get_gameObject());
 		}
 	}
 
+	private void OnDisable()
+	{
+		if (loopEnd)
+		{
+			DestroyGameObject();
+		}
+	}
+
 	private void __FUNCTION__PlayOneShotSE(AudioClip clip)
 	{
-		SoundManager.PlaySE(clip, false, _transform);
+		SoundManager.PlaySE(clip, loop: false, _transform);
 	}
 
 	private void __FUNCTION__PlayLoopSE(AudioClip clip)
@@ -317,9 +320,9 @@ public class EffectCtrl
 		{
 			if (loopAudioObject != null)
 			{
-				loopAudioObject.Stop(0);
+				loopAudioObject.Stop();
 			}
-			loopAudioObject = SoundManager.PlaySE(clip, true, _transform);
+			loopAudioObject = SoundManager.PlaySE(clip, loop: true, _transform);
 			if (loopAudioObject != null)
 			{
 				loopAudioClip = clip;
@@ -331,7 +334,7 @@ public class EffectCtrl
 	{
 		if (loopAudioObject != null)
 		{
-			loopAudioObject.Stop(0);
+			loopAudioObject.Stop();
 		}
 		loopAudioObject = null;
 		loopAudioClip = null;

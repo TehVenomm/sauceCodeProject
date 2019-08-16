@@ -124,19 +124,20 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					for (; i < 3; i += 8)
 					{
-						if (num2 == 0)
+						if (num2 != 0)
 						{
-							bitb = num3;
-							bitk = i;
-							_codec.AvailableBytesIn = num2;
-							_codec.TotalBytesIn += num - _codec.NextIn;
-							_codec.NextIn = num;
-							writeAt = num4;
-							return Flush(r);
+							r = 0;
+							num2--;
+							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+							continue;
 						}
-						r = 0;
-						num2--;
-						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+						bitb = num3;
+						bitk = i;
+						_codec.AvailableBytesIn = num2;
+						_codec.TotalBytesIn += num - _codec.NextIn;
+						_codec.NextIn = num;
+						writeAt = num4;
+						return Flush(r);
 					}
 					int num7 = num3 & 7;
 					last = (num7 & 1);
@@ -187,19 +188,20 @@ namespace BestHTTP.Decompression.Zlib
 				case InflateBlockMode.LENS:
 					for (; i < 32; i += 8)
 					{
-						if (num2 == 0)
+						if (num2 != 0)
 						{
-							bitb = num3;
-							bitk = i;
-							_codec.AvailableBytesIn = num2;
-							_codec.TotalBytesIn += num - _codec.NextIn;
-							_codec.NextIn = num;
-							writeAt = num4;
-							return Flush(r);
+							r = 0;
+							num2--;
+							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+							continue;
 						}
-						r = 0;
-						num2--;
-						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+						bitb = num3;
+						bitk = i;
+						_codec.AvailableBytesIn = num2;
+						_codec.TotalBytesIn += num - _codec.NextIn;
+						_codec.NextIn = num;
+						writeAt = num4;
+						return Flush(r);
 					}
 					if (((~num3 >> 16) & 0xFFFF) != (num3 & 0xFFFF))
 					{
@@ -285,19 +287,20 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					for (; i < 14; i += 8)
 					{
-						if (num2 == 0)
+						if (num2 != 0)
 						{
-							bitb = num3;
-							bitk = i;
-							_codec.AvailableBytesIn = num2;
-							_codec.TotalBytesIn += num - _codec.NextIn;
-							_codec.NextIn = num;
-							writeAt = num4;
-							return Flush(r);
+							r = 0;
+							num2--;
+							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+							continue;
 						}
-						r = 0;
-						num2--;
-						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+						bitb = num3;
+						bitk = i;
+						_codec.AvailableBytesIn = num2;
+						_codec.TotalBytesIn += num - _codec.NextIn;
+						_codec.NextIn = num;
+						writeAt = num4;
+						return Flush(r);
 					}
 					int num7 = table = (num3 & 0x3FFF);
 					if ((num7 & 0x1F) > 29 || ((num7 >> 5) & 0x1F) > 29)
@@ -334,19 +337,20 @@ namespace BestHTTP.Decompression.Zlib
 					{
 						for (; i < 3; i += 8)
 						{
-							if (num2 == 0)
+							if (num2 != 0)
 							{
-								bitb = num3;
-								bitk = i;
-								_codec.AvailableBytesIn = num2;
-								_codec.TotalBytesIn += num - _codec.NextIn;
-								_codec.NextIn = num;
-								writeAt = num4;
-								return Flush(r);
+								r = 0;
+								num2--;
+								num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+								continue;
 							}
-							r = 0;
-							num2--;
-							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+							bitb = num3;
+							bitk = i;
+							_codec.AvailableBytesIn = num2;
+							_codec.TotalBytesIn += num - _codec.NextIn;
+							_codec.NextIn = num;
+							writeAt = num4;
+							return Flush(r);
 						}
 						blens[border[index++]] = (num3 & 7);
 						num3 >>= 3;
@@ -390,19 +394,20 @@ namespace BestHTTP.Decompression.Zlib
 						}
 						for (num7 = bb[0]; i < num7; i += 8)
 						{
-							if (num2 == 0)
+							if (num2 != 0)
 							{
-								bitb = num3;
-								bitk = i;
-								_codec.AvailableBytesIn = num2;
-								_codec.TotalBytesIn += num - _codec.NextIn;
-								_codec.NextIn = num;
-								writeAt = num4;
-								return Flush(r);
+								r = 0;
+								num2--;
+								num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+								continue;
 							}
-							r = 0;
-							num2--;
-							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+							bitb = num3;
+							bitk = i;
+							_codec.AvailableBytesIn = num2;
+							_codec.TotalBytesIn += num - _codec.NextIn;
+							_codec.NextIn = num;
+							writeAt = num4;
+							return Flush(r);
 						}
 						num7 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num7])) * 3 + 1];
 						int num11 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num7])) * 3 + 2];
@@ -411,56 +416,55 @@ namespace BestHTTP.Decompression.Zlib
 							num3 >>= num7;
 							i -= num7;
 							blens[index++] = num11;
+							continue;
 						}
-						else
+						int num12 = (num11 != 18) ? (num11 - 14) : 7;
+						int num13 = (num11 != 18) ? 3 : 11;
+						for (; i < num7 + num12; i += 8)
 						{
-							int num12 = (num11 != 18) ? (num11 - 14) : 7;
-							int num13 = (num11 != 18) ? 3 : 11;
-							for (; i < num7 + num12; i += 8)
+							if (num2 != 0)
 							{
-								if (num2 == 0)
-								{
-									bitb = num3;
-									bitk = i;
-									_codec.AvailableBytesIn = num2;
-									_codec.TotalBytesIn += num - _codec.NextIn;
-									_codec.NextIn = num;
-									writeAt = num4;
-									return Flush(r);
-								}
 								r = 0;
 								num2--;
 								num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
+								continue;
 							}
-							num3 >>= num7;
-							i -= num7;
-							num13 += (num3 & InternalInflateConstants.InflateMask[num12]);
-							num3 >>= num12;
-							i -= num12;
-							num12 = index;
-							num7 = table;
-							if (num12 + num13 > 258 + (num7 & 0x1F) + ((num7 >> 5) & 0x1F) || (num11 == 16 && num12 < 1))
-							{
-								blens = null;
-								mode = InflateBlockMode.BAD;
-								_codec.Message = "invalid bit length repeat";
-								r = -3;
-								bitb = num3;
-								bitk = i;
-								_codec.AvailableBytesIn = num2;
-								_codec.TotalBytesIn += num - _codec.NextIn;
-								_codec.NextIn = num;
-								writeAt = num4;
-								return Flush(r);
-							}
-							num11 = ((num11 == 16) ? blens[num12 - 1] : 0);
-							do
-							{
-								blens[num12++] = num11;
-							}
-							while (--num13 != 0);
-							index = num12;
+							bitb = num3;
+							bitk = i;
+							_codec.AvailableBytesIn = num2;
+							_codec.TotalBytesIn += num - _codec.NextIn;
+							_codec.NextIn = num;
+							writeAt = num4;
+							return Flush(r);
 						}
+						num3 >>= num7;
+						i -= num7;
+						num13 += (num3 & InternalInflateConstants.InflateMask[num12]);
+						num3 >>= num12;
+						i -= num12;
+						num12 = index;
+						num7 = table;
+						if (num12 + num13 > 258 + (num7 & 0x1F) + ((num7 >> 5) & 0x1F) || (num11 == 16 && num12 < 1))
+						{
+							blens = null;
+							mode = InflateBlockMode.BAD;
+							_codec.Message = "invalid bit length repeat";
+							r = -3;
+							bitb = num3;
+							bitk = i;
+							_codec.AvailableBytesIn = num2;
+							_codec.TotalBytesIn += num - _codec.NextIn;
+							_codec.NextIn = num;
+							writeAt = num4;
+							return Flush(r);
+						}
+						num11 = ((num11 == 16) ? blens[num12 - 1] : 0);
+						do
+						{
+							blens[num12++] = num11;
+						}
+						while (--num13 != 0);
+						index = num12;
 					}
 					tb[0] = -1;
 					int[] array5 = new int[1]
@@ -475,13 +479,13 @@ namespace BestHTTP.Decompression.Zlib
 					int[] array8 = new int[1];
 					num7 = table;
 					num7 = inftree.inflate_trees_dynamic(257 + (num7 & 0x1F), 1 + ((num7 >> 5) & 0x1F), blens, array5, array6, array7, array8, hufts, _codec);
-					switch (num7)
+					if (num7 != 0)
 					{
-					case -3:
-						blens = null;
-						mode = InflateBlockMode.BAD;
-						goto default;
-					default:
+						if (num7 == -3)
+						{
+							blens = null;
+							mode = InflateBlockMode.BAD;
+						}
 						r = num7;
 						bitb = num3;
 						bitk = i;
@@ -490,8 +494,6 @@ namespace BestHTTP.Decompression.Zlib
 						_codec.NextIn = num;
 						writeAt = num4;
 						return Flush(r);
-					case 0:
-						break;
 					}
 					codes.Init(array5[0], array6[0], hufts, array7[0], hufts, array8[0]);
 					mode = InflateBlockMode.CODES;

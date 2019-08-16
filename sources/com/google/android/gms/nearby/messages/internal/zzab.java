@@ -2,17 +2,15 @@ package com.google.android.gms.nearby.messages.internal;
 
 import android.os.Parcel;
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzef;
+import com.google.android.gms.internal.nearby.zzb;
 
-public abstract class zzab extends zzef implements zzaa {
+public abstract class zzab extends zzb implements zzaa {
     public zzab() {
-        attachInterface(this, "com.google.android.gms.nearby.messages.internal.ISubscribeCallback");
+        super("com.google.android.gms.nearby.messages.internal.ISubscribeCallback");
     }
 
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        if (zza(i, parcel, parcel2, i2)) {
-            return true;
-        }
+    /* access modifiers changed from: protected */
+    public final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         if (i != 1) {
             return false;
         }

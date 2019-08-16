@@ -68,8 +68,6 @@ public class GuildMemberInfo : SkillInfoBase
 		BTN_REJECT
 	}
 
-	protected const string STR_VISUAL_EQUIP_EVENT_NAME = "VISUAL_DETAIL";
-
 	protected UI[] icons = new UI[7]
 	{
 		UI.OBJ_ICON_WEAPON_1,
@@ -117,6 +115,8 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected bool isVisualMode;
 
+	protected const string STR_VISUAL_EQUIP_EVENT_NAME = "VISUAL_DETAIL";
+
 	protected bool isFollowerList;
 
 	protected bool isFollowerListChengeTrans;
@@ -148,7 +148,6 @@ public class GuildMemberInfo : SkillInfoBase
 
 	public override void Initialize()
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		FriendCharaInfo friendCharaInfo = friendData = (GameSection.GetEventData() as FriendCharaInfo);
 		data = (GameSection.GetEventData() as CharaInfo);
 		if (friendCharaInfo != null)
@@ -166,13 +165,13 @@ public class GuildMemberInfo : SkillInfoBase
 		Transform root = FindCtrl(base._transform, UI.OBJ_FRIEND_INFO_ROOT);
 		if (data == null || data.requestId == 0)
 		{
-			SetActive(root, UI.BTN_ACCEPT, false);
-			SetActive(root, UI.BTN_REJECT, false);
+			SetActive(root, UI.BTN_ACCEPT, is_visible: false);
+			SetActive(root, UI.BTN_REJECT, is_visible: false);
 		}
 		else
 		{
-			SetActive(root, UI.BTN_ACCEPT, true);
-			SetActive(root, UI.BTN_REJECT, true);
+			SetActive(root, UI.BTN_ACCEPT, is_visible: true);
+			SetActive(root, UI.BTN_REJECT, is_visible: true);
 		}
 	}
 
@@ -194,7 +193,6 @@ public class GuildMemberInfo : SkillInfoBase
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
 		{
@@ -226,14 +224,14 @@ public class GuildMemberInfo : SkillInfoBase
 		{
 			MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = 0;
 			otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(0);
-			otherEquipSetCalculator.SetEquipSet(data.equipSet, false);
+			otherEquipSetCalculator.SetEquipSet(data.equipSet);
 		}
 		else
 		{
 			otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex);
 		}
 		SimpleStatus finalStatus = otherEquipSetCalculator.GetFinalStatus(0, data.hp, data.atk, data.def);
-		SetActive(transRoot, UI.OBJ_LAST_LOGIN, true);
+		SetActive(transRoot, UI.OBJ_LAST_LOGIN, is_visible: true);
 		SetLabelText(transRoot, UI.LBL_NAME, data.name);
 		SetLabelText(transRoot, UI.LBL_COMMENT, data.comment);
 		SetLabelText(transRoot, UI.LBL_LAST_LOGIN, base.sectionData.GetText("LAST_LOGIN"));
@@ -252,7 +250,7 @@ public class GuildMemberInfo : SkillInfoBase
 	{
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, true, true, true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
+		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, need_weapon: true, need_helm: true, need_leg: true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
 		{
 			if (player_loader != null)
 			{
@@ -264,7 +262,7 @@ public class GuildMemberInfo : SkillInfoBase
 	protected virtual void CreateDegree()
 	{
 		DegreePlate component = GetCtrl(UI.OBJ_DEGREE_PLATE_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(SelectedDegrees, false, delegate
+		component.Initialize(SelectedDegrees, isButton: false, delegate
 		{
 		});
 	}
@@ -279,7 +277,7 @@ public class GuildMemberInfo : SkillInfoBase
 			SetEvent(FindCtrl(transRoot, icons[i]), "EMPTY", 0);
 			SetEvent(FindCtrl(transRoot, icons_btn[i]), "EMPTY", 0);
 			SetLabelText(FindCtrl(transRoot, icons_level[i]), string.Empty);
-			SetActive(FindCtrl(transRoot, icons[i]), false);
+			SetActive(FindCtrl(transRoot, icons[i]), is_visible: false);
 		}
 		bool need_visual_helm_icon = isVisualMode;
 		bool need_visual_armor_icon = isVisualMode;
@@ -338,9 +336,9 @@ public class GuildMemberInfo : SkillInfoBase
 				}
 				if (!(val == null))
 				{
-					SetActive(FindCtrl(transRoot, icons[num2]), true);
+					SetActive(FindCtrl(transRoot, icons[num2]), is_visible: true);
 					string event_name = (!isVisualMode) ? "DETAIL" : "VISUAL_DETAIL";
-					ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(equipItemData.type), equipItemData.GetIconID(GetCharaSex()), equipItemData.rarity, val, equipItemData.GetTargetElementPriorityToTable(), null, -1, event_name, num2, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
+					ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(equipItemData.type), equipItemData.GetIconID(GetCharaSex()), equipItemData.rarity, val, equipItemData.GetTargetElementPriorityToTable(), null, -1, event_name, num2);
 					SetLongTouch(itemIcon.transform, event_name, num2);
 					SetEvent(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					SetLongTouch(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
@@ -391,7 +389,6 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected void SetVisualModeIcon(int index, int table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		string event_name = "VISUAL_DETAIL";
 		Transform val = FindCtrl(transRoot, icons[index]);
 		EquipItemTable.EquipItemData visualModeTargetTable = GetVisualModeTargetTable((uint)table_id, e_type, chara_info);
@@ -404,8 +401,8 @@ public class GuildMemberInfo : SkillInfoBase
 				Temporary.itemIconList[i].get_gameObject().SetActive(true);
 			}
 			Temporary.itemIconList.Clear();
-			SetActive(FindCtrl(transRoot, icons[index]), true);
-			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(visualModeTargetTable.type), visualModeTargetTable.GetIconID(GetCharaSex()), visualModeTargetTable.rarity, val, visualModeTargetTable.GetTargetElementPriorityToTable(), null, -1, event_name, index, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
+			SetActive(FindCtrl(transRoot, icons[index]), is_visible: true);
+			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(visualModeTargetTable.type), visualModeTargetTable.GetIconID(GetCharaSex()), visualModeTargetTable.rarity, val, visualModeTargetTable.GetTargetElementPriorityToTable(), null, -1, event_name, index);
 			SetLongTouch(itemIcon.transform, event_name, index);
 			SetEvent(FindCtrl(transRoot, icons_btn[index]), event_name, index);
 			SetLongTouch(FindCtrl(transRoot, icons_btn[index]), event_name, index);
@@ -419,10 +416,10 @@ public class GuildMemberInfo : SkillInfoBase
 		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.OBJ_FRIEND_INFO_ROOT, IsFriendInfo);
 		SetActive(transRoot, UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !IsFriendInfo);
 		SetActive(transRoot, UI.BTN_MAGI, showMagiButton);
@@ -432,8 +429,8 @@ public class GuildMemberInfo : SkillInfoBase
 		{
 			if (flag && !dataFollowing)
 			{
-				SetActive(transRoot, UI.BTN_FOLLOW, true);
-				SetActive(transRoot, UI.BTN_UNFOLLOW, false);
+				SetActive(transRoot, UI.BTN_FOLLOW, is_visible: true);
+				SetActive(transRoot, UI.BTN_UNFOLLOW, is_visible: false);
 				SetEvent(transRoot, UI.BTN_FOLLOW, "INVALID_FOLLOW", 0);
 			}
 			else
@@ -441,14 +438,14 @@ public class GuildMemberInfo : SkillInfoBase
 				SetActive(transRoot, UI.BTN_FOLLOW, !dataFollowing);
 				SetActive(transRoot, UI.BTN_UNFOLLOW, dataFollowing);
 			}
-			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, false);
+			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, is_visible: false);
 		}
 		else
 		{
 			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, dataFollower);
 			if (!flag && !dataFollowing)
 			{
-				SetActive(transRoot, UI.BTN_FOLLOW, true);
+				SetActive(transRoot, UI.BTN_FOLLOW, is_visible: true);
 				if (!isFollowerListChengeTrans)
 				{
 					Transform val = FindCtrl(transRoot, UI.BTN_FOLLOW);
@@ -465,11 +462,11 @@ public class GuildMemberInfo : SkillInfoBase
 			}
 			else
 			{
-				SetActive(transRoot, UI.BTN_FOLLOW, false);
+				SetActive(transRoot, UI.BTN_FOLLOW, is_visible: false);
 			}
-			SetActive(transRoot, UI.BTN_UNFOLLOW, false);
+			SetActive(transRoot, UI.BTN_UNFOLLOW, is_visible: false);
 		}
-		SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, true);
+		SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, is_visible: true);
 		bool flag2 = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(data.userId);
 		SetActive(transRoot, UI.BTN_BLACKLIST_IN, !flag2);
 		SetActive(transRoot, UI.BTN_BLACKLIST_OUT, flag2);
@@ -605,7 +602,7 @@ public class GuildMemberInfo : SkillInfoBase
 			{
 				callback(flag);
 			}
-			GameSection.ResumeEvent(flag, null);
+			GameSection.ResumeEvent(flag);
 		});
 	}
 
@@ -618,7 +615,7 @@ public class GuildMemberInfo : SkillInfoBase
 			{
 				callback(is_success);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -631,7 +628,7 @@ public class GuildMemberInfo : SkillInfoBase
 			{
 				callback(is_success);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -648,7 +645,7 @@ public class GuildMemberInfo : SkillInfoBase
 			{
 				dataFollowing = false;
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -661,7 +658,7 @@ public class GuildMemberInfo : SkillInfoBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(data.userId, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -675,7 +672,7 @@ public class GuildMemberInfo : SkillInfoBase
 	{
 		if (isVisualMode)
 		{
-			GameSection.ChangeEvent("VISUAL_DETAIL", null);
+			GameSection.ChangeEvent("VISUAL_DETAIL");
 			OnQuery_VISUAL_DETAIL();
 		}
 		else
@@ -726,7 +723,7 @@ public class GuildMemberInfo : SkillInfoBase
 		object[] array = new object[3]
 		{
 			equipSetInfo,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo, null),
+			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo),
 			new EquipSetDetailStatusAndAbilityTable.BaseStatus(data.atk, data.def, data.hp, data.equipSet)
 		};
 		GameSection.SetEventData(new object[3]
@@ -743,7 +740,7 @@ public class GuildMemberInfo : SkillInfoBase
 		object[] array = new object[3]
 		{
 			equipSetInfo,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo, null),
+			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo),
 			new EquipSetDetailStatusAndAbilityTable.BaseStatus(data.atk, data.def, data.hp, data.equipSet)
 		};
 		GameSection.SetEventData(new object[3]
@@ -766,7 +763,7 @@ public class GuildMemberInfo : SkillInfoBase
 		{
 			MonoBehaviourSingleton<GuildManager>.I.SendAdminJoin(friendData.requestId, 1, delegate(bool is_success, Error err)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 	}
@@ -778,7 +775,7 @@ public class GuildMemberInfo : SkillInfoBase
 		{
 			MonoBehaviourSingleton<GuildManager>.I.SendAdminJoin(friendData.requestId, 0, delegate(bool is_success, Error err)
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			});
 		}
 	}

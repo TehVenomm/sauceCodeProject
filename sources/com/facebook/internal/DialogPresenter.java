@@ -9,7 +9,8 @@ import com.facebook.FacebookActivity;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.facebook.internal.Utility.DialogFeatureConfig;
+import com.facebook.internal.FetchedAppSettings.DialogFeatureConfig;
+import com.facebook.internal.NativeProtocol.ProtocolVersionQueryResult;
 
 public class DialogPresenter {
 
@@ -20,7 +21,7 @@ public class DialogPresenter {
     }
 
     public static boolean canPresentNativeDialogWithFeature(DialogFeature dialogFeature) {
-        return getProtocolVersionForNativeDialog(dialogFeature) != -1;
+        return getProtocolVersionForNativeDialog(dialogFeature).getProtocolVersion() != -1;
     }
 
     public static boolean canPresentWebFallbackDialogWithFeature(DialogFeature dialogFeature) {
@@ -28,18 +29,22 @@ public class DialogPresenter {
     }
 
     private static Uri getDialogWebFallbackUri(DialogFeature dialogFeature) {
-        DialogFeatureConfig dialogFeatureConfig = Utility.getDialogFeatureConfig(FacebookSdk.getApplicationId(), dialogFeature.getAction(), dialogFeature.name());
-        return dialogFeatureConfig != null ? dialogFeatureConfig.getFallbackUrl() : null;
+        String name = dialogFeature.name();
+        DialogFeatureConfig dialogFeatureConfig = FetchedAppSettings.getDialogFeatureConfig(FacebookSdk.getApplicationId(), dialogFeature.getAction(), name);
+        if (dialogFeatureConfig != null) {
+            return dialogFeatureConfig.getFallbackUrl();
+        }
+        return null;
     }
 
-    public static int getProtocolVersionForNativeDialog(DialogFeature dialogFeature) {
+    public static ProtocolVersionQueryResult getProtocolVersionForNativeDialog(DialogFeature dialogFeature) {
         String applicationId = FacebookSdk.getApplicationId();
         String action = dialogFeature.getAction();
         return NativeProtocol.getLatestAvailableProtocolVersionForAction(action, getVersionSpecForFeature(applicationId, action, dialogFeature));
     }
 
     private static int[] getVersionSpecForFeature(String str, String str2, DialogFeature dialogFeature) {
-        DialogFeatureConfig dialogFeatureConfig = Utility.getDialogFeatureConfig(str, str2, dialogFeature.name());
+        DialogFeatureConfig dialogFeatureConfig = FetchedAppSettings.getDialogFeatureConfig(str, str2, dialogFeature.name());
         if (dialogFeatureConfig != null) {
             return dialogFeatureConfig.getVersionSpec();
         }
@@ -81,15 +86,16 @@ public class DialogPresenter {
     public static void setupAppCallForNativeDialog(AppCall appCall, ParameterProvider parameterProvider, DialogFeature dialogFeature) {
         Context applicationContext = FacebookSdk.getApplicationContext();
         String action = dialogFeature.getAction();
-        int protocolVersionForNativeDialog = getProtocolVersionForNativeDialog(dialogFeature);
-        if (protocolVersionForNativeDialog == -1) {
+        ProtocolVersionQueryResult protocolVersionForNativeDialog = getProtocolVersionForNativeDialog(dialogFeature);
+        int protocolVersion = protocolVersionForNativeDialog.getProtocolVersion();
+        if (protocolVersion == -1) {
             throw new FacebookException("Cannot present this dialog. This likely means that the Facebook app is not installed.");
         }
-        Bundle parameters = NativeProtocol.isVersionCompatibleWithBucketedIntent(protocolVersionForNativeDialog) ? parameterProvider.getParameters() : parameterProvider.getLegacyParameters();
-        if (parameters == null) {
-            parameters = new Bundle();
+        Bundle legacyParameters = NativeProtocol.isVersionCompatibleWithBucketedIntent(protocolVersion) ? parameterProvider.getParameters() : parameterProvider.getLegacyParameters();
+        if (legacyParameters == null) {
+            legacyParameters = new Bundle();
         }
-        Intent createPlatformActivityIntent = NativeProtocol.createPlatformActivityIntent(applicationContext, appCall.getCallId().toString(), action, protocolVersionForNativeDialog, parameters);
+        Intent createPlatformActivityIntent = NativeProtocol.createPlatformActivityIntent(applicationContext, appCall.getCallId().toString(), action, protocolVersionForNativeDialog, legacyParameters);
         if (createPlatformActivityIntent == null) {
             throw new FacebookException("Unable to create Intent; this likely means theFacebook app is not installed.");
         }

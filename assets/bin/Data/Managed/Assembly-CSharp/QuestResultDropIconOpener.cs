@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class QuestResultDropIconOpener
+public class QuestResultDropIconOpener : MonoBehaviour
 {
 	public class Info
 	{
@@ -9,12 +9,6 @@ public class QuestResultDropIconOpener
 
 		public bool IsBroken;
 	}
-
-	private const string SPR_RARE_ICON = "ItemOpenerIcon_Gold";
-
-	private const string SPR_NORMAL_ICON = "ItemOpenerIcon_Silver";
-
-	private const string SPR_BREAK_ICON = "ItemOpenerIcon_Red";
 
 	[SerializeField]
 	private UISprite sprite;
@@ -33,6 +27,12 @@ public class QuestResultDropIconOpener
 
 	private Action<Transform, Info, bool> loadEffCallback;
 
+	private const string SPR_RARE_ICON = "ItemOpenerIcon_Gold";
+
+	private const string SPR_NORMAL_ICON = "ItemOpenerIcon_Silver";
+
+	private const string SPR_BREAK_ICON = "ItemOpenerIcon_Red";
+
 	public QuestResultDropIconOpener()
 		: this()
 	{
@@ -46,7 +46,7 @@ public class QuestResultDropIconOpener
 			m_Info = info;
 			loadEffCallback = load_eff_callback;
 			SetSpriteRare();
-			SetSpriteBreakReward(false);
+			SetSpriteBreakReward(visible: false);
 			isInitialize = true;
 		}
 	}
@@ -68,10 +68,9 @@ public class QuestResultDropIconOpener
 
 	private void SetIcon(ItemIcon _icon)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		icon = _icon;
 		icon.transform.set_parent(iconParent.get_transform());
-		icon.VisibleIcon(false, true);
+		icon.VisibleIcon(is_visible: false);
 	}
 
 	private void SetSpriteRare()
@@ -90,14 +89,13 @@ public class QuestResultDropIconOpener
 
 	private void OpenIcon()
 	{
-		iconParent.Play(true);
-		icon.VisibleIcon(true, true);
+		iconParent.Play(forward: true);
+		icon.VisibleIcon(is_visible: true);
 		SetSpriteBreakReward(m_Info.IsBroken);
 	}
 
 	private void SetSpriteBreakReward(bool visible)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (spriteRewardCategory != null)
 		{
 			spriteRewardCategory.get_gameObject().SetActive(visible);

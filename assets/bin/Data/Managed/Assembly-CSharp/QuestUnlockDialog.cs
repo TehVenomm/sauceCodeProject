@@ -10,6 +10,6 @@ public class QuestUnlockDialog : GameSection
 	public override void Initialize()
 	{
 		base.Initialize();
-		PlayTween((Enum)UI.OBJ_UNLOCK_PORTAL_ROOT, true, (EventDelegate.Callback)null, true, 0);
+		PlayTween((Enum)UI.OBJ_UNLOCK_PORTAL_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
 	}
 }

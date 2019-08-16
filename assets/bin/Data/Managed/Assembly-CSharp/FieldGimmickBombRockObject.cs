@@ -39,7 +39,7 @@ public class FieldGimmickBombRockObject : StageObject, IFieldGimmickObject
 			LoadObject loadObject = MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable.Get((uint)m_gimmickType);
 			if (loadObject != null)
 			{
-				m_modelTrans = ResourceUtility.Realizes(loadObject.loadedObject, GetTransform(), -1);
+				m_modelTrans = ResourceUtility.Realizes(loadObject.loadedObject, GetTransform());
 			}
 		}
 	}
@@ -48,17 +48,14 @@ public class FieldGimmickBombRockObject : StageObject, IFieldGimmickObject
 	{
 		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Expected O, but got Unknown
+		//IL_006b: Expected O, but got Unknown
 		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Expected O, but got Unknown
+		//IL_00fe: Expected O, but got Unknown
 		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			Transform effect = EffectManager.GetEffect("ef_btl_enemy_explosion_01_02", base._transform);
@@ -125,11 +122,22 @@ public class FieldGimmickBombRockObject : StageObject, IFieldGimmickObject
 		return 0f;
 	}
 
+	public float GetTargetSqrRadius()
+	{
+		return 0f;
+	}
+
+	public void UpdateTargetMarker(bool isNear)
+	{
+	}
+
+	public bool IsSearchableNearest()
+	{
+		return true;
+	}
+
 	protected override void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		Utility.SetLayerWithChildren(this.get_transform(), 18);

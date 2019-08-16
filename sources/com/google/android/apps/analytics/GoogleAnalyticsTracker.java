@@ -23,12 +23,18 @@ public class GoogleAnalyticsTracker {
     private CustomVariableBuffer customVariableBuffer;
     private boolean debug = false;
     private int dispatchPeriod;
-    private Runnable dispatchRunner = new C05981();
+    private Runnable dispatchRunner = new Runnable() {
+        public void run() {
+            GoogleAnalyticsTracker.this.dispatch();
+        }
+    };
     private Dispatcher dispatcher;
     private boolean dispatcherIsBusy;
     private boolean dryRun = false;
-    private Handler handler;
-    private HitStore hitStore;
+    /* access modifiers changed from: private */
+    public Handler handler;
+    /* access modifiers changed from: private */
+    public HitStore hitStore;
     private Map<String, Map<String, Item>> itemMap = new HashMap();
     private Context parent;
     private boolean powerSaveMode;
@@ -38,33 +44,16 @@ public class GoogleAnalyticsTracker {
     private String userAgentProduct = PRODUCT;
     private String userAgentVersion = VERSION;
 
-    /* renamed from: com.google.android.apps.analytics.GoogleAnalyticsTracker$1 */
-    class C05981 implements Runnable {
-        C05981() {
-        }
-
-        public void run() {
-            GoogleAnalyticsTracker.this.dispatch();
-        }
-    }
-
     final class DispatcherCallbacks implements Callbacks {
-
-        /* renamed from: com.google.android.apps.analytics.GoogleAnalyticsTracker$DispatcherCallbacks$1 */
-        class C05991 implements Runnable {
-            C05991() {
-            }
-
-            public void run() {
-                GoogleAnalyticsTracker.this.dispatchFinished();
-            }
-        }
-
         DispatcherCallbacks() {
         }
 
         public void dispatchFinished() {
-            GoogleAnalyticsTracker.this.handler.post(new C05991());
+            GoogleAnalyticsTracker.this.handler.post(new Runnable() {
+                public void run() {
+                    GoogleAnalyticsTracker.this.dispatchFinished();
+                }
+            });
         }
 
         public void hitDispatched(long j) {
@@ -167,7 +156,8 @@ public class GoogleAnalyticsTracker {
         }
     }
 
-    void dispatchFinished() {
+    /* access modifiers changed from: 0000 */
+    public void dispatchFinished() {
         this.dispatcherIsBusy = false;
     }
 
@@ -179,11 +169,13 @@ public class GoogleAnalyticsTracker {
         return this.debug;
     }
 
-    Dispatcher getDispatcher() {
+    /* access modifiers changed from: 0000 */
+    public Dispatcher getDispatcher() {
         return this.dispatcher;
     }
 
-    HitStore getHitStore() {
+    /* access modifiers changed from: 0000 */
+    public HitStore getHitStore() {
         return this.hitStore;
     }
 
@@ -191,8 +183,12 @@ public class GoogleAnalyticsTracker {
         return this.sampleRate;
     }
 
-    String getSessionIdForAds() {
-        return this.hitStore == null ? null : this.hitStore.getSessionId();
+    /* access modifiers changed from: 0000 */
+    public String getSessionIdForAds() {
+        if (this.hitStore == null) {
+            return null;
+        }
+        return this.hitStore.getSessionId();
     }
 
     public String getVisitorCustomVar(int i) {
@@ -202,20 +198,26 @@ public class GoogleAnalyticsTracker {
         throw new IllegalArgumentException(CustomVariable.INDEX_ERROR_MSG);
     }
 
-    String getVisitorIdForAds() {
-        return this.hitStore == null ? null : this.hitStore.getVisitorId();
+    /* access modifiers changed from: 0000 */
+    public String getVisitorIdForAds() {
+        if (this.hitStore == null) {
+            return null;
+        }
+        return this.hitStore.getVisitorId();
     }
 
     public boolean isDryRun() {
         return this.dryRun;
     }
 
-    void returnToInitialState() {
+    /* access modifiers changed from: 0000 */
+    public void returnToInitialState() {
         instance = new GoogleAnalyticsTracker();
     }
 
-    void setAdHitIdGenerator(AdHitIdGenerator adHitIdGenerator) {
-        this.adHitIdGenerator = adHitIdGenerator;
+    /* access modifiers changed from: 0000 */
+    public void setAdHitIdGenerator(AdHitIdGenerator adHitIdGenerator2) {
+        this.adHitIdGenerator = adHitIdGenerator2;
     }
 
     public void setAnonymizeIp(boolean z) {
@@ -257,14 +259,14 @@ public class GoogleAnalyticsTracker {
         }
     }
 
-    public boolean setDispatcher(Dispatcher dispatcher) {
+    public boolean setDispatcher(Dispatcher dispatcher2) {
         if (this.dispatcherIsBusy) {
             return false;
         }
         if (this.dispatcher != null) {
             this.dispatcher.stop();
         }
-        this.dispatcher = dispatcher;
+        this.dispatcher = dispatcher2;
         this.dispatcher.init(new DispatcherCallbacks());
         this.dispatcher.setDryRun(this.dryRun);
         return true;
@@ -309,22 +311,24 @@ public class GoogleAnalyticsTracker {
         startNewSession(str, i, context);
     }
 
-    void start(String str, int i, Context context, HitStore hitStore, Dispatcher dispatcher, boolean z) {
-        start(str, i, context, hitStore, dispatcher, z, new DispatcherCallbacks());
+    /* access modifiers changed from: 0000 */
+    public void start(String str, int i, Context context, HitStore hitStore2, Dispatcher dispatcher2, boolean z) {
+        start(str, i, context, hitStore2, dispatcher2, z, new DispatcherCallbacks());
     }
 
-    void start(String str, int i, Context context, HitStore hitStore, Dispatcher dispatcher, boolean z, Callbacks callbacks) {
+    /* access modifiers changed from: 0000 */
+    public void start(String str, int i, Context context, HitStore hitStore2, Dispatcher dispatcher2, boolean z, Callbacks callbacks) {
         this.accountId = str;
         if (context == null) {
             throw new NullPointerException("Context cannot be null");
         }
         this.parent = context.getApplicationContext();
-        this.hitStore = hitStore;
+        this.hitStore = hitStore2;
         this.adHitIdGenerator = new AdHitIdGenerator();
         if (z) {
             this.hitStore.startNewVisit();
         }
-        this.dispatcher = dispatcher;
+        this.dispatcher = dispatcher2;
         this.dispatcher.init(callbacks);
         this.dispatcherIsBusy = false;
         if (this.connectivityManager == null) {
@@ -338,26 +342,27 @@ public class GoogleAnalyticsTracker {
         setDispatchPeriod(i);
     }
 
-    void start(String str, int i, Context context, boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void start(String str, int i, Context context, boolean z) {
+        HitStore hitStore2;
+        Dispatcher dispatcher2;
         if (context == null) {
             throw new NullPointerException("Context cannot be null");
         }
-        HitStore persistentHitStore;
-        Dispatcher networkDispatcher;
         if (this.hitStore == null) {
-            persistentHitStore = new PersistentHitStore(context);
-            persistentHitStore.setAnonymizeIp(this.anonymizeIp);
-            persistentHitStore.setSampleRate(this.sampleRate);
+            hitStore2 = new PersistentHitStore(context);
+            hitStore2.setAnonymizeIp(this.anonymizeIp);
+            hitStore2.setSampleRate(this.sampleRate);
         } else {
-            persistentHitStore = this.hitStore;
+            hitStore2 = this.hitStore;
         }
         if (this.dispatcher == null) {
-            networkDispatcher = new NetworkDispatcher(this.userAgentProduct, this.userAgentVersion);
-            networkDispatcher.setDryRun(this.dryRun);
+            dispatcher2 = new NetworkDispatcher(this.userAgentProduct, this.userAgentVersion);
+            dispatcher2.setDryRun(this.dryRun);
         } else {
-            networkDispatcher = this.dispatcher;
+            dispatcher2 = this.dispatcher;
         }
-        start(str, i, context, persistentHitStore, networkDispatcher, z);
+        start(str, i, context, hitStore2, dispatcher2, z);
     }
 
     @Deprecated
@@ -407,9 +412,9 @@ public class GoogleAnalyticsTracker {
             Map map = (Map) this.itemMap.get(transaction.getOrderId());
             if (map != null) {
                 for (Item item : map.values()) {
-                    event = new Event(this.accountId, "__##GOOGLEITEM##__", "", "", 0, this.parent.getResources().getDisplayMetrics().widthPixels, this.parent.getResources().getDisplayMetrics().heightPixels);
-                    event.setItem(item);
-                    this.hitStore.putEvent(event);
+                    Event event2 = new Event(this.accountId, "__##GOOGLEITEM##__", "", "", 0, this.parent.getResources().getDisplayMetrics().widthPixels, this.parent.getResources().getDisplayMetrics().heightPixels);
+                    event2.setItem(item);
+                    this.hitStore.putEvent(event2);
                 }
             }
         }

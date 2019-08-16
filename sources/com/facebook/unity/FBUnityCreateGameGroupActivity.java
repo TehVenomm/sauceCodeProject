@@ -14,7 +14,8 @@ import java.util.Locale;
 public class FBUnityCreateGameGroupActivity extends BaseActivity {
     public static String CREATE_GAME_GROUP_PARAMS = "create_game_group_params";
 
-    protected void onCreate(Bundle bundle) {
+    /* access modifiers changed from: protected */
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Builder builder = new Builder();
         Bundle bundleExtra = getIntent().getBundleExtra(CREATE_GAME_GROUP_PARAMS);

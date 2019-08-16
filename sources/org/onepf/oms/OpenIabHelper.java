@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,111 +80,41 @@ public class OpenIabHelper {
     public static final int SETUP_RESULT_FAILED = 1;
     public static final int SETUP_RESULT_NOT_STARTED = -1;
     public static final int SETUP_RESULT_SUCCESSFUL = 0;
+    /* access modifiers changed from: private */
     @Nullable
-    private Activity activity;
+    public Activity activity;
     @Nullable
     private volatile AppstoreInAppBillingService appStoreBillingService;
-    private final Map<String, AppstoreFactory> appStoreFactoryMap;
+    /* access modifiers changed from: private */
+    public final Map<String, AppstoreFactory> appStoreFactoryMap;
+    /* access modifiers changed from: private */
     @Nullable
-    private volatile Appstore appStoreInSetup;
-    private final Map<String, String> appStorePackageMap;
+    public volatile Appstore appStoreInSetup;
+    /* access modifiers changed from: private */
+    public final Map<String, String> appStorePackageMap;
+    /* access modifiers changed from: private */
     @Nullable
-    private volatile Appstore appstore;
-    private final Set<Appstore> availableAppstores;
-    private final Context context;
-    private final Handler handler;
+    public volatile Appstore appstore;
+    /* access modifiers changed from: private */
+    public final Set<Appstore> availableAppstores;
+    /* access modifiers changed from: private */
+    public final Context context;
+    /* access modifiers changed from: private */
+    public final Handler handler;
+    /* access modifiers changed from: private */
     @NotNull
-    private final ExecutorService inventoryExecutor;
-    private final Options options;
+    public final ExecutorService inventoryExecutor;
+    /* access modifiers changed from: private */
+    public final Options options;
     private final PackageManager packageManager;
     @Nullable
     private ExecutorService setupExecutorService;
-    private volatile int setupState;
-
-    public interface OpenStoresDiscoveredListener {
-        void openStoresDiscovered(@NotNull List<Appstore> list);
-    }
+    /* access modifiers changed from: private */
+    public volatile int setupState;
 
     private interface AppstoreFactory {
         @Nullable
         Appstore get();
-    }
-
-    /* renamed from: org.onepf.oms.OpenIabHelper$1 */
-    class C13051 implements AppstoreFactory {
-        C13051() {
-        }
-
-        @NotNull
-        public Appstore get() {
-            return new FortumoStore(OpenIabHelper.this.context);
-        }
-    }
-
-    /* renamed from: org.onepf.oms.OpenIabHelper$2 */
-    class C13062 implements AppstoreFactory {
-        C13062() {
-        }
-
-        @NotNull
-        public Appstore get() {
-            return new GooglePlay(OpenIabHelper.this.context, OpenIabHelper.this.options.getVerifyMode() != 1 ? (String) OpenIabHelper.this.options.getStoreKeys().get(OpenIabHelper.NAME_GOOGLE) : null);
-        }
-    }
-
-    /* renamed from: org.onepf.oms.OpenIabHelper$3 */
-    class C13073 implements AppstoreFactory {
-        C13073() {
-        }
-
-        @NotNull
-        public Appstore get() {
-            return new AmazonAppstore(OpenIabHelper.this.context);
-        }
-    }
-
-    /* renamed from: org.onepf.oms.OpenIabHelper$4 */
-    class C13084 implements AppstoreFactory {
-        C13084() {
-        }
-
-        @Nullable
-        public Appstore get() {
-            return new SamsungApps(OpenIabHelper.this.activity, OpenIabHelper.this.options);
-        }
-    }
-
-    /* renamed from: org.onepf.oms.OpenIabHelper$5 */
-    class C13095 implements AppstoreFactory {
-        C13095() {
-        }
-
-        @NotNull
-        public Appstore get() {
-            return new NokiaStore(OpenIabHelper.this.context);
-        }
-    }
-
-    /* renamed from: org.onepf.oms.OpenIabHelper$6 */
-    class C13106 implements AppstoreFactory {
-        C13106() {
-        }
-
-        @NotNull
-        public Appstore get() {
-            return new SkubitAppstore(OpenIabHelper.this.context);
-        }
-    }
-
-    /* renamed from: org.onepf.oms.OpenIabHelper$7 */
-    class C13117 implements AppstoreFactory {
-        C13117() {
-        }
-
-        @NotNull
-        public Appstore get() {
-            return new SkubitTestAppstore(OpenIabHelper.this.context);
-        }
     }
 
     public interface OnInitListener {
@@ -192,6 +123,10 @@ public class OpenIabHelper {
 
     public interface OnOpenIabHelperInitFinished {
         void onOpenIabHelperInitFinished();
+    }
+
+    public interface OpenStoresDiscoveredListener {
+        void openStoresDiscovered(@NotNull List<Appstore> list);
     }
 
     public static class Options {
@@ -230,7 +165,7 @@ public class OpenIabHelper {
 
             @NotNull
             public Builder addAvailableStoreNames(@NotNull String... strArr) {
-                addAvailableStoreNames(Arrays.asList(strArr));
+                addAvailableStoreNames((Collection<String>) Arrays.asList(strArr));
                 return this;
             }
 
@@ -242,7 +177,7 @@ public class OpenIabHelper {
 
             @NotNull
             public Builder addAvailableStores(@NotNull Appstore... appstoreArr) {
-                addAvailableStores(Arrays.asList(appstoreArr));
+                addAvailableStores((Collection<Appstore>) Arrays.asList(appstoreArr));
                 return this;
             }
 
@@ -254,7 +189,7 @@ public class OpenIabHelper {
 
             @NotNull
             public Builder addPreferredStoreName(@NotNull String... strArr) {
-                addPreferredStoreName(Arrays.asList(strArr));
+                addPreferredStoreName((Collection<String>) Arrays.asList(strArr));
                 return this;
             }
 
@@ -264,7 +199,7 @@ public class OpenIabHelper {
                     Security.generatePublicKey(str2);
                     this.storeKeys.put(str, str2);
                     return this;
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     throw new IllegalArgumentException(String.format("Invalid publicKey for store: %s, key: %s.", new Object[]{str, str2}), e);
                 }
             }
@@ -411,19 +346,19 @@ public class OpenIabHelper {
         }
     }
 
-    public OpenIabHelper(@NotNull Context context, @NotNull Map<String, String> map) {
-        this(context, new Builder().addStoreKeys(map).build());
+    public OpenIabHelper(@NotNull Context context2, @NotNull Map<String, String> map) {
+        this(context2, new Builder().addStoreKeys(map).build());
     }
 
-    public OpenIabHelper(@NotNull Context context, @NotNull Map<String, String> map, String[] strArr) {
-        this(context, new Builder().addStoreKeys(map).addPreferredStoreName(strArr).build());
+    public OpenIabHelper(@NotNull Context context2, @NotNull Map<String, String> map, String[] strArr) {
+        this(context2, new Builder().addStoreKeys(map).addPreferredStoreName(strArr).build());
     }
 
-    public OpenIabHelper(@NotNull Context context, @NotNull Map<String, String> map, String[] strArr, Appstore[] appstoreArr) {
-        this(context, new Builder().addStoreKeys(map).addPreferredStoreName(strArr).addAvailableStores(appstoreArr).build());
+    public OpenIabHelper(@NotNull Context context2, @NotNull Map<String, String> map, String[] strArr, Appstore[] appstoreArr) {
+        this(context2, new Builder().addStoreKeys(map).addPreferredStoreName(strArr).addAvailableStores(appstoreArr).build());
     }
 
-    public OpenIabHelper(@NotNull Context context, Options options) {
+    public OpenIabHelper(@NotNull Context context2, Options options2) {
         this.setupState = -1;
         this.handler = new Handler(Looper.getMainLooper());
         this.availableAppstores = new LinkedHashSet();
@@ -432,54 +367,90 @@ public class OpenIabHelper {
         this.appStoreFactoryMap = new HashMap();
         this.appStorePackageMap.put(NAME_YANDEX, NAME_YANDEX);
         this.appStorePackageMap.put(NAME_APTOIDE, NAME_APTOIDE);
-        this.appStoreFactoryMap.put(NAME_FORTUMO, new C13051());
+        this.appStoreFactoryMap.put(NAME_FORTUMO, new AppstoreFactory() {
+            @NotNull
+            public Appstore get() {
+                return new FortumoStore(OpenIabHelper.this.context);
+            }
+        });
         this.appStorePackageMap.put("com.android.vending", NAME_GOOGLE);
-        this.appStoreFactoryMap.put(NAME_GOOGLE, new C13062());
+        this.appStoreFactoryMap.put(NAME_GOOGLE, new AppstoreFactory() {
+            @NotNull
+            public Appstore get() {
+                return new GooglePlay(OpenIabHelper.this.context, OpenIabHelper.this.options.getVerifyMode() != 1 ? (String) OpenIabHelper.this.options.getStoreKeys().get(OpenIabHelper.NAME_GOOGLE) : null);
+            }
+        });
         this.appStorePackageMap.put(AmazonAppstore.AMAZON_INSTALLER, NAME_AMAZON);
-        this.appStoreFactoryMap.put(NAME_AMAZON, new C13073());
+        this.appStoreFactoryMap.put(NAME_AMAZON, new AppstoreFactory() {
+            @NotNull
+            public Appstore get() {
+                return new AmazonAppstore(OpenIabHelper.this.context);
+            }
+        });
         this.appStorePackageMap.put(SamsungApps.SAMSUNG_INSTALLER, NAME_SAMSUNG);
-        this.appStoreFactoryMap.put(NAME_SAMSUNG, new C13084());
+        this.appStoreFactoryMap.put(NAME_SAMSUNG, new AppstoreFactory() {
+            @Nullable
+            public Appstore get() {
+                return new SamsungApps(OpenIabHelper.this.activity, OpenIabHelper.this.options);
+            }
+        });
         this.appStorePackageMap.put(NokiaStore.NOKIA_INSTALLER, NAME_NOKIA);
-        this.appStoreFactoryMap.put(NAME_NOKIA, new C13095());
+        this.appStoreFactoryMap.put(NAME_NOKIA, new AppstoreFactory() {
+            @NotNull
+            public Appstore get() {
+                return new NokiaStore(OpenIabHelper.this.context);
+            }
+        });
         this.appStorePackageMap.put("com.skubit.android", "com.skubit.android");
-        this.appStoreFactoryMap.put("com.skubit.android", new C13106());
+        this.appStoreFactoryMap.put("com.skubit.android", new AppstoreFactory() {
+            @NotNull
+            public Appstore get() {
+                return new SkubitAppstore(OpenIabHelper.this.context);
+            }
+        });
         this.appStorePackageMap.put("net.skubit.android", "net.skubit.android");
-        this.appStoreFactoryMap.put("net.skubit.android", new C13117());
-        this.context = context.getApplicationContext();
-        this.packageManager = context.getPackageManager();
-        this.options = options;
-        if (context instanceof Activity) {
-            this.activity = (Activity) context;
+        this.appStoreFactoryMap.put("net.skubit.android", new AppstoreFactory() {
+            @NotNull
+            public Appstore get() {
+                return new SkubitTestAppstore(OpenIabHelper.this.context);
+            }
+        });
+        this.context = context2.getApplicationContext();
+        this.packageManager = context2.getPackageManager();
+        this.options = options2;
+        if (context2 instanceof Activity) {
+            this.activity = (Activity) context2;
         }
         checkOptions();
     }
 
     private void checkAmazon() {
+        boolean z;
         if (VERSION.SDK_INT >= 21) {
-            Logger.m1000d("checkAmazon() Android Lollipop not supported, ignoring amazon wrapper.");
+            Logger.m1025d("checkAmazon() Android Lollipop not supported, ignoring amazon wrapper.");
             this.appStoreFactoryMap.remove(NAME_AMAZON);
             return;
         }
-        boolean z;
         try {
             OpenIabHelper.class.getClassLoader().loadClass("com.amazon.device.iap.PurchasingService");
             z = true;
         } catch (ClassNotFoundException e) {
             z = false;
         }
-        Logger.m1001d("checkAmazon() amazon sdk available: ", Boolean.valueOf(z));
+        Logger.m1026d("checkAmazon() amazon sdk available: ", Boolean.valueOf(z));
         if (!z) {
-            z = this.options.getAvailableStoreByName(NAME_AMAZON) != null || this.options.getAvailableStoreNames().contains(NAME_AMAZON) || this.options.getPreferredStoreNames().contains(NAME_AMAZON);
-            Logger.m1001d("checkAmazon() amazon billing required: ", Boolean.valueOf(z));
-            if (z) {
+            boolean z2 = this.options.getAvailableStoreByName(NAME_AMAZON) != null || this.options.getAvailableStoreNames().contains(NAME_AMAZON) || this.options.getPreferredStoreNames().contains(NAME_AMAZON);
+            Logger.m1026d("checkAmazon() amazon billing required: ", Boolean.valueOf(z2));
+            if (z2) {
                 throw new IllegalStateException("You must satisfy amazon sdk dependency.");
             }
-            Logger.m1000d("checkAmazon() ignoring amazon wrapper.");
+            Logger.m1025d("checkAmazon() ignoring amazon wrapper.");
             this.appStoreFactoryMap.remove(NAME_AMAZON);
         }
     }
 
-    private void checkBillingAndFinish(@NotNull final OnIabSetupFinishedListener onIabSetupFinishedListener, @NotNull final Collection<Appstore> collection) {
+    /* access modifiers changed from: private */
+    public void checkBillingAndFinish(@NotNull final OnIabSetupFinishedListener onIabSetupFinishedListener, @NotNull final Collection<Appstore> collection) {
         if (this.setupState != 3) {
             throw new IllegalStateException("Can't check billing. Current state: " + setupStateToString(this.setupState));
         }
@@ -489,22 +460,22 @@ public class OpenIabHelper {
         } else {
             this.setupExecutorService.execute(this.options.isCheckInventory() ? new Runnable() {
                 public void run() {
-                    final List arrayList = new ArrayList();
+                    final ArrayList arrayList = new ArrayList();
                     for (Appstore appstore : collection) {
                         OpenIabHelper.this.appStoreInSetup = appstore;
                         if (appstore.isBillingAvailable(packageName) && OpenIabHelper.this.versionOk(appstore)) {
                             arrayList.add(appstore);
                         }
                     }
-                    Appstore appstore2 = OpenIabHelper.this.checkInventory(new HashSet(arrayList));
-                    if (appstore2 == null) {
-                        appstore2 = arrayList.isEmpty() ? null : (Appstore) arrayList.get(0);
+                    final Appstore access$1500 = OpenIabHelper.this.checkInventory(new HashSet(arrayList));
+                    if (access$1500 == null) {
+                        access$1500 = arrayList.isEmpty() ? null : (Appstore) arrayList.get(0);
                     }
-                    final OnIabSetupFinishedListener c12971 = new OnIabSetupFinishedListener() {
+                    final C15091 r2 = new OnIabSetupFinishedListener() {
                         public void onIabSetupFinished(IabResult iabResult) {
-                            Collection arrayList = new ArrayList(arrayList);
-                            if (appstore2 != null) {
-                                arrayList.remove(appstore2);
+                            ArrayList arrayList = new ArrayList(arrayList);
+                            if (access$1500 != null) {
+                                arrayList.remove(access$1500);
                             }
                             OpenIabHelper.this.dispose(arrayList);
                             onIabSetupFinishedListener.onIabSetupFinished(iabResult);
@@ -512,28 +483,34 @@ public class OpenIabHelper {
                     };
                     OpenIabHelper.this.handler.post(new Runnable() {
                         public void run() {
-                            OpenIabHelper.this.finishSetup(c12971, appstore2);
+                            OpenIabHelper.this.finishSetup(r2, access$1500);
                         }
                     });
                 }
             } : new Runnable() {
                 public void run() {
-                    for (Appstore appstore : collection) {
+                    final Appstore appstore;
+                    Iterator it = collection.iterator();
+                    while (true) {
+                        if (!it.hasNext()) {
+                            appstore = null;
+                            break;
+                        }
+                        appstore = (Appstore) it.next();
                         OpenIabHelper.this.appStoreInSetup = appstore;
                         if (appstore.isBillingAvailable(packageName) && OpenIabHelper.this.versionOk(appstore)) {
                             break;
                         }
                     }
-                    Appstore appstore2 = null;
-                    final OnIabSetupFinishedListener c12991 = new OnIabSetupFinishedListener() {
+                    final C15121 r1 = new OnIabSetupFinishedListener() {
                         public void onIabSetupFinished(IabResult iabResult) {
-                            Collection arrayList = new ArrayList(collection);
-                            if (appstore2 != null) {
-                                arrayList.remove(appstore2);
+                            ArrayList arrayList = new ArrayList(collection);
+                            if (appstore != null) {
+                                arrayList.remove(appstore);
                             }
                             OpenIabHelper.this.dispose(arrayList);
-                            if (appstore2 != null) {
-                                appstore2.getInAppBillingService().startSetup(onIabSetupFinishedListener);
+                            if (appstore != null) {
+                                appstore.getInAppBillingService().startSetup(onIabSetupFinishedListener);
                             } else {
                                 onIabSetupFinishedListener.onIabSetupFinished(iabResult);
                             }
@@ -541,7 +518,7 @@ public class OpenIabHelper {
                     };
                     OpenIabHelper.this.handler.post(new Runnable() {
                         public void run() {
-                            OpenIabHelper.this.finishSetup(c12991, appstore2);
+                            OpenIabHelper.this.finishSetup(r1, appstore);
                         }
                     });
                 }
@@ -549,12 +526,13 @@ public class OpenIabHelper {
         }
     }
 
-    private void checkBillingAndFinish(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @Nullable Appstore appstore) {
-        if (appstore == null) {
+    /* access modifiers changed from: private */
+    public void checkBillingAndFinish(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @Nullable Appstore appstore2) {
+        if (appstore2 == null) {
             finishSetup(onIabSetupFinishedListener);
             return;
         }
-        checkBillingAndFinish(onIabSetupFinishedListener, Arrays.asList(new Appstore[]{appstore}));
+        checkBillingAndFinish(onIabSetupFinishedListener, (Collection<Appstore>) Arrays.asList(new Appstore[]{appstore2}));
     }
 
     private void checkFortumo() {
@@ -565,29 +543,30 @@ public class OpenIabHelper {
         } catch (ClassNotFoundException e) {
             z = false;
         }
-        Logger.m1001d("checkFortumo() fortumo sdk available: ", Boolean.valueOf(z));
+        Logger.m1026d("checkFortumo() fortumo sdk available: ", Boolean.valueOf(z));
         if (!z) {
-            z = this.options.getAvailableStoreByName(NAME_FORTUMO) != null || this.options.getAvailableStoreNames().contains(NAME_FORTUMO) || this.options.getPreferredStoreNames().contains(NAME_FORTUMO);
-            Logger.m1001d("checkFortumo() fortumo billing required: ", Boolean.valueOf(z));
-            if (z) {
+            boolean z2 = this.options.getAvailableStoreByName(NAME_FORTUMO) != null || this.options.getAvailableStoreNames().contains(NAME_FORTUMO) || this.options.getPreferredStoreNames().contains(NAME_FORTUMO);
+            Logger.m1026d("checkFortumo() fortumo billing required: ", Boolean.valueOf(z2));
+            if (z2) {
                 throw new IllegalStateException("You must satisfy fortumo sdk dependency.");
             }
-            Logger.m1000d("checkFortumo() ignoring fortumo wrapper.");
+            Logger.m1025d("checkFortumo() ignoring fortumo wrapper.");
             this.appStoreFactoryMap.remove(NAME_FORTUMO);
         }
     }
 
     private void checkGoogle() {
-        int i = 0;
-        Logger.m1000d("checkGoogle() verify mode = " + this.options.getVerifyMode());
+        boolean z = false;
+        Logger.m1025d("checkGoogle() verify mode = " + this.options.getVerifyMode());
         if (this.options.getVerifyMode() != 1) {
-            Logger.m1001d("checkGoogle() google key available = ", Boolean.valueOf(this.options.getStoreKeys().containsKey(NAME_GOOGLE)));
-            if (!this.options.getStoreKeys().containsKey(NAME_GOOGLE)) {
+            boolean containsKey = this.options.getStoreKeys().containsKey(NAME_GOOGLE);
+            Logger.m1026d("checkGoogle() google key available = ", Boolean.valueOf(containsKey));
+            if (!containsKey) {
                 if (this.options.getAvailableStoreByName(NAME_GOOGLE) != null || this.options.getAvailableStoreNames().contains(NAME_GOOGLE) || this.options.getPreferredStoreNames().contains(NAME_GOOGLE)) {
-                    i = 1;
+                    z = true;
                 }
-                if (i == 0 || this.options.getVerifyMode() != 0) {
-                    Logger.m1000d("checkGoogle() ignoring GooglePlay wrapper.");
+                if (!z || this.options.getVerifyMode() != 0) {
+                    Logger.m1025d("checkGoogle() ignoring GooglePlay wrapper.");
                     this.appStoreFactoryMap.remove(NAME_GOOGLE);
                     return;
                 }
@@ -596,47 +575,41 @@ public class OpenIabHelper {
         }
     }
 
+    /* access modifiers changed from: private */
     @Nullable
-    private Appstore checkInventory(@NotNull Set<Appstore> set) {
+    public Appstore checkInventory(@NotNull Set<Appstore> set) {
         if (Utils.uiThread()) {
             throw new IllegalStateException("Must not be called from UI thread");
         }
         final Semaphore semaphore = new Semaphore(0);
         final Appstore[] appstoreArr = new Appstore[1];
-        for (final Appstore appstore : set) {
-            final AppstoreInAppBillingService inAppBillingService = appstore.getInAppBillingService();
-            final OnIabSetupFinishedListener anonymousClass15 = new OnIabSetupFinishedListener() {
-
-                /* renamed from: org.onepf.oms.OpenIabHelper$15$1 */
-                class C13011 implements Runnable {
-                    C13011() {
-                    }
-
-                    public void run() {
-                        try {
-                            Inventory queryInventory = inAppBillingService.queryInventory(false, null, null);
-                            if (!(queryInventory == null || queryInventory.getAllPurchases().isEmpty())) {
-                                appstoreArr[0] = appstore;
-                                Logger.dWithTimeFromUp("inventoryCheck() in ", appstore.getAppstoreName(), " found: ", Integer.valueOf(queryInventory.getAllPurchases().size()), " purchases");
-                            }
-                        } catch (IabException e) {
-                            Logger.m1005e("inventoryCheck() failed for ", appstore.getAppstoreName() + " : ", e);
-                        }
-                        semaphore.release();
-                    }
-                }
-
+        for (final Appstore appstore2 : set) {
+            final AppstoreInAppBillingService inAppBillingService = appstore2.getInAppBillingService();
+            final C151615 r0 = new OnIabSetupFinishedListener() {
                 public void onIabSetupFinished(@NotNull IabResult iabResult) {
-                    if (iabResult.isSuccess()) {
-                        OpenIabHelper.this.inventoryExecutor.execute(new C13011());
+                    if (!iabResult.isSuccess()) {
+                        semaphore.release();
                         return;
                     }
-                    semaphore.release();
+                    OpenIabHelper.this.inventoryExecutor.execute(new Runnable() {
+                        public void run() {
+                            try {
+                                Inventory queryInventory = inAppBillingService.queryInventory(false, null, null);
+                                if (queryInventory != null && !queryInventory.getAllPurchases().isEmpty()) {
+                                    appstoreArr[0] = appstore2;
+                                    Logger.dWithTimeFromUp("inventoryCheck() in ", appstore2.getAppstoreName(), " found: ", Integer.valueOf(queryInventory.getAllPurchases().size()), " purchases");
+                                }
+                            } catch (IabException e) {
+                                Logger.m1030e("inventoryCheck() failed for ", appstore2.getAppstoreName() + " : ", e);
+                            }
+                            semaphore.release();
+                        }
+                    });
                 }
             };
             this.handler.post(new Runnable() {
                 public void run() {
-                    inAppBillingService.startSetup(anonymousClass15);
+                    inAppBillingService.startSetup(r0);
                 }
             });
             try {
@@ -644,8 +617,8 @@ public class OpenIabHelper {
                 if (appstoreArr[0] != null) {
                     return appstoreArr[0];
                 }
-            } catch (Throwable e) {
-                Logger.m1003e("checkInventory() Error during inventory check: ", e);
+            } catch (InterruptedException e) {
+                Logger.m1028e("checkInventory() Error during inventory check: ", (Throwable) e);
                 return null;
             }
         }
@@ -653,47 +626,49 @@ public class OpenIabHelper {
     }
 
     private void checkNokia() {
-        Logger.m1001d("checkNokia() has permission = ", Boolean.valueOf(Utils.hasRequestedPermission(this.context, NokiaStore.NOKIA_BILLING_PERMISSION)));
-        if (!Utils.hasRequestedPermission(this.context, NokiaStore.NOKIA_BILLING_PERMISSION)) {
+        boolean hasRequestedPermission = Utils.hasRequestedPermission(this.context, NokiaStore.NOKIA_BILLING_PERMISSION);
+        Logger.m1026d("checkNokia() has permission = ", Boolean.valueOf(hasRequestedPermission));
+        if (!hasRequestedPermission) {
             if (this.options.getAvailableStoreByName(NAME_NOKIA) != null || this.options.getAvailableStoreNames().contains(NAME_NOKIA) || this.options.getPreferredStoreNames().contains(NAME_NOKIA)) {
                 throw new IllegalStateException("Nokia permission \"com.nokia.payment.BILLING\" NOT REQUESTED");
             }
-            Logger.m1000d("checkNokia() ignoring Nokia wrapper");
+            Logger.m1025d("checkNokia() ignoring Nokia wrapper");
             this.appStoreFactoryMap.remove(NAME_NOKIA);
         }
     }
 
     private void checkSamsung() {
-        Logger.m1001d("checkSamsung() activity = ", this.activity);
+        Logger.m1026d("checkSamsung() activity = ", this.activity);
         if (this.activity == null) {
             if (this.options.getAvailableStoreByName(NAME_SAMSUNG) != null || this.options.getAvailableStoreNames().contains(NAME_SAMSUNG) || this.options.getPreferredStoreNames().contains(NAME_SAMSUNG)) {
                 throw new IllegalArgumentException("You must supply Activity object as context in order to use com.samsung.apps store");
             }
-            Logger.m1000d("checkSamsung() ignoring Samsung wrapper");
+            Logger.m1025d("checkSamsung() ignoring Samsung wrapper");
             this.appStoreFactoryMap.remove(NAME_SAMSUNG);
         }
     }
 
     @NotNull
     @Deprecated
-    public static List<Appstore> discoverOpenStores(Context context, List<Appstore> list, Options options) {
+    public static List<Appstore> discoverOpenStores(Context context2, List<Appstore> list, Options options2) {
         throw new UnsupportedOperationException("This action is no longer supported.");
     }
 
-    private void discoverOpenStores(@NotNull final OpenStoresDiscoveredListener openStoresDiscoveredListener, @NotNull final Queue<Intent> queue, @NotNull final List<Appstore> list) {
+    /* access modifiers changed from: private */
+    public void discoverOpenStores(@NotNull final OpenStoresDiscoveredListener openStoresDiscoveredListener, @NotNull final Queue<Intent> queue, @NotNull final List<Appstore> list) {
         while (!queue.isEmpty()) {
             Intent intent = (Intent) queue.poll();
-            ServiceConnection anonymousClass14 = new ServiceConnection() {
+            C151514 r1 = new ServiceConnection() {
                 public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                    Object access$600;
+                    OpenAppstore openAppstore;
                     try {
-                        access$600 = OpenIabHelper.this.getOpenAppstore(componentName, iBinder, this);
-                    } catch (Throwable e) {
-                        Logger.m1010w("onServiceConnected() Error creating appsotre: ", e);
-                        access$600 = null;
+                        openAppstore = OpenIabHelper.this.getOpenAppstore(componentName, iBinder, this);
+                    } catch (RemoteException e) {
+                        Logger.m1035w("onServiceConnected() Error creating appsotre: ", e);
+                        openAppstore = null;
                     }
-                    if (access$600 != null) {
-                        list.add(access$600);
+                    if (openAppstore != null) {
+                        list.add(openAppstore);
                     }
                     OpenIabHelper.this.discoverOpenStores(openStoresDiscoveredListener, queue, list);
                 }
@@ -701,9 +676,9 @@ public class OpenIabHelper {
                 public void onServiceDisconnected(ComponentName componentName) {
                 }
             };
-            if (!this.context.bindService(intent, anonymousClass14, 1)) {
-                this.context.unbindService(anonymousClass14);
-                Logger.m1002e("discoverOpenStores() Couldn't connect to open store: " + intent);
+            if (!this.context.bindService(intent, r1, 1)) {
+                this.context.unbindService(r1);
+                Logger.m1027e("discoverOpenStores() Couldn't connect to open store: " + intent);
             } else {
                 return;
             }
@@ -711,10 +686,11 @@ public class OpenIabHelper {
         openStoresDiscoveredListener.openStoresDiscovered(Collections.unmodifiableList(list));
     }
 
-    private void dispose(@NotNull Collection<Appstore> collection) {
-        for (Appstore inAppBillingService : collection) {
-            inAppBillingService.getInAppBillingService().dispose();
-            Logger.m1001d("dispose() was called for ", inAppBillingService.getAppstoreName());
+    /* access modifiers changed from: private */
+    public void dispose(@NotNull Collection<Appstore> collection) {
+        for (Appstore appstore2 : collection) {
+            appstore2.getInAppBillingService().dispose();
+            Logger.m1026d("dispose() was called for ", appstore2.getAppstoreName());
         }
     }
 
@@ -731,63 +707,61 @@ public class OpenIabHelper {
         finishSetup(onIabSetupFinishedListener, null);
     }
 
-    private void finishSetup(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @Nullable Appstore appstore) {
-        finishSetup(onIabSetupFinishedListener, appstore == null ? new IabResult(3, "No suitable appstore was found") : new IabResult(0, "Setup ok"), appstore);
+    /* access modifiers changed from: private */
+    public void finishSetup(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @Nullable Appstore appstore2) {
+        finishSetup(onIabSetupFinishedListener, appstore2 == null ? new IabResult(3, "No suitable appstore was found") : new IabResult(0, "Setup ok"), appstore2);
     }
 
-    private void finishSetup(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @NotNull IabResult iabResult, @Nullable Appstore appstore) {
-        if (Utils.uiThread()) {
-            this.activity = null;
-            this.appStoreInSetup = null;
-            this.setupExecutorService.shutdownNow();
-            this.setupExecutorService = null;
-            if (this.setupState == 2) {
-                if (appstore != null) {
-                    dispose(Arrays.asList(new Appstore[]{appstore}));
-                    return;
-                }
-                return;
-            } else if (this.setupState != 3) {
-                throw new IllegalStateException("Setup is not started or already finished.");
-            } else {
-                boolean isSuccess = iabResult.isSuccess();
-                this.setupState = isSuccess ? 0 : 1;
-                if (isSuccess) {
-                    if (appstore == null) {
-                        throw new IllegalStateException("Appstore can't be null if setup is successful");
-                    }
-                    this.appstore = appstore;
-                    this.appStoreBillingService = appstore.getInAppBillingService();
-                }
-                Logger.dWithTimeFromUp("finishSetup() === SETUP DONE === result: ", iabResult, " Appstore: ", appstore);
-                onIabSetupFinishedListener.onIabSetupFinished(iabResult);
-                return;
-            }
+    private void finishSetup(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @NotNull IabResult iabResult, @Nullable Appstore appstore2) {
+        if (!Utils.uiThread()) {
+            throw new IllegalStateException("Must be called from UI thread.");
         }
-        throw new IllegalStateException("Must be called from UI thread.");
+        this.activity = null;
+        this.appStoreInSetup = null;
+        this.setupExecutorService.shutdownNow();
+        this.setupExecutorService = null;
+        if (this.setupState == 2) {
+            if (appstore2 != null) {
+                dispose(Arrays.asList(new Appstore[]{appstore2}));
+            }
+        } else if (this.setupState != 3) {
+            throw new IllegalStateException("Setup is not started or already finished.");
+        } else {
+            boolean isSuccess = iabResult.isSuccess();
+            this.setupState = isSuccess ? 0 : 1;
+            if (isSuccess) {
+                if (appstore2 == null) {
+                    throw new IllegalStateException("Appstore can't be null if setup is successful");
+                }
+                this.appstore = appstore2;
+                this.appStoreBillingService = appstore2.getInAppBillingService();
+            }
+            Logger.dWithTimeFromUp("finishSetup() === SETUP DONE === result: ", iabResult, " Appstore: ", appstore2);
+            onIabSetupFinishedListener.onIabSetupFinished(iabResult);
+        }
     }
 
     private void finishSetupWithError(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener) {
         finishSetupWithError(onIabSetupFinishedListener, null);
     }
 
-    private void finishSetupWithError(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @Nullable Exception exception) {
-        String str = exception == null ? "" : " : " + exception;
-        Logger.m1005e("finishSetupWithError() error occurred during setup", str);
+    private void finishSetupWithError(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener, @Nullable Exception exc) {
+        Logger.m1030e("finishSetupWithError() error occurred during setup", exc == null ? "" : " : " + exc);
         finishSetup(onIabSetupFinishedListener, new IabResult(6, "Error occured, setup failed"), null);
     }
 
     @Nullable
     public static List<String> getAllStoreSkus(@NotNull String str) {
-        Collection allStoreSkus = SkuManager.getInstance().getAllStoreSkus(str);
+        List allStoreSkus = SkuManager.getInstance().getAllStoreSkus(str);
         return allStoreSkus == null ? Collections.emptyList() : new ArrayList(allStoreSkus);
     }
 
+    /* access modifiers changed from: private */
     @Nullable
-    private Appstore getAvailableStoreByName(@NotNull String str) {
-        for (Appstore appstore : this.availableAppstores) {
-            if (str.equals(appstore.getAppstoreName())) {
-                return appstore;
+    public Appstore getAvailableStoreByName(@NotNull String str) {
+        for (Appstore appstore2 : this.availableAppstores) {
+            if (str.equals(appstore2.getAppstoreName())) {
+                return appstore2;
             }
         }
         return null;
@@ -800,31 +774,28 @@ public class OpenIabHelper {
         return intent;
     }
 
+    /* access modifiers changed from: private */
     @Nullable
-    private OpenAppstore getOpenAppstore(ComponentName componentName, IBinder iBinder, ServiceConnection serviceConnection) throws RemoteException {
+    public OpenAppstore getOpenAppstore(ComponentName componentName, IBinder iBinder, ServiceConnection serviceConnection) throws RemoteException {
         IOpenAppstore asInterface = Stub.asInterface(iBinder);
-        Object appstoreName = asInterface.getAppstoreName();
+        String appstoreName = asInterface.getAppstoreName();
         Intent billingServiceIntent = asInterface.getBillingServiceIntent();
         int verifyMode = this.options.getVerifyMode();
-        if (verifyMode == 1) {
-            Object obj = null;
-        } else {
-            String str = (String) this.options.getStoreKeys().get(appstoreName);
-        }
+        String str = verifyMode == 1 ? null : (String) this.options.getStoreKeys().get(appstoreName);
         if (TextUtils.isEmpty(appstoreName)) {
-            Logger.m1001d("getOpenAppstore() Appstore doesn't have name. Skipped. ComponentName: ", componentName);
+            Logger.m1026d("getOpenAppstore() Appstore doesn't have name. Skipped. ComponentName: ", componentName);
             return null;
         } else if (billingServiceIntent == null) {
-            Logger.m1001d("getOpenAppstore() billing is not supported by store: ", componentName);
+            Logger.m1026d("getOpenAppstore() billing is not supported by store: ", componentName);
             return null;
-        } else if (verifyMode == 0 && TextUtils.isEmpty(obj)) {
-            Logger.m1005e("getOpenAppstore() verification is required but publicKey is not provided: ", componentName);
-            return null;
-        } else {
-            OpenAppstore openAppstore = new OpenAppstore(this.context, appstoreName, asInterface, billingServiceIntent, obj, serviceConnection);
+        } else if (verifyMode != 0 || !TextUtils.isEmpty(str)) {
+            OpenAppstore openAppstore = new OpenAppstore(this.context, appstoreName, asInterface, billingServiceIntent, str, serviceConnection);
             openAppstore.componentName = componentName;
-            Logger.m1001d("getOpenAppstore() returns ", openAppstore.getAppstoreName());
+            Logger.m1026d("getOpenAppstore() returns ", openAppstore.getAppstoreName());
             return openAppstore;
+        } else {
+            Logger.m1030e("getOpenAppstore() verification is required but publicKey is not provided: ", componentName);
+            return null;
         }
     }
 
@@ -849,167 +820,151 @@ public class OpenIabHelper {
     @NotNull
     private List<ServiceInfo> queryOpenStoreServices() {
         List<ResolveInfo> queryIntentServices = this.context.getPackageManager().queryIntentServices(new Intent(BIND_INTENT), 0);
-        List arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (ResolveInfo resolveInfo : queryIntentServices) {
             arrayList.add(resolveInfo.serviceInfo);
         }
         return Collections.unmodifiableList(arrayList);
     }
 
-    private void setup(@NotNull final OnIabSetupFinishedListener onIabSetupFinishedListener) {
-        final Collection linkedHashSet = new LinkedHashSet();
+    /* access modifiers changed from: private */
+    public void setup(@NotNull final OnIabSetupFinishedListener onIabSetupFinishedListener) {
+        final LinkedHashSet linkedHashSet = new LinkedHashSet();
         final Set<String> availableStoreNames = this.options.getAvailableStoreNames();
-        if (this.availableAppstores.isEmpty() && availableStoreNames.isEmpty()) {
-            discoverOpenStores(new OpenStoresDiscoveredListener() {
-                public void openStoresDiscovered(@NotNull List<Appstore> list) {
-                    Collection<Appstore> arrayList = new ArrayList(list);
-                    for (String str : OpenIabHelper.this.appStorePackageMap.keySet()) {
-                        String str2 = (String) OpenIabHelper.this.appStorePackageMap.get(str);
-                        if (!TextUtils.isEmpty(str2) && OpenIabHelper.this.appStoreFactoryMap.containsKey(str2) && Utils.packageInstalled(OpenIabHelper.this.context, str)) {
-                            arrayList.add(((AppstoreFactory) OpenIabHelper.this.appStoreFactoryMap.get(str2)).get());
-                        }
-                    }
-                    for (String str3 : OpenIabHelper.this.appStoreFactoryMap.keySet()) {
-                        if (!OpenIabHelper.this.appStorePackageMap.values().contains(str3)) {
-                            arrayList.add(((AppstoreFactory) OpenIabHelper.this.appStoreFactoryMap.get(str3)).get());
-                        }
-                    }
-                    for (String str32 : availableStoreNames) {
-                        for (Appstore appstore : arrayList) {
-                            if (TextUtils.equals(appstore.getAppstoreName(), str32)) {
-                                linkedHashSet.add(appstore);
-                                break;
-                            }
-                        }
-                    }
-                    linkedHashSet.addAll(arrayList);
-                    OpenIabHelper.this.checkBillingAndFinish(onIabSetupFinishedListener, linkedHashSet);
+        if (!this.availableAppstores.isEmpty() || !availableStoreNames.isEmpty()) {
+            for (String availableStoreByName : availableStoreNames) {
+                Appstore availableStoreByName2 = getAvailableStoreByName(availableStoreByName);
+                if (availableStoreByName2 != null) {
+                    linkedHashSet.add(availableStoreByName2);
                 }
-            });
+            }
+            linkedHashSet.addAll(this.availableAppstores);
+            checkBillingAndFinish(onIabSetupFinishedListener, (Collection<Appstore>) linkedHashSet);
             return;
         }
-        for (String availableStoreByName : availableStoreNames) {
-            Appstore availableStoreByName2 = getAvailableStoreByName(availableStoreByName);
-            if (availableStoreByName2 != null) {
-                linkedHashSet.add(availableStoreByName2);
+        discoverOpenStores(new OpenStoresDiscoveredListener() {
+            public void openStoresDiscovered(@NotNull List<Appstore> list) {
+                ArrayList arrayList = new ArrayList(list);
+                for (String str : OpenIabHelper.this.appStorePackageMap.keySet()) {
+                    String str2 = (String) OpenIabHelper.this.appStorePackageMap.get(str);
+                    if (!TextUtils.isEmpty(str2) && OpenIabHelper.this.appStoreFactoryMap.containsKey(str2) && Utils.packageInstalled(OpenIabHelper.this.context, str)) {
+                        arrayList.add(((AppstoreFactory) OpenIabHelper.this.appStoreFactoryMap.get(str2)).get());
+                    }
+                }
+                for (String str3 : OpenIabHelper.this.appStoreFactoryMap.keySet()) {
+                    if (!OpenIabHelper.this.appStorePackageMap.values().contains(str3)) {
+                        arrayList.add(((AppstoreFactory) OpenIabHelper.this.appStoreFactoryMap.get(str3)).get());
+                    }
+                }
+                for (String str4 : availableStoreNames) {
+                    Iterator it = arrayList.iterator();
+                    while (true) {
+                        if (!it.hasNext()) {
+                            break;
+                        }
+                        Appstore appstore = (Appstore) it.next();
+                        if (TextUtils.equals(appstore.getAppstoreName(), str4)) {
+                            linkedHashSet.add(appstore);
+                            break;
+                        }
+                    }
+                }
+                linkedHashSet.addAll(arrayList);
+                OpenIabHelper.this.checkBillingAndFinish(onIabSetupFinishedListener, (Collection<Appstore>) linkedHashSet);
             }
-        }
-        linkedHashSet.addAll(this.availableAppstores);
-        checkBillingAndFinish(onIabSetupFinishedListener, linkedHashSet);
+        });
     }
 
-    private void setupForPackage(@NotNull final OnIabSetupFinishedListener onIabSetupFinishedListener, @NotNull String str, final boolean z) {
-        if (Utils.packageInstalled(this.context, str)) {
-            Appstore availableStoreByName;
-            Intent bindServiceIntent;
-            if (this.appStorePackageMap.containsKey(str)) {
-                String str2 = (String) this.appStorePackageMap.get(str);
-                if (!this.availableAppstores.isEmpty()) {
-                    availableStoreByName = getAvailableStoreByName(str2);
-                    if (availableStoreByName == null) {
-                        if (z) {
-                            setup(onIabSetupFinishedListener);
-                            return;
-                        } else {
-                            finishSetup(onIabSetupFinishedListener);
-                            return;
-                        }
-                    }
-                } else if (this.appStoreFactoryMap.containsKey(str2)) {
-                    availableStoreByName = ((AppstoreFactory) this.appStoreFactoryMap.get(str2)).get();
-                }
-                if (availableStoreByName == null) {
-                    checkBillingAndFinish(onIabSetupFinishedListener, availableStoreByName);
-                }
-                for (ServiceInfo serviceInfo : queryOpenStoreServices()) {
-                    if (TextUtils.equals(serviceInfo.packageName, str)) {
-                        bindServiceIntent = getBindServiceIntent(serviceInfo);
-                        break;
-                    }
-                }
-                bindServiceIntent = null;
-                if (bindServiceIntent != null) {
-                    if (z) {
-                        finishSetup(onIabSetupFinishedListener);
-                        return;
-                    } else {
-                        setup(onIabSetupFinishedListener);
-                        return;
-                    }
-                } else if (!this.context.bindService(bindServiceIntent, new ServiceConnection() {
-                    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                        Appstore access$600;
-                        try {
-                            access$600 = OpenIabHelper.this.getOpenAppstore(componentName, iBinder, this);
-                            if (access$600 != null) {
-                                String appstoreName = access$600.getAppstoreName();
-                                if (!OpenIabHelper.this.availableAppstores.isEmpty()) {
-                                    access$600 = OpenIabHelper.this.getAvailableStoreByName(appstoreName);
-                                }
-                            } else {
-                                access$600 = null;
-                            }
-                        } catch (Throwable e) {
-                            Logger.m1003e("setupForPackage() Error binding to open store service : ", e);
-                            access$600 = null;
-                        }
-                        if (access$600 == null && z) {
-                            OpenIabHelper.this.setup(onIabSetupFinishedListener);
-                        } else {
-                            OpenIabHelper.this.checkBillingAndFinish(onIabSetupFinishedListener, access$600);
-                        }
-                    }
-
-                    public void onServiceDisconnected(ComponentName componentName) {
-                    }
-                }, 1)) {
-                    Logger.m1002e("setupForPackage() Error binding to open store service");
-                    if (z) {
-                        finishSetupWithError(onIabSetupFinishedListener);
-                        return;
-                    } else {
-                        setup(onIabSetupFinishedListener);
-                        return;
-                    }
-                } else {
-                    return;
-                }
-            }
-            availableStoreByName = null;
-            if (availableStoreByName == null) {
-                for (ServiceInfo serviceInfo2 : queryOpenStoreServices()) {
-                    if (TextUtils.equals(serviceInfo2.packageName, str)) {
-                        bindServiceIntent = getBindServiceIntent(serviceInfo2);
-                        break;
-                    }
-                }
-                bindServiceIntent = null;
-                if (bindServiceIntent != null) {
-                    if (!this.context.bindService(bindServiceIntent, /* anonymous class already generated */, 1)) {
-                        Logger.m1002e("setupForPackage() Error binding to open store service");
-                        if (z) {
-                            finishSetupWithError(onIabSetupFinishedListener);
-                            return;
-                        } else {
-                            setup(onIabSetupFinishedListener);
-                            return;
-                        }
-                    }
-                    return;
-                } else if (z) {
-                    finishSetup(onIabSetupFinishedListener);
-                    return;
-                } else {
-                    setup(onIabSetupFinishedListener);
-                    return;
-                }
-            }
-            checkBillingAndFinish(onIabSetupFinishedListener, availableStoreByName);
-        } else if (z) {
-            setup(onIabSetupFinishedListener);
-        } else {
-            finishSetup(onIabSetupFinishedListener);
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:13:0x0041  */
+    /* JADX WARNING: Removed duplicated region for block: B:19:0x0055  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void setupForPackage(@org.jetbrains.annotations.NotNull final org.onepf.oms.appstore.googleUtils.IabHelper.OnIabSetupFinishedListener r5, @org.jetbrains.annotations.NotNull java.lang.String r6, final boolean r7) {
+        /*
+            r4 = this;
+            r1 = 0
+            android.content.Context r0 = r4.context
+            boolean r0 = org.onepf.oms.util.Utils.packageInstalled(r0, r6)
+            if (r0 != 0) goto L_0x0013
+            if (r7 == 0) goto L_0x000f
+            r4.setup(r5)
+        L_0x000e:
+            return
+        L_0x000f:
+            r4.finishSetup(r5)
+            goto L_0x000e
+        L_0x0013:
+            java.util.Map<java.lang.String, java.lang.String> r0 = r4.appStorePackageMap
+            boolean r0 = r0.containsKey(r6)
+            if (r0 == 0) goto L_0x00a2
+            java.util.Map<java.lang.String, java.lang.String> r0 = r4.appStorePackageMap
+            java.lang.Object r0 = r0.get(r6)
+            java.lang.String r0 = (java.lang.String) r0
+            java.util.Set<org.onepf.oms.Appstore> r2 = r4.availableAppstores
+            boolean r2 = r2.isEmpty()
+            if (r2 == 0) goto L_0x0045
+            java.util.Map<java.lang.String, org.onepf.oms.OpenIabHelper$AppstoreFactory> r2 = r4.appStoreFactoryMap
+            boolean r2 = r2.containsKey(r0)
+            if (r2 == 0) goto L_0x00a2
+            java.util.Map<java.lang.String, org.onepf.oms.OpenIabHelper$AppstoreFactory> r2 = r4.appStoreFactoryMap
+            java.lang.Object r0 = r2.get(r0)
+            org.onepf.oms.OpenIabHelper$AppstoreFactory r0 = (org.onepf.oms.OpenIabHelper.AppstoreFactory) r0
+            org.onepf.oms.Appstore r0 = r0.get()
+        L_0x003f:
+            if (r0 == 0) goto L_0x0055
+            r4.checkBillingAndFinish(r5, r0)
+            goto L_0x000e
+        L_0x0045:
+            org.onepf.oms.Appstore r0 = r4.getAvailableStoreByName(r0)
+            if (r0 != 0) goto L_0x003f
+            if (r7 == 0) goto L_0x0051
+            r4.setup(r5)
+            goto L_0x000e
+        L_0x0051:
+            r4.finishSetup(r5)
+            goto L_0x000e
+        L_0x0055:
+            java.util.List r0 = r4.queryOpenStoreServices()
+            java.util.Iterator r2 = r0.iterator()
+        L_0x005d:
+            boolean r0 = r2.hasNext()
+            if (r0 == 0) goto L_0x00a0
+            java.lang.Object r0 = r2.next()
+            android.content.pm.ServiceInfo r0 = (android.content.pm.ServiceInfo) r0
+            java.lang.String r3 = r0.packageName
+            boolean r3 = android.text.TextUtils.equals(r3, r6)
+            if (r3 == 0) goto L_0x005d
+            android.content.Intent r0 = r4.getBindServiceIntent(r0)
+        L_0x0075:
+            if (r0 != 0) goto L_0x0081
+            if (r7 == 0) goto L_0x007d
+            r4.setup(r5)
+            goto L_0x000e
+        L_0x007d:
+            r4.finishSetup(r5)
+            goto L_0x000e
+        L_0x0081:
+            android.content.Context r1 = r4.context
+            org.onepf.oms.OpenIabHelper$9 r2 = new org.onepf.oms.OpenIabHelper$9
+            r2.<init>(r7, r5)
+            r3 = 1
+            boolean r0 = r1.bindService(r0, r2, r3)
+            if (r0 != 0) goto L_0x000e
+            java.lang.String r0 = "setupForPackage() Error binding to open store service"
+            org.onepf.oms.util.Logger.m1027e(r0)
+            if (r7 == 0) goto L_0x009b
+            r4.setup(r5)
+            goto L_0x000e
+        L_0x009b:
+            r4.finishSetupWithError(r5)
+            goto L_0x000e
+        L_0x00a0:
+            r0 = r1
+            goto L_0x0075
+        L_0x00a2:
+            r0 = r1
+            goto L_0x003f
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.onepf.oms.OpenIabHelper.setupForPackage(org.onepf.oms.appstore.googleUtils.IabHelper$OnIabSetupFinishedListener, java.lang.String, boolean):void");
     }
 
     private static String setupStateToString(int i) {
@@ -1031,12 +986,14 @@ public class OpenIabHelper {
         throw new IllegalStateException("Wrong setup state: " + i);
     }
 
-    private void setupWithStrategy(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener) {
+    /* access modifiers changed from: private */
+    public void setupWithStrategy(@NotNull OnIabSetupFinishedListener onIabSetupFinishedListener) {
         int storeSearchStrategy = this.options.getStoreSearchStrategy();
-        Logger.m1001d("setupWithStrategy() store search strategy = ", Integer.valueOf(storeSearchStrategy));
-        Logger.m1001d("setupWithStrategy() package name = ", this.context.getPackageName());
-        String installerPackageName = this.packageManager.getInstallerPackageName(r0);
-        Logger.m1001d("setupWithStrategy() package installer = ", installerPackageName);
+        Logger.m1026d("setupWithStrategy() store search strategy = ", Integer.valueOf(storeSearchStrategy));
+        String packageName = this.context.getPackageName();
+        Logger.m1026d("setupWithStrategy() package name = ", packageName);
+        String installerPackageName = this.packageManager.getInstallerPackageName(packageName);
+        Logger.m1026d("setupWithStrategy() package installer = ", installerPackageName);
         boolean z = !TextUtils.isEmpty(installerPackageName);
         if (storeSearchStrategy == 0) {
             if (z) {
@@ -1053,7 +1010,8 @@ public class OpenIabHelper {
         }
     }
 
-    private boolean versionOk(@NotNull Appstore appstore) {
+    /* access modifiers changed from: private */
+    public boolean versionOk(@NotNull Appstore appstore2) {
         try {
             int i = this.context.getPackageManager().getPackageInfo(this.context.getPackageName(), 0).versionCode;
         } catch (NameNotFoundException e) {
@@ -1062,7 +1020,7 @@ public class OpenIabHelper {
     }
 
     public void checkOptions() {
-        Logger.m1001d("checkOptions() ", this.options);
+        Logger.m1026d("checkOptions() ", this.options);
         checkGoogle();
         checkSamsung();
         checkNokia();
@@ -1070,19 +1028,21 @@ public class OpenIabHelper {
         checkAmazon();
     }
 
-    void checkSetupDone(String str) {
+    /* access modifiers changed from: 0000 */
+    public void checkSetupDone(String str) {
         if (!setupSuccessful()) {
-            Logger.m1005e("Illegal state for operation (", str, "): ", setupStateToString(this.setupState));
-            throw new IllegalStateException(setupStateToString(this.setupState) + " Can't perform operation: " + str);
+            String str2 = setupStateToString(this.setupState);
+            Logger.m1030e("Illegal state for operation (", str, "): ", str2);
+            throw new IllegalStateException(str2 + " Can't perform operation: " + str);
         }
     }
 
     public void consume(@NotNull Purchase purchase) throws IabException {
-        Appstore appstore = this.appstore;
+        Appstore appstore2 = this.appstore;
         AppstoreInAppBillingService appstoreInAppBillingService = this.appStoreBillingService;
-        if (this.setupState == 0 && appstore != null && appstoreInAppBillingService != null) {
+        if (this.setupState == 0 && appstore2 != null && appstoreInAppBillingService != null) {
             Purchase purchase2 = (Purchase) purchase.clone();
-            purchase2.setSku(SkuManager.getInstance().getStoreSku(appstore.getAppstoreName(), purchase.getSku()));
+            purchase2.setSku(SkuManager.getInstance().getStoreSku(appstore2.getAppstoreName(), purchase.getSku()));
             appstoreInAppBillingService.consume(purchase2);
         }
     }
@@ -1098,21 +1058,22 @@ public class OpenIabHelper {
         consumeAsyncInternal(Arrays.asList(new Purchase[]{purchase}), onConsumeFinishedListener, null);
     }
 
-    void consumeAsyncInternal(@NotNull final List<Purchase> list, @Nullable final OnConsumeFinishedListener onConsumeFinishedListener, @Nullable final OnConsumeMultiFinishedListener onConsumeMultiFinishedListener) {
+    /* access modifiers changed from: 0000 */
+    public void consumeAsyncInternal(@NotNull final List<Purchase> list, @Nullable final OnConsumeFinishedListener onConsumeFinishedListener, @Nullable final OnConsumeMultiFinishedListener onConsumeMultiFinishedListener) {
         checkSetupDone("consume");
         if (list.isEmpty()) {
             throw new IllegalArgumentException("Nothing to consume.");
         }
         new Thread(new Runnable() {
             public void run() {
-                final List arrayList = new ArrayList();
+                final ArrayList arrayList = new ArrayList();
                 for (Purchase purchase : list) {
                     try {
                         OpenIabHelper.this.consume(purchase);
                         arrayList.add(new IabResult(0, "Successful consume of sku " + purchase.getSku()));
-                    } catch (Throwable e) {
+                    } catch (IabException e) {
                         arrayList.add(e.getResult());
-                        Logger.m1003e("consumeAsyncInternal() Error : ", e);
+                        Logger.m1028e("consumeAsyncInternal() Error : ", (Throwable) e);
                     }
                 }
                 if (onConsumeFinishedListener != null) {
@@ -1142,7 +1103,7 @@ public class OpenIabHelper {
         if (Utils.uiThread()) {
             throw new IllegalStateException("Must not be called from UI thread");
         }
-        final List<Appstore> arrayList = new ArrayList();
+        final ArrayList arrayList = new ArrayList();
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         discoverOpenStores(new OpenStoresDiscoveredListener() {
             public void openStoresDiscovered(@NotNull List<Appstore> list) {
@@ -1160,15 +1121,15 @@ public class OpenIabHelper {
 
     public void discoverOpenStores(@NotNull OpenStoresDiscoveredListener openStoresDiscoveredListener) {
         List<ServiceInfo> queryOpenStoreServices = queryOpenStoreServices();
-        Queue linkedList = new LinkedList();
+        LinkedList linkedList = new LinkedList();
         for (ServiceInfo bindServiceIntent : queryOpenStoreServices) {
             linkedList.add(getBindServiceIntent(bindServiceIntent));
         }
-        discoverOpenStores(openStoresDiscoveredListener, linkedList, new ArrayList());
+        discoverOpenStores(openStoresDiscoveredListener, (Queue<Intent>) linkedList, (List<Appstore>) new ArrayList<Appstore>());
     }
 
     public void dispose() {
-        Logger.m1000d("Disposing.");
+        Logger.m1025d("Disposing.");
         if (this.appStoreBillingService != null) {
             this.appStoreBillingService.dispose();
         }
@@ -1180,7 +1141,10 @@ public class OpenIabHelper {
 
     @Nullable
     public String getConnectedAppstoreName() {
-        return this.appstore == null ? null : this.appstore.getAppstoreName();
+        if (this.appstore == null) {
+            return null;
+        }
+        return this.appstore.getAppstoreName();
     }
 
     public int getSetupState() {
@@ -1195,29 +1159,29 @@ public class OpenIabHelper {
         if (this.setupState == 0) {
             return this.appStoreBillingService.handleActivityResult(i, i2, intent);
         }
-        Logger.m1001d("handleActivityResult() setup is not done. requestCode: ", Integer.valueOf(i), " resultCode: ", Integer.valueOf(i2), " data: ", intent);
+        Logger.m1026d("handleActivityResult() setup is not done. requestCode: ", Integer.valueOf(i), " resultCode: ", Integer.valueOf(i2), " data: ", intent);
         return false;
     }
 
-    public void launchPurchaseFlow(Activity activity, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener) {
-        launchPurchaseFlow(activity, str, i, onIabPurchaseFinishedListener, "");
+    public void launchPurchaseFlow(Activity activity2, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener) {
+        launchPurchaseFlow(activity2, str, i, onIabPurchaseFinishedListener, "");
     }
 
-    public void launchPurchaseFlow(Activity activity, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str2) {
-        launchPurchaseFlow(activity, str, "inapp", i, onIabPurchaseFinishedListener, str2);
+    public void launchPurchaseFlow(Activity activity2, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str2) {
+        launchPurchaseFlow(activity2, str, "inapp", i, onIabPurchaseFinishedListener, str2);
     }
 
-    public void launchPurchaseFlow(Activity activity, @NotNull String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
+    public void launchPurchaseFlow(Activity activity2, @NotNull String str, String str2, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str3) {
         checkSetupDone("launchPurchaseFlow");
-        this.appStoreBillingService.launchPurchaseFlow(activity, SkuManager.getInstance().getStoreSku(this.appstore.getAppstoreName(), str), str2, i, onIabPurchaseFinishedListener, str3);
+        this.appStoreBillingService.launchPurchaseFlow(activity2, SkuManager.getInstance().getStoreSku(this.appstore.getAppstoreName(), str), str2, i, onIabPurchaseFinishedListener, str3);
     }
 
-    public void launchSubscriptionPurchaseFlow(Activity activity, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener) {
-        launchSubscriptionPurchaseFlow(activity, str, i, onIabPurchaseFinishedListener, "");
+    public void launchSubscriptionPurchaseFlow(Activity activity2, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener) {
+        launchSubscriptionPurchaseFlow(activity2, str, i, onIabPurchaseFinishedListener, "");
     }
 
-    public void launchSubscriptionPurchaseFlow(Activity activity, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str2) {
-        launchPurchaseFlow(activity, str, "subs", i, onIabPurchaseFinishedListener, str2);
+    public void launchSubscriptionPurchaseFlow(Activity activity2, @NotNull String str, int i, OnIabPurchaseFinishedListener onIabPurchaseFinishedListener, String str2) {
+        launchPurchaseFlow(activity2, str, "subs", i, onIabPurchaseFinishedListener, str2);
     }
 
     @Nullable
@@ -1227,35 +1191,35 @@ public class OpenIabHelper {
 
     @Nullable
     public Inventory queryInventory(boolean z, @Nullable List<String> list, @Nullable List<String> list2) throws IabException {
+        List list3;
+        List list4;
         if (Utils.uiThread()) {
             throw new IllegalStateException("Must not be called from the UI thread");
         }
-        Appstore appstore = this.appstore;
+        Appstore appstore2 = this.appstore;
         AppstoreInAppBillingService appstoreInAppBillingService = this.appStoreBillingService;
-        if (this.setupState != 0 || appstore == null || appstoreInAppBillingService == null) {
+        if (this.setupState != 0 || appstore2 == null || appstoreInAppBillingService == null) {
             return null;
         }
-        List arrayList;
-        List list3;
         SkuManager instance = SkuManager.getInstance();
         if (list != null) {
-            arrayList = new ArrayList(list.size());
+            list3 = new ArrayList(list.size());
             for (String storeSku : list) {
-                arrayList.add(instance.getStoreSku(appstore.getAppstoreName(), storeSku));
+                list3.add(instance.getStoreSku(appstore2.getAppstoreName(), storeSku));
             }
-        } else {
-            arrayList = null;
-        }
-        if (list2 != null) {
-            List arrayList2 = new ArrayList(list2.size());
-            for (String storeSku2 : list2) {
-                arrayList2.add(instance.getStoreSku(appstore.getAppstoreName(), storeSku2));
-            }
-            list3 = arrayList2;
         } else {
             list3 = null;
         }
-        return appstoreInAppBillingService.queryInventory(z, arrayList, list3);
+        if (list2 != null) {
+            ArrayList arrayList = new ArrayList(list2.size());
+            for (String storeSku2 : list2) {
+                arrayList.add(instance.getStoreSku(appstore2.getAppstoreName(), storeSku2));
+            }
+            list4 = arrayList;
+        } else {
+            list4 = null;
+        }
+        return appstoreInAppBillingService.queryInventory(z, list3, list4);
     }
 
     public void queryInventoryAsync(@NotNull QueryInventoryFinishedListener queryInventoryFinishedListener) {
@@ -1273,20 +1237,20 @@ public class OpenIabHelper {
         final QueryInventoryFinishedListener queryInventoryFinishedListener2 = queryInventoryFinishedListener;
         new Thread(new Runnable() {
             public void run() {
-                IabResult iabResult;
-                Inventory inventory = null;
+                final IabResult result;
+                final Inventory inventory = null;
                 try {
                     inventory = OpenIabHelper.this.queryInventory(z2, list3, list4);
-                    iabResult = new IabResult(0, "Inventory refresh successful.");
-                } catch (Throwable e) {
-                    Throwable th = e;
-                    iabResult = th.getResult();
-                    Logger.m1003e("queryInventoryAsync() Error : ", th);
+                    result = new IabResult(0, "Inventory refresh successful.");
+                } catch (IabException e) {
+                    IabException iabException = e;
+                    result = iabException.getResult();
+                    Logger.m1028e("queryInventoryAsync() Error : ", (Throwable) iabException);
                 }
                 OpenIabHelper.this.handler.post(new Runnable() {
                     public void run() {
                         if (OpenIabHelper.this.setupState == 0) {
-                            queryInventoryFinishedListener2.onQueryInventoryFinished(iabResult, inventory);
+                            queryInventoryFinishedListener2.onQueryInventoryFinished(result, inventory);
                         }
                     }
                 });
@@ -1308,7 +1272,7 @@ public class OpenIabHelper {
 
     public void startSetup(@NotNull final OnIabSetupFinishedListener onIabSetupFinishedListener) {
         if (this.options != null) {
-            Logger.m1001d("startSetup() options = ", this.options);
+            Logger.m1026d("startSetup() options = ", this.options);
         }
         if (onIabSetupFinishedListener == null) {
             throw new IllegalArgumentException("Setup listener must be not null!");
@@ -1317,42 +1281,21 @@ public class OpenIabHelper {
             this.setupExecutorService = Executors.newSingleThreadExecutor();
             this.availableAppstores.clear();
             this.availableAppstores.addAll(this.options.getAvailableStores());
-            final List arrayList = new ArrayList(this.options.getAvailableStoreNames());
+            final ArrayList arrayList = new ArrayList(this.options.getAvailableStoreNames());
             for (Appstore appstoreName : this.availableAppstores) {
                 arrayList.remove(appstoreName.getAppstoreName());
             }
-            final List arrayList2 = new ArrayList();
+            final ArrayList arrayList2 = new ArrayList();
             for (String str : this.options.getAvailableStoreNames()) {
                 if (this.appStoreFactoryMap.containsKey(str)) {
-                    Appstore appstore = ((AppstoreFactory) this.appStoreFactoryMap.get(str)).get();
-                    arrayList2.add(appstore);
-                    this.availableAppstores.add(appstore);
+                    Appstore appstore2 = ((AppstoreFactory) this.appStoreFactoryMap.get(str)).get();
+                    arrayList2.add(appstore2);
+                    this.availableAppstores.add(appstore2);
                     arrayList.remove(str);
                 }
             }
-            if (arrayList.isEmpty()) {
-                setupWithStrategy(onIabSetupFinishedListener);
-            } else {
+            if (!arrayList.isEmpty()) {
                 discoverOpenStores(new OpenStoresDiscoveredListener() {
-
-                    /* renamed from: org.onepf.oms.OpenIabHelper$8$1 */
-                    class C13121 implements OnIabSetupFinishedListener {
-                        C13121() {
-                        }
-
-                        public void onIabSetupFinished(IabResult iabResult) {
-                            onIabSetupFinishedListener.onIabSetupFinished(iabResult);
-                            arrayList2.remove(OpenIabHelper.this.appstore);
-                            for (Appstore inAppBillingService : arrayList2) {
-                                AppstoreInAppBillingService inAppBillingService2 = inAppBillingService.getInAppBillingService();
-                                if (inAppBillingService2 != null) {
-                                    inAppBillingService2.dispose();
-                                    Logger.m1001d("startSetup() billing service disposed for ", inAppBillingService.getAppstoreName());
-                                }
-                            }
-                        }
-                    }
-
                     public void openStoresDiscovered(@NotNull List<Appstore> list) {
                         for (Appstore appstore : list) {
                             if (arrayList.contains(appstore.getAppstoreName())) {
@@ -1361,13 +1304,27 @@ public class OpenIabHelper {
                                 AppstoreInAppBillingService inAppBillingService = appstore.getInAppBillingService();
                                 if (inAppBillingService != null) {
                                     inAppBillingService.dispose();
-                                    Logger.m1001d("startSetup() billing service disposed for ", appstore.getAppstoreName());
+                                    Logger.m1026d("startSetup() billing service disposed for ", appstore.getAppstoreName());
                                 }
                             }
                         }
-                        OpenIabHelper.this.setupWithStrategy(new C13121());
+                        OpenIabHelper.this.setupWithStrategy(new OnIabSetupFinishedListener() {
+                            public void onIabSetupFinished(IabResult iabResult) {
+                                onIabSetupFinishedListener.onIabSetupFinished(iabResult);
+                                arrayList2.remove(OpenIabHelper.this.appstore);
+                                for (Appstore appstore : arrayList2) {
+                                    AppstoreInAppBillingService inAppBillingService = appstore.getInAppBillingService();
+                                    if (inAppBillingService != null) {
+                                        inAppBillingService.dispose();
+                                        Logger.m1026d("startSetup() billing service disposed for ", appstore.getAppstoreName());
+                                    }
+                                }
+                            }
+                        });
                     }
                 });
+            } else {
+                setupWithStrategy(onIabSetupFinishedListener);
             }
         } else {
             throw new IllegalStateException("Couldn't be set up. Current state: " + setupStateToString(this.setupState));

@@ -3,6 +3,7 @@ package com.facebook.share.internal;
 import android.os.Bundle;
 import com.facebook.FacebookException;
 import com.facebook.internal.Utility;
+import com.facebook.internal.Utility.Mapper;
 import com.facebook.share.model.AppGroupCreationContent;
 import com.facebook.share.model.AppGroupCreationContent.AppGroupPrivacy;
 import com.facebook.share.model.GameRequestContent;
@@ -10,7 +11,10 @@ import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
 import java.util.Locale;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class WebDialogParameters {
@@ -58,9 +62,21 @@ public class WebDialogParameters {
                 Utility.putNonEmptyString(createBaseParameters, ShareConstants.WEB_DIALOG_PARAM_ACTION_PROPERTIES, removeNamespacesFromOGJsonObject.toString());
             }
             return createBaseParameters;
-        } catch (Throwable e) {
-            throw new FacebookException("Unable to serialize the ShareOpenGraphContent to JSON", e);
+        } catch (JSONException e) {
+            throw new FacebookException("Unable to serialize the ShareOpenGraphContent to JSON", (Throwable) e);
         }
+    }
+
+    public static Bundle create(SharePhotoContent sharePhotoContent) {
+        Bundle createBaseParameters = createBaseParameters(sharePhotoContent);
+        String[] strArr = new String[sharePhotoContent.getPhotos().size()];
+        Utility.map(sharePhotoContent.getPhotos(), new Mapper<SharePhoto, String>() {
+            public String apply(SharePhoto sharePhoto) {
+                return sharePhoto.getImageUrl().toString();
+            }
+        }).toArray(strArr);
+        createBaseParameters.putStringArray("media", strArr);
+        return createBaseParameters;
     }
 
     public static Bundle createBaseParameters(ShareContent shareContent) {

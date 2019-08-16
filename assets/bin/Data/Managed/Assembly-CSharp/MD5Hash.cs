@@ -76,19 +76,19 @@ public class MD5Hash : IDataTableRequestHash
 		u32_0 |= (uint)(hash[0] << 24);
 		u32_0 |= (uint)(hash[1] << 16);
 		u32_0 |= (uint)(hash[2] << 8);
-		u32_0 |= hash[3];
+		u32_0 |= (uint)(hash[3] << 0);
 		u32_1 |= (uint)(hash[4] << 24);
 		u32_1 |= (uint)(hash[5] << 16);
 		u32_1 |= (uint)(hash[6] << 8);
-		u32_1 |= hash[7];
+		u32_1 |= (uint)(hash[7] << 0);
 		u32_2 |= (uint)(hash[8] << 24);
 		u32_2 |= (uint)(hash[9] << 16);
 		u32_2 |= (uint)(hash[10] << 8);
-		u32_2 |= hash[11];
+		u32_2 |= (uint)(hash[11] << 0);
 		u32_3 |= (uint)(hash[12] << 24);
 		u32_3 |= (uint)(hash[13] << 16);
 		u32_3 |= (uint)(hash[14] << 8);
-		u32_3 |= hash[15];
+		u32_3 |= (uint)(hash[15] << 0);
 	}
 
 	public static MD5Hash Parse(string hashString)
@@ -101,11 +101,8 @@ public class MD5Hash : IDataTableRequestHash
 				string value = hashString.Substring(j * 2 + i * 8, 2);
 				byte b = Convert.ToByte(value, 16);
 				MD5Hash mD5Hash2;
-				MD5Hash mD5Hash3 = mD5Hash2 = mD5Hash;
 				int key;
-				int key2 = key = i;
-				uint num = mD5Hash2[key];
-				mD5Hash3[key2] = (uint)((int)num | (b << 24 - j * 8));
+				(mD5Hash2 = mD5Hash)[key = i] = (uint)((int)mD5Hash2[key] | (b << 24 - j * 8));
 			}
 		}
 		return mD5Hash;
@@ -134,7 +131,7 @@ public class MD5Hash : IDataTableRequestHash
 	public override bool Equals(object obj)
 	{
 		MD5Hash mD5Hash = obj as MD5Hash;
-		if (mD5Hash == (MD5Hash)null)
+		if (mD5Hash == null)
 		{
 			return false;
 		}

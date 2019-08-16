@@ -4,9 +4,7 @@ public class InGameStoryMain : StoryMain
 {
 	public override void Initialize()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		Utility.CreateGameObjectAndComponent("StoryDirector", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+		Utility.CreateGameObjectAndComponent("StoryDirector", MonoBehaviourSingleton<AppMain>.I._transform);
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
@@ -23,9 +21,6 @@ public class InGameStoryMain : StoryMain
 
 	protected override void OnDestroy()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)

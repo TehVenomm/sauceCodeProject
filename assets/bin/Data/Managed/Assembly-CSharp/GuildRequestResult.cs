@@ -114,6 +114,7 @@ public class GuildRequestResult : QuestResultTop
 		SPR_CROWN01_OFF,
 		SPR_CROWN02_OFF,
 		SPR_CROWN03_OFF,
+		SHADOW,
 		BTN_NEXT_ALL,
 		BTN_END_HUNT_CENTER,
 		BTN_END_HUNT_LEFT,
@@ -156,55 +157,53 @@ public class GuildRequestResult : QuestResultTop
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.BTN_NEXT, false);
-		SetActive((Enum)UI.OBJ_BONUS_POINT_SHOP, false);
-		SetGrid(UI.GRD_DROP_ITEM, null, dropItemIconData.Length, true, delegate(int i, Transform o, bool is_recycle)
+		SetActive((Enum)UI.BTN_NEXT, is_visible: false);
+		SetActive((Enum)UI.OBJ_BONUS_POINT_SHOP, is_visible: false);
+		SetGrid(UI.GRD_DROP_ITEM, null, dropItemIconData.Length, reset: true, delegate(int i, Transform o, bool is_recycle)
 		{
-			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
 			ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-			RARITY_TYPE? rarity = null;
-			ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-			EQUIPMENT_TYPE? magi_enable_icon_type = null;
-			int icon_id = -1;
+			RARITY_TYPE? rARITY_TYPE = null;
+			ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
+			EQUIPMENT_TYPE? eQUIPMENT_TYPE = null;
 			int num = -1;
+			int num2 = -1;
 			if (i < dropItemIconData.Length && dropItemIconData[i] != null)
 			{
 				iTEM_ICON_TYPE = dropItemIconData[i].GetIconType();
-				icon_id = dropItemIconData[i].GetIconID();
-				rarity = dropItemIconData[i].GetRarity();
-				element = dropItemIconData[i].GetIconElement();
-				magi_enable_icon_type = dropItemIconData[i].GetIconMagiEnableType();
-				num = dropItemIconData[i].GetNum();
-				if (num == 1)
+				num = dropItemIconData[i].GetIconID();
+				rARITY_TYPE = dropItemIconData[i].GetRarity();
+				eLEMENT_TYPE = dropItemIconData[i].GetIconElement();
+				eQUIPMENT_TYPE = dropItemIconData[i].GetIconMagiEnableType();
+				num2 = dropItemIconData[i].GetNum();
+				if (num2 == 1)
 				{
-					num = -1;
+					num2 = -1;
 				}
 			}
-			bool is_new = false;
+			bool flag = false;
 			switch (iTEM_ICON_TYPE)
 			{
 			case ITEM_ICON_TYPE.ITEM:
 			case ITEM_ICON_TYPE.QUEST_ITEM:
 			{
 				ulong uniqID = dropItemIconData[i].GetUniqID();
-				if (uniqID != 0L)
+				if (uniqID != 0)
 				{
-					is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, dropItemIconData[i].GetUniqID());
+					flag = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, dropItemIconData[i].GetUniqID());
 				}
 				break;
 			}
 			default:
-				is_new = true;
+				flag = true;
 				break;
 			case ITEM_ICON_TYPE.NONE:
 				break;
 			}
-			int enemy_icon_id = 0;
+			int num3 = 0;
 			if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 			{
 				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(dropItemIconData[i].GetTableID());
-				enemy_icon_id = itemData.enemyIconID;
+				num3 = itemData.enemyIconID;
 			}
 			ItemIcon itemIcon = null;
 			if (dropItemIconData[i].GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
@@ -213,25 +212,38 @@ public class GuildRequestResult : QuestResultTop
 				{
 					icon_type = dropItemIconData[i].GetIconType(),
 					icon_id = dropItemIconData[i].GetIconID(),
-					rarity = new RARITY_TYPE?(dropItemIconData[i].GetRarity()),
+					rarity = dropItemIconData[i].GetRarity(),
 					parent = o,
 					element = dropItemIconData[i].GetIconElement(),
 					magi_enable_equip_type = dropItemIconData[i].GetIconMagiEnableType(),
 					num = dropItemIconData[i].GetNum(),
-					enemy_icon_id = enemy_icon_id,
+					enemy_icon_id = num3,
 					questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
 				});
 			}
 			else
 			{
+				ITEM_ICON_TYPE icon_type = iTEM_ICON_TYPE;
+				int icon_id = num;
+				RARITY_TYPE? rarity = rARITY_TYPE;
+				ELEMENT_TYPE element = eLEMENT_TYPE;
+				EQUIPMENT_TYPE? magi_enable_icon_type = eQUIPMENT_TYPE;
+				int num4 = num2;
+				string event_name = "DROP";
+				bool is_new = flag;
+				int toggle_group = -1;
+				bool is_select = false;
+				string icon_under_text = null;
+				bool is_equipping = false;
+				int enemy_icon_id = num3;
 				GET_TYPE getType = dropItemIconData[i].GetGetType();
-				itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, o, element, magi_enable_icon_type, num, "DROP", i, is_new, -1, false, null, false, enemy_icon_id, 0, false, getType);
+				itemIcon = ItemIcon.Create(icon_type, icon_id, rarity, o, element, magi_enable_icon_type, num4, event_name, i, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, 0, disable_rarity_text: false, getType);
 			}
-			itemIcon.SetRewardBG(true);
+			itemIcon.SetRewardBG(is_visible: true);
 			itemIcon.SetRewardCategoryInfo(dropItemIconData[i].GetCategory());
 			SetMaterialInfo(itemIcon.transform, dropItemIconData[i].GetMaterialType(), dropItemIconData[i].GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
-			itemIcon.transform.FindChild("MaterialInfo").get_gameObject().SetActive(false);
-			Transform val = SetPrefab(o, "QuestResultDropIconOpener", true);
+			itemIcon.transform.Find("MaterialInfo").get_gameObject().SetActive(false);
+			Transform val = SetPrefab(o, "QuestResultDropIconOpener");
 			QuestResultDropIconOpener.Info info2 = new QuestResultDropIconOpener.Info
 			{
 				IsRare = ResultUtility.IsRare(dropItemIconData[i]),
@@ -268,7 +280,7 @@ public class GuildRequestResult : QuestResultTop
 		if (guildRequestCompleteData.bonusPointShop != null && guildRequestCompleteData.bonusPointShop.Count > 0)
 		{
 			SetLabelText((Enum)UI.LBL_BONUS_POINT_NUM, guildRequestCompleteData.bonusPointShop[0].getPoint.ToString());
-			SetActive((Enum)UI.OBJ_BONUS_POINT_SHOP, true);
+			SetActive((Enum)UI.OBJ_BONUS_POINT_SHOP, is_visible: true);
 			base.GetComponent<UITable>((Enum)UI.TBL_GUILD_REQUEST_RESULT).Reposition();
 			SetScroll((Enum)dropItemSCR, animScrollValue);
 		}
@@ -281,9 +293,9 @@ public class GuildRequestResult : QuestResultTop
 	protected override void VisibleEndButton()
 	{
 		SetActive((Enum)UI.BTN_NEXT, animationEnd);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, false);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL_2, false);
+		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
+		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, is_visible: false);
+		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL_2, is_visible: false);
 	}
 
 	protected override string GetSceneName()

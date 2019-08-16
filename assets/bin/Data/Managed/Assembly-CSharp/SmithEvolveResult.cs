@@ -23,7 +23,7 @@ public class SmithEvolveResult : EquipResultBase
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("SmithGrowItemSelect"))
 		{
 			GameSection.StopEvent();
-			OnQuery_MAIN_MENU_STATUS();
+			TO_UNIQUE_OR_MAIN_STATUS();
 		}
 	}
 }

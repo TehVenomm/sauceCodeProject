@@ -15,31 +15,31 @@ public abstract class RequestHandler {
         private final LoadedFrom loadedFrom;
         private final InputStream stream;
 
-        public Result(Bitmap bitmap, LoadedFrom loadedFrom) {
-            this((Bitmap) Utils.checkNotNull(bitmap, "bitmap == null"), null, loadedFrom, 0);
+        public Result(Bitmap bitmap2, LoadedFrom loadedFrom2) {
+            this((Bitmap) Utils.checkNotNull(bitmap2, "bitmap == null"), null, loadedFrom2, 0);
         }
 
-        public Result(InputStream inputStream, LoadedFrom loadedFrom) {
-            this(null, (InputStream) Utils.checkNotNull(inputStream, "stream == null"), loadedFrom, 0);
+        public Result(InputStream inputStream, LoadedFrom loadedFrom2) {
+            this(null, (InputStream) Utils.checkNotNull(inputStream, "stream == null"), loadedFrom2, 0);
         }
 
-        Result(Bitmap bitmap, InputStream inputStream, LoadedFrom loadedFrom, int i) {
-            int i2;
-            int i3 = 1;
-            if (bitmap != null) {
-                i2 = 1;
+        Result(Bitmap bitmap2, InputStream inputStream, LoadedFrom loadedFrom2, int i) {
+            boolean z;
+            boolean z2 = true;
+            if (bitmap2 != null) {
+                z = true;
             } else {
-                i2 = 0;
+                z = false;
             }
             if (inputStream == null) {
-                i3 = 0;
+                z2 = false;
             }
-            if ((i3 ^ i2) == 0) {
+            if (!(z2 ^ z)) {
                 throw new AssertionError();
             }
-            this.bitmap = bitmap;
+            this.bitmap = bitmap2;
             this.stream = inputStream;
-            this.loadedFrom = (LoadedFrom) Utils.checkNotNull(loadedFrom, "loadedFrom == null");
+            this.loadedFrom = (LoadedFrom) Utils.checkNotNull(loadedFrom2, "loadedFrom == null");
             this.exifOrientation = i;
         }
 
@@ -55,7 +55,8 @@ public abstract class RequestHandler {
             return this.loadedFrom;
         }
 
-        int getExifOrientation() {
+        /* access modifiers changed from: 0000 */
+        public int getExifOrientation() {
             return this.exifOrientation;
         }
     }
@@ -64,26 +65,29 @@ public abstract class RequestHandler {
 
     public abstract Result load(Request request, int i) throws IOException;
 
-    int getRetryCount() {
+    /* access modifiers changed from: 0000 */
+    public int getRetryCount() {
         return 0;
     }
 
-    boolean shouldRetry(boolean z, NetworkInfo networkInfo) {
+    /* access modifiers changed from: 0000 */
+    public boolean shouldRetry(boolean z, NetworkInfo networkInfo) {
         return false;
     }
 
-    boolean supportsReplay() {
+    /* access modifiers changed from: 0000 */
+    public boolean supportsReplay() {
         return false;
     }
 
     static Options createBitmapOptions(Request request) {
         boolean hasSize = request.hasSize();
-        Object obj = request.config != null ? 1 : null;
+        boolean z = request.config != null;
         Options options = null;
-        if (hasSize || obj != null) {
+        if (hasSize || z) {
             options = new Options();
             options.inJustDecodeBounds = hasSize;
-            if (obj != null) {
+            if (z) {
                 options.inPreferredConfig = request.config;
             }
         }
@@ -106,12 +110,12 @@ public abstract class RequestHandler {
             } else if (i == 0) {
                 i5 = (int) Math.floor((double) (((float) i4) / ((float) i2)));
             } else {
-                i5 = (int) Math.floor((double) (((float) i4) / ((float) i2)));
-                int floor = (int) Math.floor((double) (((float) i3) / ((float) i)));
+                int floor = (int) Math.floor((double) (((float) i4) / ((float) i2)));
+                int floor2 = (int) Math.floor((double) (((float) i3) / ((float) i)));
                 if (request.centerInside) {
-                    i5 = Math.max(i5, floor);
+                    i5 = Math.max(floor, floor2);
                 } else {
-                    i5 = Math.min(i5, floor);
+                    i5 = Math.min(floor, floor2);
                 }
             }
         }

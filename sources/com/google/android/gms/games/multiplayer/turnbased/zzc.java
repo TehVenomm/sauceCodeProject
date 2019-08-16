@@ -3,14 +3,14 @@ package com.google.android.gms.games.multiplayer.turnbased;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zzb;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.games.GameEntity;
 import com.google.android.gms.games.multiplayer.ParticipantEntity;
 import java.util.ArrayList;
 
 public final class zzc implements Creator<TurnBasedMatchEntity> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzb.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         GameEntity gameEntity = null;
         String str = null;
         String str2 = null;
@@ -31,75 +31,75 @@ public final class zzc implements Creator<TurnBasedMatchEntity> {
         boolean z = false;
         String str6 = null;
         String str7 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    gameEntity = (GameEntity) zzb.zza(parcel, readInt, GameEntity.CREATOR);
+                    gameEntity = (GameEntity) SafeParcelReader.createParcelable(parcel, readHeader, GameEntity.CREATOR);
                     break;
                 case 2:
-                    str = zzb.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = zzb.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    j = zzb.zzi(parcel, readInt);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 5:
-                    str3 = zzb.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 6:
-                    j2 = zzb.zzi(parcel, readInt);
+                    j2 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 7:
-                    str4 = zzb.zzq(parcel, readInt);
+                    str4 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 8:
-                    i = zzb.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 10:
-                    i2 = zzb.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 11:
-                    i3 = zzb.zzg(parcel, readInt);
+                    i3 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 12:
-                    bArr = zzb.zzt(parcel, readInt);
+                    bArr = SafeParcelReader.createByteArray(parcel, readHeader);
                     break;
                 case 13:
-                    arrayList = zzb.zzc(parcel, readInt, ParticipantEntity.CREATOR);
+                    arrayList = SafeParcelReader.createTypedList(parcel, readHeader, ParticipantEntity.CREATOR);
                     break;
                 case 14:
-                    str5 = zzb.zzq(parcel, readInt);
+                    str5 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 15:
-                    bArr2 = zzb.zzt(parcel, readInt);
+                    bArr2 = SafeParcelReader.createByteArray(parcel, readHeader);
                     break;
                 case 16:
-                    i4 = zzb.zzg(parcel, readInt);
+                    i4 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 17:
-                    bundle = zzb.zzs(parcel, readInt);
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
                     break;
                 case 18:
-                    i5 = zzb.zzg(parcel, readInt);
+                    i5 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 19:
-                    z = zzb.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 20:
-                    str6 = zzb.zzq(parcel, readInt);
+                    str6 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 21:
-                    str7 = zzb.zzq(parcel, readInt);
+                    str7 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzb.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzb.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new TurnBasedMatchEntity(gameEntity, str, str2, j, str3, j2, str4, i, i2, i3, bArr, arrayList, str5, bArr2, i4, bundle, i5, z, str6, str7);
     }
 

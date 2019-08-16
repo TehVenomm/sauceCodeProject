@@ -27,12 +27,12 @@ public class ContextedException extends Exception implements ExceptionContext {
         this.exceptionContext = new DefaultExceptionContext();
     }
 
-    public ContextedException(String str, Throwable th, ExceptionContext exceptionContext) {
+    public ContextedException(String str, Throwable th, ExceptionContext exceptionContext2) {
         super(str, th);
-        if (exceptionContext == null) {
-            exceptionContext = new DefaultExceptionContext();
+        if (exceptionContext2 == null) {
+            exceptionContext2 = new DefaultExceptionContext();
         }
-        this.exceptionContext = exceptionContext;
+        this.exceptionContext = exceptionContext2;
     }
 
     public ContextedException addContextValue(String str, Object obj) {

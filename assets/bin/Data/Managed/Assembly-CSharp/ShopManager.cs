@@ -42,9 +42,6 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 	public ShopManager()
 	{
 		shopData = new ShopList();
-		SendGetGoldPurchaseItemList(delegate
-		{
-		});
 	}
 
 	private void Start()
@@ -103,15 +100,16 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 		int count = purchaseItemList.shopList.Count;
 		while (true)
 		{
-			if (num >= count)
+			if (num < count)
 			{
-				return;
+				if (purchaseItemList.shopList[num].productId == productId)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			if (purchaseItemList.shopList[num].productId == productId)
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		data = purchaseItemList.shopList[num];
 		index = num;
@@ -211,7 +209,10 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 				}
 				Dirty();
 			}
-			call_back(obj);
+			if (call_back != null)
+			{
+				call_back(obj);
+			}
 		}, string.Empty);
 	}
 
@@ -276,13 +277,11 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 			if (purchaseItemList == null || purchaseItemList.promotionList.Count == 0)
 			{
 				Log.Error("Promotion List is null!");
+				return;
 			}
-			else
-			{
-				HasCheckPromotionItem = true;
-				IsCheckingPromotionItem = true;
-				Native.checkAndGivePromotionItems(string.Join("----", purchaseItemList.promotionList.ToArray()));
-			}
+			HasCheckPromotionItem = true;
+			IsCheckingPromotionItem = true;
+			Native.checkAndGivePromotionItems(string.Join("----", purchaseItemList.promotionList.ToArray()));
 		}
 	}
 
@@ -371,16 +370,21 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 
 	public void UpdateDarkMarketUsedCount(int darkMarketId, int usedCount)
 	{
-		if (darkMarketItemList != null)
+		if (darkMarketItemList == null)
 		{
-			int count = darkMarketItemList.items.Count;
-			for (int i = 0; i < count; i++)
+			return;
+		}
+		int count = darkMarketItemList.items.Count;
+		for (int i = 0; i < count; i++)
+		{
+			if (darkMarketItemList.items[i].id == darkMarketId)
 			{
-				if (darkMarketItemList.items[i].id == darkMarketId)
-				{
-					darkMarketItemList.items[i].usedCount = usedCount;
-				}
+				darkMarketItemList.items[i].usedCount = usedCount;
 			}
 		}
+	}
+
+	public void SendTradingPostInfo(Action<Error> call_back)
+	{
 	}
 }

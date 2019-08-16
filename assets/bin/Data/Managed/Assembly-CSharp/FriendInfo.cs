@@ -1,5 +1,6 @@
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,6 +51,7 @@ public class FriendInfo : SkillInfoBase
 		SPR_FOLLOW_ARROW,
 		SPR_FOLLOWER_ARROW,
 		SPR_BLACKLIST_ICON,
+		SPR_SAME_CLAN_ICON,
 		LBL_LEVEL_WEAPON_1,
 		LBL_LEVEL_WEAPON_2,
 		LBL_LEVEL_WEAPON_3,
@@ -63,10 +65,19 @@ public class FriendInfo : SkillInfoBase
 		OBJ_DEGREE_PLATE_ROOT,
 		BTN_DELETEFOLLOWER,
 		BTN_KICK,
-		BTN_JOIN
+		BTN_JOIN,
+		BTN_MOVE_TO_MSG,
+		OBJ_CLAN_ROOT,
+		BTN_CLAN_SCOUT,
+		SPR_CLAN_SCOUT,
+		BTN_CLAN_DETAIL,
+		TXT_CLAN_TITLE,
+		SPR_CLAN_NAME,
+		BTN_CLAN_SCOUT_CANCEL,
+		BTN_CLAN_SCOUT_OFF,
+		OBJ_SYMBOL,
+		OBJ_SYMBOL_MARK
 	}
-
-	protected const string STR_VISUAL_EQUIP_EVENT_NAME = "VISUAL_DETAIL";
 
 	protected UI[] icons = new UI[7]
 	{
@@ -103,6 +114,14 @@ public class FriendInfo : SkillInfoBase
 
 	protected CharaInfo data;
 
+	protected FriendCharaInfo friendCharaInfo;
+
+	protected FriendMessageUserListModel.MessageUserInfo m_msgUserInfo;
+
+	protected CharaInfo clanCharaInfo;
+
+	protected ClanData userClanData;
+
 	protected PlayerLoader loader;
 
 	protected Transform transRoot;
@@ -113,6 +132,8 @@ public class FriendInfo : SkillInfoBase
 
 	protected bool isVisualMode;
 
+	protected const string STR_VISUAL_EQUIP_EVENT_NAME = "VISUAL_DETAIL";
+
 	protected bool isFollowerList;
 
 	protected bool isFollowerListChengeTrans;
@@ -121,7 +142,9 @@ public class FriendInfo : SkillInfoBase
 
 	protected bool dataFollowing;
 
-	protected FriendCharaInfo friendCharaInfo;
+	protected bool m_isInitMoveMessageButton;
+
+	private SymbolMarkCtrl symbolMark;
 
 	protected virtual bool IsFriendInfo => true;
 
@@ -139,6 +162,8 @@ public class FriendInfo : SkillInfoBase
 
 	protected virtual bool showMagiButton => false;
 
+	protected bool IsInitMoveMessageButton => m_isInitMoveMessageButton;
+
 	protected virtual string GetCreatePrefabName()
 	{
 		return "FriendInfoBase";
@@ -146,22 +171,54 @@ public class FriendInfo : SkillInfoBase
 
 	public override void Initialize()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		friendCharaInfo = (GameSection.GetEventData() as FriendCharaInfo);
-		data = (GameSection.GetEventData() as CharaInfo);
-		if (friendCharaInfo != null)
-		{
-			dataFollower = friendCharaInfo.follower;
-			dataFollowing = friendCharaInfo.following;
-		}
-		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
 		InitializeBase();
 	}
 
 	protected void InitializeBase()
 	{
+		this.StartCoroutine(DoInitialize());
+	}
+
+	protected IEnumerator DoInitialize()
+	{
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
+		{
+			bool isWait = true;
+			MonoBehaviourSingleton<ClanMatchingManager>.I.RequestDetail("0", delegate
+			{
+				isWait = false;
+			});
+			while (isWait)
+			{
+				yield return null;
+			}
+			userClanData = MonoBehaviourSingleton<ClanMatchingManager>.I.clanData;
+		}
 		base.Initialize();
+	}
+
+	protected override void OnOpen()
+	{
+		ReOpen();
+		base.OnOpen();
+	}
+
+	protected void ReOpen()
+	{
+		if (GameSection.GetEventData() is CharaInfo)
+		{
+			friendCharaInfo = (GameSection.GetEventData() as FriendCharaInfo);
+			data = (GameSection.GetEventData() as CharaInfo);
+			m_msgUserInfo = (GameSection.GetEventData() as FriendMessageUserListModel.MessageUserInfo);
+			if (friendCharaInfo != null)
+			{
+				dataFollower = friendCharaInfo.follower;
+				dataFollowing = friendCharaInfo.following;
+			}
+			nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
+			isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
+			DisableClanInfo();
+		}
 	}
 
 	protected void OnEnable()
@@ -177,11 +234,23 @@ public class FriendInfo : SkillInfoBase
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
+		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
 		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
+			{
+				loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			}
+			else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "QuestResultFriendDetail")
+			{
+				loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			}
+			else if (nowSectionName == "ClanDetail")
+			{
+				loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			}
 		}
 	}
 
@@ -194,6 +263,14 @@ public class FriendInfo : SkillInfoBase
 		UpdateEquipIcon(data.equipSet);
 		UpdateBottomButton();
 		CreateDegree();
+		if (data != null && data.userClanData != null)
+		{
+			UpdateClanInfo(data);
+		}
+		else
+		{
+			DisableClanInfo();
+		}
 	}
 
 	protected virtual void UpdateUserIDLabel()
@@ -208,14 +285,14 @@ public class FriendInfo : SkillInfoBase
 		{
 			MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = 0;
 			otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(0);
-			otherEquipSetCalculator.SetEquipSet(data.equipSet, false);
+			otherEquipSetCalculator.SetEquipSet(data.equipSet);
 		}
 		else
 		{
 			otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex);
 		}
 		SimpleStatus finalStatus = otherEquipSetCalculator.GetFinalStatus(0, data.hp, data.atk, data.def);
-		SetActive(transRoot, UI.OBJ_LAST_LOGIN, true);
+		SetActive(transRoot, UI.OBJ_LAST_LOGIN, is_visible: true);
 		SetLabelText(transRoot, UI.LBL_NAME, data.name);
 		SetLabelText(transRoot, UI.LBL_COMMENT, data.comment);
 		SetLabelText(transRoot, UI.LBL_LAST_LOGIN, base.sectionData.GetText("LAST_LOGIN"));
@@ -224,17 +301,28 @@ public class FriendInfo : SkillInfoBase
 		SetLabelText(transRoot, UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
 		SetLabelText(transRoot, UI.LBL_HP, finalStatus.hp.ToString());
 		SetLabelText(transRoot, UI.LBL_LEVEL, data.level.ToString());
-		bool flag = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(data.userId);
-		SetActive(transRoot, UI.SPR_FOLLOW_ARROW, !flag && dataFollowing);
-		SetActive(transRoot, UI.SPR_FOLLOWER_ARROW, !flag && dataFollower);
-		SetActive(transRoot, UI.SPR_BLACKLIST_ICON, flag);
+		bool black_list_user = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(data.userId);
+		bool same_clan_user = false;
+		if (data.userClanData != null && MonoBehaviourSingleton<UserInfoManager>.I.userClan != null && MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
+		{
+			same_clan_user = (data.userClanData.cId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
+		}
+		SetFollowStatus(dataFollowing, dataFollower, black_list_user, same_clan_user);
+	}
+
+	protected void SetFollowStatus(bool following, bool follower, bool black_list_user, bool same_clan_user)
+	{
+		SetActive(transRoot, UI.SPR_FOLLOW_ARROW, !black_list_user && following);
+		SetActive(transRoot, UI.SPR_FOLLOWER_ARROW, !black_list_user && follower);
+		SetActive(transRoot, UI.SPR_BLACKLIST_ICON, black_list_user);
+		SetActive(transRoot, UI.SPR_SAME_CLAN_ICON, same_clan_user);
 	}
 
 	protected virtual void LoadModel()
 	{
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, true, true, true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
+		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, need_weapon: true, need_helm: true, need_leg: true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
 		{
 			if (player_loader != null)
 			{
@@ -246,7 +334,7 @@ public class FriendInfo : SkillInfoBase
 	protected virtual void CreateDegree()
 	{
 		DegreePlate component = GetCtrl(UI.OBJ_DEGREE_PLATE_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(SelectedDegrees, false, delegate
+		component.Initialize(SelectedDegrees, isButton: false, delegate
 		{
 		});
 	}
@@ -261,7 +349,7 @@ public class FriendInfo : SkillInfoBase
 			SetEvent(FindCtrl(transRoot, icons[i]), "EMPTY", 0);
 			SetEvent(FindCtrl(transRoot, icons_btn[i]), "EMPTY", 0);
 			SetLabelText(FindCtrl(transRoot, icons_level[i]), string.Empty);
-			SetActive(FindCtrl(transRoot, icons[i]), false);
+			SetActive(FindCtrl(transRoot, icons[i]), is_visible: false);
 		}
 		bool need_visual_helm_icon = isVisualMode;
 		bool need_visual_armor_icon = isVisualMode;
@@ -320,9 +408,9 @@ public class FriendInfo : SkillInfoBase
 				}
 				if (!(val == null))
 				{
-					SetActive(FindCtrl(transRoot, icons[num2]), true);
+					SetActive(FindCtrl(transRoot, icons[num2]), is_visible: true);
 					string event_name = (!isVisualMode) ? "DETAIL" : "VISUAL_DETAIL";
-					ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(equipItemData, GetCharaSex(), val, null, -1, event_name, num2, false, -1, false, null, false, false);
+					ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(equipItemData, GetCharaSex(), val, null, -1, event_name, num2);
 					SetLongTouch(itemIcon.transform, event_name, num2);
 					SetEvent(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					SetLongTouch(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
@@ -373,7 +461,6 @@ public class FriendInfo : SkillInfoBase
 
 	protected void SetVisualModeIcon(int index, int table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		string event_name = "VISUAL_DETAIL";
 		Transform val = FindCtrl(transRoot, icons[index]);
 		EquipItemTable.EquipItemData visualModeTargetTable = GetVisualModeTargetTable((uint)table_id, e_type, chara_info);
@@ -386,8 +473,8 @@ public class FriendInfo : SkillInfoBase
 				Temporary.itemIconList[i].get_gameObject().SetActive(true);
 			}
 			Temporary.itemIconList.Clear();
-			SetActive(FindCtrl(transRoot, icons[index]), true);
-			ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(visualModeTargetTable, GetCharaSex(), val, null, -1, event_name, index, false, -1, false, null, false, false);
+			SetActive(FindCtrl(transRoot, icons[index]), is_visible: true);
+			ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(visualModeTargetTable, GetCharaSex(), val, null, -1, event_name, index);
 			SetLongTouch(itemIcon.transform, event_name, index);
 			SetEvent(FindCtrl(transRoot, icons_btn[index]), event_name, index);
 			SetLongTouch(FindCtrl(transRoot, icons_btn[index]), event_name, index);
@@ -401,10 +488,10 @@ public class FriendInfo : SkillInfoBase
 		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.OBJ_FRIEND_INFO_ROOT, IsFriendInfo);
 		SetActive(transRoot, UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !IsFriendInfo);
 		SetActive(transRoot, UI.BTN_MAGI, showMagiButton);
@@ -414,8 +501,8 @@ public class FriendInfo : SkillInfoBase
 		{
 			if (flag && !dataFollowing)
 			{
-				SetActive(transRoot, UI.BTN_FOLLOW, true);
-				SetActive(transRoot, UI.BTN_UNFOLLOW, false);
+				SetActive(transRoot, UI.BTN_FOLLOW, is_visible: true);
+				SetActive(transRoot, UI.BTN_UNFOLLOW, is_visible: false);
 				SetEvent(transRoot, UI.BTN_FOLLOW, "INVALID_FOLLOW", 0);
 			}
 			else
@@ -423,14 +510,14 @@ public class FriendInfo : SkillInfoBase
 				SetActive(transRoot, UI.BTN_FOLLOW, !dataFollowing);
 				SetActive(transRoot, UI.BTN_UNFOLLOW, dataFollowing);
 			}
-			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, false);
+			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, is_visible: false);
 		}
 		else
 		{
 			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, dataFollower);
 			if (!flag && !dataFollowing)
 			{
-				SetActive(transRoot, UI.BTN_FOLLOW, true);
+				SetActive(transRoot, UI.BTN_FOLLOW, is_visible: true);
 				if (!isFollowerListChengeTrans)
 				{
 					Transform val = FindCtrl(transRoot, UI.BTN_FOLLOW);
@@ -447,14 +534,27 @@ public class FriendInfo : SkillInfoBase
 			}
 			else
 			{
-				SetActive(transRoot, UI.BTN_FOLLOW, false);
+				SetActive(transRoot, UI.BTN_FOLLOW, is_visible: false);
 			}
-			SetActive(transRoot, UI.BTN_UNFOLLOW, false);
+			SetActive(transRoot, UI.BTN_UNFOLLOW, is_visible: false);
 		}
-		SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, true);
+		SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, is_visible: true);
 		bool flag2 = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(data.userId);
 		SetActive(transRoot, UI.BTN_BLACKLIST_IN, !flag2);
 		SetActive(transRoot, UI.BTN_BLACKLIST_OUT, flag2);
+		SetMoveMessageButton();
+	}
+
+	protected void SetMoveMessageButton()
+	{
+		if (!IsInitMoveMessageButton)
+		{
+			m_isInitMoveMessageButton = true;
+			bool flag = UserInfoManager.IsEnableCommunication();
+			bool flag2 = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("FriendInfo");
+			bool is_visible = m_msgUserInfo != null && flag && flag2;
+			SetActive(transRoot, UI.BTN_MOVE_TO_MSG, is_visible);
+		}
 	}
 
 	protected EquipItemTable.EquipItemData GetVisualModeTargetTable(uint base_table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
@@ -507,6 +607,111 @@ public class FriendInfo : SkillInfoBase
 			}
 		}
 		return result;
+	}
+
+	private bool IsLoopClanDetail()
+	{
+		List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
+		for (int i = 0; i < historyList.Count; i++)
+		{
+			if (historyList[i].sectionName == "ClanDetail")
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected void UpdateClanInfo(CharaInfo charaInfo)
+	{
+		clanCharaInfo = charaInfo;
+		SetActive(transRoot, UI.OBJ_CLAN_ROOT, is_visible: false);
+		if (clanCharaInfo == null || IsLoopClanDetail())
+		{
+			return;
+		}
+		if (charaInfo.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
+		{
+			if (clanCharaInfo.userClanData != null && clanCharaInfo.userClanData.stat != 0)
+			{
+				_showClanDetail();
+			}
+		}
+		else if (clanCharaInfo.userClanData != null && clanCharaInfo.userClanData.stat != 0)
+		{
+			_showClanDetail();
+		}
+		else if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.userClan != null && (MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsSubLeader() || MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsLeader()))
+		{
+			_showClanScout();
+		}
+	}
+
+	protected void DisableClanInfo()
+	{
+		SetActive(transRoot, UI.OBJ_CLAN_ROOT, is_visible: false);
+	}
+
+	private void _showClanDetail()
+	{
+		if (clanCharaInfo != null)
+		{
+			SetActive(transRoot, UI.OBJ_CLAN_ROOT, is_visible: true);
+			SetActive(transRoot, UI.BTN_CLAN_SCOUT, is_visible: false);
+			SetActive(transRoot, UI.BTN_CLAN_SCOUT_CANCEL, is_visible: false);
+			SetActive(transRoot, UI.BTN_CLAN_DETAIL, is_visible: true);
+			SetLabelText(transRoot, UI.SPR_CLAN_NAME, clanCharaInfo.userClanData.name);
+			if (FindCtrl(transRoot, UI.OBJ_SYMBOL_MARK) == null)
+			{
+				this.StartCoroutine(CreateSymbolMark());
+			}
+		}
+	}
+
+	private IEnumerator CreateSymbolMark()
+	{
+		LoadingQueue load_queue = new LoadingQueue(this);
+		LoadObject symbolMarkLoadObj = load_queue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
+		yield return load_queue.Wait();
+		GameObject obj = symbolMarkLoadObj.loadedObject as GameObject;
+		Transform item = ResourceUtility.Realizes(obj, 5);
+		item.set_parent(FindCtrl(transRoot, UI.OBJ_SYMBOL));
+		item.set_localScale(Vector3.get_one());
+		item.set_localPosition(Vector3.get_zero());
+		item.set_name("OBJ_SYMBOL_MARK");
+		symbolMark = item.GetComponent<SymbolMarkCtrl>();
+		symbolMark.Initilize();
+		symbolMark.LoadSymbol(clanCharaInfo.userClanData.sym);
+		symbolMark.SetSize(20);
+	}
+
+	private void _showClanScout()
+	{
+		if (clanCharaInfo != null)
+		{
+			SetActive(transRoot, UI.OBJ_CLAN_ROOT, is_visible: true);
+			SetActive(transRoot, UI.BTN_CLAN_SCOUT, is_visible: false);
+			SetActive(transRoot, UI.BTN_CLAN_SCOUT_CANCEL, is_visible: false);
+			SetActive(transRoot, UI.BTN_CLAN_SCOUT_OFF, is_visible: false);
+			SetActive(transRoot, UI.BTN_CLAN_DETAIL, is_visible: false);
+			if ((int)clanCharaInfo.level < 15)
+			{
+				SetActive(transRoot, UI.BTN_CLAN_SCOUT_OFF, is_visible: true);
+			}
+			else if (userClanData != null && userClanData.num >= MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.CLAN_MAX_MEMBER_NUM)
+			{
+				SetActive(transRoot, UI.BTN_CLAN_SCOUT_OFF, is_visible: true);
+				SetEvent(transRoot, UI.BTN_CLAN_SCOUT_OFF, "CLAN_SCOUT_MAX_MEMBER", 0);
+			}
+			else if (clanCharaInfo.isInviteToClan)
+			{
+				SetActive(transRoot, UI.BTN_CLAN_SCOUT_CANCEL, is_visible: true);
+			}
+			else
+			{
+				SetActive(transRoot, UI.BTN_CLAN_SCOUT, is_visible: true);
+			}
+		}
 	}
 
 	public virtual int GetCharaSex()
@@ -572,6 +777,11 @@ public class FriendInfo : SkillInfoBase
 		}
 	}
 
+	private void UpdateClanInvite()
+	{
+		clanCharaInfo.isInviteToClan = !clanCharaInfo.isInviteToClan;
+	}
+
 	protected virtual void OnQuery_DELETEFOLLOWER()
 	{
 		GameSection.SetEventData(new object[1]
@@ -605,7 +815,7 @@ public class FriendInfo : SkillInfoBase
 			{
 				callback(flag);
 			}
-			GameSection.ResumeEvent(flag, null);
+			GameSection.ResumeEvent(flag);
 		});
 	}
 
@@ -618,7 +828,7 @@ public class FriendInfo : SkillInfoBase
 			{
 				callback(is_success);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -631,7 +841,33 @@ public class FriendInfo : SkillInfoBase
 			{
 				callback(is_success);
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
+		});
+	}
+
+	protected void SendClanInvite(int send_userid, Action<bool> callback = null)
+	{
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<ClanMatchingManager>.I.SendClanInvite(send_userid, delegate(bool is_success)
+		{
+			if (callback != null)
+			{
+				callback(is_success);
+			}
+			GameSection.ResumeEvent(is_success);
+		});
+	}
+
+	protected void SendClanCancelInvite(int send_userid, Action<bool> callback = null)
+	{
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<ClanMatchingManager>.I.SendClanCancelInvite(send_userid, delegate(bool is_success)
+		{
+			if (callback != null)
+			{
+				callback(is_success);
+			}
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 
@@ -652,7 +888,7 @@ public class FriendInfo : SkillInfoBase
 					friendCharaInfo.following = false;
 				}
 			}
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -665,7 +901,7 @@ public class FriendInfo : SkillInfoBase
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(data.userId, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 
@@ -679,7 +915,7 @@ public class FriendInfo : SkillInfoBase
 	{
 		if (isVisualMode)
 		{
-			GameSection.ChangeEvent("VISUAL_DETAIL", null);
+			GameSection.ChangeEvent("VISUAL_DETAIL");
 			OnQuery_VISUAL_DETAIL();
 		}
 		else
@@ -730,7 +966,7 @@ public class FriendInfo : SkillInfoBase
 		object[] array = new object[3]
 		{
 			equipSetInfo,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo, null),
+			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo),
 			new EquipSetDetailStatusAndAbilityTable.BaseStatus(data.atk, data.def, data.hp, data.equipSet)
 		};
 		GameSection.SetEventData(new object[3]
@@ -747,7 +983,7 @@ public class FriendInfo : SkillInfoBase
 		object[] array = new object[3]
 		{
 			equipSetInfo,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo, null),
+			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo),
 			new EquipSetDetailStatusAndAbilityTable.BaseStatus(data.atk, data.def, data.hp, data.equipSet)
 		};
 		GameSection.SetEventData(new object[3]
@@ -766,5 +1002,109 @@ public class FriendInfo : SkillInfoBase
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
 	{
 		return NOTIFY_FLAG.UPDATE_FRIEND_PARAM;
+	}
+
+	public void OnQuery_TO_MESSAGE()
+	{
+		if (m_msgUserInfo == null)
+		{
+			GameSection.StopEvent();
+		}
+		else if (!m_msgUserInfo.isPermitted)
+		{
+			GameSection.ChangeEvent("NOT_PERMITTED");
+		}
+	}
+
+	public void OnQuery_FriendMessageConfirmMessage_YES()
+	{
+		GameSection.StayEvent();
+		MonoBehaviourSingleton<FriendManager>.I.SendGetMessageDetailList(m_msgUserInfo.userId, 0, delegate(bool is_success)
+		{
+			GameSection.ResumeEvent(is_success);
+		});
+		MonoBehaviourSingleton<FriendManager>.I.SetNoReadMessageNum(MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum - m_msgUserInfo.noReadNum);
+		m_msgUserInfo.noReadNum = 0;
+	}
+
+	protected virtual void OnQuery_CLAN_SCOUT()
+	{
+		GameSection.SetEventData(new object[1]
+		{
+			clanCharaInfo.name
+		});
+	}
+
+	protected virtual void OnQuery_CLAN_SCOUT_OFF()
+	{
+		GameSection.SetEventData(new object[1]
+		{
+			clanCharaInfo.name
+		});
+	}
+
+	protected virtual void OnQuery_ClanScoutDialog_YES()
+	{
+		GameSection.SetEventData(new object[1]
+		{
+			clanCharaInfo.name
+		});
+		SendClanInvite(clanCharaInfo.userId, delegate(bool is_success)
+		{
+			if (is_success)
+			{
+				UpdateClanInvite();
+				GameSection.ChangeStayEvent("COMPLETE");
+				MonoBehaviourSingleton<FriendManager>.I.SetClanInviteToHomeCharaInfo(clanCharaInfo.userId, clanCharaInfo.isInviteToClan);
+			}
+			else
+			{
+				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[1]
+				{
+					new EventData("[BACK]")
+				});
+				_showClanScout();
+			}
+		});
+	}
+
+	protected virtual void OnQuery_CLAN_SCOUT_CANCEL()
+	{
+		GameSection.SetEventData(new object[1]
+		{
+			clanCharaInfo.name
+		});
+	}
+
+	protected virtual void OnQuery_ClanScoutCancelDialog_YES()
+	{
+		GameSection.SetEventData(new object[1]
+		{
+			clanCharaInfo.name
+		});
+		SendClanCancelInvite(clanCharaInfo.userId, delegate(bool is_success)
+		{
+			if (is_success)
+			{
+				UpdateClanInvite();
+				GameSection.ChangeStayEvent("COMPLETE");
+				MonoBehaviourSingleton<FriendManager>.I.SetClanInviteToHomeCharaInfo(clanCharaInfo.userId, clanCharaInfo.isInviteToClan);
+			}
+		});
+	}
+
+	public void OnQuery_CLAN_DETAIL()
+	{
+		if (clanCharaInfo != null)
+		{
+			if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < 15)
+			{
+				GameSection.StopEvent();
+			}
+			else
+			{
+				GameSection.SetEventData(clanCharaInfo.userClanData.cId);
+			}
+		}
 	}
 }

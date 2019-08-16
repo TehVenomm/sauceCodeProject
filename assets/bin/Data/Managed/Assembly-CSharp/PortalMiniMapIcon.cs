@@ -22,23 +22,24 @@ public class PortalMiniMapIcon : MiniMapIcon
 
 	private void Update()
 	{
-		if (!(portal == null))
+		if (portal == null)
 		{
-			if (viewType != portal.viewType || isFull != portal.isFull)
-			{
-				int num = (int)portal.viewType;
-				if (portal.viewType == PortalObject.VIEW_TYPE.NOT_TRAVELED && !portal.isFull)
-				{
-					num = 5;
-				}
-				icon.spriteName = iconSpriteNames[num];
-				if (overIcon != null)
-				{
-					overIcon.spriteName = overIconSpriteNames[num];
-				}
-			}
-			viewType = portal.viewType;
-			isFull = portal.isFull;
+			return;
 		}
+		if (viewType != portal.viewType || isFull != portal.isFull)
+		{
+			int num = (int)portal.viewType;
+			if (portal.viewType == PortalObject.VIEW_TYPE.NOT_TRAVELED && !portal.isFull)
+			{
+				num = 5;
+			}
+			icon.spriteName = iconSpriteNames[num];
+			if (overIcon != null)
+			{
+				overIcon.spriteName = overIconSpriteNames[num];
+			}
+		}
+		viewType = portal.viewType;
+		isFull = portal.isFull;
 	}
 }

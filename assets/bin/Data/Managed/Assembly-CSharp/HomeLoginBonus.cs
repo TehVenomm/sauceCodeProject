@@ -39,29 +39,30 @@ public class HomeLoginBonus : GameSection
 		texInnerModelTexture_ = texInnerModel_.GetComponent<UITexture>();
 		glowModel_ = Utility.Find(base._transform, "LIB_00000003");
 		LoginBonus loginBonus = MonoBehaviourSingleton<AccountManager>.I.logInBonus.Find((LoginBonus obj) => obj.type == 0);
-		if (loginBonus != null)
+		if (loginBonus == null)
 		{
-			MonoBehaviourSingleton<AccountManager>.I.logInBonus.Remove(loginBonus);
-			SetLabelText((Enum)UI.LBL_LOGIN_DAYS, loginBonus.total.ToString());
-			if (loginBonus.reward.Count > 0)
+			return;
+		}
+		MonoBehaviourSingleton<AccountManager>.I.logInBonus.Remove(loginBonus);
+		SetLabelText((Enum)UI.LBL_LOGIN_DAYS, loginBonus.total.ToString());
+		if (loginBonus.reward.Count > 0)
+		{
+			LoginBonus.LoginBonusReward loginBonusReward = loginBonus.reward[0];
+			SetLabelText((Enum)UI.LBL_GET_ITEM, loginBonusReward.name);
+			float rotateSpeed = 35f;
+			if (loginBonusReward.type == 5)
 			{
-				LoginBonus.LoginBonusReward loginBonusReward = loginBonus.reward[0];
-				SetLabelText((Enum)UI.LBL_GET_ITEM, loginBonusReward.name);
-				float rotateSpeed = 35f;
-				if (loginBonusReward.type == 5)
-				{
-					uint itemId = (uint)loginBonusReward.itemId;
-					texModelRenderTexture_.InitSkillItem(texModelTexture_, itemId, true, false, 45f);
-					texInnerModelRenderTexture_.InitSkillItemSymbol(texInnerModelTexture_, itemId, true, 17f);
-				}
-				else
-				{
-					uint itemModelID = GetItemModelID((REWARD_TYPE)loginBonusReward.type, loginBonusReward.itemId);
-					texModelRenderTexture_.InitItem(texModelTexture_, itemModelID, true);
-				}
-				texModelRenderTexture_.SetRotateSpeed(rotateSpeed);
-				texInnerModelRenderTexture_.SetRotateSpeed(rotateSpeed);
+				uint itemId = (uint)loginBonusReward.itemId;
+				texModelRenderTexture_.InitSkillItem(texModelTexture_, itemId, rotation: true, light_rotation: false, 45f);
+				texInnerModelRenderTexture_.InitSkillItemSymbol(texInnerModelTexture_, itemId, rotation: true, 17f);
 			}
+			else
+			{
+				uint itemModelID = GetItemModelID((REWARD_TYPE)loginBonusReward.type, loginBonusReward.itemId);
+				texModelRenderTexture_.InitItem(texModelTexture_, itemModelID);
+			}
+			texModelRenderTexture_.SetRotateSpeed(rotateSpeed);
+			texInnerModelRenderTexture_.SetRotateSpeed(rotateSpeed);
 		}
 	}
 
@@ -96,14 +97,13 @@ public class HomeLoginBonus : GameSection
 
 	private void OnQuery_CLOSE()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (null != glowModel_)
 		{
 			glowModel_.get_gameObject().SetActive(false);
 		}
 		if (MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count > 0)
 		{
-			GameSection.ChangeEvent("LIMITED_LOGIN_BONUS", null);
+			GameSection.ChangeEvent("LIMITED_LOGIN_BONUS");
 		}
 		else
 		{

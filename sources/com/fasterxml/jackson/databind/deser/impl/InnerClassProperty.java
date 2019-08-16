@@ -36,7 +36,7 @@ public final class InnerClassProperty extends SettableBeanProperty {
     }
 
     protected InnerClassProperty(InnerClassProperty innerClassProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) innerClassProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) innerClassProperty, jsonDeserializer);
         this._delegate = innerClassProperty._delegate.withValueDeserializer(jsonDeserializer);
         this._creator = innerClassProperty._creator;
     }
@@ -52,7 +52,7 @@ public final class InnerClassProperty extends SettableBeanProperty {
     }
 
     public InnerClassProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new InnerClassProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new InnerClassProperty(this, jsonDeserializer);
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {
@@ -64,21 +64,21 @@ public final class InnerClassProperty extends SettableBeanProperty {
     }
 
     public void deserializeAndSet(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
-        Object nullValue;
+        Object obj2;
         if (jsonParser.getCurrentToken() == JsonToken.VALUE_NULL) {
-            nullValue = this._valueDeserializer.getNullValue(deserializationContext);
+            obj2 = this._valueDeserializer.getNullValue(deserializationContext);
         } else if (this._valueTypeDeserializer != null) {
-            nullValue = this._valueDeserializer.deserializeWithType(jsonParser, deserializationContext, this._valueTypeDeserializer);
+            obj2 = this._valueDeserializer.deserializeWithType(jsonParser, deserializationContext, this._valueTypeDeserializer);
         } else {
             try {
-                nullValue = this._creator.newInstance(new Object[]{obj});
-            } catch (Throwable e) {
+                obj2 = this._creator.newInstance(new Object[]{obj});
+            } catch (Exception e) {
                 ClassUtil.unwrapAndThrowAsIAE(e, "Failed to instantiate class " + this._creator.getDeclaringClass().getName() + ", problem: " + e.getMessage());
-                nullValue = null;
+                obj2 = null;
             }
-            this._valueDeserializer.deserialize(jsonParser, deserializationContext, nullValue);
+            this._valueDeserializer.deserialize(jsonParser, deserializationContext, obj2);
         }
-        set(obj, nullValue);
+        set(obj, obj2);
     }
 
     public Object deserializeSetAndReturn(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
@@ -93,11 +93,13 @@ public final class InnerClassProperty extends SettableBeanProperty {
         return this._delegate.setAndReturn(obj, obj2);
     }
 
-    Object readResolve() {
+    /* access modifiers changed from: 0000 */
+    public Object readResolve() {
         return new InnerClassProperty(this, this._annotated);
     }
 
-    Object writeReplace() {
+    /* access modifiers changed from: 0000 */
+    public Object writeReplace() {
         return this._annotated != null ? this : new InnerClassProperty(this, new AnnotatedConstructor(null, this._creator, null, null));
     }
 }

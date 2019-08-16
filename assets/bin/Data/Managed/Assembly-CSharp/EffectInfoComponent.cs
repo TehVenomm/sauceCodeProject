@@ -1,11 +1,14 @@
 using UnityEngine;
 
-public class EffectInfoComponent
+public class EffectInfoComponent : MonoBehaviour
 {
 	[Tooltip("ル\u30fcプエンドによる削除設定")]
 	public bool destroyLoopEnd;
 
 	private AudioObject loopAudioObject;
+
+	[Tooltip("WEATHER CHANGE用のカメラとのZ方向のoffset")]
+	public float CameraPosLinkOffsetZ;
 
 	public EffectInfoComponent()
 		: this()
@@ -16,7 +19,7 @@ public class EffectInfoComponent
 	{
 		if (loopAudioObject != null)
 		{
-			loopAudioObject.Stop(0);
+			loopAudioObject.Stop();
 		}
 		loopAudioObject = ao;
 	}

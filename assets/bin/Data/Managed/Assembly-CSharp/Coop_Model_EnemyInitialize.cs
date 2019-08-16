@@ -15,6 +15,12 @@ public class Coop_Model_EnemyInitialize : Coop_Model_ObjectSyncPositionBase
 
 	public int downCount;
 
+	public float concussionTotal;
+
+	public float concussionMax;
+
+	public float concussionExtend;
+
 	public BadStatus badStatusMax = new BadStatus();
 
 	public List<Enemy.RegionWorkSyncData> regions;
@@ -42,6 +48,24 @@ public class Coop_Model_EnemyInitialize : Coop_Model_ObjectSyncPositionBase
 	public Vector3[] tailPosList;
 
 	public int bulletIndex;
+
+	public float walkSpeedRateFromTable = 1f;
+
+	public ELEMENT_TYPE changeElementIcon = ELEMENT_TYPE.MAX;
+
+	public ELEMENT_TYPE changeWeakElementIcon = ELEMENT_TYPE.MAX;
+
+	public int changeToleranceRegionId = -1;
+
+	public int changeToleranceScroll = -1;
+
+	public List<BlendColorCtrl.ShaderSyncParam> shaderSyncParam;
+
+	public int deadReviveCount;
+
+	public bool isFirstMadMode;
+
+	public int recoveredHP;
 
 	public Coop_Model_EnemyInitialize()
 	{
@@ -74,6 +98,7 @@ public class Coop_Model_EnemyInitialize : Coop_Model_ObjectSyncPositionBase
 				regionWorkSyncData.isShieldDamage = enemyRegionWork.isShieldDamage;
 				regionWorkSyncData.isShieldCriticalDamage = enemyRegionWork.isShieldCriticalDamage;
 				regionWorkSyncData.shadowSealingData = enemyRegionWork.shadowSealingData;
+				regionWorkSyncData.bombArrowDataHistory = enemyRegionWork.bombArrowDataHistory;
 				regions.Add(regionWorkSyncData);
 			}
 		}

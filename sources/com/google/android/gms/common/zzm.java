@@ -1,66 +1,61 @@
 package com.google.android.gms.common;
 
-import android.os.IBinder;
-import android.os.Parcel;
-import android.os.Parcelable.Creator;
+import android.support.annotation.NonNull;
 import android.util.Log;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzat;
-import com.google.android.gms.dynamic.IObjectWrapper;
-import com.google.android.gms.dynamic.zzn;
+import com.google.android.gms.common.util.AndroidUtilsLight;
+import com.google.android.gms.common.util.Hex;
+import java.util.concurrent.Callable;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nullable;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
 
-public final class zzm extends zza {
-    public static final Creator<zzm> CREATOR = new zzn();
-    private final String zzffn;
-    private final zzg zzffo;
-    private final boolean zzffp;
+@CheckReturnValue
+class zzm {
+    private static final zzm zzac = new zzm(true, null, null);
+    private final Throwable cause;
+    final boolean zzad;
+    private final String zzae;
 
-    zzm(String str, IBinder iBinder, boolean z) {
-        this.zzffn = str;
-        this.zzffo = zzai(iBinder);
-        this.zzffp = z;
+    zzm(boolean z, @Nullable String str, @Nullable Throwable th) {
+        this.zzad = z;
+        this.zzae = str;
+        this.cause = th;
     }
 
-    zzm(String str, zzg zzg, boolean z) {
-        this.zzffn = str;
-        this.zzffo = zzg;
-        this.zzffp = z;
+    static zzm zza(@NonNull String str, @NonNull Throwable th) {
+        return new zzm(false, str, th);
     }
 
-    private static zzg zzai(IBinder iBinder) {
-        if (iBinder == null) {
-            return null;
-        }
-        try {
-            zzg zzh;
-            IObjectWrapper zzaey = zzat.zzak(iBinder).zzaey();
-            byte[] bArr = zzaey == null ? null : (byte[]) zzn.zzab(zzaey);
-            if (bArr != null) {
-                zzh = new zzh(bArr);
+    static zzm zza(Callable<String> callable) {
+        return new zzo(callable);
+    }
+
+    static zzm zzb(@NonNull String str) {
+        return new zzm(false, str, null);
+    }
+
+    static String zzc(String str, zze zze, boolean z, boolean z2) {
+        return String.format("%s: pkg=%s, sha1=%s, atk=%s, ver=%s", new Object[]{z2 ? "debug cert rejected" : "not whitelisted", str, Hex.bytesToStringLowercase(AndroidUtilsLight.zzj(CommonUtils.SHA1_INSTANCE).digest(zze.getBytes())), Boolean.valueOf(z), "12451009.false"});
+    }
+
+    static zzm zze() {
+        return zzac;
+    }
+
+    /* access modifiers changed from: 0000 */
+    @Nullable
+    public String getErrorMessage() {
+        return this.zzae;
+    }
+
+    /* access modifiers changed from: 0000 */
+    public final void zzf() {
+        if (!this.zzad && Log.isLoggable("GoogleCertificatesRslt", 3)) {
+            if (this.cause != null) {
+                Log.d("GoogleCertificatesRslt", getErrorMessage(), this.cause);
             } else {
-                Log.e("GoogleCertificatesQuery", "Could not unwrap certificate");
-                zzh = null;
+                Log.d("GoogleCertificatesRslt", getErrorMessage());
             }
-            return zzh;
-        } catch (Throwable e) {
-            Log.e("GoogleCertificatesQuery", "Could not unwrap certificate", e);
-            return null;
         }
-    }
-
-    public final void writeToParcel(Parcel parcel, int i) {
-        IBinder iBinder;
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, this.zzffn, false);
-        if (this.zzffo == null) {
-            Log.w("GoogleCertificatesQuery", "certificate binder is null");
-            iBinder = null;
-        } else {
-            iBinder = this.zzffo.asBinder();
-        }
-        zzd.zza(parcel, 2, iBinder, false);
-        zzd.zza(parcel, 3, this.zzffp);
-        zzd.zzai(parcel, zze);
     }
 }

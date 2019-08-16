@@ -13,5 +13,7 @@ namespace Network
 		public List<int> missionStatus = new List<int>();
 
 		public List<int> story = new List<int>();
+
+		public int clearTime;
 	}
 }

@@ -18,8 +18,8 @@ public class GuildMemberDetail : HomeFriendDetail
 		SetEvent(transRoot, UI.BTN_FOLLOW, "FOLLOW", 0);
 		if (flag && flag2)
 		{
-			SetActive(transRoot, UI.BTN_FOLLOW, true);
-			SetActive(transRoot, UI.BTN_UNFOLLOW, false);
+			SetActive(transRoot, UI.BTN_FOLLOW, is_visible: true);
+			SetActive(transRoot, UI.BTN_UNFOLLOW, is_visible: false);
 			SetEvent(transRoot, UI.BTN_FOLLOW, "INVALID_FOLLOW", 0);
 		}
 		else
@@ -27,7 +27,7 @@ public class GuildMemberDetail : HomeFriendDetail
 			SetActive(transRoot, UI.BTN_FOLLOW, flag2);
 			SetActive(transRoot, UI.BTN_UNFOLLOW, !flag2);
 		}
-		SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, true);
+		SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, is_visible: true);
 		bool flag3 = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(charaInfo.userId);
 		SetActive(transRoot, UI.BTN_BLACKLIST_IN, !flag3);
 		SetActive(transRoot, UI.BTN_BLACKLIST_OUT, flag3);

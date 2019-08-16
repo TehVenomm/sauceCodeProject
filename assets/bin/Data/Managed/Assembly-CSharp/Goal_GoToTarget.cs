@@ -18,7 +18,6 @@ public class Goal_GoToTarget : GoalComposite
 		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
@@ -27,26 +26,24 @@ public class Goal_GoToTarget : GoalComposite
 		if (!brain.targetCtrl.IsAliveTarget())
 		{
 			SetStatus(STATUS.COMPLETED);
+			return;
+		}
+		targetPos = brain.targetCtrl.GetAttackPosition();
+		float num = 3f;
+		if (!brain.moveCtrl.CanSeekToOpponent(targetPos, num))
+		{
+			PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
+			RaycastHit seekHit = brain.moveCtrl.seekHit;
+			Vector3 position = seekHit.get_transform().get_position();
+			AddSubGoal<Goal_MoveToAround>().SetParam(place, position, num);
+		}
+		else if (!brain.targetCtrl.IsArrivalAttackPosition())
+		{
+			AddSubGoal<Goal_MoveToPosition>().SetParam(targetPos, num);
 		}
 		else
 		{
-			targetPos = brain.targetCtrl.GetAttackPosition();
-			float num = 3f;
-			if (!brain.moveCtrl.CanSeekToOpponent(targetPos, num))
-			{
-				PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
-				RaycastHit seekHit = brain.moveCtrl.seekHit;
-				Vector3 position = seekHit.get_transform().get_position();
-				AddSubGoal<Goal_MoveToAround>().SetParam(place, position, num);
-			}
-			else if (!brain.targetCtrl.IsArrivalAttackPosition())
-			{
-				AddSubGoal<Goal_MoveToPosition>().SetParam(targetPos, num);
-			}
-			else
-			{
-				SetStatus(STATUS.COMPLETED);
-			}
+			SetStatus(STATUS.COMPLETED);
 		}
 	}
 

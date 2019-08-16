@@ -17,10 +17,6 @@ public class HateParam
 		public float atackedVolatizeRate = 0.4f;
 	}
 
-	public const int HATE_MAX_VALUE = 1000;
-
-	public const float NPC_HATE_RATE = 0.5f;
-
 	[Tooltip("ヘイトサイクルの最大タ\u30fcン数")]
 	public int cycleTurnMax = 8;
 
@@ -41,6 +37,10 @@ public class HateParam
 	public float[] distanceAttackRatio = new float[4];
 
 	public CategoryParam[] categoryParam = new CategoryParam[7];
+
+	public const int HATE_MAX_VALUE = 1000;
+
+	public const float NPC_HATE_RATE = 0.5f;
 
 	public static HateParam GetDefault()
 	{

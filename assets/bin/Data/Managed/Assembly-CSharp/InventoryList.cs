@@ -150,16 +150,17 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 		LinkedListNode<T> linkedListNode = list.First;
 		while (true)
 		{
-			if (linkedListNode == null)
+			if (linkedListNode != null)
 			{
-				return;
+				T value = linkedListNode.Value;
+				if (value.uniqueID == unique_id)
+				{
+					break;
+				}
+				linkedListNode = linkedListNode.Next;
+				continue;
 			}
-			T value = linkedListNode.Value;
-			if (value.uniqueID == unique_id)
-			{
-				break;
-			}
-			linkedListNode = linkedListNode.Next;
+			return;
 		}
 		list.Remove(linkedListNode);
 	}

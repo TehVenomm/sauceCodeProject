@@ -1,5 +1,8 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
@@ -12,6 +15,8 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			{
 				public ABILITY_ENABLE_TYPE type;
 
+				public int SpAtkEnableTypeBit;
+
 				public int[] values = new int[2];
 			}
 
@@ -20,6 +25,8 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			public string target;
 
 			public XorInt value = 0;
+
+			public int unlockEventId;
 
 			public List<Enable> enables = new List<Enable>();
 
@@ -69,8 +76,6 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			}
 		}
 
-		public const string NT = "abilityId,needAP,enableEquipType,name,description,abilityType1,abilityTarget1,enableSpAttackType1,abilityValue1,abilityEnableType1,abilityEnableValue11,abilityEnableValue12,abilityType2,abilityTarget2,enableSpAttackType2,abilityValue2,abilityEnableType2,abilityEnableValue21,abilityEnableValue22,abilityType3,abilityTarget3,enableSpAttackType3,abilityValue3,abilityEnableType3,abilityEnableValue31,abilityEnableValue32,descriptionPreGrant,minNeedAP";
-
 		public XorUInt id = 0u;
 
 		public XorInt needAP = 0;
@@ -92,6 +97,8 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 		private AbilityInfo[] m_cashedInfo;
 
 		private AbilityTable.Ability m_cashedAbility;
+
+		public const string NT = "abilityId,needAP,enableEquipType,name,description,abilityType1,abilityTarget1,enableSpAttackType1,abilityValue1,abilityEnableType1,abilityEnableValue11,abilityEnableValue12,abilityType2,abilityTarget2,enableSpAttackType2,abilityValue2,abilityEnableType2,abilityEnableValue21,abilityEnableValue22,abilityType3,abilityTarget3,enableSpAttackType3,abilityValue3,abilityEnableType3,abilityEnableValue31,abilityEnableValue32,descriptionPreGrant,minNeedAP";
 
 		public AbilityInfo[] info
 		{
@@ -137,42 +144,37 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			data.m_info = new AbilityInfo[3];
 			for (int i = 0; i < 3; i++)
 			{
-				ABILITY_ENABLE_TYPE value = ABILITY_ENABLE_TYPE.NONE;
 				data.m_info[i] = new AbilityInfo();
 				CSVReader.PopResult result = csv_reader.PopEnum(ref data.m_info[i].type, ABILITY_TYPE.NONE);
-				CSVReader.PopResult result2;
-				if ((CSVReader.PopResult.Result)result == CSVReader.PopResult.Result.DONT_DEFINE_ERROR || (CSVReader.PopResult.Result)result == CSVReader.PopResult.Result.UNKNOWN)
+				csv_reader.Pop(ref data.m_info[i].target);
+				string value = string.Empty;
+				CSVReader.PopResult result2 = csv_reader.Pop(ref value);
+				int num = ParseSpAtkEnableTypeBit(value);
+				csv_reader.Pop(ref data.m_info[i].value);
+				if (!CSVReader.PopResult.IsParseSucceeded(result))
 				{
-					csv_reader.Pop(ref data.m_info[i].target);
-					result2 = csv_reader.PopEnum(ref value, ABILITY_ENABLE_TYPE.NONE);
-					csv_reader.Pop(ref data.m_info[i].value);
 					data.m_info[i].type = ABILITY_TYPE.NEED_UPDATE;
 					data.m_info[i].target = string.Empty;
 				}
-				else
-				{
-					csv_reader.Pop(ref data.m_info[i].target);
-					result2 = csv_reader.PopEnum(ref value, ABILITY_ENABLE_TYPE.NONE);
-					csv_reader.Pop(ref data.m_info[i].value);
-				}
-				if ((CSVReader.PopResult.Result)result2 != CSVReader.PopResult.Result.DONT_DEFINE_ERROR && (CSVReader.PopResult.Result)result2 != CSVReader.PopResult.Result.UNKNOWN && value != 0)
+				if (CSVReader.PopResult.IsParseSucceeded(result2) && num != 0)
 				{
 					AbilityInfo.Enable enable = new AbilityInfo.Enable();
-					enable.type = value;
+					enable.type = ABILITY_ENABLE_TYPE.WEAPON_SP_TYPE;
+					enable.SpAtkEnableTypeBit = num;
 					data.m_info[i].enables.Add(enable);
 				}
-				value = ABILITY_ENABLE_TYPE.NONE;
-				int value2 = 0;
+				ABILITY_ENABLE_TYPE value2 = ABILITY_ENABLE_TYPE.NONE;
 				int value3 = 0;
-				result2 = csv_reader.PopEnum(ref value, ABILITY_ENABLE_TYPE.NONE);
-				csv_reader.Pop(ref value2);
+				int value4 = 0;
+				result2 = csv_reader.PopEnum(ref value2, ABILITY_ENABLE_TYPE.NONE);
 				csv_reader.Pop(ref value3);
-				if ((CSVReader.PopResult.Result)result2 != CSVReader.PopResult.Result.DONT_DEFINE_ERROR && (CSVReader.PopResult.Result)result2 != CSVReader.PopResult.Result.UNKNOWN && value != 0)
+				csv_reader.Pop(ref value4);
+				if (CSVReader.PopResult.IsParseSucceeded(result2) && value2 != 0)
 				{
 					AbilityInfo.Enable enable2 = new AbilityInfo.Enable();
-					enable2.type = value;
-					enable2.values[0] = value2;
-					enable2.values[1] = value3;
+					enable2.type = value2;
+					enable2.values[0] = value3;
+					enable2.values[1] = value4;
 					data.m_info[i].enables.Add(enable2);
 				}
 			}
@@ -194,23 +196,54 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			}
 			for (int k = 0; k < 3; k++)
 			{
-				if (Utility.IsConditionsAbilityType(data.m_info[k].type))
+				if (!Utility.IsConditionsAbilityType(data.m_info[k].type))
 				{
-					ABILITY_TYPE type = data.m_info[k].type;
-					for (int l = 0; l < 3; l++)
+					continue;
+				}
+				ABILITY_TYPE type = data.m_info[k].type;
+				for (int l = 0; l < 3; l++)
+				{
+					if (data.m_info[l].type != 0 && data.m_info[l].type != ABILITY_TYPE.TIME_LIMIT)
 					{
-						if (data.m_info[l].type != 0 && data.m_info[l].type != ABILITY_TYPE.TIME_LIMIT)
-						{
-							AbilityInfo.Enable enable4 = new AbilityInfo.Enable();
-							enable4.type = Utility.GetAbilityEnableType(type);
-							enable4.values[0] = data.m_info[k].value;
-							enable4.values[1] = 0;
-							data.m_info[l].enables.Add(enable4);
-						}
+						AbilityInfo.Enable enable4 = new AbilityInfo.Enable();
+						enable4.type = Utility.GetAbilityEnableType(type);
+						enable4.values[0] = data.m_info[k].value;
+						enable4.values[1] = 0;
+						data.m_info[l].enables.Add(enable4);
 					}
 				}
 			}
 			return true;
+		}
+
+		public static int ParseSpAtkEnableTypeBit(string _input_text)
+		{
+			int num = 0;
+			if (string.IsNullOrEmpty(_input_text))
+			{
+				return num;
+			}
+			IEnumerator enumerator = Enum.GetValues(typeof(SP_ATK_ENABLE_TYPE_BIT)).GetEnumerator();
+			try
+			{
+				while (enumerator.MoveNext())
+				{
+					object current = enumerator.Current;
+					if (_input_text.Contains(current.ToString()))
+					{
+						num |= (int)current;
+					}
+				}
+				return num;
+			}
+			finally
+			{
+				IDisposable disposable;
+				if ((disposable = (enumerator as IDisposable)) != null)
+				{
+					disposable.Dispose();
+				}
+			}
 		}
 
 		public static string CBSecondKey(CSVReader csv, int table_data_num)
@@ -274,16 +307,16 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 		{
 			id = key1;
 			this.key2 = key2;
-			needAP = reader.ReadInt32(0);
+			needAP = reader.ReadInt32();
 			name = reader.ReadString(string.Empty);
 			description = reader.ReadString(string.Empty);
 			m_info = new AbilityInfo[3];
 			for (int i = 0; i < 3; i++)
 			{
 				AbilityInfo abilityInfo = new AbilityInfo();
-				abilityInfo.type = (ABILITY_TYPE)reader.ReadInt32(0);
+				abilityInfo.type = (ABILITY_TYPE)reader.ReadInt32();
 				abilityInfo.target = reader.ReadString(string.Empty);
-				abilityInfo.value = reader.ReadInt32(0);
+				abilityInfo.value = reader.ReadInt32();
 				m_info[i] = abilityInfo;
 			}
 		}
@@ -339,9 +372,21 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 
 	private DoubleUIntKeyTable<AbilityData> abilityDataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<AbilityData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntKeyReadCSV<AbilityData> _003C_003Ef__mg_0024cache2;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
+
 	public static DoubleUIntKeyTable<AbilityData> CreateTableCSV(string csv_text)
 	{
-		return TableUtility.CreateDoubleUIntKeyTable<AbilityData>(csv_text, AbilityData.cb, "abilityId,needAP,enableEquipType,name,description,abilityType1,abilityTarget1,enableSpAttackType1,abilityValue1,abilityEnableType1,abilityEnableValue11,abilityEnableValue12,abilityType2,abilityTarget2,enableSpAttackType2,abilityValue2,abilityEnableType2,abilityEnableValue21,abilityEnableValue22,abilityType3,abilityTarget3,enableSpAttackType3,abilityValue3,abilityEnableType3,abilityEnableValue31,abilityEnableValue32,descriptionPreGrant,minNeedAP", AbilityData.CBSecondKey, null, null, null);
+		return TableUtility.CreateDoubleUIntKeyTable<AbilityData>(csv_text, AbilityData.cb, "abilityId,needAP,enableEquipType,name,description,abilityType1,abilityTarget1,enableSpAttackType1,abilityValue1,abilityEnableType1,abilityEnableValue11,abilityEnableValue12,abilityType2,abilityTarget2,enableSpAttackType2,abilityValue2,abilityEnableType2,abilityEnableValue21,abilityEnableValue22,abilityType3,abilityTarget3,enableSpAttackType3,abilityValue3,abilityEnableType3,abilityEnableValue31,abilityEnableValue32,descriptionPreGrant,minNeedAP", AbilityData.CBSecondKey);
 	}
 
 	public void CreateTable(string csv_text)
@@ -352,7 +397,7 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddDoubleUIntKeyTable(abilityDataTable, csv_text, AbilityData.cb, "abilityId,needAP,enableEquipType,name,description,abilityType1,abilityTarget1,enableSpAttackType1,abilityValue1,abilityEnableType1,abilityEnableValue11,abilityEnableValue12,abilityType2,abilityTarget2,enableSpAttackType2,abilityValue2,abilityEnableType2,abilityEnableValue21,abilityEnableValue22,abilityType3,abilityTarget3,enableSpAttackType3,abilityValue3,abilityEnableType3,abilityEnableValue31,abilityEnableValue32,descriptionPreGrant,minNeedAP", AbilityData.CBSecondKey, null, null);
+		TableUtility.AddDoubleUIntKeyTable(abilityDataTable, csv_text, AbilityData.cb, "abilityId,needAP,enableEquipType,name,description,abilityType1,abilityTarget1,enableSpAttackType1,abilityValue1,abilityEnableType1,abilityEnableValue11,abilityEnableValue12,abilityType2,abilityTarget2,enableSpAttackType2,abilityValue2,abilityEnableType2,abilityEnableValue21,abilityEnableValue22,abilityType3,abilityTarget3,enableSpAttackType3,abilityValue3,abilityEnableType3,abilityEnableValue31,abilityEnableValue32,descriptionPreGrant,minNeedAP", AbilityData.CBSecondKey);
 	}
 
 	public static DoubleUIntKeyTable<AbilityData> CreateTableBinary(byte[] bytes)
@@ -361,7 +406,7 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 		BinaryTableReader binaryTableReader = new BinaryTableReader(bytes);
 		while (binaryTableReader.MoveNext())
 		{
-			uint key = binaryTableReader.ReadUInt32(0u);
+			uint key = binaryTableReader.ReadUInt32();
 			uint key2 = 0u;
 			UIntKeyTable<AbilityData> uIntKeyTable = doubleUIntKeyTable.Get(key);
 			if (uIntKeyTable != null)

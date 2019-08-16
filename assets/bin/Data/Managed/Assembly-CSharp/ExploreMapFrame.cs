@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ExploreMapFrame
+public class ExploreMapFrame : MonoBehaviour
 {
 	private static readonly int MAP_HORIZONTAL_MARGIN_FOR_OUTER_FRAME = 6;
 
@@ -31,7 +31,7 @@ public class ExploreMapFrame
 		rotationHandler = this.GetComponentsInChildren<UIScreenRotationHandler>(true);
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
-			OnScreenRotate(true);
+			OnScreenRotate(isPortrait: true);
 		}
 	}
 
@@ -80,35 +80,33 @@ public class ExploreMapFrame
 
 	private void UpdateMap()
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		if (!(mapRoot == null))
+		if (mapRoot == null)
 		{
-			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-			{
-				float mapScale = mapRoot.GetMapScale();
-				mapRoot.get_gameObject().get_transform().set_localScale(Vector2.op_Implicit(new Vector2(mapScale, mapScale)));
-				Vector2 sonarScale = mapRoot.GetSonarScale();
-				if (mapRoot.directionSonar != null)
-				{
-					mapRoot.directionSonar.get_transform().set_localScale(Vector2.op_Implicit(sonarScale));
-				}
-			}
-			Rect mapAreaRect = CalcMapAreaRect();
-			UpdateMapCenter(mapAreaRect);
-			UpdateMapVisibleArea(mapAreaRect);
+			return;
 		}
+		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+		{
+			float mapScale = mapRoot.GetMapScale();
+			mapRoot.get_gameObject().get_transform().set_localScale(Vector2.op_Implicit(new Vector2(mapScale, mapScale)));
+			Vector2 sonarScale = mapRoot.GetSonarScale();
+			if (mapRoot.directionSonar != null)
+			{
+				mapRoot.directionSonar.get_transform().set_localScale(Vector2.op_Implicit(sonarScale));
+			}
+		}
+		Rect mapAreaRect = CalcMapAreaRect();
+		UpdateMapCenter(mapAreaRect);
+		UpdateMapVisibleArea(mapAreaRect);
 	}
 
 	private Rect CalcMapAreaRect()
@@ -135,23 +133,20 @@ public class ExploreMapFrame
 
 	private void UpdateMapCenter(Rect mapAreaRect)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		mapRoot.get_transform().set_localPosition(Utility.ToVector3XY(mapAreaRect.get_center()));
+		mapRoot.get_transform().set_localPosition(mapAreaRect.get_center().ToVector3XY());
 	}
 
 	private void UpdateMapVisibleArea(Rect mapAreaRect)
 	{
 		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 		UITexture mapTexture = mapRoot.mapTexture;
 		Vector3 localScale = mapTexture.cachedTransform.get_localScale();
 		float x = localScale.x;

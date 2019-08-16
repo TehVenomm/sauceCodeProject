@@ -34,10 +34,16 @@ public class JsonLocationInstantiator extends ValueInstantiator {
     }
 
     private static final long _long(Object obj) {
-        return obj == null ? 0 : ((Number) obj).longValue();
+        if (obj == null) {
+            return 0;
+        }
+        return ((Number) obj).longValue();
     }
 
     private static final int _int(Object obj) {
-        return obj == null ? 0 : ((Number) obj).intValue();
+        if (obj == null) {
+            return 0;
+        }
+        return ((Number) obj).intValue();
     }
 }

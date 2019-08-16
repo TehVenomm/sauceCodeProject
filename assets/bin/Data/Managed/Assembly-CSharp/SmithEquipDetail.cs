@@ -15,8 +15,8 @@ public class SmithEquipDetail : ItemDetailEquip
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_CHANGE, false);
-		SetActive((Enum)UI.BTN_CREATE, false);
-		SetActive((Enum)UI.BTN_GROW, false);
+		SetActive((Enum)UI.BTN_CHANGE, is_visible: false);
+		SetActive((Enum)UI.BTN_CREATE, is_visible: false);
+		SetActive((Enum)UI.BTN_GROW, is_visible: false);
 	}
 }

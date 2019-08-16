@@ -5,33 +5,42 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Releasable;
 import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.util.VisibleForTesting;
 import com.google.android.gms.games.multiplayer.ParticipantResult;
 import java.util.List;
 
+@Deprecated
+@VisibleForTesting
 public interface TurnBasedMultiplayer {
 
+    @Deprecated
+    public interface CancelMatchResult extends Result {
+        String getMatchId();
+    }
+
+    @Deprecated
     public interface InitiateMatchResult extends Result {
         TurnBasedMatch getMatch();
     }
 
+    @Deprecated
     public interface LeaveMatchResult extends Result {
         TurnBasedMatch getMatch();
     }
 
+    @Deprecated
     public interface LoadMatchResult extends Result {
         TurnBasedMatch getMatch();
     }
 
+    @Deprecated
     public interface LoadMatchesResult extends Releasable, Result {
         LoadMatchesResponse getMatches();
     }
 
+    @Deprecated
     public interface UpdateMatchResult extends Result {
         TurnBasedMatch getMatch();
-    }
-
-    public interface CancelMatchResult extends Result {
-        String getMatchId();
     }
 
     PendingResult<InitiateMatchResult> acceptInvitation(GoogleApiClient googleApiClient, String str);
@@ -56,10 +65,8 @@ public interface TurnBasedMultiplayer {
 
     int getMaxMatchDataSize(GoogleApiClient googleApiClient);
 
-    @Deprecated
     Intent getSelectOpponentsIntent(GoogleApiClient googleApiClient, int i, int i2);
 
-    @Deprecated
     Intent getSelectOpponentsIntent(GoogleApiClient googleApiClient, int i, int i2, boolean z);
 
     PendingResult<LeaveMatchResult> leaveMatch(GoogleApiClient googleApiClient, String str);

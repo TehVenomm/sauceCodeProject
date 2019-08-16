@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RootMotionProxy
+public class RootMotionProxy : MonoBehaviour
 {
 	private Animator animator;
 
@@ -15,11 +15,6 @@ public class RootMotionProxy
 
 	private void Start()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		animator = this.get_gameObject().GetComponent<Animator>();
 		parentTransfom = this.get_transform().get_parent();
 		if (parentTransfom != null)
@@ -40,31 +35,32 @@ public class RootMotionProxy
 		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		if (!(parentTransfom == null) && !(animator == null))
+		if (parentTransfom == null || animator == null)
 		{
-			if (!animator.get_applyRootMotion())
+			return;
+		}
+		if (!animator.get_applyRootMotion())
+		{
+			if (parentRigidbody != null)
 			{
-				if (parentRigidbody != null)
-				{
-					parentRigidbody.set_velocity(Vector3.get_zero());
-				}
+				parentRigidbody.set_velocity(Vector3.get_zero());
 			}
-			else if (parentRigidbody != null && !parentRigidbody.get_isKinematic())
+		}
+		else if (parentRigidbody != null && !parentRigidbody.get_isKinematic())
+		{
+			if (Time.get_deltaTime() > 0f)
 			{
-				if (Time.get_deltaTime() > 0f)
-				{
-					parentRigidbody.set_velocity(animator.get_deltaPosition() / Time.get_deltaTime());
-				}
-				else
-				{
-					parentRigidbody.set_velocity(Vector3.get_zero());
-				}
+				parentRigidbody.set_velocity(animator.get_deltaPosition() / Time.get_deltaTime());
 			}
 			else
 			{
-				parentTransfom.set_localPosition(parentTransfom.get_localPosition() + animator.get_deltaPosition());
-				parentTransfom.set_localRotation(parentTransfom.get_localRotation() * animator.get_deltaRotation());
+				parentRigidbody.set_velocity(Vector3.get_zero());
 			}
+		}
+		else
+		{
+			parentTransfom.set_localPosition(parentTransfom.get_localPosition() + animator.get_deltaPosition());
+			parentTransfom.set_localRotation(parentTransfom.get_localRotation() * animator.get_deltaRotation());
 		}
 	}
 }

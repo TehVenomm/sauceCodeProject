@@ -19,7 +19,7 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public R await(long arg_long_1, object arg_object_2)
 		{
-			return base.InvokeCall<R>("await", "(JLjava/util/concurrent/TimeUnit;)Lcom/google/android/gms/common/api/Result;", new object[2]
+			return InvokeCall<R>("await", "(JLjava/util/concurrent/TimeUnit;)Lcom/google/android/gms/common/api/Result;", new object[2]
 			{
 				arg_long_1,
 				arg_object_2
@@ -28,12 +28,12 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public R await()
 		{
-			return base.InvokeCall<R>("await", "()Lcom/google/android/gms/common/api/Result;", new object[0]);
+			return InvokeCall<R>("await", "()Lcom/google/android/gms/common/api/Result;", new object[0]);
 		}
 
 		public bool isCanceled()
 		{
-			return base.InvokeCall<bool>("isCanceled", "()Z", new object[0]);
+			return InvokeCall<bool>("isCanceled", "()Z", new object[0]);
 		}
 
 		public void cancel()

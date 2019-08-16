@@ -28,6 +28,25 @@ public class StageObject : ControlObject, IBulletObserver
 		public float hitStartTime;
 	}
 
+	public class HitIntervalStatus
+	{
+		public Collider fromCollider;
+
+		public float hitInterval;
+
+		public float hitIntervalTimer;
+
+		public bool enable;
+
+		public HitIntervalStatus(Collider fromCollider, float hitInterval)
+		{
+			this.fromCollider = fromCollider;
+			this.hitInterval = hitInterval;
+			hitIntervalTimer = hitInterval;
+			enable = true;
+		}
+	}
+
 	[Serializable]
 	public class StampInfo
 	{
@@ -71,7 +90,8 @@ public class StageObject : ControlObject, IBulletObserver
 		TUTORIAL = 0x200,
 		UNLOCK_EVENT = 0x400,
 		TEST = 0x800,
-		GRAB = 0x1000
+		GRAB = 0x1000,
+		DEAD_REVIVE = 0x2000
 	}
 
 	protected class HitOffTimer
@@ -97,6 +117,8 @@ public class StageObject : ControlObject, IBulletObserver
 		EVOLVE,
 		PLAYER_PAIR_SWORDS_LASER_END,
 		PLAYER_ONE_HAND_SWORD_MOVE_END,
+		PLAYER_GATHER_GIMMICK,
+		ENEMY_UPDATE_BOMBARROW,
 		NUM
 	}
 
@@ -145,6 +167,8 @@ public class StageObject : ControlObject, IBulletObserver
 
 	protected List<AttackedContinuationStatus> continuationList = new List<AttackedContinuationStatus>();
 
+	protected List<HitIntervalStatus> hitIntervalList = new List<HitIntervalStatus>();
+
 	protected uint voiceChannel;
 
 	public HIT_OFF_FLAG hitOffFlag;
@@ -159,11 +183,13 @@ public class StageObject : ControlObject, IBulletObserver
 
 	protected float wallStayTimer;
 
-	protected WaitingPacketParam[] waitingPacketParams = new WaitingPacketParam[14];
+	protected WaitingPacketParam[] waitingPacketParams = new WaitingPacketParam[16];
 
 	protected NodeTable nodeCache = new NodeTable();
 
 	protected AttackedHitStatus nowAttackedHitStatus;
+
+	private bool isRegisteredStageObjectManager;
 
 	protected List<IBulletObservable> bulletObservableList = new List<IBulletObservable>();
 
@@ -204,7 +230,7 @@ public class StageObject : ControlObject, IBulletObserver
 	public bool isInitialized
 	{
 		get;
-		private set;
+		protected set;
 	}
 
 	public bool isLoading
@@ -267,6 +293,8 @@ public class StageObject : ControlObject, IBulletObserver
 		protected set;
 	}
 
+	public bool IsRegisteredStageObjectManager => isRegisteredStageObjectManager;
+
 	public Vector2 positionXZ
 	{
 		get
@@ -304,7 +332,6 @@ public class StageObject : ControlObject, IBulletObserver
 	public StageObject()
 	{
 		objectType = OBJECT_TYPE.STAGE_OBJECT;
-		id = 0;
 		isInitialized = false;
 		coopMode = COOP_MODE_TYPE.NONE;
 		coopClientId = 0;
@@ -333,6 +360,18 @@ public class StageObject : ControlObject, IBulletObserver
 		return coopMode == COOP_MODE_TYPE.PUPPET;
 	}
 
+	public void SetHitOffFlag(bool enable, HIT_OFF_FLAG flag)
+	{
+		if (enable)
+		{
+			hitOffFlag |= flag;
+		}
+		else
+		{
+			hitOffFlag &= ~flag;
+		}
+	}
+
 	public bool IsWallStay()
 	{
 		if (objectParameter == null)
@@ -344,7 +383,6 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public void AddController<T>() where T : ControllerBase
 	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		if (controller == null)
 		{
 			if (!CoopStageObjectUtility.CanControll(this))
@@ -362,12 +400,12 @@ public class StageObject : ControlObject, IBulletObserver
 	{
 		if (controller != null)
 		{
-			controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
+			controller.SetEnableControll(enable: false);
 			Object.Destroy(controller);
 		}
 	}
 
-	public void LookAt(Vector3 pos)
+	public virtual void LookAt(Vector3 pos, bool isBlindEnable = false)
 	{
 		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
@@ -382,6 +420,7 @@ public class StageObject : ControlObject, IBulletObserver
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			SetNotifyMaster(MonoBehaviourSingleton<StageObjectManager>.I);
+			isRegisteredStageObjectManager = true;
 		}
 		if (MonoBehaviourSingleton<MiniMap>.IsValid())
 		{
@@ -401,6 +440,7 @@ public class StageObject : ControlObject, IBulletObserver
 	protected override void Awake()
 	{
 		base.Awake();
+		id = 0;
 		_rigidbody = this.GetComponent<Rigidbody>();
 		_collider = this.GetComponent<Collider>();
 		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
@@ -471,13 +511,15 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public virtual bool DestroyObject()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		isDestroyWaitFlag = false;
 		if (packetSender != null)
 		{
 			packetSender.OnDestroyObject();
 		}
-		MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(this);
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(this);
+		}
 		Object.Destroy(this.get_gameObject());
 		return true;
 	}
@@ -511,6 +553,10 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			OnAttackedContinuationUpdate(continuationList[i]);
 		}
+		if (!hitIntervalList.IsNullOrEmpty())
+		{
+			hitIntervalList.RemoveAll((HitIntervalStatus item) => !item.enable);
+		}
 	}
 
 	protected virtual void LateUpdate()
@@ -539,6 +585,14 @@ public class StageObject : ControlObject, IBulletObserver
 				OnAttackedContinuationFixedUpdate(continuationList[i]);
 			}
 		}
+		if (!hitIntervalList.IsNullOrEmpty())
+		{
+			int j = 0;
+			for (int count = hitIntervalList.Count; j < count; j++)
+			{
+				hitIntervalList[j].hitIntervalTimer -= Time.get_deltaTime();
+			}
+		}
 	}
 
 	protected virtual void OnCollisionEnter(Collision collision)
@@ -547,9 +601,6 @@ public class StageObject : ControlObject, IBulletObserver
 
 	protected virtual void OnCollisionStay(Collision collision)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		if (collision.get_gameObject().get_layer() == 9 || collision.get_gameObject().get_layer() == 17 || collision.get_gameObject().get_layer() == 18)
 		{
 			isWallStay = true;
@@ -575,6 +626,10 @@ public class StageObject : ControlObject, IBulletObserver
 	public virtual bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
 	{
 		return true;
+	}
+
+	public virtual void OnAvoidHit(StageObject fromObject, AttackHitInfo attackHitInfo)
+	{
 	}
 
 	public virtual void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
@@ -619,25 +674,26 @@ public class StageObject : ControlObject, IBulletObserver
 			attackedHitStatus.fromType = OBJECT_TYPE.PLAYER;
 		}
 		OnAttackedHitDirection(new AttackedHitStatusDirection(attackedHitStatus));
-		if (IsValidAttackedHit(hit_param.fromObject) && !IsPuppet() && !hit_param.fromObject.IsPuppet())
+		if (!IsValidAttackedHit(hit_param.fromObject) || IsPuppet() || hit_param.fromObject.IsPuppet())
 		{
-			OnAttackedHitLocal(new AttackedHitStatusLocal(attackedHitStatus));
-			if (IsMirror() || IsPuppet())
+			return;
+		}
+		OnAttackedHitLocal(new AttackedHitStatusLocal(attackedHitStatus));
+		if (IsMirror() || IsPuppet())
+		{
+			if (packetSender != null)
 			{
-				if (packetSender != null)
-				{
-					packetSender.OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
-				}
+				packetSender.OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
 			}
-			else if (IsEnableAttackedHitOwner())
+		}
+		else if (IsEnableAttackedHitOwner())
+		{
+			OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
+			AttackedHitStatusFix status = new AttackedHitStatusFix(attackedHitStatus);
+			OnAttackedHitFix(status);
+			if (packetSender != null)
 			{
-				OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
-				AttackedHitStatusFix status = new AttackedHitStatusFix(attackedHitStatus);
-				OnAttackedHitFix(status);
-				if (packetSender != null)
-				{
-					packetSender.OnAttackedHitFix(status);
-				}
+				packetSender.OnAttackedHitFix(status);
 			}
 		}
 	}
@@ -652,12 +708,10 @@ public class StageObject : ControlObject, IBulletObserver
 		if (!CheckStatusForHitEffect(status))
 		{
 			OnIgnoreHitAttack();
+			return;
 		}
-		else
-		{
-			status.fromObject.OnAttackFromHitDirection(status, this);
-			OnPlayAttackedHitEffect(status);
-		}
+		status.fromObject.OnAttackFromHitDirection(status, this);
+		OnPlayAttackedHitEffect(status);
 	}
 
 	protected virtual void OnIgnoreHitAttack()
@@ -699,7 +753,12 @@ public class StageObject : ControlObject, IBulletObserver
 		return false;
 	}
 
-	public virtual void GetAtk(AttackHitInfo info, ref AtkAttribute atk)
+	public virtual bool InvincibleDamageByBuff(Character targetCharacter, AttackedHitStatusLocal status)
+	{
+		return false;
+	}
+
+	public virtual void GetAtk(AttackHitInfo info, ref AtkAttribute atk, SkillInfo.SkillParam skillParamInfo = null)
 	{
 		if (info != null)
 		{
@@ -747,15 +806,16 @@ public class StageObject : ControlObject, IBulletObserver
 		int count = continuationList.Count;
 		while (true)
 		{
-			if (num >= count)
+			if (num < count)
 			{
-				return;
+				if (continuationList[num].attackInfo == info && continuationList[num].fromCollider == from_collider)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			if (continuationList[num].attackInfo == info && continuationList[num].fromCollider == from_collider)
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		OnAttackedContinuationEnd(continuationList[num]);
 		continuationList.RemoveAt(num);
@@ -816,9 +876,9 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			if (ignoreColliders != null)
 			{
-				Utility.IgnoreCollision(_collider, ignoreColliders, false);
+				Utility.IgnoreCollision(_collider, ignoreColliders, ignore: false);
 			}
-			Utility.IgnoreCollision(_collider, colliders, true);
+			Utility.IgnoreCollision(_collider, colliders, ignore: true);
 			ignoreColliders = colliders;
 		}
 	}
@@ -827,7 +887,7 @@ public class StageObject : ControlObject, IBulletObserver
 	{
 		if (!(_collider == null) && ignoreColliders != null)
 		{
-			Utility.IgnoreCollision(_collider, ignoreColliders, false);
+			Utility.IgnoreCollision(_collider, ignoreColliders, ignore: false);
 			ignoreColliders = null;
 		}
 	}
@@ -841,25 +901,23 @@ public class StageObject : ControlObject, IBulletObserver
 		if (coop_mode == COOP_MODE_TYPE.ORIGINAL && !CoopStageObjectUtility.CanControll(this))
 		{
 			Log.Error(LOG.INGAME, "StageObject::SetCoopMode. field block obj({0}) to {1}", this, coop_mode);
+			return;
 		}
-		else
+		if (coopMode != 0)
 		{
-			if (coopMode != 0)
+			bool flag = false;
+			if (CoopManager.IsValidInCoop())
 			{
-				bool flag = false;
-				if (CoopManager.IsValidInCoop())
-				{
-					flag = true;
-				}
-				if (!flag)
-				{
-					Log.Error(LOG.INGAME, "StageObject::SetCoopMode() Err ( not coop )");
-					return;
-				}
+				flag = true;
 			}
-			coopMode = coop_mode;
-			coopClientId = client_id;
+			if (!flag)
+			{
+				Log.Error(LOG.INGAME, "StageObject::SetCoopMode() Err ( not coop )");
+				return;
+			}
 		}
+		coopMode = coop_mode;
+		coopClientId = client_id;
 	}
 
 	public virtual Transform FindNode(string name)
@@ -871,16 +929,23 @@ public class StageObject : ControlObject, IBulletObserver
 		StringKeyTableBase.Item nodeItem = nodeCache.GetNodeItem(name);
 		if (nodeItem != null)
 		{
-			return nodeItem.value as Transform;
+			if (nodeItem.value != null)
+			{
+				return nodeItem.value as Transform;
+			}
+			nodeCache.Remove(name);
 		}
 		Transform val = Utility.Find(base._transform, name);
-		nodeCache.Add(name, val);
+		if (val != null)
+		{
+			nodeCache.Add(name, val);
+		}
 		return val;
 	}
 
 	public virtual void OnAnimEvent(AnimEventData.EventData data)
 	{
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 		switch (data.id)
 		{
 		case AnimEventFormat.ID.SHAKE_CAMERA:
@@ -903,15 +968,15 @@ public class StageObject : ControlObject, IBulletObserver
 		{
 			int num2 = data.intArgs[0];
 			string name2 = data.stringArgs[0];
-			if (num2 != 0)
+			if (num2 == 0)
 			{
-				if (EnablePlaySound())
-				{
-					SoundManager.PlayOneShotSE(num2, this, FindNode(name2));
-				}
-				return;
+				break;
 			}
-			break;
+			if (EnablePlaySound())
+			{
+				SoundManager.PlayOneShotSE(num2, this, FindNode(name2));
+			}
+			return;
 		}
 		case AnimEventFormat.ID.SE_LOOP_PLAY:
 		{
@@ -956,7 +1021,7 @@ public class StageObject : ControlObject, IBulletObserver
 	public virtual AttackInfo FindAttackInfoExternal(string name, bool fix_rate, float rate)
 	{
 		AttackInfo[] attackInfos = GetAttackInfos();
-		return _FindAttackInfo(attackInfos, name, fix_rate, rate, false);
+		return _FindAttackInfo(attackInfos, name, fix_rate, rate);
 	}
 
 	protected virtual AttackInfo _FindAttackInfo(AttackInfo[] attack_infos, string name, bool fix_rate, float rate, bool isDuplicate = false)
@@ -978,7 +1043,7 @@ public class StageObject : ControlObject, IBulletObserver
 			{
 				if (fix_rate && !string.IsNullOrEmpty(attackInfo2.rateInfoName) && rate != 0f)
 				{
-					AttackInfo rate_info = _FindAttackInfo(attack_infos, attackInfo2.rateInfoName, false, 0f, false);
+					AttackInfo rate_info = _FindAttackInfo(attack_infos, attackInfo2.rateInfoName, fix_rate: false, 0f);
 					attackInfo = attackInfo2.GetRateAttackInfo(rate_info, rate);
 				}
 				else
@@ -1007,27 +1072,28 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public virtual void SetHitOffTimer(HIT_OFF_FLAG flag, float time)
 	{
-		if (!(time <= 0f) && flag != 0)
+		if (time <= 0f || flag == HIT_OFF_FLAG.NONE)
 		{
-			hitOffFlag |= flag;
-			float num = Time.get_time() + time;
-			int i = 0;
-			for (int count = hitOffTimers.Count; i < count; i++)
-			{
-				if (hitOffTimers[i].hitOffFlag == flag)
-				{
-					if (hitOffTimers[i].endTime < num)
-					{
-						hitOffTimers[i].endTime = num;
-					}
-					return;
-				}
-			}
-			HitOffTimer hitOffTimer = new HitOffTimer();
-			hitOffTimer.endTime = num;
-			hitOffTimer.hitOffFlag = flag;
-			hitOffTimers.Add(hitOffTimer);
+			return;
 		}
+		hitOffFlag |= flag;
+		float num = Time.get_time() + time;
+		int i = 0;
+		for (int count = hitOffTimers.Count; i < count; i++)
+		{
+			if (hitOffTimers[i].hitOffFlag == flag)
+			{
+				if (hitOffTimers[i].endTime < num)
+				{
+					hitOffTimers[i].endTime = num;
+				}
+				return;
+			}
+		}
+		HitOffTimer hitOffTimer = new HitOffTimer();
+		hitOffTimer.endTime = num;
+		hitOffTimer.hitOffFlag = flag;
+		hitOffTimers.Add(hitOffTimer);
 	}
 
 	public virtual void StartWaitingPacket(WAITING_PACKET type, bool keep_sync, float add_margin_time = 0f)
@@ -1054,47 +1120,48 @@ public class StageObject : ControlObject, IBulletObserver
 
 	public virtual void UpdateWaitingPacket()
 	{
-		if (!IsCoopNone())
+		if (IsCoopNone())
 		{
-			int num = 0;
-			int num2 = 14;
-			while (true)
-			{
-				if (num >= num2)
-				{
-					return;
-				}
-				WaitingPacketParam waitingPacketParam = waitingPacketParams[num];
-				if (waitingPacketParam != null)
-				{
-					if (waitingPacketParam.startTime <= 0f)
-					{
-						break;
-					}
-					if (IsOriginal())
-					{
-						if (waitingPacketParam.keepSync && Time.get_time() >= waitingPacketParam.startTime + objectParameter.waitingPacketIntervalTime)
-						{
-							KeepWaitingPacket(waitingPacketParam.type);
-						}
-					}
-					else if (IsPuppet() || IsMirror())
-					{
-						float num3 = objectParameter.waitingPacketMarginTime + waitingPacketParam.addMarginTime;
-						if (waitingPacketParam.keepSync)
-						{
-							num3 += objectParameter.waitingPacketIntervalTime;
-						}
-						if (Time.get_time() > waitingPacketParam.startTime + num3)
-						{
-							OnFailedWaitingPacket(waitingPacketParam.type);
-						}
-					}
-				}
-				num++;
-			}
-			Log.Error("StageObject::UpdateWaitingPacket() Err ( waitingPacketStartTime <= 0.0f )");
+			return;
 		}
+		int num = 0;
+		int num2 = 16;
+		while (true)
+		{
+			if (num >= num2)
+			{
+				return;
+			}
+			WaitingPacketParam waitingPacketParam = waitingPacketParams[num];
+			if (waitingPacketParam != null)
+			{
+				if (waitingPacketParam.startTime <= 0f)
+				{
+					break;
+				}
+				if (IsOriginal())
+				{
+					if (waitingPacketParam.keepSync && Time.get_time() >= waitingPacketParam.startTime + objectParameter.waitingPacketIntervalTime)
+					{
+						KeepWaitingPacket(waitingPacketParam.type);
+					}
+				}
+				else if (IsPuppet() || IsMirror())
+				{
+					float num3 = objectParameter.waitingPacketMarginTime + waitingPacketParam.addMarginTime;
+					if (waitingPacketParam.keepSync)
+					{
+						num3 += objectParameter.waitingPacketIntervalTime;
+					}
+					if (Time.get_time() > waitingPacketParam.startTime + num3)
+					{
+						OnFailedWaitingPacket(waitingPacketParam.type);
+					}
+				}
+			}
+			num++;
+		}
+		Log.Error("StageObject::UpdateWaitingPacket() Err ( waitingPacketStartTime <= 0.0f )");
 	}
 
 	public void KeepWaitingPacket(WAITING_PACKET type)
@@ -1127,7 +1194,7 @@ public class StageObject : ControlObject, IBulletObserver
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		bool just_appear;
-		return _GetAppearToTargetPos(from_pos, target_pos, col_offset, col_radius, appear_distance, appear_margin, true, true, out just_appear);
+		return _GetAppearToTargetPos(from_pos, target_pos, col_offset, col_radius, appear_distance, appear_margin, from_inside: true, target_inside: true, out just_appear);
 	}
 
 	private static Vector3 _GetAppearToTargetPos(Vector3 from_pos, Vector3 target_pos, Vector3 col_offset, float col_radius, float appear_distance, float appear_margin, bool from_inside, bool target_inside, out bool just_appear)
@@ -1143,14 +1210,10 @@ public class StageObject : ControlObject, IBulletObserver
 		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Expected O, but got Unknown
 		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Expected O, but got Unknown
 		//IL_0367: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0369: Unknown result type (might be due to invalid IL or missing references)
 		//IL_036c: Unknown result type (might be due to invalid IL or missing references)
@@ -1220,23 +1283,24 @@ public class StageObject : ControlObject, IBulletObserver
 		for (int count = list.Count; k < count; k++)
 		{
 			CastHitInfo castHitInfo5 = list[k];
-			if (!castHitInfo5.checkCollider && !(castHitInfo5.collider == null))
+			if (castHitInfo5.checkCollider || castHitInfo5.collider == null)
 			{
-				int num3 = k;
-				while (0 <= num3 && num3 < count)
+				continue;
+			}
+			int num3 = k;
+			while (0 <= num3 && num3 < count)
+			{
+				CastHitInfo castHitInfo6 = list[num3];
+				if (num3 != k)
 				{
-					CastHitInfo castHitInfo6 = list[num3];
-					if (num3 != k)
+					if (castHitInfo6.collider == castHitInfo5.collider)
 					{
-						if (castHitInfo6.collider == castHitInfo5.collider)
-						{
-							castHitInfo6.checkCollider = true;
-							break;
-						}
-						castHitInfo6.enable = false;
+						castHitInfo6.checkCollider = true;
+						break;
 					}
-					num3 = ((!castHitInfo5.faceToTarget) ? (num3 - 1) : (num3 + 1));
+					castHitInfo6.enable = false;
 				}
+				num3 = ((!castHitInfo5.faceToTarget) ? (num3 - 1) : (num3 + 1));
 			}
 		}
 		float num4 = magnitude;
@@ -1369,11 +1433,58 @@ public class StageObject : ControlObject, IBulletObserver
 		}
 	}
 
-	public virtual void OnBreak(int brokenBulletID)
+	public virtual void OnBreak(int brokenBulletID, bool isSendOnlyOriginal)
 	{
 	}
 
 	public virtual void OnBulletDestroy(int observedID)
+	{
+	}
+
+	public virtual void OnSetSearchTarget(int observedID, int targetID)
+	{
+	}
+
+	public virtual void OnSetTurretBitTarget(int observedID, int targetID, int regionID)
+	{
+	}
+
+	public bool IsIgnoreByHitInterval(Collider fromCollider)
+	{
+		if (hitIntervalList.IsNullOrEmpty())
+		{
+			return false;
+		}
+		int i = 0;
+		for (int count = hitIntervalList.Count; i < count; i++)
+		{
+			if (hitIntervalList[i].fromCollider == fromCollider)
+			{
+				if (hitIntervalList[i].hitIntervalTimer > 0f)
+				{
+					return true;
+				}
+				hitIntervalList[i].enable = false;
+				return false;
+			}
+		}
+		return false;
+	}
+
+	public void SetHitIntervalStatus(Collider fromCollider, float hitInterval)
+	{
+		int i = 0;
+		for (int count = hitIntervalList.Count; i < count; i++)
+		{
+			if (hitIntervalList[i].fromCollider == fromCollider)
+			{
+				return;
+			}
+		}
+		hitIntervalList.Add(new HitIntervalStatus(fromCollider, hitInterval));
+	}
+
+	public virtual void OnRecvSetCoopMode(Coop_Model_ObjectCoopInfo model, CoopPacket packet)
 	{
 	}
 }

@@ -4,24 +4,24 @@ public class AbilityAtkElement : AbilityAtkBase
 {
 	public override void init(Player _player, string target, int val)
 	{
-		switch ((int)Enum.Parse(typeof(ELEMENT_TYPE), target))
+		switch ((ELEMENT_TYPE)Enum.Parse(typeof(ELEMENT_TYPE), target))
 		{
-		case 0:
+		case ELEMENT_TYPE.FIRE:
 			attr.fire = (float)val * 0.01f;
 			break;
-		case 1:
+		case ELEMENT_TYPE.WATER:
 			attr.water = (float)val * 0.01f;
 			break;
-		case 2:
+		case ELEMENT_TYPE.THUNDER:
 			attr.thunder = (float)val * 0.01f;
 			break;
-		case 3:
+		case ELEMENT_TYPE.SOIL:
 			attr.soil = (float)val * 0.01f;
 			break;
-		case 4:
+		case ELEMENT_TYPE.LIGHT:
 			attr.light = (float)val * 0.01f;
 			break;
-		case 5:
+		case ELEMENT_TYPE.DARK:
 			attr.dark = (float)val * 0.01f;
 			break;
 		}

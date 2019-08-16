@@ -3,14 +3,12 @@ package com.facebook.internal;
 import android.util.Log;
 import com.facebook.FacebookSdk;
 import com.facebook.LoggingBehavior;
-import com.google.firebase.analytics.FirebaseAnalytics.Param;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map.Entry;
 
 public class Logger {
     public static final String LOG_TAG_BASE = "FacebookSDK.";
-    private static final HashMap<String, String> stringsToReplace = new HashMap();
+    private static final HashMap<String, String> stringsToReplace = new HashMap<>();
     private final LoggingBehavior behavior;
     private StringBuilder contents;
     private int priority = 3;
@@ -58,8 +56,8 @@ public class Logger {
                 if (!FacebookSdk.isLoggingBehaviorEnabled(LoggingBehavior.INCLUDE_ACCESS_TOKENS)) {
                     registerStringToReplace(str, "ACCESS_TOKEN_REMOVED");
                 }
-            } catch (Throwable th) {
-                Class cls = Logger.class;
+            } finally {
+                Class<Logger> cls = Logger.class;
             }
         }
     }
@@ -67,10 +65,9 @@ public class Logger {
     public static void registerStringToReplace(String str, String str2) {
         synchronized (Logger.class) {
             try {
-                Object obj = stringsToReplace;
-                obj.put(str, str2);
+                stringsToReplace.put(str, str2);
             } finally {
-                Class cls = Logger.class;
+                Class<Logger> cls = Logger.class;
             }
         }
     }
@@ -78,20 +75,14 @@ public class Logger {
     private static String replaceStrings(String str) {
         synchronized (Logger.class) {
             try {
-                Iterator it = stringsToReplace.entrySet().iterator();
-                while (true) {
-                    Object hasNext = it.hasNext();
-                    if (hasNext == null) {
-                        break;
-                    }
-                    Entry entry = (Entry) it.next();
+                for (Entry entry : stringsToReplace.entrySet()) {
                     str = str.replace((CharSequence) entry.getKey(), (CharSequence) entry.getValue());
                 }
-                return str;
             } finally {
-                Class cls = Logger.class;
+                Class<Logger> cls = Logger.class;
             }
         }
+        return str;
     }
 
     private boolean shouldLog() {
@@ -110,9 +101,9 @@ public class Logger {
         }
     }
 
-    public void append(StringBuilder stringBuilder) {
+    public void append(StringBuilder sb) {
         if (shouldLog()) {
-            this.contents.append(stringBuilder);
+            this.contents.append(sb);
         }
     }
 
@@ -138,7 +129,7 @@ public class Logger {
     }
 
     public void setPriority(int i) {
-        Validate.oneOf(Integer.valueOf(i), Param.VALUE, Integer.valueOf(7), Integer.valueOf(3), Integer.valueOf(6), Integer.valueOf(4), Integer.valueOf(2), Integer.valueOf(5));
+        Validate.oneOf(Integer.valueOf(i), "value", Integer.valueOf(7), Integer.valueOf(3), Integer.valueOf(6), Integer.valueOf(4), Integer.valueOf(2), Integer.valueOf(5));
         this.priority = i;
     }
 }

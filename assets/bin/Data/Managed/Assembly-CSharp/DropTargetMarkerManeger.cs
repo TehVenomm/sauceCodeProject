@@ -47,7 +47,6 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	public static void Create()
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
 		{
 			MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().AddComponent<DropTargetMarkerManeger>();
@@ -60,7 +59,7 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Expected O, but got Unknown
+		//IL_0082: Expected O, but got Unknown
 		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
@@ -128,41 +127,43 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 		targetList.Clear();
 		targetIDList.Clear();
 		targetPortalIDList.Clear();
-		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(false);
+		Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(do_sort: false);
 		int mapId = MonoBehaviourSingleton<FieldManager>.I.GetMapId();
 		int j = 0;
 		for (int num = deliveryList.Length; j < num; j++)
 		{
 			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryList[j].dId);
-			if (deliveryTableData != null)
+			if (deliveryTableData == null)
 			{
-				uint num2 = 0u;
-				for (uint num3 = (uint)deliveryTableData.needs.Length; num2 < num3; num2++)
+				continue;
+			}
+			uint num2 = 0u;
+			for (uint num3 = (uint)deliveryTableData.needs.Length; num2 < num3; num2++)
+			{
+				uint mapID = deliveryTableData.GetMapID(num2);
+				if (mapID != 0 && mapID != mapId)
 				{
-					uint mapID = deliveryTableData.GetMapID(num2);
-					if (mapID == 0 || mapID == mapId)
+					continue;
+				}
+				uint enemyID = deliveryTableData.GetEnemyID(num2);
+				if (!targetIDList.Contains(enemyID) && (mapID != 0 || enemyID != 0))
+				{
+					int have = 0;
+					int need = 0;
+					MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(deliveryList[j].dId, out have, out need, num2);
+					if (have < need)
 					{
-						uint enemyID = deliveryTableData.GetEnemyID(num2);
-						if (!targetIDList.Contains(enemyID) && (mapID != 0 || enemyID != 0))
-						{
-							int have = 0;
-							int need = 0;
-							MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(deliveryList[j].dId, out have, out need, num2);
-							if (have < need)
-							{
-								targetIDList.Add(enemyID);
-							}
-						}
+						targetIDList.Add(enemyID);
 					}
 				}
-				uint num4 = 0u;
-				for (uint num5 = (uint)deliveryTableData.targetPortalID.Length; num4 < num5; num4++)
+			}
+			uint num4 = 0u;
+			for (uint num5 = (uint)deliveryTableData.targetPortalID.Length; num4 < num5; num4++)
+			{
+				uint item = (uint)deliveryTableData.targetPortalID[num4];
+				if (!targetPortalIDList.Contains(item) && !MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryList[j].dId))
 				{
-					uint item = (uint)deliveryTableData.targetPortalID[num4];
-					if (!targetPortalIDList.Contains(item) && !MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryList[j].dId))
-					{
-						targetPortalIDList.Add(item);
-					}
+					targetPortalIDList.Add(item);
 				}
 			}
 		}
@@ -199,7 +200,8 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 		targetInfo.offset.y = enemy.uiHeight;
 		if (enemy.enemyTableData != null)
 		{
-			targetInfo.offset.y *= enemy.enemyTableData.modelScale;
+			ref Vector3 offset = ref targetInfo.offset;
+			offset.y *= enemy.enemyTableData.modelScale;
 		}
 		targetInfo.initOffset = true;
 		targetList.Add(targetInfo);
@@ -226,63 +228,67 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	public void CheckTarget(Enemy enemy)
 	{
-		if (enemy.isInitialized)
+		if (!enemy.isInitialized)
 		{
-			int i = 0;
-			for (int count = targetList.Count; i < count; i++)
+			return;
+		}
+		int i = 0;
+		for (int count = targetList.Count; i < count; i++)
+		{
+			if (targetList[i].target == enemy._transform)
 			{
-				if (targetList[i].target == enemy._transform)
-				{
-					return;
-				}
+				return;
 			}
-			bool flag = targetIDList.Contains(0u);
-			int num = 0;
-			int count2 = targetIDList.Count;
-			while (true)
+		}
+		bool flag = targetIDList.Contains(0u);
+		int num = 0;
+		int count2 = targetIDList.Count;
+		while (true)
+		{
+			if (num < count2)
 			{
-				if (num >= count2)
-				{
-					return;
-				}
 				if (targetIDList[num] == enemy.enemyID || flag)
 				{
 					break;
 				}
 				num++;
+				continue;
 			}
-			_AddTargetInfo(enemy);
+			return;
 		}
+		_AddTargetInfo(enemy);
 	}
 
 	public void CheckTarget(PortalObject portal)
 	{
-		if (!(portal == null))
+		if (portal == null)
 		{
-			int i = 0;
-			for (int count = targetList.Count; i < count; i++)
+			return;
+		}
+		int i = 0;
+		for (int count = targetList.Count; i < count; i++)
+		{
+			if (targetList[i].target == portal._transform)
 			{
-				if (targetList[i].target == portal._transform)
-				{
-					return;
-				}
+				return;
 			}
-			int num = 0;
-			int count2 = targetPortalIDList.Count;
-			while (true)
+		}
+		int num = 0;
+		int count2 = targetPortalIDList.Count;
+		while (true)
+		{
+			if (num < count2)
 			{
-				if (num >= count2)
-				{
-					return;
-				}
 				if (targetPortalIDList[num] == portal.portalID)
 				{
 					break;
 				}
 				num++;
+				continue;
 			}
-			_AddTargetInfo(portal);
+			return;
 		}
+		_AddTargetInfo(portal);
 	}
 
 	public void RemoveTarget(Transform target)
@@ -291,15 +297,16 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 		int count = targetList.Count;
 		while (true)
 		{
-			if (num >= count)
+			if (num < count)
 			{
-				return;
+				if (!(targetList[num].target != target))
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
-			if (!(targetList[num].target != target))
-			{
-				break;
-			}
-			num++;
+			return;
 		}
 		targetList[num].targetEnemy = null;
 		targetStockList.Add(targetList[num]);
@@ -308,85 +315,79 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 
 	private void Update()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Expected O, but got Unknown
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0289: Unknown result type (might be due to invalid IL or missing references)
 		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
-		if (active)
+		//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+		if (!active)
 		{
-			int i = 0;
-			for (int count = targetList.Count; i < count; i++)
+			return;
+		}
+		int i = 0;
+		for (int count = targetList.Count; i < count; i++)
+		{
+			if (targetList[i].target == null)
 			{
-				if (targetList[i].target == null)
-				{
-					delList.Add(targetList[i]);
-				}
-				else if (!targetList[i].target.get_gameObject().get_activeSelf())
+				delList.Add(targetList[i]);
+				continue;
+			}
+			if (!targetList[i].target.get_gameObject().get_activeSelf())
+			{
+				targetList[i].active = false;
+				continue;
+			}
+			if (targetList[i].targetEnemy != null)
+			{
+				if (targetList[i].targetEnemy.isHiding || targetList[i].targetEnemy.isSummonAttack)
 				{
 					targetList[i].active = false;
+					continue;
 				}
-				else
+				if (targetList[i].targetEnemy.uiEnemyStatusGizmo != null)
 				{
-					if (targetList[i].targetEnemy != null)
-					{
-						if (targetList[i].targetEnemy.isHiding)
-						{
-							targetList[i].active = false;
-							continue;
-						}
-						if (targetList[i].targetEnemy.uiEnemyStatusGizmo != null)
-						{
-							targetList[i].targetEnemy.uiEnemyStatusGizmo.SetTargetIcon(drowMaterial.get_mainTexture());
-							targetList[i].active = false;
-							continue;
-						}
-					}
-					Vector3 val = Camera.get_main().WorldToViewportPoint(targetList[i].target.get_position());
-					if (val.x < -0f || val.x > 1f || val.y < -0f || val.y > 1f)
-					{
-						targetList[i].active = false;
-					}
-					else
-					{
-						if (!targetList[i].initOffset)
-						{
-							targetList[i].offset.y = CalcHight(targetList[i].target);
-							if (targetList[i].offset.y != 0f)
-							{
-								targetList[i].initOffset = true;
-							}
-						}
-						targetList[i].pos = targetList[i].target.get_position() + targetList[i].offset + param.offset;
-						TargetInfo targetInfo = targetList[i];
-						Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_eulerAngles();
-						targetInfo.rot = Quaternion.Euler(0f - eulerAngles.x, 0f, 0f) * defRot;
-						targetList[i].active = true;
-					}
+					targetList[i].targetEnemy.uiEnemyStatusGizmo.SetTargetIcon(drowMaterial.get_mainTexture());
+					targetList[i].active = false;
+					continue;
 				}
 			}
-			int j = 0;
-			for (int count2 = delList.Count; j < count2; j++)
+			Vector3 val = Camera.get_main().WorldToViewportPoint(targetList[i].target.get_position());
+			if (val.x < -0f || val.x > 1f || val.y < -0f || val.y > 1f)
 			{
-				targetStockList.Add(delList[j]);
-				targetList.Remove(delList[j]);
+				targetList[i].active = false;
+				continue;
 			}
-			delList.Clear();
+			if (!targetList[i].initOffset)
+			{
+				targetList[i].offset.y = CalcHight(targetList[i].target);
+				if (targetList[i].offset.y != 0f)
+				{
+					targetList[i].initOffset = true;
+				}
+			}
+			targetList[i].pos = targetList[i].target.get_position() + targetList[i].offset + param.offset;
+			TargetInfo targetInfo = targetList[i];
+			Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_eulerAngles();
+			targetInfo.rot = Quaternion.Euler(0f - eulerAngles.x, 0f, 0f) * defRot;
+			targetList[i].active = true;
 		}
+		int j = 0;
+		for (int count2 = delList.Count; j < count2; j++)
+		{
+			targetStockList.Add(delList[j]);
+			targetList.Remove(delList[j]);
+		}
+		delList.Clear();
 	}
 
 	private float CalcHight(Transform target)
@@ -425,21 +426,22 @@ public class DropTargetMarkerManeger : MonoBehaviourSingleton<DropTargetMarkerMa
 	{
 		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		if (active && !(drowMaterial == null))
+		if (!active || drowMaterial == null)
 		{
-			bool flag = false;
-			int i = 0;
-			for (int count = targetList.Count; i < count; i++)
+			return;
+		}
+		bool flag = false;
+		int i = 0;
+		for (int count = targetList.Count; i < count; i++)
+		{
+			if (targetList[i].active)
 			{
-				if (targetList[i].active)
+				if (!flag)
 				{
-					if (!flag)
-					{
-						drowMaterial.SetPass(0);
-						flag = true;
-					}
-					Graphics.DrawMeshNow(drowMesh, targetList[i].pos, targetList[i].rot);
+					drowMaterial.SetPass(0);
+					flag = true;
 				}
+				Graphics.DrawMeshNow(drowMesh, targetList[i].pos, targetList[i].rot);
 			}
 		}
 	}

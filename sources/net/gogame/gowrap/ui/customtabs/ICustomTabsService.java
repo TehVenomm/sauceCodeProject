@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.customtabs;
+package net.gogame.gowrap.p019ui.customtabs;
 
 import android.net.Uri;
 import android.os.Binder;
@@ -9,8 +9,10 @@ import android.os.Parcel;
 import android.os.RemoteException;
 import java.util.List;
 
+/* renamed from: net.gogame.gowrap.ui.customtabs.ICustomTabsService */
 public interface ICustomTabsService extends IInterface {
 
+    /* renamed from: net.gogame.gowrap.ui.customtabs.ICustomTabsService$Stub */
     public static abstract class Stub extends Binder implements ICustomTabsService {
         private static final String DESCRIPTOR = "net.gogame.gowrap.ui.customtabs.ICustomTabsService";
         static final int TRANSACTION_extraCommand = 5;
@@ -22,6 +24,7 @@ public interface ICustomTabsService extends IInterface {
         static final int TRANSACTION_validateRelationship = 9;
         static final int TRANSACTION_warmup = 2;
 
+        /* renamed from: net.gogame.gowrap.ui.customtabs.ICustomTabsService$Stub$Proxy */
         private static class Proxy implements ICustomTabsService {
             private IBinder mRemote;
 
@@ -49,10 +52,8 @@ public interface ICustomTabsService extends IInterface {
                     if (obtain2.readInt() != 0) {
                         z = true;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return z;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -70,10 +71,8 @@ public interface ICustomTabsService extends IInterface {
                     if (obtain2.readInt() != 0) {
                         z = true;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return z;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -104,20 +103,18 @@ public interface ICustomTabsService extends IInterface {
                     if (obtain2.readInt() == 0) {
                         z = false;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return z;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
             }
 
             public Bundle extraCommand(String str, Bundle bundle) throws RemoteException {
+                Bundle bundle2;
                 Parcel obtain = Parcel.obtain();
                 Parcel obtain2 = Parcel.obtain();
                 try {
-                    Bundle bundle2;
                     obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     obtain.writeString(str);
                     if (bundle != null) {
@@ -133,10 +130,8 @@ public interface ICustomTabsService extends IInterface {
                     } else {
                         bundle2 = null;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return bundle2;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -160,10 +155,8 @@ public interface ICustomTabsService extends IInterface {
                     if (obtain2.readInt() == 0) {
                         z = false;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return z;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -187,10 +180,8 @@ public interface ICustomTabsService extends IInterface {
                     if (obtain2.readInt() == 0) {
                         z = false;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return z;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -211,8 +202,7 @@ public interface ICustomTabsService extends IInterface {
                     }
                     this.mRemote.transact(8, obtain, obtain2, 0);
                     obtain2.readException();
-                    int readInt = obtain2.readInt();
-                    return readInt;
+                    return obtain2.readInt();
                 } finally {
                     obtain2.recycle();
                     obtain.recycle();
@@ -244,10 +234,8 @@ public interface ICustomTabsService extends IInterface {
                     if (obtain2.readInt() == 0) {
                         z = false;
                     }
-                    obtain2.recycle();
-                    obtain.recycle();
                     return z;
-                } catch (Throwable th) {
+                } finally {
                     obtain2.recycle();
                     obtain.recycle();
                 }
@@ -274,113 +262,115 @@ public interface ICustomTabsService extends IInterface {
         }
 
         public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-            int i3 = 0;
-            boolean warmup;
-            ICustomTabsCallback asInterface;
             Uri uri;
             Bundle bundle;
-            String readString;
-            ICustomTabsCallback asInterface2;
+            Bundle bundle2;
+            Uri uri2;
+            Bundle bundle3;
+            Bundle bundle4;
+            Uri uri3;
+            Bundle bundle5;
+            int i3 = 0;
+            String str = DESCRIPTOR;
             switch (i) {
                 case 2:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    warmup = warmup(parcel.readLong());
+                    parcel.enforceInterface(str);
+                    boolean warmup = warmup(parcel.readLong());
                     parcel2.writeNoException();
                     parcel2.writeInt(warmup ? 1 : 0);
                     return true;
                 case 3:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    warmup = newSession(net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder()));
+                    parcel.enforceInterface(str);
+                    boolean newSession = newSession(net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder()));
                     parcel2.writeNoException();
-                    if (warmup) {
+                    if (newSession) {
                         i3 = 1;
                     }
                     parcel2.writeInt(i3);
                     return true;
                 case 4:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    asInterface = net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
+                    parcel.enforceInterface(str);
+                    ICustomTabsCallback asInterface = net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
                     if (parcel.readInt() != 0) {
-                        uri = (Uri) Uri.CREATOR.createFromParcel(parcel);
+                        uri3 = (Uri) Uri.CREATOR.createFromParcel(parcel);
                     } else {
-                        uri = null;
+                        uri3 = null;
                     }
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle5 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle5 = null;
                     }
-                    warmup = mayLaunchUrl(asInterface, uri, bundle, parcel.createTypedArrayList(Bundle.CREATOR));
+                    boolean mayLaunchUrl = mayLaunchUrl(asInterface, uri3, bundle5, parcel.createTypedArrayList(Bundle.CREATOR));
                     parcel2.writeNoException();
-                    if (warmup) {
+                    if (mayLaunchUrl) {
                         i3 = 1;
                     }
                     parcel2.writeInt(i3);
                     return true;
                 case 5:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    readString = parcel.readString();
+                    parcel.enforceInterface(str);
+                    String readString = parcel.readString();
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle4 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle4 = null;
                     }
-                    bundle = extraCommand(readString, bundle);
+                    Bundle extraCommand = extraCommand(readString, bundle4);
                     parcel2.writeNoException();
-                    if (bundle != null) {
+                    if (extraCommand != null) {
                         parcel2.writeInt(1);
-                        bundle.writeToParcel(parcel2, 1);
+                        extraCommand.writeToParcel(parcel2, 1);
                         return true;
                     }
                     parcel2.writeInt(0);
                     return true;
                 case 6:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    asInterface2 = net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
+                    parcel.enforceInterface(str);
+                    ICustomTabsCallback asInterface2 = net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle3 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle3 = null;
                     }
-                    warmup = updateVisuals(asInterface2, bundle);
+                    boolean updateVisuals = updateVisuals(asInterface2, bundle3);
                     parcel2.writeNoException();
-                    if (warmup) {
+                    if (updateVisuals) {
                         i3 = 1;
                     }
                     parcel2.writeInt(i3);
                     return true;
                 case 7:
-                    Uri uri2;
-                    parcel.enforceInterface(DESCRIPTOR);
-                    asInterface2 = net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
+                    parcel.enforceInterface(str);
+                    ICustomTabsCallback asInterface3 = net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
                     if (parcel.readInt() != 0) {
                         uri2 = (Uri) Uri.CREATOR.createFromParcel(parcel);
                     } else {
                         uri2 = null;
                     }
-                    warmup = requestPostMessageChannel(asInterface2, uri2);
+                    boolean requestPostMessageChannel = requestPostMessageChannel(asInterface3, uri2);
                     parcel2.writeNoException();
-                    if (warmup) {
+                    if (requestPostMessageChannel) {
                         i3 = 1;
                     }
                     parcel2.writeInt(i3);
                     return true;
                 case 8:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    ICustomTabsCallback asInterface3 = net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
-                    readString = parcel.readString();
+                    parcel.enforceInterface(str);
+                    ICustomTabsCallback asInterface4 = net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
+                    String readString2 = parcel.readString();
                     if (parcel.readInt() != 0) {
-                        bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
+                        bundle2 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                     } else {
-                        bundle = null;
+                        bundle2 = null;
                     }
-                    int postMessage = postMessage(asInterface3, readString, bundle);
+                    int postMessage = postMessage(asInterface4, readString2, bundle2);
                     parcel2.writeNoException();
                     parcel2.writeInt(postMessage);
                     return true;
                 case 9:
-                    parcel.enforceInterface(DESCRIPTOR);
-                    asInterface = net.gogame.gowrap.ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
+                    parcel.enforceInterface(str);
+                    ICustomTabsCallback asInterface5 = net.gogame.gowrap.p019ui.customtabs.ICustomTabsCallback.Stub.asInterface(parcel.readStrongBinder());
                     int readInt = parcel.readInt();
                     if (parcel.readInt() != 0) {
                         uri = (Uri) Uri.CREATOR.createFromParcel(parcel);
@@ -392,15 +382,15 @@ public interface ICustomTabsService extends IInterface {
                     } else {
                         bundle = null;
                     }
-                    warmup = validateRelationship(asInterface, readInt, uri, bundle);
+                    boolean validateRelationship = validateRelationship(asInterface5, readInt, uri, bundle);
                     parcel2.writeNoException();
-                    if (warmup) {
+                    if (validateRelationship) {
                         i3 = 1;
                     }
                     parcel2.writeInt(i3);
                     return true;
                 case 1598968902:
-                    parcel2.writeString(DESCRIPTOR);
+                    parcel2.writeString(str);
                     return true;
                 default:
                     return super.onTransact(i, parcel, parcel2, i2);

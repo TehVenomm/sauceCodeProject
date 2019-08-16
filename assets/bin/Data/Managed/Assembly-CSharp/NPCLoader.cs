@@ -67,7 +67,6 @@ public class NPCLoader : ModelLoaderBase
 
 	public override void SetEnabled(bool is_enable)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		if (animator != null)
 		{
 			animator.set_enabled(is_enable);
@@ -79,9 +78,15 @@ public class NPCLoader : ModelLoaderBase
 		ModelLoaderBase.SetEnabled(renderers, is_enable);
 	}
 
-	public void Load(int npc_model_id, int layer, bool need_shadow, bool enable_light_probes, SHADER_TYPE shader_type, Action callback)
+	private void Update()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		if (!(animator != null))
+		{
+		}
+	}
+
+	public void Load(int npc_model_id, int layer, bool need_shadow, bool enable_light_probes, SHADER_TYPE shader_type, Action callback, bool clearAll = false)
+	{
 		Clear();
 		this.StartCoroutine(coroutine = DoLoad(npc_model_id, layer, need_shadow, enable_light_probes, shader_type, callback));
 	}
@@ -95,10 +100,10 @@ public class NPCLoader : ModelLoaderBase
 		LoadObject lo_anim = loadingQueue.Load(RESOURCE_CATEGORY.NPC_ANIM, anim_name, new string[1]
 		{
 			anim_name + "Ctrl"
-		}, false);
+		});
 		if (loadingQueue.IsLoading())
 		{
-			yield return (object)loadingQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		model = lo_model.Realizes(this.get_transform(), layer);
 		if (model != null)
@@ -117,12 +122,12 @@ public class NPCLoader : ModelLoaderBase
 		}
 		PlayerLoader.SetLightProbes(model, enable_light_probes);
 		renderers = model.GetComponentsInChildren<Renderer>();
-		int j = 0;
-		for (int i = renderers.Length; j < i; j++)
+		int i = 0;
+		for (int num = renderers.Length; i < num; i++)
 		{
-			if (renderers[j] is SkinnedMeshRenderer)
+			if (renderers[i] is SkinnedMeshRenderer)
 			{
-				(renderers[j] as SkinnedMeshRenderer).set_localBounds(BOUNDS);
+				(renderers[i] as SkinnedMeshRenderer).set_localBounds(BOUNDS);
 			}
 		}
 		switch (shader_type)
@@ -136,7 +141,7 @@ public class NPCLoader : ModelLoaderBase
 		}
 		if (need_shadow)
 		{
-			shadow = PlayerLoader.CreateShadow(this.get_transform(), true, -1, shader_type == SHADER_TYPE.LIGHTWEIGHT);
+			shadow = PlayerLoader.CreateShadow(this.get_transform(), fixedY0: true, -1, shader_type == SHADER_TYPE.LIGHTWEIGHT);
 		}
 		coroutine = null;
 		callback?.Invoke();
@@ -144,7 +149,6 @@ public class NPCLoader : ModelLoaderBase
 
 	public void Clear()
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		if (coroutine != null)
 		{
 			this.StopCoroutine(coroutine);

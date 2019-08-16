@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class ChatWebSocketConnection : IChatConnection
+public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 {
 	private static readonly string STAMP_SYMBOL_BEGIN = "[STMP]";
 
@@ -48,6 +48,8 @@ public class ChatWebSocketConnection : IChatConnection
 
 	public event ChatRoom.OnReceiveNotification onReceiveNotification;
 
+	public event ChatRoom.OnAfterSendUserMessage onAfterSendUserMessage;
+
 	public event ChatRoom.OnDisconnect onDisconnect;
 
 	public ChatWebSocketConnection()
@@ -57,12 +59,10 @@ public class ChatWebSocketConnection : IChatConnection
 
 	public void Setup(string host, int port, string path, bool autoReconnect = true)
 	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
 		UriBuilder uriBuilder = new UriBuilder("ws", host, port, path);
 		uri = uriBuilder.Uri.ToString();
 		this.autoReconnect = autoReconnect;
-		chatWebSocket = (Utility.CreateGameObjectAndComponent("ChatWebSocket", this.get_transform(), -1) as ChatWebSocket);
+		chatWebSocket = (Utility.CreateGameObjectAndComponent("ChatWebSocket", this.get_transform()) as ChatWebSocket);
 	}
 
 	private void OnWebSocketClosed()
@@ -82,7 +82,6 @@ public class ChatWebSocketConnection : IChatConnection
 
 	private void Reconnect(int count)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		reconnecting = true;
 		this.StartCoroutine(TryReconnect(count));
 	}
@@ -91,21 +90,21 @@ public class ChatWebSocketConnection : IChatConnection
 	{
 		for (float time = RECONNECT_WAIT_SEC * (float)(RECONNECT_RETRY_LIMIT - count + 1); time > 0f; time -= Time.get_deltaTime())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		TryConnect(delegate(bool success)
 		{
-			((_003CTryReconnect_003Ec__Iterator1D6)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.reconnecting = false;
+			reconnecting = false;
 			if (!success)
 			{
-				if (((_003CTryReconnect_003Ec__Iterator1D6)/*Error near IL_0088: stateMachine*/).count > 0)
+				if (count > 0)
 				{
-					((_003CTryReconnect_003Ec__Iterator1D6)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Reconnect(((_003CTryReconnect_003Ec__Iterator1D6)/*Error near IL_0088: stateMachine*/).count - 1);
+					Reconnect(count - 1);
 				}
 			}
 			else
 			{
-				((_003CTryReconnect_003Ec__Iterator1D6)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Join(((_003CTryReconnect_003Ec__Iterator1D6)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.roomId, ((_003CTryReconnect_003Ec__Iterator1D6)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.userName);
+				Join(roomId, userName);
 			}
 		});
 	}
@@ -119,32 +118,27 @@ public class ChatWebSocketConnection : IChatConnection
 
 	private void TryConnect(Action<bool> onFinished)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Expected O, but got Unknown
 		if (isEstablished)
 		{
-			onFinished?.Invoke(true);
+			onFinished?.Invoke(obj: true);
+			return;
 		}
-		else if (isConnectProcessing)
+		if (isConnectProcessing)
 		{
 			this.StartCoroutine(WaitConnectProcess(onFinished));
+			return;
 		}
-		else
-		{
-			chatWebSocket.ReceivePacketAction = OnReceivePacket;
-			m_ConnectProcess = this.StartCoroutine(ConnectProcess(onFinished));
-		}
+		chatWebSocket.ReceivePacketAction = OnReceivePacket;
+		m_ConnectProcess = this.StartCoroutine(ConnectProcess(onFinished));
 	}
 
 	public void Disconnect(Action onFinished = null)
 	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		if (isEstablished)
 		{
 			chatWebSocket.OnClosed -= OnWebSocketClosed;
-			chatWebSocket.Send(Chat_Model_LeaveRoom_Request.Create(roomId), 0, true);
-			chatWebSocket.Close(1000, "Bye!");
+			chatWebSocket.Send(Chat_Model_LeaveRoom_Request.Create(roomId), 0);
+			chatWebSocket.Close(1000);
 			established = false;
 			joined = false;
 			if ((onFinished != null || this.onDisconnect != null) && !AppMain.isApplicationQuit)
@@ -167,7 +161,7 @@ public class ChatWebSocketConnection : IChatConnection
 	{
 		while (chatWebSocket.IsOpen())
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		onFinished?.Invoke();
 		if (this.onDisconnect != null)
@@ -196,7 +190,7 @@ public class ChatWebSocketConnection : IChatConnection
 		{
 			if (result)
 			{
-				chatWebSocket.Send(Chat_Model_JoinRoom.Create(this.roomId, this.userName), 0, true);
+				chatWebSocket.Send(Chat_Model_JoinRoom.Create(this.roomId, this.userName), 0);
 			}
 			else
 			{
@@ -213,7 +207,7 @@ public class ChatWebSocketConnection : IChatConnection
 		{
 			if (result)
 			{
-				chatWebSocket.Send(Chat_Model_JoinClanRoom.Create(this.roomId, this.userName), 0, true);
+				chatWebSocket.Send(Chat_Model_JoinClanRoom.Create(this.roomId, this.userName), 0);
 			}
 			else
 			{
@@ -246,106 +240,122 @@ public class ChatWebSocketConnection : IChatConnection
 
 	private void Send(string message)
 	{
-		chatWebSocket.Send(Chat_Model_BroadcastMessage_Request.Create(roomId, message), 0, true);
+		chatWebSocket.Send(Chat_Model_BroadcastMessage_Request.Create(roomId, message), 0);
 	}
 
 	private void OnReceivePacket(ChatPacket packet)
 	{
-		if (packet != null)
+		if (packet == null)
 		{
-			switch (packet.model.packetType)
+			return;
+		}
+		switch (packet.model.packetType)
+		{
+		case CHAT_PACKET_TYPE.JOIN_ROOM:
+			OnJoin(packet);
+			break;
+		case CHAT_PACKET_TYPE.BROADCAST_ROOM:
+		{
+			Chat_Model_BroadcastMessage_Response chat_Model_BroadcastMessage_Response = packet.model as Chat_Model_BroadcastMessage_Response;
+			if (chat_Model_BroadcastMessage_Response != null)
 			{
-			case CHAT_PACKET_TYPE.JOIN_ROOM:
-				OnJoin(packet);
-				break;
-			case CHAT_PACKET_TYPE.BROADCAST_ROOM:
+				OnReceiveMessage(chat_Model_BroadcastMessage_Response);
+			}
+			else
 			{
-				Chat_Model_BroadcastMessage_Response chat_Model_BroadcastMessage_Response = packet.model as Chat_Model_BroadcastMessage_Response;
-				if (chat_Model_BroadcastMessage_Response != null)
-				{
-					OnReceiveMessage(chat_Model_BroadcastMessage_Response);
-				}
-				else
-				{
-					Log.Error("Failed parse: Chat_Model_BroadCastMessage_Response");
-				}
-				break;
+				Log.Error("Failed parse: Chat_Model_BroadCastMessage_Response");
 			}
-			case CHAT_PACKET_TYPE.PARTY_INVITE:
+			break;
+		}
+		case CHAT_PACKET_TYPE.PARTY_INVITE:
+		{
+			Chat_Model_PartyInvite chat_Model_PartyInvite = packet.model as Chat_Model_PartyInvite;
+			if (chat_Model_PartyInvite != null)
 			{
-				Chat_Model_PartyInvite chat_Model_PartyInvite = packet.model as Chat_Model_PartyInvite;
-				if (chat_Model_PartyInvite != null)
-				{
-					OnReceivePartyInvite(chat_Model_PartyInvite);
-				}
-				else
-				{
-					Log.Error("Failed parse: Chat_Model_BroadCastMessage_Response");
-				}
-				break;
+				OnReceivePartyInvite(chat_Model_PartyInvite);
 			}
-			case CHAT_PACKET_TYPE.RALLY_INVITE:
+			else
 			{
-				Chat_Model_RallyInvite chat_Model_RallyInvite = packet.model as Chat_Model_RallyInvite;
-				if (chat_Model_RallyInvite != null)
-				{
-					OnReceiveRallyInvite(chat_Model_RallyInvite);
-				}
-				else
-				{
-					Log.Error("Failed parse: Chat_Model_RallyInvite");
-				}
-				break;
+				Log.Error("Failed parse: Chat_Model_BroadCastMessage_Response");
 			}
-			case CHAT_PACKET_TYPE.DARK_MARKET_RESET:
+			break;
+		}
+		case CHAT_PACKET_TYPE.RALLY_INVITE:
+		{
+			Chat_Model_RallyInvite chat_Model_RallyInvite = packet.model as Chat_Model_RallyInvite;
+			if (chat_Model_RallyInvite != null)
 			{
-				Chat_Model_ResetDarkMarket chat_Model_ResetDarkMarket = packet.model as Chat_Model_ResetDarkMarket;
-				if (chat_Model_ResetDarkMarket != null)
-				{
-					OnReceiveResetDarkMarket(chat_Model_ResetDarkMarket);
-				}
-				else
-				{
-					Log.Error("Failed parse: Chat_Model_ResetDarkMarket");
-				}
-				break;
+				OnReceiveRallyInvite(chat_Model_RallyInvite);
 			}
-			case CHAT_PACKET_TYPE.DARK_MARKET_UPDATE:
+			else
 			{
-				Chat_Model_UpdateDarkMarket chat_Model_UpdateDarkMarket = packet.model as Chat_Model_UpdateDarkMarket;
-				if (chat_Model_UpdateDarkMarket != null)
-				{
-					OnReceiveUpdateDarkMarket(chat_Model_UpdateDarkMarket);
-				}
-				else
-				{
-					Log.Error("Failed parse: Chat_Model_UpdateDarkMarket");
-				}
-				break;
+				Log.Error("Failed parse: Chat_Model_RallyInvite");
 			}
+			break;
+		}
+		case CHAT_PACKET_TYPE.DARK_MARKET_RESET:
+		{
+			Chat_Model_ResetDarkMarket chat_Model_ResetDarkMarket = packet.model as Chat_Model_ResetDarkMarket;
+			if (chat_Model_ResetDarkMarket != null)
+			{
+				OnReceiveResetDarkMarket(chat_Model_ResetDarkMarket);
 			}
+			else
+			{
+				Log.Error("Failed parse: Chat_Model_ResetDarkMarket");
+			}
+			break;
+		}
+		case CHAT_PACKET_TYPE.DARK_MARKET_UPDATE:
+		{
+			Chat_Model_UpdateDarkMarket chat_Model_UpdateDarkMarket = packet.model as Chat_Model_UpdateDarkMarket;
+			if (chat_Model_UpdateDarkMarket != null)
+			{
+				OnReceiveUpdateDarkMarket(chat_Model_UpdateDarkMarket);
+			}
+			else
+			{
+				Log.Error("Failed parse: Chat_Model_UpdateDarkMarket");
+			}
+			break;
+		}
+		case CHAT_PACKET_TYPE.JACKPOT_WIN_UPDATE:
+		{
+			Chat_Model_JackpotWin chat_Model_JackpotWin = packet.model as Chat_Model_JackpotWin;
+			if (chat_Model_JackpotWin != null)
+			{
+				OnReceiveJackot(chat_Model_JackpotWin);
+			}
+			else
+			{
+				Log.Error("Failed parse: Chat_Model_RallyInvite");
+			}
+			break;
+		}
 		}
 	}
 
 	private void OnJoin(ChatPacket packet)
 	{
-		if (!joined)
+		if (joined)
 		{
-			Chat_Model_JoinRoom chat_Model_JoinRoom = packet.model as Chat_Model_JoinRoom;
-			if (chat_Model_JoinRoom != null && chat_Model_JoinRoom.errorType == CHAT_ERROR_TYPE.NO_ERROR)
+			return;
+		}
+		Chat_Model_JoinRoom chat_Model_JoinRoom = packet.model as Chat_Model_JoinRoom;
+		if (chat_Model_JoinRoom == null || chat_Model_JoinRoom.errorType != 0)
+		{
+			return;
+		}
+		long result = 0L;
+		long.TryParse(packet.header.fromId, out result);
+		long result2 = 0L;
+		long.TryParse(chatWebSocket.fromId, out result2);
+		if (result == result2)
+		{
+			joined = true;
+			if (this.onJoin != null)
 			{
-				long result = 0L;
-				long.TryParse(packet.header.fromId, out result);
-				long result2 = 0L;
-				long.TryParse(chatWebSocket.fromId, out result2);
-				if (result == result2)
-				{
-					joined = true;
-					if (this.onJoin != null)
-					{
-						this.onJoin(chat_Model_JoinRoom.errorType);
-					}
-				}
+				this.onJoin(chat_Model_JoinRoom.errorType);
 			}
 		}
 	}
@@ -361,12 +371,12 @@ public class ChatWebSocketConnection : IChatConnection
 			int.TryParse(s, out result2);
 			if (this.onReceiveStamp != null)
 			{
-				this.onReceiveStamp(result, packet.SenderName, result2);
+				this.onReceiveStamp(result, packet.SenderName, result2, string.Empty);
 			}
 		}
 		else if (this.onReceiveText != null)
 		{
-			this.onReceiveText(result, packet.SenderName, packet.Message);
+			this.onReceiveText(result, packet.SenderName, packet.Message, string.Empty);
 		}
 	}
 
@@ -378,12 +388,12 @@ public class ChatWebSocketConnection : IChatConnection
 		{
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 			{
-				MonoBehaviourSingleton<UserInfoManager>.I.SetPartyInviteChat(true);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetPartyInviteChat(flag: true);
 			}
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
-			MonoBehaviourSingleton<UserInfoManager>.I.SetPartyInviteChat(false);
+			MonoBehaviourSingleton<UserInfoManager>.I.SetPartyInviteChat(flag: false);
 		}
 	}
 
@@ -391,7 +401,19 @@ public class ChatWebSocketConnection : IChatConnection
 	{
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
-			MonoBehaviourSingleton<UserInfoManager>.I.SetRallyInviteChat(true);
+			MonoBehaviourSingleton<UserInfoManager>.I.SetRallyInviteChat(flag: true);
+		}
+	}
+
+	private void OnReceiveJackot(Chat_Model_JackpotWin packet)
+	{
+		string text = packet.jacpotData.Substring(0, 10);
+		if (int.Parse(text) != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
+		{
+			string jackpot = packet.jacpotData.Substring(10, 9);
+			string text2 = packet.jacpotData.Substring(19);
+			FortuneWheelManager.JackpotWinData data = new FortuneWheelManager.JackpotWinData(text, jackpot, text2);
+			MonoBehaviourSingleton<FortuneWheelManager>.I.ReceivedJackpotWin(data);
 		}
 	}
 
@@ -418,35 +440,33 @@ public class ChatWebSocketConnection : IChatConnection
 	{
 		if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
-			onFinished(false);
+			onFinished(obj: false);
+			yield break;
 		}
-		else
+		isConnectProcessing = true;
+		string fromId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
+		chatWebSocket.Connect(uri, fromId, 0);
+		float waitTimeRest = CONNECTION_TRY_TIMEOUT;
+		while (!chatWebSocket.IsConnected() && chatWebSocket.CurrentConnectionStatus != ChatWebSocket.CONNECTION_STATUS.ERROR && waitTimeRest > 0f)
 		{
-			isConnectProcessing = true;
-			string fromId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
-			chatWebSocket.Connect(uri, fromId, 0);
-			float waitTimeRest = CONNECTION_TRY_TIMEOUT;
-			while (!chatWebSocket.IsConnected() && chatWebSocket.CurrentConnectionStatus != ChatWebSocket.CONNECTION_STATUS.ERROR && waitTimeRest > 0f)
-			{
-				waitTimeRest -= Time.get_deltaTime();
-				yield return (object)null;
-			}
-			m_ConnectProcess = null;
-			established = chatWebSocket.IsConnected();
-			if (established)
-			{
-				chatWebSocket.OnClosed += OnWebSocketClosed;
-			}
-			onFinished?.Invoke(isEstablished);
-			isConnectProcessing = false;
+			waitTimeRest -= Time.get_deltaTime();
+			yield return null;
 		}
+		m_ConnectProcess = null;
+		established = chatWebSocket.IsConnected();
+		if (established)
+		{
+			chatWebSocket.OnClosed += OnWebSocketClosed;
+		}
+		onFinished?.Invoke(isEstablished);
+		isConnectProcessing = false;
 	}
 
 	private IEnumerator WaitConnectProcess(Action<bool> onFinished)
 	{
 		while (isConnectProcessing)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 		onFinished?.Invoke(isEstablished);
 	}
@@ -474,8 +494,7 @@ public class ChatWebSocketConnection : IChatConnection
 
 	private void OnDestroy()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Disconnect(null);
+		Disconnect();
 		if (Object.op_Implicit(chatWebSocket))
 		{
 			Object.Destroy(chatWebSocket.get_gameObject());
@@ -488,7 +507,7 @@ public class ChatWebSocketConnection : IChatConnection
 		{
 			if (chatWebSocket != null)
 			{
-				Disconnect(null);
+				Disconnect();
 			}
 		}
 		else

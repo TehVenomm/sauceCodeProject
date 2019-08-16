@@ -85,7 +85,7 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 			itemIconCreateParam.parent = FindCtrl(detailBase, UI.OBJ_ICON_ROOT);
 			itemIconCreateParam.element = data.GetTargetElementPriorityToTable();
 			ItemIcon itemIcon = ItemIcon.Create(itemIconCreateParam);
-			itemIcon.SetEnableCollider(false);
+			itemIcon.SetEnableCollider(is_enable: false);
 			SetLabelText(detailBase, UI.LBL_NEED_LV, needLv.ToString());
 			SetLabelText(detailBase, UI.LBL_HAVE_NUM, MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNum(equipId).ToString());
 			SetLabelText(detailBase, UI.LBL_SELL, data.sale.ToString());
@@ -95,22 +95,22 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 
 	private void InitializeCaption(string caption)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
-		if (!(ctrl == null))
+		if (ctrl == null)
 		{
-			SetLabelText(ctrl, UI.LBL_CAPTION, caption);
-			UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-			if (component != null)
+			return;
+		}
+		SetLabelText(ctrl, UI.LBL_CAPTION, caption);
+		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		if (component != null)
+		{
+			component.Reset();
+			int i = 0;
+			for (int num = component.tweens.Length; i < num; i++)
 			{
-				component.Reset();
-				int i = 0;
-				for (int num = component.tweens.Length; i < num; i++)
-				{
-					component.tweens[i].ResetToBeginning();
-				}
-				component.Play(true, null);
+				component.tweens[i].ResetToBeginning();
 			}
+			component.Play();
 		}
 	}
 
@@ -152,7 +152,9 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 		if (localInventoryEquipData != null)
 		{
 			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 1, false, (Func<int, bool>)delegate(int i)
+			m_generatedIconList.Clear();
+			UpdateNewIconInfo();
+			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 1, reset: false, (Func<int, bool>)delegate(int i)
 			{
 				if (i == 0)
 				{
@@ -177,11 +179,11 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 					uint tableID = localInventoryEquipData[num].GetTableID();
 					if (tableID == 0)
 					{
-						SetActive(t, false);
+						SetActive(t, is_visible: false);
 					}
 					else
 					{
-						SetActive(t, true);
+						SetActive(t, is_visible: true);
 						EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
 						EquipItemSortData equipItemSortData = localInventoryEquipData[num] as EquipItemSortData;
 						EquipItemInfo equipItemInfo = equipItemSortData.GetItemData() as EquipItemInfo;
@@ -189,7 +191,7 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 						bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
 						SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemInfo);
 						int equip_index = (!equipItemSortData.IsEquipping()) ? (-1) : 0;
-						ItemIcon itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, base.IsShowMainStatus, t, "SELECT", i - 1, ItemIconDetail.ICON_STATUS.NONE, is_new, -1, false, equip_index);
+						ItemIcon itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, base.IsShowMainStatus, t, "SELECT", i - 1, ItemIconDetail.ICON_STATUS.NONE, is_new, -1, is_select: false, equip_index);
 						itemIcon.SetItemID(equipItemSortData.GetTableID());
 						itemIcon.SetGrayout(equipItemInfo.level < needLv);
 						object[] event_data = new object[2]
@@ -198,6 +200,14 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 							equipItemInfo
 						};
 						SetLongTouch(itemIcon.transform, "DETAIL", event_data);
+						if (itemIcon != null && equipItemSortData != null)
+						{
+							itemIcon.SetInitData(equipItemSortData);
+						}
+						if (itemIcon != null && !m_generatedIconList.Contains(itemIcon))
+						{
+							m_generatedIconList.Add(itemIcon);
+						}
 					}
 				}
 			});
@@ -237,17 +247,17 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 			EquipItemSortData equipItemSortData = localInventoryEquipData[selectInventoryIndex] as EquipItemSortData;
 			if (equipItemSortData.IsFavorite())
 			{
-				GameSection.ChangeEvent("NOT_SELECT_FAVORITE", null);
+				GameSection.ChangeEvent("NOT_SELECT_FAVORITE");
 				return;
 			}
 			if (equipItemSortData.IsEquipping())
 			{
-				GameSection.ChangeEvent("NOT_SELECT_EQUIPPING", null);
+				GameSection.ChangeEvent("NOT_SELECT_EQUIPPING");
 				return;
 			}
 			if (equipItemSortData.GetLevel() < needLv)
 			{
-				GameSection.ChangeEvent("NOT_SELECT_LOW_LEVEL", null);
+				GameSection.ChangeEvent("NOT_SELECT_LOW_LEVEL");
 				return;
 			}
 			selectedUniqueId[equipIndex] = equipItemSortData.GetUniqID();

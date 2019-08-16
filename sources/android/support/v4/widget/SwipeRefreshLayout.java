@@ -1,6 +1,5 @@
-package android.support.v4.widget;
+package android.support.p000v4.widget;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build.VERSION;
@@ -8,13 +7,12 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.NestedScrollingChild;
-import android.support.v4.view.NestedScrollingChildHelper;
-import android.support.v4.view.NestedScrollingParent;
-import android.support.v4.view.NestedScrollingParentHelper;
-import android.support.v4.view.ViewCompat;
+import android.support.p000v4.content.ContextCompat;
+import android.support.p000v4.view.NestedScrollingChild;
+import android.support.p000v4.view.NestedScrollingChildHelper;
+import android.support.p000v4.view.NestedScrollingParent;
+import android.support.p000v4.view.NestedScrollingParentHelper;
+import android.support.p000v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -28,7 +26,9 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
+import android.widget.ListView;
 
+/* renamed from: android.support.v4.widget.SwipeRefreshLayout */
 public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingParent, NestedScrollingChild {
     private static final int ALPHA_ANIMATION_DURATION = 300;
     private static final int ANIMATE_TO_START_DURATION = 200;
@@ -44,7 +44,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
     private static final float DRAG_RATE = 0.5f;
     private static final int INVALID_POINTER = -1;
     public static final int LARGE = 0;
-    private static final int[] LAYOUT_ATTRS = new int[]{16842766};
+    private static final int[] LAYOUT_ATTRS = {16842766};
     private static final String LOG_TAG = SwipeRefreshLayout.class.getSimpleName();
     private static final int MAX_ALPHA = 255;
     private static final float MAX_PROGRESS_ANGLE = 0.8f;
@@ -74,7 +74,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
     protected int mOriginalOffsetTop;
     private final int[] mParentOffsetInWindow;
     private final int[] mParentScrollConsumed;
-    MaterialProgressDrawable mProgress;
+    CircularProgressDrawable mProgress;
     private AnimationListener mRefreshListener;
     boolean mRefreshing;
     private boolean mReturningToStart;
@@ -90,108 +90,12 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
     private int mTouchSlop;
     boolean mUsingCustomStart;
 
-    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$1 */
-    class C01511 implements AnimationListener {
-        C01511() {
-        }
-
-        @SuppressLint({"NewApi"})
-        public void onAnimationEnd(Animation animation) {
-            if (SwipeRefreshLayout.this.mRefreshing) {
-                SwipeRefreshLayout.this.mProgress.setAlpha(255);
-                SwipeRefreshLayout.this.mProgress.start();
-                if (SwipeRefreshLayout.this.mNotify && SwipeRefreshLayout.this.mListener != null) {
-                    SwipeRefreshLayout.this.mListener.onRefresh();
-                }
-                SwipeRefreshLayout.this.mCurrentTargetOffsetTop = SwipeRefreshLayout.this.mCircleView.getTop();
-                return;
-            }
-            SwipeRefreshLayout.this.reset();
-        }
-
-        public void onAnimationRepeat(Animation animation) {
-        }
-
-        public void onAnimationStart(Animation animation) {
-        }
-    }
-
-    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$2 */
-    class C01522 extends Animation {
-        C01522() {
-        }
-
-        public void applyTransformation(float f, Transformation transformation) {
-            SwipeRefreshLayout.this.setAnimationProgress(f);
-        }
-    }
-
-    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$3 */
-    class C01533 extends Animation {
-        C01533() {
-        }
-
-        public void applyTransformation(float f, Transformation transformation) {
-            SwipeRefreshLayout.this.setAnimationProgress(1.0f - f);
-        }
-    }
-
-    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$5 */
-    class C01555 implements AnimationListener {
-        C01555() {
-        }
-
-        public void onAnimationEnd(Animation animation) {
-            if (!SwipeRefreshLayout.this.mScale) {
-                SwipeRefreshLayout.this.startScaleDownAnimation(null);
-            }
-        }
-
-        public void onAnimationRepeat(Animation animation) {
-        }
-
-        public void onAnimationStart(Animation animation) {
-        }
-    }
-
-    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$6 */
-    class C01566 extends Animation {
-        C01566() {
-        }
-
-        public void applyTransformation(float f, Transformation transformation) {
-            int abs = !SwipeRefreshLayout.this.mUsingCustomStart ? SwipeRefreshLayout.this.mSpinnerOffsetEnd - Math.abs(SwipeRefreshLayout.this.mOriginalOffsetTop) : SwipeRefreshLayout.this.mSpinnerOffsetEnd;
-            abs = (int) (((float) (abs - SwipeRefreshLayout.this.mFrom)) * f);
-            SwipeRefreshLayout.this.setTargetOffsetTopAndBottom((abs + SwipeRefreshLayout.this.mFrom) - SwipeRefreshLayout.this.mCircleView.getTop(), false);
-            SwipeRefreshLayout.this.mProgress.setArrowScale(1.0f - f);
-        }
-    }
-
-    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$7 */
-    class C01577 extends Animation {
-        C01577() {
-        }
-
-        public void applyTransformation(float f, Transformation transformation) {
-            SwipeRefreshLayout.this.moveToStart(f);
-        }
-    }
-
-    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$8 */
-    class C01588 extends Animation {
-        C01588() {
-        }
-
-        public void applyTransformation(float f, Transformation transformation) {
-            SwipeRefreshLayout.this.setAnimationProgress(SwipeRefreshLayout.this.mStartingScale + ((-SwipeRefreshLayout.this.mStartingScale) * f));
-            SwipeRefreshLayout.this.moveToStart(f);
-        }
-    }
-
+    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$OnChildScrollUpCallback */
     public interface OnChildScrollUpCallback {
         boolean canChildScrollUp(SwipeRefreshLayout swipeRefreshLayout, @Nullable View view);
     }
 
+    /* renamed from: android.support.v4.widget.SwipeRefreshLayout$OnRefreshListener */
     public interface OnRefreshListener {
         void onRefresh();
     }
@@ -208,9 +112,39 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         this.mParentOffsetInWindow = new int[2];
         this.mActivePointerId = -1;
         this.mCircleViewIndex = -1;
-        this.mRefreshListener = new C01511();
-        this.mAnimateToCorrectPosition = new C01566();
-        this.mAnimateToStartPosition = new C01577();
+        this.mRefreshListener = new AnimationListener() {
+            public void onAnimationEnd(Animation animation) {
+                if (SwipeRefreshLayout.this.mRefreshing) {
+                    SwipeRefreshLayout.this.mProgress.setAlpha(255);
+                    SwipeRefreshLayout.this.mProgress.start();
+                    if (SwipeRefreshLayout.this.mNotify && SwipeRefreshLayout.this.mListener != null) {
+                        SwipeRefreshLayout.this.mListener.onRefresh();
+                    }
+                    SwipeRefreshLayout.this.mCurrentTargetOffsetTop = SwipeRefreshLayout.this.mCircleView.getTop();
+                    return;
+                }
+                SwipeRefreshLayout.this.reset();
+            }
+
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            public void onAnimationStart(Animation animation) {
+            }
+        };
+        this.mAnimateToCorrectPosition = new Animation() {
+            public void applyTransformation(float f, Transformation transformation) {
+                int i = !SwipeRefreshLayout.this.mUsingCustomStart ? SwipeRefreshLayout.this.mSpinnerOffsetEnd - Math.abs(SwipeRefreshLayout.this.mOriginalOffsetTop) : SwipeRefreshLayout.this.mSpinnerOffsetEnd;
+                int i2 = (int) (((float) (i - SwipeRefreshLayout.this.mFrom)) * f);
+                SwipeRefreshLayout.this.setTargetOffsetTopAndBottom((i2 + SwipeRefreshLayout.this.mFrom) - SwipeRefreshLayout.this.mCircleView.getTop());
+                SwipeRefreshLayout.this.mProgress.setArrowScale(1.0f - f);
+            }
+        };
+        this.mAnimateToStartPosition = new Animation() {
+            public void applyTransformation(float f, Transformation transformation) {
+                SwipeRefreshLayout.this.moveToStart(f);
+            }
+        };
         this.mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         this.mMediumAnimationDuration = getResources().getInteger(17694721);
         setWillNotDraw(false);
@@ -263,8 +197,8 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
 
     private void createProgressView() {
         this.mCircleView = new CircleImageView(getContext(), CIRCLE_BG_LIGHT);
-        this.mProgress = new MaterialProgressDrawable(getContext(), this);
-        this.mProgress.setBackgroundColor(CIRCLE_BG_LIGHT);
+        this.mProgress = new CircularProgressDrawable(getContext());
+        this.mProgress.setStyle(1);
         this.mCircleView.setImageDrawable(this.mProgress);
         this.mCircleView.setVisibility(8);
         addView(this.mCircleView);
@@ -272,12 +206,9 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
 
     private void ensureTarget() {
         if (this.mTarget == null) {
-            int i = 0;
-            while (i < getChildCount()) {
+            for (int i = 0; i < getChildCount(); i++) {
                 View childAt = getChildAt(i);
-                if (childAt.equals(this.mCircleView)) {
-                    i++;
-                } else {
+                if (!childAt.equals(this.mCircleView)) {
                     this.mTarget = childAt;
                     return;
                 }
@@ -292,46 +223,53 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         }
         this.mRefreshing = false;
         this.mProgress.setStartEndTrim(0.0f, 0.0f);
-        AnimationListener animationListener = null;
+        C02285 r0 = null;
         if (!this.mScale) {
-            animationListener = new C01555();
-        }
-        animateOffsetToStartPosition(this.mCurrentTargetOffsetTop, animationListener);
-        this.mProgress.showArrow(false);
-    }
+            r0 = new AnimationListener() {
+                public void onAnimationEnd(Animation animation) {
+                    if (!SwipeRefreshLayout.this.mScale) {
+                        SwipeRefreshLayout.this.startScaleDownAnimation(null);
+                    }
+                }
 
-    private boolean isAlphaUsedForScale() {
-        return VERSION.SDK_INT < 11;
+                public void onAnimationRepeat(Animation animation) {
+                }
+
+                public void onAnimationStart(Animation animation) {
+                }
+            };
+        }
+        animateOffsetToStartPosition(this.mCurrentTargetOffsetTop, r0);
+        this.mProgress.setArrowEnabled(false);
     }
 
     private boolean isAnimationRunning(Animation animation) {
-        return (animation == null || !animation.hasStarted() || animation.hasEnded()) ? false : true;
+        return animation != null && animation.hasStarted() && !animation.hasEnded();
     }
 
-    @SuppressLint({"NewApi"})
     private void moveSpinner(float f) {
-        this.mProgress.showArrow(true);
+        this.mProgress.setArrowEnabled(true);
         float min = Math.min(1.0f, Math.abs(f / this.mTotalDragDistance));
         float max = (((float) Math.max(((double) min) - 0.4d, 0.0d)) * 5.0f) / 3.0f;
         float abs = Math.abs(f);
         float f2 = this.mTotalDragDistance;
         float f3 = this.mUsingCustomStart ? (float) (this.mSpinnerOffsetEnd - this.mOriginalOffsetTop) : (float) this.mSpinnerOffsetEnd;
-        abs = Math.max(0.0f, Math.min(abs - f2, DECELERATE_INTERPOLATION_FACTOR * f3) / f3);
-        abs = ((float) (((double) (abs / 4.0f)) - Math.pow((double) (abs / 4.0f), 2.0d))) * DECELERATE_INTERPOLATION_FACTOR;
+        float max2 = Math.max(0.0f, Math.min(abs - f2, DECELERATE_INTERPOLATION_FACTOR * f3) / f3);
+        float pow = ((float) (((double) (max2 / 4.0f)) - Math.pow((double) (max2 / 4.0f), 2.0d))) * DECELERATE_INTERPOLATION_FACTOR;
         int i = this.mOriginalOffsetTop;
-        int i2 = (int) (((f3 * abs) * DECELERATE_INTERPOLATION_FACTOR) + (min * f3));
+        int i2 = (int) ((f3 * pow * DECELERATE_INTERPOLATION_FACTOR) + (min * f3));
         if (this.mCircleView.getVisibility() != 0) {
             this.mCircleView.setVisibility(0);
         }
         if (!this.mScale) {
-            ViewCompat.setScaleX(this.mCircleView, 1.0f);
-            ViewCompat.setScaleY(this.mCircleView, 1.0f);
+            this.mCircleView.setScaleX(1.0f);
+            this.mCircleView.setScaleY(1.0f);
         }
         if (this.mScale) {
             setAnimationProgress(Math.min(1.0f, f / this.mTotalDragDistance));
         }
         if (f < this.mTotalDragDistance) {
-            if (this.mProgress.getAlpha() > STARTING_PROGRESS_ALPHA && !isAnimationRunning(this.mAlphaStartAnimation)) {
+            if (this.mProgress.getAlpha() > 76 && !isAnimationRunning(this.mAlphaStartAnimation)) {
                 startProgressAlphaStartAnimation();
             }
         } else if (this.mProgress.getAlpha() < 255 && !isAnimationRunning(this.mAlphaMaxAnimation)) {
@@ -339,18 +277,17 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         }
         this.mProgress.setStartEndTrim(0.0f, Math.min(MAX_PROGRESS_ANGLE, max * MAX_PROGRESS_ANGLE));
         this.mProgress.setArrowScale(Math.min(1.0f, max));
-        this.mProgress.setProgressRotation((((max * 0.4f) - 16.0f) + (abs * DECELERATE_INTERPOLATION_FACTOR)) * DRAG_RATE);
-        setTargetOffsetTopAndBottom((i2 + i) - this.mCurrentTargetOffsetTop, true);
+        this.mProgress.setProgressRotation((((max * 0.4f) - 16.0f) + (pow * DECELERATE_INTERPOLATION_FACTOR)) * DRAG_RATE);
+        setTargetOffsetTopAndBottom((i2 + i) - this.mCurrentTargetOffsetTop);
     }
 
     private void onSecondaryPointerUp(MotionEvent motionEvent) {
-        int actionIndex = MotionEventCompat.getActionIndex(motionEvent);
+        int actionIndex = motionEvent.getActionIndex();
         if (motionEvent.getPointerId(actionIndex) == this.mActivePointerId) {
             this.mActivePointerId = motionEvent.getPointerId(actionIndex == 0 ? 1 : 0);
         }
     }
 
-    @SuppressLint({"NewApi"})
     private void setColorViewAlpha(int i) {
         this.mCircleView.getBackground().setAlpha(i);
         this.mProgress.setAlpha(i);
@@ -369,51 +306,44 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         }
     }
 
-    @SuppressLint({"NewApi"})
     private Animation startAlphaAnimation(final int i, final int i2) {
-        if (this.mScale && isAlphaUsedForScale()) {
-            return null;
-        }
-        Animation c01544 = new Animation() {
+        C02274 r0 = new Animation() {
             public void applyTransformation(float f, Transformation transformation) {
                 SwipeRefreshLayout.this.mProgress.setAlpha((int) (((float) i) + (((float) (i2 - i)) * f)));
             }
         };
-        c01544.setDuration(300);
+        r0.setDuration(300);
         this.mCircleView.setAnimationListener(null);
         this.mCircleView.clearAnimation();
-        this.mCircleView.startAnimation(c01544);
-        return c01544;
+        this.mCircleView.startAnimation(r0);
+        return r0;
     }
 
-    @SuppressLint({"NewApi"})
     private void startDragging(float f) {
         if (f - this.mInitialDownY > ((float) this.mTouchSlop) && !this.mIsBeingDragged) {
             this.mInitialMotionY = this.mInitialDownY + ((float) this.mTouchSlop);
             this.mIsBeingDragged = true;
-            this.mProgress.setAlpha(STARTING_PROGRESS_ALPHA);
+            this.mProgress.setAlpha(76);
         }
     }
 
-    @SuppressLint({"NewApi"})
     private void startProgressAlphaMaxAnimation() {
         this.mAlphaMaxAnimation = startAlphaAnimation(this.mProgress.getAlpha(), 255);
     }
 
-    @SuppressLint({"NewApi"})
     private void startProgressAlphaStartAnimation() {
-        this.mAlphaStartAnimation = startAlphaAnimation(this.mProgress.getAlpha(), STARTING_PROGRESS_ALPHA);
+        this.mAlphaStartAnimation = startAlphaAnimation(this.mProgress.getAlpha(), 76);
     }
 
-    @SuppressLint({"NewApi"})
     private void startScaleDownReturnToStartAnimation(int i, AnimationListener animationListener) {
         this.mFrom = i;
-        if (isAlphaUsedForScale()) {
-            this.mStartingScale = (float) this.mProgress.getAlpha();
-        } else {
-            this.mStartingScale = ViewCompat.getScaleX(this.mCircleView);
-        }
-        this.mScaleDownToStartAnimation = new C01588();
+        this.mStartingScale = this.mCircleView.getScaleX();
+        this.mScaleDownToStartAnimation = new Animation() {
+            public void applyTransformation(float f, Transformation transformation) {
+                SwipeRefreshLayout.this.setAnimationProgress(SwipeRefreshLayout.this.mStartingScale + ((-SwipeRefreshLayout.this.mStartingScale) * f));
+                SwipeRefreshLayout.this.moveToStart(f);
+            }
+        };
         this.mScaleDownToStartAnimation.setDuration(150);
         if (animationListener != null) {
             this.mCircleView.setAnimationListener(animationListener);
@@ -422,13 +352,16 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         this.mCircleView.startAnimation(this.mScaleDownToStartAnimation);
     }
 
-    @SuppressLint({"NewApi"})
     private void startScaleUpAnimation(AnimationListener animationListener) {
         this.mCircleView.setVisibility(0);
         if (VERSION.SDK_INT >= 11) {
             this.mProgress.setAlpha(255);
         }
-        this.mScaleAnimation = new C01522();
+        this.mScaleAnimation = new Animation() {
+            public void applyTransformation(float f, Transformation transformation) {
+                SwipeRefreshLayout.this.setAnimationProgress(f);
+            }
+        };
         this.mScaleAnimation.setDuration((long) this.mMediumAnimationDuration);
         if (animationListener != null) {
             this.mCircleView.setAnimationListener(animationListener);
@@ -438,18 +371,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
     }
 
     public boolean canChildScrollUp() {
-        if (this.mChildScrollUpCallback != null) {
-            return this.mChildScrollUpCallback.canChildScrollUp(this, this.mTarget);
-        }
-        if (VERSION.SDK_INT >= 14) {
-            return ViewCompat.canScrollVertically(this.mTarget, -1);
-        }
-        if (!(this.mTarget instanceof AbsListView)) {
-            return ViewCompat.canScrollVertically(this.mTarget, -1) || this.mTarget.getScrollY() > 0;
-        } else {
-            AbsListView absListView = (AbsListView) this.mTarget;
-            return absListView.getChildCount() > 0 && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0).getTop() < absListView.getPaddingTop());
-        }
+        return this.mChildScrollUpCallback != null ? this.mChildScrollUpCallback.canChildScrollUp(this, this.mTarget) : this.mTarget instanceof ListView ? ListViewCompat.canScrollList((ListView) this.mTarget, -1) : this.mTarget.canScrollVertically(-1);
     }
 
     public boolean dispatchNestedFling(float f, float f2, boolean z) {
@@ -468,7 +390,8 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         return this.mNestedScrollingChildHelper.dispatchNestedScroll(i, i2, i3, i4, iArr);
     }
 
-    protected int getChildDrawingOrder(int i, int i2) {
+    /* access modifiers changed from: protected */
+    public int getChildDrawingOrder(int i, int i2) {
         return this.mCircleViewIndex < 0 ? i2 : i2 == i + -1 ? this.mCircleViewIndex : i2 >= this.mCircleViewIndex ? i2 + 1 : i2;
     }
 
@@ -500,18 +423,20 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         return this.mRefreshing;
     }
 
-    void moveToStart(float f) {
-        setTargetOffsetTopAndBottom((this.mFrom + ((int) (((float) (this.mOriginalOffsetTop - this.mFrom)) * f))) - this.mCircleView.getTop(), false);
+    /* access modifiers changed from: 0000 */
+    public void moveToStart(float f) {
+        setTargetOffsetTopAndBottom((this.mFrom + ((int) (((float) (this.mOriginalOffsetTop - this.mFrom)) * f))) - this.mCircleView.getTop());
     }
 
-    protected void onDetachedFromWindow() {
+    /* access modifiers changed from: protected */
+    public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         reset();
     }
 
     public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
         ensureTarget();
-        int actionMasked = MotionEventCompat.getActionMasked(motionEvent);
+        int actionMasked = motionEvent.getActionMasked();
         if (this.mReturningToStart && actionMasked == 0) {
             this.mReturningToStart = false;
         }
@@ -520,15 +445,16 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         }
         switch (actionMasked) {
             case 0:
-                setTargetOffsetTopAndBottom(this.mOriginalOffsetTop - this.mCircleView.getTop(), true);
+                setTargetOffsetTopAndBottom(this.mOriginalOffsetTop - this.mCircleView.getTop());
                 this.mActivePointerId = motionEvent.getPointerId(0);
                 this.mIsBeingDragged = false;
-                actionMasked = motionEvent.findPointerIndex(this.mActivePointerId);
-                if (actionMasked >= 0) {
-                    this.mInitialDownY = motionEvent.getY(actionMasked);
+                int findPointerIndex = motionEvent.findPointerIndex(this.mActivePointerId);
+                if (findPointerIndex >= 0) {
+                    this.mInitialDownY = motionEvent.getY(findPointerIndex);
                     break;
+                } else {
+                    return false;
                 }
-                return false;
             case 1:
             case 3:
                 this.mIsBeingDragged = false;
@@ -539,12 +465,13 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
                     Log.e(LOG_TAG, "Got ACTION_MOVE event but don't have an active pointer id.");
                     return false;
                 }
-                actionMasked = motionEvent.findPointerIndex(this.mActivePointerId);
-                if (actionMasked >= 0) {
-                    startDragging(motionEvent.getY(actionMasked));
+                int findPointerIndex2 = motionEvent.findPointerIndex(this.mActivePointerId);
+                if (findPointerIndex2 >= 0) {
+                    startDragging(motionEvent.getY(findPointerIndex2));
                     break;
+                } else {
+                    return false;
                 }
-                return false;
             case 6:
                 onSecondaryPointerUp(motionEvent);
                 break;
@@ -552,7 +479,8 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         return this.mIsBeingDragged;
     }
 
-    protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
+    /* access modifiers changed from: protected */
+    public void onLayout(boolean z, int i, int i2, int i3, int i4) {
         int measuredWidth = getMeasuredWidth();
         int measuredHeight = getMeasuredHeight();
         if (getChildCount() != 0) {
@@ -564,8 +492,8 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
                 int paddingLeft = getPaddingLeft();
                 int paddingTop = getPaddingTop();
                 view.layout(paddingLeft, paddingTop, ((measuredWidth - getPaddingLeft()) - getPaddingRight()) + paddingLeft, ((measuredHeight - getPaddingTop()) - getPaddingBottom()) + paddingTop);
-                measuredHeight = this.mCircleView.getMeasuredWidth();
-                this.mCircleView.layout((measuredWidth / 2) - (measuredHeight / 2), this.mCurrentTargetOffsetTop, (measuredWidth / 2) + (measuredHeight / 2), this.mCurrentTargetOffsetTop + this.mCircleView.getMeasuredHeight());
+                int measuredWidth2 = this.mCircleView.getMeasuredWidth();
+                this.mCircleView.layout((measuredWidth / 2) - (measuredWidth2 / 2), this.mCurrentTargetOffsetTop, (measuredWidth / 2) + (measuredWidth2 / 2), this.mCurrentTargetOffsetTop + this.mCircleView.getMeasuredHeight());
             }
         }
     }
@@ -634,7 +562,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
     }
 
     public boolean onStartNestedScroll(View view, View view2, int i) {
-        return (!isEnabled() || this.mReturningToStart || this.mRefreshing || (i & 2) == 0) ? false : true;
+        return isEnabled() && !this.mReturningToStart && !this.mRefreshing && (i & 2) != 0;
     }
 
     public void onStopNestedScroll(View view) {
@@ -648,27 +576,26 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
     }
 
     public boolean onTouchEvent(MotionEvent motionEvent) {
-        int actionMasked = MotionEventCompat.getActionMasked(motionEvent);
+        int actionMasked = motionEvent.getActionMasked();
         if (this.mReturningToStart && actionMasked == 0) {
             this.mReturningToStart = false;
         }
         if (!isEnabled() || this.mReturningToStart || canChildScrollUp() || this.mRefreshing || this.mNestedScrollInProgress) {
             return false;
         }
-        float y;
         switch (actionMasked) {
             case 0:
                 this.mActivePointerId = motionEvent.getPointerId(0);
                 this.mIsBeingDragged = false;
                 break;
             case 1:
-                actionMasked = motionEvent.findPointerIndex(this.mActivePointerId);
-                if (actionMasked < 0) {
+                int findPointerIndex = motionEvent.findPointerIndex(this.mActivePointerId);
+                if (findPointerIndex < 0) {
                     Log.e(LOG_TAG, "Got ACTION_UP event but don't have an active pointer id.");
                     return false;
                 }
                 if (this.mIsBeingDragged) {
-                    y = motionEvent.getY(actionMasked);
+                    float y = motionEvent.getY(findPointerIndex);
                     float f = this.mInitialMotionY;
                     this.mIsBeingDragged = false;
                     finishSpinner((y - f) * DRAG_RATE);
@@ -676,32 +603,34 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
                 this.mActivePointerId = -1;
                 return false;
             case 2:
-                actionMasked = motionEvent.findPointerIndex(this.mActivePointerId);
-                if (actionMasked < 0) {
+                int findPointerIndex2 = motionEvent.findPointerIndex(this.mActivePointerId);
+                if (findPointerIndex2 < 0) {
                     Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
                     return false;
                 }
-                y = motionEvent.getY(actionMasked);
-                startDragging(y);
+                float y2 = motionEvent.getY(findPointerIndex2);
+                startDragging(y2);
                 if (this.mIsBeingDragged) {
-                    y = (y - this.mInitialMotionY) * DRAG_RATE;
-                    if (y > 0.0f) {
-                        moveSpinner(y);
+                    float f2 = (y2 - this.mInitialMotionY) * DRAG_RATE;
+                    if (f2 > 0.0f) {
+                        moveSpinner(f2);
                         break;
+                    } else {
+                        return false;
                     }
-                    return false;
                 }
                 break;
             case 3:
                 return false;
             case 5:
-                actionMasked = MotionEventCompat.getActionIndex(motionEvent);
-                if (actionMasked >= 0) {
-                    this.mActivePointerId = motionEvent.getPointerId(actionMasked);
+                int actionIndex = motionEvent.getActionIndex();
+                if (actionIndex >= 0) {
+                    this.mActivePointerId = motionEvent.getPointerId(actionIndex);
                     break;
+                } else {
+                    Log.e(LOG_TAG, "Got ACTION_POINTER_DOWN event but have an invalid action index.");
+                    return false;
                 }
-                Log.e(LOG_TAG, "Got ACTION_POINTER_DOWN event but have an invalid action index.");
-                return false;
             case 6:
                 onSecondaryPointerUp(motionEvent);
                 break;
@@ -718,7 +647,8 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         }
     }
 
-    void reset() {
+    /* access modifiers changed from: 0000 */
+    public void reset() {
         this.mCircleView.clearAnimation();
         this.mProgress.stop();
         this.mCircleView.setVisibility(8);
@@ -726,22 +656,19 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         if (this.mScale) {
             setAnimationProgress(0.0f);
         } else {
-            setTargetOffsetTopAndBottom(this.mOriginalOffsetTop - this.mCurrentTargetOffsetTop, true);
+            setTargetOffsetTopAndBottom(this.mOriginalOffsetTop - this.mCurrentTargetOffsetTop);
         }
         this.mCurrentTargetOffsetTop = this.mCircleView.getTop();
     }
 
-    void setAnimationProgress(float f) {
-        if (isAlphaUsedForScale()) {
-            setColorViewAlpha((int) (255.0f * f));
-            return;
-        }
-        ViewCompat.setScaleX(this.mCircleView, f);
-        ViewCompat.setScaleY(this.mCircleView, f);
+    /* access modifiers changed from: 0000 */
+    public void setAnimationProgress(float f) {
+        this.mCircleView.setScaleX(f);
+        this.mCircleView.setScaleY(f);
     }
 
     @Deprecated
-    public void setColorScheme(@ColorInt int... iArr) {
+    public void setColorScheme(@ColorRes int... iArr) {
         setColorSchemeResources(iArr);
     }
 
@@ -789,7 +716,6 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
 
     public void setProgressBackgroundColorSchemeColor(@ColorInt int i) {
         this.mCircleView.setBackgroundColor(i);
-        this.mProgress.setBackgroundColor(i);
     }
 
     public void setProgressBackgroundColorSchemeResource(@ColorRes int i) {
@@ -817,7 +743,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
             return;
         }
         this.mRefreshing = z;
-        setTargetOffsetTopAndBottom((!this.mUsingCustomStart ? this.mSpinnerOffsetEnd + this.mOriginalOffsetTop : this.mSpinnerOffsetEnd) - this.mCurrentTargetOffsetTop, true);
+        setTargetOffsetTopAndBottom((!this.mUsingCustomStart ? this.mSpinnerOffsetEnd + this.mOriginalOffsetTop : this.mSpinnerOffsetEnd) - this.mCurrentTargetOffsetTop);
         this.mNotify = false;
         startScaleUpAnimation(this.mRefreshListener);
     }
@@ -831,26 +757,29 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
                 this.mCircleDiameter = (int) (displayMetrics.density * 40.0f);
             }
             this.mCircleView.setImageDrawable(null);
-            this.mProgress.updateSizes(i);
+            this.mProgress.setStyle(i);
             this.mCircleView.setImageDrawable(this.mProgress);
         }
     }
 
-    void setTargetOffsetTopAndBottom(int i, boolean z) {
+    /* access modifiers changed from: 0000 */
+    public void setTargetOffsetTopAndBottom(int i) {
         this.mCircleView.bringToFront();
         ViewCompat.offsetTopAndBottom(this.mCircleView, i);
         this.mCurrentTargetOffsetTop = this.mCircleView.getTop();
-        if (z && VERSION.SDK_INT < 11) {
-            invalidate();
-        }
     }
 
     public boolean startNestedScroll(int i) {
         return this.mNestedScrollingChildHelper.startNestedScroll(i);
     }
 
-    void startScaleDownAnimation(AnimationListener animationListener) {
-        this.mScaleDownAnimation = new C01533();
+    /* access modifiers changed from: 0000 */
+    public void startScaleDownAnimation(AnimationListener animationListener) {
+        this.mScaleDownAnimation = new Animation() {
+            public void applyTransformation(float f, Transformation transformation) {
+                SwipeRefreshLayout.this.setAnimationProgress(1.0f - f);
+            }
+        };
         this.mScaleDownAnimation.setDuration(150);
         this.mCircleView.setAnimationListener(animationListener);
         this.mCircleView.clearAnimation();

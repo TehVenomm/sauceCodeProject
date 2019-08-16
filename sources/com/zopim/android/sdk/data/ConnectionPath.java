@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zopim.android.sdk.model.Connection;
 import com.zopim.android.sdk.model.Connection.Status;
 
 public class ConnectionPath extends Path<Connection> {
-    private static final ConnectionPath INSTANCE = new ConnectionPath();
+    /* access modifiers changed from: private */
+    public static final ConnectionPath INSTANCE = new ConnectionPath();
     private static final String LOG_TAG = ConnectionPath.class.getSimpleName();
-    private Boolean mDeviceNoConnectivity;
+    /* access modifiers changed from: private */
+    public Boolean mDeviceNoConnectivity;
     private final Object mLock = new Object();
 
     public static class ConnectivityReceiver extends BroadcastReceiver {
@@ -54,7 +57,8 @@ public class ConnectionPath extends Path<Connection> {
         return connectionPath;
     }
 
-    void clear() {
+    /* access modifiers changed from: 0000 */
+    public void clear() {
         this.mData = null;
         this.mDeviceNoConnectivity = null;
     }
@@ -62,16 +66,16 @@ public class ConnectionPath extends Path<Connection> {
     public Connection getData() {
         if (this.mDeviceNoConnectivity == null || !this.mDeviceNoConnectivity.booleanValue()) {
             return this.mData == null ? new Connection(Status.UNKNOWN) : (Connection) this.mData;
-        } else {
-            Log.v(LOG_TAG, "Device has no connection. Will return widget's connection as NO_CONNECTION");
-            return new Connection(Status.NO_CONNECTION);
         }
+        Log.v(LOG_TAG, "Device has no connection. Will return widget's connection as NO_CONNECTION");
+        return new Connection(Status.NO_CONNECTION);
     }
 
-    void update(String str) {
+    /* access modifiers changed from: 0000 */
+    public void update(String str) {
         if (str != null && !str.isEmpty()) {
             synchronized (this.mLock) {
-                this.mData = this.PARSER.parse(str, new C0863a(this));
+                this.mData = this.PARSER.parse(str, (TypeReference<T>) new C1232a<T>(this));
             }
             broadcast(getData());
         }

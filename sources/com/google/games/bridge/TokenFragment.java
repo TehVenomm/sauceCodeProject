@@ -2,7 +2,6 @@ package com.google.games.bridge;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,49 +28,24 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
     private static TokenFragment helperFragment;
     private static final Object lock = new Object();
     private static TokenRequest pendingTokenRequest;
-    private GoogleApiClient mGoogleApiClient;
-
-    /* renamed from: com.google.games.bridge.TokenFragment$1 */
-    class C06551 implements ResultCallback<GoogleSignInResult> {
-        C06551() {
-        }
-
-        public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
-            if (googleSignInResult.isSuccess()) {
-                TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), googleSignInResult.getSignInAccount());
-            } else if (googleSignInResult.getStatus().getStatusCode() == 4) {
-                TokenFragment.this.startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(TokenFragment.this.mGoogleApiClient), 9002);
-            } else {
-                Log.e(TokenFragment.TAG, "Error with silentSignIn: " + googleSignInResult.getStatus());
-                TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), null);
-            }
-        }
-    }
-
-    /* renamed from: com.google.games.bridge.TokenFragment$2 */
-    class C06562 implements ResultCallback<GoogleSignInResult> {
-        C06562() {
-        }
-
-        public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
-            if (googleSignInResult.isSuccess()) {
-                TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), googleSignInResult.getSignInAccount());
-                return;
-            }
-            Log.e(TokenFragment.TAG, "Error with silentSignIn: " + googleSignInResult.getStatus());
-            TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), googleSignInResult.getSignInAccount());
-        }
-    }
+    /* access modifiers changed from: private */
+    public GoogleApiClient mGoogleApiClient;
 
     private static class TokenRequest {
-        private String accountName;
-        private boolean doAuthCode;
-        private boolean doEmail;
-        private boolean doIdToken;
+        /* access modifiers changed from: private */
+        public String accountName;
+        /* access modifiers changed from: private */
+        public boolean doAuthCode;
+        /* access modifiers changed from: private */
+        public boolean doEmail;
+        /* access modifiers changed from: private */
+        public boolean doIdToken;
         private boolean forceRefresh;
-        private boolean hidePopups;
+        /* access modifiers changed from: private */
+        public boolean hidePopups;
         private TokenPendingResult pendingResponse = new TokenPendingResult();
-        private String[] scopes;
+        /* access modifiers changed from: private */
+        public String[] scopes;
         private String webClientId;
 
         public TokenRequest(boolean z, boolean z2, boolean z3, String str, boolean z4, String[] strArr, boolean z5, String str2) {
@@ -143,7 +117,9 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
         Log.d(TAG, "Building client for: " + tokenRequest);
         Builder builder = new Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
         if (tokenRequest.doAuthCode) {
-            if (tokenRequest.getWebClientId().isEmpty()) {
+            if (!tokenRequest.getWebClientId().isEmpty()) {
+                builder.requestServerAuthCode(tokenRequest.getWebClientId(), tokenRequest.getForceRefresh());
+            } else {
                 Log.e(TAG, "Web client ID is needed for Auth Code");
                 tokenRequest.setResult(10);
                 synchronized (lock) {
@@ -151,13 +127,14 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
                 }
                 return;
             }
-            builder.requestServerAuthCode(tokenRequest.getWebClientId(), tokenRequest.getForceRefresh());
         }
         if (tokenRequest.doEmail) {
             builder.requestEmail();
         }
         if (tokenRequest.doIdToken) {
-            if (tokenRequest.getWebClientId().isEmpty()) {
+            if (!tokenRequest.getWebClientId().isEmpty()) {
+                builder.requestIdToken(tokenRequest.getWebClientId());
+            } else {
                 Log.e(TAG, "Web client ID is needed for ID Token");
                 tokenRequest.setResult(10);
                 synchronized (lock) {
@@ -165,7 +142,6 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
                 }
                 return;
             }
-            builder.requestIdToken(tokenRequest.getWebClientId());
         }
         if (tokenRequest.scopes != null) {
             for (String scope : tokenRequest.scopes) {
@@ -176,7 +152,7 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
             Log.d(TAG, "hiding popup views for games API");
             builder.addExtension(GamesOptions.builder().setShowConnectingPopup(false).build());
         }
-        if (!(tokenRequest.accountName == null || tokenRequest.accountName.isEmpty())) {
+        if (tokenRequest.accountName != null && !tokenRequest.accountName.isEmpty()) {
             builder.setAccountName(tokenRequest.accountName);
         }
         GoogleApiClient.Builder addApi = new GoogleApiClient.Builder(getActivity()).addApi(Auth.GOOGLE_SIGN_IN_API, builder.build());
@@ -192,58 +168,117 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
         this.mGoogleApiClient.connect(2);
     }
 
-    public static PendingResult fetchToken(Activity activity, boolean z, boolean z2, boolean z3, String str, boolean z4, String[] strArr, boolean z5, String str2) {
-        Throwable th;
-        TokenRequest tokenRequest = new TokenRequest(z, z2, z3, str, z4, strArr, z5, str2);
-        Object obj = null;
-        synchronized (lock) {
-            if (pendingTokenRequest == null) {
-                pendingTokenRequest = tokenRequest;
-                obj = 1;
-            }
-        }
-        if (obj == null) {
-            Log.e(TAG, "Already a pending token request (requested == ): " + tokenRequest);
-            Log.e(TAG, "Already a pending token request: " + pendingTokenRequest);
-            tokenRequest.setResult(10);
-            return tokenRequest.getPendingResponse();
-        }
-        TokenFragment tokenFragment = (TokenFragment) activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-        if (tokenFragment == null) {
-            try {
-                Log.d(TAG, "Creating fragment");
-                Fragment tokenFragment2 = new TokenFragment();
-                try {
-                    FragmentTransaction beginTransaction = activity.getFragmentManager().beginTransaction();
-                    beginTransaction.add(tokenFragment2, FRAGMENT_TAG);
-                    beginTransaction.commit();
-                } catch (Throwable th2) {
-                    th = th2;
-                    Log.e(TAG, "Cannot launch token fragment:" + th.getMessage(), th);
-                    tokenRequest.setResult(13);
-                    synchronized (lock) {
-                        pendingTokenRequest = null;
-                    }
-                    return tokenRequest.getPendingResponse();
-                }
-            } catch (Throwable th3) {
-                th = th3;
-                Log.e(TAG, "Cannot launch token fragment:" + th.getMessage(), th);
-                tokenRequest.setResult(13);
-                synchronized (lock) {
-                    pendingTokenRequest = null;
-                }
-                return tokenRequest.getPendingResponse();
-            }
-        }
-        Log.d(TAG, "Fragment exists.. calling processRequests");
-        tokenFragment.processRequest();
-        return tokenRequest.getPendingResponse();
+    /* JADX WARNING: Removed duplicated region for block: B:24:0x00b0  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static com.google.android.gms.common.api.PendingResult fetchToken(android.app.Activity r9, boolean r10, boolean r11, boolean r12, java.lang.String r13, boolean r14, java.lang.String[] r15, boolean r16, java.lang.String r17) {
+        /*
+            com.google.games.bridge.TokenFragment$TokenRequest r0 = new com.google.games.bridge.TokenFragment$TokenRequest
+            r1 = r10
+            r2 = r11
+            r3 = r12
+            r4 = r13
+            r5 = r14
+            r6 = r15
+            r7 = r16
+            r8 = r17
+            r0.<init>(r1, r2, r3, r4, r5, r6, r7, r8)
+            r1 = 0
+            java.lang.Object r2 = lock
+            monitor-enter(r2)
+            com.google.games.bridge.TokenFragment$TokenRequest r3 = pendingTokenRequest     // Catch:{ all -> 0x0059 }
+            if (r3 != 0) goto L_0x001a
+            pendingTokenRequest = r0     // Catch:{ all -> 0x0059 }
+            r1 = 1
+        L_0x001a:
+            monitor-exit(r2)     // Catch:{ all -> 0x0059 }
+            if (r1 != 0) goto L_0x005c
+            java.lang.String r1 = "TokenFragment"
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder
+            r2.<init>()
+            java.lang.String r3 = "Already a pending token request (requested == ): "
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.StringBuilder r2 = r2.append(r0)
+            java.lang.String r2 = r2.toString()
+            android.util.Log.e(r1, r2)
+            java.lang.String r1 = "TokenFragment"
+            java.lang.StringBuilder r2 = new java.lang.StringBuilder
+            r2.<init>()
+            java.lang.String r3 = "Already a pending token request: "
+            java.lang.StringBuilder r2 = r2.append(r3)
+            com.google.games.bridge.TokenFragment$TokenRequest r3 = pendingTokenRequest
+            java.lang.StringBuilder r2 = r2.append(r3)
+            java.lang.String r2 = r2.toString()
+            android.util.Log.e(r1, r2)
+            r1 = 10
+            r0.setResult(r1)
+            com.google.android.gms.common.api.PendingResult r0 = r0.getPendingResponse()
+        L_0x0058:
+            return r0
+        L_0x0059:
+            r0 = move-exception
+            monitor-exit(r2)     // Catch:{ all -> 0x0059 }
+            throw r0
+        L_0x005c:
+            android.app.FragmentManager r1 = r9.getFragmentManager()
+            java.lang.String r2 = "gpg.AuthTokenSupport"
+            android.app.Fragment r1 = r1.findFragmentByTag(r2)
+            com.google.games.bridge.TokenFragment r1 = (com.google.games.bridge.TokenFragment) r1
+            if (r1 != 0) goto L_0x00b8
+            java.lang.String r1 = "TokenFragment"
+            java.lang.String r2 = "Creating fragment"
+            android.util.Log.d(r1, r2)     // Catch:{ Throwable -> 0x00c3 }
+            com.google.games.bridge.TokenFragment r1 = new com.google.games.bridge.TokenFragment     // Catch:{ Throwable -> 0x00c3 }
+            r1.<init>()     // Catch:{ Throwable -> 0x00c3 }
+            android.app.FragmentManager r2 = r9.getFragmentManager()     // Catch:{ Throwable -> 0x008b }
+            android.app.FragmentTransaction r2 = r2.beginTransaction()     // Catch:{ Throwable -> 0x008b }
+            java.lang.String r3 = "gpg.AuthTokenSupport"
+            r2.add(r1, r3)     // Catch:{ Throwable -> 0x008b }
+            r2.commit()     // Catch:{ Throwable -> 0x008b }
+        L_0x0086:
+            com.google.android.gms.common.api.PendingResult r0 = r0.getPendingResponse()
+            goto L_0x0058
+        L_0x008b:
+            r1 = move-exception
+        L_0x008c:
+            java.lang.String r2 = "TokenFragment"
+            java.lang.StringBuilder r3 = new java.lang.StringBuilder
+            r3.<init>()
+            java.lang.String r4 = "Cannot launch token fragment:"
+            java.lang.StringBuilder r3 = r3.append(r4)
+            java.lang.String r4 = r1.getMessage()
+            java.lang.StringBuilder r3 = r3.append(r4)
+            java.lang.String r3 = r3.toString()
+            android.util.Log.e(r2, r3, r1)
+            r1 = 13
+            r0.setResult(r1)
+            java.lang.Object r1 = lock
+            monitor-enter(r1)
+            r2 = 0
+            pendingTokenRequest = r2     // Catch:{ all -> 0x00b5 }
+            monitor-exit(r1)     // Catch:{ all -> 0x00b5 }
+            goto L_0x0086
+        L_0x00b5:
+            r0 = move-exception
+            monitor-exit(r1)     // Catch:{ all -> 0x00b5 }
+            throw r0
+        L_0x00b8:
+            java.lang.String r2 = "TokenFragment"
+            java.lang.String r3 = "Fragment exists.. calling processRequests"
+            android.util.Log.d(r2, r3)
+            r1.processRequest()
+            goto L_0x0086
+        L_0x00c3:
+            r1 = move-exception
+            goto L_0x008c
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.games.bridge.TokenFragment.fetchToken(android.app.Activity, boolean, boolean, boolean, java.lang.String, boolean, java.lang.String[], boolean, java.lang.String):com.google.android.gms.common.api.PendingResult");
     }
 
-    private void onSignedIn(int i, GoogleSignInAccount googleSignInAccount) {
+    /* access modifiers changed from: private */
+    public void onSignedIn(int i, GoogleSignInAccount googleSignInAccount) {
+        TokenRequest tokenRequest;
         synchronized (lock) {
-            TokenRequest tokenRequest = pendingTokenRequest;
+            tokenRequest = pendingTokenRequest;
             pendingTokenRequest = null;
         }
         if (tokenRequest != null) {
@@ -257,17 +292,30 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
     }
 
     private void processRequest() {
+        TokenRequest tokenRequest;
+        TokenRequest tokenRequest2;
         synchronized (lock) {
-            TokenRequest tokenRequest = pendingTokenRequest;
+            tokenRequest = pendingTokenRequest;
         }
         if (tokenRequest != null) {
             buildClient(tokenRequest);
             synchronized (lock) {
-                tokenRequest = pendingTokenRequest;
+                tokenRequest2 = pendingTokenRequest;
             }
-            if (tokenRequest != null) {
+            if (tokenRequest2 != null) {
                 if (this.mGoogleApiClient.hasConnectedApi(Games.API)) {
-                    Auth.GoogleSignInApi.silentSignIn(this.mGoogleApiClient).setResultCallback(new C06551());
+                    Auth.GoogleSignInApi.silentSignIn(this.mGoogleApiClient).setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                        public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
+                            if (googleSignInResult.isSuccess()) {
+                                TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), googleSignInResult.getSignInAccount());
+                            } else if (googleSignInResult.getStatus().getStatusCode() == 4) {
+                                TokenFragment.this.startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(TokenFragment.this.mGoogleApiClient), 9002);
+                            } else {
+                                Log.e(TokenFragment.TAG, "Error with silentSignIn: " + googleSignInResult.getStatus());
+                                TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), null);
+                            }
+                        }
+                    });
                 } else {
                     Log.d(TAG, "No connected Games API,!!!!  Hoping for connection!");
                 }
@@ -281,12 +329,12 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
             if (this.mGoogleApiClient.hasConnectedApi(Games.API)) {
                 try {
                     Games.signOut(this.mGoogleApiClient);
-                } catch (Throwable e) {
+                } catch (RuntimeException e) {
                     Log.w(TAG, "Caught exception when calling Games.signOut: " + e.getMessage(), e);
                 }
                 try {
                     Auth.GoogleSignInApi.signOut(this.mGoogleApiClient);
-                } catch (Throwable e2) {
+                } catch (RuntimeException e2) {
                     Log.w(TAG, "Caught exception when calling GoogleSignInAPI.signOut: " + e2.getMessage(), e2);
                 }
             }
@@ -310,23 +358,30 @@ public class TokenFragment extends Fragment implements ConnectionCallbacks {
             GoogleSignInResult signInResultFromIntent = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
             if (signInResultFromIntent != null && signInResultFromIntent.isSuccess()) {
                 onSignedIn(signInResultFromIntent.getStatus().getStatusCode(), signInResultFromIntent.getSignInAccount());
-                return;
             } else if (signInResultFromIntent != null) {
                 onSignedIn(signInResultFromIntent.getStatus().getStatusCode(), null);
-                return;
             } else {
                 Log.e(TAG, "Google SignIn Result is null?");
                 onSignedIn(13, null);
-                return;
             }
+        } else {
+            super.onActivityResult(i, i2, intent);
         }
-        super.onActivityResult(i, i2, intent);
     }
 
     public void onConnected(@Nullable Bundle bundle) {
         if (this.mGoogleApiClient != null) {
             if (this.mGoogleApiClient.hasConnectedApi(Games.API)) {
-                Auth.GoogleSignInApi.silentSignIn(this.mGoogleApiClient).setResultCallback(new C06562());
+                Auth.GoogleSignInApi.silentSignIn(this.mGoogleApiClient).setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                    public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
+                        if (googleSignInResult.isSuccess()) {
+                            TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), googleSignInResult.getSignInAccount());
+                            return;
+                        }
+                        Log.e(TokenFragment.TAG, "Error with silentSignIn: " + googleSignInResult.getStatus());
+                        TokenFragment.this.onSignedIn(googleSignInResult.getStatus().getStatusCode(), googleSignInResult.getSignInAccount());
+                    }
+                });
             } else {
                 startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(this.mGoogleApiClient), 9002);
             }

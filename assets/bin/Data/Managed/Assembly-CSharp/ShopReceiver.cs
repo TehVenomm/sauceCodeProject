@@ -70,47 +70,45 @@ public class ShopReceiver : MonoBehaviourSingleton<ShopReceiver>
 		if (json == null)
 		{
 			onBuyItem(null);
+			return;
+		}
+		int result = 0;
+		int.TryParse(json, out result);
+		if (result == BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE)
+		{
+			onBillingUnavailable();
 		}
 		else
 		{
-			int result = 0;
-			int.TryParse(json, out result);
-			if (result != BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE)
+			try
 			{
-				try
+				OriginalPurchaseData originalPurchaseData = JsonUtility.FromJson<OriginalPurchaseData>(json);
+				PaymentPurchaseData result2 = originalPurchaseData.result;
+				if (result2.productType == 1)
 				{
-					OriginalPurchaseData originalPurchaseData = JsonUtility.FromJson<OriginalPurchaseData>(json);
-					PaymentPurchaseData result2 = originalPurchaseData.result;
-					if (result2.productType == 1)
-					{
-						onBuyItem(result2.productId);
-					}
-					else if (result2.productType == 2)
-					{
-						onBuySpecialItem(result2);
-						GameSaveData.instance.iAPBundleBought = $"{GameSaveData.instance.iAPBundleBought}/{result2.productId}";
-					}
-					else if (result2.productType == 4)
-					{
-						onBuyGacha(result2.productId);
-					}
-					else
-					{
-						onBuyMaterialItem(result2);
-					}
+					onBuyItem(result2.productId);
 				}
-				catch (Exception ex)
+				else if (result2.productType == 2)
 				{
-					Log.Error(ex.ToString());
-					if (onBuyItem != null)
-					{
-						onBuyItem(null);
-					}
+					onBuySpecialItem(result2);
+					GameSaveData.instance.iAPBundleBought = $"{GameSaveData.instance.iAPBundleBought}/{result2.productId}";
+				}
+				else if (result2.productType == 4)
+				{
+					onBuyGacha(result2.productId);
+				}
+				else
+				{
+					onBuyMaterialItem(result2);
 				}
 			}
-			else
+			catch (Exception ex)
 			{
-				onBillingUnavailable();
+				Log.Error(ex.ToString());
+				if (onBuyItem != null)
+				{
+					onBuyItem(null);
+				}
 			}
 		}
 	}

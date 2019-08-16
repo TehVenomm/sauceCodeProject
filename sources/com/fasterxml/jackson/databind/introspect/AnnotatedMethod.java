@@ -3,6 +3,7 @@ package com.fasterxml.jackson.databind.introspect;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -90,9 +91,9 @@ public final class AnnotatedMethod extends AnnotatedWithParams implements Serial
     public void setValue(Object obj, Object obj2) throws IllegalArgumentException {
         try {
             this._method.invoke(obj, new Object[]{obj2});
-        } catch (Throwable e) {
+        } catch (IllegalAccessException e) {
             throw new IllegalArgumentException("Failed to setValue() with method " + getFullName() + ": " + e.getMessage(), e);
-        } catch (Throwable e2) {
+        } catch (InvocationTargetException e2) {
             throw new IllegalArgumentException("Failed to setValue() with method " + getFullName() + ": " + e2.getMessage(), e2);
         }
     }
@@ -100,9 +101,9 @@ public final class AnnotatedMethod extends AnnotatedWithParams implements Serial
     public Object getValue(Object obj) throws IllegalArgumentException {
         try {
             return this._method.invoke(obj, new Object[0]);
-        } catch (Throwable e) {
+        } catch (IllegalAccessException e) {
             throw new IllegalArgumentException("Failed to getValue() with method " + getFullName() + ": " + e.getMessage(), e);
-        } catch (Throwable e2) {
+        } catch (InvocationTargetException e2) {
             throw new IllegalArgumentException("Failed to getValue() with method " + getFullName() + ": " + e2.getMessage(), e2);
         }
     }
@@ -127,8 +128,11 @@ public final class AnnotatedMethod extends AnnotatedWithParams implements Serial
     }
 
     public Class<?> getRawParameterType(int i) {
-        Class[] rawParameterTypes = getRawParameterTypes();
-        return i >= rawParameterTypes.length ? null : rawParameterTypes[i];
+        Class<?>[] rawParameterTypes = getRawParameterTypes();
+        if (i >= rawParameterTypes.length) {
+            return null;
+        }
+        return rawParameterTypes[i];
     }
 
     public JavaType getParameterType(int i) {
@@ -144,7 +148,7 @@ public final class AnnotatedMethod extends AnnotatedWithParams implements Serial
     }
 
     public boolean hasReturnType() {
-        Class rawReturnType = getRawReturnType();
+        Class<Void> rawReturnType = getRawReturnType();
         return (rawReturnType == Void.TYPE || rawReturnType == Void.class) ? false : true;
     }
 
@@ -169,14 +173,16 @@ public final class AnnotatedMethod extends AnnotatedWithParams implements Serial
         return true;
     }
 
-    Object writeReplace() {
+    /* access modifiers changed from: 0000 */
+    public Object writeReplace() {
         return new AnnotatedMethod(new Serialization(this._method));
     }
 
-    Object readResolve() {
-        Class cls = this._serialization.clazz;
+    /* access modifiers changed from: 0000 */
+    public Object readResolve() {
+        Class<?> cls = this._serialization.clazz;
         try {
-            Object declaredMethod = cls.getDeclaredMethod(this._serialization.name, this._serialization.args);
+            Method declaredMethod = cls.getDeclaredMethod(this._serialization.name, this._serialization.args);
             if (!declaredMethod.isAccessible()) {
                 ClassUtil.checkAndFixAccess(declaredMethod, false);
             }

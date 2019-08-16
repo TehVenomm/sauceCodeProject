@@ -1,5 +1,6 @@
-package io.fabric.sdk.android.services.concurrency.internal;
+package p017io.fabric.sdk.android.services.concurrency.internal;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.internal.DefaultRetryPolicy */
 public class DefaultRetryPolicy implements RetryPolicy {
     private final int maxRetries;
 

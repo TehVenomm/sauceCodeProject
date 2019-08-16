@@ -1,3 +1,4 @@
+using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,7 +27,10 @@ public class WorldMap : GameSection
 		TEX_CON2,
 		TEX_CON3,
 		TEX_CON4,
-		SCR_SELECTOR
+		SCR_SELECTOR,
+		OBJ_SELECTOR,
+		OBJ_ARROW,
+		OBJ_FRAME
 	}
 
 	private enum TWEEN_ANIMATION
@@ -59,8 +63,6 @@ public class WorldMap : GameSection
 		OPEN,
 		CLOSE
 	}
-
-	private const int CHAPTER_CONTENT_NUMBER = 4;
 
 	private GameObject worldMapUIRoot;
 
@@ -120,6 +122,8 @@ public class WorldMap : GameSection
 
 	private bool regionOpenInitialized;
 
+	private const int CHAPTER_CONTENT_NUMBER = 4;
+
 	private int currentCenterIndex;
 
 	private List<Transform> chapterContentList;
@@ -169,29 +173,48 @@ public class WorldMap : GameSection
 
 	public override void Initialize()
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		isInGame = (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene");
 		this.StartCoroutine("DoInitialize");
 	}
 
 	private IEnumerator DoInitialize()
 	{
+		bool is_recv_delivery = false;
+		MonoBehaviourSingleton<DeliveryManager>.I.SendEventNormalList(delegate
+		{
+			is_recv_delivery = true;
+		});
+		while (!is_recv_delivery)
+		{
+			yield return null;
+		}
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loadedWorldMap = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMap", false);
-		LoadObject loadedRegionSpotRoot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpotRoot", false);
-		LoadObject loadedRegionSpot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpot", false);
-		LoadObject loadedFilterCamera = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ZoomBlurFilterCamera", false);
-		LoadObject loadedPlayerMarker = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "PlayerMarker", false);
+		LoadObject loadedWorldMap = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMap");
+		LoadObject loadedRegionSpotRoot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpotRoot");
+		LoadObject loadedRegionSpot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpot");
+		LoadObject loadedFilterCamera = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ZoomBlurFilterCamera");
+		LoadObject loadedPlayerMarker = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "PlayerMarker");
 		uint[] openedRegionIds = MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap();
 		uint[] validRegionIds = MonoBehaviourSingleton<WorldMapManager>.I.GetValidRegionIdListInWorldMap();
-		uint[] array = openedRegionIds;
-		foreach (uint id in array)
+		if (MonoBehaviourSingleton<WorldMapManager>.I.releaseRegionIdfromBoard > 0)
 		{
-			if (!MonoBehaviourSingleton<WorldMapManager>.I.IsShowedOpenRegion((int)id))
+			releaseRegionId = MonoBehaviourSingleton<WorldMapManager>.I.releaseRegionIdfromBoard;
+		}
+		if (releaseRegionId < 0)
+		{
+			uint[] array = openedRegionIds;
+			foreach (uint regionId in array)
 			{
-				releaseRegionId = (int)id;
-				break;
+				if (!MonoBehaviourSingleton<WorldMapManager>.I.IsShowedOpenRegion((int)regionId))
+				{
+					releaseRegionId = (int)regionId;
+					break;
+				}
 			}
+		}
+		if (releaseRegionId < 0 && MonoBehaviourSingleton<WorldMapManager>.I.transferInfo != null)
+		{
+			releaseRegionId = MonoBehaviourSingleton<WorldMapManager>.I.transferInfo.nextRegionId;
 		}
 		if (openedRegionIds.Length == 0)
 		{
@@ -206,40 +229,45 @@ public class WorldMap : GameSection
 		string passedRegionIcon = ResourceName.GetRegionIcon(1);
 		string closeRegionIcon = ResourceName.GetRegionIcon(2);
 		validRegionInfo = new ValidRegionInfo[validRegionIds.Length];
-		for (int k = 0; k < validRegionIds.Length; k++)
+		for (int j = 0; j < validRegionIds.Length; j++)
 		{
-			RegionTable.Data data = Singleton<RegionTable>.I.GetData(validRegionIds[k]);
-			if (!data.hasParentRegion())
+			RegionTable.Data data = Singleton<RegionTable>.I.GetData(validRegionIds[j]);
+			if (data.hasParentRegion())
 			{
-				string iconName = passedRegionIcon;
-				REGION_STATUS regionStatus = REGION_STATUS.OPEN;
-				int opened = Array.IndexOf(openedRegionIds, validRegionIds[k]);
-				if (opened < 0)
+				continue;
+			}
+			string resource_name = passedRegionIcon;
+			REGION_STATUS status = REGION_STATUS.OPEN;
+			int num = Array.IndexOf(openedRegionIds, validRegionIds[j]);
+			if (num < 0)
+			{
+				resource_name = closeRegionIcon;
+				status = REGION_STATUS.CLOSE;
+			}
+			else
+			{
+				EventNormalListData eventNormalListData = MonoBehaviourSingleton<DeliveryManager>.I.GetEventNormalListData((int)data.regionId);
+				if (eventNormalListData != null && eventNormalListData.numerator < eventNormalListData.denominator)
 				{
-					iconName = closeRegionIcon;
-					regionStatus = REGION_STATUS.CLOSE;
+					resource_name = newRegionIcon;
 				}
-				else if (!MonoBehaviourSingleton<WorldMapManager>.I.IsAllOpenedMap((int)data.regionId))
-				{
-					iconName = newRegionIcon;
-				}
-				LoadObject loadedObj = loadQueue.Load(RESOURCE_CATEGORY.REGION_ICON, iconName, false);
-				LoadObject releaseIconObj = loadQueue.Load(RESOURCE_CATEGORY.REGION_ICON, newRegionIcon, false);
-				validRegionInfo[k] = new ValidRegionInfo(data, loadedObj, releaseIconObj, regionStatus);
-				if (k != 0)
-				{
-					regionAreaLOs[k] = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPart" + validRegionIds[k].ToString("D3"), false);
-				}
+			}
+			LoadObject icon = loadQueue.Load(RESOURCE_CATEGORY.REGION_ICON, resource_name);
+			LoadObject releaseIcon = loadQueue.Load(RESOURCE_CATEGORY.REGION_ICON, newRegionIcon);
+			validRegionInfo[j] = new ValidRegionInfo(data, icon, releaseIcon, status);
+			if (j != 0)
+			{
+				regionAreaLOs[j] = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPart" + validRegionIds[j].ToString("D3"));
 			}
 		}
 		if (loadQueue.IsLoading())
 		{
-			yield return (object)loadQueue.Wait();
+			yield return loadQueue.Wait();
 		}
-		worldMapUIRoot = ResourceUtility.Realizes(loadedWorldMap.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).get_gameObject();
+		worldMapUIRoot = ResourceUtility.Realizes(loadedWorldMap.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform).get_gameObject();
 		worldMapCamera = worldMapUIRoot.get_transform().Find("Camera").GetComponent<WorldMapCameraController>();
-		GameObject map3 = worldMapUIRoot.get_transform().FindChild("Map").get_gameObject();
-		Transform map2 = worldMapUIRoot.get_transform().FindChild("Map2");
+		GameObject map3 = worldMapUIRoot.get_transform().Find("Map").get_gameObject();
+		Transform map2 = worldMapUIRoot.get_transform().Find("Map2");
 		spots = new SpotManager(loadedRegionSpotRoot.loadedObject as GameObject, loadedRegionSpot.loadedObject as GameObject, worldMapCamera._camera);
 		spots.CreateSpotRoot();
 		spots.SetRoot(base._transform);
@@ -250,6 +278,7 @@ public class WorldMap : GameSection
 		{
 			spotPanel.depth = base.baseDepth + 1;
 		}
+		SetSelectorDepth(spots.spotRootTransform, spotPanel.depth);
 		currentRegionID = 0;
 		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
 		if (fieldMapData != null)
@@ -259,12 +288,12 @@ public class WorldMap : GameSection
 		RegionTable.Data regionData = (releaseRegionId <= 0) ? Singleton<RegionTable>.I.GetData((uint)currentRegionID) : Singleton<RegionTable>.I.GetData((uint)releaseRegionId);
 		if (regionData != null)
 		{
-			currentWorldIndex = regionData.worldId - 1;
+			currentWorldIndex = Mathf.Max(0, regionData.worldId - 1);
 			currentDifficulty = regionData.difficulty;
 		}
 		else
 		{
-			currentWorldIndex = -1;
+			currentWorldIndex = 0;
 			currentDifficulty = REGION_DIFFICULTY_TYPE.NORMAL;
 		}
 		GameObject worldMap2Object = null;
@@ -277,11 +306,11 @@ public class WorldMap : GameSection
 		{
 			worldMap2Object = map2.get_gameObject();
 			map2.get_gameObject().SetActive(false);
-			LoadObject world3 = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, ResourceName.GetChapterImageName(1), false);
-			LoadObject world2 = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, ResourceName.GetChapterImageName(2), false);
+			LoadObject world3 = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, ResourceName.GetChapterImageName(1));
+			LoadObject world2 = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, ResourceName.GetChapterImageName(2));
 			if (loadQueue.IsLoading())
 			{
-				yield return (object)loadQueue.Wait();
+				yield return loadQueue.Wait();
 			}
 			Transform parent = spots.spotRootTransform;
 			chapterContentList = new List<Transform>();
@@ -294,31 +323,33 @@ public class WorldMap : GameSection
 			center = FindCtrl(parent, UI.OBJ_WRAP_CENTER).GetComponent<UICenterOnChild>();
 			center.onCenter = DragChapter;
 			chapterScrollView = FindCtrl(parent, UI.SCR_SELECTOR).GetComponent<UIScrollView>();
+			UIWidget w = worldSelect.GetComponent<UIWidget>();
+			SyncWorldMapSelectAntors(w);
 		}
 		worldMaps = (GameObject[])new GameObject[2]
 		{
 			map3.get_gameObject(),
 			worldMap2Object
 		};
-		playerMarker = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, base._transform, -1);
+		playerMarker = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, base._transform);
 		playerMarker.get_gameObject().SetActive(false);
 		regionAreas = (Transform[])new Transform[regionAreaLOs.Length];
-		for (int j = 0; j < regionAreaLOs.Length; j++)
+		for (int k = 0; k < regionAreaLOs.Length; k++)
 		{
-			if (!(worldMaps[validRegionInfo[j].data.worldId - 1] == null))
+			if (!(worldMaps[validRegionInfo[k].data.worldId - 1] == null))
 			{
-				Transform worldMapTransform = worldMaps[validRegionInfo[j].data.worldId - 1].get_transform();
-				LoadObject areaLO = regionAreaLOs[j];
-				if (areaLO != null && null != areaLO.loadedObject)
+				Transform transform = worldMaps[validRegionInfo[k].data.worldId - 1].get_transform();
+				LoadObject loadObject = regionAreaLOs[k];
+				if (loadObject != null && null != loadObject.loadedObject)
 				{
-					regionAreas[j] = ResourceUtility.Realizes(areaLO.loadedObject, worldMapTransform, -1);
-					regionAreas[j].get_gameObject().SetActive(false);
+					regionAreas[k] = ResourceUtility.Realizes(loadObject.loadedObject, transform);
+					regionAreas[k].get_gameObject().SetActive(false);
 				}
 			}
 		}
-		for (int i = 0; i < worldMaps.Length; i++)
+		for (int l = 0; l < worldMaps.Length; l++)
 		{
-			worldMaps[i].SetActive(i == currentWorldIndex);
+			worldMaps[l].SetActive(l == currentWorldIndex);
 		}
 		isInWorldMap = FieldManager.IsInWorldMap(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
 		bool existAreas = MonoBehaviourSingleton<WorldMapManager>.I.IsExistedWorld2();
@@ -332,6 +363,43 @@ public class WorldMap : GameSection
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += InitMapSprite;
 		}
 		base.Initialize();
+	}
+
+	private void SyncWorldMapSelectAntors(UIWidget w)
+	{
+		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+		{
+			DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+			w.leftAnchor.absolute = specialDeviceInfo.WorldMapWorldSelectAnchor.left;
+			w.rightAnchor.absolute = specialDeviceInfo.WorldMapWorldSelectAnchor.right;
+			w.bottomAnchor.absolute = specialDeviceInfo.WorldMapWorldSelectAnchor.bottom;
+			w.topAnchor.absolute = specialDeviceInfo.WorldMapWorldSelectAnchor.top;
+			w.UpdateAnchors();
+		}
+	}
+
+	private void SetSelectorDepth(Transform parent, int baseDepth)
+	{
+		UIPanel component = FindCtrl(parent, UI.OBJ_SELECTOR).GetComponent<UIPanel>();
+		if (component != null)
+		{
+			component.depth = baseDepth + 1;
+		}
+		UIPanel component2 = FindCtrl(parent, UI.SCR_SELECTOR).GetComponent<UIPanel>();
+		if (component2 != null)
+		{
+			component2.depth = baseDepth + 2;
+		}
+		UIPanel component3 = FindCtrl(parent, UI.OBJ_ARROW).GetComponent<UIPanel>();
+		if (component3 != null)
+		{
+			component3.depth = baseDepth + 3;
+		}
+		UIPanel component4 = FindCtrl(parent, UI.OBJ_FRAME).GetComponent<UIPanel>();
+		if (component4 != null)
+		{
+			component4.depth = baseDepth + 4;
+		}
 	}
 
 	private void DragChapter(GameObject go)
@@ -386,85 +454,76 @@ public class WorldMap : GameSection
 	private void SetupChapterUI()
 	{
 		Transform spotRootTransform = spots.spotRootTransform;
-		SetActive(spotRootTransform, UI.SPR_INACTIVE_ARROW_L, false);
-		SetActive(spotRootTransform, UI.OBJ_ACTIVE_ARROW_L, true);
-		SetActive(spotRootTransform, UI.SPR_INACTIVE_ARROW_R, false);
-		SetActive(spotRootTransform, UI.OBJ_ACTIVE_ARROW_R, true);
+		SetActive(spotRootTransform, UI.SPR_INACTIVE_ARROW_L, is_visible: false);
+		SetActive(spotRootTransform, UI.OBJ_ACTIVE_ARROW_L, is_visible: true);
+		SetActive(spotRootTransform, UI.SPR_INACTIVE_ARROW_R, is_visible: false);
+		SetActive(spotRootTransform, UI.OBJ_ACTIVE_ARROW_R, is_visible: true);
 	}
 
 	public void InitRegionInfo()
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0293: Expected O, but got Unknown
-		//IL_029f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
-		if (spots != null)
+		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+		if (spots == null)
 		{
-			Transform spotRootTransform = spots.spotRootTransform;
-			if (uiMapSprite == null)
+			return;
+		}
+		Transform spotRootTransform = spots.spotRootTransform;
+		if (uiMapSprite == null)
+		{
+			uiMapSprite = spotRootTransform.Find("Map").get_gameObject().GetComponent<UITexture>();
+		}
+		if (mapTween == null)
+		{
+			mapTween = spotRootTransform.Find("Map").get_gameObject().GetComponent<TweenAlpha>();
+		}
+		InitMapSprite(isPortrait: false);
+		if (currentWorldIndex >= 0)
+		{
+			worldMaps[currentWorldIndex].SetActive(true);
+		}
+		for (int i = 0; i < validRegionInfo.Length; i++)
+		{
+			RegionTable.Data data = validRegionInfo[i].data;
+			if (data == null || currentWorldIndex != data.worldId - 1 || currentDifficulty != data.difficulty)
 			{
-				uiMapSprite = spotRootTransform.FindChild("Map").get_gameObject().GetComponent<UITexture>();
+				continue;
 			}
-			if (mapTween == null)
+			int mapNo = Singleton<RegionTable>.I.GetMapNo((int)data.regionId);
+			string event_name = "OPEN_REGION";
+			string regionName = data.regionName;
+			if (validRegionInfo[i].status == REGION_STATUS.CLOSE)
 			{
-				mapTween = spotRootTransform.FindChild("Map").get_gameObject().GetComponent<TweenAlpha>();
-			}
-			InitMapSprite(false);
-			if (currentWorldIndex >= 0)
-			{
-				worldMaps[currentWorldIndex].SetActive(true);
-			}
-			for (int i = 0; i < validRegionInfo.Length; i++)
-			{
-				RegionTable.Data data = validRegionInfo[i].data;
-				if (data != null && currentWorldIndex == data.worldId - 1 && currentDifficulty == data.difficulty)
+				if (validRegionInfo[i].data.difficulty == REGION_DIFFICULTY_TYPE.NORMAL)
 				{
-					int mapNo = Singleton<RegionTable>.I.GetMapNo((int)data.regionId);
-					string event_name = "OPEN_REGION";
-					string name = data.regionName;
-					if (validRegionInfo[i].status == REGION_STATUS.CLOSE)
+					event_name = "RELEASE_REGION";
+					if (isInGame)
 					{
-						if (validRegionInfo[i].data.difficulty == REGION_DIFFICULTY_TYPE.NORMAL)
-						{
-							name = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTextList().Find((GameSceneTables.TextData textData) => textData.key == "CLOSE_AREA").text;
-							event_name = "RELEASE_REGION";
-							if (isInGame)
-							{
-								event_name = "INGAME_RELEASE_REGION";
-							}
-						}
-						else if (validRegionInfo[i].data.difficulty == REGION_DIFFICULTY_TYPE.HARD)
-						{
-							event_name = ((!isInGame) ? "HARD_NOT_OPEN" : "INGAME_HARD_NOT_OPEN");
-						}
+						event_name = "INGAME_RELEASE_REGION";
 					}
-					SpotManager.Spot spot = spots.AddSpot((int)data.regionId, name, data.iconPos, SpotManager.ICON_TYPE.CLEARED, event_name, false, false, false, (int)data.regionId, null, false, SpotManager.HAPPEN_CONDITION.NONE, mapNo);
-					spot.SetIconSprite("SPR_ICON", validRegionInfo[i].icon.loadedObject as Texture2D, (int)data.iconSize.x, (int)data.iconSize.y);
-					if (currentRegionID == data.regionId && isInWorldMap)
-					{
-						playerMarker.get_gameObject().SetActive(true);
-						playerMarker.SetParent(worldMaps[currentWorldIndex].get_transform());
-						PlayerMarker component = playerMarker.GetComponent<PlayerMarker>();
-						component.SetWorldMode(true);
-						component.SetCamera(worldMapCamera._camera.get_transform());
-						playerMarker.set_localPosition(data.markerPos);
-					}
-					if (releaseRegionId == (int)data.regionId)
-					{
-						spot._transform.get_gameObject().SetActive(false);
-						if (isInWorldMap)
-						{
-							playerMarker.get_gameObject().SetActive(false);
-						}
-					}
+				}
+				else if (validRegionInfo[i].data.difficulty == REGION_DIFFICULTY_TYPE.HARD)
+				{
+					event_name = ((!isInGame) ? "HARD_NOT_OPEN" : "INGAME_HARD_NOT_OPEN");
+				}
+			}
+			SpotManager.Spot spot = spots.AddSpot((int)data.regionId, regionName, data.iconPos, SpotManager.ICON_TYPE.CLEARED, event_name, isNew: false, canUnlockNewPortal: false, viewEnemyPopBallon: false, (int)data.regionId, null, isExistDelivery: false, SpotManager.HAPPEN_CONDITION.NONE, mapNo);
+			spot.SetIconSprite("SPR_ICON", validRegionInfo[i].icon.loadedObject as Texture2D, (int)data.iconSize.x, (int)data.iconSize.y);
+			if (currentRegionID == data.regionId && isInWorldMap)
+			{
+				playerMarker.get_gameObject().SetActive(true);
+				playerMarker.SetParent(worldMaps[currentWorldIndex].get_transform());
+				PlayerMarker component = playerMarker.GetComponent<PlayerMarker>();
+				component.SetWorldMode(enable: true);
+				component.SetCamera(worldMapCamera._camera.get_transform());
+				playerMarker.set_localPosition(data.markerPos);
+			}
+			if (releaseRegionId == (int)data.regionId)
+			{
+				spot._transform.get_gameObject().SetActive(false);
+				if (isInWorldMap)
+				{
+					playerMarker.get_gameObject().SetActive(false);
 				}
 			}
 		}
@@ -472,9 +531,6 @@ public class WorldMap : GameSection
 
 	private void InitMapSprite(bool isPortrait)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Expected O, but got Unknown
 		if (uiMapSprite != null)
 		{
 			if (null == worldMapCamera._camera.get_targetTexture())
@@ -491,9 +547,6 @@ public class WorldMap : GameSection
 	{
 		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Expected O, but got Unknown
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
 		if (currentWorldIndex >= 0)
 		{
@@ -508,7 +561,7 @@ public class WorldMap : GameSection
 		{
 			worldMapCamera.targetPos = data[currentRegionID].iconPos;
 		}
-		Transform val = spots.spotRootTransform.FindChild("CLOSE_BTN/OBJ_CLOSE_BTN_ROOT");
+		Transform val = spots.spotRootTransform.Find("CLOSE_BTN/OBJ_CLOSE_BTN_ROOT");
 		UIWidget widget = null;
 		if (val != null)
 		{
@@ -528,12 +581,12 @@ public class WorldMap : GameSection
 			{
 				selectWidget.alpha = 0f;
 			}
+			selectWidget.get_gameObject().SetActive(false);
 		}
 		FadeInMap(delegate
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			selectWidget.get_gameObject().SetActive(true);
 			InitRegionInfo();
 			if (widget != null)
 			{
@@ -544,13 +597,19 @@ public class WorldMap : GameSection
 			{
 				selectWidget.alpha = 0f;
 			}
-			PlayTween(TWEEN_ANIMATION.OPENING, null);
+			PlayTween(TWEEN_ANIMATION.OPENING);
 			UpdateAreas();
-			UpdateDifficultyButton(false);
+			UpdateDifficultyButton();
 			RegionTable.Data data2 = Singleton<RegionTable>.I.GetData((uint)releaseRegionId);
 			if (!MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && GameSceneEvent.request == null && releaseRegionId > 0)
 			{
-				this.StartCoroutine(PlayOpenRegionMap(false));
+				bool useReleaseRegion = false;
+				if (MonoBehaviourSingleton<WorldMapManager>.I.releaseRegionIdfromBoard > 0)
+				{
+					useReleaseRegion = true;
+					MonoBehaviourSingleton<WorldMapManager>.I.releaseRegionIdfromBoard = 0;
+				}
+				this.StartCoroutine(PlayOpenRegionMap(useReleaseRegion));
 			}
 		});
 		base.collectUI = base._transform;
@@ -580,13 +639,12 @@ public class WorldMap : GameSection
 		if (uITweenCtrl != null)
 		{
 			uITweenCtrl.Reset();
-			uITweenCtrl.Play(true, onComplete);
+			uITweenCtrl.Play(forward: true, onComplete);
 		}
 	}
 
 	protected override void OnDestroy()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (blurFilter != null)
 		{
 			Object.Destroy(blurFilter.get_gameObject());
@@ -612,7 +670,7 @@ public class WorldMap : GameSection
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		UpdateDifficultyButton(true);
+		UpdateDifficultyButton(forceOff: true);
 		int id = (int)GameSection.GetEventData();
 		blurCenter = new Vector2(0.5f, 0.5f);
 		SpotManager.Spot spot = spots.FindSpot(id);
@@ -620,21 +678,20 @@ public class WorldMap : GameSection
 		{
 			blurCenter = spot.GetScreenPos();
 		}
-		PlayTween(TWEEN_ANIMATION.ENDING, null);
+		PlayTween(TWEEN_ANIMATION.ENDING);
 		GameSection.StayEvent();
 		blurFilter.CacheRenderTarget(delegate
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			playerMarker.get_gameObject().SetActive(false);
 			playerMarker.SetParent(base._transform);
 			spots.ClearAllSpot();
-			GameSection.ResumeEvent(true, null);
-		}, false);
+			GameSection.ResumeEvent(is_resume: true);
+		});
 	}
 
 	public void OnQuery_OPEN_REGION_CHANGE()
 	{
-		UpdateDifficultyButton(true);
+		UpdateDifficultyButton(forceOff: true);
 		this.StopAllCoroutines();
 		spots.ClearAllSpot();
 		DisableWorldMapObject();
@@ -642,7 +699,7 @@ public class WorldMap : GameSection
 
 	public void OnQuery_DIRECT_REGION()
 	{
-		UpdateDifficultyButton(true);
+		UpdateDifficultyButton(forceOff: true);
 		this.StopAllCoroutines();
 		GameSection.SetEventData(-1);
 		spots.ClearAllSpot();
@@ -650,7 +707,7 @@ public class WorldMap : GameSection
 
 	public void OnQuery_DIRECT_EVENT()
 	{
-		UpdateDifficultyButton(true);
+		UpdateDifficultyButton(forceOff: true);
 		this.StopAllCoroutines();
 		int eventMapRegionID = (int)GameSection.GetEventData();
 		MonoBehaviourSingleton<WorldMapManager>.I.eventMapRegionID = eventMapRegionID;
@@ -660,7 +717,7 @@ public class WorldMap : GameSection
 
 	public void OnQuery_DIRECT_REGION_QUEST()
 	{
-		UpdateDifficultyButton(true);
+		UpdateDifficultyButton(forceOff: true);
 		this.StopAllCoroutines();
 		GameSection.SetEventData(-2);
 		spots.ClearAllSpot();
@@ -668,7 +725,7 @@ public class WorldMap : GameSection
 
 	public void OnQuery_DIRECT_REGION_TUTORIAL()
 	{
-		UpdateDifficultyButton(true);
+		UpdateDifficultyButton(forceOff: true);
 		this.StopAllCoroutines();
 		GameSection.SetEventData(-3);
 		spots.ClearAllSpot();
@@ -691,14 +748,12 @@ public class WorldMap : GameSection
 					val.SetActive(false);
 				}
 			}
-			GameSection.ResumeEvent(true, null);
+			GameSection.ResumeEvent(is_resume: true);
 		});
 	}
 
 	public void FadeInMap(Action onComplete)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		if (currentWorldIndex >= 0 && worldMaps[currentWorldIndex] != null)
 		{
 			worldMaps[currentWorldIndex].SetActive(true);
@@ -718,7 +773,6 @@ public class WorldMap : GameSection
 
 	public void DisableWorldMapObject()
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		GameObject[] array = worldMaps;
 		foreach (GameObject val in array)
 		{
@@ -735,52 +789,54 @@ public class WorldMap : GameSection
 
 	private IEnumerator DoFadeMap(float from, float to, float time, Action onComplete)
 	{
-		if (currentWorldIndex >= 0 && !(worldMaps[currentWorldIndex] == null))
+		if (currentWorldIndex < 0 || worldMaps[currentWorldIndex] == null)
 		{
-			Renderer r = worldMaps[currentWorldIndex].GetComponentInChildren<Renderer>();
-			if (!(r == null))
+			yield break;
+		}
+		Renderer r = worldMaps[currentWorldIndex].GetComponentInChildren<Renderer>();
+		if (r == null)
+		{
+			yield break;
+		}
+		Renderer[] areaRenderers = (Renderer[])new Renderer[regionAreas.Length];
+		for (int i = 0; i < areaRenderers.Length; i++)
+		{
+			if (null != regionAreas[i])
 			{
-				Renderer[] areaRenderers = (Renderer[])new Renderer[regionAreas.Length];
-				for (int j = 0; j < areaRenderers.Length; j++)
+				Renderer component = regionAreas[i].GetComponent<Renderer>();
+				if (null != component)
 				{
-					if (null != regionAreas[j])
-					{
-						Renderer ren = regionAreas[j].GetComponent<Renderer>();
-						if (null != ren)
-						{
-							ren.get_material().SetFloat("_Alpha", 0f);
-						}
-						areaRenderers[j] = ren;
-					}
+					component.get_material().SetFloat("_Alpha", 0f);
 				}
-				float timer2;
-				for (timer2 = 0f; timer2 < time; timer2 += Time.get_deltaTime())
-				{
-					if (null == r)
-					{
-						yield break;
-					}
-					float alpha = Mathf.Lerp(from, to, timer2 / time);
-					r.get_material().SetFloat("_Alpha", alpha);
-					yield return (object)null;
-				}
-				r.get_material().SetFloat("_Alpha", to);
-				timer2 = 0f;
-				for (float alphaTime = 0.15f; timer2 <= alphaTime; timer2 += Time.get_deltaTime())
-				{
-					float alpha2 = Mathf.Lerp(0f, 1.2f, timer2 / alphaTime);
-					for (int i = 0; i < areaRenderers.Length; i++)
-					{
-						if (null != areaRenderers[i])
-						{
-							areaRenderers[i].get_material().SetFloat("_Alpha", alpha2);
-						}
-					}
-					yield return (object)null;
-				}
-				onComplete?.Invoke();
+				areaRenderers[i] = component;
 			}
 		}
+		float timer2;
+		for (timer2 = 0f; timer2 < time; timer2 += Time.get_deltaTime())
+		{
+			if (null == r)
+			{
+				yield break;
+			}
+			float alpha = Mathf.Lerp(from, to, timer2 / time);
+			r.get_material().SetFloat("_Alpha", alpha);
+			yield return null;
+		}
+		r.get_material().SetFloat("_Alpha", to);
+		timer2 = 0f;
+		for (float alphaTime = 0.15f; timer2 <= alphaTime; timer2 += Time.get_deltaTime())
+		{
+			float alpha2 = Mathf.Lerp(0f, 1.2f, timer2 / alphaTime);
+			for (int j = 0; j < areaRenderers.Length; j++)
+			{
+				if (null != areaRenderers[j])
+				{
+					areaRenderers[j].get_material().SetFloat("_Alpha", alpha2);
+				}
+			}
+			yield return null;
+		}
+		onComplete?.Invoke();
 	}
 
 	private void LateUpdate()
@@ -826,7 +882,6 @@ public class WorldMap : GameSection
 			blurFilter.StartBlurFilter(0f, 0.25f, 0.25f, blurCenter, delegate
 			{
 				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 				blurFilter.SetBlurPram(0f, blurCenter);
 				onCompleteFilter();
 				if (regionAreas != null)
@@ -847,7 +902,7 @@ public class WorldMap : GameSection
 	{
 		if (!isChangingMap)
 		{
-			UpdateDifficultyButton(true);
+			UpdateDifficultyButton(forceOff: true);
 			if (currentCenterIndex + 1 >= 4)
 			{
 				currentCenterIndex = 0;
@@ -864,7 +919,7 @@ public class WorldMap : GameSection
 	{
 		if (!isChangingMap)
 		{
-			UpdateDifficultyButton(true);
+			UpdateDifficultyButton(forceOff: true);
 			if (currentCenterIndex <= 0)
 			{
 				currentCenterIndex = 3;
@@ -930,13 +985,12 @@ public class WorldMap : GameSection
 
 	private void ChangeActiveArea()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		UpdateAreas();
 		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, delegate
 		{
 			InitRegionInfo();
 			isChangingMap = false;
-			UpdateDifficultyButton(false);
+			UpdateDifficultyButton();
 		}));
 	}
 
@@ -950,11 +1004,11 @@ public class WorldMap : GameSection
 		object eventData = GameSection.GetEventData();
 		if (eventData != null)
 		{
-			REGION_DIFFICULTY_TYPE rEGION_DIFFICULTY_TYPE = (REGION_DIFFICULTY_TYPE)(int)eventData;
+			REGION_DIFFICULTY_TYPE rEGION_DIFFICULTY_TYPE = (REGION_DIFFICULTY_TYPE)eventData;
 			if (rEGION_DIFFICULTY_TYPE != currentDifficulty)
 			{
 				currentDifficulty = rEGION_DIFFICULTY_TYPE;
-				UpdateDifficultyButton(false);
+				UpdateDifficultyButton();
 				spots.ClearAllSpot();
 				InitRegionInfo();
 				UpdateAreas();
@@ -967,11 +1021,11 @@ public class WorldMap : GameSection
 		object eventData = GameSection.GetEventData();
 		if (eventData != null)
 		{
-			REGION_DIFFICULTY_TYPE rEGION_DIFFICULTY_TYPE = (REGION_DIFFICULTY_TYPE)(int)eventData;
+			REGION_DIFFICULTY_TYPE rEGION_DIFFICULTY_TYPE = (REGION_DIFFICULTY_TYPE)eventData;
 			if (rEGION_DIFFICULTY_TYPE != currentDifficulty)
 			{
 				currentDifficulty = rEGION_DIFFICULTY_TYPE;
-				UpdateDifficultyButton(false);
+				UpdateDifficultyButton();
 				spots.ClearAllSpot();
 				InitRegionInfo();
 				UpdateAreas();
@@ -981,22 +1035,21 @@ public class WorldMap : GameSection
 
 	private void UpdateAreas()
 	{
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		if (regionAreas != null)
+		if (regionAreas == null)
 		{
-			for (int i = 0; i < regionAreas.Length; i++)
+			return;
+		}
+		for (int i = 0; i < regionAreas.Length; i++)
+		{
+			if (!(null == regionAreas[i]))
 			{
-				if (!(null == regionAreas[i]))
+				if (validRegionInfo[i].status == REGION_STATUS.OPEN && currentWorldIndex == validRegionInfo[i].data.worldId - 1 && currentDifficulty == validRegionInfo[i].data.difficulty && validRegionInfo[i].data.regionId != (uint)releaseRegionId)
 				{
-					if (validRegionInfo[i].status == REGION_STATUS.OPEN && currentWorldIndex == validRegionInfo[i].data.worldId - 1 && currentDifficulty == validRegionInfo[i].data.difficulty && validRegionInfo[i].data.regionId != (uint)releaseRegionId)
-					{
-						regionAreas[i].get_gameObject().SetActive(true);
-					}
-					else
-					{
-						regionAreas[i].get_gameObject().SetActive(false);
-					}
+					regionAreas[i].get_gameObject().SetActive(true);
+				}
+				else
+				{
+					regionAreas[i].get_gameObject().SetActive(false);
 				}
 			}
 		}
@@ -1004,26 +1057,23 @@ public class WorldMap : GameSection
 
 	private void UpdateDifficultyButton(bool forceOff = false)
 	{
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 		Transform val = null;
 		Transform spotRootTransform = spots.spotRootTransform;
 		if (forceOff)
 		{
-			SetActive(spotRootTransform, UI.OBJ_SELECT_DIFFICULTY, false);
+			SetActive(spotRootTransform, UI.OBJ_SELECT_DIFFICULTY, is_visible: false);
+			return;
 		}
-		else
+		bool flag = IsExistedHard();
+		SetActive(spotRootTransform, UI.OBJ_SELECT_DIFFICULTY, flag);
+		if (flag)
 		{
-			bool flag = IsExistedHard();
-			SetActive(spotRootTransform, UI.OBJ_SELECT_DIFFICULTY, flag);
-			if (flag)
+			SetActive(spotRootTransform, UI.BTN_CURRENT_DIFFICULTY_NORMAL, currentDifficulty == REGION_DIFFICULTY_TYPE.NORMAL);
+			SetActive(spotRootTransform, UI.BTN_CURRENT_DIFFICULTY_HARD, currentDifficulty == REGION_DIFFICULTY_TYPE.HARD);
+			UIWidget component = FindCtrl(spotRootTransform, UI.OBJ_SELECT_DIFFICULTY).GetComponent<UIWidget>();
+			if (!(component == null))
 			{
-				SetActive(spotRootTransform, UI.BTN_CURRENT_DIFFICULTY_NORMAL, currentDifficulty == REGION_DIFFICULTY_TYPE.NORMAL);
-				SetActive(spotRootTransform, UI.BTN_CURRENT_DIFFICULTY_HARD, currentDifficulty == REGION_DIFFICULTY_TYPE.HARD);
-				UIWidget component = FindCtrl(spotRootTransform, UI.OBJ_SELECT_DIFFICULTY).GetComponent<UIWidget>();
-				if (!(component == null))
-				{
-					this.StartCoroutine(FadeWidget(component, 0, 1, 0.3f));
-				}
+				this.StartCoroutine(FadeWidget(component, 0, 1, 0.3f));
 			}
 		}
 	}
@@ -1036,7 +1086,7 @@ public class WorldMap : GameSection
 			time += Time.get_deltaTime();
 			float prog = time / duration;
 			float a = target.alpha = Mathf.Lerp((float)start, (float)end, prog);
-			yield return (object)null;
+			yield return null;
 		}
 	}
 
@@ -1049,22 +1099,32 @@ public class WorldMap : GameSection
 		});
 		if (isInGame)
 		{
-			GameSection.ChangeEvent("INGAME_SELECT_DIFFICULTY", null);
+			GameSection.ChangeEvent("INGAME_SELECT_DIFFICULTY");
 		}
 	}
 
 	private void OnQuery_RELEASE_REGION()
 	{
 		releaseRegionId = (int)GameSection.GetEventData();
+		uint[] openRegionIdListInWorldMap = MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap();
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<WorldMapManager>.I.SendRegionCrystalNum(releaseRegionId, delegate(bool isSuccess, string campainText)
+		if (openRegionIdListInWorldMap.Length <= 1)
 		{
-			GameSection.ResumeEvent(isSuccess, new object[2]
+			GameSection.ChangeStayEvent("INVALID_RELEASE");
+			releaseRegionId = -1;
+			GameSection.ResumeEvent(is_resume: true);
+		}
+		else
+		{
+			MonoBehaviourSingleton<WorldMapManager>.I.SendRegionCrystalNum(releaseRegionId, delegate(bool isSuccess, string campainText)
 			{
-				MonoBehaviourSingleton<WorldMapManager>.I.releaseCrystalNum.ToString(),
-				campainText
+				GameSection.ResumeEvent(isSuccess, new object[2]
+				{
+					MonoBehaviourSingleton<WorldMapManager>.I.releaseCrystalNum.ToString(),
+					campainText
+				});
 			});
-		});
+		}
 	}
 
 	private void OnQuery_WorldMapReleaseRegionDialog_YES()
@@ -1075,14 +1135,13 @@ public class WorldMap : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<WorldMapManager>.I.SendRegionOpen(releaseRegionId, delegate(bool isSuccess)
 			{
-				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-				GameSection.ResumeEvent(isSuccess, null);
+				GameSection.ResumeEvent(isSuccess);
 				if (isSuccess)
 				{
 					ValidRegionInfo validRegionInfo = this.validRegionInfo[releaseRegionId];
 					validRegionInfo.status = REGION_STATUS.OPEN;
 					validRegionInfo.icon = validRegionInfo.releaseIcon;
-					this.StartCoroutine(PlayOpenRegionMap(true));
+					this.StartCoroutine(PlayOpenRegionMap(useReleaseRegion: true));
 				}
 			});
 		}
@@ -1090,177 +1149,148 @@ public class WorldMap : GameSection
 
 	private IEnumerator PlayOpenRegionMap(bool useReleaseRegion)
 	{
-		if (releaseRegionId >= 0)
+		if (releaseRegionId < 0)
 		{
-			worldMapCamera.isInteractive = false;
-			playingReleaseRegion = true;
-			GameSaveData.instance.AddShowedOpenRegionId(releaseRegionId);
-			Transform closeBtn = Utility.Find(spots.spotRootTransform, "CLOSE_BTN");
-			if (null != closeBtn)
+			yield break;
+		}
+		worldMapCamera.isInteractive = false;
+		playingReleaseRegion = true;
+		GameSaveData.instance.AddShowedOpenRegionId(releaseRegionId);
+		Transform closeBtn = Utility.Find(spots.spotRootTransform, "CLOSE_BTN");
+		if (null != closeBtn)
+		{
+			closeBtn.get_gameObject().SetActive(false);
+		}
+		Transform worldSelector = FindCtrl(spots.spotRootTransform, UI.OBJ_WORLD_SELECT);
+		bool existWorldSelect = worldSelector.get_gameObject().get_activeSelf();
+		SetActive(worldSelector, is_visible: false);
+		UpdateDifficultyButton(forceOff: true);
+		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.CAMERA_ACTION, is_disable: true);
+		toRegionId = releaseRegionId;
+		yield return this.StartCoroutine(InitializeOpenRegion());
+		Vector3 to = new Vector3(0f, 0f, 0f);
+		RegionTable.Data toData = Singleton<RegionTable>.I.GetData((uint)toRegionId);
+		if (toData != null)
+		{
+			to = toData.iconPos;
+		}
+		yield return (object)new WaitForSeconds(0.5f);
+		Vector3Interpolator ip = new Vector3Interpolator();
+		Vector3 zoomDownTo = to + new Vector3(0f, 0f, -3f);
+		ip.Set(1f, worldMapCamera.targetPos, zoomDownTo);
+		ip.Play();
+		while (ip.IsPlaying())
+		{
+			ip.Update();
+			worldMapCamera.targetPos = ip.Get();
+			yield return null;
+		}
+		Transform toRegion = regionAreas[toRegionId];
+		toRegion.get_gameObject().SetActive(true);
+		Renderer toRegionRenderer = toRegion.GetComponent<Renderer>();
+		toRegionRenderer.get_material().SetFloat("_Alpha", 0f);
+		Renderer topRenderer = glowRegionTop.GetComponent<Renderer>();
+		topRenderer.get_material().SetFloat("_Alpha", 0f);
+		topRenderer.get_material().SetFloat("_AddColor", 1f);
+		topRenderer.get_material().SetFloat("_BlendRate", 1f);
+		topRenderer.set_sortingOrder(2);
+		glowRegionTop.get_gameObject().SetActive(true);
+		yield return (object)new WaitForSeconds(1f);
+		mapGlowEffectA.get_gameObject().SetActive(true);
+		Renderer mapGlowEffectARenderer = mapGlowEffectA.GetComponent<Renderer>();
+		mapGlowEffectARenderer.set_sortingOrder(1);
+		SpotManager.Spot toSpot = spots.GetSpot(toRegionId);
+		toSpot._transform.get_gameObject().SetActive(false);
+		RegionTable.Data toRegionData = Singleton<RegionTable>.I.GetData((uint)toRegionId);
+		toSpot.ReleaseRegion(toRegionData.regionName, validRegionInfo[toRegionId].releaseIcon.loadedObject as Texture2D, "OPEN_REGION");
+		ip.Set(1f, zoomDownTo, to);
+		ip.Play();
+		while (ip.IsPlaying())
+		{
+			ip.Update();
+			worldMapCamera.targetPos = ip.Get();
+			yield return null;
+		}
+		FloatInterpolator fip = new FloatInterpolator();
+		fip.Set(2f, 0f, 1.5f, null, 0f);
+		fip.Play();
+		SoundManager.PlayOneShotUISE(SE_ID_SMOKE);
+		while (fip.IsPlaying())
+		{
+			fip.Update();
+			topRenderer.get_material().SetFloat("_Alpha", fip.Get());
+			yield return null;
+		}
+		toRegionRenderer.get_material().SetFloat("_Alpha", 1f);
+		mapGlowEffectParticleA.Stop();
+		mapGlowEffectParticleA.get_gameObject().SetActive(false);
+		mapGlowEffectB.get_gameObject().SetActive(true);
+		yield return null;
+		fip.Set(0.2f, 1f, 0f, null, 0f);
+		fip.Play();
+		while (fip.IsPlaying())
+		{
+			fip.Update();
+			topRenderer.get_material().SetFloat("_Alpha", fip.Get());
+			yield return null;
+		}
+		yield return null;
+		toSpot._transform.get_gameObject().SetActive(true);
+		TweenScale tweenScale = toSpot._transform.GetComponent<TweenScale>();
+		tweenScale.PlayForward();
+		yield return (object)new WaitForSeconds(1f);
+		mapGlowEffectParticleB.Stop();
+		mapGlowEffectParticleB.get_gameObject().SetActive(false);
+		bool isTweenEnd = false;
+		telop.get_gameObject().SetActive(true);
+		UITweenCtrl tweenCtrl = telop.GetComponent<UITweenCtrl>();
+		tweenCtrl.Reset();
+		tweenCtrl.Play(forward: true, delegate
+		{
+			isTweenEnd = true;
+		});
+		SoundManager.PlayOneShotUISE(SE_ID_LOGO);
+		while (!isTweenEnd)
+		{
+			yield return null;
+		}
+		mapGlowEffectA.get_gameObject().SetActive(false);
+		mapGlowEffectB.get_gameObject().SetActive(false);
+		yield return (object)new WaitForSeconds(0.6f);
+		telop.get_gameObject().SetActive(false);
+		UpdateDifficultyButton();
+		if (null != closeBtn)
+		{
+			closeBtn.get_gameObject().SetActive(true);
+		}
+		SetActive(worldSelector, existWorldSelect);
+		playingReleaseRegion = false;
+		worldMapCamera.isInteractive = true;
+		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.CAMERA_ACTION, is_disable: false);
+		if (useReleaseRegion)
+		{
+			DispatchEvent("SUMMARY_CONFIRM");
+			yield break;
+		}
+		releaseRegionId = -1;
+		WorldMapManager.TransferInfo transferInfo = MonoBehaviourSingleton<WorldMapManager>.I.transferInfo;
+		if (transferInfo != null)
+		{
+			if (!transferInfo.nextInGame)
 			{
-				closeBtn.get_gameObject().SetActive(false);
-			}
-			Transform worldSelector = FindCtrl(spots.spotRootTransform, UI.OBJ_WORLD_SELECT);
-			bool existWorldSelect = worldSelector.get_gameObject().get_activeSelf();
-			SetActive(worldSelector, false);
-			UpdateDifficultyButton(true);
-			MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.CAMERA_ACTION, true);
-			toRegionId = releaseRegionId;
-			yield return (object)this.StartCoroutine(InitializeOpenRegion());
-			Vector3 to = new Vector3(0f, 0f, 0f);
-			RegionTable.Data toData = Singleton<RegionTable>.I.GetData((uint)toRegionId);
-			if (toData != null)
-			{
-				to = toData.iconPos;
-			}
-			yield return (object)new WaitForSeconds(0.5f);
-			Vector3Interpolator ip = new Vector3Interpolator();
-			Vector3 zoomDownTo = to + new Vector3(0f, 0f, -3f);
-			ip.Set(1f, worldMapCamera.targetPos, zoomDownTo, null, default(Vector3), null);
-			ip.Play();
-			while (ip.IsPlaying())
-			{
-				ip.Update();
-				worldMapCamera.targetPos = ip.Get();
-				yield return (object)null;
-			}
-			Transform toRegion = regionAreas[toRegionId];
-			toRegion.get_gameObject().SetActive(true);
-			Renderer toRegionRenderer = toRegion.GetComponent<Renderer>();
-			toRegionRenderer.get_material().SetFloat("_Alpha", 0f);
-			Renderer topRenderer = glowRegionTop.GetComponent<Renderer>();
-			topRenderer.get_material().SetFloat("_Alpha", 0f);
-			topRenderer.get_material().SetFloat("_AddColor", 1f);
-			topRenderer.get_material().SetFloat("_BlendRate", 1f);
-			topRenderer.set_sortingOrder(2);
-			glowRegionTop.get_gameObject().SetActive(true);
-			yield return (object)new WaitForSeconds(1f);
-			mapGlowEffectA.get_gameObject().SetActive(true);
-			Renderer mapGlowEffectARenderer = mapGlowEffectA.GetComponent<Renderer>();
-			mapGlowEffectARenderer.set_sortingOrder(1);
-			SpotManager.Spot toSpot = spots.GetSpot(toRegionId);
-			toSpot._transform.get_gameObject().SetActive(false);
-			RegionTable.Data toRegionData = Singleton<RegionTable>.I.GetData((uint)toRegionId);
-			toSpot.ReleaseRegion(toRegionData.regionName, validRegionInfo[toRegionId].releaseIcon.loadedObject as Texture2D, "OPEN_REGION");
-			ip.Set(1f, zoomDownTo, to, null, default(Vector3), null);
-			ip.Play();
-			while (ip.IsPlaying())
-			{
-				ip.Update();
-				worldMapCamera.targetPos = ip.Get();
-				yield return (object)null;
-			}
-			FloatInterpolator fip = new FloatInterpolator();
-			fip.Set(2f, 0f, 1.5f, null, 0f, null);
-			fip.Play();
-			SoundManager.PlayOneShotUISE(SE_ID_SMOKE);
-			while (fip.IsPlaying())
-			{
-				fip.Update();
-				topRenderer.get_material().SetFloat("_Alpha", fip.Get());
-				yield return (object)null;
-			}
-			toRegionRenderer.get_material().SetFloat("_Alpha", 1f);
-			mapGlowEffectParticleA.Stop();
-			mapGlowEffectParticleA.get_gameObject().SetActive(false);
-			mapGlowEffectB.get_gameObject().SetActive(true);
-			yield return (object)null;
-			fip.Set(0.2f, 1f, 0f, null, 0f, null);
-			fip.Play();
-			while (fip.IsPlaying())
-			{
-				fip.Update();
-				topRenderer.get_material().SetFloat("_Alpha", fip.Get());
-				yield return (object)null;
-			}
-			yield return (object)null;
-			toSpot._transform.get_gameObject().SetActive(true);
-			TweenScale tweenScale = toSpot._transform.GetComponent<TweenScale>();
-			tweenScale.PlayForward();
-			yield return (object)new WaitForSeconds(1f);
-			mapGlowEffectParticleB.Stop();
-			mapGlowEffectParticleB.get_gameObject().SetActive(false);
-			bool isTweenEnd = false;
-			telop.get_gameObject().SetActive(true);
-			UITweenCtrl tweenCtrl = telop.GetComponent<UITweenCtrl>();
-			tweenCtrl.Reset();
-			tweenCtrl.Play(true, delegate
-			{
-				((_003CPlayOpenRegionMap_003Ec__Iterator160)/*Error near IL_0740: stateMachine*/)._003CisTweenEnd_003E__15 = true;
-			});
-			SoundManager.PlayOneShotUISE(SE_ID_LOGO);
-			while (!isTweenEnd)
-			{
-				yield return (object)null;
-			}
-			mapGlowEffectA.get_gameObject().SetActive(false);
-			mapGlowEffectB.get_gameObject().SetActive(false);
-			yield return (object)new WaitForSeconds(0.6f);
-			telop.get_gameObject().SetActive(false);
-			UpdateDifficultyButton(false);
-			if (null != closeBtn)
-			{
-				closeBtn.get_gameObject().SetActive(true);
-			}
-			SetActive(worldSelector, existWorldSelect);
-			playingReleaseRegion = false;
-			worldMapCamera.isInteractive = true;
-			MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.CAMERA_ACTION, false);
-			if (useReleaseRegion)
-			{
-				DispatchEvent("SUMMARY_CONFIRM", null);
+				DispatchEvent("OPEN_REGION", transferInfo.nextRegionId);
+				MonoBehaviourSingleton<WorldMapManager>.I.transferInfo = null;
 			}
 			else
 			{
-				releaseRegionId = -1;
-				WorldMapManager.TransferInfo info = MonoBehaviourSingleton<WorldMapManager>.I.transferInfo;
-				if (info != null)
-				{
-					if (!info.nextInGame)
-					{
-						DispatchEvent("OPEN_REGION", info.nextRegionId);
-						MonoBehaviourSingleton<WorldMapManager>.I.transferInfo = null;
-					}
-					else
-					{
-						DispatchEvent("INGAME_MAIN", null);
-						MonoBehaviourSingleton<WorldMapManager>.I.transferInfo = null;
-					}
-				}
+				DispatchEvent("INGAME_MAIN");
+				MonoBehaviourSingleton<WorldMapManager>.I.transferInfo = null;
 			}
 		}
 	}
 
-	private void OnQuery_INGAME_MAIN()
-	{
-		GameSection.StayEvent();
-		uint jumpPortalID = MonoBehaviourSingleton<WorldMapManager>.I.GetJumpPortalID();
-		CoopApp.EnterField(jumpPortalID, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
-		{
-			if (!is_connect)
-			{
-				GameSection.ChangeStayEvent("COOP_SERVER_INVALID", null);
-				GameSection.ResumeEvent(true, null);
-				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					DispatchEvent("CLOSE", null);
-				});
-			}
-			else
-			{
-				GameSection.ResumeEvent(is_regist, null);
-				if (is_regist)
-				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("InGame", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-				}
-			}
-		});
-	}
-
 	private void DelayExecute(float delayTime, Action func)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		this.StartCoroutine(DoDelayExecute(delayTime, func));
 	}
 
@@ -1275,20 +1305,20 @@ public class WorldMap : GameSection
 		if (!regionOpenInitialized)
 		{
 			LoadingQueue loadQueue = new LoadingQueue(this);
-			LoadObject loadedMapGlowEffectA = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectA", false);
-			LoadObject loadedMapGlowEffectB = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectB", false);
-			LoadObject loadedTelop = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "TelopOpenRegion", false);
-			loadQueue.CacheSE(SE_ID_LOGO, null);
-			loadQueue.CacheSE(SE_ID_SMOKE, null);
-			LoadObject loadedMaterial = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPartGlow" + toRegionId.ToString("D3"), false);
+			LoadObject loadedMapGlowEffectA = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectA");
+			LoadObject loadedMapGlowEffectB = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectB");
+			LoadObject loadedTelop = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "TelopOpenRegion");
+			loadQueue.CacheSE(SE_ID_LOGO);
+			loadQueue.CacheSE(SE_ID_SMOKE);
+			LoadObject loadedMaterial = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPartGlow" + toRegionId.ToString("D3"));
 			if (loadQueue.IsLoading())
 			{
-				yield return (object)loadQueue.Wait();
+				yield return loadQueue.Wait();
 			}
-			mapGlowEffectA = ResourceUtility.Realizes(loadedMapGlowEffectA.loadedObject, base._transform, -1);
+			mapGlowEffectA = ResourceUtility.Realizes(loadedMapGlowEffectA.loadedObject, base._transform);
 			mapGlowEffectA.get_gameObject().SetActive(false);
 			mapGlowEffectParticleA = mapGlowEffectA.GetComponent<ParticleSystem>();
-			mapGlowEffectB = ResourceUtility.Realizes(loadedMapGlowEffectB.loadedObject, base._transform, -1);
+			mapGlowEffectB = ResourceUtility.Realizes(loadedMapGlowEffectB.loadedObject, base._transform);
 			mapGlowEffectB.get_gameObject().SetActive(false);
 			mapGlowEffectParticleB = mapGlowEffectB.GetComponent<ParticleSystem>();
 			if (loadedMaterial != null)
@@ -1297,7 +1327,7 @@ public class WorldMap : GameSection
 			}
 			if (telop == null)
 			{
-				telop = ResourceUtility.Realizes(loadedTelop.loadedObject, spots.spotRootTransform, -1);
+				telop = ResourceUtility.Realizes(loadedTelop.loadedObject, spots.spotRootTransform);
 			}
 			regionOpenInitialized = true;
 		}
@@ -1310,7 +1340,7 @@ public class WorldMap : GameSection
 		ShapeModule module = mapGlowEffectParticleB.get_shape();
 		MeshFilter meshFilter = targetArea.GetComponent<MeshFilter>();
 		module.set_mesh(meshFilter.get_sharedMesh());
-		glowRegionTop = ResourceUtility.Realizes(targetArea.get_gameObject(), base._transform, -1);
+		glowRegionTop = ResourceUtility.Realizes(targetArea.get_gameObject(), base._transform);
 		glowRegionTop.get_gameObject().SetActive(false);
 		glowRegionTop.set_localPosition(glowRegionTop.get_localPosition() + new Vector3(0f, 0f, 0.001f));
 		glowRegionTop.set_localScale(new Vector3(1.1f, 1.1f, 1.1f));
@@ -1335,36 +1365,35 @@ public class WorldMap : GameSection
 
 	private void Update()
 	{
-		if (!(worldMapCamera == null))
+		if (worldMapCamera == null)
 		{
-			if (chapterScrollView != null)
-			{
-				if (chapterScrollView.isPressing)
-				{
-					worldMapCamera.isInteractive = false;
-					beforePressed = chapterScrollView.isPressing;
-					return;
-				}
-				if (beforePressed != chapterScrollView.isPressing)
-				{
-					worldMapCamera.isInteractive = true;
-					beforePressed = chapterScrollView.isPressing;
-				}
-			}
-			if (playingReleaseRegion)
+			return;
+		}
+		if (chapterScrollView != null)
+		{
+			if (chapterScrollView.isPressing)
 			{
 				worldMapCamera.isInteractive = false;
+				beforePressed = chapterScrollView.isPressing;
+				return;
 			}
-			else
+			if (beforePressed != chapterScrollView.isPressing)
 			{
-				string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-				if (currentSectionName != beforeSectionName)
-				{
-					bool isInteractive = currentSectionName == "WorldMap" || currentSectionName == "RegionMap";
-					worldMapCamera.isInteractive = isInteractive;
-					beforeSectionName = currentSectionName;
-				}
+				worldMapCamera.isInteractive = true;
+				beforePressed = chapterScrollView.isPressing;
 			}
+		}
+		if (playingReleaseRegion)
+		{
+			worldMapCamera.isInteractive = false;
+			return;
+		}
+		string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
+		if (currentSectionName != beforeSectionName)
+		{
+			bool isInteractive = currentSectionName == "WorldMap" || currentSectionName == "RegionMap";
+			worldMapCamera.isInteractive = isInteractive;
+			beforeSectionName = currentSectionName;
 		}
 	}
 }

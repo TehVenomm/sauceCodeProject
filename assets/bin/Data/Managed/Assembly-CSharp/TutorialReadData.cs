@@ -10,9 +10,9 @@ public class TutorialReadData
 		public List<int> read_ids = new List<int>();
 	}
 
-	private const string SAVE_KEY = "TutorialProgress";
-
 	private SaveData m_SaveData;
+
+	private const string SAVE_KEY = "TutorialProgress";
 
 	public bool IsCompleteTutorial
 	{
@@ -24,21 +24,22 @@ public class TutorialReadData
 
 	public void SetReadId(int id, bool hasRead)
 	{
-		if (m_SaveData != null && m_SaveData.read_ids != null)
+		if (m_SaveData == null || m_SaveData.read_ids == null)
 		{
-			if (hasRead)
-			{
-				if (!m_SaveData.read_ids.Contains(id))
-				{
-					m_SaveData.read_ids.Add(id);
-				}
-			}
-			else if (m_SaveData.read_ids.Contains(id))
-			{
-				m_SaveData.read_ids.Remove(id);
-			}
-			UpdateReadAllFlag();
+			return;
 		}
+		if (hasRead)
+		{
+			if (!m_SaveData.read_ids.Contains(id))
+			{
+				m_SaveData.read_ids.Add(id);
+			}
+		}
+		else if (m_SaveData.read_ids.Contains(id))
+		{
+			m_SaveData.read_ids.Remove(id);
+		}
+		UpdateReadAllFlag();
 	}
 
 	public bool HasRead(int id)
@@ -74,28 +75,29 @@ public class TutorialReadData
 
 	public void UpdateReadAllFlag()
 	{
-		if (Singleton<TutorialMessageTable>.IsValid() && m_SaveData != null && m_SaveData.read_ids != null)
+		if (!Singleton<TutorialMessageTable>.IsValid() || m_SaveData == null || m_SaveData.read_ids == null)
 		{
-			bool flag = true;
-			int[] tutorialIds = Singleton<TutorialMessageTable>.I.GetTutorialIds();
-			int[] array = tutorialIds;
-			foreach (int item in array)
+			return;
+		}
+		bool flag = true;
+		int[] tutorialIds = Singleton<TutorialMessageTable>.I.GetTutorialIds();
+		int[] array = tutorialIds;
+		foreach (int item in array)
+		{
+			if (!m_SaveData.read_ids.Contains(item))
 			{
-				if (!m_SaveData.read_ids.Contains(item))
-				{
-					flag = false;
-					break;
-				}
+				flag = false;
+				break;
 			}
-			SaveData saveData = m_SaveData;
-			bool read_all = IsCompleteTutorial = flag;
-			saveData.read_all = read_all;
-			if (flag)
+		}
+		SaveData saveData = m_SaveData;
+		bool read_all = IsCompleteTutorial = flag;
+		saveData.read_all = read_all;
+		if (flag)
+		{
+			int j = 0;
+			for (int num = tutorialIds.Length; j < num; j++)
 			{
-				int j = 0;
-				for (int num = tutorialIds.Length; j < num; j++)
-				{
-				}
 			}
 		}
 	}

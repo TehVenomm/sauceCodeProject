@@ -1,4 +1,4 @@
-package io.fabric.sdk.android;
+package p017io.fabric.sdk.android;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -10,54 +10,35 @@ import android.os.Bundle;
 import java.util.HashSet;
 import java.util.Set;
 
+/* renamed from: io.fabric.sdk.android.ActivityLifecycleManager */
 public class ActivityLifecycleManager {
     private final Application application;
     private ActivityLifecycleCallbacksWrapper callbacksWrapper;
 
-    public static abstract class Callbacks {
-        public void onActivityCreated(Activity activity, Bundle bundle) {
-        }
-
-        public void onActivityDestroyed(Activity activity) {
-        }
-
-        public void onActivityPaused(Activity activity) {
-        }
-
-        public void onActivityResumed(Activity activity) {
-        }
-
-        public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-        }
-
-        public void onActivityStarted(Activity activity) {
-        }
-
-        public void onActivityStopped(Activity activity) {
-        }
-    }
-
+    /* renamed from: io.fabric.sdk.android.ActivityLifecycleManager$ActivityLifecycleCallbacksWrapper */
     private static class ActivityLifecycleCallbacksWrapper {
         private final Application application;
         private final Set<ActivityLifecycleCallbacks> registeredCallbacks = new HashSet();
 
-        ActivityLifecycleCallbacksWrapper(Application application) {
-            this.application = application;
+        ActivityLifecycleCallbacksWrapper(Application application2) {
+            this.application = application2;
         }
 
+        /* access modifiers changed from: private */
         @TargetApi(14)
-        private void clearCallbacks() {
+        public void clearCallbacks() {
             for (ActivityLifecycleCallbacks unregisterActivityLifecycleCallbacks : this.registeredCallbacks) {
                 this.application.unregisterActivityLifecycleCallbacks(unregisterActivityLifecycleCallbacks);
             }
         }
 
+        /* access modifiers changed from: private */
         @TargetApi(14)
-        private boolean registerLifecycleCallbacks(final Callbacks callbacks) {
+        public boolean registerLifecycleCallbacks(final Callbacks callbacks) {
             if (this.application == null) {
                 return false;
             }
-            ActivityLifecycleCallbacks c09121 = new ActivityLifecycleCallbacks() {
+            C12811 r0 = new ActivityLifecycleCallbacks() {
                 public void onActivityCreated(Activity activity, Bundle bundle) {
                     callbacks.onActivityCreated(activity, bundle);
                 }
@@ -86,9 +67,33 @@ public class ActivityLifecycleManager {
                     callbacks.onActivityStopped(activity);
                 }
             };
-            this.application.registerActivityLifecycleCallbacks(c09121);
-            this.registeredCallbacks.add(c09121);
+            this.application.registerActivityLifecycleCallbacks(r0);
+            this.registeredCallbacks.add(r0);
             return true;
+        }
+    }
+
+    /* renamed from: io.fabric.sdk.android.ActivityLifecycleManager$Callbacks */
+    public static abstract class Callbacks {
+        public void onActivityCreated(Activity activity, Bundle bundle) {
+        }
+
+        public void onActivityDestroyed(Activity activity) {
+        }
+
+        public void onActivityPaused(Activity activity) {
+        }
+
+        public void onActivityResumed(Activity activity) {
+        }
+
+        public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+        }
+
+        public void onActivityStarted(Activity activity) {
+        }
+
+        public void onActivityStopped(Activity activity) {
         }
     }
 

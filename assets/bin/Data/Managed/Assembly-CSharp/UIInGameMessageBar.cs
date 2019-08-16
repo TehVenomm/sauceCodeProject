@@ -65,11 +65,11 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 
 	private void _AnnounceStart()
 	{
-		UITweenCtrl.Reset(tweenCtrl, 0);
-		UITweenCtrl.Play(tweenCtrl, true, delegate
+		UITweenCtrl.Reset(tweenCtrl);
+		UITweenCtrl.Play(tweenCtrl, forward: true, delegate
 		{
 			isLock = true;
-		}, false, 0);
+		}, is_input_block: false);
 		lockTimer = dispTime;
 		isOpen = true;
 	}
@@ -109,8 +109,6 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 
 	private void _AnnounceMesseage(string name, string messeage)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		nameLabel.text = name;
 		messeageLabel.get_gameObject().SetActive(true);
 		messeageLabel.text = messeage;
@@ -120,7 +118,6 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 
 	private void _AnnounceStamp(string name, int stamp_id)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		coroutineLoadStamp = CoroutineLoadStamp(name, stamp_id);
 		this.StartCoroutine(coroutineLoadStamp);
 	}
@@ -128,8 +125,8 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 	private IEnumerator CoroutineLoadStamp(string name, int stampId)
 	{
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId, false);
-		yield return (object)load_queue.Wait();
+		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId);
+		yield return load_queue.Wait();
 		if (!(lo_stamp.loadedObject == null))
 		{
 			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
@@ -156,30 +153,32 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 
 	private void LateUpdate()
 	{
-		if (coroutineLoadStamp == null && isLock)
+		if (coroutineLoadStamp != null || !isLock)
 		{
-			lockTimer -= Time.get_deltaTime();
-			if (!(lockTimer > 0f))
+			return;
+		}
+		lockTimer -= Time.get_deltaTime();
+		if (lockTimer > 0f)
+		{
+			return;
+		}
+		if (isOpen)
+		{
+			if (!NextAnnounce())
 			{
-				if (isOpen)
+				isOpen = false;
+				UITweenCtrl.Play(tweenCtrl, forward: false, delegate
 				{
-					if (!NextAnnounce())
-					{
-						isOpen = false;
-						UITweenCtrl.Play(tweenCtrl, false, delegate
-						{
-							isLock = true;
-						}, false, 0);
-						lockTimer = 0.1f;
-					}
-				}
-				else if (!NextAnnounce())
-				{
-					panelChange.Lock();
-				}
-				isLock = false;
+					isLock = true;
+				}, is_input_block: false);
+				lockTimer = 0.1f;
 			}
 		}
+		else if (!NextAnnounce())
+		{
+			panelChange.Lock();
+		}
+		isLock = false;
 	}
 
 	private bool NextAnnounce()

@@ -1,10 +1,11 @@
-package net.gogame.gowrap.ui.dpro.model.leaderboard;
+package net.gogame.gowrap.p019ui.dpro.model.leaderboard;
 
 import android.util.JsonReader;
 import java.io.IOException;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.leaderboard.PowerRatingLeaderboardEntry */
 public class PowerRatingLeaderboardEntry extends LeaderboardEntry {
     private static final String KEY_POWER_RATING = "powerRating";
     private static final String KEY_WEAPON_NAME = "weaponName";
@@ -13,11 +14,15 @@ public class PowerRatingLeaderboardEntry extends LeaderboardEntry {
     private String weaponName;
     private Integer weaponType;
 
+    public PowerRatingLeaderboardEntry() {
+    }
+
     public PowerRatingLeaderboardEntry(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_WEAPON_TYPE)) {
             this.weaponType = JSONUtils.optInt(jsonReader);
             return true;

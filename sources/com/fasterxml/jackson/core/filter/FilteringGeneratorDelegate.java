@@ -140,9 +140,9 @@ public class FilteringGeneratorDelegate extends JsonGeneratorDelegate {
             this._itemFilter = fieldName;
             this.delegate.writeFieldName(str);
         } else {
-            fieldName = fieldName.includeProperty(str);
-            this._itemFilter = fieldName;
-            if (fieldName == TokenFilter.INCLUDE_ALL) {
+            TokenFilter includeProperty = fieldName.includeProperty(str);
+            this._itemFilter = includeProperty;
+            if (includeProperty == TokenFilter.INCLUDE_ALL) {
                 _checkPropertyParentPath();
             }
         }
@@ -156,9 +156,9 @@ public class FilteringGeneratorDelegate extends JsonGeneratorDelegate {
             this._itemFilter = fieldName;
             this.delegate.writeFieldName(serializableString);
         } else {
-            fieldName = fieldName.includeProperty(serializableString.getValue());
-            this._itemFilter = fieldName;
-            if (fieldName == TokenFilter.INCLUDE_ALL) {
+            TokenFilter includeProperty = fieldName.includeProperty(serializableString.getValue());
+            this._itemFilter = includeProperty;
+            if (includeProperty == TokenFilter.INCLUDE_ALL) {
                 _checkPropertyParentPath();
             }
         }
@@ -483,7 +483,8 @@ public class FilteringGeneratorDelegate extends JsonGeneratorDelegate {
         }
     }
 
-    protected void _checkParentPath() throws IOException {
+    /* access modifiers changed from: protected */
+    public void _checkParentPath() throws IOException {
         this._matchCount++;
         if (this._includePath) {
             this._filterContext.writePath(this.delegate);
@@ -493,7 +494,8 @@ public class FilteringGeneratorDelegate extends JsonGeneratorDelegate {
         }
     }
 
-    protected void _checkPropertyParentPath() throws IOException {
+    /* access modifiers changed from: protected */
+    public void _checkPropertyParentPath() throws IOException {
         this._matchCount++;
         if (this._includePath) {
             this._filterContext.writePath(this.delegate);
@@ -505,7 +507,8 @@ public class FilteringGeneratorDelegate extends JsonGeneratorDelegate {
         }
     }
 
-    protected boolean _checkBinaryWrite() throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean _checkBinaryWrite() throws IOException {
         if (this._itemFilter == null) {
             return false;
         }
@@ -519,7 +522,8 @@ public class FilteringGeneratorDelegate extends JsonGeneratorDelegate {
         return true;
     }
 
-    protected boolean _checkRawValueWrite() throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean _checkRawValueWrite() throws IOException {
         if (this._itemFilter == null) {
             return false;
         }

@@ -17,8 +17,8 @@ public class ExternalTypeHandler {
     private final String[] _typeIds;
 
     public static class Builder {
-        private final HashMap<String, Integer> _nameToPropertyIndex = new HashMap();
-        private final ArrayList<ExtTypedProperty> _properties = new ArrayList();
+        private final HashMap<String, Integer> _nameToPropertyIndex = new HashMap<>();
+        private final ArrayList<ExtTypedProperty> _properties = new ArrayList<>();
 
         public void addExternal(SettableBeanProperty settableBeanProperty, TypeDeserializer typeDeserializer) {
             Integer valueOf = Integer.valueOf(this._properties.size());
@@ -88,7 +88,7 @@ public class ExternalTypeHandler {
     }
 
     public boolean handleTypePropertyValue(JsonParser jsonParser, DeserializationContext deserializationContext, String str, Object obj) throws IOException {
-        Object obj2 = null;
+        boolean z = false;
         Integer num = (Integer) this._nameToPropertyIndex.get(str);
         if (num == null) {
             return false;
@@ -99,9 +99,9 @@ public class ExternalTypeHandler {
         }
         String text = jsonParser.getText();
         if (!(obj == null || this._tokens[intValue] == null)) {
-            obj2 = 1;
+            z = true;
         }
-        if (obj2 != null) {
+        if (z) {
             _deserializeAndSet(jsonParser, deserializationContext, obj, intValue, text);
             this._tokens[intValue] = null;
         } else {
@@ -111,31 +111,31 @@ public class ExternalTypeHandler {
     }
 
     public boolean handlePropertyValue(JsonParser jsonParser, DeserializationContext deserializationContext, String str, Object obj) throws IOException {
-        boolean z = false;
+        boolean z;
+        boolean z2 = false;
         Integer num = (Integer) this._nameToPropertyIndex.get(str);
         if (num == null) {
             return false;
         }
-        boolean z2;
         int intValue = num.intValue();
         if (this._properties[intValue].hasTypePropertyName(str)) {
             this._typeIds[intValue] = jsonParser.getText();
             jsonParser.skipChildren();
             if (obj == null || this._tokens[intValue] == null) {
-                z2 = false;
+                z = false;
             } else {
-                z2 = true;
+                z = true;
             }
         } else {
             TokenBuffer tokenBuffer = new TokenBuffer(jsonParser, deserializationContext);
             tokenBuffer.copyCurrentStructure(jsonParser);
             this._tokens[intValue] = tokenBuffer;
             if (!(obj == null || this._typeIds[intValue] == null)) {
-                z = true;
+                z2 = true;
             }
-            z2 = z;
+            z = z2;
         }
-        if (z2) {
+        if (z) {
             String str2 = this._typeIds[intValue];
             this._typeIds[intValue] = null;
             _deserializeAndSet(jsonParser, deserializationContext, obj, intValue, str2);
@@ -145,11 +145,11 @@ public class ExternalTypeHandler {
     }
 
     public Object complete(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
+        String str;
         int length = this._properties.length;
         for (int i = 0; i < length; i++) {
-            String str = this._typeIds[i];
-            String str2;
-            if (str == null) {
+            String str2 = this._typeIds[i];
+            if (str2 == null) {
                 TokenBuffer tokenBuffer = this._tokens[i];
                 if (tokenBuffer == null) {
                     continue;
@@ -162,62 +162,62 @@ public class ExternalTypeHandler {
                         Object deserializeIfNatural = TypeDeserializer.deserializeIfNatural(asParser, deserializationContext, property.getType());
                         if (deserializeIfNatural != null) {
                             property.set(obj, deserializeIfNatural);
-                        } else if (this._properties[i].hasDefaultType()) {
-                            str = this._properties[i].getDefaultTypeId();
-                        } else {
+                        } else if (!this._properties[i].hasDefaultType()) {
                             throw deserializationContext.mappingException("Missing external type id property '%s'", this._properties[i].getTypePropertyName());
+                        } else {
+                            str2 = this._properties[i].getDefaultTypeId();
                         }
                     }
-                    str2 = str;
-                    _deserializeAndSet(jsonParser, deserializationContext, obj, i, str2);
+                    str = str2;
+                    _deserializeAndSet(jsonParser, deserializationContext, obj, i, str);
                 }
             } else if (this._tokens[i] == null) {
                 throw deserializationContext.mappingException("Missing property '%s' for external type id '%s'", this._properties[i].getProperty().getName(), this._properties[i].getTypePropertyName());
             } else {
-                str2 = str;
-                _deserializeAndSet(jsonParser, deserializationContext, obj, i, str2);
+                str = str2;
+                _deserializeAndSet(jsonParser, deserializationContext, obj, i, str);
             }
         }
         return obj;
     }
 
     public Object complete(JsonParser jsonParser, DeserializationContext deserializationContext, PropertyValueBuffer propertyValueBuffer, PropertyBasedCreator propertyBasedCreator) throws IOException {
-        int i;
         int length = this._properties.length;
         Object[] objArr = new Object[length];
-        for (int i2 = 0; i2 < length; i2++) {
-            String str = this._typeIds[i2];
+        for (int i = 0; i < length; i++) {
+            String str = this._typeIds[i];
             if (str != null) {
-                if (this._tokens[i2] == null) {
-                    throw deserializationContext.mappingException("Missing property '%s' for external type id '%s'", this._properties[i2].getProperty().getName(), this._properties[i2].getTypePropertyName());
+                if (this._tokens[i] == null) {
+                    throw deserializationContext.mappingException("Missing property '%s' for external type id '%s'", this._properties[i].getProperty().getName(), this._properties[i].getTypePropertyName());
                 }
-                objArr[i2] = _deserialize(jsonParser, deserializationContext, i2, str);
-            } else if (this._tokens[i2] == null) {
+                objArr[i] = _deserialize(jsonParser, deserializationContext, i, str);
+            } else if (this._tokens[i] == null) {
                 continue;
-            } else if (this._properties[i2].hasDefaultType()) {
-                str = this._properties[i2].getDefaultTypeId();
-                objArr[i2] = _deserialize(jsonParser, deserializationContext, i2, str);
+            } else if (!this._properties[i].hasDefaultType()) {
+                throw deserializationContext.mappingException("Missing external type id property '%s'", this._properties[i].getTypePropertyName());
             } else {
-                throw deserializationContext.mappingException("Missing external type id property '%s'", this._properties[i2].getTypePropertyName());
+                str = this._properties[i].getDefaultTypeId();
+                objArr[i] = _deserialize(jsonParser, deserializationContext, i, str);
             }
         }
-        for (i = 0; i < length; i++) {
-            SettableBeanProperty property = this._properties[i].getProperty();
+        for (int i2 = 0; i2 < length; i2++) {
+            SettableBeanProperty property = this._properties[i2].getProperty();
             if (propertyBasedCreator.findCreatorProperty(property.getName()) != null) {
-                propertyValueBuffer.assignParameter(property, objArr[i]);
+                propertyValueBuffer.assignParameter(property, objArr[i2]);
             }
         }
         Object build = propertyBasedCreator.build(deserializationContext, propertyValueBuffer);
-        for (i = 0; i < length; i++) {
-            SettableBeanProperty property2 = this._properties[i].getProperty();
+        for (int i3 = 0; i3 < length; i3++) {
+            SettableBeanProperty property2 = this._properties[i3].getProperty();
             if (propertyBasedCreator.findCreatorProperty(property2.getName()) == null) {
-                property2.set(build, objArr[i]);
+                property2.set(build, objArr[i3]);
             }
         }
         return build;
     }
 
-    protected final Object _deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, int i, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final Object _deserialize(JsonParser jsonParser, DeserializationContext deserializationContext, int i, String str) throws IOException {
         JsonParser asParser = this._tokens[i].asParser(jsonParser);
         if (asParser.nextToken() == JsonToken.VALUE_NULL) {
             return null;
@@ -227,12 +227,13 @@ public class ExternalTypeHandler {
         tokenBuffer.writeString(str);
         tokenBuffer.copyCurrentStructure(asParser);
         tokenBuffer.writeEndArray();
-        asParser = tokenBuffer.asParser(jsonParser);
-        asParser.nextToken();
-        return this._properties[i].getProperty().deserialize(asParser, deserializationContext);
+        JsonParser asParser2 = tokenBuffer.asParser(jsonParser);
+        asParser2.nextToken();
+        return this._properties[i].getProperty().deserialize(asParser2, deserializationContext);
     }
 
-    protected final void _deserializeAndSet(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, int i, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final void _deserializeAndSet(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj, int i, String str) throws IOException {
         JsonParser asParser = this._tokens[i].asParser(jsonParser);
         if (asParser.nextToken() == JsonToken.VALUE_NULL) {
             this._properties[i].getProperty().set(obj, null);
@@ -243,8 +244,8 @@ public class ExternalTypeHandler {
         tokenBuffer.writeString(str);
         tokenBuffer.copyCurrentStructure(asParser);
         tokenBuffer.writeEndArray();
-        asParser = tokenBuffer.asParser(jsonParser);
-        asParser.nextToken();
-        this._properties[i].getProperty().deserializeAndSet(asParser, deserializationContext, obj);
+        JsonParser asParser2 = tokenBuffer.asParser(jsonParser);
+        asParser2.nextToken();
+        this._properties[i].getProperty().deserializeAndSet(asParser2, deserializationContext, obj);
     }
 }

@@ -12,53 +12,61 @@ public enum FileTransfers {
     INSTANCE;
     
     private static final String LOG_TAG = null;
-    Map<String, C0793a> mTransfers;
+    Map<String, C1134a> mTransfers;
 
     /* renamed from: com.zopim.android.sdk.api.FileTransfers$a */
-    static class C0793a {
-        /* renamed from: a */
-        public File f614a;
-        /* renamed from: b */
-        public C0794b f615b;
+    static class C1134a {
 
-        C0793a() {
-            this.f615b = C0794b.f616a;
+        /* renamed from: a */
+        public File f658a;
+
+        /* renamed from: b */
+        public C1135b f659b;
+
+        C1134a() {
+            this.f659b = C1135b.f660a;
         }
     }
 
     /* renamed from: com.zopim.android.sdk.api.FileTransfers$b */
-    enum C0794b {
+    enum C1135b {
+
         /* renamed from: a */
-        public static final C0794b f616a = null;
+        public static final C1135b f660a = null;
+
         /* renamed from: b */
-        public static final C0794b f617b = null;
+        public static final C1135b f661b = null;
+
         /* renamed from: c */
-        public static final C0794b f618c = null;
+        public static final C1135b f662c = null;
+
         /* renamed from: d */
-        public static final C0794b f619d = null;
+        public static final C1135b f663d = null;
+
         /* renamed from: e */
-        public static final C0794b f620e = null;
+        public static final C1135b f664e = null;
+
         /* renamed from: f */
-        private static final /* synthetic */ C0794b[] f621f = null;
+        private static final /* synthetic */ C1135b[] f665f = null;
 
         static {
-            f616a = new C0794b("UNKNOWN", 0);
-            f617b = new C0794b("SCHEDULED", 1);
-            f618c = new C0794b("STARTED", 2);
-            f619d = new C0794b("COMPLETED", 3);
-            f620e = new C0794b("FAILED", 4);
-            f621f = new C0794b[]{f616a, f617b, f618c, f619d, f620e};
+            f660a = new C1135b("UNKNOWN", 0);
+            f661b = new C1135b("SCHEDULED", 1);
+            f662c = new C1135b("STARTED", 2);
+            f663d = new C1135b("COMPLETED", 3);
+            f664e = new C1135b("FAILED", 4);
+            f665f = new C1135b[]{f660a, f661b, f662c, f663d, f664e};
         }
 
-        private C0794b(String str, int i) {
+        private C1135b(String str, int i) {
         }
 
-        public static C0794b valueOf(String str) {
-            return (C0794b) Enum.valueOf(C0794b.class, str);
+        public static C1135b valueOf(String str) {
+            return (C1135b) Enum.valueOf(C1135b.class, str);
         }
 
-        public static C0794b[] values() {
-            return (C0794b[]) f621f.clone();
+        public static C1135b[] values() {
+            return (C1135b[]) f665f.clone();
         }
     }
 
@@ -67,64 +75,66 @@ public enum FileTransfers {
     }
 
     private String createUniqueName(File file) {
-        int i = 0;
+        short s = 0;
         String replace = (file.getName() != null ? file.getName() : "").replace(" ", "-");
         do {
             try {
                 if (!this.mTransfers.containsKey(replace)) {
                     return replace;
                 }
-                replace = UriToFileUtil.getExtension(file.getName());
-                i = (short) (i + 1);
-                replace = file.getName().split(replace)[0] + "-" + i + replace;
+                String extension = UriToFileUtil.getExtension(file.getName());
+                s = (short) (s + 1);
+                replace = file.getName().split(extension)[0] + "-" + s + extension;
             } catch (IndexOutOfBoundsException e) {
                 Log.w(LOG_TAG, "Error generating unique file name. Will use the actual file name.");
                 return null;
             }
-        } while (i < 32767);
+        } while (s < Short.MAX_VALUE);
         return replace;
     }
 
     @Nullable
-    private Entry<String, C0793a> findTransfer(File file) {
+    private Entry<String, C1134a> findTransfer(File file) {
         if (file == null) {
             return null;
         }
-        for (Entry<String, C0793a> entry : this.mTransfers.entrySet()) {
-            C0793a c0793a = (C0793a) entry.getValue();
-            if (c0793a != null && file.equals(c0793a.f614a)) {
+        for (Entry<String, C1134a> entry : this.mTransfers.entrySet()) {
+            C1134a aVar = (C1134a) entry.getValue();
+            if (aVar != null && file.equals(aVar.f658a)) {
                 return entry;
             }
         }
         return null;
     }
 
+    /* access modifiers changed from: 0000 */
     @NonNull
-    String add(File file) {
+    public String add(File file) {
         if (file == null || file.getName() == null) {
             Log.w(LOG_TAG, "File validation failed. Can not add file to scheduled set.");
             return "";
         }
         Entry findTransfer = findTransfer(file);
         if (findTransfer != null) {
-            ((C0793a) findTransfer.getValue()).f615b = C0794b.f617b;
+            ((C1134a) findTransfer.getValue()).f659b = C1135b.f661b;
             return (String) findTransfer.getKey();
         }
         String createUniqueName = createUniqueName(file);
-        C0793a c0793a = new C0793a();
-        c0793a.f614a = file;
-        c0793a.f615b = C0794b.f617b;
-        INSTANCE.mTransfers.put(createUniqueName, c0793a);
+        C1134a aVar = new C1134a();
+        aVar.f658a = file;
+        aVar.f659b = C1135b.f661b;
+        INSTANCE.mTransfers.put(createUniqueName, aVar);
         return createUniqueName;
     }
 
-    C0793a find(File file) {
+    /* access modifiers changed from: 0000 */
+    public C1134a find(File file) {
         if (file == null) {
             return null;
         }
-        for (C0793a c0793a : this.mTransfers.values()) {
-            if (file.equals(c0793a.f614a)) {
-                return c0793a;
+        for (C1134a aVar : this.mTransfers.values()) {
+            if (file.equals(aVar.f658a)) {
+                return aVar;
             }
         }
         return null;
@@ -135,7 +145,7 @@ public enum FileTransfers {
             Log.w(LOG_TAG, "File name must not be null. Can not find file.");
             return null;
         }
-        C0793a c0793a = (C0793a) this.mTransfers.get(str);
-        return c0793a != null ? c0793a.f614a : null;
+        C1134a aVar = (C1134a) this.mTransfers.get(str);
+        return aVar != null ? aVar.f658a : null;
     }
 }

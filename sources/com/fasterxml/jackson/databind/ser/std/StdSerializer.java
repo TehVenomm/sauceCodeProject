@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.databind.ser.std;
 
-import com.facebook.share.internal.ShareConstants;
 import com.fasterxml.jackson.annotation.JsonFormat.Feature;
 import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,7 +12,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
@@ -78,17 +76,20 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         return objectNode;
     }
 
-    protected ObjectNode createObjectNode() {
+    /* access modifiers changed from: protected */
+    public ObjectNode createObjectNode() {
         return JsonNodeFactory.instance.objectNode();
     }
 
-    protected ObjectNode createSchemaNode(String str) {
+    /* access modifiers changed from: protected */
+    public ObjectNode createSchemaNode(String str) {
         ObjectNode createObjectNode = createObjectNode();
-        createObjectNode.put(ShareConstants.MEDIA_TYPE, str);
+        createObjectNode.put("type", str);
         return createObjectNode;
     }
 
-    protected ObjectNode createSchemaNode(String str, boolean z) {
+    /* access modifiers changed from: protected */
+    public ObjectNode createSchemaNode(String str, boolean z) {
         ObjectNode createSchemaNode = createSchemaNode(str);
         if (!z) {
             createSchemaNode.put("required", !z);
@@ -96,13 +97,15 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         return createSchemaNode;
     }
 
-    protected void visitStringFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void visitStringFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType) throws JsonMappingException {
         if (jsonFormatVisitorWrapper != null) {
             jsonFormatVisitorWrapper.expectStringFormat(javaType);
         }
     }
 
-    protected void visitStringFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, JsonValueFormat jsonValueFormat) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void visitStringFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, JsonValueFormat jsonValueFormat) throws JsonMappingException {
         if (jsonFormatVisitorWrapper != null) {
             JsonStringFormatVisitor expectStringFormat = jsonFormatVisitorWrapper.expectStringFormat(javaType);
             if (expectStringFormat != null) {
@@ -111,7 +114,8 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         }
     }
 
-    protected void visitIntFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, NumberType numberType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void visitIntFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, NumberType numberType) throws JsonMappingException {
         if (jsonFormatVisitorWrapper != null) {
             JsonIntegerFormatVisitor expectIntegerFormat = jsonFormatVisitorWrapper.expectIntegerFormat(javaType);
             if (expectIntegerFormat != null && numberType != null) {
@@ -120,7 +124,8 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         }
     }
 
-    protected void visitIntFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, NumberType numberType, JsonValueFormat jsonValueFormat) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void visitIntFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, NumberType numberType, JsonValueFormat jsonValueFormat) throws JsonMappingException {
         if (jsonFormatVisitorWrapper != null) {
             JsonIntegerFormatVisitor expectIntegerFormat = jsonFormatVisitorWrapper.expectIntegerFormat(javaType);
             if (expectIntegerFormat != null) {
@@ -134,7 +139,8 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         }
     }
 
-    protected void visitFloatFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, NumberType numberType) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void visitFloatFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, NumberType numberType) throws JsonMappingException {
         if (jsonFormatVisitorWrapper != null) {
             JsonNumberFormatVisitor expectNumberFormat = jsonFormatVisitorWrapper.expectNumberFormat(javaType);
             if (expectNumberFormat != null) {
@@ -143,7 +149,8 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         }
     }
 
-    protected void visitArrayFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, JsonSerializer<?> jsonSerializer, JavaType javaType2) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void visitArrayFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, JsonSerializer<?> jsonSerializer, JavaType javaType2) throws JsonMappingException {
         if (jsonFormatVisitorWrapper != null) {
             JsonArrayFormatVisitor expectArrayFormat = jsonFormatVisitorWrapper.expectArrayFormat(javaType);
             if (expectArrayFormat != null && jsonSerializer != null) {
@@ -152,7 +159,8 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         }
     }
 
-    protected void visitArrayFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, JsonFormatTypes jsonFormatTypes) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public void visitArrayFormat(JsonFormatVisitorWrapper jsonFormatVisitorWrapper, JavaType javaType, JsonFormatTypes jsonFormatTypes) throws JsonMappingException {
         if (jsonFormatVisitorWrapper != null) {
             JsonArrayFormatVisitor expectArrayFormat = jsonFormatVisitorWrapper.expectArrayFormat(javaType);
             if (expectArrayFormat != null) {
@@ -169,12 +177,12 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         if (th2 instanceof Error) {
             throw ((Error) th2);
         }
-        Object obj2 = (serializerProvider == null || serializerProvider.isEnabled(SerializationFeature.WRAP_EXCEPTIONS)) ? 1 : null;
+        boolean z = serializerProvider == null || serializerProvider.isEnabled(SerializationFeature.WRAP_EXCEPTIONS);
         if (th2 instanceof IOException) {
-            if (obj2 == null || !(th2 instanceof JsonMappingException)) {
+            if (!z || !(th2 instanceof JsonMappingException)) {
                 throw ((IOException) th2);
             }
-        } else if (obj2 == null && (th2 instanceof RuntimeException)) {
+        } else if (!z && (th2 instanceof RuntimeException)) {
             throw ((RuntimeException) th2);
         }
         throw JsonMappingException.wrapWithPath(th2, obj, str);
@@ -188,19 +196,20 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         if (th2 instanceof Error) {
             throw ((Error) th2);
         }
-        Object obj2 = (serializerProvider == null || serializerProvider.isEnabled(SerializationFeature.WRAP_EXCEPTIONS)) ? 1 : null;
+        boolean z = serializerProvider == null || serializerProvider.isEnabled(SerializationFeature.WRAP_EXCEPTIONS);
         if (th2 instanceof IOException) {
-            if (obj2 == null || !(th2 instanceof JsonMappingException)) {
+            if (!z || !(th2 instanceof JsonMappingException)) {
                 throw ((IOException) th2);
             }
-        } else if (obj2 == null && (th2 instanceof RuntimeException)) {
+        } else if (!z && (th2 instanceof RuntimeException)) {
             throw ((RuntimeException) th2);
         }
         throw JsonMappingException.wrapWithPath(th2, obj, i);
     }
 
-    protected JsonSerializer<?> findConvertingContentSerializer(SerializerProvider serializerProvider, BeanProperty beanProperty, JsonSerializer<?> jsonSerializer) throws JsonMappingException {
-        Boolean attribute = serializerProvider.getAttribute(CONVERTING_CONTENT_CONVERTER_LOCK);
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> findConvertingContentSerializer(SerializerProvider serializerProvider, BeanProperty beanProperty, JsonSerializer<?> jsonSerializer) throws JsonMappingException {
+        Object attribute = serializerProvider.getAttribute(CONVERTING_CONTENT_CONVERTER_LOCK);
         if (attribute != null && attribute == Boolean.TRUE) {
             return jsonSerializer;
         }
@@ -212,7 +221,7 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         if (member == null) {
             return jsonSerializer;
         }
-        serializerProvider.setAttribute(CONVERTING_CONTENT_CONVERTER_LOCK, Boolean.TRUE);
+        serializerProvider.setAttribute(CONVERTING_CONTENT_CONVERTER_LOCK, (Object) Boolean.TRUE);
         try {
             Object findSerializationContentConverter = annotationIntrospector.findSerializationContentConverter(member);
             if (findSerializationContentConverter == null) {
@@ -225,11 +234,12 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
             }
             return new StdDelegatingSerializer(converterInstance, outputType, jsonSerializer);
         } finally {
-            serializerProvider.setAttribute(CONVERTING_CONTENT_CONVERTER_LOCK, null);
+            serializerProvider.setAttribute(CONVERTING_CONTENT_CONVERTER_LOCK, (Object) null);
         }
     }
 
-    protected PropertyFilter findPropertyFilter(SerializerProvider serializerProvider, Object obj, Object obj2) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public PropertyFilter findPropertyFilter(SerializerProvider serializerProvider, Object obj, Object obj2) throws JsonMappingException {
         FilterProvider filterProvider = serializerProvider.getFilterProvider();
         if (filterProvider != null) {
             return filterProvider.findPropertyFilter(obj, obj2);
@@ -237,14 +247,16 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         throw JsonMappingException.from(serializerProvider, "Can not resolve PropertyFilter with id '" + obj + "'; no FilterProvider configured");
     }
 
-    protected Value findFormatOverrides(SerializerProvider serializerProvider, BeanProperty beanProperty, Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public Value findFormatOverrides(SerializerProvider serializerProvider, BeanProperty beanProperty, Class<?> cls) {
         if (beanProperty != null) {
             return beanProperty.findPropertyFormat(serializerProvider.getConfig(), cls);
         }
         return serializerProvider.getDefaultPropertyFormat(cls);
     }
 
-    protected Boolean findFormatFeature(SerializerProvider serializerProvider, BeanProperty beanProperty, Class<?> cls, Feature feature) {
+    /* access modifiers changed from: protected */
+    public Boolean findFormatFeature(SerializerProvider serializerProvider, BeanProperty beanProperty, Class<?> cls, Feature feature) {
         Value findFormatOverrides = findFormatOverrides(serializerProvider, beanProperty, cls);
         if (findFormatOverrides != null) {
             return findFormatOverrides.getFeature(feature);
@@ -252,9 +264,10 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         return null;
     }
 
-    protected JsonSerializer<?> findAnnotatedContentSerializer(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
+    /* access modifiers changed from: protected */
+    public JsonSerializer<?> findAnnotatedContentSerializer(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
         if (beanProperty != null) {
-            Annotated member = beanProperty.getMember();
+            AnnotatedMember member = beanProperty.getMember();
             AnnotationIntrospector annotationIntrospector = serializerProvider.getAnnotationIntrospector();
             if (member != null) {
                 Object findContentSerializer = annotationIntrospector.findContentSerializer(member);
@@ -266,7 +279,8 @@ public abstract class StdSerializer<T> extends JsonSerializer<T> implements Json
         return null;
     }
 
-    protected boolean isDefaultSerializer(JsonSerializer<?> jsonSerializer) {
+    /* access modifiers changed from: protected */
+    public boolean isDefaultSerializer(JsonSerializer<?> jsonSerializer) {
         return ClassUtil.isJacksonStdImpl((Object) jsonSerializer);
     }
 }

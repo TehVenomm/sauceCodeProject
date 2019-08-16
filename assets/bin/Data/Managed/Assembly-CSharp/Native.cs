@@ -18,7 +18,7 @@ public static class Native
 	public static int GetPurchaseType()
 	{
 		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
+		//IL_0026: Expected O, but got Unknown
 		if (m_purchaseType != -1)
 		{
 			return m_purchaseType;
@@ -46,7 +46,7 @@ public static class Native
 	public static bool getScreenLockMode()
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		bool result = true;
 		try
 		{
@@ -65,7 +65,7 @@ public static class Native
 	public static void setScreenLockMode(bool flag)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -83,13 +83,12 @@ public static class Native
 	public static bool IsAdsRemoved()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
 			int num = val.CallStatic<int>("isAdsRemoved", new object[0]);
 			return num == 1;
-			IL_0031:;
 		}
 		catch (Exception ex)
 		{
@@ -101,7 +100,7 @@ public static class Native
 	public static void SetShopMenuButton(bool flag)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -119,7 +118,7 @@ public static class Native
 	public static void applicationQuit()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -134,7 +133,7 @@ public static class Native
 	public static void ProcessKillCommit()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -149,7 +148,7 @@ public static class Native
 	public static void launchMyselfMarket()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -167,7 +166,7 @@ public static class Native
 	public static void LaunchMailerInvitation(string titleText, string descriptionText, string message)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -187,7 +186,7 @@ public static class Native
 	public static void OpenURL(string url)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -205,7 +204,7 @@ public static class Native
 	public static bool CheckInstallPackage(string pacakg_name)
 	{
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
+		//IL_0017: Expected O, but got Unknown
 		int num = 0;
 		try
 		{
@@ -225,7 +224,7 @@ public static class Native
 	public static void ResetPackagePreferences()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -240,7 +239,7 @@ public static class Native
 	public static void SendIdfaOrAdidWithUid(string userId, bool debugFlg)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -259,7 +258,7 @@ public static class Native
 	public static void TrackPageView(string page)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AnalyticsHelper");
@@ -277,7 +276,7 @@ public static class Native
 	public static void RequestPurchase(string productId, string userId, string userIdHash)
 	{
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Expected O, but got Unknown
+		//IL_0071: Expected O, but got Unknown
 		string text = MonoBehaviourSingleton<AccountManager>.I.account.token;
 		int num = text.IndexOf('=');
 		if (num >= 0)
@@ -310,7 +309,7 @@ public static class Native
 	public static void GetProductDatas(string productIds)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
@@ -328,7 +327,7 @@ public static class Native
 	public static void SetProductNameData(string datas)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
@@ -346,7 +345,7 @@ public static class Native
 	public static void SetProductIdData(string datas)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
@@ -364,7 +363,7 @@ public static class Native
 	public static void checkAndGivePromotionItems(string productIds)
 	{
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Expected O, but got Unknown
+		//IL_0071: Expected O, but got Unknown
 		string text = MonoBehaviourSingleton<AccountManager>.I.account.token;
 		int num = text.IndexOf('=');
 		if (num >= 0)
@@ -395,7 +394,7 @@ public static class Native
 	public static void RestorePurchasedItem(bool showErrorDialog)
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".InAppBillingHelper");
@@ -413,7 +412,7 @@ public static class Native
 	public static void TrackUserRegEventAppsFlyer(string userId)
 	{
 		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
+		//IL_0025: Expected O, but got Unknown
 		Debug.Log((object)("TrackUserRegEventAppsFlyer: userId=" + userId));
 		try
 		{
@@ -431,9 +430,10 @@ public static class Native
 
 	public static void RegisterLocalNotification(int id, string title, string body, int afterSeconds)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
-		if (0 < afterSeconds)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Expected O, but got Unknown
+		int pushEnable = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.pushEnable;
+		if ((pushEnable & 1) != 0 && 0 < afterSeconds)
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".LocalNotificationHelper");
 			if (val != null)
@@ -456,7 +456,7 @@ public static class Native
 	public static void CancelAllLocalNotification()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".LocalNotificationHelper");
 		if (val != null)
 		{
@@ -471,7 +471,7 @@ public static class Native
 	public static UserFromAttributeData GetInstallReferrer()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
@@ -507,7 +507,6 @@ public static class Native
 				}
 			}
 			return userFromAttributeData;
-			IL_0117:;
 		}
 		catch (Exception ex)
 		{
@@ -519,12 +518,11 @@ public static class Native
 	public static bool CheckReferrerSendToAppBrowser()
 	{
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
+		//IL_0015: Expected O, but got Unknown
 		try
 		{
 			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
 			return val.CallStatic<bool>("CheckReferrerSendToAppBrowser", new object[0]);
-			IL_002c:;
 		}
 		catch (Exception ex)
 		{
@@ -536,7 +534,7 @@ public static class Native
 	public static bool GetDeviceAutoRotateSetting()
 	{
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
+		//IL_0023: Expected O, but got Unknown
 		try
 		{
 			if (apphelper == null)
@@ -544,7 +542,6 @@ public static class Native
 				apphelper = new AndroidJavaClass(Property.BundleIdentifier + ".AppHelper");
 			}
 			return apphelper.CallStatic<int>("GetDeviceAutoRotateSetting", new object[0]) == 1;
-			IL_0041:;
 		}
 		catch (Exception ex)
 		{
@@ -556,7 +553,7 @@ public static class Native
 	public static void getList()
 	{
 		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
+		//IL_0023: Expected O, but got Unknown
 		try
 		{
 			if (apphelper == null)

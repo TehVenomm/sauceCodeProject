@@ -25,7 +25,7 @@ public final class ClassStack {
 
     public void addSelfReference(ResolvedRecursiveType resolvedRecursiveType) {
         if (this._selfRefs == null) {
-            this._selfRefs = new ArrayList();
+            this._selfRefs = new ArrayList<>();
         }
         this._selfRefs.add(resolvedRecursiveType);
     }
@@ -43,22 +43,22 @@ public final class ClassStack {
         if (this._current == cls) {
             return this;
         }
-        for (this = this._parent; this != null; this = this._parent) {
-            if (this._current == cls) {
-                return this;
+        for (ClassStack classStack = this._parent; classStack != null; classStack = classStack._parent) {
+            if (classStack._current == cls) {
+                return classStack;
             }
         }
         return null;
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[ClassStack (self-refs: ").append(this._selfRefs == null ? AppEventsConstants.EVENT_PARAM_VALUE_NO : String.valueOf(this._selfRefs.size())).append(')');
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ClassStack (self-refs: ").append(this._selfRefs == null ? AppEventsConstants.EVENT_PARAM_VALUE_NO : String.valueOf(this._selfRefs.size())).append(')');
         while (this != null) {
-            stringBuilder.append(' ').append(this._current.getName());
+            sb.append(' ').append(this._current.getName());
             this = this._parent;
         }
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        sb.append(']');
+        return sb.toString();
     }
 }

@@ -4,9 +4,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Releasable;
 import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.util.VisibleForTesting;
 
+@Deprecated
+@VisibleForTesting
 public interface Events {
 
+    @Deprecated
     public interface LoadEventsResult extends Releasable, Result {
         EventBuffer getEvents();
     }

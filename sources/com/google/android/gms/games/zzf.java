@@ -1,20 +1,21 @@
 package com.google.android.gms.games;
 
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.games.Games.GetServerAuthCodeResult;
+import android.os.RemoteException;
+import com.google.android.gms.games.internal.zze;
+import com.google.android.gms.internal.games.zzag;
+import com.google.android.gms.tasks.TaskCompletionSource;
 
-final class zzf implements GetServerAuthCodeResult {
-    private /* synthetic */ Status zzeik;
+final class zzf extends zzag<Void> {
+    private final /* synthetic */ String zzk;
+    private final /* synthetic */ int zzl;
 
-    zzf(zzc zzc, Status status) {
-        this.zzeik = status;
+    zzf(EventsClient eventsClient, String str, int i) {
+        this.zzk = str;
+        this.zzl = i;
     }
 
-    public final String getCode() {
-        return null;
-    }
-
-    public final Status getStatus() {
-        return this.zzeik;
+    /* access modifiers changed from: protected */
+    public final void zza(zze zze, TaskCompletionSource<Void> taskCompletionSource) throws RemoteException {
+        zze.zza(this.zzk, this.zzl);
     }
 }

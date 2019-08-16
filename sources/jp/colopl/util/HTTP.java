@@ -1,26 +1,19 @@
-package jp.colopl.util;
+package p018jp.colopl.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import io.fabric.sdk.android.services.network.HttpRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import jp.colopl.config.Config;
-import jp.colopl.drapro.AppConsts;
-import jp.colopl.util.HttpMultipartRequest.ProgressCallback;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -28,7 +21,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import p017io.fabric.sdk.android.services.network.HttpRequest;
+import p018jp.colopl.config.Config;
+import p018jp.colopl.drapro.AppConsts;
+import p018jp.colopl.util.HttpMultipartRequest.ProgressCallback;
 
+/* renamed from: jp.colopl.util.HTTP */
 public class HTTP {
     private static int CONNECT_TIMEOUT = 10000;
     private static int CONNECT_TIMEOUT_FOR_UPLOAD = 300000;
@@ -37,7 +35,7 @@ public class HTTP {
     private static String userAgent;
 
     public static List<String> createCookies(Config config) {
-        List<String> arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         arrayList.add(config.getAndroidTokenCookieName() + "=" + config.generateToken());
         arrayList.add(config.getSession().getName() + "=" + config.getSession().getSid());
         arrayList.add(config.getAppVersionCookieName() + "=" + config.getVersionCode());
@@ -55,56 +53,86 @@ public class HTTP {
         return arrayList;
     }
 
-    public static String get(String str, List<String> list) {
-        URLConnection uRLConnection;
-        String str2;
-        try {
-            String convertToString;
-            URLConnection openConnection = new URL(str).openConnection();
-            try {
-                openConnection.setRequestProperty("User-Agent", getUserAgent());
-                openConnection.setRequestProperty("apv", AppConsts.versionName);
-                ((HttpURLConnection) openConnection).setRequestMethod(HttpRequest.METHOD_GET);
-                openConnection.setUseCaches(false);
-                openConnection.setConnectTimeout(CONNECT_TIMEOUT);
-                openConnection.setReadTimeout(READ_TIMEOUT);
-                if (list != null) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for (String append : list) {
-                        stringBuilder.append(append);
-                        stringBuilder.append(";");
-                    }
-                    openConnection.setRequestProperty("Cookie", stringBuilder.toString());
-                }
-                openConnection.connect();
-                convertToString = StringUtil.convertToString(new DoneHandlerInputStream(openConnection.getInputStream()));
-            } catch (Exception e) {
-                uRLConnection = openConnection;
-                str2 = null;
-                if (uRLConnection != null) {
-                    ((HttpURLConnection) uRLConnection).disconnect();
-                }
-                return str2;
-            }
-            try {
-                ((HttpURLConnection) openConnection).disconnect();
-                return convertToString;
-            } catch (Exception e2) {
-                uRLConnection = openConnection;
-                str2 = convertToString;
-                if (uRLConnection != null) {
-                    ((HttpURLConnection) uRLConnection).disconnect();
-                }
-                return str2;
-            }
-        } catch (Exception e3) {
-            uRLConnection = null;
-            str2 = null;
-            if (uRLConnection != null) {
-                ((HttpURLConnection) uRLConnection).disconnect();
-            }
-            return str2;
-        }
+    /* JADX WARNING: type inference failed for: r1v8 */
+    /* JADX WARNING: type inference failed for: r1v16 */
+    /* JADX WARNING: Multi-variable type inference failed */
+    /* JADX WARNING: Removed duplicated region for block: B:14:0x0056  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static java.lang.String get(java.lang.String r6, java.util.List<java.lang.String> r7) {
+        /*
+            r4 = 0
+            java.net.URL r1 = new java.net.URL     // Catch:{ Exception -> 0x007f }
+            r1.<init>(r6)     // Catch:{ Exception -> 0x007f }
+            java.net.URLConnection r2 = r1.openConnection()     // Catch:{ Exception -> 0x007f }
+            java.lang.String r1 = "User-Agent"
+            java.lang.String r3 = getUserAgent()     // Catch:{ Exception -> 0x0051 }
+            r2.setRequestProperty(r1, r3)     // Catch:{ Exception -> 0x0051 }
+            java.lang.String r1 = "apv"
+            java.lang.String r3 = p018jp.colopl.drapro.AppConsts.versionName     // Catch:{ Exception -> 0x0051 }
+            r2.setRequestProperty(r1, r3)     // Catch:{ Exception -> 0x0051 }
+            r0 = r2
+            java.net.HttpURLConnection r0 = (java.net.HttpURLConnection) r0     // Catch:{ Exception -> 0x0051 }
+            r1 = r0
+            java.lang.String r3 = "GET"
+            r1.setRequestMethod(r3)     // Catch:{ Exception -> 0x0051 }
+            r1 = 0
+            r2.setUseCaches(r1)     // Catch:{ Exception -> 0x0051 }
+            int r1 = CONNECT_TIMEOUT     // Catch:{ Exception -> 0x0051 }
+            r2.setConnectTimeout(r1)     // Catch:{ Exception -> 0x0051 }
+            int r1 = READ_TIMEOUT     // Catch:{ Exception -> 0x0051 }
+            r2.setReadTimeout(r1)     // Catch:{ Exception -> 0x0051 }
+            if (r7 == 0) goto L_0x0066
+            java.lang.StringBuilder r3 = new java.lang.StringBuilder     // Catch:{ Exception -> 0x0051 }
+            r3.<init>()     // Catch:{ Exception -> 0x0051 }
+            java.util.Iterator r5 = r7.iterator()     // Catch:{ Exception -> 0x0051 }
+        L_0x003c:
+            boolean r1 = r5.hasNext()     // Catch:{ Exception -> 0x0051 }
+            if (r1 == 0) goto L_0x005d
+            java.lang.Object r1 = r5.next()     // Catch:{ Exception -> 0x0051 }
+            java.lang.String r1 = (java.lang.String) r1     // Catch:{ Exception -> 0x0051 }
+            r3.append(r1)     // Catch:{ Exception -> 0x0051 }
+            java.lang.String r1 = ";"
+            r3.append(r1)     // Catch:{ Exception -> 0x0051 }
+            goto L_0x003c
+        L_0x0051:
+            r1 = move-exception
+            r1 = r2
+            r3 = r4
+        L_0x0054:
+            if (r1 == 0) goto L_0x005b
+            java.net.HttpURLConnection r1 = (java.net.HttpURLConnection) r1
+            r1.disconnect()
+        L_0x005b:
+            r1 = r3
+        L_0x005c:
+            return r1
+        L_0x005d:
+            java.lang.String r1 = "Cookie"
+            java.lang.String r3 = r3.toString()     // Catch:{ Exception -> 0x0051 }
+            r2.setRequestProperty(r1, r3)     // Catch:{ Exception -> 0x0051 }
+        L_0x0066:
+            r2.connect()     // Catch:{ Exception -> 0x0051 }
+            jp.colopl.util.DoneHandlerInputStream r1 = new jp.colopl.util.DoneHandlerInputStream     // Catch:{ Exception -> 0x0051 }
+            java.io.InputStream r3 = r2.getInputStream()     // Catch:{ Exception -> 0x0051 }
+            r1.<init>(r3)     // Catch:{ Exception -> 0x0051 }
+            java.lang.String r3 = p018jp.colopl.util.StringUtil.convertToString(r1)     // Catch:{ Exception -> 0x0051 }
+            r0 = r2
+            java.net.HttpURLConnection r0 = (java.net.HttpURLConnection) r0     // Catch:{ Exception -> 0x0083 }
+            r1 = r0
+            r1.disconnect()     // Catch:{ Exception -> 0x0083 }
+            r1 = r3
+            goto L_0x005c
+        L_0x007f:
+            r1 = move-exception
+            r1 = r4
+            r3 = r4
+            goto L_0x0054
+        L_0x0083:
+            r1 = move-exception
+            r1 = r2
+            goto L_0x0054
+        */
+        throw new UnsupportedOperationException("Method not decompiled: p018jp.colopl.util.HTTP.get(java.lang.String, java.util.List):java.lang.String");
     }
 
     private static String getUserAgent() {
@@ -126,7 +154,7 @@ public class HTTP {
                 }
             }
             return decodeStream;
-        } catch (Throwable th) {
+        } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
@@ -137,7 +165,7 @@ public class HTTP {
     }
 
     public static String post(String str, List<NameValuePair> list, List<String> list2) {
-        HttpClient defaultHttpClient = new DefaultHttpClient();
+        DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
         defaultHttpClient.getParams().setBooleanParameter("http.protocol.handle-redirects", false);
         defaultHttpClient.getParams().setParameter("http.protocol.expect-continue", Boolean.valueOf(false));
         defaultHttpClient.getParams().setParameter("http.protocol.version", HttpVersion.HTTP_1_1);
@@ -146,7 +174,7 @@ public class HTTP {
         HttpConnectionParams.setSoTimeout(params, READ_TIMEOUT);
         HttpProtocolParams.setUserAgent(params, getUserAgent());
         try {
-            Object httpPost = new HttpPost(str);
+            HttpPost httpPost = new HttpPost(str);
             for (String addHeader : list2) {
                 httpPost.addHeader("Cookie", addHeader);
             }
@@ -174,14 +202,14 @@ public class HTTP {
     }
 
     public static String postMultipart(String str, List<NameValuePair> list, List<String> list2, File file, ProgressCallback progressCallback) {
-        HttpMultipartRequest httpMultipartRequest = new HttpMultipartRequest(str, (List) list, (List) list2, file, getUserAgent(), progressCallback);
+        HttpMultipartRequest httpMultipartRequest = new HttpMultipartRequest(str, list, list2, file, getUserAgent(), progressCallback);
         httpMultipartRequest.setConnectionTimeout(CONNECT_TIMEOUT_FOR_UPLOAD);
         httpMultipartRequest.setReadingTimeout(READ_TIMEOUT_FOR_UPLOAD);
         return httpMultipartRequest.send();
     }
 
     public static String postMultipart(String str, List<NameValuePair> list, List<String> list2, String str2, ProgressCallback progressCallback) {
-        HttpMultipartRequest httpMultipartRequest = new HttpMultipartRequest(str, (List) list, (List) list2, str2, getUserAgent(), progressCallback);
+        HttpMultipartRequest httpMultipartRequest = new HttpMultipartRequest(str, list, list2, str2, getUserAgent(), progressCallback);
         httpMultipartRequest.setConnectionTimeout(CONNECT_TIMEOUT_FOR_UPLOAD);
         httpMultipartRequest.setReadingTimeout(READ_TIMEOUT_FOR_UPLOAD);
         return httpMultipartRequest.send();
@@ -192,14 +220,14 @@ public class HTTP {
     }
 
     public static InputStream postXML(String str, String str2, List<String> list) {
-        HttpClient defaultHttpClient = new DefaultHttpClient();
+        DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
         defaultHttpClient.getParams().setBooleanParameter("http.protocol.handle-redirects", true);
         defaultHttpClient.getParams().setParameter("http.protocol.expect-continue", Boolean.valueOf(false));
         HttpParams params = defaultHttpClient.getParams();
         HttpConnectionParams.setConnectionTimeout(params, CONNECT_TIMEOUT);
         HttpConnectionParams.setSoTimeout(params, READ_TIMEOUT);
         HttpProtocolParams.setUserAgent(params, "Android");
-        Object httpPost = new HttpPost(str);
+        HttpPost httpPost = new HttpPost(str);
         if (list != null) {
             for (String addHeader : list) {
                 httpPost.addHeader("Cookie", addHeader);

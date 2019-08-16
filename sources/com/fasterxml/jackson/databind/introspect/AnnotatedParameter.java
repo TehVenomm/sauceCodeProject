@@ -82,10 +82,10 @@ public final class AnnotatedParameter extends AnnotatedMember {
             return false;
         }
         AnnotatedParameter annotatedParameter = (AnnotatedParameter) obj;
-        if (annotatedParameter._owner.equals(this._owner) && annotatedParameter._index == this._index) {
-            return true;
+        if (!annotatedParameter._owner.equals(this._owner) || annotatedParameter._index != this._index) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public String toString() {

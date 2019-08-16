@@ -1,3 +1,4 @@
+using App.Scripts.GoGame.Optimization;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,14 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 	private float terrainDataSizeInvX;
 
 	private float terrainDataSizeInvZ;
+
+	private bool isLoadingStageObject;
+
+	private bool isLoadingSkyObject;
+
+	private Coroutine loadEffectCoroutine;
+
+	private Transform currentStageContainer;
 
 	private List<Vector3> insideChipList = new List<Vector3>();
 
@@ -91,9 +100,205 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		private set;
 	}
 
+	private IEnumerator LoadStage(string id, string load_scene_name, StageTable.StageData data)
+	{
+		isLoadingStageObject = true;
+		if (GoGameCacheManager.HasCacheObj(id))
+		{
+			load_scene_name += "_lightmap";
+		}
+		LoadingQueue load_queue = new LoadingQueue(this);
+		EffectObject.wait = true;
+		if (ResourceManager.internalMode)
+		{
+			load_scene_name = $"internal__STAGE_SCENE__{load_scene_name}";
+		}
+		else if (ResourceManager.isDownloadAssets)
+		{
+			load_queue.Load(RESOURCE_CATEGORY.STAGE_SCENE, load_scene_name, null, cache_package: true);
+			yield return load_queue.Wait();
+		}
+		AsyncOperation ao = SceneManager.LoadSceneAsync(load_scene_name);
+		while (!ao.get_isDone())
+		{
+			yield return null;
+		}
+		if (GoGameCacheManager.HasCacheObj(id))
+		{
+			currentStageContainer = GoGameCacheManager.RetrieveObj(id, base._transform);
+			SceneSettingsManager componentInChildren = currentStageContainer.GetComponentInChildren<SceneSettingsManager>();
+			if (componentInChildren != null)
+			{
+				componentInChildren.Self();
+				componentInChildren.InitializeScene();
+				stageObject = componentInChildren.get_transform();
+			}
+		}
+		else
+		{
+			currentStageContainer = new GameObject(string.Format("{0}_{1}", "cache", load_scene_name)).get_transform();
+			currentStageContainer.set_parent(base._transform);
+			Scene activeScene = SceneManager.GetActiveScene();
+			GameObject[] rootGameObjects = activeScene.GetRootGameObjects();
+			GameObject[] array = rootGameObjects;
+			foreach (GameObject val in array)
+			{
+				val.get_transform().set_parent(currentStageContainer);
+			}
+			if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
+			{
+				stageObject = MonoBehaviourSingleton<SceneSettingsManager>.I.get_transform();
+			}
+		}
+		if (!MonoBehaviourSingleton<GlobalSettingsManager>.I.stageCache.Contains(data.scene))
+		{
+			PackageObject packageObject = MonoBehaviourSingleton<ResourceManager>.I.cache.PopCachedPackage(RESOURCE_CATEGORY.STAGE_SCENE.ToAssetBundleName(load_scene_name));
+			AssetBundle val2 = (packageObject == null) ? null : (packageObject.obj as AssetBundle);
+			if (val2 != null)
+			{
+				val2.Unload(false);
+			}
+		}
+		bool is_field_stage = id.StartsWith("FI");
+		if (stageObject != null && is_field_stage && (!MonoBehaviourSingleton<SceneSettingsManager>.IsValid() || !MonoBehaviourSingleton<SceneSettingsManager>.I.forceFogON))
+		{
+			ChangeLightShader(base._transform);
+		}
+		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
+		{
+			MonoBehaviourSingleton<SceneSettingsManager>.I.attributeID = data.attributeID;
+			SceneParameter component = MonoBehaviourSingleton<SceneSettingsManager>.I.GetComponent<SceneParameter>();
+			if (component != null)
+			{
+				component.Apply();
+			}
+			if (is_field_stage && !MonoBehaviourSingleton<SceneSettingsManager>.I.forceFogON)
+			{
+				ShaderGlobal.fogColor = (MonoBehaviourSingleton<SceneSettingsManager>.I.fogColor = new Color(0f, 0f, 0f, 0f));
+				ShaderGlobal.fogNear = (MonoBehaviourSingleton<SceneSettingsManager>.I.linearFogStart = 0f);
+				ShaderGlobal.fogFar = (MonoBehaviourSingleton<SceneSettingsManager>.I.linearFogEnd = float.MaxValue);
+				ShaderGlobal.fogNearLimit = (MonoBehaviourSingleton<SceneSettingsManager>.I.limitFogStart = 0f);
+				ShaderGlobal.fogFarLimit = (MonoBehaviourSingleton<SceneSettingsManager>.I.limitFogEnd = 1f);
+			}
+			if (MonoBehaviourSingleton<SceneSettingsManager>.I.saveInsideCollider && MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData != null && (MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.minX != 0 || MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.maxX != 0 || MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.minZ != 0 || MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.maxZ != 0))
+			{
+				isValidInside = true;
+			}
+			if (isValidInside)
+			{
+				insideColliderData = MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData;
+			}
+		}
+		isLoadingStageObject = false;
+	}
+
+	private IEnumerator LoadSky(StageTable.StageData data)
+	{
+		isLoadingSkyObject = true;
+		if (GoGameCacheManager.HasCacheObj(data.sky))
+		{
+			skyObject = GoGameCacheManager.RetrieveObj(data.sky, base._transform);
+		}
+		else
+		{
+			ResourceManager.enableCache = false;
+			LoadingQueue load_queue = new LoadingQueue(this);
+			LoadObject lo_sky = null;
+			if (!string.IsNullOrEmpty(data.sky))
+			{
+				lo_sky = load_queue.Load(RESOURCE_CATEGORY.STAGE_SKY, data.sky);
+			}
+			ResourceManager.enableCache = true;
+			while (load_queue.IsLoading())
+			{
+				yield return null;
+			}
+			if (lo_sky != null)
+			{
+				skyObject = ResourceUtility.Realizes(lo_sky.loadedObject, base._transform);
+			}
+		}
+		isLoadingSkyObject = false;
+	}
+
+	private IEnumerator LoadEffect(StageTable.StageData data)
+	{
+		LoadingQueue load_queue = new LoadingQueue(this);
+		bool wait_load_root_effect = false;
+		if (GoGameCacheManager.HasCacheObj(data.rootEffect))
+		{
+			rootEffect = GoGameCacheManager.RetrieveObj(data.rootEffect, base._transform);
+		}
+		else
+		{
+			wait_load_root_effect = true;
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.rootEffect);
+		}
+		bool wait_load_cameraLinkEffect = false;
+		if (GoGameCacheManager.HasCacheObj(data.cameraLinkEffect))
+		{
+			cameraLinkEffect = GoGameCacheManager.RetrieveObj(data.cameraLinkEffect, base._transform);
+		}
+		else
+		{
+			wait_load_cameraLinkEffect = true;
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffect);
+		}
+		bool wait_load_cameraLinkEffectY0 = false;
+		if (GoGameCacheManager.HasCacheObj(data.cameraLinkEffectY0))
+		{
+			cameraLinkEffectY0 = GoGameCacheManager.RetrieveObj(data.cameraLinkEffectY0, base._transform);
+		}
+		else
+		{
+			wait_load_cameraLinkEffectY0 = true;
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffectY0);
+		}
+		for (int i = 0; i < 8; i++)
+		{
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.useEffects[i]);
+		}
+		while (load_queue.IsLoading())
+		{
+			yield return null;
+		}
+		EffectObject.wait = false;
+		if (wait_load_cameraLinkEffect)
+		{
+			cameraLinkEffect = EffectManager.GetCameraLinkEffect(data.cameraLinkEffect, y0: false, base._transform);
+		}
+		if (wait_load_cameraLinkEffectY0)
+		{
+			cameraLinkEffectY0 = EffectManager.GetCameraLinkEffect(data.cameraLinkEffectY0, y0: true, base._transform);
+		}
+		if (wait_load_root_effect)
+		{
+			rootEffect = EffectManager.GetEffect(data.rootEffect, base._transform);
+		}
+		while (isLoadingStageObject)
+		{
+			yield return null;
+		}
+		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
+		{
+			WeatherController weatherController = MonoBehaviourSingleton<SceneSettingsManager>.I.weatherController;
+			if (cameraLinkEffect != null)
+			{
+				cameraLinkEffect.get_gameObject().SetActive(!weatherController.cameraLinkEffectEnable);
+			}
+			if (cameraLinkEffectY0 != null)
+			{
+				cameraLinkEffectY0.get_gameObject().SetActive(!weatherController.cameraLinkEffectY0Enable);
+			}
+			if (MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.fieldData != null)
+			{
+				MonoBehaviourSingleton<SceneSettingsManager>.I.ActivateObjectsByProgress(MonoBehaviourSingleton<FieldManager>.I.fieldData.mapFlag);
+			}
+		}
+	}
+
 	public bool LoadStage(string id)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (isLoadingStage)
 		{
 			Log.Error(LOG.GAMESCENE, "can't load stage.");
@@ -109,15 +314,18 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	private IEnumerator LoadStageCoroutine(string id)
 	{
+		Time.get_realtimeSinceStartup();
 		isLoadingStage = true;
 		insideColliderData = null;
 		isValidInside = false;
 		UnloadStage();
+		Time.get_realtimeSinceStartup();
 		Input.get_gyro().set_enabled(false);
 		currentStageName = id;
 		StageTable.StageData data = null;
 		if (!string.IsNullOrEmpty(id))
 		{
+			Time.get_realtimeSinceStartup();
 			if (!Singleton<StageTable>.IsValid())
 			{
 				yield break;
@@ -127,91 +335,15 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 			{
 				yield break;
 			}
-			LoadingQueue load_queue = new LoadingQueue(this);
-			AssetBundle asset_bundle = null;
-			EffectObject.wait = true;
-			string load_scene_name = data.scene;
-			if (ResourceManager.internalMode)
+			Time.get_realtimeSinceStartup();
+			this.StartCoroutine(LoadStage(id, data.scene, data));
+			this.StartCoroutine(LoadSky(data));
+			loadEffectCoroutine = this.StartCoroutine(LoadEffect(data));
+			while (isLoadingStageObject || isLoadingSkyObject)
 			{
-				load_scene_name = $"internal__STAGE_SCENE__{load_scene_name}";
+				yield return null;
 			}
-			else if (ResourceManager.isDownloadAssets)
-			{
-				load_queue.Load(RESOURCE_CATEGORY.STAGE_SCENE, data.scene, null, true);
-				yield return (object)load_queue.Wait();
-				PackageObject package = MonoBehaviourSingleton<ResourceManager>.I.cache.PopCachedPackage(RESOURCE_CATEGORY.STAGE_SCENE.ToAssetBundleName(data.scene));
-				asset_bundle = ((package == null) ? null : (package.obj as AssetBundle));
-			}
-			AsyncOperation ao = SceneManager.LoadSceneAsync(load_scene_name);
-			ResourceManager.enableCache = false;
-			LoadObject lo_sky = null;
-			if (!string.IsNullOrEmpty(data.sky))
-			{
-				lo_sky = load_queue.Load(RESOURCE_CATEGORY.STAGE_SKY, data.sky, false);
-			}
-			ResourceManager.enableCache = true;
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffect);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffectY0);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.rootEffect);
-			for (int i = 0; i < 8; i++)
-			{
-				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, data.useEffects[i]);
-			}
-			if (load_queue.IsLoading())
-			{
-				yield return (object)load_queue.Wait();
-			}
-			while (!ao.get_isDone())
-			{
-				yield return (object)null;
-			}
-			EffectObject.wait = false;
-			if (asset_bundle != null)
-			{
-				asset_bundle.Unload(false);
-			}
-			if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
-			{
-				stageObject = MonoBehaviourSingleton<SceneSettingsManager>.I.get_transform();
-				stageObject.set_parent(base._transform);
-			}
-			if (lo_sky != null)
-			{
-				skyObject = ResourceUtility.Realizes(lo_sky.loadedObject, base._transform, -1);
-			}
-			bool is_field_stage = id.StartsWith("FI");
-			if (stageObject != null && is_field_stage && (!MonoBehaviourSingleton<SceneSettingsManager>.IsValid() || !MonoBehaviourSingleton<SceneSettingsManager>.I.forceFogON))
-			{
-				ChangeLightShader(base._transform);
-			}
-			cameraLinkEffect = EffectManager.GetCameraLinkEffect(data.cameraLinkEffect, false, base._transform);
-			cameraLinkEffectY0 = EffectManager.GetCameraLinkEffect(data.cameraLinkEffectY0, true, base._transform);
-			rootEffect = EffectManager.GetEffect(data.rootEffect, base._transform);
-			if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
-			{
-				MonoBehaviourSingleton<SceneSettingsManager>.I.attributeID = data.attributeID;
-				SceneParameter sp = MonoBehaviourSingleton<SceneSettingsManager>.I.GetComponent<SceneParameter>();
-				if (sp != null)
-				{
-					sp.Apply();
-				}
-				if (is_field_stage && !MonoBehaviourSingleton<SceneSettingsManager>.I.forceFogON)
-				{
-					ShaderGlobal.fogColor = (MonoBehaviourSingleton<SceneSettingsManager>.I.fogColor = new Color(0f, 0f, 0f, 0f));
-					ShaderGlobal.fogNear = (MonoBehaviourSingleton<SceneSettingsManager>.I.linearFogStart = 0f);
-					ShaderGlobal.fogFar = (MonoBehaviourSingleton<SceneSettingsManager>.I.linearFogEnd = 3.40282347E+38f);
-					ShaderGlobal.fogNearLimit = (MonoBehaviourSingleton<SceneSettingsManager>.I.limitFogStart = 0f);
-					ShaderGlobal.fogFarLimit = (MonoBehaviourSingleton<SceneSettingsManager>.I.limitFogEnd = 1f);
-				}
-				if (MonoBehaviourSingleton<SceneSettingsManager>.I.saveInsideCollider && MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData != null && (MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.minX != 0 || MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.maxX != 0 || MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.minZ != 0 || MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData.maxZ != 0))
-				{
-					isValidInside = true;
-				}
-				if (isValidInside)
-				{
-					insideColliderData = MonoBehaviourSingleton<SceneSettingsManager>.I.insideColliderData;
-				}
-			}
+			Time.get_realtimeSinceStartup();
 		}
 		else if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
@@ -219,24 +351,30 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		}
 		ShaderGlobal.lightProbe = (LightmapSettings.get_lightProbes() != null);
 		currentStageData = data;
+		isLoadingStage = false;
+	}
+
+	public void SetWeatherEffect(string effectName)
+	{
+		if (cameraLinkEffect != null)
+		{
+			Object.Destroy(cameraLinkEffect.get_gameObject());
+			cameraLinkEffect = null;
+		}
+		cameraLinkEffect = EffectManager.GetCameraLinkEffect(effectName, y0: false, base._transform);
 		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
 			WeatherController weatherController = MonoBehaviourSingleton<SceneSettingsManager>.I.weatherController;
 			if (cameraLinkEffect != null)
 			{
+				weatherController.cameraLinkEffectEnable = true;
 				cameraLinkEffect.get_gameObject().SetActive(!weatherController.cameraLinkEffectEnable);
 			}
-			if (cameraLinkEffectY0 != null)
-			{
-				cameraLinkEffectY0.get_gameObject().SetActive(!weatherController.cameraLinkEffectY0Enable);
-			}
 		}
-		isLoadingStage = false;
 	}
 
 	public void LoadBackgoundImage(int image_id)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		if (isLoadingBackgoundImage)
 		{
 			Log.Error(LOG.GAMESCENE, "can't load stage.");
@@ -253,12 +391,12 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 		UnloadStage();
 		LoadingQueue load_queue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
-		LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.STAGE_IMAGE, "BackgroundImage", false);
-		LoadObject lo_tex = load_queue.Load(RESOURCE_CATEGORY.STAGE_IMAGE, ResourceName.GetBackgroundImage(image_id), false);
+		LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.STAGE_IMAGE, (!MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName().Contains("TutorialWeaponSelectTop")) ? "BackgroundImage" : "BackgroundTutImage");
+		LoadObject lo_tex = load_queue.Load(RESOURCE_CATEGORY.STAGE_IMAGE, ResourceName.GetBackgroundImage(image_id));
 		ResourceManager.enableCache = true;
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
 		Transform bg = ResourceUtility.Realizes(lo_bg.loadedObject, base._transform, 0);
 		bg.get_gameObject().GetComponent<MeshRenderer>().get_material()
@@ -271,48 +409,92 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public void UnloadStage()
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			MonoBehaviourSingleton<EffectManager>.I.DeleteManagerChildrenEffects();
+			MonoBehaviourSingleton<EffectManager>.I.ClearStocks();
 		}
-		if (MonoBehaviourSingleton<InstantiateManager>.IsValid())
+		if (AppMain.needClearMemory && MonoBehaviourSingleton<InstantiateManager>.IsValid())
 		{
 			MonoBehaviourSingleton<InstantiateManager>.I.ClearStocks();
 		}
-		if (stageObject != null)
+		if (loadEffectCoroutine != null)
 		{
-			stageObject.set_parent(null);
-			SceneManager.LoadScene("Empty");
+			this.StopCoroutine(loadEffectCoroutine);
+			loadEffectCoroutine = null;
+		}
+		if (currentStageContainer != null)
+		{
+			bool flag = stageObject == null;
+			if (GoGameCacheManager.ShouldCacheStage(currentStageName))
+			{
+				GoGameCacheManager.CacheObj(currentStageName, currentStageContainer);
+				if (stageObject != null)
+				{
+					stageObject.GetComponent<SceneSettingsManager>().Remove();
+				}
+			}
+			else
+			{
+				Object.DestroyImmediate(currentStageContainer.get_gameObject());
+			}
+			currentStageContainer = null;
 			stageObject = null;
-			ShaderGlobal.Initialize();
-			MonoBehaviourSingleton<GlobalSettingsManager>.I.ResetLightRot();
-			MonoBehaviourSingleton<GlobalSettingsManager>.I.ResetAmbientColor();
-			Input.get_gyro().set_enabled(true);
+			if (!flag)
+			{
+				SceneManager.LoadScene("Empty");
+				ShaderGlobal.Initialize();
+				MonoBehaviourSingleton<GlobalSettingsManager>.I.ResetLightRot();
+				MonoBehaviourSingleton<GlobalSettingsManager>.I.ResetAmbientColor();
+				Input.get_gyro().set_enabled(true);
+			}
 		}
 		if (skyObject != null)
 		{
-			Object.Destroy(skyObject.get_gameObject());
+			if (GoGameCacheManager.ShouldCacheSky(currentStageData.sky))
+			{
+				GoGameCacheManager.CacheObj(currentStageData.sky, skyObject);
+			}
+			else
+			{
+				Object.Destroy(skyObject.get_gameObject());
+			}
 			skyObject = null;
 		}
 		if (rootEffect != null)
 		{
-			Object.Destroy(rootEffect.get_gameObject());
+			if (GoGameCacheManager.ShouldCacheEffect(currentStageData.rootEffect))
+			{
+				GoGameCacheManager.CacheObj(currentStageData.rootEffect, rootEffect);
+			}
+			else
+			{
+				Object.Destroy(rootEffect.get_gameObject());
+			}
 			rootEffect = null;
 		}
 		if (cameraLinkEffect != null)
 		{
-			Object.Destroy(cameraLinkEffect.get_gameObject());
+			if (GoGameCacheManager.ShouldCacheEffect(currentStageData.cameraLinkEffect))
+			{
+				GoGameCacheManager.CacheObj(currentStageData.cameraLinkEffect, cameraLinkEffect);
+			}
+			else
+			{
+				Object.Destroy(cameraLinkEffect.get_gameObject());
+			}
 			cameraLinkEffect = null;
 		}
 		if (cameraLinkEffectY0 != null)
 		{
-			Object.Destroy(cameraLinkEffectY0.get_gameObject());
+			if (GoGameCacheManager.ShouldCacheEffect(currentStageData.cameraLinkEffectY0))
+			{
+				GoGameCacheManager.CacheObj(currentStageData.cameraLinkEffectY0, cameraLinkEffectY0);
+			}
+			else
+			{
+				Object.Destroy(cameraLinkEffectY0.get_gameObject());
+			}
 			cameraLinkEffectY0 = null;
 		}
 		currentStageName = null;
@@ -329,7 +511,6 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 	{
 		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			return 0f;
@@ -354,10 +535,8 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public static void ChangeLightShader(Transform root)
 	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Expected O, but got Unknown
+		//IL_00d8: Expected O, but got Unknown
 		UIntKeyTable<Material> uIntKeyTable = new UIntKeyTable<Material>();
 		List<Renderer> list = new List<Renderer>();
 		root.GetComponentsInChildren<Renderer>(true, list);
@@ -370,31 +549,30 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 			for (int num = sharedMaterials.Length; j < num; j++)
 			{
 				Material val2 = sharedMaterials[j];
-				if (val2 != null && val2.get_shader() != null)
+				if (!(val2 != null) || !(val2.get_shader() != null))
 				{
-					Material val3 = uIntKeyTable.Get((uint)val2.GetInstanceID());
-					if (val3 != null)
+					continue;
+				}
+				Material val3 = uIntKeyTable.Get((uint)val2.GetInstanceID());
+				if (val3 != null)
+				{
+					sharedMaterials[j] = val3;
+					continue;
+				}
+				string name = val2.get_shader().get_name();
+				if (!name.EndsWith("__l"))
+				{
+					Shader val4 = ResourceUtility.FindShader(name + "__l");
+					if (val4 != null)
 					{
+						val3 = new Material(val2);
+						val3.set_shader(val4);
 						sharedMaterials[j] = val3;
-					}
-					else
-					{
-						string name = val2.get_shader().get_name();
-						if (!name.EndsWith("__l"))
-						{
-							Shader val4 = ResourceUtility.FindShader(name + "__l");
-							if (val4 != null)
-							{
-								val3 = new Material(val2);
-								val3.set_shader(val4);
-								sharedMaterials[j] = val3;
-								uIntKeyTable.Add((uint)val2.GetInstanceID(), val3);
-								continue;
-							}
-						}
-						uIntKeyTable.Add((uint)val2.GetInstanceID(), val2);
+						uIntKeyTable.Add((uint)val2.GetInstanceID(), val3);
+						continue;
 					}
 				}
+				uIntKeyTable.Add((uint)val2.GetInstanceID(), val2);
 			}
 			val.set_sharedMaterials(sharedMaterials);
 		}
@@ -462,26 +640,25 @@ public class StageManager : MonoBehaviourSingleton<StageManager>
 
 	public Vector3 GetRandomPosByInsideInfo(Vector3 center, float max_radius, float min_radius, ref bool valid)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		center.y = 0f;
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
 		valid = false;
 		if (!isValidInside)
 		{

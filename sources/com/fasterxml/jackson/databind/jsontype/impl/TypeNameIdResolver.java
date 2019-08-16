@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0862Id;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
@@ -25,60 +25,56 @@ public class TypeNameIdResolver extends TypeIdResolverBase {
     }
 
     public static TypeNameIdResolver construct(MapperConfig<?> mapperConfig, JavaType javaType, Collection<NamedType> collection, boolean z, boolean z2) {
+        Map map;
+        Map map2;
+        Map map3;
         if (z == z2) {
             throw new IllegalArgumentException();
         }
-        HashMap hashMap;
-        Map hashMap2;
-        Map treeMap;
         if (z) {
-            hashMap = new HashMap();
+            map = new HashMap();
         } else {
-            hashMap = null;
+            map = null;
         }
         if (z2) {
-            hashMap2 = new HashMap();
-            treeMap = new TreeMap();
+            map2 = new HashMap();
+            map3 = new TreeMap();
         } else {
-            hashMap2 = null;
-            Object obj = hashMap;
+            map2 = null;
+            map3 = map;
         }
         if (collection != null) {
             for (NamedType namedType : collection) {
-                Object name;
                 Class type = namedType.getType();
-                if (namedType.hasName()) {
-                    name = namedType.getName();
-                } else {
-                    String _defaultTypeId = _defaultTypeId(type);
-                }
+                String _defaultTypeId = namedType.hasName() ? namedType.getName() : _defaultTypeId(type);
                 if (z) {
-                    treeMap.put(type.getName(), name);
+                    map3.put(type.getName(), _defaultTypeId);
                 }
                 if (z2) {
-                    JavaType javaType2 = (JavaType) hashMap2.get(name);
+                    JavaType javaType2 = (JavaType) map2.get(_defaultTypeId);
                     if (javaType2 == null || !type.isAssignableFrom(javaType2.getRawClass())) {
-                        hashMap2.put(name, mapperConfig.constructType(type));
+                        map2.put(_defaultTypeId, mapperConfig.constructType(type));
                     }
                 }
             }
         }
-        return new TypeNameIdResolver(mapperConfig, javaType, treeMap, hashMap2);
+        return new TypeNameIdResolver(mapperConfig, javaType, map3, map2);
     }
 
-    public Id getMechanism() {
-        return Id.NAME;
+    public C0862Id getMechanism() {
+        return C0862Id.NAME;
     }
 
     public String idFromValue(Object obj) {
         return idFromClass(obj.getClass());
     }
 
-    protected String idFromClass(Class<?> cls) {
+    /* access modifiers changed from: protected */
+    public String idFromClass(Class<?> cls) {
+        String str;
         if (cls == null) {
             return null;
         }
-        String str;
         Class rawClass = this._typeFactory.constructType((Type) cls).getRawClass();
         String name = rawClass.getName();
         synchronized (this._typeToId) {
@@ -112,7 +108,8 @@ public class TypeNameIdResolver extends TypeIdResolverBase {
         return _typeFromId(str);
     }
 
-    protected JavaType _typeFromId(String str) {
+    /* access modifiers changed from: protected */
+    public JavaType _typeFromId(String str) {
         return (JavaType) this._idToType.get(str);
     }
 
@@ -121,11 +118,11 @@ public class TypeNameIdResolver extends TypeIdResolverBase {
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('[').append(getClass().getName());
-        stringBuilder.append("; id-to-type=").append(this._idToType);
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append('[').append(getClass().getName());
+        sb.append("; id-to-type=").append(this._idToType);
+        sb.append(']');
+        return sb.toString();
     }
 
     protected static String _defaultTypeId(Class<?> cls) {

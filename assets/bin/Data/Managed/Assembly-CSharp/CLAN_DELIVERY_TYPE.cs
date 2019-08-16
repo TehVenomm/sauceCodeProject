@@ -1,0 +1,5 @@
+public enum CLAN_DELIVERY_TYPE
+{
+	DAILY = 1,
+	WEEKLY
+}

@@ -1,13 +1,15 @@
-package jp.colopl.libs;
+package p018jp.colopl.libs;
 
 import android.text.style.ClickableSpan;
 import android.view.View;
 
+/* renamed from: jp.colopl.libs.CSpan */
 public class CSpan extends ClickableSpan {
     public static final int TYPE_WIFI_SETTING = 1;
     private OnClickListener mListener;
     private int mType;
 
+    /* renamed from: jp.colopl.libs.CSpan$OnClickListener */
     public interface OnClickListener {
         void onClick(View view, int i);
     }

@@ -2,71 +2,79 @@ package com.google.android.gms.drive;
 
 import android.text.TextUtils;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.internal.zzbiw;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.internal.drive.zzaw;
 
 public class ExecutionOptions {
     public static final int CONFLICT_STRATEGY_KEEP_REMOTE = 1;
     public static final int CONFLICT_STRATEGY_OVERWRITE_REMOTE = 0;
     public static final int MAX_TRACKING_TAG_STRING_LENGTH = 65536;
-    private final String zzgdt;
-    private final boolean zzgdu;
-    private final int zzgdv;
+    private final String zzal;
+    private final boolean zzam;
+    private final int zzan;
 
     public static class Builder {
-        protected String zzgdt;
-        protected boolean zzgdu;
-        protected int zzgdv = 0;
+        protected String zzao;
+        protected boolean zzap;
+        protected int zzaq = 0;
 
         public ExecutionOptions build() {
-            zzamw();
-            return new ExecutionOptions(this.zzgdt, this.zzgdu, this.zzgdv);
+            zzn();
+            return new ExecutionOptions(this.zzao, this.zzap, this.zzaq);
         }
 
         public Builder setConflictStrategy(int i) {
-            Object obj;
+            boolean z;
             switch (i) {
                 case 0:
                 case 1:
-                    obj = 1;
+                    z = true;
                     break;
                 default:
-                    obj = null;
+                    z = false;
                     break;
             }
-            if (obj == null) {
+            if (!z) {
                 throw new IllegalArgumentException("Unrecognized value for conflict strategy: " + i);
             }
-            this.zzgdv = i;
+            this.zzaq = i;
             return this;
         }
 
         public Builder setNotifyOnCompletion(boolean z) {
-            this.zzgdu = z;
+            this.zzap = z;
             return this;
         }
 
         public Builder setTrackingTag(String str) {
-            int i = (TextUtils.isEmpty(str) || str.length() > 65536) ? 0 : 1;
-            if (i == 0) {
+            if (!(!TextUtils.isEmpty(str) && str.length() <= 65536)) {
                 throw new IllegalArgumentException(String.format("trackingTag must not be null nor empty, and the length must be <= the maximum length (%s)", new Object[]{Integer.valueOf(65536)}));
             }
-            this.zzgdt = str;
+            this.zzao = str;
             return this;
         }
 
-        protected final void zzamw() {
-            if (this.zzgdv == 1 && !this.zzgdu) {
+        /* access modifiers changed from: protected */
+        public final void zzn() {
+            if (this.zzaq == 1 && !this.zzap) {
                 throw new IllegalStateException("Cannot use CONFLICT_STRATEGY_KEEP_REMOTE without requesting completion notifications");
             }
         }
     }
 
     public ExecutionOptions(String str, boolean z, int i) {
-        this.zzgdt = str;
-        this.zzgdu = z;
-        this.zzgdv = i;
+        this.zzal = str;
+        this.zzam = z;
+        this.zzan = i;
+    }
+
+    public static boolean zza(int i) {
+        switch (i) {
+            case 1:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public boolean equals(Object obj) {
@@ -77,29 +85,33 @@ public class ExecutionOptions {
             return true;
         }
         ExecutionOptions executionOptions = (ExecutionOptions) obj;
-        return zzbf.equal(this.zzgdt, executionOptions.zzgdt) && this.zzgdv == executionOptions.zzgdv && this.zzgdu == executionOptions.zzgdu;
+        return Objects.equal(this.zzal, executionOptions.zzal) && this.zzan == executionOptions.zzan && this.zzam == executionOptions.zzam;
     }
 
     public int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzgdt, Integer.valueOf(this.zzgdv), Boolean.valueOf(this.zzgdu)});
+        return Objects.hashCode(this.zzal, Integer.valueOf(this.zzan), Boolean.valueOf(this.zzam));
     }
 
-    public final String zzamt() {
-        return this.zzgdt;
+    @Deprecated
+    public final void zza(GoogleApiClient googleApiClient) {
+        zza((zzaw) googleApiClient.getClient(Drive.CLIENT_KEY));
     }
 
-    public final boolean zzamu() {
-        return this.zzgdu;
-    }
-
-    public final int zzamv() {
-        return this.zzgdv;
-    }
-
-    public final void zze(GoogleApiClient googleApiClient) {
-        zzbiw zzbiw = (zzbiw) googleApiClient.zza(Drive.zzdwq);
-        if (this.zzgdu && !zzbiw.zzanm()) {
+    public final void zza(zzaw zzaw) {
+        if (this.zzam && !zzaw.zzag()) {
             throw new IllegalStateException("Application must define an exported DriveEventService subclass in AndroidManifest.xml to be notified on completion");
         }
+    }
+
+    public final String zzk() {
+        return this.zzal;
+    }
+
+    public final boolean zzl() {
+        return this.zzam;
+    }
+
+    public final int zzm() {
+        return this.zzan;
     }
 }

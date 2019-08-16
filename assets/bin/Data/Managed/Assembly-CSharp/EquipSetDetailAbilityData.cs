@@ -29,29 +29,22 @@ public class EquipSetDetailAbilityData : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0246: Expected O, but got Unknown
-		//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0245: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0281: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0283: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0287: Unknown result type (might be due to invalid IL or missing references)
 		//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0297: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
 		SetFullScreenButton((Enum)UI.BTN_OK);
 		SetFontStyle((Enum)UI.STR_TITLE, 2);
 		SetFontStyle((Enum)UI.STR_NEED_POINT, 2);
@@ -66,7 +59,7 @@ public class EquipSetDetailAbilityData : GameSection
 		else if (table != null)
 		{
 			SetLabelText((Enum)UI.LBL_DATA_NAME, table.name);
-			SetActive((Enum)UI.LBL_DESCRIPTION, true);
+			SetActive((Enum)UI.LBL_DESCRIPTION, is_visible: true);
 			SetLabelText((Enum)UI.LBL_DESCRIPTION, table.description);
 		}
 		else
@@ -77,55 +70,56 @@ public class EquipSetDetailAbilityData : GameSection
 		}
 		AbilityDataTable.AbilityData[] data = Singleton<AbilityDataTable>.I.GetAbilityDataArray(ability.id);
 		SetActive((Enum)UI.GRD_DATA_LIST, data != null);
-		if (data != null)
+		if (data == null)
 		{
-			SetGrid(UI.GRD_DATA_LIST, "EquipSetDetailAbilityDataItem", data.Length, false, delegate(int i, Transform t, bool is_recycle)
+			return;
+		}
+		SetGrid(UI.GRD_DATA_LIST, "EquipSetDetailAbilityDataItem", data.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
+		{
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			AbilityDataTable.AbilityData abilityData = data[i];
+			string text = string.Format(((int)abilityData.needAP < 0) ? "{0}" : "+{0}", abilityData.needAP);
+			SetLabelText(t, UI.LBL_ABILITY_DATA_NAME, abilityData.name);
+			SetLabelText(t, UI.LBL_AP, text);
+			bool flag = table != null && table.needAP == abilityData.needAP;
+			SetActive(t, UI.SPR_ABILITY_ON, flag);
+			Color color = (ability.ap != -1) ? Color.get_gray() : Color.get_white();
+			if (flag)
 			{
-				//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-				AbilityDataTable.AbilityData abilityData = data[i];
-				string text = string.Format(((int)abilityData.needAP < 0) ? "{0}" : "+{0}", abilityData.needAP);
-				SetLabelText(t, UI.LBL_ABILITY_DATA_NAME, abilityData.name);
-				SetLabelText(t, UI.LBL_AP, text);
-				bool flag = table != null && table.needAP == abilityData.needAP;
-				SetActive(t, UI.SPR_ABILITY_ON, flag);
-				Color color = (ability.ap != -1) ? Color.get_gray() : Color.get_white();
-				if (flag)
-				{
-					centeringIndex = i;
-					color = Color.get_white();
-				}
-				SetColor(t, UI.LBL_ABILITY_DATA_NAME, color);
-				SetColor(t, UI.LBL_AP, color);
-			});
-			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DATA_LIST);
-			if (component != null && component.get_enabled())
-			{
-				UIGrid component2 = base.GetComponent<UIGrid>((Enum)UI.GRD_DATA_LIST);
-				Vector2 viewSize = component.panel.GetViewSize();
-				float y = viewSize.y;
-				float cellHeight = component2.cellHeight;
-				int num = Mathf.RoundToInt(y / cellHeight);
-				int num2 = num / 2;
-				int num3 = -1;
-				if (centeringIndex > num2)
-				{
-					num3 = centeringIndex - num2;
-				}
-				Transform val = component.get_transform().FindChild("_DRAG_SCROLL_");
-				Vector3 position = component2.get_transform().get_position();
-				component.ResetPosition();
-				component.MoveRelative(new Vector3(0f, cellHeight * (float)num3));
-				Vector3 position2 = val.get_transform().get_position();
-				Vector3 position3 = component2.get_transform().get_position();
-				Vector3 val2 = position3 - position;
-				val.get_transform().set_position(position2 - val2);
+				centeringIndex = i;
+				color = Color.get_white();
 			}
+			SetColor(t, UI.LBL_ABILITY_DATA_NAME, color);
+			SetColor(t, UI.LBL_AP, color);
+		});
+		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DATA_LIST);
+		if (component != null && component.get_enabled())
+		{
+			UIGrid component2 = base.GetComponent<UIGrid>((Enum)UI.GRD_DATA_LIST);
+			Vector2 viewSize = component.panel.GetViewSize();
+			float y = viewSize.y;
+			float cellHeight = component2.cellHeight;
+			int num = Mathf.RoundToInt(y / cellHeight);
+			int num2 = num / 2;
+			int num3 = -1;
+			if (centeringIndex > num2)
+			{
+				num3 = centeringIndex - num2;
+			}
+			Transform val = component.get_transform().Find("_DRAG_SCROLL_");
+			Vector3 position = component2.get_transform().get_position();
+			component.ResetPosition();
+			component.MoveRelative(new Vector3(0f, cellHeight * (float)num3));
+			Vector3 position2 = val.get_transform().get_position();
+			Vector3 position3 = component2.get_transform().get_position();
+			Vector3 val2 = position3 - position;
+			val.get_transform().set_position(position2 - val2);
 		}
 	}
 }

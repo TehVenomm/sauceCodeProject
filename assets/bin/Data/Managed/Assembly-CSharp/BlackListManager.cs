@@ -68,7 +68,7 @@ public class BlackListManager : MonoBehaviourSingleton<BlackListManager>
 				obj = true;
 				if (MonoBehaviourSingleton<FriendManager>.IsValid())
 				{
-					MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(targetId, false);
+					MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(targetId, follow: false);
 				}
 				if (MonoBehaviourSingleton<QuestManager>.IsValid())
 				{
@@ -91,22 +91,6 @@ public class BlackListManager : MonoBehaviourSingleton<BlackListManager>
 			{
 				obj = true;
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void SendDebugRegsteredBlackList(int targetId, int delete, Action<bool> call_back)
-	{
-		DebugRegisteredBlackListModel.RequestSendForm requestSendForm = new DebugRegisteredBlackListModel.RequestSendForm();
-		requestSendForm.id = targetId;
-		requestSendForm.del = delete;
-		Protocol.Send(DebugRegisteredBlackListModel.URL, requestSendForm, delegate(DebugRegisteredBlackListModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
 			}
 			call_back(obj);
 		}, string.Empty);

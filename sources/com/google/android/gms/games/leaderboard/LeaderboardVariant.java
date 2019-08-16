@@ -1,7 +1,11 @@
 package com.google.android.gms.games.leaderboard;
 
 import com.google.android.gms.common.data.Freezable;
+import com.google.android.gms.common.util.VisibleForTesting;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
+@VisibleForTesting
 public interface LeaderboardVariant extends Freezable<LeaderboardVariant> {
     public static final int COLLECTION_PUBLIC = 0;
     @Deprecated
@@ -13,6 +17,14 @@ public interface LeaderboardVariant extends Freezable<LeaderboardVariant> {
     public static final int TIME_SPAN_ALL_TIME = 2;
     public static final int TIME_SPAN_DAILY = 0;
     public static final int TIME_SPAN_WEEKLY = 1;
+
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Collection {
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TimeSpan {
+    }
 
     int getCollection();
 
@@ -32,9 +44,9 @@ public interface LeaderboardVariant extends Freezable<LeaderboardVariant> {
 
     boolean hasPlayerInfo();
 
-    String zzarr();
+    String zzdk();
 
-    String zzars();
+    String zzdl();
 
-    String zzart();
+    String zzdm();
 }

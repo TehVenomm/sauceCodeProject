@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class EmptyScene
+public class EmptyScene : MonoBehaviour
 {
 	public static bool IsClearCache
 	{
@@ -27,7 +27,7 @@ public class EmptyScene
 			{
 				yield return (object)new WaitForEndOfFrame();
 			}
-			yield return (object)this.StartCoroutine(ResourceManager.ClearCache());
+			yield return this.StartCoroutine(ResourceManager.ClearCache());
 			yield return (object)new WaitForEndOfFrame();
 			yield return (object)new WaitForEndOfFrame();
 			yield return (object)new WaitForEndOfFrame();

@@ -14,10 +14,15 @@ public class ItemDetailSellBase : GameSection
 		SLD_SALE_NUM,
 		SPR_SALE_FRAME,
 		OBJ_MONEY_ROOT,
+		BTN_SALE_TP,
 		STR_TITLE_U,
 		STR_TITLE_D,
 		STR_SALE_NUM,
-		LBL_CAPTION
+		LBL_CAPTION,
+		LBL_SELL_GOLD_U,
+		LBL_SELL_GOLD_D,
+		LBL_SELL_TRADING_POST_U,
+		LBL_SELL_TRADING_POST_D
 	}
 
 	protected SortCompareData data;
@@ -30,6 +35,10 @@ public class ItemDetailSellBase : GameSection
 
 	public override void UpdateUI()
 	{
+		bool uiUpdateInstant = base.uiUpdateInstant;
+		base.uiUpdateInstant = true;
+		SetButtonEnabled((Enum)UI.BTN_SALE_TP, TradingPostManager.IsItemValid(data.GetTableID()));
+		base.uiUpdateInstant = uiUpdateInstant;
 		string key = "TEXT_SELL";
 		SetLabelText((Enum)UI.LBL_CAPTION, base.sectionData.GetText(key));
 		SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText(key));
@@ -39,6 +48,12 @@ public class ItemDetailSellBase : GameSection
 		SetProgressInt((Enum)UI.SLD_SALE_NUM, 1, 1, data.GetNum(), (EventDelegate.Callback)OnChagenSlider);
 		SetLabelText((Enum)UI.LBL_ITEM_NUM, data.GetNum().ToString());
 		SetLabelText((Enum)UI.LBL_MONEY, string.Format("{0, 8:#,0}", MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money));
+		string key3 = "STR_SELL_GOLD";
+		SetLabelText((Enum)UI.LBL_SELL_GOLD_U, base.sectionData.GetText(key3));
+		SetLabelText((Enum)UI.LBL_SELL_GOLD_D, base.sectionData.GetText(key3));
+		string key4 = "STR_SELL_TP";
+		SetLabelText((Enum)UI.LBL_SELL_TRADING_POST_U, base.sectionData.GetText(key4));
+		SetLabelText((Enum)UI.LBL_SELL_TRADING_POST_D, base.sectionData.GetText(key4));
 	}
 
 	private void OnChagenSlider()

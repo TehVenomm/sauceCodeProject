@@ -6,6 +6,9 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
     private static final long serialVersionUID = 86241875189L;
     private T value;
 
+    public MutableObject() {
+    }
+
     public MutableObject(T t) {
         this.value = t;
     }
@@ -32,7 +35,10 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
     }
 
     public int hashCode() {
-        return this.value == null ? 0 : this.value.hashCode();
+        if (this.value == null) {
+            return 0;
+        }
+        return this.value.hashCode();
     }
 
     public String toString() {

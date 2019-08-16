@@ -73,8 +73,8 @@ public class PurchaseDetails {
         return this.verificationStatus;
     }
 
-    public void setVerificationStatus(VerificationStatus verificationStatus) {
-        this.verificationStatus = verificationStatus;
+    public void setVerificationStatus(VerificationStatus verificationStatus2) {
+        this.verificationStatus = verificationStatus2;
     }
 
     public boolean isSandbox() {

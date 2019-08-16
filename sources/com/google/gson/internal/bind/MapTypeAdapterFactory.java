@@ -18,12 +18,12 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 public final class MapTypeAdapterFactory implements TypeAdapterFactory {
-    private final boolean complexMapKeySerialization;
+    /* access modifiers changed from: private */
+    public final boolean complexMapKeySerialization;
     private final ConstructorConstructor constructorConstructor;
 
     private final class Adapter<K, V> extends TypeAdapter<Map<K, V>> {
@@ -64,12 +64,11 @@ public final class MapTypeAdapterFactory implements TypeAdapterFactory {
                 return null;
             }
             Map<K, V> map = (Map) this.constructor.construct();
-            Object read;
             if (peek == JsonToken.BEGIN_ARRAY) {
                 jsonReader.beginArray();
                 while (jsonReader.hasNext()) {
                     jsonReader.beginArray();
-                    read = this.keyTypeAdapter.read(jsonReader);
+                    Object read = this.keyTypeAdapter.read(jsonReader);
                     if (map.put(read, this.valueTypeAdapter.read(jsonReader)) != null) {
                         throw new JsonSyntaxException("duplicate key: " + read);
                     }
@@ -81,9 +80,9 @@ public final class MapTypeAdapterFactory implements TypeAdapterFactory {
             jsonReader.beginObject();
             while (jsonReader.hasNext()) {
                 JsonReaderInternalAccess.INSTANCE.promoteNameToValue(jsonReader);
-                read = this.keyTypeAdapter.read(jsonReader);
-                if (map.put(read, this.valueTypeAdapter.read(jsonReader)) != null) {
-                    throw new JsonSyntaxException("duplicate key: " + read);
+                Object read2 = this.keyTypeAdapter.read(jsonReader);
+                if (map.put(read2, this.valueTypeAdapter.read(jsonReader)) != null) {
+                    throw new JsonSyntaxException("duplicate key: " + read2);
                 }
             }
             jsonReader.endObject();
@@ -94,18 +93,24 @@ public final class MapTypeAdapterFactory implements TypeAdapterFactory {
             int i = 0;
             if (map == null) {
                 jsonWriter.nullValue();
-            } else if (MapTypeAdapterFactory.this.complexMapKeySerialization) {
-                List arrayList = new ArrayList(map.size());
-                List arrayList2 = new ArrayList(map.size());
-                int i2 = 0;
+            } else if (!MapTypeAdapterFactory.this.complexMapKeySerialization) {
+                jsonWriter.beginObject();
                 for (Entry entry : map.entrySet()) {
-                    JsonElement toJsonTree = this.keyTypeAdapter.toJsonTree(entry.getKey());
-                    arrayList.add(toJsonTree);
-                    arrayList2.add(entry.getValue());
-                    int i3 = (toJsonTree.isJsonArray() || toJsonTree.isJsonObject()) ? 1 : 0;
-                    i2 = i3 | i2;
+                    jsonWriter.name(String.valueOf(entry.getKey()));
+                    this.valueTypeAdapter.write(jsonWriter, entry.getValue());
                 }
-                if (i2 != 0) {
+                jsonWriter.endObject();
+            } else {
+                ArrayList arrayList = new ArrayList(map.size());
+                ArrayList arrayList2 = new ArrayList(map.size());
+                boolean z = false;
+                for (Entry entry2 : map.entrySet()) {
+                    JsonElement jsonTree = this.keyTypeAdapter.toJsonTree(entry2.getKey());
+                    arrayList.add(jsonTree);
+                    arrayList2.add(entry2.getValue());
+                    z = (jsonTree.isJsonArray() || jsonTree.isJsonObject()) | z;
+                }
+                if (z) {
                     jsonWriter.beginArray();
                     while (i < arrayList.size()) {
                         jsonWriter.beginArray();
@@ -124,19 +129,12 @@ public final class MapTypeAdapterFactory implements TypeAdapterFactory {
                     i++;
                 }
                 jsonWriter.endObject();
-            } else {
-                jsonWriter.beginObject();
-                for (Entry entry2 : map.entrySet()) {
-                    jsonWriter.name(String.valueOf(entry2.getKey()));
-                    this.valueTypeAdapter.write(jsonWriter, entry2.getValue());
-                }
-                jsonWriter.endObject();
             }
         }
     }
 
-    public MapTypeAdapterFactory(ConstructorConstructor constructorConstructor, boolean z) {
-        this.constructorConstructor = constructorConstructor;
+    public MapTypeAdapterFactory(ConstructorConstructor constructorConstructor2, boolean z) {
+        this.constructorConstructor = constructorConstructor2;
         this.complexMapKeySerialization = z;
     }
 

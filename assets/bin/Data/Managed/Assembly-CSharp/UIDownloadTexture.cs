@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(UITexture))]
-public class UIDownloadTexture
+public class UIDownloadTexture : MonoBehaviour
 {
 	public string url = "http://www.yourwebsite.com/logo.png";
 
@@ -18,15 +18,15 @@ public class UIDownloadTexture
 	private IEnumerator Start()
 	{
 		WWW www = new WWW(url);
-		yield return (object)www;
+		yield return www;
 		mTex = www.get_texture();
 		if (mTex != null)
 		{
-			UITexture ut = this.GetComponent<UITexture>();
-			ut.mainTexture = mTex;
+			UITexture component = this.GetComponent<UITexture>();
+			component.mainTexture = mTex;
 			if (pixelPerfect)
 			{
-				ut.MakePixelPerfect();
+				component.MakePixelPerfect();
 			}
 		}
 		www.Dispose();

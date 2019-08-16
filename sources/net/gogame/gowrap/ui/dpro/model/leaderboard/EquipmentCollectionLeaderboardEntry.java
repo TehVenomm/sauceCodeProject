@@ -1,21 +1,26 @@
-package net.gogame.gowrap.ui.dpro.model.leaderboard;
+package net.gogame.gowrap.p019ui.dpro.model.leaderboard;
 
 import android.util.JsonReader;
 import java.io.IOException;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.leaderboard.EquipmentCollectionLeaderboardEntry */
 public class EquipmentCollectionLeaderboardEntry extends LeaderboardEntry {
     private static final String KEY_EQUIPMENT_COUNT = "equipmentCount";
     private static final String KEY_POINTS = "points";
     private Integer equipmentCount;
     private Long points;
 
+    public EquipmentCollectionLeaderboardEntry() {
+    }
+
     public EquipmentCollectionLeaderboardEntry(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_EQUIPMENT_COUNT)) {
             this.equipmentCount = JSONUtils.optInt(jsonReader);
             return true;

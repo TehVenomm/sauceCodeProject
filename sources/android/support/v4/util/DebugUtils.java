@@ -1,13 +1,14 @@
-package android.support.v4.util;
+package android.support.p000v4.util;
 
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 
 @RestrictTo({Scope.LIBRARY_GROUP})
+/* renamed from: android.support.v4.util.DebugUtils */
 public class DebugUtils {
-    public static void buildShortClassTag(Object obj, StringBuilder stringBuilder) {
+    public static void buildShortClassTag(Object obj, StringBuilder sb) {
         if (obj == null) {
-            stringBuilder.append("null");
+            sb.append("null");
             return;
         }
         String simpleName = obj.getClass().getSimpleName();
@@ -18,8 +19,8 @@ public class DebugUtils {
                 simpleName = simpleName.substring(lastIndexOf + 1);
             }
         }
-        stringBuilder.append(simpleName);
-        stringBuilder.append('{');
-        stringBuilder.append(Integer.toHexString(System.identityHashCode(obj)));
+        sb.append(simpleName);
+        sb.append('{');
+        sb.append(Integer.toHexString(System.identityHashCode(obj)));
     }
 }

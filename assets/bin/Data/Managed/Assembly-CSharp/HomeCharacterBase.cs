@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class HomeCharacterBase
+public abstract class HomeCharacterBase : MonoBehaviour
 {
 	public enum STATE
 	{
@@ -28,7 +28,7 @@ public abstract class HomeCharacterBase
 
 	protected int sexType;
 
-	protected HomePeople homePeople;
+	protected IHomePeople iHomePeople;
 
 	protected Transform namePlate;
 
@@ -103,9 +103,9 @@ public abstract class HomeCharacterBase
 	//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 
 
-	public void SetHomePeople(HomePeople homePeople)
+	public void SetHomePeople(IHomePeople homePeople)
 	{
-		this.homePeople = homePeople;
+		iHomePeople = homePeople;
 	}
 
 	public void SetWaitTime(float time)
@@ -169,11 +169,11 @@ public abstract class HomeCharacterBase
 			state = STATE.STOP;
 			if (this is HomePlayerCharacter)
 			{
-				animCtrl.PlayIdleAnims(sexType, false);
+				animCtrl.PlayIdleAnims(sexType);
 			}
 			if (this is LoungeMoveNPC)
 			{
-				animCtrl.PlayDefault(false);
+				animCtrl.PlayDefault();
 			}
 			coroutines.Push(4);
 		}
@@ -181,7 +181,6 @@ public abstract class HomeCharacterBase
 
 	public void SetVisible(bool is_visible)
 	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null) && !isLoading)
 		{
 			loader.SetEnabled(is_visible);
@@ -209,8 +208,6 @@ public abstract class HomeCharacterBase
 
 	protected void SetCollider(float height, float radius)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		Rigidbody val = this.get_gameObject().AddComponent<Rigidbody>();
 		val.set_isKinematic(true);
@@ -240,18 +237,16 @@ public abstract class HomeCharacterBase
 	{
 		if (this is LoungeMoveNPC)
 		{
-			animCtrl.PlayDefault(false);
+			animCtrl.PlayDefault();
 		}
 		else
 		{
-			animCtrl.PlayIdleAnims(sexType, false);
+			animCtrl.PlayIdleAnims(sexType);
 		}
 	}
 
 	private void Awake()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
 		isLoading = true;
 		_transform = this.get_transform();
 	}
@@ -259,27 +254,55 @@ public abstract class HomeCharacterBase
 	private IEnumerator Start()
 	{
 		loader = LoadModel();
-		while (loader.IsLoading())
+		if (!(this is HomePlayerCharacter))
 		{
-			yield return (object)null;
+			while (loader.IsLoading())
+			{
+				yield return null;
+			}
+			CreateNamePlate();
+			UpdateNamePlatePos();
+			InitCollider();
+			ChangeScale();
+			interpolator = this.get_gameObject().AddComponent<TransformInterpolator>();
+			animator = loader.GetAnimator();
+			if (!(animator == null))
+			{
+				animator.get_gameObject().AddComponent<RootMotionProxy>();
+				InitAnim();
+				coroutines.Add(new ManualCoroutine(0, this, DoFreeMove(), _active: false));
+				coroutines.Add(new ManualCoroutine(1, this, DoOutControll(), _active: false));
+				coroutines.Add(new ManualCoroutine(2, this, DoBackPosition(), _active: false));
+				coroutines.Add(new ManualCoroutine(3, this, DoLeave(), _active: false));
+				coroutines.Add(new ManualCoroutine(4, this, DoStop(), _active: false));
+				coroutines.Push(0);
+				isLoading = false;
+			}
 		}
-		CreateNamePlate();
-		UpdateNamePlatePos();
-		InitCollider();
-		ChangeScale();
-		interpolator = this.get_gameObject().AddComponent<TransformInterpolator>();
-		animator = loader.GetAnimator();
-		if (!(animator == null))
+		else
 		{
-			animator.get_gameObject().AddComponent<RootMotionProxy>();
-			InitAnim();
-			coroutines.Add(new ManualCoroutine(0, this, DoFreeMove(), false, null, null));
-			coroutines.Add(new ManualCoroutine(1, this, DoOutControll(), false, null, null));
-			coroutines.Add(new ManualCoroutine(2, this, DoBackPosition(), false, null, null));
-			coroutines.Add(new ManualCoroutine(3, this, DoLeave(), false, null, null));
-			coroutines.Add(new ManualCoroutine(4, this, DoStop(), false, null, null));
-			coroutines.Push(0);
 			isLoading = false;
+			while (loader.IsLoading())
+			{
+				yield return null;
+			}
+			CreateNamePlate();
+			UpdateNamePlatePos();
+			InitCollider();
+			ChangeScale();
+			interpolator = this.get_gameObject().AddComponent<TransformInterpolator>();
+			animator = loader.GetAnimator();
+			if (!(animator == null))
+			{
+				animator.get_gameObject().AddComponent<RootMotionProxy>();
+				InitAnim();
+				coroutines.Add(new ManualCoroutine(0, this, DoFreeMove(), _active: false));
+				coroutines.Add(new ManualCoroutine(1, this, DoOutControll(), _active: false));
+				coroutines.Add(new ManualCoroutine(2, this, DoBackPosition(), _active: false));
+				coroutines.Add(new ManualCoroutine(3, this, DoLeave(), _active: false));
+				coroutines.Add(new ManualCoroutine(4, this, DoStop(), _active: false));
+				coroutines.Push(0);
+			}
 		}
 	}
 
@@ -302,7 +325,6 @@ public abstract class HomeCharacterBase
 
 	protected virtual void UpdateNamePlatePos()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
@@ -313,31 +335,28 @@ public abstract class HomeCharacterBase
 		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		if (!(namePlate == null))
+		if (namePlate == null)
 		{
-			if (!GameSaveData.instance.headName)
-			{
-				namePlate.get_gameObject().SetActive(false);
-			}
-			else
-			{
-				Vector3 val = _transform.get_position() + new Vector3(0f, 1.9f, 0f);
-				val = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(val);
-				val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-				if (val.z >= 0f && IsVisibleNamePlate())
-				{
-					val.z = 0f;
-					namePlate.get_gameObject().SetActive(true);
-					namePlate.set_position(val);
-				}
-				else
-				{
-					namePlate.get_gameObject().SetActive(false);
-				}
-			}
+			return;
+		}
+		if (!GameSaveData.instance.headName)
+		{
+			namePlate.get_gameObject().SetActive(false);
+			return;
+		}
+		Vector3 val = _transform.get_position() + new Vector3(0f, 1.9f, 0f);
+		val = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(val);
+		val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
+		if (val.z >= 0f && IsVisibleNamePlate())
+		{
+			val.z = 0f;
+			namePlate.get_gameObject().SetActive(true);
+			namePlate.set_position(val);
+		}
+		else
+		{
+			namePlate.get_gameObject().SetActive(false);
 		}
 	}
 
@@ -367,12 +386,11 @@ public abstract class HomeCharacterBase
 
 	protected virtual void OnDestroy()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (!AppMain.isApplicationQuit)
 		{
-			if (homePeople != null)
+			if (iHomePeople != null)
 			{
-				homePeople.OnDestroyHomeCharacter(this);
+				iHomePeople.OnDestroyHomeCharacter(this);
 			}
 			if (namePlate != null)
 			{
@@ -389,27 +407,28 @@ public abstract class HomeCharacterBase
 			if (waitTime > 0f)
 			{
 				WaitInFreeMove();
-				yield return (object)null;
+				yield return null;
+				continue;
 			}
-			else if (discussionTimer != 0f)
+			if (discussionTimer != 0f)
 			{
 				if (discussionTimer < 0f)
 				{
-					if (this is HomeNPCCharacter && homePeople.selfChara != null)
+					if (this is HomeNPCCharacter && iHomePeople.selfChara != null)
 					{
 						HomeNPCCharacter npc = (HomeNPCCharacter)this;
 						if (npc != null && npc.nearAnim != PLCA.IDLE_01)
 						{
-							Vector2 val = homePeople.selfChara._transform.get_position().ToVector2XZ() - _transform.get_position().ToVector2XZ();
+							Vector2 val = iHomePeople.selfChara._transform.get_position().ToVector2XZ() - _transform.get_position().ToVector2XZ();
 							if (val.get_sqrMagnitude() < 9f)
 							{
 								PlayNearAnim(npc);
 							}
 							else if (animCtrl.playingAnim != animCtrl.defaultAnim)
 							{
-								animCtrl.PlayDefault(false);
+								animCtrl.PlayDefault();
 							}
-							yield return (object)null;
+							yield return null;
 							continue;
 						}
 					}
@@ -417,17 +436,17 @@ public abstract class HomeCharacterBase
 					{
 						if (Random.Range(0, 10) == 0)
 						{
-							animCtrl.Play(PlayerAnimCtrl.emotionAnims, false);
+							animCtrl.Play(PlayerAnimCtrl.emotionAnims);
 							discussionTimer = Random.Range(2f, 4f);
 						}
 						else if (Random.Range(0, 2) == 0)
 						{
-							animCtrl.Play(PlayerAnimCtrl.talkAnims, false);
+							animCtrl.Play(PlayerAnimCtrl.talkAnims);
 							discussionTimer = Random.Range(5f, 10f);
 						}
 						else
 						{
-							animCtrl.PlayIdleAnims(sexType, false);
+							animCtrl.PlayIdleAnims(sexType);
 							discussionTimer = Random.Range(3f, 6f);
 						}
 					}
@@ -436,86 +455,78 @@ public abstract class HomeCharacterBase
 				{
 					discussionTimer -= Time.get_deltaTime();
 				}
-				yield return (object)null;
+				yield return null;
+				continue;
 			}
-			else
+			SetupNextWayPoint();
+			yield return null;
+			IHomeManager iHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+			moveTargetPos = iHomeManager.IHomePeople.GetTargetPos(this, wayPoint);
+			while (true)
 			{
-				SetupNextWayPoint();
-				yield return (object)null;
-				if (MonoBehaviourSingleton<HomeManager>.IsValid())
-				{
-					moveTargetPos = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetTargetPos(this, wayPoint);
-				}
-				else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-				{
-					moveTargetPos = MonoBehaviourSingleton<LoungeManager>.I.HomePeople.GetTargetPos(this, wayPoint);
-				}
-				while (true)
-				{
-					animCtrl.PlayMove(false);
-					Vector3 pos = _transform.get_position();
-					Vector3 diff = moveTargetPos - pos;
-					Vector2 val2 = diff.ToVector2XZ();
-					Vector2 dir3 = val2.get_normalized();
-					Quaternion val3 = Quaternion.LookRotation(dir3.ToVector3XZ());
-					Vector3 eulerAngles = val3.get_eulerAngles();
-					float rot2 = eulerAngles.y;
-					float vel2 = 0f;
-					Vector3 eulerAngles2 = _transform.get_eulerAngles();
-					rot2 = Mathf.SmoothDampAngle(eulerAngles2.y, rot2, ref vel2, 0.1f);
-					_transform.set_eulerAngles(new Vector3(0f, rot2, 0f));
-					if (diff.get_magnitude() < 0.75f)
-					{
-						break;
-					}
-					yield return (object)null;
-				}
-				if (wayPoint.get_name().StartsWith("LEAF"))
+				animCtrl.PlayMove();
+				Vector3 pos = _transform.get_position();
+				Vector3 diff = moveTargetPos - pos;
+				Vector2 val2 = diff.ToVector2XZ();
+				Vector2 dir3 = val2.get_normalized();
+				Quaternion val3 = Quaternion.LookRotation(dir3.ToVector3XZ());
+				Vector3 eulerAngles = val3.get_eulerAngles();
+				float y = eulerAngles.y;
+				float num = 0f;
+				Vector3 eulerAngles2 = _transform.get_eulerAngles();
+				y = Mathf.SmoothDampAngle(eulerAngles2.y, y, ref num, 0.1f);
+				_transform.set_eulerAngles(new Vector3(0f, y, 0f));
+				if (diff.get_magnitude() < 0.75f)
 				{
 					break;
 				}
-				if (wayPoint.get_name().StartsWith("WAIT"))
+				yield return null;
+			}
+			if (wayPoint.get_name().StartsWith("LEAF"))
+			{
+				break;
+			}
+			if (wayPoint.get_name().StartsWith("WAIT"))
+			{
+				while (true)
 				{
-					while (true)
+					Vector3 eulerAngles3 = wayPoint.get_transform().get_eulerAngles();
+					float dir2 = eulerAngles3.y;
+					float vel2 = 0f;
+					Vector3 eulerAngles4 = _transform.get_eulerAngles();
+					dir2 = Mathf.SmoothDampAngle(eulerAngles4.y, dir2, ref vel2, 0.1f);
+					_transform.set_eulerAngles(new Vector3(0f, dir2, 0f));
+					vel2 = Mathf.Abs(vel2);
+					if (vel2 > 15f)
 					{
-						Vector3 eulerAngles3 = wayPoint.get_transform().get_eulerAngles();
-						float dir2 = eulerAngles3.y;
-						float vel = 0f;
-						Vector3 eulerAngles4 = _transform.get_eulerAngles();
-						dir2 = Mathf.SmoothDampAngle(eulerAngles4.y, dir2, ref vel, 0.1f);
-						_transform.set_eulerAngles(new Vector3(0f, dir2, 0f));
-						vel = Mathf.Abs(vel);
-						if (vel > 15f)
-						{
-							animCtrl.Play(PLCA.WALK, false);
-						}
-						else if (!string.IsNullOrEmpty(wayPoint.waitAnimStateName))
-						{
-							PLCA motion = PlayerAnimCtrl.StringToEnum(wayPoint.waitAnimStateName);
-							animCtrl.Play(motion, false);
-						}
-						else if (this is LoungeMoveNPC)
-						{
-							animCtrl.PlayDefault(false);
-						}
-						else
-						{
-							animCtrl.PlayIdleAnims(sexType, false);
-						}
-						animator.set_applyRootMotion(false);
-						if (vel < 0.01f)
-						{
-							break;
-						}
-						yield return (object)null;
+						animCtrl.Play(PLCA.WALK);
 					}
-					animCtrl.PlayIdleAnims(sexType, false);
-					waitTime = Random.Range(3f, 8f);
+					else if (!string.IsNullOrEmpty(wayPoint.waitAnimStateName))
+					{
+						PLCA anim = PlayerAnimCtrl.StringToEnum(wayPoint.waitAnimStateName);
+						animCtrl.Play(anim);
+					}
+					else if (this is LoungeMoveNPC)
+					{
+						animCtrl.PlayDefault();
+					}
+					else
+					{
+						animCtrl.PlayIdleAnims(sexType);
+					}
+					animator.set_applyRootMotion(false);
+					if (vel2 < 0.01f)
+					{
+						break;
+					}
+					yield return null;
 				}
-				else if (wayPoint.get_name() == "CENTER")
-				{
-					waitTime = Random.Range(-3f, 8f);
-				}
+				animCtrl.PlayIdleAnims(sexType);
+				waitTime = Random.Range(3f, 8f);
+			}
+			else if (wayPoint.get_name() == "CENTER")
+			{
+				waitTime = Random.Range(-3f, 8f);
 			}
 		}
 		Object.Destroy(this.get_gameObject());
@@ -523,7 +534,7 @@ public abstract class HomeCharacterBase
 
 	protected virtual void PlayNearAnim(HomeNPCCharacter npc)
 	{
-		animCtrl.Play(npc.nearAnim, false);
+		animCtrl.Play(npc.nearAnim);
 	}
 
 	private void WaitInFreeMove()
@@ -532,15 +543,15 @@ public abstract class HomeCharacterBase
 		if (!string.IsNullOrEmpty(wayPoint.waitAnimStateName))
 		{
 			PLCA anim = PlayerAnimCtrl.StringToEnum(wayPoint.waitAnimStateName);
-			animCtrl.Play(anim, false);
+			animCtrl.Play(anim);
 		}
 		else if (this is LoungeMoveNPC)
 		{
-			animCtrl.PlayDefault(false);
+			animCtrl.PlayDefault();
 		}
 		else
 		{
-			animCtrl.PlayIdleAnims(sexType, false);
+			animCtrl.PlayIdleAnims(sexType);
 		}
 	}
 
@@ -574,7 +585,7 @@ public abstract class HomeCharacterBase
 	{
 		while (true)
 		{
-			yield return (object)null;
+			yield return null;
 		}
 	}
 
@@ -582,44 +593,44 @@ public abstract class HomeCharacterBase
 	{
 		while (true)
 		{
-			yield return (object)null;
+			yield return null;
 			float maxAngle = 320f;
 			_transform.set_rotation(Quaternion.AngleAxis(maxAngle, Vector3.get_up()));
 			animCtrl.SetMoveRunAnim(1);
-			animCtrl.Play(PLCA.RUN_F, false);
-			float capability = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.npc00StunCapability;
+			animCtrl.Play(PLCA.RUN_F);
+			float stumblePercent = Singleton<HomeThemeTable>.I.GetHomeThemeData(TimeManager.GetNow()).stumblePercent;
 			Vector3 savePos2;
-			if (capability >= Random.Range(0f, 1f))
+			if (stumblePercent > (float)Random.Range(0, 100))
 			{
 				yield return (object)new WaitForSeconds(0.5f);
 				animCtrl.moveAnim = PLCA.STUN;
-				animCtrl.Play(PLCA.STUN, false);
+				animCtrl.Play(PLCA.STUN);
 				yield return (object)new WaitForSeconds(0.5f);
 				savePos2 = _transform.get_position();
 				while (!animCtrl.IsPlayingIdleAnims(0))
 				{
 					_transform.set_position(savePos2);
-					yield return (object)null;
+					yield return null;
 				}
 				animCtrl.moveAnim = PLCA.RUN_F;
-				animCtrl.Play(PLCA.RUN_F, false);
+				animCtrl.Play(PLCA.RUN_F);
 			}
 			Vector3 startDir = defaultPosition - _transform.get_position();
 			startDir.Normalize();
 			while (!CheckBackPosition(startDir))
 			{
-				yield return (object)null;
+				yield return null;
 			}
-			animCtrl.PlayDefault(false);
+			animCtrl.PlayDefault();
 			yield return (object)new WaitForSeconds(0.3f);
 			savePos2 = _transform.get_position();
 			animCtrl.moveAnim = PLCA.TURN_L;
-			animCtrl.Play(PLCA.TURN_L, false);
-			yield return (object)null;
+			animCtrl.Play(PLCA.TURN_L);
+			yield return null;
 			while (!animCtrl.IsPlayingIdleAnims(0))
 			{
 				_transform.set_position(savePos2);
-				yield return (object)null;
+				yield return null;
 			}
 			animCtrl.SetMoveRunAnim(1);
 			coroutines.Pop();
@@ -631,10 +642,10 @@ public abstract class HomeCharacterBase
 	{
 		while (true)
 		{
-			yield return (object)null;
+			yield return null;
 			while (!animCtrl.IsPlayingIdleAnims(0))
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			this.get_gameObject().SetActive(false);
 			coroutines.Pop();
@@ -646,22 +657,22 @@ public abstract class HomeCharacterBase
 	{
 		while (true)
 		{
-			yield return (object)null;
+			yield return null;
 			if (this is HomePlayerCharacter)
 			{
-				animCtrl.Play(talkAnims, false);
+				animCtrl.Play(talkAnims);
 			}
 			while (!GetSelfCharacter().IsEnableControl())
 			{
-				yield return (object)null;
+				yield return null;
 			}
 			if (this is HomePlayerCharacter)
 			{
-				animCtrl.PlayIdleAnims(sexType, false);
+				animCtrl.PlayIdleAnims(sexType);
 			}
 			if (this is LoungeMoveNPC)
 			{
-				animCtrl.PlayDefault(false);
+				animCtrl.PlayDefault();
 			}
 			coroutines.Pop();
 			state = (STATE)coroutines.Peek();
@@ -670,6 +681,7 @@ public abstract class HomeCharacterBase
 
 	private HomeSelfCharacter GetSelfCharacter()
 	{
-		return MonoBehaviourSingleton<HomeManager>.IsValid() ? MonoBehaviourSingleton<HomeManager>.I.HomePeople.selfChara : ((!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? MonoBehaviourSingleton<GuildStageManager>.I.HomePeople.selfChara : MonoBehaviourSingleton<LoungeManager>.I.HomePeople.selfChara);
+		IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+		return currentIHomeManager.IHomePeople.selfChara;
 	}
 }

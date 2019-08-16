@@ -67,7 +67,7 @@ public class WorldMapSelectDifficultyDialog : GameSection
 		}
 		else
 		{
-			GameSection.ChangeEvent("HARD_NOT_OPEN", null);
+			GameSection.ChangeEvent("HARD_NOT_OPEN");
 		}
 	}
 }

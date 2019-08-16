@@ -1,28 +1,26 @@
 package com.fasterxml.jackson.databind.deser.std;
 
-import android.support.v4.media.TransportMediator;
 import com.fasterxml.jackson.core.Base64Variants;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.google.android.gms.games.Notifications;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
 public class UUIDDeserializer extends FromStringDeserializer<UUID> {
-    static final int[] HEX_DIGITS = new int[TransportMediator.KEYCODE_MEDIA_PAUSE];
+    static final int[] HEX_DIGITS = new int[Notifications.NOTIFICATION_TYPES_ALL];
     private static final long serialVersionUID = 1;
 
     static {
-        int i = 0;
         Arrays.fill(HEX_DIGITS, -1);
-        for (int i2 = 0; i2 < 10; i2++) {
-            HEX_DIGITS[i2 + 48] = i2;
+        for (int i = 0; i < 10; i++) {
+            HEX_DIGITS[i + 48] = i;
         }
-        while (i < 6) {
-            HEX_DIGITS[i + 97] = i + 10;
-            HEX_DIGITS[i + 65] = i + 10;
-            i++;
+        for (int i2 = 0; i2 < 6; i2++) {
+            HEX_DIGITS[i2 + 97] = i2 + 10;
+            HEX_DIGITS[i2 + 65] = i2 + 10;
         }
     }
 
@@ -30,7 +28,8 @@ public class UUIDDeserializer extends FromStringDeserializer<UUID> {
         super(UUID.class);
     }
 
-    protected UUID _deserialize(String str, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public UUID _deserialize(String str, DeserializationContext deserializationContext) throws IOException {
         if (str.length() != 36) {
             if (str.length() == 24) {
                 return _fromBytes(Base64Variants.getDefaultVariant().decode(str), deserializationContext);
@@ -43,7 +42,8 @@ public class UUIDDeserializer extends FromStringDeserializer<UUID> {
         return new UUID(((((long) shortFromChars(str, 9, deserializationContext)) << 16) | ((long) shortFromChars(str, 14, deserializationContext))) + (((long) intFromChars(str, 0, deserializationContext)) << 32), ((((long) intFromChars(str, 28, deserializationContext)) << 32) >>> 32) | (((long) ((shortFromChars(str, 19, deserializationContext) << 16) | shortFromChars(str, 24, deserializationContext))) << 32));
     }
 
-    protected UUID _deserializeEmbedded(Object obj, DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public UUID _deserializeEmbedded(Object obj, DeserializationContext deserializationContext) throws IOException {
         if (obj instanceof byte[]) {
             return _fromBytes((byte[]) obj, deserializationContext);
         }
@@ -56,7 +56,7 @@ public class UUIDDeserializer extends FromStringDeserializer<UUID> {
     }
 
     static int intFromChars(String str, int i, DeserializationContext deserializationContext) throws JsonMappingException {
-        return (((byteFromChars(str, i, deserializationContext) << 24) + (byteFromChars(str, i + 2, deserializationContext) << 16)) + (byteFromChars(str, i + 4, deserializationContext) << 8)) + byteFromChars(str, i + 6, deserializationContext);
+        return (byteFromChars(str, i, deserializationContext) << 24) + (byteFromChars(str, i + 2, deserializationContext) << 16) + (byteFromChars(str, i + 4, deserializationContext) << 8) + byteFromChars(str, i + 6, deserializationContext);
     }
 
     static int shortFromChars(String str, int i, DeserializationContext deserializationContext) throws JsonMappingException {
@@ -66,13 +66,13 @@ public class UUIDDeserializer extends FromStringDeserializer<UUID> {
     static int byteFromChars(String str, int i, DeserializationContext deserializationContext) throws JsonMappingException {
         char charAt = str.charAt(i);
         char charAt2 = str.charAt(i + 1);
-        if (charAt <= '' && charAt2 <= '') {
+        if (charAt <= 127 && charAt2 <= 127) {
             int i2 = (HEX_DIGITS[charAt] << 4) | HEX_DIGITS[charAt2];
             if (i2 >= 0) {
                 return i2;
             }
         }
-        if (charAt > '' || HEX_DIGITS[charAt] < 0) {
+        if (charAt > 127 || HEX_DIGITS[charAt] < 0) {
             return _badChar(str, i, deserializationContext, charAt);
         }
         return _badChar(str, i + 1, deserializationContext, charAt2);
@@ -94,6 +94,6 @@ public class UUIDDeserializer extends FromStringDeserializer<UUID> {
     }
 
     private static int _int(byte[] bArr, int i) {
-        return (((bArr[i] << 24) | ((bArr[i + 1] & 255) << 16)) | ((bArr[i + 2] & 255) << 8)) | (bArr[i + 3] & 255);
+        return (bArr[i] << 24) | ((bArr[i + 1] & 255) << 16) | ((bArr[i + 2] & 255) << 8) | (bArr[i + 3] & 255);
     }
 }

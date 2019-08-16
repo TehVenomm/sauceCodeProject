@@ -1,8 +1,9 @@
-package android.support.v7.widget;
+package android.support.p003v7.widget;
 
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+/* renamed from: android.support.v7.widget.CardViewDelegate */
 interface CardViewDelegate {
     Drawable getCardBackground();
 

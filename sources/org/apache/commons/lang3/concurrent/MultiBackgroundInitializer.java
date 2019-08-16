@@ -2,6 +2,7 @@ package org.apache.commons.lang3.concurrent;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -58,6 +59,9 @@ public class MultiBackgroundInitializer extends BackgroundInitializer<MultiBackg
         }
     }
 
+    public MultiBackgroundInitializer() {
+    }
+
     public MultiBackgroundInitializer(ExecutorService executorService) {
         super(executorService);
     }
@@ -77,16 +81,22 @@ public class MultiBackgroundInitializer extends BackgroundInitializer<MultiBackg
         }
     }
 
-    protected int getTaskCount() {
+    /* access modifiers changed from: protected */
+    public int getTaskCount() {
         int i = 1;
-        for (BackgroundInitializer taskCount : this.childInitializers.values()) {
-            i = taskCount.getTaskCount() + i;
+        Iterator it = this.childInitializers.values().iterator();
+        while (true) {
+            int i2 = i;
+            if (!it.hasNext()) {
+                return i2;
+            }
+            i = ((BackgroundInitializer) it.next()).getTaskCount() + i2;
         }
-        return i;
     }
 
-    protected MultiBackgroundInitializerResults initialize() throws Exception {
-        Map hashMap;
+    /* access modifiers changed from: protected */
+    public MultiBackgroundInitializerResults initialize() throws Exception {
+        HashMap hashMap;
         synchronized (this) {
             hashMap = new HashMap(this.childInitializers);
         }
@@ -97,8 +107,8 @@ public class MultiBackgroundInitializer extends BackgroundInitializer<MultiBackg
             }
             backgroundInitializer.start();
         }
-        Map hashMap2 = new HashMap();
-        Map hashMap3 = new HashMap();
+        HashMap hashMap2 = new HashMap();
+        HashMap hashMap3 = new HashMap();
         for (Entry entry : hashMap.entrySet()) {
             try {
                 hashMap2.put(entry.getKey(), ((BackgroundInitializer) entry.getValue()).get());

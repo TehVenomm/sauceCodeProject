@@ -50,6 +50,6 @@ public class Goal_Move : Goal
 	public override string ToStringGoal()
 	{
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		return string.Concat((object)base.ToStringGoal(), (object)" targetPos=", (object)targetPos);
+		return base.ToStringGoal() + " targetPos=" + targetPos;
 	}
 }

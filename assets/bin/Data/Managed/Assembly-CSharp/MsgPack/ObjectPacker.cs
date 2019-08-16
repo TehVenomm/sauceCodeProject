@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using UnityEngine;
@@ -19,6 +20,36 @@ namespace MsgPack
 		private static Dictionary<Type, PackDelegate> PackerMapping;
 
 		private static Dictionary<Type, UnpackDelegate> UnpackerMapping;
+
+		[CompilerGenerated]
+		private static PackDelegate _003C_003Ef__mg_0024cache0;
+
+		[CompilerGenerated]
+		private static UnpackDelegate _003C_003Ef__mg_0024cache1;
+
+		[CompilerGenerated]
+		private static PackDelegate _003C_003Ef__mg_0024cache2;
+
+		[CompilerGenerated]
+		private static UnpackDelegate _003C_003Ef__mg_0024cache3;
+
+		[CompilerGenerated]
+		private static PackDelegate _003C_003Ef__mg_0024cache4;
+
+		[CompilerGenerated]
+		private static UnpackDelegate _003C_003Ef__mg_0024cache5;
+
+		[CompilerGenerated]
+		private static PackDelegate _003C_003Ef__mg_0024cache6;
+
+		[CompilerGenerated]
+		private static UnpackDelegate _003C_003Ef__mg_0024cache7;
+
+		[CompilerGenerated]
+		private static PackDelegate _003C_003Ef__mg_0024cache8;
+
+		[CompilerGenerated]
+		private static UnpackDelegate _003C_003Ef__mg_0024cache9;
 
 		static ObjectPacker()
 		{
@@ -42,9 +73,6 @@ namespace MsgPack
 			{
 				Pack(memoryStream, o);
 				return memoryStream.ToArray();
-				IL_001a:
-				byte[] result;
-				return result;
 			}
 		}
 
@@ -55,7 +83,7 @@ namespace MsgPack
 				throw new NotSupportedException();
 			}
 			MsgPackWriter writer = new MsgPackWriter(strm);
-			Pack(writer, o, null);
+			Pack(writer, o);
 		}
 
 		private void Pack(MsgPackWriter writer, object o, Type typeHint = null)
@@ -64,112 +92,118 @@ namespace MsgPack
 			{
 				if (typeHint == typeof(XorInt))
 				{
-					Pack(writer, 0, null);
+					Pack(writer, 0);
 				}
 				else if (typeHint == typeof(XorUInt))
 				{
-					Pack(writer, 0u, null);
+					Pack(writer, 0u);
 				}
 				else if (typeHint == typeof(XorFloat))
 				{
-					Pack(writer, 0f, null);
+					Pack(writer, 0f);
 				}
 				else
 				{
 					writer.WriteNil();
 				}
+				return;
+			}
+			Type type = o.GetType();
+			PackDelegate value;
+			if (type.IsPrimitive)
+			{
+				if (type.Equals(typeof(int)))
+				{
+					writer.Write((int)o);
+					return;
+				}
+				if (type.Equals(typeof(uint)))
+				{
+					writer.Write((uint)o);
+					return;
+				}
+				if (type.Equals(typeof(float)))
+				{
+					writer.Write((float)o);
+					return;
+				}
+				if (type.Equals(typeof(double)))
+				{
+					writer.Write((double)o);
+					return;
+				}
+				if (type.Equals(typeof(long)))
+				{
+					writer.Write((long)o);
+					return;
+				}
+				if (type.Equals(typeof(ulong)))
+				{
+					writer.Write((ulong)o);
+					return;
+				}
+				if (type.Equals(typeof(bool)))
+				{
+					writer.Write((bool)o);
+					return;
+				}
+				if (type.Equals(typeof(byte)))
+				{
+					writer.Write((byte)o);
+					return;
+				}
+				if (type.Equals(typeof(sbyte)))
+				{
+					writer.Write((sbyte)o);
+					return;
+				}
+				if (type.Equals(typeof(short)))
+				{
+					writer.Write((short)o);
+					return;
+				}
+				if (type.Equals(typeof(ushort)))
+				{
+					writer.Write((ushort)o);
+					return;
+				}
+				if (!type.Equals(typeof(char)))
+				{
+					throw new NotSupportedException();
+				}
+				writer.Write((ushort)(char)o);
+			}
+			else if (PackerMapping.TryGetValue(type, out value))
+			{
+				value(this, writer, o);
+			}
+			else if (type.IsArray)
+			{
+				Array array = (Array)o;
+				writer.WriteArrayHeader(array.Length);
+				for (int i = 0; i < array.Length; i++)
+				{
+					Pack(writer, array.GetValue(i));
+				}
+			}
+			else if (type.IsEnum)
+			{
+				writer.Write((int)o);
 			}
 			else
 			{
-				Type type = o.GetType();
-				PackDelegate value;
-				if (type.IsPrimitive)
+				ReflectionCacheEntry reflectionCacheEntry = ReflectionCache.Lookup(type);
+				writer.WriteMapHeader(reflectionCacheEntry.FieldMap.Count);
+				foreach (KeyValuePair<string, FieldInfo> item in reflectionCacheEntry.FieldMap)
 				{
-					if (type.Equals(typeof(int)))
+					writer.Write(item.Key, _buf);
+					object value2 = item.Value.GetValue(o);
+					if (item.Value.FieldType.IsInterface && value2 != null)
 					{
-						writer.Write((int)o);
+						writer.WriteArrayHeader(2);
+						writer.Write(value2.GetType().FullName);
 					}
-					else if (type.Equals(typeof(uint)))
-					{
-						writer.Write((uint)o);
-					}
-					else if (type.Equals(typeof(float)))
-					{
-						writer.Write((float)o);
-					}
-					else if (type.Equals(typeof(double)))
-					{
-						writer.Write((double)o);
-					}
-					else if (type.Equals(typeof(long)))
-					{
-						writer.Write((long)o);
-					}
-					else if (type.Equals(typeof(ulong)))
-					{
-						writer.Write((ulong)o);
-					}
-					else if (type.Equals(typeof(bool)))
-					{
-						writer.Write((bool)o);
-					}
-					else if (type.Equals(typeof(byte)))
-					{
-						writer.Write((byte)o);
-					}
-					else if (type.Equals(typeof(sbyte)))
-					{
-						writer.Write((sbyte)o);
-					}
-					else if (type.Equals(typeof(short)))
-					{
-						writer.Write((short)o);
-					}
-					else if (type.Equals(typeof(ushort)))
-					{
-						writer.Write((ushort)o);
-					}
-					else
-					{
-						if (!type.Equals(typeof(char)))
-						{
-							throw new NotSupportedException();
-						}
-						writer.Write((ushort)(char)o);
-					}
-				}
-				else if (PackerMapping.TryGetValue(type, out value))
-				{
-					value(this, writer, o);
-				}
-				else if (type.IsArray)
-				{
-					Array array = (Array)o;
-					writer.WriteArrayHeader(array.Length);
-					for (int i = 0; i < array.Length; i++)
-					{
-						Pack(writer, array.GetValue(i), null);
-					}
-				}
-				else if (type.IsEnum)
-				{
-					writer.Write((int)o);
-				}
-				else
-				{
-					ReflectionCacheEntry reflectionCacheEntry = ReflectionCache.Lookup(type);
-					writer.WriteMapHeader(reflectionCacheEntry.FieldMap.Count);
-					foreach (KeyValuePair<string, FieldInfo> item in reflectionCacheEntry.FieldMap)
-					{
-						writer.Write(item.Key, _buf);
-						object value2 = item.Value.GetValue(o);
-						if (item.Value.FieldType.IsInterface && value2 != null)
-						{
-							writer.WriteArrayHeader(2);
-							writer.Write(value2.GetType().FullName);
-						}
-						Pack(writer, value2, item.Value.FieldType);
-					}
+					Pack(writer, value2, item.Value.FieldType);
 				}
 			}
 		}
@@ -184,9 +218,6 @@ namespace MsgPack
 			using (MemoryStream strm = new MemoryStream(buf, offset, size))
 			{
 				return Unpack<T>(strm);
-				IL_0016:
-				T result;
-				return result;
 			}
 		}
 
@@ -210,9 +241,6 @@ namespace MsgPack
 			using (MemoryStream strm = new MemoryStream(buf, offset, size))
 			{
 				return Unpack(type, strm);
-				IL_0018:
-				object result;
-				return result;
 			}
 		}
 
@@ -228,8 +256,6 @@ namespace MsgPack
 
 		private object Unpack(MsgPackReader reader, Type t)
 		{
-			//IL_0591: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0596: Expected O, but got Unknown
 			if (t.IsPrimitive)
 			{
 				if (!reader.Read())
@@ -416,7 +442,7 @@ namespace MsgPack
 			{
 				throw new FormatException();
 			}
-			object obj = (!typeof(ScriptableObject).IsAssignableFrom(t)) ? FormatterServices.GetUninitializedObject(t) : ((object)ScriptableObject.CreateInstance(t));
+			object obj = (!typeof(ScriptableObject).IsAssignableFrom(t)) ? FormatterServices.GetUninitializedObject(t) : ScriptableObject.CreateInstance(t);
 			ReflectionCacheEntry reflectionCacheEntry = ReflectionCache.Lookup(t);
 			int length = (int)reader.Length;
 			for (int j = 0; j < length; j++)
@@ -493,7 +519,7 @@ namespace MsgPack
 			{
 				throw new FormatException();
 			}
-			return new DateTime(1970, 1, 1).ToLocalTime().AddSeconds((double)reader.ValueUnsigned);
+			return new DateTime(1970, 1, 1).ToLocalTime().AddSeconds(reader.ValueUnsigned);
 		}
 
 		private static void XorIntPacker(ObjectPacker packer, MsgPackWriter writer, object o)

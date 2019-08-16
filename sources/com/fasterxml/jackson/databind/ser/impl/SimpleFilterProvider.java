@@ -22,7 +22,7 @@ public class SimpleFilterProvider extends FilterProvider implements Serializable
         this._cfgFailOnUnknownId = true;
         for (Object obj : map.values()) {
             if (!(obj instanceof PropertyFilter)) {
-                this._filtersById = _convert((Map) map);
+                this._filtersById = _convert(map);
                 return;
             }
         }
@@ -30,7 +30,7 @@ public class SimpleFilterProvider extends FilterProvider implements Serializable
     }
 
     private static final Map<String, PropertyFilter> _convert(Map<String, ?> map) {
-        Map hashMap = new HashMap();
+        HashMap hashMap = new HashMap();
         for (Entry entry : map.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof PropertyFilter) {

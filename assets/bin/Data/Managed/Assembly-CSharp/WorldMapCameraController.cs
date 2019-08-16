@@ -40,7 +40,7 @@ public class WorldMapCameraController : DraggableCamera
 	{
 		base.distance = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.cameraManualDistance;
 		base.distanceManual = base.distance;
-		CreateRenderTexture(false);
+		CreateRenderTexture(isPortrait: false);
 		_camera.set_fieldOfView(cameraFovMin);
 		isInteractive_ = true;
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
@@ -56,8 +56,6 @@ public class WorldMapCameraController : DraggableCamera
 
 	private void OnDestroy()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= CreateRenderTexture;
@@ -195,9 +193,6 @@ public class WorldMapCameraController : DraggableCamera
 
 	public void Restore()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		if (null != _camera.get_targetTexture())
 		{
 			RenderTexture.ReleaseTemporary(_camera.get_targetTexture());

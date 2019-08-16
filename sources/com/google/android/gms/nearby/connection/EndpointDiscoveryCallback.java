@@ -1,7 +1,9 @@
 package com.google.android.gms.nearby.connection;
 
-public abstract class EndpointDiscoveryCallback {
-    public abstract void onEndpointFound(String str, DiscoveredEndpointInfo discoveredEndpointInfo);
+import android.support.annotation.NonNull;
 
-    public abstract void onEndpointLost(String str);
+public abstract class EndpointDiscoveryCallback {
+    public abstract void onEndpointFound(@NonNull String str, @NonNull DiscoveredEndpointInfo discoveredEndpointInfo);
+
+    public abstract void onEndpointLost(@NonNull String str);
 }

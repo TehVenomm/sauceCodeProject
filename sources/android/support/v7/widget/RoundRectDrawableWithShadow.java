@@ -1,5 +1,6 @@
-package android.support.v7.widget;
+package android.support.p003v7.widget;
 
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -13,39 +14,42 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.Drawable;
-import android.support.v7.cardview.C0161R;
+import android.support.annotation.Nullable;
+import android.support.p003v7.cardview.C0265R;
 
+/* renamed from: android.support.v7.widget.RoundRectDrawableWithShadow */
 class RoundRectDrawableWithShadow extends Drawable {
-    static final double COS_45 = Math.cos(Math.toRadians(45.0d));
-    static final float SHADOW_MULTIPLIER = 1.5f;
+    private static final double COS_45 = Math.cos(Math.toRadians(45.0d));
+    private static final float SHADOW_MULTIPLIER = 1.5f;
     static RoundRectHelper sRoundRectHelper;
     private boolean mAddPaddingForCorners = true;
-    final RectF mCardBounds;
-    float mCornerRadius;
-    Paint mCornerShadowPaint;
-    Path mCornerShadowPath;
+    private ColorStateList mBackground;
+    private final RectF mCardBounds;
+    private float mCornerRadius;
+    private Paint mCornerShadowPaint;
+    private Path mCornerShadowPath;
     private boolean mDirty = true;
-    Paint mEdgeShadowPaint;
-    final int mInsetShadow;
-    float mMaxShadowSize;
-    Paint mPaint;
+    private Paint mEdgeShadowPaint;
+    private final int mInsetShadow;
+    private Paint mPaint;
     private boolean mPrintedShadowClipWarning = false;
-    float mRawMaxShadowSize;
-    float mRawShadowSize;
+    private float mRawMaxShadowSize;
+    private float mRawShadowSize;
     private final int mShadowEndColor;
-    float mShadowSize;
+    private float mShadowSize;
     private final int mShadowStartColor;
 
+    /* renamed from: android.support.v7.widget.RoundRectDrawableWithShadow$RoundRectHelper */
     interface RoundRectHelper {
         void drawRoundRect(Canvas canvas, RectF rectF, float f, Paint paint);
     }
 
-    RoundRectDrawableWithShadow(Resources resources, int i, float f, float f2, float f3) {
-        this.mShadowStartColor = resources.getColor(C0161R.color.cardview_shadow_start_color);
-        this.mShadowEndColor = resources.getColor(C0161R.color.cardview_shadow_end_color);
-        this.mInsetShadow = resources.getDimensionPixelSize(C0161R.dimen.cardview_compat_inset_shadow);
+    RoundRectDrawableWithShadow(Resources resources, ColorStateList colorStateList, float f, float f2, float f3) {
+        this.mShadowStartColor = resources.getColor(C0265R.color.cardview_shadow_start_color);
+        this.mShadowEndColor = resources.getColor(C0265R.color.cardview_shadow_end_color);
+        this.mInsetShadow = resources.getDimensionPixelSize(C0265R.dimen.cardview_compat_inset_shadow);
         this.mPaint = new Paint(5);
-        this.mPaint.setColor(i);
+        setBackground(colorStateList);
         this.mCornerShadowPaint = new Paint(5);
         this.mCornerShadowPaint.setStyle(Style.FILL);
         this.mCornerRadius = (float) ((int) (0.5f + f));
@@ -83,23 +87,22 @@ class RoundRectDrawableWithShadow extends Drawable {
         int i = this.mShadowStartColor;
         int i2 = this.mShadowStartColor;
         int i3 = this.mShadowEndColor;
-        f2 += f3;
-        int[] iArr = new int[]{i, i2, i3};
-        float[] fArr = new float[]{0.0f, f, 1.0f};
-        paint.setShader(new RadialGradient(0.0f, 0.0f, f2, iArr, fArr, TileMode.CLAMP));
+        float f4 = f2 + f3;
+        int[] iArr = {i, i2, i3};
+        float[] fArr = {0.0f, f, 1.0f};
+        paint.setShader(new RadialGradient(0.0f, 0.0f, f4, iArr, fArr, TileMode.CLAMP));
         Paint paint2 = this.mEdgeShadowPaint;
-        f = -this.mCornerRadius;
-        f2 = this.mShadowSize;
-        f3 = -this.mCornerRadius;
-        float f4 = this.mShadowSize;
+        float f5 = -this.mCornerRadius;
+        float f6 = this.mShadowSize;
+        float f7 = -this.mCornerRadius;
+        float f8 = this.mShadowSize;
         int i4 = this.mShadowStartColor;
-        i3 = this.mShadowStartColor;
-        int i5 = this.mShadowEndColor;
-        f += f2;
-        f3 -= f4;
-        int[] iArr2 = new int[]{i4, i3, i5};
-        f2 = 0.0f;
-        paint2.setShader(new LinearGradient(0.0f, f, f2, f3, iArr2, new float[]{0.0f, 0.5f, 1.0f}, TileMode.CLAMP));
+        int i5 = this.mShadowStartColor;
+        int i6 = this.mShadowEndColor;
+        float f9 = f5 + f6;
+        float f10 = f7 - f8;
+        int[] iArr2 = {i4, i5, i6};
+        paint2.setShader(new LinearGradient(0.0f, f9, 0.0f, f10, iArr2, new float[]{0.0f, 0.5f, 1.0f}, TileMode.CLAMP));
         this.mEdgeShadowPaint.setAntiAlias(false);
     }
 
@@ -113,40 +116,74 @@ class RoundRectDrawableWithShadow extends Drawable {
 
     private void drawShadow(Canvas canvas) {
         float f = (-this.mCornerRadius) - this.mShadowSize;
-        float f2 = (this.mCornerRadius + ((float) this.mInsetShadow)) + (this.mRawShadowSize / 2.0f);
-        Object obj = this.mCardBounds.width() - (2.0f * f2) > 0.0f ? 1 : null;
-        Object obj2 = this.mCardBounds.height() - (2.0f * f2) > 0.0f ? 1 : null;
+        float f2 = this.mCornerRadius + ((float) this.mInsetShadow) + (this.mRawShadowSize / 2.0f);
+        boolean z = this.mCardBounds.width() - (2.0f * f2) > 0.0f;
+        boolean z2 = this.mCardBounds.height() - (2.0f * f2) > 0.0f;
         int save = canvas.save();
         canvas.translate(this.mCardBounds.left + f2, this.mCardBounds.top + f2);
         canvas.drawPath(this.mCornerShadowPath, this.mCornerShadowPaint);
-        if (obj != null) {
+        if (z) {
             canvas.drawRect(0.0f, f, this.mCardBounds.width() - (2.0f * f2), -this.mCornerRadius, this.mEdgeShadowPaint);
         }
         canvas.restoreToCount(save);
-        save = canvas.save();
+        int save2 = canvas.save();
         canvas.translate(this.mCardBounds.right - f2, this.mCardBounds.bottom - f2);
         canvas.rotate(180.0f);
         canvas.drawPath(this.mCornerShadowPath, this.mCornerShadowPaint);
-        if (obj != null) {
+        if (z) {
             canvas.drawRect(0.0f, f, this.mCardBounds.width() - (2.0f * f2), (-this.mCornerRadius) + this.mShadowSize, this.mEdgeShadowPaint);
         }
-        canvas.restoreToCount(save);
-        int save2 = canvas.save();
+        canvas.restoreToCount(save2);
+        int save3 = canvas.save();
         canvas.translate(this.mCardBounds.left + f2, this.mCardBounds.bottom - f2);
         canvas.rotate(270.0f);
         canvas.drawPath(this.mCornerShadowPath, this.mCornerShadowPaint);
-        if (obj2 != null) {
+        if (z2) {
             canvas.drawRect(0.0f, f, this.mCardBounds.height() - (2.0f * f2), -this.mCornerRadius, this.mEdgeShadowPaint);
         }
-        canvas.restoreToCount(save2);
-        save2 = canvas.save();
+        canvas.restoreToCount(save3);
+        int save4 = canvas.save();
         canvas.translate(this.mCardBounds.right - f2, this.mCardBounds.top + f2);
         canvas.rotate(90.0f);
         canvas.drawPath(this.mCornerShadowPath, this.mCornerShadowPaint);
-        if (obj2 != null) {
+        if (z2) {
             canvas.drawRect(0.0f, f, this.mCardBounds.height() - (2.0f * f2), -this.mCornerRadius, this.mEdgeShadowPaint);
         }
-        canvas.restoreToCount(save2);
+        canvas.restoreToCount(save4);
+    }
+
+    private void setBackground(ColorStateList colorStateList) {
+        if (colorStateList == null) {
+            colorStateList = ColorStateList.valueOf(0);
+        }
+        this.mBackground = colorStateList;
+        this.mPaint.setColor(this.mBackground.getColorForState(getState(), this.mBackground.getDefaultColor()));
+    }
+
+    private void setShadowSize(float f, float f2) {
+        if (f < 0.0f) {
+            throw new IllegalArgumentException("Invalid shadow size " + f + ". Must be >= 0");
+        } else if (f2 < 0.0f) {
+            throw new IllegalArgumentException("Invalid max shadow size " + f2 + ". Must be >= 0");
+        } else {
+            float even = (float) toEven(f);
+            float even2 = (float) toEven(f2);
+            if (even > even2) {
+                if (!this.mPrintedShadowClipWarning) {
+                    this.mPrintedShadowClipWarning = true;
+                    even = even2;
+                } else {
+                    even = even2;
+                }
+            }
+            if (this.mRawShadowSize != even || this.mRawMaxShadowSize != even2) {
+                this.mRawShadowSize = even;
+                this.mRawMaxShadowSize = even2;
+                this.mShadowSize = (float) ((int) ((even * SHADOW_MULTIPLIER) + ((float) this.mInsetShadow) + 0.5f));
+                this.mDirty = true;
+                invalidateSelf();
+            }
+        }
     }
 
     private int toEven(float f) {
@@ -165,24 +202,34 @@ class RoundRectDrawableWithShadow extends Drawable {
         sRoundRectHelper.drawRoundRect(canvas, this.mCardBounds, this.mCornerRadius, this.mPaint);
     }
 
-    float getCornerRadius() {
+    /* access modifiers changed from: 0000 */
+    public ColorStateList getColor() {
+        return this.mBackground;
+    }
+
+    /* access modifiers changed from: 0000 */
+    public float getCornerRadius() {
         return this.mCornerRadius;
     }
 
-    void getMaxShadowAndCornerPadding(Rect rect) {
+    /* access modifiers changed from: 0000 */
+    public void getMaxShadowAndCornerPadding(Rect rect) {
         getPadding(rect);
     }
 
-    float getMaxShadowSize() {
+    /* access modifiers changed from: 0000 */
+    public float getMaxShadowSize() {
         return this.mRawMaxShadowSize;
     }
 
-    float getMinHeight() {
-        return (Math.max(this.mRawMaxShadowSize, (this.mCornerRadius + ((float) this.mInsetShadow)) + ((this.mRawMaxShadowSize * SHADOW_MULTIPLIER) / 2.0f)) * 2.0f) + (((this.mRawMaxShadowSize * SHADOW_MULTIPLIER) + ((float) this.mInsetShadow)) * 2.0f);
+    /* access modifiers changed from: 0000 */
+    public float getMinHeight() {
+        return (Math.max(this.mRawMaxShadowSize, this.mCornerRadius + ((float) this.mInsetShadow) + ((this.mRawMaxShadowSize * SHADOW_MULTIPLIER) / 2.0f)) * 2.0f) + (((this.mRawMaxShadowSize * SHADOW_MULTIPLIER) + ((float) this.mInsetShadow)) * 2.0f);
     }
 
-    float getMinWidth() {
-        return (Math.max(this.mRawMaxShadowSize, (this.mCornerRadius + ((float) this.mInsetShadow)) + (this.mRawMaxShadowSize / 2.0f)) * 2.0f) + ((this.mRawMaxShadowSize + ((float) this.mInsetShadow)) * 2.0f);
+    /* access modifiers changed from: 0000 */
+    public float getMinWidth() {
+        return (Math.max(this.mRawMaxShadowSize, this.mCornerRadius + ((float) this.mInsetShadow) + (this.mRawMaxShadowSize / 2.0f)) * 2.0f) + ((this.mRawMaxShadowSize + ((float) this.mInsetShadow)) * 2.0f);
     }
 
     public int getOpacity() {
@@ -196,15 +243,34 @@ class RoundRectDrawableWithShadow extends Drawable {
         return true;
     }
 
-    float getShadowSize() {
+    /* access modifiers changed from: 0000 */
+    public float getShadowSize() {
         return this.mRawShadowSize;
     }
 
-    protected void onBoundsChange(Rect rect) {
+    public boolean isStateful() {
+        return (this.mBackground != null && this.mBackground.isStateful()) || super.isStateful();
+    }
+
+    /* access modifiers changed from: protected */
+    public void onBoundsChange(Rect rect) {
         super.onBoundsChange(rect);
         this.mDirty = true;
     }
 
+    /* access modifiers changed from: protected */
+    public boolean onStateChange(int[] iArr) {
+        int colorForState = this.mBackground.getColorForState(iArr, this.mBackground.getDefaultColor());
+        if (this.mPaint.getColor() == colorForState) {
+            return false;
+        }
+        this.mPaint.setColor(colorForState);
+        this.mDirty = true;
+        invalidateSelf();
+        return true;
+    }
+
+    /* access modifiers changed from: 0000 */
     public void setAddPaddingForCorners(boolean z) {
         this.mAddPaddingForCorners = z;
         invalidateSelf();
@@ -216,8 +282,9 @@ class RoundRectDrawableWithShadow extends Drawable {
         this.mEdgeShadowPaint.setAlpha(i);
     }
 
-    public void setColor(int i) {
-        this.mPaint.setColor(i);
+    /* access modifiers changed from: 0000 */
+    public void setColor(@Nullable ColorStateList colorStateList) {
+        setBackground(colorStateList);
         invalidateSelf();
     }
 
@@ -225,7 +292,8 @@ class RoundRectDrawableWithShadow extends Drawable {
         this.mPaint.setColorFilter(colorFilter);
     }
 
-    void setCornerRadius(float f) {
+    /* access modifiers changed from: 0000 */
+    public void setCornerRadius(float f) {
         if (f < 0.0f) {
             throw new IllegalArgumentException("Invalid radius " + f + ". Must be >= 0");
         }
@@ -237,38 +305,13 @@ class RoundRectDrawableWithShadow extends Drawable {
         }
     }
 
-    void setMaxShadowSize(float f) {
+    /* access modifiers changed from: 0000 */
+    public void setMaxShadowSize(float f) {
         setShadowSize(this.mRawShadowSize, f);
     }
 
-    void setShadowSize(float f) {
+    /* access modifiers changed from: 0000 */
+    public void setShadowSize(float f) {
         setShadowSize(f, this.mRawMaxShadowSize);
-    }
-
-    void setShadowSize(float f, float f2) {
-        if (f < 0.0f) {
-            throw new IllegalArgumentException("Invalid shadow size " + f + ". Must be >= 0");
-        } else if (f2 < 0.0f) {
-            throw new IllegalArgumentException("Invalid max shadow size " + f2 + ". Must be >= 0");
-        } else {
-            float toEven = (float) toEven(f);
-            float toEven2 = (float) toEven(f2);
-            if (toEven > toEven2) {
-                if (this.mPrintedShadowClipWarning) {
-                    toEven = toEven2;
-                } else {
-                    this.mPrintedShadowClipWarning = true;
-                    toEven = toEven2;
-                }
-            }
-            if (this.mRawShadowSize != toEven || this.mRawMaxShadowSize != toEven2) {
-                this.mRawShadowSize = toEven;
-                this.mRawMaxShadowSize = toEven2;
-                this.mShadowSize = (float) ((int) (((toEven * SHADOW_MULTIPLIER) + ((float) this.mInsetShadow)) + 0.5f));
-                this.mMaxShadowSize = ((float) this.mInsetShadow) + toEven2;
-                this.mDirty = true;
-                invalidateSelf();
-            }
-        }
     }
 }

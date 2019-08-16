@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class ExploreMapRoot
+public class ExploreMapRoot : MonoBehaviour
 {
 	[SerializeField]
 	private float _portraitScale = 1f;
@@ -50,6 +50,8 @@ public class ExploreMapRoot
 	[SerializeField]
 	private Color _sonarBackGroundColor = new Color(0.63f, 0.63f, 0.63f, 0f);
 
+	private bool isSetup;
+
 	public ExploreMapLocation[] locations => _locations;
 
 	public Transform[] portals => _portals;
@@ -72,6 +74,18 @@ public class ExploreMapRoot
 		private set;
 	}
 
+	public bool IsSetup
+	{
+		get
+		{
+			return isSetup;
+		}
+		set
+		{
+			isSetup = value;
+		}
+	}
+
 	public ExploreMapRoot()
 		: this()
 	{
@@ -90,9 +104,6 @@ public class ExploreMapRoot
 
 	public Transform FindPortalNode(int mapId0, int mapId1)
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Expected O, but got Unknown
 		ExploreMapLocation exploreMapLocation = FindLocation(mapId0);
 		ExploreMapLocation exploreMapLocation2 = FindLocation(mapId1);
 		if (null == exploreMapLocation || null == exploreMapLocation2)
@@ -104,15 +115,11 @@ public class ExploreMapRoot
 		int num = Mathf.Min(locationIndex, locationIndex2);
 		int num2 = Mathf.Max(locationIndex, locationIndex2);
 		string str = "Portal" + num.ToString() + "_" + num2.ToString();
-		return this.get_transform().FindChild("Road/" + str);
+		return this.get_transform().Find("Road/" + str);
 	}
 
 	public Transform FindNode(int mapId, out Vector3 offset, out bool isBattle)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Expected O, but got Unknown
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Expected O, but got Unknown
 		offset._002Ector(0f, 0f, 0f);
 		isBattle = false;
 		ExploreMapLocation exploreMapLocation = FindLocation(mapId);
@@ -134,47 +141,42 @@ public class ExploreMapRoot
 
 	public void UpdatePortals(bool isMiniMap)
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < portals.Length; i++)
 		{
 			Transform val = portals[i];
 			string name = val.get_name();
 			FieldMapTable.PortalTableData portalData = GetPortalData(name);
-			if (portalData != null)
+			if (portalData == null)
 			{
-				val.get_gameObject().SetActive(true);
-				UITexture[] componentsInChildren = val.GetComponentsInChildren<UITexture>();
-				if (componentsInChildren == null || componentsInChildren.Length == 0)
+				continue;
+			}
+			val.get_gameObject().SetActive(true);
+			UITexture[] componentsInChildren = val.GetComponentsInChildren<UITexture>();
+			if (componentsInChildren == null || componentsInChildren.Length == 0)
+			{
+				val.get_gameObject().SetActive(false);
+			}
+			else if (MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal(portalData.portalID))
+			{
+				componentsInChildren[0].color = passedColor;
+				if (portalData.IsWarpPortal())
 				{
-					val.get_gameObject().SetActive(false);
+					componentsInChildren[0].color = warpColor;
 				}
-				else if (MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal(portalData.portalID))
-				{
-					componentsInChildren[0].color = passedColor;
-					if (portalData.IsWarpPortal())
-					{
-						componentsInChildren[0].color = warpColor;
-					}
-				}
-				else
-				{
-					componentsInChildren[0].color = unusedColor;
-					val.get_gameObject().SetActive(isMiniMap);
-				}
+			}
+			else
+			{
+				componentsInChildren[0].color = unusedColor;
+				val.get_gameObject().SetActive(isMiniMap);
 			}
 		}
 	}
 
 	public void SetMarkers(Transform[] markers, bool isMiniMap)
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Expected O, but got Unknown
 		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
@@ -183,27 +185,28 @@ public class ExploreMapRoot
 		{
 			int num = exploreDisplayIndices[i];
 			int exploreMapId = MonoBehaviourSingleton<QuestManager>.I.GetExploreMapId(i);
-			if (0 <= exploreMapId)
+			if (0 > exploreMapId)
 			{
-				Transform val = markers[num];
-				Vector3 offset;
-				bool isBattle;
-				Transform val2 = FindNode(exploreMapId, out offset, out isBattle);
-				if (null != val2)
+				continue;
+			}
+			Transform val = markers[num];
+			Vector3 offset;
+			bool isBattle;
+			Transform val2 = FindNode(exploreMapId, out offset, out isBattle);
+			if (null != val2)
+			{
+				val.get_gameObject().SetActive(true);
+				Utility.Attach(val2, val.get_transform());
+				if (isMiniMap)
 				{
-					val.get_gameObject().SetActive(true);
-					Utility.Attach(val2, val.get_transform());
-					if (isMiniMap)
-					{
-						val.GetComponent<ExplorePlayerMarkerMini>().SetIndex(num);
-					}
-					else
-					{
-						val.GetComponent<ExplorePlayerMarker>().SetIndex(num);
-					}
-					val.set_localPosition(val.get_localPosition() + offset);
-					showBattleMarker |= isBattle;
+					val.GetComponent<ExplorePlayerMarkerMini>().SetIndex(num);
 				}
+				else
+				{
+					val.GetComponent<ExplorePlayerMarker>().SetIndex(num);
+				}
+				val.set_localPosition(val.get_localPosition() + offset);
+				showBattleMarker |= isBattle;
 			}
 		}
 	}
@@ -255,7 +258,7 @@ public class ExploreMapRoot
 		}
 		ExploreMapLocation exploreMapLocation = _locations[num];
 		ExploreMapLocation loc = _locations[num2];
-		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId, false);
+		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId);
 		return portalListByMapID.Find(delegate(FieldMapTable.PortalTableData o)
 		{
 			if (o.dstMapID == loc.mapId)
@@ -277,7 +280,7 @@ public class ExploreMapRoot
 		}
 		ExploreMapLocation exploreMapLocation = _locations[num];
 		ExploreMapLocation loc = _locations[num2];
-		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId, false);
+		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId);
 		return portalListByMapID.Find(delegate(FieldMapTable.PortalTableData o)
 		{
 			if (o.dstMapID == loc.mapId)
@@ -312,7 +315,7 @@ public class ExploreMapRoot
 		uint exitMapID = (uint)mapIDs[1];
 		uint entrancePortalID = 0u;
 		uint exitPortalID = 0u;
-		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID(entranceMapID, false);
+		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID(entranceMapID);
 		portalListByMapID.ForEach(delegate(FieldMapTable.PortalTableData o)
 		{
 			if (exitMapID == o.dstMapID)
@@ -320,7 +323,7 @@ public class ExploreMapRoot
 				entrancePortalID = o.portalID;
 			}
 		});
-		portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID(exitMapID, false);
+		portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID(exitMapID);
 		if (portalListByMapID == null)
 		{
 			return new int[0];

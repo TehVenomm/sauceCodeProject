@@ -1,11 +1,10 @@
 using Network;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameSceneGlobalSettings
 {
-	private const string INGAME_PRESET = "InGame";
-
 	public string externalStageName;
 
 	private string stageName;
@@ -22,15 +21,19 @@ public class GameSceneGlobalSettings
 
 	private bool needLoungeManager;
 
+	private bool needClanManager;
+
 	private bool needGuildManager;
 
 	private bool needStatusStageManager;
 
-	private float saveCameraNear = -3.40282347E+38f;
+	private float saveCameraNear = float.MinValue;
 
-	private float saveCameraFar = -3.40282347E+38f;
+	private float saveCameraFar = float.MinValue;
 
 	private int mainCameraCullingMask;
+
+	private const string INGAME_PRESET = "InGame";
 
 	public bool isInitialized
 	{
@@ -40,24 +43,14 @@ public class GameSceneGlobalSettings
 			{
 				return false;
 			}
-			if (MonoBehaviourSingleton<HomeManager>.IsValid())
+			IHomeManager currentIHomeManager = GetCurrentIHomeManager();
+			if (currentIHomeManager != null)
 			{
-				if (!MonoBehaviourSingleton<HomeManager>.I.IsInitialized)
+				if (!currentIHomeManager.IsInitialized)
 				{
 					return false;
 				}
-				if (MonoBehaviourSingleton<HomeManager>.I.HomeCamera.isChanging)
-				{
-					return false;
-				}
-			}
-			if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-			{
-				if (!MonoBehaviourSingleton<LoungeManager>.I.IsInitialized)
-				{
-					return false;
-				}
-				if (MonoBehaviourSingleton<LoungeManager>.I.HomeCamera.isChanging)
+				if (currentIHomeManager.HomeCamera.isChanging)
 				{
 					return false;
 				}
@@ -78,6 +71,12 @@ public class GameSceneGlobalSettings
 		}
 	}
 
+	public static bool forceIgnoreMainUI
+	{
+		get;
+		set;
+	}
+
 	public GameSceneGlobalSettings()
 	{
 		mainCameraCullingMask = GetDefaultMainCameraCullingMask();
@@ -87,7 +86,7 @@ public class GameSceneGlobalSettings
 	{
 		if (MonoBehaviourSingleton<UIManager>.I.npcMessage != null)
 		{
-			MonoBehaviourSingleton<UIManager>.I.npcMessage.UpdateMessage(section_data, false);
+			MonoBehaviourSingleton<UIManager>.I.npcMessage.UpdateMessage(section_data, is_open: false);
 		}
 	}
 
@@ -109,7 +108,7 @@ public class GameSceneGlobalSettings
 		{
 			next_section_name = string.Empty;
 		}
-		if ((prev_section_name == "InGameMain" || prev_section_name == "QuestResultTop" || prev_section_name == "QuestResultDirection") && (next_section_name == "QuestResultDirection" || next_section_name == "QuestResultFriend"))
+		if ((prev_section_name == "InGameMain" || prev_section_name == "QuestResultTop" || prev_section_name == "QuestResultDirection" || prev_section_name == "CarnivalResultPoint") && (next_section_name == "QuestResultDirection" || next_section_name == "QuestResultFriend" || next_section_name == "QuestResultTrialEnd"))
 		{
 			return TransitionManager.TYPE.WHITE;
 		}
@@ -137,7 +136,11 @@ public class GameSceneGlobalSettings
 		{
 			return TransitionManager.TYPE.LOADING;
 		}
-		bool flag = next_scene_name == "HomeScene" || next_scene_name == "LoungeScene";
+		if (prev_scene_name == "TitleScene" && next_scene_name == "ClanScene")
+		{
+			return TransitionManager.TYPE.LOADING;
+		}
+		bool flag = next_scene_name == "HomeScene" || next_scene_name == "LoungeScene" || next_scene_name == "ClanScene";
 		if (prev_scene_name == "InGameScene" && prev_section_name == "InGameQuestAcceptInvitation" && flag)
 		{
 			return TransitionManager.TYPE.LOADING;
@@ -195,10 +198,10 @@ public class GameSceneGlobalSettings
 
 	public bool SceneClear(string prev_scene_name, string prev_section_name, string next_scene_name)
 	{
-		bool result = true;
+		bool flag = true;
 		if (prev_scene_name == "TitleScene" && next_scene_name == "InGameScene")
 		{
-			result = false;
+			flag = false;
 		}
 		if (next_scene_name == "InGameScene")
 		{
@@ -211,8 +214,10 @@ public class GameSceneGlobalSettings
 			{
 			case "HomeScene":
 			case "LoungeScene":
+			case "ClanScene":
 			case "SmithScene":
 			case "StatusScene":
+			case "UniqueStatusScene":
 			case "ShopScene":
 			case "GachaScene":
 			case "FriendScene":
@@ -222,22 +227,26 @@ public class GameSceneGlobalSettings
 			}
 			if ((next_scene_name == "StatusScene" && prev_scene_name == "SmithScene") || (next_scene_name == "SmithScene" && prev_scene_name == "StatusScene"))
 			{
-				result = false;
+				flag = false;
+			}
+			if ((next_scene_name == "UniqueStatusScene" && prev_scene_name == "SmithScene") || (next_scene_name == "SmithScene" && prev_scene_name == "UniqueStatusScene"))
+			{
+				flag = false;
 			}
 			if (MonoBehaviourSingleton<UIManager>.I.mainMenu != null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.mainMenu.UpdateSceneButtons(next_scene_name);
 			}
 		}
-		return result;
+		return flag && AppMain.needClearMemory;
 	}
 
-	public void SceneInitialize(string prev_scene_name, string next_scene_name)
+	public void SceneInitialize(string prev_scene_name, string next_scene_name, bool skipChat = false)
 	{
 		if (next_scene_name != "InGameScene")
 		{
 			bool need_tutorial = UserInfoManager.IsNeedsTutorialMessage();
-			MonoBehaviourSingleton<UIManager>.I.LoadUI(true, true, need_tutorial);
+			MonoBehaviourSingleton<UIManager>.I.LoadUI(need_common: true, need_outgame: true, need_tutorial, skipChat);
 		}
 		if (next_scene_name != "GachaScene" && next_scene_name != "ShopScene" && MonoBehaviourSingleton<GachaManager>.IsValid())
 		{
@@ -255,143 +264,181 @@ public class GameSceneGlobalSettings
 			stageName = externalStageName;
 			stageImageID = -1;
 		}
-		else if (!(section_data != (GameSceneTables.SectionData)null) || !section_data.type.IsDialog())
+		else
 		{
+			if (section_data != null && section_data.type.IsDialog())
+			{
+				return;
+			}
 			string text = stageName;
 			stageName = null;
 			stageImageID = -1;
 			needHomeManager = false;
 			needLoungeManager = false;
+			needClanManager = false;
 			needGuildManager = false;
 			needStatusStageManager = false;
-			if (!(section_name == "InGameMain") && !(section_name == "MenuReset"))
+			if (section_name == "InGameMain" || section_name == "MenuReset")
 			{
-				if (scene_name == "HomeScene")
+				return;
+			}
+			if (scene_name == "HomeScene")
+			{
+				HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(TimeManager.GetNow());
+				stageName = homeThemeData.sceneName;
+				if (MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("HomeTop") && prev_scene_name == "HomeScene")
 				{
-					HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(TimeManager.GetNow());
-					stageName = homeThemeData.sceneName;
-					if (MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("HomeTop") && prev_scene_name == "HomeScene")
-					{
-						stageName = text;
-					}
-					if (string.IsNullOrEmpty(stageName))
-					{
-						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.mainStage;
-					}
-					if (stageName == homeThemeData.sceneName)
-					{
-						Singleton<HomeThemeTable>.I.SetCurrentHomeThemeName(homeThemeData.name);
-					}
-					needHomeManager = true;
+					stageName = text;
 				}
-				if (stageName == null && scene_name == "LoungeScene")
+				if (string.IsNullOrEmpty(stageName))
 				{
-					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.mainStage;
-					needLoungeManager = true;
+					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.mainStage;
 				}
-				if (stageName == null && scene_name == "GuildScene")
+				if (stageName == homeThemeData.sceneName)
 				{
-					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.guildScene.mainStage;
-					needGuildManager = true;
+					Singleton<HomeThemeTable>.I.SetCurrentHomeThemeName(homeThemeData.name);
 				}
-				if (stageName == null && (scene_name == "StatusScene" || scene_name == "ProfileScene"))
+				needHomeManager = true;
+			}
+			if (stageName == null && scene_name == "LoungeScene")
+			{
+				stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.mainStage;
+				needLoungeManager = true;
+			}
+			if (stageName == null && scene_name == "ClanScene")
+			{
+				if (prev_scene_name == "ClanScene")
 				{
-					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage;
-					if (scene_name == "StatusScene")
-					{
-						needStatusStageManager = true;
-					}
+					stageName = text;
 				}
-				if (stageName == null && scene_name == "SmithScene")
+				else
 				{
-					if (section_name == "SmithGrowSkillSelect" || section_name == "SmithGrowSkillPerformance" || section_name == "SmithGrowSkillSecond")
+					int level = MonoBehaviourSingleton<UserInfoManager>.I.userClan.level;
+					stageName = ClanLvUnlockManager.CallGetLoadStageName(level);
+				}
+				needClanManager = true;
+			}
+			if (stageName == null && (scene_name == "StatusScene" || scene_name == "ProfileScene"))
+			{
+				stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage;
+				if (scene_name == "StatusScene")
+				{
+					needStatusStageManager = true;
+				}
+			}
+			if (stageName == null && scene_name == "UniqueStatusScene")
+			{
+				stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createUniqueStage;
+				needStatusStageManager = true;
+			}
+			if (stageName == null && scene_name == "SmithScene")
+			{
+				if (section_name == "SmithGrowSkillSelect" || section_name == "SmithGrowSkillPerformance" || section_name == "SmithGrowSkillSecond")
+				{
+					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillStage;
+				}
+				else if (section_name == "SmithCreateTypeSelect" || section_name == "SmithGrowItemSelect" || section_name.EndsWith("Performance"))
+				{
+					if (StatusManager.IsUnique())
 					{
-						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillStage;
-					}
-					else if (section_name == "SmithCreateTypeSelect" || section_name == "SmithGrowItemSelect" || section_name.EndsWith("Performance"))
-					{
-						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage;
-					}
-					else if (prev_scene_name == "HomeScene" || prev_scene_name == "LoungeScene")
-					{
-						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage;
+						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createUniqueStage;
 					}
 					else
 					{
-						stageName = text;
-					}
-					if (stageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
-					{
-						needStatusStageManager = true;
+						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage;
 					}
 				}
-				if (stageName == null && scene_name == "GatherScene")
+				else if (prev_scene_name == "HomeScene" || prev_scene_name == "LoungeScene" || prev_scene_name == "ClanScene")
 				{
-					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.mainStage;
+					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage;
 				}
-				if (stageName == null && scene_name == "ForestScene")
+				else
 				{
-					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.mainStage;
+					stageName = text;
 				}
-				if (stageName == null && (scene_name == "ShopScene" || scene_name == "GachaScene"))
+				if (stageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage || stageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createUniqueStage)
 				{
-					if (section_name == "ShopTop")
+					needStatusStageManager = true;
+				}
+			}
+			if (stageName == null && scene_name == "GatherScene")
+			{
+				stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.mainStage;
+			}
+			if (stageName == null && scene_name == "ForestScene")
+			{
+				stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.mainStage;
+			}
+			if (stageName == null && (scene_name == "ShopScene" || scene_name == "GachaScene"))
+			{
+				if (section_name == "ShopTop")
+				{
+					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.mainStage;
+				}
+				else if (section_name == "GachaPerformanceSkill")
+				{
+					stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gachaScene.SkillGachaStage;
+				}
+				else if (section_name == "GachaPerformanceQuest")
+				{
+					if (MonoBehaviourSingleton<GachaManager>.IsValid() && MonoBehaviourSingleton<GachaManager>.I.IsReam())
 					{
-						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.mainStage;
-					}
-					else if (section_name == "GachaPerformanceSkill")
-					{
-						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gachaScene.SkillGachaStage;
-					}
-					else if (section_name == "GachaPerformanceQuest")
-					{
-						if (MonoBehaviourSingleton<GachaManager>.IsValid() && MonoBehaviourSingleton<GachaManager>.I.IsReam())
+						if (MonoBehaviourSingleton<GachaManager>.I.enableFeverDirector)
+						{
+							stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gachaScene.QuestFeverGachaStage;
+							stageForceLoad = true;
+						}
+						else
 						{
 							stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gachaScene.QuestReamGachaStage;
 						}
-						else
-						{
-							stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gachaScene.QuestSingleGachaStage;
-						}
 					}
 					else
 					{
-						stageName = text;
+						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.gachaScene.QuestSingleGachaStage;
 					}
 				}
-				if (stageName == null && scene_name == "TitleScene")
+				else
 				{
-					if (section_name == "CharaMake")
+					stageName = text;
+				}
+			}
+			if (stageName == null && scene_name == "TitleScene")
+			{
+				if (section_name == "CharaMake")
+				{
+					if (ExistHistorySection("StatusTop") || ExistHistorySection("ProfileTop"))
 					{
-						if (ExistHistorySection("StatusTop") || ExistHistorySection("ProfileTop"))
-						{
-							stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaEditScene.stage;
-						}
-						else
-						{
-							stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.stage;
-						}
+						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaEditScene.stage;
 					}
 					else
 					{
-						stageName = string.Empty;
+						stageName = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.stage;
 					}
 				}
-				if (stageName == null && stageImageID == -1)
+				else
 				{
-					if (scene_name == "StatusScene" || scene_name == "ItemStorageScene")
-					{
-						stageImageID = 10000000;
-					}
-					else
-					{
-						stageImageID = 10000001;
-					}
+					stageName = string.Empty;
 				}
-				if ((prev_scene_name == "ShopScene" && scene_name == "GachaScene") || (prev_scene_name == "GachaScene" && scene_name == "ShopScene"))
+			}
+			if (stageName == null && stageImageID == -1)
+			{
+				if (scene_name == "StatusScene" || scene_name == "ItemStorageScene")
 				{
-					stageForceLoad = true;
+					stageImageID = 10000000;
 				}
+				else if (scene_name.Contains("WeaponSelect"))
+				{
+					stageImageID = 99999999;
+				}
+				else
+				{
+					stageImageID = 10000001;
+				}
+			}
+			if ((prev_scene_name == "ShopScene" && scene_name == "GachaScene") || (prev_scene_name == "GachaScene" && scene_name == "ShopScene"))
+			{
+				stageForceLoad = true;
 			}
 		}
 	}
@@ -414,7 +461,7 @@ public class GameSceneGlobalSettings
 		InitCamera(scene_name, section_name);
 		if (MonoBehaviourSingleton<UIManager>.I.npcMessage != null)
 		{
-			MonoBehaviourSingleton<UIManager>.I.npcMessage.UpdateMessage(section_data, true);
+			MonoBehaviourSingleton<UIManager>.I.npcMessage.UpdateMessage(section_data, is_open: true);
 		}
 	}
 
@@ -422,16 +469,15 @@ public class GameSceneGlobalSettings
 	{
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
 		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.Run(scene_name, section_name, is_new_section, false, null);
+			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.Run(scene_name, section_name, is_new_section, hide_cursol: false);
 		}
 	}
 
 	private void InitGlobal(string scene_name, string section_name, GameSceneTables.SectionData section_data)
 	{
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 		if (scene_name != "InGameScene" && !ExistSection("QuestAcceptRoom") && !ExistSection("WorldMapOpenNewField") && MonoBehaviourSingleton<CoopApp>.IsValid())
 		{
-			MonoBehaviourSingleton<CoopApp>.I.LeaveWithParty(null, false, false);
+			MonoBehaviourSingleton<CoopApp>.I.LeaveWithParty();
 		}
 		Protocol.strict = (scene_name != "InGameScene");
 		if (scene_name != "InGameScene" && scene_name != "DebugScene")
@@ -455,21 +501,34 @@ public class GameSceneGlobalSettings
 	{
 		if (section_name == "QuestResultFriend")
 		{
-			MonoBehaviourSingleton<UIManager>.I.LoadUI(true, false, false);
+			MonoBehaviourSingleton<UIManager>.I.LoadUI(need_common: true, need_outgame: false, need_tutorial: false);
 		}
+	}
+
+	public static IHomeManager GetCurrentIHomeManager()
+	{
+		if (MonoBehaviourSingleton<HomeManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<HomeManager>.I;
+		}
+		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<LoungeManager>.I;
+		}
+		if (MonoBehaviourSingleton<ClanManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<ClanManager>.I;
+		}
+		return null;
 	}
 
 	private void InitGlobalStage(string scene_name, string section_name, GameSceneTables.SectionData section_data)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
 		if (needHomeManager)
 		{
 			if (!MonoBehaviourSingleton<HomeManager>.IsValid())
 			{
-				Utility.CreateGameObjectAndComponent("HomeManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+				Utility.CreateGameObjectAndComponent("HomeManager", MonoBehaviourSingleton<AppMain>.I._transform);
 			}
 		}
 		else if (MonoBehaviourSingleton<HomeManager>.IsValid())
@@ -480,18 +539,29 @@ public class GameSceneGlobalSettings
 		{
 			if (!MonoBehaviourSingleton<LoungeManager>.IsValid())
 			{
-				Utility.CreateGameObjectAndComponent("LoungeManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+				Utility.CreateGameObjectAndComponent("LoungeManager", MonoBehaviourSingleton<AppMain>.I._transform);
 			}
 		}
 		else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
 			Object.DestroyImmediate(MonoBehaviourSingleton<LoungeManager>.I.get_gameObject());
 		}
+		if (needClanManager)
+		{
+			if (!MonoBehaviourSingleton<ClanManager>.IsValid())
+			{
+				Utility.CreateGameObjectAndComponent("ClanManager", MonoBehaviourSingleton<AppMain>.I._transform);
+			}
+		}
+		else if (MonoBehaviourSingleton<ClanManager>.IsValid())
+		{
+			Object.DestroyImmediate(MonoBehaviourSingleton<ClanManager>.I.get_gameObject());
+		}
 		if (needGuildManager)
 		{
 			if (!MonoBehaviourSingleton<GuildStageManager>.IsValid())
 			{
-				Utility.CreateGameObjectAndComponent("GuildStageManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+				Utility.CreateGameObjectAndComponent("GuildStageManager", MonoBehaviourSingleton<AppMain>.I._transform);
 			}
 		}
 		else if (MonoBehaviourSingleton<GuildStageManager>.IsValid())
@@ -502,7 +572,7 @@ public class GameSceneGlobalSettings
 		{
 			if (!MonoBehaviourSingleton<StatusStageManager>.IsValid())
 			{
-				Utility.CreateGameObjectAndComponent("StatusStageManager", MonoBehaviourSingleton<AppMain>.I._transform, -1);
+				Utility.CreateGameObjectAndComponent("StatusStageManager", MonoBehaviourSingleton<AppMain>.I._transform);
 			}
 			MonoBehaviourSingleton<StatusStageManager>.I.UpdateCamera(scene_name, section_name, section_data);
 		}
@@ -510,28 +580,29 @@ public class GameSceneGlobalSettings
 		{
 			Object.DestroyImmediate(MonoBehaviourSingleton<StatusStageManager>.I.get_gameObject());
 		}
-		if (MonoBehaviourSingleton<StageManager>.IsValid())
+		if (!MonoBehaviourSingleton<StageManager>.IsValid())
 		{
-			if (!string.IsNullOrEmpty(stageName))
-			{
-				if (stageForceLoad)
-				{
-					MonoBehaviourSingleton<StageManager>.I.UnloadStage();
-					stageForceLoad = false;
-				}
-				if (MonoBehaviourSingleton<StageManager>.I.LoadStage(stageName) && cameraAnim != null)
-				{
-					cameraAnim.set_enabled(false);
-				}
-			}
-			else if (stageImageID > 0)
-			{
-				MonoBehaviourSingleton<StageManager>.I.LoadBackgoundImage(stageImageID);
-			}
-			else
+			return;
+		}
+		if (!string.IsNullOrEmpty(stageName))
+		{
+			if (stageForceLoad)
 			{
 				MonoBehaviourSingleton<StageManager>.I.UnloadStage();
+				stageForceLoad = false;
 			}
+			if (MonoBehaviourSingleton<StageManager>.I.LoadStage(stageName) && cameraAnim != null)
+			{
+				cameraAnim.set_enabled(false);
+			}
+		}
+		else if (stageImageID > 0)
+		{
+			MonoBehaviourSingleton<StageManager>.I.LoadBackgoundImage(stageImageID);
+		}
+		else
+		{
+			MonoBehaviourSingleton<StageManager>.I.UnloadStage();
 		}
 	}
 
@@ -543,7 +614,7 @@ public class GameSceneGlobalSettings
 
 	public bool isAvailableScreenRotation(string scene_name, string section_name)
 	{
-		return scene_name == "InGameScene" && (section_name.StartsWith("InGame") || section_name == "WorldMap" || section_name == "RegionMap" || section_name == "RegionMapDescriptionList" || section_name == "RegionMapDescriptionDetailDelivery" || section_name == "WorldMapOpenNewField" || section_name == "WorldMapOpenNewRegion" || section_name.StartsWith("ExploreMap")) && section_name != "InGameStoryMain";
+		return scene_name == "InGameScene" && (section_name.StartsWith("InGame") || section_name == "WorldMap" || section_name == "RegionMap" || section_name == "RegionMapDescriptionList" || section_name == "RegionMapDescriptionDetailDelivery" || section_name == "WorldMapOpenNewField" || section_name == "WorldMapOpenNewRegion" || section_name.StartsWith("ExploreMap") || section_name == "InformationDialog") && section_name != "InGameStoryMain";
 	}
 
 	public static void SetOrientation(bool ingame)
@@ -579,27 +650,25 @@ public class GameSceneGlobalSettings
 			Screen.set_autorotateToPortrait(true);
 			Screen.set_autorotateToPortraitUpsideDown(true);
 			Screen.set_orientation(5);
+			return;
+		}
+		Screen.set_autorotateToLandscapeLeft(false);
+		Screen.set_autorotateToLandscapeRight(false);
+		Screen.set_autorotateToPortrait(true);
+		Screen.set_autorotateToPortraitUpsideDown(true);
+		if ((int)Screen.get_orientation() == 0 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 4)
+		{
+			Screen.set_orientation(1);
+			MonoBehaviourSingleton<AppMain>.I.UpdateResolution(is_portrait: true);
+			AppMain i = MonoBehaviourSingleton<AppMain>.I;
+			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+			{
+				Screen.set_orientation(5);
+			});
 		}
 		else
 		{
-			Screen.set_autorotateToLandscapeLeft(false);
-			Screen.set_autorotateToLandscapeRight(false);
-			Screen.set_autorotateToPortrait(true);
-			Screen.set_autorotateToPortraitUpsideDown(true);
-			if ((int)Screen.get_orientation() == 0 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 4)
-			{
-				Screen.set_orientation(1);
-				MonoBehaviourSingleton<AppMain>.I.UpdateResolution(true);
-				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					Screen.set_orientation(5);
-				});
-			}
-			else
-			{
-				Screen.set_orientation(5);
-			}
+			Screen.set_orientation(5);
 		}
 	}
 
@@ -610,42 +679,39 @@ public class GameSceneGlobalSettings
 		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Expected O, but got Unknown
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Expected O, but got Unknown
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Expected O, but got Unknown
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e0: Expected O, but got Unknown
-		//IL_021e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Expected O, but got Unknown
-		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027f: Expected O, but got Unknown
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0318: Expected O, but got Unknown
-		//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0341: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0410: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0415: Unknown result type (might be due to invalid IL or missing references)
+		//IL_042d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_043a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0514: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0521: Unknown result type (might be due to invalid IL or missing references)
 		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		if (mainCamera == null || !mainCamera.get_enabled() || !MonoBehaviourSingleton<StageManager>.IsValid())
 		{
 			return;
 		}
 		mainCamera.set_cullingMask(mainCameraCullingMask);
-		if (saveCameraNear == -3.40282347E+38f)
+		if (saveCameraNear == float.MinValue)
 		{
 			saveCameraNear = mainCamera.get_nearClipPlane();
 			saveCameraFar = mainCamera.get_farClipPlane();
@@ -671,23 +737,23 @@ public class GameSceneGlobalSettings
 				CharaMake.GetCameraPosRot(out pos, out rot, ExistHistorySection("StatusTop") || ExistHistorySection("ProfileTop"));
 				mainCamera.get_transform().Set(pos, rot);
 			}
-			else if (scene_name == "StoryScene" || section_name == "InGameStoryMain")
+			else if ((scene_name == "StoryScene" || section_name == "InGameStoryMain") && MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
 			{
-				Utility.Set(mainCamera.get_transform(), new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraHeight, 0f), Vector3.get_zero());
+				mainCamera.get_transform().Set(new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraHeight, 0f), Vector3.get_zero());
 			}
 			else if (scene_name == "ProfileScene")
 			{
 				mainCamera.get_transform().Set(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendPos, MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.friendRot);
 			}
-			else if (MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
+			else if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
 			{
 				mainCamera.get_transform().Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraRot);
 			}
-			else if (MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillStage && section_name != "SmithGrowSkillResult")
+			else if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene != null && MonoBehaviourSingleton<StageManager>.I.currentStageName == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillStage && section_name != "SmithGrowSkillResult")
 			{
 				mainCamera.get_transform().Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraRot);
 			}
-			else if (scene_name == "StatusScene")
+			else if (scene_name == "StatusScene" || scene_name == "UniqueStatusScene")
 			{
 				mainCamera.get_transform().Set(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.myhousePos, MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.myhouseRot);
 			}
@@ -695,24 +761,65 @@ public class GameSceneGlobalSettings
 			{
 				if (AnimationDirector.I != null)
 				{
-					AnimationDirector.I.SetLinkCamera(true);
+					AnimationDirector.I.SetLinkCamera(is_link: true);
 				}
 			}
 			else if (section_name == "ShopTop")
 			{
 				if (AnimationDirector.I != null)
 				{
-					AnimationDirector.I.SetLinkCamera(false);
+					AnimationDirector.I.SetLinkCamera(is_link: false);
 				}
 				mainCamera.get_transform().Set(MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.cameraPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.shopScene.cameraRot);
 			}
 			else if (!(section_name == "QuestResultFriend"))
 			{
-				goto IL_0332;
+				if (section_name == "HomeTop")
+				{
+					float num = 0f;
+					float num2 = 0f;
+					if (MonoBehaviourSingleton<HomeManager>.IsValid())
+					{
+						num2 = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.GetSelfCameraHeight();
+						num = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.selfCameraTagetHeight;
+					}
+					else
+					{
+						num2 = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.GetSelfCameraHeight();
+						num = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.selfCameraTagetHeight;
+					}
+					Vector3 defaultCameraPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.defaultCameraPos;
+					defaultCameraPos.y += num2;
+					Vector3 defaultTargetPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.defaultTargetPos;
+					defaultTargetPos.y += num;
+					mainCamera.get_transform().set_position(defaultCameraPos);
+					mainCamera.get_transform().LookAt(defaultTargetPos);
+					mainCamera.set_fieldOfView(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.outGameFieldOfView);
+				}
+				else if (section_name == "LoungeTop")
+				{
+					float num3 = 0f;
+					float num4 = 0f;
+					if (MonoBehaviourSingleton<HomeManager>.IsValid())
+					{
+						num4 = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.GetSelfCameraHeight();
+						num3 = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.selfCameraTagetHeight;
+					}
+					else
+					{
+						num4 = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.GetSelfCameraHeight();
+						num3 = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.selfCameraTagetHeight;
+					}
+					Vector3 defaultCameraPos2 = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.defaultCameraPos;
+					defaultCameraPos2.y += num4;
+					Vector3 defaultTargetPos2 = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.defaultTargetPos;
+					defaultTargetPos2.y += num3;
+					mainCamera.get_transform().set_position(defaultCameraPos2);
+					mainCamera.get_transform().LookAt(defaultTargetPos2);
+					mainCamera.set_fieldOfView(MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.outGameFieldOfView);
+				}
 			}
 		}
-		goto IL_0332;
-		IL_0332:
 		UpdateCameraFieldOfView(scene_name, section_name, mainCamera, MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		string text = null;
 		if (scene_name == "ShopScene")
@@ -777,74 +884,77 @@ public class GameSceneGlobalSettings
 
 	private void UpdateCameraFieldOfView(string scene_name, string section_name, Camera camera, bool is_portrait)
 	{
-		if (!(camera == null) && camera.get_enabled() && MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
+		if (camera == null || !camera.get_enabled() || !MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
 		{
-			float num = -1f;
-			string a = null;
-			if (MonoBehaviourSingleton<StageManager>.IsValid())
+			return;
+		}
+		float num = -1f;
+		string a = null;
+		if (MonoBehaviourSingleton<StageManager>.IsValid())
+		{
+			a = MonoBehaviourSingleton<StageManager>.I.currentStageName;
+		}
+		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
+		{
+			return;
+		}
+		if (ExistSection("CharaMake"))
+		{
+			num = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.cameraFieldOfView;
+		}
+		else if (scene_name == "StoryScene" || section_name == "InGameStoryMain")
+		{
+			num = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraFieldOfView;
+		}
+		else if (scene_name == "ProfileScene")
+		{
+			num = MonoBehaviourSingleton<OutGameSettingsManager>.I.profileScene.cameraFieldOfView;
+		}
+		else if (a == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
+		{
+			num = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraFieldOfView;
+		}
+		else if (a == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillStage)
+		{
+			num = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraFieldOfView;
+		}
+		else if (a == MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.mainStage)
+		{
+			num = MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.cameraFieldOfView;
+		}
+		else
+		{
+			if (section_name == "HomeLoginBonusTheater" || section_name == "HomeLoginBonus" || section_name == "HomeLoginBonusNoticeTwo" || section_name == "HomeLoginBonusNoticeOne")
 			{
-				a = MonoBehaviourSingleton<StageManager>.I.currentStageName;
+				return;
 			}
-			if (!MonoBehaviourSingleton<StatusStageManager>.IsValid())
+			if (scene_name != null)
 			{
-				if (ExistSection("CharaMake"))
+				if (!(scene_name == "InGameScene"))
 				{
-					num = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.cameraFieldOfView;
-				}
-				else if (scene_name == "StoryScene" || section_name == "InGameStoryMain")
-				{
-					num = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraFieldOfView;
-				}
-				else if (scene_name == "ProfileScene")
-				{
-					num = MonoBehaviourSingleton<OutGameSettingsManager>.I.profileScene.cameraFieldOfView;
-				}
-				else if (a == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createStage)
-				{
-					num = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.createCameraFieldOfView;
-				}
-				else if (a == MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillStage)
-				{
-					num = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene.glowSkillCameraFieldOfView;
-				}
-				else if (a == MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.mainStage)
-				{
-					num = MonoBehaviourSingleton<OutGameSettingsManager>.I.gatherScene.cameraFieldOfView;
-				}
-				else
-				{
-					if (section_name == "HomeLoginBonusTheater" || section_name == "HomeLoginBonus" || section_name == "HomeLoginBonusNoticeTwo" || section_name == "HomeLoginBonusNoticeOne")
-					{
-						return;
-					}
-					switch (scene_name)
-					{
-					case "InGameScene":
-					{
-						if (!section_name.Contains("InGame"))
-						{
-							return;
-						}
-						GlobalSettingsManager.CameraParam cameraParam2 = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam;
-						num = ((!is_portrait) ? cameraParam2.inGameLandscapeFieldOfView : cameraParam2.inGamePortraitFieldOfView);
-						break;
-					}
-					case "StatusScene":
+					if (scene_name == "UniqueStatusScene" || scene_name == "StatusScene")
 					{
 						GlobalSettingsManager.CameraParam cameraParam = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam;
 						num = cameraParam.myhouseFieldOfView;
-						break;
-					}
 					}
 				}
-				if (num == -1f)
+				else
 				{
-					GlobalSettingsManager.CameraParam cameraParam3 = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam;
-					num = cameraParam3.outGameFieldOfView;
+					if (!section_name.Contains("InGame"))
+					{
+						return;
+					}
+					GlobalSettingsManager.CameraParam cameraParam2 = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam;
+					num = ((!is_portrait) ? cameraParam2.inGameLandscapeFieldOfView : cameraParam2.inGamePortraitFieldOfView);
 				}
-				camera.set_fieldOfView(num);
 			}
 		}
+		if (num == -1f)
+		{
+			GlobalSettingsManager.CameraParam cameraParam3 = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam;
+			num = cameraParam3.outGameFieldOfView;
+		}
+		camera.set_fieldOfView(num);
 	}
 
 	public void OnScreenRotate(bool is_portrait)
@@ -858,6 +968,7 @@ public class GameSceneGlobalSettings
 		{
 		case "MAIN_MENU_HOME":
 		case "MAIN_MENU_LOUNGE":
+		case "MAIN_MENU_CLAN":
 		case "MAIN_MENU_MY_HOUSE":
 		case "MAIN_MENU_QUEST":
 		case "MAIN_MENU_SHOP":
@@ -923,12 +1034,9 @@ public class GameSceneGlobalSettings
 		{
 			return true;
 		}
-		if (!(model is QuestCompleteModel))
+		if (model is QuestCompleteModel)
 		{
-			goto IL_0110;
 		}
-		goto IL_0110;
-		IL_0110:
 		if (model is QuestContinueModel)
 		{
 			return true;
@@ -1007,6 +1115,21 @@ public class GameSceneGlobalSettings
 		{
 			return true;
 		}
+		if (model is ClanRoomQuestModel && model.Error == Error.WRN_CLAN_NOT_JOINED)
+		{
+			return true;
+		}
+		if (model is ClanAcceptInviteModel)
+		{
+			if (model.Error == Error.WRN_CLAN_NOT_EXISTS_INVITE)
+			{
+				return true;
+			}
+			if (model.Error == Error.WRN_CLAN_NOT_EXISTS_CLAN)
+			{
+				return true;
+			}
+		}
 		if (model is GuildStatisticModel && model.Error == Error.WRN_GUILD_DELETE_GET_DATA)
 		{
 			return true;
@@ -1049,61 +1172,82 @@ public class GameSceneGlobalSettings
 
 	public static bool IsDisplayMainUI(string scene_name, string section_name, bool check_tutorial = true)
 	{
-		if (!check_tutorial || TutorialStep.HasFirstDeliveryCompleted())
+		if (check_tutorial && !TutorialStep.HasFirstDeliveryCompleted())
 		{
-			switch (scene_name)
+			return false;
+		}
+		switch (scene_name)
+		{
+		case "TitleScene":
+		case "InGameScene":
+		case "GachaScene":
+		case "StoryScene":
+		case "QuestResultScene":
+		case "DebugScene":
+		case "UniqueStatusScene":
+			return false;
+		default:
+			if (scene_name.Contains("TutorialWeaponSelect"))
 			{
-			case "TitleScene":
-			case "InGameScene":
-			case "GachaScene":
-			case "StoryScene":
-			case "QuestResultScene":
-			case "DebugScene":
 				return false;
-			default:
-				if (scene_name == "HomeScene" || scene_name == "LoungeScene")
-				{
-					if (ExistSection("QuestAcceptRoom") || ExistSection("HomeLoginBonusTheater"))
-					{
-						return false;
-					}
-					if (section_name.Contains("GuildDonateMaterialSelectDialog"))
-					{
-						return false;
-					}
-					if (section_name.Contains("GuildSmithGrowItemSelect"))
-					{
-						return false;
-					}
-					if (section_name.Contains("GuildSmithGrow"))
-					{
-						return false;
-					}
-					string prevSectionNameFromHistory = MonoBehaviourSingleton<GameSceneManager>.I.GetPrevSectionNameFromHistory();
-					if (prevSectionNameFromHistory != null)
-					{
-						if (prevSectionNameFromHistory.Contains("GuildDonateMaterialSelectDialog"))
-						{
-							return false;
-						}
-						if (prevSectionNameFromHistory.Contains("GuildSmithGrow"))
-						{
-							return false;
-						}
-						if (prevSectionNameFromHistory.Contains("GuildSmithGrowItemSelect"))
-						{
-							return false;
-						}
-					}
-				}
-				if (scene_name == "SmithScene" && section_name.Contains("Performance"))
+			}
+			if (scene_name == "HomeScene" || scene_name == "LoungeScene" || scene_name == "ClanScene")
+			{
+				if (section_name == "MenuReset")
 				{
 					return false;
 				}
-				return true;
+				if (ExistSection("QuestAcceptRoom") || ExistSection("HomeLoginBonusTheater"))
+				{
+					return false;
+				}
+				if (section_name.Contains("GuildDonateMaterialSelectDialog"))
+				{
+					return false;
+				}
+				if (section_name.Contains("GuildSmithGrowItemSelect"))
+				{
+					return false;
+				}
+				if (section_name.Contains("GuildSmithGrow"))
+				{
+					return false;
+				}
+				string prevSectionNameFromHistory = MonoBehaviourSingleton<GameSceneManager>.I.GetPrevSectionNameFromHistory();
+				if (prevSectionNameFromHistory != null)
+				{
+					if (prevSectionNameFromHistory.Contains("GuildDonateMaterialSelectDialog"))
+					{
+						return false;
+					}
+					if (prevSectionNameFromHistory.Contains("GuildSmithGrow"))
+					{
+						return false;
+					}
+					if (prevSectionNameFromHistory.Contains("GuildSmithGrowItemSelect"))
+					{
+						return false;
+					}
+				}
 			}
+			if (scene_name == "SmithScene" && section_name.Contains("Performance"))
+			{
+				return false;
+			}
+			if (scene_name == "StatusScene" && ExistSection("StatusScreenShot"))
+			{
+				return false;
+			}
+			if (scene_name == "TitleScene" && section_name == "MenuReset")
+			{
+				return false;
+			}
+			if (forceIgnoreMainUI)
+			{
+				return false;
+			}
+			return true;
 		}
-		return false;
 	}
 
 	public static bool IsDisplayMainStatusUI(string scene_name, string section_name)
@@ -1112,18 +1256,12 @@ public class GameSceneGlobalSettings
 		{
 			string text = section_name;
 			GameSection lastSectionExcludeDialog = MonoBehaviourSingleton<GameSceneManager>.I.GetLastSectionExcludeDialog();
-			if (lastSectionExcludeDialog != null && lastSectionExcludeDialog.sectionData != (GameSceneTables.SectionData)null)
+			if (lastSectionExcludeDialog != null && lastSectionExcludeDialog.sectionData != null)
 			{
 				text = lastSectionExcludeDialog.sectionData.sectionName;
 			}
-			switch (text)
+			if (text != null && (text == "StatusAvatarEquipSelect" || text == "StatusEquip" || text == "StatusEquipSort" || text == "StatusEquipList" || text == "StatusEnemyList" || text == "StatusEquipListAchievement"))
 			{
-			case "StatusAvatarEquipSelect":
-			case "StatusEquip":
-			case "StatusEquipSort":
-			case "StatusEquipList":
-			case "StatusEnemyList":
-			case "StatusEquipListAchievement":
 				return false;
 			}
 		}
@@ -1158,31 +1296,31 @@ public class GameSceneGlobalSettings
 				}
 			}
 		}
-		return IsDisplayMainUI(scene_name, section_name, false);
+		return IsDisplayMainUI(scene_name, section_name, check_tutorial: false);
 	}
 
 	public static bool IsActiveMainUI()
 	{
 		string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
 		GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-		if (!(currentSection != null) || !(currentSection.sectionData != (GameSceneTables.SectionData)null) || !currentSection.sectionData.type.IsDialog())
+		if (currentSection != null && currentSection.sectionData != null && currentSection.sectionData.type.IsDialog())
 		{
-			switch (currentSectionName)
-			{
-			case "QuestStartChangeEquipSet":
-			case "QuestStorageOverflowEquip":
-			case "QuestStorageOverflowSkill":
-			case "QuestRoomInvalid":
-			case "QuestRoomInvalid_EquipChange":
-			case "QuestRoomInvalid_UserDetail":
-			case "QuestRoomInvalid_UserDetailItem":
-			case "PresentTop":
-				return false;
-			default:
-				return true;
-			}
+			return false;
 		}
-		return false;
+		switch (currentSectionName)
+		{
+		case "QuestStartChangeEquipSet":
+		case "QuestStorageOverflowEquip":
+		case "QuestStorageOverflowSkill":
+		case "QuestRoomInvalid":
+		case "QuestRoomInvalid_EquipChange":
+		case "QuestRoomInvalid_UserDetail":
+		case "QuestRoomInvalid_UserDetailItem":
+		case "PresentTop":
+			return false;
+		default:
+			return true;
+		}
 	}
 
 	private void ResetAudioRestener()
@@ -1200,65 +1338,97 @@ public class GameSceneGlobalSettings
 		int playingBGMID = MonoBehaviourSingleton<SoundManager>.I.playingBGMID;
 		int num = -1;
 		string text = "Default";
-		switch (scene_name)
+		if (scene_name != null)
 		{
-		case "TitleScene":
-			if (section_name == "Opening")
+			if (_003C_003Ef__switch_0024mapA == null)
 			{
-				num = 13;
+				Dictionary<string, int> dictionary = new Dictionary<string, int>(12);
+				dictionary.Add("TitleScene", 0);
+				dictionary.Add("QuestResultScene", 1);
+				dictionary.Add("HomeScene", 2);
+				dictionary.Add("LoungeScene", 3);
+				dictionary.Add("ClanScene", 4);
+				dictionary.Add("StoryScene", 5);
+				dictionary.Add("GatherScene", 6);
+				dictionary.Add("InGameScene", 7);
+				dictionary.Add("StatusScene", 8);
+				dictionary.Add("ShopScene", 9);
+				dictionary.Add("GachaScene", 10);
+				dictionary.Add("UniqueStatusScene", 11);
+				_003C_003Ef__switch_0024mapA = dictionary;
 			}
-			if (section_name == "Opening")
+			if (_003C_003Ef__switch_0024mapA.TryGetValue(scene_name, out int value))
 			{
-				text = "Opening";
+				switch (value)
+				{
+				case 0:
+					if (section_name == "Opening")
+					{
+						num = 13;
+					}
+					if (section_name == "Opening")
+					{
+						text = "Opening";
+					}
+					break;
+				case 1:
+					num = 0;
+					text = "QuestResult";
+					break;
+				case 2:
+				{
+					HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(TimeManager.GetNow());
+					num = homeThemeData.bgmId;
+					if (MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("HomeTop") && MonoBehaviourSingleton<GameSceneManager>.I.prev_scene_name == "HomeScene")
+					{
+						num = playingBGMID;
+					}
+					if (num <= 0)
+					{
+						num = 2;
+					}
+					text = "Home";
+					break;
+				}
+				case 3:
+					num = 153;
+					text = "Lounge";
+					MonoBehaviourSingleton<SoundManager>.I.TransitionPreset(3u);
+					break;
+				case 4:
+					num = 153;
+					text = "Lounge";
+					MonoBehaviourSingleton<SoundManager>.I.TransitionPreset(3u);
+					break;
+				case 5:
+					text = "Story";
+					break;
+				case 6:
+					num = 108;
+					break;
+				case 7:
+					UpdateIngameBGM(section_name);
+					UpdateIngamePreset(section_name);
+					text = "InGame";
+					break;
+				case 8:
+					num = 6;
+					text = "Home";
+					break;
+				case 9:
+					num = 7;
+					text = "Gacha";
+					break;
+				case 10:
+					num = ((section_name == "GachaPerformanceQuest") ? 8 : ((!(section_name == "GachaPerformanceSkill")) ? 7 : 9));
+					text = "Gacha";
+					break;
+				case 11:
+					num = 6;
+					text = "Home";
+					break;
+				}
 			}
-			break;
-		case "QuestResultScene":
-			num = 0;
-			text = "QuestResult";
-			break;
-		case "HomeScene":
-		{
-			HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(TimeManager.GetNow());
-			num = homeThemeData.bgmId;
-			if (MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("HomeTop") && MonoBehaviourSingleton<GameSceneManager>.I.prev_scene_name == "HomeScene")
-			{
-				num = playingBGMID;
-			}
-			if (num <= 0)
-			{
-				num = 2;
-			}
-			text = "Home";
-			break;
-		}
-		case "LoungeScene":
-			num = 153;
-			text = "Lounge";
-			MonoBehaviourSingleton<SoundManager>.I.TransitionPreset(3u);
-			break;
-		case "StoryScene":
-			text = "Story";
-			break;
-		case "GatherScene":
-			num = 108;
-			break;
-		case "InGameScene":
-			UpdateIngameBGM(section_name);
-			UpdateIngamePreset(section_name);
-			text = "InGame";
-			break;
-		case "StatusScene":
-			num = 6;
-			text = "Home";
-			break;
-		case "ShopScene":
-			num = 7;
-			text = "Gacha";
-			break;
-		case "GachaScene":
-			num = ((section_name == "GachaPerformanceQuest") ? 8 : ((!(section_name == "GachaPerformanceSkill")) ? 7 : 9));
-			text = "Gacha";
-			break;
 		}
 		if (num != -1)
 		{
@@ -1266,7 +1436,7 @@ public class GameSceneGlobalSettings
 		}
 		if (text != "InGame")
 		{
-			i.TransitionTo(text, 1f);
+			i.TransitionTo(text);
 		}
 	}
 
@@ -1279,24 +1449,27 @@ public class GameSceneGlobalSettings
 		}
 		if (num > 0)
 		{
-			SoundManager.RequestBGM(num, true);
+			SoundManager.RequestBGM(num);
 		}
 	}
 
 	private void UpdateIngamePreset(string section_name)
 	{
-		switch (section_name)
+		if (section_name == null)
 		{
-		case "QuestResultDirection":
-		case "QuestResultFriend":
-			MonoBehaviourSingleton<SoundManager>.I.TransitionTo("QuestResult", 1f);
-			break;
-		case "InGameMain":
-		{
-			SoundID.AudioSettinID presetId = QuestManager.IsValidInGame() ? SoundID.AudioSettinID.IngameBoss : SoundID.AudioSettinID.IngameField;
-			MonoBehaviourSingleton<SoundManager>.I.TransitionPreset((uint)presetId);
-			break;
+			return;
 		}
+		if (!(section_name == "QuestResultDirection") && !(section_name == "QuestResultFriend"))
+		{
+			if (section_name == "InGameMain")
+			{
+				SoundID.AudioSettinID presetId = QuestManager.IsValidInGame() ? SoundID.AudioSettinID.IngameBoss : SoundID.AudioSettinID.IngameField;
+				MonoBehaviourSingleton<SoundManager>.I.TransitionPreset((uint)presetId);
+			}
+		}
+		else
+		{
+			MonoBehaviourSingleton<SoundManager>.I.TransitionTo("QuestResult");
 		}
 	}
 
@@ -1310,12 +1483,10 @@ public class GameSceneGlobalSettings
 			if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && MonoBehaviourSingleton<InGameRecorder>.I.isVictory)
 			{
 				num = 4;
+				break;
 			}
-			else
-			{
-				num = -1;
-				SoundManager.RequestBGM(10, false);
-			}
+			num = -1;
+			SoundManager.RequestBGM(10, isLoop: false);
 			break;
 		case "InGameFieldQuestConfirm":
 			num = 12;
@@ -1344,8 +1515,12 @@ public class GameSceneGlobalSettings
 					}
 				}
 			}
-			else if (QuestManager.IsValidInGame())
+			else
 			{
+				if (!QuestManager.IsValidInGame())
+				{
+					break;
+				}
 				if (MonoBehaviourSingleton<QuestManager>.IsValid())
 				{
 					num = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID();
@@ -1363,7 +1538,7 @@ public class GameSceneGlobalSettings
 		}
 		if (num > 0)
 		{
-			SoundManager.RequestBGM(num, true);
+			SoundManager.RequestBGM(num);
 		}
 	}
 }

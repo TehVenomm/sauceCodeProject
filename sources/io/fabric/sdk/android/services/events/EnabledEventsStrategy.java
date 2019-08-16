@@ -1,14 +1,17 @@
-package io.fabric.sdk.android.services.events;
+package p017io.fabric.sdk.android.services.events;
 
 import android.content.Context;
-import io.fabric.sdk.android.services.common.CommonUtils;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
 
+/* renamed from: io.fabric.sdk.android.services.events.EnabledEventsStrategy */
 public abstract class EnabledEventsStrategy<T> implements EventsStrategy<T> {
     static final int UNDEFINED_ROLLOVER_INTERVAL_SECONDS = -1;
     protected final Context context;
@@ -17,11 +20,11 @@ public abstract class EnabledEventsStrategy<T> implements EventsStrategy<T> {
     volatile int rolloverIntervalSeconds = -1;
     final AtomicReference<ScheduledFuture<?>> scheduledRolloverFutureRef;
 
-    public EnabledEventsStrategy(Context context, ScheduledExecutorService scheduledExecutorService, EventsFilesManager<T> eventsFilesManager) {
-        this.context = context;
+    public EnabledEventsStrategy(Context context2, ScheduledExecutorService scheduledExecutorService, EventsFilesManager<T> eventsFilesManager) {
+        this.context = context2;
         this.executorService = scheduledExecutorService;
         this.filesManager = eventsFilesManager;
-        this.scheduledRolloverFutureRef = new AtomicReference();
+        this.scheduledRolloverFutureRef = new AtomicReference<>();
     }
 
     public void cancelTimeBasedFileRollOver() {
@@ -32,7 +35,8 @@ public abstract class EnabledEventsStrategy<T> implements EventsStrategy<T> {
         }
     }
 
-    protected void configureRollover(int i) {
+    /* access modifiers changed from: protected */
+    public void configureRollover(int i) {
         this.rolloverIntervalSeconds = i;
         scheduleTimeBasedFileRollOver(0, (long) this.rolloverIntervalSeconds);
     }
@@ -41,11 +45,15 @@ public abstract class EnabledEventsStrategy<T> implements EventsStrategy<T> {
         this.filesManager.deleteAllEventsFiles();
     }
 
+    public int getRollover() {
+        return this.rolloverIntervalSeconds;
+    }
+
     public void recordEvent(T t) {
         CommonUtils.logControlled(this.context, t.toString());
         try {
             this.filesManager.writeEvent(t);
-        } catch (Throwable e) {
+        } catch (IOException e) {
             CommonUtils.logControlledError(this.context, "Failed to write event.", e);
         }
         scheduleTimeBasedRollOverIfNeeded();
@@ -54,31 +62,33 @@ public abstract class EnabledEventsStrategy<T> implements EventsStrategy<T> {
     public boolean rollFileOver() {
         try {
             return this.filesManager.rollFileOver();
-        } catch (Throwable e) {
+        } catch (IOException e) {
             CommonUtils.logControlledError(this.context, "Failed to roll file over.", e);
             return false;
         }
     }
 
-    void scheduleTimeBasedFileRollOver(long j, long j2) {
-        if ((this.scheduledRolloverFutureRef.get() == null ? 1 : null) != null) {
-            Runnable timeBasedFileRollOverRunnable = new TimeBasedFileRollOverRunnable(this.context, this);
+    /* access modifiers changed from: 0000 */
+    public void scheduleTimeBasedFileRollOver(long j, long j2) {
+        if (this.scheduledRolloverFutureRef.get() == null) {
+            TimeBasedFileRollOverRunnable timeBasedFileRollOverRunnable = new TimeBasedFileRollOverRunnable(this.context, this);
             CommonUtils.logControlled(this.context, "Scheduling time based file roll over every " + j2 + " seconds");
             try {
                 this.scheduledRolloverFutureRef.set(this.executorService.scheduleAtFixedRate(timeBasedFileRollOverRunnable, j, j2, TimeUnit.SECONDS));
-            } catch (Throwable e) {
+            } catch (RejectedExecutionException e) {
                 CommonUtils.logControlledError(this.context, "Failed to schedule time based file roll over", e);
             }
         }
     }
 
     public void scheduleTimeBasedRollOverIfNeeded() {
-        if ((this.rolloverIntervalSeconds != -1 ? 1 : null) != null) {
+        if (this.rolloverIntervalSeconds != -1) {
             scheduleTimeBasedFileRollOver((long) this.rolloverIntervalSeconds, (long) this.rolloverIntervalSeconds);
         }
     }
 
-    void sendAndCleanUpIfSuccess() {
+    /* access modifiers changed from: 0000 */
+    public void sendAndCleanUpIfSuccess() {
         int i = 0;
         FilesSender filesSender = getFilesSender();
         if (filesSender == null) {
@@ -88,18 +98,18 @@ public abstract class EnabledEventsStrategy<T> implements EventsStrategy<T> {
         CommonUtils.logControlled(this.context, "Sending all files");
         List batchOfFilesToSend = this.filesManager.getBatchOfFilesToSend();
         while (batchOfFilesToSend.size() > 0) {
-            CommonUtils.logControlled(this.context, String.format(Locale.US, "attempt to send batch of %d files", new Object[]{Integer.valueOf(batchOfFilesToSend.size())}));
-            boolean send = filesSender.send(batchOfFilesToSend);
-            if (send) {
-                i += batchOfFilesToSend.size();
-                this.filesManager.deleteSentFiles(batchOfFilesToSend);
-            }
-            if (!send) {
-                break;
-            }
             try {
+                CommonUtils.logControlled(this.context, String.format(Locale.US, "attempt to send batch of %d files", new Object[]{Integer.valueOf(batchOfFilesToSend.size())}));
+                boolean send = filesSender.send(batchOfFilesToSend);
+                if (send) {
+                    i += batchOfFilesToSend.size();
+                    this.filesManager.deleteSentFiles(batchOfFilesToSend);
+                }
+                if (!send) {
+                    break;
+                }
                 batchOfFilesToSend = this.filesManager.getBatchOfFilesToSend();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 CommonUtils.logControlledError(this.context, "Failed to send batch of analytics files to server: " + e.getMessage(), e);
             }
         }

@@ -26,8 +26,6 @@ public class UIEnemyStatusGizmo : UIStatusGizmoBase
 		}
 		set
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			_targetEnemy = value;
 			if (_targetEnemy != null)
 			{
@@ -68,50 +66,49 @@ public class UIEnemyStatusGizmo : UIStatusGizmoBase
 		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		if (!(targetEnemy == null))
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		if (targetEnemy == null)
 		{
-			Vector3 position = targetEnemy._position;
-			position.y += hight;
-			Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(position);
-			screenZ = val.z;
-			if (val.z < 0f)
+			return;
+		}
+		Vector3 position = targetEnemy._position;
+		position.y += hight;
+		Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(position);
+		screenZ = val.z;
+		if (val.z < 0f)
+		{
+			val *= -1f;
+		}
+		val.z = 0f;
+		Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
+		Vector3 val3 = transform.get_position() - val2;
+		if (val3.get_sqrMagnitude() >= 2E-05f)
+		{
+			transform.set_position(val2);
+		}
+		if (gaugeUI != null)
+		{
+			float num = (float)targetEnemy.hpShow / (float)targetEnemy.hpMax;
+			if (num < 0f)
 			{
-				val *= -1f;
+				num = 0f;
 			}
-			val.z = 0f;
-			Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-			Vector3 val3 = transform.get_position() - val2;
-			if (val3.get_sqrMagnitude() >= 2E-05f)
+			if (gaugeUI.nowPercent != num)
 			{
-				transform.set_position(val2);
+				gaugeUI.SetPercent(num);
 			}
-			if (gaugeUI != null)
+		}
+		if (gaugeAegisUI != null)
+		{
+			float aegisPercent = targetEnemy.GetAegisPercent();
+			bool flag = aegisPercent > 0f;
+			if (gaugeAegisUI.nowPercent != aegisPercent)
 			{
-				float num = (float)targetEnemy.hpShow / (float)targetEnemy.hpMax;
-				if (num < 0f)
-				{
-					num = 0f;
-				}
-				if (gaugeUI.nowPercent != num)
-				{
-					gaugeUI.SetPercent(num, true);
-				}
+				gaugeAegisUI.SetPercent(aegisPercent);
 			}
-			if (gaugeAegisUI != null)
+			if (gaugeAegisUI.get_gameObject().get_activeSelf() != flag)
 			{
-				float aegisPercent = targetEnemy.GetAegisPercent();
-				bool flag = aegisPercent > 0f;
-				if (gaugeAegisUI.nowPercent != aegisPercent)
-				{
-					gaugeAegisUI.SetPercent(aegisPercent, true);
-				}
-				if (gaugeAegisUI.get_gameObject().get_activeSelf() != flag)
-				{
-					gaugeAegisUI.get_gameObject().SetActive(flag);
-				}
+				gaugeAegisUI.get_gameObject().SetActive(flag);
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.C0861As;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -29,7 +29,7 @@ public abstract class TypeDeserializerBase extends TypeDeserializer implements S
 
     public abstract TypeDeserializer forProperty(BeanProperty beanProperty);
 
-    public abstract As getTypeInclusion();
+    public abstract C0861As getTypeInclusion();
 
     protected TypeDeserializerBase(JavaType javaType, TypeIdResolver typeIdResolver, String str, boolean z, Class<?> cls) {
         this._baseType = javaType;
@@ -72,19 +72,23 @@ public abstract class TypeDeserializerBase extends TypeDeserializer implements S
     }
 
     public Class<?> getDefaultImpl() {
-        return this._defaultImpl == null ? null : this._defaultImpl.getRawClass();
+        if (this._defaultImpl == null) {
+            return null;
+        }
+        return this._defaultImpl.getRawClass();
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('[').append(getClass().getName());
-        stringBuilder.append("; base-type:").append(this._baseType);
-        stringBuilder.append("; id-resolver: ").append(this._idResolver);
-        stringBuilder.append(']');
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append('[').append(getClass().getName());
+        sb.append("; base-type:").append(this._baseType);
+        sb.append("; id-resolver: ").append(this._idResolver);
+        sb.append(']');
+        return sb.toString();
     }
 
-    protected final JsonDeserializer<Object> _findDeserializer(DeserializationContext deserializationContext, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public final JsonDeserializer<Object> _findDeserializer(DeserializationContext deserializationContext, String str) throws IOException {
         JsonDeserializer<Object> jsonDeserializer = (JsonDeserializer) this._deserializers.get(str);
         if (jsonDeserializer == null) {
             JavaType typeFromId = this._idResolver.typeFromId(deserializationContext, str);
@@ -104,16 +108,17 @@ public abstract class TypeDeserializerBase extends TypeDeserializer implements S
         return jsonDeserializer;
     }
 
-    protected final JsonDeserializer<Object> _findDefaultImplDeserializer(DeserializationContext deserializationContext) throws IOException {
+    /* access modifiers changed from: protected */
+    public final JsonDeserializer<Object> _findDefaultImplDeserializer(DeserializationContext deserializationContext) throws IOException {
+        JsonDeserializer<Object> jsonDeserializer;
         if (this._defaultImpl == null) {
-            if (deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE)) {
-                return null;
+            if (!deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE)) {
+                return NullifyingDeserializer.instance;
             }
-            return NullifyingDeserializer.instance;
+            return null;
         } else if (ClassUtil.isBogusClass(this._defaultImpl.getRawClass())) {
             return NullifyingDeserializer.instance;
         } else {
-            JsonDeserializer<Object> jsonDeserializer;
             synchronized (this._defaultImpl) {
                 if (this._defaultImplDeserializer == null) {
                     this._defaultImplDeserializer = deserializationContext.findContextualValueDeserializer(this._defaultImpl, this._property);
@@ -124,35 +129,39 @@ public abstract class TypeDeserializerBase extends TypeDeserializer implements S
         }
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected Object _deserializeWithNativeTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    public Object _deserializeWithNativeTypeId(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         return _deserializeWithNativeTypeId(jsonParser, deserializationContext, jsonParser.getTypeId());
     }
 
-    protected Object _deserializeWithNativeTypeId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
-        JsonDeserializer _findDefaultImplDeserializer;
+    /* access modifiers changed from: protected */
+    public Object _deserializeWithNativeTypeId(JsonParser jsonParser, DeserializationContext deserializationContext, Object obj) throws IOException {
+        JsonDeserializer jsonDeserializer;
         if (obj == null) {
-            _findDefaultImplDeserializer = _findDefaultImplDeserializer(deserializationContext);
-            if (_findDefaultImplDeserializer == null) {
+            jsonDeserializer = _findDefaultImplDeserializer(deserializationContext);
+            if (jsonDeserializer == null) {
                 throw deserializationContext.mappingException("No (native) type id found when one was expected for polymorphic type handling");
             }
+        } else {
+            jsonDeserializer = _findDeserializer(deserializationContext, obj instanceof String ? (String) obj : String.valueOf(obj));
         }
-        _findDefaultImplDeserializer = _findDeserializer(deserializationContext, obj instanceof String ? (String) obj : String.valueOf(obj));
-        return _findDefaultImplDeserializer.deserialize(jsonParser, deserializationContext);
+        return jsonDeserializer.deserialize(jsonParser, deserializationContext);
     }
 
-    protected JsonDeserializer<Object> _handleUnknownTypeId(DeserializationContext deserializationContext, String str, TypeIdResolver typeIdResolver, JavaType javaType) throws IOException {
-        String descForKnownTypeIds;
+    /* access modifiers changed from: protected */
+    public JsonDeserializer<Object> _handleUnknownTypeId(DeserializationContext deserializationContext, String str, TypeIdResolver typeIdResolver, JavaType javaType) throws IOException {
+        String str2;
         if (typeIdResolver instanceof TypeIdResolverBase) {
-            descForKnownTypeIds = ((TypeIdResolverBase) typeIdResolver).getDescForKnownTypeIds();
+            String descForKnownTypeIds = ((TypeIdResolverBase) typeIdResolver).getDescForKnownTypeIds();
             if (descForKnownTypeIds == null) {
-                descForKnownTypeIds = "known type ids are not statically known";
+                str2 = "known type ids are not statically known";
             } else {
-                descForKnownTypeIds = "known type ids = " + descForKnownTypeIds;
+                str2 = "known type ids = " + descForKnownTypeIds;
             }
         } else {
-            descForKnownTypeIds = null;
+            str2 = null;
         }
-        throw deserializationContext.unknownTypeException(this._baseType, str, descForKnownTypeIds);
+        throw deserializationContext.unknownTypeException(this._baseType, str, str2);
     }
 }

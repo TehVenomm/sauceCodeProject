@@ -1,8 +1,6 @@
 package com.fasterxml.jackson.databind.ser.impl;
 
-import com.fasterxml.jackson.annotation.JsonFormat.Feature;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -11,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
@@ -46,50 +43,59 @@ public class StringArraySerializer extends ArraySerializerBase<String[]> impleme
         return this;
     }
 
-    public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
-        JsonSerializer serializerInstance;
-        Boolean findFormatFeature;
-        JsonSerializer jsonSerializer = null;
-        if (beanProperty != null) {
-            AnnotationIntrospector annotationIntrospector = serializerProvider.getAnnotationIntrospector();
-            Annotated member = beanProperty.getMember();
-            if (member != null) {
-                Object findContentSerializer = annotationIntrospector.findContentSerializer(member);
-                if (findContentSerializer != null) {
-                    serializerInstance = serializerProvider.serializerInstance(member, findContentSerializer);
-                    findFormatFeature = findFormatFeature(serializerProvider, beanProperty, String[].class, Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
-                    if (serializerInstance == null) {
-                        serializerInstance = this._elementSerializer;
-                    }
-                    serializerInstance = findConvertingContentSerializer(serializerProvider, beanProperty, serializerInstance);
-                    if (serializerInstance != null) {
-                        serializerInstance = serializerProvider.findValueSerializer(String.class, beanProperty);
-                    } else {
-                        serializerInstance = serializerProvider.handleSecondaryContextualization(serializerInstance, beanProperty);
-                    }
-                    if (!isDefaultSerializer(serializerInstance)) {
-                        jsonSerializer = serializerInstance;
-                    }
-                    return (jsonSerializer == this._elementSerializer || findFormatFeature != this._unwrapSingle) ? new StringArraySerializer(this, beanProperty, jsonSerializer, findFormatFeature) : this;
-                }
-            }
-        }
-        serializerInstance = null;
-        findFormatFeature = findFormatFeature(serializerProvider, beanProperty, String[].class, Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
-        if (serializerInstance == null) {
-            serializerInstance = this._elementSerializer;
-        }
-        serializerInstance = findConvertingContentSerializer(serializerProvider, beanProperty, serializerInstance);
-        if (serializerInstance != null) {
-            serializerInstance = serializerProvider.handleSecondaryContextualization(serializerInstance, beanProperty);
-        } else {
-            serializerInstance = serializerProvider.findValueSerializer(String.class, beanProperty);
-        }
-        if (isDefaultSerializer(serializerInstance)) {
-            jsonSerializer = serializerInstance;
-        }
-        if (jsonSerializer == this._elementSerializer) {
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:12:0x0029  */
+    /* JADX WARNING: Removed duplicated region for block: B:19:0x003e  */
+    /* JADX WARNING: Removed duplicated region for block: B:21:0x004a  */
+    /* JADX WARNING: Removed duplicated region for block: B:9:0x0021  */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public com.fasterxml.jackson.databind.JsonSerializer<?> createContextual(com.fasterxml.jackson.databind.SerializerProvider r5, com.fasterxml.jackson.databind.BeanProperty r6) throws com.fasterxml.jackson.databind.JsonMappingException {
+        /*
+            r4 = this;
+            r1 = 0
+            if (r6 == 0) goto L_0x004c
+            com.fasterxml.jackson.databind.AnnotationIntrospector r0 = r5.getAnnotationIntrospector()
+            com.fasterxml.jackson.databind.introspect.AnnotatedMember r2 = r6.getMember()
+            if (r2 == 0) goto L_0x004c
+            java.lang.Object r0 = r0.findContentSerializer(r2)
+            if (r0 == 0) goto L_0x004c
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r5.serializerInstance(r2, r0)
+        L_0x0017:
+            java.lang.Class<java.lang.String[]> r2 = java.lang.String[].class
+            com.fasterxml.jackson.annotation.JsonFormat$Feature r3 = com.fasterxml.jackson.annotation.JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED
+            java.lang.Boolean r2 = r4.findFormatFeature(r5, r6, r2, r3)
+            if (r0 != 0) goto L_0x0023
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r0 = r4._elementSerializer
+        L_0x0023:
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r4.findConvertingContentSerializer(r5, r6, r0)
+            if (r0 != 0) goto L_0x003e
+            java.lang.Class<java.lang.String> r0 = java.lang.String.class
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r5.findValueSerializer(r0, r6)
+        L_0x002f:
+            boolean r3 = r4.isDefaultSerializer(r0)
+            if (r3 == 0) goto L_0x004a
+        L_0x0035:
+            com.fasterxml.jackson.databind.JsonSerializer<java.lang.Object> r0 = r4._elementSerializer
+            if (r1 != r0) goto L_0x0043
+            java.lang.Boolean r0 = r4._unwrapSingle
+            if (r2 != r0) goto L_0x0043
+        L_0x003d:
+            return r4
+        L_0x003e:
+            com.fasterxml.jackson.databind.JsonSerializer r0 = r5.handleSecondaryContextualization(r0, r6)
+            goto L_0x002f
+        L_0x0043:
+            com.fasterxml.jackson.databind.ser.impl.StringArraySerializer r0 = new com.fasterxml.jackson.databind.ser.impl.StringArraySerializer
+            r0.<init>(r4, r6, r1, r2)
+            r4 = r0
+            goto L_0x003d
+        L_0x004a:
+            r1 = r0
+            goto L_0x0035
+        L_0x004c:
+            r0 = r1
+            goto L_0x0017
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.fasterxml.jackson.databind.ser.impl.StringArraySerializer.createContextual(com.fasterxml.jackson.databind.SerializerProvider, com.fasterxml.jackson.databind.BeanProperty):com.fasterxml.jackson.databind.JsonSerializer");
     }
 
     public JavaType getContentType() {
@@ -110,13 +116,13 @@ public class StringArraySerializer extends ArraySerializerBase<String[]> impleme
 
     public final void serialize(String[] strArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         int length = strArr.length;
-        if (length == 1 && ((this._unwrapSingle == null && serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) || this._unwrapSingle == Boolean.TRUE)) {
+        if (length != 1 || ((this._unwrapSingle != null || !serializerProvider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)) && this._unwrapSingle != Boolean.TRUE)) {
+            jsonGenerator.writeStartArray(length);
             serializeContents(strArr, jsonGenerator, serializerProvider);
+            jsonGenerator.writeEndArray();
             return;
         }
-        jsonGenerator.writeStartArray(length);
         serializeContents(strArr, jsonGenerator, serializerProvider);
-        jsonGenerator.writeEndArray();
     }
 
     public void serializeContents(String[] strArr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {

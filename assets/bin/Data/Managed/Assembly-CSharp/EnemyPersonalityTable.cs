@@ -1,14 +1,15 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTable
 {
 	public class Data
 	{
-		public const string NT = "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate";
-
 		public uint id;
 
 		public HateParam param = new HateParam();
+
+		public const string NT = "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate";
 
 		public static bool cb(CSVReader csv_reader, Data data, ref uint key)
 		{
@@ -54,6 +55,12 @@ public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTabl
 
 	private UIntKeyTable<Data> dataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(TextAsset textasset)
 	{
 		CreateTable(textasset.get_text());
@@ -61,13 +68,13 @@ public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTabl
 
 	public void CreateTable(string csv)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<Data>(csv, Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate", null);
+		dataTable = TableUtility.CreateUIntKeyTable<Data>(csv, Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate");
 		dataTable.TrimExcess();
 	}
 
 	public void AddTable(TextAsset textasset)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate", null);
+		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate");
 	}
 
 	public Data GetData(uint id)

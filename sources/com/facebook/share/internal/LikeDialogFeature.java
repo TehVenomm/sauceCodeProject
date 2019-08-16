@@ -3,6 +3,7 @@ package com.facebook.share.internal;
 import com.facebook.internal.DialogFeature;
 import com.facebook.internal.NativeProtocol;
 
+@Deprecated
 public enum LikeDialogFeature implements DialogFeature {
     LIKE_DIALOG(NativeProtocol.PROTOCOL_VERSION_20140701);
     

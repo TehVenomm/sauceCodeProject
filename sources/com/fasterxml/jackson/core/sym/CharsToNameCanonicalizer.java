@@ -161,6 +161,7 @@ public final class CharsToNameCanonicalizer {
     }
 
     public int collisionCount() {
+        Bucket[] bucketArr;
         int i = 0;
         for (Bucket bucket : this._buckets) {
             if (bucket != null) {
@@ -199,9 +200,9 @@ public final class CharsToNameCanonicalizer {
                 if (has != null) {
                     return has;
                 }
-                has = _findSymbol2(cArr, i, i2, bucket.next);
-                if (has != null) {
-                    return has;
+                String _findSymbol2 = _findSymbol2(cArr, i, i2, bucket.next);
+                if (_findSymbol2 != null) {
+                    return _findSymbol2;
                 }
             }
         }
@@ -268,8 +269,8 @@ public final class CharsToNameCanonicalizer {
 
     public int _hashToIndex(int i) {
         int i2 = (i >>> 15) + i;
-        i2 ^= i2 << 7;
-        return (i2 + (i2 >>> 3)) & this._indexMask;
+        int i3 = i2 ^ (i2 << 7);
+        return (i3 + (i3 >>> 3)) & this._indexMask;
     }
 
     public int calcHash(char[] cArr, int i, int i2) {
@@ -279,19 +280,22 @@ public final class CharsToNameCanonicalizer {
             i3 = (i3 * 33) + cArr[i];
             i++;
         }
-        return i3 == 0 ? 1 : i3;
+        if (i3 == 0) {
+            return 1;
+        }
+        return i3;
     }
 
     public int calcHash(String str) {
         int length = str.length();
         int i = this._hashSeed;
-        int i2 = 0;
-        while (i2 < length) {
-            int charAt = str.charAt(i2) + (i * 33);
-            i2++;
-            i = charAt;
+        for (int i2 = 0; i2 < length; i2++) {
+            i = (i * 33) + str.charAt(i2);
         }
-        return i == 0 ? 1 : i;
+        if (i == 0) {
+            return 1;
+        }
+        return i;
     }
 
     private void copyArrays() {
@@ -313,60 +317,55 @@ public final class CharsToNameCanonicalizer {
             this._dirty = true;
             return;
         }
-        int i2;
         String[] strArr = this._symbols;
         Bucket[] bucketArr = this._buckets;
         this._symbols = new String[i];
         this._buckets = new Bucket[(i >> 1)];
         this._indexMask = i - 1;
         this._sizeThreshold = _thresholdSize(i);
-        i = 0;
+        int i2 = 0;
         int i3 = 0;
-        for (i2 = 0; i2 < length; i2++) {
-            String str = strArr[i2];
+        for (int i4 = 0; i4 < length; i4++) {
+            String str = strArr[i4];
             if (str != null) {
                 i3++;
                 int _hashToIndex = _hashToIndex(calcHash(str));
                 if (this._symbols[_hashToIndex] == null) {
                     this._symbols[_hashToIndex] = str;
                 } else {
-                    _hashToIndex >>= 1;
-                    Bucket bucket = new Bucket(str, this._buckets[_hashToIndex]);
-                    this._buckets[_hashToIndex] = bucket;
-                    i = Math.max(i, bucket.length);
+                    int i5 = _hashToIndex >> 1;
+                    Bucket bucket = new Bucket(str, this._buckets[i5]);
+                    this._buckets[i5] = bucket;
+                    i2 = Math.max(i2, bucket.length);
                 }
             }
         }
-        length >>= 1;
-        i2 = 0;
-        int i4 = i3;
-        i3 = i;
-        while (i2 < length) {
-            i = i3;
-            for (Bucket bucket2 = bucketArr[i2]; bucket2 != null; bucket2 = bucket2.next) {
-                i4++;
+        int i6 = length >> 1;
+        int i7 = i3;
+        for (int i8 = 0; i8 < i6; i8++) {
+            for (Bucket bucket2 = bucketArr[i8]; bucket2 != null; bucket2 = bucket2.next) {
+                i7++;
                 String str2 = bucket2.symbol;
                 int _hashToIndex2 = _hashToIndex(calcHash(str2));
                 if (this._symbols[_hashToIndex2] == null) {
                     this._symbols[_hashToIndex2] = str2;
                 } else {
-                    _hashToIndex2 >>= 1;
-                    Bucket bucket3 = new Bucket(str2, this._buckets[_hashToIndex2]);
-                    this._buckets[_hashToIndex2] = bucket3;
-                    i = Math.max(i, bucket3.length);
+                    int i9 = _hashToIndex2 >> 1;
+                    Bucket bucket3 = new Bucket(str2, this._buckets[i9]);
+                    this._buckets[i9] = bucket3;
+                    i2 = Math.max(i2, bucket3.length);
                 }
             }
-            i2++;
-            i3 = i;
         }
-        this._longestCollisionList = i3;
+        this._longestCollisionList = i2;
         this._overflows = null;
-        if (i4 != this._size) {
-            throw new Error("Internal error on SymbolTable.rehash(): had " + this._size + " entries; now have " + i4 + AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
+        if (i7 != this._size) {
+            throw new Error("Internal error on SymbolTable.rehash(): had " + this._size + " entries; now have " + i7 + AbstractIntegrationSupport.DEFAULT_EVENT_NAME_DELIMITER);
         }
     }
 
-    protected void reportTooManyCollisions(int i) {
+    /* access modifiers changed from: protected */
+    public void reportTooManyCollisions(int i) {
         throw new IllegalStateException("Longest collision chain in symbol table (of size " + this._size + ") now exceeds maximum, " + i + " -- suspect a DoS attack based on hash collisions");
     }
 }

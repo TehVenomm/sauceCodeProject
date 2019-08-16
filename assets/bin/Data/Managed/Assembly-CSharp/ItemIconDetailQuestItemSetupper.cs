@@ -8,12 +8,12 @@ public class ItemIconDetailQuestItemSetupper : ItemIconDetailSetuperBase
 
 	public override void Set(object[] data = null)
 	{
-		base.Set(null);
+		base.Set();
 		QuestSortData questSortData = data[0] as QuestSortData;
 		bool flag = (bool)data[1];
 		QuestTable.QuestTableData tableData = questSortData.itemData.infoData.questData.tableData;
 		SetName(tableData.questText);
-		SetVisibleBG(true);
+		SetVisibleBG(is_visible: true);
 		if (flag)
 		{
 			infoRootAry[0].SetActive(true);

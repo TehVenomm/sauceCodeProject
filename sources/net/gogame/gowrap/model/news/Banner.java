@@ -13,18 +13,24 @@ public class Banner extends BaseJsonObject {
     private static final String KEY_LINK = "link";
     private static final String KEY_START_DATE_TIME = "startDateTime";
     private Long endDateTime;
-    private long id;
+
+    /* renamed from: id */
+    private long f1409id;
     private String imageUrl;
     private String link;
     private Long startDateTime;
+
+    public Banner() {
+    }
 
     public Banner(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, "id")) {
-            this.id = jsonReader.nextLong();
+            this.f1409id = jsonReader.nextLong();
             return true;
         } else if (StringUtils.isEquals(str, KEY_START_DATE_TIME)) {
             this.startDateTime = JSONUtils.optLong(jsonReader);
@@ -44,11 +50,11 @@ public class Banner extends BaseJsonObject {
     }
 
     public long getId() {
-        return this.id;
+        return this.f1409id;
     }
 
     public void setId(long j) {
-        this.id = j;
+        this.f1409id = j;
     }
 
     public Long getStartDateTime() {

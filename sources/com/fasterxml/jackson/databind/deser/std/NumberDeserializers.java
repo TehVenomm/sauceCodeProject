@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.HashSet;
 
 public class NumberDeserializers {
-    private static final HashSet<String> _classNames = new HashSet();
+    private static final HashSet<String> _classNames = new HashSet<>();
 
     @JacksonStdImpl
     public static class BigDecimalDeserializer extends StdScalarDeserializer<BigDecimal> {
@@ -90,8 +90,6 @@ public class NumberDeserializers {
                         case LONG:
                         case BIG_INTEGER:
                             return jsonParser.getBigIntegerValue();
-                        default:
-                            break;
                     }
                 case 8:
                     if (!deserializationContext.isEnabled(DeserializationFeature.ACCEPT_FLOAT_AS_INT)) {
@@ -100,37 +98,6 @@ public class NumberDeserializers {
                     return jsonParser.getDecimalValue().toBigInteger();
             }
             throw deserializationContext.mappingException(this._valueClass, jsonParser.getCurrentToken());
-        }
-    }
-
-    protected static abstract class PrimitiveOrWrapperDeserializer<T> extends StdScalarDeserializer<T> {
-        private static final long serialVersionUID = 1;
-        protected final T _nullValue;
-        protected final boolean _primitive;
-
-        protected PrimitiveOrWrapperDeserializer(Class<T> cls, T t) {
-            super((Class) cls);
-            this._nullValue = t;
-            this._primitive = cls.isPrimitive();
-        }
-
-        public final T getNullValue(DeserializationContext deserializationContext) throws JsonMappingException {
-            if (!this._primitive || !deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)) {
-                return this._nullValue;
-            }
-            throw deserializationContext.mappingException("Can not map JSON null into type %s (set DeserializationConfig.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES to 'false' to allow)", handledType().toString());
-        }
-
-        @Deprecated
-        public final T getNullValue() {
-            return this._nullValue;
-        }
-
-        public T getEmptyValue(DeserializationContext deserializationContext) throws JsonMappingException {
-            if (!this._primitive || !deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)) {
-                return this._nullValue;
-            }
-            throw deserializationContext.mappingException("Can not map Empty String as null into type %s (set DeserializationConfig.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES to 'false' to allow)", handledType().toString());
         }
     }
 
@@ -155,7 +122,7 @@ public class NumberDeserializers {
 
     @JacksonStdImpl
     public static class ByteDeserializer extends PrimitiveOrWrapperDeserializer<Byte> {
-        static final ByteDeserializer primitiveInstance = new ByteDeserializer(Byte.TYPE, Byte.valueOf((byte) 0));
+        static final ByteDeserializer primitiveInstance = new ByteDeserializer(Byte.TYPE, Byte.valueOf(0));
         private static final long serialVersionUID = 1;
         static final ByteDeserializer wrapperInstance = new ByteDeserializer(Byte.class, null);
 
@@ -170,7 +137,7 @@ public class NumberDeserializers {
 
     @JacksonStdImpl
     public static class CharacterDeserializer extends PrimitiveOrWrapperDeserializer<Character> {
-        static final CharacterDeserializer primitiveInstance = new CharacterDeserializer(Character.TYPE, Character.valueOf('\u0000'));
+        static final CharacterDeserializer primitiveInstance = new CharacterDeserializer(Character.TYPE, Character.valueOf(0));
         private static final long serialVersionUID = 1;
         static final CharacterDeserializer wrapperInstance = new CharacterDeserializer(Character.class, null);
 
@@ -332,19 +299,19 @@ public class NumberDeserializers {
                         return Double.valueOf(Double.NaN);
                     }
                     try {
-                        if (_isIntNumber(trim)) {
-                            if (deserializationContext.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)) {
-                                return new BigInteger(trim);
+                        if (!_isIntNumber(trim)) {
+                            if (deserializationContext.isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)) {
+                                return new BigDecimal(trim);
                             }
+                            return new Double(trim);
+                        } else if (deserializationContext.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)) {
+                            return new BigInteger(trim);
+                        } else {
                             long parseLong = Long.parseLong(trim);
                             if (deserializationContext.isEnabled(DeserializationFeature.USE_LONG_FOR_INTS) || parseLong > 2147483647L || parseLong < -2147483648L) {
                                 return Long.valueOf(parseLong);
                             }
                             return Integer.valueOf((int) parseLong);
-                        } else if (deserializationContext.isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)) {
-                            return new BigDecimal(trim);
-                        } else {
-                            return new Double(trim);
                         }
                     } catch (IllegalArgumentException e) {
                         throw deserializationContext.weirdStringException(trim, this._valueClass, "not a valid number");
@@ -375,9 +342,40 @@ public class NumberDeserializers {
         }
     }
 
+    protected static abstract class PrimitiveOrWrapperDeserializer<T> extends StdScalarDeserializer<T> {
+        private static final long serialVersionUID = 1;
+        protected final T _nullValue;
+        protected final boolean _primitive;
+
+        protected PrimitiveOrWrapperDeserializer(Class<T> cls, T t) {
+            super(cls);
+            this._nullValue = t;
+            this._primitive = cls.isPrimitive();
+        }
+
+        public final T getNullValue(DeserializationContext deserializationContext) throws JsonMappingException {
+            if (!this._primitive || !deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)) {
+                return this._nullValue;
+            }
+            throw deserializationContext.mappingException("Can not map JSON null into type %s (set DeserializationConfig.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES to 'false' to allow)", handledType().toString());
+        }
+
+        @Deprecated
+        public final T getNullValue() {
+            return this._nullValue;
+        }
+
+        public T getEmptyValue(DeserializationContext deserializationContext) throws JsonMappingException {
+            if (!this._primitive || !deserializationContext.isEnabled(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)) {
+                return this._nullValue;
+            }
+            throw deserializationContext.mappingException("Can not map Empty String as null into type %s (set DeserializationConfig.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES to 'false' to allow)", handledType().toString());
+        }
+    }
+
     @JacksonStdImpl
     public static class ShortDeserializer extends PrimitiveOrWrapperDeserializer<Short> {
-        static final ShortDeserializer primitiveInstance = new ShortDeserializer(Short.TYPE, Short.valueOf((short) 0));
+        static final ShortDeserializer primitiveInstance = new ShortDeserializer(Short.TYPE, Short.valueOf(0));
         private static final long serialVersionUID = 1;
         static final ShortDeserializer wrapperInstance = new ShortDeserializer(Short.class, null);
 
@@ -391,12 +389,8 @@ public class NumberDeserializers {
     }
 
     static {
-        int i = 0;
-        Class[] clsArr = new Class[]{Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class, Number.class, BigDecimal.class, BigInteger.class};
-        int length = clsArr.length;
-        while (i < length) {
-            _classNames.add(clsArr[i].getName());
-            i++;
+        for (Class name : new Class[]{Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class, Number.class, BigDecimal.class, BigInteger.class}) {
+            _classNames.add(name.getName());
         }
     }
 

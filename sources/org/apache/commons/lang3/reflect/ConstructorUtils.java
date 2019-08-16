@@ -1,6 +1,5 @@
 package org.apache.commons.lang3.reflect;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -16,7 +15,7 @@ public class ConstructorUtils {
 
     public static <T> T invokeConstructor(Class<T> cls, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Constructor matchingAccessibleConstructor = getMatchingAccessibleConstructor(cls, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Constructor matchingAccessibleConstructor = getMatchingAccessibleConstructor(cls, ArrayUtils.nullToEmpty(clsArr));
         if (matchingAccessibleConstructor != null) {
             return matchingAccessibleConstructor.newInstance(nullToEmpty);
         }
@@ -30,7 +29,7 @@ public class ConstructorUtils {
 
     public static <T> T invokeExactConstructor(Class<T> cls, Object[] objArr, Class<?>[] clsArr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Object[] nullToEmpty = ArrayUtils.nullToEmpty(objArr);
-        Constructor accessibleConstructor = getAccessibleConstructor(cls, ArrayUtils.nullToEmpty((Class[]) clsArr));
+        Constructor accessibleConstructor = getAccessibleConstructor(cls, ArrayUtils.nullToEmpty(clsArr));
         if (accessibleConstructor != null) {
             return accessibleConstructor.newInstance(nullToEmpty);
         }
@@ -48,20 +47,24 @@ public class ConstructorUtils {
 
     public static <T> Constructor<T> getAccessibleConstructor(Constructor<T> constructor) {
         Validate.notNull(constructor, "constructor cannot be null", new Object[0]);
-        return (MemberUtils.isAccessible(constructor) && isAccessible(constructor.getDeclaringClass())) ? constructor : null;
+        if (!MemberUtils.isAccessible(constructor) || !isAccessible(constructor.getDeclaringClass())) {
+            return null;
+        }
+        return constructor;
     }
 
     public static <T> Constructor<T> getMatchingAccessibleConstructor(Class<T> cls, Class<?>... clsArr) {
+        Constructor[] constructors;
         Validate.notNull(cls, "class cannot be null", new Object[0]);
         try {
-            AccessibleObject constructor = cls.getConstructor(clsArr);
+            Constructor<T> constructor = cls.getConstructor(clsArr);
             MemberUtils.setAccessibleWorkaround(constructor);
             return constructor;
         } catch (NoSuchMethodException e) {
             Constructor<T> constructor2 = null;
             for (Constructor constructor3 : cls.getConstructors()) {
-                if (ClassUtils.isAssignable((Class[]) clsArr, constructor3.getParameterTypes(), true)) {
-                    AccessibleObject accessibleConstructor = getAccessibleConstructor(constructor3);
+                if (ClassUtils.isAssignable(clsArr, (Class<?>[]) constructor3.getParameterTypes(), true)) {
+                    Constructor<T> accessibleConstructor = getAccessibleConstructor(constructor3);
                     if (accessibleConstructor != null) {
                         MemberUtils.setAccessibleWorkaround(accessibleConstructor);
                         if (constructor2 == null || MemberUtils.compareParameterTypes(accessibleConstructor.getParameterTypes(), constructor2.getParameterTypes(), clsArr) < 0) {

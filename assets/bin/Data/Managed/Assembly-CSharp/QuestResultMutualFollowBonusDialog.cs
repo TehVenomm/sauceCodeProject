@@ -53,20 +53,20 @@ public class QuestResultMutualFollowBonusDialog : ItemSellConfirm
 		}
 		bool shouldAddGold = totalGold > 0;
 		int sELL_SELECT_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX;
-		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_ICON, null, sELL_SELECT_MAX, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (i < reward_num)
 			{
 				if (i < itemData.Length)
 				{
-					int enemy_icon_id = 0;
-					int enemy_icon_id2 = 0;
+					int num = 0;
+					int num2 = 0;
 					object itemData2 = itemData[i].GetItemData();
 					if (itemData2 is ItemSortData)
 					{
 						ItemSortData itemSortData = itemData2 as ItemSortData;
-						enemy_icon_id = itemSortData.itemData.tableData.enemyIconID;
-						enemy_icon_id2 = itemSortData.itemData.tableData.enemyIconID2;
+						num = itemSortData.itemData.tableData.enemyIconID;
+						num2 = itemSortData.itemData.tableData.enemyIconID2;
 					}
 					ItemIcon itemIcon = null;
 					if (itemData[i].GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
@@ -75,41 +75,56 @@ public class QuestResultMutualFollowBonusDialog : ItemSellConfirm
 						{
 							icon_type = itemData[i].GetIconType(),
 							icon_id = itemData[i].GetIconID(),
-							rarity = new RARITY_TYPE?(itemData[i].GetRarity()),
+							rarity = itemData[i].GetRarity(),
 							parent = t,
 							element = itemData[i].GetIconElement(),
 							magi_enable_equip_type = itemData[i].GetIconMagiEnableType(),
 							num = itemData[i].GetNum(),
-							enemy_icon_id = enemy_icon_id,
-							enemy_icon_id2 = enemy_icon_id2,
+							enemy_icon_id = num,
+							enemy_icon_id2 = num2,
 							questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
 						});
 					}
 					else
 					{
+						ITEM_ICON_TYPE iconType = itemData[i].GetIconType();
+						int iconID = itemData[i].GetIconID();
+						RARITY_TYPE? rarity = itemData[i].GetRarity();
+						ELEMENT_TYPE iconElement = itemData[i].GetIconElement();
+						EQUIPMENT_TYPE? iconMagiEnableType = itemData[i].GetIconMagiEnableType();
+						int num3 = itemData[i].GetNum();
+						string event_name = null;
+						int event_data = 0;
+						bool is_new = false;
+						int toggle_group = -1;
+						bool is_select = false;
+						string icon_under_text = null;
+						bool is_equipping = false;
+						int enemy_icon_id = num;
+						int enemy_icon_id2 = num2;
 						GET_TYPE getType = itemData[i].GetGetType();
-						itemIcon = ItemIcon.Create(itemData[i].GetIconType(), itemData[i].GetIconID(), itemData[i].GetRarity(), t, itemData[i].GetIconElement(), itemData[i].GetIconMagiEnableType(), itemData[i].GetNum(), null, 0, false, -1, false, null, false, enemy_icon_id, enemy_icon_id2, false, getType);
+						itemIcon = ItemIcon.Create(iconType, iconID, rarity, t, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
 					}
-					itemIcon.SetRewardBG(true);
-					SetMaterialInfo(itemIcon.transform, itemData[i].GetMaterialType(), itemData[i].GetTableID(), null);
+					itemIcon.SetRewardBG(is_visible: true);
+					SetMaterialInfo(itemIcon.transform, itemData[i].GetMaterialType(), itemData[i].GetTableID());
 				}
 				else if (shouldAddGold)
 				{
-					ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.MONEY, 1u, t, totalGold, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-					itemIcon2.SetRewardBG(true);
-					SetMaterialInfo(itemIcon2.transform, REWARD_TYPE.MONEY, 0u, null);
+					ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.MONEY, 1u, t, totalGold);
+					itemIcon2.SetRewardBG(is_visible: true);
+					SetMaterialInfo(itemIcon2.transform, REWARD_TYPE.MONEY, 0u);
 					shouldAddGold = false;
 				}
 				else
 				{
-					ItemIcon itemIcon3 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.CRYSTAL, 1u, t, crystalNum, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-					itemIcon3.SetRewardBG(true);
-					SetMaterialInfo(itemIcon3.transform, REWARD_TYPE.CRYSTAL, 0u, null);
+					ItemIcon itemIcon3 = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.CRYSTAL, 1u, t, crystalNum);
+					itemIcon3.SetRewardBG(is_visible: true);
+					SetMaterialInfo(itemIcon3.transform, REWARD_TYPE.CRYSTAL, 0u);
 				}
 			}
 			else
 			{
-				SetActive(t, false);
+				SetActive(t, is_visible: false);
 			}
 		});
 	}

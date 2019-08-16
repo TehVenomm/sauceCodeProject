@@ -2,12 +2,16 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class NearbyConnectionsManagerBuilder : BaseReferenceHolder
 	{
+		[CompilerGenerated]
+		private static NearbyConnectionsBuilder.OnInitializationFinishedCallback _003C_003Ef__mg_0024cache0;
+
 		internal NearbyConnectionsManagerBuilder()
 			: base(NearbyConnectionsBuilder.NearbyConnections_Builder_Construct())
 		{
@@ -23,7 +27,11 @@ namespace GooglePlayGames.Native.PInvoke
 		private static void InternalOnInitializationFinishedCallback(NearbyConnectionsStatus.InitializationStatus status, IntPtr userData)
 		{
 			Action<NearbyConnectionsStatus.InitializationStatus> action = Callbacks.IntPtrToPermanentCallback<Action<NearbyConnectionsStatus.InitializationStatus>>(userData);
-			if (action != null)
+			if (action == null)
+			{
+				Logger.w("Callback for Initialization is null. Received status: " + status);
+			}
+			else
 			{
 				try
 				{
@@ -33,10 +41,6 @@ namespace GooglePlayGames.Native.PInvoke
 				{
 					Logger.e("Error encountered executing NearbyConnectionsManagerBuilder#InternalOnInitializationFinishedCallback. Smothering exception: " + arg);
 				}
-			}
-			else
-			{
-				Logger.w("Callback for Initialization is null. Received status: " + status);
 			}
 		}
 

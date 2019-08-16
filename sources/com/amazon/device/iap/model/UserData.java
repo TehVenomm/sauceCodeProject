@@ -8,17 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class UserData implements Parcelable {
-    public static final Creator<UserData> CREATOR = new C02471();
-    private static final String MARKETPLACE = "marketplace";
-    private static final String USER_ID = "userId";
-    private final String marketplace;
-    private final String userId;
-
-    /* renamed from: com.amazon.device.iap.model.UserData$1 */
-    static final class C02471 implements Creator<UserData> {
-        C02471() {
-        }
-
+    public static final Creator<UserData> CREATOR = new Creator<UserData>() {
         public UserData createFromParcel(Parcel parcel) {
             return new UserData(parcel);
         }
@@ -26,7 +16,11 @@ public final class UserData implements Parcelable {
         public UserData[] newArray(int i) {
             return new UserData[i];
         }
-    }
+    };
+    private static final String MARKETPLACE = "marketplace";
+    private static final String USER_ID = "userId";
+    private final String marketplace;
+    private final String userId;
 
     private UserData(Parcel parcel) {
         this.userId = parcel.readString();
@@ -61,12 +55,12 @@ public final class UserData implements Parcelable {
     }
 
     public String toString() {
-        String str = null;
+        boolean z = false;
         try {
-            str = toJSON().toString(4);
+            return toJSON().toString(4);
         } catch (JSONException e) {
+            return z;
         }
-        return str;
     }
 
     public void writeToParcel(Parcel parcel, int i) {

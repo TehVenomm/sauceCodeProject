@@ -87,28 +87,29 @@ public class AIUtility
 	public static NonPlayer GetNearestAliveNpc(StageObject client)
 	{
 		NonPlayer result = null;
-		float num = 3.40282347E+38f;
+		float num = float.MaxValue;
 		int i = 0;
 		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; i < count; i++)
 		{
 			NonPlayer nonPlayer = MonoBehaviourSingleton<StageObjectManager>.I.playerList[i] as NonPlayer;
-			if (!object.ReferenceEquals(nonPlayer, null) && !(nonPlayer == client))
+			if (object.ReferenceEquals(nonPlayer, null) || nonPlayer == client)
 			{
-				switch (nonPlayer.CanGoPray(client))
+				continue;
+			}
+			switch (nonPlayer.CanGoPray(client))
+			{
+			case NonPlayer.eNpcAllayState.SAME:
+				return nonPlayer;
+			case NonPlayer.eNpcAllayState.CAN:
+			{
+				float lengthWithBetweenObject = GetLengthWithBetweenObject(client, nonPlayer);
+				if (lengthWithBetweenObject < num)
 				{
-				case NonPlayer.eNpcAllayState.SAME:
-					return nonPlayer;
-				case NonPlayer.eNpcAllayState.CAN:
-				{
-					float lengthWithBetweenObject = GetLengthWithBetweenObject(client, nonPlayer);
-					if (lengthWithBetweenObject < num)
-					{
-						result = nonPlayer;
-						num = lengthWithBetweenObject;
-					}
-					break;
+					result = nonPlayer;
+					num = lengthWithBetweenObject;
 				}
-				}
+				break;
+			}
 			}
 		}
 		return result;
@@ -121,15 +122,15 @@ public class AIUtility
 		{
 			return null;
 		}
-		StageObjectManager i = MonoBehaviourSingleton<StageObjectManager>.I;
-		if (i.enemyList == null || i.enemyList.Count <= 0)
+		List<StageObject> enemyList = MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
+		if (enemyList == null || enemyList.Count <= 0)
 		{
 			return null;
 		}
-		float num = 3.40282347E+38f;
-		foreach (StageObject enemy2 in i.enemyList)
+		float num = float.MaxValue;
+		foreach (StageObject item in enemyList)
 		{
-			Enemy enemy = enemy2 as Enemy;
+			Enemy enemy = item as Enemy;
 			if (!(enemy == null) && !enemy.isDead)
 			{
 				float lengthWithBetweenObject = GetLengthWithBetweenObject(baseObj, enemy);
@@ -137,6 +138,101 @@ public class AIUtility
 				{
 					result = enemy;
 					num = lengthWithBetweenObject;
+				}
+			}
+		}
+		return result;
+	}
+
+	public static Enemy GetNearestAliveEnemy(Vector3 basePos)
+	{
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		Enemy result = null;
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return null;
+		}
+		List<StageObject> enemyList = MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
+		if (enemyList == null || enemyList.Count <= 0)
+		{
+			return null;
+		}
+		float num = float.MaxValue;
+		foreach (StageObject item in enemyList)
+		{
+			Enemy enemy = item as Enemy;
+			if (!(enemy == null) && !enemy.isDead)
+			{
+				float lengthWithBetweenPosition = GetLengthWithBetweenPosition(basePos, enemy._position);
+				if (lengthWithBetweenPosition < num)
+				{
+					result = enemy;
+					num = lengthWithBetweenPosition;
+				}
+			}
+		}
+		return result;
+	}
+
+	public static DecoyBulletObject GetNearestDecoyObject(Vector3 basePos)
+	{
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		DecoyBulletObject result = null;
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return null;
+		}
+		List<StageObject> decoyList = MonoBehaviourSingleton<StageObjectManager>.I.decoyList;
+		if (decoyList.IsNullOrEmpty())
+		{
+			return null;
+		}
+		float num = float.MaxValue;
+		int i = 0;
+		for (int count = decoyList.Count; i < count; i++)
+		{
+			DecoyBulletObject decoyBulletObject = decoyList[i] as DecoyBulletObject;
+			if (!(decoyBulletObject == null) && decoyBulletObject.IsActive())
+			{
+				float lengthWithBetweenPosition = GetLengthWithBetweenPosition(basePos, decoyBulletObject._position);
+				if (lengthWithBetweenPosition < num)
+				{
+					result = decoyBulletObject;
+					num = lengthWithBetweenPosition;
+				}
+			}
+		}
+		return result;
+	}
+
+	public static FieldWaveTargetObject GetNearestWaveMatchTargetObject(Vector3 basePos)
+	{
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		FieldWaveTargetObject result = null;
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return null;
+		}
+		List<StageObject> waveTargetList = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList;
+		if (waveTargetList.IsNullOrEmpty())
+		{
+			return null;
+		}
+		float num = float.MaxValue;
+		int i = 0;
+		for (int count = waveTargetList.Count; i < count; i++)
+		{
+			FieldWaveTargetObject fieldWaveTargetObject = waveTargetList[i] as FieldWaveTargetObject;
+			if (!(fieldWaveTargetObject == null) && !fieldWaveTargetObject.isDead)
+			{
+				float sqrLengthWithBetweenPosition = GetSqrLengthWithBetweenPosition(basePos, fieldWaveTargetObject._position);
+				if (sqrLengthWithBetweenPosition < num)
+				{
+					result = fieldWaveTargetObject;
+					num = sqrLengthWithBetweenPosition;
 				}
 			}
 		}
@@ -170,9 +266,31 @@ public class AIUtility
 		return val.get_magnitude();
 	}
 
+	public static float GetSqrLengthWithBetweenPosition(Vector3 client_pos, Vector3 target_pos)
+	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		if (client_pos == target_pos)
+		{
+			return 0f;
+		}
+		Vector3 val = target_pos - client_pos;
+		val.y = 0f;
+		return val.get_sqrMagnitude();
+	}
+
 	public static int GetObstacleMask()
 	{
 		return 393728;
+	}
+
+	public static int GetWallAndBlockMask()
+	{
+		return 131584;
 	}
 
 	public static int GetOpponentMask(StageObject client)
@@ -211,6 +329,17 @@ public class AIUtility
 		Vector3 position = client._position;
 		int obstacleMask = GetObstacleMask();
 		return RaycastForTargetPos(position, target_pos, obstacleMask, out hit);
+	}
+
+	public static bool RaycastWallAndBlock(StageObject client, Vector3 targetPos, out RaycastHit hit)
+	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		Vector3 position = client._position;
+		int wallAndBlockMask = GetWallAndBlockMask();
+		return RaycastForTargetPos(position, targetPos, wallAndBlockMask, out hit);
 	}
 
 	public static bool RaycastOpponent(StageObject client, Vector3 target_pos, out RaycastHit hit)
@@ -258,7 +387,6 @@ public class AIUtility
 
 	public static bool IsHitObstacleOrOpponentWithPlace(StageObject client, PLACE place, float range)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
@@ -278,11 +406,10 @@ public class AIUtility
 		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 val = moveObj.TransformDirection(Vector3.get_forward());
 		Vector3 val2 = moveObj.get_position() - checkObj.get_position();
 		float magnitude = val2.get_magnitude();

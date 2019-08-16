@@ -207,6 +207,10 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private int preWeaponIndex;
 
+	private int preUniqueEquipmentIndex;
+
+	private UIBurstBulletUIController m_burstBulletCtrl;
+
 	public Player targetPlayer
 	{
 		get;
@@ -217,11 +221,34 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	protected override void Awake()
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		boostRate.fontStyle = 2;
 		boostTime.fontStyle = 2;
 		this.get_gameObject().SetActive(false);
+		CreateBurstBulletUI();
+	}
+
+	private void CreateBurstBulletUI()
+	{
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		if (m_burstBulletCtrl != null)
+		{
+			return;
+		}
+		Transform val = ResourceUtility.Realizes(Resources.Load(UIPlayerStatus.UI_BURST_BULLET), this.get_transform());
+		if (!(val == null))
+		{
+			val.set_localPosition(UIPlayerStatus.UI_BURST_BULLET_POS);
+			m_burstBulletCtrl = val.GetComponent<UIBurstBulletUIController>();
+			if (m_burstBulletCtrl != null)
+			{
+				UIBurstBulletUIController.InitParam initParam = new UIBurstBulletUIController.InitParam();
+				initParam.MaxBulletCount = 6;
+				initParam.CurrentRestBulletCount = 6;
+				UIBurstBulletUIController.InitParam param = initParam;
+				m_burstBulletCtrl.Initialize(param);
+			}
+		}
 	}
 
 	private void Start()
@@ -235,23 +262,19 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void SetTarget(Player player)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		targetPlayer = player;
 		if (targetPlayer == null)
 		{
 			this.get_gameObject().SetActive(false);
+			return;
 		}
-		else
+		if (weaponChange != null)
 		{
-			if (weaponChange != null)
-			{
-				weaponChange.SetTarget(targetPlayer);
-			}
-			UpdateUI();
-			SetUpBoostAnimator();
-			this.get_gameObject().SetActive(true);
+			weaponChange.SetTarget(targetPlayer);
 		}
+		UpdateUI();
+		SetUpBoostAnimator();
+		this.get_gameObject().SetActive(true);
 	}
 
 	public void SetUpBoostAnimator()
@@ -290,45 +313,19 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private void UpdateUI()
 	{
-		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+		//IL_021a: Unknown result type (might be due to invalid IL or missing references)
 		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fd: Expected O, but got Unknown
-		//IL_040d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0416: Expected O, but got Unknown
-		//IL_0454: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0480: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0486: Expected O, but got Unknown
-		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049f: Expected O, but got Unknown
-		//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0509: Unknown result type (might be due to invalid IL or missing references)
-		//IL_050f: Expected O, but got Unknown
-		//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0528: Expected O, but got Unknown
-		//IL_07ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07f0: Expected O, but got Unknown
-		//IL_0800: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0809: Expected O, but got Unknown
-		//IL_082a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0830: Expected O, but got Unknown
+		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid() && !string.IsNullOrEmpty(MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.enduranceObjectName))
 		{
 			enduranceName.text = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.enduranceObjectName;
@@ -340,13 +337,9 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		if (hpGaugeUI != null)
 		{
 			float percent = (!(MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEnduranceMax > 0f)) ? 0f : (MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEndurance / MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEnduranceMax);
-			hpGaugeUI.SetPercent(percent, true);
+			hpGaugeUI.SetPercent(percent);
 		}
-		if (preWeaponIndex != targetPlayer.weaponIndex)
-		{
-			ResetSpActionGaugeState();
-			preWeaponIndex = targetPlayer.weaponIndex;
-		}
+		OnUpdateWeaponIndex();
 		bool flag = targetPlayer.IsValidSpActionMemori();
 		if (spActionGaugeInfo.gaugeMemoriObj.get_activeSelf() != flag)
 		{
@@ -375,7 +368,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 				flag3 = (spActionGaugeInfo.gaugeUI.nowPercent != num2);
 				if (flag3)
 				{
-					spActionGaugeInfo.gaugeUI.SetPercent(num2, false);
+					spActionGaugeInfo.gaugeUI.SetPercent(num2, anim: false);
 				}
 			}
 			UISprite sprite = spActionGaugeADD_BOOST.sprite;
@@ -390,7 +383,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 					sprite.get_gameObject().SetActive(false);
 					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
 					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 1);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 1);
+					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false, 1);
 					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.HALF);
 					SoundManager.PlayOneShotUISE(40000358);
 				}
@@ -399,7 +392,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 					sprite.get_gameObject().SetActive(false);
 					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
 					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 2);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 2);
+					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false, 2);
 					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.FULL);
 					SoundManager.PlayOneShotUISE(40000359);
 				}
@@ -407,8 +400,8 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 				{
 					sprite.get_gameObject().SetActive(true);
 					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(false);
-					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 0);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 0);
+					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform());
+					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false);
 					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.BOOST);
 				}
 			}
@@ -441,35 +434,47 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 				validCannonSpecialGaugeInfo = cannonSpecialGaugeLandscape;
 			}
 		}
-		if (validCannonSpecialGaugeInfo != null)
+		if (validCannonSpecialGaugeInfo == null)
 		{
-			float num3 = (!(targetPlayer.GetCannonChargeMax() > 0f)) ? 0f : targetPlayer.GetCannonChargeRate();
-			if (validCannonSpecialGaugeInfo.root != null && validCannonSpecialGaugeInfo.root.get_activeInHierarchy())
+			return;
+		}
+		float num3 = (!(targetPlayer.GetCannonChargeMax() > 0f)) ? 0f : targetPlayer.GetCannonChargeRate();
+		if (validCannonSpecialGaugeInfo.root != null && validCannonSpecialGaugeInfo.root.get_activeInHierarchy())
+		{
+			bool flag7 = false;
+			if (validCannonSpecialGaugeInfo.gaugeUI != null && validCannonSpecialGaugeInfo.gaugeUI.nowPercent != num3)
 			{
-				bool flag7 = false;
-				if (validCannonSpecialGaugeInfo.gaugeUI != null && validCannonSpecialGaugeInfo.gaugeUI.nowPercent != num3)
-				{
-					validCannonSpecialGaugeInfo.gaugeUI.SetPercent(num3, false);
-				}
+				validCannonSpecialGaugeInfo.gaugeUI.SetPercent(num3, anim: false);
 			}
-			validCannonSpecialGaugeInfo.gaugeNormalObj.SetActive(!targetPlayer.IsCannonFullCharged());
-			validCannonSpecialGaugeInfo.gaugeChargedObj.SetActive(targetPlayer.IsCannonFullCharged());
-			validCannonSpecialGaugeInfo.gaugeAddObj.SetActive(targetPlayer.IsCannonFullCharged());
-			validCannonSpecialGaugeInfo.fullTipObj.SetActive(targetPlayer.IsCannonFullCharged());
-			if (targetPlayer.IsCannonFullCharged())
-			{
-				if (!validCannonSpecialGaugeInfo.IsPlayAnim(CannonSpecialGaugeInfo.ANIM_STATE.FULL))
-				{
-					UITweenCtrl.Reset(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), 3);
-					UITweenCtrl.Play(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), true, null, false, 3);
-					validCannonSpecialGaugeInfo.SetState(CannonSpecialGaugeInfo.ANIM_STATE.FULL);
-				}
-			}
-			else
+		}
+		validCannonSpecialGaugeInfo.gaugeNormalObj.SetActive(!targetPlayer.IsCannonFullCharged());
+		validCannonSpecialGaugeInfo.gaugeChargedObj.SetActive(targetPlayer.IsCannonFullCharged());
+		validCannonSpecialGaugeInfo.gaugeAddObj.SetActive(targetPlayer.IsCannonFullCharged());
+		validCannonSpecialGaugeInfo.fullTipObj.SetActive(targetPlayer.IsCannonFullCharged());
+		if (targetPlayer.IsCannonFullCharged())
+		{
+			if (!validCannonSpecialGaugeInfo.IsPlayAnim(CannonSpecialGaugeInfo.ANIM_STATE.FULL))
 			{
 				UITweenCtrl.Reset(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), 3);
-				validCannonSpecialGaugeInfo.state = 0;
+				UITweenCtrl.Play(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), forward: true, null, is_input_block: false, 3);
+				validCannonSpecialGaugeInfo.SetState(CannonSpecialGaugeInfo.ANIM_STATE.FULL);
 			}
+		}
+		else
+		{
+			UITweenCtrl.Reset(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), 3);
+			validCannonSpecialGaugeInfo.state = 0;
+		}
+	}
+
+	private void OnUpdateWeaponIndex()
+	{
+		if (!(targetPlayer == null) && (preWeaponIndex != targetPlayer.weaponIndex || preUniqueEquipmentIndex != targetPlayer.uniqueEquipmentIndex))
+		{
+			preWeaponIndex = targetPlayer.weaponIndex;
+			preUniqueEquipmentIndex = targetPlayer.uniqueEquipmentIndex;
+			ResetSpActionGaugeState();
+			UpdateBurstUIInfo();
 		}
 	}
 
@@ -481,39 +486,28 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void ResetSpActionGaugeState()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Expected O, but got Unknown
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Expected O, but got Unknown
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Expected O, but got Unknown
 		spActionGaugeADD_BOOST.sprite.get_gameObject().SetActive(false);
 		spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(false);
-		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 0);
+		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform());
 		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 1);
 		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 2);
 		spActionGaugeInfo.state = 0;
-		if (!(targetPlayer == null))
+		if (targetPlayer == null)
 		{
-			if (targetPlayer.IsSpActionGaugeHalfCharged())
+			return;
+		}
+		if (targetPlayer.IsSpActionGaugeHalfCharged())
+		{
+			spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
+			if (spActionGaugeADD_HALF.sprite.get_gameObject().get_activeInHierarchy())
 			{
-				spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
-				if (spActionGaugeADD_HALF.sprite.get_gameObject().get_activeInHierarchy())
-				{
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 1);
-					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.HALF);
-				}
+				UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false, 1);
+				spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.HALF);
 			}
-			if (targetPlayer.IsSpActionGaugeFullCharged())
-			{
-				spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.FULL);
-			}
+		}
+		if (targetPlayer.IsSpActionGaugeFullCharged())
+		{
+			spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.FULL);
 		}
 	}
 
@@ -524,8 +518,6 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private void ChangeShowBoost(USE_ITEM_EFFECT_TYPE type)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		boostRate.get_gameObject().SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
 		boostTime.get_gameObject().SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
 		int i = 0;
@@ -537,7 +529,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 			{
 				panelChange.UnLock();
 				boostItems[i].anim.Reset();
-				boostItems[i].anim.Play(true, delegate
+				boostItems[i].anim.Play(forward: true, delegate
 				{
 					panelChange.Lock();
 				});
@@ -547,16 +539,18 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private void UpdateShowBoost(BoostStatus boost)
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		switch (boost.type)
 		{
 		case 1:
 		case 2:
 		case 3:
 		case 201:
+		case 210:
+		case 212:
 			boostRate.text = boost.GetBoostRateText();
 			boostRate.color = boostAnimator.GetRateColor(boost.value);
-			boostTime.text = boost.GetRemainTime();
+			boostTime.text = ((boost.type != 210) ? boost.GetRemainTime() : string.Empty);
 			break;
 		}
 	}
@@ -571,13 +565,11 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void DoEnable()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(true);
 	}
 
 	public void DoDisable()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().SetActive(false);
 	}
 
@@ -588,9 +580,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void DirectionSoulGauge(SoulEnergy soulEnergy, Vector3 worldHitPos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		if (this.get_gameObject().get_activeInHierarchy())
 		{
 			this.StartCoroutine(_DirectionSoulGauge(soulEnergy, worldHitPos));
@@ -601,8 +591,6 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 	{
 		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		Transform trans = soulEnergy.GetEffectTrans(soulEffectDirection);
 		if (!object.ReferenceEquals(trans, null))
 		{
@@ -623,30 +611,30 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void PlayChangeEvolveIcon(bool start)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		if (!object.ReferenceEquals(evolveGauge, null) && !object.ReferenceEquals(evolveGauge.evolveIcon, null) && evolveGauge.evolveIcon.get_gameObject().get_activeSelf() != start)
+		if (object.ReferenceEquals(evolveGauge, null) || object.ReferenceEquals(evolveGauge.evolveIcon, null) || evolveGauge.evolveIcon.get_gameObject().get_activeSelf() == start)
 		{
-			if (!object.ReferenceEquals(weaponChange, null))
+			return;
+		}
+		if (!object.ReferenceEquals(weaponChange, null))
+		{
+			if (start)
 			{
-				if (start)
+				weaponChange.PlayEvolveIconAnim(delegate
 				{
-					weaponChange.PlayEvolveIconAnim(delegate
-					{
-						EnableEvolveIcon(true);
-					});
-				}
-				else
-				{
-					weaponChange.PlayEvolveIconAnim(delegate
-					{
-						EnableEvolveIcon(false);
-					});
-				}
+					EnableEvolveIcon(isEnable: true);
+				});
 			}
 			else
 			{
-				EnableEvolveIcon(true);
+				weaponChange.PlayEvolveIconAnim(delegate
+				{
+					EnableEvolveIcon(isEnable: false);
+				});
 			}
+		}
+		else
+		{
+			EnableEvolveIcon(isEnable: true);
 		}
 	}
 
@@ -683,6 +671,60 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		if (!object.ReferenceEquals(weaponChange, null))
 		{
 			weaponChange.SetRestrictPopMenu(isRestrict);
+		}
+	}
+
+	public bool DoFullBurstAction()
+	{
+		if (m_burstBulletCtrl == null)
+		{
+			return false;
+		}
+		return m_burstBulletCtrl.FullBurstAction();
+	}
+
+	public bool DoShootAction()
+	{
+		if (m_burstBulletCtrl == null)
+		{
+			return false;
+		}
+		return m_burstBulletCtrl.ConsumeBulletAction();
+	}
+
+	public bool DoReloadAction()
+	{
+		if (m_burstBulletCtrl == null)
+		{
+			return false;
+		}
+		return m_burstBulletCtrl.ReloadAction();
+	}
+
+	public void CheckVisibleBulletUI()
+	{
+		if (!(m_burstBulletCtrl == null))
+		{
+			if (targetPlayer.IsValidBurstBulletUI())
+			{
+				m_burstBulletCtrl.SetActivateIconRoot();
+			}
+			else
+			{
+				m_burstBulletCtrl.SetDeactivateIconRoot();
+			}
+		}
+	}
+
+	public void UpdateBurstUIInfo()
+	{
+		if (!(m_burstBulletCtrl == null) && !(targetPlayer == null) && targetPlayer.thsCtrl != null)
+		{
+			UIBurstBulletUIController.InitParam initParam = new UIBurstBulletUIController.InitParam();
+			initParam.MaxBulletCount = targetPlayer.thsCtrl.CurrentMaxBulletCount;
+			initParam.CurrentRestBulletCount = targetPlayer.thsCtrl.CurrentRestBulletCount;
+			UIBurstBulletUIController.InitParam param = initParam;
+			m_burstBulletCtrl.Initialize(param);
 		}
 	}
 }

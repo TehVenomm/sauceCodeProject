@@ -16,12 +16,10 @@ public static class Nexus6CrashWorkaround
 
 	public static void Apply(Camera camera)
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 		if (!disable)
 		{
 			Remove(camera);
@@ -43,11 +41,7 @@ public static class Nexus6CrashWorkaround
 
 	public static void Remove(Camera camera)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Expected O, but got Unknown
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = camera.get_transform().FindChild(temporaryObjectName);
+		Transform val = camera.get_transform().Find(temporaryObjectName);
 		if (Object.op_Implicit(val))
 		{
 			Object.Destroy(val.get_gameObject());
@@ -73,9 +67,7 @@ public static class Nexus6CrashWorkaround
 	private static Transform CreateObject(Mesh mesh, Material material)
 	{
 		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
+		//IL_000b: Expected O, but got Unknown
 		GameObject val = new GameObject(temporaryObjectName);
 		MeshFilter val2 = val.AddComponent<MeshFilter>();
 		val2.set_sharedMesh(mesh);
@@ -87,7 +79,7 @@ public static class Nexus6CrashWorkaround
 	private static Mesh CreateMesh()
 	{
 		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Expected O, but got Unknown
+		//IL_0006: Expected O, but got Unknown
 		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
@@ -114,9 +106,7 @@ public static class Nexus6CrashWorkaround
 	private static Material CreateMaterial()
 	{
 		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Expected O, but got Unknown
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
+		//IL_0010: Expected O, but got Unknown
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		Material val = new Material(ResourceUtility.FindShader("mobile/Custom/tex_color"));
 		val.set_name("n6cw_mat");

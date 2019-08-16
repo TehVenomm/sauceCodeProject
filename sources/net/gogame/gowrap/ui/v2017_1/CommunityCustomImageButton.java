@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.v2017_1;
+package net.gogame.gowrap.p019ui.v2017_1;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -6,8 +6,9 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import net.gogame.gowrap.C1110R;
+import net.gogame.gowrap.C1423R;
 
+/* renamed from: net.gogame.gowrap.ui.v2017_1.CommunityCustomImageButton */
 public class CommunityCustomImageButton extends AbstractCustomImageButton {
     public CommunityCustomImageButton(Context context) {
         super(context);
@@ -30,14 +31,15 @@ public class CommunityCustomImageButton extends AbstractCustomImageButton {
         init(attributeSet);
     }
 
-    protected void init(AttributeSet attributeSet) {
-        addView(((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(C1110R.layout.net_gogame_gowrap_community_image_button, this, false));
-        TypedArray obtainStyledAttributes = getContext().getTheme().obtainStyledAttributes(attributeSet, C1110R.styleable.CustomImageButton, 0, 0);
+    /* access modifiers changed from: protected */
+    public void init(AttributeSet attributeSet) {
+        addView(((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(C1423R.C1425layout.net_gogame_gowrap_community_image_button, this, false));
+        TypedArray obtainStyledAttributes = getContext().getTheme().obtainStyledAttributes(attributeSet, C1423R.styleable.CustomImageButton, 0, 0);
         try {
-            Drawable drawable = obtainStyledAttributes.getDrawable(C1110R.styleable.CustomImageButton_image);
-            String string = obtainStyledAttributes.getString(C1110R.styleable.CustomImageButton_caption);
-            String string2 = obtainStyledAttributes.getString(C1110R.styleable.CustomImageButton_subcaption);
-            int i = obtainStyledAttributes.getInt(C1110R.styleable.CustomImageButton_level, 0);
+            Drawable drawable = obtainStyledAttributes.getDrawable(C1423R.styleable.CustomImageButton_image);
+            String string = obtainStyledAttributes.getString(C1423R.styleable.CustomImageButton_caption);
+            String string2 = obtainStyledAttributes.getString(C1423R.styleable.CustomImageButton_subcaption);
+            int i = obtainStyledAttributes.getInt(C1423R.styleable.CustomImageButton_level, 0);
             setImage(drawable);
             setCaption(string);
             setSubCaption(string2);

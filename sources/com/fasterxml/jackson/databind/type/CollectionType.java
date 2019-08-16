@@ -20,18 +20,19 @@ public final class CollectionType extends CollectionLikeType {
 
     @Deprecated
     public static CollectionType construct(Class<?> cls, JavaType javaType) {
-        TypeBindings emptyBindings;
+        TypeBindings typeBindings;
         TypeVariable[] typeParameters = cls.getTypeParameters();
         if (typeParameters == null || typeParameters.length != 1) {
-            emptyBindings = TypeBindings.emptyBindings();
+            typeBindings = TypeBindings.emptyBindings();
         } else {
-            emptyBindings = TypeBindings.create((Class) cls, javaType);
+            typeBindings = TypeBindings.create(cls, javaType);
         }
-        return new CollectionType(cls, emptyBindings, TypeBase._bogusSuperClass(cls), null, javaType, null, null, false);
+        return new CollectionType(cls, typeBindings, _bogusSuperClass(cls), null, javaType, null, null, false);
     }
 
+    /* access modifiers changed from: protected */
     @Deprecated
-    protected JavaType _narrow(Class<?> cls) {
+    public JavaType _narrow(Class<?> cls) {
         return new CollectionType(cls, this._bindings, this._superClass, this._superInterfaces, this._elementType, null, null, this._asStatic);
     }
 

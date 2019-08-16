@@ -28,7 +28,7 @@ public final class ManagedReferenceProperty extends SettableBeanProperty {
     }
 
     protected ManagedReferenceProperty(ManagedReferenceProperty managedReferenceProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) managedReferenceProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) managedReferenceProperty, jsonDeserializer);
         this._referenceName = managedReferenceProperty._referenceName;
         this._isContainer = managedReferenceProperty._isContainer;
         this._managedProperty = managedReferenceProperty._managedProperty;
@@ -48,7 +48,7 @@ public final class ManagedReferenceProperty extends SettableBeanProperty {
     }
 
     public ManagedReferenceProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new ManagedReferenceProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new ManagedReferenceProperty(this, jsonDeserializer);
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {
@@ -72,6 +72,7 @@ public final class ManagedReferenceProperty extends SettableBeanProperty {
     }
 
     public Object setAndReturn(Object obj, Object obj2) throws IOException {
+        Object[] objArr;
         if (obj2 != null) {
             if (!this._isContainer) {
                 this._backProperty.set(obj2, obj);

@@ -108,12 +108,12 @@ namespace BestHTTP.Decompression.Zlib
 		}
 
 		public ZlibStream(Stream stream, CompressionMode mode)
-			: this(stream, mode, CompressionLevel.Default, false)
+			: this(stream, mode, CompressionLevel.Default, leaveOpen: false)
 		{
 		}
 
 		public ZlibStream(Stream stream, CompressionMode mode, CompressionLevel level)
-			: this(stream, mode, level, false)
+			: this(stream, mode, level, leaveOpen: false)
 		{
 		}
 
@@ -190,9 +190,6 @@ namespace BestHTTP.Decompression.Zlib
 				Stream compressor = new ZlibStream(memoryStream, CompressionMode.Compress, CompressionLevel.BestCompression);
 				ZlibBaseStream.CompressString(s, compressor);
 				return memoryStream.ToArray();
-				IL_0023:
-				byte[] result;
-				return result;
 			}
 		}
 
@@ -203,9 +200,6 @@ namespace BestHTTP.Decompression.Zlib
 				Stream compressor = new ZlibStream(memoryStream, CompressionMode.Compress, CompressionLevel.BestCompression);
 				ZlibBaseStream.CompressBuffer(b, compressor);
 				return memoryStream.ToArray();
-				IL_0023:
-				byte[] result;
-				return result;
 			}
 		}
 
@@ -215,9 +209,6 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				Stream decompressor = new ZlibStream(stream, CompressionMode.Decompress);
 				return ZlibBaseStream.UncompressString(compressed, decompressor);
-				IL_001c:
-				string result;
-				return result;
 			}
 		}
 
@@ -227,9 +218,6 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				Stream decompressor = new ZlibStream(stream, CompressionMode.Decompress);
 				return ZlibBaseStream.UncompressBuffer(compressed, decompressor);
-				IL_001c:
-				byte[] result;
-				return result;
 			}
 		}
 	}

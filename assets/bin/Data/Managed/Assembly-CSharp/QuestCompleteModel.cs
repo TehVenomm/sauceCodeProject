@@ -38,6 +38,18 @@ public class QuestCompleteModel : BaseModel
 		public float remainSec;
 
 		public float elapseSec;
+
+		public int dc;
+
+		public int dbc;
+
+		public int pdbc;
+
+		public float rHp;
+
+		public float rSec;
+
+		public int wmwave;
 	}
 
 	public class BattleUserLog

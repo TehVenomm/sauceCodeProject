@@ -43,7 +43,8 @@ public class JsonPointerBasedFilter extends TokenFilter {
         return this;
     }
 
-    protected boolean _includeScalar() {
+    /* access modifiers changed from: protected */
+    public boolean _includeScalar() {
         return this._pathToMatch.matches();
     }
 

@@ -1,4 +1,4 @@
-package net.gogame.gowrap.ui.dpro.model.equipmentcollection;
+package net.gogame.gowrap.p019ui.dpro.model.equipmentcollection;
 
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -9,6 +9,7 @@ import net.gogame.gowrap.support.BaseJsonObject;
 import net.gogame.gowrap.support.JSONUtils;
 import net.gogame.gowrap.support.StringUtils;
 
+/* renamed from: net.gogame.gowrap.ui.dpro.model.equipmentcollection.EquipmentCollection */
 public class EquipmentCollection extends BaseJsonObject {
     private static final String KEY_EQUIPMENT_LIST = "equipmentList";
     private static final String KEY_FORGED_EQUIPMENT_COUNT = "forgedEquipmentCount";
@@ -17,11 +18,15 @@ public class EquipmentCollection extends BaseJsonObject {
     private Integer forgedEquipmentCount;
     private Integer totalEquipmentCount;
 
+    public EquipmentCollection() {
+    }
+
     public EquipmentCollection(JsonReader jsonReader) throws IOException {
         super(jsonReader);
     }
 
-    protected boolean doParse(JsonReader jsonReader, String str) throws IOException {
+    /* access modifiers changed from: protected */
+    public boolean doParse(JsonReader jsonReader, String str) throws IOException {
         if (StringUtils.isEquals(str, KEY_EQUIPMENT_LIST)) {
             if (jsonReader.peek() == JsonToken.NULL) {
                 jsonReader.nextNull();

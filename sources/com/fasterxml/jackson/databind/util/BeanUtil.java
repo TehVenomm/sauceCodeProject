@@ -28,7 +28,7 @@ public class BeanUtil {
 
     public static String okNameForIsGetter(AnnotatedMethod annotatedMethod, String str, boolean z) {
         if (str.startsWith("is")) {
-            Class rawType = annotatedMethod.getRawType();
+            Class<Boolean> rawType = annotatedMethod.getRawType();
             if (rawType == Boolean.class || rawType == Boolean.TYPE) {
                 return z ? stdManglePropertyName(str, 2) : legacyManglePropertyName(str, 2);
             }
@@ -38,16 +38,18 @@ public class BeanUtil {
 
     public static String okNameForSetter(AnnotatedMethod annotatedMethod, boolean z) {
         String okNameForMutator = okNameForMutator(annotatedMethod, "set", z);
-        return (okNameForMutator == null || ("metaClass".equals(okNameForMutator) && isGroovyMetaClassSetter(annotatedMethod))) ? null : okNameForMutator;
+        if (okNameForMutator == null || ("metaClass".equals(okNameForMutator) && isGroovyMetaClassSetter(annotatedMethod))) {
+            return null;
+        }
+        return okNameForMutator;
     }
 
     public static String okNameForMutator(AnnotatedMethod annotatedMethod, String str, boolean z) {
         String name = annotatedMethod.getName();
         if (name.startsWith(str)) {
             return z ? stdManglePropertyName(name, str.length()) : legacyManglePropertyName(name, str.length());
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Deprecated
@@ -116,22 +118,27 @@ public class BeanUtil {
             return null;
         }
         char charAt = str.charAt(i);
-        char toLowerCase = Character.toLowerCase(charAt);
-        if (charAt == toLowerCase) {
+        char lowerCase = Character.toLowerCase(charAt);
+        if (charAt == lowerCase) {
             return str.substring(i);
         }
-        StringBuilder stringBuilder = new StringBuilder(length - i);
-        stringBuilder.append(toLowerCase);
-        for (int i2 = i + 1; i2 < length; i2++) {
-            toLowerCase = str.charAt(i2);
-            char toLowerCase2 = Character.toLowerCase(toLowerCase);
-            if (toLowerCase == toLowerCase2) {
-                stringBuilder.append(str, i2, length);
+        StringBuilder sb = new StringBuilder(length - i);
+        sb.append(lowerCase);
+        int i2 = i + 1;
+        while (true) {
+            if (i2 >= length) {
                 break;
             }
-            stringBuilder.append(toLowerCase2);
+            char charAt2 = str.charAt(i2);
+            char lowerCase2 = Character.toLowerCase(charAt2);
+            if (charAt2 == lowerCase2) {
+                sb.append(str, i2, length);
+                break;
+            }
+            sb.append(lowerCase2);
+            i2++;
         }
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     protected static String stdManglePropertyName(String str, int i) {
@@ -140,16 +147,16 @@ public class BeanUtil {
             return null;
         }
         char charAt = str.charAt(i);
-        char toLowerCase = Character.toLowerCase(charAt);
-        if (charAt == toLowerCase) {
+        char lowerCase = Character.toLowerCase(charAt);
+        if (charAt == lowerCase) {
             return str.substring(i);
         }
         if (i + 1 < length && Character.isUpperCase(str.charAt(i + 1))) {
             return str.substring(i);
         }
-        StringBuilder stringBuilder = new StringBuilder(length - i);
-        stringBuilder.append(toLowerCase);
-        stringBuilder.append(str, i + 1, length);
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder(length - i);
+        sb.append(lowerCase);
+        sb.append(str, i + 1, length);
+        return sb.toString();
     }
 }

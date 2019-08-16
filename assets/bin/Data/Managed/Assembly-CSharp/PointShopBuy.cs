@@ -35,13 +35,13 @@ public class PointShopBuy : GameSection
 			currentItem = (array[0] as PointShopItem);
 			pointShop = (array[1] as PointShop);
 			onBuy = (array[2] as Action<PointShopItem, int>);
-			int num = (!currentItem.hasLimit) ? 2147483647 : (currentItem.limit - currentItem.buyCount);
+			int num = (!currentItem.hasLimit) ? int.MaxValue : (currentItem.limit - currentItem.buyCount);
 			changableNum = Mathf.Min(Mathf.Min(num, pointShop.userPoint / currentItem.needPoint), GameDefine.POINT_SHOP_MAX_BUY_LIMIT);
 		}
 		if (changableNum == 1)
 		{
-			SetActive((Enum)UI.BTN_L, false);
-			SetActive((Enum)UI.BTN_R, false);
+			SetActive((Enum)UI.BTN_L, is_visible: false);
+			SetActive((Enum)UI.BTN_R, is_visible: false);
 		}
 		else
 		{
@@ -57,8 +57,8 @@ public class PointShopBuy : GameSection
 		if (currentItem != null)
 		{
 			SetLabelText((Enum)UI.LBL_ITEM_NAME, currentItem.name);
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)currentItem.type, (uint)currentItem.itemId, GetCtrl(UI.OBJ_ITEM_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-			itemIcon.SetEnableCollider(false);
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)currentItem.type, (uint)currentItem.itemId, GetCtrl(UI.OBJ_ITEM_ICON_ROOT));
+			itemIcon.SetEnableCollider(is_enable: false);
 			ResourceLoad.LoadPointIconImageTexture(GetCtrl(UI.TEX_POINT_ICON).GetComponent<UITexture>(), (uint)pointShop.pointShopId);
 		}
 		SetLabelText((Enum)UI.LBL_CURRENT_CHANGE_NUM, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), currentNum));

@@ -15,26 +15,26 @@ public class OnceManager : MonoBehaviourSingleton<OnceManager>
 	{
 		if (!firstSendOnce)
 		{
-			callBack(true);
+			callBack(obj: true);
+			return;
 		}
-		else
+		OnceAllModel.RequestSendForm requestSendForm = new OnceAllModel.RequestSendForm();
+		requestSendForm.req_e = 1;
+		requestSendForm.req_i = 1;
+		requestSendForm.req_qi = 1;
+		requestSendForm.req_s = 1;
+		requestSendForm.req_ai = 1;
+		requestSendForm.req_ac = 1;
+		requestSendForm.d = NetworkNative.getUniqueDeviceId();
+		Protocol.Send(OnceAllModel.URL, requestSendForm, delegate(OnceAllModel ret)
 		{
-			OnceAllModel.RequestSendForm requestSendForm = new OnceAllModel.RequestSendForm();
-			requestSendForm.req_e = 1;
-			requestSendForm.req_i = 1;
-			requestSendForm.req_qi = 1;
-			requestSendForm.req_s = 1;
-			requestSendForm.req_ai = 1;
-			Protocol.Send(OnceAllModel.URL, requestSendForm, delegate(OnceAllModel ret)
+			bool obj = false;
+			if (ret.Error == Error.None)
 			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					result = ret.result;
-					firstSendOnce = false;
-				}
-				callBack(obj);
-			}, string.Empty);
-		}
+				result = ret.result;
+				firstSendOnce = false;
+			}
+			callBack(obj);
+		}, string.Empty);
 	}
 }

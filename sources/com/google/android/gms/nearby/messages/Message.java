@@ -4,14 +4,21 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbp;
-import com.google.android.gms.internal.zzclm;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
+import com.google.android.gms.internal.nearby.zzgs;
 import java.util.Arrays;
 
-public class Message extends zza implements ReflectedParcelable {
+@Class(creator = "MessageCreator")
+public class Message extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<Message> CREATOR = new zza();
     public static final int MAX_CONTENT_SIZE_BYTES = 102400;
     public static final int MAX_TYPE_LENGTH = 32;
@@ -19,31 +26,38 @@ public class Message extends zza implements ReflectedParcelable {
     public static final String MESSAGE_TYPE_AUDIO_BYTES = "__audio_bytes";
     public static final String MESSAGE_TYPE_EDDYSTONE_UID = "__eddystone_uid";
     public static final String MESSAGE_TYPE_I_BEACON_ID = "__i_beacon_id";
-    private static final zzclm[] zzjdo = new zzclm[]{zzclm.zzjfh};
+    private static final zzgs[] zzeu = {zzgs.zzgv};
+    @Field(getter = "getContent", mo13990id = 1)
     private final byte[] content;
+    @Field(getter = "getNamespace", mo13990id = 3)
+    private final String namespace;
+    @Field(getter = "getType", mo13990id = 2)
     private final String type;
-    private int versionCode;
-    private final String zzjdp;
+    @VersionField(mo13996id = 1000)
+    private final int versionCode;
+    @Field(mo13990id = 4)
     @Deprecated
-    private zzclm[] zzjdq;
-    private final long zzjdr;
+    private final zzgs[] zzev;
+    @Field(getter = "getProjectId", mo13990id = 5)
+    private final long zzew;
 
-    Message(int i, @Nullable byte[] bArr, @Nullable String str, String str2, @Nullable zzclm[] zzclmArr, long j) {
+    @Constructor
+    Message(@Param(mo13993id = 1000) int i, @Nullable @Param(mo13993id = 1) byte[] bArr, @Nullable @Param(mo13993id = 3) String str, @Param(mo13993id = 2) String str2, @Nullable @Param(mo13993id = 4) zzgs[] zzgsArr, @Param(mo13993id = 5) long j) {
         this.versionCode = i;
-        this.type = (String) zzbp.zzu(str2);
+        this.type = (String) Preconditions.checkNotNull(str2);
         if (str == null) {
             str = "";
         }
-        this.zzjdp = str;
-        this.zzjdr = 0;
-        zzbp.zzu(bArr);
-        zzbp.zzb(bArr.length <= MAX_CONTENT_SIZE_BYTES, "Content length(%d) must not exceed MAX_CONTENT_SIZE_BYTES(%d)", Integer.valueOf(bArr.length), Integer.valueOf(MAX_CONTENT_SIZE_BYTES));
+        this.namespace = str;
+        this.zzew = j;
+        Preconditions.checkNotNull(bArr);
+        Preconditions.checkArgument(bArr.length <= 102400, "Content length(%d) must not exceed MAX_CONTENT_SIZE_BYTES(%d)", Integer.valueOf(bArr.length), Integer.valueOf(MAX_CONTENT_SIZE_BYTES));
         this.content = bArr;
-        if (zzclmArr == null || zzclmArr.length == 0) {
-            zzclmArr = zzjdo;
+        if (zzgsArr == null || zzgsArr.length == 0) {
+            zzgsArr = zzeu;
         }
-        this.zzjdq = zzclmArr;
-        zzbp.zzb(str2.length() <= 32, "Type length(%d) must not exceed MAX_TYPE_LENGTH(%d)", Integer.valueOf(str2.length()), Integer.valueOf(32));
+        this.zzev = zzgsArr;
+        Preconditions.checkArgument(str2.length() <= 32, "Type length(%d) must not exceed MAX_TYPE_LENGTH(%d)", Integer.valueOf(str2.length()), Integer.valueOf(32));
     }
 
     public Message(byte[] bArr) {
@@ -55,15 +69,15 @@ public class Message extends zza implements ReflectedParcelable {
     }
 
     public Message(byte[] bArr, String str, String str2) {
-        this(bArr, str, str2, zzjdo);
+        this(bArr, str, str2, zzeu);
     }
 
-    private Message(byte[] bArr, String str, String str2, zzclm[] zzclmArr) {
-        this(bArr, str, str2, zzclmArr, 0);
+    private Message(byte[] bArr, String str, String str2, zzgs[] zzgsArr) {
+        this(bArr, str, str2, zzgsArr, 0);
     }
 
-    private Message(byte[] bArr, String str, String str2, zzclm[] zzclmArr, long j) {
-        this(2, bArr, str, str2, zzclmArr, 0);
+    private Message(byte[] bArr, String str, String str2, zzgs[] zzgsArr, long j) {
+        this(2, bArr, str, str2, zzgsArr, 0);
     }
 
     public boolean equals(Object obj) {
@@ -72,10 +86,7 @@ public class Message extends zza implements ReflectedParcelable {
                 return false;
             }
             Message message = (Message) obj;
-            if (!TextUtils.equals(this.zzjdp, message.zzjdp) || !TextUtils.equals(this.type, message.type) || !Arrays.equals(this.content, message.content)) {
-                return false;
-            }
-            if (0 != 0) {
+            if (!TextUtils.equals(this.namespace, message.namespace) || !TextUtils.equals(this.type, message.type) || !Arrays.equals(this.content, message.content) || this.zzew != message.zzew) {
                 return false;
             }
         }
@@ -87,7 +98,7 @@ public class Message extends zza implements ReflectedParcelable {
     }
 
     public String getNamespace() {
-        return this.zzjdp;
+        return this.namespace;
     }
 
     public String getType() {
@@ -95,27 +106,27 @@ public class Message extends zza implements ReflectedParcelable {
     }
 
     public int hashCode() {
-        return Arrays.hashCode(new Object[]{this.zzjdp, this.type, Integer.valueOf(Arrays.hashCode(this.content)), Long.valueOf(0)});
+        return Objects.hashCode(this.namespace, this.type, Integer.valueOf(Arrays.hashCode(this.content)), Long.valueOf(this.zzew));
     }
 
     public String toString() {
-        String str = this.zzjdp;
+        String str = this.namespace;
         String str2 = this.type;
-        return new StringBuilder((String.valueOf(str).length() + 59) + String.valueOf(str2).length()).append("Message{namespace='").append(str).append("', type='").append(str2).append("', content=[").append(this.content == null ? 0 : this.content.length).append(" bytes]}").toString();
+        return new StringBuilder(String.valueOf(str).length() + 59 + String.valueOf(str2).length()).append("Message{namespace='").append(str).append("', type='").append(str2).append("', content=[").append(this.content == null ? 0 : this.content.length).append(" bytes]}").toString();
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zza(parcel, 1, getContent(), false);
-        zzd.zza(parcel, 2, getType(), false);
-        zzd.zza(parcel, 3, getNamespace(), false);
-        zzd.zza(parcel, 4, this.zzjdq, i, false);
-        zzd.zza(parcel, 5, 0);
-        zzd.zzc(parcel, 1000, this.versionCode);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeByteArray(parcel, 1, getContent(), false);
+        SafeParcelWriter.writeString(parcel, 2, getType(), false);
+        SafeParcelWriter.writeString(parcel, 3, getNamespace(), false);
+        SafeParcelWriter.writeTypedArray(parcel, 4, this.zzev, i, false);
+        SafeParcelWriter.writeLong(parcel, 5, this.zzew);
+        SafeParcelWriter.writeInt(parcel, 1000, this.versionCode);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final boolean zzkj(String str) {
+    public final boolean zzl(String str) {
         return MESSAGE_NAMESPACE_RESERVED.equals(getNamespace()) && str.equals(getType());
     }
 }

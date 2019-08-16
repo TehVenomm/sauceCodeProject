@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.core;
 
 import com.fasterxml.jackson.core.JsonParser.NumberType;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
+import com.fasterxml.jackson.core.p015io.CharacterEscapes;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import java.io.Closeable;
 import java.io.Flushable;
@@ -32,6 +32,7 @@ public abstract class JsonGenerator implements Closeable, Flushable, Versioned {
         private final int _mask;
 
         public static int collectDefaults() {
+            Feature[] values;
             int i = 0;
             for (Feature feature : values()) {
                 if (feature.enabledByDefault()) {
@@ -219,7 +220,10 @@ public abstract class JsonGenerator implements Closeable, Flushable, Versioned {
 
     public Object getCurrentValue() {
         JsonStreamContext outputContext = getOutputContext();
-        return outputContext == null ? null : outputContext.getCurrentValue();
+        if (outputContext == null) {
+            return null;
+        }
+        return outputContext.getCurrentValue();
     }
 
     public void setCurrentValue(Object obj) {
@@ -357,8 +361,7 @@ public abstract class JsonGenerator implements Closeable, Flushable, Versioned {
         if (currentToken == null) {
             _reportError("No current event to copy");
         }
-        NumberType numberType;
-        switch (currentToken.id()) {
+        switch (currentToken.mo9113id()) {
             case -1:
                 _reportError("No current event to copy");
                 break;
@@ -385,7 +388,7 @@ public abstract class JsonGenerator implements Closeable, Flushable, Versioned {
                     return;
                 }
             case 7:
-                numberType = jsonParser.getNumberType();
+                NumberType numberType = jsonParser.getNumberType();
                 if (numberType == NumberType.INT) {
                     writeNumber(jsonParser.getIntValue());
                     return;
@@ -397,11 +400,11 @@ public abstract class JsonGenerator implements Closeable, Flushable, Versioned {
                     return;
                 }
             case 8:
-                numberType = jsonParser.getNumberType();
-                if (numberType == NumberType.BIG_DECIMAL) {
+                NumberType numberType2 = jsonParser.getNumberType();
+                if (numberType2 == NumberType.BIG_DECIMAL) {
                     writeNumber(jsonParser.getDecimalValue());
                     return;
-                } else if (numberType == NumberType.FLOAT) {
+                } else if (numberType2 == NumberType.FLOAT) {
                     writeNumber(jsonParser.getFloatValue());
                     return;
                 } else {
@@ -432,10 +435,10 @@ public abstract class JsonGenerator implements Closeable, Flushable, Versioned {
         if (currentToken == null) {
             _reportError("No current event to copy");
         }
-        int id = currentToken.id();
+        int id = currentToken.mo9113id();
         if (id == 5) {
             writeFieldName(jsonParser.getCurrentName());
-            id = jsonParser.nextToken().id();
+            id = jsonParser.nextToken().mo9113id();
         }
         switch (id) {
             case 1:
@@ -458,19 +461,23 @@ public abstract class JsonGenerator implements Closeable, Flushable, Versioned {
         }
     }
 
-    protected void _reportError(String str) throws JsonGenerationException {
+    /* access modifiers changed from: protected */
+    public void _reportError(String str) throws JsonGenerationException {
         throw new JsonGenerationException(str, this);
     }
 
-    protected final void _throwInternal() {
+    /* access modifiers changed from: protected */
+    public final void _throwInternal() {
         VersionUtil.throwInternal();
     }
 
-    protected void _reportUnsupportedOperation() {
+    /* access modifiers changed from: protected */
+    public void _reportUnsupportedOperation() {
         throw new UnsupportedOperationException("Operation not supported by generator of type " + getClass().getName());
     }
 
-    protected void _writeSimpleObject(Object obj) throws IOException {
+    /* access modifiers changed from: protected */
+    public void _writeSimpleObject(Object obj) throws IOException {
         if (obj == null) {
             writeNull();
         } else if (obj instanceof String) {

@@ -22,11 +22,11 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
     }
 
     private StringBuilder spacer(int i) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (int i2 = 0; i2 < i; i2++) {
-            stringBuilder.append(" ");
+            sb.append(" ");
         }
-        return stringBuilder;
+        return sb;
     }
 
     public void appendDetail(StringBuffer stringBuffer, String str, Object obj) {
@@ -41,7 +41,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, Object[] objArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, Object[] objArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, objArr);
@@ -49,7 +50,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void reflectionAppendArrayDetail(StringBuffer stringBuffer, String str, Object obj) {
+    /* access modifiers changed from: protected */
+    public void reflectionAppendArrayDetail(StringBuffer stringBuffer, String str, Object obj) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, obj);
@@ -57,7 +59,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, long[] jArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, long[] jArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, jArr);
@@ -65,7 +68,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, int[] iArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, int[] iArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, iArr);
@@ -73,7 +77,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, short[] sArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, short[] sArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, sArr);
@@ -81,7 +86,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, byte[] bArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, byte[] bArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, bArr);
@@ -89,7 +95,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, char[] cArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, char[] cArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, cArr);
@@ -97,7 +104,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, double[] dArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, double[] dArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, dArr);
@@ -105,7 +113,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, float[] fArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, float[] fArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, fArr);
@@ -113,7 +122,8 @@ class MultilineRecursiveToStringStyle extends RecursiveToStringStyle {
         resetIndent();
     }
 
-    protected void appendDetail(StringBuffer stringBuffer, String str, boolean[] zArr) {
+    /* access modifiers changed from: protected */
+    public void appendDetail(StringBuffer stringBuffer, String str, boolean[] zArr) {
         this.spaces += this.indent;
         resetIndent();
         super.appendDetail(stringBuffer, str, zArr);

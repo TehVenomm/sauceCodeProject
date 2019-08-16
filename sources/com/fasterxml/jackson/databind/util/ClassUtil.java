@@ -23,9 +23,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public final class ClassUtil {
-    private static final Class<?> CLS_OBJECT = Object.class;
-    private static final EmptyIterator<?> EMPTY_ITERATOR = new EmptyIterator();
-    private static final LRUMap<Class<?>, ClassMetadata> sCached = new LRUMap(48, 48);
+    /* access modifiers changed from: private */
+    public static final Class<?> CLS_OBJECT = Object.class;
+    private static final EmptyIterator<?> EMPTY_ITERATOR = new EmptyIterator<>();
+    private static final LRUMap<Class<?>, ClassMetadata> sCached = new LRUMap<>(48, 48);
 
     private static final class ClassMetadata {
         private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
@@ -54,7 +55,10 @@ public final class ClassUtil {
                 }
                 this._packageName = str;
             }
-            return str == "" ? null : str;
+            if (str == "") {
+                return null;
+            }
+            return str;
         }
 
         public Class<?>[] getInterfaces() {
@@ -62,9 +66,9 @@ public final class ClassUtil {
             if (clsArr != null) {
                 return clsArr;
             }
-            clsArr = this._forClass.getInterfaces();
-            this._interfaces = clsArr;
-            return clsArr;
+            Class<?>[] interfaces = this._forClass.getInterfaces();
+            this._interfaces = interfaces;
+            return interfaces;
         }
 
         public Type[] getGenericInterfaces() {
@@ -72,9 +76,9 @@ public final class ClassUtil {
             if (typeArr != null) {
                 return typeArr;
             }
-            typeArr = this._forClass.getGenericInterfaces();
-            this._genericInterfaces = typeArr;
-            return typeArr;
+            Type[] genericInterfaces = this._forClass.getGenericInterfaces();
+            this._genericInterfaces = genericInterfaces;
+            return genericInterfaces;
         }
 
         public Annotation[] getDeclaredAnnotations() {
@@ -109,9 +113,9 @@ public final class ClassUtil {
             if (fieldArr != null) {
                 return fieldArr;
             }
-            fieldArr = this._forClass.getDeclaredFields();
-            this._fields = fieldArr;
-            return fieldArr;
+            Field[] declaredFields = this._forClass.getDeclaredFields();
+            this._fields = declaredFields;
+            return declaredFields;
         }
 
         public Method[] getDeclaredMethods() {
@@ -119,9 +123,9 @@ public final class ClassUtil {
             if (methodArr != null) {
                 return methodArr;
             }
-            methodArr = this._forClass.getDeclaredMethods();
-            this._methods = methodArr;
-            return methodArr;
+            Method[] declaredMethods = this._forClass.getDeclaredMethods();
+            this._methods = declaredMethods;
+            return declaredMethods;
         }
 
         public boolean hasEnclosingMethod() {
@@ -161,9 +165,9 @@ public final class ClassUtil {
             if (i >= 0) {
                 return i;
             }
-            i = this._ctor.getParameterTypes().length;
-            this._paramCount = i;
-            return i;
+            int length = this._ctor.getParameterTypes().length;
+            this._paramCount = length;
+            return length;
         }
 
         public Class<?> getDeclaringClass() {
@@ -175,9 +179,9 @@ public final class ClassUtil {
             if (annotationArr != null) {
                 return annotationArr;
             }
-            annotationArr = this._ctor.getDeclaredAnnotations();
-            this._annotations = annotationArr;
-            return annotationArr;
+            Annotation[] declaredAnnotations = this._ctor.getDeclaredAnnotations();
+            this._annotations = declaredAnnotations;
+            return declaredAnnotations;
         }
 
         public Annotation[][] getParameterAnnotations() {
@@ -185,9 +189,9 @@ public final class ClassUtil {
             if (annotationArr != null) {
                 return annotationArr;
             }
-            annotationArr = this._ctor.getParameterAnnotations();
-            this._paramAnnotations = annotationArr;
-            return annotationArr;
+            Annotation[][] parameterAnnotations = this._ctor.getParameterAnnotations();
+            this._paramAnnotations = parameterAnnotations;
+            return parameterAnnotations;
         }
     }
 
@@ -233,45 +237,51 @@ public final class ClassUtil {
         private Object get(Object obj, Field field) {
             try {
                 return field.get(obj);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 throw new IllegalArgumentException(e);
             }
         }
 
         private static Field locateField(Class<?> cls, String str, Class<?> cls2) {
-            int i;
-            int length;
+            Field field;
+            int i = 0;
             Field[] declaredFields = ClassUtil.getDeclaredFields(cls);
-            for (Field field : declaredFields) {
+            int length = declaredFields.length;
+            int i2 = 0;
+            while (true) {
+                if (i2 >= length) {
+                    field = null;
+                    break;
+                }
+                field = declaredFields[i2];
                 if (str.equals(field.getName()) && field.getType() == cls2) {
                     break;
                 }
+                i2++;
             }
-            Field field2 = null;
-            if (field2 == null) {
-                length = declaredFields.length;
-                i = 0;
-                Field field3 = field2;
-                while (i < length) {
-                    field2 = declaredFields[i];
-                    if (field2.getType() != cls2) {
-                        field2 = field3;
-                    } else if (field3 != null) {
+            if (field == null) {
+                int length2 = declaredFields.length;
+                Field field2 = field;
+                while (i < length2) {
+                    Field field3 = declaredFields[i];
+                    if (field3.getType() != cls2) {
+                        field3 = field2;
+                    } else if (field2 != null) {
                         return null;
                     }
                     i++;
-                    field3 = field2;
+                    field2 = field3;
                 }
-                field2 = field3;
+                field = field2;
             }
-            if (field2 == null) {
-                return field2;
+            if (field == null) {
+                return field;
             }
             try {
-                field2.setAccessible(true);
-                return field2;
+                field.setAccessible(true);
+                return field;
             } catch (Throwable th) {
-                return field2;
+                return field;
             }
         }
     }
@@ -284,7 +294,7 @@ public final class ClassUtil {
         if (javaType == null || javaType.hasRawClass(cls) || javaType.hasRawClass(Object.class)) {
             return Collections.emptyList();
         }
-        List<JavaType> arrayList = new ArrayList(8);
+        ArrayList arrayList = new ArrayList(8);
         _addSuperTypes(javaType, cls, arrayList, z);
         return arrayList;
     }
@@ -293,13 +303,13 @@ public final class ClassUtil {
         if (cls == null || cls == cls2 || cls == Object.class) {
             return Collections.emptyList();
         }
-        List<Class<?>> arrayList = new ArrayList(8);
+        ArrayList arrayList = new ArrayList(8);
         _addRawSuperTypes(cls, cls2, arrayList, z);
         return arrayList;
     }
 
     public static List<Class<?>> findSuperClasses(Class<?> cls, Class<?> cls2, boolean z) {
-        List<Class<?>> linkedList = new LinkedList();
+        LinkedList linkedList = new LinkedList();
         if (cls != null && cls != cls2) {
             if (z) {
                 linkedList.add(cls);
@@ -317,7 +327,7 @@ public final class ClassUtil {
 
     @Deprecated
     public static List<Class<?>> findSuperTypes(Class<?> cls, Class<?> cls2) {
-        return findSuperTypes((Class) cls, (Class) cls2, new ArrayList(8));
+        return findSuperTypes(cls, cls2, (List<Class<?>>) new ArrayList<Class<?>>(8));
     }
 
     @Deprecated
@@ -328,7 +338,7 @@ public final class ClassUtil {
 
     private static void _addSuperTypes(JavaType javaType, Class<?> cls, Collection<JavaType> collection, boolean z) {
         if (javaType != null) {
-            Class<?> rawClass = javaType.getRawClass();
+            Class<Object> rawClass = javaType.getRawClass();
             if (rawClass != cls && rawClass != Object.class) {
                 if (z) {
                     if (!collection.contains(javaType)) {
@@ -382,24 +392,23 @@ public final class ClassUtil {
             if (hasEnclosingMethod(cls)) {
                 return "local/anonymous";
             }
-            if (!(z || Modifier.isStatic(cls.getModifiers()) || getEnclosingClass(cls) == null)) {
+            if (!z && !Modifier.isStatic(cls.getModifiers()) && getEnclosingClass(cls) != null) {
                 return "non-static member class";
             }
             return null;
-        } catch (SecurityException e) {
-        } catch (NullPointerException e2) {
+        } catch (NullPointerException | SecurityException e) {
         }
     }
 
     public static Class<?> getOuterClass(Class<?> cls) {
-        Class<?> cls2 = null;
         try {
-            if (!(hasEnclosingMethod(cls) || Modifier.isStatic(cls.getModifiers()))) {
-                cls2 = getEnclosingClass(cls);
+            if (!hasEnclosingMethod(cls) && !Modifier.isStatic(cls.getModifiers())) {
+                return getEnclosingClass(cls);
             }
+            return null;
         } catch (SecurityException e) {
+            return null;
         }
-        return cls2;
     }
 
     public static boolean isProxyType(Class<?> cls) {
@@ -419,10 +428,10 @@ public final class ClassUtil {
     }
 
     public static boolean isCollectionMapOrArray(Class<?> cls) {
-        if (cls.isArray() || Collection.class.isAssignableFrom(cls) || Map.class.isAssignableFrom(cls)) {
-            return true;
+        if (!cls.isArray() && !Collection.class.isAssignableFrom(cls) && !Map.class.isAssignableFrom(cls)) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static String getClassDescription(Object obj) {
@@ -468,20 +477,20 @@ public final class ClassUtil {
         if (contextClassLoader != null) {
             try {
                 return Class.forName(str, true, contextClassLoader);
-            } catch (Throwable th2) {
-                th2 = getRootCause(th2);
+            } catch (Exception e) {
+                th = getRootCause(e);
             }
         }
         try {
             return Class.forName(str);
-        } catch (Throwable e) {
-            if (th2 == null) {
-                th2 = getRootCause(e);
+        } catch (Exception e2) {
+            if (th == null) {
+                th = getRootCause(e2);
             }
-            if (th2 instanceof RuntimeException) {
-                throw ((RuntimeException) th2);
+            if (th instanceof RuntimeException) {
+                throw ((RuntimeException) th);
             }
-            throw new ClassNotFoundException(th2.getMessage(), th2);
+            throw new ClassNotFoundException(th.getMessage(), th);
         }
     }
 
@@ -510,7 +519,10 @@ public final class ClassUtil {
     }
 
     public static Class<?> getDeclaringClass(Class<?> cls) {
-        return isObjectOrPrimitive(cls) ? null : cls.getDeclaringClass();
+        if (isObjectOrPrimitive(cls)) {
+            return null;
+        }
+        return cls.getDeclaringClass();
     }
 
     public static Type getGenericSuperclass(Class<?> cls) {
@@ -522,7 +534,10 @@ public final class ClassUtil {
     }
 
     public static Class<?> getEnclosingClass(Class<?> cls) {
-        return isObjectOrPrimitive(cls) ? null : cls.getEnclosingClass();
+        if (isObjectOrPrimitive(cls)) {
+            return null;
+        }
+        return cls.getEnclosingClass();
     }
 
     private static Class<?>[] _interfaces(Class<?> cls) {
@@ -535,8 +550,8 @@ public final class ClassUtil {
             return classMetadata;
         }
         ClassMetadata classMetadata2 = new ClassMetadata(cls);
-        classMetadata = (ClassMetadata) sCached.putIfAbsent(cls, classMetadata2);
-        return classMetadata != null ? classMetadata : classMetadata2;
+        ClassMetadata classMetadata3 = (ClassMetadata) sCached.putIfAbsent(cls, classMetadata2);
+        return classMetadata3 != null ? classMetadata3 : classMetadata2;
     }
 
     @Deprecated
@@ -595,7 +610,7 @@ public final class ClassUtil {
         }
         try {
             return findConstructor.newInstance(new Object[0]);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             unwrapAndThrowAsIAE(e, "Failed to instantiate class " + cls.getName() + ", problem: " + e.getMessage());
             return null;
         }
@@ -614,7 +629,7 @@ public final class ClassUtil {
             }
         } catch (NoSuchMethodException e) {
             return null;
-        } catch (Throwable e2) {
+        } catch (Exception e2) {
             unwrapAndThrowAsIAE(e2, "Failed to find default constructor of class " + cls.getName() + ", problem: " + e2.getMessage());
             return null;
         }
@@ -637,13 +652,13 @@ public final class ClassUtil {
             return Float.valueOf(0.0f);
         }
         if (cls == Byte.TYPE) {
-            return Byte.valueOf((byte) 0);
+            return Byte.valueOf(0);
         }
         if (cls == Short.TYPE) {
-            return Short.valueOf((short) 0);
+            return Short.valueOf(0);
         }
         if (cls == Character.TYPE) {
-            return Character.valueOf('\u0000');
+            return Character.valueOf(0);
         }
         throw new IllegalArgumentException("Class " + cls.getName() + " is not a primitive type");
     }
@@ -730,17 +745,17 @@ public final class ClassUtil {
     }
 
     public static Class<? extends Enum<?>> findEnumType(EnumSet<?> enumSet) {
-        if (enumSet.isEmpty()) {
-            return EnumTypeLocator.instance.enumTypeFor((EnumSet) enumSet);
+        if (!enumSet.isEmpty()) {
+            return findEnumType((Enum) enumSet.iterator().next());
         }
-        return findEnumType((Enum) enumSet.iterator().next());
+        return EnumTypeLocator.instance.enumTypeFor(enumSet);
     }
 
     public static Class<? extends Enum<?>> findEnumType(EnumMap<?, ?> enumMap) {
-        if (enumMap.isEmpty()) {
-            return EnumTypeLocator.instance.enumTypeFor((EnumMap) enumMap);
+        if (!enumMap.isEmpty()) {
+            return findEnumType((Enum) enumMap.keySet().iterator().next());
         }
-        return findEnumType((Enum) enumMap.keySet().iterator().next());
+        return EnumTypeLocator.instance.enumTypeFor(enumMap);
     }
 
     public static Class<? extends Enum<?>> findEnumType(Enum<?> enumR) {
@@ -771,7 +786,7 @@ public final class ClassUtil {
     }
 
     public static boolean isNonStaticInnerClass(Class<?> cls) {
-        return (Modifier.isStatic(cls.getModifiers()) || getEnclosingClass(cls) == null) ? false : true;
+        return !Modifier.isStatic(cls.getModifiers()) && getEnclosingClass(cls) != null;
     }
 
     public static boolean isObjectOrPrimitive(Class<?> cls) {

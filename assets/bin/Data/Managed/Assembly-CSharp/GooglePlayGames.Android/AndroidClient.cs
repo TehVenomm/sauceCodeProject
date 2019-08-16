@@ -87,7 +87,7 @@ namespace GooglePlayGames.Android
 		private IntPtr CreateHiddenView(IntPtr activity)
 		{
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Expected O, but got Unknown
+			//IL_0041: Expected O, but got Unknown
 			if (invisible == null || invisible.GetRawObject() == IntPtr.Zero)
 			{
 				invisible = new AndroidJavaObject("android.view.View", new object[1]
@@ -109,7 +109,7 @@ namespace GooglePlayGames.Android
 		private static void LaunchBridgeIntent(IntPtr bridgedIntent)
 		{
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
+			//IL_0019: Expected O, but got Unknown
 			object[] array = new object[2];
 			jvalue[] array2 = AndroidJNIHelper.CreateJNIArgArray(array);
 			try
@@ -188,9 +188,8 @@ namespace GooglePlayGames.Android
 				Debug.LogException(ex);
 				callback(CommonStatusCodes.DeveloperError, null);
 				return;
-				IL_0049:;
 			}
-			PendingResult<Stats_LoadPlayerStatsResultObject> pendingResult = Games.Stats.loadPlayerStats(arg_GoogleApiClient_, true);
+			PendingResult<Stats_LoadPlayerStatsResultObject> pendingResult = Games.Stats.loadPlayerStats(arg_GoogleApiClient_, arg_bool_2: true);
 			pendingResult.setResultCallback(resultCallback);
 		}
 	}

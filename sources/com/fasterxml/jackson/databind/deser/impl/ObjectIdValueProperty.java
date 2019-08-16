@@ -21,7 +21,7 @@ public final class ObjectIdValueProperty extends SettableBeanProperty {
     }
 
     protected ObjectIdValueProperty(ObjectIdValueProperty objectIdValueProperty, JsonDeserializer<?> jsonDeserializer) {
-        super((SettableBeanProperty) objectIdValueProperty, (JsonDeserializer) jsonDeserializer);
+        super((SettableBeanProperty) objectIdValueProperty, jsonDeserializer);
         this._objectIdReader = objectIdValueProperty._objectIdReader;
     }
 
@@ -35,7 +35,7 @@ public final class ObjectIdValueProperty extends SettableBeanProperty {
     }
 
     public ObjectIdValueProperty withValueDeserializer(JsonDeserializer<?> jsonDeserializer) {
-        return new ObjectIdValueProperty(this, (JsonDeserializer) jsonDeserializer);
+        return new ObjectIdValueProperty(this, jsonDeserializer);
     }
 
     public <A extends Annotation> A getAnnotation(Class<A> cls) {

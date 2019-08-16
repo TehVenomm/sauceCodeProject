@@ -14,21 +14,22 @@ public class OverlayHelper {
     private final Activity activity;
     private final Handler handler;
     private final int maxRetries;
-    private PopupWindow popupWindow;
+    /* access modifiers changed from: private */
+    public PopupWindow popupWindow;
     private int retries;
     private final long retryMs;
     private final View view;
 
-    public OverlayHelper(Activity activity, View view) {
-        this(activity, view, 500, 4);
+    public OverlayHelper(Activity activity2, View view2) {
+        this(activity2, view2, 500, 4);
     }
 
-    public OverlayHelper(Activity activity, View view, long j, int i) {
+    public OverlayHelper(Activity activity2, View view2, long j, int i) {
         this.handler = new Handler();
         this.popupWindow = null;
         this.retries = 0;
-        this.activity = activity;
-        this.view = view;
+        this.activity = activity2;
+        this.view = view2;
         this.retryMs = j;
         this.maxRetries = i;
     }
@@ -61,7 +62,7 @@ public class OverlayHelper {
                     if (OverlayHelper.this.popupWindow != null) {
                         try {
                             OverlayHelper.this.popupWindow.showAtLocation(viewGroup, i4, i5, i6);
-                        } catch (Throwable e) {
+                        } catch (Exception e) {
                             Log.e(Constants.TAG, "Exception", e);
                         }
                     }
@@ -77,11 +78,11 @@ public class OverlayHelper {
         }
     }
 
-    private View getLeafView(View view) {
-        if (!(view instanceof ViewGroup)) {
-            return view;
+    private View getLeafView(View view2) {
+        if (!(view2 instanceof ViewGroup)) {
+            return view2;
         }
-        ViewGroup viewGroup = (ViewGroup) view;
+        ViewGroup viewGroup = (ViewGroup) view2;
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
             View leafView = getLeafView(viewGroup.getChildAt(i));
             if (leafView != null) {

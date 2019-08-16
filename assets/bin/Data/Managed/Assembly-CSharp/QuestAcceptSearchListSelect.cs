@@ -20,7 +20,7 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendApply(array[0], delegate(bool is_success, Error ret_code)
 			{
-				if (is_success && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
+				if (is_success && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId()))
 				{
 					Protocol.Force(delegate
 					{
@@ -31,9 +31,9 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 				}
 				else
 				{
-					GameSection.ResumeEvent(is_success, null);
+					GameSection.ResumeEvent(is_success);
 				}
-			}, 0);
+			});
 		}
 	}
 
@@ -49,9 +49,9 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 			false
 		});
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendEntry(text, true, delegate(bool is_success)
+		MonoBehaviourSingleton<PartyManager>.I.SendEntry(text, isLoungeBoard: true, delegate(bool is_success)
 		{
-			if (is_success && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
+			if (is_success && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId()))
 			{
 				Protocol.Force(delegate
 				{
@@ -62,7 +62,7 @@ public class QuestAcceptSearchListSelect : QuestSearchListSelect
 			}
 			else
 			{
-				GameSection.ResumeEvent(is_success, null);
+				GameSection.ResumeEvent(is_success);
 			}
 		});
 	}

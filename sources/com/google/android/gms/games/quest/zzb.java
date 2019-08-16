@@ -1,11 +1,11 @@
 package com.google.android.gms.games.quest;
 
 import android.os.Parcel;
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
-import com.google.android.gms.games.internal.zze;
+import com.google.android.gms.games.internal.zzbd;
 
-public final class zzb extends zzc implements Milestone {
+public final class zzb extends DataBufferRef implements Milestone {
     zzb(DataHolder dataHolder, int i) {
         super(dataHolder, i);
     }
@@ -49,14 +49,14 @@ public final class zzb extends zzc implements Milestone {
                 break;
         }
         if (j < 0) {
-            zze.zzz("MilestoneRef", "Current progress should never be negative");
+            zzbd.m430e("MilestoneRef", "Current progress should never be negative");
         } else {
             j2 = j;
         }
         if (j2 <= getTargetProgress()) {
             return j2;
         }
-        zze.zzz("MilestoneRef", "Current progress should never exceed target progress");
+        zzbd.m430e("MilestoneRef", "Current progress should never exceed target progress");
         return getTargetProgress();
     }
 

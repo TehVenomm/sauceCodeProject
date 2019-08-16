@@ -1,8 +1,15 @@
 package com.google.android.gms.games.internal;
 
-import android.os.IInterface;
-import android.os.RemoteException;
+import com.google.android.gms.common.api.internal.BaseImplementation.ResultHolder;
+import com.google.android.gms.games.GamesStatusCodes;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.CancelMatchResult;
 
-public interface zzh extends IInterface {
-    zzl zzapu() throws RemoteException;
+final class zzh extends zzat<CancelMatchResult> {
+    zzh(ResultHolder resultHolder) {
+        super(resultHolder);
+    }
+
+    public final void zzc(int i, String str) {
+        setResult(new zzc(GamesStatusCodes.zza(i), str));
+    }
 }

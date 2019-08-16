@@ -1,13 +1,12 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class PlayDataTable : Singleton<PlayDataTable>, IDataTable
 {
 	public class PlayData
 	{
-		public const string NT = "id,type,subType,name,format,orderNo,startAt";
-
 		public int id;
 
 		public int type;
@@ -23,6 +22,8 @@ public class PlayDataTable : Singleton<PlayDataTable>, IDataTable
 		public DateTime startAt;
 
 		public int count;
+
+		public const string NT = "id,type,subType,name,format,orderNo,startAt";
 
 		public static bool cb(CSVReader csv_reader, PlayData data, ref uint key)
 		{
@@ -44,9 +45,12 @@ public class PlayDataTable : Singleton<PlayDataTable>, IDataTable
 
 	private UIntKeyTable<PlayData> playDataTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<PlayData> _003C_003Ef__mg_0024cache0;
+
 	public void CreateTable(string csv_text)
 	{
-		playDataTable = TableUtility.CreateUIntKeyTable<PlayData>(csv_text, PlayData.cb, "id,type,subType,name,format,orderNo,startAt", null);
+		playDataTable = TableUtility.CreateUIntKeyTable<PlayData>(csv_text, PlayData.cb, "id,type,subType,name,format,orderNo,startAt");
 		playDataTable.TrimExcess();
 	}
 

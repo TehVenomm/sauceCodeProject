@@ -24,18 +24,11 @@ public class GoPaySupport extends AbstractIntegrationSupport implements CanSetGu
     public static final String CONFIG_APP_ID = "appId";
     public static final String CONFIG_GAME_MANAGED_VIP_STATUS = "gameManagedVipStatus";
     public static final String CONFIG_SECRET = "secret";
-    public static final GoPaySupport INSTANCE = new GoPaySupport();
     public static final String METADATA_GAME_MANAGED_VIP_STATUS = "goWrap.goPay.gameManagedVipStatus";
     private String appId;
-    private boolean gameManagedVipStatus = false;
-    private final Listener goPayClientListener = new C11131();
-    private IntegrationContext integrationContext;
-
-    /* renamed from: net.gogame.gowrap.integrations.gopay.GoPaySupport$1 */
-    class C11131 implements Listener {
-        C11131() {
-        }
-
+    /* access modifiers changed from: private */
+    public boolean gameManagedVipStatus = false;
+    private final Listener goPayClientListener = new Listener() {
         public void onVipStatus(VipStatus vipStatus) {
             if (!GoPaySupport.this.gameManagedVipStatus && GoPaySupport.this.integrationContext != null) {
                 net.gogame.gowrap.VipStatus vipStatus2 = null;
@@ -48,9 +41,11 @@ public class GoPaySupport extends AbstractIntegrationSupport implements CanSetGu
                 GoPaySupport.this.integrationContext.onVipStatusUpdated(vipStatus2);
             }
         }
-    }
+    };
+    /* access modifiers changed from: private */
+    public IntegrationContext integrationContext;
 
-    private GoPaySupport() {
+    public GoPaySupport() {
         super("goPay");
     }
 
@@ -74,9 +69,10 @@ public class GoPaySupport extends AbstractIntegrationSupport implements CanSetGu
         return ClassUtils.hasClass("net.gogame.gopay.vip.VipClient");
     }
 
-    protected void doInit(Activity activity, Config config, IntegrationContext integrationContext) {
+    /* access modifiers changed from: protected */
+    public void doInit(Activity activity, Config config, IntegrationContext integrationContext2) {
         boolean z = true;
-        this.integrationContext = integrationContext;
+        this.integrationContext = integrationContext2;
         this.appId = config.getString("appId");
         String string = config.getString(CONFIG_SECRET);
         try {
@@ -119,8 +115,8 @@ public class GoPaySupport extends AbstractIntegrationSupport implements CanSetGu
                 VipClient.INSTANCE.setExtraData(((String) entry.getKey()) + "_uid", (String) entry.getValue());
             }
         }
-        VipClient.INSTANCE.setExtraData("gowrap_version", "2.3.24");
-        VipClient.INSTANCE.setExtraHeader("X-goWrap-Version", "2.3.24");
+        VipClient.INSTANCE.setExtraData("gowrap_version", "2.6.4");
+        VipClient.INSTANCE.setExtraHeader("X-goWrap-Version", "2.6.4");
     }
 
     public void checkVipStatus(String str, boolean z) {

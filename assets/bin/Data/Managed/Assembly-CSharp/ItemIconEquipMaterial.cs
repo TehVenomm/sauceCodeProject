@@ -18,10 +18,21 @@ public class ItemIconEquipMaterial : ItemIcon
 
 	public static ItemIconEquipMaterial CreateEquipMaterialIcon(ITEM_ICON_TYPE icon_type, EquipItemTable.EquipItemData equip_table, Transform parent = null, int have_num = -1, int need_num = -1, string event_name = null, int event_data = 0, bool is_new = false, GET_TYPE getType = GET_TYPE.PAY)
 	{
-		ItemIconEquipMaterial itemIconEquipMaterial = ItemIcon.CreateIcon<ItemIconEquipMaterial>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconEquipMaterialPrefab, icon_type, equip_table.GetIconID(), equip_table.rarity, parent, ELEMENT_TYPE.MAX, null, -1, event_name, event_data, is_new, -1, false, null, false, 0, 0, false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		GameObject itemIconEquipMaterialPrefab = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconEquipMaterialPrefab;
+		int iconID = equip_table.GetIconID();
+		RARITY_TYPE? rarity = equip_table.rarity;
+		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
+		EQUIPMENT_TYPE? magi_enable_icon_type = null;
+		int num = -1;
+		bool is_new2 = is_new;
+		int toggle_group = -1;
+		bool is_select = false;
+		string icon_under_text = null;
+		bool is_equipping = false;
+		ItemIconEquipMaterial itemIconEquipMaterial = ItemIcon.CreateIcon<ItemIconEquipMaterial>(itemIconEquipMaterialPrefab, icon_type, iconID, rarity, parent, element, magi_enable_icon_type, num, event_name, event_data, is_new2, toggle_group, is_select, icon_under_text, is_equipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 		itemIconEquipMaterial.EquipTypeIconInit(equip_table);
 		itemIconEquipMaterial.SetMaterialNum(have_num);
-		itemIconEquipMaterial.SetVisibleBG(true);
+		itemIconEquipMaterial.SetVisibleBG(is_visible: true);
 		itemIconEquipMaterial.SelectUniqueID(0uL);
 		return itemIconEquipMaterial;
 	}
@@ -41,34 +52,16 @@ public class ItemIconEquipMaterial : ItemIcon
 		if (equip_table == null)
 		{
 			spriteValueType.set_enabled(false);
+			return;
 		}
-		else
-		{
-			spriteValueType.set_enabled(true);
-			spriteValueType.spriteName = ((!equip_table.IsWeapon()) ? ItemIcon.SPR_TYPE_DEF : ItemIcon.SPR_TYPE_ATK);
-		}
+		spriteValueType.set_enabled(true);
+		spriteValueType.spriteName = ((!equip_table.IsWeapon()) ? ItemIcon.SPR_TYPE_DEF : ItemIcon.SPR_TYPE_ATK);
 	}
 
 	public void SelectUniqueID(ulong id)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 		selectedUniqueID = id;
-		if (selectedUniqueID == 0L)
+		if (selectedUniqueID == 0)
 		{
 			strUnselect.get_gameObject().SetActive(true);
 			lblHave.get_transform().get_parent().get_gameObject()
@@ -78,21 +71,19 @@ public class ItemIconEquipMaterial : ItemIcon
 			spriteValueType.get_gameObject().SetActive(false);
 			lblText.text = "0";
 			lblLv.text = "0";
+			return;
 		}
-		else
+		strUnselect.get_gameObject().SetActive(false);
+		lblHave.get_transform().get_parent().get_gameObject()
+			.SetActive(false);
+		lblLv.get_transform().get_parent().get_gameObject()
+			.SetActive(true);
+		spriteValueType.get_gameObject().SetActive(true);
+		EquipItemInfo equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(id);
+		if (equipItemInfo != null)
 		{
-			strUnselect.get_gameObject().SetActive(false);
-			lblHave.get_transform().get_parent().get_gameObject()
-				.SetActive(false);
-			lblLv.get_transform().get_parent().get_gameObject()
-				.SetActive(true);
-			spriteValueType.get_gameObject().SetActive(true);
-			EquipItemInfo equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(id);
-			if (equipItemInfo != null)
-			{
-				lblText.text = ((!equipItemInfo.tableData.IsWeapon()) ? equipItemInfo.def.ToString() : equipItemInfo.atk.ToString());
-				lblLv.text = equipItemInfo.level.ToString();
-			}
+			lblText.text = ((!equipItemInfo.tableData.IsWeapon()) ? equipItemInfo.def.ToString() : equipItemInfo.atk.ToString());
+			lblLv.text = equipItemInfo.level.ToString();
 		}
 	}
 }

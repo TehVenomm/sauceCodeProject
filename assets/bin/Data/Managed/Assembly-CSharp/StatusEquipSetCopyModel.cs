@@ -29,6 +29,11 @@ public class StatusEquipSetCopyModel : BaseModel
 		public List<string> suids = new List<string>();
 
 		public List<int> slots = new List<int>();
+
+		public override string ToString()
+		{
+			return $"RequestSendForm no:{no}, name: {name}, wuid0:{wuid0}, wuid1:{wuid1}, wuid2:{wuid2}, auid:{auid}, ruid:{ruid}, luid:{luid}, huid:{huid}, show:{show}\n euids:{euids.ToJoinString()}, Count:{euids.Count}\n suids:{suids.ToJoinString()}, Count:{suids.Count}\n slots:{slots.ToJoinString()}, Count:{slots.Count}";
+		}
 	}
 
 	public static string URL = "ajax/status/copyequipset";

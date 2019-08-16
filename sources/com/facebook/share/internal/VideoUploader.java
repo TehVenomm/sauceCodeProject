@@ -33,8 +33,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import org.json.JSONException;
@@ -67,127 +67,19 @@ public class VideoUploader {
     private static Set<UploadContext> pendingUploads = new HashSet();
     private static WorkQueue uploadQueue = new WorkQueue(8);
 
-    /* renamed from: com.facebook.share.internal.VideoUploader$1 */
-    static final class C05021 extends AccessTokenTracker {
-        C05021() {
-        }
-
-        protected void onCurrentAccessTokenChanged(AccessToken accessToken, AccessToken accessToken2) {
-            if (accessToken != null) {
-                if (accessToken2 == null || !Utility.areObjectsEqual(accessToken2.getUserId(), accessToken.getUserId())) {
-                    VideoUploader.cancelAllRequests();
-                }
-            }
-        }
-    }
-
-    private static abstract class UploadWorkItemBase implements Runnable {
-        protected int completedRetries;
-        protected UploadContext uploadContext;
-
-        /* renamed from: com.facebook.share.internal.VideoUploader$UploadWorkItemBase$1 */
-        class C05061 implements Runnable {
-            C05061() {
-            }
-
-            public void run() {
-                UploadWorkItemBase.this.enqueueRetry(UploadWorkItemBase.this.completedRetries + 1);
-            }
-        }
-
-        protected UploadWorkItemBase(UploadContext uploadContext, int i) {
-            this.uploadContext = uploadContext;
-            this.completedRetries = i;
-        }
-
-        private boolean attemptRetry(int i) {
-            if (this.completedRetries >= 2 || !getTransientErrorCodes().contains(Integer.valueOf(i))) {
-                return false;
-            }
-            VideoUploader.getHandler().postDelayed(new C05061(), (long) (((int) Math.pow(3.0d, (double) this.completedRetries)) * VideoUploader.RETRY_DELAY_UNIT_MS));
-            return true;
-        }
-
-        protected void endUploadWithFailure(FacebookException facebookException) {
-            issueResponseOnMainThread(facebookException, null);
-        }
-
-        protected abstract void enqueueRetry(int i);
-
-        protected void executeGraphRequestSynchronously(Bundle bundle) {
-            Bundle bundle2 = bundle;
-            GraphResponse executeAndWait = new GraphRequest(this.uploadContext.accessToken, String.format(Locale.ROOT, "%s/videos", new Object[]{this.uploadContext.graphNode}), bundle2, HttpMethod.POST, null).executeAndWait();
-            if (executeAndWait != null) {
-                FacebookRequestError error = executeAndWait.getError();
-                JSONObject jSONObject = executeAndWait.getJSONObject();
-                if (error != null) {
-                    if (!attemptRetry(error.getSubErrorCode())) {
-                        handleError(new FacebookGraphResponseException(executeAndWait, VideoUploader.ERROR_UPLOAD));
-                        return;
-                    }
-                    return;
-                } else if (jSONObject != null) {
-                    try {
-                        handleSuccess(jSONObject);
-                        return;
-                    } catch (Throwable e) {
-                        endUploadWithFailure(new FacebookException(VideoUploader.ERROR_BAD_SERVER_RESPONSE, e));
-                        return;
-                    }
-                } else {
-                    handleError(new FacebookException(VideoUploader.ERROR_BAD_SERVER_RESPONSE));
-                    return;
-                }
-            }
-            handleError(new FacebookException(VideoUploader.ERROR_BAD_SERVER_RESPONSE));
-        }
-
-        protected abstract Bundle getParameters() throws Exception;
-
-        protected abstract Set<Integer> getTransientErrorCodes();
-
-        protected abstract void handleError(FacebookException facebookException);
-
-        protected abstract void handleSuccess(JSONObject jSONObject) throws JSONException;
-
-        protected void issueResponseOnMainThread(final FacebookException facebookException, final String str) {
-            VideoUploader.getHandler().post(new Runnable() {
-                public void run() {
-                    VideoUploader.issueResponse(UploadWorkItemBase.this.uploadContext, facebookException, str);
-                }
-            });
-        }
-
-        public void run() {
-            if (this.uploadContext.isCanceled) {
-                endUploadWithFailure(null);
-                return;
-            }
-            try {
-                executeGraphRequestSynchronously(getParameters());
-            } catch (FacebookException e) {
-                endUploadWithFailure(e);
-            } catch (Throwable e2) {
-                endUploadWithFailure(new FacebookException(VideoUploader.ERROR_UPLOAD, e2));
-            }
-        }
-    }
-
     private static class FinishUploadWorkItem extends UploadWorkItemBase {
-        static final Set<Integer> transientErrorCodes = new C05031();
-
-        /* renamed from: com.facebook.share.internal.VideoUploader$FinishUploadWorkItem$1 */
-        static final class C05031 extends HashSet<Integer> {
-            C05031() {
+        static final Set<Integer> transientErrorCodes = new HashSet<Integer>() {
+            {
                 add(Integer.valueOf(1363011));
             }
-        }
+        };
 
         public FinishUploadWorkItem(UploadContext uploadContext, int i) {
             super(uploadContext, i);
         }
 
-        protected void enqueueRetry(int i) {
+        /* access modifiers changed from: protected */
+        public void enqueueRetry(int i) {
             VideoUploader.enqueueUploadFinish(this.uploadContext, i);
         }
 
@@ -204,17 +96,20 @@ public class VideoUploader {
             return bundle;
         }
 
-        protected Set<Integer> getTransientErrorCodes() {
+        /* access modifiers changed from: protected */
+        public Set<Integer> getTransientErrorCodes() {
             return transientErrorCodes;
         }
 
-        protected void handleError(FacebookException facebookException) {
+        /* access modifiers changed from: protected */
+        public void handleError(FacebookException facebookException) {
             VideoUploader.logError(facebookException, "Video '%s' failed to finish uploading", this.uploadContext.videoId);
             endUploadWithFailure(facebookException);
         }
 
-        protected void handleSuccess(JSONObject jSONObject) throws JSONException {
-            if (jSONObject.getBoolean(GraphResponse.SUCCESS_KEY)) {
+        /* access modifiers changed from: protected */
+        public void handleSuccess(JSONObject jSONObject) throws JSONException {
+            if (jSONObject.getBoolean("success")) {
                 issueResponseOnMainThread(null, this.uploadContext.videoId);
             } else {
                 handleError(new FacebookException(VideoUploader.ERROR_BAD_SERVER_RESPONSE));
@@ -223,20 +118,18 @@ public class VideoUploader {
     }
 
     private static class StartUploadWorkItem extends UploadWorkItemBase {
-        static final Set<Integer> transientErrorCodes = new C05041();
-
-        /* renamed from: com.facebook.share.internal.VideoUploader$StartUploadWorkItem$1 */
-        static final class C05041 extends HashSet<Integer> {
-            C05041() {
+        static final Set<Integer> transientErrorCodes = new HashSet<Integer>() {
+            {
                 add(Integer.valueOf(GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_CREATION_NOT_ALLOWED));
             }
-        }
+        };
 
         public StartUploadWorkItem(UploadContext uploadContext, int i) {
             super(uploadContext, i);
         }
 
-        protected void enqueueRetry(int i) {
+        /* access modifiers changed from: protected */
+        public void enqueueRetry(int i) {
             VideoUploader.enqueueUploadStart(this.uploadContext, i);
         }
 
@@ -247,16 +140,19 @@ public class VideoUploader {
             return bundle;
         }
 
-        protected Set<Integer> getTransientErrorCodes() {
+        /* access modifiers changed from: protected */
+        public Set<Integer> getTransientErrorCodes() {
             return transientErrorCodes;
         }
 
-        protected void handleError(FacebookException facebookException) {
+        /* access modifiers changed from: protected */
+        public void handleError(FacebookException facebookException) {
             VideoUploader.logError(facebookException, "Error starting video upload", new Object[0]);
             endUploadWithFailure(facebookException);
         }
 
-        protected void handleSuccess(JSONObject jSONObject) throws JSONException {
+        /* access modifiers changed from: protected */
+        public void handleSuccess(JSONObject jSONObject) throws JSONException {
             this.uploadContext.sessionId = jSONObject.getString(VideoUploader.PARAM_SESSION_ID);
             this.uploadContext.videoId = jSONObject.getString(VideoUploader.PARAM_VIDEO_ID);
             VideoUploader.enqueueUploadChunk(this.uploadContext, jSONObject.getString(VideoUploader.PARAM_START_OFFSET), jSONObject.getString(VideoUploader.PARAM_END_OFFSET), 0);
@@ -264,20 +160,17 @@ public class VideoUploader {
     }
 
     private static class TransferChunkWorkItem extends UploadWorkItemBase {
-        static final Set<Integer> transientErrorCodes = new C05051();
-        private String chunkEnd;
-        private String chunkStart;
-
-        /* renamed from: com.facebook.share.internal.VideoUploader$TransferChunkWorkItem$1 */
-        static final class C05051 extends HashSet<Integer> {
-            C05051() {
+        static final Set<Integer> transientErrorCodes = new HashSet<Integer>() {
+            {
                 add(Integer.valueOf(1363019));
                 add(Integer.valueOf(1363021));
                 add(Integer.valueOf(1363030));
                 add(Integer.valueOf(1363033));
                 add(Integer.valueOf(1363041));
             }
-        }
+        };
+        private String chunkEnd;
+        private String chunkStart;
 
         public TransferChunkWorkItem(UploadContext uploadContext, String str, String str2, int i) {
             super(uploadContext, i);
@@ -285,7 +178,8 @@ public class VideoUploader {
             this.chunkEnd = str2;
         }
 
-        protected void enqueueRetry(int i) {
+        /* access modifiers changed from: protected */
+        public void enqueueRetry(int i) {
             VideoUploader.enqueueUploadChunk(this.uploadContext, this.chunkStart, this.chunkEnd, i);
         }
 
@@ -302,16 +196,19 @@ public class VideoUploader {
             throw new FacebookException("Error reading video");
         }
 
-        protected Set<Integer> getTransientErrorCodes() {
+        /* access modifiers changed from: protected */
+        public Set<Integer> getTransientErrorCodes() {
             return transientErrorCodes;
         }
 
-        protected void handleError(FacebookException facebookException) {
+        /* access modifiers changed from: protected */
+        public void handleError(FacebookException facebookException) {
             VideoUploader.logError(facebookException, "Error uploading video '%s'", this.uploadContext.videoId);
             endUploadWithFailure(facebookException);
         }
 
-        protected void handleSuccess(JSONObject jSONObject) throws JSONException {
+        /* access modifiers changed from: protected */
+        public void handleSuccess(JSONObject jSONObject) throws JSONException {
             String string = jSONObject.getString(VideoUploader.PARAM_START_OFFSET);
             String string2 = jSONObject.getString(VideoUploader.PARAM_END_OFFSET);
             if (Utility.areObjectsEqual(string, string2)) {
@@ -349,7 +246,7 @@ public class VideoUploader {
             this.graphNode = str;
             this.callback = facebookCallback;
             this.params = shareVideoContent.getVideo().getParameters();
-            if (!Utility.isNullOrEmpty(shareVideoContent.getPeopleIds())) {
+            if (!Utility.isNullOrEmpty((Collection<T>) shareVideoContent.getPeopleIds())) {
                 this.params.putString("tags", TextUtils.join(", ", shareVideoContent.getPeopleIds()));
             }
             if (!Utility.isNullOrEmpty(shareVideoContent.getPlaceId())) {
@@ -360,7 +257,8 @@ public class VideoUploader {
             }
         }
 
-        private void initialize() throws FileNotFoundException {
+        /* access modifiers changed from: private */
+        public void initialize() throws FileNotFoundException {
             try {
                 if (Utility.isFileUri(this.videoUri)) {
                     ParcelFileDescriptor open = ParcelFileDescriptor.open(new File(this.videoUri.getPath()), DriveFile.MODE_READ_ONLY);
@@ -379,19 +277,105 @@ public class VideoUploader {
         }
     }
 
-    private static void cancelAllRequests() {
+    private static abstract class UploadWorkItemBase implements Runnable {
+        protected int completedRetries;
+        protected UploadContext uploadContext;
+
+        protected UploadWorkItemBase(UploadContext uploadContext2, int i) {
+            this.uploadContext = uploadContext2;
+            this.completedRetries = i;
+        }
+
+        private boolean attemptRetry(int i) {
+            if (this.completedRetries >= 2 || !getTransientErrorCodes().contains(Integer.valueOf(i))) {
+                return false;
+            }
+            VideoUploader.getHandler().postDelayed(new Runnable() {
+                public void run() {
+                    UploadWorkItemBase.this.enqueueRetry(UploadWorkItemBase.this.completedRetries + 1);
+                }
+            }, (long) (((int) Math.pow(3.0d, (double) this.completedRetries)) * VideoUploader.RETRY_DELAY_UNIT_MS));
+            return true;
+        }
+
+        /* access modifiers changed from: protected */
+        public void endUploadWithFailure(FacebookException facebookException) {
+            issueResponseOnMainThread(facebookException, null);
+        }
+
+        /* access modifiers changed from: protected */
+        public abstract void enqueueRetry(int i);
+
+        /* access modifiers changed from: protected */
+        public void executeGraphRequestSynchronously(Bundle bundle) {
+            Bundle bundle2 = bundle;
+            GraphResponse executeAndWait = new GraphRequest(this.uploadContext.accessToken, String.format(Locale.ROOT, "%s/videos", new Object[]{this.uploadContext.graphNode}), bundle2, HttpMethod.POST, null).executeAndWait();
+            if (executeAndWait != null) {
+                FacebookRequestError error = executeAndWait.getError();
+                JSONObject jSONObject = executeAndWait.getJSONObject();
+                if (error != null) {
+                    if (!attemptRetry(error.getSubErrorCode())) {
+                        handleError(new FacebookGraphResponseException(executeAndWait, VideoUploader.ERROR_UPLOAD));
+                    }
+                } else if (jSONObject != null) {
+                    try {
+                        handleSuccess(jSONObject);
+                    } catch (JSONException e) {
+                        endUploadWithFailure(new FacebookException(VideoUploader.ERROR_BAD_SERVER_RESPONSE, (Throwable) e));
+                    }
+                } else {
+                    handleError(new FacebookException(VideoUploader.ERROR_BAD_SERVER_RESPONSE));
+                }
+            } else {
+                handleError(new FacebookException(VideoUploader.ERROR_BAD_SERVER_RESPONSE));
+            }
+        }
+
+        /* access modifiers changed from: protected */
+        public abstract Bundle getParameters() throws Exception;
+
+        /* access modifiers changed from: protected */
+        public abstract Set<Integer> getTransientErrorCodes();
+
+        /* access modifiers changed from: protected */
+        public abstract void handleError(FacebookException facebookException);
+
+        /* access modifiers changed from: protected */
+        public abstract void handleSuccess(JSONObject jSONObject) throws JSONException;
+
+        /* access modifiers changed from: protected */
+        public void issueResponseOnMainThread(final FacebookException facebookException, final String str) {
+            VideoUploader.getHandler().post(new Runnable() {
+                public void run() {
+                    VideoUploader.issueResponse(UploadWorkItemBase.this.uploadContext, facebookException, str);
+                }
+            });
+        }
+
+        public void run() {
+            if (!this.uploadContext.isCanceled) {
+                try {
+                    executeGraphRequestSynchronously(getParameters());
+                } catch (FacebookException e) {
+                    endUploadWithFailure(e);
+                } catch (Exception e2) {
+                    endUploadWithFailure(new FacebookException(VideoUploader.ERROR_UPLOAD, (Throwable) e2));
+                }
+            } else {
+                endUploadWithFailure(null);
+            }
+        }
+    }
+
+    /* access modifiers changed from: private */
+    public static void cancelAllRequests() {
         synchronized (VideoUploader.class) {
             try {
-                Iterator it = pendingUploads.iterator();
-                while (true) {
-                    Object hasNext = it.hasNext();
-                    if (hasNext == null) {
-                        break;
-                    }
-                    ((UploadContext) it.next()).isCanceled = true;
+                for (UploadContext uploadContext : pendingUploads) {
+                    uploadContext.isCanceled = true;
                 }
             } finally {
-                Class cls = VideoUploader.class;
+                Class<VideoUploader> cls = VideoUploader.class;
             }
         }
     }
@@ -399,67 +383,71 @@ public class VideoUploader {
     private static void enqueueRequest(UploadContext uploadContext, Runnable runnable) {
         synchronized (VideoUploader.class) {
             try {
-                Object addActiveWorkItem = uploadQueue.addActiveWorkItem(runnable);
-                uploadContext.workItem = addActiveWorkItem;
+                uploadContext.workItem = uploadQueue.addActiveWorkItem(runnable);
             } finally {
-                Class cls = VideoUploader.class;
+                Class<VideoUploader> cls = VideoUploader.class;
             }
         }
     }
 
-    private static void enqueueUploadChunk(UploadContext uploadContext, String str, String str2, int i) {
+    /* access modifiers changed from: private */
+    public static void enqueueUploadChunk(UploadContext uploadContext, String str, String str2, int i) {
         enqueueRequest(uploadContext, new TransferChunkWorkItem(uploadContext, str, str2, i));
     }
 
-    private static void enqueueUploadFinish(UploadContext uploadContext, int i) {
+    /* access modifiers changed from: private */
+    public static void enqueueUploadFinish(UploadContext uploadContext, int i) {
         enqueueRequest(uploadContext, new FinishUploadWorkItem(uploadContext, i));
     }
 
-    private static void enqueueUploadStart(UploadContext uploadContext, int i) {
+    /* access modifiers changed from: private */
+    public static void enqueueUploadStart(UploadContext uploadContext, int i) {
         enqueueRequest(uploadContext, new StartUploadWorkItem(uploadContext, i));
     }
 
-    private static byte[] getChunk(UploadContext uploadContext, String str, String str2) throws IOException {
-        if (Utility.areObjectsEqual(str, uploadContext.chunkStart)) {
-            int read;
-            int parseLong = (int) (Long.parseLong(str2) - Long.parseLong(str));
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] bArr = new byte[Math.min(8192, parseLong)];
-            do {
-                read = uploadContext.videoStream.read(bArr);
-                if (read != -1) {
-                    byteArrayOutputStream.write(bArr, 0, read);
-                    parseLong -= read;
-                    if (parseLong == 0) {
-                    }
-                }
-                uploadContext.chunkStart = str2;
-                return byteArrayOutputStream.toByteArray();
-            } while (parseLong >= 0);
-            logError(null, "Error reading video chunk. Expected buffer length - '%d'. Actual - '%d'.", Integer.valueOf(parseLong + read), Integer.valueOf(read));
+    /* access modifiers changed from: private */
+    public static byte[] getChunk(UploadContext uploadContext, String str, String str2) throws IOException {
+        int read;
+        if (!Utility.areObjectsEqual(str, uploadContext.chunkStart)) {
+            logError(null, "Error reading video chunk. Expected chunk '%s'. Requested chunk '%s'.", uploadContext.chunkStart, str);
             return null;
         }
-        logError(null, "Error reading video chunk. Expected chunk '%s'. Requested chunk '%s'.", uploadContext.chunkStart, str);
+        int parseLong = (int) (Long.parseLong(str2) - Long.parseLong(str));
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] bArr = new byte[Math.min(8192, parseLong)];
+        do {
+            read = uploadContext.videoStream.read(bArr);
+            if (read != -1) {
+                byteArrayOutputStream.write(bArr, 0, read);
+                parseLong -= read;
+                if (parseLong == 0) {
+                }
+            }
+            uploadContext.chunkStart = str2;
+            return byteArrayOutputStream.toByteArray();
+        } while (parseLong >= 0);
+        logError(null, "Error reading video chunk. Expected buffer length - '%d'. Actual - '%d'.", Integer.valueOf(parseLong + read), Integer.valueOf(read));
         return null;
     }
 
-    private static Handler getHandler() {
+    /* access modifiers changed from: private */
+    public static Handler getHandler() {
+        Handler handler2;
         synchronized (VideoUploader.class) {
-            Class mainLooper;
             try {
                 if (handler == null) {
-                    mainLooper = Looper.getMainLooper();
-                    handler = new Handler(mainLooper);
+                    handler = new Handler(Looper.getMainLooper());
                 }
-                Handler handler = handler;
-                return handler;
+                handler2 = handler;
             } finally {
-                mainLooper = VideoUploader.class;
+                Class<VideoUploader> cls = VideoUploader.class;
             }
         }
+        return handler2;
     }
 
-    private static void issueResponse(UploadContext uploadContext, FacebookException facebookException, String str) {
+    /* access modifiers changed from: private */
+    public static void issueResponse(UploadContext uploadContext, FacebookException facebookException, String str) {
         removePendingUpload(uploadContext);
         Utility.closeQuietly(uploadContext.videoStream);
         if (uploadContext.callback == null) {
@@ -474,21 +462,30 @@ public class VideoUploader {
         }
     }
 
-    private static void logError(Exception exception, String str, Object... objArr) {
-        Log.e(TAG, String.format(Locale.ROOT, str, objArr), exception);
+    /* access modifiers changed from: private */
+    public static void logError(Exception exc, String str, Object... objArr) {
+        Log.e(TAG, String.format(Locale.ROOT, str, objArr), exc);
     }
 
     private static void registerAccessTokenTracker() {
-        accessTokenTracker = new C05021();
+        accessTokenTracker = new AccessTokenTracker() {
+            /* access modifiers changed from: protected */
+            public void onCurrentAccessTokenChanged(AccessToken accessToken, AccessToken accessToken2) {
+                if (accessToken != null) {
+                    if (accessToken2 == null || !Utility.areObjectsEqual(accessToken2.getUserId(), accessToken.getUserId())) {
+                        VideoUploader.cancelAllRequests();
+                    }
+                }
+            }
+        };
     }
 
     private static void removePendingUpload(UploadContext uploadContext) {
         synchronized (VideoUploader.class) {
             try {
-                Object obj = pendingUploads;
-                obj.remove(uploadContext);
+                pendingUploads.remove(uploadContext);
             } finally {
-                Class cls = VideoUploader.class;
+                Class<VideoUploader> cls = VideoUploader.class;
             }
         }
     }
@@ -496,10 +493,9 @@ public class VideoUploader {
     public static void uploadAsync(ShareVideoContent shareVideoContent, FacebookCallback<Result> facebookCallback) throws FileNotFoundException {
         synchronized (VideoUploader.class) {
             try {
-                Object obj = "me";
-                uploadAsync(shareVideoContent, obj, facebookCallback);
+                uploadAsync(shareVideoContent, "me", facebookCallback);
             } finally {
-                Class cls = VideoUploader.class;
+                Class<VideoUploader> cls = VideoUploader.class;
             }
         }
     }
@@ -516,12 +512,12 @@ public class VideoUploader {
                 ShareVideo video = shareVideoContent.getVideo();
                 Validate.notNull(video, "videoContent.video");
                 Validate.notNull(video.getLocalUrl(), "videoContent.video.localUrl");
-                VideoUploader uploadContext = new UploadContext(shareVideoContent, str, facebookCallback);
+                UploadContext uploadContext = new UploadContext(shareVideoContent, str, facebookCallback);
                 uploadContext.initialize();
                 pendingUploads.add(uploadContext);
                 enqueueUploadStart(uploadContext, 0);
             } finally {
-                Class cls = VideoUploader.class;
+                Class<VideoUploader> cls = VideoUploader.class;
             }
         }
     }

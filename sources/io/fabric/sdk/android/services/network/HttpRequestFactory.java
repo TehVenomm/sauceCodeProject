@@ -1,7 +1,8 @@
-package io.fabric.sdk.android.services.network;
+package p017io.fabric.sdk.android.services.network;
 
 import java.util.Map;
 
+/* renamed from: io.fabric.sdk.android.services.network.HttpRequestFactory */
 public interface HttpRequestFactory {
     HttpRequest buildHttpRequest(HttpMethod httpMethod, String str);
 

@@ -17,11 +17,9 @@ public class ContinusAttackParam
 
 		public void Release()
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
 			if (effectTrans != null)
 			{
-				EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
+				EffectManager.ReleaseEffect(effectTrans.get_gameObject());
 				effectTrans = null;
 			}
 			if (eventCollider != null)
@@ -128,27 +126,25 @@ public class ContinusAttackParam
 		if (syncParam == null)
 		{
 			RemoveAll();
+			return;
+		}
+		List<SyncData> syncDataList = syncParam.syncDataList;
+		if (syncDataList == null)
+		{
+			RemoveAll();
 		}
 		else
 		{
-			List<SyncData> syncDataList = syncParam.syncDataList;
-			if (syncDataList == null)
+			foreach (SyncData item in syncDataList)
 			{
-				RemoveAll();
-			}
-			else
-			{
-				foreach (SyncData item in syncDataList)
+				ContinusAtkData continusAtkData = SearchByIndex(item.eventIndex);
+				if (continusAtkData != null)
 				{
-					ContinusAtkData continusAtkData = SearchByIndex(item.eventIndex);
-					if (continusAtkData != null)
-					{
-						continusAtkData.endTime = item.endTime;
-					}
-					else
-					{
-						m_owner.CreateContinusAttackBySyncData(item);
-					}
+					continusAtkData.endTime = item.endTime;
+				}
+				else
+				{
+					m_owner.CreateContinusAttackBySyncData(item);
 				}
 			}
 		}

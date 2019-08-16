@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class IceFloor
+public class IceFloor : MonoBehaviour
 {
 	private enum STATE
 	{
@@ -35,7 +35,6 @@ public class IceFloor
 
 	private void Awake()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		_rigidbody = this.GetComponent<Rigidbody>();
 		_rigidbody.set_useGravity(false);
@@ -53,7 +52,6 @@ public class IceFloor
 
 	public void SetCollider(float radius, float height = 2f)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		CapsuleCollider val = _collider as CapsuleCollider;
 		if (val == null)
@@ -74,9 +72,6 @@ public class IceFloor
 
 	private void Update()
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Expected O, but got Unknown
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		switch (state)
 		{
 		case STATE.UPDATE:
@@ -85,7 +80,7 @@ public class IceFloor
 			{
 				if (_effect != null)
 				{
-					EffectManager.ReleaseEffect(_effect.get_gameObject(), true, false);
+					EffectManager.ReleaseEffect(_effect.get_gameObject());
 				}
 				state = STATE.WAIT_FOR_END;
 			}
@@ -101,8 +96,6 @@ public class IceFloor
 
 	private void OnDestroy()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
 		for (int i = 0; i < hittingPlayerList.Count; i++)
 		{
 			hittingPlayerList[i].OnHitExitIceFloor(this.get_gameObject());
@@ -111,9 +104,6 @@ public class IceFloor
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Expected O, but got Unknown
 		StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
 		if (!(componentInParent == null))
 		{
@@ -128,9 +118,6 @@ public class IceFloor
 
 	private void OnTriggerExit(Collider collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Expected O, but got Unknown
 		StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
 		if (!(componentInParent == null))
 		{

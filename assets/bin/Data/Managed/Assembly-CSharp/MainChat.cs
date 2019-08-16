@@ -17,11 +17,16 @@ public class MainChat : UIBehaviour
 
 	private enum UI
 	{
-		SCR_CHAT,
+		WGT_HEADER_SPACE,
 		SPR_BG_OUT_FRAME,
 		SPR_BG_IN_FRAME,
+		WGT_SUB_HEADER_SPACE,
+		LBL_CHANNEL_NAME,
 		WGT_SLIDE_LIMIT,
+		SCR_CHAT,
 		WGT_DUMMY_DRAG_SCROLL,
+		SCR_PERSONAL_MSG_LIST_VIEW,
+		GRD_PERSONAL_MSG_VIEW,
 		SPR_SCROLL_BAR_BACKGROUND,
 		SPR_SCROLL_BAR_FOREGROUND,
 		IPT_POST,
@@ -30,7 +35,6 @@ public class MainChat : UIBehaviour
 		BTN_EMOTION,
 		OBJ_POST_FRAME,
 		SPR_BG_POST_FRAME,
-		LBL_CHANNEL_NAME,
 		OBJ_INPUT_FRAME,
 		WGT_CHAT_ROOT,
 		BTN_CHAT_HOME,
@@ -41,12 +45,14 @@ public class MainChat : UIBehaviour
 		OBJ_HOME_ITEM_LIST_ROOT,
 		OBJ_ROOM_ITEM_LIST_ROOT,
 		OBJ_LOUNGE_ITEM_LIST_ROOT,
+		OBJ_CLAN_ITEM_LIST_ROOT,
 		WGT_CHAT_TOP,
 		LBL_DEFAULT,
 		OBJ_SLIDE_PANEL,
 		OBJ_POST_STAMP_FRAME,
 		SPR_STAMP_LIST,
 		SCR_STAMP_LIST,
+		SPR_CHAT_FRAME,
 		GRD_STAMP_LIST,
 		BTN_STAMP_CLOSE,
 		WGT_ANCHOR_BOTTOM,
@@ -62,8 +68,11 @@ public class MainChat : UIBehaviour
 		WGT_NO_CONNECTION,
 		BTN_RECONNECT,
 		WGT_POST_LIMIT,
+		WGT_NO_CLAN,
+		WGT_RELOAD,
 		LBL_NO_CONNECTION,
 		LBL_POST_LIMIT,
+		LBL_NO_CLAN,
 		BTN_SPR_CHANNEL_SELECT,
 		OBJ_CHANNEL_SELECT,
 		LBL_CHANNEL,
@@ -95,20 +104,29 @@ public class MainChat : UIBehaviour
 		BTN_SHOW_ALL,
 		BTN_EDIT,
 		OBJ_STAMP_FAVORITE_EDIT,
-		OBJ_STAMP_ALL
+		OBJ_STAMP_ALL,
+		BTN_SHOW_USER_LIST
 	}
 
 	public enum CHAT_TYPE
 	{
 		HOME,
 		ROOM,
-		LOUNGE
+		LOUNGE,
+		FIELD,
+		PERSONAL,
+		CLAN
 	}
 
-	private class ChatItemListData
+	public enum HOME_TYPE
 	{
-		private const float DEFAULT_OFFSET = -26f;
+		HOME_TOP,
+		LOUNGE_TOP,
+		CLAN_TOP
+	}
 
+	public class ChatItemListData
+	{
 		public GameObject rootObject;
 
 		public List<ChatItem> itemList;
@@ -118,6 +136,21 @@ public class MainChat : UIBehaviour
 		public int oldestItemIndex;
 
 		public float slideOffset;
+
+		private const float DEFAULT_OFFSET = -26f;
+
+		public int newestIndex
+		{
+			get
+			{
+				int num = oldestItemIndex - 1;
+				if (num < 0)
+				{
+					num = itemList.Count - 1;
+				}
+				return num;
+			}
+		}
 
 		public ChatItemListData(GameObject root)
 		{
@@ -135,7 +168,6 @@ public class MainChat : UIBehaviour
 
 		public void Reset()
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			int i = 0;
 			for (int count = itemList.Count; i < count; i++)
 			{
@@ -147,11 +179,8 @@ public class MainChat : UIBehaviour
 
 		public void MoveAll(float y)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Expected O, but got Unknown
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
@@ -159,19 +188,12 @@ public class MainChat : UIBehaviour
 			int i = 0;
 			for (int count = itemList.Count; i < count; i++)
 			{
-				Transform val = itemList[i].get_transform();
-				Vector3 localPosition2 = val.get_localPosition();
+				Transform transform = itemList[i].get_transform();
+				Vector3 localPosition2 = transform.get_localPosition();
 				localPosition.y = localPosition2.y + y;
-				val.set_localPosition(localPosition);
+				transform.set_localPosition(localPosition);
 			}
 		}
-	}
-
-	private enum BtnState
-	{
-		DISABLE,
-		ON,
-		OFF
 	}
 
 	private class ChatPostRequest
@@ -182,6 +204,12 @@ public class MainChat : UIBehaviour
 			Stamp,
 			Notification
 		}
+
+		public string chatItemId = string.Empty;
+
+		public bool isWhiteColor;
+
+		public bool IsOldMessage;
 
 		public TYPE Type
 		{
@@ -213,26 +241,33 @@ public class MainChat : UIBehaviour
 			private set;
 		}
 
-		public ChatPostRequest(int userId, string userName, string message)
+		public ChatPostRequest(int userId, string userName, string message, string chatItemId, bool IsOldMessage = false)
 		{
 			Type = TYPE.Message;
 			this.userId = userId;
 			this.userName = userName;
 			this.message = message;
+			this.chatItemId = chatItemId;
+			this.IsOldMessage = IsOldMessage;
 		}
 
-		public ChatPostRequest(int userId, string userName, int stampId)
+		public ChatPostRequest(int userId, string userName, int stampId, string chatItemId, bool IsOldMessage = false)
 		{
 			Type = TYPE.Stamp;
 			this.userId = userId;
 			this.userName = userName;
 			this.stampId = stampId;
+			this.chatItemId = chatItemId;
+			this.IsOldMessage = IsOldMessage;
 		}
 
-		public ChatPostRequest(string message)
+		public ChatPostRequest(string message, string chatItemId, bool IsOldMessage = false, bool isWhiteColor = false)
 		{
 			Type = TYPE.Notification;
 			this.message = message;
+			this.chatItemId = chatItemId;
+			this.IsOldMessage = IsOldMessage;
+			this.isWhiteColor = isWhiteColor;
 		}
 	}
 
@@ -273,100 +308,37 @@ public class MainChat : UIBehaviour
 		}
 	}
 
-	private class ChatTabButton
-	{
-		private UIButton button;
-
-		private UILabel label;
-
-		private Action onActivate;
-
-		private Action onDeactivate;
-
-		private readonly Color BASE_COLOR_ACTIVE = Color.get_white();
-
-		private readonly Color BASE_COLOR_DEACTIVE = new Color(0.5f, 0.5f, 0.5f, 1f);
-
-		private readonly Color OUTLINE_COLOR_ACTIVE = new Color(0f, 0.25f, 0.31f, 1f);
-
-		private readonly Color OUTLINE_COLOR_DEACTIVE = new Color(0.12f, 0.12f, 0.12f, 1f);
-
-		private readonly string SELECTED_SPRITE = "PartyBtn_on";
-
-		private readonly string NOT_SELECTED_SPRITE = "PartyBtn_off";
-
-		public ChatTabButton(UIButton button, UILabel label, Action onClick, Action onActivate, Action onDeactivate)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			this.button = button;
-			this.label = label;
-			this.onActivate = onActivate;
-			this.onDeactivate = onDeactivate;
-			button.onClick.Add(new EventDelegate(onClick.Invoke));
-		}
-
-		public void Activate()
-		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			button.normalSprite = NOT_SELECTED_SPRITE;
-			button.SetState(UIButtonColor.State.Normal, true);
-			label.color = BASE_COLOR_ACTIVE;
-			label.effectColor = OUTLINE_COLOR_ACTIVE;
-			if (onActivate != null)
-			{
-				onActivate();
-			}
-		}
-
-		public void Select()
-		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			button.normalSprite = SELECTED_SPRITE;
-			button.SetState(UIButtonColor.State.Normal, true);
-			label.color = BASE_COLOR_ACTIVE;
-			label.effectColor = OUTLINE_COLOR_ACTIVE;
-		}
-
-		public void Deactivate()
-		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			button.SetState(UIButtonColor.State.Disabled, true);
-			label.color = BASE_COLOR_DEACTIVE;
-			label.effectColor = OUTLINE_COLOR_DEACTIVE;
-			if (onDeactivate != null)
-			{
-				onDeactivate();
-			}
-		}
-
-		public void Show()
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			button.get_gameObject().SetActive(true);
-		}
-
-		public void Hide()
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			button.get_gameObject().SetActive(false);
-		}
-	}
-
 	public const string EVENT_AGE_CONFIRM = "CHAT_AGE_CONFIRM";
+
+	public static readonly string HEADER_BUTTON_PREFAB_PATH = "InternalUI/UI_Chat/ChatHeaderButton";
+
+	public const int HEADER_BUTTON_COUNT = 4;
+
+	private readonly Vector3[] HEADER_BUTTON_PORTRAIT_POS = (Vector3[])new Vector3[4]
+	{
+		new Vector3(-217f, 33.4f, -0f),
+		new Vector3(-60f, 33.4f, -0f),
+		new Vector3(45f, 33.4f, -0f),
+		new Vector3(209f, 33f, -0f)
+	};
+
+	private readonly Vector3[] HEADER_BUTTON_LANDSCAPE_POS = (Vector3[])new Vector3[4]
+	{
+		new Vector3(-234.4f, 33.4f, -0f),
+		new Vector3(-65f, 33.9f, -0f),
+		new Vector3(50f, 33.4f, -0f),
+		new Vector3(226.5f, 33f, -0f)
+	};
+
+	private static readonly string CHANNEL_FORMAT = "0000";
+
+	private const int ITEM_COUNT_MAX = 30;
 
 	private const int CHAT_ITEM_OFFSET = 22;
 
-	private const int FORCE_SCROLL_LIMIT = 300;
+	private const int FORCE_SCROLL_LIMIT_PORTRAIT = 300;
+
+	private const int FORCE_SCROLL_LIMIT_LANDSCAPE = 344;
 
 	private const float SOFTNESS_HEIGHT = 10f;
 
@@ -378,21 +350,71 @@ public class MainChat : UIBehaviour
 
 	private const float SLIDER_OFFSET = 10f;
 
-	private const int ITEM_COUNT_MAX = 30;
+	private readonly Vector3 CHAT_ITEM_OFFSET_POS = new Vector3(-5f, 0f, 0f);
 
-	private const float SLIDER_TRANSITION_TIME = 0.25f;
+	private readonly Vector3 HOME_SLIDER_OPEN_POS = new Vector3(-180f, -474f, 0f);
+
+	private readonly Vector3 ROOM_SLIDER_OPEN_POS = new Vector3(-180f, -474f, 0f);
+
+	private readonly Vector3 HOME_SLIDER_CLOSE_POS = new Vector3(-180f, -109f, 0f);
+
+	private readonly Vector3 ROOM_SLIDER_CLOSE_POS = new Vector3(-180f, -150f, 0f);
+
+	private const float ANCHOR_LEFT = 0f;
+
+	private const float ANCHOR_CENTER = 0.5f;
+
+	private const float ANCHOR_RIGHT = 1f;
+
+	private const float ANCHOR_BOT = 0f;
+
+	private const float ANCHOR_TOP = 1f;
+
+	private static readonly Vector4 WIDGET_ANCHOR_TOP_DEFAULT_SETTINGS = new Vector4(-240f, 240f, -427f, 427f);
+
+	private static readonly Vector4 WIDGET_ANCHOR_BOT_DEFAULT_SETTINGS = new Vector4(-240f, 240f, 71f, 390f);
+
+	private static readonly Vector4 WIDGET_ANCHOR_TOP_SPLIT_LANDSCAPE_SETTINGS = new Vector4(-15f, 500f, 0f, 0f);
+
+	private static readonly Vector4 WIDGET_ANCHOR_BOT_LANDSCAPE_SETTINGS = new Vector4(-560f, -62f, 0f, 320f);
+
+	private static readonly Vector4 WIDGET_ANCHOR_BOT_SPLIT_LANDSCAPE_SETTINGS = new Vector4(-405f, 0f, 0f, 375f);
+
+	private static readonly Vector4 UI_BTN_INPUT_CLOSE_DEFAULT_POS = new Vector4(-33f, 3f, -62f, -1f);
+
+	private static readonly Vector4 UI_BTN_INPUT_CLOSE_LANDSCAPE_POS = new Vector4(-31f, 4f, 18f, 79f);
+
+	private static readonly Vector4 UI_SPRITE_CHAT_BG_FRAME_DEFAULT_POS = new Vector4(23f, -31f, 313f, -53f);
+
+	private static readonly Vector4 UI_SPRITE_CHAT_BG_FRAME_PERSONAL_POS = new Vector4(23f, -31f, 15f, -53f);
+
+	private const int STAMP_COL_DEFAULT_COUNT = 5;
+
+	private const int STAMP_COL_LANDSCAPE_COUNT = 4;
+
+	private const int STAMP_ROW_DEFAULT_COUNT = 2;
+
+	private const int STAMP_ROW_LANDSCAPE_COUNT = 3;
+
+	private GameObject m_ChatAdvisaryItemPrefab;
 
 	private GameObject m_ChatItemPrefab;
 
 	private GameObject m_ChatStampListPrefab;
 
-	private GameObject m_ChatAdvisaryItemPrefab;
+	private Vector3 SLIDER_OPEN_POS;
+
+	private Vector3 SLIDER_CLOSE_POS;
 
 	private ChatItemListData[] m_DataList = new ChatItemListData[Enum.GetNames(typeof(CHAT_TYPE)).Length];
+
+	private ChatMessageUserUIController m_msgUiCtrl;
 
 	private UIScrollView m_ScrollView;
 
 	private Transform m_ScrollViewTrans;
+
+	private SpringPanel m_ScrollViewSpring;
 
 	private UIWidget m_DummyDragScroll;
 
@@ -400,37 +422,75 @@ public class MainChat : UIBehaviour
 
 	private Transform m_DragScrollTrans;
 
-	private UISprite m_BackgroundInFrame;
-
 	private UIInput m_Input;
-
-	private UILabel m_ChannelName;
 
 	private ChatInputFrame m_InputFrame;
 
 	private UIRect m_RootRect;
 
-	private static readonly string CHANNEL_FORMAT = "0000";
-
-	private Vector3 SLIDER_OPEN_POS;
-
-	private readonly Vector3 HOME_SLIDER_OPEN_POS = new Vector3(-180f, -474f, 0f);
-
-	private readonly Vector3 ROOM_SLIDER_OPEN_POS = new Vector3(-180f, -474f, 0f);
-
-	private Vector3 SLIDER_CLOSE_POS;
-
-	private readonly Vector3 HOME_SLIDER_CLOSE_POS = new Vector3(-180f, -109f, 0f);
-
-	private readonly Vector3 ROOM_SLIDER_CLOSE_POS = new Vector3(-180f, -150f, 0f);
-
-	private bool m_IsPlayingChatWindowAnim;
+	public HOME_TYPE HomeType;
 
 	private List<int> m_StampIdListCanPost;
+
+	private List<ChatHeaderButtonController> m_headerButtonList = new List<ChatHeaderButtonController>(4);
+
+	private GameObject m_chatCloseButtonObj;
+
+	private GameObject m_stampEditButtonObj;
+
+	private GameObject m_favStampEditButtonObj;
+
+	private UIWidget m_widgetTop;
+
+	private UIWidget m_widgetTopHeader;
+
+	private UISprite m_BackgroundInFrame;
+
+	private UIPanel m_subHeaderPanel;
+
+	private GameObject m_channelSelectSpriteButtonObject;
+
+	private UILabel m_ChannelName;
+
+	private GameObject m_showUserListButtonObject;
+
+	private UIScrollView m_personalMsgScrollView;
+
+	private UIGrid m_personalMsgGrid;
+
+	private GameObject m_personalMsgGridObj;
+
+	private UIWidget m_widgetBot;
+
+	private UIWidget m_widgetChatRoot;
+
+	private UIPanel m_scrollPanel;
+
+	private UIGrid m_stampScrollGrid;
+
+	private UISprite m_stampChatFrame;
+
+	private UIPanel m_stampScrollPanel;
+
+	private UIWidget m_spriteBgBlack;
+
+	private UIWidget m_widgetInputCloseButton;
+
+	private bool m_isShowFullChatView;
+
+	private bool m_isPortrait;
+
+	private Stack<Type> m_stateStack = new Stack<Type>();
+
+	private ChatStateMachine<ChatState> m_stateMachine;
 
 	private PostRequestQueue[] m_PostRequetQueue = new PostRequestQueue[Enum.GetNames(typeof(CHAT_TYPE)).Length];
 
 	private IEnumerator m_handlPostChatPorcess;
+
+	private List<ChatItem> tmpList = new List<ChatItem>();
+
+	private bool isFieldChat;
 
 	private bool isMinimizable;
 
@@ -450,11 +510,11 @@ public class MainChat : UIBehaviour
 
 	private ChatUIFadeGroup sendLimitView;
 
+	private ChatUIFadeGroup sendLimitNoClanView;
+
 	private ChatUIFadeGroup noConnectionView;
 
-	private ChatTabButton homeTabButton;
-
-	private ChatTabButton roomTabButton;
+	private ChatUIFadeGroup sendLimitReloadView;
 
 	private ChatChannelInputPanel channelInputPanel;
 
@@ -466,89 +526,35 @@ public class MainChat : UIBehaviour
 
 	private bool isEnableOpenButton;
 
-	private string TAB_BG_NAME_ROOM = "ChatPartyTab1";
+	public bool UseNoClanBlock;
 
-	private string TAB_BG_NAME_HOME = "ChatHomeTab1";
+	private bool isFirstSlectClanTab;
 
 	private bool m_IsOnshotStampMode;
+
+	private float tmpOffsetStart;
+
+	private float dragTime;
+
+	public bool IsDraging;
 
 	private int m_LastPendingQueueCount;
 
 	private List<UIBehaviour> m_Observers = new List<UIBehaviour>();
 
-	private ChatItemListData CurrentData => m_DataList[(int)currentChat];
+	public ChatItemListData CurrentData => m_DataList[(int)currentChat];
 
-	private UIScrollView ScrollView
-	{
-		get
-		{
-			if (m_ScrollView == null)
-			{
-				m_ScrollView = GetCtrl(UI.SCR_CHAT).GetComponent<UIScrollView>();
-			}
-			return m_ScrollView;
-		}
-	}
+	private UIScrollView ScrollView => m_ScrollView ?? (m_ScrollView = GetCtrl(UI.SCR_CHAT).GetComponent<UIScrollView>());
 
-	private Transform ScrollViewTrans
-	{
-		get
-		{
-			if (m_ScrollViewTrans == null)
-			{
-				m_ScrollViewTrans = GetCtrl(UI.SCR_CHAT);
-			}
-			return m_ScrollViewTrans;
-		}
-	}
+	private Transform ScrollViewTrans => m_ScrollViewTrans ?? (m_ScrollViewTrans = ScrollView.get_transform());
 
-	private UIWidget DummyDragScroll
-	{
-		get
-		{
-			if (m_DummyDragScroll == null)
-			{
-				m_DummyDragScroll = GetCtrl(UI.WGT_DUMMY_DRAG_SCROLL).GetComponent<UIWidget>();
-			}
-			return m_DummyDragScroll;
-		}
-	}
+	private SpringPanel ScrollViewSpring => m_ScrollViewSpring ?? (m_ScrollViewSpring = GetCtrl(UI.SCR_CHAT).GetComponent<SpringPanel>());
 
-	private BoxCollider DragScrollCollider
-	{
-		get
-		{
-			if (m_DragScrollCollider == null)
-			{
-				m_DragScrollCollider = GetCtrl(UI.WGT_DUMMY_DRAG_SCROLL).GetComponent<BoxCollider>();
-			}
-			return m_DragScrollCollider;
-		}
-	}
+	private UIWidget DummyDragScroll => m_DummyDragScroll ?? (m_DummyDragScroll = GetCtrl(UI.WGT_DUMMY_DRAG_SCROLL).GetComponent<UIWidget>());
 
-	private Transform DragScrollTrans
-	{
-		get
-		{
-			if (m_DragScrollTrans == null)
-			{
-				m_DragScrollTrans = GetCtrl(UI.WGT_DUMMY_DRAG_SCROLL);
-			}
-			return m_DragScrollTrans;
-		}
-	}
+	private BoxCollider DragScrollCollider => m_DragScrollCollider ?? (m_DragScrollCollider = GetCtrl(UI.WGT_DUMMY_DRAG_SCROLL).GetComponent<BoxCollider>());
 
-	private UISprite BackgroundInFrame
-	{
-		get
-		{
-			if (m_BackgroundInFrame == null)
-			{
-				m_BackgroundInFrame = GetCtrl(UI.SPR_BG_IN_FRAME).GetComponent<UISprite>();
-			}
-			return m_BackgroundInFrame;
-		}
-	}
+	private Transform DragScrollTrans => m_DragScrollTrans ?? (m_DragScrollTrans = DragScrollCollider.get_transform());
 
 	private UIInput Input
 	{
@@ -559,18 +565,6 @@ public class MainChat : UIBehaviour
 				m_Input = GetCtrl(UI.IPT_POST).GetComponent<UIInput>();
 			}
 			return m_Input;
-		}
-	}
-
-	private UILabel ChannelName
-	{
-		get
-		{
-			if (m_ChannelName == null)
-			{
-				m_ChannelName = GetCtrl(UI.LBL_CHANNEL_NAME).GetComponent<UILabel>();
-			}
-			return m_ChannelName;
 		}
 	}
 
@@ -615,30 +609,63 @@ public class MainChat : UIBehaviour
 		}
 	}
 
-	private float CurrentTotalHeight
-	{
-		get
-		{
-			float result = 0f;
-			if (CurrentData != null)
-			{
-				result = CurrentData.currentTotalHeight;
-			}
-			return result;
-		}
-	}
+	private GameObject ChatCloseButtonObj => m_chatCloseButtonObj ?? (m_chatCloseButtonObj = GetCtrl(UI.BTN_INPUT_CLOSE).get_gameObject());
+
+	private GameObject StampEditButtonObj => m_stampEditButtonObj ?? (m_stampEditButtonObj = GetCtrl(UI.BTN_EDIT).get_gameObject());
+
+	private GameObject FavStampEditButtonObj => m_favStampEditButtonObj ?? (m_favStampEditButtonObj = GetCtrl(UI.BTN_SHOW_ALL).get_gameObject());
+
+	private UIWidget WidgetTop => m_widgetTop ?? (m_widgetTop = GetCtrl(UI.WGT_ANCHOR_TOP).GetComponent<UIWidget>());
+
+	private UIWidget WidgetTopHeader => m_widgetTopHeader ?? (m_widgetTopHeader = GetCtrl(UI.WGT_HEADER_SPACE).GetComponent<UIWidget>());
+
+	private UISprite BackgroundInFrame => m_BackgroundInFrame ?? (m_BackgroundInFrame = GetCtrl(UI.SPR_BG_IN_FRAME).GetComponent<UISprite>());
+
+	private UIPanel SubHeaderPanel => m_subHeaderPanel ?? (m_subHeaderPanel = GetCtrl(UI.WGT_SUB_HEADER_SPACE).GetComponent<UIPanel>());
+
+	private GameObject ChannelSelectSpriteButtonObject => m_channelSelectSpriteButtonObject ?? (m_channelSelectSpriteButtonObject = GetCtrl(UI.BTN_SPR_CHANNEL_SELECT).get_gameObject());
+
+	private UILabel ChannelName => m_ChannelName ?? (m_ChannelName = GetCtrl(UI.LBL_CHANNEL_NAME).GetComponent<UILabel>());
+
+	private GameObject ShowUserListButtonObject => m_showUserListButtonObject ?? (m_showUserListButtonObject = GetCtrl(UI.BTN_SHOW_USER_LIST).get_gameObject());
+
+	private UIScrollView PersonalMsgScrollView => m_personalMsgScrollView ?? (m_personalMsgScrollView = GetCtrl(UI.SCR_PERSONAL_MSG_LIST_VIEW).GetComponent<UIScrollView>());
+
+	private UIGrid PersonalMsgGrid => m_personalMsgGrid ?? (m_personalMsgGrid = GetCtrl(UI.GRD_PERSONAL_MSG_VIEW).GetComponent<UIGrid>());
+
+	private GameObject PersonalMsgGridObj => m_personalMsgGridObj ?? (m_personalMsgGridObj = PersonalMsgGrid.get_gameObject());
+
+	private UIWidget WidgetBot => m_widgetBot ?? (m_widgetBot = GetCtrl(UI.WGT_ANCHOR_BOTTOM).GetComponent<UIWidget>());
+
+	private UIWidget WidgetChatRoot => m_widgetChatRoot ?? (m_widgetChatRoot = GetCtrl(UI.WGT_CHAT_ROOT).GetComponent<UIWidget>());
+
+	private UIPanel ScrollPanel => m_scrollPanel ?? (m_scrollPanel = GetCtrl(UI.SCR_CHAT).GetComponent<UIPanel>());
+
+	private UIGrid StampScrollGrid => m_stampScrollGrid ?? (m_stampScrollGrid = GetCtrl(UI.GRD_STAMP_LIST).GetComponent<UIGrid>());
+
+	private UISprite StampChatFrame => m_stampChatFrame ?? (m_stampChatFrame = GetCtrl(UI.SPR_CHAT_FRAME).GetComponent<UISprite>());
+
+	private UIPanel StampScrollPanel => m_stampScrollPanel ?? (m_stampScrollPanel = GetCtrl(UI.SCR_STAMP_LIST).GetComponent<UIPanel>());
+
+	private UIWidget SpriteBgBlack => m_spriteBgBlack ?? (m_spriteBgBlack = GetCtrl(UI.SPR_BG_BLACK).GetComponent<UIWidget>());
+
+	private UIWidget WidgetInputCloseButton => m_widgetInputCloseButton ?? (m_widgetInputCloseButton = GetCtrl(UI.BTN_INPUT_CLOSE).GetComponent<UIWidget>());
+
+	private bool IsShowFullChatView => m_isShowFullChatView;
+
+	private bool IsPortrait => m_isPortrait;
+
+	private bool IsLandScapeFullViewMode => IsShowFullChatView && !IsPortrait;
+
+	public ChatStateMachine<ChatState> StateMachine => m_stateMachine;
+
+	private float CurrentTotalHeight => (CurrentData == null) ? 0f : CurrentData.currentTotalHeight;
 
 	private bool hasRoomChat => MonoBehaviourSingleton<ChatManager>.I.roomChat != null;
 
 	private bool hasLoungeChat => MonoBehaviourSingleton<ChatManager>.I.loungeChat != null;
 
-	private void SetScrollBarHeight(int height)
-	{
-	}
-
-	private void SetPostBtnState(BtnState btnState)
-	{
-	}
+	private bool hasClanChat => MonoBehaviourSingleton<ChatManager>.I.clanChat != null;
 
 	private void OnEnable()
 	{
@@ -658,97 +685,39 @@ public class MainChat : UIBehaviour
 
 	private void OnScreenRotate(bool is_portrait)
 	{
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0476: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d5: Unknown result type (might be due to invalid IL or missing references)
-		if (is_portrait)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+		m_isPortrait = is_portrait;
+		InitStampList();
+		SetBaseWidgetSettings();
+		SetParent(UI.BTN_HIDE_LOG, (!is_portrait) ? UI.OBJ_HIDE_LOG_L_2 : UI.OBJ_HIDE_LOG_P);
+		SetHeaderButtonPosition(is_portrait);
+		SetStampWindowSettings();
+		SetChatBgFrameUI(currentChat);
+		GetCtrl(UI.OBJ_CHANNEL_INPUT).set_localScale((!is_portrait) ? (Vector3.get_one() * 0.75f) : Vector3.get_one());
+		WidgetChatRoot.bottomAnchor.Set(0f, (!is_portrait) ? 0f : 72f);
+		WidgetChatRoot.topAnchor.Set(1f, (!is_portrait) ? (-4f) : (-72f));
+		SetScrollPanelUI(is_portrait, currentChat);
+		float num = 1.17279065f;
+		SpriteBgBlack.get_transform().set_localScale((!is_portrait) ? (Vector3.get_one() * num) : Vector3.get_one());
+		if (logView.isOpened || logView.isOpening)
 		{
-			UIWidget component = GetCtrl(UI.WGT_ANCHOR_BOTTOM).GetComponent<UIWidget>();
-			component.leftAnchor.Set(0f, 0f);
-			component.rightAnchor.Set(1f, 0f);
-			component.bottomAnchor.Set(0f, 71f);
-			component.topAnchor.Set(0f, 325f);
-			UIWidget component2 = GetCtrl(UI.WGT_ANCHOR_TOP).GetComponent<UIWidget>();
-			component2.leftAnchor.Set(0.5f, -240f);
-			component2.rightAnchor.Set(0.5f, 240f);
-			component2.bottomAnchor.Set(0.5f, -427f);
-			component2.topAnchor.Set(0.5f, 427f);
-			SetParent(UI.BTN_HIDE_LOG, UI.OBJ_HIDE_LOG_P);
-			component2.get_transform().set_localScale(Vector3.get_one());
-			GetCtrl(UI.OBJ_CHANNEL_INPUT).set_localScale(Vector3.get_one());
-			UIWidget component3 = GetCtrl(UI.WGT_CHAT_ROOT).GetComponent<UIWidget>();
-			component3.bottomAnchor.Set(0f, 72f);
-			component3.topAnchor.Set(1f, -72f);
-			UIPanel component4 = GetCtrl(UI.SCR_CHAT).GetComponent<UIPanel>();
-			component4.bottomAnchor.Set(0f, 316f);
-			UIWidget component5 = GetCtrl(UI.SPR_BG_IN_FRAME).GetComponent<UIWidget>();
-			component5.bottomAnchor.Set(0f, 309f);
-			GetCtrl(UI.SPR_BG_BLACK).set_localScale(Vector3.get_one());
-			if (logView.isOpened || logView.isOpening)
+			if (is_portrait)
 			{
 				inputBG.Close(delegate
 				{
 				});
 			}
-			GetCtrl(UI.BTN_SHOW_LOG).get_gameObject().SetActive(true);
-		}
-		else
-		{
-			UIWidget component6 = GetCtrl(UI.WGT_ANCHOR_BOTTOM).GetComponent<UIWidget>();
-			component6.leftAnchor.Set(1f, -560f);
-			component6.rightAnchor.Set(1f, -62f);
-			component6.bottomAnchor.Set(0f, 0f);
-			component6.topAnchor.Set(0f, 254f);
-			UIWidget component7 = GetCtrl(UI.WGT_ANCHOR_TOP).GetComponent<UIWidget>();
-			component7.leftAnchor.Set(1f, -552f);
-			component7.rightAnchor.Set(1f, -72f);
-			component7.bottomAnchor.Set(0f, 0f);
-			component7.topAnchor.Set(1f, 0f);
-			SetParent(UI.BTN_HIDE_LOG, UI.OBJ_HIDE_LOG_L);
-			GetCtrl(UI.OBJ_CHANNEL_INPUT).set_localScale(new Vector3(0.75f, 0.75f, 0.75f));
-			if (splitLogView)
-			{
-				float num = 0.86f;
-				UIWidget component8 = base.collectUI.GetComponent<UIWidget>();
-				float num2 = (float)component8.height * (1f - num) * 0.5f;
-				component7.get_transform().set_localScale(new Vector3(num, num, num));
-				component7.leftAnchor.Set(1f, -888f);
-				component7.rightAnchor.Set(1f, -408f);
-				component7.bottomAnchor.Set(0f, 0f - num2 - 4f);
-				component7.topAnchor.Set(1f, num2 + 4f);
-				UIWidget component9 = GetCtrl(UI.WGT_CHAT_ROOT).GetComponent<UIWidget>();
-				component9.bottomAnchor.Set(0f, 0f);
-				component9.topAnchor.Set(1f, -4f);
-				UIPanel component10 = GetCtrl(UI.SCR_CHAT).GetComponent<UIPanel>();
-				component10.bottomAnchor.Set(0f, 22f);
-				component10.SetDirty();
-				UIWidget component11 = GetCtrl(UI.SPR_BG_IN_FRAME).GetComponent<UIWidget>();
-				component11.bottomAnchor.Set(0f, 13f);
-				float num3 = 1.17279065f;
-				GetCtrl(UI.SPR_BG_BLACK).set_localScale(new Vector3(num3, num3, num3));
-				if (logView.isOpened || logView.isOpening)
-				{
-					inputBG.Open(delegate
-					{
-					});
-					GetCtrl(UI.BTN_SHOW_LOG).get_gameObject().SetActive(false);
-					component6.leftAnchor.Set(1f, -490f);
-					component6.rightAnchor.Set(1f, 8f);
-				}
-				SetParent(UI.BTN_HIDE_LOG, UI.OBJ_HIDE_LOG_L_2);
-			}
 			else
 			{
-				UIWidget component12 = GetCtrl(UI.WGT_CHAT_ROOT).GetComponent<UIWidget>();
-				component12.bottomAnchor.Set(0f, 0f);
-				component12.topAnchor.Set(1f, -4f);
+				inputBG.Open(delegate
+				{
+				});
+				GetCtrl(UI.BTN_SHOW_LOG).get_gameObject().SetActive(false);
 			}
 		}
 		ScrollView.panel.widgetsAreStatic = false;
@@ -758,8 +727,113 @@ public class MainChat : UIBehaviour
 			ScrollView.panel.widgetsAreStatic = true;
 		});
 		UpdateCloseButtonPosition();
-		UpdateAdvisoryItem(is_portrait);
 		UpdateAnchors();
+	}
+
+	private void SetStampWindowSettings()
+	{
+		int num = (!IsLandScapeFullViewMode) ? 5 : 4;
+		int num2 = (!IsLandScapeFullViewMode) ? 2 : 3;
+		StampScrollGrid.maxPerLine = num;
+		StampScrollGrid.set_enabled(true);
+		float num3 = StampScrollGrid.cellWidth * (float)num / 2f;
+		float cellHeight = StampScrollGrid.cellHeight;
+		StampChatFrame.leftAnchor.Set(0.5f, 0f - num3);
+		StampChatFrame.rightAnchor.Set(0.5f, num3);
+		StampChatFrame.topAnchor.Set(0.5f, cellHeight * 0.5f);
+		StampChatFrame.bottomAnchor.Set(0.5f, (0f - StampScrollGrid.cellHeight) * ((float)num2 - 0.5f));
+	}
+
+	private void SetBaseWidgetSettings()
+	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+		Vector4 val = (!IsLandScapeFullViewMode) ? WIDGET_ANCHOR_TOP_DEFAULT_SETTINGS : WIDGET_ANCHOR_TOP_SPLIT_LANDSCAPE_SETTINGS;
+		float num = (!IsLandScapeFullViewMode) ? 0.5f : 0f;
+		WidgetTop.leftAnchor.Set((!IsLandScapeFullViewMode) ? 0.5f : 0f, val.x);
+		WidgetTop.rightAnchor.Set((!IsLandScapeFullViewMode) ? 0.5f : 0f, val.y);
+		WidgetTop.bottomAnchor.Set((!IsLandScapeFullViewMode) ? 0.5f : 0f, val.z);
+		WidgetTop.topAnchor.Set((!IsLandScapeFullViewMode) ? 0.5f : 1f, val.w);
+		val = (IsPortrait ? WIDGET_ANCHOR_BOT_DEFAULT_SETTINGS : ((!IsShowFullChatView) ? WIDGET_ANCHOR_BOT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_BOT_SPLIT_LANDSCAPE_SETTINGS));
+		WidgetBot.leftAnchor.Set((!IsPortrait) ? 1f : 0.5f, val.x);
+		WidgetBot.rightAnchor.Set((!IsPortrait) ? 1f : 0.5f, val.y);
+		WidgetBot.bottomAnchor.Set(0f, val.z);
+		WidgetBot.topAnchor.Set(0f, val.w);
+		if (!SpecialDeviceManager.HasSpecialDeviceInfo)
+		{
+			return;
+		}
+		DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+		if (!specialDeviceInfo.NeedModifyChatAnchor)
+		{
+			return;
+		}
+		if (SpecialDeviceManager.IsPortrait)
+		{
+			WidgetBot.leftAnchor.Set(0.5f, specialDeviceInfo.ChatBottomAnchorPortrait.left);
+			WidgetBot.rightAnchor.Set(0.5f, specialDeviceInfo.ChatBottomAnchorPortrait.right);
+			WidgetBot.bottomAnchor.Set(0f, specialDeviceInfo.ChatBottomAnchorPortrait.bottom);
+			WidgetBot.topAnchor.Set(0f, specialDeviceInfo.ChatBottomAnchorPortrait.top);
+			return;
+		}
+		WidgetTop.leftAnchor.Set(0f, specialDeviceInfo.ChatTopAnchorLandscape.left);
+		WidgetTop.rightAnchor.Set(0f, specialDeviceInfo.ChatTopAnchorLandscape.right);
+		WidgetTop.bottomAnchor.Set(0f, specialDeviceInfo.ChatTopAnchorLandscape.bottom);
+		WidgetTop.topAnchor.Set(1f, specialDeviceInfo.ChatTopAnchorLandscape.top);
+		if (IsShowFullChatView)
+		{
+			WidgetBot.leftAnchor.Set(1f, specialDeviceInfo.ChatBottomAnchorLandscapeFull.left);
+			WidgetBot.rightAnchor.Set(1f, specialDeviceInfo.ChatBottomAnchorLandscapeFull.right);
+			WidgetBot.bottomAnchor.Set(0f, specialDeviceInfo.ChatBottomAnchorLandscapeFull.bottom);
+			WidgetBot.topAnchor.Set(0f, specialDeviceInfo.ChatBottomAnchorLandscapeFull.top);
+		}
+		else
+		{
+			WidgetBot.leftAnchor.Set(1f, specialDeviceInfo.ChatBottomAnchorLandscapeSmall.left);
+			WidgetBot.rightAnchor.Set(1f, specialDeviceInfo.ChatBottomAnchorLandscapeSmall.right);
+			WidgetBot.bottomAnchor.Set(0f, specialDeviceInfo.ChatBottomAnchorLandscapeSmall.bottom);
+			WidgetBot.topAnchor.Set(0f, specialDeviceInfo.ChatBottomAnchorLandscapeSmall.top);
+		}
+	}
+
+	private void SetScrollPanelUI(bool _isPortrait, CHAT_TYPE _t)
+	{
+		switch (_t)
+		{
+		case CHAT_TYPE.HOME:
+			ScrollPanel.topAnchor.Set(1f, -129f);
+			ScrollPanel.bottomAnchor.Set(0f, (!_isPortrait) ? 22f : 316f);
+			break;
+		case CHAT_TYPE.PERSONAL:
+			ScrollPanel.topAnchor.Set(1f, -129f);
+			ScrollPanel.bottomAnchor.Set(0f, (!_isPortrait) ? 22f : 15f);
+			break;
+		default:
+			ScrollPanel.topAnchor.Set(1f, -72f);
+			ScrollPanel.bottomAnchor.Set(0f, (!_isPortrait) ? 22f : 316f);
+			break;
+		}
+		ScrollPanel.SetDirty();
+	}
+
+	private void SetChatBgFrameUI(CHAT_TYPE _t)
+	{
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+		if (!(BackgroundInFrame == null))
+		{
+			Vector4 val = (_t == CHAT_TYPE.PERSONAL || HasState(typeof(ChatState_PersonalTab)) || IsLandScapeFullViewMode) ? UI_SPRITE_CHAT_BG_FRAME_PERSONAL_POS : UI_SPRITE_CHAT_BG_FRAME_DEFAULT_POS;
+			BackgroundInFrame.leftAnchor.Set(0f, val.x);
+			BackgroundInFrame.rightAnchor.Set(1f, val.y);
+			BackgroundInFrame.bottomAnchor.Set(0f, val.z);
+			BackgroundInFrame.topAnchor.Set(1f, val.w);
+		}
 	}
 
 	private void SetParent(UI changeTarget, UI parent)
@@ -778,53 +852,108 @@ public class MainChat : UIBehaviour
 
 	private void UpdateCloseButtonPosition()
 	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		Transform ctrl = GetCtrl(UI.BTN_INPUT_CLOSE);
+		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+		UIWidget widgetInputCloseButton = WidgetInputCloseButton;
 		if ((MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene" && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "QuestAcceptRoom")
 		{
-			ctrl.set_localPosition(new Vector3(231f, -218f));
+			UIRect.AnchorPoint leftAnchor = widgetInputCloseButton.leftAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_LANDSCAPE_POS = UI_BTN_INPUT_CLOSE_LANDSCAPE_POS;
+			leftAnchor.Set(1f, uI_BTN_INPUT_CLOSE_LANDSCAPE_POS.x);
+			UIRect.AnchorPoint rightAnchor = widgetInputCloseButton.rightAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_LANDSCAPE_POS2 = UI_BTN_INPUT_CLOSE_LANDSCAPE_POS;
+			rightAnchor.Set(1f, uI_BTN_INPUT_CLOSE_LANDSCAPE_POS2.y);
+			UIRect.AnchorPoint bottomAnchor = widgetInputCloseButton.bottomAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_LANDSCAPE_POS3 = UI_BTN_INPUT_CLOSE_LANDSCAPE_POS;
+			bottomAnchor.Set(0f, uI_BTN_INPUT_CLOSE_LANDSCAPE_POS3.z);
+			UIRect.AnchorPoint topAnchor = widgetInputCloseButton.topAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_LANDSCAPE_POS4 = UI_BTN_INPUT_CLOSE_LANDSCAPE_POS;
+			topAnchor.Set(0f, uI_BTN_INPUT_CLOSE_LANDSCAPE_POS4.w);
 		}
 		else
 		{
-			ctrl.set_localPosition(new Vector3(231f, 24f));
+			UIRect.AnchorPoint leftAnchor2 = widgetInputCloseButton.leftAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_DEFAULT_POS = UI_BTN_INPUT_CLOSE_DEFAULT_POS;
+			leftAnchor2.Set(1f, uI_BTN_INPUT_CLOSE_DEFAULT_POS.x);
+			UIRect.AnchorPoint rightAnchor2 = widgetInputCloseButton.rightAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_DEFAULT_POS2 = UI_BTN_INPUT_CLOSE_DEFAULT_POS;
+			rightAnchor2.Set(1f, uI_BTN_INPUT_CLOSE_DEFAULT_POS2.y);
+			UIRect.AnchorPoint bottomAnchor2 = widgetInputCloseButton.bottomAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_DEFAULT_POS3 = UI_BTN_INPUT_CLOSE_DEFAULT_POS;
+			bottomAnchor2.Set(1f, uI_BTN_INPUT_CLOSE_DEFAULT_POS3.z);
+			UIRect.AnchorPoint topAnchor2 = widgetInputCloseButton.topAnchor;
+			Vector4 uI_BTN_INPUT_CLOSE_DEFAULT_POS4 = UI_BTN_INPUT_CLOSE_DEFAULT_POS;
+			topAnchor2.Set(1f, uI_BTN_INPUT_CLOSE_DEFAULT_POS4.w);
 		}
 	}
 
 	private IEnumerator Start()
 	{
 		Initialize();
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-		}
+		yield return null;
+		InitStateMachine();
+		yield return null;
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_quest_chatitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatItem", false);
-		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem", false);
-		LoadObject lo_chatAdvisaryItem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatAdvisoryItem", false);
+		LoadObject lo_quest_chatitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatItem");
+		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
+		LoadObject lo_chatAdvisaryItem = load_queue.Load(RESOURCE_CATEGORY.UI, "GuildChatAdvisoryItem");
 		if (load_queue.IsLoading())
 		{
-			yield return (object)load_queue.Wait();
+			yield return load_queue.Wait();
 		}
-		m_DataList[0] = new ChatItemListData(GetCtrl(UI.OBJ_HOME_ITEM_LIST_ROOT).get_gameObject());
-		m_DataList[1] = new ChatItemListData(GetCtrl(UI.OBJ_ROOM_ITEM_LIST_ROOT).get_gameObject());
-		m_DataList[2] = new ChatItemListData(GetCtrl(UI.OBJ_LOUNGE_ITEM_LIST_ROOT).get_gameObject());
+		InitChatDataList();
 		for (int i = 0; i < m_PostRequetQueue.Length; i++)
 		{
 			m_PostRequetQueue[i] = new PostRequestQueue();
 		}
+		yield return null;
 		m_ChatItemPrefab = (lo_quest_chatitem.loadedObject as GameObject);
 		m_ChatStampListPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
 		m_ChatAdvisaryItemPrefab = (lo_chatAdvisaryItem.loadedObject as GameObject);
+		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+		{
+			OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+		}
+		yield return null;
 		ChangeSliderPos(CHAT_TYPE.HOME);
 		SetSliderLimit();
 		DummyDragScroll.width = 410;
+		yield return null;
 		string channelName = "0001";
 		SetChannelName(channelName);
 		ResetStampIdList();
 		Reset();
 		HideAll();
 		HideOpenButton();
+		ScrollView.onStoppedMoving = onStoppedMovingScrollView;
+		ScrollView.onDragStarted = onDragStartScrollView;
+		ScrollView.onDragFinished = onDragEndScrollView;
+		ScrollView.onPressStart = onPressStartScrollView;
+		ScrollView.onPressEnd = onPressEndScrollView;
+	}
+
+	private void InitChatDataList()
+	{
+		m_DataList[0] = new ChatItemListData(GetCtrl(UI.OBJ_HOME_ITEM_LIST_ROOT).get_gameObject());
+		m_DataList[1] = new ChatItemListData(GetCtrl(UI.OBJ_ROOM_ITEM_LIST_ROOT).get_gameObject());
+		m_DataList[2] = new ChatItemListData(GetCtrl(UI.OBJ_LOUNGE_ITEM_LIST_ROOT).get_gameObject());
+		m_DataList[3] = m_DataList[1];
+		m_DataList[4] = null;
+		m_DataList[5] = new ChatItemListData(GetCtrl(UI.OBJ_CLAN_ITEM_LIST_ROOT).get_gameObject());
 	}
 
 	private void ChangeSliderPos(CHAT_TYPE type)
@@ -850,7 +979,6 @@ public class MainChat : UIBehaviour
 	{
 		Input.value = string.Empty;
 		InputFrame.Reset();
-		m_IsPlayingChatWindowAnim = false;
 		UpdateAnchors();
 		UpdateWindowSize();
 	}
@@ -884,14 +1012,6 @@ public class MainChat : UIBehaviour
 		InputFrame.FrameResize();
 		string value = Input.value;
 		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(value));
-		if (value.Length == 0)
-		{
-			SetPostBtnState(BtnState.OFF);
-		}
-		else
-		{
-			SetPostBtnState(BtnState.ON);
-		}
 	}
 
 	private void StartPostChatProcess()
@@ -906,41 +1026,62 @@ public class MainChat : UIBehaviour
 
 	public int GetPendingQueueNum()
 	{
-		if (m_PostRequetQueue == null || m_PostRequetQueue[0] == null || m_PostRequetQueue[1] == null)
+		int num = 0;
+		if (m_PostRequetQueue == null)
 		{
-			return 0;
+			num = 0;
 		}
-		int num = m_PostRequetQueue[0].Count;
-		if (hasLoungeChat)
+		else
 		{
-			num = m_PostRequetQueue[2].Count;
+			switch (HomeType)
+			{
+			case HOME_TYPE.HOME_TOP:
+				if (m_PostRequetQueue[0] != null)
+				{
+					num = m_PostRequetQueue[0].Count;
+				}
+				break;
+			case HOME_TYPE.LOUNGE_TOP:
+				if (m_PostRequetQueue[2] != null)
+				{
+					num = m_PostRequetQueue[2].Count;
+				}
+				break;
+			}
+			if (hasRoomChat && m_PostRequetQueue[1] != null)
+			{
+				num += m_PostRequetQueue[1].Count;
+			}
 		}
-		if (hasRoomChat)
+		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.EnableClanChat)
 		{
-			num += m_PostRequetQueue[1].Count;
+			num += MonoBehaviourSingleton<ClanMatchingManager>.I.UnreadMessageCount;
 		}
 		return num;
 	}
 
 	public int GetPendingQueueNumWithoutRoom()
 	{
-		if (m_PostRequetQueue == null)
+		int num = 0;
+		if (m_PostRequetQueue != null)
 		{
-			return 0;
-		}
-		if (hasLoungeChat)
-		{
-			if (m_PostRequetQueue[2] == null)
+			if (hasLoungeChat)
 			{
-				return 0;
+				if (m_PostRequetQueue[2] != null)
+				{
+					num = m_PostRequetQueue[2].Count;
+				}
 			}
-			return m_PostRequetQueue[2].Count;
+			else if (m_PostRequetQueue[0] != null)
+			{
+				num = m_PostRequetQueue[0].Count;
+			}
 		}
-		if (m_PostRequetQueue[0] == null)
+		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.EnableClanChat)
 		{
-			return 0;
+			num += MonoBehaviourSingleton<ClanMatchingManager>.I.UnreadMessageCount;
 		}
-		return m_PostRequetQueue[0].Count;
+		return num;
 	}
 
 	private IEnumerator PostChatProcess()
@@ -948,37 +1089,64 @@ public class MainChat : UIBehaviour
 		bool bPolling = true;
 		while (bPolling)
 		{
-			if (m_PostRequetQueue[(int)currentChat].Count > 0)
+			int queueIndex = GetQueueArrayIndex(currentChat);
+			if (m_PostRequetQueue[queueIndex].Count > 0)
 			{
-				ChatPostRequest request = m_PostRequetQueue[(int)currentChat].Dequeue();
+				ChatPostRequest request = m_PostRequetQueue[queueIndex].Dequeue();
 				Post(request);
-				yield return (object)null;
+				yield return null;
 			}
-			yield return (object)null;
+			yield return null;
 		}
+	}
+
+	public int GetQueueArrayIndex(CHAT_TYPE _t)
+	{
+		if (_t == CHAT_TYPE.ROOM || _t == CHAT_TYPE.FIELD)
+		{
+			return 1;
+		}
+		return (int)_t;
 	}
 
 	public void SendStampAsMine(int stampId)
 	{
-		if (CanIPostTheStamp(stampId))
+		if (!CanIPostTheStamp(stampId))
 		{
-			switch (currentChat)
+			return;
+		}
+		switch (currentChat)
+		{
+		case CHAT_TYPE.HOME:
+			if (MonoBehaviourSingleton<ChatManager>.I.homeChat != null)
 			{
-			case CHAT_TYPE.HOME:
 				MonoBehaviourSingleton<ChatManager>.I.homeChat.SendStamp(stampId);
-				break;
-			case CHAT_TYPE.ROOM:
-				MonoBehaviourSingleton<ChatManager>.I.roomChat.SendStamp(stampId);
-				break;
-			case CHAT_TYPE.LOUNGE:
-				MonoBehaviourSingleton<ChatManager>.I.loungeChat.SendStamp(stampId);
-				break;
 			}
-			UpdateSendBlock();
-			if (m_IsOnshotStampMode)
+			break;
+		case CHAT_TYPE.ROOM:
+		case CHAT_TYPE.FIELD:
+			if (MonoBehaviourSingleton<ChatManager>.I.roomChat != null)
 			{
-				HideAll();
+				MonoBehaviourSingleton<ChatManager>.I.roomChat.SendStamp(stampId);
 			}
+			break;
+		case CHAT_TYPE.LOUNGE:
+			if (MonoBehaviourSingleton<ChatManager>.I.loungeChat != null)
+			{
+				MonoBehaviourSingleton<ChatManager>.I.loungeChat.SendStamp(stampId);
+			}
+			break;
+		case CHAT_TYPE.CLAN:
+			if (MonoBehaviourSingleton<ChatManager>.I.clanChat != null)
+			{
+				MonoBehaviourSingleton<ChatManager>.I.clanChat.SendStamp(stampId);
+			}
+			break;
+		}
+		UpdateSendBlock();
+		if (m_IsOnshotStampMode)
+		{
+			HideAll();
 		}
 	}
 
@@ -987,13 +1155,29 @@ public class MainChat : UIBehaviour
 		switch (currentChat)
 		{
 		case CHAT_TYPE.HOME:
-			MonoBehaviourSingleton<ChatManager>.I.homeChat.SendMessage(message);
+			if (MonoBehaviourSingleton<ChatManager>.I.homeChat != null)
+			{
+				MonoBehaviourSingleton<ChatManager>.I.homeChat.SendMessage(message);
+			}
 			break;
 		case CHAT_TYPE.ROOM:
-			MonoBehaviourSingleton<ChatManager>.I.roomChat.SendMessage(message);
+		case CHAT_TYPE.FIELD:
+			if (MonoBehaviourSingleton<ChatManager>.I.roomChat != null)
+			{
+				MonoBehaviourSingleton<ChatManager>.I.roomChat.SendMessage(message);
+			}
 			break;
 		case CHAT_TYPE.LOUNGE:
-			MonoBehaviourSingleton<ChatManager>.I.loungeChat.SendMessage(message);
+			if (MonoBehaviourSingleton<ChatManager>.I.loungeChat != null)
+			{
+				MonoBehaviourSingleton<ChatManager>.I.loungeChat.SendMessage(message);
+			}
+			break;
+		case CHAT_TYPE.CLAN:
+			if (MonoBehaviourSingleton<ChatManager>.I.clanChat != null)
+			{
+				MonoBehaviourSingleton<ChatManager>.I.clanChat.SendMessage(message);
+			}
 			break;
 		}
 		UpdateSendBlock();
@@ -1005,162 +1189,221 @@ public class MainChat : UIBehaviour
 
 	private void Post(ChatPostRequest request)
 	{
-		ChatItemListData data = m_DataList[(int)currentChat];
+		if (CurrentData == null)
+		{
+			return;
+		}
+		ChatItemListData currentData = CurrentData;
 		switch (request.Type)
 		{
 		case ChatPostRequest.TYPE.Message:
-			Post(request.userId, request.userName, request.message, data);
+			AddNextChatItem(request, currentData, delegate(ChatItem chatItem)
+			{
+				chatItem.Init(request.userId, request.userName, request.message, request.chatItemId);
+			});
+			SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
 			break;
 		case ChatPostRequest.TYPE.Stamp:
-			PostStamp(request.userId, request.userName, request.stampId, data);
-			break;
-		case ChatPostRequest.TYPE.Notification:
-			PostNotification(request.message, data);
-			break;
-		}
-	}
-
-	private void Post(int userId, string userName, string text, ChatItemListData data)
-	{
-		AddNextChatItem(data, delegate(ChatItem chatItem)
 		{
-			chatItem.Init(userId, userName, text);
-		});
-		SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
-	}
-
-	private void PostStamp(int userId, string userName, int stampId, ChatItemListData data)
-	{
-		if (IsValidStampId(stampId))
-		{
-			StampTable.Data data2 = Singleton<StampTable>.I.GetData((uint)stampId);
-			if (data2 != null)
+			if (!IsValidStampId(request.stampId))
 			{
-				AddNextChatItem(data, delegate(ChatItem chatItem)
+				break;
+			}
+			StampTable.Data data = Singleton<StampTable>.I.GetData((uint)request.stampId);
+			if (data != null)
+			{
+				AddNextChatItem(request, currentData, delegate(ChatItem chatItem)
 				{
-					chatItem.Init(userId, userName, stampId);
+					chatItem.Init(request.userId, request.userName, request.stampId, request.chatItemId);
 				});
-				if (data2.hasSE)
+				if (data.hasSE)
 				{
-					SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
+					SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
 				}
 				else
 				{
-					SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
+					SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
 				}
 			}
+			break;
+		}
+		case ChatPostRequest.TYPE.Notification:
+			AddNextChatItem(request, currentData, delegate(ChatItem chatItem)
+			{
+				chatItem.Init(request.message, request.chatItemId, request.isWhiteColor);
+			});
+			SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
+			break;
 		}
 	}
 
-	private void PostNotification(string text, ChatItemListData data)
+	private void AddNextChatItem(ChatPostRequest request, ChatItemListData data, Action<ChatItem> initializer)
 	{
-		AddNextChatItem(data, delegate(ChatItem chatItem)
-		{
-			chatItem.Init(text);
-		});
-		SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
-	}
-
-	private void AddNextChatItem(ChatItemListData data, Action<ChatItem> initializer)
-	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026b: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_ChatItemPrefab == null))
 		{
-			if (data.itemList.Count > 0)
+			if (!request.IsOldMessage)
 			{
-				data.currentTotalHeight += 22f;
-			}
-			float num = 0f;
-			ChatItem chatItem = null;
-			if (data.itemList.Count < 30)
-			{
-				chatItem = ResourceUtility.Realizes(m_ChatItemPrefab, data.rootObject.get_transform(), 5).GetComponent<ChatItem>();
+				addNextChatItem(data, initializer);
+				StateMachine.CurrentState.OnShowMessageOnDisplay(request.chatItemId);
 			}
 			else
 			{
-				chatItem = data.itemList[data.oldestItemIndex];
-				data.oldestItemIndex++;
-				if (data.oldestItemIndex == 30)
-				{
-					data.oldestItemIndex = 0;
-				}
-				data.currentTotalHeight -= chatItem.height + 22f;
-				ScrollView.panel.widgetsAreStatic = false;
-				num = chatItem.height + 22f;
-				data.MoveAll(num);
-				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					ScrollView.panel.widgetsAreStatic = true;
-				});
-			}
-			float currentTotalHeight = data.currentTotalHeight;
-			chatItem.get_transform().set_localPosition(new Vector3(-15f, 0f - currentTotalHeight, 0f));
-			initializer(chatItem);
-			data.currentTotalHeight += chatItem.height;
-			UpdateDummyDragScroll();
-			float num2 = data.currentTotalHeight - 300f;
-			Vector3 localPosition = ScrollViewTrans.get_localPosition();
-			if (num2 < localPosition.y)
-			{
-				float currentTotalHeight2 = data.currentTotalHeight;
-				Vector4 baseClipRegion = ScrollView.panel.baseClipRegion;
-				float num3 = currentTotalHeight2 + baseClipRegion.y;
-				Vector4 baseClipRegion2 = ScrollView.panel.baseClipRegion;
-				float num4 = num3 - baseClipRegion2.w * 0.5f;
-				Vector3 localPosition2 = ScrollViewTrans.get_localPosition();
-				float y = localPosition2.y;
-				Vector2 clipOffset = ScrollView.panel.clipOffset;
-				float num5 = num4 + (y + clipOffset.y);
-				Vector2 clipSoftness = ScrollView.panel.clipSoftness;
-				float num6 = num5 + clipSoftness.y;
-				if (data.itemList.Count >= 30)
-				{
-					ForceScroll(num6 - chatItem.height - 22f, false);
-				}
-				ForceScroll(num6, true);
-			}
-			else if (data.itemList.Count >= 30)
-			{
-				Vector3 localPosition3 = ScrollViewTrans.get_localPosition();
-				if (localPosition3.y > 300f)
-				{
-					Vector3 localPosition4 = ScrollViewTrans.get_localPosition();
-					ForceScroll(localPosition4.y - num, false);
-				}
-			}
-			if (data.itemList.Count < 30)
-			{
-				data.itemList.Add(chatItem);
+				addPrevChatItem(data, initializer);
 			}
 		}
+	}
+
+	private void addNextChatItem(ChatItemListData data, Action<ChatItem> initializer)
+	{
+		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+		if (data.itemList.Count > 0)
+		{
+			data.currentTotalHeight += 22f;
+		}
+		float num = 0f;
+		ChatItem chatItem = null;
+		if (data.itemList.Count < 30)
+		{
+			chatItem = ResourceUtility.Realizes(m_ChatItemPrefab, data.rootObject.get_transform(), 5).GetComponent<ChatItem>();
+		}
+		else
+		{
+			chatItem = data.itemList[data.oldestItemIndex];
+			data.oldestItemIndex++;
+			if (data.oldestItemIndex == 30)
+			{
+				data.oldestItemIndex = 0;
+			}
+			data.currentTotalHeight -= chatItem.height + 22f;
+			ScrollView.panel.widgetsAreStatic = false;
+			num = chatItem.height + 22f;
+			data.MoveAll(num);
+			AppMain i = MonoBehaviourSingleton<AppMain>.I;
+			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+			{
+				ScrollView.panel.widgetsAreStatic = true;
+			});
+		}
+		float currentTotalHeight = data.currentTotalHeight;
+		chatItem.get_transform().set_localPosition(CHAT_ITEM_OFFSET_POS + Vector3.get_down() * currentTotalHeight);
+		initializer(chatItem);
+		data.currentTotalHeight += chatItem.height;
+		UpdateDummyDragScroll();
+		float num2 = (!IsPortrait) ? 344 : 300;
+		float num3 = data.currentTotalHeight - num2;
+		Vector3 localPosition = ScrollViewTrans.get_localPosition();
+		if (num3 < localPosition.y)
+		{
+			float currentTotalHeight2 = data.currentTotalHeight;
+			Vector4 baseClipRegion = ScrollView.panel.baseClipRegion;
+			float num4 = currentTotalHeight2 + baseClipRegion.y;
+			Vector4 baseClipRegion2 = ScrollView.panel.baseClipRegion;
+			float num5 = num4 - baseClipRegion2.w * 0.5f;
+			Vector3 localPosition2 = ScrollViewTrans.get_localPosition();
+			float y = localPosition2.y;
+			Vector2 clipOffset = ScrollView.panel.clipOffset;
+			float num6 = num5 + (y + clipOffset.y);
+			Vector2 clipSoftness = ScrollView.panel.clipSoftness;
+			float num7 = num6 + clipSoftness.y;
+			if (data.itemList.Count >= 30)
+			{
+				ForceScroll(num7 - chatItem.height - 22f, useSpring: false);
+			}
+			ForceScroll(num7, useSpring: true);
+		}
+		else if (data.itemList.Count >= 30)
+		{
+			Vector3 localPosition3 = ScrollViewTrans.get_localPosition();
+			if (localPosition3.y > num2)
+			{
+				Vector3 localPosition4 = ScrollViewTrans.get_localPosition();
+				ForceScroll(localPosition4.y - num, useSpring: false);
+			}
+		}
+		if (data.itemList.Count < 30)
+		{
+			data.itemList.Add(chatItem);
+		}
+	}
+
+	private void addPrevChatItem(ChatItemListData data, Action<ChatItem> initializer)
+	{
+		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+		ScrollView.panel.widgetsAreStatic = false;
+		AppMain i = MonoBehaviourSingleton<AppMain>.I;
+		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+		{
+			ScrollView.panel.widgetsAreStatic = true;
+		});
+		ChatItem chatItem = null;
+		if (data.itemList.Count < 30)
+		{
+			chatItem = ResourceUtility.Realizes(m_ChatItemPrefab, data.rootObject.get_transform(), 5).GetComponent<ChatItem>();
+		}
+		else
+		{
+			chatItem = data.itemList[data.newestIndex];
+			data.itemList.Remove(chatItem);
+		}
+		initializer(chatItem);
+		tmpList.Clear();
+		tmpList.Add(chatItem);
+		tmpList.AddRange(data.itemList);
+		data.itemList.Clear();
+		data.itemList.AddRange(tmpList);
+		data.oldestItemIndex = 0;
+		Vector3 val = CHAT_ITEM_OFFSET_POS;
+		data.currentTotalHeight = 0f;
+		for (int j = 0; j < data.itemList.Count; j++)
+		{
+			if (j > 0)
+			{
+				data.currentTotalHeight += 22f;
+			}
+			ChatItem chatItem2 = data.itemList[j];
+			chatItem2.get_transform().set_localPosition(val);
+			data.currentTotalHeight += chatItem2.height;
+			val += Vector3.get_down() * chatItem2.height;
+			val += Vector3.get_down() * 22f;
+		}
+		UpdateDummyDragScroll();
 	}
 
 	private void ForceScroll(float newHeight, bool useSpring)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
 		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
@@ -1172,16 +1415,14 @@ public class MainChat : UIBehaviour
 		if (useSpring)
 		{
 			SpringPanel.Begin(ScrollView.get_gameObject(), Vector3.get_up() * newHeight, 20f);
+			return;
 		}
-		else
-		{
-			Vector2 clipOffset = ScrollView.panel.clipOffset;
-			Vector3 localPosition = ScrollViewTrans.get_localPosition();
-			float num = localPosition.y + clipOffset.y;
-			ScrollViewTrans.set_localPosition(Vector3.get_up() * newHeight);
-			clipOffset.y = 0f - newHeight + num;
-			ScrollView.panel.clipOffset = clipOffset;
-		}
+		Vector2 clipOffset = ScrollView.panel.clipOffset;
+		Vector3 localPosition = ScrollViewTrans.get_localPosition();
+		float num = localPosition.y + clipOffset.y;
+		ScrollViewTrans.set_localPosition(Vector3.get_up() * newHeight);
+		clipOffset.y = 0f - newHeight + num;
+		ScrollView.panel.clipOffset = clipOffset;
 	}
 
 	public void SaveSlideOffset()
@@ -1195,29 +1436,6 @@ public class MainChat : UIBehaviour
 
 	public void UpdateWindowSize()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		float num = 450f;
-		float currentTotalHeight = CurrentTotalHeight;
-		Vector4 baseClipRegion = ScrollView.panel.baseClipRegion;
-		float num2 = currentTotalHeight + baseClipRegion.y;
-		Vector4 baseClipRegion2 = ScrollView.panel.baseClipRegion;
-		float num3 = num2 - baseClipRegion2.w * 0.5f;
-		Vector3 localPosition = ScrollViewTrans.get_localPosition();
-		float y = localPosition.y;
-		Vector2 clipOffset = ScrollView.panel.clipOffset;
-		float num4 = num3 + (y + clipOffset.y);
-		Vector2 clipSoftness = ScrollView.panel.clipSoftness;
-		ForceScroll(num4 + clipSoftness.y, false);
-		SetScrollBarHeight((int)(num - 48f));
 		UpdateDummyDragScroll();
 	}
 
@@ -1231,28 +1449,10 @@ public class MainChat : UIBehaviour
 		bgBlack = CreateChatUIFadeGroup(UI.SPR_BG_BLACK);
 		sendBlockView = CreateChatUIFadeGroup(UI.OBJ_POST_BLOCK);
 		sendLimitView = CreateChatUIFadeGroup(UI.WGT_POST_LIMIT);
+		sendLimitNoClanView = CreateChatUIFadeGroup(UI.WGT_NO_CLAN);
+		sendLimitReloadView = CreateChatUIFadeGroup(UI.WGT_RELOAD);
 		noConnectionView = CreateChatUIFadeGroup(UI.WGT_NO_CONNECTION);
-		Action onClick = delegate
-		{
-			if (hasLoungeChat)
-			{
-				OnSelectLounge();
-			}
-			else
-			{
-				OnSelectHomeTab();
-			}
-		};
-		homeTabButton = CreateChatTabButton(UI.BTN_CHAT_HOME, UI.LBL_CHAT_HOME, onClick, delegate
-		{
-		}, delegate
-		{
-		});
-		roomTabButton = CreateChatTabButton(UI.BTN_CHAT_ROOM, UI.LBL_CHAT_ROOM, OnSelectRoomTab, delegate
-		{
-		}, delegate
-		{
-		});
+		GenerateHeaderButton();
 		SetButtonEvent(UI.BTN_SHOW_LOG, new EventDelegate(ShowFull));
 		SetButtonEvent(UI.BTN_HIDE_LOG, new EventDelegate(ShowInputOnly));
 		SetButtonEvent(UI.BTN_INPUT_CLOSE, new EventDelegate(HideFull));
@@ -1273,6 +1473,9 @@ public class MainChat : UIBehaviour
 		MonoBehaviourSingleton<ChatManager>.I.OnDestroyRoomChat += OnDestroyRoomChat;
 		MonoBehaviourSingleton<ChatManager>.I.OnCreateLoungeChat += OnCreateLoungeChat;
 		MonoBehaviourSingleton<ChatManager>.I.OnDestroyLoungeChat += OnDestroyLoungeChat;
+		MonoBehaviourSingleton<ChatManager>.I.OnCreateClanChat += OnCreateClanChat;
+		MonoBehaviourSingleton<ChatManager>.I.OnDestroyClanChat += OnDestroyClanChat;
+		MonoBehaviourSingleton<ChatManager>.I.CreateClanChat(MonoBehaviourSingleton<ClanMatchingManager>.I.GetChatConnection());
 		ChatInputFrame inputFrame = InputFrame;
 		inputFrame.onChange = (Action)Delegate.Combine(inputFrame.onChange, (Action)delegate
 		{
@@ -1290,7 +1493,7 @@ public class MainChat : UIBehaviour
 		SetButtonEvent(UI.BTN_SPR_CHANNEL_SELECT, new EventDelegate(ShowChannelSelect));
 		SetButtonEvent(UI.BTN_CLOSE_CHANNEL_SELECT, new EventDelegate(delegate
 		{
-			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
+			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 			CloseChannelSelect();
 		}));
 		SetButtonEvent(UI.BTN_HOT, new EventDelegate(OnSelectHotChannel));
@@ -1395,6 +1598,26 @@ public class MainChat : UIBehaviour
 		currentChat = CHAT_TYPE.HOME;
 	}
 
+	private void OnCreateClanChat(ChatRoom clanChat)
+	{
+		clanChat.onReceiveText += OnReceiveClanText;
+		clanChat.onReceiveStamp += OnReceiveClanStamp;
+		clanChat.onReceiveNotification += OnReceiveClanNotification;
+		clanChat.onAfterSendUserMessage += OnClanAfterSendUserMessage;
+		currentChat = CHAT_TYPE.CLAN;
+	}
+
+	private void OnDestroyClanChat(ChatRoom clanChat)
+	{
+		clanChat.onReceiveText -= OnReceiveClanText;
+		clanChat.onReceiveStamp -= OnReceiveClanStamp;
+		clanChat.onReceiveNotification -= OnReceiveClanNotification;
+		clanChat.onAfterSendUserMessage -= OnClanAfterSendUserMessage;
+		m_PostRequetQueue[5].Clear();
+		m_DataList[5].Reset();
+		currentChat = CHAT_TYPE.HOME;
+	}
+
 	private void OnJoinHomeChat(CHAT_ERROR_TYPE errorType)
 	{
 		if (errorType != 0)
@@ -1418,60 +1641,92 @@ public class MainChat : UIBehaviour
 		return true;
 	}
 
-	private void OnReceiveText(CHAT_TYPE chatType, int userId, string userName, string message)
+	private void OnReceiveText(CHAT_TYPE chatType, int userId, string userName, string message, string chatItemId, bool IsOldMessage = false)
 	{
 		if (IsAllowedUser(userId))
 		{
-			m_PostRequetQueue[(int)chatType].Enqueue(new ChatPostRequest(userId, userName, message));
+			m_PostRequetQueue[(int)chatType].Enqueue(new ChatPostRequest(userId, userName, message, chatItemId, IsOldMessage));
 		}
 	}
 
-	private void OnReceiveStamp(CHAT_TYPE chatType, int userId, string userName, int stampId)
+	private void OnReceiveStamp(CHAT_TYPE chatType, int userId, string userName, int stampId, string chatItemId, bool IsOldMessage = false)
 	{
 		if (IsAllowedUser(userId))
 		{
-			m_PostRequetQueue[(int)chatType].Enqueue(new ChatPostRequest(userId, userName, stampId));
+			m_PostRequetQueue[(int)chatType].Enqueue(new ChatPostRequest(userId, userName, stampId, chatItemId, IsOldMessage));
 		}
 	}
 
-	private void OnReceiveHomeText(int userId, string userName, string message)
+	private void OnReceiveHomeText(int userId, string userName, string message, string chatItemId, bool isOldMessage = false)
 	{
-		OnReceiveText(CHAT_TYPE.HOME, userId, userName, message);
+		OnReceiveText(CHAT_TYPE.HOME, userId, userName, message, chatItemId);
 	}
 
-	private void OnReceiveHomeStamp(int userId, string userName, int stampId)
+	private void OnReceiveHomeStamp(int userId, string userName, int stampId, string chatItemId, bool isOldMessage = false)
 	{
-		OnReceiveStamp(CHAT_TYPE.HOME, userId, userName, stampId);
+		OnReceiveStamp(CHAT_TYPE.HOME, userId, userName, stampId, chatItemId);
 	}
 
-	private void OnReceiveRoomText(int userId, string userName, string message)
+	private void OnReceiveRoomText(int userId, string userName, string message, string chatItemId, bool isOldMessage = false)
 	{
-		OnReceiveText(CHAT_TYPE.ROOM, userId, userName, message);
+		OnReceiveText(CHAT_TYPE.ROOM, userId, userName, message, chatItemId);
 	}
 
-	private void OnReceiveRoomStamp(int userId, string userName, int stampId)
+	private void OnReceiveRoomStamp(int userId, string userName, int stampId, string chatItemId, bool isOldMessage = false)
 	{
-		OnReceiveStamp(CHAT_TYPE.ROOM, userId, userName, stampId);
+		OnReceiveStamp(CHAT_TYPE.ROOM, userId, userName, stampId, chatItemId);
 	}
 
-	private void OnReceiveRoomNotification(string message)
+	private void OnReceiveRoomNotification(string message, string chatItemId, bool isOldMessage = false)
 	{
-		m_PostRequetQueue[1].Enqueue(new ChatPostRequest(message));
+		m_PostRequetQueue[1].Enqueue(new ChatPostRequest(message, chatItemId));
 	}
 
-	private void OnReceiveLoungeText(int userId, string userName, string message)
+	private void OnReceiveLoungeText(int userId, string userName, string message, string chatItemId, bool isOldMessage = false)
 	{
-		OnReceiveText(CHAT_TYPE.LOUNGE, userId, userName, message);
+		OnReceiveText(CHAT_TYPE.LOUNGE, userId, userName, message, chatItemId);
 	}
 
-	private void OnReceiveLoungeStamp(int userId, string userName, int stampId)
+	private void OnReceiveLoungeStamp(int userId, string userName, int stampId, string chatItemId, bool isOldMessage = false)
 	{
-		OnReceiveStamp(CHAT_TYPE.LOUNGE, userId, userName, stampId);
+		OnReceiveStamp(CHAT_TYPE.LOUNGE, userId, userName, stampId, chatItemId);
 	}
 
-	private void OnReceiveLoungeNotification(string message)
+	private void OnReceiveLoungeNotification(string message, string chatItemId, bool isOldMessage = false)
 	{
-		m_PostRequetQueue[2].Enqueue(new ChatPostRequest(message));
+		m_PostRequetQueue[2].Enqueue(new ChatPostRequest(message, chatItemId));
+	}
+
+	private void OnReceiveClanText(int userId, string userName, string message, string chatItemId, bool isOldMessage = false)
+	{
+		OnReceiveText(CHAT_TYPE.CLAN, userId, userName, message, chatItemId, isOldMessage);
+	}
+
+	private void OnReceiveClanStamp(int userId, string userName, int stampId, string chatItemId, bool isOldMessage = false)
+	{
+		OnReceiveStamp(CHAT_TYPE.CLAN, userId, userName, stampId, chatItemId, isOldMessage);
+	}
+
+	private void OnReceiveClanNotification(string message, string chatItemId, bool isOldMessage = false)
+	{
+		m_PostRequetQueue[5].Enqueue(new ChatPostRequest(message, chatItemId, isOldMessage, isWhiteColor: true));
+	}
+
+	private void OnClanAfterSendUserMessage()
+	{
+		if (CurrentData.itemList.Count > 0 && CurrentData.itemList.Count > CurrentData.newestIndex && CurrentData.itemList[CurrentData.newestIndex] != null && CurrentData.itemList[CurrentData.newestIndex].get_gameObject().get_activeSelf())
+		{
+			if (StateMachine.IsRun())
+			{
+				StateMachine.CurrentState.OnDragAtBottom(CurrentData.itemList[CurrentData.newestIndex].chatItemId, 10f);
+			}
+		}
+		else
+		{
+			ResetCacheData(CHAT_TYPE.CLAN);
+			MonoBehaviourSingleton<ClanMatchingManager>.I.ChatResetCache();
+			MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetNewMessage(100, string.Empty);
+		}
 	}
 
 	private ChatUIFadeGroup CreateChatUIFadeGroup(UI elm)
@@ -1487,16 +1742,17 @@ public class MainChat : UIBehaviour
 		return chatUIFadeGroup;
 	}
 
-	private ChatTabButton CreateChatTabButton(UI button_elm, UI label_elm, Action onClick, Action onActivate, Action onDeactivate)
-	{
-		UIButton component = GetCtrl(button_elm).GetComponent<UIButton>();
-		UILabel component2 = GetCtrl(label_elm).GetComponent<UILabel>();
-		return new ChatTabButton(component, component2, onClick, onActivate, onDeactivate);
-	}
-
 	public void SetRoomChatNameType(bool field)
 	{
-		SetLabelText((Enum)UI.LBL_CHAT_ROOM, StringTable.Get(STRING_CATEGORY.CHAT, (uint)((!field) ? 2 : 3)));
+		isFieldChat = field;
+		int i = 0;
+		for (int count = m_headerButtonList.Count; i < count; i++)
+		{
+			if (!(m_headerButtonList[i] == null) && (m_headerButtonList[i].MyChatType == CHAT_TYPE.ROOM || m_headerButtonList[i].MyChatType == CHAT_TYPE.FIELD))
+			{
+				m_headerButtonList[i].InitUILabel((!isFieldChat) ? CHAT_TYPE.ROOM : CHAT_TYPE.FIELD);
+			}
+		}
 	}
 
 	private void UpdateChannnelName()
@@ -1522,7 +1778,7 @@ public class MainChat : UIBehaviour
 		}
 		else
 		{
-			SetChannelName(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 4u));
+			SetChannelName("未接続");
 		}
 	}
 
@@ -1531,12 +1787,8 @@ public class MainChat : UIBehaviour
 		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<UserInfoManager>.I.advisory != null && !GuildChatAdvisoryItem.HasReadHomeNew())
 		{
 			Vector3 localPosition = (!is_portrait) ? new Vector3(0f, 215f, 0f) : new Vector3(0f, 280f, 0f);
@@ -1547,7 +1799,6 @@ public class MainChat : UIBehaviour
 				chatAdvisoryItem.Init(MonoBehaviourSingleton<UserInfoManager>.I.advisory.title, MonoBehaviourSingleton<UserInfoManager>.I.advisory.content);
 				SetButtonEvent(chatAdvisoryItem.close, new EventDelegate(delegate
 				{
-					//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 					GuildChatAdvisoryItem.SetReadHomeNew();
 					if (chatAdvisoryItem != null)
 					{
@@ -1585,103 +1836,81 @@ public class MainChat : UIBehaviour
 
 	public void ShowFullWithEdit()
 	{
-		SetActive((Enum)UI.BTN_SHOW_ALL, true);
-		SetActive((Enum)UI.BTN_EDIT, true);
+		bool flag = GetCurrentStateType() == typeof(ChatState_HomeTab);
+		bool flag2 = GetCurrentStateType() == typeof(ChatState_LoungeTab);
+		bool flag3 = GetCurrentStateType() == typeof(ChatState_ClanTab);
+		StampEditButtonObj.SetActive(flag || flag2 || flag3);
+		FavStampEditButtonObj.SetActive(flag || flag2 || flag3);
 		ShowFull();
 	}
 
 	public void ShowFull()
 	{
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0271: Unknown result type (might be due to invalid IL or missing references)
-		SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
-		if (ValidateBeforeShowUI())
+		ChatCloseButtonObj.SetActive(true);
+		SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
+		if (!ValidateBeforeShowUI())
 		{
-			if (hasRoomChat)
+			return;
+		}
+		InitChatTabState();
+		m_IsOnshotStampMode = false;
+		m_isShowFullChatView = true;
+		UpdateSendBlock();
+		UpdateChannnelName();
+		UpdateCloseButtonPosition();
+		UpdateAdvisoryItem(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+		bgBlack.Open(delegate
+		{
+		});
+		logView.Open(delegate
+		{
+		});
+		inputView.Open(delegate
+		{
+		});
+		inputBG.Close(delegate
+		{
+		});
+		channelSelect.Close(delegate
+		{
+		});
+		channelInputPanel.Close();
+		chatOpenButton.Close(delegate
+		{
+		});
+		StartPostChatProcess();
+		NotifyObservers(NOTIFY_FLAG.OPEN_WINDOW);
+		GetCtrl(UI.BTN_HIDE_LOG).get_gameObject().SetActive(isMinimizable);
+		if (splitLogView)
+		{
+			bool flag = MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait;
+			if (!flag)
 			{
-				OnSelectRoomTab();
-			}
-			else if (hasLoungeChat)
-			{
-				OnSelectLounge();
+				inputBG.Open(delegate
+				{
+				});
+				OnScreenRotate(flag);
 			}
 			else
 			{
-				OnSelectHomeTab();
+				InitStampList();
 			}
-			m_IsOnshotStampMode = false;
-			UpdateSendBlock();
-			UpdateChannnelName();
-			UpdateCloseButtonPosition();
-			UpdateAdvisoryItem(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-			bgBlack.Open(delegate
-			{
-			});
-			logView.Open(delegate
-			{
-			});
-			inputView.Open(delegate
-			{
-			});
-			inputBG.Close(delegate
-			{
-			});
-			channelSelect.Close(delegate
-			{
-			});
-			channelInputPanel.Close();
-			chatOpenButton.Close(delegate
-			{
-			});
-			StartPostChatProcess();
-			InitStampList();
-			NotifyObservers(NOTIFY_FLAG.OPEN_WINDOW);
-			GetCtrl(UI.BTN_HIDE_LOG).get_gameObject().SetActive(isMinimizable);
-			if (splitLogView)
-			{
-				if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
-				{
-					inputBG.Open(delegate
-					{
-					});
-					GetCtrl(UI.BTN_SHOW_LOG).get_gameObject().SetActive(false);
-					UIWidget component = GetCtrl(UI.WGT_ANCHOR_BOTTOM).GetComponent<UIWidget>();
-					component.leftAnchor.Set(1f, -490f);
-					component.rightAnchor.Set(1f, 8f);
-					component.UpdateAnchors();
-				}
-				else
-				{
-					GetCtrl(UI.BTN_SHOW_LOG).get_gameObject().SetActive(true);
-				}
-				GetCtrl(UI.OBJ_HIDE_LOG_L_2).get_gameObject().SetActive(true);
-			}
-			GetCtrl(UI.SPR_BG_BLACK).GetComponent<UIWidget>().ResizeCollider();
+			GetCtrl(UI.BTN_SHOW_LOG).get_gameObject().SetActive(flag);
+			GetCtrl(UI.OBJ_HIDE_LOG_L_2).get_gameObject().SetActive(true);
 		}
+		SpriteBgBlack.ResizeCollider();
+		isFirstSlectClanTab = true;
 	}
 
 	public void ShowInputOnly()
 	{
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-		SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
+		ChatCloseButtonObj.SetActive(true);
+		SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
 		if (ValidateBeforeShowUI())
 		{
-			if (hasRoomChat)
-			{
-				OnSelectRoomTab();
-			}
-			else if (hasLoungeChat)
-			{
-				OnSelectLounge();
-			}
-			else
-			{
-				OnSelectHomeTab();
-			}
+			InitChatTabState();
 			m_IsOnshotStampMode = true;
+			m_isShowFullChatView = false;
 			isMinimizable = true;
 			AppMain i = MonoBehaviourSingleton<AppMain>.I;
 			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
@@ -1705,22 +1934,17 @@ public class MainChat : UIBehaviour
 			chatOpenButton.Close(delegate
 			{
 			});
-			InitStampList();
 			NotifyObservers(NOTIFY_FLAG.OPEN_WINDOW_INPUT_ONLY);
 			GetCtrl(UI.BTN_SHOW_LOG).get_gameObject().SetActive(true);
+			bool is_portrait = MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait;
+			OnScreenRotate(is_portrait);
 			if (splitLogView)
 			{
-				if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
-				{
-					UIWidget component = GetCtrl(UI.WGT_ANCHOR_BOTTOM).GetComponent<UIWidget>();
-					component.leftAnchor.Set(1f, -560f);
-					component.rightAnchor.Set(1f, -62f);
-					component.UpdateAnchors();
-				}
 				GetCtrl(UI.OBJ_HIDE_LOG_L_2).get_gameObject().SetActive(false);
 			}
-			SetActive((Enum)UI.BTN_SHOW_ALL, false);
-			SetActive((Enum)UI.BTN_EDIT, false);
+			StampEditButtonObj.SetActive(false);
+			FavStampEditButtonObj.SetActive(false);
+			isFirstSlectClanTab = true;
 		}
 	}
 
@@ -1737,7 +1961,7 @@ public class MainChat : UIBehaviour
 
 	public void HideFull()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 		HideAll();
 	}
 
@@ -1766,12 +1990,35 @@ public class MainChat : UIBehaviour
 		}
 		StopPostChatProcess();
 		NotifyObservers(NOTIFY_FLAG.CLOSE_WINDOW);
+		StampEditButtonObj.SetActive(false);
+		FavStampEditButtonObj.SetActive(false);
+		ChatCloseButtonObj.SetActive(false);
+		if (m_msgUiCtrl != null)
+		{
+			m_msgUiCtrl.ClearList();
+		}
+	}
+
+	private void HideBottomUI()
+	{
+		SwitchBottomUIActivation(_isVisible: true);
+	}
+
+	private void ShowBottomUI()
+	{
+		SwitchBottomUIActivation(_isVisible: false);
+	}
+
+	private void SwitchBottomUIActivation(bool _isVisible)
+	{
+		if (WidgetBot.get_gameObject().get_activeSelf() != _isVisible)
+		{
+			WidgetBot.get_gameObject().SetActive(_isVisible);
+		}
 	}
 
 	public void OnPressBackKey()
 	{
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 		if (channelInputPanel.isOpened)
 		{
 			CloseChannelInput();
@@ -1785,13 +2032,13 @@ public class MainChat : UIBehaviour
 		}
 		else if (stampFavoriteEdit != null && stampFavoriteEdit.get_gameObject().get_activeSelf())
 		{
-			stampFavoriteEdit.Close(false);
+			stampFavoriteEdit.Close(update: false);
 		}
 		else if (stampAll != null && stampAll.get_gameObject().get_activeSelf())
 		{
 			stampAll.Close();
 		}
-		else
+		else if (GetTopState() != typeof(ChatState_FollowerListView))
 		{
 			HideAll();
 		}
@@ -1842,41 +2089,44 @@ public class MainChat : UIBehaviour
 	{
 		try
 		{
-			if (MonoBehaviourSingleton<ChatManager>.IsValid())
+			if (!MonoBehaviourSingleton<ChatManager>.IsValid())
 			{
-				ChatManager i = MonoBehaviourSingleton<ChatManager>.I;
-				if (!IsNullObject(i))
-				{
-					if (currentChat != 0)
-					{
-						if (currentChat != CHAT_TYPE.ROOM)
-						{
-							return i.loungeChat != null && !i.loungeChat.CanSendMessage();
-						}
-						return i.roomChat != null && !i.roomChat.CanSendMessage();
-					}
-					return i != null && !i.homeChat.CanSendMessage();
-				}
 				return false;
 			}
+			ChatManager i = MonoBehaviourSingleton<ChatManager>.I;
+			if (IsNullObject(i))
+			{
+				return false;
+			}
+			if (currentChat == CHAT_TYPE.HOME)
+			{
+				return i != null && !i.homeChat.CanSendMessage();
+			}
+			if (currentChat == CHAT_TYPE.ROOM)
+			{
+				return i.roomChat != null && !i.roomChat.CanSendMessage();
+			}
+			if (currentChat == CHAT_TYPE.LOUNGE)
+			{
+				return i.loungeChat != null && !i.loungeChat.CanSendMessage();
+			}
+			if (currentChat == CHAT_TYPE.CLAN)
+			{
+				return i.clanChat != null && !i.clanChat.CanSendMessage();
+			}
 			return false;
-			IL_00a8:
-			bool result;
-			return result;
 		}
 		catch (Exception ex)
 		{
 			Log.Error((ex == null) ? "Unhandled exception!!" : ex.Message);
 			return false;
-			IL_00d6:
-			bool result;
-			return result;
 		}
 	}
 
 	private bool IsNullObject(object targetObj)
 	{
 		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Expected O, but got Unknown
 		if (targetObj is Object)
 		{
 			if (targetObj != null)
@@ -1892,11 +2142,11 @@ public class MainChat : UIBehaviour
 		return true;
 	}
 
-	private void UpdateSendBlock()
+	public void UpdateSendBlock()
 	{
 		bool flag = IsNotConnected();
 		bool flag2 = !flag && IsSendLimit();
-		bool flag3 = flag || flag2;
+		bool flag3 = flag || flag2 || UseNoClanBlock || IsDraging;
 		if (flag)
 		{
 			noConnectionView.Open(delegate
@@ -1921,6 +2171,30 @@ public class MainChat : UIBehaviour
 			{
 			});
 		}
+		if (UseNoClanBlock)
+		{
+			sendLimitNoClanView.Open(delegate
+			{
+			});
+		}
+		else
+		{
+			sendLimitNoClanView.Close(delegate
+			{
+			});
+		}
+		if (IsDraging)
+		{
+			sendLimitReloadView.Open(delegate
+			{
+			});
+		}
+		else
+		{
+			sendLimitReloadView.Close(delegate
+			{
+			});
+		}
 		if (flag3)
 		{
 			sendBlockView.Open(delegate
@@ -1935,99 +2209,288 @@ public class MainChat : UIBehaviour
 		}
 	}
 
+	private void GenerateHeaderButton()
+	{
+		if (WidgetTopHeader == null)
+		{
+			return;
+		}
+		Transform transform = WidgetTopHeader.get_transform();
+		for (int i = 0; i < 4; i++)
+		{
+			Transform val = ResourceUtility.Realizes(Resources.Load(HEADER_BUTTON_PREFAB_PATH), transform);
+			ChatHeaderButtonController component = val.GetComponent<ChatHeaderButtonController>();
+			if (!(component == null))
+			{
+				component.Hide();
+				m_headerButtonList.Add(component);
+			}
+		}
+		SetHeaderButtonPosition(IsPortrait);
+	}
+
+	private void SetHeaderButtonPosition(bool _isPortrait)
+	{
+		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+		if (m_headerButtonList != null && m_headerButtonList.Count >= 1)
+		{
+			Vector3[] array = (!_isPortrait) ? HEADER_BUTTON_LANDSCAPE_POS : HEADER_BUTTON_PORTRAIT_POS;
+			int i = 0;
+			for (int count = m_headerButtonList.Count; i < count; i++)
+			{
+				Transform transform = m_headerButtonList[i].get_transform();
+				transform.set_localPosition(array[i]);
+				transform.set_localScale(Vector3.get_one());
+			}
+		}
+	}
+
+	private void InitChatTabState()
+	{
+		int num = -1;
+		int num2 = -1;
+		int num3 = -1;
+		int num4 = -1;
+		int num5 = -1;
+		int num6 = 0;
+		int num7 = 0;
+		int num8 = 0;
+		int num9 = 0;
+		ChatHeaderButtonController.InitParam initParam = new ChatHeaderButtonController.InitParam();
+		initParam.ButtonIndex = num9;
+		initParam.ChatType = CHAT_TYPE.PERSONAL;
+		initParam.OnSelectCallBack = OnSelectPersonalTab;
+		m_headerButtonList[num9].Initialize(initParam);
+		num = num9;
+		num9++;
+		ChatHeaderButtonController.InitParam initParam2 = new ChatHeaderButtonController.InitParam();
+		initParam2.ButtonIndex = num9;
+		initParam2.ChatType = CHAT_TYPE.CLAN;
+		initParam2.OnSelectCallBack = OnSelectClanTab;
+		m_headerButtonList[num9].Initialize(initParam2);
+		num2 = num9;
+		num9++;
+		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.EnableClanChat)
+		{
+			num6 = MonoBehaviourSingleton<ClanMatchingManager>.I.UnreadMessageCount;
+		}
+		if (HomeType == HOME_TYPE.HOME_TOP)
+		{
+			ChatHeaderButtonController.InitParam initParam3 = new ChatHeaderButtonController.InitParam();
+			initParam3.ButtonIndex = num9;
+			initParam3.ChatType = CHAT_TYPE.HOME;
+			initParam3.OnSelectCallBack = OnSelectHomeTab;
+			m_headerButtonList[num9].Initialize(initParam3);
+			num3 = num9;
+			num9++;
+			if (m_PostRequetQueue[0] != null)
+			{
+				num7 = m_PostRequetQueue[0].Count;
+			}
+		}
+		else if (HomeType == HOME_TYPE.LOUNGE_TOP)
+		{
+			ChatHeaderButtonController.InitParam initParam4 = new ChatHeaderButtonController.InitParam();
+			initParam4.ButtonIndex = num9;
+			initParam4.ChatType = CHAT_TYPE.LOUNGE;
+			initParam4.OnSelectCallBack = OnSelectLounge;
+			m_headerButtonList[num9].Initialize(initParam4);
+			num4 = num9;
+			num9++;
+			if (m_PostRequetQueue[2] != null)
+			{
+				num8 = m_PostRequetQueue[2].Count;
+			}
+		}
+		if (hasRoomChat)
+		{
+			ChatHeaderButtonController.InitParam initParam5 = new ChatHeaderButtonController.InitParam();
+			initParam5.ButtonIndex = num9;
+			initParam5.ChatType = ((!isFieldChat) ? CHAT_TYPE.ROOM : CHAT_TYPE.FIELD);
+			initParam5.OnSelectCallBack = OnSelectRoomTab;
+			m_headerButtonList[num9].Initialize(initParam5);
+			num5 = num9;
+			num9++;
+		}
+		for (int i = 0; i < m_headerButtonList.Count; i++)
+		{
+			if (i < num9)
+			{
+				m_headerButtonList[i].Show();
+			}
+			else
+			{
+				m_headerButtonList[i].Hide();
+			}
+		}
+		int index = num9 - 1;
+		if (num5 > 0)
+		{
+			index = num5;
+		}
+		else if (num6 > 0 && num2 > 0)
+		{
+			index = num2;
+		}
+		else if (num7 > 0 && num3 > 0)
+		{
+			index = num3;
+		}
+		else if (num8 > 0 && num4 > 0)
+		{
+			index = num4;
+		}
+		else if (num4 > 0)
+		{
+			index = num4;
+		}
+		else if (num2 > 0 && MonoBehaviourSingleton<ClanMatchingManager>.I.EnableClanChat)
+		{
+			index = num2;
+		}
+		else if (num3 > 0)
+		{
+			index = num3;
+		}
+		m_headerButtonList[index].OnClick();
+		if (m_msgUiCtrl == null)
+		{
+			ChatMessageUserUIController.InitParam initParam6 = new ChatMessageUserUIController.InitParam();
+			initParam6.ItemListParent = PersonalMsgGrid.get_transform();
+			initParam6.ItemVisibleCount = Mathf.FloorToInt(PersonalMsgScrollView.panel.height / PersonalMsgGrid.cellHeight);
+			initParam6.OnClickItem = delegate
+			{
+				PushNextState(typeof(ChatState_PersonalMsgView));
+			};
+			m_msgUiCtrl = new ChatMessageUserUIController(initParam6);
+			EventDelegate eventDelegate = new EventDelegate();
+			eventDelegate.methodName = "OnClickShowUserListButton";
+			eventDelegate.target = this;
+			GetCtrl(UI.BTN_SHOW_USER_LIST).GetComponent<UIButton>().onClick.Add(eventDelegate);
+		}
+	}
+
 	private void OnSelectHomeTab()
 	{
-		SaveSlideOffset();
-		m_DataList[1].rootObject.SetActive(false);
-		m_DataList[0].rootObject.SetActive(true);
-		m_DataList[2].rootObject.SetActive(false);
-		currentChat = CHAT_TYPE.HOME;
-		SetTabState(hasRoomChat, false);
-		SetLabelText((Enum)UI.LBL_CHAT_HOME, StringTable.Get(STRING_CATEGORY.CHAT, 1u));
-		UpdateWindowSize();
+		OnSelectHeaderTab(CHAT_TYPE.HOME);
+		PushNextExclusiveState(typeof(ChatState_HomeTab));
 	}
 
 	private void OnSelectRoomTab()
 	{
-		SaveSlideOffset();
-		m_DataList[1].rootObject.SetActive(true);
-		m_DataList[0].rootObject.SetActive(false);
-		m_DataList[2].rootObject.SetActive(false);
-		currentChat = CHAT_TYPE.ROOM;
-		string text = (!hasLoungeChat) ? StringTable.Get(STRING_CATEGORY.CHAT, 1u) : StringTable.Get(STRING_CATEGORY.CHAT, 7u);
-		SetLabelText((Enum)UI.LBL_CHAT_HOME, text);
-		SetTabState(true, true);
-		UpdateWindowSize();
+		OnSelectHeaderTab((!isFieldChat) ? CHAT_TYPE.ROOM : CHAT_TYPE.FIELD);
+		PushNextExclusiveState((!isFieldChat) ? typeof(ChatState_RoomTab) : typeof(ChatState_FieldTab));
 	}
 
 	private void OnSelectLounge()
 	{
+		OnSelectHeaderTab(CHAT_TYPE.LOUNGE);
+		PushNextExclusiveState(typeof(ChatState_LoungeTab));
+	}
+
+	private void OnSelectClanTab()
+	{
+		if (isFirstSlectClanTab)
+		{
+			m_DataList[5].Reset();
+			MonoBehaviourSingleton<ClanMatchingManager>.I.ChatResetCache();
+			MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetNewMessage(100, string.Empty);
+			isFirstSlectClanTab = false;
+		}
+		OnSelectHeaderTab(CHAT_TYPE.CLAN);
+		PushNextExclusiveState(typeof(ChatState_ClanTab));
+	}
+
+	public void ResetCacheData(CHAT_TYPE chatType)
+	{
+		if (m_PostRequetQueue[(int)chatType] != null)
+		{
+			m_PostRequetQueue[(int)chatType].Clear();
+		}
+		if (m_DataList[(int)chatType] != null)
+		{
+			m_DataList[(int)chatType].Reset();
+		}
+	}
+
+	private void OnSelectPersonalTab()
+	{
+		ResetOtherButtonSettings(CHAT_TYPE.PERSONAL);
+		PushNextExclusiveState(typeof(ChatState_PersonalTab));
+		if (!m_msgUiCtrl.IsConnecting)
+		{
+			PersonalMsgScrollView.ResetPosition();
+			this.StartCoroutine(m_msgUiCtrl.SendRequestMessagingPersonList(this));
+		}
+	}
+
+	private void OnSelectHeaderTab(CHAT_TYPE _t)
+	{
+		ResetOtherButtonSettings(_t);
 		SaveSlideOffset();
-		m_DataList[2].rootObject.SetActive(true);
-		m_DataList[1].rootObject.SetActive(false);
-		m_DataList[0].rootObject.SetActive(false);
-		currentChat = CHAT_TYPE.LOUNGE;
-		SetLabelText((Enum)UI.LBL_CHAT_HOME, StringTable.Get(STRING_CATEGORY.CHAT, 7u));
-		SetTabState(hasRoomChat, false);
+		if (currentChat == _t)
+		{
+			AppMain i = MonoBehaviourSingleton<AppMain>.I;
+			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
+			{
+				ScrollView.SetDragAmount(1f, 1f, updateScrollbars: true);
+			});
+		}
+		currentChat = _t;
+		StateMachine.CurrentState.OnTapHeaderTab(_t);
 		UpdateWindowSize();
 	}
 
-	private void SetTabState(bool roomEnabled, bool roomSelected)
+	private void ResetOtherButtonSettings(CHAT_TYPE _t)
 	{
-		if (roomEnabled && roomSelected)
+		if (m_headerButtonList == null || m_headerButtonList.Count < 1)
 		{
-			BackgroundInFrame.spriteName = TAB_BG_NAME_ROOM;
+			return;
 		}
-		else
+		int i = 0;
+		for (int count = m_headerButtonList.Count; i < count; i++)
 		{
-			BackgroundInFrame.spriteName = TAB_BG_NAME_HOME;
-		}
-		SetHomeTabState(!roomSelected, true);
-		SetRoomTabState(roomSelected, roomEnabled, true);
-	}
-
-	private void SetHomeTabState(bool selected, bool active = true)
-	{
-		if (selected)
-		{
-			homeTabButton.Select();
-		}
-		else if (active)
-		{
-			homeTabButton.Activate();
-		}
-		else
-		{
-			homeTabButton.Deactivate();
-		}
-	}
-
-	private void SetRoomTabState(bool selected, bool visible, bool active = true)
-	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		if (visible)
-		{
-			roomTabButton.Show();
-			if (selected)
+			if (m_headerButtonList[i].MyChatType != _t)
 			{
-				roomTabButton.Select();
-				GetCtrl(UI.SPR_BG_CHAT_ROOM).get_gameObject().SetActive(selected);
-			}
-			else if (active)
-			{
-				roomTabButton.Activate();
-				GetCtrl(UI.SPR_BG_CHAT_ROOM).get_gameObject().SetActive(!selected);
-			}
-			else
-			{
-				roomTabButton.Deactivate();
+				m_headerButtonList[i].UnSelect();
 			}
 		}
-		else
+		bool active = _t == CHAT_TYPE.ROOM || _t == CHAT_TYPE.FIELD;
+		bool flag = _t == CHAT_TYPE.HOME;
+		bool flag2 = _t == CHAT_TYPE.LOUNGE;
+		bool flag3 = _t == CHAT_TYPE.PERSONAL;
+		bool flag4 = _t == CHAT_TYPE.CLAN;
+		for (int j = 0; j < m_DataList.Length; j++)
 		{
-			roomTabButton.Hide();
+			if (m_DataList[j] != null)
+			{
+				if (j == 1 || j == 3)
+				{
+					m_DataList[j].rootObject.SetActive(active);
+				}
+				else
+				{
+					m_DataList[j].rootObject.SetActive(j == (int)_t);
+				}
+			}
 		}
+		SwitchBottomUIActivation(!flag3);
+		if (PersonalMsgGridObj.get_activeSelf() != flag3)
+		{
+			PersonalMsgGridObj.SetActive(flag3);
+		}
+		SubHeaderPanel.get_gameObject().SetActive(flag || flag3);
+		SetActiveChannelSelect(flag);
+		if (ShowUserListButtonObject.get_activeSelf() != flag3)
+		{
+			ShowUserListButtonObject.SetActive(flag3);
+		}
+		SetScrollPanelUI(IsPortrait, _t);
+		SetChatBgFrameUI(_t);
+		bool active2 = (flag && !hasRoomChat) || flag2 || flag4;
+		StampEditButtonObj.SetActive(active2);
+		FavStampEditButtonObj.SetActive(active2);
 	}
 
 	public override void UpdateUI()
@@ -2046,7 +2509,7 @@ public class MainChat : UIBehaviour
 
 	private void ShowChannelSelect()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
 		SetChannelSelectBG();
 		channelSelect.Open(delegate
 		{
@@ -2081,7 +2544,7 @@ public class MainChat : UIBehaviour
 
 	private void OnSelectInputChannelNumber()
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
 		ShowChannelInput();
 	}
 
@@ -2141,7 +2604,7 @@ public class MainChat : UIBehaviour
 
 	private void OnSelectChannel(int channel)
 	{
-		SoundManager.PlaySystemSE(SoundID.UISE.OK, 1f);
+		SoundManager.PlaySystemSE(SoundID.UISE.OK);
 		MonoBehaviourSingleton<ChatManager>.I.SelectChannel(channel);
 		UpdateChannnelName(channel);
 		CloseChannelSelect();
@@ -2149,23 +2612,96 @@ public class MainChat : UIBehaviour
 
 	private void SetChannelSelectBG()
 	{
+		if (SpecialDeviceManager.HasSpecialDeviceInfo)
+		{
+			UIVirtualScreen componentInChildren = this.GetComponentInChildren<UIVirtualScreen>();
+			if (componentInChildren != null)
+			{
+				SpriteBgBlack.width = (int)componentInChildren.ScreenWidthFull;
+				SpriteBgBlack.height = (int)componentInChildren.ScreenHeightFull;
+			}
+		}
 		SetParent(UI.SPR_BG_BLACK, UI.OBJ_CHANNEL_SELECT_BG);
-		GetCtrl(UI.SPR_BG_BLACK).GetComponent<UIWidget>().ParentHasChanged();
+		SpriteBgBlack.ParentHasChanged();
 	}
 
 	private void ResetChannelSelectBG()
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
+		if (SpecialDeviceManager.HasSpecialDeviceInfo)
+		{
+			UIVirtualScreen componentInChildren = this.GetComponentInChildren<UIVirtualScreen>();
+			if (componentInChildren != null)
+			{
+				SpriteBgBlack.width = (int)componentInChildren.ScreenWidthFull;
+				SpriteBgBlack.height = (int)componentInChildren.ScreenHeightFull;
+			}
+		}
 		SetParent(UI.SPR_BG_BLACK, GetCtrl(UI.BTN_OPEN).get_parent());
-		GetCtrl(UI.SPR_BG_BLACK).GetComponent<UIWidget>().ParentHasChanged();
+		SpriteBgBlack.ParentHasChanged();
 	}
 
 	private void OnError(string message)
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, message, StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u), null, null, null), delegate
+		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, message, StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u)), delegate
 		{
-		}, true, 0);
+		}, error: true);
+	}
+
+	public void onStoppedMovingScrollView()
+	{
+	}
+
+	public void onPressStartScrollView()
+	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		Vector2 clipOffset = ScrollView.panel.clipOffset;
+		tmpOffsetStart = clipOffset.y;
+	}
+
+	public void onPressEndScrollView()
+	{
+	}
+
+	public void onDragStartScrollView()
+	{
+		dragTime = Time.get_time();
+		IsDraging = true;
+		UpdateSendBlock();
+	}
+
+	public void onDragEndScrollView()
+	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		IsDraging = false;
+		UpdateSendBlock();
+		Vector2 clipOffset = ScrollView.panel.clipOffset;
+		if (clipOffset.y - tmpOffsetStart < 0f)
+		{
+			if (CurrentData.itemList.Count > 0)
+			{
+				if (CurrentData.itemList.Count > CurrentData.newestIndex && CurrentData.itemList[CurrentData.newestIndex] != null && CurrentData.itemList[CurrentData.newestIndex].get_gameObject().get_activeSelf() && StateMachine.IsRun())
+				{
+					StateMachine.CurrentState.OnDragAtBottom(CurrentData.itemList[CurrentData.newestIndex].chatItemId, Time.get_time() - dragTime);
+				}
+			}
+			else if (StateMachine.IsRun())
+			{
+				StateMachine.CurrentState.OnDragAtBottom(string.Empty, Time.get_time() - dragTime);
+			}
+		}
+		else if (CurrentData.itemList.Count > 0)
+		{
+			if (CurrentData.itemList.Count > CurrentData.oldestItemIndex && CurrentData.itemList[CurrentData.oldestItemIndex] != null && CurrentData.itemList[CurrentData.oldestItemIndex].get_gameObject().get_activeSelf() && StateMachine.IsRun())
+			{
+				StateMachine.CurrentState.OnDragAtTop(CurrentData.itemList[CurrentData.oldestItemIndex].chatItemId, Time.get_time() - dragTime);
+			}
+		}
+		else if (StateMachine.IsRun())
+		{
+			StateMachine.CurrentState.OnDragAtTop(string.Empty, Time.get_time() - dragTime);
+		}
 	}
 
 	private void InitStampList()
@@ -2179,8 +2715,8 @@ public class MainChat : UIBehaviour
 
 	public void UpdateStampList()
 	{
-		int item_num = m_StampIdListCanPost.Count + 10;
-		SetGrid(create_item_func: CreateStampItem, grid_ctrl_enum: UI.GRD_STAMP_LIST, item_prefab_name: null, item_num: item_num, reset: true, item_init_func: InitStampItem);
+		int item_num = m_StampIdListCanPost.Count + 10 + (IsLandScapeFullViewMode ? 2 : 0);
+		SetGrid(UI.GRD_STAMP_LIST, null, item_num, reset: true, CreateStampItem, InitStampItem);
 	}
 
 	public void ResetStampIdList()
@@ -2251,39 +2787,45 @@ public class MainChat : UIBehaviour
 
 	private void InitStampItem(int index, Transform iTransform, bool isRecycle)
 	{
-		if (m_StampIdListCanPost != null)
+		if (m_StampIdListCanPost == null)
 		{
-			int stampId = (index >= 10) ? m_StampIdListCanPost[index - 10] : MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index];
-			ChatStampListItem item = iTransform.GetComponent<ChatStampListItem>();
-			item.Init(stampId);
-			if (!isRecycle)
+			return;
+		}
+		bool flag = false;
+		int stampId;
+		if (index < 10)
+		{
+			stampId = MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index];
+		}
+		else if (IsLandScapeFullViewMode)
+		{
+			if (index < 12)
 			{
-				ChatStampListItem chatStampListItem = item;
-				chatStampListItem.onButton = (Action)Delegate.Combine(chatStampListItem.onButton, (Action)delegate
-				{
-					MonoBehaviourSingleton<UIManager>.I.mainChat.SendStampAsMine(item.StampId);
-				});
+				stampId = 1;
+				flag = true;
+			}
+			else
+			{
+				stampId = m_StampIdListCanPost[index - 12];
 			}
 		}
-	}
-
-	private IEnumerator ChatWindowAnim(Vector3 toPos)
-	{
-		if (!m_IsPlayingChatWindowAnim)
+		else
 		{
-			m_IsPlayingChatWindowAnim = true;
-			SaveSlideOffset();
-			float startTime = Time.get_time();
-			float now = startTime;
-			float endTime = startTime + 0.25f;
-			while (now < endTime)
+			stampId = m_StampIdListCanPost[index - 10];
+		}
+		ChatStampListItem item = iTransform.GetComponent<ChatStampListItem>();
+		item.Init(stampId);
+		if (flag)
+		{
+			item.SetAsDummy();
+		}
+		if (!isRecycle && !flag)
+		{
+			ChatStampListItem chatStampListItem = item;
+			chatStampListItem.onButton = (Action)Delegate.Combine(chatStampListItem.onButton, (Action)delegate
 			{
-				now = Time.get_time();
-				UpdateWindowSize();
-				yield return (object)null;
-			}
-			UpdateWindowSize();
-			m_IsPlayingChatWindowAnim = false;
+				MonoBehaviourSingleton<UIManager>.I.mainChat.SendStampAsMine(item.StampId);
+			});
 		}
 	}
 
@@ -2307,10 +2849,10 @@ public class MainChat : UIBehaviour
 		{
 			DummyDragScroll.height = (int)(CurrentTotalHeight - 20f);
 		}
-		object dragScrollTrans = (object)DragScrollTrans;
+		Transform dragScrollTrans = DragScrollTrans;
 		Vector2 clipOffset = ScrollView.panel.clipOffset;
 		dragScrollTrans.set_localPosition(new Vector3(clipOffset.x, 0f - CurrentTotalHeight, 0f));
-		object dragScrollCollider = (object)DragScrollCollider;
+		BoxCollider dragScrollCollider = DragScrollCollider;
 		Vector4 finalClipRegion = ScrollView.panel.finalClipRegion;
 		float z = finalClipRegion.z;
 		Vector4 finalClipRegion2 = ScrollView.panel.finalClipRegion;
@@ -2321,21 +2863,23 @@ public class MainChat : UIBehaviour
 
 	private void Update()
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+		float deltaTime = Time.get_deltaTime();
 		UpdateObserve();
+		UpdateStateMachine(deltaTime);
 		if (base.state == STATE.OPEN)
 		{
 			if (m_handlPostChatPorcess != null && !m_handlPostChatPorcess.MoveNext())
@@ -2360,7 +2904,7 @@ public class MainChat : UIBehaviour
 				float w2 = finalClipRegion.w;
 				Vector2 clipOffset = ScrollView.panel.clipOffset;
 				float num3 = num2 - (w2 + clipOffset.y);
-				object dragScrollCollider = (object)DragScrollCollider;
+				BoxCollider dragScrollCollider = DragScrollCollider;
 				Vector4 baseClipRegion3 = ScrollView.panel.baseClipRegion;
 				dragScrollCollider.set_center(Vector2.op_Implicit(new Vector2(baseClipRegion3.x, 0f - num3)));
 			}
@@ -2377,10 +2921,6 @@ public class MainChat : UIBehaviour
 
 	private void UpdateWidgetVisibility()
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		UIPanel panel = ScrollView.panel;
 		List<ChatItem> itemList = CurrentData.itemList;
 		int i = 0;
 		for (int count = itemList.Count; i < count; i++)
@@ -2400,14 +2940,12 @@ public class MainChat : UIBehaviour
 
 	private bool IsVisible(ChatItem chatItem)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 localPosition = chatItem.get_transform().get_localPosition();
 		float y = localPosition.y;
 		Vector3 localPosition2 = chatItem.get_transform().get_localPosition();
@@ -2421,7 +2959,7 @@ public class MainChat : UIBehaviour
 	{
 		if ((flag & NOTIFY_FLAG.ARRIVED_MESSAGE) != 0)
 		{
-			SetBadge((Enum)UI.BTN_OPEN, GetPendingQueueNum(), 1, 7, -9, false);
+			SetBadge((Enum)UI.BTN_OPEN, GetPendingQueueNum(), 1, 7, -9, is_scale_normalize: false);
 		}
 	}
 
@@ -2467,11 +3005,15 @@ public class MainChat : UIBehaviour
 
 	protected override void OnDestroy()
 	{
-		if (!AppMain.isApplicationQuit)
+		if (AppMain.isApplicationQuit)
 		{
-			base.OnDestroy();
-			int i = 0;
-			for (int num = m_DataList.Length; i < num; i++)
+			return;
+		}
+		base.OnDestroy();
+		int i = 0;
+		for (int num = m_DataList.Length; i < num; i++)
+		{
+			if (m_DataList[i] != null)
 			{
 				m_DataList[i].Reset();
 			}
@@ -2480,6 +3022,90 @@ public class MainChat : UIBehaviour
 
 	public void SetActiveChannelSelect(bool active)
 	{
-		SetActive((Enum)UI.BTN_SPR_CHANNEL_SELECT, active);
+		if (active != ChannelSelectSpriteButtonObject.get_activeSelf())
+		{
+			ChannelSelectSpriteButtonObject.SetActive(active);
+		}
+	}
+
+	private void InitStateMachine()
+	{
+		m_stateMachine = new ChatStateMachine<ChatState>();
+		StateMachine.Initialize(this);
+		StateMachine.AddListener(OnChangeState);
+		StateMachine.Start(typeof(ChatState_Init));
+	}
+
+	private void UpdateStateMachine(float _deltaTime)
+	{
+		if (StateMachine != null && StateMachine.IsRun())
+		{
+			StateMachine.Update(_deltaTime);
+		}
+	}
+
+	public void ExecCoroutine(IEnumerator _ienumarator)
+	{
+		this.StartCoroutine(_ienumarator);
+	}
+
+	private void OnChangeState(Type currentType, Type prevType)
+	{
+	}
+
+	public Type GetCurrentStateType()
+	{
+		return (StateMachine != null) ? StateMachine.CurrentStateType : null;
+	}
+
+	public Type GetPrevStateType()
+	{
+		return (StateMachine != null) ? StateMachine.PrevStateType : null;
+	}
+
+	public void PushNextState(Type _s)
+	{
+		Type currentStateType = GetCurrentStateType();
+		if (currentStateType == null || currentStateType != _s)
+		{
+			m_stateStack.Push(_s);
+		}
+	}
+
+	public void PushNextExclusiveState(Type _s)
+	{
+		Type currentStateType = GetCurrentStateType();
+		if (currentStateType == null || currentStateType != _s)
+		{
+			if (m_stateStack.Count > 0)
+			{
+				PopState();
+			}
+			PushNextState(_s);
+		}
+	}
+
+	public Type GetTopState()
+	{
+		return (m_stateStack.Count <= 0) ? null : m_stateStack.Peek();
+	}
+
+	public Type PopState()
+	{
+		if (m_stateStack.Count < 1)
+		{
+			return null;
+		}
+		return m_stateStack.Pop();
+	}
+
+	public bool HasState(Type _t)
+	{
+		return m_stateStack.Contains(_t);
+	}
+
+	public void OnClickShowUserListButton()
+	{
+		PushNextState(typeof(ChatState_FollowerListView));
 	}
 }

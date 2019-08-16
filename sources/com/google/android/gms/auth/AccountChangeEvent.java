@@ -2,37 +2,49 @@ package com.google.android.gms.auth;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.zza;
-import com.google.android.gms.common.internal.safeparcel.zzd;
-import com.google.android.gms.common.internal.zzbf;
-import com.google.android.gms.common.internal.zzbp;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Field;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.VersionField;
 
-public class AccountChangeEvent extends zza {
+@Class(creator = "AccountChangeEventCreator")
+public class AccountChangeEvent extends AbstractSafeParcelable {
     public static final Creator<AccountChangeEvent> CREATOR = new zza();
-    private int mVersion;
-    private long zzdxf;
-    private String zzdxg;
-    private int zzdxh;
-    private int zzdxi;
-    private String zzdxj;
+    @VersionField(mo13996id = 1)
+    private final int zze;
+    @Field(mo13990id = 2)
+    private final long zzf;
+    @Field(mo13990id = 3)
+    private final String zzg;
+    @Field(mo13990id = 4)
+    private final int zzh;
+    @Field(mo13990id = 5)
+    private final int zzi;
+    @Field(mo13990id = 6)
+    private final String zzj;
 
-    AccountChangeEvent(int i, long j, String str, int i2, int i3, String str2) {
-        this.mVersion = i;
-        this.zzdxf = j;
-        this.zzdxg = (String) zzbp.zzu(str);
-        this.zzdxh = i2;
-        this.zzdxi = i3;
-        this.zzdxj = str2;
+    @Constructor
+    AccountChangeEvent(@Param(mo13993id = 1) int i, @Param(mo13993id = 2) long j, @Param(mo13993id = 3) String str, @Param(mo13993id = 4) int i2, @Param(mo13993id = 5) int i3, @Param(mo13993id = 6) String str2) {
+        this.zze = i;
+        this.zzf = j;
+        this.zzg = (String) Preconditions.checkNotNull(str);
+        this.zzh = i2;
+        this.zzi = i3;
+        this.zzj = str2;
     }
 
     public AccountChangeEvent(long j, String str, int i, int i2, String str2) {
-        this.mVersion = 1;
-        this.zzdxf = j;
-        this.zzdxg = (String) zzbp.zzu(str);
-        this.zzdxh = i;
-        this.zzdxi = i2;
-        this.zzdxj = str2;
+        this.zze = 1;
+        this.zzf = j;
+        this.zzg = (String) Preconditions.checkNotNull(str);
+        this.zzh = i;
+        this.zzi = i2;
+        this.zzj = str2;
     }
 
     public boolean equals(Object obj) {
@@ -43,32 +55,32 @@ public class AccountChangeEvent extends zza {
             return false;
         }
         AccountChangeEvent accountChangeEvent = (AccountChangeEvent) obj;
-        return this.mVersion == accountChangeEvent.mVersion && this.zzdxf == accountChangeEvent.zzdxf && zzbf.equal(this.zzdxg, accountChangeEvent.zzdxg) && this.zzdxh == accountChangeEvent.zzdxh && this.zzdxi == accountChangeEvent.zzdxi && zzbf.equal(this.zzdxj, accountChangeEvent.zzdxj);
+        return this.zze == accountChangeEvent.zze && this.zzf == accountChangeEvent.zzf && Objects.equal(this.zzg, accountChangeEvent.zzg) && this.zzh == accountChangeEvent.zzh && this.zzi == accountChangeEvent.zzi && Objects.equal(this.zzj, accountChangeEvent.zzj);
     }
 
     public String getAccountName() {
-        return this.zzdxg;
+        return this.zzg;
     }
 
     public String getChangeData() {
-        return this.zzdxj;
+        return this.zzj;
     }
 
     public int getChangeType() {
-        return this.zzdxh;
+        return this.zzh;
     }
 
     public int getEventIndex() {
-        return this.zzdxi;
+        return this.zzi;
     }
 
     public int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.mVersion), Long.valueOf(this.zzdxf), this.zzdxg, Integer.valueOf(this.zzdxh), Integer.valueOf(this.zzdxi), this.zzdxj});
+        return Objects.hashCode(Integer.valueOf(this.zze), Long.valueOf(this.zzf), this.zzg, Integer.valueOf(this.zzh), Integer.valueOf(this.zzi), this.zzj);
     }
 
     public String toString() {
         String str = "UNKNOWN";
-        switch (this.zzdxh) {
+        switch (this.zzh) {
             case 1:
                 str = "ADDED";
                 break;
@@ -82,19 +94,19 @@ public class AccountChangeEvent extends zza {
                 str = "RENAMED_TO";
                 break;
         }
-        String str2 = this.zzdxg;
-        String str3 = this.zzdxj;
-        return new StringBuilder(((String.valueOf(str2).length() + 91) + String.valueOf(str).length()) + String.valueOf(str3).length()).append("AccountChangeEvent {accountName = ").append(str2).append(", changeType = ").append(str).append(", changeData = ").append(str3).append(", eventIndex = ").append(this.zzdxi).append("}").toString();
+        String str2 = this.zzg;
+        String str3 = this.zzj;
+        return new StringBuilder(String.valueOf(str2).length() + 91 + String.valueOf(str).length() + String.valueOf(str3).length()).append("AccountChangeEvent {accountName = ").append(str2).append(", changeType = ").append(str).append(", changeData = ").append(str3).append(", eventIndex = ").append(this.zzi).append("}").toString();
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzd.zze(parcel);
-        zzd.zzc(parcel, 1, this.mVersion);
-        zzd.zza(parcel, 2, this.zzdxf);
-        zzd.zza(parcel, 3, this.zzdxg, false);
-        zzd.zzc(parcel, 4, this.zzdxh);
-        zzd.zzc(parcel, 5, this.zzdxi);
-        zzd.zza(parcel, 6, this.zzdxj, false);
-        zzd.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zze);
+        SafeParcelWriter.writeLong(parcel, 2, this.zzf);
+        SafeParcelWriter.writeString(parcel, 3, this.zzg, false);
+        SafeParcelWriter.writeInt(parcel, 4, this.zzh);
+        SafeParcelWriter.writeInt(parcel, 5, this.zzi);
+        SafeParcelWriter.writeString(parcel, 6, this.zzj, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

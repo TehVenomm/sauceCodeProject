@@ -7,7 +7,9 @@ public class AttackContinuationInfo : AttackInfo
 	public enum CONTINUATION_TYPE
 	{
 		NONE,
-		INHALE
+		INHALE,
+		BARRIER,
+		SPEAR_BURST
 	}
 
 	[Serializable]
@@ -17,10 +19,26 @@ public class AttackContinuationInfo : AttackInfo
 		public float speed;
 	}
 
+	[Serializable]
+	public class Barrier
+	{
+	}
+
+	[Serializable]
+	public class ByContinuationType
+	{
+		public Barrier barrier = new Barrier();
+	}
+
 	[Tooltip("効果タイプ")]
 	public CONTINUATION_TYPE type;
 
+	[Tooltip("座標固定化設定を無効化するか")]
+	public bool disableUpdateFixTrans;
+
 	public Inhale inhale = new Inhale();
+
+	public ByContinuationType infoByContinuationType = new ByContinuationType();
 
 	public override AttackInfo GetRateAttackInfo(AttackInfo rate_info, float rate)
 	{
@@ -35,6 +53,7 @@ public class AttackContinuationInfo : AttackInfo
 			return attackContinuationInfo;
 		}
 		attackContinuationInfo.type = type;
+		attackContinuationInfo.disableUpdateFixTrans = disableUpdateFixTrans;
 		if (attackContinuationInfo.type != attackContinuationInfo2.type)
 		{
 			return attackContinuationInfo;
@@ -55,6 +74,7 @@ public class AttackContinuationInfo : AttackInfo
 		if (attackContinuationInfo != null)
 		{
 			attackContinuationInfo.type = type;
+			attackContinuationInfo.disableUpdateFixTrans = disableUpdateFixTrans;
 			attackContinuationInfo.inhale.speed = inhale.speed;
 		}
 	}

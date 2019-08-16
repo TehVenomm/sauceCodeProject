@@ -1,11 +1,10 @@
 using System;
+using System.Runtime.CompilerServices;
 
 public class HomeThemeTable : Singleton<HomeThemeTable>, IDataTable
 {
 	public class HomeThemeData
 	{
-		public const string NT = "id,name,sceneName,npc0MdlID,npc1MdlID,npc2MdlID,npc6MdlID,bgmID,startAt,endAt";
-
 		public int id;
 
 		public string name;
@@ -22,9 +21,13 @@ public class HomeThemeTable : Singleton<HomeThemeTable>, IDataTable
 
 		public int bgmId = -1;
 
+		public int stumblePercent;
+
 		public DateTime startAt;
 
 		public DateTime endAt;
+
+		public const string NT = "id,name,sceneName,npc0MdlID,npc1MdlID,npc2MdlID,npc6MdlID,bgmID,stumblePercent,startAt,endAt";
 
 		public static bool cb(CSVReader csv_reader, HomeThemeData data, ref uint key)
 		{
@@ -36,6 +39,7 @@ public class HomeThemeTable : Singleton<HomeThemeTable>, IDataTable
 			csv_reader.Pop(ref data.npc2MdlID);
 			csv_reader.Pop(ref data.npc6MdlID);
 			csv_reader.Pop(ref data.bgmId);
+			csv_reader.Pop(ref data.stumblePercent);
 			string value = string.Empty;
 			csv_reader.Pop(ref value);
 			if (!string.IsNullOrEmpty(value))
@@ -56,11 +60,14 @@ public class HomeThemeTable : Singleton<HomeThemeTable>, IDataTable
 
 	private string currentHomeTheme;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<HomeThemeData> _003C_003Ef__mg_0024cache0;
+
 	public string CurrentHomeTheme => currentHomeTheme;
 
 	public void CreateTable(string csv_text)
 	{
-		homeThemeDataTable = TableUtility.CreateUIntKeyTable<HomeThemeData>(csv_text, HomeThemeData.cb, "id,name,sceneName,npc0MdlID,npc1MdlID,npc2MdlID,npc6MdlID,bgmID,startAt,endAt", null);
+		homeThemeDataTable = TableUtility.CreateUIntKeyTable<HomeThemeData>(csv_text, HomeThemeData.cb, "id,name,sceneName,npc0MdlID,npc1MdlID,npc2MdlID,npc6MdlID,bgmID,stumblePercent,startAt,endAt");
 		homeThemeDataTable.TrimExcess();
 	}
 

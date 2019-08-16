@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UI2DSpriteAnimation
+public class UI2DSpriteAnimation : MonoBehaviour
 {
 	[SerializeField]
 	protected int framerate = 20;
@@ -40,19 +40,20 @@ public class UI2DSpriteAnimation
 
 	public void Play()
 	{
-		if (frames != null && frames.Length > 0)
+		if (frames == null || frames.Length <= 0)
 		{
-			if (!this.get_enabled() && !loop)
-			{
-				int num = (framerate <= 0) ? (mIndex - 1) : (mIndex + 1);
-				if (num < 0 || num >= frames.Length)
-				{
-					mIndex = ((framerate < 0) ? (frames.Length - 1) : 0);
-				}
-			}
-			this.set_enabled(true);
-			UpdateSprite();
+			return;
 		}
+		if (!this.get_enabled() && !loop)
+		{
+			int num = (framerate <= 0) ? (mIndex - 1) : (mIndex + 1);
+			if (num < 0 || num >= frames.Length)
+			{
+				mIndex = ((framerate < 0) ? (frames.Length - 1) : 0);
+			}
+		}
+		this.set_enabled(true);
+		UpdateSprite();
 	}
 
 	public void Pause()
@@ -77,8 +78,12 @@ public class UI2DSpriteAnimation
 		{
 			this.set_enabled(false);
 		}
-		else if (framerate != 0)
+		else
 		{
+			if (framerate == 0)
+			{
+				return;
+			}
 			float num = (!ignoreTimeScale) ? Time.get_time() : RealTime.time;
 			if (mUpdate < num)
 			{
@@ -87,12 +92,10 @@ public class UI2DSpriteAnimation
 				if (!loop && (num2 < 0 || num2 >= frames.Length))
 				{
 					this.set_enabled(false);
+					return;
 				}
-				else
-				{
-					mIndex = NGUIMath.RepeatIndex(num2, frames.Length);
-					UpdateSprite();
-				}
+				mIndex = NGUIMath.RepeatIndex(num2, frames.Length);
+				UpdateSprite();
 			}
 		}
 	}

@@ -1,5 +1,6 @@
-package io.fabric.sdk.android.services.common;
+package p017io.fabric.sdk.android.services.common;
 
+/* renamed from: io.fabric.sdk.android.services.common.DeliveryMechanism */
 public enum DeliveryMechanism {
     DEVELOPER(1),
     USER_SIDELOAD(2),
@@ -7,10 +8,12 @@ public enum DeliveryMechanism {
     APP_STORE(4);
     
     public static final String BETA_APP_PACKAGE_NAME = "io.crash.air";
-    private final int id;
+
+    /* renamed from: id */
+    private final int f1200id;
 
     private DeliveryMechanism(int i) {
-        this.id = i;
+        this.f1200id = i;
     }
 
     public static DeliveryMechanism determineFrom(String str) {
@@ -18,10 +21,10 @@ public enum DeliveryMechanism {
     }
 
     public int getId() {
-        return this.id;
+        return this.f1200id;
     }
 
     public String toString() {
-        return Integer.toString(this.id);
+        return Integer.toString(this.f1200id);
     }
 }

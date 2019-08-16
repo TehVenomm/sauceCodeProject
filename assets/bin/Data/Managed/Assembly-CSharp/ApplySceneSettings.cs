@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ApplySceneSettings
+public class ApplySceneSettings : MonoBehaviour
 {
 	public bool applyFogParams = true;
 

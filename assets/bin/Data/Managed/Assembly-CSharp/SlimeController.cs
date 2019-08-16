@@ -1,15 +1,7 @@
 using UnityEngine;
 
-public class SlimeController
+public class SlimeController : MonoBehaviour
 {
-	private const float MOVE_V = 0.15f;
-
-	private const float RAND_VR = 0.1f;
-
-	private const float RAND_V = 5f;
-
-	private const float RAND_W = 100f;
-
 	[Tooltip("FadeInアニメ\u30fcション再生時間(秒)")]
 	public float fadeInAnimTime = 0.3f;
 
@@ -81,6 +73,14 @@ public class SlimeController
 
 	private bool isSlimeStart;
 
+	private const float MOVE_V = 0.15f;
+
+	private const float RAND_VR = 0.1f;
+
+	private const float RAND_V = 5f;
+
+	private const float RAND_W = 100f;
+
 	public float updateAnimTime
 	{
 		get;
@@ -104,10 +104,8 @@ public class SlimeController
 
 	private void Start()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		Color color = meshRenderer.get_material().get_color();
 		color.a = 0f;
@@ -126,35 +124,34 @@ public class SlimeController
 		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		if (subdivionsHeight > 0 && subdivionsWidth > 0)
+		if (subdivionsHeight <= 0 || subdivionsWidth <= 0)
 		{
-			if (isMeshUpdate)
-			{
-				if (targetVector.y < 0.5f * parametricPlane._height)
-				{
-					isDrag = false;
-					targetVector = Vector3.get_zero();
-				}
-				else
-				{
-					isDrag = true;
-				}
-				SmoothingFilter();
-				int i = 0;
-				for (int num = nowVectors.Length; i < num; i++)
-				{
-					vertWork[i] = nowVectors[i];
-				}
-				meshFilter.get_mesh().set_vertices(vertWork);
-			}
-			TouchSlimeUpdateAnim();
+			return;
 		}
+		if (isMeshUpdate)
+		{
+			if (targetVector.y < 0.5f * parametricPlane._height)
+			{
+				isDrag = false;
+				targetVector = Vector3.get_zero();
+			}
+			else
+			{
+				isDrag = true;
+			}
+			SmoothingFilter();
+			int i = 0;
+			for (int num = nowVectors.Length; i < num; i++)
+			{
+				vertWork[i] = nowVectors[i];
+			}
+			meshFilter.get_mesh().set_vertices(vertWork);
+		}
+		TouchSlimeUpdateAnim();
 	}
 
 	private void Initialize()
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
@@ -213,7 +210,6 @@ public class SlimeController
 		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 		float num = targetVector.x - dragPos.x;
@@ -287,20 +283,18 @@ public class SlimeController
 
 	private void TouchStartSlimeAnim()
 	{
-		slimeAnim.TouchOn(null, null, null);
+		slimeAnim.TouchOn();
 	}
 
 	private void TouchEndSlimeAnim()
 	{
 		if (isDrag)
 		{
-			slimeAnim.TouchOff(null, null, null);
+			slimeAnim.TouchOff();
+			return;
 		}
-		else
-		{
-			CrushPolygon();
-			slimeAnim.Crush(null, null, null);
-		}
+		CrushPolygon();
+		slimeAnim.Crush();
 	}
 
 	private void TouchSlimeUpdateAnim()
@@ -405,7 +399,6 @@ public class SlimeController
 
 	private void ButtonPolygon(float rate)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		//IL_005b: Unknown result type (might be due to invalid IL or missing references)

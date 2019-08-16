@@ -35,13 +35,13 @@ public class PropertyBasedObjectIdGenerator extends PropertyGenerator {
             return this._property.get(obj);
         } catch (RuntimeException e) {
             throw e;
-        } catch (Throwable e2) {
+        } catch (Exception e2) {
             throw new IllegalStateException("Problem accessing property '" + this._property.getName() + "': " + e2.getMessage(), e2);
         }
     }
 
     public ObjectIdGenerator<Object> forScope(Class<?> cls) {
-        return cls == this._scope ? this : new PropertyBasedObjectIdGenerator((Class) cls, this._property);
+        return cls == this._scope ? this : new PropertyBasedObjectIdGenerator(cls, this._property);
     }
 
     public ObjectIdGenerator<Object> newForSerialization(Object obj) {

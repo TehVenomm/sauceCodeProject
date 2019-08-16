@@ -9,8 +9,9 @@ import com.facebook.FacebookDialog;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.LoggingBehavior;
+import java.util.Iterator;
 import java.util.List;
-import jp.colopl.drapro.LocalNotificationAlarmReceiver;
+import p018jp.colopl.drapro.LocalNotificationAlarmReceiver;
 
 public abstract class FacebookDialogBase<CONTENT, RESULT> implements FacebookDialog<CONTENT, RESULT> {
     protected static final Object BASE_AUTOMATIC_MODE = new Object();
@@ -33,19 +34,19 @@ public abstract class FacebookDialogBase<CONTENT, RESULT> implements FacebookDia
         }
     }
 
-    protected FacebookDialogBase(Activity activity, int i) {
-        Validate.notNull(activity, LocalNotificationAlarmReceiver.EXTRA_ACTIVITY);
-        this.activity = activity;
+    protected FacebookDialogBase(Activity activity2, int i) {
+        Validate.notNull(activity2, LocalNotificationAlarmReceiver.EXTRA_ACTIVITY);
+        this.activity = activity2;
         this.fragmentWrapper = null;
         this.requestCode = i;
     }
 
-    protected FacebookDialogBase(FragmentWrapper fragmentWrapper, int i) {
-        Validate.notNull(fragmentWrapper, "fragmentWrapper");
-        this.fragmentWrapper = fragmentWrapper;
+    protected FacebookDialogBase(FragmentWrapper fragmentWrapper2, int i) {
+        Validate.notNull(fragmentWrapper2, "fragmentWrapper");
+        this.fragmentWrapper = fragmentWrapper2;
         this.activity = null;
         this.requestCode = i;
-        if (fragmentWrapper.getActivity() == null) {
+        if (fragmentWrapper2.getActivity() == null) {
             throw new IllegalArgumentException("Cannot use a fragment that is not attached to an activity");
         }
     }
@@ -58,33 +59,39 @@ public abstract class FacebookDialogBase<CONTENT, RESULT> implements FacebookDia
     }
 
     private AppCall createAppCallForMode(CONTENT content, Object obj) {
-        AppCall createAppCall;
+        AppCall appCall;
         boolean z = obj == BASE_AUTOMATIC_MODE;
-        for (ModeHandler modeHandler : cachedModeHandlers()) {
+        Iterator it = cachedModeHandlers().iterator();
+        while (true) {
+            if (!it.hasNext()) {
+                appCall = null;
+                break;
+            }
+            ModeHandler modeHandler = (ModeHandler) it.next();
             if ((z || Utility.areObjectsEqual(modeHandler.getMode(), obj)) && modeHandler.canShow(content, true)) {
                 try {
-                    createAppCall = modeHandler.createAppCall(content);
+                    appCall = modeHandler.createAppCall(content);
                     break;
                 } catch (FacebookException e) {
-                    createAppCall = createBaseAppCall();
-                    DialogPresenter.setupAppCallForValidationError(createAppCall, e);
+                    appCall = createBaseAppCall();
+                    DialogPresenter.setupAppCallForValidationError(appCall, e);
                 }
             }
         }
-        createAppCall = null;
-        if (createAppCall != null) {
-            return createAppCall;
+        if (appCall != null) {
+            return appCall;
         }
-        createAppCall = createBaseAppCall();
-        DialogPresenter.setupAppCallForCannotShowError(createAppCall);
-        return createAppCall;
+        AppCall createBaseAppCall = createBaseAppCall();
+        DialogPresenter.setupAppCallForCannotShowError(createBaseAppCall);
+        return createBaseAppCall;
     }
 
     public boolean canShow(CONTENT content) {
         return canShowImpl(content, BASE_AUTOMATIC_MODE);
     }
 
-    protected boolean canShowImpl(CONTENT content, Object obj) {
+    /* access modifiers changed from: protected */
+    public boolean canShowImpl(CONTENT content, Object obj) {
         boolean z = obj == BASE_AUTOMATIC_MODE;
         for (ModeHandler modeHandler : cachedModeHandlers()) {
             if ((z || Utility.areObjectsEqual(modeHandler.getMode(), obj)) && modeHandler.canShow(content, false)) {
@@ -94,24 +101,32 @@ public abstract class FacebookDialogBase<CONTENT, RESULT> implements FacebookDia
         return false;
     }
 
-    protected abstract AppCall createBaseAppCall();
+    /* access modifiers changed from: protected */
+    public abstract AppCall createBaseAppCall();
 
-    protected Activity getActivityContext() {
-        return this.activity != null ? this.activity : this.fragmentWrapper != null ? this.fragmentWrapper.getActivity() : null;
+    /* access modifiers changed from: protected */
+    public Activity getActivityContext() {
+        if (this.activity != null) {
+            return this.activity;
+        }
+        if (this.fragmentWrapper != null) {
+            return this.fragmentWrapper.getActivity();
+        }
+        return null;
     }
 
-    protected abstract List<ModeHandler> getOrderedModeHandlers();
+    /* access modifiers changed from: protected */
+    public abstract List<ModeHandler> getOrderedModeHandlers();
 
     public int getRequestCode() {
         return this.requestCode;
     }
 
     public final void registerCallback(CallbackManager callbackManager, FacebookCallback<RESULT> facebookCallback) {
-        if (callbackManager instanceof CallbackManagerImpl) {
-            registerCallbackImpl((CallbackManagerImpl) callbackManager, facebookCallback);
-            return;
+        if (!(callbackManager instanceof CallbackManagerImpl)) {
+            throw new FacebookException("Unexpected CallbackManager, please use the provided Factory.");
         }
-        throw new FacebookException("Unexpected CallbackManager, please use the provided Factory.");
+        registerCallbackImpl((CallbackManagerImpl) callbackManager, facebookCallback);
     }
 
     public final void registerCallback(CallbackManager callbackManager, FacebookCallback<RESULT> facebookCallback, int i) {
@@ -119,9 +134,11 @@ public abstract class FacebookDialogBase<CONTENT, RESULT> implements FacebookDia
         registerCallback(callbackManager, facebookCallback);
     }
 
-    protected abstract void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, FacebookCallback<RESULT> facebookCallback);
+    /* access modifiers changed from: protected */
+    public abstract void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, FacebookCallback<RESULT> facebookCallback);
 
-    protected void setRequestCode(int i) {
+    /* access modifiers changed from: protected */
+    public void setRequestCode(int i) {
         if (FacebookSdk.isFacebookRequestCode(i)) {
             throw new IllegalArgumentException("Request code " + i + " cannot be within the range reserved by the Facebook SDK.");
         }
@@ -132,7 +149,8 @@ public abstract class FacebookDialogBase<CONTENT, RESULT> implements FacebookDia
         showImpl(content, BASE_AUTOMATIC_MODE);
     }
 
-    protected void showImpl(CONTENT content, Object obj) {
+    /* access modifiers changed from: protected */
+    public void showImpl(CONTENT content, Object obj) {
         AppCall createAppCallForMode = createAppCallForMode(content, obj);
         if (createAppCallForMode == null) {
             Log.e(TAG, "No code path should ever result in a null appCall");
@@ -146,7 +164,8 @@ public abstract class FacebookDialogBase<CONTENT, RESULT> implements FacebookDia
         }
     }
 
-    protected void startActivityForResult(Intent intent, int i) {
+    /* access modifiers changed from: protected */
+    public void startActivityForResult(Intent intent, int i) {
         String str = null;
         if (this.activity != null) {
             this.activity.startActivityForResult(intent, i);

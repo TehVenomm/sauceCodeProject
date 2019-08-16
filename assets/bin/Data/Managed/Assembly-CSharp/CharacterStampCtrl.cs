@@ -1,7 +1,7 @@
 using rhyme;
 using UnityEngine;
 
-public class CharacterStampCtrl
+public class CharacterStampCtrl : MonoBehaviour
 {
 	private bool isPlayer;
 
@@ -46,9 +46,6 @@ public class CharacterStampCtrl
 
 	public void Init(StageObject.StampInfo[] stamp_nodes, Character _owner, bool is_direction = false)
 	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		stampInfos = stamp_nodes;
 		isDirection = is_direction;
 		_transform = this.get_transform();
@@ -63,27 +60,29 @@ public class CharacterStampCtrl
 	{
 		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		if ((isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0) && (isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 1 || !FieldManager.IsValidInGameNoQuest() || !isPlayer || isSelf))
+		if ((!isDirection && MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 0) || (!isDirection && MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 1 && FieldManager.IsValidInGameNoQuest() && isPlayer && !isSelf))
 		{
-			bool flag = false;
-			if (isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType >= 2)
+			return;
+		}
+		bool flag = false;
+		if (isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType >= 2)
+		{
+			flag = true;
+		}
+		if (stampNodes == null || stampNodes.Length <= 0 || stampInfos == null || stampInfos.Length <= 0 || (!flag && !CheckDistance()))
+		{
+			return;
+		}
+		Vector3 position = _transform.get_position();
+		float y = position.y;
+		int i = 0;
+		for (int num = stampNodes.Length; i < num; i++)
+		{
+			StampNode stampNode = stampNodes[i];
+			if (stampNode.UpdateStamp(y) && enableAutoStampEffect)
 			{
-				flag = true;
-			}
-			if (stampNodes != null && stampNodes.Length > 0 && stampInfos != null && stampInfos.Length > 0 && (flag || CheckDistance()))
-			{
-				Vector3 position = _transform.get_position();
-				float y = position.y;
-				int i = 0;
-				for (int num = stampNodes.Length; i < num; i++)
-				{
-					StampNode stampNode = stampNodes[i];
-					if (stampNode.UpdateStamp(y) && enableAutoStampEffect)
-					{
-						StageObject.StampInfo stamp_info = (!(owner != null)) ? stampInfos[0] : ((owner.actionID != Character.ACTION_ID.ATTACK || stampInfos.Length < 2) ? stampInfos[0] : stampInfos[1]);
-						PlayStampEffect(stamp_info, stampNode);
-					}
-				}
+				StageObject.StampInfo stamp_info = (!(owner != null)) ? stampInfos[0] : ((owner.actionID != Character.ACTION_ID.ATTACK || stampInfos.Length < 2) ? stampInfos[0] : stampInfos[1]);
+				PlayStampEffect(stamp_info, stampNode);
 			}
 		}
 	}
@@ -159,8 +158,7 @@ public class CharacterStampCtrl
 		{
 			EffectManager.OneShot(effectName, position, _transform.get_rotation(), _transform.get_localScale() * stamp_info.effectScale, isSelf, delegate(Transform effect)
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				SceneSettingsManager.ApplyEffect(effect.get_gameObject().GetComponent<rymFX>(), true);
+				SceneSettingsManager.ApplyEffect(effect.get_gameObject().GetComponent<rymFX>(), force: true);
 				if (effectLayer != -1)
 				{
 					Utility.SetLayerWithChildren(effect, effectLayer);

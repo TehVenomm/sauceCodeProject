@@ -36,20 +36,21 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 		sellData = (from x in (IEnumerable<AbilityItemSortData>)source
 		select (x)).ToList();
 		base.isRareConfirm = false;
-		sellData.ForEach(delegate(SortCompareData sort_data)
+		int i = 0;
+		for (int count = sellData.Count; i < count; i++)
 		{
-			if (!base.isRareConfirm && GameDefine.IsRare(sort_data.GetRarity()))
+			if (!base.isRareConfirm && sellData[i] != null && GameDefine.IsRequiredAlertByRarity(sellData[i].GetRarity()))
 			{
 				base.isRareConfirm = true;
 			}
-		});
+		}
 		base.Initialize();
 	}
 
 	protected override void DrawIcon()
 	{
 		base.DrawIcon();
-		SetActive((Enum)UI.STR_NON_REWARD, true);
+		SetActive((Enum)UI.STR_NON_REWARD, is_visible: true);
 	}
 
 	private void OnQuery_NO()
@@ -101,7 +102,7 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<ItemExchangeManager>.I.SendInventorySellAbilityItem(uniqs, delegate(bool is_success)
 		{
-			GameSection.ResumeEvent(is_success, null);
+			GameSection.ResumeEvent(is_success);
 		});
 	}
 

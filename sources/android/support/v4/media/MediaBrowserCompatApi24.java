@@ -1,6 +1,5 @@
-package android.support.v4.media;
+package android.support.p000v4.media;
 
-import android.annotation.TargetApi;
 import android.media.browse.MediaBrowser;
 import android.media.browse.MediaBrowser.MediaItem;
 import android.os.Bundle;
@@ -8,16 +7,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import java.util.List;
 
-@TargetApi(24)
 @RequiresApi(24)
+/* renamed from: android.support.v4.media.MediaBrowserCompatApi24 */
 class MediaBrowserCompatApi24 {
 
+    /* renamed from: android.support.v4.media.MediaBrowserCompatApi24$SubscriptionCallback */
     interface SubscriptionCallback extends SubscriptionCallback {
         void onChildrenLoaded(@NonNull String str, List<?> list, @NonNull Bundle bundle);
 
         void onError(@NonNull String str, @NonNull Bundle bundle);
     }
 
+    /* renamed from: android.support.v4.media.MediaBrowserCompatApi24$SubscriptionCallbackProxy */
     static class SubscriptionCallbackProxy<T extends SubscriptionCallback> extends SubscriptionCallbackProxy<T> {
         public SubscriptionCallbackProxy(T t) {
             super(t);

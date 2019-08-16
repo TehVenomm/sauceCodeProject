@@ -11,8 +11,8 @@ public class AmazonAppstore extends DefaultAppstore {
     private final Context context;
     private AmazonAppstoreBillingService mBillingService;
 
-    public AmazonAppstore(Context context) {
-        this.context = context;
+    public AmazonAppstore(Context context2) {
+        this.context = context2;
     }
 
     public static boolean hasAmazonClasses() {
@@ -22,7 +22,8 @@ public class AmazonAppstore extends DefaultAppstore {
                 AmazonAppstore.class.getClassLoader().loadClass("com.amazon.android.Kiwi");
                 z = true;
             } catch (Throwable th) {
-                Class cls = AmazonAppstore.class;
+                Class<AmazonAppstore> cls = AmazonAppstore.class;
+                throw th;
             }
         }
         return z;

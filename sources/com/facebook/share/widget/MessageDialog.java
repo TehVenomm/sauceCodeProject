@@ -2,8 +2,11 @@ package com.facebook.share.widget;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import com.facebook.FacebookCallback;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.internal.AnalyticsEvents;
 import com.facebook.internal.AppCall;
 import com.facebook.internal.CallbackManagerImpl;
 import com.facebook.internal.CallbackManagerImpl.RequestCodeOffset;
@@ -17,14 +20,13 @@ import com.facebook.share.Sharer.Result;
 import com.facebook.share.internal.LegacyNativeDialogParameters;
 import com.facebook.share.internal.MessageDialogFeature;
 import com.facebook.share.internal.NativeDialogParameters;
-import com.facebook.share.internal.OpenGraphMessageDialogFeature;
 import com.facebook.share.internal.ShareContentValidation;
 import com.facebook.share.internal.ShareInternalUtility;
 import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.model.ShareOpenGraphContent;
-import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.model.ShareVideoContent;
+import com.facebook.share.model.ShareMessengerGenericTemplateContent;
+import com.facebook.share.model.ShareMessengerMediaTemplateContent;
+import com.facebook.share.model.ShareMessengerOpenGraphMusicTemplateContent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +47,7 @@ public final class MessageDialog extends FacebookDialogBase<ShareContent, Result
             ShareContentValidation.validateForMessage(shareContent);
             final AppCall createBaseAppCall = MessageDialog.this.createBaseAppCall();
             final boolean shouldFailOnDataError = MessageDialog.this.getShouldFailOnDataError();
-            MessageDialog.this.getActivityContext();
+            MessageDialog.logDialogShare(MessageDialog.this.getActivityContext(), shareContent, createBaseAppCall);
             DialogPresenter.setupAppCallForNativeDialog(createBaseAppCall, new ParameterProvider() {
                 public Bundle getLegacyParameters() {
                     return LegacyNativeDialogParameters.create(createBaseAppCall.getCallId(), shareContent, shouldFailOnDataError);
@@ -79,11 +81,11 @@ public final class MessageDialog extends FacebookDialogBase<ShareContent, Result
         this(new FragmentWrapper(fragment), i);
     }
 
-    public MessageDialog(android.support.v4.app.Fragment fragment) {
+    public MessageDialog(android.support.p000v4.app.Fragment fragment) {
         this(new FragmentWrapper(fragment));
     }
 
-    MessageDialog(android.support.v4.app.Fragment fragment, int i) {
+    MessageDialog(android.support.p000v4.app.Fragment fragment, int i) {
         this(new FragmentWrapper(fragment), i);
     }
 
@@ -104,8 +106,33 @@ public final class MessageDialog extends FacebookDialogBase<ShareContent, Result
         return feature != null && DialogPresenter.canPresentNativeDialogWithFeature(feature);
     }
 
-    private static DialogFeature getFeature(Class<? extends ShareContent> cls) {
-        return ShareLinkContent.class.isAssignableFrom(cls) ? MessageDialogFeature.MESSAGE_DIALOG : SharePhotoContent.class.isAssignableFrom(cls) ? MessageDialogFeature.PHOTOS : ShareVideoContent.class.isAssignableFrom(cls) ? MessageDialogFeature.VIDEO : ShareOpenGraphContent.class.isAssignableFrom(cls) ? OpenGraphMessageDialogFeature.OG_MESSAGE_DIALOG : null;
+    /* access modifiers changed from: private */
+    public static DialogFeature getFeature(Class<? extends ShareContent> cls) {
+        if (ShareLinkContent.class.isAssignableFrom(cls)) {
+            return MessageDialogFeature.MESSAGE_DIALOG;
+        }
+        if (ShareMessengerGenericTemplateContent.class.isAssignableFrom(cls)) {
+            return MessageDialogFeature.MESSENGER_GENERIC_TEMPLATE;
+        }
+        if (ShareMessengerOpenGraphMusicTemplateContent.class.isAssignableFrom(cls)) {
+            return MessageDialogFeature.MESSENGER_OPEN_GRAPH_MUSIC_TEMPLATE;
+        }
+        if (ShareMessengerMediaTemplateContent.class.isAssignableFrom(cls)) {
+            return MessageDialogFeature.MESSENGER_MEDIA_TEMPLATE;
+        }
+        return null;
+    }
+
+    /* access modifiers changed from: private */
+    public static void logDialogShare(Context context, ShareContent shareContent, AppCall appCall) {
+        DialogFeature feature = getFeature(shareContent.getClass());
+        String str = feature == MessageDialogFeature.MESSAGE_DIALOG ? "status" : feature == MessageDialogFeature.MESSENGER_GENERIC_TEMPLATE ? AnalyticsEvents.PARAMETER_SHARE_MESSENGER_GENERIC_TEMPLATE : feature == MessageDialogFeature.MESSENGER_MEDIA_TEMPLATE ? AnalyticsEvents.PARAMETER_SHARE_MESSENGER_MEDIA_TEMPLATE : feature == MessageDialogFeature.MESSENGER_OPEN_GRAPH_MUSIC_TEMPLATE ? AnalyticsEvents.PARAMETER_SHARE_MESSENGER_OPEN_GRAPH_MUSIC_TEMPLATE : "unknown";
+        AppEventsLogger newLogger = AppEventsLogger.newLogger(context);
+        Bundle bundle = new Bundle();
+        bundle.putString(AnalyticsEvents.PARAMETER_SHARE_DIALOG_CONTENT_TYPE, str);
+        bundle.putString(AnalyticsEvents.PARAMETER_SHARE_DIALOG_CONTENT_UUID, appCall.getCallId().toString());
+        bundle.putString(AnalyticsEvents.PARAMETER_SHARE_DIALOG_CONTENT_PAGE_ID, shareContent.getPageId());
+        newLogger.logSdkEvent(AnalyticsEvents.EVENT_SHARE_MESSENGER_DIALOG_SHOW, null, bundle);
     }
 
     public static void show(Activity activity, ShareContent shareContent) {
@@ -116,7 +143,7 @@ public final class MessageDialog extends FacebookDialogBase<ShareContent, Result
         show(new FragmentWrapper(fragment), shareContent);
     }
 
-    public static void show(android.support.v4.app.Fragment fragment, ShareContent shareContent) {
+    public static void show(android.support.p000v4.app.Fragment fragment, ShareContent shareContent) {
         show(new FragmentWrapper(fragment), shareContent);
     }
 
@@ -124,12 +151,14 @@ public final class MessageDialog extends FacebookDialogBase<ShareContent, Result
         new MessageDialog(fragmentWrapper).show(shareContent);
     }
 
-    protected AppCall createBaseAppCall() {
+    /* access modifiers changed from: protected */
+    public AppCall createBaseAppCall() {
         return new AppCall(getRequestCode());
     }
 
-    protected List<ModeHandler> getOrderedModeHandlers() {
-        List arrayList = new ArrayList();
+    /* access modifiers changed from: protected */
+    public List<ModeHandler> getOrderedModeHandlers() {
+        ArrayList arrayList = new ArrayList();
         arrayList.add(new NativeHandler());
         return arrayList;
     }
@@ -138,7 +167,8 @@ public final class MessageDialog extends FacebookDialogBase<ShareContent, Result
         return this.shouldFailOnDataError;
     }
 
-    protected void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, FacebookCallback<Result> facebookCallback) {
+    /* access modifiers changed from: protected */
+    public void registerCallbackImpl(CallbackManagerImpl callbackManagerImpl, FacebookCallback<Result> facebookCallback) {
         ShareInternalUtility.registerSharerCallback(getRequestCode(), callbackManagerImpl, facebookCallback);
     }
 

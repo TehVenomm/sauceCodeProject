@@ -30,7 +30,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal AdvertisingResult AsResult()
 		{
-			return new AdvertisingResult((ResponseStatus)(int)Enum.ToObject(typeof(ResponseStatus), GetStatus()), LocalEndpointName());
+			return new AdvertisingResult((ResponseStatus)Enum.ToObject(typeof(ResponseStatus), GetStatus()), LocalEndpointName());
 		}
 
 		internal static NativeStartAdvertisingResult FromPointer(IntPtr pointer)

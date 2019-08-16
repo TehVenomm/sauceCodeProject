@@ -20,32 +20,31 @@ public final class BuildInfo {
     }
 
     private static String getProperty(Class cls, String str) {
-        String str2 = null;
         try {
             Object obj = cls.getField(str).get(null);
-            if (obj != null) {
-                str2 = obj.toString();
+            if (obj == null) {
+                return null;
             }
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalAccessException e2) {
+            return obj.toString();
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            return null;
         }
-        return str2;
     }
 
     public static void showBuildInfoDialog(final Context context) {
         try {
             Class cls = Class.forName("net.gogame.gowrap.BuildProperties");
-            StringBuilder append = new StringBuilder().append("App package name: ").append(AppInfo.getPackageName(context)).append(StringUtils.LF).append("App version: ").append(AppInfo.getAppVersion(context)).append(StringUtils.LF).append(StringUtils.LF).append("Variant: ").append(CoreSupport.INSTANCE.getVariantId()).append(StringUtils.LF).append("Version: ").append(getProperty(cls, "VERSION")).append(StringUtils.LF).append("Build date: ").append(getProperty(cls, "BUILD_DATE")).append(StringUtils.LF).append(StringUtils.LF).append("Branch: ").append(getProperty(cls, "GIT_BRANCH")).append(StringUtils.LF).append("Commit ID: ").append(getProperty(cls, "GIT_COMMIT_ID_ABBREV")).append(StringUtils.LF).append("Commit date: ").append(getProperty(cls, "GIT_COMMIT_DATE")).append(StringUtils.LF);
+            StringBuilder append = new StringBuilder().append("App package name: ").append(AppInfo.getPackageName(context)).append(StringUtils.f1199LF).append("App version: ").append(AppInfo.getAppVersion(context)).append(StringUtils.f1199LF).append(StringUtils.f1199LF).append("Variant: ").append(CoreSupport.INSTANCE.getVariantId()).append(StringUtils.f1199LF).append("Version: ").append(getProperty(cls, "VERSION")).append(StringUtils.f1199LF).append("Build date: ").append(getProperty(cls, "BUILD_DATE")).append(StringUtils.f1199LF).append(StringUtils.f1199LF).append("Branch: ").append(getProperty(cls, "GIT_BRANCH")).append(StringUtils.f1199LF).append("Commit ID: ").append(getProperty(cls, "GIT_COMMIT_ID_ABBREV")).append(StringUtils.f1199LF).append("Commit date: ").append(getProperty(cls, "GIT_COMMIT_DATE")).append(StringUtils.f1199LF);
             if (GoWrapImpl.INSTANCE.getGuid() != null) {
-                append.append(StringUtils.LF).append("GUID: ").append(GoWrapImpl.INSTANCE.getGuid()).append(StringUtils.LF);
+                append.append(StringUtils.f1199LF).append("GUID: ").append(GoWrapImpl.INSTANCE.getGuid()).append(StringUtils.f1199LF);
             }
-            final Object stringBuilder = append.toString();
-            AlertDialog show = new Builder(context).setTitle("Info").setMessage(stringBuilder).show();
+            final String sb = append.toString();
+            AlertDialog show = new Builder(context).setTitle("Info").setMessage(sb).show();
             if (VERSION.SDK_INT >= 11) {
                 show.findViewById(16908290).setOnLongClickListener(new OnLongClickListener() {
                     public boolean onLongClick(View view) {
                         if (VERSION.SDK_INT >= 11) {
-                            ((ClipboardManager) context.getSystemService("clipboard")).setPrimaryClip(ClipData.newPlainText("Build info", stringBuilder));
+                            ((ClipboardManager) context.getSystemService("clipboard")).setPrimaryClip(ClipData.newPlainText("Build info", sb));
                             Toast.makeText(context, "Build info copied to clipboard", 0).show();
                         }
                         return false;

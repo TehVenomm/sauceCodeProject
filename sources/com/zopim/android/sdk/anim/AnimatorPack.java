@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.View;
 import java.util.ArrayList;
-import java.util.Collection;
 
 @TargetApi(11)
 public class AnimatorPack {
@@ -29,10 +28,10 @@ public class AnimatorPack {
     }
 
     public static AnimatorSet crossfade(View view, View view2, AnimatorListener animatorListener, AnimatorListener animatorListener2) {
-        Animator ofFloat = ObjectAnimator.ofFloat(view, "alpha", new float[]{1.0f, 0.5f});
-        Animator ofFloat2 = ObjectAnimator.ofFloat(view2, "alpha", new float[]{0.5f, 1.0f});
-        Animator scale = scale(view, 1.0f, 0.5f);
-        Animator scale2 = scale(view2, 0.5f, 1.0f);
+        ObjectAnimator ofFloat = ObjectAnimator.ofFloat(view, "alpha", new float[]{1.0f, 0.5f});
+        ObjectAnimator ofFloat2 = ObjectAnimator.ofFloat(view2, "alpha", new float[]{0.5f, 1.0f});
+        AnimatorSet scale = scale(view, 1.0f, 0.5f);
+        AnimatorSet scale2 = scale(view2, 0.5f, 1.0f);
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.setDuration(DURATION);
         animatorSet.play(ofFloat).with(scale).before(ofFloat2).before(scale2);
@@ -42,8 +41,8 @@ public class AnimatorPack {
         if (animatorListener2 != null) {
             ofFloat2.addListener(animatorListener2);
         }
-        ofFloat.addListener(new C0786a(view));
-        ofFloat2.addListener(new C0787b(view2));
+        ofFloat.addListener(new C1127a(view));
+        ofFloat2.addListener(new C1128b(view2));
         return animatorSet;
     }
 
@@ -51,12 +50,12 @@ public class AnimatorPack {
         if (view == null) {
             return new AnimatorSet();
         }
-        Animator ofFloat = ObjectAnimator.ofFloat(view, "alpha", new float[]{0.0f, 1.0f});
-        Animator scale = scale(view, 0.5f, 1.0f);
-        Animator animatorSet = new AnimatorSet();
+        ObjectAnimator ofFloat = ObjectAnimator.ofFloat(view, "alpha", new float[]{0.0f, 1.0f});
+        AnimatorSet scale = scale(view, 0.5f, 1.0f);
+        AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.setDuration(DURATION);
         animatorSet.play(ofFloat).with(scale);
-        animatorSet.addListener(new C0791f(view));
+        animatorSet.addListener(new C1132f(view));
         return animatorSet;
     }
 
@@ -64,18 +63,18 @@ public class AnimatorPack {
         if (view == null) {
             return new AnimatorSet();
         }
-        Animator ofFloat = ObjectAnimator.ofFloat(view, "alpha", new float[]{1.0f, 0.0f});
-        Animator scale = scale(view, 1.0f, 0.5f);
-        Animator animatorSet = new AnimatorSet();
+        ObjectAnimator ofFloat = ObjectAnimator.ofFloat(view, "alpha", new float[]{1.0f, 0.0f});
+        AnimatorSet scale = scale(view, 1.0f, 0.5f);
+        AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.setDuration(DURATION);
         animatorSet.play(ofFloat).with(scale);
-        animatorSet.addListener(new C0790e(view));
+        animatorSet.addListener(new C1131e(view));
         return animatorSet;
     }
 
     public static AnimatorSet scale(View view, float f, float f2) {
-        Animator ofFloat = ObjectAnimator.ofFloat(view, "scaleX", new float[]{f, f2});
-        Animator ofFloat2 = ObjectAnimator.ofFloat(view, "scaleY", new float[]{f, f2});
+        ObjectAnimator ofFloat = ObjectAnimator.ofFloat(view, "scaleX", new float[]{f, f2});
+        ObjectAnimator ofFloat2 = ObjectAnimator.ofFloat(view, "scaleY", new float[]{f, f2});
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.play(ofFloat).with(ofFloat2);
         animatorSet.setDuration(DURATION);
@@ -83,10 +82,10 @@ public class AnimatorPack {
     }
 
     public static Animator slideIn(View view, Direction direction) {
+        ObjectAnimator ofFloat;
         if (direction == null || view == null) {
             return null;
         }
-        Animator ofFloat;
         float translationX = view.getTranslationX();
         float translationY = view.getTranslationY();
         int[] iArr = new int[2];
@@ -120,7 +119,7 @@ public class AnimatorPack {
             return ofFloat;
         }
         ofFloat.setDuration(DURATION);
-        ofFloat.addListener(new C0789d(view));
+        ofFloat.addListener(new C1130d(view));
         return ofFloat;
     }
 
@@ -129,7 +128,7 @@ public class AnimatorPack {
             return new AnimatorSet();
         }
         long j2 = 0;
-        Collection arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (View view : viewArr) {
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.setStartDelay(j2);
@@ -143,16 +142,16 @@ public class AnimatorPack {
             arrayList.add(animatorSet);
             j2 += j;
         }
-        Animator animatorSet2 = new AnimatorSet();
+        AnimatorSet animatorSet2 = new AnimatorSet();
         animatorSet2.playTogether(arrayList);
         return animatorSet2;
     }
 
     public static Animator slideOut(View view, Direction direction) {
+        ObjectAnimator ofFloat;
         if (direction == null || view == null) {
             return null;
         }
-        Animator ofFloat;
         float translationX = view.getTranslationX();
         float translationY = view.getTranslationY();
         int[] iArr = new int[2];
@@ -183,7 +182,7 @@ public class AnimatorPack {
                 break;
         }
         ofFloat.setDuration(DURATION);
-        ofFloat.addListener(new C0788c(view, translationX, translationY));
+        ofFloat.addListener(new C1129c(view, translationX, translationY));
         return ofFloat;
     }
 
@@ -192,7 +191,7 @@ public class AnimatorPack {
             return new AnimatorSet();
         }
         long j2 = 0;
-        Collection arrayList = new ArrayList();
+        ArrayList arrayList = new ArrayList();
         for (View view : viewArr) {
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.setStartDelay(j2);
@@ -206,7 +205,7 @@ public class AnimatorPack {
             arrayList.add(animatorSet);
             j2 += j;
         }
-        Animator animatorSet2 = new AnimatorSet();
+        AnimatorSet animatorSet2 = new AnimatorSet();
         animatorSet2.playTogether(arrayList);
         return animatorSet2;
     }

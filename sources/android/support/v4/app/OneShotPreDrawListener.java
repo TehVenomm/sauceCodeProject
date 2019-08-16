@@ -1,10 +1,11 @@
-package android.support.v4.app;
+package android.support.p000v4.app;
 
 import android.view.View;
 import android.view.View.OnAttachStateChangeListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 
+/* renamed from: android.support.v4.app.OneShotPreDrawListener */
 class OneShotPreDrawListener implements OnPreDrawListener, OnAttachStateChangeListener {
     private final Runnable mRunnable;
     private final View mView;

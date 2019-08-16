@@ -9,6 +9,8 @@ public class StatusScene : GameSection
 		}
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalEquipSetData();
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalVisualEquipData();
+		MonoBehaviourSingleton<StatusStageManager>.I.SetSmithCharacterActivate(active: true);
+		MonoBehaviourSingleton<StatusStageManager>.I.SetUniqueSmithCharacterActivate(active: false);
 		base.Initialize();
 	}
 

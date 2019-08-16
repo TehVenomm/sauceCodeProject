@@ -1,9 +1,10 @@
-package io.fabric.sdk.android.services.concurrency;
+package p017io.fabric.sdk.android.services.concurrency;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
+/* renamed from: io.fabric.sdk.android.services.concurrency.PriorityFutureTask */
 public class PriorityFutureTask<V> extends FutureTask<V> implements Dependency<Task>, PriorityProvider, Task, DelegateProvider {
     final Object delegate;
 
@@ -25,7 +26,8 @@ public class PriorityFutureTask<V> extends FutureTask<V> implements Dependency<T
         return ((Dependency) ((PriorityProvider) getDelegate())).areDependenciesMet();
     }
 
-    protected <T extends Dependency<Task> & PriorityProvider & Task> T checkAndInitDelegate(Object obj) {
+    /* access modifiers changed from: protected */
+    public <T extends Dependency<Task> & PriorityProvider & Task> T checkAndInitDelegate(Object obj) {
         return PriorityTask.isProperDelegate(obj) ? (Dependency) obj : new PriorityTask();
     }
 

@@ -19,9 +19,9 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 		ROTATION = 0x2
 	}
 
-	private const TRACE_FLAGS TRACE_BOTH = TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION;
-
 	private STATUS_FLAGS Status = STATUS_FLAGS.INITIALIZE;
+
+	private const TRACE_FLAGS TRACE_BOTH = TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION;
 
 	private StageObject m_target;
 
@@ -47,19 +47,18 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 		if (!(obj == null))
 		{
 			m_target = obj;
-			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, true);
+			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, isEnable: true);
 		}
 	}
 
 	public void ReSetTargetObject()
 	{
 		m_target = null;
-		SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, false);
+		SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, isEnable: false);
 	}
 
 	protected override void Awake()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		this.get_gameObject().AddComponent<AudioListener>();
 		base.Awake();
 	}
@@ -75,7 +74,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 		{
 			if (HasFlag(STATUS_FLAGS.CAMERA_INGAME_ACTIVE))
 			{
-				TraceIngameCamera(TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
+				TraceIngameCamera();
 			}
 			else if (HasFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE))
 			{
@@ -83,7 +82,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 			}
 			else if (HasFlag(STATUS_FLAGS.CAMERA_MAIN_ACTIVE))
 			{
-				TraceMainCamera(TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
+				TraceMainCamera();
 			}
 		}
 	}
@@ -121,7 +120,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 		TraceMainCamera(TRACE_FLAGS.ROTATION);
 		if (m_target == null || m_target._transform == null)
 		{
-			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, false);
+			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, isEnable: false);
 		}
 		else
 		{
@@ -137,7 +136,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 		}
 		else
 		{
-			SetFlag(STATUS_FLAGS.CAMERA_INGAME_ACTIVE, false);
+			SetFlag(STATUS_FLAGS.CAMERA_INGAME_ACTIVE, isEnable: false);
 		}
 	}
 }

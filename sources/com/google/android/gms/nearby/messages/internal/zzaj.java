@@ -9,20 +9,22 @@ import android.util.Log;
 
 @TargetApi(14)
 final class zzaj implements ActivityLifecycleCallbacks {
-    private final Activity zzjgb;
-    private final zzah zzjgc;
+    private final Activity zzhm;
+    private final zzah zzhn;
 
     private zzaj(Activity activity, zzah zzah) {
-        this.zzjgb = activity;
-        this.zzjgc = zzah;
+        this.zzhm = activity;
+        this.zzhn = zzah;
     }
 
     public final void onActivityCreated(Activity activity, Bundle bundle) {
     }
 
     public final void onActivityDestroyed(Activity activity) {
-        if (activity == this.zzjgb) {
-            Log.v("NearbyMessagesClient", String.format("Unregistering ClientLifecycleSafetyNet's ActivityLifecycleCallbacks for %s", new Object[]{activity.getPackageName()}));
+        if (activity == this.zzhm) {
+            if (Log.isLoggable("NearbyMessagesClient", 2)) {
+                Log.v("NearbyMessagesClient", String.format("Unregistering ClientLifecycleSafetyNet's ActivityLifecycleCallbacks for %s", new Object[]{activity.getPackageName()}));
+            }
             activity.getApplication().unregisterActivityLifecycleCallbacks(this);
         }
     }
@@ -40,11 +42,13 @@ final class zzaj implements ActivityLifecycleCallbacks {
     }
 
     public final void onActivityStopped(Activity activity) {
-        if (activity == this.zzjgb) {
+        if (activity == this.zzhm) {
             try {
-                this.zzjgc.zzdy(1);
+                this.zzhn.zzf(1);
             } catch (RemoteException e) {
-                Log.v("NearbyMessagesClient", String.format("Failed to emit ACTIVITY_STOPPED from ClientLifecycleSafetyNet for Activity %s: %s", new Object[]{activity.getPackageName(), e}));
+                if (Log.isLoggable("NearbyMessagesClient", 2)) {
+                    Log.v("NearbyMessagesClient", String.format("Failed to emit ACTIVITY_STOPPED from ClientLifecycleSafetyNet for Activity %s: %s", new Object[]{activity.getPackageName(), e}));
+                }
             }
         }
     }

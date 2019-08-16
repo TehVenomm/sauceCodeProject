@@ -1,8 +1,9 @@
-package android.support.v4.text;
+package android.support.p000v4.text;
 
 import java.nio.CharBuffer;
 import java.util.Locale;
 
+/* renamed from: android.support.v4.text.TextDirectionHeuristicsCompat */
 public final class TextDirectionHeuristicsCompat {
     public static final TextDirectionHeuristicCompat ANYRTL_LTR = new TextDirectionHeuristicInternal(AnyStrong.INSTANCE_RTL, false);
     public static final TextDirectionHeuristicCompat FIRSTSTRONG_LTR = new TextDirectionHeuristicInternal(FirstStrong.INSTANCE, false);
@@ -14,10 +15,7 @@ public final class TextDirectionHeuristicsCompat {
     private static final int STATE_TRUE = 0;
     private static final int STATE_UNKNOWN = 2;
 
-    private interface TextDirectionAlgorithm {
-        int checkRtl(CharSequence charSequence, int i, int i2);
-    }
-
+    /* renamed from: android.support.v4.text.TextDirectionHeuristicsCompat$AnyStrong */
     private static class AnyStrong implements TextDirectionAlgorithm {
         public static final AnyStrong INSTANCE_LTR = new AnyStrong(false);
         public static final AnyStrong INSTANCE_RTL = new AnyStrong(true);
@@ -28,29 +26,33 @@ public final class TextDirectionHeuristicsCompat {
         }
 
         public int checkRtl(CharSequence charSequence, int i, int i2) {
-            int i3 = 0;
-            for (int i4 = i; i4 < i + i2; i4++) {
-                switch (TextDirectionHeuristicsCompat.isRtlText(Character.getDirectionality(charSequence.charAt(i4)))) {
+            boolean z = false;
+            for (int i3 = i; i3 < i + i2; i3++) {
+                switch (TextDirectionHeuristicsCompat.isRtlText(Character.getDirectionality(charSequence.charAt(i3)))) {
                     case 0:
                         if (!this.mLookForRtl) {
-                            i3 = 1;
+                            z = true;
                             break;
+                        } else {
+                            return 0;
                         }
-                        return 0;
                     case 1:
                         if (this.mLookForRtl) {
-                            i3 = 1;
+                            z = true;
                             break;
+                        } else {
+                            return 1;
                         }
-                        return 1;
-                    default:
-                        break;
                 }
             }
-            return i3 != 0 ? !this.mLookForRtl ? 0 : 1 : 2;
+            if (z) {
+                return !this.mLookForRtl ? 0 : 1;
+            }
+            return 2;
         }
     }
 
+    /* renamed from: android.support.v4.text.TextDirectionHeuristicsCompat$FirstStrong */
     private static class FirstStrong implements TextDirectionAlgorithm {
         public static final FirstStrong INSTANCE = new FirstStrong();
 
@@ -66,6 +68,12 @@ public final class TextDirectionHeuristicsCompat {
         }
     }
 
+    /* renamed from: android.support.v4.text.TextDirectionHeuristicsCompat$TextDirectionAlgorithm */
+    private interface TextDirectionAlgorithm {
+        int checkRtl(CharSequence charSequence, int i, int i2);
+    }
+
+    /* renamed from: android.support.v4.text.TextDirectionHeuristicsCompat$TextDirectionHeuristicImpl */
     private static abstract class TextDirectionHeuristicImpl implements TextDirectionHeuristicCompat {
         private final TextDirectionAlgorithm mAlgorithm;
 
@@ -84,21 +92,22 @@ public final class TextDirectionHeuristicsCompat {
             }
         }
 
-        protected abstract boolean defaultIsRtl();
+        /* access modifiers changed from: protected */
+        public abstract boolean defaultIsRtl();
 
         public boolean isRtl(CharSequence charSequence, int i, int i2) {
             if (charSequence != null && i >= 0 && i2 >= 0 && charSequence.length() - i2 >= i) {
                 return this.mAlgorithm == null ? defaultIsRtl() : doCheck(charSequence, i, i2);
-            } else {
-                throw new IllegalArgumentException();
             }
+            throw new IllegalArgumentException();
         }
 
         public boolean isRtl(char[] cArr, int i, int i2) {
-            return isRtl(CharBuffer.wrap(cArr), i, i2);
+            return isRtl((CharSequence) CharBuffer.wrap(cArr), i, i2);
         }
     }
 
+    /* renamed from: android.support.v4.text.TextDirectionHeuristicsCompat$TextDirectionHeuristicInternal */
     private static class TextDirectionHeuristicInternal extends TextDirectionHeuristicImpl {
         private final boolean mDefaultIsRtl;
 
@@ -107,11 +116,13 @@ public final class TextDirectionHeuristicsCompat {
             this.mDefaultIsRtl = z;
         }
 
-        protected boolean defaultIsRtl() {
+        /* access modifiers changed from: protected */
+        public boolean defaultIsRtl() {
             return this.mDefaultIsRtl;
         }
     }
 
+    /* renamed from: android.support.v4.text.TextDirectionHeuristicsCompat$TextDirectionHeuristicLocale */
     private static class TextDirectionHeuristicLocale extends TextDirectionHeuristicImpl {
         public static final TextDirectionHeuristicLocale INSTANCE = new TextDirectionHeuristicLocale();
 
@@ -119,7 +130,8 @@ public final class TextDirectionHeuristicsCompat {
             super(null);
         }
 
-        protected boolean defaultIsRtl() {
+        /* access modifiers changed from: protected */
+        public boolean defaultIsRtl() {
             return TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == 1;
         }
     }

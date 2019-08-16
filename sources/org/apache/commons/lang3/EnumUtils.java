@@ -16,7 +16,8 @@ public class EnumUtils {
     private static final String S_DOES_NOT_SEEM_TO_BE_AN_ENUM_TYPE = "%s does not seem to be an Enum type";
 
     public static <E extends Enum<E>> Map<String, E> getEnumMap(Class<E> cls) {
-        Map<String, E> linkedHashMap = new LinkedHashMap();
+        Enum[] enumArr;
+        LinkedHashMap linkedHashMap = new LinkedHashMap();
         for (Enum enumR : (Enum[]) cls.getEnumConstants()) {
             linkedHashMap.put(enumR.name(), enumR);
         }
@@ -41,22 +42,27 @@ public class EnumUtils {
 
     public static <E extends Enum<E>> E getEnum(Class<E> cls, String str) {
         E e = null;
-        if (str != null) {
-            try {
-                e = Enum.valueOf(cls, str);
-            } catch (IllegalArgumentException e2) {
-            }
+        if (str == null) {
+            return e;
         }
-        return e;
+        try {
+            return Enum.valueOf(cls, str);
+        } catch (IllegalArgumentException e2) {
+            return e;
+        }
     }
 
     public static <E extends Enum<E>> long generateBitVector(Class<E> cls, Iterable<? extends E> iterable) {
+        boolean z;
         checkBitVectorable(cls);
         Validate.notNull(iterable);
-        Iterator it = iterable.iterator();
         long j = 0;
-        while (it.hasNext()) {
-            boolean z;
+        Iterator it = iterable.iterator();
+        while (true) {
+            long j2 = j;
+            if (!it.hasNext()) {
+                return j2;
+            }
             Enum enumR = (Enum) it.next();
             if (enumR != null) {
                 z = true;
@@ -64,18 +70,17 @@ public class EnumUtils {
                 z = false;
             }
             Validate.isTrue(z, NULL_ELEMENTS_NOT_PERMITTED, new Object[0]);
-            j = ((long) (1 << enumR.ordinal())) | j;
+            j = ((long) (1 << enumR.ordinal())) | j2;
         }
-        return j;
     }
 
     public static <E extends Enum<E>> long[] generateBitVectors(Class<E> cls, Iterable<? extends E> iterable) {
+        boolean z;
         asEnum(cls);
         Validate.notNull(iterable);
         EnumSet noneOf = EnumSet.noneOf(cls);
         Iterator it = iterable.iterator();
         while (it.hasNext()) {
-            boolean z;
             Enum enumR = (Enum) it.next();
             if (enumR != null) {
                 z = true;
@@ -88,23 +93,23 @@ public class EnumUtils {
         long[] jArr = new long[(((((Enum[]) cls.getEnumConstants()).length - 1) / 64) + 1)];
         Iterator it2 = noneOf.iterator();
         while (it2.hasNext()) {
-            enumR = (Enum) it2.next();
-            int ordinal = enumR.ordinal() / 64;
-            jArr[ordinal] = jArr[ordinal] | ((long) (1 << (enumR.ordinal() % 64)));
+            Enum enumR2 = (Enum) it2.next();
+            int ordinal = enumR2.ordinal() / 64;
+            jArr[ordinal] = jArr[ordinal] | ((long) (1 << (enumR2.ordinal() % 64)));
         }
         ArrayUtils.reverse(jArr);
         return jArr;
     }
 
     public static <E extends Enum<E>> long generateBitVector(Class<E> cls, E... eArr) {
-        Validate.noNullElements((Object[]) eArr);
-        return generateBitVector((Class) cls, Arrays.asList(eArr));
+        Validate.noNullElements((T[]) eArr);
+        return generateBitVector(cls, (Iterable<? extends E>) Arrays.asList(eArr));
     }
 
     public static <E extends Enum<E>> long[] generateBitVectors(Class<E> cls, E... eArr) {
         asEnum(cls);
-        Validate.noNullElements((Object[]) eArr);
-        Object noneOf = EnumSet.noneOf(cls);
+        Validate.noNullElements((T[]) eArr);
+        EnumSet noneOf = EnumSet.noneOf(cls);
         Collections.addAll(noneOf, eArr);
         long[] jArr = new long[(((((Enum[]) cls.getEnumConstants()).length - 1) / 64) + 1)];
         Iterator it = noneOf.iterator();
@@ -123,6 +128,7 @@ public class EnumUtils {
     }
 
     public static <E extends Enum<E>> EnumSet<E> processBitVectors(Class<E> cls, long... jArr) {
+        Enum[] enumArr;
         EnumSet<E> noneOf = EnumSet.noneOf(asEnum(cls));
         long[] clone = ArrayUtils.clone((long[]) Validate.notNull(jArr));
         ArrayUtils.reverse(clone);
@@ -137,12 +143,13 @@ public class EnumUtils {
 
     private static <E extends Enum<E>> Class<E> checkBitVectorable(Class<E> cls) {
         boolean z;
-        if (((Enum[]) asEnum(cls).getEnumConstants()).length <= 64) {
+        Enum[] enumArr = (Enum[]) asEnum(cls).getEnumConstants();
+        if (enumArr.length <= 64) {
             z = true;
         } else {
             z = false;
         }
-        Validate.isTrue(z, CANNOT_STORE_S_S_VALUES_IN_S_BITS, Integer.valueOf(r0.length), cls.getSimpleName(), Integer.valueOf(64));
+        Validate.isTrue(z, CANNOT_STORE_S_S_VALUES_IN_S_BITS, Integer.valueOf(enumArr.length), cls.getSimpleName(), Integer.valueOf(64));
         return cls;
     }
 

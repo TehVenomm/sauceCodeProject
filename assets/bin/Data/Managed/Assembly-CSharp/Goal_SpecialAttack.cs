@@ -32,19 +32,20 @@ public class Goal_SpecialAttack : Goal
 	{
 		base.HandleEvent(brain, ev, param);
 		Player player = brain.owner as Player;
-		if (ev == BRAIN_EVENT.END_ACTION)
+		if (ev != BRAIN_EVENT.END_ACTION)
 		{
-			int num = (int)param;
-			if (player != null && num == 6)
+			return;
+		}
+		int num = (int)param;
+		if (player != null && num == 6)
+		{
+			if (player.attackMode == Player.ATTACK_MODE.ARROW && brain.weaponCtrl.isFullCharge)
 			{
-				if (player.attackMode == Player.ATTACK_MODE.ARROW && brain.weaponCtrl.isFullCharge)
-				{
-					SetStatus(STATUS.COMPLETED);
-				}
-				else if (player.isActSpecialAction)
-				{
-					SetStatus(STATUS.COMPLETED);
-				}
+				SetStatus(STATUS.COMPLETED);
+			}
+			else if (player.isActSpecialAction)
+			{
+				SetStatus(STATUS.COMPLETED);
 			}
 		}
 	}

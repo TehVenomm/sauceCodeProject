@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Locale;
 
 public class DefaultMessageStateManager implements MessageStateManager {
-    private static final String[] TABLE_COLUMNS = new String[]{"message_type", "message_id", "message_timestamp", "message_read"};
+    private static final String[] TABLE_COLUMNS = {"message_type", "message_id", "message_timestamp", "message_read"};
     private static final String TABLE_NAME = "message_status";
     private final Context context;
     private final MessageStateDbHelper dbHelper;
 
-    public DefaultMessageStateManager(Context context) {
-        this.context = context;
-        this.dbHelper = MessageStateDbHelper.getInstance(context);
+    public DefaultMessageStateManager(Context context2) {
+        this.context = context2;
+        this.dbHelper = MessageStateDbHelper.getInstance(context2);
     }
 
     public List<MessageState> getMessageStates(String str, long j) {
-        List<MessageState> arrayList = new ArrayList();
-        SQLiteDatabase readableDatabase = this.dbHelper.getReadableDatabase();
         Cursor query;
+        ArrayList arrayList = new ArrayList();
+        SQLiteDatabase readableDatabase = this.dbHelper.getReadableDatabase();
         try {
             query = readableDatabase.query(TABLE_NAME, TABLE_COLUMNS, String.format(Locale.ENGLISH, "(message_type = ?) AND (message_timestamp >= %d)", new Object[]{Long.valueOf(j)}), new String[]{str}, null, null, null);
             query.moveToFirst();
@@ -31,7 +31,7 @@ public class DefaultMessageStateManager implements MessageStateManager {
                 messageState.setType(query.getString(0));
                 messageState.setId(query.getLong(1));
                 messageState.setTimestamp(query.getLong(2));
-                messageState.setRead(query.getShort(3) != (short) 0);
+                messageState.setRead(query.getShort(3) != 0);
                 arrayList.add(messageState);
                 query.moveToNext();
             }
@@ -40,6 +40,7 @@ public class DefaultMessageStateManager implements MessageStateManager {
             return arrayList;
         } catch (Throwable th) {
             readableDatabase.close();
+            throw th;
         }
     }
 
@@ -59,8 +60,9 @@ public class DefaultMessageStateManager implements MessageStateManager {
 
     public void deleteMessageStates(String str, long j) {
         SQLiteDatabase writableDatabase = this.dbHelper.getWritableDatabase();
+        String str2 = TABLE_NAME;
         try {
-            writableDatabase.delete(TABLE_NAME, String.format(Locale.ENGLISH, "(message_type = ?) AND (message_timestamp < %d)", new Object[]{Long.valueOf(j)}), new String[]{str});
+            writableDatabase.delete(str2, String.format(Locale.ENGLISH, "(message_type = ?) AND (message_timestamp < %d)", new Object[]{Long.valueOf(j)}), new String[]{str});
         } finally {
             writableDatabase.close();
         }

@@ -10,7 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsonTypeInfo {
 
-    public enum As {
+    /* renamed from: com.fasterxml.jackson.annotation.JsonTypeInfo$As */
+    public enum C0861As {
         PROPERTY,
         WRAPPER_OBJECT,
         WRAPPER_ARRAY,
@@ -18,7 +19,8 @@ public @interface JsonTypeInfo {
         EXISTING_PROPERTY
     }
 
-    public enum Id {
+    /* renamed from: com.fasterxml.jackson.annotation.JsonTypeInfo$Id */
+    public enum C0862Id {
         NONE(null),
         CLASS("@class"),
         MINIMAL_CLASS("@c"),
@@ -27,7 +29,7 @@ public @interface JsonTypeInfo {
         
         private final String _defaultPropertyName;
 
-        private Id(String str) {
+        private C0862Id(String str) {
             this._defaultPropertyName = str;
         }
 
@@ -42,11 +44,11 @@ public @interface JsonTypeInfo {
 
     Class<?> defaultImpl() default None.class;
 
-    As include() default As.PROPERTY;
+    C0861As include() default C0861As.PROPERTY;
 
     String property() default "";
 
-    Id use();
+    C0862Id use();
 
     boolean visible() default false;
 }

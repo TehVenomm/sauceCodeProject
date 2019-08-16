@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class ItemTable : Singleton<ItemTable>, IDataTable
 {
 	public class ItemData
 	{
-		public const string NT = "itemId,itemType,getType,eventId,name,text,enemyIconID,enemyIconID2,rarity,iconID,price,cantSell,element,effectType_0,effectType_1,effectType_2,effectTime,startDate,endDate";
-
 		public uint id;
 
 		public ITEM_TYPE type;
@@ -40,6 +39,8 @@ public class ItemTable : Singleton<ItemTable>, IDataTable
 		public DateTime startDate;
 
 		public DateTime endDate;
+
+		public const string NT = "itemId,itemType,getType,eventId,name,text,enemyIconID,enemyIconID2,rarity,iconID,price,cantSell,element,effectType_0,effectType_1,effectType_2,effectTime,startDate,endDate";
 
 		public static bool cb(CSVReader csv_reader, ItemData data, ref uint key)
 		{
@@ -86,15 +87,21 @@ public class ItemTable : Singleton<ItemTable>, IDataTable
 
 	private UIntKeyTable<ItemData> itemTable;
 
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<ItemData> _003C_003Ef__mg_0024cache0;
+
+	[CompilerGenerated]
+	private static TableUtility.CallBackUIntKeyReadCSV<ItemData> _003C_003Ef__mg_0024cache1;
+
 	public void CreateTable(string csv_text)
 	{
-		itemTable = TableUtility.CreateUIntKeyTable<ItemData>(csv_text, ItemData.cb, "itemId,itemType,getType,eventId,name,text,enemyIconID,enemyIconID2,rarity,iconID,price,cantSell,element,effectType_0,effectType_1,effectType_2,effectTime,startDate,endDate", null);
+		itemTable = TableUtility.CreateUIntKeyTable<ItemData>(csv_text, ItemData.cb, "itemId,itemType,getType,eventId,name,text,enemyIconID,enemyIconID2,rarity,iconID,price,cantSell,element,effectType_0,effectType_1,effectType_2,effectTime,startDate,endDate");
 		itemTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(itemTable, csv_text, ItemData.cb, "itemId,itemType,getType,eventId,name,text,enemyIconID,enemyIconID2,rarity,iconID,price,cantSell,element,effectType_0,effectType_1,effectType_2,effectTime,startDate,endDate", null);
+		TableUtility.AddUIntKeyTable(itemTable, csv_text, ItemData.cb, "itemId,itemType,getType,eventId,name,text,enemyIconID,enemyIconID2,rarity,iconID,price,cantSell,element,effectType_0,effectType_1,effectType_2,effectTime,startDate,endDate");
 	}
 
 	public ItemData GetItemData(uint id)

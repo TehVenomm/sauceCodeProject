@@ -19,10 +19,19 @@ public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.IS
 		TEX_INNER_MODEL
 	}
 
+	protected override void OnOpen()
+	{
+		SetActive((Enum)UI.BTN_SKIP, is_visible: true);
+		if (AnimationDirector.I != null)
+		{
+			(AnimationDirector.I as SkillGachaDirector).StartDirection(this);
+		}
+	}
+
 	void SkillGachaDirector.ISectionCommand.OnShowSkillModel(uint skill_item_id)
 	{
-		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, skill_item_id, false, false);
-		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, skill_item_id, false);
+		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, skill_item_id, rotation: false, light_rotation: false);
+		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, skill_item_id, rotation: false);
 	}
 
 	void SkillGachaDirector.ISectionCommand.OnHideSkillModel()
@@ -44,14 +53,5 @@ public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.IS
 	void SkillGachaDirector.ISectionCommand.OnEnd()
 	{
 		End();
-	}
-
-	protected override void OnOpen()
-	{
-		SetActive((Enum)UI.BTN_SKIP, true);
-		if (AnimationDirector.I != null)
-		{
-			(AnimationDirector.I as SkillGachaDirector).StartDirection(this);
-		}
 	}
 }

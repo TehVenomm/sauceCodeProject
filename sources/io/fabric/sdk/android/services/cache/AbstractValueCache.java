@@ -1,7 +1,8 @@
-package io.fabric.sdk.android.services.cache;
+package p017io.fabric.sdk.android.services.cache;
 
 import android.content.Context;
 
+/* renamed from: io.fabric.sdk.android.services.cache.AbstractValueCache */
 public abstract class AbstractValueCache<T> implements ValueCache<T> {
     private final ValueCache<T> childCache;
 
@@ -20,9 +21,11 @@ public abstract class AbstractValueCache<T> implements ValueCache<T> {
         cacheValue(context, t);
     }
 
-    protected abstract void cacheValue(Context context, T t);
+    /* access modifiers changed from: protected */
+    public abstract void cacheValue(Context context, T t);
 
-    protected abstract void doInvalidate(Context context);
+    /* access modifiers changed from: protected */
+    public abstract void doInvalidate(Context context);
 
     public final T get(Context context, ValueLoader<T> valueLoader) throws Exception {
         T cached;
@@ -36,7 +39,8 @@ public abstract class AbstractValueCache<T> implements ValueCache<T> {
         return cached;
     }
 
-    protected abstract T getCached(Context context);
+    /* access modifiers changed from: protected */
+    public abstract T getCached(Context context);
 
     public final void invalidate(Context context) {
         synchronized (this) {

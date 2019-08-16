@@ -1,38 +1,42 @@
-package io.fabric.sdk.android.services.settings;
+package p017io.fabric.sdk.android.services.settings;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences.Editor;
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.Kit;
-import io.fabric.sdk.android.services.common.CommonUtils;
-import io.fabric.sdk.android.services.common.CurrentTimeProvider;
-import io.fabric.sdk.android.services.persistence.PreferenceStore;
-import io.fabric.sdk.android.services.persistence.PreferenceStoreImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
+import p017io.fabric.sdk.android.Fabric;
+import p017io.fabric.sdk.android.Kit;
+import p017io.fabric.sdk.android.services.common.CommonUtils;
+import p017io.fabric.sdk.android.services.common.CurrentTimeProvider;
+import p017io.fabric.sdk.android.services.common.DataCollectionArbiter;
+import p017io.fabric.sdk.android.services.persistence.PreferenceStore;
+import p017io.fabric.sdk.android.services.persistence.PreferenceStoreImpl;
 
+/* renamed from: io.fabric.sdk.android.services.settings.DefaultSettingsController */
 class DefaultSettingsController implements SettingsController {
     private static final String LOAD_ERROR_MESSAGE = "Unknown error while loading Crashlytics settings. Crashes will be cached until settings can be retrieved.";
     private static final String PREFS_BUILD_INSTANCE_IDENTIFIER = "existing_instance_identifier";
     private final CachedSettingsIo cachedSettingsIo;
     private final CurrentTimeProvider currentTimeProvider;
+    private final DataCollectionArbiter dataCollectionArbiter;
     private final Kit kit;
     private final PreferenceStore preferenceStore = new PreferenceStoreImpl(this.kit);
     private final SettingsJsonTransform settingsJsonTransform;
     private final SettingsRequest settingsRequest;
     private final SettingsSpiCall settingsSpiCall;
 
-    public DefaultSettingsController(Kit kit, SettingsRequest settingsRequest, CurrentTimeProvider currentTimeProvider, SettingsJsonTransform settingsJsonTransform, CachedSettingsIo cachedSettingsIo, SettingsSpiCall settingsSpiCall) {
-        this.kit = kit;
-        this.settingsRequest = settingsRequest;
-        this.currentTimeProvider = currentTimeProvider;
-        this.settingsJsonTransform = settingsJsonTransform;
-        this.cachedSettingsIo = cachedSettingsIo;
-        this.settingsSpiCall = settingsSpiCall;
+    public DefaultSettingsController(Kit kit2, SettingsRequest settingsRequest2, CurrentTimeProvider currentTimeProvider2, SettingsJsonTransform settingsJsonTransform2, CachedSettingsIo cachedSettingsIo2, SettingsSpiCall settingsSpiCall2, DataCollectionArbiter dataCollectionArbiter2) {
+        this.kit = kit2;
+        this.settingsRequest = settingsRequest2;
+        this.currentTimeProvider = currentTimeProvider2;
+        this.settingsJsonTransform = settingsJsonTransform2;
+        this.cachedSettingsIo = cachedSettingsIo2;
+        this.settingsSpiCall = settingsSpiCall2;
+        this.dataCollectionArbiter = dataCollectionArbiter2;
     }
 
     private SettingsData getCachedSettingsData(SettingsCacheBehavior settingsCacheBehavior) {
-        Throwable th;
+        Exception e;
         SettingsData settingsData = null;
         try {
             if (SettingsCacheBehavior.SKIP_CACHE_LOOKUP.equals(settingsCacheBehavior)) {
@@ -46,47 +50,47 @@ class DefaultSettingsController implements SettingsController {
                     long currentTimeMillis = this.currentTimeProvider.getCurrentTimeMillis();
                     if (SettingsCacheBehavior.IGNORE_CACHE_EXPIRATION.equals(settingsCacheBehavior) || !buildFromJson.isExpired(currentTimeMillis)) {
                         try {
-                            Fabric.getLogger().mo4289d("Fabric", "Returning cached settings.");
+                            Fabric.getLogger().mo20969d(Fabric.TAG, "Returning cached settings.");
                             return buildFromJson;
-                        } catch (Throwable e) {
-                            Throwable th2 = e;
+                        } catch (Exception e2) {
+                            e = e2;
                             settingsData = buildFromJson;
-                            th = th2;
-                            Fabric.getLogger().mo4292e("Fabric", "Failed to get cached settings", th);
+                            Fabric.getLogger().mo20972e(Fabric.TAG, "Failed to get cached settings", e);
                             return settingsData;
                         }
+                    } else {
+                        Fabric.getLogger().mo20969d(Fabric.TAG, "Cached settings have expired.");
+                        return null;
                     }
-                    Fabric.getLogger().mo4289d("Fabric", "Cached settings have expired.");
+                } else {
+                    Fabric.getLogger().mo20972e(Fabric.TAG, "Failed to transform cached settings data.", null);
                     return null;
                 }
-                Fabric.getLogger().mo4292e("Fabric", "Failed to transform cached settings data.", null);
+            } else {
+                Fabric.getLogger().mo20969d(Fabric.TAG, "No cached settings data found.");
                 return null;
             }
-            Fabric.getLogger().mo4289d("Fabric", "No cached settings data found.");
-            return null;
-        } catch (Exception e2) {
-            th = e2;
-            Fabric.getLogger().mo4292e("Fabric", "Failed to get cached settings", th);
-            return settingsData;
+        } catch (Exception e3) {
+            e = e3;
         }
     }
 
     private void logSettings(JSONObject jSONObject, String str) throws JSONException {
-        if (!CommonUtils.isClsTrace(this.kit.getContext())) {
-            jSONObject = this.settingsJsonTransform.sanitizeTraceInfo(jSONObject);
-        }
-        Fabric.getLogger().mo4289d("Fabric", str + jSONObject.toString());
+        Fabric.getLogger().mo20969d(Fabric.TAG, str + jSONObject.toString());
     }
 
-    boolean buildInstanceIdentifierChanged() {
+    /* access modifiers changed from: 0000 */
+    public boolean buildInstanceIdentifierChanged() {
         return !getStoredBuildInstanceIdentifier().equals(getBuildInstanceIdentifierFromContext());
     }
 
-    String getBuildInstanceIdentifierFromContext() {
+    /* access modifiers changed from: 0000 */
+    public String getBuildInstanceIdentifierFromContext() {
         return CommonUtils.createInstanceIdFrom(CommonUtils.resolveBuildId(this.kit.getContext()));
     }
 
-    String getStoredBuildInstanceIdentifier() {
+    /* access modifiers changed from: 0000 */
+    public String getStoredBuildInstanceIdentifier() {
         return this.preferenceStore.get().getString(PREFS_BUILD_INSTANCE_IDENTIFIER, "");
     }
 
@@ -95,58 +99,34 @@ class DefaultSettingsController implements SettingsController {
     }
 
     public SettingsData loadSettingsData(SettingsCacheBehavior settingsCacheBehavior) {
-        SettingsData settingsData;
-        Throwable e;
-        Throwable th;
-        SettingsData settingsData2 = null;
+        SettingsData settingsData = null;
+        if (!this.dataCollectionArbiter.isDataCollectionEnabled()) {
+            Fabric.getLogger().mo20969d(Fabric.TAG, "Not fetching settings, because data collection is disabled by Firebase.");
+            return null;
+        }
         try {
-            if (!(Fabric.isDebuggable() || buildInstanceIdentifierChanged())) {
-                settingsData2 = getCachedSettingsData(settingsCacheBehavior);
+            if (!Fabric.isDebuggable() && !buildInstanceIdentifierChanged()) {
+                settingsData = getCachedSettingsData(settingsCacheBehavior);
             }
-            if (settingsData2 == null) {
-                try {
-                    JSONObject invoke = this.settingsSpiCall.invoke(this.settingsRequest);
-                    if (invoke != null) {
-                        settingsData2 = this.settingsJsonTransform.buildFromJson(this.currentTimeProvider, invoke);
-                        this.cachedSettingsIo.writeCachedSettings(settingsData2.expiresAtMillis, invoke);
-                        logSettings(invoke, "Loaded settings: ");
-                        setStoredBuildInstanceIdentifier(getBuildInstanceIdentifierFromContext());
-                        settingsData = settingsData2;
-                        if (settingsData == null) {
-                            try {
-                                settingsData = getCachedSettingsData(SettingsCacheBehavior.IGNORE_CACHE_EXPIRATION);
-                            } catch (Exception e2) {
-                                e = e2;
-                                Fabric.getLogger().mo4292e("Fabric", LOAD_ERROR_MESSAGE, e);
-                                return settingsData;
-                            }
-                        }
-                        return settingsData;
-                    }
-                } catch (Throwable e3) {
-                    th = e3;
-                    settingsData = settingsData2;
-                    e = th;
-                    Fabric.getLogger().mo4292e("Fabric", LOAD_ERROR_MESSAGE, e);
-                    return settingsData;
+            if (settingsData == null) {
+                JSONObject invoke = this.settingsSpiCall.invoke(this.settingsRequest);
+                if (invoke != null) {
+                    settingsData = this.settingsJsonTransform.buildFromJson(this.currentTimeProvider, invoke);
+                    this.cachedSettingsIo.writeCachedSettings(settingsData.expiresAtMillis, invoke);
+                    logSettings(invoke, "Loaded settings: ");
+                    setStoredBuildInstanceIdentifier(getBuildInstanceIdentifierFromContext());
                 }
             }
-            settingsData = settingsData2;
-            if (settingsData == null) {
-                settingsData = getCachedSettingsData(SettingsCacheBehavior.IGNORE_CACHE_EXPIRATION);
-            }
-        } catch (Throwable e32) {
-            th = e32;
-            settingsData = null;
-            e = th;
-            Fabric.getLogger().mo4292e("Fabric", LOAD_ERROR_MESSAGE, e);
-            return settingsData;
+            return settingsData == null ? getCachedSettingsData(SettingsCacheBehavior.IGNORE_CACHE_EXPIRATION) : settingsData;
+        } catch (Exception e) {
+            Fabric.getLogger().mo20972e(Fabric.TAG, LOAD_ERROR_MESSAGE, e);
+            return null;
         }
-        return settingsData;
     }
 
+    /* access modifiers changed from: 0000 */
     @SuppressLint({"CommitPrefEdits"})
-    boolean setStoredBuildInstanceIdentifier(String str) {
+    public boolean setStoredBuildInstanceIdentifier(String str) {
         Editor edit = this.preferenceStore.edit();
         edit.putString(PREFS_BUILD_INSTANCE_IDENTIFIER, str);
         return this.preferenceStore.save(edit);

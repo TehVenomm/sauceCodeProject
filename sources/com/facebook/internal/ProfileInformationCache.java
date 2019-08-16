@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
 
 class ProfileInformationCache {
-    private static final ConcurrentHashMap<String, JSONObject> infoCache = new ConcurrentHashMap();
+    private static final ConcurrentHashMap<String, JSONObject> infoCache = new ConcurrentHashMap<>();
 
     ProfileInformationCache() {
     }

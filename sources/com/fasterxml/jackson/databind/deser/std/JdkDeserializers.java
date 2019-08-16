@@ -1,30 +1,27 @@
 package com.fasterxml.jackson.databind.deser.std;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer.Std;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class JdkDeserializers {
-    private static final HashSet<String> _classNames = new HashSet();
+    private static final HashSet<String> _classNames = new HashSet<>();
 
     static {
-        int i = 0;
         for (Class name : new Class[]{UUID.class, AtomicBoolean.class, StackTraceElement.class, ByteBuffer.class}) {
             _classNames.add(name.getName());
         }
-        Class[] types = FromStringDeserializer.types();
-        int length = types.length;
-        while (i < length) {
-            _classNames.add(types[i].getName());
-            i++;
+        for (Class name2 : FromStringDeserializer.types()) {
+            _classNames.add(name2.getName());
         }
     }
 
     public static JsonDeserializer<?> find(Class<?> cls, String str) {
         if (_classNames.contains(str)) {
-            JsonDeserializer findDeserializer = FromStringDeserializer.findDeserializer(cls);
+            Std findDeserializer = FromStringDeserializer.findDeserializer(cls);
             if (findDeserializer != null) {
                 return findDeserializer;
             }
